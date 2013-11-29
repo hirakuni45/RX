@@ -40,10 +40,10 @@ namespace device {
 	INTERRUPT_FUNC void task_SCI2_TEI_();
 	INTERRUPT_FUNC void task_SCI3_RXI_();
 	INTERRUPT_FUNC void task_SCI3_TEI_();
-	INTERRUPT_FUNC void task_SCI5_RXI_();
-	INTERRUPT_FUNC void task_SCI5_TEI_();
-	INTERRUPT_FUNC void task_SCI6_RXI_();
-	INTERRUPT_FUNC void task_SCI6_TEI_();
+//	INTERRUPT_FUNC void task_SCI5_RXI_();
+//	INTERRUPT_FUNC void task_SCI5_TEI_();
+//	INTERRUPT_FUNC void task_SCI6_RXI_();
+//	INTERRUPT_FUNC void task_SCI6_TEI_();
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -101,7 +101,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		bool set_baud(uint32_t baud, bool polling = false) {
-			uint32_t brr = F_PCK / baud / 16;
+			uint32_t brr = F_PCKB / baud / 16;
 			uint8_t cks = 0;
 			while(brr > 512) {
 				brr >>= 2;
@@ -117,8 +117,8 @@ namespace device {
 
 			uint32_t chanel = sci_.get_chanel();
 			if(polling_) {
-				ICU::IER.TEI0 = false;	// TEI0 Disable
-				ICU::IER.RXI0 = false;	// RXI0 Disable
+//				ICU::IER.TEI0 = false;	// TEI0 Disable
+//				ICU::IER.RXI0 = false;	// RXI0 Disable
 			} else {
 				sci_task_[chanel].recv = &recv_;
 				sci_task_[chanel].send = &send_;
@@ -126,31 +126,32 @@ namespace device {
 				case 0:
 					set_interrupt_task(task_SCI0_RXI_, ICU::VECTOR::RXI0);
 					set_interrupt_task(task_SCI0_TEI_, ICU::VECTOR::TEI0);
-					ICU::IER.TEI0 = true;
-					ICU::IER.RXI0 = true;
-					ICU::IPR.SCI0 = intr_level_;
+//					ICU::IER.TEI0 = true;
+//					ICU::IER.RXI0 = true;
+//					ICU::IPR.SCI0 = intr_level_;
 					break;
 				case 1:
 					set_interrupt_task(task_SCI1_RXI_, ICU::VECTOR::RXI1);
 					set_interrupt_task(task_SCI1_TEI_, ICU::VECTOR::TEI1);
-					ICU::IER.TEI1 = true;
-					ICU::IER.RXI1 = true;
-					ICU::IPR.SCI1 = intr_level_;
+//					ICU::IER.TEI1 = true;
+//					ICU::IER.RXI1 = true;
+//					ICU::IPR.SCI1 = intr_level_;
 					break;
 				case 2:
 					set_interrupt_task(task_SCI2_RXI_, ICU::VECTOR::RXI2);
 					set_interrupt_task(task_SCI2_TEI_, ICU::VECTOR::TEI2);
-					ICU::IER.TEI2 = true;
-					ICU::IER.RXI2 = true;
-					ICU::IPR.SCI2 = intr_level_;
+//					ICU::IER.TEI2 = true;
+//					ICU::IER.RXI2 = true;
+//					ICU::IPR.SCI2 = intr_level_;
 					break;
 				case 3:
 					set_interrupt_task(task_SCI3_RXI_, ICU::VECTOR::RXI3);
 					set_interrupt_task(task_SCI3_TEI_, ICU::VECTOR::TEI3);
-					ICU::IER.TEI3 = true;
-					ICU::IER.RXI3 = true;
-					ICU::IPR.SCI3 = intr_level_;
+//					ICU::IER.TEI3 = true;
+//					ICU::IER.RXI3 = true;
+//					ICU::IPR.SCI3 = intr_level_;
 					break;
+#if 0
 				case 5:
 					set_interrupt_task(task_SCI5_RXI_, ICU::VECTOR::RXI5);
 					set_interrupt_task(task_SCI5_TEI_, ICU::VECTOR::TEI5);
@@ -165,6 +166,7 @@ namespace device {
 					ICU::IER.RXI6 = true;
 					ICU::IPR.SCI6 = intr_level_;
 					break;
+#endif
 				default:
 					return false;
 				}
@@ -183,12 +185,14 @@ namespace device {
 			case 3:
 				SYSTEM::MSTPCRB.MSTPB28 = 0;	// B28 (SCI3)のストップ状態解除
 				break;
+#if 0
 			case 5:
 				SYSTEM::MSTPCRB.MSTPB26 = 0;	// B26 (SCI5)のストップ状態解除
 				break;
 			case 6:
 				SYSTEM::MSTPCRB.MSTPB25 = 0;	// B25 (SCI6)のストップ状態解除
 				break;
+#endif
 			}
 
 			// 8 bits, 1 stop bit, no parrity

@@ -9,13 +9,11 @@
 #include "system.hpp"
 #include "port.hpp"
 #include "cmt_io.hpp"
-//#include "rx62x_sci_io.hpp"
-
-#include "gpt.hpp"
+#include "sci_io.hpp"
 
 namespace root {
-device::cmt_io<device::CMT0> cmt_;
-//	device::sci_io<device::SCI0> sci_;
+	device::cmt_io<device::CMT0> cmt_;
+	device::sci_io<device::SCI1> sci_;
 }
 
 #if 0
@@ -129,7 +127,8 @@ int main(int argc, char** argv)
 
 	// 100Hz タイマー設定
 	cmt_.set_clock(F_PCKA);
-	cmt_.initialize(100, 1);
+	static const uint8_t cmt_irq_level = 1;
+	cmt_.initialize(100, cmt_irq_level);
 
 	// 「FatFs のタイマー」コールバックを設定
 //	cmt_.set_task(disk_timerproc);

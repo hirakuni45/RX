@@ -9,7 +9,7 @@
 
 namespace device {
 
-	sci_task_t sci_task_[7];
+	sci_task_t sci_task_[4];
 
 	template <class SCI, uint32_t idx>
 	void recv_task_()
@@ -124,7 +124,7 @@ namespace device {
 		send_task_<SCI3, 3>();
 	}
 
-
+#if 0
 	//-----------------------------------------------------------------//
 	/*!
 		@brief	SCI5_RXI 割り込み処理
@@ -167,5 +167,5 @@ namespace device {
 	{
 		send_task_<SCI6, 6>();
 	}
-
+#endif
 }
