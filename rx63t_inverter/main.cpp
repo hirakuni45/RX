@@ -128,6 +128,7 @@ int main(int argc, char** argv)
 //	sci_.set_baud(115200);
 
 	// 100Hz タイマー設定
+	cmt_.set_clock(F_PCKA);
 	cmt_.initialize(100, 1);
 
 	// 「FatFs のタイマー」コールバックを設定

@@ -11,11 +11,6 @@
 #include "icu.hpp"
 #include "vect.h"
 
-/// F_PCK はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCKA
-#  error "cmt_io.hpp requires F_PCKA to be defined"
-#endif
-
 namespace device {
 
 	extern void (*CMT_task[4])();
@@ -37,6 +32,8 @@ namespace device {
 
 		T	cmt_;
 
+		uint32_t	clock_;
+
 		void sleep_() { }
 
 	public:
@@ -45,7 +42,16 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		cmt_io() { }
+		cmt_io() : clock_(0) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ベースクロックの設定
+			@param[in]	clock	ベース周波数
+		*/
+		//-----------------------------------------------------------------//
+		void set_clock(uint32_t clock) { clock_ = clock; }
 
 
 		//-----------------------------------------------------------------//
@@ -57,7 +63,9 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		bool initialize(uint32_t freq, uint8_t level) const {
-			uint32_t cmcor = F_PCKA / freq / 8;
+			if(freq == 0 || clock_ == 0) return false;
+
+			uint32_t cmcor = clock_ / freq / 8;
 			uint8_t cks = 0;
 			while(cmcor > 65536) {
 				cmcor >>= 2;
@@ -152,12 +160,21 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  カウンターの値を取得
+			@brief  割り込みカウンターの値を取得
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_cnt() const {
-			return cmt_.CMCNT();
+		uint32_t get_count() const {
+			return CMT_counter[cmt_.get_chanel()];
 		}
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CMT カウンターの値を取得
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_cmt_count() const {
+			return cmt_.CMCNT();
+		}
 	};
 }
