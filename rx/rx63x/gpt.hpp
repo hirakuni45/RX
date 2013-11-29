@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX63T グループ・GPT 定義 @n
+	@brief	RX63x グループ・GPT 定義 @n
 			Copyright 2013 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
@@ -15,7 +15,7 @@ namespace device {
 		@brief  GPT 定義クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct gpt_base_t {
+	struct gpt_t {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -61,15 +61,419 @@ namespace device {
 		static gthscr_t GTHSCR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマハードウェア要因クリアコントロールレジスタ (GTHCCR)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2006> gthccr_io;
+		struct gthccr_t : public gthccr_io {
+			using gthccr_io::operator =;
+			using gthccr_io::operator ();
+			using gthccr_io::operator |=;
+			using gthccr_io::operator &=;
+
+			bits_t<gthccr_io,  0, 2>  CCHW0;
+			bits_t<gthccr_io,  2, 2>  CCHW1;
+			bits_t<gthccr_io,  4, 2>  CCHW2;
+			bits_t<gthccr_io,  6, 2>  CCHW3;
+			bit_t< gthccr_io,  8>     CCSW0;
+			bit_t< gthccr_io,  9>     CCSW1;
+			bit_t< gthccr_io, 10>     CCSW2;
+			bit_t< gthccr_io, 11>     CCSW3;
+		};
+		static gthccr_t GTHCCR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマハードウェアスタート要因セレクトレジスタ (GTHSSR)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2008> gthssr_io;
+		struct gthssr_t : public gthssr_io {
+			using gthssr_io::operator =;
+			using gthssr_io::operator ();
+			using gthssr_io::operator |=;
+			using gthssr_io::operator &=;
+
+			bits_t<gthssr_io,  0, 2>  CSHSL0;
+			bits_t<gthssr_io,  4, 2>  CSHSL1;
+			bits_t<gthssr_io,  8, 2>  CSHSL2;
+			bits_t<gthssr_io, 12, 2>  CSHSL3;
+		};
+		static gthssr_t GTHSSR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマハードウェアストップ・クリア要因セレクトレジスタ (GTHPSR)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c200a> gthpsr_io;
+		struct gthpsr_t : public gthpsr_io {
+			using gthpsr_io::operator =;
+			using gthpsr_io::operator ();
+			using gthpsr_io::operator |=;
+			using gthpsr_io::operator &=;
+
+			bits_t<gthpsr_io,  0, 2>  CSHPL0;
+			bits_t<gthpsr_io,  4, 2>  CSHPL1;
+			bits_t<gthpsr_io,  8, 2>  CSHPL2;
+			bits_t<gthpsr_io, 12, 2>  CSHPL3;
+		};
+		static gthpsr_t GTHPSR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマ書き込み保護レジスタ (GTWP)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c200c> gtwp_io;
+		struct gtwp_t : public gtwp_io {
+			using gtwp_io::operator =;
+			using gtwp_io::operator ();
+			using gtwp_io::operator |=;
+			using gtwp_io::operator &=;
+
+			bit_t<gtwp_io, 0>    WP0;
+			bit_t<gtwp_io, 1>    WP1;
+			bit_t<gtwp_io, 2>    WP2;
+			bit_t<gtwp_io, 3>    WP3;
+		};
+		static gtwp_t GTWP;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマシンクロレジスタ (GTSYNC)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c200e> gtsync_io;
+		struct gtsync_t : public gtsync_io {
+			using gtsync_io::operator =;
+			using gtsync_io::operator ();
+			using gtsync_io::operator |=;
+			using gtsync_io::operator &=;
+
+			bits_t<gtsync_io,  0, 2>  SYNC0;
+			bits_t<gtsync_io,  4, 2>  SYNC1;
+			bits_t<gtsync_io,  8, 2>  SYNC2;
+			bits_t<gtsync_io, 12, 2>  SYNC3;
+		};
+		static gtsync_t GTSYNC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマ外部トリガ入力割り込みレジスタ (GTETINT)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2010> gtetint_io;
+		struct gtetint_t : public gtetint_io {
+			using gtetint_io::operator =;
+			using gtetint_io::operator ();
+			using gtetint_io::operator |=;
+			using gtetint_io::operator &=;
+
+			bit_t<gtetint_io, 0>    ETIPEN;
+			bit_t<gtetint_io, 1>    ETINEN;
+			bit_t<gtetint_io, 8>    ETIPF;
+			bit_t<gtetint_io, 9>    ETINF;
+		};
+		static gtetint_t GTETINT;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマバッファ動作禁止レジスタ (GTBDR)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2014> gtbdr_io;
+		struct gtbdr_t : public gtbdr_io {
+			using gtbdr_io::operator =;
+			using gtbdr_io::operator ();
+			using gtbdr_io::operator |=;
+			using gtbdr_io::operator &=;
+
+			bit_t<gtbdr_io,  0>    BD0_0;
+			bit_t<gtbdr_io,  1>    BD0_1;
+			bit_t<gtbdr_io,  2>    BD0_2;
+			bit_t<gtbdr_io,  3>    BD0_3;
+			bit_t<gtbdr_io,  4>    BD1_0;
+			bit_t<gtbdr_io,  5>    BD1_1;
+			bit_t<gtbdr_io,  6>    BD1_2;
+			bit_t<gtbdr_io,  7>    BD1_3;
+			bit_t<gtbdr_io,  8>    BD2_0;
+			bit_t<gtbdr_io,  9>    BD2_1;
+			bit_t<gtbdr_io, 10>    BD2_2;
+			bit_t<gtbdr_io, 11>    BD2_3;
+			bit_t<gtbdr_io, 12>    BD3_0;
+			bit_t<gtbdr_io, 13>    BD3_1;
+			bit_t<gtbdr_io, 14>    BD3_2;
+			bit_t<gtbdr_io, 15>    BD3_3;
+		};
+		static gtbdr_t GTBDR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマスタート書き込み保護レジスタ (GTSWP)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2018> gtswp_io;
+		struct gtswp_t : public gtswp_io {
+			using gtswp_io::operator =;
+			using gtswp_io::operator ();
+			using gtswp_io::operator |=;
+			using gtswp_io::operator &=;
+
+			bit_t<gtswp_io, 0>    SWP0;
+			bit_t<gtswp_io, 1>    SWP1;
+			bit_t<gtswp_io, 2>    SWP2;
+			bit_t<gtswp_io, 3>    SWP3;
+		};
+		static gtswp_t GTSWP;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウントコントロールレジスタ (LCCR)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2080> lccr_io;
+		struct lccr_t : public lccr_io {
+			using lccr_io::operator =;
+			using lccr_io::operator ();
+			using lccr_io::operator |=;
+			using lccr_io::operator &=;
+
+			bit_t< lccr_io,  0>    LCNTE;
+			bit_t< lccr_io,  1>    LCNTCR;
+			bit_t< lccr_io,  2>    LCNTS;
+			bit_t< lccr_io,  4>    LCINTC;
+			bit_t< lccr_io,  5>    LCINTD;
+			bit_t< lccr_io,  6>    LCINTO;
+			bits_t<lccr_io,  8, 3> LCTO;
+			bit_t< lccr_io, 11>    LCNTAT;
+			bits_t<lccr_io, 12, 2> TPSC;
+			bits_t<lccr_io, 14, 2> LPSC;
+		};
+		static lccr_t LCCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウントステータスレジスタ (LCCR)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2082> lcst_io;
+		struct lcst_t : public lcst_io {
+			using lcst_io::operator =;
+			using lcst_io::operator ();
+			using lcst_io::operator |=;
+			using lcst_io::operator &=;
+
+			bit_t< lcst_io,  0>    LISC;
+			bit_t< lcst_io,  1>    LISD;
+			bit_t< lcst_io,  2>    LISO;
+		};
+		static lcst_t LCST;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウント値レジスタ (LCNT)
+		*/
+		//-----------------------------------------------------------------//
+		static io16<0x000c2084> LCNT;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウント結果平均レジスタ (LCNTA)
+		*/
+		//-----------------------------------------------------------------//
+		static io16<0x000c2086> LCNTA;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウント結果レジスタｎ (LCNTn)(n=00..15)
+		*/
+		//-----------------------------------------------------------------//
+		static io16<0x000c2088> LCNT00;
+		static io16<0x000c208a> LCNT01;
+		static io16<0x000c208c> LCNT02;
+		static io16<0x000c208e> LCNT03;
+		static io16<0x000c2090> LCNT04;
+		static io16<0x000c2092> LCNT05;
+		static io16<0x000c2094> LCNT06;
+		static io16<0x000c2096> LCNT07;
+		static io16<0x000c2098> LCNT08;
+		static io16<0x000c209a> LCNT09;
+		static io16<0x000c209c> LCNT10;
+		static io16<0x000c209e> LCNT11;
+		static io16<0x000c20a0> LCNT12;
+		static io16<0x000c20a2> LCNT13;
+		static io16<0x000c20a4> LCNT14;
+		static io16<0x000c20a6> LCNT15;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウント上限／下限許容偏差レジスタ (LCNTDU, LCNTDL)
+		*/
+		//-----------------------------------------------------------------//
+		static io16<0x000c20a8> LCNTDU;
+		static io16<0x000c20aa> LCNTDL;
 
 	};
-	static gpt_base_t GPT;
+	static gpt_t GPT;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  GPT 定義クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct gptb_t {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマ書き込み保護レジスタ (GTWP)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c280c> gtwp_io;
+		struct gtwp_t : public gtwp_io {
+			using gtwp_io::operator =;
+			using gtwp_io::operator ();
+			using gtwp_io::operator |=;
+			using gtwp_io::operator &=;
+
+			bit_t<gtwp_io, 0>    WP4;
+			bit_t<gtwp_io, 1>    WP5;
+			bit_t<gtwp_io, 2>    WP6;
+			bit_t<gtwp_io, 3>    WP7;
+		};
+		static gtwp_t GTWP;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマスタート書き込み保護レジスタ (GTSWP)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2818> gtswp_io;
+		struct gtswp_t : public gtswp_io {
+			using gtswp_io::operator =;
+			using gtswp_io::operator ();
+			using gtswp_io::operator |=;
+			using gtswp_io::operator &=;
+
+			bit_t<gtswp_io, 0>    SWP4;
+			bit_t<gtswp_io, 1>    SWP5;
+			bit_t<gtswp_io, 2>    SWP6;
+			bit_t<gtswp_io, 3>    SWP7;
+		};
+		static gtswp_t GTSWP;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウントコントロールレジスタ (LCCR)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2880> lccr_io;
+		struct lccr_t : public lccr_io {
+			using lccr_io::operator =;
+			using lccr_io::operator ();
+			using lccr_io::operator |=;
+			using lccr_io::operator &=;
+
+			bit_t< lccr_io,  0>    LCNTE;
+			bit_t< lccr_io,  1>    LCNTCR;
+			bit_t< lccr_io,  2>    LCNTS;
+			bit_t< lccr_io,  4>    LCINTC;
+			bit_t< lccr_io,  5>    LCINTD;
+			bit_t< lccr_io,  6>    LCINTO;
+			bits_t<lccr_io,  8, 3> LCTO;
+			bit_t< lccr_io, 11>    LCNTAT;
+			bits_t<lccr_io, 12, 2> TPSC;
+			bits_t<lccr_io, 14, 2> LPSC;
+		};
+		static lccr_t LCCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウントステータスレジスタ (LCCR)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2882> lcst_io;
+		struct lcst_t : public lcst_io {
+			using lcst_io::operator =;
+			using lcst_io::operator ();
+			using lcst_io::operator |=;
+			using lcst_io::operator &=;
+
+			bit_t< lcst_io,  0>    LISC;
+			bit_t< lcst_io,  1>    LISD;
+			bit_t< lcst_io,  2>    LISO;
+		};
+		static lcst_t LCST;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウント値レジスタ (LCNT)
+		*/
+		//-----------------------------------------------------------------//
+		static io16<0x000c2884> LCNT;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウント結果平均レジスタ (LCNTA)
+		*/
+		//-----------------------------------------------------------------//
+		static io16<0x000c2886> LCNTA;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウント結果レジスタｎ (LCNTn)(n=00..15)
+		*/
+		//-----------------------------------------------------------------//
+		static io16<0x000c2888> LCNT00;
+		static io16<0x000c288a> LCNT01;
+		static io16<0x000c288c> LCNT02;
+		static io16<0x000c288e> LCNT03;
+		static io16<0x000c2890> LCNT04;
+		static io16<0x000c2892> LCNT05;
+		static io16<0x000c2894> LCNT06;
+		static io16<0x000c2896> LCNT07;
+		static io16<0x000c2898> LCNT08;
+		static io16<0x000c289a> LCNT09;
+		static io16<0x000c289c> LCNT10;
+		static io16<0x000c289e> LCNT11;
+		static io16<0x000c28a0> LCNT12;
+		static io16<0x000c28a2> LCNT13;
+		static io16<0x000c28a4> LCNT14;
+		static io16<0x000c28a6> LCNT15;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  LOCO カウント上限／下限許容偏差レジスタ (LCNTDU, LCNTDL)
+		*/
+		//-----------------------------------------------------------------//
+		static io16<0x000c28a8> LCNTDU;
+		static io16<0x000c28aa> LCNTDL;
+
+	};
+	static gptb_t GPTB;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -79,7 +483,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base>
-	struct gpt_t {
+	struct gptn_t {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -415,12 +819,12 @@ namespace device {
 		static gtsos_t GTSOTR;
 
 	};
-	typedef gpt_t<0x000c2100> GPT0;
-	typedef gpt_t<0x000c2180> GPT1;
-	typedef gpt_t<0x000c2200> GPT2;
-	typedef gpt_t<0x000c2280> GPT3;
-	typedef gpt_t<0x000c2900> GPT4;
-	typedef gpt_t<0x000c2980> GPT5;
-	typedef gpt_t<0x000c2a00> GPT6;
-	typedef gpt_t<0x000c2a80> GPT7;
+	typedef gptn_t<0x000c2100> GPT0;
+	typedef gptn_t<0x000c2180> GPT1;
+	typedef gptn_t<0x000c2200> GPT2;
+	typedef gptn_t<0x000c2280> GPT3;
+	typedef gptn_t<0x000c2900> GPT4;
+	typedef gptn_t<0x000c2980> GPT5;
+	typedef gptn_t<0x000c2a00> GPT6;
+	typedef gptn_t<0x000c2a80> GPT7;
 }

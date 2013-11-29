@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX63T グループ D/A コンバーター定義 @n
+	@brief	RX63x グループ D/A コンバーター定義 @n
 			Copyright 2013 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
