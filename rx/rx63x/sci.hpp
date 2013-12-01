@@ -6,7 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "io_utils.hpp"
+#include "../io_utils.hpp"
 
 namespace device {
 
@@ -31,13 +31,13 @@ namespace device {
 			using smr_io::operator |=;
 			using smr_io::operator &=;
 
-			bits_t<smr_io, 0, 2>	CKS;
-			bit_t<smr_io, 2>	MP;
-			bit_t<smr_io, 3>	STOP;
-			bit_t<smr_io, 4>	PM;
-			bit_t<smr_io, 5>	PE;
-			bit_t<smr_io, 6>	CHR;
-			bit_t<smr_io, 7>	CM;
+			bits_t<smr_io, 0, 2>  CKS;
+			bit_t< smr_io, 2>	  MP;
+			bit_t< smr_io, 3>	  STOP;
+			bit_t< smr_io, 4>	  PM;
+			bit_t< smr_io, 5>	  PE;
+			bit_t< smr_io, 6>	  CHR;
+			bit_t< smr_io, 7>	  CM;
 		};
 		static smr_t SMR;
 
@@ -47,7 +47,7 @@ namespace device {
 			@brief  ビットレートレジスタ (BRR)
 		*/
 		//-----------------------------------------------------------------//
-		io8<base + 0x01> BRR;
+		static io8<base + 0x01> BRR;
 
 
 		//-----------------------------------------------------------------//
@@ -63,12 +63,12 @@ namespace device {
 			using scr_io::operator &=;
 
 			bits_t<scr_io, 0, 2>	CKE;
-			bit_t<scr_io, 2>	TEIE;
-			bit_t<scr_io, 3>	MPIE;
-			bit_t<scr_io, 4>	RE;
-			bit_t<scr_io, 5>	TE;
-			bit_t<scr_io, 6>	RIE;
-			bit_t<scr_io, 7>	TIE;
+			bit_t< scr_io, 2>	TEIE;
+			bit_t< scr_io, 3>	MPIE;
+			bit_t< scr_io, 4>	RE;
+			bit_t< scr_io, 5>	TE;
+			bit_t< scr_io, 6>	RIE;
+			bit_t< scr_io, 7>	TIE;
 		};
 		static scr_t SCR;
 
@@ -78,7 +78,7 @@ namespace device {
 			@brief  トランスミットデータレジスタ (TDR)
 		*/
 		//-----------------------------------------------------------------//
-		io8<base + 0x03> TDR;
+		static io8<base + 0x03> TDR;
 
 
 		//-----------------------------------------------------------------//
@@ -109,7 +109,7 @@ namespace device {
 			@brief  レシーブデータレジスタ (RDR)
 		*/
 		//-----------------------------------------------------------------//
-		io8<base + 0x05> RDR;
+		static io8_ro<base + 0x05> RDR;
 
 
 		//-----------------------------------------------------------------//

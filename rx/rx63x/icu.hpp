@@ -6,7 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "io_utils.hpp"
+#include "../io_utils.hpp"
 
 namespace device {
 
@@ -256,6 +256,21 @@ namespace device {
 			io8<base + 70> IRQ6;
 			io8<base + 71> IRQ7;
 
+			io8<base + 214> RXI0;
+			io8<base + 215> TXI0;
+			io8<base + 216> TEI0;
+
+			io8<base + 217> RXI1;
+			io8<base + 218> TXI1;
+			io8<base + 219> TEI1;
+
+			io8<base + 220> RXI2;
+			io8<base + 221> TXI2;
+			io8<base + 222> TEI2;
+
+			io8<base + 223> RXI3;
+			io8<base + 224> TXI3;
+			io8<base + 225> TEI3;
 
 			io8<base + 226> GTCIA0;
 			io8<base + 227> GTCIB0;
@@ -314,7 +329,21 @@ namespace device {
 			bit_t<ier08, 6>	IRQ6;
 			bit_t<ier08, 7>	IRQ7;
 
+			typedef io8<base + 0x1a> ier1a;
+			bit_t<ier1a, 6>	RXI0;
+			bit_t<ier1a, 7>	TXI0;
+			typedef io8<base + 0x1b> ier1b;
+			bit_t<ier1b, 0>	TEI0;
+			bit_t<ier1b, 1>	RXI1;
+			bit_t<ier1b, 2>	TXI1;
+			bit_t<ier1b, 3>	TEI1;
+			bit_t<ier1b, 4>	RXI2;
+			bit_t<ier1b, 5>	TXI2;
+			bit_t<ier1b, 6>	TEI2;
+			bit_t<ier1b, 7>	RXI3;
 			typedef io8<base + 0x1c> ier1c;
+			bit_t<ier1c, 0>	TXI3;
+			bit_t<ier1c, 1>	TEI3;
 			bit_t<ier1c, 2>	GTCIA0;
 			bit_t<ier1c, 3>	GTCIB0;
 			bit_t<ier1c, 4>	GTCIC0;
@@ -324,22 +353,22 @@ namespace device {
 
 			typedef io8<base + 0x1d> ier1d;
 			bit_t<ier1d, 0>	GTCIA1;
-			bit_t<ier1c, 1>	GTCIB1;
-			bit_t<ier1c, 2>	GTCIC1;
-			bit_t<ier1c, 3>	GTCIE1;
-			bit_t<ier1c, 4>	GTCIV1;
+			bit_t<ier1d, 1>	GTCIB1;
+			bit_t<ier1d, 2>	GTCIC1;
+			bit_t<ier1d, 3>	GTCIE1;
+			bit_t<ier1d, 4>	GTCIV1;
 
-			bit_t<ier1c, 6>	GTCIA2;
-			bit_t<ier1c, 7>	GTCIB2;
+			bit_t<ier1d, 6>	GTCIA2;
+			bit_t<ier1d, 7>	GTCIB2;
 			typedef io8<base + 0x1e> ier1e;
-			bit_t<ier1d, 0>	GTCIC2;
-			bit_t<ier1d, 1>	GTCIE2;
-			bit_t<ier1d, 2>	GTCIV2;
+			bit_t<ier1e, 0>	GTCIC2;
+			bit_t<ier1e, 1>	GTCIE2;
+			bit_t<ier1e, 2>	GTCIV2;
 
-			bit_t<ier1d, 4>	GTCIA3;
-			bit_t<ier1d, 5>	GTCIB3;
-			bit_t<ier1d, 6>	GTCIC3;
-			bit_t<ier1d, 7>	GTCIE3;
+			bit_t<ier1e, 4>	GTCIA3;
+			bit_t<ier1e, 5>	GTCIB3;
+			bit_t<ier1e, 6>	GTCIC3;
+			bit_t<ier1e, 7>	GTCIE3;
 			typedef io8<base + 0x1f> ier1f;
 			bit_t<ier1f, 0>	GTCIV3;
 		};
@@ -374,6 +403,11 @@ namespace device {
 			io8<base + 69> IRQ5;
 			io8<base + 70> IRQ6;
 			io8<base + 71> IRQ7;
+
+			io8<base + 214> SCI0;
+			io8<base + 217> SCI1;
+			io8<base + 220> SCI2;
+			io8<base + 223> SCI3;
 
 			io8<base + 226> GTCIA0;
 			io8<base + 226> GTCIB0;

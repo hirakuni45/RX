@@ -6,7 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "io_utils.hpp"
+#include "../io_utils.hpp"
 
 namespace device {
 
