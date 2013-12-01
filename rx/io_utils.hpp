@@ -104,6 +104,22 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  8 bits アクセス・テンプレート(RO)
+		@param[in]	adr	アドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t adr>
+	struct io8_ro {
+		typedef uint8_t value_type;
+
+		static uint8_t read() { return rd8_(adr); }
+
+		value_type operator () () const { return read(); }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  16 bits アクセス・テンプレート
 		@param[in]	adr	アドレス
 	*/

@@ -6,11 +6,11 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "sci.hpp"
+#include "rx63x/sci.hpp"
 #include "fifo.hpp"
-#include "system.hpp"
-#include "icu.hpp"
-#include "port.hpp"
+#include "rx63x/system.hpp"
+#include "rx63x/icu.hpp"
+#include "rx63x/port.hpp"
 #include "vect.h"
 
 /// F_PCK はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
@@ -40,10 +40,6 @@ namespace device {
 	INTERRUPT_FUNC void task_SCI2_TEI_();
 	INTERRUPT_FUNC void task_SCI3_RXI_();
 	INTERRUPT_FUNC void task_SCI3_TEI_();
-//	INTERRUPT_FUNC void task_SCI5_RXI_();
-//	INTERRUPT_FUNC void task_SCI5_TEI_();
-//	INTERRUPT_FUNC void task_SCI6_RXI_();
-//	INTERRUPT_FUNC void task_SCI6_TEI_();
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -73,7 +69,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		sci_io() : intr_level_(2), crlf_(true), polling_(false) { }
+		sci_io() : intr_level_(1), crlf_(true), polling_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -100,7 +96,9 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool set_baud(uint32_t baud, bool polling = false) {
+		bool start(uint32_t baud, bool polling = false) {
+			polling_ = polling;
+
 			uint32_t brr = F_PCKB / baud / 16;
 			uint8_t cks = 0;
 			while(brr > 512) {
@@ -111,67 +109,7 @@ namespace device {
 			bool abcs = true;
 			if(brr > 256) { brr /= 2; abcs = false; }
 
-			polling_ = polling;
-
-			sci_.SCR = 0x00;			// TE, RE disable.
-
 			uint32_t chanel = sci_.get_chanel();
-			if(polling_) {
-//				ICU::IER.TEI0 = false;	// TEI0 Disable
-//				ICU::IER.RXI0 = false;	// RXI0 Disable
-			} else {
-				sci_task_[chanel].recv = &recv_;
-				sci_task_[chanel].send = &send_;
-				switch(chanel) {
-				case 0:
-					set_interrupt_task(task_SCI0_RXI_, ICU::VECTOR::RXI0);
-					set_interrupt_task(task_SCI0_TEI_, ICU::VECTOR::TEI0);
-//					ICU::IER.TEI0 = true;
-//					ICU::IER.RXI0 = true;
-//					ICU::IPR.SCI0 = intr_level_;
-					break;
-				case 1:
-					set_interrupt_task(task_SCI1_RXI_, ICU::VECTOR::RXI1);
-					set_interrupt_task(task_SCI1_TEI_, ICU::VECTOR::TEI1);
-//					ICU::IER.TEI1 = true;
-//					ICU::IER.RXI1 = true;
-//					ICU::IPR.SCI1 = intr_level_;
-					break;
-				case 2:
-					set_interrupt_task(task_SCI2_RXI_, ICU::VECTOR::RXI2);
-					set_interrupt_task(task_SCI2_TEI_, ICU::VECTOR::TEI2);
-//					ICU::IER.TEI2 = true;
-//					ICU::IER.RXI2 = true;
-//					ICU::IPR.SCI2 = intr_level_;
-					break;
-				case 3:
-					set_interrupt_task(task_SCI3_RXI_, ICU::VECTOR::RXI3);
-					set_interrupt_task(task_SCI3_TEI_, ICU::VECTOR::TEI3);
-//					ICU::IER.TEI3 = true;
-//					ICU::IER.RXI3 = true;
-//					ICU::IPR.SCI3 = intr_level_;
-					break;
-#if 0
-				case 5:
-					set_interrupt_task(task_SCI5_RXI_, ICU::VECTOR::RXI5);
-					set_interrupt_task(task_SCI5_TEI_, ICU::VECTOR::TEI5);
-					ICU::IER.TEI5 = true;
-					ICU::IER.RXI5 = true;
-					ICU::IPR.SCI5 = intr_level_;
-					break;
-				case 6:
-					set_interrupt_task(task_SCI6_RXI_, ICU::VECTOR::RXI6);
-					set_interrupt_task(task_SCI6_TEI_, ICU::VECTOR::TEI6);
-					ICU::IER.TEI6 = true;
-					ICU::IER.RXI6 = true;
-					ICU::IPR.SCI6 = intr_level_;
-					break;
-#endif
-				default:
-					return false;
-				}
-			}
-
 			switch(chanel) {
 			case 0:
 				SYSTEM::MSTPCRB.MSTPB31 = 0;	// B31 (SCI0)のストップ状態解除
@@ -185,17 +123,73 @@ namespace device {
 			case 3:
 				SYSTEM::MSTPCRB.MSTPB28 = 0;	// B28 (SCI3)のストップ状態解除
 				break;
-#if 0
-			case 5:
-				SYSTEM::MSTPCRB.MSTPB26 = 0;	// B26 (SCI5)のストップ状態解除
-				break;
-			case 6:
-				SYSTEM::MSTPCRB.MSTPB25 = 0;	// B25 (SCI6)のストップ状態解除
-				break;
-#endif
 			}
 
-			// 8 bits, 1 stop bit, no parrity
+			sci_.SCR = 0x00;			// TE, RE disable.
+
+			if(polling_) {
+				switch(chanel) {
+				case 0:
+					ICU::IER.TEI0 = false;
+					ICU::IER.RXI0 = false;
+					break;
+				case 1:
+					ICU::IER.TEI1 = false;
+					ICU::IER.RXI1 = false;
+					break;
+				case 2:
+					ICU::IER.TEI2 = false;
+					ICU::IER.RXI2 = false;
+					break;
+				case 3:
+					ICU::IER.TEI3 = false;
+					ICU::IER.RXI3 = false;
+					break;
+				default:
+					return false;
+				}
+			} else {
+				sci_task_[chanel].recv = &recv_;
+				sci_task_[chanel].send = &send_;
+				switch(chanel) {
+				case 0:
+					set_interrupt_task(task_SCI0_RXI_, ICU::VECTOR::RXI0);
+					set_interrupt_task(task_SCI0_TEI_, ICU::VECTOR::TEI0);
+					ICU::IR.RXI0 = 0;
+					ICU::IER.RXI0 = true;
+					ICU::IER.TEI0 = true;
+					ICU::IPR.SCI0 = intr_level_;
+					break;
+				case 1:
+					set_interrupt_task(task_SCI1_RXI_, ICU::VECTOR::RXI1);
+					set_interrupt_task(task_SCI1_TEI_, ICU::VECTOR::TEI1);
+///					ICU::IR.RXI1 = 0;
+					ICU::IER.RXI1 = true;
+					ICU::IER.TEI1 = true;
+					ICU::IPR.SCI1 = intr_level_;
+					break;
+				case 2:
+					set_interrupt_task(task_SCI2_RXI_, ICU::VECTOR::RXI2);
+					set_interrupt_task(task_SCI2_TEI_, ICU::VECTOR::TEI2);
+					ICU::IR.RXI2 = 0;
+					ICU::IER.RXI2 = true;
+					ICU::IER.TEI2 = true;
+					ICU::IPR.SCI2 = intr_level_;
+					break;
+				case 3:
+					set_interrupt_task(task_SCI3_RXI_, ICU::VECTOR::RXI3);
+					set_interrupt_task(task_SCI3_TEI_, ICU::VECTOR::TEI3);
+					ICU::IR.RXI3 = 0;
+					ICU::IER.RXI3 = true;
+					ICU::IER.TEI3 = true;
+					ICU::IPR.SCI3 = intr_level_;
+					break;
+				default:
+					return false;
+				}
+			}
+
+			// 8 bits, 1 stop bit, no-parrity
 			sci_.SMR = cks;
 			sci_.SEMR.ABCS = abcs;
 			sci_.BRR = static_cast<uint8_t>(brr - 1);
@@ -258,11 +252,11 @@ namespace device {
 				if(sts & (sci_.SSR.FER.b() | sci_.SSR.PER.b())) {
 					err = true;
 				}
-				if((sts & sci_.SSR.RDRF.b()) != 0 && err == 0) {
+//				if((sts & sci_.SSR.RDRF.b()) != 0 && err == 0) {
 					return 1;	///< 受信データあり
-				} else {
-					return 0;	///< 受信データなし
-				}
+//				} else {
+//					return 0;	///< 受信データなし
+//				}
 			} else {
 				return recv_.length();
 			}
@@ -280,7 +274,7 @@ namespace device {
 				char ch;
 				while(length() == 0) sleep_();
 				ch = sci_.RDR();		///< 受信データ読み出し
-				sci_.SSR.RDRF = 0;	///< 受信フラグクリア
+///				sci_.SSR.RDRF = 0;	///< 受信フラグクリア
 				return ch;
 			} else {
 				while(recv_.length() == 0) sleep_();

@@ -7,8 +7,8 @@
 */
 //=====================================================================//
 #include "cmt.hpp"
-#include "system.hpp"
-#include "icu.hpp"
+#include "rx63x/system.hpp"
+#include "rx63x/icu.hpp"
 #include "vect.h"
 
 namespace device {
