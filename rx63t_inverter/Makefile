@@ -11,7 +11,10 @@ CSOURCES	=	vect.c \
 				init.c
 
 PSOURCES	=	main.cpp \
-				../rx/cmt_io.cpp
+				../rx/cmt_io.cpp \
+				../rx/sci_io.cpp \
+				inv_monitor.cpp
+
 
 USER_LIBS	=	stdc++
 
@@ -23,7 +26,7 @@ USER_DEFS	=	F_PCKA=96000000 F_PCKB=48000000
 MCU_TARGET	=
 
 INC_SYS		=	/usr/boost_1_53_0
-INC_ROOT	=	./ ../rx ../rx/rx63x
+INC_ROOT	=	./ ../
 LIB_ROOT	=	/usr/tkdn-20110720/rx-elf/rx-elf/lib
 
 #OPTIMIZE	=	-O0
@@ -40,7 +43,7 @@ CC_OPT		=	-Wall \
 # DEBUG_OPT	=	-Wall
 
 INCS		=	$(addprefix -I, $(INC_ROOT))
-INC_DEP		=	$(addprefix -I, $(INC_SYS))
+INC_DEP		=	$(addprefix -I, $(INC_ROOT))
 LIBINCS		=	$(addprefix -L, $(LIB_ROOT))
 DEFS		=	$(addprefix -D, $(USER_DEFS))
 LIBS		=	$(addprefix -l, $(USER_LIBS))
@@ -134,5 +137,15 @@ tarball:
 # DO NOT DELETE
 
 vect.o: vect.h
-main.o: main.hpp
-../rx/cmt_io.o: ../rx/cmt_io.hpp ../rx/cmt.hpp ../rx/io_utils.hpp vect.h
+main.o: main.hpp ../rx/rx63x/system.hpp ../rx/io_utils.hpp
+main.o: ../rx/rx63x/port.hpp ../rx/rx63x/mpc.hpp ../rx/cmt_io.hpp
+main.o: ../rx/cmt.hpp ../rx/io_utils.hpp ../rx/rx63x/system.hpp
+main.o: ../rx/rx63x/icu.hpp vect.h ../rx/sci_io.hpp ../rx/rx63x/sci.hpp
+main.o: ../rx/fifo.hpp inv_monitor.hpp command.hpp
+../rx/cmt_io.o: ../rx/cmt_io.hpp ../rx/cmt.hpp ../rx/io_utils.hpp
+../rx/cmt_io.o: ../rx/rx63x/system.hpp ../rx/io_utils.hpp ../rx/rx63x/icu.hpp
+../rx/cmt_io.o: vect.h
+../rx/sci_io.o: ../rx/sci_io.hpp ../rx/rx63x/sci.hpp ../rx/io_utils.hpp
+../rx/sci_io.o: ../rx/fifo.hpp ../rx/rx63x/system.hpp ../rx/rx63x/icu.hpp
+../rx/sci_io.o: vect.h
+inv_monitor.o: inv_monitor.hpp command.hpp main.hpp
