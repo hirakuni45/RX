@@ -9,7 +9,11 @@
 
 namespace device {
 
+#ifndef DEV_64
 	sci_task_t sci_task_[4];
+#else
+	sci_task_t sci_task_[2];
+#endif
 
 	template <class SCI, uint32_t idx>
 	void recv_task_()
@@ -25,6 +29,7 @@ namespace device {
 		}
 		if(!err) sci_task_[idx].recv->put(SCI::RDR());
 	}
+
 
 	template <class SCI, uint32_t idx>
 	void send_task_()
@@ -65,7 +70,6 @@ namespace device {
 	//-----------------------------------------------------------------//
 	INTERRUPT_FUNC void task_SCI1_RXI_()
 	{
-// device::PORTB::PODR.B7 = 0;
 		recv_task_<SCI1, 1>();
 	}
 
@@ -77,11 +81,10 @@ namespace device {
 	//-----------------------------------------------------------------//
 	INTERRUPT_FUNC void task_SCI1_TEI_()
 	{
-// device::PORTB::PODR.B7 = 0;
 		send_task_<SCI1, 1>();
 	}
 
-
+#ifndef DEV_64
 	//-----------------------------------------------------------------//
 	/*!
 		@brief	SCI2_RXI 割り込み処理
@@ -124,4 +127,5 @@ namespace device {
 	{
 		send_task_<SCI3, 3>();
 	}
+#endif
 }

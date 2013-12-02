@@ -1,24 +1,29 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX62N, RX621 グループ・SCI I/O 制御 @n
+	@brief	RX グループ・SCI I/O 制御 @n
 			Copyright 2013 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "rx63x/sci.hpp"
-#include "fifo.hpp"
 #include "rx63x/system.hpp"
 #include "rx63x/icu.hpp"
-#include "rx63x/port.hpp"
 #include "vect.h"
+#include "fifo.hpp"
 
-/// F_PCK はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
+/// F_PCKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCKB
 #  error "sci_io.hpp requires F_PCKB to be defined"
 #endif
 
+// 64ピンデバイスの場合指定
+#define DEV_64
+
 namespace device {
+
+	static const uint32_t recv_size = 256;
+	static const uint32_t send_size = 128;
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -26,8 +31,8 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct sci_task_t {
-		utility::fifo* send;
-		utility::fifo* recv;
+		utils::fifo<recv_size>* recv;
+		utils::fifo<send_size>* send;
 	};
 
 	extern sci_task_t sci_task_[];
@@ -36,16 +41,17 @@ namespace device {
 	INTERRUPT_FUNC void task_SCI0_TEI_();
 	INTERRUPT_FUNC void task_SCI1_RXI_();
 	INTERRUPT_FUNC void task_SCI1_TEI_();
+#ifndef DEV_64
 	INTERRUPT_FUNC void task_SCI2_RXI_();
 	INTERRUPT_FUNC void task_SCI2_TEI_();
 	INTERRUPT_FUNC void task_SCI3_RXI_();
 	INTERRUPT_FUNC void task_SCI3_TEI_();
-
+#endif
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCI I/O 制御クラス
-		@param[in]	T	SCIx I/O クラス
+		@param[in]	SCI	SCIx 定義クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SCI>
@@ -53,8 +59,8 @@ namespace device {
 
 		SCI	sci_;
 
-		utility::fifo	recv_;
-		utility::fifo	send_;
+		utils::fifo<recv_size>	recv_;
+		utils::fifo<send_size>	send_;
 
 		uint8_t	intr_level_;
 		bool	crlf_;
@@ -76,14 +82,10 @@ namespace device {
 		/*!
 			@brief  初期化 @n
 					※ポーリングの場合は設定しなくても良い
-			@param[in]	recv_size	受信バッファサイズ
-			@param[in]	send_size	送信バッファサイズ
 			@param[in]	level	割り込みレベル
 		*/
 		//-----------------------------------------------------------------//
-		void initialize(uint32_t recv_size, uint32_t send_size, uint32_t level) {
-			recv_.initialize(recv_size);
-			send_.initialize(send_size);
+		void initialize(uint32_t level) {
 			intr_level_ = level;
 		}
 
@@ -117,12 +119,14 @@ namespace device {
 			case 1:
 				SYSTEM::MSTPCRB.MSTPB30 = 0;	// B30 (SCI1)のストップ状態解除
 				break;
+#ifndef DEV_64
 			case 2:
 				SYSTEM::MSTPCRB.MSTPB29 = 0;	// B29 (SCI2)のストップ状態解除
 				break;
 			case 3:
 				SYSTEM::MSTPCRB.MSTPB28 = 0;	// B28 (SCI3)のストップ状態解除
 				break;
+#endif
 			}
 
 			sci_.SCR = 0x00;			// TE, RE disable.
@@ -137,6 +141,7 @@ namespace device {
 					ICU::IER.TEI1 = false;
 					ICU::IER.RXI1 = false;
 					break;
+#ifndef DEV_64
 				case 2:
 					ICU::IER.TEI2 = false;
 					ICU::IER.RXI2 = false;
@@ -145,6 +150,7 @@ namespace device {
 					ICU::IER.TEI3 = false;
 					ICU::IER.RXI3 = false;
 					break;
+#endif
 				default:
 					return false;
 				}
@@ -168,6 +174,7 @@ namespace device {
 					ICU::IER.TEI1 = true;
 					ICU::IPR.SCI1 = intr_level_;
 					break;
+#ifndef DEV_64
 				case 2:
 					set_interrupt_task(task_SCI2_RXI_, ICU::VECTOR::RXI2);
 					set_interrupt_task(task_SCI2_TEI_, ICU::VECTOR::TEI2);
@@ -184,6 +191,7 @@ namespace device {
 					ICU::IER.TEI3 = true;
 					ICU::IPR.SCI3 = intr_level_;
 					break;
+#endif
 				default:
 					return false;
 				}
