@@ -13,28 +13,26 @@
 
 namespace device {
 
-	extern void (*CMT_task[4])();
-	extern volatile uint32_t CMT_counter[4];
-
-	INTERRUPT_FUNC void task_CMT0();
-	INTERRUPT_FUNC void task_CMT1();
-	INTERRUPT_FUNC void task_CMT2();
-	INTERRUPT_FUNC void task_CMT3();
-
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  CMT I/O クラス
-		@param[in]	T	CMT クラス
+		@param[in]	CMTx	CMT チャネルクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class T>
+	template <class CMTx>
 	class cmt_io {
-
-		T	cmt_;
 
 		uint32_t	clock_;
 
 		void sleep_() { }
+
+		static volatile uint32_t counter_;
+		static void (*task_)();
+		static INTERRUPT_FUNC void cmt_task_() {
+			++counter_;
+			if(task_) (*task_)();
+			ICU::IR.CMI0 = 0;
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -75,61 +73,58 @@ namespace device {
 				return false;
 			}
 
-			uint32_t chanel = cmt_.get_chanel();
+			uint32_t chanel = CMTx::get_chanel();
+			task_ = 0;
 			switch(chanel) {
 			case 0:
-				cmt_.CMSTR0.STR0 = 0;
+				set_interrupt_task(cmt_task_, ICU::VECTOR::CMI0);
+				CMTx::CMSTR0.STR0 = 0;
 				SYSTEM::MSTPCRA.MSTPA15 = 0;
-				CMT_task[0] = 0;
-				set_interrupt_task(task_CMT0, ICU::VECTOR::CMI0);
 				ICU::IPR.CMI0 = level;
 				ICU::IER.CMI0 = true;
 				ICU::IR.CMI0 = 0;
 				break;
 			case 1:
-				cmt_.CMSTR0.STR1 = 0;
+				CMTx::CMSTR0.STR1 = 0;
 				SYSTEM::MSTPCRA.MSTPA15 = 0;
-				CMT_task[1] = 0;
-				set_interrupt_task(task_CMT1, ICU::VECTOR::CMI1);
+				set_interrupt_task(cmt_task_, ICU::VECTOR::CMI1);
 				ICU::IPR.CMI1 = level;
 				ICU::IER.CMI1 = true;
 				ICU::IR.CMI1 = 0;
 				break;
 			case 2:
-				cmt_.CMSTR1.STR2 = 0;
+				CMTx::CMSTR1.STR2 = 0;
 				SYSTEM::MSTPCRA.MSTPA14 = 0;
-				CMT_task[2] = 0;
-				set_interrupt_task(task_CMT2, ICU::VECTOR::CMI2);
+				set_interrupt_task(cmt_task_, ICU::VECTOR::CMI2);
 				ICU::IPR.CMI2 = level;
 				ICU::IER.CMI2 = true;
 				ICU::IR.CMI2 = 0;
 				break;
 			case 3:
-				cmt_.CMSTR1.STR3 = 0;
+				CMTx::CMSTR1.STR3 = 0;
 				SYSTEM::MSTPCRA.MSTPA14 = 0;
-				CMT_task[3] = 0;
-				set_interrupt_task(task_CMT3, ICU::VECTOR::CMI3);
+				set_interrupt_task(cmt_task_, ICU::VECTOR::CMI3);
 				ICU::IPR.CMI3 = level;
 				ICU::IER.CMI3 = true;
 				ICU::IR.CMI3 = 0;
 				break;
 			}
 
-		    cmt_.CMCR = cmt_.CMCR.CMIE.b() | cmt_.CMCR.CKS.b(cks);
-		    cmt_.CMCOR = cmcor - 1;
+		    CMTx::CMCR = CMTx::CMCR.CMIE.b() | CMTx::CMCR.CKS.b(cks);
+		    CMTx::CMCOR = cmcor - 1;
 
 			switch(chanel) {
 			case 0:
-			    cmt_.CMSTR0.STR0 = 1;
+			    CMTx::CMSTR0.STR0 = 1;
 				break;
 			case 1:
-			    cmt_.CMSTR0.STR1 = 1;
+			    CMTx::CMSTR0.STR1 = 1;
 				break;
 			case 2:
-			    cmt_.CMSTR1.STR2 = 1;
+			    CMTx::CMSTR1.STR2 = 1;
 				break;
 			case 3:
-			    cmt_.CMSTR1.STR3 = 1;
+			    CMTx::CMSTR1.STR3 = 1;
 				break;
 			}
 			return true;
@@ -143,7 +138,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		void set_task(void (*task)()) const {
-			CMT_task[cmt_.get_chanel()] = task;
+			cmt_task_ = task;
 		}
 
 
@@ -153,8 +148,8 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		void sync() {
-			volatile uint32_t cnt = CMT_counter[cmt_.get_chanel()];
-			while(cnt == CMT_counter[cmt_.get_chanel()]) sleep_();
+			volatile uint32_t cnt = counter_;
+			while(cnt == counter_) ;
 		}
 
 
@@ -164,7 +159,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_count() const {
-			return CMT_counter[cmt_.get_chanel()];
+			return counter_;
 		}
 
 
@@ -174,7 +169,10 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		uint16_t get_cmt_count() const {
-			return cmt_.CMCNT();
+			return CMTx::CMCNT();
 		}
 	};
+
+	template <class CMTx> volatile uint32_t cmt_io<CMTx>::counter_;
+	template <class CMTx> void (*cmt_io<CMTx>::task_)();
 }

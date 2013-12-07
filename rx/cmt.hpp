@@ -94,7 +94,7 @@ namespace device {
 			@return チャネル
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		uint32_t get_chanel() const {
+		static uint32_t get_chanel() {
 			return (base >> 3) & 3;
 		}
 	};

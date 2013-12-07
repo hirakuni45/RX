@@ -292,7 +292,7 @@ namespace device {
 			@return チャネル（０、１、２、３、１２）
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_chanel() const {
+		static uint32_t get_chanel() {
 			if(base == 0x0008b300) return 12; 
 			return (base >> 5) & 3;
 		}

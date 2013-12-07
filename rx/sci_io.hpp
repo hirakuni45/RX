@@ -27,40 +27,15 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCI 割り込みタスク受け渡し構造体
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct sci_task_t {
-		utils::fifo<recv_size>* recv;
-		utils::fifo<send_size>* send;
-	};
-
-	extern sci_task_t sci_task_[];
-
-	INTERRUPT_FUNC void task_SCI0_RXI_();
-	INTERRUPT_FUNC void task_SCI0_TEI_();
-	INTERRUPT_FUNC void task_SCI1_RXI_();
-	INTERRUPT_FUNC void task_SCI1_TEI_();
-#ifndef DEV_64
-	INTERRUPT_FUNC void task_SCI2_RXI_();
-	INTERRUPT_FUNC void task_SCI2_TEI_();
-	INTERRUPT_FUNC void task_SCI3_RXI_();
-	INTERRUPT_FUNC void task_SCI3_TEI_();
-#endif
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
 		@brief  SCI I/O 制御クラス
 		@param[in]	SCI	SCIx 定義クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI>
+	template <class SCIx>
 	class sci_io {
 
-		SCI	sci_;
-
-		utils::fifo<recv_size>	recv_;
-		utils::fifo<send_size>	send_;
+		static utils::fifo<recv_size>	recv_;
+		static utils::fifo<send_size>	send_;
 
 		uint8_t	intr_level_;
 		bool	crlf_;
@@ -68,6 +43,28 @@ namespace device {
 
 		// ※必要なら、実装する
 		void sleep_() { }
+
+		static INTERRUPT_FUNC void recv_task_()
+		{
+			bool err = false;
+			if(SCIx::SSR.ORER()) {	///< 受信オーバランエラー状態確認
+				SCIx::SSR = 0x00;	///< 受信オーバランエラークリア
+				err = true;
+			}
+			///< フレーミングエラー/パリティエラー状態確認
+			if(SCIx::SSR() & (SCIx::SSR.FER.b() | SCIx::SSR.PER.b())) {
+				err = true;
+			}
+			if(!err) recv_.put(SCIx::RDR());
+		}
+
+		static INTERRUPT_FUNC void send_task_()
+		{
+			SCIx::TDR = send_.get();
+			if(send_.length() == 0) {
+				SCIx::SCR.TEIE = 0;
+			}
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -111,7 +108,7 @@ namespace device {
 			bool abcs = true;
 			if(brr > 256) { brr /= 2; abcs = false; }
 
-			uint32_t chanel = sci_.get_chanel();
+			uint32_t chanel = SCIx::get_chanel();
 			switch(chanel) {
 			case 0:
 				SYSTEM::MSTPCRB.MSTPB31 = 0;	// B31 (SCI0)のストップ状態解除
@@ -129,7 +126,7 @@ namespace device {
 #endif
 			}
 
-			sci_.SCR = 0x00;			// TE, RE disable.
+			SCIx::SCR = 0x00;			// TE, RE disable.
 
 			if(polling_) {
 				switch(chanel) {
@@ -155,38 +152,26 @@ namespace device {
 					return false;
 				}
 			} else {
-				sci_task_[chanel].recv = &recv_;
-				sci_task_[chanel].send = &send_;
+				set_interrupt_task(recv_task_, ICU::VECTOR::RXI0);
+				set_interrupt_task(send_task_, ICU::VECTOR::TEI0);
 				switch(chanel) {
 				case 0:
-					set_interrupt_task(task_SCI0_RXI_, ICU::VECTOR::RXI0);
-					set_interrupt_task(task_SCI0_TEI_, ICU::VECTOR::TEI0);
-					ICU::IR.RXI0 = 0;
 					ICU::IER.RXI0 = true;
 					ICU::IER.TEI0 = true;
 					ICU::IPR.SCI0 = intr_level_;
 					break;
 				case 1:
-					set_interrupt_task(task_SCI1_RXI_, ICU::VECTOR::RXI1);
-					set_interrupt_task(task_SCI1_TEI_, ICU::VECTOR::TEI1);
-///					ICU::IR.RXI1 = 0;
 					ICU::IER.RXI1 = true;
 					ICU::IER.TEI1 = true;
 					ICU::IPR.SCI1 = intr_level_;
 					break;
 #ifndef DEV_64
 				case 2:
-					set_interrupt_task(task_SCI2_RXI_, ICU::VECTOR::RXI2);
-					set_interrupt_task(task_SCI2_TEI_, ICU::VECTOR::TEI2);
-					ICU::IR.RXI2 = 0;
 					ICU::IER.RXI2 = true;
 					ICU::IER.TEI2 = true;
 					ICU::IPR.SCI2 = intr_level_;
 					break;
 				case 3:
-					set_interrupt_task(task_SCI3_RXI_, ICU::VECTOR::RXI3);
-					set_interrupt_task(task_SCI3_TEI_, ICU::VECTOR::TEI3);
-					ICU::IR.RXI3 = 0;
 					ICU::IER.RXI3 = true;
 					ICU::IER.TEI3 = true;
 					ICU::IPR.SCI3 = intr_level_;
@@ -198,14 +183,14 @@ namespace device {
 			}
 
 			// 8 bits, 1 stop bit, no-parrity
-			sci_.SMR = cks;
-			sci_.SEMR.ABCS = abcs;
-			sci_.BRR = static_cast<uint8_t>(brr - 1);
+			SCIx::SMR = cks;
+			SCIx::SEMR.ABCS = abcs;
+			SCIx::BRR = static_cast<uint8_t>(brr - 1);
 
 			if(polling_) {
-				sci_.SCR = sci_.SCR.TE.b() | sci_.SCR.RE.b();
+				SCIx::SCR = SCIx::SCR.TE.b() | SCIx::SCR.RE.b();
 			} else {
-				sci_.SCR = sci_.SCR.RIE.b() | sci_.SCR.TE.b() | sci_.SCR.RE.b();
+				SCIx::SCR = SCIx::SCR.RIE.b() | SCIx::SCR.TE.b() | SCIx::SCR.RE.b();
 			}
 
 			return true;
@@ -229,15 +214,15 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void putch(char ch) {
 			if(polling_) {
-				while(sci_.SSR.TEND() == 0) sleep_();
-				sci_.TDR = ch;
+				while(SCIx::SSR.TEND() == 0) sleep_();
+				SCIx::TDR = ch;
 			} else {
 				/// ７／８ を超えてた場合は、バッファが空になるまで待つ。
 				if(send_.length() >= (send_.size() * 7 / 8)) {
 					while(send_.length() != 0) sleep_();
 				}
 				send_.put(ch);
-				sci_.SCR.TEIE = 1;
+				SCIx::SCR.TEIE = 1;
 			}
 		}
 
@@ -251,13 +236,13 @@ namespace device {
 		uint32_t length() {
 			if(polling_) {
 				bool err = false;
-				if(sci_.SSR.ORER()) {		///< 受信オーバランエラー状態確認
-					sci_.SSR.ORER = 0;	///< 受信オーバランエラークリア
+				if(SCIx::SSR.ORER()) {		///< 受信オーバランエラー状態確認
+					SCIx::SSR.ORER = 0;	///< 受信オーバランエラークリア
 					err = true;
 				}
-				uint8_t sts = sci_.SSR();	///< 受信ステータス取得
+				uint8_t sts = SCIx::SSR();	///< 受信ステータス取得
 				///< フレーミングエラー、パリティエラー状態確認
-				if(sts & (sci_.SSR.FER.b() | sci_.SSR.PER.b())) {
+				if(sts & (SCIx::SSR.FER.b() | SCIx::SSR.PER.b())) {
 					err = true;
 				}
 //				if((sts & sci_.SSR.RDRF.b()) != 0 && err == 0) {
@@ -281,7 +266,7 @@ namespace device {
 			if(polling_) {
 				char ch;
 				while(length() == 0) sleep_();
-				ch = sci_.RDR();		///< 受信データ読み出し
+				ch = SCIx::RDR();		///< 受信データ読み出し
 ///				sci_.SSR.RDRF = 0;	///< 受信フラグクリア
 				return ch;
 			} else {
@@ -307,4 +292,7 @@ namespace device {
 			}
 		}
 	};
+
+	template<class SCIx> utils::fifo<recv_size> sci_io<SCIx>::recv_;
+	template<class SCIx> utils::fifo<send_size> sci_io<SCIx>::send_;
 }
