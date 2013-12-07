@@ -11,7 +11,7 @@
 #include "rx63x/icu.hpp"
 #include "vect.h"
 
-/// F_PCKA はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
+/// F_PCKA タイマーのクロックに必要なので定義が無い場合エラーにします。
 #ifndef F_PCKA
 #  error "gpt_io.hpp requires F_PCKA to be defined"
 #endif
@@ -24,12 +24,10 @@ namespace device {
 		@param[in]	GPT	GPTx定義クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GPT>
+	template <class GPTX>
 	class gpt_io {
 
-		GPT		gpt_;
-
-
+		GPTX	gpt_;
 
 		// ※必要なら、実装する
 		void sleep_() { }
@@ -43,8 +41,30 @@ namespace device {
 		gpt_io() { }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  機能を開始
+		*/
+		//-----------------------------------------------------------------//
+		void start() {
+			GPT::GTWP.WP0 = 0;	// 書き込み保護を解除
+			gpt_.GTIOR.GTIOA = 0b010001;
+			gpt_.GTONCR = gpt_.GTONCR.OAE.b();
+			gpt_.GTUDC = gpt_.GTUDC.UD.b() | gpt_.GTUDC.UDF.b(); // UP カウント設定
 
+			gpt_.GTPR = 512 - 1;
+			gpt_.GTCCRA = 256;
 
+			GPT::GTSTR.CST0 = 1;  // カウント開始
+		}
+
+		void set_r(uint16_t n) {
+			gpt_.GTPR = n;
+		}
+
+		void set_a(uint16_t n) {
+			gpt_.GTCCRA = n;
+		}
 
 
 	};

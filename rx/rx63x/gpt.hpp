@@ -97,10 +97,10 @@ namespace device {
 			using gthssr_io::operator |=;
 			using gthssr_io::operator &=;
 
-			bits_t<gthssr_io,  0, 2>  CSHSL0;
-			bits_t<gthssr_io,  4, 2>  CSHSL1;
-			bits_t<gthssr_io,  8, 2>  CSHSL2;
-			bits_t<gthssr_io, 12, 2>  CSHSL3;
+			bits_t<gthssr_io,  0, 4>  CSHSL0;
+			bits_t<gthssr_io,  4, 4>  CSHSL1;
+			bits_t<gthssr_io,  8, 4>  CSHSL2;
+			bits_t<gthssr_io, 12, 4>  CSHSL3;
 		};
 		static gthssr_t GTHSSR;
 
@@ -117,10 +117,10 @@ namespace device {
 			using gthpsr_io::operator |=;
 			using gthpsr_io::operator &=;
 
-			bits_t<gthpsr_io,  0, 2>  CSHPL0;
-			bits_t<gthpsr_io,  4, 2>  CSHPL1;
-			bits_t<gthpsr_io,  8, 2>  CSHPL2;
-			bits_t<gthpsr_io, 12, 2>  CSHPL3;
+			bits_t<gthpsr_io,  0, 4>  CSHPL0;
+			bits_t<gthpsr_io,  4, 4>  CSHPL1;
+			bits_t<gthpsr_io,  8, 4>  CSHPL2;
+			bits_t<gthpsr_io, 12, 4>  CSHPL3;
 		};
 		static gthpsr_t GTHPSR;
 
@@ -330,7 +330,7 @@ namespace device {
 		static io16<0x000c20aa> LCNTDL;
 
 	};
-	static gpt_t GPT;
+	typedef gpt_t GPT;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -473,7 +473,7 @@ namespace device {
 		static io16<0x000c28aa> LCNTDL;
 
 	};
-	static gptb_t GPTB;
+	typedef gptb_t GPTB;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -497,7 +497,7 @@ namespace device {
 			using gtior_io::operator |=;
 			using gtior_io::operator &=;
 
-			bits_t<gtior_io,  0, 5> GTIOA;
+			bits_t<gtior_io,  0, 6> GTIOA;
 			bit_t< gtior_io,  6>    OADFLT;
 			bit_t< gtior_io,  7>    OAHLD;
 			bits_t<gtior_io,  8, 6> GTIOB;

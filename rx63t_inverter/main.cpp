@@ -11,11 +11,15 @@
 #include "rx/rx63x/mpc.hpp"
 #include "rx/cmt_io.hpp"
 #include "rx/sci_io.hpp"
+#include "rx/gpt_io.hpp"
+#include "rx/chout.hpp"
 #include "inv_monitor.hpp"
 
 namespace root {
 	device::cmt_io<device::CMT0> cmt_;
 	device::sci_io<device::SCI1> sci_;
+	device::gpt_io<device::GPT0> gpt_;
+	utils::chout chout_;
 	utils::inv_monitor monitor_;
 }
 
@@ -135,6 +139,18 @@ int main(int argc, char** argv)
 	static const uint8_t sci_irq_level = 3;
 	sci_.initialize(sci_irq_level);
 	sci_.start(115200);
+
+	// GPT0 設定 (GTIOC0A: P71:38, PD7:12)(GTIOC0B: P74:35, PD6:13)
+	device::SYSTEM::MSTPCRA.MSTPA7 = 0; // GPT0..3 モジュール有効
+	device::PORT7::PDR.B1 = 1;			// output
+	device::MPC::PWPR.B0WI = 0;			// PWPR 書き込み許可
+	device::MPC::PWPR.PFSWE = 1;		// PxxPFS 書き込み許可
+	device::MPC::P71PFS.PSEL = 0b0110;	// GTIOC0A 設定
+	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
+	device::PORT7::PMR.B1 = 1;
+	gpt_.start();	// PWM start
+	gpt_.set_r(512 - 1);
+	gpt_.set_a(256);
 
 	// 100Hz タイマー設定
 	cmt_.set_clock(F_PCKA);

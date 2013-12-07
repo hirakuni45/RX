@@ -17,9 +17,6 @@
 #  error "sci_io.hpp requires F_PCKB to be defined"
 #endif
 
-// 64ピンデバイスの場合指定
-#define DEV_64
-
 namespace device {
 
 	static const uint32_t recv_size = 256;
@@ -116,14 +113,12 @@ namespace device {
 			case 1:
 				SYSTEM::MSTPCRB.MSTPB30 = 0;	// B30 (SCI1)のストップ状態解除
 				break;
-#ifndef DEV_64
 			case 2:
 				SYSTEM::MSTPCRB.MSTPB29 = 0;	// B29 (SCI2)のストップ状態解除
 				break;
 			case 3:
 				SYSTEM::MSTPCRB.MSTPB28 = 0;	// B28 (SCI3)のストップ状態解除
 				break;
-#endif
 			}
 
 			SCIx::SCR = 0x00;			// TE, RE disable.
@@ -138,7 +133,6 @@ namespace device {
 					ICU::IER.TEI1 = false;
 					ICU::IER.RXI1 = false;
 					break;
-#ifndef DEV_64
 				case 2:
 					ICU::IER.TEI2 = false;
 					ICU::IER.RXI2 = false;
@@ -147,36 +141,39 @@ namespace device {
 					ICU::IER.TEI3 = false;
 					ICU::IER.RXI3 = false;
 					break;
-#endif
 				default:
 					return false;
 				}
 			} else {
-				set_interrupt_task(recv_task_, ICU::VECTOR::RXI0);
-				set_interrupt_task(send_task_, ICU::VECTOR::TEI0);
 				switch(chanel) {
 				case 0:
+					set_interrupt_task(recv_task_, ICU::VECTOR::RXI0);
+					set_interrupt_task(send_task_, ICU::VECTOR::TEI0);
 					ICU::IER.RXI0 = true;
 					ICU::IER.TEI0 = true;
 					ICU::IPR.SCI0 = intr_level_;
 					break;
 				case 1:
+					set_interrupt_task(recv_task_, ICU::VECTOR::RXI1);
+					set_interrupt_task(send_task_, ICU::VECTOR::TEI1);
 					ICU::IER.RXI1 = true;
 					ICU::IER.TEI1 = true;
 					ICU::IPR.SCI1 = intr_level_;
 					break;
-#ifndef DEV_64
 				case 2:
+					set_interrupt_task(recv_task_, ICU::VECTOR::RXI2);
+					set_interrupt_task(send_task_, ICU::VECTOR::TEI2);
 					ICU::IER.RXI2 = true;
 					ICU::IER.TEI2 = true;
 					ICU::IPR.SCI2 = intr_level_;
 					break;
 				case 3:
+					set_interrupt_task(recv_task_, ICU::VECTOR::RXI3);
+					set_interrupt_task(send_task_, ICU::VECTOR::TEI3);
 					ICU::IER.RXI3 = true;
 					ICU::IER.TEI3 = true;
 					ICU::IPR.SCI3 = intr_level_;
 					break;
-#endif
 				default:
 					return false;
 				}

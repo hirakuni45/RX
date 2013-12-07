@@ -13,6 +13,7 @@ CSOURCES	=	vect.c \
 PSOURCES	=	main.cpp \
 				../rx/cmt_io.cpp \
 				../rx/sci_io.cpp \
+				../rx/gpt_io.cpp \
 				inv_monitor.cpp
 
 
@@ -141,11 +142,14 @@ main.o: main.hpp ../rx/rx63x/system.hpp ../rx/io_utils.hpp
 main.o: ../rx/rx63x/port.hpp ../rx/rx63x/mpc.hpp ../rx/cmt_io.hpp
 main.o: ../rx/cmt.hpp ../rx/io_utils.hpp ../rx/rx63x/system.hpp
 main.o: ../rx/rx63x/icu.hpp vect.h ../rx/sci_io.hpp ../rx/rx63x/sci.hpp
-main.o: ../rx/fifo.hpp inv_monitor.hpp command.hpp
+main.o: ../rx/fifo.hpp ../rx/gpt_io.hpp ../rx/rx63x/gpt.hpp ../rx/chout.hpp
+main.o: inv_monitor.hpp command.hpp
 ../rx/cmt_io.o: ../rx/cmt_io.hpp ../rx/cmt.hpp ../rx/io_utils.hpp
 ../rx/cmt_io.o: ../rx/rx63x/system.hpp ../rx/io_utils.hpp ../rx/rx63x/icu.hpp
 ../rx/cmt_io.o: vect.h
 ../rx/sci_io.o: ../rx/sci_io.hpp ../rx/rx63x/sci.hpp ../rx/io_utils.hpp
-../rx/sci_io.o: ../rx/fifo.hpp ../rx/rx63x/system.hpp ../rx/rx63x/icu.hpp
-../rx/sci_io.o: vect.h
+../rx/sci_io.o: ../rx/rx63x/system.hpp ../rx/rx63x/icu.hpp vect.h
+../rx/sci_io.o: ../rx/fifo.hpp
+../rx/gpt_io.o: ../rx/gpt_io.hpp ../rx/rx63x/gpt.hpp ../rx/io_utils.hpp
+../rx/gpt_io.o: ../rx/rx63x/system.hpp ../rx/rx63x/icu.hpp vect.h
 inv_monitor.o: inv_monitor.hpp command.hpp main.hpp

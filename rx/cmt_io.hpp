@@ -31,7 +31,20 @@ namespace device {
 		static INTERRUPT_FUNC void cmt_task_() {
 			++counter_;
 			if(task_) (*task_)();
-			ICU::IR.CMI0 = 0;
+			switch(CMTx::get_chanel()) {
+			case 0:
+				ICU::IR.CMI0 = 0;
+				break;
+			case 1:
+				ICU::IR.CMI1 = 0;
+				break;
+			case 2:
+				ICU::IR.CMI2 = 0;
+				break;
+			case 3:
+				ICU::IR.CMI3 = 0;
+				break;
+			}
 		}
 
 	public:
