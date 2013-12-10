@@ -27,8 +27,6 @@ namespace device {
 	template <class GPTX>
 	class gpt_io {
 
-		GPTX	gpt_;
-
 		// ※必要なら、実装する
 		void sleep_() { }
 
@@ -48,22 +46,25 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void start() {
 			GPT::GTWP.WP0 = 0;	// 書き込み保護を解除
-			gpt_.GTIOR.GTIOA = 0b010001;
-			gpt_.GTONCR = gpt_.GTONCR.OAE.b();
-			gpt_.GTUDC = gpt_.GTUDC.UD.b() | gpt_.GTUDC.UDF.b(); // UP カウント設定
-
-			gpt_.GTPR = 512 - 1;
-			gpt_.GTCCRA = 256;
+			GPTX::GTIOR.GTIOA = 0b011001;
+			GPTX::GTONCR = GPTX::GTONCR.OAE.b();
+			GPTX::GTUDC = GPTX::GTUDC.UD.b() | GPTX::GTUDC.UDF.b(); // UP カウント設定
+			GPT::GTBDR.BD0_0 = 1;  // GPT0 GTCCR バッファ動作禁止
+			GPT::GTBDR.BD0_1 = 1;  // GPT0 GTPR バッファ動作禁止
+			GPT::GTBDR.BD0_2 = 1;  // GPT0 GTADTR バッファ動作禁止
+			GPT::GTBDR.BD0_3 = 1;  // GPT0 GTDV バッファ動作禁止 
+			GPTX::GTPR = 512 - 1;
+			GPTX::GTCCRA = 256;
 
 			GPT::GTSTR.CST0 = 1;  // カウント開始
 		}
 
 		void set_r(uint16_t n) {
-			gpt_.GTPR = n;
+			GPTX::GTPR = n;
 		}
 
 		void set_a(uint16_t n) {
-			gpt_.GTCCRA = n;
+			GPTX::GTCCRA = n;
 		}
 
 

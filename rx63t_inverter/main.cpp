@@ -141,8 +141,8 @@ int main(int argc, char** argv)
 	sci_.start(115200);
 
 	// GPT0 設定 (GTIOC0A: P71:38, PD7:12)(GTIOC0B: P74:35, PD6:13)
-	device::SYSTEM::MSTPCRA.MSTPA7 = 0; // GPT0..3 モジュール有効
 	device::PORT7::PDR.B1 = 1;			// output
+	device::SYSTEM::MSTPCRA.MSTPA7 = 0; // GPT0..3 モジュール有効
 	device::MPC::PWPR.B0WI = 0;			// PWPR 書き込み許可
 	device::MPC::PWPR.PFSWE = 1;		// PxxPFS 書き込み許可
 	device::MPC::P71PFS.PSEL = 0b0110;	// GTIOC0A 設定
