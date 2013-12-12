@@ -12,8 +12,10 @@
 #include "rx/cmt_io.hpp"
 #include "rx/sci_io.hpp"
 #include "rx/gpt_io.hpp"
+#include "rx/adc_io.hpp"
 #include "rx/chout.hpp"
 #include "inv_monitor.hpp"
+
 
 namespace root {
 	device::cmt_io<device::CMT0> cmt_;
@@ -171,10 +173,10 @@ int main(int argc, char** argv)
 		monitor_.service();
 
         ++cnt;
-        if(cnt >= 100) {
+        if(cnt >= 30) {
             cnt = 0;
         }
-		if(cnt < 50) {
+		if(cnt < 15) {
 			device::PORTB::PODR.B7 = 1; // LED Off
 		} else {
 			device::PORTB::PODR.B7 = 0; // LED On

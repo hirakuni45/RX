@@ -142,8 +142,8 @@ main.o: main.hpp ../rx/rx63x/system.hpp ../rx/io_utils.hpp
 main.o: ../rx/rx63x/port.hpp ../rx/rx63x/mpc.hpp ../rx/cmt_io.hpp
 main.o: ../rx/cmt.hpp ../rx/io_utils.hpp ../rx/rx63x/system.hpp
 main.o: ../rx/rx63x/icu.hpp vect.h ../rx/sci_io.hpp ../rx/rx63x/sci.hpp
-main.o: ../rx/fifo.hpp ../rx/gpt_io.hpp ../rx/rx63x/gpt.hpp ../rx/chout.hpp
-main.o: inv_monitor.hpp command.hpp
+main.o: ../rx/fifo.hpp ../rx/gpt_io.hpp ../rx/rx63x/gpt.hpp ../rx/adc_io.hpp
+main.o: ../rx/rx63x/s12ad.hpp ../rx/chout.hpp inv_monitor.hpp command.hpp
 ../rx/cmt_io.o: ../rx/cmt_io.hpp ../rx/cmt.hpp ../rx/io_utils.hpp
 ../rx/cmt_io.o: ../rx/rx63x/system.hpp ../rx/io_utils.hpp ../rx/rx63x/icu.hpp
 ../rx/cmt_io.o: vect.h
