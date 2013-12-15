@@ -18,9 +18,10 @@
 
 
 namespace root {
-	device::cmt_io<device::CMT0> cmt_;
-	device::sci_io<device::SCI1> sci_;
-	device::gpt_io<device::GPT0> gpt_;
+	device::cmt_io<device::CMT0>  cmt_;
+	device::sci_io<device::SCI1>  sci_;
+	device::gpt_io<device::GPT0>  gpt_;
+	device::adc_io<device::S12AD> adc_;
 	utils::chout chout_;
 	utils::inv_monitor monitor_;
 }
@@ -121,8 +122,8 @@ int main(int argc, char** argv)
 						  | device::SYSTEM::SCKCR.BCK.b(2)		// 1/4 (192/4=48)
 						  | device::SYSTEM::SCKCR.PCKA.b(1)		// 1/2 (192/2=96)
 						  | device::SYSTEM::SCKCR.PCKB.b(2)		// 1/4 (192/4=48)
-						  | device::SYSTEM::SCKCR.PCKC.b(3)		// 1/8 (192/8=24)
-						  | device::SYSTEM::SCKCR.PCKD.b(3);	// 1/8 (192/8=24)
+						  | device::SYSTEM::SCKCR.PCKC.b(2)		// 1/4 (192/8=48)
+						  | device::SYSTEM::SCKCR.PCKD.b(2);	// 1/4 (192/8=48)
 	device::SYSTEM::SCKCR3.CKSEL = 4;	///< PLL 回路選択
 
 	// Signal LED 出力設定
@@ -154,6 +155,14 @@ int main(int argc, char** argv)
 	gpt_.set_r(512 - 1);
 	gpt_.set_a(256);
 
+	// S12AD 設定 (P40:56, P41:57)
+	device::SYSTEM::MSTPCRA.MSTPA17 = 0; // S12AD モジュール有効
+	device::MPC::PWPR.B0WI = 0;			 // PWPR 書き込み許可
+	device::MPC::PWPR.PFSWE = 1;		 // PxxPFS 書き込み許可
+	device::MPC::P40PFS.ASEL = 1;	     // アナログ入力設定
+	device::MPC::P41PFS.ASEL = 1;	     // アナログ入力設定
+	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
+
 	// 100Hz タイマー設定
 	cmt_.set_clock(F_PCKA);
 	static const uint8_t cmt_irq_level = 1;
@@ -170,11 +179,21 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
+		// A/D 変換開始
+		adc_.start(0b00000011);
+		adc_.sync();
+		uint16_t adv = adc_.get(0);
+		uint16_t cpv = adv >> 3;
+		if(cpv < 10) cpv = 10;
+		else if(cpv > 500) cpv = 500;
+		gpt_.set_a(cpv);
+
 		monitor_.service();
 
         ++cnt;
         if(cnt >= 30) {
             cnt = 0;
+			chout_ << "A/D(0): " << static_cast<int32_t>(adv) << utils::chout::endl;
         }
 		if(cnt < 15) {
 			device::PORTB::PODR.B7 = 1; // LED Off
