@@ -210,6 +210,10 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		void putch(char ch) {
+			if(crlf_ && ch == '\n') {
+				putch('\r');
+			}
+
 			if(polling_) {
 				while(SCIx::SSR.TEND() == 0) sleep_();
 				SCIx::TDR = ch;
@@ -282,9 +286,6 @@ namespace device {
 		void puts(const char* s) {
 			char ch;
 			while((ch = *s++) != 0) {
-				if(crlf_ && ch == '\n') {
-					putch('\r');
-				}
 				putch(ch);
 			}
 		}

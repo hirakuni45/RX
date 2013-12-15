@@ -8,7 +8,10 @@
 //=====================================================================//
 #include <cstdint>
 
-
+extern "C" {
+	void sci_putch(char ch);
+	void sci_puts(const char* str);
+};
 
 namespace utils {
 
@@ -71,7 +74,7 @@ namespace utils {
         */
         //-----------------------------------------------------------------//
 		void put(char ch) const {
-//			out_(ch);
+			sci_putch(ch);
 		}
 
 
@@ -82,10 +85,13 @@ namespace utils {
         */
         //-----------------------------------------------------------------//
 		void string(const char* str) const {
+			sci_puts(str);
+#if 0
 			char ch;
 			while((ch = *str++) != 0) {
 				put(ch);
 			}
+#endif
 		}
 
 
