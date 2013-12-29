@@ -23,6 +23,8 @@ namespace device {
 	/*!
 		@brief  SCI I/O 制御クラス
 		@param[in]	SCI	SCIx 定義クラス
+		@param[in]	recv_size	受信バッファサイズ
+		@param[in]	send+size	送信バッファサイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SCIx, uint32_t recv_size, uint32_t send_size>
