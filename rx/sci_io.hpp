@@ -19,16 +19,13 @@
 
 namespace device {
 
-	static const uint32_t recv_size = 256;
-	static const uint32_t send_size = 128;
-
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCI I/O 制御クラス
 		@param[in]	SCI	SCIx 定義クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCIx>
+	template <class SCIx, uint32_t recv_size, uint32_t send_size>
 	class sci_io {
 
 		static utils::fifo<recv_size>	recv_;
@@ -237,7 +234,7 @@ namespace device {
 		uint32_t length() {
 			if(polling_) {
 				bool err = false;
-				if(SCIx::SSR.ORER()) {		///< 受信オーバランエラー状態確認
+				if(SCIx::SSR.ORER()) {	///< 受信オーバランエラー状態確認
 					SCIx::SSR.ORER = 0;	///< 受信オーバランエラークリア
 					err = true;
 				}
@@ -247,9 +244,9 @@ namespace device {
 					err = true;
 				}
 //				if((sts & sci_.SSR.RDRF.b()) != 0 && err == 0) {
-					return 1;	///< 受信データあり
+//					return 1;	///< 受信データあり
 //				} else {
-//					return 0;	///< 受信データなし
+					return 0;	///< 受信データなし
 //				}
 			} else {
 				return recv_.length();
@@ -267,8 +264,8 @@ namespace device {
 			if(polling_) {
 				char ch;
 				while(length() == 0) sleep_();
-				ch = SCIx::RDR();		///< 受信データ読み出し
-///				sci_.SSR.RDRF = 0;	///< 受信フラグクリア
+				ch = SCIx::RDR();	///< 受信データ読み出し
+///				SCIx::SSR.RDRF = 0;	///< 受信フラグクリア
 				return ch;
 			} else {
 				while(recv_.length() == 0) sleep_();
@@ -291,6 +288,8 @@ namespace device {
 		}
 	};
 
-	template<class SCIx> utils::fifo<recv_size> sci_io<SCIx>::recv_;
-	template<class SCIx> utils::fifo<send_size> sci_io<SCIx>::send_;
+	template<class SCIx, uint32_t recv_size, uint32_t send_size>
+		utils::fifo<recv_size> sci_io<SCIx, recv_size, send_size>::recv_;
+	template<class SCIx, uint32_t recv_size, uint32_t send_size>
+		utils::fifo<send_size> sci_io<SCIx, recv_size, send_size>::send_;
 }
