@@ -19,7 +19,7 @@
 
 namespace root {
 	device::cmt_io<device::CMT0>  cmt_;
-	device::sci_io<device::SCI1>  sci_;
+	device::sci_io<device::SCI1, 256, 256>  sci_;
 	device::gpt_io<device::GPT0>  gpt_;
 	device::adc_io<device::S12AD> adc_;
 	utils::chout chout_;
@@ -88,6 +88,16 @@ void delay_10ms(uint32_t n)
 	}
 }
 
+
+void prn_voltage_(const char* info, int32_t v)
+{
+	int32_t vv = v * 15 * 100 / 4096;
+	int32_t mod = vv % 100;
+	if(mod < 0) mod = -mod;
+	root::chout_ << info << (vv / 100) << '.' << mod << utils::chout::endl;
+}
+
+
 static volatile uint8_t dummy_;
 
 static void wait_()
@@ -155,7 +165,7 @@ int main(int argc, char** argv)
 	gpt_.set_r(512 - 1);
 	gpt_.set_a(256);
 
-	// S12AD 設定 (P40:56, P41:57)
+	// S12AD 設定 P40(56), P41(55), P42(54)
 	device::SYSTEM::MSTPCRA.MSTPA17 = 0; // S12AD モジュール有効
 	device::MPC::PWPR.B0WI = 0;			 // PWPR 書き込み許可
 	device::MPC::PWPR.PFSWE = 1;		 // PxxPFS 書き込み許可
@@ -163,10 +173,10 @@ int main(int argc, char** argv)
 	device::MPC::P41PFS.ASEL = 1;	     // アナログ入力設定
 	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
 
-	// 100Hz タイマー設定
+	// 1000Hz タイマー設定
 	cmt_.set_clock(F_PCKA);
 	static const uint8_t cmt_irq_level = 1;
-	cmt_.initialize(100, cmt_irq_level);
+	cmt_.initialize(1000, cmt_irq_level);
 
 	cmt_.sync();
 
@@ -175,15 +185,29 @@ int main(int argc, char** argv)
 ///	device::SYSTEM::PRCR = 0xa500;	///< クロック、低消費電力、関係書き込み禁止
 
 	uint32_t cnt = 0;
+	uint32_t led = 0;
+
+	int32_t ds = 0;
 
 	while(1) {
+		adc_.start(0b00000111);
+
 		cmt_.sync();
 
 		// A/D 変換開始
-		adc_.start(0b00000011);
 		adc_.sync();
-		uint16_t adv = adc_.get(0);
-		uint16_t cpv = adv >> 3;
+		int32_t ref = static_cast<int32_t>(adc_.get(0)); // 指令電圧
+		int32_t out = static_cast<int32_t>(adc_.get(1)); // 出力電圧
+		int32_t inp = static_cast<int32_t>(adc_.get(2)); // 入力電圧
+
+		// 推定制御量
+		int32_t ans = ref * 512 / inp;
+		// 誤差
+		int32_t dif = ref - out;
+
+//		int32_t cpv = ans + (dif * 512 / inp);
+		int32_t cpv = ans - 10;
+
 		if(cpv < 10) cpv = 10;
 		else if(cpv > 500) cpv = 500;
 		gpt_.set_a(cpv);
@@ -191,11 +215,18 @@ int main(int argc, char** argv)
 		monitor_.service();
 
         ++cnt;
-        if(cnt >= 30) {
+        if(cnt >= 1000) {
             cnt = 0;
-			chout_ << "A/D(0): " << static_cast<int32_t>(adv) << utils::chout::endl;
+			prn_voltage_("Inp: ", inp);
+			prn_voltage_("Ref: ", ref);
+			prn_voltage_("Dif: ", dif);
+			prn_voltage_("Out: ", out);
+			chout_ << utils::chout::endl;
         }
-		if(cnt < 15) {
+
+		++led;
+		if(led >= 300) led = 0;
+		if(led < 150) {
 			device::PORTB::PODR.B7 = 1; // LED Off
 		} else {
 			device::PORTB::PODR.B7 = 0; // LED On

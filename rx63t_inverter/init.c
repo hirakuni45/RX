@@ -63,8 +63,8 @@ int init(void)
 	}
 
 	// main の起動
-	int argc = 0;
-	char **argv = 0;
+	static int argc = 0;
+	static char **argv = 0;
 	int ret = main(argc, argv);
 
 	return ret;
