@@ -94,7 +94,12 @@ void prn_voltage_(const char* info, int32_t v)
 	int32_t vv = v * 15 * 100 / 4096;
 	int32_t mod = vv % 100;
 	if(mod < 0) mod = -mod;
-	root::chout_ << info << (vv / 100) << '.' << mod << utils::chout::endl;
+	root::chout_.suppress_char(' ');
+	root::chout_.set_length(0);
+	root::chout_ << info << (vv / 100) << '.';
+	root::chout_.suppress_char('0');
+	root::chout_.set_length(2);
+	root::chout_ << mod << utils::chout::endl;
 }
 
 
@@ -149,7 +154,7 @@ int main(int argc, char** argv)
 	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
 	device::PORTD::PMR.B3 = 1;
 	device::PORTD::PMR.B5 = 1;
-	static const uint8_t sci_irq_level = 3;
+	static const uint8_t sci_irq_level = 1;
 	sci_.initialize(sci_irq_level);
 	sci_.start(115200);
 
@@ -175,7 +180,7 @@ int main(int argc, char** argv)
 
 	// 1000Hz タイマー設定
 	cmt_.set_clock(F_PCKA);
-	static const uint8_t cmt_irq_level = 1;
+	uint8_t cmt_irq_level = 3;
 	cmt_.initialize(1000, cmt_irq_level);
 
 	cmt_.sync();
@@ -189,6 +194,7 @@ int main(int argc, char** argv)
 
 	int32_t ds = 0;
 
+	int32_t val = 10;
 	while(1) {
 		adc_.start(0b00000111);
 
@@ -204,13 +210,21 @@ int main(int argc, char** argv)
 		int32_t ans = ref * 512 / inp;
 		// 誤差
 		int32_t dif = ref - out;
+		if(dif < 0) val -= 1;
+		else val += 1;
 
 //		int32_t cpv = ans + (dif * 512 / inp);
-		int32_t cpv = ans - 10;
+//		int32_t cpv = ans - 10;
+		int32_t cpv = val;
 
-		if(cpv < 10) cpv = 10;
-		else if(cpv > 500) cpv = 500;
+		// 出力リミッター
+		int32_t low_limit = 10;
+		int32_t high_limit = 500;
+		if(cpv < low_limit) cpv = low_limit;
+		else if(cpv > high_limit) cpv = high_limit;
 		gpt_.set_a(cpv);
+
+		val = cpv;
 
 		monitor_.service();
 
@@ -221,6 +235,9 @@ int main(int argc, char** argv)
 			prn_voltage_("Ref: ", ref);
 			prn_voltage_("Dif: ", dif);
 			prn_voltage_("Out: ", out);
+			root::chout_.suppress_char('0');
+			root::chout_.set_length(2);
+			root::chout_ << "PWM: " << cpv << utils::chout::endl;
 			chout_ << utils::chout::endl;
         }
 
@@ -232,6 +249,4 @@ int main(int argc, char** argv)
 			device::PORTB::PODR.B7 = 0; // LED On
 		}
 	}
-
-	return 0;
 }
