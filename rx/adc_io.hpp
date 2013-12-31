@@ -37,6 +37,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void start(uint8_t bits) const {
 			S12AD::ADANSA = bits;
+
+			// GPT による変換開始
+			S12AD::ADCSR = S12AD::ADCSR.TRGE.b() | S12AD::ADCSR.EXTRG.b();
+			S12AD::ADSTRGR.TRSA = 0b10001;	// GPT0 要因
+
 			S12AD::ADCSR.ADST = 1;	// 変換開始
 		}
 
