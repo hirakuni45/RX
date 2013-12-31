@@ -179,10 +179,10 @@ int main(int argc, char** argv)
 	device::MPC::P41PFS.ASEL = 1;	     // アナログ入力設定
 	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
 
-	// 1000Hz タイマー設定
+	// 5000Hz タイマー設定
 	cmt_.set_clock(F_PCKB);
 	uint8_t cmt_irq_level = 3;
-	cmt_.initialize(1000, cmt_irq_level);
+	cmt_.initialize(5000, cmt_irq_level);
 
 	cmt_.sync();
 
@@ -195,6 +195,8 @@ int main(int argc, char** argv)
 
 	int32_t ds = 0;
 
+	int32_t ref = 300;
+
 	int32_t low_limit = 10;
 	int32_t high_limit = 500;
 	int32_t cpv = low_limit;
@@ -205,9 +207,15 @@ int main(int argc, char** argv)
 
 		// A/D 変換開始
 		adc_.sync();
-		int32_t ref = static_cast<int32_t>(adc_.get(0)); // 指令電圧
+///		int32_t ref = static_cast<int32_t>(adc_.get(0)); // 指令電圧
 		int32_t out = static_cast<int32_t>(adc_.get(1)); // 出力電圧
 		int32_t inp = static_cast<int32_t>(adc_.get(2)); // 入力電圧
+
+		// のこぎり波
+		ref += 20;
+		if(ref >= 1500) {
+			ref = 300;
+		}
 
 		// 誤差
 		int32_t dif = ref - out;
@@ -228,11 +236,12 @@ int main(int argc, char** argv)
 		uint16_t ofs = (512 - cpv) / 2;
 		gpt_.set_ad_a(cpv + ofs);	// A/D 変換開始タイミング
 
+#if 0
 		monitor_.service();
 
-        ++cnt;
-        if(cnt >= 1000) {
-            cnt = 0;
+		++cnt;
+		if(cnt >= 1000) {
+			cnt = 0;
 			prn_voltage_("Inp: ", inp);
 			prn_voltage_("Ref: ", ref);
 			prn_voltage_("Dif: ", dif);
@@ -242,7 +251,7 @@ int main(int argc, char** argv)
 			root::chout_ << "PWM: " << cpv << utils::chout::endl;
 			chout_ << utils::chout::endl;
         }
-
+#endif
 		++led;
 		if(led >= 300) led = 0;
 		if(led < 150) {
