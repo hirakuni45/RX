@@ -5,6 +5,7 @@
 */
 //=====================================================================//
 #include <cstdint>
+#include <cmath>
 #include "main.hpp"
 #include "rx/rx63x/system.hpp"
 #include "rx/rx63x/port.hpp"
@@ -179,7 +180,7 @@ int main(int argc, char** argv)
 	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
 
 	// 1000Hz タイマー設定
-	cmt_.set_clock(F_PCKA);
+	cmt_.set_clock(F_PCKB);
 	uint8_t cmt_irq_level = 3;
 	cmt_.initialize(1000, cmt_irq_level);
 
@@ -194,7 +195,9 @@ int main(int argc, char** argv)
 
 	int32_t ds = 0;
 
-	int32_t val = 10;
+	int32_t low_limit = 10;
+	int32_t high_limit = 500;
+	int32_t cpv = low_limit;
 	while(1) {
 		adc_.start(0b00000111);
 
@@ -206,25 +209,24 @@ int main(int argc, char** argv)
 		int32_t out = static_cast<int32_t>(adc_.get(1)); // 出力電圧
 		int32_t inp = static_cast<int32_t>(adc_.get(2)); // 入力電圧
 
-		// 推定制御量
-		int32_t ans = ref * 512 / inp;
 		// 誤差
 		int32_t dif = ref - out;
-		if(dif < 0) val -= 1;
-		else val += 1;
-
-//		int32_t cpv = ans + (dif * 512 / inp);
-//		int32_t cpv = ans - 10;
-		int32_t cpv = val;
+		if(std::abs(dif) < 15) {
+			if(dif < 0) --cpv;
+			else ++cpv;
+		} else {
+//			cpv += (dif / 4096 * 2.5 * 6) / (inp / 4096 * 2.5 * 6 / 512);
+			int32_t d = dif * 512 / inp;
+			cpv += d * 2896 / 4096; // * 0.707
+		}
 
 		// 出力リミッター
-		int32_t low_limit = 10;
-		int32_t high_limit = 500;
 		if(cpv < low_limit) cpv = low_limit;
 		else if(cpv > high_limit) cpv = high_limit;
-		gpt_.set_a(cpv);
 
-		val = cpv;
+		gpt_.set_a(cpv);
+		uint16_t ofs = (512 - cpv) / 2;
+		gpt_.set_ad_a(cpv + ofs);	// A/D 変換開始タイミング
 
 		monitor_.service();
 
