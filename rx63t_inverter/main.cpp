@@ -103,6 +103,12 @@ void prn_voltage_(const char* info, int32_t v)
 	root::chout_ << mod << utils::chout::endl;
 }
 
+void prn_value_(const char* info, int32_t v)
+{
+	root::chout_.suppress_char(' ');
+	root::chout_.set_length(0);
+	root::chout_ << info << v << utils::chout::endl;
+}
 
 static volatile uint8_t dummy_;
 
@@ -182,13 +188,20 @@ int main(int argc, char** argv)
 	// 5000Hz タイマー設定
 	cmt_.set_clock(F_PCKB);
 	uint8_t cmt_irq_level = 3;
-	cmt_.initialize(5000, cmt_irq_level);
+	cmt_.initialize(10000, cmt_irq_level);
 
 	cmt_.sync();
 
 	monitor_.initialize();
 
 ///	device::SYSTEM::PRCR = 0xa500;	///< クロック、低消費電力、関係書き込み禁止
+
+	{
+		adc_.start(0b00000111);
+		adc_.sync();
+		int32_t gain = static_cast<int32_t>(adc_.get(0));
+		prn_value_("Gain: ", gain);
+	}
 
 	uint32_t cnt = 0;
 	uint32_t led = 0;
@@ -197,9 +210,12 @@ int main(int argc, char** argv)
 
 	int32_t ref = 300;
 
-	int32_t low_limit = 10;
-	int32_t high_limit = 500;
+	int32_t base_gain = 651;
+	int32_t high_gain = 1500;
+	int32_t low_limit = 10; // 0.23V at 12V input
+	int32_t high_limit = 500; // 11.72V at 12V input
 	int32_t cpv = low_limit;
+	bool up = true;
 	while(1) {
 		adc_.start(0b00000111);
 
@@ -211,21 +227,38 @@ int main(int argc, char** argv)
 		int32_t out = static_cast<int32_t>(adc_.get(1)); // 出力電圧
 		int32_t inp = static_cast<int32_t>(adc_.get(2)); // 入力電圧
 
-		// のこぎり波
-		ref += 20;
-		if(ref >= 1500) {
-			ref = 300;
+// base_gain = static_cast<int32_t>(adc_.get(0)); // 指令電圧
+
+		// 三角波
+		if(up) {
+			ref += 20;
+		} else {
+			ref -= 20;
 		}
 
-		// 誤差
-		int32_t dif = ref - out;
-		if(std::abs(dif) < 15) {
+		if(ref > 1700) {
+			up = false;
+			ref = 1700;
+		} else if(ref < 200) {
+			up = true;
+			ref = 200;
+		}
+
+		int32_t dif = ref - out;  // 誤差
+		// PWM の制御量に対するスレッショルド
+		if(std::abs(dif) < 40) {
 			if(dif < 0) --cpv;
 			else ++cpv;
 		} else {
-//			cpv += (dif / 4096 * 2.5 * 6) / (inp / 4096 * 2.5 * 6 / 512);
+			// 基本的な制御量の計算
 			int32_t d = dif * 512 / inp;
-			cpv += d * 2896 / 4096; // * 0.707
+
+			// 指令電圧、入力電圧の比に応じて、ゲインを制御
+			// ・指令電圧が低い場合はゲインを小さくする
+			int32_t g = (high_gain - base_gain) * ref / inp;
+			g += base_gain;
+			if(d < 0) g -= g / 4;
+			cpv += d * g / 4096;
 		}
 
 		// 出力リミッター
@@ -233,7 +266,7 @@ int main(int argc, char** argv)
 		else if(cpv > high_limit) cpv = high_limit;
 
 		gpt_.set_a(cpv);
-		uint16_t ofs = (512 - cpv) / 2;
+		uint16_t ofs = (512 - cpv) / 4;
 		gpt_.set_ad_a(cpv + ofs);	// A/D 変換開始タイミング
 
 #if 0
@@ -246,15 +279,12 @@ int main(int argc, char** argv)
 			prn_voltage_("Ref: ", ref);
 			prn_voltage_("Dif: ", dif);
 			prn_voltage_("Out: ", out);
-			root::chout_.suppress_char('0');
-			root::chout_.set_length(2);
-			root::chout_ << "PWM: " << cpv << utils::chout::endl;
-			chout_ << utils::chout::endl;
+			prn_value_("PWM: ", cpv);
         }
 #endif
 		++led;
-		if(led >= 300) led = 0;
-		if(led < 150) {
+		if(led >= 700) led = 0;
+		if(led < 350) {
 			device::PORTB::PODR.B7 = 1; // LED Off
 		} else {
 			device::PORTB::PODR.B7 = 0; // LED On
