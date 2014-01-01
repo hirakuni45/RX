@@ -247,8 +247,10 @@ int main(int argc, char** argv)
 		int32_t dif = ref - out;  // 誤差
 		// PWM の制御量に対するスレッショルド
 		if(std::abs(dif) < 40) {
-			if(dif < 0) --cpv;
-			else ++cpv;
+			if(std::abs(dif) > 20) {
+				if(dif < 0) --cpv;
+				else ++cpv;
+			}
 		} else {
 			// 基本的な制御量の計算
 			int32_t d = dif * 512 / inp;
