@@ -1,0 +1,155 @@
+#=======================================================================#
+#																		#
+#	RX Makefile R5F563T6EDFM (64K Flash, 8K Ram)				        #
+#																		#
+#=======================================================================#
+TARGET		=	acservo
+
+ASOURCES	=	start.s
+
+CSOURCES	=	vect.c \
+				init.c
+
+PSOURCES	=	main.cpp \
+				../rx/cmt_io.cpp \
+				../rx/sci_io.cpp \
+				../rx/gpt_io.cpp \
+				inv_monitor.cpp
+
+
+USER_LIBS	=	stdc++
+
+LDSCRIPT	=	rx63t_single_chip.ld
+
+USER_DEFS	=	F_PCKA=96000000 F_PCKB=48000000
+
+# 	-mcpu=rx610
+MCU_TARGET	=
+
+INC_SYS		=	/usr/boost_1_53_0
+INC_ROOT	=	./ ../
+LIB_ROOT	=	/usr/tkdn-20110720/rx-elf/rx-elf/lib
+
+#OPTIMIZE	=	-O0
+#OPTIMIZE	=	-O1
+OPTIMIZE	=	-O2
+
+CPP_OPT		=	-Wno-pmf-conversions
+
+# -fno-exceptions
+CC_OPT		=	-Wall \
+				-fno-exceptions
+#				-fdata-sections -ffunction-sections -falign-jumps -funit-at-a-time
+#				-fdata-sections -ffunction-sections -falign-jumps -fno-function-cse -funit-at-a-time
+# DEBUG_OPT	=	-Wall
+
+INCS		=	$(addprefix -I, $(INC_ROOT))
+INC_DEP		=	$(addprefix -I, $(INC_ROOT))
+LIBINCS		=	$(addprefix -L, $(LIB_ROOT))
+DEFS		=	$(addprefix -D, $(USER_DEFS))
+LIBS		=	$(addprefix -l, $(USER_LIBS))
+
+# You should not have to change anything below here.
+
+CC			=	rx-elf-gcc
+CPP			=	rx-elf-g++
+AR			=	rx-elf-ar
+LD			=	rx-elf-ld
+OBJCOPY		=	rx-elf-objcopy
+OBJDUMP		=	rx-elf-objdump
+
+# ASFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
+ASFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
+# ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
+ALL_ASFLAGS    = $(ASFLAGS) $(MCU_TARGET) $(DEFS)
+
+# Override is only needed by avr-lib build system.
+
+CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
+PFLAGS		=	-std=c++0x $(CPP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
+# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
+# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
+
+override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
+
+OBJCOPY_OPT	=	--srec-forceS3 --srec-len 32
+
+OBJECTS		=	$(ASOURCES:.s=.o) $(CSOURCES:.c=.o) $(PSOURCES:.cpp=.o)
+
+# all: $(TARGET).elf lst text
+# all: $(TARGET).elf $(LDSCRIPT) Makefile lst text
+all: $(TARGET).elf $(LDSCRIPT) Makefile lst text
+
+$(TARGET).elf: $(OBJECTS) $(LDSCRIPT) Makefile
+	$(CC) $(LDFLAGS) $(LIBINCS) -o $@ $(OBJECTS) $(LIBS)
+
+%.o: %.cpp
+	$(CPP) $(PFLAGS) $(INC_DEP) $(INCS) -c $< -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(INC_DEP) $(INCS) -c $< -o $@
+
+%.o: %.s
+	$(CC) -c $(ALL_ASFLAGS) $< -o $@
+
+clean:
+	rm -rf $(OBJECTS) $(TARGET).elf
+	rm -rf *.lst *.map $(EXTRA_CLEAN_FILES)
+
+lst:  $(TARGET).lst
+
+%.lst: %.elf
+	$(OBJDUMP) -h -S $< > $@
+
+# Rules for building the .text rom images
+
+text: mot bin
+
+bin: $(TARGET).bin
+mot: $(TARGET).mot
+
+%.mot: %.elf
+	$(OBJCOPY) $(OBJCOPY_OPT) -O srec $< $@
+
+%.bin: %.elf
+	$(OBJCOPY) -O binary $< $@
+#	$(OBJCOPY) -j .vects -j .text -j .data -O binary $< $@
+
+
+depend:
+	makedepend -Y -- $(CFLAGS) $(INC_DEP) -- $(CSOURCES) $(PSOURCES)
+
+tarball:
+	chmod 644 ../fatfs/src/*.[hc] \
+		../fatfs/src/option/*.c \
+		../fatfs/rx621/*.[hc]pp \
+		../rx62x/*.[hc]pp \
+		*.s *.[hc] *.[hc]pp *.ld Makefile
+	rm -f $(TARGET)_src.tgz
+	tar cfvz $(TARGET)_src.tgz \
+		../fatfs/src/*.[hc] \
+		../fatfs/src/option/*.c \
+		../fatfs/rx621/*.[hc]pp \
+		../rx62x/*.[hc]pp \
+		../rx621_sd/*.s ../rx621_sd/*.[hc] ../rx621_sd/*.[hc]pp \
+		../rx621_sd/*.ld ../rx621_sd/Makefile
+	chmod 444 $(TARGET)_src.tgz
+
+# DO NOT DELETE
+
+vect.o: vect.h
+main.o: main.hpp ../rx/rx63x/system.hpp ../rx/io_utils.hpp
+main.o: ../rx/rx63x/port.hpp ../rx/rx63x/mpc.hpp ../rx/cmt_io.hpp
+main.o: ../rx/cmt.hpp ../rx/io_utils.hpp ../rx/rx63x/system.hpp
+main.o: ../rx/rx63x/icu.hpp vect.h ../rx/sci_io.hpp ../rx/rx63x/sci.hpp
+main.o: ../rx/fifo.hpp ../rx/gpt_io.hpp ../rx/rx63x/gpt.hpp ../rx/adc_io.hpp
+main.o: ../rx/rx63x/s12ad.hpp ../rx/chout.hpp inv_monitor.hpp command.hpp
+../rx/cmt_io.o: ../rx/cmt_io.hpp ../rx/cmt.hpp ../rx/io_utils.hpp
+../rx/cmt_io.o: ../rx/rx63x/system.hpp ../rx/io_utils.hpp ../rx/rx63x/icu.hpp
+../rx/cmt_io.o: vect.h
+../rx/sci_io.o: ../rx/sci_io.hpp ../rx/rx63x/sci.hpp ../rx/io_utils.hpp
+../rx/sci_io.o: ../rx/rx63x/system.hpp ../rx/rx63x/icu.hpp vect.h
+../rx/sci_io.o: ../rx/fifo.hpp
+../rx/gpt_io.o: ../rx/gpt_io.hpp ../rx/rx63x/gpt.hpp ../rx/io_utils.hpp
+../rx/gpt_io.o: ../rx/rx63x/system.hpp ../rx/rx63x/icu.hpp vect.h
+inv_monitor.o: inv_monitor.hpp command.hpp main.hpp
