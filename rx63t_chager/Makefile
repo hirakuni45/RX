@@ -74,7 +74,8 @@ override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCR
 
 OBJCOPY_OPT	=	--srec-forceS3 --srec-len 32
 
-OBJECTS		=	$(ASOURCES:.s=.o) $(CSOURCES:.c=.o) $(PSOURCES:.cpp=.o)
+OBJECTS	=	$(ASOURCES:.s=.o) $(CSOURCES:.c=.o) $(PSOURCES:.cpp=.o)
+DEPENDS =   $(CSOURCES:.c=.d) $(PSOURCES:.cpp=.d) 
 
 # all: $(TARGET).elf lst text
 # all: $(TARGET).elf $(LDSCRIPT) Makefile lst text
@@ -92,7 +93,18 @@ $(TARGET).elf: $(OBJECTS) $(LDSCRIPT) Makefile
 %.o: %.s
 	$(CC) -c $(ALL_ASFLAGS) $< -o $@
 
+%.d: %.c %.h
+	echo '$*.o: \' > $@
+	$(CC) -MM $(COPT) $(CFLAGS) $(INCS) $(CCWARN) $< | \
+	sed 's/.*://' >> $@
+
+%.d: %.cpp %.hpp
+	echo '$*.o: \' > $@
+	$(CPP) -MM $(POPT) $(PFLAGS) $(INCS) $(CPWARN) $< | \
+	sed 's/.*://' >> $@
+
 clean:
+	rm -rf $(DEPENDS)
 	rm -rf $(OBJECTS) $(TARGET).elf
 	rm -rf *.lst *.map $(EXTRA_CLEAN_FILES)
 
@@ -132,3 +144,7 @@ tarball:
 		../rx621_sd/*.ld ../rx621_sd/Makefile
 	chmod 444 $(TARGET)_src.tgz
 
+clean_depend:
+	rm -f $(DEPENDS)
+
+-include $(DEPENDS)

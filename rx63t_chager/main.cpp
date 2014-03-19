@@ -260,6 +260,8 @@ int32_t gain = 130;
 		if(cpv < low_limit) cpv = low_limit;
 		else if(cpv > high_limit) cpv = high_limit;
 
+cpv = 108;
+
 		gpt_.set_a(cpv);
 		uint16_t ofs = (512 - cpv) / 4;
 		gpt_.set_ad_a(cpv + ofs);	// A/D 変換開始タイミング
