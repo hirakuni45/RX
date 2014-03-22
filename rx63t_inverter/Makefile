@@ -27,8 +27,8 @@ USER_DEFS	=	F_PCKA=96000000 F_PCKB=48000000
 MCU_TARGET	=
 
 INC_SYS		=	/usr/boost_1_53_0
-INC_ROOT	=	./ ../
-LIB_ROOT	=	/usr/tkdn-20110720/rx-elf/rx-elf/lib
+INC_ROOT	=	. ..
+LIB_ROOT	=
 
 #OPTIMIZE	=	-O0
 #OPTIMIZE	=	-O1
@@ -75,6 +75,7 @@ override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCR
 OBJCOPY_OPT	=	--srec-forceS3 --srec-len 32
 
 OBJECTS		=	$(ASOURCES:.s=.o) $(CSOURCES:.c=.o) $(PSOURCES:.cpp=.o)
+DEPENDS =   $(CSOURCES:.c=.d) $(PSOURCES:.cpp=.d) 
 
 # all: $(TARGET).elf lst text
 # all: $(TARGET).elf $(LDSCRIPT) Makefile lst text
@@ -84,15 +85,26 @@ $(TARGET).elf: $(OBJECTS) $(LDSCRIPT) Makefile
 	$(CC) $(LDFLAGS) $(LIBINCS) -o $@ $(OBJECTS) $(LIBS)
 
 %.o: %.cpp
-	$(CPP) $(PFLAGS) $(INC_DEP) $(INCS) -c $< -o $@
+	$(CPP) $(PFLAGS) $(INCS) -c $< -o $@
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(INC_DEP) $(INCS) -c $< -o $@
+	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
 
 %.o: %.s
 	$(CC) -c $(ALL_ASFLAGS) $< -o $@
 
+%.d: %.c %.h
+	echo '$*.o: \' > $@
+	$(CC) -MM $(COPT) $(CFLAGS) $(INCS) $(CCWARN) $< | \
+	sed 's/.*://' >> $@
+
+%.d: %.cpp %.hpp
+	echo '$*.o: \' > $@
+	$(CPP) -MM $(POPT) $(PFLAGS) $(INCS) $(CPWARN) $< | \
+	sed 's/.*://' >> $@
+
 clean:
+	rm -rf $(DEPENDS)
 	rm -rf $(OBJECTS) $(TARGET).elf
 	rm -rf *.lst *.map $(EXTRA_CLEAN_FILES)
 
@@ -115,10 +127,6 @@ mot: $(TARGET).mot
 	$(OBJCOPY) -O binary $< $@
 #	$(OBJCOPY) -j .vects -j .text -j .data -O binary $< $@
 
-
-depend:
-	makedepend -Y -- $(CFLAGS) $(INC_DEP) -- $(CSOURCES) $(PSOURCES)
-
 tarball:
 	chmod 644 ../fatfs/src/*.[hc] \
 		../fatfs/src/option/*.c \
@@ -135,21 +143,7 @@ tarball:
 		../rx621_sd/*.ld ../rx621_sd/Makefile
 	chmod 444 $(TARGET)_src.tgz
 
-# DO NOT DELETE
+clean_depend:
+	rm -f $(DEPENDS)
 
-vect.o: vect.h
-main.o: main.hpp ../rx/rx63x/system.hpp ../rx/io_utils.hpp
-main.o: ../rx/rx63x/port.hpp ../rx/rx63x/mpc.hpp ../rx/cmt_io.hpp
-main.o: ../rx/cmt.hpp ../rx/io_utils.hpp ../rx/rx63x/system.hpp
-main.o: ../rx/rx63x/icu.hpp vect.h ../rx/sci_io.hpp ../rx/rx63x/sci.hpp
-main.o: ../rx/fifo.hpp ../rx/gpt_io.hpp ../rx/rx63x/gpt.hpp ../rx/adc_io.hpp
-main.o: ../rx/rx63x/s12ad.hpp ../rx/chout.hpp inv_monitor.hpp command.hpp
-../rx/cmt_io.o: ../rx/cmt_io.hpp ../rx/cmt.hpp ../rx/io_utils.hpp
-../rx/cmt_io.o: ../rx/rx63x/system.hpp ../rx/io_utils.hpp ../rx/rx63x/icu.hpp
-../rx/cmt_io.o: vect.h
-../rx/sci_io.o: ../rx/sci_io.hpp ../rx/rx63x/sci.hpp ../rx/io_utils.hpp
-../rx/sci_io.o: ../rx/rx63x/system.hpp ../rx/rx63x/icu.hpp vect.h
-../rx/sci_io.o: ../rx/fifo.hpp
-../rx/gpt_io.o: ../rx/gpt_io.hpp ../rx/rx63x/gpt.hpp ../rx/io_utils.hpp
-../rx/gpt_io.o: ../rx/rx63x/system.hpp ../rx/rx63x/icu.hpp vect.h
-inv_monitor.o: inv_monitor.hpp command.hpp main.hpp
+-include $(DEPENDS)
