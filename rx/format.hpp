@@ -7,6 +7,16 @@
 //=====================================================================//
 #include <unistd.h>
 
+/// ８進数のサポート
+/// #define WITH_OCTAL_FORMAT
+/// 浮動小数点(float)のサポート
+/// #define WITH_FLOAT_FORMAT
+/// 浮動小数点(double)のサポート
+/// #define WITH_DOUBLE_FORMAT
+
+/// エラーのメッセージ出力
+// #define ERROR_MESSAGE
+
 namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -19,7 +29,6 @@ namespace utils {
 			NULL_PTR,		///< 無効なポインター
 			UNKNOWN_TYPE,	///< 不明な「型」
 			DIFFERENT_TYPE,	///< 違う「型」
-			INT_REAL_RANGE,	///< 整数小数点、範囲外
 		};
 	};
 
@@ -31,21 +40,24 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class OUT>
 	class error {
+#ifdef ERROR_MESSAGE
 		OUT		out_;
-
 		void str_(const char* str) {
 			char ch;
 			while((ch = *str++) != 0) {
 				out_(ch);
 			}
 		}
+#endif
 	public:
 		void operator() (error_case::type t) {
+#ifdef ERROR_MESSAGE
 			if(t == error_case::UNKNOWN_TYPE) {
 				str_("Unknown type\n");
 			} else if(t == error_case::DIFFERENT_TYPE) {
 				str_("Different type\n");
 			}
+#endif
 		}
 	};
 
@@ -62,15 +74,19 @@ namespace utils {
 			CHA,		///< 文字
 			STR,		///< 文字列
 			BINARY,		///< ２進
+#ifdef WITH_OCTAL_FORMAT
 			OCTAL,		///< ８進
+#endif
 			DECIMAL,	///< １０進
 			U_DECIMAL,	///< １０進（符号無し）
 			HEX_CAPS,	///< １６進（大文字）
 			HEX,		///< １６進（小文字）
-			INT_REAL,	///< 整数小数点
+			FIXED_REAL,	///< 固定小数点
+#if defined(WITH_FLOAT_FORMAT) | defined(WITH_DOUBLE_FORMAT)
 			REAL,		///< 浮動小数点
 			EXPONENT,	///< 浮動小数点 exp 形式
 			REAL_AUTO,	///< 浮動小数点自動
+#endif
 			NONE_		///< 不明
 		};
 
@@ -140,9 +156,11 @@ namespace utils {
 					} else if(ch == 'b') {
 						mode_ = mode::BINARY;
 						return;
+#ifdef WITH_OCTAL_FORMAT
 					} else if(ch == 'o') {
 						mode_ = mode::OCTAL;
 						return;
+#endif
 					} else if(ch == 'd') {
 						mode_ = mode::DECIMAL;
 						return;
@@ -156,8 +174,9 @@ namespace utils {
 						mode_ = mode::HEX_CAPS;
 						return;
 					} else if(ch == 'y') {
-						mode_ = mode::INT_REAL;
+						mode_ = mode::FIXED_REAL;
 						return;
+#if defined(WITH_FLOAT_FORMAT) | defined(WITH_DOUBLE_FORMAT)
 					} else if(ch == 'f' || ch == 'F') {
 						mode_ = mode::REAL;
 						return;
@@ -167,6 +186,7 @@ namespace utils {
 					} else if(ch == 'g' || ch == 'G') {
 						mode_ = mode::REAL_AUTO;
 						return;
+#endif
 					} else if(ch == '%') {
 						out_(ch);
 						fm = false;
@@ -204,7 +224,7 @@ namespace utils {
 
 		void out_bin_(int v) {
 			char tmp[34];
-			char* p = &tmp[34 - 1];
+			char* p = &tmp[sizeof(tmp) - 1];
 			*p = 0;
 			uint8_t n = 0;
 			do {
@@ -217,9 +237,10 @@ namespace utils {
 			out_str_(p, n);
 		}
 
+#ifdef WITH_OCTAL_FORMAT
 		void out_oct_(int v) {
 			char tmp[14];
-			char* p = &tmp[14 - 1];
+			char* p = &tmp[sizeof(tmp) - 1];
 			*p = 0;
 			uint8_t n = 0;
 			do {
@@ -231,10 +252,11 @@ namespace utils {
 			if(sign_) { --p; ++n; *p = '+'; }
 			out_str_(p, n);
 		}
+#endif
 
 		void out_dec_(int v) {
 			char tmp[12];
-			char* p = &tmp[12 - 1];
+			char* p = &tmp[sizeof(tmp) - 1];
 			*p = 0;
 			uint8_t n = 0;
 			char sign = 0;
@@ -252,7 +274,7 @@ namespace utils {
 
 		void out_dec_(unsigned int v) {
 			char tmp[12];
-			char* p = &tmp[12 - 1];
+			char* p = &tmp[sizeof(tmp) - 1];
 			*p = 0;
 			uint8_t n = 0;
 			do {
@@ -267,7 +289,7 @@ namespace utils {
 
 		void out_hex_(unsigned int v, char top) {
 			char tmp[10];
-			char* p = &tmp[10 - 1];
+			char* p = &tmp[sizeof(tmp) - 1];
 			*p = 0;
 			uint8_t n = 0;
 			do {
@@ -293,35 +315,28 @@ namespace utils {
 			return m;
 		}
 
-		void out_int_real_(int v) {
-			if(ppos_ > 31) {
-				err_(error_case::INT_REAL_RANGE);
-				return;
-			}
+		void out_fixed_point_(int v, uint8_t fixpoi) {
 
-			out_dec_(v >> ppos_);
-			if(ppos_ == 0) return;
+			out_dec_(v >> fixpoi);
 			out_('.');
 
 			uint32_t d;
 			if(v < 0) { d = -v; } else { d = v; }
-			uint32_t dec = d & make_mask_(ppos_);
+			uint32_t dec = d & make_mask_(fixpoi);
 
 			int l = 0;
 			char buff[24];
-			if(decimal_ == 0) decimal_ = 3;
-			else if(decimal_ > (sizeof(buff) - 1)) decimal_ = sizeof(buff) - 1;
+			if(decimal_ > (sizeof(buff) - 1)) decimal_ = sizeof(buff) - 1;
 			while(dec > 0) {
 				dec *= 10;
-				uint32_t n = dec >> ppos_;
+				uint32_t n = dec >> fixpoi;
 				buff[l] = n + '0';
-				dec -= n << ppos_;
+				dec -= n << fixpoi;
 				++l;
 				if(l >= decimal_ || l >= (sizeof(buff) - 1)) break;
 			}
 			while(l < decimal_) {
-				if(zerosupp_) buff[l] = '0';
-				else buff[l] = ' ';
+				buff[l] = '0';
 				++l;
 			}
 			buff[l] = 0;
@@ -342,85 +357,35 @@ g, G
 
 #endif
 
-		void out_real_(float val) {
+#ifdef WITH_FLOAT_FORMAT
+		void out_real_(float v) {
 
-			uint32_t fpv = *(reinterpret_cast<uint32_t*>(&val));
+			uint32_t fpv = *(reinterpret_cast<uint32_t*>(&v));
 			bool sign = fpv >> 31;
-			int32_t e = (fpv >> 23) & 0xff;
-			e -= 127;	// bias (-127)
-			uint32_t v = fpv & 0x7fffff;
-			if(v == 0 && e == -127) ; // [0.0]
+			int32_t exp = (fpv >> 23) & 0xff;
+			exp -= 127;	// bias (-127)
+			int val = fpv & 0x7fffff;	// 23 bits
+			int shift = 23;
+			if(sign) val = -val;
+			if(val == 0 && exp == -127) ; // [0.0]
 			else {
-				v |= 0x800000; // add offset 1.0
+				val |= 0x800000; // add offset 1.0
 			}
-
 #if 0
-std::cout << "Real: " << val << std::endl;
+std::cout << "Real: " << v << std::endl;
 std::cout << "S: " << static_cast<int>(sign) << std::endl;
-std::cout << "E: " << static_cast<int>(e) << std::endl;
-std::cout << "P: " << static_cast<int>(v) << std::endl;
+std::cout << "E: " << static_cast<int>(exp) << std::endl;
+std::cout << "P: " << static_cast<int>(val) << std::endl;
 #endif
 
-			bool exp = false;
-			uint32_t o = 0x800000;
-			if(e > 0) {
-				if(e > 23) exp = true;
-				else {
-					o >>= e;
-					e = 0;
-				}
-			} else if(e < 0) {
-				e = -e;
-				if(e >= 8) {
-					if(e > 8) {
-						o <<= 8;
-						e -= 8;
-					} else {
-						o <<= e;
-						e = 0;
-					}
-				}
-// 精度を確保する必要があるので、これではマズイ・・
-				v >>= e;
-				e = 0;
+			if(exp > 0) {
+				shift -= exp;
+			} else if(exp < 0) {
+				shift -= exp;
 			}
 
-			uint32_t pup;
-			char pdn[16];
-			char* p = pdn;
-			bool po = false;
-			while(o > 0) {
-				uint32_t n = (v * 10) / o;
-				if(!po) {
-					pup = n / 10;
-					*p++ = (n % 10) + '0';
-					po = true;
-				} else {
-					*p++ = n + '0';
-				}
-				v = v * 10 - n * o;
-				v /= 10;
-				o /= 10;
-			}
-
-			// 小数点以下のゼロサプレスと長さ制限
-			do {
-				--p;
-			} while(*p == '0') ;
-			++p;
-			if(pdn == p) *p++ = '0';
-			if((p - pdn) >= decimal_) {
-				p = &pdn[decimal_];
-			}
-			*p = 0;
-
-			int d = static_cast<int>(pup);
-			if(sign) d = -d;
-			out_dec_(d);
-			out_('.');
-			out_str_(pdn);			
-
-///			out_str_(p, n);
+			if(decimal_ == 0) decimal_ = 6;
+			out_fixed_point_(val, shift);
 		}
 
 		void out_exp_(float v) {
@@ -429,6 +394,19 @@ std::cout << "P: " << static_cast<int>(v) << std::endl;
 		void out_real_auto_(float v) {
 
 		}
+#endif
+
+#ifdef WITH_DOUBLE_FORMAT
+		void out_real_(double val) {
+		}
+
+		void out_exp_(double v) {
+		}
+
+		void out_real_auto_(double v) {
+
+		}
+#endif
 
 	public:
 		//-----------------------------------------------------------------//
@@ -449,11 +427,11 @@ std::cout << "P: " << static_cast<int>(v) << std::endl;
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		format& operator % (const char val) {
+		format& operator % (char val) {
 			if(mode_ == mode::CHA) {
 				out_(val);
 			} else {
-
+				err_(error_case::DIFFERENT_TYPE);
 			}
 			reset_();
 			next_();
@@ -496,16 +474,19 @@ std::cout << "P: " << static_cast<int>(v) << std::endl;
 		format& operator % (int val) {
 			if(mode_ == mode::BINARY) {
 				out_bin_(val);
+#ifdef WITH_OCTAL_FORMAT
 			} else if(mode_ == mode::OCTAL) {
 				out_oct_(val);
+#endif
 			} else if(mode_ == mode::DECIMAL) {
 				out_dec_(val);
 			} else if(mode_ == mode::HEX) {
 				out_hex_(static_cast<unsigned int>(val), 'a');
 			} else if(mode_ == mode::HEX_CAPS) {
 				out_hex_(static_cast<unsigned int>(val), 'A');
-			} else if(mode_ == mode::INT_REAL) {
-				out_int_real_(val);
+			} else if(mode_ == mode::FIXED_REAL) {
+				if(decimal_ == 0) decimal_ = 3;
+				out_fixed_point_(val, ppos_);
 			} else {
 				err_(error_case::DIFFERENT_TYPE);
 			}
@@ -525,8 +506,10 @@ std::cout << "P: " << static_cast<int>(v) << std::endl;
 		format& operator % (unsigned int val) {
 			if(mode_ == mode::BINARY) {
 				out_bin_(val);
+#ifdef WITH_OCTAL_FORMAT
 			} else if(mode_ == mode::OCTAL) {
 				out_oct_(val);
+#endif
 			} else if(mode_ == mode::DECIMAL) {
 				out_dec_(val);
 			} else if(mode_ == mode::U_DECIMAL) {
@@ -535,8 +518,9 @@ std::cout << "P: " << static_cast<int>(v) << std::endl;
 				out_hex_(val, 'a');
 			} else if(mode_ == mode::HEX_CAPS) {
 				out_hex_(val, 'A');
-			} else if(mode_ == mode::INT_REAL) {
-				out_int_real_(val);
+			} else if(mode_ == mode::FIXED_REAL) {
+				if(decimal_ == 0) decimal_ = 3;
+				out_fixed_point_(val, ppos_);
 			} else {
 				err_(error_case::DIFFERENT_TYPE);
 			}
@@ -546,10 +530,11 @@ std::cout << "P: " << static_cast<int>(v) << std::endl;
 		}
 
 
+#ifdef WITH_FLOAT_FORMAT
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  オペレーター「%」
-			@param[in]	val	浮動小数点
+			@param[in]	val	浮動小数点(float)
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
@@ -567,5 +552,30 @@ std::cout << "P: " << static_cast<int>(v) << std::endl;
 			next_();
 			return *this;
 		}
+#endif
+
+#ifdef WITH_DOUBLE_FORMAT
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オペレーター「%」
+			@param[in]	val	浮動小数点(double)
+			@return	自分の参照
+		*/
+		//-----------------------------------------------------------------//
+		format& operator % (double val) {
+			if(mode_ == mode::REAL) {
+				out_real_(val);
+			} else if(mode_ == mode::EXPONENT) {
+				out_exp_(val);
+			} else if(mode_ == mode::REAL_AUTO) {
+				out_real_auto_(val);
+			} else {
+				err_(error_case::DIFFERENT_TYPE);
+			}
+			reset_();
+			next_();
+			return *this;
+		}
+#endif
 	};
 }
