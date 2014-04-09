@@ -38,6 +38,10 @@ namespace device {
 			bit_t< smr_io, 5>	  PE;
 			bit_t< smr_io, 6>	  CHR;
 			bit_t< smr_io, 7>	  CM;
+
+			bits_t< smr_io, 2, 2> BCP;
+			bit_t< smr_io,  6>	  BLK;
+			bit_t< smr_io,  7>	  GM;
 		};
 		static smr_t SMR;
 

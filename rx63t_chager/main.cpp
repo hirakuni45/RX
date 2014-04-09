@@ -5,7 +5,8 @@
 */
 //=====================================================================//
 #include <cstdint>
-#include <cmath>
+// #include <cmath>
+#include <cstdlib>
 #include "main.hpp"
 #include "rx/rx63x/system.hpp"
 #include "rx/rx63x/port.hpp"
@@ -14,18 +15,42 @@
 #include "rx/sci_io.hpp"
 #include "rx/gpt_io.hpp"
 #include "rx/adc_io.hpp"
-#include "rx/chout.hpp"
+#include "rx/format.hpp"
 #include "chager.hpp"
+#include "ssd1306z_io.hpp"
+#include "monograph.hpp"
 
+static volatile uint8_t dummy_;
+//-----------------------------------------------------------------//
+/*!
+	@brief	無駄ループによる時間待ち
+	@param[in]	n	無駄ループ回数
+ */
+//-----------------------------------------------------------------//
+void wait_delay(uint32_t n)
+{
+	// とりあえず無駄ループ
+	for(uint32_t i = 0; i < n; ++i) {
+		dummy_ += i & 255;
+	}
+}
 
 namespace root {
 	device::cmt_io<device::CMT0>  cmt_;
-	device::sci_io<device::SCI1, 256, 256>  sci_;
+	device::sci_io<device::SCI1, 256, 256> sci_;
 	device::gpt_io<device::GPT0>  gpt_;
 	device::adc_io<device::S12AD> adc_;
-	utils::chout chout_;
+	device::ssd1306z_io oled_;
 	utils::chager chager_;
+	graphics::monograph	monog_;
 }
+
+struct chout {
+	void operator() (char ch) {
+		root::sci_.putch(ch);
+	}
+};
+typedef utils::format<chout>	format;
 
 
 //-----------------------------------------------------------------//
@@ -89,36 +114,6 @@ void delay_10ms(uint32_t n)
 	}
 }
 
-
-void prn_voltage_(const char* info, int32_t v)
-{
-	int32_t vv = v * 15 * 100 / 4096;
-	int32_t mod = vv % 100;
-	if(mod < 0) mod = -mod;
-	root::chout_.suppress_char(' ');
-	root::chout_.set_length(0);
-	root::chout_ << info << (vv / 100) << '.';
-	root::chout_.suppress_char('0');
-	root::chout_.set_length(2);
-	root::chout_ << mod << utils::chout::endl;
-}
-
-void prn_value_(const char* info, int32_t v)
-{
-	root::chout_.suppress_char(' ');
-	root::chout_.set_length(0);
-	root::chout_ << info << v << utils::chout::endl;
-}
-
-static volatile uint8_t dummy_;
-
-static void wait_()
-{
-	// とりあえず無駄ループ
-	for(uint32_t i = 0; i < 5000; ++i) {
-		i += dummy_ & 0;
-	}
-}
 int main(int argc, char** argv);
 
 int main(int argc, char** argv)
@@ -132,12 +127,12 @@ int main(int argc, char** argv)
 	dummy_ = device::SYSTEM::MOSCCR.MOSTP();
 	device::SYSTEM::MOFCR.MOFXIN = 1;			// メインクロック強制発振
 	dummy_ = device::SYSTEM::MOFCR.MOFXIN();
-	wait_();
+	wait_delay(5000);
 
 	device::SYSTEM::PLLCR.STC = 0xf;			// PLL 16 倍(192MHz)
 	device::SYSTEM::PLLWTCR.PSTS = 0b01010;		// 131072 サイクル待ち
 	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
-	wait_();
+	wait_delay(5000);
 
 	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(3)		// 1/8 (192/8=24)
 						  | device::SYSTEM::SCKCR.ICK.b(1)		// 1/2 (192/2=96)
@@ -149,18 +144,19 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR3.CKSEL = 4;	///< PLL 回路選択
 
 	// Signal LED 出力設定
-	device::PORTB::PDR.B7 = 1; // PORTB:B7 output
-	device::PORTB::PODR.B7 = 1; // LED Off
+	device::PORTB::PDR.B7 = 1;	// PORTB:B7 output
+	device::PORTB::PODR.B7 = 1;	// LED Off
 
 	// SCI1 の初期化（PD5:RXD1:input, PD3:TXD1:output）
 	device::PORTD::PDR.B3 = 1;
+	device::PORTD::PDR.B5 = 0;
 	device::MPC::PWPR.B0WI = 0;				// PWPR 書き込み許可
 	device::MPC::PWPR.PFSWE = 1;			// PxxPFS 書き込み許可
 	device::MPC::PD3PFS.PSEL = 0b01010;		// TXD1 設定
 	device::MPC::PD5PFS.PSEL = 0b01010;		// RXD1 設定
 	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
-	device::PORTD::PMR.B3 = 1;
-	device::PORTD::PMR.B5 = 1;
+	device::PORTD::PMR.B3 = 1;				// 周辺機能として使用
+	device::PORTD::PMR.B5 = 1;				// 周辺機能として使用
 	static const uint8_t sci_irq_level = 1;
 	sci_.initialize(sci_irq_level);
 	sci_.start(115200);
@@ -172,7 +168,7 @@ int main(int argc, char** argv)
 	device::MPC::PWPR.PFSWE = 1;		// PxxPFS 書き込み許可
 	device::MPC::P71PFS.PSEL = 0b0110;	// GTIOC0A 設定
 	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
-	device::PORT7::PMR.B1 = 1;
+	device::PORT7::PMR.B1 = 1;			// 周辺機能として使用
 	gpt_.start();	// PWM start
 	gpt_.set_r(512 - 1);
 	gpt_.set_a(256);
@@ -196,27 +192,43 @@ int main(int argc, char** argv)
 
 ///	device::SYSTEM::PRCR = 0xa500;	///< クロック、低消費電力、関係書き込み禁止
 
-	for(int i = 0; i < 10; ++i) {
-		adc_.start(0b00000111);
+	monog_.init();
+	oled_.initialize();
+
+	uint16_t xx = 0;
+	uint16_t yy = 0;
+	int l = 0;
+	while(1) {
+		uint16_t x = rand() & 127;
+		uint16_t y = rand() & 63;
+		monog_.line(xx, yy, x, y, 1);
+		xx = x;
+		yy = y;
+		++l;
+		if(l >= 20) {
+			monog_.clear(0);
+			l = 0;
+		}
 		cmt_.sync();
-		adc_.sync();
-		int32_t v = static_cast<int32_t>(adc_.get(0));
-		prn_value_("Ch0: ", v);
+		oled_.copy(monog_.fb());
 	}
+
+	adc_.start(0b00000111);
+	cmt_.sync();
+	adc_.sync();
+	int v = static_cast<int32_t>(adc_.get(2));
+	format("Input Voltage: %2.4:8y\n") % ((v * 25) >> 4);
 
 	uint32_t cnt = 0;
 	uint32_t led = 0;
 
-	int32_t ds = 0;
+	int32_t low_limit  = 10;  // 0.46V at 24V
+	int32_t high_limit = 320; // 15.0V at 24V
 
-	int32_t ref = 300;
+	// 6:1
+	int32_t ref = static_cast<int32_t>((4096.0f / 2.5f) * (5.0f / 6.0f));
 
-	int32_t val = 0;
-
-	int32_t low_limit = 10; // 0.23V at 12V input
-	int32_t high_limit = 500; // 11.72V at 12V input
-	int32_t cpv = low_limit;
-	bool up = true;
+	int32_t cpv = low_limit; // 初期電圧
 	while(1) {
 		adc_.start(0b00000111);
 
@@ -225,48 +237,19 @@ int main(int argc, char** argv)
 		// A/D 変換開始
 		adc_.sync();
 
-/// device::PORTB::PODR.B7 = 0; // LED On
+		int32_t out = static_cast<int32_t>(adc_.get(0)); // 出力電圧 6:1 (Ref:2.5V, 4096:15V)
+		int32_t cur = static_cast<int32_t>(adc_.get(1)); // 出力電流 0 to 2.5A (4096:2.5A)
+		int32_t inp = static_cast<int32_t>(adc_.get(2)); // 入力電圧 10:1 (Ref:2.5V, 4096:25V)
 
-		int32_t ref = static_cast<int32_t>(adc_.get(0)); // 指令電圧
-		int32_t out = static_cast<int32_t>(adc_.get(1)); // 出力電圧
-		int32_t inp = static_cast<int32_t>(adc_.get(2)); // 入力電圧
+		if(ref < out) --cpv;
+		else if(ref > out) ++cpv;
 
-// int32_t gain = static_cast<int32_t>(adc_.get(0));
-int32_t gain = 130;
-
-		// 三角波
-#if 0
-		if(up) {
-			ref += 1;
-		} else {
-			ref -= 1;
-		}
-
-		if(ref > 1700) {
-			up = false;
-			ref = 1700;
-		} else if(ref < 200) {
-			up = true;
-			ref = 200;
-		}
-#endif
-
-		int32_t dif = ref - out;  // 誤差
-		// PWM の制御量に対するスレッショルド
-		int32_t d = dif * gain / inp;
-		val += d;
-		cpv = val / 8;
-		// 出力リミッター
 		if(cpv < low_limit) cpv = low_limit;
 		else if(cpv > high_limit) cpv = high_limit;
-
-cpv = 108;
 
 		gpt_.set_a(cpv);
 		uint16_t ofs = (512 - cpv) / 4;
 		gpt_.set_ad_a(cpv + ofs);	// A/D 変換開始タイミング
-
-/// device::PORTB::PODR.B7 = 1; // LED Off
 
 #if 0
 		chager_.service();
@@ -281,7 +264,8 @@ cpv = 108;
 			prn_value_("PWM: ", cpv);
         }
 #endif
-#if 1
+
+
 		++led;
 		if(led >= (93750 / 2)) led = 0;
 		if(led < (93750 / 4)) {
@@ -289,6 +273,5 @@ cpv = 108;
 		} else {
 			device::PORTB::PODR.B7 = 0; // LED On
 		}
-#endif
 	}
 }

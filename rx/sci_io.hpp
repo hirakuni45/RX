@@ -62,49 +62,7 @@ namespace device {
 			}
 		}
 
-	public:
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  コンストラクター
-		*/
-		//-----------------------------------------------------------------//
-		sci_io() : intr_level_(1), crlf_(true), polling_(false) { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  初期化 @n
-					※ポーリングの場合は設定しなくても良い
-			@param[in]	level	割り込みレベル
-		*/
-		//-----------------------------------------------------------------//
-		void initialize(uint32_t level) {
-			intr_level_ = level;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ボーレートを設定して、SCI を有効にする
-			@param[in]	baud	ボーレート
-			@param[in]	polling	ポーリングの場合「true」
-			@return エラーなら「false」
-		*/
-		//-----------------------------------------------------------------//
-		bool start(uint32_t baud, bool polling = false) {
-			polling_ = polling;
-
-			uint32_t brr = F_PCKB / baud / 16;
-			uint8_t cks = 0;
-			while(brr > 512) {
-				brr >>= 2;
-				++cks;
-			}
-			if(cks > 3 || brr == 0) return false;
-			bool abcs = true;
-			if(brr > 256) { brr /= 2; abcs = false; }
-
-			uint32_t chanel = SCIx::get_chanel();
+		bool set_intr_(uint32_t chanel) {
 			switch(chanel) {
 			case 0:
 				SYSTEM::MSTPCRB.MSTPB31 = 0;	// B31 (SCI0)のストップ状態解除
@@ -177,11 +135,62 @@ namespace device {
 					return false;
 				}
 			}
+			return true;
+		}
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		sci_io() : intr_level_(1), crlf_(true), polling_(false) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  初期化 @n
+					※ポーリングの場合は設定しなくても良い
+			@param[in]	level	割り込みレベル
+		*/
+		//-----------------------------------------------------------------//
+		void initialize(uint32_t level) {
+			intr_level_ = level;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ボーレートを設定して、SCI を有効にする
+			@param[in]	baud	ボーレート
+			@param[in]	polling	ポーリングの場合「true」
+			@return エラーなら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool start(uint32_t baud, bool polling = false) {
+			polling_ = polling;
+
+			uint32_t brr = F_PCKB / baud / 16;
+			uint8_t cks = 0;
+			while(brr > 512) {
+				brr >>= 2;
+				++cks;
+			}
+			if(cks > 3) return false;
+			bool abcs = true;
+			if(brr > 256) { brr /= 2; abcs = false; }
+
+			uint32_t chanel = SCIx::get_chanel();
+
+			if(!set_intr_(chanel)) {
+				return false;
+			}
 
 			// 8 bits, 1 stop bit, no-parrity
 			SCIx::SMR = cks;
 			SCIx::SEMR.ABCS = abcs;
-			SCIx::BRR = static_cast<uint8_t>(brr - 1);
+			if(brr) --brr;
+			SCIx::BRR = static_cast<uint8_t>(brr);
 
 			if(polling_) {
 				SCIx::SCR = SCIx::SCR.TE.b() | SCIx::SCR.RE.b();
@@ -195,11 +204,90 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  通信速度を設定して、SPI を有効にする
+			@param[in]	master	マスターモードの場合「true」
+			@param[in]	bps	ビットレート
+			@param[in]	polling	ポーリングの場合「true」
+			@return エラーなら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool start_spi(bool master, uint32_t bps)
+		{
+			polling_ = false;
+			crlf_ = false;
+
+			uint32_t brr = F_PCKB / bps / 4;
+			uint8_t cks = 0;
+			while(brr > 256) {
+				brr >>= 2;
+				++cks;
+			}
+			if(cks > 3 || brr > 256) return false;
+
+			uint32_t chanel = SCIx::get_chanel();
+			if(!set_intr_(chanel)) {
+				return false;
+			}
+
+			// LSB(0), MSB(1) first
+			SCIx::SCMR.SDIR = 1;
+
+			SCIx::SIMR1.IICM = 0;
+			SCIx::SMR = cks | SCIx::SMR.CM.b();
+			SCIx::SPMR.SSE = 0;		///< SS 端子制御しない「０」
+
+			if(master) {
+				SCIx::SPMR.MSS = 0;
+			} else {
+				SCIx::SPMR.MSS = 1;
+			}
+
+			// クロックタイミング種別選択
+			SCIx::SPMR.CKPOL = 0;
+			SCIx::SPMR.CKPH  = 0;
+
+			if(brr) --brr;
+			SCIx::BRR = static_cast<uint8_t>(brr);
+
+			uint8_t scr = 0;
+			if(master) {
+				scr = SCIx::SCR.CKE.b(0b01);
+			} else {
+				scr = SCIx::SCR.CKE.b(0b10);
+			}
+
+			if(polling_) {
+				SCIx::SCR = SCIx::SCR.TE.b() | SCIx::SCR.RE.b() | scr;
+			} else {
+				SCIx::SCR = SCIx::SCR.RIE.b() | SCIx::SCR.TE.b() | SCIx::SCR.RE.b() | scr;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	CRLF 自動送出
 			@param[in]	f	「false」なら無効
 		 */
 		//-----------------------------------------------------------------//
 		void auto_crlf(bool f = true) { crlf_ = f; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	SCI 出力バッファのサイズを返す
+			@return　バッファのサイズ
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t send_length() const {
+			if(polling_) {
+				return 0;
+			} else {
+				return send_.length();
+			}
+		}
 
 
 		//-----------------------------------------------------------------//

@@ -5,6 +5,10 @@
 /*  内臓ROM 0xFFFF0000～0xFFFFFFFFF (64KB)            */
 /*====================================================*/
 
+/* Default linker script, for normal executables */
+OUTPUT_ARCH(rx)
+ENTRY(_start)
+
 MEMORY {
     RAM(rwx) : org = 0x00000000, len = 0x00002000
     ROM(rx)  : org = 0xFFFF0000, len = 0x00010000
