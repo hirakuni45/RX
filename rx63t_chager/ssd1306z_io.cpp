@@ -33,9 +33,9 @@ namespace device {
 			}
 			ch <<= 1;
 			device::PORT2::PODR.B3 = 0;	// clk
-			wait_delay(1);
+			wait_delay(0);
 			device::PORT2::PODR.B3 = 1;	// clk
-			wait_delay(1);
+			wait_delay(0);
 		}
 	}
 
@@ -43,17 +43,8 @@ namespace device {
 	static void put2_(uint8_t ch)
 	{
 		while(device::SCI0::SSR.TEND() == 0) ;
-#if 0
-		uint8_t d = 0;
-		for(uint8_t i = 0; i < 8; ++i) {
-			d <<= 1;
-			if(ch & 1) d |= 1;
-			ch >>= 1;
-		}
-		device::SCI0::TDR = d;
-#else
+		wait_delay(1);
 		device::SCI0::TDR = ch;
-#endif
 	}
 
 

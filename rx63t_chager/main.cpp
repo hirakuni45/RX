@@ -121,8 +121,8 @@ void delay_10ms(uint32_t n)
 	}
 }
 
-static const int32_t low_limit_  = 10;  // 0.46V at 24V
-static const int32_t high_limit_ = 320; // 15.0V at 24V
+static const int32_t low_limit_  = 6;
+static const int32_t high_limit_ = 404; // 15v at 19v in
 static int32_t loop_cpv_;
 static int32_t adc_out_;
 static int32_t adc_cur_;
@@ -131,6 +131,8 @@ static int32_t adj_ref_;
 static uint16_t timer_count_;
 static volatile uint16_t timer_sync_;
 
+static int cnt_;
+
 static void timer_task_()
 {
 	using namespace root;
@@ -138,21 +140,22 @@ static void timer_task_()
 	adc_out_ = static_cast<int32_t>(adc_.get(0)); // 出力電圧 6:1 (Ref:2.5V, 4096:15V)
 	adc_cur_ = static_cast<int32_t>(adc_.get(1)); // 出力電流 0 to 2.5A (4096:2.5A)
 	adc_inp_ = static_cast<int32_t>(adc_.get(2)); // 入力電圧 10:1 (Ref:2.5V, 4096:25V)
-
 	adc_.start(0b00000111);
 
 	if(adj_ref_ < adc_out_) --loop_cpv_;
 	else if(adj_ref_ > adc_out_) ++loop_cpv_;
 
-	if(loop_cpv_ < low_limit_) loop_cpv_ = low_limit_;
-	else if(loop_cpv_ > high_limit_) loop_cpv_ = high_limit_;
+	int cmpv = loop_cpv_ / 16;
 
-	gpt_.set_a(loop_cpv_);
-	uint16_t ofs = (512 - loop_cpv_) / 4;
-	gpt_.set_ad_a(loop_cpv_ + ofs);	// A/D 変換開始タイミング
+	if(cmpv < low_limit_) cmpv = low_limit_;
+	else if(cmpv > high_limit_) cmpv = high_limit_;
+
+	gpt_.set_a(cmpv);
+	uint16_t ofs = (512 - cmpv) / 4;
+	gpt_.set_ad_a(cmpv + ofs);	// A/D 変換開始タイミング
 
 	++timer_count_;
-	if(timer_count_ >= 938) {
+	if(timer_count_ >= 469) {
 		timer_count_ = 0;
 		++timer_sync_;
 	}
@@ -244,7 +247,7 @@ int main(int argc, char** argv)
 	cmt_.set_clock(F_PCKB);
 	cmt_.set_task(timer_task_);
 	uint8_t cmt_irq_level = 3;
-	cmt_.initialize(93750, cmt_irq_level);
+	cmt_.initialize(46875, cmt_irq_level);
 
 	cmt_.sync();
 
