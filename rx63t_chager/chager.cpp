@@ -1,6 +1,6 @@
 //=====================================================================//
 /*!	@file
-	@brief	SD Monitor クラス
+	@brief	Chager Monitor クラス
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -68,7 +68,6 @@ namespace utils {
 #if 0
 //			if(cmd_play_(ss)) return;
 //			if(cmd_volume_(ss)) return;
-			printf("Command error: '%s'%c\n", ss[0].c_str(), 0x07);
 #endif
 	}
 

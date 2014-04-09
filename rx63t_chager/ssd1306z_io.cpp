@@ -33,9 +33,9 @@ namespace device {
 			}
 			ch <<= 1;
 			device::PORT2::PODR.B3 = 0;	// clk
-			wait_delay(10);
+			wait_delay(1);
 			device::PORT2::PODR.B3 = 1;	// clk
-			wait_delay(10);
+			wait_delay(1);
 		}
 	}
 
@@ -133,7 +133,7 @@ namespace device {
 		device::PORT2::PODR.B3 = 1;	// シリアル・クロック
 
 		select_(1);
-		wait_delay(1000);
+		wait_delay(500);
 
 		cmd_data_(0);
 		select_(0);
@@ -167,6 +167,7 @@ namespace device {
 		select_(1);
 		wait_delay(100);	// 重要！
 
+#if 0
 		device::MPC::PWPR.B0WI = 0;				// PWPR 書き込み許可
 		device::MPC::PWPR.PFSWE = 1;			// PxxPFS 書き込み許可
 		device::MPC::P30PFS.PSEL = 0b1010;		// SMOSI0設定
@@ -178,6 +179,7 @@ namespace device {
 		// 48MHz で、10Mbps 以下の設定では、6Mbps が最大値
 		// ※12Mbps では、許容範囲を超えてしまう・・
 		setup_spi_(6000000);	// 6Mbps
+#endif
 	}
 
 
@@ -190,20 +192,20 @@ namespace device {
 	void ssd1306z_io::copy(const uint8_t* buff)
 	{
 		cmd_data_(0);
-		wait_delay(10);
+		wait_delay(1);
 		select_(0);
-		wait_delay(10);
+		wait_delay(1);
 		for(uint8_t j = 0; j < 8; ++j) {
-			put2_(0xb0 + j);		// set page address 0 to 7
-			put2_(0x00);			// lower collum start address
-			put2_(0x10);			// higher collum start address
-			wait_delay(10);
+			put_(0xb0 + j);		// set page address 0 to 7
+			put_(0x00);			// lower collum start address
+			put_(0x10);			// higher collum start address
+			wait_delay(1);
 			cmd_data_(1);
-			wait_delay(10);
+			wait_delay(1);
 			for(uint16_t i = 0; i < 128; ++i) {
-				put2_(*buff++);
+				put_(*buff++);
 			}
-			wait_delay(10);
+			wait_delay(1);
 			cmd_data_(0);
 		}
 		select_(1);

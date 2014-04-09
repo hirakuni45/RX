@@ -87,7 +87,6 @@ namespace device {
 			}
 
 			uint32_t chanel = CMTx::get_chanel();
-			task_ = 0;
 			switch(chanel) {
 			case 0:
 				set_interrupt_task(cmt_task_, ICU::VECTOR::CMI0);
@@ -151,7 +150,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		void set_task(void (*task)()) const {
-			cmt_task_ = task;
+			task_ = task;
 		}
 
 
@@ -160,7 +159,7 @@ namespace device {
 			@brief  割り込みと同期
 		*/
 		//-----------------------------------------------------------------//
-		void sync() {
+		void sync() const {
 			volatile uint32_t cnt = counter_;
 			while(cnt == counter_) ;
 		}
@@ -186,6 +185,6 @@ namespace device {
 		}
 	};
 
-	template <class CMTx> volatile uint32_t cmt_io<CMTx>::counter_;
-	template <class CMTx> void (*cmt_io<CMTx>::task_)();
+	template <class CMTx> volatile uint32_t cmt_io<CMTx>::counter_ = 0;
+	template <class CMTx> void (*cmt_io<CMTx>::task_)() = 0;
 }

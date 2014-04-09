@@ -105,25 +105,6 @@ namespace graphics {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@breif	初期化
-	*/
-	//-----------------------------------------------------------------//
-	void monograph::init()
-	{
-#ifdef KANJI_FONTS
-		for(uint8_t i = 0; i < KANJI_CASH_SIZE; ++i) {
-			kanji_cash_[i].sjis_lo = 0;
-			kanji_cash_[i].sjis_hi = 0;
-		}
-		cash_first_ = 0;
-#endif
-		multi_byte_hi_ = 0;
-	}
-
-
-
-	//-----------------------------------------------------------------//
-	/*!
 		@breif	点を描画する
 		@param[in]	x	開始点Ｘ軸を指定
 		@param[in]	y	開始点Ｙ軸を指定
@@ -185,12 +166,12 @@ namespace graphics {
 	//-----------------------------------------------------------------//
 	/*!
 		@breif	全画面クリアをする
-		@param[in]	c	クリアカラー 0:クリア 0!=:塗る
+		@param[in]	c	クリアビット
 	*/
 	//-----------------------------------------------------------------//
 	void monograph::clear(uint8_t c)
 	{
-		fill(0, 0, lcd_width_, lcd_height_, c);
+		for(uint16_t i = 0; i < (lcd_width_ * lcd_height_ / 8); ++i) fb_[i] = c;
 	}
 
 
@@ -376,6 +357,29 @@ namespace graphics {
 				multi_byte_hi_ = 0;
 				if(-FONT_WIDTH >= x || static_cast<uint16_t>(x) >= lcd_width_) return;
 				draw_image(x, y, &font6x12_[(1 << 3)], FONT_WIDTH, FONT_HEIGHT);
+			}
+		}
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@breif	ascii カレント位置にフォントを描画する。
+		@param[in]	code	ASCII コード（0x00 to 0x7F)
+	*/
+	//-----------------------------------------------------------------//
+	void monograph::draw_font(char code)
+	{
+		if(code >= ' ' && code <= 0x7f) {
+			draw_font(posx_, posy_, code);
+			posx_ += 6;
+
+			if(posx_ > (lcd_width_ - 6)) {
+				posx_ = 0;
+				posy_ += 12;
+				if(posy_ > (lcd_height_ - 12)) {
+					posy_ -= 12;
+				}
 			}
 		}
 	}

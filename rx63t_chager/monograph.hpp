@@ -44,6 +44,18 @@ namespace graphics {
 		KANJI_CASH kanji_cash_[kanji_cash_size_];
 		uint8_t cash_first_;
 #endif
+		uint8_t	posx_;
+		uint8_t	posy_;
+
+		void init_() {
+#ifdef KANJI_FONTS
+			for(uint8_t i = 0; i < KANJI_CASH_SIZE; ++i) {
+				kanji_cash_[i].sjis_lo = 0;
+				kanji_cash_[i].sjis_hi = 0;
+			}
+			cash_first_ = 0;
+#endif
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -51,15 +63,11 @@ namespace graphics {
 			@breif	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		monograph() { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@breif	初期化
-		*/
-		//-----------------------------------------------------------------//
-		void init();
+		monograph() : multi_byte_hi_(0), posx_(0), posy_(0) {
+#ifdef KANJI_FONTS
+			init_();
+#endif
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -125,7 +133,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@breif	全画面クリアをする
-			@param[in]	c	クリアカラー 0:クリア 0!=:塗る
+			@param[in]	c	クリアビット
 		*/
 		//-----------------------------------------------------------------//
 		void clear(uint8_t c);
@@ -190,6 +198,20 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		void draw_font(int16_t x, int16_t y, char code);
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@breif	ascii カレント位置にフォントを描画する。
+			@param[in]	code	ASCII コード（0x00 to 0x7F)
+		*/
+		//-----------------------------------------------------------------//
+		void draw_font(char code);
+
+
+		uint8_t& at_font_posx() { return posx_; }
+
+		uint8_t& at_font_posy() { return posy_; }
 
 
 		//-----------------------------------------------------------------//

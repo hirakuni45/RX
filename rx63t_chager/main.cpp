@@ -52,6 +52,13 @@ struct chout {
 };
 typedef utils::format<chout>	format;
 
+struct grout {
+	void operator() (char ch) {
+		root::monog_.draw_font(ch);
+	}
+};
+typedef utils::format<grout>	gformat;
+
 
 //-----------------------------------------------------------------//
 /*!
@@ -112,6 +119,49 @@ void delay_10ms(uint32_t n)
 		root::cmt_.sync();
 		--n;
 	}
+}
+
+static const int32_t low_limit_  = 10;  // 0.46V at 24V
+static const int32_t high_limit_ = 320; // 15.0V at 24V
+static int32_t loop_cpv_;
+static int32_t adc_out_;
+static int32_t adc_cur_;
+static int32_t adc_inp_;
+static int32_t adj_ref_;
+static uint16_t timer_count_;
+static volatile uint16_t timer_sync_;
+
+static void timer_task_()
+{
+	using namespace root;
+
+	adc_out_ = static_cast<int32_t>(adc_.get(0)); // 出力電圧 6:1 (Ref:2.5V, 4096:15V)
+	adc_cur_ = static_cast<int32_t>(adc_.get(1)); // 出力電流 0 to 2.5A (4096:2.5A)
+	adc_inp_ = static_cast<int32_t>(adc_.get(2)); // 入力電圧 10:1 (Ref:2.5V, 4096:25V)
+
+	adc_.start(0b00000111);
+
+	if(adj_ref_ < adc_out_) --loop_cpv_;
+	else if(adj_ref_ > adc_out_) ++loop_cpv_;
+
+	if(loop_cpv_ < low_limit_) loop_cpv_ = low_limit_;
+	else if(loop_cpv_ > high_limit_) loop_cpv_ = high_limit_;
+
+	gpt_.set_a(loop_cpv_);
+	uint16_t ofs = (512 - loop_cpv_) / 4;
+	gpt_.set_ad_a(loop_cpv_ + ofs);	// A/D 変換開始タイミング
+
+	++timer_count_;
+	if(timer_count_ >= 938) {
+		timer_count_ = 0;
+		++timer_sync_;
+	}
+}
+
+static void timer_100hz()
+{
+	volatile uint16_t cnt = timer_sync_;
+	while(cnt == timer_sync_) ;
 }
 
 int main(int argc, char** argv);
@@ -181,8 +231,18 @@ int main(int argc, char** argv)
 	device::MPC::P41PFS.ASEL = 1;	     // アナログ入力設定
 	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
 
+
+	adj_ref_ = static_cast<int32_t>((4096.0f / 2.5f) * (5.0f / 6.0f)); // 指令電圧
+	loop_cpv_ = low_limit_; // 初期電圧
+	gpt_.set_a(loop_cpv_);
+	uint16_t ofs = (512 - loop_cpv_) / 4;
+	gpt_.set_ad_a(loop_cpv_ + ofs);	// A/D 変換開始タイミング
+	adc_.start(0b00000111);
+	adc_.sync();
+
 	// タイマー設定
 	cmt_.set_clock(F_PCKB);
+	cmt_.set_task(timer_task_);
 	uint8_t cmt_irq_level = 3;
 	cmt_.initialize(93750, cmt_irq_level);
 
@@ -192,86 +252,67 @@ int main(int argc, char** argv)
 
 ///	device::SYSTEM::PRCR = 0xa500;	///< クロック、低消費電力、関係書き込み禁止
 
-	monog_.init();
 	oled_.initialize();
 
+#if 0
 	uint16_t xx = 0;
 	uint16_t yy = 0;
 	int l = 0;
-	while(1) {
-		uint16_t x = rand() & 127;
-		uint16_t y = rand() & 63;
-		monog_.line(xx, yy, x, y, 1);
-		xx = x;
-		yy = y;
-		++l;
-		if(l >= 20) {
-			monog_.clear(0);
-			l = 0;
-		}
-		cmt_.sync();
-		oled_.copy(monog_.fb());
+	uint16_t x = rand() & 127;
+	uint16_t y = rand() & 63;
+	monog_.line(xx, yy, x, y, 1);
+	xx = x;
+	yy = y;
+	++l;
+	if(l >= 20) {
+		monog_.clear(0);
+		l = 0;
 	}
+#endif
 
-	adc_.start(0b00000111);
 	cmt_.sync();
-	adc_.sync();
-	int v = static_cast<int32_t>(adc_.get(2));
+	int v = adc_inp_;
 	format("Input Voltage: %2.4:8y\n") % ((v * 25) >> 4);
 
 	uint32_t cnt = 0;
 	uint32_t led = 0;
 
-	int32_t low_limit  = 10;  // 0.46V at 24V
-	int32_t high_limit = 320; // 15.0V at 24V
+	int inp = 0;
+	int out = 0;
+	int cur = 0;
 
-	// 6:1
-	int32_t ref = static_cast<int32_t>((4096.0f / 2.5f) * (5.0f / 6.0f));
-
-	int32_t cpv = low_limit; // 初期電圧
 	while(1) {
-		adc_.start(0b00000111);
+		timer_100hz();
 
-		cmt_.sync();
-
-		// A/D 変換開始
-		adc_.sync();
-
-		int32_t out = static_cast<int32_t>(adc_.get(0)); // 出力電圧 6:1 (Ref:2.5V, 4096:15V)
-		int32_t cur = static_cast<int32_t>(adc_.get(1)); // 出力電流 0 to 2.5A (4096:2.5A)
-		int32_t inp = static_cast<int32_t>(adc_.get(2)); // 入力電圧 10:1 (Ref:2.5V, 4096:25V)
-
-		if(ref < out) --cpv;
-		else if(ref > out) ++cpv;
-
-		if(cpv < low_limit) cpv = low_limit;
-		else if(cpv > high_limit) cpv = high_limit;
-
-		gpt_.set_a(cpv);
-		uint16_t ofs = (512 - cpv) / 4;
-		gpt_.set_ad_a(cpv + ofs);	// A/D 変換開始タイミング
-
-#if 0
 		chager_.service();
 
 		++cnt;
-		if(cnt >= 1000) {
+		if(cnt >= 50) {
+			inp = static_cast<int>(adc_inp_);
+			out = static_cast<int>(adc_out_);
+			cur = static_cast<int>(adc_cur_);
 			cnt = 0;
-			prn_voltage_("Inp: ", inp);
-			prn_voltage_("Ref: ", ref);
-			prn_voltage_("Dif: ", dif);
-			prn_voltage_("Out: ", out);
-			prn_value_("PWM: ", cpv);
-        }
-#endif
+		}
 
+		monog_.at_font_posx() = 0;
+		monog_.at_font_posy() = 0;
+		gformat("Inp: %2.2:8y V") % ((inp * 25) >> 4);
+		monog_.at_font_posx() = 0;
+		monog_.at_font_posy() = 12;
+		gformat("Out: %2.2:8y V") % ((out * 15) >> 4);
+		monog_.at_font_posx() = 0;
+		monog_.at_font_posy() = 12 * 2;
+		gformat("Cur: %2.2:8y A") % ((cur * 5) >> (4 + 1));	// *2.5
 
 		++led;
-		if(led >= (93750 / 2)) led = 0;
-		if(led < (93750 / 4)) {
+		if(led >= 50) led = 0;
+		if(led < 25) {
 			device::PORTB::PODR.B7 = 1; // LED Off
 		} else {
 			device::PORTB::PODR.B7 = 0; // LED On
 		}
+
+		oled_.copy(monog_.fb());
+		monog_.clear(0);
 	}
 }
