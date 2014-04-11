@@ -342,6 +342,26 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  汎用 PWM タイマソフトウェアスタートレジスタ (GTSTR)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2800> gtstr_io;
+		struct gtstr_t : public gtstr_io {
+			using gtstr_io::operator =;
+			using gtstr_io::operator ();
+			using gtstr_io::operator |=;
+			using gtstr_io::operator &=;
+
+			bit_t<gtstr_io, 0>  CST4;
+			bit_t<gtstr_io, 1>  CST5;
+			bit_t<gtstr_io, 2>  CST6;
+			bit_t<gtstr_io, 3>  CST7;
+		};
+		static gtstr_t GTSTR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  汎用 PWM タイマ書き込み保護レジスタ (GTWP)
 		*/
 		//-----------------------------------------------------------------//
@@ -358,6 +378,37 @@ namespace device {
 			bit_t<gtwp_io, 3>    WP7;
 		};
 		static gtwp_t GTWP;
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  汎用 PWM タイマバッファ動作禁止レジスタ (GTBDR)
+		*/
+		//-----------------------------------------------------------------//
+		typedef io16<0x000c2814> gtbdr_io;
+		struct gtbdr_t : public gtbdr_io {
+			using gtbdr_io::operator =;
+			using gtbdr_io::operator ();
+			using gtbdr_io::operator |=;
+			using gtbdr_io::operator &=;
+
+			bit_t<gtbdr_io,  0>    BD4_0;
+			bit_t<gtbdr_io,  1>    BD4_1;
+			bit_t<gtbdr_io,  2>    BD4_2;
+			bit_t<gtbdr_io,  3>    BD4_3;
+			bit_t<gtbdr_io,  4>    BD5_0;
+			bit_t<gtbdr_io,  5>    BD5_1;
+			bit_t<gtbdr_io,  6>    BD5_2;
+			bit_t<gtbdr_io,  7>    BD5_3;
+			bit_t<gtbdr_io,  8>    BD6_0;
+			bit_t<gtbdr_io,  9>    BD6_1;
+			bit_t<gtbdr_io, 10>    BD6_2;
+			bit_t<gtbdr_io, 11>    BD6_3;
+			bit_t<gtbdr_io, 12>    BD7_0;
+			bit_t<gtbdr_io, 13>    BD7_1;
+			bit_t<gtbdr_io, 14>    BD7_2;
+			bit_t<gtbdr_io, 15>    BD7_3;
+		};
+		static gtbdr_t GTBDR;
 
 
 		//-----------------------------------------------------------------//
@@ -817,6 +868,18 @@ namespace device {
 			bit<gtsotr_io, 0>  SOTR;
 		};
 		static gtsos_t GTSOTR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  チャネルを返す
+			@return チャネル（０、１、２、３、４、５、６、７）
+		*/
+		//-----------------------------------------------------------------//
+		static uint32_t get_chanel() {
+			
+			return ((base >> 7) & 1) | ((base >> 8) & 2) | ((base >> 9) & 4);
+		}
 
 	};
 	typedef gptn_t<0x000c2100> GPT0;
