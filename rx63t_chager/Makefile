@@ -14,7 +14,7 @@ PSOURCES	=	main.cpp \
 				../rx/cmt_io.cpp \
 				../rx/sci_io.cpp \
 				../rx/gpt_io.cpp \
-				chager.cpp \
+				monitor.cpp \
 				ssd1306z_io.cpp \
 				monograph.cpp
 
