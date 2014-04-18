@@ -62,7 +62,8 @@ namespace utils {
 					if(cur_ref_ < cur_) --cpv_;
 					else if(cur_ref_ > cur_) ++cpv_;
 				}
-				int32_t cmpv = cpv_ / 16;
+
+				int32_t cmpv = cpv_ / gain_;
 				if(cmpv < low_limit_) cmpv = low_limit_;
 				else if(cmpv > high_limit_) cmpv = high_limit_;
 				return cmpv;
