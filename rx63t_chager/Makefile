@@ -16,7 +16,8 @@ PSOURCES	=	main.cpp \
 				../rx/gpt_io.cpp \
 				monitor.cpp \
 				ssd1306z_io.cpp \
-				monograph.cpp
+				monograph.cpp \
+				chager.cpp
 
 
 USER_LIBS	=	stdc++

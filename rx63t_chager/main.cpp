@@ -13,12 +13,11 @@
 #include "rx/rx63x/mpc.hpp"
 #include "rx/cmt_io.hpp"
 #include "rx/sci_io.hpp"
-#include "rx/gpt_io.hpp"
-#include "rx/adc_io.hpp"
 #include "rx/format.hpp"
 #include "monitor.hpp"
 #include "ssd1306z_io.hpp"
 #include "monograph.hpp"
+#include "chager.hpp"
 
 static volatile uint8_t dummy_;
 //-----------------------------------------------------------------//
@@ -38,12 +37,10 @@ void wait_delay(uint32_t n)
 namespace root {
 	device::cmt_io<device::CMT0>  cmt_;
 	device::sci_io<device::SCI1, 256, 256> sci_;
-	device::gpt_io<device::GPT0>  gpt0_;
-	device::gpt_io<device::GPT1>  gpt1_;
-	device::adc_io<device::S12AD> adc_;
 	device::ssd1306z_io oled_;
-	utils::monitor monitor_;
+	utils::monitor		monitor_;
 	graphics::monograph	monog_;
+	utils::chager		chager_;
 }
 
 struct chout {
@@ -122,70 +119,22 @@ void delay_10ms(uint32_t n)
 	}
 }
 
-static const int32_t low_limit_  = 6;
-static const int32_t high_limit_ = 404; // 15v at 19v in
-static int32_t loop_cpv0_;
-static int32_t loop_cpv1_;
-static int32_t adc_out0_;
-static int32_t adc_out1_;
-static int32_t adc_cur0_;
-static int32_t adc_cur1_;
-static int32_t adc_inp_;
-static int32_t adj_ref0_;
-static int32_t adj_ref1_;
-static int32_t adj_lim1_;
-
 static uint16_t timer_count_;
 static volatile uint16_t timer_sync_;
 
-static int cnt_;
-
 static void timer_task_()
 {
-	using namespace root;
-
-	adc_out0_ = static_cast<int32_t>(adc_.get(0)); // 出力電圧 6:1 (Ref:2.5V, 4096:15V)
-	adc_cur0_ = static_cast<int32_t>(adc_.get(1)); // 出力電流 0 to 2.5A (4096:2.5A)
-	adc_inp_  = static_cast<int32_t>(adc_.get(2)); // 入力電圧 10:1 (Ref:2.5V, 4096:25V)
-	adc_cur1_ = static_cast<int32_t>(adc_.get(3)); // 出力電流 0 to 2.5A (4096:2.5A)	
-	adc_out1_ = static_cast<int32_t>(adc_.get(4)); // 出力電圧 6:1 (Ref:2.5V, 4096:15V)
-	adc_.start(0b00011111);
-
-	device::PORTB::PODR.B0 = 0;	// B0 input
-
-	if(adj_ref0_ < adc_out0_) --loop_cpv0_;
-	else if(adj_ref0_ > adc_out0_) ++loop_cpv0_;
-	{
-		int cmpv = loop_cpv0_ / 16;
-		if(cmpv < low_limit_) cmpv = low_limit_;
-		else if(cmpv > high_limit_) cmpv = high_limit_;
-		gpt0_.set_a(cmpv);
-	}
-
-
-//	if(adj_ref1_ < adc_out1_) --loop_cpv1_;
-//	else if(adj_ref1_ > adc_out1_) ++loop_cpv1_;
-	if(adj_lim1_ < adc_out1_) --loop_cpv1_;
-	else {
-		if(adj_ref1_ < adc_cur1_) --loop_cpv1_;
-		else if(adj_ref1_ > adc_cur1_) ++loop_cpv1_;
-	}
-	{
-		int cmpv = loop_cpv1_ / 16;
-		if(cmpv < low_limit_) cmpv = low_limit_;
-		else if(cmpv > high_limit_) cmpv = high_limit_;
-		gpt1_.set_a(cmpv);
-	}
-
+	root::chager_.service();
 
 	++timer_count_;
-	if(timer_count_ >= 469) {
+	// 60Hz
+	if(timer_count_ >= 781) {
 		timer_count_ = 0;
 		++timer_sync_;
 	}
 }
 
-static void timer_100hz()
+static void timer_60hz()
 {
 	volatile uint16_t cnt = timer_sync_;
 	while(cnt == timer_sync_) ;
@@ -224,7 +173,7 @@ int main(int argc, char** argv)
 	device::PORTB::PDR.B7 = 1;	// PORTB:B7 output
 	device::PORTB::PODR.B7 = 1;	// LED Off
 
-	// Phot device LED 制御 PB0, PB1, PB2
+	// Phot device 制御 PB0, PB1, PB2
 	device::PORTB::PDR.B0 = 1;	// PORTB:B0 output
 	device::PORTB::PODR.B0 = 1;	// B0 off
 	device::PORTB::PDR.B1 = 1;	// PORTB:B1 output
@@ -246,49 +195,8 @@ int main(int argc, char** argv)
 	sci_.initialize(sci_irq_level);
 	sci_.start(115200);
 
-	// GPT0 設定 (GTIOC0A: P71:38, PD7:12)(GTIOC0B: P74:35, PD6:13)
-	// GPT1 設定 (GTIOC1A: P72:37, PD5:14)(GTIOC1B: P75:34, PD4:15)
-	device::PORT7::PDR.B1 = 1;			// output
-	device::PORT7::PDR.B2 = 1;			// output
-	device::SYSTEM::MSTPCRA.MSTPA7 = 0; // GPT0..3 モジュール有効
-	device::MPC::PWPR.B0WI = 0;			// PWPR 書き込み許可
-	device::MPC::PWPR.PFSWE = 1;		// PxxPFS 書き込み許可
-	device::MPC::P71PFS.PSEL = 0b0110;	// GTIOC0A 設定
-	device::MPC::P72PFS.PSEL = 0b0110;	// GTIOC1A 設定
-	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
-	device::PORT7::PMR.B1 = 1;			// 周辺機能として使用
-	device::PORT7::PMR.B2 = 1;			// 周辺機能として使用
-	gpt0_.start_pwm(512 - 1);	// GPT0 PWM start
-	gpt0_.set_r(512 - 1);
-	gpt0_.set_a(low_limit_);
-	gpt1_.start_pwm(512 - 1);	// GPT1 PWM start
-	gpt1_.set_r(512 - 1);
-	gpt1_.set_a(low_limit_);
-
-	// S12AD 設定 P40(56), P41(55), P42(54), P43(53), P44(52),
-	device::SYSTEM::MSTPCRA.MSTPA17 = 0; // S12AD モジュール有効
-	device::MPC::PWPR.B0WI = 0;			 // PWPR 書き込み許可
-	device::MPC::PWPR.PFSWE = 1;		 // PxxPFS 書き込み許可
-	device::MPC::P40PFS.ASEL = 1;	     // アナログ入力設定
-	device::MPC::P41PFS.ASEL = 1;	     // アナログ入力設定
-	device::MPC::P42PFS.ASEL = 1;	     // アナログ入力設定
-	device::MPC::P43PFS.ASEL = 1;	     // アナログ入力設定
-	device::MPC::P44PFS.ASEL = 1;	     // アナログ入力設定
-	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
-
-
-	adj_ref0_ = static_cast<int32_t>((4096.0f / 2.5f) * (1.0f / 6.0f) * 5.0f); // Ch0 指令電圧
-//	adj_ref1_ = static_cast<int32_t>((4096.0f / 2.5f) * (1.0f / 6.0f) * 3.3f); // Ch1 指令電圧
-	adj_lim1_ = static_cast<int32_t>((4096.0f / 2.5f) * (1.0f / 6.0f) * 4.0f); // Ch1 最大電圧
-	adj_ref1_ = static_cast<int32_t>((4096.0f / 2.5f) * 0.2f); // Ch1 指令電流
-
-	loop_cpv0_ = low_limit_; // 初期電圧
-	loop_cpv1_ = low_limit_; // 初期電圧
-
-//	gpt0_.set_ad_a(high_limit_);	// A/D 変換開始タイミング
-	adc_.start(0b00011111);
-	adc_.sync();
-
+	// チャージャー本体
+	chager_.initialize();
 
 	// タイマー設定
 	cmt_.set_clock(F_PCKB);
@@ -304,40 +212,18 @@ int main(int argc, char** argv)
 
 	oled_.initialize();
 
-#if 0
-	uint16_t xx = 0;
-	uint16_t yy = 0;
-	int l = 0;
-	uint16_t x = rand() & 127;
-	uint16_t y = rand() & 63;
-	monog_.line(xx, yy, x, y, 1);
-	xx = x;
-	yy = y;
-	++l;
-	if(l >= 20) {
-		monog_.clear(0);
-		l = 0;
-	}
-#endif
-
 	cmt_.sync();
-	int v = adc_inp_;
-	format("Input Voltage: %2.4:8y\n") % ((v * 25) >> 4);
+//	int v = adc_inp_;
+//	format("Input Voltage: %2.4:8y\n") % ((v * 25) >> 4);
 
-	uint32_t cnt = 0;
 	uint32_t led = 0;
 
-	int inp = 0;
-	int out0 = 0;
-	int cur0 = 0;
-	int out1 = 0;
-	int cur1 = 0;
-
 	while(1) {
-		timer_100hz();
+		timer_60hz();
 
 		monitor_.service();
 
+#if 0
 		++cnt;
 		if(cnt >= 50) {
 			inp = static_cast<int>(adc_inp_);
@@ -347,26 +233,27 @@ int main(int argc, char** argv)
 			cur1 = static_cast<int>(adc_cur1_);
 			cnt = 0;
 		}
+#endif
 
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 0;
-		gformat("Input: %2.2:8y V") % ((inp * 25) >> 4);
+//		gformat("Input: %2.2:8y V") % ((inp * 25) >> 4);
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 12;
-		gformat("Out0:  %2.2:8y V") % ((out0 * 15) >> 4);
+//		gformat("Out0:  %2.2:8y V") % ((out0 * 15) >> 4);
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 12 * 2;
-		gformat("Cur0:  %2.2:8y A") % ((cur0 * 5) >> (4 + 1));	// *2.5
+//		gformat("Cur0:  %2.2:8y A") % ((cur0 * 5) >> (4 + 1));	// *2.5
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 12 * 3;
-		gformat("Out1:  %2.2:8y V") % ((out1 * 15) >> 4);
+//		gformat("Out1:  %2.2:8y V") % ((out1 * 15) >> 4);
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 12 * 4;
-		gformat("Cur1:  %2.2:8y A") % ((cur1 * 5) >> (4 + 1));	// *2.5
+//		gformat("Cur1:  %2.2:8y A") % ((cur1 * 5) >> (4 + 1));	// *2.5
 
 		++led;
-		if(led >= 50) led = 0;
-		if(led < 25) {
+		if(led >= 30) led = 0;
+		if(led < 15) {
 			device::PORTB::PODR.B7 = 1; // LED Off
 		} else {
 			device::PORTB::PODR.B7 = 0; // LED On

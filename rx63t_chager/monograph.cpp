@@ -102,6 +102,22 @@ namespace graphics {
 	}
 #endif
 
+#if 0
+	uint16_t xx = 0;
+	uint16_t yy = 0;
+	int l = 0;
+	uint16_t x = rand() & 127;
+	uint16_t y = rand() & 63;
+	monog_.line(xx, yy, x, y, 1);
+	xx = x;
+	yy = y;
+	++l;
+	if(l >= 20) {
+		monog_.clear(0);
+		l = 0;
+	}
+#endif
+
 
 	//-----------------------------------------------------------------//
 	/*!
