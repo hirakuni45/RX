@@ -1,0 +1,181 @@
+EESchema Schematic File Version 2  date 2014/04/18 21:29:15
+LIBS:power
+LIBS:akizuki
+LIBS:renesas
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:special
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:liion_mobile_battery-cache
+EELAYER 27 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date "18 apr 2014"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L RX63T-64 U1
+U 1 1 53510DCF
+P 5650 4050
+F 0 "U1" H 6300 6200 60  0000 C CNN
+F 1 "RX63T-64" H 5150 1950 60  0000 C CNN
+F 2 "~" H 6300 6200 60  0000 C CNN
+F 3 "~" H 6300 6200 60  0000 C CNN
+	1    5650 4050
+	1    0    0    -1  
+$EndComp
+$Comp
+L CAP C3
+U 1 1 53511203
+P 6400 1300
+F 0 "C3" H 6500 1400 60  0000 C CNN
+F 1 "CAP" H 6300 1200 60  0000 C CNN
+F 2 "" V 6400 1300 60  0000 C CNN
+F 3 "" V 6400 1300 60  0000 C CNN
+	1    6400 1300
+	1    0    0    -1  
+$EndComp
+$Comp
+L CAP C4
+U 1 1 53511212
+P 6700 1300
+F 0 "C4" H 6800 1400 60  0000 C CNN
+F 1 "CAP" H 6600 1200 60  0000 C CNN
+F 2 "" V 6700 1300 60  0000 C CNN
+F 3 "" V 6700 1300 60  0000 C CNN
+	1    6700 1300
+	1    0    0    -1  
+$EndComp
+$Comp
+L CAP C5
+U 1 1 53511221
+P 7000 1300
+F 0 "C5" H 7100 1400 60  0000 C CNN
+F 1 "CAP" H 6900 1200 60  0000 C CNN
+F 2 "" V 7000 1300 60  0000 C CNN
+F 3 "" V 7000 1300 60  0000 C CNN
+	1    7000 1300
+	1    0    0    -1  
+$EndComp
+$Comp
+L CAP C1
+U 1 1 53511230
+P 4000 2650
+F 0 "C1" H 4100 2750 60  0000 C CNN
+F 1 "18pF" H 3850 2550 60  0000 C CNN
+F 2 "" V 4000 2650 60  0000 C CNN
+F 3 "" V 4000 2650 60  0000 C CNN
+	1    4000 2650
+	1    0    0    -1  
+$EndComp
+$Comp
+L CAP C2
+U 1 1 5351123F
+P 4000 3450
+F 0 "C2" H 4100 3550 60  0000 C CNN
+F 1 "18pF" H 3850 3350 60  0000 C CNN
+F 2 "" V 4000 3450 60  0000 C CNN
+F 3 "" V 4000 3450 60  0000 C CNN
+	1    4000 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L CRYSTAL X?
+U 1 1 535114A5
+P 4000 3050
+F 0 "X?" H 4100 3150 60  0000 C CNN
+F 1 "12MHz" H 3850 2950 60  0000 C CNN
+F 2 "" V 4000 3050 60  0000 C CNN
+F 3 "" V 4000 3050 60  0000 C CNN
+	1    4000 3050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4000 2800 4000 2900
+Wire Wire Line
+	4000 3200 4000 3300
+Wire Wire Line
+	4000 3250 4300 3250
+Wire Wire Line
+	4300 3250 4300 3150
+Wire Wire Line
+	4300 3150 4700 3150
+Connection ~ 4000 3250
+Wire Wire Line
+	4000 2850 4300 2850
+Wire Wire Line
+	4300 2850 4300 2950
+Wire Wire Line
+	4300 2950 4700 2950
+Connection ~ 4000 2850
+Wire Wire Line
+	4000 3600 4000 3700
+Wire Wire Line
+	4000 2500 4000 2400
+$Comp
+L VCC #PWR?
+U 1 1 535114DA
+P 4000 2400
+F 0 "#PWR?" H 4000 2500 30  0001 C CNN
+F 1 "VCC" H 4000 2500 30  0000 C CNN
+F 2 "" H 4000 2400 60  0000 C CNN
+F 3 "" H 4000 2400 60  0000 C CNN
+	1    4000 2400
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 535114E9
+P 4000 3700
+F 0 "#PWR?" H 4000 3700 30  0001 C CNN
+F 1 "GND" H 4000 3630 30  0001 C CNN
+F 2 "" H 4000 3700 60  0000 C CNN
+F 3 "" H 4000 3700 60  0000 C CNN
+	1    4000 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R?
+U 1 1 5351170A
+P 3300 2350
+F 0 "R?" H 3300 2450 60  0000 C CNN
+F 1 "R" H 3300 2250 60  0000 C CNN
+F 2 "" H 3265 2355 60  0000 C CNN
+F 3 "" H 3265 2355 60  0000 C CNN
+	1    3300 2350
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC
