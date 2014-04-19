@@ -1,8 +1,16 @@
-EESchema-DOCLIB  Version 2.0  Date: 2014/04/18 22:04:18
+EESchema-DOCLIB  Version 2.0  Date: 2014/04/19 18:05:09
 #
 $CMP 2N7002K
 D N Channel MOSFET
 K MOSFET
+$ENDCMP
+#
+$CMP 2P-SW
+D Single, 2P Push Switch
+$ENDCMP
+#
+$CMP 3P-SW
+D Single, 3P Slide Switch
 $ENDCMP
 #
 $CMP ADM3202
@@ -35,7 +43,7 @@ D Crystal
 K XTAL
 $ENDCMP
 #
-$CMP Diode
+$CMP DIODE
 D Diode
 K D
 $ENDCMP
@@ -68,6 +76,10 @@ $ENDCMP
 $CMP L
 D Register
 K R
+$ENDCMP
+#
+$CMP LM336
+D Reference Diode
 $ENDCMP
 #
 $CMP MCP3204
@@ -115,9 +127,14 @@ D 128 dots by 64 dots monocolor graphics LCD
 K SG12864A
 $ENDCMP
 #
-$CMP Shotkey
+$CMP SHOTKEY
 D Shotkey Diode
 K D
+$ENDCMP
+#
+$CMP TLP222A
+D TOSHIBA Photocoupler Photorelay
+K TLP
 $ENDCMP
 #
 $CMP VS1011E-SO
