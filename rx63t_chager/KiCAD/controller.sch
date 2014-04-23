@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2
+EESchema Schematic File Version 2  date 2014/04/20 12:15:25
 LIBS:power
 LIBS:akizuki
 LIBS:renesas
@@ -31,6 +31,7 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
+LIBS:controller-cache
 EELAYER 27 0
 EELAYER END
 $Descr A4 11693 8268
@@ -719,8 +720,8 @@ $Comp
 L SHOTKEY D?
 U 1 1 5353405E
 P 9600 1550
-F 0 "D?" H 9700 1600 60  0000 C CNN
-F 1 "3A" H 9450 1500 60  0000 C CNN
+F 0 "D?" H 9450 1500 60  0000 C CNN
+F 1 "SX34F" H 9750 1650 60  0000 C CNN
 F 2 "~" V 9595 1515 60  0000 C CNN
 F 3 "~" V 9595 1515 60  0000 C CNN
 	1    9600 1550
@@ -770,4 +771,36 @@ Wire Wire Line
 Wire Wire Line
 	1550 2600 1550 2700
 Connection ~ 1550 2700
+$Comp
+L R R?
+U 1 1 53533AB6
+P 5500 1350
+F 0 "R?" H 5600 1400 60  0000 C CNN
+F 1 "47K" H 5400 1300 60  0000 C CNN
+F 2 "~" V 5495 1315 60  0000 C CNN
+F 3 "~" V 5495 1315 60  0000 C CNN
+	1    5500 1350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5500 1500 5500 1650
+$Comp
+L GND #PWR?
+U 1 1 53533B4C
+P 5500 1650
+F 0 "#PWR?" H 5500 1650 30  0001 C CNN
+F 1 "GND" H 5500 1580 30  0001 C CNN
+F 2 "" H 5500 1650 60  0000 C CNN
+F 3 "" H 5500 1650 60  0000 C CNN
+	1    5500 1650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5500 1200 5500 1000
+Wire Wire Line
+	5500 1000 5900 1000
+Wire Wire Line
+	5900 1000 5900 2100
+Wire Wire Line
+	5900 2100 5750 2100
 $EndSCHEMATC
