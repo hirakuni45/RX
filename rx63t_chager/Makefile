@@ -1,24 +1,27 @@
-#=======================================================================#
-#																		#
-#	RX Makefile R5F563T6EDFM (64K Flash, 8K Ram)				        #
-#																		#
-#=======================================================================#
+#=======================================================#
+#														#
+#	R8C Makefile 				        				#
+#														#
+#=======================================================#
 TARGET		=	chager
+
+BUILD		=	release
+
+VPATH		=	../
 
 ASOURCES	=	start.s
 
-CSOURCES	=	vect.c \
-				init.c
+CSOURCES	=	init.c \
+				vect.c
 
 PSOURCES	=	main.cpp \
-				../rx/cmt_io.cpp \
-				../rx/sci_io.cpp \
-				../rx/gpt_io.cpp \
+				rx/cmt_io.cpp \
+				rx/sci_io.cpp \
+				rx/gpt_io.cpp \
 				monitor.cpp \
 				ssd1306z_io.cpp \
 				monograph.cpp \
 				chager.cpp
-
 
 USER_LIBS	=	stdc++
 
@@ -26,90 +29,104 @@ LDSCRIPT	=	rx63t_single_chip.ld
 
 USER_DEFS	=	F_PCKA=96000000 F_PCKB=48000000
 
-# 	-mcpu=rx610
 MCU_TARGET	=
 
-INC_SYS		=	/usr/boost_1_53_0
-INC_ROOT	=	. ..
-LIB_ROOT	=
+WRITER		=	rx_prog
 
-#OPTIMIZE	=	-O0
-#OPTIMIZE	=	-O1
+#INC_SYS		=	/usr/boost_1_60_0
+INC_SYS		=
+
+INC_APP		=	. ../ ../rx
+
 OPTIMIZE	=	-O2
 
-CPP_OPT		=	-Wno-pmf-conversions
+CP_OPT		=	-Wall -Werror \
+				-Wno-unused-variable \
+				-fno-exceptions \
+				-fno-rtti
 
-# -fno-exceptions
-CC_OPT		=	-Wall \
+CC_OPT		=	-Wall -Werror \
+				-Wno-unused-variable \
 				-fno-exceptions
-#				-fdata-sections -ffunction-sections -falign-jumps -funit-at-a-time
-#				-fdata-sections -ffunction-sections -falign-jumps -fno-function-cse -funit-at-a-time
-# DEBUG_OPT	=	-Wall
 
-INCS		=	$(addprefix -I, $(INC_ROOT))
-INC_DEP		=	$(addprefix -I, $(INC_ROOT))
+SYSINCS		=	$(addprefix -I, $(INC_SYS))
+APPINCS		=	$(addprefix -I, $(INC_APP))
+AINCS		=	$(SYSINCS) $(APPINCS)
+CINCS		=	$(SYSINCS) $(APPINCS)
+PINCS		=	$(SYSINCS) $(APPINCS)
 LIBINCS		=	$(addprefix -L, $(LIB_ROOT))
 DEFS		=	$(addprefix -D, $(USER_DEFS))
 LIBS		=	$(addprefix -l, $(USER_LIBS))
 
 # You should not have to change anything below here.
-
+AS			=	rx-elf-as
 CC			=	rx-elf-gcc
-CPP			=	rx-elf-g++
+CP			=	rx-elf-g++
 AR			=	rx-elf-ar
 LD			=	rx-elf-ld
 OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 
-# ASFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
-ASFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
+# AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
+# AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
 # ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
-ALL_ASFLAGS    = $(ASFLAGS) $(MCU_TARGET) $(DEFS)
+ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
 
 # Override is only needed by avr-lib build system.
 
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++0x $(CPP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
+PFLAGS		=	-std=c++11 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
 
-override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
+override LDFLAGS = $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
 
 OBJCOPY_OPT	=	--srec-forceS3 --srec-len 32
 
-OBJECTS	=	$(ASOURCES:.s=.o) $(CSOURCES:.c=.o) $(PSOURCES:.cpp=.o)
-DEPENDS =   $(CSOURCES:.c=.d) $(PSOURCES:.cpp=.d) 
+OBJECTS	=	$(addprefix $(BUILD)/,$(patsubst %.s,%.o,$(ASOURCES))) \
+			$(addprefix $(BUILD)/,$(patsubst %.c,%.o,$(CSOURCES))) \
+			$(addprefix $(BUILD)/,$(patsubst %.cpp,%.o,$(PSOURCES)))
 
-# all: $(TARGET).elf lst text
-# all: $(TARGET).elf $(LDSCRIPT) Makefile lst text
-all: $(TARGET).elf $(LDSCRIPT) Makefile lst text
+DEPENDS =   $(patsubst %.o,%.d, $(OBJECTS))
+
+.PHONY: all clean
+.SUFFIXES :
+.SUFFIXES : .rc .hpp .h .s .c .cpp .o
+
+all: $(BUILD) $(TARGET).elf text
 
 $(TARGET).elf: $(OBJECTS) $(LDSCRIPT) Makefile
-	$(CPP) $(LDFLAGS) $(LIBINCS) -o $@ $(OBJECTS) $(LIBS)
+	$(CC) $(LDFLAGS) $(LIBINCS) -o $@ $(OBJECTS) $(LIBS)
 
-%.o: %.cpp
-	$(CPP) $(PFLAGS) $(INCS) -c $< -o $@
+$(BUILD)/%.o: %.s
+	mkdir -p $(dir $@); \
+	$(AS) -c $(AOPT) $(AFLAGS) $(AINCS) -o $@ $<
 
-%.o: %.c
-	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
+$(BUILD)/%.o : %.c
+	mkdir -p $(dir $@); \
+	$(CC) -c $(COPT) $(CFLAGS) $(CINCS) $(CCWARN) -o $@ $<
 
-%.o: %.s
-	$(CC) -c $(ALL_ASFLAGS) $< -o $@
+$(BUILD)/%.o : %.cpp
+	mkdir -p $(dir $@); \
+	$(CP) -c $(POPT) $(PFLAGS) $(PINCS) $(CPWARN) -o $@ $<
 
-%.d: %.c %.h
-	echo '$*.o: \' > $@
-	$(CC) -MM $(COPT) $(CFLAGS) $(INCS) $(CCWARN) $< | \
-	sed 's/.*://' >> $@
+$(BUILD)/%.d: %.c
+	mkdir -p $(dir $@); \
+	$(CC) -MM -DDEPEND_ESCAPE $(COPT) $(CFLAGS) $(APPINCS) $< \
+	| sed 's/$(notdir $*)\.o:/$(subst /,\/,$(patsubst %.d,%.o,$@) $@):/' > $@ ; \
+	[ -s $@ ] || rm -f $@
 
-%.d: %.cpp %.hpp
-	echo '$*.o: \' > $@
-	$(CPP) -MM $(POPT) $(PFLAGS) $(INCS) $(CPWARN) $< | \
-	sed 's/.*://' >> $@
+$(BUILD)/%.d: %.cpp
+	mkdir -p $(dir $@); \
+	$(CP) -MM -DDEPEND_ESCAPE $(POPT) $(PFLAGS) $(APPINCS) $< \
+	| sed 's/$(notdir $*)\.o:/$(subst /,\/,$(patsubst %.d,%.o,$@) $@):/' > $@ ; \
+	[ -s $@ ] || rm -f $@
 
 clean:
-	rm -rf $(DEPENDS)
-	rm -rf $(OBJECTS) $(TARGET).elf
-	rm -rf *.lst *.map $(EXTRA_CLEAN_FILES)
+	rm -rf $(BUILD) $(TARGET).elf $(TARGET).mot $(TARGET).lst $(TARGET).map
+
+clean_depend:
+	rm -f $(DEPENDS)
 
 lst:  $(TARGET).lst
 
@@ -118,10 +135,14 @@ lst:  $(TARGET).lst
 
 # Rules for building the .text rom images
 
-text: mot bin
+text: mot lst
 
 bin: $(TARGET).bin
 mot: $(TARGET).mot
+lst: $(TARGET).lst
+
+%.lst: %.elf
+	$(OBJDUMP) -h -S $< > $@
 
 %.mot: %.elf
 	$(OBJCOPY) $(OBJCOPY_OPT) -O srec $< $@
@@ -130,24 +151,22 @@ mot: $(TARGET).mot
 	$(OBJCOPY) -O binary $< $@
 #	$(OBJCOPY) -j .vects -j .text -j .data -O binary $< $@
 
-
 tarball:
-	chmod 644 ../fatfs/src/*.[hc] \
-		../fatfs/src/option/*.c \
-		../fatfs/rx621/*.[hc]pp \
-		../rx62x/*.[hc]pp \
-		*.s *.[hc] *.[hc]pp *.ld Makefile
-	rm -f $(TARGET)_src.tgz
-	tar cfvz $(TARGET)_src.tgz \
-		../fatfs/src/*.[hc] \
-		../fatfs/src/option/*.c \
-		../fatfs/rx621/*.[hc]pp \
-		../rx62x/*.[hc]pp \
-		../rx621_sd/*.s ../rx621_sd/*.[hc] ../rx621_sd/*.[hc]pp \
-		../rx621_sd/*.ld ../rx621_sd/Makefile
-	chmod 444 $(TARGET)_src.tgz
+	tar cfvz $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H).tgz \
+	*.[hc]pp Makefile ../common/*/*.[hc]pp ../common/*/*.[hc]
 
-clean_depend:
-	rm -f $(DEPENDS)
+bin_zip:
+	$(LK) $(LFLAGS) $(LIBS) $(OBJECTS) $(ICON_OBJ) $(LIBN) -mwindows -o $(TARGET) 
+	rm -f $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip
+	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
+
+run:
+	$(WRITER) --progress -d R5F2M120 -e -w -v $(TARGET).mot
+
+verify:
+	$(WRITER) -d R5F2M120 -v $(TARGET).mot
+
 
 -include $(DEPENDS)
+
+

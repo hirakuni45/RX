@@ -88,6 +88,8 @@ namespace device {
 				return S12AD::ADDR6();
 			case 7:
 				return S12AD::ADDR7();
+			default:
+				return 0;
 			}
 		}
 	};

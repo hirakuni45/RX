@@ -11,7 +11,8 @@ ENTRY(_start)
 
 MEMORY {
     RAM(rwx) : org = 0x00000000, len = 0x00002000
-    ROM(rx)  : org = 0xFFFF0000, len = 0x00010000
+    ROM(rx)  : org = 0xFFFF0000, len = 0x0000FFD0
+	FVEC(r)  : org = 0xFFFFFFD0, len = 0x00000030
 }
 
 SECTIONS {
@@ -19,9 +20,11 @@ SECTIONS {
 	_usp_init = 0x00001f00;
 	_isp_init = 0x00002000;
 
+/*
     .fvectors 0xFFFFFFD0 : {
-		vect.o(.fvectors)
+		hdw_vect.o(.fvectors)
     }
+*/
 
   .text           :
   {
@@ -134,4 +137,9 @@ SECTIONS {
     PROVIDE (end = .);
   } > RAM
   PROVIDE (__bsssize = SIZEOF(.bss) / 4);
+
+  .fvectors : {
+    *(.fvectors)
+  } > FVEC
 }
+

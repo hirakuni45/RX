@@ -6,8 +6,8 @@
 /*====================================================*/
 
 MEMORY {
-    RAM(rwx) : org = 0x00000000, len = 0x00002000
-    ROM(rx)  : org = 0xFFFF0000, len = 0x00010000
+    RAM(rwx) : org = 0x00000000, len = 0x00001000
+    ROM(rx)  : org = 0x00008000, len = 0x00008000
 }
 
 SECTIONS {
@@ -15,7 +15,7 @@ SECTIONS {
 	_usp_init = 0x00001f00;
 	_isp_init = 0x00002000;
 
-    .fvectors 0xFFFFFFD0 : {
+    .fvectors 0x0000FFD0 : {
 		vect.o(.fvectors)
     }
 

@@ -39,14 +39,14 @@ namespace device {
 		}
 	}
 
-
+#if 0
 	static void put2_(uint8_t ch)
 	{
 		while(device::SCI0::SSR.TEND() == 0) ;
 		wait_delay(1);
 		device::SCI0::TDR = ch;
 	}
-
+#endif
 
 	static inline void select_(bool sel) {
 		device::PORT2::PODR.B2 = sel;
@@ -56,7 +56,7 @@ namespace device {
 		device::PORT2::PODR.B4 = sel;
 	}
 
-
+#if 0
 	static bool setup_spi_(uint32_t bps)
 	{
 		uint32_t brr = F_PCKB / bps / 4;
@@ -101,7 +101,7 @@ namespace device {
 //			SCIx::SCR = SCIx::SCR.RIE.b() | SCIx::SCR.TE.b() | SCIx::SCR.RE.b() | scr;
 //		}
 	}
-
+#endif
 
 	//-----------------------------------------------------------------//
 	/*!

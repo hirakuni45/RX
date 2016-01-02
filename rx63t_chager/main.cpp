@@ -34,13 +34,30 @@ void wait_delay(uint32_t n)
 	}
 }
 
+static utils::chager	chager_;
+static uint16_t timer_count_;
+static volatile uint16_t timer_sync_;
+
+class cmt_task {
+public:
+	void operator() () {
+		chager_.service();
+
+		++timer_count_;
+		// 60Hz
+		if(timer_count_ >= 781) {
+			timer_count_ = 0;
+			++timer_sync_;
+		}
+	}
+};
+
 namespace root {
-	device::cmt_io<device::CMT0>  cmt_;
+	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 	device::sci_io<device::SCI1, 256, 256> sci_;
 	device::ssd1306z_io oled_;
 	utils::monitor		monitor_;
 	graphics::monograph	monog_;
-	utils::chager		chager_;
 }
 
 struct chout {
@@ -119,20 +136,6 @@ void delay_10ms(uint32_t n)
 	}
 }
 
-static uint16_t timer_count_;
-static volatile uint16_t timer_sync_;
-
-static void timer_task_()
-{
-	root::chager_.service();
-
-	++timer_count_;
-	// 60Hz
-	if(timer_count_ >= 781) {
-		timer_count_ = 0;
-		++timer_sync_;
-	}
-}
 
 static void timer_60hz()
 {
@@ -200,7 +203,6 @@ int main(int argc, char** argv)
 
 	// タイマー設定
 	cmt_.set_clock(F_PCKB);
-	cmt_.set_task(timer_task_);
 	uint8_t cmt_irq_level = 3;
 	cmt_.initialize(46875, cmt_irq_level);
 
@@ -237,6 +239,7 @@ int main(int argc, char** argv)
 
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 0;
+		gformat("RX63T Hello world !");
 //		gformat("Input: %2.2:8y V") % ((inp * 25) >> 4);
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 12;

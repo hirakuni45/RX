@@ -323,15 +323,15 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint32_t length() {
 			if(polling_) {
-				bool err = false;
+//				bool err = false;
 				if(SCIx::SSR.ORER()) {	///< 受信オーバランエラー状態確認
 					SCIx::SSR.ORER = 0;	///< 受信オーバランエラークリア
-					err = true;
+//					err = true;
 				}
 				uint8_t sts = SCIx::SSR();	///< 受信ステータス取得
 				///< フレーミングエラー、パリティエラー状態確認
 				if(sts & (SCIx::SSR.FER.b() | SCIx::SSR.PER.b())) {
-					err = true;
+//					err = true;
 				}
 //				if((sts & sci_.SSR.RDRF.b()) != 0 && err == 0) {
 //					return 1;	///< 受信データあり

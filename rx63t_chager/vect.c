@@ -7,14 +7,12 @@
 #include <stdlib.h>
 #include "vect.h"
 
-
 void (*interrupt_vectors[256])(void);
 
 // null interrupt TASK
 INTERRUPT_FUNC void null_task_(void)
 {
 }
-
 
 //-----------------------------------------------------------------//
 /*!
@@ -56,9 +54,10 @@ INTERRUPT_FUNC void non_maskable_interrupt_(void)
 
 INTERRUPT_FUNC void power_on_reset(void);
 
+
 #define FIXEDVECT_SECTION __attribute__ ((section (".fvectors")))
 
-void * const Fixed_Vectors[] FIXEDVECT_SECTION = {
+void (*Fixed_Vectors[])(void) FIXEDVECT_SECTION = {
 //;0xffffffd0  Exception(Supervisor Instruction)
     super_visor_inst_,
 //;0xffffffd4  Reserved
@@ -84,3 +83,4 @@ void * const Fixed_Vectors[] FIXEDVECT_SECTION = {
 //;0xfffffffc  RESET
 	power_on_reset
 };
+

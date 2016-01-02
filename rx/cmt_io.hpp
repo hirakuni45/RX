@@ -19,18 +19,20 @@ namespace device {
 		@param[in]	CMTx	CMT チャネルクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class CMTx>
+	template <class CMTx, class ITASK>
 	class cmt_io {
 
 		uint32_t	clock_;
 
 		void sleep_() { }
 
+		static ITASK	task_;
+
 		static volatile uint32_t counter_;
-		static void (*task_)();
+
 		static INTERRUPT_FUNC void cmt_task_() {
 			++counter_;
-			if(task_) (*task_)();
+			task_();
 			switch(CMTx::get_chanel()) {
 			case 0:
 				ICU::IR.CMI0 = 0;
@@ -145,17 +147,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みタスクを設定
-			@param[in]	task	設定タスク
-		*/
-		//-----------------------------------------------------------------//
-		void set_task(void (*task)()) const {
-			task_ = task;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  割り込みと同期
 		*/
 		//-----------------------------------------------------------------//
@@ -185,6 +176,5 @@ namespace device {
 		}
 	};
 
-	template <class CMTx> volatile uint32_t cmt_io<CMTx>::counter_ = 0;
-	template <class CMTx> void (*cmt_io<CMTx>::task_)() = 0;
+	template <class CMTx, class ITASK> volatile uint32_t cmt_io<CMTx, ITASK>::counter_ = 0;
 }
