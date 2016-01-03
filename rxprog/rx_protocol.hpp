@@ -97,6 +97,23 @@ namespace rx {
 		typedef std::vector<frequency> frequencies;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	area 構造体
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct area {
+			uint32_t	org_ = 0;
+			uint32_t	end_ = 0;
+
+			void info(const std::string& head = "") const {
+				std::cout << head << (boost::format("Area: %08X, %08X") % org_ % end_) << std::endl;
+			}
+		};
+		typedef std::vector<area> areas;
+
+
+
 	private:
 		utils::rs232c_io	rs232c_;
 
@@ -107,8 +124,16 @@ namespace rx {
 		uint8_t				clock_num_ = 0;
 		multipliers			multipliers_;
 		frequencies			frequencies_;
+		areas				boot_area_;
+		areas				area_;
+		areas				blocks_;
+		uint32_t			prog_size_ = 0;
+		bool				data_ = false;
+		areas				data_areas_;
+		bool				id_protect_ = false;
+		bool				pe_turn_on_ = false;
 
-		uint32_t	   		baud_rate_;
+		uint32_t	   		baud_rate_ = 0;
 
 		uint8_t				last_error_ = 0;
 
@@ -116,6 +141,10 @@ namespace rx {
 			bool f = rs232c_.send(static_cast<char>(cmd));
 			rs232c_.sync_send();
 			return f;
+		}
+
+		bool read_(void* buff, uint32_t len, const timeval& tv) {
+			return rs232c_.recv(buff, len, tv) == len;
 		}
 
 		bool read_(void* buff, uint32_t len) {
@@ -138,6 +167,29 @@ namespace rx {
 			v |= p[2] << 16;
 			v |= p[3] << 24;
 			return v;
+		}
+
+		uint32_t get16_big_(const uint8_t* p) {
+			uint32_t v;
+			v = p[1];
+			v |= p[0] << 8;
+			return v;
+		}
+
+		uint32_t get32_big_(const uint8_t* p) {
+			uint32_t v;
+			v = p[3];
+			v |= p[2] << 8;
+			v |= p[1] << 16;
+			v |= p[0] << 24;
+			return v;
+		}
+
+		void put32_big_(uint8_t* p, uint32_t val) {
+			p[0] = (val >> 24) & 0xff;
+			p[1] = (val >> 16) & 0xff;
+			p[2] = (val >> 8) & 0xff;
+			p[3] =  val & 0xff;
 		}
 
 		uint8_t sum_(const uint8_t* buff, uint32_t len) {
@@ -433,7 +485,6 @@ namespace rx {
 			if(head[0] != 0x33) {
 				return false;
 			}
-///			std::cout << "Total: " << (int)head[1] << std::endl;
 			uint8_t tmp[256];
 			if(!read_(tmp, head[1])) {
 				return false;
@@ -506,8 +557,8 @@ namespace rx {
 			cmd[4] = (mclock >> 8) & 0xff;
 			cmd[5] = mclock & 0xff;
 			cmd[6] = 0x02;
-			cmd[7] = 0x08;  // 96MHz
-			cmd[8] = 0x04;  // 48MHz
+			cmd[7] = 0x08;  // x8 96MHz
+			cmd[8] = 0x04;  // x4 48MHz
 			cmd[9] = sum_(cmd, 9);
 			if(!write_(cmd, 10)) {
 				return false;
@@ -543,64 +594,40 @@ namespace rx {
 		}
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	バージョン情報の取得
-			@return バージョンを返す（エラーならempty）
-		*/
-		//-----------------------------------------------------------------//
-		std::string get_version() {
-			if(!connection_) return std::string();
-
-			if(!command_(0xFB)) {
-				return std::string();
-			}
-			char buff[9];
-			if(!read_(buff, 8)) {
-				return std::string();
-			}
-			buff[8] = 0;
-			return std::string(buff);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ステータス情報の取得
+			@brief	ユーザー・ブート領域問い合わせ
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool get_status(status& st) {
+		bool inquiry_boot_area() {
 			if(!connection_) return false;
 
-			if(!command_(0x70)) {
+			if(!command_(0x24)) {
 				return false;
 			}
 
-			char buff[2];
-			if(!read_(buff, 2)) {
+			uint8_t head[3];
+			if(!read_(head, 3)) {
+				return false;
+			}
+			if(head[0] != 0x34) {
+				return false;
+			}
+			uint8_t tmp[256];
+			if(!read_(tmp, head[1])) {
 				return false;
 			}
 
-			st.SRD  = buff[0];
-			st.SRD1 = buff[1];
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ステータス情報のクリア
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool clear_status() {
-			if(!connection_) return false;
-
-			if(!command_(0x50)) {
-				return false;
+			auto num = head[2];
+			const uint8_t* p = tmp;
+			for(uint8_t i = 0; i < num; ++i) {
+				area a;
+				a.org_ = get32_big_(p);
+				p += 4;
+				a.end_ = get32_big_(p);
+				p += 4;
+				boot_area_.push_back(a);
 			}
 
 			return true;
@@ -609,66 +636,335 @@ namespace rx {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ID 検査
+			@brief	ユーザー・ブート領域を取得
+			@return ユーザー・ブート領域
+		*/
+		//-----------------------------------------------------------------//
+		const areas& get_boot_area() const { return boot_area_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ユーザー領域問い合わせ
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool id_inspection(const id_t& t) {
+		bool inquiry_area() {
 			if(!connection_) return false;
 
-			uint8_t buff[12];
-			buff[0] = 0xF5;
-			buff[1] = 0xDF;
-			buff[2] = 0xFF;
-			buff[3] = 0x00;
-			buff[4] = 0x07;
-			for(int i = 0; i < 7; ++i) buff[5 + i] = t.buff[i];
-			if(rs232c_.send(buff, 12) != 12) {
-				return false;
-			}
-			rs232c_.sync_send();
-
-			status st;
-			if(!get_status(st)) {
-				return false;
-			}
-			if(st.get_id_state() != 3) {
+			if(!command_(0x25)) {
 				return false;
 			}
 
-			verification_ = true;
+			uint8_t head[3];
+			if(!read_(head, 3)) {
+				return false;
+			}
+			if(head[0] != 0x35) {
+				return false;
+			}
+			uint8_t tmp[256];
+			if(!read_(tmp, head[1])) {
+				return false;
+			}
+
+			auto num = head[2];
+			const uint8_t* p = tmp;
+			for(uint8_t i = 0; i < num; ++i) {
+				area a;
+				a.org_ = get32_big_(p);
+				p += 4;
+				a.end_ = get32_big_(p);
+				p += 4;
+				area_.push_back(a);
+			}
 
 			return true;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ユーザー領域を取得
+			@return ユーザー領域
+		*/
+		//-----------------------------------------------------------------//
+		const areas& get_area() const { return area_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ブロック情報問い合わせ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_block() {
+			if(!connection_) return false;
+
+			if(!command_(0x26)) {
+				return false;
+			}
+
+			uint8_t head[4];
+			if(!read_(head, 4)) {
+				return false;
+			}
+			if(head[0] != 0x36) {
+				return false;
+			}
+
+			auto num = head[3];
+			for(uint8_t i = 0; i < num; ++i) {
+				uint8_t tmp[8];
+				if(!read_(tmp, 8)) {
+					return false;
+				}
+				area a;
+				a.org_ = get32_big_(&tmp[0]);
+				a.end_ = get32_big_(&tmp[4]);
+				blocks_.push_back(a);			
+			}
+
+			uint8_t sum[1];
+			if(!read_(sum, 1)) {
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ブロック情報を取得
+			@return ブロック情報
+		*/
+		//-----------------------------------------------------------------//
+		const areas& get_block() const { return blocks_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	プログラム・サイズ問い合わせ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_prog_size() {
+			if(!connection_) return false;
+
+			if(!command_(0x27)) {
+				return false;
+			}
+
+			uint8_t head[5];
+			if(!read_(head, 5)) {
+				return false;
+			}
+			if(head[0] != 0x37) {
+				return false;
+			}
+
+			prog_size_ = get16_big_(&head[2]);
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	プログラム・サイズを取得
+			@return プログラム・サイズ
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_prog_size() const { return prog_size_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	データ量域有無問い合わせ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_data() {
+			if(!connection_) return false;
+
+			if(!command_(0x2a)) {
+				return false;
+			}
+
+			uint8_t head[4];
+			if(!read_(head, 4)) {
+				return false;
+			}
+			if(head[0] != 0x3a) {
+				return false;
+			}
+
+			data_ = head[2] == 0x21;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	データ量域有無取得
+			@return データ量域有無「true」ならデータ量域（有）
+		*/
+		//-----------------------------------------------------------------//
+		bool get_data() const { return data_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	データ量域情報問い合わせ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_data_area() {
+			if(!connection_) return false;
+
+			if(!command_(0x2b)) {
+				return false;
+			}
+
+			uint8_t head[3];
+			if(!read_(head, 3)) {
+				return false;
+			}
+			if(head[0] != 0x3b) {
+				return false;
+			}
+
+			auto num = head[2];
+			for(uint8_t i = 0; i < num; ++i) {
+				uint8_t tmp[8];
+				if(!read_(tmp, 8)) {
+					return false;
+				}
+				area a;
+				a.org_ = get32_big_(&tmp[0]);
+				a.end_ = get32_big_(&tmp[4]);
+				data_areas_.push_back(a);			
+			}
+
+			uint8_t sum[1];
+			if(!read_(sum, 1)) {
+				return false;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	データ量域情報を取得
+			@return データ量域情報
+		*/
+		//-----------------------------------------------------------------//
+		const areas& get_data_area() const { return data_areas_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	P/E ステータス遷移
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool turn_pe_status() {
+			if(!connection_) return false;
+
+			if(!command_(0x40)) {
+				return false;
+			}
+
+			timeval tv;
+			tv.tv_sec  = 10;
+			tv.tv_usec = 0;
+			uint8_t head[1];
+			if(!read_(head, 1, tv)) {
+				return false;
+			}
+			if(head[0] == 0x26) {
+				id_protect_ = false;
+///				std::cout << "Return: 0x26" << std::endl;
+			} else if(head[0] == 0x16) {
+				id_protect_ = true;
+///				std::cout << "Return: 0x16" << std::endl;
+			} else if(head[0] == 0xc0) {
+				if(!read_(head, 1, tv)) {
+					return false;
+				}
+				last_error_ = head[0];
+				return false;
+			}
+
+			pe_turn_on_ = true;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	プロテクト状態を取得
+			@return プロテクト状態
+		*/
+		//-----------------------------------------------------------------//
+		bool get_protect() const { return id_protect_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	リード・ページ
-			@param[in]	address	アドレス
+			@param[in]	adr	アドレス
+			@param[in]	len	読み出しサイズ
 			@param[out]	dst	リード・データ
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool read_page(uint32_t address, uint8_t* dst) {
+		bool read(uint32_t adr, uint32_t len, uint8_t* dst) {
 			if(!connection_) return false;
-			if(!verification_) return false;
+			if(!pe_turn_on_) return false;
 
-			uint8_t buff[3];
-			buff[0] = 0xFF;
-			buff[1] = (address >> 8) & 0xff;
-			buff[2] = (address >> 16) & 0xff;
-			if(rs232c_.send(buff, 3) != 3) {
+			uint8_t cmd[12];
+			cmd[0] = 0x52;
+			cmd[1] = 9;
+			cmd[2] = 0x01;  // user-area, data-area
+			put32_big_(&cmd[3], adr);
+			put32_big_(&cmd[7], len);
+			cmd[11] = sum_(cmd, 11);
+			if(!write_(cmd, 12)) {
 				return false;
 			}
-			rs232c_.sync_send();
 
-			// ボーレートから想定される実時間の２倍
-			// 1.0f / static_cast<float>(baud_rate) * 10.0f * 256.0f / 1e-6 * 2.0f;
-			return read_(dst, 256);
+			uint8_t head[5];
+			if(!read_(head, 5)) {
+				return false;
+			}
+			if(head[0] != 0x52) {
+				return false;
+			}
+			auto rs = get32_big_(&head[1]);
+			/// std::cout << "Read size: " << rs << std::endl;
+			timeval tv;
+			tv.tv_sec  = 10;
+			tv.tv_usec = 0;
+			if(!read_(dst, rs, tv)) {
+//				std::cout << "Read error #0" << std::endl;
+				return false;
+			}			
+			uint8_t sum[1];
+			if(!read_(sum, 1)) {
+//				std::cout << "Read error #1" << std::endl;
+				return false;
+			}
+
+			return true;
 		}
 
-
+#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	ライト・ページ
@@ -748,7 +1044,7 @@ namespace rx {
 		//-----------------------------------------------------------------//
 		bool end() {
 			connection_ = false;
-///			verification_ = false;
+			pe_turn_on_ = false;
 			return rs232c_.close();
 		}
 
