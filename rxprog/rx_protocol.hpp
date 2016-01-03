@@ -28,14 +28,87 @@ namespace rx {
 		struct device {
 			uint32_t	code_ = 0;
 			std::string	name_;
+
+			void info(const std::string& head = "") const {
+				std::cout << head << (boost::format("Device: %s") % name_) << std::endl;
+				std::cout << head << (boost::format("Device ID: 0x%0X") % code_) << std::endl;
+			}
 		};
+		typedef std::vector<device> devices;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	clock_mode 構造体
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct clock_mode {
+			uint8_t	type_ = 0;
+
+			void info(const std::string& head = "") const {
+				std::cout << head << (boost::format("Clock Mode: 0x%02X") % static_cast<int>(type_))
+					<< std::endl;
+			}
+		};
+		typedef std::vector<clock_mode> clock_modes;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	multiplier 構造体
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct multiplier {
+			typedef std::vector<uint8_t> list;
+			list	list_;
+
+			void info(const std::string& head = "") const {
+				std::cout << head << "Multiplier: ";
+				uint32_t i = 0;
+				for(auto v : list_) {
+					std::cout << static_cast<int>(v);
+					++i;
+					if(i < list_.size()) {
+						std::cout << ", ";
+					}
+				}
+				std::cout << std::endl;
+			}
+		};
+		typedef std::vector<multiplier> multipliers;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	frequency 構造体
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct frequency {
+			uint16_t	min_ = 0;
+			uint16_t	max_ = 0;
+
+			void info(const std::string& head = "") const {
+				std::cout << head << "Frequency Min: "
+					<< (static_cast<float>(min_) / 100.0f) << " MHz, Max: "
+					<< (static_cast<float>(max_) / 100.0f) << " MHz"
+					<< std::endl;
+			}
+		};
+		typedef std::vector<frequency> frequencies;
+
 
 	private:
 		utils::rs232c_io	rs232c_;
 
 		bool				connection_ = false;
 
-		device				device_;
+		devices				devices_;
+		clock_modes			clock_modes_;
+		uint8_t				clock_num_ = 0;
+		multipliers			multipliers_;
+		frequencies			frequencies_;
+
+		uint32_t	   		baud_rate_;
 
 		uint8_t				last_error_ = 0;
 
@@ -114,7 +187,6 @@ namespace rx {
 				tv.tv_usec = 10000;  // 10ms
 				int ch = rs232c_.recv(tv);
 				if(ch == 0x00) {
-///					std::cout << "OK: " << i << std::endl;
 					ok =  true;
 					break;
 				}
@@ -146,35 +218,30 @@ namespace rx {
 		*/
 		//-----------------------------------------------------------------//
 		bool inquiry_device() {
-			if(!connection_) return false; 
+			if(!connection_) return false;
 
-			// サポート・デバイスの取得
 			if(!command_(0x20)) {
 				return false;
 			}
-
-			uint8_t buff[3];
-			if(!read_(buff, 3)) {
+			uint8_t head[3];
+			if(!read_(head, 3)) {
 				return false;
 			}
-			if(buff[0] != 0x30) {
+			if(head[0] != 0x30) {
 				return false;
 			}
-			uint32_t total = buff[1];
-///			std::cout << "Total len: " << total << std::endl;
-///			uint32_t num = buff[2];
-///			std::cout << "device num: " << num << std::endl;
+			uint32_t total = head[1];
 
 			char tmp[256 + 16];
 			if(!read_(tmp, total)) {
 				return false;
 			}
 
-			device_.code_ = get32_((const uint8_t*)&tmp[1]);
-//			std::cout << (boost::format("Code: %08X") % d.code_) << std::endl; 
+			device d;
+			d.code_ = get32_((const uint8_t*)&tmp[1]);
 			tmp[static_cast<uint8_t>(tmp[0]) + 1] = 0;
-			device_.name_ = &tmp[5];
-//			std::cout << d.name_ << std::endl;
+			d.name_ = &tmp[5];
+			devices_.push_back(d);
 
 			return true;
 		}
@@ -186,7 +253,7 @@ namespace rx {
 			@return デバイス
 		*/
 		//-----------------------------------------------------------------//
-		const device& get_device() const { return device_; }
+		const devices& get_device() const { return devices_; }
 
 
 		//-----------------------------------------------------------------//
@@ -196,6 +263,8 @@ namespace rx {
 		*/
 		//-----------------------------------------------------------------//
 		bool select_device(uint32_t code) {
+			if(!connection_) return false;
+
 			uint8_t tmp[7];
 			tmp[0] = 0x10;
 			tmp[1] = 4;
@@ -214,65 +283,267 @@ namespace rx {
 			if(res[0] == 0x06) {
 				return true;
 			} else if(res[0] == 0x90) {
-				last_error_ = res[0];
 				read_(res, 1);
+				last_error_ = res[0];
 			}
 			return false;
 		}
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	接続速度を変更する
-			@param[in]	brate	ボーレート
+			@brief	クロック・モード問い合わせ
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool change_speed(speed_t brate) {
+		bool inquiry_clock_mode() {
 			if(!connection_) return false;
 
-			int cmd;
-			switch(brate) {
-			case B9600:
-				cmd = 0xB0;
-				baud_rate_ = 9600;
-				break;
-			case B19200:
-				cmd = 0xB1;
-				baud_rate_ = 19200;
-				break;
-			case B38400:
-				cmd = 0xB2;
-				baud_rate_ = 38400;
-				break;
-			case B57600:
-				cmd = 0xB3;
-				baud_rate_ = 57600;
-				break;
-			case B115200:
-				cmd = 0xB4;
-				baud_rate_ = 115200;
-				break;
-			default:
-				return false;
-			}
-			if(!command_(cmd)) {
-				return false;
-			}
-			int ch = rs232c_.recv(tv_);
-			if(ch != cmd) {
+			if(!command_(0x21)) {
 				return false;
 			}
 
-			if(!rs232c_.change_speed(brate)) {
+			uint8_t head[2];
+			if(!read_(head, 2)) {
 				return false;
+			}
+			if(head[0] != 0x31) {
+				return false;
+			}
+			uint8_t tmp[256];
+			if(!read_(tmp, head[1] + 1)) {
+				return false;
+			}
+			for(int i = 0; i < static_cast<int>(head[1]); ++i) {
+				clock_mode cm;
+				cm.type_ = tmp[i];
+				clock_modes_.push_back(cm);
+			}
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	デバイスを取得
+			@return デバイス
+		*/
+		//-----------------------------------------------------------------//
+		const clock_modes& get_clock_mode() const { return clock_modes_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	クロック・モードを選択
+			@param[in]	cm	クロック・モード
+		*/
+		//-----------------------------------------------------------------//
+		bool select_clock_mode(const clock_mode& cm) {
+			if(!connection_) return false;
+
+			uint8_t tmp[4];
+			tmp[0] = 0x11;
+			tmp[1] = 1;
+			tmp[2] = cm.type_;
+			tmp[3] = sum_(tmp, 3);
+			if(!write_(tmp, 4)) {
+				return false;
+			}
+			uint8_t res[1];
+			if(!read_(res, 1)) {
+				return false;
+			}
+			if(res[0] == 0x06) {
+				return true;
+			} else if(res[0] == 0x91) {
+				read_(res, 1);
+				last_error_ = res[0];
+			}
+			return false;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	逓倍比問い合わせ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_multiplier() {
+			if(!connection_) return false;
+
+			if(!command_(0x22)) {
+				return false;
+			}
+
+			uint8_t head[3];
+			if(!read_(head, 3)) {
+				return false;
+			}
+			if(head[0] != 0x32) {
+				return false;
+			}
+			uint8_t tmp[256];
+			if(!read_(tmp, head[1])) {
+				return false;
+			}
+
+			clock_num_ = head[2];
+			uint8_t i = 0;
+			const uint8_t* p = tmp;
+			while(i < (head[1] - 1)) {
+				auto n = *p++;
+				multiplier mp;
+				mp.list_.resize(n);
+				for(int j = 0; j < n; ++j) mp.list_[j] = *p++;
+				multipliers_.push_back(mp);
+				i += n + 1;
 			}
 
 			return true;
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	逓倍比を取得
+			@return 逓倍比
+		*/
+		//-----------------------------------------------------------------//
+		const multipliers& get_multiplier() const { return multipliers_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	動作周波数問い合わせ
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_frequency() {
+			if(!connection_) return false;
+
+			if(!command_(0x23)) {
+				return false;
+			}
+
+			uint8_t head[3];
+			if(!read_(head, 3)) {
+				return false;
+			}
+			if(head[0] != 0x33) {
+				return false;
+			}
+///			std::cout << "Total: " << (int)head[1] << std::endl;
+			uint8_t tmp[256];
+			if(!read_(tmp, head[1])) {
+				return false;
+			}
+
+			auto num = head[2];
+			const uint8_t* p = tmp;
+			for(uint8_t i = 0; i < num; ++i) {
+				frequency q;
+				q.min_ = static_cast<uint16_t>(p[1]) | (static_cast<uint16_t>(p[0]) << 8);
+				p += 2;
+				q.max_ = static_cast<uint16_t>(p[1]) | (static_cast<uint16_t>(p[0]) << 8);
+				p += 2;
+//				std::cout << (int)q.min_ << std::endl;
+//				std::cout << (int)q.max_ << std::endl;
+				frequencies_.push_back(q);
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	動作周波数を取得
+			@return 動作周波数
+		*/
+		//-----------------------------------------------------------------//
+		const frequencies& get_frequency() const { return frequencies_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	新ビットレート選択
+			@param[in]	mclock	マスタークロック（MHz単位で、小数点第２位までを１００倍）
+			@param[in]	brate	ボーレート
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool change_speed(uint16_t mclock, speed_t brate) {
+			if(!connection_) return false;
+
+			uint32_t nbr;
+			switch(brate) {
+			case B19200:
+				nbr = 192;
+				baud_rate_ = 19200;
+				break;
+			case B38400:
+				nbr = 384;
+				baud_rate_ = 38400;
+				break;
+			case B57600:
+				nbr = 576;
+				baud_rate_ = 57600;
+				break;
+			case B115200:
+				nbr = 1152;
+				baud_rate_ = 115200;
+				break;
+			default:
+				return false;
+			}
+
+			uint8_t cmd[10];
+			cmd[0] = 0x3f;
+			cmd[1] = 7;
+			cmd[2] = (nbr >> 8) & 0xff;
+			cmd[3] = nbr & 0xff;
+			cmd[4] = (mclock >> 8) & 0xff;
+			cmd[5] = mclock & 0xff;
+			cmd[6] = 0x02;
+			cmd[7] = 0x08;  // 96MHz
+			cmd[8] = 0x04;  // 48MHz
+			cmd[9] = sum_(cmd, 9);
+			if(!write_(cmd, 10)) {
+				return false;
+			}
+			uint8_t res[1];
+			if(!read_(res, 1)) {
+				return false;
+			}
+			if(res[0] == 0xbf) {
+				read_(res, 1);
+				last_error_ = res[0];
+				return false;
+			} else if(res[0] != 0x06) {
+				return false;
+			}
+
+			usleep(25000);	// 25[ms]
+
+			if(!rs232c_.change_speed(brate)) {
+				return false;
+			}
+
+			if(!command_(0x06)) {
+				return false;
+			}
+			if(!read_(res, 1)) {
+				return false;
+			}
+			if(res[0] != 0x06) {
+				return false;
+			}
+			return true;
+		}
+
+
+#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	バージョン情報の取得

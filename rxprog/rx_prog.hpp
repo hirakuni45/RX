@@ -44,29 +44,90 @@ namespace rx {
 				std::cout << "Connection OK." << std::endl;
 			}
 
-			// 問い合わせ開始
+			// サポート・デバイス問い合わせ
 			if(!proto_.inquiry_device()) {
 				proto_.end();
 				std::cerr << "Inquiry device error." << std::endl;
 				return false;
 			}
-			auto dev = proto_.get_device();
+			auto devs = proto_.get_device();
 			if(verbose_) {
-				std::cout << (boost::format("Device: %s") % dev.name_) << std::endl;
-				std::cout << (boost::format("Device ID: 0x%0X") % dev.code_) << std::endl;
+				int i = 0;
+				for(auto dev : devs) {
+					++i;
+					std::cout << (boost::format("#%d/%d") % i % devs.size()) << std::endl;
+					dev.info("  ");
+				}
 			}
 			// デバイス選択
-			if(!proto_.select_device(dev.code_)) {
+			if(!proto_.select_device(devs[0].code_)) {
 				proto_.end();
 				std::cerr << "Select device error." << std::endl;
 				return false;
 			}
+			// クロック・モード問い合わせ
+			if(!proto_.inquiry_clock_mode()) {
+				proto_.end();
+				std::cerr << "Inquiry clock-mode error." << std::endl;
+				return false;
+			}
+			auto ckms = proto_.get_clock_mode();
+			if(verbose_) {
+				int i = 0;
+				for(auto cm : ckms) {
+					++i;
+					std::cout << (boost::format("#%d/%d") % i % ckms.size()) << std::endl;
+					cm.info("  ");
+				}				
+			}
+			// クロック・モード選択
+			if(!proto_.select_clock_mode(ckms[0])) {
+				proto_.end();
+				std::cerr << "Select clock-mode error." << std::endl;
+				return false;
+			}
 
+			// 逓倍比問い合わせ
+			if(!proto_.inquiry_multiplier()) {
+				proto_.end();
+				std::cerr << "Inquiry multiplier error." << std::endl;
+				return false;
+			}
+			auto mpls = proto_.get_multiplier();
+			if(verbose_) {
+				int i = 0;
+				for(auto mp : mpls) {
+					++i;
+					std::cout << (boost::format("#%d/%d") % i % mpls.size()) << std::endl;
+					mp.info("  ");
+				}				
+			}
 
+			// 動作周波数問い合わせ
+			if(!proto_.inquiry_frequency()) {
+				proto_.end();
+				std::cerr << "Inquiry frequency error." << std::endl;
+				return false;
+			}
+			auto freq = proto_.get_frequency();
+			if(verbose_) {
+				int i = 0;
+				for(auto q : freq) {
+					++i;
+					std::cout << (boost::format("#%d/%d") % i % freq.size()) << std::endl;
+					q.info("  ");
+				}				
+			}
 
-
-#if 0
 			// ボーレート変更
+			if(!proto_.change_speed(1200, B115200)) {
+				std::cerr << "Can't change speed." << std::endl;
+				return false;
+			}
+			if(verbose_) {
+				std::cout << "Change baud rate: " << std::endl;
+			}
+#if 0
 			int val;
 			if(!utils::string_to_int(brate, val)) {
 				std::cerr << "Baud rate conversion error: '" << brate << std::endl;
