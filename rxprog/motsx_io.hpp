@@ -22,23 +22,30 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class motsx_io {
 	public:
-		typedef std::array<uint8_t, 256>	array;
+		typedef std::array<uint8_t, 256> array;
 
-		struct array_t {
-			array	array_;
+		struct area_t {
 			uint32_t	min_;
 			uint32_t	max_;
-			array_t() : array_(), min_(0xffffffff), max_(0) { array_.fill(0xff); }
+			area_t(uint32_t min = 0xffffffff, uint32_t max = 0) : min_(min), max_(max) { } 			
+		};
+		typedef std::vector<area_t> areas;
+
+		struct array_t {
+			area_t	area_;
+			array	array_;
+
+			array_t() : area_(), array_() { array_.fill(0xff); }
+
 			void set(uint32_t adr, uint8_t data) {
-				if(min_ > adr) min_ = adr;
-				if(max_ < adr) max_ = adr;
+				if(area_.min_ > adr) area_.min_ = adr;
+				if(area_.max_ < adr) area_.max_ = adr;
 				array_[adr & 0xff] = data;
 			}
 		};
 
 	private:
-		uint32_t	amin_;
-		uint32_t	amax_;
+		area_t		area_;
 		uint32_t	exec_;
 
 		typedef std::map<uint32_t, array_t>	memory_map;
@@ -62,8 +69,8 @@ namespace utils {
 
 
 		bool load_(utils::file_io& fio) {
-			amin_ = 0xffffffff;
-			amax_ = 0x00000000;
+			area_.min_ = 0xffffffff;
+			area_.max_ = 0x00000000;
 
 			uint32_t value = 0;
 			uint32_t type = 0;
@@ -144,7 +151,7 @@ namespace utils {
 			   		if(vcnt == alen) {
 			   			address = value;
 			   			if(type >= 1 && type <= 3) {
-			   				if(amin_ > address) amin_ = address;
+			   				if(area_.min_ > address) area_.min_ = address;
 			   			}
 			   			alen >>= 1;
 			   			length -= alen;
@@ -168,7 +175,7 @@ namespace utils {
 			   		if(vcnt >= 2) {
 			   			if(type >= 1 && type <= 3) {
 			   				write_byte_(address, value);
-			   				if(amax_ < address) amax_ = address;
+			   				if(area_.max_ < address) area_.max_ = address;
 			   				++address;
 			   			}
 			   			sum += value;
@@ -209,23 +216,23 @@ namespace utils {
 			fio.put_char('S');
 
 			uint8_t sum = 0;
-			uint32_t len = (a.max_ - a.min_ + 1) * 2;
+			uint32_t len = (a.area_.max_ - a.area_.min_ + 1) * 2;
 			std::string adr;
-			if(a.max_ <= 0xffff) {
-				adr = (boost::format("1%04X") % a.max_).str();
+			if(a.area_.max_ <= 0xffff) {
+				adr = (boost::format("1%04X") % a.area_.max_).str();
 				len += 4;
-			} else if(a.max_ <= 0xffffff) {
-				adr = (boost::format("2%06X") % a.max_).str();
+			} else if(a.area_.max_ <= 0xffffff) {
+				adr = (boost::format("2%06X") % a.area_.max_).str();
 				len += 6;
 			} else {
-				adr = (boost::format("3%08X") % a.max_).str();
+				adr = (boost::format("3%08X") % a.area_.max_).str();
 				len += 8;
 			}
 			len += 2; // for check sum
 			fio.put((boost::format("%02X") % len).str());
 			fio.put(adr);
 
-			for(uint32_t i = a.min_; i <= a.max_; ++i) {
+			for(uint32_t i = a.area_.min_; i <= a.area_.max_; ++i) {
 				uint8_t data = a.array_[i & 255];
 				fio.put((boost::format("%02X") % data).str());
 				sum += data;
@@ -242,7 +249,7 @@ namespace utils {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		motsx_io() : amin_(0xffffffff), amax_(0x000000), exec_(0x000000) {
+		motsx_io() : area_(), exec_(0x000000) {
 			fill_array_.fill(0xff);
 		}
 
@@ -327,53 +334,55 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	メモリーマップの表示
+			@brief	エリア・マップの作成
+			@return エリア・マップ
 		*/
 		//-----------------------------------------------------------------//
-		void list_memory_map() const {
-			std::cout << boost::format("Motolola Sx format load map: (exec: 0x%06X)") % exec_;
-			std::cout << std::endl;
-			uint32_t org = 0;
-			uint32_t fin = 0;
-			bool first = true;
-			uint32_t total = 0;
+		areas create_area_map() const {
+			areas as;
 			for(const auto& m : memory_map_) {
-				if(first) {
-					std::cout << boost::format("  0x%06X to ") % m.second.min_;
-					org = fin = m.second.min_;
-					first = false;
+				if(as.empty()) {
+					as.emplace_back(m.second.area_);
+				} else {
+					if((as.back().max_ + 1) == m.second.area_.min_) {
+						as.back().max_ = m.second.area_.max_;
+					} else {
+						as.emplace_back(m.second.area_);
+					}
 				}
-				if(m.second.min_ != fin) {
-					std::cout << boost::format("0x%06X (%d bytes)\n") %
-						(fin - 1) % (fin - org);
-					first = true;
-					total += fin - org;
-				}
-				fin = m.second.max_ + 1;
 			}
-			std::cout << boost::format("0x%06X (%d bytes)\n") %
-				(fin - 1) % (fin - org);
-			total += fin - org;
-			std::cout << boost::format("  Total (%d bytes)\n") % total << std::flush;
+			return as;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	最小アドレスの取得
-			@return 最小アドレス
+			@brief	エリア・マップの表示
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_min() const { return amin_; }
+		void list_area_map() const {
+			std::cout << boost::format("Motolola Sx format load map: (exec: 0x%08X)") % exec_;
+			std::cout << std::endl;
+
+			auto as = create_area_map();
+			uint32_t total = 0;
+			for(const auto& a : as) {
+				auto n = a.max_ - a.min_ + 1;
+				std::cout << boost::format("  0x%08X to 0x%08X (%d bytes)") % a.min_ % a.max_ % n;
+				std::cout << std::endl;
+				total += n;
+			}
+			std::cout << boost::format("  Total (%d bytes)") % total << std::endl << std::flush;
+		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	最大アドレスの取得
-			@return 最大アドレス
+			@brief	エリアの取得
+			@return エリア
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_max() const { return amax_; }
+		const area_t& get_area() const { return area_; }
 
 
 		//-----------------------------------------------------------------//
