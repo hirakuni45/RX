@@ -26,11 +26,13 @@ namespace rx {
 		//-------------------------------------------------------------//
 		/*!
 			@brief	接続速度を変更する
+			@param[in]	path	シリアル・デバイス・パス
 			@param[in]	brate	ボーレート
+			@param[in]	rx		CPU 設定
 			@return エラー無ければ「true」
 		*/
 		//-------------------------------------------------------------//
-		bool start(const std::string& path, const std::string& brate) {
+		bool start(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx) {
 
 			// 開始
 			if(!proto_.start(path)) {
@@ -133,7 +135,7 @@ namespace rx {
 
 			// ボーレート変更
 			{
-				if(!proto_.change_speed(1200, B115200)) {
+				if(!proto_.change_speed(rx, brate)) {
 					std::cerr << "Can't change speed." << std::endl;
 					return false;
 				}
@@ -284,6 +286,66 @@ namespace rx {
 			return true;
 		}
 
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	ライト開始
+			@param[in]	data	「true」ならデータ領域
+			@return 成功なら「true」
+		*/
+		//-------------------------------------------------------------//
+		bool start_write(bool data) {
+			if(!proto_.select_write_area(data)) {
+				proto_.end();
+				std::cerr << "Memory write error.(first)" << std::endl;
+				return false;
+			}
+			return true;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	ライト
+			@param[in]	adr	開始アドレス
+			@param[in]	len	読み出しサイズ
+			@param[in]	src	書き込みアドレス
+			@return 成功なら「true」
+		*/
+		//-------------------------------------------------------------//
+		bool write(uint32_t adr, uint32_t len, const uint8_t* src) {
+			uint32_t total = 0;
+			while(len > total) {
+				uint8_t tmp[256];
+				std::memcpy(tmp, src, 256);
+				if(!proto_.write_page(adr, tmp)) {
+					proto_.end();
+					std::cerr << "Memory write error. (body)" << std::endl;
+					return false;
+				}
+				total += 256;
+				src += 256;
+				adr += 256;
+			}
+			return true;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	ライト終了
+			@return 成功なら「true」
+		*/
+		//-------------------------------------------------------------//
+		bool final_write() {
+			if(!proto_.write_page(0xffffffff, nullptr)) {
+				proto_.end();
+				std::cerr << "Memory write error. (fin)" << std::endl;
+				return false;
+			}
+
+			return true;
+		}
 
 
 		//-------------------------------------------------------------//

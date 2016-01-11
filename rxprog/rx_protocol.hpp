@@ -113,6 +113,17 @@ namespace rx {
 		typedef std::vector<area> areas;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	rx_type 構造体 @n
+					※標準設定：　12.00MHz、8(96MHz)、4(48MHz)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct rx_t {
+			uint32_t	master_ = 1200;	///< マスター・クロック（MHz 単位で、小数第２位、１００倍）
+			uint32_t	sys_div_ = 8;	///< システム・ディバイダー設定
+			uint32_t	ext_div_ = 4;	///< 周辺ディバイダー設定
+		};
 
 	private:
 		utils::rs232c_io	rs232c_;
@@ -132,8 +143,10 @@ namespace rx {
 		areas				data_areas_;
 		bool				id_protect_ = false;
 		bool				pe_turn_on_ = false;
+		bool				select_write_area_ = false;
 
-		uint32_t	   		baud_rate_ = 0;
+		uint32_t	   		baud_speed_ = 0;
+		speed_t				baud_rate_ = B9600;
 
 		uint8_t				last_error_ = 0;
 
@@ -185,6 +198,11 @@ namespace rx {
 			return v;
 		}
 
+		void put16_big_(uint8_t* p, uint32_t val) {
+			p[0] = (val >> 8) & 0xff;
+			p[1] = val & 0xff;
+		}
+
 		void put32_big_(uint8_t* p, uint32_t val) {
 			p[0] = (val >> 24) & 0xff;
 			p[1] = (val >> 16) & 0xff;
@@ -205,11 +223,12 @@ namespace rx {
 		/*!
 			@brief	開始
 			@param[in]	path	シリアルデバイスパス
+			@param[in]	brate	初期に接続する速度（B9600、B19200のいずれか）
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(const std::string& path) {
-			if(!rs232c_.open(path, B19200)) {
+		bool start(const std::string& path, speed_t brate = B9600) {
+			if(!rs232c_.open(path, brate)) {
 				return false;
 			}
 			if(!rs232c_.enable_RTS(false)) {
@@ -519,46 +538,45 @@ namespace rx {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	新ビットレート選択
-			@param[in]	mclock	マスタークロック（MHz単位で、小数点第２位までを１００倍）
-			@param[in]	brate	ボーレート
+			@param[in]	rx		マイコン設定
+			@param[in]	spped	シリアル速度
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool change_speed(uint16_t mclock, speed_t brate) {
+		bool change_speed(const rx_t& rx, uint32_t speed) {
 			if(!connection_) return false;
 
 			uint32_t nbr;
-			switch(brate) {
-			case B19200:
+			switch(speed) {
+			case 19200:
 				nbr = 192;
-				baud_rate_ = 19200;
+				baud_rate_ = B19200;
 				break;
-			case B38400:
+			case 38400:
 				nbr = 384;
-				baud_rate_ = 38400;
+				baud_rate_ = B38400;
 				break;
-			case B57600:
+			case 57600:
 				nbr = 576;
-				baud_rate_ = 57600;
+				baud_rate_ = B57600;
 				break;
-			case B115200:
+			case 115200:
 				nbr = 1152;
-				baud_rate_ = 115200;
+				baud_rate_ = B115200;
 				break;
 			default:
 				return false;
 			}
+			baud_speed_ = speed; 
 
 			uint8_t cmd[10];
 			cmd[0] = 0x3f;
 			cmd[1] = 7;
-			cmd[2] = (nbr >> 8) & 0xff;
-			cmd[3] = nbr & 0xff;
-			cmd[4] = (mclock >> 8) & 0xff;
-			cmd[5] = mclock & 0xff;
+			put16_big_(&cmd[2], nbr);
+			put16_big_(&cmd[4], rx.master_);
 			cmd[6] = 0x02;
-			cmd[7] = 0x08;  // x8 96MHz
-			cmd[8] = 0x04;  // x4 48MHz
+			cmd[7] = rx.sys_div_;
+			cmd[8] = rx.ext_div_;
 			cmd[9] = sum_(cmd, 9);
 			if(!write_(cmd, 10)) {
 				return false;
@@ -577,7 +595,7 @@ namespace rx {
 
 			usleep(25000);	// 25[ms]
 
-			if(!rs232c_.change_speed(brate)) {
+			if(!rs232c_.change_speed(baud_rate_)) {
 				return false;
 			}
 
@@ -964,10 +982,46 @@ namespace rx {
 			return true;
 		}
 
-#if 0
+
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ライト・ページ
+			@brief	ユーザー・ブート／データ領域書き込み選択
+			@param[in]	data	「true」ならデータ領域
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool select_write_area(bool data) {
+			if(!connection_) return false;
+			if(!pe_turn_on_) return false;
+
+			// 領域選択
+			uint8_t cmd;
+			if(data) cmd = 0x43;
+			else cmd = 0x42;
+			if(!command_(cmd)) {
+				return false;
+			}
+
+			timeval tv;
+			tv.tv_sec  = 10;
+			tv.tv_usec = 0;
+			uint8_t head[1];
+			if(!read_(head, 1, tv)) {
+				return false;
+			}
+			if(head[0] != 0x06) {
+				return false;
+			}
+
+			select_write_area_ = true;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ライト・ページ（２５６バイト）
 			@param[in]	address	アドレス
 			@param[in]	src	ライト・データ
 			@return エラー無ければ「true」
@@ -975,34 +1029,67 @@ namespace rx {
 		//-----------------------------------------------------------------//
 		bool write_page(uint32_t address, const uint8_t* src) {
 			if(!connection_) return false;
-			if(!verification_) return false;
+			if(!pe_turn_on_) return false;
+			if(!select_write_area_) return false;
 
-			char buff[3];
-			buff[0] = 0x41;
-			buff[1] = (address >> 8) & 0xff;
-			buff[2] = (address >> 16) & 0xff;
-			if(rs232c_.send(buff, 3) != 3) {
+			uint8_t cmd[5 + 256 + 1];
+			cmd[0] = 0x50;
+///			std::cout << boost::format("Address: %08X") % address << std::endl;			
+			if(address != 0xffffffff) {
+				put32_big_(&cmd[1], address);
+				std::memcpy(&cmd[5], src, 256);
+				cmd[5 + 256] = sum_(cmd, 5 + 256);
+
+				if(!write_(cmd, 5)) {
+					select_write_area_ = false;
+					return false;
+				}
+				for(uint32_t i = 0; i < 16; ++i) {
+					if(!write_(&cmd[5 + i * 16], 16)) {
+						select_write_area_ = false;
+						return false;
+					}
+				}
+				if(!write_(&cmd[5 + 256], 1)) {  // SUM
+				  	select_write_area_ = false;
+					return false;
+				}
+			} else {
+				put32_big_(&cmd[1], address);
+				select_write_area_ = false;
+				cmd[5] = sum_(cmd, 5);
+				if(!write_(cmd, 6)) {
+					return false;
+				}
+			}
+
+			// レスポンス
+			timeval tv;
+			tv.tv_sec  = 10;
+			tv.tv_usec = 0;
+			uint8_t head[1];
+			if(!read_(head, 1, tv)) {
+				select_write_area_ = false;
 				return false;
 			}
-			rs232c_.sync_send();
-
-			if(rs232c_.send(src, 256) != 256) {
+			if(head[0] != 0x06) {
+				std::cout << "Respons error" << std::endl;
+				select_write_area_ = false;
+				if(head[0] != 0xd0) {
+					return false;
+				}
+				if(!read_(head, 1, tv)) {
+					return false;
+				}
+				last_error_ = head[0];
+///				std::cout << boost::format("Write error code: %02X") % static_cast<uint32_t>(head[0]) << std::endl;
 				return false;
 			}
-			rs232c_.sync_send();
 
-			status st;
-			if(!get_status(st)) {
-				return false;
-			}
-			if(st.get_SR4() != 0) {
-				return false;
-			}
-
-			return clear_status();
+			return true;
 		}
 
-
+#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	イレース・ページ
@@ -1045,6 +1132,7 @@ namespace rx {
 		bool end() {
 			connection_ = false;
 			pe_turn_on_ = false;
+			select_write_area_ = false;
 			return rs232c_.close();
 		}
 

@@ -124,7 +124,7 @@ $(BUILD)/%.d : %.cpp
 	[ -s $@ ] || rm -f $@
 
 run:
-	./$(TARGET)
+	./$(TARGET) chager.mot
 
 clean:
 	rm -rf $(BUILD) $(TARGET)
