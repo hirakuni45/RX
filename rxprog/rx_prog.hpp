@@ -280,8 +280,37 @@ namespace rx {
 		bool read(uint32_t adr, uint32_t len, uint8_t* dst) {
 			if(!proto_.read(adr, len, dst)) {
 				proto_.end();
-				std::cerr << "Memory read error." << std::endl;
+				std::cerr << "Read error." << std::endl;
 				return false;
+			}
+			return true;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	リード
+			@param[in]	adr	開始アドレス
+			@param[in]	len	読み出しサイズ
+			@param[out]	dst	書き込みアドレス
+			@return 成功なら「true」
+		*/
+		//-------------------------------------------------------------//
+		bool verify(uint32_t adr, uint32_t len, const uint8_t* dst) {
+			std::vector<uint8_t> tmp;
+			tmp.resize(len);
+			if(!read(adr, len, &tmp[0])) {
+				return false;
+			}
+			for(auto v : tmp) {
+				if(v != *dst) {
+					if(verbose_) {
+
+					} else {
+						std::cerr << "Verify error." << std::endl;
+						return false;
+					}
+				}
 			}
 			return true;
 		}
@@ -297,7 +326,7 @@ namespace rx {
 		bool start_write(bool data) {
 			if(!proto_.select_write_area(data)) {
 				proto_.end();
-				std::cerr << "Memory write error.(first)" << std::endl;
+				std::cerr << "Write start error.(first)" << std::endl;
 				return false;
 			}
 			return true;
@@ -320,7 +349,7 @@ namespace rx {
 				std::memcpy(tmp, src, 256);
 				if(!proto_.write_page(adr, tmp)) {
 					proto_.end();
-					std::cerr << "Memory write error. (body)" << std::endl;
+					std::cerr << "Write body error." << std::endl;
 					return false;
 				}
 				total += 256;
@@ -340,10 +369,9 @@ namespace rx {
 		bool final_write() {
 			if(!proto_.write_page(0xffffffff, nullptr)) {
 				proto_.end();
-				std::cerr << "Memory write error. (fin)" << std::endl;
+				std::cerr << "Write final error. (fin)" << std::endl;
 				return false;
 			}
-
 			return true;
 		}
 
