@@ -1,0 +1,7 @@
+*~
+*.[ao]
+*.map
+*.lst
+*.elf
+*.mot
+release/
