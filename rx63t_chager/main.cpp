@@ -14,9 +14,9 @@
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
+#include "common/ssd1306z_io.hpp"
+#include "common/monograph.hpp"
 #include "monitor.hpp"
-#include "ssd1306z_io.hpp"
-#include "monograph.hpp"
 #include "chager.hpp"
 
 static volatile uint8_t dummy_;
@@ -34,9 +34,9 @@ void wait_delay(uint32_t n)
 	}
 }
 
-static utils::chager	chager_;
+static utils::chager chager_;
 static uint16_t timer_count_;
-static volatile uint16_t timer_sync_ = 0x0001;
+static volatile uint16_t timer_sync_;
 
 static uint32_t count_ = 1230;
 

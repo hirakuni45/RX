@@ -18,9 +18,9 @@ PSOURCES	=	main.cpp \
 				common/cmt_io.cpp \
 				common/sci_io.cpp \
 				common/gpt_io.cpp \
+				common/ssd1306z_io.cpp \
+				common/monograph.cpp \
 				monitor.cpp \
-				ssd1306z_io.cpp \
-				monograph.cpp \
 				chager.cpp
 
 USER_LIBS	=	stdc++
