@@ -14,24 +14,6 @@ INTERRUPT_FUNC void null_task_(void)
 {
 }
 
-//-----------------------------------------------------------------//
-/*!
-	@brief	割り込み関数の設定
-	@param[in]	task	割り込み関数
-	@param[in]	idx		割り込みベクター番号
- */
-//-----------------------------------------------------------------//
-void set_interrupt_task(void (*task)(void), uint32_t idx)
-{
-	if(idx < 256) {
-		if(task == NULL) {
-			task = null_task_;
-		}
-		interrupt_vectors[idx] = task;
-	}
-}
-
-
 INTERRUPT_FUNC void _rx_priviledged_exception_handler(void)
 {
 }
@@ -56,3 +38,19 @@ INTERRUPT_FUNC void _rx_nonmaskable_exception_handler(void)
 {
 }
 
+//-----------------------------------------------------------------//
+/*!
+	@brief	割り込み関数の設定
+	@param[in]	task	割り込み関数
+	@param[in]	idx		割り込みベクター番号
+ */
+//-----------------------------------------------------------------//
+void set_interrupt_task(void (*task)(void), uint32_t idx)
+{
+	if(idx < 256) {
+		if(task == NULL) {
+			task = null_task_;
+		}
+		interrupt_vectors[idx] = task;
+	}
+}
