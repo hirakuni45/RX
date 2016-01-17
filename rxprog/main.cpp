@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
 
 	motsx_.list_area_map();
 
-	return 0;
+//	return 0;
 
 	rx::protocol::rx_t rx;
 	rx.master_ = 1200;

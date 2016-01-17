@@ -5,9 +5,9 @@
 */
 //=====================================================================//
 #include <cstdio>
-#include "rx/rx63x/system.hpp"
-#include "rx/rx63x/port.hpp"
-#include "rx/rx63x/mpc.hpp"
+#include "RX63T/system.hpp"
+#include "RX63T/port.hpp"
+#include "RX63T/mpc.hpp"
 #include "chager.hpp"
 #include "main.hpp"
 

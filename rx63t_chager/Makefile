@@ -9,15 +9,15 @@ BUILD		=	release
 
 VPATH		=	../
 
-ASOURCES	=	start.s
+ASOURCES	=	common/start.s
 
-CSOURCES	=	init.c \
-				vect.c
+CSOURCES	=	common/init.c \
+				common/vect.c
 
 PSOURCES	=	main.cpp \
-				rx/cmt_io.cpp \
-				rx/sci_io.cpp \
-				rx/gpt_io.cpp \
+				common/cmt_io.cpp \
+				common/sci_io.cpp \
+				common/gpt_io.cpp \
 				monitor.cpp \
 				ssd1306z_io.cpp \
 				monograph.cpp \
@@ -25,7 +25,7 @@ PSOURCES	=	main.cpp \
 
 USER_LIBS	=	stdc++
 
-LDSCRIPT	=	rx63t_single_chip.ld
+LDSCRIPT	=	../RX63T/rx63t_64k_8k.ld
 
 USER_DEFS	=	F_PCKA=96000000 F_PCKB=48000000
 
@@ -36,7 +36,7 @@ WRITER		=	rx_prog
 #INC_SYS		=	/usr/boost_1_60_0
 INC_SYS		=
 
-INC_APP		=	. ../ ../rx
+INC_APP		=	. ../
 
 OPTIMIZE	=	-O2
 
@@ -129,9 +129,6 @@ clean_depend:
 	rm -f $(DEPENDS)
 
 lst:  $(TARGET).lst
-
-%.lst: %.elf
-	$(OBJDUMP) -h -S $< > $@
 
 # Rules for building the .text rom images
 

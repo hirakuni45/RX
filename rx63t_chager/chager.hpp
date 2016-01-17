@@ -6,8 +6,8 @@
 */
 //=====================================================================//
 #include <cstdint>
-#include "rx/gpt_io.hpp"
-#include "rx/adc_io.hpp"
+#include "common/gpt_io.hpp"
+#include "common/adc_io.hpp"
 
 namespace utils {
 

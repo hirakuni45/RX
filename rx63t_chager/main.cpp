@@ -8,12 +8,12 @@
 // #include <cmath>
 #include <cstdlib>
 #include "main.hpp"
-#include "rx/rx63x/system.hpp"
-#include "rx/rx63x/port.hpp"
-#include "rx/rx63x/mpc.hpp"
-#include "rx/cmt_io.hpp"
-#include "rx/sci_io.hpp"
-#include "rx/format.hpp"
+#include "RX63T/system.hpp"
+#include "RX63T/port.hpp"
+#include "RX63T/mpc.hpp"
+#include "common/cmt_io.hpp"
+#include "common/sci_io.hpp"
+#include "common/format.hpp"
 #include "monitor.hpp"
 #include "ssd1306z_io.hpp"
 #include "monograph.hpp"
@@ -36,7 +36,7 @@ void wait_delay(uint32_t n)
 
 static utils::chager	chager_;
 static uint16_t timer_count_;
-static volatile uint16_t timer_sync_;
+static volatile uint16_t timer_sync_ = 0x0001;
 
 class cmt_task {
 public:

@@ -5,11 +5,11 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "rx/rx63x/system.hpp"
-#include "rx/rx63x/port.hpp"
-#include "rx/rx63x/mpc.hpp"
-#include "rx/rx63x/sci.hpp"
-#include "rx/format.hpp"
+#include "RX63T/system.hpp"
+#include "RX63T/port.hpp"
+#include "RX63T/mpc.hpp"
+#include "RX63T/sci.hpp"
+#include "common/format.hpp"
 
 #include "main.hpp"
 #include "ssd1306z_io.hpp"
