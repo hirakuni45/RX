@@ -12,8 +12,22 @@
 
 static const std::string version_ = "0.01b";
 
-static rx::prog prog_;
 static utils::motsx_io motsx_;
+
+void memory_dump_()
+{
+#if 0
+		int i = 0;
+		for(auto v : mem) {
+			std::cout << (boost::format("%02X, ") % static_cast<uint32_t>(v));
+			++i;
+			if(i >= 16) {
+				i = 0;
+				std::cout << std::endl;
+			} 
+		}
+#endif
+}
 
 static void title_(const std::string& cmd)
 {
@@ -27,21 +41,21 @@ static void title_(const std::string& cmd)
 	cout << c << "[options] [mot file] ..." << endl;
 	cout << endl;
 	cout << "Options :" << endl;
-	cout << "-d, --device=DEVICE\t\tSpecify device name" << endl;
-	cout << "-e, --erase\t\t\tPerform a device erase to a minimum" << endl;
-	cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
-	cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
-	cout << "    --erase-data\t\tPerform data flash erase" << endl;
+///	cout << "-d, --device=DEVICE\t\tSpecify device name" << endl;
+///	cout << "-e, --erase\t\t\tPerform a device erase to a minimum" << endl;
+///	cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
+///	cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
+///	cout << "    --erase-data\t\tPerform data flash erase" << endl;
 //	cout << "-i, --id=xx:xx:xx:xx:xx:xx:xx\tSpecify protect ID" << endl;
-	cout << "-P, --port=PORT\t\t\tSpecify serial port" << endl;
-	cout << "-a, --area=ORG,END\t\tSpecify read area" << endl;
-	cout << "-r, --read\t\t\tPerform data read" << endl;
-	cout << "-s, --speed=SPEED\t\tSpecify serial speed" << endl;
+///	cout << "-P, --port=PORT\t\t\tSpecify serial port" << endl;
+///	cout << "-a, --area=ORG,END\t\tSpecify read area" << endl;
+///	cout << "-r, --read\t\t\tPerform data read" << endl;
+///	cout << "-s, --speed=SPEED\t\tSpecify serial speed" << endl;
 	cout << "-v, --verify\t\t\tPerform data verify" << endl;
-	cout << "    --device-list\t\tDisplay device list" << endl;
-	cout << "-V, --verbose\t\t\tVerbose output" << endl;
 	cout << "-w, --write\t\t\tPerform data write" << endl;
-	cout << "    --progress\t\t\tdisplay Progress output" << endl;
+///	cout << "    --progress\t\t\tdisplay Progress output" << endl;
+///	cout << "    --device-list\t\tDisplay device list" << endl;
+	cout << "-V, --verbose\t\t\tVerbose output" << endl;
 	cout << "-h, --help\t\t\tDisplay this" << endl;
 }
 
@@ -143,33 +157,33 @@ int main(int argc, char* argv[])
 	for(int i = 1; i < argc; ++i) {
 		const std::string p = argv[i];
 		if(p[0] == '-') {
-			if(p == "-V" || p == "-verbose") opts.verbose = true;
-			else if(p == "-s") opts.br = true;
-			else if(utils::string_strncmp(p, "--speed=", 8) == 0) { opts.speed = &p[8]; }
-			else if(p == "-d") opts.dv = true;
-			else if(utils::string_strncmp(p, "--device=", 9) == 0) { opts.device = &p[9]; }
-			else if(p == "-P") opts.dp = true;
-			else if(utils::string_strncmp(p, "--port=", 7) == 0) { opts.dev_path = &p[7]; }
-			else if(p == "-a") opts.area = true;
+			if(p == "--verbose") opts.verbose = true;
+///			else if(p == "-s") opts.br = true;
+///			else if(utils::string_strncmp(p, "--speed=", 8) == 0) { opts.speed = &p[8]; }
+///			else if(p == "-d") opts.dv = true;
+///			else if(utils::string_strncmp(p, "--device=", 9) == 0) { opts.device = &p[9]; }
+///			else if(p == "-P") opts.dp = true;
+///			else if(utils::string_strncmp(p, "--port=", 7) == 0) { opts.dev_path = &p[7]; }
+///			else if(p == "-a") opts.area = true;
 ///			else if(utils::string_strncmp(p, "--area=", 7) == 0) {
 ///				if(!opts.set_area_(&p[7])) {
 ///					opterr = true;
 ///				}
 ///			}
-			else if(p == "-r" || p == "--read") opts.read = true;
-			else if(p == "-e" || p == "--erase") opts.erase = true;
+///			else if(p == "-r" || p == "--read") opts.read = true;
+///			else if(p == "-e" || p == "--erase") opts.erase = true;
 ///			else if(p == "-i") opts.id = true;
 ///			else if(utils::string_strncmp(p, "--id=", 5) == 0) { opt.id_val = &p[5]; }
 			else if(p == "-w" || p == "--write") opts.write = true;
 			else if(p == "-v" || p == "--verify") opts.verify = true;
 ///			else if(p == "--device-list") opts.device_list = true;
 			else if(p == "--progress") opts.progress = true;
-			else if(p == "--erase-rom") opts.erase_rom = true;
-			else if(p == "--erase-data") opts.erase_data = true;
-			else if(p == "--erase-all" || p == "--erase-chip") {
-				opts.erase_rom = true;
-				opts.erase_data = true;
-			} else if(p == "-h" || p == "--help") opts.help = true;
+///			else if(p == "--erase-rom") opts.erase_rom = true;
+///			else if(p == "--erase-data") opts.erase_data = true;
+///			else if(p == "--erase-all" || p == "--erase-chip") {
+//				opts.erase_rom = true;
+//				opts.erase_data = true;
+///			} else if(p == "-h" || p == "--help") opts.help = true;
 			else {
 				opterr = true;
 			}
@@ -189,9 +203,11 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	motsx_.list_area_map();
+	if(opts.verbose) {
+		motsx_.list_area_map();
+	}
 
-//	return 0;
+	rx::prog prog_(opts.verbose);
 
 	rx::protocol::rx_t rx;
 	rx.master_ = 1200;
@@ -203,7 +219,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	if(1) {  // write
+	if(opts.write) {  // write
 		auto areas = motsx_.create_area_map();
 		if(!areas.empty()) {
 			if(!prog_.start_write(true)) {
@@ -216,9 +232,12 @@ int main(int argc, char* argv[])
 			uint32_t adr = a.min_ & 0xffffff00;
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
-				std::cout << boost::format("%08X to %08X") % adr % (adr + 255) << std::endl;
+				if(opts.progress) {
+					std::cout << '#';
+				}
+				/// std::cout << boost::format("%08X to %08X") % adr % (adr + 255) << std::endl;
 				auto mem = motsx_.get_memory(adr);
-				if(!prog_.write(adr, 256, &mem[0])) {
+				if(!prog_.write(adr, &mem[0])) {
 					prog_.end();
 					return -1;
 				}
@@ -226,26 +245,23 @@ int main(int argc, char* argv[])
 				len += 256;
 			}
 		}
+		if(opts.progress) {
+			std::cout << std::endl;
+		}
 		if(!prog_.final_write()) {
 			prog_.end();
 			return -1;
 		}
 	}
 
-
-	if(1) {  // read
-		std::vector<uint8_t> mem;
-		mem.resize(256);
-		prog_.read(0xffff0100, mem.size(), &mem[0]);
-
-		int i = 0;
-		for(auto v : mem) {
-			std::cout << (boost::format("%02X, ") % static_cast<uint32_t>(v));
-			++i;
-			if(i >= 16) {
-				i = 0;
-				std::cout << std::endl;
-			} 
+	if(opts.verify) {  // verify
+		auto areas = motsx_.create_area_map();
+		for(const auto& a : areas) {
+			uint32_t len = a.max_ - a.min_ + 1;
+			auto mem = motsx_.get_memory(a.min_);
+			if(!prog_.verify(a.min_, &mem[a.min_ & 0xff], len)) {
+				return -1;
+			}
 		}
 	}
 

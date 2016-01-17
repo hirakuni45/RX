@@ -15,7 +15,7 @@ namespace rx {
 	 */
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class prog {
-		bool		verbose_ = true;
+		bool		verbose_;
 		protocol	proto_;
 
 		std::string out_section_(uint32_t n, uint32_t num) const {
@@ -23,6 +23,14 @@ namespace rx {
 		}
 
 	public:
+		//-------------------------------------------------------------//
+		/*!
+			@brief	コンストラクター
+		*/
+		//-------------------------------------------------------------//
+		prog(bool verbose = false) : verbose_(verbose) { }
+
+
 		//-------------------------------------------------------------//
 		/*!
 			@brief	接続速度を変更する
@@ -272,12 +280,12 @@ namespace rx {
 		/*!
 			@brief	リード
 			@param[in]	adr	開始アドレス
-			@param[in]	len	読み出しサイズ
 			@param[out]	dst	書き込みアドレス
+			@param[in]	len	読み出しサイズ
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool read(uint32_t adr, uint32_t len, uint8_t* dst) {
+		bool read(uint32_t adr, uint8_t* dst, uint32_t len) {
 			if(!proto_.read(adr, len, dst)) {
 				proto_.end();
 				std::cerr << "Read error." << std::endl;
@@ -289,28 +297,34 @@ namespace rx {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	リード
+			@brief	ベリファイ
 			@param[in]	adr	開始アドレス
+			@param[in]	src	書き込みアドレス
 			@param[in]	len	読み出しサイズ
-			@param[out]	dst	書き込みアドレス
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool verify(uint32_t adr, uint32_t len, const uint8_t* dst) {
-			std::vector<uint8_t> tmp;
-			tmp.resize(len);
-			if(!read(adr, len, &tmp[0])) {
+		bool verify(uint32_t adr, const uint8_t* src, uint32_t len) {
+			std::vector<uint8_t> dev;
+			dev.resize(len);
+			if(!read(adr, &dev[0], len)) {
 				return false;
 			}
-			for(auto v : tmp) {
-				if(v != *dst) {
+			uint32_t errcnt = 0;
+			for(auto d : dev) {
+				auto m = *src++;
+				if(d != m) {
+					++errcnt;
 					if(verbose_) {
-
-					} else {
-						std::cerr << "Verify error." << std::endl;
-						return false;
+						std::cerr << (boost::format("0x%08X: D(%02X) to M(%02X)") % adr %
+							static_cast<uint32_t>(d) % static_cast<uint32_t>(m)) << std::endl;
 					}
 				}
+				++adr;
+			}
+			if(errcnt > 0) {
+				std::cerr << "Verify error: " << errcnt << std::endl;
+				return false;
 			}
 			return true;
 		}
@@ -335,26 +349,17 @@ namespace rx {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	ライト
+			@brief	ライト（２５６バイト）
 			@param[in]	adr	開始アドレス
-			@param[in]	len	読み出しサイズ
 			@param[in]	src	書き込みアドレス
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool write(uint32_t adr, uint32_t len, const uint8_t* src) {
-			uint32_t total = 0;
-			while(len > total) {
-				uint8_t tmp[256];
-				std::memcpy(tmp, src, 256);
-				if(!proto_.write_page(adr, tmp)) {
-					proto_.end();
-					std::cerr << "Write body error." << std::endl;
-					return false;
-				}
-				total += 256;
-				src += 256;
-				adr += 256;
+		bool write(uint32_t adr, const uint8_t* src) {
+			if(!proto_.write_page(adr, src)) {
+				proto_.end();
+				std::cerr << "Write body error." << std::endl;
+				return false;
 			}
 			return true;
 		}
