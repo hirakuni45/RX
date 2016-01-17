@@ -6,13 +6,6 @@
 //=====================================================================//
 int main(int argc, char**argv);
 
-extern int _preinit_array_start;
-extern int _preinit_array_end;
-extern int _init_array_start;
-extern int _init_array_end;
-extern int _fini_array_start;
-extern int _fini_array_end;
-
 extern void rx_run_init_array(void);
 extern void rx_run_fini_array(void);
 extern void rx_run_preinit_array(void);

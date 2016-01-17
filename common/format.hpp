@@ -324,7 +324,7 @@ namespace utils {
 			if(v < 0) { d = -v; } else { d = v; }
 			uint32_t dec = d & make_mask_(fixpoi);
 
-			int l = 0;
+			uint32_t l = 0;
 			char buff[24];
 			if(decimal_ > (sizeof(buff) - 1)) decimal_ = sizeof(buff) - 1;
 			while(dec > 0) {

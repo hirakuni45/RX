@@ -38,6 +38,8 @@ static utils::chager	chager_;
 static uint16_t timer_count_;
 static volatile uint16_t timer_sync_ = 0x0001;
 
+static uint32_t count_ = 1230;
+
 class cmt_task {
 public:
 	void operator() () {
@@ -219,6 +221,7 @@ int main(int argc, char** argv)
 //	format("Input Voltage: %2.4:8y\n") % ((v * 25) >> 4);
 
 	uint32_t led = 0;
+	uint32_t cnt = 0;
 
 	while(1) {
 		timer_60hz();
@@ -239,7 +242,13 @@ int main(int argc, char** argv)
 
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 0;
-		gformat("RX63T Hello world !");
+		gformat("RX63T Hello %u") % static_cast<unsigned int>(count_);
+		++cnt;
+		if(cnt >= 60) {
+			cnt = 0;
+			++count_;
+		}
+
 //		gformat("Input: %2.2:8y V") % ((inp * 25) >> 4);
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 12;
