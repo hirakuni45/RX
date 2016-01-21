@@ -12,7 +12,7 @@
 
 // 標準的 ASCII フォント
 static const uint8_t font6x12_[] = {
-#include "font6x12.h"
+#include "common/font6x12.h"
 };
 static const int FONT_WIDTH	 = 6;
 static const int FONT_HEIGHT = 12;

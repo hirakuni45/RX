@@ -5,7 +5,7 @@
 */
 //=====================================================================//
 #include <stdlib.h>
-#include "vect.h"
+#include "common/vect.h"
 
 void (*interrupt_vectors[256])(void);
 
