@@ -21,7 +21,7 @@ RX sources
 ## RX プロジェクト・リスト
  - /RX63T          --->   RX63T 専用のデバイス定義クラス
  - /RX621          --->   RX621 専用のデバイス定義クラス
- - /fatfs          --->   ChaN 氏作成の fatfs ソースコードと RX マイコン向けデバイスコード
+ - /fatfs          --->   ChaN 氏作成の fatfs ソースコードと RX マイコン向け RSPI コード
  - /common         --->   共有クラス、ヘッダーなど
  - /rxprog         --->   RX フラッシュへのプログラム書き込みツール（Windows、OS-X、※Linux 対応）
  - /rx63t_chager   --->   RX63T を使ったモバイルバッテリー・プロジェクト
