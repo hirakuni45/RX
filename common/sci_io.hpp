@@ -6,9 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "RX63T/sci.hpp"
-#include "RX63T/system.hpp"
-#include "RX63T/icu.hpp"
+#include "common/chip.hpp"
 #include "vect.h"
 #include "fifo.hpp"
 
@@ -30,8 +28,8 @@ namespace device {
 	template <class SCIx, uint32_t recv_size, uint32_t send_size>
 	class sci_io {
 
-		static utils::fifo<recv_size>	recv_;
-		static utils::fifo<send_size>	send_;
+		static utils::fifo<recv_size> recv_;
+		static utils::fifo<send_size> send_;
 
 		uint8_t	intr_level_;
 		bool	crlf_;
