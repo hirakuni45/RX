@@ -4,4 +4,5 @@
 *.lst
 *.elf
 *.mot
+*.exe
 release/
