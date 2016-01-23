@@ -55,7 +55,7 @@ namespace utils {
 		if(!command_.service()) {
 			return;
 		}
-
+#if 0
 		for(short i = 0; i < 8; ++i) {
 			char word[16];
 			if(command_.get_word(i, sizeof(word), word)) {
@@ -65,7 +65,7 @@ namespace utils {
 				break;
 			}
 		}
-#if 0
+
 //			if(cmd_play_(ss)) return;
 //			if(cmd_volume_(ss)) return;
 #endif

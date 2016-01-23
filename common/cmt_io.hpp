@@ -6,9 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "cmt.hpp"
-#include "RX63T/system.hpp"
-#include "RX63T/icu.hpp"
+#include "common/chip.hpp"
 #include "common/vect.h"
 
 namespace device {

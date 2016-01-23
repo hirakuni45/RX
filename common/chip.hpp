@@ -7,6 +7,9 @@
 */
 //=====================================================================//
 #if defined(CHIP_RX621) | defined(CHIP_RX62N) | defined(CHIP_RX62G) | defined(CHIP_RX63T) | defined(CHIP_RX630)
+
+#include "RX600/cmt.hpp"
+
 #ifdef CHIP_RX621
 #include "RX621/system.hpp"
 #include "RX621/sci.hpp"
