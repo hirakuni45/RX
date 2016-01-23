@@ -21,7 +21,7 @@ OPTLIBS		=
 ifeq ($(OS),Windows_NT)
 INC_SYS		=	/usr/local/boost_1_60_0
 else
-INC_SYS		=
+INC_SYS		=	/usr/local/include
 endif
 
 INC_LIB		=
@@ -124,7 +124,7 @@ $(BUILD)/%.d : %.cpp
 	[ -s $@ ] || rm -f $@
 
 run:
-	./$(TARGET) --write --verify chager.mot
+	./$(TARGET) --port=/dev/ttyS8 --write --verify chager.mot
 
 clean:
 	rm -rf $(BUILD) $(TARGET)

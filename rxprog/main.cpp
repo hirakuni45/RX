@@ -47,7 +47,7 @@ static void title_(const std::string& cmd)
 ///	cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
 ///	cout << "    --erase-data\t\tPerform data flash erase" << endl;
 //	cout << "-i, --id=xx:xx:xx:xx:xx:xx:xx\tSpecify protect ID" << endl;
-///	cout << "-P, --port=PORT\t\t\tSpecify serial port" << endl;
+	cout << "-P, --port=PORT\t\t\tSpecify serial port" << endl;
 ///	cout << "-a, --area=ORG,END\t\tSpecify read area" << endl;
 ///	cout << "-r, --read\t\t\tPerform data read" << endl;
 ///	cout << "-s, --speed=SPEED\t\tSpecify serial speed" << endl;
@@ -71,8 +71,8 @@ struct options {
 	std::string	speed;
 	bool	br = false;
 
-	std::string dev_path;
-	std::string dev_comx;
+	std::string com_path;
+	std::string com_name;
 	bool	dp = false;
 
 	std::string id_val;
@@ -125,7 +125,7 @@ struct options {
 			device = t;
 			dv = false;
 		} else if(dp) {
-			dev_path = t;
+			com_path = t;
 			dp = false;
 		} else if(id) {
 			id_val = t;
@@ -162,8 +162,8 @@ int main(int argc, char* argv[])
 ///			else if(utils::string_strncmp(p, "--speed=", 8) == 0) { opts.speed = &p[8]; }
 ///			else if(p == "-d") opts.dv = true;
 ///			else if(utils::string_strncmp(p, "--device=", 9) == 0) { opts.device = &p[9]; }
-///			else if(p == "-P") opts.dp = true;
-///			else if(utils::string_strncmp(p, "--port=", 7) == 0) { opts.dev_path = &p[7]; }
+			else if(p == "-P") opts.dp = true;
+			else if(p.find_first_of("--port=") == 0) { opts.com_path = &p[7]; }
 ///			else if(p == "-a") opts.area = true;
 ///			else if(utils::string_strncmp(p, "--area=", 7) == 0) {
 ///				if(!opts.set_area_(&p[7])) {
@@ -207,6 +207,25 @@ int main(int argc, char* argv[])
 		motsx_.list_area_map();
 	}
 
+    // Windwos系シリアル・ポート（COMx）の変換                                                  
+    if(!opts.com_path.empty() && opts.com_path[0] != '/') {
+		std::string s = utils::to_lower_text(opts.com_path);
+        if(s.size() > 3 && s[0] == 'c' && s[1] == 'o' && s[2] == 'm') {
+            int val;
+            if(utils::string_to_int(&s[3], val)) {
+                if(val >= 1 ) {
+                    --val;
+                    opts.com_name = opts.com_path;
+                    opts.com_path = "/dev/ttyS" + (boost::format("%d") % val).str();
+                }
+            }
+        }
+    }
+	if(opts.com_path.empty()) {
+		std::cerr << "Serial port path not found." << std::endl;
+		return -1;
+	}
+
 	rx::prog prog_(opts.verbose);
 
 	rx::protocol::rx_t rx;
@@ -214,7 +233,7 @@ int main(int argc, char* argv[])
 	rx.sys_div_ = 8;
 	rx.ext_div_ = 4;
 
-	if(!prog_.start("/dev/ttyS8", 115200, rx)) {
+	if(!prog_.start(opts.com_path, 115200, rx)) {
 		prog_.end();
 		return -1;
 	}
