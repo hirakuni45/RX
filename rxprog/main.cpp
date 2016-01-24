@@ -10,7 +10,7 @@
 #include "string_utils.hpp"
 #include "area.hpp"
 
-static const std::string version_ = "0.01b";
+static const std::string version_ = "0.10b";
 
 static utils::motsx_io motsx_;
 
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
 ///			else if(p == "-d") opts.dv = true;
 ///			else if(utils::string_strncmp(p, "--device=", 9) == 0) { opts.device = &p[9]; }
 			else if(p == "-P") opts.dp = true;
-			else if(p.find_first_of("--port=") == 0) { opts.com_path = &p[7]; }
+			else if(p.find("--port=") == 0) { opts.com_path = &p[7]; }
 ///			else if(p == "-a") opts.area = true;
 ///			else if(utils::string_strncmp(p, "--area=", 7) == 0) {
 ///				if(!opts.set_area_(&p[7])) {
@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
 		motsx_.list_area_map();
 	}
 
-    // Windwos系シリアル・ポート（COMx）の変換                                                  
+    // Windwos系シリアル・ポート（COMx）の変換
     if(!opts.com_path.empty() && opts.com_path[0] != '/') {
 		std::string s = utils::to_lower_text(opts.com_path);
         if(s.size() > 3 && s[0] == 'c' && s[1] == 'o' && s[2] == 'm') {
@@ -225,6 +225,7 @@ int main(int argc, char* argv[])
 		std::cerr << "Serial port path not found." << std::endl;
 		return -1;
 	}
+///	std::cout << opts.com_path << std::endl;
 
 	rx::prog prog_(opts.verbose);
 
