@@ -6,6 +6,7 @@
 */
 //=====================================================================//
 #include <time.h>
+#include "common/format.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,3 +67,10 @@ extern "C" {
 //-----------------------------------------------------------------//
 void delay_10ms(uint32_t n);
 
+
+struct chout {
+	void operator() (char ch) {
+		sci_putch(ch);
+	}
+};
+typedef utils::format<chout> tformat;

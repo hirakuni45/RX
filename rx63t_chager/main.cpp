@@ -13,7 +13,6 @@
 #include "RX63T/mpc.hpp"
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
-#include "common/format.hpp"
 #include "common/ssd1306z_io.hpp"
 #include "common/monograph.hpp"
 #include "monitor.hpp"
@@ -62,19 +61,12 @@ namespace root {
 	graphics::monograph	monog_;
 }
 
-struct chout {
-	void operator() (char ch) {
-		root::sci_.putch(ch);
-	}
-};
-typedef utils::format<chout>	format;
-
 struct grout {
 	void operator() (char ch) {
 		root::monog_.draw_font(ch);
 	}
 };
-typedef utils::format<grout>	gformat;
+typedef utils::format<grout> gformat;
 
 
 //-----------------------------------------------------------------//

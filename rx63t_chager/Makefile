@@ -20,7 +20,6 @@ PSOURCES	=	main.cpp \
 				common/gpt_io.cpp \
 				common/ssd1306z_io.cpp \
 				common/monograph.cpp \
-				monitor.cpp \
 				chager.cpp
 
 USER_LIBS	=	stdc++
@@ -158,10 +157,10 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	$(WRITER) --progress -d R5F2M120 -e -w -v $(TARGET).mot
+	$(WRITER) --verbose --port=/dev/ttyS8 --write --verify $(TARGET).mot
 
 verify:
-	$(WRITER) -d R5F2M120 -v $(TARGET).mot
+	$(WRITER) -v $(TARGET).mot
 
 
 -include $(DEPENDS)
