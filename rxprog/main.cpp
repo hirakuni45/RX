@@ -37,32 +37,29 @@ static const std::string get_current_path_(const std::string& exec)
 	std::string exec_path;
 #ifdef WIN32
 	{
-		std::string tmp;
-		utils::sjis_to_utf8(exec, tmp);
-		utils::convert_delimiter(tmp, '\\', '/', exec_path);
+		auto tmp = utils::sjis_to_utf8(exec);
+		exec_path = utils::convert_delimiter(tmp, '\\', '/');
 	}
 #else
 	exec_path = exec;
 #endif
 	std::string spch;
-	std::string base = utils::get_file_name(exec_path);
 	std::string env;
 	{
 #ifdef WIN32
-		std::string tmp;
-		sjis_to_utf8(getenv("PATH"), tmp);
-		utils::convert_delimiter(tmp, '\\', '/', env);
-		spch = ";";
+		auto tmp = sjis_to_utf8(getenv("PATH"));
+		env = utils::convert_delimiter(tmp, '\\', '/');
+		spch = ';';
 #else
 		env = getenv("PATH");
-		spch = ":";
+		spch = ':';
 #endif
 	}
 	utils::strings ss = utils::split_text(env, spch);
 	for(const auto& s : ss) {
-		std::string path = s + '/' + base;
+		std::string path = s + '/' + utils::get_file_name(exec_path);
 		if(utils::probe_file(path)) {
-			return std::move(s);
+			return s;
 		}
 	}
 
@@ -79,7 +76,7 @@ static void help_(const std::string& cmd)
 	cout << "Renesas RX Series Programmer Version " << version_ << endl;
 	cout << "Copyright (C) 2016, Hiramatsu Kunihito (hira@rvf-rc45.net)" << endl;
 	cout << "usage:" << endl;
-	cout << c << "[options] [mot file] ..." << endl;
+	cout << c << " [options] [mot file] ..." << endl;
 	cout << endl;
 	cout << "Options :" << endl;
 	cout << "    -P PORT,   --port=PORT     Specify serial port" << endl;

@@ -307,7 +307,15 @@ namespace utils {
 				return false;
 			}
 
-			int mode = -1;
+
+			enum class amode {
+				NONE,
+				DEFAULT,
+				PROGRAMMER,
+				DEVICE
+			};
+
+			amode mode = amode::NONE;
 			uint32_t lno = 0;
 			uint32_t err = 0;
 			while(!fio.eof()) {
@@ -322,14 +330,14 @@ namespace utils {
 				else if(cmd[0] == '#') {
 					continue;
 				} else if(cmd == "[DEFAULT]") {
-					mode = 0;
+					mode = amode::DEFAULT;
 					continue;
 				} else if(cmd == "[PROGRAMMER]") {
-					mode = 1;
+					mode = amode::PROGRAMMER;
 					reset_ana_();
 					continue;
 				} else if(cmd == "[DEVICE]") {
-					mode = 2;
+					mode = amode::DEVICE;
 					reset_ana_();
 					continue;
 				} else if(cmd[0] == '[') {
@@ -337,14 +345,14 @@ namespace utils {
 					break;
 				}
 
-				if(mode == 0) {
+				if(mode == amode::DEFAULT) {
 					if(!default_.analize(cmd)) {
 						++err;
 						std::cerr << "(" << lno << ") ";
 						std::cerr << "Default section error: " << line << "'" << std::endl; 
 						break;
 					}
-				} else if(mode == 1) {
+				} else if(mode == amode::PROGRAMMER) {
 					if(!analize_(line, lno)) {
 						std::cerr << "(" << lno << ") ";
 						std::cerr << "Programmer section error: '" << line << "'" << std::endl; 
@@ -358,7 +366,7 @@ namespace utils {
 						}
 						reset_ana_();
 					}
-				} else if(mode == 2) {
+				} else if(mode == amode::DEVICE) {
 					if(!analize_(line, lno)) {
 						std::cerr << "(" << lno << ") ";
 						std::cerr << "Device section error: '" << line << "'" << std::endl; 
