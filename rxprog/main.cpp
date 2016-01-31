@@ -183,13 +183,13 @@ static void help_(const std::string& cmd)
 	cout << "    -P PORT,   --port=PORT     Specify serial port" << endl;
 	cout << "    -s SPEED,  --speed=SPEED   Specify serial speed" << endl;
 	cout << "    -d DEVICE, --device=DEVICE Specify device name" << endl;
-///	cout << "-e, --erase\t\t\tPerform a device erase to a minimum" << endl;
+	cout << "    -e, --erase                Perform a device erase to a minimum" << endl;
 ///	cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
 ///	cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
 ///	cout << "    --erase-data\t\tPerform data flash erase" << endl;
-//	cout << "-i, --id=xx:xx:xx:xx:xx:xx:xx\tSpecify protect ID" << endl;
-///	cout << "-a, --area=ORG,END\t\tSpecify read area" << endl;
-///	cout << "-r, --read\t\t\tPerform data read" << endl;
+	cout << "    --id=ID[:,]ID[;,] ...      Specify protect ID (16bytes)" << endl;
+///	cout << "    -r, --read                 Perform data read" << endl;
+///	cout << "    --area=ORG[:,]END          Specify read area" << endl;
 	cout << "    -v, --verify               Perform data verify" << endl;
 	cout << "    -w, --write                Perform data write" << endl;
 	cout << "    --progress                 display Progress output" << endl;
@@ -246,11 +246,10 @@ int main(int argc, char* argv[])
 ///				}
 			} else if(p == "-r" || p == "--read") {
 				opts.read = true;
-///			} else if(p == "-e" || p == "--erase") {
-///				opts.erase = true;
-///			} else if(p == "-i") opts.id = true;
-///			} else if(p.find("--id=") == 0) {
-///				opt.id_val = &p[5];
+			} else if(p == "-i") {
+				opts.id = true;
+			} else if(p.find("--id=") == 0) {
+				opts.id_val = &p[std::strlen("--id=")];
 			} else if(p == "-w" || p == "--write") {
 				opts.write = true;
 			} else if(p == "-v" || p == "--verify") {
@@ -259,6 +258,8 @@ int main(int argc, char* argv[])
 				opts.progress = true;
 			} else if(p == "--device-list") {
 				opts.device_list = true;
+///			} else if(p == "-e" || p == "--erase") {
+///				opts.erase = true;
 ///			} else if(p == "--erase-rom") opts.erase_rom = true;
 ///			} else if(p == "--erase-data") opts.erase_data = true;
 ///			} else if(p == "--erase-all" || p == "--erase-chip") {
@@ -351,8 +352,11 @@ int main(int argc, char* argv[])
 	}
 
 	//=====================================
-	if(opts.erase) {  // erase
+	if(opts.read) {  // read
+	}
 
+	//=====================================
+	if(opts.erase) {  // erase
 	}
 
 	//=====================================

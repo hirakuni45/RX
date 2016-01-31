@@ -37,8 +37,6 @@ static utils::chager chager_;
 static uint16_t timer_count_;
 static volatile uint16_t timer_sync_;
 
-static uint32_t count_ = 1230;
-
 class cmt_task {
 public:
 	void operator() () {
@@ -234,11 +232,10 @@ int main(int argc, char** argv)
 
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 0;
-		gformat("RX63T Hello %u") % static_cast<unsigned int>(count_);
+		gformat("RX63T Hello");
 		++cnt;
 		if(cnt >= 60) {
 			cnt = 0;
-			++count_;
 		}
 
 //		gformat("Input: %2.2:8y V") % ((inp * 25) >> 4);

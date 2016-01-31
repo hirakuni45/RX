@@ -157,7 +157,7 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	$(WRITER) --verbose --port=/dev/ttyS8 --write --verify $(TARGET).mot
+	$(WRITER) --verbose --progress --write --verify $(TARGET).mot
 
 verify:
 	$(WRITER) -v $(TARGET).mot
