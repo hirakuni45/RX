@@ -124,7 +124,8 @@ $(BUILD)/%.d : %.cpp
 	[ -s $@ ] || rm -f $@
 
 run:
-	./$(TARGET) --port=/dev/ttyS8 --write --verify chager.mot
+	./$(TARGET) --verbose --progress --write --verify chager.mot
+#	./$(TARGET) --port=/dev/ttyS8 --write --verify chager.mot
 
 clean:
 	rm -rf $(BUILD) $(TARGET)

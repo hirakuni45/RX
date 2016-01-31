@@ -11,8 +11,10 @@
 #include "string_utils.hpp"
 #include "area.hpp"
 
-static const std::string version_ = "0.50b";
+static const std::string version_ = "0.75b";
 static const std::string conf_file_ = "rx_prog.conf";
+static const uint32_t progress_num_ = 50;
+static const char progress_cha_ = '#';
 
 static utils::conf_in conf_in_;
 static utils::motsx_io motsx_;
@@ -67,34 +69,19 @@ static const std::string get_current_path_(const std::string& exec)
 }
 
 
-static void help_(const std::string& cmd)
+struct page_t {
+	uint32_t	n = 0;
+	uint32_t	c = 0;
+};
+
+
+static void progress_(uint32_t pageall, page_t& page)
 {
-	using namespace std;
-
-	std::string c = utils::get_file_base(cmd);
-
-	cout << "Renesas RX Series Programmer Version " << version_ << endl;
-	cout << "Copyright (C) 2016, Hiramatsu Kunihito (hira@rvf-rc45.net)" << endl;
-	cout << "usage:" << endl;
-	cout << c << " [options] [mot file] ..." << endl;
-	cout << endl;
-	cout << "Options :" << endl;
-	cout << "    -P PORT,   --port=PORT     Specify serial port" << endl;
-	cout << "    -s SPEED,  --speed=SPEED   Specify serial speed" << endl;
-	cout << "    -d DEVICE, --device=DEVICE Specify device name" << endl;
-///	cout << "-e, --erase\t\t\tPerform a device erase to a minimum" << endl;
-///	cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
-///	cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
-///	cout << "    --erase-data\t\tPerform data flash erase" << endl;
-//	cout << "-i, --id=xx:xx:xx:xx:xx:xx:xx\tSpecify protect ID" << endl;
-///	cout << "-a, --area=ORG,END\t\tSpecify read area" << endl;
-///	cout << "-r, --read\t\t\tPerform data read" << endl;
-	cout << "    -v, --verify               Perform data verify" << endl;
-	cout << "    -w, --write                Perform data write" << endl;
-	cout << "    --progress                 display Progress output" << endl;
-	cout << "    --device-list              Display device list" << endl;
-	cout << "    --verbose                  Verbose output" << endl;
-	cout << "    -h, --help                 Display this" << endl;
+	uint32_t pos = progress_num_ * page.n / pageall;
+	for(uint32_t i = 0; i < (pos - page.c); ++i) {
+		std::cout << progress_cha_ << std::flush;
+	}
+	page.c = pos;
 }
 
 
@@ -181,6 +168,37 @@ struct options {
 };
 
 
+static void help_(const std::string& cmd)
+{
+	using namespace std;
+
+	std::string c = utils::get_file_base(cmd);
+
+	cout << "Renesas RX Series Programmer Version " << version_ << endl;
+	cout << "Copyright (C) 2016, Hiramatsu Kunihito (hira@rvf-rc45.net)" << endl;
+	cout << "usage:" << endl;
+	cout << c << " [options] [mot file] ..." << endl;
+	cout << endl;
+	cout << "Options :" << endl;
+	cout << "    -P PORT,   --port=PORT     Specify serial port" << endl;
+	cout << "    -s SPEED,  --speed=SPEED   Specify serial speed" << endl;
+	cout << "    -d DEVICE, --device=DEVICE Specify device name" << endl;
+///	cout << "-e, --erase\t\t\tPerform a device erase to a minimum" << endl;
+///	cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
+///	cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
+///	cout << "    --erase-data\t\tPerform data flash erase" << endl;
+//	cout << "-i, --id=xx:xx:xx:xx:xx:xx:xx\tSpecify protect ID" << endl;
+///	cout << "-a, --area=ORG,END\t\tSpecify read area" << endl;
+///	cout << "-r, --read\t\t\tPerform data read" << endl;
+	cout << "    -v, --verify               Perform data verify" << endl;
+	cout << "    -w, --write                Perform data write" << endl;
+	cout << "    --progress                 display Progress output" << endl;
+	cout << "    --device-list              Display device list" << endl;
+	cout << "    --verbose                  Verbose output" << endl;
+	cout << "    -h, --help                 Display this" << endl;
+}
+
+
 int main(int argc, char* argv[])
 {
 	if(argc == 1) {
@@ -239,7 +257,8 @@ int main(int argc, char* argv[])
 				opts.verify = true;
 			} else if(p == "--progress") {
 				opts.progress = true;
-///			} else if(p == "--device-list") opts.device_list = true;
+			} else if(p == "--device-list") {
+				opts.device_list = true;
 ///			} else if(p == "--erase-rom") opts.erase_rom = true;
 ///			} else if(p == "--erase-data") opts.erase_data = true;
 ///			} else if(p == "--erase-all" || p == "--erase-chip") {
@@ -274,16 +293,19 @@ int main(int argc, char* argv[])
 	}
 
 	// 入力ファイルの読み込み
-	if(opts.verbose) {
-		std::cout << "Input file path: '" << opts.inp_file << '\'' << std::endl;
-	}
-	if(!motsx_.load(opts.inp_file)) {
-		std::cerr << "Can't open input file: '" << opts.inp_file << "'" << std::endl;
-		return -1;
-	}
-
-	if(opts.verbose) {
-		motsx_.list_area_map();
+	uint32_t pageall = 0;
+	if(!opts.inp_file.empty()) {
+		if(opts.verbose) {
+			std::cout << "Input file path: '" << opts.inp_file << '\'' << std::endl;
+		}
+		if(!motsx_.load(opts.inp_file)) {
+			std::cerr << "Can't open input file: '" << opts.inp_file << "'" << std::endl;
+			return -1;
+		}
+		pageall = motsx_.get_total_page();
+		if(opts.verbose) {
+			motsx_.list_area_map();
+		}
 	}
 
     // Windwos系シリアル・ポート（COMx）の変換
@@ -299,6 +321,9 @@ int main(int argc, char* argv[])
                 }
             }
         }
+		if(opts.verbose) {
+			std::cout << "Serial port alias: " << opts.com_name << " ---> " << opts.com_path << std::endl;
+		}
     }
 	if(opts.com_path.empty()) {
 		std::cerr << "Serial port path not found." << std::endl;
@@ -306,6 +331,11 @@ int main(int argc, char* argv[])
 	}
 	if(opts.verbose) {
 		std::cout << "Serial port path: '" << opts.com_path << '\'' << std::endl;
+	}
+	int com_speed = 0;
+	if(!utils::string_to_int(opts.com_speed, com_speed)) {
+		std::cerr << "Serial speed conversion: '" << opts.com_speed << '\'' << std::endl;
+		return -1;		
 	}
 
 	rx::prog prog_(opts.verbose);
@@ -315,11 +345,17 @@ int main(int argc, char* argv[])
 	rx.sys_div_ = 8;
 	rx.ext_div_ = 4;
 
-	if(!prog_.start(opts.com_path, 115200, rx)) {
+	if(!prog_.start(opts.com_path, com_speed, rx)) {
 		prog_.end();
 		return -1;
 	}
 
+	//=====================================
+	if(opts.erase) {  // erase
+
+	}
+
+	//=====================================
 	if(opts.write) {  // write
 		auto areas = motsx_.create_area_map();
 		if(!areas.empty()) {
@@ -329,12 +365,16 @@ int main(int argc, char* argv[])
 			}
 		}
 		
+		if(opts.progress) {
+			std::cout << "Write:  " << std::flush;
+		}
+		page_t page;
 		for(const auto& a : areas) {
 			uint32_t adr = a.min_ & 0xffffff00;
 			uint32_t len = 0;
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
-					std::cout << '#';
+					progress_(pageall, page);
 				}
 				/// std::cout << boost::format("%08X to %08X") % adr % (adr + 255) << std::endl;
 				auto mem = motsx_.get_memory(adr);
@@ -344,10 +384,11 @@ int main(int argc, char* argv[])
 				}
 				adr += 256;
 				len += 256;
+				++page.n;
 			}
 		}
 		if(opts.progress) {
-			std::cout << std::endl;
+			std::cout << std::endl << std::flush;
 		}
 		if(!prog_.final_write()) {
 			prog_.end();
@@ -355,14 +396,33 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	//=====================================
 	if(opts.verify) {  // verify
 		auto areas = motsx_.create_area_map();
+		if(opts.progress) {
+			std::cout << "Verify: " << std::flush;
+		}
+		page_t page;
 		for(const auto& a : areas) {
-			uint32_t len = a.max_ - a.min_ + 1;
-			auto mem = motsx_.get_memory(a.min_);
-			if(!prog_.verify(a.min_, &mem[a.min_ & 0xff], len)) {
-				return -1;
+			uint32_t adr = a.min_ & 0xffffff00;
+			uint32_t len = 0;
+			while(len < (a.max_ - a.min_ + 1)) {
+				if(opts.progress) {
+					progress_(pageall, page);
+				}
+				/// std::cout << boost::format("%08X to %08X") % adr % (adr + 255) << std::endl;
+				auto mem = motsx_.get_memory(adr);
+				if(!prog_.verify(adr, &mem[0], 256)) {
+					prog_.end();
+					return -1;
+				}
+				adr += 256;
+				len += 256;
+				++page.n;
 			}
+		}
+		if(opts.progress) {
+			std::cout << std::endl << std::flush;
 		}
 	}
 

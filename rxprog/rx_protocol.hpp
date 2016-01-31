@@ -957,28 +957,36 @@ namespace rx {
 				return false;
 			}
 
-			uint8_t head[5];
-			if(!read_(head, 5)) {
-				return false;
+			{
+				timeval tv;
+				tv.tv_sec  = 10;
+				tv.tv_usec = 0;
+				uint8_t head[5];
+				if(!read_(head, 5, tv)) {
+					return false;
+				}
+				if(head[0] != 0x52) {
+					return false;
+				}
+				auto rs = get32_big_(&head[1]);
+				/// std::cout << "Read size: " << rs << std::endl;
+				tv.tv_sec  = 20;
+				tv.tv_usec = 0;
+				if(!read_(dst, rs, tv)) {
+//					std::cout << "Read error #0" << std::endl;
+					return false;
+				}
 			}
-			if(head[0] != 0x52) {
-				return false;
+			{
+				timeval tv;
+				tv.tv_sec  = 10;
+				tv.tv_usec = 0;
+				uint8_t sum[1];
+				if(!read_(sum, 1, tv)) {
+//					std::cout << "Read error #1" << std::endl;
+					return false;
+				}
 			}
-			auto rs = get32_big_(&head[1]);
-			/// std::cout << "Read size: " << rs << std::endl;
-			timeval tv;
-			tv.tv_sec  = 10;
-			tv.tv_usec = 0;
-			if(!read_(dst, rs, tv)) {
-//				std::cout << "Read error #0" << std::endl;
-				return false;
-			}			
-			uint8_t sum[1];
-			if(!read_(sum, 1)) {
-//				std::cout << "Read error #1" << std::endl;
-				return false;
-			}
-
 			return true;
 		}
 
