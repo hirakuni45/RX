@@ -221,6 +221,9 @@ int main(int argc, char* argv[])
 		opts.com_path = defa.port_;
 		opts.com_speed = defa.speed_;
 		opts.id_val = defa.id_;
+	} else {
+		std::cerr << "Configuration file can't load: '" << conf_path << '\'' << std::endl;
+		return -1;
 	}
 
    	// コマンドラインの解析
@@ -335,17 +338,37 @@ int main(int argc, char* argv[])
 	}
 	int com_speed = 0;
 	if(!utils::string_to_int(opts.com_speed, com_speed)) {
-		std::cerr << "Serial speed conversion: '" << opts.com_speed << '\'' << std::endl;
+		std::cerr << "Serial speed conversion error: '" << opts.com_speed << '\'' << std::endl;
 		return -1;		
 	}
 
-	rx::prog prog_(opts.verbose);
-
 	rx::protocol::rx_t rx;
-	rx.master_ = 1200;
-	rx.sys_div_ = 8;
-	rx.ext_div_ = 4;
+	{
+		// rx.master_ = 1200;  // 12.00MHz
+		// rx.sys_div_ = 8;    // x8 (96MHz)
+		// rx.ext_div_ = 4;    // x4 (48MHz)
+		auto devt = conf_in_.get_device();
+		int32_t val = 0;;
+		if(!utils::string_to_int(devt.clock_, val)) {
+			std::cerr << "DEVICE 'clock' tag conversion error: '" << devt.clock_ << '\'' << std::endl;
+			return -1;
+		}
+		rx.master_ = val;
 
+		if(!utils::string_to_int(devt.divide_sys_, val)) {
+			std::cerr << "DEVICE 'divide_sys' tag conversion error: '" << devt.divide_sys_ << '\'' << std::endl;
+			return -1;
+		}
+		rx.sys_div_ = val;
+
+		if(!utils::string_to_int(devt.divide_ext_, val)) {
+			std::cerr << "DEVICE 'divide_ext' tag conversion error: '" << devt.divide_ext_ << '\'' << std::endl;
+			return -1;
+		}
+		rx.ext_div_ = val;
+	}
+
+	rx::prog prog_(opts.verbose);
 	if(!prog_.start(opts.com_path, com_speed, rx)) {
 		prog_.end();
 		return -1;
