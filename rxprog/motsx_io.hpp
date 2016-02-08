@@ -238,6 +238,8 @@ namespace utils {
 				sum += data;
 			}
 
+			fio.put((boost::format("%02X") % static_cast<uint32_t>(sum)).str());
+
 			fio.put_char('\n');
 			return false;
 		}

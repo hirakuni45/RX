@@ -18,6 +18,10 @@ namespace utils {
 			if(org_ <= adr && adr <= end_) return true;
 			else return false;
 		}
+
+		uint32_t length() const {
+			return end_ - org_ + 1;
+		}
 	};
 
 	typedef std::vector<area_t>	areas;
