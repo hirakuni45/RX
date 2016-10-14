@@ -360,21 +360,22 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	エリア・マップの表示
+			@param[in]	head	追加の文字列
 		*/
 		//-----------------------------------------------------------------//
-		void list_area_map() const {
-			std::cout << boost::format("Motolola Sx format load map: (exec: 0x%08X)") % exec_;
+		void list_area_map(const std::string& head) const {
+			std::cout << head << boost::format("Motolola Sx format load map: (exec: 0x%08X)") % exec_;
 			std::cout << std::endl;
 
 			auto as = create_area_map();
 			uint32_t total = 0;
 			for(const auto& a : as) {
 				auto n = a.max_ - a.min_ + 1;
-				std::cout << boost::format("  0x%08X to 0x%08X (%d bytes)") % a.min_ % a.max_ % n;
+				std::cout << head << boost::format("  0x%08X to 0x%08X (%d bytes)") % a.min_ % a.max_ % n;
 				std::cout << std::endl;
 				total += n;
 			}
-			std::cout << boost::format("  Total (%d bytes)") % total << std::endl << std::flush;
+			std::cout << head << boost::format("  Total (%d bytes)") % total << std::endl << std::flush;
 		}
 
 

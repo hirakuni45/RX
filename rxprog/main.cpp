@@ -11,16 +11,18 @@
 #include "string_utils.hpp"
 #include "area.hpp"
 
-static const std::string version_ = "0.75b";
-static const std::string conf_file_ = "rx_prog.conf";
-static const uint32_t progress_num_ = 50;
-static const char progress_cha_ = '#';
+namespace {
 
-static utils::conf_in conf_in_;
-static utils::motsx_io motsx_;
+	const std::string version_ = "0.75b";
+	const std::string conf_file_ = "rx_prog.conf";
+	const uint32_t progress_num_ = 50;
+	const char progress_cha_ = '#';
 
-void memory_dump_()
-{
+	utils::conf_in conf_in_;
+	utils::motsx_io motsx_;
+
+	void memory_dump_()
+	{
 #if 0
 		int i = 0;
 		for(auto v : mem) {
@@ -32,172 +34,174 @@ void memory_dump_()
 			} 
 		}
 #endif
-}
+	}
 
-static const std::string get_current_path_(const std::string& exec)
-{
-	std::string exec_path;
-#ifdef WIN32
+	const std::string get_current_path_(const std::string& exec)
 	{
-		auto tmp = utils::sjis_to_utf8(exec);
-		exec_path = utils::convert_delimiter(tmp, '\\', '/');
-	}
-#else
-	exec_path = exec;
-#endif
-	std::string spch;
-	std::string env;
-	{
+		std::string exec_path;
 #ifdef WIN32
-		auto tmp = sjis_to_utf8(getenv("PATH"));
-		env = utils::convert_delimiter(tmp, '\\', '/');
-		spch = ';';
+		{
+			auto tmp = utils::sjis_to_utf8(exec);
+			exec_path = utils::convert_delimiter(tmp, '\\', '/');
+		}
 #else
-		env = getenv("PATH");
-		spch = ':';
+		exec_path = exec;
 #endif
-	}
-	utils::strings ss = utils::split_text(env, spch);
-	for(const auto& s : ss) {
-		std::string path = s + '/' + utils::get_file_name(exec_path);
-		if(utils::probe_file(path)) {
-			return s;
+		std::string spch;
+		std::string env;
+		{
+#ifdef WIN32
+			auto tmp = sjis_to_utf8(getenv("PATH"));
+			env = utils::convert_delimiter(tmp, '\\', '/');
+			spch = ';';
+#else
+			env = getenv("PATH");
+			spch = ':';
+#endif
 		}
-	}
-
-	return std::string("");
-}
-
-
-struct page_t {
-	uint32_t	n = 0;
-	uint32_t	c = 0;
-};
-
-
-static void progress_(uint32_t pageall, page_t& page)
-{
-	uint32_t pos = progress_num_ * page.n / pageall;
-	for(uint32_t i = 0; i < (pos - page.c); ++i) {
-		std::cout << progress_cha_ << std::flush;
-	}
-	page.c = pos;
-}
-
-
-struct options {
-	bool verbose = false;
-
-	std::string	inp_file;
-
-	std::string	device;
-	bool	dv = false;
-
-	std::string	com_speed;
-	bool	br = false;
-
-	std::string com_path;
-	std::string com_name;
-	bool	dp = false;
-
-	std::string id_val;
-	bool	id = false;
-
-	utils::areas area_val;
-	bool	area = false;
-
-	bool	read = false;
-	bool	erase = false;
-	bool	write = false;
-	bool	verify = false;
-	bool	device_list = false;
-	bool	progress = false;
-	bool	erase_data = false;
-	bool	erase_rom = false;
-	bool	help = false;
-
-
-	bool set_area_(const std::string& s) {
-		utils::strings ss = utils::split_text(s, ",");
-		std::string t;
-		if(ss.empty()) t = s;
-		else if(ss.size() >= 1) t = ss[0];
-		uint32_t org = 0;
-		bool err = false;
-		if(!utils::string_to_hex(t, org)) {
-			err = true;
+		utils::strings ss = utils::split_text(env, spch);
+		for(const auto& s : ss) {
+			std::string path = s + '/' + utils::get_file_name(exec_path);
+			if(utils::probe_file(path)) {
+				return s;
+			}
 		}
-		uint32_t end = org + 256;
-		if(ss.size() >= 2) {
-			if(!utils::string_to_hex(ss[1], end)) {
+
+		return std::string("");
+	}
+
+
+	struct page_t {
+		uint32_t	n = 0;
+		uint32_t	c = 0;
+	};
+
+
+	void progress_(uint32_t pageall, page_t& page)
+	{
+		uint32_t pos = progress_num_ * page.n / pageall;
+		for(uint32_t i = 0; i < (pos - page.c); ++i) {
+			std::cout << progress_cha_ << std::flush;
+		}
+		page.c = pos;
+	}
+
+
+	struct options {
+		bool verbose = false;
+
+		std::string platform;
+
+		std::string	inp_file;
+
+		std::string	device;
+		bool	dv = false;
+
+		std::string	com_speed;
+		bool	br = false;
+
+		std::string com_path;
+		std::string com_name;
+		bool	dp = false;
+
+		std::string id_val;
+		bool	id = false;
+
+		utils::areas area_val;
+		bool	area = false;
+
+		bool	read = false;
+		bool	erase = false;
+		bool	write = false;
+		bool	verify = false;
+		bool	device_list = false;
+		bool	progress = false;
+		bool	erase_data = false;
+		bool	erase_rom = false;
+		bool	help = false;
+
+
+		bool set_area_(const std::string& s) {
+			utils::strings ss = utils::split_text(s, ",");
+			std::string t;
+			if(ss.empty()) t = s;
+			else if(ss.size() >= 1) t = ss[0];
+			uint32_t org = 0;
+			bool err = false;
+			if(!utils::string_to_hex(t, org)) {
 				err = true;
 			}
-		}
-		if(err) {
-			return false;
-		}
-		area_val.emplace_back(org, end);
-		return true;
-	}
-
-
-	bool set_str(const std::string& t) {
-		bool ok = true;
-		if(br) {
-			com_speed = t;
-			br = false;
-		} else if(dv) {
-			device = t;
-			dv = false;
-		} else if(dp) {
-			com_path = t;
-			dp = false;
-		} else if(id) {
-			id_val = t;
-			id = false;
-		} else if(area) {
-			if(!set_area_(t)) {
-				ok = false;
+			uint32_t end = org + 256;
+			if(ss.size() >= 2) {
+				if(!utils::string_to_hex(ss[1], end)) {
+					err = true;
+				}
 			}
-			area = false;
-		} else {
-			inp_file = t;
+			if(err) {
+				return false;
+			}
+			area_val.emplace_back(org, end);
+			return true;
 		}
-		return ok;
+
+
+		bool set_str(const std::string& t) {
+			bool ok = true;
+			if(br) {
+				com_speed = t;
+				br = false;
+			} else if(dv) {
+				device = t;
+				dv = false;
+			} else if(dp) {
+				com_path = t;
+				dp = false;
+			} else if(id) {
+				id_val = t;
+				id = false;
+			} else if(area) {
+				if(!set_area_(t)) {
+					ok = false;
+				}
+				area = false;
+			} else {
+				inp_file = t;
+			}
+			return ok;
+		}
+	};
+
+
+	void help_(const std::string& cmd)
+	{
+		using namespace std;
+
+		std::string c = utils::get_file_base(cmd);
+
+		cout << "Renesas RX Series Programmer Version " << version_ << endl;
+		cout << "Copyright (C) 2016, Hiramatsu Kunihito (hira@rvf-rc45.net)" << endl;
+		cout << "usage:" << endl;
+		cout << c << " [options] [mot file] ..." << endl;
+		cout << endl;
+		cout << "Options :" << endl;
+		cout << "    -P PORT,   --port=PORT     Specify serial port" << endl;
+		cout << "    -s SPEED,  --speed=SPEED   Specify serial speed" << endl;
+		cout << "    -d DEVICE, --device=DEVICE Specify device name" << endl;
+		cout << "    -e, --erase                Perform a device erase to a minimum" << endl;
+///		cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
+///		cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
+///		cout << "    --erase-data\t\tPerform data flash erase" << endl;
+		cout << "    --id=ID[:,]ID[;,] ...      Specify protect ID (16bytes)" << endl;
+///		cout << "    -r, --read                 Perform data read" << endl;
+///		cout << "    --area=ORG[:,]END          Specify read area" << endl;
+		cout << "    -v, --verify               Perform data verify" << endl;
+		cout << "    -w, --write                Perform data write" << endl;
+		cout << "    --progress                 display Progress output" << endl;
+		cout << "    --device-list              Display device list" << endl;
+		cout << "    --verbose                  Verbose output" << endl;
+		cout << "    -h, --help                 Display this" << endl;
 	}
-};
-
-
-static void help_(const std::string& cmd)
-{
-	using namespace std;
-
-	std::string c = utils::get_file_base(cmd);
-
-	cout << "Renesas RX Series Programmer Version " << version_ << endl;
-	cout << "Copyright (C) 2016, Hiramatsu Kunihito (hira@rvf-rc45.net)" << endl;
-	cout << "usage:" << endl;
-	cout << c << " [options] [mot file] ..." << endl;
-	cout << endl;
-	cout << "Options :" << endl;
-	cout << "    -P PORT,   --port=PORT     Specify serial port" << endl;
-	cout << "    -s SPEED,  --speed=SPEED   Specify serial speed" << endl;
-	cout << "    -d DEVICE, --device=DEVICE Specify device name" << endl;
-	cout << "    -e, --erase                Perform a device erase to a minimum" << endl;
-///	cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
-///	cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
-///	cout << "    --erase-data\t\tPerform data flash erase" << endl;
-	cout << "    --id=ID[:,]ID[;,] ...      Specify protect ID (16bytes)" << endl;
-///	cout << "    -r, --read                 Perform data read" << endl;
-///	cout << "    --area=ORG[:,]END          Specify read area" << endl;
-	cout << "    -v, --verify               Perform data verify" << endl;
-	cout << "    -w, --write                Perform data write" << endl;
-	cout << "    --progress                 display Progress output" << endl;
-	cout << "    --device-list              Display device list" << endl;
-	cout << "    --verbose                  Verbose output" << endl;
-	cout << "    -h, --help                 Display this" << endl;
 }
-
 
 int main(int argc, char* argv[])
 {
@@ -218,7 +222,21 @@ int main(int argc, char* argv[])
 	if(conf_in_.load(conf_path)) {
 		auto defa = conf_in_.get_default();
 		opts.device = defa.device_;
-		opts.com_path = defa.port_;
+#ifdef __CYGWIN__
+		opts.com_path = defa.port_win_;
+		opts.platform = "Cygwin";
+#endif
+#ifdef __APPLE__
+		opts.com_path = defa.port_osx_;
+		opts.platform = "OS-X";
+#endif
+#ifdef __linux__
+		opts.com_path = defa.port_linux_;
+		opts.platform = "Linux";
+#endif
+		if(opts.com_path.empty()) {
+			opts.com_path = defa.port_;
+		}
 		opts.com_speed = defa.speed_;
 		opts.id_val = defa.id_;
 	} else {
@@ -284,6 +302,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	if(opts.verbose) {
+		std::cout << "# Platform: '" << opts.platform << '\'' << std::endl;
 		std::cout << "# Configuration file path: '" << conf_path << '\'' << std::endl;
 		std::cout << "# Device: '" << opts.device << '\'' << std::endl;
 		std::cout << "# Serial port path: '" << opts.com_path << '\'' << std::endl;
@@ -308,7 +327,7 @@ int main(int argc, char* argv[])
 		}
 		pageall = motsx_.get_total_page();
 		if(opts.verbose) {
-			motsx_.list_area_map();
+			motsx_.list_area_map("# ");
 		}
 	}
 

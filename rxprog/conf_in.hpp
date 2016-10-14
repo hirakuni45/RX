@@ -58,6 +58,9 @@ namespace utils {
 			std::string	programmer_;
 			std::string	device_;
 			std::string port_;
+			std::string port_win_;
+			std::string port_osx_;
+			std::string port_linux_;
 			std::string speed_;
 			std::string id_;
 
@@ -68,6 +71,9 @@ namespace utils {
 					if(ss[0] == "programmer") programmer_ = ss[1];
 					else if(ss[0] == "device") device_ = ss[1];
 					else if(ss[0] == "port") port_ = ss[1];
+					else if(ss[0] == "port_win") port_win_ = ss[1];
+					else if(ss[0] == "port_osx") port_osx_ = ss[1];
+					else if(ss[0] == "port_linux") port_linux_ = ss[1];
 					else if(ss[0] == "speed") speed_ = ss[1];
 					else if(ss[0] == "id") id_ = ss[1];
 					else ok = false;

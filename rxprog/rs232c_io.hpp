@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <sys/ioctl.h>
+
 #include <string>
 #include <iostream>
 #include <cstring>
@@ -33,9 +34,9 @@ namespace utils {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class parity {
-			none,
-			even,
-			odd
+			none,	///< パリティー無し
+			even,	///< 偶数パリティ
+			odd		///< 奇数パリティ
 		};
 
 
@@ -45,10 +46,20 @@ namespace utils {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class char_len {
-			bits7,
-			bits8
+			bits7,	///< ７ビット
+			bits8	///< ８ビット
 		};
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ストップ・ビット長
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class stop_len {
+			one,	///< １ビット
+			two		///< ２ビット
+		};
 
 	private:
 		int    fd_;
@@ -77,25 +88,19 @@ namespace utils {
 			@param[in]	path	シリアルポートパス
 			@param[in]	brate	接続ボーレート
 			@param[in]	clen	キャラクター長
+			@param[in]	slen	ストップ・ビット長
 			@param[in]	par		パリティ・ビット
+			@param[in]	hc		ハードウェアー制御を有効にする場合「true」
 			@return 正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool open(const std::string& path, speed_t brate, char_len clen = char_len::bits8, parity par = parity::none) {
-			fd_ = ::open(path.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-			if(fd_ < 0) {
-				return false;
-			}
-
-			if(tcgetattr(fd_, &attr_back_) == -1) {
-				::close(fd_);
-				fd_ = -1;
-			}
+		bool open(const std::string& path, speed_t brate,
+			char_len clen = char_len::bits8, stop_len slen = stop_len::one,
+			parity par = parity::none, bool hc = false) {
 
 			int cpar = 0;
-			int ipar = IGNPAR;
+			int ipar = IGNBRK;
 			switch(par) {
-			default:
 			case parity::none:
 				cpar = 0;
 				ipar = IGNPAR;
@@ -108,36 +113,53 @@ namespace utils {
 				cpar = (PARENB | PARODD);
 				ipar = INPCK;
 				break;
+			default:
+				return false;
 			}
 
 			int bstop = 0;
-#if 0
-			switch(mode[2]) {
-			case '1': bstop = 0;
+			switch(slen) {
+			case stop_len::one: bstop = 0;
 				break;
-			case '2': bstop = CSTOPB;
+			case stop_len::two: bstop = CSTOPB;
 				break;
-			}
-#endif
-
-			int cbits;
-			switch(clen) {
 			default:
+				return false;
+			}
+
+			int cbits = 0;
+			switch(clen) {
 			case char_len::bits8:
 				cbits = CS8;
 				break;
 			case char_len::bits7:
 				cbits = CS7;
 				break;
+			default:
+				return false;
+			}
+
+			fd_ = ::open(path.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+			if(fd_ < 0) {
+				return false;
+			}
+
+			if(tcgetattr(fd_, &attr_back_) == -1) {
+				::close(fd_);
+				fd_ = -1;
 			}
 
 			memset(&attr_, 0, sizeof(attr_));
-			attr_.c_cflag = cbits | cpar | bstop | CLOCAL | CREAD;
+			if(hc) {
+				attr_.c_cflag = cbits | cpar | bstop | CRTSCTS | CREAD;
+			} else {
+				attr_.c_cflag = cbits | cpar | bstop | CLOCAL | CREAD;
+			}
 			attr_.c_iflag = ipar;
 			attr_.c_oflag = 0;
 			attr_.c_lflag = 0;
-			attr_.c_cc[VMIN]  = 1;     // block untill n bytes are received
-			attr_.c_cc[VTIME] = 0;     // block untill a timer expires (n * 100 mSec.)
+			attr_.c_cc[VMIN]  = 0;     // block untill n bytes are received
+			attr_.c_cc[VTIME] = 1;     // block untill a timer expires (n * 100 mSec.)
 
 			if(cfsetspeed(&attr_, brate) == -1) {
 				close_();
@@ -159,6 +181,13 @@ namespace utils {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	速度を変更
+			@param[in]	brate 新しいボーレート
+			@return 正常なら「true」
+		*/
+		//-----------------------------------------------------------------//
 		bool change_speed(speed_t brate) {
 			if(fd_ < 0) return false;
 
@@ -257,7 +286,7 @@ namespace utils {
 				if(ret == -1) {  // for error..
 					break;
 				} else if(ret > 0) {
-					size_t rl = ::read(fd_, p, len);
+					size_t rl = ::read(fd_, p, len - total);
 					total += rl;
 					p += rl;
 				} else {
@@ -272,7 +301,7 @@ namespace utils {
 		/*!
 			@brief	１バイト受信（タイムアウト）
 			@param[in]	tv	タイムアウト指定
-			@return 受信した長さ
+			@return 受信データ
 		*/
 		//-----------------------------------------------------------------//
 		int recv(const timeval& tv) {
@@ -299,6 +328,13 @@ namespace utils {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信
+			@param[in]	ch	送信データ
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
 		bool send(char ch) {
 			if(fd_ < 0) return false;
 
@@ -308,6 +344,24 @@ namespace utils {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	破棄
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool flush()
+		{
+			return tcflush(fd_, TCIOFLUSH) == 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	DCD 信号の状態を取得
+			@return DCD 信号
+		*/
+		//-----------------------------------------------------------------//
 		bool get_DCD() const {
 			if(fd_ < 0) return false;
 
@@ -320,6 +374,12 @@ namespace utils {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	CTS 信号の状態を取得
+			@return CTS 信号
+		*/
+		//-----------------------------------------------------------------//
 		bool get_CTS() const {
 			if(fd_ < 0) return false;
 
@@ -332,6 +392,12 @@ namespace utils {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	DSR 信号の状態を取得
+			@return DSR 信号
+		*/
+		//-----------------------------------------------------------------//
 		bool get_DSR() const {
 			if(fd_ < 0) return false;
 
@@ -345,6 +411,34 @@ namespace utils {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	TXD 端子のレベルを設定
+			@param[in]	level	設定レベル
+			@return 正常なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool set_TXD(bool level)
+		{
+			if(fd_ < 0) return false;
+
+			int command;
+			if(level) {
+				command = TIOCCBRK;
+			} else {
+				command = TIOCSBRK;
+			}
+			return ioctl(fd_, command) != -1; 
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	DTR 信号の状態を設定
+			@param[in]	ena 「flase」なら「０」
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
 		bool enable_DTR(bool ena = true) {
 			if(fd_ < 0) return false;
 
@@ -364,6 +458,13 @@ namespace utils {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	RTS 信号の状態を設定
+			@param[in]	ena 「flase」なら「０」
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
 		bool enable_RTS(bool ena = true) {
 			if(fd_ < 0) return false;
 
@@ -378,10 +479,8 @@ namespace utils {
 			if(ioctl(fd_, TIOCMSET, &status) == -1) {
 				return false;
 			}
-
 			return true;
 		}
-
 	};
 }
 
