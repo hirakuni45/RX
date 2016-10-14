@@ -65,8 +65,7 @@ RX sources
 ```
 
 ---
-
-## RX 開発環境準備（OS-X、Linux）
+## RL78 開発環境準備（OS-X）
 
  - OS-X では、事前に macports をインストールしておきます。（brew は柔軟性が低いのでお勧めしません）
  -  OS−X のバージョンによっては、事前にX−Code、Command Line Tools などのインストールが必要になるかもしれません）
@@ -110,6 +109,22 @@ RX sources
 ```
 
 ---
+## RL78 開発環境準備（Ubuntu）
+
+Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境の場合を書いておきます。
+
+ - texinfo、gmp、mpfr、mpc、diffutils、automake コマンドなどをインストール
+```
+   sudo apt-get install texinfo
+   sudo apt-get install libgmp-dev
+   sudo apt-get install libmpfr-dev
+   sudo apt-get install libmpc-dev
+   sudo apt-get install diffutils
+   sudo apt-get install automake
+   sudo apt-get install zlib1g-dev
+```
+
+---
 ## RX 開発環境構築
 
  - RX 用コンパイラ（rx-elf-gcc,g++）は gcc-4.9.4 を使います。
@@ -126,7 +141,7 @@ RX sources
    cd binutils-2.25.1
    mkdir rx_build
    cd rx_build
-   ../configure --target=rx-elf --prefix=/usr/local/rx-elf --disable-nls
+   ../configure --target=rx-elf --prefix=/usr/local/rx-elf --disable-nls --with-system-zlib
    make
    make install     OS-X,Linux: (sudo make install)
 ```
@@ -152,7 +167,7 @@ RX sources
     cd gcc-4.9.4
     mkdir rx_build
 	cd rx_build
-    ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --enable-multilib --enable-lto
+    ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --enable-multilib --enable-lto --with-system-zlib
     make
     make install     OS-X,Linux: (sudo make install)
 ```
@@ -174,7 +189,7 @@ RX sources
     cd
     cd gcc-4.9.4
     cd rx_build
-    ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c,c++ --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --enable-multilib --enable-lto
+    ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c,c++ --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --enable-multilib --enable-lto --with-system-zlib
     make
     make install     OS-X,Linux: (sudo make install)
 ```
@@ -193,8 +208,8 @@ RX sources
 
 幾つかの方法がありますが、最も簡単で、コストがかからない方法は、シリアルインターフェースを使って
 書き込む方法です。   
-USB インターフェース内臓の RX マイコンの場合は、USB で直接接続する事もできますが、ドライバーは、
-Windows 版しか無いようです。
+USB インターフェース内臓の RX マイコンの場合は、USB でブートして接続する事もできますが、ドライバー
+は、Windows 版しか無いようです。（この辺りの事情は詳しく調査していない為間違っているかもしれません）
 
 また、全ての RX マイコンが USB インターフェースを内臓しているわけでは無い為、もっとも一般的な、
 シリアルインターフェースを使って書き込む方法を紹介します。
@@ -205,7 +220,7 @@ Windows 版しか無いようです。
 (2) TXD シリアル送信   
 (3) VCC 電源（５Ｖ又は３．３Ｖ）   
 (4) GND 電源 ０Ｖ   
-※３．３Ｖは限られた電流しか取り出せない為、レギュレーターを入れる事を推奨します。   
+※３．３Ｖは限られた電流しか取り出せない為、必ずレギュレーターが必要です。   
 ※中国製の格安なモジュールは、品質が安定していない為、お勧めしません、それらの事
 項を理解していて対処出来る人だけ利用すると良いと思います。
    
@@ -213,8 +228,7 @@ Windows 版しか無いようです。
    
 ## RX フラッシュプログラマーの構築
 
- - 以下は、まだ未完、実装中です・・・・・
- - ※ Renesas Flash Programmer の最新版を使って下さい。
+ - 現在、RX63T のフラッシュ書き込みを確認しています。
  - rxprog のビルドには「boost_1_60_0」が必要です。
  - boost はヘッダーのみ利用なので、ビルドの必要はありません、boost_1_60_0.zip を展開するだけです。
  - 又は、mingw64 環境などに pacman を使い boost をインストールして、そのパスを設定しても良いでしょう。
