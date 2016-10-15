@@ -37,7 +37,7 @@ INC_SYS		=
 
 INC_APP		=	. ../
 
-OPTIMIZE	=	-O2
+OPTIMIZE	=	-Os -flto
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
@@ -65,6 +65,7 @@ AR			=	rx-elf-ar
 LD			=	rx-elf-ld
 OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
+SIZE		=	rx-elf-size
 
 # AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
 # AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
@@ -96,6 +97,7 @@ all: $(BUILD) $(TARGET).elf text
 
 $(TARGET).elf: $(OBJECTS) $(LDSCRIPT) Makefile
 	$(CC) $(LDFLAGS) $(LIBINCS) -o $@ $(OBJECTS) $(LIBS)
+	$(SIZE) $@
 
 $(BUILD)/%.o: %.s
 	mkdir -p $(dir $@); \
