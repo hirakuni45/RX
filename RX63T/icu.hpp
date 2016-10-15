@@ -242,60 +242,60 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
 		struct ir_t {
-			io8<base + 28> CMI0;
-			io8<base + 29> CMI1;
-			io8<base + 30> CMI2;
-			io8<base + 31> CMI3;
+			rw8_t<base + 28> CMI0;
+			rw8_t<base + 29> CMI1;
+			rw8_t<base + 30> CMI2;
+			rw8_t<base + 31> CMI3;
 
-			io8<base + 64> IRQ0;
-			io8<base + 65> IRQ1;
-			io8<base + 66> IRQ2;
-			io8<base + 67> IRQ3;
-			io8<base + 68> IRQ4;
-			io8<base + 69> IRQ5;
-			io8<base + 70> IRQ6;
-			io8<base + 71> IRQ7;
+			rw8_t<base + 64> IRQ0;
+			rw8_t<base + 65> IRQ1;
+			rw8_t<base + 66> IRQ2;
+			rw8_t<base + 67> IRQ3;
+			rw8_t<base + 68> IRQ4;
+			rw8_t<base + 69> IRQ5;
+			rw8_t<base + 70> IRQ6;
+			rw8_t<base + 71> IRQ7;
 
-			io8<base + 214> RXI0;
-			io8<base + 215> TXI0;
-			io8<base + 216> TEI0;
+			rw8_t<base + 214> RXI0;
+			rw8_t<base + 215> TXI0;
+			rw8_t<base + 216> TEI0;
 
-			io8<base + 217> RXI1;
-			io8<base + 218> TXI1;
-			io8<base + 219> TEI1;
+			rw8_t<base + 217> RXI1;
+			rw8_t<base + 218> TXI1;
+			rw8_t<base + 219> TEI1;
 
-			io8<base + 220> RXI2;
-			io8<base + 221> TXI2;
-			io8<base + 222> TEI2;
+			rw8_t<base + 220> RXI2;
+			rw8_t<base + 221> TXI2;
+			rw8_t<base + 222> TEI2;
 
-			io8<base + 223> RXI3;
-			io8<base + 224> TXI3;
-			io8<base + 225> TEI3;
+			rw8_t<base + 223> RXI3;
+			rw8_t<base + 224> TXI3;
+			rw8_t<base + 225> TEI3;
 
-			io8<base + 226> GTCIA0;
-			io8<base + 227> GTCIB0;
-			io8<base + 228> GTCIC0;
-			io8<base + 229> GTCIE0;
-			io8<base + 230> GTCIV0;
-			io8<base + 231> LOCOI0;
+			rw8_t<base + 226> GTCIA0;
+			rw8_t<base + 227> GTCIB0;
+			rw8_t<base + 228> GTCIC0;
+			rw8_t<base + 229> GTCIE0;
+			rw8_t<base + 230> GTCIV0;
+			rw8_t<base + 231> LOCOI0;
 
-			io8<base + 232> GTCIA1;
-			io8<base + 233> GTCIB1;
-			io8<base + 234> GTCIC1;
-			io8<base + 235> GTCIE1;
-			io8<base + 236> GTCIV1;
+			rw8_t<base + 232> GTCIA1;
+			rw8_t<base + 233> GTCIB1;
+			rw8_t<base + 234> GTCIC1;
+			rw8_t<base + 235> GTCIE1;
+			rw8_t<base + 236> GTCIV1;
 
-			io8<base + 238> GTCIA2;
-			io8<base + 239> GTCIB2;
-			io8<base + 240> GTCIC2;
-			io8<base + 241> GTCIE2;
-			io8<base + 242> GTCIV2;
+			rw8_t<base + 238> GTCIA2;
+			rw8_t<base + 239> GTCIB2;
+			rw8_t<base + 240> GTCIC2;
+			rw8_t<base + 241> GTCIE2;
+			rw8_t<base + 242> GTCIV2;
 
-			io8<base + 244> GTCIA3;
-			io8<base + 245> GTCIB3;
-			io8<base + 246> GTCIC3;
-			io8<base + 247> GTCIE3;
-			io8<base + 248> GTCIV3;
+			rw8_t<base + 244> GTCIA3;
+			rw8_t<base + 245> GTCIB3;
+			rw8_t<base + 246> GTCIC3;
+			rw8_t<base + 247> GTCIE3;
+			rw8_t<base + 248> GTCIV3;
 		};
 		static ir_t<0x00087010> IR;
 
@@ -307,70 +307,70 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
 		struct ier_t {
-			typedef io8<base + 0x02> ier02;
-			bit_t<ier02, 0>	BUSERR;
-			bit_t<ier02, 5>	FIFERR;
-			bit_t<ier02, 7>	FRDYI;
+			typedef rw8_t<base + 0x02> ier02;
+			bit_rw_t<ier02, bitpos::B0>	BUSERR;
+			bit_rw_t<ier02, bitpos::B5>	FIFERR;
+			bit_rw_t<ier02, bitpos::B7>	FRDYI;
 
-			typedef io8<base + 0x03> ier03;
-			bit_t<ier03, 3>	SWINT;
-			bit_t<ier03, 4>	CMI0;
-			bit_t<ier03, 5>	CMI1;
-			bit_t<ier03, 6>	CMI2;
-			bit_t<ier03, 7>	CMI3;
+			typedef rw8_t<base + 0x03> ier03;
+			bit_rw_t<ier03, bitpos::B3>	SWINT;
+			bit_rw_t<ier03, bitpos::B4>	CMI0;
+			bit_rw_t<ier03, bitpos::B5>	CMI1;
+			bit_rw_t<ier03, bitpos::B6>	CMI2;
+			bit_rw_t<ier03, bitpos::B7>	CMI3;
 
-			typedef io8<base + 0x08> ier08;
-			bit_t<ier08, 0>	IRQ0;
-			bit_t<ier08, 1>	IRQ1;
-			bit_t<ier08, 2>	IRQ2;
-			bit_t<ier08, 3>	IRQ3;
-			bit_t<ier08, 4>	IRQ4;
-			bit_t<ier08, 5>	IRQ5;
-			bit_t<ier08, 6>	IRQ6;
-			bit_t<ier08, 7>	IRQ7;
+			typedef rw8_t<base + 0x08> ier08;
+			bit_rw_t<ier08, bitpos::B0>	IRQ0;
+			bit_rw_t<ier08, bitpos::B1>	IRQ1;
+			bit_rw_t<ier08, bitpos::B2>	IRQ2;
+			bit_rw_t<ier08, bitpos::B3>	IRQ3;
+			bit_rw_t<ier08, bitpos::B4>	IRQ4;
+			bit_rw_t<ier08, bitpos::B5>	IRQ5;
+			bit_rw_t<ier08, bitpos::B6>	IRQ6;
+			bit_rw_t<ier08, bitpos::B7>	IRQ7;
 
-			typedef io8<base + 0x1a> ier1a;
-			bit_t<ier1a, 6>	RXI0;
-			bit_t<ier1a, 7>	TXI0;
-			typedef io8<base + 0x1b> ier1b;
-			bit_t<ier1b, 0>	TEI0;
-			bit_t<ier1b, 1>	RXI1;
-			bit_t<ier1b, 2>	TXI1;
-			bit_t<ier1b, 3>	TEI1;
-			bit_t<ier1b, 4>	RXI2;
-			bit_t<ier1b, 5>	TXI2;
-			bit_t<ier1b, 6>	TEI2;
-			bit_t<ier1b, 7>	RXI3;
-			typedef io8<base + 0x1c> ier1c;
-			bit_t<ier1c, 0>	TXI3;
-			bit_t<ier1c, 1>	TEI3;
-			bit_t<ier1c, 2>	GTCIA0;
-			bit_t<ier1c, 3>	GTCIB0;
-			bit_t<ier1c, 4>	GTCIC0;
-			bit_t<ier1c, 5>	GTCIE0;
-			bit_t<ier1c, 6>	GTCIV0;
-			bit_t<ier1c, 7>	LOCOI0;
+			typedef rw8_t<base + 0x1a> ier1a;
+			bit_rw_t<ier1a, bitpos::B6>	RXI0;
+			bit_rw_t<ier1a, bitpos::B7>	TXI0;
+			typedef rw8_t<base + 0x1b> ier1b;
+			bit_rw_t<ier1b, bitpos::B0>	TEI0;
+			bit_rw_t<ier1b, bitpos::B1>	RXI1;
+			bit_rw_t<ier1b, bitpos::B2>	TXI1;
+			bit_rw_t<ier1b, bitpos::B3>	TEI1;
+			bit_rw_t<ier1b, bitpos::B4>	RXI2;
+			bit_rw_t<ier1b, bitpos::B5>	TXI2;
+			bit_rw_t<ier1b, bitpos::B6>	TEI2;
+			bit_rw_t<ier1b, bitpos::B7>	RXI3;
+			typedef rw8_t<base + 0x1c> ier1c;
+			bit_rw_t<ier1c, bitpos::B0>	TXI3;
+			bit_rw_t<ier1c, bitpos::B1>	TEI3;
+			bit_rw_t<ier1c, bitpos::B2>	GTCIA0;
+			bit_rw_t<ier1c, bitpos::B3>	GTCIB0;
+			bit_rw_t<ier1c, bitpos::B4>	GTCIC0;
+			bit_rw_t<ier1c, bitpos::B5>	GTCIE0;
+			bit_rw_t<ier1c, bitpos::B6>	GTCIV0;
+			bit_rw_t<ier1c, bitpos::B7>	LOCOI0;
 
-			typedef io8<base + 0x1d> ier1d;
-			bit_t<ier1d, 0>	GTCIA1;
-			bit_t<ier1d, 1>	GTCIB1;
-			bit_t<ier1d, 2>	GTCIC1;
-			bit_t<ier1d, 3>	GTCIE1;
-			bit_t<ier1d, 4>	GTCIV1;
+			typedef rw8_t<base + 0x1d> ier1d;
+			bit_rw_t<ier1d, bitpos::B0>	GTCIA1;
+			bit_rw_t<ier1d, bitpos::B1>	GTCIB1;
+			bit_rw_t<ier1d, bitpos::B2>	GTCIC1;
+			bit_rw_t<ier1d, bitpos::B3>	GTCIE1;
+			bit_rw_t<ier1d, bitpos::B4>	GTCIV1;
 
-			bit_t<ier1d, 6>	GTCIA2;
-			bit_t<ier1d, 7>	GTCIB2;
-			typedef io8<base + 0x1e> ier1e;
-			bit_t<ier1e, 0>	GTCIC2;
-			bit_t<ier1e, 1>	GTCIE2;
-			bit_t<ier1e, 2>	GTCIV2;
+			bit_rw_t<ier1d, bitpos::B6>	GTCIA2;
+			bit_rw_t<ier1d, bitpos::B7>	GTCIB2;
+			typedef rw8_t<base + 0x1e> ier1e;
+			bit_rw_t<ier1e, bitpos::B0>	GTCIC2;
+			bit_rw_t<ier1e, bitpos::B1>	GTCIE2;
+			bit_rw_t<ier1e, bitpos::B2>	GTCIV2;
 
-			bit_t<ier1e, 4>	GTCIA3;
-			bit_t<ier1e, 5>	GTCIB3;
-			bit_t<ier1e, 6>	GTCIC3;
-			bit_t<ier1e, 7>	GTCIE3;
-			typedef io8<base + 0x1f> ier1f;
-			bit_t<ier1f, 0>	GTCIV3;
+			bit_rw_t<ier1e, bitpos::B4>	GTCIA3;
+			bit_rw_t<ier1e, bitpos::B5>	GTCIB3;
+			bit_rw_t<ier1e, bitpos::B6>	GTCIC3;
+			bit_rw_t<ier1e, bitpos::B7>	GTCIE3;
+			typedef rw8_t<base + 0x1f> ier1f;
+			bit_rw_t<ier1f, bitpos::B0>	GTCIV3;
 		};
 		static ier_t<0x00087200> IER;
 
@@ -383,56 +383,56 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
 		struct ipr_t {
-			io8<base + 0> BUSERR;
+			rw8_t<base + 0> BUSERR;
 
-			io8<base + 1> FIFERR;
-			io8<base + 2> FRDIY;
+			rw8_t<base + 1> FIFERR;
+			rw8_t<base + 2> FRDIY;
 
-			io8<base + 3> SWINT;
+			rw8_t<base + 3> SWINT;
 
-			io8<base + 4> CMI0;
-			io8<base + 5> CMI1;
-			io8<base + 6> CMI2;
-			io8<base + 7> CMI3;
+			rw8_t<base + 4> CMI0;
+			rw8_t<base + 5> CMI1;
+			rw8_t<base + 6> CMI2;
+			rw8_t<base + 7> CMI3;
 
-			io8<base + 64> IRQ0;
-			io8<base + 65> IRQ1;
-			io8<base + 66> IRQ2;
-			io8<base + 67> IRQ3;
-			io8<base + 68> IRQ4;
-			io8<base + 69> IRQ5;
-			io8<base + 70> IRQ6;
-			io8<base + 71> IRQ7;
+			rw8_t<base + 64> IRQ0;
+			rw8_t<base + 65> IRQ1;
+			rw8_t<base + 66> IRQ2;
+			rw8_t<base + 67> IRQ3;
+			rw8_t<base + 68> IRQ4;
+			rw8_t<base + 69> IRQ5;
+			rw8_t<base + 70> IRQ6;
+			rw8_t<base + 71> IRQ7;
 
-			io8<base + 214> SCI0;
-			io8<base + 217> SCI1;
-			io8<base + 220> SCI2;
-			io8<base + 223> SCI3;
+			rw8_t<base + 214> SCI0;
+			rw8_t<base + 217> SCI1;
+			rw8_t<base + 220> SCI2;
+			rw8_t<base + 223> SCI3;
 
-			io8<base + 226> GTCIA0;
-			io8<base + 226> GTCIB0;
-			io8<base + 226> GTCIC0;
-			io8<base + 229> GTCIE0;
-			io8<base + 229> GTCIV0;
-			io8<base + 229> LOCOI0;
+			rw8_t<base + 226> GTCIA0;
+			rw8_t<base + 226> GTCIB0;
+			rw8_t<base + 226> GTCIC0;
+			rw8_t<base + 229> GTCIE0;
+			rw8_t<base + 229> GTCIV0;
+			rw8_t<base + 229> LOCOI0;
 
-			io8<base + 232> GTCIA1;
-			io8<base + 232> GTCIB1;
-			io8<base + 232> GTCIC1;
-			io8<base + 235> GTCIE1;
-			io8<base + 235> GTCIV1;
+			rw8_t<base + 232> GTCIA1;
+			rw8_t<base + 232> GTCIB1;
+			rw8_t<base + 232> GTCIC1;
+			rw8_t<base + 235> GTCIE1;
+			rw8_t<base + 235> GTCIV1;
 
-			io8<base + 238> GTCIA2;
-			io8<base + 238> GTCIB2;
-			io8<base + 238> GTCIC2;
-			io8<base + 241> GTCIE2;
-			io8<base + 241> GTCIV2;
+			rw8_t<base + 238> GTCIA2;
+			rw8_t<base + 238> GTCIB2;
+			rw8_t<base + 238> GTCIC2;
+			rw8_t<base + 241> GTCIE2;
+			rw8_t<base + 241> GTCIV2;
 
-			io8<base + 244> GTCIA3;
-			io8<base + 244> GTCIB3;
-			io8<base + 244> GTCIC3;
-			io8<base + 247> GTCIE3;
-			io8<base + 247> GTCIV3;
+			rw8_t<base + 244> GTCIA3;
+			rw8_t<base + 244> GTCIB3;
+			rw8_t<base + 244> GTCIC3;
+			rw8_t<base + 247> GTCIE3;
+			rw8_t<base + 247> GTCIV3;
 		};
 		static ipr_t<0x00087300> IPR;
 
@@ -449,8 +449,8 @@ namespace device {
 			using fir_io::operator |=;
 			using fir_io::operator &=;
 			
-			bits_t<fir_io, 0, 8> FVCT;
-			bit_t<fir_io, 15> FIEN;
+			bits_rw_t<fir_io, bitpos::B0, 8> FVCT;
+			bit_rw_t<fir_io, bitpos::B15> FIEN;
 		};
 		static fir_t FIR;
 
@@ -460,14 +460,14 @@ namespace device {
 			@brief  SWINTR レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io8<0x000872e0> swintr_io;
+		typedef rw8_t<0x000872e0> swintr_io;
 		struct swintr_t : public swintr_io {
 			using swintr_io::operator =;
 			using swintr_io::operator ();
 			using swintr_io::operator |=;
 			using swintr_io::operator &=;
 			
-			bit_t<swintr_io, 0> SWINT;
+			bit_rw_t<swintr_io, bitpos::B0> SWINT;
 		};
 		static swintr_t SWINTR;
 
@@ -480,14 +480,14 @@ namespace device {
 		struct dtc_t {
 
 			template <uint32_t base>
-			struct dtce_t : public io8<base> {
-				typedef io8<base> io8_;				
-				using io8_::operator =;
-				using io8_::operator ();
-				using io8_::operator |=;
-				using io8_::operator &=;
+			struct dtce_t : public rw8_t<base> {
+				typedef rw8_t<base> rw8_t;				
+				using rw8_t::operator =;
+				using rw8_t::operator ();
+				using rw8_t::operator |=;
+				using rw8_t::operator &=;
 
-				bit_t<io8_, 0>	DTCE;
+				bit_rw_t<rw8_t, 0>	DTCE;
 			};
 			dtce_t<0x00087100 + 27> DTCER027;
 			dtce_t<0x00087100 + 28> DTCER028;
@@ -631,10 +631,10 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct dmaca_t {
-			io8<0x00087400 + 0x00> DMRSR0;
-			io8<0x00087400 + 0x04> DMRSR1;
-			io8<0x00087400 + 0x08> DMRSR2;
-			io8<0x00087400 + 0x0c> DMRSR3;
+			rw8_t<0x00087400 + 0x00> DMRSR0;
+			rw8_t<0x00087400 + 0x04> DMRSR1;
+			rw8_t<0x00087400 + 0x08> DMRSR2;
+			rw8_t<0x00087400 + 0x0c> DMRSR3;
 		};
 		static dmaca_t DMACA;
 
@@ -645,14 +645,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct irqcr_t : public io8<base> {
-			typedef io8<base> io8_;
-			using io8_::operator =;
-			using io8_::operator ();
-			using io8_::operator |=;
-			using io8_::operator &=;
+		struct irqcr_t : public rw8_t<base> {
+			typedef rw8_t<base> rw8_t_;
+			using rw8_t_::operator =;
+			using rw8_t_::operator ();
+			using rw8_t_::operator |=;
+			using rw8_t_::operator &=;
 
-			bits_t<io8_, 2, 2>	IRQMD;
+			bits_rw_t<rw8_t_, B2, 2>	IRQMD;
 		};
 		static irqcr_t<0x00087500 + 0x00> IRQCR0;
 		static irqcr_t<0x00087500 + 0x01> IRQCR1;
@@ -677,16 +677,16 @@ namespace device {
 			@brief  NMISR レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io8<0x00087580> nmisr_io;
+		typedef rw8_t<0x00087580> nmisr_io;
 		struct nmisr_t : public nmisr_io {
 			using nmisr_io::operator =;
 			using nmisr_io::operator ();
 			using nmisr_io::operator |=;
 			using nmisr_io::operator &=;
 
-			bit_t<nmisr_io, 0>	NMIST;
-			bit_t<nmisr_io, 1>	LVDST;
-			bit_t<nmisr_io, 2>	OSTST;
+			bit_rw_t<nmisr_io, bitpos::B0>	NMIST;
+			bit_rw_t<nmisr_io, bitpos::B1>	LVDST;
+			bit_rw_t<nmisr_io, bitpos::B2>	OSTST;
 		};
 		static nmisr_t NMISR;
 
@@ -696,16 +696,16 @@ namespace device {
 			@brief  NMIER レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io8<0x00087581> nmier_io;
+		typedef rw8_t<0x00087581> nmier_io;
 		struct nmier_t : public nmier_io {
 			using nmier_io::operator =;
 			using nmier_io::operator ();
 			using nmier_io::operator |=;
 			using nmier_io::operator &=;
 
-			bit_t<nmier_io, 0>	NMIEN;
-			bit_t<nmier_io, 1>	LVDEN;
-			bit_t<nmier_io, 2>	OSTEN;
+			bit_rw_t<nmier_io, bitpos::B0>	NMIEN;
+			bit_rw_t<nmier_io, bitpos::B1>	LVDEN;
+			bit_rw_t<nmier_io, bitpos::B2>	OSTEN;
 		};
 		static nmier_t NMIER;
 
@@ -715,15 +715,15 @@ namespace device {
 			@brief  NMICLR レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io8<0x00087582> nmiclr_io;
+		typedef rw8_t<0x00087582> nmiclr_io;
 		struct nmiclr_t : public nmiclr_io {
 			using nmiclr_io::operator =;
 			using nmiclr_io::operator ();
 			using nmiclr_io::operator |=;
 			using nmiclr_io::operator &=;
 
-			bit_t<nmiclr_io, 0>	NMICLR;
-			bit_t<nmiclr_io, 2>	OSTCLR;
+			bit_rw_t<nmiclr_io, bitpos::B0>	NMICLR;
+			bit_rw_t<nmiclr_io, bitpos::B2>	OSTCLR;
 		};
 		static nmiclr_t NMICLR;
 
@@ -733,14 +733,14 @@ namespace device {
 			@brief  NMICR レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io8<0x00087583> nmicr_io;
+		typedef rw8_t<0x00087583> nmicr_io;
 		struct nmicr_t : public nmicr_io {
 			using nmicr_io::operator =;
 			using nmicr_io::operator ();
 			using nmicr_io::operator |=;
 			using nmicr_io::operator &=;
 
-			bit_t<nmicr_io, 3>	NMIMD;
+			bit_rw_t<nmicr_io, bitpos::B3>	NMIMD;
 		};
 		static nmicr_t NMICR;
 #endif

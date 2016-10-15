@@ -22,15 +22,15 @@ namespace device {
 			@brief  書き込みプロテクトレジスタ (PWPR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io8<0x0008c11f> pwpr_io;
+		typedef rw8_t<0x0008c11f> pwpr_io;
 		struct pwpr_t : public pwpr_io {
 			using pwpr_io::operator =;
 			using pwpr_io::operator ();
 			using pwpr_io::operator |=;
 			using pwpr_io::operator &=;
 
-			bit_t<pwpr_io, 6> PFSWE;
-			bit_t<pwpr_io, 7> B0WI;
+			bit_rw_t<pwpr_io, bitpos::B6> PFSWE;
+			bit_rw_t<pwpr_io, bitpos::B7> B0WI;
 		};
 		static pwpr_t PWPR;
 
@@ -41,15 +41,15 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct pfsx_t : public io8<base> {
-			typedef io8<base> io;
+		struct pfsx_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
 			using io::operator =;
 			using io::operator ();
 			using io::operator |=;
 			using io::operator &=;
 
-			bits_t<io, 0, 5>  PSEL;
-			bit_t< io, 6>     ISEL;
+			bits_rw_t<io, bitpos::B0, 5>  PSEL;
+			bit_rw_t< io, bitpos::B6>     ISEL;
 		};
 
 
@@ -59,14 +59,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct pfsy_t : public io8<base> {
-			typedef io8<base> io;
+		struct pfsy_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
 			using io::operator =;
 			using io::operator ();
 			using io::operator |=;
 			using io::operator &=;
 
-			bit_t<io, 7>     ASEL;
+			bit_rw_t<io, bitpos::B7>     ASEL;
 		};
 
 
@@ -76,14 +76,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct pfsz_t : public io8<base> {
-			typedef io8<base> io;
+		struct pfsz_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
 			using io::operator =;
 			using io::operator ();
 			using io::operator |=;
 			using io::operator &=;
 
-			bits_t<io, 0, 5>  PSEL;
+			bits_rw_t<io, bitpos::B0, 5>  PSEL;
 		};
 
 

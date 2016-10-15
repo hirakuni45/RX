@@ -25,14 +25,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct addrx_t : public io16<base + ofs> {
-			typedef io16<base + ofs> io;
+		struct addrx_t : public rw16_t<base + ofs> {
+			typedef rw16_t<base + ofs> io;
 			using io::operator =;
 			using io::operator ();
 			using io::operator |=;
 			using io::operator &=;
 
-			bits<io, 12, 0>    AD;
+			bits_rw_t<io, bitpos::B12, 0>    AD;
 		};
 		static addrx_t<0x20> ADDR0;
 		static addrx_t<0x22> ADDR1;
@@ -49,21 +49,21 @@ namespace device {
 			@brief  A/D コントロールレジスタ（ADCSR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io16<base + 0x00> adcsr_io;
+		typedef rw16_t<base + 0x00> adcsr_io;
 		struct adcsr_t : public adcsr_io {
 			using adcsr_io::operator =;
 			using adcsr_io::operator ();
 			using adcsr_io::operator |=;
 			using adcsr_io::operator &=;
 
-			bits_t<adcsr_io,  0, 5> DBLANS;
-			bit_t< adcsr_io,  6>    GBADIE;
-			bit_t< adcsr_io,  7>    DBLE;
-			bit_t< adcsr_io,  8>    EXTRG;
-			bit_t< adcsr_io,  9>    TRGE;
-			bit_t< adcsr_io, 12>    ADIE;
-			bits_t<adcsr_io, 13, 2> ADCS;
-			bit_t< adcsr_io, 15>    ADST;
+			bits_rw_t<adcsr_io, bitpos::B0, 5>  DBLANS;
+			bit_rw_t <adcsr_io, bitpos::B6>     GBADIE;
+			bit_rw_t <adcsr_io, bitpos::B7>     DBLE;
+			bit_rw_t <adcsr_io, bitpos::B8>     EXTRG;
+			bit_rw_t <adcsr_io, bitpos::B9>     TRGE;
+			bit_rw_t <adcsr_io, bitpos::B12>    ADIE;
+			bits_rw_t<adcsr_io, bitpos::B13, 2> ADCS;
+			bit_rw_t <adcsr_io, bitpos::B15>    ADST;
 		};
 		static adcsr_t	ADCSR;
 
@@ -73,14 +73,14 @@ namespace device {
 			@brief  A/D チャネル選択レジスタＡ（ADANSA）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io16<base + 0x04> adansa_io;
+		typedef rw16_t<base + 0x04> adansa_io;
 		struct adansa_t : public adansa_io {
 			using adansa_io::operator =;
 			using adansa_io::operator ();
 			using adansa_io::operator |=;
 			using adansa_io::operator &=;
 
-			bits<adansa_io, 0, 8>	ANSA;
+			bits_rw_t<adansa_io, bitpos::B0, 8>	ANSA;
 		};
 		static adansa_t  ADANSA;
 
@@ -90,14 +90,14 @@ namespace device {
 			@brief  A/D チャネル選択レジスタＢ（ADANSB）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io16<base + 0x14> adansb_io;
+		typedef rw16_t<base + 0x14> adansb_io;
 		struct adansb_t : public adansb_io {
 			using adansb_io::operator =;
 			using adansb_io::operator ();
 			using adansb_io::operator |=;
 			using adansb_io::operator &=;
 
-			bits<adansb_io, 0, 8>	ANSB;
+			bits_rw_t<adansb_io, bitpos::B0, 8>	ANSB;
 		};
 		static adansb_t  ADANSB;
 
@@ -107,14 +107,14 @@ namespace device {
 			@brief  A/D 変換値加算モード選択レジスタ（ADADS）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io16<base + 0x08> adads_io;
+		typedef rw16_t<base + 0x08> adads_io;
 		struct adads_t : public adads_io {
 			using adads_io::operator =;
 			using adads_io::operator ();
 			using adads_io::operator |=;
 			using adads_io::operator &=;
 
-			bits<adads_io, 0, 8>	ADS;
+			bits_rw_t<adads_io, bitpos::B0, 8>	ADS;
 		};
 		static adads_t	ADADS;
 
@@ -124,14 +124,14 @@ namespace device {
 			@brief  A/D 変換値加算回数選択レジスタ（ADADC）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io8<base + 0x0c> adadc_io;
+		typedef rw8_t<base + 0x0c> adadc_io;
 		struct adadc_t : public adadc_io {
 			using adadc_io::operator =;
 			using adadc_io::operator ();
 			using adadc_io::operator |=;
 			using adadc_io::operator &=;
 
-			bits<adadc_io, 0, 2>	ADC;
+			bits_rw_t<adadc_io, bitpos::B0, 2>	ADC;
 		};
 		static adadc_t	ADADC;
 
@@ -141,20 +141,20 @@ namespace device {
 			@brief  A/D コントロール拡張レジスタ（ADCER）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io16<base + 0x0e> adcer_io;
+		typedef rw16_t<base + 0x0e> adcer_io;
 		struct adcer_t : public adcer_io {
 			using adcer_io::operator =;
 			using adcer_io::operator ();
 			using adcer_io::operator |=;
 			using adcer_io::operator &=;
 
-			bits_t<adcer_io,  1, 2>	ADPRC;
-			bit_t< adcer_io,  4>    DCE;
-			bit_t< adcer_io,  5>    ACE;
-			bits_t<adcer_io,  8, 2>	DIAGVAL;
-			bit_t< adcer_io, 10>    DIAGLD;
-			bit_t< adcer_io, 11>    DIAGM;
-			bit_t< adcer_io, 15>    ADRFMT;
+			bits_rw_t<adcer_io, bitpos::B1, 2> ADPRC;
+			bit_rw_t< adcer_io, bitpos::B4>    DCE;
+			bit_rw_t< adcer_io, bitpos::B5>    ACE;
+			bits_rw_t<adcer_io, bitpos::B8, 2> DIAGVAL;
+			bit_rw_t< adcer_io, bitpos::B10>   DIAGLD;
+			bit_rw_t< adcer_io, bitpos::B11>   DIAGM;
+			bit_rw_t< adcer_io, bitpos::B15>   ADRFMT;
 		};
 		static adcer_t	ADCER;
 
@@ -164,15 +164,15 @@ namespace device {
 			@brief  A/D 開始トリガ選択レジスタ（ADSTRGR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io16<base + 0x10> adstrgr_io;
+		typedef rw16_t<base + 0x10> adstrgr_io;
 		struct adstrgr_t : public adstrgr_io {
 			using adstrgr_io::operator =;
 			using adstrgr_io::operator ();
 			using adstrgr_io::operator |=;
 			using adstrgr_io::operator &=;
 
-			bits_t<adstrgr_io, 0, 5>  TRSB;
-			bits_t<adstrgr_io, 8, 5>  TRSA;
+			bits_rw_t<adstrgr_io, bitpos::B0, 5>  TRSB;
+			bits_rw_t<adstrgr_io, bitpos::B8, 5>  TRSA;
 		};
 		static adstrgr_t	ADSTRGR;
 
@@ -182,14 +182,14 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ（ADSSTRn）（n=0..7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static io8<base + 0x60> ADSSTR0;
-		static io8<base + 0x73> ADSSTR1;
-		static io8<base + 0x74> ADSSTR2;
-		static io8<base + 0x75> ADSSTR3;
-		static io8<base + 0x76> ADSSTR4;
-		static io8<base + 0x77> ADSSTR5;
-		static io8<base + 0x78> ADSSTR6;
-		static io8<base + 0x79> ADSSTR7;
+		static rw8_t<base + 0x60> ADSSTR0;
+		static rw8_t<base + 0x73> ADSSTR1;
+		static rw8_t<base + 0x74> ADSSTR2;
+		static rw8_t<base + 0x75> ADSSTR3;
+		static rw8_t<base + 0x76> ADSSTR4;
+		static rw8_t<base + 0x77> ADSSTR5;
+		static rw8_t<base + 0x78> ADSSTR6;
+		static rw8_t<base + 0x79> ADSSTR7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -197,15 +197,15 @@ namespace device {
 			@brief  サンプル＆ホールド回路コントロールレジスタ（ADSHCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io16<base + 0x66> adshcr_io;
+		typedef rw16_t<base + 0x66> adshcr_io;
 		struct adshcr_t : public adshcr_io {
 			using adshcr_io::operator =;
 			using adshcr_io::operator ();
 			using adshcr_io::operator |=;
 			using adshcr_io::operator &=;
 
-			bits_t<adshcr_io, 0, 8>  SSTSH;
-			bits_t<adshcr_io, 8, 3>  SHANS;
+			bits_rw_t<adshcr_io, bitpos::B0, 8>  SSTSH;
+			bits_rw_t<adshcr_io, bitpos::B8, 3>  SHANS;
 		};
 		static adshcr_t	ADSHCR;
 
@@ -215,16 +215,16 @@ namespace device {
 			@brief  A/D グループスキャン優先コントロールレジスタ（ADGSPCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io16<base + 0x80> adgspcr_io;
+		typedef rw16_t<base + 0x80> adgspcr_io;
 		struct adgspcr_t : public adgspcr_io {
 			using adgspcr_io::operator =;
 			using adgspcr_io::operator ();
 			using adgspcr_io::operator |=;
 			using adgspcr_io::operator &=;
 
-			bit_t<adgspcr_io,  0>  PGS;
-			bit_t<adgspcr_io,  1>  GBRSCN;
-			bit_t<adgspcr_io, 15>  GBRP;
+			bit_rw_t<adgspcr_io, bitpos::B0>  PGS;
+			bit_rw_t<adgspcr_io, bitpos::B1>  GBRSCN;
+			bit_rw_t<adgspcr_io, bitpos::B15>  GBRP;
 		};
 		static adgspcr_t	ADGSPCR;
 
