@@ -1,8 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX62N, RX621, RX63T グループ・CMT 定義 @n
-			Copyright 2013 Kunihito Hiramatsu
+	@brief	RX62N, RX621, RX63T, RX64M グループ・CMT 定義 @n
+			Copyright 2013, 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -23,15 +23,15 @@ namespace device {
 			@brief  CMSTR0 レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io16<0x00088000> cmstr0_io;
+		typedef rw16_t<0x00088000> cmstr0_io;
 		struct cmstr0_t : public cmstr0_io {
 			using cmstr0_io::operator =;
 			using cmstr0_io::operator ();
 			using cmstr0_io::operator |=;
 			using cmstr0_io::operator &=;
 
-			bit_t<cmstr0_io, 0>	STR0;
-			bit_t<cmstr0_io, 1>	STR1;
+			bit_rw_t<cmstr0_io, bitpos::B0>	STR0;
+			bit_rw_t<cmstr0_io, bitpos::B1>	STR1;
 		};
 		static cmstr0_t	CMSTR0;
 
@@ -41,15 +41,15 @@ namespace device {
 			@brief  CMSTR1 レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io16<0x00088010> cmstr1_io;
+		typedef rw16_t<0x00088010> cmstr1_io;
 		struct cmstr1_t : public cmstr1_io {
 			using cmstr1_io::operator =;
 			using cmstr1_io::operator ();
 			using cmstr1_io::operator |=;
 			using cmstr1_io::operator &=;
 
-			bit_t<cmstr1_io, 0>	STR2;
-			bit_t<cmstr1_io, 1>	STR3;
+			bit_rw_t<cmstr1_io, bitpos::B0>	STR2;
+			bit_rw_t<cmstr1_io, bitpos::B1>	STR3;
 		};
 		static cmstr1_t	CMSTR1;
 
@@ -59,15 +59,15 @@ namespace device {
 			@brief  CMCR レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef io16<base + 0x00> cmcr_io;
+		typedef rw16_t<base + 0x00> cmcr_io;
 		struct cmcr_t : public cmcr_io {
 			using cmcr_io::operator =;
 			using cmcr_io::operator ();
 			using cmcr_io::operator |=;
 			using cmcr_io::operator &=;
 
-			bits_t<cmcr_io, 0, 2>	CKS;
-			bit_t <cmcr_io, 6>	CMIE;
+			bits_rw_t<cmcr_io, bitpos::B0, 2>	CKS;
+			bit_rw_t <cmcr_io, bitpos::B6>	CMIE;
 		};
 		static cmcr_t CMCR;
 
@@ -77,7 +77,7 @@ namespace device {
 			@brief  CMCNT レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static io16<base + 0x02> CMCNT;
+		static rw16_t<base + 0x02> CMCNT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -85,7 +85,7 @@ namespace device {
 			@brief  CMCOR レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static io16<base + 0x04> CMCOR;
+		static rw16_t<base + 0x04> CMCOR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
