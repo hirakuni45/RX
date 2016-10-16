@@ -223,12 +223,11 @@ namespace rx {
 		/*!
 			@brief	開始
 			@param[in]	path	シリアルデバイスパス
-			@param[in]	brate	初期に接続する速度（B9600、B19200のいずれか）
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(const std::string& path, speed_t brate = B9600) {
-			if(!rs232c_.open(path, brate)) {
+		bool start(const std::string& path) {
+			if(!rs232c_.open(path, B9600)) {
 				return false;
 			}
 			if(!rs232c_.enable_RTS(false)) {
