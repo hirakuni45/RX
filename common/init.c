@@ -23,13 +23,12 @@ int init(void)
 
 	rx_run_fini_array();
 	rx_run_init_array();
+	rx_run_preinit_array();
 
 	// main の起動
 	static int argc = 0;
 	static char **argv = 0;
 	int ret = main(argc, argv);
-
-	rx_run_preinit_array();
 
 	return ret;
 }
