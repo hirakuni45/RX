@@ -379,8 +379,8 @@ namespace device {
 			}
 		}
 
-	    typename T::value_type b() const {
-			return 1 << static_cast<typename T::value_type>(pos);
+	    typename T::value_type b(bool v) const {
+			return static_cast<typename T::value_type>(v) << static_cast<typename T::value_type>(pos);
 		}
 
 		void operator = (bool v) { set(v); }
