@@ -45,9 +45,9 @@ int main(int argc, char** argv)
 						  | device::SYSTEM::SCKCR.PCKC.b(1)		// 1/2 (120/2=60)
 						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (120/2=60)
 	device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
-	device::SYSTEM::SCKCR3.CKSEL = 0b010;	///< メインクロック発信器選択
+	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
-	uint32_t wait = 1000000;
+	uint32_t wait = 10000000;
 	device::PORT0.PDR.B7 = 1; // output
 	while(1) {
 		wait_delay_(wait);
