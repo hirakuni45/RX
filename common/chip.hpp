@@ -23,11 +23,12 @@
 #elif defined(SIG_RX630)
 #elif defined(SIG_RX64M)
 #include "RX600/port.hpp"
+#include "RX600/cmt.hpp"
 #include "RX64M/system.hpp"
 #include "RX64M/mpc.hpp"
 #include "RX64M/icu.hpp"
 #include "RX64M/sci.hpp"
-#include "RX600/cmt.hpp"
+#include "RX64M/port_map.hpp"
 #else
 #  error "Requires SIG_XXX to be defined"
 #endif
