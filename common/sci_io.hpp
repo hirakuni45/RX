@@ -153,6 +153,22 @@ namespace device {
 
 			level_ = level;
 
+			auto chanel = SCI::get_chanel();
+			switch(chanel) {
+			case 0:
+				port_map::turn(port_map::type::SCI0);
+				break;
+			case 1:
+				port_map::turn(port_map::type::SCI1);
+				break;
+			case 2:
+				port_map::turn(port_map::type::SCI2);
+				break;
+			case 3:
+				port_map::turn(port_map::type::SCI3);
+				break;
+			}
+
 			uint32_t brr = F_PCKB / baud / 16;
 			uint8_t cks = 0;
 			while(brr > 512) {
@@ -163,7 +179,6 @@ namespace device {
 			bool abcs = true;
 			if(brr > 256) { brr /= 2; abcs = false; }
 
-			uint32_t chanel = SCI::get_chanel();
 			if(!set_intr_(chanel)) {
 				return false;
 			}
