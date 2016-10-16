@@ -30,8 +30,6 @@ namespace device {
 		static RECV_BUFF recv_;
 		static SEND_BUFF send_;
 
-		static bool send_stall_;
-
 		uint8_t	level_;
 		bool	crlf_;
 
@@ -58,7 +56,6 @@ namespace device {
 				SCI::TDR = send_.get();
 			} else {
 				SCI::SCR.TIE = 0;
-				send_stall_ = true;
 			}
 		}
 
@@ -127,10 +124,9 @@ namespace device {
 		}
 
 		void send_restart_() {
-			if(send_stall_ && send_.length() > 0) {
+			if(!SCI::SCR.TIE() && send_.length() > 0) {
 				while(SCI::SSR.TEND() == 0) sleep_();
 				char ch = send_.get();
-				send_stall_ = false;
 				SCI::TDR = ch;
 				SCI::SCR.TIE = 1;
 			}
@@ -156,7 +152,6 @@ namespace device {
 		bool start(uint32_t baud, uint8_t level = 0) {
 
 			level_ = level;
-			send_stall_ = true;
 
 			uint32_t brr = F_PCKB / baud / 16;
 			uint8_t cks = 0;
@@ -360,7 +355,4 @@ namespace device {
 		RECV_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF>::recv_;
 	template<class SCI, class RECV_BUFF, class SEND_BUFF>
 		SEND_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF>::send_;
-	template<class SCI, class RECV_BUFF, class SEND_BUFF>
-		bool sci_io<SCI, RECV_BUFF, SEND_BUFF>::send_stall_;
-
 }
