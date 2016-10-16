@@ -23,7 +23,7 @@ namespace device {
 			@brief  PDR レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		basic_rw_t<rw8_t<base + 0x00> > PDR;
+		static basic_rw_t<rw8_t<base + 0x00> > PDR;
 
 
 		//-----------------------------------------------------------------//
@@ -31,7 +31,7 @@ namespace device {
 			@brief  PODR レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		basic_rw_t<rw8_t<base + 0x20> > PODR;
+		static basic_rw_t<rw8_t<base + 0x20> > PODR;
 
 
 		//-----------------------------------------------------------------//
@@ -39,7 +39,7 @@ namespace device {
 			@brief  PIDR
 		*/
 		//-----------------------------------------------------------------//
-		basic_ro_t<rw8_t<base + 0x40> > PIDR;
+		static basic_ro_t<rw8_t<base + 0x40> > PIDR;
 
 
 		//-----------------------------------------------------------------//
@@ -47,7 +47,7 @@ namespace device {
 			@brief  PMR レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		basic_rw_t<rw8_t<base + 0x60> > PMR;
+		static basic_rw_t<rw8_t<base + 0x60> > PMR;
 
 
 		//-----------------------------------------------------------------//
@@ -68,7 +68,7 @@ namespace device {
 			bit_rw_t<odr0_io, bitpos::B4> B4;
 			bit_rw_t<odr0_io, bitpos::B6> B6;
 		};
-		odr0_t ODR0;
+		static odr0_t ODR0;
 
 
 		//-----------------------------------------------------------------//
@@ -88,7 +88,7 @@ namespace device {
 			bit_rw_t<odr1_io, bitpos::B4> B4;
 			bit_rw_t<odr1_io, bitpos::B6> B6;
 		};
-		odr1_t ODR1;
+		static odr1_t ODR1;
 
 
 		//-----------------------------------------------------------------//
@@ -96,7 +96,7 @@ namespace device {
 			@brief  PCR レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		basic_rw_t<rw8_t<base + 0xC0> > PCR;
+		static basic_rw_t<rw8_t<base + 0xC0> > PCR;
 
 
 		//-----------------------------------------------------------------//
@@ -104,24 +104,24 @@ namespace device {
 			@brief  DSCR レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		basic_rw_t<rw8_t<base + 0xE0> > DSCR;
+		static basic_rw_t<rw8_t<base + 0xE0> > DSCR;
 	};
 
-	static port_t<0x0008C000> PORT0;
-	static port_t<0x0008C001> PORT1;
-	static port_t<0x0008C002> PORT2;
-	static port_t<0x0008C003> PORT3;
-	static port_t<0x0008C004> PORT4;
-	static port_t<0x0008C005> PORT5;
-	static port_t<0x0008C006> PORT6;
-	static port_t<0x0008C007> PORT7;
-	static port_t<0x0008C008> PORT8;
-	static port_t<0x0008C009> PORT9;
-	static port_t<0x0008C00a> PORTA;
-	static port_t<0x0008C00b> PORTB;
-	static port_t<0x0008C00d> PORTD;
-	static port_t<0x0008C00e> PORTE;
-	static port_t<0x0008C00f> PORTF;
-	static port_t<0x0008C010> PORTG;
-	static port_t<0x0008C012> PORTJ;
+	typedef port_t<0x0008C000> PORT0;
+	typedef port_t<0x0008C001> PORT1;
+	typedef port_t<0x0008C002> PORT2;
+	typedef port_t<0x0008C003> PORT3;
+	typedef port_t<0x0008C004> PORT4;
+	typedef port_t<0x0008C005> PORT5;
+	typedef port_t<0x0008C006> PORT6;
+	typedef port_t<0x0008C007> PORT7;
+	typedef port_t<0x0008C008> PORT8;
+	typedef port_t<0x0008C009> PORT9;
+	typedef port_t<0x0008C00a> PORTA;
+	typedef port_t<0x0008C00b> PORTB;
+	typedef port_t<0x0008C00d> PORTD;
+	typedef port_t<0x0008C00e> PORTE;
+	typedef port_t<0x0008C00f> PORTF;
+	typedef port_t<0x0008C010> PORTG;
+	typedef port_t<0x0008C012> PORTJ;
 }
