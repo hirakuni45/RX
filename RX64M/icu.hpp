@@ -278,11 +278,6 @@ namespace device {
 		struct ipr_t {
 			rw8_t<base + 0> BUSERR;
 
-			rw8_t<base + 1> FIFERR;
-			rw8_t<base + 2> FRDIY;
-
-			rw8_t<base + 3> SWINT;
-
 			rw8_t<base + 4> CMI0;
 			rw8_t<base + 5> CMI1;
 
