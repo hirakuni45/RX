@@ -26,31 +26,28 @@ int main(int argc, char** argv)
 {
 	device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
 
-#if 0
-	device::SYSTEM::MOSCWTCR.MSTS = 0b01101;	// 131072 サイクル待ち
-	device::SYSTEM::MOSCCR.MOSTP = 0;			// メインクロック発振器動作
-	dummy_ = device::SYSTEM::MOSCCR.MOSTP();
-	device::SYSTEM::MOFCR.MOFXIN = 1;			// メインクロック強制発振
-	dummy_ = device::SYSTEM::MOFCR.MOFXIN();
-	wait_delay(5000);
+	device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
+	// メインクロック強制発振とドライブ能力設定
+	device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(0b10)
+						  | device::SYSTEM::MOFCR.MOFXIN.b(1);			
+	device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
+	wait_delay_(5000);
 
-	device::SYSTEM::PLLCR.STC = 0xf;			// PLL 16 倍(192MHz)
-	device::SYSTEM::PLLWTCR.PSTS = 0b01010;		// 131072 サイクル待ち
+	device::SYSTEM::PLLCR.STC = 0b010011;		// PLL 10 倍(120MHz)
 	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
-	wait_delay(5000);
+	wait_delay_(5000);
 
-	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(3)		// 1/8 (192/8=24)
-						  | device::SYSTEM::SCKCR.ICK.b(1)		// 1/2 (192/2=96)
-						  | device::SYSTEM::SCKCR.BCK.b(2)		// 1/4 (192/4=48)
-						  | device::SYSTEM::SCKCR.PCKA.b(1)		// 1/2 (192/2=96)
-						  | device::SYSTEM::SCKCR.PCKB.b(2)		// 1/4 (192/4=48)
-						  | device::SYSTEM::SCKCR.PCKC.b(2)		// 1/4 (192/8=48)
-						  | device::SYSTEM::SCKCR.PCKD.b(2);	// 1/4 (192/8=48)
-	device::SYSTEM::SCKCR3.CKSEL = 4;	///< PLL 回路選択
-#endif
+	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)		// 1/2 (120/2=60)
+						  | device::SYSTEM::SCKCR.ICK.b(0)		// 1/1 (120/1=120)
+						  | device::SYSTEM::SCKCR.BCK.b(1)		// 1/2 (120/2=60)
+						  | device::SYSTEM::SCKCR.PCKA.b(0)		// 1/1 (120/1=120)
+						  | device::SYSTEM::SCKCR.PCKB.b(1)		// 1/2 (120/2=60)
+						  | device::SYSTEM::SCKCR.PCKC.b(1)		// 1/2 (120/2=60)
+						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (120/2=60)
+	device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
+	device::SYSTEM::SCKCR3.CKSEL = 0b010;	///< メインクロック発信器選択
 
-
-	uint32_t wait = 10000;
+	uint32_t wait = 1000000;
 	device::PORT0.PDR.B7 = 1; // output
 	while(1) {
 		wait_delay_(wait);
