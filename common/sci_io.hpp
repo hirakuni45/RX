@@ -2,13 +2,12 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX グループ・SCI I/O 制御 @n
-			Copyright 2013 Kunihito Hiramatsu
+			Copyright 2013, 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "common/chip.hpp"
 #include "vect.h"
-#include "fifo.hpp"
 
 /// F_PCKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCKB
@@ -20,43 +19,43 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCI I/O 制御クラス
-		@param[in]	SCI	SCIx 定義クラス
-		@param[in]	recv_size	受信バッファサイズ
-		@param[in]	send+size	送信バッファサイズ
+		@param[in]	SCI	SCI 定義クラス
+		@param[in]	RECV_BUFF	受信バッファクラス
+		@param[in]	SEND_BUFF	送信バッファクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCIx, uint32_t recv_size, uint32_t send_size>
+	template <class SCI, class RECV_BUFF, class SEND_BUFF>
 	class sci_io {
 
-		static utils::fifo<recv_size> recv_;
-		static utils::fifo<send_size> send_;
+		static RECV_BUFF recv_;
+		static SEND_BUFF send_;
 
 		uint8_t	intr_level_;
 		bool	crlf_;
 		bool	polling_;
 
 		// ※必要なら、実装する
-		void sleep_() { }
+		void sleep_() { asm("nop"); }
 
 		static INTERRUPT_FUNC void recv_task_()
 		{
 			bool err = false;
-			if(SCIx::SSR.ORER()) {	///< 受信オーバランエラー状態確認
-				SCIx::SSR = 0x00;	///< 受信オーバランエラークリア
+			if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
+				SCI::SSR = 0x00;	///< 受信オーバランエラークリア
 				err = true;
 			}
 			///< フレーミングエラー/パリティエラー状態確認
-			if(SCIx::SSR() & (SCIx::SSR.FER.b() | SCIx::SSR.PER.b())) {
+			if(SCI::SSR() & (SCI::SSR.FER.b() | SCI::SSR.PER.b())) {
 				err = true;
 			}
-			if(!err) recv_.put(SCIx::RDR());
+			if(!err) recv_.put(SCI::RDR());
 		}
 
 		static INTERRUPT_FUNC void send_task_()
 		{
-			SCIx::TDR = send_.get();
+			SCI::TDR = send_.get();
 			if(send_.length() == 0) {
-				SCIx::SCR.TEIE = 0;
+				SCI::SCR.TXIE = 0;
 			}
 		}
 
@@ -76,24 +75,24 @@ namespace device {
 				break;
 			}
 
-			SCIx::SCR = 0x00;			// TE, RE disable.
+			SCI::SCR = 0x00;			// TE, RE disable.
 
 			if(polling_) {
 				switch(chanel) {
 				case 0:
-					ICU::IER.TEI0 = false;
+					ICU::IER.TXI0 = false;
 					ICU::IER.RXI0 = false;
 					break;
 				case 1:
-					ICU::IER.TEI1 = false;
+					ICU::IER.TXI1 = false;
 					ICU::IER.RXI1 = false;
 					break;
 				case 2:
-					ICU::IER.TEI2 = false;
+					ICU::IER.TXI2 = false;
 					ICU::IER.RXI2 = false;
 					break;
 				case 3:
-					ICU::IER.TEI3 = false;
+					ICU::IER.TXI3 = false;
 					ICU::IER.RXI3 = false;
 					break;
 				default:
@@ -103,31 +102,35 @@ namespace device {
 				switch(chanel) {
 				case 0:
 					set_interrupt_task(recv_task_, ICU::VECTOR::RXI0);
-					set_interrupt_task(send_task_, ICU::VECTOR::TEI0);
+					set_interrupt_task(send_task_, ICU::VECTOR::TXI0);
 					ICU::IER.RXI0 = true;
-					ICU::IER.TEI0 = true;
-					ICU::IPR.SCI0 = intr_level_;
+					ICU::IPR.RXI0 = intr_level_;
+					ICU::IER.TXI0 = true;
+					ICU::IPR.TXI0 = intr_level_;
 					break;
 				case 1:
 					set_interrupt_task(recv_task_, ICU::VECTOR::RXI1);
-					set_interrupt_task(send_task_, ICU::VECTOR::TEI1);
+					set_interrupt_task(send_task_, ICU::VECTOR::TXI1);
 					ICU::IER.RXI1 = true;
-					ICU::IER.TEI1 = true;
-					ICU::IPR.SCI1 = intr_level_;
+					ICU::IPR.RXI1 = intr_level_;
+					ICU::IER.TXI1 = true;
+					ICU::IPR.TXI1 = intr_level_;
 					break;
 				case 2:
 					set_interrupt_task(recv_task_, ICU::VECTOR::RXI2);
-					set_interrupt_task(send_task_, ICU::VECTOR::TEI2);
+					set_interrupt_task(send_task_, ICU::VECTOR::TXI2);
 					ICU::IER.RXI2 = true;
-					ICU::IER.TEI2 = true;
-					ICU::IPR.SCI2 = intr_level_;
+					ICU::IPR.RXI2 = intr_level_;
+					ICU::IER.TXI2 = true;
+					ICU::IPR.TXI2 = intr_level_;
 					break;
 				case 3:
 					set_interrupt_task(recv_task_, ICU::VECTOR::RXI3);
-					set_interrupt_task(send_task_, ICU::VECTOR::TEI3);
+					set_interrupt_task(send_task_, ICU::VECTOR::TXI3);
 					ICU::IER.RXI3 = true;
-					ICU::IER.TEI3 = true;
-					ICU::IPR.SCI3 = intr_level_;
+					ICU::IPR.RXI3 = intr_level_;
+					ICU::IER.TXI3 = true;
+					ICU::IPR.TXI3 = intr_level_;
 					break;
 				default:
 					return false;
@@ -178,22 +181,22 @@ namespace device {
 			bool abcs = true;
 			if(brr > 256) { brr /= 2; abcs = false; }
 
-			uint32_t chanel = SCIx::get_chanel();
+			uint32_t chanel = SCI::get_chanel();
 
 			if(!set_intr_(chanel)) {
 				return false;
 			}
 
 			// 8 bits, 1 stop bit, no-parrity
-			SCIx::SMR = cks;
-			SCIx::SEMR.ABCS = abcs;
+			SCI::SMR = cks;
+			SCI::SEMR.ABCS = abcs;
 			if(brr) --brr;
-			SCIx::BRR = static_cast<uint8_t>(brr);
+			SCI::BRR = static_cast<uint8_t>(brr);
 
 			if(polling_) {
-				SCIx::SCR = SCIx::SCR.TE.b() | SCIx::SCR.RE.b();
+				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
 			} else {
-				SCIx::SCR = SCIx::SCR.RIE.b() | SCIx::SCR.TE.b() | SCIx::SCR.RE.b();
+				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b();
 			}
 
 			return true;
@@ -222,42 +225,42 @@ namespace device {
 			}
 			if(cks > 3 || brr > 256) return false;
 
-			uint32_t chanel = SCIx::get_chanel();
+			uint32_t chanel = SCI::get_chanel();
 			if(!set_intr_(chanel)) {
 				return false;
 			}
 
 			// LSB(0), MSB(1) first
-			SCIx::SCMR.SDIR = 1;
+			SCI::SCMR.SDIR = 1;
 
-			SCIx::SIMR1.IICM = 0;
-			SCIx::SMR = cks | SCIx::SMR.CM.b();
-			SCIx::SPMR.SSE = 0;		///< SS 端子制御しない「０」
+			SCI::SIMR1.IICM = 0;
+			SCI::SMR = cks | SCI::SMR.CM.b();
+			SCI::SPMR.SSE = 0;		///< SS 端子制御しない「０」
 
 			if(master) {
-				SCIx::SPMR.MSS = 0;
+				SCI::SPMR.MSS = 0;
 			} else {
-				SCIx::SPMR.MSS = 1;
+				SCI::SPMR.MSS = 1;
 			}
 
 			// クロックタイミング種別選択
-			SCIx::SPMR.CKPOL = 0;
-			SCIx::SPMR.CKPH  = 0;
+			SCI::SPMR.CKPOL = 0;
+			SCI::SPMR.CKPH  = 0;
 
 			if(brr) --brr;
-			SCIx::BRR = static_cast<uint8_t>(brr);
+			SCI::BRR = static_cast<uint8_t>(brr);
 
 			uint8_t scr = 0;
 			if(master) {
-				scr = SCIx::SCR.CKE.b(0b01);
+				scr = SCI::SCR.CKE.b(0b01);
 			} else {
-				scr = SCIx::SCR.CKE.b(0b10);
+				scr = SCI::SCR.CKE.b(0b10);
 			}
 
 			if(polling_) {
-				SCIx::SCR = SCIx::SCR.TE.b() | SCIx::SCR.RE.b() | scr;
+				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
 			} else {
-				SCIx::SCR = SCIx::SCR.RIE.b() | SCIx::SCR.TE.b() | SCIx::SCR.RE.b() | scr;
+				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
 			}
 
 			return true;
@@ -300,15 +303,15 @@ namespace device {
 			}
 
 			if(polling_) {
-				while(SCIx::SSR.TEND() == 0) sleep_();
-				SCIx::TDR = ch;
+				while(SCI::SSR.TEND() == 0) sleep_();
+				SCI::TDR = ch;
 			} else {
 				/// ７／８ を超えてた場合は、バッファが空になるまで待つ。
 				if(send_.length() >= (send_.size() * 7 / 8)) {
 					while(send_.length() != 0) sleep_();
 				}
 				send_.put(ch);
-				SCIx::SCR.TEIE = 1;
+				SCI::SCR.TXIE = 1;
 			}
 		}
 
@@ -322,13 +325,13 @@ namespace device {
 		uint32_t length() {
 			if(polling_) {
 //				bool err = false;
-				if(SCIx::SSR.ORER()) {	///< 受信オーバランエラー状態確認
-					SCIx::SSR.ORER = 0;	///< 受信オーバランエラークリア
+				if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
+					SCI::SSR.ORER = 0;	///< 受信オーバランエラークリア
 //					err = true;
 				}
-				uint8_t sts = SCIx::SSR();	///< 受信ステータス取得
+				uint8_t sts = SCI::SSR();	///< 受信ステータス取得
 				///< フレーミングエラー、パリティエラー状態確認
-				if(sts & (SCIx::SSR.FER.b() | SCIx::SSR.PER.b())) {
+				if(sts & (SCI::SSR.FER.b() | SCI::SSR.PER.b())) {
 //					err = true;
 				}
 //				if((sts & sci_.SSR.RDRF.b()) != 0 && err == 0) {
@@ -352,8 +355,8 @@ namespace device {
 			if(polling_) {
 				char ch;
 				while(length() == 0) sleep_();
-				ch = SCIx::RDR();	///< 受信データ読み出し
-///				SCIx::SSR.RDRF = 0;	///< 受信フラグクリア
+				ch = SCI::RDR();	///< 受信データ読み出し
+///				SCI::SSR.RDRF = 0;	///< 受信フラグクリア
 				return ch;
 			} else {
 				while(recv_.length() == 0) sleep_();
@@ -376,8 +379,8 @@ namespace device {
 		}
 	};
 
-	template<class SCIx, uint32_t recv_size, uint32_t send_size>
-		utils::fifo<recv_size> sci_io<SCIx, recv_size, send_size>::recv_;
-	template<class SCIx, uint32_t recv_size, uint32_t send_size>
-		utils::fifo<send_size> sci_io<SCIx, recv_size, send_size>::send_;
+	template<class SCI, class RECV_BUFF, class SEND_BUFF>
+		RECV_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF>::recv_;
+	template<class SCI, class RECV_BUFF, class SEND_BUFF>
+		SEND_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF>::send_;
 }
