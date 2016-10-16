@@ -30,9 +30,10 @@ namespace device {
 		static RECV_BUFF recv_;
 		static SEND_BUFF send_;
 
-		uint8_t	intr_level_;
+		static bool send_stall_;
+
+		uint8_t	level_;
 		bool	crlf_;
-		bool	polling_;
 
 		// ※必要なら、実装する
 		void sleep_() { asm("nop"); }
@@ -53,9 +54,21 @@ namespace device {
 
 		static INTERRUPT_FUNC void send_task_()
 		{
-			SCI::TDR = send_.get();
-			if(send_.length() == 0) {
-				SCI::SCR.TXIE = 0;
+			if(send_.length()) {
+				SCI::TDR = send_.get();
+			} else {
+				SCI::SCR.TIE = 0;
+				send_stall_ = true;
+			}
+		}
+
+		void set_vector_(uint8_t rx_vec, uint8_t tx_vec) {
+			if(level_) {
+				set_interrupt_task(recv_task_, rx_vec);
+				set_interrupt_task(send_task_, tx_vec);
+			} else {
+				set_interrupt_task(nullptr, rx_vec);
+				set_interrupt_task(nullptr, tx_vec);
 			}
 		}
 
@@ -77,66 +90,50 @@ namespace device {
 
 			SCI::SCR = 0x00;			// TE, RE disable.
 
-			if(polling_) {
-				switch(chanel) {
-				case 0:
-					ICU::IER.TXI0 = false;
-					ICU::IER.RXI0 = false;
-					break;
-				case 1:
-					ICU::IER.TXI1 = false;
-					ICU::IER.RXI1 = false;
-					break;
-				case 2:
-					ICU::IER.TXI2 = false;
-					ICU::IER.RXI2 = false;
-					break;
-				case 3:
-					ICU::IER.TXI3 = false;
-					ICU::IER.RXI3 = false;
-					break;
-				default:
-					return false;
-				}
-			} else {
-				switch(chanel) {
-				case 0:
-					set_interrupt_task(recv_task_, ICU::VECTOR::RXI0);
-					set_interrupt_task(send_task_, ICU::VECTOR::TXI0);
-					ICU::IER.RXI0 = true;
-					ICU::IPR.RXI0 = intr_level_;
-					ICU::IER.TXI0 = true;
-					ICU::IPR.TXI0 = intr_level_;
-					break;
-				case 1:
-					set_interrupt_task(recv_task_, ICU::VECTOR::RXI1);
-					set_interrupt_task(send_task_, ICU::VECTOR::TXI1);
-					ICU::IER.RXI1 = true;
-					ICU::IPR.RXI1 = intr_level_;
-					ICU::IER.TXI1 = true;
-					ICU::IPR.TXI1 = intr_level_;
-					break;
-				case 2:
-					set_interrupt_task(recv_task_, ICU::VECTOR::RXI2);
-					set_interrupt_task(send_task_, ICU::VECTOR::TXI2);
-					ICU::IER.RXI2 = true;
-					ICU::IPR.RXI2 = intr_level_;
-					ICU::IER.TXI2 = true;
-					ICU::IPR.TXI2 = intr_level_;
-					break;
-				case 3:
-					set_interrupt_task(recv_task_, ICU::VECTOR::RXI3);
-					set_interrupt_task(send_task_, ICU::VECTOR::TXI3);
-					ICU::IER.RXI3 = true;
-					ICU::IPR.RXI3 = intr_level_;
-					ICU::IER.TXI3 = true;
-					ICU::IPR.TXI3 = intr_level_;
-					break;
-				default:
-					return false;
-				}
+			bool ena = level_ != 0 ? true : false;
+			switch(chanel) {
+			case 0:
+				set_vector_(ICU::VECTOR::RXI0, ICU::VECTOR::TXI0);
+				ICU::IPR.RXI0 = level_;
+				ICU::IER.RXI0 = ena;
+				ICU::IPR.TXI0 = level_;
+				ICU::IER.TXI0 = ena;
+				break;
+			case 1:
+				set_vector_(ICU::VECTOR::RXI1, ICU::VECTOR::TXI1);
+				ICU::IPR.RXI1 = level_;
+				ICU::IER.RXI1 = ena;
+				ICU::IPR.TXI1 = level_;
+				ICU::IER.TXI1 = ena;
+				break;
+			case 2:
+				set_vector_(ICU::VECTOR::RXI2, ICU::VECTOR::TXI2);
+				ICU::IPR.RXI2 = level_;
+				ICU::IER.RXI2 = ena;
+				ICU::IPR.TXI2 = level_;
+				ICU::IER.TXI2 = ena;
+				break;
+			case 3:
+				set_vector_(ICU::VECTOR::RXI3, ICU::VECTOR::TXI3);
+				ICU::IPR.RXI3 = level_;
+				ICU::IER.RXI3 = ena;
+				ICU::IPR.TXI3 = level_;
+				ICU::IER.TXI3 = ena;
+				break;
+			default:
+				return false;
 			}
 			return true;
+		}
+
+		void send_restart_() {
+			if(send_stall_ && send_.length() > 0) {
+				while(SCI::SSR.TEND() == 0) sleep_();
+				char ch = send_.get();
+				send_stall_ = false;
+				SCI::TDR = ch;
+				SCI::SCR.TIE = 1;
+			}
 		}
 
 	public:
@@ -145,31 +142,21 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		sci_io() : intr_level_(1), crlf_(true), polling_(false) { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  初期化 @n
-					※ポーリングの場合は設定しなくても良い
-			@param[in]	level	割り込みレベル
-		*/
-		//-----------------------------------------------------------------//
-		void initialize(uint32_t level) {
-			intr_level_ = level;
-		}
+		sci_io() : level_(0), crlf_(true) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ボーレートを設定して、SCI を有効にする
 			@param[in]	baud	ボーレート
-			@param[in]	polling	ポーリングの場合「true」
+			@param[in]	level	割り込みレベル（０の場合ポーリング）
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t baud, bool polling = false) {
-			polling_ = polling;
+		bool start(uint32_t baud, uint8_t level = 0) {
+
+			level_ = level;
+			send_stall_ = true;
 
 			uint32_t brr = F_PCKB / baud / 16;
 			uint8_t cks = 0;
@@ -182,7 +169,6 @@ namespace device {
 			if(brr > 256) { brr /= 2; abcs = false; }
 
 			uint32_t chanel = SCI::get_chanel();
-
 			if(!set_intr_(chanel)) {
 				return false;
 			}
@@ -193,10 +179,10 @@ namespace device {
 			if(brr) --brr;
 			SCI::BRR = static_cast<uint8_t>(brr);
 
-			if(polling_) {
-				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
-			} else {
+			if(level) {
 				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b();
+			} else {
+				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
 			}
 
 			return true;
@@ -208,14 +194,14 @@ namespace device {
 			@brief  通信速度を設定して、SPI を有効にする
 			@param[in]	master	マスターモードの場合「true」
 			@param[in]	bps	ビットレート
-			@param[in]	polling	ポーリングの場合「true」
+			@param[in]	level	割り込みレベル（０の場合ポーリング）
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_spi(bool master, uint32_t bps)
+		bool start_spi(bool master, uint32_t bps, uint8_t level = 0)
 		{
-			polling_ = false;
 			crlf_ = false;
+			level_ = level;
 
 			uint32_t brr = F_PCKB / bps / 4;
 			uint8_t cks = 0;
@@ -257,10 +243,10 @@ namespace device {
 				scr = SCI::SCR.CKE.b(0b10);
 			}
 
-			if(polling_) {
-				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
-			} else {
+			if(level_) {
 				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
+			} else {
+				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
 			}
 
 			return true;
@@ -283,10 +269,10 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		uint32_t send_length() const {
-			if(polling_) {
-				return 0;
-			} else {
+			if(level_) {
 				return send_.length();
+			} else {
+				return 0;
 			}
 		}
 
@@ -302,17 +288,19 @@ namespace device {
 				putch('\r');
 			}
 
-			if(polling_) {
-				while(SCI::SSR.TEND() == 0) sleep_();
-				SCI::TDR = ch;
-			} else {
+			if(level_) {
 				/// ７／８ を超えてた場合は、バッファが空になるまで待つ。
 				if(send_.length() >= (send_.size() * 7 / 8)) {
+					send_restart_();
 					while(send_.length() != 0) sleep_();
 				}
 				send_.put(ch);
-				SCI::SCR.TXIE = 1;
+				send_restart_();
+			} else {
+				while(SCI::SSR.TEND() == 0) sleep_();
+				SCI::TDR = ch;
 			}
+
 		}
 
 
@@ -323,24 +311,14 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		uint32_t length() {
-			if(polling_) {
-//				bool err = false;
+			if(level_) {
+				return recv_.length();
+			} else {
 				if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
 					SCI::SSR.ORER = 0;	///< 受信オーバランエラークリア
-//					err = true;
 				}
-				uint8_t sts = SCI::SSR();	///< 受信ステータス取得
-				///< フレーミングエラー、パリティエラー状態確認
-				if(sts & (SCI::SSR.FER.b() | SCI::SSR.PER.b())) {
-//					err = true;
-				}
-//				if((sts & sci_.SSR.RDRF.b()) != 0 && err == 0) {
-//					return 1;	///< 受信データあり
-//				} else {
-					return 0;	///< 受信データなし
-//				}
-			} else {
-				return recv_.length();
+				auto n = SCI::SSR.RDRF();
+				return n;
 			}
 		}
 
@@ -352,15 +330,14 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		char getch() {
-			if(polling_) {
+			if(level_) {
+				while(recv_.length() == 0) sleep_();
+				return recv_.get();
+			} else {
 				char ch;
 				while(length() == 0) sleep_();
 				ch = SCI::RDR();	///< 受信データ読み出し
-///				SCI::SSR.RDRF = 0;	///< 受信フラグクリア
 				return ch;
-			} else {
-				while(recv_.length() == 0) sleep_();
-				return recv_.get();
 			}
 		}
 
@@ -383,4 +360,7 @@ namespace device {
 		RECV_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF>::recv_;
 	template<class SCI, class RECV_BUFF, class SEND_BUFF>
 		SEND_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF>::send_;
+	template<class SCI, class RECV_BUFF, class SEND_BUFF>
+		bool sci_io<SCI, RECV_BUFF, SEND_BUFF>::send_stall_;
+
 }
