@@ -2,35 +2,31 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX チップ選択ヘッダー @n
-			Copyright 2013 Kunihito Hiramatsu
+			Copyright 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#if defined(CHIP_RX621) | defined(CHIP_RX62N) | defined(CHIP_RX62G) | defined(CHIP_RX63T) | defined(CHIP_RX630)
-
+#if defined(SIG_RX621)
 #include "RX600/cmt.hpp"
-
-#ifdef CHIP_RX621
+#include "RX600/port.hpp"
 #include "RX621/system.hpp"
 #include "RX621/sci.hpp"
 #include "RX621/icu.hpp"
-#endif
-
-#ifdef CHIP_RX62N
-#endif
-
-#ifdef CHIP_RX62G
-#endif
-
-#ifdef CHIP_RX63T
+#elif defined(SIG_RX62N)
+#elif defined(SIG_RX62G)
+#elif defined(SIG_RX63T)
+#include "RX600/cmt.hpp"
+#include "RX600/port.hpp"
 #include "RX63T/system.hpp"
 #include "RX63T/sci.hpp"
 #include "RX63T/icu.hpp"
-#endif
-
-#ifdef CHIP_RX630
-#endif
-
+#elif defined(SIG_RX630)
+#elif defined(SIG_RX64M)
+#include "RX600/port.hpp"
+#include "RX64M/system.hpp"
+#include "RX64M/icu.hpp"
+#include "RX64M/sci.hpp"
+#include "RX600/cmt.hpp"
 #else
-#  error "Requires CHIP_XXXXX to be defined"
+#  error "Requires SIG_XXX to be defined"
 #endif
