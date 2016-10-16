@@ -23,7 +23,7 @@ namespace device {
 
 		uint32_t	clock_;
 
-		void sleep_() { asm("nop"); }
+		void sleep_() const { asm("nop"); }
 
 		static TASK	task_;
 
@@ -68,13 +68,13 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  初期化
+			@brief  開始
 			@param[in]	freq	タイマー周波数
 			@param[in]	level	割り込みレベル
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool initialize(uint32_t freq, uint8_t level) const {
+		bool start(uint32_t freq, uint8_t level) const {
 			if(freq == 0 || clock_ == 0) return false;
 
 			uint32_t cmcor = clock_ / freq / 8;
@@ -98,9 +98,9 @@ namespace device {
 				ICU::IR.CMI0 = 0;
 				break;
 			case 1:
+				set_interrupt_task(cmt_task_, ICU::VECTOR::CMI1);
 				CMT::CMSTR0.STR1 = 0;
 				SYSTEM::MSTPCRA.MSTPA15 = 0;
-				set_interrupt_task(cmt_task_, ICU::VECTOR::CMI1);
 				ICU::IPR.CMI1 = level;
 				ICU::IER.CMI1 = true;
 				ICU::IR.CMI1 = 0;
@@ -151,7 +151,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void sync() const {
 			volatile uint32_t cnt = counter_;
-			while(cnt == counter_) ;
+			while(cnt == counter_) sleep_();
 		}
 
 
