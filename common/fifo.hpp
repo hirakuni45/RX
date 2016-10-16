@@ -1,7 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	FIFO (first in first out)
+	@brief	FIFO (first in first out) @n
+			Copyright 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -12,26 +13,21 @@ namespace utils {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     /*!
         @brief  fifo クラス
-		@param[in]	size	バッファサイズ
+		@param[in]	SIZE	バッファサイズ
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t size_ = 256>
+	template <typename T, T SIZE>
 	class fifo {
 
-		volatile uint32_t		get_;
-		volatile uint32_t		put_;
+		typedef char DT;
+		typedef T PTS;
 
-		char		buff_[size_];
+		volatile PTS	get_ = 0;
+		volatile PTS	put_ = 0;
+
+		DT	buff_[SIZE];
 
 	public:
-        //-----------------------------------------------------------------//
-        /*!
-            @brief  コンストラクター
-        */
-        //-----------------------------------------------------------------//
-		fifo() : get_(0), put_(0) { }
-
-
         //-----------------------------------------------------------------//
         /*!
             @brief  クリア
@@ -46,11 +42,16 @@ namespace utils {
 			@param[in]	v	値
         */
         //-----------------------------------------------------------------//
-		void put(uint8_t v) {
+		void put(DT v) {
 			buff_[put_] = v;
 			++put_;
-			if(put_ >= size_) {
-				put_ = 0;
+			if(SIZE == 8 || SIZE == 16 || SIZE == 32 || SIZE == 64 || SIZE == 128) {
+				put_ &= SIZE - 1;
+			} else if(SIZE == 256) {
+			} else {
+				if(put_ >= SIZE) {
+					put_ = 0;
+				}
 			}
 		}
 
@@ -61,11 +62,16 @@ namespace utils {
 			@return	値
         */
         //-----------------------------------------------------------------//
-		uint8_t get() {
-			uint8_t data = buff_[get_];
+		DT get() {
+			DT data = buff_[get_];
 			++get_;
-			if(get_ >= size_) {
-				get_ = 0;
+			if(SIZE == 8 || SIZE == 16 || SIZE == 32 || SIZE == 64 || SIZE == 128) {
+				get_ &= SIZE - 1;
+			} else if(SIZE == 256) {
+			} else {
+				if(get_ >= SIZE) {
+					get_ = 0;
+				}
 			}
 			return data;
 		}
@@ -77,9 +83,9 @@ namespace utils {
 			@return	長さ
         */
         //-----------------------------------------------------------------//
-		uint32_t length() const {
+		PTS length() const {
 			if(put_ >= get_) return (put_ - get_);
-			else return (size_ + put_ - get_);
+			else return (SIZE + put_ - get_);
 		}
 
 
@@ -89,7 +95,7 @@ namespace utils {
 			@return	位置
         */
         //-----------------------------------------------------------------//
-		uint32_t pos_get() const { return get_; }
+		PTS pos_get() const { return get_; }
 
 
         //-----------------------------------------------------------------//
@@ -98,7 +104,7 @@ namespace utils {
 			@return	位置
         */
         //-----------------------------------------------------------------//
-		uint32_t pos_put() const { return put_; }
+		PTS pos_put() const { return put_; }
 
 
         //-----------------------------------------------------------------//
@@ -107,8 +113,7 @@ namespace utils {
 			@return	バッファのサイズ
         */
         //-----------------------------------------------------------------//
-		uint32_t size() const { return size_; }
-
+		PTS size() const { return SIZE; }
 	};
 
 }
