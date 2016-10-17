@@ -72,35 +72,7 @@ namespace device {
 		bool set_intr_() {
 			SCI::SCR = 0x00;			// TE, RE disable.
 
-			auto chanel = SCI::get_chanel();
-			switch(chanel) {
-			case 0:
-				set_vector_(ICU::VECTOR::RXI0, ICU::VECTOR::TXI0);
-				break;
-			case 1:
-				set_vector_(ICU::VECTOR::RXI1, ICU::VECTOR::TXI1);
-				break;
-			case 2:
-				set_vector_(ICU::VECTOR::RXI2, ICU::VECTOR::TXI2);
-				break;
-			case 3:
-				set_vector_(ICU::VECTOR::RXI3, ICU::VECTOR::TXI3);
-				break;
-			case 4:
-				set_vector_(ICU::VECTOR::RXI4, ICU::VECTOR::TXI4);
-				break;
-			case 5:
-				set_vector_(ICU::VECTOR::RXI5, ICU::VECTOR::TXI5);
-				break;
-			case 6:
-				set_vector_(ICU::VECTOR::RXI6, ICU::VECTOR::TXI6);
-				break;
-			case 7:
-				set_vector_(ICU::VECTOR::RXI7, ICU::VECTOR::TXI7);
-				break;
-			default:
-				return false;
-			}
+			set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
 
 			icu_mgr::set_level(SCI::get_peripheral(), level_);
 
@@ -195,8 +167,7 @@ namespace device {
 
 			power_cfg::turn(SCI::get_peripheral());
 
-			uint32_t chanel = SCI::get_chanel();
-			if(!set_intr_(chanel)) {
+			if(!set_intr_()) {
 				return false;
 			}
 
