@@ -22,8 +22,7 @@ namespace device {
 			@brief  ベクター・インデックス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct VECTOR {
-		  enum type { 
+		enum class VECTOR {
 			BUSERR = 16,  // BSC
 
 			RAMERR = 18,  // RAM
@@ -154,7 +153,6 @@ namespace device {
 
 			INTB128  = 128,
 			INTA208  = 208,
-		  };
 		};
 
 

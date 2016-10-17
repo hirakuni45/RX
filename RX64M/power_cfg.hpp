@@ -53,6 +53,10 @@ namespace device {
 			case peripheral::SCI7:
 				SYSTEM::MSTPCRB.MSTPB24 = f;	// B24 (SCI7)のストップ状態解除
 				break;
+			case peripheral::CMT0:
+			case peripheral::CMT1:
+				SYSTEM::MSTPCRA.MSTPA15 = 0;
+				break;
 			default:
 				break;
 			}

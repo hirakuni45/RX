@@ -16,7 +16,7 @@ namespace device {
 		@brief  割り込みマネージャー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct intr_mgr {
+	struct icu_mgr {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -76,6 +76,14 @@ namespace device {
 				ICU::IER.RXI7 = ena;
 				ICU::IPR.TXI7 = lvl;
 				ICU::IER.TXI7 = ena;
+				break;
+			case peripheral::CMT0:
+				ICU::IPR.CMI0 = lvl;
+				ICU::IER.CMI0 = ena;
+				break;
+			case peripheral::CMT1:
+				ICU::IPR.CMI1 = lvl;
+				ICU::IER.CMI1 = ena;
 				break;
 			default:
 				break;

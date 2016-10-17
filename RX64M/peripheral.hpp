@@ -26,6 +26,11 @@ namespace device {
 		SCI7,  // (P90:TXD7, P92:RXD7)
 
 		SCI12,  //
+
+		CMT0,
+		CMT1,
+		CMT2,
+		CMT3,
 	};
 
 }
