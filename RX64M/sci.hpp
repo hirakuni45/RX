@@ -24,24 +24,24 @@ namespace device {
 			@brief  シリアルモードレジスタ (SMR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x00> smr_io;
-		struct smr_t : public smr_io {
-			using smr_io::operator =;
-			using smr_io::operator ();
-			using smr_io::operator |=;
-			using smr_io::operator &=;
+		struct smr_t : public rw8_t<base + 0x00> {
+			typedef rw8_t<base + 0x00> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<smr_io, bitpos::B0, 2>  CKS;
-			bit_rw_t< smr_io, bitpos::B2>	  MP;
-			bit_rw_t< smr_io, bitpos::B3>	  STOP;
-			bit_rw_t< smr_io, bitpos::B4>	  PM;
-			bit_rw_t< smr_io, bitpos::B5>	  PE;
-			bit_rw_t< smr_io, bitpos::B6>	  CHR;
-			bit_rw_t< smr_io, bitpos::B7>	  CM;
+			bits_rw_t<io_, bitpos::B0, 2> CKS;
+			bit_rw_t <io_, bitpos::B2>	  MP;
+			bit_rw_t <io_, bitpos::B3>	  STOP;
+			bit_rw_t <io_, bitpos::B4>	  PM;
+			bit_rw_t <io_, bitpos::B5>	  PE;
+			bit_rw_t <io_, bitpos::B6>	  CHR;
+			bit_rw_t <io_, bitpos::B7>	  CM;
 
-			bits_rw_t< smr_io, bitpos::B2, 2> BCP;
-			bit_rw_t< smr_io, bitpos::B6>	  BLK;
-			bit_rw_t< smr_io, bitpos::B7>	  GM;
+			bits_rw_t<io_, bitpos::B2, 2> BCP;
+			bit_rw_t <io_, bitpos::B6>	  BLK;
+			bit_rw_t <io_, bitpos::B7>	  GM;
 		};
 		static smr_t SMR;
 
@@ -59,20 +59,20 @@ namespace device {
 			@brief  シリアルコントロールレジスタ (SCR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x02> scr_io;
-		struct scr_t : public scr_io {
-			using scr_io::operator =;
-			using scr_io::operator ();
-			using scr_io::operator |=;
-			using scr_io::operator &=;
+		struct scr_t : public rw8_t<base + 0x02> {
+			typedef rw8_t<base + 0x02> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<scr_io, bitpos::B0, 2>	CKE;
-			bit_rw_t< scr_io, bitpos::B2>	TEIE;
-			bit_rw_t< scr_io, bitpos::B3>	MPIE;
-			bit_rw_t< scr_io, bitpos::B4>	RE;
-			bit_rw_t< scr_io, bitpos::B5>	TE;
-			bit_rw_t< scr_io, bitpos::B6>	RIE;
-			bit_rw_t< scr_io, bitpos::B7>	TIE;
+			bits_rw_t<io_, bitpos::B0, 2> CKE;
+			bit_rw_t <io_, bitpos::B2>	  TEIE;
+			bit_rw_t <io_, bitpos::B3>	  MPIE;
+			bit_rw_t <io_, bitpos::B4>	  RE;
+			bit_rw_t <io_, bitpos::B5>	  TE;
+			bit_rw_t <io_, bitpos::B6>	  RIE;
+			bit_rw_t <io_, bitpos::B7>	  TIE;
 		};
 		static scr_t SCR;
 
@@ -90,21 +90,21 @@ namespace device {
 			@brief  シリアルステータスレジスタ (SSR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x04> ssr_io;
-		struct ssr_t : public ssr_io {
-			using ssr_io::operator =;
-			using ssr_io::operator ();
-			using ssr_io::operator |=;
-			using ssr_io::operator &=;
+		struct ssr_t : public rw8_t<base + 0x04> {
+			typedef rw8_t<base + 0x04> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<ssr_io, bitpos::B0>	MPBT;
-			bit_rw_t<ssr_io, bitpos::B1>	MPB;
-			bit_rw_t<ssr_io, bitpos::B2>	TEND;
-			bit_rw_t<ssr_io, bitpos::B3>	PER;
-			bit_rw_t<ssr_io, bitpos::B4>	FER;
-			bit_rw_t<ssr_io, bitpos::B5>	ORER;
-			bit_rw_t<ssr_io, bitpos::B6>	RDRF;
-			bit_rw_t<ssr_io, bitpos::B7>	TDRE;
+			bit_rw_t<io_, bitpos::B0> MPBT;
+			bit_rw_t<io_, bitpos::B1> MPB;
+			bit_rw_t<io_, bitpos::B2> TEND;
+			bit_rw_t<io_, bitpos::B3> PER;
+			bit_rw_t<io_, bitpos::B4> FER;
+			bit_rw_t<io_, bitpos::B5> ORER;
+			bit_rw_t<io_, bitpos::B6> RDRF;
+			bit_rw_t<io_, bitpos::B7> TDRE;
 		};
 		static ssr_t SSR;
 
@@ -122,18 +122,18 @@ namespace device {
 			@brief  スマートカードモードレジスタ (SCMR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x06> scmr_io;
-		struct scmr_t : public scmr_io {
-			using scmr_io::operator =;
-			using scmr_io::operator ();
-			using scmr_io::operator |=;
-			using scmr_io::operator &=;
+		struct scmr_t : public rw8_t<base + 0x06> {
+			typedef rw8_t<base + 0x06> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<scmr_io, bitpos::B0>	SMIF;
-			bit_rw_t<scmr_io, bitpos::B2>	SINV;
-			bit_rw_t<scmr_io, bitpos::B3>	SDIR;
-			bit_rw_t<scmr_io, bitpos::B4>	CHR1;
-			bit_rw_t<scmr_io, bitpos::B7>	BCP2;
+			bit_rw_t<io_, bitpos::B0> SMIF;
+			bit_rw_t<io_, bitpos::B2> SINV;
+			bit_rw_t<io_, bitpos::B3> SDIR;
+			bit_rw_t<io_, bitpos::B4> CHR1;
+			bit_rw_t<io_, bitpos::B7> BCP2;
 		};
 		static scmr_t SCMR;
 
@@ -143,19 +143,19 @@ namespace device {
 			@brief  シリアル拡張レジスタ (SEMR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x07> semr_io;
-		struct semr_t : public semr_io {
-			using semr_io::operator =;
-			using semr_io::operator ();
-			using semr_io::operator |=;
-			using semr_io::operator &=;
+		struct semr_t : public rw8_t<base + 0x07> {
+			typedef rw8_t<base + 0x07> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<semr_io, bitpos::B0>	ACS0;
-			bit_rw_t<semr_io, bitpos::B2>	BRME;
-			bit_rw_t<semr_io, bitpos::B4>	ABCS;
-			bit_rw_t<semr_io, bitpos::B5>	NFEN;
-			bit_rw_t<semr_io, bitpos::B6>	BGDM;
-			bit_rw_t<semr_io, bitpos::B7>	RXDESEL;
+			bit_rw_t<io_, bitpos::B0> ACS0;
+			bit_rw_t<io_, bitpos::B2> BRME;
+			bit_rw_t<io_, bitpos::B4> ABCS;
+			bit_rw_t<io_, bitpos::B5> NFEN;
+			bit_rw_t<io_, bitpos::B6> BGDM;
+			bit_rw_t<io_, bitpos::B7> RXDESEL;
 		};
 		static semr_t SEMR;
 
@@ -165,14 +165,14 @@ namespace device {
 			@brief  ノイズフィルタ設定レジスタ (SNFR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x08> snfr_io;
-		struct snfr_t : public snfr_io {
-			using snfr_io::operator =;
-			using snfr_io::operator ();
-			using snfr_io::operator |=;
-			using snfr_io::operator &=;
+		struct snfr_t : public rw8_t<base + 0x08> {
+			typedef rw8_t<base + 0x08> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<snfr_io, bitpos::B0, 3>	NFCS;
+			bits_rw_t<io_, bitpos::B0, 3> NFCS;
 		};
 		static snfr_t SNFR;
 
@@ -182,15 +182,15 @@ namespace device {
 			@brief  I2C モードレジスタ１ (SIMR1)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x09> simr1_io;
-		struct simr1_t : public simr1_io {
-			using simr1_io::operator =;
-			using simr1_io::operator ();
-			using simr1_io::operator |=;
-			using simr1_io::operator &=;
+		struct simr1_t : public rw8_t<base + 0x09> {
+			typedef rw8_t<base + 0x09> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t< simr1_io, bitpos::B0>	    IICM;
-			bits_rw_t<simr1_io, bitpos::B3, 5>	IICDL;
+			bit_rw_t <io_, bitpos::B0>    IICM;
+			bits_rw_t<io_, bitpos::B3, 5> IICDL;
 		};
 		static simr1_t SIMR1;
 
@@ -200,16 +200,16 @@ namespace device {
 			@brief  I2C モードレジスタ２ (SIMR2)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x0A> simr2_io;
-		struct simr2_t : public simr2_io {
-			using simr2_io::operator =;
-			using simr2_io::operator ();
-			using simr2_io::operator |=;
-			using simr2_io::operator &=;
+		struct simr2_t : public rw8_t<base + 0x0A> {
+			typedef rw8_t<base + 0x0A> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<simr2_io, bitpos::B0>	    IICINTM;
-			bit_rw_t<simr2_io, bitpos::B1>	    IICCSC;
-			bit_rw_t<simr2_io, bitpos::B5>	    IICACKT;
+			bit_rw_t<io_, bitpos::B0> IICINTM;
+			bit_rw_t<io_, bitpos::B1> IICCSC;
+			bit_rw_t<io_, bitpos::B5> IICACKT;
 		};
 		static simr2_t SIMR2;
 
@@ -219,19 +219,19 @@ namespace device {
 			@brief  I2C モードレジスタ３ (SIMR3)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x0B> simr3_io;
-		struct simr3_t : public simr3_io {
-			using simr3_io::operator =;
-			using simr3_io::operator ();
-			using simr3_io::operator |=;
-			using simr3_io::operator &=;
+		struct simr3_t : public rw8_t<base + 0x0B> {
+			typedef rw8_t<base + 0x0B> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t< simr3_io, bitpos::B0>	    IICSTAREQ;
-			bit_rw_t< simr3_io, bitpos::B1>	    IICRSTAREQ;
-			bit_rw_t< simr3_io, bitpos::B2>	    IICSTPREQ;
-			bit_rw_t< simr3_io, bitpos::B3>	    IICSTIF;
-			bits_rw_t<simr3_io, bitpos::B4, 2>	IICSDAS;
-			bits_rw_t<simr3_io, bitpos::B6, 2>	IICSCLS;
+			bit_rw_t <io_, bitpos::B0>    IICSTAREQ;
+			bit_rw_t <io_, bitpos::B1>    IICRSTAREQ;
+			bit_rw_t <io_, bitpos::B2>    IICSTPREQ;
+			bit_rw_t <io_, bitpos::B3>    IICSTIF;
+			bits_rw_t<io_, bitpos::B4, 2> IICSDAS;
+			bits_rw_t<io_, bitpos::B6, 2> IICSCLS;
 		};
 		static simr3_t SIMR3;
 
@@ -241,14 +241,14 @@ namespace device {
 			@brief  I2C ステータスレジスタ (SISR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x0C> sisr_io;
-		struct sisr_t : public sisr_io {
-			using sisr_io::operator =;
-			using sisr_io::operator ();
-			using sisr_io::operator |=;
-			using sisr_io::operator &=;
+		struct sisr_t : public rw8_t<base + 0x0C> {
+			typedef rw8_t<base + 0x0C> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<sisr_io, bitpos::B0>	IICACKR;
+			bit_rw_t<io_, bitpos::B0> IICACKR;
 		};
 		static sisr_t SISR;
 
@@ -258,19 +258,19 @@ namespace device {
 			@brief  SPI モードレジスタ (SPMR)
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x0D> spmr_io;
-		struct spmr_t : public spmr_io {
-			using spmr_io::operator =;
-			using spmr_io::operator ();
-			using spmr_io::operator |=;
-			using spmr_io::operator &=;
+		struct spmr_t : public rw8_t<base + 0x0D> {
+			typedef rw8_t<base + 0x0D> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<spmr_io, bitpos::B0>	SSE;
-			bit_rw_t<spmr_io, bitpos::B1>	CTSE;
-			bit_rw_t<spmr_io, bitpos::B2>	MSS;
-			bit_rw_t<spmr_io, bitpos::B4>	MFF;
-			bit_rw_t<spmr_io, bitpos::B6>	CKPOL;
-			bit_rw_t<spmr_io, bitpos::B7>	CKPH;
+			bit_rw_t<io_, bitpos::B0> SSE;
+			bit_rw_t<io_, bitpos::B1> CTSE;
+			bit_rw_t<io_, bitpos::B2> MSS;
+			bit_rw_t<io_, bitpos::B4> MFF;
+			bit_rw_t<io_, bitpos::B6> CKPOL;
+			bit_rw_t<io_, bitpos::B7> CKPH;
 		};
 		static spmr_t SPMR;
 
@@ -302,14 +302,14 @@ namespace device {
 					※SIC12 にのみ有効なレジスタ
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x20> esmer_io;
-		struct esmer_t : public esmer_io {
-			using esmer_io::operator =;
-			using esmer_io::operator ();
-			using esmer_io::operator |=;
-			using esmer_io::operator &=;
+		struct esmer_t : public rw8_t<base + 0x20> {
+			typedef rw8_t<base + 0x20> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<esmer_io, bitpos::B0>	ESME;
+			bit_rw_t<io_, bitpos::B0> ESME;
 		};
 		static esmer_t ESMER;
 	};
