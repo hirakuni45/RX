@@ -8,6 +8,7 @@
 #include "common/sci_io.hpp"
 #include "common/cmt_io.hpp"
 #include "common/fifo.hpp"
+#include "common/format.hpp"
 
 namespace {
 
@@ -29,6 +30,18 @@ namespace {
 
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
+}
+
+extern "C" {
+	void sci_putch(char ch)
+	{
+		sci_.putch(ch);
+	}
+
+	void sci_puts(const char *str)
+	{
+		sci_.puts(str);
+	}
 }
 
 int main(int argc, char** argv);
@@ -67,9 +80,10 @@ int main(int argc, char** argv)
 	static const uint8_t sci_level = 2;
 	sci_.start(115200, sci_level);
 
-	sci_.puts("RX64M start\n");
+	utils::format("RX64M start\n");
 
 	uint32_t cnt = 0;
+	uint32_t n = 0;
 	device::PORT0::PDR.B7 = 1; // output
 	while(1) {
 		cmt_.sync();
@@ -84,5 +98,10 @@ int main(int argc, char** argv)
 			cnt = 0;
 		}
 		device::PORT0::PODR.B7 = (cnt < 10) ? 0 : 1;
+
+		if((n % 60) == 0) {
+			utils::format("%d\n") % (n / 60);
+		}
+		++n;
 	}
 }
