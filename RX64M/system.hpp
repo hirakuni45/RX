@@ -22,24 +22,25 @@ namespace device {
 			@brief  システムクロックコントロールレジスタ（SCKCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<0x00080020> sckcr_io;
-		struct sckcr_t : public sckcr_io {
-			using sckcr_io::operator =;
-			using sckcr_io::operator ();
-			using sckcr_io::operator |=;
-			using sckcr_io::operator &=;
+		template<uint32_t base>
+		struct sckcr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<sckcr_io, bitpos::B0,  4>	PCKD;
-			bits_rw_t<sckcr_io, bitpos::B4,  4>	PCKC;
-			bits_rw_t<sckcr_io, bitpos::B8,  4>	PCKB;
-			bits_rw_t<sckcr_io, bitpos::B12, 4>	PCKA;
-			bits_rw_t<sckcr_io, bitpos::B16, 4>	BCK;
-			bit_rw_t <sckcr_io, bitpos::B22>	PSTOP0;
-			bit_rw_t <sckcr_io, bitpos::B23>	PSTOP1;
-			bits_rw_t<sckcr_io, bitpos::B24, 4>	ICK;
-			bits_rw_t<sckcr_io, bitpos::B28, 4>	FCK;
+			bits_rw_t<io_, bitpos::B0,  4> PCKD;
+			bits_rw_t<io_, bitpos::B4,  4> PCKC;
+			bits_rw_t<io_, bitpos::B8,  4> PCKB;
+			bits_rw_t<io_, bitpos::B12, 4> PCKA;
+			bits_rw_t<io_, bitpos::B16, 4> BCK;
+			bit_rw_t <io_, bitpos::B22>    PSTOP0;
+			bit_rw_t <io_, bitpos::B23>    PSTOP1;
+			bits_rw_t<io_, bitpos::B24, 4> ICK;
+			bits_rw_t<io_, bitpos::B28, 4> FCK;
 		};
-		static sckcr_t SCKCR;
+		static sckcr_t<0x00080020> SCKCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -47,16 +48,17 @@ namespace device {
 			@brief  システムクロックコントロールレジスタ 2（SCKCR2）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw16_t<0x00080024> sckcr2_io;
-		struct sckcr2_t : public sckcr2_io {
-			using sckcr2_io::operator =;
-			using sckcr2_io::operator ();
-			using sckcr2_io::operator |=;
-			using sckcr2_io::operator &=;
+		template<uint32_t base>
+		struct sckcr2_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<sckcr2_io, bitpos::B4, 4>	UCK;
+			bits_rw_t<io_, bitpos::B4, 4> UCK;
 		};
-		static sckcr2_t SCKCR2;
+		static sckcr2_t<0x00080024> SCKCR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

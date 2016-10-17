@@ -7,6 +7,8 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
+#include "RX64M/peripheral.hpp"
+#include "RX64M/icu.hpp"
 
 namespace device {
 
@@ -14,9 +16,12 @@ namespace device {
 	/*!
 		@brief  SCIg 定義基底クラス
 		@param[in]	base	ベース・アドレス
+		@param[in]	t		ペリフェラル型
+		@param[in]	txv		送信ベクター
+		@param[in]	rxv		受信ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv>
 	struct scig_t {
 
 		//-----------------------------------------------------------------//
@@ -285,6 +290,15 @@ namespace device {
 			if(base == 0x0008B300) return 12; 
 			return (base >> 5) & 7;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ペリフェラル型を返す
+			@return ペリフェラル型
+		*/
+		//-----------------------------------------------------------------//
+		static peripheral get_peripheral() { return t; }
 	};
 
 
@@ -292,10 +306,13 @@ namespace device {
 	/*!
 		@brief  SCIg, SCIh 定義基底クラス
 		@param[in]	base	ベース・アドレス
+		@param[in]	t		ペリフェラル型
+		@param[in]	txv		送信ベクター
+		@param[in]	rxv		受信ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
-	struct scih_t : scig_t<base> {
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv>
+	struct scih_t : scig_t<base, t, txv, rxv> {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  拡張シリアルモード有効レジスタ (ESMER) @n
@@ -314,14 +331,14 @@ namespace device {
 		static esmer_t ESMER;
 	};
 
-	typedef scig_t<0x0008A000> SCI0;
-	typedef scig_t<0x0008A020> SCI1;
-	typedef scig_t<0x0008A040> SCI2;
-	typedef scig_t<0x0008A060> SCI3;
-	typedef scig_t<0x0008A080> SCI4;
-	typedef scig_t<0x0008A0A0> SCI5;
-	typedef scig_t<0x0008A0C0> SCI6;
-	typedef scig_t<0x0008A0E0> SCI7;
+	typedef scig_t<0x0008A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0> SCI0;
+	typedef scig_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1> SCI1;
+	typedef scig_t<0x0008A040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2> SCI2;
+	typedef scig_t<0x0008A060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3> SCI3;
+	typedef scig_t<0x0008A080, peripheral::SCI4, ICU::VECTOR::TXI4, ICU::VECTOR::RXI4> SCI4;
+	typedef scig_t<0x0008A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5> SCI5;
+	typedef scig_t<0x0008A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6> SCI6;
+	typedef scig_t<0x0008A0E0, peripheral::SCI7, ICU::VECTOR::TXI7, ICU::VECTOR::RXI7> SCI7;
 
-	typedef scih_t<0x0008B300> SCI12;
+	typedef scih_t<0x0008B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12> SCI12;
 }
