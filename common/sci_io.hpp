@@ -83,6 +83,18 @@ namespace device {
 			case 3:
 				SYSTEM::MSTPCRB.MSTPB28 = 0;	// B28 (SCI3)のストップ状態解除
 				break;
+			case 4:
+				SYSTEM::MSTPCRB.MSTPB27 = 0;	// B27 (SCI4)のストップ状態解除
+				break;
+			case 5:
+				SYSTEM::MSTPCRB.MSTPB26 = 0;	// B26 (SCI5)のストップ状態解除
+				break;
+			case 6:
+				SYSTEM::MSTPCRB.MSTPB25 = 0;	// B25 (SCI6)のストップ状態解除
+				break;
+			case 7:
+				SYSTEM::MSTPCRB.MSTPB24 = 0;	// B24 (SCI7)のストップ状態解除
+				break;
 			}
 
 			SCI::SCR = 0x00;			// TE, RE disable.
@@ -116,6 +128,34 @@ namespace device {
 				ICU::IER.RXI3 = ena;
 				ICU::IPR.TXI3 = level_;
 				ICU::IER.TXI3 = ena;
+				break;
+			case 4:
+				set_vector_(ICU::VECTOR::RXI4, ICU::VECTOR::TXI4);
+				ICU::IPR.RXI4 = level_;
+				ICU::IER.RXI4 = ena;
+				ICU::IPR.TXI4 = level_;
+				ICU::IER.TXI4 = ena;
+				break;
+			case 5:
+				set_vector_(ICU::VECTOR::RXI5, ICU::VECTOR::TXI5);
+				ICU::IPR.RXI5 = level_;
+				ICU::IER.RXI5 = ena;
+				ICU::IPR.TXI5 = level_;
+				ICU::IER.TXI5 = ena;
+				break;
+			case 6:
+				set_vector_(ICU::VECTOR::RXI6, ICU::VECTOR::TXI6);
+				ICU::IPR.RXI6 = level_;
+				ICU::IER.RXI6 = ena;
+				ICU::IPR.TXI6 = level_;
+				ICU::IER.TXI6 = ena;
+				break;
+			case 7:
+				set_vector_(ICU::VECTOR::RXI7, ICU::VECTOR::TXI7);
+				ICU::IPR.RXI7 = level_;
+				ICU::IER.RXI7 = ena;
+				ICU::IPR.TXI7 = level_;
+				ICU::IER.TXI7 = ena;
 				break;
 			default:
 				return false;
@@ -154,20 +194,17 @@ namespace device {
 			level_ = level;
 
 			auto chanel = SCI::get_chanel();
-			switch(chanel) {
-			case 0:
-				port_map::turn(port_map::type::SCI0);
-				break;
-			case 1:
-				port_map::turn(port_map::type::SCI1);
-				break;
-			case 2:
-				port_map::turn(port_map::type::SCI2);
-				break;
-			case 3:
-				port_map::turn(port_map::type::SCI3);
-				break;
-			}
+			static const port_map::type map_tbls[] = {
+				port_map::type::SCI0,
+				port_map::type::SCI1,
+				port_map::type::SCI2,
+				port_map::type::SCI3,
+				port_map::type::SCI4,
+				port_map::type::SCI5,
+				port_map::type::SCI6,
+				port_map::type::SCI7
+			};
+			port_map::turn(map_tbls[chanel]);
 
 			uint32_t brr = F_PCKB / baud / 16;
 			uint8_t cks = 0;
