@@ -59,107 +59,51 @@ namespace device {
 			}
 		}
 
-		void set_vector_(uint8_t rx_vec, uint8_t tx_vec) {
+		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) {
 			if(level_) {
-				set_interrupt_task(recv_task_, rx_vec);
-				set_interrupt_task(send_task_, tx_vec);
+				set_interrupt_task(recv_task_, static_cast<uint32_t>(rx_vec));
+				set_interrupt_task(send_task_, static_cast<uint32_t>(tx_vec));
 			} else {
-				set_interrupt_task(nullptr, rx_vec);
-				set_interrupt_task(nullptr, tx_vec);
+				set_interrupt_task(nullptr, static_cast<uint32_t>(rx_vec));
+				set_interrupt_task(nullptr, static_cast<uint32_t>(tx_vec));
 			}
 		}
 
-		bool set_intr_(uint32_t chanel) {
-			switch(chanel) {
-			case 0:
-				SYSTEM::MSTPCRB.MSTPB31 = 0;	// B31 (SCI0)のストップ状態解除
-				break;
-			case 1:
-				SYSTEM::MSTPCRB.MSTPB30 = 0;	// B30 (SCI1)のストップ状態解除
-				break;
-			case 2:
-				SYSTEM::MSTPCRB.MSTPB29 = 0;	// B29 (SCI2)のストップ状態解除
-				break;
-			case 3:
-				SYSTEM::MSTPCRB.MSTPB28 = 0;	// B28 (SCI3)のストップ状態解除
-				break;
-			case 4:
-				SYSTEM::MSTPCRB.MSTPB27 = 0;	// B27 (SCI4)のストップ状態解除
-				break;
-			case 5:
-				SYSTEM::MSTPCRB.MSTPB26 = 0;	// B26 (SCI5)のストップ状態解除
-				break;
-			case 6:
-				SYSTEM::MSTPCRB.MSTPB25 = 0;	// B25 (SCI6)のストップ状態解除
-				break;
-			case 7:
-				SYSTEM::MSTPCRB.MSTPB24 = 0;	// B24 (SCI7)のストップ状態解除
-				break;
-			}
-
+		bool set_intr_() {
 			SCI::SCR = 0x00;			// TE, RE disable.
 
-			bool ena = level_ != 0 ? true : false;
+			auto chanel = SCI::get_chanel();
 			switch(chanel) {
 			case 0:
 				set_vector_(ICU::VECTOR::RXI0, ICU::VECTOR::TXI0);
-				ICU::IPR.RXI0 = level_;
-				ICU::IER.RXI0 = ena;
-				ICU::IPR.TXI0 = level_;
-				ICU::IER.TXI0 = ena;
 				break;
 			case 1:
 				set_vector_(ICU::VECTOR::RXI1, ICU::VECTOR::TXI1);
-				ICU::IPR.RXI1 = level_;
-				ICU::IER.RXI1 = ena;
-				ICU::IPR.TXI1 = level_;
-				ICU::IER.TXI1 = ena;
 				break;
 			case 2:
 				set_vector_(ICU::VECTOR::RXI2, ICU::VECTOR::TXI2);
-				ICU::IPR.RXI2 = level_;
-				ICU::IER.RXI2 = ena;
-				ICU::IPR.TXI2 = level_;
-				ICU::IER.TXI2 = ena;
 				break;
 			case 3:
 				set_vector_(ICU::VECTOR::RXI3, ICU::VECTOR::TXI3);
-				ICU::IPR.RXI3 = level_;
-				ICU::IER.RXI3 = ena;
-				ICU::IPR.TXI3 = level_;
-				ICU::IER.TXI3 = ena;
 				break;
 			case 4:
 				set_vector_(ICU::VECTOR::RXI4, ICU::VECTOR::TXI4);
-				ICU::IPR.RXI4 = level_;
-				ICU::IER.RXI4 = ena;
-				ICU::IPR.TXI4 = level_;
-				ICU::IER.TXI4 = ena;
 				break;
 			case 5:
 				set_vector_(ICU::VECTOR::RXI5, ICU::VECTOR::TXI5);
-				ICU::IPR.RXI5 = level_;
-				ICU::IER.RXI5 = ena;
-				ICU::IPR.TXI5 = level_;
-				ICU::IER.TXI5 = ena;
 				break;
 			case 6:
 				set_vector_(ICU::VECTOR::RXI6, ICU::VECTOR::TXI6);
-				ICU::IPR.RXI6 = level_;
-				ICU::IER.RXI6 = ena;
-				ICU::IPR.TXI6 = level_;
-				ICU::IER.TXI6 = ena;
 				break;
 			case 7:
 				set_vector_(ICU::VECTOR::RXI7, ICU::VECTOR::TXI7);
-				ICU::IPR.RXI7 = level_;
-				ICU::IER.RXI7 = ena;
-				ICU::IPR.TXI7 = level_;
-				ICU::IER.TXI7 = ena;
 				break;
 			default:
 				return false;
 			}
+
+			icu_mgr::set_level(SCI::get_peripheral(), level_);
+
 			return true;
 		}
 
@@ -193,18 +137,7 @@ namespace device {
 
 			level_ = level;
 
-			auto chanel = SCI::get_chanel();
-			static const port_map::type map_tbls[] = {
-				port_map::type::SCI0,
-				port_map::type::SCI1,
-				port_map::type::SCI2,
-				port_map::type::SCI3,
-				port_map::type::SCI4,
-				port_map::type::SCI5,
-				port_map::type::SCI6,
-				port_map::type::SCI7
-			};
-			port_map::turn(map_tbls[chanel]);
+			port_map::turn(SCI::get_peripheral());
 
 			uint32_t brr = F_PCKB / baud / 16;
 			uint8_t cks = 0;
@@ -216,7 +149,9 @@ namespace device {
 			bool abcs = true;
 			if(brr > 256) { brr /= 2; abcs = false; }
 
-			if(!set_intr_(chanel)) {
+			power_cfg::turn(SCI::get_peripheral());
+
+			if(!set_intr_()) {
 				return false;
 			}
 
@@ -257,6 +192,8 @@ namespace device {
 				++cks;
 			}
 			if(cks > 3 || brr > 256) return false;
+
+			power_cfg::turn(SCI::get_peripheral());
 
 			uint32_t chanel = SCI::get_chanel();
 			if(!set_intr_(chanel)) {

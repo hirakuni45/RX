@@ -23,6 +23,8 @@ namespace device {
 
 		uint32_t	clock_;
 
+		uint8_t		level_;
+
 		void sleep_() const { asm("nop"); }
 
 		static TASK	task_;
@@ -48,13 +50,17 @@ namespace device {
 			}
 		}
 
+		void set_vector_(ICU::VECTOR vec) {
+			set_interrupt_task(cmt_task_, static_cast<uint32_t>(vec));
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		cmt_io() : clock_(0) { }
+		cmt_io() : clock_(0), level_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -74,7 +80,10 @@ namespace device {
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level) const {
+		bool start(uint32_t freq, uint8_t level) {
+
+			level_ = level;
+
 			if(freq == 0 || clock_ == 0) return false;
 
 			uint32_t cmcor = clock_ / freq / 8;
@@ -87,41 +96,29 @@ namespace device {
 				return false;
 			}
 
-			uint32_t chanel = CMT::get_chanel();
+			power_cfg::turn(CMT::get_peripheral());
+
+			auto chanel = CMT::get_chanel();
 			switch(chanel) {
 			case 0:
-				set_interrupt_task(cmt_task_, ICU::VECTOR::CMI0);
+				set_vector_(ICU::VECTOR::CMI0);
 				CMT::CMSTR0.STR0 = 0;
-				SYSTEM::MSTPCRA.MSTPA15 = 0;
-				ICU::IPR.CMI0 = level;
-				ICU::IER.CMI0 = true;
-				ICU::IR.CMI0 = 0;
 				break;
 			case 1:
-				set_interrupt_task(cmt_task_, ICU::VECTOR::CMI1);
+				set_vector_(ICU::VECTOR::CMI1);
 				CMT::CMSTR0.STR1 = 0;
-				SYSTEM::MSTPCRA.MSTPA15 = 0;
-				ICU::IPR.CMI1 = level;
-				ICU::IER.CMI1 = true;
-				ICU::IR.CMI1 = 0;
 				break;
 			case 2:
+//				set_vector_(ICU::VECTOR::CMI2);
 				CMT::CMSTR1.STR2 = 0;
-				SYSTEM::MSTPCRA.MSTPA14 = 0;
-///				set_interrupt_task(cmt_task_, ICU::VECTOR::CMI2);
-///				ICU::IPR.CMI2 = level;
-///				ICU::IER.CMI2 = true;
-///				ICU::IR.CMI2 = 0;
 				break;
 			case 3:
+//				set_vector_(ICU::VECTOR::CMI3);
 				CMT::CMSTR1.STR3 = 0;
-				SYSTEM::MSTPCRA.MSTPA14 = 0;
-///				set_interrupt_task(cmt_task_, ICU::VECTOR::CMI3);
-///				ICU::IPR.CMI3 = level;
-///				ICU::IER.CMI3 = true;
-///				ICU::IR.CMI3 = 0;
 				break;
 			}
+
+			icu_mgr::set_level(CMT::get_peripheral(), level_);
 
 		    CMT::CMCR = CMT::CMCR.CMIE.b() | CMT::CMCR.CKS.b(cks);
 		    CMT::CMCOR = cmcor - 1;
