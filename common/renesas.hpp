@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX チップ選択ヘッダー @n
+	@brief	ルネサス RX 選択 @n
 			Copyright 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
@@ -13,14 +13,18 @@
 #include "RX621/sci.hpp"
 #include "RX621/icu.hpp"
 #elif defined(SIG_RX62N)
+
 #elif defined(SIG_RX62G)
+
 #elif defined(SIG_RX63T)
 #include "RX600/cmt.hpp"
 #include "RX600/port.hpp"
 #include "RX63T/system.hpp"
 #include "RX63T/sci.hpp"
 #include "RX63T/icu.hpp"
+#include "RX64M/port_map.hpp"
 #elif defined(SIG_RX630)
+
 #elif defined(SIG_RX64M)
 #include "RX600/port.hpp"
 #include "RX600/cmt.hpp"
