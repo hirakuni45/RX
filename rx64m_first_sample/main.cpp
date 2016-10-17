@@ -48,11 +48,11 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	uint32_t wait = 10000000;
-	device::PORT0.PDR.B7 = 1; // output
+	device::PORT0::PDR.B7 = 1; // output
 	while(1) {
 		wait_delay_(wait);
-		device::PORT0.PODR.B7 = 0;
+		device::PORT0::PODR.B7 = 0;
 		wait_delay_(wait);
-		device::PORT0.PODR.B7 = 1;
+		device::PORT0::PODR.B7 = 1;
 	}
 }
