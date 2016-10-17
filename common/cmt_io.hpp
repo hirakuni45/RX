@@ -6,7 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "common/chip.hpp"
+#include "common/renesas.hpp"
 #include "common/vect.h"
 
 namespace device {

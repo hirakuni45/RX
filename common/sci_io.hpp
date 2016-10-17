@@ -6,7 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "common/chip.hpp"
+#include "common/renesas.hpp"
 #include "vect.h"
 
 /// F_PCKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
