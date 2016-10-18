@@ -5,6 +5,8 @@
 #=======================================================#
 TARGET		=	chager
 
+DEVICE		=	R5F563T6
+
 BUILD		=	release
 
 VPATH		=	../
@@ -15,8 +17,6 @@ CSOURCES	=	common/init.c \
 				common/vect.c
 
 PSOURCES	=	main.cpp \
-				common/cmt_io.cpp \
-				common/sci_io.cpp \
 				common/gpt_io.cpp \
 				common/ssd1306z_io.cpp \
 				common/monograph.cpp \
@@ -24,9 +24,9 @@ PSOURCES	=	main.cpp \
 
 USER_LIBS	=	stdc++
 
-LDSCRIPT	=	../RX63T/rx63t_64k_8k.ld
+LDSCRIPT	=	../RX63T/$(DEVICE).ld
 
-USER_DEFS	=	CHIP_RX63T F_PCKA=96000000 F_PCKB=48000000
+USER_DEFS	=	SIG_RX63T F_PCKA=96000000 F_PCKB=48000000
 
 MCU_TARGET	=
 
@@ -37,10 +37,11 @@ INC_SYS		=
 
 INC_APP		=	. ../
 
-OPTIMIZE	=	-Os -flto
+OPTIMIZE	=	-Os
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
+				-Wno-unused-function \
 				-fno-exceptions \
 				-fno-rtti
 

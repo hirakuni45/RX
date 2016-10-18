@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <cstring>
 #include "common/command.hpp"
-#include "main.hpp"
+#include "common/format.hpp"
 
 namespace utils {
 
@@ -53,9 +53,9 @@ namespace utils {
 			uint32_t n = 0;
 			for(uint32_t i = 0; i < len; ++i) {
 				if(n == 0) {
-					tformat("%08X:") % static_cast<unsigned int>(org);
+					format("%08X:") % static_cast<unsigned int>(org);
 				}
-				tformat(" %02X") % static_cast<unsigned int>(device::rd8_(org + i));
+				format(" %02X") % static_cast<unsigned int>(device::rd8_(org + i));
 				++n;
 				if(n >= 16) {
 					n = 0;
