@@ -10,6 +10,8 @@
 #include "common/fifo.hpp"
 #include "common/format.hpp"
 
+#include "RX64M/rtc.hpp"
+
 namespace {
 
 	void wait_delay_(uint32_t n)
@@ -36,11 +38,6 @@ extern "C" {
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
-	}
-
-	void sci_puts(const char *str)
-	{
-		sci_.puts(str);
 	}
 }
 

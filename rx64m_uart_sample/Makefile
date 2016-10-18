@@ -30,7 +30,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX64M
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-Os -flto
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
