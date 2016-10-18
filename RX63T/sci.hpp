@@ -1,12 +1,14 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX63x グループ・SCI 定義 @n
+	@brief	RX63T グループ・SCI 定義 @n
 			Copyright 2013 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
+#include "RX63T/peripheral.hpp"
+#include "RX63T/icu.hpp"
 
 namespace device {
 
@@ -14,9 +16,12 @@ namespace device {
 	/*!
 		@brief  SCIc, SCId 定義基底クラス
 		@param[in]	base	ベース・アドレス
+		@param[in]	t		ペリフェラル型
+		@param[in]	txv		送信ベクター
+		@param[in]	rxv		受信ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv>
 	struct sci_t {
 
 		//-----------------------------------------------------------------//
@@ -288,8 +293,6 @@ namespace device {
 		static esmer_t ESMER;
 
 
-
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  チャネルを返す
@@ -300,11 +303,39 @@ namespace device {
 			if(base == 0x0008b300) return 12; 
 			return (base >> 5) & 3;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ペリフェラル型を返す
+			@return ペリフェラル型
+		*/
+		//-----------------------------------------------------------------//
+		static peripheral get_peripheral() { return t; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_tx_vec() { return txv; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_rx_vec() { return rxv; }
 	};
 
-	typedef sci_t<0x0008a000> SCI0;
-	typedef sci_t<0x0008a020> SCI1;
-	typedef sci_t<0x0008a040> SCI2;
-	typedef sci_t<0x0008a060> SCI3;
-	typedef sci_t<0x0008b300> SCI12;
+	typedef sci_t<0x0008a000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0> SCI0;
+	typedef sci_t<0x0008a020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1> SCI1;
+	typedef sci_t<0x0008a040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2> SCI2;
+	typedef sci_t<0x0008a060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3> SCI3;
+
+//	typedef sci_t<0x0008b300> SCI12;
 }

@@ -8,6 +8,7 @@
 //=====================================================================//
 #include "RX600/port.hpp"
 #include "RX63T/mpc.hpp"
+#include "RX63T/peripheral.hpp"
 
 namespace device {
 
@@ -16,48 +17,36 @@ namespace device {
 		@brief  ポート・マッピング・ユーティリティー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct port_map {
+	class port_map {
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ペリフェラル種別
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class type {
-			SCI0,  //
-			SCI1,  // （PD5:RXD1:input, PD3:TXD1:output）
-			SCI2,  //
-			SCI3,  //
-		};
+		static void sci_(peripheral t) {
+			switch(t) {
+			case peripheral::SCI0:
+				break;
+			case peripheral::SCI1:
+				break;
+			case peripheral::SCI2:
+				break;
+			case peripheral::SCI3:
+				break;
+			default:
+				break;
+			}
+		}
 
-
+	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  周辺機器に切り替える
 			@param[in]	t	周辺機器タイプ
 		*/
 		//-----------------------------------------------------------------//
-		static void turn(type t)
+		static void turn(peripheral t)
 		{
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			switch(t) {
-			case type::SCI0:
-				break;
-			case type::SCI1:
-				PORTD::PDR.B3 = 1;	// TXD1
-				PORTD::PDR.B5 = 0;  // RXD1
-				MPC::PD3PFS.PSEL = 0b01010;
-				MPC::PD5PFS.PSEL = 0b01010;
-				PORTD::PMR.B3 = 1;
-				PORTD::PMR.B5 = 1;
-				break;
-			case type::SCI2:
-				break;
-			case type::SCI3:
-				break;
-			}
+			sci_(t);
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
@@ -69,24 +58,20 @@ namespace device {
 			@param[in]	t	周辺機器タイプ
 		*/
 		//-----------------------------------------------------------------//
-		static void reset(type t) {
+		static void reset(peripheral t) {
 			MPC::PWPR.B0WI = 0;				// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;			// PxxPFS 書き込み許可
 
 			switch(t) {
-			case type::SCI0:
+			case peripheral::SCI0:
 				break;
-			case type::SCI1:
-				PORTD::PDR.B3 = 0;	// TXD1
-				PORTD::PDR.B5 = 0;  // RXD1
-				MPC::PD3PFS.PSEL = 0b00000;
-				MPC::PD5PFS.PSEL = 0b00000;
-				PORTD::PMR.B3 = 0;
-				PORTD::PMR.B5 = 0;
+			case peripheral::SCI1:
 				break;
-			case type::SCI2:
+			case peripheral::SCI2:
 				break;
-			case type::SCI3:
+			case peripheral::SCI3:
+				break;
+			default:
 				break;
 			}
 
