@@ -54,6 +54,7 @@ namespace device {
 		{
 			if(send_.length()) {
 				SCI::TDR = send_.get();
+				if(send_.length() == 0) SCI::SCR.TIE = 0;
 			} else {
 				SCI::SCR.TIE = 0;
 			}
@@ -82,9 +83,10 @@ namespace device {
 		void send_restart_() {
 			if(!SCI::SCR.TIE() && send_.length() > 0) {
 				while(SCI::SSR.TEND() == 0) sleep_();
-				char ch = send_.get();
-				SCI::TDR = ch;
-				SCI::SCR.TIE = 1;
+				SCI::TDR = send_.get();
+				if(send_.length() > 0) {
+					SCI::SCR.TIE = 1;
+				}
 			}
 		}
 
@@ -246,7 +248,6 @@ namespace device {
 			if(level_) {
 				/// ７／８ を超えてた場合は、バッファが空になるまで待つ。
 				if(send_.length() >= (send_.size() * 7 / 8)) {
-					send_restart_();
 					while(send_.length() != 0) sleep_();
 				}
 				send_.put(ch);
