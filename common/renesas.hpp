@@ -22,7 +22,9 @@
 #include "RX63T/system.hpp"
 #include "RX63T/sci.hpp"
 #include "RX63T/icu.hpp"
-#include "RX64M/port_map.hpp"
+#include "RX63T/port_map.hpp"
+#include "RX63T/power_cfg.hpp"
+#include "RX63T/icu_mgr.hpp"
 #elif defined(SIG_RX630)
 
 #elif defined(SIG_RX64M)
