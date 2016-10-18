@@ -133,18 +133,18 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 ---
 ## RX 開発環境構築
 
- - RX 用コンパイラ（rx-elf-gcc,g++）は gcc-4.9.4 を使います。
- - binutils-2.25.1.tar.gz をダウンロードしておく
- - gcc-4.9.4.tar.gz をダウンロードしておく
- - newlib-2.2.0.tar.gz をダウンロードしておく
+ - RX 用コンパイラ（rx-elf-gcc,g++）は gcc-5.4.0 を使います。
+ - binutils-2.27.tar.gz をダウンロードしておく
+ - gcc-5.4.0.tar.gz をダウンロードしておく
+ - newlib-2.4.0.tar.gz をダウンロードしておく
    
 ---
    
-#### binutils-2.25.1 をビルド
+#### binutils-2.27 をビルド
 ```
    cd
-   tar xfvz binutils-2.25.1.tar.gz
-   cd binutils-2.25.1
+   tar xfvz binutils-2.27.tar.gz
+   cd binutils-2.27
    mkdir rx_build
    cd rx_build
    ../configure --target=rx-elf --prefix=/usr/local/rx-elf --disable-nls --with-system-zlib
@@ -169,8 +169,8 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 #### C コンパイラをビルド
 ``` sh
     cd
-    tar xfvz gcc-4.9.4.tar.gz
-    cd gcc-4.9.4
+    tar xfvz gcc-5.4.0.tar.gz
+    cd gcc-5.4.0
     mkdir rx_build
 	cd rx_build
     ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto --with-system-zlib
@@ -181,19 +181,34 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 #### newlib をビルド
 ``` sh
     cd
-    tar xfvz newlib-2.2.0.tar.gz
-	cd newlib-2.2.0
+    tar xfvz newlib-2.4.0.tar.gz
+	cd newlib-2.4.0
     mkdir rx_build
     cd rx_build
     ../configure --target=rx-elf --prefix=/usr/local/rx-elf
 	make
-    make install     OS-X,Linux: (sudo make install)
+    make install     OS-X: (sudo make install)
 ```
-  
+ - Linux 環境では、sudo コマンドで、ローカルで設定した binutils のパスを認識しないので、
+「make install」が失敗する、その為、以下のようなスクリプトを書いて実行する。
+```
+#!/bin/sh
+# file: rx_install.sh
+
+PATH=${PATH}:/usr/local/rx-elf/bin
+make install
+```
+   
+```
+    sudo rx_install.sh
+```
+   
+---
+     
 #### C++ コンパイラをビルド
 ``` sh
     cd
-    cd gcc-4.9.4
+    cd gcc-5.4.0
     cd rx_build
     ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c,c++ --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto --with-system-zlib
     make
@@ -230,7 +245,7 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
 ※中国製の格安なモジュールは、品質が安定していない為、お勧めしません、それらの事
 項を理解していて対処出来る人だけ利用すると良いと思います。
    
- - 接続方法は、各デバイスのハードウェアー・マニュアルに詳細があります。
+ - 接続方法、ブートモードの設定などは、各デバイスのハードウェアー・マニュアルに詳細があります。
    
 ## RX フラッシュプログラマーの構築
 
