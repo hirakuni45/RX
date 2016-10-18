@@ -23,7 +23,6 @@
 
 extern "C" {
 	void sci_putch(char ch);
-	void sci_puts(const char* str);
 };
 
 #if 0
@@ -80,10 +79,25 @@ namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  標準出力ファンクタ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct def_chaout {
+		void operator() (char ch) {
+			sci_putch(ch);
+		}
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  簡易 format クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class format {
+	template <class chaout>
+	class basic_format {
+
+		chaout	chaout_;
 
 		enum class mode : uint8_t {
 			CHA,		///< 文字
@@ -119,6 +133,11 @@ namespace utils {
 		mode		mode_;
 		bool		zerosupp_;
 		bool		sign_;
+
+		void str_(const char* str) {
+			char ch;
+			while((ch = *str++) != 0) chaout_(ch);
+		}
 
 		void reset_() {
 			num_ = 0;
@@ -212,7 +231,7 @@ namespace utils {
 						return;
 #endif
 					} else if(ch == '%') {
-						sci_putch(ch);
+						chaout_(ch);
 						md = apmd::none;
 					} else if(ch == '-') {  // 無視する
 
@@ -225,27 +244,27 @@ namespace utils {
 				} else if(ch == '%') {
 					md = apmd::num;
 				} else {
-					sci_putch(ch);
+					chaout_(ch);
 				}
 			}
 		}
 
 		void out_str_(const char* str, char sign, uint8_t n) {
 			if(zerosupp_) {
-				if(sign != 0) { sci_putch(sign); }
+				if(sign != 0) { chaout_(sign); }
 			}
 			if(n && n < num_) {
 				uint8_t spc = num_ - n;
 				while(spc) {
 					--spc;
-					if(zerosupp_) sci_putch('0');
-					else sci_putch(' ');
+					if(zerosupp_) chaout_('0');
+					else chaout_(' ');
 				}
 			}
 			if(!zerosupp_) {
-				if(sign != 0) { sci_putch(sign); }
+				if(sign != 0) { chaout_(sign); }
 			}
-			sci_puts(str);
+			str_(str);
 		}
 
 		void out_bin_(int32_t v) {
@@ -354,7 +373,7 @@ namespace utils {
 			}
 
 			if(point_ == 0) return;
-			sci_putch('.');
+			chaout_('.');
 
 			uint8_t l = 0;
 			if(fixpoi < (sizeof(VAL) * 8 - 4)) {
@@ -362,14 +381,14 @@ namespace utils {
 				while(dec > 0) {
 					dec *= 10;
 					VAL n = dec >> fixpoi;
-					sci_putch(n + '0');
+					chaout_(n + '0');
 					dec -= n << fixpoi;
 					++l;
 					if(l >= point_) break;
 				}
 			}
 			while(l < point_) {
-				sci_putch('0');
+				chaout_('0');
 				++l;
 			}
 		}
@@ -381,8 +400,8 @@ namespace utils {
 			bool sign = fpv >> 31;
 			int16_t exp = (fpv >> 23) & 0xff;
 			if(exp == 0xff) {
-				if(sign) sci_putch('-');
-				sci_puts("inf");
+				if(sign) chaout_('-');
+				chaout_("inf");
 				return;
 			}
 
@@ -421,7 +440,7 @@ namespace utils {
 			out_fixed_point_<uint64_t>(v64, shift, sign);
 
 			if(e) {
-				sci_putch(e);
+				chaout_(e);
 				zerosupp_ = true;
 				sign_ = true;
 				num_ = 3;
@@ -524,7 +543,7 @@ namespace utils {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		format(const char* form) : form_(form), num_(0), point_(0), bitlen_(0),
+		basic_format(const char* form) : form_(form), num_(0), point_(0), bitlen_(0),
 			mode_(mode::NONE), zerosupp_(false), sign_(false) {
 			next_();
 		}
@@ -537,9 +556,9 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		format& operator % (char val) {
+		basic_format& operator % (char val) {
 			if(mode_ == mode::CHA) {
-				sci_putch(val);
+				chaout_(val);
 			} else {
 #ifdef ERROR_MESSAGE
 				err_(error_case::DIFFERENT_TYPE);
@@ -558,7 +577,7 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		format& operator % (const char* val) {
+		basic_format& operator % (const char* val) {
 			if(mode_ == mode::STR) {
 				zerosupp_ = false;
 				uint8_t n = 0;
@@ -583,7 +602,7 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		format& operator % (int val) {
+		basic_format& operator % (int val) {
 			sign_int_(static_cast<int32_t>(val));
 			return *this;
 		}
@@ -596,7 +615,7 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		format& operator % (int16_t val) {
+		basic_format& operator % (int16_t val) {
 			sign_int_(static_cast<int32_t>(val));
 			return *this;
 		}
@@ -609,7 +628,7 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		format& operator % (int32_t val) {
+		basic_format& operator % (int32_t val) {
 			sign_int_(val);
 			return *this;
 		}
@@ -622,7 +641,7 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		format& operator % (unsigned int val) {
+		basic_format& operator % (unsigned int val) {
 			unsign_int_(static_cast<uint32_t>(val));
 			return *this;
 		}
@@ -635,7 +654,7 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		format& operator % (uint16_t val) {
+		basic_format& operator % (uint16_t val) {
 			unsign_int_(static_cast<uint32_t>(val));
 			return *this;
 		}
@@ -648,7 +667,7 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		format& operator % (uint32_t val) {
+		basic_format& operator % (uint32_t val) {
 			unsign_int_(static_cast<uint32_t>(val));
 			return *this;
 		}
@@ -662,7 +681,7 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		format& operator % (float val) {
+		basic_format& operator % (float val) {
 			if(num_ == 0 && !zerosupp_ && point_ == 0) {
 				num_ = 6;
 				point_ = 6;
@@ -700,7 +719,7 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		format& operator % (double val) {
+		basic_format& operator % (double val) {
 			if(num_ == 0 && !zerosupp_) num_ = 6;
 			if(mode_ == mode::REAL) {
 				out_real_(val, 0);
@@ -721,4 +740,6 @@ namespace utils {
 		}
 #endif
 	};
+
+	typedef basic_format<def_chaout> format;
 }
