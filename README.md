@@ -71,7 +71,7 @@ RX sources
 ```
 
 ---
-## RL78 開発環境準備（OS-X）
+## RX 開発環境準備（OS-X）
 
  - OS-X では、事前に macports をインストールしておきます。（brew は柔軟性が低いのでお勧めしません）
  -  OS−X のバージョンによっては、事前にX−Code、Command Line Tools などのインストールが必要になるかもしれません）
@@ -115,7 +115,7 @@ RX sources
 ```
 
 ---
-## RL78 開発環境準備（Ubuntu）
+## RX 開発環境準備（Ubuntu）
 
 Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境の場合を書いておきます。
 
