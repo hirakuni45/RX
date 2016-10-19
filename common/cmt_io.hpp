@@ -36,10 +36,10 @@ namespace device {
 			task_();
 			switch(CMT::get_chanel()) {
 			case 0:
-				ICU::IR.CMI0 = 0;
+//				ICU::IR.CMI0 = 0;
 				break;
 			case 1:
-				ICU::IR.CMI1 = 0;
+//				ICU::IR.CMI1 = 0;
 				break;
 			case 2:
 ///				ICU::IR.CMI2 = 0;
@@ -118,10 +118,13 @@ namespace device {
 				break;
 			}
 
-			icu_mgr::set_level(CMT::get_peripheral(), level_);
-
-		    CMT::CMCR = CMT::CMCR.CMIE.b() | CMT::CMCR.CKS.b(cks);
+			if(level_) {
+			    CMT::CMCR = CMT::CMCR.CMIE.b() | CMT::CMCR.CKS.b(cks);
+			} else {
+			    CMT::CMCR = CMT::CMCR.CKS.b(cks);
+			}
 		    CMT::CMCOR = cmcor - 1;
+			icu_mgr::set_level(CMT::get_peripheral(), level_);
 
 			switch(chanel) {
 			case 0:
@@ -137,6 +140,7 @@ namespace device {
 			    CMT::CMSTR1.STR3 = 1;
 				break;
 			}
+
 			return true;
 		}
 
