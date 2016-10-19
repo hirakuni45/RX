@@ -8,10 +8,10 @@
 	.type	_start,@function
 _start:
 
-# スタックの設定（SP：__stack、USP：__stack - 32）
+# スタックの設定（SP：__stack、USP：__stack - 256）
 	mov.l	#__stack, r0
 	mvtc	r0, isp
-	sub		#32,r0
+	sub		#256,r0
 	mvtc	r0, usp
 
 # 割り込みベクタの設定
