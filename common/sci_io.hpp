@@ -70,14 +70,9 @@ namespace device {
 			}
 		}
 
-		bool set_intr_() {
-			SCI::SCR = 0x00;			// TE, RE disable.
-
+		void set_intr_() {
 			set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
-
 			icu_mgr::set_level(SCI::get_peripheral(), level_);
-
-			return true;
 		}
 
 		void send_restart_() {
@@ -101,15 +96,21 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ボーレートを設定して、SCI を有効にする
+			@brief  ボーレートを設定して、SCI を有効にする @n
+					※RX63T では、ポーリングはサポート外
 			@param[in]	baud	ボーレート
 			@param[in]	level	割り込みレベル（０の場合ポーリング）
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
 		bool start(uint32_t baud, uint8_t level = 0) {
-
+#if SIG_RX63T
+			if(level == 0) return false;
+#endif
+			crlf_ = true;
 			level_ = level;
+
+			SCI::SCR = 0x00;			// TE, RE disable.
 
 			port_map::turn(SCI::get_peripheral());
 
@@ -125,9 +126,7 @@ namespace device {
 
 			power_cfg::turn(SCI::get_peripheral());
 
-			if(!set_intr_()) {
-				return false;
-			}
+			set_intr_();
 
 			// 8 bits, 1 stop bit, no-parrity
 			SCI::SMR = cks;
@@ -159,6 +158,8 @@ namespace device {
 			crlf_ = false;
 			level_ = level;
 
+			SCI::SCR = 0x00;			// TE, RE disable.
+
 			uint32_t brr = F_PCKB / bps / 4;
 			uint8_t cks = 0;
 			while(brr > 256) {
@@ -169,9 +170,7 @@ namespace device {
 
 			power_cfg::turn(SCI::get_peripheral());
 
-			if(!set_intr_()) {
-				return false;
-			}
+			set_intr_();
 
 			// LSB(0), MSB(1) first
 			SCI::SCMR.SDIR = 1;
