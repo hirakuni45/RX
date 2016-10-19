@@ -2,8 +2,6 @@ Renesas RX マイコン
 =========
 ![R5F564ML](RX64Mtray.jpg)
 
-RX sources 
-
 ## RX 各ディレクトリー、及び概要など
 
  これはルネサス RX マイコンと、そのコンパイラである rx-elf-gcc,g++ によるプログラムです。   
