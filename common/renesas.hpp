@@ -41,6 +41,7 @@
 #include "RX64M/mpc.hpp"
 #include "RX64M/icu.hpp"
 #include "RX64M/sci.hpp"
+#include "RX64M/riic.hpp"
 #include "RX64M/port_map.hpp"
 #include "RX64M/power_cfg.hpp"
 #include "RX64M/icu_mgr.hpp"
