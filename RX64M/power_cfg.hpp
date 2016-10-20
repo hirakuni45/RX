@@ -55,7 +55,7 @@ namespace device {
 				break;
 			case peripheral::CMT0:
 			case peripheral::CMT1:
-				SYSTEM::MSTPCRA.MSTPA15 = 0;
+				SYSTEM::MSTPCRA.MSTPA15 = f;
 				break;
 			default:
 				break;
