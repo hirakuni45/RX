@@ -16,6 +16,14 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class peripheral {
+		CMT0,
+		CMT1,
+		CMT2,
+		CMT3,
+
+		RIIC0,
+		RIIC2,
+
 		SCI0,  // (P20:TXD0, P21:RXD0)
 		SCI1,  // (PF0:TXD1, PF2:RXD1)
 		SCI2,  // (P13:TXD2, P12:RXD2)
@@ -26,11 +34,6 @@ namespace device {
 		SCI7,  // (P90:TXD7, P92:RXD7)
 
 		SCI12,  //
-
-		CMT0,
-		CMT1,
-		CMT2,
-		CMT3,
 	};
 
 }

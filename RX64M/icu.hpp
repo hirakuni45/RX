@@ -62,10 +62,10 @@ namespace device {
 			IDEI    = 50,  // SRC
 			ODFI    = 51,  // SRC
 
-//			RXI0    = 52,  // RIIC0
-//			TXI0    = 53,
-//			RXI2    = 54,  // RIIC2
-//			TXI2    = 55,
+			RIIC_RXI0    = 52,  // RIIC0
+			RIIC_TXI0    = 53,
+			RIIC_RXI2    = 54,  // RIIC2
+			RIIC_TXI2    = 55,
 
 			RXI0    = 58,  // SCI0
 			TXI0    = 59,
@@ -166,6 +166,11 @@ namespace device {
 			rw8_t<base + 28> CMI0;
 			rw8_t<base + 29> CMI1;
 
+			rw8_t<base + 52> RIIC_RXI0;
+			rw8_t<base + 53> RIIC_TXI0;
+			rw8_t<base + 64> RIIC_RXI2;
+			rw8_t<base + 65> RIIC_TXI2;
+
 			rw8_t<base + 58> RXI0;
 			rw8_t<base + 59> TXI0;
 			rw8_t<base + 60> RXI1;
@@ -224,6 +229,12 @@ namespace device {
 			bit_rw_t<ier03, bitpos::B4>	CMI0;
 			bit_rw_t<ier03, bitpos::B5>	CMI1;
 
+			typedef rw8_t<base + 0x06> ier06;
+			bit_rw_t<ier06, bitpos::B4>	RIIC_RXI0;
+			bit_rw_t<ier06, bitpos::B5>	RIIC_TXI0;
+			bit_rw_t<ier06, bitpos::B6>	RIIC_RXI2;
+			bit_rw_t<ier06, bitpos::B7>	RIIC_TXI2;
+
 			typedef rw8_t<base + 0x07> ier07;
 			bit_rw_t<ier07, bitpos::B2>	RXI0;
 			bit_rw_t<ier07, bitpos::B3>	TXI0;
@@ -281,6 +292,11 @@ namespace device {
 
 			rw8_t<base + 4> CMI0;
 			rw8_t<base + 5> CMI1;
+
+			rw8_t<base + 52> RIIC_RXI0;
+			rw8_t<base + 53> RIIC_TXI0;
+			rw8_t<base + 54> RIIC_RXI2;
+			rw8_t<base + 55> RIIC_TXI2;
 
 			rw8_t<base + 58> RXI0;
 			rw8_t<base + 59> TXI0;
