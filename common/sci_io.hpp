@@ -272,7 +272,7 @@ namespace device {
 				if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
 					SCI::SSR.ORER = 0;	///< 受信オーバランエラークリア
 				}
-#if defined(SIG_RX64M)
+#if defined(SIG_RX64M) || defined(SIG_RX24T)
 				auto n = SCI::SSR.RDRF();
 #else
 				uint32_t n = 0;

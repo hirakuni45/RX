@@ -7,27 +7,33 @@
 */
 //=====================================================================//
 #if defined(SIG_RX621)
-#include "RX600/cmt.hpp"
 #include "RX600/port.hpp"
+#include "RX600/cmt.hpp"
 #include "RX621/system.hpp"
 #include "RX621/sci.hpp"
 #include "RX621/icu.hpp"
-#elif defined(SIG_RX62N)
-
-#elif defined(SIG_RX62G)
-
-#elif defined(SIG_RX63T)
-#include "RX600/cmt.hpp"
+#elif defined(SIG_RX24T)
+#include "RX24T/peripheral.hpp"
 #include "RX600/port.hpp"
+#include "RX600/cmt.hpp"
+#include "RX24T/system.hpp"
+#include "RX24T/icu.hpp"
+#include "RX24T/sci.hpp"
+#include "RX24T/port_map.hpp"
+#include "RX24T/power_cfg.hpp"
+#include "RX24T/icu_mgr.hpp"
+#elif defined(SIG_RX63T)
+#include "RX63T/peripheral.hpp"
+#include "RX600/port.hpp"
+#include "RX600/cmt.hpp"
 #include "RX63T/system.hpp"
 #include "RX63T/sci.hpp"
 #include "RX63T/icu.hpp"
 #include "RX63T/port_map.hpp"
 #include "RX63T/power_cfg.hpp"
 #include "RX63T/icu_mgr.hpp"
-#elif defined(SIG_RX630)
-
 #elif defined(SIG_RX64M)
+#include "RX64M/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/cmt.hpp"
 #include "RX64M/system.hpp"
