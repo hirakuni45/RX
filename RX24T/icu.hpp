@@ -70,6 +70,10 @@ namespace device {
 			TXI6   = 228,  // SCI6
 			TEI6   = 229,  // SCI6
 
+			EEI0   = 246,  // RIIC0
+			RXI0   = 247,  // RIIC0
+			TXI0   = 248,  // RIIC0
+			TEI0   = 249,  // RIIC0
 		};
 
 
@@ -85,10 +89,10 @@ namespace device {
 			rw8_t<base + 30> CMI2;
 			rw8_t<base + 31> CMI3;
 
-			rw8_t<base + 218> ERI0;
-			rw8_t<base + 219> RXI0;
-			rw8_t<base + 220> TXI0;
-			rw8_t<base + 221> TEI0;
+			rw8_t<base + 218> ERI1;
+			rw8_t<base + 219> RXI1;
+			rw8_t<base + 220> TXI1;
+			rw8_t<base + 221> TEI1;
 
 			rw8_t<base + 222> ERI5;
 			rw8_t<base + 223> RXI5;
@@ -99,6 +103,11 @@ namespace device {
 			rw8_t<base + 227> RXI6;
 			rw8_t<base + 228> TXI6;
 			rw8_t<base + 229> TEI6;
+
+			rw8_t<base + 246> ERI0;
+			rw8_t<base + 247> RXI0;
+			rw8_t<base + 248> TXI0;
+			rw8_t<base + 249> TEI0;
 		};
 		static ir_t<0x00087010> IR;
 
@@ -146,6 +155,12 @@ namespace device {
 			bit_rw_t<ier1c, bitpos::B4>	TXI6;
 			bit_rw_t<ier1c, bitpos::B5>	TEI6;
 
+			typedef rw8_t<base + 0x1E> ier1e;
+			bit_rw_t<ier1e, bitpos::B6>	ERI0;
+			bit_rw_t<ier1e, bitpos::B7>	RXI0;
+			typedef rw8_t<base + 0x1F> ier1f;
+			bit_rw_t<ier1f, bitpos::B0>	TXI0;
+			bit_rw_t<ier1f, bitpos::B1>	TEI0;
 		};
 		static ier_t<0x00087200> IER;
 
@@ -167,6 +182,11 @@ namespace device {
 			rw8_t<base + 218> SCI1;
 			rw8_t<base + 222> SCI5;
 			rw8_t<base + 226> SCI6;
+
+			rw8_t<base + 246> EEI0;
+			rw8_t<base + 247> RXI0;
+			rw8_t<base + 248> TXI0;
+			rw8_t<base + 249> TEI0;
 		};
 		static ipr_t<0x00087300> IPR;
 
