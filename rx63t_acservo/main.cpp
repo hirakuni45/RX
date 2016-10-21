@@ -6,132 +6,120 @@
 //=====================================================================//
 #include <cstdint>
 #include <cmath>
-#include "main.hpp"
-#include "rx/rx63x/system.hpp"
-#include "rx/rx63x/port.hpp"
-#include "rx/rx63x/mpc.hpp"
-#include "rx/cmt_io.hpp"
-#include "rx/sci_io.hpp"
-#include "rx/gpt_io.hpp"
-#include "rx/adc_io.hpp"
-#include "rx/chout.hpp"
+#include "common/cmt_io.hpp"
+#include "common/sci_io.hpp"
+#include "common/gpt_io.hpp"
+#include "common/adc_io.hpp"
+#include "common/fifo.hpp"
+#include "common/command.hpp"
 #include "inv_monitor.hpp"
 
-
-namespace root {
+namespace {
 	device::cmt_io<device::CMT0>  cmt_;
-	device::sci_io<device::SCI1, 256, 256>  sci_;
+
+	typedef utils::fifo<uint8_t, 128> buffer;
+	device::sci_io<device::SCI1, buffer, buffer>  sci_;
+
 	device::gpt_io<device::GPT0>  gpt_;
 	device::adc_io<device::S12AD> adc_;
-	utils::chout chout_;
+
 	utils::inv_monitor monitor_;
-}
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	10ms 単位タイマー
+	 */
+	//-----------------------------------------------------------------//
+	void delay_10ms_(uint32_t n)
+	{
+		while(n > 0) {
+			root::cmt_.sync();
+			--n;
+		}
+	}
 
 
-//-----------------------------------------------------------------//
-/*!
-	@brief	SCI 文字出力
-	@param[in]	ch	文字コード
- */
-//-----------------------------------------------------------------//
-void sci_putch(char ch)
-{
-	root::sci_.putch(ch);
-}
+	void prn_voltage_(const char* info, int32_t v)
+	{
+		int32_t vv = v * 15 * 100 / 4096;
+		int32_t mod = vv % 100;
+		if(mod < 0) mod = -mod;
+//		root::chout_.suppress_char(' ');
+//		root::chout_.set_length(0);
+//		root::chout_ << info << (vv / 100) << '.';
+//		root::chout_.suppress_char('0');
+//		root::chout_.set_length(2);
+//		root::chout_ << mod << utils::chout::endl;
+	}
 
-
-//-----------------------------------------------------------------//
-/*!
-	@brief	SCI 文字列出力
-	@param[in]	str	文字列
- */
-//-----------------------------------------------------------------//
-void sci_puts(const char *str)
-{
-	root::sci_.puts(str);
-}
-
-
-//-----------------------------------------------------------------//
-/*!
-	@brief	SCI 文字入力
-	@return 文字コード
- */
-//-----------------------------------------------------------------//
-char sci_getch(void)
-{
-	return root::sci_.getch();
-}
-
-
-//-----------------------------------------------------------------//
-/*!
-	@brief	SCI 文字入力数を取得
-	@return 入力文字数
- */
-//-----------------------------------------------------------------//
-uint32_t sci_length(void)
-{
-	return root::sci_.length();
-}
-
-
-//-----------------------------------------------------------------//
-/*!
-	@brief	10ms 単位タイマー
- */
-//-----------------------------------------------------------------//
-void delay_10ms(uint32_t n)
-{
-	while(n > 0) {
-		root::cmt_.sync();
-		--n;
+	void prn_value_(const char* info, int32_t v)
+	{
+//		root::chout_.suppress_char(' ');
+//		root::chout_.set_length(0);
+//		root::chout_ << info << v << utils::chout::endl;
 	}
 }
 
+extern "C" {
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	SCI 文字出力
+		@param[in]	ch	文字コード
+	 */
+	//-----------------------------------------------------------------//
+	void sci_putch(char ch)
+	{
+		sci_.putch(ch);
+	}
 
-void prn_voltage_(const char* info, int32_t v)
-{
-	int32_t vv = v * 15 * 100 / 4096;
-	int32_t mod = vv % 100;
-	if(mod < 0) mod = -mod;
-	root::chout_.suppress_char(' ');
-	root::chout_.set_length(0);
-	root::chout_ << info << (vv / 100) << '.';
-	root::chout_.suppress_char('0');
-	root::chout_.set_length(2);
-	root::chout_ << mod << utils::chout::endl;
-}
 
-void prn_value_(const char* info, int32_t v)
-{
-	root::chout_.suppress_char(' ');
-	root::chout_.set_length(0);
-	root::chout_ << info << v << utils::chout::endl;
-}
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	SCI 文字列出力
+		@param[in]	str	文字列
+	 */
+	//-----------------------------------------------------------------//
+	void sci_puts(const char *str)
+	{
+		sci_.puts(str);
+	}
 
-static volatile uint8_t dummy_;
 
-static void wait_()
-{
-	// とりあえず無駄ループ
-	for(uint32_t i = 0; i < 5000; ++i) {
-		i += dummy_ & 0;
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	SCI 文字入力
+		@return 文字コード
+	 */
+	//-----------------------------------------------------------------//
+	char sci_getch(void)
+	{
+		return sci_.getch();
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	SCI 文字入力数を取得
+		@return 入力文字数
+	 */
+	//-----------------------------------------------------------------//
+	uint32_t sci_length(void)
+	{
+		return sci_.length();
 	}
 }
+
 int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	using namespace root;
-
 	device::SYSTEM::PRCR = 0xa503;	// クロック、低消費電力、関係書き込み許可
 
 	device::SYSTEM::MOSCWTCR.MSTS = 0b01101;	// 131072 サイクル待ち
 	device::SYSTEM::MOSCCR.MOSTP = 0;			// メインクロック発振器動作
-	dummy_ = device::SYSTEM::MOSCCR.MOSTP();
+	volatile auto a = device::SYSTEM::MOSCCR.MOSTP();
 	device::SYSTEM::MOFCR.MOFXIN = 1;			// メインクロック強制発振
-	dummy_ = device::SYSTEM::MOFCR.MOFXIN();
+	volatile auto b = device::SYSTEM::MOFCR.MOFXIN();
 	wait_();
 
 	device::SYSTEM::PLLCR.STC = 0xf;			// PLL 16 倍(192MHz)
@@ -152,15 +140,6 @@ int main(int argc, char** argv)
 	device::PORTB::PDR.B7 = 1; // PORTB:B7 output
 	device::PORTB::PODR.B7 = 1; // LED Off
 
-	// SCI1 の初期化（PD5:RXD1:input, PD3:TXD1:output）
-	device::PORTD::PDR.B3 = 1;
-	device::MPC::PWPR.B0WI = 0;				// PWPR 書き込み許可
-	device::MPC::PWPR.PFSWE = 1;			// PxxPFS 書き込み許可
-	device::MPC::PD3PFS.PSEL = 0b01010;		// TXD1 設定
-	device::MPC::PD5PFS.PSEL = 0b01010;		// RXD1 設定
-	device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
-	device::PORTD::PMR.B3 = 1;
-	device::PORTD::PMR.B5 = 1;
 	static const uint8_t sci_irq_level = 1;
 	sci_.initialize(sci_irq_level);
 	sci_.start(115200);

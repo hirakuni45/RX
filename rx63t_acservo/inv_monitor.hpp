@@ -6,7 +6,7 @@
 */
 //=====================================================================//
 #include <cstdint>
-#include "command.hpp"
+#include "common/command.hpp"
 
 namespace utils {
 
