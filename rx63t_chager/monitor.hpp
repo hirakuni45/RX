@@ -96,7 +96,7 @@ namespace utils {
 				return;
 			}
 
-			auto num = command_.get_word_num();
+			auto num = command_.get_words();
 			if(num > 0) {
 				char word[16];
 				uint32_t value[2] = { 0, 0 };
