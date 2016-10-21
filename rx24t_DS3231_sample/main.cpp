@@ -105,7 +105,7 @@ int main(int argc, char** argv)
 	{
 		uint8_t intr_level = 0;
 		if(!i2c_.start(I2C::speed::fast, intr_level)) {
-//		if(!iica0_.start(IICA::speed::standard, intr_level)) {
+//		if(!i2c_.start(I2C::speed::standard, intr_level)) {
 			utils::format("IICA start error (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
 		}
 	}
