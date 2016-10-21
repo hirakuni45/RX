@@ -5,4 +5,9 @@
 *.elf
 *.mot
 *.exe
+*.bak
+*.dcm
+*.bck
+*.lib
+*.kicad_pcb-bak
 release/
