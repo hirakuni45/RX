@@ -11,15 +11,9 @@
 #include "common/format.hpp"
 #include "common/iica_io.hpp"
 
-namespace {
+#include "chip/DS3231.hpp"
 
-	void wait_delay_(uint32_t n)
-	{
-		// とりあえず無駄ループ
-		for(uint32_t i = 0; i < n; ++i) {
-			asm("nop");
-		}
-	}
+namespace {
 
 	class cmt_task {
 	public:
@@ -32,7 +26,33 @@ namespace {
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
-	device::iica_io<device::RIIC0> i2c_;
+	typedef device::iica_io<device::RIIC0> I2C;
+	I2C i2c_;
+
+	chip::DS3231<I2C> rtc_(i2c_);
+
+
+	time_t get_time_()
+	{
+		time_t t = 0;
+		if(!rtc_.get_time(t)) {
+			utils::format("Stall RTC read (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
+		}
+		return t;
+	}
+
+	void disp_time_(time_t t)
+	{
+		struct tm *m = localtime(&t);
+		utils::format("%s %s %d %02d:%02d:%02d  %4d\n")
+			% get_wday(m->tm_wday)
+			% get_mon(m->tm_mon)
+			% static_cast<uint32_t>(m->tm_mday)
+			% static_cast<uint32_t>(m->tm_hour)
+			% static_cast<uint32_t>(m->tm_min)
+			% static_cast<uint32_t>(m->tm_sec)
+			% static_cast<uint32_t>(m->tm_year + 1900);
+	}
 }
 
 extern "C" {
@@ -81,6 +101,15 @@ int main(int argc, char** argv)
 	static const uint8_t sci_level = 2;
 	sci_.start(115200, sci_level);
 
+	// IICA(I2C) の開始
+	{
+		uint8_t intr_level = 0;
+		if(!i2c_.start(I2C::speed::fast, intr_level)) {
+//		if(!iica0_.start(IICA::speed::standard, intr_level)) {
+			utils::format("IICA start error (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
+		}
+	}
+
 	utils::format("RX24T start\n");
 
 	device::PORT0::PDR.B0 = 1; // output
@@ -102,7 +131,11 @@ int main(int argc, char** argv)
 		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
 
 		if((n % 60) == 0) {
-			utils::format("%d\n") % (n / 60);
+			time_t t = get_time_();
+			if(t != 0) {
+				disp_time_(t);
+			}
+//			utils::format("%d\n") % (n / 60);
 		}
 		++n;
 	}
