@@ -30,7 +30,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		static void micro_second(uint32_t us) {
 			while(us > 0) {
-#if defined(SIG_RX64M)
+#if defined(SIG_RX64M) || defined(SIG_RX63T)
 				for(uint32_t n = 0; n < (F_PCKA / 4285714); ++n) {
 					asm("nop");
 				}

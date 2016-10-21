@@ -12,17 +12,6 @@
 #include "common/delay.hpp"
 #include "common/ssd1306z_io.hpp"
 
-extern "C" {
-	void sci_putch(char);
-}
-
-struct chout {
-	void operator() (char ch) {
-		sci_putch(ch);
-	}
-};
-// typedef utils::format<chout>	format;
-
 namespace device {
 
 	static void put_(uint8_t ch)
@@ -35,9 +24,9 @@ namespace device {
 			}
 			ch <<= 1;
 			device::PORT2::PODR.B3 = 0;	// clk
-			utils::wait_delay(0);
+			asm("nop");
 			device::PORT2::PODR.B3 = 1;	// clk
-			utils::wait_delay(0);
+			asm("nop");
 		}
 	}
 
@@ -126,7 +115,7 @@ namespace device {
 		device::PORT2::PODR.B3 = 1;	// シリアル・クロック
 
 		select_(1);
-		utils::wait_delay(500);
+		utils::delay::micro_second(500);
 
 		cmd_data_(0);
 		select_(0);
@@ -158,7 +147,7 @@ namespace device {
 		put_(0xA6);	// Set Normal Display
 		put_(0xAF);	// Set Display On
 		select_(1);
-		utils::wait_delay(100);	// 重要！
+		utils::delay::micro_second(100);  // 重要！
 
 #if 0
 		device::MPC::PWPR.B0WI = 0;				// PWPR 書き込み許可
@@ -185,20 +174,20 @@ namespace device {
 	void ssd1306z_io::copy(const uint8_t* buff)
 	{
 		cmd_data_(0);
-		utils::wait_delay(1);
+		utils::delay::micro_second(1);
 		select_(0);
-		utils::wait_delay(1);
+		utils::delay::micro_second(1);
 		for(uint8_t j = 0; j < 8; ++j) {
 			put_(0xb0 + j);		// set page address 0 to 7
 			put_(0x00);			// lower collum start address
 			put_(0x10);			// higher collum start address
-			utils::wait_delay(1);
+			utils::delay::micro_second(1);
 			cmd_data_(1);
-			utils::wait_delay(1);
+			utils::delay::micro_second(1);
 			for(uint16_t i = 0; i < 128; ++i) {
 				put_(*buff++);
 			}
-			utils::wait_delay(1);
+			utils::delay::micro_second(1);
 			cmd_data_(0);
 		}
 		select_(1);
