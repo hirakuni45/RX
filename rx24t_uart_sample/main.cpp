@@ -81,6 +81,7 @@ int main(int argc, char** argv)
 	utils::format("RX24T start\n");
 
 	device::PORT0::PDR.B0 = 1; // output
+
 	uint32_t cnt = 0;
 	uint32_t n = 0;
 	while(1) {
