@@ -19,21 +19,32 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map {
 
-		static void sci_(peripheral t) {
+		static void sub_(peripheral t) {
 			switch(t) {
+			case peripheral::RIIC0:
+				MPC::PB1PFS.PSEL = 0b01111;  // SCL0
+				MPC::PB2PFS.PSEL = 0b01111;  // SDA0
+				PORTB::PMR.B1 = 1;
+				PORTB::PMR.B2 = 1;
+				break;
+
 			case peripheral::SCI1:
-				PORTD::PDR.B3 = 1;  // TXD0
-				PORTD::PDR.B5 = 0;  // RXD0
+				PORTD::PDR.B3 = 1;  // TXD1
+				PORTD::PDR.B5 = 0;  // RXD1
 				MPC::PD3PFS.PSEL = 0b01010;
 				MPC::PD5PFS.PSEL = 0b01010;
 				PORTD::PMR.B3 = 1;
 				PORTD::PMR.B5 = 1;
 				break;
 			case peripheral::SCI5:
-
+				PORTB::PDR.B5 = 1;  // TXD5
+				PORTB::PDR.B6 = 0;  // RXD5
+				MPC::PB5PFS.PSEL = 0b01010;
+				MPC::PB6PFS.PSEL = 0b01010;
+				PORTB::PMR.B5 = 1;
+				PORTB::PMR.B6 = 1;
 				break;
 			case peripheral::SCI6:
-
 				break;
 			default:
 				break;
@@ -52,7 +63,7 @@ namespace device {
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			sci_(t);
+			sub_(t);
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}

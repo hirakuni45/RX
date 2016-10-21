@@ -21,10 +21,10 @@ namespace device {
 		CMT2,
 		CMT3,
 
+		RIIC0,
+
 		SCI1,
 		SCI5,
 		SCI6,
-
-		RIIC0,
 	};
 }
