@@ -84,18 +84,33 @@ namespace device {
 
 			power_cfg::turn(IICA::get_peripheral());
 
-			IICA::ICCR1.ICE = 0;		// ICE(B7)=0 I2C 停止
-			IICA::ICCR1.IICRST = 1;	// IICRST(B6)=1 RESET assert
-			IICA::ICCR1.IICRST = 0;	// IICRST(B6)=0 RESET negate
+			IICA::ICCR1.ICE = 0;
+			IICA::ICCR1.IICRST = 1;
+			IICA::ICCR1.IICRST = 0;
 
 			IICA::ICSER &=
 				~(IICA::ICSER.SAR0E.b() | IICA::ICSER.SAR1E.b() | IICA::ICSER.SAR2E.b());
 
-			// ビットレート設定(400kbps)
-			// CKS = 010b
-			IICA::ICMR1 = 0x28;
-			IICA::ICBRH = 0xe0 | 7;
-			IICA::ICBRL = 0xe0 | 16;
+			switch(spd_type) {
+			case speed::standard:	///< 100K b.p.s. (Standard mode)
+				IICA::ICMR1 = IICA::ICMR1.CKS.b(0b011) | IICA::ICMR1.BCWP.b();
+				IICA::ICBRH = 0b11100000 | 19;
+				IICA::ICBRL = 0b11100000 | 23;
+				break;
+			case speed::fast:		///< (50 clock) 400K b.p.s. (Fast mode)
+				IICA::ICMR1 = IICA::ICMR1.CKS.b(0b001) | IICA::ICMR1.BCWP.b();
+				IICA::ICBRH = 0b11100000 | 11;
+				IICA::ICBRL = 0b11100000 | 25;
+				break;
+			case speed::fast_plus:	///< (40 clock) 1M b.p.s. (Fast plus mode)
+				IICA::ICMR1 = IICA::ICMR1.CKS.b(0b000) | IICA::ICMR1.BCWP.b();
+				IICA::ICBRH = 0b11100000 | 10;
+				IICA::ICBRL = 0b11100000 | 21;
+				break;
+			default:
+				error_ = error::start;
+				return false;
+			}
 
 			IICA::ICCR1.ICE = 1;
 
@@ -123,20 +138,20 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool send(uint8_t adr, const uint8_t* src, uint8_t len)
 		{
-			while((IICA::ICCR2() & 0x80) != 0) ;	// ICCR2.BBSY(B7) == 0?
+			while(IICA::ICCR2.BBSY() != 0) ;
 
-			IICA::ICCR2 |= 0x02;	// ICCR2.ST(B1) ST = 1
+			IICA::ICCR2.ST = 1;
 
 			bool ret = true;
 			char slave = 1;
 			while(len > 0) {
 
-				if((IICA::ICSR2() & 0x10) != 0) {	// ICSR2.NACKF(B4) == 0?
+				if(IICA::ICSR2.NACKF() != 0) {
 					ret = false;
 					break;
 				}
 
-				while((IICA::ICSR2() & 0x80) == 0) ;	// ICSR2.TDRE(B7)
+				while(IICA::ICSR2.TDRE() == 0) ;
 
 				if(slave) {
 					IICA::ICDRT = (adr << 1);
@@ -147,17 +162,15 @@ namespace device {
 				}
 			}
 
-//	printf("TEND Wait...\n");
-			while((IICA::ICSR2() & 0x40) == 0) ;	// ICSR2.TEND(B6) == 1?
+			while(IICA::ICSR2.TEND() == 0) ;
 
-			IICA::ICSR2 &= ~0x08;	// ICSR2.STOP(B3) = 0
-			IICA::ICCR2 |=  0x08;	// ICCR2.SP(B3) = 1
+			IICA::ICSR2.STOP = 0;
+			IICA::ICCR2.SP = 1;
 
-//	printf("STOP Wait...\n");
-			while((IICA::ICSR2() & 0x08) == 0) ;	// ICSR2.STOP(B3) == 1?
+			while(IICA::ICSR2.STOP() == 0) ;
 
-			IICA::ICSR2 &= ~0x10;	// ICSR2.NACKF(B4) = 0
-			IICA::ICSR2 &= ~0x08;	// ICSR2.STOP(B3) = 0
+			IICA::ICSR2.NACKF = 0;
+			IICA::ICSR2.STOP = 0;
 
 			return ret;
 		}
@@ -174,78 +187,75 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool recv(uint8_t adr, uint8_t* dst, uint8_t len)
 		{
-			while((IICA::ICCR2() & 0x80) != 0) ;	// BBSY(B7) == 0?
+			while(IICA::ICCR2.BBSY() != 0) ;
 
-			IICA::ICCR2 |= 0x02;				// ICCR2.ST(B1) = 1
-			while((IICA::ICSR2() & 0x80) == 0) ;	// ICSR2.TDRE(B7) == 1?
+			IICA::ICCR2.ST = 1;
+
+			while(IICA::ICSR2.TDRE() == 0) ;
 
 			IICA::ICDRT = (adr << 1) | 0x01;	// Slave Address
 
-			while((IICA::ICSR2() & 0x20) == 0) ;	// ICSR2.RDRF(B5) == 1?
+			while(IICA::ICSR2.RDRF() == 0) ;
 
 			bool ret = true;
 			int8_t da;
-			if((IICA::ICSR2() & 0x10) == 0) {	// ICSR2.NACKF(B4)
+			if(IICA::ICSR2.NACKF() == 0) {
 
 				da = IICA::ICDRR();	///< dummy read
 
 				for( ; ; ) {
 
-					while((IICA::ICSR2() & 0x20) == 0) ;	// ICSR2.RDRF(B5) == 1?
+					while(IICA::ICSR2.RDRF() == 0) ;
 
 					if(len <= 1) {
 						break;
 					}
 
 					if(len <= 2) {
-						IICA::ICMR3 |= 0x40;	// WAIT(B6) = 1
+						IICA::ICMR3.WAIT = 1;
 					}
 
 					da = IICA::ICDRR();
 					*dst++ = da;
-//			printf("(%d) Read Data: %02X\n", len, da);
 					--len;
 				}
 
 				// NACK を返す必要がある場合
-				if((IICA::ICMR3() & 0x20) == 0) {	// ICMR3.RDRFS == 0?
-					IICA::ICMR3 |=  0x10;	// ICMR3.ACKWP(B4) = 0;
-					IICA::ICMR3 |=  0x08;	// ICMR3.ACKBT(B3) = 1
-					IICA::ICMR3 &= ~0x10;	// ICMR3.ACKWP(B4) = 1;
+				if(IICA::ICMR3.RDRFS() == 0) {
+					IICA::ICMR3.ACKWP = 1;
+					IICA::ICMR3.ACKBT = 1;
+					IICA::ICMR3.ACKWP = 0;
 				}
 
 				da = IICA::ICDRR();			// read data
 				if(len) {
 					*dst++ = da;
-//			printf("(%d) Read Data: %02X\n", len, da);
 					--len;
 				}
 
-				while((IICA::ICSR2() & 0x20) == 0) ;	/// ICSR2.RDRF(B5) = 1?
+				while(IICA::ICSR2.RDRF() == 0) ;
 
-				IICA::ICSR2 &= ~0x08;	// ICSR2.STOP(B3) = 0
-				IICA::ICCR2 |=  0x08;	// ICCR2.SP(B3) = 1
+				IICA::ICSR2.STOP = 0;
+				IICA::ICCR2.SP = 1;
 
 				da = IICA::ICDRR();			// read data
 				if(len) {
 					*dst = da;
-//			printf("(%d) Read Data: %02X\n", len, da);
 				}
-				IICA::ICMR3 &= ~0x40;	// WAIT(B6) = 0
+				IICA::ICMR3.WAIT = 0;
 
 			} else {
-				IICA::ICSR2 &= ~0x08;	// ICSR2.STOP(B3) = 0
-				IICA::ICCR2 |=  0x08;	// ICCR2.SP(B3) = 1
+				IICA::ICSR2.STOP = 0;
+				IICA::ICCR2.SP = 1;
 				da = IICA::ICDRR();			///< dummy read
 				ret = false;
 			}
 
-//	printf("STOP Wait...\n");
-			while((IICA::ICSR2() & 0x08) == 0) {	// ICSR2.STOP(B3) == 1?
+			while(IICA::ICSR2.STOP() == 0) {	// ICSR2.STOP(B3) == 1?
 			}
 
-			IICA::ICSR2 &= ~0x10;	// ICSR2.NACKF(B4) = 0
-			IICA::ICSR2 &= ~0x08;	// ICSR2.STOP(B3) = 0
+			IICA::ICSR2.NACKF = 0;
+			IICA::ICSR2.STOP = 0;
 
 			return ret;
 		}
