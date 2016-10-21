@@ -11,6 +11,7 @@
 #include "common/format.hpp"
 
 #include "RX64M/rtc.hpp"
+#include "common/delay.hpp"
 
 namespace {
 
@@ -70,7 +71,7 @@ int main(int argc, char** argv)
 
 	// タイマー設定（６０Ｈｚ）
 	cmt_.set_clock(F_PCKB);
-	uint8_t cmt_irq_level = 3;
+	uint8_t cmt_irq_level = 4;
 	cmt_.start(60, cmt_irq_level);
 
 	// SCI 設定
@@ -79,9 +80,11 @@ int main(int argc, char** argv)
 
 	utils::format("RX64M start\n");
 
+	device::PORT0::PDR.B5 = 1;
+	device::PORT0::PDR.B7 = 1;
+
 	uint32_t cnt = 0;
 	uint32_t n = 0;
-	device::PORT0::PDR.B7 = 1; // output
 	while(1) {
 		cmt_.sync();
 
@@ -95,6 +98,11 @@ int main(int argc, char** argv)
 			cnt = 0;
 		}
 		device::PORT0::PODR.B7 = (cnt < 10) ? 0 : 1;
+
+		utils::delay::micro_second(1);
+		device::PORT0::PODR.B5 = 0;
+		utils::delay::micro_second(1);
+		device::PORT0::PODR.B5 = 1;
 
 		if((n % 60) == 0) {
 			utils::format("%d\n") % (n / 60);
