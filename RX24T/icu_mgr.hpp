@@ -40,8 +40,10 @@ namespace device {
 
 			case peripheral::RSPI0:
 				ICU::IPR.RSPI0 = lvl;
+//				ICU::IER.SPEI0 = ena;
 				ICU::IER.SPRI0 = ena;
 				ICU::IER.SPTI0 = ena;
+//				ICU::IER.SPII0 = ena;
 				break;
 
 			case peripheral::SCI1:

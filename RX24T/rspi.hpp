@@ -14,11 +14,11 @@ namespace device {
 	/*!
 		@brief  RSPI 定義基底クラス
 		@param[in]	t		ペリフェラル型
-		@param[in]	txv		送信ベクター
 		@param[in]	rxv		受信ベクター
+		@param[in]	txv		送信ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv>
+	template <uint32_t base, peripheral t, ICU::VECTOR rxv, ICU::VECTOR txv>
 	struct rspi_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -323,21 +323,21 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  送信割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_tx_vec() { return txv; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  受信割り込みベクターを返す
 			@return ベクター型
 		*/
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR get_rx_vec() { return rxv; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_tx_vec() { return txv; }
 	};
 
-	typedef rspi_t<0x00088380, peripheral::RSPI0, ICU::VECTOR::SPTI0, ICU::VECTOR::SPRI0>	RSPI0;
+	typedef rspi_t<0x00088380, peripheral::RSPI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>	RSPI0;
 }

@@ -17,11 +17,13 @@ namespace device {
 		@brief  I2C 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	t		ペリフェラル型
-		@param[in]	txv		送信ベクター
-		@param[in]	rxv		受信ベクター
+		@param[in]	eei		イベント割り込みベクター
+		@param[in]	rxi		受信割り込みベクター
+		@param[in]	txi		送信割り込みベクター
+		@param[in]	tei		完了割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv>
+	template <uint32_t base, peripheral t, ICU::VECTOR eei, ICU::VECTOR rxi, ICU::VECTOR txi, ICU::VECTOR tei>
 	struct i2c_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -375,11 +377,11 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  送信割り込みベクターを返す
+			@brief  イベント割り込みベクターを返す
 			@return ベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_tx_vec() { return txv; }
+		static ICU::VECTOR get_eei_vec() { return eei; }
 
 
 		//-----------------------------------------------------------------//
@@ -388,7 +390,26 @@ namespace device {
 			@return ベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_rx_vec() { return rxv; }
+		static ICU::VECTOR get_rxi_vec() { return rxi; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_txi_vec() { return txi; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信完了割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_tei_vec() { return tei; }
 	};
-	typedef i2c_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0> RIIC0;
+	typedef i2c_t<0x00088300, peripheral::RIIC0,
+		ICU::VECTOR::EEI0, ICU::VECTOR::RXI0, ICU::VECTOR::TXI0, ICU::VECTOR::TEI0> RIIC0;
 }
