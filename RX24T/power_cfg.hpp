@@ -38,6 +38,10 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA14 = f;
 				break;
 
+			case peripheral::RSPI0:
+				SYSTEM::MSTPCRB.MSTPB17 = f;
+				break;
+
 			case peripheral::RIIC0:
 				SYSTEM::MSTPCRB.MSTPB21 = f;
 				break;

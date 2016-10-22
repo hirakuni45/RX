@@ -26,5 +26,7 @@ namespace device {
 		SCI1,
 		SCI5,
 		SCI6,
+
+		RSPI0,
 	};
 }

@@ -29,6 +29,21 @@ namespace device {
 		{
 			bool ena = lvl != 0 ? true : false;
 			switch(t) {
+			case peripheral::CMT0:
+				ICU::IPR.CMI0 = lvl;
+				ICU::IER.CMI0 = ena;
+				break;
+			case peripheral::CMT1:
+				ICU::IPR.CMI1 = lvl;
+				ICU::IER.CMI1 = ena;
+				break;
+
+			case peripheral::RSPI0:
+				ICU::IPR.RSPI0 = lvl;
+				ICU::IER.SPRI0 = ena;
+				ICU::IER.SPTI0 = ena;
+				break;
+
 			case peripheral::SCI1:
 				ICU::IPR.SCI1 = lvl;
 				ICU::IER.RXI1 = ena;
@@ -43,14 +58,6 @@ namespace device {
 				ICU::IPR.SCI6 = lvl;
 				ICU::IER.RXI6 = ena;
 				ICU::IER.TXI6 = ena;
-				break;
-			case peripheral::CMT0:
-				ICU::IPR.CMI0 = lvl;
-				ICU::IER.CMI0 = ena;
-				break;
-			case peripheral::CMT1:
-				ICU::IPR.CMI1 = lvl;
-				ICU::IER.CMI1 = ena;
 				break;
 			default:
 				break;

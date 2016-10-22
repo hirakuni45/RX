@@ -89,6 +89,11 @@ namespace device {
 			rw8_t<base + 30> CMI2;
 			rw8_t<base + 31> CMI3;
 
+			rw8_t<base + 44> SPEI0;
+			rw8_t<base + 45> SPRI0;
+			rw8_t<base + 46> SPTI0;
+			rw8_t<base + 47> SPII0;
+
 			rw8_t<base + 218> ERI1;
 			rw8_t<base + 219> RXI1;
 			rw8_t<base + 220> TXI1;
@@ -129,6 +134,12 @@ namespace device {
 			bit_rw_t<ier03, bitpos::B5>	CMI1;
 			bit_rw_t<ier03, bitpos::B6>	CMI2;
 			bit_rw_t<ier03, bitpos::B7>	CMI3;
+
+			typedef rw8_t<base + 0x05> ier05;
+			bit_rw_t<ier03, bitpos::B4>	SPEI0;
+			bit_rw_t<ier03, bitpos::B5>	SPRI0;
+			bit_rw_t<ier03, bitpos::B6>	SPTI0;
+			bit_rw_t<ier03, bitpos::B7>	SPII0;
 
 			typedef rw8_t<base + 0x08> ier08;
 			bit_rw_t<ier08, bitpos::B0>	IRQ0;
@@ -178,6 +189,8 @@ namespace device {
 			rw8_t<base + 5> CMI1;
 			rw8_t<base + 6> CMI2;
 			rw8_t<base + 7> CMI3;
+
+			rw8_t<base + 44> RSPI0;
 
 			rw8_t<base + 218> SCI1;
 			rw8_t<base + 222> SCI5;
