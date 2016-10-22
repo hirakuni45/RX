@@ -40,20 +40,21 @@ Renesas RX マイコン
    
  - msys2 のアップグレード
 
-```sh
-   update-core
+```
+   pacman -Sy pacman
+   pacman -Syu
 ```
 
  - コンソールを開きなおす。（コンソールを開きなおすように、メッセージが表示されるはずです）
 
-```sh
+```
    pacman -Su
 ```
  - アップデートは、複数回行われ、その際、コンソールの指示に従う事。
  - ※複数回、コンソールを開きなおす必要がある。
 
  - gcc、texinfo、gmp、mpfr、mpc、diffutils、automake、zlib tar、make、unzip コマンドなどをインストール
-```sh
+```
    pacman -S gcc
    pacman -S texinfo
    pacman -S mpc-devel
@@ -67,7 +68,7 @@ Renesas RX マイコン
 ```
   
  - git コマンドをインストール
-```sh
+```
    pacman -S git
 ```
 
@@ -168,7 +169,7 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
  -  アセンブラコマンドを実行してみて、パスが有効か確かめる。
   
 #### C コンパイラをビルド
-``` sh
+```
     cd
     tar xfvz gcc-5.4.0.tar.gz
     cd gcc-5.4.0
@@ -180,7 +181,7 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 ```
   
 #### newlib をビルド
-``` sh
+```
     cd
     tar xfvz newlib-2.4.0.tar.gz
 	cd newlib-2.4.0
@@ -207,7 +208,7 @@ make install
 ---
      
 #### C++ コンパイラをビルド
-``` sh
+```
     cd
     cd gcc-5.4.0
     cd rx_build
@@ -263,7 +264,7 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
  - rxprog のビルド（MSYS2）
  - ビルドした実行ファイルは、~/bin に配置します。
 
-``` sh
+```
     cd rxprog
     make
     mkdir ~/bin
