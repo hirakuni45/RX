@@ -53,10 +53,33 @@ namespace device {
 		};
 
 	private:
-		uint8_t		intr_lvl_;
+		uint8_t		level_;
 		uint8_t		sadr_;
 		uint8_t		speed_;
 		error		error_;
+
+		enum class event {
+			none,
+		};
+		static event  event_;
+
+		static INTERRUPT_FUNC void event_task_()
+		{
+		}
+
+		static INTERRUPT_FUNC void recv_task_()
+		{
+		}
+
+		static INTERRUPT_FUNC void send_task_()
+		{
+		}
+
+		static INTERRUPT_FUNC void end_task_()
+		{
+		}
+
+		static uint32_t intr_vec_(ICU::VECTOR v) { return static_cast<uint32_t>(v); }
 
 	public:
 		//-----------------------------------------------------------------//
@@ -65,20 +88,20 @@ namespace device {
 			@param[in]	sadr	スレーブ・アドレス
 		*/
 		//-----------------------------------------------------------------//
-		iica_io(uint8_t sadr = 0x00) : intr_lvl_(0), sadr_(sadr), speed_(0), error_(error::none) { }
+		iica_io(uint8_t sadr = 0x00) : level_(0), sadr_(sadr), speed_(0), error_(error::none) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	動作開始
-			@param[in]	spd_type	速度タイプ（メインクロックが 32MHz）
-			@param[in]	intr_lvl	割り込みレベル（１、２）０の場合ポーリング
+			@param[in]	spd_type	速度タイプ（クロックが 40MHz）
+			@param[in]	level	割り込みレベル、０の場合ポーリング
 			@return 速度範囲エラーの場合「false」	
 		 */
 		//-----------------------------------------------------------------//
-		bool start(speed spd_type, uint8_t intr_lvl)
+		bool start(speed spd_type, uint8_t level = 0)
 		{
-			intr_lvl_ = intr_lvl;
+			level_ = level;
 
 			port_map::turn(IICA::get_peripheral());
 
@@ -86,10 +109,9 @@ namespace device {
 
 			IICA::ICCR1.ICE = 0;
 			IICA::ICCR1.IICRST = 1;
-			IICA::ICCR1.IICRST = 0;
+			IICA::ICCR1.ICE = 1;
 
-			IICA::ICSER &=
-				~(IICA::ICSER.SAR0E.b() | IICA::ICSER.SAR1E.b() | IICA::ICSER.SAR2E.b());
+			IICA::ICSER = 0x00;
 
 			switch(spd_type) {
 			case speed::standard:	///< 100K b.p.s. (Standard mode)
@@ -112,7 +134,21 @@ namespace device {
 				return false;
 			}
 
-			IICA::ICCR1.ICE = 1;
+			IICA::ICFER.TMOE = 1;  // TimeOut Enable
+
+			if(level_) {
+				set_interrupt_task(event_task_, static_cast<uint32_t>(IICA::get_eei_vec()));
+				set_interrupt_task(recv_task_,  static_cast<uint32_t>(IICA::get_rxi_vec()));
+				set_interrupt_task(send_task_,  static_cast<uint32_t>(IICA::get_txi_vec()));
+				set_interrupt_task(end_task_,   static_cast<uint32_t>(IICA::get_tei_vec()));
+			} else {
+				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_eei_vec()));
+				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_rxi_vec()));
+				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_txi_vec()));
+				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_tei_vec()));
+			}
+
+			IICA::ICCR1.IICRST = 0;
 
 			return true;
 		}
@@ -138,12 +174,20 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool send(uint8_t adr, const uint8_t* src, uint8_t len)
 		{
-			while(IICA::ICCR2.BBSY() != 0) ;
+			error_ = error::none;
+
+			while(IICA::ICCR2.BBSY() != 0) {
+				if(IICA::ICSR2.TMOF()) {
+					IICA::ICSR2.TMOF = 0;
+					error_ = error::bus_open;
+					return false;
+				}
+			}
 
 			IICA::ICCR2.ST = 1;
 
 			bool ret = true;
-			char slave = 1;
+			bool first = true;
 			while(len > 0) {
 
 				if(IICA::ICSR2.NACKF() != 0) {
@@ -153,9 +197,9 @@ namespace device {
 
 				while(IICA::ICSR2.TDRE() == 0) ;
 
-				if(slave) {
+				if(first) {
 					IICA::ICDRT = (adr << 1);
-					slave = 0;
+					first = false;
 				} else {
 					IICA::ICDRT = *src++;
 					--len;
@@ -187,7 +231,15 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool recv(uint8_t adr, uint8_t* dst, uint8_t len)
 		{
-			while(IICA::ICCR2.BBSY() != 0) ;
+			error_ = error::none;
+
+			while(IICA::ICCR2.BBSY() != 0) {
+				if(IICA::ICSR2.TMOF()) {
+					IICA::ICSR2.TMOF = 0;
+					error_ = error::bus_open;
+					return false;
+				}
+			}
 
 			IICA::ICCR2.ST = 1;
 
@@ -203,7 +255,7 @@ namespace device {
 
 				da = IICA::ICDRR();	///< dummy read
 
-				for( ; ; ) {
+				while(1) {
 
 					while(IICA::ICSR2.RDRF() == 0) ;
 
@@ -227,7 +279,7 @@ namespace device {
 					IICA::ICMR3.ACKWP = 0;
 				}
 
-				da = IICA::ICDRR();			// read data
+				da = IICA::ICDRR();			// last read data
 				if(len) {
 					*dst++ = da;
 					--len;
@@ -261,4 +313,7 @@ namespace device {
 		}
 
 	};
+
+	template<class IICA> typename iica_io<IICA>::event iica_io<IICA>::event_;
+
 }
