@@ -167,7 +167,7 @@ namespace device {
 			bit_rw_t<ier1c, bitpos::B5>	TEI6;
 
 			typedef rw8_t<base + 0x1E> ier1e;
-			bit_rw_t<ier1e, bitpos::B6>	ERI0;
+			bit_rw_t<ier1e, bitpos::B6>	EEI0;
 			bit_rw_t<ier1e, bitpos::B7>	RXI0;
 			typedef rw8_t<base + 0x1F> ier1f;
 			bit_rw_t<ier1f, bitpos::B0>	TXI0;
