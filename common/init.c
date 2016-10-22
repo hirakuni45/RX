@@ -21,9 +21,9 @@ int init(void)
 		interrupt_vectors[i] = null_task_;
 	}
 
-	rx_run_fini_array();
-	rx_run_init_array();
 	rx_run_preinit_array();
+	rx_run_init_array();
+	rx_run_fini_array();
 
 	// main の起動
 	static int argc = 0;
