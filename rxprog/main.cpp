@@ -13,7 +13,7 @@
 
 namespace {
 
-	const std::string version_ = "0.75b";
+	const std::string version_ = "0.81b";
 	const std::string conf_file_ = "rx_prog.conf";
 	const uint32_t progress_num_ = 50;
 	const char progress_cha_ = '#';
@@ -319,7 +319,7 @@ int main(int argc, char* argv[])
 	uint32_t pageall = 0;
 	if(!opts.inp_file.empty()) {
 		if(opts.verbose) {
-			std::cout << "Input file path: '" << opts.inp_file << '\'' << std::endl;
+			std::cout << "# Input file path: '" << opts.inp_file << '\'' << std::endl;
 		}
 		if(!motsx_.load(opts.inp_file)) {
 			std::cerr << "Can't open input file: '" << opts.inp_file << "'" << std::endl;
@@ -345,7 +345,7 @@ int main(int argc, char* argv[])
             }
         }
 		if(opts.verbose) {
-			std::cout << "Serial port alias: " << opts.com_name << " ---> " << opts.com_path << std::endl;
+			std::cout << "# Serial port alias: " << opts.com_name << " ---> " << opts.com_path << std::endl;
 		}
     }
 	if(opts.com_path.empty()) {
@@ -353,7 +353,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 	if(opts.verbose) {
-		std::cout << "Serial port path: '" << opts.com_path << '\'' << std::endl;
+		std::cout << "# Serial port path: '" << opts.com_path << '\'' << std::endl;
 	}
 	int com_speed = 0;
 	if(!utils::string_to_int(opts.com_speed, com_speed)) {
@@ -363,29 +363,34 @@ int main(int argc, char* argv[])
 
 	rx::protocol::rx_t rx;
 	{
-		rx.cpu_type_ = "RX63T";
-		// rx.master_ = 1200;  // 12.00MHz
-		// rx.sys_div_ = 8;    // x8 (96MHz)
-		// rx.ext_div_ = 4;    // x4 (48MHz)
-		auto devt = conf_in_.get_device();
-		int32_t val = 0;;
-		if(!utils::string_to_int(devt.clock_, val)) {
-			std::cerr << "DEVICE 'clock' tag conversion error: '" << devt.clock_ << '\'' << std::endl;
-			return -1;
-		}
-		rx.master_ = val;
+		rx.verbose_ = opts.verbose;
 
-		if(!utils::string_to_int(devt.divide_sys_, val)) {
-			std::cerr << "DEVICE 'divide_sys' tag conversion error: '" << devt.divide_sys_ << '\'' << std::endl;
-			return -1;
-		}
-		rx.sys_div_ = val;
+		rx.cpu_type_ = opts.device;
 
-		if(!utils::string_to_int(devt.divide_ext_, val)) {
-			std::cerr << "DEVICE 'divide_ext' tag conversion error: '" << devt.divide_ext_ << '\'' << std::endl;
-			return -1;
+		if(rx.cpu_type_ == "RX63T") {
+			// rx.master_ = 1200;  // 12.00MHz
+			// rx.sys_div_ = 8;    // x8 (96MHz)
+			// rx.ext_div_ = 4;    // x4 (48MHz)
+			auto devt = conf_in_.get_device();
+			int32_t val = 0;;
+			if(!utils::string_to_int(devt.clock_, val)) {
+				std::cerr << "RX63T 'clock' tag conversion error: '" << devt.clock_ << '\'' << std::endl;
+				return -1;
+			}
+			rx.master_ = val;
+
+			if(!utils::string_to_int(devt.divide_sys_, val)) {
+				std::cerr << "RX63T 'divide_sys' tag conversion error: '" << devt.divide_sys_ << '\'' << std::endl;
+				return -1;
+			}
+			rx.sys_div_ = val;
+
+			if(!utils::string_to_int(devt.divide_ext_, val)) {
+				std::cerr << "RX63T 'divide_ext' tag conversion error: '" << devt.divide_ext_ << '\'' << std::endl;
+				return -1;
+			}
+			rx.ext_div_ = val;
 		}
-		rx.ext_div_ = val;
 	}
 
 	rx::prog prog_(opts.verbose);
@@ -394,13 +399,6 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	//=====================================
-	if(opts.read) {  // read
-	}
-
-	//=====================================
-	if(opts.erase) {  // erase
-	}
 
 	//=====================================
 	if(opts.write) {  // write

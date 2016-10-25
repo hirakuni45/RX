@@ -114,11 +114,30 @@ namespace rx {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief	block 構造体
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct block {
+			uint32_t	org_ = 0;
+			uint32_t	size_ = 0;
+			uint32_t	num_ = 0;
+
+			void info(const std::string& head = "") const {
+				std::cout << head << (boost::format("Block: %08X, %08X, %08X") % org_ % size_ % num_) << std::endl;
+			}
+		};
+		typedef std::vector<block> blocks;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief	rx_t 構造体 @n
 					※ RX63T 標準設定：　12.00MHz、8(96MHz)、4(48MHz)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct rx_t {
+			bool	verbose_ = false;
+
 			std::string	cpu_type_;		///< CPU タイプ
 
 			uint32_t	master_ = 1200;	///< マスター・クロック（MHz 単位で、小数第２位、１００倍）

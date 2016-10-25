@@ -20,6 +20,8 @@ namespace rx63t {
 
 		utils::rs232c_io	rs232c_;
 
+		bool				verbose_ = false;
+
 		bool				connection_ = false;
 
 		rx::protocol::devices		devices_;
@@ -110,6 +112,10 @@ namespace rx63t {
 			return 0x100 - sum;
 		}
 
+		std::string out_section_(uint32_t n, uint32_t num) const {
+			return (boost::format("#%02d/%02d: ") % n % num).str();
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -117,6 +123,234 @@ namespace rx63t {
 		*/
 		//-----------------------------------------------------------------//
 		protocol() { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	接続
+			@param[in]	path	シリアルデバイスパス
+			@param[in]	brate	ボーレート
+			@param[in]	rx		CPU 設定
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool bind(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx)
+		{
+			verbose_ = rx.verbose_;
+
+			if(!start(path)) {
+				std::cerr << "Can't open path: '" << path << "'" << std::endl;
+				return false;
+			}
+
+			// コネクション
+			if(!connection()) {
+				std::cerr << "Can't connection." << std::endl;
+				return false;
+			}
+			if(verbose_) {
+				std::cout << "Connection OK." << std::endl;
+			}
+
+			// サポート・デバイス問い合わせ
+			{
+				if(!inquiry_device()) {
+					std::cerr << "Inquiry device error." << std::endl;
+					return false;
+				}
+				auto as = get_device();
+				if(verbose_) {
+					int i = 0;
+					for(auto a : as) {
+						++i;
+						a.info(out_section_(i, as.size()));
+					}
+				}
+				// デバイス選択
+				if(!select_device(as[0].code_)) {
+					std::cerr << "Select device error." << std::endl;
+					return false;
+				}
+			}
+
+			// クロック・モード問い合わせ
+			{
+				if(!inquiry_clock_mode()) {
+					std::cerr << "Inquiry clock-mode error." << std::endl;
+					return false;
+				}
+				auto as = get_clock_mode();
+				if(verbose_) {
+					int i = 0;
+					for(auto a : as) {
+						++i;
+						a.info(out_section_(i, as.size()));
+					}				
+				}
+				// クロック・モード選択
+				if(!select_clock_mode(as[0])) {
+					std::cerr << "Select clock-mode error." << std::endl;
+					return false;
+				}
+			}
+
+			// 逓倍比問い合わせ
+			{
+				if(!inquiry_multiplier()) {
+					std::cerr << "Inquiry multiplier error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto as = get_multiplier();
+					int i = 0;
+					for(auto a : as) {
+						++i;
+						a.info(out_section_(i, as.size()));
+					}				
+				}
+			}
+
+			// 動作周波数問い合わせ
+			{
+				if(!inquiry_frequency()) {
+					std::cerr << "Inquiry frequency error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto as = get_frequency();
+					int i = 0;
+					for(auto a : as) {
+						++i;
+						a.info(out_section_(i, as.size()));
+					}				
+				}
+			}
+
+			// ボーレート変更
+			{
+				if(!change_speed(rx, brate)) {
+					std::cerr << "Can't change speed." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto sect = out_section_(1, 1);
+					std::cout << sect << "Change baud rate: " << std::endl;
+				}
+			}
+
+			// ユーザー・ブート領域問い合わせ
+			{
+				if(!inquiry_boot_area()) {
+					std::cerr << "Inquiry boot-area error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto as = get_boot_area();
+					int i = 0;
+					for(auto a : as) {
+						++i;
+						a.info(out_section_(i, as.size()) + "Boot ");
+					}				
+				}
+			}
+
+			// ユーザー領域問い合わせ
+			{
+				if(!inquiry_area()) {
+					std::cerr << "Inquiry area error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto as = get_area();
+					int i = 0;
+					for(auto a : as) {
+						++i;
+						a.info(out_section_(i, as.size()));
+					}				
+				}
+			}
+
+			// ブロック情報問い合わせ
+			{
+				if(!inquiry_block()) {
+					std::cerr << "Inquiry block error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto as = get_block();
+					int i = 0;
+					for(auto a : as) {
+						++i;
+						a.info(out_section_(i, as.size()));
+					}				
+				}
+			}
+
+			// プログラム・サイズ問い合わせ
+			{
+				if(!inquiry_prog_size()) {
+					std::cerr << "Inquiry prog-size error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto sz = get_prog_size();
+					auto sect = out_section_(1, 1);
+					std::cout << sect << (boost::format("Program size: %04X") % sz) << std::endl;
+				}
+			}
+
+			// データ量域の有無問い合わせ
+			{
+				if(!inquiry_data()) {
+					std::cerr << "Inquiry data error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto sect = out_section_(1, 1);
+					std::cout << sect << "Data area: ";
+					if(get_data()) {
+						std::cout << "true" << std::endl;
+					} else {
+						std::cout << "false" << std::endl;
+					}
+				}
+			}
+
+			// データ量域情報問い合わせ
+			{
+				if(!inquiry_data_area()) {
+					std::cerr << "Inquiry data-area error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto as = get_data_area();
+					int i = 0;
+					for(auto a : as) {
+						++i;
+						a.info(out_section_(i, as.size()) + "Data ");
+					}				
+				}
+			}
+
+			// P/E ステータスに移行
+			{
+				if(!turn_pe_status()) {
+					std::cerr << "P/E status error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto sect = out_section_(1, 1);
+					std::cout << sect << "ID Protect: ";
+					if(get_protect()) {
+						std::cout << "true" << std::endl;
+					} else {
+						std::cout << "false" << std::endl;
+					}					
+				}
+			}
+
+			return true;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -202,15 +436,19 @@ namespace rx63t {
 			}
 			uint32_t total = head[1];
 
-			char tmp[256 + 16];
+			uint8_t tmp[256 + 16];
 			if(!read_(tmp, total)) {
 				return false;
 			}
 
+			if(sum_(tmp, total - 1) != tmp[total - 1]) {
+				return false;
+			}
+
 			rx::protocol::device d;
-			d.code_ = get32_((const uint8_t*)&tmp[1]);
-			tmp[static_cast<uint8_t>(tmp[0]) + 1] = 0;
-			d.name_ = &tmp[5];
+			d.code_ = get32_(&tmp[1]);
+			tmp[tmp[0] + 1] = 0;
+			d.name_ = reinterpret_cast<const char*>(&tmp[5]);
 			devices_.push_back(d);
 
 			return true;
@@ -836,12 +1074,12 @@ namespace rx63t {
 		/*!
 			@brief	リード・ページ
 			@param[in]	adr	アドレス
-			@param[in]	len	読み出しサイズ
 			@param[out]	dst	リード・データ
+			@param[in]	len	読み出しサイズ
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool read(uint32_t adr, uint32_t len, uint8_t* dst) {
+		bool read(uint32_t adr, uint8_t* dst, uint32_t len) {
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 

@@ -82,7 +82,8 @@ LFLAGS =
 CCWARN	=	-Wimplicit -Wreturn-type -Wswitch \
 			-Wformat
 CPWARN	=	-Wall -Werror \
-			-Wno-unused-function
+			-Wno-unused-function \
+			-Wno-unused-but-set-variable
 
 OBJECTS	=	$(addprefix $(BUILD)/,$(patsubst %.cpp,%.o,$(PSOURCES))) \
 			$(addprefix $(BUILD)/,$(patsubst %.c,%.o,$(CSOURCES)))
@@ -125,8 +126,7 @@ $(BUILD)/%.d : %.cpp
 	[ -s $@ ] || rm -f $@
 
 run:
-	./$(TARGET) --verbose --progress --write --verify chager.mot
-#	./$(TARGET) --port=/dev/ttyS8 --write --verify chager.mot
+	./$(TARGET) -d RX24T --verbose --progress --write --verify DS3231_sample.mot
 
 clean:
 	rm -rf $(BUILD) $(TARGET)
@@ -147,7 +147,7 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll
 
 install:
-	cp $(TARGET) /usr/local/bin/.
+	cp $(TARGET).exe /usr/local/bin/.
 	cp $(TARGET).conf /usr/local/bin/.
 
 -include $(DEPENDS)
