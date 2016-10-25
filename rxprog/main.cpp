@@ -363,6 +363,7 @@ int main(int argc, char* argv[])
 
 	rx::protocol::rx_t rx;
 	{
+		rx.cpu_type_ = "RX63T";
 		// rx.master_ = 1200;  // 12.00MHz
 		// rx.sys_div_ = 8;    // x8 (96MHz)
 		// rx.ext_div_ = 4;    // x4 (48MHz)

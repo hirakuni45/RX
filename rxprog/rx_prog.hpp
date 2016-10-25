@@ -5,10 +5,13 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "rx_protocol.hpp"
+#include "rx63t_protocol.hpp"
+#include "rx24t_protocol.hpp"
 #include <boost/format.hpp>
+#include <boost/variant.hpp>
 
 namespace rx {
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	rx_prog クラス
@@ -16,11 +19,24 @@ namespace rx {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class prog {
 		bool		verbose_;
-		protocol	proto_;
+
+		utils::rs232c_io	rs232c_;
+
+		using protocol_type = boost::variant<rx63t::protocol, rx24t::protocol>;
+		protocol_type protocol_;
 
 		std::string out_section_(uint32_t n, uint32_t num) const {
 			return (boost::format("#%02d/%02d: ") % n % num).str();
 		}
+
+		struct start_visitor {
+    		using result_type = bool;
+
+    		template <class T>
+    		bool operator()(T& x, const std::string& path) {
+				return x.start(path);
+			}
+		};
 
 	public:
 		//-------------------------------------------------------------//
@@ -40,14 +56,29 @@ namespace rx {
 			@return エラー無ければ「true」
 		*/
 		//-------------------------------------------------------------//
-		bool start(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx) {
-
-			// 開始
-			if(!proto_.start(path)) {
-				std::cerr << "Can't open path: '" << path << "'" << std::endl;
+		bool start(const std::string& path, uint32_t brate, const rx::protocol::rx_t& rx)
+		{
+			if(rx.cpu_type_ == "RX63T") {
+				protocol_ = rx63t::protocol();
+			} else if(rx.cpu_type_ == "RX24T") {
+				protocol_ = rx24t::protocol();
+			} else {
+				std::cerr << "CPU type missmatch: '" << rx.cpu_type_ << "'" << std::endl;
 				return false;
 			}
 
+#if 0
+			{  // 開始
+				start_visitor vis;
+            	boost::apply_visitor(vis, x);
+				if(!proto_.start(path)) {
+					std::cerr << "Can't open path: '" << path << "'" << std::endl;
+					return false;
+				}
+			}
+#endif
+
+#if 0
 			// コネクション
 			{
 				if(!proto_.connection()) {
@@ -271,7 +302,7 @@ namespace rx {
 					}					
 				}
 			}
-
+#endif
 			return true;
 		}
 
@@ -286,11 +317,13 @@ namespace rx {
 		*/
 		//-------------------------------------------------------------//
 		bool read(uint32_t adr, uint8_t* dst, uint32_t len) {
+#if 0
 			if(!proto_.read(adr, len, dst)) {
 				proto_.end();
 				std::cerr << "Read error." << std::endl;
 				return false;
 			}
+#endif
 			return true;
 		}
 
@@ -305,6 +338,7 @@ namespace rx {
 		*/
 		//-------------------------------------------------------------//
 		bool verify(uint32_t adr, const uint8_t* src, uint32_t len) {
+#if 0
 			std::vector<uint8_t> dev;
 			dev.resize(len);
 			if(!read(adr, &dev[0], len)) {
@@ -326,6 +360,7 @@ namespace rx {
 				std::cerr << "Verify error: " << errcnt << std::endl;
 				return false;
 			}
+#endif
 			return true;
 		}
 
@@ -338,11 +373,13 @@ namespace rx {
 		*/
 		//-------------------------------------------------------------//
 		bool start_write(bool data) {
+#if 0
 			if(!proto_.select_write_area(data)) {
 				proto_.end();
 				std::cerr << "Write start error.(first)" << std::endl;
 				return false;
 			}
+#endif
 			return true;
 		}
 
@@ -356,11 +393,13 @@ namespace rx {
 		*/
 		//-------------------------------------------------------------//
 		bool write(uint32_t adr, const uint8_t* src) {
+#if 0
 			if(!proto_.write_page(adr, src)) {
 				proto_.end();
 				std::cerr << "Write body error." << std::endl;
 				return false;
 			}
+#endif
 			return true;
 		}
 
@@ -372,11 +411,13 @@ namespace rx {
 		*/
 		//-------------------------------------------------------------//
 		bool final_write() {
+#if 0
 			if(!proto_.write_page(0xffffffff, nullptr)) {
 				proto_.end();
 				std::cerr << "Write final error. (fin)" << std::endl;
 				return false;
 			}
+#endif
 			return true;
 		}
 
@@ -387,7 +428,7 @@ namespace rx {
 		*/
 		//-------------------------------------------------------------//
 		void end() {
-			proto_.end();
+//			proto_.end();
 		}
 	};
 }
