@@ -243,7 +243,7 @@ namespace rx24t {
 				}
 				if(verbose_) {
 					auto sect = out_section_(1, 1);
-					std::cout << sect << "Change baud rate: " << std::endl;
+					std::cout << sect << boost::format("Change baud rate: %d") % brate << std::endl;
 				}
 			}
 
