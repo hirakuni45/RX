@@ -70,7 +70,6 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	// タイマー設定（６０Ｈｚ）
-	cmt_.set_clock(F_PCKB);
 	uint8_t cmt_irq_level = 4;
 	cmt_.start(60, cmt_irq_level);
 
