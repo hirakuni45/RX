@@ -46,6 +46,20 @@ namespace rx {
 			}
 		};
 
+
+		struct erase_page_visitor {
+			using result_type = bool;
+
+			uint32_t adr_;
+			erase_page_visitor(uint32_t adr) : adr_(adr) { }
+
+    		template <class T>
+    		bool operator()(T& x) {
+				return x.erase_page(adr_);
+			}
+		};
+
+
 		struct read_visitor {
 			using result_type = bool;
 
@@ -60,6 +74,7 @@ namespace rx {
 			}
 		};
 
+
 		struct select_write_visitor {
 			using result_type = bool;
 
@@ -71,6 +86,7 @@ namespace rx {
 				return x.select_write_area(data_);
 			}
 		};
+
 
 		struct write_visitor {
 			using result_type = bool;
@@ -135,6 +151,24 @@ namespace rx {
 				}
 			}
 
+			return true;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	ページ消去
+			@param[in]	adr	開始アドレス
+			@return 成功なら「true」
+		*/
+		//-------------------------------------------------------------//
+		bool erase_page(uint32_t adr) {
+			erase_page_visitor vis(adr);
+           	if(!boost::apply_visitor(vis, protocol_)) {
+				end();
+				std::cerr << "Erase page error." << std::endl;
+				return false;
+			}
 			return true;
 		}
 

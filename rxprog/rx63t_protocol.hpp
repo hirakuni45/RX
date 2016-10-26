@@ -1072,6 +1072,42 @@ namespace rx63t {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	イレース・ページ
+			@param[in]	address	アドレス
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool erase_page(uint32_t address) {
+#if 0
+			if(!connection_) return false;
+			if(!verification_) return false;
+
+			char buff[4];
+			buff[0] = 0x20;
+			buff[1] = (address >> 8) & 0xff;
+			buff[2] = (address >> 16) & 0xff;
+			buff[3] = 0xD0;
+			if(rs232c_.send(buff, 4) != 4) {
+				return false;
+			}
+			rs232c_.sync_send();
+
+			status st;
+			if(!get_status(st)) {
+				return false;
+			}
+			if(st.get_SR5() != 0) {
+				return false;
+			}
+
+			return clear_status();
+#endif
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	リード・ページ
 			@param[in]	adr	アドレス
 			@param[out]	dst	リード・データ
@@ -1234,40 +1270,7 @@ namespace rx63t {
 			return true;
 		}
 
-#if 0
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	イレース・ページ
-			@param[in]	address	アドレス
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool erase_page(uint32_t address) {
-			if(!connection_) return false;
-			if(!verification_) return false;
 
-			char buff[4];
-			buff[0] = 0x20;
-			buff[1] = (address >> 8) & 0xff;
-			buff[2] = (address >> 16) & 0xff;
-			buff[3] = 0xD0;
-			if(rs232c_.send(buff, 4) != 4) {
-				return false;
-			}
-			rs232c_.sync_send();
-
-			status st;
-			if(!get_status(st)) {
-				return false;
-			}
-			if(st.get_SR5() != 0) {
-				return false;
-			}
-
-			return clear_status();
-		}
-
-#endif
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	終了

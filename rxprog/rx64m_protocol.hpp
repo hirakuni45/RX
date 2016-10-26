@@ -33,6 +33,8 @@ namespace rx64m {
 		uint32_t	   		baud_speed_ = 0;
 		speed_t				baud_rate_ = B9600;
 
+		bool				enable_id_ = false;
+
 		bool				pe_turn_on_ = false;
 		bool				select_write_area_ = false;
 
@@ -315,10 +317,24 @@ namespace rx64m {
 				}
 			}
 
+			// ID 認証確認
+			{
+				if(!inquiry_id()) {
+					std::cerr << "Inquiry ID error." << std::endl;
+					return false;
+				}
+				if(verbose_) {
+					auto sect = out_section_(1, 1);
+					std::cout << sect
+						<< boost::format("ID: %s") % (enable_id_ ? "Enable" : "Disable") << std::endl;
+				}
+			}
 
+			// ID 認証が有効なら、ID コードチェックを行う
+			if(enable_id_) {
+			}
 
-
-
+			pe_turn_on_ = true;			
 
 			return true;
 		}
@@ -540,8 +556,49 @@ namespace rx64m {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ID 認証モード取得コマンド
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool inquiry_id() {
+
+			if(!connection_) return false;
+
+			if(!command_(0x2C)) {
+				return false;
+			}
+
+			if(!status_back_(0x2C)) {
+				return false;
+			}
+
+			uint8_t tmp[1];
+			if(!status_data_(0x2C, tmp, sizeof(tmp))) {
+				return false;
+			}
+
+			if(tmp[0] == 0x00) enable_id_ = true;
+			else if(tmp[0] == 0xFF) enable_id_ = false;
+			else {
+				return false;
+			}
+
+			return true;
+		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	イレース・ページ
+			@param[in]	address	アドレス
+			@return エラー無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool erase_page(uint32_t address) {
+			return true;
+		}
 
 
 
