@@ -28,7 +28,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX24T
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-Os -flto
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
@@ -156,6 +156,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rl78_prog --progress --erase --write $(TARGET).mot
+	rx_prog -d RX24T --progress --write --verify $(TARGET).mot
 
 -include $(DEPENDS)
