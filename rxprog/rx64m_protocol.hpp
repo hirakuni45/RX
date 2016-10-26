@@ -8,6 +8,7 @@
 #include "rs232c_io.hpp"
 #include "rx_protocol.hpp"
 #include <vector>
+#include <set>
 #include <boost/format.hpp>
 
 namespace rx64m {
@@ -37,6 +38,9 @@ namespace rx64m {
 
 		bool				pe_turn_on_ = false;
 		bool				select_write_area_ = false;
+
+		typedef std::set<uint32_t> erase_map;
+		erase_map erase_map_;
 
 		uint8_t				last_error_ = 0;
 
@@ -123,14 +127,11 @@ namespace rx64m {
 		}
 
 
-		bool status_sub_(uint8_t res, uint8_t* dst) {
+		bool status_sub_(uint8_t* dst) {
 			if(!read_(dst, 4)) {
 				return false;
 			}
 			if(dst[0] != 0x81) {
-				return false;
-			}
-			if(dst[3] != res) {
 				return false;
 			}
 			auto l = get16_big_(&dst[1]);
@@ -178,25 +179,42 @@ namespace rx64m {
 
 
 		bool status_(uint8_t res) {
-			uint8_t tmp[4 + 1 + 1];
+			uint8_t tmp[4 + 1 + 1 + 1];
 
-			if(!status_sub_(res, tmp)) {
+			if(!status_sub_(tmp)) {
 				return false;
 			}
+
+			return tmp[3] == res;
+		}
+
+
+		bool response_(uint8_t& res, uint8_t& err) {
+			uint8_t tmp[4 + 1 + 1 + 1];
+
+			if(!status_sub_(tmp)) {
+				return false;
+			}
+			res = tmp[3];
+			err = tmp[4];
 			return true;
 		}
 
 
 		bool status_back_(uint8_t res) {
-			uint8_t tmp[4 + 1 + 1];
+			uint8_t tmp[4 + 1 + 1 + 1];
 
-			if(!status_sub_(res, tmp)) {
+			if(!status_sub_(tmp)) {
+				return false;
+			}
+
+			if(tmp[3] != res) {
 				return false;
 			}
 
 			if(!write_(tmp, sizeof(tmp))) {
 				return false;
-			}			
+			}
 			return true;
 		}
 
@@ -335,6 +353,7 @@ namespace rx64m {
 			}
 
 			pe_turn_on_ = true;			
+			erase_map_.clear();
 
 			return true;
 		}
@@ -529,7 +548,7 @@ namespace rx64m {
 			baud_speed_ = speed; 
 
 			uint8_t tmp[4];
-			put32_big_(&tmp[0],  speed);
+			put32_big_(&tmp[0], speed);
 			if(!command_(0x34, tmp, sizeof(tmp))) {
 				return false;
 			}
@@ -597,13 +616,54 @@ namespace rx64m {
 		*/
 		//-----------------------------------------------------------------//
 		bool erase_page(uint32_t address) {
+			if(!connection_) return false;
+			if(!pe_turn_on_) return false;
+
+			// ブランク・チェックを行う
+			uint8_t tmp[8];
+			auto org = address & 0xffffff00;
+			put32_big_(&tmp[0], org);
+			put32_big_(&tmp[4], org + 255);
+			if(!command_(0x10, tmp, sizeof(tmp))) {
+				return false;
+			}
+			uint8_t res;
+			uint8_t err;
+			if(!response_(res, err)) {
+				return false;
+			}
+			if(res == 0x10) return true;  // erase OK
+			else if(res != 0x90) {
+				return false;
+			} else {
+				if(err != 0xe0) { // do erase
+					return false;
+				}
+				// erase NG;
+				// std::cout << boost::format("Erase NG: %08X") % address << std::endl;
+				if(address >= 0xFFFF0000) {  // 8K block
+					org = address & 0xFFFFE000;
+				} else if(address >= 0xFFC00000) {  // 32K block
+					org = address & 0xFFFF8000;
+				}
+				put32_big_(&tmp[0], org);
+				if(!command_(0x12, tmp, 4)) {  // erase command
+					return false;
+				}
+				if(!response_(res, err)) {
+					return false;
+				}
+				if(res == 0x12) ;
+				else if(res == 0x92) {
+					std::cout << boost::format("Erase response: %02X") % static_cast<uint32_t>(err)
+						<< std::endl;
+					return false;
+				} else {
+					return false;
+				}
+			}
 			return true;
 		}
-
-
-
-
-
 
 
 		//-----------------------------------------------------------------//
@@ -617,25 +677,10 @@ namespace rx64m {
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
-#if 0
-			// ユーザ／データ領域プログラム準備
-			if(!command_(0x43)) {
-				return false;
-			}
 
-			timeval tv;
-			tv.tv_sec  = 1;
-			tv.tv_usec = 0;
-			uint8_t head[1];
-			if(!read_(head, 1, tv)) {
-				return false;
-			}
-			if(head[0] != 0x06) {
-				return false;
-			}
+
 
 			select_write_area_ = true;
-#endif
 			return true;
 		}
 
@@ -652,61 +697,10 @@ namespace rx64m {
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 			if(!select_write_area_) return false;
-#if 0
-			uint8_t cmd[5 + 256 + 1];
-			cmd[0] = 0x50;
-///			std::cout << boost::format("Address: %08X") % address << std::endl;			
-			if(address != 0xffffffff) {
-				put32_big_(&cmd[1], address);
-				std::memcpy(&cmd[5], src, 256);
-				cmd[5 + 256] = sum_(cmd, 5 + 256);
 
-				if(!write_(cmd, 5)) {
-					select_write_area_ = false;
-					return false;
-				}
-				for(uint32_t i = 0; i < 16; ++i) {
-					if(!write_(&cmd[5 + i * 16], 16)) {
-						select_write_area_ = false;
-						return false;
-					}
-				}
-				if(!write_(&cmd[5 + 256], 1)) {  // SUM
-				  	select_write_area_ = false;
-					return false;
-				}
-			} else {
-				put32_big_(&cmd[1], address);
-				select_write_area_ = false;
-				cmd[5] = sum_(cmd, 5);
-				if(!write_(cmd, 6)) {
-					return false;
-				}
-			}
 
-			// レスポンス
-			timeval tv;
-			tv.tv_sec  = 10;
-			tv.tv_usec = 0;
-			uint8_t head[1];
-			if(!read_(head, 1, tv)) {
-				select_write_area_ = false;
-				return false;
-			}
-			if(head[0] != 0x06) {
-				std::cout << "Respons error" << std::endl;
-				select_write_area_ = false;
-				if(head[0] != 0xd0) {
-					return false;
-				}
-				if(!read_(head, 1, tv)) {
-					return false;
-				}
-				last_error_ = head[0];
-///				std::cout << boost::format("Write error code: %02X") % static_cast<uint32_t>(head[0]) << std::endl;
-				return false;
-			}
-#endif
+
+
 			return true;
 		}
 
@@ -723,49 +717,9 @@ namespace rx64m {
 		bool read(uint32_t adr, uint8_t* dst, uint32_t len) {
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
-#if 0
-			uint8_t cmd[12];
-			cmd[0] = 0x52;
-			cmd[1] = 9;
-			cmd[2] = 0x01;  // user-area, data-area
-			put32_big_(&cmd[3], adr);
-			put32_big_(&cmd[7], len);
-			cmd[11] = sum_(cmd, 11);
-			if(!write_(cmd, 12)) {
-				return false;
-			}
 
-			{
-				timeval tv;
-				tv.tv_sec  = 10;
-				tv.tv_usec = 0;
-				uint8_t head[5];
-				if(!read_(head, 5, tv)) {
-					return false;
-				}
-				if(head[0] != 0x52) {
-					return false;
-				}
-				auto rs = get32_big_(&head[1]);
-				/// std::cout << "Read size: " << rs << std::endl;
-				tv.tv_sec  = 20;
-				tv.tv_usec = 0;
-				if(!read_(dst, rs, tv)) {
-//					std::cout << "Read error #0" << std::endl;
-					return false;
-				}
-			}
-			{
-				timeval tv;
-				tv.tv_sec  = 10;
-				tv.tv_usec = 0;
-				uint8_t sum[1];
-				if(!read_(sum, 1, tv)) {
-//					std::cout << "Read error #1" << std::endl;
-					return false;
-				}
-			}
-#endif
+
+
 			return true;
 		}
 
@@ -782,7 +736,6 @@ namespace rx64m {
 			select_write_area_ = false;
 			return rs232c_.close();
 		}
-
 	};
 
 }

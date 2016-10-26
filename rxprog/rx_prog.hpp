@@ -166,7 +166,7 @@ namespace rx {
 			erase_page_visitor vis(adr);
            	if(!boost::apply_visitor(vis, protocol_)) {
 				end();
-				std::cerr << "Erase page error." << std::endl;
+				std::cerr << std::endl << boost::format("Erase page error: %08X") % adr << std::endl;
 				return false;
 			}
 			return true;

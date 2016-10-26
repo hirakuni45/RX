@@ -279,8 +279,8 @@ int main(int argc, char* argv[])
 				opts.progress = true;
 			} else if(p == "--device-list") {
 				opts.device_list = true;
-///			} else if(p == "-e" || p == "--erase") {
-///				opts.erase = true;
+			} else if(p == "-e" || p == "--erase") {
+				opts.erase = true;
 ///			} else if(p == "--erase-rom") opts.erase_rom = true;
 ///			} else if(p == "--erase-data") opts.erase_data = true;
 ///			} else if(p == "--erase-all" || p == "--erase-chip") {
@@ -310,9 +310,18 @@ int main(int argc, char* argv[])
 	}
 
 	// HELP 表示
-	if(opts.help || opts.inp_file.empty() || opts.com_path.empty() || opts.com_speed.empty() || opts.device.empty()) {
+	if(opts.help || opts.com_path.empty() || (opts.inp_file.empty() && !opts.device_list)
+///			&& opts.sequrity_set.empty() && !opts.sequrity_get && !opts.sequrity_release)
+		|| opts.com_speed.empty() || opts.device.empty()) {
 		help_(argv[0]);
 		return 0;
+	}
+
+	// デバイス・リスト表示
+	if(opts.device_list) {
+		for(const auto& s : conf_in_.get_device_list()) {
+			std::cout << s << std::endl;
+		}
 	}
 
 	// 入力ファイルの読み込み
@@ -361,6 +370,9 @@ int main(int argc, char* argv[])
 		return -1;		
 	}
 
+	if(!opts.erase && !opts.write && !opts.verify) return 0;
+//		&& opts.sequrity_set.empty() && !opts.sequrity_get && !opts.sequrity_release) return 0;
+
 	rx::protocol::rx_t rx;
 	{
 		rx.verbose_ = opts.verbose;
@@ -399,7 +411,36 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-#if 0
+	//=====================================
+	if(opts.erase) {  // erase
+		auto areas = motsx_.create_area_map();
+
+		if(opts.progress) {
+			std::cout << "Erase:  " << std::flush;
+		}
+
+		page_t page;
+		for(const auto& a : areas) {
+			uint32_t adr = a.min_ & 0xffffff00;
+			uint32_t len = 0;
+			while(len < (a.max_ - a.min_ + 1)) {
+				if(opts.progress) {
+					progress_(pageall, page);
+				}
+				if(!prog_.erase_page(adr)) {  // 256 バイト単位で消去要求を送る
+					prog_.end();
+					return -1;
+				}
+				adr += 256;
+				len += 256;
+				++page.n;
+			}
+		}
+		if(opts.progress) {
+			std::cout << std::endl << std::flush;
+		}
+	}
+
 	//=====================================
 	if(opts.write) {  // write
 		auto areas = motsx_.create_area_map();
@@ -470,6 +511,6 @@ int main(int argc, char* argv[])
 			std::cout << std::endl << std::flush;
 		}
 	}
-#endif
+
 	prog_.end();
 }
