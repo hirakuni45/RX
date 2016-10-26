@@ -38,6 +38,27 @@ namespace rx {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief	device_type 構造体
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct device_type {
+			uint8_t		TYP[8];
+			uint32_t	OSA = 0;
+			uint32_t	OSI = 0;
+			uint32_t	CPA = 0;
+			uint32_t	CPI = 0;
+
+			void info(const std::string& head = "") const {
+				std::cout << head << (boost::format("Device Type OSA: %d") % OSA) << std::endl;
+				std::cout << head << (boost::format("Device Type OSI: %d") % OSI) << std::endl;
+				std::cout << head << (boost::format("Device Type CPA: %d") % CPA) << std::endl;
+				std::cout << head << (boost::format("Device Type CPI: %d") % CPI) << std::endl;
+			}
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief	clock_mode 構造体
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

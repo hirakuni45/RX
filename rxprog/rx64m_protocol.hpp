@@ -25,24 +25,62 @@ namespace rx64m {
 
 		bool				connection_ = false;
 
-		rx::protocol::devices		devices_;
-		uint8_t						data_ = 0;
-		rx::protocol::areas			area_;
-		rx::protocol::areas			data_areas_;
-		rx::protocol::blocks		blocks_;
-		bool						id_protect_ = false;
-		bool						pe_turn_on_ = false;
-		bool						select_write_area_ = false;
+		rx::protocol::device_type	device_type_;
 
-		uint32_t	   				baud_speed_ = 0;
-		speed_t						baud_rate_ = B9600;
+		uint32_t			system_clock_ = 0;
+		uint32_t			device_clock_ = 0;
 
-		uint8_t						last_error_ = 0;
+		uint32_t	   		baud_speed_ = 0;
+		speed_t				baud_rate_ = B9600;
 
-		bool command_(uint8_t cmd) {
-			bool f = rs232c_.send(static_cast<char>(cmd));
-			rs232c_.sync_send();
-			return f;
+		bool				pe_turn_on_ = false;
+		bool				select_write_area_ = false;
+
+		uint8_t				last_error_ = 0;
+
+		static uint32_t get32_(const uint8_t* p) {
+			uint32_t v;
+			v = p[0];
+			v |= static_cast<uint32_t>(p[1]) << 8;
+			v |= static_cast<uint32_t>(p[2]) << 16;
+			v |= static_cast<uint32_t>(p[3]) << 24;
+			return v;
+		}
+
+		static uint32_t get16_big_(const uint8_t* p) {
+			uint32_t v;
+			v = p[1];
+			v |= static_cast<uint32_t>(p[0]) << 8;
+			return v;
+		}
+
+		static void put16_big_(uint8_t* p, uint32_t val) {
+			p[0] = (val >> 8) & 0xff;
+			p[1] = val & 0xff;
+		}
+
+		static uint32_t get32_big_(const uint8_t* p) {
+			uint32_t v;
+			v = p[3];
+			v |= static_cast<uint32_t>(p[2]) << 8;
+			v |= static_cast<uint32_t>(p[1]) << 16;
+			v |= static_cast<uint32_t>(p[0]) << 24;
+			return v;
+		}
+
+		static void put32_big_(uint8_t* p, uint32_t val) {
+			p[0] = (val >> 24) & 0xff;
+			p[1] = (val >> 16) & 0xff;
+			p[2] = (val >> 8) & 0xff;
+			p[3] =  val & 0xff;
+		}
+
+		static uint8_t sum_(const uint8_t* buff, uint32_t len) {
+			uint16_t sum = 0;
+			for(uint32_t i = 0; i < len; ++i) {
+				sum += *buff++;
+			}
+			return (0 - sum) & 0xff;
 		}
 
 		bool read_(void* buff, uint32_t len, const timeval& tv) {
@@ -60,51 +98,133 @@ namespace rx64m {
 			uint32_t wr = rs232c_.send(buff, len);
 			rs232c_.sync_send();
 			return wr == len;
-		} 
-
-		uint32_t get32_(const uint8_t* p) {
-			uint32_t v;
-			v = p[0];
-			v |= p[1] << 8;
-			v |= p[2] << 16;
-			v |= p[3] << 24;
-			return v;
 		}
 
-		uint32_t get16_big_(const uint8_t* p) {
-			uint32_t v;
-			v = p[1];
-			v |= p[0] << 8;
-			return v;
-		}
-
-		uint32_t get32_big_(const uint8_t* p) {
-			uint32_t v;
-			v = p[3];
-			v |= p[2] << 8;
-			v |= p[1] << 16;
-			v |= p[0] << 24;
-			return v;
-		}
-
-		void put16_big_(uint8_t* p, uint32_t val) {
-			p[0] = (val >> 8) & 0xff;
-			p[1] = val & 0xff;
-		}
-
-		void put32_big_(uint8_t* p, uint32_t val) {
-			p[0] = (val >> 24) & 0xff;
-			p[1] = (val >> 16) & 0xff;
-			p[2] = (val >> 8) & 0xff;
-			p[3] =  val & 0xff;
-		}
-
-		uint8_t sum_(const uint8_t* buff, uint32_t len) {
-			uint16_t sum = 0;
-			for(uint32_t i = 0; i < len; ++i) {
-				sum += *buff++;
+		bool com_(uint8_t soh, uint8_t cmd, uint8_t ext, const uint8_t* src = nullptr, uint32_t len = 0) {
+			uint8_t tmp[1 + 2 + 1 + len + 1 + 1];
+			tmp[0] = soh;
+			put16_big_(&tmp[1], 1 + len);
+			tmp[3] = cmd;
+			if(len > 0) {
+				std::memcpy(&tmp[4], src, len);
 			}
-			return (0 - sum) & 0xff;
+			tmp[4 + len] = sum_(&tmp[1], 3 + len);
+			tmp[4 + len + 1] = ext;
+			uint32_t l = rs232c_.send(tmp, sizeof(tmp));
+			rs232c_.sync_send();
+			return l == sizeof(tmp);
+		}
+
+
+		bool command_(uint8_t cmd, const uint8_t* src = nullptr, uint32_t len = 0) {
+			return com_(0x01, cmd, 0x03, src, len);
+		}
+
+
+		bool status_sub_(uint8_t res, uint8_t* dst) {
+			if(!read_(dst, 4)) {
+				return false;
+			}
+			if(dst[0] != 0x81) {
+				return false;
+			}
+			if(dst[3] != res) {
+				return false;
+			}
+			auto l = get16_big_(&dst[1]);
+			if(l == 1 || l == 2) ;
+			else {
+				return false;
+			}
+			--l;
+			if(!read_(&dst[4], l + 2)) {
+				return false;
+			}
+			auto sum = sum_(&dst[1], 3 + l);
+			if(sum != dst[4 + l]) {
+				return false;
+			}
+			if(dst[4 + l + 1] != 0x03) {
+				return false;
+			}
+			return true;
+		}
+
+
+		void dump_status_() {
+			uint8_t tmp[4 + 1024 + 2];
+			if(!read_(tmp, 4)) {
+				return;
+			}
+			auto l = get16_big_(&tmp[1]);
+			if(!read_(&tmp[4], l + 1)) {
+				return;
+			}
+
+			std::cout << boost::format("SOD: %02X") % static_cast<uint32_t>(tmp[0]) << std::endl;
+			std::cout << boost::format("LEN: %d") % l << std::endl;
+			std::cout << boost::format("RES: %02X") % static_cast<uint32_t>(tmp[3]) << std::endl;
+			--l;
+			if(l > 0) std::cout << "Dat: ";
+			for(uint32_t i = 0; i < l; ++i) {
+				boost::format(" %02X,") % static_cast<uint32_t>(tmp[4 + i]);
+			}
+			if(l > 0) std::cout << std::endl;
+			std::cout << boost::format("SUM: %02X") % static_cast<uint32_t>(tmp[4 + l]) << std::endl;
+			std::cout << boost::format("EXT: %02X") % static_cast<uint32_t>(tmp[4 + l + 1]) << std::endl;
+		}
+
+
+		bool status_(uint8_t res) {
+			uint8_t tmp[4 + 1 + 1];
+
+			if(!status_sub_(res, tmp)) {
+				return false;
+			}
+			return true;
+		}
+
+
+		bool status_back_(uint8_t res) {
+			uint8_t tmp[4 + 1 + 1];
+
+			if(!status_sub_(res, tmp)) {
+				return false;
+			}
+
+			if(!write_(tmp, sizeof(tmp))) {
+				return false;
+			}			
+			return true;
+		}
+
+
+		bool status_data_(uint8_t res, uint8_t* dst, uint32_t len) {
+			uint8_t tmp[4 + len + 2];
+			if(!read_(tmp, 4)) {
+				return false;
+			}
+			if(tmp[0] != 0x81) {
+				return false;
+			}
+			if(tmp[3] != res) {
+				return false;
+			}
+			auto l = get16_big_(&tmp[1]);
+			if(l != (len + 1)) {
+				return false;
+			}
+			if(!read_(&tmp[4], len + 2)) {
+				return false;
+			}
+			auto sum = sum_(&tmp[1], len + 3);
+			if(sum != tmp[4 + len]) {
+				return false;
+			}
+			if(len > 0) {
+				std::memcpy(dst, &tmp[4], len);
+			}
+			return true;
 		}
 
 		std::string out_section_(uint32_t n, uint32_t num) const {
@@ -147,91 +267,39 @@ namespace rx64m {
 				std::cout << "# Connection OK." << std::endl;
 			}
 
-			// サポート・デバイス問い合わせ
+			// デバイスタイプ取得
 			{
-				if(!inquiry_device()) {
-					std::cerr << "Inquiry device error." << std::endl;
+				if(!inquiry_device_type()) {
+					std::cerr << "Inquiry device type error." << std::endl;
 					return false;
 				}
-				auto as = get_device();
+				auto a = get_device_type();
 				if(verbose_) {
-					int i = 0;
-					for(auto a : as) {
-						++i;
-						a.info(out_section_(i, as.size()));
-					}
+					a.info(out_section_(1, 1));
 				}
 			}
 
-			// データ量域の有無問い合わせ
+			// エンディアン通知コマンド
 			{
-				if(!inquiry_data()) {
-					std::cerr << "Inquiry data error." << std::endl;
-					return false;
+				uint8_t endian = 0x01;
+				if(!select_endian(endian)) {
+					std::cerr << "Select endian error." << std::endl;
 				}
 				if(verbose_) {
-					auto sect = out_section_(1, 1);
-					std::cout << sect << "Data area: ";
-					std::cout << boost::format("%02X") % static_cast<uint32_t>(data_) << std::endl;
+					std::cout << out_section_(1, 1) << "Endian is "
+						<< (endian != 0 ? "little." : "big.") << std::endl;
 				}
 			}
 
-			// ユーザー領域問い合わせ
+			// 周波数設定コマンド
 			{
-				if(!inquiry_area()) {
-					std::cerr << "Inquiry area error." << std::endl;
-					return false;
+				if(!select_frequency()) {
+					std::cerr << "Select frequency error." << std::endl;
 				}
 				if(verbose_) {
-					auto as = get_area();
-					int i = 0;
-					for(auto a : as) {
-						++i;
-						a.info(out_section_(i, as.size()) + "User ");
-					}				
-				}
-			}
-
-			// データ量域情報問い合わせ
-			{
-				if(!inquiry_data_area()) {
-					std::cerr << "Inquiry data-area error." << std::endl;
-					return false;
-				}
-				if(verbose_) {
-					auto as = get_data_area();
-					int i = 0;
-					for(auto a : as) {
-						++i;
-						a.info(out_section_(i, as.size()) + "Data ");
-					}				
-				}
-			}
-
-			// ブロック情報問い合わせ
-			{
-				if(!inquiry_block()) {
-					std::cerr << "Inquiry block error." << std::endl;
-					return false;
-				}
-				if(verbose_) {
-					auto as = get_block();
-					int i = 0;
-					for(auto a : as) {
-						++i;
-						a.info(out_section_(i, as.size()));
-					}				
-				}
-			}
-
-			//--- select device
-
-			// デバイス選択
-			{
-				auto as = get_device();
-				if(!select_device(as[0].code_)) {
-					std::cerr << "Select device error." << std::endl;
-					return false;
+					auto s = out_section_(1, 1);
+					std::cout << s << boost::format("System clock: %d") % system_clock_ << std::endl; 
+					std::cout << s << boost::format("Device clock: %d") % device_clock_ << std::endl; 
 				}
 			}
 
@@ -247,22 +315,10 @@ namespace rx64m {
 				}
 			}
 
-			// P/E ステータスに移行
-			{
-				if(!turn_pe_status()) {
-					std::cerr << "P/E status error." << std::endl;
-					return false;
-				}
-				if(verbose_) {
-					auto sect = out_section_(1, 1);
-					std::cout << sect << "ID Protect: ";
-					if(get_protect()) {
-						std::cout << "Enable" << std::endl;
-					} else {
-						std::cout << "Disable" << std::endl;
-					}					
-				}
-			}
+
+
+
+
 
 			return true;
 		}
@@ -298,7 +354,7 @@ namespace rx64m {
 		bool connection() {
 			bool ok = false;
 			for(int i = 0; i < 30; ++i) {
-				if(!command_(0x00)) {
+				if(!rs232c_.send(0x00)) {
 					return false;
 				}
 				timeval tv;
@@ -312,7 +368,7 @@ namespace rx64m {
 			}
 			if(!ok) return false;
 
-			if(!command_(0x55)) {
+			if(!rs232c_.send(0x55)) {
 				return false;
 			}
 
@@ -320,50 +376,42 @@ namespace rx64m {
 			tv.tv_sec  = 1;
 			tv.tv_usec = 0;
 			int ch = rs232c_.recv(tv);
-			if(ch == 0xff || ch != 0xE6) {
-				return false;
+			if(ch == 0xC1) {
+				connection_ = true;
+				return true;
 			}
 
-			connection_ = true;
-
-			return true;
+			return false;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	サポートデバイス問い合わせ（connection が成功したら呼ぶ）
+			@brief	デバイス種別取得（connection が成功したら呼ぶ）
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_device() {
+		bool inquiry_device_type() {
 			if(!connection_) return false;
 
-			if(!command_(0x20)) {
-				return false;
-			}
-			uint8_t tmp[2 + 256 + 16];
-			if(!read_(tmp, 2)) {
-				return false;
-			}
-			if(tmp[0] != 0x30) {
-				return false;
-			}
-			uint32_t total = tmp[1] + 1;
-
-			if(!read_(&tmp[2], total)) {
-				return false;
-			}
-			auto sum = sum_(tmp, tmp[1] + 2);
-			if(sum != tmp[2 + total - 1]) {
+			if(!command_(0x38)) {
 				return false;
 			}
 
-			rx::protocol::device d;
-			d.code_ = get32_(&tmp[3 + 1]);
-			tmp[3 + 1 + tmp[3]] = 0;
-			d.name_ = reinterpret_cast<const char*>(&tmp[3 + 1 + 4]);
-			devices_.push_back(d);
+			if(!status_back_(0x38)) {
+				return false;
+			}
+
+			uint8_t tmp[24];
+			if(!status_data_(0x38, tmp, sizeof(tmp))) {
+				return false;
+			}
+
+			std::memcpy(device_type_.TYP, &tmp[0], 8);
+			device_type_.OSA = get32_big_(&tmp[8]);
+			device_type_.OSI = get32_big_(&tmp[8 + 4]);
+			device_type_.CPA = get32_big_(&tmp[8 + 4 + 4]);
+			device_type_.CPI = get32_big_(&tmp[8 + 4 + 4 + 4]);
 
 			return true;
 		}
@@ -371,52 +419,32 @@ namespace rx64m {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	デバイスを取得
+			@brief	デバイス種別を取得
 			@return デバイス
 		*/
 		//-----------------------------------------------------------------//
-		const rx::protocol::devices& get_device() const { return devices_; }
+		const rx::protocol::device_type& get_device_type() const { return device_type_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ユーザー領域問い合わせ
+			@brief	エンディアン通知コマンド
+			@param[in]	endian ０ならビッグ、１ならリトル
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_area() {
+		bool select_endian(uint8_t endian) {
+
 			if(!connection_) return false;
 
-			if(!command_(0x25)) {
+			uint8_t tmp[1];
+			tmp[0] = endian;
+			if(!command_(0x36, tmp, 1)) {
 				return false;
 			}
 
-			uint8_t tmp[256];
-			if(!read_(tmp, 2)) {
+			if(!status_(0x36)) {
 				return false;
-			}
-			if(tmp[0] != 0x35) {
-				return false;
-			}
-			uint32_t total = tmp[1] + 1;
-			if(!read_(&tmp[2], total)) {
-				return false;
-			}
-
-			auto sum = sum_(tmp, tmp[1] + 2);
-			if(sum != tmp[2 + total - 1]) {
-				return false;
-			}
-
-			auto num = tmp[2];
-			const uint8_t* p = &tmp[3];
-			for(uint8_t i = 0; i < num; ++i) {
-				rx::protocol::area a;
-				a.org_ = get32_big_(p);
-				p += 4;
-				a.end_ = get32_big_(p);
-				p += 4;
-				area_.push_back(a);
 			}
 
 			return true;
@@ -425,193 +453,33 @@ namespace rx64m {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ユーザー領域を取得
-			@return ユーザー領域
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_area() const { return area_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	データ量域有無問い合わせ
+			@brief	周波数設定コマンド
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool inquiry_data() {
+		bool select_frequency() {
+
 			if(!connection_) return false;
 
-			if(!command_(0x2A)) {
+			uint8_t tmp[8];
+			put32_big_(&tmp[0],  16000000);
+			put32_big_(&tmp[4], 120000000);
+			if(!command_(0x32, tmp, sizeof(tmp))) {
 				return false;
 			}
 
-			uint8_t tmp[4];
-			if(!read_(tmp, 4)) {
-				return false;
-			}
-			if(tmp[0] != 0x3A) {
+			if(!status_back_(0x32)) {
 				return false;
 			}
 
-			if(sum_(tmp, 3) != tmp[4 - 1]) {
+			if(!status_data_(0x32, tmp, sizeof(tmp))) {
 				return false;
 			}
 
-			data_ = tmp[2];
+			system_clock_ = get32_big_(&tmp[0]);
+			device_clock_ = get32_big_(&tmp[4]);
 
 			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	データ量域有無取得
-			@return データ量域有無（通常、０ｘ１Ｄ）
-		*/
-		//-----------------------------------------------------------------//
-		uint8_t get_data() const { return data_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	データ量域情報問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_data_area() {
-			if(!connection_) return false;
-
-			if(!command_(0x2B)) {
-				return false;
-			}
-
-			uint8_t tmp[256];
-			if(!read_(tmp, 2)) {
-				return false;
-			}
-			if(tmp[0] != 0x3B) {
-				return false;
-			}
-			uint32_t total = tmp[1] + 1;
-			if(!read_(&tmp[2], total)) {
-				return false;
-			}
-
-			auto sum = sum_(tmp, tmp[1] + 2);
-			if(sum != tmp[2 + total - 1]) {
-				return false;
-			}
-
-			auto num = tmp[2];
-			const uint8_t* p = &tmp[3];
-			for(uint8_t i = 0; i < num; ++i) {
-				rx::protocol::area a;
-				a.org_ = get32_big_(p);
-				p += 4;
-				a.end_ = get32_big_(p);
-				p += 4;
-				data_areas_.push_back(a);			
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	データ量域情報を取得
-			@return データ量域情報
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::areas& get_data_area() const { return data_areas_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ブロック情報問い合わせ
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool inquiry_block() {
-			if(!connection_) return false;
-
-			if(!command_(0x26)) {
-				return false;
-			}
-
-			uint8_t tmp[256 + 1];
-			if(!read_(tmp, 3)) {
-				return false;
-			}
-			if(tmp[0] != 0x36) {
-				return false;
-			}
-			uint32_t total = get16_big_(&tmp[1]) + 1;
-			if(!read_(&tmp[3], total)) {
-				return false;
-			}
-
-			auto sum = sum_(tmp, 3 + total - 1);
-			if(sum != tmp[3 + total - 1]) {
-				return false;
-			}
-
-			const uint8_t* p = &tmp[4];
-			for(uint32_t i = 0; i < 2; ++i) {
-				rx::protocol::block a;
-				a.org_ = get32_big_(p);
-				p += 4;
-				a.size_ = get32_big_(p);
-				p += 4;
-				a.num_ = get32_big_(p);
-				p += 4;
-				blocks_.push_back(a);
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ブロック情報を取得
-			@return ブロック情報
-		*/
-		//-----------------------------------------------------------------//
-		const rx::protocol::blocks& get_block() const { return blocks_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	デバイスを選択
-			@param[in]	code	デバイス・コード
-		*/
-		//-----------------------------------------------------------------//
-		bool select_device(uint32_t code) {
-			if(!connection_) return false;
-
-			uint8_t tmp[7];
-			tmp[0] = 0x10;
-			tmp[1] = 4;
-			tmp[2] = code & 0xff;
-			tmp[3] = (code >> 8) & 0xff;
-			tmp[4] = (code >> 16) & 0xff;
-			tmp[5] = (code >> 24) & 0xff;
-			tmp[6] = sum_(tmp, 6);
-			if(!write_(tmp, 7)) {
-				return false;
-			}
-			uint8_t res[1];
-			if(!read_(res, 1)) {
-				return false;
-			}
-			if(res[0] == 0x46) {
-				return true;
-			} else if(res[0] == 0x90) {
-				read_(res, 1);
-				last_error_ = res[0];
-			}
-			return false;
 		}
 
 
@@ -626,22 +494,17 @@ namespace rx64m {
 		bool change_speed(const rx::protocol::rx_t& rx, uint32_t speed) {
 			if(!connection_) return false;
 
-			uint32_t nbr;
 			switch(speed) {
 			case 19200:
-				nbr = 192;
 				baud_rate_ = B19200;
 				break;
 			case 38400:
-				nbr = 384;
 				baud_rate_ = B38400;
 				break;
 			case 57600:
-				nbr = 576;
 				baud_rate_ = B57600;
 				break;
 			case 115200:
-				nbr = 1152;
 				baud_rate_ = B115200;
 				break;
 			default:
@@ -649,97 +512,40 @@ namespace rx64m {
 			}
 			baud_speed_ = speed; 
 
-			uint8_t cmd[10];
-			cmd[0] = 0x3F;
-			cmd[1] = 7;
-			put16_big_(&cmd[2], nbr);
-			cmd[4] = 0x00;  // dummy
-			cmd[5] = 0x00;  // dummy
-			cmd[6] = 0x02;
-			cmd[7] = 0x01;
-			cmd[8] = 0x01;
-			cmd[9] = sum_(cmd, 9);
-			if(!write_(cmd, 10)) {
-				return false;
-			}
-			uint8_t res[1];
-			if(!read_(res, 1)) {
-				return false;
-			}
-			if(res[0] == 0xBF) {
-				read_(res, 1);
-				last_error_ = res[0];
-				return false;
-			} else if(res[0] != 0x06) {
+			uint8_t tmp[4];
+			put32_big_(&tmp[0],  speed);
+			if(!command_(0x34, tmp, sizeof(tmp))) {
 				return false;
 			}
 
-			usleep(25000);	// 25[ms]
+			if(!status_(0x34)) {
+				return false;
+			}
+
+			usleep(1000);	// 1[ms]
 
 			if(!rs232c_.change_speed(baud_rate_)) {
 				return false;
 			}
 
-			if(!command_(0x06)) {
+			// 同期コマンド
+			if(!command_(0x00)) {
 				return false;
 			}
-			if(!read_(res, 1)) {
+			if(!status_(0x00)) {
 				return false;
 			}
-			if(res[0] != 0x06) {
-				return false;
-			}
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	P/E ステータス遷移
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool turn_pe_status() {
-			if(!connection_) return false;
-
-			if(!command_(0x40)) {
-				return false;
-			}
-
-			timeval tv;
-			tv.tv_sec  = 5;
-			tv.tv_usec = 0;
-			uint8_t head[1];
-			if(!read_(head, 1, tv)) {
-				return false;
-			}
-			if(head[0] == 0x26) {
-				id_protect_ = false;
-///				std::cout << "Return: 0x26" << std::endl;
-			} else if(head[0] == 0x16) {
-				id_protect_ = true;
-///				std::cout << "Return: 0x16" << std::endl;
-			} else if(head[0] == 0xc0) {
-				if(!read_(head, 1, tv)) {
-					return false;
-				}
-				last_error_ = head[0];
-				return false;
-			}
-
-			pe_turn_on_ = true;
 
 			return true;
 		}
 
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	プロテクト状態を取得
-			@return プロテクト状態
-		*/
-		//-----------------------------------------------------------------//
-		bool get_protect() const { return id_protect_; }
+
+
+
+
+
+
 
 
 
@@ -754,6 +560,7 @@ namespace rx64m {
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
+#if 0
 			// ユーザ／データ領域プログラム準備
 			if(!command_(0x43)) {
 				return false;
@@ -771,7 +578,7 @@ namespace rx64m {
 			}
 
 			select_write_area_ = true;
-
+#endif
 			return true;
 		}
 
@@ -788,7 +595,7 @@ namespace rx64m {
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 			if(!select_write_area_) return false;
-
+#if 0
 			uint8_t cmd[5 + 256 + 1];
 			cmd[0] = 0x50;
 ///			std::cout << boost::format("Address: %08X") % address << std::endl;			
@@ -842,7 +649,7 @@ namespace rx64m {
 ///				std::cout << boost::format("Write error code: %02X") % static_cast<uint32_t>(head[0]) << std::endl;
 				return false;
 			}
-
+#endif
 			return true;
 		}
 
@@ -859,7 +666,7 @@ namespace rx64m {
 		bool read(uint32_t adr, uint8_t* dst, uint32_t len) {
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
-
+#if 0
 			uint8_t cmd[12];
 			cmd[0] = 0x52;
 			cmd[1] = 9;
@@ -901,44 +708,11 @@ namespace rx64m {
 					return false;
 				}
 			}
+#endif
 			return true;
 		}
 
 
-#if 0
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	イレース・ページ
-			@param[in]	address	アドレス
-			@return エラー無ければ「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool erase_page(uint32_t address) {
-			if(!connection_) return false;
-			if(!verification_) return false;
-
-			char buff[4];
-			buff[0] = 0x20;
-			buff[1] = (address >> 8) & 0xff;
-			buff[2] = (address >> 16) & 0xff;
-			buff[3] = 0xD0;
-			if(rs232c_.send(buff, 4) != 4) {
-				return false;
-			}
-			rs232c_.sync_send();
-
-			status st;
-			if(!get_status(st)) {
-				return false;
-			}
-			if(st.get_SR5() != 0) {
-				return false;
-			}
-
-			return clear_status();
-		}
-
-#endif
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	終了

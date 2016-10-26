@@ -65,25 +65,25 @@ namespace rx24t {
 		uint32_t get32_(const uint8_t* p) {
 			uint32_t v;
 			v = p[0];
-			v |= p[1] << 8;
-			v |= p[2] << 16;
-			v |= p[3] << 24;
+			v |= static_cast<uint32_t>(p[1]) << 8;
+			v |= static_cast<uint32_t>(p[2]) << 16;
+			v |= static_cast<uint32_t>(p[3]) << 24;
 			return v;
 		}
 
 		uint32_t get16_big_(const uint8_t* p) {
 			uint32_t v;
 			v = p[1];
-			v |= p[0] << 8;
+			v |= static_cast<uint32_t>(p[0]) << 8;
 			return v;
 		}
 
 		uint32_t get32_big_(const uint8_t* p) {
 			uint32_t v;
 			v = p[3];
-			v |= p[2] << 8;
-			v |= p[1] << 16;
-			v |= p[0] << 24;
+			v |= static_cast<uint32_t>(p[2]) << 8;
+			v |= static_cast<uint32_t>(p[1]) << 16;
+			v |= static_cast<uint32_t>(p[0]) << 24;
 			return v;
 		}
 

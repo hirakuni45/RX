@@ -399,7 +399,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-
+#if 0
 	//=====================================
 	if(opts.write) {  // write
 		auto areas = motsx_.create_area_map();
@@ -470,6 +470,6 @@ int main(int argc, char* argv[])
 			std::cout << std::endl << std::flush;
 		}
 	}
-
+#endif
 	prog_.end();
 }
