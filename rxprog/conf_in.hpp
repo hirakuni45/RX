@@ -29,7 +29,7 @@ namespace utils {
 				--last;
 			} while(in[last] == ' ' || in[last] == '\t') ;
 			std::string out = in.substr(first, last - first + 1);
-			return std::move(out);
+			return out;
 		}
 
 	public:

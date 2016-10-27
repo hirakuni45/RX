@@ -82,8 +82,7 @@ LFLAGS =
 CCWARN	=	-Wimplicit -Wreturn-type -Wswitch \
 			-Wformat
 CPWARN	=	-Wall -Werror \
-			-Wno-unused-function \
-			-Wno-unused-but-set-variable
+			-Wno-unused-function
 
 OBJECTS	=	$(addprefix $(BUILD)/,$(patsubst %.cpp,%.o,$(PSOURCES))) \
 			$(addprefix $(BUILD)/,$(patsubst %.c,%.o,$(CSOURCES)))
