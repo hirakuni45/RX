@@ -1111,11 +1111,10 @@ namespace rx63t {
 			@brief	リード・ページ
 			@param[in]	adr	アドレス
 			@param[out]	dst	リード・データ
-			@param[in]	len	読み出しサイズ
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool read(uint32_t adr, uint8_t* dst, uint32_t len) {
+		bool read_page(uint32_t adr, uint8_t* dst) {
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
@@ -1124,7 +1123,7 @@ namespace rx63t {
 			cmd[1] = 9;
 			cmd[2] = 0x01;  // user-area, data-area
 			put32_big_(&cmd[3], adr);
-			put32_big_(&cmd[7], len);
+			put32_big_(&cmd[7], 256);
 			cmd[11] = sum_(cmd, 11);
 			if(!write_(cmd, 12)) {
 				return false;
@@ -1132,7 +1131,7 @@ namespace rx63t {
 
 			{
 				timeval tv;
-				tv.tv_sec  = 10;
+				tv.tv_sec  = 5;
 				tv.tv_usec = 0;
 				uint8_t head[5];
 				if(!read_(head, 5, tv)) {
@@ -1143,7 +1142,7 @@ namespace rx63t {
 				}
 				auto rs = get32_big_(&head[1]);
 				/// std::cout << "Read size: " << rs << std::endl;
-				tv.tv_sec  = 20;
+				tv.tv_sec  = 5;
 				tv.tv_usec = 0;
 				if(!read_(dst, rs, tv)) {
 //					std::cout << "Read error #0" << std::endl;
@@ -1152,7 +1151,7 @@ namespace rx63t {
 			}
 			{
 				timeval tv;
-				tv.tv_sec  = 10;
+				tv.tv_sec  = 5;
 				tv.tv_usec = 0;
 				uint8_t sum[1];
 				if(!read_(sum, 1, tv)) {

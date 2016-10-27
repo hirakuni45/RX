@@ -37,6 +37,7 @@ namespace rx64m {
 		bool				enable_id_ = false;
 
 		bool				pe_turn_on_ = false;
+		bool				data_area_ = false;
 		bool				select_write_area_ = false;
 
 		typedef std::set<uint32_t> erase_map;
@@ -44,14 +45,6 @@ namespace rx64m {
 
 		uint8_t				last_error_ = 0;
 
-		static uint32_t get32_(const uint8_t* p) {
-			uint32_t v;
-			v = p[0];
-			v |= static_cast<uint32_t>(p[1]) << 8;
-			v |= static_cast<uint32_t>(p[2]) << 16;
-			v |= static_cast<uint32_t>(p[3]) << 24;
-			return v;
-		}
 
 		static uint32_t get16_big_(const uint8_t* p) {
 			uint32_t v;
@@ -60,10 +53,12 @@ namespace rx64m {
 			return v;
 		}
 
+
 		static void put16_big_(uint8_t* p, uint32_t val) {
 			p[0] = (val >> 8) & 0xff;
 			p[1] = val & 0xff;
 		}
+
 
 		static uint32_t get32_big_(const uint8_t* p) {
 			uint32_t v;
@@ -74,12 +69,14 @@ namespace rx64m {
 			return v;
 		}
 
+
 		static void put32_big_(uint8_t* p, uint32_t val) {
 			p[0] = (val >> 24) & 0xff;
 			p[1] = (val >> 16) & 0xff;
 			p[2] = (val >> 8) & 0xff;
 			p[3] =  val & 0xff;
 		}
+
 
 		static uint8_t sum_(const uint8_t* buff, uint32_t len) {
 			uint16_t sum = 0;
@@ -89,9 +86,11 @@ namespace rx64m {
 			return (0 - sum) & 0xff;
 		}
 
+
 		bool read_(void* buff, uint32_t len, const timeval& tv) {
 			return rs232c_.recv(buff, len, tv) == len;
 		}
+
 
 		bool read_(void* buff, uint32_t len) {
 			timeval tv;
@@ -100,11 +99,13 @@ namespace rx64m {
 			return rs232c_.recv(buff, len, tv) == len;
 		}
 
+
 		bool write_(const void* buff, uint32_t len) {
 			uint32_t wr = rs232c_.send(buff, len);
 			rs232c_.sync_send();
 			return wr == len;
 		}
+
 
 		bool com_(uint8_t soh, uint8_t cmd, uint8_t ext, const uint8_t* src = nullptr, uint32_t len = 0) {
 			uint8_t tmp[1 + 2 + 1 + len + 1 + 1];
@@ -246,6 +247,7 @@ namespace rx64m {
 			}
 			return true;
 		}
+
 
 		std::string out_section_(uint32_t n, uint32_t num) const {
 			return (boost::format("#%02d/%02d: ") % n % num).str();
@@ -677,10 +679,9 @@ namespace rx64m {
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
-
-
-
+			data_area_ = data;
 			select_write_area_ = true;
+
 			return true;
 		}
 
@@ -698,27 +699,71 @@ namespace rx64m {
 			if(!pe_turn_on_) return false;
 			if(!select_write_area_) return false;
 
+			// final method to pass...
+			if(address == 0xFFFFFFFF || src == nullptr) {
+				return true;
+			}
 
+			uint8_t tmp[8];
+			put32_big_(&tmp[0], address);
+			put32_big_(&tmp[4], address + 255);
+			if(!command_(0x13, tmp, sizeof(tmp))) {
+				return false;
+			}
 
+			if(!status_(0x13)) {
+				return false;
+			}
 
-			return true;
+			if(!com_(0x81, 0x13, 0x03, src, 256)) {
+				return false;
+			}
+
+			uint8_t res;
+			uint8_t err;
+			if(!response_(res, err)) {
+				return false;
+			}
+			if(res == 0x13) {  // write OK
+				return true;
+			} else if(res == 0x93) { // write error
+				std::cerr << std::endl;
+				std::cerr << boost::format("Write error (%08X), status: %02X")
+					% address % static_cast<uint32_t>(err) << std::endl;
+			}
+			return false;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	リード・ページ
+			@brief	リード・ページ（２５６バイト）
 			@param[in]	adr	アドレス
 			@param[out]	dst	リード・データ
-			@param[in]	len	読み出しサイズ
 			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool read(uint32_t adr, uint8_t* dst, uint32_t len) {
+		bool read_page(uint32_t adr, uint8_t* dst) {
 			if(!connection_) return false;
 			if(!pe_turn_on_) return false;
 
+			uint8_t tmp[8];
+			put32_big_(&tmp[0], adr);
+			put32_big_(&tmp[4], adr + 255);
+			if(!command_(0x15, tmp, sizeof(tmp))) {
+				return false;
+			}
 
+			if(!status_(0x15)) {
+				return false;
+			}
+
+			if(!com_(0x81, 0x15, 0x03)) {
+				return false;
+			}
+			if(!status_data_(0x15, dst, 256)) {
+				return false;
+			}
 
 			return true;
 		}

@@ -60,17 +60,16 @@ namespace rx {
 		};
 
 
-		struct read_visitor {
+		struct read_page_visitor {
 			using result_type = bool;
 
 			uint32_t adr_;
 			uint8_t* dst_;
-			uint32_t len_;
-			read_visitor(uint32_t adr, uint8_t* dst, uint32_t len) : adr_(adr), dst_(dst), len_(len) { }
+			read_page_visitor(uint32_t adr, uint8_t* dst) : adr_(adr), dst_(dst) { }
 
     		template <class T>
     		bool operator()(T& x) {
-				return x.read(adr_, dst_, len_);
+				return x.read_page(adr_, dst_);
 			}
 		};
 
@@ -175,18 +174,17 @@ namespace rx {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	リード
+			@brief	リード・ページ（２５６バイト）
 			@param[in]	adr	開始アドレス
 			@param[out]	dst	書き込みアドレス
-			@param[in]	len	読み出しサイズ
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool read(uint32_t adr, uint8_t* dst, uint32_t len) {
-			read_visitor vis(adr, dst, len);
+		bool read_page(uint32_t adr, uint8_t* dst) {
+			read_page_visitor vis(adr, dst);
            	if(!boost::apply_visitor(vis, protocol_)) {
 				end();
-				std::cerr << "Read error." << std::endl;
+				std::cerr << "Read page error." << std::endl;
 				return false;
 			}
 			return true;
@@ -195,33 +193,31 @@ namespace rx {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	ベリファイ
+			@brief	ベリファイ・ページ（２５６バイト）
 			@param[in]	adr	開始アドレス
 			@param[in]	src	書き込みアドレス
-			@param[in]	len	読み出しサイズ
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool verify(uint32_t adr, const uint8_t* src, uint32_t len) {
-			std::vector<uint8_t> dev;
-			dev.resize(len);
-			if(!read(adr, &dev[0], len)) {
+		bool verify_page(uint32_t adr, const uint8_t* src) {
+			uint8_t dev[256];
+			if(!read_page(adr, &dev[0])) {
 				return false;
 			}
 			uint32_t errcnt = 0;
-			for(auto d : dev) {
+			for(uint32_t i = 0; i < 256; ++i) {
 				auto m = *src++;
-				if(d != m) {
+				if(dev[i] != m) {
 					++errcnt;
 					if(verbose_) {
 						std::cerr << (boost::format("0x%08X: D(%02X) to M(%02X)") % adr %
-							static_cast<uint32_t>(d) % static_cast<uint32_t>(m)) << std::endl;
+							static_cast<uint32_t>(dev[i]) % static_cast<uint32_t>(m)) << std::endl;
 					}
 				}
 				++adr;
 			}
 			if(errcnt > 0) {
-				std::cerr << "Verify error: " << errcnt << std::endl;
+				std::cerr << "Verify page error: " << errcnt << std::endl;
 				return false;
 			}
 			return true;

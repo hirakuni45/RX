@@ -13,7 +13,7 @@
 
 namespace {
 
-	const std::string version_ = "0.81b";
+	const std::string version_ = "0.87b";
 	const std::string conf_file_ = "rx_prog.conf";
 	const uint32_t progress_num_ = 50;
 	const char progress_cha_ = '#';
@@ -313,6 +313,12 @@ int main(int argc, char* argv[])
 	if(opts.help || opts.com_path.empty() || (opts.inp_file.empty() && !opts.device_list)
 ///			&& opts.sequrity_set.empty() && !opts.sequrity_get && !opts.sequrity_release)
 		|| opts.com_speed.empty() || opts.device.empty()) {
+		if(opts.device.empty()) {
+			std::cout << "Device name null." << std::endl;
+		}
+		if(opts.com_speed.empty()) {
+			std::cout << "Serial speed none." << std::endl;
+		}
 		help_(argv[0]);
 		return 0;
 	}
@@ -498,7 +504,7 @@ int main(int argc, char* argv[])
 				}
 				/// std::cout << boost::format("%08X to %08X") % adr % (adr + 255) << std::endl;
 				auto mem = motsx_.get_memory(adr);
-				if(!prog_.verify(adr, &mem[0], 256)) {
+				if(!prog_.verify_page(adr, &mem[0])) {
 					prog_.end();
 					return -1;
 				}

@@ -128,6 +128,9 @@ $(BUILD)/%.d : %.cpp
 run:
 	./$(TARGET) -d RX64M -P COM11 --verbose --progress --erase --write --verify uart_sample.mot
 
+run_verify:
+	./$(TARGET) -d RX64M -P COM11 --verbose --progress --verify uart_sample.mot
+
 clean:
 	rm -rf $(BUILD) $(TARGET)
 
