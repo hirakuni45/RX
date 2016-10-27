@@ -25,6 +25,8 @@ namespace chip {
 
 		I2C_IO& i2c_io_;
 
+		bool	start_;
+
 		struct reg_t {
 			uint8_t	reg[7];
 			bool operator != (const reg_t& t) {
@@ -54,7 +56,7 @@ namespace chip {
 			@param[in]	i2c	iica_io クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		DS3231(I2C_IO& i2c) : i2c_io_(i2c) { }
+		DS3231(I2C_IO& i2c) : i2c_io_(i2c), start_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -67,7 +69,8 @@ namespace chip {
 			uint8_t reg[2];
 			reg[0] = 0x0e;	/// internal register address
 			reg[1] = 0x00;
-			return i2c_io_.send(DS3231_ADR_, reg, 2);
+			start_ = i2c_io_.send(DS3231_ADR_, reg, 2);
+			return start_;
 		}
 
 
@@ -79,6 +82,8 @@ namespace chip {
 		 */
 		//-----------------------------------------------------------------//
 		bool set_time(time_t t) const {
+			if(!start_) return false;
+
 			const tm* tp = gmtime(&t);
 			uint8_t reg[7];
 			reg[0] = ((tp->tm_sec  / 10) << 4) | (tp->tm_sec  % 10);  // 0 to 59
@@ -102,6 +107,8 @@ namespace chip {
 		 */
 		//-----------------------------------------------------------------//
 		bool get_time(time_t& tp) const {
+			if(!start_) return false;
+
 			reg_t t;
 			reg_t tmp;
 			tm ts;
@@ -123,7 +130,7 @@ namespace chip {
 			ts.tm_mon  = ((((t.reg[5] & 0x10) >> 4) * 10) + (t.reg[5] & 0xf)) - 1;
 			ts.tm_year = ((t.reg[6] >> 4) * 10) + (t.reg[6] & 0xf);
 			ts.tm_year += 100;
-			tp = mktime(&ts);
+			tp = mktime_gmt(&ts);
 			return true;
 		}
 	};

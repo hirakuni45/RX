@@ -198,7 +198,7 @@ struct tm *localtime(const time_t *timer)
 	@return		GMT:1970年1月1日0時0分0秒(4:THU)からの経過時間（秒）
 */
 //-----------------------------------------------------------------//
-time_t mktime(const struct tm *tmp)
+time_t mktime_gmt(const struct tm *tmp)
 {
 	time_t	t;
 	long	td;
@@ -210,6 +210,25 @@ time_t mktime(const struct tm *tmp)
 	t += (time_t)tmp->tm_hour * 3600L;
 	td = get_total_day(tmp->tm_year + 1900, tmp->tm_mon, tmp->tm_mday);
 	t += (time_t)td * 86400L;
+
+	return t;
+}
+
+
+//-----------------------------------------------------------------//
+/*!
+	@brief	tm 構造体（ローカル時間）から、世界標準(グリニッジ)時間を得る@n
+			※メンバー変数 tm_yday は再計算される。@n
+			※メンバー変数 tm_wday は再計算される。@n
+			※ tm_isdgt は無視される。
+	@param[in]	tmp	tm 構造体のポインター@n
+				※NULLの場合は、システムの構造体が使われる
+	@return		GMT:1970年1月1日0時0分0秒(4:THU)からの経過時間（秒）
+*/
+//-----------------------------------------------------------------//
+time_t mktime(const struct tm *tmp)
+{
+	time_t	t = mktime_gmt(tmp);
 
 // GMT からの偏差(-9時間）
 	t -= (time_t)timezone_offset_ * 3600;
