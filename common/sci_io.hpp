@@ -265,7 +265,7 @@ namespace device {
 			@return	入力文字数
 		 */
 		//-----------------------------------------------------------------//
-		uint32_t length() {
+		uint32_t recv_length() {
 			if(level_) {
 				return recv_.length();
 			} else {
@@ -294,7 +294,7 @@ namespace device {
 				return recv_.get();
 			} else {
 				char ch;
-				while(length() == 0) sleep_();
+				while(recv_length() == 0) sleep_();
 				ch = SCI::RDR();	///< 受信データ読み出し
 				return ch;
 			}
