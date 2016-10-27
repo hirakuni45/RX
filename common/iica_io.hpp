@@ -6,8 +6,10 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include <cstring>
 #include "common/renesas.hpp"
 #include "vect.h"
+#include "common/format.hpp"
 
 /// F_PCKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCKB
@@ -59,27 +61,118 @@ namespace device {
 		error		error_;
 
 		enum class event {
-			none,
+			NONE,
+			AL,
+			NACKF,
+			TOMF,
+			START,
+			STOP,
 		};
-		static event  event_;
+
+		struct intr_t {
+			volatile event     event_;
+			volatile uint8_t   firstb_;
+			volatile bool	   dummy_recv_;
+			const uint8_t*     src_;
+			uint8_t*           dst_;
+			volatile uint16_t  len_;
+			volatile uint16_t  send_id_;
+			volatile uint16_t  recv_id_;
+			intr_t() : event_(event::NONE), firstb_(0), dummy_recv_(false),
+				src_(nullptr), dst_(nullptr), len_(0),
+				send_id_(0), recv_id_(0) { }
+		};
+		static intr_t	intr_;
 
 		static INTERRUPT_FUNC void event_task_()
 		{
+			switch(intr_.event_) {
+			case event::NONE:
+				break;
+			case event::AL:
+				break;
+			case event::NACKF:
+				IICA::ICIER.NAKIE = 0;
+				if(intr_.dst_ != nullptr) {
+					IICA::ICSR2.STOP = 0;
+					IICA::ICCR2.SP = 1;
+					volatile auto d = IICA::ICDRR();  // dummy read
+				} else {
+					IICA::ICIER.TIE = 0;
+				}
+				break;
+			case event::TOMF:
+				break;
+			case event::START:
+				break;
+			case event::STOP:
+				IICA::ICIER.SPIE = 0;
+				IICA::ICSR2.NACKF = 0;
+				IICA::ICSR2.STOP = 0;
+				intr_.event_ = event::NONE;
+				++intr_.send_id_;
+				break;
+			}
 		}
 
 		static INTERRUPT_FUNC void recv_task_()
 		{
+			if(intr_.dst_ == nullptr || intr_.len_ == 0) {
+				IICA::ICIER.RIE = 0;
+			} else {
+				if(intr_.dummy_recv_) {
+					volatile auto d = IICA::ICDRR();
+					intr_.dummy_recv_ = false;
+				} else {
+					*intr_.dst_ = IICA::ICDRR();
+					++intr_.dst_;
+				   	--intr_.len_;
+					if(intr_.len_ <= 1) {
+						IICA::ICMR3.WAIT = 1;
+					} else if(intr_.len_ == 0) {
+
+					}
+				}
+			}
 		}
 
 		static INTERRUPT_FUNC void send_task_()
 		{
+			if(intr_.firstb_) {
+				IICA::ICDRT = intr_.firstb_;
+				intr_.firstb_ = 0;
+				if(intr_.dst_ != nullptr) {  // recv
+					IICA::ICIER.RIE = 1;
+					intr_.event_ = event::NACKF;
+					IICA::ICIER.NAKIE = 1;
+					intr_.dummy_recv_ = true;
+				}
+			} else if(intr_.src_ != nullptr && intr_.len_ > 0) {
+				IICA::ICDRT = *intr_.src_;
+				++intr_.src_;
+				--intr_.len_;
+				if(intr_.len_ == 0) {
+					intr_.src_ = nullptr;
+					IICA::ICIER.TIE = 0;
+					IICA::ICIER.TEIE = 1;
+				}
+			}
 		}
 
-		static INTERRUPT_FUNC void end_task_()
+		static INTERRUPT_FUNC void tend_task_()
 		{
+			IICA::ICSR2.STOP = 0;
+			IICA::ICCR2.SP = 1;
+			IICA::ICIER.TEIE = 0;
+			intr_.event_ = event::STOP;
+			IICA::ICIER.SPIE = 1;
 		}
 
 		static uint32_t intr_vec_(ICU::VECTOR v) { return static_cast<uint32_t>(v); }
+
+		void sleep_() {
+			asm("nop");
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -140,13 +233,14 @@ namespace device {
 				set_interrupt_task(event_task_, static_cast<uint32_t>(IICA::get_eei_vec()));
 				set_interrupt_task(recv_task_,  static_cast<uint32_t>(IICA::get_rxi_vec()));
 				set_interrupt_task(send_task_,  static_cast<uint32_t>(IICA::get_txi_vec()));
-				set_interrupt_task(end_task_,   static_cast<uint32_t>(IICA::get_tei_vec()));
+				set_interrupt_task(tend_task_,  static_cast<uint32_t>(IICA::get_tei_vec()));
 			} else {
 				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_eei_vec()));
 				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_rxi_vec()));
 				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_txi_vec()));
 				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_tei_vec()));
 			}
+			icu_mgr::set_level(IICA::get_peripheral(), level_);
 
 			IICA::ICCR1.IICRST = 0;
 
@@ -165,14 +259,33 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	送信割り込みIDを取得
+			@return 送信割り込みID
+		 */
+		//-----------------------------------------------------------------//
+		uint16_t get_send_id() const { return intr_.send_id_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	受信割り込みIDを取得
+			@return 受信割り込みID
+		 */
+		//-----------------------------------------------------------------//
+		uint16_t get_recv_id() const { return intr_.recv_id_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	送信
 			@param[in]	adr	７ビットアドレス
 			@param[in]	src	転送先
-			@param[in]	len	受信バイト数
+			@param[in]	len	送信バイト数
+			@param[in]	sync	非同期の場合「false」
 			@return 送信が完了した場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool send(uint8_t adr, const uint8_t* src, uint8_t len)
+		bool send(uint8_t adr, const uint8_t* src, uint16_t len, bool sync = true)
 		{
 			error_ = error::none;
 
@@ -184,39 +297,75 @@ namespace device {
 				}
 			}
 
-			IICA::ICCR2.ST = 1;
-
 			bool ret = true;
-			bool first = true;
-			while(len > 0) {
+			if(level_) {
+				volatile auto id = intr_.send_id_;
+				intr_.firstb_ = adr << 1;
+				intr_.src_ = src;
+				intr_.len_ = len;
+				intr_.event_ = event::NACKF;
+				IICA::ICIER = IICA::ICIER() | IICA::ICIER.NAKIE.b() | IICA::ICIER.TIE.b();
+				IICA::ICCR2.ST = 1;
+				if(sync) {
+					while(id == intr_.send_id_) sleep_();
+					if(intr_.event_ != event::NONE) {
+						error_ = error::send_data;
+						ret = false;
+					}
+				}
+			} else {
+				IICA::ICCR2.ST = 1;
+				bool first = true;
+				while(len > 0) {
 
-				if(IICA::ICSR2.NACKF() != 0) {
-					ret = false;
-					break;
+					if(IICA::ICSR2.NACKF() != 0) {
+						ret = false;
+						error_ = error::send_data;
+						break;
+					}
+
+					while(IICA::ICSR2.TDRE() == 0) ;
+
+					if(first) {
+						IICA::ICDRT = (adr << 1);
+						first = false;
+					} else {
+						IICA::ICDRT = *src++;
+						--len;
+					}
 				}
 
-				while(IICA::ICSR2.TDRE() == 0) ;
+				while(IICA::ICSR2.TEND() == 0) ;
 
-				if(first) {
-					IICA::ICDRT = (adr << 1);
-					first = false;
-				} else {
-					IICA::ICDRT = *src++;
-					--len;
-				}
+				IICA::ICSR2.STOP = 0;
+				IICA::ICCR2.SP = 1;
+
+				while(IICA::ICSR2.STOP() == 0) ;
+
+				IICA::ICSR2.NACKF = 0;
+				IICA::ICSR2.STOP = 0;
 			}
-
-			while(IICA::ICSR2.TEND() == 0) ;
-
-			IICA::ICSR2.STOP = 0;
-			IICA::ICCR2.SP = 1;
-
-			while(IICA::ICSR2.STOP() == 0) ;
-
-			IICA::ICSR2.NACKF = 0;
-			IICA::ICSR2.STOP = 0;
-
 			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	送信
+			@param[in]	adr	７ビットアドレス
+			@param[in]	val	転送値
+			@param[in]	src	転送先
+			@param[in]	len	送信バイト数
+			@param[in]	sync	非同期の場合「false」
+			@return 送信が完了した場合「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool send(uint8_t adr, uint8_t val, const uint8_t* src, uint16_t len, bool sync = true)
+		{
+			uint8_t tmp[len + 1];
+			tmp[0] = val;
+			std::memcpy(&tmp[1], src, len);
+			return send(adr, tmp, len + 1, sync);
 		}
 
 
@@ -229,7 +378,7 @@ namespace device {
 			@return 受信が完了した場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool recv(uint8_t adr, uint8_t* dst, uint8_t len)
+		bool recv(uint8_t adr, uint8_t* dst, uint16_t len)
 		{
 			error_ = error::none;
 
@@ -241,79 +390,82 @@ namespace device {
 				}
 			}
 
-			IICA::ICCR2.ST = 1;
-
-			while(IICA::ICSR2.TDRE() == 0) ;
-
-			IICA::ICDRT = (adr << 1) | 0x01;	// Slave Address
-
-			while(IICA::ICSR2.RDRF() == 0) ;
-
 			bool ret = true;
-			int8_t da;
-			if(IICA::ICSR2.NACKF() == 0) {
+			if(level_) {
+				volatile auto id = intr_.recv_id_;
+				intr_.firstb_ = (adr << 1) | 0x01;
+				intr_.dst_ = dst;
+				intr_.len_ = len;
 
-				da = IICA::ICDRR();	///< dummy read
+				IICA::ICIER.TIE = 1;
+				IICA::ICCR2.ST = 1;
 
+
+
+
+			} else {
+				IICA::ICCR2.ST = 1;
+
+				while(IICA::ICSR2.TDRE() == 0) ;
+
+				IICA::ICDRT = (adr << 1) | 0x01;
+
+				while(IICA::ICSR2.RDRF() == 0) ;
+
+				if(IICA::ICSR2.NACKF() != 0) {
+					IICA::ICSR2.STOP = 0;
+					IICA::ICCR2.SP = 1;
+					IICA::ICDRR();			///< read dummy
+
+					while(IICA::ICSR2.STOP() == 0) ;
+
+					IICA::ICSR2.NACKF = 0;
+					IICA::ICSR2.STOP = 0;
+					return false;
+				}
+
+				volatile uint8_t da;
+				if(len <= 2) {
+					IICA::ICMR3.WAIT = 1;
+				}
+				da = IICA::ICDRR();  // dummy read
 				while(1) {
-
 					while(IICA::ICSR2.RDRF() == 0) ;
-
-					if(len <= 1) {
+					if(len == 2) {
 						break;
-					}
-
-					if(len <= 2) {
+					} else if(len == 3) {
 						IICA::ICMR3.WAIT = 1;
 					}
-
-					da = IICA::ICDRR();
-					*dst++ = da;
+					*dst++ = IICA::ICDRR();
 					--len;
 				}
 
-				// NACK を返す必要がある場合
 				if(IICA::ICMR3.RDRFS() == 0) {
 					IICA::ICMR3.ACKWP = 1;
 					IICA::ICMR3.ACKBT = 1;
 					IICA::ICMR3.ACKWP = 0;
 				}
-
-				da = IICA::ICDRR();			// last read data
-				if(len) {
+				da = IICA::ICDRR();
+				if(len == 2) {
 					*dst++ = da;
-					--len;
 				}
 
 				while(IICA::ICSR2.RDRF() == 0) ;
-
 				IICA::ICSR2.STOP = 0;
 				IICA::ICCR2.SP = 1;
-
-				da = IICA::ICDRR();			// read data
-				if(len) {
-					*dst = da;
-				}
+				*dst = IICA::ICDRR();
 				IICA::ICMR3.WAIT = 0;
 
-			} else {
+				while(IICA::ICSR2.STOP() == 0) ;
+
+				IICA::ICSR2.NACKF = 0;
 				IICA::ICSR2.STOP = 0;
-				IICA::ICCR2.SP = 1;
-				da = IICA::ICDRR();			///< dummy read
-				ret = false;
 			}
-
-			while(IICA::ICSR2.STOP() == 0) {	// ICSR2.STOP(B3) == 1?
-			}
-
-			IICA::ICSR2.NACKF = 0;
-			IICA::ICSR2.STOP = 0;
 
 			return ret;
 		}
 
 	};
 
-	template<class IICA> typename iica_io<IICA>::event iica_io<IICA>::event_;
-
+	template<class IICA> typename iica_io<IICA>::intr_t iica_io<IICA>::intr_;
 }
