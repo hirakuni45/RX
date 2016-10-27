@@ -191,7 +191,7 @@ namespace {
 ///		cout << "    --erase-all, --erase-chip\tPerform rom and data flash erase" << endl;
 ///		cout << "    --erase-rom\t\t\tPerform rom flash erase" << endl;
 ///		cout << "    --erase-data\t\tPerform data flash erase" << endl;
-		cout << "    --id=ID[:,]ID[;,] ...      Specify protect ID (16bytes)" << endl;
+///		cout << "    --id=ID[:,]ID[;,] ...      Specify protect ID (16bytes)" << endl;
 ///		cout << "    -r, --read                 Perform data read" << endl;
 ///		cout << "    --area=ORG[:,]END          Specify read area" << endl;
 		cout << "    -v, --verify               Perform data verify" << endl;
@@ -265,12 +265,12 @@ int main(int argc, char* argv[])
 ///				if(!opts.set_area_(&p[7])) {
 ///					opterr = true;
 ///				}
-			} else if(p == "-r" || p == "--read") {
-				opts.read = true;
-			} else if(p == "-i") {
-				opts.id = true;
-			} else if(p.find("--id=") == 0) {
-				opts.id_val = &p[std::strlen("--id=")];
+//			} else if(p == "-r" || p == "--read") {
+//				opts.read = true;
+//			} else if(p == "-i") {
+//				opts.id = true;
+//			} else if(p.find("--id=") == 0) {
+//				opts.id_val = &p[std::strlen("--id=")];
 			} else if(p == "-w" || p == "--write") {
 				opts.write = true;
 			} else if(p == "-v" || p == "--verify") {
