@@ -11,7 +11,7 @@ extern "C" {
 	void sci_putch(char ch);
 	void sci_puts(const char *str);
 	char sci_getch(void);
-	uint32_t sci_length(void);
+	uint16_t sci_length(void);
 };
 
 namespace utils {
