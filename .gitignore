@@ -8,6 +8,5 @@
 *.bak
 *.dcm
 *.bck
-*.lib
 *.kicad_pcb-bak
 release/
