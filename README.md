@@ -65,13 +65,9 @@ Renesas RX マイコン
    pacman -S make
    pacman -S unzip
    pacman -S zlib-devel
-```
-  
- - git コマンドをインストール
-```
    pacman -S git
 ```
-
+   
 ---
 ## RX 開発環境準備（OS-X）
 
@@ -222,7 +218,7 @@ make install
 ## RX プロジェクトのソースコードを取得
 
 ```
-   git clone git@github.com:hirakuni45/RX.git
+   git clone git://github.com/hirakuni45/RX.git
 ```
    
 --- 
