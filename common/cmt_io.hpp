@@ -1,13 +1,18 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX62N, RX621, RX63T, RX64M グループ・CMT I/O 制御 @n
-			Copyright 2013 Kunihito Hiramatsu
+	@brief	RX600, RX200 グループ・CMT I/O 制御 @n
+			Copyright 2013, 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
+
+/// F_PCKB は周期パラメーター計算で必要で、設定が無いとエラーにします。
+#ifndef F_PCKB
+#  error "cmt_io.hpp requires F_PCKB to be defined"
+#endif
 
 namespace device {
 
@@ -20,8 +25,6 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class CMT, class TASK>
 	class cmt_io {
-
-		uint32_t	clock_;
 
 		uint8_t		level_;
 
@@ -60,16 +63,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		cmt_io() : clock_(0), level_(0) { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ベースクロックの設定
-			@param[in]	clock	ベース周波数
-		*/
-		//-----------------------------------------------------------------//
-		void set_clock(uint32_t clock) { clock_ = clock; }
+		cmt_io() : level_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -84,9 +78,9 @@ namespace device {
 
 			level_ = level;
 
-			if(freq == 0 || clock_ == 0) return false;
+			if(freq == 0) return false;
 
-			uint32_t cmcor = clock_ / freq / 8;
+			uint32_t cmcor = F_PCKB / freq / 8;
 			uint8_t cks = 0;
 			while(cmcor > 65536) {
 				cmcor >>= 2;
