@@ -307,6 +307,13 @@ namespace device {
 		static spcmd_t<base + 0x1C> SPCMD6;
 		static spcmd_t<base + 0x1E> SPCMD7;
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  チャンネルを返す
+			@return チャネル
+		*/
+		//-----------------------------------------------------------------//
 		int get_chanel() const {
 			return (base >> 5) & 1;
 		}
