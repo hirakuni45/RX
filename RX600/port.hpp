@@ -23,7 +23,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  PDR レジスタ
+			@brief  ポート方向レジスタ（PDR）
 		*/
 		//-----------------------------------------------------------------//
 		static basic_rw_t<rw8_t<base + 0x00> > PDR;
@@ -31,7 +31,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  PODR レジスタ
+			@brief  ポート出力データレジスタ（PODR）
 		*/
 		//-----------------------------------------------------------------//
 		static basic_rw_t<rw8_t<base + 0x20> > PODR;
@@ -39,15 +39,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  PIDR
+			@brief  ポート入力データレジスタ（PIDR）
 		*/
 		//-----------------------------------------------------------------//
-		static basic_ro_t<rw8_t<base + 0x40> > PIDR;
+		static basic_ro_t<ro8_t<base + 0x40> > PIDR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  PMR レジスタ
+			@brief  ポートモードレジスタ（PMR）
 		*/
 		//-----------------------------------------------------------------//
 		static basic_rw_t<rw8_t<base + 0x60> > PMR;
@@ -55,48 +55,52 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ODR0 レジスタ
+			@brief  オープンドレイン制御レジスタ 0（ODR0）
+			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x80>  odr0_io;
-		struct odr0_t : public odr0_io {
-			using odr0_io::operator =;
-			using odr0_io::operator ();
-			using odr0_io::operator |=;
-			using odr0_io::operator &=;
+		template <uint32_t ofs>
+		struct odr0_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs>  io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<odr0_io, bitpos::B0> B0;
-			bit_rw_t<odr0_io, bitpos::B2> B2;
-			bit_rw_t<odr0_io, bitpos::B3> B3;
-			bit_rw_t<odr0_io, bitpos::B4> B4;
-			bit_rw_t<odr0_io, bitpos::B6> B6;
+			bit_rw_t<io_, bitpos::B0> B0;
+			bit_rw_t<io_, bitpos::B2> B2;
+			bit_rw_t<io_, bitpos::B3> B3;
+			bit_rw_t<io_, bitpos::B4> B4;
+			bit_rw_t<io_, bitpos::B6> B6;
 		};
-		static odr0_t ODR0;
+		static odr0_t<base + 0x80> ODR0;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ODR1 レジスタ
+			@brief  オープンドレイン制御レジスタ 1（ODR1）
+			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
-		typedef rw8_t<base + 0x81>  odr1_io;
-		struct odr1_t : public odr1_io {
-			using odr1_io::operator =;
-			using odr1_io::operator ();
-			using odr1_io::operator |=;
-			using odr1_io::operator &=;
+		template <uint32_t ofs>
+		struct odr1_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs>  io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<odr1_io, bitpos::B0> B0;
-			bit_rw_t<odr1_io, bitpos::B2> B2;
-			bit_rw_t<odr1_io, bitpos::B4> B4;
-			bit_rw_t<odr1_io, bitpos::B6> B6;
+			bit_rw_t<io_, bitpos::B0> B0;
+			bit_rw_t<io_, bitpos::B2> B2;
+			bit_rw_t<io_, bitpos::B4> B4;
+			bit_rw_t<io_, bitpos::B6> B6;
 		};
-		static odr1_t ODR1;
+		static odr1_t<base + 0x81> ODR1;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  PCR レジスタ
+			@brief  プルアップ制御レジスタ（PCR）
 		*/
 		//-----------------------------------------------------------------//
 		static basic_rw_t<rw8_t<base + 0xC0> > PCR;
@@ -104,7 +108,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  DSCR レジスタ
+			@brief  駆動能力制御レジスタ（DSCR）
 		*/
 		//-----------------------------------------------------------------//
 		static basic_rw_t<rw8_t<base + 0xE0> > DSCR;
@@ -142,7 +146,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  方向・レジスタ
+			@brief  ポート方向レジスタ
 		*/
 		//-----------------------------------------------------------------//
 		static bit_rw_t<rw8_t<PORTx::base_address_ + 0x00>, bpos> DIR;
@@ -150,10 +154,26 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポート・レジスタ
+			@brief  プルアップ制御・レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		static bit_rw_t<rw8_t<PORTx::base_address_ + 0x20>, bpos> P;
+		static bit_rw_t<rw8_t<PORTx::base_address_ + 0xC0>, bpos> PU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポート・レジスタ @n
+					※ポート出力と、ポート入力が異なる
+		*/
+		//-----------------------------------------------------------------//
+		struct port_t {
+			static bit_rw_t<rw8_t<PORTx::base_address_ + 0x20>, bpos> PO;  // ポート出力用
+			static bit_ro_t<ro8_t<PORTx::base_address_ + 0x40>, bpos> PI;  // ポート入力用
+
+			void operator = (bool val) { PO = val; }
+			bool operator () () { return PI(); }
+		};
+		static port_t P;
 
 	};
 }
