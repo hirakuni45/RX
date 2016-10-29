@@ -103,11 +103,11 @@ namespace device {
 				CMT::CMSTR0.STR1 = 0;
 				break;
 			case 2:
-//				set_vector_(ICU::VECTOR::CMI2);
+				set_vector_(ICU::VECTOR::CMI2);
 				CMT::CMSTR1.STR2 = 0;
 				break;
 			case 3:
-//				set_vector_(ICU::VECTOR::CMI3);
+				set_vector_(ICU::VECTOR::CMI3);
 				CMT::CMSTR1.STR3 = 0;
 				break;
 			}
