@@ -31,8 +31,8 @@ namespace device {
 
 			CMI0   = 28,  // CMT0
 			CMI1   = 29,  // CMT1
-			CMW2   = 30,  // CMT2
-			CMW3   = 31,  // CMT3
+			CMI2   = 30,  // CMT2
+			CMI3   = 31,  // CMT3
 
 			FEPRF  = 32,  // CAC
 			MENDF  = 33,  // CAC
