@@ -117,6 +117,7 @@ namespace device {
 			} else {
 			    CMT::CMCR = CMT::CMCR.CKS.b(cks);
 			}
+			CMT::CMCNT = 0;
 		    CMT::CMCOR = cmcor - 1;
 			icu_mgr::set_level(CMT::get_peripheral(), level_);
 
@@ -155,7 +156,7 @@ namespace device {
 			@brief  割り込みカウンターの値を取得
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_count() const {
+		uint32_t get_counter() const {
 			return counter_;
 		}
 
