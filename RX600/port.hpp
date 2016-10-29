@@ -18,6 +18,9 @@ namespace device {
 	template <uint32_t base>
 	struct port_t {
 
+		static const uint32_t base_address_ = base;
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  PDR レジスタ
@@ -105,6 +108,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static basic_rw_t<rw8_t<base + 0xE0> > DSCR;
+
 	};
 
 	typedef port_t<0x0008C000> PORT0;
@@ -124,4 +128,32 @@ namespace device {
 	typedef port_t<0x0008C00f> PORTF;
 	typedef port_t<0x0008C010> PORTG;
 	typedef port_t<0x0008C012> PORTJ;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  単ポート定義テンプレート
+		@param[in]	PORTx	ポート・クラス
+		@param[in]	bpos	ビット位置	
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class PORTx, bitpos bpos>
+	struct PORT {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  方向・レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		static bit_rw_t<rw8_t<PORTx::base_address_ + 0x00>, bpos> DIR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポート・レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		static bit_rw_t<rw8_t<PORTx::base_address_ + 0x20>, bpos> P;
+
+	};
 }
