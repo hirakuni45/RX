@@ -471,10 +471,7 @@ namespace device {
 	template <class T>
 	struct basic_ro_t : public T {
 
-		using T::operator =;
 		using T::operator ();
-		using T::operator |=;
-		using T::operator &=;
 
 		bit_ro_t<T, bitpos::B7> B7;	///< B7 アクセス
 		bit_ro_t<T, bitpos::B6> B6;	///< B6 アクセス
