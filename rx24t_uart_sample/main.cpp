@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
-		if(sci_.length()) {
+		if(sci_.recv_length()) {
 			auto ch = sci_.getch();
 			sci_.putch(ch);
 		}

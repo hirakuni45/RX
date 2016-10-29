@@ -28,7 +28,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX24T
 
-OPTIMIZE	=	-Os -flto
+OPTIMIZE	=	-Os
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
