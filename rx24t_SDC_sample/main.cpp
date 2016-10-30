@@ -298,6 +298,14 @@ extern "C" {
 		utils::format("Read: %d Bytes/Sec\n") % pbyte;
 		utils::format("Read: %d KBytes/Sec\n") % (pbyte / 1024);
 	}
+
+	bool check_mount_() {
+		auto f = sdc_.get_mount();
+		if(!f) {
+			utils::format("SD card not mount.\n");
+		}
+		return f;
+	}
 }
 
 int main(int argc, char** argv);
@@ -385,28 +393,43 @@ int main(int argc, char** argv)
 			if(cmdn >= 1) {
 				bool f = false;
 				if(command_.cmp_word(0, "dir")) {  // dir [xxx]
-					if(cmdn >= 2) {
-						char tmp[128];
-						command_.get_word(1, sizeof(tmp), tmp);
-						sdc_.dir(tmp);
-					} else {
-						sdc_.dir("");
+					if(check_mount_()) {
+						if(cmdn >= 2) {
+							char tmp[128];
+							command_.get_word(1, sizeof(tmp), tmp);
+							sdc_.dir(tmp);
+						} else {
+							sdc_.dir("");
+						}
 					}
 					f = true;
 				} else if(command_.cmp_word(0, "cd")) {  // cd [xxx]
-					if(cmdn >= 2) {
-						char tmp[128];
-						command_.get_word(1, sizeof(tmp), tmp);
-						sdc_.cd(tmp);						
-					} else {
-						sdc_.cd("/");
+					if(check_mount_()) {
+						if(cmdn >= 2) {
+							char tmp[128];
+							command_.get_word(1, sizeof(tmp), tmp);
+							sdc_.cd(tmp);						
+						} else {
+							sdc_.cd("/");
+						}
 					}
 					f = true;
 				} else if(command_.cmp_word(0, "pwd")) { // pwd
 					utils::format("%s\n") % sdc_.get_current();
 					f = true;
 				} else if(command_.cmp_word(0, "speed")) { // speed
-					test_all_();
+					if(check_mount_()) {
+						test_all_();
+					}
+					f = true;
+				} else if(command_.cmp_word(0, "help")) { // help
+					utils::format("dir [name]\n");
+					utils::format("cd [directory-name]\n");
+					utils::format("pwd\n");
+					utils::format("speed\n");
+#ifdef RTC
+					utils::format("date\n");
+#endif
 					f = true;
 #ifdef RTC
 				} else if(command_.cmp_word(0, "date")) { // date
