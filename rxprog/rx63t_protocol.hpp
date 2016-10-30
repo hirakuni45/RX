@@ -701,6 +701,10 @@ namespace rx63t {
 				nbr = 1152;
 				baud_rate_ = B115200;
 				break;
+			case 230400:
+				nbr = 2304;
+				baud_rate_ = B230400;
+				break;
 			default:
 				return false;
 			}

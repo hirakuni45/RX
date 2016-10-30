@@ -223,21 +223,26 @@ int main(int argc, char* argv[])
 		auto defa = conf_in_.get_default();
 		opts.device = defa.device_;
 #ifdef __CYGWIN__
-		opts.com_path = defa.port_win_;
 		opts.platform = "Cygwin";
+		opts.com_path = defa.port_win_;
+		opts.com_speed = defa.speed_win_;
 #endif
 #ifdef __APPLE__
-		opts.com_path = defa.port_osx_;
 		opts.platform = "OS-X";
+		opts.com_path = defa.port_osx_;
+		opts.com_speed = defa.speed_osx_;
 #endif
 #ifdef __linux__
-		opts.com_path = defa.port_linux_;
 		opts.platform = "Linux";
+		opts.com_path = defa.port_linux_;
+		opts.com_speed = defa.speed_linux_;
 #endif
 		if(opts.com_path.empty()) {
 			opts.com_path = defa.port_;
 		}
-		opts.com_speed = defa.speed_;
+		if(opts.com_speed.empty()) {
+			opts.com_speed = defa.speed_;
+		}
 		opts.id_val = defa.id_;
 	} else {
 		std::cerr << "Configuration file can't load: '" << conf_path << '\'' << std::endl;

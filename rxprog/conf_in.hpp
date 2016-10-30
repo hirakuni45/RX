@@ -62,6 +62,9 @@ namespace utils {
 			std::string port_osx_;
 			std::string port_linux_;
 			std::string speed_;
+			std::string speed_win_;
+			std::string speed_osx_;
+			std::string speed_linux_;
 			std::string id_;
 
 			bool analize(const std::string& s) {
@@ -75,6 +78,9 @@ namespace utils {
 					else if(ss[0] == "port_osx") port_osx_ = ss[1];
 					else if(ss[0] == "port_linux") port_linux_ = ss[1];
 					else if(ss[0] == "speed") speed_ = ss[1];
+					else if(ss[0] == "speed_win") speed_win_ = ss[1];
+					else if(ss[0] == "speed_osx") speed_osx_ = ss[1];
+					else if(ss[0] == "speed_linux") speed_linux_ = ss[1];
 					else if(ss[0] == "id") id_ = ss[1];
 					else ok = false;
 				} else {

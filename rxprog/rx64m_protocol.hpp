@@ -544,6 +544,9 @@ namespace rx64m {
 			case 115200:
 				baud_rate_ = B115200;
 				break;
+			case 230400:
+				baud_rate_ = B230400;
+				break;
 			default:
 				return false;
 			}
