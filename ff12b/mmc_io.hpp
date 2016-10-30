@@ -179,11 +179,10 @@ namespace fatfs {
 
 		void start_spi_(bool fast)
 		{
-			uint8_t intr_level = 0;
 			uint32_t speed;
 			if(fast) speed = spi_.get_max_speed();
-			else speed = 4000000;
-			if(!spi_.start(speed, SPI::PHASE::TYPE4, intr_level)) {
+			else speed = 4000000;  // 初期化時、4MB/s
+			if(!spi_.start_sdc(speed)) {
 				utils::format("CSI Start fail ! (Clock spped over range)\n");
 			}
 		}
