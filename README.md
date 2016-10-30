@@ -1,6 +1,6 @@
 Renesas RX マイコン
 =========
-![R5F564ML](RX64Mtray.jpg)
+![R5F564ML](RXchipS.jpg)
 
 ## RX 各ディレクトリー、及び概要など
 
