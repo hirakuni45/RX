@@ -105,6 +105,47 @@ namespace device {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ＳＤカード用設定を有効にする
+			@param[in]	speed	通信速度
+			@return エラー（速度設定範囲外）なら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool start_sdc(uint32_t speed)
+		{
+			level_ = 0;
+
+			RSPI::SPCR = 0x00;			
+
+			port_map::turn(RSPI::get_peripheral());
+
+			uint32_t spbr = F_PCKB / 2 / speed;
+			uint8_t brdv = 0;
+			while(spbr > 256) {
+				spbr >>= 1;
+				++brdv;
+				if(brdv > 3) return false;
+			}
+
+			power_cfg::turn(RSPI::get_peripheral());
+
+		    RSPI::SPBR = static_cast<uint8_t>(spbr - 1);
+
+			RSPI::SPPCR = 0x00;	// Fixed idle value, disable loop-back
+			RSPI::SPSCR = 0x00;	// disable sequence control
+			RSPI::SPDCR = 0x20;	// SPLW=1 (long word access) 
+			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0111);
+
+			RSPI::SPCR.SPMS = 1;
+			RSPI::SPCR.MSTR = 1;
+
+			RSPI::SPCR.SPE = 1;
+
+			return true;
+		}
+
+
 		//----------------------------------------------------------------//
 		/*!
 			@brief	リード・ライト
