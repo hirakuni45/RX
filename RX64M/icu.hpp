@@ -153,6 +153,9 @@ namespace device {
 
 			INTB128  = 128,
 			INTA208  = 208,
+
+			CMI2     = 256,  // CMT2 for share vector
+			CMI3     = 257,  // CMT3 for share vector
 		};
 
 
