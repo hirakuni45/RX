@@ -22,6 +22,7 @@
 #include "RX24T/riic.hpp"
 #include "RX24T/rspi.hpp"
 #include "RX24T/s12ad.hpp"
+#include "RX24T/mtu3.hpp"
 #include "RX24T/port_map.hpp"
 #include "RX24T/power_cfg.hpp"
 #include "RX24T/icu_mgr.hpp"
