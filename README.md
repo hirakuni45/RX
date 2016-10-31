@@ -24,12 +24,13 @@ Renesas RX マイコン
  - /RX63T          --->   RX63T 専用のデバイス定義クラス、リンカースクリプト
  - /RX24T          --->   RX24T 専用のデバイス定義クラス、リンカースクリプト
  - /RX621          --->   RX621 専用のデバイス定義クラス、リンカースクリプト（現在メンテ対象外）
- - /fatfs          --->   ChaN 氏作成の fatfs ソースコードと RX マイコン向け RSPI コード
+ - /ff12b          --->   ChaN 氏作成の fatfs ソースコードと RX マイコン向け RSPI コード
  - /common         --->   共有クラス、ヘッダーなど
  - /rxprog         --->   RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
  - /rx63t_chager   --->   RX63T を使ったモバイルバッテリー・チャージャー・プロジェクト
  - /rx24t_first_sample ---> RX24T を使った LED 点滅
  - /rx24t_uart_sample ---> RX24T を使った UART (SCI1) の制御サンプル
+ - /rx24t_SDC_sample  ---> RX24T を使った SD カードの動作サンプル
  - /rx64m_first_sample ---> RX64M を使った LED 点滅
  - /rx64m_uart_sample  ---> RX64M を使った UART (SCI1) の制御サンプル
 
