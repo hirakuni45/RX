@@ -17,6 +17,7 @@
 #include "RX600/port.hpp"
 #include "RX600/cmt.hpp"
 #include "RX24T/system.hpp"
+#include "RX24T/dtc.hpp"
 #include "RX24T/icu.hpp"
 #include "RX24T/sci.hpp"
 #include "RX24T/riic.hpp"
