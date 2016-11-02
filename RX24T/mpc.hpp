@@ -190,6 +190,7 @@ namespace device {
 		static pfsw_t<0x0008C168> P50PFS;
 		static pfsw_t<0x0008C169> P51PFS;
 		static pfsw_t<0x0008C16A> P52PFS;
+		static pfsw_t<0x0008C16B> P53PFS;
 		static pfsw_t<0x0008C16C> P54PFS;
 		static pfsw_t<0x0008C16D> P55PFS;
 

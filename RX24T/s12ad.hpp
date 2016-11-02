@@ -7,17 +7,19 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
+#include "RX24T/peripheral.hpp"
+#include "RX24T/icu.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  S12AD コア定義
+		@brief  S12AD 基本定義
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base>
-	struct s12ad_core_t {
+	struct s12ad_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -231,12 +233,13 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  S12AD 定義
+		@brief  S12AD0 定義
 		@param[in]	base	ベース・アドレス
+		@param[in]	t		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
-	struct s12ad_t : public s12ad_core_t<base> {
+	template <uint32_t base, peripheral t>
+	struct s12ad0_t : public s12ad_t<base> {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -509,10 +512,11 @@ namespace device {
 	/*!
 		@brief  S12AD1 定義
 		@param[in]	base	ベース・アドレス
+		@param[in]	t		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
-	struct s12ad1_t : public s12ad_core_t<base> {
+	template <uint32_t base, peripheral t>
+	struct s12ad1_t : public s12ad_t<base> {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -602,10 +606,11 @@ namespace device {
 	/*!
 		@brief  S12AD2 定義
 		@param[in]	base	ベース・アドレス
+		@param[in]	t		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
-	struct s12ad2_t : public s12ad_core_t<base> {
+	template <uint32_t base, peripheral t>
+	struct s12ad2_t : public s12ad_t<base> {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -823,9 +828,18 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static rw8_t<base + 0xEB> ADSSTR11;
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ペリフェラル型を返す
+			@return ペリフェラル型
+		*/
+		//-----------------------------------------------------------------//
+		static peripheral get_peripheral() { return t; }
+
 	};
 
-	typedef s12ad_t <0x00089000> S12AD;
-	typedef s12ad1_t<0x00089200> S12AD1;
-	typedef s12ad2_t<0x00089400> S12AD2;
+	typedef s12ad0_t<0x00089000, peripheral::S12AD>  S12AD;
+	typedef s12ad1_t<0x00089200, peripheral::S12AD1> S12AD1;
+	typedef s12ad2_t<0x00089400, peripheral::S12AD2> S12AD2;
 }

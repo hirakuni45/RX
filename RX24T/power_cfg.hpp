@@ -29,6 +29,10 @@ namespace device {
 		{
 			bool f = !ena;
 			switch(t) {
+			case peripheral::DTC:
+				SYSTEM::MSTPCRA.MSTPA28 = f;
+				break;
+
 			case peripheral::CMT0:
 			case peripheral::CMT1:
 				SYSTEM::MSTPCRA.MSTPA15 = f;
@@ -55,6 +59,17 @@ namespace device {
 			case peripheral::SCI6:
 				SYSTEM::MSTPCRB.MSTPB25 = f;
 				break;
+
+			case peripheral::S12AD:
+				SYSTEM::MSTPCRA.MSTPA17 = f;
+				break;
+			case peripheral::S12AD1:
+				SYSTEM::MSTPCRA.MSTPA16 = f;
+				break;
+			case peripheral::S12AD2:
+				SYSTEM::MSTPCRA.MSTPA23 = f;
+				break;
+
 			default:
 				break;
 			}
