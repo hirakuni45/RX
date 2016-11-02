@@ -71,6 +71,16 @@ namespace device {
 				ICU::IER.TEI0 = ena;
 				break;
 
+			case peripheral::S12AD:
+//				ICU::IPR.EEI0 = lvl;
+				break;
+			case peripheral::S12AD1:
+
+				break;
+			case peripheral::S12AD2:
+
+				break;
+
 			default:
 				break;
 			}

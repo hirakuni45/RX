@@ -89,6 +89,14 @@ namespace device {
 		};
 		static dtcsts_t<0x0008240E> DTCSTS;
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ペリフェラル型を返す
+			@return ペリフェラル型
+		*/
+		//-----------------------------------------------------------------//
+		static peripheral get_peripheral() { return peripheral::DTC; }
 	};
 	typedef dtc_t DTC;
 }
