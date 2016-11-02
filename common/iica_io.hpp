@@ -7,8 +7,8 @@
 */
 //=====================================================================//
 #include <cstring>
+#include "common/vect.h"
 #include "common/renesas.hpp"
-#include "vect.h"
 #include "common/format.hpp"
 
 /// F_PCKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。

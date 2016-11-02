@@ -9,7 +9,7 @@
 #include "RX63T/gpt.hpp"
 #include "RX63T/system.hpp"
 #include "RX63T/icu.hpp"
-#include "vect.h"
+#include "common/vect.h"
 
 /// F_PCKA タイマーのクロックに必要なので定義が無い場合エラーにします。
 #ifndef F_PCKA

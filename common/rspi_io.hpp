@@ -7,7 +7,7 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "vect.h"
+#include "common/vect.h"
 
 /// F_PCKB は速度パラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCKB
