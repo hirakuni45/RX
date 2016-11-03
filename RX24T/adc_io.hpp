@@ -1,13 +1,15 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX グループ A/D 制御 @n
+	@brief	RX24T グループ A/D 制御 @n
 			Copyright 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
+#include "RX24T/port_map.hpp"
+#include "RX24T/power_cfg.hpp"
 
 namespace device {
 
@@ -22,36 +24,26 @@ namespace device {
 	class adc_io {
 	public:
 
-#if 0
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef ADCU value_type;
+
+		//-----------------------------------------------------------------//
 		/*!
-			@brief  ＋基準電圧タイプ
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class REFP : uint8_t {
-			VDD,      ///< VDD
-			VREFP,    ///< P20/VREFP
-			INT_1_45  ///< 内臓 1.45V リファレンス
+			@brief	変換モード
+		 */
+		//-----------------------------------------------------------------//
+		enum class cnv_type : uint8_t {
+			
 		};
 
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  －基準電圧タイプ
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class REFM : uint8_t {
-			VSS,    ///< VSS
-			VREFM,  ///< P21/VREFM
-		};
-#endif
 
 	private:
 		static TASK task_;
 
+		port_map::analog	org_;
+		port_map::analog	end_;
 		uint8_t	level_;
 
-//		static volatile uint16_t value_[NUM];
+		static volatile uint16_t value_[ADCU::analog_num_];
 
 		static inline void sleep_() { asm("nop"); }
 
@@ -61,25 +53,39 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		adc_io() : level_(0) {
-//			for(uint8_t i = 0; i < NUM; ++i) value_[i] = 0;
+		adc_io() : org_(ADCU::analog_org_), end_(ADCU::analog_end_), level_(0) {
+			for(uint32_t i = 0; i < ADCU::analog_num_; ++i) value_[i] = 0;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	スタート
-			@param[in]	refp	＋基準電圧選択
-			@param[in]	refm	－基準電圧選択
-			@param[in]	level	割り込みレベル（１～２）、０の場合はポーリング
+			@param[in]	org		変換開始アナログ入力
+			@param[in]	end		変換終了アナログ入力
+			@param[in]	level	割り込みレベル、０の場合はポーリング
+			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-//		void start(REFP refp, REFM refm, uint8_t level)
-		void start(uint8_t level)
+		bool start(port_map::analog org, port_map::analog end, uint8_t level = 0)
 		{
+			if(ADCU::analog_org_ <= org && org <= ADCU::analog_end_) ;
+			else if(ADCU::analog_org_ <= end && end <= ADCU::analog_end_) ;
+			else {
+				return false;
+			}
+			org_ = org;
+			end_ = end;
 			level_ = level;
 
+			for(auto i = org; i <= end; i = static_cast<port_map::analog>(static_cast<uint32_t>(i) + 1)) {
+				port_map::turn(i);
+			}
+			power_cfg::turn(ADCU::get_peripheral());
 
+
+
+			return true;
 		}
 
 
@@ -96,29 +102,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	スキャン開始（割り込みモードの場合のみ有効）
-			@param[in]	top	開始チャネル
-		 */
-		//-----------------------------------------------------------------//
-		void start_scan(uint8_t top = 0)
-		{
-
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	A/D 変換結果を取得
 			@param[in]	ch	変換チャネル
 			@return 変換結果（上位１０ビットが有効な値）
 		 */
 		//-----------------------------------------------------------------//
-		uint16_t get(typename ADCU::CH ch)
+		uint16_t get(port_map::analog ch)
 		{
+			if(ADCU::analog_org_ <= ch && ch <= ADCU::analog_end_) {
+				uint32_t idx = static_cast<uint32_t>(ch) - static_cast<uint32_t>(ADCU::analog_org_);
+				if(level_) {
+					return value_[idx];
+				} else {
+					
+					ADCU::ADCSR = ADCU::ADCSR.ADST.b();
+					while(ADCU::ADCSR.ADST() != 0) sleep_();
+					return ADCU::get_data(ch);
+				}
+			}
 			return 0;
 		}
 	};
 
-//	template<uint16_t NUM, class TASK>
-//		volatile uint16_t adc_io<NUM, TASK>::value_[NUM]; 
+	template<class ADCU, class TASK>
+	volatile uint16_t adc_io<ADCU, TASK>::value_[ADCU::analog_num_]; 
 }
