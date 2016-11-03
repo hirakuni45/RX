@@ -276,6 +276,23 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D データレジスタ読み込み
+			@param[in]	an	アナログ入力型
+			@return A/D データレジスタ値
+		*/
+		//-----------------------------------------------------------------//
+		static uint16_t get_data(port_map::analog an) {
+			if(an == port_map::analog::AIN116) {
+				return ADDR16();
+			} else {
+				return rd16_(base + 0x20
+					+ (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_)) * 2);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D チャネル選択レジスタ A0（ADANSA0）
 			@param[in]	ofs	オフセット
 		*/
@@ -572,6 +589,23 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D データレジスタ読み込み
+			@param[in]	an	アナログ入力型
+			@return A/D データレジスタ値
+		*/
+		//-----------------------------------------------------------------//
+		static uint16_t get_data(port_map::analog an) {
+			if(an == port_map::analog::AIN116) {
+				return ADDR16();
+			} else {
+				return rd16_(base + 0x20
+					+ (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_)) * 2);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D チャネル選択レジスタ A0（ADANSA0）
 			@param[in]	ofs	オフセット
 		*/
@@ -860,6 +894,18 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static ro16_t<base + 0x36> ADDR11;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ読み込み
+			@param[in]	an	アナログ入力型
+			@return A/D データレジスタ値
+		*/
+		//-----------------------------------------------------------------//
+		static uint16_t get_data(port_map::analog an) {
+			return rd16_(base + 0x20 + (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_)) * 2);
+		}
 
 
 		//-----------------------------------------------------------------//
