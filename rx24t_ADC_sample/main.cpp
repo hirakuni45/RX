@@ -97,6 +97,8 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
+		adc_.scan();
+
 		++cnt;
 		if(cnt >= 30) {
 			cnt = 0;
@@ -104,6 +106,7 @@ int main(int argc, char** argv)
 		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
 
 		if((n % 60) == 0) {
+			adc_.sync();
 			auto a0 = adc_.get(device::port_map::analog::AIN000);
 			utils::format("Analog AIN000: %d\n") % a0;
 			auto a1 = adc_.get(device::port_map::analog::AIN001);
