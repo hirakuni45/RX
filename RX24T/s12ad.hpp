@@ -268,6 +268,18 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	アナログ入力からインデックスの変換
+			@param[in]	an	アナログ入力
+			@return インデックス
+		*/
+		//-----------------------------------------------------------------//
+		static uint32_t get_index(port_map::analog an) {
+			return static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D データレジスタ 16（ADDR16）
 		*/
 		//-----------------------------------------------------------------//
@@ -281,12 +293,11 @@ namespace device {
 			@return A/D データレジスタ値
 		*/
 		//-----------------------------------------------------------------//
-		static uint16_t get_data(port_map::analog an) {
+		static uint16_t get_ADDR(port_map::analog an) {
 			if(an == port_map::analog::AIN116) {
 				return ADDR16();
 			} else {
-				return rd16_(base + 0x20
-					+ (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_)) * 2);
+				return rd16_(base + 0x20 + get_index(an) * 2);
 			}
 		}
 
@@ -338,8 +349,8 @@ namespace device {
 			@param[in]	an	アナログチャネル
 		*/
 		//-----------------------------------------------------------------//
-		static void select_analog_a(port_map::analog an) {
-			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+		static void set_ADANSA(port_map::analog an) {
+			uint32_t n = get_index(an);
 			if(n < 4) {
 				ADANSA0 |= 1 << n;
 			} else {
@@ -395,8 +406,8 @@ namespace device {
 			@param[in]	an	アナログチャネル
 		*/
 		//-----------------------------------------------------------------//
-		static void select_analog_b(port_map::analog an) {
-			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+		static void set_ADANSB(port_map::analog an) {
+			uint32_t n = get_index(an);
 			if(n < 4) {
 				ADANSB0 |= 1 << n;
 			} else {
@@ -452,8 +463,8 @@ namespace device {
 			@param[in]	an	アナログチャネル
 		*/
 		//-----------------------------------------------------------------//
-		static void select_analog_c(port_map::analog an) {
-			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+		static void set_ADANSC(port_map::analog an) {
+			uint32_t n = get_index(an);
 			if(n < 4) {
 				ADANSC0 |= 1 << n;
 			} else {
@@ -545,6 +556,22 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D サンプリングステートレジスタ
+			@param[in]	an アナログ・チャネル
+			@param[in]	v	値
+		*/
+		//-----------------------------------------------------------------//
+		static void set_ADSSTR(port_map::analog an, uint8_t v) {
+			if(an == port_map::analog::AIN016) {
+				ADSSTRL = v;
+			} else {
+				wr8_(base + 0xE0 + get_index(an), v);
+			}
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D プログラマブルゲインアンプコントロールレジスタ（ADPGACR）
 			@param[in]	ofs	オフセット
 		*/
@@ -629,6 +656,18 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	アナログ入力からインデックスの変換
+			@param[in]	an	アナログ入力
+			@return インデックス
+		*/
+		//-----------------------------------------------------------------//
+		static uint32_t get_index(port_map::analog an) {
+			return static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D データレジスタ 16（ADDR16）
 		*/
 		//-----------------------------------------------------------------//
@@ -642,12 +681,11 @@ namespace device {
 			@return A/D データレジスタ値
 		*/
 		//-----------------------------------------------------------------//
-		static uint16_t get_data(port_map::analog an) {
+		static uint16_t get_ADDR(port_map::analog an) {
 			if(an == port_map::analog::AIN116) {
 				return ADDR16();
 			} else {
-				return rd16_(base + 0x20
-					+ (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_)) * 2);
+				return rd16_(base + 0x20 + get_index(an) * 2);
 			}
 		}
 
@@ -699,8 +737,8 @@ namespace device {
 			@param[in]	an	アナログチャネル
 		*/
 		//-----------------------------------------------------------------//
-		static void select_analog_a(port_map::analog an) {
-			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+		static void set_ADANSA(port_map::analog an) {
+			uint32_t n = get_index(an);
 			if(n < 4) {
 				ADANSA0 |= 1 << n;
 			} else {
@@ -756,8 +794,8 @@ namespace device {
 			@param[in]	an	アナログチャネル
 		*/
 		//-----------------------------------------------------------------//
-		static void select_analog_b(port_map::analog an) {
-			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+		static void set_ADANSB(port_map::analog an) {
+			uint32_t n = get_index(an);
 			if(n < 4) {
 				ADANSB0 |= 1 << n;
 			} else {
@@ -813,8 +851,8 @@ namespace device {
 			@param[in]	an	アナログチャネル
 		*/
 		//-----------------------------------------------------------------//
-		static void select_analog_c(port_map::analog an) {
-			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+		static void set_ADANSC(port_map::analog an) {
+			uint32_t n = get_index(an);
 			if(n < 4) {
 				ADANSC0 |= 1 << n;
 			} else {
@@ -861,6 +899,22 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static rw8_t<base + 0xE3> ADSSTR3;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ
+			@param[in]	an アナログ・チャネル
+			@param[in]	v	値
+		*/
+		//-----------------------------------------------------------------//
+		static void set_ADSSTR(port_map::analog an, uint8_t v) {
+			if(an == port_map::analog::AIN016) {
+				ADSSTRL = v;
+			} else {
+				wr8_(base + 0xE0 + get_index(an), v);
+			}
+		};
 
 
 		//-----------------------------------------------------------------//
@@ -926,6 +980,18 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static const port_map::analog analog_end_ = port_map::analog::AIN211;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	アナログ入力からインデックスの変換
+			@param[in]	an	アナログ入力
+			@return インデックス
+		*/
+		//-----------------------------------------------------------------//
+		static uint32_t get_index(port_map::analog an) {
+			return static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -999,8 +1065,8 @@ namespace device {
 			@return A/D データレジスタ値
 		*/
 		//-----------------------------------------------------------------//
-		static uint16_t get_data(port_map::analog an) {
-			return rd16_(base + 0x20 + (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_)) * 2);
+		static uint16_t get_ADDR(port_map::analog an) {
+			return rd16_(base + 0x20 + get_index(an) * 2);
 		}
 
 
@@ -1040,8 +1106,8 @@ namespace device {
 			@param[in]	an	アナログチャネル
 		*/
 		//-----------------------------------------------------------------//
-		static void select_analog_a(port_map::analog an) {
-			ADANSA0 |= 1 << (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_));
+		static void set_ADANSA(port_map::analog an) {
+			ADANSA0 |= 1 << get_index(an);
 		}
 
 
@@ -1081,8 +1147,8 @@ namespace device {
 			@param[in]	an	アナログチャネル
 		*/
 		//-----------------------------------------------------------------//
-		static void select_analog_b(port_map::analog an) {
-			ADANSB0 |= 1 << (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_));
+		static void set_ADANSB(port_map::analog an) {
+			ADANSB0 |= 1 << get_index(an);
 		}
 
 
@@ -1122,8 +1188,8 @@ namespace device {
 			@param[in]	an	アナログチャネル
 		*/
 		//-----------------------------------------------------------------//
-		static void select_analog_c(port_map::analog an) {
-			ADANSC0 |= 1 << (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_));
+		static void set_ADANSC(port_map::analog an) {
+			ADANSC0 |= 1 << get_index(an);
 		}
 
 
@@ -1257,6 +1323,18 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static rw8_t<base + 0xEB> ADSSTR11;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ
+			@param[in]	an アナログ・チャネル
+			@param[in]	v	値
+		*/
+		//-----------------------------------------------------------------//
+		static void set_ADSSTR(port_map::analog an, uint8_t v) {
+			wr8_(base + 0xE0 + get_index(an), v);
+		};
 
 
 		//-----------------------------------------------------------------//

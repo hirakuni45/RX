@@ -43,8 +43,6 @@ namespace device {
 		port_map::analog	end_;
 		uint8_t	level_;
 
-		static volatile uint16_t value_[ADCU::analog_num_];
-
 		static inline void sleep_() { asm("nop"); }
 
 	public:
@@ -53,9 +51,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		adc_io() : org_(ADCU::analog_org_), end_(ADCU::analog_end_), level_(0) {
-			for(uint32_t i = 0; i < ADCU::analog_num_; ++i) value_[i] = 0;
-		}
+		adc_io() : org_(ADCU::analog_org_), end_(ADCU::analog_end_), level_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -78,12 +74,13 @@ namespace device {
 			end_ = end;
 			level_ = level;
 
+			power_cfg::turn(ADCU::get_peripheral());
 			for(auto i = org; i <= end; i = static_cast<port_map::analog>(static_cast<uint32_t>(i) + 1)) {
 				port_map::turn(i);
+				ADCU::set_ADANSA(i);
+				uint8_t n = 40 + 10;
+				ADCU::set_ADSSTR(i, n);
 			}
-			power_cfg::turn(ADCU::get_peripheral());
-
-
 
 			return true;
 		}
@@ -91,12 +88,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	読み込み同期（ポーリングの場合は無視される）
+			@brief	スキャン開始
+		 */
+		//-----------------------------------------------------------------//
+		void scan() {
+			if(level_) {
+
+			}
+			ADCU::ADCSR = ADCU::ADCSR.ADST.b();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	読み込み同期
 		 */
 		//-----------------------------------------------------------------//
 		void sync() const {
-			if(level_ == 0) return;
-///			while(ADS() < NUM) sleep_();
+			if(level_) {
+
+			} else {
+				while(ADCU::ADCSR.ADST() != 0) sleep_();
+			}
 		}
 
 
@@ -109,21 +122,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint16_t get(port_map::analog ch)
 		{
-			if(ADCU::analog_org_ <= ch && ch <= ADCU::analog_end_) {
-				uint32_t idx = static_cast<uint32_t>(ch) - static_cast<uint32_t>(ADCU::analog_org_);
-				if(level_) {
-					return value_[idx];
-				} else {
-					ADCU::select_analog_a(ch);
-					ADCU::ADCSR = ADCU::ADCSR.ADST.b();
-					while(ADCU::ADCSR.ADST() != 0) sleep_();
-					return ADCU::get_data(ch);
-				}
+			if(org_ <= ch && ch <= end_) {
+				return ADCU::get_ADDR(ch);
+			} else {
+				return 0xffff;
 			}
-			return 0;
 		}
 	};
 
-	template<class ADCU, class TASK>
-	volatile uint16_t adc_io<ADCU, TASK>::value_[ADCU::analog_num_]; 
+//	template<class ADCU, class TASK>
+//	volatile uint16_t adc_io<ADCU, TASK>::value_[ADCU::analog_num_]; 
 }
