@@ -114,7 +114,7 @@ namespace device {
 				if(level_) {
 					return value_[idx];
 				} else {
-					
+					ADCU::select_analog_a(ch);
 					ADCU::ADCSR = ADCU::ADCSR.ADST.b();
 					while(ADCU::ADCSR.ADST() != 0) sleep_();
 					return ADCU::get_data(ch);

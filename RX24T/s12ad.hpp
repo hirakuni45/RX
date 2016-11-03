@@ -334,6 +334,22 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D チャネル選択レジスタ設定 A
+			@param[in]	an	アナログチャネル
+		*/
+		//-----------------------------------------------------------------//
+		static void select_analog_a(port_map::analog an) {
+			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+			if(n < 4) {
+				ADANSA0 |= 1 << n;
+			} else {
+				ADANSA1 |= 1 << (n - 4);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D チャネル選択レジスタ B0（ADANSB0）
 			@param[in]	ofs	オフセット
 		*/
@@ -375,6 +391,22 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D チャネル選択レジスタ設定 B
+			@param[in]	an	アナログチャネル
+		*/
+		//-----------------------------------------------------------------//
+		static void select_analog_b(port_map::analog an) {
+			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+			if(n < 4) {
+				ADANSB0 |= 1 << n;
+			} else {
+				ADANSB1 |= 1 << (n - 4);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D チャネル選択レジスタ C0（ADANSC0）
 			@param[in]	ofs	オフセット
 		*/
@@ -412,6 +444,22 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  ANSC100;
 		};
 		static adansc1_t<base + 0xD6>   ADANSC1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ設定 C
+			@param[in]	an	アナログチャネル
+		*/
+		//-----------------------------------------------------------------//
+		static void select_analog_c(port_map::analog an) {
+			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+			if(n < 4) {
+				ADANSC0 |= 1 << n;
+			} else {
+				ADANSC1 |= 1 << (n - 4);
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -647,6 +695,22 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D チャネル選択レジスタ設定 A
+			@param[in]	an	アナログチャネル
+		*/
+		//-----------------------------------------------------------------//
+		static void select_analog_a(port_map::analog an) {
+			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+			if(n < 4) {
+				ADANSA0 |= 1 << n;
+			} else {
+				ADANSA1 |= 1 << (n - 4);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D チャネル選択レジスタ B0（ADANSB0）
 			@param[in]	ofs	オフセット
 		*/
@@ -688,6 +752,22 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D チャネル選択レジスタ設定 B
+			@param[in]	an	アナログチャネル
+		*/
+		//-----------------------------------------------------------------//
+		static void select_analog_b(port_map::analog an) {
+			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+			if(n < 4) {
+				ADANSB0 |= 1 << n;
+			} else {
+				ADANSB1 |= 1 << (n - 4);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D チャネル選択レジスタ C0（ADANSC0）
 			@param[in]	ofs	オフセット
 		*/
@@ -725,6 +805,22 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  ANSC100;
 		};
 		static adansc1_t<base + 0xD6>   ADANSC1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ設定 C
+			@param[in]	an	アナログチャネル
+		*/
+		//-----------------------------------------------------------------//
+		static void select_analog_c(port_map::analog an) {
+			auto n = static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+			if(n < 4) {
+				ADANSC0 |= 1 << n;
+			} else {
+				ADANSC1 |= 1 << (n - 4);
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -910,6 +1006,47 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D チャネル選択レジスタ A0（ADANSA0）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adansa0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  ANSA000;
+			bit_rw_t<io_, bitpos::B1>  ANSA001;
+			bit_rw_t<io_, bitpos::B2>  ANSA002;
+			bit_rw_t<io_, bitpos::B3>  ANSA003;
+			bit_rw_t<io_, bitpos::B4>  ANSB004;
+			bit_rw_t<io_, bitpos::B5>  ANSB005;
+			bit_rw_t<io_, bitpos::B6>  ANSB006;
+			bit_rw_t<io_, bitpos::B7>  ANSB007;
+			bit_rw_t<io_, bitpos::B8>  ANSB008;
+			bit_rw_t<io_, bitpos::B9>  ANSB009;
+			bit_rw_t<io_, bitpos::B10> ANSB010;
+			bit_rw_t<io_, bitpos::B11> ANSB011;
+		};
+		static adansa0_t<base + 0x04>   ADANSA0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ設定 A
+			@param[in]	an	アナログチャネル
+		*/
+		//-----------------------------------------------------------------//
+		static void select_analog_a(port_map::analog an) {
+			ADANSA0 |= 1 << (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_));
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D チャネル選択レジスタ B0（ADANSB0）
 			@param[in]	ofs	オフセット
 		*/
@@ -940,6 +1077,17 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D チャネル選択レジスタ設定 B
+			@param[in]	an	アナログチャネル
+		*/
+		//-----------------------------------------------------------------//
+		static void select_analog_b(port_map::analog an) {
+			ADANSB0 |= 1 << (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_));
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D チャネル選択レジスタ C0（ADANSC0）
 			@param[in]	ofs	オフセット
 		*/
@@ -966,6 +1114,17 @@ namespace device {
 			bit_rw_t<io_, bitpos::B11> ANSB011;
 		};
 		static adansc0_t<base + 0xD4>   ADANSC0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ設定 C
+			@param[in]	an	アナログチャネル
+		*/
+		//-----------------------------------------------------------------//
+		static void select_analog_c(port_map::analog an) {
+			ADANSC0 |= 1 << (static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_));
+		}
 
 
 		//-----------------------------------------------------------------//
