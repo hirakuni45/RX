@@ -32,6 +32,8 @@ namespace {
 
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
+
+	device::adc_io<device::S12AD, null_task> adc_;
 }
 
 extern "C" {
@@ -83,17 +85,17 @@ int main(int argc, char** argv)
 
 	device::PORT0::PDR.B0 = 1; // output
 
-	device::S12AD::ADCSR.ADST = 1;
+	{
+		uint8_t intr_level = 0;
+		if(!adc_.start(device::port_map::analog::AIN000, device::port_map::analog::AIN001, intr_level)) {
+			utils::format("A/D start fail\n");
+		}
+	}
 
 	uint32_t cnt = 0;
 	uint32_t n = 0;
 	while(1) {
 		cmt_.sync();
-
-		if(sci_.recv_length()) {
-			auto ch = sci_.getch();
-			sci_.putch(ch);
-		}
 
 		++cnt;
 		if(cnt >= 30) {
@@ -102,7 +104,10 @@ int main(int argc, char** argv)
 		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
 
 		if((n % 60) == 0) {
-			utils::format("%d\n") % (n / 60);
+			auto a0 = adc_.get(device::port_map::analog::AIN000);
+			utils::format("Analog AIN000: %d\n") % a0;
+			auto a1 = adc_.get(device::port_map::analog::AIN001);
+			utils::format("Analog AIN001: %d\n") % a1;
 		}
 		++n;
 	}
