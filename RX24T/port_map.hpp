@@ -25,30 +25,30 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class analog : uint8_t {
-			AN000,
-			AN001,
-			AN002,
-			AN003,
-			AN016,
+			AIN000,
+			AIN001,
+			AIN002,
+			AIN003,
+			AIN016,
 
-			AN100,
-			AN101,
-			AN102,
-			AN103,
-			AN116,
+			AIN100,
+			AIN101,
+			AIN102,
+			AIN103,
+			AIN116,
 
-			AN200,
-			AN201,
-			AN202,
-			AN203,
-			AN204,
-			AN205,
-			AN206,
-			AN207,
-			AN208,
-			AN209,
-			AN210,
-			AN211,
+			AIN200,
+			AIN201,
+			AIN202,
+			AIN203,
+			AIN204,
+			AIN205,
+			AIN206,
+			AIN207,
+			AIN208,
+			AIN209,
+			AIN210,
+			AIN211,
 		};
 
 
@@ -133,94 +133,94 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			switch(t) {
-			case analog::AN000:
+			case analog::AIN000:
 				PORT4::PDR.B0 = 0;
 				MPC::P40PFS.ASEL = f;
 				break;
-			case analog::AN001:
+			case analog::AIN001:
 				PORT4::PDR.B1 = 0;
 				MPC::P41PFS.ASEL = f;
 				break;
-			case analog::AN002:
+			case analog::AIN002:
 				PORT4::PDR.B2 = 0;
 				MPC::P42PFS.ASEL = f;
 				break;
-			case analog::AN003:
+			case analog::AIN003:
 				PORT4::PDR.B3 = 0;
 				MPC::P43PFS.ASEL = f;
 				break;
-			case analog::AN016:
+			case analog::AIN016:
 				PORT2::PDR.B0 = 0;
 				MPC::P20PFS.ASEL = f;
 				break;
 
-			case analog::AN100:
+			case analog::AIN100:
 				PORT4::PDR.B4 = 0;
 				MPC::P44PFS.ASEL = f;
 				break;
-			case analog::AN101:
+			case analog::AIN101:
 				PORT4::PDR.B5 = 0;
 				MPC::P45PFS.ASEL = f;
 				break;
-			case analog::AN102:
+			case analog::AIN102:
 				PORT4::PDR.B6 = 0;
 				MPC::P46PFS.ASEL = f;
 				break;
-			case analog::AN103:
+			case analog::AIN103:
 				PORT4::PDR.B7 = 0;
 				MPC::P47PFS.ASEL = f;
 				break;
-			case analog::AN116:
+			case analog::AIN116:
 				PORT2::PDR.B1 = 0;
 				MPC::P21PFS.ASEL = f;
 				break;
 
-			case analog::AN200:
+			case analog::AIN200:
 				PORT6::PDR.B0 = 0;
 				MPC::P60PFS.ASEL = f;
 				break;
-			case analog::AN201:
+			case analog::AIN201:
 				PORT6::PDR.B1 = 0;
 				MPC::P61PFS.ASEL = f;
 				break;
-			case analog::AN202:
+			case analog::AIN202:
 				PORT6::PDR.B2 = 0;
 				MPC::P62PFS.ASEL = f;
 				break;
-			case analog::AN203:
+			case analog::AIN203:
 				PORT6::PDR.B3 = 0;
 				MPC::P63PFS.ASEL = f;
 				break;
-			case analog::AN204:
+			case analog::AIN204:
 				PORT6::PDR.B4 = 0;
 				MPC::P64PFS.ASEL = f;
 				break;
-			case analog::AN205:
+			case analog::AIN205:
 				PORT6::PDR.B5 = 0;
 				MPC::P65PFS.ASEL = f;
 				break;
 
-			case analog::AN206:
+			case analog::AIN206:
 				PORT5::PDR.B0 = 0;
 				MPC::P50PFS.ASEL = f;
 				break;
-			case analog::AN207:
+			case analog::AIN207:
 				PORT5::PDR.B1 = 0;
 				MPC::P51PFS.ASEL = f;
 				break;
-			case analog::AN208:
+			case analog::AIN208:
 				PORT5::PDR.B2 = 0;
 				MPC::P52PFS.ASEL = f;
 				break;
-			case analog::AN209:
+			case analog::AIN209:
 				PORT5::PDR.B3 = 0;
 				MPC::P53PFS.ASEL = f;
 				break;
-			case analog::AN210:
+			case analog::AIN210:
 				PORT5::PDR.B4 = 0;
 				MPC::P54PFS.ASEL = f;
 				break;
-			case analog::AN211:
+			case analog::AIN211:
 				PORT5::PDR.B5 = 0;
 				MPC::P55PFS.ASEL = f;
 				break;
