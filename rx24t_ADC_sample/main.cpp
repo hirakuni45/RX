@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 						  | device::SYSTEM::SCKCR.ICK.b(0)		// 1/1 (80/1=80)
 						  | device::SYSTEM::SCKCR.PCKA.b(0)		// 1/1 (80/1=80)
 						  | device::SYSTEM::SCKCR.PCKB.b(1)		// 1/2 (80/2=40)
-						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (120/2=60)
+						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (80/2=40)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	// タイマー設定（６０Ｈｚ）
