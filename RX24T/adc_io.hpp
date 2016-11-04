@@ -11,6 +11,11 @@
 #include "RX24T/port_map.hpp"
 #include "RX24T/power_cfg.hpp"
 
+/// F_PCKD は変換パラメーター計算で必要で、設定が無いとエラーにします。
+#ifndef F_PCKD
+#  error "adc_io.hpp requires F_PCKD to be defined"
+#endif
+
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -74,11 +79,14 @@ namespace device {
 			end_ = end;
 			level_ = level;
 
+			// 基本変換時間（１マイクロ秒）＋マージン
+			uint32_t n = F_PCKD / 1000000 + 10;
+			if(n > 255) return false;
+
 			power_cfg::turn(ADCU::get_peripheral());
 			for(auto i = org; i <= end; i = static_cast<port_map::analog>(static_cast<uint32_t>(i) + 1)) {
 				port_map::turn(i);
 				ADCU::set_ADANSA(i);
-				uint8_t n = 40 + 10;
 				ADCU::set_ADSSTR(i, n);
 			}
 
@@ -93,7 +101,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void scan() {
 			if(level_) {
-
 			}
 			ADCU::ADCSR = ADCU::ADCSR.ADST.b();
 		}
@@ -106,7 +113,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void sync() const {
 			if(level_) {
-
 			} else {
 				while(ADCU::ADCSR.ADST() != 0) sleep_();
 			}
