@@ -33,7 +33,9 @@ namespace {
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
-	device::adc_io<device::S12AD, null_task> adc_;
+	typedef device::S12AD adc;
+	typedef device::adc_io<adc, null_task> adc_io;
+	adc_io adc_io_;
 }
 
 extern "C" {
@@ -87,8 +89,11 @@ int main(int argc, char** argv)
 
 	{
 		uint8_t intr_level = 0;
-		if(!adc_.start(device::port_map::analog::AIN000, device::port_map::analog::AIN001, intr_level)) {
-			utils::format("A/D start fail\n");
+		if(!adc_io_.start(adc::analog::AIN000, intr_level)) {
+			utils::format("A/D start fail AIN000\n");
+		}
+		if(!adc_io_.start(adc::analog::AIN001, intr_level)) {
+			utils::format("A/D start fail AIN001\n");
 		}
 	}
 
@@ -97,7 +102,7 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
-		adc_.scan();
+		adc_io_.scan();
 
 		++cnt;
 		if(cnt >= 30) {
@@ -106,10 +111,10 @@ int main(int argc, char** argv)
 		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
 
 		if((n % 60) == 0) {
-			adc_.sync();
-			auto a0 = adc_.get(device::port_map::analog::AIN000);
+			adc_io_.sync();
+			auto a0 = adc_io_.get(adc::analog::AIN000);
 			utils::format("Analog AIN000: %d\n") % a0;
-			auto a1 = adc_.get(device::port_map::analog::AIN001);
+			auto a1 = adc_io_.get(adc::analog::AIN001);
 			utils::format("Analog AIN001: %d\n") % a1;
 		}
 		++n;
