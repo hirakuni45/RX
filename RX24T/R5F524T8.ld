@@ -37,7 +37,7 @@ ENTRY(_start)
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 
-/* This memory layout corresponds to the smallest predicted RX600 chip.  */
+/* This memory layout corresponds to the smallest predicted RX24T8 chip.  */
 MEMORY {
 	RAM (w)   : ORIGIN = 0x00000000, LENGTH = 0x00004000 /* 16K */
 	STACK (w) : ORIGIN = 0x00004000, LENGTH = 16 /* top of RAM */
