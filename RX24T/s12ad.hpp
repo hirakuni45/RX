@@ -8,14 +8,15 @@
 //=====================================================================//
 #include "common/io_utils.hpp"
 #include "RX24T/peripheral.hpp"
+#include "RX600/port.hpp"
+#include "RX24T/mpc.hpp"
 #include "RX24T/icu.hpp"
-#include "RX24T/port_map.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  S12AD 基本定義
+		@brief  S12AD 共通定義
 		@param[in]	base	ベース・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -242,6 +243,20 @@ namespace device {
 	template <uint32_t base, peripheral t>
 	struct s12ad0_t : public s12ad_t<base> {
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ入力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class analog : uint8_t {
+			AIN000,
+			AIN001,
+			AIN002,
+			AIN003,
+			AIN016 = 0x10,
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	アナログ入力数
@@ -252,30 +267,57 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	アナログ入力開始チャネル
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ入力型
+			@param[in]	f	ポート無効の場合「false」
 		*/
 		//-----------------------------------------------------------------//		
-		static const port_map::analog analog_org_ = port_map::analog::AIN000;
+		static void enable(analog an, bool f = true) {
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
+			switch(an) {
+			case analog::AIN000:
+				PORT4::PDR.B0 = 0;
+				MPC::P40PFS.ASEL = f;
+				break;
+			case analog::AIN001:
+				PORT4::PDR.B1 = 0;
+				MPC::P41PFS.ASEL = f;
+				break;
+			case analog::AIN002:
+				PORT4::PDR.B2 = 0;
+				MPC::P42PFS.ASEL = f;
+				break;
+			case analog::AIN003:
+				PORT4::PDR.B3 = 0;
+				MPC::P43PFS.ASEL = f;
+				break;
+			case analog::AIN016:
+				PORT2::PDR.B0 = 0;
+				MPC::P20PFS.ASEL = f;
+				break;
+			default:
+				break;
+			}
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	アナログ入力終了チャネル
-		*/
-		//-----------------------------------------------------------------//
-		static const port_map::analog analog_end_ = port_map::analog::AIN016;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	アナログ入力からインデックスの変換
-			@param[in]	an	アナログ入力
-			@return インデックス
-		*/
-		//-----------------------------------------------------------------//
-		static uint32_t get_index(port_map::analog an) {
-			return static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ読み込み
+			@param[in]	an	アナログ入力型
+			@return A/D データレジスタ値
+		*/
+		//-----------------------------------------------------------------//
+		struct addr_t {
+			uint16_t operator() (analog an) {
+				return rd16_(base + 0x20 + static_cast<uint32_t>(an) * 2);
+			}
+		};
+		static addr_t ADDR;
 
 
 		//-----------------------------------------------------------------//
@@ -286,20 +328,45 @@ namespace device {
 		static ro16_t<base + 0x40> ADDR16;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  A/D チャネル選択レジスタ定義 (ADANS)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct adans_t {
+			void set(analog an, bool f = true) {
+				uint32_t n = static_cast<uint32_t>(an);
+				uint32_t ros = ofs;
+				if(n >= 4) {
+					n -= 4;
+					ros += 2;
+				}
+				if(f) {
+					wr16_(ros, rd16_(ros) |  (static_cast<uint16_t>(1) << n));
+				} else {
+					wr16_(ros, rd16_(ros) & ~(static_cast<uint16_t>(1) << n));
+				}
+			}
+
+			bool operator() (analog an) const {
+				uint32_t n = static_cast<uint32_t>(an);
+				uint32_t ros = ofs;
+				if(n >= 4) {
+					n -= 4;
+					ros += 2;
+				}
+				return (rd16_(ros) >> n) & 1;
+			}
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D データレジスタ読み込み
-			@param[in]	an	アナログ入力型
-			@return A/D データレジスタ値
+			@brief  A/D チャネル選択レジスタ設定 A
 		*/
 		//-----------------------------------------------------------------//
-		static uint16_t get_ADDR(port_map::analog an) {
-			if(an == port_map::analog::AIN116) {
-				return ADDR16();
-			} else {
-				return rd16_(base + 0x20 + get_index(an) * 2);
-			}
-		}
+		static adans_t<base + 0x04> ADANSA;
 
 
 		//-----------------------------------------------------------------//
@@ -345,18 +412,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ設定 A
-			@param[in]	an	アナログチャネル
+			@brief  A/D チャネル選択レジスタ設定 B
 		*/
 		//-----------------------------------------------------------------//
-		static void set_ADANSA(port_map::analog an) {
-			uint32_t n = get_index(an);
-			if(n < 4) {
-				ADANSA0 |= 1 << n;
-			} else {
-				ADANSA1 |= 1 << (n - 4);
-			}
-		}
+		static adans_t<base + 0x14> ADANSB;
 
 
 		//-----------------------------------------------------------------//
@@ -402,18 +461,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ設定 B
-			@param[in]	an	アナログチャネル
+			@brief  A/D チャネル選択レジスタ設定 C
 		*/
 		//-----------------------------------------------------------------//
-		static void set_ADANSB(port_map::analog an) {
-			uint32_t n = get_index(an);
-			if(n < 4) {
-				ADANSB0 |= 1 << n;
-			} else {
-				ADANSB1 |= 1 << (n - 4);
-			}
-		}
+		static adans_t<base + 0xD4> ADANSC;
 
 
 		//-----------------------------------------------------------------//
@@ -459,22 +510,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ設定 C
-			@param[in]	an	アナログチャネル
-		*/
-		//-----------------------------------------------------------------//
-		static void set_ADANSC(port_map::analog an) {
-			uint32_t n = get_index(an);
-			if(n < 4) {
-				ADANSC0 |= 1 << n;
-			} else {
-				ADANSC1 |= 1 << (n - 4);
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  A/D 変換値加算 / 平均機能チャネル選択レジスタ 0（ADADS0）
 			@param[in]	ofs	オフセット
 		*/
@@ -516,6 +551,23 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D サンプリングステートレジスタ
+		*/
+		//-----------------------------------------------------------------//
+		struct adsstr_t {
+			void set(analog an, uint8_t v) {
+				if(an == analog::AIN016) {
+					wr8_(base + 0xDD + static_cast<uint32_t>(an), v);
+				} else {
+					wr8_(base + 0xE0 + static_cast<uint32_t>(an), v);
+				}
+			}
+		};
+		static adsstr_t ADSSTR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  A/D サンプリングステートレジスタ L（ADSSTRL）
 		*/
 		//-----------------------------------------------------------------//
@@ -552,22 +604,6 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static rw8_t<base + 0xE3> ADSSTR3;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D サンプリングステートレジスタ
-			@param[in]	an アナログ・チャネル
-			@param[in]	v	値
-		*/
-		//-----------------------------------------------------------------//
-		static void set_ADSSTR(port_map::analog an, uint8_t v) {
-			if(an == port_map::analog::AIN016) {
-				ADSSTRL = v;
-			} else {
-				wr8_(base + 0xE0 + get_index(an), v);
-			}
-		};
 
 
 		//-----------------------------------------------------------------//
@@ -630,6 +666,20 @@ namespace device {
 	template <uint32_t base, peripheral t>
 	struct s12ad1_t : public s12ad_t<base> {
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ入力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class analog : uint8_t {
+			AIN100,
+			AIN101,
+			AIN102,
+			AIN103,
+			AIN116 = 0x10,
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	アナログ入力数
@@ -640,30 +690,56 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	アナログ入力開始チャネル
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ入力型
+			@param[in]	f	ポート無効の場合「false」
 		*/
 		//-----------------------------------------------------------------//		
-		static const port_map::analog analog_org_ = port_map::analog::AIN100;
+		static void enable(analog an, bool f = true) {
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	アナログ入力終了チャネル
-		*/
-		//-----------------------------------------------------------------//
-		static const port_map::analog analog_end_ = port_map::analog::AIN116;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	アナログ入力からインデックスの変換
-			@param[in]	an	アナログ入力
-			@return インデックス
-		*/
-		//-----------------------------------------------------------------//
-		static uint32_t get_index(port_map::analog an) {
-			return static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+			switch(an) {
+			case analog::AIN100:
+				PORT4::PDR.B4 = 0;
+				MPC::P44PFS.ASEL = f;
+				break;
+			case analog::AIN101:
+				PORT4::PDR.B5 = 0;
+				MPC::P45PFS.ASEL = f;
+				break;
+			case analog::AIN102:
+				PORT4::PDR.B6 = 0;
+				MPC::P46PFS.ASEL = f;
+				break;
+			case analog::AIN103:
+				PORT4::PDR.B7 = 0;
+				MPC::P47PFS.ASEL = f;
+				break;
+			case analog::AIN116:
+				PORT2::PDR.B1 = 0;
+				MPC::P21PFS.ASEL = f;
+				break;
+			default:
+				break;
+			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ読み込み
+			@param[in]	an	アナログ入力型
+			@return A/D データレジスタ値
+		*/
+		//-----------------------------------------------------------------//
+		struct addr_t {
+			uint16_t operator() (analog an) {
+				return rd16_(base + 0x20 + static_cast<uint32_t>(an) * 2);
+			}
+		};
+		static addr_t ADDR;
 
 
 		//-----------------------------------------------------------------//
@@ -674,20 +750,45 @@ namespace device {
 		static ro16_t<base + 0x40> ADDR16;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  A/D チャネル選択レジスタ定義 (ADANS)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct adans_t {
+			void set(analog an, bool f = true) {
+				uint32_t n = static_cast<uint32_t>(an);
+				uint32_t ros = ofs;
+				if(n >= 4) {
+					n -= 4;
+					ros += 2;
+				}
+				if(f) {
+					wr16_(ros, rd16_(ros) |  (static_cast<uint16_t>(1) << n));
+				} else {
+					wr16_(ros, rd16_(ros) & ~(static_cast<uint16_t>(1) << n));
+				}
+			}
+
+			bool operator() (analog an) const {
+				uint32_t n = static_cast<uint32_t>(an);
+				uint32_t ros = ofs;
+				if(n >= 4) {
+					n -= 4;
+					ros += 2;
+				}
+				return (rd16_(ros) >> n) & 1;
+			}
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D データレジスタ読み込み
-			@param[in]	an	アナログ入力型
-			@return A/D データレジスタ値
+			@brief  A/D チャネル選択レジスタ設定 A
 		*/
 		//-----------------------------------------------------------------//
-		static uint16_t get_ADDR(port_map::analog an) {
-			if(an == port_map::analog::AIN116) {
-				return ADDR16();
-			} else {
-				return rd16_(base + 0x20 + get_index(an) * 2);
-			}
-		}
+		static adans_t<base + 0x04> ADANSA;
 
 
 		//-----------------------------------------------------------------//
@@ -733,18 +834,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ設定 A
-			@param[in]	an	アナログチャネル
+			@brief  A/D チャネル選択レジスタ設定 B
 		*/
 		//-----------------------------------------------------------------//
-		static void set_ADANSA(port_map::analog an) {
-			uint32_t n = get_index(an);
-			if(n < 4) {
-				ADANSA0 |= 1 << n;
-			} else {
-				ADANSA1 |= 1 << (n - 4);
-			}
-		}
+		static adans_t<base + 0x14> ADANSB;
 
 
 		//-----------------------------------------------------------------//
@@ -790,18 +883,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ設定 B
-			@param[in]	an	アナログチャネル
+			@brief  A/D チャネル選択レジスタ設定 C
 		*/
 		//-----------------------------------------------------------------//
-		static void set_ADANSB(port_map::analog an) {
-			uint32_t n = get_index(an);
-			if(n < 4) {
-				ADANSB0 |= 1 << n;
-			} else {
-				ADANSB1 |= 1 << (n - 4);
-			}
-		}
+		static adans_t<base + 0xD4> ADANSC;
 
 
 		//-----------------------------------------------------------------//
@@ -847,18 +932,19 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ設定 C
-			@param[in]	an	アナログチャネル
+			@brief  A/D サンプリングステートレジスタ
 		*/
 		//-----------------------------------------------------------------//
-		static void set_ADANSC(port_map::analog an) {
-			uint32_t n = get_index(an);
-			if(n < 4) {
-				ADANSC0 |= 1 << n;
-			} else {
-				ADANSC1 |= 1 << (n - 4);
+		struct adsstr_t {
+			void set(analog an, uint8_t v) {
+				if(an == analog::AIN016) {
+					wr8_(base + 0xDD + static_cast<uint32_t>(an), v);
+				} else {
+					wr8_(base + 0xE0 + static_cast<uint32_t>(an), v);
+				}
 			}
-		}
+		};
+		static adsstr_t ADSSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -903,22 +989,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D サンプリングステートレジスタ
-			@param[in]	an アナログ・チャネル
-			@param[in]	v	値
-		*/
-		//-----------------------------------------------------------------//
-		static void set_ADSSTR(port_map::analog an, uint8_t v) {
-			if(an == port_map::analog::AIN016) {
-				ADSSTRL = v;
-			} else {
-				wr8_(base + 0xE0 + get_index(an), v);
-			}
-		};
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  A/D サンプル & ホールド回路コントロールレジスタ（ADSHCR）
 			@param[in]	ofs	オフセット
 		*/
@@ -958,40 +1028,115 @@ namespace device {
 	template <uint32_t base, peripheral t>
 	struct s12ad2_t : public s12ad_t<base> {
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ入力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class analog : uint8_t {
+			AIN200,
+			AIN201,
+			AIN202,
+			AIN203,
+			AIN204,
+			AIN205,
+			AIN206,
+			AIN207,
+			AIN208,
+			AIN209,
+			AIN210,
+			AIN211,
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	アナログ入力数
 		*/
 		//-----------------------------------------------------------------//		
-		static const uint32_t analog_num_ = 5;
+		static const uint32_t analog_num_ = 12;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	アナログ入力開始チャネル
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ入力型
+			@param[in]	f	ポート無効の場合「false」
 		*/
 		//-----------------------------------------------------------------//		
-		static const port_map::analog analog_org_ = port_map::analog::AIN200;
+		static void enable(analog an, bool f = true) {
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	アナログ入力終了チャネル
-		*/
-		//-----------------------------------------------------------------//
-		static const port_map::analog analog_end_ = port_map::analog::AIN211;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	アナログ入力からインデックスの変換
-			@param[in]	an	アナログ入力
-			@return インデックス
-		*/
-		//-----------------------------------------------------------------//
-		static uint32_t get_index(port_map::analog an) {
-			return static_cast<uint32_t>(an) - static_cast<uint32_t>(analog_org_);
+			switch(an) {
+			case analog::AIN200:
+				PORT6::PDR.B0 = 0;
+				MPC::P60PFS.ASEL = f;
+				break;
+			case analog::AIN201:
+				PORT6::PDR.B1 = 0;
+				MPC::P61PFS.ASEL = f;
+				break;
+			case analog::AIN202:
+				PORT6::PDR.B2 = 0;
+				MPC::P62PFS.ASEL = f;
+				break;
+			case analog::AIN203:
+				PORT6::PDR.B3 = 0;
+				MPC::P63PFS.ASEL = f;
+				break;
+			case analog::AIN204:
+				PORT6::PDR.B4 = 0;
+				MPC::P64PFS.ASEL = f;
+				break;
+			case analog::AIN205:
+				PORT6::PDR.B5 = 0;
+				MPC::P65PFS.ASEL = f;
+				break;
+			case analog::AIN206:
+				PORT5::PDR.B0 = 0;
+				MPC::P50PFS.ASEL = f;
+				break;
+			case analog::AIN207:
+				PORT5::PDR.B1 = 0;
+				MPC::P51PFS.ASEL = f;
+				break;
+			case analog::AIN208:
+				PORT5::PDR.B2 = 0;
+				MPC::P52PFS.ASEL = f;
+				break;
+			case analog::AIN209:
+				PORT5::PDR.B3 = 0;
+				MPC::P53PFS.ASEL = f;
+				break;
+			case analog::AIN210:
+				PORT5::PDR.B4 = 0;
+				MPC::P54PFS.ASEL = f;
+				break;
+			case analog::AIN211:
+				PORT5::PDR.B5 = 0;
+				MPC::P55PFS.ASEL = f;
+				break;
+			default:
+				break;
+			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ読み込み
+			@param[in]	an	アナログ入力型
+			@return A/D データレジスタ値
+		*/
+		//-----------------------------------------------------------------//
+		struct addr_t {
+			uint16_t operator() (analog an) {
+				return rd16_(base + 0x20 + static_cast<uint32_t>(an) * 2);
+			}
+		};
+		static addr_t ADDR;
 
 
 		//-----------------------------------------------------------------//
@@ -1058,16 +1203,35 @@ namespace device {
 		static ro16_t<base + 0x36> ADDR11;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  A/D チャネル選択レジスタ定義 (ADANS)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct adans_t {
+			void set(analog an, bool f = true) {
+				uint32_t n = static_cast<uint32_t>(an);
+				if(f) {
+					wr16_(ofs, rd16_(ofs) |  (static_cast<uint16_t>(1) << n));
+				} else {
+					wr16_(ofs, rd16_(ofs) & ~(static_cast<uint16_t>(1) << n));
+				}
+			}
+
+			bool operator() (analog an) const {
+				uint32_t n = static_cast<uint32_t>(an);
+				return (rd16_(ofs) >> n) & 1;
+			}
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D データレジスタ読み込み
-			@param[in]	an	アナログ入力型
-			@return A/D データレジスタ値
+			@brief  A/D チャネル選択レジスタ設定 A
 		*/
 		//-----------------------------------------------------------------//
-		static uint16_t get_ADDR(port_map::analog an) {
-			return rd16_(base + 0x20 + get_index(an) * 2);
-		}
+		static adans_t<base + 0x04> ADANSA;
 
 
 		//-----------------------------------------------------------------//
@@ -1102,13 +1266,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ設定 A
-			@param[in]	an	アナログチャネル
+			@brief  A/D チャネル選択レジスタ設定 B
 		*/
 		//-----------------------------------------------------------------//
-		static void set_ADANSA(port_map::analog an) {
-			ADANSA0 |= 1 << get_index(an);
-		}
+		static adans_t<base + 0x14> ADANSB;
 
 
 		//-----------------------------------------------------------------//
@@ -1143,13 +1304,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ設定 B
-			@param[in]	an	アナログチャネル
+			@brief  A/D チャネル選択レジスタ設定 C
 		*/
 		//-----------------------------------------------------------------//
-		static void set_ADANSB(port_map::analog an) {
-			ADANSB0 |= 1 << get_index(an);
-		}
+		static adans_t<base + 0xD4> ADANSC;
 
 
 		//-----------------------------------------------------------------//
@@ -1184,17 +1342,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ設定 C
-			@param[in]	an	アナログチャネル
-		*/
-		//-----------------------------------------------------------------//
-		static void set_ADANSC(port_map::analog an) {
-			ADANSC0 |= 1 << get_index(an);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  A/D 内部基準電圧データレジスタ（ADOCDR）
 		*/
 		//-----------------------------------------------------------------//
@@ -1223,10 +1370,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D サンプリングステートレジスタ O（ADSSTRO）
+			@brief  A/D サンプリングステートレジスタ
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0xDF> ADSSTRO;
+		struct adsstr_t {
+			void set(analog an, uint8_t v) {
+				wr8_(base + 0xE0 + static_cast<uint32_t>(an), v);
+			}
+		};
+		static adsstr_t ADSSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -1323,18 +1475,6 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static rw8_t<base + 0xEB> ADSSTR11;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D サンプリングステートレジスタ
-			@param[in]	an アナログ・チャネル
-			@param[in]	v	値
-		*/
-		//-----------------------------------------------------------------//
-		static void set_ADSSTR(port_map::analog an, uint8_t v) {
-			wr8_(base + 0xE0 + get_index(an), v);
-		};
 
 
 		//-----------------------------------------------------------------//

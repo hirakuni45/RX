@@ -44,8 +44,6 @@ namespace device {
 	private:
 		static TASK task_;
 
-		port_map::analog	org_;
-		port_map::analog	end_;
 		uint8_t	level_;
 
 		static inline void sleep_() { asm("nop"); }
@@ -56,27 +54,19 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		adc_io() : org_(ADCU::analog_org_), end_(ADCU::analog_end_), level_(0) { }
+		adc_io() : level_(0) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	スタート
-			@param[in]	org		変換開始アナログ入力
-			@param[in]	end		変換終了アナログ入力
+			@param[in]	ana		アナログ入力
 			@param[in]	level	割り込みレベル、０の場合はポーリング
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start(port_map::analog org, port_map::analog end, uint8_t level = 0)
+		bool start(typename ADCU::analog ana, uint8_t level = 0)
 		{
-			if(ADCU::analog_org_ <= org && org <= ADCU::analog_end_) ;
-			else if(ADCU::analog_org_ <= end && end <= ADCU::analog_end_) ;
-			else {
-				return false;
-			}
-			org_ = org;
-			end_ = end;
 			level_ = level;
 
 			// 基本変換時間（１マイクロ秒）＋マージン
@@ -84,11 +74,9 @@ namespace device {
 			if(n > 255) return false;
 
 			power_cfg::turn(ADCU::get_peripheral());
-			for(auto i = org; i <= end; i = static_cast<port_map::analog>(static_cast<uint32_t>(i) + 1)) {
-				port_map::turn(i);
-				ADCU::set_ADANSA(i);
-				ADCU::set_ADSSTR(i, n);
-			}
+			ADCU::enable(ana);
+			ADCU::ADANSA.set(ana);
+			ADCU::ADSSTR.set(ana, n);
 
 			return true;
 		}
@@ -122,17 +110,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	A/D 変換結果を取得
-			@param[in]	ch	変換チャネル
+			@param[in]	an	変換チャネル
 			@return 変換結果（上位１０ビットが有効な値）
 		 */
 		//-----------------------------------------------------------------//
-		uint16_t get(port_map::analog ch)
+		uint16_t get(typename ADCU::analog an)
 		{
-			if(org_ <= ch && ch <= end_) {
-				return ADCU::get_ADDR(ch);
-			} else {
-				return 0xffff;
-			}
+			return ADCU::ADDR(an);
 		}
 	};
 
