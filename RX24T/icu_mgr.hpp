@@ -72,13 +72,19 @@ namespace device {
 				break;
 
 			case peripheral::S12AD:
-//				ICU::IPR.EEI0 = lvl;
+				ICU::IPR.S12ADI = lvl;
+				ICU::IPR.GBADI  = lvl;
+				ICU::IPR.GCADI  = lvl;
 				break;
 			case peripheral::S12AD1:
-
+				ICU::IPR.S12ADI1 = lvl;
+				ICU::IPR.GBADI1  = lvl;
+				ICU::IPR.GCADI1  = lvl;
 				break;
 			case peripheral::S12AD2:
-
+				ICU::IPR.S12ADI2 = lvl;
+				ICU::IPR.GBADI2  = lvl;
+				ICU::IPR.GCADI2  = lvl;
 				break;
 
 			default:

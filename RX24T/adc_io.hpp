@@ -44,6 +44,11 @@ namespace device {
 	private:
 		static TASK task_;
 
+		static INTERRUPT_FUNC void adi_task_()
+		{
+			task_();
+		}
+
 		uint8_t	level_;
 
 		static inline void sleep_() { asm("nop"); }
@@ -89,8 +94,23 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void scan() {
 			if(level_) {
+				set_interrupt_task(adi_task_, static_cast<uint32_t>(ADCU::get_vec()));
+				icu_mgr::set_level(ADCU::get_peripheral(), level_);
+				ADCU::ADCSR = ADCU::ADCSR.ADST.b() | ADCU::ADCSR.ADIE.b();
+			} else {
+				ADCU::ADCSR = ADCU::ADCSR.ADST.b();
 			}
-			ADCU::ADCSR = ADCU::ADCSR.ADST.b();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	変換状態の取得
+			@return 変換中なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool get_state() const {
+			return ADCU::ADCSR.ADST();
 		}
 
 
@@ -100,10 +120,7 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		void sync() const {
-			if(level_) {
-			} else {
-				while(ADCU::ADCSR.ADST() != 0) sleep_();
-			}
+			while(ADCU::ADCSR.ADST() != 0) sleep_();
 		}
 
 
@@ -114,8 +131,7 @@ namespace device {
 			@return 変換結果（上位１０ビットが有効な値）
 		 */
 		//-----------------------------------------------------------------//
-		uint16_t get(typename ADCU::analog an)
-		{
+		uint16_t get(typename ADCU::analog an) const {
 			return ADCU::ADDR(an);
 		}
 	};

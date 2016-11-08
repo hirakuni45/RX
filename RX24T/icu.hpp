@@ -57,6 +57,19 @@ namespace device {
 			LVD1   = 88,   // LVD
 			LVD2   = 89,   // LVD
 
+			S12ADI  = 102,  // S12AD
+			GBADI   = 103,  // S12AD
+			GCADI   = 104,  // S12AD
+			S12ADI1 = 105,  // S12AD1
+			GBADI1  = 106,  // S12AD1
+			GCADI1  = 107,  // S12AD1
+			CMPC0   = 108,  // CMPC0
+			CMPC1   = 109,  // CMPC1
+			CMPC2   = 110,  // CMPC2
+			S12ADI2 = 111,  // S12AD2
+			GBADI2  = 112,  // S12AD2
+			GCADI2  = 113,  // S12AD2
+
 			ERI1   = 218,  // SCI1
 			RXI1   = 219,  // SCI1
 			TXI1   = 220,  // SCI1
@@ -93,6 +106,19 @@ namespace device {
 			rw8_t<base + 45> SPRI0;
 			rw8_t<base + 46> SPTI0;
 			rw8_t<base + 47> SPII0;
+
+			rw8_t<base + 102> S12ADI;
+			rw8_t<base + 103> GBADI;
+			rw8_t<base + 104> GCADI;
+			rw8_t<base + 105> S12ADI1;
+			rw8_t<base + 106> GBADI1;
+			rw8_t<base + 107> GCADI1;
+			rw8_t<base + 108> CMPC0;
+			rw8_t<base + 109> CMPC1;
+			rw8_t<base + 110> CMPC2;
+			rw8_t<base + 111> S12ADI2;
+			rw8_t<base + 112> GBADI2;
+			rw8_t<base + 113> GCADI2;
 
 			rw8_t<base + 218> ERI1;
 			rw8_t<base + 219> RXI1;
@@ -151,6 +177,22 @@ namespace device {
 			bit_rw_t<ier08, bitpos::B6>	IRQ6;
 			bit_rw_t<ier08, bitpos::B7>	IRQ7;
 
+			typedef rw8_t<base + 0x0C> ier0c;
+			bit_rw_t<ier0c, bitpos::B6>	S12ADI;
+			bit_rw_t<ier0c, bitpos::B7>	GBADI;
+			typedef rw8_t<base + 0x0D> ier0d;
+			bit_rw_t<ier0d, bitpos::B0>	GCADI;
+			bit_rw_t<ier0d, bitpos::B1>	S12ADI1;
+			bit_rw_t<ier0d, bitpos::B2>	GBADI1;
+			bit_rw_t<ier0d, bitpos::B3>	GCADI1;
+			bit_rw_t<ier0d, bitpos::B4>	CMPC0;
+			bit_rw_t<ier0d, bitpos::B5>	CMPC1;
+			bit_rw_t<ier0d, bitpos::B6>	CMPC2;
+			bit_rw_t<ier0d, bitpos::B7>	S12ADI2;
+			typedef rw8_t<base + 0x0E> ier0e;
+			bit_rw_t<ier0e, bitpos::B0>	GBADI2;
+			bit_rw_t<ier0e, bitpos::B1>	GCADI2;
+
 			typedef rw8_t<base + 0x1B> ier1b;
 			bit_rw_t<ier1b, bitpos::B2>	ERI1;
 			bit_rw_t<ier1b, bitpos::B3>	RXI1;
@@ -185,12 +227,25 @@ namespace device {
 		template <uint32_t base>
 		struct ipr_t {
 
-			rw8_t<base + 4> CMI0;
-			rw8_t<base + 5> CMI1;
-			rw8_t<base + 6> CMI2;
-			rw8_t<base + 7> CMI3;
+			rw8_t<base + 4  > CMI0;
+			rw8_t<base + 5  > CMI1;
+			rw8_t<base + 6  > CMI2;
+			rw8_t<base + 7  > CMI3;
 
-			rw8_t<base + 44> RSPI0;
+			rw8_t<base + 44 > RSPI0;
+
+			rw8_t<base + 102> S12ADI;
+			rw8_t<base + 103> GBADI;
+			rw8_t<base + 104> GCADI;
+			rw8_t<base + 105> S12ADI1;
+			rw8_t<base + 106> GBADI1;
+			rw8_t<base + 107> GCADI1;
+			rw8_t<base + 108> CMPC0;
+			rw8_t<base + 109> CMPC1;
+			rw8_t<base + 110> CMPC2;
+			rw8_t<base + 111> S12ADI2;
+			rw8_t<base + 112> GBADI2;
+			rw8_t<base + 113> GCADI2;
 
 			rw8_t<base + 218> SCI1;
 			rw8_t<base + 222> SCI5;
