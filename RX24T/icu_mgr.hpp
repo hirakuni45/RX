@@ -75,16 +75,25 @@ namespace device {
 				ICU::IPR.S12ADI = lvl;
 				ICU::IPR.GBADI  = lvl;
 				ICU::IPR.GCADI  = lvl;
+				ICU::IER.S12ADI = ena;
+				ICU::IER.GBADI  = ena;
+				ICU::IER.GCADI  = ena;
 				break;
 			case peripheral::S12AD1:
 				ICU::IPR.S12ADI1 = lvl;
 				ICU::IPR.GBADI1  = lvl;
 				ICU::IPR.GCADI1  = lvl;
+				ICU::IER.S12ADI1 = ena;
+				ICU::IER.GBADI1  = ena;
+				ICU::IER.GCADI1  = ena;
 				break;
 			case peripheral::S12AD2:
 				ICU::IPR.S12ADI2 = lvl;
 				ICU::IPR.GBADI2  = lvl;
 				ICU::IPR.GCADI2  = lvl;
+				ICU::IER.S12ADI2 = ena;
+				ICU::IER.GBADI2  = ena;
+				ICU::IER.GCADI2  = ena;
 				break;
 
 			default:
