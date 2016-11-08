@@ -26,9 +26,11 @@
 #include "RX24T/riic.hpp"
 #include "RX24T/rspi.hpp"
 #include "RX24T/s12ad.hpp"
+#include "RX24T/da.hpp"
 #include "RX24T/port_map.hpp"
 #include "RX24T/power_cfg.hpp"
 #include "RX24T/icu_mgr.hpp"
+
 #elif defined(SIG_RX63T)
 #include "RX63T/peripheral.hpp"
 #include "RX600/port.hpp"
