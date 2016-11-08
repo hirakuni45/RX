@@ -11,16 +11,10 @@
 #include "common/fifo.hpp"
 #include "common/format.hpp"
 #include "common/adc_io.hpp"
+#include "common/bitset.hpp"
+#include "common/switch_man.hpp"
 
 namespace {
-
-	void wait_delay_(uint32_t n)
-	{
-		// とりあえず無駄ループ
-		for(uint32_t i = 0; i < n; ++i) {
-			asm("nop");
-		}
-	}
 
 	class null_task {
 	public:
@@ -36,6 +30,18 @@ namespace {
 	typedef device::S12AD adc;
 	typedef device::adc_io<adc, null_task> adc_io;
 	adc_io adc_io_;
+
+	enum class SWITCH : uint8_t {
+		RIGHT,
+		UP,
+		DOWN,
+		LEFT,
+		A,
+		B
+	};
+
+	typedef utils::bitset<uint32_t, SWITCH> switch_bits;
+	utils::switch_man<switch_bits> switch_man_;
 }
 
 extern "C" {
@@ -98,25 +104,52 @@ int main(int argc, char** argv)
 	}
 
 	uint32_t cnt = 0;
-	uint32_t n = 0;
 	while(1) {
 		cmt_.sync();
 
 		adc_io_.scan();
+
+		adc_io_.sync();
+
+		// ４つのスイッチ判定（排他的）
+		auto val = adc_io_.get(adc::analog::AIN000);
+		val += 512;  // 閾値のオフセット（4096 / 4(SWITCH) / 2）
+		val /= 1024;  // デコード（4096 / 4(SWITCH）
+
+		switch_bits tmp;
+		if(val < 4) {
+			tmp.set(static_cast<SWITCH>(val));
+		}
+
+		switch_man_.service(tmp);
+
+		bool f = false;
+		if(switch_man_.get_positive().get(SWITCH::UP)) {
+			utils::format("UP   : on\n");
+			f = true;
+		}
+		if(switch_man_.get_positive().get(SWITCH::DOWN)) {
+			utils::format("DOWN : on\n");
+			f = true;
+		}
+		if(switch_man_.get_positive().get(SWITCH::LEFT)) {
+			utils::format("LEFT : on\n");
+			f = true;
+		}
+		if(switch_man_.get_positive().get(SWITCH::RIGHT)) {
+			utils::format("RIGHT: on\n");
+			f = true;
+		}
+
+		if(f) {
+			auto a1 = adc_io_.get(adc::analog::AIN001);
+			utils::format("Analog AIN001: %d\n") % a1;
+		}
 
 		++cnt;
 		if(cnt >= 30) {
 			cnt = 0;
 		}
 		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
-
-		if((n % 60) == 0) {
-			adc_io_.sync();
-			auto a0 = adc_io_.get(adc::analog::AIN000);
-			utils::format("Analog AIN000: %d\n") % a0;
-			auto a1 = adc_io_.get(adc::analog::AIN001);
-			utils::format("Analog AIN001: %d\n") % a1;
-		}
-		++n;
 	}
 }
