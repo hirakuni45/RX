@@ -30,13 +30,22 @@ namespace {
 		}
 	};
 
+	uint32_t adc_cnt_;
+
+	class adc_task {
+	public:
+		void operator() () {
+			++adc_cnt_;
+		}
+	};
+
 	device::cmt_io<device::CMT0, null_task>  cmt_;
 
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
 	typedef device::S12AD adc;
-	typedef device::adc_io<adc, null_task> adc_io;
+	typedef device::adc_io<adc, adc_task> adc_io;
 	adc_io adc_io_;
 
 	enum class SWITCH : uint8_t {
@@ -101,8 +110,9 @@ int main(int argc, char** argv)
 
 	device::PORT0::PDR.B0 = 1; // output
 
+	// A/D 設定
 	{
-		uint8_t intr_level = 0;
+		uint8_t intr_level = 1;
 		if(!adc_io_.start(adc::analog::AIN000, intr_level)) {
 			utils::format("A/D start fail AIN000\n");
 		}
@@ -116,7 +126,6 @@ int main(int argc, char** argv)
 		cmt_.sync();
 
 		adc_io_.scan();
-
 		adc_io_.sync();
 
 		// ４つのスイッチ判定（排他的）
@@ -151,7 +160,7 @@ int main(int argc, char** argv)
 
 		if(f) {
 			auto a1 = adc_io_.get(adc::analog::AIN001);
-			utils::format("Analog AIN001: %d\n") % a1;
+			utils::format("Analog AIN001: %d (%d)\n") % a1 % adc_cnt_;
 		}
 
 		++cnt;
