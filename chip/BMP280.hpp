@@ -1,7 +1,10 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	BMP280 デジタル圧力センサー・ドライバー
+	@brief	BMP280 デジタル圧力センサー・ドライバー @n
+			Bosch Sensotec / Digital Pressure Sensor @n
+			https://www.bosch-sensortec.com/bst/products/all_products/bmp280 @n
+			Copyright 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -22,6 +25,7 @@ namespace chip {
 	class BMP280 {
 
 		// R/W ビットを含まない７ビット値
+		// ※ SDO:L ---> 0x76, SDO:H ---> 0x77
 		static const uint8_t BMP280_ADR_ = 0x77;
 
 		I2C_IO& i2c_;
@@ -51,6 +55,7 @@ namespace chip {
       		CONFIG        = 0xF5,
       		PRESSUREDATA  = 0xF7,
       		TEMPDATA      = 0xFA,
+			HUMIDDATA     = 0xFD,
 		};
 
     	struct calib_t {
@@ -192,6 +197,37 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	湿度を返す（％）(for BME280)
+			@return 湿度
+		 */
+		//-----------------------------------------------------------------//
+		float get_humidity() {
+
+			get_temperature(); // must be done first to get t_fine
+
+			int32_t adc_H = read16_(REG::HUMIDDATA);
+
+			int32_t v_x1_u32r = (t_fine_ - (static_cast<int32_t>(76800)));
+
+			v_x1_u32r = (((((adc_H << 14) - ((static_cast<int32_t>(calib_.dig_H4)) << 20) -
+				((static_cast<int32_t>(calib_.dig_H5)) * v_x1_u32r)) + (static_cast<int32_t>(16384))) >> 15) *
+				(((((((v_x1_u32r * (static_cast<int32_t>(calib_.dig_H6))) >> 10) *
+				(((v_x1_u32r * (static_cast<int32_t>(calib_.dig_H3))) >> 11) +
+				(static_cast<int32_t>(32768)))) >> 10) +
+				(static_cast<int32_t>(2097152))) * (static_cast<int32_t>(calib_.dig_H2)) + 8192) >> 14));
+
+			v_x1_u32r = (v_x1_u32r - (((((v_x1_u32r >> 15) * (v_x1_u32r >> 15)) >> 7) *
+				(static_cast<int32_t>(calib_.dig_H1))) >> 4));
+
+			v_x1_u32r = (v_x1_u32r < 0) ? 0 : v_x1_u32r;
+			v_x1_u32r = (v_x1_u32r > 419430400) ? 419430400 : v_x1_u32r;
+			float h = (v_x1_u32r>>12);
+			return  h / 1024.0f;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	圧力を返す（hPa)
 			@return 圧力
 		 */
@@ -231,7 +267,7 @@ namespace chip {
 			@return 高度
 		 */
 		//-----------------------------------------------------------------//
-		float get_altitude(float seaLevelhPa = 1013.25) {
+		float get_altitude(float seaLevelhPa = 1013.25f) {
 			float pressure = get_pressure(); // in Si units for Pascal
 			pressure /= 100.0f;
 
