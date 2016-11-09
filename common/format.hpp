@@ -401,7 +401,7 @@ namespace utils {
 			int16_t exp = (fpv >> 23) & 0xff;
 			if(exp == 0xff) {
 				if(sign) chaout_('-');
-				chaout_("inf");
+				str_("inf");
 				return;
 			}
 
