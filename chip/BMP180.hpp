@@ -196,11 +196,26 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	圧力を返す（*100 hPa）
+			@brief	温度を返す（℃ * 100）
+			@return 温度
+		 */
+		//-----------------------------------------------------------------//
+		int32_t get_temperature()
+		{
+			int32_t UT = get_raw_temperature();
+			int32_t B5 = computeB5_(UT);
+			int32_t temp = (B5 + 8) >> 3;
+			return temp * 5;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	整数圧力を返す（hPa * 100）
 			@return 圧力
 		 */
 		//-----------------------------------------------------------------//
-		int32_t get_pressure()
+		int32_t get_pressure_int100()
 		{
   			int32_t UT = get_raw_temperature();
 			int32_t UP = get_raw_pressure();
@@ -247,59 +262,32 @@ namespace chip {
 			X2 = (-7357 * p) >> 16;
 
 			p = p + ((X1 + X2 + static_cast<int32_t>(3791)) >> 4);
-			  return p;
+			return p;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	温度を返す（* 10 ℃）
-			@return 温度
+			@brief	圧力を返す [hPa]
+			@return 圧力 [hPa]
 		 */
 		//-----------------------------------------------------------------//
-		int32_t get_temperature()
-		{
-			int32_t UT = get_raw_temperature();
-
-#if 0
-			// use datasheet numbers!
-			UT = 27898;
-			ac6_ = 23153;
-			ac5_ = 32757;
-			mc_ = -8711;
-			md_ = 2868;
-#endif
-
-			int32_t B5 = computeB5_(UT);
-			int32_t temp = (B5 + 8) >> 4;
-  			// temp /= 10;
-			return temp;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	気圧を返す（海面１０１３ミリバール）
-			@return 気圧
-		 */
-		//-----------------------------------------------------------------//
-		int32_t get_sea_level_pressure(float altitude_meters)
-		{
-  			float pressure = get_pressure();
-  			return static_cast<int32_t>(pressure / std::pow(1.0f - altitude_meters / 44330.0f, 5.255f));
+		float get_pressure() {
+			return static_cast<float>(get_pressure_int100()) / 100.0f;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	高度を返す
+			@param[in]	seaLevelhPa 海面ヘクトパスカル
 			@return 高度
 		 */
 		//-----------------------------------------------------------------//
-		float get_altitude(float sealevelPressure)
+		float get_altitude(float seaLevelhPa = 1013.25f)
 		{
 			float pressure = get_pressure();
-			float altitude = 44330.0f * (1.0f - std::pow(pressure / sealevelPressure, 0.1903f));
+			float altitude = 44330.0f * (1.0f - std::pow(pressure / seaLevelhPa, 0.1903f));
 			return altitude;
 		}
 	};

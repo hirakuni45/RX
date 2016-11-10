@@ -106,7 +106,7 @@ namespace chip {
 			reg[0] = static_cast<uint8_t>(adr);
 			i2c_.send(BMP280_ADR_, reg, 1);
 			i2c_.recv(BMP280_ADR_, reg, 3);
-			return (reg[0] << 16) | (reg[1] << 8) | reg[2];
+			return (static_cast<uint32_t>(reg[0]) << 16) | (static_cast<uint32_t>(reg[1]) << 8) | reg[2];
 		}
 
 		uint16_t read16le_(REG adr) {
@@ -173,11 +173,11 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	温度を返す（℃）
+			@brief	温度を返す（100 * ℃）
 			@return 温度
 		 */
 		//-----------------------------------------------------------------//
-		float get_temperature() {
+		int32_t get_temperature() {
 			int32_t adc_T = read24_(REG::TEMPDATA);
 			adc_T >>= 4;
 
@@ -190,8 +190,7 @@ namespace chip {
 
 			t_fine_ = var1 + var2;
 
-			float t = (t_fine_ * 5 + 128) >> 8;
-			return t / 100.0f;
+			return (t_fine_ * 5 + 128) >> 8;
 		}
 
 
@@ -228,11 +227,11 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	圧力を返す（hPa)
+			@brief	整数圧力を返す（hPa * 100 * 256)
 			@return 圧力
 		 */
 		//-----------------------------------------------------------------//
-		float get_pressure() {
+		int32_t get_pressure_int25600() {
 			// Must be done first to get the t_fine variable set up
 			get_temperature();
 
@@ -257,22 +256,31 @@ namespace chip {
 			var2 = ((static_cast<int64_t>(calib_.dig_P8)) * p) >> 19;
 
 			p = ((p + var1 + var2) >> 8) + ((static_cast<int64_t>(calib_.dig_P7)) << 4);
-			return static_cast<float>(p) / 256.0f;
+			return p;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	圧力を返す [hPa]
+			@return 圧力 [hPa]
+		 */
+		//-----------------------------------------------------------------//
+		float get_pressure() {
+			return static_cast<float>(get_pressure_int25600()) / 25600.0f; 
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	高度を返す
+			@param[in]	seaLevelhPa 海面ヘクトパスカル
 			@return 高度
 		 */
 		//-----------------------------------------------------------------//
 		float get_altitude(float seaLevelhPa = 1013.25f) {
-			float pressure = get_pressure(); // in Si units for Pascal
-			pressure /= 100.0f;
-
+			float pressure = get_pressure();
 			float altitude = 44330.0f * (1.0f - std::pow(pressure / seaLevelhPa, 0.1903f));
-
 			return altitude;
 		}
 
