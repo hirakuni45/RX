@@ -30,6 +30,8 @@ namespace chip {
 
 		I2C_IO& i2c_;
 
+		uint8_t	addr_;
+
 		enum class REG : uint8_t {
       		DIG_T1        = 0x88,
       		DIG_T2        = 0x8A,
@@ -88,32 +90,32 @@ namespace chip {
 		uint8_t read8_(REG adr) {
 			uint8_t reg[1];
 			reg[0] = static_cast<uint8_t>(adr);
-			i2c_.send(BMP280_ADR_, reg, 1);
-			i2c_.recv(BMP280_ADR_, reg, 1);
+			i2c_.send(addr_, reg, 1);
+			i2c_.recv(addr_, reg, 1);
 			return reg[0];
 		}
 
 		uint16_t read16_(REG adr) {
 			uint8_t reg[2];
 			reg[0] = static_cast<uint8_t>(adr);
-			i2c_.send(BMP280_ADR_, reg, 1);
-			i2c_.recv(BMP280_ADR_, reg, 2);
+			i2c_.send(addr_, reg, 1);
+			i2c_.recv(addr_, reg, 2);
 			return (reg[0] << 8) | reg[1];
 		}
 
 		uint32_t read24_(REG adr) {
 			uint8_t reg[3];
 			reg[0] = static_cast<uint8_t>(adr);
-			i2c_.send(BMP280_ADR_, reg, 1);
-			i2c_.recv(BMP280_ADR_, reg, 3);
+			i2c_.send(addr_, reg, 1);
+			i2c_.recv(addr_, reg, 3);
 			return (static_cast<uint32_t>(reg[0]) << 16) | (static_cast<uint32_t>(reg[1]) << 8) | reg[2];
 		}
 
 		uint16_t read16le_(REG adr) {
 			uint8_t reg[2];
 			reg[0] = static_cast<uint8_t>(adr);
-			i2c_.send(BMP280_ADR_, reg, 1);
-			i2c_.recv(BMP280_ADR_, reg, 2);
+			i2c_.send(addr_, reg, 1);
+			i2c_.recv(addr_, reg, 2);
 			return (reg[1] << 8) | reg[0];
 		}
 
@@ -121,7 +123,7 @@ namespace chip {
 			uint8_t reg[2];
 			reg[0] = static_cast<uint8_t>(a);
 			reg[1] = data;
-			i2c_.send(BMP280_ADR_, reg, 2);
+			i2c_.send(addr_, reg, 2);
 		}
 
 		void get_coefficients_() {
@@ -147,25 +149,38 @@ namespace chip {
 			@param[in]	i2c	iica_io クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		BMP280(I2C_IO& i2c) : i2c_(i2c), calib_(), t_fine_(0) { }
+		BMP280(I2C_IO& i2c) : i2c_(i2c), addr_(0), calib_(), t_fine_(0) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
-			@param[in]	addr	オプションの I2C アドレス
+			@param[in]	addr	オプションの I2C アドレス @n
+								※ SDO:L ---> 0x76, SDO:H ---> 0x77 (default)
 			@return エラーなら「false」を返す
 		 */
 		//-----------------------------------------------------------------//
-		bool start(uint8_t addr = BMP280_ADR_) {
+		bool start(uint8_t addr = BMP280_ADR_)
+		{
+			addr_ = addr;
 
-			if(read8_(REG::CHIPID) != 0x58) {
+			if(read8_(REG::CHIPID) != 0x58) {  // チップＩＤの確認
+				addr_ = 0;
 				return false;
 			}
 
-			get_coefficients_();
+			get_coefficients_();  // 補正データ取得
 
-			write8_(REG::CONTROL, 0x3F);
+			// Ex: Ultra high resolution
+			// setting control
+			// osrs_t(X2): 010, osrs_p(X16): 101, mode(Normal): 11
+			uint8_t mode = 0b01000000 | 0b00010100 | 0b00000011;
+			write8_(REG::CONTROL, mode);
+
+			// setting config
+			// t_sb(0.5ms): 000, filter(16): 100, xxx(0): 0, spi3w_en(0): 0
+			uint8_t conf = 0b00000000 | 0b00010000 | 0b00000000 | 0b00000000;
+			write8_(REG::CONFIG, conf);
 
 			return true;
 		}
@@ -173,11 +188,14 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	温度を返す（100 * ℃）
+			@brief	温度を返す（℃ * 100）
 			@return 温度
 		 */
 		//-----------------------------------------------------------------//
-		int32_t get_temperature() {
+		int32_t get_temperature()
+		{
+			if(addr_ == 0) return 0;
+
 			int32_t adc_T = read24_(REG::TEMPDATA);
 			adc_T >>= 4;
 
@@ -200,7 +218,9 @@ namespace chip {
 			@return 湿度
 		 */
 		//-----------------------------------------------------------------//
-		float get_humidity() {
+		float get_humidity()
+		{
+			if(addr_ == 0) return 0;
 
 			get_temperature(); // must be done first to get t_fine
 
@@ -227,11 +247,14 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	整数圧力を返す（hPa * 100 * 256)
+			@brief	圧力を返す [hPa * 100]
 			@return 圧力
 		 */
 		//-----------------------------------------------------------------//
-		int32_t get_pressure_int25600() {
+		int32_t get_pressure()
+		{
+			if(addr_ == 0) return 0;
+
 			// Must be done first to get the t_fine variable set up
 			get_temperature();
 
@@ -256,18 +279,8 @@ namespace chip {
 			var2 = ((static_cast<int64_t>(calib_.dig_P8)) * p) >> 19;
 
 			p = ((p + var1 + var2) >> 8) + ((static_cast<int64_t>(calib_.dig_P7)) << 4);
-			return p;
-		}
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	圧力を返す [hPa]
-			@return 圧力 [hPa]
-		 */
-		//-----------------------------------------------------------------//
-		float get_pressure() {
-			return static_cast<float>(get_pressure_int25600()) / 25600.0f; 
+			return p >> 8;
 		}
 
 
@@ -278,8 +291,11 @@ namespace chip {
 			@return 高度
 		 */
 		//-----------------------------------------------------------------//
-		float get_altitude(float seaLevelhPa = 1013.25f) {
-			float pressure = get_pressure();
+		float get_altitude(float seaLevelhPa = 1013.25f)
+		{
+			if(addr_ == 0) return 0.0f;
+
+			float pressure = static_cast<float>(get_pressure()) / 100.0f;
 			float altitude = 44330.0f * (1.0f - std::pow(pressure / seaLevelhPa, 0.1903f));
 			return altitude;
 		}

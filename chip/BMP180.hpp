@@ -211,11 +211,11 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	整数圧力を返す（hPa * 100）
+			@brief	圧力を返す（hPa * 100）
 			@return 圧力
 		 */
 		//-----------------------------------------------------------------//
-		int32_t get_pressure_int100()
+		int32_t get_pressure()
 		{
   			int32_t UT = get_raw_temperature();
 			int32_t UP = get_raw_pressure();
@@ -268,17 +268,6 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	圧力を返す [hPa]
-			@return 圧力 [hPa]
-		 */
-		//-----------------------------------------------------------------//
-		float get_pressure() {
-			return static_cast<float>(get_pressure_int100()) / 100.0f;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	高度を返す
 			@param[in]	seaLevelhPa 海面ヘクトパスカル
 			@return 高度
@@ -286,7 +275,7 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		float get_altitude(float seaLevelhPa = 1013.25f)
 		{
-			float pressure = get_pressure();
+			float pressure = static_cast<float>(get_pressure()) / 100.0f;
 			float altitude = 44330.0f * (1.0f - std::pow(pressure / seaLevelhPa, 0.1903f));
 			return altitude;
 		}
