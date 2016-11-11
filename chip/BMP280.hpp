@@ -174,12 +174,12 @@ namespace chip {
 			// Ex: Ultra high resolution
 			// setting control
 			// osrs_t(X2): 010, osrs_p(X16): 101, mode(Normal): 11
-			uint8_t mode = 0b01000000 | 0b00010100 | 0b00000011;
+			uint8_t mode = 0b010'000'00 | 0b000'101'00 | 0b000'000'11;
 			write8_(REG::CONTROL, mode);
 
 			// setting config
 			// t_sb(0.5ms): 000, filter(16): 100, xxx(0): 0, spi3w_en(0): 0
-			uint8_t conf = 0b00000000 | 0b00010000 | 0b00000000 | 0b00000000;
+			uint8_t conf = 0b000'000'0'0 | 0b000'100'0'0 | 0b000'000'0'0 | 0b000'000'0'0;
 			write8_(REG::CONFIG, conf);
 
 			return true;
