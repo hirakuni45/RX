@@ -60,6 +60,35 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB25 = f;
 				break;
 
+			case peripheral::TMR0:
+			case peripheral::TMR1:
+				SYSTEM::MSTPCRA.MSTPA5 = f;
+				break;
+			case peripheral::TMR2:
+			case peripheral::TMR3:
+				SYSTEM::MSTPCRA.MSTPA4 = f;
+				break;
+			case peripheral::TMR4:
+			case peripheral::TMR5:
+				SYSTEM::MSTPCRA.MSTPA3 = f;
+				break;
+			case peripheral::TMR6:
+			case peripheral::TMR7:
+				SYSTEM::MSTPCRA.MSTPA2 = f;
+				break;
+
+			case peripheral::MTU0:
+			case peripheral::MTU1:
+			case peripheral::MTU2:
+			case peripheral::MTU3:
+			case peripheral::MTU4:
+			case peripheral::MTU5:
+			case peripheral::MTU6:
+			case peripheral::MTU7:
+			case peripheral::MTU9:
+				SYSTEM::MSTPCRA.MSTPA9 = f;
+				break;
+
 			case peripheral::S12AD:
 				SYSTEM::MSTPCRA.MSTPA17 = f;
 				break;
