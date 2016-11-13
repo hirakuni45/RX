@@ -27,7 +27,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
 		struct cmpctl_t : public rw8_t<ofs> {
-			typedef rw16_t<ofs> io_;
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -50,7 +50,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
 		struct cmpsel0_t : public rw8_t<ofs> {
-			typedef rw16_t<ofs> io_;
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -69,7 +69,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
 		struct cmpsel1_t : public rw8_t<ofs> {
-			typedef rw16_t<ofs> io_;
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -88,7 +88,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
 		struct cmpmon_t : public rw8_t<ofs> {
-			typedef rw16_t<ofs> io_;
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -107,7 +107,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
 		struct cmpioc_t : public rw8_t<ofs> {
-			typedef rw16_t<ofs> io_;
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
