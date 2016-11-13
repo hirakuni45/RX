@@ -21,16 +21,49 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU 制御クラス
-		@param[in]	MTU		MTU ユニット
+		@param[in]	MTUx	MTUx ユニット(0 to 7, 9)
 		@param[in]	TASK	割り込みタスク
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class MTU, class TASK>
+	template <class MTUx, class TASK>
 	class mtu_io {
 	public:
 
 
+	private:
+		TASK	task_;
 
+		uint8_t	level_;
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンストラクター
+		 */
+		//-----------------------------------------------------------------//
+		mtu_io() : level_(0) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PWM1 スタート(MTU0, MTU1, MTU2, MTU3, MTU4, MTU6, MTU7, MTU9)
+			@param[in]	cksrc	クロックソース
+			@param[in]	level	割り込みレベル、０の場合はポーリング
+			@return 成功なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool start_pwm1(typename MTUx::clock_source cksrc, uint8_t level = 0)
+		{
+			level_ = level;
+
+			MTUx::TCR.TPSC   = static_cast<uint8_t>(cksrc) & 0b111;
+			MTUx::TCR2.TPSC2 = static_cast<uint8_t>(cksrc) >> 3;
+
+			MTUx::TMDR1.MD = 0b0010;  // PWM モード１
+
+
+			return true;
+		}
 
 	};
 }
