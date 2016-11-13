@@ -1194,7 +1194,7 @@ namespace device {
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable_port(chanel ch, bool enable = true)
+		void enable(chanel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
@@ -1404,7 +1404,7 @@ namespace device {
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable_port(chanel ch, bool enable = true)
+		void enable(chanel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
@@ -1624,7 +1624,7 @@ namespace device {
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable_port(chanel ch, bool enable = true)
+		void enable(chanel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
@@ -1765,10 +1765,10 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class chanel : uint8_t {
-			A,  ///< MTIOC3A
-			B,  ///< MTIOC3B
-			C,  ///< MTIOC3C
-			D,  ///< MTIOC3D
+			A,  ///< P33 / MTIOC3A (LFQFP100:58)
+			B,  ///< P71 / MTIOC3B (LFQFP100:56)
+			C,  ///< P32 / MTIOC3C (LFQFP100:59)
+			D,  ///< P74 / MTIOC3D (LFQFP100:53)
 		};
 
 
@@ -1779,7 +1779,7 @@ namespace device {
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable_port(chanel ch, bool enable = true)
+		void enable(chanel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
@@ -1968,10 +1968,10 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class chanel : uint8_t {
-			A,  ///< MTIOC4A
-			B,  ///< MTIOC4B
-			C,  ///< MTIOC4C
-			D,  ///< MTIOC4D
+			A,  ///< P72 / MTIOC4A (LFQFP100:55)
+			B,  ///< P73 / MTIOC4B (LFQFP100:54)
+			C,  ///< P75 / MTIOC4C (LFQFP100:52)
+			D,  ///< P76 / MTIOC4D (LFQFP100:51)
 		};
 
 
@@ -1982,7 +1982,7 @@ namespace device {
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable_port(chanel ch, bool enable = true)
+		void enable(chanel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
@@ -2239,12 +2239,12 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class chanel : uint8_t {
-			U,   ///< MTIOC5U (P24)
-			V,   ///< MTIOC5V (P23)
-			W,   ///< MTIOC5W (P22)
-			U2,  ///< MTIOC5U (P82)
-			V2,  ///< MTIOC5V (P81)
-			W2,  ///< MTIOC5W (P80)
+			U,   ///< P24 / MTIOC5U (LFQFP100:64)
+			V,   ///< P23 / MTIOC5V (LFQFP100:65)
+			W,   ///< P22 / MTIOC5W (LFQFP100:66)
+			U2,  ///< P82 / MTIOC5U (LFQFP100:96)
+			V2,  ///< P81 / MTIOC5V (LFQFP100:97)
+			W2,  ///< P80 / MTIOC5W (LFQFP100:98)
 		};
 
 
@@ -2255,7 +2255,7 @@ namespace device {
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable_port(chanel ch, bool enable = true)
+		void enable(chanel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
@@ -2270,6 +2270,18 @@ namespace device {
 			case chanel::W:
 					MPC::P22PFS.PSEL = sel;  // MTIOC5W
 					PORT2::PMR.B2 = enable;
+				break;
+			case chanel::U2:
+					MPC::P82PFS.PSEL = sel;  // MTIOC5U
+					PORT8::PMR.B2 = enable;
+				break;
+			case chanel::V2:
+					MPC::P81PFS.PSEL = sel;  // MTIOC5V
+					PORT8::PMR.B1 = enable;
+				break;
+			case chanel::W2:
+					MPC::P80PFS.PSEL = sel;  // MTIOC5W
+					PORT8::PMR.B0 = enable;
 				break;
 			}
 		}
@@ -2538,34 +2550,39 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class chanel : uint8_t {
-			U,  ///< MTIOC5U
-			V,  ///< MTIOC5V
-			W,  ///< MTIOC5W
+			A,  ///< PA1 / MTIOC6A (LFQFP100:40)
+			B,  ///< P95 / MTIOC6B (LFQFP100:45)
+			C,  ///< PA0 / MTIOC6C (LFQFP100:41)
+			D,  ///< P92 / MTIOC6D (LFQFP100:48)
 		};
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU5)
+			@brief  ポートを有効にする(MTU6)
 			@param[in]	chanel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable_port(chanel ch, bool enable = true)
+		void enable(chanel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
-			case chanel::U:
-					MPC::P24PFS.PSEL = sel;  // MTIOC5U
-					PORT2::PMR.B4 = enable;
+			case chanel::A:
+					MPC::PA1PFS.PSEL = sel;  // MTIOC6A
+					PORTA::PMR.B1 = enable;
 				break;
-			case chanel::V:
-					MPC::P23PFS.PSEL = sel;  // MTIOC5V
-					PORT2::PMR.B3 = enable;
+			case chanel::B:
+					MPC::P95PFS.PSEL = sel;  // MTIOC6B
+					PORT9::PMR.B5 = enable;
 				break;
-			case chanel::W:
-					MPC::P22PFS.PSEL = sel;  // MTIOC5W
-					PORT2::PMR.B2 = enable;
+			case chanel::C:
+					MPC::PA0PFS.PSEL = sel;  // MTIOC6C
+					PORTA::PMR.B0 = enable;
+				break;
+			case chanel::D:
+					MPC::P92PFS.PSEL = sel;  // MTIOC6D
+					PORT9::PMR.B2 = enable;
 				break;
 			}
 		}
@@ -2754,6 +2771,50 @@ namespace device {
 			PCLKA_8    = 0b010000,	///< PCLKA / 8
 			PCLKA_32   = 0b011000,	///< PCLKA / 32
 		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  入出力チャネル(MTU7)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class chanel : uint8_t {
+			A,  ///< P94 / MTIOC7A (LFQFP100:46)
+			B,  ///< P93 / MTIOC7B (LFQFP100:47)
+			C,  ///< P91 / MTIOC7C (LFQFP100:49)
+			D,  ///< P90 / MTIOC7D (LFQFP100:50)
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートを有効にする(MTU7)
+			@param[in]	chanel	チャネル
+			@param[in]	enable	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(chanel ch, bool enable = true)
+		{
+			uint8_t sel = enable ? 0b00001 : 0;
+			switch(ch) {
+			case chanel::A:
+					MPC::P94PFS.PSEL = sel;  // MTIOC7A
+					PORT9::PMR.B4 = enable;
+				break;
+			case chanel::B:
+					MPC::P93PFS.PSEL = sel;  // MTIOC7B
+					PORT9::PMR.B3 = enable;
+				break;
+			case chanel::C:
+					MPC::P91PFS.PSEL = sel;  // MTIOC7C
+					PORT9::PMR.B1 = enable;
+				break;
+			case chanel::D:
+					MPC::P90PFS.PSEL = sel;  // MTIOC7D
+					PORT9::PMR.B0 = enable;
+				break;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -2984,6 +3045,50 @@ namespace device {
 			PCLKA_1024 = 0b101000,	///< PCLKA / 1024
 			MTIOC1A    = 0b111000,	///< MTIOC1A
 		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  入出力チャネル(MTU9)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class chanel : uint8_t {
+			A,  ///< PD7 / MTIOC9A (LFQFP100:18)
+			B,  ///< PE0 / MTIOC9B (LFQFP100:17)
+			C,  ///< PD6 / MTIOC9C (LFQFP100:19)
+			D,  ///< PE1 / MTIOC9D (LFQFP100:16)
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートを有効にする(MTU9)
+			@param[in]	chanel	チャネル
+			@param[in]	enable	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(chanel ch, bool enable = true)
+		{
+			uint8_t sel = enable ? 0b00001 : 0;
+			switch(ch) {
+			case chanel::A:
+					MPC::PD7PFS.PSEL = sel;  // MTIOC9A
+					PORTD::PMR.B7 = enable;
+				break;
+			case chanel::B:
+					MPC::PE0PFS.PSEL = sel;  // MTIOC9B
+					PORTE::PMR.B0 = enable;
+				break;
+			case chanel::C:
+					MPC::PD6PFS.PSEL = sel;  // MTIOC9C
+					PORTD::PMR.B6 = enable;
+				break;
+			case chanel::D:
+					MPC::PE1PFS.PSEL = sel;  // MTIOC9D
+					PORTE::PMR.B1 = enable;
+				break;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
