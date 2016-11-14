@@ -2,6 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	VS1063 VLSI Audio Codec ドライバー
+			Copyright 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -144,14 +145,14 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		void start()
 		{
-			SEL::PM = 0;
-			SEL::PU = 0;
+			SEL::DIR = 1;  // output
+			SEL::PU  = 0;
 
-			DCS::PM = 0;
-			DCS::PU = 0;
+			DCS::DIR = 1;  // output
+			DCS::PU  = 0;
 
-			REQ::PM = 1;
-			REQ::PU = 0;
+			REQ::DIR = 0;  // input
+			REQ::PU  = 0;
 	
 			SEL::P = 1;  // /xCS = H
 			DCS::P = 1;  // /xDCS = H
