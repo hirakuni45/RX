@@ -162,6 +162,39 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  オープンドレイン制御・レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		struct od_t {
+			static rw8_t<PORTx::base_address_ + 0x80> ODR0;
+			static rw8_t<PORTx::base_address_ + 0x81> ODR1;
+
+			void operator = (bool val) {
+				uint8_t pos = static_cast<uint8_t>(bpos);
+				if(pos < 4) { 
+					if(val) ODR0 |= 1 << (pos * 2);
+					else ODR0 &= ~(1 << (pos * 2));
+				} else {
+					pos -= 4;
+					if(val) ODR1 |= 1 << (pos * 2);
+					else ODR1 &= ~(1 << (pos * 2));
+				}
+			}
+			bool operator () () {
+				uint8_t pos = static_cast<uint8_t>(bpos);
+				if(pos < 4) {
+					return ODR0() & (1 << (pos * 2));
+				} else {
+					pos -= 4;
+					return ODR1() & (1 << (pos * 2));
+				}
+			}
+		};
+		static od_t OD;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポート・レジスタ @n
 					※ポート出力と、ポート入力が異なる
 		*/
