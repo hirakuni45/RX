@@ -23,11 +23,11 @@ namespace fatfs {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MMC テンプレートクラス
-		@param[in]	SPI		SPI クラス
-		@param[in]	PORT	ポート・クラス
+		@param[in]	SPI	SPI クラス
+		@param[in]	SEL	デバイス選択クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SPI, class PORT>
+	template <class SPI, class SEL>
 	class mmc_io {
 
 		SPI&	spi_;
@@ -74,7 +74,7 @@ namespace fatfs {
 
 
 		void deselect_() {
-			PORT::P = 1;
+			SEL::P = 1;
 			BYTE d;
 			spi_.recv(&d, 1);	/* Dummy clock (force DO hi-z for multiple slave SPI) */
 		}
@@ -82,7 +82,7 @@ namespace fatfs {
 
 		/* 1:OK, 0:Timeout */
 		int select_() {
-			PORT::P = 0;
+			SEL::P = 0;
 			BYTE d;
 			spi_.recv(&d, 1);	/* Dummy clock (force DO enabled) */
 			if (wait_ready_()) return 1;	/* Wait for card ready */
@@ -231,9 +231,9 @@ namespace fatfs {
 
 			utils::delay::milli_second(10);  // 10ms
 
-			PORT::DIR = 1;  // output
+			SEL::DIR = 1;  // output
 
-			PORT::P = 1;
+			SEL::P = 1;
 #if 0
 			CS_INIT(); CS_H();		/* Initialize port pin tied to CS */
 			CK_INIT(); CK_L();		/* Initialize port pin tied to SCLK */
