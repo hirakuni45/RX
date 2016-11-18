@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	MMC（SD カード） ドライバー @n
+	@brief	MMC（SD カード）FatFS ドライバー @n
 			Copyright 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
