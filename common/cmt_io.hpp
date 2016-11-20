@@ -37,20 +37,6 @@ namespace device {
 		static INTERRUPT_FUNC void cmt_task_() {
 			++counter_;
 			task_();
-			switch(CMT::get_chanel()) {
-			case 0:
-//				ICU::IR.CMI0 = 0;
-				break;
-			case 1:
-//				ICU::IR.CMI1 = 0;
-				break;
-			case 2:
-///				ICU::IR.CMI2 = 0;
-				break;
-			case 3:
-///				ICU::IR.CMI3 = 0;
-				break;
-			}
 		}
 
 		void set_vector_(ICU::VECTOR vec) {
@@ -70,11 +56,11 @@ namespace device {
 		/*!
 			@brief  開始
 			@param[in]	freq	タイマー周波数
-			@param[in]	level	割り込みレベル
+			@param[in]	level	割り込みレベル（０ならポーリング）
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level) {
+		bool start(uint32_t freq, uint8_t level = 0) {
 
 			level_ = level;
 
@@ -112,27 +98,31 @@ namespace device {
 				break;
 			}
 
+			CMT::CMCNT = 0;
+		    CMT::CMCOR = cmcor - 1;
+
+			counter_ = 0;
+
 			if(level_) {
 			    CMT::CMCR = CMT::CMCR.CMIE.b() | CMT::CMCR.CKS.b(cks);
 			} else {
 			    CMT::CMCR = CMT::CMCR.CKS.b(cks);
 			}
-			CMT::CMCNT = 0;
-		    CMT::CMCOR = cmcor - 1;
+
 			icu_mgr::set_level(CMT::get_peripheral(), level_);
 
 			switch(chanel) {
 			case 0:
-			    CMT::CMSTR0.STR0 = 1;
+				CMT::CMSTR0.STR0 = 1;
 				break;
 			case 1:
-			    CMT::CMSTR0.STR1 = 1;
+				CMT::CMSTR0.STR1 = 1;
 				break;
 			case 2:
-			    CMT::CMSTR1.STR2 = 1;
+				CMT::CMSTR1.STR2 = 1;
 				break;
 			case 3:
-			    CMT::CMSTR1.STR3 = 1;
+				CMT::CMSTR1.STR3 = 1;
 				break;
 			}
 
@@ -146,8 +136,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		void sync() const {
-			volatile uint32_t cnt = counter_;
-			while(cnt == counter_) sleep_();
+			if(level_) {
+				volatile uint32_t cnt = counter_;
+				while(cnt == counter_) sleep_();
+			} else {
+				auto ref = CMT::CMCNT();
+				while(ref <= CMT::CMCNT()) sleep_();
+				++counter_;
+			}
 		}
 
 
