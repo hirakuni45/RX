@@ -11,6 +11,8 @@
 #include "common/format.hpp"
 #include "common/mtu_io.hpp"
 
+#include "chip/MAX7219.hpp"
+
 namespace {
 
 	class null_task {
@@ -24,7 +26,7 @@ namespace {
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
-	typedef device::MTU0 MTU;
+	typedef device::MTU4 MTU;
 	device::mtu_io<MTU, null_task> mtu_;
 }
 
