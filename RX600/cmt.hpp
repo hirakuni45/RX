@@ -11,6 +11,8 @@
 #include "RX63T/peripheral.hpp"
 #elif defined(SIG_RX64M)
 #include "RX64M/peripheral.hpp"
+#elif defined(SIG_RX24T)
+#include "RX24T/peripheral.hpp"
 #endif
 
 namespace device {
