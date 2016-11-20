@@ -12,6 +12,8 @@ extern void rx_run_preinit_array(void);
 
 extern void (*interrupt_vectors[256])(void);
 
+extern void set_intr_level(unsigned int level);
+
 extern void null_task_(void);
 
 int init(void)
@@ -24,6 +26,8 @@ int init(void)
 	rx_run_preinit_array();
 	rx_run_init_array();
 	rx_run_fini_array();
+
+	set_intr_level(15);
 
 	// main の起動
 	static int argc = 0;
