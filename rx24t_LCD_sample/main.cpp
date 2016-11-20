@@ -11,7 +11,12 @@
 #include "common/format.hpp"
 #include "common/rspi_io.hpp"
 #include "chip/ST7565.hpp"
+#include "chip/UC1701.hpp"
 #include "common/monograph.hpp"
+
+// LCD を選択する
+// #define LCD_ST7565
+#define LCD_UC1701
 
 namespace {
 
@@ -33,10 +38,16 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B1> LCD_SEL;	///< LCD 選択信号
 	typedef device::PORT<device::PORT6, device::bitpos::B2> LCD_A0;	    ///< LCD レジスター選択
 
+#ifdef LCD_ST7565
 	// ST7565 drive
 	chip::ST7565<SPI, LCD_SEL, LCD_A0> lcd_(spi_);
+#endif
+#ifdef LCD_UC1701
+	// UC1701 drive
+	chip::UC1701<SPI, LCD_SEL, LCD_A0> lcd_(spi_);
+#endif
 
-	// モノ・グラフィックス
+	// モノクロ・グラフィックス
 	graphics::kfont_null kfont_;
 	graphics::monograph<128, 64> bitmap_(kfont_);
 
@@ -104,8 +115,15 @@ int main(int argc, char** argv)
 
 	// RSPI 開始
 	{
-		uint32_t clk = 1000000;
-		spi_.start(clk, SPI::PHASE::TYPE4);
+#ifdef LCD_ST7565
+		uint32_t clk = 8000000;
+#endif
+#ifdef LCD_UC1701
+		uint32_t clk = 4000000;
+#endif
+		if(!spi_.start(clk, SPI::PHASE::TYPE4)) {
+			utils::format("RSPI start fail...\n");
+		}
 	}
 
 	// LCD 開始
