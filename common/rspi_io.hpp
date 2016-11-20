@@ -44,6 +44,20 @@ namespace device {
 		// 便宜上のスリープ
 		void sleep_() { asm("nop"); }
 
+
+		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) {
+			uint32_t br = F_PCKB / 2 / speed;
+			brdv = 0;
+			while(br > 256) {
+				br >>= 1;
+				++brdv;
+				if(brdv > 3) return false;
+			}
+			if(br) --br;
+			spbr = br;
+			return true;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -78,17 +92,15 @@ namespace device {
 
 			port_map::turn(RSPI::get_peripheral());
 
-			uint32_t spbr = F_PCKB / 2 / speed;
-			uint8_t brdv = 0;
-			while(spbr > 256) {
-				spbr >>= 1;
-				++brdv;
-				if(brdv > 3) return false;
+			uint8_t brdv;
+			uint8_t spbr;
+			if(!clock_div_(speed, brdv, spbr)) {
+				return false;
 			}
 
 			power_cfg::turn(RSPI::get_peripheral());
 
-		    RSPI::SPBR = static_cast<uint8_t>(spbr - 1);
+		    RSPI::SPBR = spbr;
 
 			RSPI::SPPCR = 0x00;	// Fixed idle value, disable loop-back
 			RSPI::SPSCR = 0x00;	// disable sequence control
@@ -120,17 +132,15 @@ namespace device {
 
 			port_map::turn(RSPI::get_peripheral());
 
-			uint32_t spbr = F_PCKB / 2 / speed;
-			uint8_t brdv = 0;
-			while(spbr > 256) {
-				spbr >>= 1;
-				++brdv;
-				if(brdv > 3) return false;
+			uint8_t brdv;
+			uint8_t spbr;
+			if(!clock_div_(speed, brdv, spbr)) {
+				return false;
 			}
 
 			power_cfg::turn(RSPI::get_peripheral());
 
-		    RSPI::SPBR = static_cast<uint8_t>(spbr - 1);
+		    RSPI::SPBR = spbr;
 
 			RSPI::SPPCR = 0x00;	// Fixed idle value, disable loop-back
 			RSPI::SPSCR = 0x00;	// disable sequence control
