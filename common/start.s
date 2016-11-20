@@ -8,10 +8,10 @@
 	.type	_start,@function
 _start:
 
-# スタックの設定（SP：__stack、USP：__stack - 256）
+# スタックの設定（SP：__stack、USP：__stack - 128）
 	mov.l	#__stack, r0
 	mvtc	r0, isp
-	sub		#256,r0
+	sub		#128,r0
 	mvtc	r0, usp
 
 # 割り込みベクタの設定
@@ -37,6 +37,12 @@ _start:
 	push.l	r1
 	rte
 	nop
+
+# ワーク RAM の初期化
+#	mov	#__bssstart, r1
+#	mov	#0, r2
+#	mov	#__stack, r3
+#	sstr.l
 
 # 初期値付き変数の初期化
 	mov	#__datastart, r1
