@@ -51,7 +51,11 @@ namespace device {
 			while(br > 256) {
 				br >>= 1;
 				++brdv;
-				if(brdv > 3) return false;
+				if(brdv > 3) {
+					brdv = 3;
+					spbr = 255;
+					return false;
+				}
 			}
 			if(br) --br;
 			spbr = br;
@@ -92,10 +96,11 @@ namespace device {
 
 			port_map::turn(RSPI::get_peripheral());
 
+			bool f = true;
 			uint8_t brdv;
 			uint8_t spbr;
 			if(!clock_div_(speed, brdv, spbr)) {
-				return false;
+				f = false;
 			}
 
 			power_cfg::turn(RSPI::get_peripheral());
@@ -113,7 +118,7 @@ namespace device {
 
 			RSPI::SPCR.SPE = 1;
 
-			return true;
+			return f;
 		}
 
 
@@ -132,10 +137,11 @@ namespace device {
 
 			port_map::turn(RSPI::get_peripheral());
 
+			bool f = true;
 			uint8_t brdv;
 			uint8_t spbr;
 			if(!clock_div_(speed, brdv, spbr)) {
-				return false;
+				f = false;
 			}
 
 			power_cfg::turn(RSPI::get_peripheral());
@@ -152,7 +158,7 @@ namespace device {
 
 			RSPI::SPCR.SPE = 1;
 
-			return true;
+			return f;
 		}
 
 
