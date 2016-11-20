@@ -2,13 +2,11 @@
 //=====================================================================//
 /*!	@file
 	@brief	ST7565(R) LCD ドライバー
-			Copyright 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include <cstdint>
-#include "G13/port.hpp"
-#include "common/csi_io.hpp"
+#include "common/delay.hpp"
 
 namespace chip {
 
@@ -161,13 +159,10 @@ namespace chip {
 			@param[in]	comrvs	コモンライン・リバースの場合：true
 		*/
 		//-----------------------------------------------------------------//
-		void start(uint8_t contrast, bool comrvs)
+		void start(uint8_t contrast, bool comrvs = false)
 		{
-			CS::PMC = 0;  // (/CS) output
-			CS::PM = 0;
-
-			A0::PMC = 0;  // (A0) output
-			A0::PM = 0;
+			CS::DIR = 1;  // (/CS) output
+			A0::DIR = 1;  // (A0) output
 
 			reg_select_(0);
 			chip_enable_(false);
@@ -185,23 +180,23 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コピー
-			@param[in]	p	フレームバッファソース
+			@param[in]	src	フレームバッファソース
+			@param[in]	num	転送ページ数
+			@param[in]	ofs	転送オフセット
 		*/
 		//-----------------------------------------------------------------//
-		void copy(const uint8_t* p) {
+		void copy(const uint8_t* src, uint8_t num, uint8_t ofs = 0) {
 			chip_enable_();
-			uint8_t ofs = 0x00;
-			for(uint8_t page = 0; page < 8; ++page) {
+			uint8_t o = 0x00;
+			for(uint8_t page = ofs; page < (ofs + num); ++page) {
 				reg_select_(0);
 				write_(CMD::SET_PAGE, page);
-				write_(CMD::SET_COLUMN_LOWER, ofs & 0x0f);
-				write_(CMD::SET_COLUMN_UPPER, ofs >> 4);
-    			write_(CMD::RMW);
+				write_(CMD::SET_COLUMN_LOWER, o & 0x0f);
+				write_(CMD::SET_COLUMN_UPPER, o >> 4);
+///    			write_(CMD::RMW);
 				reg_select_(1);
-				for(uint8_t i = 0; i < 128; ++i) {
-					csi_.xchg(*p);
-					++p;
-				}
+				csi_.send(src, 128);
+				src += 128;
 			}
 			reg_select_(0);
 			chip_enable_(false);
