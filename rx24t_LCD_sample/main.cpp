@@ -111,7 +111,12 @@ int main(int argc, char** argv)
 	static const uint8_t sci_level = 2;
 	sci_.start(115200, sci_level);
 
-	utils::format("RX24T LCD sample\n");
+#ifdef LCD_ST7565
+	utils::format("RX24T LCD ST7565 sample\n");
+#endif
+#ifdef LCD_UC1701
+	utils::format("RX24T LCD UC1701 sample\n");
+#endif
 
 	// RSPI 開始
 	{
@@ -119,16 +124,17 @@ int main(int argc, char** argv)
 		uint32_t clk = 8000000;
 #endif
 #ifdef LCD_UC1701
-		uint32_t clk = 4000000;
+///		uint32_t clk = 4000000;
+		uint32_t clk = 1000000;
 #endif
 		if(!spi_.start(clk, SPI::PHASE::TYPE4)) {
-			utils::format("RSPI start fail...\n");
+			utils::format("RSPI speed fail...\n");
 		}
 	}
 
 	// LCD 開始
 	{
-		lcd_.start(0x04, true);
+		lcd_.start(0x00);
 		bitmap_.clear(0);
 	}
 
