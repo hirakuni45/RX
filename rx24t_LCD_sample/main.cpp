@@ -15,8 +15,8 @@
 #include "common/monograph.hpp"
 
 // LCD を選択する
-// #define LCD_ST7565
-#define LCD_UC1701
+#define LCD_ST7565
+// #define LCD_UC1701
 
 namespace {
 
@@ -124,8 +124,7 @@ int main(int argc, char** argv)
 		uint32_t clk = 8000000;
 #endif
 #ifdef LCD_UC1701
-///		uint32_t clk = 4000000;
-		uint32_t clk = 1000000;
+		uint32_t clk = 8000000;
 #endif
 		if(!spi_.start(clk, SPI::PHASE::TYPE4)) {
 			utils::format("RSPI speed fail...\n");
