@@ -49,6 +49,7 @@
 #include "RX600/port.hpp"
 #include "RX600/cmt.hpp"
 #include "RX64M/system.hpp"
+#include "RX64M/bus.hpp"
 #include "RX64M/mpc.hpp"
 #include "RX64M/icu.hpp"
 #include "RX64M/sci.hpp"
