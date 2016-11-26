@@ -174,8 +174,8 @@ namespace device {
 		//----------------------------------------------------------------//
 		uint8_t xchg(uint8_t data = 0xff)
 		{
-			RSPI::SPCR.SPTIE = 0;
-			RSPI::SPCR.SPRIE = 0;
+//			RSPI::SPCR.SPTIE = 0;
+//			RSPI::SPCR.SPRIE = 0;
 			RSPI::SPDR = static_cast<uint32_t>(data);
 			while(RSPI::SPSR.SPRF() == 0) sleep_();
 		    return static_cast<uint8_t>(RSPI::SPDR());
