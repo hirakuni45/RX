@@ -491,7 +491,24 @@ namespace device {
 			@brief  外部バス制御レジスタ 0（PFBCR0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct pfbcr0_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
 
+			bit_rw_t<io, bitpos::B0>  ADRLE;
+			bit_rw_t<io, bitpos::B1>  ADRHMS;
+			bit_rw_t<io, bitpos::B2>  ADRHMS2;
+			bit_rw_t<io, bitpos::B3>  BCLKO;
+			bit_rw_t<io, bitpos::B4>  DHE;
+			bit_rw_t<io, bitpos::B5>  DH32E;
+			bit_rw_t<io, bitpos::B6>  WR1BC1E;
+			bit_rw_t<io, bitpos::B7>  WR32BC32E;
+		};
+		static pfbcr0_t<0x0008C106> PFBCR0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -499,8 +516,41 @@ namespace device {
 			@brief  外部バス制御レジスタ 1（PFBCR1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct pfbcr1_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bits_rw_t<io, bitpos::B0, 2>  WAITS;
+			bit_rw_t <io, bitpos::B2>     ALEOE;
+			bit_rw_t <io, bitpos::B3>     ALES;
+			bit_rw_t <io, bitpos::B4>     MDSDE;
+			bit_rw_t <io, bitpos::B6>     DQM1E;
+			bit_rw_t <io, bitpos::B7>     SDCLKE;
+		};
+		static pfbcr1_t<0x0008C107> PFBCR1;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  イーサネット制御レジスタ（PFENET）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct pfenet_t : public rw8_t<base> {
+			typedef rw8_t<base> io;
+			using io::operator =;
+			using io::operator ();
+			using io::operator |=;
+			using io::operator &=;
+
+			bit_rw_t<io, bitpos::B4>  PHYMODE0;
+			bit_rw_t<io, bitpos::B5>  PHYMODE1;
+		};
+		static pfenet_t<0x0008C10E> PFENET;
 
 	};
 	typedef mpc_t MPC;
