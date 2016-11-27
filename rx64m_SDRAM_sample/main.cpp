@@ -9,6 +9,7 @@
 #include "common/sci_io.hpp"
 #include "common/fifo.hpp"
 #include "common/format.hpp"
+#include <random>
 
 namespace {
 
@@ -94,11 +95,6 @@ int main(int argc, char** argv)
 	// SDRAM 動作開始
 	device::BUS::SDCCR.EXENB = 1;
 
-
-	// タイマー設定（６０Ｈｚ）
-	uint8_t cmt_irq_level = 4;
-	cmt_.start(60, cmt_irq_level);
-
 	// SCI 設定
 	static const uint8_t sci_level = 2;
 	sci_.start(115200, sci_level);
@@ -107,8 +103,54 @@ int main(int argc, char** argv)
 
 	device::PORT0::PDR.B7 = 1; // output
 
+	// 乱数を書き込む
+	{
+		std::mt19937 mt;
+		volatile uint32_t* p = (uint32_t*)0x08000000;
+		uint32_t j = 0;
+		for(uint32_t i = 0; i < 1024 * 1024 * 32 / 4; ++i) {
+			if(j == 0) {
+				utils::format("Write block: %08X\n") % (uint32_t)p;
+				device::PORT0::PODR.B7 = !device::PORT0::PODR.B7();
+			}
+			++j;
+			if(j >= 16384) j = 0;
+			*p++ = mt();
+		}
+	}
+
+	// 乱数を読み出す
+	{
+		uint32_t error = 0;
+		std::mt19937 mt;
+		volatile uint32_t* p = (uint32_t*)0x08000000;
+		uint32_t j = 0;
+		for(uint32_t i = 0; i < 1024 * 1024 * 32 / 4; ++i) {
+			auto n = mt();
+			if(*p != n) {
+				++error;
+				utils::format("Read block error: %08X\n") % (uint32_t)p;
+			}
+			++p;
+			if(j == (16384 - 1)) {
+				utils::format("Read block OK: %08X\n") % (uint32_t)p;
+				device::PORT0::PODR.B7 = !device::PORT0::PODR.B7();
+			}
+			++j;
+			if(j >= 16384) j = 0;
+		}
+		if(error) {
+			utils::format("Read error: %d\n") % error;
+		} else {
+			utils::format("Write/Read All OK\n");
+		}
+	}
+
+	// タイマー設定（６０Ｈｚ）
+	uint8_t cmt_irq_level = 4;
+	cmt_.start(60, cmt_irq_level);
+
 	uint32_t cnt = 0;
-	uint32_t idx = 0;
 	while(1) {
 		cmt_.sync();
 
@@ -117,26 +159,9 @@ int main(int argc, char** argv)
 			sci_.putch(ch);
 		}
 
-		{
-			volatile uint32_t* p = (uint32_t*)0x08000000;
-			uint32_t q = 0x01234567;
-			for(uint32_t i = 0; i < 16; ++i) {
-				p[i] = q;
-				uint32_t m = q >> 24;
-				q <<= 8;
-				q |= m;
-			}
-		}
-
 		++cnt;
 		if(cnt >= 30) {
 			cnt = 0;
-
-			volatile uint32_t* p = (uint32_t*)0x08000000;
-			uint32_t a = p[idx];
-			utils::format("%08X\n") % a;
-			++idx;
-			idx &= 15;
 		}
 		device::PORT0::PODR.B7 = (cnt < 10) ? 0 : 1;
 	}
