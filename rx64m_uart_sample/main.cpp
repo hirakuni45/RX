@@ -15,14 +15,6 @@
 
 namespace {
 
-	void wait_delay_(uint32_t n)
-	{
-		// とりあえず無駄ループ
-		for(uint32_t i = 0; i < n; ++i) {
-			asm("nop");
-		}
-	}
-
 	class cmt_task {
 	public:
 		void operator() () {
@@ -53,11 +45,11 @@ int main(int argc, char** argv)
 	device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(0b10)
 						  | device::SYSTEM::MOFCR.MOFXIN.b();
 	device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
-	wait_delay_(5000);
+	while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
 
 	device::SYSTEM::PLLCR.STC = 0b010011;		// PLL 10 倍(120MHz)
 	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
-	wait_delay_(5000);
+	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
 
 	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)		// 1/2 (120/2=60)
 						  | device::SYSTEM::SCKCR.ICK.b(0)		// 1/1 (120/1=120)
