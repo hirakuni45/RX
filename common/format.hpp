@@ -330,7 +330,7 @@ namespace utils {
 				v >>= 4;
 				++n;
 			} while(v != 0) ;
-			out_str_(p, '+', n);
+			out_str_(p, 0, n);
 		}
 
 		uint64_t make_mask_(uint8_t num) {
