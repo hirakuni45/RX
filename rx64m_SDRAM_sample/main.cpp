@@ -21,7 +21,7 @@ namespace {
 
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
-	typedef utils::fifo<uint8_t, 128> buffer;
+	typedef utils::fifo<uint16_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 }
 
@@ -95,9 +95,17 @@ int main(int argc, char** argv)
 	// SDRAM 動作開始
 	device::BUS::SDCCR.EXENB = 1;
 
-	// SCI 設定
-	static const uint8_t sci_level = 2;
-	sci_.start(115200, sci_level);
+	{
+		// タイマー設定（６０Ｈｚ）
+		uint8_t cmt_irq_level = 4;
+		cmt_.start(60, cmt_irq_level);
+	}
+
+	{
+		// SCI 設定
+		static const uint8_t sci_level = 2;
+		sci_.start(115200, sci_level);
+	}
 
 	utils::format("RX64M SDRAM sample\n");
 
@@ -145,10 +153,6 @@ int main(int argc, char** argv)
 			utils::format("Write/Read All OK\n");
 		}
 	}
-
-	// タイマー設定（６０Ｈｚ）
-	uint8_t cmt_irq_level = 4;
-	cmt_.start(60, cmt_irq_level);
 
 	uint32_t cnt = 0;
 	while(1) {
