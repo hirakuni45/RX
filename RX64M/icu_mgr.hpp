@@ -30,10 +30,12 @@ namespace device {
 			bool ena = lvl != 0 ? true : false;
 			switch(t) {
 			case peripheral::CMT0:
+				ICU::IER.CMI0 = 0;
 				ICU::IPR.CMI0 = lvl;
 				ICU::IER.CMI0 = ena;
 				break;
 			case peripheral::CMT1:
+				ICU::IER.CMI1 = 0;
 				ICU::IPR.CMI1 = lvl;
 				ICU::IER.CMI1 = ena;
 				break;
