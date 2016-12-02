@@ -12,14 +12,6 @@
 
 namespace {
 
-	void wait_delay_(uint32_t n)
-	{
-		// とりあえず無駄ループ
-		for(uint32_t i = 0; i < n; ++i) {
-			asm("nop");
-		}
-	}
-
 	class cmt_task {
 	public:
 		void operator() () {
@@ -28,7 +20,7 @@ namespace {
 
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
-	typedef utils::fifo<uint8_t, 128> buffer;
+	typedef utils::fifo<uint16_t, 64> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 }
 
@@ -69,15 +61,19 @@ int main(int argc, char** argv)
 						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (120/2=60)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
-	// タイマー設定（６０Ｈｚ）
-	uint8_t cmt_irq_level = 4;
-	cmt_.start(60, cmt_irq_level);
+	{
+		// タイマー設定（６０Ｈｚ）
+		uint8_t cmt_level = 4;
+		cmt_.start(60, cmt_level);
+	}
 
-	// SCI 設定
-	static const uint8_t sci_level = 2;
-	sci_.start(115200, sci_level);
+	{
+		// SCI 設定
+		uint8_t sci_level = 2;
+		sci_.start(115200, sci_level);
+	}
 
-	utils::format("RX24T start\n");
+	utils::format("RX24T UART sample\n");
 
 	device::PORT0::PDR.B0 = 1; // output
 
