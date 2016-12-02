@@ -1,6 +1,6 @@
 # ===============================================================
 #
-# R63T スタートアップ
+# RX スタート・アップ
 #
 # ===============================================================
 	.text
@@ -9,33 +9,34 @@
 _start:
 
 # スタックの設定（SP：__stack、USP：__stack - 128）
-	mov.l	#__stack, r0
-	mvtc	r0, isp
-	sub		#128,r0
-	mvtc	r0, usp
+	mov.l	#__stack, r5
+	mvtc	r5, isp
+	sub		#128,r5
+	mvtc	r5, usp
 
 # 割り込みベクタの設定
 	.extern _interrupt_vectors
 	mov.l	#_interrupt_vectors, r5
 	mvtc	r5,intb
 
-	mov.l	#0x100, r5
-	mvtc	r5,fpsw
-
-# Iレジスタを設定し、割り込みを許可する
+# I レジスタを設定し、割り込みを許可する
 	mov.l	#0x00010000, r5
 	mvtc	r5,psw
 
-# PMレジスタを設定し、ユーザモードに移行する
+# PMレジスタを設定し、ユーザモードに移行する、ユーザースタックに切り替わる
 	mvfc	psw,r1
-	or		#0x100000, r1
+	or		#0x00100000, r1
 	push.l	r1
 
 # UレジスタをセットするためにRTE命令を実行する
 	mvfc	pc,r1
-	add		#0x0a,r1
+	add		#10,r1
 	push.l	r1
 	rte
+	nop
+	nop
+	nop
+	nop
 	nop
 
 # ワーク RAM の初期化
