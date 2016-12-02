@@ -52,12 +52,19 @@ namespace device {
 
 		static INTERRUPT_FUNC void send_task_()
 		{
-			if(send_.length()) {
+#if SIG_RX64M
+			if(send_.length() > 0) {
 				SCI::TDR = send_.get();
-				if(send_.length() == 0) SCI::SCR.TIE = 0;
-			} else {
+			}
+			if(send_.length() == 0) {
 				SCI::SCR.TIE = 0;
 			}
+#else
+			SCI::TDR = send_.get();
+			if(send_.length() == 0) {
+				SCI::SCR.TEIE = 0;
+			}
+#endif
 		}
 
 		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) {
@@ -71,18 +78,12 @@ namespace device {
 		}
 
 		void set_intr_() {
+#if SIG_RX64M
 			set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
+#else
+			set_vector_(SCI::get_rx_vec(), SCI::get_te_vec());
+#endif
 			icu_mgr::set_level(SCI::get_peripheral(), level_);
-		}
-
-		void send_restart_() {
-			if(!SCI::SCR.TIE() && send_.length() > 0) {
-				while(SCI::SSR.TEND() == 0) sleep_();
-				SCI::TDR = send_.get();
-				if(send_.length() > 0) {
-					SCI::SCR.TIE = 1;
-				}
-			}
 		}
 
 	public:
@@ -250,12 +251,23 @@ namespace device {
 					while(send_.length() != 0) sleep_();
 				}
 				send_.put(ch);
-				send_restart_();
+#if SIG_RX64M
+				if(SCI::SCR.TIE() == 0) {
+					while(SCI::SSR.TEND() == 0) sleep_();
+					SCI::TDR = send_.get();
+					if(send_.length() > 0) {
+						SCI::SCR.TIE = 1;
+					}
+				}
+#else
+				if(SCI::SCR.TEIE() == 0) {
+					SCI::SCR.TEIE = 1;
+				}
+#endif
 			} else {
 				while(SCI::SSR.TEND() == 0) sleep_();
 				SCI::TDR = ch;
 			}
-
 		}
 
 
