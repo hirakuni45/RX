@@ -146,6 +146,8 @@ int main(int argc, char** argv)
 	uint8_t	nn = 0;
 	uint8_t loop = 0;
 
+	uint32_t no = 0;
+
 	uint32_t cnt = 0;
 	while(1) {
 		cmt_.sync();
@@ -176,6 +178,8 @@ int main(int argc, char** argv)
 		++cnt;
 		if(cnt >= 30) {
 			cnt = 0;
+			utils::format("%d\n") % no;
+			++no;
 		}
 		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
 	}
