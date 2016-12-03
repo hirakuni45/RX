@@ -29,6 +29,7 @@ namespace device {
 
 		static RECV_BUFF recv_;
 		static SEND_BUFF send_;
+		static volatile bool send_stall_;
 
 		uint8_t	level_;
 		bool	crlf_;
@@ -58,6 +59,7 @@ namespace device {
 			}
 			if(send_.length() == 0) {
 				SCI::SCR.TIE = 0;
+				send_stall_ = true;
 			}
 #else
 			SCI::TDR = send_.get();
@@ -105,6 +107,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		bool start(uint32_t baud, uint8_t level = 0) {
+			send_stall_ = true;
 #if SIG_RX63T
 			if(level == 0) return false;
 #endif
@@ -156,6 +159,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start_spi(bool master, uint32_t bps, uint8_t level = 0)
 		{
+			send_stall_ = true;
 			crlf_ = false;
 			level_ = level;
 
@@ -246,19 +250,21 @@ namespace device {
 			}
 
 			if(level_) {
-				/// ７／８ を超えてた場合は、バッファが空になるまで待つ。
+				/// 送信バッファの容量が７／８の場合は、空になるまで待つ。
 				if(send_.length() >= (send_.size() * 7 / 8)) {
 					while(send_.length() != 0) sleep_();
 				}
 				send_.put(ch);
 #if SIG_RX64M
-				if(SCI::SCR.TIE() == 0) {
+				SCI::SCR.TIE = 0;
+				if(send_stall_) {
 					while(SCI::SSR.TEND() == 0) sleep_();
 					SCI::TDR = send_.get();
 					if(send_.length() > 0) {
-						SCI::SCR.TIE = 1;
+						send_stall_ = false;
 					}
 				}
+				SCI::SCR.TIE = !send_stall_;
 #else
 				if(SCI::SCR.TEIE() == 0) {
 					SCI::SCR.TEIE = 1;
@@ -331,4 +337,6 @@ namespace device {
 		RECV_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF>::recv_;
 	template<class SCI, class RECV_BUFF, class SEND_BUFF>
 		SEND_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF>::send_;
+	template<class SCI, class RECV_BUFF, class SEND_BUFF>
+		volatile bool sci_io<SCI, RECV_BUFF, SEND_BUFF>::send_stall_;
 }
