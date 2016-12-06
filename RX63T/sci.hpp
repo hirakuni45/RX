@@ -17,11 +17,11 @@ namespace device {
 		@brief  SCIc, SCId 定義基底クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	t		ペリフェラル型
-		@param[in]	txv		送信ベクター
 		@param[in]	rxv		受信ベクター
+		@param[in]	tev		送信ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv>
+	template <uint32_t base, peripheral t, ICU::VECTOR rxv, ICU::VECTOR tev>
 	struct sci_t {
 
 		//-----------------------------------------------------------------//
@@ -316,26 +316,26 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  送信割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_tx_vec() { return txv; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  受信割り込みベクターを返す
 			@return ベクター型
 		*/
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR get_rx_vec() { return rxv; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_te_vec() { return tev; }
 	};
 
-	typedef sci_t<0x0008a000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0> SCI0;
-	typedef sci_t<0x0008a020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1> SCI1;
-	typedef sci_t<0x0008a040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2> SCI2;
-	typedef sci_t<0x0008a060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3> SCI3;
+	typedef sci_t<0x0008a000, peripheral::SCI0, ICU::VECTOR::RXI0, ICU::VECTOR::TEI0> SCI0;
+	typedef sci_t<0x0008a020, peripheral::SCI1, ICU::VECTOR::RXI1, ICU::VECTOR::TEI1> SCI1;
+	typedef sci_t<0x0008a040, peripheral::SCI2, ICU::VECTOR::RXI2, ICU::VECTOR::TEI2> SCI2;
+	typedef sci_t<0x0008a060, peripheral::SCI3, ICU::VECTOR::RXI3, ICU::VECTOR::TEI3> SCI3;
 
 //	typedef sci_t<0x0008b300> SCI12;
 }
