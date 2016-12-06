@@ -7,7 +7,7 @@
 //=====================================================================//
 #include <cstdint>
 #include "common/gpt_io.hpp"
-#include "common/adc_io.hpp"
+// #include "common/adc_io.hpp"
 
 namespace utils {
 
@@ -23,7 +23,7 @@ namespace utils {
 		device::gpt_io<device::GPT0>  gpt0_;
 		device::gpt_io<device::GPT1>  gpt1_;
 
-		device::adc_io<device::S12AD> adc_;
+		/// device::adc_io<device::S12AD> adc_;
 
 		int16_t		inp_;
 		int16_t		volt_[4];

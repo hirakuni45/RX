@@ -57,8 +57,8 @@ namespace utils {
 		device::MPC::P44PFS.ASEL = 1;	     // アナログ入力設定
 		device::MPC::PWPR = device::MPC::PWPR.B0WI.b();	// MPC 書き込み禁止
 
-		adc_.start(0b00011111);
-		adc_.sync();
+///		adc_.start(0b00011111);
+///		adc_.sync();
 
 //		チャネル０
 		chanel0_.vol_ref_ = static_cast<int32_t>((4096.0f / 2.5f) * (1.0f / 6.0f) * 5.0f); // Ch0 指令電圧
@@ -76,16 +76,16 @@ namespace utils {
 	//-----------------------------------------------------------------//
 	void chager::service()
 	{
-		inp_  = static_cast<int32_t>(adc_.get(2)); // 入力電圧 10:1 (Ref:2.5V, 4096:25V)
+///		inp_  = static_cast<int32_t>(adc_.get(2)); // 入力電圧 10:1 (Ref:2.5V, 4096:25V)
 
-		chanel0_.out_ = static_cast<int32_t>(adc_.get(0)); // 出力電圧 6:1 (Ref:2.5V, 4096:15V)
-		chanel0_.cur_ = static_cast<int32_t>(adc_.get(1)); // 出力電流 0 to 2.5A (4096:2.5A)
-		chanel1_.out_ = static_cast<int32_t>(adc_.get(4)); // 出力電圧 6:1 (Ref:2.5V, 4096:15V)
-		chanel1_.cur_ = static_cast<int32_t>(adc_.get(3)); // 出力電流 0 to 2.5A (4096:2.5A)	
+///		chanel0_.out_ = static_cast<int32_t>(adc_.get(0)); // 出力電圧 6:1 (Ref:2.5V, 4096:15V)
+///		chanel0_.cur_ = static_cast<int32_t>(adc_.get(1)); // 出力電流 0 to 2.5A (4096:2.5A)
+///		chanel1_.out_ = static_cast<int32_t>(adc_.get(4)); // 出力電圧 6:1 (Ref:2.5V, 4096:15V)
+///		chanel1_.cur_ = static_cast<int32_t>(adc_.get(3)); // 出力電流 0 to 2.5A (4096:2.5A)	
 
-		adc_.start(0b00011111);
+///		adc_.start(0b00011111);
 
-		gpt0_.set_a(chanel0_.const_voltage());
+///		gpt0_.set_a(chanel0_.const_voltage());
 
 
 

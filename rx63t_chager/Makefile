@@ -17,9 +17,6 @@ CSOURCES	=	common/init.c \
 				common/vect.c
 
 PSOURCES	=	main.cpp \
-				common/gpt_io.cpp \
-				common/ssd1306z_io.cpp \
-				common/monograph.cpp \
 				chager.cpp
 
 USER_LIBS	=	stdc++

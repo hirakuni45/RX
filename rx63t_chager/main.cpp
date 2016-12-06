@@ -53,8 +53,11 @@ namespace {
 
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
-	device::ssd1306z_io oled_;
+
 	utils::monitor		monitor_;
+
+#if 0
+	device::ssd1306z_io oled_;
 	graphics::monograph	monog_;
 
 	struct grout {
@@ -63,6 +66,7 @@ namespace {
 		}
 	};
 	typedef utils::basic_format<grout> gformat;
+#endif
 
 	void delay_10ms_(uint32_t n)
 	{
@@ -98,9 +102,9 @@ extern "C" {
 		return sci_.getch();
 	}
 
-	uint32_t sci_length(void)
+	uint16_t sci_length(void)
 	{
-		return sci_.length();
+		return sci_.recv_length();
 	}
 }
 
@@ -152,7 +156,6 @@ int main(int argc, char** argv)
 	chager_.initialize();
 
 	// タイマー設定
-	cmt_.set_clock(F_PCKB);
 	uint8_t cmt_irq_level = 3;
 	cmt_.start(46875, cmt_irq_level);
 
@@ -162,7 +165,7 @@ int main(int argc, char** argv)
 
 ///	device::SYSTEM::PRCR = 0xa500;	///< クロック、低消費電力、関係書き込み禁止
 
-	oled_.initialize();
+///	oled_.initialize();
 
 	cmt_.sync();
 //	int v = adc_inp_;
@@ -188,6 +191,7 @@ int main(int argc, char** argv)
 		}
 #endif
 
+#if 0
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 0;
 		gformat("RX63T Hello");
@@ -209,6 +213,7 @@ int main(int argc, char** argv)
 		monog_.at_font_posx() = 0;
 		monog_.at_font_posy() = 12 * 4;
 //		gformat("Cur1:  %2.2:8y A") % ((cur1 * 5) >> (4 + 1));	// *2.5
+#endif
 
 		++led;
 		if(led >= 30) led = 0;
@@ -218,8 +223,8 @@ int main(int argc, char** argv)
 			device::PORTB::PODR.B7 = 0; // LED On
 		}
 
-		oled_.copy(monog_.fb());
-		monog_.clear(0);
+//		oled_.copy(monog_.fb());
+//		monog_.clear(0);
 	}
 }
 
