@@ -1,0 +1,13 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP RX24T
+D Renesas RX24T
+K RX
+$ENDCMP
+#
+$CMP RX64M
+D Renesas RX64M 176 pin LQFP 
+K RX64M
+$ENDCMP
+#
+#End Doc Library

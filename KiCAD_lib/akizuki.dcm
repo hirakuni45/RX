@@ -1,0 +1,28 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP 6P-SW
+D 6P Switch
+$ENDCMP
+#
+$CMP DMG3415U
+D P-CHANNEL MOSFET
+$ENDCMP
+#
+$CMP NON-POL
+D Non polarity capacitor
+$ENDCMP
+#
+$CMP R
+D Resistor
+K R DEV
+$ENDCMP
+#
+$CMP STEREO
+D Stereo conector
+$ENDCMP
+#
+$CMP VS1053
+D Audio Decoder
+$ENDCMP
+#
+#End Doc Library
