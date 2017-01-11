@@ -41,7 +41,6 @@ ENTRY(_start)
 MEMORY {
 	RAM (w)   : ORIGIN = 0x00000000, LENGTH = 0x00080000 /* 512k */
 	STACK (w) : ORIGIN = 0x00080000, LENGTH = 16 /* top of RAM */
-
 	ROM (w)   : ORIGIN = 0xFFD00000, LENGTH = 0x002FFFD0 /* 3M */
 /* This is the largest RX6000: */
 /*	ROM (w)   : ORIGIN = 0xffe00000, LENGTH = 0x001fffd0 */ /* 2Mb */
