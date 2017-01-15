@@ -39,6 +39,8 @@ namespace device {
 		TMR1,	///< 8 ビットタイマ１
 		TMR2,	///< 8 ビットタイマ２
 		TMR3,	///< 8 ビットタイマ３
+
+		SDHI,	///< SDHI
 	};
 
 }
