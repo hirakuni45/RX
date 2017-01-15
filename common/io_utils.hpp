@@ -439,6 +439,28 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  Read ビット・アクセス・テンプレート
+		@param[in]	T	アクセス・クラス
+		@param[in]	pos	初期ビット位置
+		@param[in]	len	ビット幅
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class T, bitpos pos, uint8_t len>
+	struct bits_ro_t {
+		static typename T::value_type get() {
+			return (T::read() >> static_cast<typename T::value_type>(pos)) & ((1 << len) - 1);
+		}
+
+	    typename T::value_type b(typename T::value_type v) const {
+			return (((1 << len) - 1) & v) << static_cast<typename T::value_type>(pos);
+		}
+
+		typename T::value_type operator () () const { return get(); }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  標準 Read/Write アクセス・テンプレート
 		@param[in]	T	アクセステンプレート
 	*/
