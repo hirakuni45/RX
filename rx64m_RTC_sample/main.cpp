@@ -32,6 +32,7 @@ namespace {
 }
 
 extern "C" {
+
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
@@ -257,7 +258,7 @@ int main(int argc, char** argv)
 					} else {
 						set_time_date_();
 					}
-				} else if(command_.cmp_word(0, "help")) {
+				} else if(command_.cmp_word(0, "help") || command_.cmp_word(0, "?")) {
 					sci_puts("date\n");
 					sci_puts("date yyyy/mm/dd hh:mm[:ss]\n");
 				} else {
