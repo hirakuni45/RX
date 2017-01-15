@@ -242,7 +242,7 @@ namespace utils {
 				}
 				if(bc != ' ' && (ch == ' ' || ch == 0)) {
 					if(argc == 0) {
-						return std::strncmp(key, top, p - top) == 0;
+						return std::strncmp(key, top, std::strlen(key)) == 0;
 					}
 					--argc;
 				}
