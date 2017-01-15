@@ -57,6 +57,7 @@
 #include "RX64M/port_map.hpp"
 #include "RX64M/power_cfg.hpp"
 #include "RX64M/icu_mgr.hpp"
+#include "RX64M/sdhi.hpp"
 #else
 #  error "Requires SIG_XXX to be defined"
 #endif
