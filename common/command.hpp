@@ -235,7 +235,7 @@ namespace utils {
 			if(key == nullptr) return false;
 			const char* p = buff_;
 			char bc = ' ';
-			uint32_t keylen = std::strlen(key);
+			int keylen = std::strlen(key);
 			while(1) {
 				const char* top;
 				char ch = *p;
@@ -243,7 +243,7 @@ namespace utils {
 					top = p;
 				}
 				if(bc != ' ' && (ch == ' ' || ch == 0)) {
-					uint32_t len = p - top;					
+					int len = p - top;					
 					if(argc == 0 && len == keylen) {
 						return std::strncmp(key, top, keylen) == 0;
 					}
