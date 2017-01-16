@@ -92,6 +92,9 @@ namespace device {
 		{
 			level_ = level;
 
+			// デバイスを不許可
+			RSPI::SPCR = 0x00;
+
 			// ポートを有効にする
 			port_map::turn(RSPI::get_peripheral());
 
@@ -103,9 +106,6 @@ namespace device {
 			}
 
 			power_cfg::turn(RSPI::get_peripheral());
-
-			// デバイスを不許可
-			RSPI::SPCR = 0x00;
 
 			// 設定
 		    RSPI::SPBR = spbr;
