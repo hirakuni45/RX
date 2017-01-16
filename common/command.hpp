@@ -232,17 +232,20 @@ namespace utils {
         */
         //-----------------------------------------------------------------//
 		bool cmp_word(uint8_t argc, const char* key) const {
+			if(key == nullptr) return false;
 			const char* p = buff_;
 			char bc = ' ';
-			const char* top;
+			uint32_t keylen = std::strlen(key);
 			while(1) {
+				const char* top;
 				char ch = *p;
 				if(bc == ' ' && ch != ' ') {
 					top = p;
 				}
 				if(bc != ' ' && (ch == ' ' || ch == 0)) {
-					if(argc == 0) {
-						return std::strncmp(key, top, std::strlen(key)) == 0;
+					uint32_t len = p - top;					
+					if(argc == 0 && len == keylen) {
+						return std::strncmp(key, top, keylen) == 0;
 					}
 					--argc;
 				}
