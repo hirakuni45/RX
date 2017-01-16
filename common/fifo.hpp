@@ -13,10 +13,11 @@ namespace utils {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     /*!
         @brief  fifo クラス
-		@param[in]	SIZE	バッファサイズ
+		@param[in]	T		ポインター・タイプ
+		@param[in]	SIZE	バッファサイズ（最大６５５３６）
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <typename T, T SIZE>
+	template <typename T, uint16_t SIZE>
 	class fifo {
 
 		typedef char DT;
@@ -113,7 +114,7 @@ namespace utils {
 			@return	バッファのサイズ
         */
         //-----------------------------------------------------------------//
-		PTS size() const { return SIZE; }
+		uint16_t size() const { return SIZE; }
 	};
 
 }
