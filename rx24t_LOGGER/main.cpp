@@ -32,8 +32,8 @@ namespace {
 
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
-	typedef utils::fifo<uint8_t, 128> buffer;
-	device::sci_io<device::SCI1, buffer, buffer> sci_;
+	typedef utils::fifo<uint8_t, 256> buffer;
+	device::sci_io<device::SCI1, buffer, buffer> sci1_;
 
 #ifdef RTC
 	typedef device::iica_io<device::RIIC0> I2C;
@@ -181,22 +181,22 @@ extern "C" {
 
 	void sci_putch(char ch)
 	{
-		sci_.putch(ch);
+		sci1_.putch(ch);
 	}
 
 	void sci_puts(const char* str)
 	{
-		sci_.puts(str);
+		sci1_.puts(str);
 	}
 
 	char sci_getch(void)
 	{
-		return sci_.getch();
+		return sci1_.getch();
 	}
 
 	uint16_t sci_length()
 	{
-		return sci_.recv_length();
+		return sci1_.recv_length();
 	}
 
 	DSTATUS disk_initialize(BYTE drv) {
@@ -270,14 +270,14 @@ int main(int argc, char** argv)
 						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (120/2=60)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
-	{  // タイマー設定（６０Ｈｚ）
+	{  // タイマー設定（１００Ｈｚ）
 		uint8_t intr_level = 4;
-		cmt_.start(60, intr_level);
+		cmt_.start(100, intr_level);
 	}
 
-	{  // SCI 設定
+	{  // SCI1 設定
 		uint8_t intr_level = 2;
-		sci_.start(115200, intr_level);
+		sci1_.start(115200, intr_level);
 	}
 
 #ifdef RTC
@@ -303,7 +303,8 @@ int main(int argc, char** argv)
 
 	// LCD 開始
 	{
-		lcd_.start(0x00);
+		spi_.start(8000000, SPI::PHASE::TYPE4);  // LCD 用設定、速度
+		lcd_.start(0x10);
 		bitmap_.clear(0);
 	}
 
@@ -314,6 +315,7 @@ int main(int argc, char** argv)
 	LED::DIR = 1;
 
 	uint32_t cnt = 0;
+	uint8_t nn = 0;
 	while(1) {
 		cmt_.sync();
 
@@ -384,5 +386,20 @@ int main(int argc, char** argv)
 				}
 			}
 		}
+
+		// LCD 用サービス
+		if(nn == 0) {  // フレームバッファ消去
+			bitmap_.clear(0);
+		} else if(nn == 1) {  // 描画
+			bitmap_.frame(0, 0, 128, 64, 1);
+
+
+		} else if(nn >= 2) {  // 転送
+			spi_.start(8000000, SPI::PHASE::TYPE4);  // LCD 用速度と設定
+			lcd_.copy(bitmap_.fb(), bitmap_.page_num());
+			sdc_.setup_speed();  //  SDC 用速度と設定
+			nn = 0;
+		}
+		++nn;
 	}
 }
