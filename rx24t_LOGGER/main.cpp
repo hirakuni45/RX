@@ -6,14 +6,13 @@
 */
 //=====================================================================//
 #include "common/cmt_io.hpp"
-#include "common/sci_io.hpp"
 #include "common/fifo.hpp"
-#include "common/format.hpp"
-#include "common/command.hpp"
+#include "common/sci_io.hpp"
 #include "common/rspi_io.hpp"
 #include "common/sdc_io.hpp"
 #include "chip/ST7565.hpp"
 #include "common/monograph.hpp"
+#include "common/font6x12.hpp"
 
 #define RTC
 
@@ -21,6 +20,12 @@
 #include "common/iica_io.hpp"
 #include "chip/DS3231.hpp"
 #endif
+
+#include "common/format.hpp"
+#include "common/command.hpp"
+
+#include "common/menu.hpp"
+#include "common/scene.hpp"
 
 namespace {
 
@@ -59,7 +64,14 @@ namespace {
 
 	// モノクロ・グラフィックス
 	graphics::kfont_null kfont_;
-	graphics::monograph<128, 64> bitmap_(kfont_);
+	typedef graphics::font6x12 AFONT;
+	typedef graphics::monograph<128, 64, AFONT> BITMAP;
+	BITMAP bitmap_(kfont_);
+
+	typedef graphics::menu<BITMAP, 5> MENU;
+	MENU menu_(bitmap_);
+
+	utils::scene<MENU> scene_(menu_);
 
 	utils::command<128> command_;
 
@@ -304,8 +316,14 @@ int main(int argc, char** argv)
 	// LCD 開始
 	{
 		spi_.start(8000000, SPI::PHASE::TYPE4);  // LCD 用設定、速度
-		lcd_.start(0x10);
+		bool comrvs = true;
+		lcd_.start(0x10, comrvs);
 		bitmap_.clear(0);
+
+		menu_.set_space(4);
+		menu_.add(MENU::type::PROP, "Logging");
+		menu_.add(MENU::type::PROP, "Recall");
+		menu_.add(MENU::type::PROP, "Setup");
 	}
 
 	command_.set_prompt("# ");
@@ -318,12 +336,6 @@ int main(int argc, char** argv)
 	uint8_t nn = 0;
 	while(1) {
 		cmt_.sync();
-
-		++cnt;
-		if(cnt >= 30) {
-			cnt = 0;
-		}
-		LED::P = (cnt < 10) ? 0 : 1;
 
 		sdc_.service();
 
@@ -357,16 +369,16 @@ int main(int argc, char** argv)
 				} else if(command_.cmp_word(0, "pwd")) { // pwd
 					utils::format("%s\n") % sdc_.get_current();
 					f = true;
-				} else if(command_.cmp_word(0, "speed")) { // speed
-					if(check_mount_()) {
-///						test_all_();
-					}
+				} else if(command_.cmp_word(0, "next")) {
+					menu_.focus_next();
+					f = true;
+				} else if(command_.cmp_word(0, "prev")) {
+					menu_.focus_prev();
 					f = true;
 				} else if(command_.cmp_word(0, "help")) { // help
 					utils::format("dir [name]\n");
 					utils::format("cd [directory-name]\n");
 					utils::format("pwd\n");
-					utils::format("speed\n");
 #ifdef RTC
 					utils::format("date\n");
 #endif
@@ -390,16 +402,22 @@ int main(int argc, char** argv)
 		// LCD 用サービス
 		if(nn == 0) {  // フレームバッファ消去
 			bitmap_.clear(0);
+			++nn;
 		} else if(nn == 1) {  // 描画
 			bitmap_.frame(0, 0, 128, 64, 1);
-
-
+			menu_.render();
+			++nn;
 		} else if(nn >= 2) {  // 転送
 			spi_.start(8000000, SPI::PHASE::TYPE4);  // LCD 用速度と設定
 			lcd_.copy(bitmap_.fb(), bitmap_.page_num());
 			sdc_.setup_speed();  //  SDC 用速度と設定
 			nn = 0;
 		}
-		++nn;
+
+		++cnt;
+		if(cnt >= 30) {
+			cnt = 0;
+		}
+		LED::P = (cnt < 10) ? 0 : 1;
 	}
 }

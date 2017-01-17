@@ -21,7 +21,8 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c
 
-PSOURCES	=	main.cpp
+PSOURCES	=	main.cpp \
+				common/font6x12.cpp
 
 USER_LIBS	=	stdc++
 
