@@ -59,5 +59,24 @@ namespace graphics {
 			if(code < 32 || code >= 128) return width;
 			else return width_tbl_[code - 32];
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	カーニングを取得
+			@param[in]	code	文字コード
+			@return 文字幅
+		*/
+		//-----------------------------------------------------------------//
+		static int8_t get_kern(uint8_t code) {
+			switch(code) {
+			case '!':
+			case '|':
+			case 'i':
+			case 'l':
+				return -1;
+			}
+			return 0;
+		}
 	};
 }
