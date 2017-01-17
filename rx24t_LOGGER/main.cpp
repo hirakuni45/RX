@@ -1,7 +1,8 @@
 //=====================================================================//
 /*! @file
     @brief  RX24T データ・ロガー @n
-			・P00(4) ピンに赤色LED（VF:1.9V）を吸い込みで接続する
+			・P00(4) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
+			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -26,6 +27,11 @@
 
 #include "common/menu.hpp"
 #include "common/scene.hpp"
+
+#include "common/adc_io.hpp"
+#include "common/bitset.hpp"
+#include "common/switch_man.hpp"
+
 
 namespace {
 
@@ -72,6 +78,31 @@ namespace {
 	MENU menu_(bitmap_);
 
 	utils::scene<MENU> scene_(menu_);
+
+	uint32_t adc_cnt_;
+
+	class adc_task {
+	public:
+		void operator() () {
+			++adc_cnt_;
+		}
+	};
+
+	typedef device::S12AD adc;
+	typedef device::adc_io<adc, adc_task> adc_io;
+	adc_io adc_io_;
+
+	enum class SWITCH : uint8_t {
+		RIGHT,
+		UP,
+		DOWN,
+		LEFT,
+		A,
+		B
+	};
+
+	typedef utils::bitset<uint32_t, SWITCH> switch_bits;
+	utils::switch_man<switch_bits> switch_man_;
 
 	utils::command<128> command_;
 
@@ -326,6 +357,17 @@ int main(int argc, char** argv)
 		menu_.add(MENU::type::PROP, "Setup");
 	}
 
+	// A/D 設定
+	{
+		uint8_t intr_level = 1;
+		if(!adc_io_.start(adc::analog::AIN000, intr_level)) {
+			utils::format("A/D start fail AIN000\n");
+		}
+		if(!adc_io_.start(adc::analog::AIN001, intr_level)) {
+			utils::format("A/D start fail AIN001\n");
+		}
+	}
+
 	command_.set_prompt("# ");
 
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
@@ -336,6 +378,20 @@ int main(int argc, char** argv)
 	uint8_t nn = 0;
 	while(1) {
 		cmt_.sync();
+
+		adc_io_.scan();
+		adc_io_.sync();
+
+		// ４つのスイッチ判定（排他的）
+		auto val = adc_io_.get(adc::analog::AIN000);
+		val += 512;  // 閾値のオフセット（4096 / 4(SWITCH) / 2）
+		val /= 1024;  // デコード（4096 / 4(SWITCH）
+
+		switch_bits tmp;
+		if(val < 4) {
+			tmp.set(static_cast<SWITCH>(val));
+		}
+		switch_man_.service(tmp);
 
 		sdc_.service();
 
@@ -398,6 +454,15 @@ int main(int argc, char** argv)
 				}
 			}
 		}
+
+
+		if(switch_man_.get_positive().get(SWITCH::UP)) {
+			menu_.focus_prev();
+		}
+		if(switch_man_.get_positive().get(SWITCH::DOWN)) {
+			menu_.focus_next();
+		}
+			
 
 		// LCD 用サービス
 		if(nn == 0) {  // フレームバッファ消去
