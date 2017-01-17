@@ -220,7 +220,7 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	四角を反転
+			@brief	領域を反転
 			@param[in]	x	開始位置 X
 			@param[in]	y	開始位置 Y
 			@param[in]	w	横幅 
@@ -381,6 +381,11 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		void get_mobj_size(const void* src, uint8_t& w, uint8_t& h) const {
+			if(src == nullptr) {
+				w = 0;
+				h = 0;
+				return;
+			}
 			const uint8_t* p = static_cast<const uint8_t*>(src);
 			w = *p++;
 			h = *p;
@@ -454,9 +459,16 @@ namespace graphics {
 		{
 			uint8_t c = static_cast<uint8_t>(ch);
 			if(c < 0x80) {
-				draw_font_utf16(x, y, c);
-				if(prop) x += AFONT::get_width(c);
-				else x += AFONT::width;
+				int16_t o = 0;
+				if(prop) {
+					x += AFONT::get_kern(c);
+				}
+				draw_font_utf16(x + o, y, c);
+				if(prop) {
+					x += AFONT::get_width(c);
+				} else {
+					x += AFONT::width;
+				}
 				code_ = 0;
 				return x;
 			} else if((c & 0xf0) == 0xe0) {
