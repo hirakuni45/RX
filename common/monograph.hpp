@@ -461,7 +461,7 @@ namespace graphics {
 			if(c < 0x80) {
 				int16_t o = 0;
 				if(prop) {
-					x += AFONT::get_kern(c);
+					o = AFONT::get_kern(c);
 				}
 				draw_font_utf16(x + o, y, c);
 				if(prop) {
