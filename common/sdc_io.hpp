@@ -134,6 +134,18 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	SPI 通信速度を再設定
+		 */
+		//-----------------------------------------------------------------//
+		void setup_speed()
+		{
+			if(!mount_) return;
+			spi_.start_sdc(spi_.get_max_speed());
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	初期化
 		 */
 		//-----------------------------------------------------------------//
@@ -149,8 +161,7 @@ namespace utils {
 			DETECT::PU = 1;  // pull-up
 
 			// SPI を初期化後、廃棄する事で関係ポートを初期化する。
-			uint8_t intr_level = 0;
-			if(!spi_.start(4000000, SPI::PHASE::TYPE4, intr_level)) {
+			if(!spi_.start_sdc(4000000)) {
 				format("SPI Start fail ! (Clock spped over range)\n");
 			}
 			spi_.destroy();
@@ -338,10 +349,11 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	SD カードアクセス・サービス（毎フレーム呼ぶ）
+			@param[in]	init	SPI の初期化を行う場合「true」
 			@return マウントしている場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool service()
+		bool service(bool init = false)
 		{
 			auto st = !DETECT::P();
 			if(st) {
