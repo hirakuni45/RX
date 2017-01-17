@@ -349,12 +349,13 @@ namespace graphics {
 			@param[in]	h	描画ソースの高さ
 		*/
 		//-----------------------------------------------------------------//
-		void draw_image(int16_t x, int16_t y, const uint8_t* img, uint8_t w, uint8_t h)
+		void draw_image(int16_t x, int16_t y, const void* img, uint8_t w, uint8_t h)
 		{
 			if(img == nullptr) return;
 
+			const uint8_t* p = static_cast<const uint8_t*>(img);
 			uint8_t k = 1;
-			uint8_t c = *img++;
+			uint8_t c = *p++;
 			for(uint8_t i = 0; i < h; ++i) {
 				int16_t xx = x;
 				for(uint8_t j = 0; j < w; ++j) {
@@ -362,7 +363,7 @@ namespace graphics {
 					k <<= 1;
 					if(k == 0) {
 						k = 1;
-						c = *img++;
+						c = *p++;
 					}
 					++xx;
 				}
@@ -373,19 +374,35 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	モーションオブジェクトのサイズを取得
+			@param[in]	src	描画オブジェクト
+			@param[in]	w	横幅
+			@param[in]	h	高さ
+		*/
+		//-----------------------------------------------------------------//
+		void get_mobj_size(const void* src, uint8_t& w, uint8_t& h) const {
+			const uint8_t* p = static_cast<const uint8_t*>(src);
+			w = *p++;
+			h = *p;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	モーションオブジェクトを描画する
 			@param[in]	x	開始点Ｘ軸を指定
 			@param[in]	y	開始点Ｙ軸を指定
-			@param[in]	img	描画ソースのポインター
+			@param[in]	src	描画オブジェクト
 		*/
 		//-----------------------------------------------------------------//
-		void draw_mobj(int16_t x, int16_t y, const uint8_t* img)
+		void draw_mobj(int16_t x, int16_t y, const void* src)
 		{
-			if(img == nullptr) return;
+			if(src == nullptr) return;
 
-			uint8_t w = *img++;
-			uint8_t h = *img++;
-			draw_image(x, y, img, w, h);
+			const uint8_t* p = static_cast<const uint8_t*>(src);
+			uint8_t w = *p++;
+			uint8_t h = *p++;
+			draw_image(x, y, p, w, h);
 		}
 
 
