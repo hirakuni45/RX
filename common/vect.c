@@ -55,3 +55,5 @@ void set_interrupt_task(void (*task)(void), uint32_t idx)
 		interrupt_vectors[idx] = task;
 	}
 }
+
+int __dso_handle;
