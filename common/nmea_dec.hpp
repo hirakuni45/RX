@@ -25,13 +25,15 @@ namespace utils {
 		uint16_t	pos_;
 		char		line_[128];
 
-		char		time_[11];
-		char		lat_[11];  // 緯度(latitude)
-		char		ns_[2];    // 北緯、南緯
-		char		lon_[11];  // 経度(longitude)
-		char		ew_[2];    // 東経、西経
-		char		q_[2];     // 品質
+		char		time_[11];  // 時間
+		char		lat_[11];   // 緯度(latitude)
+		char		ns_[2];     // 北緯、南緯
+		char		lon_[11];   // 経度(longitude)
+		char		ew_[2];     // 東経、西経
+		char		q_[2];      // 品質
 		char		satellite_[3];  // 衛星数
+
+		char		date_[7];   // 日付
 
 		uint32_t	id_;
 
@@ -67,6 +69,17 @@ namespace utils {
 					p += l;
 					++n;
 				}
+#if 0
+			} else if(std::strncmp(&line_[1], "GPRMC,", 6) == 0) {
+				const char* p = &line_[7];
+				uint16_t n = 0;
+				uint16_t l;
+				while((l = word_(p)) != 0) {
+					if(n == 8) std::strncpy(date_, p, l - 1);
+					p += l;
+					++n;
+				}
+#endif
 			}
 			return false;
 		}
@@ -86,6 +99,8 @@ namespace utils {
 			ew_[0] = 0;
 			q_[0] = 0;
 			satellite_[0] = 0;
+
+			date_[0] = 0;
 		}
 
 
