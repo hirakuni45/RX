@@ -1,133 +1,135 @@
 //=====================================================================//
 /*!	@file
-	@breif	モーション・オブジェクト関係（スプライト・データ）@n
+	@breif	リソース・データ @n
 			Copyright 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "mobj.hpp"
+#include "resource.hpp"
 
 // タイトル表示を有効にする場合
 #define TITLE_ENABLE
 
 // 8x12 ピクセルフォント
 static const uint8_t nmb12_0[] = {
-#include "nmb12_0.h"
+#include "resource/nmb12_0.h"
 };
 static const uint8_t nmb12_1[] = {
-#include "nmb12_1.h"
+#include "resource/nmb12_1.h"
 };
 static const uint8_t nmb12_2[] = {
-#include "nmb12_2.h"
+#include "resource/nmb12_2.h"
 };
 static const uint8_t nmb12_3[] = {
-#include "nmb12_3.h"
+#include "resource/nmb12_3.h"
 };
 static const uint8_t nmb12_4[] = {
-#include "nmb12_4.h"
+#include "resource/nmb12_4.h"
 };
 static const uint8_t nmb12_5[] = {
-#include "nmb12_5.h"
+#include "resource/nmb12_5.h"
 };
 static const uint8_t nmb12_6[] = {
-#include "nmb12_6.h"
+#include "resource/nmb12_6.h"
 };
 static const uint8_t nmb12_7[] = {
-#include "nmb12_7.h"
+#include "resource/nmb12_7.h"
 };
 static const uint8_t nmb12_8[] = {
-#include "nmb12_8.h"
+#include "resource/nmb12_8.h"
 };
 static const uint8_t nmb12_9[] = {
-#include "nmb12_9.h"
+#include "resource/nmb12_9.h"
 };
 static const uint8_t nmb12_co[] = {
-#include "nmb12_co.h"
+#include "resource/nmb12_co.h"
 };
 static const uint8_t nmb12_po[] = {
-#include "nmb12_po.h"
+#include "resource/nmb12_po.h"
 };
 static const uint8_t nmb12_sl[] = {
-#include "nmb12_sl.h"
+#include "resource/nmb12_sl.h"
 };
 static const uint8_t nmb12_x[] = {
-#include "nmb12_x.h"
+#include "resource/nmb12_x.h"
 };
 static const uint8_t nmb12_a[] = {
-#include "nmb12_a.h"
+#include "resource/nmb12_a.h"
 };
 static const uint8_t nmb12_b[] = {
-#include "nmb12_b.h"
+#include "resource/nmb12_b.h"
 };
 static const uint8_t nmb12_v[] = {
-#include "nmb12_v.h"
+#include "resource/nmb12_v.h"
 };
 static const uint8_t nmb12_c[] = {
-#include "nmb12_c.h"
+#include "resource/nmb12_c.h"
 };
 static const uint8_t nmb12_do[] = {
-#include "nmb12_do.h"
+#include "resource/nmb12_do.h"
 };
 
 // 18x32 ピクセルフォント
 static const uint8_t nmb32_0[] = {
-#include "nmb32_0.h"
+#include "resource/nmb32_0.h"
 };
 static const uint8_t nmb32_1[] = {
-#include "nmb32_1.h"
+#include "resource/nmb32_1.h"
 };
 static const uint8_t nmb32_2[] = {
-#include "nmb32_2.h"
+#include "resource/nmb32_2.h"
 };
 static const uint8_t nmb32_3[] = {
-#include "nmb32_3.h"
+#include "resource/nmb32_3.h"
 };
 static const uint8_t nmb32_4[] = {
-#include "nmb32_4.h"
+#include "resource/nmb32_4.h"
 };
 static const uint8_t nmb32_5[] = {
-#include "nmb32_5.h"
+#include "resource/nmb32_5.h"
 };
 static const uint8_t nmb32_6[] = {
-#include "nmb32_6.h"
+#include "resource/nmb32_6.h"
 };
 static const uint8_t nmb32_7[] = {
-#include "nmb32_7.h"
+#include "resource/nmb32_7.h"
 };
 static const uint8_t nmb32_8[] = {
-#include "nmb32_8.h"
+#include "resource/nmb32_8.h"
 };
 static const uint8_t nmb32_9[] = {
-#include "nmb32_9.h"
+#include "resource/nmb32_9.h"
 };
 static const uint8_t nmb32_kmh[] = {
-#include "nmb32_kmh.h"
+#include "resource/nmb32_kmh.h"
 };
 static const uint8_t nmb32_c[] = {
-#include "nmb32_c.h"
+#include "resource/nmb32_c.h"
 };
 static const uint8_t nmb32_p[] = {
-#include "nmb32_p.h"
+#include "resource/nmb32_p.h"
 };
 static const uint8_t nmb32_x[] = {
-#include "nmb32_x.h"
+#include "resource/nmb32_x.h"
 };
 static const uint8_t nmb32_rpm[] = {
-#include "nmb32_rpm.h"
+#include "resource/nmb32_rpm.h"
 };
 
 #ifdef TITLE_ENABLE
 static const uint8_t g_title_bmp[] = {
-#include "title_bmp.h"
+#include "resource/title_bmp.h"
 };
 #endif
 
+#if 0
 static const uint8_t g_batt_icon[] = {
-#include "batt_icon.h"
+#include "resource/batt_icon.h"
 };
 static const uint8_t g_batt_ext[] = {
-#include "batt_ext.h"
+#include "resource/batt_ext.h"
 };
+#endif
 
 static const uint8_t *nmb12[10] = {
 	nmb12_0,

@@ -22,6 +22,7 @@ CSOURCES	=	common/init.c \
 				common/time.c
 
 PSOURCES	=	main.cpp \
+				resource.cpp \
 				common/font6x12.cpp
 
 USER_LIBS	=	stdc++
