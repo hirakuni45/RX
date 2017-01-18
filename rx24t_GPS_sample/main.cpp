@@ -12,6 +12,7 @@
 #include "common/sci_io.hpp"
 #include "common/fifo.hpp"
 #include "common/format.hpp"
+#include "common/nmea_dec.hpp"
 
 namespace {
 
@@ -26,7 +27,10 @@ namespace {
 	typedef utils::fifo<uint8_t,  256> fifo256;
 	typedef utils::fifo<uint16_t, 512> fifo512;
 	device::sci_io<device::SCI1, fifo256, fifo256> sci1_;
-	device::sci_io<device::SCI5, fifo512, fifo256> sci5_;
+	typedef device::sci_io<device::SCI5, fifo512, fifo256> SCI5;
+	SCI5	sci5_;
+
+	utils::nmea_dec<SCI5> nmea_(sci5_);
 }
 
 extern "C" {
@@ -108,10 +112,16 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
-		while(sci5_.recv_length() > 0) {
-			auto ch = sci5_.getch();
-			sci1_.putch(ch);
-		}
+		auto f = nmea_.service();
+		if(f) {
+			utils::format("Time: %s, ") % nmea_.get_time();
+			utils::format("Lat: %s, ") % nmea_.get_lat();
+			utils::format("Lon: %s\n") % nmea_.get_lon();
+		};
+//		while(sci5_.recv_length() > 0) {
+//			auto ch = sci5_.getch();
+//			sci1_.putch(ch);
+//		}
 
 		++cnt;
 		if(cnt >= 30) {
