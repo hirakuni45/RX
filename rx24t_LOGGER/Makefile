@@ -31,7 +31,11 @@ LDSCRIPT	=	../RX24T/$(DEVICE).ld
 
 USER_DEFS	=	SIG_RX24T F_PCKA=80000000 F_PCKB=40000000 F_PCKD=40000000
 
-INC_SYS		=
+ifeq ($(OS),Windows_NT)
+INC_SYS		=	/usr/local/boost_1_60_0
+else
+INC_SYS		=	/usr/local/include
+endif
 
 INC_APP		=	. ../ ../RX24T
 
