@@ -115,14 +115,11 @@ int main(int argc, char** argv)
 		auto f = nmea_.service();
 		if(f) {
 			utils::format("%s: ") % nmea_.get_satellite();
-			utils::format("Time: %s, ") % nmea_.get_time();
+			utils::format("D/T: %s %s, ") % nmea_.get_date() % nmea_.get_time();
 			utils::format("Lat: %s, ") % nmea_.get_lat();
-			utils::format("Lon: %s\n") % nmea_.get_lon();
+			utils::format("Lon: %s, ") % nmea_.get_lon();
+			utils::format("Alt: %s [%s]\n") % nmea_.get_altitude() % nmea_.get_altitude_unit();
 		};
-//		while(sci5_.recv_length() > 0) {
-//			auto ch = sci5_.getch();
-//			sci1_.putch(ch);
-//		}
 
 		++cnt;
 		if(cnt >= 30) {
