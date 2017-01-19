@@ -136,6 +136,6 @@ namespace device {
 		}
 	};
 
-//	template<class ADCU, class TASK>
-//	volatile uint16_t adc_io<ADCU, TASK>::value_[ADCU::analog_num_]; 
+	template <class ADCU, class TASK>
+	TASK adc_io<ADCU, TASK>::task_;
 }
