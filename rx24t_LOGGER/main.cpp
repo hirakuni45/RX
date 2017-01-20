@@ -129,7 +129,7 @@ int main(int argc, char** argv)
 
 	core_.init_device();
 
-	utils::format("RX24T Data Logger\n");
+	utils::format("G.P.S. Logger\n");
 	core_.command_.set_prompt("# ");
 
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
