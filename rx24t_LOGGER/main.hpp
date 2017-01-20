@@ -27,6 +27,8 @@
 
 #include "common/nmea_dec.hpp"
 
+#include "scene_id.hpp"
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 /*!
 	@brief	リソース・クラス
@@ -104,15 +106,29 @@ struct core_t {
 	typedef utils::bitset<uint32_t, SWITCH> switch_bits;
 	utils::switch_man<switch_bits> switch_man_;
 
+	int16_t		menu_pos_;
+
 	utils::command<128> command_;
 
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	コンストラクター
+	*/
+	//-----------------------------------------------------------------//
 	core_t() : nmea_(sci5_),
 			   sdc_(spi_),
 			   lcd_(spi_),
 			   bitmap_(kfont_),
-			   menu_(bitmap_) { }
+			   menu_(bitmap_),
+			   menu_pos_(-1)
+	{ }
 
 
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	クロックなどシステム関係初期化
+	*/
+	//-----------------------------------------------------------------//
 	void init()
 	{
 		device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
@@ -142,6 +158,12 @@ struct core_t {
 		device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 	}
 
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	デバイス関係初期化
+	*/
+	//-----------------------------------------------------------------//
 	void init_device()
 	{
 		{  // タイマー設定（１００Ｈｚ）
@@ -194,7 +216,13 @@ struct core_t {
 	}
 
 
-	void disp_time_(time_t t)
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	時間表示
+		@param[in]	t	時間
+	*/
+	//-----------------------------------------------------------------//
+	void disp_time(time_t t)
 	{
 		struct tm *m = localtime(&t);
 		utils::format("%s %s %d %02d:%02d:%02d  %4d\n")
@@ -207,17 +235,12 @@ struct core_t {
 			% static_cast<uint32_t>(m->tm_year + 1900);
 	}
 
-	void date_()
-	{
-		time_t t = 0;
-#if 0
-		if(!rtc_.get_time(t)) {
-			utils::format("Stall RTC read (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
-		}
-#endif
-		disp_time_(t);
-	}
 
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	数字入力
+	*/
+	//-----------------------------------------------------------------//
 	const char* get_dec_(const char* p, char tmch, int& value) {
 		int v = 0;
 		char ch;
@@ -236,7 +259,14 @@ struct core_t {
 		return p;
 	}
 
-	bool check_mount_()
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	マウント検査
+		@return マウント済みなら「true」
+	*/
+	//-----------------------------------------------------------------//
+	bool check_mount()
 	{
 		auto f = sdc_.get_mount();
 		if(!f) {
@@ -246,7 +276,12 @@ struct core_t {
 	}
 
 
-	void command_service_()
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	コマンド・サービス
+	*/
+	//-----------------------------------------------------------------//
+	void command_service()
 	{
 		// コマンド入力と、コマンド解析
 		if(command_.service()) {
@@ -254,7 +289,7 @@ struct core_t {
 			if(cmdn >= 1) {
 				bool f = false;
 				if(command_.cmp_word(0, "dir")) {  // dir [xxx]
-					if(check_mount_()) {
+					if(check_mount()) {
 						if(cmdn >= 2) {
 							char tmp[128];
 							command_.get_word(1, sizeof(tmp), tmp);
@@ -265,7 +300,7 @@ struct core_t {
 					}
 					f = true;
 				} else if(command_.cmp_word(0, "cd")) {  // cd [xxx]
-					if(check_mount_()) {
+					if(check_mount()) {
 						if(cmdn >= 2) {
 							char tmp[128];
 							command_.get_word(1, sizeof(tmp), tmp);
@@ -299,8 +334,42 @@ struct core_t {
 			}
 		}
 	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	メニュー選択サービス
+	*/
+	//-----------------------------------------------------------------//
+	void menu_item_service()
+	{
+		if(switch_man_.get_positive().get(SWITCH::UP)) {
+			menu_.focus_prev();
+		}
+		if(switch_man_.get_positive().get(SWITCH::DOWN)) {
+			menu_.focus_next();
+		}
+		if(switch_man_.get_negative().get(SWITCH::RIGHT)) {
+			menu_pos_ = menu_.get_pos();
+		}
+	}
+
 };
 
-core_t& get_core();
 
-void select_scene(uint32_t idx);
+//---------------------------------------------------------------------//
+/*!
+	@brief	コアの参照
+	@return コア
+*/
+//---------------------------------------------------------------------//
+core_t& at_core();
+
+
+//---------------------------------------------------------------------//
+/*!
+	@brief	シーンを選択
+	@param[in]	id	シーンＩＤ
+*/
+//---------------------------------------------------------------------//
+void select_scene(app::scene_id id);

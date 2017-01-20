@@ -10,32 +10,53 @@
 
 #include "common/scene.hpp"
 #include "root_menu.hpp"
+#include "logging.hpp"
 
 namespace {
 
 	core_t core_;
 
-	typedef utils::scene<app::root_menu> SCENE;
+	typedef utils::scene<app::root_menu, app::logging> SCENE;
 	SCENE scene_;
 
 	app::root_menu	root_menu_;
+
+	app::logging	logging_;
 }
 
-core_t& get_core()
+
+//---------------------------------------------------------------------//
+/*!
+	@brief	コアの参照
+	@return コア
+*/
+//---------------------------------------------------------------------//
+core_t& at_core()
 {
 	return core_;
 }
 
-void select_scene(uint32_t idx)
+
+//---------------------------------------------------------------------//
+/*!
+	@brief	シーンを選択
+	@param[in]	id	シーンＩＤ
+*/
+//---------------------------------------------------------------------//
+void select_scene(app::scene_id id)
 {
-	switch(idx) {
-	case 0:
+	switch(id) {
+	case app::scene_id::root_menu:
 		scene_.change(root_menu_);
+		break;
+	case app::scene_id::logging:
+		scene_.change(logging_);
 		break;
 	default:
 		break;
 	}
 }
+
 
 extern "C" {
 
@@ -104,7 +125,7 @@ int main(int argc, char** argv)
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	LED::DIR = 1;
 
-	select_scene(0);
+	select_scene(app::scene_id::root_menu);
 
 	uint32_t cnt = 0;
 	uint8_t nn = 0;
@@ -124,6 +145,7 @@ int main(int argc, char** argv)
 			tmp.set(static_cast<core_t::SWITCH>(val));
 		}
 		core_.switch_man_.service(tmp);
+		core_.menu_item_service();
 
 		auto f = core_.nmea_.service();
 		if(f) {
@@ -135,14 +157,6 @@ int main(int argc, char** argv)
 		};
 
 		core_.sdc_.service();
-
-
-		if(core_.switch_man_.get_positive().get(core_t::SWITCH::UP)) {
-			core_.menu_.focus_prev();
-		}
-		if(core_.switch_man_.get_positive().get(core_t::SWITCH::DOWN)) {
-			core_.menu_.focus_next();
-		}
 
 		// LCD 用サービス
 		if(nn == 0) {  // フレームバッファ消去
