@@ -57,6 +57,11 @@ namespace app {
 			// 衛星数の表示
 			core.bitmap_.draw_text(2, 1, core.nmea_.get_satellite());
 
+			// マウント状態の表示
+			if(core.sdc_.get_mount()) {
+				core.bitmap_.draw_font(128 - 8, 1, '*'); 
+			}
+
 			int n = core.menu_pos_;
 			switch(n) {
 			case 0:
