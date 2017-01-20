@@ -6,8 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include <cstdint>
-#include <functional>
+#include <boost/variant.hpp>
 
 namespace utils {
 
@@ -16,23 +15,67 @@ namespace utils {
 		@brief	シーン・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class BASE>
+	template <class... Args>
 	class scene {
 
-		BASE&	base_;
+		static const int argc_ = sizeof...(Args);
 
-		typedef std::function< void(BASE&) > func_type;
+		using scene_type = boost::variant<Args...>;
+		scene_type cur_scene_;
+		scene_type new_scene_;
 
-		func_type	init_;
-		func_type	service_;	
+		struct init_visitor {
+			using result_type = void;
+
+    		template <class T>
+    		void operator()(T& x) {
+				return x.init();
+			}
+		};
+
+		struct service_visitor {
+			using result_type = void;
+
+    		template <class T>
+    		void operator()(T& x) {
+				return x.service();
+			}
+		};
+
+		bool	change_;
+		bool	current_;
+
+		void init_()
+		{
+			init_visitor vis;
+           	boost::apply_visitor(vis, new_scene_);
+			cur_scene_ = new_scene_;
+			current_ = true;
+		}
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	start	開始時クラスのインデックス
 		*/
 		//-----------------------------------------------------------------//
-		scene(BASE& base) : base_(base) { }
+		scene() : change_(false), current_(false) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	チェンジ・シーン
+			@param[in]	T	型
+			@param[in]	new_scene	新規シーンのインスタンス
+		*/
+		//-----------------------------------------------------------------//
+		template <class T>
+		void change(T scene)
+		{
+			new_scene_ = scene;
+			change_ = true;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -42,12 +85,14 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void service()
 		{
-			if(init_ != nullptr) {
-				init_(base_);
-				init_ = nullptr;
+			if(change_) {
+				init_();
+				change_ = false;
 			}
-			if(service_ != nullptr) {
-				service_(base_);
+
+			if(current_) {
+				service_visitor vis;
+    	       	boost::apply_visitor(vis, cur_scene_);
 			}
 		}
 	};
