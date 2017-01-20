@@ -33,7 +33,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init()
 		{
-			auto& core = get_core();
+			auto& core = at_core();
 
 			core.menu_.set_space(4);
 			core.menu_.add(core_t::MENU::type::PROP, "Logging");
@@ -49,11 +49,29 @@ namespace app {
 		//-------------------------------------------------------------//
 		void service()
 		{
-			auto& core = get_core();
+			auto& core = at_core();
 
 			core.bitmap_.frame(0, 0, 128, 64, 1);
 			core.menu_.render();
 
+			// 衛星数の表示
+			core.bitmap_.draw_text(2, 1, core.nmea_.get_satellite());
+
+			int n = core.menu_pos_;
+			switch(n) {
+			case 0:
+				select_scene(app::scene_id::logging);
+				core.menu_.clear();
+				break;
+			case 1:
+
+				break;
+			case 2:
+
+				break;
+			default:
+				break;
+			}
 		}
 	};
 
