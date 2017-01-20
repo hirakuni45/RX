@@ -18,6 +18,8 @@ namespace app {
 		root_menu,		///< ルート・メニュー
 
 		logging,		///< ロギング
+		recall,			///< リコール
+		setup,			///< セットアップ
 	};
 
 }

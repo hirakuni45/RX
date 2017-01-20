@@ -11,29 +11,21 @@
 #include "common/scene.hpp"
 #include "root_menu.hpp"
 #include "logging.hpp"
+#include "recall.hpp"
+#include "setup.hpp"
 
 namespace {
 
 	core_t core_;
 
-	typedef utils::scene<app::root_menu, app::logging> SCENE;
+	typedef utils::scene<app::root_menu, app::logging, app::recall, app::setup> SCENE;
 	SCENE scene_;
 
 	app::root_menu	root_menu_;
 
 	app::logging	logging_;
-}
-
-
-//---------------------------------------------------------------------//
-/*!
-	@brief	コアの参照
-	@return コア
-*/
-//---------------------------------------------------------------------//
-core_t& at_core()
-{
-	return core_;
+	app::recall		recall_;
+	app::setup		setup_;
 }
 
 
@@ -52,9 +44,27 @@ void select_scene(app::scene_id id)
 	case app::scene_id::logging:
 		scene_.change(logging_);
 		break;
+	case app::scene_id::recall:
+		scene_.change(recall_);
+		break;
+	case app::scene_id::setup:
+		scene_.change(setup_);
+		break;
 	default:
 		break;
 	}
+}
+
+
+//---------------------------------------------------------------------//
+/*!
+	@brief	コアの参照
+	@return コア
+*/
+//---------------------------------------------------------------------//
+core_t& at_core()
+{
+	return core_;
 }
 
 

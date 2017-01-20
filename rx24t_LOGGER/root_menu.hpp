@@ -64,10 +64,12 @@ namespace app {
 				core.menu_.clear();
 				break;
 			case 1:
-
+				select_scene(app::scene_id::recall);
+				core.menu_.clear();
 				break;
 			case 2:
-
+				select_scene(app::scene_id::setup);
+				core.menu_.clear();
 				break;
 			default:
 				break;
