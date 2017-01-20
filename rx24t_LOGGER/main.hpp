@@ -33,7 +33,7 @@
 	@param[in]	GR		描画クラス
 */
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-struct main_t {
+struct core_t {
 
 	class cmt_task {
 	public:
@@ -106,7 +106,7 @@ struct main_t {
 
 	utils::command<128> command_;
 
-	main_t() : nmea_(sci5_),
+	core_t() : nmea_(sci5_),
 			   sdc_(spi_),
 			   lcd_(spi_),
 			   bitmap_(kfont_),
@@ -180,11 +180,6 @@ struct main_t {
 			bool comrvs = true;
 			lcd_.start(0x10, comrvs);
 			bitmap_.clear(0);
-
-			menu_.set_space(4);
-			menu_.add(MENU::type::PROP, "Logging");
-			menu_.add(MENU::type::PROP, "Recall");
-			menu_.add(MENU::type::PROP, "Setup");
 		}
 
 		{  // A/D 設定
@@ -304,5 +299,8 @@ struct main_t {
 			}
 		}
 	}
-
 };
+
+core_t& get_core();
+
+void select_scene(uint32_t idx);

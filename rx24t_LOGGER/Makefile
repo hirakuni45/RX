@@ -15,7 +15,8 @@ VPATH		=	../
 
 ASOURCES	=	common/start.s
 
-CSOURCES	=	common/init.c \
+CSOURCES	=	common/syscalls.c \
+				common/init.c \
 				common/vect.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
@@ -81,6 +82,7 @@ PFLAGS		=	-std=c++14 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
 
+# -nostdlib -nodefaultlibs
 override LDFLAGS = $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
 
 OBJCOPY_OPT	=	--srec-forceS3 --srec-len 32

@@ -9,55 +9,74 @@
 #include "main.hpp"
 
 #include "common/scene.hpp"
+#include "root_menu.hpp"
 
 namespace {
 
-	main_t main_;
+	core_t core_;
 
-	utils::scene<main_t> scene_(main_);
+	typedef utils::scene<app::root_menu> SCENE;
+	SCENE scene_;
 
+	app::root_menu	root_menu_;
+}
+
+core_t& get_core()
+{
+	return core_;
+}
+
+void select_scene(uint32_t idx)
+{
+	switch(idx) {
+	case 0:
+		scene_.change(root_menu_);
+		break;
+	default:
+		break;
+	}
 }
 
 extern "C" {
 
 	void sci_putch(char ch)
 	{
-		main_.sci1_.putch(ch);
+		core_.sci1_.putch(ch);
 	}
 
 	void sci_puts(const char* str)
 	{
-		main_.sci1_.puts(str);
+		core_.sci1_.puts(str);
 	}
 
 	char sci_getch(void)
 	{
-		return main_.sci1_.getch();
+		return core_.sci1_.getch();
 	}
 
 	uint16_t sci_length()
 	{
-		return main_.sci1_.recv_length();
+		return core_.sci1_.recv_length();
 	}
 
 	DSTATUS disk_initialize(BYTE drv) {
-		return main_.sdc_.at_mmc().disk_initialize(drv);
+		return core_.sdc_.at_mmc().disk_initialize(drv);
 	}
 
 	DSTATUS disk_status(BYTE drv) {
-		return main_.sdc_.at_mmc().disk_status(drv);
+		return core_.sdc_.at_mmc().disk_status(drv);
 	}
 
 	DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
-		return main_.sdc_.at_mmc().disk_read(drv, buff, sector, count);
+		return core_.sdc_.at_mmc().disk_read(drv, buff, sector, count);
 	}
 
 	DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
-		return main_.sdc_.at_mmc().disk_write(drv, buff, sector, count);
+		return core_.sdc_.at_mmc().disk_write(drv, buff, sector, count);
 	}
 
 	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
-		return main_.sdc_.at_mmc().disk_ioctl(drv, ctrl, buff);
+		return core_.sdc_.at_mmc().disk_ioctl(drv, ctrl, buff);
 	}
 
 	DWORD get_fattime(void) {
@@ -75,68 +94,69 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	main_.init();
+	core_.init();
 
-	main_.init_device();
+	core_.init_device();
 
 	utils::format("RX24T Data Logger\n");
-
-	main_.command_.set_prompt("# ");
+	core_.command_.set_prompt("# ");
 
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-
 	LED::DIR = 1;
+
+	select_scene(0);
 
 	uint32_t cnt = 0;
 	uint8_t nn = 0;
 	while(1) {
-		main_.cmt_.sync();
+		core_.cmt_.sync();
 
-		main_.adc_io_.scan();
-		main_.adc_io_.sync();
+		core_.adc_io_.scan();
+		core_.adc_io_.sync();
 
 		// ４つのスイッチ判定（排他的）
-		auto val = main_.adc_io_.get(main_t::ADC::analog::AIN000);
+		auto val = core_.adc_io_.get(core_t::ADC::analog::AIN000);
 		val += 512;  // 閾値のオフセット（4096 / 4(SWITCH) / 2）
 		val /= 1024;  // デコード（4096 / 4(SWITCH）
 
-		main_t::switch_bits tmp;
+		core_t::switch_bits tmp;
 		if(val < 4) {
-			tmp.set(static_cast<main_t::SWITCH>(val));
+			tmp.set(static_cast<core_t::SWITCH>(val));
 		}
-		main_.switch_man_.service(tmp);
+		core_.switch_man_.service(tmp);
 
-		auto f = main_.nmea_.service();
+		auto f = core_.nmea_.service();
 		if(f) {
-			utils::format("%s: ") % main_.nmea_.get_satellite();
-			utils::format("D/T: %s %s, ") % main_.nmea_.get_date() % main_.nmea_.get_time();
-			utils::format("Lat: %s, ") % main_.nmea_.get_lat();
-			utils::format("Lon: %s, ") % main_.nmea_.get_lon();
-			utils::format("Alt: %s [%s]\n") % main_.nmea_.get_altitude() % main_.nmea_.get_altitude_unit();
+			utils::format("%s: ") % core_.nmea_.get_satellite();
+			utils::format("D/T: %s %s, ") % core_.nmea_.get_date() % core_.nmea_.get_time();
+			utils::format("Lat: %s, ") % core_.nmea_.get_lat();
+			utils::format("Lon: %s, ") % core_.nmea_.get_lon();
+			utils::format("Alt: %s [%s]\n") % core_.nmea_.get_altitude() % core_.nmea_.get_altitude_unit();
 		};
 
-		main_.sdc_.service();
+		core_.sdc_.service();
 
-		if(main_.switch_man_.get_positive().get(main_t::SWITCH::UP)) {
-			main_.menu_.focus_prev();
+
+		if(core_.switch_man_.get_positive().get(core_t::SWITCH::UP)) {
+			core_.menu_.focus_prev();
 		}
-		if(main_.switch_man_.get_positive().get(main_t::SWITCH::DOWN)) {
-			main_.menu_.focus_next();
+		if(core_.switch_man_.get_positive().get(core_t::SWITCH::DOWN)) {
+			core_.menu_.focus_next();
 		}
-			
 
 		// LCD 用サービス
 		if(nn == 0) {  // フレームバッファ消去
-			main_.bitmap_.clear(0);
+			core_.bitmap_.clear(0);
 			++nn;
 		} else if(nn == 1) {  // 描画
-			main_.bitmap_.frame(0, 0, 128, 64, 1);
-			main_.menu_.render();
+			// シーン・タスク
+			scene_.service();
+
 			++nn;
 		} else if(nn >= 2) {  // 転送
-			main_.spi_.start(8000000, main_t::SPI::PHASE::TYPE4);  // LCD 用速度と設定
-			main_.lcd_.copy(main_.bitmap_.fb(), main_.bitmap_.page_num());
-			main_.sdc_.setup_speed();  //  SDC 用速度と設定
+			core_.spi_.start(8000000, core_t::SPI::PHASE::TYPE4);  // LCD 用速度と設定
+			core_.lcd_.copy(core_.bitmap_.fb(), core_.bitmap_.page_num());
+			core_.sdc_.setup_speed();  //  SDC 用速度と設定
 			nn = 0;
 		}
 
