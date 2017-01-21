@@ -34,6 +34,7 @@
 #include "RX24T/power_cfg.hpp"
 #include "RX24T/icu_mgr.hpp"
 #include "RX24T/flash.hpp"
+#include "RX24T/flash_io.hpp"
 
 #elif defined(SIG_RX63T)
 #include "RX63T/peripheral.hpp"

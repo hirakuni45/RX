@@ -6,6 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include <cstring>
 #include "common/renesas.hpp"
 #include "common/delay.hpp"
 
