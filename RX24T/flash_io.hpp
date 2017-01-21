@@ -24,7 +24,8 @@ namespace device {
 	class flash_io {
 
 	public:
-		static const uint16_t data_flash_size_ = 8192;
+		static const uint16_t data_flash_block_ = 1024;
+		static const uint16_t data_flash_size_  = 8192;
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -148,11 +149,11 @@ namespace device {
 
 			device::FLASH::FASR.EXS = 0;
 
-			uint16_t org = static_cast<uint16_t>(bank) * 0x400;
+			uint16_t org = static_cast<uint16_t>(bank) * data_flash_block_;
 			device::FLASH::FSARH = 0xFE00;
 			device::FLASH::FSARL = org;
 			device::FLASH::FEARH = 0xFE00;
-			device::FLASH::FEARL = org + 0x3FF;
+			device::FLASH::FEARL = org + data_flash_block_ - 1;
 
 			device::FLASH::FCR = 0x84;
 			while(device::FLASH::FSTATR1.FRDY() == 0) ;
@@ -196,10 +197,10 @@ namespace device {
 			bool ret = true;
 			uint16_t page = data_flash_size_;
 			for(uint16_t i = 0; i < len; ++i) {
-				if(page != (org & ~0x3ff)) {
+				if(page != (org & ~(data_flash_block_ - 1))) {
 					device::FLASH::FSARH = 0xFE00;
 					device::FLASH::FSARL = org;
-					page = org & ~0x3FF;
+					page = org & ~(data_flash_block_ - 1);
 				}
 				device::FLASH::FWB0 = *p++;
 				device::FLASH::FCR = 0x81;
