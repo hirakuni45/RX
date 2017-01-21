@@ -20,12 +20,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  E2 データフラッシュ制御レジスタ (DFLCTL)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct dflctl_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
+		template <uint32_t base>
+		struct dflctl_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -39,12 +39,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュ P/E モードエントリレジスタ (FENTRYR)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct fentryr_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
+		template <uint32_t base>
+		struct fentryr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -68,12 +68,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  プロテクト解除ステータスレジスタ (FPSR)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct fpsr_t : public ro8_t<ofs> {
-			typedef ro8_t<ofs> io_;
+		template <uint32_t base>
+		struct fpsr_t : public ro8_t<base> {
+			typedef ro8_t<base> io_;
 			using io_::operator ();
 
 			bit_ro_t<io_, bitpos::B0> PERR;
@@ -84,12 +84,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュ P/E モード制御レジスタ (FPMCR)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct fpmcr_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
+		template <uint32_t base>
+		struct fpmcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -101,18 +101,18 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  LVPE;
 			bit_rw_t<io_, bitpos::B7>  FMS2;
 		};
-		static fpmcr_t<0x007FFFB2> FPMCR;
+		static fpmcr_t<0x007FC100> FPMCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュ初期設定レジスタ (FISR)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct fisr_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
+		template <uint32_t base>
+		struct fisr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -127,12 +127,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュリセットレジスタ (FRESETR)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct fresetr_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
+		template <uint32_t base>
+		struct fresetr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -146,18 +146,18 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュ領域選択レジスタ (FASR)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct fasr_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
+		template <uint32_t base>
+		struct fasr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>  EXT;
+			bit_rw_t<io_, bitpos::B0>  EXS;
 		};
 		static fasr_t<0x007FC104> FASR;
 
@@ -165,12 +165,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュ制御レジスタ (FCR)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct fcr_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
+		template <uint32_t base>
+		struct fcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -186,12 +186,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュエクストラ領域制御レジスタ (FEXCR)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct fexcr_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
+		template <uint32_t base>
+		struct fexcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -249,12 +249,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュステータスレジスタ 0 (FSTATR0)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct fstatr0_t : public ro8_t<ofs> {
-			typedef ro8_t<ofs> io_;
+		template <uint32_t base>
+		struct fstatr0_t : public ro8_t<base> {
+			typedef ro8_t<base> io_;
 			using io_::operator ();
 
 			bit_ro_t<io_, bitpos::B0>  ERERR;
@@ -269,12 +269,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュステータスレジスタ 1 (FSTATR1)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct fstatr1_t : public ro8_t<ofs> {
-			typedef ro8_t<ofs> io_;
+		template <uint32_t base>
+		struct fstatr1_t : public ro8_t<base> {
+			typedef ro8_t<base> io_;
 			using io_::operator ();
 
 			bit_ro_t<io_, bitpos::B6>  FRDY;
@@ -302,12 +302,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュスタートアップ設定モニタレジスタ (FSCMR)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct fscmr_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
+		template <uint32_t base>
+		struct fscmr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -339,21 +339,21 @@ namespace device {
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3)
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x007FC350> UIDR0;
-		static rw16_t<0x007FC354> UIDR1;
-		static rw16_t<0x007FC358> UIDR2;
-		static rw16_t<0x007FC35C> UIDR3;
+		static rw32_t<0x007FC350> UIDR0;
+		static rw32_t<0x007FC354> UIDR1;
+		static rw32_t<0x007FC358> UIDR2;
+		static rw32_t<0x007FC35C> UIDR3;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ROM キャッシュ許可レジスタ (ROMCE)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct romce_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
+		template <uint32_t base>
+		struct romce_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -367,12 +367,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ROM キャッシュ無効化レジスタ (ROMCIV)
-			@param[in]	ofs	オフセット
+			@param[in]	base	ベース
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct romciv_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
+		template <uint32_t base>
+		struct romciv_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
