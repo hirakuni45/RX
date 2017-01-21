@@ -107,31 +107,34 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  読み出し
-			@param[in]	ofs	開始オフセット
+			@param[in]	org	開始アドレス
 			@return データ
 		*/
 		//-----------------------------------------------------------------//
-		uint8_t read(uint16_t ofs) const
+		uint8_t read(uint16_t org) const
 		{
-			if(ofs >= data_flash_size_) return 0;
+			if(org >= data_flash_size_) return 0;
 			turn_rd_();
-			return device::rd8_(0x00100000 + ofs);
+			return device::rd8_(0x00100000 + org);
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  読み出し
-			@param[in]	ofs	開始オフセット
+			@param[in]	org	開始アドレス
 			@param[in]	len	バイト数
 			@param[out]	dst	先
 		*/
 		//-----------------------------------------------------------------//
-		void read(uint16_t ofs, uint16_t len, void* dst) const
+		void read(uint16_t org, uint16_t len, void* dst) const
 		{
-			if(ofs >= data_flash_size_ || (ofs + len) >= data_flash_size_) return;
+			if(org >= data_flash_size_) return;
+			if((org + len) > data_flash_size_) {
+				len = data_flash_size_ - org;
+			}
 			turn_rd_();
-			const void* src = reinterpret_cast<const void*>(0x00100000 + ofs);
+			const void* src = reinterpret_cast<const void*>(0x00100000 + org);
 			std::memcpy(dst, src, len);
 		}
 
