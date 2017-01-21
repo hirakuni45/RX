@@ -11,7 +11,6 @@
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
-#include "RX24T/flash_io.hpp"
 
 namespace {
 
