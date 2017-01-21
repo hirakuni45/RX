@@ -181,6 +181,7 @@ namespace device {
 			@param[in]	src ソース
 			@param[in]	org	開始オフセット
 			@param[in]	len	バイト数
+			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
 		bool write(const void* src, uint16_t org, uint16_t len) const
@@ -230,7 +231,7 @@ namespace device {
 			@brief  書き込み
 			@param[in]	org	開始オフセット
 			@param[in]	data	書き込みデータ
-			@return 
+			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
 		bool write(uint16_t org, uint8_t data) const
