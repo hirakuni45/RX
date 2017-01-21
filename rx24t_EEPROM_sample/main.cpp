@@ -10,7 +10,8 @@
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
-#include "RX24T/eeprom_io.hpp"
+#include "common/command.hpp"
+#include "RX24T/flash_io.hpp"
 
 namespace {
 
@@ -25,7 +26,7 @@ namespace {
 	typedef utils::fifo<uint8_t, 128> fifo128;
 	device::sci_io<device::SCI1, fifo128, fifo128> sci_;
 
-
+	utils::command<256> command_;
 }
 
 extern "C" {
@@ -92,13 +93,18 @@ int main(int argc, char** argv)
 
 	utils::format("RX24T EEPROM sample\n");
 
+	command_.set_prompt("# ");
+
 	device::PORT0::PDR.B0 = 1; // output
 
 	uint32_t cnt = 0;
 	while(1) {
 		cmt_.sync();
 
+		// コマンド入力と、コマンド解析
+		if(command_.service()) {
 
+		}
 
 		++cnt;
 		if(cnt >= 30) {
