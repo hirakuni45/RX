@@ -32,6 +32,7 @@ Renesas RX マイコン
  - /rx24t_uart_sample  ---> RX24T を使った UART (SCI1) の制御サンプル
  - /rx24t_SDC_sample   ---> RX24T を使った SD カードの動作サンプル
  - /rx24t_GPS_sample   ---> RX24T を使った GPS の動作サンプル
+ - /rx24t_DATA_FLASH_sample ---> RX24T を使ったデータ・フラッシュ操作サンプル
  - /rx24t_LOGGER       ---> RX24T を使ったデータロガー・プロジェクト
  - /rx64m_first_sample ---> RX64M を使った LED 点滅
  - /rx64m_uart_sample  ---> RX64M を使った UART (SCI1) の制御サンプル
