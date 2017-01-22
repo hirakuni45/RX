@@ -62,7 +62,9 @@ namespace graphics {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		menu(GR& gr) : gr_(gr), size_(0), mx_(0), my_(0), spc_(0), pos_(0), focus_(true) { }
+		menu(GR& gr) : gr_(gr), size_(0), mx_(0), my_(0),
+					   spc_(0), pos_(0), focus_(true)
+		{ }
 
 
 		//-----------------------------------------------------------------//
@@ -143,7 +145,7 @@ namespace graphics {
 			size_ = 0;
 			mx_ = 0;
 			my_ = 0;
-			pos_ = -1;
+			pos_ = 0;
 		}
 
 
@@ -191,14 +193,18 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	レンダリング
+			@param[in]	ox	描画オフセットＸ
+			@param[in]	oy	描画オフセットＹ
 		*/
 		//-----------------------------------------------------------------//
-		void render() const
+		void render(int16_t ox = 0, int16_t oy = 0) const
 		{
 			if(size_ == 0) return;
 
-			int16_t x = (gr_.get_width()  - mx_) / 2;
-			int16_t y = (gr_.get_height() - my_) / 2;
+			int16_t x = (gr_.get_width()  - ox - mx_) / 2;
+			int16_t y = (gr_.get_height() - oy - my_) / 2;
+			x += ox;
+			y += oy;
 			for(auto i = 0; i < size_; ++i) {
 				y += spc_ / 2;
 				uint8_t w;
