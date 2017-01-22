@@ -142,6 +142,41 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  消去チェック
+			@param[in]	bank	バンク
+			@return エラーがあれば「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool erase_check(data_area bank) const
+		{
+			turn_pe_();
+
+			device::FLASH::FASR.EXS = 0;
+
+			uint16_t org = static_cast<uint16_t>(bank) * data_flash_block_;
+			device::FLASH::FSARH = 0xFE00;
+			device::FLASH::FSARL = org;
+			device::FLASH::FEARH = 0xFE00;
+			device::FLASH::FEARL = org + data_flash_block_ - 1;
+
+			device::FLASH::FCR = 0x83;
+			while(device::FLASH::FSTATR1.FRDY() == 0) ;
+			device::FLASH::FCR = 0x00;
+			while(device::FLASH::FSTATR1.FRDY() != 0) ;
+
+			bool ret = true;
+			if(device::FLASH::FSTATR0.ILGLERR() != 0 || device::FLASH::FSTATR0.ERERR() != 0) {
+				ret = false;
+			} else {
+				device::FLASH::FRESETR.FRESET = 1;
+				device::FLASH::FRESETR.FRESET = 0;
+			}
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  消去
 			@param[in]	bank	バンク
 			@return エラーがあれば「false」
@@ -167,11 +202,10 @@ namespace device {
 			bool ret = true;
 			if(device::FLASH::FSTATR0.ILGLERR() != 0 || device::FLASH::FSTATR0.ERERR() != 0) {
 				ret = false;
+			} else {
+				device::FLASH::FRESETR.FRESET = 1;
+				device::FLASH::FRESETR.FRESET = 0;
 			}
-
-			device::FLASH::FRESETR.FRESET = 1;
-			device::FLASH::FRESETR.FRESET = 0;
-
 			return ret;
 		}
 
@@ -219,10 +253,10 @@ namespace device {
 				}
 				++org;
 			}
-
-			device::FLASH::FRESETR.FRESET = 1;
-			device::FLASH::FRESETR.FRESET = 0;
-
+			if(ret) { 
+				device::FLASH::FRESETR.FRESET = 1;
+				device::FLASH::FRESETR.FRESET = 0;
+			}
 			return ret;
 		}
 
