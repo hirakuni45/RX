@@ -14,7 +14,9 @@ namespace app {
 		@brief	ルート・メニュー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class scene_id {
+	enum class scene_id : uint8_t {
+		title,			///< タイトル
+
 		root_menu,		///< ルート・メニュー
 
 		logging,		///< ロギング

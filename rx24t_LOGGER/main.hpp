@@ -29,6 +29,7 @@
 
 #include "scene_id.hpp"
 #include "resource.hpp"
+#include "datalogger.hpp"
 
 extern "C" {
 	void string_reset(void);
@@ -147,8 +148,8 @@ struct core_t {
 		UP,
 		DOWN,
 		LEFT,
-		A,
-		B
+		PIT,
+		CANCEL
 	};
 
 	typedef utils::bitset<uint32_t, SWITCH> switch_bits;
@@ -159,7 +160,7 @@ struct core_t {
 	utils::command<128> command_;
 
 	uint8_t	tmp_text_pos_;
-	char	tmp_text_[256];
+	char	tmp_text_[64];
 
 	struct text_chaout {
 		void operator() (char ch) {
@@ -168,6 +169,11 @@ struct core_t {
 		text_chaout() { string_reset(); }
 	};
 
+	uint16_t	loop_count_;
+
+	bool		fbc_enable_;
+
+	app::datalogger	datalogger_;
 
 	//-----------------------------------------------------------------//
 	/*!

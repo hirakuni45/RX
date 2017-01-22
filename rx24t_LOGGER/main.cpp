@@ -9,6 +9,7 @@
 #include "main.hpp"
 
 #include "common/scene.hpp"
+#include "title.hpp"
 #include "root_menu.hpp"
 #include "logging.hpp"
 #include "recall.hpp"
@@ -19,8 +20,11 @@ namespace {
 
 	core_t core_;
 
-	typedef utils::scene<app::root_menu, app::logging, app::recall, app::setup, app::laptimer> SCENE;
+	typedef utils::scene<app::title, app::root_menu,
+		app::logging, app::recall, app::setup, app::laptimer> SCENE;
 	SCENE scene_;
+
+	app::title		title_;
 
 	app::root_menu	root_menu_;
 
@@ -40,6 +44,9 @@ namespace {
 void select_scene(app::scene_id id)
 {
 	switch(id) {
+	case app::scene_id::title:
+		scene_.change(title_);
+		break;
 	case app::scene_id::root_menu:
 		scene_.change(root_menu_);
 		break;
@@ -102,9 +109,9 @@ extern "C" {
 
 	void string_chaout(char ch)
 	{
-		core_.tmp_text_[core_.tmp_text_pos_] = ch;
+		core_.tmp_text_[core_.tmp_text_pos_ & (sizeof(core_t::tmp_text_) - 1)] = ch;
 		++core_.tmp_text_pos_;
-		core_.tmp_text_[core_.tmp_text_pos_] = 0;
+		core_.tmp_text_[core_.tmp_text_pos_ & (sizeof(core_t::tmp_text_) - 1)] = 0;
 	}
 
 	void laptimer_service(uint8_t pitflag)
@@ -157,7 +164,7 @@ int main(int argc, char** argv)
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	LED::DIR = 1;
 
-	select_scene(app::scene_id::root_menu);
+	select_scene(app::scene_id::title);
 
 	uint32_t cnt = 0;
 	while(1) {
@@ -190,12 +197,16 @@ int main(int argc, char** argv)
 		core_.sdc_.service();
 
 		{
-			core_.bitmap_.clear(0);
+			if(core_.fbc_enable_) {
+				core_.bitmap_.clear(0);
+			}
 			scene_.service();
 			core_.spi_.start(8000000, core_t::SPI::PHASE::TYPE4);  // LCD 用速度と設定
 			core_.lcd_.copy(core_.bitmap_.fb(), core_.bitmap_.page_num());
 			core_.sdc_.setup_speed();  //  SDC 用速度と設定
 		}
+
+		++core_.loop_count_;
 
 		++cnt;
 		if(cnt >= 15) {
