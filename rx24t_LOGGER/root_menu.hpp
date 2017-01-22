@@ -36,6 +36,7 @@ namespace app {
 			auto& core = at_core();
 
 			core.menu_.set_space(4);
+			core.menu_.add(core_t::MENU::type::PROP, "Laptimer");
 			core.menu_.add(core_t::MENU::type::PROP, "Logging");
 			core.menu_.add(core_t::MENU::type::PROP, "Recall");
 			core.menu_.add(core_t::MENU::type::PROP, "Setup");
@@ -62,17 +63,21 @@ namespace app {
 				core.bitmap_.draw_font(128 - 8, 1, '*'); 
 			}
 
-			int n = core.menu_pos_;
+			int n = core.menu_run_;
 			switch(n) {
 			case 0:
-				select_scene(app::scene_id::logging);
+				select_scene(app::scene_id::laptimer);
 				core.menu_.clear();
 				break;
 			case 1:
-				select_scene(app::scene_id::recall);
+				select_scene(app::scene_id::logging);
 				core.menu_.clear();
 				break;
 			case 2:
+				select_scene(app::scene_id::recall);
+				core.menu_.clear();
+				break;
+			case 3:
 				select_scene(app::scene_id::setup);
 				core.menu_.clear();
 				break;

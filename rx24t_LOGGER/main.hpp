@@ -28,6 +28,13 @@
 #include "common/nmea_dec.hpp"
 
 #include "scene_id.hpp"
+#include "resource.hpp"
+
+extern "C" {
+	void string_reset(void);
+	void string_chaout(char ch);
+	void laptimer_service(uint8_t pitflag);
+};
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 /*!
@@ -36,7 +43,6 @@
 */
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 struct core_t {
-
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -61,6 +67,9 @@ struct core_t {
 		*/
 		//-------------------------------------------------------------//
 		void operator() () {
+
+			laptimer_service(0);
+
 			++cnt_;
 			if(cnt_ >= 3) {
 				cnt_ = 0;
@@ -116,6 +125,8 @@ struct core_t {
 	typedef graphics::monograph<128, 64, AFONT> BITMAP;
 	BITMAP bitmap_;
 
+	app::resource<BITMAP> resource_;
+
 	typedef graphics::menu<BITMAP, 5> MENU;
 	MENU menu_;
 
@@ -143,9 +154,20 @@ struct core_t {
 	typedef utils::bitset<uint32_t, SWITCH> switch_bits;
 	utils::switch_man<switch_bits> switch_man_;
 
-	int16_t		menu_pos_;
+	int16_t		menu_run_;
 
 	utils::command<128> command_;
+
+	uint8_t	tmp_text_pos_;
+	char	tmp_text_[256];
+
+	struct text_chaout {
+		void operator() (char ch) {
+			string_chaout(ch);
+		}
+		text_chaout() { string_reset(); }
+	};
+
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -156,9 +178,18 @@ struct core_t {
 			   sdc_(spi_),
 			   lcd_(spi_),
 			   bitmap_(kfont_),
+			   resource_(bitmap_),
 			   menu_(bitmap_),
-			   menu_pos_(-1)
+			   menu_run_(-1)
 	{ }
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	文字列出力フォーマット定義
+	*/
+	//-----------------------------------------------------------------//
+	typedef utils::basic_format<text_chaout> text_format;
 
 
 	//-----------------------------------------------------------------//
@@ -250,6 +281,52 @@ struct core_t {
 				utils::format("A/D start fail AIN001\n");
 			}
 		}
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	時間を取得 @n
+				※ G.P.S. が無い場合、RTC から取得
+		@return 時間
+	*/
+	//-----------------------------------------------------------------//
+	time_t get_time() const
+	{
+		auto t = nmea_.get_gmtime();
+		return t;
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@breif	日付表示 YYYY/MM/DD を行う
+		@param[in]	x	開始点Ｘ軸を指定
+		@param[in]	y	開始点Ｙ軸を指定
+		@param[in]	t	tm 構造体のポインター
+	*/
+	//-----------------------------------------------------------------//
+	void draw_date(int16_t x, int16_t y, const struct tm *t)
+	{
+		text_format("%04u/%02u/%02u") % static_cast<uint32_t>(t->tm_year + 1900)
+			% static_cast<uint32_t>(t->tm_mon + 1) % static_cast<uint32_t>(t->tm_mday);
+ 		bitmap_.draw_text(x, y, tmp_text_);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@breif	時間表示 HH/MM/SS を行う
+		@param[in]	x	開始点Ｘ軸を指定
+		@param[in]	y	開始点Ｙ軸を指定
+		@param[in]	t	tm 構造体のポインター
+	*/
+	//-----------------------------------------------------------------//
+	void draw_time(short x, short y, const struct tm* t)
+	{
+		text_format("%02u:%02u.%02u") % static_cast<uint32_t>(t->tm_hour)
+			% static_cast<uint32_t>(t->tm_min) % static_cast<uint32_t>(t->tm_sec);
+		bitmap_.draw_text(x, y, tmp_text_);
 	}
 
 
@@ -387,7 +464,7 @@ struct core_t {
 			menu_.focus_next();
 		}
 		if(switch_man_.get_negative().get(SWITCH::RIGHT)) {
-			menu_pos_ = menu_.get_pos();
+			menu_run_ = menu_.get_pos();
 		}
 	}
 

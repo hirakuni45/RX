@@ -20,6 +20,8 @@ namespace app {
 		logging,		///< ロギング
 		recall,			///< リコール
 		setup,			///< セットアップ
+
+		laptimer,		///< ラップ・タイマー
 	};
 
 }

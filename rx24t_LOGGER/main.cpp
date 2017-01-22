@@ -13,12 +13,13 @@
 #include "logging.hpp"
 #include "recall.hpp"
 #include "setup.hpp"
+#include "laptimer.hpp"
 
 namespace {
 
 	core_t core_;
 
-	typedef utils::scene<app::root_menu, app::logging, app::recall, app::setup> SCENE;
+	typedef utils::scene<app::root_menu, app::logging, app::recall, app::setup, app::laptimer> SCENE;
 	SCENE scene_;
 
 	app::root_menu	root_menu_;
@@ -26,7 +27,7 @@ namespace {
 	app::logging	logging_;
 	app::recall		recall_;
 	app::setup		setup_;
-
+	app::laptimer	laptimer_;
 }
 
 
@@ -50,6 +51,9 @@ void select_scene(app::scene_id id)
 		break;
 	case app::scene_id::setup:
 		scene_.change(setup_);
+		break;
+	case app::scene_id::laptimer:
+		scene_.change(laptimer_);
 		break;
 	default:
 		break;
@@ -89,6 +93,23 @@ extern "C" {
 	uint16_t sci_length()
 	{
 		return core_.sci1_.recv_length();
+	}
+
+	void string_reset()
+	{
+		core_.tmp_text_pos_ = 0;
+	}
+
+	void string_chaout(char ch)
+	{
+		core_.tmp_text_[core_.tmp_text_pos_] = ch;
+		++core_.tmp_text_pos_;
+		core_.tmp_text_[core_.tmp_text_pos_] = 0;
+	}
+
+	void laptimer_service(uint8_t pitflag)
+	{
+		laptimer_.laptimer_service(pitflag);
 	}
 
 	DSTATUS disk_initialize(BYTE drv) {
