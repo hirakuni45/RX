@@ -168,4 +168,5 @@ namespace device {
 	};
 
 	template <class CMT, class TASK> volatile uint32_t cmt_io<CMT, TASK>::counter_ = 0;
+	template <class CMT, class TASK> TASK cmt_io<CMT, TASK>::task_;
 }
