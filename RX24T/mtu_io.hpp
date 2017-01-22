@@ -11,9 +11,9 @@
 #include "RX24T/port_map.hpp"
 #include "RX24T/power_cfg.hpp"
 
-/// F_PCKD は変換パラメーター計算で必要で、設定が無いとエラーにします。
+/// F_PCKA は変換パラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCKA
-#  error "mtu_io.hpp requires F_PCKD to be defined"
+#  error "mtu_io.hpp requires F_PCKA to be defined"
 #endif
 
 namespace device {
