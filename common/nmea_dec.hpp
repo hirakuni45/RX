@@ -222,13 +222,13 @@ namespace utils {
 			@return 時間「time_t」
         */
         //-----------------------------------------------------------------//
-		time_t get_tm() const {
+		time_t get_gmtime() const {
 			tm ts;
 			ts.tm_sec  = get_dec_(&time_[4], 2);
 			ts.tm_min  = get_dec_(&time_[2], 2);
 			ts.tm_hour = get_dec_(&time_[0], 2);
 			ts.tm_mday = get_dec_(&date_[0], 2);
-			ts.tm_mon  = get_dec_(&date_[2], 2);
+			ts.tm_mon  = get_dec_(&date_[2], 2) - 1;
 			ts.tm_year = get_dec_(&date_[4], 2);
 			ts.tm_year += 100;  // 起点１９００年
 			return mktime_gmt(&ts);
