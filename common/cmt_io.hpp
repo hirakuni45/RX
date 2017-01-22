@@ -165,6 +165,15 @@ namespace device {
 		uint16_t get_cmt_count() const {
 			return CMT::CMCNT();
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  TASK クラスの参照
+			@return TASK クラス
+		*/
+		//-----------------------------------------------------------------//
+		static TASK& at_task() { return task_; }
 	};
 
 	template <class CMT, class TASK> volatile uint32_t cmt_io<CMT, TASK>::counter_ = 0;
