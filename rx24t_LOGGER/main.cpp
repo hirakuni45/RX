@@ -26,6 +26,7 @@ namespace {
 	app::logging	logging_;
 	app::recall		recall_;
 	app::setup		setup_;
+
 }
 
 
@@ -138,9 +139,8 @@ int main(int argc, char** argv)
 	select_scene(app::scene_id::root_menu);
 
 	uint32_t cnt = 0;
-	uint8_t nn = 0;
 	while(1) {
-		core_.cmt_.sync();
+		core_.cmt_.at_task().sync3();
 
 		core_.adc_io_.scan();
 		core_.adc_io_.sync();
@@ -168,26 +168,18 @@ int main(int argc, char** argv)
 
 		core_.sdc_.service();
 
-		// LCD 用サービス
-		if(nn == 0) {  // フレームバッファ消去
+		{
 			core_.bitmap_.clear(0);
-			++nn;
-		} else if(nn == 1) {  // 描画
-			// シーン・タスク
 			scene_.service();
-
-			++nn;
-		} else if(nn >= 2) {  // 転送
 			core_.spi_.start(8000000, core_t::SPI::PHASE::TYPE4);  // LCD 用速度と設定
 			core_.lcd_.copy(core_.bitmap_.fb(), core_.bitmap_.page_num());
 			core_.sdc_.setup_speed();  //  SDC 用速度と設定
-			nn = 0;
 		}
 
 		++cnt;
-		if(cnt >= 30) {
+		if(cnt >= 15) {
 			cnt = 0;
 		}
-		LED::P = (cnt < 10) ? 0 : 1;
+		LED::P = (cnt < 5) ? 0 : 1;
 	}
 }
