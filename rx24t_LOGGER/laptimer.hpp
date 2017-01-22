@@ -43,6 +43,7 @@ namespace app {
 		enum class task {
 			menu,
 			main,
+			recall_init,
 		};
 		task	task_;
 
@@ -104,68 +105,118 @@ namespace app {
 
 			core.resource_.draw_number3_12(100, 52, lap_count_);
 
-
-
-#if 0
-	unsigned long a, b, l;
-
-	if(g_lap_step == 0) {
-		// ピットイン中はプログレスバー表示をしない
-		if((g_switch_level & SWITCH_BIT_PIT)) {
-			if(g_switch_level & SWITCH_BIT_PIT) {
-				monograph_draw_string_P(0, (64 - 12), PSTR("- Pit IN -"));
-			}
-		} else if(g_pit_out_count) {
-			monograph_draw_string_P(0, (64 - 12), PSTR("- Pit OUT -"));
-			--g_pit_out_count;
-		} else {
-			// プログレスバー表示
-			if(g_lap_count) {
-				// ピット・アウトした周は表示しない
-				if((g_lap_buff[g_lap_count - 1] & 1) == 0) {
-					b = get_laptimer() - g_lap_time_ref - (g_lap_buff[g_lap_count] >> 1);
-					a = (g_lap_buff[g_lap_count] >> 1) - (g_lap_buff[g_lap_count - 1] >> 1);	// 1周前のタイム
-					if(a > 0) {
-						l = b * 90 / a;
-						if(l >= 90) l = 90;
-						trg = 1;
-						if(l >= 70) {
-							if((g_loop_count & 15) < 6) trg = 0;
+			if(lap_step_ == 0) {
+				// ピットイン中はプログレスバー表示をしない
+				if(core.switch_man_.get_level().get(core_t::SWITCH::PIT)) {
+					core.bitmap_.draw_text(0, (64 - 12), "- Pit IN -");
+				} else if(pit_out_count_) {
+					core.bitmap_.draw_text(0, (64 - 12), "- Pit OUT -");
+					--pit_out_count_;
+				} else {
+					// プログレスバー表示
+					if(lap_count_) {
+						// ピット・アウトした周は表示しない
+						if((lap_buff_[lap_count_ - 1] & 1) == 0) {
+							uint32_t b = get_laptimer_() - lap_time_ref_ - (lap_buff_[lap_count_] >> 1);
+							// 1周前のタイム
+							uint32_t a = (lap_buff_[lap_count_] >> 1) - (lap_buff_[lap_count_ - 1] >> 1);
+							if(a > 0) {
+								uint32_t l = b * 90 / a;
+								if(l >= 90) l = 90;
+								trg = 1;
+								if(l >= 70) {
+									if((core.loop_count_ & 15) < 6) trg = 0;
+								}
+								if(trg) {
+									core.bitmap_.line(0, 56,  l, 56, 1);
+									core.bitmap_.line(0, 57,  l, 57, 1);
+								}
+							}
 						}
-						if(trg) {
-							monograph_line(0, 56,  l, 56, 1);
-							monograph_line(0, 57,  l, 57, 1);
-						}
+						core.bitmap_.line(0, 58, 90, 58, 1);
 					}
 				}
-				monograph_line(0, 58, 90, 58, 1);
+			} else if(lap_exit_ == 0) {
+				lap_exit_active_--;
+				if(lap_exit_active_ == 0) lap_step_ = 0;
+			}
+
+			// ピットアウトの検出
+			if(core.switch_man_.get_negative().get(core_t::SWITCH::PIT)) {
+				pit_out_count_ = TRIGGER_LOOP_PITOUT;
+			}
+
+			// キャンセルボタンのホールド
+			if(core.switch_man_.get_level().get(core_t::SWITCH::CANCEL)) {
+				++cancel_count_;
+				if(cancel_count_ >= 50) {
+					lap_exit_ = 1;
+				}
+			} else {
+				cancel_count_ = 0;
 			}
 		}
-	} else if(g_lap_exit == 0) {
-		g_lap_exit_active--;
-		if(g_lap_exit_active == 0) g_lap_step = 0;
 
-	}
-
-	// ピットアウトの検出
-	if(g_switch_negative & SWITCH_BIT_PIT) {
-		g_pit_out_count = TRIGGER_LOOP_PITOUT;
-	}
-
-	// キャンセルボタンのホールド
-	if(g_switch_level & SWITCH_BIT_CANCEL) {
-		++g_cancel_count;
-		if(g_cancel_count >= 50) {
-			g_lap_exit = 1;
+		// データ・セーブ
+		void data_save_()
+		{
+#if 0
+			if(save_enable_ && lap_count_ > 0) {
+				uint16_t org = 0;
+				eeprom_write_word(org, lap_count_);
+				++org;
+				eeprom_write_word(org, lap_count_ ^ 0xffff);
+		++p1;
+		uint32_t *p2 = (uint32_t*)p1;
+		eeprom_write_dword(p2, (uint32_t)g_start_time);
+		++p2;
+		eeprom_write_dword(p2, (uint32_t)g_lap_total);
+		++p2;
+		int i;
+		for(i = 0; i < g_lap_count; ++i) {
+			eeprom_write_dword(p2, (uint32_t)g_lap_buff[i]);
+			p2++;
 		}
-	} else {
-		g_cancel_count = 0;
 	}
+	install_task(menu_init);
 #endif
 		}
 
+		// リコール初期化
 		void recall_init_()
 		{
+#if 0
+			uint16_t *p1;
+			uint16_t v;
+			int i;
+			uint32_t *p2;
+
+			p1 = 0;
+			lap_count_ = eeprom_read_word(p1);
+	++p1;
+	v  = eeprom_read_word(p1);
+	++p1;
+	if(g_lap_count == (v ^ 0xffff) && g_lap_count > 0) {
+		p2 = (uint32_t*)p1;
+		g_start_time = eeprom_read_dword(p2);
+		++p2;
+		g_lap_total = eeprom_read_dword(p2);
+		++p2;
+		g_lap_best = 0;
+		for(i = 0; i < g_lap_count; ++i) {
+			g_lap_buff[i] = eeprom_read_dword(p2);
+			++p2;
+			if(i > 0) {
+				unsigned long t = (g_lap_buff[i] >> 1) - (g_lap_buff[i - 1] >> 1);
+				if(g_lap_best == 0) g_lap_best = t;
+				else if(g_lap_best > t) g_lap_best = t;
+			}
+		}
+		install_task(recall_date);
+	} else {
+		install_task(recall_nodata);
+	}
+#endif
 		}
 
 		// ラップ・タイマー・メニュー
@@ -204,7 +255,7 @@ namespace app {
 				task_ = task::main;
 				break;
 			case 1:
-////				task_ = [this]{ recall_init_(); };
+				task_ = task::recall_init;
 				break;
 			case 2:
 //				install_task(setup_init);
@@ -252,6 +303,9 @@ namespace app {
 				break;
 			case task::main:
 				laptimer_main_();
+				break;
+			case task::recall_init:
+				recall_init_();
 				break;
 			default:
 				break;
