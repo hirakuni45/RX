@@ -29,7 +29,7 @@
 				errno が設定されます。
 */
 //-----------------------------------------------------------------//
-int _open(const char *path, int flags)
+int open(const char *path, int flags, ...)
 {
 	return 0;
 }
