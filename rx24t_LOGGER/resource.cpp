@@ -9,9 +9,6 @@
 
 namespace app {
 
-// タイトル表示を有効にする場合
-#define TITLE_ENABLE
-
 	// 8x12 ピクセルフォント
 	const uint8_t nmb12_0[] = {
 		#include "resource/nmb12_0.h"
@@ -119,11 +116,9 @@ namespace app {
 		#include "resource/nmb32_rpm.h"
 	};
 
-#ifdef TITLE_ENABLE
-	const uint8_t g_title_bmp[] = {
+	const uint8_t title_bmp[] = {
 		#include "resource/title_bmp.h"
 	};
-#endif
 
 #if 0
 	const uint8_t batt_icon[] = {
