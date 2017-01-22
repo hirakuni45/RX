@@ -29,6 +29,8 @@ namespace app {
 	extern const uint8_t nmb32_kmh[];
 	extern const uint8_t nmb32_rpm[];
 
+	extern const uint8_t title_bmp[];
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	リソース・クラス
@@ -567,9 +569,7 @@ namespace app {
 		//-----------------------------------------------------------------//
 		void draw_title()
 		{
-#ifdef TITLE_ENABLE
-			gr_.draw_mobj(0, 0, g_title_bmp);
-#endif
+			gr_.draw_mobj(0, 0, title_bmp);
 		}
 
 
