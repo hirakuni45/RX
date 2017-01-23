@@ -1,7 +1,12 @@
 EESchema-DOCLIB  Version 2.0
 #
 $CMP RX24T
-D Renesas RX24T
+D Renesas RX24T LFQFP 100
+K RX
+$ENDCMP
+#
+$CMP RX24T_100P
+D Renesas RX24T LFQFP 100
 K RX
 $ENDCMP
 #
