@@ -1,4 +1,4 @@
-update=2016/12/08 11:44:11
+update=2017/01/24 2:56:46
 version=1
 last_client=kicad
 [pcbnew]
@@ -61,3 +61,4 @@ LibName29=valves
 LibName30=D:/Git/RX/KiCAD_lib/akizuki
 LibName31=D:/Git/RX/KiCAD_lib/ftdi
 LibName32=D:/Git/RX/KiCAD_lib/renesas
+LibName33=D:/Git/RX/KiCAD_lib/analog
