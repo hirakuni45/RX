@@ -1,5 +1,13 @@
 EESchema-DOCLIB  Version 2.0
 #
+$CMP ADP2504
+D 1000 mA, 2.5 MHz Buck-Boost DC-to-DC Converters
+$ENDCMP
+#
+$CMP BQ24072T
+D 1.5A USB-Friendly Li-Ion Battery and Power-Path Management
+$ENDCMP
+#
 $CMP DIT4192
 D 192kHz Digital Audio Transmitter
 K TI
