@@ -23,6 +23,16 @@ namespace utils {
 
 	public:
 
+		enum class BAUDRATE : uint8_t {
+			B4800,
+			B9600,
+			B14400,
+			B19200,
+			B38400,
+			B57600,
+			B115200,
+		};
+
 		static const uint32_t sinfo_num_ = 12;		///< 衛星情報の最大数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -353,6 +363,66 @@ namespace utils {
 				}
 			}
 			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@breif	G.P.S. のボーレートを設定
+			@param[in]	bpsno	ボーレート番号
+		 */
+		//-----------------------------------------------------------------//
+		void set_baudrate(BAUDRATE bpsno)
+		{
+//			"$PMTK251,38400*27\r\n"
+// SUP500 GPS
+#if 0
+			sci_.putch(0xA0);
+			sci_.putch(0xA1);
+			sci_.putch(0x00);
+
+			sci_.putch(0x04);	// メッセージ数
+
+			sci_.putch(0x05);	// メッセージID
+			sci_.putch(0x00);	// COM port 0  以外はない
+			sci_.putch(bpsno); 	// 0: 4800, 1: 9600, 2: 19200, 3: 38400, 4: 57600, 5: 115200
+			sci_.putch(0x00);	// 0: update to SRAM, 1: update to both SRAM & FLASH
+			uint8_t sum = 0x05 ^ bpsno;
+			sci_.putch(sum);
+
+			sci_.putch(0x0D);
+			sci_.putch(0x0A);
+#endif
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@breif	G.P.S. の１０Ｈｚ測位の設定@n
+					※事前にボーレートを高く設定する必要がある
+		 */
+		//-----------------------------------------------------------------//
+		void set_rate10()
+		{
+// $PMTK220,1000*1F<CR><LF> 1Hz
+// $PMTK220, 200*2C<CR><LF> 5Hz
+// $PMTK220,100*2F<CR><LF> 10Hz
+// SUP500 GPS
+#if 0
+			sci_.putch(0xA0);
+			sci_.putch(0xA1);
+			sci_.putch(0x00);
+
+			sci_.putch(0x03);
+
+			sci_.putch(0x0E);
+			sci_.putch(0x0A);
+			sci_.putch(0x00);
+			sci_.putch(0x04);
+
+			sci_.putch(0x0D);
+			sci_.putch(0x0A);
+#endif
 		}
 	};
 }
