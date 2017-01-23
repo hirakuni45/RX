@@ -1,0 +1,23 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP DIT4192
+D 192kHz Digital Audio Transmitter
+K TI
+$ENDCMP
+#
+$CMP RX24T
+D Renesas RX24T LFQFP 100
+K RX
+$ENDCMP
+#
+$CMP RX24T_100P
+D Renesas RX24T LFQFP 100
+K RX
+$ENDCMP
+#
+$CMP RX64M
+D Renesas RX64M 176 pin LQFP 
+K RX64M
+$ENDCMP
+#
+#End Doc Library
