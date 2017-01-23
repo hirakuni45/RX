@@ -20,6 +20,7 @@ Renesas RX マイコン
    
 ## RX プロジェクト・リスト
  - /RX600          --->   RX マイコン共通デバイス定義クラス
+ - /RX71M          --->   RX71M 専用のデバイス定義クラス、リンカースクリプト
  - /RX64M          --->   RX64M 専用のデバイス定義クラス、リンカースクリプト
  - /RX63T          --->   RX63T 専用のデバイス定義クラス、リンカースクリプト
  - /RX24T          --->   RX24T 専用のデバイス定義クラス、リンカースクリプト
@@ -29,7 +30,7 @@ Renesas RX マイコン
  - /rxprog         --->   RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
  - /rx63t_chager   --->   RX63T を使ったモバイルバッテリー・チャージャー・プロジェクト
  - /rx24t_first_sample ---> RX24T を使った LED 点滅
- - /rx24t_uart_sample  ---> RX24T を使った UART (SCI1) の制御サンプル
+ - /rx24t_SCI_sample   ---> RX24T を使った SCI1 の制御サンプル
  - /rx24t_SDC_sample   ---> RX24T を使った SD カードの動作サンプル
  - /rx24t_GPS_sample   ---> RX24T を使った GPS の動作サンプル
  - /rx24t_DATA_FLASH_sample ---> RX24T を使ったデータ・フラッシュ操作サンプル
