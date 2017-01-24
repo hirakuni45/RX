@@ -45,16 +45,19 @@ namespace device {
 				break;
 
 			case peripheral::SCI1:
+			case peripheral::SCI1C:
 				ICU::IPR.SCI1 = lvl;
 				ICU::IER.RXI1 = ena;
 				ICU::IER.TEI1 = ena;
 				break;
 			case peripheral::SCI5:
+			case peripheral::SCI5C:
 				ICU::IPR.SCI5 = lvl;
 				ICU::IER.RXI5 = ena;
 				ICU::IER.TEI5 = ena;
 				break;
 			case peripheral::SCI6:
+			case peripheral::SCI6C:
 				ICU::IPR.SCI6 = lvl;
 				ICU::IER.RXI6 = ena;
 				ICU::IER.TEI6 = ena;
