@@ -319,8 +319,11 @@ namespace device {
 		static ICU::VECTOR get_te_vec() { return tev; }
 	};
 
-	typedef scig_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::RXI1, ICU::VECTOR::TEI1> SCI1;
+	typedef scig_t<0x0008A020, peripheral::SCI1,  ICU::VECTOR::RXI1, ICU::VECTOR::TEI1> SCI1;
+	typedef scig_t<0x0008A020, peripheral::SCI1C, ICU::VECTOR::RXI1, ICU::VECTOR::TEI1> SCI1C;
 
-	typedef scig_t<0x0008A0A0, peripheral::SCI5, ICU::VECTOR::RXI5, ICU::VECTOR::TEI5> SCI5;
-	typedef scig_t<0x0008A0C0, peripheral::SCI6, ICU::VECTOR::RXI6, ICU::VECTOR::TEI6> SCI6;
+	typedef scig_t<0x0008A0A0, peripheral::SCI5,  ICU::VECTOR::RXI5, ICU::VECTOR::TEI5> SCI5;
+	typedef scig_t<0x0008A0A0, peripheral::SCI5C, ICU::VECTOR::RXI5, ICU::VECTOR::TEI5> SCI5C;
+	typedef scig_t<0x0008A0C0, peripheral::SCI6,  ICU::VECTOR::RXI6, ICU::VECTOR::TEI6> SCI6;
+	typedef scig_t<0x0008A0C0, peripheral::SCI6C, ICU::VECTOR::RXI6, ICU::VECTOR::TEI6> SCI6C;
 }
