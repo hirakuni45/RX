@@ -25,6 +25,10 @@ $CMP STEREO
 D Stereo conector
 $ENDCMP
 #
+$CMP TCM809R
+D Microcontroller Reset Monitors (3.3V)
+$ENDCMP
+#
 $CMP VS1053
 D Audio Decoder
 $ENDCMP
