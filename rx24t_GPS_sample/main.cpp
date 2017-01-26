@@ -3,7 +3,7 @@
     @brief  RX24T GPS サンプル @n
 			・P00(4) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
 			・PB6/RXD5(27) <--- GPS-TX @n
-			・PB5/TXD5(28) ---> GPS-RX
+			・PB5/TXD5(28) ---> GPS-RX @n
 			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
