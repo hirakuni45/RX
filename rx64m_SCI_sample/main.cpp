@@ -14,6 +14,8 @@
 #include "RX64M/rtc.hpp"
 #include "common/delay.hpp"
 
+#include <cstdio>
+
 namespace {
 
 	class cmt_task {
