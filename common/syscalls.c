@@ -19,9 +19,10 @@
 
 void sci_putch(char ch);
 char sci_getch(void);
+void utf8_to_sjis(const char* src, char* dst);
 
 // FatFS を使う場合有効にする
-// #define FAT_FS
+#define FAT_FS
 
 #ifdef FAT_FS
 #include "ff12b/src/diskio.h"
@@ -81,7 +82,10 @@ int open(const char *path, int flags, ...)
 	if(flags & O_TRUNC) mode |= FA_CREATE_ALWAYS;
 	else if(flags & O_CREAT) mode |= FA_CREATE_NEW;
 
-	FRESULT res = f_open(&file_obj_[file], path, mode);
+	char tmp[256];
+	utf8_to_sjis(path, tmp);
+
+	FRESULT res = f_open(&file_obj_[file], tmp, mode);
 	if(res == FR_OK) {
 		fd_pads_[file] = 1;
 		errno = 0;
@@ -453,7 +457,7 @@ int close(int file)
 //-----------------------------------------------------------------//
 /*!
 	@brief	ファイルディスクリプタが端末を参照しているかをチェックする
-	@param[in]	file	ファイルディスクリプタ
+	@param[in]	file	ファイル記述子
 	@return		端末を参照するオープンされたファイルディスクリプタ @n
 	            であれば 1 を返す。@n
 				そうでなければ 0 を返し、 errno にエラーを示す値を設定する。
