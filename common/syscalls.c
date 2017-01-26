@@ -17,17 +17,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ff12b/src/diskio.h"
-#include "ff12b/src/ff.h"
-
 void sci_putch(char ch);
 char sci_getch(void);
 
+// FatFS を使う場合有効にする
+// #define FAT_FS
+
+#ifdef FAT_FS
+#include "ff12b/src/diskio.h"
+#include "ff12b/src/ff.h"
+
+// 同時にオープンできる数
 #define OPEN_MAX_ 4
 
 static FATFS fatfs_;
 static FIL file_obj_[OPEN_MAX_];
 static char fd_pads_[OPEN_MAX_];
+#endif
 
 //-----------------------------------------------------------------//
 /*!
@@ -43,21 +49,19 @@ static char fd_pads_[OPEN_MAX_];
 //-----------------------------------------------------------------//
 int open(const char *path, int flags, ...)
 {
-	int i, rw;
-	BYTE mode;
-
 	if(path == NULL) {
 		errno = EFAULT;
 		return -1;
 	}
 
+	int file = -1;
+#ifdef FAT_FS
 //	if(g_sd_init_enable == 0 || g_sd_mount_enable == 0) {
 //		errno = EACCES;
 //		return -1;
 //	}
 
-	int file = -1;
-	for(i = 3; i < OPEN_MAX_; ++i) {
+	for(int i = 3; i < OPEN_MAX_; ++i) {
 		if(fd_pads_[i] == 0) {
 			file = i;
 			break;
@@ -68,8 +72,8 @@ int open(const char *path, int flags, ...)
 		return -1;
 	}
 
-	mode = 0;
-	rw = flags & (O_RDONLY | O_WRONLY | O_RDWR);
+	BYTE mode = 0;
+	int rw = flags & (O_RDONLY | O_WRONLY | O_RDWR);
 	if(rw == O_RDONLY) mode = FA_READ | FA_OPEN_EXISTING;
 	else if(rw == O_WRONLY) mode = FA_WRITE;
 	else if(rw == O_RDWR) mode = FA_READ | FA_WRITE | FA_OPEN_ALWAYS;
@@ -77,8 +81,7 @@ int open(const char *path, int flags, ...)
 	if(flags & O_TRUNC) mode |= FA_CREATE_ALWAYS;
 	else if(flags & O_CREAT) mode |= FA_CREATE_NEW;
 
-	FRESULT res;
-	res = f_open(&file_obj_[file], path, mode);
+	FRESULT res = f_open(&file_obj_[file], path, mode);
 	if(res == FR_OK) {
 		fd_pads_[file] = 1;
 		errno = 0;
@@ -94,7 +97,7 @@ int open(const char *path, int flags, ...)
 		errno = EIO;
 		file = -1;
 	}
-
+#endif
 	return file;
 }
 
@@ -110,19 +113,20 @@ int open(const char *path, int flags, ...)
 //-----------------------------------------------------------------//
 int read(int file, void *ptr, int len)
 {
-	int i;
 	int l = 0;
 	if(file >= 0 && file <= 2) {
 		// stdin
 		if(file == 0) {
 			char *p = ptr;
-			for(i = 0; i < len; ++i) {
+			for(int i = 0; i < len; ++i) {
 				*p++ = sci_getch();
 			}
 			errno = 0;
 			l = len;
 		}
-	} else if(file < OPEN_MAX_) {
+	}
+#ifdef FAT_FS
+	else if(file < OPEN_MAX_) {
 		UINT rl;
 		FRESULT res;
 		if(fd_pads_[file] != 0) {
@@ -151,6 +155,7 @@ int read(int file, void *ptr, int len)
 		errno = EBADF;
 		l = -1;
 	}
+#endif
 	return l;
 }
 
@@ -166,25 +171,23 @@ int read(int file, void *ptr, int len)
 //-----------------------------------------------------------------//
 int write(int file, const void *ptr, int len)
 {
-	int i;
 	int l = -1;
-	UINT rl;
-	FRESULT res;
-
 	if(file >= 0 && file <= 2) {
 		if(file == 1 || file == 2) {
 			const char *p = ptr;
-			for(i = 0; i < len; ++i) {
+			for(int i = 0; i < len; ++i) {
 				char ch = *p++;
 				sci_putch(ch);
 			}
 			l = len;
 			errno = 0;
 		}
-	} else if(file < OPEN_MAX_) {
+	}
+#ifdef FAT_FS
+	else if(file < OPEN_MAX_) {
 		if(fd_pads_[file] != 0) {
-
-			res = f_write(&file_obj_[file], ptr, len, &rl);
+			UINT rl;
+			FRESULT res = f_write(&file_obj_[file], ptr, len, &rl);
 			if(res == FR_OK) {
 				errno = 0;
 				l = (int)rl;
@@ -204,6 +207,7 @@ int write(int file, const void *ptr, int len)
 		errno = EBADF;
 		l = -1;
 	}
+#endif
 	return l;
 }
 
@@ -223,7 +227,9 @@ int lseek(int file, int offset, int dir)
 	if(file >= 0 && file <= 2) {
 		errno = 0;
 		pos = 0;
-	} else if(file < OPEN_MAX_) {
+	}
+#ifdef FAT_FS
+	else if(file < OPEN_MAX_) {
 		FRESULT res;
 		DWORD ofs;
 		FIL *fp;
@@ -261,7 +267,7 @@ int lseek(int file, int offset, int dir)
 	} else {
 		errno = EBADF;
 	}
-
+#endif
 	return pos;
 }
 
@@ -277,9 +283,8 @@ int lseek(int file, int offset, int dir)
 //-----------------------------------------------------------------//
 int link(const char *oldpath, const char *newpath)
 {
-	FRESULT res;
-
-	res = f_rename(oldpath, newpath);
+#ifdef FAT_FS
+	FRESULT res = f_rename(oldpath, newpath);
 	if(res == FR_OK) {
 
 		errno = 0;
@@ -291,6 +296,9 @@ int link(const char *oldpath, const char *newpath)
 #endif
 		return -1;
 	}
+#else
+	return -1;
+#endif
 }
 
 
@@ -303,9 +311,8 @@ int link(const char *oldpath, const char *newpath)
 //-----------------------------------------------------------------//
 int unlink(const char *path)
 {
-	FRESULT res;
-
-	res = f_unlink(path);
+#ifdef FAT_FS
+	FRESULT res = f_unlink(path);
 	if(res == FR_OK) {
 		errno = 0;
 		return 0;
@@ -313,6 +320,10 @@ int unlink(const char *path)
 		errno = EIO;
 		return -1;
 	}
+#else
+	errno = EIO;
+	return -1;
+#endif
 }
 
 
@@ -404,8 +415,8 @@ int fstat(int fd, struct stat *st)
 //-----------------------------------------------------------------//
 int close(int file)
 {
+#ifdef FAT_FS
 	FRESULT res;
-
 	if(file >= 0 && file <= 2) {
 		errno = EBADF;
 		return -1;
@@ -419,6 +430,7 @@ int close(int file)
 //			sprintf(g_text, "syscalls: _close ok.(%d):\n", file);
 //			sh72620_uart_puts(STDIO_SIO_CHANEL, g_text);
 #endif
+			return 0;
 		} else {
 #ifdef SYSCALLS_DEBUG
 //			sprintf(g_text, "(%d)f_close error: %x\n", file, (int)res);
@@ -431,7 +443,10 @@ int close(int file)
 		errno = EBADF;
 		return -1;
 	}
-	return 0;
+#else
+	errno = EBADF;
+	return -1;
+#endif
 }
 
 
@@ -449,10 +464,13 @@ int isatty(int file)
 	if(file >= 0 && file <= 2) {
 		errno = 0;
 		return 1;
-	} else if(file < OPEN_MAX_) {
+	}
+#ifdef FAT_FS
+	else if(file < OPEN_MAX_) {
 		errno = ENOTTY;
 		return 0;
 	}
+#endif
 	errno = EINVAL;
 	return 0;
 }
