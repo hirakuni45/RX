@@ -148,6 +148,10 @@ extern "C" {
 #endif
 		return utils::str::get_fattime(t);
 	}
+
+	void utf8_to_sjis(const char* src, char* dst) {
+		utils::str::utf8_to_sjis(src, dst);
+	}
 }
 
 int main(int argc, char** argv);
