@@ -210,6 +210,10 @@ extern "C" {
 #endif
 	}
 
+	void utf8_to_sjis(const char* src, char* dst) {
+		utils::str::utf8_to_sjis(src, dst);
+	}
+
 	uint8_t v_ = 91;
 	uint8_t m_ = 123;
 	uint8_t rand_()

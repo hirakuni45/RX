@@ -19,7 +19,8 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
-				common/time.c
+				common/time.c \
+				common/syscalls.c
 
 PSOURCES	=	main.cpp
 
