@@ -334,21 +334,27 @@ int unlink(const char *path)
 //-----------------------------------------------------------------//
 /*!
 	@brief	ファイルの状態を取得する
-	@param[in]	path	ファイル名
+	@param[in]	file	ファイル記述子
 	@param[in]	st		ファイル情報を格納する構造体のポインター
 	@return		成功なら「０」を返す。
 */
 //-----------------------------------------------------------------//
-int fstat(int fd, struct stat *st)
+int fstat(int file, struct stat *st)
 {
+	int ret = -1;
+	if(file >= 0 && file <= 2) {
+		errno = 0;
+		ret = 0;
+	}
+
+
 #if 0
-	FRESULT res;
 	FILINFO finf;
 	struct tm ttm;
 	time_t tt;
 	mode_t mdt;
 
-	res = f_stat(path, &finf);
+	FRESULT res = f_stat(path, &finf);
 	if(res == FR_OK) {
 		st->st_dev = 0;		/* ファイルがあるデバイスの ID */
 		st->st_ino = 0;		/* inode 番号 */
@@ -406,7 +412,7 @@ int fstat(int fd, struct stat *st)
 		return -1;
 	}
 #endif
-	return 0;
+	return ret;
 }
 
 
