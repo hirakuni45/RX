@@ -17,6 +17,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+// stdin: 0, stdout: 1, stderr: 2 予約
+
+void sci_putch(char ch);
 
 //-----------------------------------------------------------------//
 /*!
@@ -59,7 +62,7 @@ int fstat(int fd, struct stat *st)
 	@return		読み込みバイト数
 */
 //-----------------------------------------------------------------//
-int read(int file, char *ptr, int len)
+int read(int file, void *ptr, int len)
 {
 	return 0;
 }
@@ -74,8 +77,16 @@ int read(int file, char *ptr, int len)
 	@return		書き込みバイト数
 */
 //-----------------------------------------------------------------//
-int write(int file, const char *ptr, int len)
+int write(int file, const void *ptr, int len)
 {
+	if(file == 1 || file == 2) {
+		const char *p = ptr;
+		for(int i = 0; i < len; ++i) {
+			sci_putch(*p);
+			++p;
+		}
+		return len;
+	}
 	return 0;
 }
 
