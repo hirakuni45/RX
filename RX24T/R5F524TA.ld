@@ -39,12 +39,9 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX24TA chip.  */
 MEMORY {
-	RAM (w)   : ORIGIN = 0x00000000, LENGTH = 0x00004000 /* 16K */
+	RAM (w)   : ORIGIN = 0x00000000, LENGTH = 0x00003F00 /* 16K - stack_size (0x100) */
 	STACK (w) : ORIGIN = 0x00004000, LENGTH = 16 /* top of RAM */
-
 	ROM (w)   : ORIGIN = 0xFFFC0000, LENGTH = 0x0003FFD0 /* 256K */
-/* This is the largest RX6000: */
-/*	ROM (w)   : ORIGIN = 0xffe00000, LENGTH = 0x001fffd0 */ /* 2Mb */
 }
 
 SECTIONS
