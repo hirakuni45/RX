@@ -12,8 +12,6 @@
 #include "common/format.hpp"
 #include "common/mtu_io.hpp"
 
-#include "chip/MAX7219.hpp"
-
 namespace {
 
 	class null_task {
@@ -27,15 +25,17 @@ namespace {
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
-	typedef device::MTU4 MTU;
-	device::mtu_io<MTU, null_task> mtu_;
+	typedef device::MTU0 MTU0;
+	device::mtu_io<MTU0, null_task> mtu_;
 }
 
 extern "C" {
+
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
 	}
+
 }
 
 int main(int argc, char** argv);
@@ -77,9 +77,9 @@ int main(int argc, char** argv)
 	sci_.start(115200, sci_level);
 
 	// MTU 設定
-	mtu_.start_pwm1(MTU::clock_source::PCLKA_4);
+//	mtu_.start_pwm1(MTU::clock_source::PCLKA_4);
 
-	utils::format("RX24T start\n");
+	utils::format("RX24T MTU PWM sample\n");
 
 	device::PORT0::PDR.B0 = 1; // output
 
