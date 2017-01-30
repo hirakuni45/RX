@@ -39,7 +39,7 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX600 chip.  */
 MEMORY {
-	RAM (w)   : ORIGIN = 0x00000000, LENGTH = 0x00080000 /* 512k */
+	RAM (w)   : ORIGIN = 0x00000000, LENGTH = 0x0007F000 /* 512k - stack_size (0x1000) */
 	STACK (w) : ORIGIN = 0x00080000, LENGTH = 16 /* top of RAM */
 
 	ROM (w)   : ORIGIN = 0xFFD80000, LENGTH = 0x0028FFD0 /* 2.5M */
