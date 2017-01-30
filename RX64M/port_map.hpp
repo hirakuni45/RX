@@ -85,6 +85,24 @@ namespace device {
 				PORT9::PMR.B0 = 1;
 				PORT9::PMR.B2 = 1;
 				break;
+			case peripheral::SDHI:
+				MPC::P80PFS.PSEL = 0b011010;  // SDHI_WP
+				MPC::P81PFS.PSEL = 0b011010;  // SDHI_CD
+				PORT8::PMR.B0 = 1;
+				PORT8::PMR.B2 = 1;
+				MPC::PC2PFS.PSEL = 0b011010;  // SDHI_D3
+				MPC::PC3PFS.PSEL = 0b011010;  // SDHI_D0
+				MPC::PC4PFS.PSEL = 0b011010;  // SDHI_D1
+				PORTC::PMR.B2 = 1;
+				PORTC::PMR.B3 = 1;
+				PORTC::PMR.B4 = 1;
+   				MPC::P75PFS.PSEL = 0b011010;  // SDHI_D2
+				MPC::P76PFS.PSEL = 0b011010;  // SDHI_CMD
+				MPC::P77PFS.PSEL = 0b011010;  // SDHI_CLK
+				PORT7::PMR.B5 = 1;
+				PORT7::PMR.B6 = 1;
+				PORT7::PMR.B7 = 1;
+				break;
 			default:
 				break;
 			}

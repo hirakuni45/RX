@@ -55,7 +55,10 @@ namespace device {
 				break;
 			case peripheral::CMT0:
 			case peripheral::CMT1:
-				SYSTEM::MSTPCRA.MSTPA15 = f;
+				SYSTEM::MSTPCRA.MSTPA15 = f;	// CMT0, CMT1 のストップ状態解除
+				break;
+			case peripheral::SDHI:
+				SYSTEM::MSTPCRD.MSTPD19 = f;	// SDHI のストップ状態解除
 				break;
 			default:
 				break;
