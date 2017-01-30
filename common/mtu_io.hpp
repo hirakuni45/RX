@@ -1,11 +1,83 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX グループ MTU 制御 @n
-			Copyright 2016 Kunihito Hiramatsu
+	@brief	RX グループ MTU3 制御 @n
+			Copyright 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#if defined(SIG_RX24T)
-#include "RX24T/mtu_io.hpp"
+#include "common/renesas.hpp"
+
+/// F_PCKA は変換パラメーター計算で必要で、設定が無いとエラーにします。
+#ifndef F_PCKA
+#  error "mtu_io.hpp requires F_PCKA to be defined"
 #endif
+
+namespace device {
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  MTU 制御クラス
+		@param[in]	MTU	MTU ユニット
+		@param[in]	TASK	割り込みタスク
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class MTU, class TASK>
+	class mtu_io {
+	public:
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  機能タイプ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class functions : uint8_t {
+			PWM,	///< PWM
+		};
+
+	private:
+
+		static TASK	task_;
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		mtu_io() { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  開始
+			@param[in]	func	機能選択
+			@param[in]	level	割り込みレベル
+		*/
+		//-----------------------------------------------------------------//
+		bool start(functions func, uint8_t level)
+		{
+			power_cfg::turn(MTU::get_peripheral());
+
+
+
+
+
+			return true;
+		}
+
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  TASK クラスの参照
+			@return TASK クラス
+		*/
+		//-----------------------------------------------------------------//
+		static TASK& at_task() { return task_; }
+	};
+
+	template <class MTU, class TASK> TASK mtu_io<MTU, TASK>::task_;
+
+}
+
