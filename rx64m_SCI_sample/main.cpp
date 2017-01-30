@@ -14,8 +14,6 @@
 #include "RX64M/rtc.hpp"
 #include "common/delay.hpp"
 
-#include <cstdio>
-
 namespace {
 
 	class cmt_task {
@@ -31,9 +29,15 @@ namespace {
 }
 
 extern "C" {
+
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
+	}
+
+	char sci_getch(void)
+	{
+		return sci_.getch();
 	}
 }
 
@@ -64,13 +68,15 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
-	// タイマー設定（６０Ｈｚ）
-	uint8_t cmt_irq_level = 4;
-	cmt_.start(60, cmt_irq_level);
+	{  // タイマー設定（６０Ｈｚ）
+		uint8_t int_level = 4;
+		cmt_.start(60, int_level);
+	}
 
-	// SCI 設定
-	static const uint8_t sci_level = 2;
-	sci_.start(115200, sci_level);
+	{  // SCI 設定
+		uint8_t int_level = 2;
+		sci_.start(115200, int_level);
+	}
 
 	utils::format("RX64M start\n");
 
