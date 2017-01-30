@@ -125,11 +125,12 @@ namespace device {
 	typedef port_t<0x0008C007> PORT7;
 	typedef port_t<0x0008C008> PORT8;
 	typedef port_t<0x0008C009> PORT9;
-	typedef port_t<0x0008C00a> PORTA;
-	typedef port_t<0x0008C00b> PORTB;
-	typedef port_t<0x0008C00d> PORTD;
-	typedef port_t<0x0008C00e> PORTE;
-	typedef port_t<0x0008C00f> PORTF;
+	typedef port_t<0x0008C00A> PORTA;
+	typedef port_t<0x0008C00B> PORTB;
+	typedef port_t<0x0008C00C> PORTC;
+	typedef port_t<0x0008C00D> PORTD;
+	typedef port_t<0x0008C00E> PORTE;
+	typedef port_t<0x0008C00F> PORTF;
 	typedef port_t<0x0008C010> PORTG;
 	typedef port_t<0x0008C012> PORTJ;
 
