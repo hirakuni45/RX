@@ -22,7 +22,7 @@ char sci_getch(void);
 void utf8_to_sjis(const char* src, char* dst);
 
 // FatFS を使う場合有効にする
-#define FAT_FS
+// #define FAT_FS
 
 #ifdef FAT_FS
 #include "ff12b/src/diskio.h"
