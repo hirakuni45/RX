@@ -8,15 +8,16 @@ Renesas RX マイコン
    
  現在では、Windows、OS-X、Linux で動作確認が済んだ、専用書き込みプログラムも実装してあり、   
  複数の環境で、開発が出来るようになっています。   
- ※現在サポートされる書き込みデバイスは RX63T、RX24T、RX64M
+ ※現在サポートされ、動作確認済みデバイスは RX63T、RX24T、RX64M
    
  プロジェクトは、Makefile、及び、関連ヘッダー、ソースコードからなり、専用のスタートアップルーチン、   
- リンカースクリプトで構成されています。   
+ リンカースクリプトで構成されています。
+ 「make」コマンド一発で、従属規則生成から、コンパイル、リンクまで完了する為、IDE を必要としません。  
  その為、専用のブートプログラムやローダーは必要なく、作成したバイナリーをそのまま ROM へ書いて実行   
  できます。   
    
- デバイスＩ／Ｏ操作では、C++ で構成されたテンプレートクラスライブラリーを活用出来るように専用の   
- ヘッダーを用意してあり、各種デバイス用の小さなクラスライブラリーの充実も行っています。   
+ デバイスＩ／Ｏ操作では、C++ で実装されたテンプレート・クラス・ライブラリーを活用して専用の   
+ ヘッダーを用意してあり、ユーティリティー的クラス・ライブラリーの充実も行っています。   
    
 ## RX プロジェクト・リスト
  - /RX600          --->   RX マイコン共通デバイス定義クラス
@@ -28,15 +29,15 @@ Renesas RX マイコン
  - /ff12b          --->   ChaN 氏作成の fatfs ソースコードと RX マイコン向け RSPI コード
  - /common         --->   共有クラス、ヘッダーなど
  - /rxprog         --->   RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
- - /rx63t_chager   --->   RX63T を使ったモバイルバッテリー・チャージャー・プロジェクト
+ - /rx63t_chager   --->   RX63T を使ったモバイルバッテリー・チャージャー・プロジェクト（未完）
  - /rx24t_first_sample ---> RX24T を使った LED 点滅
  - /rx24t_SCI_sample   ---> RX24T を使った SCI1 の制御サンプル
  - /rx24t_SDC_sample   ---> RX24T を使った SD カードの動作サンプル
  - /rx24t_GPS_sample   ---> RX24T を使った GPS の動作サンプル
- - /rx24t_DATA_FLASH_sample ---> RX24T を使ったデータ・フラッシュ操作サンプル
+ - /rx24t_DATA_FLASH_sample ---> RX24T を使った内臓データ・フラッシュ操作サンプル
  - /rx24t_LOGGER       ---> RX24T を使ったデータロガー・プロジェクト
  - /rx64m_first_sample ---> RX64M を使った LED 点滅
- - /rx64m_uart_sample  ---> RX64M を使った UART (SCI1) の制御サンプル
+ - /rx64m_SCI_sample  ---> RX64M を使った UART (SCI1) の制御サンプル
  - /rx64m_SDRAM_sample ---> RX64M を使った SDRAM の制御サンプル（128Mビット×2、32ビットバス）
  - /rx64m_RTC_sample   ---> RX64M を使った 内臓 RTC の動作サンプル
 
@@ -80,7 +81,7 @@ Renesas RX マイコン
 ## RX 開発環境準備（OS-X）
 
  - OS-X では、事前に macports をインストールしておきます。（brew は柔軟性が低いのでお勧めしません）
- -  OS−X のバージョンによっては、事前にX−Code、Command Line Tools などのインストールが必要になるかもしれません）
+ - OS−X のバージョンによっては、事前に X−Code、Command Line Tools などのインストールが必要になるかもしれません）
 
  - macports のアップグレード
 
@@ -139,9 +140,9 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 ---
 ## RX 開発環境構築
 
- - RX 用コンパイラ（rx-elf-gcc,g++）は gcc-5.4.0 を使います。
+ - RX 用コンパイラ（rx-elf-gcc,g++）は gcc-6.2.0 を使います。
  - binutils-2.27.tar.gz をダウンロードしておく
- - gcc-5.4.0.tar.gz をダウンロードしておく
+ - gcc-6.2.0.tar.gz をダウンロードしておく
  - newlib-2.4.0.tar.gz をダウンロードしておく
    
 ---
@@ -175,8 +176,8 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 #### C コンパイラをビルド
 ```
     cd
-    tar xfvz gcc-5.4.0.tar.gz
-    cd gcc-5.4.0
+    tar xfvz gcc-6.2.0.tar.gz
+    cd gcc-6.2.0
     mkdir rx_build
 	cd rx_build
     ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto --with-system-zlib
@@ -196,7 +197,7 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
     make install     OS-X: (sudo make install)
 ```
  - Linux 環境では、sudo コマンドで、ローカルで設定した binutils のパスを認識しないので、
-「make install」が失敗する、その為、以下のようなスクリプトを書いて実行する。
+「make install」が失敗します、その為、以下のようなスクリプトを書いて実行します。
 ```
 #!/bin/sh
 # file: rx_install.sh
@@ -214,7 +215,7 @@ make install
 #### C++ コンパイラをビルド
 ```
     cd
-    cd gcc-5.4.0
+    cd gcc-6.2.0
     cd rx_build
     ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c,c++ --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto --with-system-zlib
     make
@@ -265,8 +266,8 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
  - 現在のバージョンでは、消去、書き込み、比較 の動作のみ実装されています。
  - コードプロテクトの ID 設定や比較などは未実装です。
  - RX24T、RX63T では、接続が確立した時に、消去が自動で行われる為、消去動作は無視されます。
- - rx_prog のビルドには「boost_1_60_0」が必要です。
- - boost はヘッダーのみ利用なので、ビルドの必要はありません、boost_1_60_0.zip を展開(MSYS2)するだけです。
+ - rx_prog のビルドには「boost」が必要です。（通常最新バージョンを使う）
+ - boost はヘッダーのみ利用なので、ビルドの必要はありません、boost_X_YY_Z.zip を展開(MSYS2)するだけです。
  - 又は、mingw64 環境などに pacman を使い boost をインストールして、そのパスを設定しても良いでしょう。
 
 ``` 
@@ -275,21 +276,19 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
 ```
 
  - rxprog のビルド（MSYS2）
- - ビルドした実行ファイルは、~/bin に配置します。
+ - ビルドした実行ファイルは、/usr/local/bin に配置します。
 
 ```
     cd rxprog
     make
-    mkdir ~/bin
-    cp rx_prog.exe ~/bin/.
-    cp rx_prog.conf ~/bin/.
-　　※~/bin にパスを通しておく。
+    make install
+　　※/usr/local/bin にパスを通しておく。
 ```
  - rx_prog.conf を編集して、接続する COM ポート、ボーレートの設定をする。
  - /dev/ttyS10 -> COM11 に相当します。（数字に＋１する）
  - 「rx_prog.conf」には、標準のシリアルポートを記述できます、自分の環境に合わせて設定しておくと良いでしょう。
- - ポートの設定は、開発環境によりスイッチできるよう、Windows、OS-X、Linux と別のポートを設定できます。
- - プロジェクトの「Makefile」には、「make run」で書き込めるスクリプトが設定されています。
+ - ポートの設定は、開発環境の違いに対応できるように、Windows、OS-X、Linux と別のポートを設定できます。
+ - 各プロジェクトの「Makefile」には、「make run」で書き込めるスクリプトが設定されています。
   
 ---
       
