@@ -107,6 +107,15 @@ int main(int argc, char** argv)
 			if(cmdn >= 1) {
 				char tmp[128];
 				if(command_.get_word(0, sizeof(tmp), tmp)) {
+#if 0
+					float a = 0.0f;
+					int n = (utils::input("%f", tmp) % a).num();
+					if(n == 1) {
+						utils::format("Value: %10.5f\n") % a;
+					} else {
+						utils::format("Input decimal ?\n");
+					}
+#else
 					int a = 0;
 					int n = (utils::input("%d", tmp) % a).num();
 					if(n == 1) {
@@ -114,6 +123,7 @@ int main(int argc, char** argv)
 					} else {
 						utils::format("Input decimal ?\n");
 					}
+#endif
 				}
 			}
 		}
