@@ -112,12 +112,41 @@ namespace utils {
 			return a;
 		}
 
+
+		float real_() {
+			uint32_t a = 0;
+			uint32_t b = 0;
+			uint32_t c = 1;
+			char ch;
+			bool p = false;
+			while((ch = inp_()) != 0) {
+				if(ch >= '0' && ch <= '9') {
+					a *= 10;
+					a += ch - '0';
+					c *= 10;
+				} else if(ch == '.') {
+					b = a;
+					a = 0;
+					c = 1;
+					p = true;
+				} else {
+					break;
+				}
+			}
+			if(p) {
+				return static_cast<float>(b) + static_cast<float>(a) / static_cast<float>(c);
+			} else {
+				return static_cast<float>(a); 
+			}
+		}
+
 		enum class mode : uint8_t {
 			NONE,
 			BIN,
 			OCT,
 			DEC,
 			HEX,
+			FLOAT,
 		};
 		mode	mode_;
 		bool	err_;
@@ -156,15 +185,19 @@ namespace utils {
 						return;
 					}
 					break;
+
 				case fmm::type:
-					if(ch == 'b' || ch == 'B') {
+					if(ch >= 0x60) ch -= 0x20;
+					if(ch == 'B') {
 						mode_ = mode::BIN;
-					} else if(ch == 'o' || ch == 'O') {
+					} else if(ch == 'O') {
 						mode_ = mode::OCT;
-					} else if(ch == 'd' || ch == 'D') {
+					} else if(ch == 'D') {
 						mode_ = mode::DEC;
-					} else if(ch == 'x' || ch == 'X') {
+					} else if(ch == 'X') {
 						mode_ = mode::HEX;
+					} else if(ch == 'F') {
+						mode_ = mode::FLOAT;
 					} else {
 						err_ = true;
 					}
@@ -178,15 +211,20 @@ namespace utils {
 		}
 
 
-		int32_t nb_(bool sign = true)
-		{
+		bool neg_() {
 			bool neg = false;
-			if(sign) {
-				auto s = inp_();
-				if(s == '-') { neg = true; }
-				else if(s == '+') { neg = false; }
-				else inp_.unget();
-			}
+			auto s = inp_();
+			if(s == '-') { neg = true; }
+			else if(s == '+') { neg = false; }
+			else inp_.unget();
+			return neg;
+		}
+
+
+		int32_t nb_int_(bool sign = true)
+		{
+			auto neg = neg_();
+
 			uint32_t v = 0;
 			switch(mode_) {
 			case mode::BIN:
@@ -210,8 +248,31 @@ namespace utils {
 				next_();
 				if(!err_) ++num_;
 			}
-			if(neg) return -static_cast<int32_t>(v);
+			if(sign && neg) return -static_cast<int32_t>(v);
 			else return static_cast<int32_t>(v);
+		}
+
+
+		float nb_real_()
+		{
+			bool neg = neg_();
+
+			float v = 0.0f;
+			switch(mode_) {
+			case mode::FLOAT:
+				v = real_();
+				break;
+			default:
+				err_ = true;
+				break;
+			}
+			if(!err_) {
+				inp_.unget();
+				next_();
+				if(!err_) ++num_;
+			}
+			if(neg) return -v;
+			else return v;			
 		}
 
 	public:
@@ -249,7 +310,12 @@ namespace utils {
 		basic_input& operator % (T& val)
 		{
 			if(err_) return *this;
-			val = nb_(!std::is_signed<T>::value);
+
+			if(std::is_floating_point<T>::value) {
+				val = nb_real_();
+			} else {
+				val = nb_int_(std::is_signed<T>::value);
+			}
 			return *this;
 		}
 
@@ -263,5 +329,4 @@ namespace utils {
 	};
 
 	typedef basic_input<def_chainp> input;
-
 }
