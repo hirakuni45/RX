@@ -10,6 +10,8 @@
 #include "common/sci_io.hpp"
 #include "common/fifo.hpp"
 #include "common/format.hpp"
+#include "common/input.hpp"
+#include "common/command.hpp"
 
 namespace {
 
@@ -23,12 +25,30 @@ namespace {
 
 	typedef utils::fifo<uint16_t, 64> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
+
+	utils::command<128> command_;
 }
 
 extern "C" {
+
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
+	}
+
+	void sci_puts(const char* str)
+	{
+		sci_.puts(str);
+	}
+
+	char sci_getch(void)
+	{
+		return sci_.getch();
+	}
+
+	uint16_t sci_length()
+	{
+		return sci_.recv_length();
 	}
 }
 
@@ -74,16 +94,28 @@ int main(int argc, char** argv)
 
 	utils::format("RX24T SCI sample\n");
 
+	command_.set_prompt("# ");
+
 	device::PORT0::PDR.B0 = 1; // output
 
 	uint32_t cnt = 0;
-	uint32_t n = 0;
 	while(1) {
 		cmt_.sync();
 
-		if(sci_.recv_length()) {
-			auto ch = sci_.getch();
-			sci_.putch(ch);
+		if(command_.service()) {
+			uint8_t cmdn = command_.get_words();
+			if(cmdn >= 1) {
+				char tmp[128];
+				if(command_.get_word(0, sizeof(tmp), tmp)) {
+					int a = 0;
+					int n = (utils::input("%d", tmp) % a).num();
+					if(n == 1) {
+						utils::format("Value: %d\n") % a;
+					} else {
+						utils::format("Input decimal ?\n");
+					}
+				}
+			}
 		}
 
 		++cnt;
@@ -91,10 +123,5 @@ int main(int argc, char** argv)
 			cnt = 0;
 		}
 		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
-
-		if((n % 60) == 0) {
-			utils::format("%d\n") % (n / 60);
-		}
-		++n;
 	}
 }
