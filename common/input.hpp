@@ -27,12 +27,31 @@ namespace utils {
 		char		last_;
 		bool		unget_;
 	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+			@param[in]	str		入力文字列（省力された場合「sci_getch」を使う）
+		*/
+		//-----------------------------------------------------------------//
 		def_chainp(const char* str = nullptr) : str_(str), last_(0), unget_(false) { }
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  １文字戻す
+		*/
+		//-----------------------------------------------------------------//
 		void unget() {
 			unget_ = true;
 		}
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ファンクタ（文字取得）
+			@return 文字
+		*/
+		//-----------------------------------------------------------------//
 		char operator() () {
 			if(unget_) {
 				unget_ = false;
@@ -52,7 +71,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  汎用入力クラス
-		@param[in]	INP	入力クラス
+		@param[in]	INP	文字入力クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class INP>
@@ -61,6 +80,19 @@ namespace utils {
 		const char*	form_;
 
 		INP			inp_;
+
+		enum class mode : uint8_t {
+			NONE,
+			BIN,
+			OCT,
+			DEC,
+			HEX,
+			FLOAT,
+		};
+		mode	mode_;
+		bool	err_;
+
+		int		num_;
 
 		uint32_t bin_() {
 			uint32_t a = 0;
@@ -140,28 +172,14 @@ namespace utils {
 			}
 		}
 
-		enum class mode : uint8_t {
-			NONE,
-			BIN,
-			OCT,
-			DEC,
-			HEX,
-			FLOAT,
-		};
-		mode	mode_;
-		bool	err_;
-
-		int		num_;
-
-		enum class fmm : uint8_t {
-			none,
-			type,
-
-		};
-
 		void next_()
 		{
+			enum class fmm : uint8_t {
+				none,
+				type,
+			};
 			fmm cm = fmm::none;
+
 			char ch;
 			while((ch = *form_++) != 0) {
 				switch(cm) {
@@ -301,6 +319,15 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  変換ステータスを返す
+			@return 変換が全て正常なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool status() const { return !err_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  テンプレート・オペレーター「%」
 			@param[in]	val	整数型
 			@return	自分の参照
@@ -318,14 +345,6 @@ namespace utils {
 			}
 			return *this;
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  オペレーター「=」
-		*/
-		//-----------------------------------------------------------------//
-		basic_input& operator = (const basic_input& in) { return *this; }
 	};
 
 	typedef basic_input<def_chainp> input;
