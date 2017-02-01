@@ -7,7 +7,7 @@
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include <cstdint>
+#include <type_traits>
 
 extern "C" {
 
@@ -122,7 +122,7 @@ namespace utils {
 		mode	mode_;
 		bool	err_;
 
-		static uint16_t	cnvcnt_;
+		int		num_;
 
 		enum class fmm : uint8_t {
 			none,
@@ -208,7 +208,7 @@ namespace utils {
 			if(!err_) {
 				inp_.unget();
 				next_();
-				if(err_) ++cnvcnt_;
+				if(!err_) ++num_;
 			}
 			if(neg) return -static_cast<int32_t>(v);
 			else return static_cast<int32_t>(v);
@@ -223,9 +223,8 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		basic_input(const char* form, const char* inp = nullptr) : form_(form), inp_(inp),
-			mode_(mode::NONE), err_(false)
+			mode_(mode::NONE), err_(false), num_(0)
 		{
-			cnvcnt_ = 0;
 			next_();
 		}
 
@@ -236,100 +235,32 @@ namespace utils {
 			@return 正常変換数
 		*/
 		//-----------------------------------------------------------------//
-		static uint16_t get_conversion() { return cnvcnt_; }
+		int num() const { return num_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  オペレーター「%」（int）
-			@param[in]	val	整数値
+			@brief  テンプレート・オペレーター「%」
+			@param[in]	val	整数型
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		basic_input& operator % (int& val)
+		template <typename T>
+		basic_input& operator % (T& val)
 		{
 			if(err_) return *this;
-			val = nb_(false);
+			val = nb_(!std::is_signed<T>::value);
 			return *this;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  オペレーター「%」（int16_t）
-			@param[in]	val	整数値
-			@return	自分の参照
+			@brief  オペレーター「=」
 		*/
 		//-----------------------------------------------------------------//
-		basic_input& operator % (int16_t& val)
-		{
-			if(err_) return *this;
-			val = nb_(false);
-			return *this;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  オペレーター「%」（int32_t）
-			@param[in]	val	整数値
-			@return	自分の参照
-		*/
-		//-----------------------------------------------------------------//
-		basic_input& operator % (int32_t& val)
-		{
-			if(err_) return *this;
-			val = nb_();
-			return *this;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  オペレーター「%」（uint16_t）
-			@param[in]	val	整数値
-			@return	自分の参照
-		*/
-		//-----------------------------------------------------------------//
-		basic_input& operator % (uint16_t& val)
-		{
-			if(err_) return *this;
-		   	val = nb_(false);
-			return *this;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  オペレーター「%」（unsigned int）
-			@param[in]	val	整数値
-			@return	自分の参照
-		*/
-		//-----------------------------------------------------------------//
-		basic_input& operator % (unsigned int& val)
-		{
-			if(err_) return *this;
-		   	val = nb_(false);
-			return *this;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  オペレーター「%」（uint32_t）
-			@param[in]	val	整数値
-			@return	自分の参照
-		*/
-		//-----------------------------------------------------------------//
-		basic_input& operator % (uint32_t& val)
-		{
-			if(err_) return *this;
-			val = nb_();
-			return *this;
-		}
+		basic_input& operator = (const basic_input& in) { return *this; }
 	};
-
-	template<class INP> uint16_t basic_input<INP>::cnvcnt_;
 
 	typedef basic_input<def_chainp> input;
 
