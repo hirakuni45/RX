@@ -96,6 +96,12 @@ int main(int argc, char** argv)
 
 	command_.set_prompt("# ");
 
+	{
+		int a;
+		int n = (utils::input("%d") % a).num();
+		utils::format("stdin... N: %d, V: %d\n") % n % a;
+	}
+
 	device::PORT0::PDR.B0 = 1; // output
 
 	uint32_t cnt = 0;
