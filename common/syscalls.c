@@ -123,7 +123,11 @@ int read(int file, void *ptr, int len)
 		if(file == 0) {
 			char *p = ptr;
 			for(int i = 0; i < len; ++i) {
-				*p++ = sci_getch();
+				char ch = sci_getch();
+				sci_putch(ch);  // エコーバック
+				// 改行コードを変換する
+				if(ch == '\r') ch = '\n';
+				*p++ = ch;
 			}
 			errno = 0;
 			l = len;
