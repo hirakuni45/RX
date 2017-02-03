@@ -2,18 +2,20 @@
 //=====================================================================//
 /*! @file
     @brief  input クラス @n
-			数値、文字列などの入力クラス
+			数値、文字列などの入力クラス @n
+			%b ---> ２進の数値 @n
+			%o ---> ８進の数値 @n
+			%d ---> １０進の数値 @n
+			%x ---> １６進の数値 @n
+			%f ---> 浮動小数点数（float、double） @n
+			%c ---> １文字のキャラクター @n
+			%% ---> '%' のキャラクター
 			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include <type_traits>
-
-extern "C" {
-
-	char sci_getch(void);
-
-};
+#include <unistd.h>
 
 namespace utils {
 
@@ -57,7 +59,13 @@ namespace utils {
 				unget_ = false;
 			} else {
 				if(str_ == nullptr) {
-					last_ = sci_getch();
+					char ch;
+					if(read(0, &ch, 1) == 1) {
+						if(ch == '\n') ch = 0;
+						last_ = ch;
+					} else {
+						last_ = 0;
+					}
 				} else {
 					last_ = *str_;
 					if(last_ != 0) { ++str_; }
@@ -76,7 +84,24 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class INP>
 	class basic_input {
+	public:
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  エラー詳細
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class error : uint8_t {
+			none,			///< エラー無し
+			cha_sets,		///< 文字セットの不一致
+			partition,		///< 仕切りキャラクターの不一致
+			input_type,		///< 無効な入力タイプ
+			not_integer,	///< 整数の不一致
+			not_float,		///< 浮動小数点の不一致
+			terminate,		///< 終端文字の不一致
+		};
+
+	private:
 		const char*	form_;
 
 		INP			inp_;
@@ -87,11 +112,11 @@ namespace utils {
 			OCT,
 			DEC,
 			HEX,
-			FLOAT,
+			REAL,
+			CHA,
 		};
 		mode	mode_;
-		bool	err_;
-
+		error	error_;
 		int		num_;
 
 		uint32_t bin_() {
@@ -145,7 +170,8 @@ namespace utils {
 		}
 
 
-		float real_() {
+		template<typename T>
+		T real_() {
 			uint32_t a = 0;
 			uint32_t b = 0;
 			uint32_t c = 1;
@@ -166,11 +192,12 @@ namespace utils {
 				}
 			}
 			if(p) {
-				return static_cast<float>(b) + static_cast<float>(a) / static_cast<float>(c);
+				return static_cast<T>(b) + static_cast<T>(a) / static_cast<T>(c);
 			} else {
-				return static_cast<float>(a); 
+				return static_cast<T>(a); 
 			}
 		}
+
 
 		void next_()
 		{
@@ -193,38 +220,47 @@ namespace utils {
 						}
 						form_ = p;
 						if(!ok) {
-							err_ = true;
+							error_ = error::cha_sets;
 							return;
 						}
 					} else if(ch == '%' && *form_ != '%') {
 						cm = fmm::type;
 					} else if(ch != inp_()) {
-						err_ = true;
+						error_ = error::partition;
 						return;
 					}
 					break;
 
 				case fmm::type:
-					if(ch >= 0x60) ch -= 0x20;
-					if(ch == 'B') {
+					switch(ch) {
+					case 'b':
 						mode_ = mode::BIN;
-					} else if(ch == 'O') {
+						break;
+					case 'o':
 						mode_ = mode::OCT;
-					} else if(ch == 'D') {
+						break;
+					case 'd':
 						mode_ = mode::DEC;
-					} else if(ch == 'X') {
+						break;
+					case 'x':
 						mode_ = mode::HEX;
-					} else if(ch == 'F') {
-						mode_ = mode::FLOAT;
-					} else {
-						err_ = true;
+						break;
+					case 'f':
+						mode_ = mode::REAL;
+						break;
+					case 'c':
+						mode_ = mode::CHA;
+						break;
+					default:
+						error_ = error::input_type;
+						break;
 					}
 					return;
 				}
 			}
 			if(ch == 0 && inp_() == 0) ;
 			else {
-				err_ = true;
+				error_ = error::terminate;
 			}
 		}
 
@@ -258,36 +294,37 @@ namespace utils {
 				v = hex_();
 				break;
 			default:
-				err_ = true;
+				error_ = error::not_integer;
 				break;
 			}
-			if(!err_) {
+			if(error_ == error::none) {
 				inp_.unget();
 				next_();
-				if(!err_) ++num_;
+				if(error_ == error::none) ++num_;
 			}
 			if(sign && neg) return -static_cast<int32_t>(v);
 			else return static_cast<int32_t>(v);
 		}
 
 
-		float nb_real_()
+		template <typename T>
+		T nb_real_()
 		{
 			bool neg = neg_();
 
-			float v = 0.0f;
+			T v = 0.0f;
 			switch(mode_) {
-			case mode::FLOAT:
-				v = real_();
+			case mode::REAL:
+				v = real_<T>();
 				break;
 			default:
-				err_ = true;
+				error_ = error::not_float;
 				break;
 			}
-			if(!err_) {
+			if(error_ == error::none) {
 				inp_.unget();
 				next_();
-				if(!err_) ++num_;
+				if(error_ == error::none) ++num_;
 			}
 			if(neg) return -v;
 			else return v;			
@@ -302,10 +339,28 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		basic_input(const char* form, const char* inp = nullptr) : form_(form), inp_(inp),
-			mode_(mode::NONE), err_(false), num_(0)
+			mode_(mode::NONE), error_(error::none), num_(0)
 		{
 			next_();
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  エラーを返す
+			@return エラー
+		*/
+		//-----------------------------------------------------------------//
+		error error() const { return error_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  変換ステータスを返す
+			@return 変換が全て正常なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool status() const { return error_ == error::none; }
 
 
 		//-----------------------------------------------------------------//
@@ -319,15 +374,6 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  変換ステータスを返す
-			@return 変換が全て正常なら「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool status() const { return !err_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  テンプレート・オペレーター「%」
 			@param[in]	val	整数型
 			@return	自分の参照
@@ -336,12 +382,17 @@ namespace utils {
 		template <typename T>
 		basic_input& operator % (T& val)
 		{
-			if(err_) return *this;
+			if(error_ != error::none) return *this;
 
 			if(std::is_floating_point<T>::value) {
-				val = nb_real_();
+				val = nb_real_<T>();
 			} else {
-				val = nb_int_(std::is_signed<T>::value);
+				if(mode_ == mode::CHA) {
+					val = inp_();
+					next_();
+				} else {
+					val = nb_int_(std::is_signed<T>::value);
+				}
 			}
 			return *this;
 		}
