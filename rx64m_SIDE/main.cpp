@@ -1,13 +1,15 @@
 //=====================================================================//
 /*! @file
-    @brief  RX64M ファースト・サンプル @n
+    @brief  RX64M SIDE sample @n
 			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
 			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "RX64M/system.hpp"
-#include "RX600/port.hpp"
+#include "common/cmt_io.hpp"
+#include "common/sci_io.hpp"
+#include "common/fifo.hpp"
+#include "common/format.hpp"
 
 #include "side/arcade.h"
 
@@ -15,6 +17,29 @@ namespace {
 
 	InvadersMachine side_;
 
+	class cmt_task {
+	public:
+		void operator() () {
+		}
+	};
+
+	device::cmt_io<device::CMT0, cmt_task>  cmt_;
+
+	typedef utils::fifo<uint16_t, 128> buffer;
+	device::sci_io<device::SCI1, buffer, buffer> sci_;
+
+}
+
+extern "C" {
+	void sci_putch(char ch)
+	{
+		sci_.putch(ch);
+	}
+
+	char sci_getch(void)
+	{
+		return sci_.getch();
+	}
 }
 
 int main(int argc, char** argv);

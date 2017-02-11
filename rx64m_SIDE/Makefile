@@ -14,7 +14,8 @@ VPATH		=	../
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c
+				common/vect.c \
+				common/syscalls.c
 
 PSOURCES	=	main.cpp \
 				side/arcade.cpp \
@@ -26,7 +27,7 @@ USER_LIBS	=	stdc++
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
-USER_DEFS	=	F_CLK=120000000 DEVICE_SIG=$(DEVICE)
+USER_DEFS	=	SIG_RX64M F_PCKA=120000000 F_PCKB=60000000
 
 MCU_TARGET	=	
 
@@ -34,7 +35,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX64M
 
-OPTIMIZE	=	-Os -flto
+OPTIMIZE	=	-Os
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
