@@ -67,6 +67,11 @@ extern "C" {
 	{
 		sci_.putch(ch);
 	}
+
+	char sci_getch(void)
+	{
+		return sci_.getch();
+	}
 }
 
 int main(int argc, char** argv);
