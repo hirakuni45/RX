@@ -13,6 +13,8 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 
+#include "common/string_utils.hpp"
+
 namespace {
 
 	class cmt_task {
