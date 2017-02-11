@@ -517,6 +517,35 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  オペレーター「%」(const char*)
+			@param[in]	val	値
+			@return	自分の参照
+		*/
+		//-----------------------------------------------------------------//
+		basic_format& operator % (char* val)
+		{
+			if(error_ != error::none) {
+				return *this;
+			}
+
+			if(mode_ == mode::STR) {
+				zerosupp_ = false;
+				uint8_t n = 0;
+				const char* p = val;
+				while((*p++) != 0) { ++n; }
+				out_str_(val, 0, n);
+			} else {
+				error_ = error::different;
+			}
+
+			reset_();
+			next_();
+			return *this;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  オペレーター「%」
 			@param[in]	val	値
 			@return	自分の参照
