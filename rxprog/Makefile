@@ -19,7 +19,7 @@ PSOURCES	=	main.cpp \
 STDLIBS		=
 OPTLIBS		=
 ifeq ($(OS),Windows_NT)
-INC_SYS		=	/usr/local/boost_1_60_0
+INC_SYS		=	/mingw64/include
 else
 INC_SYS		=	/usr/local/include
 endif
