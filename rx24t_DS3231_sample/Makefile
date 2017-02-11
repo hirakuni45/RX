@@ -15,6 +15,7 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
+				common/syscalls.c \
 				common/time.c
 
 PSOURCES	=	main.cpp
