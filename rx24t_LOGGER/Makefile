@@ -15,9 +15,9 @@ VPATH		=	../
 
 ASOURCES	=	common/start.s
 
-CSOURCES	=	common/syscalls.c \
-				common/init.c \
+CSOURCES	=	common/init.c \
 				common/vect.c \
+				common/syscalls.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c
@@ -30,10 +30,10 @@ USER_LIBS	=	stdc++
 
 LDSCRIPT	=	../RX24T/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX24T F_PCKA=80000000 F_PCKB=40000000 F_PCKD=40000000 F_FCLK=20000000
+USER_DEFS	=	SIG_RX24T F_PCKA=80000000 F_PCKB=40000000 F_PCKD=40000000 F_FCLK=20000000 FAT_FS
 
 ifeq ($(OS),Windows_NT)
-INC_SYS		=	/usr/local/boost_1_60_0
+INC_SYS		=	/mingw64/include
 else
 INC_SYS		=	/usr/local/include
 endif
