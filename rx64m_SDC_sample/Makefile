@@ -7,6 +7,8 @@ TARGET		=	sdc_sample
 
 DEVICE		=	R5F564MF
 
+FATFS_VER	=	ff12b
+
 BUILD		=	release
 
 VPATH		=	../
@@ -15,7 +17,11 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
+				common/syscalls.c \
 				common/time.c
+#				$(FATFS_VER)/src/ff.c \
+#				$(FATFS_VER)/src/option/unicode.c \
+
 
 PSOURCES	=	main.cpp
 

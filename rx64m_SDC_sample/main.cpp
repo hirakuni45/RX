@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  RX64M RTC サンプル @n
+    @brief  RX64M SDC サンプル @n
 			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
 			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -12,6 +12,8 @@
 #include "common/fifo.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/sdc_io.hpp"
+// #include "common/rspi_io.hpp"
 
 #include "common/string_utils.hpp"
 
@@ -29,6 +31,18 @@ namespace {
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
 	utils::rtc_io rtc_;
+
+#if 0
+	// SDC 用　SPI 定義（RSPI0）
+	typedef device::rspi_io<device::RSPI0> sdc_spi;
+	sdc_spi sdc_spi_;
+
+	typedef device::PORT<device::PORT6, device::bitpos::B5> sdc_select;	///< カード選択信号
+	typedef device::PORT<device::PORT6, device::bitpos::B4> sdc_power;	///< カード電源制御
+	typedef device::PORT<device::PORT6, device::bitpos::B3> sdc_detect;	///< カード検出
+
+	utils::sdc_io<sdc_spi, sdc_select, sdc_power, sdc_detect> sdc_(sdc_spi_);
+#endif
 
 	utils::command<64> command_;
 
@@ -55,7 +69,39 @@ extern "C" {
 	{
 		return sci_.recv_length();
 	}
+#if 0
+	DSTATUS disk_initialize(BYTE drv) {
+		return sdc_.at_mmc().disk_initialize(drv);
+	}
 
+	DSTATUS disk_status(BYTE drv) {
+		return sdc_.at_mmc().disk_status(drv);
+	}
+
+	DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
+		return sdc_.at_mmc().disk_read(drv, buff, sector, count);
+	}
+
+	DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
+		return sdc_.at_mmc().disk_write(drv, buff, sector, count);
+	}
+
+	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
+		return sdc_.at_mmc().disk_ioctl(drv, ctrl, buff);
+	}
+
+	DWORD get_fattime(void) {
+		time_t t = 0;
+		if(!rtc_.get_time(t)) {
+			utils::format("Stall RTC read (%d)\n") % static_cast<uint32_t>(iica_.get_last_error());
+		}
+		return utils::str::get_fattime(t);
+	}
+
+	void utf8_to_sjis(const char* src, char* dst) {
+		utils::str::utf8_to_sjis(src, dst);
+	}
+#endif
 	time_t get_time_()
 	{
 		time_t t = 0;
