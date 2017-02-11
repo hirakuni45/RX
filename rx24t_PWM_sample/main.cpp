@@ -30,12 +30,15 @@ namespace {
 }
 
 extern "C" {
-
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
 	}
 
+	char sci_getch(void)
+	{
+		return sci_.getch();
+	}
 }
 
 int main(int argc, char** argv);
