@@ -8,8 +8,6 @@
 //=====================================================================//
 #include "RX64M/system.hpp"
 
-namespace device {
-
 namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -17,20 +15,36 @@ namespace utils {
 		@brief  SDRAM 種別
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class sdram_size {
-		
+	enum class sdram_type {
+		M128,	///< 128 Mbits (16 Mbytes)
+		M256,	///< 256 Mbits (32 Mbytes)
+		M512,	///< 512 Mbits (64 Mbytes)
 	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  バス幅
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class sdram_width {
+		W16,	///< 16 bits
+		W32,	///< 32 bits
+	};
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SDRAM 制御クラス
+		@param[in]	mtype	メモリータイプ
+		@param[in]	busw	バス幅
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <sdram_size size>
+	template <sdram_type mtype, sdram_width busw>
 	class sdram {
 
 	public:
-		void init()
+		void operator() ()
 		{
 			// SDRAM 初期化 128M/32bits bus
 			device::MPC::PFAOE0 = 0xff;  // A8 to A15
@@ -68,4 +82,13 @@ namespace utils {
 			device::BUS::SDCCR.EXENB = 1;
 		}
 	};
+
+	typedef sdram<sdram_type::M128, sdram_width::W16> SDRAM_128M_16W;
+	typedef sdram<sdram_type::M128, sdram_width::W32> SDRAM_128M_32W;
+
+	typedef sdram<sdram_type::M256, sdram_width::W16> SDRAM_256M_16W;
+	typedef sdram<sdram_type::M256, sdram_width::W32> SDRAM_256M_32W;
+
+	typedef sdram<sdram_type::M512, sdram_width::W16> SDRAM_512M_16W;
+	typedef sdram<sdram_type::M512, sdram_width::W32> SDRAM_512M_32W;
 }
