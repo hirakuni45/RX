@@ -41,6 +41,13 @@ namespace device {
 		TMR3,	///< 8 ビットタイマ３
 
 		SDHI,	///< SDHI
+
+		ETHERC0,	///< Ethernet 0
+		ETHERC1,	///< Ethernet 1
+
+		EDMAC0,		///< Ethernet DMA 0
+		EDMAC1,		///< Ethernet DMA 1
+		PTPEDMAC,	///< PTP Ethernet DMA
 	};
 
 }
