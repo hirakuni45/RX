@@ -36,6 +36,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0,  6> CMDIDX;
 			bits_rw_t<io_, bitpos::B6,  2> ACMD;
+			bits_rw_t<io_, bitpos::B0,  8> CMD;
 			bits_rw_t<io_, bitpos::B8,  3> RSPTP;
 			bit_rw_t <io_, bitpos::B11>    CMDTP;
 			bit_rw_t <io_, bitpos::B12>    CMDRW;
@@ -421,7 +422,7 @@ namespace device {
 			@brief  バージョンレジスタ（ SDVER ）
 		*/
 		//-----------------------------------------------------------------//
-		struct sdver_t : public rw32_t<base + 0x1C4> {
+		struct sdver_t : public ro32_t<base + 0x1C4> {
 			typedef ro32_t<base + 0x1C4> io_;
 			using io_::operator ();
 

@@ -6,6 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include "common/renesas.hpp"
 #include "ff12b/src/diskio.h"
 #include "ff12b/src/ff.h"
 #include "common/delay.hpp"
@@ -17,6 +18,11 @@
 #define CT_SD2		0x04		/* SD ver 2 */
 #define CT_SDC		(CT_SD1|CT_SD2)	/* SD */
 #define CT_BLOCK	0x08		/* Block addressing */
+
+/// F_PCKB はクロック速度計算などで必要で、設定が無いとエラーにします。
+#ifndef F_PCKB
+#  error "sdhi_io.hpp requires F_PCKB to be defined"
+#endif
 
 namespace fatfs {
 
@@ -34,106 +40,50 @@ namespace fatfs {
 
 		// MMC/SD command (SPI mode)
 		enum class command : uint8_t {
-			CMD0 = 0,			/* GO_IDLE_STATE */
-			CMD1 = 1,			/* SEND_OP_COND */
-			ACMD41 = 0x80 + 41,	/* SEND_OP_COND (SDC) */
-			CMD8 = 8,			/* SEND_IF_COND */
-			CMD9 = 9,			/* SEND_CSD */
-			CMD10 = 10,			/* SEND_CID */
-			CMD12 = 12,			/* STOP_TRANSMISSION */
-			CMD13 = 13,			/* SEND_STATUS */
-			ACMD13 = 0x80 + 13,	/* SD_STATUS (SDC) */
-			CMD16 = 16,			/* SET_BLOCKLEN */
-			CMD17 = 17,			/* READ_SINGLE_BLOCK */
-			CMD18 = 18,			/* READ_MULTIPLE_BLOCK */
-			CMD23 = 23,			/* SET_BLOCK_COUNT */
-			ACMD23 = 0x80 + 23,	/* SET_WR_BLK_ERASE_COUNT (SDC) */
-			CMD24 = 24,			/* WRITE_BLOCK */
-			CMD25 = 25,			/* WRITE_MULTIPLE_BLOCK */
-			CMD32 = 32,			/* ERASE_ER_BLK_START */
-			CMD33 = 33,			/* ERASE_ER_BLK_END */
-			CMD38 = 38,			/* ERASE */
-			CMD55 = 55,			/* APP_CMD */
-			CMD58 = 58,			/* READ_OCR */
+			CMD0 = 0,			///< GO_IDLE_STATE
+			CMD1 = 1,			///< SEND_OP_COND
+			ACMD41 = 0x80 + 41,	///< SEND_OP_COND (SDC)
+			CMD8 = 8,			///< SEND_IF_COND
+			CMD9 = 9,			///< SEND_CSD
+			CMD10 = 10,			///< SEND_CID
+			CMD12 = 12,			///< STOP_TRANSMISSION
+			CMD13 = 13,			///< SEND_STATUS
+			ACMD13 = 0x80 + 13,	///< SD_STATUS (SDC)
+			CMD16 = 16,			///< SET_BLOCKLEN
+			CMD17 = 17,			///< READ_SINGLE_BLOCK
+			CMD18 = 18,			///< READ_MULTIPLE_BLOCK
+			CMD23 = 23,			///< SET_BLOCK_COUNT
+			ACMD23 = 0x80 + 23,	///< SET_WR_BLK_ERASE_COUNT (SDC)
+			CMD24 = 24,			///< WRITE_BLOCK
+			CMD25 = 25,			///< WRITE_MULTIPLE_BLOCK
+			CMD32 = 32,			///< ERASE_ER_BLK_START
+			CMD33 = 33,			///< ERASE_ER_BLK_END
+			CMD38 = 38,			///< ERASE
+			CMD55 = 55,			///< APP_CMD
+			CMD58 = 58,			///< READ_OCR
 		};
-
-#if 0
-		/* 1:OK, 0:Timeout */
-		int wait_ready_() {
-			BYTE d;
-			UINT tmr;
-			for (tmr = 5000; tmr; tmr--) {	/* Wait for ready in timeout of 500ms */
-				spi_.recv(&d, 1);
-				if (d == 0xFF) break;
-				utils::delay::micro_second(100);
-			}
-			return tmr ? 1 : 0;
-		}
 
 
 		void deselect_() {
-			SEL::P = 1;
-			BYTE d;
-			spi_.recv(&d, 1);	/* Dummy clock (force DO hi-z for multiple slave SPI) */
+//			SEL::P = 1;
+//			BYTE d;
+//			spi_.recv(&d, 1);	/* Dummy clock (force DO hi-z for multiple slave SPI) */
 		}
 
 
-		/* 1:OK, 0:Timeout */
-		int select_() {
-			SEL::P = 0;
-			BYTE d;
-			spi_.recv(&d, 1);	/* Dummy clock (force DO enabled) */
-			if (wait_ready_()) return 1;	/* Wait for card ready */
-			deselect_();
-			return 0;			/* Failed */
-		}
-
-
-		/* 1:OK, 0:Failed */
-		/* Data buffer to store received data */
-		/* Byte count */
-		int rcvr_datablock_ (BYTE *buff, UINT btr)
+		BYTE send_cmd_(command cmd, DWORD arg)
 		{
-			BYTE d[2];
-			UINT tmr;
-			for (tmr = 1000; tmr; tmr--) {	/* Wait for data packet in timeout of 100ms */
-				spi_.recv(d, 1);
-				if (d[0] != 0xFF) break;
-				utils::delay::micro_second(100);
-			}
-			if (d[0] != 0xFE) return 0;		/* If not valid data token, return with error */
+			SDHI::SDSTS1 = 0;
+			SDHI::SDSTS2 = 0;
 
-			spi_.recv(buff, btr);			/* Receive the data block into buffer */
-			spi_.recv(d, 2);				/* Discard CRC */
+			// クロック分周比、クロック許可、自動制御
+			SDHI::SDCLKCR = SDHI::SDCLKCR.CLKSEL.b(1) | SDHI::SDCLKCR.CLKEN.b() | SDHI::SDCLKCR.CLKCTRLEN.b();
 
-			return 1;						/* Return with success */
-		}
+			SDHI::SDARG = arg;
+			SDHI::SDCMD = SDHI::SDCMD.CMD.b(static_cast<uint8_t>(cmd));
 
 
-		/* 1:OK, 0:Failed */
-		/* 512 byte data block to be transmitted */
-		/* Data/Stop token */
-		int xmit_datablock_(const BYTE *buff, BYTE token) {
-			BYTE d[2];
-
-			if (!wait_ready_()) return 0;
-
-			d[0] = token;
-			spi_.send(d, 1);	/* Xmit a token */
-			if (token != 0xFD) {		/* Is it data token? */
-				spi_.send(buff, 512);	/* Xmit the 512 byte data block to MMC */
-				spi_.recv(d, 2);		/* Xmit dummy CRC (0xFF,0xFF) */
-				spi_.recv(d, 1);		/* Receive data response */
-				if ((d[0] & 0x1F) != 0x05)	/* If not accepted, return with error */
-				return 0;
-			}
-
-			return 1;
-		}
-
-
-		BYTE send_cmd_(command cmd, DWORD arg) {
-
+#if 0
 			auto c = static_cast<uint8_t>(cmd);
 			if (c & 0x80) {	/* ACMD<n> is the command sequense of CMD55-CMD<n> */
 				c &= 0x7F;
@@ -173,7 +123,80 @@ namespace fatfs {
 			} while ((d & 0x80) && --n) ;
 
 			return d;			/* Return with the response value */
+#endif
+			return 0;
 		}
+
+
+		/* 1:OK, 0:Failed */
+		/* Data buffer to store received data */
+		/* Byte count */
+		int rcvr_datablock_(BYTE *buff, UINT btr)
+		{
+#if 0
+			BYTE d[2];
+			UINT tmr;
+			for (tmr = 1000; tmr; tmr--) {	/* Wait for data packet in timeout of 100ms */
+				spi_.recv(d, 1);
+				if (d[0] != 0xFF) break;
+				utils::delay::micro_second(100);
+			}
+			if (d[0] != 0xFE) return 0;		/* If not valid data token, return with error */
+
+			spi_.recv(buff, btr);			/* Receive the data block into buffer */
+			spi_.recv(d, 2);				/* Discard CRC */
+#endif
+			return 1;						/* Return with success */
+		}
+
+		/* 1:OK, 0:Failed */
+		/* 512 byte data block to be transmitted */
+		/* Data/Stop token */
+		int xmit_datablock_(const BYTE *buff, BYTE token)
+		{
+#if 0
+			BYTE d[2];
+
+			if (!wait_ready_()) return 0;
+
+			d[0] = token;
+			spi_.send(d, 1);	/* Xmit a token */
+			if (token != 0xFD) {		/* Is it data token? */
+				spi_.send(buff, 512);	/* Xmit the 512 byte data block to MMC */
+				spi_.recv(d, 2);		/* Xmit dummy CRC (0xFF,0xFF) */
+				spi_.recv(d, 1);		/* Receive data response */
+				if ((d[0] & 0x1F) != 0x05)	/* If not accepted, return with error */
+				return 0;
+			}
+#endif
+			return 1;
+		}
+
+
+
+#if 0
+		/* 1:OK, 0:Timeout */
+		int wait_ready_() {
+			BYTE d;
+			UINT tmr;
+			for (tmr = 5000; tmr; tmr--) {	/* Wait for ready in timeout of 500ms */
+				spi_.recv(&d, 1);
+				if (d == 0xFF) break;
+				utils::delay::micro_second(100);
+			}
+			return tmr ? 1 : 0;
+		}
+
+		/* 1:OK, 0:Timeout */
+		int select_() {
+			SEL::P = 0;
+			BYTE d;
+			spi_.recv(&d, 1);	/* Dummy clock (force DO enabled) */
+			if (wait_ready_()) return 1;	/* Wait for card ready */
+			deselect_();
+			return 0;			/* Failed */
+		}
+
 
 		void start_spi_(bool fast)
 		{
@@ -227,9 +250,9 @@ namespace fatfs {
 		{
 			if (drv) return RES_NOTRDY;
 
+			device::power_cfg::turn(SDHI::get_peripheral());
 
-
-
+#if 0
 			/* Apply 80 dummy clocks and the card gets ready to receive command */
 			BYTE buf[4];
 			for (uint8_t n = 10; n; n--) spi_.recv(buf, 1);
@@ -276,6 +299,8 @@ namespace fatfs {
 			start_spi_(true);
 
 			return s;
+#endif
+			return RES_NOTRDY;
 		}
 
 
@@ -293,7 +318,7 @@ namespace fatfs {
 			if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
 			if (!(CardType_ & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
 
-			/*  READ_MULTIPLE_BLOCK : READ_SINGLE_BLOCK */
+			//  READ_MULTIPLE_BLOCK : READ_SINGLE_BLOCK
 			command cmd = count > 1 ? command::CMD18 : command::CMD17;
 			if (send_cmd_(cmd, sector) == 0) {
 				do {
@@ -322,12 +347,11 @@ namespace fatfs {
 			if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
 			if (!(CardType_ & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
 
-			if (count == 1) {	/* Single block write */
+			if (count == 1) {  // Single block write
 			if ((send_cmd_(command::CMD24, sector) == 0)	/* WRITE_BLOCK */
 				&& xmit_datablock_(buff, 0xFE))
 				count = 0;
-			}
-			else {				/* Multiple block write */
+			} else {           // Multiple block write
 				if (CardType_ & CT_SDC) send_cmd_(command::ACMD23, count);
 				if (send_cmd_(command::CMD25, sector) == 0) {	/* WRITE_MULTIPLE_BLOCK */
 				do {
@@ -355,6 +379,7 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff)
 		{
+#if 0
 			if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;	/* Check if card is in the socket */
 
 			DRESULT res = RES_ERROR;
@@ -394,6 +419,8 @@ namespace fatfs {
 			deselect_();
 
 			return res;
+#endif
+			return RES_NOTRDY;
 		}
 	};
 }
