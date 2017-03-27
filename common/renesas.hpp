@@ -61,6 +61,8 @@
 #include "RX64M/icu_mgr.hpp"
 #include "RX64M/sdhi.hpp"
 #include "RX64M/sdram.hpp"
+#include "RX64M/etherc.hpp"
+#include "RX64M/edmac.hpp"
 #else
 #  error "Requires SIG_XXX to be defined"
 #endif
