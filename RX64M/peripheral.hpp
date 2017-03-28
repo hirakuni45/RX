@@ -44,6 +44,7 @@ namespace device {
 
 		ETHERC0,	///< Ethernet 0
 		ETHERC1,	///< Ethernet 1
+		PTPETHERC,	///< PTP Ethernet
 
 		EDMAC0,		///< Ethernet DMA 0
 		EDMAC1,		///< Ethernet DMA 1

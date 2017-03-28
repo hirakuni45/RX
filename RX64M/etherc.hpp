@@ -412,6 +412,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return t; }
 	};
+
 	typedef etherc_t<0x000C0100, peripheral::ETHERC0> ETHERC0;
 	typedef etherc_t<0x000C0300, peripheral::ETHERC1> ETHERC1;
 }
