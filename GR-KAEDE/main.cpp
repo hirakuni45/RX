@@ -1,35 +1,45 @@
 //=====================================================================//
 /*! @file
-    @brief  GR-KAEDE(RX64M) ファースト・サンプル @n
-			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
+    @brief  GR-KAEDE(RX64M) サンプル @n
 			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "common/renesas.hpp"
 
+#include "common/cmt_io.hpp"
+#include "common/fifo.hpp"
+#include "common/sci_io.hpp"
+
+#include "common/ether_io.hpp"
+
+#include "common/format.hpp"
+
 namespace {
 
-	void wait_delay_(uint32_t n)
-	{
-		// とりあえず無駄ループ
-		for(uint32_t i = 0; i < n; ++i) {
-			asm("nop");
+	class cmt_task {
+	public:
+		void operator() () {
 		}
-	}
+	};
 
+	device::cmt_io<device::CMT0, cmt_task>  cmt_;
+
+	typedef utils::fifo<uint8_t, 128> buffer;
+	device::sci_io<device::SCI7, buffer, buffer> sci_;
+
+	device::ether_io<device::ETHERC0, device::EDMAC0> en_;
 }
 
 extern "C" {
 	void sci_putch(char ch)
 	{
-//		sci_.putch(ch);
+		sci_.putch(ch);
 	}
 
 	char sci_getch(void)
 	{
-//		return sci_.getch();
-		return 0;
+		return sci_.getch();
 	}
 }
 
@@ -63,12 +73,34 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR2.UCK = 0b0011;  // USB Clock: 1/4 (96/4=24)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
-	uint32_t wait = 10000000;
+	{  // タイマー設定（６０Ｈｚ）
+		uint8_t int_level = 4;
+		cmt_.start(60, int_level);
+	}
+
+	{  // SCI 設定
+		uint8_t int_level = 2;
+		sci_.start(115200, int_level);
+	}
+
+	utils::format("Start GR-KAEDE\n");
+
 	device::PORTC::PDR.B0 = 1; // output
+
+	uint32_t cnt = 0;
+
 	while(1) {
-		wait_delay_(wait);
-		device::PORTC::PODR.B0 = 0;
-		wait_delay_(wait);
-		device::PORTC::PODR.B0 = 1;
+		cmt_.sync();
+
+		if(sci_.recv_length()) {
+			auto ch = sci_.getch();
+			sci_.putch(ch);
+		}
+
+		++cnt;
+		if(cnt >= 30) {
+			cnt = 0;
+		}
+		device::PORTC::PODR.B0 = (cnt < 10) ? 0 : 1;
 	}
 }

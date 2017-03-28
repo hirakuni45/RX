@@ -9,13 +9,20 @@ DEVICE		=	R5F564MF
 
 BUILD		=	release
 
-VPATH		=	../
+VPATH		=	../ ../uip
 
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
+
+#				uip/uip.c \
+				uip/uip_arp.c \
+				uip/uiplib.c \
+				uip/psock.c \
+				uip/timer.c \
+				uip/uip-neighbor.c
 
 PSOURCES	=	main.cpp
 
@@ -25,7 +32,7 @@ LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
 USER_DEFS	=	SIG_RX64M F_PCKA=96000000 F_PCKB=48000000
 
-MCU_TARGET	=	
+MCU_TARGET	=
 
 INC_SYS		=
 
