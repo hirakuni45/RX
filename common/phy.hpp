@@ -320,15 +320,57 @@ namespace device {
 		}
 
 	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+		*/
+		//-----------------------------------------------------------------//
 		phy_t() : local_advertise_(0) { }
 
 
-/***********************************************************************************************************************
-* Function Name: Phy_Start_Autonegotiate
-* Description  : Starts autonegotiate
-* Arguments    : None
-* Return Value : None
-***********************************************************************************************************************/
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  Resets Ethernet PHY device
+			@return OK: true, ERROR: false
+		*/
+		//-----------------------------------------------------------------//
+		bool init()
+		{
+			/* Reset PHY */
+			write_(PHY_REG_CONTROL, PHY_CONTROL_RESET);
+
+			uint16_t count = 0;
+			uint16_t reg;
+			/* Reset completion waiting */
+			do {
+				reg = read_(PHY_REG_CONTROL);
+				count++;
+			} while ( (reg & PHY_CONTROL_RESET) && (count < PHY_DELAY_RESET) );
+
+			if( count < PHY_DELAY_RESET ) {
+				/* 
+				 * When KSZ8041NL of the Micrel, Inc. is used, 
+				 * the pin that outputs the state of LINK is used combinedly with ACTIVITY in default. 
+				 * The setting of the pin is changed so that only the state of LINK is output. 
+				 */
+#ifdef MICREL_KSZ8041NL
+				reg = read_(PHY_REG_PHY_CONTROL_1);
+				reg &= ~0x8000;
+				reg |= 0x4000;
+				write_(PHY_REG_PHY_CONTROL_1, reg);
+#endif
+				return true;
+			}
+			return false;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  Starts autonegotiate
+			@param[in]	PauseFrameEnableFlag
+		*/
+		//-----------------------------------------------------------------//
 		void start_autonegotiate(bool PauseFrameEnableFlag)
 		{
 			/* Set local ability */
@@ -355,20 +397,15 @@ namespace device {
 		}
 
 
-	/********
-	* Function Name: Phy_Set_Autonegotiate
-	* Description  : reports the other side's physical capability
-	* Arguments    : *line_speed_duplex - 
-	*                    a pointer to the location of both the line speed and the duplex
-	*                *local_pause - 
-	*                    a pointer to the location to store the local pause bits.
-	*                *partner_pause - 
-	*                    a pointer to the location to store the partner pause bits.
-	* Return Value : R_PHY_ERROR
-	*                R_PHY_OK
-	* Note         : The value returned to local_pause and patner_pause is used 
-	*                as it is as an argument of _ R_Ether_PauseResolution function. 
-	***************************************************************************************************/
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  reports the other side's physical capability
+			@param[in]	line_speed_duplex	both the line speed and the duplex
+			@param[in]	local_pause			store the local pause bits.
+			@param[in]	partner_pause		store the partner pause bits.
+			@return OK: true, ERROR: false
+		*/
+		//-----------------------------------------------------------------//
 		bool set_autonegotiate(uint16_t& line_speed_duplex, uint16_t& local_pause, uint16_t& partner_pause)
 		{
 			/* Because reading the first time shows the previous state, the Link status bit is read twice. */
@@ -428,12 +465,12 @@ namespace device {
 		}
 
 
-/***********************************************************************************************************************
-* Function Name: Phy_GetLinkStatus 
-* Description  : Returns the status of the physical link 
-* Arguments    : none 
-* Return Value : -1 if links is down, 0 otherwise 
-***********************************************************************************************************************/
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  Returns the status of the physical link
+			@return false: links is down, true: otherwise 
+		*/
+		//-----------------------------------------------------------------//
 		bool get_link_status()
 		{
 			/* Because reading the first time shows the previous state, the Link status bit is read twice. */
