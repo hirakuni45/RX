@@ -1,7 +1,7 @@
 //=====================================================================//
 /*! @file
     @brief  ハードウェアー・ベクター関係 @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2016, 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -39,6 +39,21 @@ INTERRUPT_FUNC void _rx_nonmaskable_exception_handler(void)
 {
 }
 
+
+//-----------------------------------------------------------------//
+/*!
+	@brief	割り込みの初期化
+ */
+//-----------------------------------------------------------------//
+void init_interrupt(void)
+{
+	// 割り込みベクターテーブルの初期化
+	for(int i = 0; i < 256; ++i) {
+		interrupt_vectors[i] = null_task_;
+	}
+}
+
+
 //-----------------------------------------------------------------//
 /*!
 	@brief	割り込み関数の設定
@@ -56,4 +71,3 @@ void set_interrupt_task(void (*task)(void), uint32_t idx)
 	}
 }
 
-int __dso_handle;

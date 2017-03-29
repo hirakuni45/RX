@@ -17,8 +17,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-void sci_putch(char ch);
-char sci_getch(void);
+void sci_putch(char ch) __attribute__((weak));
+void sci_putch(char ch) { }
+char sci_getch(void) __attribute__((weak));
+char sci_getch(void) { return 0; }
+
 void utf8_to_sjis(const char* src, char* dst);
 
 // FatFS を使う場合有効にする

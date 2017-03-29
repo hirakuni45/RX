@@ -104,6 +104,13 @@ skip_inilist:
 done_inilist:
 	rts
 
+    .section .data
+    .global ___dso_handle
+    .weak   ___dso_handle
+___dso_handle:
+    .long    0
+
+	.text
 	.global	_set_intr_level
 _set_intr_level:
 	and		#15,r1
