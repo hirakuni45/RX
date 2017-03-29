@@ -28,7 +28,7 @@ namespace {
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI7, buffer, buffer> sci_;
 
-	device::ether_io<device::ETHERC0, device::EDMAC0> en_;
+	device::ether_io<device::ETHERC0, device::EDMAC0> eth_;
 }
 
 extern "C" {
@@ -81,6 +81,11 @@ int main(int argc, char** argv)
 	{  // SCI 設定
 		uint8_t int_level = 2;
 		sci_.start(115200, int_level);
+	}
+
+	{  // Ethernet 設定
+		uint8_t int_level = 7;
+		eth_.start(int_level);
 	}
 
 	utils::format("Start GR-KAEDE\n");
