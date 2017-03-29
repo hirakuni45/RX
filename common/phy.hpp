@@ -20,18 +20,15 @@ namespace device {
 	class phy_t {
 
 	public:
-		enum LinkStatE
-		{
-			PHY_NO_LINK = 0,
-			PHY_LINK_10H,
-			PHY_LINK_10F,
-			PHY_LINK_100H,
-			PHY_LINK_100F,
+		enum class LinkStat : uint8_t {
+			NO_LINK = 0,
+			LINK_10H,
+			LINK_10F,
+			LINK_100H,
+			LINK_100F,
 		};
 
-
 	private:
-
 		// Media Independent Interface
 		static const int PHY_MII_ST    = 1;
 		static const int PHY_MII_READ  = 2;
@@ -406,8 +403,10 @@ namespace device {
 			@return OK: true, ERROR: false
 		*/
 		//-----------------------------------------------------------------//
-		bool set_autonegotiate(uint16_t& line_speed_duplex, uint16_t& local_pause, uint16_t& partner_pause)
+		bool set_autonegotiate(LinkStat& line_speed_duplex, uint16_t& local_pause, uint16_t& partner_pause)
 		{
+			line_speed_duplex = LinkStat::NO_LINK;
+
 			/* Because reading the first time shows the previous state, the Link status bit is read twice. */
 			uint16_t reg = read_(PHY_REG_STATUS);
 			reg = read_(PHY_REG_STATUS);
@@ -445,19 +444,19 @@ namespace device {
 
 				/* Establish the line speed and the duplex */
 				if ( reg & PHY_AN_LINK_PARTNER_10H ) {
-					line_speed_duplex = PHY_LINK_10H;
+					line_speed_duplex = LinkStat::LINK_10H;
 				}
 
 				if ( reg & PHY_AN_LINK_PARTNER_10F ) {
-					line_speed_duplex = PHY_LINK_10F;
+					line_speed_duplex = LinkStat::LINK_10F;
 				}
 
 				if ( reg & PHY_AN_LINK_PARTNER_100H ) {
-					line_speed_duplex = PHY_LINK_100H;
+					line_speed_duplex = LinkStat::LINK_100H;
 				}
 
 				if ( reg & PHY_AN_LINK_PARTNER_100F ) {
-					line_speed_duplex = PHY_LINK_100F;
+					line_speed_duplex = LinkStat::LINK_100F;
 				}
 
 			return true;

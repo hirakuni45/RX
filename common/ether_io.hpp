@@ -10,24 +10,19 @@
 #include "common/vect.h"
 #include "common/phy.hpp"
 
-/// F_PCKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCKB
-#  error "sci_io.hpp requires F_PCKB to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCI I/O 制御クラス
-		@param[in]	ETHC インサーネット・クラス
-		@param[in]	EDMAC インサーネット DMA クラス
+		@param[in]	ETHC インサーネット・コントローラー
+		@param[in]	EDMAC インサーネットＤＭＡコントローラー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ETHC, class EDMAC>
 	class ether_io {
 	public:
-		typedef phy_t<ETHC> PHY;
+		typedef phy_t<ETHC> PHY;	///< 物理層コントローラー
 
 		static const int EMAC_BUFSIZE = 1536;  /* Must be 32-byte aligned */
 		/* The number of Rx descriptors. */
@@ -112,6 +107,7 @@ namespace device {
 		static const int ERROR = -1;
 		static const int ERROR_LINK = -2;
 		static const int ERROR_MPDE = -3;
+		static const int ERROR_TACT = -4;	///< Transmission buffer dryness error. 
 
 		static const int NO_DATA = 0;
 
@@ -122,6 +118,11 @@ namespace device {
 
 		static const int NO_USE_MAGIC_PACKET_DETECT = 0;
 		static const int USE_MAGIC_PACKET_DETECT    = 1;
+
+		 // Please define the level of the LINKSTA signal when Link becomes up.
+		static const int LINK_PRESENT    = 0;
+		// Please define the level of the LINKSTA signal when Link becomes down.
+		static const int LINK_NOTPRESENT = 1;
 
 		struct descriptor_s {
     		uint32_t	status;
@@ -212,9 +213,10 @@ namespace device {
 
 		PHY		phy_;
 
-		volatile uint8_t PauseFrameEnableFlag_;
-		volatile uint8_t LchngFlag_;
-		volatile uint8_t TransferEnableFlag_;
+		volatile uint8_t	PauseFrameEnableFlag_;
+		volatile uint8_t	LchngFlag_;
+		volatile uint8_t	TransferEnableFlag_;
+		volatile uint8_t	magic_packet_detect_;
 
 		descriptor_s rx_descriptors_[EMAC_NUM_RX_DESCRIPTORS];
 		descriptor_s tx_descriptors_[EMAC_NUM_TX_DESCRIPTORS];
@@ -362,7 +364,7 @@ namespace device {
 		}
 
 
-		int32_t ether_do_link_(const uint8_t mode)
+		int32_t do_link_(const uint8_t mode)
 		{
 			uint16_t link_speed_duplex  = 0;
 			uint16_t local_pause_bits   = 0;
@@ -477,43 +479,46 @@ namespace device {
 		}
 		
 
+		void configure_mac_(const uint8_t* mac_addr, const uint8_t mode)
+		{
+			/* Software reset */
+			reset_mac_();
+
+			/* Set MAC address */
+			uint32_t mac_h, mac_l;
+			mac_h = (static_cast<uint32_t>(mac_addr[0]) << 24) |
+					(static_cast<uint32_t>(mac_addr[1]) << 16) |
+					(static_cast<uint32_t>(mac_addr[2]) << 8 ) |
+					(static_cast<uint32_t>(mac_addr[3]));
+
+			mac_l = (static_cast<uint32_t>(mac_addr[4]) << 8) |
+					(static_cast<uint32_t>(mac_addr[5]));
+
+			ETHC::MAHR = mac_h;
+			ETHC::MALR = mac_l;
+
+			/* Initialize receive and transmit descriptors */
+			init_descriptors_();
+
+			/* Perform rest of hardware interface configuration */
+			config_ethernet_(mode);
+		}
+
 #if 0
-/***********************************************************************************************************************
-* Function Name: ether_configure_mac
-* Description  : Software reset is executed, and ETHERC and EDMAC are configured. 
-* Arguments    : mac_addr - MAC address
-*                mode - 
-*                   The operational mode is specified. 
-*                   NO_USE_MAGIC_PACKET_DETECT (0) - Communicate mode usually
-*                   USE_MAGIC_PACKET_DETECT    (1) - Magic packet detection mode
-* Return Value : None
-***********************************************************************************************************************/
-static void ether_configure_mac(const uint8_t mac_addr[], const uint8_t mode)
-{
-    uint32_t    mac_h, mac_l;
+		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) {
+			if(level_) {
+				set_interrupt_task(recv_task_, static_cast<uint32_t>(rx_vec));
+				set_interrupt_task(send_task_, static_cast<uint32_t>(tx_vec));
+			} else {
+				set_interrupt_task(nullptr, static_cast<uint32_t>(rx_vec));
+				set_interrupt_task(nullptr, static_cast<uint32_t>(tx_vec));
+			}
+		}
 
-    /* Software reset */
-    _R_Ether_ResetMAC();
-
-    /* Set MAC address */
-    mac_h = ((uint32_t)mac_addr[0] << 24) | \
-            ((uint32_t)mac_addr[1] << 16) | \
-            ((uint32_t)mac_addr[2] << 8 ) | \
-            (uint32_t)mac_addr[3];
-
-    mac_l = ((uint32_t)mac_addr[4] << 8 ) | \
-             (uint32_t)mac_addr[5];
-
-    ETHERC0.MAHR = mac_h;
-    ETHERC0.MALR.LONG = mac_l;
-
-    /* Initialize receive and transmit descriptors */
-    _R_Ether_InitDescriptors();
-
-    /* Perform rest of hardware interface configuration */
-    _R_Ether_ConfigEthernet(mode);
-
-} /* End of function ether_configure_mac() */
+		void set_intr_() {
+			set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
+			icu_mgr::set_level(SCI::get_peripheral(), level_);
+		}
 #endif
 
 	public:
@@ -528,15 +533,31 @@ static void ether_configure_mac(const uint8_t mac_addr[], const uint8_t mode)
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  物理層インスタンスの参照
+			@return 物理層インスタンス
+		*/
+		//-----------------------------------------------------------------//
+		PHY& at_phy() { return phy_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  コントローラーを有効にして起動
-			@param[in]	level	割り込みレベル（０の場合ポーリング）
+			@param[in]	level	割り込みレベル
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint8_t level = 0)
+		bool start(uint8_t level)
 		{
-			level_ = level;
+			power_cfg::turn(ETHC::get_peripheral());
+			power_cfg::turn(EDMAC::get_peripheral());
 
+			level_ = level;
+			if(level == 0) {
+
+			} else {
+
+			}
 
 			return true;
 		}
@@ -699,30 +720,239 @@ static void ether_configure_mac(const uint8_t mac_addr[], const uint8_t mode)
 					app_rx_desc_->status &= ~(RFP1 | RFP0 | RFE | RFS9_RFOVER | RFS8_RAD | RFS7_RMAF | \
                                      RFS4_RRF | RFS3_RTLF | RFS2_RTSF | RFS1_PRE | RFS0_CERF);
 					app_rx_desc_ = app_rx_desc_->next;
+				}
+				if (0x00000000L == EDMAC::EDRRR()) {
+					/* Restart if stopped */
+					EDMAC::EDRRR = 0x00000001L;
+				}
+				ret = OK;
 			}
-			if (0x00000000L == EDMAC::EDRRR()) {
-				/* Restart if stopped */
-				EDMAC::EDRRR = 0x00000001L;
-			}
-			ret = OK;
+    		return ret;
 		}
-    	return ret;
-	}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	Get Points to the buffer pointer used by the stack.
+			@param[in]	buf			buffer pointer
+			@param[in]	buf_size	buffer size
+			@return OK @n
+					ERROR_LINK: The auto negotiation processing is not @n
+								completed and sending and receiving is not permitted. @n
+					ERROR_MPDE: The transmission is not permitted because @n
+								of the detection mode of magic packet. @n
+        			ERROR_TACT: There is not becoming empty of the transmission buffer. 
+		*/
+		//-----------------------------------------------------------------//
+		int32_t write_get_buf(void** buf, uint16_t& buf_size)
+		{
+			int32_t ret;
+			/* When the Link up processing is not completed, return error */
+			if (FLAG_OFF == TransferEnableFlag_) {
+				ret = ERROR_LINK;
+			} else if (1 == ETHC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
+				ret = ERROR_MPDE;
+			} else {  // When the Link up processing is completed
+				/* All transmit buffers are full */
+				if (TACT == (app_tx_desc_->status & TACT)) {
+					ret = ERROR_TACT;
+				} else {
+					/* Give application another buffer to work with */
+					*buf = app_tx_desc_->buf_p;
+					buf_size = app_tx_desc_->size;
+					ret = OK;
+				}
+			}
+			return ret;
+		}
 
 
-#if 0
-int32_t R_ETHER_Write_ZC2_GetBuf(uint32_t ch, void **buf, uint16_t *buf_size);
-int32_t R_ETHER_Write_ZC2_SetBuf(uint32_t ch, const uint32_t len);
-int32_t R_Ether_CheckLink_ZC(uint32_t ch);
-void    R_ETHER_LinkProcess(void);
-int32_t R_ETHER_WakeOnLAN(uint32_t ch);
-void    R_ETHER_Callback_WakeOnLAN(void);
-void    R_ETHER_Callback_Link_On(void);
-void    R_ETHER_Callback_Link_Off(void);
-#endif
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	Transmits an Ethernet frame. @n
+					The transmit descriptor points to the data to transmit. @n
+					Data is sent directly from memory as a "zero copy" operation.
+			@param[in]	len		length of data, in bytes, to transmit	
+			@return OK @n
+					ERROR_LINK: The auto negotiation processing is not @n
+								completed and sending and receiving is not permitted. @n
+					ERROR_MPDE: The transmission is not permitted because @n
+								of the detection mode of magic packet.
+		*/
+		//-----------------------------------------------------------------//
+		int32_t write_set_buf(const uint32_t len)
+		{
+			int32_t ret;
+			/* When the Link up processing is not completed, return error */
+			if (FLAG_OFF == TransferEnableFlag_) {
+				ret = ERROR_LINK;
+			} else if (1 == ETHC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
+				ret = ERROR_MPDE;
+			} else {  // When the Link up processing is completed
+				/* The data of the buffer is made active.  */
+				app_tx_desc_->bufsize = len;
+				app_tx_desc_->status &= ~(TFP1 | TFP0);
+				app_tx_desc_->status |= (TFP1 | TFP0 | TACT);
+				app_tx_desc_ = app_tx_desc_->next;
 
+				if (0x00000000L == EDMAC::EDTRR()) {
+					/* Restart if stopped */
+					EDMAC::EDTRR = 0x00000001L;
+				}
+				ret = OK;
+			}
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	Verifies the Etherent link is up or not.
+			@return Link is up: true, Link is down: false
+		*/
+		//-----------------------------------------------------------------//
+		bool check_link()
+		{
+			return phy_.get_link_status();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	The Link up processing, the Link down processing, @n
+					and the magic packet detection processing are executed. 
+		*/
+		//-----------------------------------------------------------------//
+		void link_process()
+		{
+			/* When the magic packet is detected. */
+			if (FLAG_ON == MpdFlag_) {
+				MpdFlag_ = FLAG_OFF;
+				callback_wake_on_lan();
+			}
+
+			/* When the link is up */
+			if (FLAG_ON_LINK_ON == LchngFlag_) {
+				LchngFlag_ = FLAG_OFF;
+
+				/* 
+				 * The Link Up/Down is confirmed by the Link Status bit of PHY register1, 
+				 * because the LINK signal of PHY-LSI is used for LED indicator, and 
+				 * isn't used for notifing the Link Up/Down to external device.
+				 */
+				auto ret = check_link();
+				if (ret) {
+					/*
+					 * ETHERC and EDMAC are set after ETHERC and EDMAC are reset in software
+					 * and sending and receiving is permitted. 
+					 */
+					configure_mac_(mac_addr_buf_, NO_USE_MAGIC_PACKET_DETECT);
+					do_link_(NO_USE_MAGIC_PACKET_DETECT);
+
+					TransferEnableFlag_ = FLAG_ON;
+					callback_link_on();
+				} else {
+					/* no proccess */
+				}
+			} else if (FLAG_ON_LINK_OFF == LchngFlag_) {  // When the link is down
+				LchngFlag_ = FLAG_OFF;
+				/* 
+				 * The Link Up/Down is confirmed by the Link Status bit of PHY register1, 
+				 * because the LINK signal of PHY-LSI is used for LED indicator, and 
+				 * isn't used for notifing the Link Up/Down to external device.
+				 */
+				auto ret = check_link();
+				if (ret) {
+					/* Disable receive and transmit. */
+					ETHC::ECMR.RE = 0;
+					ETHC::ECMR.TE = 0;
+            
+					TransferEnableFlag_ = FLAG_OFF;
+					callback_link_off();
+				} else {
+					/* no proccess */
+				}
+			} else {
+				/* no proccess */
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	The setting of ETHERC is changed from a usual sending and @n
+					receiving mode to the magic packet detection mode. 
+			@return OK: ok @n
+					ERROR: Became Link down while changing the setting. @n
+					ERROR_LINK: The auto negotiation processing is not @n
+								completed and sending and receiving is not permitted. 
+		*/
+		//-----------------------------------------------------------------//
+		int32_t wake_on_lan()
+		{
+    		int32_t ret;
+			/* When the Link up processing is not completed, return error */
+			if (FLAG_OFF == TransferEnableFlag_)
+			{
+				ret = ERROR_LINK;
+			} else {  // When the Link up processing is completed
+				/* Change to the magic packet detection mode.  */
+				configure_mac_(mac_addr_buf_, USE_MAGIC_PACKET_DETECT);
+				auto ret = do_link_(USE_MAGIC_PACKET_DETECT);
+				if (OK == ret) {
+					/* It is confirmed not to become Link down while changing the setting. */
+					if (LINK_PRESENT == ETHC::PSR.LMON()) {
+						ret = OK;
+					} else {
+						ret = ERROR;
+					}
+				} else {
+					ret = ERROR;
+				}
+			}
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	Callback function that notifies user to have become Link up.
+		*/
+		//-----------------------------------------------------------------//
+		void callback_link_on()
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	Callback function that notifies user to have become Link down.
+		*/
+		//-----------------------------------------------------------------//
+		void callback_link_off()
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	Callback function that notifies user to have detected magic packet.
+		*/
+		//-----------------------------------------------------------------//
+		void callback_wake_on_lan()
+		{
+			/* Please add necessary processing when magic packet is detected.  */
+			/*
+			 * After the close function is called, the open function is called 
+			 * to have to set ETHERC to a usual operational mode
+			 * to usually communicate after magic packet is detected. 
+			 */
+			close();
+			open(mac_addr_buf_);
+
+			/* This code is for the sample program. */
+			magic_packet_detect_ = 1;
+		}
 	};
 
 #if 0
