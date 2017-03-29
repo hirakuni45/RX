@@ -53,13 +53,22 @@ namespace device {
 			case peripheral::SCI7:
 				SYSTEM::MSTPCRB.MSTPB24 = f;	// B24 (SCI7)のストップ状態解除
 				break;
+
 			case peripheral::CMT0:
 			case peripheral::CMT1:
 				SYSTEM::MSTPCRA.MSTPA15 = f;	// CMT0, CMT1 のストップ状態解除
 				break;
+			case peripheral::CMT2:
+			case peripheral::CMT3:
+				SYSTEM::MSTPCRA.MSTPA14 = f;	// CMT0, CMT1 のストップ状態解除
+				break;
+
+
+
 			case peripheral::SDHI:
 				SYSTEM::MSTPCRD.MSTPD19 = f;	// SDHI のストップ状態解除
 				break;
+
 			case peripheral::ETHERC0:
 			case peripheral::EDMAC0:
 				SYSTEM::MSTPCRB.MSTPB15 = f;	// ETHER0, EDMAC0 のストップ状態解除

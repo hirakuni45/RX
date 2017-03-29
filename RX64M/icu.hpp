@@ -2,7 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX64M グループ・ICUb 定義 @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2016,2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -162,6 +162,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  IR レジスタ
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -211,6 +212,12 @@ namespace device {
 
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
+
+			rw8_t<base + 106> GROUPBE0;
+			rw8_t<base + 110> GROUPBL0;
+			rw8_t<base + 111> GROUPBL1;
+			rw8_t<base + 112> GROUPAL0;
+			rw8_t<base + 113> GROUPAL1;
 		};
 		static ir_t<0x00087010> IR;
 
@@ -279,6 +286,14 @@ namespace device {
 			typedef rw8_t<base + 0x0C> ier0C;
 			bit_rw_t<ier0C, bitpos::B2>	RXI7;
 			bit_rw_t<ier0C, bitpos::B3>	TXI7;
+
+			typedef rw8_t<base + 0x0D> ier0D;
+			bit_rw_t<ier0D, bitpos::B2>	GROUPBE0;
+			bit_rw_t<ier0D, bitpos::B6>	GROUPBL0;
+			bit_rw_t<ier0D, bitpos::B7>	GROUPBL1;
+			typedef rw8_t<base + 0x0E> ier0E;
+			bit_rw_t<ier0E, bitpos::B0>	GROUPAL0;
+			bit_rw_t<ier0E, bitpos::B1> GROUPAL1;
 		};
 		static ier_t<0x00087200> IER;
 
@@ -336,12 +351,414 @@ namespace device {
 			rw8_t<base + 86> RXI6;
 			rw8_t<base + 87> TXI6;
 
-
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
+
+			rw8_t<base + 106> GROUPBE0;
+			rw8_t<base + 110> GROUPBL0;
+			rw8_t<base + 111> GROUPBL1;
+			rw8_t<base + 112> GROUPAL0;
+			rw8_t<base + 113> GROUPAL1;
 		};
 		static ipr_t<0x00087300> IPR;
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み要求レジスタ
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct grp_t : public ro32_t<base> {
+			typedef ro32_t<base> io_;
+			using io_::operator ();
+
+			bit_ro_t <io_, bitpos::B0>  IS0;
+			bit_ro_t <io_, bitpos::B1>  IS1;
+			bit_ro_t <io_, bitpos::B2>  IS2;
+			bit_ro_t <io_, bitpos::B3>  IS3;
+			bit_ro_t <io_, bitpos::B4>  IS4;
+			bit_ro_t <io_, bitpos::B5>  IS5;
+			bit_ro_t <io_, bitpos::B6>  IS6;
+			bit_ro_t <io_, bitpos::B7>  IS7;
+
+			bit_ro_t <io_, bitpos::B8>  IS8;
+			bit_ro_t <io_, bitpos::B9>  IS9;
+			bit_ro_t <io_, bitpos::B10> IS10;
+			bit_ro_t <io_, bitpos::B11> IS11;
+			bit_ro_t <io_, bitpos::B12> IS12;
+			bit_ro_t <io_, bitpos::B13> IS13;
+			bit_ro_t <io_, bitpos::B14> IS14;
+			bit_ro_t <io_, bitpos::B15> IS15;
+
+			bit_ro_t <io_, bitpos::B16> IS16;
+			bit_ro_t <io_, bitpos::B17> IS17;
+			bit_ro_t <io_, bitpos::B18> IS18;
+			bit_ro_t <io_, bitpos::B19> IS19;
+			bit_ro_t <io_, bitpos::B20> IS20;
+			bit_ro_t <io_, bitpos::B21> IS21;
+			bit_ro_t <io_, bitpos::B22> IS22;
+			bit_ro_t <io_, bitpos::B23> IS23;
+
+			bit_ro_t <io_, bitpos::B24> IS24;
+			bit_ro_t <io_, bitpos::B25> IS25;
+			bit_ro_t <io_, bitpos::B26> IS26;
+			bit_ro_t <io_, bitpos::B27> IS27;
+			bit_ro_t <io_, bitpos::B28> IS28;
+			bit_ro_t <io_, bitpos::B29> IS29;
+			bit_ro_t <io_, bitpos::B30> IS30;
+			bit_ro_t <io_, bitpos::B31> IS31;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ BE0 割り込み要求レジスタ（GRPBE0）@n
+					グループ BL0/1 割り込み要求レジスタ（GRPBL0/GRPBL1）@n
+					グループ AL0/1 割り込み要求レジスタ（GRPAL0/GRPAL1）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static grp_t<0x00087600> GRPBE0;
+		static grp_t<0x00087630> GRPBL0;
+		static grp_t<0x00087634> GRPBL1;
+		static grp_t<0x00087830> GRPAL0;
+		static grp_t<0x00087834> GRPAL1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み要求許可レジスタ
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct gen_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  EN0;
+			bit_rw_t <io_, bitpos::B1>  EN1;
+			bit_rw_t <io_, bitpos::B2>  EN2;
+			bit_rw_t <io_, bitpos::B3>  EN3;
+			bit_rw_t <io_, bitpos::B4>  EN4;
+			bit_rw_t <io_, bitpos::B5>  EN5;
+			bit_rw_t <io_, bitpos::B6>  EN6;
+			bit_rw_t <io_, bitpos::B7>  EN7;
+
+			bit_rw_t <io_, bitpos::B8>  EN8;
+			bit_rw_t <io_, bitpos::B9>  EN9;
+			bit_rw_t <io_, bitpos::B10> EN10;
+			bit_rw_t <io_, bitpos::B11> EN11;
+			bit_rw_t <io_, bitpos::B12> EN12;
+			bit_rw_t <io_, bitpos::B13> EN13;
+			bit_rw_t <io_, bitpos::B14> EN14;
+			bit_rw_t <io_, bitpos::B15> EN15;
+
+			bit_rw_t <io_, bitpos::B16> EN16;
+			bit_rw_t <io_, bitpos::B17> EN17;
+			bit_rw_t <io_, bitpos::B18> EN18;
+			bit_rw_t <io_, bitpos::B19> EN19;
+			bit_rw_t <io_, bitpos::B20> EN20;
+			bit_rw_t <io_, bitpos::B21> EN21;
+			bit_rw_t <io_, bitpos::B22> EN22;
+			bit_rw_t <io_, bitpos::B23> EN23;
+
+			bit_rw_t <io_, bitpos::B24> EN24;
+			bit_rw_t <io_, bitpos::B25> EN25;
+			bit_rw_t <io_, bitpos::B26> EN26;
+			bit_rw_t <io_, bitpos::B27> EN27;
+			bit_rw_t <io_, bitpos::B28> EN28;
+			bit_rw_t <io_, bitpos::B29> EN29;
+			bit_rw_t <io_, bitpos::B30> EN30;
+			bit_rw_t <io_, bitpos::B31> EN31;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ BE0 割り込み要求許可レジスタ（GENBE0）@n
+					グループ BL0/1 割り込み要求許可レジスタ（GENBL0/GENBL1）@n
+					グループ AL0/1 割り込み要求許可レジスタ（GENAL0/GENAL1）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static gen_t<0x00087640> GENBE0;
+		static gen_t<0x00087670> GENBL0;
+		static gen_t<0x00087674> GENBL1;
+		static gen_t<0x00087870> GENAL0;
+		static gen_t<0x00087874> GENAL1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ BE0 割り込みクリアレジスタ（GCRBE0）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct gcrbe0_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  CLR0;
+			bit_rw_t <io_, bitpos::B1>  CLR1;
+			bit_rw_t <io_, bitpos::B2>  CLR2;
+			bit_rw_t <io_, bitpos::B3>  CLR3;
+			bit_rw_t <io_, bitpos::B4>  CLR4;
+			bit_rw_t <io_, bitpos::B5>  CLR5;
+			bit_rw_t <io_, bitpos::B6>  CLR6;
+			bit_rw_t <io_, bitpos::B7>  CLR7;
+
+			bit_rw_t <io_, bitpos::B8>  CLR8;
+			bit_rw_t <io_, bitpos::B9>  CLR9;
+			bit_rw_t <io_, bitpos::B10> CLR10;
+			bit_rw_t <io_, bitpos::B11> CLR11;
+			bit_rw_t <io_, bitpos::B12> CLR12;
+			bit_rw_t <io_, bitpos::B13> CLR13;
+			bit_rw_t <io_, bitpos::B14> CLR14;
+			bit_rw_t <io_, bitpos::B15> CLR15;
+
+			bit_rw_t <io_, bitpos::B16> CLR16;
+			bit_rw_t <io_, bitpos::B17> CLR17;
+			bit_rw_t <io_, bitpos::B18> CLR18;
+			bit_rw_t <io_, bitpos::B19> CLR19;
+			bit_rw_t <io_, bitpos::B20> CLR20;
+			bit_rw_t <io_, bitpos::B21> CLR21;
+			bit_rw_t <io_, bitpos::B22> CLR22;
+			bit_rw_t <io_, bitpos::B23> CLR23;
+
+			bit_rw_t <io_, bitpos::B24> CLR24;
+			bit_rw_t <io_, bitpos::B25> CLR25;
+			bit_rw_t <io_, bitpos::B26> CLR26;
+			bit_rw_t <io_, bitpos::B27> CLR27;
+			bit_rw_t <io_, bitpos::B28> CLR28;
+			bit_rw_t <io_, bitpos::B29> CLR29;
+			bit_rw_t <io_, bitpos::B30> CLR30;
+			bit_rw_t <io_, bitpos::B31> CLR31;
+		};
+		static gcrbe0_t<0x00087680> GCRBE0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込み要求レジスタ
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct pixr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  PIR0;
+			bit_rw_t <io_, bitpos::B1>  PIR1;
+			bit_rw_t <io_, bitpos::B2>  PIR2;
+			bit_rw_t <io_, bitpos::B3>  PIR3;
+			bit_rw_t <io_, bitpos::B4>  PIR4;
+			bit_rw_t <io_, bitpos::B5>  PIR5;
+			bit_rw_t <io_, bitpos::B6>  PIR6;
+			bit_rw_t <io_, bitpos::B7>  PIR7;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込み B 要求レジスタ k（PIBRk）（k = 0h ～ Ah）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static pixr_t<0x00087700> PIBR0;
+		static pixr_t<0x00087701> PIBR1;
+		static pixr_t<0x00087702> PIBR2;
+		static pixr_t<0x00087703> PIBR3;
+		static pixr_t<0x00087704> PIBR4;
+		static pixr_t<0x00087705> PIBR5;
+		static pixr_t<0x00087706> PIBR6;
+		static pixr_t<0x00087707> PIBR7;
+		static pixr_t<0x00087708> PIBR8;
+		static pixr_t<0x00087709> PIBR9;
+		static pixr_t<0x0008770A> PIBRA;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ Bh）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static pixr_t<0x00087900> PIAR0;
+		static pixr_t<0x00087901> PIAR1;
+		static pixr_t<0x00087902> PIAR2;
+		static pixr_t<0x00087903> PIAR3;
+		static pixr_t<0x00087904> PIAR4;
+		static pixr_t<0x00087905> PIAR5;
+		static pixr_t<0x00087906> PIAR6;
+		static pixr_t<0x00087907> PIAR7;
+		static pixr_t<0x00087908> PIAR8;
+		static pixr_t<0x00087909> PIAR9;
+		static pixr_t<0x0008790A> PIARA;
+		static pixr_t<0x0008790B> PIARB;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込み B 要因選択レジスタ Xn（SLIBXRn）（n = 128 ～ 143）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static rw8_t<0x00087780> SLIBX128;
+		static rw8_t<0x00087781> SLIBX129;
+		static rw8_t<0x00087782> SLIBX130;
+		static rw8_t<0x00087783> SLIBX131;
+		static rw8_t<0x00087784> SLIBX132;
+		static rw8_t<0x00087785> SLIBX133;
+		static rw8_t<0x00087786> SLIBX134;
+		static rw8_t<0x00087787> SLIBX135;
+		static rw8_t<0x00087788> SLIBX136;
+		static rw8_t<0x00087789> SLIBX137;
+		static rw8_t<0x0008778A> SLIBX138;
+		static rw8_t<0x0008778B> SLIBX139;
+		static rw8_t<0x0008778C> SLIBX140;
+		static rw8_t<0x0008778D> SLIBX141;
+		static rw8_t<0x0008778E> SLIBX142;
+		static rw8_t<0x0008778F> SLIBX143;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込み B 要因選択レジスタ n（SLIBRn）（n = 144 ～ 207）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static rw8_t<0x00087790> SLIBR144;
+		static rw8_t<0x00087791> SLIBR145;
+		static rw8_t<0x00087792> SLIBR146;
+		static rw8_t<0x00087793> SLIBR147;
+		static rw8_t<0x00087794> SLIBR148;
+		static rw8_t<0x00087795> SLIBR149;
+		static rw8_t<0x00087796> SLIBR150;
+		static rw8_t<0x00087797> SLIBR151;
+		static rw8_t<0x00087798> SLIBR152;
+		static rw8_t<0x00087799> SLIBR153;
+		static rw8_t<0x0008779A> SLIBR154;
+		static rw8_t<0x0008779B> SLIBR155;
+		static rw8_t<0x0008779C> SLIBR156;
+		static rw8_t<0x0008779D> SLIBR157;
+		static rw8_t<0x0008779E> SLIBR158;
+		static rw8_t<0x0008779F> SLIBR159;
+
+		static rw8_t<0x000877A0> SLIBR160;
+		static rw8_t<0x000877A1> SLIBR161;
+		static rw8_t<0x000877A2> SLIBR162;
+		static rw8_t<0x000877A3> SLIBR163;
+		static rw8_t<0x000877A4> SLIBR164;
+		static rw8_t<0x000877A5> SLIBR165;
+		static rw8_t<0x000877A6> SLIBR166;
+		static rw8_t<0x000877A7> SLIBR167;
+		static rw8_t<0x000877A8> SLIBR168;
+		static rw8_t<0x000877A9> SLIBR169;
+		static rw8_t<0x000877AA> SLIBR170;
+		static rw8_t<0x000877AB> SLIBR171;
+		static rw8_t<0x000877AC> SLIBR172;
+		static rw8_t<0x000877AD> SLIBR173;
+		static rw8_t<0x000877AE> SLIBR174;
+		static rw8_t<0x000877AF> SLIBR175;
+
+		static rw8_t<0x000877B0> SLIBR176;
+		static rw8_t<0x000877B1> SLIBR177;
+		static rw8_t<0x000877B2> SLIBR178;
+		static rw8_t<0x000877B3> SLIBR179;
+		static rw8_t<0x000877B4> SLIBR180;
+		static rw8_t<0x000877B5> SLIBR181;
+		static rw8_t<0x000877B6> SLIBR182;
+		static rw8_t<0x000877B7> SLIBR183;
+		static rw8_t<0x000877B8> SLIBR184;
+		static rw8_t<0x000877B9> SLIBR185;
+		static rw8_t<0x000877BA> SLIBR186;
+		static rw8_t<0x000877BB> SLIBR187;
+		static rw8_t<0x000877BC> SLIBR188;
+		static rw8_t<0x000877BD> SLIBR189;
+		static rw8_t<0x000877BE> SLIBR190;
+		static rw8_t<0x000877BF> SLIBR191;
+
+		static rw8_t<0x000877C0> SLIBR192;
+		static rw8_t<0x000877C1> SLIBR193;
+		static rw8_t<0x000877C2> SLIBR194;
+		static rw8_t<0x000877C3> SLIBR195;
+		static rw8_t<0x000877C4> SLIBR196;
+		static rw8_t<0x000877C5> SLIBR197;
+		static rw8_t<0x000877C6> SLIBR198;
+		static rw8_t<0x000877C7> SLIBR199;
+		static rw8_t<0x000877C8> SLIBR200;
+		static rw8_t<0x000877C9> SLIBR201;
+		static rw8_t<0x000877CA> SLIBR202;
+		static rw8_t<0x000877CB> SLIBR203;
+		static rw8_t<0x000877CC> SLIBR204;
+		static rw8_t<0x000877CD> SLIBR205;
+		static rw8_t<0x000877CE> SLIBR206;
+		static rw8_t<0x000877CF> SLIBR207;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static rw8_t<0x000879D0> SLIAR208;
+		static rw8_t<0x000879D1> SLIAR209;
+		static rw8_t<0x000879D2> SLIAR210;
+		static rw8_t<0x000879D3> SLIAR211;
+		static rw8_t<0x000879D4> SLIAR212;
+		static rw8_t<0x000879D5> SLIAR213;
+		static rw8_t<0x000879D6> SLIAR214;
+		static rw8_t<0x000879D7> SLIAR215;
+		static rw8_t<0x000879D8> SLIAR216;
+		static rw8_t<0x000879D9> SLIAR217;
+		static rw8_t<0x000879DA> SLIAR218;
+		static rw8_t<0x000879DB> SLIAR219;
+		static rw8_t<0x000879DC> SLIAR220;
+		static rw8_t<0x000879DD> SLIAR221;
+		static rw8_t<0x000879DE> SLIAR222;
+		static rw8_t<0x000879DF> SLIAR223;
+
+		static rw8_t<0x000879E0> SLIAR224;
+		static rw8_t<0x000879E1> SLIAR225;
+		static rw8_t<0x000879E2> SLIAR226;
+		static rw8_t<0x000879E3> SLIAR227;
+		static rw8_t<0x000879E4> SLIAR228;
+		static rw8_t<0x000879E5> SLIAR229;
+		static rw8_t<0x000879E6> SLIAR230;
+		static rw8_t<0x000879E7> SLIAR231;
+		static rw8_t<0x000879E8> SLIAR232;
+		static rw8_t<0x000879E9> SLIAR233;
+		static rw8_t<0x000879EA> SLIAR234;
+		static rw8_t<0x000879EB> SLIAR235;
+		static rw8_t<0x000879EC> SLIAR236;
+		static rw8_t<0x000879ED> SLIAR237;
+		static rw8_t<0x000879EE> SLIAR238;
+		static rw8_t<0x000879EF> SLIAR239;
+
+		static rw8_t<0x000879F0> SLIAR240;
+		static rw8_t<0x000879F1> SLIAR241;
+		static rw8_t<0x000879F2> SLIAR242;
+		static rw8_t<0x000879F3> SLIAR243;
+		static rw8_t<0x000879F4> SLIAR244;
+		static rw8_t<0x000879F5> SLIAR245;
+		static rw8_t<0x000879F6> SLIAR246;
+		static rw8_t<0x000879F7> SLIAR247;
+		static rw8_t<0x000879F8> SLIAR248;
+		static rw8_t<0x000879F9> SLIAR249;
+		static rw8_t<0x000879FA> SLIAR250;
+		static rw8_t<0x000879FB> SLIAR251;
+		static rw8_t<0x000879FC> SLIAR252;
+		static rw8_t<0x000879FD> SLIAR253;
+		static rw8_t<0x000879FE> SLIAR254;
+		static rw8_t<0x000879FF> SLIAR255;
 	};
 	typedef icu_t ICU;
 }

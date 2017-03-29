@@ -40,6 +40,8 @@ namespace device {
 		TMR2,	///< 8 ビットタイマ２
 		TMR3,	///< 8 ビットタイマ３
 
+		S12AD,	///< 12 ビット A/D コンバータ
+
 		SDHI,	///< SDHI
 
 		ETHERC0,	///< Ethernet 0
