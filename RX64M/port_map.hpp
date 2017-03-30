@@ -2,7 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX64M グループ・ポート・マッピング @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2016, 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -102,6 +102,30 @@ namespace device {
 				PORT7::PMR.B5 = 1;
 				PORT7::PMR.B6 = 1;
 				PORT7::PMR.B7 = 1;
+				break;
+			case peripheral::ETHERC0:
+				MPC::P71PFS.PSEL = 0b010001;  // ET0_MDIO
+				MPC::P72PFS.PSEL = 0b010001;  // ET0_MDC
+//				MPC::P73PFS.PSEL = 0b010001;  // ET0_WOL
+				MPC::P74PFS.PSEL = 0b010001;  // ET0_ERXD1
+				MPC::P75PFS.PSEL = 0b010001;  // ET0_ERXD0
+				MPC::P76PFS.PSEL = 0b010001;  // ET0_RX_CLK
+				MPC::P77PFS.PSEL = 0b010001;  // ET0_RX_ER
+				PORT7::PMR.B1 = 1;
+				PORT7::PMR.B2 = 1;
+//				PORT7::PMR.B3 = 1;
+				PORT7::PMR.B4 = 1;
+				PORT7::PMR.B5 = 1;
+				PORT7::PMR.B6 = 1;
+				PORT7::PMR.B7 = 1;
+				MPC::P80PFS.PSEL = 0b010001;  // ET0_TX_EN
+				MPC::P81PFS.PSEL = 0b010001;  // ET0_ETXD0
+				MPC::P82PFS.PSEL = 0b010001;  // ET0_ETXD1
+				MPC::P83PFS.PSEL = 0b010001;  // ET0_CRS
+				PORT8::PMR.B0 = 1;
+				PORT8::PMR.B1 = 1;
+				PORT8::PMR.B2 = 1;
+				PORT8::PMR.B3 = 1;
 				break;
 			default:
 				break;

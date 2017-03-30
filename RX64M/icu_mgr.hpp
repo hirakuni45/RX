@@ -2,12 +2,13 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX64M グループ・割り込みマネージャー @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2016, 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "RX64M/icu.hpp"
 #include "RX64M/peripheral.hpp"
+#include "common/vect.h"
 
 namespace device {
 
@@ -107,6 +108,99 @@ namespace device {
 				break;
 			case peripheral::ETHERC1:
 
+				break;
+			default:
+				break;
+			}
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み・ハンドラ GROUPBE0
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static INTERRUPT_FUNC void group_be0_handler_()
+		{
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み・ハンドラ GROUPBL0
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static INTERRUPT_FUNC void group_bl0_handler_()
+		{
+
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み・ハンドラ GROUPBL1
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static INTERRUPT_FUNC void group_bl1_handler_()
+		{
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み・ハンドラ GROUPAL0
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static INTERRUPT_FUNC void group_al0_handler_()
+		{
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み・ハンドラ GROUPAL1
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static INTERRUPT_FUNC void group_al1_handler_()
+		{
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  グループ割り込みを設定する
+			@param[in]	vec	グループ割り込み・インデックス
+			@param[in]	lvl	割り込みレベル（０なら割り込み禁止）
+		*/
+		//-----------------------------------------------------------------//
+		static void set_group_vector(ICU::VECTOR vec, uint8_t lvl)
+		{
+			bool ena = lvl != 0 ? true : false;
+			switch(vec) {
+			case ICU::VECTOR::GROUPBE0:
+				set_interrupt_task(group_be0_handler_, static_cast<uint32_t>(vec));
+				ICU::IPR.GROUPBE0 = lvl;
+				ICU::IER.GROUPBE0 = ena;
+				break;
+			case ICU::VECTOR::GROUPBL0:
+				set_interrupt_task(group_bl0_handler_, static_cast<uint32_t>(vec));
+				ICU::IPR.GROUPBL0 = lvl;
+				ICU::IER.GROUPBL0 = ena;
+				break;
+			case ICU::VECTOR::GROUPBL1:
+				set_interrupt_task(group_bl1_handler_, static_cast<uint32_t>(vec));
+				ICU::IPR.GROUPBL1 = lvl;
+				ICU::IER.GROUPBL1 = ena;
+				break;
+			case ICU::VECTOR::GROUPAL0:
+				set_interrupt_task(group_al0_handler_, static_cast<uint32_t>(vec));
+				ICU::IPR.GROUPAL0 = lvl;
+				ICU::IER.GROUPAL0 = ena;
+				break;
+			case ICU::VECTOR::GROUPAL1:
+				set_interrupt_task(group_al1_handler_, static_cast<uint32_t>(vec));
+				ICU::IPR.GROUPAL1 = lvl;
+				ICU::IER.GROUPAL1 = ena;
 				break;
 			default:
 				break;
