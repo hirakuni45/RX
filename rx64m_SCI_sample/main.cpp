@@ -6,13 +6,14 @@
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include "common/renesas.hpp"
+
 #include "common/sci_io.hpp"
 #include "common/cmt_io.hpp"
 #include "common/fifo.hpp"
 #include "common/format.hpp"
-
-#include "RX64M/rtc.hpp"
 #include "common/delay.hpp"
+#include "common/command.hpp"
 
 namespace {
 
@@ -26,6 +27,8 @@ namespace {
 
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
+
+	utils::command<256> cmd_;
 }
 
 extern "C" {
@@ -38,6 +41,16 @@ extern "C" {
 	char sci_getch(void)
 	{
 		return sci_.getch();
+	}
+
+	void sci_puts(const char *str)
+	{
+		sci_.puts(str);
+	}
+
+	uint16_t sci_length(void)
+	{
+		return sci_.recv_length();
 	}
 }
 
@@ -78,19 +91,19 @@ int main(int argc, char** argv)
 		sci_.start(115200, int_level);
 	}
 
-	utils::format("RX64M start\n");
+	utils::format("RX64M SCI sample start\n");
+
+	cmd_.set_prompt("# ");
 
 	device::PORT0::PDR.B5 = 1;
 	device::PORT0::PDR.B7 = 1;
 
 	uint32_t cnt = 0;
-	uint32_t n = 0;
 	while(1) {
 		cmt_.sync();
 
-		if(sci_.recv_length()) {
-			auto ch = sci_.getch();
-			sci_.putch(ch);
+		if(cmd_.service()) {
+
 		}
 
 		++cnt;
@@ -98,15 +111,5 @@ int main(int argc, char** argv)
 			cnt = 0;
 		}
 		device::PORT0::PODR.B7 = (cnt < 10) ? 0 : 1;
-
-		utils::delay::micro_second(1);
-		device::PORT0::PODR.B5 = 0;
-		utils::delay::micro_second(1);
-		device::PORT0::PODR.B5 = 1;
-
-		if((n % 60) == 0) {
-			utils::format("%d\n") % (n / 60);
-		}
-		++n;
 	}
 }
