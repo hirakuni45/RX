@@ -38,17 +38,18 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  端子機能制御規定クラス W
+			@param[in]	base	アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
 		struct pfsw_t : public rw8_t<base> {
-			typedef rw8_t<base> io;
-			using io::operator =;
-			using io::operator ();
-			using io::operator |=;
-			using io::operator &=;
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<io, bitpos::B0, 6>  PSEL;
+			bits_rw_t<io_, bitpos::B0, 6>  PSEL;
 		};
 
 

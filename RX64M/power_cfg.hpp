@@ -63,8 +63,6 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA14 = f;	// CMT0, CMT1 のストップ状態解除
 				break;
 
-
-
 			case peripheral::SDHI:
 				SYSTEM::MSTPCRD.MSTPD19 = f;	// SDHI のストップ状態解除
 				break;

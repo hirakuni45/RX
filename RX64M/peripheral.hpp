@@ -44,8 +44,8 @@ namespace device {
 
 		SDHI,	///< SDHI
 
-		ETHERC0,	///< Ethernet 0
-		ETHERC1,	///< Ethernet 1
+		ETHERC0,	///< Ethernet 0 (PHY RMII)
+		ETHERC1,	///< Ethernet 1 (PHY RMII)
 		PTPETHERC,	///< PTP Ethernet
 
 		EDMAC0,		///< Ethernet DMA 0
