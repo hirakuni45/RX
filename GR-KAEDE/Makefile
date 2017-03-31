@@ -9,45 +9,59 @@ DEVICE		=	R5F564MF
 
 BUILD		=	release
 
-VPATH		=	../ ../uip
+VPATH		=	../
 
-ASOURCES	=	common/start.s
+ASOURCES	=	common/start.s \
+				GR/core/driver/cksum_rx_little.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c
+				common/syscalls.c \
+				GR/core/r_byteq_v1.30/r_byteq.c \
+				GR/core/driver/phy.c \
+				GR/core/driver/r_ether.c \
+				GR/core/driver/t4_driver.c \
+				GR/core/driver/timer.c \
+				GR/core/T4_src/config_tcpudp.c \
+				GR/core/T4_src/ether.c \
+				GR/core/T4_src/ip.c \
+				GR/core/T4_src/udp.c \
+				GR/core/T4_src/tcp.c \
+				GR/core/T4_src/tcp_api.c \
+				GR/core/T4_src/r_dhcp_client.c \
+				GR/core/T4_src/r_dns_client.c
 
-#				uip/uip.c \
-				uip/uip_arp.c \
-				uip/uiplib.c \
-				uip/psock.c \
-				uip/timer.c \
-				uip/uip-neighbor.c
-
-PSOURCES	=	main.cpp
+PSOURCES	=	main.cpp \
+				GR/core/IPAddress.cpp \
+				GR/core/Ethernet.cpp
 
 USER_LIBS	=	stdc++
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX64M F_PCKA=96000000 F_PCKB=48000000
+USER_DEFS	=	SIG_RX64M F_PCKA=48000000 F_PCKB=48000000 \
+				GRKAEDE GRSAKURA ARDUINO=144 CPPAPP __RX_LITTLE_ENDIAN__=1 __T4__ __RX
 
 MCU_TARGET	=
 
 INC_SYS		=
 
-INC_APP		=	. ../ ../RX64M
+INC_APP		=	. ../ ../RX64M ../GR
 
 OPTIMIZE	=	-Os
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
-				-fno-exceptions
+				-fno-exceptions \
+				-mlittle-endian-data \
+				-mcpu=rx600
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
-				-fno-exceptions
+				-fno-exceptions \
+				-mlittle-endian-data \
+				-mcpu=rx600
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
 APPINCS		=	$(addprefix -I, $(INC_APP))
@@ -76,7 +90,7 @@ ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
 # Override is only needed by avr-lib build system.
 
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++14 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
+PFLAGS		=	-std=c++11 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
 
