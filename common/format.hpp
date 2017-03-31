@@ -248,7 +248,7 @@ namespace utils {
 				v >>= 1;
 				++n;
 			} while(v != 0) ;
-			out_str_(p, '+', n);
+			out_str_(p, 0, n);
 		}
 
 
@@ -262,7 +262,7 @@ namespace utils {
 				v >>= 3;
 				++n;
 			} while(v != 0) ;
-			out_str_(p, '+', n);
+			out_str_(p, 0, n);
 		}
 
 
