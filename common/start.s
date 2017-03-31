@@ -4,21 +4,33 @@
 # Copyright 2016 Kunihito Hiramatsu
 #
 # ===============================================================
+	.extern	__istack
+	.extern	__ustack
 	.text
 	.global _start
 	.type	_start,@function
 _start:
-
-# スタックの設定（SP：__stack、USP：__stack - 128）
-	mov.l	#__stack, r5
-	mvtc	r5, isp
-	sub		#128,r5
-	mvtc	r5, usp
+	mvtc	#__istack, isp
+	mvtc	#__ustack, usp
 
 # 割り込みベクタの設定
 	.extern _interrupt_vectors
-	mov.l	#_interrupt_vectors, r5
-	mvtc	r5,intb
+	mvtc	#_interrupt_vectors, intb
+
+/* setup FPSW */
+    mvtc    #100h, fpsw
+
+# .bss セクションの初期化
+	mov	#__bssstart, r1
+	mov	#0, r2
+	mov	#__bsssize, r3
+	sstr.b
+
+# 初期値付き変数の初期化
+	mov	#__datastart, r1
+	mov	#__romdatastart, r2
+	mov	#__romdatacopysize, r3
+	smovf
 
 # I レジスタを設定し、割り込みを許可する
 	mov.l	#0x00010000, r5
@@ -39,24 +51,6 @@ _start:
 	nop
 	nop
 	nop
-
-# ワーク RAM の初期化
-#	mov	#__bssstart, r1
-#	mov	#0, r2
-#	mov	#__stack, r3
-#	sstr.l
-
-# 初期値付き変数の初期化
-	mov	#__datastart, r1
-	mov	#__romdatastart, r2
-	mov	#__romdatacopysize, r3
-	smovf
-
-# .bss セクションの初期化
-	mov	#__bssstart, r1
-	mov	#0, r2
-	mov	#__bsssize, r3
-	sstr.l
 
 # init() 関数から開始
 	.extern	_init
