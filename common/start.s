@@ -21,9 +21,15 @@ _start:
     mvtc    #100h, fpsw
 
 # .bss セクションの初期化
-	mov	#__bssstart, r1
+#	mov	#__bssstart, r1
+#	mov	#0, r2
+#	mov	#__bsssize, r3
+#	sstr.b
+
+# RAM 全領域のゼロクリア
+	mov	#0, r1
 	mov	#0, r2
-	mov	#__bsssize, r3
+	mov	#__istack, r3
 	sstr.b
 
 # 初期値付き変数の初期化
