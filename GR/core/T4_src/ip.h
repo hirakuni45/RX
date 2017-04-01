@@ -120,15 +120,14 @@
 
 typedef struct
 {
-
-    uchar  ip_ver_len;
-    uchar  ip_tos;
-    uint16  ip_total_len;
-    uint16  ip_id;
-    uint16  ip_fragoff;
-    uchar  ip_ttl;
-    uchar  ip_proto_num;
-    uint16  ip_chksum;
+    uint8_t  ip_ver_len;
+    uint8_t  ip_tos;
+    uint16_t  ip_total_len;
+    uint16_t  ip_id;
+    uint16_t  ip_fragoff;
+    uint8_t  ip_ttl;
+    uint8_t  ip_proto_num;
+    uint16_t  ip_chksum;
     IPaddr  ip_src;
     IPaddr  ip_dst;
 } _IP_HDR;
@@ -136,72 +135,72 @@ typedef struct
 typedef struct
 {
     _IP_HDR  iph;   /* IP header */
-    uchar  data[1];  /* DATA (upper protocol)*/
+    uint8_t  data[1];  /* DATA (upper protocol)*/
 } _IP_PKT;
 
 
 typedef struct
 {
-    uint32  rsvd;
-    uchar  tgt_ip[16];
-    uchar  opt_type;
-    uchar  opt_len;
-    uchar  opt[6];
+    uint32_t  rsvd;
+    uint8_t  tgt_ip[16];
+    uint8_t  opt_type;
+    uint8_t  opt_len;
+    uint8_t  opt[6];
 } _ICMP_NBR_PKT;
 
 typedef struct
 {
-    uint32  rsvd;
-    uchar  opt_type;
-    uchar  opt_len;
-    uchar  opt[6];
+    uint32_t  rsvd;
+    uint8_t  opt_type;
+    uint8_t  opt_len;
+    uint8_t  opt[6];
 } _ICMP_RTR_SOL_PKT;
 
 typedef struct
 {
-    uchar  type;
-    uchar  len;
-    uchar  px_len;
-    uchar  rsvd;
-    uint32  valid_lt;
-    uint32  pref_lt;
-    uint32  rsvd2;
-    uchar  prefix[16];
+    uint8_t  type;
+    uint8_t  len;
+    uint8_t  px_len;
+    uint8_t  rsvd;
+    uint32_t  valid_lt;
+    uint32_t  pref_lt;
+    uint32_t  rsvd2;
+    uint8_t  prefix[16];
 } _ICMP_OPT_PFX;
 
 typedef struct
 {
-    uchar  hop_limit;
-    uchar  flag;
-    uint16  ef_time;
-    uint32  reachable_time;
-    uint32  reachable_rtx_timer; // 12
-    uchar  opt_type;
-    uchar  opt_len;
-    uchar  opt[6];
+    uint8_t  hop_limit;
+    uint8_t  flag;
+    uint16_t  ef_time;
+    uint32_t  reachable_time;
+    uint32_t  reachable_rtx_timer; // 12
+    uint8_t  opt_type;
+    uint8_t  opt_len;
+    uint8_t  opt[6];
     _ICMP_OPT_PFX pfx_opt;
 } _ICMP_RTR_ADV_PKT;
 
 typedef struct
 {
-    uint16 id;     /* message id */
-    uint16 seq;    /* sequence number */
+    uint16_t id;     /* message id */
+    uint16_t seq;    /* sequence number */
 } _ICMP_ECHO_PKT;
 
 
 typedef struct _icmp_hdr
 {
-    uchar type;    /* type of message */
-    uchar code;    /* code (additional info. depend on type) */
-    uint16 chksum;    /* checksum of ICMP header+data   */
-    uint16 id;     /* message id */
-    uint16 seq;    /* sequence number */
+    uint8_t type;    /* type of message */
+    uint8_t code;    /* code (additional info. depend on type) */
+    uint16_t chksum;    /* checksum of ICMP header+data   */
+    uint16_t id;     /* message id */
+    uint16_t seq;    /* sequence number */
 } _ICMP_HDR;
 
 typedef struct
 {
     _ICMP_HDR icmph;
-    uchar  data[1];
+    uint8_t  data[1];
 } _ICMP_PKT;
 
 /* Channel information  for v.2.00 */
@@ -224,8 +223,8 @@ extern _CH_INFO *_ch_info_tbl;
 extern _CH_INFO *_ch_info_head;
 
 
-sint16 _ip_rcv_hdr(void);
-sint16 _ip_snd(uchar *data, uint16 len) ;
+int16_t _ip_rcv_hdr(void);
+int16_t _ip_snd(uint8_t *data, uint16_t len) ;
 #if defined(_ETHER)
 void _ip_icmp_init_tbl(void);
 void _ip_icmp_update_tbl(void);
@@ -234,17 +233,17 @@ _ARP_ENTRY *_ip_search_tbl(void);
 #endif
 void _ip_snd_icmp(void);
 
-uint16 _cksum(const uchar *data, uint16 nbytes, uint16 sum0);
+uint16_t _cksum(const uint8_t *data, uint16_t nbytes, uint16_t sum0);
 #if defined(M16C) || defined(R8C)   /* assembler */
 #pragma PARAMETER _cksum(a0, r0, r1);
 #elif defined(M16C80) || defined(M32C80) /* assembler */
 #pragma PARAMETER /C _cksum(a0, r0, r1);
 #endif
 
-schar _ip_check_ipadd_proto(_IP_HDR *piph);
-uchar _ip_check_multicast(uchar *ipaddr);
-uchar _ip_check_broadcast(uchar *ipaddr);
-sint16 _ppp_snd_ip(uchar *data, uint16 len);
+int8_t _ip_check_ipadd_proto(_IP_HDR *piph);
+uint8_t _ip_check_multicast(uint8_t *ipaddr);
+uint8_t _ip_check_broadcast(uint8_t *ipaddr);
+int16_t _ppp_snd_ip(uint8_t *data, uint16_t len);
 
 
 

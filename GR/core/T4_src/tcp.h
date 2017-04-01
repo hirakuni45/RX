@@ -103,26 +103,26 @@
 
 typedef struct
 {
-    uint16  my_port;
+    uint16_t  my_port;
     T_IPVxEP *dstaddr;
-    uint16  repid;
+    uint16_t  repid;
 } _TCP_API_CNR;
 
 
 typedef struct
 {
-    sint16   dtsiz;
-    uchar  *datap;
+    int16_t   dtsiz;
+    uint8_t  *datap;
 } _TCP_API_DR;
 
 typedef struct
 {
-    uchar   type;
-    volatile uchar stat;
-    sint16   tmout;
+    uint8_t   type;
+    volatile uint8_t stat;
+    int16_t   tmout;
     ER    *error;
-    uint16   flag;
-    uint16   reserved;
+    uint16_t   flag;
+    uint16_t   reserved;
     union
     {
         _TCP_API_CNR  cnr;
@@ -134,22 +134,22 @@ typedef struct
 
 typedef struct
 {
-    uint16    sport;
-    uint16    dport;
-    uint32    seq;
-    uint32    ack;
-    uchar     len;
-    uchar     flg;
-    uint16    win_size;
-    uint16    cksum;
-    uint16    urg_ptr;
-    uchar     opt[2];
+    uint16_t    sport;
+    uint16_t    dport;
+    uint32_t    seq;
+    uint32_t    ack;
+    uint8_t     len;
+    uint8_t     flg;
+    uint16_t    win_size;
+    uint16_t    cksum;
+    uint16_t    urg_ptr;
+    uint8_t     opt[2];
 } _TCP_HDR;
 
 typedef struct
 {
     _TCP_HDR  th;
-    uchar     data[1];
+    uint8_t     data[1];
 } _TCPS;
 
 
@@ -161,8 +161,8 @@ typedef struct
 
 typedef struct
 {
-    volatile uchar stat;
-    uchar dummy;
+    volatile uint8_t stat;
+    uint8_t dummy;
     _TCP_API_REQ req;
 } _TCP_CB;
 #define GET_TCP_CALLBACK_INFO_PTR(cepid) \
@@ -204,76 +204,76 @@ typedef ER(*_TCP_CALLBACK_FUNC)(ID cepid, FN fncd , VP p_parblk);
          
 typedef struct
 {
-    uchar   sadr[IP_ALEN];
-    uchar   dadr[IP_ALEN];
-    uchar   reserve;
-    uchar   prtcl;
-    uint16  len;
+    uint8_t   sadr[IP_ALEN];
+    uint8_t   dadr[IP_ALEN];
+    uint8_t   reserve;
+    uint8_t   prtcl;
+    uint16_t  len;
 } _TCP_PHDR;
 
 typedef struct
 {
-    uchar src_addr[IP_ALEN];
-    uchar dst_addr[IP_ALEN];
-    uchar reserve;
-    uchar proto;
-    uint16 len;
+    uint8_t src_addr[IP_ALEN];
+    uint8_t dst_addr[IP_ALEN];
+    uint8_t reserve;
+    uint8_t proto;
+    uint16_t len;
 } _TCPUDP_PHDR;
 
 
 typedef struct
 {
-    uchar    *data;
-    uchar     hdr_flg;
-    uint16   len;
-    uint16    rst_cnt;
-    uint16    nxt_rtx_cnt;
-    uint16    cur_int;
-    uint32    seq;
+    uint8_t    *data;
+    uint8_t     hdr_flg;
+    uint16_t   len;
+    uint16_t    rst_cnt;
+    uint16_t    nxt_rtx_cnt;
+    uint16_t    cur_int;
+    uint32_t    seq;
 } _TCP_RTX_Q;
 
 typedef struct
 {
-    uchar    *data;
-    uchar     hdr_flg;
-    uint16   len;
-    uint32    seq;
+    uint8_t    *data;
+    uint8_t     hdr_flg;
+    uint16_t   len;
+    uint32_t    seq;
 } _TCP_RTX_Q2;
 
 typedef struct
 {
-    uint16          flag;
+    uint16_t          flag;
 #if defined(_TCP)
-    uint16   cepid;
-    uint16   status;
-    uint16   nxt_status;
-    uchar   it_stat;
-    uchar           hdr_flg;
-    uint16          mss;
+    uint16_t   cepid;
+    uint16_t   status;
+    uint16_t   nxt_status;
+    uint8_t   it_stat;
+    uint8_t           hdr_flg;
+    uint16_t          mss;
     _API_REQ  req;
     _API_REQ  req_can;
-    uint32          suna;
-    uint32          snxt;
-    uint32          risn;
-    uint32          rnxt;
-    uchar           rem_ip[IP_ALEN];
-    uint16          rem_port;
-    uint16          loc_port;
-    uint16          rtchk_cnt;
+    uint32_t          suna;
+    uint32_t          snxt;
+    uint32_t          risn;
+    uint32_t          rnxt;
+    uint8_t           rem_ip[IP_ALEN];
+    uint16_t          rem_port;
+    uint16_t          loc_port;
+    uint16_t          rtchk_cnt;
     _TCP_RTX_Q      retrans_q;
     _TCP_RTX_Q2  retrans_q2;
-    uchar          *nxtdat;
-    uchar          *rwin;
-    uchar          *rwin_bnry;
-    uchar          *rwin_curr;
-    uint16          swsize;
-    uint16          rmt_rwsize;
-    uint16          sdsize;
-    uint16          rdsize;
-    uint16          mslcnt;
-    uint16   zwin_int;
-    uint16          nxt_zero;
-    uint16          zwp_noack_cnt;
+    uint8_t          *nxtdat;
+    uint8_t          *rwin;
+    uint8_t          *rwin_bnry;
+    uint8_t          *rwin_curr;
+    uint16_t          swsize;
+    uint16_t          rmt_rwsize;
+    uint16_t          sdsize;
+    uint16_t          rdsize;
+    uint16_t          mslcnt;
+    uint16_t   zwin_int;
+    uint16_t          nxt_zero;
+    uint16_t          zwp_noack_cnt;
 
     _TCP_CB   callback_info;
 
@@ -286,10 +286,10 @@ typedef struct
     _IP_HDR  iph;    // IP Header
     union
     {
-        uchar tcph[_TCPH_LEN+4]; // TCP Header (20:header+4:MSS option)
-        uchar icmph[_ICMP_HLEN]; // ICMP Header
+        uint8_t tcph[_TCPH_LEN+4]; // TCP Header (20:header+4:MSS option)
+        uint8_t icmph[_ICMP_HLEN]; // ICMP Header
 #if defined(_UDP)
-        uchar udph[_UDPH_LEN]; // UDP Header
+        uint8_t udph[_UDPH_LEN]; // UDP Header
 #endif
     } thdr;
 } _TX_IPH ;
@@ -299,9 +299,9 @@ typedef struct
 #if defined(_ETHER)
     _ETH_HDR eh;     // Ether Header
 #elif defined(_PPP)
-    uchar  address;   /* 0xff */
-    uchar  control;   /* 0x03 */
-    uint16  proto;
+    uint8_t  address;   /* 0xff */
+    uint8_t  control;   /* 0x03 */
+    uint16_t  proto;
 #endif
     union
     {
@@ -312,7 +312,7 @@ typedef struct
 #endif
 #endif
     } ihdr;
-    uint16  hlen;
+    uint16_t  hlen;
 } _TX_HDR;
 
 void _proc_api(void);
@@ -327,8 +327,8 @@ void _tcp_stat(void);
 ER  _tcp_rcv_rst(void);
 ER  _tcp_rcv_syn(void);
 void _tcp_rcv_ack(void);
-sint16 _tcp_rcv_opt(void);
-sint16 _tcp_proc_data(void);
+int16_t _tcp_rcv_opt(void);
+int16_t _tcp_proc_data(void);
 ER  _tcp_rcv_fin(void);
 void _tcp_swin_updt(void);
 void _tcp_cpy_rwdat(void);
@@ -345,10 +345,10 @@ void _tcp_api_wup(ID);
 void _tcp_api_slp(ID cepid);
 ER _tcp_check_cepid_arg(ID cepid);
 ER _tcp_check_len_arg(INT len);
-ER  _tcp_check_tmout_arg(uint16 api_type, TMO tmout, _TCP_CB* pTcpcb);
-uint16 _tcp_is_tcb_queue_over(uint16 api_type, _TCB* pTcb,  _TCP_CB* pTcpcb);
-uint16 _tcp_call_callback(ID cepid, FN fncd, VP p_parblk);
-FN _tcp_api_type_to_fn(uint16 api_type);
-ER _tcp_recv_polling(_TCB* pTcb, uchar *buf, uint16 size);
+ER  _tcp_check_tmout_arg(uint16_t api_type, TMO tmout, _TCP_CB* pTcpcb);
+uint16_t _tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb);
+uint16_t _tcp_call_callback(ID cepid, FN fncd, VP p_parblk);
+FN _tcp_api_type_to_fn(uint16_t api_type);
+ER _tcp_recv_polling(_TCB* pTcb, uint8_t *buf, uint16_t size);
 void _tcp_init_callback_info(_TCP_CB* pCallbackInfo);
 

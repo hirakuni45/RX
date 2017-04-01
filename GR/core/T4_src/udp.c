@@ -159,7 +159,7 @@ ER udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, VP data, INT len, TMO tmout)
 
         p->cepid = cepid;
         p->len  = len;
-        p->data  = (uchar *)((uint32)data);
+        p->data  = (uint8_t *)((uint32_t)data);
         p->cancel_flag = 0;
         p->tmout = tmout;
         p->ercd  = &ercd;
@@ -244,7 +244,7 @@ ER udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, VP data, INT len, TMO tmout)
 
     p->cepid = cepid;
     p->len  = len;
-    p->data  = (uchar *)((uint32)data);
+    p->data  = (uint8_t *)((uint32_t)data);
     p->cancel_flag = 0;
     p->tmout = tmout;
     p->ercd  = &ercd;
@@ -335,11 +335,11 @@ ER udp_can_cep(ID cepid, FN fncd)
 ***********************************************************************************************************************/
 void _udp_rcv(_IP_HDR *piph, _UDP_HDR *pudph)
 {
-    sint16  i;
+    int16_t  i;
     _TCPUDP_PHDR ph;
-    uint16  dport;
+    uint16_t  dport;
     _UDP_CB  *pucb;
-    uint16  cksum_tmp;
+    uint16_t  cksum_tmp;
 
     cksum_tmp = _tcpudp_cksum(piph, &ph);
     if (pudph->cksum != 0)
@@ -394,16 +394,16 @@ __err__udp_rcv:
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-sint16 _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
+int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
 {
     T_UDP_CCEP far const *pcep;
     ER    ercd;
     FN    fncd;
-    uint16   sport;
-    uint16   saddr[IP_ALEN/2];
-    uint16   len;
-    uchar   *data;
-    uint16   ip_dlen;
+    uint16_t   sport;
+    uint16_t   saddr[IP_ALEN/2];
+    uint16_t   len;
+    uint8_t   *data;
+    uint16_t   ip_dlen;
     ID    cepid;
     UH    count;
     _UDP_CB   *tmp;
@@ -435,7 +435,7 @@ sint16 _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
     len  -= sizeof(_UDP_HDR);
     ercd  = len;
     sport = net2hs(udph->src_port);
-    data  = (uchar*)udph + sizeof(_UDP_HDR);
+    data  = (uint8_t*)udph + sizeof(_UDP_HDR);
     net2hl_yn_xn(saddr, ph->src_addr);
 
     if (fncd != TEV_UDP_RCV_DAT)
@@ -500,13 +500,13 @@ void _udp_snd(_TCPUDP_PHDR *ph)
     ER    ercd;
     FN    fncd;
     T_UDP_CCEP far const *pcep;
-    sint16   len;
-    uint16   sum16;
+    int16_t   len;
+    uint16_t   sum16;
     _UDP_CB   *pucb;
     _UDP_API_REQ *pureq;
     _UDP_HDR  *udph;
-    sint16   ret;
-    sint16   i;
+    int16_t   ret;
+    int16_t   i;
     UH    count;
     _UDP_CB   *tmp;
 
@@ -531,9 +531,9 @@ void _udp_snd(_TCPUDP_PHDR *ph)
             _cpy_ipaddr(ph->src_addr, _ch_info_tbl->_myipaddr);
             ph->proto = _IPH_UDP;
 
-            sum16 = _cksum((uchar *)ph,   sizeof(_TCPUDP_PHDR), 0);
-            sum16 = _cksum((uchar *)udph, sizeof(_UDP_HDR), ~hs2net(sum16));
-            sum16 = _cksum((uchar *)pureq->data, pureq->len, ~hs2net(sum16));
+            sum16 = _cksum((uint8_t *)ph,   sizeof(_TCPUDP_PHDR), 0);
+            sum16 = _cksum((uint8_t *)udph, sizeof(_UDP_HDR), ~hs2net(sum16));
+            sum16 = _cksum((uint8_t *)pureq->data, pureq->len, ~hs2net(sum16));
             udph->cksum = hs2net(sum16);
 
             if (udph->cksum == 0)
@@ -634,7 +634,7 @@ void _proc_udp_api()
 {
     _UDP_CB      *pucb;
     _UDP_API_REQ *pureq;
-    sint16  i;
+    int16_t  i;
     ER   ercd;
     FN   fn;
     UH    count;
@@ -686,7 +686,7 @@ void _udp_init(UW **workpp)
 {
     _udp_cb = (_UDP_CB *)(*workpp);
     memset(_udp_cb, 0, sizeof(_UDP_CB) * __udpcepn);
-    *workpp = (UW *)((uchar *)(*workpp) + (sizeof(_UDP_CB) * __udpcepn));
+    *workpp = (UW *)((uint8_t *)(*workpp) + (sizeof(_UDP_CB) * __udpcepn));
 }
 
 
@@ -699,7 +699,7 @@ void _udp_init(UW **workpp)
 void _udp_api_tmout()
 {
     _UDP_API_REQ *pureq;
-    sint16  i;
+    int16_t  i;
 
     for (i = 0; i < __udpcepn; i++)
     {
@@ -730,10 +730,10 @@ void _udp_api_tmout()
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-uint16 _tcpudp_cksum(_IP_HDR *piph, _TCPUDP_PHDR *ph)
+uint16_t _tcpudp_cksum(_IP_HDR *piph, _TCPUDP_PHDR *ph)
 {
-    uint16   sum16;
-    uint16   len;
+    uint16_t   sum16;
+    uint16_t   len;
 
     _cpy_ipaddr(ph->src_addr, piph->ip_src);
     _cpy_ipaddr(ph->dst_addr, piph->ip_dst);
@@ -745,8 +745,8 @@ uint16 _tcpudp_cksum(_IP_HDR *piph, _TCPUDP_PHDR *ph)
     len -= _IP_HLEN_MIN;
     ph->len = hs2net(len);
 
-    sum16 = _cksum((uchar *)ph, sizeof(_TCPUDP_PHDR), 0);
-    sum16 = _cksum((uchar *)piph + sizeof(_IP_HDR), len, ~hs2net(sum16));
+    sum16 = _cksum((uint8_t *)ph, sizeof(_TCPUDP_PHDR), 0);
+    sum16 = _cksum((uint8_t *)piph + sizeof(_IP_HDR), len, ~hs2net(sum16));
 
     return (sum16);
 }
@@ -757,7 +757,7 @@ uint16 _tcpudp_cksum(_IP_HDR *piph, _TCPUDP_PHDR *ph)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-FN  _udp_api_type_to_fn(uint16 api_type)
+FN  _udp_api_type_to_fn(uint16_t api_type)
 {
     FN fncd = TFN_TCP_ALL;
 

@@ -62,7 +62,7 @@ _CH_INFO *_ch_info_head;
 /***********************************************************************************************************************
 Private global variables and functions
 ***********************************************************************************************************************/
-static sint16 _ip_chk_srcip(uchar *src_ipaddr);
+static int16_t _ip_chk_srcip(uint8_t *src_ipaddr);
 
 /***********************************************************************************************************************
 Exported global variables (read from other files)
@@ -73,7 +73,7 @@ extern _TCB   *_tcp_tcb;    /* TCB (Transport Control Block) */
 
 #if defined(_ETHER)
 extern far UH const _ip_tblcnt;
-extern uchar *_ether_p_rcv_buff;
+extern uint8_t *_ether_p_rcv_buff;
 #endif
 
 #if defined(_ETHER)
@@ -91,10 +91,10 @@ extern far UB const __multi_TTL[];
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-sint16 _ip_rcv_hdr(void)
+int16_t _ip_rcv_hdr(void)
 {
     _IP_HDR  *pip;
-    uint16  total_len;
+    uint16_t  total_len;
 
     /* Head of IP packet   */
     pip  = (_IP_HDR *)_ch_info_tbl->_p_rcv_buf.pip;
@@ -146,7 +146,7 @@ sint16 _ip_rcv_hdr(void)
     }
 
     /* Check checksum */
-    if (_cksum((uchar *)pip, _IP_HLEN_MIN, 0) != 0)
+    if (_cksum((uint8_t *)pip, _IP_HLEN_MIN, 0) != 0)
     {
         report_error(_ch_info_tbl->_ch_num, RE_IP_HEADER6, data_link_buf_ptr);
         goto _err_ip_rcv_hdr;
@@ -188,11 +188,11 @@ _err_ip_rcv_hdr:
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-sint16 _ip_snd(uchar *data, uint16 dlen)
+int16_t _ip_snd(uint8_t *data, uint16_t dlen)
 {
-    sint16 ercd;
+    int16_t ercd;
     register _IP_HDR *pip = (_IP_HDR *) & _tx_hdr.ihdr.tip.iph;
-    register uint16 sum;
+    register uint16_t sum;
 
     /* generate: IP header */
     pip->ip_chksum  = 0;
@@ -210,7 +210,7 @@ sint16 _ip_snd(uchar *data, uint16 dlen)
     pip->ip_id   = hs2net(_ch_info_tbl->_ip_id);
     _ch_info_tbl->_ip_id++;
 
-    sum  = _cksum((uchar *)pip, _IP_HLEN_MIN, 0);
+    sum  = _cksum((uint8_t *)pip, _IP_HLEN_MIN, 0);
     pip->ip_chksum  = hs2net(sum);
 
     _tx_hdr.hlen += _IP_HLEN_MIN;
@@ -254,9 +254,9 @@ void _ip_snd_icmp(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-sint16 _ip_chk_srcip(uchar *src_ip)
+int16_t _ip_chk_srcip(uint8_t *src_ip)
 {
-    uint32 tmp1, tmp2, tmp3 ;
+    uint32_t tmp1, tmp2, tmp3 ;
 
     /* Check if src IP is Broadcast or Multicast */
     if (src_ip[0] >= 0xE0)
@@ -281,9 +281,9 @@ sint16 _ip_chk_srcip(uchar *src_ip)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-schar _ip_check_ipadd_proto(_IP_HDR *piph)
+int8_t _ip_check_ipadd_proto(_IP_HDR *piph)
 {
-    uchar type;
+    uint8_t type;
 
     if (_cmp_ipaddr(piph->ip_dst, _ch_info_tbl->_myipaddr) == 0)
     {
@@ -338,9 +338,9 @@ schar _ip_check_ipadd_proto(_IP_HDR *piph)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-uchar _ip_check_multicast(uchar *ipaddr)
+uint8_t _ip_check_multicast(uint8_t *ipaddr)
 {
-    uint32 addr;
+    uint32_t addr;
 
     net2hl_yn_xn(&addr, ipaddr);
 
@@ -360,12 +360,12 @@ uchar _ip_check_multicast(uchar *ipaddr)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-uchar _ip_check_broadcast(uchar *ipaddr)
+uint8_t _ip_check_broadcast(uint8_t *ipaddr)
 {
-    uint32 addr;
-    uint32 myipaddr;
-    uint32 subnet_mask;
-    uint32 broad_cast_addr = 0xffffffff;
+    uint32_t addr;
+    uint32_t myipaddr;
+    uint32_t subnet_mask;
+    uint32_t broad_cast_addr = 0xffffffff;
 
     net2hl_yn_xn(&addr, ipaddr);
     net2hl_yn_xn(&subnet_mask, tcpudp_env[_ch_info_tbl->_ch_num].maskaddr);
@@ -390,9 +390,9 @@ uchar _ip_check_broadcast(uchar *ipaddr)
 #endif
 
 #if 0
-uint16 _cksum(const uchar *data, uint16 nbytes, uint16 sum0)
+uint16_t _cksum(const uint8_t *data, uint16_t nbytes, uint16_t sum0)
 {
-	uint16 sum = sum0;
+	uint16_t sum = sum0;
 	while(nbytes > 0) {
 		sum += *data++;
 		nbytes--;

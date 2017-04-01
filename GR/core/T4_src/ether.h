@@ -42,22 +42,22 @@ Typedef definitions
 ***********************************************************************************************************************/
 typedef struct
 {
-    uint16 len; // 受信パケットの長さ
-    uchar *pip; // IPヘッダの先頭へのポインタ
-    uchar ip_rcv; // IPデータを受信：1　それ以外：0（リリース時にゼロクリア）
+    uint16_t len; // 受信パケットの長さ
+    uint8_t *pip; // IPヘッダの先頭へのポインタ
+    uint8_t ip_rcv; // IPデータを受信：1　それ以外：0（リリース時にゼロクリア）
 } _P_RCV_BUF ;
 
 typedef struct
 {
-    uchar   eh_dst[6];    /* destination ip address     */
-    uchar   eh_src[6];    /* source ip address          */
-    uint16  eh_type;   /* Ethernet packet type */
+    uint8_t   eh_dst[6];    /* destination ip address     */
+    uint8_t   eh_src[6];    /* source ip address          */
+    uint16_t  eh_type;   /* Ethernet packet type */
 } _ETH_HDR;
 
 typedef struct
 {
     _ETH_HDR eh;    /* Ether Header (Received BUFFER) */
-    uchar data[1];  /* DATA */
+    uint8_t data[1];  /* DATA */
 } _EP;
 
 /***********************************************************************************************************************
@@ -69,8 +69,8 @@ extern UB   _myethaddr[][6];
 Exported global functions (to be accessed by other files)
 ***********************************************************************************************************************/
 void _ether_proc_rcv(void);
-sint16 _ether_snd_ip(uchar *data, uint16 dlen);
-sint16 _ether_snd(uint16 type, uchar  *data, uint16 dlen);
+int16_t _ether_snd_ip(uint8_t *data, uint16_t dlen);
+int16_t _ether_snd(uint16_t type, uint8_t  *data, uint16_t dlen);
 
 /*==================================================*/
 /* For ARP */
@@ -116,41 +116,41 @@ Typedef definitions
 
 typedef struct
 {
-    uint32 dst_ipaddr; /* Destination IP address (may differ from nexthop) */
-    uchar  proto;    /* protocol code */
+    uint32_t dst_ipaddr; /* Destination IP address (may differ from nexthop) */
+    uint8_t  proto;    /* protocol code */
 } _IPH_INFO;
 
 typedef struct
 {
-    sint16   ar_hwtype; /* hardware type   */
-    sint16   ar_prtype; /* protocol type   */
-    uchar ar_hwlen; /* hardware address length  */
-    uchar ar_prlen; /* protocol address length  */
-    uint16 ar_op;  /* ARP operation (see list above) */
-    uchar ar_sha[6];  /* sender hw addrs */
-    uchar ar_spa[4];  /* sender proto addrs */
-    uchar ar_tha[6];  /* target hw addrs */
-    uchar ar_tpa[4];  /* target proto addrs */
+    int16_t   ar_hwtype; /* hardware type   */
+    int16_t   ar_prtype; /* protocol type   */
+    uint8_t ar_hwlen; /* hardware address length  */
+    uint8_t ar_prlen; /* protocol address length  */
+    uint16_t ar_op;  /* ARP operation (see list above) */
+    uint8_t ar_sha[6];  /* sender hw addrs */
+    uint8_t ar_spa[4];  /* sender proto addrs */
+    uint8_t ar_tha[6];  /* target hw addrs */
+    uint8_t ar_tpa[4];  /* target proto addrs */
 } _ARP_PKT ;
 
 
 #if !defined(_IPV6)
 typedef struct
 {
-    uchar ae_pra[4];   /* Protocol address   */
-    uchar ae_hwa[6];   /* Hardware address   */
-    uint16 ae_ttl;   /* time to live    */
-    uchar ae_state;  /* state of this entry (see above) */
-    uchar ae_attempts; /* number of retries so far  */
+    uint8_t ae_pra[4];   /* Protocol address   */
+    uint8_t ae_hwa[6];   /* Hardware address   */
+    uint16_t ae_ttl;   /* time to live    */
+    uint8_t ae_state;  /* state of this entry (see above) */
+    uint8_t ae_attempts; /* number of retries so far  */
 } _ARP_ENTRY ;
 extern _ARP_ENTRY **_ether_arp_tbl;
 
 void _ether_rcv_arp(void);
-sint16 _ether_snd_arp(_ARP_ENTRY *ae);
+int16_t _ether_snd_arp(_ARP_ENTRY *ae);
 void _ether_arp_resolve(void);
 void _ether_arp_init(void);
 void _ether_arp_del(_ARP_ENTRY *ae);
-_ARP_ENTRY *_ether_arp_add(uchar *ipaddr, uchar *ethaddr);
+_ARP_ENTRY *_ether_arp_add(uint8_t *ipaddr, uint8_t *ethaddr);
 #endif
 
 /***********************************************************************************************************************

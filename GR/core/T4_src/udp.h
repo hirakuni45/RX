@@ -28,29 +28,29 @@
 
 typedef struct     /* message format of DARPA UDP */
 {
-    uint16 src_port;  /* source UDP port number  */
-    uint16 dst_port;  /* destination UDP port number */
-    uint16 len;   /* length of UDP packet   */
-    uint16 cksum;   /* UDP checksum (0 => none)  */
+    uint16_t src_port;  /* source UDP port number  */
+    uint16_t dst_port;  /* destination UDP port number */
+    uint16_t len;   /* length of UDP packet   */
+    uint16_t cksum;   /* UDP checksum (0 => none)  */
 } _UDP_HDR;
 
 typedef struct
 {
     _UDP_HDR udph;
-    uchar  data[1];
+    uint8_t  data[1];
 } _UDP_PKT;
 
 typedef struct
 {
-    volatile uchar stat;
-    uchar type;
-    sint16 len;
-    sint16 tmout;
+    volatile uint8_t stat;
+    uint8_t type;
+    int16_t len;
+    int16_t tmout;
     ID  cepid;
-    uchar *data;
+    uint8_t *data;
     T_IPVxEP *p_dstaddr;
     ER  *ercd;
-    uchar cancel_flag;
+    uint8_t cancel_flag;
 } _UDP_API_REQ;
 
 #define _UDP_API_NON   0
@@ -67,15 +67,15 @@ typedef struct
 typedef struct
 {
     T_IPVxEP dstaddr;
-    sint16  len;
-    uchar  *data;
+    int16_t  len;
+    uint8_t  *data;
 } _UDP_RCV_INFO;
 
 typedef struct
 {
     _UDP_API_REQ req;
     _UDP_RCV_INFO rcv;
-    volatile uchar stat;
+    volatile uint8_t stat;
 } _UDP_CB;
 
 #define _UDP_CB_STAT_CALLBACK 1
@@ -83,16 +83,16 @@ typedef struct
 #define _UDP_CB_STAT_RCV  4
 #define _UDP_CB_STAT_LOCK  8
 
-uint16 _tcpudp_cksum(_IP_HDR *iph, _TCPUDP_PHDR *ph);
+uint16_t _tcpudp_cksum(_IP_HDR *iph, _TCPUDP_PHDR *ph);
 void _udp_rcv(_IP_HDR *piph, _UDP_HDR *pudph);
-sint16 _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph);
+int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph);
 void _proc_udp_api(void);
 void _udp_api_tmout(void);
 void _udp_api_slp(_UDP_CB *pucb, ID id);
 void _udp_api_wup(_UDP_CB *pucb, ID id);
 void _udp_init(UW **workpp);
 void _udp_snd(_TCPUDP_PHDR *ph);
-FN  _udp_api_type_to_fn(uint16 api_type);
+FN  _udp_api_type_to_fn(uint16_t api_type);
 ER _udp_check_cepid_arg(ID cepid);
 ER _udp_check_len_arg(INT len);
 

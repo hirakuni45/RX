@@ -79,7 +79,7 @@ extern far UH const _ip_tblcnt[];
 _ARP_ENTRY   **_ether_arp_tbl;
 #endif
 #if defined(_PPP)
-extern uint16 ppp_sio_status;
+extern uint16_t ppp_sio_status;
 extern _PPP_API_REQ _ppp_api_req;
 #endif
 
@@ -102,7 +102,7 @@ ER tcpudp_open(UW *workp)
 
     _tcp_tcb = (_TCB*)currp;
     head_tcb = (_TCB*)currp;
-    currp = (UW*)((uchar*)currp + (sizeof(_TCB) * __tcpcepn));
+    currp = (UW*)((uint8_t*)currp + (sizeof(_TCB) * __tcpcepn));
 
 #if defined(_TCP)
     for (counter = 0; counter < __tcpcepn; counter++)
@@ -111,12 +111,12 @@ ER tcpudp_open(UW *workp)
 
         _tcp_init_callback_info(&head_tcb[counter].callback_info);
 
-        _tcp_tcb[counter].rwin = (uchar*)currp;
+        _tcp_tcb[counter].rwin = (uint8_t*)currp;
 
-        currp = (UW *)((uchar *)currp + tcp_ccep[counter].rbufsz);
+        currp = (UW *)((uint8_t *)currp + tcp_ccep[counter].rbufsz);
         rem = tcp_ccep[counter].rbufsz % 4;
         if (rem != 0)
-            currp = (UW *)((uchar *)currp + (4 - rem));
+            currp = (UW *)((uint8_t *)currp + (4 - rem));
         _tcp_tcb[counter].cepid = counter + 1;
         _tcp_init_tcb(&_tcp_tcb[counter]);
     }
@@ -140,7 +140,7 @@ ER tcpudp_open(UW *workp)
         memcpy(_ch_info_head[counter]._mymaskaddr, tcpudp_env[counter].maskaddr, IP_ALEN);
         memcpy(_ch_info_head[counter]._mygwaddr, tcpudp_env[counter].gwaddr, IP_ALEN);
     }
-    currp = (UW*)((uchar*)currp + (sizeof(_CH_INFO) * _t4_channel_num));
+    currp = (UW*)((uint8_t*)currp + (sizeof(_CH_INFO) * _t4_channel_num));
 
 
 #if defined(_PPP)
@@ -151,12 +151,12 @@ ER tcpudp_open(UW *workp)
 #elif defined(_ETHER)
     _ether_arp_tbl = (_ARP_ENTRY **)currp;
 
-    currp = (UW *)((uchar *)currp + _t4_channel_num * sizeof(_ARP_ENTRY *));
+    currp = (UW *)((uint8_t *)currp + _t4_channel_num * sizeof(_ARP_ENTRY *));
 
     for (counter = 0; counter < _t4_channel_num; counter++)
     {
         *(_ether_arp_tbl + counter) = ((_ARP_ENTRY *)currp);
-        currp = (UW *)((uchar *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
+        currp = (UW *)((uint8_t *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
     }
 
     _ether_arp_init();
@@ -570,7 +570,7 @@ ER tcp_snd_dat(ID cepid, VP data, INT len, TMO tmout)
     head_tcb[cepid-1].req.type = _TCP_API_SNDDT;
     head_tcb[cepid-1].req.tmout = tmout;
     head_tcb[cepid-1].req.d.dr.dtsiz = len;
-    head_tcb[cepid-1].req.d.dr.datap = (uchar *)((uint32)data);
+    head_tcb[cepid-1].req.d.dr.datap = (uint8_t *)((uint32_t)data);
 
     err = _tcp_api_req(cepid);
 
@@ -624,7 +624,7 @@ ER tcp_rcv_dat(ID cepid, VP data, INT len, TMO tmout)
 
         if (head_tcb[cepid-1].rdsize > 0)
         {
-            err = _tcp_recv_polling(&head_tcb[cepid-1], (uchar*)((uint32)data), len);
+            err = _tcp_recv_polling(&head_tcb[cepid-1], (uint8_t*)((uint32_t)data), len);
             return err;
         }
         else
@@ -653,7 +653,7 @@ ER tcp_rcv_dat(ID cepid, VP data, INT len, TMO tmout)
     head_tcb[cepid-1].req.type = _TCP_API_RCVDT;
     head_tcb[cepid-1].req.tmout = tmout;
     head_tcb[cepid-1].req.d.dr.dtsiz = len;
-    head_tcb[cepid-1].req.d.dr.datap = (uchar *)((uint32)data);
+    head_tcb[cepid-1].req.d.dr.datap = (uint8_t *)((uint32_t)data);
 
     err = _tcp_api_req(cepid);
 

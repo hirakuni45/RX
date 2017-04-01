@@ -1,3 +1,4 @@
+#pragma once
 /***********************************************************************************************************************
 * DISCLAIMER
 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
@@ -25,14 +26,9 @@
 * History : DD.MM.YYYY Version  Description
 *         : 01.04.2014 1.00     First Release
 ***********************************************************************************************************************/
-#define _TCP_UNIT_TIME  10    /* 10ms */
+#include <stdint.h>
 
-typedef   signed char  schar;
-typedef unsigned char  uchar;
-typedef   signed short  sint16;
-typedef unsigned short  uint16;
-typedef   signed long  sint32;
-typedef unsigned long  uint32;
+#define _TCP_UNIT_TIME  10    /* 10ms */
 
 #define TRUE  1
 #define FALSE  0
@@ -70,12 +66,12 @@ void net2hl_yn_xn(void *y, void *x);
 
 #else /* BIGENDIAN == 0 */
 
-#define hs2net(x) ((uint16)((x)>>8)  | (uint16)((x)<<8))
-#define net2hs(x) ((uint16)((x)>>8)  | (uint16)((x)<<8))
-#define hl2net(x) ((uint32)((x)>>24) | (uint32)((0xff0000&(x))>>8) \
-                   | (uint32)((0x00ff00&(x))<<8) | (uint32)((x)<<24))
-#define net2hl(x) ((uint32)((x)>>24) | (uint32)((0xff0000&(x))>>8) \
-                   | (uint32)((0x00ff00&(x))<<8) | (uint32)((x)<<24))
+#define hs2net(x) ((uint16_t)((x)>>8)  | (uint16_t)((x)<<8))
+#define net2hs(x) ((uint16_t)((x)>>8)  | (uint16_t)((x)<<8))
+#define hl2net(x) ((uint32_t)((x)>>24) | (uint32_t)((0xff0000&(x))>>8) \
+                   | (uint32_t)((0x00ff00&(x))<<8) | (uint32_t)((x)<<24))
+#define net2hl(x) ((uint32_t)((x)>>24) | (uint32_t)((0xff0000&(x))>>8) \
+                   | (uint32_t)((0x00ff00&(x))<<8) | (uint32_t)((x)<<24))
 
 void net2hl_yn_xn(void *y, void *x);
 #define hl2net_yn_xn(y, x) net2hl_yn_xn(y, x)
@@ -83,15 +79,15 @@ void net2hl_yn_xn(void *y, void *x);
     {\
         register tmp1; \
         register tmp2; \
-        register uchar *a0 = (uchar *)x; \
-        tmp1 = *((uchar*)a0    );\
-        tmp2 = *((uchar*)a0 + 3);\
-        *((uchar*)a0    ) = tmp2;\
-        *((uchar*)a0 +3 ) = tmp1;\
-        tmp1 = *((uchar*)a0 + 1);\
-        tmp2 = *((uchar*)a0 + 2);\
-        *((uchar*)a0 + 1) = tmp2;\
-        *((uchar*)a0 + 2) = tmp1;\
+        register uint8_t *a0 = (uint8_t *)x; \
+        tmp1 = *((uint8_t*)a0    );\
+        tmp2 = *((uint8_t*)a0 + 3);\
+        *((uint8_t*)a0    ) = tmp2;\
+        *((uint8_t*)a0 +3 ) = tmp1;\
+        tmp1 = *((uint8_t*)a0 + 1);\
+        tmp2 = *((uint8_t*)a0 + 2);\
+        *((uint8_t*)a0 + 1) = tmp2;\
+        *((uint8_t*)a0 + 2) = tmp1;\
     }
 #endif
 
@@ -104,10 +100,10 @@ void net2hl_yn_xn(void *y, void *x);
 #define T_IPVxEP T_IPV4EP
 
 #define IP_ALEN    4
-typedef uchar IPaddr[IP_ALEN]; /*  IP address */
+typedef uint8_t IPaddr[IP_ALEN]; /*  IP address */
 
 #define EP_ALEN    6
-typedef uchar Eaddr[EP_ALEN];  /*  MAC address */
+typedef uint8_t Eaddr[EP_ALEN];  /*  MAC address */
 
 
 /*
@@ -122,32 +118,32 @@ typedef uchar Eaddr[EP_ALEN];  /*  MAC address */
  defined(__RX) || defined(__v850) || defined(__GNUC__) || defined(GRSAKURA)
 #define _cmp_ipaddr(x,y) memcmp(x,y,(size_t)IP_ALEN)
 #else
-#define _cmp_ipaddr(x, y)  ( ((*(((uint16 *)(x))  )) ^ (*(((uint16 *)(y))  ))) |  \
-                             ((*(((uint16 *)(x))+1)) ^ (*(((uint16 *)(y))+1)))  )
+#define _cmp_ipaddr(x, y)  ( ((*(((uint16_t *)(x))  )) ^ (*(((uint16_t *)(y))  ))) |  \
+                             ((*(((uint16_t *)(x))+1)) ^ (*(((uint16_t *)(y))+1)))  )
 #endif
 /* same as memcpy(x, y, IP_ALEN) */
 #if defined (_SH2) || defined(_SH2A) || defined(_SH2AFPU) || defined(_SH4) || defined(_SH4A) ||\
  defined(__RX) || defined(__v850) || defined(__GNUC__) || defined(GRSAKURA)
 #define _cpy_ipaddr(x ,y) memcpy(x,y,IP_ALEN)
 #else
-#define _cpy_ipaddr(x, y)  *((uint32 *)(x)) = *((uint32 *)(y))
+#define _cpy_ipaddr(x, y)  *((uint32_t *)(x)) = *((uint32_t *)(y))
 #endif
 /* same as memcpy(x, y, EP_ALEN) */
 #if defined (_SH2) || defined(_SH2A) || defined(_SH2AFPU) || defined(_SH4) || defined(_SH4A) ||\
  defined(__RX) || defined(__v850) || defined(__GNUC__) || defined(GRSAKURA)
 #define _cpy_eaddr(x, y) memcpy(x,y,EP_ALEN);
 #else
-#define _cpy_eaddr(x, y)   *(((uint32 *)(x))  ) = *(((uint32 *)(y))  ); \
-    *(((uint16 *)(x))+2) = *(((uint16 *)(y))+2);
+#define _cpy_eaddr(x, y)   *(((uint32_t *)(x))  ) = *(((uint32_t *)(y))  ); \
+    *(((uint16_t *)(x))+2) = *(((uint16_t *)(y))+2);
 #endif
-#define _cmp_ipv6addr(x, y)   ( ((*(((uint32 *)(x))  )) ^ (*(((uint32 *)(y))  ))) |  \
-                                ((*(((uint32 *)(x))+1)) ^ (*(((uint32 *)(y))+1))) |  \
-                                ((*(((uint32 *)(x))+2)) ^ (*(((uint32 *)(y))+2))) |  \
-                                ((*(((uint32 *)(x))+3)) ^ (*(((uint32 *)(y))+3)))  )
-#define _cpy_ipv6addr(x, y)  *(((uint32 *)(x))  ) = *(((uint32 *)(y))  ); \
-    *(((uint32 *)(x))+1) = *(((uint32 *)(y))+1); \
-    *(((uint32 *)(x))+2) = *(((uint32 *)(y))+2); \
-    *(((uint32 *)(x))+3) = *(((uint32 *)(y))+3);
+#define _cmp_ipv6addr(x, y)   ( ((*(((uint32_t *)(x))  )) ^ (*(((uint32_t *)(y))  ))) |  \
+                                ((*(((uint32_t *)(x))+1)) ^ (*(((uint32_t *)(y))+1))) |  \
+                                ((*(((uint32_t *)(x))+2)) ^ (*(((uint32_t *)(y))+2))) |  \
+                                ((*(((uint32_t *)(x))+3)) ^ (*(((uint32_t *)(y))+3)))  )
+#define _cpy_ipv6addr(x, y)  *(((uint32_t *)(x))  ) = *(((uint32_t *)(y))  ); \
+    *(((uint32_t *)(x))+1) = *(((uint32_t *)(y))+1); \
+    *(((uint32_t *)(x))+2) = *(((uint32_t *)(y))+2); \
+    *(((uint32_t *)(x))+3) = *(((uint32_t *)(y))+3);
 #endif
 
 

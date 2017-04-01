@@ -54,7 +54,7 @@ Exported global variables (to be accessed by other files)
 /***********************************************************************************************************************
 Private global variables and functions
 ***********************************************************************************************************************/
-uchar    *_ether_p_rcv_buff;
+uint8_t    *_ether_p_rcv_buff;
 
 /***********************************************************************************************************************
 Exported global variables (read from other files)
@@ -77,9 +77,9 @@ extern TCPUDP_ENV tcpudp_env[];
 
 void _ether_proc_rcv(void)
 {
-    sint16  len;
+    int16_t  len;
     _EP   *pep;
-    uchar  *buf;
+    uint8_t  *buf;
 
     /* Return when receive buffer has not released yet */
     /* The information has already stored in '_p_rcv_buf' */
@@ -160,7 +160,7 @@ void _ether_rcv_arp(void)
 {
     _ARP_ENTRY *ae;
     _ARP_PKT *rpap;
-    uint16  i;
+    uint16_t  i;
 
     rpap = (_ARP_PKT *)(_ch_info_tbl->_p_rcv_buf.pip);
     /* Discard: exclude ARP packet addressed to itself */
@@ -249,11 +249,11 @@ void _ether_arp_resolve(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-sint16 _ether_snd_arp(_ARP_ENTRY *ae)
+int16_t _ether_snd_arp(_ARP_ENTRY *ae)
 {
     _ETH_HDR *peh;
     _ARP_PKT *rpap, *parp;
-    sint16  ret;
+    int16_t  ret;
 
     rpap = (_ARP_PKT *)(_ch_info_tbl->_p_rcv_buf.pip);
     rpap = (_ARP_PKT *)_ch_info_tbl->arp_buff;
@@ -306,18 +306,18 @@ sint16 _ether_snd_arp(_ARP_ENTRY *ae)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-sint16 _ether_snd_ip(uchar *data, uint16 dlen)
+int16_t _ether_snd_ip(uint8_t *data, uint16_t dlen)
 {
-    sint16 ret = 0;
-    sint16 i;
-    uint32  nexthop;
-    uint32  tmp1;
-    uchar  eaddr[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    int16_t ret = 0;
+    int16_t i;
+    uint32_t  nexthop;
+    uint32_t  tmp1;
+    uint8_t  eaddr[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 #if defined(_MULTI)
-    uint32 addr;
-    uint32 subnet_mask;
-    uint32 broad_cast_addr = 0xffffffff;
-    static const uchar ip_broadcast[] = {0xff, 0xff, 0xff, 0xff};
+    uint32_t addr;
+    uint32_t subnet_mask;
+    uint32_t broad_cast_addr = 0xffffffff;
+    static const uint8_t ip_broadcast[] = {0xff, 0xff, 0xff, 0xff};
 #endif
     _ETH_HDR *peh;
     _ARP_ENTRY *ae;
@@ -335,7 +335,7 @@ sint16 _ether_snd_ip(uchar *data, uint16 dlen)
 
 #if defined(_MULTI)
     /* EX.XX.XX.XX (multicast) */
-    if ((*((uchar*)&tmp1) & 0xf0) == 0xe0)
+    if ((*((uint8_t*)&tmp1) & 0xf0) == 0xe0)
     {
         _cpy_ipaddr(&nexthop, &tmp1);
         _tx_hdr.hlen += _ETH_LEN;
@@ -404,7 +404,7 @@ sint16 _ether_snd_ip(uchar *data, uint16 dlen)
     else
     {
         /* Regist the new entry to the ARP table */
-        ae = _ether_arp_add((uchar *) & nexthop, eaddr);
+        ae = _ether_arp_add((uint8_t *) & nexthop, eaddr);
         _ch_info_tbl->flag |= _TCBF_SND_ARP_REQ;
         _ether_snd_arp(ae);
 
@@ -419,20 +419,20 @@ sint16 _ether_snd_ip(uchar *data, uint16 dlen)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-sint16 _ether_snd(uint16 type, uchar *data, uint16 dlen)
+int16_t _ether_snd(uint16_t type, uint8_t *data, uint16_t dlen)
 {
     _ETH_HDR *peh;
-    sint16  plen, ret, i;
-    uchar  pad[_EP_PAD_MAX]; /* 0 padding data (max size if 18(_EP_PAD_MAX)) */
+    int16_t  plen, ret, i;
+    uint8_t  pad[_EP_PAD_MAX]; /* 0 padding data (max size if 18(_EP_PAD_MAX)) */
 
 #if defined(_MULTI)
     _IP_HDR  *piph;
-    static const uchar eth_multi_addr[3] = {0x01, 0x00, 0x5e};
-    static const uchar eth_broadcast[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-    static const uchar ip_broadcast[] = {0xff, 0xff, 0xff, 0xff};
-    uint32 addr;
-    uint32 subnet_mask;
-    uint32 broad_cast_addr = 0xffffffff;
+    static const uint8_t eth_multi_addr[3] = {0x01, 0x00, 0x5e};
+    static const uint8_t eth_broadcast[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    static const uint8_t ip_broadcast[] = {0xff, 0xff, 0xff, 0xff};
+    uint32_t addr;
+    uint32_t subnet_mask;
+    uint32_t broad_cast_addr = 0xffffffff;
 #endif
 
     peh = &(_tx_hdr.eh);
@@ -502,11 +502,11 @@ sint16 _ether_snd(uint16 type, uchar *data, uint16 dlen)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-_ARP_ENTRY *_ether_arp_add(uchar *ipaddr, uchar *ethaddr)
+_ARP_ENTRY *_ether_arp_add(uint8_t *ipaddr, uint8_t *ethaddr)
 {
-    sint16 i;
-    uint16 tmp_ttl = ARP_TIMEOUT;
-    uchar bcast[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    int16_t i;
+    uint16_t tmp_ttl = ARP_TIMEOUT;
+    uint8_t bcast[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
     _ARP_ENTRY *ae, *ae_tmp, *ae_tmp2;
 
 
@@ -608,7 +608,7 @@ void _ether_arp_del(_ARP_ENTRY *ae)
 ***********************************************************************************************************************/
 void _ether_arp_init(void)
 {
-    uint16 counter;
+    uint16_t counter;
     _ARP_ENTRY *ae;
 
     /* table clear for all channels */

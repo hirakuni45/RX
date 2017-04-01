@@ -104,26 +104,26 @@ extern _CH_INFO *_ch_info_head;
 #if BIGENDIAN == 0  /* little endian */
 void net2hl_yn_xn(void *y, void *x)
 {
-    register uchar *a1 = (uchar *)y;
-    register uchar *a0 = (uchar *)x;
+    register uint8_t *a1 = (uint8_t *)y;
+    register uint8_t *a0 = (uint8_t *)x;
 
-    *((uchar*)a1 + 3) = *((uchar*)a0);
-    *((uchar*)a1 + 2) = *((uchar*)a0 + 1);
-    *((uchar*)a1 + 1) = *((uchar*)a0 + 2);
-    *((uchar*)a1) = *((uchar*)a0 + 3);
+    *((uint8_t*)a1 + 3) = *((uint8_t*)a0);
+    *((uint8_t*)a1 + 2) = *((uint8_t*)a0 + 1);
+    *((uint8_t*)a1 + 1) = *((uint8_t*)a0 + 2);
+    *((uint8_t*)a1) = *((uint8_t*)a0 + 3);
 }
 #endif
 
 #if BIGENDIAN == 1  /* big endian */
 void net2hl_yn_xn(void *y, void *x)
 {
-    register uchar *a1 = (uchar *)y;
-    register uchar *a0 = (uchar *)x;
+    register uint8_t *a1 = (uint8_t *)y;
+    register uint8_t *a0 = (uint8_t *)x;
 
-    *((uchar*)a1) = *((uchar*)a0);
-    *((uchar*)a1 + 1) = *((uchar*)a0 + 1);
-    *((uchar*)a1 + 2) = *((uchar*)a0 + 2);
-    *((uchar*)a1 + 3) = *((uchar*)a0 + 3);
+    *((uint8_t*)a1) = *((uint8_t*)a0);
+    *((uint8_t*)a1 + 1) = *((uint8_t*)a0 + 1);
+    *((uint8_t*)a1 + 2) = *((uint8_t*)a0 + 2);
+    *((uint8_t*)a1 + 3) = *((uint8_t*)a0 + 3);
 }
 #endif
 
@@ -135,7 +135,7 @@ void net2hl_yn_xn(void *y, void *x)
 ***********************************************************************************************************************/
 void _tcp_init_tcb(_TCB *_ptcb)
 {
-    uint16 i;
+    uint16_t i;
     uint8_t ch;
 
     ch = tcp_ccep[_ptcb->cepid-1].cepatr;
@@ -333,7 +333,7 @@ void _tcp_api_acpt(void)
 void _tcp_api_con(void)
 {
     _API_REQ *areq;
-    static uint16 port;
+    static uint16_t port;
 
     areq = &(_tcp_tcb->req);
 
@@ -623,8 +623,8 @@ void _tcp_api_rcvdt(void)
 void _tcp_cpy_rwdat(void)
 {
     _API_REQ *areq;
-    uint16  api_dsiz;
-    uint16  free_win;
+    uint16_t  api_dsiz;
+    uint16_t  free_win;
 
     areq = &(_tcp_tcb->req);
 
@@ -686,8 +686,8 @@ void _proc_rcv(void)
     _ICMP_HDR *picmph;
     _TCP_HDR *ptcph;
     _TCP_PHDR phdr;
-    uint16  seg_size, sum16;
-    uint16  counter = 0;
+    uint16_t  seg_size, sum16;
+    uint16_t  counter = 0;
     uint8_t  ch;
 
     _tcp_tcb = head_tcb;
@@ -767,8 +767,8 @@ void _proc_rcv(void)
                 phdr.prtcl = _IPH_TCP;
                 seg_size = net2hs(piph->ip_total_len) - _IP_HLEN_MIN;
                 phdr.len = hs2net(seg_size);
-                sum16 = _cksum((uchar *) & phdr, sizeof(_TCP_PHDR), 0);
-                sum16 = _cksum((uchar *)ptcph, seg_size, ~hs2net(sum16));
+                sum16 = _cksum((uint8_t *) & phdr, sizeof(_TCP_PHDR), 0);
+                sum16 = _cksum((uint8_t *)ptcph, seg_size, ~hs2net(sum16));
                 if (sum16 != 0)
                 {
                     report_error(_ch_info_tbl->_ch_num, RE_TCP_HEADER2, data_link_buf_ptr);
@@ -843,7 +843,7 @@ _err_proc_rcv:
 ***********************************************************************************************************************/
 void _tcp_stat(void)
 {
-    sint16 ret;
+    int16_t ret;
 
     ret = _tcp_rcv_opt();
     if (ret == E_ERR)
@@ -1000,7 +1000,7 @@ ER _tcp_rcv_syn(void)
     _IP_PKT  *pip;
     _IP_HDR  *piph;
     _TCP_HDR *ph;
-    uint32  tmp;
+    uint32_t  tmp;
 
     pip  = (_IP_PKT *)(_ch_info_tbl->_p_rcv_buf.pip);
     piph = (_IP_HDR *)pip;
@@ -1093,8 +1093,8 @@ void _tcp_rcv_ack(void)
 {
     _IP_PKT  *pip;
     _TCP_HDR *ph;
-    uint32  tmp, ackdsz;
-    uint32   suna;
+    uint32_t  tmp, ackdsz;
+    uint32_t   suna;
 
     pip  = (_IP_PKT *)(_ch_info_tbl->_p_rcv_buf.pip);
     ph  = (_TCP_HDR *)(pip->data);
@@ -1138,8 +1138,8 @@ void _tcp_rcv_ack(void)
     }
     if (_tcp_tcb->snxt == suna)
     {
-        uchar cur_req_stat = _tcp_tcb->req.stat;
-        uchar cur_req_type = _tcp_tcb->req.type;
+        uint8_t cur_req_stat = _tcp_tcb->req.stat;
+        uint8_t cur_req_type = _tcp_tcb->req.type;
 
         _tcp_tcb->suna = suna;
 
@@ -1238,15 +1238,15 @@ void _tcp_rcv_ack(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-sint16 _tcp_rcv_opt(void)
+int16_t _tcp_rcv_opt(void)
 {
-    uint16  mss;
+    uint16_t  mss;
     _IP_PKT  *pip;
     _TCP_HDR *ph;
-    uint32  tmp;
-    uint16  hdr_siz;
-    uchar  *p, opt_len, opt_type;
-    uint16  total_opt_len;
+    uint32_t  tmp;
+    uint16_t  hdr_siz;
+    uint8_t  *p, opt_len, opt_type;
+    uint16_t  total_opt_len;
 
     pip  = (_IP_PKT *)(_ch_info_tbl->_p_rcv_buf.pip);
     ph  = (_TCP_HDR *)(pip->data);
@@ -1286,7 +1286,7 @@ sint16 _tcp_rcv_opt(void)
             {
                 if (opt_len != 4)
                     return E_ERR;
-                mss = (((uint16) * (p + 2)) << 8) | ((uint16) * (p + 3));
+                mss = (((uint16_t) * (p + 2)) << 8) | ((uint16_t) * (p + 3));
             }
         }
         p += opt_len;
@@ -1308,13 +1308,13 @@ sint16 _tcp_rcv_opt(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-sint16 _tcp_proc_data(void)
+int16_t _tcp_proc_data(void)
 {
-    uint16 hdr_siz;
-    sint32 data_siz;
-    sint32 free_siz;
-    uint32 seq;
-    uchar  *p_tdata;
+    uint16_t hdr_siz;
+    int32_t data_siz;
+    int32_t free_siz;
+    uint32_t seq;
+    uint8_t  *p_tdata;
     _TCPS *p_tcps ;
     _IP_PKT *p_ip;
 
@@ -1323,7 +1323,7 @@ sint16 _tcp_proc_data(void)
 
     hdr_siz  = ((p_tcps->th.len & 0xf0) >> (4 - 2));
     data_siz = net2hs(p_ip->iph.ip_total_len) - _IP_HLEN_MIN - hdr_siz;
-    p_tdata  = ((uchar *)p_tcps) + hdr_siz;
+    p_tdata  = ((uint8_t *)p_tcps) + hdr_siz;
 
     net2hl_yn_xn(&seq, &p_tcps->th.seq);
     if (seq != _tcp_tcb->rnxt)
@@ -1448,10 +1448,10 @@ ER _tcp_rcv_fin(void)
 void _tcp_swin_updt(void)
 {
     _TCP_HDR *ph ;
-    uint32  win_size;
-    sint32  diff;
+    uint32_t  win_size;
+    int32_t  diff;
     _TCPS  *p_tcps ;
-    uint32  suna;
+    uint32_t  suna;
 
     p_tcps = (_TCPS *) & (((_IP_PKT *)_ch_info_tbl->_p_rcv_buf.pip)->data) ;
     ph  = &(p_tcps->th);
@@ -1551,19 +1551,19 @@ void _tcp_swin_updt(void)
 ***********************************************************************************************************************/
 void _proc_snd(void)
 {
-    uint16  sum, len = 0;
+    uint16_t  sum, len = 0;
 #if defined(__GNUC__) || defined(GRSAKURA)
-    sint16  i;
+    int16_t  i;
 #else
-    sint16  ret, i;
+    int16_t  ret, i;
 #endif
-    uchar  *picmpdata;
+    uint8_t  *picmpdata;
     _ICMP_HDR *picmph_r, *picmph_s;
     _ICMP_PKT *picmp;
     _IP_PKT  *pip;
-    uchar cur_req_stat;
-    uchar cur_req_type;
-    uint16 counter = 0;
+    uint8_t cur_req_stat;
+    uint8_t cur_req_type;
+    uint16_t counter = 0;
 
     _TCP_PHDR phdr;
 #if defined(_ETHER)
@@ -1790,9 +1790,9 @@ void _proc_snd(void)
             picmph_s->chksum = 0;
             picmph_s->id = picmph_r->id;
             picmph_s->seq = picmph_r->seq;
-            sum = _cksum((uchar *)picmph_s, _ICMP_HLEN, 0);
+            sum = _cksum((uint8_t *)picmph_s, _ICMP_HLEN, 0);
             sum = ~hs2net(sum);
-            sum = _cksum((uchar *)picmpdata, len, sum);
+            sum = _cksum((uint8_t *)picmpdata, len, sum);
             picmph_s->chksum = hs2net(sum);
 
             _tx_hdr.hlen = _ICMP_HLEN;
@@ -1842,13 +1842,13 @@ void _proc_snd(void)
 #if defined(_TCP)
 void _tcp_snd(void)
 {
-    uint32  seq;
-    uint16  sum, tmp, len = 0, smode = 0;
-    sint16  ret;
-    uchar  *pdata = NULL, flg = 0;
+    uint32_t  seq;
+    uint16_t  sum, tmp, len = 0, smode = 0;
+    int16_t  ret;
+    uint8_t  *pdata = NULL, flg = 0;
     _TCP_HDR *ptcph;
     _TCP_PHDR phdr;
-    uint16  dack_flag = _tcp_tcb->flag;
+    uint16_t  dack_flag = _tcp_tcb->flag;
 
     if (_tcp_tcb->flag & _TCBF_SND_ZWIN)
     {
@@ -2085,9 +2085,9 @@ void _tcp_snd(void)
     phdr.prtcl = _IPH_TCP ;
     phdr.len = hs2net(len + (ptcph->len >> 2)) ;
     ptcph->cksum = 0 ;
-    sum = _cksum((uchar *) & phdr, 12, 0);
+    sum = _cksum((uint8_t *) & phdr, 12, 0);
     sum = ~hs2net(sum);
-    sum = _cksum((uchar *)ptcph, (ptcph->len >> 2), sum);
+    sum = _cksum((uint8_t *)ptcph, (ptcph->len >> 2), sum);
     sum = ~hs2net(sum);
     sum = _cksum(pdata, len, sum);
     ptcph->cksum = hs2net(sum);
@@ -2328,7 +2328,7 @@ void _tcp_clr_rtq(_TCB *_ptcb)
 ***********************************************************************************************************************/
 void _tcp_return_listen(void)
 {
-    uint16 tmp;
+    uint16_t tmp;
 
     tmp = _tcp_tcb->loc_port;
 
@@ -2396,7 +2396,7 @@ ER _tcp_check_len_arg(INT len)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER  _tcp_check_tmout_arg(uint16 api_type, TMO tmout, _TCP_CB* pTcpcb)
+ER  _tcp_check_tmout_arg(uint16_t api_type, TMO tmout, _TCP_CB* pTcpcb)
 {
     ER errcode = E_OK;
 
@@ -2439,9 +2439,9 @@ ER  _tcp_check_tmout_arg(uint16 api_type, TMO tmout, _TCP_CB* pTcpcb)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-uint16  _tcp_is_tcb_queue_over(uint16 api_type, _TCB* pTcb,  _TCP_CB* pTcpcb)
+uint16_t  _tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb)
 {
-    uint16 bResult = FALSE;
+    uint16_t bResult = FALSE;
 
     if (pTcb->req.stat != _TCP_API_STAT_INIT && pTcb->req.stat != _TCP_API_STAT_COMPLETE)
     {
@@ -2462,7 +2462,7 @@ uint16  _tcp_is_tcb_queue_over(uint16 api_type, _TCB* pTcb,  _TCP_CB* pTcpcb)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-uint16 _tcp_call_callback(ID cepid, FN fncd, VP p_parblk)
+uint16_t _tcp_call_callback(ID cepid, FN fncd, VP p_parblk)
 {
     UH count;
 
@@ -2495,7 +2495,7 @@ uint16 _tcp_call_callback(ID cepid, FN fncd, VP p_parblk)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-FN  _tcp_api_type_to_fn(uint16 api_type)
+FN  _tcp_api_type_to_fn(uint16_t api_type)
 {
     FN fncd = TFN_TCP_ALL;
 
@@ -2535,10 +2535,10 @@ FN  _tcp_api_type_to_fn(uint16 api_type)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _tcp_recv_polling(_TCB* pTcb, uchar *buf, uint16 size)
+ER _tcp_recv_polling(_TCB* pTcb, uint8_t *buf, uint16_t size)
 {
-    uint16  api_dsiz;
-    uint16  free_win;
+    uint16_t  api_dsiz;
+    uint16_t  free_win;
 
     api_dsiz = size;
 
