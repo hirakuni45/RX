@@ -60,6 +60,7 @@
 #include "RX64M/power_cfg.hpp"
 #include "RX64M/icu_mgr.hpp"
 #include "RX64M/sdhi.hpp"
+#include "RX64M/s12adc.hpp"
 #include "RX64M/sdram.hpp"
 #include "RX64M/etherc.hpp"
 #include "RX64M/edmac.hpp"
