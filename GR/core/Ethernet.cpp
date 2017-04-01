@@ -6,7 +6,7 @@
 #include "r_byteq_v1.30/r_byteq_if.h"
 #include "Ethernet.h"
 
-typedef uint32_t uint;
+#include "common/format.hpp"
 
 EthernetClass Ethernet;
 EthernetClient resClient;
@@ -23,11 +23,8 @@ static byteq_hdl_t hdl,hdl_forSize;
 static uint8_t byteq_buf_forSize[RING_SIZ_forSize]={0};    /*sizeQueBody 1024>>2=256*/
 
 
-#define ETHER_DEBUG
+/// #define ETHER_DEBUG
 
-#ifdef ETHER_DEBUG
-#include "common/format.hpp"
-#endif
 
 /***********************************************************************************************************************
 * Function Name: main
@@ -122,7 +119,10 @@ extern "C" ER t4_udp_callback(ID cepid, FN fncd , VP p_parblk){
                         }
                     }
                     ip.dword = g_remoteIPV4EP.ipaddr;
-                    g_remoteIPV4EP.ipaddr = ((uint)ip.bytes[0]<<24) | ((uint)ip.bytes[1]<<16) | ((uint)ip.bytes[2]<<8) | ((uint)ip.bytes[3]);
+                    g_remoteIPV4EP.ipaddr = ((uint32_t)ip.bytes[0]<<24)
+										  | ((uint32_t)ip.bytes[1]<<16)
+										  | ((uint32_t)ip.bytes[2]<<8)
+										  | ((uint32_t)ip.bytes[3]);
                 }
                 break;
             default:
@@ -943,7 +943,7 @@ int EthernetUDP::read(void)
 
   byteq_err = R_BYTEQ_Get(hdl, &byteq_char);
   if(byteq_err == BYTEQ_SUCCESS){
-      res = (int)((uint)byteq_char);
+      res = (int)((uint32_t)byteq_char);
       _remaining -= 1;
   }
   else{
