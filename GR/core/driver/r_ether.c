@@ -51,9 +51,9 @@ Includes   <System Includes> , "Project Includes"
 void lan_inthdr(void);
 #endif
 
-#define ETHER_DEBUG
+#define ETHC_DEBUG
 
-#ifdef ETHER_DEBUG
+#ifdef ETHC_DEBUG
 void sci_puts(const char*);
 #endif
 
@@ -116,7 +116,7 @@ static void    _R_Ether_InitDescriptors(void);
 static void    _R_Ether_ConfigEthernet(const uint8_t mode);
 static void    _R_Ether_PauseResolution(uint8_t local_ability, uint8_t partner_ability,
                               uint16_t *tx_pause, uint16_t *rx_pause);
-static void    ether_configure_mac(const uint8_t mac_addr[], const uint8_t mode);
+static void    ether_configure_mac(const uint8_t *mac_addr, const uint8_t mode);
 static int32_t ether_do_link(const uint8_t mode);
 
 /**
@@ -168,9 +168,6 @@ static const pauseresolution_s pause_resolution[PAUSE_TABLE_ENTRIES] =
  * on the memory map.
  */
 #if defined(__GNUC__) || defined(GRSAKURA)
-// static descriptor_s rx_descriptors[EMAC_NUM_RX_DESCRIPTORS] __attribute__ ((section("._RX_DESC")));
-// static descriptor_s tx_descriptors[EMAC_NUM_TX_DESCRIPTORS] __attribute__ ((section("._TX_DESC")));
-// static etherbuffer_s ether_buffers __attribute__ ((section("._ETHERNET_BUFFERS")));
 static descriptor_s rx_descriptors[EMAC_NUM_RX_DESCRIPTORS] __attribute__ ((aligned(32)));
 static descriptor_s tx_descriptors[EMAC_NUM_TX_DESCRIPTORS] __attribute__ ((aligned(32)));
 static etherbuffer_s ether_buffers __attribute__ ((aligned(32)));
@@ -204,15 +201,11 @@ static etherbuffer_s   ether_buffers;
 * Return Value : R_ETHER_OK
 *                R_ETHER_ERROR
 ***********************************************************************************************************************/
-int32_t R_ETHER_Open_ZC2(uint32_t ch, const uint8_t mac_addr[])
+int32_t R_ETHER_Open_ZC2(const uint8_t *mac_addr)
 {
     int16_t phy_ret;
     int32_t ret;
 
-#if defined(__GNUC__) || defined(GRSAKURA)
-#else
-    ch = ch;    /* Keep compiler happy */
-#endif
     /* Initialize the flags */
     g_ether_TransferEnableFlag = ETHER_FLAG_OFF;
     g_ether_MpdFlag            = ETHER_FLAG_OFF;
@@ -265,12 +258,8 @@ int32_t R_ETHER_Open_ZC2(uint32_t ch, const uint8_t mac_addr[])
 * Return Value : R_ETHER_OK
 *                R_ETHER_ERROR
 ***********************************************************************************************************************/
-int32_t R_ETHER_Close_ZC2(uint32_t ch)
+int32_t R_ETHER_Close_ZC2(void)
 {
-#if defined(__GNUC__) || defined(GRSAKURA)
-#else
-    ch = ch;    /* Keep compiler happy */
-#endif
     /* Disable Ethernet interrupt. */
     ICU.IER[IER_ICU_GROUPAL1].BIT.IEN1 = 0;
     ICU.GENAL1.BIT.EN4 = 0;
@@ -304,14 +293,10 @@ int32_t R_ETHER_Close_ZC2(uint32_t ch)
 *                R_ETHER_ERROR_MPDE -
 *                    Doesn't receive the data to the receive buffer for the detection mode of magic packet. 
 ***********************************************************************************************************************/
-int32_t R_ETHER_Read_ZC2(uint32_t ch, void **buf)
+int32_t R_ETHER_Read_ZC2(void **buf)
 {
     int32_t num_recvd;
     int32_t ret;
-#if defined(__GNUC__) || defined(GRSAKURA)
-#else
-    ch = ch;    /* Keep compiler happy */
-#endif
     /* When the Link up processing is not completed, return error */
     if (ETHER_FLAG_OFF == g_ether_TransferEnableFlag)
     {
@@ -325,9 +310,6 @@ int32_t R_ETHER_Read_ZC2(uint32_t ch, void **buf)
     /* When the Link up processing is completed */
     else
     {
-#ifdef ETHER_DEBUG
-///		sci_puts("Read: entry\n");
-#endif
         while (1)
         {
             /* When receive data exists. */
@@ -336,7 +318,7 @@ int32_t R_ETHER_Read_ZC2(uint32_t ch, void **buf)
                 if (app_rx_desc->status & RFE)
                 {
                     /* The buffer is released at the error.  */
-                    ret = R_ETHER_Read_ZC2_BufRelease(ch);
+                    ret = R_ETHER_Read_ZC2_BufRelease();
                 }
                 else
                 {
@@ -372,14 +354,9 @@ int32_t R_ETHER_Read_ZC2(uint32_t ch, void **buf)
 *                R_ETHER_ERROR_MPDE -
 *                   Doesn't receive the data to the receive buffer for the detection mode of magic packet. 
 ***********************************************************************************************************************/
-int32_t R_ETHER_Read_ZC2_BufRelease(uint32_t ch)
+int32_t R_ETHER_Read_ZC2_BufRelease(void)
 {
     int32_t ret;
-
-#if defined(__GNUC__) || defined(GRSAKURA)
-#else
-   ch = ch;    /* Keep compiler happy */
-#endif
     /* When the Link up processing is not completed, return error */
     if (ETHER_FLAG_OFF == g_ether_TransferEnableFlag)
     {
@@ -427,14 +404,10 @@ int32_t R_ETHER_Read_ZC2_BufRelease(uint32_t ch)
 *                R_ETHER_ERROR_TACT - 
 *                    There is not becoming empty of the transmission buffer. 
 ***********************************************************************************************************************/
-int32_t R_ETHER_Write_ZC2_GetBuf(uint32_t ch, void **buf, uint16_t *buf_size)
+int32_t R_ETHER_Write_ZC2_GetBuf(void **buf, uint16_t *buf_size)
 {
     int32_t ret;
 
-#if defined(__GNUC__) || defined(GRSAKURA)
-#else
-   ch = ch;    /* Keep compiler happy */
-#endif
     /* When the Link up processing is not completed, return error */
     if (ETHER_FLAG_OFF == g_ether_TransferEnableFlag)
     {
@@ -477,14 +450,10 @@ int32_t R_ETHER_Write_ZC2_GetBuf(uint32_t ch, void **buf, uint16_t *buf_size)
 *                R_ETHER_ERROR_MPDE - 
 *                    The transmission is not permitted because of the detection mode of magic packet. 
 ***********************************************************************************************************************/
-int32_t R_ETHER_Write_ZC2_SetBuf(uint32_t ch, const uint32_t len)
+int32_t R_ETHER_Write_ZC2_SetBuf(const uint32_t len)
 {
     int32_t ret;
 
-#if defined(__GNUC__) || defined(GRSAKURA)
-#else
-    ch = ch;    /* Keep compiler happy */
-#endif
     /* When the Link up processing is not completed, return error */
     if (ETHER_FLAG_OFF == g_ether_TransferEnableFlag)
     {
@@ -524,14 +493,10 @@ int32_t R_ETHER_Write_ZC2_SetBuf(uint32_t ch, const uint32_t len)
 * Return Value : R_ETHER_OK (Link is up)
 *                R_ETHER_ERROR (Link is down)
 ***********************************************************************************************************************/
-int32_t R_Ether_CheckLink_ZC(uint32_t ch)
+int32_t R_Ether_CheckLink_ZC(void)
 {
     int16_t status;
 
-#if defined(__GNUC__) || defined(GRSAKURA)
-#else
-    ch = ch;    /* Keep compiler happy */
-#endif
     status = Phy_GetLinkStatus();
 
     if (R_PHY_ERROR == status)
@@ -573,7 +538,7 @@ void R_ETHER_LinkProcess(void)
          * because the LINK signal of PHY-LSI is used for LED indicator, and 
          * isn't used for notifing the Link Up/Down to external device.
          */
-        ret = R_Ether_CheckLink_ZC(0);
+        ret = R_Ether_CheckLink_ZC();
         if (R_ETHER_OK == ret)
         {
             /*
@@ -600,7 +565,7 @@ void R_ETHER_LinkProcess(void)
          * because the LINK signal of PHY-LSI is used for LED indicator, and 
          * isn't used for notifing the Link Up/Down to external device.
          */
-        ret = R_Ether_CheckLink_ZC(0);
+        ret = R_Ether_CheckLink_ZC();
         if (R_ETHER_ERROR == ret)
         {
             /* Disable receive and transmit. */
@@ -631,14 +596,10 @@ void R_ETHER_LinkProcess(void)
 *                R_ETHER_ERROR_LINK - 
 *                    The auto negotiation processing is not completed and sending and receiving is not permitted. 
 ***********************************************************************************************************************/
-int32_t R_ETHER_WakeOnLAN(uint32_t ch)
+int32_t R_ETHER_WakeOnLAN(void)
 {
     int32_t ret;
 
-#if defined(__GNUC__) || defined(GRSAKURA)
-#else
-    ch = ch;    /* Keep compiler happy */
-#endif
     /* When the Link up processing is not completed, return error */
     if (ETHER_FLAG_OFF == g_ether_TransferEnableFlag)
     {
@@ -708,8 +669,8 @@ void R_ETHER_Callback_WakeOnLAN(void)
      * to have to set ETHERC to a usual operational mode
      * to usually communicate after magic packet is detected. 
      */
-    R_ETHER_Close_ZC2(0);
-    R_ETHER_Open_ZC2(0, mac_addr_buf);
+    R_ETHER_Close_ZC2();
+    R_ETHER_Open_ZC2(mac_addr_buf);
     
     /* This code is for the sample program. */
     g_magic_packet_detect = 1;
@@ -916,7 +877,7 @@ static void _R_Ether_PauseResolution(uint8_t local_ability, uint8_t partner_abil
 *                   USE_MAGIC_PACKET_DETECT    (1) - Magic packet detection mode
 * Return Value : None
 ***********************************************************************************************************************/
-static void ether_configure_mac(const uint8_t mac_addr[], const uint8_t mode)
+static void ether_configure_mac(const uint8_t *mac_addr, const uint8_t mode)
 {
     uint32_t    mac_h, mac_l;
 

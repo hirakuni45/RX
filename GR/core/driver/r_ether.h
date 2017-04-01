@@ -106,13 +106,14 @@ extern volatile uint8_t g_ether_TransferEnableFlag;
 /***********************************************************************************************************************
 Exported global functions (to be accessed by other files)
 ***********************************************************************************************************************/
-int32_t R_ETHER_Open_ZC2(uint32_t ch, const uint8_t mac_addr[]);
-int32_t R_ETHER_Close_ZC2(uint32_t ch);
-int32_t R_ETHER_Read_ZC2(uint32_t ch, void **buf);
-int32_t R_ETHER_Read_ZC2_BufRelease(uint32_t ch);
-int32_t R_ETHER_Write_ZC2_GetBuf(uint32_t ch, void **buf, uint16_t *buf_size);
-int32_t R_ETHER_Write_ZC2_SetBuf(uint32_t ch, const uint32_t len);
-int32_t R_Ether_CheckLink_ZC(uint32_t ch);
+int32_t R_ETHER_Open_ZC2(const uint8_t *mac_addr);
+int32_t R_ETHER_Close_ZC2(void); 
+int32_t R_ETHER_Read_ZC2(void **buf);
+int32_t R_ETHER_Read_ZC2_BufRelease(void);
+int32_t R_ETHER_Write_ZC2_GetBuf(void **buf, uint16_t *buf_size);
+int32_t R_ETHER_Write_ZC2_SetBuf(const uint32_t len);
+int32_t R_Ether_CheckLink_ZC(void);
+
 #if defined(__GNUC__) || defined(GRSAKURA)
 #if defined(__cplusplus)
 extern "C" {
@@ -123,7 +124,7 @@ void    R_ETHER_LinkProcess(void);
 #endif
 void    R_ETHER_LinkProcess(void);
 #endif
-int32_t R_ETHER_WakeOnLAN(uint32_t ch);
+int32_t R_ETHER_WakeOnLAN(void);
 void    R_ETHER_Callback_WakeOnLAN(void);
 void    R_ETHER_Callback_Link_On(void);
 void    R_ETHER_Callback_Link_Off(void);

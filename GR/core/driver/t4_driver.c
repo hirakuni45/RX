@@ -108,7 +108,7 @@ ER lan_open(void)
 {
 	ER ret;
 	memset(&t4_stat, 0, sizeof(T4_STATISTICS));
-	ret = R_ETHER_Open_ZC2(0, _myethaddr);
+	ret = R_ETHER_Open_ZC2(_myethaddr);
 	if (R_ETHER_OK != ret)
 	{
 		return -1;
@@ -118,7 +118,7 @@ ER lan_open(void)
 
 ER lan_close(void)
 {
-	R_ETHER_Close_ZC2(0);
+	R_ETHER_Close_ZC2();
 	return 0;
 }
 
@@ -140,7 +140,7 @@ void dis_int(void)
 H rcv_buff_release(UB lan_port_no)
 {
 	/* This function is called when TCP/IP finished using receive buffer specified lan_read. */
-	R_ETHER_Read_ZC2_BufRelease(0);
+	R_ETHER_Read_ZC2_BufRelease();
 	return 0;
 }
 
@@ -168,8 +168,8 @@ void tcpudp_act_cyc(UB cycact)
 
 void lan_reset(UB lan_port_no)
 {
-	R_ETHER_Close_ZC2(0);
-	R_ETHER_Open_ZC2(0, _myethaddr);
+	R_ETHER_Close_ZC2();
+	R_ETHER_Open_ZC2(_myethaddr);
 }
 
 void udp_api_slp(ID cepid)
@@ -203,7 +203,7 @@ H	lan_read(UB lan_port_no, B **buf)
 	int32_t driver_ret;
 	H return_code;
 
-	driver_ret = R_ETHER_Read_ZC2(0, (void **)buf);
+	driver_ret = R_ETHER_Read_ZC2((void **)buf);
 	if (driver_ret > 0)
 	{
 		t4_stat.t4_rec_cnt++;
@@ -236,7 +236,7 @@ H	lan_write(UB lan_port_no, B *header , H header_len, B *data , H data_len)
 	B	*buf;
 	uint16_t	buf_size;
 
-	driver_ret = R_ETHER_Write_ZC2_GetBuf(0, (void **) & buf, &buf_size);
+	driver_ret = R_ETHER_Write_ZC2_GetBuf((void **) &buf, &buf_size);
 	if (R_ETHER_OK == driver_ret)
 	{
 		if (buf_size >= header_len + data_len)
@@ -244,7 +244,7 @@ H	lan_write(UB lan_port_no, B *header , H header_len, B *data , H data_len)
 			memcpy(buf, header, header_len);
 			memcpy(buf + header_len, data, data_len);
 
-			driver_ret =  R_ETHER_Write_ZC2_SetBuf(0, (uint16_t)(header_len + data_len));
+			driver_ret =  R_ETHER_Write_ZC2_SetBuf((uint16_t)(header_len + data_len));
 			if (R_ETHER_OK == driver_ret)
 			{
 				t4_stat.t4_snd_cnt++;
