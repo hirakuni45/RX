@@ -16,6 +16,8 @@
 #include "common/vect.h"
 #include "GR/core/Ethernet.h"
 
+#define SERVER_TASK
+
 namespace {
 
 	volatile unsigned long millis_ = 0;
@@ -97,7 +99,7 @@ extern "C" {
 namespace {
 
 #ifdef SERVER_TASK
-	void server()
+	void service_server()
 	{
 		EthernetClient client = server_.available();
 		if (client) {
@@ -211,16 +213,20 @@ int main(int argc, char** argv)
 
 		static const uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 		if(Ethernet.begin(mac) == 0) {
-			utils::format("Fail Ethernet: begin...\n");
+			utils::format("Ethernet Fail: begin (DHCP)...\n");
 
-			utils::format("Direct IP: ");
+			utils::format("SetIP: ");
 			IPAddress ipa(192, 168, 3, 20);
 			Ethernet.begin(mac, ipa);
+		} else {
+			utils::format("DHCP: ");
 		}
 		Ethernet.localIP().print();
 
 #ifdef SERVER_TASK
 		server_.begin();
+		utils::format("Start server: ");
+		Ethernet.localIP().print();
 #endif
 	}
 
@@ -239,7 +245,7 @@ int main(int argc, char** argv)
 		}
 
 #ifdef SERVER_TASK
-		server();
+		service_server();
 #endif
 
 		++cnt;
