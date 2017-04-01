@@ -25,16 +25,65 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D データレジスタ 0（ADDRy）（y=0 to 7）
+			@brief  A/D データレジスタ 0（ADDR0）
 		*/
 		//-----------------------------------------------------------------//
 		static ro16_t<base + 0x20> ADDR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 1（ADDR1）
+		*/
+		//-----------------------------------------------------------------//
 		static ro16_t<base + 0x22> ADDR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 2（ADDR2）
+		*/
+		//-----------------------------------------------------------------//
 		static ro16_t<base + 0x24> ADDR2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 3（ADDR3）
+		*/
+		//-----------------------------------------------------------------//
 		static ro16_t<base + 0x26> ADDR3;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 4（ADDR4）
+		*/
+		//-----------------------------------------------------------------//
 		static ro16_t<base + 0x28> ADDR4;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 5（ADDR5）
+		*/
+		//-----------------------------------------------------------------//
 		static ro16_t<base + 0x2A> ADDR5;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 6（ADDR6）
+		*/
+		//-----------------------------------------------------------------//
 		static ro16_t<base + 0x2C> ADDR6;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 7（ADDR7）
+		*/
+		//-----------------------------------------------------------------//
 		static ro16_t<base + 0x2E> ADDR7;
 
 
@@ -60,6 +109,26 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static ro16_t<base + 0x86> ADDBLDRB;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	A/D 自己診断データレジスタ（ ADRD ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adrd_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 12>  AD;
+			bits_rw_t<io_, bitpos::B14, 2>  DIAGST;
+		};
+		static adrd_t<base + 0x1E>  ADRD;
 
 
 		//-----------------------------------------------------------------//
@@ -279,10 +348,22 @@ namespace device {
 				PORT4::PDR.B3 = 0;
 				MPC::P43PFS.ASEL = f;
 				break;
-//			case analog::AIN004:
-//				PORT2::PDR.B0 = 0;
-//				MPC::P20PFS.ASEL = f;
-//				break;
+			case analog::AIN004:
+				PORT4::PDR.B4 = 0;
+				MPC::P44PFS.ASEL = f;
+				break;
+			case analog::AIN005:
+				PORT4::PDR.B5 = 0;
+				MPC::P45PFS.ASEL = f;
+				break;
+			case analog::AIN006:
+				PORT4::PDR.B6 = 0;
+				MPC::P46PFS.ASEL = f;
+				break;
+			case analog::AIN007:
+				PORT4::PDR.B7 = 0;
+				MPC::P47PFS.ASEL = f;
+				break;
 			default:
 				break;
 			}
@@ -308,55 +389,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D データレジスタ 16（ADDR16）
-		*/
-		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x40> ADDR16;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  A/D チャネル選択レジスタ定義 (ADANS)
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t ofs>
-		struct adans_t {
-			void set(analog an, bool f = true) {
-				uint32_t n = static_cast<uint32_t>(an);
-				uint32_t ros = ofs;
-				if(n >= 4) {
-					n -= 4;
-					ros += 2;
-				}
-				if(f) {
-					wr16_(ros, rd16_(ros) |  (static_cast<uint16_t>(1) << n));
-				} else {
-					wr16_(ros, rd16_(ros) & ~(static_cast<uint16_t>(1) << n));
-				}
-			}
-
-			bool operator() (analog an) const {
-				uint32_t n = static_cast<uint32_t>(an);
-				uint32_t ros = ofs;
-				if(n >= 4) {
-					n -= 4;
-					ros += 2;
-				}
-				return (rd16_(ros) >> n) & 1;
-			}
-		};
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D チャネル選択レジスタ設定 A
-		*/
-		//-----------------------------------------------------------------//
-		static adans_t<base + 0x04> ADANSA;
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  A/D チャネル選択レジスタ A0（ADANSA0）
 			@param[in]	ofs	オフセット
 		*/
@@ -373,27 +405,36 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  ANSA001;
 			bit_rw_t<io_, bitpos::B2>  ANSA002;
 			bit_rw_t<io_, bitpos::B3>  ANSA003;
+			bit_rw_t<io_, bitpos::B4>  ANSA004;
+			bit_rw_t<io_, bitpos::B5>  ANSA005;
+			bit_rw_t<io_, bitpos::B6>  ANSA006;
+			bit_rw_t<io_, bitpos::B7>  ANSA007;
 		};
 		static adansa0_t<base + 0x04>   ADANSA0;
 
 
-		//-----------------------------------------------------------------//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  A/D チャネル選択レジスタ A1（ADANSA1）
-			@param[in]	ofs	オフセット
+			@brief  A/D チャネル選択レジスタ定義 (ADANS) unit0
 		*/
-		//-----------------------------------------------------------------//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct adansa1_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
+		struct adans_t {
+			void set(analog an, bool f = true) {
+				uint32_t n = static_cast<uint32_t>(an);
+				if(f) {
+					wr16_(ofs, rd16_(ofs) |  (static_cast<uint16_t>(1) << n));
+				} else {
+					wr16_(ofs, rd16_(ofs) & ~(static_cast<uint16_t>(1) << n));
+				}
+			}
 
-			bit_rw_t<io_, bitpos::B0>  ANSA100;
+			bool operator() (analog an) const {
+				uint32_t n = static_cast<uint32_t>(an);
+				return (rd16_(ofs) >> n) & 1;
+			}
 		};
-		static adansa1_t<base + 0x06>   ADANSA1;
+		static adans_t<base + 0x04>   ADANSA;
 
 
 		//-----------------------------------------------------------------//
@@ -512,27 +553,12 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  ADS001;
 			bit_rw_t<io_, bitpos::B2>  ADS002;
 			bit_rw_t<io_, bitpos::B3>  ADS003;
+			bit_rw_t<io_, bitpos::B3>  ADS004;
+			bit_rw_t<io_, bitpos::B3>  ADS005;
+			bit_rw_t<io_, bitpos::B3>  ADS006;
+			bit_rw_t<io_, bitpos::B3>  ADS007;
 		};
 		static adads0_t<base + 0x08>   ADADS0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D 変換値加算 / 平均機能チャネル選択レジスタ 1（ADADS1）
-			@param[in]	ofs	オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct adads1_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  ADS100;
-		};
-		static adads1_t<base + 0x0A>   ADADS1;
 
 
 		//-----------------------------------------------------------------//
@@ -693,6 +719,19 @@ namespace device {
 			AIN105,
 			AIN106,
 			AIN107,
+			AIN108,
+			AIN109,
+			AIN110,
+			AIN111,
+			AIN112,
+			AIN113,
+			AIN114,
+			AIN115,
+			AIN116,
+			AIN117,
+			AIN118,
+			AIN119,
+			AIN120,
 		};
 
 
@@ -701,7 +740,7 @@ namespace device {
 			@brief	アナログ入力数
 		*/
 		//-----------------------------------------------------------------//		
-		static const uint32_t analog_num_ = 5;
+		static const uint32_t analog_num_ = 20;
 
 
 		//-----------------------------------------------------------------//
@@ -717,30 +756,214 @@ namespace device {
 
 			switch(an) {
 			case analog::AIN100:
-				PORT4::PDR.B4 = 0;
-				MPC::P44PFS.ASEL = f;
+				PORTE::PDR.B2 = 0;
+				MPC::PE2PFS.ASEL = f;
 				break;
 			case analog::AIN101:
-				PORT4::PDR.B5 = 0;
-				MPC::P45PFS.ASEL = f;
+				PORTE::PDR.B3 = 0;
+				MPC::PE3PFS.ASEL = f;
 				break;
 			case analog::AIN102:
-				PORT4::PDR.B6 = 0;
-				MPC::P46PFS.ASEL = f;
+				PORTE::PDR.B4 = 0;
+				MPC::PE4PFS.ASEL = f;
 				break;
 			case analog::AIN103:
-				PORT4::PDR.B7 = 0;
-				MPC::P47PFS.ASEL = f;
+				PORTE::PDR.B5 = 0;
+				MPC::PE5PFS.ASEL = f;
 				break;
-//			case analog::AIN116:
-//				PORT2::PDR.B1 = 0;
-//				MPC::P21PFS.ASEL = f;
-//				break;
+			case analog::AIN104:
+				PORTE::PDR.B6 = 0;
+				MPC::PE6PFS.ASEL = f;
+				break;
+			case analog::AIN105:
+				PORTE::PDR.B7 = 0;
+				MPC::PE7PFS.ASEL = f;
+				break;
+			case analog::AIN106:
+				PORTD::PDR.B6 = 0;
+				MPC::PD6PFS.ASEL = f;
+				break;
+			case analog::AIN107:
+				PORTD::PDR.B7 = 0;
+				MPC::PD7PFS.ASEL = f;
+				break;
+			case analog::AIN108:
+				PORTD::PDR.B0 = 0;
+				MPC::PD0PFS.ASEL = f;
+				break;
+			case analog::AIN109:
+				PORTD::PDR.B1 = 0;
+				MPC::PD1PFS.ASEL = f;
+				break;
+			case analog::AIN110:
+				PORTD::PDR.B2 = 0;
+				MPC::PD2PFS.ASEL = f;
+				break;
+			case analog::AIN111:
+				PORTD::PDR.B3 = 0;
+				MPC::PD3PFS.ASEL = f;
+				break;
+			case analog::AIN112:
+				PORTD::PDR.B4 = 0;
+				MPC::PD4PFS.ASEL = f;
+				break;
+			case analog::AIN113:
+				PORTD::PDR.B5 = 0;
+				MPC::PD5PFS.ASEL = f;
+				break;
+			case analog::AIN114:
+				PORT9::PDR.B0 = 0;
+				MPC::P90PFS.ASEL = f;
+				break;
+			case analog::AIN115:
+				PORT9::PDR.B1 = 0;
+				MPC::P91PFS.ASEL = f;
+				break;
+			case analog::AIN116:
+				PORT9::PDR.B2 = 0;
+				MPC::P92PFS.ASEL = f;
+				break;
+			case analog::AIN117:
+				PORT9::PDR.B3 = 0;
+				MPC::P93PFS.ASEL = f;
+				break;
+			case analog::AIN118:
+				PORT0::PDR.B0 = 0;
+				MPC::P00PFS.ASEL = f;
+				break;
+			case analog::AIN119:
+				PORT0::PDR.B1 = 0;
+				MPC::P01PFS.ASEL = f;
+				break;
+			case analog::AIN120:
+				PORT0::PDR.B2 = 0;
+				MPC::P02PFS.ASEL = f;
+				break;
 			default:
 				break;
 			}
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 8（ADDR8）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x30> ADDR8;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 9（ADDR9）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x32> ADDR9;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 10（ADDR10）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x34> ADDR10;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 11（ADDR11）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x36> ADDR11;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 12（ADDR12）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x38> ADDR12;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 13（ADDR13）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x3A> ADDR13;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 14（ADDR14）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x3C> ADDR14;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 15（ADDR15）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x3E> ADDR15;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 16（ADDR16）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x40> ADDR16;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 17（ADDR17）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x42> ADDR17;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 18（ADDR18）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x44> ADDR18;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 19（ADDR19）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x46> ADDR19;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D データレジスタ 20（ADDR20）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x48> ADDR20;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D 温度センサデータレジスタ（ ADTSDR ）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x1A> ADTSDR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief   A/D 内部基準電圧データレジスタ（ ADOCDR ）
+		*/
+		//-----------------------------------------------------------------//
+		static ro16_t<base + 0x01C> ADOCDR;
 
 
 		//-----------------------------------------------------------------//
@@ -756,14 +979,6 @@ namespace device {
 			}
 		};
 		static addr_t ADDR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D データレジスタ 16（ADDR16）
-		*/
-		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x40> ADDR16;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -797,13 +1012,6 @@ namespace device {
 				return (rd16_(ros) >> n) & 1;
 			}
 		};
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D チャネル選択レジスタ設定 A
-		*/
-		//-----------------------------------------------------------------//
 		static adans_t<base + 0x04> ADANSA;
 
 
@@ -895,6 +1103,40 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  ANSB100;
 		};
 		static adansb1_t<base + 0x16>   ADANSB1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D 変換値加算 / 平均機能チャネル選択レジスタ 0（ADADS0）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adads0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   ADS000;
+			bit_rw_t<io_, bitpos::B1>   ADS001;
+			bit_rw_t<io_, bitpos::B2>   ADS002;
+			bit_rw_t<io_, bitpos::B3>   ADS003;
+			bit_rw_t<io_, bitpos::B4>   ADS004;
+			bit_rw_t<io_, bitpos::B5>   ADS005;
+			bit_rw_t<io_, bitpos::B6>   ADS006;
+			bit_rw_t<io_, bitpos::B7>   ADS007;
+			bit_rw_t<io_, bitpos::B8>   ADS008;
+			bit_rw_t<io_, bitpos::B9>   ADS009;
+			bit_rw_t<io_, bitpos::B10>  ADS010;
+			bit_rw_t<io_, bitpos::B11>  ADS011;
+			bit_rw_t<io_, bitpos::B12>  ADS012;
+			bit_rw_t<io_, bitpos::B13>  ADS013;
+			bit_rw_t<io_, bitpos::B14>  ADS014;
+			bit_rw_t<io_, bitpos::B15>  ADS015;
+		};
+		static adads0_t<base + 0x08>   ADADS0;
 
 
 		//-----------------------------------------------------------------//
