@@ -168,9 +168,12 @@ static const pauseresolution_s pause_resolution[PAUSE_TABLE_ENTRIES] =
  * on the memory map.
  */
 #if defined(__GNUC__) || defined(GRSAKURA)
-static descriptor_s rx_descriptors[EMAC_NUM_RX_DESCRIPTORS] __attribute__ ((section("._RX_DESC")));
-static descriptor_s tx_descriptors[EMAC_NUM_TX_DESCRIPTORS] __attribute__ ((section("._TX_DESC")));
-static etherbuffer_s ether_buffers __attribute__ ((section("._ETHERNET_BUFFERS")));
+// static descriptor_s rx_descriptors[EMAC_NUM_RX_DESCRIPTORS] __attribute__ ((section("._RX_DESC")));
+// static descriptor_s tx_descriptors[EMAC_NUM_TX_DESCRIPTORS] __attribute__ ((section("._TX_DESC")));
+// static etherbuffer_s ether_buffers __attribute__ ((section("._ETHERNET_BUFFERS")));
+static descriptor_s rx_descriptors[EMAC_NUM_RX_DESCRIPTORS] __attribute__ ((aligned(32)));
+static descriptor_s tx_descriptors[EMAC_NUM_TX_DESCRIPTORS] __attribute__ ((aligned(32)));
+static etherbuffer_s ether_buffers __attribute__ ((aligned(32)));
 #else
 #pragma section _RX_DESC
 static descriptor_s    rx_descriptors[EMAC_NUM_RX_DESCRIPTORS];
