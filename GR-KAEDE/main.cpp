@@ -101,7 +101,7 @@ namespace {
 #ifdef SERVER_TASK
 	void service_server()
 	{
-		EthernetClient client = server_.available();
+		EthernetClient& client = server_.available();
 		if (client) {
 			utils::format("new client\n");
 
@@ -200,8 +200,8 @@ int main(int argc, char** argv)
 	// タイトル・コール
 	utils::format("\nStart GR-KAEDE, ");
 	utils::format("Endian: %3b") % static_cast<uint32_t>(device::SYSTEM::MDE.MDE());
-	utils::format(", PCKA: %u [Hz]") % static_cast<uint32>(F_PCKA);
-	utils::format(", PCKB: %u [Hz]\n") % static_cast<uint32>(F_PCKB);
+	utils::format(", PCKA: %u [Hz]") % static_cast<uint32_t>(F_PCKA);
+	utils::format(", PCKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCKB);
 
 	{  // Ethernet 起動
 		device::power_cfg::turn(device::peripheral::ETHERC0);

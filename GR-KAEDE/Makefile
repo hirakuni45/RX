@@ -53,15 +53,15 @@ OPTIMIZE	=	-Os
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-mcpu=rx600 \
 				-fno-exceptions \
-				-mlittle-endian-data \
-				-mcpu=rx600
+				-mlittle-endian-data
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
+				-mcpu=rx600 \
 				-fno-exceptions \
-				-mlittle-endian-data \
-				-mcpu=rx600
+				-mlittle-endian-data
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
 APPINCS		=	$(addprefix -I, $(INC_APP))
