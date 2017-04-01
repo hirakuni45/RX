@@ -1,5 +1,4 @@
-#ifndef __T4ETHERNET_H__
-#define	__T4ETHERNET_H__
+#pragma once
 
 #include "IPAddress.h"
 #include "T4_src/type.h"
@@ -249,16 +248,23 @@ class EthernetServer : public EthernetClass {
 		    _port = 0;
 		}
         EthernetServer(uint16_t port);
+
 		virtual ~EthernetServer(){}
+
 		size_t write() { return 0; };
+
         size_t write(uint8_t b);
+
         size_t write(const void* buffer, size_t size);
+
 		void begin(void);
+
 		void begin(uint16_t port){
 			_port = port;
 			begin();
 		}
-		EthernetClient available(void);
+
+		EthernetClient& available(void);
 
 		size_t print(const char* t = nullptr) {
 			if(t == nullptr) return 0;
@@ -294,41 +300,53 @@ class EthernetServer : public EthernetClass {
 
 class EthernetClient : public EthernetServer {
     public:
-      EthernetClient(){
-      }
+      EthernetClient() { }
+
       virtual ~EthernetClient(){}
+
       int read(void);
+
       int read(uint8_t *buf, size_t size);
+
       int8_t connected(void);
+
       int connect(IPAddress ip, uint16_t port);
+
       int connect(const char *host, uint16_t port);
+
       int available();
+
       void flush();
+
       void stop();
-      operator bool(){
+
+      operator bool() {
           return connected();
       }
-      bool operator==(const bool value){
+
+      bool operator == (const bool value) {
 #ifdef T4_ETHER_DEBUG
           Serial.print("t4:EthernetClient:==:");
           Serial.println(bool() == value);
 #endif
           return bool() == value;
       }
-      bool operator!=(const bool value){
+
+      bool operator != (const bool value) {
 #ifdef T4_ETHER_DEBUG
           Serial.print("t4:EthernetClient:!=:");
           Serial.println(bool() != value);
 #endif
           return bool() != value;
       }
-      bool operator==(const EthernetClient& rhs){
+
+      bool operator == (const EthernetClient& rhs) {
 #ifdef T4_ETHER_DEBUG
           Serial.println("t4:EthernetClient:==:true");
 #endif
           return true;
       }
-      bool operator!=(const EthernetClient& rhs){
+      bool operator != (const EthernetClient& rhs) {
 #ifdef T4_ETHER_DEBUG
           Serial.print("t4:EthernetClient:!=:");
           Serial.println(!this->operator==(rhs));
@@ -338,7 +356,7 @@ class EthernetClient : public EthernetServer {
     private:
 };
 
-class EthernetUDP : public EthernetClass{
+class EthernetUDP : public EthernetClass {
     private:
       uint16_t  _port;
       uint16_t  _offset;
@@ -377,5 +395,3 @@ class EthernetUDP : public EthernetClass{
       IPAddress remoteIP();
       uint16_t remotePort();
 };
-
-#endif
