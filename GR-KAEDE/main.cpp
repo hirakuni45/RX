@@ -11,10 +11,10 @@
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
-#include "rx64m/rtc_io.hpp"
 #include "common/command.hpp"
+#include "common/rspi_io.hpp"
+#include "common/sdc_io.hpp"
 
-#include "common/vect.h"
 #include "GR/core/Ethernet.h"
 
 #include <cstdlib>
@@ -55,6 +55,16 @@ namespace {
 	device::sci_io<device::SCI7, buffer, buffer> sci_;
 
 	utils::rtc_io rtc_;
+
+	// SDC 用　SPI 定義（RSPI0）
+	typedef device::rspi_io<device::RSPI> sdc_spi;
+	sdc_spi sdc_spi_;
+
+	typedef device::PORT<device::PORTC, device::bitpos::B4> sdc_select;	///< カード選択信号
+	typedef device::NULL_PORT  sdc_power;	///< カード電源制御（常に電源ＯＮ）
+	typedef device::PORT<device::PORTB, device::bitpos::B7> sdc_detect;	///< カード検出
+
+	utils::sdc_io<sdc_spi, sdc_select, sdc_power, sdc_detect> sdc_(sdc_spi_);
 
 	utils::command<256> cmd_;
 
