@@ -2,16 +2,30 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX グループ・RSPI I/O 制御 @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2016, 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
 
-/// F_PCKB は速度パラメーター計算で必要で、設定が無いとエラーにします。
+/// F_PCKx は速度パラメーター計算で必要で、設定が無いとエラーにします。
+#if defined(SIG_RX24T)
 #ifndef F_PCKB
 #  error "sci_io.hpp requires F_PCKB to be defined"
+#else
+#undef PCLK
+#define PCLK F_PCKB
+#define PCLK_MAX 20000000
+#endif
+#elif defined(SIG_RX64M)
+#ifndef F_PCKA
+#  error "sci_io.hpp requires F_PCKA to be defined"
+#else
+#undef PCLK
+#define PCLK F_PCKA
+#define PCLK_MAX 40000000
+#endif
 #endif
 
 namespace device {
@@ -46,7 +60,7 @@ namespace device {
 
 
 		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) {
-			uint32_t br = F_PCKB / 2 / speed;
+			uint32_t br = PCLK / 2 / speed;
 			brdv = 0;
 			while(br > 256) {
 				br >>= 1;
@@ -73,10 +87,12 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  設定可能な最大速度を返す（通常、F_PCKB の半分）
+			@brief  設定可能な最大速度を返す @n
+					・RX24T: 20MHz @n
+					・RX64M: 40MHz @n
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_max_speed() const { return F_PCKB / 2; }
+		uint32_t get_max_speed() const { return PCLK_MAX; }
 
 
 		//-----------------------------------------------------------------//
