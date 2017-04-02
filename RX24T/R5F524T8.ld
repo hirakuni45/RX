@@ -40,7 +40,8 @@ ENTRY(_start)
 /* This memory layout corresponds to the smallest predicted RX24T8 chip.  */
 MEMORY {
 	RAM (w)   : ORIGIN = 0x00000000, LENGTH = 0x00003F00 /* 16K - stack_size (0x100) */
-	STACK (w) : ORIGIN = 0x00004000, LENGTH = 16 /* top of RAM */
+	USTACK (w) : ORIGIN = 0x00003F00, LENGTH = 4 /* ustack */
+	ISTACK (w) : ORIGIN = 0x00004000, LENGTH = 4 /* istack 256 bytes */
 	ROM (w)   : ORIGIN = 0xFFFE0000, LENGTH = 0x0001FFD0 /* 128K */
 }
 
@@ -156,10 +157,16 @@ SECTIONS
   } > RAM
   PROVIDE (__bsssize = SIZEOF(.bss) / 4);
 
-  .stack (ORIGIN (STACK)) :
+  .istack (ORIGIN (ISTACK)) :
   {
-    PROVIDE (__stack = .);
-    *(.stack)
+    PROVIDE (__istack = .);
+    *(.istack)
+  }
+
+  .ustack (ORIGIN (USTACK)) :
+  {
+    PROVIDE (__ustack = .);
+    *(.ustack)
   }
 
   /* Providing one of these symbols in your code is sufficient to have
