@@ -16,6 +16,8 @@
 #include "common/vect.h"
 #include "GR/core/Ethernet.h"
 
+#include <cstdlib>
+
 #define SERVER_TASK
 
 namespace {
@@ -105,17 +107,19 @@ namespace {
 		if (client) {
 			utils::format("new client\n");
 
-			// an http request ends with a blank line
-			bool currentLineIsBlank = true;
 			while (client.connected()) {
 				if (client.available()) {
-					char c = client.read();
-        			sci_putch(c);
+					char tmp[256];
+					int len = client.read(tmp, 255);
+					if(len > 0 && len < 256) {
+						tmp[len] = 0;
+	        			sci_puts(tmp);
+					}
 
 					// if you've gotten to the end of the line (received a newline
 					// character) and the line is blank, the http request has ended,
 					// so you can send a reply
-					if (c == '\n' && currentLineIsBlank) {
+					if (len > 0 && tmp[len - 1] == '\n') {
 						// send a standard http response header
 						client.println("HTTP/1.1 200 OK");
           				client.println("Content-Type: text/html");
@@ -126,29 +130,19 @@ namespace {
 						client.println("<!DOCTYPE HTML>");
 						client.println("<html>");
 						// output the value of each analog input pin
-						for (int analogChannel = 0; analogChannel < 6; analogChannel++) {
-///							int sensorReading = analogRead(analogChannel);
-							int sensorReading = 1234;
-							client.print("analog input ");
-///							client.print(analogChannel);
-							client.print(" is ");
-///							client.print(sensorReading);
+						for (int ach = 0; ach < 4; ++ach) {
+							char tmp[128];
+							utils::format("analog input(%d): %d", tmp, sizeof(tmp)) % ach % rand();
+							client.print(tmp);
 							client.println("<br/ >");
 						}
 						client.println("</html>");
 						break;
 					}
-					if (c == '\n') {
-						// you're starting a new line
-						currentLineIsBlank = true;
-					} else if (c != '\r') {
-						// you've gotten a character on the current line
-						currentLineIsBlank = false;
-					}
 				}
 			}
 			// give the web browser time to receive the data
-			delay(1);
+///			delay(1);
 			// close the connection:
 			client.stop();
 			utils::format("client disconnected\n");
