@@ -70,11 +70,11 @@ extern "C"{
     ER tcp_force_clr(ID cepid);
     void ConfigurePortPins(void);
     void EnablePeripheralModules(void);
-    ER http_callback(ID cepid, FN fncd , VP p_parblk);
-    ER dns_callback(ID cepid, FN fncd , VP p_parblk);
-    ER t4_tcp_callback(ID cepid, FN fncd , VP p_parblk);
+    ER http_callback(ID cepid, FN fncd , void *p_parblk);
+    ER dns_callback(ID cepid, FN fncd , void *p_parblk);
+    ER t4_tcp_callback(ID cepid, FN fncd , void *p_parblk);
 }
-extern "C" ER USB_dataReceive_callback(ID cepid, FN fncd,VP p_parblk);
+extern "C" ER USB_dataReceive_callback(ID cepid, FN fncd, void *p_parblk);
 extern "C" void queueInit(void);
 void setup_terminal_wait();
 
@@ -289,7 +289,7 @@ class EthernetServer : public EthernetClass {
             tcp_crep[repid-1].myaddr.portno = portno;
             return 0;
         }
-        int16_t t4_set_tcp_ccep(ID cepid, UB ch, INT rbufsz){
+        int16_t t4_set_tcp_ccep(ID cepid, UB ch, int rbufsz) {
             if (cepid == 0 || cepid > __tcpcepn){
                 return -1;
             }

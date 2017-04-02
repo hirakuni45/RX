@@ -61,7 +61,7 @@ void EthernetClass::maininit(void){
 *                   : VP        p_parblk;    Parameter block
 * Return Value      : ER                ;    always 0 (not in use)
 ******************************************************************************/
-extern "C" ER t4_udp_callback(ID cepid, FN fncd , VP p_parblk){
+extern "C" ER t4_udp_callback(ID cepid, FN fncd , void *p_parblk){
     union _recvSiz{
             ER  dword;          /*typedef int32_t W;typedef W ER*/
             uint8_t bytes[4];
@@ -683,7 +683,7 @@ int EthernetClient::connect(const char *host, uint16_t port){
 #ifdef T4_ETHER_DEBUG
     Serial.println("t4:EthernetClient::connect(name,port)");
 #endif
-    udp_ccep[0].callback = (ER(*)(ID, FN, VP))dns_callback;      /* DNS resolve use */
+    udp_ccep[0].callback = (ER(*)(ID, FN, void *))dns_callback;      /* DNS resolve use */
     R_dns_init();
 #ifdef T4_ETHER_DEBUG
     Serial.print("R_dns_resolve_name(");
@@ -903,7 +903,7 @@ uint8_t EthernetUDP::begin(uint16_t port)
 
     if(port){
         udp_ccep[0].myaddr.portno = port;
-        udp_ccep[0].callback = (ER(*)(ID, FN, VP))t4_udp_callback;
+        udp_ccep[0].callback = (ER(*)(ID, FN, void *))t4_udp_callback;
         res = 1;
     }
     else{
