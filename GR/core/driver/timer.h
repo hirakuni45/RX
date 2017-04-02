@@ -1,3 +1,4 @@
+#pragma once
 /************************************************************************************
 * DISCLAIMER
 
@@ -47,13 +48,10 @@
 *               : 21.06.2010 1.00 First Release
  *""FILE COMMENT END""**************************************************************************/
 
-#ifndef _TIMER_H_
-#define _TIMER_H_
-
 /******************************************************************************
 Macro definitions
 ******************************************************************************/
-typedef enum tagWaitTimerStatus{
+typedef enum tagWaitTimerStatus {
 	IS_NOT_OVER,
 	IS_OVER
 } WAIT_STATUS;
@@ -80,6 +78,3 @@ extern void api_timeoutstart(unsigned long);
 extern void api_timeoutstop(void);
 extern unsigned char api_timeoutchk(void);
 //extern void WaitTimer(unsigned long ms);
-
-#endif //_TIMER_H_
-/* FILE END */

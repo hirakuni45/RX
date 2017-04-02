@@ -45,7 +45,6 @@ Includes <System Includes> , "Project Includes"
 ******************************************************************************/
 #if defined(__GNUC__) || defined(GRSAKURA)
 #include "../T4_src/t4define.h"
-/// #include <arduino.h>
 #else
 #include <machine.h>
 #endif
