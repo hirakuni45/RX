@@ -433,19 +433,6 @@ void EthernetClass::stop(void){
 #endif
 }
 
-/******************************************************************************
-Description:
-    Create a server that listens for incoming connections on the specified port.
-Syntax:
-    Server(port);
-Parameters:
-    port: the port to listen on (int)
-Returns:
-    None
-******************************************************************************/
-EthernetServer::EthernetServer(uint16_t port){
-  _port = port;
-}
 
 /******************************************************************************
 Description:
@@ -457,19 +444,21 @@ Parameters:
 Returns:
     None
 ******************************************************************************/
-void EthernetServer::begin(void)
+void EthernetServer::begin(uint16_t port)
 {
+	port_ = port;
+
 #ifdef ETHER_DEBUG
 	utils::format("t4:EthernetServer::begin:");
 #endif
-    if(_port > 0){
+    if(port_ > 0){
         /* initialize cep status */
         cep[0].status = T4_CLOSED;
         /* Initialize TCP reception point */
 #ifdef ETHER_DEBUG
         utils::format("t4_set_tcp_crep():");
 #endif
-        if(t4_set_tcp_crep(ARDUINO_TCP_CEP, _port) != E_OK) {                    /* 20150522 fri */
+        if(t4_set_tcp_crep(ARDUINO_TCP_CEP, port_) != E_OK) {                    /* 20150522 fri */
 			utils::format("t4_set_tcp_crep(): halt...\n");
             while(1);       //error trap
         }
@@ -830,7 +819,8 @@ Parameters:
 Returns:
     The next byte (or character), or -1 if none is available.
 ******************************************************************************/
-int EthernetClient::read(void) {
+int EthernetClient::read()
+{
     int32_t  ercd;
     int      rcv_data;
 #if defined(ETHER_DEBUG)
@@ -850,7 +840,7 @@ int EthernetClient::read(void) {
     return rcv_data;
 }
 
-int EthernetClient::read(uint8_t *buf, size_t size) {
+int EthernetClient::read(void* buf, size_t size) {
     int32_t  ercd;
 
     ercd = tcp_rcv_dat(ARDUINO_TCP_CEP, buf, size, TMO_FEVR);
@@ -935,7 +925,7 @@ Parameters:
 Returns:
     char : returns the characters in the buffer
 ******************************************************************************/
-int EthernetUDP::read(void)
+int EthernetUDP::read()
 {
   int   res;
   uint8_t byteq_char;
@@ -944,7 +934,7 @@ int EthernetUDP::read(void)
   byteq_err = R_BYTEQ_Get(hdl, &byteq_char);
   if(byteq_err == BYTEQ_SUCCESS){
       res = (int)((uint32_t)byteq_char);
-      _remaining -= 1;
+      remaining_ -= 1;
   }
   else{
       res = -1;
@@ -956,21 +946,22 @@ int EthernetUDP::read(void)
   return res;
 }
 
-int EthernetUDP::read(unsigned char* buffer, size_t len)
+int EthernetUDP::read(void* dst, size_t len)
 {
-    int res=0;
+    int res = 0;
     uint8_t byteq_char, i;
     byteq_err_t byteq_err;
 
     /* Get characters from the queue and print to virtual console. */
-    for (i=0; i<len; i++){
+	uint8_t* buffer = static_cast<uint8_t*>(dst);
+    for (i=0; i<len; i++) {
         byteq_err = R_BYTEQ_Get(hdl, &byteq_char);
         if(byteq_err == BYTEQ_SUCCESS){
             *buffer++ = byteq_char;
             res++;
-            _remaining -= 1;
+            remaining_ -= 1;
         }
-        else{
+        else {
 #ifdef T4_ETHER_DEBUG
             Serial.print("T4:EthUDP:parsePacket:R_BYTEQ_Get()=");
             Serial.println(byteq_err);
@@ -999,25 +990,25 @@ Returns:
     byte : returns the number of characters sent. This does not have to be read
 ******************************************************************************/
 size_t EthernetUDP::write(uint8_t byte){
-  if(_offset + 1 > UDP_RCV_DAT_DATAREAD_MAXIMUM){
+  if(offset_ + 1 > UDP_RCV_DAT_DATAREAD_MAXIMUM){
       return 0;
   }
   else{
-      _sendBuf[_offset++] = byte;
+      sendBuf_[offset_++] = byte;
   }
   return 1;
 }
 
-size_t EthernetUDP::write(const uint8_t *buffer, size_t size=0){
-    if(!size){
+size_t EthernetUDP::write(const void* buffer, size_t size) {
+    if(buffer == nullptr || size == 0) {
         return 0;
     }
-    if(_offset + size > UDP_RCV_DAT_DATAREAD_MAXIMUM){
+    if(offset_ + size > UDP_RCV_DAT_DATAREAD_MAXIMUM){
         return 0;
     }
-    else{
-        memcpy(&_sendBuf[_offset], buffer, size);
-        _offset += size;
+    else {
+        memcpy(&sendBuf_[offset_], buffer, size);
+        offset_ += size;
     }
     return size;
 }
@@ -1033,16 +1024,16 @@ Parameters:
 Returns:
     Returns an int: 1 if successful, 0 if there was a problem resolving the hostname or port.
 ******************************************************************************/
-int EthernetUDP::beginPacket(IPAddress ip, uint16_t port){
+int EthernetUDP::beginPacket(const IPAddress& ip, uint16_t port){
     int res;
 
     if(!uint32_t(ip) || !port){
         res =  0;
     }
     else{
-        _sendIPV4EP.ipaddr = ((int)ip._address.bytes[0]<<24) | ((int)ip._address.bytes[1]<<16) |((int)ip._address.bytes[2]<<8) | ((int)ip._address.bytes[3]);
-        _sendIPV4EP.portno = port;
-        _offset = 0;
+        sendIPV4EP_.ipaddr = ((int)ip._address.bytes[0]<<24) | ((int)ip._address.bytes[1]<<16) |((int)ip._address.bytes[2]<<8) | ((int)ip._address.bytes[3]);
+        sendIPV4EP_.portno = port;
+        offset_ = 0;
         res = 1;
     }
     return res;
@@ -1062,10 +1053,10 @@ int EthernetUDP::endPacket(void){
     ER  ercd;
     int res;
 
-    ercd = udp_snd_dat(ARDUINO_UDP_CEP, &_sendIPV4EP, _sendBuf, _offset, TMO_FEVR);       /* 20150522 fri */
+    ercd = udp_snd_dat(ARDUINO_UDP_CEP, &sendIPV4EP_, sendBuf_, offset_, TMO_FEVR);       /* 20150522 fri */
     if(ercd > 0){
         res = 1;
-        _offset = 0;
+        offset_ = 0;
     }
     else{
         res = 0;
@@ -1084,14 +1075,14 @@ Parameters:
 Returns:
     int: the size of a received UDP packet
 ******************************************************************************/
-int EthernetUDP::parsePacket(void){
+int EthernetUDP::parsePacket(void) {
     byteq_err_t byteq_err;
     union{
             uint16_t    word;
             uint8_t     byte[2];
     }recvSiz;
 
-    while(_remaining){
+    while(remaining_) {
         read();             /*drop data until _remaining==0*/
     }
 
@@ -1111,40 +1102,13 @@ int EthernetUDP::parsePacket(void){
 #endif
         }
         else{
-               _remaining = (int)recvSiz.word;
+               remaining_ = (int)recvSiz.word;
         }
     }
-    return _remaining;
-}
-/******************************************************************************
-Description:
-    Get the number of bytes (characters) available for reading from the buffer. This is data that's already arrived.
-    This function can only be successfully called after UDP.parsePacket().
-    available() inherits from the Stream utility class.
-Syntax:
-    UDP.available()
-Parameters:
-    None
-Returns:
-    the number of bytes available to read
-******************************************************************************/
-int EthernetUDP::available(void){
-  return _remaining;
+    return remaining_;
 }
 
-/******************************************************************************
-Description:
-    Disconnect from the server. Release any resource being used during the UDP session.
-Syntax:
-    EthernetUDP.stop()
-Parameters:
-    none
-Returns:
-    none
-******************************************************************************/
-void EthernetUDP::stop(void){
-    /* nothing to do 20150527 review */
-}
+
 
 /******************************************************************************
 Description:
@@ -1157,9 +1121,8 @@ Parameters:
 Returns:
     4 bytes : the IP address of the remote connection
 ******************************************************************************/
-IPAddress EthernetUDP::remoteIP(void){
+IPAddress EthernetUDP::remoteIP() {
     IPAddress ip((uint32_t)g_remoteIPV4EP.ipaddr);
-
     return ip;
 }
 
@@ -1174,7 +1137,8 @@ Parameters:
 Returns:
     int : the port of the UDP connection to a remote host
 ******************************************************************************/
-uint16_t EthernetUDP::remotePort(void){
-    return g_remoteIPV4EP.portno;
+uint16_t EthernetUDP::remotePort()
+{
+   	return g_remoteIPV4EP.portno;
 }
 

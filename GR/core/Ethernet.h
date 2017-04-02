@@ -240,31 +240,32 @@ class EthernetClass {
 };
 
 class EthernetServer : public EthernetClass {
-	private:
-		uint16_t _port;
+	uint16_t port_;
 	
 	public:
-		EthernetServer(){
-		    _port = 0;
-		}
-        EthernetServer(uint16_t port);
+	/******************************************************************************
+	Description:
+		Create a server that listens for incoming connections on the specified port.
+	Syntax:
+    	Server(port);
+	Parameters:
+    	port: the port to listen on (int)
+	Returns:
+    	None
+	******************************************************************************/
+	EthernetServer(uint16_t port = 0) : port_(port) { }
 
-		virtual ~EthernetServer(){}
+	virtual ~EthernetServer(){}
 
-		size_t write() { return 0; };
+	size_t write() { return 0; };
 
-        size_t write(uint8_t b);
+	size_t write(uint8_t byte);
 
-        size_t write(const void* buffer, size_t size);
+	size_t write(const void* buffer, size_t size);
 
-		void begin(void);
+	void begin(uint16_t port = 0);
 
-		void begin(uint16_t port){
-			_port = port;
-			begin();
-		}
-
-		EthernetClient& available(void);
+	EthernetClient& available(void);
 
 		size_t print(const char* t = nullptr) {
 			if(t == nullptr) return 0;
@@ -304,11 +305,11 @@ class EthernetClient : public EthernetServer {
 
       virtual ~EthernetClient(){}
 
-      int read(void);
+      int read();
 
-      int read(uint8_t *buf, size_t size);
+      int read(void* buf, size_t size);
 
-      int8_t connected(void);
+      int8_t connected();
 
       int connect(IPAddress ip, uint16_t port);
 
@@ -353,45 +354,68 @@ class EthernetClient : public EthernetServer {
 #endif
           return !this->operator==(rhs);
       }
-    private:
 };
 
 class EthernetUDP : public EthernetClass {
-    private:
-      uint16_t  _port;
-      uint16_t  _offset;
-      int       _remaining;
+	uint16_t  port_;
+	uint16_t  offset_;
+	int       remaining_;
 
-      T_IPV4EP  _sendIPV4EP;
-      uint8_t   _sendBuf[UDP_RCV_DAT_DATAREAD_MAXIMUM+1];
-      uint8_t   _recvBuf[UDP_RCV_BUFFER_SIZE];
+	T_IPV4EP  sendIPV4EP_;
+	uint8_t   sendBuf_[UDP_RCV_DAT_DATAREAD_MAXIMUM+1];
+	uint8_t   recvBuf_[UDP_RCV_BUFFER_SIZE];
 
-    public:
-      EthernetUDP(){
-          _remaining = 0;
-          _port=0;
-          _offset=0;
+	public:
+	EthernetUDP() : port_(0), offset_(0), remaining_(0) {
+		sendIPV4EP_.ipaddr = 0;
+		sendIPV4EP_.portno = 0;
+	}
+	virtual ~EthernetUDP() { }
 
-          _sendIPV4EP.ipaddr = 0;
-          _sendIPV4EP.portno = 0;
-      }
-      virtual ~EthernetUDP(){}
-      uint8_t begin(uint16_t);
-      void stop();
+	uint8_t begin(uint16_t);
 
-      int beginPacket(IPAddress ip, uint16_t port);
-      int endPacket();
-      size_t write(uint8_t);
-      size_t write(const uint8_t *buffer, size_t size);
+	/******************************************************************************
+	Description:
+    	Get the number of bytes (characters) available for reading from the buffer. This is data that's already arrived.
+    	This function can only be successfully called after UDP.parsePacket().
+    	available() inherits from the Stream utility class.
+	Syntax:
+    	UDP.available()
+	Parameters:
+    	None
+	Returns:
+    	the number of bytes available to read
+	******************************************************************************/
+	int available() const {
+		return remaining_;
+	}
 
-///      using Print::write;
 
-      int parsePacket();
-      int available();
-      int read();
-      int read(unsigned char* buffer, size_t len);
-      int read(char* buffer, size_t len) { return read((unsigned char*)buffer, len); };
+	/******************************************************************************
+	Description:
+	    Disconnect from the server. Release any resource being used during the UDP session.
+	Syntax:
+	    EthernetUDP.stop()
+	Parameters:
+	    none
+	Returns:
+	    none
+	******************************************************************************/
+	void stop() { }
 
-      IPAddress remoteIP();
-      uint16_t remotePort();
+	int beginPacket(const IPAddress& ip, uint16_t port);
+	int endPacket();
+
+	size_t write(uint8_t byte);
+
+	size_t write(const void* buffer, size_t size);
+
+	int parsePacket();
+	int available();
+
+	int read();
+	int read(void* buffer, size_t len);
+
+	IPAddress remoteIP();
+	uint16_t remotePort();
 };
