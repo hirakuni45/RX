@@ -2,7 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	ルネサス RX 選択 @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2016, 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -56,6 +56,7 @@
 #include "RX64M/icu.hpp"
 #include "RX64M/sci.hpp"
 #include "RX64M/riic.hpp"
+#include "RX64M/rspi.hpp"
 #include "RX64M/port_map.hpp"
 #include "RX64M/power_cfg.hpp"
 #include "RX64M/icu_mgr.hpp"
