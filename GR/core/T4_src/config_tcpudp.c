@@ -41,7 +41,7 @@
 #endif
 
 #include "r_t4_itcpip.h"
-extern ER t4_udp_callback(ID cepid, FN fncd , VP p_parblk);
+extern ER t4_udp_callback(ID cepid, FN fncd , void *p_parblk);
 
 /****************************************************************************/
 /**********************     TCP-related definition     **********************/

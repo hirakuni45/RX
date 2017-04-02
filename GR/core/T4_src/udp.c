@@ -82,7 +82,7 @@ extern UB *_ether_p_rcv_buff;
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, VP data, INT len, TMO tmout)
+ER udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, TMO tmout)
 {
     ER  ercd;
     _UDP_CB *pcb;
@@ -193,7 +193,7 @@ ER udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, VP data, INT len, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, VP data, INT len, TMO tmout)
+ER udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, TMO tmout)
 {
     ER  ercd;
     _UDP_CB *pcb;
@@ -478,7 +478,7 @@ int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
                 tmp = &_udp_cb[count];
                 tmp->stat |= _UDP_CB_STAT_CALLBACK;
             }
-            (*pcep->callback)(cepid, fncd, (VP)&ercd);
+            (*pcep->callback)(cepid, fncd, (void *)&ercd);
         }
         for (count = 0; count < __udpcepn; count++)
         {
@@ -572,7 +572,7 @@ void _udp_snd(_TCPUDP_PHDR *ph)
                             tmp->stat |= _UDP_CB_STAT_CALLBACK;
                         }
                         fncd = TFN_UDP_SND_DAT;
-                        (*pcep->callback)(i + 1, fncd, (VP)&ercd);
+                        (*pcep->callback)(i + 1, fncd, (void *)&ercd);
                     }
                     for (count = 0; count < __udpcepn; count++)
                     {
@@ -664,7 +664,7 @@ void _proc_udp_api()
                     tmp = &_udp_cb[count];
                     tmp->stat |= _UDP_CB_STAT_CALLBACK;
                 }
-                (udp_ccep[i].callback)(i + 1 /* cepid */, fn, (VP)&ercd);
+                (udp_ccep[i].callback)(i + 1 /* cepid */, fn, (void *)&ercd);
                 for (count = 0; count < __udpcepn; count++)
                 {
                     tmp = &_udp_cb[count];
@@ -798,7 +798,7 @@ ER _udp_check_cepid_arg(ID cepid)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _udp_check_len_arg(INT len)
+ER _udp_check_len_arg(int len)
 {
     ER err = E_OK;
     if (len < 0)

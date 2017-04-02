@@ -97,10 +97,7 @@ typedef uint32_t        UW;
 typedef int8_t          VB;
 typedef int16_t         VH;
 typedef int32_t         VW;
-typedef void*		    VP;
 typedef void    (*FP)(void);
-typedef W               INT;
-typedef UW              UINT;
 typedef H               ID;
 typedef H               PRI;
 typedef W               TMO;
@@ -110,7 +107,7 @@ typedef UH              ATR;
 #endif
 #endif
 
-typedef INT             FN;
+typedef int32_t         FN;
 
 #include "r_mw_version.h"
 
@@ -138,11 +135,11 @@ typedef struct t_tcp_crep
 typedef struct t_tcp_ccep
 {
     ATR      cepatr;    /* TCP communication end point attribute  */
-    VP       sbuf;      /* Top address of transmit window buffer  */
-    INT      sbufsz;    /* Size of transmit window buffer         */
-    VP       rbuf;      /* Top address of receive window buffer   */
-    INT      rbufsz;    /* Size of receive window buffer          */
-    ER(*callback)(ID cepid, FN fncd , VP p_parblk);   /* Callback routine */
+    void    *sbuf;      /* Top address of transmit window buffer  */
+    int      sbufsz;    /* Size of transmit window buffer         */
+    void    *rbuf;      /* Top address of receive window buffer   */
+    int      rbufsz;    /* Size of receive window buffer          */
+    ER(*callback)(ID cepid, FN fncd , void *p_parblk);   /* Callback routine */
 } T_TCP_CCEP;
 
 /***  UDP communication end point  ***/
@@ -150,7 +147,7 @@ typedef struct t_udp_ccep
 {
     ATR      cepatr;    /* UDP communication end point attribute  */
     T_IPV4EP myaddr;    /* Local IP address and port number       */
-    ER(*callback)(ID cepid, FN fncd , VP p_parblk); /* Callback routine */
+    ER(*callback)(ID cepid, FN fncd , void *p_parblk); /* Callback routine */
 } T_UDP_CCEP;
 
 /***  IP address settings  ***/
@@ -347,16 +344,16 @@ typedef struct T4_STATISTICS
 extern "C" {
 #endif
 #endif
-ER udp_snd_dat(ID cepid, T_IPV4EP *p_dstaddr, VP data, INT len, TMO tmout);
-ER udp_rcv_dat(ID cepid, T_IPV4EP *p_dstaddr, VP data, INT len, TMO tmout);
+ER udp_snd_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, TMO tmout);
+ER udp_rcv_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, TMO tmout);
 ER udp_can_cep(ID cepid, FN fncd);
 
 ER tcp_acp_cep(ID cepid, ID repid, T_IPV4EP *p_dstadr, TMO tmout);
 ER tcp_con_cep(ID cepid, T_IPV4EP *p_myadr,  T_IPV4EP *p_dstadr, TMO tmout);
 ER tcp_sht_cep(ID cepid);
 ER tcp_cls_cep(ID cepid, TMO tmout);
-ER tcp_snd_dat(ID cepid, VP data,  INT dlen, TMO tmout);
-ER tcp_rcv_dat(ID cepid, VP data, INT dlen, TMO tmout);
+ER tcp_snd_dat(ID cepid, void *data, int dlen, TMO tmout);
+ER tcp_rcv_dat(ID cepid, void *data, int dlen, TMO tmout);
 ER tcp_can_cep(ID cepid, FN fncd);
 
 ER tcpudp_open(UW *workp);    /* Open TCP/IP library (initialization)                         */

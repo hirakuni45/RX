@@ -94,7 +94,7 @@ void _udp_init(UW **workpp);
 void _udp_snd(_TCPUDP_PHDR *ph);
 FN  _udp_api_type_to_fn(uint16_t api_type);
 ER _udp_check_cepid_arg(ID cepid);
-ER _udp_check_len_arg(INT len);
+ER _udp_check_len_arg(int len);
 
 
 

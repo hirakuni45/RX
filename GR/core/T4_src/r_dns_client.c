@@ -501,7 +501,7 @@ int32_t R_dns_process(void)
 *                    error code pointer
 * Return Value : error code
 ***********************************************************************************************************************/
-ER dns_callback(ID cepid, FN fncd , VP p_parblk)
+ER dns_callback(ID cepid, FN fncd , void *p_parblk)
 {
 	ER	parblk;
 	ER	ercd;

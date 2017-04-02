@@ -2380,7 +2380,7 @@ ER _tcp_check_cepid_arg(ID cepid)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _tcp_check_len_arg(INT len)
+ER _tcp_check_len_arg(int len)
 {
     ER err = E_OK;
     if (len < 0)
@@ -2462,7 +2462,7 @@ uint16_t  _tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-uint16_t _tcp_call_callback(ID cepid, FN fncd, VP p_parblk)
+uint16_t _tcp_call_callback(ID cepid, FN fncd, void *p_parblk)
 {
     UH count;
 
