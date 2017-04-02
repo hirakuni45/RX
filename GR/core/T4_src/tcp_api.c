@@ -531,7 +531,7 @@ ER tcp_cls_cep(ID cepid, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER tcp_snd_dat(ID cepid, VP data, INT len, TMO tmout)
+ER tcp_snd_dat(ID cepid, void *data, int len, TMO tmout)
 {
     ER err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
@@ -591,7 +591,7 @@ ER tcp_snd_dat(ID cepid, VP data, INT len, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER tcp_rcv_dat(ID cepid, VP data, INT len, TMO tmout)
+ER tcp_rcv_dat(ID cepid, void *data, int len, TMO tmout)
 {
     ER err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
