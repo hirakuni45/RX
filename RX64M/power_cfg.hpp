@@ -29,6 +29,22 @@ namespace device {
 		{
 			bool f = !ena;
 			switch(t) {
+			case peripheral::CMT0:
+			case peripheral::CMT1:
+				SYSTEM::MSTPCRA.MSTPA15 = f;	// CMT0, CMT1 のストップ状態解除
+				break;
+			case peripheral::CMT2:
+			case peripheral::CMT3:
+				SYSTEM::MSTPCRA.MSTPA14 = f;	// CMT2, CMT3 のストップ状態解除
+				break;
+
+			case peripheral::S12AD:
+				SYSTEM::MSTPCRA.MSTPA17 = f;	// S12AD のストップ状態解除
+				break;
+			case peripheral::S12AD1:
+				SYSTEM::MSTPCRA.MSTPA16 = f;	// S12AD1 のストップ状態解除
+				break;
+
 			case peripheral::SCI0:
 				SYSTEM::MSTPCRB.MSTPB31 = f;	// B31 (SCI0)のストップ状態解除
 				break;
@@ -54,13 +70,8 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB24 = f;	// B24 (SCI7)のストップ状態解除
 				break;
 
-			case peripheral::CMT0:
-			case peripheral::CMT1:
-				SYSTEM::MSTPCRA.MSTPA15 = f;	// CMT0, CMT1 のストップ状態解除
-				break;
-			case peripheral::CMT2:
-			case peripheral::CMT3:
-				SYSTEM::MSTPCRA.MSTPA14 = f;	// CMT0, CMT1 のストップ状態解除
+			case peripheral::RSPI:
+				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI のストップ状態解除
 				break;
 
 			case peripheral::SDHI:

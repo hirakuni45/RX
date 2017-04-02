@@ -19,118 +19,163 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map {
 
-		static void sub_(peripheral t) {
+		static void sub_(peripheral t, bool enable) {
 			switch(t) {
+			// ※シリアルポートの MPC 設定では、PDR を制御する必要は無いが、
+			// 出力ポートのインピーダンス制御の一環として入れてある。
 			case peripheral::SCI0:
-				PORT2::PDR.B0 = 1;  // TXD0
-				PORT2::PDR.B1 = 0;  // RXD0
-				MPC::P20PFS.PSEL = 0b001010;
-				MPC::P21PFS.PSEL = 0b001010;
-				PORT2::PMR.B0 = 1;
-				PORT2::PMR.B1 = 1;
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					PORT2::PDR.B0 = enable; // TXD0
+					PORT2::PDR.B1 = 0;  	// RXD0
+					MPC::P20PFS.PSEL = sel;
+					MPC::P21PFS.PSEL = sel;
+					PORT2::PMR.B0 = enable;
+					PORT2::PMR.B1 = enable;
+				}
 				break;
 			case peripheral::SCI1:
-				PORTF::PDR.B0 = 1;  // TXD1
-				PORTF::PDR.B2 = 0;  // RXD1
-				MPC::PF0PFS.PSEL = 0b001010;
-				MPC::PF2PFS.PSEL = 0b001010;
-				PORTF::PMR.B0 = 1;
-				PORTF::PMR.B2 = 1;
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					PORTF::PDR.B0 = enable; // TXD1
+					PORTF::PDR.B2 = 0;  	// RXD1
+					MPC::PF0PFS.PSEL = sel;
+					MPC::PF2PFS.PSEL = sel;
+					PORTF::PMR.B0 = enable;
+					PORTF::PMR.B2 = enable;
+				}
 				break;
 			case peripheral::SCI2:
-				PORT1::PDR.B3 = 1;  // TXD2
-				PORT1::PDR.B2 = 0;  // RXD2
-				MPC::P13PFS.PSEL = 0b001010;
-				MPC::P12PFS.PSEL = 0b001010;
-				PORT1::PMR.B3 = 1;
-				PORT1::PMR.B2 = 1;
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					PORT1::PDR.B3 = enable; // TXD2
+					PORT1::PDR.B2 = 0;  	// RXD2
+					MPC::P13PFS.PSEL = sel;
+					MPC::P12PFS.PSEL = sel;
+					PORT1::PMR.B3 = enable;
+					PORT1::PMR.B2 = enable;
+				}
 				break;
 			case peripheral::SCI3:
-				PORT2::PDR.B3 = 1;  // TXD3
-				PORT2::PDR.B5 = 0;  // RXD3
-				MPC::P23PFS.PSEL = 0b001010;
-				MPC::P25PFS.PSEL = 0b001010;
-				PORT2::PMR.B3 = 1;
-				PORT2::PMR.B5 = 1;
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					PORT2::PDR.B3 = enable; // TXD3
+					PORT2::PDR.B5 = 0;  	// RXD3
+					MPC::P23PFS.PSEL = sel;
+					MPC::P25PFS.PSEL = sel;
+					PORT2::PMR.B3 = enable;
+					PORT2::PMR.B5 = enable;
+				}
 				break;
 			case peripheral::SCI4:
-				PORTB::PDR.B1 = 1;  // TXD4
-				PORTB::PDR.B0 = 0;  // RXD4
-				MPC::PB1PFS.PSEL = 0b001010;
-				MPC::PB0PFS.PSEL = 0b001010;
-				PORTB::PMR.B1 = 1;
-				PORTB::PMR.B0 = 1;
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					PORTB::PDR.B1 = enable; // TXD4
+					PORTB::PDR.B0 = 0;  	// RXD4
+					MPC::PB1PFS.PSEL = sel;
+					MPC::PB0PFS.PSEL = sel;
+					PORTB::PMR.B1 = enable;
+					PORTB::PMR.B0 = enable;
+				}
 				break;
 			case peripheral::SCI5:
-				PORTA::PDR.B4 = 1;  // TXD5
-				PORTA::PDR.B2 = 0;  // RXD5
-				MPC::PA4PFS.PSEL = 0b001010;
-				MPC::PA2PFS.PSEL = 0b001010;
-				PORTA::PMR.B4 = 1;
-				PORTA::PMR.B2 = 1;
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					PORTA::PDR.B4 = enable; // TXD5
+					PORTA::PDR.B2 = 0;  	// RXD5
+					MPC::PA4PFS.PSEL = sel;
+					MPC::PA2PFS.PSEL = sel;
+					PORTA::PMR.B4 = enable;
+					PORTA::PMR.B2 = enable;
+				}
 				break;
 			case peripheral::SCI6:
-				PORT0::PDR.B0 = 1;  // TXD6
-				PORT0::PDR.B1 = 0;  // RXD6
-				MPC::P00PFS.PSEL = 0b001010;
-				MPC::P01PFS.PSEL = 0b001010;
-				PORT0::PMR.B0 = 1;
-				PORT0::PMR.B1 = 1;
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					PORT0::PDR.B0 = enable; // TXD6
+					PORT0::PDR.B1 = 0;  	// RXD6
+					MPC::P00PFS.PSEL = sel;
+					MPC::P01PFS.PSEL = sel;
+					PORT0::PMR.B0 = enable;
+					PORT0::PMR.B1 = enable;
+				}
 				break;
 			case peripheral::SCI7:
-				PORT9::PDR.B0 = 1;  // TXD7
-				PORT9::PDR.B2 = 0;  // RXD7
-				MPC::P90PFS.PSEL = 0b001010;
-				MPC::P92PFS.PSEL = 0b001010;
-				PORT9::PMR.B0 = 1;
-				PORT9::PMR.B2 = 1;
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					PORT9::PDR.B0 = enable; // TXD7
+					PORT9::PDR.B2 = 0;  	// RXD7
+					MPC::P90PFS.PSEL = sel;
+					MPC::P92PFS.PSEL = sel;
+					PORT9::PMR.B0 = enable;
+					PORT9::PMR.B2 = enable;
+				}
+				break;
+
+			case peripheral::RSPI:
+				{
+					uint8_t sel = enable ? 0b001101 : 0;
+					MPC::PC7PFS.PSEL = sel;  // PC7/MISOA
+					MPC::PC6PFS.PSEL = sel;  // PC6/MOSIA
+					MPC::PC5PFS.PSEL = sel;  // PC5/RSPCKA
+					PORTC::PMR.B7 = enable;
+					PORTC::PMR.B6 = enable;
+					PORTC::PMR.B5 = enable;
+				}
 				break;
 
 			case peripheral::SDHI:
-				MPC::P80PFS.PSEL = 0b011010;  // SDHI_WP
-				MPC::P81PFS.PSEL = 0b011010;  // SDHI_CD
-				PORT8::PMR.B0 = 1;
-				PORT8::PMR.B2 = 1;
-				MPC::PC2PFS.PSEL = 0b011010;  // SDHI_D3
-				MPC::PC3PFS.PSEL = 0b011010;  // SDHI_D0
-				MPC::PC4PFS.PSEL = 0b011010;  // SDHI_D1
-				PORTC::PMR.B2 = 1;
-				PORTC::PMR.B3 = 1;
-				PORTC::PMR.B4 = 1;
-   				MPC::P75PFS.PSEL = 0b011010;  // SDHI_D2
-				MPC::P76PFS.PSEL = 0b011010;  // SDHI_CMD
-				MPC::P77PFS.PSEL = 0b011010;  // SDHI_CLK
-				PORT7::PMR.B5 = 1;
-				PORT7::PMR.B6 = 1;
-				PORT7::PMR.B7 = 1;
+				{
+					uint8_t sel = enable ? 0b011010 : 0;
+					MPC::P80PFS.PSEL = sel;  // SDHI_WP
+					MPC::P81PFS.PSEL = sel;  // SDHI_CD
+					PORT8::PMR.B0 = enable;
+					PORT8::PMR.B2 = enable;
+					MPC::PC2PFS.PSEL = sel;  // SDHI_D3
+					MPC::PC3PFS.PSEL = sel;  // SDHI_D0
+					MPC::PC4PFS.PSEL = sel;  // SDHI_D1
+					PORTC::PMR.B2 = enable;
+					PORTC::PMR.B3 = enable;
+					PORTC::PMR.B4 = enable;
+   					MPC::P75PFS.PSEL = sel;  // SDHI_D2
+					MPC::P76PFS.PSEL = sel;  // SDHI_CMD
+					MPC::P77PFS.PSEL = sel;  // SDHI_CLK
+					PORT7::PMR.B5 = enable;
+					PORT7::PMR.B6 = enable;
+					PORT7::PMR.B7 = enable;
+				}
 				break;
 
-			case peripheral::ETHERC0:
-//				MPC::P34PFS.PSEL = 0b010001;  // ET0_LINKSTA
-//				PORT3::PMR.B4 = 1;
-				MPC::P71PFS.PSEL = 0b010001;  // ET0_MDIO
-				MPC::P72PFS.PSEL = 0b010001;  // ET0_MDC
-//				MPC::P73PFS.PSEL = 0b010001;  // ET0_WOL
-				MPC::P74PFS.PSEL = 0b010010;  // RMII0_RXD1
-				MPC::P75PFS.PSEL = 0b010010;  // RMII0_RXD0
-				MPC::P76PFS.PSEL = 0b010010;  // REF50CK0
-				MPC::P77PFS.PSEL = 0b010010;  // RMII0_RX_ER
-				PORT7::PMR.B1 = 1;
-				PORT7::PMR.B2 = 1;
-//				PORT7::PMR.B3 = 1;
-				PORT7::PMR.B4 = 1;
-				PORT7::PMR.B5 = 1;
-				PORT7::PMR.B6 = 1;
-				PORT7::PMR.B7 = 1;
-				MPC::P80PFS.PSEL = 0b010010;  // RMII0_TXD_EN
-				MPC::P81PFS.PSEL = 0b010010;  // RMII0_TXD0
-				MPC::P82PFS.PSEL = 0b010010;  // RMII0_TXD1
-				MPC::P83PFS.PSEL = 0b010010;  // RMII0_CRS_DV
-				PORT8::PMR.B0 = 1;
-				PORT8::PMR.B1 = 1;
-				PORT8::PMR.B2 = 1;
-				PORT8::PMR.B3 = 1;
-				MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
+			case peripheral::ETHERC0:  // only RMII mode
+				{
+					uint8_t  mii = enable ? 0b010001 : 0;
+					uint8_t rmii = enable ? 0b010010 : 0;
+//					MPC::P34PFS.PSEL = mii;   // ET0_LINKSTA
+//					PORT3::PMR.B4 = enable;
+					MPC::P71PFS.PSEL = mii;   // ET0_MDIO
+					MPC::P72PFS.PSEL = mii;   // ET0_MDC
+//					MPC::P73PFS.PSEL = mii;   // ET0_WOL
+					MPC::P74PFS.PSEL = rmii;  // RMII0_RXD1
+					MPC::P75PFS.PSEL = rmii;  // RMII0_RXD0
+					MPC::P76PFS.PSEL = rmii;  // REF50CK0
+					MPC::P77PFS.PSEL = rmii;  // RMII0_RX_ER
+					PORT7::PMR.B1 = enable;
+					PORT7::PMR.B2 = enable;
+//					PORT7::PMR.B3 = enable;
+					PORT7::PMR.B4 = enable;
+					PORT7::PMR.B5 = enable;
+					PORT7::PMR.B6 = enable;
+					PORT7::PMR.B7 = enable;
+					MPC::P80PFS.PSEL = rmii;  // RMII0_TXD_EN
+					MPC::P81PFS.PSEL = rmii;  // RMII0_TXD0
+					MPC::P82PFS.PSEL = rmii;  // RMII0_TXD1
+					MPC::P83PFS.PSEL = rmii;  // RMII0_CRS_DV
+					PORT8::PMR.B0 = enable;
+					PORT8::PMR.B1 = enable;
+					PORT8::PMR.B2 = enable;
+					PORT8::PMR.B3 = enable;
+					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
+				}
 				break;
 
 			case peripheral::ETHERC1:
@@ -153,7 +198,7 @@ namespace device {
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			sub_(t);
+			sub_(t, true);
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
@@ -169,74 +214,7 @@ namespace device {
 			MPC::PWPR.B0WI = 0;				// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;			// PxxPFS 書き込み許可
 
-			switch(t) {
-			case peripheral::SCI0:
-				PORT2::PDR.B0 = 0;  // TXD0
-				PORT2::PDR.B1 = 0;  // RXD0
-				MPC::P20PFS.PSEL = 0b000000;
-				MPC::P21PFS.PSEL = 0b000000;
-				PORT2::PMR.B0 = 0;
-				PORT2::PMR.B1 = 0;
-				break;
-			case peripheral::SCI1:
-				PORTF::PDR.B0 = 0;	// TXD1
-				PORTF::PDR.B2 = 0;	// RXD1
-				MPC::PF0PFS.PSEL = 0b000000;
-				MPC::PF2PFS.PSEL = 0b000000;
-				PORTF::PMR.B0 = 0;				// 周辺機能として使用
-				PORTF::PMR.B2 = 0;				// 周辺機能として使用
-				break;
-			case peripheral::SCI2:
-				PORT1::PDR.B3 = 0;  // TXD2
-				PORT1::PDR.B2 = 0;  // RXD2
-				MPC::P13PFS.PSEL = 0b000000;
-				MPC::P12PFS.PSEL = 0b000000;
-				PORT1::PMR.B3 = 0;
-				PORT1::PMR.B2 = 0;
-				break;
-			case peripheral::SCI3:
-				PORT2::PDR.B3 = 0;  // TXD3
-				PORT2::PDR.B5 = 0;  // RXD3
-				MPC::P23PFS.PSEL = 0b000000;
-				MPC::P25PFS.PSEL = 0b000000;
-				PORT2::PMR.B3 = 0;
-				PORT2::PMR.B5 = 0;
-				break;
-			case peripheral::SCI4:
-				PORTB::PDR.B1 = 0;  // TXD4
-				PORTB::PDR.B0 = 0;  // RXD4
-				MPC::PB1PFS.PSEL = 0b000000;
-				MPC::PB0PFS.PSEL = 0b000000;
-				PORTB::PMR.B1 = 0;
-				PORTB::PMR.B0 = 0;
-				break;
-			case peripheral::SCI5:
-				PORTA::PDR.B4 = 0;  // TXD5
-				PORTA::PDR.B2 = 0;  // RXD5
-				MPC::PA4PFS.PSEL = 0b000000;
-				MPC::PA2PFS.PSEL = 0b000000;
-				PORTA::PMR.B4 = 0;
-				PORTA::PMR.B2 = 0;
-				break;
-			case peripheral::SCI6:
-				PORT0::PDR.B0 = 0;  // TXD6
-				PORT0::PDR.B1 = 0;  // RXD6
-				MPC::P00PFS.PSEL = 0b000000;
-				MPC::P01PFS.PSEL = 0b000000;
-				PORT0::PMR.B0 = 0;
-				PORT0::PMR.B1 = 0;
-				break;
-			case peripheral::SCI7:
-				PORT9::PDR.B0 = 0;  // TXD7
-				PORT9::PDR.B2 = 0;  // RXD7
-				MPC::P90PFS.PSEL = 0b000000;
-				MPC::P92PFS.PSEL = 0b000000;
-				PORT9::PMR.B0 = 0;
-				PORT9::PMR.B2 = 0;
-				break;
-			default:
-				break;
-			}
+			sub_(t, false);
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
