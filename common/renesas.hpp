@@ -6,6 +6,9 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include "common/vect.h"
+#include "common/delay.hpp"
+
 #if defined(SIG_RX621)
 #include "RX600/port.hpp"
 #include "RX600/cmt.hpp"
@@ -65,6 +68,8 @@
 #include "RX64M/sdram.hpp"
 #include "RX64M/etherc.hpp"
 #include "RX64M/edmac.hpp"
+#include "RX64M/rtc.hpp"
+#include "RX64M/rtc_io.hpp"
 #else
 #  error "Requires SIG_XXX to be defined"
 #endif
