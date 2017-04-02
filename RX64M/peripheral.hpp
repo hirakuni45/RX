@@ -35,6 +35,8 @@ namespace device {
 
 		SCI12,  //
 
+		RSPI,
+
 		TMR0,	///< 8 ビットタイマ０
 		TMR1,	///< 8 ビットタイマ１
 		TMR2,	///< 8 ビットタイマ２

@@ -44,7 +44,7 @@ namespace device {
 			D0FIFO0 = 34,  // USB0
 			D1FIFO0 = 35,  // USB0
 
-			RPRI0   = 38,  // RSPI0
+			SPRI0   = 38,  // RSPI0
 			SPTI0   = 39,  // RSPI0
 
 			SPRI    = 42,  // QSPI
