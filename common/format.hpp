@@ -50,10 +50,21 @@ namespace utils {
 		@brief  標準出力ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct def_chaout {
+	class def_chaout {
+		char*		out_;
+		uint16_t	len_;
+		uint16_t	pos_;
+	public:
+		def_chaout(char* out = nullptr, uint16_t len = 0) : out_(out), len_(len), pos_(0) { } 
 		void operator() (char ch) {
-			char tmp = ch;
-			write(1, &tmp, 1);
+			if(out_ != nullptr && len_ > 1 && pos_ < (len_ - 1)) {
+				out_[pos_] = ch;
+				++pos_;
+				out_[pos_] = 0;
+			} else {
+				char tmp = ch;
+				write(1, &tmp, 1);
+			}
 		}
 	};
 
@@ -79,8 +90,6 @@ namespace utils {
 		};
 
 	private:
-		chaout	chaout_;
-
 		enum class mode : uint8_t {
 			CHA,		///< 文字
 			STR,		///< 文字列
@@ -101,6 +110,8 @@ namespace utils {
 		error		error_;
 
 		const char*	form_;
+
+		chaout	chaout_;
 
 		char		buff_[34];
 
@@ -459,9 +470,13 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
+			@param[in]	form	フォーマット式
 		*/
 		//-----------------------------------------------------------------//
-		basic_format(const char* form) : error_(error::none), form_(form), num_(0), point_(0),
+		basic_format(const char* form, char* out = nullptr, uint16_t len = 0) noexcept :
+			error_(error::none),
+			form_(form), chaout_(out, len),
+			num_(0), point_(0),
 			bitlen_(0),
 			mode_(mode::NONE), zerosupp_(false), sign_(false) {
 			next_();
@@ -474,7 +489,7 @@ namespace utils {
 			@return エラー
 		*/
 		//-----------------------------------------------------------------//
-		error get_error() const { return error_; }
+		error get_error() const noexcept { return error_; }
 
 
 		//-----------------------------------------------------------------//
@@ -483,7 +498,7 @@ namespace utils {
 			@return 変換が全て正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool status() const { return error_ == error::none; }
+		bool status() const noexcept { return error_ == error::none; }
 
 
 		//-----------------------------------------------------------------//
@@ -493,7 +508,7 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		basic_format& operator % (const char* val)
+		basic_format& operator % (const char* val) noexcept
 		{
 			if(error_ != error::none) {
 				return *this;
@@ -522,7 +537,7 @@ namespace utils {
 			@return	自分の参照
 		*/
 		//-----------------------------------------------------------------//
-		basic_format& operator % (char* val)
+		basic_format& operator % (char* val) noexcept
 		{
 			if(error_ != error::none) {
 				return *this;
@@ -552,7 +567,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		template <typename T>
-		basic_format& operator % (T val)
+		basic_format& operator % (T val) noexcept
 		{
 			if(error_ != error::none) {
 				return *this;
