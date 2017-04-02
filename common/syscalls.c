@@ -1,8 +1,9 @@
 //=====================================================================//
 /*!	@file
 	@brief	標準ライブラリーハード依存「syscalls」モジュール@n
-			通常は libc.a にアーカイブされているモジュールを、@n
-			置き換える。（オリジナルは、除去する必要あり）
+			通常は libc.a にアーカイブされているモジュールを @n
+			置き換える。@n
+			Copyright 2016, 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -32,11 +33,20 @@ void utf8_to_sjis(const char* src, char* dst);
 #include "ff12b/src/ff.h"
 
 // 同時にオープンできる数
-#define OPEN_MAX_ 4
+#define OPEN_MAX_ 16
 
 static FATFS fatfs_;
 static FIL file_obj_[OPEN_MAX_];
 static char fd_pads_[OPEN_MAX_];
+#endif
+
+// システムコール関係のデバッグ用
+// #define SYSCALLS_DEBUG
+// read 関数の詳細デバッグ
+// #define SYSCALLS_READ_DEBUG
+
+#ifdef SYSCALLS_DEBUG
+static char debug_tmp_[256];
 #endif
 
 //-----------------------------------------------------------------//
@@ -93,13 +103,13 @@ int open(const char *path, int flags, ...)
 		fd_pads_[file] = 1;
 		errno = 0;
 #ifdef SYSCALLS_DEBUG
-//		sprintf(g_text, "syscalls: _open ok.(%d): '%s' at 0x%08X\n", file, path, mode);
-//		sh72620_uart_puts(STDIO_SIO_CHANEL, g_text);
+		sprintf(debug_tmp_, "syscalls: _open ok.(%d): '%s' at 0x%08X\n", file, path, mode);
+		sci_puts(debug_tmp_);
 #endif
 	} else {
 #ifdef SYSCALLS_DEBUG
-//		sprintf(g_text, "(%d)f_open error: (%d) at 0x%08X\n", file, (int)res, mode);
-//		sh72620_uart_puts(STDIO_SIO_CHANEL, g_text);
+		sprintf(debug_tmp_, "(%d)f_open error: (%d) at 0x%08X\n", file, (int)res, mode);
+		sci_puts(debug_tmp_);
 #endif
 		errno = EIO;
 		file = -1;
@@ -141,19 +151,22 @@ int read(int file, void *ptr, int len)
 		UINT rl;
 		FRESULT res;
 		if(fd_pads_[file] != 0) {
-//			sprintf(txt, "syscalls: _read(%d): request: %d at %08X\n", file, len, (int)ptr);
-//			sh72620_uart_puts(STDIO_SIO_CHANEL, txt);
-
+#ifdef SYSCALLS_READ_DEBUG
+			sprintf(debug_tmp_, "syscalls: _read(%d): request: %d at %08X\n", file, len, (int)ptr);
+			sci_puts(debug_tmp_);
+#endif
 			res = f_read(&file_obj_[file], ptr, len, &rl);
 			if(res == FR_OK) {
-//				sprintf(txt, "syscalls: _read(%d): %d->%d\n", file, len, rl);
-//				sh72620_uart_puts(STDIO_SIO_CHANEL, txt);
+#ifdef SYSCALLS_READ_DEBUG
+				sprintf(debug_tmp_, "syscalls: _read(%d): %d->%d\n", file, len, rl);
+				sci_puts(debug_tmp_);
+#endif
 				errno = 0;
 				l = (int)rl;
 			} else {
 #ifdef SYSCALLS_DEBUG
-//				sprintf(g_text, "(%d)f_read error: %x\n", file, (int)res);
-//				sh72620_uart_puts(STDIO_SIO_CHANEL, g_text);
+				sprintf(debug_tmp_, "(%d)f_read error: %x\n", file, (int)res);
+				sci_puts(debug_tmp_);
 #endif
 				errno = EIO;
 				l = -1;
@@ -204,8 +217,8 @@ int write(int file, const void *ptr, int len)
 				l = (int)rl;
 			} else {
 #ifdef SYSCALLS_DEBUG
-//				sprintf(g_text, "(%d)f_write error: %x\n", file, (int)res);
-//				sh72620_uart_puts(STDIO_SIO_CHANEL, g_text);
+				sprintf(debug_tmp_, "(%d)f_write error: %x\n", file, (int)res);
+				sci_puts(debug_tmp_);
 #endif
 				errno = EIO;
 				l = -1;
@@ -267,8 +280,8 @@ int lseek(int file, int offset, int dir)
 				errno = 0;
 			} else {
 #ifdef SYSCALLS_DEBUG
-//				sprintf(g_text, "(%d)f_seek error: %x\n", file, (int)res);
-//				sh72620_uart_puts(STDIO_SIO_CHANEL, g_text);
+				sprintf(debug_tmp_, "(%d)f_seek error: %x\n", file, (int)res);
+				sci_puts(debug_tmp_);
 #endif
 				errno = EIO;
 			}
@@ -302,8 +315,8 @@ int link(const char *oldpath, const char *newpath)
 		return 0;
 	} else {
 #ifdef SYSCALLS_DEBUG
-//		sprintf(g_text, "('%s' -> '%s')f_rename error: %x\n", oldpath, newpath, (int)res);
-//		sh72620_uart_puts(STDIO_SIO_CHANEL, g_text);
+		sprintf(debug_tmp_, "('%s' -> '%s')f_rename error: %x\n", oldpath, newpath, (int)res);
+		sci_puts(debug_tmp_);
 #endif
 		return -1;
 	}
@@ -444,14 +457,14 @@ int close(int file)
 		if(res == FR_OK) {
 			errno = 0;
 #ifdef SYSCALLS_DEBUG
-//			sprintf(g_text, "syscalls: _close ok.(%d):\n", file);
-//			sh72620_uart_puts(STDIO_SIO_CHANEL, g_text);
+			sprintf(debug_tmp_, "syscalls: _close ok.(%d):\n", file);
+			sci_puts(debug_tmp_);
 #endif
 			return 0;
 		} else {
 #ifdef SYSCALLS_DEBUG
-//			sprintf(g_text, "(%d)f_close error: %x\n", file, (int)res);
-//			sh72620_uart_puts(STDIO_SIO_CHANEL, g_text);
+			sprintf(debug_tmp_, "(%d)f_close error: %x\n", file, (int)res);
+			sci_puts(debug_tmp_);
 #endif
 			errno = EIO;
 			return -1;
@@ -500,6 +513,5 @@ void kill(int n, int m)
 
 int getpid(int n)
 {
-  return 1;
+	return 1;
 }
-
