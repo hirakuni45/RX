@@ -11,6 +11,7 @@
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
+#include "rx64m/rtc_io.hpp"
 #include "common/command.hpp"
 
 #include "common/vect.h"
@@ -53,6 +54,8 @@ namespace {
 	typedef utils::fifo<uint8_t, 256> buffer;
 	device::sci_io<device::SCI7, buffer, buffer> sci_;
 
+	utils::rtc_io rtc_;
+
 	utils::command<256> cmd_;
 
 	// EthernetClient client_;
@@ -86,6 +89,15 @@ extern "C" {
 		return sci_.recv_length();
 	}
 
+	time_t get_time_()
+	{
+		time_t t = 0;
+		if(!rtc_.get_time(t)) {
+			utils::format("Stall RTC read\n");
+		}
+		return t;
+	}
+
 	unsigned long millis(void)
 	{
 		return millis_;
@@ -99,6 +111,98 @@ extern "C" {
 }
 
 namespace {
+
+	void disp_time_(time_t t, char* dst = nullptr, uint32_t size = 0)
+	{
+		struct tm *m = localtime(&t);
+		utils::format("%s %s %d %02d:%02d:%02d  %4d\n", dst, size)
+			% get_wday(m->tm_wday)
+			% get_mon(m->tm_mon)
+			% static_cast<uint32_t>(m->tm_mday)
+			% static_cast<uint32_t>(m->tm_hour)
+			% static_cast<uint32_t>(m->tm_min)
+			% static_cast<uint32_t>(m->tm_sec)
+			% static_cast<uint32_t>(m->tm_year + 1900);
+	}
+
+	const char* get_dec_(const char* p, char tmch, int& value) {
+		int v = 0;
+		char ch;
+		while((ch = *p) != 0) {
+			++p;
+			if(ch == tmch) {
+				break;
+			} else if(ch >= '0' && ch <= '9') {
+				v *= 10;
+				v += ch - '0';
+			} else {
+				return nullptr;
+			}
+		}
+		value = v;
+		return p;
+	}
+
+	void set_time_date_()
+	{
+		time_t t = get_time_();
+		if(t == 0) return;
+
+		struct tm *m = localtime(&t);
+		bool err = false;
+		if(cmd_.get_words() == 3) {
+			char buff[12];
+			if(cmd_.get_word(1, sizeof(buff), buff)) {
+				const char* p = buff;
+				int vs[3];
+				uint8_t i;
+				for(i = 0; i < 3; ++i) {
+					p = get_dec_(p, '/', vs[i]);
+					if(p == nullptr) {
+						break;
+					}
+				}
+				if(p != nullptr && p[0] == 0 && i == 3) {
+					if(vs[0] >= 1900 && vs[0] < 2100) m->tm_year = vs[0] - 1900;
+					if(vs[1] >= 1 && vs[1] <= 12) m->tm_mon = vs[1] - 1;
+					if(vs[2] >= 1 && vs[2] <= 31) m->tm_mday = vs[2];		
+				} else {
+					err = true;
+				}
+			}
+
+			if(cmd_.get_word(2, sizeof(buff), buff)) {
+				const char* p = buff;
+				int vs[3];
+				uint8_t i;
+				for(i = 0; i < 3; ++i) {
+					p = get_dec_(p, ':', vs[i]);
+					if(p == nullptr) {
+						break;
+					}
+				}
+				if(p != nullptr && p[0] == 0 && (i == 2 || i == 3)) {
+					if(vs[0] >= 0 && vs[0] < 24) m->tm_hour = vs[0];
+					if(vs[1] >= 0 && vs[1] < 60) m->tm_min = vs[1];
+					if(i == 3 && vs[2] >= 0 && vs[2] < 60) m->tm_sec = vs[2];
+					else m->tm_sec = 0;
+				} else {
+					err = true;
+				}
+			}
+		}
+
+		if(err) {
+			sci_puts("Can't analize Time/Date input.\n");
+			return;
+		}
+
+		time_t tt = mktime(m);
+		if(!rtc_.set_time(tt)) {
+			sci_puts("Stall RTC write...\n");
+		}
+	}
+
 
 #ifdef SERVER_TASK
 	void service_server()
@@ -129,13 +233,22 @@ namespace {
 						client.println();
 						client.println("<!DOCTYPE HTML>");
 						client.println("<html>");
-						// output the value of each analog input pin
+						client.println("<font size=\"5\">");
+						{  // 時間表示
+							char tmp[128];
+							time_t t = get_time_();
+							disp_time_(t, tmp, sizeof(tmp));
+							client.print(tmp);
+							client.println("<br/ >");
+						}
+						// アナログ入力の表示
 						for (int ach = 0; ach < 4; ++ach) {
 							char tmp[128];
 							utils::format("analog input(%d): %d", tmp, sizeof(tmp)) % ach % rand();
 							client.print(tmp);
 							client.println("<br/ >");
 						}
+						client.println("</font>");
 						client.println("</html>");
 						break;
 					}
@@ -191,11 +304,21 @@ int main(int argc, char** argv)
 		sci_.start(115200, int_level);
 	}
 
+	{  // RTC 設定
+		rtc_.start();
+	}
+
 	// タイトル・コール
 	utils::format("\nStart GR-KAEDE, ");
 	utils::format("Endian: %3b") % static_cast<uint32_t>(device::SYSTEM::MDE.MDE());
 	utils::format(", PCKA: %u [Hz]") % static_cast<uint32_t>(F_PCKA);
 	utils::format(", PCKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCKB);
+	{
+		time_t t = get_time_();
+		if(t != 0) {
+			disp_time_(t);
+		}
+	}
 
 	{  // Ethernet 起動
 		device::power_cfg::turn(device::peripheral::ETHERC0);
@@ -235,7 +358,31 @@ int main(int argc, char** argv)
 		sync_100hz();
 		Ethernet.mainloop();
 
+		// コマンド入力と、コマンド解析
 		if(cmd_.service()) {
+			uint8_t cmdn = cmd_.get_words();
+			if(cmdn >= 1) {
+				if(cmd_.cmp_word(0, "date")) {
+					if(cmdn == 1) {
+						time_t t = get_time_();
+						if(t != 0) {
+							disp_time_(t);
+						}
+					} else {
+						set_time_date_();
+					}
+				} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
+					sci_puts("date\n");
+					sci_puts("date yyyy/mm/dd hh:mm[:ss]\n");
+				} else {
+					char buff[32];
+					if(cmd_.get_word(0, sizeof(buff), buff)) {
+						sci_puts("Command error: ");
+						sci_puts(buff);
+						sci_putch('\n');
+					}
+				}
+			}
 		}
 
 #ifdef SERVER_TASK

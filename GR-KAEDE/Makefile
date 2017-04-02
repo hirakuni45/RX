@@ -5,7 +5,8 @@
 #=======================================================#
 TARGET		=	kaede_sample
 
-DEVICE		=	R5F564MF
+# GR-KAEDE MCU (R5F564MLCDFB 144pin QFP)
+DEVICE		=	R5F564ML
 
 BUILD		=	release
 
@@ -17,6 +18,7 @@ ASOURCES	=	common/start.s \
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
+				common/time.c \
 				GR/core/r_byteq_v1.30/r_byteq.c \
 				GR/core/driver/phy.c \
 				GR/core/driver/r_ether.c \
