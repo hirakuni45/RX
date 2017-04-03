@@ -191,30 +191,15 @@ namespace device {
 		/*!
 			@brief  周辺機器に切り替える
 			@param[in]	t	周辺機器タイプ
+			@param[in]	ena	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void turn(peripheral t)
+		static void turn(peripheral t, bool ena = true)
 		{
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			sub_(t, true);
-
-			MPC::PWPR = device::MPC::PWPR.B0WI.b();
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  周辺機器をリセット（ポートに戻す）
-			@param[in]	t	周辺機器タイプ
-		*/
-		//-----------------------------------------------------------------//
-		static void reset(peripheral t) {
-			MPC::PWPR.B0WI = 0;				// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;			// PxxPFS 書き込み許可
-
-			sub_(t, false);
+			sub_(t, ena);
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 		}
