@@ -32,15 +32,18 @@ void utf8_to_sjis(const char* src, char* dst);
 #include "ff12b/src/diskio.h"
 #include "ff12b/src/ff.h"
 
-// 同時にオープンできる数
+// stdin, stdout, stderr のオフセット
+#define STD_OFS_ (3)
+
+// 同時にオープンできる標準的な数（３）
 #if defined(FAT_FS_NUM)
-#define OPEN_MAX_ (FAT_FS_NUM)
+#define OPEN_MAX_ (STD_OFS_ + FAT_FS_NUM)
 #else
-#define OPEN_MAX_ 4
+#define OPEN_MAX_ (STD_OFS_ + 3)
 #endif
 
 static FATFS fatfs_;
-static FIL file_obj_[OPEN_MAX_];
+static FIL file_obj_[OPEN_MAX_ - STD_OFS_];
 static char fd_pads_[OPEN_MAX_];
 #endif
 
@@ -102,7 +105,7 @@ int open(const char *path, int flags, ...)
 	char tmp[256];
 	utf8_to_sjis(path, tmp);
 
-	FRESULT res = f_open(&file_obj_[file], tmp, mode);
+	FRESULT res = f_open(&file_obj_[file - STD_OFS_], tmp, mode);
 	if(res == FR_OK) {
 		fd_pads_[file] = 1;
 		errno = 0;
@@ -159,7 +162,7 @@ int read(int file, void *ptr, int len)
 			sprintf(debug_tmp_, "syscalls: _read(%d): request: %d at %08X\n", file, len, (int)ptr);
 			sci_puts(debug_tmp_);
 #endif
-			res = f_read(&file_obj_[file], ptr, len, &rl);
+			res = f_read(&file_obj_[file - STD_OFS_], ptr, len, &rl);
 			if(res == FR_OK) {
 #ifdef SYSCALLS_READ_DEBUG
 				sprintf(debug_tmp_, "syscalls: _read(%d): %d->%d\n", file, len, rl);
@@ -215,7 +218,7 @@ int write(int file, const void *ptr, int len)
 	else if(file < OPEN_MAX_) {
 		if(fd_pads_[file] != 0) {
 			UINT rl;
-			FRESULT res = f_write(&file_obj_[file], ptr, len, &rl);
+			FRESULT res = f_write(&file_obj_[file - STD_OFS_], ptr, len, &rl);
 			if(res == FR_OK) {
 				errno = 0;
 				l = (int)rl;
@@ -263,7 +266,7 @@ int lseek(int file, int offset, int dir)
 		FIL *fp;
 
 		if(fd_pads_[file] != 0) {
-			fp = &file_obj_[file];
+			fp = &file_obj_[file - STD_OFS_];
 			if(dir == SEEK_SET) {
 				ofs = (DWORD)offset;
 			} else if(dir == SEEK_CUR) {
@@ -457,7 +460,7 @@ int close(int file)
 	} else if(file < OPEN_MAX_) {
 		fd_pads_[file] = 0;
 
-		res = f_close(&file_obj_[file]);
+		res = f_close(&file_obj_[file - STD_OFS_]);
 		if(res == FR_OK) {
 			errno = 0;
 #ifdef SYSCALLS_DEBUG
