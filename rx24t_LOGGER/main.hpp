@@ -159,16 +159,6 @@ struct core_t {
 
 	utils::command<128> command_;
 
-	uint8_t	tmp_text_pos_;
-	char	tmp_text_[64];
-
-	struct text_chaout {
-		void operator() (char ch) {
-			string_chaout(ch);
-		}
-		text_chaout() { string_reset(); }
-	};
-
 	uint16_t	loop_count_;
 
 	bool		fbc_enable_;
@@ -188,14 +178,6 @@ struct core_t {
 			   menu_(bitmap_),
 			   menu_run_(-1)
 	{ }
-
-
-	//-----------------------------------------------------------------//
-	/*!
-		@brief	文字列出力フォーマット定義
-	*/
-	//-----------------------------------------------------------------//
-	typedef utils::basic_format<text_chaout> text_format;
 
 
 	//-----------------------------------------------------------------//
@@ -263,7 +245,7 @@ struct core_t {
 		}
 
 		{  // SD カード・クラスの初期化
-			sdc_.initialize();
+			sdc_.start();
 		}
 
 
@@ -314,9 +296,10 @@ struct core_t {
 	//-----------------------------------------------------------------//
 	void draw_date(int16_t x, int16_t y, const struct tm *t)
 	{
-		text_format("%04u/%02u/%02u") % static_cast<uint32_t>(t->tm_year + 1900)
+		char tmp[128];
+		utils::format("%04u/%02u/%02u", tmp, sizeof(tmp)) % static_cast<uint32_t>(t->tm_year + 1900)
 			% static_cast<uint32_t>(t->tm_mon + 1) % static_cast<uint32_t>(t->tm_mday);
- 		bitmap_.draw_text(x, y, tmp_text_);
+ 		bitmap_.draw_text(x, y, tmp);
 	}
 
 
@@ -330,9 +313,10 @@ struct core_t {
 	//-----------------------------------------------------------------//
 	void draw_time(short x, short y, const struct tm* t)
 	{
-		text_format("%02u:%02u.%02u") % static_cast<uint32_t>(t->tm_hour)
+		char tmp[128];
+		utils::format("%02u:%02u.%02u", tmp, sizeof(tmp)) % static_cast<uint32_t>(t->tm_hour)
 			% static_cast<uint32_t>(t->tm_min) % static_cast<uint32_t>(t->tm_sec);
-		bitmap_.draw_text(x, y, tmp_text_);
+		bitmap_.draw_text(x, y, tmp);
 	}
 
 

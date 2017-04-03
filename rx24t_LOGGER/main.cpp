@@ -102,18 +102,6 @@ extern "C" {
 		return core_.sci1_.recv_length();
 	}
 
-	void string_reset()
-	{
-		core_.tmp_text_pos_ = 0;
-	}
-
-	void string_chaout(char ch)
-	{
-		core_.tmp_text_[core_.tmp_text_pos_ & (sizeof(core_t::tmp_text_) - 1)] = ch;
-		++core_.tmp_text_pos_;
-		core_.tmp_text_[core_.tmp_text_pos_ & (sizeof(core_t::tmp_text_) - 1)] = 0;
-	}
-
 	void laptimer_service(uint8_t pitflag)
 	{
 		laptimer_.laptimer_service(pitflag);
