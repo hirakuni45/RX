@@ -363,7 +363,7 @@ int main(int argc, char** argv)
 #endif
 
 	// SD カード・クラスの初期化
-	sdc_.initialize();
+	sdc_.start();
 
 	utils::format("RX24T SD-CARD Access sample\n");
 
