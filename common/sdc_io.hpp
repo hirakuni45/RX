@@ -2,7 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	SD カード・アクセス制御 @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2016, 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -146,10 +146,10 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	初期化
+			@brief	開始（初期化）
 		 */
 		//-----------------------------------------------------------------//
-		void initialize()
+		void start()
 		{
 			SELECT::DIR = 1;
 			SELECT::P = 0;  // 電源ＯＦＦ時、「０」にしておかないと電流が回り込む
@@ -161,7 +161,8 @@ namespace utils {
 			DETECT::PU = 1;  // pull-up
 
 			// SPI を初期化後、廃棄する事で関係ポートを初期化する。
-			if(!spi_.start_sdc(4000000)) {
+			// 初期化時４ＭＨｚ
+			if(!spi_.start_sdc(400000)) {
 				format("SPI Start fail ! (Clock spped over range)\n");
 			}
 			spi_.destroy();
@@ -367,14 +368,14 @@ namespace utils {
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
 				POWER::P = 0;
 				SELECT::P = 1;
-//				format("Card ditect\n");
+///				format("Card ditect\n");
 			} else if(cd_ && select_wait_ == 0) {
 				f_mount(&fatfs_, "", 0);
 				spi_.destroy();
 				POWER::P = 1;
 				SELECT::P = 0;
 				mount_ = false;
-//				format("Card unditect\n");
+///				format("Card unditect\n");
 			}
 			if(select_wait_ >= 10) cd_ = true;
 			else cd_ = false;
@@ -384,7 +385,7 @@ namespace utils {
 				if(mount_delay_ == 0) {
 					auto st = f_mount(&fatfs_, "", 1);
 					if(st != FR_OK) {
-						format("Mount fail: %d\n") % static_cast<uint32_t>(st);
+						format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
 						spi_.destroy();
 						POWER::P = 1;
 						SELECT::P = 0;

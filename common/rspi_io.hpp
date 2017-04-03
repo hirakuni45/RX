@@ -16,7 +16,7 @@
 #else
 #undef PCLK
 #define PCLK F_PCKB
-#define PCLK_MAX 20000000
+#define PCLK_MAX (F_PCKB / 4)
 #endif
 #elif defined(SIG_RX64M)
 #ifndef F_PCKA
@@ -24,7 +24,7 @@
 #else
 #undef PCLK
 #define PCLK F_PCKA
-#define PCLK_MAX 40000000
+#define PCLK_MAX (F_PCKA / 2)
 #endif
 #endif
 
