@@ -41,11 +41,14 @@ namespace device {
 		{
 			bool err = false;
 			if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
-				SCI::SSR = 0x00;	///< 受信オーバランエラークリア
+				SCI::SSR.ORER = 0;	///< 受信オーバランエラークリア
 				err = true;
 			}
 			///< フレーミングエラー/パリティエラー状態確認
 			if(SCI::SSR() & (SCI::SSR.FER.b() | SCI::SSR.PER.b())) {
+				// エラーフラグの消去
+				SCI::SSR.FER = 0;
+				SCI::SSR.PER = 0;
 				err = true;
 			}
 			if(!err) recv_.put(SCI::RDR());
