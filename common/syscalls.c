@@ -33,7 +33,11 @@ void utf8_to_sjis(const char* src, char* dst);
 #include "ff12b/src/ff.h"
 
 // 同時にオープンできる数
-#define OPEN_MAX_ 16
+#if defined(FAT_FS_NUM)
+#define OPEN_MAX_ (FAT_FS_NUM)
+#else
+#define OPEN_MAX_ 4
+#endif
 
 static FATFS fatfs_;
 static FIL file_obj_[OPEN_MAX_];
