@@ -40,10 +40,9 @@ ENTRY(_start)
 /* This memory layout corresponds to the smallest predicted RX600 chip.  */
 MEMORY {
 	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00001F00 /* 8k - 256(USP + SP) */
-	STACK (w)  : ORIGIN = 0x00002000, LENGTH = 16 /* top of RAM */
+	USTACK (w) : ORIGIN = 0x00001FC0, LENGTH = 4 /* ustack 192 bytes */
+	ISTACK (w) : ORIGIN = 0x00002000, LENGTH = 4 /* istack 64 bytes  */
 	ROM (w)    : ORIGIN = 0xFFFF0000, LENGTH = 0x0000FFD0 /* 64k - 0x30(.fvectors) */
-/* This is the largest RX6000: */
-/*	ROM (w)   : ORIGIN = 0xffe00000, LENGTH = 0x001fffd0 */ /* 2Mb */
 }
 
 SECTIONS
@@ -158,10 +157,16 @@ SECTIONS
   } > RAM
   PROVIDE (__bsssize = SIZEOF(.bss) / 4);
 
-  .stack (ORIGIN (STACK)) :
+  .istack (ORIGIN (ISTACK)) :
   {
-    PROVIDE (__stack = .);
-    *(.stack)
+    PROVIDE (__istack = .);
+    *(.istack)
+  }
+
+  .ustack (ORIGIN (USTACK)) :
+  {
+    PROVIDE (__ustack = .);
+    *(.ustack)
   }
 
   /* Providing one of these symbols in your code is sufficient to have
