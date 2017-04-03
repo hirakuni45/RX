@@ -25,7 +25,7 @@ char sci_getch(void) { return 0; }
 
 void utf8_to_sjis(const char* src, char* dst);
 
-// FatFS を使う場合有効にする
+// FatFS を使う場合有効にする（通常 Makefile で定義）
 // #define FAT_FS
 
 #ifdef FAT_FS
