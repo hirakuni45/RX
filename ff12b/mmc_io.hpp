@@ -149,6 +149,9 @@ namespace fatfs {
 				if (!select_()) return 0xFF;
 			}
 
+//			utils::format("SEL: %d\n") % static_cast<int>(SEL::P());
+//			utils::format("CMD: %02X\n") % static_cast<uint32_t>(cmd);
+
 			/* Send a command packet */
 			BYTE buf[6];
 			buf[0] = 0x40 | c;						/* Start + Command index */
@@ -180,8 +183,11 @@ namespace fatfs {
 		void start_spi_(bool fast)
 		{
 			uint32_t speed;
-			if(fast) speed = spi_.get_max_speed();
-			else speed = 4000000;  // 初期化時、4MB/s
+			if(fast) {
+				speed = spi_.get_max_speed();
+				// 最大速度を25MHzに制限する。
+				if(speed > 25000000) speed = 25000000;
+			} else speed = 4000000;  // 初期化時、4MB/s
 			if(!spi_.start_sdc(speed)) {
 				utils::format("CSI Start fail ! (Clock spped over range)\n");
 			}
@@ -232,16 +238,9 @@ namespace fatfs {
 			utils::delay::milli_second(10);  // 10ms
 
 			SEL::DIR = 1;  // output
-
 			SEL::P = 1;
-#if 0
-			CS_INIT(); CS_H();		/* Initialize port pin tied to CS */
-			CK_INIT(); CK_L();		/* Initialize port pin tied to SCLK */
-			DI_INIT();				/* Initialize port pin tied to DI */
-			DO_INIT();				/* Initialize port pin tied to DO */
-#endif
+			// MISO: H (pull-up)
 			start_spi_(false);
-
 			/* Apply 80 dummy clocks and the card gets ready to receive command */
 			BYTE buf[4];
 			for (uint8_t n = 10; n; n--) spi_.recv(buf, 1);
