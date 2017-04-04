@@ -45,6 +45,7 @@ Includes   <System Includes> , "Project Includes"
 #include "../r_config/r_t4_dns_client_rx_config.h"
 #include "r_t4_dns_client_rx_if.h"
 #include "r_dns_client.h"
+#include "core/driver/timer.h"
 
 /***********************************************************************************************************************
 Macro definitions

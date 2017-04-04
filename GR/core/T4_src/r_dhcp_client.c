@@ -48,6 +48,7 @@ Includes   <System Includes> , "Project Includes"
 #include "r_t4_dhcp_client_rx_if.h"
 #include "r_dhcp_client.h"
 #include "../driver/r_ether.h"
+#include "../driver/timer.h"
 
 #if defined(__GNUC__) || defined(GRSAKURA)
 static int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet);

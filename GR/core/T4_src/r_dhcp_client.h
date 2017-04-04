@@ -1,3 +1,4 @@
+#pragma once
 /***********************************************************************************************************************
 * DISCLAIMER
 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
@@ -26,9 +27,6 @@
 *         : 15.03.2011 1.00    First Release
 *         : 09.05.2014 1.01    Corresponded to FIT Modules.
 ***********************************************************************************************************************/
-#ifndef	R_DHCP_CLIENT_H
-#define	R_DHCP_CLIENT_H
-
 #if !defined(__GNUC__) && !defined(GRSAKURA)
 #pragma pack
 #endif
@@ -160,7 +158,3 @@ static uint16_t checksum(uint16_t *data, int32_t len);
 static uint16_t checksum_udp(uint16_t *pre_header, uint16_t *data, int32_t len);
 #endif
 
-void	 reset_timer(void);
-uint16_t get_timer(void);
-
-#endif	/* R_DHCP_CLIENT_H */

@@ -147,7 +147,5 @@ static uint32_t convert_array_to_long(uint8_t *ipaddr);
 static uint16_t htons(uint16_t data);
 static uint32_t htonl(uint32_t data);
 #endif
-void	 reset_timer(void);
-uint16_t get_timer(void);
 
 #endif	/* R_DNS_CLIENT_H */
