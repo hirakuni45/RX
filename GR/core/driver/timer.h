@@ -67,7 +67,7 @@ extern "C"{
 extern void OpenTimer(void);
 extern void CloseTimer(void);
 extern void reset_timer(void);
-extern uint32_t get_timer(void);
+extern uint16_t get_timer(void);
 extern WAIT_STATUS CheckTimer(void);
 extern void api_timeoutstart(unsigned long);
 extern void api_timeoutstop(void);

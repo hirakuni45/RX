@@ -69,9 +69,9 @@ Exported global variables and functions (to be accessed by other files)
 ******************************************************************************/
 void timer_interrupt(void);
 
-//void wait_Xms(UH limit_time);
-//void reset_timer(void);
-//UH get_timer(void);
+// void wait_Xms(UH limit_time);
+// void reset_timer(void);
+// UH get_timer(void);
 
 /******************************************************************************
 Imported global variables and functions (from other files)
@@ -93,7 +93,7 @@ Private global variables and functions
 ******************************************************************************/
 UH tcpudp_time_cnt;
 UB tcpip_flag;
-static volatile uint32_t wait_timer_;
+volatile UH wait_timer_;
 T4_STATISTICS t4_stat;
 UB *err_buf_ptr;
 
@@ -382,9 +382,9 @@ void lan_inthdr(void)	// callback from r_ether.c
 Functions (Test function)
 ******************************************************************************/
 
-void wait_Xms(uint32_t limit_time)
+void wait_Xms(uint16_t limit_time)
 {
-	uint32_t max;
+	uint16_t max;
 
 	wait_timer_ = 0;
 	max = limit_time / 10;
@@ -397,7 +397,7 @@ void reset_timer(void)
 	wait_timer_ = 0;
 }
 
-uint32_t get_timer(void)
+UH get_timer(void)
 {
 	return wait_timer_;
 }
