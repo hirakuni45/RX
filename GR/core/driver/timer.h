@@ -48,6 +48,8 @@
 *               : 21.06.2010 1.00 First Release
  *""FILE COMMENT END""**************************************************************************/
 
+#include <stdint.h>
+
 /******************************************************************************
 Macro definitions
 ******************************************************************************/
@@ -59,22 +61,18 @@ typedef enum tagWaitTimerStatus {
 /******************************************************************************
 Imported global variables and functions (from other files)
 ******************************************************************************/
-#if defined(__GNUC__) || defined(GRSAKURA)
 #if defined(__cplusplus)
 extern "C"{
 #endif
-#endif
 extern void OpenTimer(void);
 extern void CloseTimer(void);
-#if defined(__GNUC__) || defined(GRSAKURA)
-#if defined(__cplusplus)
-}
-#endif
-#endif
-extern void StartTimer(void);
-extern void StopTimer(void);
-WAIT_STATUS CheckTimer(void);
+extern void reset_timer(void);
+extern uint32_t get_timer(void);
+extern WAIT_STATUS CheckTimer(void);
 extern void api_timeoutstart(unsigned long);
 extern void api_timeoutstop(void);
 extern unsigned char api_timeoutchk(void);
 //extern void WaitTimer(unsigned long ms);
+#if defined(__cplusplus)
+};
+#endif

@@ -520,14 +520,12 @@ int32_t R_Ether_CheckLink_ZC(void)
 void R_ETHER_LinkProcess(void)
 {
     int32_t ret;
-
     /* When the magic packet is detected. */
     if (ETHER_FLAG_ON == g_ether_MpdFlag)
     {
         g_ether_MpdFlag = ETHER_FLAG_OFF;
         R_ETHER_Callback_WakeOnLAN();
     }
-
     /* When the link is up */
     if (ETHER_FLAG_ON_LINK_ON == g_ether_LchngFlag)
     {

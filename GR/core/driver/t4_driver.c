@@ -69,9 +69,9 @@ Exported global variables and functions (to be accessed by other files)
 ******************************************************************************/
 void timer_interrupt(void);
 
-void wait_Xms(UH limit_time);
-void reset_timer(void);
-UH get_timer(void);
+//void wait_Xms(UH limit_time);
+//void reset_timer(void);
+//UH get_timer(void);
 
 /******************************************************************************
 Imported global variables and functions (from other files)
@@ -93,7 +93,7 @@ Private global variables and functions
 ******************************************************************************/
 UH tcpudp_time_cnt;
 UB tcpip_flag;
-volatile UH wait_timer;
+static volatile uint32_t wait_timer_;
 T4_STATISTICS t4_stat;
 UB *err_buf_ptr;
 
@@ -351,9 +351,9 @@ void timer_interrupt(void)
 	}
 
 	/* for wait function */
-	if (wait_timer < 0xFFFF)
+	if (wait_timer_ < 0xffff)
 	{
-		wait_timer++;
+		wait_timer_++;
 	}
 
 	/* polling PHY chip to check LINK status @ per 1sec */
@@ -382,24 +382,24 @@ void lan_inthdr(void)	// callback from r_ether.c
 Functions (Test function)
 ******************************************************************************/
 
-void wait_Xms(UH limit_time)
+void wait_Xms(uint32_t limit_time)
 {
-	UH max;
+	uint32_t max;
 
-	wait_timer = 0;
+	wait_timer_ = 0;
 	max = limit_time / 10;
 
-	while (wait_timer < max);
+	while (wait_timer_ < max);
 }
 
 void reset_timer(void)
 {
-	wait_timer = 0;
+	wait_timer_ = 0;
 }
 
-UH get_timer(void)
+uint32_t get_timer(void)
 {
-	return wait_timer;
+	return wait_timer_;
 }
 
 /******************************************************************************

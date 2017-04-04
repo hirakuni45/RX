@@ -104,7 +104,7 @@ void OpenTimer(void)
     /*  5ms@48MHz : 6000/(48MHz/8)=6000/6MHz=1ms */
     CMT.CMSTR0.BIT.STR1 = 0;         // CMT1.CMCNT count is stopped
     CMT1.CMCR.WORD = 0x0040;          // CKS=00b,CMIE=1; PCLK/8,Compare match interrupt (CMIn) enabled
-    CMT1.CMCOR = 6000 * 10 - 1;       // (6250*10)-1 (10ms)
+    CMT1.CMCOR = (F_PCKB / 8 / 100) - 1;       // (10ms)
 #else
 	/* CMT0 */
 	/*	5ms@50MHz : 6250/(50MHz/8)=6250/6.25MHz=1ms	*/
