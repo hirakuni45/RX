@@ -8,6 +8,8 @@ TARGET		=	kaede_sample
 # GR-KAEDE MCU (R5F564MLCDFB 144pin QFP)
 DEVICE		=	R5F564ML
 
+FATFS_VER	=	ff12b
+
 BUILD		=	release
 
 VPATH		=	../
@@ -17,6 +19,8 @@ ASOURCES	=	common/start.s \
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
+				$(FATFS_VER)/src/ff.c \
+				$(FATFS_VER)/src/option/unicode.c \
 				common/syscalls.c \
 				common/time.c \
 				GR/core/r_byteq_v1.30/r_byteq.c \
@@ -41,7 +45,7 @@ USER_LIBS	=	stdc++
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX64M F_PCKA=96000000 F_PCKB=48000000 \
+USER_DEFS	=	SIG_RX64M F_PCKA=96000000 F_PCKB=48000000 FAT_FS FAT_FS_NUM=16 \
 				GRKAEDE GRSAKURA ARDUINO=144 CPPAPP __RX_LITTLE_ENDIAN__=1 __T4__ __RX
 
 MCU_TARGET	=

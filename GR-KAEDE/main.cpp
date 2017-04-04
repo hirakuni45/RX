@@ -15,9 +15,10 @@
 #include "common/rspi_io.hpp"
 #include "common/sdc_io.hpp"
 
-#include "GR/core/Ethernet.h"
+/// #include "seeda.hpp"
 
 #include <cstdlib>
+#include "GR/core/Ethernet.h"
 
 #define SERVER_TASK
 
@@ -56,22 +57,25 @@ namespace {
 
 	utils::rtc_io rtc_;
 
-	// SDC 用　SPI 定義（RSPI0）
-	typedef device::rspi_io<device::RSPI> sdc_spi;
-	sdc_spi sdc_spi_;
+	// SDC 用　SPI 定義（RSPI）
+	typedef device::rspi_io<device::RSPI> RSPI;
+	RSPI rspi_;
 
 	typedef device::PORT<device::PORTC, device::bitpos::B4> sdc_select;	///< カード選択信号
 	typedef device::NULL_PORT  sdc_power;	///< カード電源制御（常に電源ＯＮ）
 	typedef device::PORT<device::PORTB, device::bitpos::B7> sdc_detect;	///< カード検出
 
-	utils::sdc_io<sdc_spi, sdc_select, sdc_power, sdc_detect> sdc_(sdc_spi_);
+	typedef utils::sdc_io<RSPI, sdc_select, sdc_power, sdc_detect> SDC;
+	SDC sdc_(rspi_, 10000000);
 
 	utils::command<256> cmd_;
 
-	// EthernetClient client_;
 #ifdef SERVER_TASK
 	EthernetServer server_(80);
 #endif
+
+	// TelnetClient
+//	EthernetServer telnet_(23);
 }
 
 extern "C" {
@@ -106,6 +110,36 @@ extern "C" {
 			utils::format("Stall RTC read\n");
 		}
 		return t;
+	}
+
+	DSTATUS disk_initialize(BYTE drv) {
+		return sdc_.at_mmc().disk_initialize(drv);
+	}
+
+	DSTATUS disk_status(BYTE drv) {
+		return sdc_.at_mmc().disk_status(drv);
+	}
+
+	DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
+		return sdc_.at_mmc().disk_read(drv, buff, sector, count);
+	}
+
+	DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
+		return sdc_.at_mmc().disk_write(drv, buff, sector, count);
+	}
+
+	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
+		return sdc_.at_mmc().disk_ioctl(drv, ctrl, buff);
+	}
+
+	DWORD get_fattime(void) {
+		time_t t = 0;
+		rtc_.get_time(t);
+		return utils::str::get_fattime(t);
+	}
+
+	void utf8_to_sjis(const char* src, char* dst) {
+		utils::str::utf8_to_sjis(src, dst);
 	}
 
 	unsigned long millis(void)
@@ -213,6 +247,13 @@ namespace {
 		}
 	}
 
+	bool check_mount_() {
+		auto f = sdc_.get_mount();
+		if(!f) {
+			utils::format("SD card not mount.\n");
+		}
+		return f;
+	}
 
 #ifdef SERVER_TASK
 	void service_server()
@@ -254,7 +295,8 @@ namespace {
 						// アナログ入力の表示
 						for (int ach = 0; ach < 4; ++ach) {
 							char tmp[128];
-							utils::format("analog input(%d): %d", tmp, sizeof(tmp)) % ach % rand();
+							int v = rand() & (4096 - 1);
+							utils::format("analog input(%d): %d", tmp, sizeof(tmp)) % ach % v;
 							client.print(tmp);
 							client.println("<br/ >");
 						}
@@ -272,7 +314,22 @@ namespace {
 		}
 	}
 #endif
+
+#if 0
+	void telnet_service()
+	{
+		EthernetClient& client = telnet_.available();
+		if(client) {
+			char tmp[256];
+			int len = client.read(tmp, 256);
+			if(len > 0) {
+				client.write(tmp, len);
+			}
+		}
+	}
+#endif
 }
+
 
 int main(int argc, char** argv);
 
@@ -318,6 +375,10 @@ int main(int argc, char** argv)
 		rtc_.start();
 	}
 
+	{  // SD カード・クラスの初期化
+		sdc_.start();
+	}
+
 	// タイトル・コール
 	utils::format("\nStart GR-KAEDE, ");
 	utils::format("Endian: %3b") % static_cast<uint32_t>(device::SYSTEM::MDE.MDE());
@@ -355,6 +416,8 @@ int main(int argc, char** argv)
 		utils::format("Start server: ");
 		Ethernet.localIP().print();
 #endif
+
+///		telnet_.begin();
 	}
 
 	cmd_.set_prompt("# ");
@@ -368,11 +431,39 @@ int main(int argc, char** argv)
 		sync_100hz();
 		Ethernet.mainloop();
 
+		sdc_.service();
+
 		// コマンド入力と、コマンド解析
 		if(cmd_.service()) {
 			uint8_t cmdn = cmd_.get_words();
 			if(cmdn >= 1) {
-				if(cmd_.cmp_word(0, "date")) {
+				bool f = false;
+				if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
+					if(check_mount_()) {
+						if(cmdn >= 2) {
+							char tmp[128];
+							cmd_.get_word(1, sizeof(tmp), tmp);
+							sdc_.dir(tmp);
+						} else {
+							sdc_.dir("");
+						}
+					}
+					f = true;
+				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
+					if(check_mount_()) {
+						if(cmdn >= 2) {
+							char tmp[128];
+							cmd_.get_word(1, sizeof(tmp), tmp);
+							sdc_.cd(tmp);						
+						} else {
+							sdc_.cd("/");
+						}
+					}
+					f = true;
+				} else if(cmd_.cmp_word(0, "pwd")) { // pwd
+					utils::format("%s\n") % sdc_.get_current();
+					f = true;
+				} else if(cmd_.cmp_word(0, "date")) {
 					if(cmdn == 1) {
 						time_t t = get_time_();
 						if(t != 0) {
@@ -381,15 +472,19 @@ int main(int argc, char** argv)
 					} else {
 						set_time_date_();
 					}
+					f = true;
 				} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
-					sci_puts("date\n");
-					sci_puts("date yyyy/mm/dd hh:mm[:ss]\n");
-				} else {
-					char buff[32];
-					if(cmd_.get_word(0, sizeof(buff), buff)) {
-						sci_puts("Command error: ");
-						sci_puts(buff);
-						sci_putch('\n');
+					utils::format("date\n");
+					utils::format("date yyyy/mm/dd hh:mm[:ss]\n");
+					utils::format("dir [name]\n");
+					utils::format("cd [directory-name]\n");
+					utils::format("pwd\n");
+					f = true;
+				}
+				if(!f) {
+					char tmp[128];
+					if(cmd_.get_word(0, sizeof(tmp), tmp)) {
+						utils::format("Command error: '%s'\n") % tmp;
 					}
 				}
 			}
@@ -398,6 +493,7 @@ int main(int argc, char** argv)
 #ifdef SERVER_TASK
 		service_server();
 #endif
+///		telnet_service();
 
 		++cnt;
 		if(cnt >= 30) {
