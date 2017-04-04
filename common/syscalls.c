@@ -42,7 +42,6 @@ void utf8_to_sjis(const char* src, char* dst);
 #define OPEN_MAX_ (STD_OFS_ + 3)
 #endif
 
-static FATFS fatfs_;
 static FIL file_obj_[OPEN_MAX_ - STD_OFS_];
 static char fd_pads_[OPEN_MAX_];
 #endif
@@ -110,7 +109,7 @@ int open(const char *path, int flags, ...)
 		fd_pads_[file] = 1;
 		errno = 0;
 #ifdef SYSCALLS_DEBUG
-		sprintf(debug_tmp_, "syscalls: _open ok.(%d): '%s' at 0x%08X\n", file, path, mode);
+		sprintf(debug_tmp_, "syscalls: open ok.(%d): '%s' at 0x%08X\n", file, path, mode);
 		sci_puts(debug_tmp_);
 #endif
 	} else {
@@ -159,20 +158,20 @@ int read(int file, void *ptr, int len)
 		FRESULT res;
 		if(fd_pads_[file] != 0) {
 #ifdef SYSCALLS_READ_DEBUG
-			sprintf(debug_tmp_, "syscalls: _read(%d): request: %d at %08X\n", file, len, (int)ptr);
+			sprintf(debug_tmp_, "syscalls: read(%d): request: %d at %08X\n", file, len, (int)ptr);
 			sci_puts(debug_tmp_);
 #endif
 			res = f_read(&file_obj_[file - STD_OFS_], ptr, len, &rl);
 			if(res == FR_OK) {
 #ifdef SYSCALLS_READ_DEBUG
-				sprintf(debug_tmp_, "syscalls: _read(%d): %d->%d\n", file, len, rl);
+				sprintf(debug_tmp_, "syscalls: read(%d): %d->%d\n", file, len, rl);
 				sci_puts(debug_tmp_);
 #endif
 				errno = 0;
 				l = (int)rl;
 			} else {
 #ifdef SYSCALLS_DEBUG
-				sprintf(debug_tmp_, "(%d)f_read error: %x\n", file, (int)res);
+				sprintf(debug_tmp_, "(%d)read error: %x\n", file, (int)res);
 				sci_puts(debug_tmp_);
 #endif
 				errno = EIO;
@@ -224,7 +223,7 @@ int write(int file, const void *ptr, int len)
 				l = (int)rl;
 			} else {
 #ifdef SYSCALLS_DEBUG
-				sprintf(debug_tmp_, "(%d)f_write error: %x\n", file, (int)res);
+				sprintf(debug_tmp_, "(%d)write error: %x\n", file, (int)res);
 				sci_puts(debug_tmp_);
 #endif
 				errno = EIO;
@@ -287,7 +286,7 @@ int lseek(int file, int offset, int dir)
 				errno = 0;
 			} else {
 #ifdef SYSCALLS_DEBUG
-				sprintf(debug_tmp_, "(%d)f_seek error: %x\n", file, (int)res);
+				sprintf(debug_tmp_, "(%d)lseek error: %x\n", file, (int)res);
 				sci_puts(debug_tmp_);
 #endif
 				errno = EIO;
@@ -322,7 +321,7 @@ int link(const char *oldpath, const char *newpath)
 		return 0;
 	} else {
 #ifdef SYSCALLS_DEBUG
-		sprintf(debug_tmp_, "('%s' -> '%s')f_rename error: %x\n", oldpath, newpath, (int)res);
+		sprintf(debug_tmp_, "('%s' -> '%s')link error: %x\n", oldpath, newpath, (int)res);
 		sci_puts(debug_tmp_);
 #endif
 		return -1;
@@ -464,13 +463,13 @@ int close(int file)
 		if(res == FR_OK) {
 			errno = 0;
 #ifdef SYSCALLS_DEBUG
-			sprintf(debug_tmp_, "syscalls: _close ok.(%d):\n", file);
+			sprintf(debug_tmp_, "syscalls: close ok.(%d):\n", file);
 			sci_puts(debug_tmp_);
 #endif
 			return 0;
 		} else {
 #ifdef SYSCALLS_DEBUG
-			sprintf(debug_tmp_, "(%d)f_close error: %x\n", file, (int)res);
+			sprintf(debug_tmp_, "(%d)close error: %x\n", file, (int)res);
 			sci_puts(debug_tmp_);
 #endif
 			errno = EIO;

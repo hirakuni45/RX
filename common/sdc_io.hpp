@@ -8,9 +8,9 @@
 //=====================================================================//
 #include <cstring>
 #include "common/renesas.hpp"
-#include "ff12b/mmc_io.hpp"
 #include "common/format.hpp"
 #include "common/string_utils.hpp"
+#include "ff12b/mmc_io.hpp"
 
 namespace utils {
 
@@ -126,22 +126,12 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	SPI	SPI クラス
+			@param[in]	limitc	SPI 最大速度
 		 */
 		//-----------------------------------------------------------------//
-		sdc_io(SPI& spi) : spi_(spi), mmc_(spi_),
+		sdc_io(SPI& spi, uint32_t limitc) : spi_(spi), mmc_(spi_, limitc),
 			mount_delay_(0), select_wait_(0), cd_(false), mount_(false) { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	SPI 通信速度を再設定
-		 */
-		//-----------------------------------------------------------------//
-		void setup_speed()
-		{
-			if(!mount_) return;
-			spi_.start_sdc(spi_.get_max_speed());
-		}
 
 
 		//-----------------------------------------------------------------//
@@ -161,7 +151,7 @@ namespace utils {
 			DETECT::PU = 1;  // pull-up
 
 			// SPI を初期化後、廃棄する事で関係ポートを初期化する。
-			// 初期化時４ＭＨｚ
+			// 初期化時 400KHz
 			if(!spi_.start_sdc(400000)) {
 				format("SPI Start fail ! (Clock spped over range)\n");
 			}

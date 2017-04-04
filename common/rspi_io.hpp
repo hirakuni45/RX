@@ -53,6 +53,7 @@ namespace device {
 		};
 
 	private:
+
 		uint8_t	level_;
 
 		// 便宜上のスリープ
@@ -60,16 +61,24 @@ namespace device {
 
 
 		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) {
-			uint32_t br = PCLK / 2 / speed;
-			brdv = 0;
-			while(br > 256) {
+///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(PCLK);
+			uint32_t br = static_cast<uint32_t>(PCLK) / speed;
+			uint8_t dv = 0;
+			while(br > 512) {
 				br >>= 1;
-				++brdv;
-				if(brdv > 3) {
+				++dv;
+				if(dv > 3) {
 					brdv = 3;
 					spbr = 255;
 					return false;
 				}
+			}
+			brdv = dv;
+			if(br & 1) {
+				br >>= 1;
+				++br;
+			} else {
+				br >>= 1;
 			}
 			if(br) --br;
 			spbr = br;
@@ -154,23 +163,35 @@ namespace device {
 
 			RSPI::SPCR = 0x00;			
 
-			port_map::turn(RSPI::get_peripheral());
-
 			bool f = true;
 			uint8_t brdv;
 			uint8_t spbr;
 			if(!clock_div_(speed, brdv, spbr)) {
 				f = false;
 			}
-
 			power_cfg::turn(RSPI::get_peripheral());
+			port_map::turn(RSPI::get_peripheral());
+
+#if 0
+			utils::format("RSPI Request Speed: %u [Hz]\n") % speed;
+//			utils::format("RSPI SPBR: %d\n") % static_cast<uint32_t>(spbr);
+//			utils::format("RSPI BRDV: %d\n") % static_cast<uint32_t>(brdv);
+#endif
 
 		    RSPI::SPBR = spbr;
 
+			// 実際のクロックを表示
+#if 0
+			static const uint8_t n[4] = { 1, 2, 4, 8 };
+			uint32_t z = static_cast<uint32_t>(PCLK)
+					/ (2 * static_cast<uint32_t>(spbr + 1) * static_cast<uint32_t>(n[brdv]));
+			utils::format("RSPI Real Speed: %u [Hz]\n") % z;
+#endif
 			RSPI::SPPCR = 0x00;	// Fixed idle value, disable loop-back
 			RSPI::SPSCR = 0x00;	// disable sequence control
 			RSPI::SPDCR = 0x20;	// SPLW=1 (long word access) 
-			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0111);
+			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0100);
+///				| RSPI::SPCMD0.CPHA.b(0) | RSPI::SPCMD0.CPOL.b(1);
 
 			RSPI::SPCR.SPMS = 1;
 			RSPI::SPCR.MSTR = 1;
@@ -194,7 +215,8 @@ namespace device {
 //			RSPI::SPCR.SPRIE = 0;
 			RSPI::SPDR = static_cast<uint32_t>(data);
 			while(RSPI::SPSR.SPRF() == 0) sleep_();
-		    return static_cast<uint8_t>(RSPI::SPDR());
+			uint32_t d = RSPI::SPDR();
+		    return d & 0xff;
 		}
 
 
