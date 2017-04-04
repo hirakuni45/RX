@@ -6,13 +6,15 @@
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include "common/renesas.hpp"
+
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
-#include "rx64m/rtc_io.hpp"
 #include "common/fifo.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
-#include "rx64m/sdhi_io.hpp"
+#include "common/rspi_io.hpp"
+#include "common/spi_io.hpp"
 #include "common/sdc_io.hpp"
 
 #include "common/string_utils.hpp"
@@ -27,15 +29,32 @@ namespace {
 
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
-	typedef utils::fifo<uint16_t, 128> buffer;
+	typedef utils::fifo<uint16_t, 256> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
 	utils::rtc_io rtc_;
 
 	// SDC 用定義（SDHI）
-	fatfs::sdhi_io<device::SDHI> sdc_;
+///	fatfs::sdhi_io<device::SDHI> sdc_;
 
-	utils::command<64> command_;
+	typedef device::rspi_io<device::RSPI> RSPI;
+	RSPI rspi_;
+
+	// Soft SDC 用　SPI 定義（SPI）
+	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
+	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
+	typedef device::PORT<device::PORT7, device::bitpos::B7> SPCK;
+	typedef device::spi_io<MISO, MOSI, SPCK> SPI;
+	SPI spi_;
+
+	typedef device::PORT<device::PORTC, device::bitpos::B2> sdc_select;	///< カード選択信号
+	typedef device::PORT<device::PORT8, device::bitpos::B2> sdc_power;	///< カード電源制御
+	typedef device::PORT<device::PORT8, device::bitpos::B1> sdc_detect;	///< カード検出
+
+	typedef utils::sdc_io<SPI, sdc_select, sdc_power, sdc_detect> SDC;
+	SDC sdc_(spi_, 10000000);
+
+	utils::command<256> command_;
 
 	utils::SDRAM_128M_32W	sdram_;
 }
@@ -63,30 +82,28 @@ extern "C" {
 	}
 
 	DSTATUS disk_initialize(BYTE drv) {
-		return sdc_.disk_initialize(drv);
+		return sdc_.at_mmc().disk_initialize(drv);
 	}
 
 	DSTATUS disk_status(BYTE drv) {
-		return sdc_.disk_status(drv);
+		return sdc_.at_mmc().disk_status(drv);
 	}
 
 	DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
-		return sdc_.disk_read(drv, buff, sector, count);
+		return sdc_.at_mmc().disk_read(drv, buff, sector, count);
 	}
 
 	DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
-		return sdc_.disk_write(drv, buff, sector, count);
+		return sdc_.at_mmc().disk_write(drv, buff, sector, count);
 	}
 
 	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
-		return sdc_.disk_ioctl(drv, ctrl, buff);
+		return sdc_.at_mmc().disk_ioctl(drv, ctrl, buff);
 	}
 
 	DWORD get_fattime(void) {
 		time_t t = 0;
-		if(!rtc_.get_time(t)) {
-			utils::format("Stall RTC read\n");
-		}
+		rtc_.get_time(t);
 		return utils::str::get_fattime(t);
 	}
 
@@ -242,7 +259,7 @@ int main(int argc, char** argv)
 		rtc_.start();
 	}
 
-	utils::format("RX64M RTC sample\n");
+	utils::format("RX64M SDHC sample\n");
 
 	device::PORT0::PDR.B7 = 1; // output
 
@@ -252,6 +269,8 @@ int main(int argc, char** argv)
 	char buff[16];
 	while(1) {
 		cmt_.sync();
+
+		sdc_.service();
 
 		// コマンド入力と、コマンド解析
 		if(command_.service()) {

@@ -17,11 +17,10 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c \
-				common/time.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
-
+				common/syscalls.c \
+				common/time.c
 
 PSOURCES	=	main.cpp
 
