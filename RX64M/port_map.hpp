@@ -115,9 +115,13 @@ namespace device {
 			case peripheral::RSPI:
 				{
 					uint8_t sel = enable ? 0b001101 : 0;
-					MPC::PC7PFS.PSEL = sel;  // PC7/MISOA
-					MPC::PC6PFS.PSEL = sel;  // PC6/MOSIA
-					MPC::PC5PFS.PSEL = sel;  // PC5/RSPCKA
+//					PORTC::PCR.B7 = 1;		// pull-up
+//					PORTC::PDR.B7 = 0;		// MISOA
+//					PORTC::PDR.B6 = 1;		// MOSIA
+//					PORTC::PDR.B5 = 1;		// RSPCKA
+					MPC::PC7PFS.PSEL = sel;  // MISOA
+					MPC::PC6PFS.PSEL = sel;  // MOSIA
+					MPC::PC5PFS.PSEL = sel;  // RSPCKA
 					PORTC::PMR.B7 = enable;
 					PORTC::PMR.B6 = enable;
 					PORTC::PMR.B5 = enable;
