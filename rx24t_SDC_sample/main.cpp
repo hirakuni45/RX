@@ -47,7 +47,7 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B4> sdc_power;	///< カード電源制御
 	typedef device::PORT<device::PORT6, device::bitpos::B3> sdc_detect;	///< カード検出
 
-	utils::sdc_io<sdc_spi, sdc_select, sdc_power, sdc_detect> sdc_(sdc_spi_);
+	utils::sdc_io<sdc_spi, sdc_select, sdc_power, sdc_detect> sdc_(sdc_spi_, 20000000);
 
 	utils::command<128> command_;
 
