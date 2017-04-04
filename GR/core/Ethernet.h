@@ -88,7 +88,8 @@ class EthernetClass {
         uint32_t    dhcpIPAddressLeaseTime_sec;
         uint32_t    dhcpUse;
         bool        tcp_acp_cep_call_flg;
-        void dhcpSuccess(DHCP *tmpDhcpPt){
+
+        void dhcpSuccess(DHCP *tmpDhcpPt) {
             memcpy(tcpudp_env.ipaddr, tmpDhcpPt->ipaddr, 4);
 #ifdef T4_ETHER_DEBUG
             Serial.print("ip = ");

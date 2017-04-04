@@ -25,6 +25,9 @@ static uint8_t byteq_buf_forSize[RING_SIZ_forSize]={0};    /*sizeQueBody 1024>>2
 
 /// #define ETHER_DEBUG
 
+extern "C" {
+	void sci_puts(const char*);
+};
 
 /***********************************************************************************************************************
 * Function Name: main
@@ -189,7 +192,7 @@ Returns:
     0 on failure. The other versions don't return anything.
 ******************************************************************************/
 int EthernetClass::begin(const uint8_t *mac){
-    DHCP        tmpDhcp;
+    DHCP tmpDhcp;
 
 #ifdef T4_ETHER_DEBUG
     Serial.print("t4:EthernetClass::begin(mac:");
@@ -211,10 +214,17 @@ int EthernetClass::begin(const uint8_t *mac){
 #ifdef T4_ETHER_DEBUG
     Serial.println("OpenTimer()");
 #endif
+//	reset_timer();
     OpenTimer();
-    while(g_ether_TransferEnableFlag != ETHER_FLAG_ON){
+    while(g_ether_TransferEnableFlag != ETHER_FLAG_ON) {
         R_ETHER_LinkProcess();
+//		auto n = get_timer();
+//		if(n >= (10 * 100 * 5)) {  // 5 秒間の待ち
+//	        CloseTimer();
+//    	    return 0;
+//		}
     }
+
 #ifdef T4_ETHER_DEBUG
     Serial.print("r_dhcp_open:");
 #endif
