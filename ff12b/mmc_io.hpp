@@ -2,7 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	MMC（SD カード）FatFS ドライバー @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2016, 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -12,11 +12,11 @@
 #include "common/format.hpp"
 
 /* MMC card type flags (MMC_GET_TYPE) */
-#define CT_MMC		0x01		/* MMC ver 3 */
-#define CT_SD1		0x02		/* SD ver 1 */
-#define CT_SD2		0x04		/* SD ver 2 */
-#define CT_SDC		(CT_SD1|CT_SD2)	/* SD */
-#define CT_BLOCK	0x08		/* Block addressing */
+#define CT_MMC		0x01				/* MMC ver 3 */
+#define CT_SD1		0x02				/* SD ver 1 */
+#define CT_SD2		0x04				/* SD ver 2 */
+#define CT_SDC		(CT_SD1 | CT_SD2)	/* SD */
+#define CT_BLOCK	0x08				/* Block addressing */
 
 namespace fatfs {
 
@@ -32,8 +32,10 @@ namespace fatfs {
 
 		SPI&	spi_;
 
-		DSTATUS Stat_ = STA_NOINIT;	// Disk status
-		BYTE CardType_ = 0;			// b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing
+		DSTATUS Stat_;	// Disk status
+		BYTE CardType_;	// b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing
+
+		uint32_t	limitc_;
 
 		// MMC/SD command (SPI mode)
 		enum class command : uint8_t {
@@ -136,7 +138,10 @@ namespace fatfs {
 
 		BYTE send_cmd_(command cmd, DWORD arg) {
 
-			auto c = static_cast<uint8_t>(cmd);
+#ifdef DEBUG
+			utils::format("send_cmd_: 0x%02X, 0x%08X\n") % static_cast<uint32_t>(cmd) % static_cast<uint32_t>(arg);
+#endif
+			uint8_t c = static_cast<uint8_t>(cmd);
 			if (c & 0x80) {	/* ACMD<n> is the command sequense of CMD55-CMD<n> */
 				c &= 0x7F;
 				auto n = send_cmd_(command::CMD55, 0);
@@ -148,10 +153,10 @@ namespace fatfs {
 				deselect_();
 				if (!select_()) return 0xFF;
 			}
-
-//			utils::format("SEL: %d\n") % static_cast<int>(SEL::P());
-//			utils::format("CMD: %02X\n") % static_cast<uint32_t>(cmd);
-
+#ifdef DEBUG
+			utils::format("SEL: %d\n") % static_cast<int>(SEL::P());
+			utils::format("CMD: 0x%02X\n") % static_cast<uint32_t>(cmd);
+#endif
 			/* Send a command packet */
 			BYTE buf[6];
 			buf[0] = 0x40 | c;						/* Start + Command index */
@@ -183,11 +188,12 @@ namespace fatfs {
 		void start_spi_(bool fast)
 		{
 			uint32_t speed;
-			if(fast) {
+			if(fast) {  // 最大速度制限
 				speed = spi_.get_max_speed();
-				// 最大速度を25MHzに制限する。
-				if(speed > 25000000) speed = 25000000;
-			} else speed = 4000000;  // 初期化時、4MB/s
+				if(speed > limitc_) speed = limitc_;
+			} else {
+				speed = 400000;  // 初期化時、400Kbits/s
+			}
 			if(!spi_.start_sdc(speed)) {
 				utils::format("CSI Start fail ! (Clock spped over range)\n");
 			}
@@ -198,9 +204,11 @@ namespace fatfs {
 		/*!
 			@brief	コンストラクター
 			@param[in]	spi	SPI クラス
+			@param[in]	limitc	SPI 最大速度
 		 */
 		//-----------------------------------------------------------------//
-		mmc_io(SPI& spi) : spi_(spi) { }
+		mmc_io(SPI& spi, uint32_t limitc) :
+			spi_(spi), Stat_(STA_NOINIT), CardType_(0), limitc_(limitc) { }
 
 
 		//-----------------------------------------------------------------//
@@ -235,10 +243,11 @@ namespace fatfs {
 		{
 			if (drv) return RES_NOTRDY;
 
-			utils::delay::milli_second(10);  // 10ms
-
 			SEL::DIR = 1;  // output
 			SEL::P = 1;
+
+			utils::delay::milli_second(10);  // 10ms
+
 			// MISO: H (pull-up)
 			start_spi_(false);
 			/* Apply 80 dummy clocks and the card gets ready to receive command */
@@ -286,6 +295,9 @@ namespace fatfs {
 
 			start_spi_(true);
 
+#ifdef DEBUG
+			utils::format("init ret: %d\n") % static_cast<uint32_t>(s);
+#endif
 			return s;
 		}
 
