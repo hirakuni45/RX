@@ -19,7 +19,7 @@ namespace device {
 		@param[in]	data	書き込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	static inline void wr8_(address_type adr, uint8_t data) {
+	inline void wr8_(address_type adr, uint8_t data) {
 		*reinterpret_cast<volatile uint8_t*>(adr) = data;
 	}
 
@@ -31,7 +31,7 @@ namespace device {
 		@param[in]	data	読み込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	static inline uint8_t rd8_(address_type adr) {
+	inline uint8_t rd8_(address_type adr) {
 		return *reinterpret_cast<volatile uint8_t*>(adr);
 	}
 
@@ -43,7 +43,7 @@ namespace device {
 		@param[in]	data	書き込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	static inline void wr16_(address_type adr, uint16_t data) {
+	inline void wr16_(address_type adr, uint16_t data) {
 		*reinterpret_cast<volatile uint16_t*>(adr) = data;
 	}
 
@@ -55,7 +55,7 @@ namespace device {
 		@param[in]	data	読み込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	static inline uint16_t rd16_(address_type adr) {
+	inline uint16_t rd16_(address_type adr) {
 		return *reinterpret_cast<volatile uint16_t*>(adr);
 	}
 
@@ -67,7 +67,7 @@ namespace device {
 		@param[in]	data	書き込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	static inline void wr32_(address_type adr, uint32_t data) {
+	inline void wr32_(address_type adr, uint32_t data) {
 		*reinterpret_cast<volatile uint32_t*>(adr) = data;
 	}
 
@@ -79,7 +79,7 @@ namespace device {
 		@param[in]	data	読み込みデータ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	static inline uint32_t rd32_(address_type adr) {
+	inline uint32_t rd32_(address_type adr) {
 		return *reinterpret_cast<volatile uint32_t*>(adr);
 	}
 
@@ -111,10 +111,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static value_type read() { return rd8_(adr); }
 
-		void operator = (value_type data) const { write(data); }
-		value_type operator () () const { return read(); }
-		void operator |= (value_type data) const { write(read() | data); }
-		void operator &= (value_type data) const { write(read() & data); }
+		void operator = (value_type data) { write(data); }
+		value_type operator () () { return read(); }
+		void operator |= (value_type data) { write(read() | data); }
+		void operator &= (value_type data) { write(read() & data); }
 	};
 
 
@@ -136,7 +136,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static value_type read() { return rd8_(adr); }
 
-		value_type operator () () const { return read(); }
+		value_type operator () () { return read(); }
 	};
 
 
@@ -158,7 +158,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void write(value_type data) { wr8_(adr, data); }
 
-		void operator = (value_type data) const { write(data); }
+		void operator = (value_type data) { write(data); }
 	};
 
 
@@ -189,10 +189,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static value_type read() { return rd16_(adr); }
 
-		void operator = (value_type data) const { write(data); }
-		value_type operator () () const { return read(); }
-		void operator |= (value_type data) const { write(read() | data); }
-		void operator &= (value_type data) const { write(read() & data); }
+		void operator = (value_type data) { write(data); }
+		value_type operator () () { return read(); }
+		void operator |= (value_type data) { write(read() | data); }
+		void operator &= (value_type data) { write(read() & data); }
 	};
 
 
@@ -214,7 +214,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static value_type read() { return rd16_(adr); }
 
-		value_type operator () () const { return read(); }
+		value_type operator () () { return read(); }
 	};
 
 
@@ -236,7 +236,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void write(value_type data) { wr16_(adr, data); }
 
-		void operator = (value_type data) const { write(data); }
+		void operator = (value_type data) { write(data); }
 	};
 
 
@@ -267,10 +267,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static value_type read() { return rd32_(adr); }
 
-		void operator = (value_type data) const { write(data); }
-		value_type operator () () const { return read(); }
-		void operator |= (value_type data) const { write(read() | data); }
-		void operator &= (value_type data) const { write(read() & data); }
+		void operator = (value_type data) { write(data); }
+		value_type operator () () { return read(); }
+		void operator |= (value_type data) { write(read() | data); }
+		void operator &= (value_type data) { write(read() & data); }
 	};
 
 
@@ -292,7 +292,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static value_type read() { return rd32_(adr); }
 
-		value_type operator () () const { return read(); }
+		value_type operator () () { return read(); }
 	};
 
 
@@ -314,7 +314,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void write(value_type data) { wr32_(adr, data); }
 
-		void operator = (value_type data) const { write(data); }
+		void operator = (value_type data) { write(data); }
 	};
 
 
@@ -368,10 +368,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos>
 	struct bit_rw_t {
-		static bool get() {
+		bool get() {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & 1;
 		}
-		static void set(bool v) {
+		void set(bool v) {
 			if(v) {
 				T::write(T::read() | (1 << static_cast<typename T::value_type>(pos)));
 			} else {
@@ -379,7 +379,7 @@ namespace device {
 			}
 		}
 
-	    typename T::value_type b(bool v = true) const {
+	    typename T::value_type b(bool v = true) {
 			return static_cast<typename T::value_type>(v) << static_cast<typename T::value_type>(pos);
 		}
 
@@ -398,20 +398,20 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos, uint8_t len>
 	struct bits_rw_t {
-		static typename T::value_type get() {
+		typename T::value_type get() {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & ((1 << len) - 1);
 		}
-		static void set(typename T::value_type v) {
+		void set(typename T::value_type v) {
 			auto m = static_cast<typename T::value_type>(((1 << len) - 1) << static_cast<typename T::value_type>(pos));
 			T::write((T::read() & ~m) | (static_cast<typename T::value_type>(v) << static_cast<typename T::value_type>(pos)));
 		}
 
-	    typename T::value_type b(typename T::value_type v) const {
+	    typename T::value_type b(typename T::value_type v) {
 			return (((1 << len) - 1) & v) << static_cast<typename T::value_type>(pos);
 		}
 
-		void operator = (typename T::value_type v) const { set(v); }
-		typename T::value_type operator () () const { return get(); }
+		void operator = (typename T::value_type v) { set(v); }
+		typename T::value_type operator () () { return get(); }
 	};
 
 
@@ -425,15 +425,15 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos>
 	struct bit_ro_t {
-		static bool get() {
+		bool get() {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & 1;
 		}
 
-	    typename T::value_type b() const {
+	    typename T::value_type b() {
 			return 1 << static_cast<typename T::value_type>(pos);
 		}
 
-		bool operator () () const { return get(); }
+		bool operator () () { return get(); }
 	};
 
 
@@ -447,15 +447,15 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos, uint8_t len>
 	struct bits_ro_t {
-		static typename T::value_type get() {
+		typename T::value_type get() {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & ((1 << len) - 1);
 		}
 
-	    typename T::value_type b(typename T::value_type v) const {
+	    typename T::value_type b(typename T::value_type v) {
 			return (((1 << len) - 1) & v) << static_cast<typename T::value_type>(pos);
 		}
 
-		typename T::value_type operator () () const { return get(); }
+		typename T::value_type operator () () { return get(); }
 	};
 
 
