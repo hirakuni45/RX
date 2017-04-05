@@ -37,15 +37,12 @@ ENTRY(_start)
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 
-/* This memory layout corresponds to the smallest predicted RX600 chip.  */
+/* This memory layout corresponds to the smallest predicted RX64M chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0007F000 /* 512k - STACK(0x1000) */
-	USTACK (w) : ORIGIN = 0x0007FC00, LENGTH = 4 /* top of RAM */
-	ISTACK (w) : ORIGIN = 0x00080000, LENGTH = 4 /* top of RAM */
-
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0007F000 /* 512k - (USTACK+ISTACK)(0x1000) */
+	USTACK (w) : ORIGIN = 0x0007FC00, LENGTH = 4 /* ustack 3072 */
+	ISTACK (w) : ORIGIN = 0x00080000, LENGTH = 4 /* istack 1024 */
 	ROM (w)   : ORIGIN = 0xFFE00000, LENGTH = 0x001FFFD0 /* 2M */
-/* This is the largest RX6000: */
-/*	ROM (w)   : ORIGIN = 0xffe00000, LENGTH = 0x001fffd0 */ /* 2Mb */
 }
 
 SECTIONS
