@@ -1,6 +1,6 @@
 # ===============================================================
 #
-# RX ƒXƒ^[ƒgEƒAƒbƒv
+# RX ã‚¹ã‚¿ãƒ¼ãƒˆãƒ»ã‚¢ãƒƒãƒ—
 # Copyright 2016 Kunihito Hiramatsu
 #
 # ===============================================================
@@ -13,41 +13,43 @@ _start:
 	mvtc	#__istack, isp
 	mvtc	#__ustack, usp
 
-# Š„‚è‚İƒxƒNƒ^‚Ìİ’è
+# å‰²ã‚Šè¾¼ã¿ãƒ™ã‚¯ã‚¿ã®è¨­å®š
 	.extern _interrupt_vectors
 	mvtc	#_interrupt_vectors, intb
 
 /* setup FPSW */
     mvtc    #100h, fpsw
 
-# .bss ƒZƒNƒVƒ‡ƒ“‚Ì‰Šú‰»
-#	mov	#__bssstart, r1
-#	mov	#0, r2
-#	mov	#__bsssize, r3
-#	sstr.b
-
-# RAM ‘S—Ìˆæ‚Ìƒ[ƒƒNƒŠƒA
+# RAM å…¨é ˜åŸŸã®ã‚¼ãƒ­ã‚¯ãƒªã‚¢
 	mov	#0, r1
 	mov	#0, r2
 	mov	#__istack, r3
+	sub r1, r3
 	sstr.b
 
-# ‰Šú’l•t‚«•Ï”‚Ì‰Šú‰»
+# .bss ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã®æ¶ˆå»
+	mov	#__bssstart, r1
+	mov	#0, r2
+	mov	#__bssend, r3
+	sub r1, r3
+	sstr.b
+
+# åˆæœŸå€¤ä»˜ãå¤‰æ•°ã®åˆæœŸåŒ–
 	mov	#__datastart, r1
 	mov	#__romdatastart, r2
 	mov	#__romdatacopysize, r3
 	smovf
 
-# I ƒŒƒWƒXƒ^‚ğİ’è‚µAŠ„‚è‚İ‚ğ‹–‰Â‚·‚é
+# I ãƒ¬ã‚¸ã‚¹ã‚¿ã‚’è¨­å®šã—ã€å‰²ã‚Šè¾¼ã¿ã‚’è¨±å¯ã™ã‚‹
 	mov.l	#0x00010000, r5
 	mvtc	r5,psw
 
-# PMƒŒƒWƒXƒ^‚ğİ’è‚µAƒ†[ƒUƒ‚[ƒh‚ÉˆÚs‚·‚éAƒ†[ƒU[ƒXƒ^ƒbƒN‚ÉØ‚è‘Ö‚í‚é
+# PMãƒ¬ã‚¸ã‚¹ã‚¿ã‚’è¨­å®šã—ã€ãƒ¦ãƒ¼ã‚¶ãƒ¢ãƒ¼ãƒ‰ã«ç§»è¡Œã™ã‚‹ã€ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚¹ã‚¿ãƒƒã‚¯ã«åˆ‡ã‚Šæ›¿ã‚ã‚‹
 	mvfc	psw,r1
 	or		#0x00100000, r1
 	push.l	r1
 
-# UƒŒƒWƒXƒ^‚ğƒZƒbƒg‚·‚é‚½‚ß‚ÉRTE–½—ß‚ğÀs‚·‚é
+# Uãƒ¬ã‚¸ã‚¹ã‚¿ã‚’ã‚»ãƒƒãƒˆã™ã‚‹ãŸã‚ã«RTEå‘½ä»¤ã‚’å®Ÿè¡Œã™ã‚‹
 	mvfc	pc,r1
 	add		#10,r1
 	push.l	r1
@@ -58,7 +60,7 @@ _start:
 	nop
 	nop
 
-# init() ŠÖ”‚©‚çŠJn
+# init() é–¢æ•°ã‹ã‚‰é–‹å§‹
 	.extern	_init
 	bra		_init
 
@@ -84,7 +86,7 @@ _rx_run_fini_array:
 	mov	#__fini_array_end,r1
 	mov	#-4, r3
 
-# ‰Šú‰»ƒŠƒXƒg
+# åˆæœŸåŒ–ãƒªã‚¹ãƒˆ
 _rx_run_inilist:
 next_inilist:
 	cmp	r1,r2
