@@ -237,8 +237,8 @@ namespace utils {
 			const char* p = buff_;
 			char bc = ' ';
 			int keylen = std::strlen(key);
+			const char* top = p;
 			while(1) {
-				const char* top;
 				char ch = *p;
 				if(bc == ' ' && ch != ' ') {
 					top = p;
