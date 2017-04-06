@@ -55,8 +55,12 @@ namespace utils {
 			} else {
 				format("%9d ") % fi->fsize;
 			}
-			format("%s %2d %4d %02d:%02d ") % get_mon(m->tm_mon) % m->tm_mday
-				% (m->tm_year + 1900) % m->tm_hour % m->tm_min;
+			format("%s %2d %4d %02d:%02d ") 
+				% get_mon(m->tm_mon)
+				% static_cast<int>(m->tm_mday)
+				% static_cast<int>(m->tm_year + 1900)
+				% static_cast<int>(m->tm_hour)
+				% static_cast<int>(m->tm_min);
 			if(dir) {
 				format("/");
 			} else {
