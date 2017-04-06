@@ -32,11 +32,11 @@ namespace utils {
 	private:
 		static const int path_buff_size_ = 256;
 
+		FATFS	fatfs_;  ///< FatFS コンテキスト
+
 		SPI&	spi_;
 
 		mmc_type mmc_;
-
-		FATFS	fatfs_;  ///< FatFS コンテキスト
 
 		uint8_t	mount_delay_;
 		uint8_t	select_wait_;
@@ -162,6 +162,8 @@ namespace utils {
 			current_[0] = 0;
 			select_wait_ = 0;
 			mount_delay_ = 0;
+
+			memset(&fatfs_, 0, sizeof(FATFS));
 		}
 
 
@@ -356,7 +358,7 @@ namespace utils {
 			}
 			if(!cd_ && select_wait_ >= 10) {
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
-				POWER::P = 0;
+///				POWER::P = 0;
 				SELECT::P = 1;
 ///				format("Card ditect\n");
 			} else if(cd_ && select_wait_ == 0) {
