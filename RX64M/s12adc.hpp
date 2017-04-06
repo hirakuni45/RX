@@ -172,7 +172,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 3>  ADC;
+			bits_rw_t<io_, bitpos::B0, 2>  ADC;
 			bit_rw_t <io_, bitpos::B7>     AVEE;
 		};
 		static adadc_t<base + 0x0C>  ADADC;
@@ -192,6 +192,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
+			bits_rw_t<io_, bitpos::B0, 2>  ADPRC;
 			bit_rw_t <io_, bitpos::B5>     ACE;
 			bits_rw_t<io_, bitpos::B8, 2>  DIAGVAL;
 			bit_rw_t <io_, bitpos::B10>    DIAGLD;
@@ -219,6 +220,76 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 6>  TRSA;
 		};
 		static adstrgr_t<base + 0x10>  ADSTRGR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 0（ADSSTR0）
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<base + 0x60> ADSSTR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 1（ADSSTR1）
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<base + 0x73> ADSSTR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 2（ADSSTR2）
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<base + 0x74> ADSSTR2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 3（ADSSTR3）
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<base + 0x75> ADSSTR3;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 4（ADSSTR4）
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<base + 0x76> ADSSTR4;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 5（ADSSTR5）
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<base + 0x77> ADSSTR5;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 6（ADSSTR6）
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<base + 0x78> ADSSTR6;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ 7（ADSSTR7）
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<base + 0x79> ADSSTR7;
+
+
+
+
+
+
 
 
 		//-----------------------------------------------------------------//
@@ -416,6 +487,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  A/D チャネル選択レジスタ定義 (ADANS) unit0
+			@param[in]	ofs	オフセット
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
@@ -434,6 +506,13 @@ namespace device {
 				return (rd16_(ofs) >> n) & 1;
 			}
 		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ設定 A
+		*/
+		//-----------------------------------------------------------------//
 		static adans_t<base + 0x04>   ADANSA;
 
 
@@ -463,76 +542,12 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  ANSB001;
 			bit_rw_t<io_, bitpos::B2>  ANSB002;
 			bit_rw_t<io_, bitpos::B3>  ANSB003;
+			bit_rw_t<io_, bitpos::B4>  ANSB004;
+			bit_rw_t<io_, bitpos::B5>  ANSB005;
+			bit_rw_t<io_, bitpos::B6>  ANSB006;
+			bit_rw_t<io_, bitpos::B7>  ANSB007;
 		};
 		static adansb0_t<base + 0x14>   ADANSB0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D チャネル選択レジスタ B1（ADANSB1）
-			@param[in]	ofs	オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct adansb1_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  ANSB100;
-		};
-		static adansb1_t<base + 0x16>   ADANSB1;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D チャネル選択レジスタ設定 C
-		*/
-		//-----------------------------------------------------------------//
-		static adans_t<base + 0xD4> ADANSC;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D チャネル選択レジスタ C0（ADANSC0）
-			@param[in]	ofs	オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct adansc0_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  ANSC000;
-			bit_rw_t<io_, bitpos::B1>  ANSC001;
-			bit_rw_t<io_, bitpos::B2>  ANSC002;
-			bit_rw_t<io_, bitpos::B3>  ANSC003;
-		};
-		static adansc0_t<base + 0xD4>   ADANSC0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D チャネル選択レジスタ C1（ADANSC1）
-			@param[in]	ofs	オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct adansc1_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>  ANSC100;
-		};
-		static adansc1_t<base + 0xD6>   ADANSC1;
 
 
 		//-----------------------------------------------------------------//
@@ -553,12 +568,31 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  ADS001;
 			bit_rw_t<io_, bitpos::B2>  ADS002;
 			bit_rw_t<io_, bitpos::B3>  ADS003;
-			bit_rw_t<io_, bitpos::B3>  ADS004;
-			bit_rw_t<io_, bitpos::B3>  ADS005;
-			bit_rw_t<io_, bitpos::B3>  ADS006;
-			bit_rw_t<io_, bitpos::B3>  ADS007;
+			bit_rw_t<io_, bitpos::B4>  ADS004;
+			bit_rw_t<io_, bitpos::B5>  ADS005;
+			bit_rw_t<io_, bitpos::B6>  ADS006;
+			bit_rw_t<io_, bitpos::B7>  ADS007;
 		};
 		static adads0_t<base + 0x08>   ADADS0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 		//-----------------------------------------------------------------//
@@ -577,45 +611,6 @@ namespace device {
 		};
 		static adsstr_t ADSSTR;
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D サンプリングステートレジスタ L（ADSSTRL）
-		*/
-		//-----------------------------------------------------------------//
-		static rw8_t<base + 0xDD> ADSSTRL;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D サンプリングステートレジスタ 0（ADSSTR0）
-		*/
-		//-----------------------------------------------------------------//
-		static rw8_t<base + 0xE0> ADSSTR0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D サンプリングステートレジスタ 1（ADSSTR1）
-		*/
-		//-----------------------------------------------------------------//
-		static rw8_t<base + 0xE1> ADSSTR1;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D サンプリングステートレジスタ 2（ADSSTR2）
-		*/
-		//-----------------------------------------------------------------//
-		static rw8_t<base + 0xE2> ADSSTR2;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D サンプリングステートレジスタ 3（ADSSTR3）
-		*/
-		//-----------------------------------------------------------------//
-		static rw8_t<base + 0xE3> ADSSTR3;
 
 
 		//-----------------------------------------------------------------//
@@ -981,40 +976,6 @@ namespace device {
 		static addr_t ADDR;
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  A/D チャネル選択レジスタ定義 (ADANS)
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t ofs>
-		struct adans_t {
-			void set(analog an, bool f = true) {
-				uint32_t n = static_cast<uint32_t>(an);
-				uint32_t ros = ofs;
-				if(n >= 4) {
-					n -= 4;
-					ros += 2;
-				}
-				if(f) {
-					wr16_(ros, rd16_(ros) |  (static_cast<uint16_t>(1) << n));
-				} else {
-					wr16_(ros, rd16_(ros) & ~(static_cast<uint16_t>(1) << n));
-				}
-			}
-
-			bool operator() (analog an) const {
-				uint32_t n = static_cast<uint32_t>(an);
-				uint32_t ros = ofs;
-				if(n >= 4) {
-					n -= 4;
-					ros += 2;
-				}
-				return (rd16_(ros) >> n) & 1;
-			}
-		};
-		static adans_t<base + 0x04> ADANSA;
-
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  A/D チャネル選択レジスタ A0（ADANSA0）
@@ -1029,10 +990,22 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>  ANSA000;
-			bit_rw_t<io_, bitpos::B1>  ANSA001;
-			bit_rw_t<io_, bitpos::B2>  ANSA002;
-			bit_rw_t<io_, bitpos::B3>  ANSA003;
+			bit_rw_t<io_, bitpos::B0>  ANSA100;
+			bit_rw_t<io_, bitpos::B1>  ANSA101;
+			bit_rw_t<io_, bitpos::B2>  ANSA102;
+			bit_rw_t<io_, bitpos::B3>  ANSA103;
+			bit_rw_t<io_, bitpos::B4>  ANSA104;
+			bit_rw_t<io_, bitpos::B5>  ANSA105;
+			bit_rw_t<io_, bitpos::B6>  ANSA106;
+			bit_rw_t<io_, bitpos::B7>  ANSA107;
+			bit_rw_t<io_, bitpos::B8>  ANSA108;
+			bit_rw_t<io_, bitpos::B9>  ANSA109;
+			bit_rw_t<io_, bitpos::B10> ANSA110;
+			bit_rw_t<io_, bitpos::B11> ANSA111;
+			bit_rw_t<io_, bitpos::B12> ANSA112;
+			bit_rw_t<io_, bitpos::B13> ANSA113;
+			bit_rw_t<io_, bitpos::B14> ANSA114;
+			bit_rw_t<io_, bitpos::B15> ANSA115;
 		};
 		static adansa0_t<base + 0x04>   ADANSA0;
 
@@ -1051,17 +1024,55 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>  ANSA100;
+			bit_rw_t<io_, bitpos::B0>  ANSA116;
+			bit_rw_t<io_, bitpos::B1>  ANSA117;
+			bit_rw_t<io_, bitpos::B2>  ANSA118;
+			bit_rw_t<io_, bitpos::B3>  ANSA119;
+			bit_rw_t<io_, bitpos::B4>  ANSA120;
 		};
 		static adansa1_t<base + 0x06>   ADANSA1;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  A/D チャネル選択レジスタ定義 (ADANS)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct adans_t {
+			void set(analog an, bool f = true) {
+				uint32_t n = static_cast<uint32_t>(an);
+				uint32_t ros = ofs;
+				if(n >= 16) {
+					n &= 15;
+					ros += 2;
+				}
+				if(f) {
+					wr16_(ros, rd16_(ros) |  (static_cast<uint16_t>(1) << n));
+				} else {
+					wr16_(ros, rd16_(ros) & ~(static_cast<uint16_t>(1) << n));
+				}
+			}
+
+			bool operator() (analog an) const {
+				uint32_t n = static_cast<uint32_t>(an);
+				uint32_t ros = ofs;
+				if(n >= 16) {
+					n &= 15;
+					ros += 2;
+				}
+				return (rd16_(ros) >> n) & 1;
+			}
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ設定 B
+			@brief  A/D チャネル選択レジスタ（ADANSA）
 		*/
 		//-----------------------------------------------------------------//
-		static adans_t<base + 0x14> ADANSB;
+		static adans_t<base + 0x04> ADANSA;
 
 
 		//-----------------------------------------------------------------//
@@ -1078,12 +1089,32 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>  ANSB000;
-			bit_rw_t<io_, bitpos::B1>  ANSB001;
-			bit_rw_t<io_, bitpos::B2>  ANSB002;
-			bit_rw_t<io_, bitpos::B3>  ANSB003;
+			bit_rw_t<io_, bitpos::B0>  ANSB100;
+			bit_rw_t<io_, bitpos::B1>  ANSB101;
+			bit_rw_t<io_, bitpos::B2>  ANSB102;
+			bit_rw_t<io_, bitpos::B3>  ANSB103;
+			bit_rw_t<io_, bitpos::B4>  ANSB104;
+			bit_rw_t<io_, bitpos::B5>  ANSB105;
+			bit_rw_t<io_, bitpos::B6>  ANSB106;
+			bit_rw_t<io_, bitpos::B7>  ANSB107;
+			bit_rw_t<io_, bitpos::B8>  ANSB108;
+			bit_rw_t<io_, bitpos::B9>  ANSB109;
+			bit_rw_t<io_, bitpos::B10> ANSB110;
+			bit_rw_t<io_, bitpos::B11> ANSB111;
+			bit_rw_t<io_, bitpos::B12> ANSB112;
+			bit_rw_t<io_, bitpos::B13> ANSB113;
+			bit_rw_t<io_, bitpos::B14> ANSB114;
+			bit_rw_t<io_, bitpos::B15> ANSB115;
 		};
 		static adansb0_t<base + 0x14>   ADANSB0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D チャネル選択レジスタ設定 B
+		*/
+		//-----------------------------------------------------------------//
+		static adans_t<base + 0x14> ADANSB;
 
 
 		//-----------------------------------------------------------------//
@@ -1100,7 +1131,11 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>  ANSB100;
+			bit_rw_t<io_, bitpos::B0>  ANSB116;
+			bit_rw_t<io_, bitpos::B1>  ANSB117;
+			bit_rw_t<io_, bitpos::B2>  ANSB118;
+			bit_rw_t<io_, bitpos::B3>  ANSB119;
+			bit_rw_t<io_, bitpos::B4>  ANSB120;
 		};
 		static adansb1_t<base + 0x16>   ADANSB1;
 
@@ -1119,90 +1154,75 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>   ADS000;
-			bit_rw_t<io_, bitpos::B1>   ADS001;
-			bit_rw_t<io_, bitpos::B2>   ADS002;
-			bit_rw_t<io_, bitpos::B3>   ADS003;
-			bit_rw_t<io_, bitpos::B4>   ADS004;
-			bit_rw_t<io_, bitpos::B5>   ADS005;
-			bit_rw_t<io_, bitpos::B6>   ADS006;
-			bit_rw_t<io_, bitpos::B7>   ADS007;
-			bit_rw_t<io_, bitpos::B8>   ADS008;
-			bit_rw_t<io_, bitpos::B9>   ADS009;
-			bit_rw_t<io_, bitpos::B10>  ADS010;
-			bit_rw_t<io_, bitpos::B11>  ADS011;
-			bit_rw_t<io_, bitpos::B12>  ADS012;
-			bit_rw_t<io_, bitpos::B13>  ADS013;
-			bit_rw_t<io_, bitpos::B14>  ADS014;
-			bit_rw_t<io_, bitpos::B15>  ADS015;
+			bit_rw_t<io_, bitpos::B0>   ADS100;
+			bit_rw_t<io_, bitpos::B1>   ADS101;
+			bit_rw_t<io_, bitpos::B2>   ADS102;
+			bit_rw_t<io_, bitpos::B3>   ADS103;
+			bit_rw_t<io_, bitpos::B4>   ADS104;
+			bit_rw_t<io_, bitpos::B5>   ADS105;
+			bit_rw_t<io_, bitpos::B6>   ADS106;
+			bit_rw_t<io_, bitpos::B7>   ADS107;
+			bit_rw_t<io_, bitpos::B8>   ADS108;
+			bit_rw_t<io_, bitpos::B9>   ADS109;
+			bit_rw_t<io_, bitpos::B10>  ADS110;
+			bit_rw_t<io_, bitpos::B11>  ADS111;
+			bit_rw_t<io_, bitpos::B12>  ADS112;
+			bit_rw_t<io_, bitpos::B13>  ADS113;
+			bit_rw_t<io_, bitpos::B14>  ADS114;
+			bit_rw_t<io_, bitpos::B15>  ADS115;
 		};
 		static adads0_t<base + 0x08>   ADADS0;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ設定 C
-		*/
-		//-----------------------------------------------------------------//
-		static adans_t<base + 0xD4> ADANSC;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D チャネル選択レジスタ C0（ADANSC0）
+			@brief  A/D 変換値加算 / 平均モード選択レジスタ 1 （ ADADS1 ）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adansc0_t : public rw16_t<ofs> {
+		struct adads1_t : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>  ANSC000;
-			bit_rw_t<io_, bitpos::B1>  ANSC001;
-			bit_rw_t<io_, bitpos::B2>  ANSC002;
-			bit_rw_t<io_, bitpos::B3>  ANSC003;
+			bit_rw_t<io_, bitpos::B0>   ADS116;
+			bit_rw_t<io_, bitpos::B1>   ADS117;
+			bit_rw_t<io_, bitpos::B2>   ADS118;
+			bit_rw_t<io_, bitpos::B3>   ADS119;
+			bit_rw_t<io_, bitpos::B4>   ADS120;
 		};
-		static adansc0_t<base + 0xD4>   ADANSC0;
+		static adads1_t<base + 0x10>   ADADS1;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D チャネル選択レジスタ C1（ADANSC1）
+			@brief  A/D 変換拡張入力コントロールレジスタ（ ADEXICR ）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adansc1_t : public rw16_t<ofs> {
+		struct adexicr_t : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>  ANSC100;
-		};
-		static adansc1_t<base + 0xD6>   ADANSC1;
+			bit_rw_t<io_, bitpos::B0>      TSSAD;
+			bit_rw_t<io_, bitpos::B1>      OCSAD;
 
+			bit_rw_t<io_, bitpos::B8>      TSSA;
+			bit_rw_t<io_, bitpos::B9>      OCSA;
+			bit_rw_t<io_, bitpos::B10>     TSSB;
+			bit_rw_t<io_, bitpos::B11>     OCSB;
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D サンプリングステートレジスタ
-		*/
-		//-----------------------------------------------------------------//
-		struct adsstr_t {
-			void set(analog an, uint8_t v) {
-				if(an == analog::AIN016) {
-					wr8_(base + 0xDD + static_cast<uint32_t>(an), v);
-				} else {
-					wr8_(base + 0xE0 + static_cast<uint32_t>(an), v);
-				}
-			}
+			bits_rw_t<io_, bitpos::B13, 2> EXSEL;
+			bit_rw_t<io_, bitpos::B15>     EXOEN;
 		};
-		static adsstr_t ADSSTR;
+		static adexicr_t<base + 0x12>   ADEXICR;
 
 
 		//-----------------------------------------------------------------//
@@ -1210,39 +1230,36 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ L（ADSSTRL）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0xDD> ADSSTRL;
+		static rw8_t<base + 0x61> ADSSTRL;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D サンプリングステートレジスタ 0（ADSSTR0）
+			@brief  A/D サンプリングステートレジスタ T（ADSSTRT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0xE0> ADSSTR0;
+		static rw8_t<base + 0x70> ADSSTRT;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D サンプリングステートレジスタ 1（ADSSTR1）
+			@brief  A/D サンプリングステートレジスタ L（ADSSTRO）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0xE1> ADSSTR1;
+		static rw8_t<base + 0x71> ADSSTRO;
 
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D サンプリングステートレジスタ 2（ADSSTR2）
-		*/
-		//-----------------------------------------------------------------//
-		static rw8_t<base + 0xE2> ADSSTR2;
 
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  A/D サンプリングステートレジスタ 3（ADSSTR3）
-		*/
-		//-----------------------------------------------------------------//
-		static rw8_t<base + 0xE3> ADSSTR3;
+
+
+
+
+
+
+
+
+
 
 
 		//-----------------------------------------------------------------//

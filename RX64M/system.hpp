@@ -399,20 +399,22 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  メインクロック発振器強制発振コントロールレジスタ（MOFCR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x0008C293> mofcr_io;
-		struct mofcr_t : public mofcr_io {
-			using mofcr_io::operator =;
-			using mofcr_io::operator ();
-			using mofcr_io::operator |=;
-			using mofcr_io::operator &=;
+		template <uint32_t base>
+		struct mofcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<mofcr_io, bitpos::B0> MOFXIN;
-			bits_rw_t<mofcr_io, bitpos::B4, 2> MODRV2;
-			bit_rw_t<mofcr_io, bitpos::B6> MOSEL;
+			bit_rw_t<io_, bitpos::B0>      MOFXIN;
+			bits_rw_t<io_, bitpos::B4, 2>  MODRV2;
+			bit_rw_t<io_, bitpos::B6>      MOSEL;
 		};
-		static mofcr_t MOFCR;
+		static mofcr_t<0x0008C293> MOFCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -672,23 +674,28 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  プロテクトレジスタ（PRCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw16_t<0x000803FE> prcr_io;
-		struct prcr_t : public prcr_io {
-			using prcr_io::operator =;
-			using prcr_io::operator ();
-			using prcr_io::operator |=;
-			using prcr_io::operator &=;
+		template <uint32_t base>
+		struct prcr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<prcr_io, bitpos::B0>	PRC0;
-			bit_rw_t<prcr_io, bitpos::B1>	PRC1;
-			bit_rw_t<prcr_io, bitpos::B3>	PRC3;
-			bits_rw_t<prcr_io, bitpos::B8, 8>	PRKEY;
+			bit_rw_t<io_, bitpos::B0>	   PRC0;
+			bit_rw_t<io_, bitpos::B1>	   PRC1;
+			bit_rw_t<io_, bitpos::B3>      PRC3;
+			bits_rw_t<io_, bitpos::B8, 8>  PRKEY;
 		};
-		static prcr_t PRCR;
-
+		static prcr_t<0x000803FE> PRCR;
 	};
-
 	typedef system_t SYSTEM;
+
+	rw8_t<0x000800A2>   		  system_t::MOSCWTCR;
+	system_t::mofcr_t<0x0008C293> system_t::MOFCR;
+	system_t::sckcr_t<0x00080020> system_t::SCKCR;
+	system_t::prcr_t<0x000803FE>  system_t::PRCR;
 }

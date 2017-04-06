@@ -51,6 +51,8 @@ namespace device {
 		ETHERC1,	///< Ethernet 1 (PHY RMII)
 		PTPETHERC,	///< PTP Ethernet
 
+		ETHERCA,	///< Ethernet 0 (PHY RMII)カスタムポート接続
+
 		EDMAC0,		///< Ethernet DMA 0
 		EDMAC1,		///< Ethernet DMA 1
 		PTPEDMAC,	///< PTP Ethernet DMA
