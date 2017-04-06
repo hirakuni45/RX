@@ -14,18 +14,18 @@ BUILD		=	release
 
 VPATH		=	../
 
-ASOURCES	=	common/start.s \
-				GR/core/driver/cksum_rx_little.s
+ASOURCES	=	common/start.s
+
+#				GR/core/driver/cksum_rx_little.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
+				common/syscalls.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
-				common/syscalls.c \
-				common/time.c \
-				GR/core/r_byteq_v1.30/r_byteq.c \
-				GR/core/driver/phy.c \
-				GR/core/driver/r_ether.c \
+				common/time.c
+
+#				GR/core/r_byteq_v1.30/r_byteq.c \
 				GR/core/driver/t4_driver.c \
 				GR/core/driver/timer.c \
 				GR/core/T4_src/config_tcpudp.c \
@@ -35,11 +35,14 @@ CSOURCES	=	common/init.c \
 				GR/core/T4_src/tcp.c \
 				GR/core/T4_src/tcp_api.c \
 				GR/core/T4_src/r_dhcp_client.c \
-				GR/core/T4_src/r_dns_client.c
+				GR/core/T4_src/r_dns_client.c \
+				GR/core/driver/phy.c \
+				GR/core/driver/r_ether.c
 
-PSOURCES	=	main.cpp \
-				GR/core/IPAddress.cpp \
-				GR/core/Ethernet.cpp
+PSOURCES	=	main.cpp
+
+#				GR/core/IPAddress.cpp \
+#				GR/core/Ethernet.cpp
 
 USER_LIBS	=	stdc++
 
@@ -54,7 +57,9 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX64M ../GR
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-O1
+
+AS_OPT		=	-mcpu=rx600
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
@@ -89,6 +94,7 @@ OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
 
 # AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
+AFLAGS		=	$(AS_OPT)
 # AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
 # ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
 ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
@@ -96,7 +102,7 @@ ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
 # Override is only needed by avr-lib build system.
 
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++11 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
+PFLAGS		=	-std=c++14 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
 

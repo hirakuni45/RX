@@ -13,14 +13,17 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/rspi_io.hpp"
+#include "common/spi_io.hpp"
 #include "common/sdc_io.hpp"
 
 /// #include "seeda.hpp"
 
-#include <cstdlib>
-#include "GR/core/Ethernet.h"
+#include <string>
 
-#define SERVER_TASK
+#include <cstdlib>
+// #include "GR/core/Ethernet.h"
+
+// #define SERVER_TASK
 
 namespace {
 
@@ -52,21 +55,29 @@ namespace {
 
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
-	typedef utils::fifo<uint8_t, 256> buffer;
+	typedef utils::fifo<uint8_t, 4096> buffer;
 	device::sci_io<device::SCI7, buffer, buffer> sci_;
 
 	utils::rtc_io rtc_;
 
+#if 0
 	// SDC 用　SPI 定義（RSPI）
-	typedef device::rspi_io<device::RSPI> RSPI;
-	RSPI rspi_;
+	typedef device::rspi_io<device::RSPI> SPI;
+#else
+	// Soft SDC 用　SPI 定義（SPI）
+	typedef device::PORT<device::PORTC, device::bitpos::B7> MISO;
+	typedef device::PORT<device::PORTC, device::bitpos::B6> MOSI;
+	typedef device::PORT<device::PORTC, device::bitpos::B5> SPCK;
+	typedef device::spi_io<MISO, MOSI, SPCK> SPI;
+#endif
+	SPI spi_;
 
 	typedef device::PORT<device::PORTC, device::bitpos::B4> sdc_select;	///< カード選択信号
 	typedef device::NULL_PORT  sdc_power;	///< カード電源制御（常に電源ＯＮ）
 	typedef device::PORT<device::PORTB, device::bitpos::B7> sdc_detect;	///< カード検出
 
-	typedef utils::sdc_io<RSPI, sdc_select, sdc_power, sdc_detect> SDC;
-	SDC sdc_(rspi_, 10000000);
+	typedef utils::sdc_io<SPI, sdc_select, sdc_power, sdc_detect> SDC;
+	SDC sdc_(spi_, 1000000);
 
 	utils::command<256> cmd_;
 
@@ -362,12 +373,14 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
-		uint8_t int_level = 4;
-		cmt_.start(1000, int_level);
+		uint8_t int_level = 0;
+///		cmt_.start(1000, int_level);
+		cmt_.start(60, int_level);
 	}
 
 	{  // SCI 設定
-		uint8_t int_level = 2;
+///		uint8_t int_level = 2;
+		uint8_t int_level = 0;
 		sci_.start(115200, int_level);
 	}
 
@@ -391,6 +404,7 @@ int main(int argc, char** argv)
 		}
 	}
 
+#ifdef SERVER_TASK
 	{  // Ethernet 起動
 		device::power_cfg::turn(device::peripheral::ETHERC0);
 		device::port_map::turn(device::peripheral::ETHERC0);
@@ -411,14 +425,13 @@ int main(int argc, char** argv)
 		}
 		Ethernet.localIP().print();
 
-#ifdef SERVER_TASK
 		server_.begin();
 		utils::format("Start server: ");
 		Ethernet.localIP().print();
-#endif
 
 ///		telnet_.begin();
 	}
+#endif
 
 	cmd_.set_prompt("# ");
 
@@ -427,10 +440,11 @@ int main(int argc, char** argv)
 	uint32_t cnt = 0;
 
 	while(1) {
-///		cmt_.sync();
-		sync_100hz();
+		cmt_.sync();
+///		sync_100hz();
+#ifdef SERVER_TASK
 		Ethernet.mainloop();
-
+#endif
 		sdc_.service();
 
 		// コマンド入力と、コマンド解析
