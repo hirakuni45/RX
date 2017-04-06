@@ -61,6 +61,7 @@ namespace device {
 		bool start_sdc(uint32_t speed)
 		{
 			MISO::DIR = 0;
+			MISO::PU = 1;
 			MOSI::DIR = 1;
 			SPCK::DIR = 1;
 
@@ -152,11 +153,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void recv(void* dst, uint32_t size)
 		{
-			auto ptr = static_cast<uint8_t*>(dst);
-			auto end = ptr + size;
-			while(ptr < end) {
+			uint8_t* ptr = static_cast<uint8_t*>(dst);
+			uint32_t pos = 0;
+			while(pos < size) {
 				*ptr = xchg();
 				++ptr;
+				++pos;
 			}
 		}
 
@@ -169,6 +171,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void destroy(bool power = true)
 		{
+			MISO::PU = 0;
+			MOSI::DIR = 0;
+			SPCK::DIR = 0;
 		}
 	};
 }
