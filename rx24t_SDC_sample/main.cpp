@@ -12,6 +12,7 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/rspi_io.hpp"
+#include "common/spi_io.hpp"
 #include "common/sdc_io.hpp"
 
 #ifdef RTC
@@ -39,15 +40,23 @@ namespace {
 	chip::DS3231<I2C> rtc_(i2c_);
 #endif
 
-	// SDC 用　SPI 定義（RSPI0）
-	typedef device::rspi_io<device::RSPI0> sdc_spi;
-	sdc_spi sdc_spi_;
-
+#if 0
+	// RSPI SDC 用　SPI 定義（RSPI0）
+	typedef device::rspi_io<device::RSPI0> SPI;
+	SPI spi_;
+#else
+	// Soft SDC 用　SPI 定義（SPI）
+	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;
+	typedef device::PORT<device::PORT2, device::bitpos::B3> MOSI;
+	typedef device::PORT<device::PORT2, device::bitpos::B4> SPCK;
+	typedef device::spi_io<MISO, MOSI, SPCK> SPI;
+	SPI spi_;
+#endif
 	typedef device::PORT<device::PORT6, device::bitpos::B5> sdc_select;	///< カード選択信号
 	typedef device::PORT<device::PORT6, device::bitpos::B4> sdc_power;	///< カード電源制御
 	typedef device::PORT<device::PORT6, device::bitpos::B3> sdc_detect;	///< カード検出
 
-	utils::sdc_io<sdc_spi, sdc_select, sdc_power, sdc_detect> sdc_(sdc_spi_, 20000000);
+	utils::sdc_io<SPI, sdc_select, sdc_power, sdc_detect> sdc_(spi_, 20000000);
 
 	utils::command<128> command_;
 
