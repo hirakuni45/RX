@@ -37,8 +37,8 @@ namespace {
 	// SDC 用定義（SDHI）
 ///	fatfs::sdhi_io<device::SDHI> sdc_;
 
-	typedef device::rspi_io<device::RSPI> RSPI;
-	RSPI rspi_;
+//	typedef device::rspi_io<device::RSPI> RSPI;
+//	RSPI rspi_;
 
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
@@ -52,11 +52,11 @@ namespace {
 	typedef device::PORT<device::PORT8, device::bitpos::B1> sdc_detect;	///< カード検出
 
 	typedef utils::sdc_io<SPI, sdc_select, sdc_power, sdc_detect> SDC;
-	SDC sdc_(spi_, 10000000);
+	SDC sdc_(spi_, 20000000);
 
-	utils::command<256> command_;
+	utils::command<256> cmd_;
 
-	utils::SDRAM_128M_32W	sdram_;
+//	utils::SDRAM_128M_32W	sdram_;
 }
 
 extern "C" {
@@ -161,9 +161,9 @@ extern "C" {
 
 		struct tm *m = localtime(&t);
 		bool err = false;
-		if(command_.get_words() == 3) {
+		if(cmd_.get_words() == 3) {
 			char buff[12];
-			if(command_.get_word(1, sizeof(buff), buff)) {
+			if(cmd_.get_word(1, sizeof(buff), buff)) {
 				const char* p = buff;
 				int vs[3];
 				uint8_t i;
@@ -182,7 +182,7 @@ extern "C" {
 				}
 			}
 
-			if(command_.get_word(2, sizeof(buff), buff)) {
+			if(cmd_.get_word(2, sizeof(buff), buff)) {
 				const char* p = buff;
 				int vs[3];
 				uint8_t i;
@@ -212,6 +212,14 @@ extern "C" {
 		if(!rtc_.set_time(tt)) {
 			sci_puts("Stall RTC write...\n");
 		}
+	}
+
+	bool check_mount_() {
+		auto f = sdc_.get_mount();
+		if(!f) {
+			utils::format("SD card not mount.\n");
+		}
+		return f;
 	}
 }
 
@@ -243,7 +251,7 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	// SDRAM 初期化 128M/32bits bus
-	sdram_();
+//	sdram_();
 
 	{  // タイマー設定（６０Ｈｚ）
 		uint8_t cmt_irq_level = 4;
@@ -251,7 +259,8 @@ int main(int argc, char** argv)
 	}
 
 	{  // SCI 設定
-		static const uint8_t sci_level = 2;
+//		uint8_t sci_level = 2;
+		uint8_t sci_level = 0;
 		sci_.start(115200, sci_level);
 	}
 
@@ -259,11 +268,15 @@ int main(int argc, char** argv)
 		rtc_.start();
 	}
 
-	utils::format("RX64M SDHC sample\n");
+	{  // SD カード・クラスの初期化
+		sdc_.start();
+	}
+
+	utils::format("RX64M SDC sample\n");
 
 	device::PORT0::PDR.B7 = 1; // output
 
-	command_.set_prompt("# ");
+	cmd_.set_prompt("# ");
 
 	uint32_t cnt = 0;
 	char buff[16];
@@ -273,10 +286,36 @@ int main(int argc, char** argv)
 		sdc_.service();
 
 		// コマンド入力と、コマンド解析
-		if(command_.service()) {
-			uint8_t cmdn = command_.get_words();
+		if(cmd_.service()) {
+			uint8_t cmdn = cmd_.get_words();
 			if(cmdn >= 1) {
-				if(command_.cmp_word(0, "date")) {
+				bool f = false;
+				if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
+					if(check_mount_()) {
+						if(cmdn >= 2) {
+							char tmp[128];
+							cmd_.get_word(1, sizeof(tmp), tmp);
+							sdc_.dir(tmp);
+						} else {
+							sdc_.dir("");
+						}
+					}
+					f = true;
+				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
+					if(check_mount_()) {
+						if(cmdn >= 2) {
+							char tmp[128];
+							cmd_.get_word(1, sizeof(tmp), tmp);
+							sdc_.cd(tmp);						
+						} else {
+							sdc_.cd("/");
+						}
+					}
+					f = true;
+				} else if(cmd_.cmp_word(0, "pwd")) { // pwd
+					utils::format("%s\n") % sdc_.get_current();
+					f = true;
+				} else if(cmd_.cmp_word(0, "date")) {
 					if(cmdn == 1) {
 						time_t t = get_time_();
 						if(t != 0) {
@@ -285,14 +324,19 @@ int main(int argc, char** argv)
 					} else {
 						set_time_date_();
 					}
-				} else if(command_.cmp_word(0, "help") || command_.cmp_word(0, "?")) {
-					sci_puts("date\n");
-					sci_puts("date yyyy/mm/dd hh:mm[:ss]\n");
-				} else {
-					if(command_.get_word(0, sizeof(buff), buff)) {
-						sci_puts("Command error: ");
-						sci_puts(buff);
-						sci_putch('\n');
+					f = true;
+				} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
+					utils::format("date\n");
+					utils::format("date yyyy/mm/dd hh:mm[:ss]\n");
+					utils::format("dir [name]\n");
+					utils::format("cd [directory-name]\n");
+					utils::format("pwd\n");
+					f = true;
+				}
+				if(!f) {
+					char tmp[128];
+					if(cmd_.get_word(0, sizeof(tmp), tmp)) {
+						utils::format("Command error: '%s'\n") % tmp;
 					}
 				}
 			}

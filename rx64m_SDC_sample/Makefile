@@ -17,9 +17,9 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
+				common/syscalls.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
-				common/syscalls.c \
 				common/time.c
 
 PSOURCES	=	main.cpp
@@ -28,7 +28,7 @@ USER_LIBS	=	stdc++
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX64M F_PCKA=120000000 F_PCKB=60000000
+USER_DEFS	=	SIG_RX64M F_PCKA=120000000 F_PCKB=60000000 FAT_FS FAT_FS_NUM=16
 
 MCU_TARGET	=	
 
@@ -41,10 +41,12 @@ OPTIMIZE	=	-Os
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-mcpu=rx600 \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
+				-mcpu=rx600 \
 				-fno-exceptions
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
