@@ -88,9 +88,13 @@ namespace fatfs {
 		/* 1:OK, 0:Timeout */
 		int select_() {
 			SEL::P = 0;
+#ifdef DEBUG
 			utils::format("Select port: %d\n") % static_cast<uint32_t>(SEL::P());
+#endif
 			volatile BYTE d = spi_.xchg();	/* Dummy clock (force DO enabled) */
+#ifdef DEBUG
 			utils::format("Select dummy: 0x%02X\n") % static_cast<uint32_t>(d);
+#endif
 			if (wait_ready_()) return 1;	/* Wait for card ready */
 			deselect_();
 			return 0;			/* Failed */
@@ -158,9 +162,9 @@ namespace fatfs {
 
 			/* Select the card and wait for ready except to stop multiple block read */
 			if (c != static_cast<uint8_t>(command::CMD12)) {
-				utils::format("Deselect...\n");
+///				utils::format("Deselect...\n");
 				deselect_();
-				utils::format("Select...\n");
+///				utils::format("Select...\n");
 				if (!select_()) return 0xFF;
 			}
 #ifdef DEBUG
