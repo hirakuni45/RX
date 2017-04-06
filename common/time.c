@@ -127,25 +127,25 @@ time_t get_timezone_offset(void)
 //-----------------------------------------------------------------//
 struct tm *gmtime(const time_t *tp)
 {
-	time_t	t;
+	uint32_t t;
 	short	i, j, k;
 
-	t = *tp;
+	t = (uint32_t)(*tp);
 
-	time_st_.tm_sec  = t % (time_t)60;
-	t /= (time_t)60;
+	time_st_.tm_sec  = t % 60;
+	t /= 60;
 
-	time_st_.tm_min  = t % (time_t)60;
-	t /= (time_t)60;
+	time_st_.tm_min  = t % 60;
+	t /= 60;
 
-	time_st_.tm_hour = t % (time_t)24;
-	t /= (time_t)24;
+	time_st_.tm_hour = t % 24;
+	t /= 24;
 
 	time_st_.tm_wday = (t + 4) % 7;
 
 	j = 1970;
 	while(t >= (i = get_yday(j))) {
-		t -= (time_t)i;
+		t -= i;
 		j++;
 	}
 	time_st_.tm_year = j - 1900;
@@ -154,7 +154,7 @@ struct tm *gmtime(const time_t *tp)
 
 	k = 0;
 	while(t >= (i = get_mday(j, k))) {
-		t -= (time_t)i;
+		t -= i;
 		k++;
 	}
 	time_st_.tm_mon = k;
