@@ -11,12 +11,17 @@
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
+#include "common/spi_io.hpp"
+#include "RX600/port.hpp"
+
 /* MMC card type flags (MMC_GET_TYPE) */
 #define CT_MMC		0x01				/* MMC ver 3 */
 #define CT_SD1		0x02				/* SD ver 1 */
 #define CT_SD2		0x04				/* SD ver 2 */
 #define CT_SDC		(CT_SD1 | CT_SD2)	/* SD */
 #define CT_BLOCK	0x08				/* Block addressing */
+
+// #define DEBUG
 
 namespace fatfs {
 
@@ -32,10 +37,10 @@ namespace fatfs {
 
 		SPI&	spi_;
 
+		uint32_t	limitc_;
+
 		DSTATUS Stat_;	// Disk status
 		BYTE CardType_;	// b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing
-
-		uint32_t	limitc_;
 
 		// MMC/SD command (SPI mode)
 		enum class command : uint8_t {
@@ -64,10 +69,9 @@ namespace fatfs {
 
 		/* 1:OK, 0:Timeout */
 		int wait_ready_() {
-			BYTE d;
 			UINT tmr;
 			for (tmr = 5000; tmr; tmr--) {	/* Wait for ready in timeout of 500ms */
-				spi_.recv(&d, 1);
+				BYTE d = spi_.xchg();
 				if (d == 0xFF) break;
 				utils::delay::micro_second(100);
 			}
@@ -77,16 +81,16 @@ namespace fatfs {
 
 		void deselect_() {
 			SEL::P = 1;
-			BYTE d;
-			spi_.recv(&d, 1);	/* Dummy clock (force DO hi-z for multiple slave SPI) */
+			volatile BYTE d = spi_.xchg();	/* Dummy clock (force DO hi-z for multiple slave SPI) */
 		}
 
 
 		/* 1:OK, 0:Timeout */
 		int select_() {
 			SEL::P = 0;
-			BYTE d;
-			spi_.recv(&d, 1);	/* Dummy clock (force DO enabled) */
+			utils::format("Select port: %d\n") % static_cast<uint32_t>(SEL::P());
+			volatile BYTE d = spi_.xchg();	/* Dummy clock (force DO enabled) */
+			utils::format("Select dummy: 0x%02X\n") % static_cast<uint32_t>(d);
 			if (wait_ready_()) return 1;	/* Wait for card ready */
 			deselect_();
 			return 0;			/* Failed */
@@ -106,7 +110,11 @@ namespace fatfs {
 				utils::delay::micro_second(100);
 			}
 			if (d[0] != 0xFE) return 0;		/* If not valid data token, return with error */
-
+#ifdef DEBUG
+			utils::format("rcvr_datablock_: 0x%08X, %d\n") % (uint32_t)(buff)
+				% static_cast<uint32_t>(btr);
+			utils::delay::micro_second(100000);
+#endif
 			spi_.recv(buff, btr);			/* Receive the data block into buffer */
 			spi_.recv(d, 2);				/* Discard CRC */
 
@@ -150,7 +158,9 @@ namespace fatfs {
 
 			/* Select the card and wait for ready except to stop multiple block read */
 			if (c != static_cast<uint8_t>(command::CMD12)) {
+				utils::format("Deselect...\n");
 				deselect_();
+				utils::format("Select...\n");
 				if (!select_()) return 0xFF;
 			}
 #ifdef DEBUG
@@ -171,15 +181,14 @@ namespace fatfs {
 			spi_.send(buf, 6);
 
 			/* Receive command response */
+			BYTE d = 0;
 			if (c == static_cast<uint8_t>(command::CMD12)) {  /* Skip a stuff byte when stop reading */
-				BYTE d;
-				spi_.recv(&d, 1);
+				d = spi_.xchg();
 			}
 
 			n = 10;		/* Wait for a valid response in timeout of 10 attempts */
-			BYTE d;
 			do {
-				spi_.recv(&d, 1);
+				d = spi_.xchg();
 			} while ((d & 0x80) && --n) ;
 
 			return d;			/* Return with the response value */
@@ -208,7 +217,7 @@ namespace fatfs {
 		 */
 		//-----------------------------------------------------------------//
 		mmc_io(SPI& spi, uint32_t limitc) :
-			spi_(spi), Stat_(STA_NOINIT), CardType_(0), limitc_(limitc) { }
+			spi_(spi), limitc_(limitc), Stat_(STA_NOINIT), CardType_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -245,8 +254,9 @@ namespace fatfs {
 
 			SEL::DIR = 1;  // output
 			SEL::P = 1;
+			SEL::PU = 0;
 
-			utils::delay::milli_second(10);  // 10ms
+			utils::delay::milli_second(100);  // 100ms
 
 			// MISO: H (pull-up)
 			start_spi_(false);
@@ -286,6 +296,10 @@ namespace fatfs {
 						ty = 0;
 					}
 				}
+			} else {
+#ifdef DEBUG
+				utils::format("Idle state error...\n");
+#endif
 			}
 			CardType_ = ty;
 			DSTATUS s = ty ? 0 : STA_NOINIT;
@@ -296,7 +310,7 @@ namespace fatfs {
 			start_spi_(true);
 
 #ifdef DEBUG
-			utils::format("init ret: %d\n") % static_cast<uint32_t>(s);
+			utils::format("init ret: cardtype: %d\n") % static_cast<uint32_t>(ty);
 #endif
 			return s;
 		}
