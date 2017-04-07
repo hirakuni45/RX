@@ -419,7 +419,10 @@ namespace utils {
 			@return カレント。パス
 		 */
 		//-----------------------------------------------------------------//
-		const char* get_current() const { return current_; }
+		const char* get_current() const {
+			if(current_[0] == 0) return "/";
+			return current_;
+		}
 
 
 		//-----------------------------------------------------------------//
