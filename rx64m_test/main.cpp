@@ -16,7 +16,7 @@
 #include "common/spi_io.hpp"
 #include "common/sdc_io.hpp"
 
-#include "chip/LTC2346_16.hpp"
+#include "chip/LTC2348_16.hpp"
 
 /// #include "seeda.hpp"
 
