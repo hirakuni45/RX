@@ -35,13 +35,17 @@ Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
 #if defined(__GNUC__) || defined(GRSAKURA)
 #include "../T4_src/t4define.h"
-/// #include <arduino.h>
 #else
 #include <machine.h>
 #endif
 #include "rx64m/iodefine.h"
 #include "phy.h"
 #include "r_ether.h"
+
+#include <stdio.h>
+
+/// PHY:DP83822 device is active
+#define TI_DP83822
 
 /***********************************************************************************************************************
 Macro definitions
@@ -170,13 +174,14 @@ static uint16_t local_advertise; /* the capabilities of the local link as PHY da
 ***********************************************************************************************************************/
 int16_t  Phy_Init(void)
 {
-    uint16_t reg;
-    uint32_t count;
+	printf("Start PHY Init...\n");
 
-    /* Reset PHY */
-    _Phy_Write(PHY_REG_CONTROL, PHY_CONTROL_RESET);
+	uint16_t reg;
 
-    count = 0;
+	/* Reset PHY */
+	_Phy_Write(PHY_REG_CONTROL, PHY_CONTROL_RESET);
+
+    uint32_t count = 0;
     /* Reset completion waiting */
     do
     {
@@ -184,8 +189,10 @@ int16_t  Phy_Init(void)
         count++;
     } while ( (reg & PHY_CONTROL_RESET) && (count < PHY_DELAY_RESET) );
 
+	printf("PHY Init: delay reset: %d\n", (int)count);
+
     if( count < PHY_DELAY_RESET )
-    {     
+    {
         /* 
          * When KSZ8041NL of the Micrel, Inc. is used, 
          * the pin that outputs the state of LINK is used combinedly with ACTIVITY in default. 
@@ -197,10 +204,17 @@ int16_t  Phy_Init(void)
         reg |= 0x4000;
         _Phy_Write(PHY_REG_PHY_CONTROL_1, reg);
 #endif /* MICREL_KSZ8041NL */
-        
+
+#ifdef TI_DP83822
+//	_Phy_Write(0x0012, 0x00FF);
+//	_Phy_Write(0x0013, 0x00FF);
+	_Phy_Write(0x0017, 0x0061);  // RMII Enable(B5)
+#endif
+		printf("PHY Init OK...\n");
         return R_PHY_OK;
     }
 
+	printf("PHY Init Error...\n");
     return R_PHY_ERROR;
 } /* End of function Phy_Init() */
 
