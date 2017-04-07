@@ -63,7 +63,9 @@ namespace device {
 			MISO::DIR = 0;
 			MISO::PU = 1;
 			MOSI::DIR = 1;
+//			MOSI::PU = 1;
 			SPCK::DIR = 1;
+//			SPCK::PU = 1;
 
 			uint32_t n = 120000000 / speed;
 			if(n > 511) n = 511;
