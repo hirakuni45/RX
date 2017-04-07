@@ -60,7 +60,7 @@ namespace {
 
 	utils::rtc_io rtc_;
 
-#if 0
+#if 1
 	// SDC 用　SPI 定義（RSPI）
 	typedef device::rspi_io<device::RSPI> SPI;
 #else
@@ -77,7 +77,7 @@ namespace {
 	typedef device::PORT<device::PORTB, device::bitpos::B7> sdc_detect;	///< カード検出
 
 	typedef utils::sdc_io<SPI, sdc_select, sdc_power, sdc_detect> SDC;
-	SDC sdc_(spi_, 1000000);
+	SDC sdc_(spi_, 20000000);
 
 	utils::command<256> cmd_;
 
@@ -375,7 +375,7 @@ int main(int argc, char** argv)
 	{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
 		uint8_t int_level = 0;
 ///		cmt_.start(1000, int_level);
-		cmt_.start(60, int_level);
+		cmt_.start(100, int_level);
 	}
 
 	{  // SCI 設定
@@ -389,6 +389,8 @@ int main(int argc, char** argv)
 	}
 
 	{  // SD カード・クラスの初期化
+		device::PORTC::PDR.B3 = 1; // output
+		device::PORTC::PODR.B3 = 1; // MISO: pull-up		
 		sdc_.start();
 	}
 
