@@ -186,8 +186,8 @@ namespace device {
 				{
 					uint8_t  mii = enable ? 0b010001 : 0;
 					uint8_t rmii = enable ? 0b010010 : 0;
-//					MPC::P73PFS.PSEL = mii;   // ET0_WOL
-//					PORT7::PMR.B3 = enable;
+					MPC::P73PFS.PSEL = mii;   // ET0_WOL
+					PORT7::PMR.B3 = enable;
 					MPC::PB7PFS.PSEL = rmii;   // RMII0_CRS_DV
 					MPC::PB6PFS.PSEL = rmii;   // RMII0_TXD1 
 					MPC::PB5PFS.PSEL = rmii;   // RMII0_TXD0
