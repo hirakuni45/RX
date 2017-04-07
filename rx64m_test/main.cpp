@@ -16,6 +16,8 @@
 #include "common/spi_io.hpp"
 #include "common/sdc_io.hpp"
 
+#include "chip/LTC2346_16.hpp"
+
 /// #include "seeda.hpp"
 
 #include <string>
@@ -58,7 +60,7 @@ namespace {
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
 	typedef utils::fifo<uint8_t, 1024> buffer;
-	device::sci_io<device::SCI0, buffer, buffer> sci_;
+	device::sci_io<device::SCI5, buffer, buffer> sci_;
 
 	utils::rtc_io rtc_;
 
@@ -511,12 +513,25 @@ int main(int argc, char** argv)
 						set_time_date_();
 					}
 					f = true;
+				} else if(cmd_.cmp_word(0, "reset")) {
+					char buff[4];
+					if(cmd_.get_word(1, sizeof(buff), buff)) {
+						// Reset signal
+						if(strcmp(buff, "0") == 0) {
+							device::PORT7::PODR.B0 = 0;
+							f = true;
+						} else if(strcmp(buff, "1") == 0) {
+							device::PORT7::PODR.B0 = 1;
+							f = true;
+						}
+					}
 				} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
 					utils::format("date\n");
 					utils::format("date yyyy/mm/dd hh:mm[:ss]\n");
 					utils::format("dir [name]\n");
 					utils::format("cd [directory-name]\n");
 					utils::format("pwd\n");
+					utils::format("reset [01]  (PHY reset signal)\n");
 					f = true;
 				}
 				if(!f) {
