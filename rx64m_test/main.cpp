@@ -20,10 +20,12 @@
 
 #include <string>
 
+#define SERVER_TASK
+
+#ifdef SERVER_TASK
 #include <cstdlib>
 #include "GR/core/Ethernet.h"
-
-#define SERVER_TASK
+#endif
 
 namespace {
 
@@ -56,28 +58,31 @@ namespace {
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
 	typedef utils::fifo<uint8_t, 1024> buffer;
-	device::sci_io<device::SCI7, buffer, buffer> sci_;
+	device::sci_io<device::SCI0, buffer, buffer> sci_;
 
 	utils::rtc_io rtc_;
+
+	typedef device::PORT<device::PORT6, device::bitpos::B7> SW1;
+	typedef device::PORT<device::PORT6, device::bitpos::B6> SW2;
 
 #if 0
 	// SDC 用　SPI 定義（RSPI）
 	typedef device::rspi_io<device::RSPI> SPI;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
-	typedef device::PORT<device::PORTC, device::bitpos::B7> MISO;
-	typedef device::PORT<device::PORTC, device::bitpos::B6> MOSI;
-	typedef device::PORT<device::PORTC, device::bitpos::B5> SPCK;
+	typedef device::PORT<device::PORTD, device::bitpos::B6> MISO;
+	typedef device::PORT<device::PORTD, device::bitpos::B4> MOSI;
+	typedef device::PORT<device::PORTD, device::bitpos::B5> SPCK;
 	typedef device::spi_io<MISO, MOSI, SPCK> SPI;
 #endif
 	SPI spi_;
 
-	typedef device::PORT<device::PORTC, device::bitpos::B4> sdc_select;	///< カード選択信号
+	typedef device::PORT<device::PORTD, device::bitpos::B3> sdc_select;	///< カード選択信号
 	typedef device::NULL_PORT  sdc_power;	///< カード電源制御（常に電源ＯＮ）
-	typedef device::PORT<device::PORTB, device::bitpos::B7> sdc_detect;	///< カード検出
+	typedef device::PORT<device::PORTE, device::bitpos::B6> sdc_detect;	///< カード検出
 
 	typedef utils::sdc_io<SPI, sdc_select, sdc_power, sdc_detect> SDC;
-	SDC sdc_(spi_, 1000000);
+	SDC sdc_(spi_, 10000000);
 
 	utils::command<256> cmd_;
 
@@ -166,6 +171,11 @@ extern "C" {
 }
 
 namespace {
+
+	uint8_t get_switch_()
+	{
+		return static_cast<uint8_t>(!SW1::P()) | (static_cast<uint8_t>(!SW2::P()) << 1);
+	}
 
 	void disp_time_(time_t t, char* dst = nullptr, uint32_t size = 0)
 	{
@@ -372,6 +382,11 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(0b0011) | 1;  // USB Clock: 1/4 (200/4=50)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
+	{  // DIP-SW プルアップ
+		SW1::PU = 1;
+		SW2::PU = 1;
+	}
+
 	{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
 		uint8_t int_level = 1;
 		cmt_.start(1000, int_level);
@@ -395,6 +410,7 @@ int main(int argc, char** argv)
 	utils::format("Endian: %3b") % static_cast<uint32_t>(device::SYSTEM::MDE.MDE());
 	utils::format(", PCKA: %u [Hz]") % static_cast<uint32_t>(F_PCKA);
 	utils::format(", PCKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCKB);
+	utils::format("Switch: %d\n") % static_cast<int>(get_switch_());
 	{
 		time_t t = get_time_();
 		if(t != 0) {
@@ -402,13 +418,17 @@ int main(int argc, char** argv)
 		}
 	}
 
-#ifdef SERVER_TASK
-	{  // Ethernet 起動
+	{  // PHY initialize
+		device::PORT7::PDR.B3 = 1; // Power down output
+		device::PORT7::PODR.B3 = 1; // Power assert (Power Active)
 		device::PORT7::PDR.B0 = 1; // PHY RESET output
+		device::PORT7::PODR.B0 = 0; // Reset assert
+		utils::delay::milli_second(200); /// reset time
 		device::PORT7::PODR.B0 = 1; // Reset negate
-		device::PORT7::PDR.B3 = 1; // Power down
-		device::PORT7::PODR.B3 = 1; // Power ON
+	}
 
+#ifdef SERVER_TASK
+	if(get_switch_() == 3) {  // Ethernet 起動
 		device::power_cfg::turn(device::peripheral::ETHERCA);
 		device::port_map::turn(device::peripheral::ETHERCA);
 		set_interrupt_task(INT_Excep_ICU_GROUPAL1, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
@@ -431,8 +451,6 @@ int main(int argc, char** argv)
 		server_.begin();
 		utils::format("Start server: ");
 		Ethernet.localIP().print();
-
-///		telnet_.begin();
 	}
 #endif
 
@@ -443,14 +461,12 @@ int main(int argc, char** argv)
 	uint32_t cnt = 0;
 
 	while(1) {
-///		cmt_.sync();
 		sync_100hz();
 
 #ifdef SERVER_TASK
 		Ethernet.mainloop();
 
 		service_server();
-///		telnet_service();
 #endif
 
 		sdc_.service();
