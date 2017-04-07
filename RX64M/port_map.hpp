@@ -82,11 +82,11 @@ namespace device {
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
 					PORTA::PDR.B4 = enable; // TXD5
-					PORTA::PDR.B2 = 0;  	// RXD5
+					PORTA::PDR.B3 = 0;  	// RXD5
 					MPC::PA4PFS.PSEL = sel;
-					MPC::PA2PFS.PSEL = sel;
+					MPC::PA3PFS.PSEL = sel;
 					PORTA::PMR.B4 = enable;
-					PORTA::PMR.B2 = enable;
+					PORTA::PMR.B3 = enable;
 				}
 				break;
 			case peripheral::SCI6:
