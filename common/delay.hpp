@@ -8,8 +8,8 @@
 //=====================================================================//
 #include <cstdint>
 
-#ifndef F_PCKA
-#  error "delay.hpp requires F_PCKA to be defined"
+#ifndef F_ICK
+#  error "delay.hpp requires F_ICK to be defined"
 #endif
 
 namespace utils {

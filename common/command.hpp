@@ -173,9 +173,18 @@ namespace utils {
 			const char* p = buff_;
 			char bc = ' ';
 			uint8_t n = 0;
+			bool esc = false;
 			while(1) {
 				char ch = *p++;
 				if(ch == 0) break;
+				if(esc) {
+					esc = false;
+					continue;
+				}
+				if(ch == '\\') {
+					esc = true;
+					continue;
+				} 
 				if(bc == ' ' && ch != ' ') {
 					++n;
 				}
