@@ -32,7 +32,7 @@
 
 namespace {
 
-	const int seeda_version_ = 10;
+	const int seeda_version_ = 15;
 
 	volatile unsigned long millis_ = 0;
 	volatile unsigned long delay_ = 0;
@@ -61,6 +61,8 @@ namespace {
 	}
 
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
+
+//	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
 	typedef utils::fifo<uint8_t, 1024> buffer;
 	device::sci_io<device::SCI5, buffer, buffer> sci_;
@@ -330,8 +332,10 @@ namespace {
 			if(eadc_.convert()) {
 				for(int i = 0; i < 8; ++i) {
 					uint32_t v = eadc_.get_data(i);
-					utils::format("LTC2348-16(%d): CHID: %d, SPAN: %03b, %d\n")
-						% i % ((v >> 3) & 7) % (v & 7) % (v >> 8);
+					float gain = 5.12f;
+					float fv = static_cast<float>(v >> 8) / 65535.0f * gain;
+					utils::format("LTC2348-16(%d): CHID: %d, SPAN: %03b, %6.3f [V] (%d)\n")
+						% i % ((v >> 3) & 7) % (v & 7) % fv % (v >> 8);
 				}
 			} else {
 				utils::format("LTC2348-16 convert error\n");
@@ -344,7 +348,9 @@ namespace {
 					if(eadc_.convert()) {
 						int ch = tmp[0] - '0';
 						uint32_t v = eadc_.get_value(ch);
-						utils::format("LTC2348-16(%d): %d\n") % ch % v;
+						float gain = 5.12f;
+						float fv = static_cast<float>(v >> 8) / 65535.0f * gain;
+						utils::format("LTC2348-16(%d): %6.3f [V] (%d)\n") % ch % fv % v;
 					} else {
 						utils::format("LTC2348-16 convert error\n");
 					}
@@ -556,11 +562,12 @@ int main(int argc, char** argv)
 		sdc_.start();
 	}
 
-	{  // LTC2348ILX-16 初期化（クロック１ＭＨｚ）
+	{  // LTC2348ILX-16 初期化
 		// 内臓リファレンスと内臓バッファ
 		// VREFIN: 2.024V、VREFBUF: 4.096V、Analog range: 0V to 5.12V
-		if(!eadc_.start(200000, 0b001)) {
-			utils::format("LTC2348_16 start fail...\n");
+//		if(!eadc_.start(200000, 0b001)) {
+		if(!eadc_.start(1000000, 0b001)) {
+			utils::format("LTC2348_16 not found...\n");
 		}
 	}
 
@@ -597,6 +604,7 @@ int main(int argc, char** argv)
 //	while(1) {
 //		eadc_.convert();
 //	}
+
 
 
 #ifdef SERVER_TASK
@@ -697,7 +705,7 @@ int main(int argc, char** argv)
 					utils::format("pwd\n");
 					utils::format("reset [01]  (PHY reset signal)\n");
 					utils::format("eadc [0-7]  (LTC2348 A/D conversion)\n");
-///					utils::format("sample -ch 0-7 -rate FRQ -num SAMPLE-NUM file-name (LTC2348 A/D sample)\n");
+					utils::format("sample -ch 0-7 -rate FRQ -num SAMPLE-NUM file-name (LTC2348 A/D sample)\n");
 					f = true;
 				}
 				if(!f) {
