@@ -69,18 +69,18 @@ namespace chip {
 			SDI::P = 0;
 			uint32_t mask = 0x00800000;
 			while(mask > 0) {
+				data_[0 + ofs] <<= 1;
+				if(SDO::SDO0::P()) ++data_[0 + ofs];
+				data_[2 + ofs] <<= 1;
+				if(SDO::SDO2::P()) ++data_[2 + ofs];
+				data_[4 + ofs] <<= 1;
+				if(SDO::SDO4::P()) ++data_[4 + ofs];
+				data_[6 + ofs] <<= 1;
+				if(SDO::SDO6::P()) ++data_[6 + ofs];
+
 				volatile uint16_t l = clk_loop_ >> 1;
 				while(l > 0) { --l; }
 				SCKI::P = 0;
-
-				data_[0 + ofs] <<= 1;
-				data_[0 + ofs] |= SDO::SDO0::P();
-				data_[2 + ofs] <<= 1;
-				data_[2 + ofs] |= SDO::SDO2::P();
-				data_[4 + ofs] <<= 1;
-				data_[4 + ofs] |= SDO::SDO4::P();
-				data_[6 + ofs] <<= 1;
-				data_[6 + ofs] |= SDO::SDO6::P();
 
 				if(span & mask) {
 					SDI::P = 1;
@@ -135,8 +135,8 @@ namespace chip {
 				if(cnt > 65535) return false;
 				busy_loop_ = cnt;
 			}
-			{  // tCONV: 500ns (2MHz)
-				uint32_t cnt = static_cast<uint32_t>(F_ICK) / 2000000;
+			{  // tCONV: 500ns/ch 200ksps
+				uint32_t cnt = static_cast<uint32_t>(F_ICK) / 200000;
 				if(cnt > 65535) return false;
 				cnv_loop_ = cnt;
 			}
@@ -144,26 +144,39 @@ namespace chip {
 			uint32_t ss = 0;
 			for(int i = 0; i < 8; ++i) {
 				ss <<= 3;
-				ss |= span & 7;
+				ss |= static_cast<uint32_t>(span & 7);
 			}
 			span_ = ss;
 
 			CSN::DIR = 1;
 			CSN::P = 1;
+//			CSN::PU =1;
 			CNV::DIR = 1;
 			CNV::P = 0;
+//			CNV::PU = 1;
 			BUSY::DIR = 0;
+//			BUSY::PU = 1;
 			PD::DIR = 1;
 			PD::P = 0;
+//			PD::PU = 1;
 			SDI::DIR = 1;
 			SDI::P = 0;
+//			SDI::PU = 1;
 			SCKI::DIR = 1;
 			SCKI::P = 0;
+//			SCKI::PU = 1;
+
 			SDO::SCKO::DIR = 0;
+//			SDO::SCKO::PU = 1;
+
 			SDO::SDO0::DIR = 0;
+//			SDO::SDO0::PU = 1;
 			SDO::SDO2::DIR = 0;
+//			SDO::SDO2::PU = 1;
 			SDO::SDO4::DIR = 0;
+//			SDO::SDO4::PU = 1;
 			SDO::SDO6::DIR = 0;
+//			SDO::SDO6::PU = 1;
 
 			utils::delay::milli_second(1);
 			device_ = convert();
@@ -192,7 +205,6 @@ namespace chip {
 		bool convert()
 		{
 			SCKI::P = 0;
-			CSN::P = 0;
 			SDI::P = 0;
 
 			data_[0] = 0;
@@ -226,6 +238,8 @@ namespace chip {
 				}
 			}
 
+			CSN::P = 0;
+
 			// 変換待ち 最大 500ns
 			{
 				uint16_t n = cnv_loop_;
@@ -233,6 +247,7 @@ namespace chip {
 					if(BUSY::P() == 0) break;
 					--n;
 				}
+/// 			utils::format("Conversion count: %d\n") % static_cast<int>(cnv_loop_ - n);
 				CNV::P = 0;
 				if(n == 0) {
 					CSN::P = 1;
