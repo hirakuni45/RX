@@ -68,17 +68,23 @@ namespace chip {
 		{
 			SDI::P = 0;
 			uint32_t mask = 0x00800000;
+			uint32_t d0 = 0;
+			uint32_t d1 = 0;
+			uint32_t d2 = 0;
+			uint32_t d3 = 0;
+			volatile uint16_t ll = clk_loop_ >> 1;
+			if(ll > 10) ll -= 10; else ll = 0;
 			while(mask > 0) {
-				data_[0 + ofs] <<= 1;
-				if(SDO::SDO0::P()) ++data_[0 + ofs];
-				data_[2 + ofs] <<= 1;
-				if(SDO::SDO2::P()) ++data_[2 + ofs];
-				data_[4 + ofs] <<= 1;
-				if(SDO::SDO4::P()) ++data_[4 + ofs];
-				data_[6 + ofs] <<= 1;
-				if(SDO::SDO6::P()) ++data_[6 + ofs];
+				d0 <<= 1;
+				d0 |= SDO::SDO0::P();
+				d1 <<= 1;
+				d1 |= SDO::SDO2::P();
+				d2 <<= 1;
+				d2 |= SDO::SDO4::P();
+				d3 <<= 1;
+				d3 |= SDO::SDO6::P();
 
-				volatile uint16_t l = clk_loop_ >> 1;
+				volatile uint16_t l = ll;
 				while(l > 0) { --l; }
 				SCKI::P = 0;
 
@@ -93,6 +99,10 @@ namespace chip {
 				while(h > 0) { --h; }
 				SCKI::P = 1;
 			}
+			data_[0 + ofs] = d0;
+			data_[2 + ofs] = d1;
+			data_[4 + ofs] = d2;
+			data_[6 + ofs] = d3;
 		}
 
 	public:
@@ -126,7 +136,9 @@ namespace chip {
 		{
 			{
 				uint32_t cnt = static_cast<uint32_t>(F_ICK) / speed;
-				cnt /=  2;  // ループ命令によるマシンサイクル補正
+				float a = static_cast<float>(cnt);
+				a /= 10.974f;
+				cnt = static_cast<uint32_t>(a);
 				if(cnt > 65535) return false;
 				clk_loop_ = cnt;
 			}
@@ -150,33 +162,22 @@ namespace chip {
 
 			CSN::DIR = 1;
 			CSN::P = 1;
-//			CSN::PU =1;
 			CNV::DIR = 1;
 			CNV::P = 0;
-//			CNV::PU = 1;
 			BUSY::DIR = 0;
-//			BUSY::PU = 1;
 			PD::DIR = 1;
 			PD::P = 0;
-//			PD::PU = 1;
 			SDI::DIR = 1;
 			SDI::P = 0;
-//			SDI::PU = 1;
 			SCKI::DIR = 1;
 			SCKI::P = 0;
-//			SCKI::PU = 1;
 
 			SDO::SCKO::DIR = 0;
-//			SDO::SCKO::PU = 1;
 
 			SDO::SDO0::DIR = 0;
-//			SDO::SDO0::PU = 1;
 			SDO::SDO2::DIR = 0;
-//			SDO::SDO2::PU = 1;
 			SDO::SDO4::DIR = 0;
-//			SDO::SDO4::PU = 1;
 			SDO::SDO6::DIR = 0;
-//			SDO::SDO6::PU = 1;
 
 			utils::delay::milli_second(1);
 			device_ = convert();
@@ -206,15 +207,6 @@ namespace chip {
 		{
 			SCKI::P = 0;
 			SDI::P = 0;
-
-			data_[0] = 0;
-			data_[1] = 0;
-			data_[2] = 0;
-			data_[3] = 0;
-			data_[4] = 0;
-			data_[5] = 0;
-			data_[6] = 0;
-			data_[7] = 0;
 
 			if(BUSY::P() != 0) {
 				return false;
@@ -285,6 +277,19 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		uint32_t get_data(uint8_t ch) const {
 			return data_[ch & 7];
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  変換電圧を取得
+			@param[in]	ch	チャネル（０～７）
+			@return 変換電圧
+		*/
+		//-----------------------------------------------------------------//
+		float get_voltage(uint8_t ch) const {
+			float gain = 5.12f;
+			return static_cast<float>(data_[ch & 7]) / 65535.0f * gain;
 		}
 	};
 }
