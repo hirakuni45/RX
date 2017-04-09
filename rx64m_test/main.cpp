@@ -32,7 +32,7 @@
 
 namespace {
 
-	const int seeda_version_ = 5;
+	const int seeda_version_ = 10;
 
 	volatile unsigned long millis_ = 0;
 	volatile unsigned long delay_ = 0;
@@ -330,7 +330,7 @@ namespace {
 			if(eadc_.convert()) {
 				for(int i = 0; i < 8; ++i) {
 					uint32_t v = eadc_.get_data(i);
-					utils::format("LTC2348-16(%d): CHID: %d, SPAN: %d, %d\n")
+					utils::format("LTC2348-16(%d): CHID: %d, SPAN: %03b, %d\n")
 						% i % ((v >> 3) & 7) % (v & 7) % (v >> 8);
 				}
 			} else {
@@ -559,8 +559,7 @@ int main(int argc, char** argv)
 	{  // LTC2348ILX-16 初期化（クロック１ＭＨｚ）
 		// 内臓リファレンスと内臓バッファ
 		// VREFIN: 2.024V、VREFBUF: 4.096V、Analog range: 0V to 5.12V
-		if(!eadc_.start(100000, 0b001)) {
-///		if(!eadc_.start(100000, 0b000)) {
+		if(!eadc_.start(200000, 0b001)) {
 			utils::format("LTC2348_16 start fail...\n");
 		}
 	}
@@ -698,7 +697,7 @@ int main(int argc, char** argv)
 					utils::format("pwd\n");
 					utils::format("reset [01]  (PHY reset signal)\n");
 					utils::format("eadc [0-7]  (LTC2348 A/D conversion)\n");
-					utils::format("sample -ch 0-7 -rate FRQ -num SAMPLE-NUM file-name (LTC2348 A/D sample)\n");
+///					utils::format("sample -ch 0-7 -rate FRQ -num SAMPLE-NUM file-name (LTC2348 A/D sample)\n");
 					f = true;
 				}
 				if(!f) {
