@@ -3,7 +3,7 @@
 #	RX64M Makefile 				        				#
 #														#
 #=======================================================#
-TARGET		=	test_sample
+TARGET		=	seeda_sample
 
 # MCU (R5F564MLHDFB 144pin QFP)
 DEVICE		=	R5F564ML
@@ -11,6 +11,8 @@ DEVICE		=	R5F564ML
 FATFS_VER	=	ff12b
 
 BUILD		=	release
+
+BUILD_ID	=	$(shell date +%Y%m%d%H)
 
 VPATH		=	../
 
@@ -46,8 +48,9 @@ USER_LIBS	=	stdc++
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
 USER_DEFS	=	SIG_RX64M F_ICK=100000000 F_PCKA=100000000 F_PCKB=50000000 \
+				B_ID=$(BUILD_ID) \
 				FAT_FS FAT_FS_NUM=16 \
-				GRKAEDE GRSAKURA ARDUINO=144 CPPAPP __RX_LITTLE_ENDIAN__=1 __T4__ __RX
+				GRKAEDE GRSAKURA CPPAPP __RX_LITTLE_ENDIAN__=1 __T4__ __RX
 
 MCU_TARGET	=
 
