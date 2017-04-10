@@ -186,16 +186,20 @@ namespace device {
 				{
 					uint8_t  mii = enable ? 0b010001 : 0;
 					uint8_t rmii = enable ? 0b010010 : 0;
-					MPC::P73PFS.PSEL = mii;   // ET0_WOL
-					PORT7::PMR.B3 = enable;
-					MPC::PB7PFS.PSEL = rmii;   // RMII0_CRS_DV
-					MPC::PB6PFS.PSEL = rmii;   // RMII0_TXD1 
-					MPC::PB5PFS.PSEL = rmii;   // RMII0_TXD0
-					MPC::PB4PFS.PSEL = rmii;   // RMII0_TXD_EN
-					MPC::PB3PFS.PSEL = rmii;   // RMII0_RX_ER
-					MPC::PB2PFS.PSEL = rmii;   // REF50CK0
-					MPC::PB1PFS.PSEL = rmii;   // RMII0_RXD0
-					MPC::PB0PFS.PSEL = rmii;   // RMII0_RXD1
+///					MPC::P73PFS.PSEL = mii;   // ET0_WOL  (144LQFP: 77)
+					MPC::P72PFS.PSEL = mii;   // ET0_MDC  (144LQFP: 85)
+					MPC::P71PFS.PSEL = mii;   // ET0_MDIO (144LQFP: 86)
+///					PORT7::PMR.B3 = enable;
+					PORT7::PMR.B2 = enable;
+					PORT7::PMR.B1 = enable;
+					MPC::PB7PFS.PSEL = rmii;  // RMII0_CRS_DV (144LQFP: 78)
+					MPC::PB6PFS.PSEL = rmii;  // RMII0_TXD1   (144LQFP: 79)
+					MPC::PB5PFS.PSEL = rmii;  // RMII0_TXD0   (144LQFP: 80)
+					MPC::PB4PFS.PSEL = rmii;  // RMII0_TXD_EN (144LQFP: 81)
+					MPC::PB3PFS.PSEL = rmii;  // RMII0_RX_ER  (144LQFP: 82)
+					MPC::PB2PFS.PSEL = rmii;  // REF50CK0     (144LQFP: 83)
+					MPC::PB1PFS.PSEL = rmii;  // RMII0_RXD0   (144LQFP: 84)
+					MPC::PB0PFS.PSEL = rmii;  // RMII0_RXD1   (144LQFP: 87)
 					PORTB::PMR.B7 = enable;
 					PORTB::PMR.B6 = enable;
 					PORTB::PMR.B5 = enable;
@@ -204,10 +208,6 @@ namespace device {
 					PORTB::PMR.B2 = enable;
 					PORTB::PMR.B1 = enable;
 					PORTB::PMR.B0 = enable;
-					MPC::P72PFS.PSEL = mii;    // ET0_MDC
-					MPC::P71PFS.PSEL = mii;    // ET0_MDIO
-					PORT7::PMR.B2 = enable;
-					PORT7::PMR.B1 = enable;
 					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
 				}
 				break;
