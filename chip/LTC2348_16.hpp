@@ -52,7 +52,25 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class CSN, class CNV, class BUSY, class PD, class SDI, class SCKI, class SDO>
 	class LTC2348_16 {
+	public:
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ソフト・スパン種別 @n
+					Internal VREFBUF: 4.096V
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class span_type : uint8_t {
+			DISABLE,  		///< 000, Chanel Disable
+			P5_12,			///< 001, 1.25 * VREFBUF          (+0      to +5.12V)
+			M5P5,			///< 010, 2.5  * VREFBUF / 1.024  (-5V     to +5V)
+			P5_12M5_12,		///< 011, 2.5  * VREFBUF          (-5.12V  to +5.12V)
+			P10,			///< 100, 2.5  * VREFBUF / 1.024  (+0      to +10V)
+			P10_24,			///< 101, 2.5  * VREFBUF          (+0      to +10.24V)
+			M10P10,			///< 110, 5.0  * VREFBUF / 1.024  (-10V    to +10V)
+			M10_24P10_24,	///< 111, 5.0  * VREFBUF          (-10.24V to +10.24V)
+		};
 
+	private:
 		uint32_t	span_;
 
 		uint32_t	data_[8];
@@ -116,23 +134,14 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  スパンデータの取得
-			@return スパンデータ
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_span() const { return span_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  デバイスの開始 @n
 					制御線を初期化して、デバイスのゆ有無を確認
-			@param[in]	speed	制御クロック速度
-			@param[in]	span	変換スパン
+			@param[in]	speed	制御クロック速度（ソフトループなので正確ではない）
+			@param[in]	span	変換スパン種別（全てのチャネルに同一のスパンが設定される）
 			@return デバイスが有効なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t speed, uint8_t span)
+		bool start(uint32_t speed, span_type span)
 		{
 			{
 				uint32_t cnt = static_cast<uint32_t>(F_ICK) / speed;
@@ -156,21 +165,21 @@ namespace chip {
 			uint32_t ss = 0;
 			for(int i = 0; i < 8; ++i) {
 				ss <<= 3;
-				ss |= static_cast<uint32_t>(span & 7);
+				ss |= static_cast<uint32_t>(span);
 			}
 			span_ = ss;
 
-			CSN::DIR = 1;
-			CSN::P = 1;
-			CNV::DIR = 1;
-			CNV::P = 0;
+			CSN::DIR  = 1;
+			CSN::P    = 1;
+			CNV::DIR  = 1;
+			CNV::P    = 0;
 			BUSY::DIR = 0;
-			PD::DIR = 1;
-			PD::P = 0;
-			SDI::DIR = 1;
-			SDI::P = 0;
+			PD::DIR   = 1;
+			PD::P     = 0;
+			SDI::DIR  = 1;
+			SDI::P    = 0;
 			SCKI::DIR = 1;
-			SCKI::P = 0;
+			SCKI::P   = 0;
 
 			SDO::SCKO::DIR = 0;
 
@@ -194,6 +203,33 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		bool probe() const {
 			return device_;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  チャネルにスパン種別を設定
+			@param[in]	ch		チャネル
+			@param[in]	span	スパン種別
+		*/
+		//-----------------------------------------------------------------//
+		void set_span(uint8_t ch, span_type span)
+		{
+			span_ &= ~(0b111 << (ch * 3));
+			span_ |= static_cast<uint32_t>(span) << (ch * 3);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  チャネルのスパン種別を取得
+			@param[in]	ch		チャネル
+			@return スパン種別
+		*/
+		//-----------------------------------------------------------------//
+		span_type get_span(uint8_t ch) const
+		{
+			return static_cast<span_type>((span_ >> (ch * 3)) & 0b111);
 		}
 
 
@@ -258,7 +294,7 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  変換値を取得
+			@brief  Ａ／Ｄ変換値を取得（０～６５５３５）
 			@param[in]	ch	チャネル（０～７）
 			@return 変換値
 		*/
@@ -270,7 +306,7 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  変換値を取得
+			@brief  変換データ（２４ビット生データ）を取得
 			@param[in]	ch	チャネル（０～７）
 			@return 変換値
 		*/
@@ -282,14 +318,19 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  変換電圧を取得
+			@brief  変換電圧に変換して取得
 			@param[in]	ch	チャネル（０～７）
 			@return 変換電圧
 		*/
 		//-----------------------------------------------------------------//
 		float get_voltage(uint8_t ch) const {
-			float gain = 5.12f;
-			return static_cast<float>(data_[ch & 7]) / 65535.0f * gain;
+			uint32_t span = (span_ >> (ch * 3)) & 7;
+			float ofs = 0.0f;
+			if(span == 2 || span == 3 || span == 6 || span == 7) {
+				ofs = 0.5f;
+			}
+			static const float gain[8] = { 0.0f, 5.12f, 5.0f, 5.12f, 10.0f, 10.24f, 10.0f, 10.24f };
+			return ((static_cast<float>(data_[ch & 7] >> 8) / 65535.0f) - ofs) * gain[span];
 		}
 	};
 }
