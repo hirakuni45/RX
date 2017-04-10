@@ -1,23 +1,23 @@
 #pragma once
 //=====================================================================//
 /*! @file
-    @brief  seeda tools クラス @n
+    @brief  SEEDA03 tools クラス @n
 			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include "main.hpp"
 #include <string>
 #include "common/renesas.hpp"
 
 #include "common/rspi_io.hpp"
 #include "common/spi_io.hpp"
 #include "common/sdc_io.hpp"
-#include "common/command.hpp"
-#include "common/format.hpp"
-#include "common/input.hpp"
 #include "common/cmt_io.hpp"
 
 #include "common/time.h"
+
+#include "chip/LTC2348_16.hpp"
 
 namespace seeda {
 
@@ -27,6 +27,8 @@ namespace seeda {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class tools {
+
+		CMD		cmd_;
 
 		typedef utils::rtc_io RTC;
 		RTC		rtc_;
@@ -44,11 +46,6 @@ namespace seeda {
 
 		typedef utils::sdc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC;
 		SDC		sdc_;
-
-		utils::command<256> cmd_;
-
-		typedef device::PORT<device::PORT7, device::bitpos::B0> LAN_RESN;
-		typedef device::PORT<device::PORT7, device::bitpos::B3> LAN_PDN;
 
 		// LTC2348-16 A/D 制御ポート定義
 		typedef device::PORT<device::PORT4, device::bitpos::B0> LTC_CSN;   // P40(141)
@@ -218,32 +215,6 @@ namespace seeda {
 			auto f = sdc_.get_mount();
 			if(!f) {
 				utils::format("SD card not mount.\n");
-			}
-			return f;
-		}
-
-
-		bool reset_signal_(uint8_t cmdn)
-		{
-			bool f = false;
-			if(cmdn == 1) {
-				bool v = LAN_RESN::P();
-				utils::format("LAN-RESN: %d\n") % static_cast<int>(v);
-				return true;
-			} else if(cmdn > 1) {
-				char tmp[16];
-				if(cmd_.get_word(1, sizeof(tmp), tmp)) {
-					// Reset signal
-					if(strcmp(tmp, "0") == 0) {
-						device::PORT7::PODR.B0 = 0;
-						f = true;
-					} else if(strcmp(tmp, "1") == 0) {
-						device::PORT7::PODR.B0 = 1;
-						f = true;
-					} else {
-						utils::format("reset param error: '%s'\n") % tmp;
-					}
-				}
 			}
 			return f;
 		}
@@ -438,16 +409,6 @@ namespace seeda {
 			// SD カード・クラスの初期化
 			sdc_.start();
 
-			{  // LAN initialize (PHY reset, PHY POWER-DOWN
-				LAN_PDN::DIR = 1;  // output;
-				LAN_PDN::P = 1;    // Not Power Down Mode..
-				LAN_RESN::DIR = 1; // output;
-
-				LAN_RESN::P = 0;
-				utils::delay::milli_second(200); /// reset time
-				LAN_RESN::P = 1;
-			}
-
 			{  // LTC2348ILX-16 初期化
 				// 内臓リファレンスと内臓バッファ
 				// VREFIN: 2.024V、VREFBUF: 4.096V、Analog range: 0V to 5.12V
@@ -462,15 +423,21 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  LTC2348 A/D Converter ステート表示
+			@brief  タイトル表示 @n
+					LTC2348 A/D Converter ステート表示
 		*/
 		//-----------------------------------------------------------------//
-		void list_eadc()
+		void title()
 		{
 			if(eadc_.probe()) {
 				utils::format("Device LTC2348-16: Ready\n");
 			} else {
 				utils::format("Device LTC2348-16: Not Ready\n");
+			}
+
+			{
+				time_t t = get_time();
+				disp_time(t);
 			}
 		}
 
@@ -524,8 +491,8 @@ namespace seeda {
 							set_time_date_();
 						}
 						f = true;
-					} else if(cmd_.cmp_word(0, "reset")) {
-						f = reset_signal_(cmdn);
+///					} else if(cmd_.cmp_word(0, "reset")) {
+///						f = reset_signal_(cmdn);
 					} else if(cmd_.cmp_word(0, "eadc")) {
 						f = eadc_conv_(cmdn);
 					} else if(cmd_.cmp_word(0, "span")) {
@@ -538,7 +505,7 @@ namespace seeda {
 						utils::format("dir [name]\n");
 						utils::format("cd [directory-name]\n");
 						utils::format("pwd\n");
-						utils::format("reset [01]  (PHY reset signal)\n");
+///						utils::format("reset [01]  (PHY reset signal)\n");
 						utils::format("eadc [0-7]  (LTC2348 A/D conversion)\n");
 						utils::format("span CH(0-7) SPAN(0-7)  (LTC2348 A/D span setting)\n"); 
 						utils::format("sample -ch 0-7 -rate FRQ -num SAMPLE-NUM file-name (LTC2348 A/D sample)\n");

@@ -6,9 +6,7 @@
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "common/renesas.hpp"
-
-#include "common/command.hpp"
+#include "main.hpp"
 
 #include "GR/core/Ethernet.h"
 #include <cstdlib>
@@ -186,8 +184,9 @@ namespace seeda {
 			@param[in]	cmd		コマンド入力インスタンス
 		*/
 		//-----------------------------------------------------------------//
-		bool reset_signal(COMMAND cmd)
+		bool reset_signal(CMD cmd)
 		{
+			uint8_t cmdn = cmd.get_words();
 			bool f = false;
 			if(cmdn == 1) {
 				bool v = LAN_RESN::P();
@@ -195,7 +194,7 @@ namespace seeda {
 				return true;
 			} else if(cmdn > 1) {
 				char tmp[16];
-				if(cmd_.get_word(1, sizeof(tmp), tmp)) {
+				if(cmd.get_word(1, sizeof(tmp), tmp)) {
 					// Reset signal
 					if(strcmp(tmp, "0") == 0) {
 						device::PORT7::PODR.B0 = 0;

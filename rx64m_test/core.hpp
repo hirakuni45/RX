@@ -21,7 +21,7 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct core {
 
-		static const int seeda_version_ = 15;
+		static const int seeda_version_ = 17;
 		static const uint32_t build_id_ = B_ID;
 
 		class cmt_task {
@@ -116,7 +116,8 @@ namespace seeda {
 			// タイトル・コール
 			utils::format("\nStart Seeda03 Build: %u Version %d.%02d\n") % build_id_
 				% (seeda_version_ / 100) % (seeda_version_ % 100);
-			utils::format("Endian: %3b") % static_cast<uint32_t>(device::SYSTEM::MDE.MDE());
+			uint8_t mde = device::SYSTEM::MDE.MDE();
+			utils::format("Endian: %3b (%s)") % static_cast<uint32_t>(mde) % (mde == 0b111 ? "Little" : "Big");
 			utils::format(", PCKA: %u [Hz]") % static_cast<uint32_t>(F_PCKA);
 			utils::format(", PCKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCKB);
 			utils::format("DIP-Switch: %d\n") % static_cast<int>(get_switch_());
