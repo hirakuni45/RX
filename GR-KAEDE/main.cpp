@@ -28,17 +28,23 @@
 
 namespace {
 
-	volatile unsigned long millis_ = 0;
-	volatile unsigned long delay_ = 0;
-	volatile uint32_t millis10x_ = 0;
-	volatile uint32_t cmtdiv_ = 0;
-
 	class cmt_task {
+		void (*task_10ms_)();
+
+		volatile unsigned long millis_;
+		volatile unsigned long delay_;
+		volatile uint32_t millis10x_;
+		volatile uint32_t cmtdiv_;
+
 	public:
+		cmt_task() : task_10ms_(nullptr),
+			millis_(0), delay_(0), millis10x_(0), cmtdiv_(0) { }
+
 		void operator() () {
 			++millis_;
 			++cmtdiv_;
 			if(cmtdiv_ >= 10) {
+				if(task_10ms_ != nullptr) (*task_10ms_)();
 				cmtdiv_ = 0;
 				++millis10x_;
 			}
@@ -46,13 +52,21 @@ namespace {
 				--delay_;
 			}
 		}
-	};
 
-	static void sync_100hz()
-	{
-		volatile uint32_t tmp = millis10x_;
-		while(tmp == millis10x_) ;
-	}
+		void set_task_10ms(void (*task)(void)) {
+			task_10ms_ = task;
+		}
+
+		void sync_100hz()
+		{
+			volatile uint32_t tmp = millis10x_;
+			while(tmp == millis10x_) ;
+		}
+
+		unsigned long get_millis() const { return millis_; }
+		unsigned long get_delay() const { return delay_; }
+		void set_delay(unsigned long n) { delay_ = n; }
+	};
 
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
@@ -93,7 +107,7 @@ namespace {
 extern "C" {
 
 	void INT_Excep_ICU_GROUPAL1(void);
-	void INT_Excep_CMT1_CMI1(void);
+///	void INT_Excep_CMT1_CMI1(void);
 
 	void sci_putch(char ch)
 	{
@@ -156,13 +170,17 @@ extern "C" {
 
 	unsigned long millis(void)
 	{
-		return millis_;
+		return cmt_.at_task().get_millis();
 	}
 
 	void delay(unsigned long ms)
 	{
-		delay_ = ms;
-		while(delay_ != 0) ;		
+		cmt_.at_task().set_delay(ms);
+		while(cmt_.at_task().get_delay() != 0) ;
+	}
+
+	void set_task_10ms(void (*task)(void)) {
+		cmt_.at_task().set_task_10ms(task);
 	}
 }
 
@@ -410,7 +428,7 @@ int main(int argc, char** argv)
 		device::power_cfg::turn(device::peripheral::ETHERC0);
 		device::port_map::turn(device::peripheral::ETHERC0);
 		set_interrupt_task(INT_Excep_ICU_GROUPAL1, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
-		set_interrupt_task(INT_Excep_CMT1_CMI1, static_cast<uint32_t>(device::icu_t::VECTOR::CMI1));
+///		set_interrupt_task(INT_Excep_CMT1_CMI1, static_cast<uint32_t>(device::icu_t::VECTOR::CMI1));
 
 		Ethernet.maininit();
 
@@ -441,7 +459,7 @@ int main(int argc, char** argv)
 	uint32_t cnt = 0;
 
 	while(1) {
-		sync_100hz();
+		cmt_.at_task().sync_100hz();
 
 #ifdef SERVER_TASK
 		Ethernet.mainloop();

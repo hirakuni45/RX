@@ -25,7 +25,6 @@ CSOURCES	=	common/init.c \
 				common/time.c \
 				GR/core/r_byteq_v1.30/r_byteq.c \
 				GR/core/driver/t4_driver.c \
-				GR/core/driver/timer.c \
 				GR/core/T4_src/config_tcpudp.c \
 				GR/core/T4_src/ether.c \
 				GR/core/T4_src/ip.c \
