@@ -208,9 +208,9 @@ int EthernetClass::begin(const uint8_t *mac){
     memcpy(_myethaddr, mac, EP_ALEN);           /*use from the beginning only 6byte*/
     startLANController();
 #ifdef ETHER_DEBUG
-    utils::format("OpenTimer()\n");
+    utils::format("open_timer()\n");
 #endif
-    OpenTimer();
+    open_timer();
     while(g_ether_TransferEnableFlag != ETHER_FLAG_ON) {
         R_ETHER_LinkProcess();
     }
@@ -222,7 +222,7 @@ int EthernetClass::begin(const uint8_t *mac){
 #ifdef ETHER_DEBUG
     utils::format("fail...\n");
 #endif
-        CloseTimer();                           /* 150518 review */
+        close_timer();                           /* 150518 review */
         return 0;                               /* 0 on failure */
     }
     else{
@@ -232,9 +232,9 @@ int EthernetClass::begin(const uint8_t *mac){
         dhcpSuccess(&tmpDhcp);
     }
 #ifdef ETHER_DEBUG
-    utils::format("CloseTimer()\n");
+    utils::format("close_timer()\n");
 #endif
-    CloseTimer();
+    close_timer();
     initialize_TCP_IP();
     clr_tcp_acp_cep_call_flg();                         /* 20150609 tue */
     return 1;                                    /* returns an int: 1 on a successful DHCP connection */
