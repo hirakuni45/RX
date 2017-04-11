@@ -23,11 +23,8 @@ static byteq_hdl_t hdl,hdl_forSize;
 static uint8_t byteq_buf_forSize[RING_SIZ_forSize]={0};    /*sizeQueBody 1024>>2=256*/
 
 
-/// #define ETHER_DEBUG
+#define ETHER_DEBUG
 
-extern "C" {
-	void sci_puts(const char*);
-};
 
 /***********************************************************************************************************************
 * Function Name: main
@@ -35,19 +32,18 @@ extern "C" {
 * Arguments    : none
 * Return Value : none
 ***********************************************************************************************************************/
-void EthernetClass::maininit(void){
+void EthernetClass::maininit(void)
+{
     byteq_err_t byteq_err;
     /* Open and initialize a byte queue with a size of BUFSIZE bytes. */
-#if defined(T4_ETHER_DEBUG) || defined(T4_UT_TEST) || defined(T4_IT_TEST)
-    setup_print();
-    setup_terminal_wait();
-#endif
     byteq_err = R_BYTEQ_Open(byteq_buf, RING_SIZ, &hdl);                                /*udp data*/
-    if (BYTEQ_SUCCESS != byteq_err){
+    if (BYTEQ_SUCCESS != byteq_err) {
+		utils::format("mainint: step 0 halt...");
         while(1);
     }
     byteq_err = R_BYTEQ_Open(byteq_buf_forSize, RING_SIZ_forSize, &hdl_forSize);        /*size memory only*/
-    if (BYTEQ_SUCCESS != byteq_err){
+    if (BYTEQ_SUCCESS != byteq_err) {
+		utils::format("mainint: step 1 halt...");
         while(1);
     }
 }
@@ -211,20 +207,20 @@ int EthernetClass::begin(const uint8_t *mac){
 #endif
     memcpy(_myethaddr, mac, EP_ALEN);           /*use from the beginning only 6byte*/
     startLANController();
-#ifdef T4_ETHER_DEBUG
-    Serial.println("OpenTimer()");
+#ifdef ETHER_DEBUG
+    utils::format("OpenTimer()\n");
 #endif
     OpenTimer();
     while(g_ether_TransferEnableFlag != ETHER_FLAG_ON) {
         R_ETHER_LinkProcess();
     }
 
-#ifdef T4_ETHER_DEBUG
-    Serial.print("r_dhcp_open:");
+#ifdef ETHER_DEBUG
+    utils::format("r_dhcp_open:\n");
 #endif
     if(r_dhcp_open(&tmpDhcp, (uint8_t *)tcpudp_work, mac) == -1){
-#ifdef T4_ETHER_DEBUG
-    Serial.println("fail");
+#ifdef ETHER_DEBUG
+    utils::format("fail...\n");
 #endif
         CloseTimer();                           /* 150518 review */
         return 0;                               /* 0 on failure */
@@ -235,8 +231,8 @@ int EthernetClass::begin(const uint8_t *mac){
 #endif
         dhcpSuccess(&tmpDhcp);
     }
-#ifdef T4_ETHER_DEBUG
-    Serial.println("CloseTimer()");
+#ifdef ETHER_DEBUG
+    utils::format("CloseTimer()\n");
 #endif
     CloseTimer();
     initialize_TCP_IP();
