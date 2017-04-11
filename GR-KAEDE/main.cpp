@@ -16,14 +16,15 @@
 #include "common/spi_io.hpp"
 #include "common/sdc_io.hpp"
 
-/// #include "seeda.hpp"
-
 #include <string>
 
 #include <cstdlib>
-// #include "GR/core/Ethernet.h"
 
-// #define SERVER_TASK
+#define SERVER_TASK
+
+#ifdef SERVER_TASK
+#include "GR/core/Ethernet.h"
+#endif
 
 namespace {
 
@@ -373,14 +374,12 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
-		uint8_t int_level = 0;
-///		cmt_.start(1000, int_level);
-		cmt_.start(100, int_level);
+		uint8_t int_level = 2;
+		cmt_.start(1000, int_level);
 	}
 
 	{  // SCI 設定
-///		uint8_t int_level = 2;
-		uint8_t int_level = 0;
+		uint8_t int_level = 1;
 		sci_.start(115200, int_level);
 	}
 
@@ -442,8 +441,8 @@ int main(int argc, char** argv)
 	uint32_t cnt = 0;
 
 	while(1) {
-		cmt_.sync();
-///		sync_100hz();
+		sync_100hz();
+
 #ifdef SERVER_TASK
 		Ethernet.mainloop();
 #endif

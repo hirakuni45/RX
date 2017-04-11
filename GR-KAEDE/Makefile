@@ -14,18 +14,16 @@ BUILD		=	release
 
 VPATH		=	../
 
-ASOURCES	=	common/start.s
-
-#				GR/core/driver/cksum_rx_little.s
+ASOURCES	=	common/start.s \
+				GR/core/driver/cksum_rx_little.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
-				common/time.c
-
-#				GR/core/r_byteq_v1.30/r_byteq.c \
+				common/time.c \
+				GR/core/r_byteq_v1.30/r_byteq.c \
 				GR/core/driver/t4_driver.c \
 				GR/core/driver/timer.c \
 				GR/core/T4_src/config_tcpudp.c \
@@ -39,17 +37,17 @@ CSOURCES	=	common/init.c \
 				GR/core/driver/phy.c \
 				GR/core/driver/r_ether.c
 
-PSOURCES	=	main.cpp
-
-#				GR/core/IPAddress.cpp \
-#				GR/core/Ethernet.cpp
+PSOURCES	=	main.cpp \
+				GR/core/IPAddress.cpp \
+				GR/core/Ethernet.cpp
 
 USER_LIBS	=	stdc++
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX64M F_PCKA=96000000 F_PCKB=48000000 FAT_FS FAT_FS_NUM=16 \
-				GRKAEDE GRSAKURA ARDUINO=144 CPPAPP __RX_LITTLE_ENDIAN__=1 __T4__ __RX
+USER_DEFS	=	SIG_RX64M F_ICK=96000000 F_PCKA=96000000 F_PCKB=48000000 \
+				FAT_FS FAT_FS_NUM=16 \
+				GRKAEDE GRSAKURA CPPAPP __RX_LITTLE_ENDIAN__=1 __T4__ __RX
 
 MCU_TARGET	=
 
@@ -57,7 +55,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX64M ../GR
 
-OPTIMIZE	=	-O1
+OPTIMIZE	=	-Os
 
 AS_OPT		=	-mcpu=rx600
 
