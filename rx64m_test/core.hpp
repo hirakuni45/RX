@@ -71,9 +71,6 @@ namespace seeda {
 		typedef device::sci_io<device::SCI5, BUFFER, BUFFER> SCI;
 		SCI		sci_;
 
-		typedef device::PORT<device::PORT6, device::bitpos::B7> SW1;
-		typedef device::PORT<device::PORT6, device::bitpos::B6> SW2;
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -81,18 +78,6 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		core() { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  設定スイッチの状態を取得
-			@return 設定スイッチの状態
-		*/
-		//-----------------------------------------------------------------//
-		uint8_t get_switch()
-		{
-			return static_cast<uint8_t>(!SW1::P()) | (static_cast<uint8_t>(!SW2::P()) << 1);
-		}
 
 
 		//-----------------------------------------------------------------//

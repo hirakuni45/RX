@@ -29,13 +29,15 @@ namespace seeda {
 
 		EthernetServer server_;
 
+		uint32_t	count_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		net() : server_(80) { }
+		net() : server_(80), count_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -85,7 +87,6 @@ namespace seeda {
 		void title()
 		{
 		}
-
 
 #if 0
 		void telnet_service()
@@ -137,18 +138,25 @@ namespace seeda {
 							client.println("<!DOCTYPE HTML>");
 							client.println("<html>");
 							client.println("<font size=\"5\">");
+							{  // コネクション回数表示
+								++count_;
+								char tmp[128];
+								utils::format("Conection: %d", tmp, sizeof(tmp)) % count_;
+								client.print(tmp);
+								client.println("<br/ >");
+							}
 							{  // 時間表示
-//								char tmp[128];
-//								time_t t = get_time();
-//								disp_time_(t, tmp, sizeof(tmp));
-//								client.print(tmp);
-//								client.println("<br/ >");
+								char tmp[128];
+								time_t t = get_time();
+								disp_time(t, tmp, sizeof(tmp));
+								client.print(tmp);
+								client.println("<br/ >");
 							}
 							// アナログ入力の表示
-							for (int ach = 0; ach < 4; ++ach) {
+							for (int ch = 0; ch < 8; ++ch) {
 								char tmp[128];
-								int v = rand() & (4096 - 1);
-								utils::format("analog input(%d): %d", tmp, sizeof(tmp)) % ach % v;
+								int v = get_analog(ch);
+								utils::format("Analog Chanel %d: %d", tmp, sizeof(tmp)) % ch % v;
 								client.print(tmp);
 								client.println("<br/ >");
 							}

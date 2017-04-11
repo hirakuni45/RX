@@ -43,9 +43,6 @@ namespace seeda {
 
 		CMD		cmd_;
 
-		typedef utils::rtc_io RTC;
-		RTC		rtc_;
-
 		// Soft SDC 用　SPI 定義（SPI）
 		typedef device::PORT<device::PORTD, device::bitpos::B6> MISO;
 		typedef device::PORT<device::PORTD, device::bitpos::B4> MOSI;
@@ -210,9 +207,7 @@ namespace seeda {
 			}
 
 			time_t tt = mktime(m);
-			if(!rtc_.set_time(tt)) {
-				utils::format("Stall RTC write...\n");
-			}
+			set_time(tt);
 		}
 
 
@@ -229,16 +224,16 @@ namespace seeda {
 		{
 			bool f = false;
 			if(cmdn == 1) {
-				if(eadc_.convert()) {
-					for(int i = 0; i < 8; ++i) {
-						uint32_t v = eadc_.get_data(i);
-						float fv = eadc_.get_voltage(i);
-						utils::format("LTC2348-16(%d): CHID: %d, SPAN: %03b, %6.3f [V] (%d)\n")
-							% i % ((v >> 3) & 7) % (v & 7) % fv % (v >> 8);
-					}
-				} else {
-					utils::format("LTC2348-16 convert error\n");
+///				if(eadc_.convert()) {
+				for(int i = 0; i < 8; ++i) {
+					uint32_t v = eadc_.get_data(i);
+					float fv = eadc_.get_voltage(i);
+					utils::format("LTC2348-16(%d): CHID: %d, SPAN: %03b, %6.3f [V] (%d)\n")
+						% i % ((v >> 3) & 7) % (v & 7) % fv % (v >> 8);
 				}
+///				} else {
+///					utils::format("LTC2348-16 convert error\n");
+///				}
 				return true;
 			} else if(cmdn > 1) {
 				char tmp[16];
@@ -368,49 +363,11 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  時間の取得
-			@return 時間
-		*/
-		//-----------------------------------------------------------------//
-		time_t get_time() const {
-			time_t t = 0;
-			rtc_.get_time(t);
-			return t;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  時間の表示
-			@param[in]	t		時間
-			@param[in]	dst		出力文字列
-			@param[in]	size	文字列の大きさ
-		*/
-		//-----------------------------------------------------------------//
-		void disp_time(time_t t, char* dst = nullptr, uint32_t size = 0)
-		{
-			struct tm *m = localtime(&t);
-			utils::format("%s %s %d %02d:%02d:%02d  %4d\n", dst, size)
-				% get_wday(m->tm_wday)
-				% get_mon(m->tm_mon)
-				% static_cast<uint32_t>(m->tm_mday)
-				% static_cast<uint32_t>(m->tm_hour)
-				% static_cast<uint32_t>(m->tm_min)
-				% static_cast<uint32_t>(m->tm_sec)
-				% static_cast<uint32_t>(m->tm_year + 1900);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  初期化
 		*/
 		//-----------------------------------------------------------------//
 		void init()
 		{
-			// RTC 設定
-			rtc_.start();
-
 			// SD カード・クラスの初期化
 			sdc_.start();
 
@@ -459,11 +416,29 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  A/D 変換値の取得
+			@param[in]	ch	チャネル（０～７）
+			@return A/D 変換値
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_analog(uint8_t ch) const
+		{
+			if(ch >= 8) {
+				return 0;
+			}
+			return eadc_.get_value(ch);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  サービス
 		*/
 		//-----------------------------------------------------------------//
 		void service()
 		{
+			eadc_.convert();
+
 			sdc_.service();
 
 			// コマンド入力と、コマンド解析
