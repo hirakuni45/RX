@@ -413,7 +413,7 @@ static void polling_link_status(void)
 
 	if (!(_1s_timer++ % 100))
 	{
-		link_stat = Phy_GetLinkStatus();
+		link_stat = phy_get_link_status();
 		if (pre_link_stat != link_stat)
 		{
 			if (link_stat == R_PHY_OK)

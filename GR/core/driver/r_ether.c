@@ -36,6 +36,7 @@
 /***********************************************************************************************************************
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
+#include <stdio.h>
 #include <stddef.h>
 #if defined(__GNUC__) || defined(GRSAKURA)
 #include "../T4_src/t4define.h"
@@ -52,11 +53,6 @@ void lan_inthdr(void);
 #endif
 
 #define ETHC_DEBUG
-
-#ifdef ETHC_DEBUG
-void sci_puts(const char*);
-#endif
-
 
 /***********************************************************************************************************************
 Macro definitions
@@ -222,10 +218,10 @@ int32_t R_ETHER_Open_ZC2(const uint8_t *mac_addr)
     _R_Ether_ResetMAC();
 
     /* Software reset the PHY */
-    phy_ret = Phy_Init();
+    phy_ret = phy_init();
     if (R_PHY_OK == phy_ret)
     {
-        Phy_Start_Autonegotiate();
+        phy_start_autonegotiate();
 
         /* Clear all ETHERC status BFR, PSRTO, LCHNG, MPD, ICD */
         ETHERC0.ECSR.LONG = 0x00000037;
@@ -497,7 +493,7 @@ int32_t R_Ether_CheckLink_ZC(void)
 {
     int16_t status;
 
-    status = Phy_GetLinkStatus();
+    status = phy_get_link_status();
 
     if (R_PHY_ERROR == status)
     {
@@ -551,6 +547,7 @@ void R_ETHER_LinkProcess(void)
         }
         else
         {
+			printf("+");
             /* no proccess */
         }
     }
@@ -575,11 +572,13 @@ void R_ETHER_LinkProcess(void)
         }
         else
         {
+			printf(".");
             /* no proccess */
         }
     }
     else
     {
+//		printf("-");
         /* no proccess */
     }
 } /* End of function R_ETHER_LinkProcess() */
@@ -701,6 +700,7 @@ static void _R_Ether_ResetMAC(void)
      */
     for (i = 0; i < 0x00000100; i++)
     {
+		asm("nop");
     }
 } /* End of function _R_Ether_ResetMAC() */
 
@@ -928,7 +928,7 @@ static int32_t ether_do_link(const uint8_t mode)
     uint16_t link_result        = 0;
 
     /* Set the link status */
-    link_result = Phy_Set_Autonegotiate(&link_speed_duplex, &local_pause_bits, &partner_pause_bits);
+    link_result = phy_set_autonegotiate(&link_speed_duplex, &local_pause_bits, &partner_pause_bits);
     if (R_PHY_OK == link_result)
     {
         switch (link_speed_duplex)
@@ -939,7 +939,7 @@ static int32_t ether_do_link(const uint8_t mode)
                 ETHERC0.ECMR.BIT.RTM = 1;
                 ret = R_ETHER_OK;
 #ifdef ETHC_DEBUG
-				sci_puts("PHY Half duplex 100M\n");
+				printf("PHY Half duplex 100M\n");
 #endif
                 break;
 
@@ -948,7 +948,7 @@ static int32_t ether_do_link(const uint8_t mode)
                 ETHERC0.ECMR.BIT.RTM = 0;
                 ret = R_ETHER_OK;
 #ifdef ETHC_DEBUG
-				sci_puts("PHY Half duplex 10M\n");
+				printf("PHY Half duplex 10M\n");
 #endif
                 break;
 
@@ -959,7 +959,7 @@ static int32_t ether_do_link(const uint8_t mode)
                 full_duplex = 1;
                 ret = R_ETHER_OK;
 #ifdef ETHC_DEBUG
-				sci_puts("PHY Full duplex 100M\n");
+				printf("PHY Full duplex 100M\n");
 #endif
                 break;
 
@@ -969,7 +969,7 @@ static int32_t ether_do_link(const uint8_t mode)
                 full_duplex = 1;
                 ret = R_ETHER_OK;
 #ifdef ETHC_DEBUG
-				sci_puts("PHY Full duplex 10M\n");
+				printf("PHY Full duplex 10M\n");
 #endif
                 break;
 
