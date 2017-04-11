@@ -8,6 +8,8 @@
 //=====================================================================//
 #include "main.hpp"
 #include <string>
+#include <set>
+#include <cstdlib>
 #include "common/renesas.hpp"
 
 #include "common/rspi_io.hpp"
@@ -27,6 +29,17 @@ namespace seeda {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class tools {
+
+		class cmt1_task {
+
+		public:
+			cmt1_task() { }
+
+			void operator() () {
+			}
+		};
+		typedef device::cmt_io<device::CMT1, cmt1_task> CMT1;
+		CMT1	cmt1_;
 
 		CMD		cmd_;
 
@@ -62,14 +75,6 @@ namespace seeda {
 		typedef struct chip::LTC2348_SDO_t<LTC_SCKO, LTC_SDO0, LTC_SDO2, LTC_SDO4, LTC_SDO6> LTC_SDO;
 		typedef chip::LTC2348_16<LTC_CSN, LTC_CNV, LTC_BUSY, LTC_PD, LTC_SDI, LTC_SCKI, LTC_SDO> EADC;
 		EADC	eadc_;
-
-		class null_task {
-		public:
-			void operator() () { }
-		};
-		typedef device::cmt_io<device::CMT1, null_task> CMT1;
-		CMT1	cmt1_;
-
 
 		void adc_capture_(int ch, int rate, int num, const char* fname)
 		{
@@ -412,7 +417,7 @@ namespace seeda {
 			{  // LTC2348ILX-16 初期化
 				// 内臓リファレンスと内臓バッファ
 				// VREFIN: 2.024V、VREFBUF: 4.096V、Analog range: 0V to 5.12V
-				if(!eadc_.start(1000000, EADC::span_type::P5_12)) {
+				if(!eadc_.start(2000000, EADC::span_type::P5_12)) {
 					utils::format("LTC2348_16 not found...\n");
 				}
 			}
@@ -439,6 +444,16 @@ namespace seeda {
 				time_t t = get_time();
 				disp_time(t);
 			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  データ列の評価
+		*/
+		//-----------------------------------------------------------------//
+		void analize()
+		{
 		}
 
 
@@ -491,8 +506,8 @@ namespace seeda {
 							set_time_date_();
 						}
 						f = true;
-///					} else if(cmd_.cmp_word(0, "reset")) {
-///						f = reset_signal_(cmdn);
+//					} else if(cmd_.cmp_word(0, "reset")) {
+//						f = reset_signal_(cmdn);
 					} else if(cmd_.cmp_word(0, "eadc")) {
 						f = eadc_conv_(cmdn);
 					} else if(cmd_.cmp_word(0, "span")) {

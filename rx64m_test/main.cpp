@@ -20,9 +20,6 @@ namespace seeda {
 
 extern "C" {
 
-	extern void INT_Excep_ICU_GROUPAL1(void);
-	extern void INT_Excep_CMT1_CMI1(void);
-
 	void sci_putch(char ch)
 	{
 		seeda::core_.sci_.putch(ch);
@@ -84,6 +81,10 @@ extern "C" {
 		seeda::core_.cmt0_.at_task().set_delay(ms);
 		while(seeda::core_.cmt0_.at_task().get_delay() != 0) ;		
 	}
+
+	void set_task_10ms(void (*task)(void)) {
+		seeda::core_.cmt0_.at_task().set_task_10ms(task);
+	}
 }
 
 int main(int argc, char** argv);
@@ -122,11 +123,14 @@ int main(int argc, char** argv)
 
 	core_.init();
 	tools_.init();
-	net_.init();
 
 	core_.title();
 	tools_.title();
-	net_.title();
+
+	if(core_.get_switch() == 3) {  // Ethernet 起動
+		net_.init();
+		net_.title();
+	}
 
 	device::PORT4::PDR.B7 = 1; // output
 
@@ -136,7 +140,10 @@ int main(int argc, char** argv)
 
 		core_.service();
 		tools_.service();
-		net_.service();
+
+		if(core_.get_switch() == 3) {  // Ethernet サービス
+			net_.service();
+		}
 
 		++cnt;
 		if(cnt >= 30) {

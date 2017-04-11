@@ -27,7 +27,6 @@ CSOURCES	=	common/init.c \
 				common/time.c \
 				GR/core/r_byteq_v1.30/r_byteq.c \
 				GR/core/driver/t4_driver.c \
-				GR/core/driver/timer.c \
 				GR/core/T4_src/config_tcpudp.c \
 				GR/core/T4_src/ether.c \
 				GR/core/T4_src/ip.c \
@@ -49,7 +48,8 @@ LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
 USER_DEFS	=	SIG_RX64M F_ICK=100000000 F_PCKA=100000000 F_PCKB=50000000 \
 				B_ID=$(BUILD_ID) \
-				FAT_FS FAT_FS_NUM=16 \
+				FAT_FS FAT_FS_NUM=3 \
+				TI_DP83822 \
 				GRKAEDE GRSAKURA CPPAPP __RX_LITTLE_ENDIAN__=1 __T4__ __RX
 
 MCU_TARGET	=
@@ -71,6 +71,7 @@ CP_OPT		=	-Wall -Werror \
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
+				-Wno-unused-function \
 				-mcpu=rx600 \
 				-fno-exceptions \
 				-mlittle-endian-data

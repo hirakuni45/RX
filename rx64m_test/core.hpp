@@ -25,24 +25,32 @@ namespace seeda {
 		static const uint32_t build_id_ = B_ID;
 
 		class cmt_task {
+			void (*task_10ms_)();
+
 			volatile unsigned long millis_;
 			volatile unsigned long delay_;
 			volatile uint32_t millis10x_;
 			volatile uint32_t cmtdiv_;
 
 		public:
-			cmt_task() : millis_(0), delay_(0), millis10x_(0), cmtdiv_(0) { }
+			cmt_task() : task_10ms_(nullptr),
+				millis_(0), delay_(0), millis10x_(0), cmtdiv_(0) { }
 
 			void operator() () {
 				++millis_;
 				++cmtdiv_;
 				if(cmtdiv_ >= 10) {
+					if(task_10ms_ != nullptr) (*task_10ms_)();
 					cmtdiv_ = 0;
 					++millis10x_;
 				}
 				if(delay_) {
 					--delay_;
 				}
+			}
+
+			void set_task_10ms(void (*task)(void)) {
+				task_10ms_ = task;
 			}
 
 			void sync_100hz()
@@ -66,11 +74,6 @@ namespace seeda {
 		typedef device::PORT<device::PORT6, device::bitpos::B7> SW1;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> SW2;
 
-		uint8_t get_switch_()
-		{
-			return static_cast<uint8_t>(!SW1::P()) | (static_cast<uint8_t>(!SW2::P()) << 1);
-		}
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -78,6 +81,18 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		core() { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  設定スイッチの状態を取得
+			@return 設定スイッチの状態
+		*/
+		//-----------------------------------------------------------------//
+		uint8_t get_switch()
+		{
+			return static_cast<uint8_t>(!SW1::P()) | (static_cast<uint8_t>(!SW2::P()) << 1);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -120,7 +135,7 @@ namespace seeda {
 			utils::format("Endian: %3b (%s)") % static_cast<uint32_t>(mde) % (mde == 0b111 ? "Little" : "Big");
 			utils::format(", PCKA: %u [Hz]") % static_cast<uint32_t>(F_PCKA);
 			utils::format(", PCKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCKB);
-			utils::format("DIP-Switch: %d\n") % static_cast<int>(get_switch_());
+			utils::format("DIP-Switch: %d\n") % static_cast<int>(get_switch());
 		}
 
 
