@@ -49,6 +49,12 @@ Macro definitions
 #define PHY_REG_AN_LINK_PARTNER         (5)
 #define PHY_REG_AN_EXPANSION            (6)
 
+#ifdef TI_DP83822
+#define PHY_REG_DP83822_REGCR     (0x0D)
+#define PHY_REG_DP83822_ADDAR     (0x0E)
+#define PHY_REG_DP83822_RCSR      (0x17)
+#endif
+
 /* Vendor Specific PHY Registers */
 #ifdef MICREL_KSZ8041NL
 #define PHY_REG_PHY_CONTROL_1           (0x1E)
@@ -109,6 +115,7 @@ Macro definitions
 
 /*==============================================================================*/
 //  DP83822 Boot Strap:															//
+//..............................................................................//
 //    COL   (#29):  FX_EN:    0, PHY_AD0:   1									//
 //    RX_D0 (#30):  AN_1:     1, PHY_AD1:   0									//
 //    RX_D1 (#31):  EEE_EN:   0, PHY_AD2:   0									//
@@ -346,10 +353,8 @@ static void phy_preamble_(void)
 	}
 }
 
-static uint16_t phy_read_(uint16_t reg_addr)
+static uint16_t phy_read_sub_(uint16_t reg_addr)
 {
-    uint16_t data;
-
     /*
      * The value is read from the PHY register by the frame format of MII Management Interface provided 
      * for by Table 22-12 of 22.2.4.5 of IEEE 802.3-2008_section2. 
@@ -357,6 +362,7 @@ static uint16_t phy_read_(uint16_t reg_addr)
     phy_preamble_();
     phy_reg_set_(reg_addr, PHY_MII_READ);
     phy_trans_z_to_0_();
+    uint16_t data;
     phy_reg_read_(&data);
     phy_trans_z_to_0_();
 
@@ -364,7 +370,7 @@ static uint16_t phy_read_(uint16_t reg_addr)
 }
 
 
-static void phy_write_(uint16_t reg_addr, uint16_t data)
+static void phy_write_sub_(uint16_t reg_addr, uint16_t data)
 {
     /*
      * The value is read from the PHY register by the frame format of MII Management Interface provided
@@ -378,25 +384,40 @@ static void phy_write_(uint16_t reg_addr, uint16_t data)
 }
 
 
-#ifdef TI_DP83822
-static uint16_t phy_read_ext_(uint16_t adr)
+static uint16_t phy_read_(uint16_t reg_addr)
 {
-	phy_write_(0x000D, 0x001F);  // address command
-	phy_write_(0x000E, adr);
-	phy_write_(0x000D, 0x401F);  // read command
-	uint16_t val;
-	val = phy_read_(0x000E);
-	return val;
+	if(reg_addr > 0x1f) {
+#ifdef TI_DP83822
+		phy_write_sub_(PHY_REG_DP83822_REGCR, 0x001F);  // address command
+		phy_write_sub_(PHY_REG_DP83822_ADDAR, reg_addr);
+		phy_write_sub_(PHY_REG_DP83822_REGCR, 0x401F);  // read/write command
+		return phy_read_sub_(PHY_REG_DP83822_ADDAR);
+#else
+		printf("PHY Address Range Error: %04X\n", reg_addr);
+		return 0;
+#endif
+	} else {
+		return phy_read_sub_(reg_addr);
+	}
 }
 
-static void phy_write_ext_(uint16_t adr, uint16_t data)
+
+static void phy_write_(uint16_t reg_addr, uint16_t data)
 {
-	phy_write_(0x000D, 0x001F);  // address command
-	phy_write_(0x000E, adr);
-	phy_write_(0x000D, 0x401F);  // write command
-	phy_write_(0x000E, data);
-}
+	if(reg_addr > 0x1f) {
+#ifdef TI_DP83822
+		phy_write_sub_(PHY_REG_DP83822_REGCR, 0x001F);  // address command
+		phy_write_sub_(PHY_REG_DP83822_ADDAR, reg_addr);
+		phy_write_sub_(PHY_REG_DP83822_REGCR, 0x401F);  // read/write command
+		phy_write_sub_(PHY_REG_DP83822_ADDAR, data);
+#else
+		printf("PHY Address Range Error: %04X\n", reg_addr);
+		return 0;
 #endif
+	} else {
+		return phy_write_sub_(reg_addr, data);
+	}
+}
 
 
 /***********************************************************************************************************************
@@ -469,22 +490,22 @@ int16_t phy_init(void)
 
 #ifdef TI_DP83822
 #ifdef PHY_DEBUG
-    reg = phy_read_ext_(0x0467);
+    reg = phy_read_(0x0467);
 	printf("DP83822 Boot Strap Latch #1(SOR1): 0x%04X\n", (int)reg);
-    reg = phy_read_ext_(0x0468);
+    reg = phy_read_(0x0468);
 	printf("DP83822 Boot Strap Latch #2(SOR2): 0x%04X\n", (int)reg);
 #endif
-	phy_write_(0x0000, 0b0011000100000000);
-	phy_write_(0x0004, 0b0000000111100001);
-//	phy_write_(0x0009, 0b0000000000000000);
-
+///	phy_write_(0x0000, 0b0011000100000000);
+///	phy_write_(0x0004, 0b0000000111100001);
 //	reg = read_ext_(0x000A);
 //	printf("DP83822 0x000A: 0x%04X\n", (int)reg);
 
-	phy_write_(0x0017, 0b0000000001100001);
 	phy_write_(0x0018, 0b0000010001000000);
 	phy_write_(0x0019, 0b0000000000100001);
-	phy_write_ext_(0x0462, 0b0100001100000000);
+///	phy_write_(0x0462, 0b0100001100000000);
+	phy_write_(0x0462, 0b0100001100000000);
+
+	phy_write_(PHY_REG_DP83822_RCSR, 0b0000000001100001);
 
 #endif
 #ifdef PHY_DEBUG

@@ -53,6 +53,7 @@ void lan_inthdr(void);
 #endif
 
 #define ETHC_DEBUG
+/// #define LINK_DEBUG
 
 /***********************************************************************************************************************
 Macro definitions
@@ -183,6 +184,9 @@ static descriptor_s    tx_descriptors[EMAC_NUM_TX_DESCRIPTORS];
 static etherbuffer_s   ether_buffers;
 #pragma section
 #endif
+
+static uint16_t link_proc_count_;
+static int link_proc_loop_;
 
 /**
  * Renesas Ethernet API functions
@@ -547,7 +551,7 @@ void R_ETHER_LinkProcess(void)
         }
         else
         {
-			printf("+");
+///			printf("+");
             /* no proccess */
         }
     }
@@ -572,13 +576,20 @@ void R_ETHER_LinkProcess(void)
         }
         else
         {
-			printf(".");
+///			printf(".");
             /* no proccess */
         }
     }
     else
     {
-//		printf("-");
+#ifdef LINK_DEBUG
+		link_proc_count_++;
+		if(link_proc_count_ >= 100000) {
+			printf("Link no proccess (%d)\n", link_proc_loop_);
+			link_proc_loop_++;
+			link_proc_count_ = 0;
+		}
+#endif
         /* no proccess */
     }
 } /* End of function R_ETHER_LinkProcess() */
