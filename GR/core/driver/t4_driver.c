@@ -1,92 +1,26 @@
-/*******************************************************************************
-* DISCLAIMER
-* This software is supplied by Renesas Electronics Corporation and is only
-* intended for use with Renesas products. No other uses are authorized. This
-* software is owned by Renesas Electronics Corporation and is protected under
-* all applicable laws, including copyright laws.
-* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
-* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
-* LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
-* AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
-* TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
-* ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
-* FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
-* ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
-* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-* Renesas reserves the right, without notice, to make changes to this software
-* and to discontinue the availability of this software. By using this software,
-* you agree to the additional terms and conditions found by accessing the
-* following link:
-* http://www.renesas.com/disclaimer
-*
-* Copyright (C) 2011 Renesas Electronics Corporation. All rights reserved.
-*******************************************************************************/
-
-/*******************************************************************************
-* File Name     : t4_driver.c
-* Version       : 1.03
-* Device(s)     : RX62N,RX63N
-* Tool-Chain    : C/C++ Compiler Package for RX Family
-* H/W Platform  : Renesas Starter Kit+ for RX62N (Renesas)
-*               : Renesas Starter Kit+ for RX63N (Renesas)
-* Description   : T4 ethernet driver interface program.
-******************************************************************************/
-/******************************************************************************
-* History       : DD.MM.YYYY Version Description
-*               : 15.01.2011 1.00   First Release.
-*               : 31.08.2011 1.01	Cleanup source code.
-*               : 06.11.2012 1.02	Added RX63N support.
-*               : 02.19.2014 1.03	Support M3S-T4-Tiny V.2.00.
-*               : 03.03.2014 1.03-a	Customized for system that has no ET_LINKSTA pin using
-******************************************************************************/
-
-/******************************************************************************
-Includes <System Includes> , "Project Includes"
-******************************************************************************/
-#if defined(__GNUC__) || defined(GRSAKURA)
-#include "../T4_src/t4define.h"
-#else
-#include <machine.h>
-#endif
-#include "../T4_src/r_t4_itcpip.h"
+//=====================================================================//
+/*!	@file
+	@brief	ドライバー @n
+			Copyright 2017 Kunihito Hiramatsu
+	@author	平松邦仁 (hira@rvf-rc45.net)
+*/
+//=====================================================================//
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include "../T4_src/t4define.h"
+#include "../T4_src/r_t4_itcpip.h"
 #include "rx64m/iodefine.h"
 #include "r_ether.h"
 #include "phy.h"
-#include "timer.h"
-#if !defined(__GNUC__) && !defined(GRSAKURA)
-#include "r_t4_http_server_rx_if.h"
-#endif
+// #include "timer.h"
 
-extern void sci_puts(const char*);
-
-/******************************************************************************
-Macro definitions
-******************************************************************************/
-
-/******************************************************************************
-Exported global variables and functions (to be accessed by other files)
-******************************************************************************/
-void timer_interrupt(void);
-
-// void wait_Xms(UH limit_time);
-// void reset_timer(void);
-// UH get_timer(void);
-
-/******************************************************************************
-Imported global variables and functions (from other files)
-******************************************************************************/
 extern UB _myethaddr[6];
-#if !defined(__GNUC__) && !defined(GRSAKURA)
-extern SYS_TIME sys_time;
-#endif
 
 #if defined (_T4_TEST)
 extern H lan_read_for_test(UB lan_port_no, B **buf, H return_code);
 #endif
-#if !defined(__GNUC__) && !defined(GRSAKURA)
-extern void	update_sys_time(void *pdata);
-#endif
+
 
 /******************************************************************************
 Private global variables and functions
@@ -97,7 +31,70 @@ volatile UH wait_timer_;
 T4_STATISTICS t4_stat;
 UB *err_buf_ptr;
 
-static void polling_link_status(void);
+
+/******************************************************************************
+Functions (for system that has no ET_LINKSTA pin using)
+******************************************************************************/
+static void polling_link_status_(void)
+{
+	static uint16_t _1s_timer;
+	static int16_t pre_link_stat = R_PHY_ERROR;
+	int16_t link_stat;
+
+	if (!(_1s_timer++ % 100))
+	{
+		link_stat = phy_get_link_status();
+		if (pre_link_stat != link_stat)
+		{
+			if (link_stat == R_PHY_OK)
+			{
+				g_ether_LchngFlag = ETHER_FLAG_ON_LINK_ON;
+			}
+			else
+			{
+				g_ether_LchngFlag = ETHER_FLAG_ON_LINK_OFF;
+			}
+		}
+		pre_link_stat = link_stat;
+	}
+}
+
+
+/******************************************************************************
+Functions (Interrput handler)
+******************************************************************************/
+///void __attribute__((interrupt)) INT_Excep_CMT1_CMI1(void)
+static void service_10ms_(void)
+{
+	if (tcpip_flag == 1)
+	{
+		_process_tcpip();
+		tcpudp_time_cnt++;
+	}
+
+	/* for wait function */
+	if (wait_timer_ < 0xffff)
+	{
+		wait_timer_++;
+	}
+
+	/* polling PHY chip to check LINK status @ per 1sec */
+	polling_link_status_();
+}
+
+extern void set_task_10ms(void (*task)(void));
+
+
+void open_timer(void)
+{
+	set_task_10ms(service_10ms_);
+}
+
+
+void close_timer(void)
+{
+	set_task_10ms(NULL);
+} 
 
 /******************************************************************************
 Functions (API)
@@ -154,11 +151,11 @@ void tcpudp_act_cyc(UB cycact)
 	{
 		case 0:
 			tcpip_flag = 0;
-			CloseTimer();
+			close_timer();
 			break;
 		case 1:
 			tcpip_flag = 1;
-			OpenTimer();
+			open_timer();
 			break;
 		default:
 			break;
@@ -327,44 +324,6 @@ void report_error(UB lan_port_no, H err_code, UB *err_data)
 }
 
 
-/******************************************************************************
-Functions (Interrput handler)
-******************************************************************************/
-
-#if defined(__GNUC__) || defined(GRSAKURA)
-void __attribute__((interrupt)) INT_Excep_CMT1_CMI1(void);
-void INT_Excep_CMT1_CMI1(void)
-#else
-#pragma interrupt ( timer_interrupt( vect = _VECT( _CMT0_CMI0 ) ) )
-void timer_interrupt(void)
-#endif
-{
-#if defined(__GNUC__) || defined(GRSAKURA)
-///    interrupts();
-#else
-    setpsw_i();
-#endif
-	if (tcpip_flag == 1)
-	{
-		_process_tcpip();
-		tcpudp_time_cnt++;
-	}
-
-	/* for wait function */
-	if (wait_timer_ < 0xffff)
-	{
-		wait_timer_++;
-	}
-
-	/* polling PHY chip to check LINK status @ per 1sec */
-	polling_link_status();
-
-	/* for Web server timer */
-#if !defined(__GNUC__) && !defined(GRSAKURA)
-	update_sys_time(NULL);
-#endif
-}
-
 void lan_inthdr(void)	// callback from r_ether.c
 {
 #if defined(__GNUC__) || defined(GRSAKURA)
@@ -402,32 +361,6 @@ UH get_timer(void)
 	return wait_timer_;
 }
 
-/******************************************************************************
-Functions (for system that has no ET_LINKSTA pin using)
-******************************************************************************/
-static void polling_link_status(void)
-{
-	static uint16_t _1s_timer;
-	static int16_t pre_link_stat = R_PHY_ERROR;
-	int16_t link_stat;
-
-	if (!(_1s_timer++ % 100))
-	{
-		link_stat = phy_get_link_status();
-		if (pre_link_stat != link_stat)
-		{
-			if (link_stat == R_PHY_OK)
-			{
-				g_ether_LchngFlag = ETHER_FLAG_ON_LINK_ON;
-			}
-			else
-			{
-				g_ether_LchngFlag = ETHER_FLAG_ON_LINK_OFF;
-			}
-		}
-		pre_link_stat = link_stat;
-	}
-}
 
 
 
