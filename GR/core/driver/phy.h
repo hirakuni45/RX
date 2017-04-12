@@ -55,10 +55,10 @@ void phy_start_autonegotiate(void);
 
 //-----------------------------------------------------------------//
 /*!
-	@brief  PHY 速度調整取得
-	@param[in]	line_speed_duplex	both the line speed and the duplex
-	@param[in]	local_pause			store the local pause bits
-	@param[in]	partner_pause		store the partner pause bits
+	@brief  PHY 自動速度調整結果取得
+	@param[out]	line_speed_duplex	both the line speed and the duplex
+	@param[out]	local_pause			store the local pause bits
+	@param[out]	partner_pause		store the partner pause bits
 	@return		R_PHY_ERROR, R_PHY_OK
 */
 //-----------------------------------------------------------------//

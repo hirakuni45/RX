@@ -1,6 +1,6 @@
 //=====================================================================//
 /*!	@file
-	@brief	ドライバー @n
+	@brief	ドライバー関係 @n
 			Copyright 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
@@ -8,12 +8,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "phy.h"
+#include "r_ether.h"
 #include "../T4_src/t4define.h"
 #include "../T4_src/r_t4_itcpip.h"
-#include "rx64m/iodefine.h"
-#include "r_ether.h"
-#include "phy.h"
-// #include "timer.h"
 
 extern UB _myethaddr[6];
 
@@ -96,10 +94,10 @@ void close_timer(void)
 	set_task_10ms(NULL);
 } 
 
+
 /******************************************************************************
 Functions (API)
 ******************************************************************************/
-
 ER lan_open(void)
 {
 	ER ret;
@@ -226,7 +224,7 @@ H	lan_read(UB lan_port_no, B **buf)
 	return return_code;
 }
 
-H	lan_write(UB lan_port_no, B *header , H header_len, B *data , H data_len)
+H lan_write(UB lan_port_no, B *header , H header_len, B *data , H data_len)
 {
 	int32_t driver_ret;
 	B	*buf;
@@ -326,11 +324,7 @@ void report_error(UB lan_port_no, H err_code, UB *err_data)
 
 void lan_inthdr(void)	// callback from r_ether.c
 {
-#if defined(__GNUC__) || defined(GRSAKURA)
-///    interrupts();
-#else
-	setpsw_i();
-#endif
+///	interrupts();
 	if (tcpip_flag == 1)
 	{
 		_process_tcpip();

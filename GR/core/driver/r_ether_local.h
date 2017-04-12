@@ -29,9 +29,7 @@
 #ifndef R_ETHER_LOCAL_H
 #define R_ETHER_LOCAL_H
 
-#if defined(__GNUC__) || defined(GRSAKURA)
 #include "../T4_src/t4define.h"
-#endif
 
 /***********************************************************************************************************************
 Macro definitions
