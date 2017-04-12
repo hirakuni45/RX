@@ -1,9 +1,9 @@
-#include "T4_src/t4define.h"
 #include <string.h>
 #include <stdio.h>
 
 #include "r_byteq_v1.30/r_byteq_if.h"
 #include "Ethernet.h"
+#include "core/T4_src/tcp_api.h"
 
 #include "common/format.hpp"
 
@@ -59,9 +59,9 @@ void EthernetClass::maininit(void)
 *                   : VP        p_parblk;    Parameter block
 * Return Value      : ER                ;    always 0 (not in use)
 ******************************************************************************/
-extern "C" ER t4_udp_callback(ID cepid, FN fncd , void *p_parblk){
+extern "C" int t4_udp_callback(ID cepid, FN fncd , void *p_parblk) {
     union _recvSiz{
-            ER  dword;          /*typedef int32_t W;typedef W ER*/
+            int  dword;          /*typedef int32_t W;typedef W ER*/
             uint8_t bytes[4];
     } recvSiz;
     union _dhcp_sv_ip{
@@ -490,8 +490,7 @@ Returns:
     this object will evaluate to false in an if-statement (see the example below)
 ******************************************************************************/
 EthernetClient& EthernetServer::available() {
-    ER  ercd;
-
+    int  ercd;
     ercd = tcp_read_stat(ARDUINO_TCP_CEP);      /* 20150609 tue */
 #if defined(T4_ETHER_DEBUG)
         Serial.print("t4:EthernetServer::available():tcp_read_stat()=");
@@ -590,7 +589,7 @@ Returns:
     Returns true if the client is connected, false if not.
 ******************************************************************************/
 int8_t EthernetClient::connected(void){
-    ER  ercd;
+    int  ercd;
     int8_t  res;
 
     ercd = tcp_read_stat(ARDUINO_TCP_CEP);       /* 20150522 fri */
@@ -632,7 +631,7 @@ Returns:
     INVALID_RESPONSE -4
 ******************************************************************************/
 int EthernetClient::connect(IPAddress distip, uint16_t distport){
-    ER  ercd;
+    int  ercd;
     T_IPV4EP    distAdr;
     int         res = false;
 
@@ -676,13 +675,13 @@ int EthernetClient::connect(IPAddress distip, uint16_t distport){
 }
 
 int EthernetClient::connect(const char *host, uint16_t port){
-    ER  ercd;   /* 20150527 */
+    int  ercd;   /* 20150527 */
     int res = false;
 
 #ifdef T4_ETHER_DEBUG
     Serial.println("t4:EthernetClient::connect(name,port)");
 #endif
-    udp_ccep[0].callback = (ER(*)(ID, FN, void *))dns_callback;      /* DNS resolve use */
+    udp_ccep[0].callback = (int (*)(ID, FN, void *))dns_callback;      /* DNS resolve use */
     R_dns_init();
 #ifdef T4_ETHER_DEBUG
     Serial.print("R_dns_resolve_name(");
@@ -795,7 +794,7 @@ Returns:
 ******************************************************************************/
 int EthernetClient::available(void){
     int res = 0;
-    ER  ercd;
+    int  ercd;
 
     if(connected() == true){
         res =  head_tcb[0].rdsize;
@@ -902,7 +901,7 @@ uint8_t EthernetUDP::begin(uint16_t port)
 
     if(port){
         udp_ccep[0].myaddr.portno = port;
-        udp_ccep[0].callback = (ER(*)(ID, FN, void *))t4_udp_callback;
+        udp_ccep[0].callback = (int (*)(ID, FN, void *))t4_udp_callback;
         res = 1;
     }
     else{
@@ -1049,7 +1048,7 @@ Returns:
     Returns an int: 1 if the packet was sent successfully, 0 if there was an error
 ******************************************************************************/
 int EthernetUDP::endPacket(void){
-    ER  ercd;
+    int  ercd;
     int res;
 
     ercd = udp_snd_dat(ARDUINO_UDP_CEP, &sendIPV4EP_, sendBuf_, offset_, TMO_FEVR);       /* 20150522 fri */

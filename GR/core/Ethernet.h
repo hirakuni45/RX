@@ -65,19 +65,7 @@ extern uint8_t     cepid_max;
 extern NAME_TABLE  name_table;
 extern DNS_MNG     dns_mng;
 
-extern "C"{
-    ER tcp_read_stat(ID cepid);
-    ER tcp_force_clr(ID cepid);
-    void ConfigurePortPins(void);
-    void EnablePeripheralModules(void);
-    ER http_callback(ID cepid, FN fncd , void *p_parblk);
-    ER dns_callback(ID cepid, FN fncd , void *p_parblk);
-    ER t4_tcp_callback(ID cepid, FN fncd , void *p_parblk);
-}
-extern "C" ER USB_dataReceive_callback(ID cepid, FN fncd, void *p_parblk);
-extern "C" void queueInit(void);
 void setup_terminal_wait();
-
 
 class EthernetClass;
 class EthernetClient;
@@ -142,7 +130,7 @@ class EthernetClass {
         void dhcpLeaseTimeCopy(DHCP *);
         int32_t dhcp_release(DHCP *dhcp, DHCP_PACKET *dhcp_packet);
         void startLANController(void){
-            ER  ercd;
+            int  ercd;
             ercd = lan_open();
 #ifdef T4_ETHER_DEBUG
             Serial.print("lan_open() = ");
@@ -154,7 +142,7 @@ class EthernetClass {
         }
         void initialize_TCP_IP(void){
             UW          size;
-            ER          ercd;
+            int         ercd;
 
             size = tcpudp_get_ramsize();
 #ifdef T4_ETHER_DEBUG
