@@ -11,10 +11,10 @@
 #include "phy.h"
 #include "r_ether.h"
 
-/// PHY:DP83822 device is active
+/// PHY:DP83822 device is active (for Makefile)
 // #define TI_DP83822
 
-#define PHY_DEBUG
+// #define PHY_DEBUG
 
 /* Media Independent Interface */
 #define PHY_MII_ST                      (1)
@@ -427,7 +427,7 @@ int16_t phy_init(void)
 	uint16_t reg;
 
 #ifdef PHY_DEBUG
-	printf("Start PHY Init: ADR: %d\n", (int)PHY_MII_ADDR);
+	printf("Start PHY init: ADR: %d\n", (int)PHY_MII_ADDR);
     reg = phy_read_(PHY_REG_IDENTIFIER1);
     reg = phy_read_(PHY_REG_IDENTIFIER1);
 	printf("PHY Identifier1: 0x%04X\n", (int)reg);
@@ -447,7 +447,7 @@ int16_t phy_init(void)
         count++;
     } while ( (reg & PHY_CONTROL_RESET) && (count < PHY_DELAY_RESET) );
 #ifdef PHY_DEBUG
-	printf("PHY Init: reset loop: %d/%d\n", (int)count, (int)PHY_DELAY_RESET);
+	printf("PHY init: reset loop: %d/%d\n", (int)count, (int)PHY_DELAY_RESET);
 #endif
 
     if( count < PHY_DELAY_RESET )
@@ -485,7 +485,7 @@ int16_t phy_init(void)
 
 #endif
 #ifdef PHY_DEBUG
-		printf("PHY Init OK...\n");
+		printf("PHY init OK...\n");
 #endif
         return R_PHY_OK;
     }
