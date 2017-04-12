@@ -298,7 +298,7 @@ class EthernetClient : public EthernetServer {
 
       int read(void* buf, size_t size);
 
-      int8_t connected();
+      int connected();
 
       int connect(IPAddress ip, uint16_t port);
 

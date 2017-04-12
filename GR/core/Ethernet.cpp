@@ -129,6 +129,8 @@ extern "C" int t4_udp_callback(ID cepid, FN fncd , void *p_parblk) {
     }
     return 0;
 }
+
+
 /******************************************************************************
 Description:
     DNS resolve use call-back func.
@@ -164,6 +166,7 @@ extern "C" void dnsResolveCallback(int32_t ercd, NAME_TABLE *name_table){
 #endif
     }
 }
+
 
 /******************************************************************************
 Description:
@@ -309,6 +312,7 @@ void EthernetClass::begin(const uint8_t *mac_address, const IPAddress& local_ip,
 #endif
 }
 
+
 /******************************************************************************
 Description:
     Obtains the IP address of the Ethernet shield. Useful when the address is auto assigned through DHCP.
@@ -322,6 +326,7 @@ Returns:
 IPAddress EthernetClass::localIP(void){
     return tcpudp_env.ipaddr;
 }
+
 
 /******************************************************************************
 Description:
@@ -337,6 +342,7 @@ IPAddress EthernetClass::subnetMask(void){
     return tcpudp_env.maskaddr;
 }
 
+
 /******************************************************************************
 Description:
     Obtains the gateway address of the Ethernet shield.
@@ -351,6 +357,7 @@ IPAddress EthernetClass::gatewayIP(void){
     return tcpudp_env.gwaddr;
 }
 
+
 /******************************************************************************
 Description:
     Obtains the dnsServer address of the Ethernet shield.
@@ -364,6 +371,7 @@ Returns:
 IPAddress EthernetClass::dnsServerIP(void){
     return dnsaddr1;
 }
+
 
 /******************************************************************************
 Description:
@@ -404,6 +412,7 @@ int EthernetClass::maintain(void){
     }
     return res;
 }
+
 
 /******************************************************************************
 Description:
@@ -475,6 +484,7 @@ void EthernetServer::begin(uint16_t port)
 #endif
     }
 }
+
 
 /******************************************************************************
 Description:
@@ -548,6 +558,8 @@ size_t EthernetServer::write(const uint8_t *buffer, size_t size){
     return ercd;
 }
 */
+
+
 size_t EthernetServer::write(const void* buffer, size_t size)
 {
 	int32_t ercd;
@@ -577,6 +589,7 @@ size_t EthernetServer::write(const void* buffer, size_t size)
     return current_send_size;
 }
 
+
 /******************************************************************************
 Description:
     Whether or not the client is connected.
@@ -588,7 +601,7 @@ Parameters:
 Returns:
     Returns true if the client is connected, false if not.
 ******************************************************************************/
-int8_t EthernetClient::connected(void){
+int EthernetClient::connected(void){
     int  ercd;
     int8_t  res;
 
@@ -613,6 +626,7 @@ int8_t EthernetClient::connected(void){
     return res;
 }
 
+
 /******************************************************************************
 Description:
     Connects to a specified IP address and port.
@@ -630,7 +644,8 @@ Returns:
     TIMED_OUT -1
     INVALID_RESPONSE -4
 ******************************************************************************/
-int EthernetClient::connect(IPAddress distip, uint16_t distport){
+int EthernetClient::connect(IPAddress distip, uint16_t distport)
+{
     int  ercd;
     T_IPV4EP    distAdr;
     int         res = false;
@@ -674,7 +689,8 @@ int EthernetClient::connect(IPAddress distip, uint16_t distport){
     return res;
 }
 
-int EthernetClient::connect(const char *host, uint16_t port){
+int EthernetClient::connect(const char *host, uint16_t port)
+{
     int  ercd;   /* 20150527 */
     int res = false;
 
@@ -780,6 +796,7 @@ int EthernetClient::connect(const char *host, uint16_t port){
     return res;
 }
 
+
 /******************************************************************************
 Description:
     Returns the number of bytes available for reading
@@ -792,7 +809,8 @@ Parameters:
 Returns:
     The number of bytes available.
 ******************************************************************************/
-int EthernetClient::available(void){
+int EthernetClient::available(void)
+{
     int res = 0;
     int  ercd;
 
@@ -885,6 +903,7 @@ void EthernetClient::stop(void){
 	EthernetClass::stop();
 }
 
+
 /******************************************************************************
 Description:
     Initializes the ethernet UDP library and network settings.
@@ -909,6 +928,7 @@ uint8_t EthernetUDP::begin(uint16_t port)
     }
     return res;
 }
+
 
 /******************************************************************************
 Description:
@@ -944,6 +964,7 @@ int EthernetUDP::read()
   return res;
 }
 
+
 int EthernetUDP::read(void* dst, size_t len)
 {
     int res = 0;
@@ -973,6 +994,7 @@ int EthernetUDP::read(void* dst, size_t len)
     return res;
 }
 
+
 /******************************************************************************
 Description:
     Writes UDP data to the remote connection. Must be wrapped between beginPacket() and endPacket().
@@ -997,6 +1019,7 @@ size_t EthernetUDP::write(uint8_t byte){
   return 1;
 }
 
+
 size_t EthernetUDP::write(const void* buffer, size_t size) {
     if(buffer == nullptr || size == 0) {
         return 0;
@@ -1010,6 +1033,7 @@ size_t EthernetUDP::write(const void* buffer, size_t size) {
     }
     return size;
 }
+
 
 /******************************************************************************
 Description:
@@ -1037,6 +1061,7 @@ int EthernetUDP::beginPacket(const IPAddress& ip, uint16_t port){
     return res;
 }
 
+
 /******************************************************************************
 Description:
     Called after writing UDP data to the remote connection.
@@ -1061,6 +1086,7 @@ int EthernetUDP::endPacket(void){
     }
     return res;
 }
+
 
 /******************************************************************************
 Description:
@@ -1124,6 +1150,7 @@ IPAddress EthernetUDP::remoteIP() {
     return ip;
 }
 
+
 /******************************************************************************
 Description:
     Gets the port of the remote UDP connection.
@@ -1139,4 +1166,3 @@ uint16_t EthernetUDP::remotePort()
 {
    	return g_remoteIPV4EP.portno;
 }
-
