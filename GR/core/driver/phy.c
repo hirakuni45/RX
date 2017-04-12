@@ -5,10 +5,6 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-
-/***********************************************************************************************************************
-Includes   <System Includes> , "Project Includes"
-***********************************************************************************************************************/
 #include <stdio.h>
 #include "../T4_src/t4define.h"
 #include "rx64m/iodefine.h"
@@ -20,9 +16,6 @@ Includes   <System Includes> , "Project Includes"
 
 #define PHY_DEBUG
 
-/***********************************************************************************************************************
-Macro definitions
-***********************************************************************************************************************/
 /* Media Independent Interface */
 #define PHY_MII_ST                      (1)
 #define PHY_MII_READ                    (2)
@@ -419,33 +412,16 @@ static void phy_write_(uint16_t reg_addr, uint16_t data)
 	}
 }
 
-
-/***********************************************************************************************************************
-Typedef definitions
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Imported global variables and functions (from other files)
-***********************************************************************************************************************/
 extern volatile uint8_t g_ether_PauseFrameEnableFlag;
-
-/***********************************************************************************************************************
-Exported global variables (to be accessed by other files)
-***********************************************************************************************************************/
 
 static uint16_t local_advertise; /* the capabilities of the local link as PHY data */
 
-/**
- * Public functions
- */
-
-/***********************************************************************************************************************
-* Function Name: Phy_Init
-* Description  : Resets Ethernet PHY device
-* Arguments    : none
-* Return Value : R_PHY_ERROR
-*                R_PHY_OK
-***********************************************************************************************************************/
+//-----------------------------------------------------------------//
+/*!
+	@brief  PHY 初期化
+	@return R_PHY_ERROR, R_PHY_OK
+*/
+//-----------------------------------------------------------------//
 int16_t phy_init(void)
 {
 	uint16_t reg;
@@ -522,12 +498,11 @@ int16_t phy_init(void)
 }
 
 
-/***********************************************************************************************************************
-* Function Name: Phy_Start_Autonegotiate
-* Description  : Starts autonegotiate
-* Arguments    : None
-* Return Value : None
-***********************************************************************************************************************/
+//-----------------------------------------------------------------//
+/*!
+	@brief  PHY 自動速度調整
+*/
+//-----------------------------------------------------------------//
 void phy_start_autonegotiate(void)
 {
     /* Set local ability */
@@ -559,21 +534,17 @@ void phy_start_autonegotiate(void)
 
 }
 
-/***********************************************************************************************************************
-* Function Name: Phy_Set_Autonegotiate
-* Description  : reports the other side's physical capability
-* Arguments    : *line_speed_duplex - 
-*                    a pointer to the location of both the line speed and the duplex
-*                *local_pause - 
-*                    a pointer to the location to store the local pause bits.
-*                *partner_pause - 
-*                    a pointer to the location to store the partner pause bits.
-* Return Value : R_PHY_ERROR
-*                R_PHY_OK
-* Note         : The value returned to local_pause and patner_pause is used 
-*                as it is as an argument of _ R_Ether_PauseResolution function. 
-***********************************************************************************************************************/
-int16_t phy_set_autonegotiate(uint16_t *line_speed_duplex, uint16_t *local_pause, uint16_t *partner_pause)
+
+//-----------------------------------------------------------------//
+/*!
+	@brief  PHY 速度調整取得
+	@param[in]	line_speed_duplex	both the line speed and the duplex
+	@param[in]	local_pause			store the local pause bits
+	@param[in]	partner_pause		store the partner pause bits
+	@return		R_PHY_ERROR, R_PHY_OK
+*/
+//-----------------------------------------------------------------//
+int16_t phy_get_autonegotiate(uint16_t *line_speed_duplex, uint16_t *local_pause, uint16_t *partner_pause)
 {
     uint16_t reg;
     
@@ -646,12 +617,12 @@ int16_t phy_set_autonegotiate(uint16_t *line_speed_duplex, uint16_t *local_pause
 }
 
 
-/***********************************************************************************************************************
-* Function Name: Phy_GetLinkStatus 
-* Description  : Returns the status of the physical link 
-* Arguments    : none 
-* Return Value : -1 if links is down, 0 otherwise 
-***********************************************************************************************************************/
+//-----------------------------------------------------------------//
+/*!
+	@brief  PHY リンクステータス取得
+	@return -1 if links is down, 0 otherwise 
+*/
+//-----------------------------------------------------------------//
 int16_t phy_get_link_status(void)
 {
     uint16_t reg;

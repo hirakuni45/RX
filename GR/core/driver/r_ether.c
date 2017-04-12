@@ -939,7 +939,7 @@ static int32_t ether_do_link(const uint8_t mode)
     uint16_t link_result        = 0;
 
     /* Set the link status */
-    link_result = phy_set_autonegotiate(&link_speed_duplex, &local_pause_bits, &partner_pause_bits);
+    link_result = phy_get_autonegotiate(&link_speed_duplex, &local_pause_bits, &partner_pause_bits);
     if (R_PHY_OK == link_result)
     {
         switch (link_speed_duplex)
