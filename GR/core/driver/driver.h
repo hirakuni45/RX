@@ -16,8 +16,8 @@ extern "C"{
 	void reset_timer(void);
 	uint16_t get_timer(void);
 
-	ER lan_open(void);
-	ER lan_close(void);
+	int lan_open(void);
+	int lan_close(void);
 
 	void ena_int(void);
 	void dis_int(void);

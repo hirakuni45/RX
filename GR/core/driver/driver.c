@@ -98,9 +98,9 @@ void close_timer(void)
 /******************************************************************************
 Functions (API)
 ******************************************************************************/
-ER lan_open(void)
+int lan_open(void)
 {
-	ER ret;
+	int ret;
 	memset(&t4_stat, 0, sizeof(T4_STATISTICS));
 	ret = R_ETHER_Open_ZC2(_myethaddr);
 	if (R_ETHER_OK != ret)
@@ -110,7 +110,7 @@ ER lan_open(void)
 	return 0;
 }
 
-ER lan_close(void)
+int lan_close(void)
 {
 	R_ETHER_Close_ZC2();
 	return 0;
