@@ -127,9 +127,15 @@ typedef struct
 
 typedef	int32_t (*DNS_PROC_FUNC)(void);
 
-/***********************************************************************************************************************
-Exported global variables
-***********************************************************************************************************************/
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+int dns_callback(ID cepid, FN fncd , void *p_parblk);
+#if defined(__cplusplus)
+}
+#endif
+
 
 /***********************************************************************************************************************
 Exported global functions (to be accessed by other files)
@@ -147,5 +153,6 @@ static uint32_t convert_array_to_long(uint8_t *ipaddr);
 static uint16_t htons(uint16_t data);
 static uint32_t htonl(uint32_t data);
 #endif
+
 
 #endif	/* R_DNS_CLIENT_H */

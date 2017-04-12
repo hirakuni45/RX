@@ -36,12 +36,10 @@
 * History       : DD.MM.YYYY Version Description
 *               : 30.08.2011 1.00    First release.
 ******************************************************************************/
-#if defined(__GNUC__) || defined(GRSAKURA)
 #include "t4define.h"
-#endif
 
 #include "r_t4_itcpip.h"
-extern ER t4_udp_callback(ID cepid, FN fncd , void *p_parblk);
+extern int t4_udp_callback(ID cepid, FN fncd , void *p_parblk);
 
 /****************************************************************************/
 /**********************     TCP-related definition     **********************/

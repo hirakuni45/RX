@@ -120,7 +120,7 @@ typedef struct
     uint8_t   type;
     volatile uint8_t stat;
     int16_t   tmout;
-    ER    *error;
+    int    *error;
     uint16_t   flag;
     uint16_t   reserved;
     union
@@ -156,7 +156,7 @@ typedef struct
 
 typedef struct
 {
-    ER  ercd;
+    int  ercd;
 } _TCP_API_REQ;
 
 typedef struct
@@ -178,7 +178,7 @@ enum
 #define _TCP_CB_STAT_IS_API_LOCKED(stat)  ((stat) & _TCP_CB_STAT_LOCK)
 #define _TCP_CB_STAT_SET_API_LOCK_FLG(stat)  ((stat)=(stat)|((_TCP_CB_STAT_LOCK)))
 #define _TCP_CB_STAT_CLEAR_API_LOCK_FLG(stat) ((stat)=(stat)&(~(_TCP_CB_STAT_LOCK)))
-typedef ER(*_TCP_CALLBACK_FUNC)(ID cepid, FN fncd , void *p_parblk);
+typedef int (*_TCP_CALLBACK_FUNC)(ID cepid, FN fncd , void *p_parblk);
 #define _TCP_CB_GET_CALLBACK_FUNC_PTR(cepid) (tcp_ccep[(cepid)-1].callback)
 #define _TCP_CB_CALL_CALLBACK(cepid, fncd, pTcpTcb)       \
     do {\
@@ -320,16 +320,16 @@ void _proc_rcv(void);
 void _proc_snd(void);
 
 void _tcp_init_tcb(_TCB *_ptcb);
-ER  _tcp_api_req(ID cepid);
-void _tcp_clr_req(ID cepid);
-void _tcp_cancel_api(ER ercd);
+// int  _tcp_api_req(ID cepid);
+// void _tcp_clr_req(ID cepid);
+void _tcp_cancel_api(int ercd);
 void _tcp_stat(void);
-ER  _tcp_rcv_rst(void);
-ER  _tcp_rcv_syn(void);
+int  _tcp_rcv_rst(void);
+int  _tcp_rcv_syn(void);
 void _tcp_rcv_ack(void);
 int16_t _tcp_rcv_opt(void);
 int16_t _tcp_proc_data(void);
-ER  _tcp_rcv_fin(void);
+int  _tcp_rcv_fin(void);
 void _tcp_swin_updt(void);
 void _tcp_cpy_rwdat(void);
 void _tcp_clr_rtq(_TCB *ptcb);
@@ -342,13 +342,13 @@ void _tcp_api_sht_cls(void);
 void _tcp_api_snddt(void);
 void _tcp_api_rcvdt(void);
 void _tcp_api_wup(ID);
-void _tcp_api_slp(ID cepid);
-ER _tcp_check_cepid_arg(ID cepid);
-ER _tcp_check_len_arg(int len);
-ER  _tcp_check_tmout_arg(uint16_t api_type, TMO tmout, _TCP_CB* pTcpcb);
+// void _tcp_api_slp(ID cepid);
+int _tcp_check_cepid_arg(ID cepid);
+int _tcp_check_len_arg(int len);
+int  _tcp_check_tmout_arg(uint16_t api_type, TMO tmout, _TCP_CB* pTcpcb);
 uint16_t _tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb);
 uint16_t _tcp_call_callback(ID cepid, FN fncd, void *p_parblk);
 FN _tcp_api_type_to_fn(uint16_t api_type);
-ER _tcp_recv_polling(_TCB* pTcb, uint8_t *buf, uint16_t size);
+int _tcp_recv_polling(_TCB* pTcb, uint8_t *buf, uint16_t size);
 void _tcp_init_callback_info(_TCP_CB* pCallbackInfo);
 

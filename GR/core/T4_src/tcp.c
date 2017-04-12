@@ -887,7 +887,7 @@ _tcp_stat_release:
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _tcp_rcv_rst(void)
+int _tcp_rcv_rst(void)
 {
     _IP_PKT  *pip;
     _TCP_HDR *ph;
@@ -996,7 +996,7 @@ ER _tcp_rcv_rst(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _tcp_rcv_syn(void)
+int _tcp_rcv_syn(void)
 {
     _IP_PKT  *pip;
     _IP_HDR  *piph;
@@ -1365,7 +1365,7 @@ int16_t _tcp_proc_data(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _tcp_rcv_fin(void)
+int _tcp_rcv_fin(void)
 {
     _IP_PKT  *pip;
     _TCP_HDR *ph;
@@ -2249,7 +2249,7 @@ void _tcp_snd(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-void _tcp_cancel_api(ER ercd)
+void _tcp_cancel_api(int ercd)
 {
     _API_REQ *areq;
 
@@ -2365,9 +2365,9 @@ void _tcp_api_wup(ID id)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _tcp_check_cepid_arg(ID cepid)
+int _tcp_check_cepid_arg(ID cepid)
 {
-    ER err = E_OK;
+    int err = E_OK;
     if ((cepid <= 0) || (cepid > __tcpcepn))
     {
         err = E_PAR;
@@ -2381,9 +2381,9 @@ ER _tcp_check_cepid_arg(ID cepid)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _tcp_check_len_arg(int len)
+int _tcp_check_len_arg(int len)
 {
-    ER err = E_OK;
+    int err = E_OK;
     if (len < 0)
     {
         err = E_PAR;
@@ -2397,9 +2397,9 @@ ER _tcp_check_len_arg(int len)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER  _tcp_check_tmout_arg(uint16_t api_type, TMO tmout, _TCP_CB* pTcpcb)
+int  _tcp_check_tmout_arg(uint16_t api_type, TMO tmout, _TCP_CB* pTcpcb)
 {
-    ER errcode = E_OK;
+    int errcode = E_OK;
 
     if (_TCP_CB_STAT_IS_VIA_CALLBACK(pTcpcb->stat))
     {
@@ -2536,7 +2536,7 @@ FN  _tcp_api_type_to_fn(uint16_t api_type)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _tcp_recv_polling(_TCB* pTcb, uint8_t *buf, uint16_t size)
+int _tcp_recv_polling(_TCB* pTcb, uint8_t *buf, uint16_t size)
 {
     uint16_t  api_dsiz;
     uint16_t  free_win;

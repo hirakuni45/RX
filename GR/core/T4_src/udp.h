@@ -49,7 +49,7 @@ typedef struct
     ID  cepid;
     uint8_t *data;
     T_IPVxEP *p_dstaddr;
-    ER  *ercd;
+    int  *ercd;
     uint8_t cancel_flag;
 } _UDP_API_REQ;
 
@@ -93,8 +93,8 @@ void _udp_api_wup(_UDP_CB *pucb, ID id);
 void _udp_init(UW **workpp);
 void _udp_snd(_TCPUDP_PHDR *ph);
 FN  _udp_api_type_to_fn(uint16_t api_type);
-ER _udp_check_cepid_arg(ID cepid);
-ER _udp_check_len_arg(int len);
+int _udp_check_cepid_arg(ID cepid);
+int _udp_check_len_arg(int len);
 
 
 

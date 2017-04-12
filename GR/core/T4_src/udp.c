@@ -81,9 +81,9 @@ extern UB *_ether_p_rcv_buff;
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, TMO tmout)
+int udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, TMO tmout)
 {
-    ER  ercd;
+    int  ercd;
     _UDP_CB *pcb;
     _UDP_API_REQ *p;
 
@@ -192,9 +192,9 @@ ER udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, TMO tmout)
+int udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, TMO tmout)
 {
-    ER  ercd;
+    int  ercd;
     _UDP_CB *pcb;
     _UDP_API_REQ *p;
 
@@ -275,9 +275,9 @@ ER udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER udp_can_cep(ID cepid, FN fncd)
+int udp_can_cep(ID cepid, FN fncd)
 {
-    ER  ercd;
+    int  ercd;
     _UDP_CB *pcb;
     _UDP_API_REQ *p;
     ID cepid_tmp = cepid;
@@ -396,7 +396,7 @@ __err__udp_rcv:
 int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
 {
     T_UDP_CCEP far const *pcep;
-    ER    ercd;
+    int    ercd;
     FN    fncd;
     uint16_t   sport;
     uint16_t   saddr[IP_ALEN/2];
@@ -496,7 +496,7 @@ int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
 ***********************************************************************************************************************/
 void _udp_snd(_TCPUDP_PHDR *ph)
 {
-    ER    ercd;
+    int    ercd;
     FN    fncd;
     T_UDP_CCEP far const *pcep;
     int16_t   len;
@@ -634,7 +634,7 @@ void _proc_udp_api()
     _UDP_CB      *pucb;
     _UDP_API_REQ *pureq;
     int16_t  i;
-    ER   ercd;
+    int   ercd;
     FN   fn;
     UH    count;
     _UDP_CB   *tmp;
@@ -781,9 +781,9 @@ FN  _udp_api_type_to_fn(uint16_t api_type)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _udp_check_cepid_arg(ID cepid)
+int _udp_check_cepid_arg(ID cepid)
 {
-    ER err = E_OK;
+    int err = E_OK;
     if ((cepid <= 0) || (cepid > __udpcepn))
     {
         err = E_PAR;
@@ -797,9 +797,9 @@ ER _udp_check_cepid_arg(ID cepid)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _udp_check_len_arg(int len)
+int _udp_check_len_arg(int len)
 {
-    ER err = E_OK;
+    int err = E_OK;
     if (len < 0)
     {
         err = E_PAR;

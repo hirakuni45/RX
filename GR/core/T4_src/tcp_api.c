@@ -29,21 +29,20 @@
 /***********************************************************************************************************************
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
-#if defined(__GNUC__) || defined(GRSAKURA)
-#include "t4define.h"
-#endif
 #include <string.h>
-#include "type.h"
-#include "r_t4_itcpip.h"
+#include "tcp_api.h"
+
 #if defined(_ETHER)
 #include "ether.h"
 #elif defined(_PPP)
 #include "ppp.h"
 #endif
+
 #include "ip.h"
 #include "tcp.h"
 #include "udp.h"
 #include "core/driver/driver.h"
+
 
 /***********************************************************************************************************************
 Macro definitions
@@ -90,7 +89,7 @@ extern _PPP_API_REQ _ppp_api_req;
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER tcpudp_open(UW *workp)
+int tcpudp_open(UW *workp)
 {
     UW *currp;
     UH rem;
@@ -174,7 +173,7 @@ ER tcpudp_open(UW *workp)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER tcpudp_close(void)
+int tcpudp_close(void)
 {
     tcpudp_act_cyc(0);
     return (E_OK);
@@ -319,9 +318,9 @@ W tcpudp_get_ramsize(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, TMO tmout)
+int tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, TMO tmout)
 {
-    ER err;
+    int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 
     err = _tcp_check_cepid_arg(cepid);
@@ -379,9 +378,9 @@ ER tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER tcp_con_cep(ID cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, TMO tmout)
+int tcp_con_cep(ID cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, TMO tmout)
 {
-    ER err;
+    int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 
     err = _tcp_check_cepid_arg(cepid);
@@ -438,9 +437,9 @@ ER tcp_con_cep(ID cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER tcp_sht_cep(ID cepid)
+int tcp_sht_cep(ID cepid)
 {
-    ER err;
+    int err;
 
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 
@@ -479,9 +478,9 @@ ER tcp_sht_cep(ID cepid)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER tcp_cls_cep(ID cepid, TMO tmout)
+int tcp_cls_cep(ID cepid, TMO tmout)
 {
-    ER   err;
+    int   err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 
     err = _tcp_check_cepid_arg(cepid);
@@ -532,9 +531,9 @@ ER tcp_cls_cep(ID cepid, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER tcp_snd_dat(ID cepid, void *data, int len, TMO tmout)
+int tcp_snd_dat(ID cepid, void *data, int len, TMO tmout)
 {
-    ER err;
+    int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 
     err = _tcp_check_cepid_arg(cepid);
@@ -592,9 +591,9 @@ ER tcp_snd_dat(ID cepid, void *data, int len, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER tcp_rcv_dat(ID cepid, void *data, int len, TMO tmout)
+int tcp_rcv_dat(ID cepid, void *data, int len, TMO tmout)
 {
-    ER err;
+    int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 
     err = _tcp_check_cepid_arg(cepid);
@@ -674,9 +673,9 @@ ER tcp_rcv_dat(ID cepid, void *data, int len, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER tcp_can_cep(ID cepid, FN fncd)
+int tcp_can_cep(ID cepid, FN fncd)
 {
-    ER err;
+    int err;
     FN fn;
 
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
@@ -729,9 +728,9 @@ ER tcp_can_cep(ID cepid, FN fncd)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-ER _tcp_api_req(ID cepid)
+int _tcp_api_req(ID cepid)
 {
-    ER err = E_INI;
+    int err = E_INI;
 
     head_tcb[cepid-1].req.error = &err;
     head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
@@ -789,12 +788,6 @@ void _tcp_clr_req(ID cepid)
 
 
 #if defined(_TEST_LIBRARY)
-
-ER tcp_read_stat(ID cepid);
-ER tcp_force_clr(ID cepid);
-ER udp_force_clr(ID cepid);
-ER tcp_set_mss(ID cepid, UH mss);
-
 /***********************************************************************************************************************
 * Function Name: tcp_read_stat
 * Description  : read TCB status
@@ -814,9 +807,9 @@ ER tcp_set_mss(ID cepid, UH mss);
 *    10  time_wait
 *    11  others
 ***********************************************************************************************************************/
-ER tcp_read_stat(ID cepid)
+int tcp_read_stat(ID cepid)
 {
-    ER err = E_INI;
+    int err = E_INI;
 
     err = _tcp_check_cepid_arg(cepid);
     if (err != E_OK)
@@ -875,9 +868,9 @@ extern void _tcp_init_tcb(_TCB *_ptcb);
 * Return Value : E_OK force clear OK
 *       : E_PAR invalid cepid
 ***********************************************************************************************************************/
-ER tcp_force_clr(ID cepid)
+int tcp_force_clr(ID cepid)
 {
-    ER err = E_PAR;
+    int err = E_PAR;
 
     // cepid 引数をチェックする。
     err = _tcp_check_cepid_arg(cepid);
@@ -905,9 +898,9 @@ extern _UDP_CB  *_udp_cb;
 * Return Value : E_OK force clear OK
 *       : E_PAR invalid cepid
 ***********************************************************************************************************************/
-ER udp_force_clr(ID cepid)
+int udp_force_clr(ID cepid)
 {
-    ER err = E_PAR;
+    int err = E_PAR;
     _UDP_CB      *pucb;
     _UDP_API_REQ *pureq;
 
@@ -937,9 +930,9 @@ ER udp_force_clr(ID cepid)
 * Return Value : E_OK setting OK
 *       : E_PAR invalid cepid
 ***********************************************************************************************************************/
-ER tcp_set_mss(ID cepid, UH mss)
+int tcp_set_mss(ID cepid, UH mss)
 {
-    ER err = E_PAR;
+    int err = E_PAR;
 
     // cepid 引数をチェックする。
     err = _tcp_check_cepid_arg(cepid);

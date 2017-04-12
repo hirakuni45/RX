@@ -65,19 +65,15 @@ Exported global variables
 /***********************************************************************************************************************
 Exported global functions (to be accessed by other files)
 ***********************************************************************************************************************/
-#if defined(__GNUC__) || defined(GRSAKURA)
 #if defined(__cplusplus)
 extern "C" {
-#endif
 #endif
 void		R_dns_init(void);
 int32_t		R_dns_resolve_name(char *name, DNS_CB_FUNC func);
 int32_t		R_dns_process(void);
 uint32_t	R_T4_DNS_CLIENT_GetVersion(void);
-#if defined(__GNUC__) || defined(GRSAKURA)
 #if defined(__cplusplus)
 }
-#endif
 #endif
 
 #endif	/* R_T4_DNS_CLIENT_RX_IF_H	*/

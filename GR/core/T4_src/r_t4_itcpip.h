@@ -102,7 +102,7 @@ typedef H               ID;
 typedef H               PRI;
 typedef W               TMO;
 typedef H               HNO;
-typedef W               ER;
+/// typedef W               ER;
 typedef UH              ATR;
 #endif
 #endif
@@ -139,7 +139,7 @@ typedef struct t_tcp_ccep
     int      sbufsz;    /* Size of transmit window buffer         */
     void    *rbuf;      /* Top address of receive window buffer   */
     int      rbufsz;    /* Size of receive window buffer          */
-    ER(*callback)(ID cepid, FN fncd , void *p_parblk);   /* Callback routine */
+    int (*callback)(ID cepid, FN fncd , void *p_parblk);   /* Callback routine */
 } T_TCP_CCEP;
 
 /***  UDP communication end point  ***/
@@ -147,7 +147,7 @@ typedef struct t_udp_ccep
 {
     ATR      cepatr;    /* UDP communication end point attribute  */
     T_IPV4EP myaddr;    /* Local IP address and port number       */
-    ER(*callback)(ID cepid, FN fncd , void *p_parblk); /* Callback routine */
+    int (*callback)(ID cepid, FN fncd , void *p_parblk); /* Callback routine */
 } T_UDP_CCEP;
 
 /***  IP address settings  ***/
@@ -339,36 +339,32 @@ typedef struct T4_STATISTICS
 /*******************************/
 /***  Prototype Declaration  ***/
 /*******************************/
-#if defined(__GNUC__) || defined(GRSAKURA)
 #if defined(__cplusplus)
 extern "C" {
 #endif
-#endif
-ER udp_snd_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, TMO tmout);
-ER udp_rcv_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, TMO tmout);
-ER udp_can_cep(ID cepid, FN fncd);
+int udp_snd_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, TMO tmout);
+int udp_rcv_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, TMO tmout);
+int udp_can_cep(ID cepid, FN fncd);
 
-ER tcp_acp_cep(ID cepid, ID repid, T_IPV4EP *p_dstadr, TMO tmout);
-ER tcp_con_cep(ID cepid, T_IPV4EP *p_myadr,  T_IPV4EP *p_dstadr, TMO tmout);
-ER tcp_sht_cep(ID cepid);
-ER tcp_cls_cep(ID cepid, TMO tmout);
-ER tcp_snd_dat(ID cepid, void *data, int dlen, TMO tmout);
-ER tcp_rcv_dat(ID cepid, void *data, int dlen, TMO tmout);
-ER tcp_can_cep(ID cepid, FN fncd);
+int tcp_acp_cep(ID cepid, ID repid, T_IPV4EP *p_dstadr, TMO tmout);
+int tcp_con_cep(ID cepid, T_IPV4EP *p_myadr,  T_IPV4EP *p_dstadr, TMO tmout);
+int tcp_sht_cep(ID cepid);
+int tcp_cls_cep(ID cepid, TMO tmout);
+int tcp_snd_dat(ID cepid, void *data, int dlen, TMO tmout);
+int tcp_rcv_dat(ID cepid, void *data, int dlen, TMO tmout);
+int tcp_can_cep(ID cepid, FN fncd);
 
-ER tcpudp_open(UW *workp);    /* Open TCP/IP library (initialization)                         */
-ER tcpudp_close(void);        /* Close TCP/IP library (stop)                                  */
+int tcpudp_open(UW *workp);    /* Open TCP/IP library (initialization)                         */
+int tcpudp_close(void);        /* Close TCP/IP library (stop)                                  */
 W  tcpudp_get_ramsize(void);  /* Calculation of size of work area                             */
 void _process_tcpip(void);    /* TCP/IP process function called from ether INT and timer INT. */
-#if defined(__GNUC__) || defined(GRSAKURA)
 #if defined(__cplusplus)
 }
 #endif
-#endif
 
 /* PPP-related APIs */
-ER ppp_open(void);            /* Open PPP driver         */
-ER ppp_close(void);           /* Close PPP driver        */
+int ppp_open(void);            /* Open PPP driver         */
+int ppp_close(void);           /* Close PPP driver        */
 UH ppp_status(void);          /* PPP status              */
 
 
@@ -443,14 +439,14 @@ typedef struct
 /* PPP driver API (called by user application)  */
 void sio_open(UB rate);
 void sio_close(void);
-ER  modem_active_open(void);
-ER  modem_passive_open(void);
-ER  modem_close(void);
+int  modem_active_open(void);
+int  modem_passive_open(void);
+int  modem_close(void);
 
 /* PPP driver interface function (called by library) */
 H  ppp_read(UB **ppp);
 H  ppp_write(B *hdr, H hlen, B **pdata, H *pdlen, H num);
-ER ppp_api_req(UH type, void *parblk, H tmout);
+int ppp_api_req(UH type, void *parblk, H tmout);
 UH ppp_drv_status(void);            /* Get PPP driver state      */
 H  modem_read(UB **rzlt);
 H  modem_write(void *parblk);
