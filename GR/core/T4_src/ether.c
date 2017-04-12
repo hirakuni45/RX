@@ -29,15 +29,14 @@
 /***********************************************************************************************************************
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
-#if defined(__GNUC__) || defined(GRSAKURA)
-#include "t4define.h"
-#endif
 #include <string.h>
+#include "t4define.h"
 #include "type.h"
 #include "r_t4_itcpip.h"
 #include "ether.h"
 #include "ip.h"
 #include "tcp.h"
+#include "core/driver/driver.h"
 
 /***********************************************************************************************************************
 Macro definitions

@@ -43,6 +43,7 @@ Includes   <System Includes> , "Project Includes"
 #include "ip.h"
 #include "tcp.h"
 #include "udp.h"
+#include "core/driver/driver.h"
 
 /***********************************************************************************************************************
 Macro definitions

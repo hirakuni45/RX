@@ -376,18 +376,9 @@ UH ppp_status(void);          /* PPP status              */
 /***  Driver Interface  ***/
 /**************************/
 /*++++++++++++++++ PPP/Ether common items +++++++++++++++++*/
-H    rcv_buff_release(UB);
-void tcpudp_act_cyc(UB cycact);     /* Control TCP cyclic processing start/stop     */
 void tcp_api_slp(ID);               /* Wait for completion of TCP API               */
-void tcp_api_wup(ID);               /* Cancel the wait state of TCP API completion  */
-void udp_api_slp(ID);               /* Wait for completion of UDP API               */
-void udp_api_wup(ID);               /* Cancel the wait state of UDP API completion  */
 void ppp_api_slp(void);             /* Wait for completion of PPP API               */
 void ppp_api_wup(void);             /* Cancel the wait state of PPP API completion  */
-UH   tcpudp_get_time(void);         /* Get time information                         */
-void report_error(UB, H, UB*);      /* Report error function                        */
-void ena_int(void);                 /* temporarily enable interrupt function        */
-void dis_int(void);                 /* temporarily disable interrupt function       */
 void get_random_number(UB *, UW);   /* Get random number for CHAP auth              */
 
 /* T4 version information structure*/
@@ -464,23 +455,6 @@ UH ppp_drv_status(void);            /* Get PPP driver state      */
 H  modem_read(UB **rzlt);
 H  modem_write(void *parblk);
 
-
-/*++++++++++++++++ Ether related +++++++++++++++++*/
-#if defined(__GNUC__) || defined(GRSAKURA)
-#if defined(__cplusplus)
-extern "C" {
-#endif
-#endif
-ER lan_open(void);                   /* Initialize LAN driver         */
-ER lan_close(void);                  /* Deactivate the LAN driver     */
-H  lan_read(UB, B **buf);
-H  lan_write(UB, B * , H, B * , H);  /* Send LAN data                 */
-void    lan_reset(UB) ;
-#if defined(__GNUC__) || defined(GRSAKURA)
-#if defined(__cplusplus)
-}
-#endif
-#endif
 
 #endif /* _R_T4_ITCPIP_H */
 
