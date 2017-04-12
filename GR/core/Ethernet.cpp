@@ -1,4 +1,3 @@
-
 #include "T4_src/t4define.h"
 #include <string.h>
 #include <stdio.h>
@@ -23,7 +22,7 @@ static byteq_hdl_t hdl,hdl_forSize;
 static uint8_t byteq_buf_forSize[RING_SIZ_forSize]={0};    /*sizeQueBody 1024>>2=256*/
 
 
-#define ETHER_DEBUG
+// #define ETHER_DEBUG
 
 
 /***********************************************************************************************************************
