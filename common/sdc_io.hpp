@@ -177,7 +177,7 @@ namespace utils {
 			@param[in]	fp		ファイル構造体ポインター
 			@param[in]	path	ファイル名
 			@param[in]	mode	オープン・モード
-			@return 移動成功なら「true」
+			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
 		bool open(FIL* fp, const char* path, BYTE mode)
@@ -192,6 +192,24 @@ namespace utils {
 				return false;
 			}
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ファイルがあるか検査
+			@param[in]	path	ファイル名
+			@return ファイルがある場合「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool probe(const char* path)
+		{
+			FIL fp;
+			bool ret = open(&fp, path, FA_READ | FA_OPEN_EXISTING);
+			if(ret) {
+				f_close(&fp);
+			}
+			return ret;
 		}
 
 
