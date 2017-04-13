@@ -36,7 +36,7 @@ IPAddress& IPAddress::operator=(const uint8_t *address){
 
 void IPAddress::print() const
 {
-	utils::format("%d, %d, %d, %d\n")
+	utils::format("%d, %d, %d, %d")
 		% static_cast<uint32_t>(_address.bytes[0])
 		% static_cast<uint32_t>(_address.bytes[1])
 		% static_cast<uint32_t>(_address.bytes[2])

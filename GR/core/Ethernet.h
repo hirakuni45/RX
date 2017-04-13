@@ -249,6 +249,8 @@ class EthernetServer : public EthernetClass {
 
 	virtual ~EthernetServer() { }
 
+	uint16_t get_port() const { return port_; }
+
 	size_t write() { return 0; };
 
 	size_t write(uint8_t byte);
