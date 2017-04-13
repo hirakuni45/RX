@@ -102,9 +102,12 @@ int open(const char *path, int flags, ...)
 	else if(flags & O_CREAT) mode |= FA_CREATE_NEW;
 
 	char tmp[256];
+#if _USE_LFN != 0
 	utf8_to_sjis(path, tmp);
-
 	FRESULT res = f_open(&file_obj_[file - STD_OFS_], tmp, mode);
+#else
+	FRESULT res = f_open(&file_obj_[file - STD_OFS_], path, mode);
+#endif
 	if(res == FR_OK) {
 		fd_pads_[file] = 1;
 		errno = 0;
