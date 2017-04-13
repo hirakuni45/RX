@@ -90,31 +90,28 @@ namespace chip {
 			uint32_t d1 = 0;
 			uint32_t d2 = 0;
 			uint32_t d3 = 0;
-			volatile uint16_t ll = clk_loop_ >> 1;
-			if(ll > 10) ll -= 10; else ll = 0;
+///			volatile uint16_t ll = clk_loop_ >> 1;
+///			if(ll > 10) ll -= 10; else ll = 0;
 			while(mask > 0) {
 				d0 <<= 1;
 				d0 |= SDO::SDO0::P();
 				d1 <<= 1;
 				d1 |= SDO::SDO2::P();
+
+///				volatile uint16_t l = ll;
+///				while(l > 0) { --l; }
+				SCKI::P = 0;
+
 				d2 <<= 1;
 				d2 |= SDO::SDO4::P();
 				d3 <<= 1;
 				d3 |= SDO::SDO6::P();
 
-				volatile uint16_t l = ll;
-				while(l > 0) { --l; }
-				SCKI::P = 0;
-
-				if(span & mask) {
-					SDI::P = 1;
-				} else {
-					SDI::P = 0;
-				}
+				SDI::P = span & mask;
 				mask >>= 1;
 
-				volatile uint16_t h = clk_loop_ >> 1;
-				while(h > 0) { --h; }
+///				volatile uint16_t h = clk_loop_ >> 1;
+///				while(h > 0) { --h; }
 				SCKI::P = 1;
 			}
 			data_[0 + ofs] = d0;
