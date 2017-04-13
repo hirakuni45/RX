@@ -13,6 +13,8 @@
 #include "driver/driver.h"
 #include "driver/r_ether.h"
 
+#include "common/format.hpp"
+
 extern "C" {
 	unsigned long millis(void);
 	void delay(unsigned long ms);
@@ -228,6 +230,7 @@ class EthernetClass {
         }
 };
 
+
 class EthernetServer : public EthernetClass {
 	uint16_t port_;
 	
@@ -244,7 +247,7 @@ class EthernetServer : public EthernetClass {
 	******************************************************************************/
 	EthernetServer(uint16_t port = 0) : port_(port) { }
 
-	virtual ~EthernetServer(){}
+	virtual ~EthernetServer() { }
 
 	size_t write() { return 0; };
 
@@ -254,21 +257,44 @@ class EthernetServer : public EthernetClass {
 
 	void begin(uint16_t port = 0);
 
-	EthernetClient& available(void);
+	EthernetClient available(void);
 
-		size_t print(const char* t = nullptr) {
-			if(t == nullptr) return 0;
 
-			size_t  l = strlen(t);
-			return write(t, l);
-		}
+	size_t print(const char* t = nullptr) {
+		if(t == nullptr) return 0;
+		size_t l = strlen(t);
+		return write(t, l);
+	}
 
-		/* get the length of the string * s return. '\ 0' is not included in length. */
-        size_t println(const char* t = nullptr) {
-			size_t l = print(t);
-			l += print("\r\n");
-            return l;
-        }
+
+	size_t print(int value) {
+		char tmp[16];
+		utils::format("%d", tmp, sizeof(tmp)) % value;
+		return printf(tmp);
+	}
+
+
+	/* get the length of the string * s return. '\ 0' is not included in length. */
+	size_t println(const char* t = nullptr) {
+		size_t l = print(t);
+		l += print("\r\n");
+		return l;
+	}
+
+	EthernetServer& operator << (const char* t) {
+		print(t);
+		return *this;
+	}
+
+	EthernetServer& operator << (int value) {
+		print(value);
+		return *this;
+	}
+
+	EthernetServer& operator << (char ch) {
+		write(ch);
+		return *this;
+	}
 
 	protected:
         int16_t t4_set_tcp_crep(ID repid, UH portno){
@@ -287,6 +313,7 @@ class EthernetServer : public EthernetClass {
             return 0;
         }
 };
+
 
 class EthernetClient : public EthernetServer {
     public:
@@ -344,6 +371,7 @@ class EthernetClient : public EthernetServer {
           return !this->operator==(rhs);
       }
 };
+
 
 class EthernetUDP : public EthernetClass {
 	uint16_t  port_;

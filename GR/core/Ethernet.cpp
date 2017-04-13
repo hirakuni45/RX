@@ -499,7 +499,7 @@ Returns:
     a Client object; if no Client has data available for reading,
     this object will evaluate to false in an if-statement (see the example below)
 ******************************************************************************/
-EthernetClient& EthernetServer::available() {
+EthernetClient EthernetServer::available() {
     int  ercd;
     ercd = tcp_read_stat(ARDUINO_TCP_CEP);      /* 20150609 tue */
 #if defined(T4_ETHER_DEBUG)
