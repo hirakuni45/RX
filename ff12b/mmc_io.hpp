@@ -250,6 +250,7 @@ namespace fatfs {
 		/*!
 			@brief	初期化
 			@param[in]	drv		Physical drive nmuber (0)
+			@return ステータス
 		 */
 		//-----------------------------------------------------------------//
 		DSTATUS disk_initialize (BYTE drv)
@@ -327,6 +328,7 @@ namespace fatfs {
 			@param[out]	buff	Pointer to the data buffer to store read data
 			@param[in]	sector	Start sector number (LBA)
 			@param[in]	count	Sector count (1..128)
+			@return リザルト
 		 */
 		//-----------------------------------------------------------------//
 		DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count)
@@ -356,6 +358,7 @@ namespace fatfs {
 			@param[in]	buff	Pointer to the data to be written	
 			@param[in]	sector	Start sector number (LBA)
 			@param[in]	count	Sector count (1..128)
+			@return リザルト
 		 */
 		//-----------------------------------------------------------------//
 		DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count)
@@ -392,6 +395,7 @@ namespace fatfs {
 			@param[in]	drv		Physical drive nmuber (0)
 			@param[in]	ctrl	Control code
 			@param[in]	buff	Buffer to send/receive control data
+			@return リザルト
 		 */
 		//-----------------------------------------------------------------//
 		DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff)
