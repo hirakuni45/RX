@@ -38,19 +38,13 @@ Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
 #include <stdio.h>
 #include <stddef.h>
-#if defined(__GNUC__) || defined(GRSAKURA)
 #include "../T4_src/t4define.h"
-#else
-#include <machine.h>
-#endif
 #include "rx64m/iodefine.h"
 #include "r_ether.h"
 #include "phy.h"
 #include "r_ether_local.h"
 
-#if defined(__GNUC__) || defined(GRSAKURA)
 void lan_inthdr(void);
-#endif
 
 #define ETHC_DEBUG
 /// #define LINK_DEBUG
@@ -164,26 +158,9 @@ static const pauseresolution_s pause_resolution[PAUSE_TABLE_ENTRIES] =
  * defined with section pragma directives to easly locate them
  * on the memory map.
  */
-#if defined(__GNUC__) || defined(GRSAKURA)
 static descriptor_s rx_descriptors[EMAC_NUM_RX_DESCRIPTORS] __attribute__ ((aligned(32)));
 static descriptor_s tx_descriptors[EMAC_NUM_TX_DESCRIPTORS] __attribute__ ((aligned(32)));
 static etherbuffer_s ether_buffers __attribute__ ((aligned(32)));
-#else
-#pragma section _RX_DESC
-static descriptor_s    rx_descriptors[EMAC_NUM_RX_DESCRIPTORS];
-#pragma section _TX_DESC
-static descriptor_s    tx_descriptors[EMAC_NUM_TX_DESCRIPTORS];
-#pragma section _ETHERNET_BUFFERS
-/* 
- * As for Ethernet buffer, the size of total buffer which are use for transmission and the reception is secured.
- * The total buffer's size which the value is integrated from  EMAC_NUM_BUFFERS (buffer number) and 
- * EMAC_BUFSIZE (the size of one buffer).
- * The EMAC_BUFSIZE and EMAC_NUM_BUFFERS are defined by macro in the file "r_ether_local.h".
- * It is sequentially used from the head of the buffer as a receive buffer or a transmission buffer.
- */
-static etherbuffer_s   ether_buffers;
-#pragma section
-#endif
 
 static uint16_t link_proc_count_;
 static int link_proc_loop_;
@@ -809,17 +786,9 @@ static void _R_Ether_ConfigEthernet(const uint8_t mode)
     EDMAC0.EDMR.BIT.DE = 1;
 #endif
 
-#if defined(__GNUC__) || defined(GRSAKURA)
     EDMAC0.RDLAR = app_rx_desc;
     EDMAC0.TDLAR = app_tx_desc;
-#else
-    /* Initialize Rx descriptor list address */
-    /* Casting the pointer to a uint32_t type is valid because the Renesas Compiler uses 4 bytes per pointer. */
-    EDMAC.RDLAR = (uint32_t) app_rx_desc;
-    /* Initialize Tx descriptor list address */
-    /* Casting the pointer to a uint32_t type is valid because the Renesas Compiler uses 4 bytes per pointer. */
-    EDMAC.TDLAR = (uint32_t) app_tx_desc;
-#endif
+
     /* Don't reflect the EESR.RMAF bit status in the RD0.RFS bit in the receive descriptor */
     EDMAC0.TRSCER.LONG = 0x00000080;
     /* Threshold of Tx_FIFO */
@@ -1003,11 +972,7 @@ static int32_t ether_do_link(const uint8_t mode)
                 /* PAUSE flow control FIFO settings. */
                 EDMAC0.FCFTR.LONG = 0x00000000;
                 /* Control of a PAUSE frame whose TIME parameter value is 0 is enabled. */
-#if defined(__GNUC__) || defined(GRSAKURA)
                 ETHERC0.ECMR.BIT.ZPF = 1;
-#else
-                ETHERC.ECMR.BIT.ZPE = 1;
-#endif
 
                 /**
                  * Enable PAUSE for full duplex link depending on
@@ -1083,13 +1048,8 @@ static int32_t ether_do_link(const uint8_t mode)
 * Arguments    : None
 * Return Value : None
 ***********************************************************************************************************************/
-#if defined(__GNUC__) || defined(GRSAKURA)
 void INT_Excep_ICU_GROUPAL1(void) __attribute__ ((interrupt));
 void INT_Excep_ICU_GROUPAL1(void)
-#else
-#pragma interrupt (Excep_Ether_isr(vect = VECT_ETHER_EINT, enable))
-static void Excep_Ether_isr(void)
-#endif
 {
     uint32_t status_ecsr = ETHERC0.ECSR.LONG;
     uint32_t status_eesr = EDMAC0.EESR.LONG;
