@@ -21,7 +21,7 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct core {
 
-		static const int seeda_version_ = 17;
+		static const int seeda_version_ = 50;
 		static const uint32_t build_id_ = B_ID;
 
 		class cmt_task {
@@ -37,6 +37,8 @@ namespace seeda {
 				millis_(0), delay_(0), millis10x_(0), cmtdiv_(0) { }
 
 			void operator() () {
+				eadc_server();
+
 				++millis_;
 				++cmtdiv_;
 				if(cmtdiv_ >= 10) {
@@ -47,6 +49,7 @@ namespace seeda {
 				if(delay_) {
 					--delay_;
 				}
+				
 			}
 
 			void set_task_10ms(void (*task)(void)) {

@@ -11,15 +11,7 @@
 #include <set>
 #include <cstdlib>
 #include "common/renesas.hpp"
-
-#include "common/rspi_io.hpp"
-#include "common/spi_io.hpp"
-#include "common/sdc_io.hpp"
 #include "common/cmt_io.hpp"
-
-#include "common/time.h"
-
-#include "chip/LTC2348_16.hpp"
 
 namespace seeda {
 
@@ -43,36 +35,6 @@ namespace seeda {
 
 		CMD		cmd_;
 
-		// Soft SDC 用　SPI 定義（SPI）
-		typedef device::PORT<device::PORTD, device::bitpos::B6> MISO;
-		typedef device::PORT<device::PORTD, device::bitpos::B4> MOSI;
-		typedef device::PORT<device::PORTD, device::bitpos::B5> SPCK;
-		typedef device::spi_io<MISO, MOSI, SPCK> SPI;
-		SPI		spi_;
-
-		typedef device::PORT<device::PORTD, device::bitpos::B3> SDC_SELECT;	///< カード選択信号
-		typedef device::NULL_PORT  SDC_POWER;	///< カード電源制御（常に電源ＯＮ）
-		typedef device::PORT<device::PORTE, device::bitpos::B6> SDC_DETECT;	///< カード検出
-
-		typedef utils::sdc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC;
-		SDC		sdc_;
-
-		// LTC2348-16 A/D 制御ポート定義
-		typedef device::PORT<device::PORT4, device::bitpos::B0> LTC_CSN;   // P40(141)
-		typedef device::PORT<device::PORTC, device::bitpos::B6> LTC_CNV;   // PC6(61)
-		typedef device::PORT<device::PORTD, device::bitpos::B0> LTC_BUSY;  // PD0/IRQ0(126)
-		typedef device::PORT<device::PORT5, device::bitpos::B3> LTC_PD;    // P53(53)
-		typedef device::PORT<device::PORT5, device::bitpos::B6> LTC_SDI;   // P56(50)
-		typedef device::PORT<device::PORT8, device::bitpos::B6> LTC_SCKO;  // P86(41)
-		typedef device::PORT<device::PORT8, device::bitpos::B7> LTC_SCKI;  // P87(39)
-		typedef device::PORT<device::PORT2, device::bitpos::B0> LTC_SDO0;  // P20(37)
-		typedef device::PORT<device::PORT2, device::bitpos::B1> LTC_SDO2;  // P21(36)
-		typedef device::PORT<device::PORT2, device::bitpos::B2> LTC_SDO4;  // P22(35)
-		typedef device::PORT<device::PORT2, device::bitpos::B3> LTC_SDO6;  // P23(34)
-		typedef struct chip::LTC2348_SDO_t<LTC_SCKO, LTC_SDO0, LTC_SDO2, LTC_SDO4, LTC_SDO6> LTC_SDO;
-		typedef chip::LTC2348_16<LTC_CSN, LTC_CNV, LTC_BUSY, LTC_PD, LTC_SDI, LTC_SCKI, LTC_SDO> EADC;
-		EADC	eadc_;
-
 		void adc_capture_(int ch, int rate, int num, const char* fname)
 		{
 			// utils::format("ch:   %d\n") % ch;
@@ -93,15 +55,15 @@ namespace seeda {
 			int16_t* buff = new int16_t[num];
 			for(int i = 0; i < num; ++i) {
 				cmt1_.sync();
-				eadc_.convert();
-				uint16_t v = eadc_.get_value(ch);
+				at_eadc().convert();
+				uint16_t v = at_eadc().get_value(ch);
 				buff[i] = v - 32768;
 			}
 			cmt1_.destroy();
 
 			// write file
 			FIL fp;
-			if(!sdc_.open(&fp, fname, FA_WRITE | FA_CREATE_ALWAYS)) {
+			if(!at_sdc().open(&fp, fname, FA_WRITE | FA_CREATE_ALWAYS)) {
 				utils::format("Can't create file: '%s'\n") % fname;
 				delete[] buff;
 				return;
@@ -212,7 +174,7 @@ namespace seeda {
 
 
 		bool check_mount_() {
-			auto f = sdc_.get_mount();
+			auto f = at_sdc().get_mount();
 			if(!f) {
 				utils::format("SD card not mount.\n");
 			}
@@ -226,8 +188,8 @@ namespace seeda {
 			if(cmdn == 1) {
 ///				if(eadc_.convert()) {
 				for(int i = 0; i < 8; ++i) {
-					uint32_t v = eadc_.get_data(i);
-					float fv = eadc_.get_voltage(i);
+					uint32_t v = at_eadc().get_data(i);
+					float fv = at_eadc().get_voltage(i);
 					utils::format("LTC2348-16(%d): CHID: %d, SPAN: %03b, %6.3f [V] (%d)\n")
 						% i % ((v >> 3) & 7) % (v & 7) % fv % (v >> 8);
 				}
@@ -239,10 +201,10 @@ namespace seeda {
 				char tmp[16];
 				if(cmd_.get_word(1, sizeof(tmp), tmp)) {
 					if(tmp[0] >= '0' && tmp[0] <= '7' && tmp[1] == 0) {
-						if(eadc_.convert()) {
+						if(at_eadc().convert()) {
 							int ch = tmp[0] - '0';
-							uint32_t v = eadc_.get_value(ch);
-							float fv = eadc_.get_voltage(ch);
+							uint32_t v = at_eadc().get_value(ch);
+							float fv = at_eadc().get_voltage(ch);
 							utils::format("LTC2348-16(%d): %6.3f [V] (%d)\n") % ch % fv % v;
 						} else {
 							utils::format("LTC2348-16 convert error\n");
@@ -264,7 +226,7 @@ namespace seeda {
 				if(get_int_(1, ch)) {
 					int span;
 					if(get_int_(2, span)) {
-						eadc_.set_span(ch, static_cast<EADC::span_type>(span));
+						at_eadc().set_span(ch, static_cast<EADC::span_type>(span));
 					} else {
 						param_error_(2);
 					}
@@ -274,7 +236,7 @@ namespace seeda {
 			} else if(cmdn == 2) {
 				int ch;
 				if(get_int_(1, ch)) {
-					auto span = eadc_.get_span(ch);
+					auto span = at_eadc().get_span(ch);
 					utils::format("LTC2348-16(%d): SPAN: %03b\n") % ch % static_cast<uint32_t>(span);
 				} else {
 					char tmp[32];
@@ -284,7 +246,7 @@ namespace seeda {
 				}
 			} else {
 				for(int i = 0; i < 8; ++i) {
-					auto span = eadc_.get_span(i);
+					auto span = at_eadc().get_span(i);
 					utils::format("LTC2348-16(%d): SPAN: %03b\n") % i % static_cast<uint32_t>(span);
 				}			
 			}
@@ -358,7 +320,7 @@ namespace seeda {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		tools() : sdc_(spi_, 10000000) { }
+		tools() { }
 
 
 		//-----------------------------------------------------------------//
@@ -368,17 +330,6 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void init()
 		{
-			// SD カード・クラスの初期化
-			sdc_.start();
-
-			{  // LTC2348ILX-16 初期化
-				// 内臓リファレンスと内臓バッファ
-				// VREFIN: 2.024V、VREFBUF: 4.096V、Analog range: 0V to 5.12V
-				if(!eadc_.start(2000000, EADC::span_type::P5_12)) {
-					utils::format("LTC2348_16 not found...\n");
-				}
-			}
-
 			cmd_.set_prompt("# ");
 		}
 
@@ -391,7 +342,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void title()
 		{
-			if(eadc_.probe()) {
+			if(at_eadc().probe()) {
 				utils::format("Device LTC2348-16: Ready\n");
 			} else {
 				utils::format("Device LTC2348-16: Not Ready\n");
@@ -401,6 +352,10 @@ namespace seeda {
 				time_t t = get_time();
 				disp_time(t);
 			}
+
+//			while(1) {
+//				eadc_.convert();
+//			}			
 		}
 
 
@@ -416,31 +371,11 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D 変換値の取得
-			@param[in]	ch	チャネル（０～７）
-			@return A/D 変換値
-		*/
-		//-----------------------------------------------------------------//
-		uint16_t get_analog(uint8_t ch) const
-		{
-			if(ch >= 8) {
-				return 0;
-			}
-			return eadc_.get_value(ch);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  サービス
 		*/
 		//-----------------------------------------------------------------//
 		void service()
 		{
-			eadc_.convert();
-
-			sdc_.service();
-
 			// コマンド入力と、コマンド解析
 			if(cmd_.service()) {
 				uint8_t cmdn = cmd_.get_words();
@@ -451,9 +386,9 @@ namespace seeda {
 							if(cmdn >= 2) {
 								char tmp[128];
 								cmd_.get_word(1, sizeof(tmp), tmp);
-								sdc_.dir(tmp);
+								at_sdc().dir(tmp);
 							} else {
-								sdc_.dir("");
+								at_sdc().dir("");
 							}
 						}
 						f = true;
@@ -462,14 +397,14 @@ namespace seeda {
 							if(cmdn >= 2) {
 								char tmp[128];
 								cmd_.get_word(1, sizeof(tmp), tmp);
-								sdc_.cd(tmp);						
+								at_sdc().cd(tmp);						
 							} else {
-								sdc_.cd("/");
+								at_sdc().cd("/");
 							}
 						}
 						f = true;
 					} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-						utils::format("%s\n") % sdc_.get_current();
+						utils::format("%s\n") % at_sdc().get_current();
 						f = true;
 					} else if(cmd_.cmp_word(0, "date")) {
 						if(cmdn == 1) {
@@ -509,36 +444,6 @@ namespace seeda {
 					}
 				}
 			}
-		}
-
-
-		DSTATUS disk_initialize(BYTE drv)
-		{
-			return sdc_.at_mmc().disk_initialize(drv);
-		}
-
-
-		DSTATUS disk_status(BYTE drv)
-		{
-			return sdc_.at_mmc().disk_status(drv);
-		}
-
-
-		DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count)
-		{
-			return sdc_.at_mmc().disk_read(drv, buff, sector, count);
-		}
-
-
-		DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count)
-		{
-			return sdc_.at_mmc().disk_write(drv, buff, sector, count);
-		}
-
-
-		DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff)
-		{
-			return sdc_.at_mmc().disk_ioctl(drv, ctrl, buff);
 		}
 	};
 }

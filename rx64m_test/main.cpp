@@ -10,14 +10,59 @@
 #include "tools.hpp"
 #include "net.hpp"
 
-namespace seeda {
+namespace {
 
-	core 	core_;
-	tools	tools_;
-	net		net_;
+	seeda::core 	core_;
+	seeda::tools	tools_;
+	seeda::net		net_;
+
+	seeda::SPI		spi_;
+	seeda::SDC		sdc_(spi_, 20000000);
 
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
+
+	seeda::EADC		eadc_;
+
+	uint32_t		sample_count_;
+	seeda::sample	sample_[8];
+	seeda::sample_t	sample_t_[8];
+
+///	bool	config_;
+
+	void main_init_()
+	{
+		// RTC 設定
+		rtc_.start();
+
+		{  // LTC2348ILX-16 初期化
+			// 内臓リファレンスと内臓バッファ
+			// VREFIN: 2.024V、VREFBUF: 4.096V、Analog range: 0V to 5.12V
+			if(!eadc_.start(2000000, seeda::EADC::span_type::P5_12)) {
+				utils::format("LTC2348_16 not found...\n");
+			}
+		}
+	}
+}
+
+namespace seeda {
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  SDC_IO クラスへの参照
+		@return SDC_IO クラス
+	*/
+	//-----------------------------------------------------------------//
+	SDC& at_sdc() { return sdc_; }
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  EADC クラスへの参照
+		@return EADC クラス
+	*/
+	//-----------------------------------------------------------------//
+	EADC& at_eadc() { return eadc_; }
 
 
 	//-----------------------------------------------------------------//
@@ -72,95 +117,198 @@ namespace seeda {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@brief  A/D 変換値の取得
-		@param[in]	ch	チャネル（０～７）
-		@return A/D 変換値
+		@brief  EADC サーバー
 	*/
 	//-----------------------------------------------------------------//
-	uint16_t get_analog(uint8_t ch)
+	void eadc_server()
 	{
-		return tools_.get_analog(ch);
+		eadc_.convert();
+		for(int i = 0; i < 8; ++i) {
+			sample_[i].add(eadc_.get_value(i));
+		}
+		++sample_count_;
+		if(sample_count_ >= 1000) {
+			for(int i = 0; i < 8; ++i) {
+				sample_[i].collect();
+				sample_t_[i] = sample_[i].get();
+				sample_[i].clear();
+			}
+			sample_count_ = 0;
+		}
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  A/D サンプルの取得
+		@param[in]	ch	チャネル（０～７）
+		@return A/D サンプル
+	*/
+	//-----------------------------------------------------------------//
+	const sample_t& get_sample(uint8_t ch)
+	{
+		return sample_t_[ch];
 	}
 }
 
 extern "C" {
 
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  システム・文字出力
+		@param[in]	ch	文字
+	*/
+	//-----------------------------------------------------------------//
 	void sci_putch(char ch)
 	{
-		seeda::core_.sci_.putch(ch);
+		core_.sci_.putch(ch);
 	}
 
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  システム・文字列出力
+		@param[in]	s	文字列
+	*/
+	//-----------------------------------------------------------------//
 	void sci_puts(const char* s)
 	{
-		seeda::core_.sci_.puts(s);
+		core_.sci_.puts(s);
 	}
 
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  システム・文字入力
+		@return	文字
+	*/
+	//-----------------------------------------------------------------//
 	char sci_getch(void)
 	{
-		return seeda::core_.sci_.getch();
+		return core_.sci_.getch();
 	}
 
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  システム・文字列長の取得
+		@return	文字列長
+	*/
+	//-----------------------------------------------------------------//
 	uint16_t sci_length(void)
 	{
-		return seeda::core_.sci_.recv_length();
+		return core_.sci_.recv_length();
 	}
 
 
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へ初期化関数を提供
+		@param[in]	drv		Physical drive nmuber (0)
+		@return ステータス
+	 */
+	//-----------------------------------------------------------------//
 	DSTATUS disk_initialize(BYTE drv) {
-		return seeda::tools_.disk_initialize(drv);
+		return sdc_.at_mmc().disk_initialize(drv);
 	}
 
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へステータスを提供
+		@param[in]	drv		Physical drive nmuber (0)
+	 */
+	//-----------------------------------------------------------------//
 	DSTATUS disk_status(BYTE drv) {
-		return seeda::tools_.disk_status(drv);
+		return sdc_.at_mmc().disk_status(drv);
 	}
 
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へリード・セクターを提供
+		@param[in]	drv		Physical drive nmuber (0)
+		@param[out]	buff	Pointer to the data buffer to store read data
+		@param[in]	sector	Start sector number (LBA)
+		@param[in]	count	Sector count (1..128)
+		@return リザルト
+	 */
+	//-----------------------------------------------------------------//
 	DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
-		return seeda::tools_.disk_read(drv, buff, sector, count);
+		return sdc_.at_mmc().disk_read(drv, buff, sector, count);
 	}
 
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へライト・セクターを提供
+		@param[in]	drv		Physical drive nmuber (0)
+		@param[in]	buff	Pointer to the data to be written	
+		@param[in]	sector	Start sector number (LBA)
+		@param[in]	count	Sector count (1..128)
+		@return リザルト
+	 */
+	//-----------------------------------------------------------------//
 	DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
-		return seeda::tools_.disk_write(drv, buff, sector, count);
+		return sdc_.at_mmc().disk_write(drv, buff, sector, count);
 	}
 
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へI/O コントロールを提供
+		@param[in]	drv		Physical drive nmuber (0)
+		@param[in]	ctrl	Control code
+		@param[in]	buff	Buffer to send/receive control data
+		@return リザルト
+	 */
+	//-----------------------------------------------------------------//
 	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
-		return seeda::tools_.disk_ioctl(drv, ctrl, buff);
+		return sdc_.at_mmc().disk_ioctl(drv, ctrl, buff);
 	}
 
 
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へ時間を提供
+		@return FatFs 時間
+	 */
+	//-----------------------------------------------------------------//
 	DWORD get_fattime(void) {
 		auto t = seeda::get_time();
 		return utils::str::get_fattime(t);
 	}
 
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	UTF-8 から ShiftJIS への変換
+		@param[in]	src	UTF-8 文字列ソース
+		@param[out]	dst	ShiftJIS 文字列出力
+	 */
+	//-----------------------------------------------------------------//
 	void utf8_to_sjis(const char* src, char* dst) {
 		utils::str::utf8_to_sjis(src, dst);
 	}
 
+
 	unsigned long millis(void)
 	{
-		return seeda::core_.cmt0_.at_task().get_millis();
+		return core_.cmt0_.at_task().get_millis();
 	}
+
 
 	void delay(unsigned long ms)
 	{
-		seeda::core_.cmt0_.at_task().set_delay(ms);
-		while(seeda::core_.cmt0_.at_task().get_delay() != 0) ;		
+		core_.cmt0_.at_task().set_delay(ms);
+		while(core_.cmt0_.at_task().get_delay() != 0) ;		
 	}
+
 
 	void set_task_10ms(void (*task)(void)) {
-		seeda::core_.cmt0_.at_task().set_task_10ms(task);
+		core_.cmt0_.at_task().set_task_10ms(task);
 	}
 }
-
-namespace {
-
-	void main_init_()
-	{
-		// RTC 設定
-		seeda::rtc_.start();
-	}
-}
-
 
 int main(int argc, char** argv);
 
@@ -168,7 +316,7 @@ int main(int argc, char** argv)
 {
 	using namespace seeda;
 
-	device::PORT3::PCR.B5 = 1; // P35 pull-up
+	device::PORT3::PCR.B5 = 1; // P35(NMI) pull-up
 
 	device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
 
@@ -198,18 +346,22 @@ int main(int argc, char** argv)
 
 	main_init_();
 
-	core_.init();
-	tools_.init();
+	sample_count_ = 0;
 
+	core_.init();
+
+	// SD カード・クラスの初期化
+	sdc_.start();
+
+	// 設定ファイルの確認
+///	config_ = sdc_.probe("seeda.cfg");
 	core_.title();
+
+	tools_.init();
 	tools_.title();
 
-	if(seeda::get_switch() == 3) {  // Ethernet 起動
-		net_.init();
-		net_.title();
-	}
-
-	device::PORT4::PDR.B7 = 1; // output
+	net_.init();
+	net_.title();
 
 	uint32_t cnt = 0;
 	while(1) {
@@ -218,14 +370,17 @@ int main(int argc, char** argv)
 		core_.service();
 		tools_.service();
 
-		if(seeda::get_switch() == 3) {  // Ethernet サービス
-			net_.service();
-		}
+		sdc_.service();
+
+		net_.service();
 
 		++cnt;
 		if(cnt >= 30) {
 			cnt = 0;
 		}
-		device::PORT4::PODR.B7 = (cnt < 10) ? 0 : 1;
+///		if(config_) {
+			device::PORTA::PDR.B0 = 1; // output
+			device::PORTA::PODR.B0 = (cnt < 10) ? 0 : 1;
+///		}
 	}
 }
