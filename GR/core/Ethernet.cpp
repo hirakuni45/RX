@@ -22,7 +22,7 @@ static byteq_hdl_t hdl,hdl_forSize;
 static uint8_t byteq_buf_forSize[RING_SIZ_forSize]={0};    /*sizeQueBody 1024>>2=256*/
 
 
-// #define ETHER_DEBUG
+#define ETHER_DEBUG
 
 
 /***********************************************************************************************************************
@@ -601,26 +601,23 @@ Parameters:
 Returns:
     Returns true if the client is connected, false if not.
 ******************************************************************************/
-int EthernetClient::connected(void){
-    int  ercd;
-    int8_t  res;
-
-    ercd = tcp_read_stat(ARDUINO_TCP_CEP);       /* 20150522 fri */
+bool EthernetClient::connected(void)
+{
+    int ercd = tcp_read_stat(ARDUINO_TCP_CEP);       /* 20150522 fri */
 #if defined(T4_ETHER_DEBUG)
-        Serial.print("t4:EthernetClient::connected():tcp_read_stat=");
-        Serial.print(ercd);
-        Serial.print(":");
+    utils::format("t4:EthernetClient::connected():tcp_read_stat=%d") % ercd;
+    utils::format(":");
 #endif
-    if(ercd == T4_TCPS_ESTABLISHED || ercd == T4_TCPS_CLOSE_WAIT){   /*2015_0603 wed*/
+    bool res;
+    if(ercd == T4_TCPS_ESTABLISHED || ercd == T4_TCPS_CLOSE_WAIT) {   /*2015_0603 wed*/
         res = true;
 #if defined(T4_ETHER_DEBUG)
-        Serial.println(":return true");
+        utils::format(":return true\n");
 #endif
-    }
-    else{
+    } else {
         res = false;
 #if defined(T4_ETHER_DEBUG)
-        Serial.println(":return false");
+        utils::format(":return false\n");
 #endif
     }
     return res;
