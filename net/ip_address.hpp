@@ -7,6 +7,7 @@
 */
 //=====================================================================//
 #include <cstdint>
+#include "common/format.hpp"
 #include "common/input.hpp"
 
 namespace net {
@@ -57,11 +58,11 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  コンストラクター
+			@brief  配列から設定
 			@param[in]	address	配列
 		*/
 		//-----------------------------------------------------------------//
-		ip_address(const uint8_t* address) {
+		void set(const uint8_t* address) {
 			if(address == nullptr) {
 				address_ = 0;
 				return;
@@ -72,7 +73,14 @@ namespace net {
 			address_.bytes[3] = address[3];
 		}
 
-		bool from_string(const char *address) {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  文字列から設定
+			@param[in]	address	配列
+		*/
+		//-----------------------------------------------------------------//
+		bool set_string(const char *address) {
 			if(address == nullptr) return false;
 			int a, b, c, d;
 			auto f = (utils::input("%d.%d.%d.%d", address) % a % b % c % d).status();
@@ -85,6 +93,7 @@ namespace net {
 			return f;
 		}
 
+
 		operator uint32_t() const { return address_.dword; };
 
 		bool operator==(const ip_address& addr) const {
@@ -93,8 +102,13 @@ namespace net {
 
 
 		bool operator == (const uint8_t* addr) const {
-			return memcmp(addr, address_.bytes, sizeof(address_.bytes)) == 0;
+			if(addr == nullptr) return false;
+			return (address_.bytes[0] == addr[0]
+				 && address_.bytes[1] == addr[1]
+				 && address_.bytes[2] == addr[2]
+				 && address_.bytes[3] == addr[3]);
 		}
+
 
 		uint8_t operator [] (int index) const { return address_.bytes[index]; };
 
@@ -103,13 +117,25 @@ namespace net {
 
 
 		ip_address& operator = (const uint8_t* address) {
-			memcpy(address_.bytes, address, sizeof(address_.bytes));
+			address_.bytes[0] = address[0];
+			address_.bytes[1] = address[1];
+			address_.bytes[2] = address[2];
+			address_.bytes[3] = address[3];
 			return *this;
 		}
+
 
 		ip_address& operator = (uint32_t address) {
 			address_.dword = address;
 			return *this;
+		}
+
+
+		void print() const {
+			utils::format("%d.%d.%d.%d") % static_cast<int>(address_.bytes[0])
+										 % static_cast<int>(address_.bytes[1])
+										 % static_cast<int>(address_.bytes[2])
+										 % static_cast<int>(address_.bytes[3]);
 		}
 	};
 }
