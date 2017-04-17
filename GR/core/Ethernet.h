@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdio>
+
 #include "IPAddress.h"
 #include "T4_src/type.h"
 #include "T4_src/r_t4_itcpip.h"
@@ -23,12 +25,14 @@ extern "C" {
 /******************************************************************************
 Macro definitions
 ******************************************************************************/
-#define ARDUINO_TCP_CEP          1
-#define ARDUINO_UDP_CEP          1
+#define ARDUINO_TCP_CEP         1
+#define ARDUINO_UDP_CEP         1
 #define T4_CLOSED               0
+
+#define T4_TCPS_CLOSED          0
 #define T4_TCPS_ESTABLISHED     2
 #define T4_TCPS_CLOSE_WAIT      4
-#define T4_TCPS_CLOSED          0
+
 #define DHCP_NOTHING_HAPPEND    0
 #define DHCP_RENEW_SUCCESS      2
 #define TCPUDP_WORK                     1780/sizeof(UW)     /*20150520 wed review*/

@@ -806,15 +806,23 @@ Parameters:
 Returns:
     The number of bytes available.
 ******************************************************************************/
-int EthernetClient::available(void)
+int EthernetClient::available()
 {
     int res = 0;
-    int  ercd;
-
-    if(connected() == true){
+    if(connected()){
         res =  head_tcb[0].rdsize;
-        ercd = tcp_read_stat(ARDUINO_TCP_CEP);
-        if(res == 0 && ercd == T4_TCPS_CLOSE_WAIT){
+        int ercd = tcp_read_stat(ARDUINO_TCP_CEP);
+#ifdef ETHER_DEBUG
+		static int ercd_ = -1;
+		if(ercd != ercd_) {
+			utils::format("(%d) tcp_read_stat: %d\n") % res % ercd;
+			ercd_ = ercd;
+		}
+#endif
+        if(res == 0 && ercd == T4_TCPS_CLOSE_WAIT) {
+#ifdef ETHER_DEBUG
+			utils::format("tcp_sht_cep\n");
+#endif
             tcp_sht_cep(ARDUINO_TCP_CEP);
         }
     }

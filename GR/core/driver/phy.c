@@ -405,10 +405,10 @@ static void phy_write_(uint16_t reg_addr, uint16_t data)
 		phy_write_sub_(PHY_REG_DP83822_ADDAR, data);
 #else
 		printf("PHY Address Range Error: %04X\n", reg_addr);
-		return 0;
+		return;
 #endif
 	} else {
-		return phy_write_sub_(reg_addr, data);
+		phy_write_sub_(reg_addr, data);
 	}
 }
 
@@ -466,6 +466,8 @@ int16_t phy_init(void)
 
 #ifdef TI_DP83822
 #ifdef PHY_DEBUG
+    reg = phy_read_(0x0462);
+	printf("DP83822 Boot Strap Latch (0x0462): 0x%04X\n", (int)reg);
     reg = phy_read_(0x0467);
 	printf("DP83822 Boot Strap Latch #1(SOR1): 0x%04X\n", (int)reg);
     reg = phy_read_(0x0468);
@@ -478,10 +480,14 @@ int16_t phy_init(void)
 
 	phy_write_(0x0018, 0b0000010001000000);
 	phy_write_(0x0019, 0b0000000000100001);
-///	phy_write_(0x0462, 0b0100001100000000);
 	phy_write_(0x0462, 0b0100001100000000);
 
 	phy_write_(PHY_REG_DP83822_RCSR, 0b0000000001100001);
+
+#ifdef PHY_DEBUG
+    reg = phy_read_(0x0462);
+	printf("DP83822 Boot Strap Latch (0x0462): 0x%04X\n", (int)reg);
+#endif
 
 #endif
 #ifdef PHY_DEBUG

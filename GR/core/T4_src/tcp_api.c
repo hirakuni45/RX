@@ -29,6 +29,7 @@
 /***********************************************************************************************************************
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
+#include <stdio.h>
 #include <string.h>
 #include "tcp_api.h"
 
@@ -809,54 +810,52 @@ void _tcp_clr_req(ID cepid)
 ***********************************************************************************************************************/
 int tcp_read_stat(ID cepid)
 {
-    int err = E_INI;
-
-    err = _tcp_check_cepid_arg(cepid);
-    if (err != E_OK)
-    {
+    int err = _tcp_check_cepid_arg(cepid);
+    if(err != E_OK) {
         return E_PAR;
     }
 
-    switch (head_tcb[cepid-1].status)
+	int ret = -1;
+    switch (head_tcb[cepid - 1].status)
     {
         case _TCPS_CLOSED:
-            err = 0;
+            ret = 0;
             break;
         case _TCPS_LISTEN:
-            err = 1;
+            ret = 1;
             break;
         case _TCPS_ESTABLISHED:
-            err = 2;
+            ret = 2;
             break;
         case _TCPS_FIN_WAIT2:
-            err = 3;
+            ret = 3;
             break;
         case _TCPS_CLOSE_WAIT:
-            err = 4;
+            ret = 4;
             break;
         case _TCPS_SYN_SENT:
-            err = 5;
+            ret = 5;
             break;
         case _TCPS_SYN_RECEIVED:
-            err = 6;
+            ret = 6;
             break;
         case _TCPS_FIN_WAIT1:
-            err = 7;
+            ret = 7;
             break;
         case _TCPS_LAST_ACK:
-            err = 8;
+            ret = 8;
             break;
         case _TCPS_CLOSING:
-            err = 9;
+            ret = 9;
             break;
         case _TCPS_TIME_WAIT:
-            err = 10;
+            ret = 10;
             break;
         default:
-            err = 11;
+            ret = 11;
             break;
     }
-    return err;
+    return ret;
 }
 
 extern void _tcp_init_tcb(_TCB *_ptcb);
