@@ -12,6 +12,8 @@ FATFS_VER	=	ff12b
 
 BUILD		=	release
 
+BUILD_ID	=	$(shell date +%Y%m%d%H)
+
 VPATH		=	../
 
 ASOURCES	=	common/start.s \
@@ -24,7 +26,7 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c \
 				GR/core/r_byteq_v1.30/r_byteq.c \
-				GR/core/driver/t4_driver.c \
+				GR/core/driver/driver.c \
 				GR/core/T4_src/config_tcpudp.c \
 				GR/core/T4_src/ether.c \
 				GR/core/T4_src/ip.c \
@@ -45,14 +47,15 @@ USER_LIBS	=	stdc++
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
 USER_DEFS	=	SIG_RX64M F_ICK=96000000 F_PCKA=96000000 F_PCKB=48000000 \
-				FAT_FS FAT_FS_NUM=16 \
-				GRKAEDE GRSAKURA CPPAPP __RX_LITTLE_ENDIAN__=1 __T4__ __RX
+				B_ID=$(BUILD_ID) \
+				FAT_FS FAT_FS_NUM=3 \
+				__RX __RX_LITTLE_ENDIAN__
 
 MCU_TARGET	=
 
 INC_SYS		=
 
-INC_APP		=	. ../ ../RX64M ../GR
+INC_APP		=	. ../ ../RX64M ../GR ../rx64m_test
 
 OPTIMIZE	=	-Os
 
