@@ -367,6 +367,51 @@ namespace utils {
 
 			return mktime(&ttm);
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  １６進数ダンプ
+			@param[in]	src	ソース
+			@param[in]	num	数
+			@param[in]	lin	１行辺りの表示数
+		*/
+		//-----------------------------------------------------------------//
+		static void conv_html_amp(const char* src, char* dst)
+		{
+			char ch;
+			bool amp = false;
+			int hex = 0;
+			uint8_t hv = 0;
+			while((ch = *src++) != 0) {
+				if(amp) {
+					if(ch == '%') {
+						*dst = ch;
+						++dst;
+						continue;
+					} else {
+						hex = 2;
+					}
+					amp = false;
+				}
+				if(hex > 0) {
+					hv <<= 4;
+					if(ch >= '0' && ch <= '9') hv |= ch - '0';
+					else if(ch >= 'A' && ch <= 'F') hv |= ch - 'A' + 10;
+					else if(ch >= 'a' && ch <= 'f') hv |= ch - 'a' + 10;
+					--hex;
+					if(hex == 0) ch = hv;
+					else continue;
+				}
+				if(ch == '%') {
+					amp = true;
+				} else {
+					*dst = ch;
+					++dst;
+				}
+			}
+			*dst = 0;
+		}
 	};
 
 
@@ -388,6 +433,18 @@ namespace utils {
 
 		const char* line_[line_size];
 		uint32_t	line_pos_;
+
+		bool set_term_() {
+			if(line_pos_ < line_size) {
+				buff_[buff_pos_] = 0;
+				++buff_pos_;
+				++line_pos_;
+				back_ = 0;
+				return true;
+			} else {
+				return false;
+			}
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -434,9 +491,23 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	終端を設定
+			@return 追加出来ない（割り当てオーバー）場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool set_term() {
+			if(back_ == 0) {
+				line_[line_pos_] = &buff_[buff_pos_];
+			}
+			return set_term_();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	追加
 			@param[in]	ch	キャラクター
-			@return 追加出来ない場合「false」
+			@return 追加出来ない（割り当てオーバー）場合「false」
 		*/
 		//-----------------------------------------------------------------//
 		bool add(char ch)
@@ -446,15 +517,7 @@ namespace utils {
 			}
 
 			if(back_ != spch_ && ch == spch_) {
-				if(line_pos_ < line_size) {
-					buff_[buff_pos_] = 0;
-					++buff_pos_;
-					++line_pos_;
-					back_ = 0;
-					return true;
-				} else {
-					return false;
-				}
+				return set_term_();
 			}
 
 			if(buff_pos_ < (buff_size - 1)) {
