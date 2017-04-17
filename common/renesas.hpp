@@ -70,6 +70,8 @@
 #include "RX64M/edmac.hpp"
 #include "RX64M/rtc.hpp"
 #include "RX64M/rtc_io.hpp"
+#include "RX64M/flash.hpp"
+#include "RX64M/flash_io.hpp"
 #else
 #  error "Requires SIG_XXX to be defined"
 #endif
