@@ -7,7 +7,11 @@
 */
 //=====================================================================//
 #include <cstdio>
-#include "main.hpp"
+#ifdef SEEDA
+#include "rx64m_test/main.hpp"
+#else
+#include "GR-KAEDE/main.hpp"
+#endif
 
 #include "common/string_utils.hpp"
 
@@ -16,6 +20,8 @@
 extern "C" {
 	void INT_Excep_ICU_GROUPAL1(void);
 }
+
+#define GET_DEBUG
 
 namespace seeda {
 
@@ -35,43 +41,50 @@ namespace seeda {
 
 		enum class server_task {
 			wait_client,
-			wait_available,
-			analize,
+			main_loop,
 			disconnect_delay,
 			disconnect,
 		};
 		server_task		server_task_;
 
-		typedef utils::line_manage<1024, 20> LINE_MAN;
+		typedef utils::line_manage<2048, 20> LINE_MAN;
 		LINE_MAN	line_man_;
 
 		uint32_t	disconnect_loop_;
 
-#if 0
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
 			if(fi == nullptr) return;
 
-			time_t t = str::fatfs_time_to(fi->fdate, fi->ftime);
+			EthernetClient* cl = static_cast<EthernetClient*>(option);
+
+			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
 			struct tm *m = localtime(&t);
 			if(dir) {
-				format("          ");
+				cl->print("          ");
 			} else {
-				format("%9d ") % fi->fsize;
+				char tmp[16];
+				utils::format("%9d ", tmp, sizeof(tmp)) % fi->fsize;
+				cl->print(tmp);
 			}
-			format("%s %2d %4d %02d:%02d ") 
-				% get_mon(m->tm_mon)
-				% static_cast<int>(m->tm_mday)
-				% static_cast<int>(m->tm_year + 1900)
-				% static_cast<int>(m->tm_hour)
-				% static_cast<int>(m->tm_min);
-			if(dir) {
-				format("/");
-			} else {
-				format(" ");
+			{
+				char tmp[32];
+				utils::format("%s %2d %4d %02d:%02d ", tmp, sizeof(tmp)) 
+					% get_mon(m->tm_mon)
+					% static_cast<int>(m->tm_mday)
+					% static_cast<int>(m->tm_year + 1900)
+					% static_cast<int>(m->tm_hour)
+					% static_cast<int>(m->tm_min);
+				cl->print(tmp);
+				if(dir) {
+					cl->print("/");
+				} else {
+					cl->print(" ");
+				}
+				cl->print(name);
+				cl->println("<br/>");
 			}
-			format("%s\n") % name;
 		}
-#endif
+
 
 		void send_head_(EthernetClient& client, int id, bool keep)
 		{
@@ -86,30 +99,80 @@ namespace seeda {
 			client.println();
 		}
 
+
 		// クライアントからの応答を解析して終端（空行）があったら「true」
-		bool analize_request_(EthernetClient& client)
+		int analize_request_(EthernetClient& client)
 		{
-			char tmp[512];
+			char tmp[1024];
 			int len = client.read(tmp, sizeof(tmp));
-			if(len <= 0) return false;
+			if(len <= 0) return -1;
 
 			for(int i = 0; i < len; ++i) {
 				char ch = tmp[i];
 				if(ch == 0 || ch == 0x0d) continue;
-				if(!line_man_.add(ch)) return false;
-			}
-			if(!line_man_.empty()) {
-				const char* p = line_man_[line_man_.size() - 1];
-				if(p != nullptr && *p == 0) {  // 応答の終端！（空行）
-
-					for(uint32_t i = 0; i < line_man_.size(); ++i) {
-						utils::format("%s\n") % line_man_[i];
-					}
-
-					return true;
+				if(!line_man_.add(ch)) {
+					utils::format("line_man: memory over\n");
+					return -1;
 				}
 			}
-			return false;
+			if(static_cast<size_t>(len) < sizeof(tmp)) {
+				line_man_.set_term();
+				if(!line_man_.empty()) {
+#if 0
+					for(uint32_t i = 0; i < line_man_.size(); ++i) {
+						const char* p = line_man_[i];
+						utils::format("%s\n") % p;
+					}
+#endif
+					for(uint32_t i = 0; i < line_man_.size(); ++i) {
+						const char* p = line_man_[i];
+						if(p[0] == 0) {  // 応答の終端！（空行）
+							return i;
+						}
+					}
+				}
+			}
+			return -1;
+		}
+
+
+		void do_cgi_(EthernetClient& client, const char* path, int pos)
+		{
+			utils::format("CGI: '%s'\n") % path;
+
+			int len = 0;
+			for(int i = 0; i < static_cast<int>(line_man_.size()); ++i) {
+				const char* p = line_man_[i];
+				static const char* key = { "Content-Length: " };
+				if(strncmp(p, key, strlen(key)) == 0) {
+					utils::input("%d", p + strlen(key)) % len;
+					break;
+				}
+			}
+
+			int lines = static_cast<int>(line_man_.size());
+			++pos;
+			if(pos >= lines) {
+				utils::format("CGI No Body\n");
+			} else {
+				char tmp[256];
+				utils::str::conv_html_amp(line_man_[pos], tmp);
+				utils::format("CGI Body: '%s'\n") % tmp;
+			}
+
+
+
+			
+		}
+
+
+		// POST などの空行以下のデータ列を受け取る
+		bool recv_data_(EthernetClient& client, char* recv, uint32_t max)
+		{
+			int len = client.read(recv, max);
+			if(len <= 0) return false;
+
+			return true;
 		}
 
 
@@ -162,9 +225,56 @@ namespace seeda {
 		}
 
 
+		// 設定画面
 		void render_setup_(EthernetClient& client)
 		{
-			render_null_(client, "Setup");
+			send_head_(client, 200, false);
+
+			client.println("<html>");
+
+			client.println("<head>");
+			client.println("<title>SEEDA Setup</title>");
+			client.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
+			client.println("<meta http-equiv=\"Pragma\" content=\"no-cache\">");
+			client.println("<meta http-equiv=\"Cache-Control\" content=\"no-cache\">");
+			client.println("<meta http-equiv=\"Expires\" content=\"0\">");
+			client.println("</head>");
+
+			// RTC 設定 /// client.println("<input type=\"reset\" value=\"取消\">");
+			client.println("<form method=\"POST\" action=\"cgi/set_date.cgi\">");
+			client.println("<div>年月日(yyyy/mm/dd)：<input type=\"text\" name=\"date_ymd\" size=\"10\" /></div>");
+			client.println("<div>時間　(hh:mm[:ss])：<input type=\"text\" name=\"date_t\" size=\"8\" /></div>");
+			client.println("<input type=\"submit\" value=\"ＲＴＣ設定\" />");
+			client.println("</form>");
+			client.println("<br>");
+
+#if 0
+			// タイムスライス設定
+			client.println("<form method=\"POST\" action=\"cgi/set_rate.cgi\">");
+			client.println("<p>Ａ／Ｄ変換サンプリング・レート<br>");
+			client.println("<input type=\"radio\" name=\"rate\" value=\"_10ms\" />１０［ｍｓ］"); 
+			client.println("<input type=\"radio\" name=\"rate\" value=\"_01ms\" />　１［ｍｓ］"); 
+			client.println("</p>");
+			client.println("<input type=\"submit\" value=\"レート設定\" />");
+			client.println("</form>");
+			client.println("<br>");
+#endif
+
+			// 閾値設定
+			client.println("<form method=\"POST\" action=\"cgi/set_level.cgi\">");
+			static const char* ch16[] = { "０", "１", "２", "３", "４", "５", "６", "７" };
+			for (int ch = 0; ch < 8; ++ch) {
+				const auto& t = get_sample(ch);
+				char tmp[256];
+				utils::format("<div>チャネル%s：<input type=\"text\" name=\"level_ch%d\" size=\"6\" value=\"%d\"  /></div>", tmp, sizeof(tmp))
+					% ch16[ch] % ch % static_cast<int>(t.limit_level_);
+				client.println(tmp);
+			}
+			client.println("<input type=\"submit\" value=\"Ａ／Ｄ変換閾値設定\" />");
+			client.println("</form>");
+			client.println("<br>");
+
+			client.println("</html>");
 		}
 
 
@@ -175,8 +285,7 @@ namespace seeda {
 			client.println("<!DOCTYPE HTML>");
 			client.println("<html>");
 
-
-///			return dir_loop(root, dir_list_func_, true);
+			at_sdc().dir_loop("", dir_list_func_, true, &client);
 
 
 			client.println("</html>");
@@ -292,6 +401,19 @@ namespace seeda {
 			}
 		}
 
+
+		void get_path_(const char* src, char* dst) {
+			int n = 0;
+			char ch;
+			while((ch = src[n]) != 0) {
+				if(ch == ' ') break;
+				dst[n] = ch;
+				++n;
+			}
+			dst[n] = 0;
+		}
+
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -317,8 +439,13 @@ namespace seeda {
 			utils::delay::milli_second(200); /// reset rise time
 			LAN_RESN::P = 1;
 
+#ifdef SEEDA
 			device::power_cfg::turn(device::peripheral::ETHERCA);
 			device::port_map::turn(device::peripheral::ETHERCA);
+#else
+			device::power_cfg::turn(device::peripheral::ETHERC0);
+			device::port_map::turn(device::peripheral::ETHERC0);
+#endif
 			set_interrupt_task(INT_Excep_ICU_GROUPAL1, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
 
 			Ethernet.maininit();
@@ -326,9 +453,11 @@ namespace seeda {
 			static const uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 
 			bool develope = true;
+#ifdef SEEDA
 			if(get_switch() != 0) {
 				develope = false;
 			}
+#endif
 
 			if(develope) {
 				if(Ethernet.begin(mac) == 0) {
@@ -382,44 +511,47 @@ namespace seeda {
 			EthernetClient client = server_.available();
 
 			switch(server_task_) {
+
 			case server_task::wait_client:
 				if(client) {
 					utils::format("new client\n");
 					++count_;
-					server_task_ = server_task::wait_available;
+					line_man_.clear();
+					server_task_ = server_task::main_loop;
 				}
 				break;
-			case server_task::wait_available:
+
+			case server_task::main_loop:
 				if(client.connected()) {
-					if(client.available()) {
-						line_man_.clear();
-						server_task_ = server_task::analize;
+
+					if(client.available() == 0) {
+///						utils::format("client not available\n");
+						break;
 					}
-				}
-				break;
-			case server_task::analize:
-				if(client.connected()) {
-					if(analize_request_(client)) {
+
+					auto pos = analize_request_(client);
+					if(pos > 0) {
 						char path[256];
 						path[0] = 0;
 						if(!line_man_.empty()) {
-							auto t = line_man_[0];
+							const auto& t = line_man_[0];
 							if(strncmp(t, "GET ", 4) == 0) {
-								int n = 0;
-								char ch;
-								while((ch = t[n + 4]) != 0) {
-									if(ch == ' ') break;
-									path[n] = ch;
-									++n;
-								}
-								path[n] = 0;
+								get_path_(t + 4, path);
+							} else if(strncmp(t, "POST ", 5) == 0) {
+								get_path_(t + 5, path);
 							}
+						} else {
+							utils::format("fail GET/POST data section\n");
+							break;
 						}
 						if(strcmp(path, "/") == 0) {
 ///							render_root_(client);
 							render_data_(client);
-///						} else if(strcmp(path, "/data") == 0) {
-///							render_data_(client);
+						} else if(strncmp(path, "/cgi/", 5) == 0) {
+							do_cgi_(client, path, pos);
+							render_setup_(client);
+						} else if(strcmp(path, "/data") == 0) {
+							render_data_(client);
 						} else if(strcmp(path, "/setup") == 0) {
 							render_setup_(client);
 						} else if(strcmp(path, "/files") == 0) {
@@ -432,13 +564,14 @@ namespace seeda {
 							render_null_(client, tmp);
 						}
 						server_task_ = server_task::disconnect_delay;
-						disconnect_loop_ = 1;
+						disconnect_loop_ = 5;
 					}
 				} else {
 					server_task_ = server_task::disconnect_delay;
-					disconnect_loop_ = 1;
+					disconnect_loop_ = 5;
 				}
 				break;
+
 			case server_task::disconnect_delay:
 				if(disconnect_loop_ > 0) {
 					--disconnect_loop_;
@@ -446,6 +579,7 @@ namespace seeda {
 					server_task_ = server_task::disconnect;
 				}
 				break;
+
 			case server_task::disconnect:
 			default:
 				client.stop();
