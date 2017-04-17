@@ -9,6 +9,7 @@
 #include <cstring>
 #include "ff12b/src/ff.h"
 #include "common/time.h"
+#include "common/format.hpp"
 
 /// string, vector が使える環境
 // #define STRING_VECTOR
@@ -371,10 +372,9 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  １６進数ダンプ
+			@brief  html 内１６進表記コードの変換
 			@param[in]	src	ソース
-			@param[in]	num	数
-			@param[in]	lin	１行辺りの表示数
+			@param[out]	dst	出力
 		*/
 		//-----------------------------------------------------------------//
 		static void conv_html_amp(const char* src, char* dst)
@@ -413,6 +413,132 @@ namespace utils {
 			*dst = 0;
 		}
 	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  CGI POST のパース
+		@param[in]	buff_size	バッファの最大サイズ
+		@param[in]	unit_size	ユニットの最大サイズ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t buff_size, uint32_t unit_size>
+	class parse_cgi_post {
+	public:
+		struct unit_t {
+			const char* key;
+			const char* val;
+			unit_t() : key(nullptr), val(nullptr) { }
+		};
+
+	private:
+		char				buff_[buff_size];
+		unit_t				units_[unit_size];
+		uint32_t			size_;
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		parse_cgi_post() : size_(0) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	クリア
+		*/
+		//-----------------------------------------------------------------//
+		void clear() {
+			size_ = 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	パース
+			@param[in]	src	ソース
+			@return パースに失敗（メモリー不足）したら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool parse(const char* src)
+		{
+			uint32_t n = 0;
+			uint32_t s = 0;
+			char ch;
+			char bch = 0;
+			while((ch = *src) != 0) {
+				if(bch == '=') {
+					units_[s].val = &buff_[n];
+				} else if(bch == 0) {
+					units_[s].key = &buff_[n];
+				}
+				if(bch == '&') {
+					if(s < (unit_size - 1)) {
+						++s;
+					} else {
+						size_ = 0;
+						return false;
+					}
+					units_[s].key = &buff_[n];
+				}
+				if(n < (buff_size - 1)) {
+					if(ch == '=') { bch = ch; ch = 0; }
+					else if(ch == '&') { bch = ch; ch = 0; }
+					else bch = ch;
+					buff_[n] = ch;
+					++n;
+				} else {
+					size_ = 0;
+					return false;
+				}
+				++src;
+			}
+
+			buff_[n] = 0;
+			size_ = s + 1;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ユニット・サイズを取得
+			@return ユニット・サイズ
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t size() const { return size_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ユニットを取得
+			@param[in]	idx	インデックス
+			@return ユニット
+		*/
+		//-----------------------------------------------------------------//
+		const unit_t& get_unit(uint32_t idx) const {
+			static const unit_t null_unit;
+			if(idx >= size_) return null_unit;
+			return units_[idx];
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	リスト
+		*/
+		//-----------------------------------------------------------------//
+		void list() const {
+			utils::format("Size: %d\n") % size_;
+			for(uint32_t i = 0; i < size(); ++i) {
+				utils::format("Key: '%s' - Value: '%s'\n") % units_[i].key % units_[i].val;
+			}
+		}		
+	};
+
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
