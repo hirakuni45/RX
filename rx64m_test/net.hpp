@@ -86,7 +86,7 @@ namespace seeda {
 		}
 
 
-		void send_head_(EthernetClient& client, int id, bool keep)
+		void send_info_(EthernetClient& client, int id, bool keep)
 		{
 			client << "HTTP/1.1 ";
 			client << id << " OK";
@@ -97,6 +97,20 @@ namespace seeda {
 			if(keep) client.println("keep-alive");
 			else client.println("close");
 			client.println();
+		}
+
+
+		void send_head_(EthernetClient& client, const char* title)
+		{
+			client.println("<head>");
+			char tmp[256];
+			utils::format("<title>SEEDA %s</title>", tmp, sizeof(tmp)) % title;
+			client.println(tmp);
+			client.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
+			client.println("<meta http-equiv=\"Pragma\" content=\"no-cache\">");
+			client.println("<meta http-equiv=\"Cache-Control\" content=\"no-cache\">");
+			client.println("<meta http-equiv=\"Expires\" content=\"0\">");
+			client.println("</head>");
 		}
 
 
@@ -152,17 +166,56 @@ namespace seeda {
 
 			int lines = static_cast<int>(line_man_.size());
 			++pos;
+			char body[256];
 			if(pos >= lines) {
 				utils::format("CGI No Body\n");
+				return;
 			} else {
-				char tmp[256];
-				utils::str::conv_html_amp(line_man_[pos], tmp);
-				utils::format("CGI Body: '%s'\n") % tmp;
+				utils::str::conv_html_amp(line_man_[pos], body);
+//				utils::format("CGI Body: '%s'\n") % body;
 			}
 
-
-
-			
+			if(strcmp(path, "/cgi/set_rtc.cgi") == 0) {
+				typedef utils::parse_cgi_post<256, 2> CGI_RTC;
+				CGI_RTC cgi;
+				cgi.parse(body);
+				const char* date = nullptr;
+				const char* time = nullptr;
+				for(uint32_t i = 0; i < cgi.size(); ++i) {
+					const auto& t = cgi.get_unit(i);
+					if(strcmp(t.key, "date") == 0) {
+						date = t.val;
+					} else if(strcmp(t.key, "time") == 0) {
+						time = t.val;
+					}
+				}
+				if(date != nullptr && time != nullptr) {
+					time_t t = seeda::make_time(date, time);
+					if(t != 0) {
+						seeda::set_time(t);
+					}
+				}
+//				cgi.list();
+			} else if(strcmp(path, "/cgi/set_level.cgi") == 0) {
+				typedef utils::parse_cgi_post<256, 8> CGI_ADC;
+				CGI_ADC cgi;
+				cgi.parse(body);
+				for(uint32_t i = 0; i < cgi.size(); ++i) {
+					const auto& t = cgi.get_unit(i);
+					int ch;
+					if((utils::input("level_ch%d", t.key) % ch).status()) {
+						sample_t samp = get_sample(ch);
+						int v;
+						if((utils::input("%d", t.val) % v).status()) {
+							if(v >= 0 && v <= 65535) {
+								samp.limit_level_ = v;
+								set_sample(ch, samp);
+							}
+						}
+					}
+				}
+//				cgi.list();
+			}
 		}
 
 
@@ -178,16 +231,19 @@ namespace seeda {
 
 		void render_404_(EthernetClient& client, const char* msg)
 		{
-			send_head_(client, 404, false);
+			send_info_(client, 404, false);
 		}
 
 
 		void render_null_(EthernetClient& client, const char* title = nullptr)
 		{
-			send_head_(client, 200, false);
+			send_info_(client, 200, false);
 
 			client.println("<!DOCTYPE HTML>");
 			client.println("<html>");
+			send_head_(client, "NULL");
+
+
 			if(title != nullptr) {
 				client.println(title);
 			}
@@ -197,8 +253,13 @@ namespace seeda {
 
 		void render_root_(EthernetClient& client)
 		{
-			send_head_(client, 200, false);
+			send_info_(client, 200, false);
 
+			client.println("<!DOCTYPE HTML>");
+			client.println("<html>");
+			send_head_(client, "Root");
+
+			client.println("</html>");
 #if 0
 			client.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">");
 			client.println("<html>");
@@ -228,29 +289,49 @@ namespace seeda {
 		// 設定画面
 		void render_setup_(EthernetClient& client)
 		{
-			send_head_(client, 200, false);
+			send_info_(client, 200, false);
 
+			client.println("<!DOCTYPE HTML>");
 			client.println("<html>");
+			send_head_(client, "Setup");
 
-			client.println("<head>");
-			client.println("<title>SEEDA Setup</title>");
-			client.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-			client.println("<meta http-equiv=\"Pragma\" content=\"no-cache\">");
-			client.println("<meta http-equiv=\"Cache-Control\" content=\"no-cache\">");
-			client.println("<meta http-equiv=\"Expires\" content=\"0\">");
-			client.println("</head>");
+			{  // 時間表示
+				char tmp[128];
+				time_t t = get_time();
+				disp_time(t, tmp, sizeof(tmp));
+				client.print(tmp);
+				client.println("<br/>");
+				client.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+			}
+
+			client.println("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"リロード\" />");
+			client.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+
+//			client.println("<font size=\"4\">");
+//			client.println("</font>");
 
 			// RTC 設定 /// client.println("<input type=\"reset\" value=\"取消\">");
-			client.println("<form method=\"POST\" action=\"cgi/set_date.cgi\">");
-			client.println("<div>年月日(yyyy/mm/dd)：<input type=\"text\" name=\"date_ymd\" size=\"10\" /></div>");
-			client.println("<div>時間　(hh:mm[:ss])：<input type=\"text\" name=\"date_t\" size=\"8\" /></div>");
-			client.println("<input type=\"submit\" value=\"ＲＴＣ設定\" />");
-			client.println("</form>");
-			client.println("<br>");
+			{
+				client.println("<form method=\"POST\" action=\"/cgi/set_rtc.cgi\">");
+				auto t = get_time();
+				struct tm *m = localtime(&t);
+				char tmp[256];
+				utils::format("<div>年月日(yyyy/mm/dd)：<input type=\"text\" name=\"date\" size=\"10\" value=\"%d/%d/%d\" /></div>", tmp, sizeof(tmp))
+					% static_cast<int>(m->tm_year + 1900) % static_cast<int>(m->tm_mon + 1) % static_cast<int>(m->tm_mday);
+				client.println(tmp);
+				utils::format("<div>時間　(hh:mm[:ss])：<input type=\"text\" name=\"time\" size=\"8\" value=\"%d:%d\" /></div>", tmp, sizeof(tmp))
+					% static_cast<int>(m->tm_hour) % static_cast<int>(m->tm_min);
+				client.println(tmp);
+				client.println("<input type=\"submit\" value=\"ＲＴＣ設定\" />");
+				client.println("</form>");
+				client.println("<br>");
+
+				client.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+			}
 
 #if 0
-			// タイムスライス設定
-			client.println("<form method=\"POST\" action=\"cgi/set_rate.cgi\">");
+			// サンプリング周期設定
+			client.println("<form method=\"POST\" action=\"/cgi/set_rate.cgi\">");
 			client.println("<p>Ａ／Ｄ変換サンプリング・レート<br>");
 			client.println("<input type=\"radio\" name=\"rate\" value=\"_10ms\" />１０［ｍｓ］"); 
 			client.println("<input type=\"radio\" name=\"rate\" value=\"_01ms\" />　１［ｍｓ］"); 
@@ -261,18 +342,22 @@ namespace seeda {
 #endif
 
 			// 閾値設定
-			client.println("<form method=\"POST\" action=\"cgi/set_level.cgi\">");
-			static const char* ch16[] = { "０", "１", "２", "３", "４", "５", "６", "７" };
-			for (int ch = 0; ch < 8; ++ch) {
-				const auto& t = get_sample(ch);
-				char tmp[256];
-				utils::format("<div>チャネル%s：<input type=\"text\" name=\"level_ch%d\" size=\"6\" value=\"%d\"  /></div>", tmp, sizeof(tmp))
-					% ch16[ch] % ch % static_cast<int>(t.limit_level_);
-				client.println(tmp);
+			{
+				client.println("<form method=\"POST\" action=\"/cgi/set_level.cgi\">");
+				static const char* ch16[] = { "０", "１", "２", "３", "４", "５", "６", "７" };
+				for (int ch = 0; ch < 8; ++ch) {
+					const auto& t = get_sample(ch);
+					char tmp[256];
+					utils::format("<div>チャネル%s：<input type=\"text\" name=\"level_ch%d\" size=\"6\" value=\"%d\"  /></div>", tmp, sizeof(tmp))
+						% ch16[ch] % ch % static_cast<int>(t.limit_level_);
+					client.println(tmp);
+				}
+				client.println("<input type=\"submit\" value=\"Ａ／Ｄ変換閾値設定\" />");
+				client.println("</form>");
+
+				client.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
 			}
-			client.println("<input type=\"submit\" value=\"Ａ／Ｄ変換閾値設定\" />");
-			client.println("</form>");
-			client.println("<br>");
+
 
 			client.println("</html>");
 		}
@@ -280,13 +365,13 @@ namespace seeda {
 
 		void render_files_(EthernetClient& client)
 		{
-			send_head_(client, 200, false);
+			send_info_(client, 200, false);
 
 			client.println("<!DOCTYPE HTML>");
 			client.println("<html>");
+			send_head_(client, "Files");
 
 			at_sdc().dir_loop("", dir_list_func_, true, &client);
-
 
 			client.println("</html>");
 		}
@@ -294,11 +379,13 @@ namespace seeda {
 
 		void render_data_(EthernetClient& client)
 		{
-			send_head_(client, 200, false);
+			send_info_(client, 200, false);
 			// client.println("Refresh: 5");  // refresh the page automatically every 5 sec
 
 			client.println("<!DOCTYPE HTML>");
 			client.println("<html>");
+			send_head_(client, "Data");
+
 			client.println("<font size=\"4\">");
 			{  // コネクション回数表示
 				char tmp[128];
@@ -359,6 +446,11 @@ namespace seeda {
 				client << "</tr>\n";
 			}
 			client << "</table>\n";
+
+			client.println("<br>");
+			client.println("<hr align=\"left\" width=\"600\" size=\"3\" />");
+
+			client.println("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\" />");
 
 			client.println("</html>");
 		}
