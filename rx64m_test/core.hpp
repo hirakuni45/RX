@@ -21,7 +21,7 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct core {
 
-		static const int seeda_version_ = 75;
+		static const int seeda_version_ = 80;
 		static const uint32_t build_id_ = B_ID;
 
 		class cmt_task {
@@ -63,7 +63,9 @@ namespace seeda {
 			}
 
 			volatile unsigned long get_millis() const { return millis_; }
+
 			volatile unsigned long get_delay() const { return delay_; }
+
 			void set_delay(volatile unsigned long n) { delay_ = n; }
 		};
 

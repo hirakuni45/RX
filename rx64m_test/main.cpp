@@ -30,10 +30,14 @@ namespace {
 
 ///	bool	config_;
 
+	volatile bool enable_eadc_;
+
 	void main_init_()
 	{
 		// RTC 設定
 		rtc_.start();
+
+		enable_eadc_ = false;
 
 		{  // LTC2348ILX-16 初期化
 			// 内臓リファレンスと内臓バッファ
@@ -157,6 +161,8 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	void eadc_server()
 	{
+		if(!enable_eadc_) return;
+
 		eadc_.convert();
 		for(int i = 0; i < 8; ++i) {
 			sample_[i].add(eadc_.get_value(i));
@@ -170,6 +176,18 @@ namespace seeda {
 			}
 			sample_count_ = 0;
 		}
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  EADC サーバー許可
+		@param[in]	ena	「false」の場合不許可
+	*/
+	//-----------------------------------------------------------------//
+	void enable_eadc_server(bool ena)
+	{
+		enable_eadc_ = ena;
 	}
 
 
@@ -410,6 +428,8 @@ int main(int argc, char** argv)
 
 	net_.init();
 	net_.title();
+
+	enable_eadc_server();
 
 	uint32_t cnt = 0;
 	while(1) {

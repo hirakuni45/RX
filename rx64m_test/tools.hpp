@@ -37,6 +37,8 @@ namespace seeda {
 
 		void adc_capture_(int ch, int rate, int num, const char* fname)
 		{
+			seeda::enable_eadc_server(false);
+
 			// utils::format("ch:   %d\n") % ch;
 			// utils::format("rate: %d\n") % rate;
 			// utils::format("num:  %d\n") % num;
@@ -66,6 +68,7 @@ namespace seeda {
 			if(!at_sdc().open(&fp, fname, FA_WRITE | FA_CREATE_ALWAYS)) {
 				utils::format("Can't create file: '%s'\n") % fname;
 				delete[] buff;
+				seeda::enable_eadc_server();
 				return;
 			}
 
@@ -74,6 +77,7 @@ namespace seeda {
 			f_close(&fp);
 
 			delete[] buff;
+			seeda::enable_eadc_server();
 		}
 
 
@@ -221,6 +225,8 @@ namespace seeda {
 
 		bool eadc_span_(uint8_t cmdn)
 		{
+			seeda::enable_eadc_server(false);
+
 			if(cmdn >= 3) {
 				int ch;
 				if(get_int_(1, ch)) {
@@ -250,6 +256,9 @@ namespace seeda {
 					utils::format("LTC2348-16(%d): SPAN: %03b\n") % i % static_cast<uint32_t>(span);
 				}			
 			}
+
+			seeda::enable_eadc_server();
+
 			return true;
 		}
 
