@@ -195,11 +195,6 @@ int main(int argc, char** argv)
 					utils::format("Read param error: %s\n") % command_.get_command();
 				}
 			} else if(command_.cmp_word(0, "write") && n >= 3) {
-				static const uint8_t aaa[4] = { 0x12, 0x34, 0x56, 0x78 };
-				if(!flash_.write(aaa, 0, 4)) {
-					utils::format("Write error...\n");
-				}
-#if 0
 				char buff[8];
 				if(command_.get_word(1, sizeof(buff), buff)) {
 					uint16_t org = get_hexadecimal_(buff);
@@ -214,7 +209,6 @@ int main(int argc, char** argv)
 						}
 					}
 				}
-#endif
 			} else if(command_.cmp_word(0, "?") || command_.cmp_word(0, "help")) {
 				utils::format("erase [bank] (erase 0 to %d)\n") % FLASH::data_flash_bank_;
 				utils::format("r org [end] (read)\n");
