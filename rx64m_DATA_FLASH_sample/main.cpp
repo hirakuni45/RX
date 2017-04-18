@@ -1,6 +1,7 @@
 //=====================================================================//
 /*! @file
     @brief  RX64M Data Flash サンプル @n
+			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
 			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
@@ -11,6 +12,7 @@
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/input.hpp"
 
 namespace {
 
@@ -22,13 +24,13 @@ namespace {
 
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
-	typedef utils::fifo<uint8_t, 128> fifo128;
-	device::sci_io<device::SCI1, fifo128, fifo128> sci_;
+	typedef utils::fifo<uint8_t, 256> BUFFER;
+	device::sci_io<device::SCI1, BUFFER, BUFFER> sci_;
 
 	utils::command<256> command_;
 
-//	typedef device::flash_io FLASH;
-//	FLASH flash_;
+	typedef device::flash_io FLASH;
+	FLASH flash_;
 }
 
 extern "C" {
@@ -77,8 +79,7 @@ extern "C" {
 				utils::format("0x%04X:") % static_cast<uint32_t>(org);
 				adr = false;
 			}
-///			uint8_t dat = flash_.read(org);
-			uint8_t dat = 0;
+			uint8_t dat = flash_.read(org);
 			utils::format(" %02X%") % static_cast<uint32_t>(dat);
 			uint16_t a = org;
 			++org;
@@ -130,14 +131,15 @@ int main(int argc, char** argv)
 	}
 
 	{  // DataFlash 開始
-//		flash_.start();
+		flash_.start();
 	}
 
-	utils::format("RX24T DataFlash sample\n");
+	utils::format("RX64M Data Flash sample\n");
+	utils::format("Data Flash size: %08X\n") % FLASH::data_flash_size_;
 
 	command_.set_prompt("# ");
 
-	device::PORT0::PDR.B0 = 1; // output
+	device::PORT0::PDR.B7 = 1; // output
 
 	uint32_t cnt = 0;
 	while(1) {
@@ -148,15 +150,22 @@ int main(int argc, char** argv)
 			auto n = command_.get_words();
 			if(command_.cmp_word(0, "erase") && n >= 2) {
 				bool f = false;
-				char buff[8];
+				char buff[16];
 				if(command_.get_word(1, sizeof(buff), buff)) {
-					char nb = buff[4];
-					if(buff[5] == 0 && std::strncmp(buff, "bank", 4) == 0 && nb >= '0' && nb <= '7') {
-///						f = flash_.erase(static_cast<FLASH::data_area>(nb - '0'));
-						bool f = false;
-						if(!f) {
-							utils::format("Erase error: bank%c\n") % nb;
-							f = true;
+					int bank;
+					if((utils::input("%d", buff) % bank).status()) {
+						if(static_cast<uint32_t>(bank) < FLASH::data_flash_bank_) {
+							f = flash_.erase(bank);
+							if(!f) {
+								utils::format("Erase error: bank %d\n") % bank;
+								f = true;
+							} else {
+								f = flash_.erase_check(bank);
+								if(!f) {
+									utils::format("Erase Check error: bank %d\n") % bank;
+									f = true;
+								}
+							}
 						}
 					}
 				}
@@ -186,30 +195,34 @@ int main(int argc, char** argv)
 					utils::format("Read param error: %s\n") % command_.get_command();
 				}
 			} else if(command_.cmp_word(0, "write") && n >= 3) {
+				static const uint8_t aaa[4] = { 0x12, 0x34, 0x56, 0x78 };
+				if(!flash_.write(aaa, 0, 4)) {
+					utils::format("Write error...\n");
+				}
+#if 0
 				char buff[8];
 				if(command_.get_word(1, sizeof(buff), buff)) {
 					uint16_t org = get_hexadecimal_(buff);
 					for(uint8_t i = 2; i < n; ++i) {
 						if(command_.get_word(i, sizeof(buff), buff)) {
 							uint16_t data = get_hexadecimal_(buff);
-///							if(!flash_.write(org, data)) {
-///								utils::format("Write error: %04X: %02X\n")
-///									% static_cast<uint32_t>(org) % static_cast<uint32_t>(data);
-///							}
+							if(!flash_.write(org, data)) {
+								utils::format("Write error: %04X: %02X\n")
+									% static_cast<uint32_t>(org) % static_cast<uint32_t>(data);
+							}
 							++org;
 						}
 					}
 				}
+#endif
 			} else if(command_.cmp_word(0, "?") || command_.cmp_word(0, "help")) {
-				sci_puts("erase bank0..7 (erase bank0 to bank7)\n");
-				sci_puts("r org [end] (read)\n");
-				sci_puts("write org data... (write)\n");
+				utils::format("erase [bank] (erase 0 to %d)\n") % FLASH::data_flash_bank_;
+				utils::format("r org [end] (read)\n");
+				utils::format("write org data... (write)\n");
 			} else {
 				const char* p = command_.get_command();
 				if(p[0]) {
-					sci_puts("command error: ");
-					sci_puts(p);
-					sci_puts("\n");
+					utils::format("command error: '%s'\n") % p;
 				}
 			}
 		}
@@ -218,6 +231,6 @@ int main(int argc, char** argv)
 		if(cnt >= 30) {
 			cnt = 0;
 		}
-		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
+		device::PORT0::PODR.B7 = (cnt < 10) ? 0 : 1;
 	}
 }
