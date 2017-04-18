@@ -39,7 +39,9 @@ namespace device {
 		bool	trans_farm_;
 
 		/// FACIコマンド発行領域 007E 0000h 4バイト
-		static rw8_t<0x007E0000> FACI_CMD_AREA;
+		static rw8_t<0x007E0000> FACI_CMD_AREA;		///< byte 書き込み
+
+		static rw16_t<0x007E0000> FACI_CMD_AREA16;	///< word(16) 書き込み
 
 		// return 「true」正常、「false」ロック状態
 		bool turn_break_() const
@@ -142,18 +144,20 @@ namespace device {
 			device::FLASH::FSADDR = org;
 
 			FACI_CMD_AREA = 0xE8;
-			FACI_CMD_AREA = 2;
+			FACI_CMD_AREA = 0x02;
 
 			const uint8_t* p = static_cast<const uint8_t*>(src);
-			FACI_CMD_AREA = p[0];
-			FACI_CMD_AREA = p[1];
+			FACI_CMD_AREA16 = (static_cast<uint16_t>(p[1]) << 8) | static_cast<uint16_t>(p[0]);
 
 			while(device::FLASH::FSTATR.DBFULL() != 0) {
 				asm("nop");
 			}
-			
-			FACI_CMD_AREA = p[2];
-			FACI_CMD_AREA = p[3];
+
+			FACI_CMD_AREA16 = (static_cast<uint16_t>(p[3]) << 8) | static_cast<uint16_t>(p[2]);
+
+			while(device::FLASH::FSTATR.DBFULL() != 0) {
+				asm("nop");
+			}
 
 			FACI_CMD_AREA = 0xD0;
 
@@ -175,7 +179,7 @@ namespace device {
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() != 0) {
-				utils::format("FACI 'write4_' fail\n");
+				utils::format("FACI 'write4_' CMD Lock fail\n");
 				return false;
 			}
 			return true;
@@ -341,7 +345,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool write(const void* src, uint32_t org, uint32_t len) const
 		{
-			if(len & 3) return false;
+			if((len & 3) != 0 || (org & 3) != 0) return false;
 
 			if(org >= data_flash_size_) return false;
 
@@ -349,51 +353,18 @@ namespace device {
 				len = data_flash_size_ - org;
 			}
 
-
-			turn_pe_();
-			return write4_(src, org);
-
-#if 0
-			// 先頭の４バイト・アライメント
-			uint8_t first_tmp[4];
-			bool first = false;
-			if(org & 3) {
-				read(org & 0xfffffffc, 4, first_tmp);
-
-				first = true;
-			}
-
-			// 長さの４バイト・アライメント
-			uint8_t last_tmp[4];
-			bool last = false;
-			uint32_t end = org + len;
-			if(end & 3) {
-				read(end & 0xfffffffc, 4, last_tmp);
-				last = true;
-			}
-
 			turn_pe_();
 
-			if(first) {
-				if(!write4_(first_tmp, org & 0xfffffffc)) {
-					return false;
-				}
-			}
-
-			const uint8_t* p = src;
-			while(org < lim) {
-				write4_(p, org);
+			const uint8_t* p = static_cast<const uint8_t*>(src);
+			bool f = false;
+			while(len > 0) {
+				f = write4_(p, org);
+				if(!f) break;
 				p += 4;
 				org += 4;
+				len -= 4;
 			}
-
-			if(last) {
-				if(!write4_(last_tmp, end & 0xfffffffc)) {
-					return false;
-				}
-			}
-#endif
-			return true;
+			return f;
 		}
 
 
