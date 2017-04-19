@@ -7,12 +7,12 @@
 */
 //=====================================================================//
 #include <cstdio>
+#include <cmath>
 #include "rx64m_test/main.hpp"
-
 #include "common/string_utils.hpp"
+#include "chip/NTCTH.hpp"
 
 #include "GR/core/Ethernet.h"
-
 extern "C" {
 	void INT_Excep_ICU_GROUPAL1(void);
 }
@@ -48,6 +48,11 @@ namespace seeda {
 
 		uint32_t	disconnect_loop_;
 
+		// サーミスタ定義
+//		typedef chip::NTCTH<4095, 10.0f, 3452.0f, true> THMISTER;
+		typedef chip::NTCTH<4095, true> THMISTER;
+		THMISTER thmister_;
+
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
 			if(fi == nullptr) return;
 
@@ -66,10 +71,12 @@ namespace seeda {
 			}
 			{
 				char tmp[64];
-				utils::format("<td>%s %2d %4d %02d:%02d</td>", tmp, sizeof(tmp)) 
+				utils::format("<td>%s %2d %4d</td>", tmp, sizeof(tmp)) 
 					% get_mon(m->tm_mon)
 					% static_cast<int>(m->tm_mday)
-					% static_cast<int>(m->tm_year + 1900)
+					% static_cast<int>(m->tm_year + 1900);
+				cl->print(tmp);
+				utils::format("<td>%02d:%02d</td>", tmp, sizeof(tmp)) 
 					% static_cast<int>(m->tm_hour)
 					% static_cast<int>(m->tm_min);
 				cl->print(tmp);
@@ -343,8 +350,6 @@ namespace seeda {
 				client.println(tmp);
 				client.println("<input type=\"submit\" value=\"ＲＴＣ設定\" />");
 				client.println("</form>");
-				client.println("<br>");
-
 				client.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
 			}
 
@@ -397,8 +402,17 @@ namespace seeda {
 			client.println("<html>");
 			send_head_(client, "SD Files");
 
-			client.println("<table border=0>");
-			client.println("<tr><th>Size</th><th>Date/Time</th><th>Name</th></tr>");
+			client.println("<style type=\"text/css\">");
+			client.println(".table3 {");
+			client.println("  border-collapse: collapse;");
+			client.println("  width: 500px;");
+			client.println("}");
+			client.println(".table3 th {");
+			client.println("  background-color: #cccccc;");
+			client.println("}");
+			client.println("</style>");
+			client.println("<table class=\"table3\" border=1>");
+			client.println("<tr><th>Size</th><th>Date</th><th>Time</th><th>Name</th></tr>");
 			at_sdc().dir_loop("", dir_list_func_, true, &client);
 			client.println("</table>");
 
@@ -439,6 +453,14 @@ namespace seeda {
 
 			client.println("<br/>");
 			client.println("</font>");
+
+			{  // 内臓 A/D 表示（湿度、温度）
+				char tmp[64];
+				auto v = get_adc(6);
+				utils::format("温度： %5.2f [度]", tmp, sizeof(tmp)) % thmister_(v);
+				client.println(tmp);
+				client.println("<hr align=\"left\" width=\"600\" size=\"3\" />");
+			}
 
 			client << "<style type=\"text/css\">\n";
 			client << ".table5 {\n";
