@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	MPU6050 ジャイロ、加速度センサ・ドライバー
+	@brief	MPU6050 ジャイロ、加速度センサ・ドライバー @n
 			Copyright 2016 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
