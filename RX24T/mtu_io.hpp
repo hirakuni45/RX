@@ -6,7 +6,6 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "common/renesas.hpp"
 #include "common/vect.h"
 #include "RX24T/port_map.hpp"
 #include "RX24T/power_cfg.hpp"
