@@ -46,6 +46,12 @@ namespace {
 				utils::format("LTC2348_16 not found...\n");
 			}
 		}
+#else
+		{  // GR-KAEDE の SPI 端子のハードバグ回避
+		   // ※PC3 から、PC7 へ １K オームで接続
+			device::PORTC::PDR.B3 = 1; // output
+			device::PORTC::PODR.B3 = 1;
+		}
 #endif
 	}
 }
@@ -203,6 +209,19 @@ namespace seeda {
 	const sample_t& get_sample(uint8_t ch)
 	{
 		return sample_t_[ch];
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  内臓 A/D 変換値の取得
+		@param[in]	ch	チャネル（５、６、７）
+		@return A/D 変換値
+	*/
+	//-----------------------------------------------------------------//
+	uint16_t get_adc(uint32_t ch)
+	{
+		return core_.get_adc(ch);
 	}
 }
 
