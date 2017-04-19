@@ -7,11 +7,7 @@
 */
 //=====================================================================//
 #include <cstdio>
-#ifdef SEEDA
 #include "rx64m_test/main.hpp"
-#else
-#include "GR-KAEDE/main.hpp"
-#endif
 
 #include "common/string_utils.hpp"
 
@@ -294,6 +290,14 @@ namespace seeda {
 			client.println("<!DOCTYPE HTML>");
 			client.println("<html>");
 			send_head_(client, "Setup");
+
+			{  // ビルドバージョン表示
+				char tmp[128];
+				utils::format("Seeda03 Build: %u Version %d.%02d", tmp, sizeof(tmp)) % build_id_
+					% (seeda_version_ / 100) % (seeda_version_ % 100);
+				client.println(tmp);
+				client.println("<br/>");
+			}
 
 			{  // 時間表示
 				char tmp[128];

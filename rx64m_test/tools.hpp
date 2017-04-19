@@ -35,6 +35,7 @@ namespace seeda {
 
 		CMD		cmd_;
 
+#ifdef SEEDA
 		void adc_capture_(int ch, int rate, int num, const char* fname)
 		{
 			seeda::enable_eadc_server(false);
@@ -79,7 +80,7 @@ namespace seeda {
 			delete[] buff;
 			seeda::enable_eadc_server();
 		}
-
+#endif
 
 		bool get_int_(uint8_t argc, int& val) {
 			char tmp[32];
@@ -185,7 +186,7 @@ namespace seeda {
 			return f;
 		}
 
-
+#ifdef SEEDA
 		bool eadc_conv_(uint8_t cmdn)
 		{
 			bool f = false;
@@ -322,6 +323,7 @@ namespace seeda {
 			}
 			return true;
 		}
+#endif
 
 	public:
 		//-----------------------------------------------------------------//
@@ -351,12 +353,13 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void title()
 		{
+#ifdef SEEDA
 			if(at_eadc().probe()) {
 				utils::format("Device LTC2348-16: Ready\n");
 			} else {
 				utils::format("Device LTC2348-16: Not Ready\n");
 			}
-
+#endif
 			{
 				time_t t = get_time();
 				disp_time(t);
@@ -427,22 +430,26 @@ namespace seeda {
 						f = true;
 //					} else if(cmd_.cmp_word(0, "reset")) {
 //						f = reset_signal_(cmdn);
+#ifdef SEEDA
 					} else if(cmd_.cmp_word(0, "eadc")) {
 						f = eadc_conv_(cmdn);
 					} else if(cmd_.cmp_word(0, "span")) {
 						f = eadc_span_(cmdn);
 					} else if(cmd_.cmp_word(0, "sample")) {
 						f = eadc_sample_(cmdn);
+#endif
 					} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
 						utils::format("date\n");
 						utils::format("date yyyy/mm/dd hh:mm[:ss]\n");
 						utils::format("dir [name]\n");
 						utils::format("cd [directory-name]\n");
 						utils::format("pwd\n");
+#ifdef SEEDA
 ///						utils::format("reset [01]  (PHY reset signal)\n");
 						utils::format("eadc [0-7]  (LTC2348 A/D conversion)\n");
 						utils::format("span CH(0-7) SPAN(0-7)  (LTC2348 A/D span setting)\n"); 
 						utils::format("sample -ch 0-7 -rate FRQ -num SAMPLE-NUM file-name (LTC2348 A/D sample)\n");
+#endif
 						f = true;
 					}
 					if(!f) {

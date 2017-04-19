@@ -21,9 +21,6 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct core {
 
-		static const int seeda_version_ = 80;
-		static const uint32_t build_id_ = B_ID;
-
 		class cmt_task {
 			void (*task_10ms_)();
 
@@ -37,8 +34,9 @@ namespace seeda {
 				millis_(0), delay_(0), millis10x_(0), cmtdiv_(0) { }
 
 			void operator() () {
+#ifdef SEEDA
 				eadc_server();
-
+#endif
 				++millis_;
 				++cmtdiv_;
 				if(cmtdiv_ >= 10) {
@@ -72,8 +70,12 @@ namespace seeda {
 		typedef device::cmt_io<device::CMT0, cmt_task> CMT0;
 		CMT0	cmt0_;
 
-		typedef utils::fifo<uint8_t, 1024> BUFFER;
+		typedef utils::fifo<uint8_t, 2048> BUFFER;
+#ifdef SEEDA
 		typedef device::sci_io<device::SCI5, BUFFER, BUFFER> SCI;
+#else
+		typedef device::sci_io<device::SCI7, BUFFER, BUFFER> SCI;
+#endif
 		SCI		sci_;
 
 	public:
@@ -92,13 +94,14 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void init()
 		{
+#ifdef SEEDA
 			{  // DIP-SW プルアップ
 				SW1::DIR = 0;  // input
 				SW2::DIR = 0;  // input
 				SW1::PU = 1;
 				SW2::PU = 1;
 			}
-
+#endif
 			{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
 				uint8_t int_level = 1;
 				cmt0_.start(1000, int_level);

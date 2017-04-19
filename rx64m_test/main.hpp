@@ -22,12 +22,18 @@
 
 namespace seeda {
 
+	static const int seeda_version_ = 80;
+	static const uint32_t build_id_ = B_ID;
+
 	typedef utils::command<256> CMD;
 
+#ifdef SEEDA
 	typedef device::PORT<device::PORT6, device::bitpos::B7> SW1;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> SW2;
+#endif
 
 	// Soft SDC 用　SPI 定義（SPI）
+#ifdef SEEDA
 	typedef device::PORT<device::PORTD, device::bitpos::B6> MISO;
 	typedef device::PORT<device::PORTD, device::bitpos::B4> MOSI;
 	typedef device::PORT<device::PORTD, device::bitpos::B5> SPCK;
@@ -36,10 +42,16 @@ namespace seeda {
 	typedef device::PORT<device::PORTD, device::bitpos::B3> SDC_SELECT;	///< カード選択信号
 	typedef device::NULL_PORT  SDC_POWER;	///< カード電源制御（常に電源ＯＮ）
 	typedef device::PORT<device::PORTE, device::bitpos::B6> SDC_DETECT;	///< カード検出
-
+#else
+	// SDC 用　SPI 定義（RSPI）
+	typedef device::rspi_io<device::RSPI> SPI;
+	typedef device::PORT<device::PORTC, device::bitpos::B4> SDC_SELECT;	///< カード選択信号
+	typedef device::NULL_PORT  SDC_POWER;	///< カード電源制御（常に電源ＯＮ）
+	typedef device::PORT<device::PORTB, device::bitpos::B7> SDC_DETECT;	///< カード検出
+#endif
 	typedef utils::sdc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC;
 
-
+#ifdef SEEDA
 	// LTC2348-16 A/D 制御ポート定義
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LTC_CSN;   // P40(141)
 	typedef device::PORT<device::PORTC, device::bitpos::B6> LTC_CNV;   // PC6(61)
@@ -54,7 +66,7 @@ namespace seeda {
 	typedef device::PORT<device::PORT2, device::bitpos::B3> LTC_SDO6;  // P23(34)
 	typedef struct chip::LTC2348_SDO_t<LTC_SCKO, LTC_SDO0, LTC_SDO2, LTC_SDO4, LTC_SDO6> LTC_SDO;
 	typedef chip::LTC2348_16<LTC_CSN, LTC_CNV, LTC_BUSY, LTC_PD, LTC_SDI, LTC_SCKI, LTC_SDO> EADC;
-
+#endif
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -64,7 +76,7 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	SDC& at_sdc();
 
-
+#ifdef SEEDA
 	//-----------------------------------------------------------------//
 	/*!
 		@brief  EADC クラスへの参照
@@ -72,7 +84,7 @@ namespace seeda {
 	*/
 	//-----------------------------------------------------------------//
 	EADC& at_eadc();
-
+#endif
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -138,7 +150,11 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	uint8_t get_switch()
 	{
+#ifdef SEEDA
 		return static_cast<uint8_t>(!SW1::P()) | (static_cast<uint8_t>(!SW2::P()) << 1);
+#else
+		return 0;  // for only develope mode
+#endif
 	}
 
 
