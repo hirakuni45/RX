@@ -2,14 +2,14 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX24T グループ A/D 制御 @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2016,2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "common/renesas.hpp"
-#include "common/vect.h"
+#include "RX24T/icu_mgr.hpp"
 #include "RX24T/port_map.hpp"
 #include "RX24T/power_cfg.hpp"
+#include "common/vect.h"
 
 /// F_PCKD は変換パラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCKD
