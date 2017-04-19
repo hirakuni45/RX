@@ -15,6 +15,7 @@
 #include "RX621/system.hpp"
 #include "RX621/sci.hpp"
 #include "RX621/icu.hpp"
+
 #elif defined(SIG_RX24T)
 #include "RX24T/peripheral.hpp"
 #include "RX600/port.hpp"
@@ -30,6 +31,7 @@
 #include "RX24T/rspi.hpp"
 #include "RX24T/crc.hpp"
 #include "RX24T/s12ad.hpp"
+#include "RX24T/adc_io.hpp"
 #include "RX24T/da.hpp"
 #include "RX24T/cmpc.hpp"
 #include "RX24T/doc.hpp"
@@ -49,6 +51,7 @@
 #include "RX63T/port_map.hpp"
 #include "RX63T/power_cfg.hpp"
 #include "RX63T/icu_mgr.hpp"
+
 #elif defined(SIG_RX64M)
 #include "RX64M/peripheral.hpp"
 #include "RX600/port.hpp"
@@ -65,6 +68,7 @@
 #include "RX64M/icu_mgr.hpp"
 #include "RX64M/sdhi.hpp"
 #include "RX64M/s12adc.hpp"
+#include "RX64M/adc_io.hpp"
 #include "RX64M/sdram.hpp"
 #include "RX64M/etherc.hpp"
 #include "RX64M/edmac.hpp"
@@ -72,6 +76,7 @@
 #include "RX64M/rtc_io.hpp"
 #include "RX64M/flash.hpp"
 #include "RX64M/flash_io.hpp"
+
 #else
 #  error "Requires SIG_XXX to be defined"
 #endif
