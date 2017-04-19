@@ -7,8 +7,6 @@
 //=====================================================================//
 #pragma once
 
-// class EthernetClient;
-
 namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -24,26 +22,20 @@ namespace net {
 
 		void accept_()
 		{
-			int listening = 0;
-
-			for (int sock = 0; sock < MAX_SOCK_NUM; sock++) {
-				EthernetClient client(sock);
-
-    if (EthernetClass::_server_port[sock] == _port) {
-      if (client.status() == SnSR::LISTEN) {
-        listening = 1;
-      } 
-      else if (client.status() == SnSR::CLOSE_WAIT && !client.available()) {
-        client.stop();
-      }
-    } 
-  }
-
-  if (!listening) {
-    begin();
-  }
-}
-#endif
+			bool listening = false;
+			for (int sock = 0; sock < ETHERNET::socket_max; sock++) {
+				ethernet_client client(sock);
+				if(ETHERNET::server_port[sock] == _port) {
+					if(client.status() == SnSR::LISTEN) {
+					listening = true;
+					} else if(client.status() == SnSR::CLOSE_WAIT && !client.available()) {
+						client.stop();
+					}
+				}
+			}
+			if(!listening) {
+				begin();
+			}
 		}
 
 	public:

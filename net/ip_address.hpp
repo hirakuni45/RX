@@ -94,7 +94,13 @@ namespace net {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  型変換キャスト演算子（uint32_t 型）
+		*/
+		//-----------------------------------------------------------------//
 		operator uint32_t() const { return address_.dword; };
+
 
 		bool operator==(const ip_address& addr) const {
 			return address_.dword == addr.address_.dword;
@@ -131,6 +137,11 @@ namespace net {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  標準コンソールにアドレス表示
+		*/
+		//-----------------------------------------------------------------//
 		void print() const {
 			utils::format("%d.%d.%d.%d") % static_cast<int>(address_.bytes[0])
 										 % static_cast<int>(address_.bytes[1])

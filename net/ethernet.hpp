@@ -19,13 +19,15 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class SOCKET, uint32_t SOCKET_MAX>
 	class ethernet {
+	public:
+		static const uint32_t socket_max = SOCKET_MAX;
+		static uint8_t state[SOCKET_MAX];
+		static uint16_t server_port[SOCKET_MAX];
 
+	private:
 		SOCKET&	sock_;
 
 		ip_address	dns_server_;
-
-		static uint8_t state_[SOCKET_MAX];
-		static uint16_t server_port_[SOCKET_MAX];
 
 	public:
 		//-----------------------------------------------------------------//
@@ -85,8 +87,14 @@ namespace net {
 
 
 		const ip_address& local_ip() const;
+
+
 		const ip_address& subnet_mask() const;
+
+
 		const ip_address& gateway_ip() const;
+
+
 		const ip_address& dns_server_ip() const;
 
 
@@ -100,7 +108,7 @@ namespace net {
 	};
 
 	template<class SOCKET, uint32_t SOCKET_MAX>
-		uint8_t ethernet<SOCKET, SOCKET_MAX>::state_[SOCKET_MAX];
+		uint8_t ethernet<SOCKET, SOCKET_MAX>::state[SOCKET_MAX];
 	template<class SOCKET, uint32_t SOCKET_MAX>
-		uint16_t ethernet<SOCKET, SOCKET_MAX>::server_port_[SOCKET_MAX];
+		uint16_t ethernet<SOCKET, SOCKET_MAX>::server_port[SOCKET_MAX];
 }
