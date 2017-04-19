@@ -488,8 +488,8 @@ int16_t phy_init(void)
     reg = phy_read_(0x0462);
 	printf("DP83822 Boot Strap Latch (0x0462): 0x%04X\n", (int)reg);
 #endif
-
 #endif
+
 #ifdef PHY_DEBUG
 		printf("PHY init OK...\n");
 #endif
