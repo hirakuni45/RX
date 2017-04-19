@@ -78,13 +78,25 @@ namespace seeda {
 #endif
 		SCI		sci_;
 
+		// 内臓 A/D 変換 タスク
+		struct adc_task {
+			void operator () () {
+			}
+		};
+
+		typedef device::S12AD ADC;
+		typedef device::adc_io<ADC, adc_task> ADC_IO;
+		ADC_IO	adc_io_;
+
+		uint32_t	list_cnt_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		core() { }
+		core() : list_cnt_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -110,6 +122,13 @@ namespace seeda {
 			{  // SCI 設定
 				uint8_t int_level = 2;
 				sci_.start(115200, int_level);
+			}
+
+			{  // 内臓 A/D 変換設定
+				uint8_t intr_level = 0;
+				adc_io_.start(ADC::analog::AIN005, intr_level);
+				adc_io_.start(ADC::analog::AIN006, intr_level);
+				adc_io_.start(ADC::analog::AIN007, intr_level);
 			}
 		}
 
@@ -150,6 +169,28 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void service()
 		{
-		}		
+#if 0
+			++list_cnt_;
+			if(list_cnt_ >= 100) {
+				auto val = adc_io_.get(ADC::analog::AIN005);
+				utils::format("AIN005: %d\n") % static_cast<int>(val);
+				list_cnt_ = 0;
+			}
+#endif
+			adc_io_.scan();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D 変換値の取得
+			@param[in]	ch	チャネル（５、６、７）
+			@return A/D 変換値
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_adc(uint32_t ch) const {
+			return adc_io_.get(static_cast<ADC::analog>(ch));
+		}
+
 	};
 }

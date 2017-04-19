@@ -17,12 +17,11 @@
 #include "common/time.h"
 
 #include "chip/LTC2348_16.hpp"
-
 #include "sample.hpp"
 
 namespace seeda {
 
-	static const int seeda_version_ = 80;
+	static const int seeda_version_ = 83;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef utils::command<256> CMD;
@@ -76,6 +75,7 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	SDC& at_sdc();
 
+
 #ifdef SEEDA
 	//-----------------------------------------------------------------//
 	/*!
@@ -85,6 +85,7 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	EADC& at_eadc();
 #endif
+
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -176,4 +177,14 @@ namespace seeda {
 	*/
 	//-----------------------------------------------------------------//
 	const sample_t& get_sample(uint8_t ch);
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  内臓 A/D 変換値の取得
+		@param[in]	ch	チャネル（５、６、７）
+		@return A/D 変換値
+	*/
+	//-----------------------------------------------------------------//
+	uint16_t get_adc(uint32_t ch);
 }

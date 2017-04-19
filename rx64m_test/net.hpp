@@ -53,18 +53,20 @@ namespace seeda {
 
 			EthernetClient* cl = static_cast<EthernetClient*>(option);
 
+			cl->print("<tr>");
+
 			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
 			struct tm *m = localtime(&t);
 			if(dir) {
-				cl->print("          ");
+				cl->print("<td>-</td>");
 			} else {
-				char tmp[16];
-				utils::format("%9d ", tmp, sizeof(tmp)) % fi->fsize;
+				char tmp[32];
+				utils::format("<td>%9d</td>", tmp, sizeof(tmp)) % fi->fsize;
 				cl->print(tmp);
 			}
 			{
-				char tmp[32];
-				utils::format("%s %2d %4d %02d:%02d ", tmp, sizeof(tmp)) 
+				char tmp[64];
+				utils::format("<td>%s %2d %4d %02d:%02d</td>", tmp, sizeof(tmp)) 
 					% get_mon(m->tm_mon)
 					% static_cast<int>(m->tm_mday)
 					% static_cast<int>(m->tm_year + 1900)
@@ -72,12 +74,13 @@ namespace seeda {
 					% static_cast<int>(m->tm_min);
 				cl->print(tmp);
 				if(dir) {
-					cl->print("/");
+					cl->print("<td>/");
 				} else {
-					cl->print(" ");
+					cl->print("<td> ");
 				}
 				cl->print(name);
-				cl->println("<br/>");
+				cl->print("</td>");
+				cl->println("</tr>");
 			}
 		}
 
@@ -311,6 +314,18 @@ namespace seeda {
 			client.println("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"リロード\" />");
 			client.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
 
+			client.println("<input type=\"button\" onclick=\"location.href='/'\" value=\"データ表示\" />");
+			client.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+
+			{  // 内臓 A/D 表示
+				char tmp[128];
+				float v = static_cast<float>(get_adc(5)) / 4095.0f * 3.3f;
+				utils::format("バックアップ電池電圧： %4.2f [V]", tmp, sizeof(tmp)) % v;
+				client.println(tmp);
+				client.println("<br>");
+				client.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+			}
+
 //			client.println("<font size=\"4\">");
 //			client.println("</font>");
 
@@ -366,6 +381,10 @@ namespace seeda {
 			{
 			}
 
+			// ＳＤカード操作画面へのボタン
+			client.println("<input type=\"button\" onclick=\"location.href='/files'\" value=\"ＳＤカード\" />");
+			client.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+
 			client.println("</html>");
 		}
 
@@ -376,9 +395,16 @@ namespace seeda {
 
 			client.println("<!DOCTYPE HTML>");
 			client.println("<html>");
-			send_head_(client, "Files");
+			send_head_(client, "SD Files");
 
+			client.println("<table border=0>");
+			client.println("<tr><th>Size</th><th>Date/Time</th><th>Name</th></tr>");
 			at_sdc().dir_loop("", dir_list_func_, true, &client);
+			client.println("</table>");
+
+			client.println("<br>");
+			client.println("<hr align=\"left\" width=\"600\" size=\"3\" />");
+			client.println("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\" />");
 
 			client.println("</html>");
 		}
@@ -455,8 +481,8 @@ namespace seeda {
 			client << "</table>\n";
 
 			client.println("<br>");
-			client.println("<hr align=\"left\" width=\"600\" size=\"3\" />");
 
+			client.println("<hr align=\"left\" width=\"600\" size=\"3\" />");
 			client.println("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\" />");
 
 			client.println("</html>");
