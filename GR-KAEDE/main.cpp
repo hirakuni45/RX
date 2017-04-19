@@ -5,10 +5,11 @@
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "main.hpp"
-#include "core.hpp"
-#include "tools.hpp"
+#include "../rx64m_test/main.hpp"
+#include "../rx64m_test/core.hpp"
+#include "../rx64m_test/tools.hpp"
 #include "../rx64m_test/net.hpp"
+#include "common/input.hpp"
 
 namespace {
 
@@ -69,6 +70,42 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	EADC& at_eadc() { return eadc_; }
 #endif
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  時間の作成
+		@param[in]	date	日付
+		@param[in]	time	時間
+	*/
+	//-----------------------------------------------------------------//
+	size_t make_time(const char* date, const char* time)
+	{
+		time_t t = get_time();
+		struct tm *m = localtime(&t);
+		int vs[3];
+		if((utils::input("%d/%d/%d", date) % vs[0] % vs[1] % vs[2]).status()) {
+			if(vs[0] >= 1900 && vs[0] < 2100) m->tm_year = vs[0] - 1900;
+			if(vs[1] >= 1 && vs[1] <= 12) m->tm_mon = vs[1] - 1;
+			if(vs[2] >= 1 && vs[2] <= 31) m->tm_mday = vs[2];		
+		} else {
+			return 0;
+		}
+
+		if((utils::input("%d:%d:%d", time) % vs[0] % vs[1] % vs[2]).status()) {
+			if(vs[0] >= 0 && vs[0] < 24) m->tm_hour = vs[0];
+			if(vs[1] >= 0 && vs[1] < 60) m->tm_min = vs[1];
+			if(vs[2] >= 0 && vs[2] < 60) m->tm_sec = vs[2];
+		} else if((utils::input("%d:%d", time) % vs[0] % vs[1]).status()) {
+			if(vs[0] >= 0 && vs[0] < 24) m->tm_hour = vs[0];
+			if(vs[1] >= 0 && vs[1] < 60) m->tm_min = vs[1];
+			m->tm_sec = 0;
+		} else {
+			return 0;
+		}
+		return mktime(m);
+	}
+
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -142,6 +179,19 @@ namespace seeda {
 		}
 	}
 #endif
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  A/D サンプルの設定
+		@param[in]	ch	チャネル（０～７）
+		@param[in]	t	サンプル構造体
+	*/
+	//-----------------------------------------------------------------//
+	void set_sample(uint8_t ch, const sample_t& t)
+	{
+		sample_t_[ch] = t;
+	}
+
 
 	//-----------------------------------------------------------------//
 	/*!
