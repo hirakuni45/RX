@@ -601,7 +601,7 @@ namespace device {
 		};
 		static adads0_t<base + 0x08>   ADADS0;
 
-#if 0
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  A/D サンプリングステートレジスタ
@@ -609,11 +609,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		struct adsstr_t {
 			void set(analog an, uint8_t v) {
-				wr8_(base + 0xE0 + static_cast<uint32_t>(an), v);
+				static const uint16_t tbl[8] = { 0x60, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79 };
+				wr8_(base + tbl[static_cast<uint32_t>(an)], v);
 			}
 		};
 		static adsstr_t ADSSTR;
-#endif
 
 
 		//-----------------------------------------------------------------//
