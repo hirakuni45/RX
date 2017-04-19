@@ -42,7 +42,7 @@ PSOURCES	=	main.cpp \
 				GR/core/IPAddress.cpp \
 				GR/core/Ethernet.cpp
 
-USER_LIBS	=	stdc++
+USER_LIBS	=	stdc++ m
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
