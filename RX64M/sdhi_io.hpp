@@ -6,7 +6,6 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "common/renesas.hpp"
 #include "ff12b/src/diskio.h"
 #include "ff12b/src/ff.h"
 #include "common/delay.hpp"

@@ -6,10 +6,10 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "common/renesas.hpp"
-#include "common/vect.h"
 #include "RX64M/port_map.hpp"
 #include "RX64M/power_cfg.hpp"
+#include "RX64M/icu_mgr.hpp"
+#include "common/vect.h"
 
 /// F_PCKD は変換パラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCKD
@@ -79,7 +79,7 @@ namespace device {
 			if(n > 255) return false;
 
 			power_cfg::turn(ADCU::get_peripheral());
-			ADCU::enable(ana);  // ポート設定
+			ADCU::enable(ana);
 			ADCU::ADANSA.set(ana);
 			ADCU::ADSSTR.set(ana, n);
 

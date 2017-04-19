@@ -2,7 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX64M グループ・S12ADC 定義 @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -222,12 +222,30 @@ namespace device {
 		static adstrgr_t<base + 0x10>  ADSTRGR;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  A/D サンプリングステートレジスタ x（ADSSTRx）
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct adsstrx_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>  SST;
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  A/D サンプリングステートレジスタ 0（ADSSTR0）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x60> ADSSTR0;
+		static adsstrx_t<base + 0x60> ADSSTR0;
 
 
 		//-----------------------------------------------------------------//
@@ -235,7 +253,7 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 1（ADSSTR1）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x73> ADSSTR1;
+		static adsstrx_t<base + 0x73> ADSSTR1;
 
 
 		//-----------------------------------------------------------------//
@@ -243,7 +261,7 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 2（ADSSTR2）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x74> ADSSTR2;
+		static adsstrx_t<base + 0x74> ADSSTR2;
 
 
 		//-----------------------------------------------------------------//
@@ -251,7 +269,7 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 3（ADSSTR3）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x75> ADSSTR3;
+		static adsstrx_t<base + 0x75> ADSSTR3;
 
 
 		//-----------------------------------------------------------------//
@@ -259,7 +277,7 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 4（ADSSTR4）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x76> ADSSTR4;
+		static adsstrx_t<base + 0x76> ADSSTR4;
 
 
 		//-----------------------------------------------------------------//
@@ -267,7 +285,7 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 5（ADSSTR5）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x77> ADSSTR5;
+		static adsstrx_t<base + 0x77> ADSSTR5;
 
 
 		//-----------------------------------------------------------------//
@@ -275,7 +293,7 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 6（ADSSTR6）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x78> ADSSTR6;
+		static adsstrx_t<base + 0x78> ADSSTR6;
 
 
 		//-----------------------------------------------------------------//
@@ -283,34 +301,7 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 7（ADSSTR7）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x79> ADSSTR7;
-
-
-
-
-
-
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	A/D グループ C トリガ選択レジスタ（ADGCTRGR）
-			@param[in]	ofs	オフセット
-		*/
-		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct adgctrgr_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bits_rw_t<io_, bitpos::B0, 6>  TRSC;
-			bit_rw_t <io_, bitpos::B6>     GCADIE;
-			bit_rw_t <io_, bitpos::B7>     GRCE;
-		};
-		static adgctrgr_t<base + 0xD9>  ADGCTRGR;
+		static adsstrx_t<base + 0x79> ADSSTR7;
 
 
 		//-----------------------------------------------------------------//
@@ -348,10 +339,45 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>   PGS;
 			bit_rw_t<io_, bitpos::B1>   GBRSCN;
-			bit_rw_t<io_, bitpos::B14>  LGRRS;
 			bit_rw_t<io_, bitpos::B15>  GBRP;
 		};
 		static adgspcr_t<base + 0x80>  ADGSPCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	A/D コンペアコントロールレジスタ（ ADCMPCR ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpcr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B6>   WCMPE;
+			bit_rw_t <io_, bitpos::B7>   CMPIE;
+		};
+		static adcmpcr_t<base + 0x90>  ADCMPCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアデータレジスタ 0 （ ADCMPDR0 ）
+		*/
+		//-----------------------------------------------------------------//
+		static rw16_t<base + 0x9C> ADCMPDR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアデータレジスタ 1 （ ADCMPDR1 ）
+		*/
+		//-----------------------------------------------------------------//
+		static rw16_t<base + 0x9E> ADCMPDR1;
 
 	};
 
@@ -575,26 +601,7 @@ namespace device {
 		};
 		static adads0_t<base + 0x08>   ADADS0;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  A/D サンプリングステートレジスタ
@@ -602,54 +609,107 @@ namespace device {
 		//-----------------------------------------------------------------//
 		struct adsstr_t {
 			void set(analog an, uint8_t v) {
-				if(an == analog::AIN016) {
-					wr8_(base + 0xDD + static_cast<uint32_t>(an), v);
-				} else {
-					wr8_(base + 0xE0 + static_cast<uint32_t>(an), v);
-				}
+				wr8_(base + 0xE0 + static_cast<uint32_t>(an), v);
 			}
 		};
 		static adsstr_t ADSSTR;
-
+#endif
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D プログラマブルゲインアンプコントロールレジスタ（ADPGACR）
+			@brief  A/D サンプル & ホールド回路コントロールレジスタ（ADSHCR）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adpgacr_t : public rw16_t<ofs> {
+		struct adshcr_t : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B1>  P000SEL1;
-			bit_rw_t<io_, bitpos::B2>  P000ENAMP;
+			bits_rw_t<io_, bitpos::B0, 8>  SSTSH;
+			bits_rw_t<io_, bitpos::B8, 3>  SHANS;
 		};
-		static adpgacr_t<base + 0x1A0>  ADPGACR;
+		static adshcr_t<base + 0x66>   ADSHCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D プログラマブルゲインアンプゲイン設定レジスタ 0（ADPGAGS0）
+			@brief  A/D サンプル＆ホールド動作モード選択レジスタ（ ADSHMSR ）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adpgags0_t : public rw16_t<ofs> {
+		struct adshmsr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  SHMD;
+		};
+		static adshmsr_t<base + 0x7C>  ADSHMSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	A/D コンペアチャネル選択レジスタ 0 （ ADCMPANSR0 ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpansr0_t : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 3>  P000GAIN;
+			bits_rw_t <io_, bitpos::B0, 8>  CMPS0;
 		};
-		static adpgags0_t<base + 0x1A2>  ADPGAGS0;
+		static adcmpansr0_t<base + 0x94>  ADCMPANSR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアレベルレジスタ 0 （ ADCMPLR0 ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmplr0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>  CMPL0;
+		};
+		static adcmplr0_t<base + 0x98>  ADCMPLR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアステータスレジスタ 0 （ ADCMPSR0 ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpsr0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>  CMPF0;
+		};
+		static adcmpsr0_t<base + 0xA0>  ADCMPSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -700,6 +760,8 @@ namespace device {
 	template <uint32_t base, peripheral t>
 	struct s12ad1_t : public s12adc_t<base> {
 
+		typedef s12adc_t<base> base_class;
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  アナログ入力型
@@ -727,6 +789,8 @@ namespace device {
 			AIN118,
 			AIN119,
 			AIN120,
+			AINT,		///< 温度センサ
+			AINO,		///< 内部基準電圧
 		};
 
 
@@ -1225,12 +1289,30 @@ namespace device {
 		static adexicr_t<base + 0x12>   ADEXICR;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  A/D サンプリングステートレジスタ x（ADSSTRx）
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct adsstrx_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>  SST;
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  A/D サンプリングステートレジスタ L（ADSSTRL）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x61> ADSSTRL;
+		static adsstrx_t<base + 0x61> ADSSTRL;
 
 
 		//-----------------------------------------------------------------//
@@ -1238,48 +1320,204 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ T（ADSSTRT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x70> ADSSTRT;
+		static adsstrx_t<base + 0x70> ADSSTRT;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D サンプリングステートレジスタ L（ADSSTRO）
+			@brief  A/D サンプリングステートレジスタ O（ADSSTRO）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x71> ADSSTRO;
+		static adsstrx_t<base + 0x71> ADSSTRO;
 
 
-
-
-
-
-
-
-
-
-
-
-
+#if 0
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D サンプリングステートレジスタ
+		*/
+		//-----------------------------------------------------------------//
+		struct adsstr_t {
+			void set(analog an, uint8_t v) {
+				wr8_(base + 0xE0 + static_cast<uint32_t>(an), v);
+			}
+		};
+		static adsstr_t ADSSTR;
+#endif
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  A/D サンプル & ホールド回路コントロールレジスタ（ADSHCR）
+			@brief	A/D コンペアチャネル選択レジスタ 0 （ ADCMPANSR0 ）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adshcr_t : public rw16_t<ofs> {
+		struct adcmpansr0_t : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 8>  SSTSH;
-			bits_rw_t<io_, bitpos::B8, 3>  SHANS;
+			bits_rw_t <io_, bitpos::B0, 16>  CMPS0;
 		};
-		static adshcr_t<base + 0x66>   ADSHCR;
+		static adcmpansr0_t<base + 0x94>  ADCMPANSR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	A/D コンペアチャネル選択レジスタ 1 （ ADCMPANSR1 ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpansr1_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t <io_, bitpos::B0, 5>  CMPS1;
+		};
+		static adcmpansr1_t<base + 0x96>  ADCMPANSR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	A/D コンペアチャネル選択拡張レジスタ（ ADCMPANSER ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpanser_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  CMPSTS;
+			bit_rw_t <io_, bitpos::B1>  CMPSOC;
+		};
+		static adcmpanser_t<base + 0x92>  ADCMPANSER;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアレベルレジスタ 0 （ ADCMPLR0 ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmplr0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16>  CMPL0;
+		};
+		static adcmplr0_t<base + 0x98>  ADCMPLR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアレベルレジスタ 1 （ ADCMPLR1 ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmplr1_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 5>  CMPL1;
+		};
+		static adcmplr1_t<base + 0x9A>  ADCMPLR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアレベル拡張レジスタ（ ADCMPLER ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpler_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  CMPLTS;
+			bit_rw_t<io_, bitpos::B0>  CMPLOC;
+		};
+		static adcmpler_t<base + 0x93>  ADCMPLER;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアステータスレジスタ 0 （ ADCMPSR0 ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpsr0_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16>  CMPF0;
+		};
+		static adcmpsr0_t<base + 0xA0>  ADCMPSR0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアステータスレジスタ 1 （ ADCMPSR1 ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpsr1_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 5>  CMPF1;
+		};
+		static adcmpsr1_t<base + 0xA2>  ADCMPSR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  A/D コンペアステータス拡張レジスタ（ ADCMPSER ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct adcmpser_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  CMPFTS;
+			bit_rw_t<io_, bitpos::B1>  CMPFOC;
+		};
+		static adcmpser_t<base + 0xA4>  ADCMPSER;
 
 
 		//-----------------------------------------------------------------//

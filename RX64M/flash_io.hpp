@@ -7,7 +7,6 @@
 */
 //=====================================================================//
 #include <cstring>
-#include "common/renesas.hpp"
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
