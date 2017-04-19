@@ -362,6 +362,9 @@ namespace seeda {
 				client.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
 			}
 
+			// クライアント
+			{
+			}
 
 			client.println("</html>");
 		}
