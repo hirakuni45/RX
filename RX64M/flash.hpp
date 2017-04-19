@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M グループ・フラッシュ 定義 @n
+	@brief	RX64M/RX71M グループ・フラッシュ 定義 @n
 			Copyright 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */

@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M グループ FLASH 制御 @n
+	@brief	RX64M/RX71M グループ FLASH 制御 @n
 			Copyright 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
@@ -31,9 +31,9 @@ namespace device {
 			@brief  データ・フラッシュ構成（全体６４Ｋバイト、ブロック６４バイト）
 		*/
 		//-----------------------------------------------------------------//
-		static const uint32_t data_flash_block_ = 64;     ///< データ・フラッシュのブロックサイズ
-		static const uint32_t data_flash_size_  = 65536;  ///< データ・フラッシュの容量
-		static const uint32_t data_flash_bank_  = 1024;   ///< データ・フラッシュのバンク数
+		static const uint32_t data_flash_block = 64;     ///< データ・フラッシュのブロックサイズ
+		static const uint32_t data_flash_size  = 65536;  ///< データ・フラッシュの容量
+		static const uint32_t data_flash_bank  = 1024;   ///< データ・フラッシュのバンク数
 
 	private:
 		bool	trans_farm_;
@@ -59,14 +59,18 @@ namespace device {
 				if(cnt == 0) break;
 			}
 			if(cnt == 0) {
+#ifndef NDEBUG
 				utils::format("FACI 'turn_break_' timeout\n");
+#endif
 				return false;
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() == 0) {
 				return true;
 			} else {
+#ifndef NDEBUG
 				utils::format("FACI 'turn_break_' fail\n");
+#endif
 				return false;
 			}
 		}
@@ -87,7 +91,9 @@ namespace device {
 			device::FLASH::FENTRYR = 0xAA00;
 
 			if(device::FLASH::FENTRYR() != 0x0000) {
+#ifndef NDEBUG
 				utils::format("FACI 'turn_rd_' fail\n"); 
+#endif
 			}
 		}
 
@@ -97,7 +103,9 @@ namespace device {
 			device::FLASH::FENTRYR = 0xAA80;
 
 			if(device::FLASH::FENTRYR() != 0x0080) {
+#ifndef NDEBUG
 				utils::format("FACI 'turn_pe_' fail\n"); 
+#endif
 			}
 		}
 
@@ -131,14 +139,16 @@ namespace device {
 
 				trans_farm_ = true;
 			} else {
+#ifndef NDEBUG
 				utils::format("FACI Lock...\n");
+#endif
 			}
 		}
 
 
 		// 4 バイト書き込み
 		// org: align 4 bytes
-		bool write4_(const void* src, uint32_t org) const
+		bool write32_(const void* src, uint32_t org) const
 		{
 			device::FLASH::FPROTR = 0x5501;
 			device::FLASH::FSADDR = org;
@@ -174,12 +184,16 @@ namespace device {
 			}
 			if(cnt == 0) {  // time out
 				turn_break_();
-				utils::format("FACI 'write4_' timeout\n");
+#ifndef NDEBUG
+				utils::format("FACI 'write32_' timeout\n");
+#endif
 				return false;
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() != 0) {
-				utils::format("FACI 'write4_' CMD Lock fail\n");
+#ifndef NDEBUG
+				utils::format("FACI 'write32_' CMD Lock fail\n");
+#endif
 				return false;
 			}
 			return true;
@@ -215,7 +229,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint8_t read(uint32_t org) const
 		{
-			if(org >= data_flash_size_) return 0;
+			if(org >= data_flash_size) return 0;
 			turn_rd_();
 			return device::rd8_(0x00100000 + org);
 		}
@@ -231,9 +245,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void read(uint32_t org, uint32_t len, void* dst) const
 		{
-			if(org >= data_flash_size_) return;
-			if((org + len) > data_flash_size_) {
-				len = data_flash_size_ - org;
+			if(org >= data_flash_size) return;
+			if((org + len) > data_flash_size) {
+				len = data_flash_size - org;
 			}
 			turn_rd_();
 			const void* src = reinterpret_cast<const void*>(0x00100000 + org);
@@ -250,11 +264,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase_check(uint32_t bank) const
 		{
-			if(bank >= data_flash_bank_) return false;
+			if(bank >= data_flash_bank) return false;
 
 			device::FLASH::FBCCNT = 0x00;  // address increment
-			device::FLASH::FSADDR =  bank * data_flash_block_;
-			device::FLASH::FEADDR = ((bank + 1) * data_flash_block_) - 1;
+			device::FLASH::FSADDR =  bank * data_flash_block;
+			device::FLASH::FEADDR = ((bank + 1) * data_flash_block) - 1;
 
 			FACI_CMD_AREA = 0x71;
 			FACI_CMD_AREA = 0xD0;
@@ -271,7 +285,9 @@ namespace device {
 			}
 			if(cnt == 0) {  // time out
 				turn_break_();
+#ifndef NDEBUG
 				utils::format("FACI 'erase_check' timeout\n");
+#endif
 				return false;
 			}
 
@@ -281,7 +297,9 @@ namespace device {
 					return false;
 				}
 			} else {
+#ifndef NDEBUG
 				utils::format("FACI 'erase_check' fail\n");
+#endif
 				return false;
 			}
 
@@ -298,13 +316,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool erase(uint32_t bank) const
 		{
-			if(bank >= data_flash_bank_) return false;
+			if(bank >= data_flash_bank) return false;
 
 			turn_pe_();
 
 			device::FLASH::FPROTR = 0x5501;
 			device::FLASH::FCPSR  = 0x0000;  // サスペンド優先
-			device::FLASH::FSADDR = bank * data_flash_block_;
+			device::FLASH::FSADDR = bank * data_flash_block;
 
 			FACI_CMD_AREA = 0x20;
 			FACI_CMD_AREA = 0xD0;
@@ -321,14 +339,18 @@ namespace device {
 			}
 			if(cnt == 0) {  // time out
 				turn_break_();
+#ifndef NDEBUG
 				utils::format("FACI 'erase' timeout\n");
+#endif
 				return false;
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() == 0) {
 				return true;
 			} else {
+#ifndef NDEBUG
 				utils::format("FACI 'erase' fail\n");
+#endif
 				return false;
 			}
 		}
@@ -345,24 +367,41 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool write(const void* src, uint32_t org, uint32_t len) const
 		{
-			if((len & 3) != 0 || (org & 3) != 0) return false;
+///			if((len & 3) != 0 || (org & 3) != 0) return false;
 
-			if(org >= data_flash_size_) return false;
+			if(org >= data_flash_size) return false;
 
-			if((org + len) > data_flash_size_) {
-				len = data_flash_size_ - org;
+			if((org + len) > data_flash_size) {
+				len = data_flash_size - org;
 			}
 
 			turn_pe_();
 
 			const uint8_t* p = static_cast<const uint8_t*>(src);
 			bool f = false;
-			while(len > 0) {
-				f = write4_(p, org);
+			int32_t l = static_cast<int32_t>(len);
+			while(l > 0) {
+				uint32_t mod = org & 3;
+				if(mod != 0) {
+					uint8_t tmp[4];
+					tmp[0] = 0xFF;
+					tmp[1] = 0xFF;
+					tmp[2] = 0xFF;
+					tmp[3] = 0xFF;
+					l -= 4 - mod;
+					while(mod < 3) {
+						tmp[mod] = *p++;
+						++mod;
+					}
+					org &= 0xFFFFFFFC;
+					f = write32_(tmp, org);
+				} else {
+					f = write32_(p, org);
+					p += 4;
+					l -= 4;
+				}
 				if(!f) break;
-				p += 4;
 				org += 4;
-				len -= 4;
 			}
 			return f;
 		}
