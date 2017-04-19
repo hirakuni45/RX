@@ -135,7 +135,7 @@ int main(int argc, char** argv)
 	}
 
 	utils::format("RX64M Data Flash sample\n");
-	utils::format("Data Flash size: %08X\n") % FLASH::data_flash_size_;
+	utils::format("Data Flash size: %08X\n") % FLASH::data_flash_size;
 
 	command_.set_prompt("# ");
 
@@ -154,7 +154,7 @@ int main(int argc, char** argv)
 				if(command_.get_word(1, sizeof(buff), buff)) {
 					int bank;
 					if((utils::input("%d", buff) % bank).status()) {
-						if(static_cast<uint32_t>(bank) < FLASH::data_flash_bank_) {
+						if(static_cast<uint32_t>(bank) < FLASH::data_flash_bank) {
 							f = flash_.erase(bank);
 							if(!f) {
 								utils::format("Erase error: bank %d\n") % bank;
@@ -210,7 +210,7 @@ int main(int argc, char** argv)
 					}
 				}
 			} else if(command_.cmp_word(0, "?") || command_.cmp_word(0, "help")) {
-				utils::format("erase [bank] (erase 0 to %d)\n") % FLASH::data_flash_bank_;
+				utils::format("erase [bank] (erase 0 to %d)\n") % FLASH::data_flash_bank;
 				utils::format("r org [end] (read)\n");
 				utils::format("write org data... (write)\n");
 			} else {
