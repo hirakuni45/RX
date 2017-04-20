@@ -29,7 +29,7 @@ namespace chip {
 		@param[in]	thup	サーミスタが VCC 側の場合「true」、GND 側の場合「false」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint16_t ADNUM, thermistor THM, uint16_t REFR, bool thup>
+	template <uint32_t ADNUM, thermistor THM, uint32_t REFR, bool thup>
 	class NTCTH {
 
 		// サーミスタの型に応じたパラメーター
@@ -48,14 +48,14 @@ namespace chip {
 		}
 
 		// サーミスターが VCC 側
-		static float thermistor_upper_(uint16_t raw)
+		static float thermistor_upper_(uint32_t raw)
 		{
 			float thr = (static_cast<float>(REFR * ADNUM) / static_cast<float>(raw)) - static_cast<float>(REFR);
 			return thr;
 		}
 
 		// サーミスターが GND 側
-		static float thermistor_lower_(uint16_t raw)
+		static float thermistor_lower_(uint32_t raw)
 		{
 			float thr = static_cast<float>(REFR * raw) / static_cast<float>(ADNUM - raw);
 			return thr;
