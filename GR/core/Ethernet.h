@@ -266,7 +266,7 @@ class EthernetServer : public EthernetClass {
 	EthernetClient available(void);
 
 
-	size_t print(const char* t = nullptr) {
+	size_t print(const char* t) {
 		if(t == nullptr) return 0;
 		size_t l = strlen(t);
 		return write(t, l);
@@ -276,15 +276,23 @@ class EthernetServer : public EthernetClass {
 	size_t print(int value) {
 		char tmp[16];
 		utils::format("%d", tmp, sizeof(tmp)) % value;
-		return printf(tmp);
+		return print(tmp);
 	}
 
 
 	/* get the length of the string * s return. '\ 0' is not included in length. */
-	size_t println(const char* t = nullptr) {
-		size_t l = print(t);
-		l += print("\r\n");
-		return l;
+	size_t println(const char* t = nullptr)
+	{
+		if(t == nullptr) {
+			return write("\r\n", 2);
+		}
+
+		size_t l = strlen(t);
+		char tmp[l + 2];
+		strcpy(tmp, t);
+		tmp[l + 0] = '\r';
+		tmp[l + 1] = '\n';
+		return write(tmp, l + 2);
 	}
 
 	EthernetServer& operator << (const char* t) {
@@ -322,61 +330,65 @@ class EthernetServer : public EthernetClass {
 
 
 class EthernetClient : public EthernetServer {
-    public:
-      EthernetClient() { }
+	public:
+	EthernetClient() { }
 
-      virtual ~EthernetClient(){}
+	virtual ~EthernetClient(){}
 
-      int read();
+	int read();
 
-      int read(void* buf, size_t size);
+	int read(void* buf, size_t size);
 
-      bool connected();
+	bool connected();
 
-      int connect(IPAddress ip, uint16_t port);
+	/// timeout [ms]
+	int connect(const IPAddress& ip, uint16_t port, int32_t timeout = 3000);
 
-      int connect(const char *host, uint16_t port);
+	int connect(const char *host, uint16_t port);
 
-      int available();
+	int available();
 
-      void flush();
+	void flush();
 
-      void stop();
+	void stop();
 
-      operator bool() {
-          return connected();
-      }
+	operator bool() {
+		return connected();
+	}
 
-      bool operator == (const bool value) {
+	bool operator == (const bool value) {
 #ifdef T4_ETHER_DEBUG
-          Serial.print("t4:EthernetClient:==:");
-          Serial.println(bool() == value);
+		Serial.print("t4:EthernetClient:==:");
+		Serial.println(bool() == value);
 #endif
-          return bool() == value;
-      }
+		return bool() == value;
+	}
 
-      bool operator != (const bool value) {
+	bool operator != (const bool value) {
 #ifdef T4_ETHER_DEBUG
-          Serial.print("t4:EthernetClient:!=:");
-          Serial.println(bool() != value);
+		Serial.print("t4:EthernetClient:!=:");
+		Serial.println(bool() != value);
 #endif
-          return bool() != value;
-      }
+		return bool() != value;
+	}
 
-      bool operator == (const EthernetClient& rhs) {
+	bool operator == (const EthernetClient& rhs) {
 #ifdef T4_ETHER_DEBUG
-          Serial.println("t4:EthernetClient:==:true");
+		Serial.println("t4:EthernetClient:==:true");
 #endif
-          return true;
-      }
-      bool operator != (const EthernetClient& rhs) {
+		return true;
+	}
+
+
+	bool operator != (const EthernetClient& rhs) {
 #ifdef T4_ETHER_DEBUG
-          Serial.print("t4:EthernetClient:!=:");
-          Serial.println(!this->operator==(rhs));
+		Serial.print("t4:EthernetClient:!=:");
+		Serial.println(!this->operator==(rhs));
 #endif
-          return !this->operator==(rhs);
-      }
+		return !this->operator==(rhs);
+	}
 };
+
 
 
 class EthernetUDP : public EthernetClass {

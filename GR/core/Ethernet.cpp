@@ -631,18 +631,18 @@ Returns:
     TIMED_OUT -1
     INVALID_RESPONSE -4
 ******************************************************************************/
-int EthernetClient::connect(IPAddress distip, uint16_t distport)
+int EthernetClient::connect(const IPAddress& distip, uint16_t distport, int32_t timeout)
 {
     int  ercd;
     T_IPV4EP    distAdr;
-    int         res = false;
+    int res = false;
 
 #ifdef T4_ETHER_DEBUG
         Serial.println("EthernetClient::connect(ip,port):");
 #endif
     distAdr.ipaddr = distip._address.bytes[0]<<24 | distip._address.bytes[1]<<16 | distip._address.bytes[2]<<8 | distip._address.bytes[3];
     distAdr.portno = distport;
-    if(!connected()){
+    if(!connected()) {
 #ifdef T4_ETHER_DEBUG
         Serial.print("tcp_con_cep(");
         Serial.print(ARDUINO_TCP_CEP);
@@ -653,21 +653,19 @@ int EthernetClient::connect(IPAddress distip, uint16_t distport)
         Serial.print(distAdr.portno);
         Serial.print("TMO_FEVR):");
 #endif
-        ercd = tcp_con_cep(ARDUINO_TCP_CEP, NADR,  &distAdr, 3000);       /* 20150522 fri 20150615 mon*/
+        ercd = tcp_con_cep(ARDUINO_TCP_CEP, NADR,  &distAdr, timeout);
         if(ercd == E_OK){
 #ifdef T4_ETHER_DEBUG
         Serial.println("E_OK");
 #endif
             res = 1;
-        }
-        else{
+        } else {
 #ifdef T4_ETHER_DEBUG
         Serial.println(ercd);
 #endif
             res = -1;
         }
-    }
-    else{
+    } else {
 #ifdef T4_ETHER_DEBUG
         Serial.println("already connected. double call");
 #endif
