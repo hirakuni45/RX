@@ -547,17 +547,9 @@ Returns:
 size_t EthernetServer::write(uint8_t b){
     int32_t  ercd;
 
-    ercd = tcp_snd_dat(ARDUINO_TCP_CEP, &b, 1, TMO_FEVR);       /* 20150522 fri */
+    ercd = tcp_send_data(ARDUINO_TCP_CEP, &b, 1, TMO_FEVR);       /* 20150522 fri */
     return ercd;
 }
-/*
-size_t EthernetServer::write(const uint8_t *buffer, size_t size){
-    int32_t  ercd;
-
-    ercd = tcp_snd_dat(ARDUINO_TCP_CEP, (void*)buffer, size, TMO_FEVR);    //20150522 fri
-    return ercd;
-}
-*/
 
 
 size_t EthernetServer::write(const void* buffer, size_t size)
@@ -567,16 +559,14 @@ size_t EthernetServer::write(const void* buffer, size_t size)
 
 	const uint8_t* p = static_cast<const uint8_t*>(buffer);
 	if (size <= 0x7fff) {
-		ercd = tcp_snd_dat(ARDUINO_TCP_CEP, (void*)p, size, TMO_FEVR); /* 20150522 fri */
+		ercd = tcp_send_data(ARDUINO_TCP_CEP, p, size, TMO_FEVR);
 	} else {
 		while (size > current_send_size) {
 			if ((size - current_send_size) > 0x7fff) {
-                ercd = tcp_snd_dat(ARDUINO_TCP_CEP, (void*)(p + current_send_size), 0x7fff,
-                        TMO_FEVR);
-            }
-            else {
-                ercd = tcp_snd_dat(ARDUINO_TCP_CEP, (void*) (p + current_send_size),
-                        (size - current_send_size), TMO_FEVR);
+                ercd = tcp_send_data(ARDUINO_TCP_CEP, (p + current_send_size), 0x7fff, TMO_FEVR);
+            } else {
+				ercd = tcp_send_data(ARDUINO_TCP_CEP, (p + current_send_size),
+					(size - current_send_size), TMO_FEVR);
             }
 
             if(ercd < 0){
@@ -848,7 +838,7 @@ int EthernetClient::read()
     utils::format("t4:EthernetClinet::read()");
     utils::format("%u : ") % static_cast<uint32_t>(millis());
 #endif
-    ercd = tcp_rcv_dat(ARDUINO_TCP_CEP, cep[0].rcv_buf, 1, TMO_FEVR);       /* 20150522 fri */
+    ercd = tcp_recv_data(ARDUINO_TCP_CEP, cep[0].rcv_buf, 1, TMO_FEVR);       /* 20150522 fri */
 #if defined(ETHER_DEBUG)
     utils::format("%u\n") % static_cast<uint32_t>(millis());
 #endif
@@ -864,7 +854,7 @@ int EthernetClient::read()
 int EthernetClient::read(void* buf, size_t size) {
     int32_t  ercd;
 
-    ercd = tcp_rcv_dat(ARDUINO_TCP_CEP, buf, size, TMO_FEVR);
+    ercd = tcp_recv_data(ARDUINO_TCP_CEP, buf, size, TMO_FEVR);
     if(ercd <= 0) {      /* 20150527 */
         ercd = -1;
     } else {

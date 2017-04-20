@@ -350,8 +350,6 @@ int tcp_acp_cep(ID cepid, ID repid, T_IPV4EP *p_dstadr, TMO tmout);
 int tcp_con_cep(ID cepid, T_IPV4EP *p_myadr,  T_IPV4EP *p_dstadr, TMO tmout);
 int tcp_sht_cep(ID cepid);
 int tcp_cls_cep(ID cepid, TMO tmout);
-int tcp_snd_dat(ID cepid, void *data, int dlen, TMO tmout);
-int tcp_rcv_dat(ID cepid, void *data, int dlen, TMO tmout);
 int tcp_can_cep(ID cepid, FN fncd);
 
 int tcpudp_open(UW *workp);    /* Open TCP/IP library (initialization)                         */

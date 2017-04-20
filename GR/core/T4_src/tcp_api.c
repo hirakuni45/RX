@@ -527,12 +527,12 @@ int tcp_cls_cep(ID cepid, TMO tmout)
 
 
 /***********************************************************************************************************************
-* Function Name: tcp_snd_dat
+* Function Name: tcp_send_data
 * Description  :
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int tcp_snd_dat(ID cepid, void *data, int len, TMO tmout)
+int tcp_send_data(ID cepid, const void *data, int len, TMO tmout)
 {
     int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
@@ -592,7 +592,7 @@ int tcp_snd_dat(ID cepid, void *data, int len, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int tcp_rcv_dat(ID cepid, void *data, int len, TMO tmout)
+int tcp_recv_data(ID cepid, void *data, int len, TMO tmout)
 {
     int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
