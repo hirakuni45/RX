@@ -12,7 +12,9 @@
 #include "common/string_utils.hpp"
 #include "chip/NTCTH.hpp"
 
-#include "GR/core/Ethernet.h"
+#include "GR/core/ethernet.hpp"
+#include "GR/core/ethernet_client.hpp"
+
 extern "C" {
 	void INT_Excep_ICU_GROUPAL1(void);
 }
@@ -26,12 +28,14 @@ namespace seeda {
 		@brief  net クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class net {
+	class nets {
 
 		typedef device::PORT<device::PORT7, device::bitpos::B0> LAN_RESN;
 		typedef device::PORT<device::PORT7, device::bitpos::B3> LAN_PDN;
 
-		EthernetServer	server_;
+		net::ethernet			ethernet_;
+		net::ethernet_server	server_;
+		net::ethernet_client	client_;
 
 		uint32_t		count_;
 
@@ -43,20 +47,27 @@ namespace seeda {
 		};
 		server_task		server_task_;
 
+		enum class client_task {
+			connection,
+			main_loop,
+			disconnect,
+		};
+		client_task		client_task_;
+
 		typedef utils::line_manage<2048, 20> LINE_MAN;
 		LINE_MAN	line_man_;
 
 		uint32_t	disconnect_loop_;
 
 		// サーミスタ定義
-//		typedef chip::NTCTH<4095, 10.0f, 3452.0f, true> THMISTER;
-		typedef chip::NTCTH<4095, true> THMISTER;
+		// A/D: 12 bits, NT103, 分圧抵抗: 10K オーム、サーミスタ: ＶＣＣ側
+		typedef chip::NTCTH<4095, chip::thermistor::NT103, 10000, true> THMISTER;
 		THMISTER thmister_;
 
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
 			if(fi == nullptr) return;
 
-			EthernetClient* cl = static_cast<EthernetClient*>(option);
+			net::ethernet_client* cl = static_cast<net::ethernet_client*>(option);
 
 			cl->print("<tr>");
 
@@ -92,7 +103,7 @@ namespace seeda {
 		}
 
 
-		void send_info_(EthernetClient& client, int id, bool keep)
+		void send_info_(net::ethernet_client& client, int id, bool keep)
 		{
 			client << "HTTP/1.1 ";
 			client << id << " OK";
@@ -106,7 +117,7 @@ namespace seeda {
 		}
 
 
-		void send_head_(EthernetClient& client, const char* title)
+		void send_head_(net::ethernet_client& client, const char* title)
 		{
 			client.println("<head>");
 			char tmp[256];
@@ -121,7 +132,7 @@ namespace seeda {
 
 
 		// クライアントからの応答を解析して終端（空行）があったら「true」
-		int analize_request_(EthernetClient& client)
+		int analize_request_(net::ethernet_client& client)
 		{
 			char tmp[1024];
 			int len = client.read(tmp, sizeof(tmp));
@@ -156,7 +167,7 @@ namespace seeda {
 		}
 
 
-		void do_cgi_(EthernetClient& client, const char* path, int pos)
+		void do_cgi_(net::ethernet_client& client, const char* path, int pos)
 		{
 			utils::format("CGI: '%s'\n") % path;
 
@@ -226,7 +237,7 @@ namespace seeda {
 
 
 		// POST などの空行以下のデータ列を受け取る
-		bool recv_data_(EthernetClient& client, char* recv, uint32_t max)
+		bool recv_data_(net::ethernet_client& client, char* recv, uint32_t max)
 		{
 			int len = client.read(recv, max);
 			if(len <= 0) return false;
@@ -235,13 +246,13 @@ namespace seeda {
 		}
 
 
-		void render_404_(EthernetClient& client, const char* msg)
+		void render_404_(net::ethernet_client& client, const char* msg)
 		{
 			send_info_(client, 404, false);
 		}
 
 
-		void render_null_(EthernetClient& client, const char* title = nullptr)
+		void render_null_(net::ethernet_client& client, const char* title = nullptr)
 		{
 			send_info_(client, 200, false);
 
@@ -257,7 +268,7 @@ namespace seeda {
 		}
 
 
-		void render_root_(EthernetClient& client)
+		void render_root_(net::ethernet_client& client)
 		{
 			send_info_(client, 200, false);
 
@@ -293,7 +304,7 @@ namespace seeda {
 
 
 		// 設定画面
-		void render_setup_(EthernetClient& client)
+		void render_setup_(net::ethernet_client& client)
 		{
 			send_info_(client, 200, false);
 
@@ -394,7 +405,7 @@ namespace seeda {
 		}
 
 
-		void render_files_(EthernetClient& client)
+		void render_files_(net::ethernet_client& client)
 		{
 			send_info_(client, 200, false);
 
@@ -424,7 +435,7 @@ namespace seeda {
 		}
 
 
-		void render_data_(EthernetClient& client)
+		void render_data_(net::ethernet_client& client)
 		{
 			send_info_(client, 200, false);
 			// client.println("Refresh: 5");  // refresh the page automatically every 5 sec
@@ -511,7 +522,7 @@ namespace seeda {
 		}
 
 
-		void send_file_(EthernetClient& client, const char* path)
+		void send_file_(net::ethernet_client& client, const char* path)
 		{
 			FILE* fp = fopen(path, "rb");
 			if(fp != nullptr) {
@@ -561,13 +572,60 @@ namespace seeda {
 		}
 
 
+		void service_client_()
+		{
+			switch(client_task_) {
+			case client_task::connection:
+				if(client_.connected()) {
+					client_task_ = client_task::main_loop;
+					break;
+				}
+
+				if(client_.connect(net::ip_address(192, 168, 3, 4), 3000, 5) == 1) {
+					utils::format("Conected\n");
+					client_task_ = client_task::main_loop;
+				}
+				break;
+
+			case client_task::main_loop:
+				if(!client_.connected()) {
+					client_task_ = client_task::disconnect;
+					break;
+				}
+
+//				client_.print("SEEDA03");
+
+				break;
+			
+			case client_task::disconnect:
+				client_.stop();
+				utils::format("client disconnected\n");
+				client_task_ = client_task::connection;
+				break;
+			}
+
+
+#if 0
+					static int nnn = 0;
+	 				if(nnn >= 100) {
+						utils::format(".\n");
+						client_.print("SEEDA03");
+						nnn = 0;
+					} else {
+						++nnn;
+					}
+#endif
+
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		net() : server_(), count_(0), server_task_(server_task::wait_client),
+		nets() : server_(), count_(0), server_task_(server_task::wait_client),
+			client_task_(client_task::connection),
 			line_man_(0x0a), disconnect_loop_(0) { }
 
 
@@ -595,7 +653,7 @@ namespace seeda {
 #endif
 			set_interrupt_task(INT_Excep_ICU_GROUPAL1, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
 
-			Ethernet.maininit();
+			ethernet_.maininit();
 
 			static const uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 
@@ -607,32 +665,34 @@ namespace seeda {
 #endif
 
 			if(develope) {
-				if(Ethernet.begin(mac) == 0) {
+				if(ethernet_.begin(mac) == 0) {
 					utils::format("Ethernet Fail: begin (DHCP)...\n");
 
 					utils::format("SetIP: ");
-					IPAddress ipa(192, 168, 3, 20);
-					Ethernet.begin(mac, ipa);
+					net::ip_address ipa(192, 168, 3, 20);
+					ethernet_.begin(mac, ipa);
 				} else {
 					utils::format("DHCP: ");
 				}
 			} else {
 				utils::format("SetIP: ");
-				IPAddress ipa(192, 168, 1, 10);
-				Ethernet.begin(mac, ipa);
+				net::ip_address ipa(192, 168, 1, 10);
+				ethernet_.begin(mac, ipa);
 			}
-			Ethernet.localIP().print();
+			ethernet_.localIP().print();
 			utils::format("\n");
 
-			if(develope) {
-				server_.begin(80);
-			} else {
-				server_.begin(3000);
-			}
-
+			server_.begin(80);
 			utils::format("Start server: ");
-			Ethernet.localIP().print();
+			ethernet_.localIP().print();
 			utils::format("  port(%d)\n") % static_cast<int>(server_.get_port());
+
+#if 0
+			client_.begin(3000);
+			utils::format("Start client: ");
+			ethernet_.localIP().print();
+			utils::format("  port(%d)\n") % static_cast<int>(client_.get_port());
+#endif
 		}
 
 
@@ -653,9 +713,11 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void service()
 		{
-			Ethernet.mainloop();
+			ethernet_.mainloop();
 
-			EthernetClient client = server_.available();
+///			service_client_();
+
+			net::ethernet_client client = server_.available();
 
 			switch(server_task_) {
 
@@ -675,7 +737,6 @@ namespace seeda {
 ///						utils::format("client not available\n");
 						break;
 					}
-
 					auto pos = analize_request_(client);
 					if(pos > 0) {
 						char path[256];
