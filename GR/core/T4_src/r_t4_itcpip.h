@@ -100,9 +100,7 @@ typedef int32_t         VW;
 typedef void    (*FP)(void);
 typedef H               ID;
 typedef H               PRI;
-typedef W               TMO;
 typedef H               HNO;
-/// typedef W               ER;
 typedef UH              ATR;
 #endif
 #endif
@@ -342,15 +340,15 @@ typedef struct T4_STATISTICS
 #if defined(__cplusplus)
 extern "C" {
 #endif
-int udp_snd_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, TMO tmout);
-int udp_rcv_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, TMO tmout);
+int udp_snd_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, int32_t tmout);
+int udp_rcv_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, int32_t tmout);
 int udp_can_cep(ID cepid, FN fncd);
 
-int tcp_acp_cep(ID cepid, ID repid, T_IPV4EP *p_dstadr, TMO tmout);
-int tcp_con_cep(ID cepid, T_IPV4EP *p_myadr,  T_IPV4EP *p_dstadr, TMO tmout);
-int tcp_sht_cep(ID cepid);
-int tcp_cls_cep(ID cepid, TMO tmout);
-int tcp_can_cep(ID cepid, FN fncd);
+// int tcp_acp_cep(ID cepid, ID repid, T_IPV4EP *p_dstadr, TMO tmout);
+// int tcp_con_cep(ID cepid, T_IPV4EP *p_myadr,  T_IPV4EP *p_dstadr, TMO tmout);
+// int tcp_sht_cep(ID cepid);
+// int tcp_cls_cep(ID cepid, TMO tmout);
+// int tcp_can_cep(ID cepid, FN fncd);
 
 int tcpudp_open(UW *workp);    /* Open TCP/IP library (initialization)                         */
 int tcpudp_close(void);        /* Close TCP/IP library (stop)                                  */

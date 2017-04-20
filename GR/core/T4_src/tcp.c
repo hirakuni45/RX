@@ -68,25 +68,25 @@ Private global variables and functions
 
 #if defined(_ETHER)
 extern UB *_ether_p_rcv_buff;
-extern far const UH  _ip_tblcnt[];
+extern const UH  _ip_tblcnt[];
 #endif /* _ETHER */
 
 #if defined(_TCP)
-extern far const UB _t4_channel_num;
-extern far const UH  _tcp_mss[];
-extern far UW  _tcp_initial_seqno[];
-extern far const UH  _tcp_2msl[];
-extern far const UH  _tcp_rt_tmo_rst[];
-extern far const T_TCP_CREP tcp_crep[];
-extern far const T_TCP_CCEP tcp_ccep[];
-extern far const H __tcpcepn;
-extern far UB _tcp_dack[];
+extern const UB _t4_channel_num;
+extern const UH  _tcp_mss[];
+extern UW  _tcp_initial_seqno[];
+extern const UH  _tcp_2msl[];
+extern const UH  _tcp_rt_tmo_rst[];
+extern const T_TCP_CREP tcp_crep[];
+extern const T_TCP_CCEP tcp_ccep[];
+extern const H __tcpcepn;
+extern UB _tcp_dack[];
 extern UB *data_link_buf_ptr;
 #endif
 
 #if defined(_UDP)
 extern _UDP_CB  *_udp_cb;
-extern far const H   __udpcepn;
+extern const H   __udpcepn;
 #endif
 
 #if defined(_PPP)
@@ -2397,7 +2397,7 @@ int _tcp_check_len_arg(int len)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int  _tcp_check_tmout_arg(uint16_t api_type, TMO tmout, _TCP_CB* pTcpcb)
+int  _tcp_check_tmout_arg(uint16_t api_type, int32_t tmout, _TCP_CB* pTcpcb)
 {
     int errcode = E_OK;
 

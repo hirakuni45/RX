@@ -1,3 +1,4 @@
+#pragma once
 /***********************************************************************************************************************
 * DISCLAIMER
 * This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
@@ -127,7 +128,7 @@ typedef struct
     {
         _TCP_API_CNR  cnr;
         _TCP_API_DR   dr;
-        void far *parblk;
+        void *parblk;
     } d;
 } _API_REQ;
 
@@ -345,7 +346,7 @@ void _tcp_api_wup(ID);
 // void _tcp_api_slp(ID cepid);
 int _tcp_check_cepid_arg(ID cepid);
 int _tcp_check_len_arg(int len);
-int  _tcp_check_tmout_arg(uint16_t api_type, TMO tmout, _TCP_CB* pTcpcb);
+int  _tcp_check_tmout_arg(uint16_t api_type, int32_t tmout, _TCP_CB* pTcpcb);
 uint16_t _tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb);
 uint16_t _tcp_call_callback(ID cepid, FN fncd, void *p_parblk);
 FN _tcp_api_type_to_fn(uint16_t api_type);

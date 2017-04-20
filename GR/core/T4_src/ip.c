@@ -71,16 +71,16 @@ extern _TX_HDR  _tx_hdr;    /* Transmit header area */
 extern _TCB   *_tcp_tcb;    /* TCB (Transport Control Block) */
 
 #if defined(_ETHER)
-extern far UH const _ip_tblcnt;
+extern UH const _ip_tblcnt;
 extern uint8_t *_ether_p_rcv_buff;
 #endif
 
 #if defined(_ETHER)
-extern far UH const _ip_tblcnt;
+extern UH const _ip_tblcnt;
 #endif
 #if defined(_MULTI)
 extern TCPUDP_ENV tcpudp_env[];
-extern far UB const __multi_TTL[];
+extern UB const __multi_TTL[];
 #endif
 
 

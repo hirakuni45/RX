@@ -61,22 +61,22 @@ Exported global variables (to be accessed by other files)
 Private global variables and functions
 ***********************************************************************************************************************/
 
-extern far const UB _t4_channel_num;
+extern const UB _t4_channel_num;
 extern _TCB   *_tcp_tcb;
 extern _TCB   *head_tcb;
 extern TCPUDP_ENV tcpudp_env[];
-extern far const T_TCP_CCEP tcp_ccep[];
-extern far const H __tcpcepn;
-extern far const H __tcprepn;
+extern const T_TCP_CCEP tcp_ccep[];
+extern const H __tcpcepn;
+extern const H __tcprepn;
 extern UH _tcp_timer_cnt;
 extern UH _tcp_pre_timer_cnt;
 
 #if defined(_UDP)
-extern far const H __udpcepn;
+extern const H __udpcepn;
 #endif
 
 #if defined(_ETHER)
-extern far UH const _ip_tblcnt[];
+extern UH const _ip_tblcnt[];
 _ARP_ENTRY   **_ether_arp_tbl;
 #endif
 #if defined(_PPP)
@@ -319,7 +319,7 @@ W tcpudp_get_ramsize(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, TMO tmout)
+int tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, int32_t tmout)
 {
     int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
@@ -379,7 +379,7 @@ int tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int tcp_con_cep(ID cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, TMO tmout)
+int tcp_con_cep(ID cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmout)
 {
     int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
@@ -479,7 +479,7 @@ int tcp_sht_cep(ID cepid)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int tcp_cls_cep(ID cepid, TMO tmout)
+int tcp_cls_cep(ID cepid, int32_t tmout)
 {
     int   err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
@@ -532,7 +532,7 @@ int tcp_cls_cep(ID cepid, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int tcp_send_data(ID cepid, const void *data, int len, TMO tmout)
+int tcp_send_data(ID cepid, const void *data, int len, int32_t tmout)
 {
     int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
@@ -592,7 +592,7 @@ int tcp_send_data(ID cepid, const void *data, int len, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int tcp_recv_data(ID cepid, void *data, int len, TMO tmout)
+int tcp_recv_data(ID cepid, void *data, int len, int32_t tmout)
 {
     int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);

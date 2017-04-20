@@ -61,9 +61,9 @@ Private global variables and functions
 
 #if defined(_UDP)
 _UDP_CB  *_udp_cb;
-extern far const T_UDP_CCEP udp_ccep[];
-extern far const H __udpcepn;
-extern far const UB _udp_enable_zerochecksum[];
+extern const T_UDP_CCEP udp_ccep[];
+extern const H __udpcepn;
+extern const UB _udp_enable_zerochecksum[];
 extern UB *data_link_buf_ptr;
 #endif
 
@@ -81,7 +81,7 @@ extern UB *_ether_p_rcv_buff;
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, TMO tmout)
+int udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, int32_t tmout)
 {
     int  ercd;
     _UDP_CB *pcb;
@@ -192,7 +192,7 @@ int udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, TMO tmout)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, TMO tmout)
+int udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, int32_t tmout)
 {
     int  ercd;
     _UDP_CB *pcb;
@@ -395,7 +395,7 @@ __err__udp_rcv:
 ***********************************************************************************************************************/
 int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
 {
-    T_UDP_CCEP far const *pcep;
+    T_UDP_CCEP const *pcep;
     int    ercd;
     FN    fncd;
     uint16_t   sport;
@@ -498,7 +498,7 @@ void _udp_snd(_TCPUDP_PHDR *ph)
 {
     int    ercd;
     FN    fncd;
-    T_UDP_CCEP far const *pcep;
+    T_UDP_CCEP const *pcep;
     int16_t   len;
     uint16_t   sum16;
     _UDP_CB   *pucb;

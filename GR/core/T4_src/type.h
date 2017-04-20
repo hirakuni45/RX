@@ -52,8 +52,8 @@
 
 /* near/far definition */
 #if !defined(R8C) || !defined(M16C) || !defined(M16C80) || !defined(M32C80)
-#define  far
-#define  near
+/// #define  far
+/// #define  near
 #endif
 
 #if BIGENDIAN == 1
