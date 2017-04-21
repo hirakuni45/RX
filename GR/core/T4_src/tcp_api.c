@@ -84,13 +84,7 @@ extern uint16_t ppp_sio_status;
 extern _PPP_API_REQ _ppp_api_req;
 #endif
 
-/***********************************************************************************************************************
-* Function Name: tcpudp_open
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-int tcpudp_open(UW *workp)
+void tcpudp_open(UW *workp)
 {
     UW *currp;
     UH rem;
@@ -164,21 +158,14 @@ int tcpudp_open(UW *workp)
 #endif
 
     tcpudp_act_cyc(1);
-
-    return (E_OK);
 }
 
-/***********************************************************************************************************************
-* Function Name: tcpudp_close
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-int tcpudp_close(void)
+
+void tcpudp_close(void)
 {
     tcpudp_act_cyc(0);
-    return (E_OK);
 }
+
 
 /***********************************************************************************************************************
 * Function Name: _getRAMsize_sub

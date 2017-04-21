@@ -8,8 +8,9 @@
 extern "C" {
 #endif
 
-int tcpudp_open(UW *workp);
-int tcpudp_close(void);
+void tcpudp_open(UW *workp);
+void tcpudp_close(void);
+
 void _getRAMsize_sub(W *ramsize);
 
 #if defined(_TCP)

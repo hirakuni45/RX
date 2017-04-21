@@ -349,9 +349,9 @@ int udp_can_cep(ID cepid, FN fncd);
 // int tcp_sht_cep(ID cepid);
 // int tcp_cls_cep(ID cepid, TMO tmout);
 // int tcp_can_cep(ID cepid, FN fncd);
+// int tcpudp_open(UW *workp);    /* Open TCP/IP library (initialization)                         */
+// int tcpudp_close(void);        /* Close TCP/IP library (stop)                                  */
 
-int tcpudp_open(UW *workp);    /* Open TCP/IP library (initialization)                         */
-int tcpudp_close(void);        /* Close TCP/IP library (stop)                                  */
 W  tcpudp_get_ramsize(void);  /* Calculation of size of work area                             */
 void _process_tcpip(void);    /* TCP/IP process function called from ether INT and timer INT. */
 #if defined(__cplusplus)
