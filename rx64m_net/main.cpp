@@ -14,6 +14,7 @@
 
 #include "GR/core/ethernet.hpp"
 #include "GR/core/ethernet_server.hpp"
+#include "GR/core/ethernet_client.hpp"
 
 namespace {
 
@@ -82,6 +83,7 @@ namespace {
 
 	net::ethernet ethernet_;
 	net::ethernet_server server_(ethernet_);
+	net::ethernet_client client_(ethernet_);
 }
 
 extern "C" {
