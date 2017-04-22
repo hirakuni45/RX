@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  SEEDA03 (RX64M) メイン @n
+    @brief  GR-KAEDE (RX64M) メイン @n
 			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
@@ -8,14 +8,14 @@
 #include "../rx64m_test/main.hpp"
 #include "../rx64m_test/core.hpp"
 #include "../rx64m_test/tools.hpp"
-#include "../rx64m_test/net.hpp"
+#include "../rx64m_test/nets.hpp"
 #include "common/input.hpp"
 
 namespace {
 
 	seeda::core 	core_;
 	seeda::tools	tools_;
-	seeda::net		net_;
+	seeda::nets		nets_;
 
 	seeda::SPI		spi_;
 	seeda::SDC		sdc_(spi_, 20000000);
@@ -434,8 +434,8 @@ int main(int argc, char** argv)
 	tools_.init();
 	tools_.title();
 
-	net_.init();
-	net_.title();
+	nets_.init();
+	nets_.title();
 
 	uint32_t cnt = 0;
 	while(1) {
@@ -446,7 +446,7 @@ int main(int argc, char** argv)
 
 		sdc_.service();
 
-		net_.service();
+		nets_.service();
 
 		++cnt;
 		if(cnt >= 30) {

@@ -141,8 +141,12 @@ namespace seeda {
 		void title()
 		{
 			// タイトル・コール
+#ifdef SEEDA
 			utils::format("\nStart Seeda03 Build: %u Version %d.%02d\n") % build_id_
 				% (seeda_version_ / 100) % (seeda_version_ % 100);
+#else
+			utils::format("\nStart GR-KAEDE Build: %u\n") % build_id_;
+#endif
 			uint8_t mde = device::SYSTEM::MDE.MDE();
 			utils::format("Endian: %3b (%s)") % static_cast<uint32_t>(mde) % (mde == 0b111 ? "Little" : "Big");
 			utils::format(", PCKA: %u [Hz]") % static_cast<uint32_t>(F_PCKA);

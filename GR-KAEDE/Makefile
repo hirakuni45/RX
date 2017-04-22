@@ -39,8 +39,7 @@ CSOURCES	=	common/init.c \
 				GR/core/driver/r_ether.c
 
 PSOURCES	=	main.cpp \
-				GR/core/IPAddress.cpp \
-				GR/core/Ethernet.cpp
+				GR/core/ethernet.cpp
 
 USER_LIBS	=	stdc++ m
 

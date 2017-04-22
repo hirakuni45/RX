@@ -8,13 +8,13 @@
 #include "main.hpp"
 #include "core.hpp"
 #include "tools.hpp"
-#include "net.hpp"
+#include "nets.hpp"
 
 namespace {
 
 	seeda::core 	core_;
 	seeda::tools	tools_;
-	seeda::net		net_;
+	seeda::nets		nets_;
 
 	seeda::SPI		spi_;
 	seeda::SDC		sdc_(spi_, 20000000);
@@ -439,8 +439,8 @@ int main(int argc, char** argv)
 	tools_.init();
 	tools_.title();
 
-	net_.init();
-	net_.title();
+	nets_.init();
+	nets_.title();
 
 	enable_eadc_server();
 
@@ -453,7 +453,7 @@ int main(int argc, char** argv)
 
 		sdc_.service();
 
-		net_.service();
+		nets_.service();
 
 		++cnt;
 		if(cnt >= 30) {
