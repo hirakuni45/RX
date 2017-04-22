@@ -50,8 +50,6 @@ typedef utils::basic_format<utils::def_chaout> debug_format;
 /******************************************************************************
 Macro definitions
 ******************************************************************************/
-#define ARDUINO_TCP_CEP         1
-#define ARDUINO_UDP_CEP         1
 #define T4_CLOSED               0
 
 #define T4_TCPS_CLOSED          0
@@ -60,22 +58,8 @@ Macro definitions
 
 #define DHCP_NOTHING_HAPPEND    0
 #define DHCP_RENEW_SUCCESS      2
-#define UDP_RCV_BUFFER_SIZE             1024
-#define TCP_MSS                         1460
-#define UDP_TX_PACKET_MAX_SIZE          24                  /*Along with Arduino original code*/
-
-struct CEP {
-    uint32_t    status;
-    T_IPV4EP    dst_addr;
-    T_IPV4EP    src_addr;
-    int32_t     current_rcv_data_len;
-    int32_t     total_rcv_len;
-    uint8_t     rcv_buf[TCP_MSS];
-    uint8_t     snd_buf[TCP_MSS];
-    int32_t     _1sec_counter;
-    int32_t     _1sec_timer;
-    int32_t     pre_1sec_timer;
-};
+#define UDP_RCV_BUFFER_SIZE     1024
+#define UDP_TX_PACKET_MAX_SIZE  24
 
 extern _TCB   *head_tcb;
 extern UB _t4_channel_num;
@@ -107,17 +91,36 @@ namespace net {
 	class ethernet {
 
 	public:
-		CEP			cep[ARDUINO_TCP_CEP];
+		static const uint32_t max_connection = 4;
+		static const uint32_t TCP_MSS = 1460;
+
+		struct CEP {
+			uint32_t    status;
+			T_IPV4EP    dst_addr;
+			T_IPV4EP    src_addr;
+			int32_t     current_recv_data_len;
+			int32_t     total_rcv_len;
+			uint8_t     recv_buf[TCP_MSS];
+			uint8_t     send_buf[TCP_MSS];
+			int32_t     sec_counter;
+			int32_t     sec_timer;
+			int32_t     pre_sec_timer;
+			bool		enable;
+			bool		call_flag;
+			CEP() : enable(false), call_flag(false) { }
+		};
 
 		static const uint32_t TCPUDP_WORK = 1780 / sizeof(uint32_t);
 		uint32_t	tcpudp_work[TCPUDP_WORK];
 
 	private:
+		CEP			cep_[max_connection];
+
         uint32_t    dhcpIPAddressLeaseTime_sec;
         uint32_t    dhcpIPuse_sec;
         uint32_t    fromSystemGetLastTime;
         bool		dhcp_use_;
-        bool		tcp_acp_cep_call_flg;
+///        bool		tcp_acp_cep_call_flg;
 
 		static T_IPV4EP remoteIPV4EP_;
 		static char UDPrecvBuf_[UDP_RCV_DAT_DATAREAD_MAXIMUM];
@@ -236,8 +239,7 @@ namespace net {
         ethernet() : dhcpIPAddressLeaseTime_sec(0),
 			dhcpIPuse_sec(0),
 			fromSystemGetLastTime(0),
-			dhcp_use_(false),
-			tcp_acp_cep_call_flg(false) { }
+			dhcp_use_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -246,6 +248,71 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
         ~ethernet() { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  新規コネクションの作成（最大４つ）
+			@return コネクションID（１～４）０なら失敗
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t new_connection()
+		{
+			for(uint32_t i = 0; i < max_connection; ++i) {
+				if(!cep_[i].enable) {
+					cep_[i].enable = true;
+					return i + 1;
+				}
+			}
+			return 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コネクションの終了
+			@param[in]	cepid	コネクション ID
+		*/
+		//-----------------------------------------------------------------//
+		void end_connection(uint32_t cepid)
+		{
+			if(cepid > 0 && cepid <= max_connection) {
+				cep_[cepid - 1].call_flag = false;
+				cep_[cepid - 1].enable = false;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コネクション・リソースへの参照
+			@param[in]	cepid	コネクション ID
+			@return コネクション・リソース
+		*/
+		//-----------------------------------------------------------------//
+		CEP& at_cep(uint32_t cepid) { return cep_[cepid - 1]; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  イーサネット開始
+		*/
+		//-----------------------------------------------------------------//
+		void start()
+		{
+			byteq_err_t byteq_err;
+			/* Open and initialize a byte queue with a size of BUFSIZE bytes. */
+			byteq_err = R_BYTEQ_Open(byteq_buf, RING_SIZ, &hdl_);
+			if(BYTEQ_SUCCESS != byteq_err) {
+				utils::format("start: step 0 halt...");
+				while(1) ;
+			}
+			byteq_err = R_BYTEQ_Open(byteq_buf_forSize_, RING_SIZ_forSize, &hdl_forSize_);
+			if(BYTEQ_SUCCESS != byteq_err) {
+				utils::format("start: step 1 halt...");
+				while(1);
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -302,7 +369,7 @@ namespace net {
 #endif
 			close_timer();
 			initialize_TCP_IP();
-			clr_tcp_acp_cep_call_flg();
+///			clr_tcp_acp_cep_call_flg();
 			return 1;	/* returns an int: 1 on a successful DHCP connection */
 		}
 
@@ -383,7 +450,7 @@ namespace net {
 			memcpy(tcpudp_env.gwaddr, gateway.get(), IP_ALEN);
 			memcpy(tcpudp_env.maskaddr, subnet.get(), IP_ALEN);
 			dhcp_use_ = false;
-			clr_tcp_acp_cep_call_flg();
+			/// clr_tcp_acp_cep_call_flg();
 #ifdef T4_ETHER_DEBUG
 			Serial.print("t4:EthernetClass::begin(mac:");
 			Serial.print((uchar)mac_address[0],HEX);
@@ -475,75 +542,22 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  イーサネット開始
-		*/
-		//-----------------------------------------------------------------//
-		void start()
-		{
-			byteq_err_t byteq_err;
-			/* Open and initialize a byte queue with a size of BUFSIZE bytes. */
-			byteq_err = R_BYTEQ_Open(byteq_buf, RING_SIZ, &hdl_);
-			if(BYTEQ_SUCCESS != byteq_err) {
-				utils::format("mainint: step 0 halt...");
-				while(1) ;
-			}
-			byteq_err = R_BYTEQ_Open(byteq_buf_forSize_, RING_SIZ_forSize, &hdl_forSize_);
-			if(BYTEQ_SUCCESS != byteq_err) {
-				utils::format("mainint: step 1 halt...");
-				while(1);
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  サービス（メイン・ループ）
 		*/
 		//-----------------------------------------------------------------//
         void service()
 		{
             R_ETHER_LinkProcess();
+
             if(dhcp_use_) {
                 uint32_t    sec,ms;
                 ms = millis();
-                sec = (ms - fromSystemGetLastTime)/1000;
+                sec = (ms - fromSystemGetLastTime) / 1000;
                 if(sec){
                     fromSystemGetLastTime = ms;
                     dhcpIPuse_sec += sec;
                 }
             }
-        }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  停止
-		*/
-		//-----------------------------------------------------------------//
-        void stop()
-		{
-			tcp_cls_cep(ARDUINO_TCP_CEP, TMO_FEVR);
-			clr_tcp_acp_cep_call_flg();
-			dhcp_use_ = false;
-#if defined(T4_ETHER_DEBUG)
-			Serial.println("EthernetClass::stop():");
-			Serial.print("tcp_sht_cep():");
-			Serial.print("tcp_cls_cep():");
-			Serial.println("clr_tcp_acp_cep_call_flg()");
-#endif
-		}
-
-
-        bool get_tcp_acp_cep_call_flg() const {
-            return tcp_acp_cep_call_flg;
-        }
-
-        void set_tcp_acp_cep_call_flg() {
-            tcp_acp_cep_call_flg = true;
-        }
-
-        void clr_tcp_acp_cep_call_flg() {
-            tcp_acp_cep_call_flg = false;
         }
 
 
@@ -558,63 +572,63 @@ namespace net {
 				uint8_t bytes[IP_ALEN];
 				uint32_t dword;
 			} ip;
-    int     i;
-    byteq_err_t byteq_err;
-    uint16_t count;
+			byteq_err_t byteq_err;
+			uint16_t count;
 
-    if(cepid == ARDUINO_UDP_CEP){
-        switch (fncd){
-            case TEV_UDP_RCV_DAT:   /* UDP data received             */
-                /* queue filled with data by R_BYTEQ_Put()elsewhere */
-                byteq_err = R_BYTEQ_Unused(hdl_forSize_, &count);
-                if(count < 2){  /*can not record any more DATA SIZE QUE*/
+///			if(cepid == ARDUINO_UDP_CEP) {
+			if(cepid > 0 && cepid <= static_cast<ID>(max_connection)) { 
+				switch (fncd){
+				/// UDP data received
+				case TEV_UDP_RCV_DAT:
+					/* queue filled with data by R_BYTEQ_Put()elsewhere */
+					byteq_err = R_BYTEQ_Unused(hdl_forSize_, &count);
+					if(count < 2) {  /*can not record any more DATA SIZE QUE*/
 #if defined(T4_ETHER_DEBUG)
-                    Serial.print("<T4:t4_udp_callback:dataSizeQue:can not record any more DATA SIZE QUE>");
+						Serial.print("<T4:t4_udp_callback:dataSizeQue:can not record any more DATA SIZE QUE>");
 #endif
-                    break;
-                }
-                recvSiz.dword = udp_rcv_dat(cepid,
-                                    &remoteIPV4EP_, /*IP address and port number acquisition of opponent*/
-                                    UDPrecvBuf_,    /*Start address of the area for storing the received data*/
-                                    UDP_RCV_DAT_DATAREAD_MAXIMUM,       /*work size*/
-                                    TMO_POL);                           /*polling*/
-                /* queue filled with data by R_BYTEQ_Put()elsewhere */
-                byteq_err = R_BYTEQ_Unused(hdl_, &count);
-                if(count < recvSiz.dword){  /*can not record any more UDP PACKET SIZE QUE*/
+						break;
+					}
+					recvSiz.dword = udp_rcv_dat(cepid,
+						&remoteIPV4EP_, /*IP address and port number acquisition of opponent*/
+						UDPrecvBuf_,    /*Start address of the area for storing the received data*/
+						UDP_RCV_DAT_DATAREAD_MAXIMUM,       /*work size*/
+						TMO_POL);                           /*polling*/
+						/* queue filled with data by R_BYTEQ_Put()elsewhere */
+					byteq_err = R_BYTEQ_Unused(hdl_, &count);
+					if(count < recvSiz.dword) {  /*can not record any more UDP PACKET SIZE QUE*/
 #if defined(T4_ETHER_DEBUG)
-                    Serial.print("<T4:t4_udp_callback:UDP PACKET Que:can not record any more UDP PACKET SIZE QUE>");
+						Serial.print("<t4_udp_callback:UDP PACKET Que:can not record any more UDP PACKET SIZE QUE>");
 #endif
-                    break;
-                }
-                if(recvSiz.dword > 0){                                  /*reveive success*/
-                    byteq_err = R_BYTEQ_Put(hdl_forSize_, recvSiz.bytes[1]);     /*udp packet size upper*/
-                    if (BYTEQ_SUCCESS != byteq_err){
-                        printf("<t4:size memory Que ERROR>");
-                        break;
-                    }
-                    byteq_err = R_BYTEQ_Put(hdl_forSize_, recvSiz.bytes[0]);     /*udp packet size lower*/
-                    if (BYTEQ_SUCCESS != byteq_err){
-                        printf("<t4:size memory Que ERROR>");
-                        break;
-                    }
-
-                    /* Put characters in to the queue. */
-                    for (i=0; i<recvSiz.dword; i++){                    /*ring buffer que_ing*/
-                        byteq_err = R_BYTEQ_Put(hdl_, UDPrecvBuf_[i]);
-                        if (BYTEQ_SUCCESS != byteq_err){
-                            printf("<t4:enQueue ERROR>");
-                            break;
-                        }
-                    }
-                    ip.dword = remoteIPV4EP_.ipaddr;
-                    remoteIPV4EP_.ipaddr = ((uint32_t)ip.bytes[0]<<24)
-										  | ((uint32_t)ip.bytes[1]<<16)
-										  | ((uint32_t)ip.bytes[2]<<8)
-										  | ((uint32_t)ip.bytes[3]);
-                }
-                break;
-            default:
-                break;
+						break;
+					}
+					if(recvSiz.dword > 0) {
+						byteq_err = R_BYTEQ_Put(hdl_forSize_, recvSiz.bytes[1]);     /*udp packet size upper*/
+						if(BYTEQ_SUCCESS != byteq_err) {
+                        	printf("<size memory Que ERROR>");
+							break;
+						}
+						byteq_err = R_BYTEQ_Put(hdl_forSize_, recvSiz.bytes[0]);     /*udp packet size lower*/
+						if(BYTEQ_SUCCESS != byteq_err) {
+							printf("<size memory Que ERROR>");
+							break;
+						}
+						/* Put characters in to the queue. */
+						for(int i = 0; i < recvSiz.dword; i++) {
+							byteq_err = R_BYTEQ_Put(hdl_, UDPrecvBuf_[i]);
+							if(BYTEQ_SUCCESS != byteq_err) {
+								printf("<t4:enQueue ERROR>");
+								break;
+							}
+						}
+						ip.dword = remoteIPV4EP_.ipaddr;
+						remoteIPV4EP_.ipaddr = ((uint32_t)ip.bytes[0] << 24)
+								| ((uint32_t)ip.bytes[1]<<16)
+								| ((uint32_t)ip.bytes[2]<<8)
+								| ((uint32_t)ip.bytes[3]);
+					}
+					break;
+				default:
+					break;
         		}
     		}
 	    	return 0;

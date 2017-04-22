@@ -89,7 +89,7 @@ namespace net {
 			@param[in]	address	配列
 		*/
 		//-----------------------------------------------------------------//
-		bool set_string(const char *address) {
+		bool from_string(const char *address) {
 			if(address == nullptr) return false;
 			int a, b, c, d;
 			auto f = (utils::input("%d.%d.%d.%d", address) % a % b % c % d).status();
