@@ -22,6 +22,23 @@ namespace net {
 		uint16_t	port_;
 		uint32_t	cepid_;
 
+		int16_t set_tcp_crep_(ID repid, UH portno) {
+			if (repid == 0 || repid > __tcprepn) {
+				return -1;
+			}
+			tcp_crep[repid - 1].myaddr.portno = portno;
+			return 0;
+		}
+
+		int16_t set_tcp_ccep_(ID cepid, UB ch, int rbufsz) {
+			if (cepid == 0 || cepid > __tcpcepn){
+				return -1;
+			}
+			tcp_ccep[cepid - 1].cepatr = ch;
+			tcp_ccep[cepid - 1].rbufsz = rbufsz;
+			return 0;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -85,8 +102,8 @@ namespace net {
 				utils::format("set_tcp_crep_(): %d") % cepid_;
 #endif
 				if(set_tcp_crep_(cepid_, port_) != E_OK) {
-					utils::format("t4_set_tcp_crep() halt..: %d\n") % cepid_;
-					while(1);
+					utils::format("set_tcp_crep() fail: %d\n") % cepid_;
+					return;
 				}
 
 				/* Initialize TCP communication end point */
@@ -94,8 +111,8 @@ namespace net {
 				utils::format("set_tcp_ccep(): %d\n") % cepid_;
 #endif
 				if(set_tcp_ccep_(cepid_, 0, ethernet::TCP_MSS) != E_OK) {
-					utils::format("t4_set_tcp_ccep() halt..: %d\n") % cepid_;
-					while(1) ;
+					utils::format("set_tcp_ccep_() fail: %d\n") % cepid_;
+					return;
 				}
 			} else {
 				utils::format("port == 0\n");
@@ -151,7 +168,6 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int32_t write(uint8_t data)
 		{
-///			int32_t ercd = tcp_send_data(ARDUINO_TCP_CEP, &data, 1, TMO_FEVR);
 			int32_t ercd = tcp_send_data(cepid_, &data, 1, TMO_FEVR);
 			return ercd;
 		}
@@ -170,15 +186,12 @@ namespace net {
 
 			const uint8_t* p = static_cast<const uint8_t*>(buffer);
 			if (size <= 0x7fff) {
-///				ercd = tcp_send_data(ARDUINO_TCP_CEP, p, size, TMO_FEVR);
 				ercd = tcp_send_data(cepid_, p, size, TMO_FEVR);
 			} else {
 				while (size > current_send_size) {
 					if((size - current_send_size) > 0x7fff) {
-///						ercd = tcp_send_data(ARDUINO_TCP_CEP, (p + current_send_size), 0x7fff, TMO_FEVR);
 						ercd = tcp_send_data(cepid_, (p + current_send_size), 0x7fff, TMO_FEVR);
 					} else {
-///						ercd = tcp_send_data(ARDUINO_TCP_CEP, (p + current_send_size),
 						ercd = tcp_send_data(cepid_, (p + current_send_size),
 									(size - current_send_size), TMO_FEVR);
 					}
@@ -267,24 +280,6 @@ namespace net {
 		}
 
 
-		int16_t set_tcp_crep_(ID repid, UH portno) {
-			if (repid == 0 || repid > __tcprepn) {
-				return -1;
-			}
-			tcp_crep[repid - 1].myaddr.portno = portno;
-			return 0;
-		}
-
-		int16_t set_tcp_ccep_(ID cepid, UB ch, int rbufsz) {
-			if (cepid == 0 || cepid > __tcpcepn){
-				return -1;
-			}
-			tcp_ccep[cepid - 1].cepatr = ch;
-			tcp_ccep[cepid - 1].rbufsz = rbufsz;
-			return 0;
-		}
-
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  有効なデータがあるか
@@ -295,7 +290,7 @@ namespace net {
 		{
 			int res = 0;
 			if(connected()) {
-				res = head_tcb[0].rdsize;
+				res = head_tcb[cepid_ - 1].rdsize;
 				int ercd = tcp_read_stat(cepid_);
 #ifdef ETHER_DEBUG
 				utils::format("(%d) tcp_read_stat: %d\n") % res % ercd;

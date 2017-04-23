@@ -21,7 +21,7 @@ namespace net {
 extern "C" {
 
 	int t4_udp_callback(ID cepid, FN fncd , void *p_parblk) {
-		return net::ethernet::t4_udp_callback(cepid, fncd , p_parblk);
+		return net::ethernet::udp_callback(cepid, fncd , p_parblk);
 	}
 
 }

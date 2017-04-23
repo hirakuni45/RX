@@ -34,6 +34,8 @@ extern "C" {
 };
 
 
+// #define DEBUG
+
 #ifndef DEBUG
 // デバッグ以外で出力を無効にする
 struct null_chaout {
@@ -58,7 +60,8 @@ Macro definitions
 
 #define DHCP_NOTHING_HAPPEND    0
 #define DHCP_RENEW_SUCCESS      2
-#define UDP_RCV_BUFFER_SIZE     1024
+/// #define UDP_RCV_BUFFER_SIZE     1024
+#define UDP_RCV_BUFFER_SIZE     4096
 #define UDP_TX_PACKET_MAX_SIZE  24
 
 extern _TCB   *head_tcb;
@@ -110,17 +113,15 @@ namespace net {
 			CEP() : enable(false), call_flag(false) { }
 		};
 
-		static const uint32_t TCPUDP_WORK = 1780 / sizeof(uint32_t);
-		uint32_t	tcpudp_work[TCPUDP_WORK];
-
 	private:
 		CEP			cep_[max_connection];
+
+		uint32_t	tcpudp_work_[2700];
 
         uint32_t    dhcpIPAddressLeaseTime_sec;
         uint32_t    dhcpIPuse_sec;
         uint32_t    fromSystemGetLastTime;
         bool		dhcp_use_;
-///        bool		tcp_acp_cep_call_flg;
 
 		static T_IPV4EP remoteIPV4EP_;
 		static char UDPrecvBuf_[UDP_RCV_DAT_DATAREAD_MAXIMUM];
@@ -129,54 +130,20 @@ namespace net {
 		static byteq_hdl_t	hdl_forSize_;
 		static uint8_t byteq_buf_forSize_[RING_SIZ_forSize];    /* sizeQueBody 1024 >> 2 = 256 */
 
-        void dhcpSuccess(DHCP *tmpDhcpPt) {
+        void dhcpSuccess(DHCP* tmpDhcpPt) {
             memcpy(tcpudp_env.ipaddr, tmpDhcpPt->ipaddr, 4);
             debug_format("ip = %08X\n") % get_local_ip();
 
             memcpy(tcpudp_env.maskaddr, tmpDhcpPt->maskaddr, 4);
-#ifdef T4_ETHER_DEBUG
-            Serial.print("snm = ");
-            Serial.println(subnetMask());
-#endif
             memcpy(tcpudp_env.gwaddr, tmpDhcpPt->gwaddr, 4);
-#ifdef T4_ETHER_DEBUG
-            Serial.print("gw = ");
-            Serial.println(gatewayIP());
-#endif
             memcpy((char *)dnsaddr1, (char *)tmpDhcpPt->dnsaddr, 4);
-#ifdef T4_ETHER_DEBUG
-            Serial.print("dns = ");
-            Serial.println(dnsServerIP());
-#endif
-            memcpy(dhcpSvMac.bytes, ((DHCP_PACKET*)tcpudp_work)->ether.source_address, EP_ALEN);
-#ifdef T4_ETHER_DEBUG
-            Serial.print("dhcpSvmac = ");
-            Serial.print(dhcpSvMac.bytes[0],HEX);
-            Serial.print(":");
-            Serial.print(dhcpSvMac.bytes[1],HEX);
-            Serial.print(":");
-            Serial.print(dhcpSvMac.bytes[2],HEX);
-            Serial.print(":");
-            Serial.print(dhcpSvMac.bytes[3],HEX);
-            Serial.print(":");
-            Serial.print(dhcpSvMac.bytes[4],HEX);
-            Serial.print(":");
-            Serial.println(dhcpSvMac.bytes[5],HEX);
-#endif
-            memcpy(dhcpSvIp.bytes, ((DHCP_PACKET*)tcpudp_work)->ipv4.source_ip, IP_ALEN);
-#ifdef T4_ETHER_DEBUG
-            Serial.print("dhcpSvIP = ");
-            Serial.println(dhcpSvIp.dword,HEX);
-#endif
+            memcpy(dhcpSvMac.bytes, ((DHCP_PACKET*)tcpudp_work_)->ether.source_address, EP_ALEN);
+            memcpy(dhcpSvIp.bytes, ((DHCP_PACKET*)tcpudp_work_)->ipv4.source_ip, IP_ALEN);
             dhcp_use_ = true;
 
 			dhcpIPuse_sec = 0;                 /*dhcp lease time local countup start*/
             fromSystemGetLastTime = millis();
             dhcpIPAddressLeaseTime_sec = tmpDhcpPt->dhcpIPAddressLeaseTime;     /*ip lease limit from dhcpSv*/
-#ifdef T4_ETHER_DEBUG
-            Serial.print("dhcpIPAddressLeaseTime_sec = ");
-            Serial.println(dhcpIPAddressLeaseTime_sec);
-#endif
         }
 
 ///        void dhcpLeaseTimeCopy(DHCP *);
@@ -185,13 +152,10 @@ namespace net {
 
 		void startLANController()
 		{
-            int  ercd;
-            ercd = lan_open();
-#ifdef T4_ETHER_DEBUG
-            Serial.print("lan_open() = ");
-            Serial.println(ercd);
-#endif
-            if (ercd != E_OK){
+            int  ercd = lan_open();
+            debug_format("lan_open() = %d\n") % ercd;
+            if(ercd != E_OK) {
+				utils::format("lan_open() fail...\n");
                 while(1);
             }
         }
@@ -199,23 +163,15 @@ namespace net {
 
         void initialize_TCP_IP()
 		{
-			UW	size;
-            int	ercd;
-
-            size = tcpudp_get_ramsize();
-#ifdef T4_ETHER_DEBUG
-            Serial.print("tcpudp_get_ramsize() = ");
-            Serial.println(size);
-#endif
-            if (size > (sizeof(tcpudp_work))){
+			uint32_t size = tcpudp_get_ramsize();
+			uint32_t real = sizeof(tcpudp_work_);
+            if(size > real) {
+				utils::format("empty tcpudp RAM size: need(%d), real(%d)\n") % size % real;
                 while(1);
             }
 
-            tcpudp_open(tcpudp_work);
-#ifdef T4_ETHER_DEBUG
-            Serial.print("tcpudp_open() = ");
-            Serial.println(ercd);
-#endif
+			tcpudp_open(tcpudp_work_);
+            debug_format("tcpudp_open()\n");
         }
 
 	public:
@@ -352,7 +308,7 @@ namespace net {
 #ifdef ETHER_DEBUG
 			utils::format("r_dhcp_open:\n");
 #endif
-			if(r_dhcp_open(&tmpDhcp, (uint8_t *)tcpudp_work, mac) == -1) {
+			if(r_dhcp_open(&tmpDhcp, (uint8_t*)tcpudp_work_, mac) == -1) {
 #ifdef ETHER_DEBUG
 				utils::format("fail...\n");
 #endif
@@ -561,7 +517,7 @@ namespace net {
         }
 
 
-		static int t4_udp_callback(ID cepid, FN fncd , void *p_parblk)
+		static int udp_callback(ID cepid, FN fncd , void *p_parblk)
 		{
 			union _recvSiz {
 				int  dword;          /*typedef int32_t W;typedef W ER*/
@@ -575,7 +531,6 @@ namespace net {
 			byteq_err_t byteq_err;
 			uint16_t count;
 
-///			if(cepid == ARDUINO_UDP_CEP) {
 			if(cepid > 0 && cepid <= static_cast<ID>(max_connection)) { 
 				switch (fncd){
 				/// UDP data received

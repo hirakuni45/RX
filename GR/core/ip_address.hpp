@@ -32,6 +32,7 @@ namespace net {
 		};
 
 		address_t	address_;
+		char		str_[4*4+1];
 
 	public:
 		//-----------------------------------------------------------------//
@@ -40,7 +41,7 @@ namespace net {
 			@param[in]	dword	32bits IP
 		*/
 		//-----------------------------------------------------------------//
-		ip_address(uint32_t dword = 0) : address_(dword) { }
+		ip_address(uint32_t dword = 0) : address_(dword), str_{ 0 } { }
 
 
 		//-----------------------------------------------------------------//
@@ -148,14 +149,18 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  標準コンソールにアドレス表示
+			@brief  文字列で取得
+			@param[in]	spch	分離キャラクター（通常「.」）
+			@return 文字列
 		*/
 		//-----------------------------------------------------------------//
-		void print() const {
-			utils::format("%d.%d.%d.%d") % static_cast<int>(address_.bytes[0])
-										 % static_cast<int>(address_.bytes[1])
-										 % static_cast<int>(address_.bytes[2])
-										 % static_cast<int>(address_.bytes[3]);
+		const char* get_str(char spch = '.') {
+			utils::format("%d%c%d%c%d%c%d", str_, sizeof(str_))
+				% static_cast<int>(address_.bytes[0]) % spch
+				% static_cast<int>(address_.bytes[1]) % spch
+				% static_cast<int>(address_.bytes[2]) % spch
+				% static_cast<int>(address_.bytes[3]);
+			return str_;
 		}
 	};
 }
