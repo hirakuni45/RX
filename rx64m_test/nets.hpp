@@ -60,6 +60,13 @@ namespace seeda {
 
 		uint32_t	disconnect_loop_;
 
+
+		int			send_loop_;
+
+
+		net::ip_address		client_ip_;
+
+
 		// サーミスタ定義
 		// A/D: 12 bits, NT103, 分圧抵抗: 10K オーム、サーミスタ: ＶＣＣ側
 		typedef chip::NTCTH<4095, chip::thermistor::NT103, 10000, true> THMISTER;
@@ -171,7 +178,7 @@ namespace seeda {
 		}
 
 
-		void do_cgi_(net::ethernet_base& base, const char* path, int pos)
+		void select_cgi_(net::ethernet_base& base, const char* path, int pos)
 		{
 			utils::format("CGI: '%s'\n") % path;
 
@@ -236,6 +243,15 @@ namespace seeda {
 					}
 				}
 //				cgi.list();
+			} else if(strcmp(path, "/cgi/set_client.cgi") == 0) {
+				typedef utils::parse_cgi_post<256, 1> CGI_IP;
+				CGI_IP cgi;
+				cgi.parse(body);
+				for(uint32_t i = 0; i < cgi.size(); ++i) {
+//					const auto& t = cgi.get_unit(i);
+//					if((utils::input("ip%d", t.key) % ch).status()) {
+//					}
+				}
 			}
 		}
 
@@ -272,66 +288,82 @@ namespace seeda {
 		}
 
 
+		void render_date_time_(net::ethernet_base& base)
+		{
+			char tmp[128];
+			time_t t = get_time();
+			disp_time(t, tmp, sizeof(tmp));
+			base.print(tmp);
+			base.println("<br>");
+		}
+
+
+		void render_version_(net::ethernet_base& base)
+		{  // ビルドバージョン表示
+			char tmp[128];
+			utils::format("Seeda03 Build: %u Version %d.%02d", tmp, sizeof(tmp)) % build_id_
+				% (seeda_version_ / 100) % (seeda_version_ % 100);
+			base.println(tmp);
+			base.println("<br>");
+		}
+
+
 		void render_root_(net::ethernet_base& base)
 		{
 			send_info_(base, 200, false);
 
 			base.println("<!DOCTYPE HTML>");
 			base.println("<html>");
-			send_head_(base, "Root");
+			send_head_(base, "Root/SimpleData");
+
+			{  // コネクション回数表示
+				char tmp[64];
+				utils::format("Conection: %d<br>", tmp, sizeof(tmp)) % count_;
+				base.println(tmp);
+			}
+
+			render_date_time_(base);
+
+			base.println("Sampling: 1[ms]<br>");
+
+			for (int ch = 0; ch < 8; ++ch) {
+				const auto& t = get_sample(ch);
+				char tmp[64];
+				utils::format("%d,", tmp, sizeof(tmp)) % ch;
+				base.print(tmp);
+				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.min_);
+				base.print(tmp);
+				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.max_);
+				base.print(tmp);
+				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.average_);
+				base.print(tmp);
+				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.limit_level_);
+				base.print(tmp);
+				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.limit_up_);
+				base.print(tmp);
+				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.median_);
+				base.print(tmp);
+				base.println("<br>");
+			}
 
 			base.println("</html>");
-#if 0
-			base.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">");
-			client.println("<html>");
-			client.println("<head>");
-			client.println("<title>SEEDA Settings</title>");
-			client.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-			client.println("<meta http-equiv=\"Pragma\" content=\"no-cache\">");
-			client.println("<meta http-equiv=\"Cache-Control\" content=\"no-cache\">");
-			client.println("<meta http-equiv=\"Expires\" content=\"0\">");
-			client.println("<script src=\"seeda/OnceOnly.html\"></script>");
-			client.println("</head>");
-			client.println("<FRAMESET cols=\"223,*\" frameborder=\"NO\" border=\"0\">");
-			client.println("<FRAMESET rows=\"137,*\" frameborder=\"NO\" border=\"0\">");
-			client.println("<FRAME name=\"ttl\" scrolling=\"NO\" noresize src=\"seeda/title.png\">");
-			client.println("<FRAME name=\"men\" scrolling=\"AUTO\" noresize src=\"seeda/men.html\">");
-			client.println("</FRAMESET>");
-			client.println("<FRAME name=\"frm\" src=\"seeda/frmtop.html\">");
-			client.println("<NOFRAMES>");
-			client.println("<p>You cann't access this page without frame brouser.</p>");
-			client.println("</NOFRAMES>");
-			client.println("</FRAMESET>");
-			client.println("</html>");
-#endif
 		}
 
 
-		// 設定画面
-		void render_setup_(net::ethernet_base& base)
+		// メイン設定画面
+		void render_setup_main_(net::ethernet_base& base)
 		{
 			send_info_(base, 200, false);
 
 			base.println("<!DOCTYPE HTML>");
 			base.println("<html>");
-			send_head_(base, "Setup");
+			send_head_(base, "SetupMain");
 
-			{  // ビルドバージョン表示
-				char tmp[128];
-				utils::format("Seeda03 Build: %u Version %d.%02d", tmp, sizeof(tmp)) % build_id_
-					% (seeda_version_ / 100) % (seeda_version_ % 100);
-				base.println(tmp);
-				base.println("<br/>");
-			}
+			render_version_(base);
 
-			{  // 時間表示
-				char tmp[128];
-				time_t t = get_time();
-				disp_time(t, tmp, sizeof(tmp));
-				base.print(tmp);
-				base.println("<br/>");
-				base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
-			}
+			render_date_time_(base);
+
+			base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
 
 			base.println("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"リロード\" />");
 			base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
@@ -348,10 +380,10 @@ namespace seeda {
 				base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
 			}
 
-//			client.println("<font size=\"4\">");
-//			client.println("</font>");
+//			base.println("<font size=\"4\">");
+//			base.println("</font>");
 
-			// RTC 設定 /// client.println("<input type=\"reset\" value=\"取消\">");
+			// RTC 設定
 			{
 				base.println("<form method=\"POST\" action=\"/cgi/set_rtc.cgi\">");
 				auto t = get_time();
@@ -367,18 +399,6 @@ namespace seeda {
 				base.println("</form>");
 				base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
 			}
-
-#if 0
-			// サンプリング周期設定
-			client.println("<form method=\"POST\" action=\"/cgi/set_rate.cgi\">");
-			client.println("<p>Ａ／Ｄ変換サンプリング・レート<br>");
-			client.println("<input type=\"radio\" name=\"rate\" value=\"_10ms\" />１０［ｍｓ］"); 
-			client.println("<input type=\"radio\" name=\"rate\" value=\"_01ms\" />　１［ｍｓ］"); 
-			client.println("</p>");
-			client.println("<input type=\"submit\" value=\"レート設定\" />");
-			client.println("</form>");
-			client.println("<br>");
-#endif
 
 			// 閾値設定
 			{
@@ -397,13 +417,42 @@ namespace seeda {
 				base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
 			}
 
-			// クライアント
-			{
-			}
-
 			// ＳＤカード操作画面へのボタン
 			base.println("<input type=\"button\" onclick=\"location.href='/files'\" value=\"ＳＤカード\" />");
 			base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+
+			base.println("</html>");
+		}
+
+
+		// クライアント設定画面
+		void render_setup_client_(net::ethernet_base& base)
+		{
+			send_info_(base, 200, false);
+
+			base.println("<!DOCTYPE HTML>");
+			base.println("<html>");
+			send_head_(base, "SetupClient");
+
+			render_version_(base);
+
+			render_date_time_(base);
+
+			base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+
+			// クライアント
+			{
+				base.println("<form method=\"POST\" action=\"/cgi/set_client.cgi\">");
+				char tmp[256];
+				utils::format("<div>クライアント：<input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\" /></div>", tmp, sizeof(tmp))
+					% static_cast<int>(client_ip_[0])
+					% static_cast<int>(client_ip_[1])
+					% static_cast<int>(client_ip_[2])
+					% static_cast<int>(client_ip_[3]);
+				base.println(tmp);
+				base.println("<input type=\"submit\" value=\"クライアント設定\" />");
+				base.println("</form>");
+			}
 
 			base.println("</html>");
 		}
@@ -442,7 +491,7 @@ namespace seeda {
 		void render_data_(net::ethernet_base& base)
 		{
 			send_info_(base, 200, false);
-			// client.println("Refresh: 5");  // refresh the page automatically every 5 sec
+			// base.println("Refresh: 5");  // refresh the page automatically every 5 sec
 
 			base.println("<!DOCTYPE HTML>");
 			base.println("<html>");
@@ -453,20 +502,14 @@ namespace seeda {
 				char tmp[128];
 				utils::format("Conection: %d", tmp, sizeof(tmp)) % count_;
 				base.print(tmp);
-				base.println("<br/>");
+				base.println("<br>");
 			}
-			{  // 時間表示
-				char tmp[128];
-				time_t t = get_time();
-				disp_time(t, tmp, sizeof(tmp));
-				base.print(tmp);
-				base.println("<br/>");
-			}
+
+			render_date_time_(base);
 
 			base.println("サンプリング周期： 1[ms]");
-			base.println("<br/>");
+			base.println("<br>");
 
-			base.println("<br/>");
 			base.println("</font>");
 
 			{  // 内臓 A/D 表示（湿度、温度）
@@ -500,7 +543,7 @@ namespace seeda {
 				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % ch;
 				base.print(tmp);
 ///				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.value_);
-///				client.print(tmp);
+///				base.print(tmp);
 				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.min_);
 				base.print(tmp);
 				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.max_);
@@ -576,19 +619,24 @@ namespace seeda {
 		}
 
 
+		// 指定のアドレス、ポートに定期的に、Ａ／Ｄ変換データを送る。
 		void service_client_()
 		{
-#if 0
 			switch(client_task_) {
-			case client_task::connection:
-				if(client_.connected()) {
-					client_task_ = client_task::main_loop;
-					break;
-				}
 
-				if(client_.connect(net::ip_address(192, 168, 3, 4), 3000, 5) == 1) {
-					utils::format("Conected\n");
-					client_task_ = client_task::main_loop;
+			case client_task::connection:
+				{
+					if(client_.connected()) {
+						client_task_ = client_task::main_loop;
+						break;
+					}
+					uint16_t dstport = 3000;
+					if(client_.connect(client_ip_, dstport, TMO_NBLK) == 1) {
+///					if(client_.connect(client_ip_, dstport, 1) == 1) {
+						utils::format("Conected: %s, %d\n") % client_ip_.get_str() % dstport;
+						client_task_ = client_task::main_loop;
+						send_loop_ = 10;
+					}
 				}
 				break;
 
@@ -598,8 +646,13 @@ namespace seeda {
 					break;
 				}
 
-//				client_.print("SEEDA03");
-
+				if(send_loop_ > 0) {
+					client_.print("SEEDA03");
+					--send_loop_;
+					if(send_loop_ == 0) {
+						client_task_ = client_task::disconnect;
+					}					
+				}
 				break;
 			
 			case client_task::disconnect:
@@ -608,20 +661,6 @@ namespace seeda {
 				client_task_ = client_task::connection;
 				break;
 			}
-
-#endif
-
-#if 0
-					static int nnn = 0;
-	 				if(nnn >= 100) {
-						utils::format(".\n");
-						client_.print("SEEDA03");
-						nnn = 0;
-					} else {
-						++nnn;
-					}
-#endif
-
 		}
 
 	public:
@@ -632,7 +671,8 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		nets() : server_(ethernet_), client_(ethernet_), count_(0), server_task_(server_task::wait_client),
 			client_task_(client_task::connection),
-			line_man_(0x0a), disconnect_loop_(0) { }
+			line_man_(0x0a), disconnect_loop_(0),
+			client_ip_(192, 168, 3, 4) { }
 
 
 		//-----------------------------------------------------------------//
@@ -681,24 +721,21 @@ namespace seeda {
 					utils::format("DHCP: ");
 				}
 			} else {
-				utils::format("SetIP: ");
 				net::ip_address ipa(192, 168, 1, 10);
 				ethernet_.begin(mac, ipa);
+				utils::format("SetIP: ");
 			}
-			ethernet_.get_local_ip().print();
-			utils::format("\n");
+			utils::format("%s\n") % ethernet_.get_local_ip().get_str();
 
+			// http server
 			server_.begin(80);
-			utils::format("Start server: ");
-			ethernet_.get_local_ip().print();
+			utils::format("Start server: %s") % ethernet_.get_local_ip().get_str();
 			utils::format("  port(%d)\n") % static_cast<int>(server_.get_port());
 
-#if 0
+			// client service (3000)
 			client_.begin(3000);
-			utils::format("Start client: ");
-			ethernet_.localIP().print();
+			utils::format("Start client: %s") % ethernet_.get_local_ip().get_str();
 			utils::format("  port(%d)\n") % static_cast<int>(client_.get_port());
-#endif
 		}
 
 
@@ -721,7 +758,7 @@ namespace seeda {
 		{
 			ethernet_.service();
 
-///			service_client_();
+			service_client_();
 
 			server_.service();
 
@@ -759,15 +796,16 @@ namespace seeda {
 							break;
 						}
 						if(strcmp(path, "/") == 0) {
-///							render_root_(base);
-							render_data_(base);
+							render_root_(base);
 						} else if(strncmp(path, "/cgi/", 5) == 0) {
-							do_cgi_(base, path, pos);
-							render_setup_(base);
+							select_cgi_(base, path, pos);
+							render_setup_main_(base);
 						} else if(strcmp(path, "/data") == 0) {
 							render_data_(base);
 						} else if(strcmp(path, "/setup") == 0) {
-							render_setup_(base);
+							render_setup_main_(base);
+						} else if(strcmp(path, "/client") == 0) {
+							render_setup_client_(base);
 						} else if(strcmp(path, "/files") == 0) {
 							render_files_(base);
 						} else if(strncmp(path, "/seeda/", 7) == 0) {
