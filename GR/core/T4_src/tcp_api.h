@@ -27,7 +27,7 @@ W _getIpRAMsize(void);
 W _getTblRAMsize(void);
 #endif
 
-W tcpudp_get_ramsize(void);
+uint32_t tcpudp_get_ramsize(void);
 
 #if defined(_TCP)
 int tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, int32_t tmout);

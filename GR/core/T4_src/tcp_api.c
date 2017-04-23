@@ -278,9 +278,9 @@ W _getTblRAMsize(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-W tcpudp_get_ramsize(void)
+uint32_t tcpudp_get_ramsize(void)
 {
-    W   ramsize;
+    uint32_t ramsize;
 
     ramsize = 0;
 #if defined(_TCP)
@@ -368,10 +368,9 @@ int tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, int32_t tmout)
 ***********************************************************************************************************************/
 int tcp_con_cep(ID cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmout)
 {
-    int err;
-    _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
+    _TCP_CB *pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 
-    err = _tcp_check_cepid_arg(cepid);
+    int err = _tcp_check_cepid_arg(cepid);
     if (err != E_OK)
     {
         return E_PAR;

@@ -344,15 +344,6 @@ int udp_snd_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, int32_t tmou
 int udp_rcv_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, int32_t tmout);
 int udp_can_cep(ID cepid, FN fncd);
 
-// int tcp_acp_cep(ID cepid, ID repid, T_IPV4EP *p_dstadr, TMO tmout);
-// int tcp_con_cep(ID cepid, T_IPV4EP *p_myadr,  T_IPV4EP *p_dstadr, TMO tmout);
-// int tcp_sht_cep(ID cepid);
-// int tcp_cls_cep(ID cepid, TMO tmout);
-// int tcp_can_cep(ID cepid, FN fncd);
-// int tcpudp_open(UW *workp);    /* Open TCP/IP library (initialization)                         */
-// int tcpudp_close(void);        /* Close TCP/IP library (stop)                                  */
-
-W  tcpudp_get_ramsize(void);  /* Calculation of size of work area                             */
 void _process_tcpip(void);    /* TCP/IP process function called from ether INT and timer INT. */
 #if defined(__cplusplus)
 }

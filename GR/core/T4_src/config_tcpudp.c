@@ -39,6 +39,7 @@
 #include "t4define.h"
 
 #include "r_t4_itcpip.h"
+
 extern int t4_udp_callback(ID cepid, FN fncd , void *p_parblk);
 
 /****************************************************************************/
@@ -49,7 +50,10 @@ const UB _t4_channel_num = 1;
 
 /***  Definition of TCP reception point (only port number needs to be set) ***/
 T_TCP_CREP tcp_crep[] = {
-	{ 0x0000, { 0, 80 }},
+	{ 0x0000, { 0, 80 } },
+	{ 0x0000, { 0, 80 } },
+	{ 0x0000, { 0, 80 } },
+	{ 0x0000, { 0, 80 } },
 };
 
 /* Total number of TCP reception points */
@@ -58,6 +62,9 @@ const H __tcprepn = sizeof(tcp_crep) / sizeof(T_TCP_CREP);
 /***  Definition of TCP communication end point
       (only receive window size needs to be set) ***/
 T_TCP_CCEP tcp_ccep[] = {
+    { 0, 0, 0, 0, 1460, 0 },
+    { 0, 0, 0, 0, 1460, 0 },
+    { 0, 0, 0, 0, 1460, 0 },
     { 0, 0, 0, 0, 1460, 0 },
 };
 
@@ -71,9 +78,6 @@ const UH _tcp_mss = 1460;    /* MAX:1460 bytes */
 UW    _tcp_initial_seqno = 1;
 
 /***  2MSL wait time (unit:10ms)  ***/
-#if 0
-const UH    _tcp_2msl = (1 * 60 * (1000 / 10));      /* 1 min */
-#endif
 const UH    _tcp_2msl = 1;      /* 10 ms */
 
 /***  Maximum value of retransmission timeout period (unit:10ms)  ***/
@@ -89,6 +93,9 @@ UB    _tcp_dack = 1;
 /***  Definition of UDP communication end point  ***/
 
 T_UDP_CCEP udp_ccep[] = {
+        { 0x0000, { 0, 1365 }, t4_udp_callback },
+        { 0x0000, { 0, 1365 }, t4_udp_callback },
+        { 0x0000, { 0, 1365 }, t4_udp_callback },
         { 0x0000, { 0, 1365 }, t4_udp_callback },
 };
 
@@ -127,7 +134,7 @@ TCPUDP_ENV tcpudp_env =
 /* Local MAC address (Set all 0s when unspecified) */
 #define MY_MAC_ADDR    0x02,0x00,0x00,0x00,0x00,0x00
 
-UB _myethaddr[6] = {MY_MAC_ADDR};
+UB _myethaddr[6] = { MY_MAC_ADDR };
 
 /*--------------------------------------------------------------------------*/
 /*    Set of PPP-related                                                    */
