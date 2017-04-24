@@ -1,34 +1,10 @@
-/***********************************************************************************************************************
-* DISCLAIMER
-* This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
-* other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
-* applicable laws, including copyright laws.
-* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
-* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
-* EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
-* SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
-* SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-* Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
-* this software. By using this software, you agree to the additional terms and conditions found by accessing the
-* following link:
-* http://www.renesas.com/disclaimer
-*
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
-***********************************************************************************************************************/
-/***********************************************************************************************************************
-* File Name    : tcp_api.c
-* Version      : 1.0
-* Description  : Processing for TCP API
-***********************************************************************************************************************/
-/**********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Includes   <System Includes> , "Project Includes"
-***********************************************************************************************************************/
+//=====================================================================//
+/*!	@file
+	@brief	TCP/UDP api @n
+			Copyright 2017 Kunihito Hiramatsu
+	@author	平松邦仁 (hira@rvf-rc45.net)
+*/
+//=====================================================================//
 #include <stdio.h>
 #include <string.h>
 #include "tcp_api.h"
@@ -44,22 +20,6 @@ Includes   <System Includes> , "Project Includes"
 #include "udp.h"
 #include "core/driver/driver.h"
 
-
-/***********************************************************************************************************************
-Macro definitions
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Typedef definitions
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Exported global variables (to be accessed by other files)
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Private global variables and functions
-***********************************************************************************************************************/
 
 extern const UB _t4_channel_num;
 extern _TCB   *_tcp_tcb;
@@ -84,6 +44,50 @@ extern uint16_t ppp_sio_status;
 extern _PPP_API_REQ _ppp_api_req;
 #endif
 
+
+static void tcpudp_api_slp_(int cepid)
+{
+	do {
+		tcp_api_slp(cepid);
+	} while (head_tcb[cepid-1].req.stat != _TCP_API_STAT_COMPLETE) ;
+}
+
+
+static void tcpudp_clr_req_(int cepid)
+{
+	head_tcb[cepid-1].req.type = 0;
+	head_tcb[cepid-1].req.stat = _TCP_API_STAT_INIT;
+	head_tcb[cepid-1].req.tmout = 0;
+	head_tcb[cepid-1].req.error = NULL;
+	head_tcb[cepid-1].req.d.dr.dtsiz = 0;
+	head_tcb[cepid-1].req.d.dr.datap = NULL;
+	head_tcb[cepid-1].req.flag = 0;
+}
+
+
+static int tcpudp_api_req_(int cepid)
+{
+    int err = E_INI;
+
+    head_tcb[cepid-1].req.error = &err;
+    head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
+    head_tcb[cepid-1].req.flag = 0;
+
+    if (head_tcb[cepid-1].req.tmout == TMO_NBLK)
+    {
+        _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
+
+        pTcbCb->req.ercd = E_INI;
+        head_tcb[cepid-1].req.error = &pTcbCb->req.ercd;
+
+        return E_WBLK;
+    }
+    tcpudp_api_slp_(cepid);
+    tcpudp_clr_req_(cepid);
+    return err;
+}
+
+
 void tcpudp_open(uint32_t *workp)
 {
 	uint32_t *currp = workp;
@@ -97,7 +101,7 @@ void tcpudp_open(uint32_t *workp)
 
 #if defined(_TCP)
 	for(int counter = 0; counter < __tcpcepn; counter++) {
-		_tcp_clr_req(counter + 1);
+		tcpudp_clr_req_(counter + 1);
 
 		_tcp_init_callback_info(&head_tcb[counter].callback_info);
 
@@ -219,7 +223,7 @@ static uint32_t get_ether_memory_size_(void)
 #endif
 
 
-uint32_t get_tcpudp_memory_size(void)
+uint32_t tcpudp_get_memory_size(void)
 {
 	uint32_t ramsize = 0;
 
@@ -240,13 +244,7 @@ uint32_t get_tcpudp_memory_size(void)
 }
 
 #if defined(_TCP)
-/***********************************************************************************************************************
-* Function Name: tcp_acp_cep
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-int tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, int32_t tmout)
+int tcp_acp_cep(int cepid, int repid, T_IPVxEP *p_dstaddr, int32_t tmout)
 {
     int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
@@ -286,7 +284,7 @@ int tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, int32_t tmout)
     head_tcb[cepid-1].req.d.cnr.dstaddr = p_dstaddr;
     head_tcb[cepid-1].req.d.cnr.repid = repid;
 
-    err = _tcp_api_req(cepid);
+    err = tcpudp_api_req_(cepid);
 
     if (err == E_WBLK)
     {
@@ -300,13 +298,7 @@ int tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, int32_t tmout)
 }
 
 
-/***********************************************************************************************************************
-* Function Name: tcp_con_cep
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-int tcp_con_cep(ID cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmout)
+int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmout)
 {
     _TCP_CB *pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 
@@ -344,7 +336,7 @@ int tcp_con_cep(ID cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmout
     else
         head_tcb[cepid-1].req.d.cnr.my_port = p_myaddr->portno;
 
-    err = _tcp_api_req(cepid);
+    err = tcpudp_api_req_(cepid);
 
     if (err == E_WBLK)
     {
@@ -358,107 +350,85 @@ int tcp_con_cep(ID cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmout
 }
 
 
-/***********************************************************************************************************************
-* Function Name: tcp_sht_cep
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-int tcp_sht_cep(ID cepid)
+int tcp_sht_cep(int cepid, int32_t tmout)
 {
-    int err;
+    int ret = _tcp_check_cepid_arg(cepid);
+	if(ret != E_OK) {
+		return E_PAR;
+	}
 
-    _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
+	_TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
+	ret = _tcp_check_tmout_arg(_TCP_API_CLSCP, tmout, pTcbCb);
+	if(ret != E_OK && ret != E_WBLK) {
+		return ret;
+	}
 
-    err = _tcp_check_cepid_arg(cepid);
-    if (err != E_OK)
-    {
-        return E_PAR;
-    }
+	if(_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
+		return E_NOSPT;
+	}
 
-    if (_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat))
-    {
-        return E_NOSPT;
-    }
+	if(_tcp_is_tcb_queue_over(_TCP_API_SHTCP, &head_tcb[cepid-1], pTcbCb)) {
+		return E_QOVR;
+	}
 
-    if (_tcp_is_tcb_queue_over(_TCP_API_SHTCP, &head_tcb[cepid-1], pTcbCb))
-    {
-        return E_QOVR;
-    }
+	if(ret == E_WBLK) {
+		if(!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
+			_TCP_CB_STAT_SET_API_LOCK_FLG(pTcbCb->stat);
+		}
+	}
+	head_tcb[cepid-1].req.type = _TCP_API_SHTCP;
+	head_tcb[cepid-1].req.tmout = tmout;
 
+///	if(_TCP_CB_GET_CALLBACK_FUNC_PTR(cepid)) {
+///		head_tcb[cepid-1].req.tmout = TMO_NBLK;
+///	}
 
-    head_tcb[cepid-1].req.type = _TCP_API_SHTCP;
-    head_tcb[cepid-1].req.tmout = TMO_FEVR;
-
-    if (_TCP_CB_GET_CALLBACK_FUNC_PTR(cepid))
-    {
-        head_tcb[cepid-1].req.tmout = TMO_NBLK;
-    }
-    err = _tcp_api_req(cepid);
-
-    return err;
-}
-
-/***********************************************************************************************************************
-* Function Name: tcp_cls_cep
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-int tcp_cls_cep(ID cepid, int32_t tmout)
-{
-    int   err;
-    _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
-
-    err = _tcp_check_cepid_arg(cepid);
-    if (err != E_OK)
-    {
-        return E_PAR;
-    }
-
-    err = _tcp_check_tmout_arg(_TCP_API_CLSCP, tmout, pTcbCb);
-    if (err != E_OK && err != E_WBLK)
-    {
-        return err;
-    }
-
-    if (_tcp_is_tcb_queue_over(_TCP_API_CLSCP, &head_tcb[cepid-1], pTcbCb))
-    {
-        return E_QOVR;
-    }
-
-    if (err == E_WBLK)
-    {
-        if (!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat))
-        {
-            _TCP_CB_STAT_SET_API_LOCK_FLG(pTcbCb->stat);
-        }
-    }
-
-    head_tcb[cepid-1].req.type = _TCP_API_CLSCP;
-    head_tcb[cepid-1].req.tmout = tmout;
-
-    err = _tcp_api_req(cepid);
-
-    if (err == E_WBLK)
-    {
-        if (!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat))
-        {
-            _TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
-        }
-    }
-
-    return err;
+	ret = tcpudp_api_req_(cepid);
+	if(ret == E_WBLK) {
+		if(!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
+			_TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
+		}
+	}
+	return ret;
 }
 
 
-/***********************************************************************************************************************
-* Function Name: tcp_send_data
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-int tcp_send_data(ID cepid, const void *data, int len, int32_t tmout)
+int tcp_cls_cep(int cepid, int32_t tmout)
+{
+	int ret = _tcp_check_cepid_arg(cepid);
+	if(ret != E_OK) {
+		return E_PAR;
+	}
+
+	_TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
+	ret = _tcp_check_tmout_arg(_TCP_API_CLSCP, tmout, pTcbCb);
+	if(ret != E_OK && ret != E_WBLK) {
+		return ret;
+	}
+
+	if(_tcp_is_tcb_queue_over(_TCP_API_CLSCP, &head_tcb[cepid-1], pTcbCb)) {
+		return E_QOVR;
+	}
+	if(ret == E_WBLK) {
+		if(!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
+			_TCP_CB_STAT_SET_API_LOCK_FLG(pTcbCb->stat);
+		}
+	}
+
+	head_tcb[cepid-1].req.type = _TCP_API_CLSCP;
+	head_tcb[cepid-1].req.tmout = tmout;
+
+	ret = tcpudp_api_req_(cepid);
+	if(ret == E_WBLK) {
+		if(!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
+			_TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
+		}
+	}
+    return ret;
+}
+
+
+int tcp_send_data(int cepid, const void *data, int len, int32_t tmout)
 {
     int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
@@ -499,7 +469,7 @@ int tcp_send_data(ID cepid, const void *data, int len, int32_t tmout)
     head_tcb[cepid-1].req.d.dr.dtsiz = len;
     head_tcb[cepid-1].req.d.dr.datap = (uint8_t *)((uint32_t)data);
 
-    err = _tcp_api_req(cepid);
+    err = tcpudp_api_req_(cepid);
 
     if (err == E_WBLK)
     {
@@ -512,13 +482,8 @@ int tcp_send_data(ID cepid, const void *data, int len, int32_t tmout)
     return err;
 }
 
-/***********************************************************************************************************************
-* Function Name: tcp_rcv_dat
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-int tcp_recv_data(ID cepid, void *data, int len, int32_t tmout)
+
+int tcp_recv_data(int cepid, void *data, int len, int32_t tmout)
 {
     int err;
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
@@ -582,7 +547,7 @@ int tcp_recv_data(ID cepid, void *data, int len, int32_t tmout)
     head_tcb[cepid-1].req.d.dr.dtsiz = len;
     head_tcb[cepid-1].req.d.dr.datap = (uint8_t *)((uint32_t)data);
 
-    err = _tcp_api_req(cepid);
+    err = tcpudp_api_req_(cepid);
 
     if (err == E_WBLK)
     {
@@ -594,13 +559,8 @@ int tcp_recv_data(ID cepid, void *data, int len, int32_t tmout)
     return err;
 }
 
-/***********************************************************************************************************************
-* Function Name: tcp_can_cep
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-int tcp_can_cep(ID cepid, FN fncd)
+
+int tcp_can_cep(int cepid, FN fncd)
 {
     int err;
     FN fn;
@@ -649,73 +609,10 @@ int tcp_can_cep(ID cepid, FN fncd)
 }
 
 
-/***********************************************************************************************************************
-* Function Name: _tcp_api_req
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-int _tcp_api_req(ID cepid)
-{
-    int err = E_INI;
-
-    head_tcb[cepid-1].req.error = &err;
-    head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
-    head_tcb[cepid-1].req.flag = 0;
-
-    if (head_tcb[cepid-1].req.tmout == TMO_NBLK)
-    {
-        _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
-
-        pTcbCb->req.ercd = E_INI;
-        head_tcb[cepid-1].req.error = &pTcbCb->req.ercd;
-
-        return E_WBLK;
-    }
-    _tcp_api_slp(cepid);
-    _tcp_clr_req(cepid);
-    return err;
-}
-
-
-/***********************************************************************************************************************
-* Function Name: _tcp_api_slp
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-void _tcp_api_slp(ID cepid)
-{
-    do
-    {
-        tcp_api_slp(cepid);
-    }
-    while (head_tcb[cepid-1].req.stat != _TCP_API_STAT_COMPLETE);
-    return;
-}
-
-
-/***********************************************************************************************************************
-* Function Name: _tcp_clr_req
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-void _tcp_clr_req(ID cepid)
-{
-    head_tcb[cepid-1].req.type = 0;
-    head_tcb[cepid-1].req.stat = _TCP_API_STAT_INIT;
-    head_tcb[cepid-1].req.tmout = 0;
-    head_tcb[cepid-1].req.error = NULL;
-    head_tcb[cepid-1].req.d.dr.dtsiz = 0;
-    head_tcb[cepid-1].req.d.dr.datap = NULL;
-    head_tcb[cepid-1].req.flag = 0;
-    return;
-}
 
 
 #if defined(_TEST_LIBRARY)
-/***********************************************************************************************************************
+/***************************************************************************************
 * Function Name: tcp_read_stat
 * Description  : read TCB status
 * Arguments    : cepid
@@ -733,8 +630,8 @@ void _tcp_clr_req(ID cepid)
 *    9  closing
 *    10  time_wait
 *    11  others
-***********************************************************************************************************************/
-int tcp_read_stat(ID cepid)
+***************************************************************************************/
+int tcp_read_stat(int cepid)
 {
     int err = _tcp_check_cepid_arg(cepid);
     if(err != E_OK) {
@@ -784,16 +681,18 @@ int tcp_read_stat(ID cepid)
     return ret;
 }
 
+
 extern void _tcp_init_tcb(_TCB *_ptcb);
 
-/***********************************************************************************************************************
+
+/***************************************************************************************
 * Function Name: tcp_force_clr
 * Description  : force break TCP TMO_FEVR loop
 * Arguments    : cepid
 * Return Value : E_OK force clear OK
 *       : E_PAR invalid cepid
-***********************************************************************************************************************/
-int tcp_force_clr(ID cepid)
+***************************************************************************************/
+int tcp_force_clr(int cepid)
 {
     int err = E_PAR;
 
@@ -816,14 +715,15 @@ int tcp_force_clr(ID cepid)
 
 extern _UDP_CB  *_udp_cb;
 
-/***********************************************************************************************************************
+
+/***************************************************************************************
 * Function Name: udp_force_clr
 * Description  : force break UDP TMO_FEVR loop
 * Arguments    : cepid
 * Return Value : E_OK force clear OK
 *       : E_PAR invalid cepid
-***********************************************************************************************************************/
-int udp_force_clr(ID cepid)
+***************************************************************************************/
+int udp_force_clr(int cepid)
 {
     int err = E_PAR;
     _UDP_CB      *pucb;
@@ -848,14 +748,15 @@ int udp_force_clr(ID cepid)
     return err;
 }
 
-/***********************************************************************************************************************
+
+/***************************************************************************************
 * Function Name: tcp_set_mss
 * Description  : MSS setting function
 * Arguments    : cepid
 * Return Value : E_OK setting OK
 *       : E_PAR invalid cepid
-***********************************************************************************************************************/
-int tcp_set_mss(ID cepid, UH mss)
+***************************************************************************************/
+int tcp_set_mss(int cepid, uint16_t mss)
 {
     int err = E_PAR;
 
@@ -873,7 +774,6 @@ int tcp_set_mss(ID cepid, UH mss)
 
 #endif
 #endif
-
 
 
 
