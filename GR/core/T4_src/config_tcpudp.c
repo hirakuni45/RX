@@ -45,7 +45,7 @@ extern int t4_udp_callback(ID cepid, FN fncd , void *p_parblk);
 /**********************     TCP-related definition     **********************/
 /****************************************************************************/
 /* Number of LAN port, Number of Serial port */
-const UB _t4_channel_num = 1;
+const UB _t4_channel_num = 4;
 
 /***  Definition of TCP reception point (only port number needs to be set) ***/
 T_TCP_CREP tcp_crep[] = {
