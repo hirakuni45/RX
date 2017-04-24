@@ -162,6 +162,19 @@ namespace net {
 				% static_cast<int>(address_.bytes[3]);
 			return str;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  エンディアン変換
+			@param[in]	src	32bits エンディアン変換
+			@return エンディアン変換
+		*/
+		//-----------------------------------------------------------------//
+		static uint32_t endian_convert(uint32_t src) {
+			return ((src >> 24) & 0x000000FF) | ((src >> 8 ) & 0x0000FF00)
+				 | ((src << 8 ) & 0x00FF0000) | ((src << 24) & 0xFF000000);
+		}
 	};
 }
 

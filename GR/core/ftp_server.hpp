@@ -6,7 +6,14 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include <cstring>
 #include "ethernet_server.hpp"
+
+#include "common/time.h"
+
+extern "C" {
+	time_t get_time(void);
+};
 
 namespace net {
 
@@ -27,12 +34,70 @@ namespace net {
 
 		enum class task {
 			connection,
+			user_name,
+			password,
 			main,
 		};
 
 		task	task_;
 
+		typedef utils::line_manage<512, 1> LINE_MAN;
+		LINE_MAN	line_man_;
+
 		uint32_t	time_out_;
+
+#if 0
+boolean FtpServer::userIdentity()
+{
+  if( strcmp( command, "USER" ))
+    client << "500 Syntax error\r\n";
+  if( strcmp( parameters, FTP_USER ))
+    client << "530 \r\n";
+  else
+  {
+    client << "331 OK. Password required\r\n";
+    strcpy( cwdName, "/" );
+    return true;
+  }
+  millisDelay = millis() + 100;  // delay of 100 ms
+  return false;
+}
+#endif
+
+		bool command_service_()
+		{
+			char tmp[256];
+			int len = ctrl_.read(tmp, sizeof(tmp));
+
+			for(int i = 0; i < len; ++i) {
+				char ch = tmp[i];
+				if(ch == 0 || ch == 0x0d) continue;
+				if(!line_man_.add(ch)) {
+					utils::format("line_man: memory over\n");
+					return false;
+				}
+			}
+			if(static_cast<size_t>(len) < sizeof(tmp)) {
+				line_man_.set_term();
+				return true;
+			}
+			return false;
+		}
+
+
+		void disp_time_(time_t t, char* dst, uint32_t size)
+		{
+			struct tm *m = localtime(&t);
+			utils::format("%s %s %d %02d:%02d:%02d  %4d", dst, size)
+				% get_wday(m->tm_wday)
+				% get_mon(m->tm_mon)
+				% static_cast<uint32_t>(m->tm_mday)
+				% static_cast<uint32_t>(m->tm_hour)
+				% static_cast<uint32_t>(m->tm_min)
+				% static_cast<uint32_t>(m->tm_sec)
+				% static_cast<uint32_t>(m->tm_year + 1900);
+		}
+
 
 	public:
 		//-----------------------------------------------------------------//
@@ -41,7 +106,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
         ftp_server(ethernet& e) : eth_(e), ctrl_(e), data_(e),
-			task_(task::connection), time_out_(0)
+			task_(task::connection), line_man_('\n'), time_out_(0)
 			{ }
 
 
@@ -69,15 +134,41 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void service()
 		{
+			ctrl_.service();
 
 			switch(task_) {
 			case task::connection:
 				if(ctrl_.connected()) {
-					utils::format("new FTP client\n");
-					task_ = task::main;
+					utils::format("new FTP client form: %s\n") % ctrl_.get_from_ip().c_str();
+					char tmp[64];
+					utils::format("220 %s SEEDA03 FTP server ", tmp, sizeof(tmp))
+						% eth_.get_local_ip().c_str();
+					ctrl_.print(tmp);
+					time_t t = get_time();
+					disp_time_(t, tmp, sizeof(tmp));
+					ctrl_.println(tmp);
+					task_ = task::user_name;
+					line_man_.clear();
 				}
 				break;
+
+			case task::user_name:
+				if(command_service_()) {
+					if(!line_man_.empty()) {
+//						const auto& t = line_man_[0];
+//						if(strcmp(t, "USER") == 0) {
+//							
+//						}
+					}
+				}
+				break;
+
+			case task::password:
+				break;
+
 			case task::main:
+
+
 				break;
 			}
 
