@@ -626,16 +626,14 @@ namespace seeda {
 
 			case client_task::connection:
 				{
+					uint16_t dstport = 3000;
 					if(client_.connected()) {
+						utils::format("Conected: %s (port: %d)\n") % client_ip_.get_str() % dstport;
+						send_loop_ = 10;
 						client_task_ = client_task::main_loop;
 						break;
-					}
-					uint16_t dstport = 3000;
-					if(client_.connect(client_ip_, dstport, TMO_NBLK) == 1) {
-///					if(client_.connect(client_ip_, dstport, 1) == 1) {
-						utils::format("Conected: %s, %d\n") % client_ip_.get_str() % dstport;
-						client_task_ = client_task::main_loop;
-						send_loop_ = 10;
+					} else {
+						client_.connect(client_ip_, dstport, TMO_NBLK);
 					}
 				}
 				break;
