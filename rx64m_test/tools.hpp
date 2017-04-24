@@ -363,6 +363,7 @@ namespace seeda {
 			{
 				time_t t = get_time();
 				disp_time(t);
+				utils::format("\n");
 			}
 
 //			while(1) {
@@ -423,6 +424,7 @@ namespace seeda {
 							time_t t = get_time();
 							if(t != 0) {
 								disp_time(t);
+								utils::format("\n");
 							}
 						} else {
 							set_time_date_();

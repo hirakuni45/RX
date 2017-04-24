@@ -60,12 +60,8 @@ namespace seeda {
 
 		uint32_t	disconnect_loop_;
 
-
-		int			send_loop_;
-
-
 		net::ip_address		client_ip_;
-
+		time_t		client_time_;
 
 		// サーミスタ定義
 		// A/D: 12 bits, NT103, 分圧抵抗: 10K オーム、サーミスタ: ＶＣＣ側
@@ -107,6 +103,25 @@ namespace seeda {
 				base->print(name);
 				base->print("</td>");
 				base->println("</tr>");
+			}
+		}
+
+
+		void make_adc_csv_(net::ethernet_base& base, const char* tail)
+		{
+			char tmp[256];
+			for(int ch = 0; ch < 8; ++ch) {
+				const auto& t = get_sample(ch);
+				utils::format("%d,%d,%d,%d,%d,%d,%d%s", tmp, sizeof(tmp))
+					% ch
+					% static_cast<uint32_t>(t.min_)
+					% static_cast<uint32_t>(t.max_)
+					% static_cast<uint32_t>(t.average_)
+					% static_cast<uint32_t>(t.limit_level_)
+					% static_cast<uint32_t>(t.limit_up_)
+					% static_cast<uint32_t>(t.median_)
+					% tail;
+				base.print(tmp);
 			}
 		}
 
@@ -248,9 +263,11 @@ namespace seeda {
 				CGI_IP cgi;
 				cgi.parse(body);
 				for(uint32_t i = 0; i < cgi.size(); ++i) {
-//					const auto& t = cgi.get_unit(i);
-//					if((utils::input("ip%d", t.key) % ch).status()) {
-//					}
+					const auto& t = cgi.get_unit(i);
+					if(strcmp(t.key, "ip") == 0) {
+						client_ip_.from_string(t.val);
+						utils::format("Set new client ip: %s\n") % client_ip_.c_str();
+					}
 				}
 			}
 		}
@@ -326,25 +343,7 @@ namespace seeda {
 
 			base.println("Sampling: 1[ms]<br>");
 
-			for (int ch = 0; ch < 8; ++ch) {
-				const auto& t = get_sample(ch);
-				char tmp[64];
-				utils::format("%d,", tmp, sizeof(tmp)) % ch;
-				base.print(tmp);
-				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.min_);
-				base.print(tmp);
-				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.max_);
-				base.print(tmp);
-				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.average_);
-				base.print(tmp);
-				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.limit_level_);
-				base.print(tmp);
-				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.limit_up_);
-				base.print(tmp);
-				utils::format("%d,", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.median_);
-				base.print(tmp);
-				base.println("<br>");
-			}
+			make_adc_csv_(base, "<br>\r\n");
 
 			base.println("</html>");
 		}
@@ -444,7 +443,7 @@ namespace seeda {
 			{
 				base.println("<form method=\"POST\" action=\"/cgi/set_client.cgi\">");
 				char tmp[256];
-				utils::format("<div>クライアント：<input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\" /></div>", tmp, sizeof(tmp))
+				utils::format("<div>クライアント IP：<input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\" /></div>", tmp, sizeof(tmp))
 					% static_cast<int>(client_ip_[0])
 					% static_cast<int>(client_ip_[1])
 					% static_cast<int>(client_ip_[2])
@@ -622,18 +621,19 @@ namespace seeda {
 		// 指定のアドレス、ポートに定期的に、Ａ／Ｄ変換データを送る。
 		void service_client_()
 		{
+			time_t t;
 			switch(client_task_) {
 
 			case client_task::connection:
 				{
 					uint16_t dstport = 3000;
 					if(client_.connected()) {
-						utils::format("Conected: %s (port: %d)\n") % client_ip_.get_str() % dstport;
-						send_loop_ = 10;
+						utils::format("Conected: %s (port: %d)\n") % client_ip_.c_str() % dstport;
 						client_task_ = client_task::main_loop;
-						break;
+						client_time_ = get_time();
 					} else {
-						client_.connect(client_ip_, dstport, TMO_NBLK);
+///						client_.connect(client_ip_, dstport, TMO_NBLK);
+						client_.connect(client_ip_, dstport, 1);
 					}
 				}
 				break;
@@ -643,19 +643,25 @@ namespace seeda {
 					client_task_ = client_task::disconnect;
 					break;
 				}
-
-				if(send_loop_ > 0) {
-					client_.print("SEEDA03");
-					--send_loop_;
-					if(send_loop_ == 0) {
-						client_task_ = client_task::disconnect;
-					}					
+				t = get_time();
+				if(client_time_ == t) break;
+				client_time_ = t;
+				{
+					char tmp[128];
+					time_t t = get_time();
+					disp_time(t, tmp, sizeof(tmp));
+					client_.println(tmp);
+				}
+				{
+					make_adc_csv_(client_, "\n");
+///					client_.print("end\n");
+///					client_task_ = client_task::disconnect;
 				}
 				break;
 			
 			case client_task::disconnect:
 				client_.stop();
-				utils::format("client disconnected\n");
+				utils::format("client disconnected: %s\n") % client_ip_.c_str();
 				client_task_ = client_task::connection;
 				break;
 			}
@@ -670,7 +676,7 @@ namespace seeda {
 		nets() : server_(ethernet_), client_(ethernet_), count_(0), server_task_(server_task::wait_client),
 			client_task_(client_task::connection),
 			line_man_(0x0a), disconnect_loop_(0),
-			client_ip_(192, 168, 3, 4) { }
+			client_ip_(192, 168, 3, 4), client_time_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -723,16 +729,16 @@ namespace seeda {
 				ethernet_.begin(mac, ipa);
 				utils::format("SetIP: ");
 			}
-			utils::format("%s\n") % ethernet_.get_local_ip().get_str();
+			utils::format("%s\n") % ethernet_.get_local_ip().c_str();
 
 			// http server
 			server_.begin(80);
-			utils::format("Start server: %s") % ethernet_.get_local_ip().get_str();
+			utils::format("Start server: %s") % ethernet_.get_local_ip().c_str();
 			utils::format("  port(%d)\n") % static_cast<int>(server_.get_port());
 
 			// client service (3000)
 			client_.begin(3000);
-			utils::format("Start client: %s") % ethernet_.get_local_ip().get_str();
+			utils::format("Start client: %s") % ethernet_.get_local_ip().c_str();
 			utils::format("  port(%d)\n") % static_cast<int>(client_.get_port());
 		}
 
@@ -764,7 +770,7 @@ namespace seeda {
 
 			case server_task::wait_client:
 				if(server_.connected()) {
-					utils::format("new client\n");
+					utils::format("new http\n");
 					++count_;
 					line_man_.clear();
 					server_task_ = server_task::main_loop;
@@ -833,7 +839,7 @@ namespace seeda {
 			case server_task::disconnect:
 			default:
 				server_.stop();
-				utils::format("client disconnected\n");
+				utils::format("http disconnected\n");
 				server_task_ = server_task::wait_client;
 				break;
 			}

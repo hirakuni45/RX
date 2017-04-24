@@ -143,7 +143,7 @@ namespace seeda {
 	void disp_time(time_t t, char* dst, uint32_t size)
 	{
 		struct tm *m = localtime(&t);
-		utils::format("%s %s %d %02d:%02d:%02d  %4d\n", dst, size)
+		utils::format("%s %s %d %02d:%02d:%02d  %4d", dst, size)
 			% get_wday(m->tm_wday)
 			% get_mon(m->tm_mon)
 			% static_cast<uint32_t>(m->tm_mday)
