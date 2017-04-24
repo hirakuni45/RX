@@ -2,7 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	NTC サーミスタ 温度計算 クラス @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -16,16 +16,18 @@ namespace chip {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class thermistor {
-		NT103,	///< THB:4126, TR25:10K
+		NT103_34G,	///< THB:3435, TR25:10K
+		NT103_41G,	///< THB:4126, TR25:10K
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  NTCTH テンプレートクラス
-		@param[in]	ADNUM	A/D 変換値の量子化最大値
+		@param[in]	ADNUM	A/D 変換値の量子化最大値（１２ビットの場合４０９５ @n
+							１０ビットの場合、１０２３）
 		@param[in]	THM		サーミスタの型
-		@param[in]	REFR	分圧抵抗値
+		@param[in]	REFR	分圧抵抗値（単位オーム）
 		@param[in]	thup	サーミスタが VCC 側の場合「true」、GND 側の場合「false」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -38,7 +40,11 @@ namespace chip {
 		static void get_para_(float& THB, float& TR25)
 		{
 			switch(THM) {
-			case thermistor::NT103:
+			case thermistor::NT103_34G:
+				THB  = 3435.0f;  ///< サーミスタＢ定数
+				TR25 = 10e3;     ///< R25 サーミスタ２５℃基準抵抗値
+				break;
+			case thermistor::NT103_41G:
 				THB  = 4126.0f;  ///< サーミスタＢ定数
 				TR25 = 10e3;     ///< R25 サーミスタ２５℃基準抵抗値
 				break;
