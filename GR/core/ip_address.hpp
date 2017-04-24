@@ -32,7 +32,6 @@ namespace net {
 		};
 
 		address_t	address_;
-		char		str_[4*4+1];
 
 	public:
 		//-----------------------------------------------------------------//
@@ -41,7 +40,7 @@ namespace net {
 			@param[in]	dword	32bits IP
 		*/
 		//-----------------------------------------------------------------//
-		ip_address(uint32_t dword = 0) : address_(dword), str_{ 0 } { }
+		ip_address(uint32_t dword = 0) : address_(dword) { }
 
 
 		//-----------------------------------------------------------------//
@@ -154,13 +153,14 @@ namespace net {
 			@return 文字列
 		*/
 		//-----------------------------------------------------------------//
-		const char* c_str(char spch = '.') {
-			utils::format("%d%c%d%c%d%c%d", str_, sizeof(str_))
+		const char* c_str(char spch = '.') const {
+			static char str[4*4+1];
+			utils::format("%d%c%d%c%d%c%d", str, sizeof(str))
 				% static_cast<int>(address_.bytes[0]) % spch
 				% static_cast<int>(address_.bytes[1]) % spch
 				% static_cast<int>(address_.bytes[2]) % spch
 				% static_cast<int>(address_.bytes[3]);
-			return str_;
+			return str;
 		}
 	};
 }

@@ -59,6 +59,15 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ethernet を参照
+			@return ethernet
+		*/
+		//-----------------------------------------------------------------//
+		const ethernet& get_ethernet() const { return ethernet_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポート番号を取得
 			@return ポート番号
 		*/
@@ -140,8 +149,8 @@ namespace net {
 		bool connected()
 		{
 			bool ret = false;
-			int ercd = tcp_read_stat(cepid_);
-			if(ercd == T4_TCPS_ESTABLISHED || ercd == T4_TCPS_CLOSE_WAIT) {
+			TCP_API_STAT ercd = tcp_read_stat(cepid_);
+			if(ercd == TCP_API_STAT_ESTABLISHED || ercd == TCP_API_STAT_CLOSE_WAIT) {
 				ret = true;
 			}
 			return ret;
@@ -280,9 +289,9 @@ namespace net {
 			int ret = 0;
 			if(connected()) {
 				ret = head_tcb[cepid_ - 1].rdsize;
-				int ercd = tcp_read_stat(cepid_);
+				TCP_API_STAT ercd = tcp_read_stat(cepid_);
 
-				if(ret == 0 && ercd == T4_TCPS_CLOSE_WAIT) {
+				if(ret == 0 && ercd == TCP_API_STAT_CLOSE_WAIT) {
 					tcp_sht_cep(cepid_, TMO_FEVR);
 				}
 			}

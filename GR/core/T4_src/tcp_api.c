@@ -631,51 +631,51 @@ int tcp_can_cep(int cepid, FN fncd)
 *    10  time_wait
 *    11  others
 ***************************************************************************************/
-int tcp_read_stat(int cepid)
+TCP_API_STAT tcp_read_stat(int cepid)
 {
     int err = _tcp_check_cepid_arg(cepid);
     if(err != E_OK) {
-        return E_PAR;
+        return TCP_API_STAT_INVALID;
     }
 
-	int ret = -1;
+	TCP_API_STAT ret = TCP_API_STAT_OTHER;
     switch (head_tcb[cepid - 1].status)
     {
         case _TCPS_CLOSED:
-            ret = 0;
+            ret = TCP_API_STAT_CLOSED;
             break;
         case _TCPS_LISTEN:
-            ret = 1;
+            ret = TCP_API_STAT_LISTEN;
             break;
         case _TCPS_ESTABLISHED:
-            ret = 2;
+            ret = TCP_API_STAT_ESTABLISHED;
             break;
         case _TCPS_FIN_WAIT2:
-            ret = 3;
+            ret = TCP_API_STAT_FIN_WAIT2;
             break;
         case _TCPS_CLOSE_WAIT:
-            ret = 4;
+            ret = TCP_API_STAT_CLOSE_WAIT;
             break;
         case _TCPS_SYN_SENT:
-            ret = 5;
+            ret = TCP_API_STAT_SYN_SENT;
             break;
         case _TCPS_SYN_RECEIVED:
-            ret = 6;
+            ret = TCP_API_STAT_SYN_RECEIVED;
             break;
         case _TCPS_FIN_WAIT1:
-            ret = 7;
+            ret = TCP_API_STAT_FIN_WAIT1;
             break;
         case _TCPS_LAST_ACK:
-            ret = 8;
+            ret = TCP_API_STAT_LAST_ACK;
             break;
         case _TCPS_CLOSING:
-            ret = 9;
+            ret = TCP_API_STAT_CLOSING;
             break;
         case _TCPS_TIME_WAIT:
-            ret = 10;
+            ret = TCP_API_STAT_TIME_WAIT;
             break;
         default:
-            ret = 11;
+            ret = TCP_API_STAT_OTHER;
             break;
     }
     return ret;

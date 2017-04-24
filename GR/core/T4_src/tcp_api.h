@@ -10,6 +10,22 @@
 #include "type.h"
 #include "r_t4_itcpip.h"
 
+typedef enum {
+	TCP_API_STAT_INVALID = -1,
+	TCP_API_STAT_CLOSED = 0,
+	TCP_API_STAT_LISTEN = 1,
+	TCP_API_STAT_ESTABLISHED = 2,
+	TCP_API_STAT_FIN_WAIT2 = 3,
+	TCP_API_STAT_CLOSE_WAIT = 4,
+	TCP_API_STAT_SYN_SENT = 5,
+	TCP_API_STAT_SYN_RECEIVED = 6,
+	TCP_API_STAT_FIN_WAIT1 = 7,
+	TCP_API_STAT_LAST_ACK = 8,
+	TCP_API_STAT_CLOSING = 9,
+	TCP_API_STAT_TIME_WAIT = 10,
+	TCP_API_STAT_OTHER = 11,
+} TCP_API_STAT;
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -28,7 +44,7 @@ int tcp_recv_data(int cepid, void *data, int len, int32_t tmout);
 int tcp_can_cep(int cepid, FN fncd);
 
 #if defined(_TEST_LIBRARY)
-int tcp_read_stat(int cepid);
+TCP_API_STAT tcp_read_stat(int cepid);
 int tcp_force_clr(int cepid);
 int udp_force_clr(int cepid);
 int tcp_set_mss(int cepid, uint16_t mss);
