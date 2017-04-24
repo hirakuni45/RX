@@ -84,219 +84,159 @@ extern uint16_t ppp_sio_status;
 extern _PPP_API_REQ _ppp_api_req;
 #endif
 
-void tcpudp_open(UW *workp)
+void tcpudp_open(uint32_t *workp)
 {
-    UW *currp;
-    UH rem;
-    UB counter;
+	uint32_t *currp = workp;
 
-    currp = workp;
+	_tcp_timer_cnt = 0;
+	_tcp_pre_timer_cnt = 0;
 
-    _tcp_timer_cnt = 0;
-    _tcp_pre_timer_cnt = 0;
-
-    _tcp_tcb = (_TCB*)currp;
-    head_tcb = (_TCB*)currp;
-    currp = (UW*)((uint8_t*)currp + (sizeof(_TCB) * __tcpcepn));
+	_tcp_tcb = (_TCB*)currp;
+	head_tcb = (_TCB*)currp;
+	currp = (uint32_t*)((uint8_t*)currp + (sizeof(_TCB) * __tcpcepn));
 
 #if defined(_TCP)
-    for (counter = 0; counter < __tcpcepn; counter++)
-    {
-        _tcp_clr_req(counter + 1);
+	for(int counter = 0; counter < __tcpcepn; counter++) {
+		_tcp_clr_req(counter + 1);
 
-        _tcp_init_callback_info(&head_tcb[counter].callback_info);
+		_tcp_init_callback_info(&head_tcb[counter].callback_info);
 
-        _tcp_tcb[counter].rwin = (uint8_t*)currp;
+		_tcp_tcb[counter].rwin = (uint8_t*)currp;
 
-        currp = (UW *)((uint8_t *)currp + tcp_ccep[counter].rbufsz);
-        rem = tcp_ccep[counter].rbufsz % 4;
-        if (rem != 0)
-            currp = (UW *)((uint8_t *)currp + (4 - rem));
-        _tcp_tcb[counter].cepid = counter + 1;
-        _tcp_init_tcb(&_tcp_tcb[counter]);
+		currp = (uint32_t *)((uint8_t *)currp + tcp_ccep[counter].rbufsz);
+		uint16_t rem = tcp_ccep[counter].rbufsz % 4;
+		if(rem != 0) {
+			currp = (uint32_t *)((uint8_t *)currp + (4 - rem));
+		}
+		_tcp_tcb[counter].cepid = counter + 1;
+		_tcp_init_tcb(&_tcp_tcb[counter]);
     }
 #endif
 
 #if defined(_UDP)
-    _udp_init(&currp);
+	_udp_init(&currp);
 #endif
 
-    _ch_info_tbl = (_CH_INFO*)currp;
-    _ch_info_head = (_CH_INFO*)currp;
-    for (counter = 0;counter < _t4_channel_num; counter++)
-    {
-        _ch_info_head[counter]._ch_num = counter;
-        _ch_info_head[counter].flag = 0;
-        _ch_info_head[counter]._rcvd = 0;
+	_ch_info_tbl = (_CH_INFO*)currp;
+	_ch_info_head = (_CH_INFO*)currp;
+	for(int counter = 0;counter < _t4_channel_num; counter++) {
+		_ch_info_head[counter]._ch_num = counter;
+		_ch_info_head[counter].flag = 0;
+		_ch_info_head[counter]._rcvd = 0;
 
-        memset(&_ch_info_head[counter]._p_rcv_buf, 0, sizeof(_P_RCV_BUF));
+		memset(&_ch_info_head[counter]._p_rcv_buf, 0, sizeof(_P_RCV_BUF));
 
-        memcpy(_ch_info_head[counter]._myipaddr, tcpudp_env[counter].ipaddr, IP_ALEN);
-        memcpy(_ch_info_head[counter]._mymaskaddr, tcpudp_env[counter].maskaddr, IP_ALEN);
-        memcpy(_ch_info_head[counter]._mygwaddr, tcpudp_env[counter].gwaddr, IP_ALEN);
-    }
-    currp = (UW*)((uint8_t*)currp + (sizeof(_CH_INFO) * _t4_channel_num));
-
+		memcpy(_ch_info_head[counter]._myipaddr, tcpudp_env[counter].ipaddr, IP_ALEN);
+		memcpy(_ch_info_head[counter]._mymaskaddr, tcpudp_env[counter].maskaddr, IP_ALEN);
+		memcpy(_ch_info_head[counter]._mygwaddr, tcpudp_env[counter].gwaddr, IP_ALEN);
+	}
+	currp = (uint32_t*)((uint8_t*)currp + (sizeof(_CH_INFO) * _t4_channel_num));
 
 #if defined(_PPP)
-    ppp_sio_status    = 0;
-    memset(&_ppp_api_req, 0, sizeof(_ppp_api_req));
-    _ppp_init();
+	ppp_sio_status    = 0;
+	memset(&_ppp_api_req, 0, sizeof(_ppp_api_req));
+	_ppp_init();
 
 #elif defined(_ETHER)
-    _ether_arp_tbl = (_ARP_ENTRY **)currp;
+	_ether_arp_tbl = (_ARP_ENTRY **)currp;
 
-    currp = (UW *)((uint8_t *)currp + _t4_channel_num * sizeof(_ARP_ENTRY *));
+	currp = (uint32_t *)((uint8_t *)currp + _t4_channel_num * sizeof(_ARP_ENTRY *));
 
-    for (counter = 0; counter < _t4_channel_num; counter++)
-    {
-        *(_ether_arp_tbl + counter) = ((_ARP_ENTRY *)currp);
-        currp = (UW *)((uint8_t *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
-    }
+	for(int counter = 0; counter < _t4_channel_num; counter++) {
+		*(_ether_arp_tbl + counter) = ((_ARP_ENTRY *)currp);
+		currp = (uint32_t *)((uint8_t *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
+	}
 
-    _ether_arp_init();
+	_ether_arp_init();
 #endif
 
-    tcpudp_act_cyc(1);
+	tcpudp_act_cyc(1);
 }
 
 
 void tcpudp_close(void)
 {
-    tcpudp_act_cyc(0);
+	tcpudp_act_cyc(0);
 }
 
 
-/***********************************************************************************************************************
-* Function Name: _getRAMsize_sub
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-void _getRAMsize_sub(W *ramsize)
+static void get_align_memory_size_(uint32_t *ramsize)
 {
-    W   tmp;
-
-    tmp = *ramsize & 0x3;
-    if (tmp != 0)
-        *ramsize += (4 - tmp);
-
-    return;
+	uint32_t tmp = *ramsize & 0x3;
+	if(tmp != 0) {
+		*ramsize += (4 - tmp);
+	}
 }
 
 #if defined(_TCP)
-/***********************************************************************************************************************
-* Function Name: _getTcpRAMsize
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-W _getTcpRAMsize(void)
+static uint32_t get_tcp_memory_size_(void)
 {
-    W   ramsize = 0;
-    UB   counter;
-
-    for (counter = 0; counter < __tcpcepn; counter++)
-    {
-        ramsize += tcp_ccep[counter].rbufsz;
-        ramsize += 4 - (tcp_ccep[counter].rbufsz % 4);
-    }
-    _getRAMsize_sub(&ramsize);
+	uint32_t ramsize = 0;
+    for(int counter = 0; counter < __tcpcepn; counter++) {
+		ramsize += tcp_ccep[counter].rbufsz;
+		ramsize += 4 - (tcp_ccep[counter].rbufsz % 4);
+	}
+    get_align_memory_size_(&ramsize);
 
     ramsize += (sizeof(_TCB) * __tcpcepn);
 
-    _getRAMsize_sub(&ramsize);
+    get_align_memory_size_(&ramsize);
 
     return ramsize;
 }
 #endif
 
 #if defined(_UDP)
-/***********************************************************************************************************************
-* Function Name: _getUdpRAMsize
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-W _getUdpRAMsize(void)
+static uint32_t get_udp_memory_size_(void)
 {
-    W ramsize = 0;
-
+    uint32_t ramsize = 0;
     ramsize += (sizeof(_UDP_CB) * __udpcepn);
-
     return ramsize;
 }
 #endif
 
 
-/***********************************************************************************************************************
-* Function Name: _getIpRAMsize
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-W _getIpRAMsize(void)
+static uint32_t get_ip_memory_size_(void)
 {
-    W   ramsize;
-
-    ramsize = 0;
-
+    uint32_t ramsize = 0;
     ramsize += (_t4_channel_num * sizeof(_CH_INFO));
-
     return ramsize;
 }
 
 
 #if defined(_ETHER)
-/***********************************************************************************************************************
-* Function Name: _getTblRAMsize
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-W _getTblRAMsize(void)
+static uint32_t get_ether_memory_size_(void)
 {
-    W   ramsize;
-    UH   count;
+	uint32_t ramsize = 0;
+	ramsize += _t4_channel_num * sizeof(_ARP_ENTRY *);
+	for(int count = 0; count < _t4_channel_num; count++) {
+		ramsize += (_ip_tblcnt[count] * sizeof(_ARP_ENTRY));
+	}
+    get_align_memory_size_(&ramsize);
 
-    ramsize = 0;
-    ramsize += _t4_channel_num * sizeof(_ARP_ENTRY *);
-    for (count = 0;count < _t4_channel_num; count++)
-    {
-        ramsize += (_ip_tblcnt[count] * sizeof(_ARP_ENTRY));
-    }
-    _getRAMsize_sub(&ramsize);
-
-    return ramsize;
+	return ramsize;
 }
 #endif
 
 
-/***********************************************************************************************************************
-* Function Name: tcpudp_get_ramsize
-* Description  :
-* Arguments    :
-* Return Value :
-***********************************************************************************************************************/
-uint32_t tcpudp_get_ramsize(void)
+uint32_t get_tcpudp_memory_size(void)
 {
-    uint32_t ramsize;
+	uint32_t ramsize = 0;
 
-    ramsize = 0;
 #if defined(_TCP)
-    ramsize += _getTcpRAMsize();
+	ramsize += get_tcp_memory_size_();
 #endif
 #if defined(_UDP)
-    ramsize += _getUdpRAMsize();
+	ramsize += get_udp_memory_size_();
 #endif
 
-    ramsize += _getIpRAMsize();
+	ramsize += get_ip_memory_size_();
 
 #if defined(_ETHER)
-    ramsize += _getTblRAMsize();
+	ramsize += get_ether_memory_size_();
 #endif
 
-    return ramsize;
+	return ramsize;
 }
 
 #if defined(_TCP)

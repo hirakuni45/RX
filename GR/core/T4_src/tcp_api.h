@@ -8,26 +8,9 @@
 extern "C" {
 #endif
 
-void tcpudp_open(UW *workp);
+void tcpudp_open(uint32_t *workp);
 void tcpudp_close(void);
-
-void _getRAMsize_sub(W *ramsize);
-
-#if defined(_TCP)
-W _getTcpRAMsize(void);
-#endif
-
-#if defined(_UDP)
-W _getUdpRAMsize(void);
-#endif
-
-W _getIpRAMsize(void);
-
-#if defined(_ETHER)
-W _getTblRAMsize(void);
-#endif
-
-uint32_t tcpudp_get_ramsize(void);
+uint32_t get_tcpudp_memory_size(void);
 
 #if defined(_TCP)
 int tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, int32_t tmout);
