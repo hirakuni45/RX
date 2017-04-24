@@ -78,9 +78,8 @@ namespace net {
 		//-----------------------------------------------------------------//
         void stop()
 		{
-			while(tcp_sht_cep(get_cepid()) != E_OK) {
-				delay(1);
-			}
+			tcp_sht_cep(get_cepid(), TMO_FEVR);
+
 			tcp_cls_cep(get_cepid(), TMO_FEVR);
 			ethernet::CEP& cep = at_ethernet().at_cep(get_cepid());
 			cep.call_flag = false;

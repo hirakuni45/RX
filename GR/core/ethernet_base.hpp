@@ -283,14 +283,9 @@ namespace net {
 			if(connected()) {
 				res = head_tcb[cepid_ - 1].rdsize;
 				int ercd = tcp_read_stat(cepid_);
-#ifdef ETHER_DEBUG
-				utils::format("(%d) tcp_read_stat: %d\n") % res % ercd;
-#endif
+
 				if(res == 0 && ercd == T4_TCPS_CLOSE_WAIT) {
-#ifdef ETHER_DEBUG
-					utils::format("tcp_sht_cep\n");
-#endif
-					tcp_sht_cep(cepid_);
+					tcp_sht_cep(cepid_, TMO_FEVR);
 				}
 			}
 			return res;
