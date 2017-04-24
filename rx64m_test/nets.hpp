@@ -162,9 +162,8 @@ namespace seeda {
 		// クライアントからの応答を解析して終端（空行）があったら「true」
 		int analize_request_(net::ethernet_base& base)
 		{
-			char tmp[1024];
+			char tmp[512];
 			int len = base.read(tmp, sizeof(tmp));
-			if(len <= 0) return -1;
 
 			for(int i = 0; i < len; ++i) {
 				char ch = tmp[i];

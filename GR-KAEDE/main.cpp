@@ -129,20 +129,6 @@ namespace seeda {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@brief  GMT 時間の取得
-		@return GMT 時間
-	*/
-	//-----------------------------------------------------------------//
-	time_t get_time()
-	{
-		time_t t = 0;
-		rtc_.get_time(t);
-		return t;
-	}
-
-
-	//-----------------------------------------------------------------//
-	/*!
 		@brief  時間の表示
 		@param[in]	t		時間
 		@param[in]	dst		出力文字列
@@ -349,7 +335,7 @@ extern "C" {
 	 */
 	//-----------------------------------------------------------------//
 	DWORD get_fattime(void) {
-		auto t = seeda::get_time();
+		auto t = get_time();
 		return utils::str::get_fattime(t);
 	}
 
@@ -363,6 +349,20 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	void utf8_to_sjis(const char* src, char* dst) {
 		utils::str::utf8_to_sjis(src, dst);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  GMT 時間の取得
+		@return GMT 時間
+	*/
+	//-----------------------------------------------------------------//
+	time_t get_time()
+	{
+		time_t t = 0;
+		rtc_.get_time(t);
+		return t;
 	}
 
 
@@ -382,6 +382,8 @@ extern "C" {
 	void set_task_10ms(void (*task)(void)) {
 		core_.cmt0_.at_task().set_task_10ms(task);
 	}
+
+
 }
 
 int main(int argc, char** argv);
