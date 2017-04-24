@@ -154,7 +154,7 @@ namespace net {
 			@return 文字列
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_str(char spch = '.') {
+		const char* c_str(char spch = '.') {
 			utils::format("%d%c%d%c%d%c%d", str_, sizeof(str_))
 				% static_cast<int>(address_.bytes[0]) % spch
 				% static_cast<int>(address_.bytes[1]) % spch
