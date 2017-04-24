@@ -163,7 +163,7 @@ namespace net {
 
         void initialize_TCP_IP()
 		{
-			uint32_t size = tcpudp_get_ramsize();
+			uint32_t size = get_tcpudp_memory_size();
 			uint32_t real = sizeof(tcpudp_work_);
             if(size > real) {
 				utils::format("empty tcpudp RAM size: need(%d), real(%d)\n") % size % real;

@@ -59,15 +59,8 @@ namespace net {
 			int res = 0;
 			if(!connected()) {
 				int ercd = tcp_con_cep(get_cepid(), NADR,  &adr, timeout);
-				if(ercd == E_OK) {
+				if(ercd == E_OK || ercd == E_WBLK) {
 					res = 1;
-				} else if(ercd == E_WBLK) {  // timeout が「TMO_NBLK」の場合
-//					if(head_tcb[get_cepid() - 1].req.error == E_OK) ;
-					if(head_tcb[get_cepid() - 1].req.stat == _TCP_API_STAT_COMPLETE) {
-						res = 1;
-					} else {
-						res = -1;
-					}
 				} else {
 					res = -1;
 				}

@@ -140,20 +140,11 @@ namespace net {
 		bool connected()
 		{
 			int ercd = tcp_read_stat(cepid_);
-#if defined(T4_ETHER_DEBUG)
-			utils::format("eternet_base.connected(): tcp_read_stat = %d, ") % ercd;
-#endif
 			bool res;
 			if(ercd == T4_TCPS_ESTABLISHED || ercd == T4_TCPS_CLOSE_WAIT) {
 				res = true;
-#if defined(T4_ETHER_DEBUG)
-				utils::format(" true\n");
-#endif
 			} else {
 				res = false;
-#if defined(T4_ETHER_DEBUG)
-				utils::format(" false\n");
-#endif
 			}
 			return res;
 		}
