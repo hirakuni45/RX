@@ -676,7 +676,12 @@ namespace seeda {
 		nets() : server_(ethernet_), client_(ethernet_), count_(0), server_task_(server_task::wait_client),
 			client_task_(client_task::connection),
 			line_man_(0x0a), disconnect_loop_(0),
-			client_ip_(192, 168, 3, 4), client_time_(0) { }
+#ifdef SEEDA
+			client_ip_(192, 168, 1, 3),
+#else
+			client_ip_(192, 168, 3, 4),
+#endif
+			client_time_(0) { }
 
 
 		//-----------------------------------------------------------------//
