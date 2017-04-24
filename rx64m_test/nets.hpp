@@ -780,7 +780,7 @@ namespace seeda {
 
 			case server_task::wait_client:
 				if(server_.connected()) {
-					utils::format("new http\n");
+					utils::format("New http connected, form: %s\n") % server_.get_from_ip().c_str();
 					++count_;
 					line_man_.clear();
 					server_task_ = server_task::main_loop;
