@@ -139,14 +139,12 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool connected()
 		{
+			bool ret = false;
 			int ercd = tcp_read_stat(cepid_);
-			bool res;
 			if(ercd == T4_TCPS_ESTABLISHED || ercd == T4_TCPS_CLOSE_WAIT) {
-				res = true;
-			} else {
-				res = false;
+				ret = true;
 			}
-			return res;
+			return ret;
 		}
 
 
@@ -279,16 +277,16 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int available()
 		{
-			int res = 0;
+			int ret = 0;
 			if(connected()) {
-				res = head_tcb[cepid_ - 1].rdsize;
+				ret = head_tcb[cepid_ - 1].rdsize;
 				int ercd = tcp_read_stat(cepid_);
 
-				if(res == 0 && ercd == T4_TCPS_CLOSE_WAIT) {
+				if(ret == 0 && ercd == T4_TCPS_CLOSE_WAIT) {
 					tcp_sht_cep(cepid_, TMO_FEVR);
 				}
 			}
-			return res;
+			return ret;
 		}
 	};
 }
