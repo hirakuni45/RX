@@ -26,7 +26,7 @@
 * History : DD.MM.YYYY Version  Description
 *         : 01.04.2014 1.00     First Release
 ***********************************************************************************************************************/
-#include "t4define.h"
+#include "net_config.h"
 
 #define _TCPH_LEN  20 // minimum TCP  header length (in bytes)
 #define _UDPH_LEN  8 // UDP header length (in bytes)

@@ -30,7 +30,7 @@
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
 #include <string.h>
-#include "t4define.h"
+#include "net_config.h"
 #include "type.h"
 #include "r_t4_itcpip.h"
 #include "ether.h"

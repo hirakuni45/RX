@@ -38,7 +38,7 @@ Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
 #include <stdio.h>
 #include <stddef.h>
-#include "../T4_src/t4define.h"
+#include "../T4_src/net_config.h"
 #include "rx64m/iodefine.h"
 #include "r_ether.h"
 #include "phy.h"

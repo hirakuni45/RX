@@ -36,9 +36,7 @@
 /***********************************************************************************************************************
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
-#if defined(__GNUC__) || defined(GRSAKURA)
-#include "t4define.h"
-#endif
+#include "net_config.h"
 #include <string.h>
 #include <stdint.h>
 #include "r_t4_itcpip.h"

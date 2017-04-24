@@ -6,7 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "t4define.h"
+#include "net_config.h"
 #include "type.h"
 #include "r_t4_itcpip.h"
 

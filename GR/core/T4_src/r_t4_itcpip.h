@@ -82,11 +82,7 @@
     defined(_SH2) || defined(_SH2A) || defined(_SH2AFPU) || defined(_SH4) || defined(_SH4A) ||\
     defined(__RX) || defined(__v850) || (defined(__GNUC__) || defined(GRSAKURA))
 
-#if defined(__RX)
 #include <stdint.h>
-#else
-#include "r_stdint.h"
-#endif
 
 typedef int8_t          B;
 typedef int16_t         H;
@@ -101,13 +97,12 @@ typedef void    (*FP)(void);
 typedef H               ID;
 typedef H               PRI;
 typedef H               HNO;
-typedef UH              ATR;
 #endif
 #endif
 
 typedef int32_t         FN;
 
-#include "r_mw_version.h"
+/// #include "r_mw_version.h"
 
 /*
  * ITRON TCP/IP API Specifications header file
@@ -125,14 +120,14 @@ typedef struct t_ipv4ep
 /***  TCP reception point  ***/
 typedef struct t_tcp_crep
 {
-    ATR      repatr;    /* TCP reception point attribute    */
+    uint16_t repatr;    /* TCP reception point attribute    */
     T_IPV4EP myaddr;    /* Local IP address and port number */
 } T_TCP_CREP;
 
 /***  TCP communication end point  ***/
 typedef struct t_tcp_ccep
 {
-    ATR      cepatr;    /* TCP communication end point attribute  */
+    uint16_t cepatr;    /* TCP communication end point attribute  */
     void    *sbuf;      /* Top address of transmit window buffer  */
     int      sbufsz;    /* Size of transmit window buffer         */
     void    *rbuf;      /* Top address of receive window buffer   */
@@ -143,7 +138,7 @@ typedef struct t_tcp_ccep
 /***  UDP communication end point  ***/
 typedef struct t_udp_ccep
 {
-    ATR      cepatr;    /* UDP communication end point attribute  */
+    uint16_t cepatr;    /* UDP communication end point attribute  */
     T_IPV4EP myaddr;    /* Local IP address and port number       */
     int (*callback)(ID cepid, FN fncd , void *p_parblk); /* Callback routine */
 } T_UDP_CCEP;
@@ -365,7 +360,7 @@ void ppp_api_wup(void);             /* Cancel the wait state of PPP API completi
 void get_random_number(UB *, UW);   /* Get random number for CHAP auth              */
 
 /* T4 version information structure*/
-extern const mw_version_t R_t4_version;
+/// extern const mw_version_t R_t4_version;
 
 /*++++++++++++++++ PPP +++++++++++++++++*/
 /* PPP authentication system (Set ppp_auth) */

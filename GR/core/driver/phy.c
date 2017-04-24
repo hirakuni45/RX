@@ -6,7 +6,7 @@
 */
 //=====================================================================//
 #include <stdio.h>
-#include "../T4_src/t4define.h"
+#include "../T4_src/net_config.h"
 #include "rx64m/iodefine.h"
 #include "phy.h"
 #include "r_ether.h"

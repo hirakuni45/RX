@@ -10,7 +10,7 @@
 #include <string.h>
 #include "phy.h"
 #include "r_ether.h"
-#include "../T4_src/t4define.h"
+#include "../T4_src/net_config.h"
 #include "../T4_src/r_t4_itcpip.h"
 
 extern UB _myethaddr[6];

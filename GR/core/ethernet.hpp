@@ -49,9 +49,8 @@ typedef utils::basic_format<null_chaout> debug_format;
 typedef utils::basic_format<utils::def_chaout> debug_format;
 #endif
 
-/******************************************************************************
-Macro definitions
-******************************************************************************/
+
+
 #define T4_CLOSED               0
 
 #define T4_TCPS_CLOSED          0

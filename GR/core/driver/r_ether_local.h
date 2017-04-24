@@ -29,7 +29,7 @@
 #ifndef R_ETHER_LOCAL_H
 #define R_ETHER_LOCAL_H
 
-#include "../T4_src/t4define.h"
+#include "../T4_src/net_config.h"
 
 /***********************************************************************************************************************
 Macro definitions

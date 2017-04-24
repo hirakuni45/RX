@@ -36,8 +36,7 @@
 * History       : DD.MM.YYYY Version Description
 *               : 30.08.2011 1.00    First release.
 ******************************************************************************/
-#include "t4define.h"
-
+#include "net_config.h"
 #include "r_t4_itcpip.h"
 
 extern int t4_udp_callback(ID cepid, FN fncd , void *p_parblk);
