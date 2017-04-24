@@ -15,6 +15,7 @@
 #include "GR/core/ethernet.hpp"
 #include "GR/core/ethernet_client.hpp"
 #include "GR/core/ethernet_server.hpp"
+#include "GR/core/ftp_server.hpp"
 
 extern "C" {
 	void INT_Excep_ICU_GROUPAL1(void);
@@ -37,6 +38,7 @@ namespace seeda {
 		net::ethernet			ethernet_;
 		net::ethernet_server	server_;
 		net::ethernet_client	client_;
+		net::ftp_server			ftp_;
 
 		uint32_t		count_;
 
@@ -64,8 +66,8 @@ namespace seeda {
 		time_t		client_time_;
 
 		// サーミスタ定義
-		// A/D: 12 bits, NT103, 分圧抵抗: 10K オーム、サーミスタ: ＶＣＣ側
-		typedef chip::NTCTH<4095, chip::thermistor::NT103, 10000, true> THMISTER;
+		// A/D: 12 bits, NT103_41G, 分圧抵抗: 10K オーム、サーミスタ: ＶＣＣ側
+		typedef chip::NTCTH<4095, chip::thermistor::NT103_41G, 10000, true> THMISTER;
 		THMISTER thmister_;
 
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
@@ -673,7 +675,8 @@ namespace seeda {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		nets() : server_(ethernet_), client_(ethernet_), count_(0), server_task_(server_task::wait_client),
+		nets() : server_(ethernet_), client_(ethernet_), ftp_(ethernet_),
+			count_(0), server_task_(server_task::wait_client),
 			client_task_(client_task::connection),
 			line_man_(0x0a), disconnect_loop_(0),
 #ifdef SEEDA
@@ -745,6 +748,9 @@ namespace seeda {
 			client_.begin(3000);
 			utils::format("Start client: %s") % ethernet_.get_local_ip().c_str();
 			utils::format("  port(%d)\n") % static_cast<int>(client_.get_port());
+
+			// FTP Server
+			ftp_.start();
 		}
 
 
@@ -848,6 +854,8 @@ namespace seeda {
 				server_task_ = server_task::wait_client;
 				break;
 			}
+
+			ftp_.service();
 		}
 
 
