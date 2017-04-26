@@ -624,4 +624,48 @@ namespace net {
 			return current_send_size;
 		}
 	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  インサーネット文字出力ファンクタ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	class eth_chaout {
+		int			fd_;
+		char		tmp_[512];
+		uint32_t	pos_;
+
+		void out_(char ch) {
+			tmp_[pos_] = ch;
+			++pos_;
+			if(pos_ >= sizeof(tmp_)) {
+				ethernet::write(fd_, tmp_, pos_);
+				pos_ = 0;
+			}
+		}
+	public:
+		eth_chaout(int fd) : fd_(fd), pos_(0) {
+			if(fd_ <= 0) {
+				utils::format("FTP FD Fail: %d\n") % fd_;
+			}
+		}
+
+		~eth_chaout() {
+			if(pos_ > 0) {
+				ethernet::write(fd_, tmp_, pos_);
+			}
+		}
+
+		void operator() (char ch) {
+			if(ch == '\n') {
+				out_('\r');
+			}
+			out_(ch);
+			if(ch == '\n' && pos_ != 0) {
+				ethernet::write(fd_, tmp_, pos_);
+				pos_ = 0;
+			}
+		}
+	};
 }

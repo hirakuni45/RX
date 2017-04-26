@@ -127,65 +127,8 @@ namespace net {
 
 		bool		data_enable_;
 
-		static uint32_t	ctrl_cepid_;
-		static uint32_t	data_cepid_;
-
 		// -------------------------------------------------------------------- //
-
-		class ctrl_chaout {
-			char		tmp_[512];
-			uint32_t	pos_;
-
-			void out_(char ch) {
-				tmp_[pos_] = ch;
-				++pos_;
-				if(pos_ >= sizeof(tmp_)) {
-					ethernet::write(ctrl_cepid_, tmp_, pos_);
-					pos_ = 0;
-				}
-			}
-		public:
-			ctrl_chaout(char* out = nullptr, uint16_t len = 0) : pos_(0) { }
-			void operator() (char ch) {
-				if(ch == '\n') {
-					out_('\r');
-				}
-				out_(ch);
-				if(ch == '\n' && pos_ != 0) {
-					ethernet::write(ctrl_cepid_, tmp_, pos_);
-					pos_ = 0;
-				}
-			}
-		};
-		typedef utils::basic_format<ctrl_chaout> ctrl_format;
-
-		class data_chaout {
-			char		tmp_[512];
-			uint32_t	pos_;
-
-			void out_(char ch) {
-				tmp_[pos_] = ch;
-				++pos_;
-				if(pos_ >= sizeof(tmp_)) {
-					ethernet::write(data_cepid_, tmp_, pos_);
-					pos_ = 0;
-				}
-			}
-		public:
-			data_chaout(char* out = nullptr, uint16_t len = 0) : pos_(0) { }
-			void operator() (char ch) {
-				if(ch == '\n') {
-					out_('\r');
-				}
-				out_(ch);
-				if(ch == '\n' && pos_ != 0) {
-					ethernet::write(data_cepid_, tmp_, pos_);
-					pos_ = 0;
-				}
-			}
-		};
-		typedef utils::basic_format<data_chaout> data_format;
-
+		typedef utils::basic_format<eth_chaout> format;
 
 		static void disp_time_(time_t t, char* dst, uint32_t size)
 		{
@@ -218,10 +161,12 @@ namespace net {
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
 			if(fi == nullptr) return;
 
+			int fd = reinterpret_cast<int>(option);
+
 			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
 			char tmp[32];
 			make_date_time_(t, tmp, sizeof(tmp));
-			data_format("Type=%s;Size=%d;Modify=%s; %s\n")
+			format("Type=%s;Size=%d;Modify=%s; %s\n", fd)
 				% (dir ? "dir" : "file")
 				% fi->fsize
 				% tmp
@@ -312,9 +257,9 @@ namespace net {
 //    if( strcmp( parameters, "." ) == 0 )  // 'CWD .' is the same as PWD command
 // client << "257 \"" << cwdName << "\" is your current directory\r\n";     
 					if(sdc_.cd(param_)) {
-						ctrl_format("250 Ok. Current directory is '%s'\n") % sdc_.get_current();
+						format("250 Ok. Current directory is '%s'\n", ctrl_.get_cepid()) % sdc_.get_current();
 					} else {
-						ctrl_format("550 Can't change directory to '%s'\n") % param_;
+						format("550 Can't change directory to '%s'\n", ctrl_.get_cepid()) % param_;
 						ret = false;
 					}
 				}
@@ -347,7 +292,7 @@ namespace net {
 			case ftp_command::PASV:
 				{
 					const auto& ip = eth_.get_local_ip();
-					ctrl_format("227 Entering Passive Mode (%d,%d,%d,%d,%d,%d)\n")
+					format("227 Entering Passive Mode (%d,%d,%d,%d,%d,%d)\n", ctrl_.get_cepid())
 						% ip[0] % ip[1] % ip[2] % ip[3] % (DATA_PORT_PASV >> 8) % (DATA_PORT_PASV & 255);
 					task_ = task::start_pasv;
 				}
@@ -384,13 +329,13 @@ namespace net {
     }
   }
 #endif
-				ctrl_format("200 PORT command successful\n");
+				format("200 PORT command successful\n", ctrl_.get_cepid());
 #endif
 				break;
 
 			case ftp_command::PWD:
 			case ftp_command::XPWD:
-				ctrl_format("257 '%s' is your current directory\n") % sdc_.get_current();
+				format("257 '%s' is your current directory\n", ctrl_.get_cepid()) % sdc_.get_current();
 				break;
 
 			case ftp_command::QUIT:
@@ -405,7 +350,7 @@ namespace net {
 
 			case ftp_command::RETR:
 				if(param_ == nullptr) {
-					ctrl_format("501 No file name\n");
+					format("501 No file name\n", ctrl_.get_cepid());
 					ret = false;
 					break;
 				}
@@ -413,7 +358,7 @@ namespace net {
 					char path[256+1];
 					sdc_.make_full_path(param_, path);
 					if(!sdc_.probe(path)) {
-						ctrl_format("550 File '%s' not found\n") % path;
+						format("550 File '%s' not found\n", ctrl_.get_cepid()) % path;
 						ret = false;
 						break;
 					}
@@ -471,14 +416,14 @@ namespace net {
 
 			case ftp_command::TYPE:
 				if(param_ == nullptr) {
-					ctrl_format("504 Unknow TYPE\n");
+					format("504 Unknow TYPE\n", ctrl_.get_cepid());
 					ret = false;
 				} else if(strcmp(param_, "A") == 0) {
-					ctrl_format("200 TYPE is now ASII\n");
+					format("200 TYPE is now ASII\n", ctrl_.get_cepid());
 				} else if(strcmp(param_, "I") == 0) {
-			    	ctrl_format("200 TYPE is now binary\n");
+			    	format("200 TYPE is now binary\n", ctrl_.get_cepid());
 				} else {
-					ctrl_format("504 Unknow TYPE\n");
+					format("504 Unknow TYPE\n", ctrl_.get_cepid());
 					ret = false;
 				}
 				break;
@@ -487,27 +432,28 @@ namespace net {
 				break;
 
 			case ftp_command::FEAT:
-				ctrl_format("211-Extensions suported:\n");
-				ctrl_format(" MDTM\n");
-				ctrl_format(" MLSD\n");
-				ctrl_format(" SIZE\n");
-				ctrl_format(" SITE FREE\n");
-				ctrl_format("211 End.\n");
+				format("211-Extensions suported:\n", ctrl_.get_cepid());
+				format(" MDTM\n", ctrl_.get_cepid());
+				format(" MLSD\n", ctrl_.get_cepid());
+				format(" SIZE\n", ctrl_.get_cepid());
+				format(" SITE FREE\n", ctrl_.get_cepid());
+				format("211 End.\n", ctrl_.get_cepid());
  				break;
 
 			case ftp_command::MLSD:
 				ftp_debug("MLSD\n");
 			    if(!data_.connected()) {
-					ctrl_format("425 No data connection\n");
+					format("425 No data connection\n", ctrl_.get_cepid());
 					ret = false;
 				} else {
-      				ctrl_format("150 Accepted data connection\n");
+      				format("150 Accepted data connection\n", ctrl_.get_cepid());
 					if(sdc_.get_mount()) {
-						int n = sdc_.dir_loop(sdc_.get_current(), dir_list_func_, true);
-						ctrl_format("226-options: -a -l\n");
-						ctrl_format("226 %d matches total\n") % n;
+						void* fd = reinterpret_cast<void*>(data_.get_cepid());
+						int n = sdc_.dir_loop(sdc_.get_current(), dir_list_func_, true, fd);
+						format("226-options: -a -l\n", ctrl_.get_cepid());
+						format("226 %d matches total\n", ctrl_.get_cepid()) % n;
 					} else {
-						ctrl_format("550 File system not mount\n");
+						format("550 File system not mount\n", ctrl_.get_cepid());
 						ret = false;
 					}
 				}
@@ -1050,12 +996,12 @@ void FtpServer::service()
 			switch(task_) {
 			case task::connection:
 				if(ctrl_.connected()) {
-					ctrl_cepid_ = ctrl_.get_cepid();
 					ftp_debug("FTP Server (CTRL): connect form: '%s'\n") % ctrl_.get_from_ip().c_str();
 					time_t t = get_time();
 					char tmp[128];
 					disp_time_(t, tmp, sizeof(tmp));
-					ctrl_format("220 %s SEEDA03 FTP server %s\n") % eth_.get_local_ip().c_str() % tmp;
+					format("220 %s SEEDA03 FTP server %s\n", ctrl_.get_cepid())
+						% eth_.get_local_ip().c_str() % tmp;
 					line_man_.clear();
 					task_ = task::user_identity;
 				}
@@ -1068,16 +1014,16 @@ void FtpServer::service()
 					if(cmd == ftp_command::USER) {
 						if(strcmp(param_, user_) == 0) {
 							ftp_debug("FTP Server: USER OK: '%s'\n") % param_;
-							ctrl_format("331 OK. %s User password required\n") % param_;
+							format("331 OK. %s User password required\n", ctrl_.get_cepid()) % param_;
 							line_man_.clear();
 							task_ = task::password;
 						} else {
 							ftp_debug("FTP Server: USER NG: '%s'\n") % param_;
-							ctrl_format("530 %s User not found\n") % param_;
+							format("530 %s User not found\n", ctrl_.get_cepid()) % param_;
 							task_ = task::disconnect;
 						}
 					} else {
-					    ctrl_format("500 USER Certification Error\n");
+					    format("500 USER Certification Error\n", ctrl_.get_cepid());
 						task_ = task::disconnect;
 					}
 				}
@@ -1090,16 +1036,16 @@ void FtpServer::service()
 					if(cmd == ftp_command::PASS) {
 						if(strcmp(param_, pass_) == 0) {
 							ftp_debug("FTP Server: password OK: '%s'\n") % param_;
-							ctrl_format("230 Login ok %s\n") % user_;
+							format("230 Login ok %s\n", ctrl_.get_cepid()) % user_;
 							line_man_.clear();
 							task_ = task::command;
 						} else {
 							ftp_debug("FTP Server: password NG: '%s'\n") % param_;
-							ctrl_format("530 Password fail %s\n") % user_;
+							format("530 Password fail %s\n", ctrl_.get_cepid()) % user_;
 							task_ = task::disconnect;
 						}
 					} else {
-					    ctrl_format("500 PASS Certification Error\n");
+					    format("500 PASS Certification Error\n", ctrl_.get_cepid());
 						task_ = task::disconnect;
 					}
 				}
@@ -1108,9 +1054,8 @@ void FtpServer::service()
 			case task::start_pasv:
 				if(!data_enable_) {
 					data_.begin(DATA_PORT_PASV);
-					data_cepid_ = data_.get_cepid();
 					utils::format("Start FTP Server (DATA): %s (%d) %d\n")
-						% eth_.get_local_ip().c_str() % data_.get_port() % data_cepid_;
+						% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
 					data_enable_ = true;					
 					task_ = task::data_connection;
 				} else if(!data_.connected()) {
@@ -1203,7 +1148,4 @@ void FtpServer::service()
 
 		{ nullptr, ftp_command::NONE_ },
 	};
-
-	template<class SDC> uint32_t ftp_server<SDC>::ctrl_cepid_;
-	template<class SDC> uint32_t ftp_server<SDC>::data_cepid_;
 }
