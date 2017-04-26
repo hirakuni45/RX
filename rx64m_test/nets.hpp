@@ -38,7 +38,8 @@ namespace seeda {
 		net::ethernet			ethernet_;
 		net::ethernet_server	server_;
 		net::ethernet_client	client_;
-		net::ftp_server			ftp_;
+		typedef net::ftp_server<SDC> FTP;
+		FTP				ftp_;
 
 		uint32_t		count_;
 
@@ -673,7 +674,7 @@ namespace seeda {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		nets() : server_(ethernet_), client_(ethernet_), ftp_(ethernet_),
+		nets() : server_(ethernet_), client_(ethernet_), ftp_(ethernet_, at_sdc()),
 			count_(0), server_task_(server_task::wait_client),
 			client_task_(client_task::connection),
 			line_man_(0x0a), disconnect_loop_(0),
