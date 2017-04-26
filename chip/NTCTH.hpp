@@ -18,6 +18,7 @@ namespace chip {
 	enum class thermistor {
 		NT103_34G,	///< THB:3435, TR25:10K
 		NT103_41G,	///< THB:4126, TR25:10K
+		HX103_3380,	///< THB:3380, TR25:10K (25C to 50C)
 	};
 
 
@@ -46,6 +47,10 @@ namespace chip {
 				break;
 			case thermistor::NT103_41G:
 				THB  = 4126.0f;  ///< サーミスタＢ定数
+				TR25 = 10e3;     ///< R25 サーミスタ２５℃基準抵抗値
+				break;
+			case thermistor::HX103_3380:
+				THB  = 3380.0f;  ///< サーミスタＢ定数
 				TR25 = 10e3;     ///< R25 サーミスタ２５℃基準抵抗値
 				break;
 			default:
