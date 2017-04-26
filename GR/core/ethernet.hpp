@@ -597,5 +597,31 @@ namespace net {
     		}
 	    	return 0;
 		}
+
+
+		static int32_t write(uint32_t cepid, const void* buffer, uint32_t size)
+		{
+			int32_t ercd;
+			uint32_t current_send_size = 0;
+
+			const uint8_t* p = static_cast<const uint8_t*>(buffer);
+			if (size <= 0x7fff) {
+				ercd = tcp_send_data(cepid, p, size, TMO_FEVR);
+			} else {
+				while (size > current_send_size) {
+					if((size - current_send_size) > 0x7fff) {
+						ercd = tcp_send_data(cepid, (p + current_send_size), 0x7fff, TMO_FEVR);
+					} else {
+						ercd = tcp_send_data(cepid, (p + current_send_size),
+									(size - current_send_size), TMO_FEVR);
+					}
+					if(ercd < 0) {
+						break; // error
+					}
+					current_send_size += static_cast<uint32_t>(ercd);
+				}
+			}
+			return current_send_size;
+		}
 	};
 }
