@@ -55,6 +55,13 @@ namespace utils {
 		uint16_t	len_;
 		uint16_t	pos_;
 	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+			@param[in]	out		文字列出力用ポインター（nullptrの場合、標準出力）
+			@param[in]	len		文字列出力用長さ
+		*/
+		//-----------------------------------------------------------------//
 		def_chaout(char* out = nullptr, uint16_t len = 0) : out_(out), len_(len), pos_(0) { } 
 		void operator() (char ch) {
 			if(out_ != nullptr && len_ > 1 && pos_ < (len_ - 1)) {
@@ -471,11 +478,30 @@ namespace utils {
 		/*!
 			@brief  コンストラクター
 			@param[in]	form	フォーマット式
+			@param[in]	out		文字列出力用ポインター
+			@param[in]	len		文字列出力用長さ
 		*/
 		//-----------------------------------------------------------------//
 		basic_format(const char* form, char* out = nullptr, uint16_t len = 0) noexcept :
 			error_(error::none),
 			form_(form), chaout_(out, len),
+			num_(0), point_(0),
+			bitlen_(0),
+			mode_(mode::NONE), zerosupp_(false), sign_(false) {
+			next_();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+			@param[in]	form	フォーマット式
+			@param[in]	fd		ファイル識別子
+		*/
+		//-----------------------------------------------------------------//
+		basic_format(const char* form, int fd) noexcept :
+			error_(error::none),
+			form_(form), chaout_(fd),
 			num_(0), point_(0),
 			bitlen_(0),
 			mode_(mode::NONE), zerosupp_(false), sign_(false) {
