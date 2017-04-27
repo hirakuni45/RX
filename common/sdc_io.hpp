@@ -258,7 +258,7 @@ namespace utils {
 			@return ファイル数
 		 */
 		//-----------------------------------------------------------------//
-		uint16_t dir_loop(const char* root, dir_loop_func func = nullptr, bool todir = false,
+		uint32_t dir_loop(const char* root, dir_loop_func func = nullptr, bool todir = false,
 			void* option = nullptr)
 		{
 			char full[path_buff_size_];
@@ -271,7 +271,7 @@ namespace utils {
 #if _USE_LFN != 0
 			str::utf8_to_sjis(full, full);
 #endif
-			uint16_t num = 0;
+			uint32_t num = 0;
 			auto st = f_opendir(&dir, full);
 			if(st != FR_OK) {
 				format("Can't open dir(%d): '%s'\n") % static_cast<uint32_t>(st) % full;
