@@ -54,6 +54,7 @@ namespace utils {
 		char*		out_;
 		uint16_t	len_;
 		uint16_t	pos_;
+		uint32_t	all_;
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -62,17 +63,20 @@ namespace utils {
 			@param[in]	len		文字列出力用長さ
 		*/
 		//-----------------------------------------------------------------//
-		def_chaout(char* out = nullptr, uint16_t len = 0) : out_(out), len_(len), pos_(0) { } 
+		def_chaout(char* out = nullptr, uint16_t len = 0) : out_(out), len_(len), pos_(0), all_(0) { } 
 		void operator() (char ch) {
 			if(out_ != nullptr && len_ > 1 && pos_ < (len_ - 1)) {
 				out_[pos_] = ch;
 				++pos_;
 				out_[pos_] = 0;
+				++all_;
 			} else {
 				char tmp = ch;
 				write(1, &tmp, 1);
+				++all_;
 			}
 		}
+		uint32_t get_length() const { return all_; }
 	};
 
 
@@ -114,13 +118,13 @@ namespace utils {
 			NONE		///< 不明
 		};
 
-		error		error_;
-
 		const char*	form_;
 
-		chaout	chaout_;
+		chaout		chaout_;
 
 		char		buff_[34];
+
+		error		error_;
 
 		uint8_t		num_;
 		uint8_t		point_;
@@ -483,8 +487,8 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		basic_format(const char* form, char* out = nullptr, uint16_t len = 0) noexcept :
-			error_(error::none),
 			form_(form), chaout_(out, len),
+			error_(error::none),
 			num_(0), point_(0),
 			bitlen_(0),
 			mode_(mode::NONE), zerosupp_(false), sign_(false) {
@@ -500,8 +504,8 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		basic_format(const char* form, int fd) noexcept :
-			error_(error::none),
 			form_(form), chaout_(fd),
+			error_(error::none),
 			num_(0), point_(0),
 			bitlen_(0),
 			mode_(mode::NONE), zerosupp_(false), sign_(false) {
@@ -529,6 +533,15 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  出力数を返す
+			@return 出力数
+		*/
+		//-----------------------------------------------------------------//
+		int get_length() const noexcept { return chaout_.get_length(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  オペレーター「%」(const char*)
 			@param[in]	val	値
 			@return	自分の参照
@@ -541,11 +554,16 @@ namespace utils {
 			}
 
 			if(mode_ == mode::STR) {
-				zerosupp_ = false;
-				uint8_t n = 0;
-				const char* p = val;
-				while((*p++) != 0) { ++n; }
-				out_str_(val, 0, n);
+				if(val == nullptr) {
+					static const char* nullstr = { "(nullptr)" };
+					out_str_(nullstr, 0, strlen(nullstr));					
+				} else {
+					zerosupp_ = false;
+					uint8_t n = 0;
+					const char* p = val;
+					while((*p++) != 0) { ++n; }
+					out_str_(val, 0, n);
+				}
 			} else {
 				error_ = error::different;
 			}
@@ -570,11 +588,16 @@ namespace utils {
 			}
 
 			if(mode_ == mode::STR) {
-				zerosupp_ = false;
-				uint8_t n = 0;
-				const char* p = val;
-				while((*p++) != 0) { ++n; }
-				out_str_(val, 0, n);
+				if(val == nullptr) {
+					static const char* nullstr = { "(nullptr)" };
+					out_str_(nullstr, 0, strlen(nullstr));					
+				} else {
+					zerosupp_ = false;
+					uint8_t n = 0;
+					const char* p = val;
+					while((*p++) != 0) { ++n; }
+					out_str_(val, 0, n);
+				}
 			} else {
 				error_ = error::different;
 			}
