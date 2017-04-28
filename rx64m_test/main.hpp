@@ -12,6 +12,7 @@
 #include "common/spi_io.hpp"
 #include "common/sdc_io.hpp"
 #include "common/command.hpp"
+#include "common/fifo.hpp"
 #include "common/format.hpp"
 #include "common/input.hpp"
 #include "common/time.h"
@@ -66,6 +67,8 @@ namespace seeda {
 	typedef struct chip::LTC2348_SDO_t<LTC_SCKO, LTC_SDO0, LTC_SDO2, LTC_SDO4, LTC_SDO6> LTC_SDO;
 	typedef chip::LTC2348_16<LTC_CSN, LTC_CNV, LTC_BUSY, LTC_PD, LTC_SDI, LTC_SCKI, LTC_SDO> EADC;
 #endif
+
+	typedef utils::fifo<uint16_t, 32, seeda::sample_t>  SAMPLE_FIFO;
 
 	//-----------------------------------------------------------------//
 	/*!

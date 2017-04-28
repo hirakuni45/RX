@@ -12,6 +12,7 @@
 #include "common/string_utils.hpp"
 #include "chip/NTCTH.hpp"
 
+
 #include "GR/core/ethernet.hpp"
 #include "GR/core/ethernet_client.hpp"
 #include "GR/core/ethernet_server.hpp"
@@ -71,51 +72,54 @@ namespace seeda {
 		typedef chip::NTCTH<4095, chip::thermistor::NT103_41G, 10000, true> THMISTER;
 		THMISTER thmister_;
 
+		char		write_path_[32];
+		int32_t		write_count_;
+
+
+		//-------------------------------------------------------------------------//
+
+
+		typedef utils::basic_format<net::eth_chaout> format;
+
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
 			if(fi == nullptr) return;
 
-			net::ethernet_base* base = static_cast<net::ethernet_base*>(option);
+			int fd = reinterpret_cast<int>(option);
 
-			base->print("<tr>");
+			format("<tr>", fd);
 
 			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
 			struct tm *m = localtime(&t);
 			if(dir) {
-				base->print("<td>-</td>");
+				format("<td>-</td>\n", fd);
 			} else {
-				char tmp[32];
-				utils::format("<td>%9d</td>", tmp, sizeof(tmp)) % fi->fsize;
-				base->print(tmp);
+				format("<td>%9d</td>\n", fd) % fi->fsize;
 			}
 			{
-				char tmp[64];
-				utils::format("<td>%s %2d %4d</td>", tmp, sizeof(tmp)) 
+				format("<td>%s %2d %4d</td>\n", fd) 
 					% get_mon(m->tm_mon)
 					% static_cast<int>(m->tm_mday)
 					% static_cast<int>(m->tm_year + 1900);
-				base->print(tmp);
-				utils::format("<td>%02d:%02d</td>", tmp, sizeof(tmp)) 
+				format("<td>%02d:%02d</td>\n", fd) 
 					% static_cast<int>(m->tm_hour)
 					% static_cast<int>(m->tm_min);
-				base->print(tmp);
 				if(dir) {
-					base->print("<td>/");
+					format("<td>/", fd);
 				} else {
-					base->print("<td> ");
+					format("<td> ", fd);
 				}
-				base->print(name);
-				base->print("</td>");
-				base->println("</tr>");
+				format(name, fd);
+				format("</td>", fd);
+				format("</tr>\n", fd);
 			}
 		}
 
 
 		void make_adc_csv_(net::ethernet_base& base, const char* tail)
 		{
-			char tmp[256];
 			for(int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample(ch);
-				utils::format("%d,%d,%d,%d,%d,%d,%d%s", tmp, sizeof(tmp))
+				format("%d,%d,%d,%d,%d,%d,%d%s", base.get_cepid())
 					% ch
 					% static_cast<uint32_t>(t.min_)
 					% static_cast<uint32_t>(t.max_)
@@ -124,39 +128,30 @@ namespace seeda {
 					% static_cast<uint32_t>(t.limit_up_)
 					% static_cast<uint32_t>(t.median_)
 					% tail;
-				base.print(tmp);
 			}
 		}
 
 
 		void send_info_(net::ethernet_base& base, int id, bool keep)
 		{
-			base.print("HTTP/1.1 ");
-			char tmp[10];
-			utils::format("%d", tmp, sizeof(tmp)) % id;
-			base.print(tmp);
-			base.print(" OK");
-			base.println();
-			base.println("Server: seeda/rx64m");
-			base.println("Content-Type: text/html");
-			base.print("Connection: ");
-			if(keep) base.println("keep-alive");
-			else base.println("close");
-			base.println();
+			int fd = base.get_cepid();
+			format("HTTP/1.1 %d OK\n", fd) % id;
+			format("Server: seeda/rx64m\n", fd);
+			format("Content-Type: text/html\n", fd);
+			format("Connection: %s\n\n", fd) % (keep == true ? "keep-alive" : "close");
 		}
 
 
 		void send_head_(net::ethernet_base& base, const char* title)
 		{
-			base.println("<head>");
-			char tmp[256];
-			utils::format("<title>SEEDA %s</title>", tmp, sizeof(tmp)) % title;
-			base.println(tmp);
-			base.println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-			base.println("<meta http-equiv=\"Pragma\" content=\"no-cache\">");
-			base.println("<meta http-equiv=\"Cache-Control\" content=\"no-cache\">");
-			base.println("<meta http-equiv=\"Expires\" content=\"0\">");
-			base.println("</head>");
+			int fd = base.get_cepid();
+			format("<head>\n", fd);
+			format("<title>SEEDA %s</title>\n", fd) % title;
+			format("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n", fd);
+			format("<meta http-equiv=\"Pragma\" content=\"no-cache\">\n", fd);
+			format("<meta http-equiv=\"Cache-Control\" content=\"no-cache\">\n", fd);
+			format("<meta http-equiv=\"Expires\" content=\"0\">\n", fd);
+			format("</head>\n", fd);
 		}
 
 
@@ -177,12 +172,6 @@ namespace seeda {
 			if(static_cast<size_t>(len) < sizeof(tmp)) {
 				line_man_.set_term();
 				if(!line_man_.empty()) {
-#if 0
-					for(uint32_t i = 0; i < line_man_.size(); ++i) {
-						const char* p = line_man_[i];
-						utils::format("%s\n") % p;
-					}
-#endif
 					for(uint32_t i = 0; i < line_man_.size(); ++i) {
 						const char* p = line_man_[i];
 						if(p[0] == 0) {  // 応答の終端！（空行）
@@ -217,7 +206,6 @@ namespace seeda {
 				return;
 			} else {
 				utils::str::conv_html_amp(line_man_[pos], body);
-//				utils::format("CGI Body: '%s'\n") % body;
 			}
 
 			if(strcmp(path, "/cgi/set_rtc.cgi") == 0) {
@@ -259,7 +247,6 @@ namespace seeda {
 						}
 					}
 				}
-//				cgi.list();
 			} else if(strcmp(path, "/cgi/set_client.cgi") == 0) {
 				typedef utils::parse_cgi_post<256, 1> CGI_IP;
 				CGI_IP cgi;
@@ -267,10 +254,26 @@ namespace seeda {
 				for(uint32_t i = 0; i < cgi.size(); ++i) {
 					const auto& t = cgi.get_unit(i);
 					if(strcmp(t.key, "ip") == 0) {
+						utils::format("Set client IP: '%s'\n") % t.val;
 						client_ip_.from_string(t.val);
-						utils::format("Set new client ip: %s\n") % client_ip_.c_str();
 					}
 				}
+			} else if(strcmp(path, "/cgi/set_write.cgi") == 0) {
+				typedef utils::parse_cgi_post<256, 2> CGI_IP;
+				CGI_IP cgi;
+				cgi.parse(body);
+				for(uint32_t i = 0; i < cgi.size(); ++i) {
+					const auto& t = cgi.get_unit(i);
+					if(strcmp(t.key, "fname") == 0) {
+						write_path_[0] = 0;
+						if(t.val != nullptr) strcpy(write_path_, t.val); 
+					} else if(strcmp(t.key, "count") == 0) {
+						write_count_ = 0;
+						utils::input("%d") % write_count_;
+					}
+				}
+				utils::format("Set write file: '%s'\n") % write_path_;
+				utils::format("Set write count: %d\n") % write_count_;;
 			}
 		}
 
@@ -293,303 +296,287 @@ namespace seeda {
 
 		void render_null_(net::ethernet_base& base, const char* title = nullptr)
 		{
+			int fd = base.get_cepid();
+
 			send_info_(base, 200, false);
 
-			base.println("<!DOCTYPE HTML>");
-			base.println("<html>");
+			format("<!DOCTYPE HTML>\n", fd);
+			format("<html>\n", fd);
 			send_head_(base, "NULL");
 
-
 			if(title != nullptr) {
-				base.println(title);
+				format(title, fd);
 			}
-			base.println("</html>");
+			format("</html>\n", fd);
 		}
 
 
 		void render_date_time_(net::ethernet_base& base)
 		{
+			int fd = base.get_cepid();
 			char tmp[128];
 			time_t t = get_time();
 			disp_time(t, tmp, sizeof(tmp));
-			base.print(tmp);
-			base.println("<br>");
+			format("%s<br>\n", fd) % tmp;
 		}
 
 
+		// ビルドバージョン表示
 		void render_version_(net::ethernet_base& base)
-		{  // ビルドバージョン表示
-			char tmp[128];
-			utils::format("Seeda03 Build: %u Version %d.%02d", tmp, sizeof(tmp)) % build_id_
+		{
+			int fd = base.get_cepid();
+			format("Seeda03 Build: %u Version %d.%02d<br>\n", fd) % build_id_
 				% (seeda_version_ / 100) % (seeda_version_ % 100);
-			base.println(tmp);
-			base.println("<br>");
 		}
 
 
 		void render_root_(net::ethernet_base& base)
 		{
+			int fd = base.get_cepid();
 			send_info_(base, 200, false);
 
-			base.println("<!DOCTYPE HTML>");
-			base.println("<html>");
+			format("<!DOCTYPE HTML>\n", fd);
+			format("<html>\n", fd);
 			send_head_(base, "Root/SimpleData");
 
-			{  // コネクション回数表示
-				char tmp[64];
-				utils::format("Conection: %d<br>", tmp, sizeof(tmp)) % count_;
-				base.println(tmp);
-			}
+			// コネクション回数表示
+			format("Conection: %d<br>\n", fd) % count_;
 
 			render_date_time_(base);
 
-			base.println("Sampling: 1[ms]<br>");
+			format("Sampling: 1[ms]<br>\n", fd);
 
-			make_adc_csv_(base, "<br>\r\n");
+			make_adc_csv_(base, "<br>\n");
 
-			base.println("</html>");
+			format("</html>\n", fd);
 		}
 
 
 		// メイン設定画面
 		void render_setup_main_(net::ethernet_base& base)
 		{
+			int fd = base.get_cepid();
 			send_info_(base, 200, false);
 
-			base.println("<!DOCTYPE HTML>");
-			base.println("<html>");
+			format("<!DOCTYPE HTML>\n", fd);
+			format("<html>\n", fd);
 			send_head_(base, "SetupMain");
 
 			render_version_(base);
 
 			render_date_time_(base);
 
-			base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
 
-			base.println("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"リロード\" />");
-			base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"リロード\" />\n", fd);
+			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
 
-			base.println("<input type=\"button\" onclick=\"location.href='/'\" value=\"データ表示\" />");
-			base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+			format("<input type=\"button\" onclick=\"location.href='/data'\" value=\"データ表示\" />\n", fd);
+			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
 
 			{  // 内臓 A/D 表示
-				char tmp[128];
 				float v = static_cast<float>(get_adc(5)) / 4095.0f * 3.3f;
-				utils::format("バックアップ電池電圧： %4.2f [V]", tmp, sizeof(tmp)) % v;
-				base.println(tmp);
-				base.println("<br>");
-				base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+				format("バックアップ電池電圧： %4.2f [V]<br>\n", fd) % v;
+				format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
 			}
-
-//			base.println("<font size=\"4\">");
-//			base.println("</font>");
 
 			// RTC 設定
 			{
-				base.println("<form method=\"POST\" action=\"/cgi/set_rtc.cgi\">");
+				format("<form method=\"POST\" action=\"/cgi/set_rtc.cgi\">\n", fd);
 				auto t = get_time();
 				struct tm *m = localtime(&t);
-				char tmp[256];
-				utils::format("<div>年月日(yyyy/mm/dd)：<input type=\"text\" name=\"date\" size=\"10\" value=\"%d/%d/%d\" /></div>", tmp, sizeof(tmp))
+				format("<div>年月日(yyyy/mm/dd)：<input type=\"text\" name=\"date\" size=\"10\" value=\"%d/%d/%d\" /></div>\n", fd)
 					% static_cast<int>(m->tm_year + 1900) % static_cast<int>(m->tm_mon + 1) % static_cast<int>(m->tm_mday);
-				base.println(tmp);
-				utils::format("<div>時間　(hh:mm[:ss])：<input type=\"text\" name=\"time\" size=\"8\" value=\"%d:%d\" /></div>", tmp, sizeof(tmp))
+				format("<div>時間　(hh:mm[:ss])：<input type=\"text\" name=\"time\" size=\"8\" value=\"%d:%d\" /></div>\n", fd)
 					% static_cast<int>(m->tm_hour) % static_cast<int>(m->tm_min);
-				base.println(tmp);
-				base.println("<input type=\"submit\" value=\"ＲＴＣ設定\" />");
-				base.println("</form>");
-				base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+				format("<input type=\"submit\" value=\"ＲＴＣ設定\" />\n", fd);
+				format("</form>\n", fd);
+				format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
 			}
 
 			// 閾値設定
 			{
-				base.println("<form method=\"POST\" action=\"/cgi/set_level.cgi\">");
+				format("<form method=\"POST\" action=\"/cgi/set_level.cgi\">\n", fd);
 				static const char* ch16[] = { "０", "１", "２", "３", "４", "５", "６", "７" };
 				for (int ch = 0; ch < 8; ++ch) {
 					const auto& t = get_sample(ch);
-					char tmp[256];
-					utils::format("<div>チャネル%s：<input type=\"text\" name=\"level_ch%d\" size=\"6\" value=\"%d\"  /></div>", tmp, sizeof(tmp))
+					format("<div>チャネル%s：<input type=\"text\" name=\"level_ch%d\" size=\"6\" value=\"%d\"  /></div>\n", fd)
 						% ch16[ch] % ch % static_cast<int>(t.limit_level_);
-					base.println(tmp);
 				}
-				base.println("<input type=\"submit\" value=\"Ａ／Ｄ変換閾値設定\" />");
-				base.println("</form>");
+				format("<input type=\"submit\" value=\"Ａ／Ｄ変換閾値設定\" />\n", fd);
+				format("</form>\n", fd);
 
-				base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+				format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
 			}
 
 			// ＳＤカード操作画面へのボタン
-			base.println("<input type=\"button\" onclick=\"location.href='/files'\" value=\"ＳＤカード\" />");
-			base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+			format("<input type=\"button\" onclick=\"location.href='/files'\" value=\"ＳＤカード\" />\n", fd);
+			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
 
-			base.println("</html>");
+			// ファイル書き込み設定
+			{
+				format("<form method=\"POST\" action=\"/cgi/set_write.cgi\">\n", fd);
+				char tmp[16];
+				utils::format("test.cvs", tmp, sizeof(tmp));
+				format("<div>ファイル名：<input type=\"text\" name=\"fname\" size=\"16\" value=\"%s\" /></div>\n", fd)
+				% tmp;
+				format("<div>書き込み数（秒）：<input type=\"text\" name=\"count\" size=\"16\" value=\"%s\" /></div>\n", fd)
+				% tmp;
+				format("<input type=\"submit\" value=\"ファイル書き込み設定\" />\n", fd);
+				format("</form>\n", fd);
+
+				format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
+			}
+
+			format("</html>\n", fd);
 		}
 
 
 		// クライアント設定画面
 		void render_setup_client_(net::ethernet_base& base)
 		{
+			int fd = base.get_cepid();
 			send_info_(base, 200, false);
 
-			base.println("<!DOCTYPE HTML>");
-			base.println("<html>");
+			format("<!DOCTYPE HTML>\n", fd);
+			format("<html>\n", fd);
 			send_head_(base, "SetupClient");
 
 			render_version_(base);
 
 			render_date_time_(base);
 
-			base.println("<hr align=\"left\" width=\"400\" size=\"3\" />");
+			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
 
 			// クライアント
-			{
-				base.println("<form method=\"POST\" action=\"/cgi/set_client.cgi\">");
-				char tmp[256];
-				utils::format("<div>クライアント IP：<input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\" /></div>", tmp, sizeof(tmp))
-					% static_cast<int>(client_ip_[0])
-					% static_cast<int>(client_ip_[1])
-					% static_cast<int>(client_ip_[2])
-					% static_cast<int>(client_ip_[3]);
-				base.println(tmp);
-				base.println("<input type=\"submit\" value=\"クライアント設定\" />");
-				base.println("</form>");
-			}
+			format("<form method=\"POST\" action=\"/cgi/set_client.cgi\">\n", fd);
+			format("<div>クライアント IP：<input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\" /></div>\n", fd)
+				% static_cast<int>(client_ip_[0])
+				% static_cast<int>(client_ip_[1])
+				% static_cast<int>(client_ip_[2])
+				% static_cast<int>(client_ip_[3]);
+			format("<input type=\"submit\" value=\"クライアント設定\" />\n", fd);
+			format("</form>\n", fd);
 
-			base.println("</html>");
+			format("</html>\n", fd);
 		}
 
 
 		void render_files_(net::ethernet_base& base)
 		{
+			int fd = base.get_cepid();
 			send_info_(base, 200, false);
 
-			base.println("<!DOCTYPE HTML>");
-			base.println("<html>");
+			format("<!DOCTYPE HTML>\n", fd);
+			format("<html>\n", fd);
 			send_head_(base, "SD Files");
 
-			base.println("<style type=\"text/css\">");
-			base.println(".table3 {");
-			base.println("  border-collapse: collapse;");
-			base.println("  width: 500px;");
-			base.println("}");
-			base.println(".table3 th {");
-			base.println("  background-color: #cccccc;");
-			base.println("}");
-			base.println("</style>");
-			base.println("<table class=\"table3\" border=1>");
-			base.println("<tr><th>Size</th><th>Date</th><th>Time</th><th>Name</th></tr>");
-			at_sdc().dir_loop("", dir_list_func_, true, &base);
-			base.println("</table>");
+			format("<style type=\"text/css\">\n", fd);
+			format(".table3 {\n", fd);
+			format("  border-collapse: collapse;\n", fd);
+			format("  width: 500px;\n", fd);
+			format("}\n", fd);
+			format(".table3 th {\n", fd);
+			format("  background-color: #cccccc;\n", fd);
+			format("}\n", fd);
+			format("</style>\n", fd);
+			format("<table class=\"table3\" border=1>\n", fd);
+			format("<tr><th>Size</th><th>Date</th><th>Time</th><th>Name</th></tr>\n", fd);
+			at_sdc().dir_loop("", dir_list_func_, true, reinterpret_cast<void*>(fd));
+			format("</table>\n", fd);
 
-			base.println("<br>");
-			base.println("<hr align=\"left\" width=\"600\" size=\"3\" />");
-			base.println("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\" />");
+			format("<br>\n", fd);
+			format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\" />\n", fd);
 
-			base.println("</html>");
+			format("</html>\n", fd);
 		}
 
 
 		void render_data_(net::ethernet_base& base)
 		{
+			int fd = base.get_cepid();
 			send_info_(base, 200, false);
-			// base.println("Refresh: 5");  // refresh the page automatically every 5 sec
+			// format("Refresh: 5\n", fd);  // refresh the page automatically every 5 sec
 
-			base.println("<!DOCTYPE HTML>");
-			base.println("<html>");
+			format("<!DOCTYPE HTML>\n", fd);
+			format("<html>\n", fd);
 			send_head_(base, "Data");
 
-			base.println("<font size=\"4\">");
-			{  // コネクション回数表示
-				char tmp[128];
-				utils::format("Conection: %d", tmp, sizeof(tmp)) % count_;
-				base.print(tmp);
-				base.println("<br>");
-			}
+			format("<font size=\"4\">\n", fd);
+			// コネクション回数表示
+			format("Conection: %d<br>\n", fd) % count_;
 
 			render_date_time_(base);
 
-			base.println("サンプリング周期： 1[ms]");
-			base.println("<br>");
+			format("サンプリング周期： 1[ms]<br>\n", fd);
 
-			base.println("</font>");
+			format("</font>\n", fd);
 
 			{  // 内臓 A/D 表示（湿度、温度）
-				char tmp[64];
 				auto v = get_adc(6);
-				utils::format("温度： %5.2f [度]", tmp, sizeof(tmp)) % thmister_(v);
-				base.println(tmp);
-				base.println("<hr align=\"left\" width=\"600\" size=\"3\" />");
+				format("温度： %5.2f [度]\n", fd) % thmister_(v);
+				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
 			}
 
-			base.println("<style type=\"text/css\">");
-			base.println(".table5 {");
-			base.println("  border-collapse: collapse;");
-			base.println("  width: 500px;");
-			base.println("}");
-			base.println(".table5 th {");
-			base.println("  background-color: #cccccc;");
-			base.println("}");
-			base.println(".table5 td {");
-			base.println("  text-align: center;");
-			base.println("}");
-			base.println("</style>");
+			format("<style type=\"text/css\">\n", fd);
+			format(".table5 {\n", fd);
+			format("  border-collapse: collapse;\n", fd);
+			format("  width: 500px;\n", fd);
+			format("}\n", fd);
+			format(".table5 th {\n", fd);
+			format("  background-color: #cccccc;\n", fd);
+			format("}\n", fd);
+			format(".table5 td {\n", fd);
+			format("  text-align: center;\n", fd);
+			format("}\n", fd);
+			format("</style>\n", fd);
 
-			base.println("<table class=\"table5\" border=1>");
-			base.println(" <tr><th>チャネル</th><th>最小値</th><th>最大値</th><th>平均</th>"
-					  "<th>基準値</th><th>カウント</th><th>Median</th></tr>");
+			format("<table class=\"table5\" border=1>\n", fd);
+			format(" <tr><th>チャネル</th><th>最小値</th><th>最大値</th><th>平均</th>"
+					  "<th>基準値</th><th>カウント</th><th>Median</th></tr>\n", fd);
 			for (int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample(ch);
-				base.print(" <tr>");
-				char tmp[128];
-				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % ch;
-				base.print(tmp);
-///				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.value_);
-///				base.print(tmp);
-				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.min_);
-				base.print(tmp);
-				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.max_);
-				base.print(tmp);
-				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.average_);
-				base.print(tmp);
-				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.limit_level_);
-				base.print(tmp);
-				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.limit_up_);
-				base.print(tmp);
-				utils::format("<td>%d</td>", tmp, sizeof(tmp)) % static_cast<uint32_t>(t.median_);
-				base.print(tmp);
-				base.println("</tr>");
+				format(" <tr>\n", fd);
+				format("<td>%d</td>", fd) % ch;
+				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.min_);
+				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.max_);
+				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.average_);
+				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.limit_level_);
+				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.limit_up_);
+				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.median_);
+				format("</tr>\n", fd);
 			}
-			base.println("</table>");
+			format("</table>\n", fd);
 
-			base.println("<br>");
+			format("<br>\n", fd);
 
-			base.println("<hr align=\"left\" width=\"600\" size=\"3\" />");
-			base.println("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\" />");
+			format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\" />\n", fd);
 
-			base.println("</html>");
+			format("</html>\n", fd);
 		}
 
 
 		void send_file_(net::ethernet_base& base, const char* path)
 		{
+			int fd = base.get_cepid();
 			FILE* fp = fopen(path, "rb");
 			if(fp != nullptr) {
-				base.println("HTTP/1.1 200 OK");
-				base.print("Content-Type: ");
+				format("HTTP/1.1 200 OK\n", fd);
+				format("Content-Type: ", fd);
 				const char* ext = strrchr(path, '.');
 				if(ext != nullptr) {
 					++ext;
 					if(strcmp(ext, "png") == 0 || strcmp(ext, "jpeg") == 0 || strcmp(ext, "jpg") == 0) {
-						base.print("image/");
+						format("image/%s\n", fd) % ext;
 					} else {
-						base.print("text/");
+						format("text/%s\n", fd) % ext;
 					}
-					base.println(ext);
 				} else {
-					base.println("text/plain");
+					format("text/plain\n", fd);
 				}
-				base.println("Connection: close");
-				base.println();
+				format("Connection: close\n\n", fd);
 				uint8_t tmp[512];
 				uint32_t total = 0;
 				uint32_t len;
@@ -620,6 +607,34 @@ namespace seeda {
 		}
 
 
+		void make_client_data_(char* dst)
+		{
+#if 0
+			t = get_time();
+			if(client_time_ == t) break;
+			client_time_ = t;
+			{
+				char tmp[128];
+				time_t t = get_time();
+				disp_time(t, tmp, sizeof(tmp));
+				format("%s", client_.get_cepid()) % tmp;
+			}
+			for(int ch = 0; ch < 8; ++ch) {
+				const auto& t = get_sample(ch);
+				format("%d,%d,%d,%d,%d,%d,%d%s", base.get_cepid())
+					% ch
+					% static_cast<uint32_t>(t.min_)
+					% static_cast<uint32_t>(t.max_)
+					% static_cast<uint32_t>(t.average_)
+					% static_cast<uint32_t>(t.limit_level_)
+					% static_cast<uint32_t>(t.limit_up_)
+					% static_cast<uint32_t>(t.median_)
+					% tail;
+			}
+#endif
+		}
+
+
 		// 指定のアドレス、ポートに定期的に、Ａ／Ｄ変換データを送る。
 		void service_client_()
 		{
@@ -644,6 +659,7 @@ namespace seeda {
 					client_task_ = client_task::disconnect;
 					break;
 				}
+
 				t = get_time();
 				if(client_time_ == t) break;
 				client_time_ = t;
@@ -651,13 +667,12 @@ namespace seeda {
 					char tmp[128];
 					time_t t = get_time();
 					disp_time(t, tmp, sizeof(tmp));
-					client_.println(tmp);
+					format("%s", client_.get_cepid()) % tmp;
 				}
 				{
 					make_adc_csv_(client_, "\n");
-///					client_.print("end\n");
-///					client_task_ = client_task::disconnect;
 				}
+
 				break;
 			
 			case client_task::disconnect:
@@ -666,6 +681,12 @@ namespace seeda {
 				client_task_ = client_task::connection;
 				break;
 			}
+		}
+
+
+		void write_service_()
+		{
+
 		}
 
 	public:
@@ -681,9 +702,10 @@ namespace seeda {
 #ifdef SEEDA
 			client_ip_(192, 168, 1, 3),
 #else
-			client_ip_(192, 168, 3, 4),
+			client_ip_(192, 168, 3, 5),
 #endif
-			client_time_(0) { }
+			client_time_(0),
+			write_path_{ 0 }, write_count_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -855,6 +877,8 @@ namespace seeda {
 			}
 
 			ftp_.service();
+
+			write_service_();
 		}
 
 

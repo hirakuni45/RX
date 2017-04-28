@@ -28,9 +28,10 @@ namespace {
 	seeda::sample	sample_[8];
 	seeda::sample_t	sample_t_[8];
 
-///	bool	config_;
+	volatile bool	enable_eadc_;
 
-	volatile bool enable_eadc_;
+	seeda::SAMPLE_FIFO	sample_buff_;
+
 
 	void main_init_()
 	{
@@ -149,10 +150,16 @@ namespace seeda {
 	{
 		if(!enable_eadc_) return;
 
+#ifdef SEEDA
 		eadc_.convert();
 		for(int i = 0; i < 8; ++i) {
 			sample_[i].add(eadc_.get_value(i));
 		}
+#else
+		for(int i = 0; i < 8; ++i) {
+			sample_[i].add(32767 + ((rand() & 255) - 127));
+		}
+#endif
 		++sample_count_;
 		if(sample_count_ >= 1000) {
 			for(int i = 0; i < 8; ++i) {

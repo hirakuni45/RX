@@ -34,9 +34,9 @@ namespace seeda {
 				millis_(0), delay_(0), millis10x_(0), cmtdiv_(0) { }
 
 			void operator() () {
-#ifdef SEEDA
+
 				eadc_server();
-#endif
+
 				++millis_;
 				++cmtdiv_;
 				if(cmtdiv_ >= 10) {
