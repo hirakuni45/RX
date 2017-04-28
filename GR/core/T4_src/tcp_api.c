@@ -36,7 +36,8 @@ extern const H __udpcepn;
 #endif
 
 #if defined(_ETHER)
-extern UH const _ip_tblcnt[];
+/// extern UH const _ip_tblcnt[];
+extern UH const _ip_tblcnt;
 _ARP_ENTRY   **_ether_arp_tbl;
 #endif
 #if defined(_PPP)
@@ -148,7 +149,8 @@ void tcpudp_open(uint32_t *workp)
 
 	for(int counter = 0; counter < _t4_channel_num; counter++) {
 		*(_ether_arp_tbl + counter) = ((_ARP_ENTRY *)currp);
-		currp = (uint32_t *)((uint8_t *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
+///		currp = (uint32_t *)((uint8_t *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
+		currp = (uint32_t *)((uint8_t *)currp + _ip_tblcnt * sizeof(_ARP_ENTRY));
 	}
 
 	_ether_arp_init();
@@ -214,7 +216,8 @@ static uint32_t get_ether_memory_size_(void)
 	uint32_t ramsize = 0;
 	ramsize += _t4_channel_num * sizeof(_ARP_ENTRY *);
 	for(int count = 0; count < _t4_channel_num; count++) {
-		ramsize += (_ip_tblcnt[count] * sizeof(_ARP_ENTRY));
+///		ramsize += (_ip_tblcnt[count] * sizeof(_ARP_ENTRY));
+		ramsize += (_ip_tblcnt * sizeof(_ARP_ENTRY));
 	}
     get_align_memory_size_(&ramsize);
 

@@ -92,10 +92,10 @@ UB    _tcp_dack = 1;
 /***  Definition of UDP communication end point  ***/
 
 T_UDP_CCEP udp_ccep[] = {
-        { 0x0000, { 0, 1365 }, t4_udp_callback },
-        { 0x0000, { 0, 1365 }, t4_udp_callback },
-        { 0x0000, { 0, 1365 }, t4_udp_callback },
-        { 0x0000, { 0, 1365 }, t4_udp_callback },
+    { 0x0000, { 0, 1365 }, t4_udp_callback },
+    { 0x0000, { 0, 1365 }, t4_udp_callback },
+    { 0x0000, { 0, 1365 }, t4_udp_callback },
+    { 0x0000, { 0, 1365 }, t4_udp_callback },
 };
 
 /* Total number of UDP communication end points */

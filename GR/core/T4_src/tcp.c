@@ -66,7 +66,8 @@ Private global variables and functions
 
 #if defined(_ETHER)
 extern UB *_ether_p_rcv_buff;
-extern const UH  _ip_tblcnt[];
+/// extern const UH  _ip_tblcnt[];
+extern const UH  _ip_tblcnt;
 #endif /* _ETHER */
 
 #if defined(_TCP)
@@ -1580,7 +1581,8 @@ void _proc_snd(void)
             ae = _ether_arp_tbl[counter];
             _ch_info_tbl = &_ch_info_head[counter];
 
-            for (i = 0; i < _ip_tblcnt[counter]; i++, ae++)
+///            for (i = 0; i < _ip_tblcnt[counter]; i++, ae++)
+            for (i = 0; i < _ip_tblcnt; i++, ae++)
             {
                 if (((ae->ae_state == AS_RESOLVED)
                         || (ae->ae_state == AS_PENDING)) && (ae->ae_ttl > 0))
