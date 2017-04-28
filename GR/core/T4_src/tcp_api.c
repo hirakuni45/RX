@@ -21,7 +21,6 @@
 #include "core/driver/driver.h"
 
 
-extern const UB _t4_channel_num;
 extern _TCB   *_tcp_tcb;
 extern _TCB   *head_tcb;
 extern TCPUDP_ENV tcpudp_env[];
@@ -124,7 +123,7 @@ void tcpudp_open(uint32_t *workp)
 
 	_ch_info_tbl = (_CH_INFO*)currp;
 	_ch_info_head = (_CH_INFO*)currp;
-	for(int counter = 0;counter < _t4_channel_num; counter++) {
+	for(int counter = 0;counter < TCPUDP_CHANNEL_NUM; counter++) {
 		_ch_info_head[counter]._ch_num = counter;
 		_ch_info_head[counter].flag = 0;
 		_ch_info_head[counter]._rcvd = 0;
@@ -135,7 +134,7 @@ void tcpudp_open(uint32_t *workp)
 		memcpy(_ch_info_head[counter]._mymaskaddr, tcpudp_env[counter].maskaddr, IP_ALEN);
 		memcpy(_ch_info_head[counter]._mygwaddr, tcpudp_env[counter].gwaddr, IP_ALEN);
 	}
-	currp = (uint32_t*)((uint8_t*)currp + (sizeof(_CH_INFO) * _t4_channel_num));
+	currp = (uint32_t*)((uint8_t*)currp + (sizeof(_CH_INFO) * TCPUDP_CHANNEL_NUM));
 
 #if defined(_PPP)
 	ppp_sio_status    = 0;
@@ -145,9 +144,9 @@ void tcpudp_open(uint32_t *workp)
 #elif defined(_ETHER)
 	_ether_arp_tbl = (_ARP_ENTRY **)currp;
 
-	currp = (uint32_t *)((uint8_t *)currp + _t4_channel_num * sizeof(_ARP_ENTRY *));
+	currp = (uint32_t *)((uint8_t *)currp + TCPUDP_CHANNEL_NUM * sizeof(_ARP_ENTRY *));
 
-	for(int counter = 0; counter < _t4_channel_num; counter++) {
+	for(int counter = 0; counter < TCPUDP_CHANNEL_NUM; counter++) {
 		*(_ether_arp_tbl + counter) = ((_ARP_ENTRY *)currp);
 ///		currp = (uint32_t *)((uint8_t *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
 		currp = (uint32_t *)((uint8_t *)currp + _ip_tblcnt * sizeof(_ARP_ENTRY));
@@ -205,7 +204,7 @@ static uint32_t get_udp_memory_size_(void)
 static uint32_t get_ip_memory_size_(void)
 {
     uint32_t ramsize = 0;
-    ramsize += (_t4_channel_num * sizeof(_CH_INFO));
+    ramsize += (TCPUDP_CHANNEL_NUM * sizeof(_CH_INFO));
     return ramsize;
 }
 
@@ -214,8 +213,8 @@ static uint32_t get_ip_memory_size_(void)
 static uint32_t get_ether_memory_size_(void)
 {
 	uint32_t ramsize = 0;
-	ramsize += _t4_channel_num * sizeof(_ARP_ENTRY *);
-	for(int count = 0; count < _t4_channel_num; count++) {
+	ramsize += TCPUDP_CHANNEL_NUM * sizeof(_ARP_ENTRY *);
+	for(int count = 0; count < TCPUDP_CHANNEL_NUM; count++) {
 ///		ramsize += (_ip_tblcnt[count] * sizeof(_ARP_ENTRY));
 		ramsize += (_ip_tblcnt * sizeof(_ARP_ENTRY));
 	}

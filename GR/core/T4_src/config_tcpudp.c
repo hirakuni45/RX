@@ -44,11 +44,9 @@ extern int t4_udp_callback(ID cepid, FN fncd , void *p_parblk);
 /****************************************************************************/
 /**********************     TCP-related definition     **********************/
 /****************************************************************************/
-/* Number of LAN port, Number of Serial port */
-const UB _t4_channel_num = 6;
 
 /***  Definition of TCP reception point (only port number needs to be set) ***/
-T_TCP_CREP tcp_crep[] = {
+T_TCP_CREP tcp_crep[TCPUDP_CHANNEL_NUM] = {
 	{ 0x0000, { 0, 80 } },
 	{ 0x0000, { 0, 80 } },
 	{ 0x0000, { 0, 80 } },
@@ -62,7 +60,7 @@ const H __tcprepn = sizeof(tcp_crep) / sizeof(T_TCP_CREP);
 
 /***  Definition of TCP communication end point
       (only receive window size needs to be set) ***/
-T_TCP_CCEP tcp_ccep[] = {
+T_TCP_CCEP tcp_ccep[TCPUDP_CHANNEL_NUM] = {
     { 0, 0, 0, 0, 1460, 0 },
     { 0, 0, 0, 0, 1460, 0 },
     { 0, 0, 0, 0, 1460, 0 },
@@ -95,7 +93,7 @@ UB    _tcp_dack = 1;
 /****************************************************************************/
 /***  Definition of UDP communication end point  ***/
 
-T_UDP_CCEP udp_ccep[] = {
+T_UDP_CCEP udp_ccep[TCPUDP_CHANNEL_NUM] = {
     { 0x0000, { 0, 1365 }, t4_udp_callback },
     { 0x0000, { 0, 1365 }, t4_udp_callback },
     { 0x0000, { 0, 1365 }, t4_udp_callback },

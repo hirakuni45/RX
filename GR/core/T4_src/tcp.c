@@ -1,34 +1,10 @@
-/***********************************************************************************************************************
-* DISCLAIMER
-* This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
-* other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
-* applicable laws, including copyright laws.
-* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
-* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
-* EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
-* SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
-* SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-* Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
-* this software. By using this software, you agree to the additional terms and conditions found by accessing the
-* following link:
-* http://www.renesas.com/disclaimer
-*
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
-***********************************************************************************************************************/
-/***********************************************************************************************************************
-* File Name    : tcp.c
-* Version      : 1.0
-* Description  : Processing for TCP protocol
-***********************************************************************************************************************/
-/**********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Includes   <System Includes> , "Project Includes"
-***********************************************************************************************************************/
+//=====================================================================//
+/*!	@file
+	@brief	TCP @n
+			Copyright 2017 Kunihito Hiramatsu
+	@author	ïΩèºñMêm (hira@rvf-rc45.net)
+*/
+//=====================================================================//
 #include "net_config.h"
 #include <string.h>
 #include "type.h"
@@ -43,17 +19,9 @@ Includes   <System Includes> , "Project Includes"
 #include "udp.h"
 #include "core/driver/driver.h"
 
-/***********************************************************************************************************************
-Macro definitions
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Typedef definitions
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
+/*******************************************************************************************************
 Exported global variables (to be accessed by other files)
-***********************************************************************************************************************/
+*******************************************************************************************************/
 _TCB  *_tcp_tcb;    /* TCB (Transport Control Block) pointer */
 _TCB  *head_tcb;    /* TCB head pointer */
 _TX_HDR  _tx_hdr;    /* TCP transmit header area */
@@ -71,7 +39,6 @@ extern const UH  _ip_tblcnt;
 #endif /* _ETHER */
 
 #if defined(_TCP)
-extern const UB _t4_channel_num;
 extern const UH  _tcp_mss[];
 extern UW  _tcp_initial_seqno[];
 extern const UH  _tcp_2msl[];
@@ -209,14 +176,14 @@ void _process_tcpip(void)
                 }
             }
 #endif
-            for (counter = 0 ; counter < _t4_channel_num ; counter++)
+            for (counter = 0 ; counter < TCPUDP_CHANNEL_NUM; counter++)
             {
                 if ((_ch_info_head[counter]._rcvd == 1) && ((_ch_info_head[counter].flag & _TCBF_SND_ICMP) == 0))
                 {
                     break;
                 }
             }
-            if (counter >= _t4_channel_num)
+            if (counter >= TCPUDP_CHANNEL_NUM)
             {
                 break;
             }
@@ -692,7 +659,7 @@ void _proc_rcv(void)
 
     _tcp_tcb = head_tcb;
 
-    for (ch = 0; ch < _t4_channel_num; ch++)
+    for (ch = 0; ch < TCPUDP_CHANNEL_NUM; ch++)
     {
         _ch_info_tbl = &_ch_info_head[ch];
         _ether_proc_rcv();
@@ -828,7 +795,7 @@ void _proc_rcv(void)
 _err_proc_rcv:
         rcv_buff_release(_ch_info_tbl->_ch_num);
         _ch_info_tbl->_p_rcv_buf.len = 0;
-    }    /* for(ch = 0; ch < _t4_channel_num; ch++) */
+    }
 
     return;
 }
@@ -1576,7 +1543,7 @@ void _proc_snd(void)
         _tcp_pre_timer_cnt = _tcp_timer_cnt;
 
 #if defined(_ETHER)
-        for (counter = 0;counter < _t4_channel_num; counter++)
+        for (counter = 0;counter < TCPUDP_CHANNEL_NUM; counter++)
         {
             ae = _ether_arp_tbl[counter];
             _ch_info_tbl = &_ch_info_head[counter];
@@ -1761,7 +1728,7 @@ void _proc_snd(void)
 
     }
 
-    for (counter = 0; counter < _t4_channel_num; counter++)
+    for (counter = 0; counter < TCPUDP_CHANNEL_NUM; counter++)
     {
         _ch_info_tbl = &_ch_info_head[counter];
 
@@ -1818,7 +1785,7 @@ void _proc_snd(void)
 #endif
         }
 #endif
-    }  /* for(counter = 0; counter < _t4_channel_num; counter++) */
+    }
 
     for (counter = 0; counter != __tcpcepn;counter++)
     {

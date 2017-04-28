@@ -64,7 +64,6 @@ typedef utils::basic_format<utils::def_chaout> debug_format;
 #define UDP_TX_PACKET_MAX_SIZE  24
 
 extern _TCB   *head_tcb;
-extern UB _t4_channel_num;
 extern T_TCP_CREP tcp_crep[];
 extern T_TCP_CCEP tcp_ccep[];
 extern T_UDP_CCEP udp_ccep[];
@@ -93,7 +92,6 @@ namespace net {
 	class ethernet {
 
 	public:
-		static const uint32_t max_connection = 4;
 		static const uint32_t TCP_MSS = 1460;
 
 		struct CEP {
@@ -113,7 +111,7 @@ namespace net {
 		};
 
 	private:
-		CEP			cep_[max_connection];
+		CEP			cep_[TCPUDP_CHANNEL_NUM];
 
 		uint32_t	tcpudp_work_[2700];
 
@@ -168,6 +166,7 @@ namespace net {
 				utils::format("empty tcpudp RAM size: need(%d), real(%d)\n") % size % real;
                 while(1);
             }
+			utils::format("tcpudp RAM size: need(%d), real(%d)\n") % size % real;
 
 			tcpudp_open(tcpudp_work_);
             debug_format("tcpudp_open()\n");
@@ -213,7 +212,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		uint32_t new_connection()
 		{
-			for(uint32_t i = 0; i < max_connection; ++i) {
+			for(uint32_t i = 0; i < TCPUDP_CHANNEL_NUM; ++i) {
 				if(!cep_[i].enable) {
 					cep_[i].enable = true;
 					return i + 1;
@@ -231,7 +230,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void end_connection(uint32_t cepid)
 		{
-			if(cepid > 0 && cepid <= max_connection) {
+			if(cepid > 0 && cepid <= TCPUDP_CHANNEL_NUM) {
 				cep_[cepid - 1].call_flag = false;
 				cep_[cepid - 1].enable = false;
 			}
@@ -526,7 +525,7 @@ namespace net {
         }
 
 
-		static int udp_callback(ID cepid, FN fncd , void *p_parblk)
+		static int udp_callback(uint32_t cepid, FN fncd , void *p_parblk)
 		{
 			union _recvSiz {
 				int  dword;          /*typedef int32_t W;typedef W ER*/
@@ -540,7 +539,7 @@ namespace net {
 			byteq_err_t byteq_err;
 			uint16_t count;
 
-			if(cepid > 0 && cepid <= static_cast<ID>(max_connection)) { 
+			if(cepid > 0 && cepid <= static_cast<uint32_t>(TCPUDP_CHANNEL_NUM)) { 
 				switch (fncd){
 				/// UDP data received
 				case TEV_UDP_RCV_DAT:
@@ -601,6 +600,8 @@ namespace net {
 
 		static int32_t write(uint32_t cepid, const void* buffer, uint32_t size)
 		{
+			if(buffer == nullptr || size == 0) return 0;
+
 			int32_t ercd;
 			uint32_t current_send_size = 0;
 
@@ -632,40 +633,66 @@ namespace net {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class eth_chaout {
+		char		tmp_[256];
 		int			fd_;
-		char		tmp_[512];
 		uint32_t	pos_;
+		uint32_t	len_;
 
 		void out_(char ch) {
 			tmp_[pos_] = ch;
 			++pos_;
-			if(pos_ >= sizeof(tmp_)) {
+			++len_;
+			if(ch == '\n' || pos_ >= sizeof(tmp_)) {
 				ethernet::write(fd_, tmp_, pos_);
 				pos_ = 0;
 			}
 		}
 	public:
-		eth_chaout(int fd) : fd_(fd), pos_(0) {
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクタ
+			@param[in]	fd	識別子
+		*/
+		//-----------------------------------------------------------------//
+		eth_chaout(int fd) : fd_(fd), pos_(0), len_(0) {
 			if(fd_ <= 0) {
-				utils::format("FTP FD Fail: %d\n") % fd_;
+				utils::format("Eth fd fail: %d\n") % fd_;
 			}
 		}
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  デストラクタ
+		*/
+		//-----------------------------------------------------------------//
 		~eth_chaout() {
 			if(pos_ > 0) {
 				ethernet::write(fd_, tmp_, pos_);
 			}
 		}
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  () オペレーター
+			@param[in]	ch	文字
+		*/
+		//-----------------------------------------------------------------//
 		void operator() (char ch) {
 			if(ch == '\n') {
 				out_('\r');
 			}
 			out_(ch);
-			if(ch == '\n' && pos_ != 0) {
-				ethernet::write(fd_, tmp_, pos_);
-				pos_ = 0;
-			}
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  文字数を返す
+			@return 文字数
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_length() const { return len_; }
 	};
 }
