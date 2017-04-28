@@ -58,6 +58,23 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  設定
+			@param[in]	first	IP 1ST
+			@param[in]	second	IP 2ND
+			@param[in]	third	IP 3RD
+			@param[in]	fourth	IP 4TH
+		*/
+		//-----------------------------------------------------------------//
+		void set(uint8_t first, uint8_t second, uint8_t third, uint8_t fourth) {
+			address_.bytes[0] = first;
+			address_.bytes[1] = second;
+			address_.bytes[2] = third;
+			address_.bytes[3] = fourth;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  配列から設定
 			@param[in]	address	配列
 		*/
