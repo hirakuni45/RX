@@ -1,8 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	FIFO (first in first out) @n
-			Copyright 2016 Kunihito Hiramatsu
+	@brief	FIFO (first in first out) テンプレート @n
+			Copyright 2016,2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -15,12 +15,12 @@ namespace utils {
         @brief  fifo クラス
 		@param[in]	T		ポインター・タイプ
 		@param[in]	SIZE	バッファサイズ（最大６５５３６）
+		@param[in]	DT		データ・タイプ
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <typename T, uint16_t SIZE>
+	template <typename T, uint16_t SIZE, typename DT = char>
 	class fifo {
 
-		typedef char DT;
 		typedef T PTS;
 
 		volatile PTS	get_ = 0;
@@ -116,5 +116,4 @@ namespace utils {
         //-----------------------------------------------------------------//
 		uint16_t size() const { return SIZE; }
 	};
-
 }
