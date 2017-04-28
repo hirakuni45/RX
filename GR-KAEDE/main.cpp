@@ -31,12 +31,16 @@ namespace {
 	seeda::sample	sample_[8];
 	seeda::sample_t	sample_t_[8];
 
-///	bool	config_;
+	volatile bool	enable_eadc_;
+
+	seeda::SAMPLE_FIFO	sample_buff_;
 
 	void main_init_()
 	{
 		// RTC 設定
 		rtc_.start();
+
+		enable_eadc_ = false;
 
 #ifdef SEEDA
 		{  // LTC2348ILX-16 初期化
@@ -148,7 +152,7 @@ namespace seeda {
 			% static_cast<uint32_t>(m->tm_year + 1900);
 	}
 
-#ifdef SEEDA
+
 	//-----------------------------------------------------------------//
 	/*!
 		@brief  EADC サーバー
@@ -156,10 +160,18 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	void eadc_server()
 	{
+		if(!enable_eadc_) return;
+
+#ifdef SEEDA
 		eadc_.convert();
 		for(int i = 0; i < 8; ++i) {
 			sample_[i].add(eadc_.get_value(i));
 		}
+#else
+		for(int i = 0; i < 8; ++i) {
+			sample_[i].add(32767 + ((rand() & 255) - 127));
+		}
+#endif
 		++sample_count_;
 		if(sample_count_ >= 1000) {
 			for(int i = 0; i < 8; ++i) {
@@ -170,7 +182,19 @@ namespace seeda {
 			sample_count_ = 0;
 		}
 	}
-#endif
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  EADC サーバー許可
+		@param[in]	ena	「false」の場合不許可
+	*/
+	//-----------------------------------------------------------------//
+	void enable_eadc_server(bool ena)
+	{
+		enable_eadc_ = ena;
+	}
+
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -438,6 +462,8 @@ int main(int argc, char** argv)
 
 	nets_.init();
 	nets_.title();
+
+	enable_eadc_server();
 
 	uint32_t cnt = 0;
 	while(1) {
