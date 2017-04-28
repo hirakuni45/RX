@@ -85,6 +85,15 @@ namespace net {
 	template <class SDC>
 	class ftp_server {
 
+		// デバッグ以外で出力を無効にする
+		struct null_chaout {
+			null_chaout(char* out = nullptr, uint16_t len = 0) { } 
+			void operator() (char ch) {
+			}
+		};
+//		typedef utils::basic_format<null_chaout> ftp_debug;
+		typedef utils::basic_format<utils::def_chaout> ftp_debug;
+
 		static const uint16_t CTRL_PORT = 21;
 		static const uint16_t DATA_PORT = 20;
 		static const uint16_t DATA_PORT_PASV = 55600;
@@ -125,6 +134,9 @@ namespace net {
 
 		const char*	param_;
 
+		ip_address	data_ip_;
+		uint16_t	data_port_;
+
 		bool		data_enable_;
 
 		// -------------------------------------------------------------------- //
@@ -158,30 +170,31 @@ namespace net {
 		}
 
 
-		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
+		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+		{
 			if(fi == nullptr) return;
 
-			int fd = reinterpret_cast<int>(option);
-
+			ethernet_server* data = static_cast<ethernet_server*>(option);
+			int fd = data->get_cepid();
+#if 0
+			if(dir) {
+				format("+/;", fd);			
+			} else {
+				format("+r,s%d,\t%s\n", fd) % fi->fsize % name;
+			}
+#else
 			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
 			char tmp[32];
 			make_date_time_(t, tmp, sizeof(tmp));
-			format("Type=%s;Size=%d;Modify=%s; %s\n", fd)
+			format("Type=%s;Size=%d;Modify=%s; %s", data->get_cepid())
 				% (dir ? "dir" : "file")
 				% fi->fsize
 				% tmp
 				% name;
+			data->service();
+#endif
 		}
 
-
-		// デバッグ以外で出力を無効にする
-		struct null_chaout {
-			null_chaout(char* out = nullptr, uint16_t len = 0) { } 
-			void operator() (char ch) {
-			}
-		};
-//		typedef utils::basic_format<null_chaout> ftp_debug;
-		typedef utils::basic_format<utils::def_chaout> ftp_debug;
 
 		ftp_command scan_command_(const char* para) {
 			const char* term = strchr(para, ' ');
@@ -215,7 +228,6 @@ namespace net {
 			for(int i = 0; i < len; ++i) {
 				char ch = tmp[i];
 				if(ch == 0 || ch == 0x0d) continue;
-// utils::format("%c") % ch;
 				if(!line_man_.add(ch)) {
 					utils::format("line_man: memory over\n");
 					return false;
@@ -254,7 +266,7 @@ namespace net {
 
 			case ftp_command::CWD:
 				{
-//    if( strcmp( parameters, "." ) == 0 )  // 'CWD .' is the same as PWD command
+// if( strcmp( parameters, "." ) == 0 )  // 'CWD .' is the same as PWD command
 // client << "257 \"" << cwdName << "\" is your current directory\r\n";     
 					if(sdc_.cd(param_)) {
 						format("250 Ok. Current directory is '%s'\n", ctrl_.get_cepid()) % sdc_.get_current();
@@ -272,6 +284,18 @@ namespace net {
 				break;
 
 			case ftp_command::LIST:
+				if(!data_.connected()) {
+					format("425 No data connection\n", ctrl_.get_cepid());
+					break;
+				}
+				format("150 Accepted data connection\n", ctrl_.get_cepid());
+				if(sdc_.get_mount()) {
+					int n = sdc_.dir_loop(sdc_.get_current(), dir_list_func_, true, &data_);
+					format("226 %d matches total\n", ctrl_.get_cepid()) % n;
+				} else {
+					format("550 Can't open directory %s\n", ctrl_.get_cepid()) % sdc_.get_current();
+				}
+//				data_.stop();
 				break;
 
 			case ftp_command::MKD:
@@ -299,43 +323,21 @@ namespace net {
 				break;
 
 			case ftp_command::PORT:
-#if 0
-				ftp_debug("PORT: '%s'\n") % param_;
-#if 0
-    data.stop();
-    // get IP of data client
-    dataIp[ 0 ] = atoi( parameters );
-    char * p = strchr( parameters, ',' );
-    for( uint8_t i = 1; i < 4; i ++ )
-    {
-      dataIp[ i ] = atoi( ++ p );
-      p = strchr( p, ',' );
-    }
-    // get port of data client
-    dataPort = 256 * atoi( ++ p );
-    p = strchr( p, ',' );
-    dataPort += atoi( ++ p );
-    if( p == NULL )
-      client << "501 Can't interpret parameters\r\n";
-    else
-    {
-      #ifdef FTP_DEBUG
-        Serial << "Data IP set to " << dataIp[0] << ":" << dataIp[1]
-               << ":" << dataIp[2] << ":" << dataIp[3] << endl;
-        Serial << "Data port set to " << dataPort << endl;
-      #endif
-      client << "200 PORT command successful\r\n";
-      dataPassiveConn = false;
-    }
-  }
-#endif
-				format("200 PORT command successful\n", ctrl_.get_cepid());
-#endif
+				int v[6];
+				if((utils::input("%d,%d,%d,%d,%d,%d", param_)
+					% v[0] % v[1] % v[2] % v[3] % v[4] % v[5]).status()) {
+					data_ip_.set(v[0], v[1], v[2], v[3]);
+					data_port_ = (v[4] << 8) | v[5];
+					utils::format("PORT: '%s' (%d)\n") % data_ip_.c_str() % data_port_;
+					format("200 PORT command successful\n", ctrl_.get_cepid());
+				} else {
+					format("501 PORT parameters NG!\n", ctrl_.get_cepid());
+				}
 				break;
 
 			case ftp_command::PWD:
 			case ftp_command::XPWD:
-				format("257 '%s' is your current directory\n", ctrl_.get_cepid()) % sdc_.get_current();
+				format("257 \"%s\" is your current directory\n", ctrl_.get_cepid()) % sdc_.get_current();
 				break;
 
 			case ftp_command::QUIT:
@@ -419,9 +421,9 @@ namespace net {
 					format("504 Unknow TYPE\n", ctrl_.get_cepid());
 					ret = false;
 				} else if(strcmp(param_, "A") == 0) {
-					format("200 TYPE is now ASII\n", ctrl_.get_cepid());
+					format("200 TYPE is now ASCII\n", ctrl_.get_cepid());
 				} else if(strcmp(param_, "I") == 0) {
-			    	format("200 TYPE is now binary\n", ctrl_.get_cepid());
+			    	format("200 TYPE is now BINARY\n", ctrl_.get_cepid());
 				} else {
 					format("504 Unknow TYPE\n", ctrl_.get_cepid());
 					ret = false;
@@ -441,15 +443,14 @@ namespace net {
  				break;
 
 			case ftp_command::MLSD:
-				ftp_debug("MLSD\n");
 			    if(!data_.connected()) {
 					format("425 No data connection\n", ctrl_.get_cepid());
 					ret = false;
 				} else {
       				format("150 Accepted data connection\n", ctrl_.get_cepid());
+
 					if(sdc_.get_mount()) {
-						void* fd = reinterpret_cast<void*>(data_.get_cepid());
-						int n = sdc_.dir_loop(sdc_.get_current(), dir_list_func_, true, fd);
+						int n = sdc_.dir_loop(sdc_.get_current(), dir_list_func_, true, &data_);
 						format("226-options: -a -l\n", ctrl_.get_cepid());
 						format("226 %d matches total\n", ctrl_.get_cepid()) % n;
 					} else {
@@ -464,6 +465,8 @@ namespace net {
 			default:
 				break;
 			}
+
+			ftp_debug("FTP command: %s, '%s'\n") % line_man_[0] % param_;
 
 			return ret;
 		}
@@ -568,36 +571,6 @@ boolean FtpServer::processCommand()
         else
           client << "450 Can't delete " << parameters << "\r\n";
       }
-    }
-  }
-  //
-  //  LIST - List 
-  //
-  else if( ! strcmp( command, "LIST" ))
-  {
-    if( ! dataConnect())
-      client << "425 No data connection\r\n";
-    else
-    {
-      client << "150 Accepted data connection\r\n";
-      uint16_t nm = 0;
-      FAT_DIR dir;
-      if( ! dir.openDir( cwdName ))
-        client << "550 Can't open directory " << cwdName << "\r\n";
-      else
-      {
-        while( dir.nextFile())
-        {
-          if( dir.isDir() )
-            data << "+/";
-          else
-            data << "+r,s" << dir.fileSize();
-          data << ",\t" << dir.fileName() << "\r\n";
-          nm ++;
-        }
-        client << "226 " << nm << " matches total\r\n";
-      }
-      data.stop();
     }
   }
   //
@@ -978,8 +951,16 @@ void FtpServer::service()
 		{
 			ctrl_.begin(CTRL_PORT);
 			task_ = task::connection;
-			utils::format("Start FTP Server (CTRL): %s (%d)\n")
-				% eth_.get_local_ip().c_str() % ctrl_.get_port();
+			utils::format("Start FTP Server (CTRL): %s (%d) fd(%d)\n")
+				% eth_.get_local_ip().c_str() % ctrl_.get_port() % ctrl_.get_cepid();
+
+
+//			data_.begin(DATA_PORT_PASV);
+#if 0
+			data_.begin(DATA_PORT);
+			utils::format("Start FTP Server (DATA): %s (%d) fd(%d)\n")
+				% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
+#endif
 		}
 
 
@@ -1054,7 +1035,7 @@ void FtpServer::service()
 			case task::start_pasv:
 				if(!data_enable_) {
 					data_.begin(DATA_PORT_PASV);
-					utils::format("Start FTP Server (DATA): %s (%d) %d\n")
+					utils::format("Start FTP Server (DATA): %s (%d) fd(%d)\n")
 						% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
 					data_enable_ = true;					
 					task_ = task::data_connection;
@@ -1067,7 +1048,8 @@ void FtpServer::service()
 
 			case task::data_connection:
 				if(data_.connected()) {
-					ftp_debug("FTP Server (PASV DATA): connect form: '%s'\n") % data_.get_from_ip().c_str();
+					ftp_debug("FTP Server (DATA): connect form: '%s' (%d)\n")
+						% ctrl_.get_from_ip().c_str() % data_.get_port();
 					task_ = task::command;
 				}
 				break;
@@ -1078,8 +1060,8 @@ void FtpServer::service()
 					if(!service_command_()) {
 						task_ = task::disconnect;
 					}
+					line_man_.clear();
 				}
-				line_man_.clear();
 				break;
 
 			case task::disconnect:
@@ -1090,7 +1072,8 @@ void FtpServer::service()
 				if(delay_loop_) {
 					--delay_loop_;
 				} else {
-					ftp_debug("FTP Server: disconnect\n");
+					ftp_debug("FTP Server (CTRL/DATA): disconnect\n");
+					data_.stop();
 					ctrl_.stop();
 					task_ = task::connection;
 				}
