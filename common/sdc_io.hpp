@@ -332,6 +332,7 @@ namespace utils {
 
 			char full[path_buff_size_];
 			create_full_path_(path, full);
+
 #if _USE_LFN != 0
 			char oem[path_buff_size_];
 			str::utf8_to_sjis(full, oem);
@@ -527,6 +528,10 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void make_full_path(const char* name, char* dst) const {
 			if(name == nullptr || dst == nullptr) return;
+			if(name[0] == '/') {
+				std::strcpy(dst, name);
+				return;
+			}
 			std::strcpy(dst, current_);
 			if(dst[std::strlen(dst)] != '/') {
 				std::strcat(dst, "/");
