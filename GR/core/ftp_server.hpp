@@ -7,6 +7,7 @@
 */
 //=====================================================================//
 #include <cstring>
+#include <cstdio>
 #include "ethernet_server.hpp"
 
 #include "common/time.h"
@@ -108,12 +109,17 @@ namespace net {
 		ethernet_server	data_;
 
 		enum class task {
+			begin,
 			connection,
 			user_identity,
 			password,
 
 			start_pasv,
 			data_connection,
+
+			send_file,	///< Server ---> Client
+
+			recv_file,	///< Client ---> Server
 
 			command,
 
@@ -137,7 +143,8 @@ namespace net {
 		ip_address	data_ip_;
 		uint16_t	data_port_;
 
-		bool		data_enable_;
+		FILE*		file_fp_;
+		uint32_t	file_total_;
 
 		// -------------------------------------------------------------------- //
 		typedef utils::basic_format<eth_chaout> format;
@@ -222,7 +229,13 @@ namespace net {
 		bool service_line_()
 		{
 			char tmp[256];
-			int len = ctrl_.read(tmp, sizeof(tmp));
+			int len  = 0;
+			if(ctrl_.available() > 0) {	
+				len = ctrl_.read(tmp, sizeof(tmp));
+				if(len <= 0) return false;
+			} else {
+				return false;
+			}
 
 			for(int i = 0; i < len; ++i) {
 				char ch = tmp[i];
@@ -271,35 +284,8 @@ namespace net {
 				break;
 
 			case ftp_command::CDUP:
-#if 0
-  //
-  //  CDUP - Change to Parent Directory 
-  //
-  if( ! strcmp( command, "CDUP" ))
-  {
-    boolean ok = false;
-    
-    if( strlen( cwdName ) > 1 )            // do nothing if cwdName is root
-    {
-      // if cwdName ends with '/', remove it (must not append)
-      if( cwdName[ strlen( cwdName ) - 1 ] == '/' )
-        cwdName[ strlen( cwdName ) - 1 ] = 0;
-      // search last '/'
-      char * pSep = strrchr( cwdName, '/' );
-      ok = pSep > cwdName;
-      // if found, ends the string on its position
-      if( ok )
-      {
-        * pSep = 0;
-        ok = FAT.exists( cwdName );
-      }
-    }
-    // if an error appends, move to root
-    if( ! ok )
-      strcpy( cwdName, "/" );
-    client << "200 Ok. Current directory is " << cwdName << "\r\n";
-  }
-#endif
+				sdc_.cd("..");
+				format("200 Ok. Current directory is %s\n", ctrl_.get_cepid()) % sdc_.get_current();
 				break;
 
 			case ftp_command::CWD:
@@ -419,6 +405,7 @@ namespace net {
 				break;
 
 			case ftp_command::QUIT:
+				utils::format("FTP Server 'QUIT'\n");
 				ret = false;
 				break;
 
@@ -435,24 +422,29 @@ namespace net {
 					break;
 				}
 				{
-					char path[256+1];
+					char path[256 + 1];
 					sdc_.make_full_path(param_, path);
 					if(!sdc_.probe(path)) {
 						format("550 File '%s' not found\n", ctrl_.get_cepid()) % path;
 						ret = false;
 						break;
 					}
-					
+					uint32_t fsz = sdc_.size(path);
+					file_fp_ = fopen(path, "rb");
+					if(file_fp_ == nullptr) {
+						format("450 Can't open %s \n", ctrl_.get_cepid()) % path;
+						break;
+					}
+					format("150-Connected to port %d\n", ctrl_.get_cepid()) % data_.get_port();
+					format("150 %u bytes to download\n", ctrl_.get_cepid()) % fsz;
+					file_total_ = 0;
+					task_ = task::send_file;
+				}					
 #if 0
-      else if( ! file.open( path, O_READ ))
-        client << "450 Can't open " << parameters << "\r\n";
       else if( ! dataConnect())
         client << "425 No data connection\r\n";
       else
       {
-        #ifdef FTP_DEBUG
-          Serial << "Sending " << parameters << endl;
-        #endif
         client << "150-Connected to port " << dataPort << "\r\n";
         client << "150 " << file.fileSize() << " bytes to download\r\n";
         millisBeginTrans = millis();
@@ -461,7 +453,6 @@ namespace net {
       }
     }
 #endif
-				}
 				break;
 
 			case ftp_command::RMD:
@@ -496,6 +487,37 @@ namespace net {
 				break;
 
 			case ftp_command::STOR:
+				if(param_ == nullptr) {
+					format("501 No file name\n", ctrl_.get_cepid());
+					break;
+				}
+				{
+					char path[256 + 1];
+					sdc_.make_full_path(param_, path);
+					file_fp_ = fopen(path, "wb");
+					if(file_fp_ == nullptr) {
+						format("451 Can't open/create %s\n", ctrl_.get_cepid()) % path;
+						break;
+					}
+					format("150 Connected to port %d\n", ctrl_.get_cepid()) % data_.get_port();
+					file_total_ = 0;
+					task_ = task::recv_file;
+				}
+#if 0
+      else if( ! dataConnect())
+      {
+        client << "425 No data connection\r\n";
+        file.close();
+      }
+      else
+      {
+        millisBeginTrans = millis();
+        bytesTransfered = 0;
+        transferStatus = 2;
+      }
+    }
+  }
+#endif
 				break;
 
 			case ftp_command::STOU:
@@ -673,35 +695,6 @@ namespace net {
   {
     // dataPort = 0;
     client << "200 Zzz...\r\n";
-  }
-  //
-  //  STOR - Store
-  //
-  else if( ! strcmp( command, "STOR" ))
-  {
-    char path[ FTP_CWD_SIZE ];
-    if( strlen( parameters ) == 0 )
-      client << "501 No file name\r\n";
-    else if( makePath( path ))
-    {
-      if( ! file.open( path, O_CREAT | O_WRITE ))
-        client << "451 Can't open/create " << parameters << "\r\n";
-      else if( ! dataConnect())
-      {
-        client << "425 No data connection\r\n";
-        file.close();
-      }
-      else
-      {
-        #ifdef FTP_DEBUG
-          Serial << "Receiving " << parameters << endl;
-        #endif
-        client << "150 Connected to port " << dataPort << "\r\n";
-        millisBeginTrans = millis();
-        bytesTransfered = 0;
-        transferStatus = 2;
-      }
-    }
   }
   //
   //  RNFR - Rename From 
@@ -886,9 +879,9 @@ void FtpServer::service()
 		*/
 		//-----------------------------------------------------------------//
         ftp_server(ethernet& e, SDC& sdc) : eth_(e), sdc_(sdc), ctrl_(e), data_(e),
-			task_(task::connection), line_man_('\n'),
+			task_(task::begin), line_man_('\n'),
 			user_{ "SEEDA03" }, pass_{ "SEEDA03" }, time_out_(0), delay_loop_(0),
-			param_(nullptr), data_enable_(false)
+			param_(nullptr), file_fp_(nullptr)
 			{ }
 
 
@@ -899,18 +892,7 @@ void FtpServer::service()
 		//-----------------------------------------------------------------//
 		void start()
 		{
-			ctrl_.begin(CTRL_PORT);
-			task_ = task::connection;
-			utils::format("Start FTP Server (CTRL): %s (%d) fd(%d)\n")
-				% eth_.get_local_ip().c_str() % ctrl_.get_port() % ctrl_.get_cepid();
-
-
-//			data_.begin(DATA_PORT_PASV);
-#if 0
-			data_.begin(DATA_PORT);
-			utils::format("Start FTP Server (DATA): %s (%d) fd(%d)\n")
-				% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
-#endif
+			task_ = task::begin;
 		}
 
 
@@ -922,6 +904,13 @@ void FtpServer::service()
 		void service()
 		{
 			switch(task_) {
+			case task::begin:
+				ctrl_.begin(CTRL_PORT);
+				utils::format("Start FTP Server (CTRL): %s (%d), fd(%d)\n")
+					% eth_.get_local_ip().c_str() % ctrl_.get_port() % ctrl_.get_cepid();
+				task_ = task::connection;
+				break;
+
 			case task::connection:
 				if(ctrl_.connected()) {
 					ftp_debug("FTP Server (CTRL): connect form: '%s'\n") % ctrl_.get_from_ip().c_str();
@@ -980,17 +969,10 @@ void FtpServer::service()
 				break;
 
 			case task::start_pasv:
-				if(!data_enable_) {
-					data_.begin(DATA_PORT_PASV);
-					utils::format("Start FTP Server (DATA): %s (%d) fd(%d)\n")
-						% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
-					data_enable_ = true;					
-					task_ = task::data_connection;
-				} else if(!data_.connected()) {
-					task_ = task::data_connection;
-				} else {
-					task_ = task::command;
-				}
+				data_.begin(DATA_PORT_PASV);
+				utils::format("Start FTP Server (DATA): '%s' (%d) fd(%d)\n")
+					% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
+				task_ = task::data_connection;
 				break;
 
 			case task::data_connection:
@@ -998,10 +980,65 @@ void FtpServer::service()
 					ftp_debug("FTP Server (DATA): connect form: '%s' (%d)\n")
 						% ctrl_.get_from_ip().c_str() % data_.get_port();
 					task_ = task::command;
+					line_man_.clear();
 				}
 				break;
 
+			//--------------------------//
+			case task::send_file:
+				for(int i = 0; i < 16; ++i) {  // 1 frame/8192 bytes
+					uint8_t tmp[512];
+					uint32_t sz = fread(tmp, 1, sizeof(tmp), file_fp_);
+					if(sz > 0) {
+						data_.write(tmp, sz);
+						file_total_ += sz;
+					}
+					if(sz < sizeof(tmp)) {
+//  if( deltaT > 0 && bytesTransfered > 0 )
+// {
+//    client << "226-File successfully transferred\r\n";
+//    client << "226 " << deltaT << " ms, "
+//           << bytesTransfered / deltaT << " kbytes/s\r\n";
+//  }
+						format("226 File successfully transferred\n", ctrl_.get_cepid());  
+						fclose(file_fp_);
+						file_fp_ = nullptr;
+						data_.stop();
+						task_ = task::command;
+						break;
+					}
+				}
+				break;
+
+			//--------------------------//
+			case task::recv_file:
+				for(int i = 0; i < 8; ++i) {  // 1 frame/4096 bytes
+					uint8_t tmp[512];
+					int32_t rds = data_.read(tmp, sizeof(tmp));
+//					static int32_t rrr;
+//					if(rrr != rds) {
+//						utils::format("Data read: %d\n") % rds;
+//						rrr = rds;
+//					}
+					if(rds > 0) {
+						fwrite(tmp, 1, rds, file_fp_);
+					}
+					if(!data_.connected() || rds < 0) {
+						format("226 File successfully transferred\n", ctrl_.get_cepid());  
+						fclose(file_fp_);
+						file_fp_ = nullptr;
+						data_.stop();
+						task_ = task::command;
+						break;
+					}
+				}
+				break;
+
+			//--------------------------//
 			case task::command:
+				if(!ctrl_.connected()) {
+					task_ = task::disconnect;
+				}
 				if(!service_line_()) break;
 				if(!line_man_.empty()) {
 					if(!service_command_()) {
@@ -1013,16 +1050,16 @@ void FtpServer::service()
 
 			case task::disconnect:
 			default:
-				delay_loop_ = 10;
+				ctrl_.stop();
+				ftp_debug("FTP Server (CTRL): disconnect\n");
+				delay_loop_ = 4;
+				task_ = task::disconnect_main;
 				break;
 			case task::disconnect_main:
 				if(delay_loop_) {
 					--delay_loop_;
 				} else {
-					ftp_debug("FTP Server (CTRL/DATA): disconnect\n");
-					data_.stop();
-					ctrl_.stop();
-					task_ = task::connection;
+					task_ = task::begin;
 				}
 				break;
 			}
