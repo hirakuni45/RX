@@ -12,8 +12,7 @@
 #include "r_ether.h"
 #include "../T4_src/net_config.h"
 #include "../T4_src/r_t4_itcpip.h"
-
-extern UB _myethaddr[6];
+#include "../T4_src/config_tcpudp.h"
 
 #if defined (_T4_TEST)
 extern H lan_read_for_test(UB lan_port_no, B **buf, H return_code);
@@ -102,7 +101,8 @@ int lan_open(void)
 {
 	int ret;
 	memset(&t4_stat, 0, sizeof(T4_STATISTICS));
-	ret = R_ETHER_Open_ZC2(_myethaddr);
+	int ch = 0;
+	ret = R_ETHER_Open_ZC2(ethernet_mac[ch].mac);
 	if (R_ETHER_OK != ret)
 	{
 		return -1;
@@ -163,7 +163,8 @@ void tcpudp_act_cyc(UB cycact)
 void lan_reset(UB lan_port_no)
 {
 	R_ETHER_Close_ZC2();
-	R_ETHER_Open_ZC2(_myethaddr);
+	int ch = 0;
+	R_ETHER_Open_ZC2(ethernet_mac[ch].mac);
 }
 
 void udp_api_slp(ID cepid)
