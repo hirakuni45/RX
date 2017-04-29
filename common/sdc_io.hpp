@@ -104,7 +104,7 @@ namespace utils {
 			++t->idx_;
 		}
 
-		void create_full_path_(const char* path, char* full) {
+		void create_full_path_(const char* path, char* full) const {
 			std::strcpy(full, current_);
 			if(path == nullptr || path[0] == 0) {
 				if(full[0] == 0) {
@@ -180,8 +180,11 @@ namespace utils {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool open(FIL* fp, const char* path, BYTE mode)
+		bool open(FIL* fp, const char* path, BYTE mode) const
 		{
+			if(!mount_) return false;
+			if(fp == nullptr || path == nullptr) return false;
+
 			char full[path_buff_size_];
 			create_full_path_(path, full);
 
@@ -197,20 +200,121 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	クローズ
+			@param[in]	fp		ファイル構造体ポインター
+			@return 成功なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool close(FIL* fp) const
+		{
+			if(!mount_) return false;
+			if(fp == nullptr) return false;
+
+			return f_close(fp) == FR_OK;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	ファイルがあるか検査
 			@param[in]	path	ファイル名
 			@return ファイルがある場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool probe(const char* path)
+		bool probe(const char* path) const
 		{
+			if(!mount_) return false;
 			FIL fp;
 			bool ret = open(&fp, path, FA_READ | FA_OPEN_EXISTING);
 			if(ret) {
-				f_close(&fp);
+				if(f_close(&fp) != FR_OK) {
+					return false;
+				}
 			}
 			return ret;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ファイル・サイズを返す @n
+					※アクセス出来ない場合も「０」を返すので、存在確認に使えない
+			@param[in]	path	ファイル名
+			@return ファイル・サイズ
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t size(const char* path) const
+		{
+			if(!mount_) return false;
+			if(path == nullptr) return 0;
+
+			char full[path_buff_size_];
+			create_full_path_(path, full);
+
+#if _USE_LFN != 0
+			str::utf8_to_sjis(full, full);
+#endif
+			FILINFO fno;
+			if(f_stat(full, &fno) != FR_OK) {
+
+				return 0;
+			}
+
+			return fno.fsize;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ファイルの削除
+			@param[in]	path	相対パス、又は、絶対パス
+			@return 削除成功なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool remove(const char* path)
+		{
+			if(!mount_) return false;
+			if(path == nullptr) return false;
+
+			char full[path_buff_size_];
+			create_full_path_(path, full);
+
+#if _USE_LFN != 0
+			str::utf8_to_sjis(full, full);
+#endif
+			return f_unlink(full) == FR_OK;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ディレクトリーの作成
+			@param[in]	path	相対パス、又は、絶対パス
+			@return 成功なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool mkdir(const char* path)
+		{
+			if(!mount_) return false;
+			if(path == nullptr) return false;
+
+			char full[path_buff_size_];
+			create_full_path_(path, full);
+
+#if _USE_LFN != 0
+			str::utf8_to_sjis(full, full);
+#endif
+			return f_mkdir(full) == FR_OK;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ディスク容量の取得
+			@return 成功なら「true」
+		 */
+		//-----------------------------------------------------------------//
+// FRESULT f_getfree (const TCHAR* path, DWORD* nclst, FATFS** fatfs);	/* Get number of free clusters on the drive 
 
 
 		//-----------------------------------------------------------------//
