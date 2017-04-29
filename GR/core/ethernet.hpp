@@ -13,6 +13,7 @@
 
 #include "T4_src/type.h"
 #include "T4_src/r_t4_itcpip.h"
+#include "T4_src/config_tcpudp.h"
 #include "T4_src/r_t4_dhcp_client_rx_if.h"
 #include "T4_src/r_dhcp_client.h"
 #include "T4_src/r_t4_dns_client_rx_if.h"
@@ -64,15 +65,8 @@ typedef utils::basic_format<utils::def_chaout> debug_format;
 #define UDP_TX_PACKET_MAX_SIZE  24
 
 extern _TCB   *head_tcb;
-extern T_TCP_CREP tcp_crep[];
-extern T_TCP_CCEP tcp_ccep[];
-extern T_UDP_CCEP udp_ccep[];
-extern const H __tcprepn;
-extern const H __tcpcepn;
-extern const H __udpcepn;
 extern uint8_t dnsaddr1[];
 extern uint8_t dnsaddr2[];
-extern TCPUDP_ENV tcpudp_env;
 extern volatile UH wait_timer;
 extern uint8_t     cepid_max;
 extern NAME_TABLE  name_table;
@@ -107,8 +101,7 @@ namespace net {
 			int32_t     pre_sec_timer;
 			bool		enable;
 			bool		call_flag;
-			bool		server;
-			CEP() : enable(false), call_flag(false), server(false) { }
+			CEP() : enable(false), call_flag(false) { }
 		};
 
 	private:
@@ -129,11 +122,12 @@ namespace net {
 		static uint8_t byteq_buf_forSize_[RING_SIZ_forSize];    /* sizeQueBody 1024 >> 2 = 256 */
 
         void dhcpSuccess(DHCP* tmpDhcpPt) {
-            memcpy(tcpudp_env.ipaddr, tmpDhcpPt->ipaddr, 4);
+			int ch = 0;
+            memcpy(tcpudp_env[ch].ipaddr, tmpDhcpPt->ipaddr, 4);
             debug_format("ip = %08X\n") % get_local_ip();
 
-            memcpy(tcpudp_env.maskaddr, tmpDhcpPt->maskaddr, 4);
-            memcpy(tcpudp_env.gwaddr, tmpDhcpPt->gwaddr, 4);
+            memcpy(tcpudp_env[ch].maskaddr, tmpDhcpPt->maskaddr, 4);
+            memcpy(tcpudp_env[ch].gwaddr, tmpDhcpPt->gwaddr, 4);
             memcpy((char *)dnsaddr1, (char *)tmpDhcpPt->dnsaddr, 4);
             memcpy(dhcpSvMac.bytes, ((DHCP_PACKET*)tcpudp_work_)->ether.source_address, EP_ALEN);
             memcpy(dhcpSvIp.bytes, ((DHCP_PACKET*)tcpudp_work_)->ipv4.source_ip, IP_ALEN);
@@ -280,24 +274,6 @@ namespace net {
 		}
 
 
-		int16_t set_tcp_crep(int32_t repid, UH portno) {
-			if (repid == 0 || repid > __tcprepn) {
-				return -1;
-			}
-			tcp_crep[repid - 1].myaddr.portno = portno;
-			return 0;
-		}
-
-		int16_t set_tcp_ccep(int32_t cepid, UB ch, int rbufsz) {
-			if (cepid == 0 || cepid > __tcpcepn){
-				return -1;
-			}
-			tcp_ccep[cepid - 1].cepatr = ch;
-			tcp_ccep[cepid - 1].rbufsz = rbufsz;
-			return 0;
-		}
-
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  開始
@@ -322,7 +298,7 @@ namespace net {
 			Serial.print((uchar)(mac[5]),HEX);
 			Serial.println(")");
 #endif
-			memcpy(_myethaddr, mac, EP_ALEN);           /*use from the beginning only 6byte*/
+			memcpy(&ethernet_mac[0], mac, EP_ALEN);           /*use from the beginning only 6byte*/
 			startLANController();
 #ifdef ETHER_DEBUG
 			utils::format("open_timer()\n");
@@ -427,11 +403,12 @@ namespace net {
 		void begin(const uint8_t* mac, const ip_address& local_ip, const ip_address& dns_server,
 			const ip_address& gateway, const ip_address& subnet)
 		{
-			memcpy(_myethaddr, mac, EP_ALEN);
-			memcpy(tcpudp_env.ipaddr, local_ip.get(), IP_ALEN);
+			int ch = 0;
+			memcpy(ethernet_mac[ch].mac, mac, EP_ALEN);
+			memcpy(tcpudp_env[ch].ipaddr, local_ip.get(), IP_ALEN);
 			memcpy(dnsaddr1, dns_server.get(), IP_ALEN);
-			memcpy(tcpudp_env.gwaddr, gateway.get(), IP_ALEN);
-			memcpy(tcpudp_env.maskaddr, subnet.get(), IP_ALEN);
+			memcpy(tcpudp_env[ch].gwaddr, gateway.get(), IP_ALEN);
+			memcpy(tcpudp_env[ch].maskaddr, subnet.get(), IP_ALEN);
 			dhcp_use_ = false;
 			/// clr_tcp_acp_cep_call_flg();
 #ifdef T4_ETHER_DEBUG
@@ -479,7 +456,8 @@ namespace net {
 		//-----------------------------------------------------------------//
 		static ip_address get_local_ip() {
 			ip_address adr;
-			adr.set(tcpudp_env.ipaddr);
+			int ch = 0;
+			adr.set(tcpudp_env[ch].ipaddr);
 			return adr;
 		}
 
@@ -492,7 +470,8 @@ namespace net {
 		//-----------------------------------------------------------------//
 		static ip_address get_subnet_mask() {
 			ip_address adr;
-			adr.set(tcpudp_env.maskaddr);
+			int ch = 0;
+			adr.set(tcpudp_env[ch].maskaddr);
 			return adr;
 		}
 
@@ -505,7 +484,8 @@ namespace net {
 		//-----------------------------------------------------------------//
 		static ip_address get_gateway_ip() {
 			ip_address adr;
-			adr.set(tcpudp_env.gwaddr);
+			int ch = 0;
+			adr.set(tcpudp_env[ch].gwaddr);
 			return adr;
 		}
 
@@ -545,7 +525,6 @@ namespace net {
 			// サーバー向けサービス
 			for(uint32_t i = 0; i < TCPUDP_CHANNEL_NUM; ++i) {
 				if(!cep_[i].enable) continue;
-				if(!cep_[i].server) continue;
 
 				uint32_t cepid = i + 1;
 				TCP_API_STAT ercd = tcp_read_stat(cepid);
@@ -646,10 +625,10 @@ namespace net {
 		/*!
 			@brief  ネットの起動
 			@param[in]	port	ポート番号
-			@param[in]	server	サーバーの場合「true」
+			@return TCP/UDP ディスクリプタ
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t start(uint16_t port, bool server)
+		uint32_t create(uint16_t port)
 		{
 			uint32_t cepid = new_connection();
 			if(cepid == 0) {
@@ -657,22 +636,20 @@ namespace net {
 				return 0;
 			}
 
-			at_cep(cepid).server = true;
-
-			/* initialize cep status */
 			at_cep(cepid).status = T4_CLOSED;
-			/* Initialize TCP reception point */
 
-			if(set_tcp_crep(cepid, port) != E_OK) {
-				utils::format("set_tcp_crep() fail: %d\n") % cepid;
+			if(cepid > tcp_crep_num) {
+				end_connection(cepid);
 				return 0;
 			}
+			tcp_crep[cepid - 1].myaddr.portno = port;
 
-			/* Initialize TCP communication end point */
-			if(set_tcp_ccep(cepid, 0, ethernet::TCP_MSS) != E_OK) {
-				utils::format("set_tcp_ccep() fail: %d\n") % cepid;
+			if(cepid > tcp_ccep_num) {
+				end_connection(cepid);
 				return 0;
 			}
+			tcp_ccep[cepid - 1].cepatr = 0;  // ch
+			tcp_ccep[cepid - 1].rbufsz = ethernet::TCP_MSS;
 
 			return cepid;
 		}

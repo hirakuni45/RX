@@ -89,7 +89,8 @@ namespace net {
 		int connect(const ip_address& ip, uint16_t port, int32_t timeout = 1000)
 		{
 			if(cepid_ == 0) {
-				cepid_ = ethernet_.start(port, false);
+				cepid_ = ethernet_.create(port);
+				utils::format("New Client: %d\n") % cepid_;
 				if(cepid_ == 0) return -1;
 			}
 

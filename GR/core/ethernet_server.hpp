@@ -101,7 +101,7 @@ namespace net {
 		void begin(uint16_t port)
 		{
 			if(port > 0) {
-				cepid_ = ethernet_.start(port, true);
+				cepid_ = ethernet_.create(port);
 				if(cepid_ > 0) {
 					port_ = port;
 				}
