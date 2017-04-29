@@ -1,38 +1,15 @@
-/***********************************************************************************************************************
-* DISCLAIMER
-* This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
-* other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
-* applicable laws, including copyright laws.
-* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
-* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
-* EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
-* SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
-* SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-* Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
-* this software. By using this software, you agree to the additional terms and conditions found by accessing the
-* following link:
-* http://www.renesas.com/disclaimer
-*
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
-***********************************************************************************************************************/
-/***********************************************************************************************************************
-* File Name    : ether.c
-* Version      : 1.0
-* Description  : Processing for Ether protocol
-***********************************************************************************************************************/
-/**********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Includes   <System Includes> , "Project Includes"
-***********************************************************************************************************************/
+//=====================================================================//
+/*!	@file
+	@brief	ether.c @n
+			Copyright 2017 Kunihito Hiramatsu
+	@author	ïΩèºñMêm (hira@rvf-rc45.net)
+*/
+//=====================================================================//
 #include <string.h>
 #include "net_config.h"
 #include "type.h"
 #include "r_t4_itcpip.h"
+#include "config_tcpudp.h"
 #include "ether.h"
 #include "ip.h"
 #include "tcp.h"
@@ -61,10 +38,6 @@ Exported global variables (read from other files)
 extern UB *data_link_buf_ptr;    /* Buffer pointer to Datalink layer */
 extern _TX_HDR  _tx_hdr;    /* Area for transmit header */
 extern UH  const _ip_tblcnt;
-
-#if defined(_MULTI)
-extern TCPUDP_ENV tcpudp_env[];
-#endif
 
 /***********************************************************************************************************************
 * Function Name: _ether_proc_rcv
@@ -269,7 +242,7 @@ int16_t _ether_snd_arp(_ARP_ENTRY *ae)
         parp->ar_hwlen = EP_ALEN;
         parp->ar_prlen = IP_ALEN;
         parp->ar_op  = hs2net(AR_REQUEST);
-        memcpy(parp->ar_sha, _myethaddr[_ch_info_tbl->_ch_num], EP_ALEN);
+        memcpy(parp->ar_sha, ethernet_mac[_ch_info_tbl->_ch_num].mac, EP_ALEN);
         _cpy_ipaddr(parp->ar_spa, _ch_info_tbl->_myipaddr);
         _cpy_eaddr(parp->ar_tha, ae->ae_hwa);
         _cpy_ipaddr(parp->ar_tpa, ae->ae_pra);
@@ -281,7 +254,7 @@ int16_t _ether_snd_arp(_ARP_ENTRY *ae)
     {
         _cpy_eaddr(parp, rpap);
         parp->ar_op = hs2net(AR_REPLY);
-        memcpy(parp->ar_sha, _myethaddr[_ch_info_tbl->_ch_num], EP_ALEN);
+        memcpy(parp->ar_sha, ethernet_mac[_ch_info_tbl->_ch_num].mac, EP_ALEN);
         memcpy(parp->ar_spa, _ch_info_tbl->_myipaddr, IP_ALEN);
         memcpy(parp->ar_tha, rpap->ar_sha, EP_ALEN + IP_ALEN);
         _cpy_eaddr(peh->eh_dst, rpap->ar_sha);
@@ -439,7 +412,7 @@ int16_t _ether_snd(uint16_t type, uint8_t *data, uint16_t dlen)
     peh = &(_tx_hdr.eh);
 
     /* Generate Ethernet header */
-    memcpy(peh->eh_src, _myethaddr[_ch_info_tbl->_ch_num],  EP_ALEN);
+    memcpy(peh->eh_src, ethernet_mac[_ch_info_tbl->_ch_num].mac,  EP_ALEN);
     peh->eh_type = hs2net(type);
 
 #if defined(_MULTI)

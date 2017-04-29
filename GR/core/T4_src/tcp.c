@@ -8,7 +8,7 @@
 #include "net_config.h"
 #include <string.h>
 #include "type.h"
-#include "r_t4_itcpip.h"
+#include "config_tcpudp.h"
 #if defined(_ETHER)
 #include "ether.h"
 #elif defined(_PPP)
@@ -37,23 +37,6 @@ extern UB *_ether_p_rcv_buff;
 /// extern const UH  _ip_tblcnt[];
 extern const UH  _ip_tblcnt;
 #endif /* _ETHER */
-
-#if defined(_TCP)
-extern const UH  _tcp_mss[];
-extern UW  _tcp_initial_seqno[];
-extern const UH  _tcp_2msl[];
-extern const UH  _tcp_rt_tmo_rst[];
-extern const T_TCP_CREP tcp_crep[];
-extern const T_TCP_CCEP tcp_ccep[];
-extern const H __tcpcepn;
-extern UB _tcp_dack[];
-extern UB *data_link_buf_ptr;
-#endif
-
-#if defined(_UDP)
-extern _UDP_CB  *_udp_cb;
-extern const H   __udpcepn;
-#endif
 
 #if defined(_PPP)
 extern UB ppp_mode;
@@ -104,7 +87,6 @@ void _tcp_init_tcb(_TCB *_ptcb)
 {
     uint16_t i;
     uint8_t ch;
-
     ch = tcp_ccep[_ptcb->cepid-1].cepatr;
 
     _ptcb->flag  = 0;      // TCP status flag
@@ -113,10 +95,10 @@ void _tcp_init_tcb(_TCB *_ptcb)
     _ptcb->nxt_status = _TCPS_CLOSED;   // Next status to transit
     _ptcb->it_stat = _ITS_NORMAL;    // ITRON status
     _ptcb->hdr_flg = 0;      // Header flag
-    _ptcb->mss  = _tcp_mss[ch];    // MSS: max segment size
+    _ptcb->mss  = tcp_mss[ch];	// MSS: max segment size
 
-    _ptcb->suna  = _tcp_initial_seqno[ch]; // transmitted, but no acked sequence number
-    _ptcb->snxt  = _tcp_initial_seqno[ch]; // next transmit sequence number
+    _ptcb->suna  = tcp_initial_seqno[ch]; // transmitted, but no acked sequence number
+    _ptcb->snxt  = tcp_initial_seqno[ch]; // next transmit sequence number
     _ptcb->risn  = 0;      // the sequence number that first received when connecting
     _ptcb->rnxt  = 0;      // next receive(expected) sequence number
     for (i = 0; i < 4; i++)
@@ -168,7 +150,7 @@ void _process_tcpip(void)
             _proc_snd();
 
 #if defined(_UDP)
-            for (counter = 0; counter < __udpcepn; counter++)
+            for (counter = 0; counter < udp_ccep_num; counter++)
             {
                 if ((_udp_cb[counter].req.type != _UDP_API_NON) && (_udp_cb[counter].req.stat == _UDP_API_STAT_UNTREATED))
                 {
@@ -219,7 +201,7 @@ void _proc_api(void)
         _tcp_api_rcvdt
     };
 
-    for (counter = 0;counter < __tcpcepn; counter++)
+    for (counter = 0;counter < tcp_ccep_num; counter++)
     {
         _tcp_tcb = &head_tcb[counter];
         _ch_info_tbl = &_ch_info_head[tcp_ccep[counter].cepatr];
@@ -480,7 +462,7 @@ void _tcp_api_snddt(void)
     _tcp_tcb->hdr_flg = _TCPF_ACK;
     _tcp_tcb->flag |= (_TCBF_NEED_SEND | _TCBF_SND_TCP);
 
-    if (_tcp_dack[ tcp_ccep[ _tcp_tcb->cepid-1].cepatr ] == 1)
+    if (tcp_dack[ tcp_ccep[ _tcp_tcb->cepid-1].cepatr ] == 1)
     {
         _tcp_tcb->flag &= ~_TCBF_AVOID_DACK;
     }
@@ -694,7 +676,7 @@ void _proc_rcv(void)
                 /****** TCP ******/
             case(_IPH_TCP):
                 ptcph = (_TCP_HDR *)(pip->data);
-                while (counter != __tcpcepn)
+                while (counter != tcp_ccep_num)
                 {
                     _tcp_tcb = &head_tcb[counter];
                     if ((ptcph->sport == hs2net(_tcp_tcb->rem_port))
@@ -708,10 +690,10 @@ void _proc_rcv(void)
                     }
                     counter++;
                 }
-                if (counter == __tcpcepn)
+                if (counter == tcp_ccep_num)
                 {
                     counter = 0;
-                    while (counter != __tcpcepn)
+                    while (counter != tcp_ccep_num)
                     {
                         _tcp_tcb = &head_tcb[counter];
                         if ((_tcp_tcb->status == _TCPS_LISTEN)
@@ -722,7 +704,7 @@ void _proc_rcv(void)
                         }
                         counter++;
                     }
-                    if (counter == __tcpcepn)
+                    if (counter == tcp_ccep_num)
                     {
                         report_error(_ch_info_tbl->_ch_num, RE_TCP_HEADER1, data_link_buf_ptr);
                         goto _err_proc_rcv;
@@ -991,7 +973,7 @@ int _tcp_rcv_syn(void)
             /* SYN-SENT */
         case _TCPS_SYN_SENT:
             net2hl_yn_xn(&tmp,  &ph->ack) ;
-            if ((ph->flg & (_TCPF_SYN | _TCPF_ACK)) && (tmp == _tcp_initial_seqno[_ch_info_tbl->_ch_num] + 1))
+            if ((ph->flg & (_TCPF_SYN | _TCPF_ACK)) && (tmp == tcp_initial_seqno[_ch_info_tbl->_ch_num] + 1))
             {
                 net2hl_yn_xn(&_tcp_tcb->risn,  &ph->seq) ;
                 _tcp_tcb->rnxt = _tcp_tcb->risn + 1;
@@ -1086,14 +1068,14 @@ void _tcp_rcv_ack(void)
 
     suna = tmp;
 
-    if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
+    if (tcp_dack[_ch_info_tbl->_ch_num] == 1)
     {
         if ((_tcp_tcb->snxt != suna) && (_tcp_tcb->retrans_q.len == ackdsz))
         {
             _tcp_tcb->retrans_q.data    = _tcp_tcb->retrans_q2.data;
             _tcp_tcb->retrans_q.hdr_flg   = _tcp_tcb->retrans_q2.hdr_flg;
             _tcp_tcb->retrans_q.len    = _tcp_tcb->retrans_q2.len;
-            _tcp_tcb->retrans_q.rst_cnt   = _tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
+            _tcp_tcb->retrans_q.rst_cnt   = tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
             _tcp_tcb->retrans_q.nxt_rtx_cnt  = _TCP_RTO_INIT;
             _tcp_tcb->retrans_q.cur_int   = _TCP_RTO_INIT;
             _tcp_tcb->retrans_q.seq    = _tcp_tcb->retrans_q2.seq;
@@ -1110,7 +1092,7 @@ void _tcp_rcv_ack(void)
 
         _tcp_tcb->suna = suna;
 
-        if (_tcp_dack[_ch_info_tbl->_ch_num])
+        if (tcp_dack[_ch_info_tbl->_ch_num])
         {
             _tcp_tcb->flag &= ~_TCBF_AVOID_DACK;
         }
@@ -1151,7 +1133,7 @@ void _tcp_rcv_ack(void)
             case _TCPS_CLOSING:
                 _tcp_tcb->status = _TCPS_TIME_WAIT;
                 _tcp_tcb->nxt_status = _TCPS_TIME_WAIT;
-                _tcp_tcb->mslcnt = _tcp_2msl[_ch_info_tbl->_ch_num];
+                _tcp_tcb->mslcnt = tcp_2msl[_ch_info_tbl->_ch_num];
                 break;
             case _TCPS_LAST_ACK:
                 _tcp_tcb->status = _TCPS_CLOSED;
@@ -1427,7 +1409,7 @@ void _tcp_swin_updt(void)
     win_size = net2hs(ph->win_size);
     _tcp_tcb->swsize = win_size ;
 
-    if (_tcp_dack[_ch_info_tbl->_ch_num])
+    if (tcp_dack[_ch_info_tbl->_ch_num])
     {
         net2hl_yn_xn(&suna,  &ph->ack) ;
         if ((_tcp_tcb->snxt >= suna) && ((_tcp_tcb->snxt - suna) < 0x7fffffff))
@@ -1472,9 +1454,9 @@ void _tcp_swin_updt(void)
         {
             if ((_tcp_tcb->rmt_rwsize >= _tcp_tcb->mss) || (_tcp_tcb->rmt_rwsize >= _tcp_tcb->sdsize) || (_tcp_tcb->rmt_rwsize != _tcp_tcb->swsize)/*(bug39 fix)*/)
             {
-                if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
+                if (tcp_dack[_ch_info_tbl->_ch_num] == 1)
                 {
-                    _tcp_tcb->retrans_q.rst_cnt = _tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
+                    _tcp_tcb->retrans_q.rst_cnt = tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
                     _tcp_tcb->retrans_q.nxt_rtx_cnt = _TCP_RTO_INIT;
                     if (!(_tcp_tcb->flag & _TCBF_NEED_SEND))
                     {
@@ -1589,7 +1571,7 @@ void _proc_snd(void)
 #endif
 
 #if defined(_TCP)
-        for (counter = 0;counter < __tcpcepn; counter++)
+        for (counter = 0;counter < tcp_ccep_num; counter++)
         {
             _tcp_tcb = &head_tcb[counter];
             _ch_info_tbl = &_ch_info_head[tcp_ccep[counter].cepatr];
@@ -1787,7 +1769,7 @@ void _proc_snd(void)
 #endif
     }
 
-    for (counter = 0; counter != __tcpcepn;counter++)
+    for (counter = 0; counter != tcp_ccep_num;counter++)
     {
         _tcp_tcb = &head_tcb[counter];
         _ch_info_tbl = &_ch_info_head[tcp_ccep[counter].cepatr];
@@ -1801,7 +1783,7 @@ void _proc_snd(void)
             }
         }
 #endif
-    }  /* for(counter = 0; counter != __tcpcepn;counter++) */
+    }  /* for(counter = 0; counter != tcp_ccep_num;counter++) */
 #if defined(_UDP)
     _udp_snd((_TCPUDP_PHDR*)&phdr);
 #endif
@@ -1825,7 +1807,7 @@ void _tcp_snd(void)
             _tcp_tcb->nxt_zero = _TCP_RTO_INIT;
             _tcp_tcb->zwin_int = _TCP_RTO_INIT;
             _tcp_tcb->flag &= ~_TCBF_SND_ZWIN;
-            if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
+            if (tcp_dack[_ch_info_tbl->_ch_num] == 1)
             {
                 if (_tcp_tcb->retrans_q.data != NULL)
                 {
@@ -1844,7 +1826,7 @@ void _tcp_snd(void)
         seq = _tcp_tcb->suna - 1;
         flg  = _TCPF_ACK;
         smode = _TCBF_SND_ZWIN;
-        if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
+        if (tcp_dack[_ch_info_tbl->_ch_num] == 1)
         {
             _tcp_tcb->flag &= ~_TCBF_AVOID_DACK;
         }
@@ -1856,7 +1838,7 @@ void _tcp_snd(void)
     }
     else
     {
-        if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
+        if (tcp_dack[_ch_info_tbl->_ch_num] == 1)
         {
             if (_tcp_tcb->sdsize > 0)
             {
@@ -1985,7 +1967,7 @@ void _tcp_snd(void)
                     || (_tcp_tcb->hdr_flg & _TCPF_RST)))
             {
 
-                if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
+                if (tcp_dack[_ch_info_tbl->_ch_num] == 1)
                 {
                     if (dack_flag & _TCBF_AVOID_DACK)
                     {
@@ -2000,7 +1982,7 @@ void _tcp_snd(void)
                         _tcp_tcb->retrans_q.data    = pdata;
                         _tcp_tcb->retrans_q.hdr_flg   = flg;
                         _tcp_tcb->retrans_q.len    = len;
-                        _tcp_tcb->retrans_q.rst_cnt   = _tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
+                        _tcp_tcb->retrans_q.rst_cnt   = tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
                         _tcp_tcb->retrans_q.nxt_rtx_cnt  = _TCP_RTO_INIT;
                         _tcp_tcb->retrans_q.cur_int   = _TCP_RTO_INIT;
                         _tcp_tcb->retrans_q.seq    = seq;
@@ -2010,7 +1992,7 @@ void _tcp_snd(void)
                 {
                     _tcp_tcb->retrans_q.data   = pdata;
                     _tcp_tcb->retrans_q.hdr_flg   = flg;
-                    _tcp_tcb->retrans_q.rst_cnt   = _tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
+                    _tcp_tcb->retrans_q.rst_cnt   = tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
                     _tcp_tcb->retrans_q.nxt_rtx_cnt  = _TCP_RTO_INIT;
                     _tcp_tcb->retrans_q.cur_int   = _TCP_RTO_INIT;
                     _tcp_tcb->retrans_q.seq    = seq;
@@ -2068,7 +2050,7 @@ void _tcp_snd(void)
     ret = _ip_snd(pdata, len);
     if (ret == E_IP_PENDING)
     {
-        if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
+        if (tcp_dack[_ch_info_tbl->_ch_num] == 1)
         {
             _tcp_tcb->flag = dack_flag;
         }
@@ -2112,9 +2094,9 @@ void _tcp_snd(void)
         if ((_tcp_tcb->flag & _TCBF_SND_ZWIN) && !(_tcp_tcb->hdr_flg & (_TCPF_FIN | _TCPF_SYN | _TCPF_RST)))
         {
             if (_tcp_tcb->zwp_noack_cnt == 0xffff)
-                _tcp_tcb->zwp_noack_cnt = _tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
+                _tcp_tcb->zwp_noack_cnt = tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
         }
-        if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
+        if (tcp_dack[_ch_info_tbl->_ch_num] == 1)
         {
             if (!(_tcp_tcb->flag & _TCBF_SND_TCP))
             {
@@ -2181,7 +2163,7 @@ void _tcp_snd(void)
                 }
                 _tcp_tcb->status = _tcp_tcb->nxt_status;
                 if (_tcp_tcb->status == _TCPS_TIME_WAIT)
-                    _tcp_tcb->mslcnt = _tcp_2msl[_ch_info_tbl->_ch_num];
+                    _tcp_tcb->mslcnt = tcp_2msl[_ch_info_tbl->_ch_num];
             }
 
             else
@@ -2190,7 +2172,7 @@ void _tcp_snd(void)
 
             }
         }
-        if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
+        if (tcp_dack[_ch_info_tbl->_ch_num] == 1)
         {
             if ((_tcp_tcb->flag & _TCBF_AVOID_DACK) == 0)
             {
@@ -2275,7 +2257,7 @@ void _tcp_clr_rtq(_TCB *_ptcb)
 {
     _ptcb->retrans_q.data   = NULL;
     _ptcb->retrans_q.hdr_flg  = 0;
-    if (_tcp_dack[ tcp_ccep[_ptcb->cepid-1].cepatr ] == 1)
+    if (tcp_dack[ tcp_ccep[_ptcb->cepid-1].cepatr ] == 1)
     {
         _ptcb->retrans_q.len   = 0;
     }
@@ -2335,7 +2317,7 @@ void _tcp_api_wup(ID id)
 int _tcp_check_cepid_arg(ID cepid)
 {
     int err = E_OK;
-    if ((cepid <= 0) || (cepid > __tcpcepn))
+    if ((cepid <= 0) || (cepid > tcp_ccep_num))
     {
         err = E_PAR;
     }
@@ -2440,14 +2422,14 @@ uint16_t _tcp_call_callback(ID cepid, FN fncd, void *p_parblk)
 
     if (pCallback)
     {
-        for (count = 0; count < __tcpcepn; count++)
+        for (count = 0; count < tcp_ccep_num; count++)
         {
             tmp = GET_TCP_CALLBACK_INFO_PTR(count + 1);
             _TCP_CB_STAT_SET_CALLBACK_FLG(tmp->stat);
         }
         pCallback(_tcp_tcb->cepid, fncd, p_parblk);
 
-        for (count = 0; count < __tcpcepn; count++)
+        for (count = 0; count < tcp_ccep_num; count++)
         {
             tmp = GET_TCP_CALLBACK_INFO_PTR(count + 1);
             _TCP_CB_STAT_CLEAR_CALLBACK_FLG(tmp->stat);

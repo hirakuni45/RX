@@ -157,7 +157,7 @@ enum
 #define _TCP_CB_STAT_IS_API_LOCKED(stat)  ((stat) & _TCP_CB_STAT_LOCK)
 #define _TCP_CB_STAT_SET_API_LOCK_FLG(stat)  ((stat)=(stat)|((_TCP_CB_STAT_LOCK)))
 #define _TCP_CB_STAT_CLEAR_API_LOCK_FLG(stat) ((stat)=(stat)&(~(_TCP_CB_STAT_LOCK)))
-typedef int (*_TCP_CALLBACK_FUNC)(ID cepid, FN fncd , void *p_parblk);
+typedef int (*_TCP_CALLBACK_FUNC)(uint32_t cepid, FN fncd , void *p_parblk);
 #define _TCP_CB_GET_CALLBACK_FUNC_PTR(cepid) (tcp_ccep[(cepid)-1].callback)
 #define _TCP_CB_CALL_CALLBACK(cepid, fncd, pTcpTcb)       \
     do {\

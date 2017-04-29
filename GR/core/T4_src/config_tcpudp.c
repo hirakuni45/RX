@@ -1,45 +1,11 @@
-/*******************************************************************************
-* DISCLAIMER
-* This software is supplied by Renesas Electronics Corporation and is only
-* intended for use with Renesas products. No other uses are authorized. This
-* software is owned by Renesas Electronics Corporation and is protected under
-* all applicable laws, including copyright laws.
-* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
-* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
-* LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
-* AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
-* TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
-* ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
-* FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
-* ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
-* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-* Renesas reserves the right, without notice, to make changes to this software
-* and to discontinue the availability of this software. By using this software,
-* you agree to the additional terms and conditions found by accessing the
-* following link:
-* http://www.renesas.com/disclaimer
-*
-* Copyright (C) 2011 Renesas Electronics Corporation. All rights reserved.
-*******************************************************************************/
-
-/*******************************************************************************
-* File Name     : config_tcpudp.c
-* Version       : 1.00
-* Device(s)     : Renesas microcomputer
-* Tool-Chain    : Renesas compilers
-* OS            :
-* H/W Platform  :
-* Description   : T4 configuration file
-* Limitations   :
-******************************************************************************/
-/******************************************************************************
-* History       : DD.MM.YYYY Version Description
-*               : 30.08.2011 1.00    First release.
-******************************************************************************/
-#include "net_config.h"
-#include "r_t4_itcpip.h"
-
-extern int t4_udp_callback(ID cepid, FN fncd , void *p_parblk);
+//=====================================================================//
+/*!	@file
+	@brief	TCP/UDP config @n
+			Copyright 2017 Kunihito Hiramatsu
+	@author	平松邦仁 (hira@rvf-rc45.net)
+*/
+//=====================================================================//
+#include "config_tcpudp.h"
 
 /****************************************************************************/
 /**********************     TCP-related definition     **********************/
@@ -56,7 +22,7 @@ T_TCP_CREP tcp_crep[TCPUDP_CHANNEL_NUM] = {
 };
 
 /* Total number of TCP reception points */
-const H __tcprepn = sizeof(tcp_crep) / sizeof(T_TCP_CREP);
+const uint32_t tcp_crep_num = sizeof(tcp_crep) / sizeof(T_TCP_CREP);
 
 /***  Definition of TCP communication end point
       (only receive window size needs to be set) ***/
@@ -70,23 +36,24 @@ T_TCP_CCEP tcp_ccep[TCPUDP_CHANNEL_NUM] = {
 };
 
 /* Total number of TCP communication end points */
-const H __tcpcepn = sizeof(tcp_ccep) / sizeof(T_TCP_CCEP);
+const uint32_t tcp_ccep_num = sizeof(tcp_ccep) / sizeof(T_TCP_CCEP);
 
 /***  TCP MSS  ***/
-const UH _tcp_mss = 1460;    /* MAX:1460 bytes */
+const uint16_t tcp_mss[] = { 1460 };    /* MAX:1460 bytes */
 
 /***  Initial value of sequence number (Set the value other than 0)  ***/
-UW    _tcp_initial_seqno = 1;
+const uint32_t tcp_initial_seqno[] = { 1 };
 
 /***  2MSL wait time (unit:10ms)  ***/
-const UH    _tcp_2msl = 1;      /* 10 ms */
+const uint16_t tcp_2msl[] = { 1 };      /* 10 ms */
 
 /***  Maximum value of retransmission timeout period (unit:10ms)  ***/
-const UH    _tcp_rt_tmo_rst = (10 * 60 * (1000 / 10));     /* 10 min */
+const uint32_t tcp_rt_tmo_rst[] = {
+	(10 * 60 * (1000 / 10))     /* 10 min */
+};
 
 /***  Transmit for delay ack (ON=1/OFF=0) ***/
-UB    _tcp_dack = 1;
-
+const uint8_t tcp_dack[] = { 1 };
 
 /****************************************************************************/
 /**********************     UDP-related definition     **********************/
@@ -103,7 +70,7 @@ T_UDP_CCEP udp_ccep[TCPUDP_CHANNEL_NUM] = {
 };
 
 /* Total number of UDP communication end points */
-const H __udpcepn = (sizeof(udp_ccep) / sizeof(T_UDP_CCEP));
+const uint32_t udp_ccep_num = (sizeof(udp_ccep) / sizeof(T_UDP_CCEP));
 
 /***  TTL for multicast transmission  ***/
 const UB __multi_TTL = 1;
@@ -120,11 +87,10 @@ const UH _ip_tblcnt = 3;
 #define GATEWAY_ADDR   0,0,0,0                /* Gateway address (invalid if all 0s) */
 #define SUBNET_MASK    255,255,255,0          /* Subnet mask  */
 
-TCPUDP_ENV tcpudp_env =
-{
-    {MY_IP_ADDR},
+TCPUDP_ENV tcpudp_env[] = {
+{   {MY_IP_ADDR},
     {SUBNET_MASK},
-    {GATEWAY_ADDR}
+    {GATEWAY_ADDR} }
 };
 
 
@@ -135,9 +101,9 @@ TCPUDP_ENV tcpudp_env =
 /*    Set of Ethernet-related                                               */
 /*--------------------------------------------------------------------------*/
 /* Local MAC address (Set all 0s when unspecified) */
-#define MY_MAC_ADDR    0x02,0x00,0x00,0x00,0x00,0x00
-
-UB _myethaddr[6] = { MY_MAC_ADDR };
+MAC_ADDRESS ethernet_mac[] = {
+	{ { 0x02,0x00,0x00,0x00,0x00,0x00 } }
+};
 
 /*--------------------------------------------------------------------------*/
 /*    Set of PPP-related                                                    */

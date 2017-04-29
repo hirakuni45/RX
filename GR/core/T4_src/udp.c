@@ -1,38 +1,15 @@
-/***********************************************************************************************************************
-* DISCLAIMER
-* This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
-* other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
-* applicable laws, including copyright laws.
-* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
-* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
-* EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
-* SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
-* SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-* Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
-* this software. By using this software, you agree to the additional terms and conditions found by accessing the
-* following link:
-* http://www.renesas.com/disclaimer
-*
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
-***********************************************************************************************************************/
-/***********************************************************************************************************************
-* File Name    : udp.c
-* Version      : 1.0
-* Description  : Processing for TCP API
-***********************************************************************************************************************/
-/**********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Includes   <System Includes> , "Project Includes"
-***********************************************************************************************************************/
+//=====================================================================//
+/*!	@file
+	@brief	udp.c @n
+			Copyright 2017 Kunihito Hiramatsu
+	@author	平松邦仁 (hira@rvf-rc45.net)
+*/
+//=====================================================================//
 #include "net_config.h"
 #include <string.h>
 #include "type.h"
 #include "r_t4_itcpip.h"
+#include "config_tcpudp.h"
 #if defined(_ETHER)
 #include "ether.h"
 #elif defined(_PPP)
@@ -61,8 +38,6 @@ Private global variables and functions
 
 #if defined(_UDP)
 _UDP_CB  *_udp_cb;
-extern const T_UDP_CCEP udp_ccep[];
-extern const H __udpcepn;
 extern const UB _udp_enable_zerochecksum[];
 extern UB *data_link_buf_ptr;
 #endif
@@ -367,7 +342,7 @@ void _udp_rcv(_IP_HDR *piph, _UDP_HDR *pudph)
     }
     dport = net2hs(pudph->dst_port);
 
-    for (i = 0; i < __udpcepn; i++)
+    for (i = 0; i < udp_ccep_num; i++)
     {
         if ((udp_ccep[i].myaddr.portno == dport) && (_ch_info_tbl->_ch_num == udp_ccep[i].cepatr))
         {
@@ -377,7 +352,7 @@ void _udp_rcv(_IP_HDR *piph, _UDP_HDR *pudph)
         }
     }
 
-    if (i == __udpcepn)
+    if (i == udp_ccep_num)
     {
         report_error(_ch_info_tbl->_ch_num, RE_UDP_HEADER3, data_link_buf_ptr);
     }
@@ -472,14 +447,14 @@ int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
     {
         if (pcep->callback != NULL)
         {
-            for (count = 0; count < __udpcepn; count++)
+            for (count = 0; count < udp_ccep_num; count++)
             {
                 tmp = &_udp_cb[count];
                 tmp->stat |= _UDP_CB_STAT_CALLBACK;
             }
             (*pcep->callback)(cepid, fncd, (void *)&ercd);
         }
-        for (count = 0; count < __udpcepn; count++)
+        for (count = 0; count < udp_ccep_num; count++)
         {
             tmp = &_udp_cb[count];
             tmp->stat &= (~(_UDP_CB_STAT_CALLBACK | _UDP_CB_STAT_RCV));
@@ -509,7 +484,7 @@ void _udp_snd(_TCPUDP_PHDR *ph)
     UH    count;
     _UDP_CB   *tmp;
 
-    for (i = 0; i < __udpcepn; i++)
+    for (i = 0; i < udp_ccep_num; i++)
     {
         pucb  = &_udp_cb[i];
         pureq = &pucb->req;
@@ -565,7 +540,7 @@ void _udp_snd(_TCPUDP_PHDR *ph)
                     pcep = &udp_ccep[i];
                     if (pcep->callback != NULL)
                     {
-                        for (count = 0; count < __udpcepn; count++)
+                        for (count = 0; count < udp_ccep_num; count++)
                         {
                             tmp = &_udp_cb[count];
                             tmp->stat |= _UDP_CB_STAT_CALLBACK;
@@ -573,7 +548,7 @@ void _udp_snd(_TCPUDP_PHDR *ph)
                         fncd = TFN_UDP_SND_DAT;
                         (*pcep->callback)(i + 1, fncd, (void *)&ercd);
                     }
-                    for (count = 0; count < __udpcepn; count++)
+                    for (count = 0; count < udp_ccep_num; count++)
                     {
                         tmp = &_udp_cb[count];
                         tmp->stat &= ~(_UDP_CB_STAT_CALLBACK);
@@ -639,7 +614,7 @@ void _proc_udp_api()
     UH    count;
     _UDP_CB   *tmp;
 
-    for (i = 0; i < __udpcepn; i++)
+    for (i = 0; i < udp_ccep_num; i++)
     {
         pucb  = &_udp_cb[i];
         pureq = &pucb->req;
@@ -658,13 +633,13 @@ void _proc_udp_api()
                 fn = _udp_api_type_to_fn(pureq->type);
                 memset(pucb, 0, sizeof(_UDP_CB));
                 ercd = E_RLWAI;
-                for (count = 0; count < __udpcepn; count++)
+                for (count = 0; count < udp_ccep_num; count++)
                 {
                     tmp = &_udp_cb[count];
                     tmp->stat |= _UDP_CB_STAT_CALLBACK;
                 }
                 (udp_ccep[i].callback)(i + 1 /* cepid */, fn, (void *)&ercd);
-                for (count = 0; count < __udpcepn; count++)
+                for (count = 0; count < udp_ccep_num; count++)
                 {
                     tmp = &_udp_cb[count];
                     tmp->stat &= ~(_UDP_CB_STAT_CALLBACK);
@@ -684,8 +659,8 @@ void _proc_udp_api()
 void _udp_init(UW **workpp)
 {
     _udp_cb = (_UDP_CB *)(*workpp);
-    memset(_udp_cb, 0, sizeof(_UDP_CB) * __udpcepn);
-    *workpp = (UW *)((uint8_t *)(*workpp) + (sizeof(_UDP_CB) * __udpcepn));
+    memset(_udp_cb, 0, sizeof(_UDP_CB) * udp_ccep_num);
+    *workpp = (UW *)((uint8_t *)(*workpp) + (sizeof(_UDP_CB) * udp_ccep_num));
 }
 
 
@@ -700,7 +675,7 @@ void _udp_api_tmout()
     _UDP_API_REQ *pureq;
     int16_t  i;
 
-    for (i = 0; i < __udpcepn; i++)
+    for (i = 0; i < udp_ccep_num; i++)
     {
         pureq = &_udp_cb[i].req;
         if (pureq->type != _UDP_API_NON)
@@ -784,7 +759,7 @@ FN  _udp_api_type_to_fn(uint16_t api_type)
 int _udp_check_cepid_arg(ID cepid)
 {
     int err = E_OK;
-    if ((cepid <= 0) || (cepid > __udpcepn))
+    if ((cepid <= 0) || (cepid > udp_ccep_num))
     {
         err = E_PAR;
     }

@@ -132,7 +132,7 @@ typedef struct t_tcp_ccep
     int      sbufsz;    /* Size of transmit window buffer         */
     void    *rbuf;      /* Top address of receive window buffer   */
     int      rbufsz;    /* Size of receive window buffer          */
-    int (*callback)(ID cepid, FN fncd , void *p_parblk);   /* Callback routine */
+    int (*callback)(uint32_t cepid, FN fncd , void *p_parblk);   /* Callback routine */
 } T_TCP_CCEP;
 
 /***  UDP communication end point  ***/
@@ -140,7 +140,7 @@ typedef struct t_udp_ccep
 {
     uint16_t cepatr;    /* UDP communication end point attribute  */
     T_IPV4EP myaddr;    /* Local IP address and port number       */
-    int (*callback)(ID cepid, FN fncd , void *p_parblk); /* Callback routine */
+    int (*callback)(uint32_t cepid, FN fncd , void *p_parblk); /* Callback routine */
 } T_UDP_CCEP;
 
 /***  IP address settings  ***/

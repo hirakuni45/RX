@@ -15,27 +15,19 @@
 #include "ppp.h"
 #endif
 
+#include "config_tcpudp.h"
+
 #include "ip.h"
 #include "tcp.h"
 #include "udp.h"
 #include "core/driver/driver.h"
 
-
 extern _TCB   *_tcp_tcb;
 extern _TCB   *head_tcb;
-extern TCPUDP_ENV tcpudp_env[];
-extern const T_TCP_CCEP tcp_ccep[];
-extern const H __tcpcepn;
-extern const H __tcprepn;
 extern UH _tcp_timer_cnt;
 extern UH _tcp_pre_timer_cnt;
 
-#if defined(_UDP)
-extern const H __udpcepn;
-#endif
-
 #if defined(_ETHER)
-/// extern UH const _ip_tblcnt[];
 extern UH const _ip_tblcnt;
 _ARP_ENTRY   **_ether_arp_tbl;
 #endif
@@ -97,10 +89,10 @@ void tcpudp_open(uint32_t *workp)
 
 	_tcp_tcb = (_TCB*)currp;
 	head_tcb = (_TCB*)currp;
-	currp = (uint32_t*)((uint8_t*)currp + (sizeof(_TCB) * __tcpcepn));
+	currp = (uint32_t*)((uint8_t*)currp + (sizeof(_TCB) * tcp_ccep_num));
 
 #if defined(_TCP)
-	for(int counter = 0; counter < __tcpcepn; counter++) {
+	for(int counter = 0; counter < tcp_ccep_num; counter++) {
 		tcpudp_clr_req_(counter + 1);
 
 		_tcp_init_callback_info(&head_tcb[counter].callback_info);
@@ -130,9 +122,9 @@ void tcpudp_open(uint32_t *workp)
 
 		memset(&_ch_info_head[counter]._p_rcv_buf, 0, sizeof(_P_RCV_BUF));
 
-		memcpy(_ch_info_head[counter]._myipaddr, tcpudp_env[counter].ipaddr, IP_ALEN);
+		memcpy(_ch_info_head[counter]._myipaddr,   tcpudp_env[counter].ipaddr, IP_ALEN);
 		memcpy(_ch_info_head[counter]._mymaskaddr, tcpudp_env[counter].maskaddr, IP_ALEN);
-		memcpy(_ch_info_head[counter]._mygwaddr, tcpudp_env[counter].gwaddr, IP_ALEN);
+		memcpy(_ch_info_head[counter]._mygwaddr,   tcpudp_env[counter].gwaddr, IP_ALEN);
 	}
 	currp = (uint32_t*)((uint8_t*)currp + (sizeof(_CH_INFO) * TCPUDP_CHANNEL_NUM));
 
@@ -177,13 +169,13 @@ static void get_align_memory_size_(uint32_t *ramsize)
 static uint32_t get_tcp_memory_size_(void)
 {
 	uint32_t ramsize = 0;
-    for(int counter = 0; counter < __tcpcepn; counter++) {
+    for(int counter = 0; counter < tcp_ccep_num; counter++) {
 		ramsize += tcp_ccep[counter].rbufsz;
 		ramsize += 4 - (tcp_ccep[counter].rbufsz % 4);
 	}
     get_align_memory_size_(&ramsize);
 
-    ramsize += (sizeof(_TCB) * __tcpcepn);
+    ramsize += (sizeof(_TCB) * tcp_ccep_num);
 
     get_align_memory_size_(&ramsize);
 
@@ -195,7 +187,7 @@ static uint32_t get_tcp_memory_size_(void)
 static uint32_t get_udp_memory_size_(void)
 {
     uint32_t ramsize = 0;
-    ramsize += (sizeof(_UDP_CB) * __udpcepn);
+    ramsize += (sizeof(_UDP_CB) * udp_ccep_num);
     return ramsize;
 }
 #endif
@@ -257,7 +249,7 @@ int tcp_acp_cep(int cepid, int repid, T_IPVxEP *p_dstaddr, int32_t tmout)
         return E_PAR;
     }
 
-    if ((repid <= 0) || (repid > __tcprepn))
+    if ((repid <= 0) || (repid > tcp_crep_num))
     {
         return E_PAR;
     }
