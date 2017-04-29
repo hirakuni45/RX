@@ -186,12 +186,11 @@ namespace net {
 			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
 			char tmp[32];
 			make_date_time_(t, tmp, sizeof(tmp));
-			format("Type=%s;Size=%d;Modify=%s; %s", data->get_cepid())
+			format("Type=%s;Size=%d;Modify=%s; %s\n", data->get_cepid())
 				% (dir ? "dir" : "file")
 				% fi->fsize
 				% tmp
 				% name;
-			data->service();
 #endif
 		}
 
@@ -596,9 +595,9 @@ namespace net {
 					ret = false;
 				} else {
       				format("150 Accepted data connection\n", ctrl_.get_cepid());
-
 					if(sdc_.get_mount()) {
 						int n = sdc_.dir_loop(sdc_.get_current(), dir_list_func_, true, &data_);
+						data_.stop();
 						format("226-options: -a -l\n", ctrl_.get_cepid());
 						format("226 %d matches total\n", ctrl_.get_cepid()) % n;
 					} else {
@@ -922,9 +921,6 @@ void FtpServer::service()
 		//-----------------------------------------------------------------//
 		void service()
 		{
-			ctrl_.service();
-			data_.service();
-
 			switch(task_) {
 			case task::connection:
 				if(ctrl_.connected()) {
