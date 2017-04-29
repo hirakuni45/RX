@@ -107,7 +107,8 @@ namespace net {
 			int32_t     pre_sec_timer;
 			bool		enable;
 			bool		call_flag;
-			CEP() : enable(false), call_flag(false) { }
+			bool		server;
+			CEP() : enable(false), call_flag(false), server(false) { }
 		};
 
 	private:
@@ -276,6 +277,24 @@ namespace net {
 				utils::format("start: step 1 halt...");
 				while(1);
 			}
+		}
+
+
+		int16_t set_tcp_crep(int32_t repid, UH portno) {
+			if (repid == 0 || repid > __tcprepn) {
+				return -1;
+			}
+			tcp_crep[repid - 1].myaddr.portno = portno;
+			return 0;
+		}
+
+		int16_t set_tcp_ccep(int32_t cepid, UB ch, int rbufsz) {
+			if (cepid == 0 || cepid > __tcpcepn){
+				return -1;
+			}
+			tcp_ccep[cepid - 1].cepatr = ch;
+			tcp_ccep[cepid - 1].rbufsz = rbufsz;
+			return 0;
 		}
 
 
@@ -522,6 +541,31 @@ namespace net {
                     dhcpIPuse_sec += sec;
                 }
             }
+
+			// サーバー向けサービス
+			for(uint32_t i = 0; i < TCPUDP_CHANNEL_NUM; ++i) {
+				if(!cep_[i].enable) continue;
+				if(!cep_[i].server) continue;
+
+				uint32_t cepid = i + 1;
+				TCP_API_STAT ercd = tcp_read_stat(cepid);
+
+				ethernet::CEP& cep = at_cep(cepid);
+///				int cfg = cep.call_flag;
+//				debug_format("ethernet_server::available():tcp_read_stat() = %d, call_flag: %d\n") % ercd;
+
+				if(ercd == TCP_API_STAT_CLOSED && !cep.call_flag) {
+					int ret = tcp_acp_cep(cepid, cepid, &cep.dst_addr, TMO_NBLK);
+//					debug_format("ethernet_server::available():tcp_acp_cep(TMO_NBLK) = %d") % ret;
+					if(ret == E_WBLK){
+//						debug_format(", E_WBLK(success)\n");
+					} else {
+//						debug_format("fail: %d\n") % ret;
+					}
+					// one time call flag is on
+					cep.call_flag = true;
+				}
+			}
         }
 
 
@@ -598,14 +642,78 @@ namespace net {
 		}
 
 
-		static int32_t write(uint32_t cepid, const void* buffer, uint32_t size)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ネットの起動
+			@param[in]	port	ポート番号
+			@param[in]	server	サーバーの場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t start(uint16_t port, bool server)
 		{
-			if(buffer == nullptr || size == 0) return 0;
+			uint32_t cepid = new_connection();
+			if(cepid == 0) {
+				utils::format("Connection handle empty\n");
+				return 0;
+			}
+
+			at_cep(cepid).server = true;
+
+			/* initialize cep status */
+			at_cep(cepid).status = T4_CLOSED;
+			/* Initialize TCP reception point */
+
+			if(set_tcp_crep(cepid, port) != E_OK) {
+				utils::format("set_tcp_crep() fail: %d\n") % cepid;
+				return 0;
+			}
+
+			/* Initialize TCP communication end point */
+			if(set_tcp_ccep(cepid, 0, ethernet::TCP_MSS) != E_OK) {
+				utils::format("set_tcp_ccep() fail: %d\n") % cepid;
+				return 0;
+			}
+
+			return cepid;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  読み込み
+			@param[in]	cepid	TCP/UDP ディスクリプタ
+			@param[out]	buff	読み込み先
+			@param[in]	size	読み込みサイズ
+			@return 読み込みサイズ（負の場合エラー）
+		*/
+		//-----------------------------------------------------------------//
+		static int read(uint32_t cepid, void* buff, size_t size)
+		{
+			int32_t ercd = tcp_recv_data(cepid, buff, size, TMO_FEVR);
+			if(ercd <= 0) {
+				ercd = -1;
+			}
+			return ercd;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  書き込み
+			@param[in]	cepid	TCP/UDP ディスクリプタ
+			@param[in]	buff	書き込み元
+			@param[in]	size	サイズ
+			@return 書き込みサイズ（負の場合エラー）
+		*/
+		//-----------------------------------------------------------------//
+		static int32_t write(uint32_t cepid, const void* buff, uint32_t size)
+		{
+			if(buff == nullptr || size == 0) return 0;
 
 			int32_t ercd;
 			uint32_t current_send_size = 0;
 
-			const uint8_t* p = static_cast<const uint8_t*>(buffer);
+			const uint8_t* p = static_cast<const uint8_t*>(buff);
 			if (size <= 0x7fff) {
 				ercd = tcp_send_data(cepid, p, size, TMO_FEVR);
 			} else {
@@ -624,6 +732,7 @@ namespace net {
 			}
 			return current_send_size;
 		}
+
 	};
 
 
