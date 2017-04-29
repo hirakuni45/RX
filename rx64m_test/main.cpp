@@ -167,7 +167,7 @@ namespace seeda {
 				sample_t_[i] = sample_[i].get();
 				sample_[i].clear();
 			}
-			sample_count_ = 0;
+			sample_count_ = 0;			
 		}
 	}
 

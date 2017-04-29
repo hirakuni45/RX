@@ -115,11 +115,11 @@ namespace seeda {
 		}
 
 
-		void make_adc_csv_(net::ethernet_base& base, const char* tail)
+		void make_adc_csv_(uint32_t fd, const char* tail)
 		{
 			for(int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample(ch);
-				format("%d,%d,%d,%d,%d,%d,%d%s", base.get_cepid())
+				format("%d,%d,%d,%d,%d,%d,%d%s", fd)
 					% ch
 					% static_cast<uint32_t>(t.min_)
 					% static_cast<uint32_t>(t.max_)
@@ -132,9 +132,8 @@ namespace seeda {
 		}
 
 
-		void send_info_(net::ethernet_base& base, int id, bool keep)
+		void send_info_(int fd, int id, bool keep)
 		{
-			int fd = base.get_cepid();
 			format("HTTP/1.1 %d OK\n", fd) % id;
 			format("Server: seeda/rx64m\n", fd);
 			format("Content-Type: text/html\n", fd);
@@ -142,9 +141,8 @@ namespace seeda {
 		}
 
 
-		void send_head_(net::ethernet_base& base, const char* title)
+		void send_head_(int fd, const char* title)
 		{
-			int fd = base.get_cepid();
 			format("<head>\n", fd);
 			format("<title>SEEDA %s</title>\n", fd) % title;
 			format("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n", fd);
@@ -156,10 +154,10 @@ namespace seeda {
 
 
 		// クライアントからの応答を解析して終端（空行）があったら「true」
-		int analize_request_(net::ethernet_base& base)
+		int analize_request_()
 		{
 			char tmp[512];
-			int len = base.read(tmp, sizeof(tmp));
+			int len = server_.read(tmp, sizeof(tmp));
 
 			for(int i = 0; i < len; ++i) {
 				char ch = tmp[i];
@@ -184,7 +182,7 @@ namespace seeda {
 		}
 
 
-		void select_cgi_(net::ethernet_base& base, const char* path, int pos)
+		void select_cgi_(int fd, const char* path, int pos)
 		{
 			utils::format("CGI: '%s'\n") % path;
 
@@ -278,31 +276,31 @@ namespace seeda {
 		}
 
 
+#if 0
 		// POST などの空行以下のデータ列を受け取る
-		bool recv_data_(net::ethernet_base& base, char* recv, uint32_t max)
+		bool recv_data_(char* recv, uint32_t max)
 		{
 			int len = base.read(recv, max);
 			if(len <= 0) return false;
 
 			return true;
 		}
+#endif
 
 
-		void render_404_(net::ethernet_base& base, const char* msg)
+		void render_404_(int fd, const char* msg)
 		{
-			send_info_(base, 404, false);
+			send_info_(fd, 404, false);
 		}
 
 
-		void render_null_(net::ethernet_base& base, const char* title = nullptr)
+		void render_null_(int fd, const char* title = nullptr)
 		{
-			int fd = base.get_cepid();
-
-			send_info_(base, 200, false);
+			send_info_(fd, 200, false);
 
 			format("<!DOCTYPE HTML>\n", fd);
 			format("<html>\n", fd);
-			send_head_(base, "NULL");
+			send_head_(fd, "NULL");
 
 			if(title != nullptr) {
 				format(title, fd);
@@ -311,9 +309,8 @@ namespace seeda {
 		}
 
 
-		void render_date_time_(net::ethernet_base& base)
+		void render_date_time_(int fd)
 		{
-			int fd = base.get_cepid();
 			char tmp[128];
 			time_t t = get_time();
 			disp_time(t, tmp, sizeof(tmp));
@@ -322,49 +319,46 @@ namespace seeda {
 
 
 		// ビルドバージョン表示
-		void render_version_(net::ethernet_base& base)
+		void render_version_(int fd)
 		{
-			int fd = base.get_cepid();
 			format("Seeda03 Build: %u Version %d.%02d<br>\n", fd) % build_id_
 				% (seeda_version_ / 100) % (seeda_version_ % 100);
 		}
 
 
-		void render_root_(net::ethernet_base& base)
+		void render_root_(int fd)
 		{
-			int fd = base.get_cepid();
-			send_info_(base, 200, false);
+			send_info_(fd, 200, false);
 
 			format("<!DOCTYPE HTML>\n", fd);
 			format("<html>\n", fd);
-			send_head_(base, "Root/SimpleData");
+			send_head_(fd, "Root/SimpleData");
 
 			// コネクション回数表示
 			format("Conection: %d<br>\n", fd) % count_;
 
-			render_date_time_(base);
+			render_date_time_(fd);
 
 			format("Sampling: 1[ms]<br>\n", fd);
 
-			make_adc_csv_(base, "<br>\n");
+			make_adc_csv_(fd, "<br>\n");
 
 			format("</html>\n", fd);
 		}
 
 
 		// メイン設定画面
-		void render_setup_main_(net::ethernet_base& base)
+		void render_setup_main_(int fd)
 		{
-			int fd = base.get_cepid();
-			send_info_(base, 200, false);
+			send_info_(fd, 200, false);
 
 			format("<!DOCTYPE HTML>\n", fd);
 			format("<html>\n", fd);
-			send_head_(base, "SetupMain");
+			send_head_(fd, "SetupMain");
 
-			render_version_(base);
+			render_version_(fd);
 
-			render_date_time_(base);
+			render_date_time_(fd);
 
 			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
 
@@ -433,18 +427,17 @@ namespace seeda {
 
 
 		// クライアント設定画面
-		void render_setup_client_(net::ethernet_base& base)
+		void render_setup_client_(int fd)
 		{
-			int fd = base.get_cepid();
-			send_info_(base, 200, false);
+			send_info_(fd, 200, false);
 
 			format("<!DOCTYPE HTML>\n", fd);
 			format("<html>\n", fd);
-			send_head_(base, "SetupClient");
+			send_head_(fd, "SetupClient");
 
-			render_version_(base);
+			render_version_(fd);
 
-			render_date_time_(base);
+			render_date_time_(fd);
 
 			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
 
@@ -462,14 +455,13 @@ namespace seeda {
 		}
 
 
-		void render_files_(net::ethernet_base& base)
+		void render_files_(int fd)
 		{
-			int fd = base.get_cepid();
-			send_info_(base, 200, false);
+			send_info_(fd, 200, false);
 
 			format("<!DOCTYPE HTML>\n", fd);
 			format("<html>\n", fd);
-			send_head_(base, "SD Files");
+			send_head_(fd, "SD Files");
 
 			format("<style type=\"text/css\">\n", fd);
 			format(".table3 {\n", fd);
@@ -493,21 +485,20 @@ namespace seeda {
 		}
 
 
-		void render_data_(net::ethernet_base& base)
+		void render_data_(int fd)
 		{
-			int fd = base.get_cepid();
-			send_info_(base, 200, false);
+			send_info_(fd, 200, false);
 			// format("Refresh: 5\n", fd);  // refresh the page automatically every 5 sec
 
 			format("<!DOCTYPE HTML>\n", fd);
 			format("<html>\n", fd);
-			send_head_(base, "Data");
+			send_head_(fd, "Data");
 
 			format("<font size=\"4\">\n", fd);
 			// コネクション回数表示
 			format("Conection: %d<br>\n", fd) % count_;
 
-			render_date_time_(base);
+			render_date_time_(fd);
 
 			format("サンプリング周期： 1[ms]<br>\n", fd);
 
@@ -558,9 +549,8 @@ namespace seeda {
 		}
 
 
-		void send_file_(net::ethernet_base& base, const char* path)
+		void send_file_(int fd, const char* path)
 		{
-			int fd = base.get_cepid();
 			FILE* fp = fopen(path, "rb");
 			if(fp != nullptr) {
 				format("HTTP/1.1 200 OK\n", fd);
@@ -581,16 +571,16 @@ namespace seeda {
 				uint32_t total = 0;
 				uint32_t len;
 				while((len = fread(tmp, 1, sizeof(tmp), fp)) == sizeof(tmp)) {
-					base.write(tmp, sizeof(tmp));
+					server_.write(tmp, sizeof(tmp));
 					total += len;
 				}
 				if(len > 0) {
-					base.write(tmp, len);
+					server_.write(tmp, len);
 					total += len;
 				}
 				fclose(fp);
 			} else {
-				render_null_(base, path);
+				render_null_(fd, path);
 			}
 		}
 
@@ -667,10 +657,10 @@ namespace seeda {
 					char tmp[128];
 					time_t t = get_time();
 					disp_time(t, tmp, sizeof(tmp));
-					format("%s", client_.get_cepid()) % tmp;
+					format("%s\n", client_.get_cepid()) % tmp;
 				}
 				{
-					make_adc_csv_(client_, "\n");
+					make_adc_csv_(client_.get_cepid(), "\n");
 				}
 
 				break;
@@ -702,7 +692,7 @@ namespace seeda {
 #ifdef SEEDA
 			client_ip_(192, 168, 1, 3),
 #else
-			client_ip_(192, 168, 3, 5),
+			client_ip_(192, 168, 3, 7),
 #endif
 			client_time_(0),
 			write_path_{ 0 }, write_count_(0) { }
@@ -762,13 +752,13 @@ namespace seeda {
 
 			// http server
 			server_.begin(80);
-			utils::format("Start server: %s") % ethernet_.get_local_ip().c_str();
+			utils::format("Start HTTP server: %s") % ethernet_.get_local_ip().c_str();
 			utils::format("  port(%d)\n") % static_cast<int>(server_.get_port());
 
 			// client service (3000)
-			client_.begin(3000);
-			utils::format("Start client: %s") % ethernet_.get_local_ip().c_str();
-			utils::format("  port(%d)\n") % static_cast<int>(client_.get_port());
+//			client_.begin(3000);
+//			utils::format("Start client: %s") % ethernet_.get_local_ip().c_str();
+//			utils::format("  port(%d)\n") % static_cast<int>(client_.get_port());
 
 			// FTP Server
 			ftp_.start();
@@ -796,8 +786,6 @@ namespace seeda {
 
 			service_client_();
 
-			server_.service();
-
 			switch(server_task_) {
 
 			case server_task::wait_client:
@@ -815,8 +803,8 @@ namespace seeda {
 					if(server_.available() == 0) {  // リードデータがあるか？
 						break;
 					}
-					net::ethernet_base& base = static_cast<net::ethernet_base&>(server_);
-					auto pos = analize_request_(base);
+					int fd = server_.get_cepid();
+					auto pos = analize_request_();
 					if(pos > 0) {
 						char path[256];
 						path[0] = 0;
@@ -832,24 +820,24 @@ namespace seeda {
 							break;
 						}
 						if(strcmp(path, "/") == 0) {
-							render_root_(base);
+							render_root_(fd);
 						} else if(strncmp(path, "/cgi/", 5) == 0) {
-							select_cgi_(base, path, pos);
-							render_setup_main_(base);
+							select_cgi_(fd, path, pos);
+							render_setup_main_(fd);
 						} else if(strcmp(path, "/data") == 0) {
-							render_data_(base);
+							render_data_(fd);
 						} else if(strcmp(path, "/setup") == 0) {
-							render_setup_main_(base);
+							render_setup_main_(fd);
 						} else if(strcmp(path, "/client") == 0) {
-							render_setup_client_(base);
+							render_setup_client_(fd);
 						} else if(strcmp(path, "/files") == 0) {
-							render_files_(base);
+							render_files_(fd);
 						} else if(strncmp(path, "/seeda/", 7) == 0) {
-							send_file_(base, path);
+							send_file_(fd, path);
 						} else {
 							char tmp[256];
 							utils::format("Invalid path: '%s'", tmp, sizeof(tmp)) % path;
-							render_null_(base, tmp);
+							render_null_(fd, tmp);
 						}
 						server_task_ = server_task::disconnect_delay;
 						disconnect_loop_ = 5;
