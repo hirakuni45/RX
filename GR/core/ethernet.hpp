@@ -522,12 +522,18 @@ namespace net {
                 }
             }
 
-			// サーバー向けサービス
+			// サービス
 			for(uint32_t i = 0; i < TCPUDP_CHANNEL_NUM; ++i) {
 				if(!cep_[i].enable) continue;
 
 				uint32_t cepid = i + 1;
 				TCP_API_STAT ercd = tcp_read_stat(cepid);
+
+				static TCP_API_STAT ercd_[8];
+				if(ercd != ercd_[i]) {
+					utils::format("STAT: %d (%d)\n") % static_cast<int>(ercd) % cepid;
+					ercd_[i] = ercd;
+				}
 
 				ethernet::CEP& cep = at_cep(cepid);
 ///				int cfg = cep.call_flag;
