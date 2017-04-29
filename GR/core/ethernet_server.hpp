@@ -119,9 +119,12 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool connected()
 		{
+			if(cepid_ == 0) return false;
+
 			bool ret = false;
 			TCP_API_STAT ercd = tcp_read_stat(cepid_);
-			if(ercd == TCP_API_STAT_ESTABLISHED || ercd == TCP_API_STAT_CLOSE_WAIT) {
+///			if(ercd == TCP_API_STAT_ESTABLISHED || ercd == TCP_API_STAT_CLOSE_WAIT) {
+			if(ercd == TCP_API_STAT_ESTABLISHED) {
 				ret = true;
 			}
 			return ret;
@@ -187,6 +190,7 @@ namespace net {
 			tcp_cls_cep(cepid_, TMO_FEVR);
 			ethernet::CEP& cep = ethernet_.at_cep(cepid_);
 			cep.call_flag = false;
+			end();
 		}
 
 
@@ -197,8 +201,8 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void end()
 		{
-			stop();
 			ethernet_.end_connection(cepid_);
+			cepid_ = 0;
 		}
 	};
 }
