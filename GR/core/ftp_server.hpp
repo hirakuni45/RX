@@ -250,6 +250,16 @@ namespace net {
 			switch(cmd) {
 
 			case ftp_command::ABOR:
+#if 0
+  //
+  //  ABOR - Abort
+  //
+  else if( ! strcmp( command, "ABOR" ))
+  {
+    abortTransfer();
+    client << "226 Data connection closed" << "\r\n";
+  }
+#endif
 				break;
 
 			case ftp_command::ACCT:
@@ -262,6 +272,35 @@ namespace net {
 				break;
 
 			case ftp_command::CDUP:
+#if 0
+  //
+  //  CDUP - Change to Parent Directory 
+  //
+  if( ! strcmp( command, "CDUP" ))
+  {
+    boolean ok = false;
+    
+    if( strlen( cwdName ) > 1 )            // do nothing if cwdName is root
+    {
+      // if cwdName ends with '/', remove it (must not append)
+      if( cwdName[ strlen( cwdName ) - 1 ] == '/' )
+        cwdName[ strlen( cwdName ) - 1 ] = 0;
+      // search last '/'
+      char * pSep = strrchr( cwdName, '/' );
+      ok = pSep > cwdName;
+      // if found, ends the string on its position
+      if( ok )
+      {
+        * pSep = 0;
+        ok = FAT.exists( cwdName );
+      }
+    }
+    // if an error appends, move to root
+    if( ! ok )
+      strcpy( cwdName, "/" );
+    client << "200 Ok. Current directory is " << cwdName << "\r\n";
+  }
+#endif
 				break;
 
 			case ftp_command::CWD:
@@ -278,6 +317,19 @@ namespace net {
 				break;
 
 			case ftp_command::DELE:
+				if(param_ == nullptr || strlen(param_) == 0) {
+					format("501 No file name\n", ctrl_.get_cepid());
+					break;
+				}
+				if(!sdc_.probe(param_)) {
+					format("550 File %s not found\n", ctrl_.get_cepid()) % param_;
+					break;
+				}
+				if(sdc_.remove(param_)) {
+					format("250 \"%s\" deleted\n", ctrl_.get_cepid()) % param_;
+				} else {
+					format("450 Can't delete %s\n", ctrl_.get_cepid()) % param_;
+				}
 				break;
 
 			case ftp_command::HELP:
@@ -299,6 +351,19 @@ namespace net {
 				break;
 
 			case ftp_command::MKD:
+				if(param_ == nullptr || strlen(param_) == 0) {
+					format("501 No directory name\n", ctrl_.get_cepid());
+					break;
+				}
+				if(sdc_.probe(param_)) {
+					format("521 \"%s\" directory already exists\n", ctrl_.get_cepid()) % param_;
+					break;
+				}
+				if(sdc_.mkdir(param_)) {
+					format("257 \"%s\" created\n", ctrl_.get_cepid()) % param_;
+				} else {
+					format("550 Can't create \"%s\"\n", ctrl_.get_cepid()) % param_;
+				}
 				break;
 
 			case ftp_command::NLST:
@@ -308,6 +373,20 @@ namespace net {
 				break;
 
 			case ftp_command::MODE:
+#if 0
+  //
+  //  MODE - Transfer Mode 
+  //
+  else if( ! strcmp( command, "MODE" ))
+  {
+    if( ! strcmp( parameters, "S" ))
+      client << "200 S Ok\r\n";
+    // else if( ! strcmp( parameters, "B" ))
+    //  client << "200 B Ok\r\n";
+    else
+      client << "504 Only S(tream) is suported\r\n";
+  }
+#endif
 				break;
 
 			case ftp_command::PASS:
@@ -387,6 +466,19 @@ namespace net {
 				break;
 
 			case ftp_command::RMD:
+				if(param_ == nullptr || strlen(param_) == 0) {
+					format("501 No directory name\n", ctrl_.get_cepid());
+					break;
+				}
+				if(!sdc_.probe(param_)) {
+					format("550 File %s not found\n", ctrl_.get_cepid()) % param_;
+					break;
+				}
+				if(sdc_.remove(param_)) {
+					format("250 \"%s\" deleted\n", ctrl_.get_cepid()) % param_;
+				} else {
+					format("501 Can't delete %s\n", ctrl_.get_cepid()) % param_;
+				}
 				break;
 
 			case ftp_command::RNFR:
@@ -411,6 +503,20 @@ namespace net {
 				break;
 
 			case ftp_command::STRU:
+#if 0
+  //
+  //  STRU - File Structure
+  //
+  else if( ! strcmp( command, "STRU" ))
+  {
+    if( ! strcmp( parameters, "F" ))
+      client << "200 F Ok\r\n";
+    // else if( ! strcmp( parameters, "R" ))
+    //  client << "200 B Ok\r\n";
+    else
+      client << "504 Only F(ile) is suported\r\n";
+  }
+#endif
 				break;
 
 			case ftp_command::SYST:
@@ -442,6 +548,48 @@ namespace net {
 				format("211 End.\n", ctrl_.get_cepid());
  				break;
 
+			case ftp_command::MDTM:
+#if 0
+  //
+  //  MDTM - File Modification Time (see RFC 3659)
+  //
+  else if( ! strcmp( command, "MDTM" ))
+  {
+    char path[ FTP_CWD_SIZE ];
+    char * fname = parameters;
+    uint16_t year;
+    uint8_t month, day, hour, minute, second, setTime;
+    setTime = getDateTime( & year, & month, & day, & hour, & minute, & second );
+    // fname point to file name
+    fname += setTime;
+    if( strlen( fname ) <= 0 )
+      client << "501 No file name\r\n";
+    else if( makePath( path, fname ))
+    {
+      if( ! FAT.exists( path ))
+        client << "550 No such file " << parameters << "\r\n";
+      else if( setTime ) // set file modification time
+      {
+        if( FAT.timeStamp( path, year, month, day, hour, minute, second ))
+          client << "200 Ok\r\n";
+        else
+          client << "550 Unable to modify time\r\n";
+      }
+      else // get file modification time
+      {
+        uint16_t date, time;
+        if( FAT.getFileModTime( path, & date, & time ))
+        {
+          char dtStr[ 15 ];
+          client << "213 " << makeDateTimeStr( dtStr, date, time ) << "\r\n";
+        }
+        else
+          client << "550 Unable to retrieve time\r\n";
+      }
+    }
+  }
+#endif
+
 			case ftp_command::MLSD:
 			    if(!data_.connected()) {
 					format("425 No data connection\n", ctrl_.get_cepid());
@@ -460,6 +608,22 @@ namespace net {
 				}
 				break;
 
+			case ftp_command::SIZE:
+				if(param_ == nullptr || strlen(param_) == 0) {
+					format("501 No file name\n", ctrl_.get_cepid());
+					break;
+				}
+				if(!sdc_.probe(param_)) {
+					format("550 No such file %s\n", ctrl_.get_cepid()) % param_;
+					break;
+				}
+				{
+					uint32_t sz = sdc_.size(param_);
+///					format("450 Can't open %s\n", ctrl_.get_cepid()) % param_;
+					format("213 %u\n", ctrl_.get_cepid()) % sz;
+				}
+				break;
+
 			case ftp_command::NONE_:
 				ftp_debug("FTP Server: Fail: '%s'\n") % line_man_[0];
 			default:
@@ -472,107 +636,11 @@ namespace net {
 		}
 
 #if 0
-boolean FtpServer::processCommand()
-{
-  ///////////////////////////////////////
-  //                                   //
-  //      ACCESS CONTROL COMMANDS      //
-  //                                   //
-  ///////////////////////////////////////
-
-  //
-  //  CDUP - Change to Parent Directory 
-  //
-  if( ! strcmp( command, "CDUP" ))
-  {
-    boolean ok = false;
-    
-    if( strlen( cwdName ) > 1 )            // do nothing if cwdName is root
-    {
-      // if cwdName ends with '/', remove it (must not append)
-      if( cwdName[ strlen( cwdName ) - 1 ] == '/' )
-        cwdName[ strlen( cwdName ) - 1 ] = 0;
-      // search last '/'
-      char * pSep = strrchr( cwdName, '/' );
-      ok = pSep > cwdName;
-      // if found, ends the string on its position
-      if( ok )
-      {
-        * pSep = 0;
-        ok = FAT.exists( cwdName );
-      }
-    }
-    // if an error appends, move to root
-    if( ! ok )
-      strcpy( cwdName, "/" );
-    client << "200 Ok. Current directory is " << cwdName << "\r\n";
-  }
-  ///////////////////////////////////////
-  //                                   //
-  //    TRANSFER PARAMETER COMMANDS    //
-  //                                   //
-  ///////////////////////////////////////
-
-  //
-  //  MODE - Transfer Mode 
-  //
-  else if( ! strcmp( command, "MODE" ))
-  {
-    if( ! strcmp( parameters, "S" ))
-      client << "200 S Ok\r\n";
-    // else if( ! strcmp( parameters, "B" ))
-    //  client << "200 B Ok\r\n";
-    else
-      client << "504 Only S(tream) is suported\r\n";
-  }
-  //
-  //  STRU - File Structure
-  //
-  else if( ! strcmp( command, "STRU" ))
-  {
-    if( ! strcmp( parameters, "F" ))
-      client << "200 F Ok\r\n";
-    // else if( ! strcmp( parameters, "R" ))
-    //  client << "200 B Ok\r\n";
-    else
-      client << "504 Only F(ile) is suported\r\n";
-  }
-
   ///////////////////////////////////////
   //                                   //
   //        FTP SERVICE COMMANDS       //
   //                                   //
   ///////////////////////////////////////
-
-  //
-  //  ABOR - Abort
-  //
-  else if( ! strcmp( command, "ABOR" ))
-  {
-    abortTransfer();
-    client << "226 Data connection closed" << "\r\n";
-  }
-  //
-  //  DELE - Delete a File 
-  //
-  else if( ! strcmp( command, "DELE" ))
-  {
-    char path[ FTP_CWD_SIZE ];
-    if( strlen( parameters ) == 0 )
-      client << "501 No file name\r\n";
-    else if( makePath( path ))
-    {
-      if( ! FAT.exists( path ))
-        client << "550 File " << parameters << " not found\r\n";
-      else
-      {
-        if( FAT.remove( path ))
-          client << "250 Deleted " << parameters << "\r\n";
-        else
-          client << "450 Can't delete " << parameters << "\r\n";
-      }
-    }
-  }
   //
   //  NLST - Name List 
   //
@@ -634,51 +702,6 @@ boolean FtpServer::processCommand()
         bytesTransfered = 0;
         transferStatus = 2;
       }
-    }
-  }
-  //
-  //  MKD - Make Directory
-  //
-  else if( ! strcmp( command, "MKD" ))
-  {
-    char path[ FTP_CWD_SIZE ];
-    if( strlen( parameters ) == 0 )
-      client << "501 No directory name\r\n";
-    else if( makePath( path ))
-    {
-      if( FAT.exists( path ))
-        client << "521 \"" << parameters << "\" directory already exists\r\n";
-      else
-      {
-        #ifdef FTP_DEBUG
-          Serial << "Creating directory " << parameters << endl;
-        #endif
-        if( FAT.mkdir( path ))
-          client << "257 \"" << parameters << "\" created\r\n";
-        else
-          client << "550 Can't create \"" << parameters << "\"\r\n";
-      }
-    }
-  }
-  //
-  //  RMD - Remove a Directory 
-  //
-  else if( ! strcmp( command, "RMD" ))
-  {
-    char path[ FTP_CWD_SIZE ];
-    if( strlen( parameters ) == 0 )
-      client << "501 No directory name\r\n";
-    else if( makePath( path ))
-    {
-      #ifdef FTP_DEBUG
-        Serial << "Deleting " << path << endl;
-      #endif
-      if( ! FAT.exists( path ))
-        client << "550 File " << parameters << " not found\r\n";
-      else if( FAT.rmdir( path ))
-        client << "250 \"" << parameters << "\" deleted\r\n";
-      else
-        client << "501 Can't delete \"" << parameters << "\"\r\n";
     }
   }
   //
@@ -760,78 +783,6 @@ boolean FtpServer::processCommand()
   //   EXTENSIONS COMMANDS (RFC 3659)  //
   //                                   //
   ///////////////////////////////////////
-
-  //
-  //  FEAT - New Features
-  //
-  else if( ! strcmp( command, "FEAT" ))
-  {
-    client << "211-Extensions suported:\r\n";
-    client << " MDTM\r\n";
-    client << " MLSD\r\n";
-    client << " SIZE\r\n";
-    client << " SITE FREE\r\n";
-    client << "211 End.\r\n";
-  }
-  //
-  //  MDTM - File Modification Time (see RFC 3659)
-  //
-  else if( ! strcmp( command, "MDTM" ))
-  {
-    char path[ FTP_CWD_SIZE ];
-    char * fname = parameters;
-    uint16_t year;
-    uint8_t month, day, hour, minute, second, setTime;
-    setTime = getDateTime( & year, & month, & day, & hour, & minute, & second );
-    // fname point to file name
-    fname += setTime;
-    if( strlen( fname ) <= 0 )
-      client << "501 No file name\r\n";
-    else if( makePath( path, fname ))
-    {
-      if( ! FAT.exists( path ))
-        client << "550 No such file " << parameters << "\r\n";
-      else if( setTime ) // set file modification time
-      {
-        if( FAT.timeStamp( path, year, month, day, hour, minute, second ))
-          client << "200 Ok\r\n";
-        else
-          client << "550 Unable to modify time\r\n";
-      }
-      else // get file modification time
-      {
-        uint16_t date, time;
-        if( FAT.getFileModTime( path, & date, & time ))
-        {
-          char dtStr[ 15 ];
-          client << "213 " << makeDateTimeStr( dtStr, date, time ) << "\r\n";
-        }
-        else
-          client << "550 Unable to retrieve time\r\n";
-      }
-    }
-  }
-  //
-  //  SIZE - Size of the file
-  //
-  else if( ! strcmp( command, "SIZE" ))
-  {
-    char path[ FTP_CWD_SIZE ];
-    if( strlen( parameters ) == 0 )
-      client << "501 No file name\r\n";
-    else if( makePath( path ))
-    {
-      if( ! FAT.exists( path ))
-        client << "550 No such file " << parameters << "\r\n";
-      else if( ! file.open( path ))
-        client << "450 Can't open " << parameters << "\r\n";
-      else
-      {
-        client << "213 " << file.fileSize() << "\r\n";
-        file.close();
-      }
-    }
-  }
   //
   //  SITE - System command
   //
