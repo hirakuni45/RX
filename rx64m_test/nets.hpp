@@ -639,6 +639,7 @@ namespace seeda {
 						client_task_ = client_task::main_loop;
 						client_time_ = get_time();
 					} else {
+//						utils::format("Conect... %s (port: %d)\n") % client_ip_.c_str() % dstport;
 						client_.connect(client_ip_, dstport, TMO_NBLK);
 					}
 				}
