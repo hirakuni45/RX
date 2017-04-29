@@ -45,7 +45,8 @@ namespace seeda {
 		uint32_t		count_;
 
 		enum class server_task {
-			wait_client,
+			begin_http,
+			wait_http,
 			main_loop,
 			disconnect_delay,
 			disconnect,
@@ -53,11 +54,13 @@ namespace seeda {
 		server_task		server_task_;
 
 		enum class client_task {
-			connection,
+			connect,
+			wait_connect,
 			main_loop,
 			disconnect,
 		};
 		client_task		client_task_;
+		uint16_t		client_port_;
 
 		typedef utils::line_manage<2048, 20> LINE_MAN;
 		LINE_MAN	line_man_;
@@ -267,7 +270,7 @@ namespace seeda {
 						if(t.val != nullptr) strcpy(write_path_, t.val); 
 					} else if(strcmp(t.key, "count") == 0) {
 						write_count_ = 0;
-						utils::input("%d") % write_count_;
+						utils::input("%d", t.val) % write_count_;
 					}
 				}
 				utils::format("Set write file: '%s'\n") % write_path_;
@@ -414,6 +417,7 @@ namespace seeda {
 				utils::format("test.cvs", tmp, sizeof(tmp));
 				format("<div>ファイル名：<input type=\"text\" name=\"fname\" size=\"16\" value=\"%s\" /></div>\n", fd)
 				% tmp;
+				utils::format("100", tmp, sizeof(tmp));
 				format("<div>書き込み数（秒）：<input type=\"text\" name=\"count\" size=\"16\" value=\"%s\" /></div>\n", fd)
 				% tmp;
 				format("<input type=\"submit\" value=\"ファイル書き込み設定\" />\n", fd);
@@ -631,17 +635,19 @@ namespace seeda {
 			time_t t;
 			switch(client_task_) {
 
-			case client_task::connection:
-				{
-					uint16_t dstport = 3000;
-					if(client_.connected()) {
-						utils::format("Conected: %s (port: %d)\n") % client_ip_.c_str() % dstport;
-						client_task_ = client_task::main_loop;
-						client_time_ = get_time();
-					} else {
-//						utils::format("Conect... %s (port: %d)\n") % client_ip_.c_str() % dstport;
-						client_.connect(client_ip_, dstport, TMO_NBLK);
-					}
+			case client_task::connect:
+				if(client_.connect(client_ip_, client_port_, TMO_NBLK) == 1) {
+					utils::format("Start SEEDA03 client: %s port(%d), fd(%d)\n")
+						% client_ip_.c_str() % client_port_ % client_.get_cepid();
+					client_task_ = client_task::wait_connect;
+				}
+				break;
+
+			case client_task::wait_connect:
+				if(client_.connected()) {
+					utils::format("Conected Client\n");
+					client_time_ = get_time();
+					client_task_ = client_task::main_loop;
 				}
 				break;
 
@@ -663,13 +669,12 @@ namespace seeda {
 				{
 					make_adc_csv_(client_.get_cepid(), "\n");
 				}
-
 				break;
 			
 			case client_task::disconnect:
 				client_.stop();
 				utils::format("client disconnected: %s\n") % client_ip_.c_str();
-				client_task_ = client_task::connection;
+				client_task_ = client_task::connect;
 				break;
 			}
 		}
@@ -687,8 +692,8 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		nets() : server_(ethernet_), client_(ethernet_), ftp_(ethernet_, at_sdc()),
-			count_(0), server_task_(server_task::wait_client),
-			client_task_(client_task::connection),
+			count_(0), server_task_(server_task::begin_http),
+			client_task_(client_task::connect), client_port_(3000),
 			line_man_(0x0a), disconnect_loop_(0),
 #ifdef SEEDA
 			client_ip_(192, 168, 1, 3),
@@ -751,16 +756,6 @@ namespace seeda {
 			}
 			utils::format("%s\n") % ethernet_.get_local_ip().c_str();
 
-			// http server
-			server_.begin(80);
-			utils::format("Start HTTP server: %s") % ethernet_.get_local_ip().c_str();
-			utils::format("  port(%d)\n") % static_cast<int>(server_.get_port());
-
-			// client service (3000)
-//			client_.begin(3000);
-//			utils::format("Start client: %s") % ethernet_.get_local_ip().c_str();
-//			utils::format("  port(%d)\n") % static_cast<int>(client_.get_port());
-
 			// FTP Server
 			ftp_.start();
 		}
@@ -785,11 +780,18 @@ namespace seeda {
 		{
 			ethernet_.service();
 
-			service_client_();
-
 			switch(server_task_) {
 
-			case server_task::wait_client:
+			case server_task::begin_http:
+				// http server
+				server_.begin(80);
+				utils::format("Start HTTP server: %s") % ethernet_.get_local_ip().c_str();
+				utils::format("  port(%d), fd(%d)\n")
+					% static_cast<int>(server_.get_port()) % server_.get_cepid();
+				server_task_ = server_task::wait_http;
+				break;
+
+			case server_task::wait_http:
 				if(server_.connected()) {
 					utils::format("New http connected, form: %s\n") % server_.get_from_ip().c_str();
 					++count_;
@@ -861,9 +863,11 @@ namespace seeda {
 			default:
 				server_.stop();
 				utils::format("http disconnected\n");
-				server_task_ = server_task::wait_client;
+				server_task_ = server_task::begin_http;
 				break;
 			}
+
+			service_client_();
 
 			ftp_.service();
 
