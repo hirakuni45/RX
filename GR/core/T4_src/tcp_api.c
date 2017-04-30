@@ -554,10 +554,10 @@ int tcp_recv_data(int cepid, void *data, int len, int32_t tmout)
 }
 
 
-int tcp_can_cep(int cepid, FN fncd)
+int tcp_can_cep(int cepid, int32_t fncd)
 {
     int err;
-    FN fn;
+    int32_t fn;
 
     _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 

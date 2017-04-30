@@ -505,6 +505,41 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  通信ストリームをアップデート（最新にする）
+		*/
+		//-----------------------------------------------------------------//
+        void update(uint32_t cepid)
+		{
+			if(cepid == 0 || cepid > TCPUDP_CHANNEL_NUM) return;
+
+			TCP_API_STAT ercd = tcp_read_stat(cepid);
+
+			static TCP_API_STAT ercd_[8];
+			if(ercd != ercd_[cepid - 1]) {
+//				utils::format("STAT: %d (%d)\n") % static_cast<int>(ercd) % cepid;
+				ercd_[cepid - 1] = ercd;
+			}
+
+			ethernet::CEP& cep = at_cep(cepid);
+///			int cfg = cep.call_flag;
+//			debug_format("ethernet_server::available():tcp_read_stat() = %d, call_flag: %d\n") % ercd;
+
+			if(ercd == TCP_API_STAT_CLOSED && !cep.call_flag) {
+				int ret = tcp_acp_cep(cepid, cepid, &cep.dst_addr, TMO_NBLK);
+//				debug_format("ethernet_server::available():tcp_acp_cep(TMO_NBLK) = %d") % ret;
+				if(ret == E_WBLK){
+//					debug_format(", E_WBLK(success)\n");
+				} else {
+//					debug_format("fail: %d\n") % ret;
+				}
+				// one time call flag is on
+				cep.call_flag = true;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  サービス（メイン・ループ）
 		*/
 		//-----------------------------------------------------------------//
@@ -527,34 +562,12 @@ namespace net {
 				if(!cep_[i].enable) continue;
 
 				uint32_t cepid = i + 1;
-				TCP_API_STAT ercd = tcp_read_stat(cepid);
-
-				static TCP_API_STAT ercd_[8];
-				if(ercd != ercd_[i]) {
-					utils::format("STAT: %d (%d)\n") % static_cast<int>(ercd) % cepid;
-					ercd_[i] = ercd;
-				}
-
-				ethernet::CEP& cep = at_cep(cepid);
-///				int cfg = cep.call_flag;
-//				debug_format("ethernet_server::available():tcp_read_stat() = %d, call_flag: %d\n") % ercd;
-
-				if(ercd == TCP_API_STAT_CLOSED && !cep.call_flag) {
-					int ret = tcp_acp_cep(cepid, cepid, &cep.dst_addr, TMO_NBLK);
-//					debug_format("ethernet_server::available():tcp_acp_cep(TMO_NBLK) = %d") % ret;
-					if(ret == E_WBLK){
-//						debug_format(", E_WBLK(success)\n");
-					} else {
-//						debug_format("fail: %d\n") % ret;
-					}
-					// one time call flag is on
-					cep.call_flag = true;
-				}
+				update(cepid);
 			}
         }
 
 
-		static int udp_callback(uint32_t cepid, FN fncd , void *p_parblk)
+		static int udp_callback(uint32_t cepid, int32_t fncd , void *p_parblk)
 		{
 			union _recvSiz {
 				int  dword;          /*typedef int32_t W;typedef W ER*/

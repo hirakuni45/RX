@@ -157,7 +157,7 @@ enum
 #define _TCP_CB_STAT_IS_API_LOCKED(stat)  ((stat) & _TCP_CB_STAT_LOCK)
 #define _TCP_CB_STAT_SET_API_LOCK_FLG(stat)  ((stat)=(stat)|((_TCP_CB_STAT_LOCK)))
 #define _TCP_CB_STAT_CLEAR_API_LOCK_FLG(stat) ((stat)=(stat)&(~(_TCP_CB_STAT_LOCK)))
-typedef int (*_TCP_CALLBACK_FUNC)(uint32_t cepid, FN fncd , void *p_parblk);
+typedef int (*_TCP_CALLBACK_FUNC)(uint32_t cepid, int32_t fncd , void *p_parblk);
 #define _TCP_CB_GET_CALLBACK_FUNC_PTR(cepid) (tcp_ccep[(cepid)-1].callback)
 #define _TCP_CB_CALL_CALLBACK(cepid, fncd, pTcpTcb)       \
     do {\
@@ -326,8 +326,9 @@ int _tcp_check_cepid_arg(ID cepid);
 int _tcp_check_len_arg(int len);
 int  _tcp_check_tmout_arg(uint16_t api_type, int32_t tmout, _TCP_CB* pTcpcb);
 uint16_t _tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb);
-uint16_t _tcp_call_callback(ID cepid, FN fncd, void *p_parblk);
-FN _tcp_api_type_to_fn(uint16_t api_type);
+uint16_t _tcp_call_callback(ID cepid, int32_t fncd, void *p_parblk);
+int32_t _tcp_api_type_to_fn(uint16_t api_type);
 int _tcp_recv_polling(_TCB* pTcb, uint8_t *buf, uint16_t size);
 void _tcp_init_callback_info(_TCP_CB* pCallbackInfo);
 
+void _process_tcpip(void);

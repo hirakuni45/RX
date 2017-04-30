@@ -1,32 +1,11 @@
-/***********************************************************************************************************************
-* DISCLAIMER
-* This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
-* other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
-* applicable laws, including copyright laws.
-* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
-* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
-* EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
-* SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
-* SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-* Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
-* this software. By using this software, you agree to the additional terms and conditions found by accessing the
-* following link:
-* http://www.renesas.com/disclaimer
-*
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
-***********************************************************************************************************************/
-/***********************************************************************************************************************
-* File Name	   : r_dns_client.h
-* Version      : 1.01
-* Description  :
-***********************************************************************************************************************/
-/***********************************************************************************************************************
-* History : DD.MM.YYYY Version Description
-*         : 09.05.2014 1.01    Corresponded to FIT Modules
-***********************************************************************************************************************/
-#ifndef	R_DNS_CLIENT_H
-#define	R_DNS_CLIENT_H
+#pragma once
+//=====================================================================//
+/*!	@file
+	@brief	r_dns_client.h @n
+			Copyright 2017 Kunihito Hiramatsu
+	@author	平松邦仁 (hira@rvf-rc45.net)
+*/
+//=====================================================================//
 
 /***********************************************************************************************************************
 Macro definitions
@@ -131,16 +110,12 @@ typedef	int32_t (*DNS_PROC_FUNC)(void);
 #if defined(__cplusplus)
 extern "C" {
 #endif
-int dns_callback(ID cepid, FN fncd , void *p_parblk);
+int dns_callback(ID cepid, int32_t fncd , void *p_parblk);
 #if defined(__cplusplus)
 }
 #endif
 
-
-/***********************************************************************************************************************
-Exported global functions (to be accessed by other files)
-***********************************************************************************************************************/
-#if !defined(__GNUC__) && !defined(GRSAKURA)
+#if 0
 static int32_t send_dns_request(char *mame, uint32_t dstaddr);
 static int32_t receive_dns_response(NAME_TABLE *table);
 static int32_t convert_name_to_dns_query(char *query, char *name);
@@ -153,6 +128,3 @@ static uint32_t convert_array_to_long(uint8_t *ipaddr);
 static uint16_t htons(uint16_t data);
 static uint32_t htonl(uint32_t data);
 #endif
-
-
-#endif	/* R_DNS_CLIENT_H */

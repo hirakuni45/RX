@@ -250,7 +250,7 @@ void _tcp_api_acpt(void)
         {
             if (areq->tmout == TMO_NBLK)
             {
-                FN fncd;
+                int32_t fncd;
                 fncd = _tcp_api_type_to_fn(areq->type);
 
                 _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
@@ -294,7 +294,7 @@ void _tcp_api_con(void)
         {
             if (areq->tmout == TMO_NBLK)
             {
-                FN fncd;
+                int32_t fncd;
                 fncd = _tcp_api_type_to_fn(areq->type);
 
                 _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
@@ -365,7 +365,7 @@ void _tcp_api_sht_cls(void)
         {
             if (areq->tmout == TMO_NBLK)
             {
-                FN fncd;
+                int32_t fncd;
                 fncd = _tcp_api_type_to_fn(areq->type);
 
                 _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
@@ -397,7 +397,7 @@ void _tcp_api_sht_cls(void)
             {
                 if (areq->tmout == TMO_NBLK)
                 {
-                    FN fncd;
+                    int32_t fncd;
                     fncd = _tcp_api_type_to_fn(areq->type);
 
                     _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
@@ -735,7 +735,7 @@ void _proc_rcv(void)
                     {
                         if (_tcp_tcb->req.tmout == TMO_NBLK)
                         {
-                            FN fncd;
+                            int32_t fncd;
                             fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
 
                             _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
@@ -1021,7 +1021,7 @@ int _tcp_rcv_syn(void)
 
         if (_tcp_tcb->req.tmout == TMO_NBLK)
         {
-            FN fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
+            int32_t fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
             _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
         }
         else
@@ -1111,7 +1111,7 @@ void _tcp_rcv_ack(void)
 
                 if (_tcp_tcb->req.tmout == TMO_NBLK)
                 {
-                    FN fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
+                    int32_t fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
                     _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
                 }
                 else
@@ -1145,7 +1145,7 @@ void _tcp_rcv_ack(void)
 
                     if (_tcp_tcb->req.tmout == TMO_NBLK)
                     {
-                        FN fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
+                        int32_t fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
                         _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
                     }
                     else
@@ -1343,7 +1343,7 @@ int _tcp_rcv_fin(void)
 
                         if (_tcp_tcb->req.tmout == TMO_NBLK)
                         {
-                            FN fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
+                            int32_t fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
                             _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
                         }
                         else
@@ -1590,7 +1590,7 @@ void _proc_snd(void)
                         *(_tcp_tcb->req.error) = E_OK;
                         if (_tcp_tcb->req.tmout == TMO_NBLK)
                         {
-                            FN fncd = _tcp_api_type_to_fn(cur_req_type);
+                            int32_t fncd = _tcp_api_type_to_fn(cur_req_type);
                             _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
                         }
                         else
@@ -2064,7 +2064,7 @@ void _tcp_snd(void)
                 {
                     if (_tcp_tcb->req.tmout == TMO_NBLK)
                     {
-                        FN fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
+                        int32_t fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
                         _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
                     }
                     else
@@ -2113,7 +2113,7 @@ void _tcp_snd(void)
             {
                 if (_tcp_tcb->req.tmout == TMO_NBLK)
                 {
-                    FN fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
+                    int32_t fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
                     _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
                 }
                 else
@@ -2150,7 +2150,7 @@ void _tcp_snd(void)
                             _tcp_tcb->it_stat = _ITS_SHT;
                         if (_tcp_tcb->req.tmout == TMO_NBLK)
                         {
-                            FN fncd;
+                            int32_t fncd;
                             fncd = _tcp_api_type_to_fn(_tcp_tcb->req.type);
 
                             _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
@@ -2236,7 +2236,7 @@ void _tcp_cancel_api(int ercd)
     {
         if (_tcp_tcb->req.tmout == TMO_NBLK)
         {
-            FN fncd = _tcp_api_type_to_fn(areq->type);
+            int32_t fncd = _tcp_api_type_to_fn(areq->type);
             _TCP_CB_CALL_CALLBACK(_tcp_tcb->cepid, fncd, _tcp_tcb);
         }
         else
@@ -2412,7 +2412,7 @@ uint16_t  _tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-uint16_t _tcp_call_callback(ID cepid, FN fncd, void *p_parblk)
+uint16_t _tcp_call_callback(ID cepid, int32_t fncd, void *p_parblk)
 {
     UH count;
 
@@ -2445,9 +2445,9 @@ uint16_t _tcp_call_callback(ID cepid, FN fncd, void *p_parblk)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-FN  _tcp_api_type_to_fn(uint16_t api_type)
+int32_t _tcp_api_type_to_fn(uint16_t api_type)
 {
-    FN fncd = TFN_TCP_ALL;
+    int32_t fncd = TFN_TCP_ALL;
 
     switch (api_type)
     {

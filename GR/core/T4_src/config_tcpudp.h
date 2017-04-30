@@ -11,7 +11,7 @@
 #include "udp.h"
 #include "tcp.h"
 
-extern int t4_udp_callback(uint32_t cepid, FN fncd, void *p_parblk);
+extern int t4_udp_callback(uint32_t cepid, int32_t fncd, void *p_parblk);
 
 #if defined(_TCP)
 extern T_TCP_CREP tcp_crep[];

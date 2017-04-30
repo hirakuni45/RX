@@ -1,41 +1,3 @@
-/***********************************************************************************************************************
-* DISCLAIMER
-* This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
-* other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
-* applicable laws, including copyright laws.
-* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
-* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
-* EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
-* SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
-* SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-* Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
-* this software. By using this software, you agree to the additional terms and conditions found by accessing the
-* following link:
-* http://www.renesas.com/disclaimer
-*
-* Copyright (C) 2011 Renesas Electronics Corporation. All rights reserved.
-***********************************************************************************************************************/
-/***********************************************************************************************************************
-* File Name    : r_dns_client.c
-* Version      : 1.0
-* Device(s)	   : any
-* Tool-Chain   : any
-* OS		   : any
-* H/W Platform : any
-* Description  : This is the dns client code.
-* Operation	   :
-* Limitations  :
-***********************************************************************************************************************/
-/**********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*               : 04.04.2011 1.00    First Release
-*               : 27.05.2014 1.01    Corresponded to Non-blocking call.
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Includes   <System Includes> , "Project Includes"
-***********************************************************************************************************************/
 #include "net_config.h"
 #include <string.h>
 #include <stdint.h>
@@ -44,6 +6,7 @@ Includes   <System Includes> , "Project Includes"
 #include "r_t4_dns_client_rx_if.h"
 #include "r_dns_client.h"
 #include "core/driver/driver.h"
+#include "udp.h"
 
 /***********************************************************************************************************************
 Macro definitions
@@ -500,7 +463,7 @@ int32_t R_dns_process(void)
 *                    error code pointer
 * Return Value : error code
 ***********************************************************************************************************************/
-int dns_callback(ID cepid, FN fncd , void *p_parblk)
+int dns_callback(ID cepid, int32_t fncd , void *p_parblk)
 {
 	int32_t	parblk;
 	int	ercd;

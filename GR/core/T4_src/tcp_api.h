@@ -41,7 +41,7 @@ int tcp_sht_cep(int cepid, int32_t tmout);
 int tcp_cls_cep(int cepid, int32_t tmout);
 int tcp_send_data(int cepid, const void *data, int len, int32_t tmout);
 int tcp_recv_data(int cepid, void *data, int len, int32_t tmout);
-int tcp_can_cep(int cepid, FN fncd);
+int tcp_can_cep(int cepid, int32_t fncd);
 
 #if defined(_TEST_LIBRARY)
 TCP_API_STAT tcp_read_stat(int cepid);

@@ -1,73 +1,11 @@
-/******************************************************************************
-* WEBSITE
-* Please refer to
-*   http://www.renesas.com/mw/t4
-*   http://japan.renesas.com/mw/t4
-*******************************************************************************
-  Copyright (C) 2004-2014. Renesas Electronics Corporation, All Rights Reserved.
-*******************************************************************************
-* File Name    : r_t4_itcpip.h
-* Version      : 2.02
-* Description  : TCP/IP library T4 Header file
-*******************************************************************************
-* History : DD.MM.YYYY Version Description
-*         : 25.08.2009 0.24     First beta Release
-*         : 25.09.2009 0.25     Corresponded for RSK standard driver interface
-*         : 08.10.2009 0.26     Applied T3-Tiny bug fix
-*         : 11.03.2010 0.27     Fixed bug.
-*         : 12.03.2010 0.28     Added setting variable "_tcp_dack"
-*         : 27.08.2010 0.29     Corrected r_t4_itcpip.h
-*         : 27.09.2010 1.00     First release
-*         : 10.10.2010 1.01     Fixed bug.
-*         : 05.01.2011 1.02     Fixed bug.
-*         : 05.01.2011 1.03     Corrected r_t4_itcpip.h
-*         : 23.08.2011 1.04     Added "report_error" function, cleanup code
-*         : 01.04.2012 1.05     Added "PPP" connect and R8C support.
-*         :                     Added SH-4A support.
-*         :                     Added V850E2 support.
-*         :                     Change user defined function spec
-*         :                     api_slp() -> tcp_api_slp(), udp_api_slp(), ppp_api_slp()
-*         :                     api_wup() -> tcp_api_wup(), udp_api_wup(), ppp_api_wup()
-*         :                     Fixed bug.
-*         : 21.06.2013 1.06     Fixed bug: r_t4_itcpip.h.
-*         :                     Added UDP broadcast function.
-*         :                     Fixed bug: TCP 3way hand-shake behavior with zero-window size SYN.
-*         :                     Fixed bug: TCP sending.
-*         :                     Fixed bug: ppp re-connect.
-*         : 31.03.2014 2.00     Added setting variable "_t4_channel_num" for several link-layer channels.
-*         :                     Change user defined function spec.
-*         :                     lan_read(), lan_write(), lan_reset(),
-*         :                     report_error(), and rcv_buff_release(),
-*         :                     Change API define _process_tcpip().
-*         :                     Change error code (E_XX) and NADR value.
-*         :                     Deleted PPP Libraries temporary. (maybe return at next release)
-*         :                     Fixed Bug.
-*         : 07.08.2014 2.01     Clean up source code.
-*         : 01.29.2015 2.02     Changed RX IDE from High-performance Embedded Workshop to CS+.
-*         :                     Changed RX compiler option from (-rx600,-rx200) to (-rxv2,-rxv1).
-*-----------------------------------------------------------------------------
-* T4 library list :
-*                   Ethernet    PPP     Notice
-*   RXV2-big        V.2.02      x       PPP is temporarily unavailable
-*   RXV2-little     V.2.02      x       PPP is temporarily unavailable
-*   RXV1-big        V.2.02      x       PPP is temporarily unavailable
-*   RXV1-little     V.2.02      x       PPP is temporarily unavailable
-*   V850E2M         V.1.04      -
-*   SH-2A           V.1.06      -
-*   SH-2A-fpu       V.1.06      -
-*   SH-4-big        -           -
-*   SH-4-little     V.1.04      -
-*   SH-4A-big       x           -       Renesas internal use
-*   SH-4A-little    x           -       Renesas internal use
-*   H8S/2600-adv    V.1.04      -
-*   M16C            V.1.04      -
-*   R8C             x           x       Renesas internal use
-*   R8C-far         x           x       Renesas internal use
-*-----------------------------------------------------------------------------
-******************************************************************************/
-
-#ifndef _R_T4_ITCPIP_H
-#define _R_T4_ITCPIP_H
+#pragma once
+//=====================================================================//
+/*!	@file
+	@brief	TCP/UDP api @n
+			Copyright 2017 Kunihito Hiramatsu
+	@author	平松邦仁 (hira@rvf-rc45.net)
+*/
+//=====================================================================//
 /*
  * ITRON data type definition
  */
@@ -100,9 +38,7 @@ typedef H               HNO;
 #endif
 #endif
 
-typedef int32_t         FN;
-
-/// #include "r_mw_version.h"
+// typedef int32_t         FN;
 
 /*
  * ITRON TCP/IP API Specifications header file
@@ -132,7 +68,7 @@ typedef struct t_tcp_ccep
     int      sbufsz;    /* Size of transmit window buffer         */
     void    *rbuf;      /* Top address of receive window buffer   */
     int      rbufsz;    /* Size of receive window buffer          */
-    int (*callback)(uint32_t cepid, FN fncd , void *p_parblk);   /* Callback routine */
+    int (*callback)(uint32_t cepid, int32_t fncd , void *p_parblk);   /* Callback routine */
 } T_TCP_CCEP;
 
 /***  UDP communication end point  ***/
@@ -140,7 +76,7 @@ typedef struct t_udp_ccep
 {
     uint16_t cepatr;    /* UDP communication end point attribute  */
     T_IPV4EP myaddr;    /* Local IP address and port number       */
-    int (*callback)(uint32_t cepid, FN fncd , void *p_parblk); /* Callback routine */
+    int (*callback)(uint32_t cepid, int32_t fncd , void *p_parblk); /* Callback routine */
 } T_UDP_CCEP;
 
 /***  IP address settings  ***/
@@ -329,21 +265,6 @@ typedef struct T4_STATISTICS
 #define RE_UDP_HEADER3      -83
 #define RE_ICMP_HEADER1     -101
 
-/*******************************/
-/***  Prototype Declaration  ***/
-/*******************************/
-#if defined(__cplusplus)
-extern "C" {
-#endif
-int udp_snd_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, int32_t tmout);
-int udp_rcv_dat(ID cepid, T_IPV4EP *p_dstaddr, void *data, int len, int32_t tmout);
-int udp_can_cep(ID cepid, FN fncd);
-
-void _process_tcpip(void);    /* TCP/IP process function called from ether INT and timer INT. */
-#if defined(__cplusplus)
-}
-#endif
-
 /* PPP-related APIs */
 int ppp_open(void);            /* Open PPP driver         */
 int ppp_close(void);           /* Close PPP driver        */
@@ -432,8 +353,5 @@ int ppp_api_req(UH type, void *parblk, H tmout);
 UH ppp_drv_status(void);            /* Get PPP driver state      */
 H  modem_read(UB **rzlt);
 H  modem_write(void *parblk);
-
-
-#endif /* _R_T4_ITCPIP_H */
 
 

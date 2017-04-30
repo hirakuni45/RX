@@ -56,7 +56,7 @@ extern UB *_ether_p_rcv_buff;
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, int32_t tmout)
+int udp_rcv_dat(int cepid, T_IPVxEP *p_dstaddr, void *data, int len, int32_t tmout)
 {
     int  ercd;
     _UDP_CB *pcb;
@@ -167,7 +167,7 @@ int udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, int32_t tmou
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, int32_t tmout)
+int udp_snd_dat(int cepid, T_IPVxEP *p_dstaddr, void *data, int len, int32_t tmout)
 {
     int  ercd;
     _UDP_CB *pcb;
@@ -250,13 +250,13 @@ int udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, void *data, int len, int32_t tmou
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int udp_can_cep(ID cepid, FN fncd)
+int udp_can_cep(int cepid, int32_t fncd)
 {
     int  ercd;
     _UDP_CB *pcb;
     _UDP_API_REQ *p;
-    ID cepid_tmp = cepid;
-    FN fncd_tmp = fncd;
+    int cepid_tmp = cepid;
+    int32_t fncd_tmp = fncd;
 
     ercd = _udp_check_cepid_arg(cepid);
     if (ercd != E_OK)
@@ -372,7 +372,7 @@ int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
 {
     T_UDP_CCEP const *pcep;
     int    ercd;
-    FN    fncd;
+    int32_t    fncd;
     uint16_t   sport;
     uint16_t   saddr[IP_ALEN/2];
     uint16_t   len;
@@ -472,7 +472,7 @@ int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
 void _udp_snd(_TCPUDP_PHDR *ph)
 {
     int    ercd;
-    FN    fncd;
+    int32_t    fncd;
     T_UDP_CCEP const *pcep;
     int16_t   len;
     uint16_t   sum16;
@@ -610,7 +610,7 @@ void _proc_udp_api()
     _UDP_API_REQ *pureq;
     int16_t  i;
     int   ercd;
-    FN   fn;
+    int32_t   fn;
     UH    count;
     _UDP_CB   *tmp;
 
@@ -731,9 +731,9 @@ uint16_t _tcpudp_cksum(_IP_HDR *piph, _TCPUDP_PHDR *ph)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-FN  _udp_api_type_to_fn(uint16_t api_type)
+int32_t _udp_api_type_to_fn(uint16_t api_type)
 {
-    FN fncd = TFN_TCP_ALL;
+    int32_t fncd = TFN_TCP_ALL;
 
     switch (api_type)
     {

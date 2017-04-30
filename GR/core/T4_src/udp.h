@@ -76,11 +76,19 @@ void _udp_api_slp(_UDP_CB *pucb, ID id);
 void _udp_api_wup(_UDP_CB *pucb, ID id);
 void _udp_init(UW **workpp);
 void _udp_snd(_TCPUDP_PHDR *ph);
-FN  _udp_api_type_to_fn(uint16_t api_type);
+int32_t  _udp_api_type_to_fn(uint16_t api_type);
 int _udp_check_cepid_arg(ID cepid);
 int _udp_check_len_arg(int len);
 
+#if defined(_UDP)
 
-
-
-
+#if defined(__cplusplus)
+extern "C" {
+#endif
+int udp_rcv_dat(int cepid, T_IPVxEP *p_dstaddr, void *data, int len, int32_t tmout);
+int udp_snd_dat(int cepid, T_IPVxEP *p_dstaddr, void *data, int len, int32_t tmout);
+int udp_can_cep(int cepid, int32_t fncd);
+#if defined(__cplusplus)
+}
+#endif
+#endif
