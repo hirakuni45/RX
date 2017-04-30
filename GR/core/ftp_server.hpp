@@ -912,7 +912,6 @@ namespace net {
 						task_ = task::command;
 						break;
 					}
-					eth_.update(data_.get_cepid());
 				}
 				break;
 
@@ -931,7 +930,6 @@ namespace net {
 						task_ = task::command;
 						break;
 					}
-					eth_.update(data_.get_cepid());
 				}
 				break;
 
