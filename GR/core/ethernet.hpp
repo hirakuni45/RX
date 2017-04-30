@@ -35,7 +35,7 @@ extern "C" {
 };
 
 
-// #define DEBUG
+#define DEBUG
 
 #ifndef DEBUG
 // デバッグ以外で出力を無効にする
@@ -123,15 +123,15 @@ namespace net {
 
         void dhcpSuccess(DHCP* tmpDhcpPt) {
 			int ch = 0;
-            memcpy(tcpudp_env[ch].ipaddr, tmpDhcpPt->ipaddr, 4);
-            debug_format("ip = %08X\n") % get_local_ip();
+			memcpy(tcpudp_env[ch].ipaddr, tmpDhcpPt->ipaddr, 4);
+			debug_format("ip = %08X\n") % get_local_ip();
 
-            memcpy(tcpudp_env[ch].maskaddr, tmpDhcpPt->maskaddr, 4);
-            memcpy(tcpudp_env[ch].gwaddr, tmpDhcpPt->gwaddr, 4);
-            memcpy((char *)dnsaddr1, (char *)tmpDhcpPt->dnsaddr, 4);
-            memcpy(dhcpSvMac.bytes, ((DHCP_PACKET*)tcpudp_work_)->ether.source_address, EP_ALEN);
-            memcpy(dhcpSvIp.bytes, ((DHCP_PACKET*)tcpudp_work_)->ipv4.source_ip, IP_ALEN);
-            dhcp_use_ = true;
+			memcpy(tcpudp_env[ch].maskaddr, tmpDhcpPt->maskaddr, 4);
+			memcpy(tcpudp_env[ch].gwaddr, tmpDhcpPt->gwaddr, 4);
+			memcpy((char *)dnsaddr1, (char *)tmpDhcpPt->dnsaddr, 4);
+			memcpy(dhcpSvMac.bytes, ((DHCP_PACKET*)tcpudp_work_)->ether.source_address, EP_ALEN);
+			memcpy(dhcpSvIp.bytes, ((DHCP_PACKET*)tcpudp_work_)->ipv4.source_ip, IP_ALEN);
+			dhcp_use_ = true;
 
 			dhcpIPuse_sec = 0;                 /*dhcp lease time local countup start*/
             fromSystemGetLastTime = millis();
@@ -514,12 +514,13 @@ namespace net {
 
 			TCP_API_STAT ercd = tcp_read_stat(cepid);
 
+#ifdef DEBUG
 			static TCP_API_STAT ercd_[8];
 			if(ercd != ercd_[cepid - 1]) {
-//				utils::format("STAT: %d (%d)\n") % static_cast<int>(ercd) % cepid;
+				utils::format("STAT: %d (%d)\n") % static_cast<int>(ercd) % cepid;
 				ercd_[cepid - 1] = ercd;
 			}
-
+#endif
 			ethernet::CEP& cep = at_cep(cepid);
 ///			int cfg = cep.call_flag;
 //			debug_format("ethernet_server::available():tcp_read_stat() = %d, call_flag: %d\n") % ercd;
@@ -669,6 +670,8 @@ namespace net {
 			}
 			tcp_ccep[cepid - 1].cepatr = 0;  // ch
 			tcp_ccep[cepid - 1].rbufsz = ethernet::TCP_MSS;
+
+			debug_format("Create TCP/UDP: %d\n") % cepid;			
 
 			return cepid;
 		}

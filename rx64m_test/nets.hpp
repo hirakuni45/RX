@@ -645,7 +645,7 @@ namespace seeda {
 
 			case client_task::wait_connect:
 				if(client_.connected()) {
-					utils::format("Conected Client\n");
+					utils::format("Conected Client: %s\n") % client_ip_.c_str();
 					client_time_ = get_time();
 					client_task_ = client_task::main_loop;
 				}

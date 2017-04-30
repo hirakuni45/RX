@@ -123,8 +123,7 @@ namespace net {
 
 			bool ret = false;
 			TCP_API_STAT ercd = tcp_read_stat(cepid_);
-///			if(ercd == TCP_API_STAT_ESTABLISHED || ercd == TCP_API_STAT_CLOSE_WAIT) {
-			if(ercd == TCP_API_STAT_ESTABLISHED) {
+			if(ercd == TCP_API_STAT_ESTABLISHED || ercd == TCP_API_STAT_CLOSE_WAIT) {
 				ret = true;
 			}
 			return ret;

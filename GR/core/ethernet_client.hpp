@@ -8,6 +8,8 @@
 //=====================================================================//
 #include "ethernet.hpp"
 
+#include "common/delay.hpp"
+
 namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -102,7 +104,8 @@ namespace net {
 
 			int res = 0;
 			if(!connected()) {
-				int ercd = tcp_con_cep(cepid_, NADR,  &adr, timeout);
+				int ercd = tcp_con_cep(cepid_, NADR, &adr, timeout);
+				utils::format("Client connection: %d\n") % ercd;
 				if(ercd == E_OK || ercd == E_WBLK) {
 					res = 1;
 				} else {
@@ -127,8 +130,7 @@ namespace net {
 
 			bool ret = false;
 			TCP_API_STAT ercd = tcp_read_stat(cepid_);
-///			if(ercd == TCP_API_STAT_ESTABLISHED || ercd == TCP_API_STAT_CLOSE_WAIT) {
-			if(ercd == TCP_API_STAT_ESTABLISHED) {
+			if(ercd == TCP_API_STAT_ESTABLISHED || ercd == TCP_API_STAT_CLOSE_WAIT) {
 				ret = true;
 			}
 			return ret;
