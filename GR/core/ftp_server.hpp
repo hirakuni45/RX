@@ -6,8 +6,8 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include <cstring>
 #include <cstdio>
+#include <cstring>
 #include "ethernet_server.hpp"
 
 #include "common/time.h"
@@ -121,6 +121,8 @@ namespace net {
 
 			recv_file,	///< Client ---> Server
 
+			recv_rename,	///< Client ---> Server (rename file name)
+
 			command,
 
 			disconnect,
@@ -143,8 +145,12 @@ namespace net {
 		ip_address	data_ip_;
 		uint16_t	data_port_;
 
+		uint32_t	data_connect_loop_;
+
 		FILE*		file_fp_;
 		uint32_t	file_total_;
+
+		uint8_t		rs_buf_[8192];
 
 		// -------------------------------------------------------------------- //
 		typedef utils::basic_format<eth_chaout> format;
@@ -174,6 +180,24 @@ namespace net {
 				% static_cast<uint32_t>(m->tm_hour)
 				% static_cast<uint32_t>(m->tm_min)
 				% static_cast<uint32_t>(m->tm_sec);
+		}
+
+
+		static bool parse_YYYYMMDDHHMMSS_(const char* str)
+		{
+			if(str == nullptr) return false;
+			if(strlen(str) != 14) return false;
+
+			char ch;
+			while((ch = *str) != 0) {
+				if(ch >= '0' && ch <= '9') {
+				} else {
+					return false;
+				}
+				++str;
+			}
+
+			return true;
 		}
 
 
@@ -259,8 +283,9 @@ namespace net {
 
 			ftp_command cmd = scan_command_(line_man_[0]);
 
-			switch(cmd) {
+			bool exec = true;
 
+			switch(cmd) {
 			case ftp_command::ABOR:
 #if 0
   //
@@ -275,12 +300,9 @@ namespace net {
 				break;
 
 			case ftp_command::ACCT:
-				break;
-
 			case ftp_command::ALLO:
-				break;
-
 			case ftp_command::APPE:
+				exec = false;
 				break;
 
 			case ftp_command::CDUP:
@@ -352,17 +374,37 @@ namespace net {
 				break;
 
 			case ftp_command::NLST:
+#if 0
+    if( ! dataConnect())
+      client << "425 No data connection\r\n";
+    else
+    {
+      client << "150 Accepted data connection\r\n";
+      uint16_t nm = 0;
+      FAT_DIR dir;
+      if( ! dir.openDir( cwdName ))
+        client << "550 Can't open directory " << parameters << "\r\n";
+      else
+      {
+        while( dir.nextFile())
+        {
+          data << dir.fileName() << "\r\n";
+          nm ++;
+        }
+        client << "226 " << nm << " matches total\r\n";
+      }
+      data.stop();
+    }
+  }
+#endif
 				break;
 
 			case ftp_command::NOOP:
+				format("200 ...\n", ctrl_.get_cepid());
 				break;
 
 			case ftp_command::MODE:
 #if 0
-  //
-  //  MODE - Transfer Mode 
-  //
-  else if( ! strcmp( command, "MODE" ))
   {
     if( ! strcmp( parameters, "S" ))
       client << "200 S Ok\r\n";
@@ -410,9 +452,8 @@ namespace net {
 				break;
 
 			case ftp_command::REIN:
-				break;
-
 			case ftp_command::REST:
+				exec = true;
 				break;
 
 			case ftp_command::RETR:
@@ -471,256 +512,22 @@ namespace net {
 				}
 				break;
 
+			// 引数に指定した名前のファイル（ディレクトリ）をリネームする。
 			case ftp_command::RNFR:
-				break;
-
-			case ftp_command::RNTO:
-				break;
-
-			case ftp_command::SITE:
-				break;
-
-			case ftp_command::SMNT:
-				break;
-
-			case ftp_command::STAT:
-				break;
-
-			case ftp_command::STOR:
-				if(param_ == nullptr) {
-					format("501 No file name\n", ctrl_.get_cepid());
-					break;
-				}
-				{
-					char path[256 + 1];
-					sdc_.make_full_path(param_, path);
-					file_fp_ = fopen(path, "wb");
-					if(file_fp_ == nullptr) {
-						format("451 Can't open/create %s\n", ctrl_.get_cepid()) % path;
-						break;
-					}
-					format("150 Connected to port %d\n", ctrl_.get_cepid()) % data_.get_port();
-					file_total_ = 0;
-					task_ = task::recv_file;
-				}
-#if 0
-      else if( ! dataConnect())
-      {
-        client << "425 No data connection\r\n";
-        file.close();
-      }
-      else
-      {
-        millisBeginTrans = millis();
-        bytesTransfered = 0;
-        transferStatus = 2;
-      }
-    }
-  }
-#endif
-				break;
-
-			case ftp_command::STOU:
-				break;
-
-			case ftp_command::STRU:
-#if 0
-  //
-  //  STRU - File Structure
-  //
-  else if( ! strcmp( command, "STRU" ))
-  {
-    if( ! strcmp( parameters, "F" ))
-      client << "200 F Ok\r\n";
-    // else if( ! strcmp( parameters, "R" ))
-    //  client << "200 B Ok\r\n";
-    else
-      client << "504 Only F(ile) is suported\r\n";
-  }
-#endif
-				break;
-
-			case ftp_command::SYST:
-				break;
-
-			case ftp_command::TYPE:
-				if(param_ == nullptr) {
-					format("504 Unknow TYPE\n", ctrl_.get_cepid());
-					ret = false;
-				} else if(strcmp(param_, "A") == 0) {
-					format("200 TYPE is now ASCII\n", ctrl_.get_cepid());
-				} else if(strcmp(param_, "I") == 0) {
-			    	format("200 TYPE is now BINARY\n", ctrl_.get_cepid());
-				} else {
-					format("504 Unknow TYPE\n", ctrl_.get_cepid());
-					ret = false;
-				}
-				break;
-
-			case ftp_command::USER:
-				break;
-
-			case ftp_command::FEAT:
-				format("211-Extensions suported:\n", ctrl_.get_cepid());
-				format(" MDTM\n", ctrl_.get_cepid());
-				format(" MLSD\n", ctrl_.get_cepid());
-				format(" SIZE\n", ctrl_.get_cepid());
-				format(" SITE FREE\n", ctrl_.get_cepid());
-				format("211 End.\n", ctrl_.get_cepid());
- 				break;
-
-			case ftp_command::MDTM:
-#if 0
-  //
-  //  MDTM - File Modification Time (see RFC 3659)
-  //
-  else if( ! strcmp( command, "MDTM" ))
-  {
-    char path[ FTP_CWD_SIZE ];
-    char * fname = parameters;
-    uint16_t year;
-    uint8_t month, day, hour, minute, second, setTime;
-    setTime = getDateTime( & year, & month, & day, & hour, & minute, & second );
-    // fname point to file name
-    fname += setTime;
-    if( strlen( fname ) <= 0 )
-      client << "501 No file name\r\n";
-    else if( makePath( path, fname ))
-    {
-      if( ! FAT.exists( path ))
-        client << "550 No such file " << parameters << "\r\n";
-      else if( setTime ) // set file modification time
-      {
-        if( FAT.timeStamp( path, year, month, day, hour, minute, second ))
-          client << "200 Ok\r\n";
-        else
-          client << "550 Unable to modify time\r\n";
-      }
-      else // get file modification time
-      {
-        uint16_t date, time;
-        if( FAT.getFileModTime( path, & date, & time ))
-        {
-          char dtStr[ 15 ];
-          client << "213 " << makeDateTimeStr( dtStr, date, time ) << "\r\n";
-        }
-        else
-          client << "550 Unable to retrieve time\r\n";
-      }
-    }
-  }
-#endif
-
-			case ftp_command::MLSD:
-			    if(!data_.connected()) {
-					format("425 No data connection\n", ctrl_.get_cepid());
-					ret = false;
-				} else {
-      				format("150 Accepted data connection\n", ctrl_.get_cepid());
-					if(sdc_.get_mount()) {
-						int n = sdc_.dir_loop(sdc_.get_current(), dir_list_func_, true, &data_);
-						data_.stop();
-						format("226-options: -a -l\n", ctrl_.get_cepid());
-						format("226 %d matches total\n", ctrl_.get_cepid()) % n;
-					} else {
-						format("550 File system not mount\n", ctrl_.get_cepid());
-						ret = false;
-					}
-				}
-				break;
-
-			case ftp_command::SIZE:
 				if(param_ == nullptr || strlen(param_) == 0) {
 					format("501 No file name\n", ctrl_.get_cepid());
 					break;
 				}
 				if(!sdc_.probe(param_)) {
-					format("550 No such file %s\n", ctrl_.get_cepid()) % param_;
-					break;
-				}
-				{
-					uint32_t sz = sdc_.size(param_);
-///					format("450 Can't open %s\n", ctrl_.get_cepid()) % param_;
-					format("213 %u\n", ctrl_.get_cepid()) % sz;
+					format("550 File %s not found\n", ctrl_.get_cepid()) % param_;
+				} else {
+					format("350 RNFR accepted - file exists, ready for destination\n", ctrl_.get_cepid());     
+					task_ = task::recv_rename;
 				}
 				break;
 
-			case ftp_command::NONE_:
-				ftp_debug("FTP Server: Fail: '%s'\n") % line_man_[0];
-			default:
-				break;
-			}
-
-			ftp_debug("FTP command: %s, '%s'\n") % line_man_[0] % param_;
-
-			return ret;
-		}
-
+			case ftp_command::RNTO:
 #if 0
-  ///////////////////////////////////////
-  //                                   //
-  //        FTP SERVICE COMMANDS       //
-  //                                   //
-  ///////////////////////////////////////
-  //
-  //  NLST - Name List 
-  //
-  else if( ! strcmp( command, "NLST" ))
-  {
-    if( ! dataConnect())
-      client << "425 No data connection\r\n";
-    else
-    {
-      client << "150 Accepted data connection\r\n";
-      uint16_t nm = 0;
-      FAT_DIR dir;
-      if( ! dir.openDir( cwdName ))
-        client << "550 Can't open directory " << parameters << "\r\n";
-      else
-      {
-        while( dir.nextFile())
-        {
-          data << dir.fileName() << "\r\n";
-          nm ++;
-        }
-        client << "226 " << nm << " matches total\r\n";
-      }
-      data.stop();
-    }
-  }
-  //
-  //  NOOP
-  //
-  else if( ! strcmp( command, "NOOP" ))
-  {
-    // dataPort = 0;
-    client << "200 Zzz...\r\n";
-  }
-  //
-  //  RNFR - Rename From 
-  //
-  else if( ! strcmp( command, "RNFR" ))
-  {
-    buf[ 0 ] = 0;
-    if( strlen( parameters ) == 0 )
-      client << "501 No file name\r\n";
-    else if( makePath( buf ))
-    {
-      if( ! FAT.exists( buf ))
-        client << "550 File " << parameters << " not found\r\n";
-      else
-      {
-        #ifdef FTP_DEBUG
-          Serial << "Renaming " << buf << endl;
-        #endif
-        client << "350 RNFR accepted - file exists, ready for destination\r\n";     
-        rnfrCmd = true;
-      }
-    }
-  }
-  //
-  //  RNTO - Rename To 
-  //
   else if( ! strcmp( command, "RNTO" ))
   {
   Serial << buf << endl;
@@ -769,100 +576,189 @@ namespace net {
     }
     rnfrCmd = false;
   }
-
-  ///////////////////////////////////////
-  //                                   //
-  //   EXTENSIONS COMMANDS (RFC 3659)  //
-  //                                   //
-  ///////////////////////////////////////
-  //
-  //  SITE - System command
-  //
-  else if( ! strcmp( command, "SITE" ))
-  {
-    if( ! strcmp( parameters, "FREE" ))
-      client << "200 " << FAT.free() << " MB free of " 
-             << FAT.capacity() << " MB capacity\r\n";
-    else
-      client << "500 Unknow SITE command " << parameters << "\r\n";
-  }
-  //
-  //  Unrecognized commands ...
-  //
-  else
-    client << "500 Unknow command\r\n";
-  
-  return true;
-}
 #endif
+				break;
 
+			case ftp_command::SITE:
+				if(strcmp(param_, "FREE") == 0) {
+					uint32_t free;
+					uint32_t capa;
+					if(sdc_.get_disk_space(free, capa)) {
+						format("200 %u MB free of %u MB capacity\n", ctrl_.get_cepid())
+							% (free / 1024) % (capa / 1024);
+					} else {
+						format("550 disk not available\n", ctrl_.get_cepid()) % param_;
+					}
+				} else {
+					format("500 Unknow SITE command %s\n", ctrl_.get_cepid()) % param_;
+				}
+				break;
 
+			case ftp_command::SMNT:
+			case ftp_command::STAT:
+				exec = true;
+				break;
 
+			case ftp_command::STOR:
+				if(param_ == nullptr) {
+					format("501 No file name\n", ctrl_.get_cepid());
+					break;
+				}
+				{
+					char path[256 + 1];
+					sdc_.make_full_path(param_, path);
+					file_fp_ = fopen(path, "wb");
+					if(file_fp_ == nullptr) {
+						format("451 Can't open/create %s\n", ctrl_.get_cepid()) % path;
+						break;
+					}
+					format("150 Connected to port %d\n", ctrl_.get_cepid()) % data_.get_port();
+					file_total_ = 0;
+					task_ = task::recv_file;
+				}
 #if 0
-void FtpServer::service()
-{
-  if((int32_t) ( millisDelay - millis() ) > 0 )
-    return;
-
-  if( cmdStatus == 0 )
-  {
-    if( client.connected())
-      disconnectClient();
-    cmdStatus = 1;
-  }
-  else if( cmdStatus == 1 )         // Ftp server waiting for connection
-  {
-    abortTransfer();
-    iniVariables();
-    #ifdef FTP_DEBUG
-      Serial << "Ftp server waiting for connection on port " << FTP_CTRL_PORT << endl;
-    #endif
-    cmdStatus = 2;
-  }
-  else if( cmdStatus == 2 )         // Ftp server idle
-  {
-    client = ftpServer.connected();
-    if( client > 0 )                // A client connected
-    {
-      clientConnected();      
-      millisEndConnection = millis() + 10 * 1000 ; // wait client id during 10 s.
-      cmdStatus = 3;
-    }
-  }
-  else if( readChar() > 0 )         // got response
-  {
-    if( cmdStatus == 3 )            // Ftp server waiting for user identity
-      if( userIdentity() )
-        cmdStatus = 4;
-      else
-        cmdStatus = 0;
-    else if( cmdStatus == 4 )       // Ftp server waiting for user registration
-      if( userPassword() )
+      else if( ! dataConnect())
       {
-        cmdStatus = 5;
-        millisEndConnection = millis() + millisTimeOut;
+        client << "425 No data connection\r\n";
+        file.close();
       }
       else
-        cmdStatus = 0;
-    else if( cmdStatus == 5 )       // Ftp server waiting for user command
-      if( ! processCommand())
-        cmdStatus = 0;
-      else
-        millisEndConnection = millis() + millisTimeOut;
+      {
+        millisBeginTrans = millis();
+        bytesTransfered = 0;
+        transferStatus = 2;
+      }
+    }
   }
-  else if( ! client.connected() )
-    cmdStatus = 1;
+#endif
+				break;
 
-  if( transferStatus == 1 )         // Retrieve data
-  {
-    if( ! doRetrieve())
-      transferStatus = 0;
-  }
-  else if( transferStatus == 2 )    // Store data
-  {
-    if( ! doStore())
-      transferStatus = 0;
-  }
+			case ftp_command::STOU:
+				exec = false;
+				break;
+
+			case ftp_command::STRU:
+				if(strcmp(param_, "F") == 0) {
+					format("200 F Ok\n", ctrl_.get_cepid());
+				} else {
+					format("504 no suport %s\n", ctrl_.get_cepid()) % param_;
+				}
+				break;
+
+			case ftp_command::SYST:
+				exec = false;
+				break;
+
+			case ftp_command::TYPE:
+				if(param_ == nullptr) {
+					format("504 Unknow TYPE\n", ctrl_.get_cepid());
+					ret = false;
+				} else if(strcmp(param_, "A") == 0) {
+					format("200 TYPE is now ASCII\n", ctrl_.get_cepid());
+				} else if(strcmp(param_, "I") == 0) {
+			    	format("200 TYPE is now BINARY\n", ctrl_.get_cepid());
+				} else {
+					format("504 Unknow TYPE\n", ctrl_.get_cepid());
+					ret = false;
+				}
+				break;
+
+			case ftp_command::USER:
+				break;
+
+			case ftp_command::FEAT:
+				format("211-Extensions suported:\n", ctrl_.get_cepid());
+				format(" MDTM\n", ctrl_.get_cepid());
+				format(" MLSD\n", ctrl_.get_cepid());
+				format(" SIZE\n", ctrl_.get_cepid());
+				format(" SITE FREE\n", ctrl_.get_cepid());
+				format("211 End.\n", ctrl_.get_cepid());
+ 				break;
+
+			case ftp_command::MDTM:
+				if(param_ == nullptr || strlen(param_) == 0) {
+					format("501 No file name\n", ctrl_.get_cepid());
+					break;
+				}
+				{
+					// check Date/Time param
+					if(parse_YYYYMMDDHHMMSS_(param_)) {
+//        else
+//          client << "550 Unable to modify time\r\n";
+						format("200 Ok\n", ctrl_.get_cepid());
+						break;
+					}
+					char path[256 + 1];
+					sdc_.make_full_path(param_, path);
+					if(!sdc_.probe(path)) {
+						format("550 No such file %s\n", ctrl_.get_cepid()) % path;
+						break;
+					}
+					time_t t = sdc_.get_time(path);
+					if(t != 0) {
+						struct tm *m = localtime(&t);
+						format("213 %04d%02d%02d%02d%02d%02d\n", ctrl_.get_cepid())
+							% static_cast<int>(m->tm_year + 1900)
+							% static_cast<int>(m->tm_mon + 1)
+							% static_cast<int>(m->tm_mday)
+							% static_cast<int>(m->tm_hour)
+							% static_cast<int>(m->tm_min)
+							% static_cast<int>(m->tm_sec);
+					} else {
+						format("550 Unable to retrieve time\n", ctrl_.get_cepid());
+					}
+				}
+				break;
+
+			case ftp_command::MLSD:
+			    if(!data_.connected()) {
+					format("425 No data connection\n", ctrl_.get_cepid());
+					ret = false;
+				} else {
+      				format("150 Accepted data connection\n", ctrl_.get_cepid());
+					if(sdc_.get_mount()) {
+						int n = sdc_.dir_loop(sdc_.get_current(), dir_list_func_, true, &data_);
+						data_.stop();
+						format("226-options: -a -l\n", ctrl_.get_cepid());
+						format("226 %d matches total\n", ctrl_.get_cepid()) % n;
+					} else {
+						format("550 File system not mount\n", ctrl_.get_cepid());
+						ret = false;
+					}
+				}
+				break;
+
+			case ftp_command::SIZE:
+				if(param_ == nullptr || strlen(param_) == 0) {
+					format("501 No file name\n", ctrl_.get_cepid());
+					break;
+				}
+				if(!sdc_.probe(param_)) {
+					format("550 No such file %s\n", ctrl_.get_cepid()) % param_;
+					break;
+				}
+				{
+					uint32_t sz = sdc_.size(param_);
+///					format("450 Can't open %s\n", ctrl_.get_cepid()) % param_;
+					format("213 %u\n", ctrl_.get_cepid()) % sz;
+				}
+				break;
+
+			case ftp_command::NONE_:
+			default:
+				exec = false;
+				break;
+			}
+
+			if(!exec) {
+				ftp_debug("FTP Server: command table search out: '%s'\n") % line_man_[0];
+    			format("500 Unknow command %s\n", ctrl_.get_cepid()) % line_man_[0];
+			}
+
+			ftp_debug("FTP command: %s, '%s'\n") % line_man_[0] % param_;
+			return ret;
+		}
+#if 0
   else if( cmdStatus > 2 && ! ((int32_t) ( millisEndConnection - millis() ) > 0 ))
   {
     client << "530 Timeout\r\n";
@@ -881,7 +777,9 @@ void FtpServer::service()
         ftp_server(ethernet& e, SDC& sdc) : eth_(e), sdc_(sdc), ctrl_(e), data_(e),
 			task_(task::begin), line_man_('\n'),
 			user_{ "SEEDA03" }, pass_{ "SEEDA03" }, time_out_(0), delay_loop_(0),
-			param_(nullptr), file_fp_(nullptr)
+			param_(nullptr), data_ip_(), data_port_(0),
+			data_connect_loop_(0),
+			file_fp_(nullptr), file_total_(0)
 			{ }
 
 
@@ -972,6 +870,7 @@ void FtpServer::service()
 				data_.begin(DATA_PORT_PASV);
 				utils::format("Start FTP Server (DATA): '%s' (%d) fd(%d)\n")
 					% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
+				data_connect_loop_ = 10 * 100;  // 10 sec
 				task_ = task::data_connection;
 				break;
 
@@ -981,19 +880,25 @@ void FtpServer::service()
 						% ctrl_.get_from_ip().c_str() % data_.get_port();
 					task_ = task::command;
 					line_man_.clear();
+					break;
+				}
+				if(data_connect_loop_) {
+					--data_connect_loop_;
+				} else {
+					format("425 No data connection (timeout)\n", ctrl_.get_cepid());
+					task_ = task::command;
 				}
 				break;
 
 			//--------------------------//
 			case task::send_file:
-				for(int i = 0; i < 16; ++i) {  // 1 frame/8192 bytes
-					uint8_t tmp[512];
-					uint32_t sz = fread(tmp, 1, sizeof(tmp), file_fp_);
+				{
+					uint32_t sz = fread(rs_buf_, 1, sizeof(rs_buf_), file_fp_);
 					if(sz > 0) {
-						data_.write(tmp, sz);
+						data_.write(rs_buf_, sz);
 						file_total_ += sz;
 					}
-					if(sz < sizeof(tmp)) {
+					if(sz < sizeof(rs_buf_)) {
 //  if( deltaT > 0 && bytesTransfered > 0 )
 // {
 //    client << "226-File successfully transferred\r\n";
@@ -1007,29 +912,39 @@ void FtpServer::service()
 						task_ = task::command;
 						break;
 					}
+					eth_.update(data_.get_cepid());
 				}
 				break;
 
 			//--------------------------//
 			case task::recv_file:
-				for(int i = 0; i < 8; ++i) {  // 1 frame/4096 bytes
-					uint8_t tmp[512];
-					int32_t rds = data_.read(tmp, sizeof(tmp));
-//					static int32_t rrr;
-//					if(rrr != rds) {
-//						utils::format("Data read: %d\n") % rds;
-//						rrr = rds;
-//					}
+				{
+					int32_t rds = data_.read(rs_buf_, sizeof(rs_buf_));
 					if(rds > 0) {
-						fwrite(tmp, 1, rds, file_fp_);
+						fwrite(rs_buf_, 1, rds, file_fp_);
 					}
 					if(!data_.connected() || rds < 0) {
-						format("226 File successfully transferred\n", ctrl_.get_cepid());  
+						format("226 File successfully transferred\n", ctrl_.get_cepid());
 						fclose(file_fp_);
 						file_fp_ = nullptr;
 						data_.stop();
 						task_ = task::command;
 						break;
+					}
+					eth_.update(data_.get_cepid());
+				}
+				break;
+
+			//--------------------------//
+			case task::recv_rename:
+				{
+					uint8_t tmp[256];
+					int32_t rds = data_.read(tmp, sizeof(tmp));
+					if(rds > 0) {
+
+					}
+					if(!data_.connected() || rds < 0) {
+
 					}
 				}
 				break;
