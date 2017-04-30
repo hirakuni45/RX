@@ -104,7 +104,8 @@ namespace utils {
 			++t->idx_;
 		}
 
-		void create_full_path_(const char* path, char* full) const {
+		void create_full_path_(const char* path, char* full) const
+		{
 			std::strcpy(full, current_);
 			if(path == nullptr || path[0] == 0) {
 				if(full[0] == 0) {
@@ -118,10 +119,23 @@ namespace utils {
 			} else if(path[0] == '/') {
 				std::strcpy(full, path);
 			} else {
-				std::strcat(full, "/");
+				uint32_t len = strlen(full);
+				if(len > 0 && full[len - 1] != '/') {
+					std::strcat(full, "/");
+				}
 				std::strcat(full, path);
 			}
 		}
+
+
+		// FATFS で認識できるパス（文字コード）へ変換
+		void create_fatfs_path_(const char* path, char* full) const {
+			create_full_path_(path, full);
+#if _USE_LFN != 0
+			str::utf8_to_sjis(full, full);
+#endif
+		}
+
 
 	public:
 		typedef void (*dir_loop_func)(const char* name, const FILINFO* fi, bool dir, void* option);
@@ -173,6 +187,28 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	ファイルの存在を検査
+			@param[in]	path	ファイル名
+			@return ファイルがある場合「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool probe(const char* path) const
+		{
+			if(!mount_) return false;
+
+			FIL fp;
+			bool ret = open(&fp, path, FA_READ | FA_OPEN_EXISTING);
+			if(ret) {
+				if(f_close(&fp) != FR_OK) {
+					return false;
+				}
+			}
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	カレント・ファイルのオープン
 			@param[in]	fp		ファイル構造体ポインター
 			@param[in]	path	ファイル名
@@ -186,11 +222,8 @@ namespace utils {
 			if(fp == nullptr || path == nullptr) return false;
 
 			char full[path_buff_size_];
-			create_full_path_(path, full);
+			create_fatfs_path_(path, full);
 
-#if _USE_LFN != 0
-			str::utf8_to_sjis(full, full);
-#endif
 			if(f_open(fp, full, mode) != FR_OK) {
 				return false;
 			}
@@ -216,27 +249,6 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ファイルがあるか検査
-			@param[in]	path	ファイル名
-			@return ファイルがある場合「true」
-		 */
-		//-----------------------------------------------------------------//
-		bool probe(const char* path) const
-		{
-			if(!mount_) return false;
-			FIL fp;
-			bool ret = open(&fp, path, FA_READ | FA_OPEN_EXISTING);
-			if(ret) {
-				if(f_close(&fp) != FR_OK) {
-					return false;
-				}
-			}
-			return ret;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	ファイル・サイズを返す @n
 					※アクセス出来ない場合も「０」を返すので、存在確認に使えない
 			@param[in]	path	ファイル名
@@ -246,21 +258,41 @@ namespace utils {
 		uint32_t size(const char* path) const
 		{
 			if(!mount_) return false;
-			if(path == nullptr) return 0;
+			if(path == nullptr) return false;
 
 			char full[path_buff_size_];
-			create_full_path_(path, full);
+			create_fatfs_path_(path, full);
 
-#if _USE_LFN != 0
-			str::utf8_to_sjis(full, full);
-#endif
 			FILINFO fno;
 			if(f_stat(full, &fno) != FR_OK) {
-
 				return 0;
 			}
 
 			return fno.fsize;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ファイルの更新時間を取得
+			@param[in]	path	ファイル名
+			@return ファイルの更新時間（０の場合エラー）
+		 */
+		//-----------------------------------------------------------------//
+		time_t get_time(const char* path) const
+		{
+			if(!mount_) return 0;
+			if(path == nullptr) return 0;
+
+			char full[path_buff_size_];
+			create_fatfs_path_(path, full);
+
+			FILINFO fno;
+			if(f_stat(full, &fno) != FR_OK) {
+				return 0;
+			}
+
+			return str::fatfs_time_to(fno.fdate, fno.ftime);
 		}
 
 
@@ -277,12 +309,31 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[path_buff_size_];
-			create_full_path_(path, full);
+			create_fatfs_path_(path, full);
 
-#if _USE_LFN != 0
-			str::utf8_to_sjis(full, full);
-#endif
 			return f_unlink(full) == FR_OK;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ファイル名の変更
+			@param[in]	org_path	元名
+			@param[in]	new_path	新名
+			@return 成功なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool rename(const char* org_path, const char* new_path)
+		{
+			if(!mount_) return false;
+			if(org_path == nullptr || new_path == nullptr) return false;
+
+			char org_full[path_buff_size_];
+			create_fatfs_path_(org_path, org_full);
+			char new_full[path_buff_size_];
+			create_fatfs_path_(new_path, new_full);
+
+			return f_rename(org_full, new_full) == FR_OK;
 		}
 
 
@@ -299,22 +350,36 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[path_buff_size_];
-			create_full_path_(path, full);
+			create_fatfs_path_(path, full);
 
-#if _USE_LFN != 0
-			str::utf8_to_sjis(full, full);
-#endif
 			return f_mkdir(full) == FR_OK;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ディスク容量の取得
+			@brief	ディスク空き容量の取得
+			@param[in]	free	フリー・スペース（単位Ｋバイト)
+			@param[in]	capa	最大容量（単位Ｋバイト）
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-// FRESULT f_getfree (const TCHAR* path, DWORD* nclst, FATFS** fatfs);	/* Get number of free clusters on the drive 
+		bool get_disk_space(uint32_t& free, uint32_t& capa) const
+		{
+			if(!get_mount()) return false;
+
+			FATFS* fs;
+			DWORD nclst = 0;
+			if(f_getfree("", &nclst, &fs) == FR_OK) {
+
+				// 全セクタ数と空きセクタ数を計算（５１２バイトセクタ）
+				capa = (fs->n_fatent - 2) * fs->csize / 2;
+				free = nclst * fs->csize / 2;
+				return true;
+			} else {
+				return false;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
