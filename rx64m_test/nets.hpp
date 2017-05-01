@@ -117,21 +117,48 @@ namespace seeda {
 			}
 		}
 
+		
+		void value_convert_(seeda::sample_t::mode m, uint16_t src, float gain, char* dst, uint32_t size)
+		{
+			switch(m) {
+			case seeda::sample_t::mode::temp:
+			case seeda::sample_t::mode::current:
+				{
+					float a = static_cast<float>(src) / 65535.0f * gain;
+					utils::format("%6.3f", dst, size) % a;
+				}
+				break;
+			default:
+				utils::format("%d", dst, size) % src;
+				break;
+			}
+		}
+
 
 		void make_adc_csv_(uint32_t fd, const char* tail)
 		{
+			static const char* modes[] = { "temp", "current", "value" };
 			for(int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample(ch);
-				format("%d,%d,%d,%d,%d,%d,%d,%d,%d%s", fd)
+				char min[16];
+				value_convert_(t.mode_, t.min_,     t.gain_, min, sizeof(min));
+				char max[16];
+				value_convert_(t.mode_, t.max_,     t.gain_, max, sizeof(max));
+				char ave[16];
+				value_convert_(t.mode_, t.average_, t.gain_, ave, sizeof(ave));
+				char med[16];
+				value_convert_(t.mode_, t.median_,  t.gain_, med, sizeof(med));
+				format("%d,%s,%s,%s,%s,%d,%d,%d,%d,%s%s", fd)
 					% ch
-					% static_cast<uint32_t>(t.min_)
-					% static_cast<uint32_t>(t.max_)
-					% static_cast<uint32_t>(t.average_)
+					% modes[static_cast<uint32_t>(t.mode_)]
+					% min
+					% max
+					% ave
 					% static_cast<uint32_t>(t.limit_lo_level_)
 					% static_cast<uint32_t>(t.limit_lo_count_)
 					% static_cast<uint32_t>(t.limit_hi_level_)
 					% static_cast<uint32_t>(t.limit_hi_count_)
-					% static_cast<uint32_t>(t.median_)
+					% med
 					% tail;
 			}
 		}
@@ -570,25 +597,45 @@ namespace seeda {
 			format("</style>\n", fd);
 
 			format("<table class=\"table5\" border=1>\n", fd);
-			format(" <tr><th>チャネル</th><th>最小値</th><th>最大値</th><th>平均</th>"
+			format(" <tr><th>チャネル</th><th>表示</th><th>最小値</th><th>最大値</th><th>平均</th>"
 					  "<th>下限</th><th>下限数</th>"
 					  "<th>上限</th><th>上限数</th><th>Median</th></tr>\n", fd);
-			for (int ch = 0; ch < 8; ++ch) {
+
+			static const char* modes[] = { "温度", "電流", "数値" };
+			for(int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample(ch);
-				format(" <tr>\n", fd);
-				format("<td>%d</td>", fd) % ch;
-				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.min_);
-				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.max_);
-				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.average_);
-				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.limit_lo_level_);
-				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.limit_lo_count_);
-				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.limit_hi_level_);
-				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.limit_hi_count_);
-				format("<td>%d</td>", fd) % static_cast<uint32_t>(t.median_);
-				format("</tr>\n", fd);
+				char min[16];
+				value_convert_(t.mode_, t.min_,     t.gain_, min, sizeof(min));
+				char max[16];
+				value_convert_(t.mode_, t.max_,     t.gain_, max, sizeof(max));
+				char ave[16];
+				value_convert_(t.mode_, t.average_, t.gain_, ave, sizeof(ave));
+				char med[16];
+				value_convert_(t.mode_, t.median_,  t.gain_, med, sizeof(med));
+				format("<tr>"
+					"<td>%d</td>"
+					"<td>%s</td>"
+					"<td>%s</td>"
+					"<td>%s</td>"
+					"<td>%s</td>"
+					"<td>%d</td>"
+					"<td>%d</td>"
+					"<td>%d</td>"
+					"<td>%d</td>"
+					"<td>%s</td>"
+					"</tr>\n", fd)
+					% ch
+					% modes[static_cast<uint32_t>(t.mode_)]
+					% min
+					% max
+					% ave
+					% static_cast<uint32_t>(t.limit_lo_level_)
+					% static_cast<uint32_t>(t.limit_lo_count_)
+					% static_cast<uint32_t>(t.limit_hi_level_)
+					% static_cast<uint32_t>(t.limit_hi_count_)
+					% med;
 			}
 			format("</table>\n", fd);
-
 			format("<br>\n", fd);
 
 			format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
