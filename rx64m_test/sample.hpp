@@ -16,13 +16,25 @@ namespace seeda {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct sample_t {
-		uint32_t	limit_up_;		///< 閾値を超えた数
-		uint16_t	limit_level_;	///< 閾値
+		enum class mode : uint16_t {
+			temp,		///< 温度
+			current,	///< 電流
+			none,		///< 数値
+		};
+
+		float		gain_;				///< 実数変換ゲイン
+		uint32_t	limit_lo_count_;	///< lo を超えた数
+		uint32_t	limit_hi_count_;	///< hi を超えた数
+		uint16_t	limit_lo_level_;	///< lo レベル
+		uint16_t	limit_hi_level_;	///< hi レベル
+		mode		mode_;
 		uint16_t	min_;
 		uint16_t	max_;
 		uint16_t	average_;
 		uint16_t	median_;
-		sample_t() : limit_up_(0), limit_level_(32767),
+		sample_t() : gain_(100.0f),
+					 limit_lo_count_(0), limit_hi_count_(0), limit_lo_level_(30000), limit_hi_level_(40000),
+					 mode_(mode::none),
 					 min_(0), max_(0), average_(0), median_(0) { }
 	};
 
@@ -65,7 +77,8 @@ namespace seeda {
 			t_.max_ = 0;
 			t_.average_ = 0;
 			t_.median_ = 0;
-			t_.limit_up_ = 0;
+			t_.limit_lo_count_ = 0;
+			t_.limit_hi_count_ = 0;
 
 			map_.clear();
 		}
@@ -84,7 +97,8 @@ namespace seeda {
 			if(t_.min_ > data) t_.min_ = data;
 			if(t_.max_ < data) t_.max_ = data;
 
-			if(t_.limit_level_ < data) ++t_.limit_up_;
+			if(t_.limit_hi_level_ < data) ++t_.limit_hi_count_;
+			if(t_.limit_lo_level_ > data) ++t_.limit_lo_count_;
 
 			auto ret = map_.emplace(data, 1);
 			if(!ret.second) {
@@ -129,5 +143,14 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		const sample_t& get() const { return t_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  結果参照
+			@return 結果
+		*/
+		//-----------------------------------------------------------------//
+		sample_t& at() { return t_; }
 	};
 }
