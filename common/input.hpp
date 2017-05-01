@@ -182,7 +182,7 @@ namespace utils {
 					a *= 10;
 					a += ch - '0';
 					c *= 10;
-				} else if(ch == '.') {
+				} else if(!p && ch == '.') {
 					b = a;
 					a = 0;
 					c = 1;
@@ -192,7 +192,7 @@ namespace utils {
 				}
 			}
 			if(p) {
-				return static_cast<T>(b) + static_cast<T>(a) / static_cast<T>(c);
+				return static_cast<T>(b) + (static_cast<T>(a) / static_cast<T>(c));
 			} else {
 				return static_cast<T>(a); 
 			}
