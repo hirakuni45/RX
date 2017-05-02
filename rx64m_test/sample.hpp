@@ -17,23 +17,27 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct sample_t {
 		enum class mode : uint16_t {
-			temp,		///< 温度
-			current,	///< 電流
-			none,		///< 数値
+			none,	///< 無変換
+			real,	///< 係数変換
 		};
 
-		float		gain_;				///< 実数変換ゲイン
+		float		gain_;				///< 係数変換ゲイン
+		float		offset_;			///< 係数オフセット
+
 		uint32_t	limit_lo_count_;	///< lo を超えた数
 		uint32_t	limit_hi_count_;	///< hi を超えた数
 		uint16_t	limit_lo_level_;	///< lo レベル
 		uint16_t	limit_hi_level_;	///< hi レベル
+
 		mode		mode_;
+
 		uint16_t	min_;
 		uint16_t	max_;
 		uint16_t	average_;
 		uint16_t	median_;
-		sample_t() : gain_(100.0f),
-					 limit_lo_count_(0), limit_hi_count_(0), limit_lo_level_(30000), limit_hi_level_(40000),
+
+		sample_t() : gain_(1024.0f), offset_(0.0f),
+					limit_lo_count_(0), limit_hi_count_(0), limit_lo_level_(30000), limit_hi_level_(40000),
 					 mode_(mode::none),
 					 min_(0), max_(0), average_(0), median_(0) { }
 	};

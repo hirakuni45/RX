@@ -76,7 +76,7 @@ namespace seeda {
 		THMISTER thmister_;
 
 		char		write_path_[32];
-		int32_t		write_count_;
+		int32_t		write_time_;
 
 
 		//-------------------------------------------------------------------------//
@@ -118,14 +118,13 @@ namespace seeda {
 		}
 
 		
-		void value_convert_(seeda::sample_t::mode m, uint16_t src, float gain, char* dst, uint32_t size)
+		void value_convert_(seeda::sample_t::mode m, uint16_t src, float gain, float offset, char* dst, uint32_t size)
 		{
 			switch(m) {
-			case seeda::sample_t::mode::temp:
-			case seeda::sample_t::mode::current:
+			case seeda::sample_t::mode::real:
 				{
-					float a = static_cast<float>(src) / 65535.0f * gain;
-					utils::format("%6.3f", dst, size) % a;
+					float a = static_cast<float>(src) / 65535.0f * gain + offset;
+					utils::format("%6.2f", dst, size) % a;
 				}
 				break;
 			default:
@@ -141,13 +140,13 @@ namespace seeda {
 			for(int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample(ch);
 				char min[16];
-				value_convert_(t.mode_, t.min_,     t.gain_, min, sizeof(min));
+				value_convert_(t.mode_, t.min_,     t.gain_, t.offset_, min, sizeof(min));
 				char max[16];
-				value_convert_(t.mode_, t.max_,     t.gain_, max, sizeof(max));
+				value_convert_(t.mode_, t.max_,     t.gain_, t.offset_, max, sizeof(max));
 				char ave[16];
-				value_convert_(t.mode_, t.average_, t.gain_, ave, sizeof(ave));
+				value_convert_(t.mode_, t.average_, t.gain_, t.offset_, ave, sizeof(ave));
 				char med[16];
-				value_convert_(t.mode_, t.median_,  t.gain_, med, sizeof(med));
+				value_convert_(t.mode_, t.median_,  t.gain_, t.offset_, med, sizeof(med));
 				format("%d,%s,%s,%s,%s,%d,%d,%d,%d,%s%s", fd)
 					% ch
 					% modes[static_cast<uint32_t>(t.mode_)]
@@ -235,6 +234,7 @@ namespace seeda {
 				utils::format("CGI No Body\n");
 				return;
 			} else {
+//				utils::format("CGI param: '%s'\n") % line_man_[pos];
 				utils::str::conv_html_amp(line_man_[pos], body);
 			}
 
@@ -260,24 +260,31 @@ namespace seeda {
 				}
 //				cgi.list();
 			} else if(strcmp(path, "/cgi/set_adc.cgi") == 0) {
-				typedef utils::parse_cgi_post<1024, 4 * 8> CGI_ADC;
+				typedef utils::parse_cgi_post<1024, 5 * 8> CGI_ADC;
 				CGI_ADC cgi;
 				cgi.parse(body);
 				for(uint32_t i = 0; i < cgi.size(); ++i) {
 					const auto& t = cgi.get_unit(i);
 					int ch;
 					if((utils::input("mode%d", t.key) % ch).status()) {
-						if(strcmp(t.val, "temp") == 0) {  // 温度
-							at_sample(ch).mode_ = seeda::sample_t::mode::temp;
-						} else if(strcmp(t.val, "current") == 0) {  // 電流
-							at_sample(ch).mode_ = seeda::sample_t::mode::current;
-						} else if(strcmp(t.val, "none") == 0) {  // 数値
+						if(strcmp(t.val, "none") == 0) {  // 数値（無変換）
 							at_sample(ch).mode_ = seeda::sample_t::mode::none;
+						} else if(strcmp(t.val, "real") == 0) {  // 係数変換
+							at_sample(ch).mode_ = seeda::sample_t::mode::real;
 						}
 					} else if((utils::input("gain%d", t.key) % ch).status()) {
 						float v;
-						if((utils::input("%f", t.val) % v).status()) {
+						const char* p = t.val;
+						while(p[0] == '+') ++p;  // ＋符号は送る
+						if((utils::input("%f", p) % v).status()) {
 							at_sample(ch).gain_ = v;
+						}
+					} else if((utils::input("offset%d", t.key) % ch).status()) {
+						float v;
+						const char* p = t.val;
+						while(p[0] == '+') ++p;  // ＋符号は送る
+						if((utils::input("%f", p) % v).status()) {
+							at_sample(ch).offset_ = v;
 						}
 					} else if((utils::input("level_lo%d", t.key) % ch).status()) {
 						int v;
@@ -319,12 +326,12 @@ namespace seeda {
 						write_path_[0] = 0;
 						if(t.val != nullptr) strcpy(write_path_, t.val); 
 					} else if(strcmp(t.key, "count") == 0) {
-						write_count_ = 0;
-						utils::input("%d", t.val) % write_count_;
+						write_time_ = 0;
+						utils::input("%d", t.val) % write_time_;
 					}
 				}
 				utils::format("Set write file: '%s'\n") % write_path_;
-				utils::format("Set write count: %d\n") % write_count_;;
+				utils::format("Set write time: %d\n") % write_time_;;
 			}
 		}
 
@@ -413,18 +420,18 @@ namespace seeda {
 
 			render_date_time_(fd);
 
-			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
+			format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
 
 			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"リロード\" />\n", fd);
-			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
+			format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
 
 			format("<input type=\"button\" onclick=\"location.href='/data'\" value=\"データ表示\" />\n", fd);
-			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
+			format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
 
 			{  // 内臓 A/D 表示
 				float v = static_cast<float>(get_adc(5)) / 4095.0f * 3.3f;
 				format("バックアップ電池電圧： %4.2f [V]<br>\n", fd) % v;
-				format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
 			}
 
 			// RTC 設定
@@ -443,7 +450,7 @@ namespace seeda {
 					% static_cast<int>(m->tm_hour) % static_cast<int>(m->tm_min);
 				format("<tr><td><input type=\"submit\" value=\"ＲＴＣ設定\"></td></tr>\n", fd);
 				format("</table></form>\n", fd);
-				format("<hr align=\"left\" width=\"500\" size=\"3\" />\n", fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
 			}
 
 			// Ａ／Ｄ変換設定
@@ -453,46 +460,60 @@ namespace seeda {
 					const seeda::sample_t& t = at_sample(ch);
 					format("<tr>"
 						"<td>CH%d</td>"
-						"<td><input type=\"radio\" name=\"mode%d\" value=\"temp\" %s>温度</td>"
-						"<td><input type=\"radio\" name=\"mode%d\" value=\"current\" %s>電流</td>"
-						"<td><input type=\"radio\" name=\"mode%d\" value=\"none\" %s>数値</td>"
+						"<td><input type=\"radio\" name=\"mode%d\" value=\"none\"%s>数値</td>"
+						"<td><input type=\"radio\" name=\"mode%d\" value=\"real\"%s>係数</td>"
 						"<td>ゲイン：</td>"
-						"<td><input type=\"text\" name=\"gain%d\" size=\"6\" value=\"%5.2f\"></td>"
+						"<td><input type=\"text\" name=\"gain%d\" size=\"6\" value=\"%6.2f\"></td>"
+						"<td>オフセット：</td>"
+						"<td><input type=\"text\" name=\"offset%d\" size=\"6\" value=\"%6.2f\"></td>"
 						"<td>下限：</td>"
 						"<td><input type=\"text\" name=\"level_lo%d\" size=\"6\" value=\"%d\"></td>"
 						"<td>上限：</td>"
 						"<td><input type=\"text\" name=\"level_hi%d\" size=\"6\" value=\"%d\"></td>"
 						"</tr>\n", fd)
 						% ch
-						% ch % (t.mode_ == seeda::sample_t::mode::temp ? "checked" : "")
-						% ch % (t.mode_ == seeda::sample_t::mode::current ? "checked" : "")
-						% ch % (t.mode_ == seeda::sample_t::mode::none ? "checked" : "")
+						% ch % (t.mode_ == seeda::sample_t::mode::none ? " checked" : "")
+						% ch % (t.mode_ == seeda::sample_t::mode::real ? " checked" : "")
 						% ch % t.gain_
+						% ch % t.offset_
 						% ch % static_cast<int>(t.limit_lo_level_)
 						% ch % static_cast<int>(t.limit_hi_level_);
 				}
 				format("<tr><td><input type=\"submit\" value=\"設定\"></td></tr>\n", fd);
 				format("</table></form>\n", fd);
-				format("<hr align=\"left\" width=\"500\" size=\"3\" />\n", fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
 			}
 
-			// ＳＤカード操作画面へのボタン
-			format("<input type=\"button\" onclick=\"location.href='/files'\" value=\"ＳＤカード\" />\n", fd);
-			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
+			{  // ＳＤカード操作画面へのボタン
+				format("<input type=\"button\" onclick=\"location.href='/files'\" value=\"ＳＤカード\">\n",
+					fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+			}
 
-			// ファイル書き込み設定
-			{
+			{  // クライアント設定ボタン
+				format("<input type=\"button\" onclick=\"location.href='/client'\" value=\"クライアント\">\n",
+					fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+			}
+
+			{  // ファイル書き込み設定
 				format("<form method=\"POST\" action=\"/cgi/set_write.cgi\"><table>\n", fd);
+
+//				format("<tr>"
+//						"<td><input type=\"radio\" name=\"mode%d\" value=\"one\"%s>数値</td>"
+//						"<td><input type=\"radio\" name=\"mode%d\" value=\"\"%s>係数</td>"
+//						"</tr>", fd);
+
 				format("<tr><td>ファイル名：</td>"
 					"<td><input type=\"text\" name=\"fname\" size=\"16\" value=\"%s\"></td></tr>\n", fd)
 					% write_path_;
 				format("<tr><td>書き込み時間（秒）：</td>"
 					"<td><input type=\"text\" name=\"count\" size=\"16\" value=\"%d\"></td></tr>\n", fd)
-					% write_count_;
+					% write_time_;
 				format("<tr><td><input type=\"submit\" value=\"ファイル書き込み設定\"></td></tr>\n", fd);
 				format("</table></form>\n", fd);
 
-				format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
 			}
 
 			format("</html>\n", fd);
@@ -601,17 +622,17 @@ namespace seeda {
 					  "<th>下限</th><th>下限数</th>"
 					  "<th>上限</th><th>上限数</th><th>Median</th></tr>\n", fd);
 
-			static const char* modes[] = { "温度", "電流", "数値" };
+			static const char* modes[] = { "数値", "係数" };
 			for(int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample(ch);
 				char min[16];
-				value_convert_(t.mode_, t.min_,     t.gain_, min, sizeof(min));
+				value_convert_(t.mode_, t.min_,     t.gain_, t.offset_, min, sizeof(min));
 				char max[16];
-				value_convert_(t.mode_, t.max_,     t.gain_, max, sizeof(max));
+				value_convert_(t.mode_, t.max_,     t.gain_, t.offset_, max, sizeof(max));
 				char ave[16];
-				value_convert_(t.mode_, t.average_, t.gain_, ave, sizeof(ave));
+				value_convert_(t.mode_, t.average_, t.gain_, t.offset_, ave, sizeof(ave));
 				char med[16];
-				value_convert_(t.mode_, t.median_,  t.gain_, med, sizeof(med));
+				value_convert_(t.mode_, t.median_,  t.gain_, t.offset_, med, sizeof(med));
 				format("<tr>"
 					"<td>%d</td>"
 					"<td>%s</td>"
@@ -795,7 +816,7 @@ namespace seeda {
 			client_ip_(192, 168, 3, 7),
 #endif
 			client_time_(0),
-			write_path_{ "test.csv" }, write_count_(60) { }
+			write_path_{ "test.csv" }, write_time_(60) { }
 
 
 		//-----------------------------------------------------------------//
