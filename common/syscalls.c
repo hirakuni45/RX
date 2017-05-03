@@ -317,7 +317,16 @@ int lseek(int file, int offset, int dir)
 int link(const char *oldpath, const char *newpath)
 {
 #ifdef FAT_FS
+
+#if _USE_LFN != 0
+	char oldtmp[256];
+	utf8_to_sjis(oldpath, oldtmp);
+	char newtmp[256];
+	utf8_to_sjis(newpath, newtmp);
+	FRESULT res = f_rename(oldtmp, newtmp);
+#else
 	FRESULT res = f_rename(oldpath, newpath);
+#endif
 	if(res == FR_OK) {
 
 		errno = 0;
@@ -345,7 +354,13 @@ int link(const char *oldpath, const char *newpath)
 int unlink(const char *path)
 {
 #ifdef FAT_FS
+#if _USE_LFN != 0
+	char tmp[256];
+	utf8_to_sjis(path, tmp);
+	FRESULT res = f_unlink(tmp);
+#else
 	FRESULT res = f_unlink(path);
+#endif
 	if(res == FR_OK) {
 		errno = 0;
 		return 0;
