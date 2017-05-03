@@ -275,8 +275,20 @@ namespace utils {
 		}
 
 
+		void skip_space_() {
+			while(1) {
+				char ch = inp_();
+				if(ch != ' ') {
+					inp_.unget();
+					return;
+				}
+			}
+		}
+
+
 		int32_t nb_int_(bool sign = true)
 		{
+			skip_space_();
 			auto neg = neg_();
 
 			uint32_t v = 0;
@@ -310,6 +322,7 @@ namespace utils {
 		template <typename T>
 		T nb_real_()
 		{
+			skip_space_();
 			bool neg = neg_();
 
 			T v = 0.0f;
