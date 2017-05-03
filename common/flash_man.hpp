@@ -6,17 +6,20 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "common/renasas.hpp"
+#include "common/renesas.hpp"
 
 namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  flash_man class
+		@param[in]	IO	フラッシュ I/O
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class IO>
 	class flash_man {
 
+		IO&		io_;
 
 
 	public:
@@ -25,7 +28,7 @@ namespace utils {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		flash_man() { }
+		flash_man(IO& io) : io_(io) { }
 
 
 	};
