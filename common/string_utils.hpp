@@ -372,28 +372,17 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  html 内１６進表記コードの変換
+			@brief  URL エンコード文字列を通常文字列へ変換
 			@param[in]	src	ソース
 			@param[out]	dst	出力
 		*/
 		//-----------------------------------------------------------------//
-		static void conv_html_amp(const char* src, char* dst)
+		static void url_encode_to_str(const char* src, char* dst)
 		{
 			char ch;
-			bool amp = false;
-			int hex = 0;
+			uint8_t hex = 0;
 			uint8_t hv = 0;
 			while((ch = *src++) != 0) {
-				if(amp) {
-					if(ch == '%') {
-						*dst = ch;
-						++dst;
-						continue;
-					} else {
-						hex = 2;
-					}
-					amp = false;
-				}
 				if(hex > 0) {
 					hv <<= 4;
 					if(ch >= '0' && ch <= '9') hv |= ch - '0';
@@ -404,8 +393,9 @@ namespace utils {
 					else continue;
 				}
 				if(ch == '%') {
-					amp = true;
+					hex = 2;
 				} else {
+					if(ch == '+') ch = ' ';
 					*dst = ch;
 					++dst;
 				}
