@@ -137,19 +137,21 @@ namespace seeda {
 		@param[in]	t		時間
 		@param[in]	dst		出力文字列
 		@param[in]	size	文字列の大きさ
+		@return 生成された文字列の長さ
 	*/
 	//-----------------------------------------------------------------//
-	void disp_time(time_t t, char* dst, uint32_t size)
+	int disp_time(time_t t, char* dst, uint32_t size)
 	{
 		struct tm *m = localtime(&t);
-		utils::format("%s %s %d %02d:%02d:%02d  %4d", dst, size)
+		int n = (utils::format("%s %s %d %02d:%02d:%02d  %4d", dst, size)
 			% get_wday(m->tm_wday)
 			% get_mon(m->tm_mon)
 			% static_cast<uint32_t>(m->tm_mday)
 			% static_cast<uint32_t>(m->tm_hour)
 			% static_cast<uint32_t>(m->tm_min)
 			% static_cast<uint32_t>(m->tm_sec)
-			% static_cast<uint32_t>(m->tm_year + 1900);
+			% static_cast<uint32_t>(m->tm_year + 1900)).get_length();
+		return n;
 	}
 
 
@@ -177,6 +179,7 @@ namespace seeda {
 			for(int i = 0; i < 8; ++i) {
 				sample_[i].collect();
 				sample_t_[i] = sample_[i].get();
+				sample_t_[i].ch_ = i;
 				sample_[i].clear();
 			}
 			sample_count_ = 0;
