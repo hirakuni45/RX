@@ -15,6 +15,7 @@
 #include "common/fifo.hpp"
 #include "common/format.hpp"
 #include "common/input.hpp"
+#include "common/flash_man.hpp"
 #include "common/time.h"
 
 #include "chip/LTC2348_16.hpp"
@@ -68,7 +69,9 @@ namespace seeda {
 	typedef chip::LTC2348_16<LTC_CSN, LTC_CNV, LTC_BUSY, LTC_PD, LTC_SDI, LTC_SCKI, LTC_SDO> EADC;
 #endif
 
-	typedef utils::fifo<uint16_t, 32, seeda::sample_t>  SAMPLE_FIFO;
+	typedef device::flash_io FLASH_IO;
+	typedef utils::flash_man<FLASH_IO> FLASH_MAN;
+
 
 	//-----------------------------------------------------------------//
 	/*!

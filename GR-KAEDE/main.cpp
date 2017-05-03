@@ -33,7 +33,6 @@ namespace {
 
 	volatile bool	enable_eadc_;
 
-	seeda::SAMPLE_FIFO	sample_buff_;
 
 	void main_init_()
 	{
