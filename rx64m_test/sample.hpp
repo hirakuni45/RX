@@ -7,6 +7,8 @@
 */
 //=====================================================================//
 #include <map>
+#include "common/format.hpp"
+#include "common/time.h"
 
 namespace seeda {
 
@@ -29,17 +31,65 @@ namespace seeda {
 		uint16_t	limit_lo_level_;	///< lo レベル
 		uint16_t	limit_hi_level_;	///< hi レベル
 
-		mode		mode_;
+		time_t		time_;
 
+		uint16_t	ch_;
+		mode		mode_;
 		uint16_t	min_;
 		uint16_t	max_;
 		uint16_t	average_;
 		uint16_t	median_;
 
 		sample_t() : gain_(1024.0f), offset_(0.0f),
-					limit_lo_count_(0), limit_hi_count_(0), limit_lo_level_(30000), limit_hi_level_(40000),
-					 mode_(mode::none),
-					 min_(0), max_(0), average_(0), median_(0) { }
+			limit_lo_count_(0), limit_hi_count_(0), limit_lo_level_(30000), limit_hi_level_(40000),
+			time_(0),
+			ch_(0), mode_(mode::none),
+			min_(0), max_(0), average_(0), median_(0) { }
+
+
+		void value_convert(uint16_t src, char* dst, uint32_t size) const
+		{
+			switch(mode_) {
+			case mode::real:
+				{
+					float a = static_cast<float>(src) / 65535.0f * gain_ + offset_;
+					utils::format("%6.2f", dst, size) % a;
+				}
+				break;
+			default:
+				utils::format("%d", dst, size) % src;
+				break;
+			}
+		}
+
+
+		int make_csv(const char* tail, char* dst, uint32_t size) const
+		{
+			char min[16];
+			value_convert(min_,     min, sizeof(min));
+			char max[16];
+			value_convert(max_,     max, sizeof(max));
+			char ave[16];
+			value_convert(average_, ave, sizeof(ave));
+			char med[16];
+			value_convert(median_,  med, sizeof(med));
+
+			static const char* modes[] = { "value", "real" };
+
+			int sz = (utils::format("%d,%s,%s,%s,%s,%d,%d,%d,%d,%s%s", dst, size)
+				% ch_
+				% modes[static_cast<uint32_t>(mode_)]
+				% min
+				% max
+				% ave
+				% static_cast<uint32_t>(limit_lo_level_)
+				% static_cast<uint32_t>(limit_lo_count_)
+				% static_cast<uint32_t>(limit_hi_level_)
+				% static_cast<uint32_t>(limit_hi_count_)
+				% med
+				% tail).get_length();
+			return sz;
+		}
 	};
 
 

@@ -132,9 +132,10 @@ namespace seeda {
 		@param[in]	t		時間
 		@param[in]	dst		出力文字列
 		@param[in]	size	文字列の大きさ
+		@return 生成された文字列の長さ
 	*/
 	//-----------------------------------------------------------------//
-	void disp_time(time_t t, char* dst = nullptr, uint32_t size = 0);
+	int disp_time(time_t t, char* dst = nullptr, uint32_t size = 0);
 
 
 	//-----------------------------------------------------------------//

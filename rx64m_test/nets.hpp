@@ -12,6 +12,7 @@
 #include "common/string_utils.hpp"
 #include "chip/NTCTH.hpp"
 
+#include "write_file.hpp"
 
 #include "GR/core/ethernet.hpp"
 #include "GR/core/ethernet_client.hpp"
@@ -75,9 +76,7 @@ namespace seeda {
 		typedef chip::NTCTH<4095, chip::thermistor::NT103_41G, 10000, true> THMISTER;
 		THMISTER thmister_;
 
-		char		write_path_[32];
-		int32_t		write_time_;
-
+		write_file	write_file_;
 
 		//-------------------------------------------------------------------------//
 
@@ -117,48 +116,14 @@ namespace seeda {
 			}
 		}
 
-		
-		void value_convert_(seeda::sample_t::mode m, uint16_t src, float gain, float offset, char* dst, uint32_t size)
-		{
-			switch(m) {
-			case seeda::sample_t::mode::real:
-				{
-					float a = static_cast<float>(src) / 65535.0f * gain + offset;
-					utils::format("%6.2f", dst, size) % a;
-				}
-				break;
-			default:
-				utils::format("%d", dst, size) % src;
-				break;
-			}
-		}
-
 
 		void make_adc_csv_(uint32_t fd, const char* tail)
 		{
-			static const char* modes[] = { "temp", "current", "value" };
 			for(int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample(ch);
-				char min[16];
-				value_convert_(t.mode_, t.min_,     t.gain_, t.offset_, min, sizeof(min));
-				char max[16];
-				value_convert_(t.mode_, t.max_,     t.gain_, t.offset_, max, sizeof(max));
-				char ave[16];
-				value_convert_(t.mode_, t.average_, t.gain_, t.offset_, ave, sizeof(ave));
-				char med[16];
-				value_convert_(t.mode_, t.median_,  t.gain_, t.offset_, med, sizeof(med));
-				format("%d,%s,%s,%s,%s,%d,%d,%d,%d,%s%s", fd)
-					% ch
-					% modes[static_cast<uint32_t>(t.mode_)]
-					% min
-					% max
-					% ave
-					% static_cast<uint32_t>(t.limit_lo_level_)
-					% static_cast<uint32_t>(t.limit_lo_count_)
-					% static_cast<uint32_t>(t.limit_hi_level_)
-					% static_cast<uint32_t>(t.limit_hi_count_)
-					% med
-					% tail;
+				char tmp[256];
+				t.make_csv(tail, tmp, sizeof(tmp));
+				format("%s", fd) % tmp;
 			}
 		}
 
@@ -234,8 +199,9 @@ namespace seeda {
 				utils::format("CGI No Body\n");
 				return;
 			} else {
-//				utils::format("CGI param: '%s'\n") % line_man_[pos];
-				utils::str::conv_html_amp(line_man_[pos], body);
+//				utils::format("CGI param (URL enocde): '%s'\n") % line_man_[pos];
+				utils::str::url_encode_to_str(line_man_[pos], body);
+//				utils::format("CGI param (str): '%s'\n") % body;
 			}
 
 			if(strcmp(path, "/cgi/set_rtc.cgi") == 0) {
@@ -275,14 +241,12 @@ namespace seeda {
 					} else if((utils::input("gain%d", t.key) % ch).status()) {
 						float v;
 						const char* p = t.val;
-						while(p[0] == '+') ++p;  // ＋符号は送る
 						if((utils::input("%f", p) % v).status()) {
 							at_sample(ch).gain_ = v;
 						}
 					} else if((utils::input("offset%d", t.key) % ch).status()) {
 						float v;
 						const char* p = t.val;
-						while(p[0] == '+') ++p;  // ＋符号は送る
 						if((utils::input("%f", p) % v).status()) {
 							at_sample(ch).offset_ = v;
 						}
@@ -317,21 +281,24 @@ namespace seeda {
 					}
 				}
 			} else if(strcmp(path, "/cgi/set_write.cgi") == 0) {
-				typedef utils::parse_cgi_post<256, 2> CGI_IP;
-				CGI_IP cgi;
-				cgi.parse(body);
-				for(uint32_t i = 0; i < cgi.size(); ++i) {
-					const auto& t = cgi.get_unit(i);
-					if(strcmp(t.key, "fname") == 0) {
-						write_path_[0] = 0;
-						if(t.val != nullptr) strcpy(write_path_, t.val); 
-					} else if(strcmp(t.key, "count") == 0) {
-						write_time_ = 0;
-						utils::input("%d", t.val) % write_time_;
+				if(!write_file_.get_enable()) {
+					typedef utils::parse_cgi_post<256, 2> CGI_IP;
+					CGI_IP cgi;
+					cgi.parse(body);
+					for(uint32_t i = 0; i < cgi.size(); ++i) {
+						const auto& t = cgi.get_unit(i);
+						if(strcmp(t.key, "fname") == 0) {
+							if(t.val != nullptr) write_file_.set_path(t.val);
+						} else if(strcmp(t.key, "count") == 0) {
+							int n;
+							utils::input("%d", t.val) % n;
+							write_file_.set_limit(n);
+						}
 					}
+					write_file_.enable();
+				} else {
+					write_file_.enable(false);
 				}
-				utils::format("Set write file: '%s'\n") % write_path_;
-				utils::format("Set write time: %d\n") % write_time_;;
 			}
 		}
 
@@ -497,20 +464,23 @@ namespace seeda {
 			}
 
 			{  // ファイル書き込み設定
-				format("<form method=\"POST\" action=\"/cgi/set_write.cgi\"><table>\n", fd);
-
-//				format("<tr>"
-//						"<td><input type=\"radio\" name=\"mode%d\" value=\"one\"%s>数値</td>"
-//						"<td><input type=\"radio\" name=\"mode%d\" value=\"\"%s>係数</td>"
-//						"</tr>", fd);
-
-				format("<tr><td>ファイル名：</td>"
-					"<td><input type=\"text\" name=\"fname\" size=\"16\" value=\"%s\"></td></tr>\n", fd)
-					% write_path_;
-				format("<tr><td>書き込み時間（秒）：</td>"
-					"<td><input type=\"text\" name=\"count\" size=\"16\" value=\"%d\"></td></tr>\n", fd)
-					% write_time_;
-				format("<tr><td><input type=\"submit\" value=\"ファイル書き込み設定\"></td></tr>\n", fd);
+				format("<form method=\"POST\" action=\"/cgi/set_write.cgi\">\n", fd);
+				format("<table><tr><td>ファイル名：</td>", fd);
+				if(!write_file_.get_enable()) {
+					format("<td><input type=\"text\" name=\"fname\" size=\"16\" value=\"%s\"></td></tr>\n", fd)
+						% write_file_.get_path();
+				} else {
+					format("<td>%s</td></tr>\n", fd) % write_file_.get_path();
+				}
+				format("<tr><td>書き込み時間（秒）：</td>", fd);
+				if(!write_file_.get_enable()) {
+					format("<td><input type=\"text\" name=\"count\" size=\"16\" value=\"%d\"></td></tr>\n", fd)
+						% write_file_.get_limit();
+					format("<tr><td><input type=\"submit\" value=\"書き込み開始\"></td></tr>\n", fd);
+				} else {
+					format("<td>%d/%d</td></tr>\n", fd) % write_file_.get_resume() % write_file_.get_limit();
+					format("<tr><td><input type=\"submit\" value=\"書き込み停止\"></td></tr>\n", fd);
+				}
 				format("</table></form>\n", fd);
 
 				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
@@ -626,13 +596,13 @@ namespace seeda {
 			for(int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample(ch);
 				char min[16];
-				value_convert_(t.mode_, t.min_,     t.gain_, t.offset_, min, sizeof(min));
+				t.value_convert(t.min_,    min, sizeof(min));
 				char max[16];
-				value_convert_(t.mode_, t.max_,     t.gain_, t.offset_, max, sizeof(max));
+				t.value_convert(t.max_,     max, sizeof(max));
 				char ave[16];
-				value_convert_(t.mode_, t.average_, t.gain_, t.offset_, ave, sizeof(ave));
+				t.value_convert(t.average_, ave, sizeof(ave));
 				char med[16];
-				value_convert_(t.mode_, t.median_,  t.gain_, t.offset_, med, sizeof(med));
+				t.value_convert(t.median_,  med, sizeof(med));
 				format("<tr>"
 					"<td>%d</td>"
 					"<td>%s</td>"
@@ -794,12 +764,6 @@ namespace seeda {
 			}
 		}
 
-
-		void write_service_()
-		{
-
-		}
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -816,7 +780,9 @@ namespace seeda {
 			client_ip_(192, 168, 3, 7),
 #endif
 			client_time_(0),
-			write_path_{ "test.csv" }, write_time_(60) { }
+
+			write_file_()
+			{ }
 
 
 		//-----------------------------------------------------------------//
@@ -986,7 +952,7 @@ namespace seeda {
 
 			ftp_.service();
 
-			write_service_();
+			write_file_.service();
 		}
 
 
