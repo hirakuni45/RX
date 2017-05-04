@@ -59,9 +59,13 @@ namespace seeda {
 			wait_connect,
 			main_loop,
 			disconnect,
+			delay_connection,
+			delay_loop,
 		};
 		client_task		client_task_;
 		uint16_t		client_port_;
+		uint32_t		client_delay_;
+		uint32_t		client_timeout_;
 
 		typedef utils::line_manage<2048, 20> LINE_MAN;
 		LINE_MAN	line_man_;
@@ -277,7 +281,7 @@ namespace seeda {
 						utils::format("Set client IP: '%s'\n") % t.val;
 						client_ip_.from_string(t.val);
 						// restart service_client...
-						client_task_ = client_task::connect;
+						client_task_ = client_task::disconnect;
 					}
 				}
 			} else if(strcmp(path, "/cgi/set_write.cgi") == 0) {
@@ -722,9 +726,9 @@ namespace seeda {
 
 			case client_task::connect:
 				if(client_.connect(client_ip_, client_port_, TMO_NBLK) == 1) {
-///				if(client_.connect(client_ip_, client_port_, 100) == 1) {
 					utils::format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% client_ip_.c_str() % client_port_ % client_.get_cepid();
+					client_timeout_ = 5 * 100;  // 5 sec
 					client_task_ = client_task::wait_connect;
 				}
 				break;
@@ -734,6 +738,11 @@ namespace seeda {
 					utils::format("Client Conected: %s\n") % client_ip_.c_str();
 					client_time_ = get_time();
 					client_task_ = client_task::main_loop;
+				}
+				if(client_timeout_) {
+					--client_timeout_;
+				} else {
+///					client_task_ = client_task::disconnect;
 				}
 				break;
 
@@ -760,8 +769,20 @@ namespace seeda {
 			case client_task::disconnect:
 				client_.stop();
 				utils::format("Client disconnected: %s\n") % client_ip_.c_str();
-				client_task_ = client_task::connect;
+				client_task_ = client_task::delay_connection;
 				break;
+
+			case client_task::delay_connection:
+				client_delay_ = 50;  // 0.5sec
+				client_task_ = client_task::delay_loop;
+				break;
+
+			case client_task::delay_loop:
+				if(client_delay_) {
+					--client_delay_;
+				} else {
+					client_task_ = client_task::connect;
+				}
 			}
 		}
 
@@ -773,7 +794,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		nets() : server_(ethernet_), client_(ethernet_), ftp_(ethernet_, at_sdc()),
 			count_(0), server_task_(server_task::begin_http),
-			client_task_(client_task::connect), client_port_(3000),
+			client_task_(client_task::connect), client_port_(3000), client_delay_(0), client_timeout_(0),
 			line_man_(0x0a), disconnect_loop_(0),
 #ifdef SEEDA
 			client_ip_(192, 168, 1, 3),
