@@ -772,6 +772,7 @@ namespace net {
 			ftp_debug("FTP command: %s, '%s'\n") % line_man_[0] % param_;
 			return ret;
 		}
+
 #if 0
   else if( cmdStatus > 2 && ! ((int32_t) ( millisEndConnection - millis() ) > 0 ))
   {
