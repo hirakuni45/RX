@@ -57,19 +57,15 @@ static void tcpudp_clr_req_(int cepid)
 }
 
 
-static int err_tmp_[TCPUDP_CHANNEL_NUM];
-
 static int tcpudp_api_req_(int cepid)
 {
-//    int err = E_INI;
-	err_tmp_[cepid - 1] = E_INI;
+    int err = E_INI;
 
-    head_tcb[cepid-1].req.error = &err_tmp_[cepid - 1];
+    head_tcb[cepid-1].req.error = &err;
     head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
     head_tcb[cepid-1].req.flag = 0;
 
-    if (head_tcb[cepid-1].req.tmout == TMO_NBLK)
-    {
+	if(head_tcb[cepid-1].req.tmout == TMO_NBLK) {
         _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 
         pTcbCb->req.ercd = E_INI;
@@ -77,9 +73,16 @@ static int tcpudp_api_req_(int cepid)
 
         return E_WBLK;
     }
+
     tcpudp_api_slp_(cepid);
+
+    if (head_tcb[cepid-1].req.tmout == TMO_NBLK) {
+		err = *head_tcb[cepid-1].req.error;
+	}
+
     tcpudp_clr_req_(cepid);
-    return err_tmp_[cepid - 1];
+
+    return err;
 }
 
 
