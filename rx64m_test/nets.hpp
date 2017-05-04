@@ -722,7 +722,8 @@ namespace seeda {
 
 			case client_task::connect:
 				if(client_.connect(client_ip_, client_port_, TMO_NBLK) == 1) {
-					utils::format("Start SEEDA03 client: %s port(%d), fd(%d)\n")
+///				if(client_.connect(client_ip_, client_port_, 100) == 1) {
+					utils::format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% client_ip_.c_str() % client_port_ % client_.get_cepid();
 					client_task_ = client_task::wait_connect;
 				}
@@ -730,7 +731,7 @@ namespace seeda {
 
 			case client_task::wait_connect:
 				if(client_.connected()) {
-					utils::format("Conected Client: %s\n") % client_ip_.c_str();
+					utils::format("Client Conected: %s\n") % client_ip_.c_str();
 					client_time_ = get_time();
 					client_task_ = client_task::main_loop;
 				}
@@ -758,7 +759,7 @@ namespace seeda {
 			
 			case client_task::disconnect:
 				client_.stop();
-				utils::format("client disconnected: %s\n") % client_ip_.c_str();
+				utils::format("Client disconnected: %s\n") % client_ip_.c_str();
 				client_task_ = client_task::connect;
 				break;
 			}
