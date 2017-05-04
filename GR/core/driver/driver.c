@@ -23,7 +23,7 @@ extern H lan_read_for_test(UB lan_port_no, B **buf, H return_code);
 Private global variables and functions
 ******************************************************************************/
 UH tcpudp_time_cnt;
-UB tcpip_flag;
+static volatile uint8_t tcpip_flag_;
 volatile UH wait_timer_;
 T4_STATISTICS t4_stat;
 UB *err_buf_ptr;
@@ -63,7 +63,7 @@ Functions (Interrput handler)
 ///void __attribute__((interrupt)) INT_Excep_CMT1_CMI1(void)
 static void service_10ms_(void)
 {
-	if (tcpip_flag == 1)
+	if (tcpip_flag_ == 1)
 	{
 		_process_tcpip();
 		tcpudp_time_cnt++;
@@ -122,12 +122,12 @@ Functions (Use definiton function that called from T4 library)
 
 void ena_int(void)
 {
-	tcpip_flag = 1;
+	tcpip_flag_ = 1;
 }
 
 void dis_int(void)
 {
-	tcpip_flag = 0;
+	tcpip_flag_ = 0;
 }
 
 
@@ -148,11 +148,11 @@ void tcpudp_act_cyc(UB cycact)
 	switch (cycact)
 	{
 		case 0:
-			tcpip_flag = 0;
+			tcpip_flag_ = 0;
 			close_timer();
 			break;
 		case 1:
-			tcpip_flag = 1;
+			tcpip_flag_ = 1;
 			open_timer();
 			break;
 		default:
@@ -325,8 +325,7 @@ void report_error(UB lan_port_no, H err_code, UB *err_data)
 
 void lan_inthdr(void)	// callback from r_ether.c
 {
-///	interrupts();
-	if (tcpip_flag == 1)
+	if (tcpip_flag_ != 0)
 	{
 		_process_tcpip();
 	}

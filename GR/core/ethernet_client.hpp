@@ -105,7 +105,11 @@ namespace net {
 			int res = 0;
 			if(!connected()) {
 				int ercd = tcp_con_cep(cepid_, NADR, &adr, timeout);
-				utils::format("Client connection state: %d\n") % ercd;
+				static int ercd_ = 0;
+				if(ercd_ != ercd) {
+					utils::format("Client connection state: %d\n") % ercd;
+					ercd_ = ercd;
+				}
 				if(ercd == E_OK || ercd == E_WBLK) {
 					res = 1;
 				} else {

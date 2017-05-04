@@ -321,7 +321,6 @@ void _tcp_api_sht_cls(void);
 void _tcp_api_snddt(void);
 void _tcp_api_rcvdt(void);
 void _tcp_api_wup(ID);
-// void _tcp_api_slp(ID cepid);
 int _tcp_check_cepid_arg(ID cepid);
 int _tcp_check_len_arg(int len);
 int  _tcp_check_tmout_arg(uint16_t api_type, int32_t tmout, _TCP_CB* pTcpcb);

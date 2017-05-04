@@ -73,7 +73,8 @@ extern NAME_TABLE  name_table;
 extern DNS_MNG     dns_mng;
 
 #define UDP_RCV_DAT_DATAREAD_MAXIMUM    1472
-#define RING_SIZ            (1 << 10)           /* exsample 1024 = 1<<10 */
+
+#define RING_SIZ            (4096)           /* exsample 1024 */
 #define RING_SIZ_forSize    (RING_SIZ >> 2)
 
 namespace net {
