@@ -92,11 +92,15 @@ int open(const char *path, int flags, ...)
 		return -1;
 	}
 
+//	printf("flags: %08X\n", flags);
+
 	BYTE mode = 0;
-	int rw = flags & (O_RDONLY | O_WRONLY | O_RDWR);
-	if(rw == O_RDONLY) mode = FA_READ | FA_OPEN_EXISTING;
-	else if(rw == O_WRONLY) mode = FA_WRITE;
-	else if(rw == O_RDWR) mode = FA_READ | FA_WRITE | FA_OPEN_ALWAYS;
+	int rwm = flags & O_ACCMODE;
+	if(rwm == O_RDONLY) mode = FA_READ | FA_OPEN_EXISTING;
+	else if(rwm == O_WRONLY) mode = FA_WRITE;
+	else if(rwm == O_RDWR) mode = FA_READ | FA_WRITE;
+
+	if(flags & O_APPEND) mode |= FA_OPEN_APPEND;
 
 	if(flags & O_TRUNC) mode |= FA_CREATE_ALWAYS;
 	else if(flags & O_CREAT) mode |= FA_CREATE_NEW;
