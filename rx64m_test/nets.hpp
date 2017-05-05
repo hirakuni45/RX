@@ -13,6 +13,7 @@
 #include "chip/NTCTH.hpp"
 
 #include "write_file.hpp"
+#include "preference.hpp"
 
 #include "GR/core/ethernet.hpp"
 #include "GR/core/ethernet_client.hpp"
@@ -81,6 +82,9 @@ namespace seeda {
 		THMISTER thmister_;
 
 		write_file	write_file_;
+
+		preference	pre_;
+		uint32_t	startup_delay_;
 
 		//-------------------------------------------------------------------------//
 
@@ -270,6 +274,16 @@ namespace seeda {
 						}
 					}
 				}
+
+				for(int ch = 0; ch < 8; ++ch) {
+					pre_.at().mode_[ch] = static_cast<uint8_t>(at_sample(ch).mode_);
+					pre_.at().gain_[ch] = at_sample(ch).gain_;
+					pre_.at().offset_[ch] = at_sample(ch).offset_;
+					pre_.at().limit_lo_level_[ch] = at_sample(ch).limit_lo_level_;
+					pre_.at().limit_hi_level_[ch] = at_sample(ch).limit_hi_level_;
+				}
+				pre_.write();
+
 //				cgi.list();
 			} else if(strcmp(path, "/cgi/set_client.cgi") == 0) {
 				typedef utils::parse_cgi_post<256, 2> CGI_IP;
@@ -288,6 +302,11 @@ namespace seeda {
 						}
 					}
 				}
+
+				for(int i = 0; i < 4; ++i) pre_.at().client_ip_[i] = client_ip_[i];
+				pre_.at().client_port_ = client_port_;
+				pre_.write();
+
 				// restart service_client...
 				client_task_ = client_task::disconnect;
 			} else if(strcmp(path, "/cgi/set_write.cgi") == 0) {
@@ -818,7 +837,7 @@ namespace seeda {
 #endif
 			client_time_(0),
 
-			write_file_()
+			write_file_(), pre_(), startup_delay_(100)
 			{ }
 
 
@@ -990,6 +1009,23 @@ namespace seeda {
 			ftp_.service();
 
 			write_file_.service();
+
+			if(startup_delay_) {
+				--startup_delay_;
+				if(startup_delay_ == 0) {
+					if(pre_.read()) {
+						for(int ch = 0; ch < 8; ++ch) {
+							at_sample(ch).mode_ = static_cast<sample_t::mode>(pre_.get().mode_[ch]);
+							at_sample(ch).gain_ = pre_.get().gain_[ch];
+							at_sample(ch).offset_ = pre_.get().offset_[ch];
+							at_sample(ch).limit_lo_level_ = pre_.get().limit_lo_level_[ch];
+							at_sample(ch).limit_hi_level_ = pre_.get().limit_hi_level_[ch];
+						}
+						for(int i = 0; i < 4; ++i) client_ip_[i] = pre_.get().client_ip_[i];
+						client_port_ = pre_.get().client_port_;
+					}
+				}
+			}
 		}
 
 
