@@ -199,6 +199,12 @@ namespace net {
 			ethernet_.end_connection(cepid_);
 			cepid_ = 0;
 		}
+
+
+		void force_clear()
+		{
+			ethernet_.force_clear(cepid_);
+		}
 	};
 }
 

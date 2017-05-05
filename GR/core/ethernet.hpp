@@ -774,6 +774,12 @@ namespace net {
 			}
 			return ret;
 		}
+
+
+		void force_clear(uint32_t cepid)
+		{
+			tcp_force_clr(cepid);
+		}
 	};
 
 

@@ -317,7 +317,8 @@ int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmou
     }
 
     if (_tcp_is_tcb_queue_over(_TCP_API_CONCP, &head_tcb[cepid-1], pTcbCb))
-    {		
+    {
+		tcp_force_clr(cepid);
         return E_QOVR;
     }
 
@@ -609,8 +610,6 @@ int tcp_can_cep(int cepid, int32_t fncd)
 
     return err;
 }
-
-
 
 
 #if defined(_TEST_LIBRARY)
