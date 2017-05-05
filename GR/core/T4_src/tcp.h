@@ -299,8 +299,6 @@ void _proc_rcv(void);
 void _proc_snd(void);
 
 void _tcp_init_tcb(_TCB *_ptcb);
-// int  _tcp_api_req(ID cepid);
-// void _tcp_clr_req(ID cepid);
 void _tcp_cancel_api(int ercd);
 void _tcp_stat(void);
 int  _tcp_rcv_rst(void);

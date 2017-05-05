@@ -27,6 +27,8 @@ extern _TCB   *head_tcb;
 extern UH _tcp_timer_cnt;
 extern UH _tcp_pre_timer_cnt;
 
+extern _UDP_CB  *_udp_cb;
+
 #if defined(_ETHER)
 extern UH const _ip_tblcnt;
 _ARP_ENTRY   **_ether_arp_tbl;
@@ -682,9 +684,6 @@ TCP_API_STAT tcp_read_stat(int cepid)
 }
 
 
-extern void _tcp_init_tcb(_TCB *_ptcb);
-
-
 /***************************************************************************************
 * Function Name: tcp_force_clr
 * Description  : force break TCP TMO_FEVR loop
@@ -712,8 +711,6 @@ int tcp_force_clr(int cepid)
 
     return err;
 }
-
-extern _UDP_CB  *_udp_cb;
 
 
 /***************************************************************************************

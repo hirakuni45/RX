@@ -73,15 +73,30 @@ T_UDP_CCEP udp_ccep[TCPUDP_CHANNEL_NUM] = {
 const uint32_t udp_ccep_num = (sizeof(udp_ccep) / sizeof(T_UDP_CCEP));
 
 /***  TTL for multicast transmission  ***/
-const UB __multi_TTL = 1;
+const uint8_t multi_TTL[TCPUDP_CHANNEL_NUM] = {
+	1,
+	1,
+	1,
+	1,
+	1,
+	1
+};
 
 /*** Behavior of UDP zero checksum ***/
-const UB _udp_enable_zerochecksum = 0;           /* 0 = disable, other = enable */
+/* 0 = disable, other = enable */
+const uint8_t udp_enable_zerochecksum[] = {
+	0,
+	0,
+	0,
+	0,
+	0,
+	0
+};
 
 /****************************************************************************/
 /**********************     IP-related definition     ***********************/
 /****************************************************************************/
-const UH _ip_tblcnt = 3;
+const uint16_t _ip_tblcnt = 3;
 
 #define MY_IP_ADDR     192,168,0,3            /* Local IP address  */
 #define GATEWAY_ADDR   0,0,0,0                /* Gateway address (invalid if all 0s) */
@@ -109,13 +124,13 @@ MAC_ADDRESS ethernet_mac[] = {
 /*    Set of PPP-related                                                    */
 /*--------------------------------------------------------------------------*/
 /* Authentication-related setting */
-const UH ppp_auth  = AUTH_PAP;               /* PAP,No authentication enabled */
-UB user_name[6]    = "abcde";                /* user name */
-UB user_passwd[6]  = "abc00";                /* password  */
+const uint16_t ppp_auth  = AUTH_PAP;              /* PAP,No authentication enabled */
+uint8_t user_name[6]    = "abcde";                /* user name */
+uint8_t user_passwd[6]  = "abc00";                /* password  */
 
 /* Dial up-related setting */
-const UB peer_dial[]      = "0,123";                /* Destination telephone number */
-const UB at_commands[]   = "ATW2S0=2&C0&D0&S0M0S10=255X3";    /* Modem initialization command */
+const uint8_t peer_dial[]      = "0,123";                /* Destination telephone number */
+const uint8_t at_commands[]   = "ATW2S0=2&C0&D0&S0M0S10=255X3";    /* Modem initialization command */
 
 
 /* Copyright 2014, RENESAS ELECTRONICS CORPORATION */

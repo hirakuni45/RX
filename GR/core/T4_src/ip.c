@@ -10,6 +10,7 @@
 #include <string.h>
 #include "type.h"
 #include "r_t4_itcpip.h"
+#include "config_tcpudp.h"
 #if defined(_ETHER)
 #include "ether.h"
 #elif defined(_PPP)
@@ -56,7 +57,6 @@ extern UH const _ip_tblcnt;
 #endif
 #if defined(_MULTI)
 extern TCPUDP_ENV tcpudp_env[];
-extern UB const __multi_TTL[];
 #endif
 
 
@@ -176,7 +176,7 @@ int16_t _ip_snd(uint8_t *data, uint16_t dlen)
     pip->ip_ver_len  = (_IPH_VERSION4 << 4) | (_IP_HLEN_MIN >> 2);
 #if defined(_MULTI)
     if ((pip->ip_dst[0] & 0xf0) == 0xe0)   /* multicast addresss */
-        pip->ip_ttl  = __multi_TTL[_ch_info_tbl->_ch_num];
+        pip->ip_ttl  = multi_TTL[_ch_info_tbl->_ch_num];
     else
 #endif
         pip->ip_ttl   = _IPH_TTL;

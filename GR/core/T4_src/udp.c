@@ -38,7 +38,6 @@ Private global variables and functions
 
 #if defined(_UDP)
 _UDP_CB  *_udp_cb;
-extern const UB _udp_enable_zerochecksum[];
 extern UB *data_link_buf_ptr;
 #endif
 
@@ -334,7 +333,7 @@ void _udp_rcv(_IP_HDR *piph, _UDP_HDR *pudph)
     else
     {
         _tcpudp_cksum(piph, &ph);
-        if (_udp_enable_zerochecksum[_ch_info_tbl->_ch_num] != 0)
+        if (udp_enable_zerochecksum[_ch_info_tbl->_ch_num] != 0)
         {
             report_error(_ch_info_tbl->_ch_num, RE_UDP_HEADER2, data_link_buf_ptr);
             goto __err__udp_rcv;
