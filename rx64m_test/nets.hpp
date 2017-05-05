@@ -272,7 +272,7 @@ namespace seeda {
 				}
 //				cgi.list();
 			} else if(strcmp(path, "/cgi/set_client.cgi") == 0) {
-				typedef utils::parse_cgi_post<256, 1> CGI_IP;
+				typedef utils::parse_cgi_post<256, 2> CGI_IP;
 				CGI_IP cgi;
 				cgi.parse(body);
 				for(uint32_t i = 0; i < cgi.size(); ++i) {
@@ -280,10 +280,16 @@ namespace seeda {
 					if(strcmp(t.key, "ip") == 0) {
 						utils::format("Set client IP: '%s'\n") % t.val;
 						client_ip_.from_string(t.val);
-						// restart service_client...
-						client_task_ = client_task::disconnect;
+					} else if(strcmp(t.key, "port") == 0) {
+						int port;
+						if((utils::input("%d", t.val) % port).status()) {
+							utils::format("Set client PORT: %d\n") % port;
+							client_port_ = port;
+						}
 					}
 				}
+				// restart service_client...
+				client_task_ = client_task::disconnect;
 			} else if(strcmp(path, "/cgi/set_write.cgi") == 0) {
 				if(!write_file_.get_enable()) {
 					typedef utils::parse_cgi_post<256, 2> CGI_IP;
@@ -391,26 +397,26 @@ namespace seeda {
 
 			render_date_time_(fd);
 
-			format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+			format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 
-			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"リロード\" />\n", fd);
-			format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"リロード\">\n", fd);
+			format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 
-			format("<input type=\"button\" onclick=\"location.href='/data'\" value=\"データ表示\" />\n", fd);
-			format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+			format("<input type=\"button\" onclick=\"location.href='/data'\" value=\"データ表示\">\n", fd);
+			format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 
 			{  // 内臓 A/D 表示
 				float v = static_cast<float>(get_adc(5)) / 4095.0f * 3.3f;
 				format("バックアップ電池電圧： %4.2f [V]<br>\n", fd) % v;
-				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
 
 			// RTC 設定
 			{
-				format("<form method=\"POST\" action=\"/cgi/set_rtc.cgi\"><table>\n", fd);
+				format("<form method=\"POST\" action=\"/cgi/set_rtc.cgi\">\n", fd);
 				auto t = get_time();
 				struct tm *m = localtime(&t);
-				format("<tr>"
+				format("<table><tr>"
 					"<td>年月日(yyyy/mm/dd)：</td>"
 					"<td><input type=\"text\" name=\"date\" size=\"10\" value=\"%d/%d/%d\"></td></tr>\n", fd)
 					% static_cast<int>(m->tm_year + 1900)
@@ -421,7 +427,7 @@ namespace seeda {
 					% static_cast<int>(m->tm_hour) % static_cast<int>(m->tm_min);
 				format("<tr><td><input type=\"submit\" value=\"ＲＴＣ設定\"></td></tr>\n", fd);
 				format("</table></form>\n", fd);
-				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
 
 			// Ａ／Ｄ変換設定
@@ -452,19 +458,19 @@ namespace seeda {
 				}
 				format("<tr><td><input type=\"submit\" value=\"設定\"></td></tr>\n", fd);
 				format("</table></form>\n", fd);
-				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
 
 			{  // ＳＤカード操作画面へのボタン
 				format("<input type=\"button\" onclick=\"location.href='/files'\" value=\"ＳＤカード\">\n",
 					fd);
-				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
 
 			{  // クライアント設定ボタン
 				format("<input type=\"button\" onclick=\"location.href='/client'\" value=\"クライアント\">\n",
 					fd);
-				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
 
 			{  // ファイル書き込み設定
@@ -487,7 +493,7 @@ namespace seeda {
 				}
 				format("</table></form>\n", fd);
 
-				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
 
 			format("</html>\n", fd);
@@ -507,17 +513,26 @@ namespace seeda {
 
 			render_date_time_(fd);
 
-			format("<hr align=\"left\" width=\"400\" size=\"3\" />\n", fd);
+			format("<hr align=\"left\" width=\"400\" size=\"3\">\n", fd);
 
-			// クライアント
+			// クライアント設定
 			format("<form method=\"POST\" action=\"/cgi/set_client.cgi\">\n", fd);
-			format("<div>クライアント IP：<input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\" /></div>\n", fd)
+			format("<table><tr><td>クライアント IP：</td>"
+				"<td><input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\"></td></tr>\n", fd)
 				% static_cast<int>(client_ip_[0])
 				% static_cast<int>(client_ip_[1])
 				% static_cast<int>(client_ip_[2])
 				% static_cast<int>(client_ip_[3]);
-			format("<input type=\"submit\" value=\"クライアント設定\" />\n", fd);
-			format("</form>\n", fd);
+			format("<tr><td>クライアント IP：</td>"
+				"<td><input type=\"text\" name=\"port\" size=\"5\" value=\"%d\"></td></tr>\n", fd)
+				% static_cast<int>(client_port_);
+			format("<tr><td><input type=\"submit\" value=\"クライアント設定\"></td></tr>\n", fd);
+			format("</table></form>\n", fd);
+
+			format("<hr align=\"left\" width=\"400\" size=\"3\">\n", fd);
+
+			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n", fd);
+			format("<hr align=\"left\" width=\"400\" size=\"3\">\n", fd);
 
 			format("</html>\n", fd);
 		}
@@ -546,8 +561,8 @@ namespace seeda {
 			format("</table>\n", fd);
 
 			format("<br>\n", fd);
-			format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
-			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\" />\n", fd);
+			format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n", fd);
 
 			format("</html>\n", fd);
 		}
@@ -575,7 +590,7 @@ namespace seeda {
 			{  // 内臓 A/D 表示（湿度、温度）
 				auto v = get_adc(6);
 				format("温度： %5.2f [度]\n", fd) % thmister_(v);
-				format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
+				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
 
 			format("<style type=\"text/css\">\n", fd);
@@ -633,8 +648,8 @@ namespace seeda {
 			format("</table>\n", fd);
 			format("<br>\n", fd);
 
-			format("<hr align=\"left\" width=\"600\" size=\"3\" />\n", fd);
-			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\" />\n", fd);
+			format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n", fd);
 
 			format("</html>\n", fd);
 		}
