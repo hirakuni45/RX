@@ -1,34 +1,5 @@
 #pragma once
-/***********************************************************************************************************************
-* DISCLAIMER
-* This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
-* other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
-* applicable laws, including copyright laws.
-* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
-* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
-* EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
-* SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
-* SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-* Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
-* this software. By using this software, you agree to the additional terms and conditions found by accessing the
-* following link:
-* http://www.renesas.com/disclaimer
-*
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
-***********************************************************************************************************************/
-/***********************************************************************************************************************
-* File Name    : type.h
-* Version      : 1.0
-* Description  : standard type for T4 header file
-***********************************************************************************************************************/
-/***********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
-***********************************************************************************************************************/
 #include <stdint.h>
-
-#define _TCP_UNIT_TIME  10    /* 10ms */
 
 #define TRUE  1
 #define FALSE  0
@@ -50,11 +21,6 @@
 #define  BIGENDIAN 1
 #endif
 
-/* near/far definition */
-#if !defined(R8C) || !defined(M16C) || !defined(M16C80) || !defined(M32C80)
-/// #define  far
-/// #define  near
-#endif
 
 #if BIGENDIAN == 1
 #define hs2net(x) (x)
@@ -91,11 +57,6 @@ void net2hl_yn_xn(void *y, void *x);
     }
 #endif
 
-#if !defined(NULL)
-#if defined(M16C) || defined(M16C80) || defined(M32C80) || defined(R8C)
-#define NULL  0
-#endif
-#endif
 
 #define T_IPVxEP T_IPV4EP
 
@@ -114,6 +75,7 @@ typedef uint8_t Eaddr[EP_ALEN];  /*  MAC address */
  defined(_SH2) || defined(_SH2A) || defined(_SH2AFPU) || defined(_SH4) || defined(_SH4A) ||\
  defined(__RX) || defined(__v850) || defined(__GNUC__) || defined(GRSAKURA)
 /* same as memcmp(x, y, IP_ALEN) */
+
 #if defined (_SH2) || defined(_SH2A) || defined(_SH2AFPU) || defined(_SH4) || defined(_SH4A) ||\
  defined(__RX) || defined(__v850) || defined(__GNUC__) || defined(GRSAKURA)
 #define _cmp_ipaddr(x,y) memcmp(x,y,(size_t)IP_ALEN)
@@ -145,37 +107,3 @@ typedef uint8_t Eaddr[EP_ALEN];  /*  MAC address */
     *(((uint32_t *)(x))+2) = *(((uint32_t *)(y))+2); \
     *(((uint32_t *)(x))+3) = *(((uint32_t *)(y))+3);
 #endif
-
-
-
-#if defined(M16C) || defined(M16C80) || defined(M32C80) || defined(R8C)
-# if defined(_EN_SB)
-#pragma SBDATA  _p_rcv_buf
-#pragma SBDATA _myipaddr
-#pragma SBDATA _ip_id
-#pragma SBDATA  _tcp_timer_cnt
-#pragma SBDATA  _tcp_pre_timer_cnt
-#pragma SBDATA  _rcvd
-#pragma SBDATA  _tcp_tcb
-#pragma SBDATA _tx_hdr
-#  if defined(_ETHER)
-#pragma SBDATA _myethaddr
-#  elif defined(_PPP)
-#pragma SBDATA  ppp_info
-#pragma SBDATA  ppp_sio_status
-#pragma SBDATA  _ppp_status
-#pragma SBDATA  _ppp_seq
-#pragma SBDATA _ppp_restart
-#pragma SBDATA _ppp_nak_cnt
-#pragma SBDATA _ppp_auth_flag
-#pragma SBDATA _ppp_api_req
-#pragma SBDATA _ppp_conf
-#  endif
-# endif
-#endif
-
-
-
-
-
-

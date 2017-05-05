@@ -74,8 +74,8 @@ extern DNS_MNG     dns_mng;
 
 #define UDP_RCV_DAT_DATAREAD_MAXIMUM    1472
 
-#define RING_SIZ            (4096)           /* exsample 1024 */
-#define RING_SIZ_forSize    (RING_SIZ >> 2)
+#define RING_SIZ			(1024)	/* exsample 1024 */
+#define RING_SIZ_forSize	(RING_SIZ >> 2)
 
 namespace net {
 
@@ -733,6 +733,47 @@ namespace net {
 			return current_send_size;
 		}
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  接続確認
+			@param[in]	cepid	TCP/UDP ディスクリプタ
+			@return 接続中なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool connected(uint32_t cepid)
+		{
+			if(cepid == 0) return false;
+
+			bool ret = false;
+			TCP_API_STAT ercd = tcp_read_stat(cepid);
+			if(ercd == TCP_API_STAT_ESTABLISHED || ercd == TCP_API_STAT_CLOSE_WAIT) {
+				ret = true;
+			}
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  有効なデータがあるか
+			@param[in]	cepid	TCP/UDP ディスクリプタ
+			@return 有効なデータ数
+		*/
+		//-----------------------------------------------------------------//
+		int available(uint32_t cepid)
+		{
+			int ret = 0;
+			if(connected(cepid)) {
+				ret = head_tcb[cepid - 1].rdsize;
+				TCP_API_STAT ercd = tcp_read_stat(cepid);
+
+				if(ret == 0 && ercd == TCP_API_STAT_CLOSE_WAIT) {
+					tcp_sht_cep(cepid, TMO_FEVR);
+				}
+			}
+			return ret;
+		}
 	};
 
 

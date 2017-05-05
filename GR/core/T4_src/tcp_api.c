@@ -314,13 +314,8 @@ int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmou
         return err;
     }
 
-	/////////////////
-	if(head_tcb[cepid-1].req.stat == _TCP_API_STAT_INCOMPLETE) {
-		tcp_can_cep(cepid, _TCP_API_CONCP);
-	}
-
     if (_tcp_is_tcb_queue_over(_TCP_API_CONCP, &head_tcb[cepid-1], pTcbCb))
-    {
+    {		
         return E_QOVR;
     }
 

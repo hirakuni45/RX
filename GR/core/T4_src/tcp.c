@@ -211,7 +211,6 @@ void _proc_api(void)
 
         if (areq->stat == _TCP_API_STAT_UNTREATED)
         {
-
             areq->stat = _TCP_API_STAT_INCOMPLETE;
             functbl_tcp_api[areq->type - 1]();
         }
@@ -2404,7 +2403,9 @@ uint16_t  _tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb
         bResult = TRUE;
     }
 
-//	printf("QUEUE Over: %d, API_TYPE: %d\n", (int)pTcb->req.stat, (int)api_type);
+//	if(bResult == FALSE) {
+//		printf("QUEUE Over: %d, API_TYPE: %d\n", (int)pTcb->req.stat, (int)api_type);
+//	}
 
     return bResult;
 }

@@ -6,20 +6,6 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-/*
- * ITRON data type definition
- */
-#if defined(__MR30_H) || defined(__MR308_H) || defined(__MR32R) || defined(__HIOS_ITRON_H) || defined(__ITRON_H)
-#define __ITRON_DATA_TYPE
-#endif
-
-#if !defined(__ITRON_DATA_TYPE)
-#define __ITRON_DATA_TYPE
-#if defined(R8C) || defined(M16C) || defined(M16C80) || defined(M32C80) ||\
-    defined(__300HA__) || defined(__2600A__) ||\
-    defined(_SH2) || defined(_SH2A) || defined(_SH2AFPU) || defined(_SH4) || defined(_SH4A) ||\
-    defined(__RX) || defined(__v850) || (defined(__GNUC__) || defined(GRSAKURA))
-
 #include <stdint.h>
 
 typedef int8_t          B;
@@ -35,10 +21,6 @@ typedef void    (*FP)(void);
 typedef H               ID;
 typedef H               PRI;
 typedef H               HNO;
-#endif
-#endif
-
-// typedef int32_t         FN;
 
 /*
  * ITRON TCP/IP API Specifications header file
@@ -49,8 +31,8 @@ typedef H               HNO;
 /*** IP address/Port No. information ***/
 typedef struct t_ipv4ep
 {
-    UW       ipaddr;    /* IP address */
-    UH       portno;    /* Port number */
+    uint32_t  ipaddr;    /* IP address */
+    uint16_t  portno;    /* Port number */
 } T_IPV4EP;
 
 /***  TCP reception point  ***/
@@ -82,11 +64,11 @@ typedef struct t_udp_ccep
 /***  IP address settings  ***/
 typedef struct
 {
-    UB ipaddr[4];       /* Local IP address        */
-    UB maskaddr[4];     /* Subnet mask             */
-    UB gwaddr[4];       /* Gateway address X       */
+    uint8_t ipaddr[4];       /* Local IP address        */
+    uint8_t maskaddr[4];     /* Subnet mask             */
+    uint8_t gwaddr[4];       /* Gateway address X       */
 #if defined(__M32R__)
-    UW dummy;           /* for alignment           */
+    uint32_t dummy;           /* for alignment           */
 #endif
 } TCPUDP_ENV;
 
@@ -120,7 +102,7 @@ typedef struct T4_STATISTICS
     UW re_udp_header2_cnt;
     UW re_udp_header3_cnt;
     UW re_icmp_header1_cnt;
-}T4_STATISTICS;
+} T4_STATISTICS;
 
 /****************************/
 /***  API Function Codes  ***/
@@ -353,5 +335,3 @@ int ppp_api_req(UH type, void *parblk, H tmout);
 UH ppp_drv_status(void);            /* Get PPP driver state      */
 H  modem_read(UB **rzlt);
 H  modem_write(void *parblk);
-
-

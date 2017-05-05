@@ -39,7 +39,6 @@ Includes   <System Includes> , "Project Includes"
 /* Used for configuring the BYTEQ code */
 #include "r_byteq_config.h"
 
-
 /***********************************************************************************************************************
 Macro definitions
 ***********************************************************************************************************************/
@@ -47,11 +46,9 @@ Macro definitions
 #define BYTEQ_VERSION_MAJOR (1)
 #define BYTEQ_VERSION_MINOR (30)
 
-
 /*****************************************************************************
 Typedef definitions
 ******************************************************************************/
-
 typedef enum e_byteq_err        // BYTEQ API error codes
 {
     BYTEQ_SUCCESS = 0,
@@ -65,45 +62,31 @@ typedef enum e_byteq_err        // BYTEQ API error codes
 
 
 /* BYTE QUEUE HANDLE */
-
 typedef struct st_byteq_ctrl *  byteq_hdl_t;
-
 
 /*****************************************************************************
 Public Functions
 ******************************************************************************/
-#if defined(__GNUC__) || defined(GRSAKURA)
 #if defined(__cplusplus)
 extern "C" {
 #endif
-#endif
-byteq_err_t R_BYTEQ_Open(uint8_t * const        p_buf,
-                         uint16_t const         size,
-                         byteq_hdl_t * const    p_hdl);
 
+byteq_err_t R_BYTEQ_Open(uint8_t * const p_buf, uint16_t const size, byteq_hdl_t * const p_hdl);
 byteq_err_t R_BYTEQ_Close(byteq_hdl_t const hdl);
 
-byteq_err_t R_BYTEQ_Put(byteq_hdl_t const   hdl,
-                        uint8_t const       byte);
-
-byteq_err_t R_BYTEQ_Get(byteq_hdl_t const   hdl,
-                        uint8_t * const     p_byte);
+byteq_err_t R_BYTEQ_Put(byteq_hdl_t const hdl, uint8_t const byte);
+byteq_err_t R_BYTEQ_Get(byteq_hdl_t const hdl, uint8_t * const p_byte);
 
 byteq_err_t R_BYTEQ_Flush(byteq_hdl_t const hdl);
 
-byteq_err_t R_BYTEQ_Used(byteq_hdl_t const  hdl,
-                         uint16_t * const   p_cnt);
-
-byteq_err_t R_BYTEQ_Unused(byteq_hdl_t const    hdl,
-                           uint16_t * const     p_cnt);
+byteq_err_t R_BYTEQ_Used(byteq_hdl_t const hdl, uint16_t * const p_cnt);
+byteq_err_t R_BYTEQ_Unused(byteq_hdl_t const hdl, uint16_t * const p_cnt);
 
 uint32_t R_BYTEQ_GetVersion(void);
-#if defined(__GNUC__) || defined(GRSAKURA)
+
 #if defined(__cplusplus)
 }
 #endif
-#endif
-
 
 #endif /* BYTEQ_IF_H */
 

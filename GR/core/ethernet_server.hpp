@@ -119,14 +119,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool connected()
 		{
-			if(cepid_ == 0) return false;
-
-			bool ret = false;
-			TCP_API_STAT ercd = tcp_read_stat(cepid_);
-			if(ercd == TCP_API_STAT_ESTABLISHED || ercd == TCP_API_STAT_CLOSE_WAIT) {
-				ret = true;
-			}
-			return ret;
+			return ethernet_.connected(cepid_);
 		}
 
 
@@ -166,16 +159,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int available()
 		{
-			int ret = 0;
-			if(connected()) {
-				ret = head_tcb[cepid_ - 1].rdsize;
-				TCP_API_STAT ercd = tcp_read_stat(cepid_);
-
-				if(ret == 0 && ercd == TCP_API_STAT_CLOSE_WAIT) {
-					tcp_sht_cep(cepid_, TMO_FEVR);
-				}
-			}
-			return ret;
+			return ethernet_.available(cepid_);
 		}
 
 
