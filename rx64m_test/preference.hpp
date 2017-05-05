@@ -32,11 +32,20 @@ namespace seeda {
 			uint8_t		client_ip_[4];
 			uint16_t	client_port_;
 
+			char		write_path_[16];
+			uint32_t	write_limit_;
+
 			seeda_t() : magic_(0),
 				gain_{ 1.0f }, offset_{ 0.0f },
 				limit_lo_level_{ 30000 }, limit_hi_level_{ 40000 },
 				mode_{ 0 },
-				client_ip_{ 0 }, client_port_(3000) { }
+#ifdef SEEDA
+				client_ip_{ 192, 168, 1, 3 },
+#else
+				client_ip_{ 192, 168, 3, 7 },
+#endif
+				client_port_(3000),
+				write_path_{ "test.csv" }, write_limit_(60) { }
 		};
 
 	private:
