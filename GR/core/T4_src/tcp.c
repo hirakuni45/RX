@@ -26,25 +26,9 @@ Exported global variables (to be accessed by other files)
 _TCB  *_tcp_tcb;    /* TCB (Transport Control Block) pointer */
 _TCB  *head_tcb;    /* TCB head pointer */
 _TX_HDR  _tx_hdr;    /* TCP transmit header area */
-UH   _tcp_timer_cnt;   /* timer count: 10ms unit */
-UH   _tcp_pre_timer_cnt;  /* previous timer count */
+uint16_t _tcp_timer_cnt;   /* timer count: 10ms unit */
+uint16_t _tcp_pre_timer_cnt;  /* previous timer count */
 
-/***********************************************************************************************************************
-Private global variables and functions
-***********************************************************************************************************************/
-
-#if defined(_ETHER)
-extern UB *_ether_p_rcv_buff;
-/// extern const UH  _ip_tblcnt[];
-extern const UH  _ip_tblcnt;
-#endif /* _ETHER */
-
-#if defined(_PPP)
-extern UB ppp_mode;
-#endif
-
-extern _CH_INFO *_ch_info_tbl;
-extern _CH_INFO *_ch_info_head;
 
 /***********************************************************************************************************************
 * Function Name: net2hl_yn_xn
@@ -1517,7 +1501,6 @@ void _proc_snd(void)
     _TCP_PHDR phdr;
 #if defined(_ETHER)
     _ARP_ENTRY *ae;
-
     ae = _ether_arp_tbl[0];
 #endif
     if (_tcp_pre_timer_cnt != _tcp_timer_cnt)
@@ -1530,8 +1513,7 @@ void _proc_snd(void)
             ae = _ether_arp_tbl[counter];
             _ch_info_tbl = &_ch_info_head[counter];
 
-///            for (i = 0; i < _ip_tblcnt[counter]; i++, ae++)
-            for (i = 0; i < _ip_tblcnt; i++, ae++)
+            for (i = 0; i < _ip_tblcnt[counter]; i++, ae++)
             {
                 if (((ae->ae_state == AS_RESOLVED)
                         || (ae->ae_state == AS_PENDING)) && (ae->ae_ttl > 0))

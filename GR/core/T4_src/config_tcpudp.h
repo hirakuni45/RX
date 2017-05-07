@@ -45,7 +45,7 @@ extern const uint8_t multi_TTL[];
 
 extern const uint8_t udp_enable_zerochecksum[];
 
-extern const uint16_t _ip_tblcnt;
+extern const uint16_t _ip_tblcnt[];
 
 extern TCPUDP_ENV tcpudp_env[];
 

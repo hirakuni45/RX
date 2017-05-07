@@ -22,23 +22,6 @@
 #include "udp.h"
 #include "core/driver/driver.h"
 
-extern _TCB   *_tcp_tcb;
-extern _TCB   *head_tcb;
-extern UH _tcp_timer_cnt;
-extern UH _tcp_pre_timer_cnt;
-
-extern _UDP_CB  *_udp_cb;
-
-#if defined(_ETHER)
-extern UH const _ip_tblcnt;
-_ARP_ENTRY   **_ether_arp_tbl;
-#endif
-#if defined(_PPP)
-extern uint16_t ppp_sio_status;
-extern _PPP_API_REQ _ppp_api_req;
-#endif
-
-
 static void tcpudp_api_slp_(int cepid)
 {
 	do {
@@ -148,8 +131,7 @@ void tcpudp_open(uint32_t *workp)
 
 	for(int counter = 0; counter < TCPUDP_CHANNEL_NUM; counter++) {
 		*(_ether_arp_tbl + counter) = ((_ARP_ENTRY *)currp);
-///		currp = (uint32_t *)((uint8_t *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
-		currp = (uint32_t *)((uint8_t *)currp + _ip_tblcnt * sizeof(_ARP_ENTRY));
+		currp = (uint32_t *)((uint8_t *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
 	}
 
 	_ether_arp_init();
@@ -215,8 +197,7 @@ static uint32_t get_ether_memory_size_(void)
 	uint32_t ramsize = 0;
 	ramsize += TCPUDP_CHANNEL_NUM * sizeof(_ARP_ENTRY *);
 	for(int count = 0; count < TCPUDP_CHANNEL_NUM; count++) {
-///		ramsize += (_ip_tblcnt[count] * sizeof(_ARP_ENTRY));
-		ramsize += (_ip_tblcnt * sizeof(_ARP_ENTRY));
+		ramsize += (_ip_tblcnt[count] * sizeof(_ARP_ENTRY));
 	}
     get_align_memory_size_(&ramsize);
 
@@ -318,7 +299,7 @@ int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmou
 
     if (_tcp_is_tcb_queue_over(_TCP_API_CONCP, &head_tcb[cepid-1], pTcbCb))
     {
-		tcp_force_clr(cepid);
+///		tcp_force_clr(cepid);
         return E_QOVR;
     }
 

@@ -39,26 +39,40 @@ T_TCP_CCEP tcp_ccep[TCPUDP_CHANNEL_NUM] = {
 const uint32_t tcp_ccep_num = sizeof(tcp_ccep) / sizeof(T_TCP_CCEP);
 
 /***  TCP MSS  ***/
-const uint16_t tcp_mss[] = { 1460 };    /* MAX:1460 bytes */
+const uint16_t tcp_mss[] = {
+	1460, 1460, 1460, 1460, 1460, 1460
+};    /* MAX:1460 bytes */
 
 /***  Initial value of sequence number (Set the value other than 0)  ***/
-const uint32_t tcp_initial_seqno[] = { 1 };
+const uint32_t tcp_initial_seqno[] = {
+	1, 1, 1, 1, 1, 1,
+};
 
 /***  2MSL wait time (unit:10ms)  ***/
-const uint16_t tcp_2msl[] = { 1 };      /* 10 ms */
+const uint16_t tcp_2msl[] = {
+	1, 1, 1, 1, 1, 1
+};      /* 10 ms */
 
 /***  Maximum value of retransmission timeout period (unit:10ms)  ***/
 const uint32_t tcp_rt_tmo_rst[] = {
-	(10 * 60 * (1000 / 10))     /* 10 min */
+	(10 * 60 * (1000 / 10)),     /* 10 min */
+	(10 * 60 * (1000 / 10)),
+	(10 * 60 * (1000 / 10)),
+	(10 * 60 * (1000 / 10)),
+	(10 * 60 * (1000 / 10)),
+	(10 * 60 * (1000 / 10)),
 };
 
 /***  Transmit for delay ack (ON=1/OFF=0) ***/
-const uint8_t tcp_dack[] = { 1 };
+const uint8_t tcp_dack[] = {
+	1, 1, 1, 1, 1, 1
+};
 
 /****************************************************************************/
 /**********************     UDP-related definition     **********************/
 /****************************************************************************/
 /***  Definition of UDP communication end point  ***/
+_UDP_CB  *_udp_cb;
 
 T_UDP_CCEP udp_ccep[TCPUDP_CHANNEL_NUM] = {
     { 0x0000, { 0, 1365 }, t4_udp_callback },
@@ -96,16 +110,18 @@ const uint8_t udp_enable_zerochecksum[] = {
 /****************************************************************************/
 /**********************     IP-related definition     ***********************/
 /****************************************************************************/
-const uint16_t _ip_tblcnt = 3;
+const uint16_t _ip_tblcnt[] = {
+	3, 3, 3, 3, 3, 3
+};
 
 #define MY_IP_ADDR     192,168,0,3            /* Local IP address  */
 #define GATEWAY_ADDR   0,0,0,0                /* Gateway address (invalid if all 0s) */
 #define SUBNET_MASK    255,255,255,0          /* Subnet mask  */
 
 TCPUDP_ENV tcpudp_env[] = {
-{   {MY_IP_ADDR},
-    {SUBNET_MASK},
-    {GATEWAY_ADDR} }
+{	{ MY_IP_ADDR },
+	{ SUBNET_MASK },
+	{ GATEWAY_ADDR }  }
 };
 
 

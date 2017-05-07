@@ -40,25 +40,6 @@ Private global variables and functions
 ***********************************************************************************************************************/
 static int16_t _ip_chk_srcip(uint8_t *src_ipaddr);
 
-/***********************************************************************************************************************
-Exported global variables (read from other files)
-***********************************************************************************************************************/
-
-extern _TX_HDR  _tx_hdr;    /* Transmit header area */
-extern _TCB   *_tcp_tcb;    /* TCB (Transport Control Block) */
-
-#if defined(_ETHER)
-extern UH const _ip_tblcnt;
-extern uint8_t *_ether_p_rcv_buff;
-#endif
-
-#if defined(_ETHER)
-extern UH const _ip_tblcnt;
-#endif
-#if defined(_MULTI)
-extern TCPUDP_ENV tcpudp_env[];
-#endif
-
 
 /***********************************************************************************************************************
 * Function Name: _ip_rcv_hdr

@@ -294,6 +294,14 @@ typedef struct
     uint16_t  hlen;
 } _TX_HDR;
 
+
+extern _TCB  *_tcp_tcb;    /* TCB (Transport Control Block) pointer */
+extern _TCB  *head_tcb;    /* TCB head pointer */
+extern _TX_HDR _tx_hdr;    /* TCP transmit header area */
+extern uint16_t _tcp_timer_cnt;   /* timer count: 10ms unit */
+extern uint16_t _tcp_pre_timer_cnt;  /* previous timer count */
+
+
 void _proc_api(void);
 void _proc_rcv(void);
 void _proc_snd(void);

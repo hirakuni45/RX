@@ -114,6 +114,7 @@ typedef struct
     uint8_t ae_state;  /* state of this entry (see above) */
     uint8_t ae_attempts; /* number of retries so far  */
 } _ARP_ENTRY ;
+
 extern _ARP_ENTRY **_ether_arp_tbl;
 
 void _ether_rcv_arp(void);

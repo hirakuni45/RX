@@ -15,29 +15,8 @@
 #include "tcp.h"
 #include "core/driver/driver.h"
 
-/***********************************************************************************************************************
-Macro definitions
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Typedef definitions
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Exported global variables (to be accessed by other files)
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Private global variables and functions
-***********************************************************************************************************************/
 uint8_t    *_ether_p_rcv_buff;
-
-/***********************************************************************************************************************
-Exported global variables (read from other files)
-***********************************************************************************************************************/
-extern UB *data_link_buf_ptr;    /* Buffer pointer to Datalink layer */
-extern _TX_HDR  _tx_hdr;    /* Area for transmit header */
-extern UH  const _ip_tblcnt;
+_ARP_ENTRY **_ether_arp_tbl;
 
 /***********************************************************************************************************************
 * Function Name: _ether_proc_rcv
@@ -168,8 +147,7 @@ void _ether_rcv_arp(void)
         case(hs2net(AR_REPLY)):
             /* Is unresolved entry exist? */
             ae = _ether_arp_tbl[_ch_info_tbl->_ch_num];
-///            for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
-            for (i = 0; i < _ip_tblcnt; i++, ae++)
+            for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
             {
                 if (ae->ae_state == AS_PENDING)
                 {
@@ -348,14 +326,12 @@ int16_t _ether_snd_ip(uint8_t *data, uint16_t dlen)
 
     /* exist nexthop in ARP table? */
     ae = _ether_arp_tbl[_ch_info_tbl->_ch_num];
-///    for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
-    for (i = 0; i < _ip_tblcnt; i++, ae++)
+    for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
     {
         if ((_cmp_ipaddr(&nexthop, ae->ae_pra)) == 0)
             break;
     }
-///    if (i < _ip_tblcnt[_ch_info_tbl->_ch_num])
-    if (i < _ip_tblcnt)
+    if (i < _ip_tblcnt[_ch_info_tbl->_ch_num])
     {
         /* If exist */
         switch (ae->ae_state)
@@ -487,8 +463,7 @@ _ARP_ENTRY *_ether_arp_add(uint8_t *ipaddr, uint8_t *ethaddr)
     /* Search the existed entry */
     ae_tmp = NULL;
     ae = _ether_arp_tbl[_ch_info_tbl->_ch_num];
-///    for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
-    for (i = 0; i < _ip_tblcnt; i++, ae++)
+    for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
     {
         if ((_cmp_ipaddr(ipaddr, ae->ae_pra)) == 0)
         {
@@ -518,8 +493,7 @@ _ARP_ENTRY *_ether_arp_add(uint8_t *ipaddr, uint8_t *ethaddr)
         ae_tmp2 = NULL;
         /* Select the most smallest TTL */
         ae = _ether_arp_tbl[_ch_info_tbl->_ch_num];
-///        for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
-        for (i = 0; i < _ip_tblcnt; i++, ae++)
+        for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
         {
             if (ae->ae_state == AS_RESOLVED)
             {
@@ -591,8 +565,7 @@ void _ether_arp_init(void)
     for (counter = 0; counter < TCPUDP_CHANNEL_NUM; counter++)
     {
         ae = _ether_arp_tbl[counter];
-///        memset(ae->ae_pra, 0, (sizeof(_ARP_ENTRY) * _ip_tblcnt[counter]));
-        memset(ae->ae_pra, 0, (sizeof(_ARP_ENTRY) * _ip_tblcnt));
+        memset(ae->ae_pra, 0, (sizeof(_ARP_ENTRY) * _ip_tblcnt[counter]));
     }
     return;
 }

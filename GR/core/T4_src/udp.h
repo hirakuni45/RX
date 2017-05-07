@@ -70,6 +70,7 @@ typedef struct
 uint16_t _tcpudp_cksum(_IP_HDR *iph, _TCPUDP_PHDR *ph);
 void _udp_rcv(_IP_HDR *piph, _UDP_HDR *pudph);
 int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph);
+void _udp_snd(_TCPUDP_PHDR *ph);
 void _proc_udp_api(void);
 void _udp_api_tmout(void);
 void _udp_api_slp(_UDP_CB *pucb, ID id);
