@@ -21,6 +21,8 @@
 #include "chip/LTC2348_16.hpp"
 #include "sample.hpp"
 
+#include "chip/EUI_XX.hpp"
+
 namespace seeda {
 
 	static const int seeda_version_ = 110;
