@@ -21,21 +21,21 @@ extern "C"{
 
 	void ena_int(void);
 	void dis_int(void);
-	H rcv_buff_release(UB lan_port_no);
-	UH tcpudp_get_time(void);
-	void tcpudp_act_cyc(UB cycact);
-	void lan_reset(UB lan_port_no);
-	void udp_api_slp(ID cepid);
-	void udp_api_wup(ID cepid);
-	void tcp_api_wup(ID cepid);
-	void tcp_api_slp(ID cepid);
-	H lan_read(UB lan_port_no, B **buf);
-	H lan_write(UB lan_port_no, B *header , H header_len, B *data , H data_len);
-	void report_error(UB lan_port_no, H err_code, UB *err_data);
+	int16_t rcv_buff_release(uint8_t lan_port_no);
+	uint16_t tcpudp_get_time(void);
+	void tcpudp_act_cyc(uint8_t cycact);
+	void lan_reset(uint8_t lan_port_no);
+	void udp_api_slp(uint16_t cepid);
+	void udp_api_wup(uint16_t cepid);
+	void tcp_api_wup(uint16_t cepid);
+	void tcp_api_slp(uint16_t cepid);
+	int16_t lan_read(uint8_t lan_port_no, int8_t **buf);
+	int16_t lan_write(uint8_t lan_port_no, int8_t *header , int16_t header_len, int8_t *data , int16_t data_len);
+	void report_error(uint8_t lan_port_no, int16_t err_code, uint8_t *err_data);
 	void lan_inthdr(void);
 	void wait_Xms(uint16_t limit_time);
 	void reset_timer(void);
-	UH get_timer(void);
+	uint16_t get_timer(void);
 
 #if defined(__cplusplus)
 };

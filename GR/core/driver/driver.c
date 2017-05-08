@@ -11,22 +11,21 @@
 #include "phy.h"
 #include "r_ether.h"
 #include "../T4_src/net_config.h"
-#include "../T4_src/r_t4_itcpip.h"
 #include "../T4_src/config_tcpudp.h"
 
 #if defined (_T4_TEST)
-extern H lan_read_for_test(UB lan_port_no, B **buf, H return_code);
+extern H lan_read_for_test(uint8_t lan_port_no, int8_t **buf, H return_code);
 #endif
 
 
 /******************************************************************************
 Private global variables and functions
 ******************************************************************************/
-UH tcpudp_time_cnt;
+uint16_t tcpudp_time_cnt;
 static volatile uint8_t tcpip_flag_;
-volatile UH wait_timer_;
+volatile uint16_t wait_timer_;
 T4_STATISTICS t4_stat;
-UB *err_buf_ptr;
+uint8_t *err_buf_ptr;
 
 
 /******************************************************************************
@@ -131,19 +130,19 @@ void dis_int(void)
 }
 
 
-H rcv_buff_release(UB lan_port_no)
+int16_t rcv_buff_release(uint8_t lan_port_no)
 {
 	/* This function is called when TCP/IP finished using receive buffer specified lan_read. */
 	R_ETHER_Read_ZC2_BufRelease();
 	return 0;
 }
 
-UH tcpudp_get_time(void)
+uint16_t tcpudp_get_time(void)
 {
 	return tcpudp_time_cnt;
 }
 
-void tcpudp_act_cyc(UB cycact)
+void tcpudp_act_cyc(uint8_t cycact)
 {
 	switch (cycact)
 	{
@@ -160,14 +159,14 @@ void tcpudp_act_cyc(UB cycact)
 	}
 }
 
-void lan_reset(UB lan_port_no)
+void lan_reset(uint8_t lan_port_no)
 {
 	R_ETHER_Close_ZC2();
 	int ch = 0;
 	R_ETHER_Open_ZC2(ethernet_mac[ch].mac);
 }
 
-void udp_api_slp(ID cepid)
+void udp_api_slp(uint16_t cepid)
 {
 	/* check LAN link stat */
 	R_ETHER_LinkProcess();
@@ -175,12 +174,12 @@ void udp_api_slp(ID cepid)
 	/* If user uses "Real time OS", user may define "sleep task" here. */
 }
 
-void udp_api_wup(ID cepid)
+void udp_api_wup(uint16_t cepid)
 {
 	/* If user uses "Real time OS", user may define "wake up task" here. */
 }
 
-void tcp_api_slp(ID cepid)
+void tcp_api_slp(uint16_t cepid)
 {
 	/* check LAN link stat */
 	R_ETHER_LinkProcess();
@@ -188,22 +187,22 @@ void tcp_api_slp(ID cepid)
 	/* If user uses "Real time OS", user may define "sleep task" here. */
 }
 
-void tcp_api_wup(ID cepid)
+void tcp_api_wup(uint16_t cepid)
 {
 	/* If user uses "Real time OS", user may define "wake up task" here. */
 }
 
-H	lan_read(UB lan_port_no, B **buf)
+int16_t	lan_read(uint8_t lan_port_no, int8_t **buf)
 {
 	int32_t driver_ret;
-	H return_code;
+	int16_t return_code;
 
 	driver_ret = R_ETHER_Read_ZC2((void **)buf);
 	if (driver_ret > 0)
 	{
 		t4_stat.t4_rec_cnt++;
-		t4_stat.t4_rec_byte += (UW)driver_ret;
-		return_code = (H)driver_ret;
+		t4_stat.t4_rec_byte += (uint32_t)driver_ret;
+		return_code = (int16_t)driver_ret;
 	}
 	else if (driver_ret == 0)
 	{
@@ -225,10 +224,10 @@ H	lan_read(UB lan_port_no, B **buf)
 	return return_code;
 }
 
-H lan_write(UB lan_port_no, B *header , H header_len, B *data , H data_len)
+int16_t lan_write(uint8_t lan_port_no, int8_t *header , int16_t header_len, int8_t *data , int16_t data_len)
 {
 	int32_t driver_ret;
-	B	*buf;
+	int8_t	*buf;
 	uint16_t	buf_size;
 
 	driver_ret = R_ETHER_Write_ZC2_GetBuf((void **) &buf, &buf_size);
@@ -251,7 +250,7 @@ H lan_write(UB lan_port_no, B *header , H header_len, B *data , H data_len)
 	return -5;
 }
 
-void report_error(UB lan_port_no, H err_code, UB *err_data)
+void report_error(uint8_t lan_port_no, int16_t err_code, uint8_t *err_data)
 {
 	err_buf_ptr = err_data;
 
@@ -350,7 +349,7 @@ void reset_timer(void)
 	wait_timer_ = 0;
 }
 
-UH get_timer(void)
+uint16_t get_timer(void)
 {
 	return wait_timer_;
 }
