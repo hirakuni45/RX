@@ -8,7 +8,6 @@
 #include "net_config.h"
 #include <string.h>
 #include "type.h"
-#include "r_t4_itcpip.h"
 #include "config_tcpudp.h"
 #if defined(_ETHER)
 #include "ether.h"
@@ -349,8 +348,8 @@ int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
     uint16_t   len;
     uint8_t   *data;
     uint16_t   ip_dlen;
-    ID    cepid;
-    UH    count;
+    uint16_t   cepid;
+    uint16_t   count;
     _UDP_CB   *tmp;
 
     fncd = 0;
@@ -452,7 +451,7 @@ void _udp_snd(_TCPUDP_PHDR *ph)
     _UDP_HDR  *udph;
     int16_t   ret;
     int16_t   i;
-    UH    count;
+    uint16_t  count;
     _UDP_CB   *tmp;
 
     for (i = 0; i < udp_ccep_num; i++)
@@ -542,7 +541,7 @@ void _udp_snd(_TCPUDP_PHDR *ph)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-void _udp_api_slp(_UDP_CB *pcb, ID id)
+void _udp_api_slp(_UDP_CB *pcb, uint16_t id)
 {
     do
     {
@@ -559,7 +558,7 @@ void _udp_api_slp(_UDP_CB *pcb, ID id)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-void _udp_api_wup(_UDP_CB *pcb, ID id)
+void _udp_api_wup(_UDP_CB *pcb, uint16_t id)
 {
     if (pcb->req.stat != _UDP_API_STAT_COMPLETE)
     {
@@ -582,7 +581,7 @@ void _proc_udp_api()
     int16_t  i;
     int   ercd;
     int32_t   fn;
-    UH    count;
+    uint16_t  count;
     _UDP_CB   *tmp;
 
     for (i = 0; i < udp_ccep_num; i++)
@@ -627,11 +626,11 @@ void _proc_udp_api()
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-void _udp_init(UW **workpp)
+void _udp_init(uint32_t **workpp)
 {
     _udp_cb = (_UDP_CB *)(*workpp);
     memset(_udp_cb, 0, sizeof(_UDP_CB) * udp_ccep_num);
-    *workpp = (UW *)((uint8_t *)(*workpp) + (sizeof(_UDP_CB) * udp_ccep_num));
+    *workpp = (uint32_t *)((uint8_t *)(*workpp) + (sizeof(_UDP_CB) * udp_ccep_num));
 }
 
 
@@ -727,7 +726,7 @@ int32_t _udp_api_type_to_fn(uint16_t api_type)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int _udp_check_cepid_arg(ID cepid)
+int _udp_check_cepid_arg(uint16_t cepid)
 {
     int err = E_OK;
     if ((cepid <= 0) || (cepid > udp_ccep_num))

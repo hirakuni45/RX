@@ -9,7 +9,6 @@
 #include "ip.h"
 #include <string.h>
 #include "type.h"
-#include "r_t4_itcpip.h"
 #include "config_tcpudp.h"
 #if defined(_ETHER)
 #include "ether.h"

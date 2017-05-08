@@ -116,8 +116,8 @@ void _tcp_init_tcb(_TCB *_ptcb)
 ***********************************************************************************************************************/
 void _process_tcpip(void)
 {
-    UH counter = 0;
-    volatile static UB _process_flag = 0;
+    uint16_t counter = 0;
+    volatile static uint8_t _process_flag = 0;
 
     if (_process_flag == 0)
     {
@@ -174,7 +174,7 @@ void _proc_api(void)
 {
 #if defined(_TCP)
     _API_REQ *areq;
-    UH counter = 0;
+    uint16_t counter = 0;
 
     static void (* const functbl_tcp_api[])(void) =
     {
@@ -2278,7 +2278,7 @@ void _tcp_return_listen(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-void _tcp_api_wup(ID id)
+void _tcp_api_wup(uint16_t id)
 {
     if (_tcp_tcb->req.stat != _TCP_API_STAT_COMPLETE)
     {
@@ -2296,7 +2296,7 @@ void _tcp_api_wup(ID id)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int _tcp_check_cepid_arg(ID cepid)
+int _tcp_check_cepid_arg(uint16_t cepid)
 {
     int err = E_OK;
     if ((cepid <= 0) || (cepid > tcp_ccep_num))
@@ -2398,9 +2398,9 @@ uint16_t  _tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-uint16_t _tcp_call_callback(ID cepid, int32_t fncd, void *p_parblk)
+uint16_t _tcp_call_callback(uint16_t cepid, int32_t fncd, void *p_parblk)
 {
-    UH count;
+    uint16_t count;
 
     _TCP_CB *tmp;
 

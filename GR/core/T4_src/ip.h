@@ -6,8 +6,8 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "ether.h"
 #include "type.h"
+#include "ether.h"
 
 extern uint8_t *data_link_buf_ptr;
 

@@ -6,6 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include "net_config.h"
 #include "type.h"
 #include "ip.h"
 #include "tcp.h"
@@ -27,10 +28,10 @@ typedef struct
 typedef struct
 {
     volatile uint8_t stat;
-    uint8_t type;
-    int16_t len;
-    int16_t tmout;
-    ID  cepid;
+    uint8_t  type;
+    int16_t  len;
+    int16_t  tmout;
+    uint16_t cepid;
     uint8_t *data;
     T_IPVxEP *p_dstaddr;
     int  *ercd;
@@ -73,12 +74,12 @@ int16_t _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph);
 void _udp_snd(_TCPUDP_PHDR *ph);
 void _proc_udp_api(void);
 void _udp_api_tmout(void);
-void _udp_api_slp(_UDP_CB *pucb, ID id);
-void _udp_api_wup(_UDP_CB *pucb, ID id);
-void _udp_init(UW **workpp);
+void _udp_api_slp(_UDP_CB *pucb, uint16_t id);
+void _udp_api_wup(_UDP_CB *pucb, uint16_t id);
+void _udp_init(uint32_t **workpp);
 void _udp_snd(_TCPUDP_PHDR *ph);
 int32_t  _udp_api_type_to_fn(uint16_t api_type);
-int _udp_check_cepid_arg(ID cepid);
+int _udp_check_cepid_arg(uint16_t cepid);
 int _udp_check_len_arg(int len);
 
 #if defined(_UDP)
