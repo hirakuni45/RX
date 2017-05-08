@@ -28,6 +28,7 @@ extern "C"{
 	void udp_api_slp(ID cepid);
 	void udp_api_wup(ID cepid);
 	void tcp_api_wup(ID cepid);
+	void tcp_api_slp(ID cepid);
 	H lan_read(UB lan_port_no, B **buf);
 	H lan_write(UB lan_port_no, B *header , H header_len, B *data , H data_len);
 	void report_error(UB lan_port_no, H err_code, UB *err_data);
