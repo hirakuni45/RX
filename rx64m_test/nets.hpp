@@ -908,7 +908,7 @@ namespace seeda {
 					utils::format("DHCP: ");
 				}
 			} else {
-				net::ip_address ipa(192, 168, 1, 10);
+				net::ip_address ipa(192, 168, 1, 22);
 				ethernet_.begin(mac, ipa);
 				utils::format("SetIP: ");
 			}
