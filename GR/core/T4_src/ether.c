@@ -8,7 +8,6 @@
 #include <string.h>
 #include "net_config.h"
 #include "type.h"
-#include "r_t4_itcpip.h"
 #include "config_tcpudp.h"
 #include "ether.h"
 #include "ip.h"
@@ -37,7 +36,7 @@ void _ether_proc_rcv(void)
         return;
 
     /* Call: driver interface to receive */
-    len = lan_read(_ch_info_tbl->_ch_num, (B **) & buf);
+    len = lan_read(_ch_info_tbl->_ch_num, (int8_t **) & buf);
 
     /*
      *  len > 0 : receive data size
@@ -68,11 +67,11 @@ void _ether_proc_rcv(void)
     {
         rcv_buff_release(_ch_info_tbl->_ch_num);
         _ch_info_tbl->_p_rcv_buf.len = 0;
-        report_error(_ch_info_tbl->_ch_num, RE_LEN, (UB*)buf);
+        report_error(_ch_info_tbl->_ch_num, RE_LEN, (uint8_t*)buf);
         return;
     }
     pep = (_EP *)buf;
-    data_link_buf_ptr = (UB*)buf;
+    data_link_buf_ptr = (uint8_t *)buf;
 
     /* other(len >= 0): start receive process */
     _ch_info_tbl->_p_rcv_buf.len = len - _ETH_LEN;
@@ -431,11 +430,11 @@ int16_t _ether_snd(uint16_t type, uint8_t *data, uint16_t dlen)
         for (i = 0; i < plen; i++)
             pad[dlen+i] = 0;
         /* call the transmit function */
-        ret = lan_write(_ch_info_tbl->_ch_num, (B*) & _tx_hdr, (H)_tx_hdr.hlen, (B*)pad, (H)(_EP_MIN_LEN - _tx_hdr.hlen));
+        ret = lan_write(_ch_info_tbl->_ch_num, (int8_t *) & _tx_hdr, (int16_t)_tx_hdr.hlen, (int8_t *)pad, (int16_t)(_EP_MIN_LEN - _tx_hdr.hlen));
     }
     else
         /* call the transmit function */
-        ret = lan_write(_ch_info_tbl->_ch_num, (B *) & _tx_hdr, (H)_tx_hdr.hlen, (B*)data, (H)dlen);
+        ret = lan_write(_ch_info_tbl->_ch_num, (int8_t *) & _tx_hdr, (int16_t)_tx_hdr.hlen, (int8_t *)data, (int16_t)dlen);
 
     /* 0: transmit complete */
     if (ret == 0)

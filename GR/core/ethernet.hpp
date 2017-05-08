@@ -12,7 +12,6 @@
 #include "ip_address.hpp"
 
 #include "T4_src/type.h"
-#include "T4_src/r_t4_itcpip.h"
 #include "T4_src/config_tcpudp.h"
 #include "T4_src/r_t4_dhcp_client_rx_if.h"
 #include "T4_src/r_dhcp_client.h"
@@ -67,7 +66,7 @@ typedef utils::basic_format<utils::def_chaout> debug_format;
 extern _TCB   *head_tcb;
 extern uint8_t dnsaddr1[];
 extern uint8_t dnsaddr2[];
-extern volatile UH wait_timer;
+extern volatile uint16_t wait_timer;
 extern uint8_t     cepid_max;
 extern NAME_TABLE  name_table;
 extern DNS_MNG     dns_mng;
