@@ -41,7 +41,7 @@ Includes   <System Includes> , "Project Includes"
 ******************************************************************************/
 #include "net_config.h"
 #include <string.h>
-#include "r_t4_itcpip.h"
+#include "config_tcpudp.h"
 #include "../r_config/r_t4_dhcp_client_rx_config.h"
 #include "r_t4_dhcp_client_rx_if.h"
 #include "r_dhcp_client.h"
@@ -101,7 +101,7 @@ int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 
 	const char broadcast[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 	const char blank_ip[] = {0, 0, 0, 0};
-	UB tmp_header[12];
+	uint8_t tmp_header[12];
 
 	memset(dhcp_packet, 0, sizeof(DHCP_PACKET));
 
@@ -142,7 +142,7 @@ int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 	memcpy(dhcp_packet->dhcp.options.client_mac, dhcp->macaddr, 6);
 	dhcp_packet->dhcp.options.dummy[0]				= 0xff;
 
-	dhcp_packet->ipv4.checksum						= checksum((UH *) & dhcp_packet->ipv4, sizeof(dhcp_packet->ipv4));
+	dhcp_packet->ipv4.checksum						= checksum((uint16_t *) & dhcp_packet->ipv4, sizeof(dhcp_packet->ipv4));
 
 	memcpy(tmp_header, dhcp_packet->ipv4.source_ip, 4);
 	memcpy(tmp_header + 4, dhcp_packet->ipv4.destination_ip, 4);
@@ -153,7 +153,7 @@ int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 	dhcp_packet->udp.checksum						= checksum_udp((uint16_t *)tmp_header, (uint16_t *) & dhcp_packet->udp,
 	                                 sizeof(dhcp_packet->udp) + sizeof(dhcp_packet->dhcp));
 
-	lan_write(ETHER_CHANNEL_0, (B *)&dhcp_packet->ether, sizeof(dhcp_packet->ether), (B *)&dhcp_packet->ipv4, sizeof(DHCP_PACKET) - sizeof(dhcp_packet->ether));
+	lan_write(ETHER_CHANNEL_0, (int8_t *)&dhcp_packet->ether, sizeof(dhcp_packet->ether), (int8_t *)&dhcp_packet->ipv4, sizeof(DHCP_PACKET) - sizeof(dhcp_packet->ether));
 
 	return 0;
 
@@ -162,9 +162,9 @@ int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 int32_t dhcp_wait_offer(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 {
 
-	H	len;
-	B	*p;
-	volatile UH	timer;
+	int16_t	len;
+	int8_t	*p;
+	volatile uint16_t	timer;
 
 	reset_timer();
 	memset(dhcp_packet, 0, sizeof(DHCP_PACKET));
@@ -176,7 +176,7 @@ int32_t dhcp_wait_offer(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 		{
 			return -1;
 		}
-		len	= lan_read(ETHER_CHANNEL_0, (B **) & p);
+		len	= lan_read(ETHER_CHANNEL_0, (int8_t **) & p);
 		if (len > 0)
 		{
 			memcpy(dhcp_packet, p, sizeof(dhcp_packet->ether) + sizeof(dhcp_packet->ipv4)\
@@ -200,7 +200,7 @@ int32_t dhcp_request(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 	const char broadcast[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 	const char blank_ip[] = {0, 0, 0, 0};
 	const char request_ip[] = {0x32, 0x04};
-	UB tmp_header[12];
+	uint8_t tmp_header[12];
 
 	memset(dhcp_packet, 0, sizeof(DHCP_PACKET));
 
@@ -256,7 +256,7 @@ int32_t dhcp_request(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 	dhcp_packet->udp.checksum						= checksum_udp((uint16_t *)tmp_header, (uint16_t *) & dhcp_packet->udp,
 	                                 sizeof(dhcp_packet->udp) + sizeof(dhcp_packet->dhcp));
 
-	lan_write(ETHER_CHANNEL_0, (B *)&dhcp_packet->ether, sizeof(dhcp_packet->ether), (B *)&dhcp_packet->ipv4, sizeof(DHCP_PACKET) - sizeof(dhcp_packet->ether));
+	lan_write(ETHER_CHANNEL_0, (int8_t *)&dhcp_packet->ether, sizeof(dhcp_packet->ether), (int8_t *)&dhcp_packet->ipv4, sizeof(DHCP_PACKET) - sizeof(dhcp_packet->ether));
 
 	return 0;
 
@@ -267,13 +267,13 @@ int32_t dhcp_request(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 int32_t dhcp_wait_ack(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 {
 
-	H	len;
-	B	*p;
-	UB	*option;
-	UB	flag = 0;
+	int16_t	len;
+	int8_t	*p;
+	uint8_t	*option;
+	uint8_t	flag = 0;
 	char none[5] = {"none"};
 
-	volatile UH	timer;
+	volatile uint16_t	timer;
 
 	reset_timer();
 
@@ -284,7 +284,7 @@ int32_t dhcp_wait_ack(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 		{
 			return -1;
 		}
-		len	= lan_read(ETHER_CHANNEL_0, (B **) & p);
+		len	= lan_read(ETHER_CHANNEL_0, (int8_t **) & p);
 		if (len > 0)
 		{
 			memcpy(dhcp_packet, p, sizeof(dhcp_packet->ether) + sizeof(dhcp_packet->ipv4)\
@@ -299,7 +299,7 @@ int32_t dhcp_wait_ack(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 		}
 	}
 
-	option	=	(UB *) & dhcp_packet->dhcp.options.message_type1;
+	option	=	(uint8_t *) & dhcp_packet->dhcp.options.message_type1;
 
 	while (*option != 0xff) 	// End option
 	{

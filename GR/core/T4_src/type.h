@@ -22,6 +22,24 @@
 #endif
 
 
+/*** IP address/Port No. information ***/
+typedef struct t_ipv4ep
+{
+    uint32_t  ipaddr;    /* IP address */
+    uint16_t  portno;    /* Port number */
+} T_IPV4EP;
+
+
+#define T_IPVxEP T_IPV4EP
+
+#define IP_ALEN    4
+typedef uint8_t IPaddr[IP_ALEN]; /*  IP address */
+
+#define EP_ALEN    6
+typedef uint8_t Eaddr[EP_ALEN];  /*  MAC address */
+
+
+
 #if BIGENDIAN == 1
 #define hs2net(x) (x)
 #define net2hs(x) (x)
@@ -56,16 +74,6 @@ void net2hl_yn_xn(void *y, void *x);
         *((uint8_t*)a0 + 2) = tmp1;\
     }
 #endif
-
-
-#define T_IPVxEP T_IPV4EP
-
-#define IP_ALEN    4
-typedef uint8_t IPaddr[IP_ALEN]; /*  IP address */
-
-#define EP_ALEN    6
-typedef uint8_t Eaddr[EP_ALEN];  /*  MAC address */
-
 
 /*
  * Macro function

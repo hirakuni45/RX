@@ -1,7 +1,7 @@
 #include "net_config.h"
 #include <string.h>
 #include <stdint.h>
-#include "r_t4_itcpip.h"
+#include "config_tcpudp.h"
 #include "../r_config/r_t4_dns_client_rx_config.h"
 #include "r_t4_dns_client_rx_if.h"
 #include "r_dns_client.h"
@@ -463,7 +463,7 @@ int32_t R_dns_process(void)
 *                    error code pointer
 * Return Value : error code
 ***********************************************************************************************************************/
-int dns_callback(ID cepid, int32_t fncd , void *p_parblk)
+int dns_callback(uint16_t cepid, int32_t fncd , void *p_parblk)
 {
 	int32_t	parblk;
 	int	ercd;

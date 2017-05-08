@@ -8,7 +8,7 @@
 //=====================================================================//
 #include "net_config.h"
 #include "type.h"
-#include "r_t4_itcpip.h"
+#include "config_tcpudp.h"
 
 typedef enum {
 	TCP_API_STAT_INVALID = -1,

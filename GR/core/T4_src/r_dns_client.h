@@ -101,7 +101,7 @@ typedef struct
 	DNS_CB_FUNC		cb_func;					/* callback function					*/
 	char			name[NAME_SIZE];			/* domain name							*/
 	uint32_t 		retry_cnt;					/* retry counter						*/
-	ID				cepid;						/* the communication endpoint ID		*/
+	uint16_t		cepid;						/* the communication endpoint ID		*/
 } DNS_MNG;
 
 typedef	int32_t (*DNS_PROC_FUNC)(void);
@@ -110,21 +110,7 @@ typedef	int32_t (*DNS_PROC_FUNC)(void);
 #if defined(__cplusplus)
 extern "C" {
 #endif
-int dns_callback(ID cepid, int32_t fncd , void *p_parblk);
+int dns_callback(uint16_t cepid, int32_t fncd , void *p_parblk);
 #if defined(__cplusplus)
 }
-#endif
-
-#if 0
-static int32_t send_dns_request(char *mame, uint32_t dstaddr);
-static int32_t receive_dns_response(NAME_TABLE *table);
-static int32_t convert_name_to_dns_query(char *query, char *name);
-static int32_t check_query(char *query);
-static int32_t check_answer(char *answer, char *dns_response, NAME_TABLE *table, uint8_t *query_type);
-static int32_t get_name_till_stringend(const char *string, const char *dns_response, NAME_TABLE *table);
-static void clear_table(NAME_TABLE *table);
-
-static uint32_t convert_array_to_long(uint8_t *ipaddr);
-static uint16_t htons(uint16_t data);
-static uint32_t htonl(uint32_t data);
 #endif
