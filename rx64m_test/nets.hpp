@@ -768,7 +768,6 @@ namespace seeda {
 
 			case client_task::connect:
 				if(client_.connect(client_ip_, client_port_, TMO_NBLK)) {
-///				if(client_.connect(client_ip_, client_port_)) {
 					utils::format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% client_ip_.c_str() % client_port_ % client_.get_cepid();
 					client_timeout_ = 5 * 100;  // 5 sec
