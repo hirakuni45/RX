@@ -222,6 +222,7 @@ typedef struct
 typedef struct
 {
     uint16_t          flag;
+	uint16_t	close_count;
 #if defined(_TCP)
     uint16_t   cepid;
     uint16_t   status;
@@ -255,7 +256,6 @@ typedef struct
     uint16_t          zwp_noack_cnt;
 
     _TCP_CB   callback_info;
-
 #endif
 } _TCB;
 

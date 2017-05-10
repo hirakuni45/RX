@@ -775,10 +775,29 @@ namespace net {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  QOVR リセット
+			@param[in]	cepid	TCP/UDP ディスクリプタ
+		*/
+		//-----------------------------------------------------------------//
 		void reset(uint32_t cepid)
 		{
-//			utils::format("TCP reset(init)\n");
-//			tcp_reset(cepid);
+			tcp_reset_queue(cepid);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  状態の取得
+			@param[in]	cepid	TCP/UDP ディスクリプタ
+			@return 状態コード
+		*/
+		//-----------------------------------------------------------------//
+		TCP_API_STAT get_stat(uint32_t cepid)
+		{
+			TCP_API_STAT ercd = tcp_read_stat(cepid);
+			return ercd;
 		}
 	};
 

@@ -35,6 +35,8 @@ uint32_t tcpudp_get_memory_size(void);
 void tcpudp_close(void);
 
 #if defined(_TCP)
+void tcp_init(uint32_t cepid);
+
 int tcp_acp_cep(int cepid, int repid, T_IPVxEP *p_dstaddr, int32_t tmout);
 int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmout);
 int tcp_sht_cep(int cepid, int32_t tmout);
@@ -49,6 +51,7 @@ int tcp_force_clr(int cepid);
 int udp_force_clr(int cepid);
 int tcp_set_mss(int cepid, uint16_t mss);
 void tcp_reset_queue(int cepid);
+uint16_t tcp_get_close_count(int cepid);
 #endif
 #endif
 

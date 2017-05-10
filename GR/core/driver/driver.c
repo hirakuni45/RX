@@ -59,7 +59,6 @@ static void polling_link_status_(void)
 /******************************************************************************
 Functions (Interrput handler)
 ******************************************************************************/
-///void __attribute__((interrupt)) INT_Excep_CMT1_CMI1(void)
 static void service_10ms_(void)
 {
 	if (tcpip_flag_ == 1)

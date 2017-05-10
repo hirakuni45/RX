@@ -24,7 +24,7 @@ namespace net {
 		uint32_t	cepid_;
 		uint16_t	port_;
 
-		uint16_t	nonblock_delay_;
+		uint16_t	close_count_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -33,7 +33,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		ethernet_client(ethernet& e) : ethernet_(e), cepid_(0), port_(0),
-			nonblock_delay_(0) { }
+			close_count_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -96,22 +96,12 @@ namespace net {
 			if(cepid_ == 0) {
 				cepid_ = ethernet_.create(port);
 				if(cepid_ == 0) return false;
-			}
-
-			if(nonblock_delay_ > 0) {
-				if(connected()) {
-					nonblock_delay_ = 0;
-					return true;
-				}
-				--nonblock_delay_;
-				if(nonblock_delay_ == 0) {
-					ethernet_.reset(cepid_);
-				}
+				close_count_ = tcp_get_close_count(cepid_);
 			}
 
 			bool ret = false;
 			if(!connected()) {
-				T_IPV4EP adr;
+				static T_IPV4EP adr;
 				adr.ipaddr =  (static_cast<uint32_t>(ip[0]) << 24)
 							| (static_cast<uint32_t>(ip[1]) << 16)
 							| (static_cast<uint32_t>(ip[2]) << 8)
@@ -123,16 +113,15 @@ namespace net {
 					utils::format("Client connection state: %d\n") % ercd;
 					ercd_ = ercd;
 				}
-///				if(ercd == E_OK || ercd == E_WBLK) {
 				if(ercd == E_OK) {
 					ret = true;
-				} else if(ercd == E_WBLK) {
-					nonblock_delay_ = 250;  // とりあえず、250 count（２．５秒）
-				} else if(ercd == E_TMOUT) {
-//					ethernet_.reset(cepid_);
-				} else if(ercd == E_QOVR) {
-					ethernet_.reset(cepid_);
 				}
+
+				if(close_count_ != tcp_get_close_count(cepid_)) {
+//					utils::format("Error close (timeout)\n");
+					stop();  // 強制終了
+				}
+
 			} else {
 				ret = true;
 			}
@@ -214,6 +203,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void end()
 		{
+			tcp_init(cepid_);
 			ethernet_.end_connection(cepid_);
 			cepid_ = 0;
 		}

@@ -61,6 +61,7 @@ const uint32_t tcp_rt_tmo_rst[] = {
 	(10 * 60 * (1000 / 10)),
 	(10 * 60 * (1000 / 10)),
 	(10 * 60 * (1000 / 10)),
+///	(10 * (1000 / 10)),   // test 10 sec
 };
 
 /***  Transmit for delay ack (ON=1/OFF=0) ***/

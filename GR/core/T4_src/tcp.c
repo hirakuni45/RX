@@ -1641,6 +1641,7 @@ void _proc_snd(void)
                         case _TCP_API_CONCP:
                             *(_tcp_tcb->req.error) = E_CLS;
                             _tcp_tcb->flag |= (_TCBF_NEED_INIT | _TCBF_NEED_API);
+							_tcp_tcb->close_count++;
                             break;
                         case _TCP_API_CLSCP:
                             *(_tcp_tcb->req.error) = E_OK;
@@ -2373,25 +2374,15 @@ int  _tcp_check_tmout_arg(uint16_t api_type, int32_t tmout, _TCP_CB* pTcpcb)
 ***********************************************************************************************************************/
 uint16_t tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb)
 {
-    uint16_t bResult = FALSE;
+	uint16_t bResult = FALSE;
 
-    if (pTcb->req.stat != _TCP_API_STAT_INIT && pTcb->req.stat != _TCP_API_STAT_COMPLETE)
-    {
-///		printf("QOVR: API Not complete...\n");
-        bResult = TRUE;
-    }
-    else if (_TCP_CB_STAT_IS_VIA_CALLBACK(pTcpcb->stat) &&
-             _TCP_CB_STAT_IS_API_LOCKED(pTcpcb->stat))
-    {
-///		printf("QOVR: API Locked...\n");
-        bResult = TRUE;
-    }
-
-//	if(bResult == FALSE) {
-//		printf("QUEUE Over: %d, API_TYPE: %d\n", (int)pTcb->req.stat, (int)api_type);
-//	}
-
-    return bResult;
+	if(pTcb->req.stat != _TCP_API_STAT_INIT && pTcb->req.stat != _TCP_API_STAT_COMPLETE) {
+		bResult = TRUE;
+	} else if(_TCP_CB_STAT_IS_VIA_CALLBACK(pTcpcb->stat) &&
+			  _TCP_CB_STAT_IS_API_LOCKED(pTcpcb->stat)) {
+		bResult = TRUE;
+	}
+	return bResult;
 }
 
 /***********************************************************************************************************************

@@ -52,7 +52,6 @@ static int tcpudp_api_req_(int cepid)
 
 	if(head_tcb[cepid-1].req.tmout == TMO_NBLK) {
         _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
-
         pTcbCb->req.ercd = E_INI;
         head_tcb[cepid-1].req.error = &pTcbCb->req.ercd;
 
@@ -60,14 +59,19 @@ static int tcpudp_api_req_(int cepid)
     }
 
     tcpudp_api_slp_(cepid);
-
-    if (head_tcb[cepid-1].req.tmout == TMO_NBLK) {
-		err = *head_tcb[cepid-1].req.error;
-	}
-
     tcpudp_clr_req_(cepid);
 
     return err;
+}
+
+
+void tcp_init(uint32_t cepid)
+{
+	tcpudp_clr_req_(cepid);
+
+	_tcp_init_callback_info(&head_tcb[cepid - 1].callback_info);
+
+	_tcp_init_tcb(&_tcp_tcb[cepid - 1]);
 }
 
 
@@ -275,6 +279,7 @@ int tcp_acp_cep(int cepid, int repid, T_IPVxEP *p_dstaddr, int32_t tmout)
         {
             _TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
         }
+		err = *head_tcb[cepid - 1].req.error;
     }
 
     return err;
@@ -285,21 +290,21 @@ int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmou
 {
 	_TCP_CB *pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 
-	int err = _tcp_check_cepid_arg(cepid);
-	if(err != E_OK) {
+	int ret = _tcp_check_cepid_arg(cepid);
+	if(ret != E_OK) {
 		return E_PAR;
 	}
 
-	err = _tcp_check_tmout_arg(_TCP_API_CONCP, tmout, pTcbCb);
-	if(err != E_OK && err != E_WBLK) {
-		return err;
+	ret = _tcp_check_tmout_arg(_TCP_API_CONCP, tmout, pTcbCb);
+	if(ret != E_OK && ret != E_WBLK) {
+		return ret;
 	}
 
 	if(tcp_is_tcb_queue_over(_TCP_API_CONCP, &head_tcb[cepid-1], pTcbCb)) {
 		return E_QOVR;
 	}
 
-	if(err == E_WBLK) {
+	if(ret == E_WBLK) {
 		if(!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
 			_TCP_CB_STAT_SET_API_LOCK_FLG(pTcbCb->stat);
 		}
@@ -315,13 +320,16 @@ int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmou
 		head_tcb[cepid-1].req.d.cnr.my_port = p_myaddr->portno;
 	}
 
-	err = tcpudp_api_req_(cepid);
-	if(err == E_WBLK) {
+	ret = tcpudp_api_req_(cepid);
+	if(ret == E_WBLK) {
 		if(!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
 			_TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
 		}
+		ret = *head_tcb[cepid - 1].req.error;
+
+		printf("con_cep: %d\n", ret);
 	}
-	return err;
+	return ret;
 }
 
 
@@ -363,6 +371,7 @@ int tcp_sht_cep(int cepid, int32_t tmout)
 		if(!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
 			_TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
 		}
+		ret = *head_tcb[cepid - 1].req.error;
 	}
 	return ret;
 }
@@ -398,6 +407,7 @@ int tcp_cls_cep(int cepid, int32_t tmout)
 		if(!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
 			_TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
 		}
+		ret = *head_tcb[cepid - 1].req.error;
 	}
     return ret;
 }
@@ -452,6 +462,7 @@ int tcp_send_data(int cepid, const void *data, int len, int32_t tmout)
         {
             _TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
         }
+		err = *head_tcb[cepid - 1].req.error;
     }
 
     return err;
@@ -530,6 +541,7 @@ int tcp_recv_data(int cepid, void *data, int len, int32_t tmout)
         {
             _TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
         }
+		err = *head_tcb[cepid - 1].req.error;
     }
     return err;
 }
@@ -735,7 +747,7 @@ int tcp_set_mss(int cepid, uint16_t mss)
         return E_PAR;
     }
 
-    head_tcb[cepid-1].mss = mss;
+    head_tcb[cepid - 1].mss = mss;
 
     return err;
 }
@@ -749,6 +761,12 @@ void tcp_reset_queue(int cepid)
 	}
 
 	_tcp_clr_rtq(&head_tcb[cepid - 1]);
+}
+
+
+uint16_t tcp_get_close_count(int cepid)
+{
+	return head_tcb[cepid - 1].close_count;
 }
 
 #endif
