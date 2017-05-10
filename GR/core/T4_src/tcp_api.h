@@ -48,6 +48,7 @@ TCP_API_STAT tcp_read_stat(int cepid);
 int tcp_force_clr(int cepid);
 int udp_force_clr(int cepid);
 int tcp_set_mss(int cepid, uint16_t mss);
+void tcp_reset_queue(int cepid);
 #endif
 #endif
 

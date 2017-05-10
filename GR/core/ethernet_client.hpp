@@ -24,13 +24,16 @@ namespace net {
 		uint32_t	cepid_;
 		uint16_t	port_;
 
+		uint16_t	nonblock_delay_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		ethernet_client(ethernet& e) : ethernet_(e), cepid_(0), port_(0) { }
+		ethernet_client(ethernet& e) : ethernet_(e), cepid_(0), port_(0),
+			nonblock_delay_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -85,40 +88,55 @@ namespace net {
 			@param[in]	ip		接続先の IP アドレス
 			@param[in]	port	接続ポート
 			@param[in]	timeout	タイムアウト、単位１０ミリ秒（標準で１０秒）
-			@return 接続できた場合「１」
+			@return 接続できた場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		int connect(const ip_address& ip, uint16_t port, int32_t timeout = 1000)
+		bool connect(const ip_address& ip, uint16_t port, int32_t timeout = 1000)
 		{
 			if(cepid_ == 0) {
 				cepid_ = ethernet_.create(port);
-				if(cepid_ == 0) return -1;
+				if(cepid_ == 0) return false;
 			}
 
-			T_IPV4EP adr;
-			adr.ipaddr =  (static_cast<uint32_t>(ip[0]) << 24)
-						| (static_cast<uint32_t>(ip[1]) << 16)
-						| (static_cast<uint32_t>(ip[2]) << 8)
-						| (static_cast<uint32_t>(ip[3]));
-			adr.portno = port;
+			if(nonblock_delay_ > 0) {
+				if(connected()) {
+					nonblock_delay_ = 0;
+					return true;
+				}
+				--nonblock_delay_;
+				if(nonblock_delay_ == 0) {
+					ethernet_.reset(cepid_);
+				}
+			}
 
-			int res = 0;
+			bool ret = false;
 			if(!connected()) {
+				T_IPV4EP adr;
+				adr.ipaddr =  (static_cast<uint32_t>(ip[0]) << 24)
+							| (static_cast<uint32_t>(ip[1]) << 16)
+							| (static_cast<uint32_t>(ip[2]) << 8)
+							| (static_cast<uint32_t>(ip[3]));
+				adr.portno = port;
 				int ercd = tcp_con_cep(cepid_, NADR, &adr, timeout);
 				static int ercd_ = 0;
 				if(ercd_ != ercd) {
 					utils::format("Client connection state: %d\n") % ercd;
 					ercd_ = ercd;
 				}
-				if(ercd == E_OK || ercd == E_WBLK) {
-					res = 1;
-				} else {
-					res = -1;
+///				if(ercd == E_OK || ercd == E_WBLK) {
+				if(ercd == E_OK) {
+					ret = true;
+				} else if(ercd == E_WBLK) {
+					nonblock_delay_ = 250;  // とりあえず、250 count（２．５秒）
+				} else if(ercd == E_TMOUT) {
+//					ethernet_.reset(cepid_);
+				} else if(ercd == E_QOVR) {
+					ethernet_.reset(cepid_);
 				}
 			} else {
-				res = 1;  /* already connect */
+				ret = true;
 			}
-			return res;
+			return ret;
 		}
 
 
@@ -198,12 +216,6 @@ namespace net {
 		{
 			ethernet_.end_connection(cepid_);
 			cepid_ = 0;
-		}
-
-
-		void force_clear()
-		{
-			ethernet_.force_clear(cepid_);
 		}
 	};
 }

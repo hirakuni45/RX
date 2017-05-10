@@ -775,9 +775,10 @@ namespace net {
 		}
 
 
-		void force_clear(uint32_t cepid)
+		void reset(uint32_t cepid)
 		{
-			tcp_force_clr(cepid);
+//			utils::format("TCP reset(init)\n");
+//			tcp_reset(cepid);
 		}
 	};
 

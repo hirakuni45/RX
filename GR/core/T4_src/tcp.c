@@ -2366,22 +2366,24 @@ int  _tcp_check_tmout_arg(uint16_t api_type, int32_t tmout, _TCP_CB* pTcpcb)
 }
 
 /***********************************************************************************************************************
-* Function Name: _tcp_is_tcb_queue_over
+* Function Name: tcp_is_tcb_queue_over
 * Description  :
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-uint16_t  _tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb)
+uint16_t tcp_is_tcb_queue_over(uint16_t api_type, _TCB* pTcb,  _TCP_CB* pTcpcb)
 {
     uint16_t bResult = FALSE;
 
     if (pTcb->req.stat != _TCP_API_STAT_INIT && pTcb->req.stat != _TCP_API_STAT_COMPLETE)
     {
+///		printf("QOVR: API Not complete...\n");
         bResult = TRUE;
     }
     else if (_TCP_CB_STAT_IS_VIA_CALLBACK(pTcpcb->stat) &&
              _TCP_CB_STAT_IS_API_LOCKED(pTcpcb->stat))
     {
+///		printf("QOVR: API Locked...\n");
         bResult = TRUE;
     }
 

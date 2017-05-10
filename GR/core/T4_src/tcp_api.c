@@ -249,7 +249,7 @@ int tcp_acp_cep(int cepid, int repid, T_IPVxEP *p_dstaddr, int32_t tmout)
         return err;
     }
 
-    if (_tcp_is_tcb_queue_over(_TCP_API_ACPCP, &head_tcb[cepid-1], pTcbCb))
+    if (tcp_is_tcb_queue_over(_TCP_API_ACPCP, &head_tcb[cepid-1], pTcbCb))
     {
         return E_QOVR;
     }
@@ -283,54 +283,45 @@ int tcp_acp_cep(int cepid, int repid, T_IPVxEP *p_dstaddr, int32_t tmout)
 
 int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmout)
 {
-    _TCP_CB *pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
+	_TCP_CB *pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
 
-    int err = _tcp_check_cepid_arg(cepid);
-    if (err != E_OK)
-    {
-        return E_PAR;
-    }
+	int err = _tcp_check_cepid_arg(cepid);
+	if(err != E_OK) {
+		return E_PAR;
+	}
 
-    err = _tcp_check_tmout_arg(_TCP_API_CONCP, tmout, pTcbCb);
-    if (err != E_OK && err != E_WBLK)
-    {
-        return err;
-    }
+	err = _tcp_check_tmout_arg(_TCP_API_CONCP, tmout, pTcbCb);
+	if(err != E_OK && err != E_WBLK) {
+		return err;
+	}
 
-    if (_tcp_is_tcb_queue_over(_TCP_API_CONCP, &head_tcb[cepid-1], pTcbCb))
-    {
-///		tcp_force_clr(cepid);
-        return E_QOVR;
-    }
+	if(tcp_is_tcb_queue_over(_TCP_API_CONCP, &head_tcb[cepid-1], pTcbCb)) {
+		return E_QOVR;
+	}
 
-    if (err == E_WBLK)
-    {
-        if (!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat))
-        {
-            _TCP_CB_STAT_SET_API_LOCK_FLG(pTcbCb->stat);
-        }
-    }
+	if(err == E_WBLK) {
+		if(!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
+			_TCP_CB_STAT_SET_API_LOCK_FLG(pTcbCb->stat);
+		}
+	}
 
-    head_tcb[cepid-1].req.type = _TCP_API_CONCP;
-    head_tcb[cepid-1].req.tmout = tmout;
-    head_tcb[cepid-1].req.d.cnr.dstaddr = p_dstaddr;
+	head_tcb[cepid - 1].req.type = _TCP_API_CONCP;
+	head_tcb[cepid - 1].req.tmout = tmout;
+	head_tcb[cepid - 1].req.d.cnr.dstaddr = p_dstaddr;
 
-    if ((p_myaddr == (T_IPVxEP *)NADR) || (p_myaddr->portno == TCP_PORTANY))
-        head_tcb[cepid-1].req.d.cnr.my_port = 0;
-    else
-        head_tcb[cepid-1].req.d.cnr.my_port = p_myaddr->portno;
+	if((p_myaddr == (T_IPVxEP *)NADR) || (p_myaddr->portno == TCP_PORTANY)) {
+		head_tcb[cepid-1].req.d.cnr.my_port = 0;
+	} else {
+		head_tcb[cepid-1].req.d.cnr.my_port = p_myaddr->portno;
+	}
 
-    err = tcpudp_api_req_(cepid);
-
-    if (err == E_WBLK)
-    {
-        if (!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat))
-        {
-            _TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
-        }
-    }
-
-    return err;
+	err = tcpudp_api_req_(cepid);
+	if(err == E_WBLK) {
+		if(!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
+			_TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
+		}
+	}
+	return err;
 }
 
 
@@ -351,7 +342,7 @@ int tcp_sht_cep(int cepid, int32_t tmout)
 		return E_NOSPT;
 	}
 
-	if(_tcp_is_tcb_queue_over(_TCP_API_SHTCP, &head_tcb[cepid-1], pTcbCb)) {
+	if(tcp_is_tcb_queue_over(_TCP_API_SHTCP, &head_tcb[cepid-1], pTcbCb)) {
 		return E_QOVR;
 	}
 
@@ -390,7 +381,7 @@ int tcp_cls_cep(int cepid, int32_t tmout)
 		return ret;
 	}
 
-	if(_tcp_is_tcb_queue_over(_TCP_API_CLSCP, &head_tcb[cepid-1], pTcbCb)) {
+	if(tcp_is_tcb_queue_over(_TCP_API_CLSCP, &head_tcb[cepid-1], pTcbCb)) {
 		return E_QOVR;
 	}
 	if(ret == E_WBLK) {
@@ -436,7 +427,7 @@ int tcp_send_data(int cepid, const void *data, int len, int32_t tmout)
         return err;
     }
 
-    if (_tcp_is_tcb_queue_over(_TCP_API_SNDDT, &head_tcb[cepid-1], pTcbCb))
+    if (tcp_is_tcb_queue_over(_TCP_API_SNDDT, &head_tcb[cepid-1], pTcbCb))
     {
         return E_QOVR;
     }
@@ -513,7 +504,7 @@ int tcp_recv_data(int cepid, void *data, int len, int32_t tmout)
         }
     }
 
-    if (_tcp_is_tcb_queue_over(_TCP_API_RCVDT, &head_tcb[cepid-1], pTcbCb))
+    if (tcp_is_tcb_queue_over(_TCP_API_RCVDT, &head_tcb[cepid-1], pTcbCb))
     {
         return E_QOVR;
     }
@@ -749,8 +740,16 @@ int tcp_set_mss(int cepid, uint16_t mss)
     return err;
 }
 
+
+void tcp_reset_queue(int cepid)
+{
+	int err = _tcp_check_cepid_arg(cepid);
+	if(err != E_OK) {
+		return;
+	}
+
+	_tcp_clr_rtq(&head_tcb[cepid - 1]);
+}
+
 #endif
 #endif
-
-
-
