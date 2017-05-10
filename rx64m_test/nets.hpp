@@ -345,18 +345,6 @@ namespace seeda {
 		}
 
 
-#if 0
-		// POST などの空行以下のデータ列を受け取る
-		bool recv_data_(char* recv, uint32_t max)
-		{
-			int len = base.read(recv, max);
-			if(len <= 0) return false;
-
-			return true;
-		}
-#endif
-
-
 		void render_404_(int fd, const char* msg)
 		{
 			send_info_(fd, 404, false);
@@ -779,7 +767,8 @@ namespace seeda {
 			switch(client_task_) {
 
 			case client_task::connect:
-				if(client_.connect(client_ip_, client_port_, TMO_NBLK) == 1) {
+				if(client_.connect(client_ip_, client_port_, TMO_NBLK)) {
+///				if(client_.connect(client_ip_, client_port_)) {
 					utils::format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% client_ip_.c_str() % client_port_ % client_.get_cepid();
 					client_timeout_ = 5 * 100;  // 5 sec
@@ -793,12 +782,12 @@ namespace seeda {
 					client_time_ = get_time();
 					client_task_ = client_task::main_loop;
 				}
-				if(client_timeout_) {
-					--client_timeout_;
-				} else {
+//				if(client_timeout_) {
+//					--client_timeout_;
+//				} else {
 //					client_.force_clear();
-					client_task_ = client_task::disconnect;
-				}
+//					client_task_ = client_task::disconnect;
+//				}
 				break;
 
 			case client_task::main_loop:
