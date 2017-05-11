@@ -494,8 +494,8 @@ namespace seeda {
 				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
 
-			{  // クライアント設定ボタン
-				format("<input type=\"button\" onclick=\"location.href='/client'\" value=\"クライアント\">\n",
+			{  // クライアント機能設定ボタン
+				format("<input type=\"button\" onclick=\"location.href='/client'\" value=\"クライアント機能\">\n",
 					fd);
 				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
@@ -527,7 +527,7 @@ namespace seeda {
 		}
 
 
-		// クライアント設定画面
+		// クライアント機能設定画面
 		void render_setup_client_(int fd)
 		{
 			send_info_(fd, 200, false);
@@ -542,18 +542,18 @@ namespace seeda {
 
 			format("<hr align=\"left\" width=\"400\" size=\"3\">\n", fd);
 
-			// クライアント設定
+			// クライアント機能設定
 			format("<form method=\"POST\" action=\"/cgi/set_client.cgi\">\n", fd);
-			format("<table><tr><td>クライアント IP：</td>"
+			format("<table><tr><td>接続先 IP：</td>"
 				"<td><input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\"></td></tr>\n", fd)
 				% static_cast<int>(client_ip_[0])
 				% static_cast<int>(client_ip_[1])
 				% static_cast<int>(client_ip_[2])
 				% static_cast<int>(client_ip_[3]);
-			format("<tr><td>クライアント IP：</td>"
+			format("<tr><td>接続先ポート：</td>"
 				"<td><input type=\"text\" name=\"port\" size=\"5\" value=\"%d\"></td></tr>\n", fd)
 				% static_cast<int>(client_port_);
-			format("<tr><td><input type=\"submit\" value=\"クライアント設定\"></td></tr>\n", fd);
+			format("<tr><td><input type=\"submit\" value=\"接続先設定\"></td></tr>\n", fd);
 			format("</table></form>\n", fd);
 
 			format("<hr align=\"left\" width=\"400\" size=\"3\">\n", fd);
