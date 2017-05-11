@@ -115,6 +115,8 @@ namespace net {
 				}
 				if(ercd == E_OK) {
 					ret = true;
+				} else if(ercd == E_QOVR) {
+///					ethernet_.reset(cepid_);
 				}
 
 				if(close_count_ != tcp_get_close_count(cepid_)) {
