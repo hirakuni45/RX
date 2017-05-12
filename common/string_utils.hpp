@@ -375,13 +375,15 @@ namespace utils {
 			@brief  URL エンコード文字列を通常文字列へ変換
 			@param[in]	src	ソース
 			@param[out]	dst	出力
+			@param[in]	len	出力長（０の場合サイズ検査無し）
 		*/
 		//-----------------------------------------------------------------//
-		static void url_encode_to_str(const char* src, char* dst)
+		static void url_encode_to_str(const char* src, char* dst, uint32_t len = 0)
 		{
 			char ch;
 			uint8_t hex = 0;
 			uint8_t hv = 0;
+			uint32_t l = 0;
 			while((ch = *src++) != 0) {
 				if(hex > 0) {
 					hv <<= 4;
@@ -396,9 +398,48 @@ namespace utils {
 					hex = 2;
 				} else {
 					if(ch == '+') ch = ' ';
+					if(len > 0 && l >= (len - 1)) break;
 					*dst = ch;
 					++dst;
+					++l;
 				}
+			}
+			*dst = 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  通常文字列を URL デコード文字列へ変換
+			@param[in]	src	ソース
+			@param[out]	dst	出力
+			@param[in]	len	出力長（０の場合サイズ検査無し）
+		*/
+		//-----------------------------------------------------------------//
+		static void url_decode_to_str(const char* src, char* dst, uint32_t len = 0)
+		{
+			char ch;
+			uint32_t l = 0;
+			while((ch = *src++) != 0) {
+				if(ch == ' ') ch = '+';
+				else if(ch >= '0' && ch <= '9') ;
+				else if(ch >= 'A' && ch <= 'Z') ;
+				else if(ch >= 'a' && ch <= 'z') ;
+				else {
+					if(len > 0 && l >= (len - 1)) break;
+					*dst++ = '%';
+					++l;
+					uint8_t v = static_cast<uint8_t>(ch) >> 4;
+					if(len > 0 && l >= (len - 1)) break;
+					*dst++ = v < 10 ? (v + '0') : (v + 'A' - 10);
+					++l;
+					v = static_cast<uint8_t>(ch) & 0xf;
+					ch = v < 10 ? (v + '0') : (v + 'A' - 10);
+				}
+
+				if(len > 0 && l >= (len - 1)) break;
+				*dst++ = ch;
+				++l;
 			}
 			*dst = 0;
 		}
