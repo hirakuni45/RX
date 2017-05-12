@@ -87,6 +87,8 @@ namespace net {
 
 	public:
 		static const uint32_t TCP_MSS = 1460;
+		static const uint32_t RECV_SIZE = 1024;
+		static const uint32_t SEND_SIZE = 4096;
 
 		struct CEP {
 			uint32_t    status;
@@ -94,14 +96,16 @@ namespace net {
 			T_IPV4EP    src_addr;
 			int32_t     current_recv_data_len;
 			int32_t     total_rcv_len;
-			uint8_t     recv_buf[TCP_MSS];
-			uint8_t     send_buf[TCP_MSS];
+			uint8_t     recv_buf[RECV_SIZE];
+			uint8_t     send_buf[SEND_SIZE];
 			int32_t     sec_counter;
 			int32_t     sec_timer;
 			int32_t     pre_sec_timer;
+			uint32_t	recv_pos_;
+			uint32_t	send_pos_;
 			bool		enable;
 			bool		call_flag;
-			CEP() : enable(false), call_flag(false) { }
+			CEP() : recv_pos_(0), send_pos_(0), enable(false), call_flag(false) { }
 		};
 
 	private:
@@ -226,6 +230,8 @@ namespace net {
 		void end_connection(uint32_t cepid)
 		{
 			if(cepid > 0 && cepid <= TCPUDP_CHANNEL_NUM) {
+				cep_[cepid - 1].recv_pos_ = 0;
+				cep_[cepid - 1].send_pos_ = 0;
 				cep_[cepid - 1].call_flag = false;
 				cep_[cepid - 1].enable = false;
 			}
@@ -688,6 +694,8 @@ namespace net {
 		//-----------------------------------------------------------------//
 		static int read(uint32_t cepid, void* buff, size_t size)
 		{
+			if(buff == nullptr || size == 0) return 0;
+
 			int32_t ercd = tcp_recv_data(cepid, buff, size, TMO_FEVR);
 			if(ercd <= 0) {
 				ercd = -1;
@@ -817,10 +825,14 @@ namespace net {
 			tmp_[pos_] = ch;
 			++pos_;
 			++len_;
-			if(ch == '\n' || pos_ >= sizeof(tmp_)) {
+			if(pos_ >= sizeof(tmp_)) {
 				ethernet::write(fd_, tmp_, pos_);
 				pos_ = 0;
 			}
+//			if(ch == '\n' || pos_ >= sizeof(tmp_)) {
+//				ethernet::write(fd_, tmp_, pos_);				
+//				pos_ = 0;
+//			}
 		}
 	public:
 		//-----------------------------------------------------------------//

@@ -326,8 +326,6 @@ int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmou
 			_TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
 		}
 		ret = *head_tcb[cepid - 1].req.error;
-
-		printf("con_cep: %d\n", ret);
 	}
 	return ret;
 }
