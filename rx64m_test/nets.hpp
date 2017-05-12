@@ -14,6 +14,7 @@
 
 #include "write_file.hpp"
 #include "preference.hpp"
+#include "client.hpp"
 
 #include "GR/core/ethernet.hpp"
 #include "GR/core/ethernet_client.hpp"
@@ -40,7 +41,8 @@ namespace seeda {
 
 		net::ethernet			ethernet_;
 		net::ethernet_server	server_;
-		net::ethernet_client	client_;
+		client					client_;
+
 		typedef net::ftp_server<SDC> FTP;
 		FTP				ftp_;
 
@@ -55,26 +57,10 @@ namespace seeda {
 		};
 		server_task		server_task_;
 
-		enum class client_task {
-			connect,
-			wait_connect,
-			main_loop,
-			disconnect,
-			delay_connection,
-			delay_loop,
-		};
-		client_task		client_task_;
-		uint16_t		client_port_;
-		uint32_t		client_delay_;
-		uint32_t		client_timeout_;
-
 		typedef utils::line_manage<2048, 20> LINE_MAN;
 		LINE_MAN	line_man_;
 
 		uint32_t	disconnect_loop_;
-
-		net::ip_address		client_ip_;
-		time_t		client_time_;
 
 		// サーミスタ定義
 		// A/D: 12 bits, NT103_41G, 分圧抵抗: 10K オーム、サーミスタ: ＶＣＣ側
@@ -127,8 +113,8 @@ namespace seeda {
 
 		void write_pre_()
 		{
-			for(int i = 0; i < 4; ++i) pre_.at().client_ip_[i] = client_ip_[i];
-			pre_.at().client_port_ = client_port_;
+			for(int i = 0; i < 4; ++i) pre_.at().client_ip_[i] = (client_.get_ip())[i];
+			pre_.at().client_port_ = client_.get_port();
 
 			for(int ch = 0; ch < 8; ++ch) {
 				pre_.at().mode_[ch] = static_cast<uint8_t>(at_sample(ch).mode_);
@@ -306,20 +292,20 @@ namespace seeda {
 					const auto& t = cgi.get_unit(i);
 					if(strcmp(t.key, "ip") == 0) {
 						utils::format("Set client IP: '%s'\n") % t.val;
-						client_ip_.from_string(t.val);
+						client_.at_ip().from_string(t.val);
 					} else if(strcmp(t.key, "port") == 0) {
 						int port;
 						if((utils::input("%d", t.val) % port).status()) {
 							utils::format("Set client PORT: %d\n") % port;
-							client_port_ = port;
+							client_.set_port(port);
 						}
 					}
 				}
 
 				write_pre_();
 
-				// restart service_client...
-				client_task_ = client_task::disconnect;
+				client_.restart();
+
 			} else if(strcmp(path, "/cgi/set_write.cgi") == 0) {
 				if(!write_file_.get_enable()) {
 					typedef utils::parse_cgi_post<256, 2> CGI_IP;
@@ -546,13 +532,13 @@ namespace seeda {
 			format("<form method=\"POST\" action=\"/cgi/set_client.cgi\">\n", fd);
 			format("<table><tr><td>接続先 IP：</td>"
 				"<td><input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\"></td></tr>\n", fd)
-				% static_cast<int>(client_ip_[0])
-				% static_cast<int>(client_ip_[1])
-				% static_cast<int>(client_ip_[2])
-				% static_cast<int>(client_ip_[3]);
+				% static_cast<int>(client_.get_ip()[0])
+				% static_cast<int>(client_.get_ip()[1])
+				% static_cast<int>(client_.get_ip()[2])
+				% static_cast<int>(client_.get_ip()[3]);
 			format("<tr><td>接続先ポート：</td>"
 				"<td><input type=\"text\" name=\"port\" size=\"5\" value=\"%d\"></td></tr>\n", fd)
-				% static_cast<int>(client_port_);
+				% static_cast<int>(client_.get_port());
 			format("<tr><td><input type=\"submit\" value=\"接続先設定\"></td></tr>\n", fd);
 			format("</table></form>\n", fd);
 
@@ -759,76 +745,6 @@ namespace seeda {
 #endif
 		}
 
-
-		// 指定のアドレス、ポートに定期的に、Ａ／Ｄ変換データを送る。
-		void service_client_()
-		{
-			time_t t;
-			switch(client_task_) {
-
-			case client_task::connect:
-				if(client_.connect(client_ip_, client_port_, TMO_NBLK)) {
-					utils::format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
-						% client_ip_.c_str() % client_port_ % client_.get_cepid();
-					client_timeout_ = 5 * 100;  // 5 sec
-					client_task_ = client_task::wait_connect;
-				}
-				break;
-
-			case client_task::wait_connect:
-				if(client_.connected()) {
-					utils::format("Client Conected: %s\n") % client_ip_.c_str();
-					client_time_ = get_time();
-					client_task_ = client_task::main_loop;
-				}
-//				if(client_timeout_) {
-//					--client_timeout_;
-//				} else {
-//					client_.force_clear();
-//					client_task_ = client_task::disconnect;
-//				}
-				break;
-
-			case client_task::main_loop:
-				if(!client_.connected()) {
-					client_task_ = client_task::disconnect;
-					break;
-				}
-
-				t = get_time();
-				if(client_time_ == t) break;
-				client_time_ = t;
-				{
-					char tmp[128];
-					time_t t = get_time();
-					disp_time(t, tmp, sizeof(tmp));
-					format("%s\n", client_.get_cepid()) % tmp;
-				}
-				{
-					make_adc_csv_(client_.get_cepid(), "\n");
-				}
-				break;
-			
-			case client_task::disconnect:
-				client_.stop();
-				utils::format("Client disconnected: %s\n") % client_ip_.c_str();
-				client_task_ = client_task::delay_connection;
-				break;
-
-			case client_task::delay_connection:
-				client_delay_ = 50;  // 0.5sec
-				client_task_ = client_task::delay_loop;
-				break;
-
-			case client_task::delay_loop:
-				if(client_delay_) {
-					--client_delay_;
-				} else {
-					client_task_ = client_task::connect;
-				}
-			}
-		}
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -837,15 +753,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		nets() : server_(ethernet_), client_(ethernet_), ftp_(ethernet_, at_sdc()),
 			count_(0), server_task_(server_task::begin_http),
-			client_task_(client_task::connect), client_port_(3000), client_delay_(0), client_timeout_(0),
 			line_man_(0x0a), disconnect_loop_(0),
-#ifdef SEEDA
-			client_ip_(192, 168, 1, 3),
-#else
-			client_ip_(192, 168, 3, 7),
-#endif
-			client_time_(0),
-
 			write_file_(), pre_(), startup_delay_(100)
 			{ }
 
@@ -1013,7 +921,7 @@ namespace seeda {
 				break;
 			}
 
-			service_client_();
+			client_.service();
 
 			ftp_.service();
 
@@ -1030,13 +938,13 @@ namespace seeda {
 							at_sample(ch).limit_lo_level_ = pre_.get().limit_lo_level_[ch];
 							at_sample(ch).limit_hi_level_ = pre_.get().limit_hi_level_[ch];
 						}
-						for(int i = 0; i < 4; ++i) client_ip_[i] = pre_.get().client_ip_[i];
-						client_port_ = pre_.get().client_port_;
+						for(int i = 0; i < 4; ++i) client_.at_ip()[i] = pre_.get().client_ip_[i];
+						client_.set_port(pre_.get().client_port_);
 
 						write_file_.set_path(pre_.get().write_path_);
 						write_file_.set_limit(pre_.get().write_limit_); 
-
 					}
+					client_.start_connect();
 				}
 			}
 		}
