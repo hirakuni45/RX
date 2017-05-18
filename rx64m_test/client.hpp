@@ -140,32 +140,39 @@ namespace seeda {
 
 			case task::main_loop:
 				if(!client_.connected()) {
+					task_ = task::disconnect;
 					break;
 				}
 				t = get_time();
 				if(time_ == t) break;
 				time_ = t;
 				{
-					auto fd = client_.get_cepid();
-					{
-						char s[64];
-						int n = disp_time(t, s, sizeof(s));
-						s[n] = '\n';
-						s[n + 1] = 0;
-						char tmp[128];
-						utils::str::url_decode_to_str(s, tmp, sizeof(tmp)); 
-
-						format("POST /api/?val=%s", fd) % tmp;
-					}
+					struct tm *m = localtime(&t);
+					char data[1024];
+					uint32_t l = 0;
+					l += (utils::format("%04d/%02d/%02d,%02d:%02d:%02d", &data[l], sizeof(data) - l)
+						% static_cast<uint32_t>(m->tm_year + 1900)
+						% static_cast<uint32_t>(m->tm_mon + 1)
+						% static_cast<uint32_t>(m->tm_mday)
+						% static_cast<uint32_t>(m->tm_hour)
+						% static_cast<uint32_t>(m->tm_min)
+						% static_cast<uint32_t>(m->tm_sec)).get_length();
 					for(int ch = 0; ch < 8; ++ch) {
-						const auto& t = get_sample(ch);
-						char s[256];
-						t.make_csv("\n", s, sizeof(s));
-						char tmp[512];
-						utils::str::url_decode_to_str(s, tmp, sizeof(tmp)); 
-						format("%s", fd) % tmp;
+						const auto& smp = get_sample(ch);
+						data[l] = ',';
+						++l;
+						l += smp.make_csv2(&data[l], sizeof(data) - l);
 					}
-					format(" HTTP/1.1\n", fd);
+					data[l] = '\n';
+					++l;
+					data[l] = 0;
+					++l;
+
+					char tmp[2048];
+					utils::str::url_decode_to_str(data, tmp, sizeof(tmp)); 
+
+					auto fd = client_.get_cepid();
+					format("POST /api/?val=%s HTTP/1.1\n", fd) % tmp;
 					format("Host: %d.%d.%d.%d\n", fd)
 						% static_cast<int>(ip_[0])
 						% static_cast<int>(ip_[1])
@@ -175,8 +182,7 @@ namespace seeda {
 					format("User-Agent: SEEDA03 Post Client\n", fd);
 					format("Connection: close\n\n", fd);
 				}
-				client_.stop();
-				task_ = task::connect;
+				task_ = task::disconnect;
 				break;
 			
 			case task::disconnect:
@@ -186,18 +192,5 @@ namespace seeda {
 				break;
 			}
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ポスト
-		*/
-		//-----------------------------------------------------------------//
-		void post(const sample_t& t)
-		{
-
-		}
-
-
 	};
 }

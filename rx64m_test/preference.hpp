@@ -45,7 +45,7 @@ namespace seeda {
 				client_ip_{ 192, 168, 3, 7 },
 #endif
 				client_port_(3000),
-				write_path_{ "test.csv" }, write_limit_(60) { }
+				write_path_{ "00000" }, write_limit_(60) { }
 		};
 
 	private:

@@ -37,15 +37,17 @@ namespace seeda {
 
 		time_t		time_ref_;
 
+		uint32_t	unit_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		write_file() : limit_(60), count_(0), path_{ "test.csv" },
+		write_file() : limit_(60), count_(0), path_{ "00000" },
 			enable_(false), state_(false),
-			fp_(nullptr), time_ref_(0) { }
+			fp_(nullptr), time_ref_(0), unit_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -53,7 +55,10 @@ namespace seeda {
 			@brief  書き込み許可
 		*/
 		//-----------------------------------------------------------------//
-		void enable(bool ena = true) { enable_ = ena; }
+		void enable(bool ena = true) {
+			enable_ = ena;
+			count_ = 0;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -73,7 +78,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void set_path(const char* path)
 		{
-			strcpy(path_, path);
+			utils::format("%s", path_, sizeof(path_)) % path;
 		}
 
 
@@ -151,8 +156,8 @@ namespace seeda {
 				return;
 			}
 
+			time_t t = get_time();
 			{
-				time_t t = get_time();
 				if(time_ref_ != t) {
 					time_ref_ = t;
 					for(int i = 0; i < 8; ++i) {
@@ -161,38 +166,74 @@ namespace seeda {
 						fifo_.put(get_sample(i));
 					}
 //					utils::format("Write data injection...\n");
-				}
-			}
 
-			if(fp_ == nullptr) {
-				fp_ = fopen(path_, "wb");
-				count_ = 0;
-				if(fp_ == nullptr) {  // error then disable write.
-					utils::format("File open error: '%s'\n") % path_;
-					enable_ = false;
-				} else {
-					utils::format("Start write file: '%s'\n") % path_;
+					if(fp_ == nullptr) {
+						struct tm *m = localtime(&time_ref_);
+						char file[256];
+						utils::format("%s_%04d%02d%02d%02d%02d.csv", file, sizeof(file))
+							% path_
+							% static_cast<uint32_t>(m->tm_year + 1900)
+							% static_cast<uint32_t>(m->tm_mon + 1)
+							% static_cast<uint32_t>(m->tm_mday)
+							% static_cast<uint32_t>(m->tm_hour)
+							% static_cast<uint32_t>(m->tm_min);
+						fp_ = fopen(file, "wb");
+						unit_ = 0;
+						if(fp_ == nullptr) {  // error then disable write.
+							utils::format("File open error: '%s'\n") % file;
+							enable_ = false;
+						} else {
+							utils::format("Start write file: '%s'\n") % file;
+						}
+						char data[1024];
+						uint32_t l = 0;
+						l += (utils::format("DATE,TIME", &data[l], sizeof(data) - l)).get_length();
+						for(int i = 0; i < 8; ++i) {
+							l += (utils::format(",CH,MAX,MIN,AVE,MEDIAN,COUNTUP", &data[l], sizeof(data) - l)).get_length();
+						}
+						data[l] = '\n';
+						++l;
+						fwrite(data, 1, l, fp_);
+						return;
+					}
 				}
-				return;
 			}
 
 			if(fifo_.length() == 0) return;
 
-			sample_t t = fifo_.get();
-			char tmp[256];
-			if(t.ch_ == 0) {
-				auto tsz = disp_time(t.time_, tmp, sizeof(tmp));
-				tmp[tsz] = '\n';
-				++tsz;
-				fwrite(tmp, 1, tsz, fp_);
-			}
+			sample_t smp = fifo_.get();
 
-			int sz = t.make_csv("\n", tmp, sizeof(tmp));
-			fwrite(tmp, 1, sz, fp_);
+			char data[2048];
+			uint32_t l = 0;
+			struct tm *m = localtime(&smp.time_);
+			l += (utils::format("%04d/%02d/%02d,%02d:%02d:%02d,", &data[l], sizeof(data) - l)
+				% static_cast<uint32_t>(m->tm_year + 1900)
+				% static_cast<uint32_t>(m->tm_mon + 1)
+				% static_cast<uint32_t>(m->tm_mday)
+				% static_cast<uint32_t>(m->tm_hour)
+				% static_cast<uint32_t>(m->tm_min)
+				% static_cast<uint32_t>(m->tm_sec)).get_length();
+			l += smp.make_csv2(&data[l], sizeof(data) - l);
+			if(smp.ch_ < 7) {
+				data[l] = ',';
+				++l;
+			}
+			l += smp.make_csv2(&data[l], sizeof(data) - l);
+			if(smp.ch_ == 7) {
+				data[l] = '\n';
+				++l;
+			}
+			fwrite(data, 1, l, fp_);
 //			utils::format("Write ch: %d\n") % t.ch_;
 
-			if(t.ch_ == 7) {  // last channnel
+			if(smp.ch_ == 7) {  // last channnel
 				++count_;
+				++unit_;
+				if(unit_ >= 60) {  // change file.
+					fclose(fp_);
+					fp_ = nullptr;
+				}
+
 				if(count_ >= limit_) {
 					fclose(fp_);
 					fp_ = nullptr;

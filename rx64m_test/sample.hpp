@@ -90,6 +90,30 @@ namespace seeda {
 				% tail).get_length();
 			return sz;
 		}
+
+
+		int make_csv2(char* dst, uint32_t size) const
+		{
+			char min[16];
+			value_convert(min_,     min, sizeof(min));
+			char max[16];
+			value_convert(max_,     max, sizeof(max));
+			char ave[16];
+			value_convert(average_, ave, sizeof(ave));
+			char med[16];
+			value_convert(median_,  med, sizeof(med));
+
+			uint32_t count = limit_lo_count_ + limit_hi_count_;
+
+			int sz = (utils::format("%d,%s,%s,%s,%s,%u", dst, size)
+				% ch_
+				% max
+				% min
+				% ave
+				% med
+				% count).get_length();
+			return sz;
+		}
 	};
 
 

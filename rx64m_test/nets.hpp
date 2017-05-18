@@ -488,7 +488,7 @@ namespace seeda {
 
 			{  // ファイル書き込み設定
 				format("<form method=\"POST\" action=\"/cgi/set_write.cgi\">\n", fd);
-				format("<table><tr><td>ファイル名：</td>", fd);
+				format("<table><tr><td>ファイル名(ベース)：</td>", fd);
 				if(!write_file_.get_enable()) {
 					format("<td><input type=\"text\" name=\"fname\" size=\"16\" value=\"%s\"></td></tr>\n", fd)
 						% write_file_.get_path();
