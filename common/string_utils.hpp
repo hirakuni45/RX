@@ -300,6 +300,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	FatFS が使う時間取得関数
+			@param[in]	t	グリニッチ標準時間
 			@return	FatFS 形式の時刻ビットフィールドを返す。@n
 			        現在のローカル・タイムがDWORD値にパックされて返されます。@n
 					ビット・フィールドは次に示すようになります。@n
@@ -314,7 +315,8 @@ namespace utils {
 		static DWORD get_fattime(time_t t)
 		{
 //			t = 0;	/* 1970 01-01 00:00:00 */
-			struct tm *tp = localtime(&t);
+//			struct tm *tp = localtime(&t);
+			struct tm *tp = gmtime(&t);
 
 #ifdef DEBUG_
 			format("get_fattime: (source) %4d/%d/%d/ %02d:%02d:%02d\n")
@@ -342,7 +344,7 @@ namespace utils {
 			@brief	FatFS が扱う時間値から、time_t への変換
 			@param[in]	date	日付
 			@param[in]	time	時間
-			@return 標準時間値
+			@return GMT 標準時間値
 		*/
 		//-----------------------------------------------------------------//
 		static time_t fatfs_time_to(WORD date, WORD time)
@@ -366,7 +368,7 @@ namespace utils {
 			ttm.tm_mon  = ((date >> 5) & 0xf) - 1;
 			ttm.tm_year = ((date >> 9) & 0x7f) + 1980 - 1900;
 
-			return mktime(&ttm);
+			return mktime_gmt(&ttm);
 		}
 
 
