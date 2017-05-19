@@ -53,7 +53,7 @@ namespace seeda {
 			case mode::real:
 				{
 					float a = static_cast<float>(src) / 65535.0f * gain_ + offset_;
-					utils::format("%6.2f", dst, size) % a;
+					utils::format("%3.2f", dst, size) % a;
 				}
 				break;
 			default:

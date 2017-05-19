@@ -37,17 +37,15 @@ namespace seeda {
 
 		time_t		time_ref_;
 
-		uint32_t	unit_;
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		write_file() : limit_(60), count_(0), path_{ "00000" },
+		write_file() : limit_(5), count_(0), path_{ "00000" },
 			enable_(false), state_(false),
-			fp_(nullptr), time_ref_(0), unit_(0) { }
+			fp_(nullptr), time_ref_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -160,11 +158,6 @@ namespace seeda {
 			{
 				if(time_ref_ != t) {
 					time_ref_ = t;
-					for(int i = 0; i < 8; ++i) {
-						at_sample(i).time_ = t;
-						at_sample(i).ch_ = i;
-						fifo_.put(get_sample(i));
-					}
 //					utils::format("Write data injection...\n");
 
 					if(fp_ == nullptr) {
@@ -178,7 +171,6 @@ namespace seeda {
 							% static_cast<uint32_t>(m->tm_hour)
 							% static_cast<uint32_t>(m->tm_min);
 						fp_ = fopen(file, "wb");
-						unit_ = 0;
 						if(fp_ == nullptr) {  // error then disable write.
 							utils::format("File open error: '%s'\n") % file;
 							enable_ = false;
@@ -194,7 +186,13 @@ namespace seeda {
 						data[l] = '\n';
 						++l;
 						fwrite(data, 1, l, fp_);
-						return;
+						fifo_.clear();
+					}
+					for(int i = 0; i < 8; ++i) {
+						auto smp = get_sample(i);
+						smp.time_ = t;
+						smp.ch_ = i;
+						fifo_.put(smp);
 					}
 				}
 			}
@@ -206,15 +204,15 @@ namespace seeda {
 			char data[2048];
 			uint32_t l = 0;
 			struct tm *m = localtime(&smp.time_);
-			l += (utils::format("%04d/%02d/%02d,%02d:%02d:%02d,", &data[l], sizeof(data) - l)
-				% static_cast<uint32_t>(m->tm_year + 1900)
-				% static_cast<uint32_t>(m->tm_mon + 1)
-				% static_cast<uint32_t>(m->tm_mday)
-				% static_cast<uint32_t>(m->tm_hour)
-				% static_cast<uint32_t>(m->tm_min)
-				% static_cast<uint32_t>(m->tm_sec)).get_length();
-			l += smp.make_csv2(&data[l], sizeof(data) - l);
-			if(smp.ch_ < 7) {
+			if(smp.ch_ == 0) {
+				l += (utils::format("%04d/%02d/%02d,%02d:%02d:%02d,", &data[l], sizeof(data) - l)
+					% static_cast<uint32_t>(m->tm_year + 1900)
+					% static_cast<uint32_t>(m->tm_mon + 1)
+					% static_cast<uint32_t>(m->tm_mday)
+					% static_cast<uint32_t>(m->tm_hour)
+					% static_cast<uint32_t>(m->tm_min)
+					% static_cast<uint32_t>(m->tm_sec)).get_length();
+			} else {
 				data[l] = ',';
 				++l;
 			}
@@ -227,17 +225,16 @@ namespace seeda {
 //			utils::format("Write ch: %d\n") % t.ch_;
 
 			if(smp.ch_ == 7) {  // last channnel
-				++count_;
-				++unit_;
-				if(unit_ >= 60) {  // change file.
+				if(m->tm_sec == 59) {  // change file.
 					fclose(fp_);
 					fp_ = nullptr;
+					++count_;
 				}
 
 				if(count_ >= limit_) {
 					fclose(fp_);
 					fp_ = nullptr;
-					utils::format("Close write file: %d sec\n") % count_;
+					utils::format("Fin write file: %d sec\n") % count_;
 					enable_ = false;
 				}
 			}

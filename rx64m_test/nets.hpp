@@ -495,7 +495,7 @@ namespace seeda {
 				} else {
 					format("<td>%s</td></tr>\n", fd) % write_file_.get_path();
 				}
-				format("<tr><td>書き込み時間（秒）：</td>", fd);
+				format("<tr><td>書き込み数：</td>", fd);
 				if(!write_file_.get_enable()) {
 					format("<td><input type=\"text\" name=\"count\" size=\"16\" value=\"%d\"></td></tr>\n", fd)
 						% write_file_.get_limit();
