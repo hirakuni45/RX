@@ -65,11 +65,8 @@
 #endif
 
 
-void install_timer_task(void (*task)(void));
-
-
 //TCP/IP stack handle
-/// OsTask *netTaskHandle;
+OsTask *netTaskHandle;
 //Mutex preventing simultaneous access to the TCP/IP stack
 OsMutex netMutex;
 //Event object to receive notifications from device drivers
@@ -292,13 +289,12 @@ error_t netInit(void)
       NULL, netTaskStack, NET_TASK_STACK_SIZE, NET_TASK_PRIORITY);
 #else
    //Create a task to handle TCP/IP events
-///   netTaskHandle = osCreateTask("TCP/IP Stack", (OsTaskCode) netTask,
-///      NULL, NET_TASK_STACK_SIZE, NET_TASK_PRIORITY);
-	install_timer_task(netTask);
+   netTaskHandle = osCreateTask("TCP/IP Stack", (OsTaskCode) netTask,
+      NULL, NET_TASK_STACK_SIZE, NET_TASK_PRIORITY);
 
    //Unable to create the task?
-///   if(netTaskHandle == OS_INVALID_HANDLE)
-///      return ERROR_OUT_OF_RESOURCES;
+   if(netTaskHandle == OS_INVALID_HANDLE)
+      return ERROR_OUT_OF_RESOURCES;
 #endif
 
 #if (NET_RTOS_SUPPORT == DISABLED)
