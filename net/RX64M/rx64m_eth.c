@@ -162,6 +162,11 @@ error_t rx64mEthInit(NetInterface *interface)
    //Set the lower 16 bits of the MAC address
    ETHERC.MALR.BIT.MA = (interface->macAddr.b[4] << 8) | interface->macAddr.b[5];
 
+   TRACE_INFO("MAC: %02X-%02X-%02X-%02X-%02X-%02X\r\n",
+		interface->macAddr.b[0], interface->macAddr.b[1], interface->macAddr.b[2],
+		interface->macAddr.b[3], interface->macAddr.b[4], interface->macAddr.b[5]
+   );
+
    //Set descriptor length (16 bytes)
    EDMAC.EDMR.BIT.DL = 0;
    //Select little endian mode
