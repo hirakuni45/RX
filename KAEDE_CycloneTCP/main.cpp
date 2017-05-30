@@ -30,6 +30,8 @@
 
 namespace {
 
+	void (*nic_task_)(void);
+
 	class cmt_task {
 
 		void (*task_)(void);
@@ -40,9 +42,9 @@ namespace {
 		void operator() () {
 			systemTicks += 10;
 
-			if(task_ != nullptr) {
-				(*task_)();
-			}
+//			if(task_ != nullptr) {
+//				(*task_)();
+//			}
 		}
 
 		void set_task(void (*task)()) { task_ = task; }
@@ -260,7 +262,8 @@ extern "C" {
 
 	void install_timer_task(void (*task)(void))
 	{
-		cmt_.at_task().set_task(task);
+//		cmt_.at_task().set_task(task);
+		nic_task_ = task;
 	}
 
 
@@ -354,34 +357,32 @@ int main(int argc, char** argv)
 
 	//Initialize network interface
 	error = netConfigInterface(interface);
-	//Any error to report?
-	if(error) {
+	if(error) {  // Any error to report?
 		//Debug message
 		TRACE_ERROR("Failed to configure interface %s!\r\n", interface->name);
 	}
 
 #if (IPV4_SUPPORT == ENABLED)
 #if (APP_USE_DHCP == ENABLED)
-	//Get default settings
+	// Get default settings
 	dhcpClientGetDefaultSettings(&dhcpClientSettings_);
-	//Set the network interface to be configured by DHCP
+	// Set the network interface to be configured by DHCP
 	dhcpClientSettings_.interface = interface;
-	//Disable rapid commit option
+	// Disable rapid commit option
 	dhcpClientSettings_.rapidCommit = FALSE;
 
-	//DHCP client initialization
+	// DHCP client initialization
 	error = dhcpClientInit(&dhcpClientContext_, &dhcpClientSettings_);
-	//Failed to initialize DHCP client?
-	if(error) {
-		//Debug message
+	if(error) {  // Failed to initialize DHCP client?
+		// Debug message
 		TRACE_ERROR("Failed to initialize DHCP client!\r\n");
 	}
 
-	//Start DHCP client
+	// Start DHCP client
 	error = dhcpClientStart(&dhcpClientContext_);
-	//Failed to start DHCP client?
+	// Failed to start DHCP client?
 	if(error) {
-		//Debug message
+		// Debug message
 		TRACE_ERROR("Failed to start DHCP client!\r\n");
 	}
 #else
@@ -410,6 +411,11 @@ int main(int argc, char** argv)
 	uint32_t cnt = 0;
 	while(1) {
 		cmt_.sync();
+
+		if(nic_task_ != nullptr) {
+			(*nic_task_)();
+		}
+
 
 		sdc_.service();
 
