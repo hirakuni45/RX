@@ -17,7 +17,7 @@ namespace {
 	seeda::nets		nets_;
 
 	seeda::SPI		spi_;
-	seeda::SDC		sdc_(spi_, 20000000);
+	seeda::SDC		sdc_(spi_, 120000000);
 
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
