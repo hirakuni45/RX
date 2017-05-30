@@ -57,7 +57,7 @@ namespace chip {
 			CS::P = 0;
 			spi_.xchg(0x03);
 			spi_.xchg(org);
-			spi_.read(dst, len);
+			spi_.recv(dst, len);
 			CS::P = 1;
 			return true;
 		}
@@ -77,7 +77,7 @@ namespace chip {
 			CS::P = 0;
 			spi_.xchg(0x02);
 			spi_.xchg(org);
-			spi_.write(src, len);
+			spi_.send(src, len);
 			CS::P = 1;
 			return true;
 		}
