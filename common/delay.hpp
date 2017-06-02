@@ -23,19 +23,35 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ループ
+			@param[in]	cnt	ループ回数
+		*/
+		//-----------------------------------------------------------------//
+		static void loop(uint32_t cnt)
+		{
+			while(cnt > 0) {
+				asm("nop");
+				--cnt;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  マイクロ秒単位の待ち @n
 					あまり正確では無く、速度に関連する設定に依存します。
 			@param[in]	us	待ち時間（マイクロ秒）
 		*/
 		//-----------------------------------------------------------------//
-		static void micro_second(uint32_t us) {
+		static void micro_second(uint32_t us)
+		{
 			while(us > 0) {
 #if defined(SIG_RX64M) || defined(SIG_RX63T)
-				for(uint32_t n = 0; n < (F_PCKA / 4285714); ++n) {
+				for(uint32_t n = 0; n < (F_ICK / 4285714); ++n) {
 					asm("nop");
 				}
 #elif defined(SIG_RX24T)
-				for(uint32_t n = 0; n < (F_PCKA / 5333333); ++n) {
+				for(uint32_t n = 0; n < (F_ICK / 5333333); ++n) {
 					asm("nop");
 				}
 #else
@@ -52,7 +68,8 @@ namespace utils {
 			@param[in]	ms	待ち時間（ミリ秒）
 		*/
 		//-----------------------------------------------------------------//
-		static void milli_second(uint32_t ms) {
+		static void milli_second(uint32_t ms)
+		{
 			for(uint32_t i = 0; i < ms; ++i) {
 				micro_second(1000);
 			}
