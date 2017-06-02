@@ -2,6 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	EUI-48/EUI-64 EEPROM クラス @n
+			25AA02E48/25AA02E64 @n
 			Copyright 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
@@ -19,8 +20,35 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SPI, class CS>
 	class EUI_XX {
+	public:
+		static const uint8_t eui48_org = 0xFA;
+ 		static const uint8_t eui64_org = 0xF8;
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  Block Protection
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class BP : uint8_t {
+			none,	///< none
+			upq,	///< Upper 1/4 (0xC0 to 0xFF)
+			uph,	///< Upper 1/2 (0x80 to 0xFF)
+			all,	///< All (0x00 to 0xFF)
+		};
+
+	private:
 
 		SPI&	spi_;
+
+		bool get_write_busy_() const
+		{
+			utils::delay::loop(10);
+			CS::P = 0;
+			spi_.xchg(0x05);  // read state
+			uint8_t v = spi_.xchg(0x00);
+			CS::P = 1;
+			return (v & 1) != 0;		
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -34,18 +62,24 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
+			@param	bp	ブロック・プロテクション
 		 */
 		//-----------------------------------------------------------------//
-		void start()
+		void start(BP bp = BP::upq)
 		{
 			CS::DIR = 1;
 			CS::PU  = 0;
+
+			CS::P = 0;
+			spi_.xchg(0x01);  // write status
+			spi_.xchg(static_cast<uint8_t>(bp) << 2);
+			CS::P = 1;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	書き込み
+			@brief	読み込み
 			@param[in]	org	開始アドレス
 			@param[out]	dst	ディストネーション・アドレス
 			@param[in]	len	長さ（最大１６）
@@ -54,6 +88,9 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		bool read(uint8_t org, uint8_t* dst, uint8_t len)
 		{
+			while(get_write_busy_()) ;
+
+			utils::delay::loop(10);
 			CS::P = 0;
 			spi_.xchg(0x03);
 			spi_.xchg(org);
@@ -74,6 +111,14 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		bool write(uint8_t org, const uint8_t* src, uint8_t len)
 		{
+			while(get_write_busy_()) ;
+
+			utils::delay::loop(10);
+			CS::P = 0;
+			spi_.xchg(0x06);  // write enable
+			CS::P = 1;
+
+			utils::delay::loop(10);
 			CS::P = 0;
 			spi_.xchg(0x02);
 			spi_.xchg(org);
