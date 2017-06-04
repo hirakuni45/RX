@@ -86,7 +86,7 @@ namespace chip {
 			@return 正常なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool read(uint8_t org, uint8_t* dst, uint8_t len)
+		bool read(uint8_t org, void* dst, uint8_t len)
 		{
 			while(get_write_busy_()) ;
 
@@ -109,7 +109,7 @@ namespace chip {
 			@return 正常なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool write(uint8_t org, const uint8_t* src, uint8_t len)
+		bool write(uint8_t org, const void* src, uint8_t len)
 		{
 			while(get_write_busy_()) ;
 
