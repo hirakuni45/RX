@@ -111,19 +111,28 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		bool write(uint8_t org, const void* src, uint8_t len)
 		{
-			while(get_write_busy_()) ;
+			while(len > 0) {
 
-			utils::delay::loop(10);
-			CS::P = 0;
-			spi_.xchg(0x06);  // write enable
-			CS::P = 1;
+				while(get_write_busy_()) ;
 
-			utils::delay::loop(10);
-			CS::P = 0;
-			spi_.xchg(0x02);
-			spi_.xchg(org);
-			spi_.send(src, len);
-			CS::P = 1;
+				utils::delay::loop(10);
+				CS::P = 0;
+				spi_.xchg(0x06);  // write enable
+				CS::P = 1;
+
+				uint8_t l = len;
+				if(l > 16) l = 16;
+
+				utils::delay::loop(10);
+				CS::P = 0;
+				spi_.xchg(0x02);
+				spi_.xchg(org);
+				spi_.send(src, l);
+				CS::P = 1;
+
+				len -= l;
+				org += l;
+			}
 			return true;
 		}
 	};
