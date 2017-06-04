@@ -144,14 +144,10 @@ namespace seeda {
 						ip_[1] = 168;
 						ip_[2] = 1;
 						ip_[3] = 22;
+						dhcp_ = false;
 					}
 					write_eui_();
 				}
-			}
-
-			// develope の場合、常に DHCP は有効
-			if(dev) {
-				dhcp_ = true;
 			}
 
 			{
@@ -160,13 +156,20 @@ namespace seeda {
 				eui_.read(EUI::eui48_org, tmp, 6);
 				if(  tmp[0] == 0xff && tmp[1] == 0xff && tmp[2] == 0xff
 				  && tmp[3] == 0xff && tmp[4] == 0xff && tmp[5] == 0xff) {
+
 				} else if(tmp[0] == 0x00 && tmp[1] == 0x00 && tmp[2] == 0x00
 					   && tmp[3] == 0x00 && tmp[4] == 0x00 && tmp[5] == 0x00) {
+
 				} else {
 					for(int i = 0; i < 6; ++i) {
 						mac_[i] = tmp[i];
 					}
 				}
+			}
+
+			// develope の場合、常に DHCP は有効
+			if(dev) {
+				dhcp_ = true;
 			}
 #endif
 		}
