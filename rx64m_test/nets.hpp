@@ -11,7 +11,6 @@
 #include "rx64m_test/main.hpp"
 #include "common/string_utils.hpp"
 #include "chip/NTCTH.hpp"
-#include "chip/EUI_XX.hpp"
 
 #include "write_file.hpp"
 #include "client.hpp"
@@ -62,9 +61,6 @@ namespace seeda {
 		};
 		server_task		server_task_;
 
-		typedef utils::line_manage<2048, 20> LINE_MAN;
-		LINE_MAN	line_man_;
-
 		uint32_t	disconnect_loop_;
 
 		// サーミスタ定義
@@ -74,24 +70,12 @@ namespace seeda {
 
 		write_file	write_file_;
 
-#ifdef SEEDA
-		// mac address rom I/F
-		typedef device::PORT<device::PORT1, device::bitpos::B5> MISO;
-		typedef device::PORT<device::PORT1, device::bitpos::B6> MOSI;
-		typedef device::PORT<device::PORT1, device::bitpos::B7> SPCK;
-		typedef device::spi_io<MISO, MOSI, SPCK> SPI;
-
-		typedef device::PORT<device::PORT1, device::bitpos::B4> EUI_CS;
-		typedef chip::EUI_XX<SPI, EUI_CS> EUI_XX;
-		SPI		spi_;
-		EUI_XX	eui_;
-#endif
-
 		setup	setup_;
 		cgi		cgi_;
 
-		//-------------------------------------------------------------------------//
+		bool 	develope_;
 
+		//-------------------------------------------------------------------------//
 
 		typedef utils::basic_format<net::eth_chaout> format;
 
@@ -137,35 +121,6 @@ namespace seeda {
 				t.make_csv(tail, tmp, sizeof(tmp));
 				format("%s", fd) % tmp;
 			}
-		}
-
-
-		// クライアントからの応答を解析して終端（空行）があったら「true」
-		int analize_request_()
-		{
-			char tmp[512];
-			int len = server_.read(tmp, sizeof(tmp));
-
-			for(int i = 0; i < len; ++i) {
-				char ch = tmp[i];
-				if(ch == 0 || ch == 0x0d) continue;
-				if(!line_man_.add(ch)) {
-					utils::format("line_man: memory over\n");
-					return -1;
-				}
-			}
-			if(static_cast<size_t>(len) < sizeof(tmp)) {
-				line_man_.set_term();
-				if(!line_man_.empty()) {
-					for(uint32_t i = 0; i < line_man_.size(); ++i) {
-						const char* p = line_man_[i];
-						if(p[0] == 0) {  // 応答の終端！（空行）
-							return i;
-						}
-					}
-				}
-			}
-			return -1;
 		}
 
 
@@ -266,20 +221,20 @@ namespace seeda {
 				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
 
-			format("<style type=\"text/css\">\n", fd);
-			format(".table5 {\n", fd);
-			format("  border-collapse: collapse;\n", fd);
-			format("  width: 600px;\n", fd);
-			format("}\n", fd);
-			format(".table5 th {\n", fd);
+			format("<style type=\"text/css\">", fd);
+			format(".table5 {", fd);
+			format("  border-collapse: collapse;", fd);
+			format("  width: 600px;", fd);
+			format("}", fd);
+			format(".table5 th {", fd);
 			format("  background-color: #cccccc;\n", fd);
-			format("}\n", fd);
-			format(".table5 td {\n", fd);
-			format("  text-align: center;\n", fd);
-			format("}\n", fd);
+			format("}", fd);
+			format(".table5 td {", fd);
+			format("  text-align: center;", fd);
+			format("}", fd);
 			format("</style>\n", fd);
 
-			format("<table class=\"table5\" border=1>\n", fd);
+			format("<table class=\"table5\" border=1>", fd);
 			format(" <tr><th>チャネル</th><th>表示</th><th>最小値</th><th>最大値</th><th>平均</th>"
 					  "<th>下限</th><th>下限数</th>"
 					  "<th>上限</th><th>上限数</th><th>Median</th></tr>\n", fd);
@@ -376,6 +331,31 @@ namespace seeda {
 		}
 
 
+		void startup_()
+		{
+			setup_.init_eui(develope_);
+			const uint8_t* ips = setup_.get_ip();
+			const uint8_t* mac = setup_.get_mac();
+
+			net::ip_address ipa(ips[0], ips[1], ips[2], ips[3]);
+			if(setup_.get_dhcp()) {
+				if(ethernet_.begin(mac) == 0) {
+					utils::format("Ethernet Fail: begin (DHCP)...\n");
+					utils::format("SetIP: ");
+					ethernet_.begin(mac, ipa);
+				} else {
+					utils::format("DHCP: ");
+				}
+			} else {
+				ethernet_.begin(mac, ipa);
+				utils::format("SetIP: ");
+			}
+			utils::format("%s\n") % ethernet_.get_local_ip().c_str();
+
+			// FTP Server
+			ftp_.start();
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -384,12 +364,10 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		nets() : server_(ethernet_), ftp_(ethernet_, at_sdc()), client_(ethernet_),
 			count_(0), server_task_(server_task::begin_http),
-			line_man_(0x0a), disconnect_loop_(0),
+			disconnect_loop_(0),
 			write_file_(),
-#ifdef SEEDA
-			spi_(), eui_(spi_),
-#endif
-			setup_(write_file_, client_), cgi_(write_file_, client_)
+			setup_(write_file_, client_), cgi_(write_file_, client_, setup_),
+			develope_(true)
 			{ }
 
 
@@ -420,56 +398,11 @@ namespace seeda {
 			ethernet_.start();
 
 #ifdef SEEDA
-			uint8_t mac[6];
-			spi_.start_sdc(4000000);
-			eui_.start();
-
-			mac[0] = 0xDE;
-			mac[1] = 0xAD;
-			mac[2] = 0xBE;
-			mac[3] = 0xEF;
-			mac[4] = 0xFE;
-			mac[5] = 0xED;
-			eui_.write(0, mac, 6);
-
-			eui_.read(0, mac, 6);
-
-			utils::format("%02X, %02X, %02X, %02X, %02X, %02X\n")
-				% static_cast<uint32_t>(mac[0])
-				% static_cast<uint32_t>(mac[1])
-				% static_cast<uint32_t>(mac[2])
-				% static_cast<uint32_t>(mac[3])
-				% static_cast<uint32_t>(mac[4])
-				% static_cast<uint32_t>(mac[5]);
-#endif
-			static const uint8_t mac_[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-
-			bool develope = true;
-#ifdef SEEDA
 			if(get_switch() != 0) {
-				develope = false;
+				develope_ = false;
 			}
 #endif
-
-			if(develope) {
-				if(ethernet_.begin(mac_) == 0) {
-					utils::format("Ethernet Fail: begin (DHCP)...\n");
-
-					utils::format("SetIP: ");
-					net::ip_address ipa(192, 168, 3, 20);
-					ethernet_.begin(mac_, ipa);
-				} else {
-					utils::format("DHCP: ");
-				}
-			} else {
-				net::ip_address ipa(192, 168, 1, 22);
-				ethernet_.begin(mac_, ipa);
-				utils::format("SetIP: ");
-			}
-			utils::format("%s\n") % ethernet_.get_local_ip().c_str();
-
-			// FTP Server
-			ftp_.start();
+			startup_();
 		}
 
 
@@ -507,7 +440,7 @@ namespace seeda {
 				if(server_.connected()) {
 					utils::format("New http connected, form: %s\n") % server_.get_from_ip().c_str();
 					++count_;
-					line_man_.clear();
+					cgi_.at_line_man().clear();
 					server_task_ = server_task::main_loop;
 				}
 				break;
@@ -519,12 +452,14 @@ namespace seeda {
 						break;
 					}
 					int fd = server_.get_cepid();
-					auto pos = analize_request_();
+					char tmp[512];
+					int len = server_.read(tmp, sizeof(tmp));
+					auto pos = cgi_.analize_request(tmp, len);
 					if(pos > 0) {
 						char path[256];
 						path[0] = 0;
-						if(!line_man_.empty()) {
-							const auto& t = line_man_[0];
+						if(!cgi_.at_line_man().empty()) {
+							const auto& t = cgi_.at_line_man()[0];
 							if(strncmp(t, "GET ", 4) == 0) {
 								get_path_(t + 4, path);
 							} else if(strncmp(t, "POST ", 5) == 0) {
@@ -538,11 +473,11 @@ namespace seeda {
 							render_root_(fd);
 						} else if(strncmp(path, "/cgi/", 5) == 0) {
 							cgi_.select(fd, path, pos);
-							setup_.render_main(fd);
+							setup_.render_main(fd, develope_);
 						} else if(strcmp(path, "/data") == 0) {
 							render_data_(fd);
 						} else if(strcmp(path, "/setup") == 0) {
-							setup_.render_main(fd);
+							setup_.render_main(fd, develope_);
 						} else if(strcmp(path, "/client") == 0) {
 							setup_.render_client(fd);
 						} else if(strcmp(path, "/files") == 0) {
@@ -581,9 +516,9 @@ namespace seeda {
 
 			client_.service();
 
-			ftp_.service();
-
 			write_file_.service();
+
+			ftp_.service();
 
 			cgi_.service();
 		}

@@ -7,6 +7,7 @@
 */
 //=====================================================================//
 #include <map>
+#include <complex>
 #include "common/format.hpp"
 #include "common/time.h"
 
@@ -40,11 +41,13 @@ namespace seeda {
 		uint16_t	average_;
 		uint16_t	median_;
 
+		bool		abs_;
+
 		sample_t() : gain_(1024.0f), offset_(0.0f),
 			limit_lo_count_(0), limit_hi_count_(0), limit_lo_level_(30000), limit_hi_level_(40000),
 			time_(0),
 			ch_(0), mode_(mode::none),
-			min_(0), max_(0), average_(0), median_(0) { }
+			min_(0), max_(0), average_(0), median_(0), abs_(false) { }
 
 
 		void value_convert(uint16_t src, char* dst, uint32_t size) const
@@ -53,6 +56,9 @@ namespace seeda {
 			case mode::real:
 				{
 					float a = static_cast<float>(src) / 65535.0f * gain_ + offset_;
+					if(abs_) {
+						a = std::abs(a);
+					}
 					utils::format("%3.2f", dst, size) % a;
 				}
 				break;

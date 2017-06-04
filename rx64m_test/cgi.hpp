@@ -14,6 +14,7 @@
 #include "write_file.hpp"
 #include "preference.hpp"
 #include "client.hpp"
+#include "setup.hpp"
 
 namespace seeda {
 
@@ -23,17 +24,22 @@ namespace seeda {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class cgi {
-
-		write_file&	write_file_;
-
-		client&		client_;
-
+	public:
 		typedef utils::line_manage<2048, 20> LINE_MAN;
+
+	private:
+		write_file&	write_file_;
+		client&		client_;
+		setup&		setup_;
+
 		LINE_MAN	line_man_;
 
 		preference	pre_;
 
 		uint32_t	startup_delay_;
+
+		bool		dhcp_;
+		uint8_t		ip_[4];
 
 		typedef utils::basic_format<net::eth_chaout> format;
 
@@ -62,8 +68,49 @@ namespace seeda {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		cgi(write_file& wf, client& cl) : write_file_(wf), client_(cl),
-			line_man_(0x0a), pre_(), startup_delay_(100) { }
+		cgi(write_file& wf, client& cl, setup& stu) : write_file_(wf), client_(cl), setup_(stu),
+			line_man_(0x0a),
+			pre_(), startup_delay_(100), dhcp_(false), ip_{ 0 } { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief ライン・マネージャーへの参照
+			@return ライン・マネージャー
+		*/
+		//-----------------------------------------------------------------//
+		LINE_MAN& at_line_man() { return line_man_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief クライアントからの応答を解析して終端（空行）があったら行数を返す
+			@return 行数
+		*/
+		//-----------------------------------------------------------------//
+		int analize_request(const char* tmp, int len)
+		{
+			for(int i = 0; i < len; ++i) {
+				char ch = tmp[i];
+				if(ch == 0 || ch == 0x0d) continue;
+				if(!line_man_.add(ch)) {
+					utils::format("line_man: memory over\n");
+					return -1;
+				}
+			}
+			if(len > 0) {
+				line_man_.set_term();
+				if(!line_man_.empty()) {
+					for(uint32_t i = 0; i < line_man_.size(); ++i) {
+						const char* p = line_man_[i];
+						if(p[0] == 0) {  // 応答の終端！（空行）
+							return i;
+						}
+					}
+				}
+			}
+			return -1;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -96,6 +143,7 @@ namespace seeda {
 				utils::str::url_encode_to_str(line_man_[pos], body);
 //				utils::format("CGI param (str): '%s'\n") % body;
 			}
+
 
 			if(strcmp(path, "/cgi/set_rtc.cgi") == 0) {
 				typedef utils::parse_cgi_post<256, 2> CGI_RTC;
@@ -206,31 +254,61 @@ namespace seeda {
 				}
 			} else if(strcmp(path, "/cgi/del_pre.cgi") == 0) {
 				at_sdc().remove("seeda03.pre");
+			} else if(strcmp(path, "/cgi/set_ip.cgi") == 0) {
+				typedef utils::parse_cgi_post<256, 5> CGI_IP;
+				CGI_IP cgi;
+				cgi.parse(body);
+				dhcp_ = false;
+				for(uint32_t i = 0; i < cgi.size(); ++i) {
+					const auto& t = cgi.get_unit(i);
+					int n;
+					if(strcmp(t.key, "dhcp") == 0) {
+						if(strcmp(t.val, "on") == 0) {
+							dhcp_ = true;
+						}
+					} else if((utils::input("ip%d", t.key) % n).status()) {
+						if(n >= 0 && n <= 3) {
+							int v;
+							utils::input("%d", t.val) % v;
+							utils::format("%d, ") % v;
+							ip_[n] = v;
+						}
+						utils::format("\n");
+					}
+				}
+				setup_.write_eui(dhcp_, ip_);
 			}
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief サービス
+		*/
+		//-----------------------------------------------------------------//
 		void service()
 		{
-			if(startup_delay_) {
-				--startup_delay_;
-				if(startup_delay_ == 0) {
-					if(pre_.read()) {
-						for(int ch = 0; ch < 8; ++ch) {
-							at_sample(ch).mode_ = static_cast<sample_t::mode>(pre_.get().mode_[ch]);
-							at_sample(ch).gain_ = pre_.get().gain_[ch];
-							at_sample(ch).offset_ = pre_.get().offset_[ch];
-							at_sample(ch).limit_lo_level_ = pre_.get().limit_lo_level_[ch];
-							at_sample(ch).limit_hi_level_ = pre_.get().limit_hi_level_[ch];
-						}
-						for(int i = 0; i < 4; ++i) client_.at_ip()[i] = pre_.get().client_ip_[i];
-						client_.set_port(pre_.get().client_port_);
+			if(startup_delay_ == 0) {
+				return;
+			}
 
-						write_file_.set_path(pre_.get().write_path_);
-						write_file_.set_limit(pre_.get().write_limit_); 
+			--startup_delay_;
+			if(startup_delay_ == 0) {
+				if(pre_.read()) {
+					for(int ch = 0; ch < 8; ++ch) {
+						at_sample(ch).mode_ = static_cast<sample_t::mode>(pre_.get().mode_[ch]);
+						at_sample(ch).gain_ = pre_.get().gain_[ch];
+						at_sample(ch).offset_ = pre_.get().offset_[ch];
+						at_sample(ch).limit_lo_level_ = pre_.get().limit_lo_level_[ch];
+						at_sample(ch).limit_hi_level_ = pre_.get().limit_hi_level_[ch];
 					}
-					client_.start_connect();
+					for(int i = 0; i < 4; ++i) client_.at_ip()[i] = pre_.get().client_ip_[i];
+					client_.set_port(pre_.get().client_port_);
+
+					write_file_.set_path(pre_.get().write_path_);
+					write_file_.set_limit(pre_.get().write_limit_); 
 				}
+				client_.start_connect();
 			}
 		}
 	};
