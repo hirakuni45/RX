@@ -378,9 +378,10 @@ namespace utils {
 			@param[in]	src	ソース
 			@param[out]	dst	出力
 			@param[in]	len	出力長（０の場合サイズ検査無し）
+			@return 出力数
 		*/
 		//-----------------------------------------------------------------//
-		static void url_encode_to_str(const char* src, char* dst, uint32_t len = 0)
+		static uint32_t url_encode_to_str(const char* src, char* dst, uint32_t len = 0)
 		{
 			char ch;
 			uint8_t hex = 0;
@@ -407,6 +408,7 @@ namespace utils {
 				}
 			}
 			*dst = 0;
+			return l + 1;
 		}
 
 
@@ -416,9 +418,10 @@ namespace utils {
 			@param[in]	src	ソース
 			@param[out]	dst	出力
 			@param[in]	len	出力長（０の場合サイズ検査無し）
+			@return 出力数
 		*/
 		//-----------------------------------------------------------------//
-		static void url_decode_to_str(const char* src, char* dst, uint32_t len = 0)
+		static uint32_t url_decode_to_str(const char* src, char* dst, uint32_t len = 0)
 		{
 			char ch;
 			uint32_t l = 0;
@@ -444,6 +447,31 @@ namespace utils {
 				++l;
 			}
 			*dst = 0;
+			return l + 1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  パスワード隠し文字へ変換
+			@param[in]	cha	隠しキャラクター
+			@param[in]	src	ソース
+			@param[out]	dst	出力
+			@param[in]	len	出力長（０の場合サイズ検査無し）
+			@return 出力数
+		*/
+		//-----------------------------------------------------------------//
+		static uint32_t conv_pass_cha(char cha, const char* src, char* dst, uint32_t len = 0)
+		{
+			char ch;
+			uint32_t l = 0;
+			while((ch = *src++) != 0) {
+				if(len > 0 && l >= (len - 1)) break;
+				*dst++ = cha;
+				++l;
+			}
+			*dst = 0;
+			return l + 1;
 		}
 	};
 
