@@ -86,6 +86,20 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  接続先を取得
+			@return 接続先
+		*/
+		//-----------------------------------------------------------------//
+		const ip_address& get_from_ip() const {
+			const ethernet::CEP& cep = ethernet_.get_cep(cepid_);
+			uint32_t ipw = cep.dst_addr.ipaddr;
+			static ip_address ip((ipw >> 24) & 255, (ipw >> 16) & 255, (ipw >> 8) & 255, ipw & 255);
+			return ip;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  コネクション
 			@param[in]	ip		接続先の IP アドレス
 			@param[in]	port	接続ポート
