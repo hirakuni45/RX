@@ -757,6 +757,7 @@ namespace net {
 				break;
 
 			case ftp_command::SYST:
+				format("215 Renesas_RX64M single task OS.\n", ctrl_.get_cepid());
 				break;
 
 			case ftp_command::TYPE:
