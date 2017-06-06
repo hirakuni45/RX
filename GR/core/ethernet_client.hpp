@@ -30,9 +30,11 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
+			@param[in]	e	インサーネットへの参照
+			@param[in]	port	ポート番号
 		*/
 		//-----------------------------------------------------------------//
-		ethernet_client(ethernet& e) : ethernet_(e), cepid_(0), port_(0),
+		ethernet_client(ethernet& e, uint16_t port) : ethernet_(e), cepid_(0), port_(port),
 			close_count_(0) { }
 
 
@@ -94,7 +96,7 @@ namespace net {
 		bool connect(const ip_address& ip, uint16_t port, int32_t timeout = 1000)
 		{
 			if(cepid_ == 0) {
-				cepid_ = ethernet_.create(port);
+				cepid_ = ethernet_.create(port_);
 				if(cepid_ == 0) return false;
 				close_count_ = tcp_get_close_count(cepid_);
 			}
