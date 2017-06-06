@@ -3,8 +3,13 @@
 /*!	@file
 	@brief	FTP server class @n
 			・SFTP などの暗号化通信は、未サポート @n
-			・FFFTP: PASV(Enable):OK、PASV(Disable):NG @n
-			・FileZilla: 既定値（PORT）:OK、アクティブ（PASV?)：NG、パッシブ（PASV）：OK @n
+			・FFFTP: PASV(有効):OK、PASV(無効):NG @n
+			※PASV(無効) では PORT モードで接続するが、ネットワーク @n
+			が複数（WiFiやセカンダリーネットワーク）ある機種では、利用 @n
+			している IP アドレスを正しく取得しない為、正常に接続できない @n
+			ようだ、これは、FFFTP のバグ（仕様）と思える。@n
+			・FileZilla: 既定値 (PORT): OK、アクティブ： NG、パッシブ (PASV)： OK @n
+			※「アクティブ」の仕様が不明 @n
 			・ftp（MSYS2）:（PORT）OK @n
 			Copyright 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
