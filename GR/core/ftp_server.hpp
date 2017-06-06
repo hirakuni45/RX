@@ -906,7 +906,7 @@ namespace net {
         ftp_server(ethernet& e, SDC& sdc) : eth_(e), sdc_(sdc),
 			ctrl_(e), data_(e), port_(e, DATA_PORT),
 			task_(task::begin), line_man_('\n'),
-			user_{ "SEEDA03" }, pass_{ "SEEDA03" }, time_out_(0), delay_loop_(0),
+			user_{ 0 }, pass_{ 0 }, time_out_(0), delay_loop_(0),
 			param_(nullptr), data_ip_(), data_port_(0),
 			data_connect_loop_(0),
 			file_fp_(nullptr), file_total_(0), file_frame_(0), file_wait_(0),
@@ -917,10 +917,17 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  開始
+			@param[in]	user	ユーザー名
+			@param[in]	pass	パスワード
 		*/
 		//-----------------------------------------------------------------//
-		void start()
+		void start(const char* user, const char* pass)
 		{
+			if(user == nullptr || pass == nullptr) {
+				return;
+			}
+			strncpy(user_, user, sizeof(user_) - 1);
+			strncpy(pass_, pass, sizeof(pass_) - 1);
 			task_ = task::begin;
 		}
 
