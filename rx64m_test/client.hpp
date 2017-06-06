@@ -20,6 +20,8 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class client {
 
+		static const uint16_t PORT = 3000;	///< クライアント・ポート
+
 		net::ethernet_client	client_;
 
 		enum class task {
@@ -47,13 +49,13 @@ namespace seeda {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		client(net::ethernet& eth) : client_(eth), task_(task::startup),
+		client(net::ethernet& eth) : client_(eth, PORT), task_(task::startup),
 #ifdef SEEDA
 			ip_(192, 168, 1, 3),
 #else
 			ip_(192, 168, 3, 7),
 #endif
-			port_(3000),
+			port_(PORT),
 			delay_(0), timeout_(0), time_(0) { }
 
 
