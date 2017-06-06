@@ -353,7 +353,7 @@ namespace seeda {
 			utils::format("%s\n") % ethernet_.get_local_ip().c_str();
 
 			// FTP Server
-			ftp_.start();
+			ftp_.start("SEEDA03", "SEEDA03");
 		}
 
 	public:
