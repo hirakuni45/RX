@@ -2,6 +2,10 @@
 //=====================================================================//
 /*!	@file
 	@brief	FTP server class @n
+			・SFTP などの暗号化通信は、未サポート @n
+			・FFFTP: PASV(Enable):OK、PASV(Disable):NG @n
+			・FileZilla: 既定値（PORT）:OK、アクティブ（PASV?)：NG、パッシブ（PASV）：OK @n
+			・ftp（MSYS2）:（PORT）OK @n
 			Copyright 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
