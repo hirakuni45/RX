@@ -643,10 +643,10 @@ namespace net {
 				break;
 
 			case ftp_command::RNTO:
+//				if(param_ == nullptr || strlen(param_) == 0) {
+//					format("501 No file name\n", ctrl_.get_cepid());
+//				}
 #if 0
-  else if( ! strcmp( command, "RNTO" ))
-  {
-  Serial << buf << endl;
     char path[ FTP_CWD_SIZE ];
     char dir[ FTP_FIL_SIZE ];
     if( strlen( buf ) == 0 || ! rnfrCmd )
@@ -969,12 +969,12 @@ namespace net {
 						format("215 Renesas_RX64M single task OS.\n", ctrl_.get_cepid());
 					} else if(cmd == ftp_command::USER) {
 						if(strcmp(param_, user_) == 0) {
-							ftp_debug("FTP Server: USER OK: '%s'\n") % param_;
+							ftp_debug("FTP Server user OK: '%s'\n") % param_;
 							format("331 OK. %s User password required\n", ctrl_.get_cepid()) % param_;
 							line_man_.clear();
 							task_ = task::password;
 						} else {
-							ftp_debug("FTP Server: USER NG: '%s'\n") % param_;
+							ftp_debug("FTP Server user NG: '%s'\n") % param_;
 							format("530 %s User not found\n", ctrl_.get_cepid()) % param_;
 							task_ = task::disconnect;
 						}
@@ -992,12 +992,12 @@ namespace net {
 					ftp_command cmd = scan_command_(line_man_[0]);
 					if(cmd == ftp_command::PASS) {
 						if(strcmp(param_, pass_) == 0) {
-							ftp_debug("FTP Server: password OK: '%s'\n") % param_;
+							ftp_debug("FTP Server password OK: '%s'\n") % param_;
 							format("230 Login ok %s\n", ctrl_.get_cepid()) % user_;
 							line_man_.clear();
 							task_ = task::command;
 						} else {
-							ftp_debug("FTP Server: password NG: '%s'\n") % param_;
+							ftp_debug("FTP Server password NG: '%s'\n") % param_;
 							format("530 Password fail %s\n", ctrl_.get_cepid()) % user_;
 							task_ = task::disconnect;
 						}
@@ -1011,7 +1011,7 @@ namespace net {
 
 			case task::start_pasv:
 				data_.begin(DATA_PORT_PASV);
-				utils::format("Start FTP Server DATA (PASV): '%s' (%d) fd(%d)\n")
+				utils::format("Start FTP Server data (PASV): '%s' (%d) fd(%d)\n")
 					% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
 				data_connect_loop_ = 10 * 100;  // 10 sec
 				task_ = task::data_connection;
@@ -1019,8 +1019,10 @@ namespace net {
 
 			case task::data_connection:
 				if(data_.connected()) {
-					ftp_debug("FTP Server (DATA): connect form: '%s' (%d)\n")
-						% ctrl_.get_from_ip().c_str() % data_.get_port();
+					ftp_debug("Connection FTP Server data (PASV): '%s' %d [ms] (%d)\n")
+						% data_.get_from_ip().c_str()
+						% static_cast<int>(data_connect_loop_ * 10)
+						% data_.get_port();
 					task_ = task::command;
 					line_man_.clear();
 					pasv_enable_ = true;
@@ -1036,16 +1038,18 @@ namespace net {
 
 			case task::start_port:
 				port_.connect(data_ip_, data_port_, TMO_NBLK);
-				utils::format("Start FTP Server PORT connection: '%s' (%d) fd(%d)\n")
-					% eth_.get_local_ip().c_str() % port_.get_port() % port_.get_cepid();
+				utils::format("Start FTP Server data (PORT): '%s' (%d) fd(%d)\n")
+					% data_ip_.c_str() % data_port_ % port_.get_cepid();
 				data_connect_loop_ = 10 * 100;  // 10 sec
 				task_ = task::port_connection;
 				break;
 
 			case task::port_connection:
 				if(port_.connected()) {
-					ftp_debug("FTP Server (PORT): connect form: '%s' (%d)\n")
-						% ctrl_.get_from_ip().c_str() % port_.get_port();
+					ftp_debug("Connection FTP Server data (PORT): '%s' %d [ms] (%d)\n")
+						% port_.get_from_ip().c_str()
+						% static_cast<int>(data_connect_loop_ * 10)
+						% port_.get_port();
 					task_ = task::command;
 					line_man_.clear();
 					pasv_enable_ = false;
