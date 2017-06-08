@@ -99,6 +99,7 @@ namespace net {
 
 		static const uint32_t	login_timeout_    = 100 * 30;  ///< 30 sec.
 		static const uint32_t	transfer_timeout_ = 100 * 10;  ///< 10 sec.
+		static const uint32_t	data_connection_timeout_ = 100 * 10;  ///< 10 sec.
 
 		// デバッグ以外で出力を無効にする
 		struct null_chaout {
@@ -1022,26 +1023,26 @@ namespace net {
 				data_.begin(DATA_PORT_PASV);
 				utils::format("Start FTP Server data (PASV): '%s' (%d) fd(%d)\n")
 					% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
-				data_connect_loop_ = 10 * 100;  // 10 sec
+				data_connect_loop_ = data_connection_timeout_;
 				task_ = task::data_connection;
 				break;
 
-			case task::data_connection:
-				if(data_.connected()) {
-					ftp_debug("Connection FTP Server data (PASV): '%s' %d [ms] (%d)\n")
-						% data_.get_from_ip().c_str()
-						% static_cast<int>(data_connect_loop_ * 10)
-						% data_.get_port();
-					task_ = task::command;
-					line_man_.clear();
-					pasv_enable_ = true;
-					break;
-				}
+			case task::data_connection:  // PASV
 				if(data_connect_loop_) {
 					--data_connect_loop_;
 				} else {
 					format("425 No data connection (timeout)\n", ctrl_.get_cepid());
 					task_ = task::command;
+				}
+				if(data_.connected()) {
+					ftp_debug("Connection FTP Server data (PASV): '%s' %d [ms] (%d)\n")
+						% data_.get_from_ip().c_str()
+						% static_cast<int>(data_connection_timeout_ - data_connect_loop_)
+						% data_.get_port();
+					task_ = task::command;
+					line_man_.clear();
+					pasv_enable_ = true;
+					break;
 				}
 				break;
 
@@ -1049,26 +1050,26 @@ namespace net {
 				port_.connect(data_ip_, data_port_, TMO_NBLK);
 				utils::format("Start FTP Server data (PORT): '%s' (%d) fd(%d)\n")
 					% data_ip_.c_str() % data_port_ % port_.get_cepid();
-				data_connect_loop_ = 10 * 100;  // 10 sec
+				data_connect_loop_ = data_connection_timeout_;
 				task_ = task::port_connection;
 				break;
 
-			case task::port_connection:
-				if(port_.connected()) {
-					ftp_debug("Connection FTP Server data (PORT): '%s' %d [ms] (%d)\n")
-						% port_.get_from_ip().c_str()
-						% static_cast<int>(data_connect_loop_ * 10)
-						% port_.get_port();
-					task_ = task::command;
-					line_man_.clear();
-					pasv_enable_ = false;
-					break;
-				}
+			case task::port_connection:  // PORT
 				if(data_connect_loop_) {
 					--data_connect_loop_;
 				} else {
 					format("425 No data connection (timeout)\n", ctrl_.get_cepid());
 					task_ = task::command;
+				}
+				if(port_.connected()) {
+					ftp_debug("Connection FTP Server data (PORT): '%s' %d [ms] (%d)\n")
+						% port_.get_from_ip().c_str()
+						% static_cast<int>(data_connection_timeout_ - data_connect_loop_)
+						% port_.get_port();
+					task_ = task::command;
+					line_man_.clear();
+					pasv_enable_ = false;
+					break;
 				}
 				break;
 
