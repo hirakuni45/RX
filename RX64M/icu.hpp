@@ -440,41 +440,41 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>  EN0;
-			bit_rw_t <io_, bitpos::B1>  EN1;
-			bit_rw_t <io_, bitpos::B2>  EN2;
-			bit_rw_t <io_, bitpos::B3>  EN3;
-			bit_rw_t <io_, bitpos::B4>  EN4;
-			bit_rw_t <io_, bitpos::B5>  EN5;
-			bit_rw_t <io_, bitpos::B6>  EN6;
-			bit_rw_t <io_, bitpos::B7>  EN7;
+			bit_rw_t<io_, bitpos::B0>  EN0;
+			bit_rw_t<io_, bitpos::B1>  EN1;
+			bit_rw_t<io_, bitpos::B2>  EN2;
+			bit_rw_t<io_, bitpos::B3>  EN3;
+			bit_rw_t<io_, bitpos::B4>  EN4;
+			bit_rw_t<io_, bitpos::B5>  EN5;
+			bit_rw_t<io_, bitpos::B6>  EN6;
+			bit_rw_t<io_, bitpos::B7>  EN7;
 
-			bit_rw_t <io_, bitpos::B8>  EN8;
-			bit_rw_t <io_, bitpos::B9>  EN9;
-			bit_rw_t <io_, bitpos::B10> EN10;
-			bit_rw_t <io_, bitpos::B11> EN11;
-			bit_rw_t <io_, bitpos::B12> EN12;
-			bit_rw_t <io_, bitpos::B13> EN13;
-			bit_rw_t <io_, bitpos::B14> EN14;
-			bit_rw_t <io_, bitpos::B15> EN15;
+			bit_rw_t<io_, bitpos::B8>  EN8;
+			bit_rw_t<io_, bitpos::B9>  EN9;
+			bit_rw_t<io_, bitpos::B10> EN10;
+			bit_rw_t<io_, bitpos::B11> EN11;
+			bit_rw_t<io_, bitpos::B12> EN12;
+			bit_rw_t<io_, bitpos::B13> EN13;
+			bit_rw_t<io_, bitpos::B14> EN14;
+			bit_rw_t<io_, bitpos::B15> EN15;
 
-			bit_rw_t <io_, bitpos::B16> EN16;
-			bit_rw_t <io_, bitpos::B17> EN17;
-			bit_rw_t <io_, bitpos::B18> EN18;
-			bit_rw_t <io_, bitpos::B19> EN19;
-			bit_rw_t <io_, bitpos::B20> EN20;
-			bit_rw_t <io_, bitpos::B21> EN21;
-			bit_rw_t <io_, bitpos::B22> EN22;
-			bit_rw_t <io_, bitpos::B23> EN23;
+			bit_rw_t<io_, bitpos::B16> EN16;
+			bit_rw_t<io_, bitpos::B17> EN17;
+			bit_rw_t<io_, bitpos::B18> EN18;
+			bit_rw_t<io_, bitpos::B19> EN19;
+			bit_rw_t<io_, bitpos::B20> EN20;
+			bit_rw_t<io_, bitpos::B21> EN21;
+			bit_rw_t<io_, bitpos::B22> EN22;
+			bit_rw_t<io_, bitpos::B23> EN23;
 
-			bit_rw_t <io_, bitpos::B24> EN24;
-			bit_rw_t <io_, bitpos::B25> EN25;
-			bit_rw_t <io_, bitpos::B26> EN26;
-			bit_rw_t <io_, bitpos::B27> EN27;
-			bit_rw_t <io_, bitpos::B28> EN28;
-			bit_rw_t <io_, bitpos::B29> EN29;
-			bit_rw_t <io_, bitpos::B30> EN30;
-			bit_rw_t <io_, bitpos::B31> EN31;
+			bit_rw_t<io_, bitpos::B24> EN24;
+			bit_rw_t<io_, bitpos::B25> EN25;
+			bit_rw_t<io_, bitpos::B26> EN26;
+			bit_rw_t<io_, bitpos::B27> EN27;
+			bit_rw_t<io_, bitpos::B28> EN28;
+			bit_rw_t<io_, bitpos::B29> EN29;
+			bit_rw_t<io_, bitpos::B30> EN30;
+			bit_rw_t<io_, bitpos::B31> EN31;
 		};
 
 
