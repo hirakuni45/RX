@@ -15,23 +15,21 @@
 #include "common/input.hpp"
 
 #include "chip/phy_base.hpp"
-
-// #include "net/net_core.h"
+#include "net/dhcp_client.hpp"
 
 namespace {
 
 	class cmt_task {
-		volatile bool	task_enable_;
+		volatile uint32_t	count_;
 	public:
-		cmt_task() : task_enable_(false) { }
+		cmt_task() : count_(0) { }
 
 		void operator() () {
-			if(task_enable_) {
-///				net_timer_service();
-			}
+			++count_;
 		}
 
-		void task_enable(bool f = true) { task_enable_ = f; }
+		void set_count(uint32_t v = 0) { count_ = v; }
+		uint32_t get_count() const { return count_; }
 	};
 
 	typedef device::cmt_io<device::CMT0, cmt_task> CMT0;
@@ -72,6 +70,9 @@ namespace {
 	typedef device::ether_io<ETHERC, EDMAC, PHY, eth_task> ETHERNET;
 
 	ETHERNET ether_;
+
+	typedef net::dhcp_client<ETHERNET> DHCP;
+	DHCP	dhcp_(ether_);
 }
 
 extern "C" {
@@ -229,17 +230,25 @@ extern "C" {
 	}
 
 
-#if 0
-	void OpenTimer(void)
-	{
-		cmt_.at_task().task_enable();
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	タイマーカウンターをリセット
+	 */
+	//-----------------------------------------------------------------//
+	void reset_timer(void) {
+		cmt_.at_task().set_count();
 	}
 
-	void CloseTimer(void)
-	{
-		cmt_.at_task().task_enable(false);
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	タイマーカウンターを取得
+		@return	タイマーカウント
+	 */
+	//-----------------------------------------------------------------//
+	uint32_t get_timer(void) {
+		return cmt_.at_task().get_count();
 	}
-#endif
 }
 
 
@@ -286,7 +295,7 @@ int main(int argc, char** argv)
 		sci_.start(115200, int_level);
 	}
 
-	utils::format("Start GR-KAEDE net\n");
+	utils::format("\nStart GR-KAEDE Ethernet stack\n");
 
 	// SD カード・クラスの初期化
 	sdc_.start();
@@ -324,16 +333,16 @@ int main(int argc, char** argv)
 			if(cnt >= 50) cnt = 0;
 		}
 		utils::format("Ether Link UP OK\n");
+
+		{
+			DHCP::dhcp_t t;
+			if(dhcp_.start(t)) {
+				utils::format("DHCP OK\n");
+			} else {
+				utils::format("DHCP NG\n");
+			}
+		}
 	}
-
-#if 0
-	device::power_cfg::turn(device::peripheral::ETHERC0);
-	device::port_map::turn(device::peripheral::ETHERC0);
-	set_interrupt_task(net_entry_intr, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
-
-	auto ret = net_init();
-	utils::format("Net init: %d\n") % ret;
-#endif
 
 	while(1) {  // 100Hz (10ms interval)
 		cmt_.sync();
