@@ -34,7 +34,7 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class phy_option {
 		BASE,				///< 一般、標準仕様
-		TI_DP83822,			///< TI/DP83822
+		TI_DP83822_,		///< TI/DP83822
 		MICREL_KSZ8041NL,	///< MICREL/KSZ8041NL
 	};
 
@@ -49,6 +49,19 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ETHERC, uint16_t DEV_ADR = 0, phy_option DEV_OPT = phy_option::BASE>
 	class phy_base {
+
+#ifndef PHY_DEBUG
+		// デバッグ以外で出力を無効にする
+		struct null_chaout {
+			null_chaout(char* out = nullptr, uint16_t len = 0) { } 
+			void operator() (char ch) {
+			}
+		};
+
+		typedef utils::basic_format<null_chaout> debug_format;
+#else
+		typedef utils::basic_format<utils::def_chaout> debug_format;
+#endif
 
 		static const uint16_t REG_CONTROL          = 0;
 		static const uint16_t REG_STATUS           = 1;
@@ -341,7 +354,7 @@ namespace chip {
 		uint16_t read_(uint16_t addr)
 		{
 			if(addr > 0x1f) {  // 拡張アドレスの場合
-				if(DEV_OPT == phy_option::TI_DP83822) {
+				if(DEV_OPT == phy_option::TI_DP83822_) {
 					write_sub_(REG_DP83822_REGCR, 0x001F);  // address command
 					write_sub_(REG_DP83822_ADDAR, addr);
 					write_sub_(REG_DP83822_REGCR, 0x401F);  // read/write command
@@ -359,7 +372,7 @@ namespace chip {
 		void write_(uint16_t addr, uint16_t data)
 		{
 			if(addr > 0x1f) {  // 拡張アドレスの場合
-				if(DEV_OPT == phy_option::TI_DP83822) {
+				if(DEV_OPT == phy_option::TI_DP83822_) {
 					write_sub_(REG_DP83822_REGCR, 0x001F);  // address command
 					write_sub_(REG_DP83822_ADDAR, addr);
 					write_sub_(REG_DP83822_REGCR, 0x401F);  // read/write command
@@ -392,15 +405,14 @@ namespace chip {
 		bool init(void)
 		{
 			uint16_t reg;
-#ifdef PHY_DEBUG
-			utils::format("Start PHY init: ADR: %d\n") % static_cast<int>(DEV_ADR);
+
+			debug_format("Start PHY init: ADR: %d\n") % static_cast<int>(DEV_ADR);
 			reg = read_(REG_IDENTIFIER1);
 			reg = read_(REG_IDENTIFIER1);
-			utils::format("PHY Identifier1: 0x%04X\n") % static_cast<int>(reg);
+			debug_format("PHY Identifier1: 0x%04X\n") % static_cast<int>(reg);
 			reg = read_(REG_IDENTIFIER2);
 			reg = read_(REG_IDENTIFIER2);
-			utils::format("PHY Identifier2: 0x%04X\n") % static_cast<int>(reg);
-#endif
+			debug_format("PHY Identifier2: 0x%04X\n") % static_cast<int>(reg);
 
 			// Reset PHY
 			write_(REG_CONTROL, CONTROL_RESET);
@@ -410,11 +422,10 @@ namespace chip {
 				reg = read_(REG_CONTROL);
 				count++;
 			} while((reg & CONTROL_RESET) && (count < DELAY_RESET));
-#ifdef PHY_DEBUG
-			utils::format("PHY init: reset loop: %d/%d\n")
+
+			debug_format("PHY init: reset loop: %d/%d\n")
 				% static_cast<int>(count)
 				% static_cast<int>(DELAY_RESET);
-#endif
 
 			if(count < DELAY_RESET) {
 				// When KSZ8041NL of the Micrel, Inc. is used, 
@@ -425,34 +436,28 @@ namespace chip {
 					reg &= ~0x8000;
 					reg |= 0x4000;
 					write_(REG_PHY_CONTROL_1, reg);
-				} else if(DEV_OPT == phy_option::TI_DP83822) {
-#ifdef PHY_DEBUG
-					reg = read_(0x0462);
-					utils::format("DP83822 Boot Strap Latch (0x0462): 0x%04X\n") % static_cast<int>(reg);
-					reg = read_(0x0467);
-					utils::format("DP83822 Boot Strap Latch #1(SOR1): 0x%04X\n") % static_cast<int>(reg);
-					reg = read_(0x0468);
-					utils::format("DP83822 Boot Strap Latch #2(SOR2): 0x%04X\n") % static_cast<int>(reg);
-#endif
+				} else if(DEV_OPT == phy_option::TI_DP83822_) {
+
+					debug_format("DP83822 Boot Strap Latch (0x0462): 0x%04X\n")
+						% static_cast<int>(read_(0x0462));
+					debug_format("DP83822 Boot Strap Latch #1(SOR1): 0x%04X\n")
+						% static_cast<int>(read_(0x0467));
+					debug_format("DP83822 Boot Strap Latch #2(SOR2): 0x%04X\n")
+						% static_cast<int>(read_(0x0468));
+
 					write_(0x0018, 0b0000010001000000);
 					write_(0x0019, 0b0000000000100001);
 					write_(0x0462, 0b0100001100000000);
 
 					write_(REG_DP83822_RCSR, 0b0000000001100001);
-#ifdef PHY_DEBUG
-					reg = read_(0x0462);
-					utils::format("DP83822 Boot Strap Latch (0x0462): 0x%04X\n") % static_cast<int>(reg);
-#endif
+					debug_format("DP83822 Boot Strap Latch (0x0462): 0x%04X\n")
+						% static_cast<int>(read_(0x0462));
 				}
 
-#ifdef PHY_DEBUG
-				utils::format("PHY init OK...\n");
-#endif
+				debug_format("PHY init OK !\n");
 				return true;
 			}
-#ifdef PHY_DEBUG
-			utils::format("PHY Init NG...\n");
-#endif
+			debug_format("PHY Init NG !\n");
 			return false;
 		}
 
