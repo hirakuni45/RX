@@ -114,9 +114,6 @@ DEFINE YOUR SYSTEM - UNCOMMENT THE INCLUDE PATH FOR THE PLATFORM YOU ARE USING.
 
 #define PLATFORM_DEFINED
 
-#define R_BSP_VERSION_MAJOR 2
-#define R_BSP_VERSION_MINOR 80
-
 #define __evenaccess volatile
 
 #include "RX64M/iodefine.h"
