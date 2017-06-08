@@ -29,11 +29,11 @@ namespace chip {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  PHY オプショナル・デバイス
+		@brief  PHY オプショナル・デバイス型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class phy_option {
-		BASE,				///< 基本仕様
+		BASE,				///< 一般、標準仕様
 		TI_DP83822,			///< TI/DP83822
 		MICREL_KSZ8041NL,	///< MICREL/KSZ8041NL
 	};
@@ -44,7 +44,7 @@ namespace chip {
 		@brief  PHY ベース・テンプレート・クラス
 		@param[in]	ETHERC	インサーネット・コントローラー・クラス
 		@param[in]	DEV_ADR	PHY デバイス・アドレス
-		@param[in]	DEV_OPT	オプションデバイス
+		@param[in]	DEV_OPT	オプションデバイス型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ETHERC, uint16_t DEV_ADR = 0, phy_option DEV_OPT = phy_option::BASE>
