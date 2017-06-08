@@ -15,6 +15,8 @@
 #include "r_t4_driver_rx/src/timer.h"
 #include "net_core.h"
 
+#define DEBUG_NET
+
 extern TCPUDP_ENV tcpudp_env[];
 extern uint8_t _myethaddr[2][6];
 //extern uint8_t dnsaddr1[];
@@ -24,6 +26,8 @@ extern volatile uint8_t link_detect[ETHER_CHANNEL_MAX];
 extern void timer_interrupt(void*);
 
 extern volatile uint32_t ether_intr_count;
+
+extern volatile uint32_t timer_count;
 
 static UW tcpudp_work[ 21504 / sizeof(UW)];  // calculated by W tcpudp_get_ramsize( void )
 
@@ -43,36 +47,46 @@ static void set_tcpudp_env_(DHCP *dhcp)
 //-----------------------------------------------------------------//
 /*!
 	@brief	net 初期化
+	@return 「０」以外の場合エラー
  */
 //-----------------------------------------------------------------//
-void net_init(void)
+int net_init(void)
 {
-	// Initialize the Ethernet driver
-	R_ETHER_Initial();
-
 	// start LAN controller
 	ER ercd = lan_open();
 	if(ercd != E_OK) {
-        for( ;; ) ;
+#ifdef DEBUG_NET
+		printf("net_init: LAN controller open error\n");
+#endif
+		return -1;
     }
 
+#ifdef DEBUG_NET
 	printf("DHCP client start\n");
-
+#endif
 	// DHCP client
 	OpenTimer();
 //	while(ETHER_FLAG_ON_LINK_ON != link_detect[0] && ETHER_FLAG_ON_LINK_ON != link_detect[1]) {
 	volatile uint32_t n = ether_intr_count;
+	timer_count = 0;
+	uint32_t t = 100;
+	int loop = 0;
 	while(ETHER_FLAG_ON_LINK_ON != link_detect[0]) {
 		R_ETHER_LinkProcess(0);
 		// R_ETHER_LinkProcess(1);
-
 		if(n != ether_intr_count) {
-			printf("Ether intr: %d\n", (int)ether_intr_count);
+			printf("net_init: Ether link loop: %d\n", (int)ether_intr_count);
 			n = ether_intr_count;
 		}
+		if(timer_count >= t) {
+			loop++;
+			printf("net_init: Ether link wait %d\n", loop);
+			t += 100;
+		}
 	}
-
+#ifdef DEBUG_NET
 	printf("net_init 'LINK_ON'\n");
+#endif
 
 //	volatile DHCP dhcp;
 	DHCP dhcp;
@@ -88,14 +102,21 @@ void net_init(void)
 	if(ramsize > (sizeof(tcpudp_work))) {
 		// Then reserve as much memory array for the work area as the size
 		// indicated by the returned value.
-		for( ;; );
+#ifdef DEBUG_NET
+		printf("net_init: memory empty\n");
+#endif
+		return -2;
 	}
 
 	// Initialize the TCP/IP
 	ercd = tcpudp_open(tcpudp_work);
 	if(ercd != E_OK) {
-		for( ;; );
+#ifdef DEBUG_NET
+		printf("net_init: Fail tcpudp_open\n");
+#endif
+		return -3;
 	}
+	return 0;
 }
 
 
