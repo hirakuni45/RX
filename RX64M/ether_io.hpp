@@ -154,7 +154,7 @@ namespace device {
 
 		uint8_t	intr_level_;
 
-		uint8_t	mac_addr_buf_[6];
+		uint8_t	mac_addr_[6];
 
 		bool	pause_frame_enable_flag_;
 		volatile uint8_t	lchng_flag_;
@@ -500,7 +500,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		ether_io() : intr_level_(0),
-			mac_addr_buf_{ 0 },
+			mac_addr_{ 0 },
 			pause_frame_enable_flag_(false),
 			app_rx_desc_(nullptr), app_tx_desc_(nullptr),
 			link_stat_(false)
@@ -523,6 +523,15 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static INTR_TASK& at_task() { return intr_task_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	MAC アドレスの取得
+			@return MAC アドレス
+		*/
+		//-----------------------------------------------------------------//
+		const uint8_t* get_mac() { return mac_addr_; }
 
 
 		//-----------------------------------------------------------------//
@@ -559,12 +568,12 @@ namespace device {
 			mpd_flag_             = FLAG_OFF;
 			lchng_flag_           = FLAG_OFF;
 
-			mac_addr_buf_[0] = mac_addr[0];
-			mac_addr_buf_[1] = mac_addr[1];
-			mac_addr_buf_[2] = mac_addr[2];
-			mac_addr_buf_[3] = mac_addr[3];
-			mac_addr_buf_[4] = mac_addr[4];
-			mac_addr_buf_[5] = mac_addr[5];
+			mac_addr_[0] = mac_addr[0];
+			mac_addr_[1] = mac_addr[1];
+			mac_addr_[2] = mac_addr[2];
+			mac_addr_[3] = mac_addr[3];
+			mac_addr_[4] = mac_addr[4];
+			mac_addr_[5] = mac_addr[5];
 
 			// Software reset
     		reset_mac_();
@@ -635,25 +644,25 @@ namespace device {
 						for the detection mode of magic packet. 
 		*/
 		//-----------------------------------------------------------------//
-		int32_t read(void** buf)
+		int32_t get_read(void** buf)
 		{
 			int32_t num_recvd;
 			int32_t ret;
 
 			// When the Link up processing is not completed, return error
-			if (FLAG_OFF == transfer_enable_flag_) {
+			if(FLAG_OFF == transfer_enable_flag_) {
 				ret = ERROR_LINK;
-			} else if (1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
+			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
 				ret = ERROR_MPDE;
 			} else {  // When the Link up processing is completed
-				while (1) {
+				while(1) {
 					// When receive data exists.
 					if(RACT != (app_rx_desc_->status & RACT)) {
 						if(app_rx_desc_->status & RFE) {  // The buffer is released at the error.
 							ret = read_buf_release();
 						} else {
-							 // Pass the pointer to received data to application.  This is
-							 // zero-copy operation.
+							// Pass the pointer to received data to application.  This is
+							// zero-copy operation.
 							*buf = app_rx_desc_->buf_p;
 
 							// Get bytes received
@@ -757,7 +766,7 @@ namespace device {
 								of the detection mode of magic packet.
 		*/
 		//-----------------------------------------------------------------//
-		int32_t write_set_buf(const uint32_t len)
+		int32_t write_set_buf(uint32_t len)
 		{
 			int32_t ret;
 			// When the Link up processing is not completed, return error
@@ -779,6 +788,75 @@ namespace device {
 				ret = OK;
 			}
 			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	read
+			@param[out]	org	リード・ポインター
+			@return 正の値なら読み込みバイト数、負ならエラー
+		*/
+		//-----------------------------------------------------------------//
+		int32_t read(void** org)
+		{
+			int32_t ret;
+			// H return_code;
+			int32_t state = get_read(org);
+			if(state > 0) {
+				// t4_stat[lan_port_no].t4_rec_cnt++;
+				// t4_stat[lan_port_no].t4_rec_byte += (UW)driver_ret;
+				ret = state;
+			} else if(state == 0) {
+				// get_read() returns "0" when receiving data is nothing
+				ret = state;
+			} else {
+				// R_Ether_Read() returns "negative values" when error occurred
+				ret = -2; // Return code "-2" notifies "Ether controller disable" to T4.
+//				return_code = -5; // Return code "-5" notifies "reset request" to T4.
+//				return_code = -6; // Return code "-6" notifies "CRC error" to T4.
+			}
+
+#if defined (_T4_TEST)
+		    ret = lan_read_for_test(lan_port_no, buf, return_code);
+#endif
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	write
+			@param[in]	head_org	ヘッダー
+			@param[in]	head_len	ヘッダー長
+			@param[in]	body_org	ボディー
+			@param[in]	body_len	ボディー長
+			@return 正常終了なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool write(const void* head_org, uint16_t head_len, const void* body_org, uint16_t body_len)
+		{
+    		uint16_t len;
+			void* ptr;
+    		auto ret = write_get_buf(&ptr, len);
+			if(ret == OK) {
+				uint32_t all = head_len;
+				all += body_len;
+				if(static_cast<uint32_t>(len) >= all) {
+					memcpy(ptr, head_org, head_len);
+					uint8_t* p = static_cast<uint8_t*>(ptr);
+					p += head_len;
+					memcpy(p, body_org, body_len);
+
+					ret = write_set_buf(all);
+					if(ret == OK) {
+//						t4_stat[lan_port_no].t4_snd_cnt++;
+//						t4_stat[lan_port_no].t4_snd_byte += (head_len + body_len);
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
 
@@ -822,7 +900,7 @@ namespace device {
 				if(ret) {
 					// ETHERC and EDMAC are set after ETHERC and EDMAC are reset in software
 					// and sending and receiving is permitted. 
-					configure_mac_(mac_addr_buf_, NO_USE_MAGIC_PACKET_DETECT);
+					configure_mac_(mac_addr_, NO_USE_MAGIC_PACKET_DETECT);
 					do_link_(NO_USE_MAGIC_PACKET_DETECT);
 
 					transfer_enable_flag_ = FLAG_ON;
@@ -871,7 +949,7 @@ namespace device {
 				ret = ERROR_LINK;
 			} else {  // When the Link up processing is completed
 				// Change to the magic packet detection mode.
-				configure_mac_(mac_addr_buf_, USE_MAGIC_PACKET_DETECT);
+				configure_mac_(mac_addr_, USE_MAGIC_PACKET_DETECT);
 				auto ret = do_link_(USE_MAGIC_PACKET_DETECT);
 				if(OK == ret) {
 					// It is confirmed not to become Link down while changing the setting.
@@ -924,7 +1002,7 @@ namespace device {
 			// to have to set ETHERC to a usual operational mode
 			// to usually communicate after magic packet is detected. 
 			close();
-			open(mac_addr_buf_);
+			open(mac_addr_);
 
 			// This code is for the sample program.
 			magic_packet_detect_ = 1;
