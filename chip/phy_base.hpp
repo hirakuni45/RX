@@ -27,12 +27,25 @@ namespace chip {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  PHY ベース・テンプレート・クラス
-		@param[in]	ETHERC	 インサーネット・コントローラー・クラス
-		@param[in]	DEV_ADR	PHY アドレス
+		@brief  PHY オプショナル・デバイス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHERC, uint16_t DEV_ADR = 0>
+	enum class phy_option {
+		BASE,				///< 基本仕様
+		TI_DP83822,			///< TI/DP83822
+		MICREL_KSZ8041NL,	///< MICREL/KSZ8041NL
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  PHY ベース・テンプレート・クラス
+		@param[in]	ETHERC	インサーネット・コントローラー・クラス
+		@param[in]	DEV_ADR	PHY デバイス・アドレス
+		@param[in]	DEV_OPT	オプションデバイス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class ETHERC, uint16_t DEV_ADR = 0, phy_option DEV_OPT = phy_option::BASE>
 	class phy_base {
 
 		static const uint16_t REG_CONTROL          = 0;
@@ -102,23 +115,8 @@ namespace chip {
 		static const uint32_t DELAY_RESET     = 0x00020000L;
 		static const uint32_t DELAY_AN        = 0x00800000L;
 
-		ETHERC&	ethc_;
-
-		uint16_t local_advertise_;
-
-
-#if 0
-#ifdef TI_DP83822
-#define PHY_REG_DP83822_REGCR     (0x0D)
-#define PHY_REG_DP83822_ADDAR     (0x0E)
-#define PHY_REG_DP83822_RCSR      (0x17)
-#endif
-
-/* Vendor Specific PHY Registers */
-#ifdef MICREL_KSZ8041NL
-#define PHY_REG_PHY_CONTROL_1           (0x1E)
-#endif /* MICREL_KSZ8041NL */
-#endif
+		// for MICREL/KSZ8041NL Vender special register
+		static const uint16_t REG_PHY_CONTROL_1    = 0x1E;
 
 		/*==============================================================================*/
 		//  DP83822 Boot Strap:															//
@@ -149,7 +147,13 @@ namespace chip {
 		//    FX_EN: 1, AN_EN: X, AN_1: X, AN_0: 0 ---> 100BASE-FX, Half-Duplex			//
 		//    FX_EN: 1, AN_EN: X, AN_1: X, AN_0: 1 ---> 100BASE-FX, Full-Duplex			//
 		/*==============================================================================*/
+		static const uint16_t REG_DP83822_REGCR  = 0x0D;
+		static const uint16_t REG_DP83822_ADDAR  = 0x0E;
+		static const uint16_t REG_DP83822_RCSR   = 0x17;
 
+		ETHERC&	ethc_;
+
+		uint16_t local_advertise_;
 
 		void mii_write1_()
 		{
@@ -337,39 +341,35 @@ namespace chip {
 		uint16_t read_(uint16_t addr)
 		{
 			if(addr > 0x1f) {  // 拡張アドレスの場合
-#if 0
-#ifdef TI_DP83822
-			write_sub_(PHY_REG_DP83822_REGCR, 0x001F);  // address command
-			write_sub_(PHY_REG_DP83822_ADDAR, addr);
-			write_sub_(PHY_REG_DP83822_REGCR, 0x401F);  // read/write command
-			return read_sub_(PHY_REG_DP83822_ADDAR);
-#else
-			printf("PHY Address Range Error: %04X\n", reg_addr);
-			return 0;
-#endif
-#endif
+				if(DEV_OPT == phy_option::TI_DP83822) {
+					write_sub_(REG_DP83822_REGCR, 0x001F);  // address command
+					write_sub_(REG_DP83822_ADDAR, addr);
+					write_sub_(REG_DP83822_REGCR, 0x401F);  // read/write command
+					return read_sub_(REG_DP83822_ADDAR);
+				} else {
+					utils::format("PHY Address Range Error: %04X\n") % static_cast<int>(addr);
+					return 0;
+				}
 			} else {
 				return read_sub_(addr);
 			}
 		}
 
 
-		void write_(uint16_t reg_addr, uint16_t data)
+		void write_(uint16_t addr, uint16_t data)
 		{
-			if(reg_addr > 0x1f) {  // 拡張アドレスの場合
-#if 0
-#ifdef TI_DP83822
-				phy_write_sub_(PHY_REG_DP83822_REGCR, 0x001F);  // address command
-				phy_write_sub_(PHY_REG_DP83822_ADDAR, reg_addr);
-				phy_write_sub_(PHY_REG_DP83822_REGCR, 0x401F);  // read/write command
-				phy_write_sub_(PHY_REG_DP83822_ADDAR, data);
-#else
-				printf("PHY Address Range Error: %04X\n", reg_addr);
+			if(addr > 0x1f) {  // 拡張アドレスの場合
+				if(DEV_OPT == phy_option::TI_DP83822) {
+					write_sub_(REG_DP83822_REGCR, 0x001F);  // address command
+					write_sub_(REG_DP83822_ADDAR, addr);
+					write_sub_(REG_DP83822_REGCR, 0x401F);  // read/write command
+					write_sub_(REG_DP83822_ADDAR, data);
+				} else {
+					utils::format("PHY Address Range Error: %04X\n") % static_cast<int>(addr);
+				}
 				return;
-#endif
-#endif
 			} else {
-				write_sub_(reg_addr, data);
+				write_sub_(addr, data);
 			}
 		}
 
@@ -420,34 +420,30 @@ namespace chip {
 				// When KSZ8041NL of the Micrel, Inc. is used, 
 				// the pin that outputs the state of LINK is used combinedly with ACTIVITY in default. 
 				// The setting of the pin is changed so that only the state of LINK is output. 
-#ifdef MICREL_KSZ8041NL
-				reg = phy_read_(REG_PHY_CONTROL_1);
-				reg &= ~0x8000;
-				reg |= 0x4000;
-				write_(REG_PHY_CONTROL_1, reg);
-#endif
-
-#ifdef TI_DP83822
+				if(DEV_OPT == phy_option::MICREL_KSZ8041NL) {
+					reg = read_(REG_PHY_CONTROL_1);
+					reg &= ~0x8000;
+					reg |= 0x4000;
+					write_(REG_PHY_CONTROL_1, reg);
+				} else if(DEV_OPT == phy_option::TI_DP83822) {
 #ifdef PHY_DEBUG
-				reg = phy_read_(0x0462);
-				printf("DP83822 Boot Strap Latch (0x0462): 0x%04X\n", (int)reg);
-				reg = phy_read_(0x0467);
-				printf("DP83822 Boot Strap Latch #1(SOR1): 0x%04X\n", (int)reg);
-				reg = phy_read_(0x0468);
-				printf("DP83822 Boot Strap Latch #2(SOR2): 0x%04X\n", (int)reg);
+					reg = phy_read_(0x0462);
+					printf("DP83822 Boot Strap Latch (0x0462): 0x%04X\n", (int)reg);
+					reg = phy_read_(0x0467);
+					printf("DP83822 Boot Strap Latch #1(SOR1): 0x%04X\n", (int)reg);
+					reg = phy_read_(0x0468);
+					printf("DP83822 Boot Strap Latch #2(SOR2): 0x%04X\n", (int)reg);
 #endif
+					write_(0x0018, 0b0000010001000000);
+					write_(0x0019, 0b0000000000100001);
+					write_(0x0462, 0b0100001100000000);
 
-				write_(0x0018, 0b0000010001000000);
-				write_(0x0019, 0b0000000000100001);
-				write_(0x0462, 0b0100001100000000);
-
-				write_(REG_DP83822_RCSR, 0b0000000001100001);
-
+					write_(REG_DP83822_RCSR, 0b0000000001100001);
 #ifdef PHY_DEBUG
-				reg = read_(0x0462);
-				printf("DP83822 Boot Strap Latch (0x0462): 0x%04X\n", (int)reg);
+					reg = read_(0x0462);
+					utils::format("DP83822 Boot Strap Latch (0x0462): 0x%04X\n") % static_cast<int>(reg);
 #endif
-#endif
+				}
 
 #ifdef PHY_DEBUG
 				printf("PHY init OK...\n");
