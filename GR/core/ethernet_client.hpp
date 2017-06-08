@@ -92,7 +92,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		const ip_address& get_from_ip() const {
 			const ethernet::CEP& cep = ethernet_.get_cep(cepid_);
-			uint32_t ipw = cep.dst_addr.ipaddr;
+			uint32_t ipw = cep.src_addr.ipaddr;
 			static ip_address ip((ipw >> 24) & 255, (ipw >> 16) & 255, (ipw >> 8) & 255, ipw & 255);
 			return ip;
 		}
