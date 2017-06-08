@@ -14,19 +14,28 @@
 #include "common/format.hpp"
 #include "common/input.hpp"
 
+#include "chip/phy_base.hpp"
+
+// #include "net/net_core.h"
+
 namespace {
 
 	class cmt_task {
+		volatile bool	task_enable_;
 	public:
-		cmt_task() { }
+		cmt_task() : task_enable_(false) { }
 
 		void operator() () {
-				
+			if(task_enable_) {
+///				net_timer_service();
+			}
 		}
+
+		void task_enable(bool f = true) { task_enable_ = f; }
 	};
 
 	typedef device::cmt_io<device::CMT0, cmt_task> CMT0;
-	CMT0	cmt0_;
+	CMT0	cmt_;
 
 	typedef utils::fifo<uint8_t, 2048> BUFFER;
 	typedef device::sci_io<device::SCI7, BUFFER, BUFFER> SCI;
@@ -45,6 +54,24 @@ namespace {
 
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
+
+
+	volatile uint32_t ethc_count_;
+
+	// インサーネット割り込みファンクタ
+	class eth_task {
+	public:
+		void operator() () {
+			ethc_count_++;
+		}
+	};
+
+	typedef device::ETHERC0 ETHERC;  // Eternet Controller
+	typedef device::EDMAC0 EDMAC;    // Ethernet DMA Controller
+	typedef chip::phy_base<ETHERC> PHY;  // Ethernet PHY
+	typedef device::ether_io<ETHERC, EDMAC, PHY, eth_task> ETHERNET;
+
+	ETHERNET ether_;
 }
 
 extern "C" {
@@ -200,6 +227,19 @@ extern "C" {
 	void utf8_to_sjis(const char* src, char* dst) {
 		utils::str::utf8_to_sjis(src, dst);
 	}
+
+
+#if 0
+	void OpenTimer(void)
+	{
+		cmt_.at_task().task_enable();
+	}
+
+	void CloseTimer(void)
+	{
+		cmt_.at_task().task_enable(false);
+	}
+#endif
 }
 
 
@@ -238,7 +278,7 @@ int main(int argc, char** argv)
 
 	{  // タイマー設定、１００Ｈｚ（１０ｍｓ）
 		uint8_t int_level = 1;
-		cmt0_.start(100, int_level);
+		cmt_.start(100, int_level);
 	}
 
 	{  // SCI 設定
@@ -246,15 +286,68 @@ int main(int argc, char** argv)
 		sci_.start(115200, int_level);
 	}
 
+	utils::format("Start GR-KAEDE net\n");
+
 	// SD カード・クラスの初期化
 	sdc_.start();
 
+	// Ethernet の開始
+	{
+		uint8_t intr_level = 4;
+		ether_.start(intr_level);
+	}
 
 	uint32_t cnt = 0;
-	while(1) {
+	{
+		static uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+		if(!ether_.open(mac)) {
+			utils::format("Ether open NG !\n");
+		} else {
+			utils::format("Ether open OK !\n");
+		}
 
+		volatile uint32_t n = ethc_count_;
+		while(1) {
+			cmt_.sync();
+
+			ether_.polling_link_status();
+			if(ether_.link_process()) break;
+
+			if(n != ethc_count_) {
+				utils::format("Ethernet intr: %d\n") % ethc_count_;
+				n = ethc_count_;
+			}
+
+			device::PORTC::PDR.B0 = 1; // output
+			device::PORTC::PODR.B0 = (cnt < 10) ? 0 : 1;
+			++cnt;
+			if(cnt >= 50) cnt = 0;
+		}
+		utils::format("Ether Link UP OK\n");
+	}
+
+#if 0
+	device::power_cfg::turn(device::peripheral::ETHERC0);
+	device::port_map::turn(device::peripheral::ETHERC0);
+	set_interrupt_task(net_entry_intr, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
+
+	auto ret = net_init();
+	utils::format("Net init: %d\n") % ret;
+#endif
+
+	while(1) {  // 100Hz (10ms interval)
+		cmt_.sync();
+
+///		net_service();
+
+		ether_.polling_link_status();
+		ether_.link_process();
+
+		sdc_.service();
 
 		device::PORTC::PDR.B0 = 1; // output
 		device::PORTC::PODR.B0 = (cnt < 10) ? 0 : 1;
+		++cnt;
+		if(cnt >= 50) cnt = 0;
 	}
 }

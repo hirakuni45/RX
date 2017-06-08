@@ -18,13 +18,35 @@ VPATH		=	../
 
 ASOURCES	=	common/start.s
 
+#				net/r_t4_rx/T4_src/checksum/rx/cksum_rx_little.s
+
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
-				common/time.c \
-				net/r_ether_rx/src/r_ether_rx.c
+				common/time.c
+
+
+#				net/net_core.c \
+				net/r_ether_rx/src/targets/rx/r_ether_setting_rx.c \
+				net/r_ether_rx/src/phy/phy.c \
+				net/r_ether_rx/src/r_ether_rx.c \
+				net/r_t4_rx/T4_src/ether.c \
+				net/r_t4_rx/T4_src/ip.c \
+				net/r_t4_rx/T4_src/tcp.c \
+				net/r_t4_rx/T4_src/udp.c \
+				net/r_t4_rx/T4_src/tcp_api.c \
+				net/r_t4_rx/src/config_tcpudp.c \
+				net/r_t4_driver_rx/src/ether_callback.c \
+				net/r_t4_driver_rx/src/t4_driver.c \
+				net/r_t4_dhcp_client_rx/src/r_dhcp_client.c \
+				net/r_t4_dns_client_rx/src/r_dns_client.c
+
+#				net/r_t4_http_server_rx/src/r_http_server.c
+#				net/r_t4_http_server_rx/src/r_http_server_config.c
+#				net/r_t4_ftp_server_rx/src/r_ftp_server.c
+
 
 PSOURCES	=	main.cpp
 
@@ -34,14 +56,22 @@ LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
 USER_DEFS	=	SIG_RX64M F_ICK=96000000 F_FCK=48000000 F_PCKA=96000000 F_PCKB=48000000 F_PCKD=48000000 \
 				B_ID=$(BUILD_ID) \
-				FAT_FS FAT_FS_NUM=3
+				FAT_FS FAT_FS_NUM=3 \
+				__RX _ETHER _TCP _UDP _ICMP
 
 MCU_TARGET	=
 
 INC_SYS		=
 
 INC_APP		=	. ../ ../RX64M \
-				../net ../net/r_config ../net/r_ether_rx
+				../net ../net/r_config \
+				../net/r_ether_rx \
+				../net/r_t4_rx \
+				../net/r_t4_dhcp_client_rx \
+				../net/r_t4_dns_client_rx
+
+#				../net/r_t4_http_server_rx
+#				../net/r_t4_ftp_server_rx 
 
 OPTIMIZE	=	-Os
 
@@ -56,6 +86,7 @@ CP_OPT		=	-Wall -Werror \
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
+				-Wno-maybe-uninitialized \
 				-mcpu=rx600 \
 				-fno-exceptions \
 				-mlittle-endian-data
