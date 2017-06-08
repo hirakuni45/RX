@@ -167,7 +167,7 @@ namespace seeda {
 				}
 //				cgi.list();
 			} else if(strcmp(path, "/cgi/set_adc.cgi") == 0) {
-				typedef utils::parse_cgi_post<1024, 5 * 8> CGI_ADC;
+				typedef utils::parse_cgi_post<2048, 6 * 8> CGI_ADC;
 				CGI_ADC cgi;
 				cgi.parse(body);
 				for(uint32_t i = 0; i < cgi.size(); ++i) {
@@ -210,7 +210,7 @@ namespace seeda {
 
 				write_pre_();
 
-//				cgi.list();
+				cgi.list();
 			} else if(strcmp(path, "/cgi/set_client.cgi") == 0) {
 				typedef utils::parse_cgi_post<256, 2> CGI_IP;
 				CGI_IP cgi;

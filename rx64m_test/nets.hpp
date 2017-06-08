@@ -452,7 +452,7 @@ namespace seeda {
 						break;
 					}
 					int fd = server_.get_cepid();
-					char tmp[512];
+					char tmp[2048];
 					int len = server_.read(tmp, sizeof(tmp));
 					auto pos = cgi_.analize_request(tmp, len);
 					if(pos > 0) {

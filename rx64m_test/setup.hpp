@@ -338,7 +338,6 @@ namespace seeda {
 						"<td><input type=\"text\" name=\"level_lo%d\" size=\"6\" value=\"%d\"></td>"
 						"<td>上限：</td>"
 						"<td><input type=\"text\" name=\"level_hi%d\" size=\"6\" value=\"%d\"></td>"
-///						"<td><input type=\"checkbox\" name=\"abs%d\" value=\"on\"%s>絶対値</td>"
 						"</tr>\n", fd)
 						% ch
 						% ch % (t.mode_ == seeda::sample_t::mode::none ? " checked" : "")
@@ -347,10 +346,13 @@ namespace seeda {
 						% ch % t.offset_
 						% ch % static_cast<int>(t.limit_lo_level_)
 						% ch % static_cast<int>(t.limit_hi_level_);
+
+///						"<td><input type=\"checkbox\" name=\"abs%d\" value=\"on\"%s>絶対値</td>"
+///
 ///						% ch % (t.abs_ ? " checked=\"checked\"" : "")
 				}
-				format("<tr><td><input type=\"submit\" value=\"設定\"></td></tr>\n", fd);
-				format("</table></form>\n", fd);
+				format("<tr><td><input type=\"submit\" value=\"設定\"></td></tr>"
+					   "</table></form>\n", fd);
 				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
 
