@@ -216,25 +216,6 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  個別出力信号設定レジスタ（IOSR）
-			@param[in]	ofs	オフセット
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t ofs>
-		struct iosr_t : public rw32_t<ofs> {
-			typedef rw32_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> ELB;
-		};
-		static iosr_t<base + 0x6C> IOSR;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
 			@brief  フロー制御開始 FIFO しきい値設定レジスタ（FCFTR）
 			@param[in]	ofs	オフセット
 		*/
@@ -446,8 +427,23 @@ namespace device {
 		static trscer_t<base + 0x38> TRSCER;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  個別出力信号設定レジスタ（IOSR）
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct iosr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-
+			bit_rw_t<io_, bitpos::B0> ELB;
+		};
+		static iosr_t<base + 0x6C> IOSR;
 
 
 		//-----------------------------------------------------------------//
@@ -541,10 +537,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B30>  TWBIP;
 		};
 		static eesipr_t<base + 0x30> EESIPR;
-
-
-
-
 
 
 		//-----------------------------------------------------------------//

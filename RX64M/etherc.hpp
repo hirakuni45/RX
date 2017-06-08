@@ -169,7 +169,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct pdmlr_t : public rw32_t<ofs> {
+		struct rdmlr_t : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -178,7 +178,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 20> RMD;
 		};
-		static pdmlr_t<base + 0x40> PDMLR;
+		static rdmlr_t<base + 0x40> RDMLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -280,13 +280,13 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct tpausec_t : public ro32_t<ofs> {
+		struct tpausecr_t : public ro32_t<ofs> {
 			typedef ro32_t<ofs> io_;
 			using io_::operator ();
 
 			bits_ro_t<io_, bitpos::B0, 8> TXP;
 		};
-		static tpausec_t<base + 0x60> TPAUSECR;
+		static tpausecr_t<base + 0x68> TPAUSECR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
