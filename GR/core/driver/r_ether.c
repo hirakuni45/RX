@@ -38,7 +38,6 @@ Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
 #include <stdio.h>
 #include <stddef.h>
-#include "../T4_src/net_config.h"
 #include "rx64m/iodefine.h"
 #include "r_ether.h"
 #include "phy.h"
@@ -133,7 +132,6 @@ static descriptor_s * app_tx_desc = NULL;
 static uint8_t  g_ether_MpdFlag;
 
 static uint8_t  mac_addr_buf[6];
-
 
 /**
  * PAUSE Resolution as documented in IEEE 802.3-2008_section2 Annex
