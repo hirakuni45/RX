@@ -270,7 +270,7 @@ namespace seeda {
 
 			{  // 内臓 A/D 表示
 				float v = static_cast<float>(get_adc(5)) / 4095.0f * 3.3f;
-				format("バックアップ電池電圧： %4.2f [V]<br>\n", fd) % v;
+				format("バッテリー電圧： %4.2f [V]<br>\n", fd) % v;
 				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			}
 
