@@ -9,6 +9,8 @@
 #include <cstdint>
 #include "common/format.hpp"
 
+#define PHY_DEBUG
+
 namespace chip {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -151,8 +153,6 @@ namespace chip {
 		static const uint16_t REG_DP83822_ADDAR  = 0x0E;
 		static const uint16_t REG_DP83822_RCSR   = 0x17;
 
-		ETHERC&	ethc_;
-
 		uint16_t local_advertise_;
 
 		void mii_write1_()
@@ -161,16 +161,16 @@ namespace chip {
 			// provided by "Table 22-12" of "22.2.4.5" of "IEEE 802.3-2008_section2". 
 			// The data that 1 is output. 
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000006;
+				ETHERC::PIR = 0x00000006;
 			}
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000007;
+				ETHERC::PIR = 0x00000007;
 			}
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000007;
+				ETHERC::PIR = 0x00000007;
 			}
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000006;
+				ETHERC::PIR = 0x00000006;
 			}
 		}
 
@@ -181,16 +181,16 @@ namespace chip {
 			// provided by "Table 22-12" of "22.2.4.5" of "IEEE 802.3-2008_section2". 
 			// The data that 0 is output. 
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000002;
+				ETHERC::PIR = 0x00000002;
 			}
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000003;
+				ETHERC::PIR = 0x00000003;
 			}
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000003;
+				ETHERC::PIR = 0x00000003;
 			}
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000002;
+				ETHERC::PIR = 0x00000002;
 			}
 		}
 
@@ -211,16 +211,16 @@ namespace chip {
 			// MII Management Interface which is provided by "Table 22-12" of "22.2.4.5"
 			// of "IEEE 802.3-2008_section2".
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000000;
+				ETHERC::PIR = 0x00000000;
 			}
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000001;
+				ETHERC::PIR = 0x00000001;
 			}
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000001;
+				ETHERC::PIR = 0x00000001;
 			}
 			for(int j = MII_WAIT; j > 0; j--) {
-				ethc_.PIR = 0x00000000;
+				ETHERC::PIR = 0x00000000;
 			}
 		}
 
@@ -262,21 +262,21 @@ namespace chip {
 			int i = 16;
 			while( i > 0 ) {
 				for(int j = MII_WAIT; j > 0; j--) {
-					ethc_.PIR = 0x00000000;
+					ETHERC::PIR = 0x00000000;
 				}
 				for(int j = MII_WAIT; j > 0; j--) {
-					ethc_.PIR = 0x00000001;
+					ETHERC::PIR = 0x00000001;
 				}
 
 				data <<= 1;
 				// MDI read
-				data |= static_cast<uint16_t>((ethc_.PIR() & 0x00000008) >> 3);
+				data |= static_cast<uint16_t>((ETHERC::PIR() & 0x00000008) >> 3);
 
 				for(int j = MII_WAIT; j > 0; j--) {
-					ethc_.PIR = 0x00000001;
+					ETHERC::PIR = 0x00000001;
 				}
 				for(int j = MII_WAIT; j > 0; j--) {
-					ethc_.PIR = 0x00000000;
+					ETHERC::PIR = 0x00000000;
 				}
 				i--;
 			}
@@ -380,7 +380,7 @@ namespace chip {
 			@param[in]	ethc	インサーネット・コントローラー
 		*/
 		//-----------------------------------------------------------------//
-		phy_base(ETHERC& ethc) : ethc_(ethc), local_advertise_(0) { }
+		phy_base() : local_advertise_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -393,7 +393,7 @@ namespace chip {
 		{
 			uint16_t reg;
 #ifdef PHY_DEBUG
-			utils::format("Start PHY init: ADR: %d\n") % static_cast<int>(MII_ADDR);
+			utils::format("Start PHY init: ADR: %d\n") % static_cast<int>(DEV_ADR);
 			reg = read_(REG_IDENTIFIER1);
 			reg = read_(REG_IDENTIFIER1);
 			utils::format("PHY Identifier1: 0x%04X\n") % static_cast<int>(reg);
@@ -427,12 +427,12 @@ namespace chip {
 					write_(REG_PHY_CONTROL_1, reg);
 				} else if(DEV_OPT == phy_option::TI_DP83822) {
 #ifdef PHY_DEBUG
-					reg = phy_read_(0x0462);
-					printf("DP83822 Boot Strap Latch (0x0462): 0x%04X\n", (int)reg);
-					reg = phy_read_(0x0467);
-					printf("DP83822 Boot Strap Latch #1(SOR1): 0x%04X\n", (int)reg);
-					reg = phy_read_(0x0468);
-					printf("DP83822 Boot Strap Latch #2(SOR2): 0x%04X\n", (int)reg);
+					reg = read_(0x0462);
+					utils::format("DP83822 Boot Strap Latch (0x0462): 0x%04X\n") % static_cast<int>(reg);
+					reg = read_(0x0467);
+					utils::format("DP83822 Boot Strap Latch #1(SOR1): 0x%04X\n") % static_cast<int>(reg);
+					reg = read_(0x0468);
+					utils::format("DP83822 Boot Strap Latch #2(SOR2): 0x%04X\n") % static_cast<int>(reg);
 #endif
 					write_(0x0018, 0b0000010001000000);
 					write_(0x0019, 0b0000000000100001);
@@ -446,7 +446,7 @@ namespace chip {
 				}
 
 #ifdef PHY_DEBUG
-				printf("PHY init OK...\n");
+				utils::format("PHY init OK...\n");
 #endif
 				return true;
 			}
