@@ -11,6 +11,12 @@
 #include "common/format.hpp"
 #include "chip/phy_base.hpp"
 
+#ifdef BIG_ENDIAN
+#elif LITTLE_ENDIAN
+#elif
+#error "ether_io.hpp requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
+#endif
+
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -24,6 +30,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ETHRC, class EDMAC, class PHY, class INTR_TASK>
 	class ether_io {
+
+		static const int EMAC_BUFSIZE = 1536;  			// Must be 32-byte aligned
+		static const int EMAC_NUM_RX_DESCRIPTORS = 4;	// The number of RX descriptors.
+		static const int EMAC_NUM_TX_DESCRIPTORS = 4;	// The number of TX descriptors.
+
 	public:
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -49,16 +60,7 @@ namespace device {
 		};
 
 	private:
-		static const int EMAC_BUFSIZE = 1536;  			// Must be 32-byte aligned
-		static const int EMAC_NUM_RX_DESCRIPTORS = 1;	// The number of RX descriptors.
-		static const int EMAC_NUM_TX_DESCRIPTORS = 1;	// The number of TX descriptors.
-
-		// The total number of EMAC buffers to allocate. The number of
-		// total buffers is simply the sum of the number of transmit and
-		// receive buffers.
-		static const int  EMAC_NUM_BUFFERS = EMAC_NUM_RX_DESCRIPTORS + EMAC_NUM_TX_DESCRIPTORS;
-
-		/* Bit definitions of status member of DescriptorS */
+		// Bit definitions of status member of DescriptorS
 		static const uint32_t TACT = 0x80000000;
 		static const uint32_t RACT = 0x80000000;
 		static const uint32_t TDLE = 0x40000000;
@@ -161,21 +163,26 @@ namespace device {
 
 		struct descriptor_s {
     		uint32_t	status;
+#ifdef LITTLE_ENDIAN
 			uint16_t	size;
 			uint16_t	bufsize;
-			uint8_t*	buf_p;
-			descriptor_s*	next;
+#else
+			uint16_t	bufsize;
+			uint16_t	size;
+#endif
+			volatile void*	buf_p;
+			volatile descriptor_s*	next;
 		};
 
 		struct etherbuffer_s {
-			uint8_t  buffer[EMAC_NUM_BUFFERS][EMAC_BUFSIZE];
+			uint8_t  buffer[EMAC_NUM_RX_DESCRIPTORS + EMAC_NUM_TX_DESCRIPTORS][EMAC_BUFSIZE];
 		};
 
 	private:
 		// アライメントを使う場合、注意
-		descriptor_s rx_descriptors_[EMAC_NUM_RX_DESCRIPTORS] __attribute__ ((aligned(32)));
-		descriptor_s tx_descriptors_[EMAC_NUM_TX_DESCRIPTORS] __attribute__ ((aligned(32)));
-		etherbuffer_s ether_buffers_ __attribute__ ((aligned(32)));
+		volatile descriptor_s rx_descriptors_[EMAC_NUM_RX_DESCRIPTORS] __attribute__ ((aligned(32)));
+		volatile descriptor_s tx_descriptors_[EMAC_NUM_TX_DESCRIPTORS] __attribute__ ((aligned(32)));
+		volatile etherbuffer_s ether_buffers_ __attribute__ ((aligned(32)));
 		volatile descriptor_s* app_rx_desc_;
 		volatile descriptor_s* app_tx_desc_;
 
@@ -188,8 +195,8 @@ namespace device {
 
 		uint8_t	mac_addr_[6];
 
-		volatile bool	pause_frame_enable_flag_;
-		volatile bool	magic_packet_detect_;
+		volatile bool		pause_frame_enable_flag_;
+		volatile bool		magic_packet_detect_;
 		volatile uint8_t	lchng_flag_;
 		volatile uint8_t	transfer_enable_flag_;
 
@@ -201,19 +208,13 @@ namespace device {
 		uint32_t		recv_mod_;
 
 
-		// ※必要なら、実装する
-		void sleep_() { asm("nop"); }
-
-
 		void reset_mac_() {
-			/* Software reset */
+			// Software reset
 			EDMAC::EDMR.SWR = 1;
 
-			/* Delay */
-			/*
-			 * Waiting time until the initialization of ETHERC and EDMAC is completed is 64 cycles
-			 * in the clock conversion of an internal bus of EDMAC. 
-			 */
+			// Delay
+			// Waiting time until the initialization of ETHERC and EDMAC is completed is 64 cycles
+			// in the clock conversion of an internal bus of EDMAC. 
 			for(int i = 0; i < 0x00000100; i++) {
 				asm("nop");
 			}
@@ -222,9 +223,9 @@ namespace device {
 
 		void init_descriptors_()
 		{
-			descriptor_s* descriptor;
+			volatile descriptor_s* descriptor;
 
-			/* Initialize the receive descriptors */
+			// Initialize the receive descriptors
 			for(int i = 0; i < EMAC_NUM_RX_DESCRIPTORS; i++) {
 				descriptor = &rx_descriptors_[i];
 				descriptor->buf_p = &ether_buffers_.buffer[i][0];
@@ -234,15 +235,15 @@ namespace device {
 				descriptor->next = &rx_descriptors_[i + 1];
 			}
 
-			/* The last descriptor points back to the start */
+			// The last descriptor points back to the start
 			descriptor->status |= RDLE;
 			descriptor->next = &rx_descriptors_[0];
 
-			/* Initialize application receive descriptor pointer */
+			// Initialize application receive descriptor pointer
 			app_rx_desc_ = &rx_descriptors_[0];
 
-			/* Initialize the transmit descriptors */
-			for (int i = 0; i < EMAC_NUM_TX_DESCRIPTORS; i++) {
+			// Initialize the transmit descriptors
+			for(int i = 0; i < EMAC_NUM_TX_DESCRIPTORS; i++) {
 				descriptor = &tx_descriptors_[i];
 				descriptor->buf_p = &ether_buffers_.buffer[EMAC_NUM_RX_DESCRIPTORS + i][0];
 				descriptor->bufsize = 0;
@@ -251,25 +252,23 @@ namespace device {
 				descriptor->next = &tx_descriptors_[i + 1];
 			}
 
-			/* The last descriptor points back to the start */
+			// The last descriptor points back to the start
 			descriptor->status |= TDLE;
 			descriptor->next = &tx_descriptors_[0];
 
-			/* Initialize application transmit descriptor pointer */
-			app_tx_desc_  = &tx_descriptors_[0];
-
-			utils::delay::micro_second(100);
+			// Initialize application transmit descriptor pointer
+			app_tx_desc_ = &tx_descriptors_[0];
 		}
 
 
 		void config_ethernet_(const uint8_t mode)
 		{
-			/* Magic packet detecion mode */
+			// Magic packet detecion mode
 			if (USE_MAGIC_PACKET_DETECT == mode) {
 				ETHRC::ECSIPR = 0x00000006;
 				EDMAC::EESIPR = 0x00400000;
 			} else {  // Normal mode
-				/* LINK Signal Change Interrupt Enable */
+				// LINK Signal Change Interrupt Enable
 				ETHRC::ECSIPR.LCHNGIP = 1;
 				EDMAC::EESIPR.ECIIP   = 1;
 
@@ -309,11 +308,10 @@ namespace device {
 			EDMAC::TFTR = 0x00000000;
 			// transmit fifo & receive fifo is 2048 bytes
 			EDMAC::FDR  = 0x00000707;
-			/*  Configure receiving method
-				b0      RNR - Receive Request Bit Reset - Continuous reception of multiple frames is possible.
-				b1      RNC - Receive Request Bit Non-Reset Mode - The RR bit is automatically reset.
-				b31:b2  Reserved set to 0
-			 */
+			// Configure receiving method
+			// b0      RNR - Receive Request Bit Reset - Continuous reception of multiple frames is possible.
+			// b1      RNC - Receive Request Bit Non-Reset Mode - The RR bit is automatically reset.
+			// b31:b2  Reserved set to 0
 			EDMAC::RMCR  = 0x00000001;
 		}
 
@@ -374,7 +372,7 @@ namespace device {
 				utils::format("PHY Link 10Mbps / Half\n");
 				break;
 
-			/* Full duplex link */
+			// Full duplex link
 			case chip::phy_link_state::LINK_100F:
 				ETHRC::ECMR.DM  = 1;
 				ETHRC::ECMR.RTM = 1;
@@ -397,17 +395,17 @@ namespace device {
 				break;
 			}
 
-			/* At the communicate mode usually */
+			// At the communicate mode usually
 			if(NO_USE_MAGIC_PACKET_DETECT == mode) {
-				/* When pause frame is used */
+				// When pause frame is used
 				if(full_duplex && pause_frame_enable_flag_) {
-					/* Set automatic PAUSE for 512 bit-time */
+					// Set automatic PAUSE for 512 bit-time
 					ETHRC::APR = 0x0000FFFF;
-					/* Set unlimited retransmit of PAUSE frames */
+					// Set unlimited retransmit of PAUSE frames
 					ETHRC::TPAUSER = 0;
-					/* PAUSE flow control FIFO settings. */
+					// PAUSE flow control FIFO settings.
 					EDMAC::FCFTR = 0x00000000;
-					/* Control of a PAUSE frame whose TIME parameter value is 0 is enabled. */
+					// Control of a PAUSE frame whose TIME parameter value is 0 is enabled.
 					ETHRC::ECMR.ZPF = 1;
 
 					 // Enable PAUSE for full duplex link depending on
@@ -417,16 +415,16 @@ namespace device {
 					pause_resolution_(local_pause_bits, partner_pause_bits,
                                       transmit_pause_set, receive_pause_set);
 			
-					if (XMIT_PAUSE_ON == transmit_pause_set) {
-						/* Enable automatic PAUSE frame transmission */
+					if(XMIT_PAUSE_ON == transmit_pause_set) {
+						// Enable automatic PAUSE frame transmission
 						ETHRC::ECMR.TXF = 1;
 					} else {
-						/* Disable automatic PAUSE frame transmission */
+						// Disable automatic PAUSE frame transmission
 						ETHRC::ECMR.TXF = 0;
 					}
 
-					if (RECV_PAUSE_ON == receive_pause_set) {
-						/* Enable reception of PAUSE frames */
+					if(RECV_PAUSE_ON == receive_pause_set) {
+						// Enable reception of PAUSE frames
 						ETHRC::ECMR.RXF = 1;
 					} else {
 						/* Disable reception of PAUSE frames */
@@ -438,11 +436,11 @@ namespace device {
 					ETHRC::ECMR.RXF = 0;
 				}
 
-				/* Enable receive and transmit. */
+				// Enable receive and transmit.
 				ETHRC::ECMR.RE = 1;
 				ETHRC::ECMR.TE = 1;
 
-				/* Enable EDMAC receive */
+				// Enable EDMAC receive
 				EDMAC::EDRRR = 0x1;
 			} else {
 				// The magic packet detection is permitted.
@@ -536,7 +534,6 @@ namespace device {
 #endif
 		}
 
-
 		int32_t recv_buf_release_()
 		{
     		int32_t ret;
@@ -583,7 +580,7 @@ namespace device {
 						} else {
 							// Pass the pointer to received data to application.  This is
 							// zero-copy operation.
-							*buf = app_rx_desc_->buf_p;
+							*buf = (void*)app_rx_desc_->buf_p;
 
 							// Get bytes received
 							num_recvd = app_rx_desc_->size;
@@ -613,8 +610,8 @@ namespace device {
 				if(TACT == (app_tx_desc_->status & TACT)) {
 					ret = ERROR_TACT;
 				} else {
-					/* Give application another buffer to work with */
-					*buf = app_tx_desc_->buf_p;
+					// Give application another buffer to work with
+					*buf = (void*)app_tx_desc_->buf_p;
 					buf_size = app_tx_desc_->size;
 					ret = OK;
 				}
@@ -655,7 +652,6 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		ether_io() :
-			rx_descriptors_{ 0 }, tx_descriptors_{ 0 }, ether_buffers_{ 0 },
 			app_rx_desc_(nullptr), app_tx_desc_(nullptr),
 			intr_level_(0), mac_addr_{ 0 },
 			pause_frame_enable_flag_(false), magic_packet_detect_(false),
