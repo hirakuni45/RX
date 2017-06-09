@@ -34,9 +34,11 @@ namespace net {
 
 		typedef dhcp_client<ETHER_IO> DHCP;
 		DHCP		dhcp_;
-///		DHCP::dhcp_t dhcp_status_;
 
 		task		task_;
+
+		uint8_t	link_interval_;
+		bool	link_up_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -46,7 +48,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		net_core(ETHER_IO& io) : io_(io), dhcp_(io),
-			task_(task::wait_link)
+			task_(task::wait_link), link_interval_(0), link_up_(false)
 			{ }
 
 
@@ -78,11 +80,18 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void service()
 		{
+			if(link_interval_ >= 100) {
+				io_.polling_link_status();
+				link_interval_ = 0;
+			}
+			++link_interval_;
+
+			bool link = io_.link_process();
+
 			switch(task_) {
 
 			case task::wait_link:
-				io_.polling_link_status();
-				if(io_.link_process()) {
+				if(!link_up_ && link) {
 					utils::format("Ether Link UP: OK\n");
 					task_ = task::wait_dhcp;
 				}
@@ -109,6 +118,12 @@ namespace net {
 			default:
 				break;
 			}
+
+			if(link_up_ && !link) {  // link is down
+				task_ = task::wait_link;
+			}
+
+			link_up_ = link;
 		}
 	};
 
