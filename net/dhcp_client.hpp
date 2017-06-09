@@ -22,7 +22,57 @@ extern "C" {
 	uint32_t get_timer(void);
 }
 
+#define DHCP_DEBUG
+
 namespace net {
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  DHCP_INFO 情報 クラス 
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct DHCP_INFO {
+		uint8_t	ipaddr[4];
+		uint8_t	maskaddr[4];
+		uint8_t	gwaddr[4];
+		uint8_t	dnsaddr[4];
+		uint8_t	dnsaddr2[4];
+		char	domain[20];
+		uint8_t	macaddr[6];
+
+		uint32_t	lease_time;
+		uint32_t	renewal_time;
+		uint32_t	rebinding_time;
+
+		DHCP_INFO() :
+			ipaddr { 0 },
+			maskaddr { 0 },
+			gwaddr { 0 },
+			dnsaddr { 0 },
+			dnsaddr2 { 0 },
+			domain { 0 },
+			macaddr { 0 },
+			lease_time(0), renewal_time(0), rebinding_time(0)
+		{ }
+
+		void list_adr(const char* head, const uint8_t* a) const
+		{
+			utils::format("%s%d.%d.%d.%d\n") % head
+				% static_cast<int>(a[0]) % static_cast<int>(a[1])
+				% static_cast<int>(a[2]) % static_cast<int>(a[3]);
+		}
+
+		void list() const
+		{
+			list_adr("IP:   ", ipaddr);
+			list_adr("MASK: ", maskaddr);
+			list_adr("GW:   ", gwaddr);
+			list_adr("DNS:  ", dnsaddr);
+			list_adr("DNS2: ", dnsaddr2);
+			utils::format("DOMAIN: '%s'\n") % domain;
+		}
+	};
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -33,23 +83,27 @@ namespace net {
 	template <class ETHER_IO>
 	class dhcp_client {
 
-		static const uint32_t TIMEOUT = 2 * 1000 / 10;  ///< 2sec (unit 10ms)
-		static const uint8_t DOMAIN_GET = 0x01;
-
-	public:
-		struct dhcp_t {
-			uint8_t	ipaddr[4];
-			uint8_t	maskaddr[4];
-			uint8_t	gwaddr[4];
-			uint8_t	dnsaddr[4];
-			uint8_t	dnsaddr2[4];
-			char	domain[20];
-			uint8_t	macaddr[6];
+#ifndef DHCP_DEBUG
+		// デバッグ以外で出力を無効にする
+		struct null_chaout {
+			null_chaout(char* out = nullptr, uint16_t len = 0) { } 
+			void operator() (char ch) {
+			}
 		};
 
-	private:
+		typedef utils::basic_format<null_chaout> debug_format;
+#else
+		typedef utils::basic_format<utils::def_chaout> debug_format;
+#endif
+
+		static const uint32_t TIMEOUT = 2 * 1000 / 10;  ///< 2 sec (unit 10ms)
+		static const uint8_t DOMAIN_GET = 0x01;
+
 		static const uint32_t EXPANSION_DHCP_PACKET_SIZE  = 300;
 		static const uint32_t TRANSACTION_ID = 0x12345678;
+
+		ETHER_IO&	io_;
+		DHCP_INFO	info_;
 
 		struct dv_options {
 			uint32_t	magic_cookie;
@@ -59,16 +113,7 @@ namespace net {
 			uint8_t		client_id2;
 			uint8_t		client_mac[6];
 			uint8_t		dummy[48 + EXPANSION_DHCP_PACKET_SIZE];
-
-			dv_options() :
-				magic_cookie(0),
-				message_type1(0),
-				message_type2(0),
-				client_id1(0),
-				client_id2(0),
-				client_mac{ 0 },
-				dummy{ 0 } { }
-		};
+		} __attribute__((__packed__));
 
 
 		struct dhcp_data {
@@ -87,24 +132,7 @@ namespace net {
 			uint8_t		server_host_name[64];
 			uint8_t		file_name[128];
 			dv_options	options;
-
-			dhcp_data() :
-				opecode(0),
-				hard_addr(0),
-				hard_addr_len(0),
-				hop_count(0),
-				transaction_id(0),
-				second(0),
-				dummy(0),
-				client_ip{ 0 },
-				user_ip{ 0 },
-				server_ip{ 0 },
-				gateway_ip{ 0 },
-				client_hard_addr{ 0 },
-				server_host_name{ 0 },
-				file_name{ 0 },
-				options() { }
-		};
+		} __attribute__((__packed__));
 
 
 		struct udp_packet {
@@ -112,9 +140,7 @@ namespace net {
 			uint16_t	destination_port;
 			uint16_t	length;
 			uint16_t	checksum;
-
-			udp_packet() : source_port(0), destination_port(0), length(0), checksum(0) { }
-		};
+		} __attribute__((__packed__));
 
 
 		struct ipv4_packet {
@@ -128,26 +154,14 @@ namespace net {
 			uint16_t	checksum;
 			uint8_t		source_ip[4];
 			uint8_t		destination_ip[4];
-
-			ipv4_packet() : version_and_length(0),
-				differentiated_services_field(0),
-				total_length(0),
-				identification(0),
-				flags_and_fragment_offset(0),
-				time_to_live(0),
-				protocol(0),
-				checksum(0),
-				source_ip{ 0 }, destination_ip{ 0 } { }
-		};
+		} __attribute__((__packed__));
 
 
 		struct ether_packet {
 			uint8_t  destination_address[6];
 			uint8_t  source_address[6];
 			uint16_t packet_type;
-
-			ether_packet() : destination_address{ 0 }, source_address{ 0 }, packet_type(0) { }
-		};
+		} __attribute__((__packed__));
 
 
 		struct dhcp_packet {
@@ -155,12 +169,7 @@ namespace net {
 			ipv4_packet		ipv4;
 			udp_packet		udp;
 			dhcp_data		dhcp;
-
-			dhcp_packet() : ether(), ipv4(), udp(), dhcp() { } 
-		};
-
-
-		ETHER_IO&	io_;
+		} __attribute__((__packed__));
 
 
 		static inline uint16_t htons_(uint16_t data)
@@ -204,8 +213,7 @@ namespace net {
 			}
 
 			if(len == 1) {
-				const void* tmp = data;
-				const uint8_t* p = static_cast<const uint8_t*>(tmp);
+				const uint8_t* p = reinterpret_cast<const uint8_t*>(data);
 				sum += *p;
 			}
 
@@ -238,8 +246,7 @@ namespace net {
 			}
 
 			if(len == 1) {
-				const void* tmp = data;
-				const uint8_t* p = static_cast<const uint8_t*>(tmp);
+				const uint8_t* p = reinterpret_cast<const uint8_t*>(data);
 				sum += *p;
 			}
 
@@ -250,10 +257,18 @@ namespace net {
 		}
 
 
-		bool discover_(dhcp_t& dhcp, dhcp_packet& packet)
+		bool discover_(DHCP_INFO& dhcp, dhcp_packet& packet)
 		{
 			const uint8_t broadcast[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 			const uint8_t blank_ip[] = { 0, 0, 0, 0 };
+
+			debug_format("DHCP MAC: %02X:%02X:%02X:%02X:%02X:%02X\n")
+				% static_cast<uint32_t>(dhcp.macaddr[0])
+				% static_cast<uint32_t>(dhcp.macaddr[1])
+				% static_cast<uint32_t>(dhcp.macaddr[2])
+				% static_cast<uint32_t>(dhcp.macaddr[3])
+				% static_cast<uint32_t>(dhcp.macaddr[4])
+				% static_cast<uint32_t>(dhcp.macaddr[5]);
 
 			memcpy(packet.ether.destination_address, broadcast, 6);
 			memcpy(packet.ether.source_address, dhcp.macaddr, 6);
@@ -304,46 +319,51 @@ namespace net {
 			packet.udp.checksum                       = checksum_udp_(tmp_header, &packet.udp,
 				sizeof(packet.udp) + sizeof(packet.dhcp));
 
-			io_.write(&packet.ether, sizeof(packet.ether),
-					  &packet.ipv4, sizeof(dhcp_packet) - sizeof(packet.ether));
+			// DHCP write: 14, 628 (sum: 29223, udpsum: 5473)
+			int head_len = sizeof(packet.ether);
+			int body_len = sizeof(dhcp_packet) - sizeof(packet.ether);
+			debug_format("DHCP write: %d, %d (sum: %d, udpsum: %d)\n")
+				% head_len % body_len % (int)packet.ipv4.checksum % (int)packet.udp.checksum;
+
+			uint8_t tmp[head_len + body_len];
+			memcpy(tmp, &packet.ether, head_len);
+			memcpy(&tmp[head_len], &packet.ipv4, body_len);
+			auto wl = io_.write(tmp, head_len + body_len);
+			debug_format("DHCP write: %d\n") % wl;
+
 			return true;
 		}
 
 
-		bool wait_offer_(dhcp_t& dhcp, dhcp_packet& packet)
+		bool wait_offer_(DHCP_INFO& dhcp, dhcp_packet& packet)
 		{
-			reset_timer();
 			memset(&packet, 0, sizeof(packet));
-
+			reset_timer();
 			while(1) {
 				auto timer = get_timer();
 				if(timer > TIMEOUT) {
 					return false;
 				}
-
-				void* ptr;
-				auto len = io_.read(&ptr);
+				uint32_t all = sizeof(packet.ether) + sizeof(packet.ipv4)
+							 + sizeof(packet.udp) + sizeof(packet.dhcp);
+				auto len = io_.read(&packet, all);
 				if(len > 0) {
-					memcpy(&packet, ptr,
-						sizeof(packet.ether) + sizeof(packet.ipv4)
-						+ sizeof(packet.udp) + sizeof(packet.dhcp));
-
-					io_.read_buf_release();
-            		if((packet.udp.source_port == htons_(0x0043)) &&
-						(packet.udp.destination_port == htons_(0x0044)) &&
-						(packet.dhcp.transaction_id == htonl_(TRANSACTION_ID)) &&
-						(packet.dhcp.options.message_type1 == htons_(0x3501)) &&
-						(packet.dhcp.options.message_type2 == 0x02)) {
-						break;
+					debug_format("DHCP Read: %d (%d)\n") % len % all;
+					if(packet.udp.source_port == htons_(0x0043)
+						&& packet.udp.destination_port == htons_(0x0044)
+						&& packet.dhcp.transaction_id == htonl_(TRANSACTION_ID)
+					 	&& packet.dhcp.options.message_type1 == htons_(0x3501)
+					 	&& packet.dhcp.options.message_type2 == 0x02) {
+						memcpy(dhcp.ipaddr, packet.dhcp.user_ip, 4);
+						return true;
 					}
 				}
 			}
-			memcpy(dhcp.ipaddr, packet.dhcp.user_ip, 4);
-			return true;
+			return false;
 		}
 
 
-		bool request_(dhcp_t& dhcp, dhcp_packet& packet)
+		bool request_(DHCP_INFO& dhcp, dhcp_packet& packet)
 		{
 			const uint8_t broadcast[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 			const uint8_t blank_ip[] = { 0, 0, 0, 0 };
@@ -404,13 +424,19 @@ namespace net {
 			packet.udp.checksum                       = checksum_udp_(tmp_header, &packet.udp,
 				sizeof(packet.udp) + sizeof(packet.dhcp));
 
-			io_.write(&packet.ether, sizeof(packet.ether), &packet.ipv4,
-				sizeof(dhcp_packet) - sizeof(packet.ether));
+			int hds = sizeof(packet.ether);
+			int bds = sizeof(dhcp_packet) - sizeof(packet.ether);
+			uint8_t tmp[hds + bds];
+			memcpy(tmp, &packet.ether, hds);
+			memcpy(&tmp[hds], &packet.ipv4, bds);
+			io_.write(tmp, hds + bds);
+//			io_.write(&packet.ether, sizeof(packet.ether), &packet.ipv4,
+//				sizeof(dhcp_packet) - sizeof(packet.ether));
 			return true;
 		}
 
 
-		bool wait_ack_(dhcp_t& dhcp, dhcp_packet& packet)
+		bool wait_ack_(DHCP_INFO& dhcp, dhcp_packet& packet)
 		{
 			uint8_t none[5] = { "none" };
 
@@ -420,12 +446,11 @@ namespace net {
 				if(timer > TIMEOUT) {
 					return false;
 				}
-				void* ptr;
-				auto len = io_.read(&ptr);
+
+				int all = sizeof(packet.ether) + sizeof(packet.ipv4)
+						+ sizeof(packet.udp) + sizeof(packet.dhcp);
+				auto len = io_.read(&packet, all);
 				if(len > 0) {
-					memcpy(&packet, ptr, sizeof(packet.ether) + sizeof(packet.ipv4)
-						+ sizeof(packet.udp) + sizeof(packet.dhcp));
-					io_.read_buf_release();
 					if((packet.udp.source_port == htons_(0x0043))
 						&& (packet.udp.destination_port == htons_(0x0044))
 						&& (packet.dhcp.transaction_id == htonl_(TRANSACTION_ID))
@@ -436,8 +461,7 @@ namespace net {
 				}
 			}
 
-			const void* p = static_cast<const void*>(&packet.dhcp.options.message_type1);
-			const uint8_t* option = static_cast<const uint8_t*>(p);
+			const uint8_t* option = reinterpret_cast<const uint8_t*>(&packet.dhcp.options.message_type1);
 			uint8_t flag = 0;
 			while(*option != 0xff) {  // End option
 				while(*option == 0) {  // OPTION No.0 : Padding
@@ -470,10 +494,25 @@ namespace net {
 					break;
 
 				case 51:   // OPTION No.51 : IP Address Lease Time
+					{
+						const uint32_t* p = reinterpret_cast<const uint32_t*>(option + 2);
+				    	dhcp.lease_time = htonl_(*p);
+					}
+					break;
 				case 53:   // OPTION No.53 : DHCP Message Type
 				case 54:   // OPTION No.54 : Server Identiffer
 				case 58:   // OPTION No.58 : Renewal Time Value
+					{
+						const uint32_t* p = reinterpret_cast<const uint32_t*>(option + 2);
+				    	dhcp.renewal_time = htonl_(*p);
+					}
+					break;
 				case 59:   // OPTION No.59 : Rebinding Time Value
+					{
+						const uint32_t* p = reinterpret_cast<const uint32_t*>(option + 2);
+				    	dhcp.rebinding_time = htonl_(*p);
+					}
+					break;
 				default:
 					break;
 				}
@@ -495,34 +534,51 @@ namespace net {
 			@param[in]	io	インサーネット入出力
 		*/
 		//-----------------------------------------------------------------//
-		dhcp_client(ETHER_IO& io) : io_(io) { }
+		dhcp_client(ETHER_IO& io) : io_(io), info_() { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  DHCP サーバーから、IP アドレスを取得
-			@param[out]	dhcp	取得した DHCP 情報
 		*/
 		//-----------------------------------------------------------------//
-		bool start(dhcp_t& dhcp)
+		bool start()
 		{
-			memcpy(dhcp.macaddr, io_.get_mac(), 6);
+			memcpy(info_.macaddr, io_.get_mac(), 6);
+
 			dhcp_packet packet;
+			memset(&packet, 0, sizeof(dhcp_packet));
 
-			if(!discover_(dhcp, packet)) {
-				return false;
-			}
-			if(!wait_offer_(dhcp, packet)) {
+			debug_format("DHCP discover\n");
+			if(!discover_(info_, packet)) {
 				return false;
 			}
 
-			if(!request_(dhcp, packet)) {
+			debug_format("DHCP wait_offer\n");
+			if(!wait_offer_(info_, packet)) {
 				return false;
 			}
-			if(!wait_ack_(dhcp, packet)) {
+
+			debug_format("DHCP request\n");
+			if(!request_(info_, packet)) {
 				return false;
 			}
+
+			debug_format("DHCP wait_ack\n");
+			if(!wait_ack_(info_, packet)) {
+				return false;
+			}
+
 			return true;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  DHCP 情報の取得
+			@return DHCP 情報
+		*/
+		//-----------------------------------------------------------------//
+		const DHCP_INFO& get_info() const { return info_; }
 	};
 }
