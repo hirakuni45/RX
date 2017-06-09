@@ -15,7 +15,7 @@
 #include "common/input.hpp"
 
 #include "chip/phy_base.hpp"
-#include "net/dhcp_client.hpp"
+#include "net/net_core.hpp"
 
 namespace {
 
@@ -60,19 +60,18 @@ namespace {
 	class eth_task {
 	public:
 		void operator() () {
-			ethc_count_++;
+			++ethc_count_;
 		}
 	};
 
-	typedef device::ETHERC0 ETHERC;  // Eternet Controller
-	typedef device::EDMAC0 EDMAC;    // Ethernet DMA Controller
+	typedef device::ETHERC0 ETHERC;      // Eternet Controller
+	typedef device::EDMAC0 EDMAC;        // Ethernet DMA Controller
 	typedef chip::phy_base<ETHERC> PHY;  // Ethernet PHY
-	typedef device::ether_io<ETHERC, EDMAC, PHY, eth_task> ETHERNET;
+	typedef device::ether_io<ETHERC, EDMAC, PHY, eth_task> ETHER_IO;
+	ETHER_IO 	ether_;
 
-	ETHERNET ether_;
-
-	typedef net::dhcp_client<ETHERNET> DHCP;
-	DHCP	dhcp_(ether_);
+	typedef net::net_core<ETHER_IO> NET_CORE;
+	NET_CORE	net_(ether_);
 }
 
 extern "C" {
@@ -295,62 +294,24 @@ int main(int argc, char** argv)
 		sci_.start(115200, int_level);
 	}
 
-	utils::format("\nStart GR-KAEDE Ethernet stack\n");
+	utils::format("\nStart GR-KAEDE Ethernet Sample\n");
 
 	// SD カード・クラスの初期化
 	sdc_.start();
 
-	// Ethernet の開始
-	{
+	{  // Ethernet の開始
 		uint8_t intr_level = 4;
 		ether_.start(intr_level);
+
+		static uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+		net_.start(mac);
 	}
 
 	uint32_t cnt = 0;
-	{
-		static uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-		if(!ether_.open(mac)) {
-			utils::format("Ether open NG !\n");
-		} else {
-			utils::format("Ether open OK !\n");
-		}
-
-		volatile uint32_t n = ethc_count_;
-		while(1) {
-			cmt_.sync();
-
-			ether_.polling_link_status();
-			if(ether_.link_process()) break;
-
-			if(n != ethc_count_) {
-				utils::format("Ethernet intr: %d\n") % ethc_count_;
-				n = ethc_count_;
-			}
-
-			device::PORTC::PDR.B0 = 1; // output
-			device::PORTC::PODR.B0 = (cnt < 10) ? 0 : 1;
-			++cnt;
-			if(cnt >= 50) cnt = 0;
-		}
-		utils::format("Ether Link UP OK\n");
-
-		{
-			DHCP::dhcp_t t;
-			if(dhcp_.start(t)) {
-				utils::format("DHCP OK\n");
-			} else {
-				utils::format("DHCP NG\n");
-			}
-		}
-	}
-
 	while(1) {  // 100Hz (10ms interval)
 		cmt_.sync();
 
-///		net_service();
-
-		ether_.polling_link_status();
-		ether_.link_process();
+		net_.service();
 
 		sdc_.service();
 
