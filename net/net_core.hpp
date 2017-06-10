@@ -7,6 +7,7 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "net/dhcp_client.hpp"
+#include "net/net_io.hpp"
 
 namespace net {
 
