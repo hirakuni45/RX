@@ -30,7 +30,7 @@ namespace seeda {
 		static void send_info(int fd, int id, bool keep)
 		{
 			format("HTTP/1.1 %d OK\n", fd) % id;
-			format("Server: seeda/rx64m\n", fd);
+			format("Server: SEEDA03/RX64M\n", fd);
 			format("Content-Type: text/html\n", fd);
 			format("Connection: %s\n\n", fd) % (keep == true ? "keep-alive" : "close");
 		}
@@ -44,7 +44,7 @@ namespace seeda {
 		static void send_head(int fd, const char* title)
 		{
 			format("<head>\n", fd);
-			format("<title>SEEDA %s</title>\n", fd) % title;
+			format("<title>SEEDA03 %s</title>\n", fd) % title;
 			format("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n", fd);
 			format("<meta http-equiv=\"Pragma\" content=\"no-cache\">\n", fd);
 			format("<meta http-equiv=\"Cache-Control\" content=\"no-cache\">\n", fd);
