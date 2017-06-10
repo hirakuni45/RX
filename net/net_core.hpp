@@ -23,6 +23,7 @@ namespace net {
 	private:
 
 		enum class task {
+			halt,		// Halt !!!
 			wait_link,	// リンクアップを待つ
 			wait_dhcp,	// DHCP IP アドレスの取得を待つ
 			setup_ip,	// IP アドレスを直接設定
@@ -91,21 +92,26 @@ namespace net {
 			switch(task_) {
 
 			case task::wait_link:
-				if(!link_up_ && link) {
-					utils::format("Ether Link UP: OK\n");
+				if(link) {
+					utils::format("Ether Link UP\n");
+					dhcp_.start(200);  // 2 sec
 					task_ = task::wait_dhcp;
 				}
 				break;
 
 			case task::wait_dhcp:
-				if(dhcp_.start()) {
-					utils::format("DHCP OK\n");
+				dhcp_.service();
+				if(dhcp_.get_info().state == DHCP_INFO::state_t::collect) {
+					utils::format("DHCP Collect\n");
 					const DHCP_INFO& info = dhcp_.get_info();
 					info.list();
 					task_ = task::main_loop;
-				} else {
-					utils::format("DHCP NG\n");
+				} else if(dhcp_.get_info().state == DHCP_INFO::state_t::timeout) {
+					utils::format("DHCP Timeout\n");
 					task_ = task::setup_ip;
+				} else if(dhcp_.get_info().state == DHCP_INFO::state_t::error) {
+					utils::format("DHCP Error\n");
+					task_ = task::halt;
 				}
 				break;
 
@@ -119,9 +125,10 @@ namespace net {
 				break;
 			}
 
-			if(link_up_ && !link) {  // link is down
-				task_ = task::wait_link;
-			}
+//			if(link_up_ && !link) {  // link is down
+//				utils::format("Ether Link Down\n");
+//				task_ = task::wait_link;
+//			}
 
 			link_up_ = link;
 		}
