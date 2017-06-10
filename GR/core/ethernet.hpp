@@ -829,10 +829,6 @@ namespace net {
 				ethernet::write(fd_, tmp_, pos_);
 				pos_ = 0;
 			}
-//			if(ch == '\n' || pos_ >= sizeof(tmp_)) {
-//				ethernet::write(fd_, tmp_, pos_);				
-//				pos_ = 0;
-//			}
 		}
 	public:
 		//-----------------------------------------------------------------//
