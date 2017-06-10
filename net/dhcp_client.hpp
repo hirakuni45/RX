@@ -10,6 +10,7 @@
 #include <cstring>
 #include "common/format.hpp"
 #include "common/input.hpp"
+#include "net/net_tools.hpp"
 
 #ifdef BIG_ENDIAN
 #elif LITTLE_ENDIAN
@@ -196,34 +197,6 @@ namespace net {
 		task		task_;
 
 
-		static inline uint16_t htons_(uint16_t data)
-		{
-#ifndef BIG_ENDIAN
-			uint16_t tmp = 0;
-			tmp  = (data & 0x00ff) << 8;
-			tmp |= (data & 0xff00) >> 8;
-			return tmp;
-#else
-			return data;
-#endif
-		}
-
-
-		static inline uint32_t htonl_(uint32_t data)
-		{
-#ifndef BIG_ENDIAN
-			uint32_t tmp = 0;
-			tmp  = (data & 0x000000ff) << 24;
-			tmp |= (data & 0x0000ff00) << 8;
-			tmp |= (data & 0x00ff0000) >> 8;
-			tmp |= (data & 0xff000000) >> 24;
-			return tmp;
-#else
-    		return data;
-#endif
-		}
-
-
 		static uint16_t checksum_(const void* ptr, int32_t len)
 		{
 			const uint16_t* data = static_cast<const uint16_t*>(ptr);
@@ -296,37 +269,37 @@ namespace net {
 
 			memcpy(packet.ether.destination_address, broadcast, 6);
 			memcpy(packet.ether.source_address, dhcp.macaddr, 6);
-			packet.ether.packet_type = htons_(0x0800);
+			packet.ether.packet_type = tools::htons(0x0800);
 
 			packet.ipv4.version_and_length            = 0x45;
 			packet.ipv4.differentiated_services_field = 0x00;
-			packet.ipv4.total_length                  = htons_(0x0148);
-			packet.ipv4.identification                = htons_(0x1234);
-			packet.ipv4.flags_and_fragment_offset     = htons_(0x0000);
+			packet.ipv4.total_length                  = tools::htons(0x0148);
+			packet.ipv4.identification                = tools::htons(0x1234);
+			packet.ipv4.flags_and_fragment_offset     = tools::htons(0x0000);
 			packet.ipv4.time_to_live                  = 0x80;
 			packet.ipv4.protocol                      = 0x11;
-			packet.ipv4.checksum                      = htons_(0x0000);
+			packet.ipv4.checksum                      = tools::htons(0x0000);
 			memcpy(packet.ipv4.source_ip, blank_ip, 4);
 			memcpy(packet.ipv4.destination_ip, broadcast, 4);
 
-			packet.udp.source_port                    = htons_(68);
-			packet.udp.destination_port               = htons_(67);
-			packet.udp.length                         = htons_(0x0134);
-			packet.udp.checksum                       = htons_(0x0000);
+			packet.udp.source_port                    = tools::htons(68);
+			packet.udp.destination_port               = tools::htons(67);
+			packet.udp.length                         = tools::htons(0x0134);
+			packet.udp.checksum                       = tools::htons(0x0000);
 
 			packet.dhcp.opecode                       = 0x01;
 			packet.dhcp.hard_addr                     = 0x01;
 			packet.dhcp.hard_addr_len                 = 0x06;
 			packet.dhcp.hop_count                     = 0x00;
-			packet.dhcp.transaction_id                = htonl_(TRANSACTION_ID);
-			packet.dhcp.second                        = htons_(0x0000);
-			packet.dhcp.dummy                         = htons_(0x0000);
+			packet.dhcp.transaction_id                = tools::htonl(TRANSACTION_ID);
+			packet.dhcp.second                        = tools::htons(0x0000);
+			packet.dhcp.dummy                         = tools::htons(0x0000);
 			memcpy(packet.dhcp.client_hard_addr, dhcp.macaddr, 6);
 
-			packet.dhcp.options.magic_cookie          = htonl_(0x63825363);
-			packet.dhcp.options.message_type1         = htons_(0x3501);
+			packet.dhcp.options.magic_cookie          = tools::htonl(0x63825363);
+			packet.dhcp.options.message_type1         = tools::htons(0x3501);
 			packet.dhcp.options.message_type2         = 0x01;
-			packet.dhcp.options.client_id1            = htons_(0x3d07);
+			packet.dhcp.options.client_id1            = tools::htons(0x3d07);
 			packet.dhcp.options.client_id2            = 0x01;
 			memcpy(packet.dhcp.options.client_mac, dhcp.macaddr, 6);
 			packet.dhcp.options.dummy[0]              = 0xff;
@@ -366,10 +339,10 @@ namespace net {
 			auto len = io_.read(&packet, all);
 			if(len > 0) {
 				debug_format("DHCP Read: %d (%d)\n") % len % all;
-				if(packet.udp.source_port == htons_(0x0043)
-					&& packet.udp.destination_port == htons_(0x0044)
-					&& packet.dhcp.transaction_id == htonl_(TRANSACTION_ID)
-				 	&& packet.dhcp.options.message_type1 == htons_(0x3501)
+				if(packet.udp.source_port == tools::htons(0x0043)
+					&& packet.udp.destination_port == tools::htons(0x0044)
+					&& packet.dhcp.transaction_id == tools::htonl(TRANSACTION_ID)
+				 	&& packet.dhcp.options.message_type1 == tools::htons(0x3501)
 				 	&& packet.dhcp.options.message_type2 == 0x02) {
 					memcpy(dhcp.ipaddr, packet.dhcp.user_ip, 4);
 					return true;
@@ -390,38 +363,38 @@ namespace net {
 
 			memcpy(packet.ether.destination_address, broadcast, 6);
 			memcpy(packet.ether.source_address, dhcp.macaddr, 6);
-			packet.ether.packet_type = htons_(0x0800);
+			packet.ether.packet_type = tools::htons(0x0800);
 
 			packet.ipv4.version_and_length            = 0x45;
 			packet.ipv4.differentiated_services_field = 0x00;
-			packet.ipv4.total_length                  = htons_(0x0148);
-			packet.ipv4.identification                = htons_(0x1234);
-			packet.ipv4.flags_and_fragment_offset     = htons_(0x0000);
+			packet.ipv4.total_length                  = tools::htons(0x0148);
+			packet.ipv4.identification                = tools::htons(0x1234);
+			packet.ipv4.flags_and_fragment_offset     = tools::htons(0x0000);
 			packet.ipv4.time_to_live                  = 0x80;
 			packet.ipv4.protocol                      = 0x11;
-			packet.ipv4.checksum                      = htons_(0x0000);
+			packet.ipv4.checksum                      = tools::htons(0x0000);
 			memcpy(packet.ipv4.source_ip, blank_ip, 4);
 			memcpy(packet.ipv4.destination_ip, broadcast, 4);
 
-			packet.udp.source_port                    = htons_(68);
-			packet.udp.destination_port               = htons_(67);
-			packet.udp.length                         = htons_(0x0134);
-			packet.udp.checksum                       = htons_(0x0000);
+			packet.udp.source_port                    = tools::htons(68);
+			packet.udp.destination_port               = tools::htons(67);
+			packet.udp.length                         = tools::htons(0x0134);
+			packet.udp.checksum                       = tools::htons(0x0000);
 
 			packet.dhcp.opecode                       = 0x01;
 			packet.dhcp.hard_addr                     = 0x01;
 			packet.dhcp.hard_addr_len                 = 0x06;
 			packet.dhcp.hop_count                     = 0x00;
-			packet.dhcp.transaction_id                = htonl_(TRANSACTION_ID);
-			packet.dhcp.second                        = htons_(0x0000);
-			packet.dhcp.dummy                         = htons_(0x0000);
+			packet.dhcp.transaction_id                = tools::htonl(TRANSACTION_ID);
+			packet.dhcp.second                        = tools::htons(0x0000);
+			packet.dhcp.dummy                         = tools::htons(0x0000);
 			memcpy(packet.dhcp.client_hard_addr, dhcp.macaddr, 6);
 
-			packet.dhcp.options.magic_cookie          = htonl_(0x63825363);
-			packet.dhcp.options.message_type1         = htons_(0x3501);
+			packet.dhcp.options.magic_cookie          = tools::htonl(0x63825363);
+			packet.dhcp.options.message_type1         = tools::htons(0x3501);
 			packet.dhcp.options.message_type2         = 0x03;
 			*(&packet.dhcp.options.message_type2 + 1) = 0x00;
-			packet.dhcp.options.client_id1            = htons_(0x3d07);
+			packet.dhcp.options.client_id1            = tools::htons(0x3d07);
 			packet.dhcp.options.client_id2            = 0x01;
 			memcpy(packet.dhcp.options.client_mac, dhcp.macaddr, 6);
 			memset(packet.dhcp.options.dummy, 0, sizeof(packet.dhcp.options.dummy));
@@ -458,10 +431,10 @@ namespace net {
 					+ sizeof(packet.udp) + sizeof(packet.dhcp);
 			auto len = io_.read(&packet, all);
 			if(len > 0) {
-				if((packet.udp.source_port == htons_(0x0043))
-					&& (packet.udp.destination_port == htons_(0x0044))
-					&& (packet.dhcp.transaction_id == htonl_(TRANSACTION_ID))
-					&& (packet.dhcp.options.message_type1 == htons_(0x3501))
+				if((packet.udp.source_port == tools::htons(0x0043))
+					&& (packet.udp.destination_port == tools::htons(0x0044))
+					&& (packet.dhcp.transaction_id == tools::htonl(TRANSACTION_ID))
+					&& (packet.dhcp.options.message_type1 == tools::htons(0x3501))
 					&& (packet.dhcp.options.message_type2 == 0x05)) {
 					return true;
 				}
@@ -507,7 +480,7 @@ namespace net {
 				case 51:   // OPTION No.51 : IP Address Lease Time
 					{
 						const uint32_t* p = reinterpret_cast<const uint32_t*>(option + 2);
-				    	dhcp.lease_time = htonl_(*p);
+				    	dhcp.lease_time = tools::htonl(*p);
 					}
 					break;
 				case 53:   // OPTION No.53 : DHCP Message Type
@@ -515,13 +488,13 @@ namespace net {
 				case 58:   // OPTION No.58 : Renewal Time Value
 					{
 						const uint32_t* p = reinterpret_cast<const uint32_t*>(option + 2);
-				    	dhcp.renewal_time = htonl_(*p);
+				    	dhcp.renewal_time = tools::htonl(*p);
 					}
 					break;
 				case 59:   // OPTION No.59 : Rebinding Time Value
 					{
 						const uint32_t* p = reinterpret_cast<const uint32_t*>(option + 2);
-				    	dhcp.rebinding_time = htonl_(*p);
+				    	dhcp.rebinding_time = tools::htonl(*p);
 					}
 					break;
 				default:
