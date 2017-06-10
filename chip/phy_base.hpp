@@ -9,7 +9,7 @@
 #include <cstdint>
 #include "common/format.hpp"
 
-#define PHY_DEBUG
+// #define PHY_DEBUG
 
 namespace chip {
 
