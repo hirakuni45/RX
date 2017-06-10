@@ -40,6 +40,7 @@
 Includes   <System Includes> , "Project Includes"
 ******************************************************************************/
 #include "net_config.h"
+#include <stdio.h>
 #include <string.h>
 #include "config_tcpudp.h"
 #include "../r_config/r_t4_dhcp_client_rx_config.h"
@@ -153,6 +154,11 @@ int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 	dhcp_packet->udp.checksum						= checksum_udp((uint16_t *)tmp_header, (uint16_t *) & dhcp_packet->udp,
 	                                 sizeof(dhcp_packet->udp) + sizeof(dhcp_packet->dhcp));
 
+	int head_len = sizeof(dhcp_packet->ether);
+	int body_len = sizeof(DHCP_PACKET) - sizeof(dhcp_packet->ether);
+	printf("DHCP write: %d, %d (sum: %d, udpsum: %d)\n",
+		head_len, body_len, (int)dhcp_packet->ipv4.checksum, (int)dhcp_packet->udp.checksum);
+
 	lan_write(ETHER_CHANNEL_0, (int8_t *)&dhcp_packet->ether, sizeof(dhcp_packet->ether), (int8_t *)&dhcp_packet->ipv4, sizeof(DHCP_PACKET) - sizeof(dhcp_packet->ether));
 
 	return 0;
@@ -161,9 +167,6 @@ int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 
 int32_t dhcp_wait_offer(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 {
-
-	int16_t	len;
-	int8_t	*p;
 	volatile uint16_t	timer;
 
 	reset_timer();
@@ -176,16 +179,20 @@ int32_t dhcp_wait_offer(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 		{
 			return -1;
 		}
-		len	= lan_read(ETHER_CHANNEL_0, (int8_t **) & p);
-		if (len > 0)
-		{
-			memcpy(dhcp_packet, p, sizeof(dhcp_packet->ether) + sizeof(dhcp_packet->ipv4)\
-			       + sizeof(dhcp_packet->udp) + sizeof(dhcp_packet->dhcp));
+		int16_t	len;
+		int8_t	*p;
+		len	= lan_read(ETHER_CHANNEL_0, &p);
+		if(len > 0) {
+			int all = sizeof(dhcp_packet->ether) + sizeof(dhcp_packet->ipv4)
+				+ sizeof(dhcp_packet->udp) + sizeof(dhcp_packet->dhcp);
+			printf("DHCP read: %d (%d)\n", (int)len, all);
+			memcpy(dhcp_packet, p, all);
+
 			rcv_buff_release(ETHER_CHANNEL_0);
-			if ((dhcp_packet->udp.source_port == htons(0x0043)) && \
-			        (dhcp_packet->udp.destination_port == htons(0x0044)) && \
-			        (dhcp_packet->dhcp.transaction_id == htonl(TRANSACTION_ID)) && \
-			        (dhcp_packet->dhcp.options.message_type1 == htons(0x3501)) && \
+			if ((dhcp_packet->udp.source_port == htons(0x0043)) &&
+			        (dhcp_packet->udp.destination_port == htons(0x0044)) &&
+			        (dhcp_packet->dhcp.transaction_id == htonl(TRANSACTION_ID)) &&
+			        (dhcp_packet->dhcp.options.message_type1 == htons(0x3501)) &&
 			        (dhcp_packet->dhcp.options.message_type2 == 0x02))
 				break;
 		}
