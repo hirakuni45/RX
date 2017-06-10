@@ -11,7 +11,7 @@
 
 #ifdef BIG_ENDIAN
 #elif LITTLE_ENDIAN
-#elif
+#else
 #error "net_tools.hpp requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
 #endif
 

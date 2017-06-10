@@ -13,7 +13,7 @@
 
 #ifdef BIG_ENDIAN
 #elif LITTLE_ENDIAN
-#elif
+#else
 #error "ether_io.hpp requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
 #endif
 
@@ -139,6 +139,11 @@ namespace device {
 			uint8_t     receive;
 		};
 
+		enum class magic_packet_mode : uint8_t {
+			no_use,
+			use,
+		};
+
 	public:
 		static const int OK    = 0;
 		static const int ERROR = -1;
@@ -152,9 +157,6 @@ namespace device {
 		static const int FLAG_ON          = 1;
 		static const int FLAG_ON_LINK_ON  = 3;
 		static const int FLAG_ON_LINK_OFF = 2;
-
-		static const int NO_USE_MAGIC_PACKET_DETECT = 0;
-		static const int USE_MAGIC_PACKET_DETECT    = 1;
 
 		 // Please define the level of the LINKSTA signal when Link becomes up.
 		static const int LINK_PRESENT    = 0;
@@ -195,10 +197,10 @@ namespace device {
 
 		uint8_t	mac_addr_[6];
 
-		volatile bool		pause_frame_enable_flag_;
-		volatile bool		magic_packet_detect_;
-		volatile uint8_t	lchng_flag_;
-		volatile uint8_t	transfer_enable_flag_;
+		volatile bool					pause_frame_enable_flag_;
+		volatile magic_packet_mode		magic_packet_detect_;
+		volatile uint8_t				lchng_flag_;
+		volatile uint8_t				transfer_enable_flag_;
 
 		bool	link_stat_;
 
@@ -261,10 +263,10 @@ namespace device {
 		}
 
 
-		void config_ethernet_(const uint8_t mode)
+		void config_ethernet_(magic_packet_mode mode)
 		{
 			// Magic packet detecion mode
-			if (USE_MAGIC_PACKET_DETECT == mode) {
+			if(mode == magic_packet_mode::use) {
 				ETHRC::ECSIPR = 0x00000006;
 				EDMAC::EESIPR = 0x00400000;
 			} else {  // Normal mode
@@ -345,7 +347,7 @@ namespace device {
 		}
 
 
-		int32_t do_link_(const uint8_t mode)
+		int32_t do_link_(magic_packet_mode mode)
 		{
     		int32_t ret = OK;
 
@@ -396,7 +398,7 @@ namespace device {
 			}
 
 			// At the communicate mode usually
-			if(NO_USE_MAGIC_PACKET_DETECT == mode) {
+			if(mode == magic_packet_mode::no_use) {
 				// When pause frame is used
 				if(full_duplex && pause_frame_enable_flag_) {
 					// Set automatic PAUSE for 512 bit-time
@@ -456,7 +458,7 @@ namespace device {
 		}
 		
 
-		void configure_mac_(const uint8_t* mac_addr, const uint8_t mode)
+		void configure_mac_(const uint8_t* mac_addr, magic_packet_mode mode)
 		{
 			// Software reset
 			reset_mac_();
@@ -654,7 +656,7 @@ namespace device {
 		ether_io() :
 			app_rx_desc_(nullptr), app_tx_desc_(nullptr),
 			intr_level_(0), mac_addr_{ 0 },
-			pause_frame_enable_flag_(false), magic_packet_detect_(false),
+			pause_frame_enable_flag_(false), magic_packet_detect_(magic_packet_mode::no_use),
 			lchng_flag_(FLAG_OFF), transfer_enable_flag_(FLAG_OFF),
 			link_stat_(false), stat_(), recv_ptr_(nullptr), recv_mod_(0)
 			{ }
@@ -916,8 +918,8 @@ namespace device {
 				if(ret) {
 					// ETHERC and EDMAC are set after ETHERC and EDMAC are reset in software
 					// and sending and receiving is permitted. 
-					configure_mac_(mac_addr_, NO_USE_MAGIC_PACKET_DETECT);
-					do_link_(NO_USE_MAGIC_PACKET_DETECT);
+					configure_mac_(mac_addr_, magic_packet_mode::no_use);
+					do_link_(magic_packet_mode::no_use);
 
 					transfer_enable_flag_ = FLAG_ON;
 					callback_link_on();
@@ -965,8 +967,8 @@ namespace device {
 				ret = ERROR_LINK;
 			} else {  // When the Link up processing is completed
 				// Change to the magic packet detection mode.
-				configure_mac_(mac_addr_, USE_MAGIC_PACKET_DETECT);
-				auto ret = do_link_(USE_MAGIC_PACKET_DETECT);
+				configure_mac_(mac_addr_, magic_packet_mode::use);
+				auto ret = do_link_(magic_packet_mode::use);
 				if(OK == ret) {
 					// It is confirmed not to become Link down while changing the setting.
 					if(LINK_PRESENT == ETHRC::PSR.LMON()) {
@@ -1021,7 +1023,7 @@ namespace device {
 			open(mac_addr_);
 
 			// This code is for the sample program.
-			magic_packet_detect_ = true;
+			magic_packet_detect_ = magic_packet_mode::use;
 		}
 
 
