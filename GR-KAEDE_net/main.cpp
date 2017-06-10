@@ -257,6 +257,12 @@ int main(int argc, char** argv)
 {
 	device::PORT3::PCR.B5 = 1; // P35(NMI) pull-up
 
+	{  // GR-KAEDE の SPI 端子のハードバグ回避
+	   // ※PC3 から、PC7 へ １K オームで接続
+		device::PORTC::PDR.B3 = 1; // output
+		device::PORTC::PODR.B3 = 1;
+	}
+
 	device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
 
 	device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
@@ -282,7 +288,6 @@ int main(int argc, char** argv)
 						  | device::SYSTEM::SCKCR.PCKD.b(2);	// 1/4 (198/4=48)
 	device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(0b0011) | 1;  // USB Clock: 1/4 (198/4=48)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
-
 
 	{  // タイマー設定、１００Ｈｚ（１０ｍｓ）
 		uint8_t int_level = 1;
