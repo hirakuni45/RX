@@ -6,7 +6,8 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include <cstdint>
+#include <algorithm>
+#include <cstring>
 
 namespace utils {
 
@@ -20,7 +21,6 @@ namespace utils {
 	class fixed_string {
 		char		text_[SIZE];
 		uint16_t	pos_;
-		char		tmp_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -28,7 +28,7 @@ namespace utils {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		fixed_string() : pos_(0), tmp_(0) { text_[0] = 0; }
+		fixed_string() : pos_(0) { text_[0] = 0; }
 
 
 		//-----------------------------------------------------------------//
@@ -71,6 +71,33 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  交換
+			@param[in]	src	ソース
+			@return 自分
+		*/
+		//-----------------------------------------------------------------//
+		void swap(fixed_string& src) {
+			std::swap(src.text_, text_);
+			std::swap(src.pos_, pos_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  代入
+			@param[in]	src	ソース
+			@return 自分
+		*/
+		//-----------------------------------------------------------------//
+		fixed_string& operator = (const fixed_string& src) {
+			std::strcpy(text_, src.text_);
+			pos_ = src.pos_;
+			return *this;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  文字を加える
 			@param[in]	ch	文字
 			@return 自分
@@ -82,7 +109,7 @@ namespace utils {
 				++pos_;
 			}
 			return *this;
-		} 
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -94,9 +121,49 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		char& operator [] (uint32_t pos) {
 			if(pos >= pos_) {
-				return tmp_;
+				static char tmp = 0;
+				return tmp;
 			}
 			return text_[pos];
-		}		
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  一致比較
+			@param[in]	text	文字列
+			@return 同じなら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool operator == (const char* text) const {
+			if(text == nullptr) {
+				return pos_ == 0;
+			}
+			return std::strcmp(text_, text) == 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  一致比較
+			@param[in]	th	比較対象
+			@return 同じなら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool operator == (const fixed_string& th) const {
+			return std::strcmp(c_str(), th.c_str()) == 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  不一致比較
+			@param[in]	th	比較対象
+			@return 同じなら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool operator != (const fixed_string& th) const {
+			return std::strcmp(c_str(), th.c_str()) != 0;
+		}
 	};
 }
