@@ -17,12 +17,7 @@
 #error "dhcp_client.hpp requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
 #endif
 
-extern "C" {
-	void reset_timer(void);
-	uint32_t get_timer(void);
-}
-
-#define DHCP_DEBUG
+// #define DHCP_DEBUG
 
 namespace net {
 
@@ -32,6 +27,15 @@ namespace net {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct DHCP_INFO {
+
+		enum class state_t : uint8_t {
+			idle,		///< アイドル
+			run,		///< 動作中
+			collect,	///< 完了（有効な情報）
+			timeout,	///< タイムアウト
+			error,		///< エラー
+		};
+
 		uint8_t	ipaddr[4];
 		uint8_t	maskaddr[4];
 		uint8_t	gwaddr[4];
@@ -44,6 +48,8 @@ namespace net {
 		uint32_t	renewal_time;
 		uint32_t	rebinding_time;
 
+		state_t		state;
+
 		DHCP_INFO() :
 			ipaddr { 0 },
 			maskaddr { 0 },
@@ -52,7 +58,8 @@ namespace net {
 			dnsaddr2 { 0 },
 			domain { 0 },
 			macaddr { 0 },
-			lease_time(0), renewal_time(0), rebinding_time(0)
+			lease_time(0), renewal_time(0), rebinding_time(0),
+			state(state_t::idle)
 		{ }
 
 		void list_adr(const char* head, const uint8_t* a) const
@@ -96,14 +103,21 @@ namespace net {
 		typedef utils::basic_format<utils::def_chaout> debug_format;
 #endif
 
-		static const uint32_t TIMEOUT = 2 * 1000 / 10;  ///< 2 sec (unit 10ms)
 		static const uint8_t DOMAIN_GET = 0x01;
 
 		static const uint32_t EXPANSION_DHCP_PACKET_SIZE  = 300;
 		static const uint32_t TRANSACTION_ID = 0x12345678;
 
-		ETHER_IO&	io_;
-		DHCP_INFO	info_;
+
+		enum class task : uint8_t {
+			none,
+			discover,
+			wait_offer,
+			request,
+			wait_ack,
+			final,
+		};
+
 
 		struct dv_options {
 			uint32_t	magic_cookie;
@@ -170,6 +184,16 @@ namespace net {
 			udp_packet		udp;
 			dhcp_data		dhcp;
 		} __attribute__((__packed__));
+
+
+		ETHER_IO&	io_;
+		DHCP_INFO	info_;
+
+		dhcp_packet	packet_;
+
+		uint32_t	timeout_;
+		uint32_t	count_;
+		task		task_;
 
 
 		static inline uint16_t htons_(uint16_t data)
@@ -337,26 +361,18 @@ namespace net {
 
 		bool wait_offer_(DHCP_INFO& dhcp, dhcp_packet& packet)
 		{
-			memset(&packet, 0, sizeof(packet));
-			reset_timer();
-			while(1) {
-				auto timer = get_timer();
-				if(timer > TIMEOUT) {
-					return false;
-				}
-				uint32_t all = sizeof(packet.ether) + sizeof(packet.ipv4)
-							 + sizeof(packet.udp) + sizeof(packet.dhcp);
-				auto len = io_.read(&packet, all);
-				if(len > 0) {
-					debug_format("DHCP Read: %d (%d)\n") % len % all;
-					if(packet.udp.source_port == htons_(0x0043)
-						&& packet.udp.destination_port == htons_(0x0044)
-						&& packet.dhcp.transaction_id == htonl_(TRANSACTION_ID)
-					 	&& packet.dhcp.options.message_type1 == htons_(0x3501)
-					 	&& packet.dhcp.options.message_type2 == 0x02) {
-						memcpy(dhcp.ipaddr, packet.dhcp.user_ip, 4);
-						return true;
-					}
+			uint32_t all = sizeof(packet.ether) + sizeof(packet.ipv4)
+						 + sizeof(packet.udp) + sizeof(packet.dhcp);
+			auto len = io_.read(&packet, all);
+			if(len > 0) {
+				debug_format("DHCP Read: %d (%d)\n") % len % all;
+				if(packet.udp.source_port == htons_(0x0043)
+					&& packet.udp.destination_port == htons_(0x0044)
+					&& packet.dhcp.transaction_id == htonl_(TRANSACTION_ID)
+				 	&& packet.dhcp.options.message_type1 == htons_(0x3501)
+				 	&& packet.dhcp.options.message_type2 == 0x02) {
+					memcpy(dhcp.ipaddr, packet.dhcp.user_ip, 4);
+					return true;
 				}
 			}
 			return false;
@@ -438,29 +454,24 @@ namespace net {
 
 		bool wait_ack_(DHCP_INFO& dhcp, dhcp_packet& packet)
 		{
-			uint8_t none[5] = { "none" };
-
-			reset_timer();
-			while(1) {
-				auto timer = get_timer();
-				if(timer > TIMEOUT) {
-					return false;
-				}
-
-				int all = sizeof(packet.ether) + sizeof(packet.ipv4)
-						+ sizeof(packet.udp) + sizeof(packet.dhcp);
-				auto len = io_.read(&packet, all);
-				if(len > 0) {
-					if((packet.udp.source_port == htons_(0x0043))
-						&& (packet.udp.destination_port == htons_(0x0044))
-						&& (packet.dhcp.transaction_id == htonl_(TRANSACTION_ID))
-						&& (packet.dhcp.options.message_type1 == htons_(0x3501))
-						&& (packet.dhcp.options.message_type2 == 0x05)) {
-                		break;
-					}
+			int all = sizeof(packet.ether) + sizeof(packet.ipv4)
+					+ sizeof(packet.udp) + sizeof(packet.dhcp);
+			auto len = io_.read(&packet, all);
+			if(len > 0) {
+				if((packet.udp.source_port == htons_(0x0043))
+					&& (packet.udp.destination_port == htons_(0x0044))
+					&& (packet.dhcp.transaction_id == htonl_(TRANSACTION_ID))
+					&& (packet.dhcp.options.message_type1 == htons_(0x3501))
+					&& (packet.dhcp.options.message_type2 == 0x05)) {
+					return true;
 				}
 			}
+			return false;
+		}
 
+
+		static void final_(DHCP_INFO& dhcp, dhcp_packet& packet)
+		{
 			const uint8_t* option = reinterpret_cast<const uint8_t*>(&packet.dhcp.options.message_type1);
 			uint8_t flag = 0;
 			while(*option != 0xff) {  // End option
@@ -520,10 +531,8 @@ namespace net {
 			}
 
 			if(!(flag & DOMAIN_GET)) {
-				memcpy(dhcp.domain, none, 5);
+				strcpy(dhcp.domain, "none");
 			}
-
-			return true;
 		}
 
 
@@ -534,42 +543,96 @@ namespace net {
 			@param[in]	io	インサーネット入出力
 		*/
 		//-----------------------------------------------------------------//
-		dhcp_client(ETHER_IO& io) : io_(io), info_() { }
+		dhcp_client(ETHER_IO& io) : io_(io), info_(), timeout_(0), count_(0), task_(task::none) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  DHCP サーバーから、IP アドレスを取得
+			@param[in]	timeout	DHCP 取得最大時間
 		*/
 		//-----------------------------------------------------------------//
-		bool start()
+		void start(uint32_t timeout)
 		{
 			memcpy(info_.macaddr, io_.get_mac(), 6);
 
-			dhcp_packet packet;
-			memset(&packet, 0, sizeof(dhcp_packet));
+			memset(&packet_, 0, sizeof(dhcp_packet));
 
+			timeout_ = timeout;
+			count_ = 0;
+			task_ = task::discover;
+			info_.state = DHCP_INFO::state_t::run;
 			debug_format("DHCP discover\n");
-			if(!discover_(info_, packet)) {
-				return false;
-			}
+		}
 
-			debug_format("DHCP wait_offer\n");
-			if(!wait_offer_(info_, packet)) {
-				return false;
-			}
 
-			debug_format("DHCP request\n");
-			if(!request_(info_, packet)) {
-				return false;
-			}
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  DHCP クライアント・サービス @n
+					※1/100 秒間隔で呼び出す
+		*/
+		//-----------------------------------------------------------------//
+		void service()
+		{
+			switch(task_) {
+			case task::discover:
+				if(discover_(info_, packet_)) {
+					memset(&packet_, 0, sizeof(dhcp_packet));
+					count_ = 0;
+					task_ = task::wait_offer;
+					debug_format("DHCP wait_offer\n");
+				} else {
+					task_ = task::none;
+					info_.state = DHCP_INFO::state_t::error;
+				}
+				break;
 
-			debug_format("DHCP wait_ack\n");
-			if(!wait_ack_(info_, packet)) {
-				return false;
-			}
+			case task::wait_offer:
+				if(count_ >= timeout_) {
+					task_ = task::none;
+					info_.state = DHCP_INFO::state_t::timeout;
+					debug_format("DHCP timeout\n");
+				}
+				++count_;
+				if(wait_offer_(info_, packet_)) {
+					task_ = task::request;
+					debug_format("DHCP request\n");
+				}
+				break;
 
-			return true;
+			case task::request:
+				if(request_(info_, packet_)) {
+					task_ = task::wait_ack;
+					debug_format("DHCP wait_ack\n");
+					count_ = 0;
+				} else {
+					task_ = task::none;
+					info_.state = DHCP_INFO::state_t::error;
+				}
+				break;
+
+			case task::wait_ack:
+				if(count_ >= timeout_) {
+					task_ = task::none;
+					info_.state = DHCP_INFO::state_t::timeout;
+				}
+				++count_;
+
+				if(wait_ack_(info_, packet_)) {
+					debug_format("DHCP final\n");
+					task_ = task::final;
+				}
+				break;
+
+			case task::final:
+				final_(info_, packet_);
+				task_ = task::none;
+				info_.state = DHCP_INFO::state_t::collect;
+				break;
+
+			default:
+				break;
+			}
 		}
 
 
