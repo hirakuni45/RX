@@ -159,7 +159,6 @@ static const pauseresolution_s pause_resolution[PAUSE_TABLE_ENTRIES] =
 static descriptor_s rx_descriptors[EMAC_NUM_RX_DESCRIPTORS] __attribute__ ((aligned(32)));
 static descriptor_s tx_descriptors[EMAC_NUM_TX_DESCRIPTORS] __attribute__ ((aligned(32)));
 static etherbuffer_s ether_buffers __attribute__ ((aligned(32)));
-
 static uint16_t link_proc_count_;
 static int link_proc_loop_;
 

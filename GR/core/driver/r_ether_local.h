@@ -38,9 +38,9 @@ Macro definitions
    because the driver is single-frame/single-buffer processing.  */
 #define EMAC_BUFSIZE                (1536)  /* Must be 32-byte aligned */
 /* The number of Rx descriptors. */
-#define EMAC_NUM_RX_DESCRIPTORS     (1)
+#define EMAC_NUM_RX_DESCRIPTORS     (4)
 /* The number of Tx descriptors. */
-#define EMAC_NUM_TX_DESCRIPTORS     (1)
+#define EMAC_NUM_TX_DESCRIPTORS     (4)
 
 /**
  * The total number of EMAC buffers to allocate. The number of
