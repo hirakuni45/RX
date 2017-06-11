@@ -15,7 +15,6 @@
 //=====================================================================//
 #include <type_traits>
 #include <unistd.h>
-#include "common/fixed_string.hpp"
 
 /* 
   e, E
@@ -48,45 +47,107 @@ namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  標準出力ファンクタ
+		@brief  無効出力ファンクタ @n
+				※全ての動作が無効
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class def_chaout {
-		char*		out_;
-		uint16_t	len_;
-		uint16_t	pos_;
-		uint32_t	all_;
+	class null_chaout {
+	public:
+
+		void operator() (char ch) {
+		}
+
+		void clear() { };
+
+		uint32_t size() const { return 0; }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  サイズ出力ファンクタ @n
+				※出力サイズのみ有効
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	class size_chaout {
+		uint32_t	size_;
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
-			@param[in]	out		文字列出力用ポインター（nullptrの場合、標準出力）
-			@param[in]	len		文字列出力用長さ
 		*/
 		//-----------------------------------------------------------------//
-		def_chaout(char* out = nullptr, uint16_t len = 0) : out_(out), len_(len), pos_(0), all_(0) { } 
+		size_chaout() : size_(0) { } 
+
 		void operator() (char ch) {
-			if(out_ != nullptr && len_ > 1 && pos_ < (len_ - 1)) {
-				out_[pos_] = ch;
-				++pos_;
-				out_[pos_] = 0;
-				++all_;
-			} else {
-				char tmp = ch;
-				write(1, &tmp, 1);
-				++all_;
-			}
+			++size_;
 		}
-		uint32_t get_length() const { return all_; }
+
+		void clear() { size_ = 0; };
+
+		uint32_t size() const { return size_; }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  標準出力ファンクタ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	class def_chaout {
+		uint32_t	size_;
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		def_chaout() : size_(0) { } 
+
+		void operator() (char ch) {
+			char tmp = ch;
+			write(1, &tmp, 1);  // FD by stdout
+			++size_;
+		}
+
+		void clear() { size_ = 0; };
+
+		uint32_t size() const { return size_; }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  文字列クラス、出力ファンクタ
+		@param[in]	str	文字列クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class STR>
+	class string_chaout {
+		STR	str_;
+
+	public:
+		string_chaout() : str_() { }
+
+		void operator () (char ch) {
+			str_ += ch;
+		}
+
+		void clear() { str_.clear(); }
+
+		uint32_t size() const { return str_.size(); }
+
+		STR& at() { return str_; }
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  簡易 format クラス
+		@param[in]	CHAOUT	文字出力ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class chaout>
+	template <class CHAOUT>
 	class basic_format {
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -119,9 +180,9 @@ namespace utils {
 			NONE		///< 不明
 		};
 
-		const char*	form_;
+		static CHAOUT	chaout_;
 
-		chaout		chaout_;
+		const char*	form_;
 
 		char		buff_[34];
 
@@ -483,35 +544,36 @@ namespace utils {
 		/*!
 			@brief  コンストラクター
 			@param[in]	form	フォーマット式
-			@param[in]	out		文字列出力用ポインター
-			@param[in]	len		文字列出力用長さ
+			@param[in]	clear	出力をクリアする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		basic_format(const char* form, char* out = nullptr, uint16_t len = 0) noexcept :
-			form_(form), chaout_(out, len),
+		basic_format(const char* form, bool clear = true) noexcept :
+			form_(form),
 			error_(error::none),
 			num_(0), point_(0),
 			bitlen_(0),
-			mode_(mode::NONE), zerosupp_(false), sign_(false) {
+			mode_(mode::NONE), zerosupp_(false), sign_(false)
+		{
+			if(clear) chaout_.clear();
 			next_();
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  コンストラクター
-			@param[in]	form	フォーマット式
-			@param[in]	fd		ファイル識別子
+			@brief  出力ファンクタの参照
+			@return 出力ファンクタ
 		*/
 		//-----------------------------------------------------------------//
-		basic_format(const char* form, int fd) noexcept :
-			form_(form), chaout_(fd),
-			error_(error::none),
-			num_(0), point_(0),
-			bitlen_(0),
-			mode_(mode::NONE), zerosupp_(false), sign_(false) {
-			next_();
-		}
+		static CHAOUT& chaout() { return chaout_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  出力ファンクタのクリア
+		*/
+		//-----------------------------------------------------------------//
+		static void clear() { chaout_.clear(); }
 
 
 		//-----------------------------------------------------------------//
@@ -534,11 +596,11 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  出力数を返す
-			@return 出力数
+			@brief  出力サイズを返す
+			@return 出力サイズ
 		*/
 		//-----------------------------------------------------------------//
-		int get_length() const noexcept { return chaout_.get_length(); }
+		int size() const noexcept { return chaout_.size(); }
 
 
 		//-----------------------------------------------------------------//
@@ -661,5 +723,9 @@ namespace utils {
 		}
 	};
 
+	template <class CHAOUT> CHAOUT basic_format<CHAOUT>::chaout_;
+
 	typedef basic_format<def_chaout> format;
+	typedef basic_format<null_chaout> null_format;
+	typedef basic_format<size_chaout> size_format;
 }
