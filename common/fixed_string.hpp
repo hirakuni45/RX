@@ -17,27 +17,35 @@ namespace utils {
 		@param[in]	SIZE	文字列サイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint16_t SIZE>
+	template <uint32_t SIZE>
 	class fixed_string {
 		char		text_[SIZE];
-		uint16_t	pos_;
+		uint32_t	pos_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクタ
+			@param[in]	str	初期設定文字列
 		*/
 		//-----------------------------------------------------------------//
-		fixed_string() : pos_(0) { text_[0] = 0; }
+		fixed_string(const char* str = nullptr) : pos_(0) {
+			if(str != nullptr) {
+				std::strcpy(text_, str);
+				pos_ = std::strlen(text_);
+			} else {
+				text_[pos_] = 0;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  最大サイズを返す
-			@return 最大サイズ
+			@brief  格納可能な最大サイズを返す（終端の数を除外）
+			@return 格納可能な最大サイズ
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t max_size() const { return SIZE; }
+		uint32_t capacity() const noexcept { return SIZE - 1; }
 
 
 		//-----------------------------------------------------------------//
@@ -46,12 +54,12 @@ namespace utils {
 			@return 現在のサイズ
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t size() const { return pos_; }
+		uint32_t size() const noexcept { return pos_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  文字列をクリア
+			@brief  文字列をクリア（リセット）
 		*/
 		//-----------------------------------------------------------------//
 		void clear() noexcept {
@@ -76,7 +84,7 @@ namespace utils {
 			@return 自分
 		*/
 		//-----------------------------------------------------------------//
-		void swap(fixed_string& src) {
+		void swap(fixed_string& src) noexcept {
 			std::swap(src.text_, text_);
 			std::swap(src.pos_, pos_);
 		}
@@ -90,7 +98,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		fixed_string& operator = (const fixed_string& src) {
-			std::strcpy(text_, src.text_);
+			std::strcpy(text_, src.c_str());
 			pos_ = src.pos_;
 			return *this;
 		}
@@ -98,7 +106,7 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  文字を加える
+			@brief  文字を追加
 			@param[in]	ch	文字
 			@return 自分
 		*/
@@ -115,12 +123,38 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  文字列を追加
+			@param[in]	str	文字列
+			@return 自分
+		*/
+		//-----------------------------------------------------------------//
+		fixed_string& operator += (const char* str) {
+			if(str == nullptr) {
+				return *this;
+			}
+
+			uint32_t l = std::strlen(str);
+			if((pos_ + l) < (SIZE - 1)) {
+				std::strcpy(&text_[pos_], str);
+				pos_ += l;
+			} else {  // バッファが許す範囲でコピー
+				l = SIZE - pos_ - 1;
+				std::strncpy(&text_[pos_], str, l);
+				pos_ = SIZE - 1;
+			}
+			text_[pos_] = 0; 
+			return *this;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  文字参照
 			@param[in]	pos	配列位置
 			@return 文字
 		*/
 		//-----------------------------------------------------------------//
-		char& operator [] (uint32_t pos) {
+		char& operator [] (uint32_t pos) noexcept {
 			if(pos >= pos_) {
 				static char tmp = 0;
 				return tmp;
@@ -136,17 +170,37 @@ namespace utils {
 			@return 同じなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool operator == (const char* text) const {
+		bool cmp(const char* text) const noexcept {
 			if(text == nullptr) {
 				return pos_ == 0;
 			}
-			return std::strcmp(text_, text) == 0;
+			return std::strcmp(c_str(), text) == 0;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  一致比較
+			@brief  一致比較（オペレーター）
+			@param[in]	text	文字列
+			@return 同じなら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool operator == (const char* text) const { return cmp(text); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  不一致比較（オペレーター）
+			@param[in]	text	文字列
+			@return 同じなら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool operator != (const char* text) const { return !cmp(text); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クラス、一致比較（オペレーター）
 			@param[in]	th	比較対象
 			@return 同じなら「true」
 		*/
@@ -158,7 +212,7 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  不一致比較
+			@brief  クラス、不一致比較（オペレーター）
 			@param[in]	th	比較対象
 			@return 同じなら「true」
 		*/
