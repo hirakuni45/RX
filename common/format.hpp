@@ -2,13 +2,15 @@
 //=====================================================================//
 /*! @file
     @brief  format クラス @n
-			・安全性を考慮した、printf 表示に準じたクラス
+			・安全性を考慮した、[s]printf 表示に準じたクラス
 			・二進表記として、「%b」をサポート
 			・固定小数点表示「%N.M:Ly」形式をサポート @n
 			※ N：全桁数、M：小数部桁数、L：小数部のビット数 @n
 			※ N には、小数点、符号が含まれる @n
 			Ex: %1.2:8y ---> 256 で 1.00、128 で 0.50、384 で 1.50 と @n
-			と表示される。
+			と表示される。@n
+			+ 2017/06/11 20:00- 標準文字出力クラスの再定義、実装 @n 
+			+ 2017/06/11 21:00- 固定文字列クラス向け chaout、実装 @n
 			Copyright 2013,2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
@@ -70,7 +72,9 @@ namespace utils {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class size_chaout {
+
 		uint32_t	size_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -94,15 +98,17 @@ namespace utils {
 		@brief  標準出力ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class def_chaout {
+	class stdout_chaout {
+
 		uint32_t	size_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		def_chaout() : size_(0) { } 
+		stdout_chaout() : size_(0) { } 
 
 		void operator() (char ch) {
 			char tmp = ch;
@@ -118,26 +124,65 @@ namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  文字列クラス、出力ファンクタ
-		@param[in]	str	文字列クラス
+		@brief  標準出力ターミネーター・ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class STR>
+	class stdout_term {
+	public:
+		void operator() (const char* s, uint16_t l) {
+			write(1, s, l);  // FD by stdout
+		}
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  文字列クラス、出力ファンクタ
+		@param[in]	STR		文字列クラス
+		@param[in]	TERM	ターミネーター・ファンクタ	
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class STR, class TERM>
 	class string_chaout {
-		STR	str_;
+
+		STR		str_;
+		TERM	term_;
 
 	public:
-		string_chaout() : str_() { }
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		string_chaout() : str_(), term_() { }
 
 		void operator () (char ch) {
 			str_ += ch;
+			if(str_.size() >= (str_.capacity() * 8 / 7)) {  // 残り 1/8 になったら、書き出し
+				term_(str_.c_str(), str_.size());
+				str_.clear();
+			}			
 		}
 
-		void clear() { str_.clear(); }
+		void clear() {
+			if(str_.size() > 0) {
+				term_(str_.c_str(), str_.size());
+			}
+			str_.clear();
+		}
 
 		uint32_t size() const { return str_.size(); }
 
-		STR& at() { return str_; }
+		void flush() {
+			if(str_.size() > 0) {
+				term_(str_.c_str(), str_.size());
+				str_.clear();
+			}
+		}
+
+		STR& at_str() { return str_; }
+
+		TERM& at_term() { return term_; }
 	};
 
 
@@ -544,17 +589,15 @@ namespace utils {
 		/*!
 			@brief  コンストラクター
 			@param[in]	form	フォーマット式
-			@param[in]	clear	出力をクリアする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		basic_format(const char* form, bool clear = true) noexcept :
+		basic_format(const char* form) noexcept :
 			form_(form),
 			error_(error::none),
 			num_(0), point_(0),
 			bitlen_(0),
 			mode_(mode::NONE), zerosupp_(false), sign_(false)
 		{
-			if(clear) chaout_.clear();
 			next_();
 		}
 
@@ -566,14 +609,6 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		static CHAOUT& chaout() { return chaout_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  出力ファンクタのクリア
-		*/
-		//-----------------------------------------------------------------//
-		static void clear() { chaout_.clear(); }
 
 
 		//-----------------------------------------------------------------//
@@ -725,7 +760,7 @@ namespace utils {
 
 	template <class CHAOUT> CHAOUT basic_format<CHAOUT>::chaout_;
 
-	typedef basic_format<def_chaout> format;
+	typedef basic_format<stdout_chaout> format;
 	typedef basic_format<null_chaout> null_format;
 	typedef basic_format<size_chaout> size_format;
 }
