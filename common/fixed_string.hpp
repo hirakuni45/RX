@@ -33,8 +33,8 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  配列の最大サイズを返す
-			@return 配列の最大サイズ
+			@brief  最大サイズを返す
+			@return 最大サイズ
 		*/
 		//-----------------------------------------------------------------//
 		uint16_t max_size() const { return SIZE; }
@@ -104,9 +104,10 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		fixed_string& operator += (char ch) {
-			if(pos_ < SIZE) {
+			if(pos_ < (SIZE - 1)) {
 				text_[pos_] = ch;
 				++pos_;
+				text_[pos_] = 0;
 			}
 			return *this;
 		}
