@@ -16,6 +16,13 @@
 #include "common/input.hpp"
 #include "common/time.h"
 
+#include "GR/core/ethernet.hpp"
+#include "GR/core/http_server.hpp"
+
+extern "C" {
+	void INT_Excep_ICU_GROUPAL1(void);
+}
+
 namespace {
 
 	class cmt_task {
@@ -85,6 +92,11 @@ namespace {
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
 
+	net::ethernet		ethernet_;
+
+	typedef net::http_server<SDC> HTTP_SERVER;
+	HTTP_SERVER			http_(ethernet_, sdc_);
+	
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -356,9 +368,39 @@ int main(int argc, char** argv)
 		utils::format(", PCKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCKB);
 	}
 
+
+	device::power_cfg::turn(device::peripheral::ETHERC0);
+	device::port_map::turn(device::peripheral::ETHERC0);
+
+	set_interrupt_task(INT_Excep_ICU_GROUPAL1, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
+
+	ethernet_.start();
+
+	{
+		static const uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+		net::ip_address ipa(192, 168, 3, 20);
+		bool dhcp = true;
+		if(dhcp) {
+			if(ethernet_.begin(mac) == 0) {
+				utils::format("Ethernet Fail: begin (DHCP)...\n");
+				utils::format("SetIP: ");
+				ethernet_.begin(mac, ipa);
+			} else {
+				utils::format("DHCP: ");
+			}
+		} else {
+			ethernet_.begin(mac, ipa);
+			utils::format("SetIP: ");
+		}
+		utils::format("%s\n") % ethernet_.get_local_ip().c_str();
+	}
+
+
 	uint32_t cnt = 0;
 	while(1) {
 		cmt0_.at_task().sync_100hz();
+
+		ethernet_.service();
 
 		sdc_.service();
 

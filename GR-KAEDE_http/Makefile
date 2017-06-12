@@ -3,7 +3,7 @@
 #	RX64M Makefile 				        				#
 #														#
 #=======================================================#
-TARGET		=	kaede_sample
+TARGET		=	kaede_http_sample
 
 # GR-KAEDE MCU (R5F564MLCDFB 144pin QFP)
 DEVICE		=	R5F564ML
