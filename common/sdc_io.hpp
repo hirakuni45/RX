@@ -107,6 +107,7 @@ namespace utils {
 		void create_full_path_(const char* path, char* full) const
 		{
 			std::strcpy(full, current_);
+
 			if(path == nullptr || path[0] == 0) {
 				if(full[0] == 0) {
 					std::strcpy(full, "/");
@@ -114,10 +115,14 @@ namespace utils {
 			} else if(std::strcmp(path, "..") == 0) {
 				char* p = std::strrchr(full, '/');
 				if(p != nullptr) {
-					*p = 0;
+					if(&full[0] == p) {
+						p[1] = 0;
+					} else {
+						*p = 0;
+					}
 				}
 			} else if(path[0] == '/') {
-				std::strcpy(full, path);
+				std::strcpy(full, path);				
 			} else {
 				uint32_t len = strlen(full);
 				if(len > 0 && full[len - 1] != '/') {
@@ -177,7 +182,7 @@ namespace utils {
 
 			mount_ = false;
 
-			current_[0] = 0;
+			strcpy(current_, "/");
 			select_wait_ = 0;
 			mount_delay_ = 0;
 
@@ -575,7 +580,7 @@ namespace utils {
 						SELECT::P = 0;
 						mount_ = false;
 					} else {
-						current_[0] = 0;
+						strcpy(current_, "/");
 						mount_ = true;
 					}
 				}
@@ -611,10 +616,7 @@ namespace utils {
 			@return カレント。パス
 		 */
 		//-----------------------------------------------------------------//
-		const char* get_current() const {
-			if(current_[0] == 0) return "/";
-			return current_;
-		}
+		const char* get_current() const { return current_; }
 
 
 		//-----------------------------------------------------------------//
