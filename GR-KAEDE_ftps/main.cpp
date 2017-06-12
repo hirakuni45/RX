@@ -396,7 +396,7 @@ int main(int argc, char** argv)
 	}
 
 
-	ftp_.start("GR-KAEDE", "KAEDE", "KAEDE");
+	ftp_.start("GR-KAEDE", "Renesas_RX64M", "KAEDE", "KAEDE");
 
 
 	uint32_t cnt = 0;
