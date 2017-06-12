@@ -7,6 +7,7 @@
 */
 //=====================================================================//
 #include <cstdint>
+#include "common/fixed_string.hpp"
 #include "common/format.hpp"
 #include "common/input.hpp"
 
@@ -171,13 +172,13 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		const char* c_str(char spch = '.') const {
-			static char str[4*4+1];
-			utils::format("%d%c%d%c%d%c%d", str, sizeof(str))
+			static char tmp[4*4+1];
+			utils::sformat("%d%c%d%c%d%c%d", tmp, sizeof(tmp))
 				% static_cast<int>(address_.bytes[0]) % spch
 				% static_cast<int>(address_.bytes[1]) % spch
 				% static_cast<int>(address_.bytes[2]) % spch
 				% static_cast<int>(address_.bytes[3]);
-			return str;
+			return tmp;
 		}
 
 
