@@ -11,6 +11,7 @@
 			と表示される。@n
 			+ 2017/06/11 20:00- 標準文字出力クラスの再定義、実装 @n 
 			+ 2017/06/11 21:00- 固定文字列クラス向け chaout、実装 @n
+			+ 2017/06/12 14:50- memory_chaoutと、専用コンストラクター実装 @n
 			Copyright 2013,2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
@@ -137,6 +138,17 @@ namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  標準出力ターミネーター・ファンクタ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	class null_term {
+	public:
+		void operator() (const char* s, uint16_t l) { }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  文字列クラス、出力ファンクタ
 		@param[in]	STR		文字列クラス
 		@param[in]	TERM	ターミネーター・ファンクタ	
@@ -158,7 +170,7 @@ namespace utils {
 
 		void operator () (char ch) {
 			str_ += ch;
-			if(str_.size() >= (str_.capacity() * 8 / 7)) {  // 残り 1/8 になったら、書き出し
+			if(str_.size() >= str_.capacity()) {
 				term_(str_.c_str(), str_.size());
 				str_.clear();
 			}			
@@ -183,6 +195,50 @@ namespace utils {
 		STR& at_str() { return str_; }
 
 		TERM& at_term() { return term_; }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  メモリー文字列クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	class memory_chaout {
+
+		char*		dst_;
+		uint32_t	size_;
+		uint32_t	pos_;
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+			@param[in]	dst		出力先
+			@param[in]	size	最大サイズ
+		*/
+		//-----------------------------------------------------------------//
+		memory_chaout(char* dst = nullptr, uint32_t size = 0) : dst_(dst), size_(size), pos_(0) { }
+
+		void set(char* dst, uint32_t size)
+		{
+			if(dst_ != dst || size_ != size) {  // ポインター、サイズ、どちらか異なる場合は常にリセット
+				pos_ = 0;
+			}
+			dst_ = dst;
+			size_ = size;
+		}
+
+		void operator () (char ch) {
+			if(pos_ < (size_ - 1)) {
+				dst_[pos_] = ch;
+				++pos_;
+				dst_[pos_] = 0;
+			}
+		}
+
+		void clear() { pos_ = 0; }
+
+		uint32_t size() const { return size_; }
 	};
 
 
@@ -604,6 +660,28 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  コンストラクター
+			@param[in]	form	フォーマット式
+			@param[in]	buff	文字バッファ
+			@param[in]	size	文字バッファサイズ
+			@param[in]	append	文字バッファに追加する場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		basic_format(const char* form, char* buff, uint32_t size, bool append = false) noexcept :
+			form_(form),
+			error_(error::none),
+			num_(0), point_(0),
+			bitlen_(0),
+			mode_(mode::NONE), zerosupp_(false), sign_(false)
+		{
+			chaout_.set(buff, size);
+			if(!append) { chaout_.clear(); }
+			next_();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  出力ファンクタの参照
 			@return 出力ファンクタ
 		*/
@@ -761,6 +839,7 @@ namespace utils {
 	template <class CHAOUT> CHAOUT basic_format<CHAOUT>::chaout_;
 
 	typedef basic_format<stdout_chaout> format;
+	typedef basic_format<memory_chaout> sformat;
 	typedef basic_format<null_chaout> null_format;
 	typedef basic_format<size_chaout> size_format;
 }
