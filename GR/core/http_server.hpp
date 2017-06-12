@@ -18,6 +18,8 @@ extern "C" {
 
 namespace net {
 
+	typedef utils::basic_format<ether_string<ethernet::format_id::http, 4096 > > http_format;
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  ftp_server class
@@ -33,8 +35,6 @@ namespace net {
 		SDC&			sdc_;
 
 		ethernet_server	http_;
-
-		typedef utils::fixed_string<MAX_SIZE> STRING;
 
 
 
