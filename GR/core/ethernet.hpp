@@ -78,6 +78,12 @@ namespace net {
 	class ethernet {
 
 	public:
+		enum format_id {
+			http,
+			ftps_ctrl,
+			ftps_data,
+		};
+
 		static const uint32_t TCP_MSS = 1460;
 		static const uint32_t RECV_SIZE = 1024;
 		static const uint32_t SEND_SIZE = 4096;
@@ -809,7 +815,7 @@ namespace net {
 		@param[in]	SIZE	バッファ・サイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <int ID, uint32_t SIZE>
+	template <ethernet::format_id ID, uint32_t SIZE>
 	class ether_string
 	{
 	public:
@@ -822,20 +828,11 @@ namespace net {
 	public:
 		ether_string() : str_(), fd_(0) { }
 
-		void operator() (char ch) {
-			if(ch == '\n') {
-				str_ += '\r';  // 改行を「CR+LF」とする
-				if(str_.size() >= (str_.capacity() - 1)) {
-					clear();
-				}
-			}
-			str_ += ch;
-			if(str_.size() >= (str_.capacity() - 1)) {
-				clear();
-			}
+		void clear() {
+			str_.clear();
 		}
 
-		void clear() {
+		void flush() {
 			if(str_.size() > 0) {
 				if(fd_ > 0) { 
 					ethernet::write(fd_, str_.c_str(), str_.size());
@@ -843,7 +840,20 @@ namespace net {
 					utils::format("ether_string: FD is null.\n");
 				}
 			}
-			str_.clear();
+			clear();
+		}
+
+		void operator() (char ch) {
+			if(ch == '\n') {
+				str_ += '\r';  // 改行を「CR+LF」とする
+				if(str_.size() >= (str_.capacity() - 1)) {
+					flush();
+				}
+			}
+			str_ += ch;
+			if(str_.size() >= (str_.capacity() - 1)) {
+				flush();
+			}
 		}
 
 		uint32_t size() const { return str_.size(); }
