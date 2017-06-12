@@ -24,6 +24,8 @@
 #include "common/format.hpp"
 #include "common/string_utils.hpp"
 
+// #define FTP_DEBUG
+
 extern "C" {
 	time_t get_time(void);
 };
@@ -97,19 +99,22 @@ namespace net {
 	template <class SDC>
 	class ftp_server {
 
+		typedef utils::basic_format<ether_string<2, 256> > ctrl_format;
+		typedef utils::basic_format<ether_string<3, 1024> > data_format;
+
+		void ctrl_flush() { ctrl_format::chaout().clear(); }
+		void data_flush() { data_format::chaout().clear(); }
+
 		static const uint32_t	login_timeout_    = 100 * 30;  ///< 30 sec.
 		static const uint32_t	transfer_timeout_ = 100 * 10;  ///< 10 sec.
 		static const uint32_t	data_connection_timeout_ = 100 * 10;  ///< 10 sec.
 
 		// デバッグ以外で出力を無効にする
-		struct null_chaout {
-			null_chaout(char* out = nullptr, uint16_t len = 0) { } 
-			void operator() (char ch) {
-			}
-		};
-//		typedef utils::basic_format<null_chaout> ftp_debug;
-		typedef utils::basic_format<utils::def_chaout> ftp_debug;
-
+#ifdef FTP_DEBUG
+		typedef utils::null_format debug_format;
+#else
+		typedef utils::format debug_format;
+#endif
 		static const uint16_t CTRL_PORT = 21;
 		static const uint16_t DATA_PORT = 20;
 		static const uint16_t DATA_PORT_PASV = 55600;
@@ -153,6 +158,7 @@ namespace net {
 		typedef utils::line_manage<1024, 1> LINE_MAN;
 		LINE_MAN	line_man_;
 
+		char		host_[16];
 		char		user_[16];
 		char		pass_[16];
 
@@ -174,13 +180,10 @@ namespace net {
 
 		bool		pasv_enable_;
 
-		// -------------------------------------------------------------------- //
-		typedef utils::basic_format<eth_chaout> format;
-
-		static void disp_time_(time_t t, char* dst, uint32_t size)
+		static void disp_time_(time_t t)
 		{
 			struct tm *m = localtime(&t);
-			utils::format("%s %s %d %02d:%02d:%02d  %4d", dst, size)
+			ctrl_format("%s %s %d %02d:%02d:%02d  %4d")
 				% get_wday(m->tm_wday)
 				% get_mon(m->tm_mon)
 				% static_cast<uint32_t>(m->tm_mday)
@@ -192,10 +195,10 @@ namespace net {
 
 
 		// Create string YYYYMMDDHHMMSS
-		static void make_date_time_(time_t t, char* dst, uint32_t size)
+		static void make_date_time_(time_t t, char* tmp, uint32_t size)
 		{
 			struct tm *m = localtime(&t);
-		 	utils::format("%04u%02u%02u%02u%02u%02u", dst, size)
+		 	utils::sformat("%04u%02u%02u%02u%02u%02u", tmp, size)
 				% static_cast<uint32_t>(m->tm_year + 1900)
 				% static_cast<uint32_t>(m->tm_mon + 1)
 				% static_cast<uint32_t>(m->tm_mday)
@@ -223,27 +226,15 @@ namespace net {
 		}
 
 
-		static void dir_nlst_data_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+		static void dir_nlst_func_(const char* name, const FILINFO* fi, bool dir, void* option)
 		{
 			if(fi == nullptr) return;
 
-			ethernet_server* data = static_cast<ethernet_server*>(option);
-			int fd = data->get_cepid();
-			format("%s\n", fd) % name;
+			data_format("%s\n") % name;
 		}
 
 
-		static void dir_nlst_port_func_(const char* name, const FILINFO* fi, bool dir, void* option)
-		{
-			if(fi == nullptr) return;
-
-			ethernet_client* data = static_cast<ethernet_client*>(option);
-			int fd = data->get_cepid();
-			format("%s\n", fd) % name;
-		}
-
-
-		static void dir_list_sub_(const char* name, const FILINFO* fi, bool dir, int fd)
+		static void dir_list_sub_(const char* name, const FILINFO* fi, bool dir)
 		{
 			char cdir = '-';
 			if(dir) {
@@ -254,7 +245,7 @@ namespace net {
 
 			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
 			struct tm *m = localtime(&t);
-			format("%crw-rw-rw- %d user root %d %s %d %02d:%02d %s\n", fd)
+			data_format("%crw-rw-rw- %d user root %d %s %d %02d:%02d %s\n")
 				% cdir % block % fi->fsize
 				% get_mon(m->tm_mon)
 				% static_cast<int>(m->tm_mday)
@@ -264,32 +255,20 @@ namespace net {
 		}
 
 
-		static void dir_list_data_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option)
 		{
 			if(fi == nullptr) return;
 
-			ethernet_server* data = static_cast<ethernet_server*>(option);
-			int fd = data->get_cepid();
-			dir_list_sub_(name, fi, dir, fd);
+			dir_list_sub_(name, fi, dir);
 		}
 
 
-		static void dir_list_port_func_(const char* name, const FILINFO* fi, bool dir, void* option)
-		{
-			if(fi == nullptr) return;
-
-			ethernet_client* data = static_cast<ethernet_client*>(option);
-			int fd = data->get_cepid();
-			dir_list_sub_(name, fi, dir, fd);
-		}
-
-
-		static void dir_mlsd_sub_(const char* name, const FILINFO* fi, bool dir, int fd)
+		static void dir_mlsd_sub_(const char* name, const FILINFO* fi, bool dir)
 		{
 			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
 			char tmp[32];
 			make_date_time_(t, tmp, sizeof(tmp));
-			format("Type=%s;Size=%d;Modify=%s; %s\n", fd)
+			data_format("Type=%s;Size=%d;Modify=%s; %s\n")
 				% (dir ? "dir" : "file")
 				% fi->fsize
 				% tmp
@@ -297,23 +276,11 @@ namespace net {
 		}
 
 
-		static void dir_mlsd_data_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+		static void dir_mlsd_func_(const char* name, const FILINFO* fi, bool dir, void* option)
 		{
 			if(fi == nullptr) return;
 
-			ethernet_server* data = static_cast<ethernet_server*>(option);
-			int fd = data->get_cepid();
-			dir_mlsd_sub_(name, fi, dir, fd);
-		}
-
-
-		static void dir_mlsd_port_func_(const char* name, const FILINFO* fi, bool dir, void* option)
-		{
-			if(fi == nullptr) return;
-
-			ethernet_client* data = static_cast<ethernet_client*>(option);
-			int fd = data->get_cepid();
-			dir_mlsd_sub_(name, fi, dir, fd);
+			dir_mlsd_sub_(name, fi, dir);
 		}
 
 
@@ -344,16 +311,16 @@ namespace net {
 
 		void debug_dump_(const char* ptr, int len)
 		{
-			ftp_debug("(%d)") % len;
+			debug_format("(%d)") % len;
 			for(int i = 0; i < len; ++i) {
 				char ch = ptr[i];
 				if(ch >= 0 && ch < 0x20) {
-					ftp_debug(",%02X ") % static_cast<int>(ch);
+					debug_format(",%02X ") % static_cast<int>(ch);
 				} else {
-					ftp_debug("%c") % ch;
+					debug_format("%c") % ch;
 				}
 			}
-			ftp_debug("\n");
+			debug_format("\n");
 		}
 
 
@@ -373,7 +340,7 @@ namespace net {
 				char ch = tmp[i];
 				if(ch == 0 || ch == 0x0d) continue;
 				if(!line_man_.add(ch)) {
-					ftp_debug("line_man: memory over\n");
+					debug_format("line_man: memory over\n");
 					return false;
 				}
 			}
@@ -395,53 +362,60 @@ namespace net {
 
 			switch(cmd) {
 			case ftp_command::ABOR:
-				format("226 Data connection closed\n", ctrl_.get_cepid());
+				ctrl_format("226 Data connection closed\n");
+				ctrl_flush();
 				task_ = task::disconnect;
 				break;
 
 			case ftp_command::ACCT:
 			case ftp_command::ALLO:
 			case ftp_command::APPE:
-				ftp_debug("Not service: '%s'\n") % line_man_[0];
+				debug_format("Not service: '%s'\n") % line_man_[0];
 				exec = false;
 				break;
 
 			case ftp_command::CDUP:
 				sdc_.cd("..");
-				format("200 Ok. Current directory is %s\n", ctrl_.get_cepid()) % sdc_.get_current();
+				ctrl_format("200 Ok. Current directory is %s\n") % sdc_.get_current();
+				ctrl_flush();
 				break;
 
 			case ftp_command::CWD:
 				{
 					if(strcmp(param_, ".") == 0) {
-						format("257 \"%s\" is your current directory\n", ctrl_.get_cepid()) % param_;     
+						ctrl_format("257 \"%s\" is your current directory\n") % param_;     
 					} else if(sdc_.cd(param_)) {
-						format("250 Ok. Current directory is '%s'\n", ctrl_.get_cepid()) % sdc_.get_current();
+						ctrl_format("250 Ok. Current directory is '%s'\n") % sdc_.get_current();
 					} else {
-						format("550 Can't change directory to '%s'\n", ctrl_.get_cepid()) % param_;
+						ctrl_format("550 Can't change directory to '%s'\n") % param_;
 						ret = false;
 					}
+					ctrl_flush();
 				}
 				break;
 
 			case ftp_command::DELE:
 				if(param_ == nullptr || strlen(param_) == 0) {
-					format("501 No file name\n", ctrl_.get_cepid());
+					ctrl_format("501 No file name\n");
+					ctrl_flush();
 					break;
 				}
 				if(!sdc_.probe(param_)) {
-					format("550 File %s not found\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("550 File %s not found\n") % param_;
+					ctrl_flush();
 					break;
 				}
 				if(sdc_.remove(param_)) {
-					format("250 \"%s\" deleted\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("250 \"%s\" deleted\n") % param_;
 				} else {
-					format("450 Can't delete %s\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("450 Can't delete %s\n") % param_;
 				}
+				ctrl_flush();
 				break;
 
 			case ftp_command::HELP:
-				format("214 Help list none...\n", ctrl_.get_cepid());
+				ctrl_format("214 Help list none...\n");
+				ctrl_flush();
 				break;
 
 			case ftp_command::LIST:
@@ -453,23 +427,22 @@ namespace net {
 						con = port_.connected();
 					}
 					if(!con) {
-						format("425 No data connection\n", ctrl_.get_cepid());
+						ctrl_format("425 No data connection\n");
+						ctrl_flush();
 						ret = false;
 						break;
 					}
-					format("150 Accepted data connection\n", ctrl_.get_cepid());
+					ctrl_format("150 Accepted data connection\n");
+					ctrl_flush();
 					if(sdc_.get_mount()) {
-						int n;
-						if(pasv_enable_) {
-							n = sdc_.dir_loop(sdc_.get_current(), dir_list_data_func_, true, &data_);
-						} else {
-							n = sdc_.dir_loop(sdc_.get_current(), dir_list_port_func_, true, &port_);
-						}
-						format("226 %d matches total\n", ctrl_.get_cepid()) % n;
+						int n = sdc_.dir_loop(sdc_.get_current(), dir_list_func_, true, nullptr);
+						data_flush();
+						ctrl_format("226 %d matches total\n") % n;
 					} else {
-						format("550 Can't open directory %s\n", ctrl_.get_cepid()) % sdc_.get_current();
+						ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
 						ret = false;
 					}
+					ctrl_flush();
 					if(pasv_enable_) {
 						data_.stop();
 					} else {
@@ -480,18 +453,21 @@ namespace net {
 
 			case ftp_command::MKD:
 				if(param_ == nullptr || strlen(param_) == 0) {
-					format("501 No directory name\n", ctrl_.get_cepid());
+					ctrl_format("501 No directory name\n");
+					ctrl_flush();
 					break;
 				}
 				if(sdc_.probe(param_)) {
-					format("521 \"%s\" directory already exists\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("521 \"%s\" directory already exists\n") % param_;
+					ctrl_flush();
 					break;
 				}
 				if(sdc_.mkdir(param_)) {
-					format("257 \"%s\" created\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("257 \"%s\" created\n") % param_;
 				} else {
-					format("550 Can't create \"%s\"\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("550 Can't create \"%s\"\n") % param_;
 				}
+				ctrl_flush();
 				break;
 
 			case ftp_command::NLST:
@@ -503,23 +479,22 @@ namespace net {
 						con = port_.connected();
 					}
 					if(!con) {
-						format("425 No data connection\n", ctrl_.get_cepid());
+						ctrl_format("425 No data connection\n");
+						ctrl_flush();
 						ret = false;
 						break;
 					}
-					format("150 Accepted data connection\n", ctrl_.get_cepid());
+					ctrl_format("150 Accepted data connection\n");
+					ctrl_flush();
 					if(sdc_.get_mount()) {
-						int n;
-						if(pasv_enable_) {
-							n = sdc_.dir_loop(sdc_.get_current(), dir_nlst_data_func_, true, &data_);
-						} else {
-							n = sdc_.dir_loop(sdc_.get_current(), dir_nlst_port_func_, true, &port_);
-						}
-						format("226 %d matches total\n", ctrl_.get_cepid()) % n;
+						int n = sdc_.dir_loop(sdc_.get_current(), dir_nlst_func_, true, nullptr);
+						data_flush();
+						ctrl_format("226 %d matches total\n") % n;
 					} else {
-						format("550 Can't open directory %s\n", ctrl_.get_cepid()) % sdc_.get_current();
+						ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
 						ret = false;
 					}
+					ctrl_flush();
 					if(pasv_enable_) {
 						data_.stop();
 					} else {
@@ -529,7 +504,8 @@ namespace net {
 				break;
 
 			case ftp_command::NOOP:
-				format("200 ...\n", ctrl_.get_cepid());
+				ctrl_format("200 ...\n");
+				ctrl_flush();
 				break;
 
 			case ftp_command::MODE:
@@ -543,7 +519,7 @@ namespace net {
       client << "504 Only S(tream) is suported\r\n";
   }
 #endif
-				ftp_debug("Not service: '%s'\n") % line_man_[0];
+				debug_format("Not service: '%s'\n") % line_man_[0];
 				exec = false;
 				break;
 
@@ -553,8 +529,9 @@ namespace net {
 			case ftp_command::PASV:
 				{
 					const auto& ip = eth_.get_local_ip();
-					format("227 Entering Passive Mode (%d,%d,%d,%d,%d,%d)\n", ctrl_.get_cepid())
+					ctrl_format("227 Entering Passive Mode (%d,%d,%d,%d,%d,%d)\n")
 						% ip[0] % ip[1] % ip[2] % ip[3] % (DATA_PORT_PASV >> 8) % (DATA_PORT_PASV & 255);
+					ctrl_flush();
 					task_ = task::start_pasv;
 				}
 				break;
@@ -566,16 +543,18 @@ namespace net {
 					data_ip_.set(v[0], v[1], v[2], v[3]);
 					data_port_ = (v[4] << 8) | v[5];
 					utils::format("PORT: '%s' (%d)\n") % data_ip_.c_str() % data_port_;
-					format("220 PORT command successful\n", ctrl_.get_cepid());
+					ctrl_format("220 PORT command successful\n");
 					task_ = task::start_port;
 				} else {
-					format("501 PORT parameters error.\n", ctrl_.get_cepid());
+					ctrl_format("501 PORT parameters error.\n");
 				}
+				ctrl_flush();
 				break;
 
 			case ftp_command::PWD:
 			case ftp_command::XPWD:
-				format("257 \"%s\" is your current directory\n", ctrl_.get_cepid()) % sdc_.get_current();
+				ctrl_format("257 \"%s\" is your current directory\n") % sdc_.get_current();
+				ctrl_flush();
 				break;
 
 			case ftp_command::QUIT:
@@ -585,13 +564,14 @@ namespace net {
 
 			case ftp_command::REIN:
 			case ftp_command::REST:
-				ftp_debug("Not service: '%s'\n") % line_man_[0];
+				debug_format("Not service: '%s'\n") % line_man_[0];
 				exec = false;
 				break;
 
 			case ftp_command::RETR:
 				if(param_ == nullptr) {
-					format("501 No file name\n", ctrl_.get_cepid());
+					ctrl_format("501 No file name\n");
+					ctrl_flush();
 					ret = false;
 					break;
 				}
@@ -599,22 +579,25 @@ namespace net {
 					char path[256 + 1];
 					sdc_.make_full_path(param_, path);
 					if(!sdc_.probe(path)) {
-						format("550 File '%s' not found\n", ctrl_.get_cepid()) % path;
+						ctrl_format("550 File '%s' not found\n") % path;
+						ctrl_flush();
 						ret = false;
 						break;
 					}
 					uint32_t fsz = sdc_.size(path);
 					file_fp_ = fopen(path, "rb");
 					if(file_fp_ == nullptr) {
-						format("450 Can't open %s \n", ctrl_.get_cepid()) % path;
+						ctrl_format("450 Can't open %s \n") % path;
+						ctrl_flush();
 						break;
 					}
 					if(pasv_enable_) {
-						format("150-Connected to port %d\n", ctrl_.get_cepid()) % data_.get_port();
+						ctrl_format("150-Connected to port %d\n") % data_.get_port();
 					} else {
-						format("150-Connected to port %d\n", ctrl_.get_cepid()) % port_.get_port();
+						ctrl_format("150-Connected to port %d\n") % port_.get_port();
 					}
-					format("150 %u bytes to download\n", ctrl_.get_cepid()) % fsz;
+					ctrl_format("150 %u bytes to download\n") % fsz;
+					ctrl_flush();
 					file_total_ = 0;
 					file_frame_ = 0;
 					file_wait_ = 0;
@@ -624,32 +607,37 @@ namespace net {
 
 			case ftp_command::RMD:
 				if(param_ == nullptr || strlen(param_) == 0) {
-					format("501 No directory name\n", ctrl_.get_cepid());
+					ctrl_format("501 No directory name\n");
+					ctrl_flush();
 					break;
 				}
 				if(!sdc_.probe(param_)) {
-					format("550 File %s not found\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("550 File %s not found\n") % param_;
+					ctrl_flush();
 					break;
 				}
 				if(sdc_.remove(param_)) {
-					format("250 \"%s\" deleted\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("250 \"%s\" deleted\n") % param_;
 				} else {
-					format("501 Can't delete %s\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("501 Can't delete %s\n") % param_;
 				}
+				ctrl_flush();
 				break;
 
 			// 引数に指定した名前のファイル（ディレクトリ）をリネームする。
 			case ftp_command::RNFR:
 				if(param_ == nullptr || strlen(param_) == 0) {
-					format("501 No file name\n", ctrl_.get_cepid());
+					ctrl_format("501 No file name\n");
+					ctrl_flush();
 					break;
 				}
 				if(!sdc_.probe(param_)) {
-					format("550 File %s not found\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("550 File %s not found\n") % param_;
 				} else {
-					format("350 RNFR accepted - file exists, ready for destination\n", ctrl_.get_cepid());     
+					ctrl_format("350 RNFR accepted - file exists, ready for destination\n");     
 					task_ = task::recv_rename;
 				}
+				ctrl_flush();
 				break;
 
 			case ftp_command::RNTO:
@@ -703,7 +691,7 @@ namespace net {
     rnfrCmd = false;
   }
 #endif
-				ftp_debug("Not service: '%s'\n") % line_man_[0];
+				debug_format("Not service: '%s'\n") % line_man_[0];
 				exec = false;
 				break;
 
@@ -712,25 +700,27 @@ namespace net {
 					uint32_t free;
 					uint32_t capa;
 					if(sdc_.get_disk_space(free, capa)) {
-						format("200 %u MB free of %u MB capacity\n", ctrl_.get_cepid())
+						ctrl_format("200 %u MB free of %u MB capacity\n")
 							% (free / 1024) % (capa / 1024);
 					} else {
-						format("550 disk not available\n", ctrl_.get_cepid()) % param_;
+						ctrl_format("550 disk not available\n") % param_;
 					}
 				} else {
-					format("500 Unknow SITE command %s\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("500 Unknow SITE command %s\n") % param_;
 				}
+				ctrl_flush();
 				break;
 
 			case ftp_command::SMNT:
 			case ftp_command::STAT:
-				ftp_debug("Not service: '%s'\n") % line_man_[0];
+				debug_format("Not service: '%s'\n") % line_man_[0];
 				exec = false;
 				break;
 
 			case ftp_command::STOR:
 				if(param_ == nullptr) {
-					format("501 No file name\n", ctrl_.get_cepid());
+					ctrl_format("501 No file name\n");
+					ctrl_flush();
 					break;
 				}
 				{
@@ -738,14 +728,16 @@ namespace net {
 					sdc_.make_full_path(param_, path);
 					file_fp_ = fopen(path, "wb");
 					if(file_fp_ == nullptr) {
-						format("451 Can't open/create %s\n", ctrl_.get_cepid()) % path;
+						ctrl_format("451 Can't open/create %s\n") % path;
+						ctrl_flush();
 						break;
 					}
 					if(pasv_enable_) {
-						format("150 Connected to port %d\n", ctrl_.get_cepid()) % data_.get_port();
+						ctrl_format("150 Connected to port %d\n") % data_.get_port();
 					} else {
-						format("150 Connected to port %d\n", ctrl_.get_cepid()) % port_.get_port();
+						ctrl_format("150 Connected to port %d\n") % port_.get_port();
 					}
+					ctrl_flush();
 					file_total_ = 0;
 					file_frame_ = 0;
 					file_wait_ = 0;
@@ -754,51 +746,56 @@ namespace net {
 				break;
 
 			case ftp_command::STOU:
-				ftp_debug("Not service: '%s'\n") % line_man_[0];
+				debug_format("Not service: '%s'\n") % line_man_[0];
 				exec = false;
 				break;
 
 			case ftp_command::STRU:
 				if(strcmp(param_, "F") == 0) {
-					format("200 F Ok\n", ctrl_.get_cepid());
+					ctrl_format("200 F Ok\n");
 				} else {
-					format("504 no suport %s\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("504 no suport %s\n") % param_;
 				}
+				ctrl_flush();
 				break;
 
 			case ftp_command::SYST:
-				format("215 Renesas_RX64M single task OS.\n", ctrl_.get_cepid());
+				ctrl_format("215 Renesas_RX64M single task OS.\n");
+				ctrl_flush();
 				break;
 
 			case ftp_command::TYPE:
 				if(param_ == nullptr) {
-					format("504 Unknow TYPE\n", ctrl_.get_cepid());
+					ctrl_format("504 Unknow TYPE\n");
 					ret = false;
 				} else if(strcmp(param_, "A") == 0) {
-					format("200 TYPE is now ASCII\n", ctrl_.get_cepid());
+					ctrl_format("200 TYPE is now ASCII\n");
 				} else if(strcmp(param_, "I") == 0) {
-			    	format("200 TYPE is now BINARY\n", ctrl_.get_cepid());
+					ctrl_format("200 TYPE is now BINARY\n");
 				} else {
-					format("504 Unknow TYPE\n", ctrl_.get_cepid());
+					ctrl_format("504 Unknow TYPE\n");
 					ret = false;
 				}
+				ctrl_flush();
 				break;
 
 			case ftp_command::USER:
 				break;
 
 			case ftp_command::FEAT:
-				format("211-Extensions suported:\n", ctrl_.get_cepid());
-				format(" MDTM\n", ctrl_.get_cepid());
-				format(" MLSD\n", ctrl_.get_cepid());
-				format(" SIZE\n", ctrl_.get_cepid());
-				format(" SITE FREE\n", ctrl_.get_cepid());
-				format("211 End.\n", ctrl_.get_cepid());
+				ctrl_format("211-Extensions suported:\n");
+				ctrl_format(" MDTM\n");
+				ctrl_format(" MLSD\n");
+				ctrl_format(" SIZE\n");
+				ctrl_format(" SITE FREE\n");
+				ctrl_format("211 End.\n");
+				ctrl_flush();
  				break;
 
 			case ftp_command::MDTM:
 				if(param_ == nullptr || strlen(param_) == 0) {
-					format("501 No file name\n", ctrl_.get_cepid());
+					ctrl_format("501 No file name\n");
+					ctrl_flush();
 					break;
 				}
 				{
@@ -806,19 +803,21 @@ namespace net {
 					if(parse_YYYYMMDDHHMMSS_(param_)) {
 //        else
 //          client << "550 Unable to modify time\r\n";
-						format("200 Ok\n", ctrl_.get_cepid());
+						ctrl_format("200 Ok\n");
+						ctrl_flush();
 						break;
 					}
 					char path[256 + 1];
 					sdc_.make_full_path(param_, path);
 					if(!sdc_.probe(path)) {
-						format("550 No such file %s\n", ctrl_.get_cepid()) % path;
+						ctrl_format("550 No such file %s\n") % path;
+						ctrl_flush();
 						break;
 					}
 					time_t t = sdc_.get_time(path);
 					if(t != 0) {
 						struct tm *m = localtime(&t);
-						format("213 %04d%02d%02d%02d%02d%02d\n", ctrl_.get_cepid())
+						ctrl_format("213 %04d%02d%02d%02d%02d%02d\n")
 							% static_cast<int>(m->tm_year + 1900)
 							% static_cast<int>(m->tm_mon + 1)
 							% static_cast<int>(m->tm_mday)
@@ -826,7 +825,8 @@ namespace net {
 							% static_cast<int>(m->tm_min)
 							% static_cast<int>(m->tm_sec);
 					} else {
-						format("550 Unable to retrieve time\n", ctrl_.get_cepid());
+						ctrl_format("550 Unable to retrieve time\n");
+						ctrl_flush();
 					}
 				}
 				break;
@@ -840,23 +840,22 @@ namespace net {
 						con = port_.connected();
 					}
 				    if(!con) {
-						format("425 No data connection\n", ctrl_.get_cepid());
+						ctrl_format("425 No data connection\n");
+						ctrl_flush();
 						ret = false;
 					} else {
-	   	   				format("150 Accepted data connection\n", ctrl_.get_cepid());
+						ctrl_format("150 Accepted data connection\n");
+						ctrl_flush();
 						if(sdc_.get_mount()) {
-							int n;
-							if(pasv_enable_) {
-								n = sdc_.dir_loop(sdc_.get_current(), dir_mlsd_data_func_, true, &data_);
-							} else {
-								n = sdc_.dir_loop(sdc_.get_current(), dir_mlsd_port_func_, true, &port_);
-							}
-							format("226-options: -a -l\n", ctrl_.get_cepid());
-							format("226 %d matches total\n", ctrl_.get_cepid()) % n;
+							int n = sdc_.dir_loop(sdc_.get_current(), dir_mlsd_func_, true, nullptr);
+							data_flush();
+							ctrl_format("226-options: -a -l\n");
+							ctrl_format("226 %d matches total\n") % n;
 						} else {
-							format("550 File system not mount\n", ctrl_.get_cepid());
+							ctrl_format("550 File system not mount\n");
 							ret = false;
 						}
+						ctrl_flush();
 						if(pasv_enable_) {
 							data_.stop();
 						} else {
@@ -868,17 +867,20 @@ namespace net {
 
 			case ftp_command::SIZE:
 				if(param_ == nullptr || strlen(param_) == 0) {
-					format("501 No file name\n", ctrl_.get_cepid());
+					ctrl_format("501 No file name\n");
+					ctrl_flush();
 					break;
 				}
 				if(!sdc_.probe(param_)) {
-					format("550 No such file %s\n", ctrl_.get_cepid()) % param_;
+					ctrl_format("550 No such file %s\n") % param_;
+					ctrl_flush();
 					break;
 				}
 				{
 					uint32_t sz = sdc_.size(param_);
 ///					format("450 Can't open %s\n", ctrl_.get_cepid()) % param_;
-					format("213 %u\n", ctrl_.get_cepid()) % sz;
+					ctrl_format("213 %u\n") % sz;
+					ctrl_flush();
 				}
 				break;
 
@@ -889,11 +891,12 @@ namespace net {
 			}
 
 			if(!exec) {
-				ftp_debug("FTP Server: command table search out: '%s'\n") % line_man_[0];
-    			format("500 Unknow command %s\n", ctrl_.get_cepid()) % line_man_[0];
+				debug_format("FTP Server: command table search out: '%s'\n") % line_man_[0];
+    			ctrl_format("500 Unknow command %s\n") % line_man_[0];
+				ctrl_flush();
 			}
 
-			ftp_debug("FTP command: %s, '%s'\n") % line_man_[0] % param_;
+			debug_format("FTP command: %s, '%s'\n") % line_man_[0] % param_;
 			return ret;
 		}
 
@@ -927,18 +930,23 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  開始
+			@param[in]	host	ホスト名
 			@param[in]	user	ユーザー名
 			@param[in]	pass	パスワード
 		*/
 		//-----------------------------------------------------------------//
-		void start(const char* user, const char* pass)
+		void start(const char* host, const char* user, const char* pass)
 		{
-			if(user == nullptr || pass == nullptr) {
+			if(host == nullptr || user == nullptr || pass == nullptr) {
 				return;
 			}
+			strncpy(host_, host, sizeof(host_) - 1);
 			strncpy(user_, user, sizeof(user_) - 1);
 			strncpy(pass_, pass, sizeof(pass_) - 1);
 			task_ = task::begin;
+
+			ctrl_format::chaout().set_fd(0);
+			data_format::chaout().set_fd(0);
 		}
 
 
@@ -955,16 +963,17 @@ namespace net {
 				utils::format("Start FTP Server (CTRL): %s (%d), fd(%d)\n")
 					% eth_.get_local_ip().c_str() % ctrl_.get_port() % ctrl_.get_cepid();
 				task_ = task::connection;
+				ctrl_format::chaout().set_fd(ctrl_.get_cepid());
 				break;
 
 			case task::connection:
 				if(ctrl_.connected()) {
-					ftp_debug("FTP Server (CTRL): connect form: '%s'\n") % ctrl_.get_from_ip().c_str();
+					debug_format("FTP Server (CTRL): connect form: '%s'\n") % ctrl_.get_from_ip().c_str();
+					ctrl_format("220 %s FTP server %s ") % host_ % eth_.get_local_ip().c_str();
 					time_t t = get_time();
-					char tmp[128];
-					disp_time_(t, tmp, sizeof(tmp));
-					format("220 %s SEEDA03 FTP server %s\n", ctrl_.get_cepid())
-						% eth_.get_local_ip().c_str() % tmp;
+					disp_time_(t);
+					ctrl_format("\n");
+					ctrl_flush();
 					line_man_.clear();
 					task_ = task::user_identity;
 				}
@@ -976,23 +985,24 @@ namespace net {
 					ftp_command cmd = scan_command_(line_man_[0]);
 					if(cmd == ftp_command::SYST) {
 						line_man_.clear();
-						format("215 Renesas_RX64M single task OS.\n", ctrl_.get_cepid());
+						ctrl_format("215 Renesas_RX64M single task OS.\n");
 					} else if(cmd == ftp_command::USER) {
 						if(strcmp(param_, user_) == 0) {
-							ftp_debug("FTP Server user OK: '%s'\n") % param_;
-							format("331 OK. %s User password required\n", ctrl_.get_cepid()) % param_;
+							debug_format("FTP Server user OK: '%s'\n") % param_;
+							ctrl_format("331 OK. %s User password required\n") % param_;
 							line_man_.clear();
 							task_ = task::password;
 						} else {
-							ftp_debug("FTP Server user NG: '%s'\n") % param_;
-							format("530 %s User not found\n", ctrl_.get_cepid()) % param_;
+							debug_format("FTP Server user NG: '%s'\n") % param_;
+							ctrl_format("530 %s User not found\n") % param_;
 							task_ = task::disconnect;
 						}
 					} else {
-						ftp_debug("Error: 'task::user_identity', '%s'\n") % line_man_[0];
-					    format("500 USER Certification Error\n", ctrl_.get_cepid());
+						debug_format("Error: 'task::user_identity', '%s'\n") % line_man_[0];
+					    ctrl_format("500 USER Certification Error\n");
 						task_ = task::disconnect;
 					}
+					ctrl_flush();
 				}
 				break;
 
@@ -1002,20 +1012,21 @@ namespace net {
 					ftp_command cmd = scan_command_(line_man_[0]);
 					if(cmd == ftp_command::PASS) {
 						if(strcmp(param_, pass_) == 0) {
-							ftp_debug("FTP Server password OK: '%s'\n") % param_;
-							format("230 Login ok %s\n", ctrl_.get_cepid()) % user_;
+							debug_format("FTP Server password OK: '%s'\n") % param_;
+							ctrl_format("230 Login ok %s\n") % user_;
 							line_man_.clear();
 							task_ = task::command;
 						} else {
-							ftp_debug("FTP Server password NG: '%s'\n") % param_;
-							format("530 Password fail %s\n", ctrl_.get_cepid()) % user_;
+							debug_format("FTP Server password NG: '%s'\n") % param_;
+							ctrl_format("530 Password fail %s\n") % user_;
 							task_ = task::disconnect;
 						}
 					} else {
-						ftp_debug("Error: 'task::password', '%s'\n") % line_man_[0];
-					    format("500 PASS Certification Error\n", ctrl_.get_cepid());
+						debug_format("Error: 'task::password', '%s'\n") % line_man_[0];
+					    ctrl_format("500 PASS Certification Error\n");
 						task_ = task::disconnect;
 					}
+					ctrl_flush();
 				}
 				break;
 
@@ -1024,6 +1035,7 @@ namespace net {
 				utils::format("Start FTP Server data (PASV): '%s' (%d) fd(%d)\n")
 					% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
 				data_connect_loop_ = data_connection_timeout_;
+				data_format::chaout().set_fd(data_.get_cepid());
 				task_ = task::data_connection;
 				break;
 
@@ -1031,11 +1043,12 @@ namespace net {
 				if(data_connect_loop_) {
 					--data_connect_loop_;
 				} else {
-					format("425 No data connection (timeout)\n", ctrl_.get_cepid());
+					ctrl_format("425 No data connection (timeout)\n");
+					ctrl_flush();
 					task_ = task::command;
 				}
 				if(data_.connected()) {
-					ftp_debug("Connection FTP Server data (PASV): '%s' %d [ms] (%d)\n")
+					debug_format("Connection FTP Server data (PASV): '%s' %d [ms] (%d)\n")
 						% data_.get_from_ip().c_str()
 						% static_cast<int>(data_connection_timeout_ - data_connect_loop_)
 						% data_.get_port();
@@ -1051,6 +1064,7 @@ namespace net {
 				utils::format("Start FTP Server data (PORT): '%s' (%d) fd(%d)\n")
 					% data_ip_.c_str() % data_port_ % port_.get_cepid();
 				data_connect_loop_ = data_connection_timeout_;
+				data_format::chaout().set_fd(port_.get_cepid());
 				task_ = task::port_connection;
 				break;
 
@@ -1058,11 +1072,12 @@ namespace net {
 				if(data_connect_loop_) {
 					--data_connect_loop_;
 				} else {
-					format("425 No data connection (timeout)\n", ctrl_.get_cepid());
+					ctrl_format("425 No data connection (timeout)\n");
+					ctrl_flush();
 					task_ = task::command;
 				}
 				if(port_.connected()) {
-					ftp_debug("Connection FTP Server data (PORT): '%s' %d [ms] (%d)\n")
+					debug_format("Connection FTP Server data (PORT): '%s' %d [ms] (%d)\n")
 						% port_.get_from_ip().c_str()
 						% static_cast<int>(data_connection_timeout_ - data_connect_loop_)
 						% port_.get_port();
@@ -1091,8 +1106,8 @@ namespace net {
 					++file_frame_;
 					if(sz < sizeof(rs_buf_)) {
 						uint32_t krate = file_total_ * 100 / file_frame_ / 1024;
-						format("226 File successfully transferred (%u KBytes/Sec)\n", ctrl_.get_cepid())
-							% krate;  
+						ctrl_format("226 File successfully transferred (%u KBytes/Sec)\n") % krate;
+						ctrl_flush();
 						fclose(file_fp_);
 						file_fp_ = nullptr;
 						if(pasv_enable_) {
@@ -1105,7 +1120,8 @@ namespace net {
 						break;
 					}
 					if(file_wait_ >= transfer_timeout_) {
-						format("421 Data timeout. Reconnect. Sorry\n", ctrl_.get_cepid());
+						ctrl_format("421 Data timeout. Reconnect. Sorry\n");
+						ctrl_flush();
 						fclose(file_fp_);
 						file_fp_ = nullptr;
 						if(pasv_enable_) {
@@ -1141,8 +1157,8 @@ namespace net {
 					else con = port_.connected();
 					if(!con || sz < 0) {
 						uint32_t krate = file_total_ * 100 / file_frame_ / 1024;
-						format("226 File successfully transferred (%u KBytes/Sec)\n", ctrl_.get_cepid())
-							% krate;
+						ctrl_format("226 File successfully transferred (%u KBytes/Sec)\n") % krate;
+						ctrl_flush();
 						fclose(file_fp_);
 						file_fp_ = nullptr;
 						if(pasv_enable_) {
@@ -1155,7 +1171,8 @@ namespace net {
 						break;
 					}
 					if(file_wait_ >= transfer_timeout_) {
-						format("421 Data timeout. Reconnect. Sorry\n", ctrl_.get_cepid());
+						ctrl_format("421 Data timeout. Reconnect. Sorry\n");
+						ctrl_flush();
 						fclose(file_fp_);
 						file_fp_ = nullptr;
 						if(pasv_enable_) {
@@ -1163,7 +1180,7 @@ namespace net {
 						} else {
 							port_.stop();
 						}
-						utils::format("Data recv timeout\n");
+						debug_format("Data recv timeout\n");
 						task_ = task::command;
 					}
 				}
@@ -1205,7 +1222,7 @@ namespace net {
 			case task::disconnect:
 			default:
 				ctrl_.stop();
-				ftp_debug("FTP Server (CTRL): disconnect\n");
+				debug_format("FTP Server (CTRL): disconnect\n");
 				delay_loop_ = 4;
 				task_ = task::disconnect_main;
 				break;
