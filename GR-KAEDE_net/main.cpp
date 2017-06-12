@@ -13,6 +13,7 @@
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/input.hpp"
+#include "common/fixed_string.hpp"
 
 #include "chip/phy_base.hpp"
 #include "net/net_core.hpp"
@@ -56,22 +57,18 @@ namespace {
 
 	volatile uint32_t ethc_count_;
 
-	// インサーネット割り込みファンクタ
-	class eth_task {
-	public:
-		void operator() () {
-			++ethc_count_;
-		}
-	};
-
 	typedef device::ETHERC0 ETHERC;      // Eternet Controller
 	typedef device::EDMAC0 EDMAC;        // Ethernet DMA Controller
 	typedef chip::phy_base<ETHERC> PHY;  // Ethernet PHY
-	typedef device::ether_io<ETHERC, EDMAC, PHY, eth_task> ETHER_IO;
+	typedef device::ether_io<ETHERC, EDMAC, PHY> ETHER_IO;
 	ETHER_IO 	ether_;
 
 	typedef net::net_core<ETHER_IO> NET_CORE;
 	NET_CORE	net_(ether_);
+
+//	typedef utils::fixed_string<1024> FIXED_STR;
+//	typedef utils::stdout_term TERM;
+//	typedef utils::basic_format<utils::string_chaout<FIXED_STR, TERM> > sformat;
 }
 
 extern "C" {
