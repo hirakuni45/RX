@@ -25,10 +25,9 @@ namespace device {
 		@param[in]	ETHRC	インサーネット・コントローラー
 		@param[in]	EDMAC	インサーネットＤＭＡコントローラー
 		@param[in]	PHY		物理層コントローラー
-		@param[in]	INTR_TASK	割り込みタスク型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHRC, class EDMAC, class PHY, class INTR_TASK>
+	template <class ETHRC, class EDMAC, class PHY>
 	class ether_io {
 
 		static const int EMAC_BUFSIZE = 1536;  			// Must be 32-byte aligned
@@ -188,8 +187,8 @@ namespace device {
 		volatile descriptor_s* app_rx_desc_;
 		volatile descriptor_s* app_tx_desc_;
 
-		static INTR_TASK	intr_task_;
-		static volatile uint8_t  mpd_flag_;
+		static volatile uint8_t	mpd_flag_;
+		static volatile void*	intr_task_;
 
 		PHY		phy_;
 
@@ -516,7 +515,10 @@ namespace device {
 			}
 			EDMAC::EESR = status_eesr;  // Clear EDMAC status bits
 
-			intr_task_();
+			if(intr_task_ != nullptr) {
+				void (*task)() = reinterpret_cast<void(*)()>(intr_task_);
+				task();
+			}
 
 			// This is sample code
 #if 0
@@ -664,20 +666,20 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  割り込みタスクを設定（EDMAC)
+			@param[in]	task	割り込みタスク
+		*/
+		//-----------------------------------------------------------------//
+		static void set_intr_task(void (*task)()) { intr_task_ = task; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  物理層クラスへの参照
 			@return 物理層クラス
 		*/
 		//-----------------------------------------------------------------//
 		PHY& at_phy() { return phy_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	割り込みクラスへの参照
-			@return 割り込みクラス
-		*/
-		//-----------------------------------------------------------------//
-		static INTR_TASK& at_task() { return intr_task_; }
 
 
 		//-----------------------------------------------------------------//
@@ -1046,10 +1048,10 @@ namespace device {
 		}
 	};
 
-	template <class ETHRC, class EDMAC, class PHY, class INTR_TASK>
-		volatile uint8_t ether_io<ETHRC, EDMAC, PHY, INTR_TASK>::mpd_flag_;
+	template <class ETHRC, class EDMAC, class PHY>
+		volatile uint8_t ether_io<ETHRC, EDMAC, PHY>::mpd_flag_;
 
-	template <class ETHRC, class EDMAC, class PHY, class INTR_TASK>
-		INTR_TASK ether_io<ETHRC, EDMAC, PHY, INTR_TASK>::intr_task_;
+	template <class ETHRC, class EDMAC, class PHY>
+		volatile void* ether_io<ETHRC, EDMAC, PHY>::intr_task_;
 
 }
