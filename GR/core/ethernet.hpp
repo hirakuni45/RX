@@ -37,18 +37,10 @@ extern "C" {
 #define DEBUG
 
 #ifndef DEBUG
-// デバッグ以外で出力を無効にする
-struct null_chaout {
-	null_chaout(char* out = nullptr, uint16_t len = 0) { } 
-	void operator() (char ch) {
-	}
-};
-
-typedef utils::basic_format<null_chaout> debug_format;
+typedef utils::null_format debug_format;
 #else
-typedef utils::basic_format<utils::def_chaout> debug_format;
+typedef utils::format debug_format;
 #endif
-
 
 
 #define T4_CLOSED               0
@@ -812,70 +804,50 @@ namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  インサーネット文字出力ファンクタ
+		@brief  Ethernet 文字出力テンプレートクラス
+		@param[in]	ID		スタテッック領域の識別子として使用
+		@param[in]	SIZE	バッファ・サイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class eth_chaout {
-		char		tmp_[256];
-		int			fd_;
-		uint32_t	pos_;
-		uint32_t	len_;
-
-		void out_(char ch) {
-			tmp_[pos_] = ch;
-			++pos_;
-			++len_;
-			if(pos_ >= sizeof(tmp_)) {
-				ethernet::write(fd_, tmp_, pos_);
-				pos_ = 0;
-			}
-		}
+	template <int ID, uint32_t SIZE>
+	class ether_string
+	{
 	public:
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  コンストラクタ
-			@param[in]	fd	識別子
-		*/
-		//-----------------------------------------------------------------//
-		eth_chaout(int fd) : fd_(fd), pos_(0), len_(0) {
-			if(fd_ <= 0) {
-				utils::format("Eth fd fail: %d\n") % fd_;
-			}
-		}
+		typedef utils::fixed_string<SIZE + 1> STR;
 
+	private:
+		STR		str_;
+		int		fd_;
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  デストラクタ
-		*/
-		//-----------------------------------------------------------------//
-		~eth_chaout() {
-			if(pos_ > 0) {
-				ethernet::write(fd_, tmp_, pos_);
-			}
-		}
+	public:
+		ether_string() : str_(), fd_(0) { }
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  () オペレーター
-			@param[in]	ch	文字
-		*/
-		//-----------------------------------------------------------------//
 		void operator() (char ch) {
 			if(ch == '\n') {
-				out_('\r');
+				str_ += '\r';  // 改行を「CR+LF」とする
+				if(str_.size() >= (str_.capacity() - 1)) {
+					clear();
+				}
 			}
-			out_(ch);
+			str_ += ch;
+			if(str_.size() >= (str_.capacity() - 1)) {
+				clear();
+			}
 		}
 
+		void clear() {
+			if(str_.size() > 0) {
+				if(fd_ > 0) { 
+					ethernet::write(fd_, str_.c_str(), str_.size());
+				} else {
+					utils::format("ether_string: FD is null.\n");
+				}
+			}
+			str_.clear();
+		}
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  文字数を返す
-			@return 文字数
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_length() const { return len_; }
+		uint32_t size() const { return str_.size(); }
+
+		void set_fd(int fd) { fd_ = fd; }
 	};
 }
