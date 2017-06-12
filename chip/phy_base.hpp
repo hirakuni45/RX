@@ -51,16 +51,9 @@ namespace chip {
 	class phy_base {
 
 #ifndef PHY_DEBUG
-		// デバッグ以外で出力を無効にする
-		struct null_chaout {
-			null_chaout(char* out = nullptr, uint16_t len = 0) { } 
-			void operator() (char ch) {
-			}
-		};
-
-		typedef utils::basic_format<null_chaout> debug_format;
+		typedef utils::null_format debug_format;
 #else
-		typedef utils::basic_format<utils::def_chaout> debug_format;
+		typedef utils::format debug_format;
 #endif
 
 		static const uint16_t REG_CONTROL          = 0;
