@@ -99,11 +99,11 @@ namespace net {
 	template <class SDC>
 	class ftp_server {
 
-		typedef utils::basic_format<ether_string<2, 256> > ctrl_format;
-		typedef utils::basic_format<ether_string<3, 1024> > data_format;
+		typedef utils::basic_format<ether_string<ethernet::format_id::ftps_ctrl, 256 > > ctrl_format;
+		typedef utils::basic_format<ether_string<ethernet::format_id::ftps_data, 1024> > data_format;
 
-		void ctrl_flush() { ctrl_format::chaout().clear(); }
-		void data_flush() { data_format::chaout().clear(); }
+		void ctrl_flush() { ctrl_format::chaout().flush(); }
+		void data_flush() { data_format::chaout().flush(); }
 
 		static const uint32_t	login_timeout_    = 100 * 30;  ///< 30 sec.
 		static const uint32_t	transfer_timeout_ = 100 * 10;  ///< 10 sec.
@@ -111,9 +111,9 @@ namespace net {
 
 		// デバッグ以外で出力を無効にする
 #ifdef FTP_DEBUG
-		typedef utils::null_format debug_format;
-#else
 		typedef utils::format debug_format;
+#else
+		typedef utils::null_format debug_format;
 #endif
 		static const uint16_t CTRL_PORT = 21;
 		static const uint16_t DATA_PORT = 20;
@@ -161,6 +161,7 @@ namespace net {
 		char		host_[16];
 		char		user_[16];
 		char		pass_[16];
+		char		syst_[16];
 
 		uint32_t	time_out_;
 		uint32_t	delay_loop_;
@@ -385,6 +386,7 @@ namespace net {
 					if(strcmp(param_, ".") == 0) {
 						ctrl_format("257 \"%s\" is your current directory\n") % param_;     
 					} else if(sdc_.cd(param_)) {
+						debug_format("SDC: Current Path: '%s'\n") % sdc_.get_current();
 						ctrl_format("250 Ok. Current directory is '%s'\n") % sdc_.get_current();
 					} else {
 						ctrl_format("550 Can't change directory to '%s'\n") % param_;
@@ -435,7 +437,7 @@ namespace net {
 					ctrl_format("150 Accepted data connection\n");
 					ctrl_flush();
 					if(sdc_.get_mount()) {
-						int n = sdc_.dir_loop(sdc_.get_current(), dir_list_func_, true, nullptr);
+						int n = sdc_.dir_loop("", dir_list_func_, true, nullptr);
 						data_flush();
 						ctrl_format("226 %d matches total\n") % n;
 					} else {
@@ -487,7 +489,7 @@ namespace net {
 					ctrl_format("150 Accepted data connection\n");
 					ctrl_flush();
 					if(sdc_.get_mount()) {
-						int n = sdc_.dir_loop(sdc_.get_current(), dir_nlst_func_, true, nullptr);
+						int n = sdc_.dir_loop("", dir_nlst_func_, true, nullptr);
 						data_flush();
 						ctrl_format("226 %d matches total\n") % n;
 					} else {
@@ -542,7 +544,7 @@ namespace net {
 					% v[0] % v[1] % v[2] % v[3] % v[4] % v[5]).status()) {
 					data_ip_.set(v[0], v[1], v[2], v[3]);
 					data_port_ = (v[4] << 8) | v[5];
-					utils::format("PORT: '%s' (%d)\n") % data_ip_.c_str() % data_port_;
+					debug_format("PORT: '%s' (%d)\n") % data_ip_.c_str() % data_port_;
 					ctrl_format("220 PORT command successful\n");
 					task_ = task::start_port;
 				} else {
@@ -558,7 +560,7 @@ namespace net {
 				break;
 
 			case ftp_command::QUIT:
-				utils::format("FTP Server 'QUIT'\n");
+				debug_format("FTP Server 'QUIT'\n");
 				ret = false;
 				break;
 
@@ -760,7 +762,7 @@ namespace net {
 				break;
 
 			case ftp_command::SYST:
-				ctrl_format("215 Renesas_RX64M single task OS.\n");
+				ctrl_format("215 %s single task OS.\n") % syst_;
 				ctrl_flush();
 				break;
 
@@ -847,7 +849,7 @@ namespace net {
 						ctrl_format("150 Accepted data connection\n");
 						ctrl_flush();
 						if(sdc_.get_mount()) {
-							int n = sdc_.dir_loop(sdc_.get_current(), dir_mlsd_func_, true, nullptr);
+							int n = sdc_.dir_loop("", dir_mlsd_func_, true, nullptr);
 							data_flush();
 							ctrl_format("226-options: -a -l\n");
 							ctrl_format("226 %d matches total\n") % n;
@@ -931,18 +933,23 @@ namespace net {
 		/*!
 			@brief  開始
 			@param[in]	host	ホスト名
+			@param[in]	syst	システム名
 			@param[in]	user	ユーザー名
 			@param[in]	pass	パスワード
 		*/
 		//-----------------------------------------------------------------//
-		void start(const char* host, const char* user, const char* pass)
+		void start(const char* host, const char* syst, const char* user, const char* pass)
 		{
-			if(host == nullptr || user == nullptr || pass == nullptr) {
+			if(host == nullptr || syst == nullptr || user == nullptr || pass == nullptr) {
 				return;
 			}
 			strncpy(host_, host, sizeof(host_) - 1);
+			strncpy(syst_, host, sizeof(syst_) - 1);
 			strncpy(user_, user, sizeof(user_) - 1);
 			strncpy(pass_, pass, sizeof(pass_) - 1);
+
+			sdc_.cd("/");
+
 			task_ = task::begin;
 
 			ctrl_format::chaout().set_fd(0);
@@ -960,7 +967,7 @@ namespace net {
 			switch(task_) {
 			case task::begin:
 				ctrl_.begin(CTRL_PORT);
-				utils::format("Start FTP Server (CTRL): %s (%d), fd(%d)\n")
+				debug_format("Start FTP Server (CTRL): %s (%d), fd(%d)\n")
 					% eth_.get_local_ip().c_str() % ctrl_.get_port() % ctrl_.get_cepid();
 				task_ = task::connection;
 				ctrl_format::chaout().set_fd(ctrl_.get_cepid());
@@ -985,7 +992,7 @@ namespace net {
 					ftp_command cmd = scan_command_(line_man_[0]);
 					if(cmd == ftp_command::SYST) {
 						line_man_.clear();
-						ctrl_format("215 Renesas_RX64M single task OS.\n");
+						ctrl_format("215 %s single task OS.\n") % syst_;
 					} else if(cmd == ftp_command::USER) {
 						if(strcmp(param_, user_) == 0) {
 							debug_format("FTP Server user OK: '%s'\n") % param_;
@@ -1032,7 +1039,7 @@ namespace net {
 
 			case task::start_pasv:
 				data_.begin(DATA_PORT_PASV);
-				utils::format("Start FTP Server data (PASV): '%s' (%d) fd(%d)\n")
+				debug_format("Start FTP Server data (PASV): '%s' (%d) fd(%d)\n")
 					% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
 				data_connect_loop_ = data_connection_timeout_;
 				data_format::chaout().set_fd(data_.get_cepid());
@@ -1061,7 +1068,7 @@ namespace net {
 
 			case task::start_port:
 				port_.connect(data_ip_, data_port_, TMO_NBLK);
-				utils::format("Start FTP Server data (PORT): '%s' (%d) fd(%d)\n")
+				debug_format("Start FTP Server data (PORT): '%s' (%d) fd(%d)\n")
 					% data_ip_.c_str() % data_port_ % port_.get_cepid();
 				data_connect_loop_ = data_connection_timeout_;
 				data_format::chaout().set_fd(port_.get_cepid());
@@ -1116,7 +1123,7 @@ namespace net {
 							port_.stop();
 						}
 						task_ = task::command;
-						utils::format("Data send %u Bytes, %u Kbytes/Sec\n") % file_total_ % krate;
+						debug_format("Data send %u Bytes, %u Kbytes/Sec\n") % file_total_ % krate;
 						break;
 					}
 					if(file_wait_ >= transfer_timeout_) {
@@ -1129,7 +1136,7 @@ namespace net {
 						} else {
 							port_.stop();
 						}
-						utils::format("Data send timeout\n");
+						debug_format("Data send timeout\n");
 						task_ = task::command;
 					}
 				}
@@ -1166,7 +1173,7 @@ namespace net {
 						} else {
 							port_.stop();
 						}
-						utils::format("Data recv %u Bytes, %u Kbytes/Sec\n") % file_total_ % krate;
+						debug_format("Data recv %u Bytes, %u Kbytes/Sec\n") % file_total_ % krate;
 						task_ = task::command;
 						break;
 					}
