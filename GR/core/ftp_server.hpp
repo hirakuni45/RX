@@ -574,7 +574,6 @@ namespace net {
 				if(param_ == nullptr) {
 					ctrl_format("501 No file name\n");
 					ctrl_flush();
-					ret = false;
 					break;
 				}
 				{
@@ -583,7 +582,6 @@ namespace net {
 					if(!sdc_.probe(path)) {
 						ctrl_format("550 File '%s' not found\n") % path;
 						ctrl_flush();
-						ret = false;
 						break;
 					}
 					uint32_t fsz = sdc_.size(path);
