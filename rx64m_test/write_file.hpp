@@ -9,7 +9,9 @@
 #include <cstdio>
 #include <cstring>
 #include "common/fifo.hpp"
-// #include "main.hpp"
+#include "common/format.hpp"
+
+// #define WF_DEBUG
 
 namespace seeda {
 
@@ -19,6 +21,12 @@ namespace seeda {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class write_file {
+
+#ifdef WF_DEBUG
+		typedef utils::format debug_format;
+#else
+		typedef utils::null_format debug_format;
+#endif
 
 		uint32_t	limit_;
 		uint32_t	count_;
@@ -147,7 +155,7 @@ namespace seeda {
 			state_ = enable_;
 			if(!enable_) {
 				if(back && fp_ != nullptr) {
-					utils::format("Write file aborted\n");
+					debug_format("Write file aborted\n");
 					fclose(fp_);
 					fp_ = nullptr;
 				}
@@ -172,10 +180,10 @@ namespace seeda {
 							% static_cast<uint32_t>(m->tm_min);
 						fp_ = fopen(file, "wb");
 						if(fp_ == nullptr) {  // error then disable write.
-							utils::format("File open error: '%s'\n") % file;
+							debug_format("File open error: '%s'\n") % file;
 							enable_ = false;
 						} else {
-							utils::format("Start write file: '%s'\n") % file;
+							debug_format("Start write file: '%s'\n") % file;
 						}
 						char data[1024];
 						utils::sformat("DATE,TIME", data, sizeof(data));
@@ -230,7 +238,7 @@ namespace seeda {
 				if(count_ >= limit_) {
 					fclose(fp_);
 					fp_ = nullptr;
-					utils::format("Fin write file: %d sec\n") % count_;
+					debug_format("Fin write file: %d sec\n") % count_;
 					enable_ = false;
 				}
 			}
