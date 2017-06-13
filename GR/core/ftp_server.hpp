@@ -177,7 +177,7 @@ namespace net {
 		uint32_t	file_frame_;
 		uint32_t	file_wait_;
 
-		uint8_t		rs_buf_[8192];
+		uint8_t		rw_buf_[8192];
 
 		bool		pasv_enable_;
 
@@ -1096,12 +1096,12 @@ namespace net {
 			//--------------------------//
 			case task::send_file:
 				{
-					uint32_t sz = fread(rs_buf_, 1, sizeof(rs_buf_), file_fp_);
+					uint32_t sz = fread(rw_buf_, 1, sizeof(rw_buf_), file_fp_);
 					if(sz > 0) {
 						if(pasv_enable_) {
-							data_.write(rs_buf_, sz);
+							data_.write(rw_buf_, sz);
 						} else {
-							port_.write(rs_buf_, sz);
+							port_.write(rw_buf_, sz);
 						}
 						file_total_ += sz;
 						file_wait_ = 0;
@@ -1109,7 +1109,7 @@ namespace net {
 						++file_wait_;
 					}
 					++file_frame_;
-					if(sz < sizeof(rs_buf_)) {
+					if(sz < sizeof(rw_buf_)) {
 						uint32_t krate = file_total_ * 100 / file_frame_ / 1024;
 						ctrl_format("226 File successfully transferred (%u KBytes/Sec)\n") % krate;
 						ctrl_flush();
@@ -1145,12 +1145,12 @@ namespace net {
 				{
 					int32_t sz;
 					if(pasv_enable_) {
-						sz = data_.read(rs_buf_, sizeof(rs_buf_));
+						sz = data_.read(rw_buf_, sizeof(rw_buf_));
 					} else {
-						sz = port_.read(rs_buf_, sizeof(rs_buf_));
+						sz = port_.read(rw_buf_, sizeof(rw_buf_));
 					}
 					if(sz > 0) {
-						fwrite(rs_buf_, 1, sz, file_fp_);
+						fwrite(rw_buf_, 1, sz, file_fp_);
 						file_total_ += sz;
 						file_wait_ = 0;
 					} else {
