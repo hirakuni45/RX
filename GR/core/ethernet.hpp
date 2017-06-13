@@ -859,5 +859,7 @@ namespace net {
 		uint32_t size() const { return str_.size(); }
 
 		void set_fd(int fd) { fd_ = fd; }
+
+		STR& at_str() { return str_; }
 	};
 }
