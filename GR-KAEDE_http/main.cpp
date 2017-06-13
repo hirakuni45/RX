@@ -110,32 +110,6 @@ namespace {
 			utils::format("Stall RTC write...\n");
 		}
 	}
-
-
-#if 0
-	//-----------------------------------------------------------------//
-	/*!
-		@brief  時間の表示
-		@param[in]	t		時間
-		@param[in]	dst		出力文字列
-		@param[in]	size	文字列の大きさ
-		@return 生成された文字列の長さ
-	*/
-	//-----------------------------------------------------------------//
-	int disp_time(time_t t, char* dst, uint32_t size)
-	{
-		struct tm *m = localtime(&t);
-		int n = (utils::format("%s %s %d %02d:%02d:%02d  %4d", dst, size)
-			% get_wday(m->tm_wday)
-			% get_mon(m->tm_mon)
-			% static_cast<uint32_t>(m->tm_mday)
-			% static_cast<uint32_t>(m->tm_hour)
-			% static_cast<uint32_t>(m->tm_min)
-			% static_cast<uint32_t>(m->tm_sec)
-			% static_cast<uint32_t>(m->tm_year + 1900)).get_length();
-		return n;
-	}
-#endif
 }
 
 extern "C" {
@@ -310,7 +284,6 @@ extern "C" {
 		cmt0_.at_task().set_task_10ms(task);
 	}
 
-
 }
 
 int main(int argc, char** argv);
@@ -396,11 +369,15 @@ int main(int argc, char** argv)
 	}
 
 
+	http_.start("GR-KAEDE HTTP Server");
+
 	uint32_t cnt = 0;
 	while(1) {
 		cmt0_.at_task().sync_100hz();
 
 		ethernet_.service();
+
+		http_.service();
 
 		sdc_.service();
 
