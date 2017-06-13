@@ -36,7 +36,7 @@ namespace net {
 		typedef utils::line_manage<2048, 20> LINE_MAN;
 		typedef utils::basic_format<ether_string<ethernet::format_id::http, MAX_SIZE> > http_format;
 
-		typedef std::function< void () > render_task_type;
+		typedef std::function< void () > http_task_type;
 
 	private:
 		// デバッグ以外で出力を無効にする
@@ -65,11 +65,14 @@ namespace net {
 		struct page_key_t {
 			const char*	path_;
 			const char* title_;
-			render_task_type	task_;
-			page_key_t() : path_(nullptr), title_(nullptr), task_() { }
+			http_task_type	task_;
+			bool			cgi_;
+			page_key_t() : path_(nullptr), title_(nullptr), task_(), cgi_(false) { }
 		};
 		uint32_t		page_num_;
 		page_key_t		page_key_[MAX_PAGE];
+
+		char			post_body_[2048];
 
 		enum class task : uint8_t {
 			none,
@@ -96,7 +99,37 @@ namespace net {
 
 		void render_404page(const char* path)
 		{
-			render_page(path);
+			exec_page(path);
+		}
+
+
+		int set_page_(const char* path)
+		{
+			if(page_num_ >= MAX_PAGE) {
+				debug_format("HTTP Server: set page empty '%s'\n") % path;
+				return -1;
+			}
+			// 既に登録があるか検査
+			for(int i = 0; i < static_cast<int>(page_num_); ++i) {
+				if(std::strcmp(page_key_[i].path_, path) == 0) {
+					return i;
+				}
+			}
+
+			int n = page_num_;
+			++page_num_;
+			return n;
+		}
+
+
+		int find_page_(const char* path, bool cgi)
+		{
+			for(int i = 0; i < static_cast<int>(page_num_); ++i) {
+				if(std::strcmp(page_key_[i].path_, path) == 0 && page_key_[i].cgi_ == cgi) {
+					return i;
+				}
+			}
+			return -1;
 		}
 
 	public:
@@ -111,6 +144,15 @@ namespace net {
 			page_num_(0), page_key_{ },
 			task_(task::none)
 		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief POST ボディーを取得
+			@return POST ボディー
+		*/
+		//-----------------------------------------------------------------//
+		const char* get_post_body() const { return post_body_; }
 
 
 		//-----------------------------------------------------------------//
@@ -240,12 +282,13 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ページのレンダリング
+			@brief  ページの実行
 			@param[in]	path	ページのパス
-			@return 有効なパスなら「true」xs
+			@param[in]	cgi		CGI ページの場合「true」
+			@return 有効なパスなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool render_page(const char* path)
+		bool exec_page(const char* path, bool cgi = false)
 		{
 			if(std::strcmp(path, "/favicon.ico") == 0) {
 				make_info(404, -1, false);
@@ -253,27 +296,30 @@ namespace net {
 				return true;
 			}
 
-			page_key_t* t = nullptr;
-			for(uint32_t i = 0; i < page_num_; ++i) {
-				if(std::strcmp(page_key_[i].path_, path) == 0) {
-					t = &page_key_[i];
-					break;
-				}
+			int idx = find_page_(path, cgi);
+			if(idx < 0) return false;
+
+			page_key_t& t = page_key_[idx];
+
+			uint32_t clp = 0;
+			uint32_t org = 0;
+			if(!cgi) {
+				http_format::chaout().clear();
+
+				clp = make_info(200, -1, false);
+				org = http_format::chaout().size();
+				http_format("<!DOCTYPE HTML>\n");
+				http_format("<html>\n");
+
+				make_head(t.title_);
 			}
-			if(t == nullptr) return false;
 
-			http_format::chaout().clear();
+			if(t.task_) {
+				t.task_();
+			}
 
-			uint32_t clp = make_info(200, -1, false);
-
-			uint32_t org = http_format::chaout().size();
-			http_format("<!DOCTYPE HTML>\n");
-			http_format("<html>\n");
-
-			make_head(t->title_);
-
-			if(t->task_) {
-				t->task_();
+			if(cgi) {
+				return true;
 			}
 
 			http_format("</html>\n");
@@ -295,6 +341,37 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  URL エンコードとパース
+			@param[in]	pos		データの行位置
+		*/
+		//-----------------------------------------------------------------//
+		void parse_cgi(int pos)
+		{
+			int len = 0;
+			for(int i = 0; i < static_cast<int>(line_man_.size()); ++i) {
+				const char* p = line_man_[i];
+				static const char* key = { "Content-Length: " };
+				if(strncmp(p, key, strlen(key)) == 0) {
+					utils::input("%d", p + strlen(key)) % len;
+					break;
+				}
+			}
+
+			int lines = static_cast<int>(line_man_.size());
+			++pos;
+			post_body_[0] = 0;
+			if(pos >= lines) {
+				utils::format("CGI No Body\n");
+			} else {
+//				utils::format("CGI param (URL enocde): '%s'\n") % line_man_[pos];
+				utils::str::url_encode_to_str(line_man_[pos], post_body_);
+//				debug_format("CGI param (str): '%s'\n") % post_body_;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ページ登録全クリア
 		*/
 		//-----------------------------------------------------------------//
@@ -305,30 +382,42 @@ namespace net {
 		/*!
 			@brief  ページの登録
 			@param[in]	path	ページ・パス
+			@param[in]	title	ページ・タイトル
 			@param[in]	task	レンダリング・タスク
 			@return ページ・登録したら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool set_page(const char* path, const char*title, render_task_type task)
+		bool set_page(const char* path, const char*title, http_task_type task)
 		{
-			if(page_num_ >= MAX_PAGE) {
-				debug_format("HTTP Server: set page empty '%s'\n") % path;
-				return false;
-			}
-			// 既に登録があるか検査
-			for(uint32_t i = 0; i < page_num_; ++i) {
-				if(std::strcmp(page_key_[page_num_].path_, path) == 0) {
-					page_key_[i].path_ = path;
-					page_key_[i].title_ = title;
-					page_key_[i].task_ = task;
-					return true;
-				}
-			}
+			int idx = set_page_(path);
+			if(idx < 0) return false;
 
-			page_key_[page_num_].path_ = path;
-			page_key_[page_num_].title_ = title;
-			page_key_[page_num_].task_ = task;
-			++page_num_;
+			page_key_[idx].path_  = path;
+			page_key_[idx].title_ = title;
+			page_key_[idx].task_  = task;
+			page_key_[idx].cgi_   = false;
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CGI の登録
+			@param[in]	path	ページ・パス
+			@param[in]	title	ページ・タイトル
+			@param[in]	task	レンダリング・タスク
+			@return ページ・登録したら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool set_cgi(const char* path, const char*title, http_task_type task)
+		{
+			int idx = set_page_(path);
+			if(idx < 0) return false;
+
+			page_key_[idx].path_  = path;
+			page_key_[idx].title_ = title;
+			page_key_[idx].task_  = task;
+			page_key_[idx].cgi_   = true;
 			return true;
 		}
 
@@ -379,21 +468,30 @@ namespace net {
 							if(strncmp(t, "GET ", 4) == 0) {
 								get_path_(t + 4, path);
 								debug_format("HTTP Server: GET '%s'\n") % path;
+
+								bool find = exec_page(path, false);
+								if(!find) {
+									debug_format("HTTP Server: can't find GET: '%s'\n") % path;
+									make_info(404, -1, false);
+									http_format::chaout().flush();
+								}
+
 							} else if(strncmp(t, "POST ", 5) == 0) {
 								get_path_(t + 5, path);
 								debug_format("HTTP Server: POST '%s'\n") % path;
+								parse_cgi(pos);
+								bool find = exec_page(path, true);
+								if(!find) {
+									debug_format("HTTP Server: can't find POST: '%s'\n") % path;
+									make_info(404, -1, false);
+									http_format::chaout().flush();
+								}
+
 							} else {
 								debug_format("HTTP Server: request fail '%s'\n") % t;
 							}
 						} else {
 							debug_format("HTTP Server: request fail section.\n");
-							break;
-						}
-						bool find = render_page(path);
-						if(!find) {
-							debug_format("HTTP Server: can't find path '%s'\n") % path;
-							make_info(404, -1, false);
-							http_format::chaout().flush();
 						}
 
 						task_ = task::disconnect_delay;

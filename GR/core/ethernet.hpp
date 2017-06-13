@@ -82,6 +82,8 @@ namespace net {
 			http,
 			ftps_ctrl,
 			ftps_data,
+			server0,
+			client0,
 		};
 
 		static const uint32_t TCP_MSS = 1460;
