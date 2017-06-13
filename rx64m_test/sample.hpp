@@ -19,6 +19,7 @@ namespace seeda {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct sample_t {
+
 		enum class mode : uint16_t {
 			none,	///< 無変換
 			real,	///< 係数変換
@@ -59,11 +60,11 @@ namespace seeda {
 					if(abs_) {
 						a = std::abs(a);
 					}
-					utils::format("%3.2f", dst, size) % a;
+					utils::sformat("%3.2f", dst, size) % a;
 				}
 				break;
 			default:
-				utils::format("%d", dst, size) % src;
+				utils::sformat("%d", dst, size) % src;
 				break;
 			}
 		}
@@ -82,7 +83,7 @@ namespace seeda {
 
 			static const char* modes[] = { "value", "real" };
 
-			int sz = (utils::format("%d,%s,%s,%s,%s,%d,%d,%d,%d,%s%s", dst, size)
+			int sz = (utils::sformat("%d,%s,%s,%s,%s,%d,%d,%d,%d,%s%s", dst, size)
 				% ch_
 				% modes[static_cast<uint32_t>(mode_)]
 				% min
@@ -93,7 +94,7 @@ namespace seeda {
 				% static_cast<uint32_t>(limit_hi_level_)
 				% static_cast<uint32_t>(limit_hi_count_)
 				% med
-				% tail).get_length();
+				% tail).size();
 			return sz;
 		}
 
@@ -111,13 +112,13 @@ namespace seeda {
 
 			uint32_t count = limit_lo_count_ + limit_hi_count_;
 
-			int sz = (utils::format("%d,%s,%s,%s,%s,%u", dst, size)
+			int sz = (utils::sformat("%d,%s,%s,%s,%s,%u", dst, size)
 				% ch_
 				% max
 				% min
 				% ave
 				% med
-				% count).get_length();
+				% count).size();
 			return sz;
 		}
 	};

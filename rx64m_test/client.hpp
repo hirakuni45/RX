@@ -6,10 +6,10 @@
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include "main.hpp"
+
 #include "GR/core/ethernet_client.hpp"
 #include "sample.hpp"
-
-#include "main.hpp"
 
 namespace seeda {
 
@@ -40,8 +40,6 @@ namespace seeda {
 		uint32_t	timeout_;
 
 		time_t		time_;
-
-		typedef utils::basic_format<net::eth_chaout> format;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -124,6 +122,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void service()
 		{
+#if 0
 			time_t t;
 			switch(task_) {
 
@@ -195,6 +194,7 @@ namespace seeda {
 				task_ = task::connect;
 				break;
 			}
+#endif
 		}
 	};
 }

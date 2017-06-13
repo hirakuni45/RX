@@ -23,6 +23,9 @@
 
 #include "chip/EUI_XX.hpp"
 
+#include "GR/core/http_server.hpp"
+#include "GR/core/ftp_server.hpp"
+
 namespace seeda {
 
 	static const int seeda_version_ = 181;
@@ -74,6 +77,10 @@ namespace seeda {
 	typedef device::flash_io FLASH_IO;
 	typedef utils::flash_man<FLASH_IO> FLASH_MAN;
 
+	typedef net::http_server<SDC, 16, 8192> HTTP;
+	typedef HTTP::http_format http_format;	
+
+	typedef net::ftp_server<SDC> FTP;
 
 	//-----------------------------------------------------------------//
 	/*!

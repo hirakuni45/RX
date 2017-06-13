@@ -8,7 +8,7 @@
 //=====================================================================//
 #include "client.hpp"
 #include "write_file.hpp"
-#include "net_tools.hpp"
+// #include "net_tools.hpp"
 
 #include "chip/EUI_XX.hpp"
 
@@ -52,8 +52,6 @@ namespace seeda {
 			eui_.write(0x0A, ip_, 4);
 		}
 #endif
-
-		typedef utils::basic_format<net::eth_chaout> format;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -200,17 +198,11 @@ namespace seeda {
 			@brief  クライアント機能設定画面
 		*/
 		//-----------------------------------------------------------------//
-		void render_client(int fd)
+		void render_client()
 		{
-			net_tools::send_info(fd, 200, false);
-
-			format("<!DOCTYPE HTML>\n", fd);
-			format("<html>\n", fd);
-			net_tools::send_head(fd, "SetupClient");
-
-			net_tools::render_version(fd);
-
-			net_tools::render_date_time(fd);
+#if 0
+			net_tools::render_version();
+			net_tools::render_date_time();
 
 			format("<hr align=\"left\" width=\"400\" size=\"3\">\n", fd);
 
@@ -234,99 +226,92 @@ namespace seeda {
 			format("<hr align=\"left\" width=\"400\" size=\"3\">\n", fd);
 
 			format("</html>\n", fd);
+#endif
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  レンダリング・メイン
-			@param[in]	fd	ディスクリプタ
+			@brief  レンダリング・メイン設定ページ
 			@param[in]	dev	develope の場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void render_main(int fd, bool dev)
+		void render_main(bool dev)
 		{
-			net_tools::send_info(fd, 200, false);
-
-			format("<!DOCTYPE HTML>\n", fd);
-			format("<html>\n", fd);
-			net_tools::send_head(fd, "SetupMain");
-
-			net_tools::render_version(fd);
-
-			net_tools::render_date_time(fd);
-			format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+			net_tools::render_version();
+			net_tools::render_date_time();
+			http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 
 			if(dev) {
-				format("Develope mode<br>", fd); 
-				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+				http_format("Develope mode<br>");
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 
-			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"リロード\">\n", fd);
-			format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"リロード\">\n");
+			http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 
-			format("<input type=\"button\" onclick=\"location.href='/data'\" value=\"データ表示\">\n", fd);
-			format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+			http_format("<input type=\"button\" onclick=\"location.href='/data'\" value=\"データ表示\">\n");
+			http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 
 			{  // 内臓 A/D 表示
 				float v = static_cast<float>(get_adc(5)) / 4095.0f * 3.3f;
-				format("バッテリー電圧： %4.2f [V]<br>\n", fd) % v;
-				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+				http_format("バッテリー電圧： %4.2f [V]<br>\n") % v;
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 
 			// MAC アドレス表示
 			{
-				format("MAC Address: %02X:%02X:%02X:%02X:%02X:%02X<br>", fd)
-						% static_cast<uint32_t>(mac_[0])
-						% static_cast<uint32_t>(mac_[1])
-						% static_cast<uint32_t>(mac_[2])
-						% static_cast<uint32_t>(mac_[3])
-						% static_cast<uint32_t>(mac_[4])
-						% static_cast<uint32_t>(mac_[5]);
-				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+				http_format("MAC Address: %02X:%02X:%02X:%02X:%02X:%02X<br>")
+					% static_cast<uint32_t>(mac_[0])
+					% static_cast<uint32_t>(mac_[1])
+					% static_cast<uint32_t>(mac_[2])
+					% static_cast<uint32_t>(mac_[3])
+					% static_cast<uint32_t>(mac_[4])
+					% static_cast<uint32_t>(mac_[5]);
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 
 			// IP 設定
 			{
-				format("<form method=\"POST\" action=\"/cgi/set_ip.cgi\">\n", fd);
-				format("<table><tr>"
-					   "<td><input type=\"checkbox\" name=\"dhcp\" value=\"on\"%s>ＤＨＣＰ</td>", fd)
+				http_format("<form method=\"POST\" action=\"/cgi/set_ip.cgi\">\n");
+				http_format("<table><tr>"
+					   "<td><input type=\"checkbox\" name=\"dhcp\" value=\"on\"%s>ＤＨＣＰ</td>")
 						% (dhcp_ ? " checked=\"checked\"" : "");
 				for(int i = 0; i < 4; ++i) {
-					format("<td><input type=\"text\" name=\"ip%d\" size=\"3\" value=\"%d\"></td>", fd)
+					http_format("<td><input type=\"text\" name=\"ip%d\" size=\"3\" value=\"%d\"></td>")
 						% i
 						% static_cast<uint32_t>(ip_[i]);
 				}
-				format("<td><input type=\"submit\" value=\"ＩＰ設定\"></td>\n", fd);
-				format("</table></form>\n", fd);
-				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+				http_format("<td><input type=\"submit\" value=\"ＩＰ設定\"></td>\n");
+				http_format("</table></form>\n");
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 
 			// RTC 設定
 			{
-				format("<form method=\"POST\" action=\"/cgi/set_rtc.cgi\">\n", fd);
+				http_format("<form method=\"POST\" action=\"/cgi/set_rtc.cgi\">\n");
 				auto t = get_time();
 				struct tm *m = localtime(&t);
-				format("<table><tr>"
+				http_format("<table><tr>"
 					"<td>年月日(yyyy/mm/dd)：</td>"
-					"<td><input type=\"text\" name=\"date\" size=\"10\" value=\"%d/%d/%d\"></td></tr>\n", fd)
+					"<td><input type=\"text\" name=\"date\" size=\"10\" value=\"%d/%d/%d\"></td></tr>\n")
 					% static_cast<int>(m->tm_year + 1900)
 					% static_cast<int>(m->tm_mon + 1) % static_cast<int>(m->tm_mday);
-				format("<tr>"
+				http_format("<tr>"
 					"<td>時間(hh:mm[:ss])：</td>"
-					"<td><input type=\"text\" name=\"time\" size=\"8\" value=\"%d:%d\"></td></tr>\n", fd)
+					"<td><input type=\"text\" name=\"time\" size=\"8\" value=\"%d:%d\"></td></tr>\n")
 					% static_cast<int>(m->tm_hour) % static_cast<int>(m->tm_min);
-				format("<tr><td><input type=\"submit\" value=\"ＲＴＣ設定\"></td></tr>\n", fd);
-				format("</table></form>\n", fd);
-				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+				http_format("<tr><td><input type=\"submit\" value=\"ＲＴＣ設定\"></td></tr>\n");
+				http_format("</table></form>\n");
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 
 			// Ａ／Ｄ変換設定
 			{
-				format("<form method=\"POST\" action=\"/cgi/set_adc.cgi\"><table>\n", fd);
+				http_format("<form method=\"POST\" action=\"/cgi/set_adc.cgi\"><table>\n");
 				for(int ch = 0; ch < 8; ++ch) {
 					const seeda::sample_t& t = at_sample(ch);
-					format("<tr>"
+					http_format("<tr>"
 						"<td>CH%d</td>"
 						"<td><input type=\"radio\" name=\"mode%d\" value=\"none\"%s>数値</td>"
 						"<td><input type=\"radio\" name=\"mode%d\" value=\"real\"%s>係数</td>"
@@ -338,7 +323,7 @@ namespace seeda {
 						"<td><input type=\"text\" name=\"level_lo%d\" size=\"6\" value=\"%d\"></td>"
 						"<td>上限：</td>"
 						"<td><input type=\"text\" name=\"level_hi%d\" size=\"6\" value=\"%d\"></td>"
-						"</tr>\n", fd)
+						"</tr>\n")
 						% ch
 						% ch % (t.mode_ == seeda::sample_t::mode::none ? " checked" : "")
 						% ch % (t.mode_ == seeda::sample_t::mode::real ? " checked" : "")
@@ -351,54 +336,49 @@ namespace seeda {
 ///
 ///						% ch % (t.abs_ ? " checked=\"checked\"" : "")
 				}
-				format("<tr><td><input type=\"submit\" value=\"設定\"></td></tr>"
-					   "</table></form>\n", fd);
-				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+				http_format("<tr><td><input type=\"submit\" value=\"設定\"></td></tr>"
+					   "</table></form>\n");
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 
 			{  // ＳＤカード操作画面へのボタン
-				format("<input type=\"button\" onclick=\"location.href='/files'\" value=\"ＳＤカード\">\n",
-					fd);
-				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+				http_format("<input type=\"button\" onclick=\"location.href='/files'\" value=\"ＳＤカード\">\n");
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 
 
 			{  // プリファレンス消去ボタン
-				format("<input type=\"button\" onclick=\"location.href='/cgi/del_pre.cgi'\" value=\"プリファレンス消去\">\n",
-					fd);
-				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+				http_format("<input type=\"button\" onclick=\"location.href='/cgi/del_pre.cgi'\" value=\"プリファレンス消去\">\n");
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 
 			{  // クライアント機能設定ボタン
-				format("<input type=\"button\" onclick=\"location.href='/client'\" value=\"クライアント機能\">\n",
-					fd);
-				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+				http_format("<input type=\"button\" onclick=\"location.href='/client'\" value=\"クライアント機能\">\n");
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 
 			{  // ファイル書き込み設定
-				format("<form method=\"POST\" action=\"/cgi/set_write.cgi\">\n", fd);
-				format("<table><tr><td>ファイル名(ベース)：</td>", fd);
+				http_format("<form method=\"POST\" action=\"/cgi/set_write.cgi\">\n");
+				http_format("<table><tr><td>ファイル名(ベース)：</td>");
 				if(!write_file_.get_enable()) {
-					format("<td><input type=\"text\" name=\"fname\" size=\"16\" value=\"%s\"></td></tr>\n", fd)
+					http_format("<td><input type=\"text\" name=\"fname\" size=\"16\" value=\"%s\"></td></tr>\n")
 						% write_file_.get_path();
 				} else {
-					format("<td>%s</td></tr>\n", fd) % write_file_.get_path();
+					http_format("<td>%s</td></tr>\n") % write_file_.get_path();
 				}
-				format("<tr><td>書き込み数：</td>", fd);
+				http_format("<tr><td>書き込み数：</td>");
 				if(!write_file_.get_enable()) {
-					format("<td><input type=\"text\" name=\"count\" size=\"16\" value=\"%d\"></td></tr>\n", fd)
+					http_format("<td><input type=\"text\" name=\"count\" size=\"16\" value=\"%d\"></td></tr>\n")
 						% write_file_.get_limit();
-					format("<tr><td><input type=\"submit\" value=\"書き込み開始\"></td></tr>\n", fd);
+					http_format("<tr><td><input type=\"submit\" value=\"書き込み開始\"></td></tr>\n");
 				} else {
-					format("<td>%d/%d</td></tr>\n", fd) % write_file_.get_resume() % write_file_.get_limit();
-					format("<tr><td><input type=\"submit\" value=\"書き込み停止\"></td></tr>\n", fd);
+					http_format("<td>%d/%d</td></tr>\n") % write_file_.get_resume() % write_file_.get_limit();
+					http_format("<tr><td><input type=\"submit\" value=\"書き込み停止\"></td></tr>\n");
 				}
-				format("</table></form>\n", fd);
+				http_format("</table></form>\n");
 
-				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
-
-			format("</html>\n", fd);
 		}
 	};
 }

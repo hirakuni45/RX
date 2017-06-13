@@ -76,7 +76,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void set_path(const char* path)
 		{
-			utils::format("%s", path_, sizeof(path_)) % path;
+			utils::sformat("%s", path_, sizeof(path_)) % path;
 		}
 
 
@@ -163,7 +163,7 @@ namespace seeda {
 					if(fp_ == nullptr) {
 						struct tm *m = localtime(&time_ref_);
 						char file[256];
-						utils::format("%s_%04d%02d%02d%02d%02d.csv", file, sizeof(file))
+						utils::sformat("%s_%04d%02d%02d%02d%02d.csv", file, sizeof(file))
 							% path_
 							% static_cast<uint32_t>(m->tm_year + 1900)
 							% static_cast<uint32_t>(m->tm_mon + 1)
@@ -179,9 +179,10 @@ namespace seeda {
 						}
 						char data[1024];
 						uint32_t l = 0;
-						l += (utils::format("DATE,TIME", &data[l], sizeof(data) - l)).get_length();
+						l += (utils::sformat("DATE,TIME", &data[l], sizeof(data) - l)).size();
 						for(int i = 0; i < 8; ++i) {
-							l += (utils::format(",CH,MAX,MIN,AVE,MEDIAN,COUNTUP", &data[l], sizeof(data) - l)).get_length();
+							l += (utils::sformat(",CH,MAX,MIN,AVE,MEDIAN,COUNTUP",
+									&data[l], sizeof(data) - l)).size();
 						}
 						data[l] = '\n';
 						++l;
@@ -205,13 +206,13 @@ namespace seeda {
 			uint32_t l = 0;
 			struct tm *m = localtime(&smp.time_);
 			if(smp.ch_ == 0) {
-				l += (utils::format("%04d/%02d/%02d,%02d:%02d:%02d,", &data[l], sizeof(data) - l)
+				l += (utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d,", &data[l], sizeof(data) - l)
 					% static_cast<uint32_t>(m->tm_year + 1900)
 					% static_cast<uint32_t>(m->tm_mon + 1)
 					% static_cast<uint32_t>(m->tm_mday)
 					% static_cast<uint32_t>(m->tm_hour)
 					% static_cast<uint32_t>(m->tm_min)
-					% static_cast<uint32_t>(m->tm_sec)).get_length();
+					% static_cast<uint32_t>(m->tm_sec)).size();
 			} else {
 				data[l] = ',';
 				++l;

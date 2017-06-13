@@ -13,16 +13,14 @@
 #include "chip/NTCTH.hpp"
 
 #include "write_file.hpp"
-#include "client.hpp"
+/// #include "client.hpp"
 
 #include "GR/core/ethernet.hpp"
 #include "GR/core/ethernet_client.hpp"
-#include "GR/core/ethernet_server.hpp"
-#include "GR/core/ftp_server.hpp"
 
 #include "net_tools.hpp"
 #include "setup.hpp"
-#include "cgi.hpp"
+//#include "cgi.hpp"
 
 extern "C" {
 	void INT_Excep_ICU_GROUPAL1(void);
@@ -42,43 +40,29 @@ namespace seeda {
 		typedef device::PORT<device::PORT7, device::bitpos::B0> LAN_RESN;
 		typedef device::PORT<device::PORT7, device::bitpos::B3> LAN_PDN;
 
-		net::ethernet			ethernet_;
-		net::ethernet_server	server_;
+		net::ethernet	ethernet_;
 
-		typedef net::ftp_server<SDC> FTP;
+		HTTP			http_;
 		FTP				ftp_;
 
 		client			client_;
 
 		uint32_t		count_;
 
-		enum class server_task {
-			begin_http,
-			wait_http,
-			main_loop,
-			disconnect_delay,
-			disconnect,
-		};
-		server_task		server_task_;
-
-		uint32_t	disconnect_loop_;
-
 		// サーミスタ定義
 		// A/D: 12 bits, NT103_41G, 分圧抵抗: 10K オーム、サーミスタ: ＶＣＣ側
 		typedef chip::NTCTH<4095, chip::thermistor::NT103_41G, 10000, true> THMISTER;
-		THMISTER thmister_;
+		THMISTER	thmister_;
 
 		write_file	write_file_;
 
 		setup	setup_;
-		cgi		cgi_;
+//		cgi		cgi_;
 
 		bool 	develope_;
 
 		//-------------------------------------------------------------------------//
-
-		typedef utils::basic_format<net::eth_chaout> format;
-
+#if 0
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
 			if(fi == nullptr) return;
 
@@ -111,25 +95,19 @@ namespace seeda {
 				format("</tr>\n", fd);
 			}
 		}
+#endif
 
-
-		void make_adc_csv_(uint32_t fd, const char* tail)
+		void make_adc_csv_(const char* tail)
 		{
 			for(int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample(ch);
 				char tmp[256];
 				t.make_csv(tail, tmp, sizeof(tmp));
-				format("%s", fd) % tmp;
+				http_format("%s") % tmp;
 			}
 		}
 
-
-		void render_404_(int fd, const char* msg)
-		{
-			net_tools::send_info(fd, 404, false);
-		}
-
-
+#if 0
 		void render_null_(int fd, const char* title = nullptr)
 		{
 			net_tools::send_info(fd, 200, false);
@@ -141,27 +119,6 @@ namespace seeda {
 			if(title != nullptr) {
 				format(title, fd);
 			}
-			format("</html>\n", fd);
-		}
-
-
-		void render_root_(int fd)
-		{
-			net_tools::send_info(fd, 200, false);
-
-			format("<!DOCTYPE HTML>\n", fd);
-			format("<html>\n", fd);
-			net_tools::send_head(fd, "Root/SimpleData");
-
-			// コネクション回数表示
-			format("Conection: %d<br>\n", fd) % count_;
-
-			net_tools::render_date_time(fd);
-
-			format("Sampling: 1[ms]<br>\n", fd);
-
-			make_adc_csv_(fd, "<br>\n");
-
 			format("</html>\n", fd);
 		}
 
@@ -189,93 +146,6 @@ namespace seeda {
 			format("</table>\n", fd);
 
 			format("<br>\n", fd);
-			format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
-			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n", fd);
-
-			format("</html>\n", fd);
-		}
-
-
-		void render_data_(int fd)
-		{
-			net_tools::send_info(fd, 200, false);
-			// format("Refresh: 5\n", fd);  // refresh the page automatically every 5 sec
-
-			format("<!DOCTYPE HTML>\n", fd);
-			format("<html>\n", fd);
-			net_tools::send_head(fd, "Data");
-
-			format("<font size=\"4\">\n", fd);
-			// コネクション回数表示
-			format("Conection: %d<br>\n", fd) % count_;
-
-			net_tools::render_date_time(fd);
-
-			format("サンプリング周期： 1[ms]<br>\n", fd);
-
-			format("</font>\n", fd);
-
-			{  // 内臓 A/D 表示（湿度、温度）
-				auto v = get_adc(6);
-				format("温度： %5.2f [度]\n", fd) % thmister_(v);
-				format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
-			}
-
-			format("<style type=\"text/css\">", fd);
-			format(".table5 {", fd);
-			format("  border-collapse: collapse;", fd);
-			format("  width: 600px;", fd);
-			format("}", fd);
-			format(".table5 th {", fd);
-			format("  background-color: #cccccc;\n", fd);
-			format("}", fd);
-			format(".table5 td {", fd);
-			format("  text-align: center;", fd);
-			format("}", fd);
-			format("</style>\n", fd);
-
-			format("<table class=\"table5\" border=1>", fd);
-			format(" <tr><th>チャネル</th><th>表示</th><th>最小値</th><th>最大値</th><th>平均</th>"
-					  "<th>下限</th><th>下限数</th>"
-					  "<th>上限</th><th>上限数</th><th>Median</th></tr>\n", fd);
-
-			static const char* modes[] = { "数値", "係数" };
-			for(int ch = 0; ch < 8; ++ch) {
-				const auto& t = get_sample(ch);
-				char min[16];
-				t.value_convert(t.min_,    min, sizeof(min));
-				char max[16];
-				t.value_convert(t.max_,     max, sizeof(max));
-				char ave[16];
-				t.value_convert(t.average_, ave, sizeof(ave));
-				char med[16];
-				t.value_convert(t.median_,  med, sizeof(med));
-				format("<tr>"
-					"<td>%d</td>"
-					"<td>%s</td>"
-					"<td>%s</td>"
-					"<td>%s</td>"
-					"<td>%s</td>"
-					"<td>%d</td>"
-					"<td>%d</td>"
-					"<td>%d</td>"
-					"<td>%d</td>"
-					"<td>%s</td>"
-					"</tr>\n", fd)
-					% ch
-					% modes[static_cast<uint32_t>(t.mode_)]
-					% min
-					% max
-					% ave
-					% static_cast<uint32_t>(t.limit_lo_level_)
-					% static_cast<uint32_t>(t.limit_lo_count_)
-					% static_cast<uint32_t>(t.limit_hi_level_)
-					% static_cast<uint32_t>(t.limit_hi_count_)
-					% med;
-			}
-			format("</table>\n", fd);
-			format("<br>\n", fd);
-
 			format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
 			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n", fd);
 
@@ -317,17 +187,83 @@ namespace seeda {
 				render_null_(fd, path);
 			}
 		}
+#endif
 
+		void render_data_()
+		{
+			http_format("<font size=\"4\">\n");
+			++count_;
+			http_format("Conection: %d<br>\n") % count_;
 
-		void get_path_(const char* src, char* dst) {
-			int n = 0;
-			char ch;
-			while((ch = src[n]) != 0) {
-				if(ch == ' ') break;
-				dst[n] = ch;
-				++n;
+			net_tools::render_date_time();
+
+			http_format("サンプリング周期： 1[ms]<br>\n");
+
+			http_format("</font>\n");
+
+			{  // 内臓 A/D 表示（湿度、温度）
+				auto v = get_adc(6);
+				http_format("温度： %5.2f [度]\n") % thmister_(v);
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
-			dst[n] = 0;
+
+			http_format("<style type=\"text/css\">");
+			http_format(".table5 {");
+			http_format("  border-collapse: collapse;");
+			http_format("  width: 600px;");
+			http_format("}");
+			http_format(".table5 th {");
+			http_format("  background-color: #cccccc;\n");
+			http_format("}");
+			http_format(".table5 td {");
+			http_format("  text-align: center;");
+			http_format("}");
+			http_format("</style>\n");
+
+			http_format("<table class=\"table5\" border=1>");
+			http_format(" <tr><th>チャネル</th><th>表示</th><th>最小値</th><th>最大値</th><th>平均</th>"
+				"<th>下限</th><th>下限数</th>"
+				"<th>上限</th><th>上限数</th><th>Median</th></tr>\n");
+
+			static const char* modes[] = { "数値", "係数" };
+			for(int ch = 0; ch < 8; ++ch) {
+				const auto& t = get_sample(ch);
+				char min[16];
+				t.value_convert(t.min_,     min, sizeof(min));
+				char max[16];
+				t.value_convert(t.max_,     max, sizeof(max));
+				char ave[16];
+				t.value_convert(t.average_, ave, sizeof(ave));
+				char med[16];
+				t.value_convert(t.median_,  med, sizeof(med));
+				http_format("<tr>"
+					"<td>%d</td>"
+					"<td>%s</td>"
+					"<td>%s</td>"
+					"<td>%s</td>"
+					"<td>%s</td>"
+					"<td>%d</td>"
+					"<td>%d</td>"
+					"<td>%d</td>"
+					"<td>%d</td>"
+					"<td>%s</td>"
+					"</tr>\n")
+					% ch
+					% modes[static_cast<uint32_t>(t.mode_)]
+					% min
+					% max
+					% ave
+					% static_cast<uint32_t>(t.limit_lo_level_)
+					% static_cast<uint32_t>(t.limit_lo_count_)
+					% static_cast<uint32_t>(t.limit_hi_level_)
+					% static_cast<uint32_t>(t.limit_hi_count_)
+					% med;
+			}
+			http_format("</table>\n");
+			http_format("<br>\n");
+
+			http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n");
 		}
 
 
@@ -352,8 +288,40 @@ namespace seeda {
 			}
 			utils::format("%s\n") % ethernet_.get_local_ip().c_str();
 
+			// HTTP Server
+			http_.start("Seeda03 HTTP Server");
+
+			http_.set_page("/", "SimpleData", [=](void) {
+				++count_;
+				http_format("Conection: %d<br>\n") % count_;
+				net_tools::render_date_time();
+				http_format("Sampling: 1[ms]<br>\n");
+				make_adc_csv_("<br>\n");
+			} );
+
+			http_.set_page("/data", "RichData", [=](void) {
+				render_data_();
+			} );
+
+			http_.set_page("/setup", "SetupMain", [=](void) {
+				setup_.render_main(develope_);
+			} );
+
+#if 0
+						} else if(strncmp(path, "/cgi/", 5) == 0) {
+							cgi_.select(fd, path, pos);
+							setup_.render_main(fd, develope_);
+						} else if(strcmp(path, "/client") == 0) {
+							setup_.render_client(fd);
+						} else if(strcmp(path, "/files") == 0) {
+							render_files_(fd);
+						} else if(strncmp(path, "/seeda/", 7) == 0) {
+							send_file_(fd, path);
+						} else {
+#endif
+
 			// FTP Server
-			ftp_.start("SEEDA03", "SEEDA03");
+			ftp_.start("SEEDA03", "Renesas_RX64M", "SEEDA03", "SEEDA03");
 		}
 
 	public:
@@ -362,11 +330,11 @@ namespace seeda {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		nets() : server_(ethernet_), ftp_(ethernet_, at_sdc()), client_(ethernet_),
-			count_(0), server_task_(server_task::begin_http),
-			disconnect_loop_(0),
+		nets() : http_(ethernet_, at_sdc()), ftp_(ethernet_, at_sdc()), client_(ethernet_),
+			count_(0),
 			write_file_(),
-			setup_(write_file_, client_), cgi_(write_file_, client_, setup_),
+			setup_(write_file_, client_),
+///			cgi_(write_file_, client_, setup_),
 			develope_(true)
 			{ }
 
@@ -425,102 +393,15 @@ namespace seeda {
 		{
 			ethernet_.service();
 
-			switch(server_task_) {
+			http_.service();
 
-			case server_task::begin_http:
-				// http server
-				server_.begin(80);
-				utils::format("Start HTTP server: %s") % ethernet_.get_local_ip().c_str();
-				utils::format("  port(%d), fd(%d)\n")
-					% static_cast<int>(server_.get_port()) % server_.get_cepid();
-				server_task_ = server_task::wait_http;
-				break;
-
-			case server_task::wait_http:
-				if(server_.connected()) {
-					utils::format("New http connected, form: %s\n") % server_.get_from_ip().c_str();
-					++count_;
-					cgi_.at_line_man().clear();
-					server_task_ = server_task::main_loop;
-				}
-				break;
-
-			case server_task::main_loop:
-				if(server_.connected()) {
-
-					if(server_.available() == 0) {  // リードデータがあるか？
-						break;
-					}
-					int fd = server_.get_cepid();
-					char tmp[2048];
-					int len = server_.read(tmp, sizeof(tmp));
-					auto pos = cgi_.analize_request(tmp, len);
-					if(pos > 0) {
-						char path[256];
-						path[0] = 0;
-						if(!cgi_.at_line_man().empty()) {
-							const auto& t = cgi_.at_line_man()[0];
-							if(strncmp(t, "GET ", 4) == 0) {
-								get_path_(t + 4, path);
-							} else if(strncmp(t, "POST ", 5) == 0) {
-								get_path_(t + 5, path);
-							}
-						} else {
-							utils::format("fail GET/POST data section\n");
-							break;
-						}
-						if(strcmp(path, "/") == 0) {
-							render_root_(fd);
-						} else if(strncmp(path, "/cgi/", 5) == 0) {
-							cgi_.select(fd, path, pos);
-							setup_.render_main(fd, develope_);
-						} else if(strcmp(path, "/data") == 0) {
-							render_data_(fd);
-						} else if(strcmp(path, "/setup") == 0) {
-							setup_.render_main(fd, develope_);
-						} else if(strcmp(path, "/client") == 0) {
-							setup_.render_client(fd);
-						} else if(strcmp(path, "/files") == 0) {
-							render_files_(fd);
-						} else if(strncmp(path, "/seeda/", 7) == 0) {
-							send_file_(fd, path);
-						} else {
-							char tmp[256];
-							utils::format("Invalid path: '%s'", tmp, sizeof(tmp)) % path;
-							render_null_(fd, tmp);
-						}
-						server_task_ = server_task::disconnect_delay;
-						disconnect_loop_ = 5;
-					}
-				} else {
-					server_task_ = server_task::disconnect_delay;
-					disconnect_loop_ = 5;
-				}
-				break;
-
-			case server_task::disconnect_delay:
-				if(disconnect_loop_ > 0) {
-					--disconnect_loop_;
-				} else {
-					server_task_ = server_task::disconnect;
-				}
-				break;
-
-			case server_task::disconnect:
-			default:
-				server_.stop();
-				utils::format("http disconnected\n");
-				server_task_ = server_task::begin_http;
-				break;
-			}
-
-			client_.service();
+///			client_.service();
 
 			write_file_.service();
 
 			ftp_.service();
 
-			cgi_.service();
+///			cgi_.service();
 		}
 
 
