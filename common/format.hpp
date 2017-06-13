@@ -12,6 +12,7 @@
 			+ 2017/06/11 20:00- 標準文字出力クラスの再定義、実装 @n 
 			+ 2017/06/11 21:00- 固定文字列クラス向け chaout、実装 @n
 			+ 2017/06/12 14:50- memory_chaoutと、専用コンストラクター実装 @n
+			+ 2017/06/14 05:34- memory_chaout size() のバグ修正 @n
 			Copyright 2013,2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
@@ -206,7 +207,7 @@ namespace utils {
 	class memory_chaout {
 
 		char*		dst_;
-		uint32_t	size_;
+		uint32_t	limit_;
 		uint32_t	pos_;
 
 	public:
@@ -215,19 +216,19 @@ namespace utils {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		memory_chaout() : dst_(nullptr), size_(0), pos_(0) { }
+		memory_chaout() : dst_(nullptr), limit_(0), pos_(0) { }
 
-		void set(char* dst, uint32_t size)
+		void set(char* dst, uint32_t limit)
 		{
-			if(dst_ != dst || size_ != size) {  // ポインター、サイズ、どちらか異なる場合は常にリセット
+			if(dst_ != dst || limit_ != limit) {  // ポインター、サイズ、どちらか異なる場合は常にリセット
 				pos_ = 0;
 			}
 			dst_ = dst;
-			size_ = size;
+			limit_ = limit;
 		}
 
 		void operator () (char ch) {
-			if(pos_ < (size_ - 1)) {
+			if(pos_ < (limit_ - 1)) {
 				dst_[pos_] = ch;
 				++pos_;
 				dst_[pos_] = 0;
@@ -236,7 +237,7 @@ namespace utils {
 
 		void clear() { pos_ = 0; }
 
-		uint32_t size() const { return size_; }
+		uint32_t size() const { return pos_; }
 	};
 
 
