@@ -213,11 +213,9 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
-			@param[in]	dst		出力先
-			@param[in]	size	最大サイズ
 		*/
 		//-----------------------------------------------------------------//
-		memory_chaout(char* dst = nullptr, uint32_t size = 0) : dst_(dst), size_(size), pos_(0) { }
+		memory_chaout() : dst_(nullptr), size_(0), pos_(0) { }
 
 		void set(char* dst, uint32_t size)
 		{
@@ -675,7 +673,10 @@ namespace utils {
 			mode_(mode::NONE), zerosupp_(false), sign_(false)
 		{
 			chaout_.set(buff, size);
-			if(!append) { chaout_.clear(); }
+			if(!append) {
+				chaout_.clear();
+
+			}
 			next_();
 		}
 
