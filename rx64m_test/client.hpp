@@ -152,26 +152,20 @@ namespace seeda {
 				{
 					struct tm *m = localtime(&t);
 					char data[1024];
-					uint32_t l = 0;
-					l += (utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d", &data[l], sizeof(data) - l)
+					utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d", data, sizeof(data))
 						% static_cast<uint32_t>(m->tm_year + 1900)
 						% static_cast<uint32_t>(m->tm_mon + 1)
 						% static_cast<uint32_t>(m->tm_mday)
 						% static_cast<uint32_t>(m->tm_hour)
 						% static_cast<uint32_t>(m->tm_min)
-						% static_cast<uint32_t>(m->tm_sec)).size();
+						% static_cast<uint32_t>(m->tm_sec);
+
 					for(int ch = 0; ch < 8; ++ch) {
 						const auto& smp = get_sample(ch);
-						data[l] = ',';
-						++l;
-						l += smp.make_csv2(&data[l], sizeof(data) - l);
+						utils::sformat(",", data, sizeof(data), true);
+						smp.make_csv2(data, sizeof(data), true);
 					}
-					data[l] = '\n';
-					++l;
-					data[l] = 0;
-					++l;
-
-					utils::format("%s\n") % data;
+					utils::sformat("\n", data, sizeof(data), true);
 
 					char tmp[2048];
 					utils::str::url_decode_to_str(data, tmp, sizeof(tmp)); 

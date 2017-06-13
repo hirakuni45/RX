@@ -128,7 +128,10 @@ namespace seeda {
 			for(int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample(ch);
 				char tmp[256];
-				t.make_csv(tail, tmp, sizeof(tmp));
+				t.make_csv(tmp, sizeof(tmp), false);
+				if(tail != nullptr) {
+					utils::sformat("%s", tmp, sizeof(tmp), true) % tail;
+				}
 				http_format("%s") % tmp;
 			}
 		}

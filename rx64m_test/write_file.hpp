@@ -178,15 +178,13 @@ namespace seeda {
 							utils::format("Start write file: '%s'\n") % file;
 						}
 						char data[1024];
-						uint32_t l = 0;
-						l += (utils::sformat("DATE,TIME", &data[l], sizeof(data) - l)).size();
+						utils::sformat("DATE,TIME", data, sizeof(data));
 						for(int i = 0; i < 8; ++i) {
-							l += (utils::sformat(",CH,MAX,MIN,AVE,MEDIAN,COUNTUP",
-									&data[l], sizeof(data) - l)).size();
+							utils::sformat(",CH,MAX,MIN,AVE,MEDIAN,COUNTUP", data, sizeof(data), true);
 						}
-						data[l] = '\n';
-						++l;
-						fwrite(data, 1, l, fp_);
+						utils::sformat("\n", data, sizeof(data), true);
+
+						fwrite(data, 1, utils::sformat::chaout().size(), fp_);
 						fifo_.clear();
 					}
 					for(int i = 0; i < 8; ++i) {
@@ -203,26 +201,23 @@ namespace seeda {
 			sample_t smp = fifo_.get();
 
 			char data[2048];
-			uint32_t l = 0;
 			struct tm *m = localtime(&smp.time_);
 			if(smp.ch_ == 0) {
-				l += (utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d,", &data[l], sizeof(data) - l)
+				utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d,", data, sizeof(data))
 					% static_cast<uint32_t>(m->tm_year + 1900)
 					% static_cast<uint32_t>(m->tm_mon + 1)
 					% static_cast<uint32_t>(m->tm_mday)
 					% static_cast<uint32_t>(m->tm_hour)
 					% static_cast<uint32_t>(m->tm_min)
-					% static_cast<uint32_t>(m->tm_sec)).size();
+					% static_cast<uint32_t>(m->tm_sec);
 			} else {
-				data[l] = ',';
-				++l;
+				utils::sformat(",", data, sizeof(data));
 			}
-			l += smp.make_csv2(&data[l], sizeof(data) - l);
+			smp.make_csv2(data, sizeof(data), true);
 			if(smp.ch_ == 7) {
-				data[l] = '\n';
-				++l;
+				utils::sformat("\n", data, sizeof(data), true);
 			}
-			fwrite(data, 1, l, fp_);
+			fwrite(data, 1, utils::sformat::chaout().size(), fp_);
 //			utils::format("Write ch: %d\n") % t.ch_;
 
 			if(smp.ch_ == 7) {  // last channnel

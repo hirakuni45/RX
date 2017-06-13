@@ -51,75 +51,57 @@ namespace seeda {
 			min_(0), max_(0), average_(0), median_(0), abs_(false) { }
 
 
-		void value_convert(uint16_t src, char* dst, uint32_t size) const
+		void value_convert(uint16_t value, char* dst, uint32_t size) const
 		{
 			switch(mode_) {
 			case mode::real:
 				{
-					float a = static_cast<float>(src) / 65535.0f * gain_ + offset_;
+					float a = static_cast<float>(value) / 65535.0f * gain_ + offset_;
 					if(abs_) {
 						a = std::abs(a);
 					}
-					utils::sformat("%3.2f", dst, size) % a;
+					utils::sformat("%3.2f", dst, size, true) % a;
 				}
 				break;
 			default:
-				utils::sformat("%d", dst, size) % src;
+				utils::sformat("%d", dst, size, true) % value;
 				break;
 			}
 		}
 
 
-		int make_csv(const char* tail, char* dst, uint32_t size) const
+		void make_csv(char* dst, uint32_t size, bool append) const
 		{
-			char min[16];
-			value_convert(min_,     min, sizeof(min));
-			char max[16];
-			value_convert(max_,     max, sizeof(max));
-			char ave[16];
-			value_convert(average_, ave, sizeof(ave));
-			char med[16];
-			value_convert(median_,  med, sizeof(med));
-
 			static const char* modes[] = { "value", "real" };
 
-			int sz = (utils::sformat("%d,%s,%s,%s,%s,%d,%d,%d,%d,%s%s", dst, size)
-				% ch_
-				% modes[static_cast<uint32_t>(mode_)]
-				% min
-				% max
-				% ave
-				% static_cast<uint32_t>(limit_lo_level_)
-				% static_cast<uint32_t>(limit_lo_count_)
-				% static_cast<uint32_t>(limit_hi_level_)
-				% static_cast<uint32_t>(limit_hi_count_)
-				% med
-				% tail).size();
-			return sz;
+			utils::sformat("%d,%s", dst, size, append) % ch_ % modes[static_cast<uint32_t>(mode_)];
+			utils::sformat(",",     dst, size, true);
+			value_convert(min_,     dst, size);
+			utils::sformat(",",     dst, size, true);
+			value_convert(max_,     dst, size);
+			utils::sformat(",",     dst, size, true);
+			value_convert(average_, dst, size);
+			utils::sformat("%d,",   dst, size, true) % static_cast<uint32_t>(limit_lo_level_);
+			utils::sformat("%d,",   dst, size, true) % static_cast<uint32_t>(limit_lo_count_);
+			utils::sformat("%d,",   dst, size, true) % static_cast<uint32_t>(limit_hi_level_);
+			utils::sformat("%d,",   dst, size, true) % static_cast<uint32_t>(limit_hi_count_);
+			value_convert(median_,  dst, size);
 		}
 
 
-		int make_csv2(char* dst, uint32_t size) const
+		void make_csv2(char* dst, uint32_t size, bool append) const
 		{
-			char min[16];
-			value_convert(min_,     min, sizeof(min));
-			char max[16];
-			value_convert(max_,     max, sizeof(max));
-			char ave[16];
-			value_convert(average_, ave, sizeof(ave));
-			char med[16];
-			value_convert(median_,  med, sizeof(med));
-
 			uint32_t count = limit_lo_count_ + limit_hi_count_;
 
-			int sz = (utils::sformat("%d,%s,%s,%s,%s,%u", dst, size)
-				% ch_
-				% max
-				% min
-				% ave
-				% med
-				% count).size();
-			return sz;
+			utils::sformat("%d,",   dst, size, append) % ch_;
+			value_convert(max_,     dst, size);
+			utils::sformat(",",     dst, size, true);
+			value_convert(min_,     dst, size);
+			utils::sformat(",",     dst, size, true);
+			value_convert(average_, dst, size);
+			utils::sformat(",",     dst, size, true);
+			value_convert(median_,  dst, size);
+			utils::sformat(",%u",   dst, size, true) % count;
 		}
 	};
 
