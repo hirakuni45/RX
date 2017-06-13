@@ -8,6 +8,7 @@
 //=====================================================================//
 #include <cstdio>
 #include <cstring>
+#include <functional>
 #include "ethernet_server.hpp"
 
 #include "common/sdc_io.hpp"
@@ -25,14 +26,17 @@ namespace net {
 	/*!
 		@brief  http_server class テンプレート
 		@param[in]	SDC	ＳＤカードファイル操作インスタンス
+		@param[in]	MAX_PAGE	登録ページの最大数
 		@param[in]	MAX_SIZE	一時バッファの最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SDC, uint32_t MAX_SIZE = 4096>
+	template <class SDC, uint32_t MAX_PAGE = 16, uint32_t MAX_SIZE = 4096>
 	class http_server {
 	public:
 		typedef utils::line_manage<2048, 20> LINE_MAN;
 		typedef utils::basic_format<ether_string<ethernet::format_id::http, MAX_SIZE> > http_format;
+
+		typedef std::function< void () > render_task_type;
 
 	private:
 		// デバッグ以外で出力を無効にする
@@ -58,6 +62,15 @@ namespace net {
 		uint32_t		count_;
 		uint32_t		disconnect_loop_;
 
+		struct page_key_t {
+			const char*	path_;
+			const char* title_;
+			render_task_type	task_;
+			page_key_t() : path_(nullptr), title_(nullptr), task_() { }
+		};
+		uint32_t		page_num_;
+		page_key_t		page_key_[MAX_PAGE];
+
 		enum class task : uint8_t {
 			none,
 			begin_http,
@@ -81,6 +94,11 @@ namespace net {
 		}
 
 
+		void render_404page(const char* path)
+		{
+			render_page(path);
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -90,6 +108,7 @@ namespace net {
 		http_server(ethernet& e, SDC& sdc) : eth_(e), sdc_(sdc), http_(e), line_man_(0x0a),
 			last_modified_(0), server_name_{ 0 }, timeout_(15), max_(60),
 			count_(0), disconnect_loop_(0),
+			page_num_(0), page_key_{ },
 			task_(task::none)
 		{ }
 
@@ -143,21 +162,24 @@ namespace net {
 			disconnect_loop_ = 0;
 
 			task_ = task::begin_http;
+
+			debug_format("HTTP Server: page capacity: %d\n") % http_format::chaout().at_str().capacity();
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  応答メッセージの生成
+			@param[in]	status	ステータスコード
 			@param[in]	length	コンテンツ長（バイト）
 			@param[in]	keep	セッション・キープの場合「true」
 			@return 「Content-Length: 」後の位置
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t make_info(uint32_t length, bool keep = false)
+		uint32_t make_info(int status, int length, bool keep = false)
 		{
 			uint32_t lp = 0;
-			http_format("HTTP/1.1 200 OK\n");
+			http_format("HTTP/1.1 %d OK\n") % status;
 
 			time_t t = get_time();
 			struct tm *m = gmtime(&t);
@@ -181,14 +203,17 @@ namespace net {
 				% static_cast<uint32_t>(m->tm_min)
 				% static_cast<uint32_t>(m->tm_sec);
 			http_format("Accept_ranges: bytes\n");
-			if(length > 0) {
-				http_format("Content-Length: %6u\n") % length;
+			if(length >= 0) {
+				http_format("Content-Length: %d\n") % length;
 			} else {
 				http_format("Content-Length: ");
 				lp = http_format::chaout().size();
-				http_format("      \n");
+				// % http_format::chaout().at_str().capacity();
+				http_format("     \n");
 			}
-			http_format("Keep-Alive: timeout=%u,max=%u\n") % timeout_ % max_;
+			if(keep) {
+				http_format("Keep-Alive: timeout=%u,max=%u\n") % timeout_ % max_;
+			}
 			http_format("Connection: %s\n") % (keep == true ? "keep-alive" : "close");
 			http_format("Content-Type: text/html\n\n");
 			return lp;
@@ -217,43 +242,94 @@ namespace net {
 		/*!
 			@brief  ページのレンダリング
 			@param[in]	path	ページのパス
-			@param[in]	body	ページ・ボディー
+			@return 有効なパスなら「true」xs
 		*/
 		//-----------------------------------------------------------------//
-		void render_page(const char* path, const char* body)
+		bool render_page(const char* path)
 		{
+			if(std::strcmp(path, "/favicon.ico") == 0) {
+				make_info(404, -1, false);
+				http_format::chaout().flush();  // 最終的な書き込み
+				return true;
+			}
+
+			page_key_t* t = nullptr;
+			for(uint32_t i = 0; i < page_num_; ++i) {
+				if(std::strcmp(page_key_[i].path_, path) == 0) {
+					t = &page_key_[i];
+					break;
+				}
+			}
+			if(t == nullptr) return false;
+
 			http_format::chaout().clear();
 
-			uint32_t clp = make_info(0, false);
+			uint32_t clp = make_info(200, -1, false);
 
 			uint32_t org = http_format::chaout().size();
 			http_format("<!DOCTYPE HTML>\n");
 			http_format("<html>\n");
 
-			make_head("test page");
+			make_head(t->title_);
 
-			if(body != nullptr) {
-				http_format("%s\n") % body;
+			if(t->task_) {
+				t->task_();
 			}
 
 			http_format("</html>\n");
-			uint32_t len = http_format::chaout().size();
+			uint32_t end = http_format::chaout().size();
 
-			debug_format("HTTP Server: body size: %d\n") % (len - org);
+			debug_format("HTTP Server: body size: %d\n") % (end - org);
 
-			char tmp[6 + 1];  // 数字６文字＋終端（０）
-			utils::sformat("%6d", tmp, sizeof(tmp)) % (len - org);
-			strncpy(&http_format::chaout().at_str()[clp], tmp, 6); // 数字部のみコピー
+			char tmp[5 + 1];  // 数字５文字＋終端
+			utils::sformat("%5d", tmp, sizeof(tmp)) % (end - org);
+			strncpy(&http_format::chaout().at_str()[clp], tmp, 5); // 数字部のみコピー
 
-//			debug_format("HTTP Server: html all\n%s\n") % &http_format::chaout().at_str()[0];
+///			debug_format("HTTP Server: body: -----\n%s\n-----\n") % http_format::chaout().at_str().c_str();
 
 			http_format::chaout().flush();  // 最終的な書き込み
+
+			return true;
 		}
 
 
-		void render_404page(const char* path)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ページ登録全クリア
+		*/
+		//-----------------------------------------------------------------//
+		void clear_page() { page_num_ = 0; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ページの登録
+			@param[in]	path	ページ・パス
+			@param[in]	task	レンダリング・タスク
+			@return ページ・登録したら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool set_page(const char* path, const char*title, render_task_type task)
 		{
-			render_page(path, nullptr);
+			if(page_num_ >= MAX_PAGE) {
+				debug_format("HTTP Server: set page empty '%s'\n") % path;
+				return false;
+			}
+			// 既に登録があるか検査
+			for(uint32_t i = 0; i < page_num_; ++i) {
+				if(std::strcmp(page_key_[page_num_].path_, path) == 0) {
+					page_key_[i].path_ = path;
+					page_key_[i].title_ = title;
+					page_key_[i].task_ = task;
+					return true;
+				}
+			}
+
+			page_key_[page_num_].path_ = path;
+			page_key_[page_num_].title_ = title;
+			page_key_[page_num_].task_ = task;
+			++page_num_;
+			return true;
 		}
 
 
@@ -290,12 +366,12 @@ namespace net {
 					if(http_.available() == 0) {  // リードデータがあるか？
 						break;
 					}
-					char tmp[2048];
+					char tmp[2048];  // 大きな POST データに備えた大きさ
 					int len = http_.read(tmp, sizeof(tmp));
-// tmp[len] = 0;
-// debug_format("Request: %d, '%s'\n") % len % tmp;
 					auto pos = analize_request(tmp, len);
 					if(pos > 0) {
+						tmp[len] = 0;
+///						debug_format("HTTP Server: client -----\n%s-----\n") % tmp;
 						char path[256];
 						path[0] = 0;
 						if(!line_man_.empty()) {
@@ -307,33 +383,17 @@ namespace net {
 								get_path_(t + 5, path);
 								debug_format("HTTP Server: POST '%s'\n") % path;
 							} else {
-								debug_format("HTTP Server: fail key '%s'\n") % t;
+								debug_format("HTTP Server: request fail '%s'\n") % t;
 							}
 						} else {
-							debug_format("HTTP Server: fail GET/POST data section\n");
+							debug_format("HTTP Server: request fail section.\n");
 							break;
 						}
-						if(strcmp(path, "/") == 0) {
-							render_page(path, "asdfgh");
-#if 0
-						} else if(strncmp(path, "/cgi/", 5) == 0) {
-							cgi_.select(fd, path, pos);
-							setup_.render_main(fd, develope_);
-						} else if(strcmp(path, "/data") == 0) {
-							render_data_(fd);
-						} else if(strcmp(path, "/setup") == 0) {
-							setup_.render_main(fd, develope_);
-						} else if(strcmp(path, "/client") == 0) {
-							setup_.render_client(fd);
-						} else if(strcmp(path, "/files") == 0) {
-							render_files_(fd);
-						} else if(strncmp(path, "/seeda/", 7) == 0) {
-							send_file_(fd, path);
-#endif
-						} else {
-							char tmp[256];
-							utils::sformat("HTTP Server: Invalid path: '%s'", tmp, sizeof(tmp)) % path;
-							render_404page(tmp);
+						bool find = render_page(path);
+						if(!find) {
+							debug_format("HTTP Server: can't find path '%s'\n") % path;
+							make_info(404, -1, false);
+							http_format::chaout().flush();
 						}
 
 						task_ = task::disconnect_delay;
@@ -356,7 +416,8 @@ namespace net {
 			case task::disconnect:
 			default:
 				http_.stop();
-				debug_format("http disconnected\n");
+				debug_format("HTTP Server: disconnected\n");
+				http_format::chaout().set_fd(0);
 				task_ = task::begin_http;
 				break;
 			}

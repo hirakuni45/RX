@@ -834,8 +834,22 @@ namespace net {
 
 		void flush() {
 			if(str_.size() > 0) {
-				if(fd_ > 0) { 
-					ethernet::write(fd_, str_.c_str(), str_.size());
+				if(fd_ > 0) {
+					uint32_t len = str_.size();
+					const char* p = str_.c_str();
+#if 0
+					while(len > 0) {
+						uint32_t l = len;
+						if(l >= 2048) {
+							l = 2048;
+						}
+						ethernet::write(fd_, p, l);
+						len -= l;
+						p += l;
+					}
+#else
+					ethernet::write(fd_, p, len);
+#endif				
 				} else {
 					utils::format("ether_string: FD is null.\n");
 				}
