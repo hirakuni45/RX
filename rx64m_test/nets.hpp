@@ -13,14 +13,14 @@
 #include "chip/NTCTH.hpp"
 
 #include "write_file.hpp"
-/// #include "client.hpp"
+#include "client.hpp"
 
 #include "GR/core/ethernet.hpp"
 #include "GR/core/ethernet_client.hpp"
 
 #include "net_tools.hpp"
 #include "setup.hpp"
-//#include "cgi.hpp"
+#include "preference.hpp"
 
 extern "C" {
 	void INT_Excep_ICU_GROUPAL1(void);
@@ -57,11 +57,37 @@ namespace seeda {
 		write_file	write_file_;
 
 		setup	setup_;
-//		cgi		cgi_;
+
+		preference	pre_;
+
+		uint32_t	startup_delay_;
+
+		uint8_t	ip_[4];
 
 		bool 	develope_;
+		bool	dhcp_;
 
 		//-------------------------------------------------------------------------//
+
+		void write_pre_()
+		{
+			for(int i = 0; i < 4; ++i) pre_.at().client_ip_[i] = (client_.get_ip())[i];
+			pre_.at().client_port_ = client_.get_port();
+
+			for(int ch = 0; ch < 8; ++ch) {
+				pre_.at().mode_[ch] = static_cast<uint8_t>(at_sample(ch).mode_);
+				pre_.at().gain_[ch] = at_sample(ch).gain_;
+				pre_.at().offset_[ch] = at_sample(ch).offset_;
+				pre_.at().limit_lo_level_[ch] = at_sample(ch).limit_lo_level_;
+				pre_.at().limit_hi_level_[ch] = at_sample(ch).limit_hi_level_;
+			}
+
+			strcpy(pre_.at().write_path_, write_file_.get_path());
+			pre_.at().write_limit_ = write_file_.get_limit();
+
+			pre_.write();
+		}
+
 #if 0
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
 			if(fi == nullptr) return;
@@ -108,21 +134,6 @@ namespace seeda {
 		}
 
 #if 0
-		void render_null_(int fd, const char* title = nullptr)
-		{
-			net_tools::send_info(fd, 200, false);
-
-			format("<!DOCTYPE HTML>\n", fd);
-			format("<html>\n", fd);
-			net_tools::send_head(fd, "NULL");
-
-			if(title != nullptr) {
-				format(title, fd);
-			}
-			format("</html>\n", fd);
-		}
-
-
 		void render_files_(int fd)
 		{
 			net_tools::send_info(fd, 200, false);
@@ -267,6 +278,151 @@ namespace seeda {
 		}
 
 
+		void set_rtc_()
+		{
+			typedef utils::parse_cgi_post<256, 2> CGI_RTC;
+			CGI_RTC cgi;
+			cgi.parse(http_.get_post_body());
+			const char* date = nullptr;
+			const char* time = nullptr;
+			for(uint32_t i = 0; i < cgi.size(); ++i) {
+				const auto& t = cgi.get_unit(i);
+				if(strcmp(t.key, "date") == 0) {
+					date = t.val;
+				} else if(strcmp(t.key, "time") == 0) {
+					time = t.val;
+				}
+			}
+			if(date != nullptr && time != nullptr) {
+				time_t t = seeda::make_time(date, time);
+				if(t != 0) {
+					seeda::set_time(t);
+				}
+			}
+//			cgi.list();
+		}
+
+
+		void set_adc_()
+		{
+			typedef utils::parse_cgi_post<2048, 6 * 8> CGI_ADC;
+			CGI_ADC cgi;
+			cgi.parse(http_.get_post_body());
+			for(uint32_t i = 0; i < cgi.size(); ++i) {
+				const auto& t = cgi.get_unit(i);
+				int ch;
+				if((utils::input("mode%d", t.key) % ch).status()) {
+					if(strcmp(t.val, "none") == 0) {  // 数値（無変換）
+						at_sample(ch).mode_ = seeda::sample_t::mode::none;
+					} else if(strcmp(t.val, "real") == 0) {  // 係数変換
+						at_sample(ch).mode_ = seeda::sample_t::mode::real;
+					}
+				} else if((utils::input("gain%d", t.key) % ch).status()) {
+					float v = 0.0f;
+					const char* p = t.val;
+					if((utils::input("%f", p) % v).status()) {
+						at_sample(ch).gain_ = v;
+					}
+				} else if((utils::input("offset%d", t.key) % ch).status()) {
+					float v = 0.0f;
+					const char* p = t.val;
+					if((utils::input("%f", p) % v).status()) {
+						at_sample(ch).offset_ = v;
+					}
+				} else if((utils::input("level_lo%d", t.key) % ch).status()) {
+					int v = 0;
+					if((utils::input("%d", t.val) % v).status()) {
+						if(v >= 0 && v <= 65535) {
+							at_sample(ch).limit_lo_level_ = v;
+						}
+					}
+				} else if((utils::input("level_hi%d", t.key) % ch).status()) {
+					int v = 0;
+					if((utils::input("%d", t.val) % v).status()) {
+						if(v >= 0 && v <= 65535) {
+							at_sample(ch).limit_hi_level_ = v;
+						}
+					}
+				}
+			}
+			write_pre_();
+//			cgi.list();
+		}
+
+
+		void set_client_()
+		{
+			typedef utils::parse_cgi_post<256, 2> CGI_IP;
+			CGI_IP cgi;
+			cgi.parse(http_.get_post_body());
+			for(uint32_t i = 0; i < cgi.size(); ++i) {
+				const auto& t = cgi.get_unit(i);
+				if(strcmp(t.key, "ip") == 0) {
+					utils::format("Set client IP: '%s'\n") % t.val;
+					client_.at_ip().from_string(t.val);
+				} else if(strcmp(t.key, "port") == 0) {
+					int port;
+					if((utils::input("%d", t.val) % port).status()) {
+						utils::format("Set client PORT: %d\n") % port;
+						client_.set_port(port);
+					}
+				}
+			}
+			write_pre_();
+			client_.restart();
+		}
+
+
+		void set_write_()
+		{
+			if(!write_file_.get_enable()) {
+				typedef utils::parse_cgi_post<256, 2> CGI_IP;
+				CGI_IP cgi;
+				cgi.parse(http_.get_post_body());
+				for(uint32_t i = 0; i < cgi.size(); ++i) {
+					const auto& t = cgi.get_unit(i);
+					if(strcmp(t.key, "fname") == 0) {
+						if(t.val != nullptr) write_file_.set_path(t.val);
+					} else if(strcmp(t.key, "count") == 0) {
+						int n;
+						utils::input("%d", t.val) % n;
+						write_file_.set_limit(n);
+					}
+				}
+				write_file_.enable();
+			} else {
+				write_file_.enable(false);
+			}
+		}
+
+
+		void set_ip_()
+		{
+			typedef utils::parse_cgi_post<256, 5> CGI_IP;
+			CGI_IP cgi;
+			cgi.parse(http_.get_post_body());
+			dhcp_ = false;
+			for(uint32_t i = 0; i < cgi.size(); ++i) {
+				const auto& t = cgi.get_unit(i);
+				int n;
+				if(strcmp(t.key, "dhcp") == 0) {
+					if(strcmp(t.val, "on") == 0) {
+						dhcp_ = true;
+					}
+				} else if((utils::input("ip%d", t.key) % n).status()) {
+					if(n >= 0 && n <= 3) {
+						int v;
+						utils::input("%d", t.val) % v;
+						utils::format("%d, ") % v;
+						ip_[n] = v;
+					}
+					utils::format("\n");
+				}
+			}
+			setup_.write_eui(dhcp_, ip_);
+		}
+
+
 		void startup_()
 		{
 			setup_.init_eui(develope_);
@@ -307,18 +463,46 @@ namespace seeda {
 				setup_.render_main(develope_);
 			} );
 
+			http_.set_page("/client", "SetupClient", [=](void) {
+				setup_.render_client(develope_);
+			} );
+
 #if 0
-						} else if(strncmp(path, "/cgi/", 5) == 0) {
-							cgi_.select(fd, path, pos);
-							setup_.render_main(fd, develope_);
-						} else if(strcmp(path, "/client") == 0) {
-							setup_.render_client(fd);
-						} else if(strcmp(path, "/files") == 0) {
-							render_files_(fd);
-						} else if(strncmp(path, "/seeda/", 7) == 0) {
-							send_file_(fd, path);
-						} else {
+			} else if(strcmp(path, "/files") == 0) {
+				render_files_(fd);
+			} else if(strncmp(path, "/seeda/", 7) == 0) {
+				send_file_(fd, path);
 #endif
+
+			http_.set_cgi("/cgi/set_rtc.cgi", "SetRTC", [=](void) {
+				set_rtc_();
+				http_.exec_page("/setup");
+			} );
+
+			http_.set_cgi("/cgi/set_adc.cgi", "SetADC", [=](void) {
+				set_adc_();
+				http_.exec_page("/setup");
+			} );
+
+			http_.set_cgi("/cgi/set_client.cgi", "SetClient", [=](void) {
+				set_client_();
+				http_.exec_page("/setup");
+			} );
+
+			http_.set_cgi("/cgi/set_write.cgi", "SetWrite", [=](void) {
+				set_write_();
+				http_.exec_page("/setup");
+			} );
+
+			http_.set_cgi("/cgi/del_pre.cgi", "DelFile", [=](void) {
+				at_sdc().remove("seeda03.pre");
+				http_.exec_page("/setup");
+			} );
+
+			http_.set_cgi("/cgi/set_ip.cgi", "SetIP", [=](void) {
+				set_ip_();
+				http_.exec_page("/setup");
+			} );
 
 			// FTP Server
 			ftp_.start("SEEDA03", "Renesas_RX64M", "SEEDA03", "SEEDA03");
@@ -334,8 +518,8 @@ namespace seeda {
 			count_(0),
 			write_file_(),
 			setup_(write_file_, client_),
-///			cgi_(write_file_, client_, setup_),
-			develope_(true)
+			startup_delay_(100), ip_{ 0 },
+			develope_(true), dhcp_(false)
 			{ }
 
 
@@ -384,6 +568,32 @@ namespace seeda {
 		}
 
 
+		void service_sub()
+		{
+			if(startup_delay_ == 0) {
+				return;
+			}
+			--startup_delay_;
+			if(startup_delay_ == 0) {
+				if(pre_.read()) {
+					for(int ch = 0; ch < 8; ++ch) {
+						at_sample(ch).mode_ = static_cast<sample_t::mode>(pre_.get().mode_[ch]);
+						at_sample(ch).gain_ = pre_.get().gain_[ch];
+						at_sample(ch).offset_ = pre_.get().offset_[ch];
+						at_sample(ch).limit_lo_level_ = pre_.get().limit_lo_level_[ch];
+						at_sample(ch).limit_hi_level_ = pre_.get().limit_hi_level_[ch];
+					}
+					for(int i = 0; i < 4; ++i) client_.at_ip()[i] = pre_.get().client_ip_[i];
+					client_.set_port(pre_.get().client_port_);
+
+					write_file_.set_path(pre_.get().write_path_);
+					write_file_.set_limit(pre_.get().write_limit_); 
+				}
+				client_.start_connect();
+			}
+		}
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  サービス
@@ -395,13 +605,13 @@ namespace seeda {
 
 			http_.service();
 
-///			client_.service();
+			client_.service();
 
 			write_file_.service();
 
 			ftp_.service();
 
-///			cgi_.service();
+			service_sub();			
 		}
 
 

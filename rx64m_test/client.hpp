@@ -24,6 +24,8 @@ namespace seeda {
 
 		net::ethernet_client	client_;
 
+		typedef utils::basic_format<net::ether_string<net::ethernet::format_id::client0, 2048> > format;
+
 		enum class task {
 			startup,
 			connect,
@@ -122,7 +124,6 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void service()
 		{
-#if 0
 			time_t t;
 			switch(task_) {
 
@@ -136,6 +137,7 @@ namespace seeda {
 					timeout_ = 5 * 100;  // 5 sec
 					task_ = task::main_loop;
 					time_ = get_time();
+					format::chaout().set_fd(client_.get_cepid());
 				}
 				break;
 
@@ -151,13 +153,13 @@ namespace seeda {
 					struct tm *m = localtime(&t);
 					char data[1024];
 					uint32_t l = 0;
-					l += (utils::format("%04d/%02d/%02d,%02d:%02d:%02d", &data[l], sizeof(data) - l)
+					l += (utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d", &data[l], sizeof(data) - l)
 						% static_cast<uint32_t>(m->tm_year + 1900)
 						% static_cast<uint32_t>(m->tm_mon + 1)
 						% static_cast<uint32_t>(m->tm_mday)
 						% static_cast<uint32_t>(m->tm_hour)
 						% static_cast<uint32_t>(m->tm_min)
-						% static_cast<uint32_t>(m->tm_sec)).get_length();
+						% static_cast<uint32_t>(m->tm_sec)).size();
 					for(int ch = 0; ch < 8; ++ch) {
 						const auto& smp = get_sample(ch);
 						data[l] = ',';
@@ -169,21 +171,22 @@ namespace seeda {
 					data[l] = 0;
 					++l;
 
+					utils::format("%s\n") % data;
+
 					char tmp[2048];
 					utils::str::url_decode_to_str(data, tmp, sizeof(tmp)); 
 
-					
-
-					auto fd = client_.get_cepid();
-					format("POST /api/?val=%s HTTP/1.1\n", fd) % tmp;
-					format("Host: %d.%d.%d.%d\n", fd)
+					format::chaout().clear();
+					format("POST /api/?val=%s HTTP/1.1\n") % tmp;
+					format("Host: %d.%d.%d.%d\n")
 						% static_cast<int>(ip_[0])
 						% static_cast<int>(ip_[1])
 						% static_cast<int>(ip_[2])
 						% static_cast<int>(ip_[3]);
-					format("Content-Type: application/x-www-form-urlencoded\n", fd);
-					format("User-Agent: SEEDA03 Post Client\n", fd);
-					format("Connection: close\n\n", fd);
+					format("Content-Type: application/x-www-form-urlencoded\n");
+					format("User-Agent: SEEDA03 Post Client\n");
+					format("Connection: close\n\n");
+					format::chaout().flush();
 				}
 				task_ = task::disconnect;
 				break;
@@ -194,7 +197,6 @@ namespace seeda {
 				task_ = task::connect;
 				break;
 			}
-#endif
 		}
 	};
 }

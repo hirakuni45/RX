@@ -196,37 +196,39 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  クライアント機能設定画面
+			@param[in]	dev	develope の場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void render_client()
+		void render_client(bool dev)
 		{
-#if 0
 			net_tools::render_version();
 			net_tools::render_date_time();
 
-			format("<hr align=\"left\" width=\"400\" size=\"3\">\n", fd);
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+
+			if(dev) {
+				http_format("Develope mode<br>");
+				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+			}
 
 			// クライアント機能設定
-			format("<form method=\"POST\" action=\"/cgi/set_client.cgi\">\n", fd);
-			format("<table><tr><td>接続先 IP：</td>"
-				"<td><input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\"></td></tr>\n", fd)
+			http_format("<form method=\"POST\" action=\"/cgi/set_client.cgi\">\n");
+			http_format("<table><tr><td>接続先 IP：</td>"
+				"<td><input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\"></td></tr>\n")
 				% static_cast<int>(client_.get_ip()[0])
 				% static_cast<int>(client_.get_ip()[1])
 				% static_cast<int>(client_.get_ip()[2])
 				% static_cast<int>(client_.get_ip()[3]);
-			format("<tr><td>接続先ポート：</td>"
-				"<td><input type=\"text\" name=\"port\" size=\"5\" value=\"%d\"></td></tr>\n", fd)
+			http_format("<tr><td>接続先ポート：</td>"
+				"<td><input type=\"text\" name=\"port\" size=\"5\" value=\"%d\"></td></tr>\n")
 				% static_cast<int>(client_.get_port());
-			format("<tr><td><input type=\"submit\" value=\"接続先設定\"></td></tr>\n", fd);
-			format("</table></form>\n", fd);
+			http_format("<tr><td><input type=\"submit\" value=\"接続先設定\"></td></tr>\n");
+			http_format("</table></form>\n");
 
-			format("<hr align=\"left\" width=\"400\" size=\"3\">\n", fd);
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 
-			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n", fd);
-			format("<hr align=\"left\" width=\"400\" size=\"3\">\n", fd);
-
-			format("</html>\n", fd);
-#endif
+			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n");
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 		}
 
 
