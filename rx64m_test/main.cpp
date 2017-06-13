@@ -129,14 +129,14 @@ namespace seeda {
 	int disp_time(time_t t, char* dst, uint32_t size)
 	{
 		struct tm *m = localtime(&t);
-		auto n = (utils::format("%s %s %d %02d:%02d:%02d  %4d", dst, size)
+		auto n = (utils::sformat("%s %s %d %02d:%02d:%02d  %4d", dst, size)
 			% get_wday(m->tm_wday)
 			% get_mon(m->tm_mon)
 			% static_cast<uint32_t>(m->tm_mday)
 			% static_cast<uint32_t>(m->tm_hour)
 			% static_cast<uint32_t>(m->tm_min)
 			% static_cast<uint32_t>(m->tm_sec)
-			% static_cast<uint32_t>(m->tm_year + 1900)).get_length();
+			% static_cast<uint32_t>(m->tm_year + 1900)).size();
 		return n;
 	}
 
