@@ -26,7 +26,7 @@ extern "C" {
 	void INT_Excep_ICU_GROUPAL1(void);
 }
 
-#define GET_DEBUG
+// #define NETS_DEBUG
 
 namespace seeda {
 
@@ -36,6 +36,12 @@ namespace seeda {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class nets {
+
+#ifdef NETS_DEBUG
+		typedef utils::format debug_format;
+#else
+		typedef utils::null_format debug_format;
+#endif
 
 		typedef device::PORT<device::PORT7, device::bitpos::B0> LAN_RESN;
 		typedef device::PORT<device::PORT7, device::bitpos::B3> LAN_PDN;
@@ -88,40 +94,6 @@ namespace seeda {
 			pre_.write();
 		}
 
-#if 0
-		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
-			if(fi == nullptr) return;
-
-			int fd = reinterpret_cast<int>(option);
-
-			format("<tr>", fd);
-
-			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
-			struct tm *m = localtime(&t);
-			if(dir) {
-				format("<td>-</td>\n", fd);
-			} else {
-				format("<td>%9d</td>\n", fd) % fi->fsize;
-			}
-			{
-				format("<td>%s %2d %4d</td>\n", fd) 
-					% get_mon(m->tm_mon)
-					% static_cast<int>(m->tm_mday)
-					% static_cast<int>(m->tm_year + 1900);
-				format("<td>%02d:%02d</td>\n", fd) 
-					% static_cast<int>(m->tm_hour)
-					% static_cast<int>(m->tm_min);
-				if(dir) {
-					format("<td>/", fd);
-				} else {
-					format("<td> ", fd);
-				}
-				format(name, fd);
-				format("</td>", fd);
-				format("</tr>\n", fd);
-			}
-		}
-#endif
 
 		void make_adc_csv_(const char* tail)
 		{
@@ -136,72 +108,6 @@ namespace seeda {
 			}
 		}
 
-#if 0
-		void render_files_(int fd)
-		{
-			net_tools::send_info(fd, 200, false);
-
-			format("<!DOCTYPE HTML>\n", fd);
-			format("<html>\n", fd);
-			net_tools::send_head(fd, "SD Files");
-
-			format("<style type=\"text/css\">\n", fd);
-			format(".table3 {\n", fd);
-			format("  border-collapse: collapse;\n", fd);
-			format("  width: 500px;\n", fd);
-			format("}\n", fd);
-			format(".table3 th {\n", fd);
-			format("  background-color: #cccccc;\n", fd);
-			format("}\n", fd);
-			format("</style>\n", fd);
-			format("<table class=\"table3\" border=1>\n", fd);
-			format("<tr><th>Size</th><th>Date</th><th>Time</th><th>Name</th></tr>\n", fd);
-			at_sdc().dir_loop("", dir_list_func_, true, reinterpret_cast<void*>(fd));
-			format("</table>\n", fd);
-
-			format("<br>\n", fd);
-			format("<hr align=\"left\" width=\"600\" size=\"3\">\n", fd);
-			format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n", fd);
-
-			format("</html>\n", fd);
-		}
-
-
-		void send_file_(int fd, const char* path)
-		{
-			FILE* fp = fopen(path, "rb");
-			if(fp != nullptr) {
-				format("HTTP/1.1 200 OK\n", fd);
-				format("Content-Type: ", fd);
-				const char* ext = strrchr(path, '.');
-				if(ext != nullptr) {
-					++ext;
-					if(strcmp(ext, "png") == 0 || strcmp(ext, "jpeg") == 0 || strcmp(ext, "jpg") == 0) {
-						format("image/%s\n", fd) % ext;
-					} else {
-						format("text/%s\n", fd) % ext;
-					}
-				} else {
-					format("text/plain\n", fd);
-				}
-				format("Connection: close\n\n", fd);
-				uint8_t tmp[512];
-				uint32_t total = 0;
-				uint32_t len;
-				while((len = fread(tmp, 1, sizeof(tmp), fp)) == sizeof(tmp)) {
-					server_.write(tmp, sizeof(tmp));
-					total += len;
-				}
-				if(len > 0) {
-					server_.write(tmp, len);
-					total += len;
-				}
-				fclose(fp);
-			} else {
-				render_null_(fd, path);
-			}
-		}
-#endif
 
 		void render_data_()
 		{
@@ -361,12 +267,12 @@ namespace seeda {
 			for(uint32_t i = 0; i < cgi.size(); ++i) {
 				const auto& t = cgi.get_unit(i);
 				if(strcmp(t.key, "ip") == 0) {
-					utils::format("Set client IP: '%s'\n") % t.val;
+					debug_format("Set client IP: '%s'\n") % t.val;
 					client_.at_ip().from_string(t.val);
 				} else if(strcmp(t.key, "port") == 0) {
 					int port;
 					if((utils::input("%d", t.val) % port).status()) {
-						utils::format("Set client PORT: %d\n") % port;
+						debug_format("Set client PORT: %d\n") % port;
 						client_.set_port(port);
 					}
 				}
@@ -416,10 +322,10 @@ namespace seeda {
 					if(n >= 0 && n <= 3) {
 						int v;
 						utils::input("%d", t.val) % v;
-						utils::format("%d, ") % v;
+						debug_format("%d, ") % v;
 						ip_[n] = v;
 					}
-					utils::format("\n");
+					debug_format("\n");
 				}
 			}
 			setup_.write_eui(dhcp_, ip_);
@@ -435,17 +341,17 @@ namespace seeda {
 			net::ip_address ipa(ips[0], ips[1], ips[2], ips[3]);
 			if(setup_.get_dhcp()) {
 				if(ethernet_.begin(mac) == 0) {
-					utils::format("Ethernet Fail: begin (DHCP)...\n");
-					utils::format("SetIP: ");
+					debug_format("Ethernet Fail: begin (DHCP)...\n");
+					debug_format("SetIP: ");
 					ethernet_.begin(mac, ipa);
 				} else {
-					utils::format("DHCP: ");
+					debug_format("DHCP: ");
 				}
 			} else {
 				ethernet_.begin(mac, ipa);
-				utils::format("SetIP: ");
+				debug_format("SetIP: ");
 			}
-			utils::format("%s\n") % ethernet_.get_local_ip().c_str();
+			debug_format("%s\n") % ethernet_.get_local_ip().c_str();
 
 			// HTTP Server
 			http_.start("Seeda03 HTTP Server");
@@ -470,12 +376,18 @@ namespace seeda {
 				setup_.render_client(develope_);
 			} );
 
-#if 0
-			} else if(strcmp(path, "/files") == 0) {
-				render_files_(fd);
-			} else if(strncmp(path, "/seeda/", 7) == 0) {
-				send_file_(fd, path);
-#endif
+			http_.set_page("/preference", "DelFile", [=](void) {
+				net_tools::render_version();
+				net_tools::render_date_time();
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				if(at_sdc().remove("/seeda03.pre")) {
+					http_format("Succeeded in the removal of the 'seeda03.pre'<br>\n");
+				} else {
+					http_format("Failed in the removal of the 'seeda03.pre'<br>\n");
+				}
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"戻る\">\n");
+			} );
 
 			http_.set_cgi("/cgi/set_rtc.cgi", "SetRTC", [=](void) {
 				set_rtc_();
@@ -494,11 +406,6 @@ namespace seeda {
 
 			http_.set_cgi("/cgi/set_write.cgi", "SetWrite", [=](void) {
 				set_write_();
-				http_.exec_page("/setup");
-			} );
-
-			http_.set_cgi("/cgi/del_pre.cgi", "DelFile", [=](void) {
-				at_sdc().remove("seeda03.pre");
 				http_.exec_page("/setup");
 			} );
 
@@ -630,7 +537,7 @@ namespace seeda {
 			bool f = false;
 			if(cmdn == 1) {
 				bool v = LAN_RESN::P();
-				utils::format("LAN-RESN: %d\n") % static_cast<int>(v);
+				debug_format("LAN-RESN: %d\n") % static_cast<int>(v);
 				return true;
 			} else if(cmdn > 1) {
 				char tmp[16];
@@ -643,7 +550,7 @@ namespace seeda {
 						device::PORT7::PODR.B0 = 1;
 						f = true;
 					} else {
-						utils::format("reset param error: '%s'\n") % tmp;
+						debug_format("reset param error: '%s'\n") % tmp;
 					}
 				}
 			}

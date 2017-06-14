@@ -350,7 +350,7 @@ namespace seeda {
 
 
 			{  // プリファレンス消去ボタン
-				http_format("<input type=\"button\" onclick=\"location.href='/cgi/del_pre.cgi'\" value=\"プリファレンス消去\">\n");
+				http_format("<input type=\"button\" onclick=\"location.href='/preference'\" value=\"プリファレンス消去\">\n");
 				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 
