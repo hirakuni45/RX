@@ -135,9 +135,12 @@ namespace utils {
 
 		// FATFS で認識できるパス（文字コード）へ変換
 		void create_fatfs_path_(const char* path, char* full) const {
-			create_full_path_(path, full);
 #if _USE_LFN != 0
-			str::utf8_to_sjis(full, full);
+			char tmp[path_buff_size_];
+			create_full_path_(path, tmp);
+			str::utf8_to_sjis(tmp, full);
+#else
+			create_full_path_(path, full);
 #endif
 		}
 
