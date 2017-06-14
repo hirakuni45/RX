@@ -11,7 +11,7 @@
 #include "common/fifo.hpp"
 #include "common/format.hpp"
 
-// #define WF_DEBUG
+// #define WRITE_FILE_DEBUG
 
 namespace seeda {
 
@@ -22,7 +22,7 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class write_file {
 
-#ifdef WF_DEBUG
+#ifdef WRITE_FILE_DEBUG
 		typedef utils::format debug_format;
 #else
 		typedef utils::null_format debug_format;
@@ -43,7 +43,31 @@ namespace seeda {
 
 		FILE	*fp_;
 
-		time_t		time_ref_;
+		time_t	time_ref_;
+
+		enum class task : uint8_t {
+			wait_request,
+			sync_time,
+			make_filename,
+			open_file,
+			write_header,
+			push_data,
+			make_data,
+			write_body,
+			next_data,
+			next_file,
+		};
+
+		task	task_;
+
+		bool	last_data_;
+
+		uint8_t	second_;
+
+		char	filename_[256];
+
+		char		data_[512];
+		uint32_t	data_len_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -53,7 +77,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		write_file() : limit_(5), count_(0), path_{ "00000" },
 			enable_(false), state_(false),
-			fp_(nullptr), time_ref_(0) { }
+			fp_(nullptr), time_ref_(0), task_(task::wait_request), last_data_(false), second_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -158,89 +182,147 @@ namespace seeda {
 					debug_format("Write file aborted\n");
 					fclose(fp_);
 					fp_ = nullptr;
+					task_ = task::wait_request;
 				}
 				return;
 			}
 
-			time_t t = get_time();
-			{
-				if(time_ref_ != t) {
-					time_ref_ = t;
-//					utils::format("Write data injection...\n");
+			switch(task_) {
 
-					if(fp_ == nullptr) {
-						struct tm *m = localtime(&time_ref_);
-						char file[256];
-						utils::sformat("%s_%04d%02d%02d%02d%02d.csv", file, sizeof(file))
-							% path_
+			case task::wait_request:
+				if(enable_ && !back) {
+					task_ = task::sync_time;
+				}
+				break;
+
+			case task::sync_time:
+				{
+					time_t t = get_time();
+					if(time_ref_ != t) {
+						time_ref_ = t;
+						task_ = task::make_filename;
+					}
+				}
+				break;
+
+			case task::make_filename:
+				{
+					struct tm *m = localtime(&time_ref_);
+					utils::sformat("%s_%04d%02d%02d%02d%02d.csv", filename_, sizeof(filename_))
+						% path_
+						% static_cast<uint32_t>(m->tm_year + 1900)
+						% static_cast<uint32_t>(m->tm_mon + 1)
+						% static_cast<uint32_t>(m->tm_mday)
+						% static_cast<uint32_t>(m->tm_hour)
+						% static_cast<uint32_t>(m->tm_min);
+					task_ = task::open_file;
+				}
+				break;
+
+			case task::open_file:
+				fp_ = fopen(filename_, "wb");
+				if(fp_ == nullptr) {  // error then disable write.
+					debug_format("File open error: '%s'\n") % filename_;
+					enable_ = false;
+					task_ = task::wait_request;
+				} else {
+					debug_format("Start write file: '%s'\n") % filename_;
+					task_ = task::write_header;
+				}
+				break;
+
+			case task::write_header:
+				{
+					char data[1024];
+					utils::sformat("DATE,TIME", data, sizeof(data));
+					for(int i = 0; i < 8; ++i) {
+						utils::sformat(",CH,MAX,MIN,AVE,MEDIAN,COUNTUP", data, sizeof(data), true);
+					}
+					utils::sformat("\n", data, sizeof(data), true);
+
+					fwrite(data, 1, utils::sformat::chaout().size(), fp_);
+					fifo_.clear();
+					task_ = task::push_data;
+				}
+				break;
+
+			case task::push_data:
+				for(int i = 0; i < 8; ++i) {
+					auto smp = get_sample(i);
+					smp.time_ = time_ref_;
+					smp.ch_ = i;
+					fifo_.put(smp);
+				}
+				task_ = task::make_data;
+				break;
+
+			case task::make_data:
+				if(fifo_.length() != 0) {
+					sample_t smp = fifo_.get();
+					if(smp.ch_ == 0) {
+						struct tm *m = localtime(&smp.time_);
+						utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d,", data_, sizeof(data_))
 							% static_cast<uint32_t>(m->tm_year + 1900)
 							% static_cast<uint32_t>(m->tm_mon + 1)
 							% static_cast<uint32_t>(m->tm_mday)
 							% static_cast<uint32_t>(m->tm_hour)
-							% static_cast<uint32_t>(m->tm_min);
-						fp_ = fopen(file, "wb");
-						if(fp_ == nullptr) {  // error then disable write.
-							debug_format("File open error: '%s'\n") % file;
-							enable_ = false;
-						} else {
-							debug_format("Start write file: '%s'\n") % file;
-						}
-						char data[1024];
-						utils::sformat("DATE,TIME", data, sizeof(data));
-						for(int i = 0; i < 8; ++i) {
-							utils::sformat(",CH,MAX,MIN,AVE,MEDIAN,COUNTUP", data, sizeof(data), true);
-						}
-						utils::sformat("\n", data, sizeof(data), true);
-
-						fwrite(data, 1, utils::sformat::chaout().size(), fp_);
-						fifo_.clear();
+							% static_cast<uint32_t>(m->tm_min)
+							% static_cast<uint32_t>(m->tm_sec);
+						second_ = m->tm_sec;
+					} else {
+						utils::sformat(",", data_, sizeof(data_));
 					}
-					for(int i = 0; i < 8; ++i) {
-						auto smp = get_sample(i);
-						smp.time_ = t;
-						smp.ch_ = i;
-						fifo_.put(smp);
+					smp.make_csv2(data_, sizeof(data_), true);
+					if(smp.ch_ == 7) {
+						utils::sformat("\n", data_, sizeof(data_), true);
+						last_data_ = true;
+					} else {
+						last_data_ = false;
+					}
+					data_len_ = utils::sformat::chaout().size();
+					task_ = task::write_body;
+				}
+				break;
+
+			case task::write_body:
+				fwrite(data_, 1, data_len_, fp_);
+				if(last_data_) {
+					if(second_ == 59) {  // change file.
+						task_ = task::next_file;
+					} else {
+						task_ = task::next_data;
+					}
+				} else {
+					task_ = task::make_data;
+				}
+				break;
+
+			case task::next_data:
+				{
+					time_t t = get_time();
+					if(time_ref_ != t) {
+						time_ref_ = t;
+						task_ = task::push_data;
 					}
 				}
-			}
+				break;
 
-			if(fifo_.length() == 0) return;
-
-			sample_t smp = fifo_.get();
-
-			char data[2048];
-			struct tm *m = localtime(&smp.time_);
-			if(smp.ch_ == 0) {
-				utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d,", data, sizeof(data))
-					% static_cast<uint32_t>(m->tm_year + 1900)
-					% static_cast<uint32_t>(m->tm_mon + 1)
-					% static_cast<uint32_t>(m->tm_mday)
-					% static_cast<uint32_t>(m->tm_hour)
-					% static_cast<uint32_t>(m->tm_min)
-					% static_cast<uint32_t>(m->tm_sec);
-			} else {
-				utils::sformat(",", data, sizeof(data));
-			}
-			smp.make_csv2(data, sizeof(data), true);
-			if(smp.ch_ == 7) {
-				utils::sformat("\n", data, sizeof(data), true);
-			}
-			fwrite(data, 1, utils::sformat::chaout().size(), fp_);
-//			utils::format("Write ch: %d\n") % t.ch_;
-
-			if(smp.ch_ == 7) {  // last channnel
-				if(m->tm_sec == 59) {  // change file.
-					fclose(fp_);
-					fp_ = nullptr;
-					++count_;
-				}
-
+			case task::next_file:
+				fclose(fp_);
+				fp_ = nullptr;
+				++count_;
 				if(count_ >= limit_) {
-					fclose(fp_);
 					fp_ = nullptr;
-					debug_format("Fin write file: %d sec\n") % count_;
+					debug_format("Fin write file: %d files\n") % count_;
 					enable_ = false;
+					task_ = task::wait_request;
+				} else {
+					task_ = task::sync_time;
 				}
+				break;
+
+			default:
+				break;
 			}
 		}
 	};
