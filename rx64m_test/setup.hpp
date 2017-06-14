@@ -8,7 +8,6 @@
 //=====================================================================//
 #include "client.hpp"
 #include "write_file.hpp"
-// #include "net_tools.hpp"
 
 #include "chip/EUI_XX.hpp"
 
@@ -344,7 +343,7 @@ namespace seeda {
 			}
 
 			{  // ＳＤカードステータス・ボタン
-				http_format("<input type=\"button\" onclick=\"location.href='/sdc_state'\" value=\"ＳＤカード\">\n");
+				http_format("<input type=\"button\" onclick=\"location.href='/sdc_state'\" value=\"ＳＤカード情報\">\n");
 				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 

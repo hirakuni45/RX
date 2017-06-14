@@ -126,7 +126,7 @@ namespace seeda {
 			{  // 内臓 A/D 表示（湿度、温度）
 				auto v = get_adc(6);
 				http_format("温度： %5.2f [度]\n") % thmister_(v);
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_.tag_hr(600, 3);
 			}
 
 			http_format("<style type=\"text/css\">");
@@ -184,7 +184,7 @@ namespace seeda {
 			http_format("</table>\n");
 			http_format("<br>\n");
 
-			http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+			http_.tag_hr(600, 3);
 			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n");
 		}
 
@@ -358,7 +358,7 @@ namespace seeda {
 			// HTTP Server
 			http_.start("Seeda03 HTTP Server");
 
-			http_.set_page("/", "SimpleData", [=](void) {
+			http_.set_link("/", "SimpleData", [=](void) {
 				++count_;
 				http_format("Conection: %d<br>\n") % count_;
 				net_tools::render_date_time();
@@ -366,35 +366,35 @@ namespace seeda {
 				make_adc_csv_("<br>\n");
 			} );
 
-			http_.set_page("/data", "RichData", [=](void) {
+			http_.set_link("/data", "RichData", [=](void) {
 				render_data_();
 			} );
 
-			http_.set_page("/setup", "SetupMain", [=](void) {
+			http_.set_link("/setup", "SetupMain", [=](void) {
 				setup_.render_main(develope_);
 			} );
 
-			http_.set_page("/client", "SetupClient", [=](void) {
+			http_.set_link("/client", "SetupClient", [=](void) {
 				setup_.render_client(develope_);
 			} );
 
-			http_.set_page("/preference", "DeletePreference", [=](void) {
+			http_.set_link("/preference", "DeletePreference", [=](void) {
 				net_tools::render_version();
 				net_tools::render_date_time();
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_.tag_hr(600, 3);
 				if(at_sdc().remove("/seeda03.pre")) {
 					http_format("Succeeded in the removal of the 'seeda03.pre'<br>\n");
 				} else {
 					http_format("Failed in the removal of the 'seeda03.pre'<br>\n");
 				}
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_.tag_hr(600, 3);
 				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"戻る\">\n");
 			} );
 
-			http_.set_page("/sdc_state", "DeletePreference", [=](void) {
+			http_.set_link("/sdc_state", "DeletePreference", [=](void) {
 				net_tools::render_version();
 				net_tools::render_date_time();
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_.tag_hr(600, 3);
 				uint32_t fspc;
 				uint32_t capa;
 				bool ret = at_sdc().get_disk_space(fspc, capa);
@@ -404,33 +404,33 @@ namespace seeda {
 				} else {
 					http_format("ＳＤカードがありません。<br>\n");
 				}
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_.tag_hr(600, 3);
 				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"戻る\">\n");
 			} );
 
 			http_.set_cgi("/cgi/set_rtc.cgi", "SetRTC", [=](void) {
 				set_rtc_();
-				http_.exec_page("/setup");
+				http_.exec_link("/setup");
 			} );
 
 			http_.set_cgi("/cgi/set_adc.cgi", "SetADC", [=](void) {
 				set_adc_();
-				http_.exec_page("/setup");
+				http_.exec_link("/setup");
 			} );
 
 			http_.set_cgi("/cgi/set_client.cgi", "SetClient", [=](void) {
 				set_client_();
-				http_.exec_page("/setup");
+				http_.exec_link("/setup");
 			} );
 
 			http_.set_cgi("/cgi/set_write.cgi", "SetWrite", [=](void) {
 				set_write_();
-				http_.exec_page("/setup");
+				http_.exec_link("/setup");
 			} );
 
 			http_.set_cgi("/cgi/set_ip.cgi", "SetIP", [=](void) {
 				set_ip_();
-				http_.exec_page("/setup");
+				http_.exec_link("/setup");
 			} );
 
 			// FTP Server
