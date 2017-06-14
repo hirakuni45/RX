@@ -398,7 +398,8 @@ int main(int argc, char** argv)
 	}
 
 	http_.start("GR-KAEDE HTTP Server");
-	http_.set_page("/", "", [=](void) {
+
+	http_.set_link("/", "", [=](void) {
 		time_t t = get_time();
 		struct tm *m = localtime(&t);
 		format("%s %s %d %02d:%02d:%02d  %4d<br>\n")
@@ -410,8 +411,10 @@ int main(int argc, char** argv)
 			% static_cast<uint32_t>(m->tm_sec)
 			% static_cast<uint32_t>(m->tm_year + 1900);
 
+		http_.tag_hr(500, 3);
+
 		loop_ = 0;
-		sdc_.dir_loop("", dir_list_func_, true, nullptr);
+//		sdc_.dir_loop("", dir_list_func_, true, nullptr);
 	} );
 
 	uint32_t cnt = 0;
