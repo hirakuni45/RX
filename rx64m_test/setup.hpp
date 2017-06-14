@@ -343,8 +343,8 @@ namespace seeda {
 				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 
-			if(0) {  // ＳＤカード操作画面へのボタン
-				http_format("<input type=\"button\" onclick=\"location.href='/files'\" value=\"ＳＤカード\">\n");
+			{  // ＳＤカードステータス・ボタン
+				http_format("<input type=\"button\" onclick=\"location.href='/sdc_state'\" value=\"ＳＤカード\">\n");
 				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 			}
 

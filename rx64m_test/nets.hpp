@@ -43,8 +43,10 @@ namespace seeda {
 		typedef utils::null_format debug_format;
 #endif
 
+#ifdef SEEDA
 		typedef device::PORT<device::PORT7, device::bitpos::B0> LAN_RESN;
 		typedef device::PORT<device::PORT7, device::bitpos::B3> LAN_PDN;
+#endif
 
 		net::ethernet	ethernet_;
 
@@ -376,7 +378,7 @@ namespace seeda {
 				setup_.render_client(develope_);
 			} );
 
-			http_.set_page("/preference", "DelFile", [=](void) {
+			http_.set_page("/preference", "DeletePreference", [=](void) {
 				net_tools::render_version();
 				net_tools::render_date_time();
 				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
@@ -384,6 +386,23 @@ namespace seeda {
 					http_format("Succeeded in the removal of the 'seeda03.pre'<br>\n");
 				} else {
 					http_format("Failed in the removal of the 'seeda03.pre'<br>\n");
+				}
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"戻る\">\n");
+			} );
+
+			http_.set_page("/sdc_state", "DeletePreference", [=](void) {
+				net_tools::render_version();
+				net_tools::render_date_time();
+				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				uint32_t fspc;
+				uint32_t capa;
+				bool ret = at_sdc().get_disk_space(fspc, capa);
+				if(ret) {
+					http_format("ＳＤカード全容量： %u [KBytes]<br>\n") % capa;
+					http_format("ＳＤカード空容量： %u [KBytes]<br>\n") % fspc;
+				} else {
+					http_format("ＳＤカードがありません。<br>\n");
 				}
 				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
 				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"戻る\">\n");
@@ -418,6 +437,33 @@ namespace seeda {
 			ftp_.start("SEEDA03", "Renesas_RX64M", "SEEDA03", "SEEDA03");
 		}
 
+
+		void service_startup_()
+		{
+			if(startup_delay_ == 0) {
+				return;
+			}
+			--startup_delay_;
+			if(startup_delay_ == 0) {
+				if(pre_.read()) {
+					for(int ch = 0; ch < 8; ++ch) {
+						at_sample(ch).mode_ = static_cast<sample_t::mode>(pre_.get().mode_[ch]);
+						at_sample(ch).gain_ = pre_.get().gain_[ch];
+						at_sample(ch).offset_ = pre_.get().offset_[ch];
+						at_sample(ch).limit_lo_level_ = pre_.get().limit_lo_level_[ch];
+						at_sample(ch).limit_hi_level_ = pre_.get().limit_hi_level_[ch];
+					}
+					for(int i = 0; i < 4; ++i) client_.at_ip()[i] = pre_.get().client_ip_[i];
+					client_.set_port(pre_.get().client_port_);
+
+					write_file_.set_path(pre_.get().write_path_);
+					write_file_.set_limit(pre_.get().write_limit_); 
+				}
+				client_.start_connect();
+			}
+		}
+
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -440,6 +486,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void init()
 		{
+#ifdef SEEDA
 			// LAN initialize (PHY reset, PHY POWER-DOWN
 			LAN_PDN::DIR = 1;  // output;
 			LAN_PDN::P = 1;    // Not Power Down Mode..
@@ -448,7 +495,6 @@ namespace seeda {
 			utils::delay::milli_second(200); /// reset rise time
 			LAN_RESN::P = 1;
 
-#ifdef SEEDA
 			device::power_cfg::turn(device::peripheral::ETHERCA);
 			device::port_map::turn(device::peripheral::ETHERCA);
 #else
@@ -478,32 +524,6 @@ namespace seeda {
 		}
 
 
-		void service_sub()
-		{
-			if(startup_delay_ == 0) {
-				return;
-			}
-			--startup_delay_;
-			if(startup_delay_ == 0) {
-				if(pre_.read()) {
-					for(int ch = 0; ch < 8; ++ch) {
-						at_sample(ch).mode_ = static_cast<sample_t::mode>(pre_.get().mode_[ch]);
-						at_sample(ch).gain_ = pre_.get().gain_[ch];
-						at_sample(ch).offset_ = pre_.get().offset_[ch];
-						at_sample(ch).limit_lo_level_ = pre_.get().limit_lo_level_[ch];
-						at_sample(ch).limit_hi_level_ = pre_.get().limit_hi_level_[ch];
-					}
-					for(int i = 0; i < 4; ++i) client_.at_ip()[i] = pre_.get().client_ip_[i];
-					client_.set_port(pre_.get().client_port_);
-
-					write_file_.set_path(pre_.get().write_path_);
-					write_file_.set_limit(pre_.get().write_limit_); 
-				}
-				client_.start_connect();
-			}
-		}
-
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  サービス
@@ -521,10 +541,11 @@ namespace seeda {
 
 			ftp_.service();
 
-			service_sub();			
+			service_startup_();
 		}
 
 
+#ifdef SEEDA
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  PHY リセット信号制御
@@ -556,5 +577,6 @@ namespace seeda {
 			}
 			return f;
 		}
+#endif
 	};
 }
