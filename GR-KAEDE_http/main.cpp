@@ -94,9 +94,14 @@ namespace {
 
 	net::ethernet		ethernet_;
 
-	typedef net::http_server<SDC> HTTP_SERVER;
+	typedef net::http_server<SDC, 16, 8192> HTTP_SERVER;
 	HTTP_SERVER			http_(ethernet_, sdc_);
-	
+
+	typedef HTTP_SERVER::http_format format;	
+
+
+	uint32_t loop_ = 0;
+
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -109,6 +114,32 @@ namespace {
 		if(!rtc_.set_time(t)) {
 			utils::format("Stall RTC write...\n");
 		}
+	}
+
+
+	static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+	{
+		if(fi == nullptr) return;
+
+//		++loop_;
+//		if(loop_ >= 50) return;
+
+		char cdir = '-';
+		if(dir) {
+			cdir = 'd';
+		}
+		int block = fi->fsize / 512;
+		if(block == 0 && fi->fsize > 0) ++block;
+
+		time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
+		struct tm *m = localtime(&t);
+		format("%crw-rw-rw- %d user root %d %s %d %02d:%02d %s<br>\n")
+			% cdir % block % fi->fsize
+			% get_mon(m->tm_mon)
+			% static_cast<int>(m->tm_mday)
+			% static_cast<int>(m->tm_hour)
+			% static_cast<int>(m->tm_min)
+			% name;
 	}
 }
 
@@ -341,35 +372,47 @@ int main(int argc, char** argv)
 		utils::format(", PCKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCKB);
 	}
 
-
 	device::power_cfg::turn(device::peripheral::ETHERC0);
 	device::port_map::turn(device::peripheral::ETHERC0);
 
 	set_interrupt_task(INT_Excep_ICU_GROUPAL1, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
 
 	ethernet_.start();
-
 	{
 		static const uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-		net::ip_address ipa(192, 168, 3, 20);
+		net::ip_address ipa(192, 168, 3, 20);  // 固定アドレス
 		bool dhcp = true;
 		if(dhcp) {
 			if(ethernet_.begin(mac) == 0) {
 				utils::format("Ethernet Fail: begin (DHCP)...\n");
-				utils::format("SetIP: ");
+				utils::format("SetIP (DHCP fail): ");
 				ethernet_.begin(mac, ipa);
 			} else {
-				utils::format("DHCP: ");
+				utils::format("SetIP  DHCP): ");
 			}
 		} else {
 			ethernet_.begin(mac, ipa);
-			utils::format("SetIP: ");
+			utils::format("SetIP (Direct): ");
 		}
 		utils::format("%s\n") % ethernet_.get_local_ip().c_str();
 	}
 
-
 	http_.start("GR-KAEDE HTTP Server");
+	http_.set_page("/", "", [=](void) {
+		time_t t = get_time();
+		struct tm *m = localtime(&t);
+		format("%s %s %d %02d:%02d:%02d  %4d<br>\n")
+			% get_wday(m->tm_wday)
+			% get_mon(m->tm_mon)
+			% static_cast<uint32_t>(m->tm_mday)
+			% static_cast<uint32_t>(m->tm_hour)
+			% static_cast<uint32_t>(m->tm_min)
+			% static_cast<uint32_t>(m->tm_sec)
+			% static_cast<uint32_t>(m->tm_year + 1900);
+
+		loop_ = 0;
+		sdc_.dir_loop("", dir_list_func_, true, nullptr);
+	} );
 
 	uint32_t cnt = 0;
 	while(1) {
