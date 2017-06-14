@@ -13,6 +13,7 @@
 
 #include "common/sdc_io.hpp"
 #include "common/fixed_string.hpp"
+#include "common/color.hpp"
 
 // #define HTTP_DEBUG
 
@@ -26,17 +27,30 @@ namespace net {
 	/*!
 		@brief  http_server class テンプレート
 		@param[in]	SDC	ＳＤカードファイル操作インスタンス
-		@param[in]	MAX_PAGE	登録ページの最大数
-		@param[in]	MAX_SIZE	一時バッファの最大数
+		@param[in]	MAX_LINK	登録リンクの最大数
+		@param[in]	MAX_SIZE	文字列、一時バッファの最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SDC, uint32_t MAX_PAGE = 16, uint32_t MAX_SIZE = 4096>
+	template <class SDC, uint32_t MAX_LINK = 16, uint32_t MAX_SIZE = 4096>
 	class http_server {
 	public:
 		typedef utils::line_manage<2048, 20> LINE_MAN;
 		typedef utils::basic_format<ether_string<ethernet::format_id::http, MAX_SIZE> > http_format;
 
 		typedef std::function< void () > http_task_type;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アライメント属性
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class align {
+			left,	///< 左寄せ
+			center,	///< 中央
+			right	///< 右寄せ
+		};
+
 
 	private:
 		// デバッグ以外で出力を無効にする
@@ -62,15 +76,19 @@ namespace net {
 		uint32_t		count_;
 		uint32_t		disconnect_loop_;
 
-		struct page_key_t {
+		struct link_t {
 			const char*	path_;
 			const char* title_;
+
+			const char* file_;	// link file path.
+
 			http_task_type	task_;
 			bool			cgi_;
-			page_key_t() : path_(nullptr), title_(nullptr), task_(), cgi_(false) { }
+			link_t() : path_(nullptr), title_(nullptr), file_(nullptr),
+				task_(), cgi_(false) { }
 		};
-		uint32_t		page_num_;
-		page_key_t		page_key_[MAX_PAGE];
+		uint32_t		link_num_;
+		link_t			link_[MAX_LINK];
 
 		char			post_body_[2048];
 
@@ -83,6 +101,9 @@ namespace net {
 			disconnect,
 		};
 		task		task_;
+
+		utils::color	back_color_;
+		utils::color	fore_color_;
 
 
 		static void get_path_(const char* src, char* dst) {
@@ -99,33 +120,33 @@ namespace net {
 
 		void render_404page(const char* path)
 		{
-			exec_page(path);
+			exec_link(path);
 		}
 
 
-		int set_page_(const char* path)
+		int set_link_(const char* path)
 		{
-			if(page_num_ >= MAX_PAGE) {
-				debug_format("HTTP Server: set page empty '%s'\n") % path;
+			if(link_num_ >= MAX_LINK) {
+				debug_format("HTTP Server: set link empty '%s'\n") % path;
 				return -1;
 			}
 			// 既に登録があるか検査
-			for(int i = 0; i < static_cast<int>(page_num_); ++i) {
-				if(std::strcmp(page_key_[i].path_, path) == 0) {
+			for(int i = 0; i < static_cast<int>(link_num_); ++i) {
+				if(std::strcmp(link_[i].path_, path) == 0) {
 					return i;
 				}
 			}
 
-			int n = page_num_;
-			++page_num_;
+			int n = link_num_;
+			++link_num_;
 			return n;
 		}
 
 
-		int find_page_(const char* path, bool cgi)
+		int find_link_(const char* path, bool cgi)
 		{
-			for(int i = 0; i < static_cast<int>(page_num_); ++i) {
-				if(std::strcmp(page_key_[i].path_, path) == 0 && page_key_[i].cgi_ == cgi) {
+			for(int i = 0; i < static_cast<int>(link_num_); ++i) {
+				if(std::strcmp(link_[i].path_, path) == 0 && link_[i].cgi_ == cgi) {
 					return i;
 				}
 			}
@@ -141,8 +162,9 @@ namespace net {
 		http_server(ethernet& e, SDC& sdc) : eth_(e), sdc_(sdc), http_(e), line_man_(0x0a),
 			last_modified_(0), server_name_{ 0 }, timeout_(15), max_(60),
 			count_(0), disconnect_loop_(0),
-			page_num_(0), page_key_{ },
-			task_(task::none)
+			link_num_(0), link_{ },
+			task_(task::none),
+			back_color_(255, 255, 255), fore_color_(0, 0, 0)
 		{ }
 
 
@@ -205,7 +227,7 @@ namespace net {
 
 			task_ = task::begin_http;
 
-			debug_format("HTTP Server: page capacity: %d\n") % http_format::chaout().at_str().capacity();
+			debug_format("HTTP Server: link capacity: %d\n") % http_format::chaout().at_str().capacity();
 		}
 
 
@@ -282,13 +304,13 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ページの実行
+			@brief  リンクの実行
 			@param[in]	path	ページのパス
 			@param[in]	cgi		CGI ページの場合「true」
 			@return 有効なパスなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool exec_page(const char* path, bool cgi = false)
+		bool exec_link(const char* path, bool cgi = false)
 		{
 			if(std::strcmp(path, "/favicon.ico") == 0) {
 				make_info(404, -1, false);
@@ -296,10 +318,10 @@ namespace net {
 				return true;
 			}
 
-			int idx = find_page_(path, cgi);
+			int idx = find_link_(path, cgi);
 			if(idx < 0) return false;
 
-			page_key_t& t = page_key_[idx];
+			link_t& t = link_[idx];
 
 			uint32_t clp = 0;
 			uint32_t org = 0;
@@ -372,30 +394,31 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ページ登録全クリア
+			@brief  リンク登録全クリア
 		*/
 		//-----------------------------------------------------------------//
-		void clear_page() { page_num_ = 0; }
+		void clear_link() { link_num_ = 0; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ページの登録
+			@brief  リンクの登録（タスク）
 			@param[in]	path	ページ・パス
 			@param[in]	title	ページ・タイトル
 			@param[in]	task	レンダリング・タスク
 			@return ページ・登録したら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool set_page(const char* path, const char*title, http_task_type task)
+		bool set_link(const char* path, const char*title, http_task_type task)
 		{
-			int idx = set_page_(path);
+			int idx = set_link_(path);
 			if(idx < 0) return false;
 
-			page_key_[idx].path_  = path;
-			page_key_[idx].title_ = title;
-			page_key_[idx].task_  = task;
-			page_key_[idx].cgi_   = false;
+			link_[idx].path_  = path;
+			link_[idx].title_ = title;
+			link_[idx].file_  = nullptr;
+			link_[idx].task_  = task;
+			link_[idx].cgi_   = false;
 			return true;
 		}
 
@@ -411,13 +434,38 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool set_cgi(const char* path, const char*title, http_task_type task)
 		{
-			int idx = set_page_(path);
+			int idx = set_link_(path);
 			if(idx < 0) return false;
 
-			page_key_[idx].path_  = path;
-			page_key_[idx].title_ = title;
-			page_key_[idx].task_  = task;
-			page_key_[idx].cgi_   = true;
+			link_[idx].path_  = path;
+			link_[idx].title_ = title;
+			link_[idx].file_  = nullptr;
+			link_[idx].task_  = task;
+			link_[idx].cgi_   = true;
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ファイルの登録
+			@param[in]	path	ページ・パス
+			@param[in]	title	ページ・タイトル
+			@param[in]	file	ファイル・パス
+			@return ページ・登録したら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool set_file(const char* path, const char*title, const char* file)
+		{
+			int idx = set_link_(path);
+			if(idx < 0) return false;
+
+			link_[idx].path_  = path;
+			link_[idx].title_ = title;
+			link_[idx].file_  = file;
+			link_[idx].task_  = nullptr;
+			link_[idx].cgi_   = false;
+
 			return true;
 		}
 
@@ -516,7 +564,7 @@ namespace net {
 								get_path_(t + 4, path);
 								debug_format("HTTP Server: GET '%s'\n") % path;
 
-								bool find = exec_page(path, false);
+								bool find = exec_link(path, false);
 								if(!find) {
 									debug_format("HTTP Server: can't find GET: '%s'\n") % path;
 									make_info(404, -1, false);
@@ -527,7 +575,7 @@ namespace net {
 								get_path_(t + 5, path);
 								debug_format("HTTP Server: POST '%s'\n") % path;
 								parse_cgi(pos);
-								bool find = exec_page(path, true);
+								bool find = exec_link(path, true);
 								if(!find) {
 									debug_format("HTTP Server: can't find POST: '%s'\n") % path;
 									make_info(404, -1, false);
@@ -535,7 +583,7 @@ namespace net {
 								}
 
 							} else {
-								debug_format("HTTP Server: request fail '%s'\n") % t;
+								debug_format("HTTP Server: request fail command '%s'\n") % t;
 							}
 						} else {
 							debug_format("HTTP Server: request fail section.\n");
@@ -567,6 +615,162 @@ namespace net {
 				break;
 			}
 		}
-	};
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バック・カラーの設定
+			@param[in]	r	赤
+			@param[in]	g	緑
+			@param[in]	b	青
+		*/
+		//-----------------------------------------------------------------//
+		void set_back_color(uint8_t r, uint8_t g, uint8_t b)
+		{
+			back_color_.r = r;
+			back_color_.g = g;
+			back_color_.b = b;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バック・カラーの設定
+			@param[in]	c	カラー
+		*/
+		//-----------------------------------------------------------------//
+		void set_back_color(const utils::color& c)
+		{
+			back_color_ = c;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バック・カラーの設定
+			@param[in]	t	カラー属性
+		*/
+		//-----------------------------------------------------------------//
+		void set_back_color(utils::color::type t)
+		{
+			back_color_.set(t);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  フォア・カラーの設定
+			@param[in]	r	赤
+			@param[in]	g	緑
+			@param[in]	b	青
+		*/
+		//-----------------------------------------------------------------//
+		void set_fore_color(uint8_t r, uint8_t g, uint8_t b)
+		{
+			fore_color_.r = r;
+			fore_color_.g = g;
+			fore_color_.b = b;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  フォア・カラーの設定
+			@param[in]	c	カラー
+		*/
+		//-----------------------------------------------------------------//
+		void set_fore_color(const utils::color& c)
+		{
+			fore_color_ = c;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  フォア・カラーの設定
+			@param[in]	t	カラー属性
+		*/
+		//-----------------------------------------------------------------//
+		void set_fore_color(utils::color::type t)
+		{
+			fore_color_.set(t);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  フォア・カラーとバックカラーの交換
+		*/
+		//-----------------------------------------------------------------//
+		void swap_color()
+		{
+			std::swap(back_color_, fore_color_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  カラーの文字列生成
+			@param[in]	c	カラー
+		*/
+		//-----------------------------------------------------------------//
+		static void insert_color_str(const utils::color& c)
+		{
+			http_format("color=\"#%02X%02X%02X\"")
+				% static_cast<uint32_t>(c.r)
+				% static_cast<uint32_t>(c.g)
+				% static_cast<uint32_t>(c.b);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アライメント・文字列の取得
+			@param[in]	type	アライメント属性
+		*/
+		//-----------------------------------------------------------------//
+		static const char* get_align_str(align type)
+		{
+			static const char* align_str[] = { "left", "center", "right" };
+			return align_str[static_cast<uint32_t>(type)];
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  Horizontal Rule（水平線）
+			@param[in]	width	横幅
+			@param[in]	size	高さ（デフォルト１）
+			@param[in	type	アライメント属性（デフォルト「left」）
+			@param[in]	col		カラーを適用する場合「true」
+			@param[in]	nos		シンプルな概観の場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		void tag_hr(uint16_t width, uint16_t size = 1, align type = align::left, bool col = false, bool nos = false)
+		{
+			http_format("<hr ");
+			if(col) {
+				insert_color_str(fore_color_);
+			}
+			http_format(" align=\"%s\" width=\"%d\" size=\"%d\" %s>")
+				% get_align_str(type)
+				% width
+				% size
+				% (nos ? "noshade" : "");
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  input 形式の生成
+			@param[in]	type	タイプ
+			@param[in]	link	リンク先
+			@param[in]	text	文字列
+		*/
+		//-----------------------------------------------------------------//
+		void tag_input()
+		{
+//			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"戻る\">");
+		}
+	};
 }
