@@ -367,12 +367,12 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	ディスク空き容量の取得
-			@param[in]	free	フリー・スペース（単位Ｋバイト)
+			@param[in]	fspc	フリー・スペース（単位Ｋバイト)
 			@param[in]	capa	最大容量（単位Ｋバイト）
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool get_disk_space(uint32_t& free, uint32_t& capa) const
+		bool get_disk_space(uint32_t& fspc, uint32_t& capa) const
 		{
 			if(!get_mount()) return false;
 
@@ -382,7 +382,7 @@ namespace utils {
 
 				// 全セクタ数と空きセクタ数を計算（５１２バイトセクタ）
 				capa = (fs->n_fatent - 2) * fs->csize / 2;
-				free = nclst * fs->csize / 2;
+				fspc = nclst * fs->csize / 2;
 				return true;
 			} else {
 				return false;
