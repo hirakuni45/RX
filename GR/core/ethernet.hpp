@@ -34,14 +34,13 @@ extern "C" {
 };
 
 
-#define DEBUG
+// #define ETH_DEBUG
 
-#ifndef DEBUG
-typedef utils::null_format debug_format;
-#else
+#ifdef ETH_DEBUG
 typedef utils::format debug_format;
+#else
+typedef utils::null_format debug_format;
 #endif
-
 
 #define T4_CLOSED               0
 
@@ -165,7 +164,7 @@ namespace net {
 				utils::format("empty tcpudp RAM size: need(%d), real(%d)\n") % size % real;
                 while(1);
             }
-			utils::format("tcpudp RAM size: need(%d), real(%d)\n") % size % real;
+			debug_format("tcpudp RAM size: need(%d), real(%d)\n") % size % real;
 
 			tcpudp_open(tcpudp_work_);
             debug_format("tcpudp_open()\n");
@@ -306,32 +305,22 @@ namespace net {
 #endif
 			memcpy(&ethernet_mac[0], mac, EP_ALEN);           /*use from the beginning only 6byte*/
 			startLANController();
-#ifdef ETHER_DEBUG
-			utils::format("open_timer()\n");
-#endif
+			debug_format("open_timer()\n");
 			open_timer();
 			while(g_ether_TransferEnableFlag != ETHER_FLAG_ON) {
 				R_ETHER_LinkProcess();
 			}
 
-#ifdef ETHER_DEBUG
-			utils::format("r_dhcp_open:\n");
-#endif
+			debug_format("r_dhcp_open:\n");
 			if(r_dhcp_open(&tmpDhcp, (uint8_t*)tcpudp_work_, mac) == -1) {
-#ifdef ETHER_DEBUG
-				utils::format("fail...\n");
-#endif
+				debug_format("fail...\n");
 				close_timer();
 				return 0;	/* 0 on failure */
 			} else {
-#ifdef T4_ETHER_DEBUG
-				Serial.println("dhcpSuccess");
-#endif
+				debug_format("dhcpSuccess\n");
 				dhcpSuccess(&tmpDhcp);
 			}
-#ifdef ETHER_DEBUG
-			utils::format("close_timer()\n");
-#endif
+			debug_format("close_timer()\n");
 			close_timer();
 			initialize_TCP_IP();
 ///			clr_tcp_acp_cep_call_flg();
@@ -520,13 +509,12 @@ namespace net {
 
 			TCP_API_STAT ercd = tcp_read_stat(cepid);
 
-#ifdef DEBUG
 			static TCP_API_STAT ercd_[8];
 			if(ercd != ercd_[cepid - 1]) {
-				utils::format("STAT: %d (%d)\n") % static_cast<int>(ercd) % cepid;
+				debug_format("STAT: %d (%d)\n") % static_cast<int>(ercd) % cepid;
 				ercd_[cepid - 1] = ercd;
 			}
-#endif
+
 			ethernet::CEP& cep = at_cep(cepid);
 ///			int cfg = cep.call_flag;
 //			debug_format("ethernet_server::available():tcp_read_stat() = %d, call_flag: %d\n") % ercd;

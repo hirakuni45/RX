@@ -126,7 +126,7 @@ namespace net {
 				int ercd = tcp_con_cep(cepid_, NADR, &adr, timeout);
 				static int ercd_ = 0;
 				if(ercd_ != ercd) {
-					utils::format("Client connection state: %d\n") % ercd;
+					debug_format("Client connection state: %d\n") % ercd;
 					ercd_ = ercd;
 				}
 				if(ercd == E_OK) {
@@ -136,7 +136,7 @@ namespace net {
 				}
 
 				if(close_count_ != tcp_get_close_count(cepid_)) {
-//					utils::format("Error close (timeout)\n");
+//					debug_format("Error close (timeout)\n");
 					stop();  // 強制終了
 				}
 

@@ -106,7 +106,7 @@ namespace net {
 					port_ = port;
 				}
 			} else {
-				utils::format("port == 0\n");
+				debug_format("port == 0\n");
 			}
 		}
 

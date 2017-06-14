@@ -14,7 +14,7 @@
 #include "common/sdc_io.hpp"
 #include "common/fixed_string.hpp"
 
-#define HTTP_DEBUG
+// #define HTTP_DEBUG
 
 extern "C" {
 	time_t get_time(void);
@@ -306,7 +306,7 @@ namespace net {
 			if(!cgi) {
 				http_format::chaout().clear();
 
-				clp = make_info(200, -1, false);
+				clp = make_info(200, -1, true);
 				org = http_format::chaout().size();
 				http_format("<!DOCTYPE HTML>\n");
 				http_format("<html>\n");
@@ -361,7 +361,7 @@ namespace net {
 			++pos;
 			post_body_[0] = 0;
 			if(pos >= lines) {
-				utils::format("CGI No Body\n");
+				debug_format("CGI No Body\n");
 			} else {
 //				utils::format("CGI param (URL enocde): '%s'\n") % line_man_[pos];
 				utils::str::url_encode_to_str(line_man_[pos], post_body_);
@@ -419,6 +419,53 @@ namespace net {
 			page_key_[idx].task_  = task;
 			page_key_[idx].cgi_   = true;
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ファイル送信
+			@param[in]	path	ファイル・パス
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool send_file(const char* path)
+		{
+			FILE* fp = fopen(path, "rb");
+			if(fp == nullptr) {
+				return false;
+			}
+			uint32_t fsz = sdc_.size(path);
+
+			http_format::chaout().clear();
+			http_format("HTTP/1.1 200 OK\n");
+			http_format("Content-Type: ");
+			const char* ext = strrchr(path, '.');
+			if(ext != nullptr) {
+				++ext;
+				if(strcmp(ext, "png") == 0 || strcmp(ext, "jpeg") == 0 || strcmp(ext, "jpg") == 0) {
+					http_format("image/%s\n") % ext;
+				} else {
+					http_format("text/%s\n") % ext;
+				}
+			} else {
+				http_format("text/plain\n");
+			}
+			http_format("Content-Length: %u\n") % fsz;
+			http_format("Connection: close\n\n");
+			http_format::chaout().flush();				
+			uint8_t tmp[512];
+			uint32_t total = 0;
+			uint32_t len;
+			while((len = fread(tmp, 1, sizeof(tmp), fp)) == sizeof(tmp)) {
+				http_.write(tmp, sizeof(tmp));
+				total += len;
+			}
+			if(len > 0) {
+				http_.write(tmp, len);
+				total += len;
+			}
+			fclose(fp);
 		}
 
 
