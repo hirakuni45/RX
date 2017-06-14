@@ -11,6 +11,8 @@
 #include "GR/core/ethernet_client.hpp"
 #include "sample.hpp"
 
+// #define CLIENT_DEBUG
+
 namespace seeda {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -19,6 +21,12 @@ namespace seeda {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class client {
+
+#ifdef CLIENT_DEBUG
+		typedef utils::format debug_format;
+#else
+		typedef utils::null_format debug_format;
+#endif
 
 		static const uint16_t PORT = 3000;	///< クライアント・ポート
 
@@ -29,7 +37,10 @@ namespace seeda {
 		enum class task {
 			startup,
 			connect,
-			main_loop,
+			time_sync,
+			make_form,
+			url_decode,
+			send_data,
 			disconnect,
 		};
 
@@ -42,6 +53,11 @@ namespace seeda {
 		uint32_t	timeout_;
 
 		time_t		time_;
+
+		struct tm	tm_;
+
+		char		form_[1024];
+		char		data_[2048];
 
 	public:
 		//-----------------------------------------------------------------//
@@ -132,62 +148,71 @@ namespace seeda {
 
 			case task::connect:
 				if(client_.connect(ip_, port_, TMO_NBLK)) {
-					utils::format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
+					debug_format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% ip_.c_str() % port_ % client_.get_cepid();
 					timeout_ = 5 * 100;  // 5 sec
-					task_ = task::main_loop;
 					time_ = get_time();
 					format::chaout().set_fd(client_.get_cepid());
+					task_ = task::time_sync;
 				}
 				break;
 
-			case task::main_loop:
+			case task::time_sync:
 				if(!client_.connected()) {
 					task_ = task::disconnect;
 					break;
 				}
-				t = get_time();
-				if(time_ == t) break;
-				time_ = t;
 				{
-					struct tm *m = localtime(&t);
-					char data[1024];
-					utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d", data, sizeof(data))
-						% static_cast<uint32_t>(m->tm_year + 1900)
-						% static_cast<uint32_t>(m->tm_mon + 1)
-						% static_cast<uint32_t>(m->tm_mday)
-						% static_cast<uint32_t>(m->tm_hour)
-						% static_cast<uint32_t>(m->tm_min)
-						% static_cast<uint32_t>(m->tm_sec);
-
-					for(int ch = 0; ch < 8; ++ch) {
-						const auto& smp = get_sample(ch);
-						utils::sformat(",", data, sizeof(data), true);
-						smp.make_csv2(data, sizeof(data), true);
-					}
-					utils::sformat("\n", data, sizeof(data), true);
-
-					char tmp[2048];
-					utils::str::url_decode_to_str(data, tmp, sizeof(tmp)); 
-
-					format::chaout().clear();
-					format("POST /api/?val=%s HTTP/1.1\n") % tmp;
-					format("Host: %d.%d.%d.%d\n")
-						% static_cast<int>(ip_[0])
-						% static_cast<int>(ip_[1])
-						% static_cast<int>(ip_[2])
-						% static_cast<int>(ip_[3]);
-					format("Content-Type: application/x-www-form-urlencoded\n");
-					format("User-Agent: SEEDA03 Post Client\n");
-					format("Connection: close\n\n");
-					format::chaout().flush();
+					auto t = get_time();
+					if(time_ == t) break;
+					time_ = t;
+					struct tm* m = localtime(&t);
+					tm_ = *m;
+					task_ = task::make_form;
 				}
+				break;
+
+			case task::make_form:
+				utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d", form_, sizeof(form_))
+					% static_cast<uint32_t>(tm_.tm_year + 1900)
+					% static_cast<uint32_t>(tm_.tm_mon + 1)
+					% static_cast<uint32_t>(tm_.tm_mday)
+					% static_cast<uint32_t>(tm_.tm_hour)
+					% static_cast<uint32_t>(tm_.tm_min)
+					% static_cast<uint32_t>(tm_.tm_sec);
+
+				for(int ch = 0; ch < 8; ++ch) {
+					const auto& smp = get_sample(ch);
+					utils::sformat(",", form_, sizeof(form_), true);
+					smp.make_csv2(form_, sizeof(form_), true);
+				}
+				utils::sformat("\n", form_, sizeof(form_), true);
+				task_ = task::url_decode;
+				break;
+
+			case task::url_decode:
+				utils::str::url_decode_to_str(form_, data_, sizeof(data_)); 
+				task_ = task::send_data;
+				break;
+
+			case task::send_data:
+				format::chaout().clear();
+				format("POST /api/?val=%s HTTP/1.1\n") % data_;
+				format("Host: %d.%d.%d.%d\n")
+					% static_cast<int>(ip_[0])
+					% static_cast<int>(ip_[1])
+					% static_cast<int>(ip_[2])
+					% static_cast<int>(ip_[3]);
+				format("Content-Type: application/x-www-form-urlencoded\n");
+				format("User-Agent: SEEDA03 Post Client\n");
+				format("Connection: close\n\n");
+				format::chaout().flush();
 				task_ = task::disconnect;
 				break;
 			
 			case task::disconnect:
 				client_.stop();
-				utils::format("Client disconnected: %s\n") % ip_.c_str();
+				debug_format("Client disconnected: %s\n") % ip_.c_str();
 				task_ = task::connect;
 				break;
 			}
