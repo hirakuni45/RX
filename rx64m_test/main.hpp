@@ -28,7 +28,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 190;
+	static const int seeda_version_ = 200;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef utils::command<256> CMD;
@@ -179,11 +179,10 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	/*!
 		@brief  A/D サンプルの取得
-		@param[in]	ch	チャネル（０～７）
 		@return A/D サンプル
 	*/
 	//-----------------------------------------------------------------//
-	const sample_t& get_sample(uint8_t ch);
+	const sample_data& get_sample_data();
 
 
 	//-----------------------------------------------------------------//

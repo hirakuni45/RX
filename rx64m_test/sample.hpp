@@ -33,8 +33,6 @@ namespace seeda {
 		uint16_t	limit_lo_level_;	///< lo レベル
 		uint16_t	limit_hi_level_;	///< hi レベル
 
-		time_t		time_;
-
 		uint16_t	ch_;
 		mode		mode_;
 		uint16_t	min_;
@@ -46,7 +44,6 @@ namespace seeda {
 
 		sample_t() : gain_(1024.0f), offset_(0.0f),
 			limit_lo_count_(0), limit_hi_count_(0), limit_lo_level_(30000), limit_hi_level_(40000),
-			time_(0),
 			ch_(0), mode_(mode::none),
 			min_(0), max_(0), average_(0), median_(0), abs_(false) { }
 
@@ -103,6 +100,17 @@ namespace seeda {
 			value_convert(median_,  dst, size);
 			utils::sformat(",%u",   dst, size, true) % count;
 		}
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  サンプル・データ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct sample_data {
+		time_t		time_;
+		sample_t	smp_[8];
 	};
 
 

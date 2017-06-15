@@ -197,9 +197,9 @@ namespace seeda {
 
 			case task::sync_time:
 				{
-					time_t t = get_time();
-					if(time_ref_ != t) {
-						time_ref_ = t;
+					const sample_data& smd = get_sample_data();
+					if(time_ref_ != smd.time_) {
+						time_ref_ = smd.time_;
 						task_ = task::make_filename;
 					}
 				}
@@ -247,11 +247,11 @@ namespace seeda {
 				break;
 
 			case task::push_data:
-				for(int i = 0; i < 8; ++i) {
-					auto smp = get_sample(i);
-					smp.time_ = time_ref_;
-					smp.ch_ = i;
-					fifo_.put(smp);
+				{
+					const sample_data& smd = get_sample_data();
+					for(int i = 0; i < 8; ++i) {
+						fifo_.put(smd.smp_[i]);
+					}
 				}
 				task_ = task::make_data;
 				break;
@@ -260,7 +260,7 @@ namespace seeda {
 				if(fifo_.length() != 0) {
 					sample_t smp = fifo_.get();
 					if(smp.ch_ == 0) {
-						struct tm *m = localtime(&smp.time_);
+						struct tm *m = localtime(&time_ref_);
 						utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d,", data_, sizeof(data_))
 							% static_cast<uint32_t>(m->tm_year + 1900)
 							% static_cast<uint32_t>(m->tm_mon + 1)
@@ -299,9 +299,9 @@ namespace seeda {
 
 			case task::next_data:
 				{
-					time_t t = get_time();
-					if(time_ref_ != t) {
-						time_ref_ = t;
+					const sample_data& smd = get_sample_data();
+					if(time_ref_ != smd.time_) {
+						time_ref_ = smd.time_;
 						task_ = task::push_data;
 					}
 				}

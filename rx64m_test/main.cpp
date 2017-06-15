@@ -26,10 +26,9 @@ namespace {
 
 	uint32_t		sample_count_;
 	seeda::sample	sample_[8];
-	seeda::sample_t	sample_t_[8];
+	seeda::sample_data	sample_data_;
 
 	volatile bool	enable_eadc_;
-
 
 	void main_init_()
 	{
@@ -161,11 +160,11 @@ namespace seeda {
 		}
 #endif
 		++sample_count_;
-		if(sample_count_ >= 1000) {
+		if(sample_count_ >= 1000) {  // 1sec
 			for(int i = 0; i < 8; ++i) {
 				sample_[i].collect();
-				sample_t_[i] = sample_[i].get();
-				sample_t_[i].ch_ = i;
+				sample_data_.smp_[i] = sample_[i].get();
+				sample_data_.smp_[i].ch_ = i;
 				sample_[i].clear();
 			}
 			sample_count_ = 0;			
@@ -201,13 +200,12 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	/*!
 		@brief  A/D サンプルの取得
-		@param[in]	ch	チャネル（０～７）
 		@return A/D サンプル
 	*/
 	//-----------------------------------------------------------------//
-	const sample_t& get_sample(uint8_t ch)
+	const sample_data& get_sample_data()
 	{
-		return sample_t_[ch];
+		return sample_data_;
 	}
 
 
@@ -455,6 +453,8 @@ int main(int argc, char** argv)
 	uint32_t cnt = 0;
 	while(1) {
 		core_.sync();
+
+		sample_data_.time_ = get_time();
 
 		core_.service();
 		tools_.service();

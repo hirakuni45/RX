@@ -100,7 +100,7 @@ namespace seeda {
 		void make_adc_csv_(const char* tail)
 		{
 			for(int ch = 0; ch < 8; ++ch) {
-				const auto& t = get_sample(ch);
+				const auto& t = get_sample_data().smp_[ch];
 				char tmp[256];
 				t.make_csv(tmp, sizeof(tmp), false);
 				if(tail != nullptr) {
@@ -149,7 +149,7 @@ namespace seeda {
 
 			static const char* modes[] = { "数値", "係数" };
 			for(int ch = 0; ch < 8; ++ch) {
-				const auto& t = get_sample(ch);
+				const auto& t = get_sample_data().smp_[ch];
 				char min[16];
 				t.value_convert(t.min_,     min, sizeof(min));
 				char max[16];

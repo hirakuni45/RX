@@ -151,7 +151,7 @@ namespace seeda {
 					debug_format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% ip_.c_str() % port_ % client_.get_cepid();
 					timeout_ = 5 * 100;  // 5 sec
-					time_ = get_time();
+					time_ = get_sample_data().time_;
 					format::chaout().set_fd(client_.get_cepid());
 					task_ = task::time_sync;
 				}
@@ -163,7 +163,7 @@ namespace seeda {
 					break;
 				}
 				{
-					auto t = get_time();
+					auto t = get_sample_data().time_;
 					if(time_ == t) break;
 					time_ = t;
 					struct tm* m = localtime(&t);
@@ -180,11 +180,12 @@ namespace seeda {
 					% static_cast<uint32_t>(tm_.tm_hour)
 					% static_cast<uint32_t>(tm_.tm_min)
 					% static_cast<uint32_t>(tm_.tm_sec);
-
-				for(int ch = 0; ch < 8; ++ch) {
-					const auto& smp = get_sample(ch);
-					utils::sformat(",", form_, sizeof(form_), true);
-					smp.make_csv2(form_, sizeof(form_), true);
+				{
+					const sample_data& smd = get_sample_data();
+					for(int ch = 0; ch < 8; ++ch) {
+						utils::sformat(",", form_, sizeof(form_), true);
+						smd.smp_[ch].make_csv2(form_, sizeof(form_), true);
+					}
 				}
 				utils::sformat("\n", form_, sizeof(form_), true);
 				task_ = task::url_decode;
