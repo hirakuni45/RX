@@ -606,7 +606,8 @@ namespace utils {
 				return;
 			}
 			std::strcpy(dst, current_);
-			if(dst[std::strlen(dst)] != '/') {
+			auto len = std::strlen(dst);
+			if(len > 0 && dst[len - 1] != '/') {
 				std::strcat(dst, "/");
 			}
 			std::strcat(dst, name);
