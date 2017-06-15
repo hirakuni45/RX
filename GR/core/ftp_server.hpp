@@ -390,7 +390,6 @@ namespace net {
 						ctrl_format("250 Ok. Current directory is '%s'\n") % sdc_.get_current();
 					} else {
 						ctrl_format("550 Can't change directory to '%s'\n") % param_;
-						ret = false;
 					}
 					ctrl_flush();
 				}
@@ -431,7 +430,6 @@ namespace net {
 					if(!con) {
 						ctrl_format("425 No data connection\n");
 						ctrl_flush();
-						ret = false;
 						break;
 					}
 					ctrl_format("150 Accepted data connection\n");
@@ -442,7 +440,6 @@ namespace net {
 						ctrl_format("226 %d matches total\n") % n;
 					} else {
 						ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
-						ret = false;
 					}
 					ctrl_flush();
 					if(pasv_enable_) {
@@ -483,7 +480,6 @@ namespace net {
 					if(!con) {
 						ctrl_format("425 No data connection\n");
 						ctrl_flush();
-						ret = false;
 						break;
 					}
 					ctrl_format("150 Accepted data connection\n");
@@ -494,7 +490,6 @@ namespace net {
 						ctrl_format("226 %d matches total\n") % n;
 					} else {
 						ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
-						ret = false;
 					}
 					ctrl_flush();
 					if(pasv_enable_) {
@@ -767,14 +762,12 @@ namespace net {
 			case ftp_command::TYPE:
 				if(param_ == nullptr) {
 					ctrl_format("504 Unknow TYPE\n");
-					ret = false;
 				} else if(strcmp(param_, "A") == 0) {
 					ctrl_format("200 TYPE is now ASCII\n");
 				} else if(strcmp(param_, "I") == 0) {
 					ctrl_format("200 TYPE is now BINARY\n");
 				} else {
 					ctrl_format("504 Unknow TYPE\n");
-					ret = false;
 				}
 				ctrl_flush();
 				break;
@@ -842,7 +835,6 @@ namespace net {
 				    if(!con) {
 						ctrl_format("425 No data connection\n");
 						ctrl_flush();
-						ret = false;
 					} else {
 						ctrl_format("150 Accepted data connection\n");
 						ctrl_flush();
@@ -853,7 +845,6 @@ namespace net {
 							ctrl_format("226 %d matches total\n") % n;
 						} else {
 							ctrl_format("550 File system not mount\n");
-							ret = false;
 						}
 						ctrl_flush();
 						if(pasv_enable_) {
