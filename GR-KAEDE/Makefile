@@ -69,6 +69,7 @@ CP_OPT		=	-Wall -Werror \
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
+				-Wno-unused-function \
 				-mcpu=rx600 \
 				-fno-exceptions \
 				-mlittle-endian-data
