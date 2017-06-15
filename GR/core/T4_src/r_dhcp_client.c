@@ -156,8 +156,8 @@ int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 
 	int head_len = sizeof(dhcp_packet->ether);
 	int body_len = sizeof(DHCP_PACKET) - sizeof(dhcp_packet->ether);
-	printf("DHCP write: %d, %d (sum: %d, udpsum: %d)\n",
-		head_len, body_len, (int)dhcp_packet->ipv4.checksum, (int)dhcp_packet->udp.checksum);
+//	printf("DHCP write: %d, %d (sum: %d, udpsum: %d)\n",
+//		head_len, body_len, (int)dhcp_packet->ipv4.checksum, (int)dhcp_packet->udp.checksum);
 
 	lan_write(ETHER_CHANNEL_0, (int8_t *)&dhcp_packet->ether, sizeof(dhcp_packet->ether), (int8_t *)&dhcp_packet->ipv4, sizeof(DHCP_PACKET) - sizeof(dhcp_packet->ether));
 
@@ -185,7 +185,7 @@ int32_t dhcp_wait_offer(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 		if(len > 0) {
 			int all = sizeof(dhcp_packet->ether) + sizeof(dhcp_packet->ipv4)
 				+ sizeof(dhcp_packet->udp) + sizeof(dhcp_packet->dhcp);
-			printf("DHCP read: %d (%d)\n", (int)len, all);
+///			printf("DHCP read: %d (%d)\n", (int)len, all);
 			memcpy(dhcp_packet, p, all);
 
 			rcv_buff_release(ETHER_CHANNEL_0);
