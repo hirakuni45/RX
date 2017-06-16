@@ -29,7 +29,7 @@ namespace utils {
 			@param[in]	str	初期設定文字列
 		*/
 		//-----------------------------------------------------------------//
-		fixed_string(const char* str = nullptr) : pos_(0) {
+		fixed_string(const char* str = nullptr) noexcept : pos_(0) {
 			if(str != nullptr) {
 				std::strcpy(text_, str);
 				pos_ = std::strlen(text_);
