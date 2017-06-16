@@ -6,8 +6,7 @@
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "RX64M/system.hpp"
-#include "RX600/port.hpp"
+#include "common/renesas.hpp"
 
 namespace {
 
