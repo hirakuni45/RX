@@ -25,6 +25,8 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c \
+				GR/core/driver/phy.c \
+				GR/core/driver/r_ether.c \
 				GR/core/r_byteq_v1.30/r_byteq.c \
 				GR/core/driver/driver.c \
 				GR/core/T4_src/config_tcpudp.c \
@@ -34,9 +36,7 @@ CSOURCES	=	common/init.c \
 				GR/core/T4_src/tcp.c \
 				GR/core/T4_src/tcp_api.c \
 				GR/core/T4_src/r_dhcp_client.c \
-				GR/core/T4_src/r_dns_client.c \
-				GR/core/driver/phy.c \
-				GR/core/driver/r_ether.c
+				GR/core/T4_src/r_dns_client.c
 
 PSOURCES	=	main.cpp \
 				GR/core/ethernet.cpp
