@@ -19,6 +19,96 @@
 
 namespace device {
 
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  stat_t クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct ether_stat_t {
+
+		enum class error_type {
+			LEN,
+			NETWORK_LAYER,
+			TRANSPORT_LAYER,
+			ARP_HEADER1,
+			ARP_HEADER2,
+			IP_HEADER1,
+			IP_HEADER2,
+			IP_HEADER3,
+			IP_HEADER4,
+			IP_HEADER5,
+			IP_HEADER6,
+			IP_HEADER7,
+			IP_HEADER8,
+			IP_HEADER9,
+			TCP_HEADER1,
+			TCP_HEADER2,
+			UDP_HEADER1,
+			UDP_HEADER2,
+			UDP_HEADER3,
+			ICMP_HEADER1,
+
+			none,
+			num_
+		};
+
+		uint32_t	recv_request_;
+		uint32_t	recv_bytes_;
+		uint32_t	send_request_;
+		uint32_t	send_bytes_;
+
+		uint32_t	count_[static_cast<int>(error_type::num_)];
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		ether_stat_t() :
+			recv_request_(0), recv_bytes_(0), send_request_(0), send_bytes_(0),
+			count_{ 0 } { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  リセット（変数初期化）
+		*/
+		//-----------------------------------------------------------------//
+		void reset() {
+			recv_request_ = 0;
+			recv_bytes_   = 0;
+			send_request_ = 0;
+			send_bytes_   = 0;
+			for(int i = 0; i < static_cast<int>(error_type::num_); ++i) {
+				count_[i] = 0;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  エラー・カウントを進める
+			@param[in]	t	エラー・タイプ
+		*/
+		//-----------------------------------------------------------------//
+		void inc_error_count(error_type t) {
+			++count_[static_cast<int>(t)];
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  エラー・カウントを取得
+			@return エラー・カウント
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_error_count(error_type t) const {
+			return count_[static_cast<int>(t)];
+		}
+	};
+
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  Ethernet I/O 制御クラス
@@ -33,30 +123,6 @@ namespace device {
 		static const int EMAC_BUFSIZE = 1536;  			// Must be 32-byte aligned
 		static const int EMAC_NUM_RX_DESCRIPTORS = 4;	// The number of RX descriptors.
 		static const int EMAC_NUM_TX_DESCRIPTORS = 4;	// The number of TX descriptors.
-
-	public:
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  stat_t クラス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct stat_t {
-			uint32_t	recv_request_;
-			uint32_t	recv_bytes_;
-			uint32_t	send_request_;
-			uint32_t	send_bytes_;
-
-			stat_t() :
-				recv_request_(0), recv_bytes_(0), send_request_(0), send_bytes_(0) { }
-
-			void reset() {
-				recv_request_ = 0;
-				recv_bytes_ = 0;
-				send_request_ = 0;
-				send_bytes_ = 0;
-			}
-		};
 
 	private:
 		// Bit definitions of status member of DescriptorS
@@ -201,13 +267,14 @@ namespace device {
 		volatile uint8_t				lchng_flag_;
 		volatile uint8_t				transfer_enable_flag_;
 
-		bool	link_stat_;
+		bool			link_stat_;
 
-		stat_t	stat_;
+		ether_stat_t	stat_;
 
 		const uint8_t*	recv_ptr_;
 		uint32_t		recv_mod_;
 
+		const void*		err_data_;
 
 		void reset_mac_() {
 			// Software reset
@@ -538,117 +605,6 @@ namespace device {
 #endif
 		}
 
-		int32_t recv_buf_release_()
-		{
-    		int32_t ret;
-
-			// When the Link up processing is not completed, return error
-			if(FLAG_OFF == transfer_enable_flag_) {
-				ret = ERROR_LINK;
-			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
-				ret = ERROR_MPDE;
-			} else {  // When the Link up processing is completed
-				if(RACT != (app_rx_desc_->status & RACT)) {  // When receive data exists
-					// Move to next descriptor
-					app_rx_desc_->status |= RACT;
-					app_rx_desc_->status &= ~(RFP1 | RFP0 | RFE | RFS9_RFOVER | RFS8_RAD | RFS7_RMAF | \
-                                     RFS4_RRF | RFS3_RTLF | RFS2_RTSF | RFS1_PRE | RFS0_CERF);
-					app_rx_desc_ = app_rx_desc_->next;
-				}
-				if(0x00000000L == EDMAC::EDRRR()) {
-					// Restart if stopped
-					EDMAC::EDRRR = 0x00000001L;
-				}
-				ret = OK;
-			}
-    		return ret;
-		}
-
-
-		int32_t recv_(void** buf)
-		{
-			int32_t num_recvd;
-			int32_t ret;
-
-			// When the Link up processing is not completed, return error
-			if(FLAG_OFF == transfer_enable_flag_) {
-				ret = ERROR_LINK;
-			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
-				ret = ERROR_MPDE;
-			} else {  // When the Link up processing is completed
-				while(1) {
-					// When receive data exists.
-					if(RACT != (app_rx_desc_->status & RACT)) {
-						if(app_rx_desc_->status & RFE) {  // The buffer is released at the error.
-							ret = recv_buf_release_();
-						} else {
-							// Pass the pointer to received data to application.  This is
-							// zero-copy operation.
-							*buf = (void*)app_rx_desc_->buf_p;
-
-							// Get bytes received
-							num_recvd = app_rx_desc_->size;
-							ret = num_recvd;
-							break;
-						}
-					} else {
-						ret = NO_DATA;
-						break;
-					}
-				}
-			}
-			return ret;
-		}
-
-
-		int32_t send_get_buf_(void** buf, uint16_t& buf_size)
-		{
-			int32_t ret;
-			// When the Link up processing is not completed, return error
-			if (FLAG_OFF == transfer_enable_flag_) {
-				ret = ERROR_LINK;
-			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
-				ret = ERROR_MPDE;
-			} else {  // When the Link up processing is completed
-				// All transmit buffers are full
-				if(TACT == (app_tx_desc_->status & TACT)) {
-					ret = ERROR_TACT;
-				} else {
-					// Give application another buffer to work with
-					*buf = (void*)app_tx_desc_->buf_p;
-					buf_size = app_tx_desc_->size;
-					ret = OK;
-				}
-			}
-			return ret;
-		}
-
-
-		int32_t send_(uint32_t len)
-		{
-			int32_t ret;
-			// When the Link up processing is not completed, return error
-			if(FLAG_OFF == transfer_enable_flag_) {
-				ret = ERROR_LINK;
-			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
-				ret = ERROR_MPDE;
-			} else {  // When the Link up processing is completed
-				// The data of the buffer is made active.
-				app_tx_desc_->bufsize = len;
-				app_tx_desc_->status &= ~(TFP1 | TFP0);
-				app_tx_desc_->status |= (TFP1 | TFP0 | TACT);
-				app_tx_desc_ = app_tx_desc_->next;
-
-				if(0x00000000L == EDMAC::EDTRR()) {
-					// Restart if stopped
-					EDMAC::EDTRR = 0x00000001L;
-				}
-				ret = OK;
-			}
-			return ret;
-		}
-
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -660,7 +616,7 @@ namespace device {
 			intr_level_(0), mac_addr_{ 0 },
 			pause_frame_enable_flag_(false), magic_packet_detect_(magic_packet_mode::no_use),
 			lchng_flag_(FLAG_OFF), transfer_enable_flag_(FLAG_OFF),
-			link_stat_(false), stat_(), recv_ptr_(nullptr), recv_mod_(0)
+			link_stat_(false), stat_(), recv_ptr_(nullptr), recv_mod_(0), err_data_(nullptr)
 			{ }
 
 
@@ -670,7 +626,9 @@ namespace device {
 			@param[in]	task	割り込みタスク
 		*/
 		//-----------------------------------------------------------------//
-		static void set_intr_task(void (*task)()) { intr_task_ = task; }
+		static void set_intr_task(void (*task)(void)) {
+			intr_task_ = reinterpret_cast<volatile void*>(task);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -693,11 +651,11 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	stat_t の取得
-			@return stat_t
+			@brief	状態の取得
+			@return ether_stat_t の参照
 		*/
 		//-----------------------------------------------------------------//
-		const stat_t& get_stat() const { return stat_; }
+		const ether_stat_t& get_stat() const { return stat_; }
 
 
 		//-----------------------------------------------------------------//
@@ -774,6 +732,117 @@ namespace device {
 		}
 
 
+		int32_t recv_buff_release()
+		{
+    		int32_t ret;
+
+			// When the Link up processing is not completed, return error
+			if(FLAG_OFF == transfer_enable_flag_) {
+				ret = ERROR_LINK;
+			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
+				ret = ERROR_MPDE;
+			} else {  // When the Link up processing is completed
+				if(RACT != (app_rx_desc_->status & RACT)) {  // When receive data exists
+					// Move to next descriptor
+					app_rx_desc_->status |= RACT;
+					app_rx_desc_->status &= ~(RFP1 | RFP0 | RFE | RFS9_RFOVER | RFS8_RAD | RFS7_RMAF | \
+                                     RFS4_RRF | RFS3_RTLF | RFS2_RTSF | RFS1_PRE | RFS0_CERF);
+					app_rx_desc_ = app_rx_desc_->next;
+				}
+				if(0x00000000L == EDMAC::EDRRR()) {
+					// Restart if stopped
+					EDMAC::EDRRR = 0x00000001L;
+				}
+				ret = OK;
+			}
+    		return ret;
+		}
+
+
+		int32_t recv(void** buf)
+		{
+			int32_t num_recvd;
+			int32_t ret;
+
+			// When the Link up processing is not completed, return error
+			if(FLAG_OFF == transfer_enable_flag_) {
+				ret = ERROR_LINK;
+			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
+				ret = ERROR_MPDE;
+			} else {  // When the Link up processing is completed
+				while(1) {
+					// When receive data exists.
+					if(RACT != (app_rx_desc_->status & RACT)) {
+						if(app_rx_desc_->status & RFE) {  // The buffer is released at the error.
+							ret = recv_buff_release();
+						} else {
+							// Pass the pointer to received data to application.  This is
+							// zero-copy operation.
+							*buf = (void*)app_rx_desc_->buf_p;
+
+							// Get bytes received
+							num_recvd = app_rx_desc_->size;
+							ret = num_recvd;
+							break;
+						}
+					} else {
+						ret = NO_DATA;
+						break;
+					}
+				}
+			}
+			return ret;
+		}
+
+
+		int32_t send_buff(void** buf, uint16_t& buf_size)
+		{
+			int32_t ret;
+			// When the Link up processing is not completed, return error
+			if (FLAG_OFF == transfer_enable_flag_) {
+				ret = ERROR_LINK;
+			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
+				ret = ERROR_MPDE;
+			} else {  // When the Link up processing is completed
+				// All transmit buffers are full
+				if(TACT == (app_tx_desc_->status & TACT)) {
+					ret = ERROR_TACT;
+				} else {
+					// Give application another buffer to work with
+					*buf = (void*)app_tx_desc_->buf_p;
+					buf_size = app_tx_desc_->size;
+					ret = OK;
+				}
+			}
+			return ret;
+		}
+
+
+		int32_t send(uint32_t len)
+		{
+			int32_t ret;
+			// When the Link up processing is not completed, return error
+			if(FLAG_OFF == transfer_enable_flag_) {
+				ret = ERROR_LINK;
+			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
+				ret = ERROR_MPDE;
+			} else {  // When the Link up processing is completed
+				// The data of the buffer is made active.
+				app_tx_desc_->bufsize = len;
+				app_tx_desc_->status &= ~(TFP1 | TFP0);
+				app_tx_desc_->status |= (TFP1 | TFP0 | TACT);
+				app_tx_desc_ = app_tx_desc_->next;
+
+				if(0x00000000L == EDMAC::EDTRR()) {
+					// Restart if stopped
+					EDMAC::EDTRR = 0x00000001L;
+				}
+				ret = OK;
+			}
+			return ret;
+		}
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	リード・データ
@@ -793,7 +862,7 @@ namespace device {
 					memcpy(dst, recv_ptr_, recv_mod_);
 					recv_ptr_ = nullptr;
 					recv_mod_ = 0;
-					recv_buf_release_();
+					recv_buff_release();
 					return ret;
 				} else {
 					memcpy(dst, recv_ptr_, len);
@@ -804,7 +873,7 @@ namespace device {
 			}
 
 			void* ptr;
-			auto l = recv_(&ptr);
+			auto l = recv(&ptr);
 			if(l > 0) {
 				if(l > static_cast<int32_t>(len)) {
 					l -= len;
@@ -818,7 +887,7 @@ namespace device {
 				ret = l;
 				memcpy(dst, ptr, l);
 				if(recv_ptr_ == nullptr) {
-					recv_buf_release_();
+					recv_buff_release();
 				}
 			}
 			return ret;
@@ -828,8 +897,39 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	ライト・データ
+			@param[in]	hsrc	ヘッダー転送元
+			@param[in]	hlen	ヘッダー長さ
+			@param[in]	bsrc	ボディー転送元
+			@param[in]	blen	ボディー長さ
+			@return ライト数
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t write(const void* hsrc, uint32_t hlen, const void* bsrc, uint32_t blen)
+		{
+			void* buf;
+			uint16_t buf_size;
+			int32_t ret = send_buff(&buf, buf_size);
+			if(OK == ret) {
+				if(buf_size >= (hlen + blen)) {
+					memcpy(buf, hsrc, hlen);
+					memcpy(static_cast<uint8_t*>(buf) + hlen, bsrc, blen);
+					ret =  send(hlen + blen);
+					if(OK == ret) {
+						stat_.send_request_++;
+						stat_.send_bytes_ += hlen + blen;
+						return 0;
+					}
+				}
+			}
+			return -5;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ライト・データ
 			@param[in]	src	転送元
-			@param[in]	len	ライト長
+			@param[in]	len	長さ
 			@return ライト数
 		*/
 		//-----------------------------------------------------------------//
@@ -838,7 +938,7 @@ namespace device {
 			void* ptr;
 			uint16_t maxlen;
 			uint32_t ret = 0;
-    		if(send_get_buf_(&ptr, maxlen) == OK) {
+    		if(send_buff(&ptr, maxlen) == OK) {
 				if(len > maxlen) {
 					memcpy(ptr, src, maxlen);
 					ret = maxlen;
@@ -846,7 +946,7 @@ namespace device {
 					memcpy(ptr, src, len);
 					ret = len;
 				}
-				if(send_(ret) == OK) {
+				if(send(ret) == OK) {
 					stat_.send_request_++;
 					stat_.send_bytes_ += ret;
 				}
@@ -994,6 +1094,7 @@ namespace device {
 		void callback_link_on()
 		{
 			utils::format("EtherC Link-ON (callback)\n");
+
 		}
 
 
@@ -1005,6 +1106,7 @@ namespace device {
 		void callback_link_off()
 		{
 			utils::format("EtherC Link-OFF (callback)\n");
+
 		}
 
 
@@ -1045,6 +1147,20 @@ namespace device {
 				}
 				link_stat_ = stat;
 			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	レポート・エラー
+			@param[in]	err_code	エラー・コード
+			@param[in]	err_data	エラー・データ
+		*/
+		//-----------------------------------------------------------------//
+		void report_error(ether_stat_t::error_type err_code, const void* err_data)
+		{
+			err_data_ = err_data;
+			stat_.inc_error_count(err_code);
 		}
 	};
 
