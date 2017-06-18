@@ -1,13 +1,16 @@
 //=====================================================================//
 /*! @file
-    @brief  net_core @n
+    @brief  ネット・コア @n
 			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "net/dhcp_client.hpp"
-#include "net/net_io.hpp"
+
+#include "r_t4_itcpip.h"
+
+extern TCPUDP_ENV tcpudp_env[];
 
 namespace net {
 
@@ -28,9 +31,10 @@ namespace net {
 			wait_link,	// リンクアップを待つ
 			wait_dhcp,	// DHCP IP アドレスの取得を待つ
 			setup_ip,	// IP アドレスを直接設定
+			setup_tcpudp,
 			main_loop,	// メイン・ループ
+			stall,		// ストール
 		};
-
 
 		ETHER_IO&	io_;
 
@@ -39,8 +43,22 @@ namespace net {
 
 		task		task_;
 
-		uint8_t	link_interval_;
-		bool	link_up_;
+		uint8_t		link_interval_;
+
+		uint32_t	tcpudp_work_[21504 / sizeof(uint32_t)];
+
+		void set_tcpudp_env_()
+		{
+			const DHCP_INFO& info = dhcp_.get_info();
+			info.list();
+
+			memcpy(tcpudp_env[0].ipaddr, info.ipaddr, 4);
+			memcpy(tcpudp_env[0].maskaddr, info.maskaddr, 4);
+			memcpy(tcpudp_env[0].gwaddr, info.gwaddr, 4);
+
+//			memcpy(dnsaddr1, info.dnsaddr, 4);
+//			memcpy(dnsaddr2, info.dnsaddr2, 4);
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -50,7 +68,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		net_core(ETHER_IO& io) : io_(io), dhcp_(io),
-			task_(task::wait_link), link_interval_(0), link_up_(false)
+			task_(task::wait_link), link_interval_(0)
 			{ }
 
 
@@ -82,21 +100,22 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void service()
 		{
-			if(link_interval_ >= 100) {
-				io_.polling_link_status();
-				link_interval_ = 0;
-			}
-			++link_interval_;
-
-			bool link = io_.link_process();
-
 			switch(task_) {
 
 			case task::wait_link:
-				if(link) {
-					utils::format("Ether Link UP\n");
-					dhcp_.start(200);  // 2 sec
-					task_ = task::wait_dhcp;
+				{
+					if(link_interval_ >= 100) {
+						io_.polling_link_status();
+						link_interval_ = 0;
+					}
+					++link_interval_;
+
+					bool link = io_.link_process();
+					if(link) {
+						utils::format("Ether Link UP\n");
+						dhcp_.start(200);  // 2 sec
+						task_ = task::wait_dhcp;
+					}
 				}
 				break;
 
@@ -104,9 +123,8 @@ namespace net {
 				dhcp_.service();
 				if(dhcp_.get_info().state == DHCP_INFO::state_t::collect) {
 					utils::format("DHCP Collect\n");
-					const DHCP_INFO& info = dhcp_.get_info();
-					info.list();
-					task_ = task::main_loop;
+					set_tcpudp_env_();
+					task_ = task::setup_tcpudp;
 				} else if(dhcp_.get_info().state == DHCP_INFO::state_t::timeout) {
 					utils::format("DHCP Timeout\n");
 					task_ = task::setup_ip;
@@ -119,19 +137,40 @@ namespace net {
 			case task::setup_ip:
 				break;
 
+			case task::setup_tcpudp:
+				{
+					// Get the size of the work area used by the T4 (RAM size).
+					uint32_t ramsize = tcpudp_get_ramsize();
+					if(ramsize > (sizeof(tcpudp_work_))) {
+						// Then reserve as much memory array for the work area as the size
+						// indicated by the returned value.
+						task_ = task::stall;
+						break;
+					}
+
+					// Initialize the TCP/IP
+					auto ercd = tcpudp_open(tcpudp_work_);
+					if(ercd != E_OK) {
+						task_ = task::stall;
+						break;						
+					}
+
+					task_ = task::main_loop;
+				}
+				break;
+
 			case task::main_loop:
+				io_.link_process();
+
+
+				break;
+
+			case task::stall:
 				break;
 
 			default:
 				break;
 			}
-
-//			if(link_up_ && !link) {  // link is down
-//				utils::format("Ether Link Down\n");
-//				task_ = task::wait_link;
-//			}
-
-			link_up_ = link;
 		}
 	};
 
