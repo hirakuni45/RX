@@ -54,9 +54,10 @@ namespace seeda {
 			case mode::real:
 				{
 					float a = static_cast<float>(value) / 65535.0f * gain_ + offset_;
-					if(abs_) {
+// real モードの場合、常に絶対値
+//					if(abs_) {
 						a = std::abs(a);
-					}
+//					}
 					utils::sformat("%3.2f", dst, size, true) % a;
 				}
 				break;
@@ -167,6 +168,10 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void add(uint16_t data)
 		{
+///			if(t_.mode_ == mode::real) {
+///				float a = static_cast<float>(data) / 65535.0f * gain_ + offset_;
+///			}
+
 			sum_ += data;
 			++count_;
 			if(t_.min_ > data) t_.min_ = data;
