@@ -28,7 +28,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 200;
+	static const int seeda_version_ = 210;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef utils::command<256> CMD;
