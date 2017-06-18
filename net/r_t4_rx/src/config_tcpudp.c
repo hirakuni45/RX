@@ -47,13 +47,15 @@ extern ER t4_callback(ID cepid, FN fncd , VP p_parblk);
 const UB _t4_channel_num = 1;
 
 /***  Definition of TCP reception point (only port number needs to be set) ***/
-T_TCP_CREP tcp_crep[3] =
+T_TCP_CREP tcp_crep[6] =
 {
     /* { attribute of reception point, {local IP address, local port number}} */
-    { 0x0000, { 0, 1024 }},
-    { 0x0000, { 0, 1025 }},
-    { 0x0000, { 0, 1026 }},
-
+    { 0x0000, { 0, 1024 } },
+    { 0x0000, { 0, 1025 } },
+    { 0x0000, { 0, 1026 } },
+    { 0x0000, { 0, 1027 } },
+    { 0x0000, { 0, 1028 } },
+    { 0x0000, { 0, 1029 } },
 };
 
 /* Total number of TCP reception points */

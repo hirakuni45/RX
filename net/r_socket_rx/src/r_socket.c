@@ -93,7 +93,7 @@ Private global variables and functions
 ******************************************************************************/
 BSDSocket  sockets[TOTAL_BSD_SOCKET];
 uint32_t   create_id;
-static uint32_t tcpudp_work[TCPUDP_WORK/sizeof(uint32_t) + 1];
+static uint32_t tcpudp_work[TCPUDP_WORK / sizeof(uint32_t) + 1];
 
 static int dup_tcp_socket( int sock );          /* Make a duplicate of a socket */
 static int reset_socket( int sock );        /* Clear a socket. make it */
@@ -116,7 +116,7 @@ int how_many_closed(ID sock_type);
 * Arguments    : none
 * Return Value : none
 ******************************************************************************/
-void R_SOCKET_Open(void)
+int R_SOCKET_Open(void)
 {
     int i;
     ER  ercd;
@@ -155,17 +155,19 @@ void R_SOCKET_Open(void)
 
     /* initialize TCP/IP */
     size = tcpudp_get_ramsize();
-    if (size > (sizeof(tcpudp_work)))
+    if (size > sizeof(tcpudp_work))
     {
-        for ( ;; );
+///        for ( ;; );
+		return -1;
     }
 
     ercd = tcpudp_open(tcpudp_work);
     if (ercd != E_OK)
     {
-        for ( ;; );
+///        for ( ;; );
+		return -2;
     }
-
+	return size;
 }
 
 /******************************************************************************

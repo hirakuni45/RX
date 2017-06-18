@@ -50,6 +50,7 @@ Includes   <System Includes> , "Project Includes"
  #include "igmp.h"
 #endif
 
+#include <stdio.h>
 
 /***********************************************************************************************************************
 Macro definitions
@@ -751,7 +752,6 @@ void _proc_rcv(void)
         {
             goto _err_proc_rcv;
         }
-
 
         switch (piph->ip_proto_num)
         {

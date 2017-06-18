@@ -451,10 +451,16 @@ struct timeval
     long tv_sec;
     long tv_usec;
 };
+
 /******************************************************************************
 Public Functions
 ******************************************************************************/
-void R_SOCKET_Open( void );
+#if defined(__GNUC__)
+#if defined(__cplusplus)
+extern "C" {
+#endif
+#endif
+int R_SOCKET_Open( void );
 void R_SOCKET_Close( void );
 
 int  socket( int domain, int type, int protocol );
@@ -475,7 +481,11 @@ int  closesocket( int sock );
 int  fcntl ( int sock, int command, int flags );
 int  select ( int nfds, fd_set *p_readfds, fd_set *p_writefds, fd_set *p_errorfds,
               struct timeval *timeout );
-
+#if defined(__GNUC__)
+#if defined(__cplusplus)
+}
+#endif
+#endif
 void r_socket_task_switch(int sock);
 void r_socket_task_switch_select(void);
 int r_socket_sem_lock(void);
