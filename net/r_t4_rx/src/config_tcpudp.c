@@ -44,7 +44,7 @@ extern ER t4_callback(ID cepid, FN fncd , VP p_parblk);
 /**********************     TCP-related definition     **********************/
 /****************************************************************************/
 /* Number of LAN port, Number of Serial port */
-const UB _t4_channel_num = 2;
+const UB _t4_channel_num = 1;
 
 /***  Definition of TCP reception point (only port number needs to be set) ***/
 T_TCP_CREP tcp_crep[3] =

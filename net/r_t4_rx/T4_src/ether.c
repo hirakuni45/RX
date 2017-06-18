@@ -81,7 +81,7 @@ void _ether_proc_rcv(void)
 {
     sint16  len;
     _EP   *pep;
-    uchar  *buf;
+    void  *buf;
 
     /* Return when receive buffer has not released yet */
     /* The information has already stored in '_p_rcv_buf' */
@@ -89,7 +89,7 @@ void _ether_proc_rcv(void)
         return;
 
     /* Call: driver interface to receive */
-    len = lan_read(_ch_info_tbl->_ch_num, (B **) & buf);
+    len = lan_read(_ch_info_tbl->_ch_num, &buf);
 
     /*
      *  len > 0 : receive data size

@@ -75,3 +75,25 @@ void get_random_number(uint8_t *data, uint16_t len)
             break;
     }
 }
+
+
+void r_socket_task_switch(int sock)
+{
+}
+
+
+void r_socket_task_switch_select(void)
+{
+}
+
+
+int r_socket_sem_lock(void)
+{
+	return 0;
+}
+
+
+int r_socket_sem_release(void)
+{
+	return 0;
+}
