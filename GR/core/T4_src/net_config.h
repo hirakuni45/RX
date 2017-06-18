@@ -18,5 +18,4 @@
 #define __RX600 1
 #define __LIT 1
 
-#define TCPUDP_CHANNEL_NUM  6
 
