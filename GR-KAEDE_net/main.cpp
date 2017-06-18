@@ -18,20 +18,110 @@
 #include "chip/phy_base.hpp"
 #include "net/net_core.hpp"
 
+#include "r_t4_itcpip.h"
+
 namespace {
 
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  CMT タスク
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class cmt_task {
-		volatile uint32_t	count_;
-	public:
-		cmt_task() : count_(0) { }
 
+		volatile uint16_t	wait_timer_;
+		volatile uint16_t	tcpudp_time_cnt_;
+
+		volatile bool		open_timer_;
+		volatile bool		tcpip_flag_;
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		cmt_task() : wait_timer_(0), tcpudp_time_cnt_(0),
+			open_timer_(false), tcpip_flag_(false) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オペレーター ()
+		*/
+		//-----------------------------------------------------------------//
 		void operator() () {
-			++count_;
+			if(open_timer_) {
+				if(tcpip_flag_) {
+					_process_tcpip();
+					tcpudp_time_cnt_++;
+				}
+
+				// for wait function
+				if(wait_timer_ < 0xFFFF) {
+					wait_timer_++;
+				}
+			}
 		}
 
-		void set_count(uint32_t v = 0) { count_ = v; }
-		uint32_t get_count() const { return count_; }
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマーを有効、又は無効にする
+			@param[in]	f	「false」なら無効
+		*/
+		//-----------------------------------------------------------------//
+		void enable_timer(bool f = true) { open_timer_ = f; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  tcpudp のタイムカウントを取得
+			@param[in]	tcpudp のタイムカウント
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_tcpudp_time() const { return tcpudp_time_cnt_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	tcpip タスクの許可
+			@param[in]	f	不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable_tcpip(bool f = true)
+		{
+			tcpip_flag_ = f;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	tcpip タスクの状態
+			@return	許可の場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool get_tcpip() const { return tcpip_flag_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  カウントの設定
+			@param[in]	v	カウント値
+		*/
+		//-----------------------------------------------------------------//
+		void set_wait_timer(uint16_t v = 0) { wait_timer_ = v; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  カウントの取得
+			@return カウント値
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_wait_timer() const { return wait_timer_; }
 	};
+
 
 	typedef device::cmt_io<device::CMT0, cmt_task> CMT0;
 	CMT0	cmt_;
@@ -65,10 +155,6 @@ namespace {
 
 	typedef net::net_core<ETHER_IO> NET_CORE;
 	NET_CORE	net_(ether_);
-
-//	typedef utils::fixed_string<1024> FIXED_STR;
-//	typedef utils::stdout_term TERM;
-//	typedef utils::basic_format<utils::string_chaout<FIXED_STR, TERM> > sformat;
 }
 
 extern "C" {
@@ -231,8 +317,9 @@ extern "C" {
 		@brief	タイマーカウンターをリセット
 	 */
 	//-----------------------------------------------------------------//
-	void reset_timer(void) {
-		cmt_.at_task().set_count();
+	void reset_timer(void)
+	{
+		cmt_.at_task().set_wait_timer(0);
 	}
 
 
@@ -242,8 +329,196 @@ extern "C" {
 		@return	タイマーカウント
 	 */
 	//-----------------------------------------------------------------//
-	uint32_t get_timer(void) {
-		return cmt_.at_task().get_count();
+	uint16_t get_timer(void)
+	{
+		return cmt_.at_task().get_wait_timer();
+	}
+
+
+	uint16_t get_tcpudp_time(void)
+	{
+		return cmt_.at_task().get_tcpudp_time();
+	}
+
+
+	/////////////////////////////////////////////////////////////////////
+	//  eternet interface
+	/////////////////////////////////////////////////////////////////////
+	void lan_inthdr(void)
+	{
+///		InterruptsEnable();
+
+		if(cmt_.at_task().get_tcpip()) {
+			_process_tcpip();
+		}
+	}
+
+
+	void ena_int(void)
+	{
+		cmt_.at_task().enable_tcpip();
+	}
+
+
+	void dis_int(void)
+	{
+		cmt_.at_task().enable_tcpip(false);
+	}
+
+
+	void tcp_api_slp(int16_t cepid)
+	{
+		// same as udp_api_slp(). ->
+		/// R_BSP_InterruptsDisable();
+
+		// check LAN link stat
+		ether_.link_process();
+
+		/// R_BSP_InterruptsEnable();
+		/*<-*/
+
+		// If user uses "Real time OS", user may define "sleep task" here.
+	}
+
+
+	void udp_api_slp(int16_t cepid)
+	{
+		// R_ETHER_LinkProcess() is used in timer_interrupt(). It isn't necessary here. ->
+		/// R_BSP_InterruptsDisable();
+		// check LAN link stat
+		ether_.link_process();
+		/// R_BSP_InterruptsEnable();
+		// If user uses "Real time OS", user may define "sleep task" here.
+	}
+
+
+	void udp_api_wup(int16_t cepid)
+	{
+	}
+
+
+	void tcp_api_wup(int16_t cepid)
+	{
+		// If user uses "Real time OS", user may define "wake up task" here.
+	}
+
+
+	uint16_t tcpudp_get_time(void)
+	{
+		return cmt_.at_task().get_tcpudp_time();
+	}
+
+
+	void tcpudp_act_cyc(uint8_t cycact)
+	{
+		switch (cycact) {
+		case 0:
+			cmt_.at_task().enable_tcpip(false);
+			cmt_.at_task().enable_timer(false);
+			break;
+		case 1:
+			cmt_.at_task().enable_tcpip();
+			cmt_.at_task().enable_timer();
+			break;
+		default:
+			break;
+		}
+	}
+
+
+	void lan_reset(uint8_t lan_port_no)
+	{
+		ether_.close();
+		// R_ETHER_Control(CONTROL_POWER_OFF, param);
+	}
+
+
+	int16_t lan_read(uint8_t lan_port_no, void **buf)
+	{
+		return ether_.recv(buf);
+	}
+
+
+	int16_t rcv_buff_release(uint8_t lan_port_no)
+	{
+		return ether_.recv_buff_release();
+	}
+
+
+	int16_t lan_write(uint8_t lan_port_no, const void* hsrc, int16_t hlen, const void* bsrc, int16_t blen)
+	{
+		return ether_.write(hsrc, hlen, bsrc,blen);
+	}
+
+
+	void report_error(uint8_t lan_port_no, int16_t err_code, const void* err_data)
+	{
+		device::ether_stat_t::error_type t = device::ether_stat_t::error_type::none;
+		switch (err_code) {
+		case RE_LEN:
+			t = device::ether_stat_t::error_type::LEN;
+			break;
+		case RE_NETWORK_LAYER:
+			t = device::ether_stat_t::error_type::NETWORK_LAYER;
+			break;
+		case RE_TRANSPORT_LAYER:
+			t = device::ether_stat_t::error_type::TRANSPORT_LAYER;
+			break;
+		case RE_ARP_HEADER1:
+			t = device::ether_stat_t::error_type::ARP_HEADER1;
+			break;
+		case RE_ARP_HEADER2:
+			t = device::ether_stat_t::error_type::ARP_HEADER2;
+			break;
+		case RE_IP_HEADER1:
+			t = device::ether_stat_t::error_type::IP_HEADER1;
+			break;
+		case RE_IP_HEADER2:
+			t = device::ether_stat_t::error_type::IP_HEADER2;
+			break;
+		case RE_IP_HEADER3:
+			t = device::ether_stat_t::error_type::IP_HEADER3;
+			break;
+		case RE_IP_HEADER4:
+			t = device::ether_stat_t::error_type::IP_HEADER4;
+			break;
+		case RE_IP_HEADER5:
+			t = device::ether_stat_t::error_type::IP_HEADER5;
+			break;
+		case RE_IP_HEADER6:
+			t = device::ether_stat_t::error_type::IP_HEADER6;
+			break;
+		case RE_IP_HEADER7:
+			t = device::ether_stat_t::error_type::IP_HEADER7;
+			break;
+		case RE_IP_HEADER8:
+			t = device::ether_stat_t::error_type::IP_HEADER8;
+			break;
+		case RE_IP_HEADER9:
+			t = device::ether_stat_t::error_type::IP_HEADER9;
+			break;
+		case RE_TCP_HEADER1:
+			t = device::ether_stat_t::error_type::TCP_HEADER1;
+			break;
+		case RE_TCP_HEADER2:
+			t = device::ether_stat_t::error_type::TCP_HEADER2;
+			break;
+		case RE_UDP_HEADER1:
+			t = device::ether_stat_t::error_type::UDP_HEADER1;
+			break;
+		case RE_UDP_HEADER2:
+			t = device::ether_stat_t::error_type::UDP_HEADER2;
+			break;
+		case RE_UDP_HEADER3:
+			t = device::ether_stat_t::error_type::UDP_HEADER3;
+			break;
+		case RE_ICMP_HEADER1:
+			t = device::ether_stat_t::error_type::ICMP_HEADER1;
+			break;
+		default:
+			break;
+		}
+		ether_.report_error(t, err_data);
 	}
 }
 
@@ -252,6 +527,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
+	// NMI input pull-up
 	device::PORT3::PCR.B5 = 1; // P35(NMI) pull-up
 
 	{  // GR-KAEDE の SPI 端子のハードバグ回避
@@ -302,6 +578,7 @@ int main(int argc, char** argv)
 	sdc_.start();
 
 	{  // Ethernet の開始
+		ether_.set_intr_task(lan_inthdr);
 		uint8_t intr_level = 4;
 		ether_.start(intr_level);
 
