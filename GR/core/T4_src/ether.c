@@ -557,11 +557,11 @@ void _ether_arp_del(_ARP_ENTRY *ae)
 ***********************************************************************************************************************/
 void _ether_arp_init(void)
 {
-    uint16_t counter;
+    uint8_t counter;
     _ARP_ENTRY *ae;
 
     /* table clear for all channels */
-    for (counter = 0; counter < TCPUDP_CHANNEL_NUM; counter++)
+    for (counter = 0; counter < t4_channel_num; counter++)
     {
         ae = _ether_arp_tbl[counter];
         memset(ae->ae_pra, 0, (sizeof(_ARP_ENTRY) * _ip_tblcnt[counter]));

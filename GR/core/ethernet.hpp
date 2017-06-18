@@ -34,7 +34,7 @@ extern "C" {
 };
 
 
-// #define ETH_DEBUG
+#define ETH_DEBUG
 
 #ifdef ETH_DEBUG
 typedef utils::format debug_format;
@@ -108,7 +108,7 @@ namespace net {
 		};
 
 	private:
-		CEP			cep_[TCPUDP_CHANNEL_NUM];
+		CEP			cep_[TCP_CCEP_MAX + UDP_CCEP_MAX];
 
 		uint32_t	tcpudp_work_[2700];
 
@@ -210,7 +210,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		uint32_t new_connection()
 		{
-			for(uint32_t i = 0; i < TCPUDP_CHANNEL_NUM; ++i) {
+			for(uint32_t i = 0; i < tcp_ccep_num; ++i) {
 				if(!cep_[i].enable) {
 					cep_[i].enable = true;
 					return i + 1;
@@ -228,7 +228,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void end_connection(uint32_t cepid)
 		{
-			if(cepid > 0 && cepid <= TCPUDP_CHANNEL_NUM) {
+			if(cepid > 0 && cepid <= tcp_ccep_num) {
 				cep_[cepid - 1].recv_pos_ = 0;
 				cep_[cepid - 1].send_pos_ = 0;
 				cep_[cepid - 1].call_flag = false;
@@ -505,7 +505,7 @@ namespace net {
 		//-----------------------------------------------------------------//
         void update(uint32_t cepid)
 		{
-			if(cepid == 0 || cepid > TCPUDP_CHANNEL_NUM) return;
+			if(cepid == 0 || cepid > tcp_ccep_num) return;
 
 			TCP_API_STAT ercd = tcp_read_stat(cepid);
 
@@ -553,7 +553,7 @@ namespace net {
             }
 
 			// サービス
-			for(uint32_t i = 0; i < TCPUDP_CHANNEL_NUM; ++i) {
+			for(uint32_t i = 0; i < tcp_ccep_num; ++i) {
 				if(!cep_[i].enable) continue;
 
 				uint32_t cepid = i + 1;
@@ -576,7 +576,7 @@ namespace net {
 			byteq_err_t byteq_err;
 			uint16_t count;
 
-			if(cepid > 0 && cepid <= static_cast<uint32_t>(TCPUDP_CHANNEL_NUM)) { 
+			if(cepid > 0 && cepid <= static_cast<uint32_t>(6)) { 
 				switch (fncd){
 				/// UDP data received
 				case TEV_UDP_RCV_DAT:

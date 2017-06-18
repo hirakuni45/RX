@@ -143,14 +143,14 @@ void _process_tcpip(void)
                 }
             }
 #endif
-            for (counter = 0 ; counter < TCPUDP_CHANNEL_NUM; counter++)
+            for (counter = 0 ; counter < t4_channel_num; counter++)
             {
                 if ((_ch_info_head[counter]._rcvd == 1) && ((_ch_info_head[counter].flag & _TCBF_SND_ICMP) == 0))
                 {
                     break;
                 }
             }
-            if (counter >= TCPUDP_CHANNEL_NUM)
+            if (counter >= t4_channel_num)
             {
                 break;
             }
@@ -625,7 +625,7 @@ void _proc_rcv(void)
 
     _tcp_tcb = head_tcb;
 
-    for (ch = 0; ch < TCPUDP_CHANNEL_NUM; ch++)
+    for (ch = 0; ch < t4_channel_num; ch++)
     {
         _ch_info_tbl = &_ch_info_head[ch];
         _ether_proc_rcv();
@@ -1508,7 +1508,7 @@ void _proc_snd(void)
         _tcp_pre_timer_cnt = _tcp_timer_cnt;
 
 #if defined(_ETHER)
-        for (counter = 0;counter < TCPUDP_CHANNEL_NUM; counter++)
+        for (counter = 0;counter < t4_channel_num; counter++)
         {
             ae = _ether_arp_tbl[counter];
             _ch_info_tbl = &_ch_info_head[counter];
@@ -1693,7 +1693,7 @@ void _proc_snd(void)
 
     }
 
-    for (counter = 0; counter < TCPUDP_CHANNEL_NUM; counter++)
+    for (counter = 0; counter < t4_channel_num; counter++)
     {
         _ch_info_tbl = &_ch_info_head[counter];
 

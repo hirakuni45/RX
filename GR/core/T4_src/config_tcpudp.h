@@ -288,6 +288,11 @@ extern "C" {
 }
 #endif
 
+extern const uint8_t t4_channel_num;
+
+#define TCP_CREP_MAX  6
+#define TCP_CCEP_MAX  6
+#define UDP_CCEP_MAX  6
 
 #if defined(_TCP)
 extern T_TCP_CREP tcp_crep[];

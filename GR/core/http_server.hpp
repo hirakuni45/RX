@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstring>
 #include <functional>
+
 #include "ethernet_server.hpp"
 
 #include "common/sdc_io.hpp"

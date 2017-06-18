@@ -24,7 +24,7 @@
 #include "common/format.hpp"
 #include "common/string_utils.hpp"
 
-// #define FTP_DEBUG
+#define FTP_DEBUG
 
 extern "C" {
 	time_t get_time(void);
@@ -142,8 +142,8 @@ namespace net {
 			port_connection,
 
 			send_file,	///< Server ---> Client
-
 			recv_file,	///< Client ---> Server
+			close_port,	///< ポートをクローズ
 
 			recv_rename,	///< Client ---> Server (rename file name)
 
@@ -235,8 +235,10 @@ namespace net {
 		}
 
 
-		static void dir_list_sub_(const char* name, const FILINFO* fi, bool dir)
+		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option)
 		{
+			if(fi == nullptr) return;
+
 			char cdir = '-';
 			if(dir) {
 				cdir = 'd';
@@ -256,16 +258,10 @@ namespace net {
 		}
 
 
-		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+		static void dir_mlsd_func_(const char* name, const FILINFO* fi, bool dir, void* option)
 		{
 			if(fi == nullptr) return;
 
-			dir_list_sub_(name, fi, dir);
-		}
-
-
-		static void dir_mlsd_sub_(const char* name, const FILINFO* fi, bool dir)
-		{
 			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
 			char tmp[32];
 			make_date_time_(t, tmp, sizeof(tmp));
@@ -274,14 +270,6 @@ namespace net {
 				% fi->fsize
 				% tmp
 				% name;
-		}
-
-
-		static void dir_mlsd_func_(const char* name, const FILINFO* fi, bool dir, void* option)
-		{
-			if(fi == nullptr) return;
-
-			dir_mlsd_sub_(name, fi, dir);
 		}
 
 
@@ -569,6 +557,7 @@ namespace net {
 				if(param_ == nullptr) {
 					ctrl_format("501 No file name\n");
 					ctrl_flush();
+					task_ = task::close_port;
 					break;
 				}
 				{
@@ -577,6 +566,7 @@ namespace net {
 					if(!sdc_.probe(path)) {
 						ctrl_format("550 File '%s' not found\n") % path;
 						ctrl_flush();
+						task_ = task::close_port;
 						break;
 					}
 					uint32_t fsz = sdc_.size(path);
@@ -584,6 +574,7 @@ namespace net {
 					if(file_fp_ == nullptr) {
 						ctrl_format("450 Can't open %s \n") % path;
 						ctrl_flush();
+						task_ = task::close_port;
 						break;
 					}
 					if(pasv_enable_) {
@@ -716,6 +707,7 @@ namespace net {
 				if(param_ == nullptr) {
 					ctrl_format("501 No file name\n");
 					ctrl_flush();
+					task_ = task::close_port;
 					break;
 				}
 				{
@@ -725,6 +717,7 @@ namespace net {
 					if(file_fp_ == nullptr) {
 						ctrl_format("451 Can't open/create %s\n") % path;
 						ctrl_flush();
+						task_ = task::close_port;
 						break;
 					}
 					if(pasv_enable_) {
@@ -794,8 +787,6 @@ namespace net {
 				{
 					// check Date/Time param
 					if(parse_YYYYMMDDHHMMSS_(param_)) {
-//        else
-//          client << "550 Unable to modify time\r\n";
 						ctrl_format("200 Ok\n");
 						ctrl_flush();
 						break;
@@ -847,12 +838,19 @@ namespace net {
 							ctrl_format("550 File system not mount\n");
 						}
 						ctrl_flush();
-						if(pasv_enable_) {
-							data_.stop();
-						} else {
-							port_.stop();
-						}
 					}
+					if(pasv_enable_) {
+						data_.stop();
+					} else {
+						port_.stop();
+					}
+#if 0
+					if(task_ == task::command) {
+utils::format("Reconnection CTRL\n");
+						ctrl_.stop();
+						task_ = task::begin;
+					}
+#endif
 				}
 				break;
 
@@ -1180,6 +1178,15 @@ namespace net {
 						task_ = task::command;
 					}
 				}
+				break;
+
+			case task::close_port:
+				if(pasv_enable_) {
+					data_.stop();
+				} else {
+					port_.stop();
+				}
+				task_ = task::command;
 				break;
 
 			//--------------------------//

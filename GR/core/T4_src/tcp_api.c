@@ -110,7 +110,7 @@ void tcpudp_open(uint32_t *workp)
 
 	_ch_info_tbl = (_CH_INFO*)currp;
 	_ch_info_head = (_CH_INFO*)currp;
-	for(int counter = 0;counter < TCPUDP_CHANNEL_NUM; counter++) {
+	for(int counter = 0;counter < t4_channel_num; counter++) {
 		_ch_info_head[counter]._ch_num = counter;
 		_ch_info_head[counter].flag = 0;
 		_ch_info_head[counter]._rcvd = 0;
@@ -121,7 +121,7 @@ void tcpudp_open(uint32_t *workp)
 		memcpy(_ch_info_head[counter]._mymaskaddr, tcpudp_env[counter].maskaddr, IP_ALEN);
 		memcpy(_ch_info_head[counter]._mygwaddr,   tcpudp_env[counter].gwaddr, IP_ALEN);
 	}
-	currp = (uint32_t*)((uint8_t*)currp + (sizeof(_CH_INFO) * TCPUDP_CHANNEL_NUM));
+	currp = (uint32_t*)((uint8_t*)currp + (sizeof(_CH_INFO) * t4_channel_num));
 
 #if defined(_PPP)
 	ppp_sio_status    = 0;
@@ -131,9 +131,9 @@ void tcpudp_open(uint32_t *workp)
 #elif defined(_ETHER)
 	_ether_arp_tbl = (_ARP_ENTRY **)currp;
 
-	currp = (uint32_t *)((uint8_t *)currp + TCPUDP_CHANNEL_NUM * sizeof(_ARP_ENTRY *));
+	currp = (uint32_t *)((uint8_t *)currp + t4_channel_num * sizeof(_ARP_ENTRY *));
 
-	for(int counter = 0; counter < TCPUDP_CHANNEL_NUM; counter++) {
+	for(int counter = 0; counter < t4_channel_num; counter++) {
 		*(_ether_arp_tbl + counter) = ((_ARP_ENTRY *)currp);
 		currp = (uint32_t *)((uint8_t *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
 	}
@@ -190,7 +190,7 @@ static uint32_t get_udp_memory_size_(void)
 static uint32_t get_ip_memory_size_(void)
 {
     uint32_t ramsize = 0;
-    ramsize += (TCPUDP_CHANNEL_NUM * sizeof(_CH_INFO));
+    ramsize += (t4_channel_num * sizeof(_CH_INFO));
     return ramsize;
 }
 
@@ -199,8 +199,8 @@ static uint32_t get_ip_memory_size_(void)
 static uint32_t get_ether_memory_size_(void)
 {
 	uint32_t ramsize = 0;
-	ramsize += TCPUDP_CHANNEL_NUM * sizeof(_ARP_ENTRY *);
-	for(int count = 0; count < TCPUDP_CHANNEL_NUM; count++) {
+	ramsize += t4_channel_num * sizeof(_ARP_ENTRY *);
+	for(int count = 0; count < t4_channel_num; count++) {
 		ramsize += (_ip_tblcnt[count] * sizeof(_ARP_ENTRY));
 	}
     get_align_memory_size_(&ramsize);

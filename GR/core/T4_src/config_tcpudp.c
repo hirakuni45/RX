@@ -10,9 +10,15 @@
 /****************************************************************************/
 /**********************     TCP-related definition     **********************/
 /****************************************************************************/
+/* Number of LAN port, Number of Serial port */
+const uint8_t t4_channel_num = 1;
+
+/****************************************************************************/
+/**********************     TCP-related definition     **********************/
+/****************************************************************************/
 
 /***  Definition of TCP reception point (only port number needs to be set) ***/
-T_TCP_CREP tcp_crep[TCPUDP_CHANNEL_NUM] = {
+T_TCP_CREP tcp_crep[TCP_CREP_MAX] = {
 	{ 0x0000, { 0, 80 } },
 	{ 0x0000, { 0, 80 } },
 	{ 0x0000, { 0, 80 } },
@@ -26,7 +32,7 @@ const uint32_t tcp_crep_num = sizeof(tcp_crep) / sizeof(T_TCP_CREP);
 
 /***  Definition of TCP communication end point
       (only receive window size needs to be set) ***/
-T_TCP_CCEP tcp_ccep[TCPUDP_CHANNEL_NUM] = {
+T_TCP_CCEP tcp_ccep[TCP_CCEP_MAX] = {
     { 0, 0, 0, 0, 1460, 0 },
     { 0, 0, 0, 0, 1460, 0 },
     { 0, 0, 0, 0, 1460, 0 },
@@ -75,7 +81,7 @@ const uint8_t tcp_dack[] = {
 /***  Definition of UDP communication end point  ***/
 _UDP_CB  *_udp_cb;
 
-T_UDP_CCEP udp_ccep[TCPUDP_CHANNEL_NUM] = {
+T_UDP_CCEP udp_ccep[UDP_CCEP_MAX] = {
     { 0x0000, { 0, 1365 }, t4_udp_callback },
     { 0x0000, { 0, 1365 }, t4_udp_callback },
     { 0x0000, { 0, 1365 }, t4_udp_callback },
@@ -88,7 +94,7 @@ T_UDP_CCEP udp_ccep[TCPUDP_CHANNEL_NUM] = {
 const uint32_t udp_ccep_num = (sizeof(udp_ccep) / sizeof(T_UDP_CCEP));
 
 /***  TTL for multicast transmission  ***/
-const uint8_t multi_TTL[TCPUDP_CHANNEL_NUM] = {
+const uint8_t multi_TTL[] = {
 	1,
 	1,
 	1,

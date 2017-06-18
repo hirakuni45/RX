@@ -206,7 +206,9 @@ namespace net {
 		//-----------------------------------------------------------------//
         void stop()
 		{
-			tcp_sht_cep(cepid_, TMO_FEVR);
+			if(!connected()) {
+				tcp_sht_cep(cepid_, TMO_FEVR);
+			}
 			tcp_cls_cep(cepid_, TMO_FEVR);
 			ethernet::CEP& cep = ethernet_.at_cep(cepid_);
 			cep.call_flag = false;
