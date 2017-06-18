@@ -22,6 +22,10 @@
 
 namespace {
 
+	volatile bool tcpip_flag_ = false;
+
+	volatile uint32_t net_int_cnt_ = 0;
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  CMT タスク
@@ -33,7 +37,6 @@ namespace {
 		volatile uint16_t	tcpudp_time_cnt_;
 
 		volatile bool		open_timer_;
-		volatile bool		tcpip_flag_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -42,7 +45,7 @@ namespace {
 		*/
 		//-----------------------------------------------------------------//
 		cmt_task() : wait_timer_(0), tcpudp_time_cnt_(0),
-			open_timer_(false), tcpip_flag_(false) { }
+			open_timer_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -81,27 +84,6 @@ namespace {
 		*/
 		//-----------------------------------------------------------------//
 		uint16_t get_tcpudp_time() const { return tcpudp_time_cnt_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	tcpip タスクの許可
-			@param[in]	f	不許可の場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		void enable_tcpip(bool f = true)
-		{
-			tcpip_flag_ = f;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	tcpip タスクの状態
-			@return	許可の場合「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool get_tcpip() const { return tcpip_flag_; }
 
 
 		//-----------------------------------------------------------------//
@@ -348,21 +330,22 @@ extern "C" {
 	{
 ///		InterruptsEnable();
 
-		if(cmt_.at_task().get_tcpip()) {
+		if(tcpip_flag_) {
 			_process_tcpip();
+			++net_int_cnt_;
 		}
 	}
 
 
 	void ena_int(void)
 	{
-		cmt_.at_task().enable_tcpip();
+		tcpip_flag_ = true;
 	}
 
 
 	void dis_int(void)
 	{
-		cmt_.at_task().enable_tcpip(false);
+		tcpip_flag_ = false;
 	}
 
 
@@ -413,11 +396,11 @@ extern "C" {
 	{
 		switch (cycact) {
 		case 0:
-			cmt_.at_task().enable_tcpip(false);
+			tcpip_flag_ = false;
 			cmt_.at_task().enable_timer(false);
 			break;
 		case 1:
-			cmt_.at_task().enable_tcpip();
+			tcpip_flag_ = true;
 			cmt_.at_task().enable_timer();
 			break;
 		default:
@@ -453,6 +436,7 @@ extern "C" {
 
 	void report_error(uint8_t lan_port_no, int16_t err_code, const void* err_data)
 	{
+/// utils::format("report_error: %d\n") % err_code;
 		device::ether_stat_t::error_type t = device::ether_stat_t::error_type::none;
 		switch (err_code) {
 		case RE_LEN:
@@ -587,10 +571,18 @@ int main(int argc, char** argv)
 	}
 
 	uint32_t cnt = 0;
+	volatile uint32_t nnn = 0;
 	while(1) {  // 100Hz (10ms interval)
 		cmt_.sync();
 
 		net_.service();
+
+#if 0
+		if(nnn != net_int_cnt_) {
+			nnn = net_int_cnt_;
+			utils::format("Net intr: %u\n") % net_int_cnt_;
+		}
+#endif
 
 		sdc_.service();
 
