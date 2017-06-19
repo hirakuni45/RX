@@ -59,6 +59,7 @@ namespace device {
 
 		uint32_t	count_[static_cast<int>(error_type::num_)];
 
+		bool		link_;
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -67,7 +68,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		ether_stat_t() :
 			recv_request_(0), recv_bytes_(0), send_request_(0), send_bytes_(0),
-			count_{ 0 } { }
+			count_{ 0 }, link_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -352,8 +353,17 @@ namespace device {
 			ETHRC::IPGR = 0x00000014;
 
 			// Set little endian mode
+#ifdef LITTLE_ENDIAN
     		EDMAC::EDMR.DE = 1;
-
+#else
+    		EDMAC::EDMR.DE = 0;
+#endif
+			{
+				uint32_t a = reinterpret_cast<uint32_t>(&ether_buffers_);
+				if(a & 0x1f) {  // 32 bytes aligned test
+					utils::format("Alignd error: Ether buffer adr: %08X\n") % a;
+				}
+			}
 			uint32_t rxa = reinterpret_cast<uint32_t>(app_rx_desc_);
 			if(rxa & 0x1f) {  // 32 bytes aligned test
 				utils::format("Alignd error: Ether RX adr: %08X\n") % rxa;
@@ -660,6 +670,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	割り込みの制御
+			@param[in]	flag	「false」の場合禁止
+		*/
+		//-----------------------------------------------------------------//
+		void enable_interrupt(bool flag = true)
+		{
+			if(flag) {
+				// Set Ethernet interrupt level and enable
+				ICU::IPR.GROUPAL1 = intr_level_;
+				ICU::IER.GROUPAL1 = 1;
+				ICU::GENAL1.EN4   = 1;
+			} else {
+				// Disable Ethernet interrupt.
+				ICU::GENAL1.EN4   = 0;
+				ICU::IER.GROUPAL1 = 0;
+				ICU::IPR.GROUPAL1 = 0;  // intr level
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  コントローラーを有効にしてスタート
 			@param[in]	level	割り込みレベル
 			@return エラーなら「false」
@@ -745,7 +777,7 @@ namespace device {
 				if(RACT != (app_rx_desc_->status & RACT)) {  // When receive data exists
 					// Move to next descriptor
 					app_rx_desc_->status |= RACT;
-					app_rx_desc_->status &= ~(RFP1 | RFP0 | RFE | RFS9_RFOVER | RFS8_RAD | RFS7_RMAF | \
+					app_rx_desc_->status &= ~(RFP1 | RFP0 | RFE | RFS9_RFOVER | RFS8_RAD | RFS7_RMAF |
                                      RFS4_RRF | RFS3_RTLF | RFS2_RTSF | RFS1_PRE | RFS0_CERF);
 					app_rx_desc_ = app_rx_desc_->next;
 				}
@@ -1094,7 +1126,7 @@ namespace device {
 		void callback_link_on()
 		{
 			utils::format("EtherC Link-ON (callback)\n");
-
+			stat_.link_ = true;
 		}
 
 
@@ -1106,7 +1138,7 @@ namespace device {
 		void callback_link_off()
 		{
 			utils::format("EtherC Link-OFF (callback)\n");
-
+			stat_.link_ = false;
 		}
 
 
