@@ -315,10 +315,7 @@ namespace net {
 			debug_format("DHCP write: %d, %d (sum: %d, udpsum: %d)\n")
 				% head_len % body_len % (int)packet.ipv4.checksum % (int)packet.udp.checksum;
 
-			uint8_t tmp[head_len + body_len];
-			memcpy(tmp, &packet.ether, head_len);
-			memcpy(&tmp[head_len], &packet.ipv4, body_len);
-			auto wl = io_.write(tmp, head_len + body_len);
+			auto wl = io_.write(&packet.ether, head_len, &packet.ipv4, body_len);
 			debug_format("DHCP write: %d\n") % wl;
 
 			return true;
