@@ -40,6 +40,7 @@ Includes   <System Includes> , "Project Includes"
 #include "ether.h"
 #include "ip.h"
 #include "tcp.h"
+#include "r_t4_rx/src/config_tcpudp.h"
 
 #include <stdio.h>
 
@@ -63,13 +64,13 @@ uchar    *_ether_p_rcv_buff;
 /***********************************************************************************************************************
 Exported global variables (read from other files)
 ***********************************************************************************************************************/
-extern far const UB _t4_channel_num;
+/// extern far const UB _t4_channel_num;
 extern UB *data_link_buf_ptr;    /* Buffer pointer to Datalink layer */
 extern _TX_HDR  _tx_hdr;    /* Area for transmit header */
-extern far UH  const _ip_tblcnt[];
+/// extern far UH  const _ip_tblcnt[];
 
 #if defined(_MULTI)
-extern TCPUDP_ENV tcpudp_env[];
+/// extern TCPUDP_ENV tcpudp_env[];
 #endif
 
 /***********************************************************************************************************************

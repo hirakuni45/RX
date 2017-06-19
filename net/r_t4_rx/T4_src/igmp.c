@@ -15,6 +15,8 @@
 
 #include "igmp.h"
 
+#include "r_t4_rx/src/config_tcpudp.h"
+
 /*#define debug*/
 
 #define C10SEC  1000                                                /* 10ms int 1000 count = 10x1000=10sec */
@@ -22,10 +24,11 @@
 const uint8_t IGMP_BENDER_CODE[3] = {0x01,0x00,0x5E};               /* multicast packet mac head 3byte */
 
 
-extern UH get_timer(void);
+extern uint16_t get_timer(void);
 
-extern UB   _myethaddr[][6];
-extern TCPUDP_ENV tcpudp_env[];
+/// extern UB   _myethaddr[][6];
+/// extern TCPUDP_ENV tcpudp_env[];
+
 extern UB *data_link_buf_ptr;
 
 IGMP_GROUP_ARRAY IGMP_WK[MULTI_CAST_MAX_GROUP_COUNT];               /* multicast group memory */

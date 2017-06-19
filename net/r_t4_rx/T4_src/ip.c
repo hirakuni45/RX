@@ -50,6 +50,8 @@ Includes   <System Includes> , "Project Includes"
  #include "igmp.h"
 #endif
 
+#include "r_t4_rx/src/config_tcpudp.h"
+
 #include <stdio.h>
 
 /***********************************************************************************************************************
@@ -80,16 +82,16 @@ extern _TX_HDR  _tx_hdr;    /* Transmit header area */
 extern _TCB   *_tcp_tcb;    /* TCB (Transport Control Block) */
 
 #if defined(_ETHER)
-extern far UH const _ip_tblcnt;
+/// extern far UH const _ip_tblcnt;
 extern uchar *_ether_p_rcv_buff;
 #endif
 
 #if defined(_ETHER)
-extern far UH const _ip_tblcnt;
+/// extern far UH const _ip_tblcnt;
 #endif
 #if defined(_MULTI)
-extern TCPUDP_ENV tcpudp_env[];
-extern far UB const __multi_TTL[];
+/// extern TCPUDP_ENV tcpudp_env[];
+/// extern far UB const __multi_TTL[];
 #endif
 
 

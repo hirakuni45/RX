@@ -50,6 +50,8 @@ Includes   <System Includes> , "Project Includes"
  #include "igmp.h"
 #endif
 
+#include "r_t4_rx/src/config_tcpudp.h"
+
 #include <stdio.h>
 
 /***********************************************************************************************************************
@@ -75,25 +77,25 @@ Private global variables and functions
 
 #if defined(_ETHER)
 extern UB *_ether_p_rcv_buff;
-extern far const UH  _ip_tblcnt[];
+/// extern far const UH  _ip_tblcnt[];
 #endif /* _ETHER */
 
 #if defined(_TCP)
-extern far const UB _t4_channel_num;
-extern far const UH  _tcp_mss[];
-extern far UW  _tcp_initial_seqno[];
-extern far const UH  _tcp_2msl[];
-extern far const UH  _tcp_rt_tmo_rst[];
-extern far const T_TCP_CREP tcp_crep[];
-extern far const T_TCP_CCEP tcp_ccep[];
-extern far const H __tcpcepn;
-extern far UB _tcp_dack[];
+/// extern far const UB _t4_channel_num;
+/// extern far const UH  _tcp_mss[];
+/// extern far UW  _tcp_initial_seqno[];
+/// extern far const UH  _tcp_2msl[];
+/// extern far const UH  _tcp_rt_tmo_rst[];
+/// extern far const T_TCP_CREP tcp_crep[];
+/// extern far const T_TCP_CCEP tcp_ccep[];
+/// extern far const H __tcpcepn;
+/// extern far UB _tcp_dack[];
 extern UB *data_link_buf_ptr;
 #endif
 
 #if defined(_UDP)
 extern _UDP_CB  *_udp_cb;
-extern far const H   __udpcepn;
+/// extern far const H   __udpcepn;
 #endif
 
 #if defined(_PPP)

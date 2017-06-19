@@ -46,6 +46,8 @@ Includes   <System Includes> , "Project Includes"
 #include "ip.h"
 #include "tcp.h"
 #include "udp.h"
+#include "r_t4_rx/src/config_tcpudp.h"
+
 
 /***********************************************************************************************************************
 Macro definitions
@@ -63,22 +65,22 @@ Exported global variables (to be accessed by other files)
 Private global variables and functions
 ***********************************************************************************************************************/
 
-extern far const UB _t4_channel_num;
+/// extern far const UB _t4_channel_num;
 extern _TCB   *_tcp_tcb;
 extern _TCB   *head_tcb;
-extern TCPUDP_ENV tcpudp_env[];
-extern far const T_TCP_CCEP tcp_ccep[];
-extern far const H __tcpcepn;
-extern far const H __tcprepn;
+/// extern TCPUDP_ENV tcpudp_env[];
+/// extern far const T_TCP_CCEP tcp_ccep[];
+/// extern far const H __tcpcepn;
+/// extern far const H __tcprepn;
 extern UH _tcp_timer_cnt;
 extern UH _tcp_pre_timer_cnt;
 
 #if defined(_UDP)
-extern far const H __udpcepn;
+/// extern far const H __udpcepn;
 #endif
 
 #if defined(_ETHER)
-extern far UH const _ip_tblcnt[];
+/// extern far UH const _ip_tblcnt[];
 _ARP_ENTRY   **_ether_arp_tbl;
 #endif
 #if defined(_PPP)

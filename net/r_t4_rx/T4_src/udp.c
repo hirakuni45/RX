@@ -46,6 +46,8 @@ Includes   <System Includes> , "Project Includes"
 #include "ip.h"
 #include "tcp.h"
 #include "udp.h"
+#include "r_t4_rx/src/config_tcpudp.h"
+
 
 /***********************************************************************************************************************
 Macro definitions
@@ -65,8 +67,8 @@ Private global variables and functions
 
 #if defined(_UDP)
 _UDP_CB  *_udp_cb;
-extern far const T_UDP_CCEP udp_ccep[];
-extern far const H __udpcepn;
+/// extern far const T_UDP_CCEP udp_ccep[];
+/// extern far const H __udpcepn;
 extern far const UB _udp_enable_zerochecksum[];
 extern UB *data_link_buf_ptr;
 #endif
