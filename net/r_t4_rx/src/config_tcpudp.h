@@ -43,8 +43,3 @@ extern const uint16_t _ip_tblcnt[2];
 extern TCPUDP_ENV tcpudp_env[2];
 
 extern uint8_t _myethaddr[2][6];
-
-
-
-
-extern uint8_t _myethaddr[][6];
