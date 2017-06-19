@@ -25,8 +25,8 @@
 * History : DD.MM.YYYY Version  Description
 *         : 01.04.2014 1.00     First Release
 ***********************************************************************************************************************/
-#ifndef __TYPE_H__
-#define __TYPE_H__
+#ifndef TYPE_H
+#define TYPE_H
 
 #define _TCP_UNIT_TIME  10    /* 10ms */
 
