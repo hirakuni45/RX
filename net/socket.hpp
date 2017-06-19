@@ -8,6 +8,7 @@
 //=====================================================================//
 #include <cstdint>
 
+#include "r_t4_rx/src/config_tcpudp.h"
 #include "r_socket_rx_if.h"
 
 namespace net {
@@ -30,12 +31,18 @@ namespace net {
 			auto ret = R_SOCKET_Open();
 			if(ret < 0) {
 				if(ret == -1) {
-					utils::format("Open socket memory empty\n");
+					utils::format("Socket open memory empty\n");
 				} else {
-					utils::format("Open socket fail\n");
+					utils::format("Socket open fail\n");
 				}
 			} else {
-				utils::format("Socket start: %u bytes\n") % static_cast<uint32_t>(ret);
+			const uint8_t* ip = tcpudp_env[0].ipaddr;
+			utils::format("Socket start: (%d.%d.%d.%d) %u bytes\n")
+				% static_cast<int>(ip[0])
+				% static_cast<int>(ip[1])
+				% static_cast<int>(ip[2])
+				% static_cast<int>(ip[3])
+				% static_cast<uint32_t>(ret);
 			}
 		}
 
