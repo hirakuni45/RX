@@ -12,8 +12,10 @@
 #include "common/input.hpp"
 #include "net/net_tools.hpp"
 
-#ifdef BIG_ENDIAN
-#elif LITTLE_ENDIAN
+#if defined(BIG_ENDIAN)
+//
+#elif defined(LITTLE_ENDIAN)
+//
 #else
 #error "dhcp_client.hpp requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
 #endif

@@ -9,8 +9,12 @@
 #include <cstdint>
 #include <cstring>
 
-#ifdef BIG_ENDIAN
-#elif LITTLE_ENDIAN
+#include "r_tcpip_private.h"
+
+#if defined(BIG_ENDIAN)
+//
+#elif defined(LITTLE_ENDIAN)
+//
 #else
 #error "net_tools.hpp requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
 #endif

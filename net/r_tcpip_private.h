@@ -8,9 +8,18 @@
 //=====================================================================//
 #include <stdint.h>
 
-#include "t4define.h"
+#if (defined(__GNUC__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__))
+#ifndef BIG_ENDIAN
+#define BIG_ENDIAN
+#endif
+#elif (defined(__GNUC__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))
+#ifndef LITTLE_ENDIAN
+#define LITTLE_ENDIAN
+#endif
+#else
+#error "r_tcpip_private.h requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
+#endif
 
-#define __RX600 1
-#define __LIT 1
+#include "t4define.h"
 
 void get_random_number(uint8_t *, uint16_t);
