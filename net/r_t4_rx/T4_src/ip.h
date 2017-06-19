@@ -122,7 +122,6 @@
 
 typedef struct
 {
-
     uchar  ip_ver_len;
     uchar  ip_tos;
     uint16  ip_total_len;
@@ -246,7 +245,7 @@ uchar _ip_check_multicast(uchar *ipaddr);
 uchar _ip_check_broadcast(uchar *ipaddr);
 sint16 _ppp_snd_ip(uchar *data, uint16 len);
 
-
+void dump_ip_header(const _IP_HDR *p);
 
 #endif	/*multi include guard*/
 

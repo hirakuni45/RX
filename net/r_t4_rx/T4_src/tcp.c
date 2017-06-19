@@ -714,8 +714,10 @@ void _proc_rcv(void)
 {
     _IP_PKT  *pip;
     _IP_HDR  *piph;
+#if defined(_ICMP)
     _ICMP_PKT *picmp;
     _ICMP_HDR *picmph;
+#endif
     _TCP_HDR *ptcph;
     _TCP_PHDR phdr;
     uint16  seg_size, sum16;
@@ -753,6 +755,9 @@ void _proc_rcv(void)
             goto _err_proc_rcv;
         }
 
+#ifdef DUMP_IP_HEADER
+		dump_ip_header(piph);
+#endif
         switch (piph->ip_proto_num)
         {
 #if defined(_TCP)

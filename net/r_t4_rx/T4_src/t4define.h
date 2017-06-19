@@ -1,5 +1,5 @@
-#ifndef _T4DEFINE_H_
-#define _T4DEFINE_H_
+#ifndef T4DEFINE_H
+#define T4DEFINE_H
 
 #define _TCP
 #define _UDP
@@ -14,5 +14,8 @@
 
 #define _ETHER
 
-#endif	/*#ifndef _T4DEFINE_H_*/
+// for debug
+// #define DUMP_IP_HEADER
+// #define DUMP_EP_HEADER
 
+#endif

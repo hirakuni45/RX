@@ -50,6 +50,8 @@ Includes   <System Includes> , "Project Includes"
  #include "igmp.h"
 #endif
 
+#include <stdio.h>
+
 /***********************************************************************************************************************
 Macro definitions
 ***********************************************************************************************************************/
@@ -423,5 +425,26 @@ uchar _ip_check_broadcast(uchar *ipaddr)
 	}
 }
 #endif
+
+void dump_ip_header(const _IP_HDR *p)
+{
+	if(p->ip_proto_num == _IPH_UDP) return;
+
+	printf("IP_HDR:  ");
+	printf("  proto_num: %d", (int)p->ip_proto_num);
+	printf("  total_len: %d\n", (int)net2hs(p->ip_total_len));
+
+	printf("  ver_len:   %d\n", (int)p->ip_ver_len);
+	printf("  tos:       %d\n", (int)p->ip_tos);
+	printf("  id:        %d\n", (int)net2hs(p->ip_id));
+	printf("  fragoff:   %d\n", (int)net2hs(p->ip_fragoff));
+	printf("  ttl:       %d\n", (int)p->ip_ttl);
+	printf("  chksum:    %d\n", (int)net2hs(p->ip_chksum));
+	const uint8_t* ip = p->ip_src;
+	printf("  src:       %d.%d.%d.%d\n", (int)ip[0], (int)ip[1], (int)ip[2], (int)ip[3]);
+	ip = p->ip_dst;
+	printf("  dst:       %d.%d.%d.%d\n", (int)ip[0], (int)ip[1], (int)ip[2], (int)ip[3]);
+} 
+
 
 

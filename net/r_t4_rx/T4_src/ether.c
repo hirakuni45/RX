@@ -41,6 +41,8 @@ Includes   <System Includes> , "Project Includes"
 #include "ip.h"
 #include "tcp.h"
 
+#include <stdio.h>
+
 /***********************************************************************************************************************
 Macro definitions
 ***********************************************************************************************************************/
@@ -130,6 +132,10 @@ void _ether_proc_rcv(void)
     _ch_info_tbl->_p_rcv_buf.len = len - _ETH_LEN;
     _ch_info_tbl->_p_rcv_buf.pip = &(pep->data[0]);
     _ch_info_tbl->_p_rcv_buf.ip_rcv = 0;
+
+#ifdef DUMP_EP_HEADER
+	dump_ep_header(pep);
+#endif
 
     /* Find the packet type */
     switch (pep->eh.eh_type)
@@ -641,3 +647,19 @@ void _ether_arp_init(void)
     return;
 }
 
+
+void dump_ep_header(const _EP *p)
+{
+	uint16_t type = hs2net(p->eh.eh_type);
+	if(type == EPT_IP || type == EPT_ARP) {
+		printf("EP:  ");
+		printf("type(%08X): %04X\n", (int)&p->eh.eh_type, (int)type);
+		const uint8_t *ip;
+		ip = p->eh.eh_dst;
+		printf("  dst(%08X):  %02X-%02X-%02X-%02X-%02X-%02X\n", (int)ip,
+			(int)ip[0], (int)ip[1], (int)ip[2], (int)ip[3], (int)ip[4], (int)ip[5]);
+		ip = p->eh.eh_src;
+		printf("  src(%08X):  %02X-%02X-%02X-%02X-%02X-%02X\n", (int)ip,
+			(int)ip[0], (int)ip[1], (int)ip[2], (int)ip[3], (int)ip[4], (int)ip[5]);
+	}
+}
