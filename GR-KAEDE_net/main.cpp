@@ -22,9 +22,16 @@
 
 namespace {
 
+	typedef device::ETHERC0 ETHERC;      // Eternet Controller
+	typedef device::EDMAC0 EDMAC;        // Ethernet DMA Controller
+	typedef chip::phy_base<ETHERC> PHY;  // Ethernet PHY
+	typedef device::ether_io<ETHERC, EDMAC, PHY> ETHER_IO;
+	ETHER_IO 	ether_;
+
 	volatile bool tcpip_flag_ = false;
 
 	volatile uint32_t net_int_cnt_ = 0;
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -125,15 +132,6 @@ namespace {
 
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
-
-
-	volatile uint32_t ethc_count_;
-
-	typedef device::ETHERC0 ETHERC;      // Eternet Controller
-	typedef device::EDMAC0 EDMAC;        // Ethernet DMA Controller
-	typedef chip::phy_base<ETHERC> PHY;  // Ethernet PHY
-	typedef device::ether_io<ETHERC, EDMAC, PHY> ETHER_IO;
-	ETHER_IO 	ether_;
 
 	typedef net::net_core<ETHER_IO> NET_CORE;
 	NET_CORE	net_(ether_);
@@ -324,12 +322,13 @@ extern "C" {
 
 
 	/////////////////////////////////////////////////////////////////////
-	//  eternet interface
+	//
+	//  renesas ip-stack interface
+	//
 	/////////////////////////////////////////////////////////////////////
 	void lan_inthdr(void)
 	{
 ///		InterruptsEnable();
-
 		if(tcpip_flag_) {
 			_process_tcpip();
 			++net_int_cnt_;
@@ -352,12 +351,10 @@ extern "C" {
 	void tcp_api_slp(int16_t cepid)
 	{
 		// same as udp_api_slp(). ->
-		/// R_BSP_InterruptsDisable();
-
+		ether_.enable_interrupt(false);
 		// check LAN link stat
 		ether_.link_process();
-
-		/// R_BSP_InterruptsEnable();
+		ether_.enable_interrupt();
 		/*<-*/
 
 		// If user uses "Real time OS", user may define "sleep task" here.
@@ -367,10 +364,10 @@ extern "C" {
 	void udp_api_slp(int16_t cepid)
 	{
 		// R_ETHER_LinkProcess() is used in timer_interrupt(). It isn't necessary here. ->
-		/// R_BSP_InterruptsDisable();
+		ether_.enable_interrupt(false);
 		// check LAN link stat
 		ether_.link_process();
-		/// R_BSP_InterruptsEnable();
+		ether_.enable_interrupt();
 		// If user uses "Real time OS", user may define "sleep task" here.
 	}
 
@@ -411,26 +408,41 @@ extern "C" {
 
 	void lan_reset(uint8_t lan_port_no)
 	{
+		utils::format("EterC: close\n");
 		ether_.close();
 		// R_ETHER_Control(CONTROL_POWER_OFF, param);
+		utils::format("lan_reset\n");
 	}
 
 
 	int16_t lan_read(uint8_t lan_port_no, void **buf)
 	{
-		return ether_.recv(buf);
+		auto ret = ether_.recv(buf);
+		int16_t rc;
+		if(ret > 0) {
+			rc = ret;
+		} else if(ret == 0) {
+			rc = -1;
+		} else {
+			rc = -2;
+		}
+
+//		rc = lan_read_for_test(buf, rc);
+
+		return rc;
 	}
 
 
 	int16_t rcv_buff_release(uint8_t lan_port_no)
 	{
-		return ether_.recv_buff_release();
+		ether_.recv_buff_release();
+		return 0;
 	}
 
 
 	int16_t lan_write(uint8_t lan_port_no, const void* hsrc, int16_t hlen, const void* bsrc, int16_t blen)
 	{
-		return ether_.write(hsrc, hlen, bsrc,blen);
+		return ether_.write(hsrc, hlen, bsrc, blen);
 	}
 
 
