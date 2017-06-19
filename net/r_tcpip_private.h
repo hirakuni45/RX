@@ -8,16 +8,7 @@
 //=====================================================================//
 #include <stdint.h>
 
-#define _far
-#define far
-
-#define _ETHER
-#define _UDP
-#define _TCP
-#define _ICMP
-#define _IGMP
-#define _MULTI
-#define _TCP_DACK
+#include "t4define.h"
 
 #define __RX600 1
 #define __LIT 1
