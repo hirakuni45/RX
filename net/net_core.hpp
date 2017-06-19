@@ -8,11 +8,8 @@
 #include "common/renesas.hpp"
 #include "net/dhcp_client.hpp"
 
-#include "r_t4_itcpip.h"
-
+#include "r_t4_rx/src/config_tcpudp.h"
 #include "net/socket.hpp"
-
-extern TCPUDP_ENV tcpudp_env[];
 
 namespace net {
 
@@ -103,6 +100,7 @@ namespace net {
 			bool ret = io_.open(mac);
 			if(ret) {
 				utils::format("Ether open OK\n");
+				memcpy(&_myethaddr[0][0], mac, 6);				
 			} else {
 				utils::format("Ether open NG\n");
 			}
@@ -179,7 +177,13 @@ namespace net {
 						break;						
 					}
 
-					utils::format("TCP/IP start: %u bytes\n") % ramsize;
+					const uint8_t* ip = tcpudp_env[0].ipaddr;
+					utils::format("TCP/IP start: (%d.%d.%d.%d) %u bytes\n")
+						% static_cast<int>(ip[0])
+						% static_cast<int>(ip[1])
+						% static_cast<int>(ip[2])
+						% static_cast<int>(ip[3])
+						% ramsize;
 #endif
 					task_ = task::main_init;
 				}
@@ -192,6 +196,20 @@ namespace net {
 
 			case task::main_loop:
 				io_.link_process();
+
+
+				if(link_interval_ >= 100) {
+					io_.polling_link_status();
+					link_interval_ = 0;
+				}
+				++link_interval_;
+
+
+				if(!io_.get_stat().link_) {
+					task_ = task::wait_link;
+				}
+
+
 
 				break;
 
