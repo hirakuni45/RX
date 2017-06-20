@@ -39,10 +39,13 @@
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
 /* for size_t */
-/// #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include "r_t4_itcpip.h"
 #include "r_socket_rx_config.h"
 /// #include "r_errno.h"
+
 /***********************************************************************************************************************
 Macro definitions
 ******************************************************************************/
@@ -208,6 +211,7 @@ Typedef definitions
 ***********************************************************************************************************************/
 typedef int SOCKET;
 
+#if 0
 #if !defined(__ITRON_DATA_TYPE)
 # if defined(__R8C__)  || defined(__H8__)\
   ||  defined(__M16C__) || defined(__M16C80__) || defined(__M32C80__)\
@@ -244,6 +248,8 @@ typedef UH           ATR;
 #else
 typedef W            FN;
 #endif
+#endif
+
 #endif
 
 /* Data types. */
@@ -403,54 +409,62 @@ typedef struct _tag_BSDSocket
     volatile uint8_t    finrcv;
 } BSDSocket;
 
-#define FD_SETSIZE  32UL
 
-#ifndef _BITS_BYTE
-#define _BITS_BYTE  8UL
-#endif
-typedef int32_t __fd_mask;
+#define R_FD_SETSIZE  32UL
+
+#define R_NFDBITS   32UL
+typedef uint32_t r_fd_mask;
+
+#define r_howmany(x, y) (((x) + ((y) - 1)) / (y))
 
 //#define __NFDBITS ((unsigned)(sizeof(__fd_mask) * _BITS_BYTE)) /* bits per mask */
-#define __NFDBITS   32UL
-#define __howmany(x, y) (((x) + ((y) - 1)) / (y))
 
-typedef struct _tagfd_set
+typedef struct
 {
-    __fd_mask fds_bits[__howmany(FD_SETSIZE, __NFDBITS)];
-} fd_set;
+    r_fd_mask fds_bits[r_howmany(R_FD_SETSIZE, R_NFDBITS)];
+} r_fd_set;
 
-#define FD_SET(n, p) \
-    ((p)->fds_bits[(unsigned)(n) / __NFDBITS] |= (1 << ((unsigned)(n) % __NFDBITS)))
-#define FD_CLR(n, p) \
-    ((p)->fds_bits[(unsigned)(n) / __NFDBITS] &= ~(1UL << ((unsigned)(n) % __NFDBITS)))
-#define FD_ISSET(n, p) \
-    ((p)->fds_bits[(unsigned)(n) / __NFDBITS] & (1 << ((unsigned)(n) % __NFDBITS)))
-#define FD_COPY(f, t)   memcpy(t, f, sizeof(*(f)))
-#define FD_ZERO(p)      memset(p, 0, sizeof(*(p)))
 
-#if FD_SETSIZE  <= 32
-#define FD_ISZERO(p)    \
+/// #define _BITS_BYTE  8UL
+
+/// #if R_FD_SETSIZE  <= 32
+
+#define R_FD_SET(n, p) \
+    ((p)->fds_bits[(unsigned)(n) / R_NFDBITS] |= (1 << ((unsigned)(n) % R_NFDBITS)))
+#define R_FD_CLR(n, p) \
+    ((p)->fds_bits[(unsigned)(n) / R_NFDBITS] &= ~(1UL << ((unsigned)(n) % R_NFDBITS)))
+#define R_FD_ISSET(n, p) \
+    ((p)->fds_bits[(unsigned)(n) / R_NFDBITS] & (1 << ((unsigned)(n) % R_NFDBITS)))
+
+#define R_FD_COPY(f, t)   memcpy(t, f, sizeof(*(f)))
+#define R_FD_ZERO(p)      memset(p, 0, sizeof(*(p)))
+
+#define R_FD_ISZERO(p)    \
     ((p)->fds_bits[0] == 0)
-#elif FD_SETSIZE <= (32*2)
-#define FD_ISZERO(p)    \
+
+#if 0
+/// #elif FD_SETSIZE <= (32*2)
+#define R_FD_ISZERO(p)    \
     (((p)->fds_bits[0] == 0) && ((p)->fds_bits[1] == 0))
-#elif FD_SETSIZE <= (32*3)
-#define FD_ISZERO(p)    \
+/// #elif FD_SETSIZE <= (32*3)
+#define R_FD_ISZERO(p)    \
     (((p)->fds_bits[0] == 0) && ((p)->fds_bits[1] == 0) && \
      ((p)->fds_bits[2] == 0))
-#else
-#define FD_ISZERO(p)    \
+/// #else
+#define R_FD_ISZERO(p)    \
     (((p)->fds_bits[0] == 0) && ((p)->fds_bits[1] == 0) && \
      (((p)->fds_bits[2] == 0) && ((p)->fds_bits[3] == 0))
-#endif      /* FD_SETSIZE */
+#endif
+/// #endif      /* FD_SETSIZE */
 
-#define T4_TCP_CLS_CEP_TMOUT (10)
 
-struct timeval
+typedef struct
 {
     long tv_sec;
     long tv_usec;
-};
+} r_timeval;
+
+#define T4_TCP_CLS_CEP_TMOUT (10)
 
 /******************************************************************************
 Public Functions
@@ -463,35 +477,33 @@ extern "C" {
 int R_SOCKET_Open( void );
 void R_SOCKET_Close( void );
 
-int  socket( int domain, int type, int protocol );
-int  bind( int sock, const struct sockaddr * name, int namelen );
-int  listen( int sock, int backlog );
-int  connect( int sock, struct sockaddr * name, int namelen );
-int  accept( int sock, struct sockaddr * address, int * address_len );
-int  sendto( int sock,  const void * buffer, size_t length, int flags,
+int  r_socket( int domain, int type, int protocol );
+int  r_bind( int sock, const struct sockaddr * name, int namelen );
+int  r_listen( int sock, int backlog );
+int  r_connect( int sock, struct sockaddr * name, int namelen );
+int  r_accept( int sock, struct sockaddr * address, int * address_len );
+int  r_sendto( int sock,  const void * buffer, size_t length, int flags,
              const struct sockaddr * to, int tolen );
-int  send( int sock,  const char * buffer, size_t length, int flags );
-int  recvfrom( int sock, void * buffer, size_t length, int flags,
+int  r_send( int sock,  const char * buffer, size_t length, int flags );
+int  r_recvfrom( int sock, void * buffer, size_t length, int flags,
                struct sockaddr * from, int * fromlen );
-int  recv( int sock, void * buffer, size_t length, int flags );
-int  getpeername(int sock, struct sockaddr *address, int *address_len);
-int  setsockopt( int sock, int level, int option_name, const void * optval,
+int  r_recv( int sock, void * buffer, size_t length, int flags );
+int  r_getpeername(int sock, struct sockaddr *address, int *address_len);
+int  r_setsockopt( int sock, int level, int option_name, const void * optval,
                  int option_len );
-int  closesocket( int sock );
-int  fcntl ( int sock, int command, int flags );
-int  select ( int nfds, fd_set *p_readfds, fd_set *p_writefds, fd_set *p_errorfds,
-              struct timeval *timeout );
+int  r_closesocket( int sock );
+int  r_fcntl ( int sock, int command, int flags );
+int  r_select ( int nfds, r_fd_set *p_readfds, r_fd_set *p_writefds, r_fd_set *p_errorfds, r_timeval *timeout );
 #if defined(__GNUC__)
 #if defined(__cplusplus)
 }
 #endif
 #endif
+
 void r_socket_task_switch(int sock);
 void r_socket_task_switch_select(void);
 int r_socket_sem_lock(void);
 int r_socket_sem_release(void);
-
-
 
 uint16_t htons(uint16_t n);
 uint16_t ntohs(uint16_t n);

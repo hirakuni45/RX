@@ -33,8 +33,8 @@
 *         :                    Added R_SOCKET_Close().
 *         :                    Omitted Ether-2 channels support.
 ***********************************************************************************************************************/
-#ifndef __R_SOCKET_RX_CONFIG_H__
-#define __R_SOCKET_RX_CONFIG_H__
+#ifndef R_SOCKET_RX_CONFIG_H
+#define R_SOCKET_RX_CONFIG_H
 
 #ifndef MAX_UDP_CCEP
 #define MAX_UDP_CCEP        (6)
@@ -59,5 +59,5 @@
 #define BSD_RCV_BUFSZ        (1460)
 #define BSD_SND_BUFSZ        (1460)
 
-#endif /* __R_SOCKET_CONFIG_H__ */
+#endif /* R_SOCKET_CONFIG_H */
 

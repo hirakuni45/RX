@@ -190,7 +190,7 @@ void R_SOCKET_Close( void )
 *                           Don't care
 * Return Value : SOCKET socket - An integer representing socket descriptor
 ******************************************************************************/
-int socket( int domain, int type, int protocol )
+int r_socket( int domain, int type, int protocol )
 {
     SOCKET sock, ifirst, ilast;
     int semp_ret;
@@ -281,7 +281,7 @@ int socket( int domain, int type, int protocol )
 *                namelen - length of the sockaddr structure.
 * Return Value : 0 for success, SOCKET_ERROR indicates an error.
 *****************************************************************************/
-int bind( int sock, const struct sockaddr * name, int namelen )
+int r_bind( int sock, const struct sockaddr * name, int namelen )
 {
     struct sockaddr_in *local_addr;
     unsigned short lPort;
@@ -348,7 +348,7 @@ int bind( int sock, const struct sockaddr * name, int namelen )
 *                namelen - length of the sockaddr structure.
 * Return Value : 0 for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int connect( int sock, struct sockaddr *name, int namelen )
+int r_connect( int sock, struct sockaddr *name, int namelen )
 {
     struct sockaddr_in *addr;
     unsigned long remote_ip;
@@ -509,7 +509,7 @@ int connect( int sock, struct sockaddr *name, int namelen )
 *                queued (fixed to 1 ONLY - not use internally )
 * Return Value : 0 for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int listen( int sock, int backlog )
+int r_listen( int sock, int backlog )
 {
     SOCKET peer_socket;
     int     peer_cepid, cepid, ercd;
@@ -595,7 +595,7 @@ int listen( int sock, int backlog )
 *                   SOCKET_ERROR indicates an error.
 *              : if successful, peersocket = socket
 ******************************************************************************/
-int accept( int sock, struct sockaddr * address, int * address_len )
+int r_accept( int sock, struct sockaddr * address, int * address_len )
 {
     uint32_t this_id;
     uint32_t this_peer_id;
@@ -752,7 +752,7 @@ acp_chk_ret_socket:             /* Check return socket before return */
 *                flags - message flags. Currently this field is not supported and must be 0.
 * Return Value : Number of bytes sent for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int send( int sock,  const char * buffer, size_t length, int flags )
+int r_send( int sock,  const char * buffer, size_t length, int flags )
 {
     int  cepid;
     ER ercd = 0;
@@ -908,7 +908,7 @@ int send( int sock,  const char * buffer, size_t length, int flags )
 *                tolen - length of the sockaddr structure.
 * Return Value : Number of bytes sent for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int sendto( int sock,  const void * buffer, size_t length, int flags,
+int r_sendto( int sock,  const void * buffer, size_t length, int flags,
             const struct sockaddr * to, int tolen )
 {
     struct sockaddr_in *addr;
@@ -1042,7 +1042,7 @@ int sendto( int sock,  const void * buffer, size_t length, int flags,
 *                flags - NA
 * Return Value : Number of bytes returned for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int recv( int sock, void * buffer, size_t length, int flags )
+int r_recv( int sock, void * buffer, size_t length, int flags )
 {
     struct  sockaddr from;      /* No use. To pass par check */
     int     fromlen;            /* No use. To pass par check */
@@ -1059,7 +1059,7 @@ int recv( int sock, void * buffer, size_t length, int flags )
         errno = EPROTONOSUPPORT;
         return SOCKET_ERROR;
     }
-    return recvfrom( sock, buffer, length, flags, &from, &fromlen );
+    return r_recvfrom( sock, buffer, length, flags, &from, &fromlen );
 }
 /******************************************************************************
 * Function Name: recvfrom
@@ -1075,7 +1075,7 @@ int recv( int sock, void * buffer, size_t length, int flags )
 * Return Value : Number of bytes returned for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
 
-int recvfrom( int sock, void * buffer, size_t length, int flags, struct sockaddr * from, int * fromlen )
+int r_recvfrom( int sock, void * buffer, size_t length, int flags, struct sockaddr * from, int * fromlen )
 {
     struct sockaddr_in *remoteaddr;
     int BytesRead = 0;
@@ -1406,7 +1406,7 @@ int recvfrom( int sock, void * buffer, size_t length, int flags, struct sockaddr
 * Arguments    : sock - Socket descriptor returned from a previous call to socket
 * Return Value : E_OK for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int closesocket( int sock )
+int r_closesocket( int sock )
 {
     ER ercd = E_OK;
     int  cepid;
@@ -1949,7 +1949,7 @@ ER t4_udp_generic_callback(ID cepid, FN fncd , VP p_parblk)
 *                flags - NA
 * Return Value : E_OK for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int fcntl (int sock, int command, int flags)
+int r_fcntl (int sock, int command, int flags)
 {
     int ret_code = E_OK;
 
@@ -2008,15 +2008,14 @@ int fcntl (int sock, int command, int flags)
 * Caveats      : No consideration for timeout / signals releasing yet
 * Return Value : the total number of ready descriptors in all the output sets.
 ******************************************************************************/
-int select (int nfds, fd_set *p_readfds, fd_set *p_writefds, fd_set *p_errorfds,
-            struct timeval *timeout )
+int r_select (int nfds, r_fd_set *p_readfds, r_fd_set *p_writefds, r_fd_set *p_errorfds, r_timeval *timeout )
 {
     int tot_count = 0, sockfd;
     uint16_t timer1;
     uint16_t timer2;
-    fd_set readfds;
-    fd_set writefds;
-    fd_set errorfds;
+    r_fd_set readfds;
+    r_fd_set writefds;
+    r_fd_set errorfds;
 #ifdef R_SOCKET_PAR_CHECK
     if (select_par_check(nfds, p_readfds, p_writefds, p_errorfds, timeout) != true)
     {
@@ -2048,25 +2047,25 @@ int select (int nfds, fd_set *p_readfds, fd_set *p_writefds, fd_set *p_errorfds,
     }
     timer1 = tcpudp_get_time();
 
-    FD_COPY(p_readfds,  &readfds);
-    FD_COPY(p_writefds, &writefds);
-    FD_COPY(p_errorfds, &errorfds);
+    R_FD_COPY(p_readfds,  &readfds);
+    R_FD_COPY(p_writefds, &writefds);
+    R_FD_COPY(p_errorfds, &errorfds);
 
     while (1)
     {
-        FD_COPY(&readfds, p_readfds);
-        FD_COPY(&writefds, p_writefds);
-        FD_COPY(&errorfds, p_errorfds);
+        R_FD_COPY(&readfds, p_readfds);
+        R_FD_COPY(&writefds, p_writefds);
+        R_FD_COPY(&errorfds, p_errorfds);
         tot_count = 0;
         if ( p_readfds != NULL )
         {
             for ( sockfd = 0; sockfd < nfds; sockfd++ )
             {
-                if ( FD_ISSET(sockfd, p_readfds))
+                if ( R_FD_ISSET(sockfd, p_readfds))
                 {
                     if ( is_sel_readable( sockfd ) == 0 )
                     {
-                        FD_CLR(sockfd, p_readfds);
+                        R_FD_CLR(sockfd, p_readfds);
                     }
                     else
                     {
@@ -2079,11 +2078,11 @@ int select (int nfds, fd_set *p_readfds, fd_set *p_writefds, fd_set *p_errorfds,
         {
             for ( sockfd = 0; sockfd < nfds; sockfd++ )
             {
-                if ( FD_ISSET(sockfd, p_writefds))
+                if ( R_FD_ISSET(sockfd, p_writefds))
                 {
                     if ( is_sel_writeable( sockfd ) == 0 )
                     {
-                        FD_CLR(sockfd, p_writefds);
+                        R_FD_CLR(sockfd, p_writefds);
                     }
                     else
                     {
@@ -2097,11 +2096,11 @@ int select (int nfds, fd_set *p_readfds, fd_set *p_writefds, fd_set *p_errorfds,
         {
             for ( sockfd = 0; sockfd < nfds; sockfd++ )
             {
-                if ( FD_ISSET(sockfd, p_errorfds))
+                if ( R_FD_ISSET(sockfd, p_errorfds))
                 {
                     if ( is_sel_errpending(sockfd ) == 0 )
                     {
-                        FD_CLR(sockfd, p_errorfds);
+                        R_FD_CLR(sockfd, p_errorfds);
                     }
                     else
                     {

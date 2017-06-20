@@ -47,8 +47,6 @@ namespace net {
 
 ///		uint32_t	tcpudp_work_[21504 / sizeof(uint32_t)];
 
-		socket		socket_;
-
 		void set_tcpudp_env_()
 		{
 			const DHCP_INFO& info = dhcp_.get_info();
@@ -160,7 +158,7 @@ namespace net {
 			case task::setup_tcpudp:
 				{
 #if 1
-					socket_.start();
+					socket::start();
 #else
 					// Get the size of the work area used by the T4 (RAM size).
 					uint32_t ramsize = tcpudp_get_ramsize();

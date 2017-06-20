@@ -25,8 +25,8 @@
 *         : 01.04.2014 1.00    First Release
 *         : 01.12.2015 1.01    IGMP added.
 ***********************************************************************************************************************/
-#ifndef S2_RX_CONFIG_HEADER_FILE
-#define S2_RX_CONFIG_HEADER_FILE
+#ifndef R_T4_RX_CONFIG_H
+#define R_T4_RX_CONFIG_H
 
 /***********************************************************************************************************************
 Configuration Options
@@ -35,6 +35,6 @@ Configuration Options
     Now, T4 config file is "config_tcpudp.c". Please modefy "config_tcpudp.c" directly.
 */
 
-#endif /* T4_RX_CONFIG_HEADER_FILE */
+#endif /* T4_RX_CONFIG_H */
 
 
