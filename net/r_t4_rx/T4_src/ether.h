@@ -155,6 +155,7 @@ _ARP_ENTRY *_ether_arp_add(uchar *ipaddr, uchar *ethaddr);
 #endif
 
 void dump_ep_header(const _EP *p);
+void dump_ep_header_filter(const _EP *p);
 
 /***********************************************************************************************************************
 Exported global variables

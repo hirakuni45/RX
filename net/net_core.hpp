@@ -41,6 +41,9 @@ namespace net {
 		typedef dhcp_client<ETHER_IO> DHCP;
 		DHCP		dhcp_;
 
+		typedef socket<ETHER_IO> SOCKET;
+		SOCKET		socket_;
+
 		task		task_;
 
 		uint8_t		link_interval_;
@@ -82,7 +85,7 @@ namespace net {
 			@param[in]	io	インサーネット・ドライバー・クラス
 		*/
 		//-----------------------------------------------------------------//
-		net_core(ETHER_IO& io) : io_(io), dhcp_(io),
+		net_core(ETHER_IO& io) : io_(io), dhcp_(io), socket_(io),
 			task_(task::wait_link), link_interval_(0)
 			{ }
 
@@ -158,7 +161,10 @@ namespace net {
 			case task::setup_tcpudp:
 				{
 #if 1
-					socket::start();
+					if(!socket<ETHER_IO>::start()) {
+						task_ = task::stall;
+						break;
+					}
 #else
 					// Get the size of the work area used by the T4 (RAM size).
 					uint32_t ramsize = tcpudp_get_ramsize();
@@ -189,6 +195,9 @@ namespace net {
 
 			case task::main_init:
 				io_.link_process();
+
+				socket_.open(3000);
+
 				task_ = task::main_loop;
 				break;
 
@@ -207,6 +216,8 @@ namespace net {
 					task_ = task::wait_link;
 				}
 
+
+				socket_.service();
 
 
 				break;
@@ -227,5 +238,4 @@ namespace net {
 			}
 		}
 	};
-
 }

@@ -136,6 +136,8 @@ void _ether_proc_rcv(void)
 
 #ifdef DUMP_EP_HEADER
 	dump_ep_header(pep);
+#else
+	dump_ep_header_filter(pep);
 #endif
 
     /* Find the packet type */
@@ -663,4 +665,14 @@ void dump_ep_header(const _EP *p)
 		printf("  src(%08X):  %02X-%02X-%02X-%02X-%02X-%02X\n", (int)ip,
 			(int)ip[0], (int)ip[1], (int)ip[2], (int)ip[3], (int)ip[4], (int)ip[5]);
 	}
+}
+
+
+void dump_ep_header_filter(const _EP *p)
+{
+//	const uint8_t *ip;
+//	ip = p->eh.eh_dst;
+//	if(ip[0] == 192 && ip[1] == 168 && ip[2] == 3 && ip[3] == 7) {
+//		dump_ep_header(p);
+//	}
 }

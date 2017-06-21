@@ -62,6 +62,7 @@ Includes   <System Includes> , "Project Includes"
 #include "r_socket_par_check.h"
 /// #include "r_errno.h"
 
+#include "r_t4_rx/src/config_tcpudp.h"
 
 /******************************************************************************
 Typedef definitions
@@ -75,9 +76,9 @@ Macro definitions
 /******************************************************************************
 Imported global variables and functions (from other files)
 ******************************************************************************/
-extern T_TCP_CCEP tcp_ccep[MAX_TCP_CCEP];
-extern T_TCP_CREP tcp_crep[MAX_TCP_CCEP];
-extern T_UDP_CCEP udp_ccep[MAX_UDP_CCEP];
+/// extern T_TCP_CCEP tcp_ccep[MAX_TCP_CCEP];
+/// extern T_TCP_CREP tcp_crep[MAX_TCP_CCEP];
+/// extern T_UDP_CCEP udp_ccep[MAX_UDP_CCEP];
 
 extern ER udp_force_clr( ID cepid);
 extern ER tcp_force_clr( ID cepid);
@@ -120,7 +121,7 @@ int R_SOCKET_Open(void)
 {
     int i;
     ER  ercd;
-    W   size;
+    int size;
 
     memset(tcp_ccep, 0x00, MAX_TCP_CCEP * sizeof(T_TCP_CCEP));
     memset(tcp_crep, 0x00, MAX_TCP_CREP * sizeof(T_TCP_CREP));
@@ -157,14 +158,14 @@ int R_SOCKET_Open(void)
     size = tcpudp_get_ramsize();
     if (size > sizeof(tcpudp_work))
     {
-///        for ( ;; );
+		printf("R_SOCKET_Open: empty memory (%d, %d)\n", (int)size, (int)sizeof(tcpudp_work));
 		return -1;
     }
 
     ercd = tcpudp_open(tcpudp_work);
     if (ercd != E_OK)
     {
-///        for ( ;; );
+		printf("R_SOCKET_Open: tcpudp_open error\n");
 		return -2;
     }
 	return size;
@@ -272,6 +273,7 @@ int r_socket( int domain, int type, int protocol )
     return sock;
 }
 
+
 /****************************************************************************
 * Function Name: bind
 * Description  : The bind function assigns a name to an unnamed socket.
@@ -281,9 +283,9 @@ int r_socket( int domain, int type, int protocol )
 *                namelen - length of the sockaddr structure.
 * Return Value : 0 for success, SOCKET_ERROR indicates an error.
 *****************************************************************************/
-int r_bind( int sock, const struct sockaddr * name, int namelen )
+int r_bind( int sock, const sockaddr * name, int namelen )
 {
-    struct sockaddr_in *local_addr;
+    sockaddr_in *local_addr;
     unsigned short lPort;
     int cepno;
 
@@ -302,12 +304,12 @@ int r_bind( int sock, const struct sockaddr * name, int namelen )
         /* binding to a new address; or the socket has been shut down. */
         return SOCKET_ERROR;
     }
-    if ( namelen < (int)sizeof(struct sockaddr_in) )
+    if ( namelen < (int)sizeof(sockaddr_in) )
     {
         errno = EINVAL;          /* The address_len argument is not a valid length for the address family. */
         return SOCKET_ERROR;     /* improper name string */
     }
-    local_addr = (struct sockaddr_in *)name;
+    local_addr = (sockaddr_in *)name;
 
     lPort = local_addr->sin_port;
     /* If ipaddr is IPADDR_ANY, should get addr of local adaptor and bind to it? */
@@ -348,9 +350,9 @@ int r_bind( int sock, const struct sockaddr * name, int namelen )
 *                namelen - length of the sockaddr structure.
 * Return Value : 0 for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int r_connect( int sock, struct sockaddr *name, int namelen )
+int r_connect( int sock, sockaddr *name, int namelen )
 {
-    struct sockaddr_in *addr;
+    sockaddr_in *addr;
     unsigned long remote_ip;
     unsigned short remote_port;
     ER ercd = SOCKET_ERROR;
@@ -403,12 +405,12 @@ int r_connect( int sock, struct sockaddr *name, int namelen )
         errno = EPROTOTYPE;
         return SOCKET_ERROR;
     }
-    if ( namelen < (int)sizeof(struct sockaddr_in) )
+    if ( namelen < (int)sizeof(sockaddr_in) )
     {
         errno = EINVAL;     /* The address_len argument is not a valid length for the address family; or invalid address family in the sockaddr structure. */
         return SOCKET_ERROR;
     }
-    addr = (struct sockaddr_in *)name;
+    addr = (sockaddr_in *)name;
 
     remote_port = addr->sin_port;
     remote_ip  = addr->sin_addr.S_un.S_addr;
@@ -595,13 +597,13 @@ int r_listen( int sock, int backlog )
 *                   SOCKET_ERROR indicates an error.
 *              : if successful, peersocket = socket
 ******************************************************************************/
-int r_accept( int sock, struct sockaddr * address, int * address_len )
+int r_accept( int sock, sockaddr * address, int * address_len )
 {
     uint32_t this_id;
     uint32_t this_peer_id;
     int  cepid;
     int  peer_socket, ret_socket;
-    struct sockaddr_in *padr;
+    sockaddr_in *padr;
     int  peer_cepid;
     ER ercd = SOCKET_ERROR;
 
@@ -677,11 +679,12 @@ int r_accept( int sock, struct sockaddr * address, int * address_len )
                     goto acp_chk_ret_socket;
                 }
             }
-            padr = (struct sockaddr_in *)address;
+
+            padr = (sockaddr_in *)address;
             padr->sin_family = AF_INET;
             padr->sin_port = sockets[ret_socket].dstaddr.portno;
             padr->sin_addr.S_un.S_addr = sockets[ret_socket].dstaddr.ipaddr;
-            *address_len = (int)(unsigned int)sizeof(struct sockaddr_in);
+            *address_len = (int)(unsigned int)sizeof(sockaddr_in);
             sockets[sock].event = -1;
 
             peer_socket = dup_tcp_socket(sock);
@@ -742,6 +745,8 @@ acp_chk_ret_socket:             /* Check return socket before return */
     }
     return ret_socket;
 }
+
+
 /******************************************************************************
 * Function Name: send
 * Description  : The send function is used to send outgoing data to a connected
@@ -749,18 +754,17 @@ acp_chk_ret_socket:             /* Check return socket before return */
 * Arguments    : sock - Socket descriptor
 *                buffer - application data buffer containing data to transmit
 *                length - length of data in bytes
-*                flags - message flags. Currently this field is not supported and must be 0.
 * Return Value : Number of bytes sent for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int r_send( int sock,  const char * buffer, size_t length, int flags )
+int r_send( int sock,  const void *buffer, uint32_t length)
 {
     int  cepid;
-    ER ercd = 0;
+    int ercd = 0;
     uint32_t this_id;
 
     errno = E_OK;
 #ifdef R_SOCKET_PAR_CHECK
-    if (send_par_check(sock, buffer, length, flags) != true)
+    if (send_par_check(sock, buffer, length) != true)
     {
         return E_PAR;
     }
@@ -896,6 +900,8 @@ int r_send( int sock,  const char * buffer, size_t length, int flags )
     }
     return ercd;
 }
+
+
 /******************************************************************************
 * Function Name: sendto
 * Description  : The sendto function is used to send outgoing data on a socket
@@ -903,15 +909,13 @@ int r_send( int sock,  const char * buffer, size_t length, int flags )
 * Arguments    : sock - Socket descriptor returned from a previous call to socket
 *                buffer - application data buffer containing data to transmit
 *                length - length of data in bytes
-*                flags - message flags. Currently this field is not supported and must be 0.
 *                to - pointer to the the sockaddr structure containing the destination address.
 *                tolen - length of the sockaddr structure.
 * Return Value : Number of bytes sent for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int r_sendto( int sock,  const void * buffer, size_t length, int flags,
-            const struct sockaddr * to, int tolen )
+int r_sendto( int sock,  const void * buffer, uint32_t length, const sockaddr * to, int tolen )
 {
-    struct sockaddr_in *addr;
+    sockaddr_in *addr;
     ER ercd = E_OK;
     uint32_t this_id;
     int  cepid;
@@ -919,7 +923,7 @@ int r_sendto( int sock,  const void * buffer, size_t length, int flags,
     errno = E_OK;
     this_id = sockets[sock].create_id;
 #ifdef R_SOCKET_PAR_CHECK
-    if (sendto_par_check(sock, buffer, length, flags, to, tolen) != true)
+    if (sendto_par_check(sock, buffer, length, to, tolen) != true)
     {
         return E_PAR;
     }
@@ -935,7 +939,7 @@ int r_sendto( int sock,  const void * buffer, size_t length, int flags,
         errno = ENOBUFS;
         return SOCKET_ERROR;
     }
-    if ( tolen < (int)sizeof(struct sockaddr_in) )
+    if ( tolen < (int)sizeof(sockaddr_in) )
     {
         errno = EINVAL;         /* The dest_len argument is not a valid length for the address family. */
         return SOCKET_ERROR;
@@ -954,7 +958,7 @@ int r_sendto( int sock,  const void * buffer, size_t length, int flags,
             return SOCKET_ERROR;
         }
         cepid = sock + 1 - MAX_TCP_CCEP;
-        addr = (struct sockaddr_in *)to;
+        addr = (sockaddr_in *)to;
 
         if ( sockets[sock].state < BSD_CONNECTED )
         {
@@ -1032,6 +1036,8 @@ int r_sendto( int sock,  const void * buffer, size_t length, int flags,
     }
     return ercd;
 }
+
+
 /******************************************************************************
 * Function Name: recv
 * Description  : The recv() function is used to receive incoming data that has been
@@ -1039,16 +1045,15 @@ int r_sendto( int sock,  const void * buffer, size_t length, int flags,
 * Arguments    : sock - Socket descriptor returned from a previous call to socket
 *                buffer - application data receive buffer
 *                length - buffer length in bytes
-*                flags - NA
 * Return Value : Number of bytes returned for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int r_recv( int sock, void * buffer, size_t length, int flags )
+int r_recv(int sock, void * buffer, uint32_t length)
 {
-    struct  sockaddr from;      /* No use. To pass par check */
+    sockaddr from;      /* No use. To pass par check */
     int     fromlen;            /* No use. To pass par check */
 #ifdef R_SOCKET_PAR_CHECK
 
-    if (recv_par_check(sock, buffer, length, flags) != true)
+    if (recv_par_check(sock, buffer, length) != true)
     {
         return E_PAR;
     }
@@ -1059,8 +1064,10 @@ int r_recv( int sock, void * buffer, size_t length, int flags )
         errno = EPROTONOSUPPORT;
         return SOCKET_ERROR;
     }
-    return r_recvfrom( sock, buffer, length, flags, &from, &fromlen );
+    return r_recvfrom( sock, buffer, length, &from, &fromlen );
 }
+
+
 /******************************************************************************
 * Function Name: recvfrom
 * Description  : The recvfrom() function is used to receive incoming data that has been
@@ -1068,16 +1075,14 @@ int r_recv( int sock, void * buffer, size_t length, int flags )
 * Arguments    : sock - Socket descriptor returned from a previous call to socket
 *                buffer - application data receive buffer
 *                length - buffer length in bytes
-*                flags - NA
 *                from - pointer to the the sockaddr structure that will be filled
 *                       in with the destination address.
 *                fromlen - size of buffer pointed by from.
 * Return Value : Number of bytes returned for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-
-int r_recvfrom( int sock, void * buffer, size_t length, int flags, struct sockaddr * from, int * fromlen )
+int r_recvfrom( int sock, void * buffer, uint32_t length, sockaddr * from, int * fromlen )
 {
-    struct sockaddr_in *remoteaddr;
+    sockaddr_in*remoteaddr;
     int BytesRead = 0;
     unsigned char * buf;
     int  cepid;
@@ -1086,7 +1091,7 @@ int r_recvfrom( int sock, void * buffer, size_t length, int flags, struct sockad
     uint32_t this_id;
 
 #ifdef R_SOCKET_PAR_CHECK
-    if (recvfrom_par_check(sock, buffer, length, flags, from, fromlen) != true)
+    if (recvfrom_par_check(sock, buffer, length, from, fromlen) != true)
     {
         return E_PAR;
     }
@@ -1305,7 +1310,7 @@ int r_recvfrom( int sock, void * buffer, size_t length, int flags, struct sockad
             /* Must return the addr also */
             if ( from != NULL )
             {
-                remoteaddr = (struct sockaddr_in *)from;
+                remoteaddr = (sockaddr_in *)from;
                 remoteaddr->sin_family = AF_INET;
                 remoteaddr->sin_port = sockets[sock].dstaddr.portno;
                 remoteaddr->sin_port = sockets[sock].dstaddr.portno;
@@ -1313,7 +1318,7 @@ int r_recvfrom( int sock, void * buffer, size_t length, int flags, struct sockad
             }
             if ( fromlen != NULL )
             {
-                *fromlen = sizeof(struct sockaddr_in); /* fixed? why? */
+                *fromlen = sizeof(sockaddr_in); /* fixed? why? */
             }
             return BytesRead;
         }
@@ -1377,7 +1382,7 @@ int r_recvfrom( int sock, void * buffer, size_t length, int flags, struct sockad
                     sockets[sock].rcvLen -= BytesRead;
                     if ( from != NULL )
                     {
-                        remoteaddr = (struct sockaddr_in *)from;
+                        remoteaddr = (sockaddr_in *)from;
                         remoteaddr->sin_family = AF_INET;
                         remoteaddr->sin_port = sockets[sock].dstaddr.portno;
                         remoteaddr->sin_port = sockets[sock].dstaddr.portno;
@@ -1385,7 +1390,7 @@ int r_recvfrom( int sock, void * buffer, size_t length, int flags, struct sockad
                     }
                     if ( fromlen != NULL )
                     {
-                        *fromlen = sizeof(struct sockaddr_in); /* fixed? why? */
+                        *fromlen = sizeof(sockaddr_in); /* fixed? why? */
                     }
                     return BytesRead;
                 }
@@ -1570,6 +1575,7 @@ int r_closesocket( int sock )
     }
     return ercd;
 }
+
 
 /******************************************************************************
 * ID                : 1.0
@@ -1946,7 +1952,7 @@ ER t4_udp_generic_callback(ID cepid, FN fncd , VP p_parblk)
 *                retrieving and changing the permissions of file, or locking a file for edit
 * Arguments    : sock - Socket descriptor returned from a previous call to socket
 *                command - Command to execute
-*                flags - NA
+				 flags - flags
 * Return Value : E_OK for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
 int r_fcntl (int sock, int command, int flags)
@@ -2137,6 +2143,7 @@ int r_select (int nfds, r_fd_set *p_readfds, r_fd_set *p_writefds, r_fd_set *p_e
     return tot_count;
 }
 
+
 /*********** helper function *******************************/
 /******************************************************************************
 * Function Name: htons
@@ -2221,6 +2228,7 @@ int how_many_closed(ID sock_type )
     }
     return found;
 }
+
 
 /******************************************************************************
 * Function Name: is_sel_readable, is_sel_writeable, is_sel_errpending
@@ -2327,6 +2335,8 @@ static int is_sel_writeable(int socks)
 
     return can_write;
 }
+
+
 // TODO : What sort of error can I track
 // TODO : Does the socket layer get all information from T4?
 static int is_sel_errpending(int socks)
@@ -2379,6 +2389,7 @@ static int is_sel_errpending(int socks)
     return can_err;
 }
 
+
 /******************************************************************************
 * Function Name: dup_tcp_socket
 * Description  : Make a duplicate socket
@@ -2429,6 +2440,8 @@ static int dup_tcp_socket( int sock )           // Make a duplicate of a socket
 #endif
     return i;
 }
+
+
 /******************************************************************************
 * Function Name: reset_socket
 * Description  : Clean up a TCP socket without affecting the underlying T4

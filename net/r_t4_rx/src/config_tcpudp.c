@@ -47,7 +47,7 @@ extern ER t4_callback(ID cepid, FN fncd , VP p_parblk);
 const uint8_t _t4_channel_num = 1;
 
 /***  Definition of TCP reception point (only port number needs to be set) ***/
-T_TCP_CREP tcp_crep[6] =
+T_TCP_CREP tcp_crep[MAX_TCP_CREP] =
 {
     /* { attribute of reception point, {local IP address, local port number}} */
     { 0x0000, { 0, 1024 } },
@@ -56,6 +56,8 @@ T_TCP_CREP tcp_crep[6] =
     { 0x0000, { 0, 1027 } },
     { 0x0000, { 0, 1028 } },
     { 0x0000, { 0, 1029 } },
+    { 0x0000, { 0, 1030 } },
+    { 0x0000, { 0, 1031 } },
 };
 
 /* Total number of TCP reception points */
@@ -63,7 +65,7 @@ const uint16_t __tcprepn = sizeof(tcp_crep) / sizeof(T_TCP_CREP);
 
 /***  Definition of TCP communication end point
       (only receive window size needs to be set) ***/
-T_TCP_CCEP tcp_ccep[6] =
+T_TCP_CCEP tcp_ccep[MAX_TCP_CCEP] =
 {
     /* { attribute of TCP communication end point,
          top address of transmit window buffer, size of transmit window buffer,
@@ -76,7 +78,8 @@ T_TCP_CCEP tcp_ccep[6] =
     { 0, 0, 0, 0, 1460, 0 },
     { 0, 0, 0, 0, 1460, 0 },
     { 0, 0, 0, 0, 1460, 0 },
-
+    { 0, 0, 0, 0, 1460, 0 },
+    { 0, 0, 0, 0, 1460, 0 },
 };
 
 /* Total number of TCP communication end points */
@@ -113,16 +116,13 @@ uint8_t _tcp_dack[2] = { 1, 1 };
 /**********************     UDP-related definition     **********************/
 /****************************************************************************/
 /***  Definition of UDP communication end point  ***/
-T_UDP_CCEP udp_ccep[6] =
+T_UDP_CCEP udp_ccep[MAX_UDP_CCEP] =
 {
     /* only setting port number */
     { 0, { 0, 1365 }, 0 },
     { 0, { 0, 1366 }, 0 },
     { 0, { 0, 1367 }, 0 },
     { 0, { 0, 1365 }, 0 },
-    { 0, { 0, 1366 }, 0 },
-    { 0, { 0, 1367 }, 0 },
-
 };
 /* Total number of UDP communication end points */
 const uint16_t __udpcepn = (sizeof(udp_ccep) / sizeof(T_UDP_CCEP));

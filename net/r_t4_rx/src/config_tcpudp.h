@@ -8,13 +8,18 @@
 //=====================================================================//
 #include "r_t4_itcpip.h"
 
+#define MAX_TCP_CREP  8
+#define MAX_TCP_CCEP  8
+#define MAX_UDP_CCEP  4
+#define TOTAL_BSD_SOCKET    (MAX_TCP_CCEP + MAX_UDP_CCEP)
+
 extern const uint8_t _t4_channel_num;
 
-extern T_TCP_CREP tcp_crep[6];
+extern T_TCP_CREP tcp_crep[MAX_TCP_CREP];
 
 extern const uint16_t __tcprepn;
 
-extern T_TCP_CCEP tcp_ccep[6];
+extern T_TCP_CCEP tcp_ccep[MAX_TCP_CCEP];
 
 extern const uint16_t __tcpcepn;
 
@@ -30,7 +35,7 @@ extern const uint16_t _tcp_rt_tmo_rst[2];
 
 extern uint8_t _tcp_dack[2];
 
-extern T_UDP_CCEP udp_ccep[6];
+extern T_UDP_CCEP udp_ccep[MAX_UDP_CCEP];
 
 extern const uint16_t __udpcepn;
 

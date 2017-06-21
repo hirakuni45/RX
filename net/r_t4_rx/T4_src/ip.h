@@ -25,8 +25,8 @@
 * History : DD.MM.YYYY Version  Description
 *         : 01.04.2014 1.00     First Release
 ***********************************************************************************************************************/
-#ifndef __IP_H__
-#define __IP_H__
+#ifndef IP_H
+#define IP_H
 
 /* protocol type */
 #define _IPH_HBH  0  /* Relay point */
@@ -247,6 +247,6 @@ sint16 _ppp_snd_ip(uchar *data, uint16 len);
 
 void dump_ip_header(const _IP_HDR *p);
 
-#endif	/*multi include guard*/
+#endif
 
 
