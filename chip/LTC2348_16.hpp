@@ -11,9 +11,9 @@
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
-/// F_ICK は速度パラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_ICK
-#  error "LTC2348_16.hpp requires F_ICK to be defined"
+/// F_ICLK は速度パラメーター計算で必要で、設定が無いとエラーにします。
+#ifndef F_ICLK
+#  error "LTC2348_16.hpp requires F_ICLK to be defined"
 #endif
 
 namespace chip {
@@ -141,7 +141,7 @@ namespace chip {
 		bool start(uint32_t speed, span_type span)
 		{
 			{
-				uint32_t cnt = static_cast<uint32_t>(F_ICK) / speed;
+				uint32_t cnt = static_cast<uint32_t>(F_ICLK) / speed;
 				float a = static_cast<float>(cnt);
 				a /= 10.974f;
 				cnt = static_cast<uint32_t>(a);
@@ -149,12 +149,12 @@ namespace chip {
 				clk_loop_ = cnt;
 			}
 			{  // BUSY loop 200ns (5MHz)
-				uint32_t cnt = static_cast<uint32_t>(F_ICK) / 5000000;
+				uint32_t cnt = static_cast<uint32_t>(F_ICLK) / 5000000;
 				if(cnt > 65535) return false;
 				busy_loop_ = cnt;
 			}
 			{  // tCONV: 500ns/ch 200ksps
-				uint32_t cnt = static_cast<uint32_t>(F_ICK) / 200000;
+				uint32_t cnt = static_cast<uint32_t>(F_ICLK) / 200000;
 				if(cnt > 65535) return false;
 				cnv_loop_ = cnt;
 			}
