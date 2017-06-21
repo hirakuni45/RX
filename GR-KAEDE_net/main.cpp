@@ -339,12 +339,14 @@ extern "C" {
 	void ena_int(void)
 	{
 		tcpip_flag_ = true;
+utils::format("TCPIP Enable\n");
 	}
 
 
 	void dis_int(void)
 	{
 		tcpip_flag_ = false;
+utils::format("TCPIP Disable\n");
 	}
 
 
@@ -393,11 +395,11 @@ extern "C" {
 	{
 		switch (cycact) {
 		case 0:
-			tcpip_flag_ = false;
+			dis_int();
 			cmt_.at_task().enable_timer(false);
 			break;
 		case 1:
-			tcpip_flag_ = true;
+			ena_int();
 			cmt_.at_task().enable_timer();
 			break;
 		default:
@@ -421,6 +423,7 @@ extern "C" {
 		int16_t rc;
 		if(ret > 0) {
 			rc = ret;
+/// utils::format("lan_read: %d\n") % static_cast<int>(rc);
 		} else if(ret == 0) {
 			rc = -1;
 		} else {
@@ -442,6 +445,7 @@ extern "C" {
 
 	int16_t lan_write(uint8_t lan_port_no, const void* hsrc, int16_t hlen, const void* bsrc, int16_t blen)
 	{
+utils::format("lan_write: %d, %d\n") % static_cast<int>(hlen) % static_cast<int>(blen);
 		return ether_.write(hsrc, hlen, bsrc, blen);
 	}
 
