@@ -11,7 +11,7 @@
 
 namespace device {
 
-/// F_CLK は変換パラメーター計算で必要で、設定が無いとエラーにします。
+/// F_FCLK は変換パラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_FCLK
 #  error "flash_io.hpp requires F_FCLK to be defined"
 #endif
