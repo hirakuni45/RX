@@ -297,7 +297,7 @@ struct core_t {
 	void draw_date(int16_t x, int16_t y, const struct tm *t)
 	{
 		char tmp[128];
-		utils::format("%04u/%02u/%02u", tmp, sizeof(tmp)) % static_cast<uint32_t>(t->tm_year + 1900)
+		utils::sformat("%04u/%02u/%02u", tmp, sizeof(tmp)) % static_cast<uint32_t>(t->tm_year + 1900)
 			% static_cast<uint32_t>(t->tm_mon + 1) % static_cast<uint32_t>(t->tm_mday);
  		bitmap_.draw_text(x, y, tmp);
 	}
@@ -314,7 +314,7 @@ struct core_t {
 	void draw_time(short x, short y, const struct tm* t)
 	{
 		char tmp[128];
-		utils::format("%02u:%02u.%02u", tmp, sizeof(tmp)) % static_cast<uint32_t>(t->tm_hour)
+		utils::sformat("%02u:%02u.%02u", tmp, sizeof(tmp)) % static_cast<uint32_t>(t->tm_hour)
 			% static_cast<uint32_t>(t->tm_min) % static_cast<uint32_t>(t->tm_sec);
 		bitmap_.draw_text(x, y, tmp);
 	}
