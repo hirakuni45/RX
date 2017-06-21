@@ -11,11 +11,6 @@
 #include "common/renesas.hpp"
 #include "common/format.hpp"
 
-/// F_PCKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCKB
-#  error "iica_io.hpp requires F_PCKB to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

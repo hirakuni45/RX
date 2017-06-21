@@ -8,9 +8,9 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 
-/// F_PCKA は変換パラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCKA
-#  error "mtu_io.hpp requires F_PCKA to be defined"
+/// F_PCLKA は変換パラメーター計算で必要で、設定が無いとエラーにします。
+#ifndef F_PCLKA
+#  error "mtu_io.hpp requires F_PCLKA to be defined"
 #endif
 
 namespace device {

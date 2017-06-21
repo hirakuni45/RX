@@ -2,16 +2,16 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX グループ・SCI I/O 制御 @n
-			Copyright 2013, 2016 Kunihito Hiramatsu
+			Copyright 2013, 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
 
-/// F_PCKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCKB
-#  error "sci_io.hpp requires F_PCKB to be defined"
+/// F_PCLKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
+#ifndef F_PCLKB
+#  error "sci_io.hpp requires F_PCLKB to be defined"
 #endif
 
 namespace device {
@@ -121,7 +121,7 @@ namespace device {
 
 			port_map::turn(SCI::get_peripheral());
 
-			uint32_t brr = F_PCKB / baud / 16;
+			uint32_t brr = F_PCLKB / baud / 16;
 			uint8_t cks = 0;
 			while(brr > 512) {
 				brr >>= 2;
@@ -168,7 +168,7 @@ namespace device {
 
 			SCI::SCR = 0x00;			// TE, RE disable.
 
-			uint32_t brr = F_PCKB / bps / 4;
+			uint32_t brr = F_PCLKB / bps / 4;
 			uint8_t cks = 0;
 			while(brr > 256) {
 				brr >>= 2;

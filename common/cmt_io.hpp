@@ -2,16 +2,16 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX600, RX200 グループ・CMT I/O 制御 @n
-			Copyright 2013, 2016 Kunihito Hiramatsu
+			Copyright 2013, 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
 
-/// F_PCKB は周期パラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCKB
-#  error "cmt_io.hpp requires F_PCKB to be defined"
+/// F_PCLKB は周期パラメーター計算で必要で、設定が無いとエラーにします。
+#ifndef F_PCLKB
+#  error "cmt_io.hpp requires F_PCLKB to be defined"
 #endif
 
 namespace device {
@@ -66,7 +66,7 @@ namespace device {
 
 			if(freq == 0) return false;
 
-			uint32_t cmcor = F_PCKB / freq / 8;
+			uint32_t cmcor = F_PCLKB / freq / 8;
 			uint8_t cks = 0;
 			while(cmcor > 65536) {
 				cmcor >>= 2;

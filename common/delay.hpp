@@ -2,14 +2,14 @@
 //=====================================================================//
 /*!	@file
 	@brief	delay ユーティリティー (RX) @n
-			Copyright 2016 Kunihito Hiramatsu
+			Copyright 2016, 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include <cstdint>
 
-#ifndef F_ICK
-#  error "delay.hpp requires F_ICK to be defined"
+#ifndef F_ICLK
+#  error "delay.hpp requires F_ICLK to be defined"
 #endif
 
 namespace utils {
@@ -47,11 +47,11 @@ namespace utils {
 		{
 			while(us > 0) {
 #if defined(SIG_RX64M) || defined(SIG_RX63T)
-				for(uint32_t n = 0; n < (F_ICK / 4285714); ++n) {
+				for(uint32_t n = 0; n < (F_ICLK / 4285714); ++n) {
 					asm("nop");
 				}
 #elif defined(SIG_RX24T)
-				for(uint32_t n = 0; n < (F_ICK / 5333333); ++n) {
+				for(uint32_t n = 0; n < (F_ICLK / 5333333); ++n) {
 					asm("nop");
 				}
 #else

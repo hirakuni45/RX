@@ -11,9 +11,9 @@
 #include "RX63T/icu.hpp"
 #include "common/vect.h"
 
-/// F_PCKA タイマーのクロックに必要なので定義が無い場合エラーにします。
-#ifndef F_PCKA
-#  error "gpt_io.hpp requires F_PCKA to be defined"
+/// F_PCLKA タイマーのクロックに必要なので定義が無い場合エラーにします。
+#ifndef F_PCLKA
+#  error "gpt_io.hpp requires F_PCLKA to be defined"
 #endif
 
 namespace device {

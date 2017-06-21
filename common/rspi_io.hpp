@@ -11,20 +11,20 @@
 
 /// F_PCKx は速度パラメーター計算で必要で、設定が無いとエラーにします。
 #if defined(SIG_RX24T)
-#ifndef F_PCKB
-#  error "sci_io.hpp requires F_PCKB to be defined"
+#ifndef F_PCLKB
+#  error "rspi_io.hpp requires F_PCLKB to be defined"
 #else
 #undef PCLK
-#define PCLK F_PCKB
-#define PCLK_MAX (F_PCKB / 4)
+#define PCLK F_PCLKB
+#define PCLK_MAX (F_PCLKB / 4)
 #endif
 #elif defined(SIG_RX64M)
-#ifndef F_PCKA
-#  error "sci_io.hpp requires F_PCKA to be defined"
+#ifndef F_PCLKA
+#  error "rspi_io.hpp requires F_PCLKA to be defined"
 #else
 #undef PCLK
-#define PCLK F_PCKA
-#define PCLK_MAX (F_PCKA / 2)
+#define PCLK F_PCLKA
+#define PCLK_MAX (F_PCLKA / 2)
 #endif
 #endif
 
@@ -98,7 +98,8 @@ namespace device {
 		/*!
 			@brief  設定可能な最大速度を返す @n
 					・RX24T: 20MHz @n
-					・RX64M: 40MHz @n
+					・RX64M: 40MHz
+			@return 最大速度
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_max_speed() const { return PCLK_MAX; }
