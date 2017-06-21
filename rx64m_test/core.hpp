@@ -149,8 +149,8 @@ namespace seeda {
 #endif
 			uint8_t mde = device::SYSTEM::MDE.MDE();
 			utils::format("Endian: %3b (%s)") % static_cast<uint32_t>(mde) % (mde == 0b111 ? "Little" : "Big");
-			utils::format(", PCKA: %u [Hz]") % static_cast<uint32_t>(F_PCKA);
-			utils::format(", PCKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCKB);
+			utils::format(", PCLKA: %u [Hz]") % static_cast<uint32_t>(F_PCLKA);
+			utils::format(", PCLKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCLKB);
 			utils::format("DIP-Switch: %d\n") % static_cast<int>(get_switch());
 		}
 
