@@ -364,8 +364,8 @@ int main(int argc, char** argv)
 		utils::format("\nStart GR-KAEDE http sample\n");
 		uint8_t mde = device::SYSTEM::MDE.MDE();
 		utils::format("Endian: %3b (%s)") % static_cast<uint32_t>(mde) % (mde == 0b111 ? "Little" : "Big");
-		utils::format(", PCKA: %u [Hz]") % static_cast<uint32_t>(F_PCKA);
-		utils::format(", PCKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCKB);
+		utils::format(", PCLKA: %u [Hz]") % static_cast<uint32_t>(F_PCLKA);
+		utils::format(", PCLKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCLKB);
 	}
 
 
