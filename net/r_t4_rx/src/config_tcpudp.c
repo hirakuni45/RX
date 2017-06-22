@@ -35,29 +35,31 @@
 /******************************************************************************
 * History       : DD.MM.YYYY Version Description
 *               : 30.08.2011 1.00    First release.
+*               : 30.11.2016 1.01    DHCP relation add.
 ******************************************************************************/
-#include "config_tcpudp.h"
 
-extern ER t4_callback(ID cepid, FN fncd , VP p_parblk);
+#include "config_tcpudp.h"
 
 /****************************************************************************/
 /**********************     TCP-related definition     **********************/
 /****************************************************************************/
 /* Number of LAN port, Number of Serial port */
-const uint8_t _t4_channel_num = 1;
+/// const uint8_t _t4_channel_num = 1;
+const uint8_t _t4_dhcp_enable = 0;
+const uint16_t _t4_dhcp_ip_reply_arp_delay = 300;       /* unit:10ms */
 
 /***  Definition of TCP reception point (only port number needs to be set) ***/
 T_TCP_CREP tcp_crep[MAX_TCP_CREP] =
 {
     /* { attribute of reception point, {local IP address, local port number}} */
-    { 0x0000, { 0, 1024 } },
-    { 0x0000, { 0, 1025 } },
-    { 0x0000, { 0, 1026 } },
-    { 0x0000, { 0, 1027 } },
-    { 0x0000, { 0, 1028 } },
-    { 0x0000, { 0, 1029 } },
-    { 0x0000, { 0, 1030 } },
-    { 0x0000, { 0, 1031 } },
+    { 0, { 0, 1024 } },
+    { 0, { 0, 1024 } },
+    { 0, { 0, 1024 } },
+    { 0, { 0, 1024 } },
+    { 0, { 0, 1024 } },
+    { 0, { 0, 1024 } },
+    { 0, { 0, 1024 } },
+    { 0, { 0, 1024 } },
 };
 
 /* Total number of TCP reception points */
@@ -86,31 +88,27 @@ T_TCP_CCEP tcp_ccep[MAX_TCP_CCEP] =
 const uint16_t __tcpcepn = sizeof(tcp_ccep) / sizeof(T_TCP_CCEP);
 
 /***  TCP MSS  ***/
-const uint16_t _tcp_mss[2] =
+const uint16_t _tcp_mss[_t4_channel_num] =
 {
     /* MAX:1460 bytes */
     1460,
-    1460,
 };
 
-/***  Initial value of sequence number (Set the value other than 0)  ***/
-uint16_t _tcp_initial_seqno[2] = { 1, 1 };
-
 /***  2MSL wait time (unit:10ms)  ***/
-const uint16_t _tcp_2msl[2] =
+const uint16_t _tcp_2msl[_t4_channel_num] =
 {
-    (1 * 60 * (1000 / 10)),      /* 1 min */
     (1 * 60 * (1000 / 10)),      /* 1 min */
 };
 /***  Maximum value of retransmission timeout period (unit:10ms)  ***/
-const uint16_t _tcp_rt_tmo_rst[2] =
+const uint16_t _tcp_rt_tmo_rst[_t4_channel_num] =
 {
-    (10 * 60 * (1000 / 10)),     /* 10 min */
     (10 * 60 * (1000 / 10)),     /* 10 min */
 };
 /***  Transmit for delay ack (ON=1/OFF=0) ***/
-uint8_t _tcp_dack[2] = { 1, 1 };
-
+const uint8_t _tcp_dack[_t4_channel_num] =
+{
+	1
+};
 
 /****************************************************************************/
 /**********************     UDP-related definition     **********************/
@@ -120,23 +118,39 @@ T_UDP_CCEP udp_ccep[MAX_UDP_CCEP] =
 {
     /* only setting port number */
     { 0, { 0, 1365 }, 0 },
-    { 0, { 0, 1366 }, 0 },
-    { 0, { 0, 1367 }, 0 },
+    { 0, { 0, 1365 }, 0 },
+    { 0, { 0, 1365 }, 0 },
     { 0, { 0, 1365 }, 0 },
 };
 /* Total number of UDP communication end points */
 const uint16_t __udpcepn = (sizeof(udp_ccep) / sizeof(T_UDP_CCEP));
 
 /***  TTL for multicast transmission  ***/
-const uint8_t __multi_TTL[2] = { 1, 1 };
+const uint8_t __multi_TTL[_t4_channel_num] =
+{
+	1
+};
 
 /*** Behavior of UDP zero checksum ***/
-const uint8_t _udp_enable_zerochecksum[2] = { 0, 0 };           /* 0 = disable, other = enable */
+const uint8_t _udp_enable_zerochecksum[_t4_channel_num] =
+{
+	0
+}; /* 0 = disable, other = enable */
+
+/****************************************************************************/
+/**********************  SYSTEM-callback definition   ***********************/
+/****************************************************************************/
+
+/// extern ER user_cb(UB channel, UW eventid, VP param);
+/// const callback_from_system_t g_fp_user = user_cb;
 
 /****************************************************************************/
 /**********************     IP-related definition     ***********************/
 /****************************************************************************/
-const uint16_t _ip_tblcnt[2] = { 3, 3 };
+const uint16_t _ip_tblcnt[_t4_channel_num] =
+{
+	3
+};
 
 #define MY_IP_ADDR0     192,168,0,3            /* Local IP address  */
 #define GATEWAY_ADDR0   0,0,0,0                /* Gateway address (invalid if all 0s) */
@@ -146,12 +160,12 @@ const uint16_t _ip_tblcnt[2] = { 3, 3 };
 #define GATEWAY_ADDR1   0,0,0,0                /* Gateway address (invalid if all 0s) */
 #define SUBNET_MASK1    255,255,255,0          /* Subnet mask  */
 
-TCPUDP_ENV tcpudp_env[2] =
+TCPUDP_ENV tcpudp_env[_t4_channel_num] =
 {
-    { { MY_IP_ADDR0 }, { SUBNET_MASK0 }, { GATEWAY_ADDR0 } },
-    { { MY_IP_ADDR1 }, { SUBNET_MASK1 }, { GATEWAY_ADDR1 } },
+    {
+		{ MY_IP_ADDR0 }, { SUBNET_MASK0 }, { GATEWAY_ADDR0 }
+	},
 };
-
 
 /****************************************************************************/
 /**********************     Driver-related definition     *******************/
@@ -163,23 +177,22 @@ TCPUDP_ENV tcpudp_env[2] =
 #define MY_MAC_ADDR0    0x74,0x90,0x50,0x00,0x79,0x03
 #define MY_MAC_ADDR1    0x74,0x90,0x50,0x00,0x79,0x04
 
-uint8_t _myethaddr[2][6] =
+uint8_t _myethaddr[_t4_channel_num][6] =
 {
     { MY_MAC_ADDR0 },
-    { MY_MAC_ADDR1 },
 };
 
 /*--------------------------------------------------------------------------*/
 /*    Set of PPP-related                                                    */
 /*--------------------------------------------------------------------------*/
 /* Authentication-related setting */
-const uint16_t ppp_auth  = AUTH_PAP;               /* PAP,No authentication enabled */
-uint8_t user_name[6]    = "abcde";                /* user name */
-uint8_t user_passwd[6]  = "abc00";                /* password  */
+const uint16_t ppp_auth  = AUTH_PAP;       /* PAP,No authentication enabled */
+char user_name[8]    = { "abcde" };        /* user name */
+char user_passwd[8]  = { "abc00" };        /* password  */
 
 /* Dial up-related setting */
-const uint8_t peer_dial[]      = "0,123";                /* Destination telephone number */
-const uint8_t at_commands[]   = "ATW2S0=2&C0&D0&S0M0S10=255X3";    /* Modem initialization command */
+const char peer_dial[]     = "0,123";                /* Destination telephone number */
+const char at_commands[]   = "ATW2S0=2&C0&D0&S0M0S10=255X3";    /* Modem initialization command */
 
 
 /* Copyright 2014, RENESAS ELECTRONICS CORPORATION */
