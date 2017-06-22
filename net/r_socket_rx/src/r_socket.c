@@ -52,9 +52,8 @@
 /******************************************************************************
 Includes   <System Includes> , "Project Includes"
 ******************************************************************************/
-/// #include <stdio.h>
+#include <stdio.h>
 #include <string.h>
-/// #include <stdlib.h>
 #include <errno.h>
 #include "r_t4_itcpip.h"
 #include "r_socket_rx_config.h"
