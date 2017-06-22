@@ -26,6 +26,7 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c \
 				net/r_tcpip_private.c \
+				net/r_t4_rx/T4_src/global.c \
 				net/r_t4_rx/T4_src/ether.c \
 				net/r_t4_rx/T4_src/ip.c \
 				net/r_t4_rx/T4_src/tcp.c \
