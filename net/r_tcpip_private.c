@@ -11,7 +11,7 @@
 
 extern uint16_t get_tcpudp_time(void);
 
-void get_random_number(uint8_t *data, uint16_t len)
+void get_random_number(UB *data, UW len)
 {
     static uint32_t y = 2463534242;
     uint32_t res;

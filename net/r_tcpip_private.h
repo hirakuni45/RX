@@ -22,4 +22,3 @@
 
 #include "t4define.h"
 
-void get_random_number(uint8_t *, uint16_t);

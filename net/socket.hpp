@@ -167,6 +167,7 @@ namespace net {
 				if(r_fcntl(fd_, F_SETFL, O_NONBLOCK) != E_OK) {
 					utils::format("r_fcntl: error\n");
 				}
+
 				server_ = server;
 				if(server) {
 					task_ = task::bind;
