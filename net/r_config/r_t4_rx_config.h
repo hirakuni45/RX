@@ -14,19 +14,21 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2014-2016 Renesas Electronics Corporation. All rights reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : r_t4_rx_config.h
+* Version      : 1.01
 * Description  : Configuration options for the r_t4_rx module.
+* Website      : https://www.renesas.com/mw/t4
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * History : DD.MM.YYYY Version Description
 *         : 01.04.2014 1.00    First Release
-*         : 01.12.2015 1.01    IGMP added.
+*         : 30.11.2016 1.01    File Header maintenance
 ***********************************************************************************************************************/
-#ifndef R_T4_RX_CONFIG_H
-#define R_T4_RX_CONFIG_H
+#ifndef T4_RX_CONFIG_HEADER_FILE
+#define T4_RX_CONFIG_HEADER_FILE
 
 /***********************************************************************************************************************
 Configuration Options
@@ -35,6 +37,6 @@ Configuration Options
     Now, T4 config file is "config_tcpudp.c". Please modefy "config_tcpudp.c" directly.
 */
 
-#endif /* T4_RX_CONFIG_H */
+#endif /* T4_RX_CONFIG_HEADER_FILE */
 
 

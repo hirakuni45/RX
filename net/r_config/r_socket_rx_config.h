@@ -36,21 +36,23 @@
 #ifndef R_SOCKET_RX_CONFIG_H
 #define R_SOCKET_RX_CONFIG_H
 
-///#ifndef MAX_UDP_CCEP
-///#define MAX_UDP_CCEP        (4)
-///#endif
-///#ifndef MAX_TCP_CCEP
-///#define MAX_TCP_CCEP        (8)
-///#endif
-///#ifndef MAX_TCP_CREP
-///#define MAX_TCP_CREP        MAX_TCP_CCEP
-///#endif
+#if 0
+#ifndef MAX_UDP_CCEP
+#define MAX_UDP_CCEP        (4)
+#endif
+#ifndef MAX_TCP_CCEP
+#define MAX_TCP_CCEP        (8)
+#endif
+#ifndef MAX_TCP_CREP
+#define MAX_TCP_CREP        MAX_TCP_CCEP
+#endif
+#endif
 
 #define SOCKET_TCP_WINSIZE   (1460)
 
-#define TCPUDP_WORK         (13344)
+///#define TCPUDP_WORK         (13344)
 
-///#define TOTAL_BSD_SOCKET    (MAX_TCP_CCEP + MAX_UDP_CCEP)
+/// #define TOTAL_BSD_SOCKET    (MAX_TCP_CCEP + MAX_UDP_CCEP)
 
 /// #define R_SOCKET_PAR_CHECK  (1) /* comment out this to skip parameter checking */
 
