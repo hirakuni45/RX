@@ -14,17 +14,22 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2014-2016 Renesas Electronics Corporation. All rights reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : udp.h
-* Version      : 1.0
+* Version      : 1.01
 * Description  : processing for UDP
+* Website      : https://www.renesas.com/mw/t4
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
+* History : DD.MM.YYYY Version Description
+*         : 01.04.2014 1.00    First Release
+*         : 30.11.2016 1.01    add DHCP relation
 ***********************************************************************************************************************/
+
+#ifndef UDP_H__
+#define UDP_H__
 
 typedef struct     /* message format of DARPA UDP */
 {
@@ -98,7 +103,4 @@ FN  _udp_api_type_to_fn(uint16 api_type);
 ER _udp_check_cepid_arg(ID cepid);
 ER _udp_check_len_arg(INT len);
 
-
-
-
-
+#endif /*#ifndef UDP_H__*/

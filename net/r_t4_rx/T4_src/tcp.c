@@ -14,16 +14,18 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2014-2016 Renesas Electronics Corporation. All rights reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : tcp.c
-* Version      : 1.0
+* Version      : 1.01
 * Description  : Processing for TCP protocol
+* Website      : https://www.renesas.com/mw/t4
 ***********************************************************************************************************************/
 /**********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
+* History : DD.MM.YYYY Version Description
+*         : 01.04.2014 1.00    First Release
+*         : 05.12.2016 1.01    add DHCP relation
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
@@ -31,6 +33,7 @@ Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
 #include "t4define.h"
 
+#include <stdio.h>
 #include <string.h>
 #if defined(__GNUC__)
 #include "r_tcpip_private.h"
@@ -47,12 +50,13 @@ Includes   <System Includes> , "Project Includes"
 #include "udp.h"
 
 #if defined(_IGMP)
- #include "igmp.h"
+#include "igmp.h"
 #endif
+#include "dhcp.h"
 
 #include "r_t4_rx/src/config_tcpudp.h"
 
-#include <stdio.h>
+extern void get_random_number(UB *data, UW len);
 
 /***********************************************************************************************************************
 Macro definitions
@@ -75,32 +79,11 @@ UH   _tcp_pre_timer_cnt;  /* previous timer count */
 Private global variables and functions
 ***********************************************************************************************************************/
 
-#if defined(_ETHER)
-extern UB *_ether_p_rcv_buff;
-/// extern far const UH  _ip_tblcnt[];
-#endif /* _ETHER */
-
 #if defined(_TCP)
-/// extern far const UB _t4_channel_num;
-/// extern far const UH  _tcp_mss[];
-/// extern far UW  _tcp_initial_seqno[];
-/// extern far const UH  _tcp_2msl[];
-/// extern far const UH  _tcp_rt_tmo_rst[];
-/// extern far const T_TCP_CREP tcp_crep[];
-/// extern far const T_TCP_CCEP tcp_ccep[];
-/// extern far const H __tcpcepn;
-/// extern far UB _tcp_dack[];
 extern UB *data_link_buf_ptr;
 #endif
 
-#if defined(_UDP)
 extern _UDP_CB  *_udp_cb;
-/// extern far const H   __udpcepn;
-#endif
-
-#if defined(_PPP)
-extern UB ppp_mode;
-#endif
 
 extern _CH_INFO *_ch_info_tbl;
 extern _CH_INFO *_ch_info_head;
@@ -150,37 +133,41 @@ void _tcp_init_tcb(_TCB *_ptcb)
 
     ch = tcp_ccep[_ptcb->cepid-1].cepatr;
 
-    _ptcb->flag  = 0;      // TCP status flag
+    _ptcb->flag  = 0;
 #if defined(_TCP)
-    _ptcb->status  = _TCPS_CLOSED;   // TCP connection status
-    _ptcb->nxt_status = _TCPS_CLOSED;   // Next status to transit
-    _ptcb->it_stat = _ITS_NORMAL;    // ITRON status
-    _ptcb->hdr_flg = 0;      // Header flag
-    _ptcb->mss  = _tcp_mss[ch];    // MSS: max segment size
-
-    _ptcb->suna  = _tcp_initial_seqno[ch]; // transmitted, but no acked sequence number
-    _ptcb->snxt  = _tcp_initial_seqno[ch]; // next transmit sequence number
-    _ptcb->risn  = 0;      // the sequence number that first received when connecting
-    _ptcb->rnxt  = 0;      // next receive(expected) sequence number
+    _ptcb->status  = _TCPS_CLOSED;
+    _ptcb->nxt_status = _TCPS_CLOSED;
+    _ptcb->it_stat = _ITS_NORMAL;
+    _ptcb->hdr_flg = 0;
+    _ptcb->mss  = _tcp_mss[ch];
+    do
+    {
+        get_random_number((UB*)&(_ptcb->tcp_initial_seqno), sizeof((_ptcb->tcp_initial_seqno)));
+    }
+    while (_ptcb->tcp_initial_seqno == 0);
+    _ptcb->suna  = _ptcb->tcp_initial_seqno;
+    _ptcb->snxt  = _ptcb->tcp_initial_seqno;
+    _ptcb->risn  = 0;
+    _ptcb->rnxt  = 0;
     for (i = 0; i < 4; i++)
-	{
-        _ptcb->rem_ip[i] = 0;     // destination IP address (need 4 byte align)
-	}	/*2669*/
-    _ptcb->rem_port = 0;      // remote port number
-    _ptcb->loc_port = 0;      // local port number
-    _ptcb->rtchk_cnt = 0;     // timeer count for re-transmit
-    _tcp_clr_rtq(_ptcb);      // initialize re-transmit queue
-    _ptcb->nxtdat  = NULL;     // pointer to next transmit data
-    _ptcb->rwin_bnry = _ptcb->rwin;   // Received window BNRY(boundary) pointer
-    _ptcb->rwin_curr = _ptcb->rwin;   // Received window CURR(current) pointer
-    _ptcb->swsize  = 0;     // the recieve window size that notified by remote host
-    _ptcb->rmt_rwsize = 0;     // local transmit window size
-    _ptcb->sdsize  = 0;     // remain transmit data size
-    _ptcb->rdsize  = 0;     // received data size
-    _ptcb->mslcnt  = 0;     // 2MSL remain count
-    _ptcb->zwin_int = _TCP_RTO_INIT;   // zero-window probe interval
-    _ptcb->nxt_zero = 0xffff;     // the time that until next zero-window probe
-    _ptcb->zwp_noack_cnt = 0xffff;   // no acked time for the zero-window probe
+    {
+        _ptcb->rem_ip[i] = 0;
+    } /*2669*/
+    _ptcb->rem_port = 0;
+    _ptcb->loc_port = 0;
+    _ptcb->rtchk_cnt = 0;
+    _tcp_clr_rtq(_ptcb);
+    _ptcb->nxtdat  = NULL;
+    _ptcb->rwin_bnry = _ptcb->rwin;
+    _ptcb->rwin_curr = _ptcb->rwin;
+    _ptcb->swsize  = 0;
+    _ptcb->rmt_rwsize = 0;
+    _ptcb->sdsize  = 0;
+    _ptcb->rdsize  = 0;
+    _ptcb->mslcnt  = 0;
+    _ptcb->zwin_int = _TCP_RTO_INIT;
+    _ptcb->nxt_zero = 0xffff;
+    _ptcb->zwp_noack_cnt = 0xffff;
 #endif
 
     return;
@@ -196,36 +183,81 @@ void _process_tcpip(void)
 {
     UH counter = 0;
     volatile static UB _process_flag = 0;
-#if defined(_IGMP)	
-	static UH	_old_time;
-#endif
+    static UH _old_time;
+    UH endpoint;
+    uint32_t cnt;
+    uint32_t channel;
 
     if (_process_flag == 0)
     {
         _process_flag = 1;
         _tcp_timer_cnt = tcpudp_get_time();
-		
-#if defined(_IGMP)	
-	if( _old_time != _tcp_timer_cnt){
-		int_send_igmp_timer_expired(_tcp_timer_cnt);
-		_old_time = _tcp_timer_cnt;
-	}
+
+        if ( _old_time != _tcp_timer_cnt)
+        {
+#if defined(_IGMP)
+            int_send_igmp_timer_expired(_tcp_timer_cnt);
 #endif
+            if (1 == _t4_dhcp_enable)
+            {
+                dhcp_int_timer();
+            }
+            _old_time = _tcp_timer_cnt;
+        }
 
         while (1)
         {
+            if (1 == _t4_dhcp_enable)
+            {
+                dhcp_process();
+            }
 #if defined(_PPP)
             _ppp_proc();
 
 #endif
             _proc_api();
             _proc_rcv();
+            if (1 == _t4_dhcp_enable)
+            {
+                for (cnt = 0; cnt < __tcpcepn; cnt++)
+                {
+                    channel = tcp_ccep[cnt].cepatr;
+                    if (1 == (_ch_info_head[channel].ip_terminated_flag))
+                    {
+                        if (((head_tcb[cnt].req.tmout) == TMO_FEVR))
+                        {
+                            _tcp_tcb = &head_tcb[cnt];
+                            _tcp_api_wup(head_tcb[cnt].cepid);
+                        }
+                    }
+                }
+                for (cnt = 0; cnt < __udpcepn; cnt++)
+                {
+                    channel = udp_ccep[cnt].cepatr;
+                    if (1 == (_ch_info_head[channel].ip_terminated_flag))
+                    {
+                        if (((_udp_cb[cnt].req.tmout) == TMO_FEVR))
+                        {
+                            _udp_api_wup(&_udp_cb[cnt], _udp_cb[cnt].req.cepid);
+                        }
+                    }
+                }
+            }
             _proc_snd();
 
 #if defined(_UDP)
-            for (counter = 0; counter < __udpcepn; counter++)
+            if (1 == _t4_dhcp_enable)
             {
-                if ((_udp_cb[counter].req.type != _UDP_API_NON) && (_udp_cb[counter].req.stat == _UDP_API_STAT_UNTREATED))
+                endpoint = __udpcepn + _t4_channel_num;
+            }
+            else
+            {
+                endpoint = __udpcepn;
+            }
+            for (counter = 0; counter < endpoint; counter++)
+            {
+                if ((_udp_cb[counter].req.type != _UDP_API_NON) && \
+                        (_udp_cb[counter].req.stat == _UDP_API_STAT_UNTREATED))
                 {
                     continue;
                 }
@@ -249,7 +281,7 @@ void _process_tcpip(void)
     {
 
     }
-	
+
     return;
 }
 
@@ -264,6 +296,7 @@ void _proc_api(void)
 #if defined(_TCP)
     _API_REQ *areq;
     UH counter = 0;
+    UB canceld;
 
     static void (* const functbl_tcp_api[])(void) =
     {
@@ -282,17 +315,26 @@ void _proc_api(void)
 
         areq = &(_tcp_tcb->req);
 
-        if (areq->stat == _TCP_API_STAT_UNTREATED)
-        {
-
-            areq->stat = _TCP_API_STAT_INCOMPLETE;
-            functbl_tcp_api[areq->type - 1]();
-        }
-
-        if ((areq->stat == _TCP_API_STAT_INCOMPLETE) && (areq->flag & _TCP_API_FLAG_CANCELED))
+        canceld = 0;
+        if (  ((areq->stat == _TCP_API_STAT_UNTREATED) || (areq->stat == _TCP_API_STAT_INCOMPLETE)  )
+                && (areq->flag & _TCP_API_FLAG_CANCELED))
         {
             _tcp_cancel_api(E_RLWAI);
             areq->flag &= (~_TCP_API_FLAG_CANCELED);
+            canceld = 1;
+        }
+
+        if (areq->stat == _TCP_API_STAT_UNTREATED)
+        {
+            if (((areq->type) == _TCP_API_CLSCP) && (canceld == 1))
+            {
+                /* nothing todo */
+            }
+            else
+            {
+                areq->stat = _TCP_API_STAT_INCOMPLETE;
+                functbl_tcp_api[areq->type - 1]();
+            }
         }
     }
 #endif
@@ -356,7 +398,7 @@ void _tcp_api_acpt(void)
 void _tcp_api_con(void)
 {
     _API_REQ *areq;
-    static uint16 port;
+    uint16_t  ui_rndm;
 
     areq = &(_tcp_tcb->req);
 
@@ -387,16 +429,13 @@ void _tcp_api_con(void)
 
     if (areq->d.cnr.my_port == 0)
     {
-        if ((port < 1024) || (port > 5000))
-		{
-            port = 1024;
-		}	/*2669*/
-        _tcp_tcb->loc_port = port++;
+        get_random_number((UB*)&ui_rndm, sizeof(ui_rndm));
+        _tcp_tcb->loc_port = (ui_rndm & 0x3FFF) + 0xC000;    /* #3370 */
     }
     else
-	{
+    {
         _tcp_tcb->loc_port = areq->d.cnr.my_port;
-	}	/*2669*/
+    } /*2669*/
     _tcp_tcb->hdr_flg = _TCPF_SYN;
     _tcp_tcb->nxt_status = _TCPS_SYN_SENT;
     _tcp_tcb->flag  |= (_TCBF_NEED_SEND | _TCBF_SND_TCP);
@@ -424,9 +463,9 @@ void _tcp_api_sht_cls(void)
                 /* If this msg is from 'tcp_cls_cep()' */
             case _TCP_API_CLSCP :
                 if (_tcp_tcb->status != _TCPS_CLOSED)
-				{
+                {
                     return;
-				}	/*2669*/
+                } /*2669*/
                 else
                 {
                     *(areq->error) = E_OK ;
@@ -437,7 +476,7 @@ void _tcp_api_sht_cls(void)
                 *(areq->error) = E_OBJ ;
                 break;
             default :
-                break;	/*2670*/
+                break; /*2670*/
         }
 
         if (areq->stat != _TCP_API_STAT_COMPLETE)
@@ -462,13 +501,13 @@ void _tcp_api_sht_cls(void)
             /* Allowed Status */
         case _TCPS_ESTABLISHED :
             if (_tcp_tcb->nxt_status == _TCPS_CLOSE_WAIT)
-			{
+            {
                 _tcp_tcb->nxt_status = _TCPS_LAST_ACK;
-			}	/*2669*/
+            } /*2669*/
             else
-			{
+            {
                 _tcp_tcb->nxt_status = _TCPS_FIN_WAIT1;
-			}	/*2669*/
+            } /*2669*/
             break ;
         case _TCPS_CLOSE_WAIT :
             _tcp_tcb->nxt_status = _TCPS_LAST_ACK;
@@ -683,9 +722,9 @@ void _tcp_cpy_rwdat(void)
         _tcp_tcb->rwin_curr = _tcp_tcb->rwin;
     }
     else
-	{
+    {
         _tcp_tcb->rwin_bnry += api_dsiz;
-	}	/*2669*/
+    } /*2669*/
 
     *(areq->error) = api_dsiz;
 
@@ -716,10 +755,8 @@ void _proc_rcv(void)
 {
     _IP_PKT  *pip;
     _IP_HDR  *piph;
-#if defined(_ICMP)
     _ICMP_PKT *picmp;
     _ICMP_HDR *picmph;
-#endif
     _TCP_HDR *ptcph;
     _TCP_PHDR phdr;
     uint16  seg_size, sum16;
@@ -739,9 +776,9 @@ void _proc_rcv(void)
             continue;
         }
         else
-		{	
+        {
             _ch_info_tbl->_rcvd = 1;
-		}	/*2669*/
+        } /*2669*/
 #if defined(_ETHER)
         if (_ch_info_tbl->_p_rcv_buf.ip_rcv == 0)
         {
@@ -751,15 +788,12 @@ void _proc_rcv(void)
 
         pip = (_IP_PKT *)(_ch_info_tbl->_p_rcv_buf.pip);
         piph = (_IP_HDR *)pip;
-
-        if (_ip_rcv_hdr() != 0)
+        if ((_ip_rcv_hdr() != 0))
         {
             goto _err_proc_rcv;
         }
 
-#ifdef DUMP_IP_HEADER
-		dump_ip_header(piph);
-#endif
+
         switch (piph->ip_proto_num)
         {
 #if defined(_TCP)
@@ -773,7 +807,9 @@ void _proc_rcv(void)
                             && (ptcph->dport == hs2net(_tcp_tcb->loc_port))
                             && (_cmp_ipaddr(piph->ip_src, _tcp_tcb->rem_ip) == 0)
                             && (_ch_info_tbl->_ch_num == tcp_ccep[counter].cepatr)
-                            && (_tcp_tcb->status != _TCPS_LISTEN)
+                            && (  (_tcp_tcb->status != _TCPS_LISTEN)
+                                  || ((_tcp_tcb->status == _TCPS_LISTEN) && \
+                                      (_tcp_tcb->nxt_status == _TCPS_SYN_RECEIVED)))
                             && (_tcp_tcb->status != _TCPS_CLOSED))
                     {
                         break;
@@ -787,6 +823,7 @@ void _proc_rcv(void)
                     {
                         _tcp_tcb = &head_tcb[counter];
                         if ((_tcp_tcb->status == _TCPS_LISTEN)
+                                && (_tcp_tcb->nxt_status != _TCPS_SYN_RECEIVED)
                                 && (_ch_info_tbl->_ch_num == tcp_ccep[counter].cepatr)
                                 && (ptcph->dport == hs2net(_tcp_tcb->loc_port)))
                         {
@@ -815,13 +852,13 @@ void _proc_rcv(void)
                 }
 
                 _tcp_stat();
-                if (((_tcp_tcb->req.type == _TCP_API_ACPCP) && (_tcp_tcb->status == _TCPS_ESTABLISHED))
-                        || ((_tcp_tcb->req.type == _TCP_API_RCVDT) && (*(_tcp_tcb->req.error) != E_INI))
-                        || ((_tcp_tcb->req.type == _TCP_API_SNDDT) && (_tcp_tcb->snxt == _tcp_tcb->suna)
-                            && (_tcp_tcb->sdsize == 0))
-                        || ((_tcp_tcb->req.type == _TCP_API_CLSCP) && (_tcp_tcb->status == _TCPS_CLOSED)))
-				{
-                    if (_tcp_tcb->req.stat == _TCP_API_STAT_INCOMPLETE)
+                if (_tcp_tcb->req.stat == _TCP_API_STAT_INCOMPLETE)
+                {
+                    if (((_tcp_tcb->req.type == _TCP_API_ACPCP) && (_tcp_tcb->status == _TCPS_ESTABLISHED))
+                            || ((_tcp_tcb->req.type == _TCP_API_RCVDT) && (*(_tcp_tcb->req.error) != E_INI))
+                            || ((_tcp_tcb->req.type == _TCP_API_SNDDT) && (_tcp_tcb->snxt == _tcp_tcb->suna)
+                                && (_tcp_tcb->sdsize == 0))
+                            || ((_tcp_tcb->req.type == _TCP_API_CLSCP) && (_tcp_tcb->status == _TCPS_CLOSED)))
                     {
                         if (_tcp_tcb->req.tmout == TMO_NBLK)
                         {
@@ -835,7 +872,7 @@ void _proc_rcv(void)
                             _tcp_api_wup(_tcp_tcb->cepid);
                         }
                     }
-				}	/*2669*/
+                } /*2669*/
                 break;
 #endif /* _TCP */
 #if defined(_ICMP)
@@ -887,15 +924,15 @@ void _tcp_stat(void)
 
     ret = _tcp_rcv_opt();
     if (ret == E_ERR)
-	{
+    {
         goto _tcp_stat_release;
-	}	/*2669*/
+    } /*2669*/
 
     ret = _tcp_rcv_rst();
     if (ret != E_NO_RCV)
-	{
+    {
         goto _tcp_stat_release;
-	}	/*2669*/
+    } /*2669*/
     if (_tcp_tcb->status == _TCPS_CLOSED)
     {
         goto _tcp_stat_release;
@@ -903,18 +940,18 @@ void _tcp_stat(void)
 
     ret = _tcp_rcv_syn();
     if ((ret == E_ERR) || ((_tcp_tcb->status == _TCPS_LISTEN) && (ret != E_SYN_OK)))
-	{
+    {
         goto _tcp_stat_release;
-	}	/*2669*/
+    } /*2669*/
     if (!(_tcp_tcb->status & _TCPS_LISTEN))
-	{
+    {
         _tcp_rcv_ack();
-	}	/*2669*/
+    } /*2669*/
     if (_tcp_tcb->status == _TCPS_CLOSED)
     {
         goto _tcp_stat_release;
     }
-	
+
     if (_tcp_tcb->status & (_TCPS_ESTABLISHED | _TCPS_FIN_WAIT1 | _TCPS_FIN_WAIT2))
     {
         ret = _tcp_proc_data();
@@ -952,9 +989,9 @@ ER _tcp_rcv_rst(void)
     ph = (_TCP_HDR *)(pip->data);
 
     if (!(ph->flg & _TCPF_RST))
-	{
+    {
         return E_NO_RCV;
-	}	/*2669*/
+    } /*2669*/
     if (areq->stat == _TCP_API_STAT_INCOMPLETE)
     {
         switch (areq->type)
@@ -1015,9 +1052,9 @@ ER _tcp_rcv_rst(void)
                 /* _ITS_RST */
                 _tcp_tcb->it_stat = _ITS_RST;
                 if (_tcp_tcb->rdsize > 0)
-				{
+                {
                     break;
-				}	/*2669*/
+                } /*2669*/
                 *(areq->error) = E_CLS;
 
                 if (areq->tmout == TMO_NBLK)
@@ -1064,9 +1101,9 @@ ER _tcp_rcv_syn(void)
     ph  = (_TCP_HDR *)(pip->data);
 
     if (!(ph->flg & _TCPF_SYN))
-	{
+    {
         return E_NO_RCV;
-	}	/*2669*/
+    } /*2669*/
     switch (_tcp_tcb->status)
     {
             /* LISTEN */
@@ -1082,7 +1119,7 @@ ER _tcp_rcv_syn(void)
             /* SYN-SENT */
         case _TCPS_SYN_SENT:
             net2hl_yn_xn(&tmp,  &ph->ack) ;
-            if ((ph->flg & (_TCPF_SYN | _TCPF_ACK)) && (tmp == _tcp_initial_seqno[_ch_info_tbl->_ch_num] + 1))
+            if ((ph->flg & (_TCPF_SYN | _TCPF_ACK)) && (tmp == _tcp_tcb->tcp_initial_seqno + 1))
             {
                 net2hl_yn_xn(&_tcp_tcb->risn,  &ph->seq) ;
                 _tcp_tcb->rnxt = _tcp_tcb->risn + 1;
@@ -1159,25 +1196,25 @@ void _tcp_rcv_ack(void)
     net2hl_yn_xn(&tmp,  &ph->ack) ;
 
     if (!(ph->flg & _TCPF_ACK))
-	{
+    {
         return;
-	}	/*2669*/
+    } /*2669*/
     if (_tcp_tcb->nxt_zero != 0xffff)
-	{
+    {
         _tcp_tcb->zwp_noack_cnt = 0xffff;
-	}	/*2669*/
+    } /*2669*/
     if ((tmp > _tcp_tcb->suna) && ((tmp - _tcp_tcb->suna) < 0x7fffffff))
     {
         ackdsz = tmp - _tcp_tcb->suna;
     }
     else if ((tmp <  _tcp_tcb->suna) && ((_tcp_tcb->suna - tmp) > 0x7fffffff))
     {
-        ackdsz = 0xffffffff - _tcp_tcb->suna + tmp + 1;
+        ackdsz = 0xffffffffu - _tcp_tcb->suna + tmp + 1;
     }
     else
-	{
+    {
         return;
-	}	/*2669*/
+    } /*2669*/
     suna = tmp;
 
     if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
@@ -1185,12 +1222,10 @@ void _tcp_rcv_ack(void)
         if ((_tcp_tcb->snxt != suna) && (_tcp_tcb->retrans_q.len == ackdsz))
         {
             _tcp_tcb->retrans_q.data    = _tcp_tcb->retrans_q2.data;
-            _tcp_tcb->retrans_q.hdr_flg   = _tcp_tcb->retrans_q2.hdr_flg;
-            _tcp_tcb->retrans_q.len    = _tcp_tcb->retrans_q2.len;
-            _tcp_tcb->retrans_q.rst_cnt   = _tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
-            _tcp_tcb->retrans_q.nxt_rtx_cnt  = _TCP_RTO_INIT;
-            _tcp_tcb->retrans_q.cur_int   = _TCP_RTO_INIT;
-            _tcp_tcb->retrans_q.seq    = _tcp_tcb->retrans_q2.seq;
+            _tcp_tcb->retrans_q.hdr_flg = _tcp_tcb->retrans_q2.hdr_flg;
+            _tcp_tcb->retrans_q.len     = _tcp_tcb->retrans_q2.len;
+            _tcp_tcb->retrans_q.rst_cnt = _tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
+            _tcp_tcb->retrans_q.seq     = _tcp_tcb->retrans_q2.seq;
         }
         else
         {
@@ -1276,17 +1311,17 @@ void _tcp_rcv_ack(void)
                 && (cur_req_stat == _TCP_API_STAT_INCOMPLETE))
         {
             if (_tcp_tcb->sdsize < ackdsz)
-			{
+            {
                 _tcp_tcb->sdsize = 0;
-			}	/*2669*/
+            } /*2669*/
             else
-			{
+            {
                 _tcp_tcb->sdsize -= ackdsz;
-			}	/*2669*/
+            } /*2669*/
             if (_tcp_tcb->sdsize == 0)
-			{
+            {
                 *(_tcp_tcb->req.error) = _tcp_tcb->req.d.dr.dtsiz;
-			}	/*2669*/
+            } /*2669*/
             else
             {
                 _tcp_tcb->hdr_flg |= _TCPF_ACK;
@@ -1321,13 +1356,13 @@ sint16 _tcp_rcv_opt(void)
     hdr_siz  = ((ph->len & 0xf0) >> 2);
 
     if (hdr_siz < 20)
-	{
+    {
         return E_ERR;
-	}	/*2669*/
+    } /*2669*/
     else if (hdr_siz == 20)
-	{
+    {
         return E_OK;
-	}	/*2669*/
+    } /*2669*/
     mss = 0;
     p = &(ph->opt[0]);
     total_opt_len = hdr_siz - 20;
@@ -1355,9 +1390,9 @@ sint16 _tcp_rcv_opt(void)
             if (opt_type == 2)
             {
                 if (opt_len != 4)
-				{
+                {
                     return E_ERR;
-				}	/*2669*/
+                } /*2669*/
                 mss = (((uint16) * (p + 2)) << 8) | ((uint16) * (p + 3));
             }
         }
@@ -1365,13 +1400,13 @@ sint16 _tcp_rcv_opt(void)
         total_opt_len -= opt_len;
     }
     if (mss == 0)
-	{
+    {
         mss = _TCP_DEFAULT_MSS;
-	}	/*2669*/
+    } /*2669*/
     if ((_tcp_tcb->status & (_TCPS_LISTEN | _TCPS_SYN_SENT)) && (mss < _tcp_tcb->mss))
-	{
+    {
         _tcp_tcb->mss = mss;
-	}	/*2669*/
+    } /*2669*/
     return mss;
 }
 
@@ -1391,6 +1426,7 @@ sint16 _tcp_proc_data(void)
     uchar  *p_tdata;
     _TCPS *p_tcps ;
     _IP_PKT *p_ip;
+    uint32 calc;
 
     p_ip = (_IP_PKT *)_ch_info_tbl->_p_rcv_buf.pip;
     p_tcps = (_TCPS *) & (((_IP_PKT *)_ch_info_tbl->_p_rcv_buf.pip)->data) ;
@@ -1399,40 +1435,56 @@ sint16 _tcp_proc_data(void)
     data_siz = net2hs(p_ip->iph.ip_total_len) - _IP_HLEN_MIN - hdr_siz;
     p_tdata  = ((uchar *)p_tcps) + hdr_siz;
 
+    calc = 0;
     net2hl_yn_xn(&seq, &p_tcps->th.seq);
     if (seq != _tcp_tcb->rnxt)
     {
         _tcp_tcb->hdr_flg |= _TCPF_ACK;
         _tcp_tcb->flag |= (_TCBF_NEED_SEND | _TCBF_SND_TCP);
-        return E_ERR;
+        if (_tcp_tcb->rnxt > seq && (_tcp_tcb->rnxt - seq) < 0x7fffffff)
+        {
+            calc = _tcp_tcb->rnxt - seq;
+            data_siz -= calc;
+            p_tdata += calc;
+        }
+        else if (_tcp_tcb->rnxt < seq && (seq - _tcp_tcb->rnxt) > 0x7fffffff)
+        {
+            calc = 0xffffffffu - seq + _tcp_tcb->rnxt + 1;
+            data_siz -= calc;
+            p_tdata += calc;
+        }
+        else
+        {
+            return E_ERR;
+        }
     }
-    if (data_siz == 0)
-	{
+    if (data_siz <= 0)
+    {
         return E_NO_RCV;
-	}	/*2669*/
+    } /*2669*/
     _tcp_tcb->hdr_flg |= _TCPF_ACK;
     _tcp_tcb->flag |= (_TCBF_NEED_SEND | _TCBF_SND_TCP);
 
     free_siz = _tcp_tcb->rwin + tcp_ccep[_tcp_tcb->cepid-1].rbufsz - _tcp_tcb->rwin_curr;
     if (free_siz == 0)
-	{
+    {
         return E_NO_RCV;
-	}	/*2669*/
+    } /*2669*/
     else if (data_siz > free_siz)
-	{
+    {
         data_siz = free_siz;
-	}	/*2669*/
+    } /*2669*/
     memcpy(_tcp_tcb->rwin_curr, p_tdata, data_siz);
     _tcp_tcb->rdsize += data_siz;
     _tcp_tcb->rwin_curr += data_siz;
 
-    _tcp_tcb->rnxt = seq + data_siz;
+    _tcp_tcb->rnxt = seq + data_siz + calc;
 
     if ((_tcp_tcb->req.type == _TCP_API_RCVDT)
             && (_tcp_tcb->req.stat == _TCP_API_STAT_INCOMPLETE))
-	{
+    {
         _tcp_cpy_rwdat();
-	}	/*2669*/
+    } /*2669*/
     return E_OK;
 }
 
@@ -1452,9 +1504,9 @@ ER _tcp_rcv_fin(void)
     ph = (_TCP_HDR *)(pip->data);
 
     if (!(ph->flg & _TCPF_FIN))
-	{
+    {
         return E_NO_RCV;
-	}	/*2669*/
+    } /*2669*/
     if (!(_tcp_tcb->flag & _TCBF_FIN_RCVD))
     {
         switch (_tcp_tcb->status)
@@ -1506,7 +1558,7 @@ ER _tcp_rcv_fin(void)
                 *(_tcp_tcb->req.error) = E_CLS;
                 return E_OK;
             default:
-                break;	/*2670*/
+                break; /*2670*/
         }
         _tcp_tcb->flag |= _TCBF_FIN_RCVD;
         _tcp_tcb->rnxt++;
@@ -1549,12 +1601,12 @@ void _tcp_swin_updt(void)
         }
         else if ((_tcp_tcb->snxt <  suna) && ((suna - _tcp_tcb->snxt) > 0x7fffffff))
         {
-            diff = win_size - (0xffffffff - suna + _tcp_tcb->snxt + 1);
+            diff = win_size - (0xffffffffu - suna + _tcp_tcb->snxt + 1);
         }
         else
-		{
+        {
             diff = win_size;
-		}	/*2669*/
+        } /*2669*/
     }
     else
     {
@@ -1564,17 +1616,17 @@ void _tcp_swin_updt(void)
         }
         else if ((_tcp_tcb->snxt <  _tcp_tcb->suna) && ((_tcp_tcb->suna - _tcp_tcb->snxt) > 0x7fffffff))
         {
-            diff = win_size - (0xffffffff - _tcp_tcb->suna + _tcp_tcb->snxt + 1);
+            diff = win_size - (0xffffffffu - _tcp_tcb->suna + _tcp_tcb->snxt + 1);
         }
         else
-		{
+        {
             diff = win_size;
-		}	/*2669*/
+        } /*2669*/
     }
     if (diff < 0)
-	{
+    {
         diff = 0;
-	}	/*2669*/
+    } /*2669*/
     _tcp_tcb->rmt_rwsize = diff;
 
     if (_tcp_tcb->rmt_rwsize == 0)
@@ -1589,7 +1641,8 @@ void _tcp_swin_updt(void)
     {
         if (_tcp_tcb->sdsize > 0)
         {
-            if ((_tcp_tcb->rmt_rwsize >= _tcp_tcb->mss) || (_tcp_tcb->rmt_rwsize >= _tcp_tcb->sdsize) || (_tcp_tcb->rmt_rwsize != _tcp_tcb->swsize)/*(bug39 fix)*/)
+            if ((_tcp_tcb->rmt_rwsize >= _tcp_tcb->mss) || (_tcp_tcb->rmt_rwsize >= _tcp_tcb->sdsize) \
+                    || (_tcp_tcb->rmt_rwsize != _tcp_tcb->swsize)/*(bug39 fix)*/)
             {
                 if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
                 {
@@ -1671,16 +1724,16 @@ void _proc_snd(void)
             {
                 if (((ae->ae_state == AS_RESOLVED)
                         || (ae->ae_state == AS_PENDING)) && (ae->ae_ttl > 0))
-				{
+                {
                     ae->ae_ttl--;
-				}	/*2669*/
+                } /*2669*/
 
                 if (ae->ae_state == AS_RESOLVED)
                 {
                     if (ae->ae_ttl == 0)
-					{
+                    {
                         _ether_arp_del(ae);
-					}	/*2669*/
+                    } /*2669*/
                 }
                 else if (ae->ae_state == AS_TMOUT)
                 {
@@ -1723,8 +1776,8 @@ void _proc_snd(void)
             {
                 if (_tcp_tcb->ack_wait_timer != _tcp_timer_cnt)
                 {
-                        _tcp_tcb->ack_wait_timer = _tcp_timer_cnt;
-                        _tcp_tcb->ack_wait_timercnt--;
+                    _tcp_tcb->ack_wait_timer = _tcp_timer_cnt;
+                    _tcp_tcb->ack_wait_timercnt--;
                 }
             }
 
@@ -1766,28 +1819,28 @@ void _proc_snd(void)
 
 
             if ((_tcp_tcb->retrans_q.nxt_rtx_cnt != 0xffff) && (_tcp_tcb->retrans_q.nxt_rtx_cnt > 0))
-			{
+            {
                 _tcp_tcb->retrans_q.nxt_rtx_cnt--;
-			}	/*2669*/
+            } /*2669*/
             if ((_tcp_tcb->retrans_q.rst_cnt != 0xffff) && (_tcp_tcb->retrans_q.rst_cnt > 0))
-			{
+            {
                 _tcp_tcb->retrans_q.rst_cnt--;
-			}	/*2669*/
+            } /*2669*/
 
             if (_tcp_tcb->zwp_noack_cnt != 0xffff)
-			{
+            {
                 if (_tcp_tcb->zwp_noack_cnt > 0)
-				{
+                {
                     _tcp_tcb->zwp_noack_cnt--;
-				}	/*2669*/
-			}	/*2669*/
+                } /*2669*/
+            } /*2669*/
             if (_tcp_tcb->nxt_zero != 0xffff)
-			{
+            {
                 if (_tcp_tcb->nxt_zero > 0)
-				{
+                {
                     _tcp_tcb->nxt_zero--;
-				}	/*2669*/
-			}	/*2669*/
+                } /*2669*/
+            } /*2669*/
             if (_tcp_tcb->zwp_noack_cnt == 0)
             {
                 _tcp_tcb->zwp_noack_cnt = 0xffff;
@@ -1802,9 +1855,9 @@ void _proc_snd(void)
             {
                 _tcp_tcb->zwin_int *= 2;
                 if (_tcp_tcb->zwin_int > _TCP_RTO_INT_MAX)
-				{
+                {
                     _tcp_tcb->zwin_int = _TCP_RTO_INT_MAX;
-				}	/*2669*/
+                } /*2669*/
                 _tcp_tcb->nxt_zero = _tcp_tcb->zwin_int;
                 _tcp_tcb->flag |= (_TCBF_NEED_SEND | _TCBF_SND_ZWIN);
             }
@@ -1858,9 +1911,9 @@ void _proc_snd(void)
             {
                 _tcp_tcb->retrans_q.cur_int *= 2;
                 if (_tcp_tcb->retrans_q.cur_int > _TCP_RTO_INT_MAX)
-				{
+                {
                     _tcp_tcb->retrans_q.cur_int = _TCP_RTO_INT_MAX;
-				}	/*2669*/
+                } /*2669*/
                 _tcp_tcb->retrans_q.nxt_rtx_cnt = _tcp_tcb->retrans_q.cur_int;
                 _tcp_tcb->flag |= (_TCBF_NEED_SEND | _TCBF_SND_RTX);
             }
@@ -1943,7 +1996,8 @@ void _proc_snd(void)
         {
             if (_tcp_tcb->flag & (_TCBF_SND_TCP | _TCBF_SND_RTX | _TCBF_SND_ZWIN))
             {
-                if((_tcp_tcb->status == _TCPS_FIN_WAIT1) && (_tcp_tcb->nxt_status == _TCPS_CLOSING) && (_tcp_tcb->ack_wait_timercnt != 0))
+                if ((_tcp_tcb->status == _TCPS_FIN_WAIT1) && \
+                        (_tcp_tcb->nxt_status == _TCPS_CLOSING) && (_tcp_tcb->ack_wait_timercnt != 0))
                 {
                     /* nothing to do */
                 }
@@ -2013,7 +2067,8 @@ void _tcp_snd(void)
         {
             if (_tcp_tcb->sdsize > 0)
             {
-                if ((_tcp_tcb->flag & _TCBF_SND_TCP) && ((_tcp_tcb->suna == _tcp_tcb->snxt) || (_tcp_tcb->flag & _TCBF_AVOID_DACK)))
+                if ((_tcp_tcb->flag & _TCBF_SND_TCP) && \
+                        ((_tcp_tcb->suna == _tcp_tcb->snxt) || (_tcp_tcb->flag & _TCBF_AVOID_DACK)))
                 {
                     if (_tcp_tcb->sdsize > _tcp_tcb->mss)
                     {
@@ -2108,26 +2163,26 @@ void _tcp_snd(void)
                         flg = (_TCPF_ACK | _TCPF_PSH);
                     }
                     if (len > _tcp_tcb->rmt_rwsize)
-					{
+                    {
                         len = _tcp_tcb->rmt_rwsize;
-					}	/*2669*/
+                    } /*2669*/
                 }
                 else if (_tcp_tcb->flag & _TCBF_SND_RTX)
                 {
                     if ((_tcp_tcb->snxt >= _tcp_tcb->suna) &&
                             ((_tcp_tcb->snxt - _tcp_tcb->suna) < 0x7fffffff))
-					{
+                    {
                         len = _tcp_tcb->snxt - _tcp_tcb->suna;
-					}	/*2669*/
+                    } /*2669*/
                     else if ((_tcp_tcb->snxt <  _tcp_tcb->suna) &&
                              ((_tcp_tcb->suna - _tcp_tcb->snxt) > 0x7fffffff))
-					{
-                        len = 0xffffffff - _tcp_tcb->suna + _tcp_tcb->snxt + 1;
-					}	/*2669*/
+                    {
+                        len = 0xffffffffu - _tcp_tcb->suna + _tcp_tcb->snxt + 1;
+                    } /*2669*/
                     else
-					{
+                    {
                         len = 0;
-					}	/*2669*/
+                    } /*2669*/
                 }
             }
             else
@@ -2135,7 +2190,14 @@ void _tcp_snd(void)
                 len = 0;
             }
         }
-        if (_tcp_tcb->flag & _TCBF_SND_TCP)
+        if (_tcp_tcb->flag & _TCBF_SND_RTX)
+        {
+            pdata = _tcp_tcb->retrans_q.data;
+            seq  = _tcp_tcb->retrans_q.seq;
+            flg  |= _tcp_tcb->retrans_q.hdr_flg;
+            smode = _TCBF_SND_RTX;
+        }
+        else if (_tcp_tcb->flag & _TCBF_SND_TCP)
         {
             pdata = _tcp_tcb->nxtdat;
             seq  = _tcp_tcb->snxt;
@@ -2178,13 +2240,6 @@ void _tcp_snd(void)
                 }
             }
         }
-        else if (_tcp_tcb->flag & _TCBF_SND_RTX)
-        {
-            pdata = _tcp_tcb->retrans_q.data;
-            seq  = _tcp_tcb->retrans_q.seq;
-            flg  |= _tcp_tcb->retrans_q.hdr_flg;
-            smode = _TCBF_SND_RTX;
-        }
     }
     ptcph = (_TCP_HDR *)(_tx_hdr.ihdr.tip.thdr.tcph);
     ptcph->sport = hs2net(_tcp_tcb->loc_port) ;
@@ -2192,13 +2247,13 @@ void _tcp_snd(void)
     hl2net_yn_xn(&ptcph->ack, &_tcp_tcb->rnxt);
     hl2net_yn_xn(&ptcph->seq, &seq);
     if (flg & _TCPF_RST)
-	{
+    {
         ptcph->flg  = _TCPF_RST ;
-	}	/*2669*/
+    } /*2669*/
     else
-	{
+    {
         ptcph->flg  = flg ;
-	}	/*2669*/
+    } /*2669*/
     if (ptcph->flg & _TCPF_SYN)
     {
         ptcph->opt[0] = 0x02 ; /* Option Kind = 2 (MSS) */
@@ -2211,7 +2266,7 @@ void _tcp_snd(void)
     {
         ptcph->len = (20 << 2);
     }
-    ptcph->win_size = hs2net(_tcp_tcb->rwin + tcp_ccep[_tcp_tcb->cepid-1].rbufsz - _tcp_tcb->rwin_curr) ;
+    ptcph->win_size = hs2net((_tcp_tcb->rwin) + (tcp_ccep[_tcp_tcb->cepid-1].rbufsz) - (_tcp_tcb->rwin_curr)) ;
     _cpy_ipaddr(phdr.sadr, _ch_info_tbl->_myipaddr);
     _cpy_ipaddr(phdr.dadr, _tcp_tcb->rem_ip);
     phdr.reserve = 0 ;
@@ -2277,9 +2332,9 @@ void _tcp_snd(void)
         if ((_tcp_tcb->flag & _TCBF_SND_ZWIN) && !(_tcp_tcb->hdr_flg & (_TCPF_FIN | _TCPF_SYN | _TCPF_RST)))
         {
             if (_tcp_tcb->zwp_noack_cnt == 0xffff)
-			{
+            {
                 _tcp_tcb->zwp_noack_cnt = _tcp_rt_tmo_rst[_ch_info_tbl->_ch_num];
-			}	/*2669*/
+            } /*2669*/
         }
         if (_tcp_dack[_ch_info_tbl->_ch_num] == 1)
         {
@@ -2311,13 +2366,13 @@ void _tcp_snd(void)
                 _tcp_init_tcb(_tcp_tcb);
             }
             else if (_tcp_tcb->flag & _TCBF_RET_LISTEN)
-			{
+            {
                 _tcp_return_listen();
-			}	/*2669*/
+            } /*2669*/
             else
-			{
+            {
                 _tcp_tcb->status = _tcp_tcb->nxt_status;
-			}	/*2669*/
+            } /*2669*/
             _tcp_tcb->flag &= ~_TCBF_NEED_SEND;
             return;
         }
@@ -2327,9 +2382,9 @@ void _tcp_snd(void)
             if (_tcp_tcb->hdr_flg & (_TCPF_SYN | _TCPF_FIN))
             {
                 _tcp_tcb->snxt++;
-                if(_tcp_tcb->hdr_flg & (_TCPF_FIN))
+                if (_tcp_tcb->hdr_flg & (_TCPF_FIN))
                 {
-                    if(_tcp_tcb->nxt_status == _TCPS_FIN_WAIT1)
+                    if (_tcp_tcb->nxt_status == _TCPS_FIN_WAIT1)
                     {
                         _tcp_tcb->ack_wait_timer = tcpudp_get_time();
                         _tcp_tcb->ack_wait_timercnt = _TCP_FIN_WAIT1_SND_WAIT;
@@ -2346,9 +2401,9 @@ void _tcp_snd(void)
                     {
                         *(_tcp_tcb->req.error) = E_OK;
                         if (_tcp_tcb->req.type == _TCP_API_SHTCP)
-						{
+                        {
                             _tcp_tcb->it_stat = _ITS_SHT;
-						}	/*2669*/
+                        } /*2669*/
                         if (_tcp_tcb->req.tmout == TMO_NBLK)
                         {
                             FN fncd;
@@ -2364,9 +2419,9 @@ void _tcp_snd(void)
                 }
                 _tcp_tcb->status = _tcp_tcb->nxt_status;
                 if (_tcp_tcb->status == _TCPS_TIME_WAIT)
-				{
+                {
                     _tcp_tcb->mslcnt = _tcp_2msl[_ch_info_tbl->_ch_num];
-				}	/*2669*/
+                } /*2669*/
             }
 
             else
@@ -2716,9 +2771,9 @@ ER _tcp_recv_polling(_TCB* pTcb, uchar *buf, uint16 size)
         pTcb->rwin_curr = pTcb->rwin;
     }
     else
-	{
+    {
         pTcb->rwin_bnry += api_dsiz;
-	}	/*2669*/
+    } /*2669*/
     return api_dsiz;
 }
 

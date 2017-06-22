@@ -14,16 +14,18 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2014-2016 Renesas Electronics Corporation. All rights reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : udp.c
-* Version      : 1.0
+* Version      : 1.01
 * Description  : Processing for TCP API
+* Website      : https://www.renesas.com/mw/t4
 ***********************************************************************************************************************/
 /**********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
+* History : DD.MM.YYYY Version Description
+*         : 01.04.2014 1.00    First Release
+*         : 30.11.2016 1.01    add DHCP relation
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
@@ -46,8 +48,9 @@ Includes   <System Includes> , "Project Includes"
 #include "ip.h"
 #include "tcp.h"
 #include "udp.h"
-#include "r_t4_rx/src/config_tcpudp.h"
+#include "dhcp.h"
 
+#include "r_t4_rx/src/config_tcpudp.h"
 
 /***********************************************************************************************************************
 Macro definitions
@@ -67,18 +70,10 @@ Private global variables and functions
 
 #if defined(_UDP)
 _UDP_CB  *_udp_cb;
-/// extern far const T_UDP_CCEP udp_ccep[];
-/// extern far const H __udpcepn;
-extern far const UB _udp_enable_zerochecksum[];
 extern UB *data_link_buf_ptr;
 #endif
 
 extern _TX_HDR _tx_hdr;
-
-#if defined(_ETHER)
-extern UB *_ether_p_rcv_buff;
-#endif /* _ETHER */
-
 
 #if defined(_UDP)
 /***********************************************************************************************************************
@@ -97,6 +92,11 @@ ER udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, VP data, INT len, TMO tmout)
     if (ercd != E_OK)
     {
         return E_PAR;
+    }
+
+    if (1 == _ch_info_head[(udp_ccep[cepid-1].cepatr)].ip_terminated_flag)
+    {
+        return E_SYS;
     }
 
     ercd = _udp_check_len_arg(len);
@@ -164,7 +164,7 @@ ER udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, VP data, INT len, TMO tmout)
 
         p->cepid = cepid;
         p->len  = len;
-        p->data  = (uchar *)((uint32)data);
+        p->data  = (uchar *)data;
         p->cancel_flag = 0;
         p->tmout = tmout;
         p->ercd  = &pcb->req.rcv_ercd;
@@ -187,6 +187,10 @@ ER udp_rcv_dat(ID cepid, T_IPVxEP *p_dstaddr, VP data, INT len, TMO tmout)
         {
             _udp_api_slp(pcb, cepid);
             ercd = pcb->req.rcv_ercd;
+            if (1 == (_ch_info_head[udp_ccep[cepid-1].cepatr].ip_terminated_flag))
+            {
+                ercd = E_SYS;
+            }
         }
         pcb->req.rcv_ercd = ercd;
     }
@@ -211,6 +215,11 @@ ER udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, VP data, INT len, TMO tmout)
     if (ercd != E_OK)
     {
         return E_PAR;
+    }
+
+    if (1 == _ch_info_head[(udp_ccep[cepid-1].cepatr)].ip_terminated_flag)
+    {
+        return E_SYS;
     }
 
     ercd = _udp_check_len_arg(len);
@@ -251,7 +260,7 @@ ER udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, VP data, INT len, TMO tmout)
 
     p->cepid = cepid;
     p->len  = len;
-    p->data  = (uchar *)((uint32)data);
+    p->data  = (uchar *)data;
     p->cancel_flag = 0;
     p->tmout = tmout;
     p->ercd  = &pcb->req.snd_ercd;
@@ -274,10 +283,14 @@ ER udp_snd_dat(ID cepid, T_IPVxEP *p_dstaddr, VP data, INT len, TMO tmout)
     {
         _udp_api_slp(pcb, cepid);
         ercd = pcb->req.snd_ercd;
+        if (1 == (_ch_info_head[udp_ccep[cepid-1].cepatr].ip_terminated_flag))
+        {
+            ercd = E_SYS;
+        }
     }
     pcb->req.snd_ercd = ercd;
 
-	return (ercd);
+    return (ercd);
 }
 
 /***********************************************************************************************************************
@@ -300,6 +313,11 @@ ER udp_can_cep(ID cepid, FN fncd)
         return E_PAR;
     }
 
+    if (1 == _ch_info_head[(udp_ccep[cepid-1].cepatr)].ip_terminated_flag)
+    {
+        return E_SYS;
+    }
+
     pcb = &_udp_cb[cepid - 1];
     p   = &pcb->req;
 
@@ -319,8 +337,9 @@ ER udp_can_cep(ID cepid, FN fncd)
     dis_int();
 
     if (((cepid_tmp == p->cepid) && (fncd_tmp == _udp_api_type_to_fn(p->type))) || \
-            ((cepid_tmp == p->cepid) && (fncd_tmp == TFN_UDP_ALL) && (_udp_api_type_to_fn(p->type) == TFN_UDP_SND_DAT)) || \
-            ((cepid_tmp == p->cepid) && (fncd_tmp == TFN_UDP_ALL) && (_udp_api_type_to_fn(p->type) == TFN_UDP_RCV_DAT)))
+            ((cepid_tmp == p->cepid) && (fncd_tmp == TFN_UDP_ALL) && (_udp_api_type_to_fn(p->type) == TFN_UDP_SND_DAT))\
+            || ((cepid_tmp == p->cepid) && (fncd_tmp == TFN_UDP_ALL) && (_udp_api_type_to_fn(p->type) == \
+                    TFN_UDP_RCV_DAT)))
     {
         ercd = E_OK;
 
@@ -350,6 +369,7 @@ void _udp_rcv(_IP_HDR *piph, _UDP_HDR *pudph)
     uint16  dport;
     _UDP_CB  *pucb;
     uint16  cksum_tmp;
+    sint16  endpoint;
 
     cksum_tmp = _tcpudp_cksum(piph, &ph);
     if (pudph->cksum != 0)
@@ -387,8 +407,29 @@ void _udp_rcv(_IP_HDR *piph, _UDP_HDR *pudph)
             break;
         }
     }
+    if (1 == _t4_dhcp_enable)
+    {
+        for (i = __udpcepn; i < (__udpcepn + _t4_channel_num); i++)
+        {
+            if (((_ch_info_tbl->pt_udp_dhcp_ccep->myaddr.portno) == dport) &&
+                    ((_ch_info_tbl->_ch_num) == (_ch_info_tbl->pt_udp_dhcp_ccep->cepatr)))
+            {
+                pucb = &_udp_cb[i];
+                _udp_rcv_sub(pucb, pudph, &ph);
+                break;
+            }
+        }
+    }
 
-    if (i == __udpcepn)
+    if (1 == _t4_dhcp_enable)
+    {
+        endpoint = __udpcepn + _t4_channel_num;
+    }
+    else
+    {
+        endpoint = __udpcepn;
+    }
+    if (i == endpoint)
     {
         report_error(_ch_info_tbl->_ch_num, RE_UDP_HEADER3, data_link_buf_ptr);
     }
@@ -408,14 +449,15 @@ sint16 _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
 {
     T_UDP_CCEP far const *pcep;
     FN    fncd;
-    uint16   sport;
-    uint16   saddr[IP_ALEN/2];
-    uint16   len;
+    uint16  sport;
+    uint16  saddr[IP_ALEN/2];
+    uint16  len;
     uchar   *data;
-    uint16   ip_dlen;
-    ID    cepid;
-    UH    count;
-    _UDP_CB   *tmp;
+    uint16  ip_dlen;
+    ID      cepid;
+    UH      count;
+    _UDP_CB *tmp;
+    UH      endpoint;
 
     fncd = 0;
     if ((pucb->req.type == _UDP_API_RCV_DAT)
@@ -471,7 +513,22 @@ sint16 _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
     }
 
     cepid = (pucb   - _udp_cb) + 1;
-    pcep = &udp_ccep[cepid - 1];
+    if (1 == _t4_dhcp_enable)
+    {
+        if (cepid > __udpcepn)
+        {
+            pcep = (_ch_info_head[cepid -1 -__udpcepn].pt_udp_dhcp_ccep);
+        }
+        else
+        {
+            pcep = &udp_ccep[cepid - 1];
+        }
+    }
+    else
+    {
+        pcep = &udp_ccep[cepid - 1];
+    }
+
     if (fncd == 0)
     {
         *(pucb->req.ercd) = pucb->req.rcv_ercd;
@@ -482,14 +539,40 @@ sint16 _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
     {
         if (pcep->callback != NULL)
         {
-            for (count = 0; count < __udpcepn; count++)
+            if (1 == _t4_dhcp_enable)
             {
-                tmp = &_udp_cb[count];
-                tmp->stat |= _UDP_CB_STAT_CALLBACK;
+                endpoint = __udpcepn + _t4_channel_num;
             }
-            (*pcep->callback)(cepid, fncd, (VP)&pucb->req.rcv_ercd);
+            else
+            {
+                endpoint = __udpcepn;
+            }
+            if ((0 != (_ch_info_head[pcep->cepatr]._myipaddr[0])) || (__udpcepn < cepid))
+            {
+                for (count = 0; count < endpoint; count++)
+                {
+                    tmp = &_udp_cb[count];
+                    tmp->stat |= _UDP_CB_STAT_CALLBACK;
+                }
+                if (0 == (_ch_info_head[udp_ccep[cepid-1].cepatr].ip_terminated_flag))
+                {
+                    (*pcep->callback)(cepid, fncd, (VP)&pucb->req.rcv_ercd);
+                }
+            }
         }
-        for (count = 0; count < __udpcepn; count++)
+        if (1 == _t4_dhcp_enable)
+        {
+            if (udph->src_port == hs2net(DHCP_SERVER_PORT))
+            {
+                dhcp_rcv_dat_int(pucb, udph, ph);
+            }
+            endpoint = __udpcepn + _t4_channel_num;
+        }
+        else
+        {
+            endpoint = __udpcepn;
+        }
+        for (count = 0; count < endpoint; count++)
         {
             tmp = &_udp_cb[count];
             tmp->stat &= (~(_UDP_CB_STAT_CALLBACK | _UDP_CB_STAT_RCV));
@@ -508,26 +591,68 @@ void _udp_snd(_TCPUDP_PHDR *ph)
 {
     FN    fncd;
     T_UDP_CCEP far const *pcep;
-    sint16   len;
-    uint16   sum16;
-    _UDP_CB   *pucb;
+    sint16      len;
+    uint16      sum16;
+    _UDP_CB     *pucb;
     _UDP_API_REQ *pureq;
-    _UDP_HDR  *udph;
-    sint16   ret;
-    sint16   i;
-    UH    count;
-    _UDP_CB   *tmp;
+    _UDP_HDR    *udph;
+    sint16      ret;
+    sint16      i;
+    UH          count;
+    _UDP_CB     *tmp;
+    uint32_t    ul_magic_cookie;
+    uint32_t    ul_your_ip_address;
+    T_UDP_CCEP* pt_udp_dhcp_ccep;
+    sint16      endpoint;
 
-    for (i = 0; i < __udpcepn; i++)
+    if (_t4_dhcp_enable == 1)
+    {
+        endpoint = __udpcepn + _t4_channel_num;
+    }
+    else
+    {
+        endpoint = __udpcepn;
+    }
+    for (i = 0; i < endpoint; i++)
     {
         pucb  = &_udp_cb[i];
         pureq = &pucb->req;
-        _ch_info_tbl = &_ch_info_head[udp_ccep[i].cepatr];
 
-    	if ((pucb->stat & _UDP_CB_STAT_SND) && (pureq->stat == _UDP_API_STAT_INCOMPLETE))
+        if (_t4_dhcp_enable == 1)
+        {
+            if (i >= __udpcepn)
+            {
+                _ch_info_tbl = &_ch_info_head[i-__udpcepn];
+            }
+            else
+            {
+                _ch_info_tbl = &_ch_info_head[udp_ccep[i].cepatr];
+            }
+            pt_udp_dhcp_ccep = _ch_info_tbl->pt_udp_dhcp_ccep;
+        }
+        else
+        {
+            _ch_info_tbl = &_ch_info_head[udp_ccep[i].cepatr];
+        }
+
+        if ((pucb->stat & _UDP_CB_STAT_SND) && (pureq->stat == _UDP_API_STAT_INCOMPLETE))
         {
             udph = (_UDP_HDR *)(_tx_hdr.ihdr.tip.thdr.udph);
-            udph->src_port = hs2net(udp_ccep[i].myaddr.portno);
+            if (_t4_dhcp_enable == 1)
+            {
+                if (i >= __udpcepn)
+                {
+                    udph->src_port = hs2net(pt_udp_dhcp_ccep->myaddr.portno);
+                }
+                else
+                {
+                    udph->src_port = hs2net(udp_ccep[i].myaddr.portno);
+                }
+            }
+            else
+            {
+                udph->src_port = hs2net(udp_ccep[i].myaddr.portno);
+            }
             udph->dst_port = hs2net(pureq->p_dstaddr->portno);
             len    = pureq->len + sizeof(_UDP_HDR);
             udph->len  = hs2net(len);
@@ -536,7 +661,26 @@ void _udp_snd(_TCPUDP_PHDR *ph)
             ph->len      = udph->len;
             ph->reserve  = 0;
             hl2net_yn_xn(&ph->dst_addr, &pureq->p_dstaddr->ipaddr);
-            _cpy_ipaddr(ph->src_addr, _ch_info_tbl->_myipaddr);
+            if (_t4_dhcp_enable == 1)
+            {
+				dhcp_packet_t * t = (dhcp_packet_t*)pureq->data;
+///				void* ptr = (((dhcp_packet_t*)pureq->data)->uca312_options);
+				uint32_t* tmp = (uint32_t*)t->uca312_options;
+                ul_magic_cookie = net2hl(tmp[0]);
+                ul_your_ip_address = _ch_info_tbl->_myipaddr[0];
+                if ((ul_your_ip_address == 0) && (ul_magic_cookie == DHCP_PKTFLD_MAGIC_COOKIE))
+                {
+                    memset(ph->src_addr, 0, IP_ALEN);
+                }
+                else
+                {
+                    _cpy_ipaddr(ph->src_addr, _ch_info_tbl->_myipaddr);
+                }
+            }
+            else
+            {
+                _cpy_ipaddr(ph->src_addr, _ch_info_tbl->_myipaddr);
+            }
             ph->proto = _IPH_UDP;
 
             sum16 = _cksum((uchar *)ph,   sizeof(_TCPUDP_PHDR), 0);
@@ -551,7 +695,21 @@ void _udp_snd(_TCPUDP_PHDR *ph)
 
             _tx_hdr.hlen = sizeof(_UDP_HDR);
             _cpy_ipaddr(_tx_hdr.ihdr.tip.iph.ip_dst, ph->dst_addr);
-            _cpy_ipaddr(_tx_hdr.ihdr.tip.iph.ip_src, ph->src_addr);
+            if (_t4_dhcp_enable == 1)
+            {
+                if ((ul_your_ip_address == 0) && (ul_magic_cookie == DHCP_PKTFLD_MAGIC_COOKIE))
+                {
+                    memset(_tx_hdr.ihdr.tip.iph.ip_src, 0, IP_ALEN);
+                }
+                else    /*normal*/
+                {
+                    _cpy_ipaddr(_tx_hdr.ihdr.tip.iph.ip_src, ph->src_addr);
+                }
+            }
+            else
+            {
+                _cpy_ipaddr(_tx_hdr.ihdr.tip.iph.ip_src, ph->src_addr);
+            }
             _tx_hdr.ihdr.tip.iph.ip_proto_num = _IPH_UDP;
             ret = _ip_snd(pureq->data, pureq->len);
 
@@ -571,18 +729,51 @@ void _udp_snd(_TCPUDP_PHDR *ph)
                 {
                     pureq->stat = _UDP_API_STAT_COMPLETE;
                     pureq->type = _UDP_API_NON;
-                    pcep = &udp_ccep[i];
+                    if (_t4_dhcp_enable == 1)
+                    {
+                        if (i >= __udpcepn)
+                        {
+                            pcep = (_ch_info_head[i -__udpcepn].pt_udp_dhcp_ccep);
+                        }
+                        else
+                        {
+                            pcep = &udp_ccep[i];
+                        }
+                    }
+                    else
+                    {
+                        pcep = &udp_ccep[i];
+                    }
                     if (pcep->callback != NULL)
                     {
-                        for (count = 0; count < __udpcepn; count++)
+                        if (_t4_dhcp_enable == 1)
+                        {
+                            endpoint = __udpcepn + _t4_channel_num;
+                        }
+                        else
+                        {
+                            endpoint = __udpcepn;
+                        }
+                        for (count = 0; count < endpoint; count++)
                         {
                             tmp = &_udp_cb[count];
                             tmp->stat |= _UDP_CB_STAT_CALLBACK;
                         }
                         fncd = TFN_UDP_SND_DAT;
-                        (*pcep->callback)(i + 1, fncd, (VP)&pureq->snd_ercd);
+                        if (0 == (_ch_info_head[udp_ccep[count].cepatr].ip_terminated_flag))
+                        {
+                            (*pcep->callback)(i + 1, fncd, (VP)&pureq->snd_ercd);
+                        }
                     }
-                    for (count = 0; count < __udpcepn; count++)
+                    if (_t4_dhcp_enable == 1)
+                    {
+                        endpoint = __udpcepn + _t4_channel_num;
+                    }
+                    else
+                    {
+                        endpoint = __udpcepn;
+                    }
+                    for (count = 0; count < endpoint; count++)
                     {
                         tmp = &_udp_cb[count];
                         tmp->stat &= ~(_UDP_CB_STAT_CALLBACK);
@@ -638,17 +829,27 @@ void _udp_api_wup(_UDP_CB *pcb, ID id)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-void _proc_udp_api()
+void _proc_udp_api(void)
 {
     _UDP_CB      *pucb;
     _UDP_API_REQ *pureq;
-    sint16  i;
-    ER   ercd;
-    FN   fn;
-    UH    count;
-    _UDP_CB   *tmp;
+    sint16      i;
+    ER          ercd;
+    FN          fn;
+    UH          count;
+    _UDP_CB     *tmp;
+    T_UDP_CCEP* pt_udp_dhcp_ccep = _ch_info_tbl[0].pt_udp_dhcp_ccep;
+    sint16      endpoint;
 
-    for (i = 0; i < __udpcepn; i++)
+    if (_t4_dhcp_enable == 1)
+    {
+        endpoint = __udpcepn + _t4_channel_num;
+    }
+    else
+    {
+        endpoint = __udpcepn;
+    }
+    for (i = 0; i < endpoint; i++)
     {
         pucb  = &_udp_cb[i];
         pureq = &pucb->req;
@@ -667,13 +868,31 @@ void _proc_udp_api()
                 fn = _udp_api_type_to_fn(pureq->type);
                 memset(pucb, 0, sizeof(_UDP_CB));
                 ercd = E_RLWAI;
-                for (count = 0; count < __udpcepn; count++)
+                if (_t4_dhcp_enable == 1)
+                {
+                    endpoint = __udpcepn + _t4_channel_num;
+                }
+                else
+                {
+                    endpoint = __udpcepn;
+                }
+                for (count = 0; count < endpoint; count++)
                 {
                     tmp = &_udp_cb[count];
                     tmp->stat |= _UDP_CB_STAT_CALLBACK;
                 }
-                (udp_ccep[i].callback)(i + 1 /* cepid */, fn, (VP)&ercd);
-                for (count = 0; count < __udpcepn; count++)
+                if (i >= __udpcepn)
+                {
+                    ((pt_udp_dhcp_ccep + (i - __udpcepn))->callback)(i + 1 /* cepid */, fn, (VP)&ercd);
+                }
+                else
+                {
+                    if (0 == (_ch_info_head[udp_ccep[i].cepatr].ip_terminated_flag))
+                    {
+                        (udp_ccep[i].callback)(i + 1 /* cepid */, fn, (VP)&ercd);
+                    }
+                }
+                for (count = 0; count < endpoint; count++)
                 {
                     tmp = &_udp_cb[count];
                     tmp->stat &= ~(_UDP_CB_STAT_CALLBACK);
@@ -692,9 +911,18 @@ void _proc_udp_api()
 ***********************************************************************************************************************/
 void _udp_init(UW **workpp)
 {
+    uint32_t    endpoint;
+
     _udp_cb = (_UDP_CB *)(*workpp);
-    memset(_udp_cb, 0, sizeof(_UDP_CB) * __udpcepn);
-    *workpp = (UW *)((uchar *)(*workpp) + (sizeof(_UDP_CB) * __udpcepn));
+    if (_t4_dhcp_enable == 1)
+    {
+        endpoint = __udpcepn + _t4_channel_num;
+    }
+    else
+    {
+        endpoint = __udpcepn;
+    }
+    *workpp = (UW *)((uchar *)(*workpp) + (sizeof(_UDP_CB) * (endpoint)));
 }
 
 
@@ -704,12 +932,21 @@ void _udp_init(UW **workpp)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-void _udp_api_tmout()
+void _udp_api_tmout(void)
 {
     _UDP_API_REQ *pureq;
-    sint16  i;
+    sint16      i;
+    sint16      endpoint;
 
-    for (i = 0; i < __udpcepn; i++)
+    if (_t4_dhcp_enable == 1)
+    {
+        endpoint = __udpcepn + _t4_channel_num;
+    }
+    else
+    {
+        endpoint = __udpcepn;
+    }
+    for (i = 0; i < endpoint; i++)
     {
         pureq = &_udp_cb[i].req;
         if (pureq->type != _UDP_API_NON)
@@ -730,7 +967,7 @@ void _udp_api_tmout()
         }
     }
 }
-#endif
+#endif  /*#if defined(_UDP)*/
 
 /***********************************************************************************************************************
 * Function Name: _tcpudp_cksum
@@ -793,7 +1030,17 @@ FN  _udp_api_type_to_fn(uint16 api_type)
 ER _udp_check_cepid_arg(ID cepid)
 {
     ER err = E_OK;
-    if ((cepid <= 0) || (cepid > __udpcepn))
+    ID      endpoint;
+
+    if (_t4_dhcp_enable == 1)
+    {
+        endpoint = __udpcepn + _t4_channel_num;
+    }
+    else
+    {
+        endpoint = __udpcepn;
+    }
+    if ((cepid <= 0) || (cepid > endpoint))
     {
         err = E_PAR;
     }

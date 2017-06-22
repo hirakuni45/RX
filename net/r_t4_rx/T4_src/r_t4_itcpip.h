@@ -1,19 +1,32 @@
-/******************************************************************************
-* WEBSITE
-* Please refer to
-*   http://www.renesas.com/mw/t4
-*   http://japan.renesas.com/mw/t4
-*******************************************************************************
-  Copyright (C) 2004-2015. Renesas Electronics Corporation, All Rights Reserved.
-*******************************************************************************
+/***********************************************************************************************************************
+* DISCLAIMER
+* This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+* other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+* applicable laws, including copyright laws.
+* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+* EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+* SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+* SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+* this software. By using this software, you agree to the additional terms and conditions found by accessing the
+* following link:
+* http://www.renesas.com/disclaimer
+*
+* Copyright (C) 2004-2016 Renesas Electronics Corporation, All Rights Reserved.
+***********************************************************************************************************************/
+/***********************************************************************************************************************
 * File Name    : r_t4_itcpip.h
-* Version      : 2.05
-* Description  : TCP/IP library T4 Header file
-*******************************************************************************
-* History : DD.MM.YYYY Version Description
-*         : 25.08.2009 0.24     First beta Release
+* Version      : 2.06
+* Description  : TCP/IP library T4 Header file.
+* Website      : https://www.renesas.com/mw/t4
+***********************************************************************************************************************/
+/***********************************************************************************************************************
+* History : DD.MM.YYYY Version  Description
+*         : 25.08.2009 0.24     First beta Release from T3(since 2007) and T2(since 2004) code.
 *         : 25.09.2009 0.25     Corresponded for RSK standard driver interface
-*         : 08.10.2009 0.26     Applied T3-Tiny bug fix
+*         : 08.10.2009 0.26     Applied T3 bug fix
 *         : 11.03.2010 0.27     Fixed bug.
 *         : 12.03.2010 0.28     Added setting variable "_tcp_dack"
 *         : 27.08.2010 0.29     Corrected r_t4_itcpip.h
@@ -43,35 +56,14 @@
 *         :                     Deleted PPP Libraries temporary. (maybe return at next release)
 *         :                     Fixed Bug.
 *         : 07.08.2014 2.01     Clean up source code.
-*         : 01.29.2015 2.02     Changed RX IDE from High-performance Embedded Workshop to CS+.
+*         : 29.01.2015 2.02     Changed RX IDE from High-performance Embedded Workshop to CS+/e2 studio.
 *         :                     Changed RX compiler option from (-rx600,-rx200) to (-rxv2,-rxv1).
-*         : 07.01.2015 2.03     Fixed Bug: Fixed behavior of crossing-FIN sequence.
-*         :                     Fixed Bug: Fixed behavior of receiving Windowsize=0 ACK when passive close. 
-*         : 08.25.2015 2.04     Added SC32 support. 
-*         : 01.12.2015 2.05     IGMP added.
-*-----------------------------------------------------------------------------
-* T4 library list :
-*                   Ethernet    PPP     Notice
-*   RXV1-big        V.2.05      x       PPP is temporarily unavailable
-*   RXV1-little     V.2.05      x       PPP is temporarily unavailable
-*   SC32            V.2.04      x       PPP is temporarily unavailable
-*   RXV2-big        V.2.03      x       PPP is temporarily unavailable
-*   RXV2-little     V.2.03      x       PPP is temporarily unavailable
-*   RXV1-big        V.2.03      x       PPP is temporarily unavailable
-*   RXV1-little     V.2.03      x       PPP is temporarily unavailable
-*   V850E2M         V.1.04      -
-*   SH-2A           V.1.06      -
-*   SH-2A-fpu       V.1.06      -
-*   SH-4-big        -           -
-*   SH-4-little     V.1.04      -
-*   SH-4A-big       x           -       Renesas internal use
-*   SH-4A-little    x           -       Renesas internal use
-*   H8S/2600-adv    V.1.04      -
-*   M16C            V.1.04      -
-*   R8C             x           x       Renesas internal use
-*   R8C-far         x           x       Renesas internal use
-*-----------------------------------------------------------------------------
-******************************************************************************/
+*         : 01.07.2015 2.03     Fixed Bug: Fixed behavior of crossing-FIN sequence.
+*         :                     Fixed Bug: Fixed behavior of receiving Windowsize=0 ACK when passive close.
+*         : 25.08.2015 2.04     Added SC32 support. (Unofficial release)
+*         : 01.12.2015 2.05     Added IGMP support.
+*         : 30.11.2016 2.06     Added DHCP support.
+***********************************************************************************************************************/
 
 #ifndef _R_T4_ITCPIP_H
 #define _R_T4_ITCPIP_H
@@ -112,8 +104,8 @@ typedef void _far *     VP;
 typedef void    (*FP)(void);
 
 #if defined(__GNUC__)
-typedef int               INT;
-typedef unsigned int          UINT;
+typedef int             INT;
+typedef unsigned int    UINT;
 #else
 typedef W               INT;
 typedef UW              UINT;
@@ -213,7 +205,22 @@ typedef struct T4_STATISTICS
     UW re_icmp_header1_cnt;
     UW re_igmp_header1_cnt;    /* v205 IGMP ext. */
     UW re_igmp_header2_cnt;    /* v205 IGMP ext. */
+    UW re_dhcp_header1_cnt;    /* v206 DHCP ext. */
+    UW re_dhcp_header2_cnt;    /* v206 DHCP ext. */
 }T4_STATISTICS;
+
+typedef struct _dhcp
+{
+    uint8_t ipaddr[4];
+    uint8_t maskaddr[4];
+    uint8_t gwaddr[4];
+    uint8_t dnsaddr[4];
+    uint8_t dnsaddr2[4];
+    char    domain[253+1];
+    uint8_t macaddr[6];
+}DHCP;
+
+typedef ER(*callback_from_system_t)(UB channel, UW eventid, VP param);
 
 /****************************/
 /***  API Function Codes  ***/
@@ -358,47 +365,69 @@ typedef struct T4_STATISTICS
 #define RE_UDP_HEADER3      -83
 #define RE_ICMP_HEADER1     -101
 
-#define	RE_IGMP_HEADER1		-121	/* v205 IGMP ext. this error is IGMP header checksum error*/
-#define	RE_IGMP_HEADER2		-122	/* v205 IGMP ext. this error is IGMP packet Untreated*/
+#define RE_IGMP_HEADER1     -121 /* v205 IGMP ext. this error is IGMP header checksum error*/
+#define RE_IGMP_HEADER2     -122 /* v205 IGMP ext. this error is IGMP packet Untreated*/
+
+#define RE_DHCP_ILLEGAL     (-131)
+#define RE_DHCP_SND_TIMEOUT (-132)
 
 /******************************************
  *      Error code (IGMP)                 *
  ******************************************/
- 
-#define	E_IGMP_MULTICAST_OUT_OF_RANGE	-1
-#define E_IGMP_MULTICAST_DOUBLE_ENTRY	-2
-#define E_IGMP_MULTICAST_NOT_ENTRY		-3
-#define E_IGMP_MULTICAST_MAX_ENTRY		-4
-#define	E_IGMP_SYSTEM_ERROR				-5
+
+#define E_IGMP_MULTICAST_OUT_OF_RANGE -1
+#define E_IGMP_MULTICAST_DOUBLE_ENTRY -2
+#define E_IGMP_MULTICAST_NOT_ENTRY    -3
+#define E_IGMP_MULTICAST_MAX_ENTRY    -4
+#define E_IGMP_SYSTEM_ERROR           -5
 
 #define IP_ALEN    4
 typedef UB IPaddr[IP_ALEN]; /*  IP address */
 
- 
+
+/*******************************
+ *      callback eventID       *
+ *******************************/
+/* L2:ether layer */
+#define ETHER_EV_LINK_OFF           (0u)
+#define ETHER_EV_LINK_ON            (1u)
+#define ETHER_EV_COLLISION_IP       (2u)
+/* L7:dhcp */
+#define DHCP_EV_LEASE_IP            (20u)
+#define DHCP_EV_LEASE_OVER          (21u)
+#define DHCP_EV_INIT                (22u)
+#define DHCP_EV_INIT_REBOOT         (23u)
+#define DHCP_EV_APIPA               (24u)
+#define DHCP_EV_NAK                 (25u)
+#define DHCP_EV_FATAL_ERROR         (26u)
+#define DHCP_EV_PLEASE_RESET        (27u)
+
 /*******************************/
 /***  Prototype Declaration  ***/
 /*******************************/
 #if defined(__GNUC__)
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif
 #endif
-ER udp_snd_dat(ID cepid, T_IPV4EP *p_dstaddr, VP data, INT len, TMO tmout);
-ER udp_rcv_dat(ID cepid, T_IPV4EP *p_dstaddr, VP data, INT len, TMO tmout);
-ER udp_can_cep(ID cepid, FN fncd);
+    ER udp_snd_dat(ID cepid, T_IPV4EP *p_dstaddr, VP data, INT len, TMO tmout);
+    ER udp_rcv_dat(ID cepid, T_IPV4EP *p_dstaddr, VP data, INT len, TMO tmout);
+    ER udp_can_cep(ID cepid, FN fncd);
 
-ER tcp_acp_cep(ID cepid, ID repid, T_IPV4EP *p_dstadr, TMO tmout);
-ER tcp_con_cep(ID cepid, T_IPV4EP *p_myadr,  T_IPV4EP *p_dstadr, TMO tmout);
-ER tcp_sht_cep(ID cepid);
-ER tcp_cls_cep(ID cepid, TMO tmout);
-ER tcp_snd_dat(ID cepid, VP data,  INT dlen, TMO tmout);
-ER tcp_rcv_dat(ID cepid, VP data, INT dlen, TMO tmout);
-ER tcp_can_cep(ID cepid, FN fncd);
+    ER tcp_acp_cep(ID cepid, ID repid, T_IPV4EP *p_dstadr, TMO tmout);
+    ER tcp_con_cep(ID cepid, T_IPV4EP *p_myadr,  T_IPV4EP *p_dstadr, TMO tmout);
+    ER tcp_sht_cep(ID cepid);
+    ER tcp_cls_cep(ID cepid, TMO tmout);
+    ER tcp_snd_dat(ID cepid, VP data,  INT dlen, TMO tmout);
+    ER tcp_rcv_dat(ID cepid, VP data, INT dlen, TMO tmout);
+    ER tcp_can_cep(ID cepid, FN fncd);
 
-ER tcpudp_open(UW *workp);    /* Open TCP/IP library (initialization)                         */
-ER tcpudp_close(void);        /* Close TCP/IP library (stop)                                  */
-W  tcpudp_get_ramsize(void);  /* Calculation of size of work area                             */
-void _process_tcpip(void);    /* TCP/IP process function called from ether INT and timer INT. */
+    ER tcpudp_open(UW *workp);    /* Open TCP/IP library (initialization)                         */
+    ER tcpudp_close(void);        /* Close TCP/IP library (stop)                                  */
+    ER tcpudp_reset(UB channel);
+    W  tcpudp_get_ramsize(void);  /* Calculation of size of work area                             */
+    void _process_tcpip(void);    /* TCP/IP process function called from ether INT and timer INT. */
 #if defined(__GNUC__)
 #if defined(__cplusplus)
 }
@@ -415,32 +444,15 @@ UH ppp_status(void);          /* PPP status              */
 /***  Driver Interface  ***/
 /**************************/
 /*++++++++++++++++ PPP/Ether common items +++++++++++++++++*/
-#if defined(__GNUC__)
-#if defined(__cplusplus)
-extern "C" {
-#endif
-#endif
-void tcpudp_act_cyc(UB cycact);     /* Control TCP cyclic processing start/stop     */
-void tcp_api_slp(ID);               /* Wait for completion of TCP API               */
-void tcp_api_wup(ID);               /* Cancel the wait state of TCP API completion  */
-void udp_api_slp(ID);               /* Wait for completion of UDP API               */
-void udp_api_wup(ID);               /* Cancel the wait state of UDP API completion  */
-void ppp_api_slp(void);             /* Wait for completion of PPP API               */
-void ppp_api_wup(void);             /* Cancel the wait state of PPP API completion  */
-UH   tcpudp_get_time(void);         /* Get time information                         */
-void report_error(uint8_t, int16_t, const void *);      /* Report error function                        */
-#if defined(__GNUC__)
-#if defined(__cplusplus)
-}
-#endif
-#endif
+void ppp_api_slp(void);                   /* Wait for completion of PPP API               */
+void ppp_api_wup(void);                   /* Cancel the wait state of PPP API completion  */
+void report_error(UB lan_port_no, H err_code, UB *err_data);      /* Report error function  */
+void get_random_number(UB *data, UW len); /* Get random number for CHAP auth              */
+void register_callback_linklayer(callback_from_system_t call_fp);
 
 /* user publication function */
 UW igmp_join_group(UW* mCastAdr, UW RJ45port);
 UW igmp_leave_group(UW* mCastAdr, UW RJ45port);
-
-/* T4 version information structure*/
-extern const mw_version_t R_t4_version;
 
 /*++++++++++++++++ PPP +++++++++++++++++*/
 /* PPP authentication system (Set ppp_auth) */
@@ -517,17 +529,26 @@ H  modem_write(void far *parblk);
 /*++++++++++++++++ Ether related +++++++++++++++++*/
 #if defined(__GNUC__)
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif
 #endif
-ER lan_open(void);                   /* Initialize LAN driver         */
-ER lan_close(void);                  /* Deactivate the LAN driver     */
-H lan_read(uint8_t, void **buf);
-H lan_write(uint8_t, const void *, int16_t, const void * , int16_t);  /* Send LAN data                 */
-void lan_reset(uint8_t) ;
-H rcv_buff_release(uint8_t);
-void ena_int(void);                 /* temporarily enable interrupt function        */
-void dis_int(void);                 /* temporarily disable interrupt function       */
+	ER lan_open(void);                   /* Initialize LAN driver         */
+	ER lan_close(void);                  /* Deactivate the LAN driver     */
+	H lan_read(uint8_t, void **buf);
+	H lan_write(uint8_t, const void *, int16_t, const void * , int16_t);  /* Send LAN data                 */
+	void lan_reset(uint8_t) ;
+	int16_t lan_check_link(uint16_t lan_port_no);
+	H rcv_buff_release(uint8_t);
+	void ena_int(void);                 /* temporarily enable interrupt function        */
+	void dis_int(void);                 /* temporarily disable interrupt function       */
+	void tcpudp_act_cyc(uint8_t cycact);           /* Control TCP cyclic processing start/stop     */
+	uint16_t tcpudp_get_time(void);               /* Get time information                         */
+	void tcp_api_slp(int16_t cepid);               /* Wait for completion of TCP API               */
+	void tcp_api_wup(int16_t cepid);               /* Cancel the wait state of TCP API completion  */
+	void udp_api_slp(int16_t cepid);               /* Wait for completion of UDP API               */
+	void udp_api_wup(int16_t cepid);               /* Cancel the wait state of UDP API completion  */
+
 #if defined(__GNUC__)
 #if defined(__cplusplus)
 }

@@ -14,25 +14,26 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2014-2016 Renesas Electronics Corporation. All rights reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : tcp_api.c
-* Version      : 1.0
+* Version      : 1.01
 * Description  : Processing for TCP API
+* Website      : https://www.renesas.com/mw/t4
 ***********************************************************************************************************************/
 /**********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
+* History : DD.MM.YYYY Version Description
+*         : 01.04.2014 1.00    First Release
+*         : 30.11.2016 1.01    add DHCP relation
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
-
-#include "t4define.h"
-
+#include <stdio.h>
 #include <string.h>
+#include "t4define.h"
 #if defined(__GNUC__)
 #include "r_tcpip_private.h"
 #endif /* #if defined(__GNUC__) */
@@ -46,8 +47,11 @@ Includes   <System Includes> , "Project Includes"
 #include "ip.h"
 #include "tcp.h"
 #include "udp.h"
-#include "r_t4_rx/src/config_tcpudp.h"
+#include "dhcp.h"
+#include "ether.h"
+#include "dhcp.h"
 
+#include "r_t4_rx/src/config_tcpudp.h"
 
 /***********************************************************************************************************************
 Macro definitions
@@ -65,28 +69,20 @@ Exported global variables (to be accessed by other files)
 Private global variables and functions
 ***********************************************************************************************************************/
 
-/// extern far const UB _t4_channel_num;
 extern _TCB   *_tcp_tcb;
 extern _TCB   *head_tcb;
-/// extern TCPUDP_ENV tcpudp_env[];
-/// extern far const T_TCP_CCEP tcp_ccep[];
-/// extern far const H __tcpcepn;
-/// extern far const H __tcprepn;
-extern UH _tcp_timer_cnt;
-extern UH _tcp_pre_timer_cnt;
-
-#if defined(_UDP)
-/// extern far const H __udpcepn;
-#endif
+extern UH   _tcp_timer_cnt;
+extern UH   _tcp_pre_timer_cnt;
 
 #if defined(_ETHER)
-/// extern far UH const _ip_tblcnt[];
 _ARP_ENTRY   **_ether_arp_tbl;
 #endif
 #if defined(_PPP)
 extern uint16 ppp_sio_status;
 extern _PPP_API_REQ _ppp_api_req;
 #endif
+
+ER tcpudp_reset_sub(UB channel);
 
 /***********************************************************************************************************************
 * Function Name: tcpudp_open
@@ -99,6 +95,8 @@ ER tcpudp_open(UW *workp)
     UW *currp;
     UH rem;
     UB counter;
+    T_UDP_CCEP* pt_udpccep;
+    dhcp_inf_t* pt_dhcp_inf;
 
     currp = workp;
 
@@ -112,20 +110,14 @@ ER tcpudp_open(UW *workp)
 #if defined(_TCP)
     for (counter = 0; counter < __tcpcepn; counter++)
     {
-        _tcp_clr_req(counter + 1);
-
-        _tcp_init_callback_info(&head_tcb[counter].callback_info);
-
         _tcp_tcb[counter].rwin = (uchar*)currp;
 
         currp = (UW *)((uchar *)currp + tcp_ccep[counter].rbufsz);
         rem = tcp_ccep[counter].rbufsz % 4;
         if (rem != 0)
-		{
+        {
             currp = (UW *)((uchar *)currp + (4 - rem));
-		}	/*2669*/
-        _tcp_tcb[counter].cepid = counter + 1;
-        _tcp_init_tcb(&_tcp_tcb[counter]);
+        } /*2669*/
     }
 #endif
 
@@ -133,22 +125,27 @@ ER tcpudp_open(UW *workp)
     _udp_init(&currp);
 #endif
 
+    if (1 == _t4_dhcp_enable)
+    {
+        pt_udpccep = (T_UDP_CCEP*)currp;                                            /* partation head */
+        currp = (UW*)((uchar*)currp + (sizeof(T_UDP_CCEP) * _t4_channel_num));      /* keep partation DHCP */
+
+        pt_dhcp_inf = (dhcp_inf_t*)currp;                                           /* partation head */
+        currp = (UW*)((uchar*)currp + (sizeof(dhcp_inf_t) * _t4_channel_num));      /* keep partation DHCP */
+    }
+
     _ch_info_tbl = (_CH_INFO*)currp;
     _ch_info_head = (_CH_INFO*)currp;
     for (counter = 0;counter < _t4_channel_num; counter++)
     {
-        _ch_info_head[counter]._ch_num = counter;
-        _ch_info_head[counter].flag = 0;
-        _ch_info_head[counter]._rcvd = 0;
-
-        memset(&_ch_info_head[counter]._p_rcv_buf, 0, sizeof(_P_RCV_BUF));
-
-        memcpy(_ch_info_head[counter]._myipaddr, tcpudp_env[counter].ipaddr, IP_ALEN);
-        memcpy(_ch_info_head[counter]._mymaskaddr, tcpudp_env[counter].maskaddr, IP_ALEN);
-        memcpy(_ch_info_head[counter]._mygwaddr, tcpudp_env[counter].gwaddr, IP_ALEN);
+        _ch_info_head[counter].etherlink = 0;
+        if (1 == _t4_dhcp_enable)
+        {
+            _ch_info_head[counter].pt_udp_dhcp_ccep = (pt_udpccep + counter);
+            _ch_info_head[counter].pt_dhcp_inf = (pt_dhcp_inf + counter);
+        }
     }
     currp = (UW*)((uchar*)currp + (sizeof(_CH_INFO) * _t4_channel_num));
-
 
 #if defined(_PPP)
     ppp_sio_status    = 0;
@@ -165,12 +162,17 @@ ER tcpudp_open(UW *workp)
         *(_ether_arp_tbl + counter) = ((_ARP_ENTRY *)currp);
         currp = (UW *)((uchar *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
     }
-
-    _ether_arp_init();
 #endif
-
+    for (counter = 0; counter < _t4_channel_num; counter++)
+    {
+        tcpudp_reset_sub(counter);
+    }
+///    register_callback_linklayer(callback_tcpip);
     tcpudp_act_cyc(1);
-
+    for (counter = 0; counter < _t4_channel_num; counter++)
+    {
+        _ch_info_head[counter].etherlink = lan_check_link(counter);
+    }
     return (E_OK);
 }
 
@@ -183,6 +185,7 @@ ER tcpudp_open(UW *workp)
 ER tcpudp_close(void)
 {
     tcpudp_act_cyc(0);
+///    register_callback_linklayer(0);
     return (E_OK);
 }
 
@@ -192,15 +195,15 @@ ER tcpudp_close(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-void _getRAMsize_sub(W *ramsize)
+static void _getRAMsize_sub(W *ramsize)
 {
     W   tmp;
 
     tmp = *ramsize & 0x3;
     if (tmp != 0)
-	{
+    {
         *ramsize += (4 - tmp);
-	}	/*2669*/
+    } /*2669*/
     return;
 }
 
@@ -211,7 +214,7 @@ void _getRAMsize_sub(W *ramsize)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-W _getTcpRAMsize(void)
+static W _getTcpRAMsize(void)
 {
     W   ramsize = 0;
     UB   counter;
@@ -238,12 +241,15 @@ W _getTcpRAMsize(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-W _getUdpRAMsize(void)
+static W _getUdpRAMsize(void)
 {
     W ramsize = 0;
 
     ramsize += (sizeof(_UDP_CB) * __udpcepn);
-
+    if (1 == _t4_dhcp_enable)
+    {
+        ramsize += (sizeof(_UDP_CB) * _t4_channel_num);
+    }
     return ramsize;
 }
 #endif
@@ -255,7 +261,7 @@ W _getUdpRAMsize(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-W _getIpRAMsize(void)
+static W _getIpRAMsize(void)
 {
     W   ramsize;
 
@@ -274,7 +280,7 @@ W _getIpRAMsize(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-W _getTblRAMsize(void)
+static W _getTblRAMsize(void)
 {
     W   ramsize;
     UH   count;
@@ -316,6 +322,12 @@ W tcpudp_get_ramsize(void)
     ramsize += _getTblRAMsize();
 #endif
 
+    if (1 == _t4_dhcp_enable)
+    {
+        ramsize += (sizeof(T_UDP_CCEP) * _t4_channel_num);
+        ramsize += (sizeof(dhcp_inf_t) * _t4_channel_num);
+    }
+
     return ramsize;
 }
 
@@ -342,6 +354,11 @@ ER tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, TMO tmout)
         return E_PAR;
     }
 
+    if (1 == _ch_info_head[(tcp_ccep[cepid-1].cepatr)].ip_terminated_flag)
+    {
+        return E_SYS;
+    }
+
     err = _tcp_check_tmout_arg(_TCP_API_ACPCP, tmout, pTcbCb);
     if (err != E_OK && err != E_WBLK)
     {
@@ -361,10 +378,15 @@ ER tcp_acp_cep(ID cepid, ID repid, T_IPVxEP *p_dstaddr, TMO tmout)
         }
     }
 
+    dis_int();
     head_tcb[cepid-1].req.type = _TCP_API_ACPCP;
     head_tcb[cepid-1].req.tmout = tmout;
     head_tcb[cepid-1].req.d.cnr.dstaddr = p_dstaddr;
     head_tcb[cepid-1].req.d.cnr.repid = repid;
+    head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
+    head_tcb[cepid-1].req.flag = 0;
+    *head_tcb[cepid-1].req.error = E_INI;
+    ena_int();                                                      /*  #3577 */
 
     err = _tcp_api_req(cepid);
 
@@ -397,6 +419,11 @@ ER tcp_con_cep(ID cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, TMO tmout)
         return E_PAR;
     }
 
+    if (1 == _ch_info_head[(tcp_ccep[cepid-1].cepatr)].ip_terminated_flag)
+    {
+        return E_SYS;
+    }
+
     err = _tcp_check_tmout_arg(_TCP_API_CONCP, tmout, GET_TCP_CALLBACK_INFO_PTR(cepid));
     if (err != E_OK && err != E_WBLK)
     {
@@ -416,18 +443,23 @@ ER tcp_con_cep(ID cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, TMO tmout)
         }
     }
 
+    dis_int();
     head_tcb[cepid-1].req.type = _TCP_API_CONCP;
     head_tcb[cepid-1].req.tmout = tmout;
     head_tcb[cepid-1].req.d.cnr.dstaddr = p_dstaddr;
+    head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
+    head_tcb[cepid-1].req.flag = 0;
+    *head_tcb[cepid-1].req.error = E_INI;
 
     if ((p_myaddr == (T_IPVxEP *)NADR) || (p_myaddr->portno == TCP_PORTANY))
-	{
+    {
         head_tcb[cepid-1].req.d.cnr.my_port = 0;
-	}	/*2669*/
+    } /*2669*/
     else
-	{
+    {
         head_tcb[cepid-1].req.d.cnr.my_port = p_myaddr->portno;
-	}	/*2669*/
+    } /*2669*/
+    ena_int();                                                      /*  #3577 */
     err = _tcp_api_req(cepid);
 
     if (err == E_WBLK)
@@ -460,6 +492,11 @@ ER tcp_sht_cep(ID cepid)
         return E_PAR;
     }
 
+    if (1 == _ch_info_head[(tcp_ccep[cepid-1].cepatr)].ip_terminated_flag)
+    {
+        return E_SYS;
+    }
+
     if (_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat))
     {
         return E_NOSPT;
@@ -470,9 +507,13 @@ ER tcp_sht_cep(ID cepid)
         return E_QOVR;
     }
 
-
+    dis_int();
     head_tcb[cepid-1].req.type = _TCP_API_SHTCP;
     head_tcb[cepid-1].req.tmout = TMO_FEVR;
+    head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
+    head_tcb[cepid-1].req.flag = 0;
+    *head_tcb[cepid-1].req.error = E_INI;
+    ena_int();                                                      /*  #3577 */
 
     if (_TCP_CB_GET_CALLBACK_FUNC_PTR(cepid))
     {
@@ -500,6 +541,11 @@ ER tcp_cls_cep(ID cepid, TMO tmout)
         return E_PAR;
     }
 
+    if (1 == _ch_info_head[(tcp_ccep[cepid-1].cepatr)].ip_terminated_flag)
+    {
+        return E_SYS;
+    }
+
     err = _tcp_check_tmout_arg(_TCP_API_CLSCP, tmout, pTcbCb);
     if (err != E_OK && err != E_WBLK)
     {
@@ -519,8 +565,13 @@ ER tcp_cls_cep(ID cepid, TMO tmout)
         }
     }
 
+    dis_int();
     head_tcb[cepid-1].req.type = _TCP_API_CLSCP;
     head_tcb[cepid-1].req.tmout = tmout;
+    head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
+    head_tcb[cepid-1].req.flag = 0;
+    *head_tcb[cepid-1].req.error = E_INI;
+    ena_int();                                                      /*  #3577 */
 
     err = _tcp_api_req(cepid);
 
@@ -553,6 +604,11 @@ ER tcp_snd_dat(ID cepid, VP data, INT len, TMO tmout)
         return E_PAR;
     }
 
+    if (1 == _ch_info_head[(tcp_ccep[cepid-1].cepatr)].ip_terminated_flag)
+    {
+        return E_SYS;
+    }
+
     err = _tcp_check_len_arg(len);
     if (err != E_OK)
     {
@@ -578,10 +634,15 @@ ER tcp_snd_dat(ID cepid, VP data, INT len, TMO tmout)
         }
     }
 
+    dis_int();
     head_tcb[cepid-1].req.type = _TCP_API_SNDDT;
     head_tcb[cepid-1].req.tmout = tmout;
     head_tcb[cepid-1].req.d.dr.dtsiz = len;
-    head_tcb[cepid-1].req.d.dr.datap = (uchar *)((uint32)data);
+    head_tcb[cepid-1].req.d.dr.datap = (uchar *)data;
+    head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
+    head_tcb[cepid-1].req.flag = 0;
+    *head_tcb[cepid-1].req.error = E_INI;
+    ena_int();                                                      /*  #3577 */
 
     err = _tcp_api_req(cepid);
 
@@ -613,6 +674,11 @@ ER tcp_rcv_dat(ID cepid, VP data, INT len, TMO tmout)
         return E_PAR;
     }
 
+    if (1 == _ch_info_head[(tcp_ccep[cepid-1].cepatr)].ip_terminated_flag)
+    {
+        return E_SYS;
+    }
+
     err = _tcp_check_len_arg(len);
     if (err != E_OK)
     {
@@ -635,7 +701,7 @@ ER tcp_rcv_dat(ID cepid, VP data, INT len, TMO tmout)
 
         if (head_tcb[cepid-1].rdsize > 0)
         {
-            err = _tcp_recv_polling(&head_tcb[cepid-1], (uchar*)((uint32)data), len);
+            err = _tcp_recv_polling(&head_tcb[cepid-1], (uchar*)data, len);
             return err;
         }
         else
@@ -661,10 +727,15 @@ ER tcp_rcv_dat(ID cepid, VP data, INT len, TMO tmout)
         }
     }
 
+    dis_int();
     head_tcb[cepid-1].req.type = _TCP_API_RCVDT;
     head_tcb[cepid-1].req.tmout = tmout;
     head_tcb[cepid-1].req.d.dr.dtsiz = len;
-    head_tcb[cepid-1].req.d.dr.datap = (uchar *)((uint32)data);
+    head_tcb[cepid-1].req.d.dr.datap = (uchar *)data;
+    head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
+    head_tcb[cepid-1].req.flag = 0;
+    *head_tcb[cepid-1].req.error = E_INI;
+    ena_int();                                                      /*  #3577 */
 
     err = _tcp_api_req(cepid);
 
@@ -695,6 +766,11 @@ ER tcp_can_cep(ID cepid, FN fncd)
     if (err != E_OK)
     {
         return E_PAR;
+    }
+
+    if (1 == _ch_info_head[(tcp_ccep[cepid-1].cepatr)].ip_terminated_flag)
+    {
+        return E_SYS;
     }
 
     if (_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat))
@@ -741,24 +817,19 @@ ER tcp_can_cep(ID cepid, FN fncd)
 ***********************************************************************************************************************/
 ER _tcp_api_req(ID cepid)
 {
-    ER err = E_INI;
-
-    head_tcb[cepid-1].req.error = &err;
-    head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
-    head_tcb[cepid-1].req.flag = 0;
-
     if (head_tcb[cepid-1].req.tmout == TMO_NBLK)
     {
-        _TCP_CB* pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
-
-        pTcbCb->req.ercd = E_INI;
-        head_tcb[cepid-1].req.error = &pTcbCb->req.ercd;
-
         return E_WBLK;
     }
     _tcp_api_slp(cepid);
+    dis_int();
     _tcp_clr_req(cepid);
-    return err;
+    ena_int();
+    if (1 == (_ch_info_head[tcp_ccep[cepid-1].cepatr].ip_terminated_flag))
+    {
+        *head_tcb[cepid-1].req.error = E_SYS;
+    }
+    return *head_tcb[cepid-1].req.error;
 }
 
 
@@ -790,7 +861,6 @@ void _tcp_clr_req(ID cepid)
     head_tcb[cepid-1].req.type = 0;
     head_tcb[cepid-1].req.stat = _TCP_API_STAT_INIT;
     head_tcb[cepid-1].req.tmout = 0;
-    head_tcb[cepid-1].req.error = NULL;
     head_tcb[cepid-1].req.d.dr.dtsiz = 0;
     head_tcb[cepid-1].req.d.dr.datap = NULL;
     head_tcb[cepid-1].req.flag = 0;
@@ -962,6 +1032,122 @@ ER tcp_set_mss(ID cepid, UH mss)
 #endif
 #endif
 
+/***********************************************************************************************************************
+* Function Name: tcpudp_reset
+* Description  : T4-interface mono channel reset function wrapper(User public API)
+* Arguments    : channel
+*                  RJ45 interface,other
+* Return Value : E_OK fixed
+***********************************************************************************************************************/
+ER tcpudp_reset(UB channel)
+{
+    dis_int();
+    tcpudp_reset_sub(channel);
+    ena_int();
+    return (E_OK);
+}
 
+/***********************************************************************************************************************
+* Function Name: tcpudp_reset_sub
+* Description  : T4-interface mono channel reset function body(internal API)
+* Arguments    : channel
+*                  RJ45 interface,other
+* Return Value : E_OK fixed
+***********************************************************************************************************************/
+ER tcpudp_reset_sub(UB channel)
+{
+    UB counter;
+    _ARP_ENTRY *ae;
 
+#if defined(_TCP)
+    for (counter = 0; counter < __tcpcepn; counter++)
+    {
+        if (channel == tcp_ccep[counter].cepatr)
+        {
+            uchar *rwin = head_tcb[counter].rwin;
+            memset(&head_tcb[counter], 0, sizeof(_TCB));
+            head_tcb[counter].rwin = rwin;
+            _tcp_clr_req(counter + 1);
+            _tcp_init_callback_info(&head_tcb[counter].callback_info);
+            head_tcb[counter].cepid = counter + 1;
+            _tcp_init_tcb(&head_tcb[counter]);
+            head_tcb[counter].req.error = &head_tcb[counter].callback_info.req.ercd;     /* #3577 */
+        }
+    }
+#endif
 
+#if defined(_UDP)
+    for (counter = 0; counter < __udpcepn; counter++)
+    {
+        if (channel == (udp_ccep[((_udp_cb+counter)->req.cepid)].cepatr))
+        {
+            memset((_udp_cb + counter), 0, (sizeof(_UDP_CB)));
+        }
+    }
+    for (counter = 0; counter < _t4_channel_num; counter++)
+    {
+        if (channel == counter)
+        {
+            memset((_udp_cb + __udpcepn + counter), 0, (sizeof(_UDP_CB)));
+        }
+    }
+#endif
+
+    if (1 == _t4_dhcp_enable)
+    {
+        for (counter = 0; counter < _t4_channel_num; counter++)
+        {
+            if (channel == counter)
+            {
+                memset((_ch_info_head[counter].pt_dhcp_inf), 0, sizeof(dhcp_inf_t));
+            }
+        }
+    }
+
+    for (counter = 0;counter < _t4_channel_num; counter++)
+    {
+        if (channel == counter)
+        {
+            _ch_info_head[counter]._ch_num = counter;
+            _ch_info_head[counter].flag = 0;
+            _ch_info_head[counter]._rcvd = 0;
+            if (1 == _t4_dhcp_enable)
+            {
+                _ch_info_head[counter].ip_terminated_flag = 0u;
+                _ch_info_head[counter].pt_udp_dhcp_ccep->cepatr = counter;
+                _ch_info_head[counter].pt_udp_dhcp_ccep->myaddr.ipaddr = 0u;
+                _ch_info_head[counter].pt_udp_dhcp_ccep->myaddr.portno = DHCP_CLIENT_PORT;
+                _ch_info_head[counter].pt_udp_dhcp_ccep->callback = dhcp_callback_from_t4;
+                memset(_ch_info_head[counter]._myipaddr, 0, IP_ALEN);
+                memset(_ch_info_head[counter]._mymaskaddr, 0, IP_ALEN);
+                memset(_ch_info_head[counter]._mygwaddr, 0, IP_ALEN);
+            }
+            else
+            {
+                memcpy(_ch_info_head[counter]._myipaddr, tcpudp_env[counter].ipaddr, IP_ALEN);
+                memcpy(_ch_info_head[counter]._mymaskaddr, tcpudp_env[counter].maskaddr, IP_ALEN);
+                memcpy(_ch_info_head[counter]._mygwaddr, tcpudp_env[counter].gwaddr, IP_ALEN);
+            }
+            memset(&_ch_info_head[counter]._p_rcv_buf, 0, sizeof(_P_RCV_BUF));
+
+        }
+    }
+
+#if defined(_PPP)
+    ppp_sio_status    = 0;
+    memset(&_ppp_api_req, 0, sizeof(_ppp_api_req));
+    _ppp_init();
+
+#elif defined(_ETHER)
+    /* table clear for all channels */
+    for (counter = 0; counter < _t4_channel_num; counter++)
+    {
+        if (channel == counter)
+        {
+            ae = _ether_arp_tbl[counter];
+            memset(ae->ae_pra, 0, (sizeof(_ARP_ENTRY) * _ip_tblcnt[counter]));
+        }
+    }
+#endif
+    return (E_OK);
+}

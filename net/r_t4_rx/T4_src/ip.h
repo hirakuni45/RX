@@ -14,19 +14,21 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2014-2016 Renesas Electronics Corporation. All rights reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : ip.h
-* Version      : 1.0
+* Version      : 1.01
 * Description  : Processing for IP protocol header file
+* Website      : https://www.renesas.com/mw/t4
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
+* History : DD.MM.YYYY Version Description
+*         : 01.04.2014 1.00    First Release
+*         : 30.11.2016 1.01    File Header maintenance
 ***********************************************************************************************************************/
-#ifndef IP_H
-#define IP_H
+#ifndef __IP_H__
+#define __IP_H__
 
 /* protocol type */
 #define _IPH_HBH  0  /* Relay point */
@@ -122,13 +124,14 @@
 
 typedef struct
 {
-    uchar  ip_ver_len;
-    uchar  ip_tos;
+
+    uchar   ip_ver_len;
+    uchar   ip_tos;
     uint16  ip_total_len;
     uint16  ip_id;
     uint16  ip_fragoff;
-    uchar  ip_ttl;
-    uchar  ip_proto_num;
+    uchar   ip_ttl;
+    uchar   ip_proto_num;
     uint16  ip_chksum;
     IPaddr  ip_src;
     IPaddr  ip_dst;
@@ -136,89 +139,93 @@ typedef struct
 
 typedef struct
 {
-    _IP_HDR  iph;   /* IP header */
-    uchar  data[1];  /* DATA (upper protocol)*/
+    _IP_HDR  iph;       /* IP header */
+    uchar    data[1];   /* DATA (upper protocol)*/
 } _IP_PKT;
 
 
 typedef struct
 {
     uint32  rsvd;
-    uchar  tgt_ip[16];
-    uchar  opt_type;
-    uchar  opt_len;
-    uchar  opt[6];
+    uchar   tgt_ip[16];
+    uchar   opt_type;
+    uchar   opt_len;
+    uchar   opt[6];
 } _ICMP_NBR_PKT;
 
 typedef struct
 {
     uint32  rsvd;
-    uchar  opt_type;
-    uchar  opt_len;
-    uchar  opt[6];
+    uchar   opt_type;
+    uchar   opt_len;
+    uchar   opt[6];
 } _ICMP_RTR_SOL_PKT;
 
 typedef struct
 {
-    uchar  type;
-    uchar  len;
-    uchar  px_len;
-    uchar  rsvd;
+    uchar   type;
+    uchar   len;
+    uchar   px_len;
+    uchar   rsvd;
     uint32  valid_lt;
     uint32  pref_lt;
     uint32  rsvd2;
-    uchar  prefix[16];
+    uchar   prefix[16];
 } _ICMP_OPT_PFX;
 
 typedef struct
 {
-    uchar  hop_limit;
-    uchar  flag;
-    uint16  ef_time;
-    uint32  reachable_time;
-    uint32  reachable_rtx_timer; // 12
-    uchar  opt_type;
-    uchar  opt_len;
-    uchar  opt[6];
-    _ICMP_OPT_PFX pfx_opt;
+    uchar          hop_limit;
+    uchar          flag;
+    uint16         ef_time;
+    uint32         reachable_time;
+    uint32         reachable_rtx_timer;
+    uchar          opt_type;
+    uchar          opt_len;
+    uchar          opt[6];
+    _ICMP_OPT_PFX  pfx_opt;
 } _ICMP_RTR_ADV_PKT;
 
 typedef struct
 {
-    uint16 id;     /* message id */
-    uint16 seq;    /* sequence number */
+    uint16  id;        /* message id */
+    uint16  seq;       /* sequence number */
 } _ICMP_ECHO_PKT;
 
 
 typedef struct _icmp_hdr
 {
-    uchar type;    /* type of message */
-    uchar code;    /* code (additional info. depend on type) */
-    uint16 chksum;    /* checksum of ICMP header+data   */
-    uint16 id;     /* message id */
-    uint16 seq;    /* sequence number */
+    uchar   type;      /* type of message */
+    uchar   code;      /* code (additional info. depend on type) */
+    uint16  chksum;    /* checksum of ICMP header+data   */
+    uint16  id;        /* message id */
+    uint16  seq;       /* sequence number */
 } _ICMP_HDR;
 
 typedef struct
 {
     _ICMP_HDR icmph;
-    uchar  data[1];
+    uchar     data[1];
 } _ICMP_PKT;
 
 /* Channel information  for v.2.00 */
 typedef struct _channel_info
 {
-    uint8_t  _ch_num;
+    uint8_t    _ch_num;
     _P_RCV_BUF _p_rcv_buf;
-    uint32_t _myipaddr[1];
-    uint16_t _ip_id;
-    uint16_t _rcvd;
-    uint16_t flag;
+    uint32_t   _myipaddr[1];
+    uint16_t   _ip_id;
+    uint16_t   _rcvd;
+    uint16_t   flag;
 #if defined(_ETHER)
-    uint32_t _mymaskaddr[1];
-    uint32_t _mygwaddr[1];
-    uint8_t  arp_buff[28];
+    uint32_t   _mymaskaddr[1];
+    uint32_t   _mygwaddr[1];
+    uint8_t    arp_buff[28];
 #endif
+    T_UDP_CCEP* pt_udp_dhcp_ccep;        /* dhcp communication end pointer */
+    void*       pt_dhcp_inf;             /* dhcp information */
+    uint32_t    ip_terminated_flag;      /* dhcp ip change */
+    uint32_t    etherlink;               /* ether link status */
 } _CH_INFO;
 
 extern _CH_INFO *_ch_info_tbl;
@@ -245,8 +252,8 @@ uchar _ip_check_multicast(uchar *ipaddr);
 uchar _ip_check_broadcast(uchar *ipaddr);
 sint16 _ppp_snd_ip(uchar *data, uint16 len);
 
-void dump_ip_header(const _IP_HDR *p);
 
-#endif
+
+#endif /*multi include guard*/
 
 

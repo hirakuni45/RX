@@ -14,16 +14,18 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2014-2016 Renesas Electronics Corporation. All rights reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : ip.c
-* Version      : 1.0
+* Version      : 1.01
 * Description  : Processing for IP protocol
+* Website      : https://www.renesas.com/mw/t4
 ***********************************************************************************************************************/
 /**********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
+* History : DD.MM.YYYY Version Description
+*         : 01.04.2014 1.00    First Release
+*         : 30.11.2016 1.01    File Header maintenance
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
@@ -47,12 +49,9 @@ Includes   <System Includes> , "Project Includes"
 #include "udp.h"
 
 #if defined(_IGMP)
- #include "igmp.h"
+#include "igmp.h"
 #endif
-
-#include "r_t4_rx/src/config_tcpudp.h"
-
-#include <stdio.h>
+#include "dhcp.h"
 
 /***********************************************************************************************************************
 Macro definitions
@@ -79,19 +78,11 @@ Exported global variables (read from other files)
 ***********************************************************************************************************************/
 
 extern _TX_HDR  _tx_hdr;    /* Transmit header area */
-extern _TCB   *_tcp_tcb;    /* TCB (Transport Control Block) */
+extern UB _t4_dhcp_enable;
 
-#if defined(_ETHER)
-/// extern far UH const _ip_tblcnt;
-extern uchar *_ether_p_rcv_buff;
-#endif
-
-#if defined(_ETHER)
-/// extern far UH const _ip_tblcnt;
-#endif
 #if defined(_MULTI)
-/// extern TCPUDP_ENV tcpudp_env[];
-/// extern far UB const __multi_TTL[];
+extern TCPUDP_ENV tcpudp_env[];
+extern far UB const __multi_TTL[];
 #endif
 
 
@@ -210,15 +201,15 @@ sint16 _ip_snd(uchar *data, uint16 dlen)
     pip->ip_fragoff  = 0;
     pip->ip_ver_len  = (_IPH_VERSION4 << 4) | (_IP_HLEN_MIN >> 2);
 #if defined(_MULTI)
-    if ((pip->ip_dst[0] & 0xf0) == 0xe0)   /* multicast addresss */
-	{
+    if ((pip->ip_dst[0] & 0xf0) == 0xe0)   /* multicast address */
+    {
         pip->ip_ttl  = __multi_TTL[_ch_info_tbl->_ch_num];
-	}	/*2669*/
+    } /*2669*/
     else
 #endif
-	{
+    {
         pip->ip_ttl   = _IPH_TTL;
-	}	/*2669*/
+    } /*2669*/
     pip->ip_total_len = _IP_HLEN_MIN + _tx_hdr.hlen + dlen;
     pip->ip_total_len = hs2net(pip->ip_total_len);
     pip->ip_id   = hs2net(_ch_info_tbl->_ip_id);
@@ -268,15 +259,15 @@ void _ip_snd_icmp(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-sint16 _ip_chk_srcip(uchar *src_ip)
+static sint16 _ip_chk_srcip(uchar *src_ip)
 {
     uint32 tmp1, tmp2, tmp3 ;
 
     /* Check if src IP is Broadcast or Multicast */
     if (src_ip[0] >= 0xE0)
-	{
+    {
         return -1;
-	}
+    }
 
 #if defined(_ETHER)
     /* Check if src IP is Network Address or Network Broadcast */
@@ -284,9 +275,9 @@ sint16 _ip_chk_srcip(uchar *src_ip)
     _cpy_ipaddr(&tmp2, _ch_info_tbl->_mymaskaddr);
     _cpy_ipaddr(&tmp3, _ch_info_tbl->_myipaddr);
     if ((tmp1 == (tmp2 & tmp3)) || (tmp1 == (~tmp2 | tmp3)))
-	{
+    {
         return -1;
-	}
+    }
 
     return 0;
 #endif
@@ -302,6 +293,9 @@ sint16 _ip_chk_srcip(uchar *src_ip)
 schar _ip_check_ipadd_proto(_IP_HDR *piph)
 {
     uchar type;
+    _UDP_PKT  *pudp;
+    _UDP_HDR  *pudph;
+
 
     if (_cmp_ipaddr(piph->ip_dst, _ch_info_tbl->_myipaddr) == 0)
     {
@@ -320,12 +314,12 @@ schar _ip_check_ipadd_proto(_IP_HDR *piph)
     else
     {
         type = _ip_check_broadcast(piph->ip_dst);
-        if (type == _IP_TYPE_BROADCAST)     // 255.255.255.255
+        if (type == _IP_TYPE_BROADCAST)
         {
             if (piph->ip_proto_num != _IPH_TCP)
-			{
+            {
                 return (0);
-			}	/*2669*/
+            } /*2669*/
         }
         else if (type == _IP_TYPE_DIRECTED_BROADCAST)
         {
@@ -336,22 +330,33 @@ schar _ip_check_ipadd_proto(_IP_HDR *piph)
         }
 
         type = _ip_check_multicast(piph->ip_dst);
-        if (type == _IP_TYPE_MULTI_ALL_HOST)    // 224.0.0.1
+        if (type == _IP_TYPE_MULTI_ALL_HOST)
         {
-            if (piph->ip_proto_num != _IPH_TCP){
+            if (piph->ip_proto_num != _IPH_TCP)
+            {
 #if defined(_IGMP)
-			    int_send_igmp_when_router_query_receive(_ch_info_tbl->_ch_num, &(_ch_info_tbl->_p_rcv_buf));		//for router
+                int_send_igmp_when_router_query_receive(_ch_info_tbl->_ch_num, &(_ch_info_tbl->_p_rcv_buf));
 #endif
                 return (0);
-			}
+            }
         }
         else if (type == _IP_TYPE_MULTI_ANY)
         {
             if (piph->ip_proto_num != _IPH_TCP)
             {
 #if defined(_IGMP)
-			    int_send_igmp_when_membership_report_receive(_ch_info_tbl->_ch_num, &(_ch_info_tbl->_p_rcv_buf));	//for other member
+                int_send_igmp_when_membership_report_receive(_ch_info_tbl->_ch_num, &(_ch_info_tbl->_p_rcv_buf));
 #endif
+                return (0);
+            }
+        }
+        if (1 == _t4_dhcp_enable)
+        {
+            pudp  = (_UDP_PKT *)(((_IP_PKT*)piph)->data);
+            pudph = (_UDP_HDR *)pudp;
+            if (((_IPH_UDP == (piph->ip_proto_num)) && ((pudph->src_port) == hs2net(DHCP_SERVER_PORT)))
+                    || ((pudph->dst_port) == hs2net(DHCP_CLIENT_PORT)))
+            {
                 return (0);
             }
         }
@@ -371,22 +376,22 @@ uchar _ip_check_multicast(uchar *ipaddr)
 
     net2hl_yn_xn(&addr, ipaddr);
 
-    if (addr == 0xe0000000)     // 224.0.0.0 (Reserved)
-	{
+    if (addr == 0xe0000000u)
+    {
         return (_IP_TYPE_MULTI_RESERVED);
-	}	/*2669*/
-    else if (addr == 0xe0000001)   // 224.0.0.1 (All Host)
-	{
+    } /*2669*/
+    else if (addr == 0xe0000001u)
+    {
         return (_IP_TYPE_MULTI_ALL_HOST);
-	}	/*2669*/
-    else if ((ipaddr[0] & 0xf0) == 0xe0) // EX.XX.XX.XX (Other Multicast)
-	{
+    } /*2669*/
+    else if ((ipaddr[0] & 0xf0) == 0xe0)
+    {
         return (_IP_TYPE_MULTI_ANY);
-	}	/*2669*/
+    } /*2669*/
     else
-	{
+    {
         return (_IP_TYPE_NON_MULTI);
-	}	/*2669*/
+    } /*2669*/
 }
 
 /***********************************************************************************************************************
@@ -400,17 +405,17 @@ uchar _ip_check_broadcast(uchar *ipaddr)
     uint32 addr;
     uint32 myipaddr;
     uint32 subnet_mask;
-    uint32 broad_cast_addr = 0xffffffff;
+    uint32 broad_cast_addr = 0xffffffffu;
 
     net2hl_yn_xn(&addr, ipaddr);
     net2hl_yn_xn(&subnet_mask, tcpudp_env[_ch_info_tbl->_ch_num].maskaddr);
     net2hl_yn_xn(&myipaddr, tcpudp_env[_ch_info_tbl->_ch_num].ipaddr);
 
-    if (addr == 0xffffffff)     // 255.255.255.255 (Broadcast)
-	{
+    if (0xffffffffu == addr)
+    {
         return (_IP_TYPE_BROADCAST);
-	}	/*2669*/
-    else if ((addr & ~subnet_mask) == (broad_cast_addr & ~subnet_mask))   // (Directed Broadcast)
+    } /*2669*/
+    else if ((addr & ~subnet_mask) == (broad_cast_addr & ~subnet_mask))
     {
         if ((addr & subnet_mask) == (myipaddr & subnet_mask))
         {
@@ -422,31 +427,10 @@ uchar _ip_check_broadcast(uchar *ipaddr)
         }
     }
     else
-	{
+    {
         return (_IP_TYPE_NON_BROAD);
-	}
+    }
 }
 #endif
-
-void dump_ip_header(const _IP_HDR *p)
-{
-	if(p->ip_proto_num == _IPH_UDP) return;
-
-	printf("IP_HDR:  ");
-	printf("  proto_num: %d", (int)p->ip_proto_num);
-	printf("  total_len: %d\n", (int)net2hs(p->ip_total_len));
-
-	printf("  ver_len:   %d\n", (int)p->ip_ver_len);
-	printf("  tos:       %d\n", (int)p->ip_tos);
-	printf("  id:        %d\n", (int)net2hs(p->ip_id));
-	printf("  fragoff:   %d\n", (int)net2hs(p->ip_fragoff));
-	printf("  ttl:       %d\n", (int)p->ip_ttl);
-	printf("  chksum:    %d\n", (int)net2hs(p->ip_chksum));
-	const uint8_t* ip = p->ip_src;
-	printf("  src:       %d.%d.%d.%d\n", (int)ip[0], (int)ip[1], (int)ip[2], (int)ip[3]);
-	ip = p->ip_dst;
-	printf("  dst:       %d.%d.%d.%d\n", (int)ip[0], (int)ip[1], (int)ip[2], (int)ip[3]);
-} 
-
 
 

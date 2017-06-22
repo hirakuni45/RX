@@ -14,24 +14,26 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2014-2016 Renesas Electronics Corporation, All Rights Reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : ether.c
-* Version      : 1.0
+* Version      : 1.01
 * Description  : Processing for Ether protocol
+* Website      : https://www.renesas.com/mw/t4
 ***********************************************************************************************************************/
-/**********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
+/***********************************************************************************************************************
+* History : DD.MM.YYYY Version Description
+*         : 01.04.2014 1.00    First Release
+*         : 30.11.2016 1.01    add DHCP relation
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
-#include "t4define.h"
-
+#include <stdio.h>
 #include <string.h>
+#include "t4define.h"
 #if defined(__GNUC__)
 #include "r_tcpip_private.h"
 #endif /* #if defined(__GNUC__) */
@@ -40,9 +42,9 @@ Includes   <System Includes> , "Project Includes"
 #include "ether.h"
 #include "ip.h"
 #include "tcp.h"
-#include "r_t4_rx/src/config_tcpudp.h"
+#include "dhcp.h"
 
-#include <stdio.h>
+#include "r_t4_rx/src/config_tcpudp.h"
 
 /***********************************************************************************************************************
 Macro definitions
@@ -64,13 +66,11 @@ uchar    *_ether_p_rcv_buff;
 /***********************************************************************************************************************
 Exported global variables (read from other files)
 ***********************************************************************************************************************/
-/// extern far const UB _t4_channel_num;
 extern UB *data_link_buf_ptr;    /* Buffer pointer to Datalink layer */
 extern _TX_HDR  _tx_hdr;    /* Area for transmit header */
-/// extern far UH  const _ip_tblcnt[];
 
 #if defined(_MULTI)
-/// extern TCPUDP_ENV tcpudp_env[];
+extern TCPUDP_ENV tcpudp_env[];
 #endif
 
 /***********************************************************************************************************************
@@ -84,21 +84,23 @@ void _ether_proc_rcv(void)
 {
     sint16  len;
     _EP   *pep;
-    void  *buf;
 
     /* Return when receive buffer has not released yet */
     /* The information has already stored in '_p_rcv_buf' */
     if (_ch_info_tbl->_p_rcv_buf.len != 0)
+    {
         return;
+    }
 
     /* Call: driver interface to receive */
+    void *buf;
     len = lan_read(_ch_info_tbl->_ch_num, &buf);
 
     /*
      *  len > 0 : receive data size
      *       -1 : No data in LAN controller buffer
      *       -2 : LAN controller status is 'STOP'
-     *       -5 : LAN controller stauts is 'ILLEAGAL' or need reset.
+     *       -5 : LAN controller status is 'ILLEGAL' or need reset.
      *       -6 : CRC error
      */
 
@@ -118,7 +120,7 @@ void _ether_proc_rcv(void)
         /* No data, LAN controller status is 'STOP'. */
         return;
     }
-    /* Illeagal len: discard the received data */
+    /* Illegal len: discard the received data */
     else if ((len > 1514) || (len < 60))
     {
         rcv_buff_release(_ch_info_tbl->_ch_num);
@@ -133,12 +135,6 @@ void _ether_proc_rcv(void)
     _ch_info_tbl->_p_rcv_buf.len = len - _ETH_LEN;
     _ch_info_tbl->_p_rcv_buf.pip = &(pep->data[0]);
     _ch_info_tbl->_p_rcv_buf.ip_rcv = 0;
-
-#ifdef DUMP_EP_HEADER
-	dump_ep_header(pep);
-#else
-	dump_ep_header_filter(pep);
-#endif
 
     /* Find the packet type */
     switch (pep->eh.eh_type)
@@ -156,7 +152,7 @@ void _ether_proc_rcv(void)
             rcv_buff_release(_ch_info_tbl->_ch_num);
             _ch_info_tbl->_p_rcv_buf.len = 0;
             report_error(_ch_info_tbl->_ch_num, RE_NETWORK_LAYER, data_link_buf_ptr);
-			break;		/*2670*/
+            break;  /*2670*/
     }
 
     return;
@@ -173,10 +169,26 @@ void _ether_rcv_arp(void)
     _ARP_ENTRY *ae;
     _ARP_PKT *rpap;
     uint16  i;
+    uint32  ul_res;
 
     rpap = (_ARP_PKT *)(_ch_info_tbl->_p_rcv_buf.pip);
     /* Discard: exclude ARP packet addressed to itself */
-    if (_cmp_ipaddr(&(rpap->ar_tpa), _ch_info_tbl->_myipaddr))
+    ul_res = memcmp(rpap->ar_spa, _ch_info_tbl->_myipaddr, IP_ALEN);
+    if ( ul_res == 0)               /* colligion ip detect */
+    {
+        if ((rpap->ar_op) == hs2net(AR_REPLY))
+        {
+            callback_tcpip(_ch_info_tbl->_ch_num, ETHER_EV_COLLISION_IP, 0);
+        }
+        else
+        {
+            /* nothing to do */
+        }
+        rcv_buff_release(_ch_info_tbl->_ch_num);
+        _ch_info_tbl->_p_rcv_buf.len = 0;
+        return;
+    }
+    else if (_cmp_ipaddr(&(rpap->ar_tpa), _ch_info_tbl->_myipaddr))
     {
         rcv_buff_release(_ch_info_tbl->_ch_num);
         _ch_info_tbl->_p_rcv_buf.len = 0;
@@ -225,7 +237,7 @@ void _ether_rcv_arp(void)
             }
             break;
         default:
-            break;	/*2670*/
+            break; /*2670*/
     }
 
     rcv_buff_release(_ch_info_tbl->_ch_num);
@@ -265,7 +277,6 @@ sint16 _ether_snd_arp(_ARP_ENTRY *ae)
     _ETH_HDR *peh;
     _ARP_PKT *rpap, *parp;
     sint16  ret;
-
     rpap = (_ARP_PKT *)(_ch_info_tbl->_p_rcv_buf.pip);
     rpap = (_ARP_PKT *)_ch_info_tbl->arp_buff;
 
@@ -287,7 +298,6 @@ sint16 _ether_snd_arp(_ARP_ENTRY *ae)
         _cpy_ipaddr(parp->ar_tpa, ae->ae_pra);
         _cpy_eaddr(peh->eh_dst, ae->ae_hwa);
     }
-
     /* If ARP response request, generate ARP packet using received ARP packet */
     else if (_ch_info_tbl->flag & _TCBF_SND_ARP_REP)
     {
@@ -300,9 +310,9 @@ sint16 _ether_snd_arp(_ARP_ENTRY *ae)
     }
 
     else
-	{
+    {
         return 0;
-	}				/*2669*/
+    }    /*2669*/
 
     _tx_hdr.hlen = _ETH_LEN + ARP_PLEN;
     ret = _ether_snd(EPT_ARP, NULL, 0);
@@ -312,6 +322,57 @@ sint16 _ether_snd_arp(_ARP_ENTRY *ae)
     return ret;
 }
 #endif
+
+void ether_snd_gratuitous_arp(void)
+{
+    _ARP_PKT *parp;
+    const uint8_t bcastadr[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+
+    parp = &(_tx_hdr.ihdr.tarp);
+    parp->ar_hwtype = hs2net(HWT_ETH);
+    parp->ar_prtype = hs2net(EPT_IP);
+    parp->ar_hwlen  = EP_ALEN;
+    parp->ar_prlen  = IP_ALEN;
+    parp->ar_op     = hs2net(AR_REQUEST);
+
+    memcpy(parp->ar_sha, _myethaddr[_ch_info_tbl->_ch_num], EP_ALEN);       /* senderHWaddrs is my ether addr */
+    _cpy_ipaddr(parp->ar_spa, _ch_info_tbl->_myipaddr);                     /* senderProtoAddrs is my ip addr */
+    _cpy_eaddr(parp->ar_tha, bcastadr);                                     /* targetHWaddrs is broad cast addr */
+    _cpy_ipaddr(parp->ar_tpa, _ch_info_tbl->_myipaddr);                     /* targetProtoAddrs is my ip addr */
+
+    _tx_hdr.hlen = _ETH_LEN + ARP_PLEN;
+    _ether_snd(EPT_ARP, NULL, 0);
+
+    _ch_info_tbl->flag &= ~(_TCBF_SND_ARP_REQ | _TCBF_SND_ARP_REP);
+
+    return;
+}
+
+void ether_snd_ip_reply_arp(void)
+{
+    _ARP_PKT *parp;
+    const uint8_t bcastadr[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+
+    parp = &(_tx_hdr.ihdr.tarp);
+    parp->ar_hwtype = hs2net(HWT_ETH);
+    parp->ar_prtype = hs2net(EPT_IP);
+    parp->ar_hwlen  = EP_ALEN;
+    parp->ar_prlen  = IP_ALEN;
+    parp->ar_op     = hs2net(AR_REPLY);
+
+    memcpy(parp->ar_sha, _myethaddr[_ch_info_tbl->_ch_num], EP_ALEN);       /* senderHWaddrs is my ether addr */
+    _cpy_ipaddr(parp->ar_spa, _ch_info_tbl->_myipaddr);                     /* senderProtoAddrs is my ip addr */
+    _cpy_eaddr(parp->ar_tha, bcastadr);                                     /* targetHWaddrs is b_cast */
+    _cpy_ipaddr(parp->ar_tpa, _ch_info_tbl->_myipaddr);                     /* targetProtoAddrs is my ip addr */
+
+    _tx_hdr.hlen = _ETH_LEN + ARP_PLEN;
+    _ether_snd(EPT_ARP, NULL, 0);
+
+    _ch_info_tbl->flag &= ~(_TCBF_SND_ARP_REQ | _TCBF_SND_ARP_REP);
+
+    return;
+}
+
 
 /***********************************************************************************************************************
 * Function Name: _ether_snd_ip
@@ -329,7 +390,7 @@ sint16 _ether_snd_ip(uchar *data, uint16 dlen)
 #if defined(_MULTI)
     uint32 addr;
     uint32 subnet_mask;
-    uint32 broad_cast_addr = 0xffffffff;
+    uint32 broad_cast_addr = 0xffffffffu;
     static const uchar ip_broadcast[] = {0xff, 0xff, 0xff, 0xff};
 #endif
     _ETH_HDR *peh;
@@ -382,13 +443,13 @@ sint16 _ether_snd_ip(uchar *data, uint16 dlen)
     else
     {
         if (_ch_info_tbl->_mygwaddr[0] != 0)
-		{
+        {
             _cpy_ipaddr(&nexthop, _ch_info_tbl->_mygwaddr);
-		}	/*2669*/
+        } /*2669*/
         else
-		{
+        {
             return 0;
-		}	/*2669*/
+        } /*2669*/
     }
 
     /* exist nexthop in ARP table? */
@@ -396,9 +457,9 @@ sint16 _ether_snd_ip(uchar *data, uint16 dlen)
     for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
     {
         if ((_cmp_ipaddr(&nexthop, ae->ae_pra)) == 0)
-		{
+        {
             break;
-		}	/*2669*/
+        } /*2669*/
     }
     if (i < _ip_tblcnt[_ch_info_tbl->_ch_num])
     {
@@ -451,7 +512,7 @@ sint16 _ether_snd(uint16 type, uchar *data, uint16 dlen)
     static const uchar ip_broadcast[] = {0xff, 0xff, 0xff, 0xff};
     uint32 addr;
     uint32 subnet_mask;
-    uint32 broad_cast_addr = 0xffffffff;
+    uint32 broad_cast_addr = 0xffffffffu;
 #endif
 
     peh = &(_tx_hdr.eh);
@@ -491,18 +552,19 @@ sint16 _ether_snd(uint16 type, uchar *data, uint16 dlen)
     }
 #endif
 
-    /* 0 padding when the pakcet lenght is less than 60 byte */
+    /* 0 padding when the packet length is less than 60 byte */
     if ((_tx_hdr.hlen + dlen) < _EP_MIN_LEN)
     {
         plen = _EP_MIN_LEN - (_tx_hdr.hlen + dlen);
         /* copy the data to temporarily area for padding */
         memcpy(pad, data, dlen);
         for (i = 0; i < plen; i++)
-		{
+        {
             pad[dlen+i] = 0;
-		}	/*2669*/
+        } /*2669*/
         /* call the transmit function */
-        ret = lan_write(_ch_info_tbl->_ch_num, (B*) & _tx_hdr, (H)_tx_hdr.hlen, (B*)pad, (H)(_EP_MIN_LEN - _tx_hdr.hlen));
+        ret = lan_write(_ch_info_tbl->_ch_num, (B*) & _tx_hdr, \
+                        (H)_tx_hdr.hlen, (B*)pad, (H)(_EP_MIN_LEN - _tx_hdr.hlen));
     }
     else
         /* call the transmit function */
@@ -514,9 +576,9 @@ sint16 _ether_snd(uint16 type, uchar *data, uint16 dlen)
         return 0;
     }
     else
-	{
+    {
         return -1;
-	}	/*2669*/
+    } /*2669*/
 }
 
 /***********************************************************************************************************************
@@ -556,9 +618,9 @@ _ARP_ENTRY *_ether_arp_add(uchar *ipaddr, uchar *ethaddr)
             return ae;
         }
         else if (ae->ae_state == AS_FREE)
-		{
+        {
             ae_tmp = ae;
-		}	/*2669*/
+        } /*2669*/
     }
 
     /* Delete the most old entry if FREE entry is not exist */
@@ -578,27 +640,27 @@ _ARP_ENTRY *_ether_arp_add(uchar *ipaddr, uchar *ethaddr)
                 }
             }
             else if (ae->ae_state & (AS_PENDING | AS_TMOUT))
-			{
+            {
                 ae_tmp2 = ae;
-			}	/*2669*/
+            } /*2669*/
         }
         if (ae_tmp != NULL)
         {
             ae = ae_tmp;
         }
         else
-		{
+        {
             ae = ae_tmp2;
-		}	/*2669*/
+        } /*2669*/
 
         /* Delete the selected entry */
         _ether_arp_del(ae);
     }
     /* If FREE entry is exist, use this */
     else
-	{
+    {
         ae = ae_tmp;
-	}	/*2669*/
+    } /*2669*/
 
     memcpy(ae->ae_pra, ipaddr, IP_ALEN);
     memcpy(ae->ae_hwa, ethaddr, EP_ALEN);
@@ -650,29 +712,25 @@ void _ether_arp_init(void)
     return;
 }
 
-
-void dump_ep_header(const _EP *p)
+ER callback_tcpip(UB channel, UW eventid, VP param)
 {
-	uint16_t type = hs2net(p->eh.eh_type);
-	if(type == EPT_IP || type == EPT_ARP) {
-		printf("EP:  ");
-		printf("type(%08X): %04X\n", (int)&p->eh.eh_type, (int)type);
-		const uint8_t *ip;
-		ip = p->eh.eh_dst;
-		printf("  dst(%08X):  %02X-%02X-%02X-%02X-%02X-%02X\n", (int)ip,
-			(int)ip[0], (int)ip[1], (int)ip[2], (int)ip[3], (int)ip[4], (int)ip[5]);
-		ip = p->eh.eh_src;
-		printf("  src(%08X):  %02X-%02X-%02X-%02X-%02X-%02X\n", (int)ip,
-			(int)ip[0], (int)ip[1], (int)ip[2], (int)ip[3], (int)ip[4], (int)ip[5]);
-	}
+    if (eventid == ETHER_EV_LINK_ON)
+    {
+        _ch_info_head[channel].etherlink = 1;
+    }
+    else if (eventid == ETHER_EV_LINK_OFF)
+    {
+        _ch_info_head[channel].etherlink = 0;
+    }
+///    if (0 != g_fp_user)
+///    {
+///        g_fp_user(channel, eventid, param);
+///    }
+    if (1 == _t4_dhcp_enable)
+    {
+        dhcp_callback_from_ether(channel, eventid, param);
+    }
+    return 0;
 }
 
 
-void dump_ep_header_filter(const _EP *p)
-{
-//	const uint8_t *ip;
-//	ip = p->eh.eh_dst;
-//	if(ip[0] == 192 && ip[1] == 168 && ip[2] == 3 && ip[3] == 7) {
-//		dump_ep_header(p);
-//	}
-}

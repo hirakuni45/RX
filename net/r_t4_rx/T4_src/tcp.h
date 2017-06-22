@@ -14,23 +14,28 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2014-2016 Renesas Electronics Corporation. All rights reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : tcp.h
-* Version      : 1.0
+* Version      : 1.01
 * Description  : Processing for TCP protocol header file
+* Website      : https://www.renesas.com/mw/t4
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
+* History : DD.MM.YYYY Version Description
+*         : 01.04.2014 1.00    First Release
+*         : 30.11.2016 1.01    add DHCP relation
 ***********************************************************************************************************************/
+
+#ifndef TCP_H__
+#define TCP_H__
 
 #include "t4define.h"
 
 
-#define _TCPH_LEN  20 // minimum TCP  header length (in bytes)
-#define _UDPH_LEN  8 // UDP header length (in bytes)
+#define _TCPH_LEN  20 /* minimum TCP  header length (in bytes)*/
+#define _UDPH_LEN  8  /* UDP header length (in bytes)*/
 
 #define E_NO_RCV  -10
 #define E_RST_RCV  -2
@@ -45,20 +50,20 @@
 #define _ITS_SHT 1
 #define _ITS_RST 2
 
-#define _TCP_RTO_INIT  (2 * 100)  // 2 sec.
-#define _TCP_RTO_INT_MAX (60 * 100)  // 1 min.
+#define _TCP_RTO_INIT  (2 * 100)     /* 2 sec. */
+#define _TCP_RTO_INT_MAX (60 * 100)  /* 1 min. */
 
-#define _TCPS_CLOSED  0x0000
-#define _TCPS_LISTEN  0x0001
-#define _TCPS_SYN_SENT  0x0002
+#define _TCPS_CLOSED       0x0000
+#define _TCPS_LISTEN       0x0001
+#define _TCPS_SYN_SENT     0x0002
 #define _TCPS_SYN_RECEIVED 0x0004
-#define _TCPS_ESTABLISHED 0x0008
-#define _TCPS_FIN_WAIT1  0x0010
-#define _TCPS_FIN_WAIT2  0x0020
-#define _TCPS_CLOSE_WAIT 0x0040
-#define _TCPS_LAST_ACK  0x0080
-#define _TCPS_CLOSING  0x0100
-#define _TCPS_TIME_WAIT  0x0200
+#define _TCPS_ESTABLISHED  0x0008
+#define _TCPS_FIN_WAIT1    0x0010
+#define _TCPS_FIN_WAIT2    0x0020
+#define _TCPS_CLOSE_WAIT   0x0040
+#define _TCPS_LAST_ACK     0x0080
+#define _TCPS_CLOSING      0x0100
+#define _TCPS_TIME_WAIT    0x0200
 
 #define  _TCPF_URG     0x20
 #define  _TCPF_ACK     0x10
@@ -67,37 +72,37 @@
 #define  _TCPF_SYN     0x02
 #define  _TCPF_FIN     0x01
 
-#define _TCBF_NEED_SEND  0x0001
-#define _TCBF_PEND_ARP  0x0002
-#define _TCBF_PEND_ICMP  0x0004
-#define _TCBF_PEND_ZWIN  0x0008
-#define _TCBF_PEND_DRV  0x0010
-#define _TCBF_NEED_INIT  0x0020
-#define _TCBF_FIN_RCVD  0x0040
-#define _TCBF_NEED_API  0x0080
-#define _TCBF_SND_ICMP  0x0100
-#define _TCBF_SND_TCP  0x0200
-#define _TCBF_SND_RTX  0x0400
-#define _TCBF_SND_ZWIN  0x0800
+#define _TCBF_NEED_SEND   0x0001
+#define _TCBF_PEND_ARP    0x0002
+#define _TCBF_PEND_ICMP   0x0004
+#define _TCBF_PEND_ZWIN   0x0008
+#define _TCBF_PEND_DRV    0x0010
+#define _TCBF_NEED_INIT   0x0020
+#define _TCBF_FIN_RCVD    0x0040
+#define _TCBF_NEED_API    0x0080
+#define _TCBF_SND_ICMP    0x0100
+#define _TCBF_SND_TCP     0x0200
+#define _TCBF_SND_RTX     0x0400
+#define _TCBF_SND_ZWIN    0x0800
 #define _TCBF_SND_ARP_REQ 0x1000
 #define _TCBF_SND_ARP_REP 0x2000
-#define _TCBF_RET_LISTEN 0x4000
-#define _TCBF_AVOID_DACK 0x8000
-#define _TCBF_14  0x0000
+#define _TCBF_RET_LISTEN  0x4000
+#define _TCBF_AVOID_DACK  0x8000
+#define _TCBF_14          0x0000
 
-#define _TCP_API_ACPCP 1 // tcp_acp_cep()
-#define _TCP_API_CONCP 2 // tcp_con_cep()
-#define _TCP_API_SHTCP 3 // tcp_sht_cep()
-#define _TCP_API_CLSCP 4 // tcp_cls_cep()
-#define _TCP_API_SNDDT 5 // tcp_snd_dat()
-#define _TCP_API_RCVDT 6 // tcp_rcv_dat()
-#define _TCP_API_CANCP 7 // tcp_can_cep()
+#define _TCP_API_ACPCP    1
+#define _TCP_API_CONCP    2
+#define _TCP_API_SHTCP    3
+#define _TCP_API_CLSCP    4
+#define _TCP_API_SNDDT    5
+#define _TCP_API_RCVDT    6
+#define _TCP_API_CANCP    7
 
-#define _TCP_API_STAT_INIT   0
+#define _TCP_API_STAT_INIT       0
 #define _TCP_API_STAT_UNTREATED  1
 #define _TCP_API_STAT_INCOMPLETE 2
-#define _TCP_API_STAT_COMPLETE  3
-#define _TCP_API_STAT_TMOUT   4
+#define _TCP_API_STAT_COMPLETE   3
+#define _TCP_API_STAT_TMOUT      4
 
 #define _TCP_API_FLAG_CANCELED  1
 
@@ -184,26 +189,18 @@ typedef ER(*_TCP_CALLBACK_FUNC)(ID cepid, FN fncd , VP p_parblk);
 #define _TCP_CB_GET_CALLBACK_FUNC_PTR(cepid) (tcp_ccep[(cepid)-1].callback)
 #define _TCP_CB_CALL_CALLBACK(cepid, fncd, pTcpTcb)       \
     do {\
-        if ( (*(pTcpTcb->req.error) < 0 && pTcpTcb->req.stat != _TCP_API_STAT_COMPLETE) || \
-                (*(pTcpTcb->req.error) >=0 && pTcpTcb->req.stat == _TCP_API_STAT_INCOMPLETE) ) \
-        {                     \
-            pTcpTcb->req.stat = _TCP_API_STAT_COMPLETE;      \
-            \
-            _tcp_call_callback(cepid, fncd, (VP)pTcpTcb->req.error);  \
+        if ( ( (pTcpTcb->req.stat != _TCP_API_STAT_COMPLETE) && (*(pTcpTcb->req.error) < 0)) || \
+                ((pTcpTcb->req.stat == _TCP_API_STAT_INCOMPLETE) && (*(pTcpTcb->req.error) >=0)) ) \
+        { \
+            if(0 == _ch_info_head[tcp_ccep[cepid-1].cepatr].ip_terminated_flag) \
+            { \
+                pTcpTcb->req.stat = _TCP_API_STAT_COMPLETE;      \
+                \
+                _tcp_call_callback(cepid, fncd, (VP)pTcpTcb->req.error);  \
+            } \
         }                 \
     }while(0)
-#define _TCP_CB_CALL_CALLBACK_WITH_CLOSE(cepid, fncd, req_error, req_stat) \
-    do {\
-        if ( (*(req_error) < 0 && req_stat != _TCP_API_STAT_COMPLETE) || \
-                (*(req_error) >=0 && req_stat == _TCP_API_STAT_INCOMPLETE) ) \
-        {                     \
-            req_stat = _TCP_API_STAT_COMPLETE;         \
-            \
-            _tcp_call_callback(cepid, fncd, (VP)req_error);     \
-        }                 \
-    }while(0)                \
-        \
-         
+
 typedef struct
 {
     uchar   sadr[IP_ALEN];
@@ -246,14 +243,15 @@ typedef struct
 {
     uint16          flag;
 #if defined(_TCP)
-    uint16   cepid;
-    uint16   status;
-    uint16   nxt_status;
-    uchar   it_stat;
+    uint16          cepid;
+    uint16          status;
+    uint16          nxt_status;
+    uchar           it_stat;
     uchar           hdr_flg;
     uint16          mss;
-    _API_REQ  req;
-    _API_REQ  req_can;
+    _API_REQ        req;
+    _API_REQ        req_can;
+    UW              tcp_initial_seqno;
     uint32          suna;
     uint32          snxt;
     uint32          risn;
@@ -263,7 +261,7 @@ typedef struct
     uint16          loc_port;
     uint16          rtchk_cnt;
     _TCP_RTX_Q      retrans_q;
-    _TCP_RTX_Q2  retrans_q2;
+    _TCP_RTX_Q2     retrans_q2;
     uchar          *nxtdat;
     uchar          *rwin;
     uchar          *rwin_bnry;
@@ -273,11 +271,11 @@ typedef struct
     uint16          sdsize;
     uint16          rdsize;
     uint16          mslcnt;
-    uint16   zwin_int;
+    uint16          zwin_int;
     uint16          nxt_zero;
     uint16          zwp_noack_cnt;
 
-    _TCP_CB   callback_info;
+    _TCP_CB         callback_info;
 
     uint16          ack_wait_timer;
     uint16          ack_wait_timercnt;
@@ -287,13 +285,13 @@ typedef struct
 
 typedef struct
 {
-    _IP_HDR  iph;    // IP Header
+    _IP_HDR  iph;
     union
     {
-        uchar tcph[_TCPH_LEN+4]; // TCP Header (20:header+4:MSS option)
-        uchar icmph[_ICMP_HLEN]; // ICMP Header
+        uchar tcph[_TCPH_LEN+4];
+        uchar icmph[_ICMP_HLEN];
 #if defined(_UDP)
-        uchar udph[_UDPH_LEN]; // UDP Header
+        uchar udph[_UDPH_LEN];
 #endif
     } thdr;
 } _TX_IPH ;
@@ -301,7 +299,7 @@ typedef struct
 typedef struct
 {
 #if defined(_ETHER)
-    _ETH_HDR eh;     // Ether Header
+    _ETH_HDR eh;
 #elif defined(_PPP)
     uchar  address;   /* 0xff */
     uchar  control;   /* 0x03 */
@@ -309,7 +307,7 @@ typedef struct
 #endif
     union
     {
-        _TX_IPH  tip;   // IP Header
+        _TX_IPH  tip;
 #if defined(_ETHER)
 #if !defined(_IPV6)
         _ARP_PKT tarp;
@@ -345,7 +343,7 @@ void _tcp_api_con(void);
 void _tcp_api_sht_cls(void);
 void _tcp_api_snddt(void);
 void _tcp_api_rcvdt(void);
-void _tcp_api_wup(ID);
+void _tcp_api_wup(ID cepid);
 void _tcp_api_slp(ID cepid);
 ER _tcp_check_cepid_arg(ID cepid);
 ER _tcp_check_len_arg(INT len);
@@ -356,3 +354,4 @@ FN _tcp_api_type_to_fn(uint16 api_type);
 ER _tcp_recv_polling(_TCB* pTcb, uchar *buf, uint16 size);
 void _tcp_init_callback_info(_TCP_CB* pCallbackInfo);
 
+#endif /*#ifndef TCP_H__*/

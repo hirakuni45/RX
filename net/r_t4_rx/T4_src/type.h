@@ -14,19 +14,21 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2014 Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2014-2016 Renesas Electronics Corporation. All rights reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : type.h
-* Version      : 1.0
+* Version      : 1.01
 * Description  : standard type for T4 header file
+* Website      : https://www.renesas.com/mw/t4
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
-* History : DD.MM.YYYY Version  Description
-*         : 01.04.2014 1.00     First Release
+* History : DD.MM.YYYY Version Description
+*         : 01.04.2014 1.00    First Release
+*         : 30.11.2016 1.01    File Header maintenance
 ***********************************************************************************************************************/
-#ifndef TYPE_H
-#define TYPE_H
+#ifndef __TYPE_H__
+#define __TYPE_H__
 
 #define _TCP_UNIT_TIME  10    /* 10ms */
 
@@ -66,7 +68,7 @@ typedef unsigned long  uint32;
 #endif
 
 #if BIGENDIAN == 1
-#define	type_h_define_BIGENDIAN_detect
+#define type_h_define_BIGENDIAN_detect
 #define hs2net(x) (x)
 #define net2hs(x) (x)
 #define hl2net(x) (x)
@@ -109,15 +111,8 @@ void net2hl_yn_xn(void *y, void *x);
 
 #define T_IPVxEP T_IPV4EP
 
-/* This Defined to r_t4_itcpip.h   */
-//#define IP_ALEN    4
-//typedef uchar IPaddr[IP_ALEN]; /*  IP address */
-
 #define EP_ALEN    6
 typedef uchar Eaddr[EP_ALEN];  /*  MAC address */
-
-#define ETHER_CHANNEL_0		0
-#define ETHER_CHANNEL_1		1
 
 /*
  * Macro function
@@ -187,7 +182,7 @@ typedef uchar Eaddr[EP_ALEN];  /*  MAC address */
 # endif
 #endif
 
-#endif	/*include guard*/
+#endif /*include guard*/
 
 
 
