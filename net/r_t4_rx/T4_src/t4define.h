@@ -36,7 +36,7 @@
 #define _IGMP
 #define _MULTI
 #define _TCP_DACK
-#define _TEST_LIBRARY
+/// #define _TEST_LIBRARY
 #define _far
 #define far
 #define _ETHER

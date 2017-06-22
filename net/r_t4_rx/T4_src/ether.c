@@ -43,6 +43,7 @@ Includes   <System Includes> , "Project Includes"
 #include "ip.h"
 #include "tcp.h"
 #include "dhcp.h"
+#include "global.h"
 
 #include "r_t4_rx/src/config_tcpudp.h"
 
@@ -61,17 +62,10 @@ Exported global variables (to be accessed by other files)
 /***********************************************************************************************************************
 Private global variables and functions
 ***********************************************************************************************************************/
-uchar    *_ether_p_rcv_buff;
 
 /***********************************************************************************************************************
 Exported global variables (read from other files)
 ***********************************************************************************************************************/
-extern UB *data_link_buf_ptr;    /* Buffer pointer to Datalink layer */
-extern _TX_HDR  _tx_hdr;    /* Area for transmit header */
-
-#if defined(_MULTI)
-extern TCPUDP_ENV tcpudp_env[];
-#endif
 
 /***********************************************************************************************************************
 * Function Name: _ether_proc_rcv

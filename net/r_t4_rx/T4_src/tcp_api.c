@@ -50,6 +50,7 @@ Includes   <System Includes> , "Project Includes"
 #include "dhcp.h"
 #include "ether.h"
 #include "dhcp.h"
+#include "global.h"
 
 #include "r_t4_rx/src/config_tcpudp.h"
 
@@ -68,19 +69,6 @@ Exported global variables (to be accessed by other files)
 /***********************************************************************************************************************
 Private global variables and functions
 ***********************************************************************************************************************/
-
-extern _TCB   *_tcp_tcb;
-extern _TCB   *head_tcb;
-extern UH   _tcp_timer_cnt;
-extern UH   _tcp_pre_timer_cnt;
-
-#if defined(_ETHER)
-_ARP_ENTRY   **_ether_arp_tbl;
-#endif
-#if defined(_PPP)
-extern uint16 ppp_sio_status;
-extern _PPP_API_REQ _ppp_api_req;
-#endif
 
 ER tcpudp_reset_sub(UB channel);
 

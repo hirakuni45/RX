@@ -147,7 +147,6 @@ typedef struct
     uchar ae_state;      /* state of this entry (see above) */
     uchar ae_attempts;   /* number of retries so far  */
 } _ARP_ENTRY ;
-extern _ARP_ENTRY **_ether_arp_tbl;
 
 void _ether_rcv_arp(void);
 sint16 _ether_snd_arp(_ARP_ENTRY *ae);

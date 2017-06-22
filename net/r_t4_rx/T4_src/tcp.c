@@ -54,6 +54,7 @@ Includes   <System Includes> , "Project Includes"
 #endif
 #include "dhcp.h"
 
+#include "global.h"
 #include "r_t4_rx/src/config_tcpudp.h"
 
 extern void get_random_number(UB *data, UW len);
@@ -69,11 +70,7 @@ Typedef definitions
 /***********************************************************************************************************************
 Exported global variables (to be accessed by other files)
 ***********************************************************************************************************************/
-_TCB  *_tcp_tcb;    /* TCB (Transport Control Block) pointer */
-_TCB  *head_tcb;    /* TCB head pointer */
-_TX_HDR  _tx_hdr;    /* TCP transmit header area */
-UH   _tcp_timer_cnt;   /* timer count: 10ms unit */
-UH   _tcp_pre_timer_cnt;  /* previous timer count */
+
 
 /***********************************************************************************************************************
 Private global variables and functions

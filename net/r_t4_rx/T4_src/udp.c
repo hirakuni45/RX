@@ -51,6 +51,7 @@ Includes   <System Includes> , "Project Includes"
 #include "dhcp.h"
 
 #include "r_t4_rx/src/config_tcpudp.h"
+#include "global.h"
 
 /***********************************************************************************************************************
 Macro definitions
@@ -67,13 +68,6 @@ Exported global variables (to be accessed by other files)
 /***********************************************************************************************************************
 Private global variables and functions
 ***********************************************************************************************************************/
-
-#if defined(_UDP)
-_UDP_CB  *_udp_cb;
-extern UB *data_link_buf_ptr;
-#endif
-
-extern _TX_HDR _tx_hdr;
 
 #if defined(_UDP)
 /***********************************************************************************************************************
