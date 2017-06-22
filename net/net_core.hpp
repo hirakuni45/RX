@@ -8,7 +8,7 @@
 #include "common/renesas.hpp"
 #include "net/dhcp_client.hpp"
 
-#include "r_t4_rx/src/config_tcpudp.h"
+// #include "r_t4_rx/src/config_tcpudp.h"
 #include "net/socket.hpp"
 
 namespace net {
@@ -196,7 +196,8 @@ namespace net {
 			case task::main_init:
 				io_.link_process();
 
-				socket_.open(3000);
+///				socket_.open(3000, false, ip_adrs(192,168,3,7));  // client socket
+				socket_.open(3000);  // server socket
 
 				task_ = task::main_loop;
 				break;
