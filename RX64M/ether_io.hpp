@@ -942,7 +942,7 @@ namespace device {
 			@return ライト数
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t write(const void* hsrc, uint32_t hlen, const void* bsrc, uint32_t blen)
+		int32_t write(const void* hsrc, uint32_t hlen, const void* bsrc, uint32_t blen)
 		{
 			void* buf;
 			uint16_t buf_size;
