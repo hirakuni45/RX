@@ -42,8 +42,9 @@ Includes   <System Includes> , "Project Includes"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include "r_t4_itcpip.h"
+#include "r_t4_rx/src/config_tcpudp.h"
 #include "r_socket_rx_config.h"
+
 /// #include "r_errno.h"
 
 /***********************************************************************************************************************
