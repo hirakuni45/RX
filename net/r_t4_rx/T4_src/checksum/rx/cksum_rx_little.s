@@ -5,9 +5,7 @@
 __cksum:                           ; function: _cksum
 	.stack      __cksum=4
 
-;uint16 _cksum(uchar *data, uint16 nbytes, uint16 sum0);
-	and		#0ffffh,	r2			;arg2 uint16
-	and		#0ffffh,	r3			;arg3 uint16
+
 
 
 
