@@ -667,7 +667,9 @@ void _proc_rcv(void)
                             && (ptcph->dport == hs2net(_tcp_tcb->loc_port))
                             && (_cmp_ipaddr(piph->ip_src, _tcp_tcb->rem_ip) == 0)
                             && (_ch_info_tbl->_ch_num == tcp_ccep[counter].cepatr)
-                            && (_tcp_tcb->status != _TCPS_LISTEN)
+                            && ((_tcp_tcb->status != _TCPS_LISTEN)
+                                  || ((_tcp_tcb->status == _TCPS_LISTEN) &&
+                                      (_tcp_tcb->nxt_status == _TCPS_SYN_RECEIVED)))
                             && (_tcp_tcb->status != _TCPS_CLOSED))
                     {
                         break;

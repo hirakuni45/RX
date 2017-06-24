@@ -57,7 +57,7 @@ static int tcpudp_api_req_(int cepid)
 
         return E_WBLK;
     }
-
+printf("tcpudp_api_req: error\n");
     tcpudp_api_slp_(cepid);
     tcpudp_clr_req_(cepid);
 
@@ -266,22 +266,34 @@ int tcp_acp_cep(int cepid, int repid, T_IPVxEP *p_dstaddr, int32_t tmout)
         }
     }
 
+#if 1
+    dis_int();
     head_tcb[cepid-1].req.type = _TCP_API_ACPCP;
     head_tcb[cepid-1].req.tmout = tmout;
     head_tcb[cepid-1].req.d.cnr.dstaddr = p_dstaddr;
     head_tcb[cepid-1].req.d.cnr.repid = repid;
+    head_tcb[cepid-1].req.stat = _TCP_API_STAT_UNTREATED;
+    head_tcb[cepid-1].req.flag = 0;
+    *head_tcb[cepid-1].req.error = E_INI;
+    ena_int();                                                      /*  #3577 */
+#else
+    head_tcb[cepid-1].req.type = _TCP_API_ACPCP;
+    head_tcb[cepid-1].req.tmout = tmout;
+    head_tcb[cepid-1].req.d.cnr.dstaddr = p_dstaddr;
+    head_tcb[cepid-1].req.d.cnr.repid = repid;
+#endif
 
     err = tcpudp_api_req_(cepid);
-
-    if (err == E_WBLK)
+    if(err == E_WBLK)
     {
         if (!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat))
         {
             _TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
         }
+#if 0
 		err = *head_tcb[cepid - 1].req.error;
-    }
-
+#endif
+	}
     return err;
 }
 

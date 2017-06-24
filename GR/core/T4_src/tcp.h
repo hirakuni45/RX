@@ -336,4 +336,12 @@ int32_t _tcp_api_type_to_fn(uint16_t api_type);
 int _tcp_recv_polling(_TCB* pTcb, uint8_t *buf, uint16_t size);
 void _tcp_init_callback_info(_TCP_CB* pCallbackInfo);
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 void _process_tcpip(void);
+
+#if defined(__cplusplus)
+}
+#endif
