@@ -246,11 +246,11 @@ namespace device {
 #endif
 			volatile void*	buf_p;
 			volatile descriptor_s*	next;
-		};
+		} __attribute__((__packed__));
 
 		struct etherbuffer_s {
 			uint8_t  buffer[EMAC_NUM_RX_DESCRIPTORS + EMAC_NUM_TX_DESCRIPTORS][EMAC_BUFSIZE];
-		};
+		} __attribute__((__packed__));
 
 	private:
 		// アライメントを使う場合、注意
@@ -269,10 +269,10 @@ namespace device {
 
 		uint8_t	mac_addr_[6];
 
-		volatile bool					pause_frame_enable_flag_;
+		volatile bool					pause_frame_enable_;
 		volatile magic_packet_mode		magic_packet_detect_;
 		volatile uint8_t				lchng_flag_;
-		volatile uint8_t				transfer_enable_flag_;
+		volatile bool					transfer_enable_;
 
 		bool			link_stat_;
 
@@ -482,7 +482,7 @@ namespace device {
 			// At the communicate mode usually
 			if(mode == magic_packet_mode::no_use) {
 				// When pause frame is used
-				if(full_duplex && pause_frame_enable_flag_) {
+				if(full_duplex && pause_frame_enable_) {
 					// Set automatic PAUSE for 512 bit-time
 					ETHRC::APR = 0x0000FFFF;
 					// Set unlimited retransmit of PAUSE frames
@@ -630,8 +630,8 @@ namespace device {
 		ether_io() :
 			app_rx_desc_(nullptr), app_tx_desc_(nullptr),
 			intr_level_(0), mac_addr_{ 0 },
-			pause_frame_enable_flag_(false), magic_packet_detect_(magic_packet_mode::no_use),
-			lchng_flag_(FLAG_OFF), transfer_enable_flag_(FLAG_OFF),
+			pause_frame_enable_(false), magic_packet_detect_(magic_packet_mode::no_use),
+			lchng_flag_(FLAG_OFF), transfer_enable_(false),
 			link_stat_(false), stat_(), recv_ptr_(nullptr), recv_mod_(0), err_data_(nullptr)
 			{ }
 
@@ -710,6 +710,27 @@ namespace device {
 
 			intr_level_ = level;
 
+			// Initialize the transmit and receive descriptor
+			memset((void*)rx_descriptors_, 0x00, sizeof(rx_descriptors_));
+			memset((void*)tx_descriptors_, 0x00, sizeof(tx_descriptors_));
+
+			// Initialize the Ether buffer */
+			memset((void*)&ether_buffers_, 0x00, sizeof(ether_buffers_));
+
+#if 0
+    memset(etherc_edmac_power_cont, 0x00, sizeof(etherc_edmac_power_cont));
+
+    /* Initialize the callback function pointer */
+    cb_func.pcb_func = NULL;
+
+    /* Initialize the interrupt handler pointer */
+    cb_func.pcb_int_hnd = NULL;
+
+    /* Initialize */
+    promiscuous_mode[ETHER_CHANNEL_0] = ETHER_PROMISCUOUS_OFF;
+    mc_filter_flag[ETHER_CHANNEL_0] = ETHER_MC_FILTER_OFF;
+    bc_filter_count[ETHER_CHANNEL_0] = 0;
+#endif
 			return true;
 		}
 
@@ -724,7 +745,7 @@ namespace device {
 		bool open(const uint8_t* mac_addr)
 		{
 			/* Initialize the flags */
-			transfer_enable_flag_ = FLAG_OFF;
+			transfer_enable_ = false;
 			mpd_flag_             = FLAG_OFF;
 			lchng_flag_           = FLAG_OFF;
 
@@ -741,7 +762,7 @@ namespace device {
 			// Software reset the PHY
 			bool phy_ret = phy_.init();
 			if(phy_ret) {
-				phy_.start_autonegotiate(pause_frame_enable_flag_);
+				phy_.start_autonegotiate(pause_frame_enable_);
 
 				/* Clear all ETHERC status BFR, PSRTO, LCHNG, MPD, ICD */
 				ETHRC::ECSR = 0x00000037;
@@ -775,7 +796,7 @@ namespace device {
     		int32_t ret;
 
 			// When the Link up processing is not completed, return error
-			if(FLAG_OFF == transfer_enable_flag_) {
+			if(!transfer_enable_) {
 				ret = ERROR_LINK;
 			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
 				ret = ERROR_MPDE;
@@ -803,7 +824,7 @@ namespace device {
 			int32_t ret;
 
 			// When the Link up processing is not completed, return error
-			if(FLAG_OFF == transfer_enable_flag_) {
+			if(!transfer_enable_) {
 				ret = ERROR_LINK;
 			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
 				ret = ERROR_MPDE;
@@ -837,7 +858,7 @@ namespace device {
 		{
 			int32_t ret;
 			// When the Link up processing is not completed, return error
-			if (FLAG_OFF == transfer_enable_flag_) {
+			if(!transfer_enable_) {
 				ret = ERROR_LINK;
 			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
 				ret = ERROR_MPDE;
@@ -860,7 +881,7 @@ namespace device {
 		{
 			int32_t ret;
 			// When the Link up processing is not completed, return error
-			if(FLAG_OFF == transfer_enable_flag_) {
+			if(!transfer_enable_) {
 				ret = ERROR_LINK;
 			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
 				ret = ERROR_MPDE;
@@ -1010,9 +1031,9 @@ namespace device {
 			ETHRC::ECMR = 0x00000000;
 
 			// Initialize the flags
-			transfer_enable_flag_  = FLAG_OFF;
-			mpd_flag_              = FLAG_OFF;
-			lchng_flag_            = FLAG_OFF;
+			transfer_enable_  = false;
+			mpd_flag_         = FLAG_OFF;
+			lchng_flag_       = FLAG_OFF;
 
 			return true;
 		}
@@ -1061,7 +1082,7 @@ namespace device {
 					configure_mac_(mac_addr_, magic_packet_mode::no_use);
 					do_link_(magic_packet_mode::no_use);
 
-					transfer_enable_flag_ = FLAG_ON;
+					transfer_enable_ = true;
 					callback_link_on();
 				} else {
 					// no proccess
@@ -1077,7 +1098,7 @@ namespace device {
 					ETHRC::ECMR.RE = 0;
 					ETHRC::ECMR.TE = 0;
             
-					transfer_enable_flag_ = FLAG_OFF;
+					transfer_enable_ = false;
 					callback_link_off();
 				} else {
 					// no proccess
@@ -1103,7 +1124,7 @@ namespace device {
 		{
     		int32_t ret;
 			// When the Link up processing is not completed, return error
-			if(FLAG_OFF == transfer_enable_flag_) {
+			if(!transfer_enable_) {
 				ret = ERROR_LINK;
 			} else {  // When the Link up processing is completed
 				// Change to the magic packet detection mode.
