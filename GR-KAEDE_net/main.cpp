@@ -18,8 +18,6 @@
 #include "chip/phy_base.hpp"
 #include "net/net_core.hpp"
 
-#include "r_t4_itcpip.h"
-
 namespace {
 
 	typedef device::ETHERC0 ETHERC;      // Eternet Controller
@@ -40,7 +38,6 @@ namespace {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class cmt_task {
 
-		volatile uint16_t	wait_timer_;
 		volatile uint16_t	tcpudp_time_cnt_;
 
 		volatile bool		open_timer_;
@@ -51,7 +48,7 @@ namespace {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		cmt_task() : wait_timer_(0), tcpudp_time_cnt_(0),
+		cmt_task() : tcpudp_time_cnt_(0),
 			open_timer_(false) { }
 
 
@@ -65,11 +62,6 @@ namespace {
 				if(tcpip_flag_) {
 					_process_tcpip();
 					tcpudp_time_cnt_++;
-				}
-
-				// for wait function
-				if(wait_timer_ < 0xFFFF) {
-					wait_timer_++;
 				}
 			}
 		}
@@ -91,24 +83,6 @@ namespace {
 		*/
 		//-----------------------------------------------------------------//
 		uint16_t get_tcpudp_time() const { return tcpudp_time_cnt_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  カウントの設定
-			@param[in]	v	カウント値
-		*/
-		//-----------------------------------------------------------------//
-		void set_wait_timer(uint16_t v = 0) { wait_timer_ = v; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  カウントの取得
-			@return カウント値
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_wait_timer() const { return wait_timer_; }
 	};
 
 
@@ -292,29 +266,6 @@ extern "C" {
 	}
 
 
-	//-----------------------------------------------------------------//
-	/*!
-		@brief	タイマーカウンターをリセット
-	 */
-	//-----------------------------------------------------------------//
-	void reset_timer(void)
-	{
-		cmt_.at_task().set_wait_timer(0);
-	}
-
-
-	//-----------------------------------------------------------------//
-	/*!
-		@brief	タイマーカウンターを取得
-		@return	タイマーカウント
-	 */
-	//-----------------------------------------------------------------//
-	uint16_t get_timer(void)
-	{
-		return cmt_.at_task().get_wait_timer();
-	}
-
-
 	uint16_t get_tcpudp_time(void)
 	{
 		return cmt_.at_task().get_tcpudp_time();
@@ -328,7 +279,7 @@ extern "C" {
 	/////////////////////////////////////////////////////////////////////
 	void lan_inthdr(void)
 	{
-///		InterruptsEnable();
+		ether_.enable_interrupt();
 		if(tcpip_flag_) {
 			_process_tcpip();
 			++net_int_cnt_;
@@ -339,7 +290,6 @@ extern "C" {
 	void ena_int(void)
 	{
 		tcpip_flag_ = true;
-utils::format("TCPIP Enable\n");
 	}
 
 
@@ -352,7 +302,6 @@ utils::format("TCPIP Enable\n");
 	void dis_int(void)
 	{
 		tcpip_flag_ = false;
-utils::format("TCPIP Disable\n");
 	}
 
 
@@ -388,12 +337,6 @@ utils::format("TCPIP Disable\n");
 	void tcp_api_wup(int16_t cepid)
 	{
 		// If user uses "Real time OS", user may define "wake up task" here.
-	}
-
-
-	uint16_t tcpudp_get_time(void)
-	{
-		return cmt_.at_task().get_tcpudp_time();
 	}
 
 

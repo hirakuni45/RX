@@ -19,25 +19,28 @@ VPATH		=	../
 ASOURCES	=	common/start.s \
 				net/r_t4_rx/T4_src/checksum/rx/cksum_rx_little.s
 
+#				GR/core/driver/cksum_rx_little.s
+
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c \
-				net/r_tcpip_private.c \
 				net/r_t4_rx/T4_src/global.c \
 				net/r_t4_rx/T4_src/ether.c \
 				net/r_t4_rx/T4_src/ip.c \
 				net/r_t4_rx/T4_src/tcp.c \
 				net/r_t4_rx/T4_src/udp.c \
-				net/r_t4_rx/T4_src/igmp.c \
 				net/r_t4_rx/T4_src/dhcp.c \
+				net/r_t4_rx/T4_src/igmp.c \
 				net/r_t4_rx/T4_src/tcp_api.c \
 				net/r_t4_rx/src/config_tcpudp.c \
-				net/r_socket_rx/src/r_socket.c
+				net/r_socket_rx/src/r_socket.c \
+				net/r_tcpip_private.c
 
-#				net/r_socket_rx/src/r_socket_par_check.c
+
+
 
 PSOURCES	=	main.cpp
 
@@ -54,10 +57,7 @@ MCU_TARGET	=
 INC_SYS		=
 
 INC_APP		=	. ../ ../RX64M \
-				../net ../net/r_config \
-				../net/r_t4_rx/T4_src \
-				../net/r_socket_rx \
-				../net/r_socket_rx/src
+				../net ../net/r_config ../net/r_t4_rx/T4_src ../net/r_socket_rx/src
 
 OPTIMIZE	=	-Os
 
