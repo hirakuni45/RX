@@ -17,6 +17,7 @@
 
 #include "chip/phy_base.hpp"
 #include "net/net_core.hpp"
+#include "net/http_server.hpp"
 
 namespace {
 
@@ -27,9 +28,7 @@ namespace {
 	ETHER_IO 	ether_;
 
 	volatile bool tcpip_flag_ = false;
-
 	volatile uint32_t net_int_cnt_ = 0;
-
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -39,7 +38,6 @@ namespace {
 	class cmt_task {
 
 		volatile uint16_t	tcpudp_time_cnt_;
-
 		volatile bool		open_timer_;
 
 	public:
@@ -109,6 +107,9 @@ namespace {
 
 	typedef net::net_core<ETHER_IO> NET_CORE;
 	NET_CORE	net_(ether_);
+
+	typedef net::http_server<ETHER_IO, SDC> HTTP;
+	HTTP		http_(ether_, sdc_);
 }
 
 extern "C" {
@@ -378,9 +379,6 @@ extern "C" {
 		} else {
 			rc = -2;
 		}
-
-//		rc = lan_read_for_test(buf, rc);
-
 		return rc;
 	}
 
@@ -532,21 +530,37 @@ int main(int argc, char** argv)
 		net_.start(mac);
 	}
 
+	{  // HTTP サーバーの設定
+		http_.start("GR-KAEDE_net HTTP Server");
+
+		// ルート・ページ設定
+		http_.set_link("/", "", [=](void) {
+			time_t t = get_time();
+			struct tm *m = localtime(&t);
+			HTTP::http_format("%s %s %d %02d:%02d:%02d  %4d<br>\n")
+				% get_wday(m->tm_wday)
+				% get_mon(m->tm_mon)
+				% static_cast<uint32_t>(m->tm_mday)
+				% static_cast<uint32_t>(m->tm_hour)
+				% static_cast<uint32_t>(m->tm_min)
+				% static_cast<uint32_t>(m->tm_sec)
+				% static_cast<uint32_t>(m->tm_year + 1900);
+
+			http_.tag_hr(500, 3);
+		} );
+	}
+
 	uint32_t cnt = 0;
-	volatile uint32_t nnn = 0;
 	while(1) {  // 100Hz (10ms interval)
 		cmt_.sync();
 
-		net_.service();
-
-#if 0
-		if(nnn != net_int_cnt_) {
-			nnn = net_int_cnt_;
-			utils::format("Net intr: %u\n") % net_int_cnt_;
-		}
-#endif
-
 		sdc_.service();
+
+		net_.service();
+		bool l = net_.check_link();
+		if(l) {
+			http_.service();
+		}
 
 		device::PORTC::PDR.B0 = 1; // output
 		device::PORTC::PODR.B0 = (cnt < 10) ? 0 : 1;
