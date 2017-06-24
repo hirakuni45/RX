@@ -54,7 +54,7 @@ MCU_TARGET	=
 
 INC_SYS		=
 
-INC_APP		=	. ../ ../RX64M ../GR ../rx64m_test
+INC_APP		=	. ../ ../RX64M ../GR ../GR/core/r_socket_rx ../rx64m_test
 
 OPTIMIZE	=	-Os
 
