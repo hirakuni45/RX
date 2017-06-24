@@ -20,5 +20,5 @@
 #error "r_tcpip_private.h requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
 #endif
 
-#include "t4define.h"
+// #include "t4define.h"
 

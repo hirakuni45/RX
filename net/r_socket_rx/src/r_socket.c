@@ -55,11 +55,13 @@ Includes   <System Includes> , "Project Includes"
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include "t4define.h"
 #include "r_t4_itcpip.h"
 #include "r_socket_rx_config.h"
-#include "r_socket_rx_if.h"
+#include "../r_socket_rx_if.h"
+#ifdef R_SOCKET_PAR_CHECK
 #include "r_socket_par_check.h"
-/// #include "r_errno.h"
+#endif
 
 #include "r_t4_rx/src/config_tcpudp.h"
 
@@ -75,1506 +77,28 @@ Macro definitions
 /******************************************************************************
 Imported global variables and functions (from other files)
 ******************************************************************************/
-/// extern T_TCP_CCEP tcp_ccep[MAX_TCP_CCEP];
-/// extern T_TCP_CREP tcp_crep[MAX_TCP_CCEP];
-/// extern T_UDP_CCEP udp_ccep[MAX_UDP_CCEP];
-
-extern ER udp_force_clr( ID cepid);
-extern ER tcp_force_clr( ID cepid);
 
 
 /******************************************************************************
 Exported global variables and functions (to be accessed by other files)
 ******************************************************************************/
-/// extern void get_random_number(UB *data, UW len);
+
 
 /******************************************************************************
 Private global variables and functions
 ******************************************************************************/
-BSDSocket  sockets[TOTAL_BSD_SOCKET];
-uint32_t   create_id;
+static BSDSocket  sockets[TOTAL_BSD_SOCKET];
+static uint32_t   create_id;
 static uint32_t tcpudp_work[TCPUDP_WORK / sizeof(uint32_t) + 1];
 
 static int dup_tcp_socket( int sock );          /* Make a duplicate of a socket */
 static int reset_socket( int sock );        /* Clear a socket. make it */
 static uint16_t get_ephemeral_port(void);
-
-
-ER t4_tcp_generic_callback(ID cepid, FN fncd , VP p_parblk);
-ER t4_udp_generic_callback(ID cepid, FN fncd , VP p_parblk);
-
 static int is_sel_readable(int socks );
 static int is_sel_writeable(int socks);
 static int is_sel_errpending(int socks);
 
-int how_many_closed(ID sock_type);
-
-
-/******************************************************************************
-* Function Name: R_SOCKET_Open
-* Description  : Initialize the socket structure to a known initial value
-* Arguments    : none
-* Return Value : none
-******************************************************************************/
-int R_SOCKET_Open(void)
-{
-    int i;
-    ER  ercd;
-    int size;
-
-    memset(tcp_ccep, 0x00, MAX_TCP_CCEP * sizeof(T_TCP_CCEP));
-    memset(tcp_crep, 0x00, MAX_TCP_CREP * sizeof(T_TCP_CREP));
-    memset(udp_ccep, 0x00, MAX_UDP_CCEP * sizeof(T_UDP_CCEP));
-    for ( i = 0; i < TOTAL_BSD_SOCKET; i++)
-    {
-        sockets[i].state = BSD_CLOSED;
-        sockets[i].T4status = T4_CLOSED;
-        sockets[i].event = -1;
-        sockets[i].socket_type = 0;
-        sockets[i].backlog = 0;
-        sockets[i].dstaddr.ipaddr = 0;
-        sockets[i].dstaddr.portno = 0;
-        sockets[i].tmout = 0;  /* default is TMO_POL */
-        sockets[i].T4proc = 0;
-        sockets[i].rcvLen = 0;
-        sockets[i].sndLen = 0;
-        sockets[i].sndSz = 0;
-        sockets[i].err_type = ERR_NONE; /* No errors */
-        sockets[i].peer_socket = -1;
-        sockets[i].socket_proc = 0;
-        if ( i < MAX_TCP_CCEP )
-        {
-            tcp_ccep[i].rbufsz = SOCKET_TCP_WINSIZE;
-            tcp_ccep[i].callback = t4_tcp_generic_callback;
-        }
-        else
-        {
-            udp_ccep[i-MAX_TCP_CCEP].callback = t4_udp_generic_callback;
-        }
-    }
-
-    /* initialize TCP/IP */
-    size = tcpudp_get_ramsize();
-    if (size > sizeof(tcpudp_work))
-    {
-		printf("R_SOCKET_Open: empty memory (%d, %d)\n", (int)size, (int)sizeof(tcpudp_work));
-		return -1;
-    }
-
-    ercd = tcpudp_open(tcpudp_work);
-    if (ercd != E_OK)
-    {
-		printf("R_SOCKET_Open: tcpudp_open error\n");
-		return -2;
-    }
-	return size;
-}
-
-/******************************************************************************
-* Function Name: R_SOCKET_Open
-* Description  : Initialize the socket structure to a known initial value
-* Arguments    : none
-* Return Value : none
-******************************************************************************/
-void R_SOCKET_Close( void )
-{
-    tcpudp_close();
-}
-
-/******************************************************************************
-* Function Name: socket
-* Description  : This function creates a new socket
-* Arguments    : domain   - Address domain/Families - AF_INET, AF_UNIX etc.,
-*                type     - socket type SOCK_DGRAM or SOCK_STREAM
-*                protocol - IP protocol IPPROTO_UDP or IPPROTO_TCP
-*                           Don't care
-* Return Value : SOCKET socket - An integer representing socket descriptor
-******************************************************************************/
-int r_socket( int domain, int type, int protocol )
-{
-    SOCKET sock, ifirst, ilast;
-    int semp_ret;
-
-    errno = E_OK;           /* No error */
-    semp_ret = E_OK;
-
-#ifdef R_SOCKET_PAR_CHECK
-    if (socket_par_check(domain, type, protocol) != true)
-    {
-        return E_PAR;
-    }
-#endif  /* R_SOCKET_PAR_CHECK */
-
-    if ( (type == SOCK_STREAM) && (protocol == IPPROTO_TCP) )
-    {
-        /* sock {0..MAX_TCP_CCEP-1} reserved for SOCK_STREAM */
-        ifirst = 0;
-        ilast = MAX_TCP_CCEP;
-    }
-    else if (( type == SOCK_DGRAM ) && ( protocol == IPPROTO_UDP))
-    {
-        /* {MAX_TCP_CCEP .. MAX_TCP_CCEP+MAX_UDP_CCEP-1} reserved for SOCK_DGRAM */
-        ifirst = MAX_TCP_CCEP;
-        ilast = MAX_TCP_CCEP + MAX_UDP_CCEP;
-    }
-    else
-    {
-        errno = EPROTONOSUPPORT;    /* The protocol is not supported by the address family, or */
-        /* the protocol is not supported by the implementation. */
-        return SOCKET_ERROR;
-    }
-#if (SOCKET_IF_USE_SEMP == 1)
-    semp_ret = r_socket_sem_lock();            /* Return immediately if lock cannot be acquired? */
-#endif
-    if (semp_ret != E_OK)
-    {
-        errno = EACCES;
-        return  SOCKET_ERROR;    /* No sockets available */
-    }
-    for ( sock = ifirst; sock < ilast; sock++)
-    {
-        if ( sockets[sock].state == BSD_CLOSED ) /* sock available for use? */
-        {
-            break;
-        }
-    }
-    if ( sock == ilast )
-    {
-        r_socket_sem_release();
-        errno = ENFILE;          /* No more file descriptors are available for the system. */
-        return  SOCKET_ERROR;    /* No sockets available */
-    }
-
-    if ( type == SOCK_STREAM )
-    {
-        tcp_ccep[sock].cepatr = 0;              /* Choose first channel; */
-    }
-    else
-    {
-        udp_ccep[sock-MAX_TCP_CCEP].cepatr = 0; /* Choose first channel; */
-    }
-    sockets[sock].socket_type = type;
-    sockets[sock].state = BSD_CREATED;
-    sockets[sock].tmout = TMO_FEVR;    /* Default is blocking type */
-    sockets[sock].err_type = ERR_NONE; /* No error */
-
-    sockets[sock].T4proc = 0;
-    sockets[sock].socket_proc = 0;
-    ++ create_id;
-    sockets[sock].create_id = create_id; /* Set this is a peer socket */
-    if ( type == SOCK_DGRAM )
-    {
-        udp_ccep[sock-MAX_TCP_CCEP].myaddr.portno = get_ephemeral_port(); /*  Choose next channel; */
-    }
-#if (SOCKET_IF_USE_SEMP == 1)
-    r_socket_sem_release();
-#endif
-    return sock;
-}
-
-
-/****************************************************************************
-* Function Name: bind
-* Description  : The bind function assigns a name to an unnamed socket.
-* Arguments    : sock  - socket descriptor
-*                name    - pointer to the sockaddr structure containing the
-*                          local address of the socket.
-*                namelen - length of the sockaddr structure.
-* Return Value : 0 for success, SOCKET_ERROR indicates an error.
-*****************************************************************************/
-int r_bind( int sock, const sockaddr * name, int namelen )
-{
-    sockaddr_in *local_addr;
-    unsigned short lPort;
-    int cepno;
-
-    errno = E_OK;           /* No error */
-#ifdef R_SOCKET_PAR_CHECK
-    if (bind_par_check(sock, name, namelen) != true)
-    {
-        return E_PAR;
-    }
-#endif  /* R_SOCKET_PAR_CHECK */
-
-    if ( sockets[sock].state != BSD_CREATED ) /* only work with newly created socket */
-    {
-
-        errno = EINVAL;         /* The socket is already bound to an address, and the protocol does not support */
-        /* binding to a new address; or the socket has been shut down. */
-        return SOCKET_ERROR;
-    }
-    if ( namelen < (int)sizeof(sockaddr_in) )
-    {
-        errno = EINVAL;          /* The address_len argument is not a valid length for the address family. */
-        return SOCKET_ERROR;     /* improper name string */
-    }
-    local_addr = (sockaddr_in *)name;
-
-    lPort = local_addr->sin_port;
-    /* If ipaddr is IPADDR_ANY, should get addr of local adaptor and bind to it? */
-    if ( sockets[sock].socket_type == SOCK_STREAM )
-    {
-        cepno = sock;
-        tcp_crep[cepno].repatr = 0x0000; /* TCP recp point attribute */
-        tcp_crep[cepno].myaddr.ipaddr = local_addr->sin_addr.S_un.S_addr;
-        tcp_crep[cepno].myaddr.portno = lPort;/* local 's IP and portno */
-
-        tcp_ccep[cepno].sbuf = 0;   /* Not implemented */
-        tcp_ccep[cepno].sbufsz = 0; /* Not implemented */
-        tcp_ccep[cepno].rbuf = 0;  /* Not implemented */
-        tcp_ccep[cepno].rbufsz = SOCKET_TCP_WINSIZE;
-    }
-    else if ( sockets[sock].socket_type == SOCK_DGRAM )
-    {
-        /* cepno is never negative. sock assigned from MAX_TCP_CCEP..MAX_TCP_CCEP+MAX_UDP_CCEP */
-        cepno = sock - MAX_TCP_CCEP;
-        udp_ccep[cepno].myaddr.ipaddr = local_addr->sin_addr.S_un.S_addr;
-        udp_ccep[cepno].myaddr.portno = lPort;/* local's IP and portno */
-    }
-    else
-    {
-        errno = EPROTONOSUPPORT;    /*  Should have failed when create socket */
-        return SOCKET_ERROR;
-    }
-    sockets[sock].state = BSD_BOUND;
-    return E_OK;
-}
-
-/******************************************************************************
-* Function Name: connect
-* Description  : The connect function assigns the address of the peer communications
-* Arguments    : sock  - socket descriptor
-*                name    - pointer to the the sockaddr structure containing the
-*                          peer address of the socket to be connected to
-*                namelen - length of the sockaddr structure.
-* Return Value : 0 for success, SOCKET_ERROR indicates an error.
-******************************************************************************/
-int r_connect( int sock, sockaddr *name, int namelen )
-{
-    sockaddr_in *addr;
-    unsigned long remote_ip;
-    unsigned short remote_port;
-    ER ercd = SOCKET_ERROR;
-    signed short i;
-    unsigned short lport;
-    uint32_t this_id;
-
-
-    errno = E_OK;
-#ifdef R_SOCKET_PAR_CHECK
-    if (connect_par_check(sock, name, namelen) != true)
-    {
-        return E_PAR;
-    }
-#endif  /* R_SOCKET_PAR_CHECK */
-    this_id = sockets[sock].create_id;
-
-    if ( sockets[sock].socket_type == SOCK_STREAM )
-    {
-        if ((sockets[sock].state != BSD_BOUND) && (sockets[sock].state != BSD_CREATED) )
-        {
-            switch (sockets[sock].state)
-            {
-                case BSD_CONNECTING:
-                    errno = EALREADY;   /* A connection request is already in progress for the specified socket. */
-                    break;
-                case BSD_CONNECTED:
-                    errno = EISCONN;    /* The specified socket is connection-mode and is already connected. */
-                    break;
-                case BSD_LISTENING:
-                case BSD_CLOSED:
-                case BSD_CLOSING:
-                default:
-                    errno = EOPNOTSUPP; /* The socket is listening and cannot be connected. */
-                    break;
-            }
-            return SOCKET_ERROR;
-        }
-    }
-    else if ( sockets[sock].socket_type == SOCK_DGRAM )
-    {
-        if ((sockets[sock].state < BSD_CREATED) )
-        {
-            errno = EOPNOTSUPP;
-            return SOCKET_ERROR;
-        }
-    }
-    else
-    {
-        errno = EPROTOTYPE;
-        return SOCKET_ERROR;
-    }
-    if ( namelen < (int)sizeof(sockaddr_in) )
-    {
-        errno = EINVAL;     /* The address_len argument is not a valid length for the address family; or invalid address family in the sockaddr structure. */
-        return SOCKET_ERROR;
-    }
-    addr = (sockaddr_in *)name;
-
-    remote_port = addr->sin_port;
-    remote_ip  = addr->sin_addr.S_un.S_addr;
-
-    if ( (remote_ip == 0) || (remote_port == 0) )
-    {
-        errno = EINVAL;
-        return SOCKET_ERROR;
-    }
-    if ( sockets[sock].socket_type == SOCK_STREAM )
-    {
-        int  t4_cepno;
-
-        t4_cepno = sock + 1;
-        if (sockets[sock].state == BSD_CREATED)
-        {
-            i = 0;
-            while (i < MAX_TCP_CREP)
-            {
-                lport = get_ephemeral_port();
-                for (i = 0;i < MAX_TCP_CREP;i++)
-                {
-                    if (lport == tcp_crep[i].myaddr.portno)
-                    {
-                        break;
-                    }
-                }
-            }
-            tcp_crep[t4_cepno - 1].repatr = 0x0000; /* TCP recp point attribute */
-            tcp_crep[t4_cepno - 1].myaddr.ipaddr = NADR;
-            tcp_crep[t4_cepno - 1].myaddr.portno = lport;/* local 's IP and portno */
-
-            tcp_ccep[t4_cepno - 1].sbuf = 0;   /* Not implemented */
-            tcp_ccep[t4_cepno - 1].sbufsz = 0; /* Not implemented */
-            tcp_ccep[t4_cepno - 1].rbuf = 0;   /* Not implemented */
-            tcp_ccep[t4_cepno - 1].rbufsz = SOCKET_TCP_WINSIZE;
-            tcp_ccep[t4_cepno - 1].callback = t4_tcp_generic_callback;
-        }
-
-        sockets[sock].dstaddr.portno = remote_port;
-        sockets[sock].dstaddr.ipaddr = remote_ip;
-
-        ercd = tcp_con_cep(t4_cepno, (T_IPV4EP*) & tcp_crep[t4_cepno - 1].myaddr,
-                           (T_IPV4EP*) & sockets[sock].dstaddr,
-                           TMO_NBLK);
-        if (ercd == E_WBLK)
-        {
-            sockets[sock].T4proc |= T4_PROC_CON;
-            sockets[sock].state = BSD_CONNECTING; /* State to be completed in callback */
-            if (sockets[sock].tmout == TMO_NBLK)
-            {
-                errno = EINPROGRESS;
-                return SOCKET_ERROR;
-            }
-            else
-            {
-                while (   (0 != (sockets[sock].T4proc & T4_PROC_CON))
-                          && (this_id == sockets[sock].create_id)
-
-                      )
-                {
-                    r_socket_task_switch(sock);
-                }
-                if (this_id != sockets[sock].create_id)
-                {
-                    errno = ECONNABORTED;
-                    return SOCKET_ERROR;
-                }
-                if (sockets[sock].state != BSD_CONNECTED)
-                {
-                    errno = EINVAL;           /* TODO : E_PAR, E_QOVR, E_OBJ */
-                    return SOCKET_ERROR;
-                }
-            }
-        }
-        else
-        {
-            errno = EINVAL;           /* TODO : E_PAR, E_QOVR, E_OBJ */
-            return SOCKET_ERROR;
-        }
-    }
-    else
-    {
-        /* UDP: remote port is used as a filter only.  no need to call connect() */
-        /* TODO any check for addr range, port range? */
-        sockets[sock].dstaddr.portno = remote_port;
-        sockets[sock].dstaddr.ipaddr = remote_ip; /* Does it mean only talk to this ip? */
-        sockets[sock].state = BSD_CONNECTED;
-    }
-    return E_OK;
-}
-
-/******************************************************************************
-* Function Name: listen
-* Description  : The listen function sets the specified socket in a listen mode.
-* Arguments    : sock  - Socket identifier
-*                backlog - maximum number of connection requests that can be
-*                queued (fixed to 1 ONLY - not use internally )
-* Return Value : 0 for success, SOCKET_ERROR indicates an error.
-******************************************************************************/
-int r_listen( int sock, int backlog )
-{
-    SOCKET peer_socket;
-    int     peer_cepid, cepid, ercd;
-
-#ifdef R_SOCKET_PAR_CHECK
-    if (listen_par_check(sock, backlog) != true)
-    {
-        return E_PAR;
-    }
-#endif  /* R_SOCKET_PAR_CHECK */
-
-    if ( (sock >= TOTAL_BSD_SOCKET) || (sock < 0 ))
-    {
-        errno = ENOTSOCK;       /* The socket argument does not refer to a socket. */
-        return SOCKET_ERROR;
-    }
-    if (sockets[sock].socket_type != SOCK_STREAM)
-    {
-        errno = EOPNOTSUPP;
-        return SOCKET_ERROR;
-    }
-    if (sockets[sock].state != BSD_BOUND)
-    {
-        switch ( sockets[sock].state)
-        {
-            case BSD_CLOSING:
-            case BSD_CLOSED:
-                errno = EINVAL;         /* The socket has been shut down */
-                break;
-            case BSD_CREATED:
-                errno = EDESTADDRREQ;   /* The socket is not bound to a local address, and the protocol does not */
-                /* support listening on an unbound socket */
-                break;
-            default:                    /* TODO */
-                errno = EINVAL;         /*  The socket has been shut down */
-                break;
-        }
-        return SOCKET_ERROR;
-    }
-    /* put this socket in listen mode */
-    sockets[sock].state = BSD_LISTENING;
-    sockets[sock].backlog = backlog;  /* Not Used */
-
-    peer_socket = dup_tcp_socket( sock );
-    if ( peer_socket == SOCKET_ERROR )
-    {
-        errno = ENFILE;
-        return SOCKET_ERROR;
-    }
-    peer_cepid = peer_socket + 1;
-    cepid = sock + 1;
-
-    ercd = tcp_acp_cep(peer_cepid, cepid, &sockets[peer_socket].dstaddr, TMO_NBLK);
-    if (ercd == E_WBLK)
-    {
-        sockets[peer_socket].state = BSD_CONNECTING; /* State change in callback */
-        sockets[peer_socket].T4proc |= (uint32_t)T4_PROC_ACP;
-        sockets[sock].peer_socket = peer_socket;
-    }
-    else
-    {
-        reset_socket( peer_socket );
-        sockets[sock].peer_socket = -1;
-        errno = EINVAL;         /* Dont have a proper return code */
-        return SOCKET_ERROR;
-    }
-    return E_OK;
-}
-
-/******************************************************************************
-* Function Name: accept
-* Description  : The accept function is used to accept a connection request
-*                queued for a listening socket.
-* Arguments    : sock      Socket descriptor
-*                              must be bound to a local name and in
-*                              listening mode.
-*                address       pointer to the the sockaddr structure that will receive
-*                              the connecting node IP address and port number.
-*                address_len   A value-result parameter and should initially contain
-*                              the amount of space pointed to by name; on return it contains
-*                              the actual length (in bytes) of the name returned.
-* Return Value : peersocket for success non-negative descriptor,
-*                   SOCKET_ERROR indicates an error.
-*              : if successful, peersocket = socket
-******************************************************************************/
-int r_accept( int sock, sockaddr * address, int * address_len )
-{
-    uint32_t this_id;
-    uint32_t this_peer_id;
-    int  cepid;
-    int  peer_socket, ret_socket;
-    sockaddr_in *padr;
-    int  peer_cepid;
-    ER ercd = SOCKET_ERROR;
-
-    ret_socket = peer_socket = SOCKET_ERROR;
-    errno = E_OK;
-
-#ifdef R_SOCKET_PAR_CHECK
-    if (accept_par_check(sock, address, address_len) != true)
-    {
-        return E_PAR;
-    }
-#endif  /* R_SOCKET_PAR_CHECK */
-
-    this_id = sockets[sock].create_id;
-    if ((sockets[sock].tmout != TMO_FEVR) && (sockets[sock].tmout != TMO_NBLK))
-    {
-        errno = EINVAL;
-        return SOCKET_ERROR;
-    }
-    if (sockets[sock].event == SOCKET_ERR_CEP)
-    {
-        errno = ECONNABORTED;
-        return SOCKET_ERROR;
-    }
-    if ( sockets[sock].socket_type != SOCK_STREAM )
-    {
-        errno = EOPNOTSUPP;
-        return SOCKET_ERROR;
-    }
-
-    cepid = sock + 1;
-
-    if ( sockets[sock].state == BSD_LISTENING )/* if listening, do accept */
-    {
-        /* Get the listener's peer socket */
-        ret_socket = sockets[sock].peer_socket;
-        if (ret_socket != -1)
-        {
-            this_peer_id = sockets[ret_socket].create_id;
-            /* Check the state of the peer socket */
-            if (sockets[ret_socket].state == BSD_CONNECTING)
-            {
-                if (sockets[sock].tmout == TMO_FEVR) /* Blocking */
-                {
-                    while (1)
-                    {
-                        if (   ( 0 == (sockets[ret_socket].T4proc & T4_PROC_ACP)
-                                 || (sockets[sock].state == BSD_CLOSED)
-                                 || (this_id != sockets[sock].create_id))
-                                || (this_peer_id != sockets[ret_socket].create_id))
-                        {
-                            break;
-                        }
-                        r_socket_task_switch(sock);
-                    }
-
-                    if (  (sockets[sock].state == BSD_CLOSED)
-                            || (this_id != sockets[sock].create_id)
-                            || (this_peer_id != sockets[ret_socket].create_id))
-                    {
-                        errno = ECONNABORTED;
-                        return SOCKET_ERROR;
-                    }
-                    if (sockets[ret_socket].state != BSD_CONNECTED)
-                    {
-                        /* Error */
-                        goto acp_chk_ret_socket;
-                    }
-                }
-                else
-                {
-                    /* Non-blocking */
-                    goto acp_chk_ret_socket;
-                }
-            }
-
-            padr = (sockaddr_in *)address;
-            padr->sin_family = AF_INET;
-            padr->sin_port = sockets[ret_socket].dstaddr.portno;
-            padr->sin_addr.S_un.S_addr = sockets[ret_socket].dstaddr.ipaddr;
-            *address_len = (int)(unsigned int)sizeof(sockaddr_in);
-            sockets[sock].event = -1;
-
-            peer_socket = dup_tcp_socket(sock);
-            if (peer_socket == SOCKET_ERROR)
-            {
-                sockets[sock].event = -1;
-                sockets[sock].peer_socket = -1;
-                goto acp_chk_ret_socket;
-            }
-            else
-            {
-                sockets[sock].peer_socket = peer_socket;
-            }
-        }
-        else
-        {
-            peer_socket = dup_tcp_socket(sock);
-            if (peer_socket == SOCKET_ERROR)
-            {
-                errno = ENFILE;
-                return SOCKET_ERROR;
-            }
-            else
-            {
-                sockets[sock].peer_socket = peer_socket;
-            }
-        }
-        peer_cepid = peer_socket + 1;
-        sockets[sock].event = -1;
-        ercd = tcp_acp_cep(peer_cepid, cepid, &sockets[peer_socket].dstaddr, TMO_NBLK); /*  Fix bug in case non-blocking */
-
-        if (ercd == E_WBLK)
-        {
-            sockets[peer_socket].T4proc |= (uint32_t)T4_PROC_ACP;
-            sockets[peer_socket].state = BSD_CONNECTING; /* State change in callback */
-            errno = EAGAIN; /* O_NONBLOCK is set for the socket file descriptor and */
-            /* no connections are present to be accepted. */
-            return ret_socket;
-        }
-        else
-        {
-            reset_socket( peer_socket );
-            errno = EINVAL; /* The socket is not accepting connections. */
-            return SOCKET_ERROR;
-        }
-    }
-    else /* Close the peer socket if the sock is not listening/connected */
-    {
-        errno = EOPNOTSUPP; /* The socket type of the specified socket does not */
-        /* support accepting connections. */
-        return SOCKET_ERROR;
-    }
-acp_chk_ret_socket:             /* Check return socket before return */
-    if ( sockets[ret_socket].state != BSD_CONNECTED )
-    {
-        errno = EAGAIN;     /* Poll again.  Socket not established yet */
-        return SOCKET_ERROR;
-    }
-    return ret_socket;
-}
-
-
-/******************************************************************************
-* Function Name: send
-* Description  : The send function is used to send outgoing data to a connected
-*                socket.
-* Arguments    : sock - Socket descriptor
-*                buffer - application data buffer containing data to transmit
-*                length - length of data in bytes
-* Return Value : Number of bytes sent for success, SOCKET_ERROR indicates an error.
-******************************************************************************/
-int r_send( int sock,  const void *buffer, uint32_t length)
-{
-    int  cepid;
-    int ercd = 0;
-    uint32_t this_id;
-
-    errno = E_OK;
-#ifdef R_SOCKET_PAR_CHECK
-    if (send_par_check(sock, buffer, length) != true)
-    {
-        return E_PAR;
-    }
-#endif  /* R_SOCKET_PAR_CHECK */
-
-    this_id = sockets[sock].create_id;
-    if (sockets[sock].event == SOCKET_ERR_CEP)
-    {
-        return SOCKET_ERROR;
-    }
-    /* For NBLK, data is transfer to an internal sndbuf[] so API can return immediately  */
-    /* In callback, data is throttled out depending on available BW */
-
-    /* In TCP data to be send may be broken into segments */
-    /* In UDP data should not be broken up, but send within 1 frame */
-
-    if ( sockets[sock].state < BSD_CONNECTED)
-    {
-        errno = ENOTCONN;   /* The socket is not connected. */
-        return SOCKET_ERROR;
-    }
-
-    if ( sockets[sock].socket_type == SOCK_DGRAM ) /* udp */
-    {
-        errno = EOPNOTSUPP;     /* The socket argument is associated with a socket that */
-        /* does not support one or more of the values set in flags. */
-        return SOCKET_ERROR;
-    }
-    if ( sockets[sock].socket_type == SOCK_STREAM ) /* tcp */
-    {
-        cepid = sock + 1;
-        if ( 0 != (sockets[sock].T4proc & T4_PROC_SND_START))
-        {
-            errno = ENOBUFS;
-            ercd  = SOCKET_ERROR;
-            return ercd;
-        }
-        if ( length > BSD_SND_BUFSZ)
-        {
-            errno = ENOBUFS;
-            return SOCKET_ERROR;
-        }
-
-        memcpy( sockets[sock].snd_buf, buffer, length );
-        sockets[sock].sndLen = 0;
-        sockets[sock].sndSz = length;
-        sockets[sock].pending_sndlen = length;
-        sockets[sock].T4proc &= ~(T4_PROC_SND_END);
-        if ( 0 != (sockets[sock].T4proc & T4_PROC_RCV_START))
-        {
-            sockets[sock].T4proc |= (T4_PROC_SND_START | T4_PROC_CAN_START);
-            ercd = tcp_can_cep( cepid, TFN_TCP_ALL );
-            if (ercd == E_OK)
-            {
-                ercd = length;
-            }
-            else
-            {
-                sockets[sock].T4proc &= ~(T4_PROC_SND_START | T4_PROC_CAN_START);
-                sockets[sock].T4proc |= (T4_PROC_CAN_END);
-
-                sockets[sock].T4proc &= ~(T4_PROC_SND_END);
-                sockets[sock].T4proc |= (T4_PROC_SND_START);
-                ercd = tcp_snd_dat( cepid, (VP)sockets[sock].snd_buf, length,
-                                    TMO_NBLK );
-                if ( ercd == E_WBLK )
-                {
-                    ercd = length;  /* Return length of data even though it may not been sent*/
-
-                }
-                else
-                {
-                    sockets[sock].T4proc &= ~(T4_PROC_SND_START);
-                    errno = ENOBUFS;
-                    return SOCKET_ERROR;
-
-                }
-            }
-
-        }
-        else
-        {
-            sockets[sock].T4proc |= (T4_PROC_SND_START);
-            ercd = tcp_snd_dat( cepid, (VP)sockets[sock].snd_buf, length,
-                                TMO_NBLK );
-            if ( ercd == E_WBLK )
-            {
-                ercd = length;  /* Return length of data even though it may not been sent*/
-            }
-            else
-            {
-                sockets[sock].T4proc &= ~(T4_PROC_SND_START);
-                errno = ENOBUFS;
-                return SOCKET_ERROR;
-            }
-        }
-        if (sockets[sock].tmout == TMO_FEVR)
-        {
-            while (1)
-            {
-                if (  (sockets[sock].sndLen == sockets[sock].sndSz)
-                        || (0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
-                        || (  this_id != sockets[sock].create_id)
-                        || (sockets[sock].socket_type ==  ERR_OTHERS))
-                {
-                    break;
-                }
-                r_socket_task_switch(sock);
-            }
-            if (this_id != sockets[sock].create_id)
-            {
-                errno = ECONNABORTED;
-                ercd  = SOCKET_ERROR;
-            }
-            else
-            {
-                sockets[sock].socket_proc &= ~(SOCKET_PROC_SND);
-                if (sockets[sock].sndLen == sockets[sock].sndSz)
-                {
-                    ercd = length;
-                }
-                else
-                {
-                    errno = ECONNABORTED;
-                    ercd  = SOCKET_ERROR;
-                }
-            }
-        }
-        else
-        {
-            ercd = length;  /* Return length of data even though it may not been sent*/
-        }
-    }
-    return ercd;
-}
-
-
-/******************************************************************************
-* Function Name: sendto
-* Description  : The sendto function is used to send outgoing data on a socket
-*                of type datagram.
-* Arguments    : sock - Socket descriptor returned from a previous call to socket
-*                buffer - application data buffer containing data to transmit
-*                length - length of data in bytes
-*                to - pointer to the the sockaddr structure containing the destination address.
-*                tolen - length of the sockaddr structure.
-* Return Value : Number of bytes sent for success, SOCKET_ERROR indicates an error.
-******************************************************************************/
-int r_sendto( int sock,  const void * buffer, uint32_t length, const sockaddr * to, int tolen )
-{
-    sockaddr_in *addr;
-    ER ercd = E_OK;
-    uint32_t this_id;
-    int  cepid;
-
-    errno = E_OK;
-    this_id = sockets[sock].create_id;
-#ifdef R_SOCKET_PAR_CHECK
-    if (sendto_par_check(sock, buffer, length, to, tolen) != true)
-    {
-        return E_PAR;
-    }
-#endif  /* R_SOCKET_PAR_CHECK */
-
-    if (sockets[sock].event == SOCKET_ERR_CEP)
-    {
-        errno = ECONNABORTED;
-        return SOCKET_ERROR;
-    }
-    if ( 0 != (sockets[sock].T4proc & T4_PROC_SND_START))
-    {
-        errno = ENOBUFS;
-        return SOCKET_ERROR;
-    }
-    if ( tolen < (int)sizeof(sockaddr_in) )
-    {
-        errno = EINVAL;         /* The dest_len argument is not a valid length for the address family. */
-        return SOCKET_ERROR;
-    }
-    if ( sockets[sock].socket_type == SOCK_DGRAM )
-    {
-
-        if ( sockets[sock].state < BSD_CREATED ) /* must create and bind before send */
-        {
-            errno = ENOTCONN;
-            return SOCKET_ERROR;
-        }
-        if ( length > BSD_SND_BUFSZ)
-        {
-            errno = ENOBUFS;
-            return SOCKET_ERROR;
-        }
-        cepid = sock + 1 - MAX_TCP_CCEP;
-        addr = (sockaddr_in *)to;
-
-        if ( sockets[sock].state < BSD_CONNECTED )
-        {
-            sockets[sock].dstaddr.portno = addr->sin_port;
-            sockets[sock].dstaddr.ipaddr = addr->sin_addr.S_un.S_addr;
-        }
-
-        memcpy( sockets[sock].snd_buf, buffer, length );
-        sockets[sock].sndLen = 0;
-        sockets[sock].sndSz = length;
-        sockets[sock].pending_sndlen = length;
-        sockets[sock].T4proc &= ~(T4_PROC_SND_END);
-        sockets[sock].T4proc |= (T4_PROC_SND_START);
-        ercd = udp_snd_dat( cepid, (T_IPV4EP*) & sockets[sock].dstaddr, (VP)sockets[sock].snd_buf, length, TMO_NBLK );
-        if ( ercd == E_WBLK )
-        {
-            ercd = length;  /* Return length of data even though it may not been sent*/
-
-        }
-        else
-        {
-            sockets[sock].T4proc &= ~((uint32_t)T4_PROC_SND_START);
-            errno = ENOBUFS;
-            return SOCKET_ERROR;
-        }
-        if (sockets[sock].tmout == TMO_FEVR)
-        {
-            while (1)
-            {
-                if (  (sockets[sock].sndLen == sockets[sock].sndSz)
-                        || (  this_id != sockets[sock].create_id)
-                        || (0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
-                        || (sockets[sock].socket_type ==  ERR_OTHERS))
-                {
-                    break;
-                }
-                r_socket_task_switch(sock);
-            }
-            if (this_id != sockets[sock].create_id)
-            {
-                errno = ECONNABORTED;
-                return SOCKET_ERROR;
-            }
-            if ( 0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
-            {
-                errno = ECONNABORTED;
-                return SOCKET_ERROR;
-            }
-            else
-            {
-                sockets[sock].socket_proc &= ~(SOCKET_PROC_SND);
-                if (sockets[sock].sndLen == sockets[sock].sndSz)
-                {
-                    ercd = length;
-                }
-                else
-                {
-                    errno = ECONNABORTED;
-                    return SOCKET_ERROR;
-                }
-            }
-        }
-        else
-        {
-            ercd = length;  /* Return length of data even though it may not been sent*/
-        }
-
-    }
-    else
-    {
-        errno = EOPNOTSUPP;     /* The socket argument is associated with a socket that */
-        /* does not support one or more of the values set in flags. */
-        return SOCKET_ERROR;
-
-    }
-    return ercd;
-}
-
-
-/******************************************************************************
-* Function Name: recv
-* Description  : The recv() function is used to receive incoming data that has been
-*                queued for a socket.
-* Arguments    : sock - Socket descriptor returned from a previous call to socket
-*                buffer - application data receive buffer
-*                length - buffer length in bytes
-* Return Value : Number of bytes returned for success, SOCKET_ERROR indicates an error.
-******************************************************************************/
-int r_recv(int sock, void * buffer, uint32_t length)
-{
-    sockaddr from;      /* No use. To pass par check */
-    int     fromlen;            /* No use. To pass par check */
-#ifdef R_SOCKET_PAR_CHECK
-
-    if (recv_par_check(sock, buffer, length) != true)
-    {
-        return E_PAR;
-    }
-#endif  /* R_SOCKET_PAR_CHECK */
-
-    if ( sockets[sock].socket_type != SOCK_STREAM )
-    {
-        errno = EPROTONOSUPPORT;
-        return SOCKET_ERROR;
-    }
-    return r_recvfrom( sock, buffer, length, &from, &fromlen );
-}
-
-
-/******************************************************************************
-* Function Name: recvfrom
-* Description  : The recvfrom() function is used to receive incoming data that has been
-*                queued for a socket.
-* Arguments    : sock - Socket descriptor returned from a previous call to socket
-*                buffer - application data receive buffer
-*                length - buffer length in bytes
-*                from - pointer to the the sockaddr structure that will be filled
-*                       in with the destination address.
-*                fromlen - size of buffer pointed by from.
-* Return Value : Number of bytes returned for success, SOCKET_ERROR indicates an error.
-******************************************************************************/
-int r_recvfrom( int sock, void * buffer, uint32_t length, sockaddr * from, int * fromlen )
-{
-    sockaddr_in*remoteaddr;
-    int BytesRead = 0;
-    unsigned char * buf;
-    int  cepid;
-    int  len;
-    ER   ercd;
-    uint32_t this_id;
-
-#ifdef R_SOCKET_PAR_CHECK
-    if (recvfrom_par_check(sock, buffer, length, from, fromlen) != true)
-    {
-        return E_PAR;
-    }
-#endif  /* R_SOCKET_PAR_CHECK */
-
-    this_id = sockets[sock].create_id;
-    if ((sockets[sock].tmout != TMO_FEVR) && (sockets[sock].tmout != TMO_NBLK))
-    {
-        errno = EINVAL;
-        return SOCKET_ERROR;
-    }
-    if ((sockets[sock].tmout == TMO_NBLK) && (sockets[sock].event == SOCKET_ERR_CEP))
-    {
-        errno = ECONNRESET;
-        return SOCKET_ERROR;
-    }
-    buf = (unsigned char *)buffer;
-    if ( sockets[sock].socket_type == SOCK_STREAM ) /* TCP */
-    {
-        cepid = sock + 1;
-        if ( sockets[sock].state !=  BSD_CONNECTED && sockets[sock].state !=  BSD_CLOSING)
-        {
-            errno = ENOTCONN;
-            return SOCKET_ERROR;
-        }
-        if ( sockets[sock].rcvLen > 0 ) /* Previous data remain in read_buf. */
-        {
-            if ( length > sockets[sock].rcvLen )
-            {
-                BytesRead = sockets[sock].rcvLen;
-            }
-            else
-            {
-                BytesRead = length;
-            }
-            if (sockets[sock].rcvout_offset + BytesRead > BSD_RCV_BUFSZ)
-            {
-                int cnt;
-                cnt =  BSD_RCV_BUFSZ - sockets[sock].rcvout_offset;
-                memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], cnt);
-                sockets[sock].rcvout_offset = 0;
-                memcpy(&buf[cnt], (const char *)&sockets[sock].rcv_buf[0], BytesRead - cnt);
-                sockets[sock].rcvout_offset += (BytesRead - cnt);
-
-            }
-            else
-            {
-                memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], BytesRead);
-                sockets[sock].rcvout_offset += BytesRead;
-            }
-            len = sockets[sock].rcvLen;
-            sockets[sock].rcvLen -= BytesRead;
-            if ( len == BSD_RCV_BUFSZ && sockets[sock].state ==  BSD_CONNECTED)
-            {
-                int size;
-                if (sockets[sock].rcvin_offset == BSD_RCV_BUFSZ)
-                {
-                    sockets[sock].rcvin_offset = 0;
-                }
-                if ((BSD_RCV_BUFSZ - sockets[sock].rcvin_offset) > BSD_RCV_BUFSZ - sockets[sock].rcvLen)
-                {
-                    size = BSD_RCV_BUFSZ - sockets[sock].rcvLen;
-                }
-                else
-                {
-                    size = BSD_RCV_BUFSZ - sockets[sock].rcvin_offset;
-                }
-                sockets[sock].pending_rcvlen = size;
-                sockets[sock].T4proc &= ~((uint32_t)T4_PROC_RCV_END);
-                sockets[sock].T4proc |= ((uint32_t)T4_PROC_RCV_START);
-                ercd = tcp_rcv_dat(cepid, (VP)(&sockets[sock].rcv_buf[sockets[sock].rcvin_offset]), size, TMO_NBLK);
-                if ((ercd != E_WBLK) && (ercd != E_QOVR))
-                {
-                    /* fatal error */
-                    sockets[sock].state = BSD_FATALERROR;
-                }
-            }
-            return BytesRead;
-        }
-        if ( sockets[sock].rcvLen == 0 ) /* Previous data remain in read_buf. */
-        {
-
-            if (sockets[sock].finrcv == 1)
-            {
-                return 0;
-            }
-            if ( sockets[sock].tmout == TMO_NBLK )
-            {
-                errno = EAGAIN;
-                return SOCKET_ERROR;
-            }
-            else
-            {
-                sockets[sock].T4proc &= ~((uint32_t)T4_PROC_RCV_END);
-                while (1)
-                {
-                    if (  (sockets[sock].rcvLen > 0)
-                            || (sockets[sock].finrcv == 1)
-                            || (0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
-                            || (this_id != sockets[sock].create_id)
-                            || (sockets[sock].socket_type ==  ERR_OTHERS))
-                    {
-                        break;
-                    }
-                    r_socket_task_switch(sock);
-                }
-
-                if ( this_id != sockets[sock].create_id)
-                {
-                    errno = ECONNABORTED;
-                    return SOCKET_ERROR;
-                }
-                if ( 0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
-                {
-                    errno = ECONNABORTED;
-                    return SOCKET_ERROR;
-                }
-                if ( sockets[sock].rcvLen > 0 ) /* Previous data remain in read_buf. */
-                {
-                    if ( length > sockets[sock].rcvLen )
-                    {
-                        BytesRead = sockets[sock].rcvLen;
-                    }
-                    else
-                    {
-                        BytesRead = length;
-                    }
-                    if (sockets[sock].rcvout_offset + BytesRead > BSD_RCV_BUFSZ)
-                    {
-                        int cnt;
-                        cnt =  BSD_RCV_BUFSZ - sockets[sock].rcvout_offset;
-                        memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], cnt);
-                        sockets[sock].rcvout_offset = 0;
-                        memcpy(&buf[cnt], (const char *)&sockets[sock].rcv_buf[0], BytesRead - cnt);
-                        sockets[sock].rcvout_offset += (BytesRead - cnt);
-                    }
-                    else
-                    {
-                        memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], BytesRead);
-                        sockets[sock].rcvout_offset += BytesRead;
-                    }
-                    len = sockets[sock].rcvLen;
-                    sockets[sock].rcvLen -= BytesRead;
-                    if ( len == BSD_RCV_BUFSZ && sockets[sock].state ==  BSD_CONNECTED )
-                    {
-                        int size;
-                        if (sockets[sock].rcvin_offset == BSD_RCV_BUFSZ)
-                        {
-                            sockets[sock].rcvin_offset = 0;
-                        }
-                        if ((BSD_RCV_BUFSZ - sockets[sock].rcvin_offset) > BSD_RCV_BUFSZ - sockets[sock].rcvLen)
-                        {
-                            size = BSD_RCV_BUFSZ - sockets[sock].rcvLen;
-                        }
-                        else
-                        {
-                            size = BSD_RCV_BUFSZ - sockets[sock].rcvin_offset;
-                        }
-                        sockets[sock].pending_rcvlen = size;
-                        sockets[sock].T4proc &= ~((uint32_t)T4_PROC_RCV_END);
-                        sockets[sock].T4proc |= ((uint32_t)T4_PROC_RCV_START);
-                        tcp_rcv_dat(cepid, (VP)(&sockets[sock].rcv_buf[sockets[sock].rcvin_offset]), size, TMO_NBLK);
-                    }
-                    return BytesRead;
-                }
-                if ( sockets[sock].rcvLen == 0 ) /* Previous data remain in read_buf. */
-                {
-                    if (sockets[sock].finrcv == 1)
-                    {
-                        return 0;
-                    }
-                    else
-                    {
-                    }
-                }
-                return SOCKET_ERROR;
-
-            }
-        }
-    }
-    else
-    {
-        if ( sockets[sock].state < BSD_CREATED ) /* must call bind before recv */
-        {
-            errno = ENOTCONN;
-            return SOCKET_ERROR;
-        }
-        cepid = sock + 1 - MAX_TCP_CCEP;
-
-        if ( sockets[sock].rcvLen > 0 ) /* Previous data remain in read_buf. */
-        {
-            if ( length > sockets[sock].rcvLen )
-            {
-                BytesRead = sockets[sock].rcvLen;
-            }
-            else
-            {
-                BytesRead = length;
-            }
-            if (sockets[sock].rcvout_offset + BytesRead > BSD_RCV_BUFSZ)
-            {
-                int cnt;
-                cnt =  BSD_RCV_BUFSZ - sockets[sock].rcvout_offset;
-                memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], cnt);
-                sockets[sock].rcvout_offset = 0;
-                memcpy(&buf[cnt], (const char *)&sockets[sock].rcv_buf[0], BytesRead - cnt);
-                sockets[sock].rcvout_offset += (BytesRead - cnt);
-
-            }
-            else
-            {
-                memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], BytesRead);
-                sockets[sock].rcvout_offset += BytesRead;
-            }
-            sockets[sock].rcvLen -= BytesRead;
-            /* Must return the addr also */
-            if ( from != NULL )
-            {
-                remoteaddr = (sockaddr_in *)from;
-                remoteaddr->sin_family = AF_INET;
-                remoteaddr->sin_port = sockets[sock].dstaddr.portno;
-                remoteaddr->sin_port = sockets[sock].dstaddr.portno;
-                remoteaddr->sin_addr.S_un.S_addr = sockets[sock].dstaddr.ipaddr;
-            }
-            if ( fromlen != NULL )
-            {
-                *fromlen = sizeof(sockaddr_in); /* fixed? why? */
-            }
-            return BytesRead;
-        }
-        if ( sockets[sock].rcvLen == 0 ) /* Previous data remain in read_buf. */
-        {
-            if ( sockets[sock].tmout == TMO_NBLK )
-            {
-                errno = EAGAIN;
-                return SOCKET_ERROR;
-            }
-            else
-            {
-                sockets[sock].T4proc &= ~((uint32_t)T4_PROC_RCV_END);
-                while (1)
-                {
-                    if (  (sockets[sock].rcvLen > 0)
-                            || (0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
-                            || (this_id != sockets[sock].create_id)
-                            || (sockets[sock].socket_type ==  ERR_OTHERS))
-                    {
-                        break;
-                    }
-                    r_socket_task_switch(sock);
-                }
-
-                if ( this_id != sockets[sock].create_id)
-                {
-                    errno = ECONNABORTED;
-                    return SOCKET_ERROR;
-                }
-                if ( 0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
-                {
-                    errno = ECONNABORTED;
-                    return SOCKET_ERROR;
-                }
-                if ( sockets[sock].rcvLen > 0 ) /* Previous data remain in read_buf. */
-                {
-                    if ( length > sockets[sock].rcvLen )
-                    {
-                        BytesRead = sockets[sock].rcvLen;
-                    }
-                    else
-                    {
-                        BytesRead = length;
-                    }
-                    if (sockets[sock].rcvout_offset + BytesRead > BSD_RCV_BUFSZ)
-                    {
-                        int cnt;
-                        cnt =  BSD_RCV_BUFSZ - sockets[sock].rcvout_offset;
-                        memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], cnt);
-                        sockets[sock].rcvout_offset = 0;
-                        memcpy(&buf[cnt], (const char *)&sockets[sock].rcv_buf[0], BytesRead - cnt);
-                        sockets[sock].rcvout_offset += (BytesRead - cnt);
-
-                    }
-                    else
-                    {
-                        memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], BytesRead);
-                        sockets[sock].rcvout_offset += BytesRead;
-                    }
-                    sockets[sock].rcvLen -= BytesRead;
-                    if ( from != NULL )
-                    {
-                        remoteaddr = (sockaddr_in *)from;
-                        remoteaddr->sin_family = AF_INET;
-                        remoteaddr->sin_port = sockets[sock].dstaddr.portno;
-                        remoteaddr->sin_port = sockets[sock].dstaddr.portno;
-                        remoteaddr->sin_addr.S_un.S_addr = sockets[sock].dstaddr.ipaddr;
-                    }
-                    if ( fromlen != NULL )
-                    {
-                        *fromlen = sizeof(sockaddr_in); /* fixed? why? */
-                    }
-                    return BytesRead;
-                }
-                if ( sockets[sock].rcvLen == 0 ) /* Previous data remain in read_buf. */
-                {
-                }
-                return SOCKET_ERROR;
-            }
-        }
-    }
-    return BytesRead;
-}
-
-
-/******************************************************************************
-* Function Name: closesocket
-* Description  : The closesocket() function closes an existing socket.
-* Arguments    : sock - Socket descriptor returned from a previous call to socket
-* Return Value : E_OK for success, SOCKET_ERROR indicates an error.
-******************************************************************************/
-int r_closesocket( int sock )
-{
-    ER ercd = E_OK;
-    int  cepid;
-
-    errno = E_OK;
-#ifdef R_SOCKET_PAR_CHECK
-    if (closesocket_par_check(sock) != true)
-    {
-        return E_PAR;
-    }
-#endif  /* R_SOCKET_PAR_CHECK */
-
-
-    if ((sockets[sock].tmout != TMO_FEVR) && (sockets[sock].tmout != TMO_NBLK))
-    {
-        errno = ENOTSOCK;   /* No socket created */
-        return SOCKET_ERROR;
-    }
-
-    if ( sockets[sock].socket_type == SOCK_STREAM )
-    {
-
-        if ((sockets[sock].event == SOCKET_ERR_CEP)) /* if I want to close a socket with error?*/
-        {
-            if ((sockets[sock].state == BSD_CONNECTED))
-            {
-                /* Close a socket error */
-                ercd = tcp_cls_cep(sock + 1, T4_TCP_CLS_CEP_TMOUT);
-            }
-            sockets[sock].state = BSD_CLOSED; /* In callback it will change to BSD_CLOSED */
-            sockets[sock].event = -1;
-            return E_OK;
-        }
-        if ( sockets[sock].event == SOCKET_CLS_CEP)
-        {
-            sockets[sock].state = BSD_CLOSED;
-            sockets[sock].event = -1;
-            return E_OK;
-        }
-        if ( sockets[sock].state == BSD_CLOSED)
-        {
-            errno = EINVAL;
-            return SOCKET_ERROR;
-        }
-        if ( sockets[sock].state <= BSD_BOUND)
-        {
-            reset_socket(sock);
-            sockets[sock].state = BSD_CLOSED;
-            sockets[sock].event = -1;
-            return E_OK;
-        }
-        /*------------------------------*/
-        if ( sockets[sock].state == BSD_LISTENING)
-        {
-            if (sockets[sock].peer_socket != -1)
-            {
-                if (sockets[sockets[sock].peer_socket].state >= BSD_CONNECTING)
-                {
-                    sockets[sockets[sock].peer_socket].T4proc &= ~T4_PROC_CAN_END;
-                    sockets[sockets[sock].peer_socket].T4proc |= T4_PROC_CAN_START;
-                    if (E_OK == tcp_can_cep(sockets[sock].peer_socket + 1, TFN_TCP_ALL))
-                    {
-                        while (0 == (sockets[sockets[sock].peer_socket].T4proc & T4_PROC_CAN_END))
-                        {
-                            r_socket_task_switch(sock);
-                        }
-                    }
-                    else
-                    {
-                        sockets[sockets[sock].peer_socket].T4proc &= ~T4_PROC_CAN_START;
-                    }
-                    if (sockets[sockets[sock].peer_socket].state >= BSD_CLOSING)
-                    {
-                        tcp_cls_cep(sockets[sock].peer_socket + 1, T4_TCP_CLS_CEP_TMOUT);
-                    }
-                    reset_socket(sockets[sock].peer_socket);
-                }
-            }
-            sockets[sock].socket_proc |= SOCKET_PROC_CLS_END;
-            reset_socket(sock);
-            return E_OK;
-        }
-        else if (sockets[sock].state == BSD_CONNECTING)
-        {
-            sockets[sock].T4proc &= ~T4_PROC_CAN_END;
-            sockets[sock].T4proc |= T4_PROC_CAN_START;
-            if (E_OK == tcp_can_cep(sock + 1, TFN_TCP_ALL))
-            {
-                while (0 == (sockets[sock].T4proc & T4_PROC_CAN_END))
-                {
-                    r_socket_task_switch(sock);
-                }
-            }
-            else
-            {
-                sockets[sock].T4proc &= ~T4_PROC_CAN_START;
-            }
-            tcp_cls_cep(sock + 1, T4_TCP_CLS_CEP_TMOUT);
-            sockets[sock].socket_proc |= SOCKET_PROC_CLS_END;
-            reset_socket(sock);
-            return E_OK;
-        }
-        else if (sockets[sock].state == BSD_CLOSING)
-        {
-            sockets[sock].T4proc |= T4_PROC_CAN_START;
-            if (E_OK == tcp_can_cep(sock + 1, TFN_TCP_ALL))
-            {
-                while (0 == (sockets[sock].T4proc & T4_PROC_CAN_END))
-                {
-                    r_socket_task_switch(sock);
-                }
-            }
-            else
-            {
-                sockets[sock].T4proc &= ~T4_PROC_CAN_START;
-            }
-            tcp_cls_cep(sock + 1, T4_TCP_CLS_CEP_TMOUT);
-            sockets[sock].socket_proc |= SOCKET_PROC_CLS_END;
-            reset_socket(sock);
-            return E_OK;
-        }
-        else if (sockets[sock].state == BSD_CONNECTED)
-        {
-            sockets[sock].socket_proc |= SOCKET_PROC_CLS_START;
-            sockets[sock].T4proc &= ~T4_PROC_CAN_END;
-            sockets[sock].T4proc |= T4_PROC_CAN_START;
-            if (E_OK == tcp_can_cep(sock + 1, TFN_TCP_ALL))
-            {
-                while (0 == (sockets[sock].T4proc & T4_PROC_CAN_END))
-                {
-                    r_socket_task_switch(sock);
-                }
-            }
-            else
-            {
-                sockets[sock].T4proc &= ~T4_PROC_CAN_START;
-            }
-            ercd = tcp_cls_cep(sock + 1, T4_TCP_CLS_CEP_TMOUT);
-            sockets[sock].socket_proc |= SOCKET_PROC_CLS_END;
-            reset_socket(sock);
-            return E_OK;
-        }
-    }
-    else
-    {
-        cepid = sock + 1 - MAX_TCP_CCEP;
-        if ( 0 != (sockets[sock].T4proc & T4_PROC_SND_START))
-        {
-            ercd = udp_can_cep(cepid, TFN_UDP_ALL );
-            if (ercd == E_OK)
-            {
-                while (0 == (sockets[sock].T4proc & T4_PROC_CAN_END))
-                {
-                    r_socket_task_switch(sock);
-                }
-            }
-        }
-        sockets[sock].socket_proc |= SOCKET_PROC_CLS_END;
-        reset_socket(sock);
-        ercd = E_OK;
-    }
-    return ercd;
-}
-
+static uint32_t no_connect_count_;
 
 /******************************************************************************
 * ID                : 1.0
@@ -1588,8 +112,7 @@ int r_closesocket( int sock )
 *                   : VP  p_parblk; Parameter block
 * Return Value      : ER          ; always 0 (not in use)
 ******************************************************************************/
-
-ER t4_tcp_generic_callback(ID cepid, FN fncd , VP p_parblk)
+static ER t4_tcp_generic_callback(ID cepid, FN fncd , VP p_parblk)
 {
     int32_t i, j, remain_size;
     ER ercd;
@@ -1846,8 +369,8 @@ ER t4_tcp_generic_callback(ID cepid, FN fncd , VP p_parblk)
         }
     }
     return 0;
-
 }
+
 
 /******************************************************************************
 * ID                : 1.0
@@ -1861,7 +384,7 @@ ER t4_tcp_generic_callback(ID cepid, FN fncd , VP p_parblk)
 *                   : VP  p_parblk; Parameter block
 * Return Value      : ER          ; always 0 (not in use)
 ******************************************************************************/
-ER t4_udp_generic_callback(ID cepid, FN fncd , VP p_parblk)
+static ER t4_udp_generic_callback(ID cepid, FN fncd , VP p_parblk)
 {
     int32_t i, remain_size;
     ER ercd;
@@ -1943,6 +466,1447 @@ ER t4_udp_generic_callback(ID cepid, FN fncd , VP p_parblk)
     return 0;
 }
 
+
+/******************************************************************************
+* Function Name: R_SOCKET_Open
+* Description  : Initialize the socket structure to a known initial value
+* Arguments    : none
+* Return Value : none
+******************************************************************************/
+int R_SOCKET_Open(void)
+{
+    int i;
+    ER  ercd;
+    int size;
+
+    memset(tcp_ccep, 0x00, MAX_TCP_CCEP * sizeof(T_TCP_CCEP));
+    memset(tcp_crep, 0x00, MAX_TCP_CREP * sizeof(T_TCP_CREP));
+    memset(udp_ccep, 0x00, MAX_UDP_CCEP * sizeof(T_UDP_CCEP));
+    for ( i = 0; i < TOTAL_BSD_SOCKET; i++)
+    {
+        sockets[i].state = BSD_CLOSED;
+        sockets[i].T4status = T4_CLOSED;
+        sockets[i].event = -1;
+        sockets[i].socket_type = 0;
+        sockets[i].backlog = 0;
+        sockets[i].dstaddr.ipaddr = 0;
+        sockets[i].dstaddr.portno = 0;
+        sockets[i].tmout = 0;  /* default is TMO_POL */
+        sockets[i].T4proc = 0;
+        sockets[i].rcvLen = 0;
+        sockets[i].sndLen = 0;
+        sockets[i].sndSz = 0;
+        sockets[i].err_type = ERR_NONE; /* No errors */
+        sockets[i].peer_socket = -1;
+        sockets[i].socket_proc = 0;
+        if ( i < MAX_TCP_CCEP )
+        {
+            tcp_ccep[i].rbufsz = SOCKET_TCP_WINSIZE;
+            tcp_ccep[i].callback = t4_tcp_generic_callback;
+        }
+        else
+        {
+            udp_ccep[i-MAX_TCP_CCEP].callback = t4_udp_generic_callback;
+        }
+    }
+
+    /* initialize TCP/IP */
+    size = tcpudp_get_ramsize();
+    if (size > sizeof(tcpudp_work))
+    {
+		printf("R_SOCKET_Open: empty memory (%d, %d)\n", (int)size, (int)sizeof(tcpudp_work));
+		return -1;
+    }
+	memset(tcpudp_work, 0x00, sizeof(tcpudp_work));
+
+    ercd = tcpudp_open(tcpudp_work);
+    if (ercd != E_OK)
+    {
+		printf("R_SOCKET_Open: tcpudp_open error\n");
+		return -2;
+    }
+	return size;
+}
+
+
+/******************************************************************************
+* Function Name: R_SOCKET_Open
+* Description  : Initialize the socket structure to a known initial value
+* Arguments    : none
+* Return Value : none
+******************************************************************************/
+void R_SOCKET_Close( void )
+{
+    tcpudp_close();
+}
+
+
+/******************************************************************************
+* Function Name: socket
+* Description  : This function creates a new socket
+* Arguments    : domain   - Address domain/Families - AF_INET, AF_UNIX etc.,
+*                type     - socket type SOCK_DGRAM or SOCK_STREAM
+*                protocol - IP protocol IPPROTO_UDP or IPPROTO_TCP
+*                           Don't care
+* Return Value : SOCKET socket - An integer representing socket descriptor
+******************************************************************************/
+int r_socket( int domain, int type, int protocol )
+{
+    SOCKET sock, ifirst, ilast;
+    int semp_ret;
+
+    errno = E_OK;           /* No error */
+    semp_ret = E_OK;
+
+#ifdef R_SOCKET_PAR_CHECK
+    if (socket_par_check(domain, type, protocol) != true)
+    {
+        return E_PAR;
+    }
+#endif  /* R_SOCKET_PAR_CHECK */
+
+    if ( (type == SOCK_STREAM) && (protocol == IPPROTO_TCP) )
+    {
+        /* sock {0..MAX_TCP_CCEP-1} reserved for SOCK_STREAM */
+        ifirst = 0;
+        ilast = MAX_TCP_CCEP;
+    }
+    else if (( type == SOCK_DGRAM ) && ( protocol == IPPROTO_UDP))
+    {
+        /* {MAX_TCP_CCEP .. MAX_TCP_CCEP+MAX_UDP_CCEP-1} reserved for SOCK_DGRAM */
+        ifirst = MAX_TCP_CCEP;
+        ilast = MAX_TCP_CCEP + MAX_UDP_CCEP;
+    }
+    else
+    {
+        errno = EPROTONOSUPPORT;    /* The protocol is not supported by the address family, or */
+        /* the protocol is not supported by the implementation. */
+        return SOCKET_ERROR;
+    }
+#if (SOCKET_IF_USE_SEMP == 1)
+    semp_ret = r_socket_sem_lock();            /* Return immediately if lock cannot be acquired? */
+#endif
+    if (semp_ret != E_OK)
+    {
+        errno = EACCES;
+        return  SOCKET_ERROR;    /* No sockets available */
+    }
+    for ( sock = ifirst; sock < ilast; sock++)
+    {
+        if ( sockets[sock].state == BSD_CLOSED ) /* sock available for use? */
+        {
+            break;
+        }
+    }
+    if ( sock == ilast )
+    {
+        r_socket_sem_release();
+        errno = ENFILE;          /* No more file descriptors are available for the system. */
+        return  SOCKET_ERROR;    /* No sockets available */
+    }
+
+    if ( type == SOCK_STREAM )
+    {
+        tcp_ccep[sock].cepatr = 0;              /* Choose first channel; */
+    }
+    else
+    {
+        udp_ccep[sock-MAX_TCP_CCEP].cepatr = 0; /* Choose first channel; */
+    }
+    sockets[sock].socket_type = type;
+    sockets[sock].state = BSD_CREATED;
+    sockets[sock].tmout = TMO_FEVR;    /* Default is blocking type */
+    sockets[sock].err_type = ERR_NONE; /* No error */
+
+    sockets[sock].T4proc = 0;
+    sockets[sock].socket_proc = 0;
+    ++ create_id;
+    sockets[sock].create_id = create_id; /* Set this is a peer socket */
+    if ( type == SOCK_DGRAM )
+    {
+        udp_ccep[sock-MAX_TCP_CCEP].myaddr.portno = get_ephemeral_port(); /*  Choose next channel; */
+    }
+#if (SOCKET_IF_USE_SEMP == 1)
+    r_socket_sem_release();
+#endif
+    return sock;
+}
+
+
+/****************************************************************************
+* Function Name: bind
+* Description  : The bind function assigns a name to an unnamed socket.
+* Arguments    : sock  - socket descriptor
+*                name    - pointer to the sockaddr structure containing the
+*                          local address of the socket.
+*                namelen - length of the sockaddr structure.
+* Return Value : 0 for success, SOCKET_ERROR indicates an error.
+*****************************************************************************/
+int r_bind( int sock, const sockaddr_in *local_addr)
+{
+    int cepno;
+
+    errno = E_OK;           /* No error */
+#ifdef R_SOCKET_PAR_CHECK
+    if (bind_par_check(sock, name, namelen) != true)
+    {
+        return E_PAR;
+    }
+#endif  /* R_SOCKET_PAR_CHECK */
+
+    if ( sockets[sock].state != BSD_CREATED ) /* only work with newly created socket */
+    {
+
+        errno = EINVAL;         /* The socket is already bound to an address, and the protocol does not support */
+        /* binding to a new address; or the socket has been shut down. */
+        return SOCKET_ERROR;
+    }
+
+//	sockets[i].dstaddr.ipaddr = 0;
+//	sockets[i].dstaddr.portno = 0;
+
+    /* If ipaddr is IPADDR_ANY, should get addr of local adaptor and bind to it? */
+    if ( sockets[sock].socket_type == SOCK_STREAM )
+    {
+        cepno = sock;
+        tcp_crep[cepno].repatr = 0x0000; /* TCP recp point attribute */
+        tcp_crep[cepno].myaddr.ipaddr = local_addr->sin_addr.S_un.S_addr;
+        tcp_crep[cepno].myaddr.portno = htons(local_addr->sin_port);  /* local 's IP and portno */
+
+        tcp_ccep[cepno].sbuf = 0;   /* Not implemented */
+        tcp_ccep[cepno].sbufsz = 0; /* Not implemented */
+        tcp_ccep[cepno].rbuf = 0;  /* Not implemented */
+        tcp_ccep[cepno].rbufsz = SOCKET_TCP_WINSIZE;
+    }
+    else if ( sockets[sock].socket_type == SOCK_DGRAM )
+    {
+        /* cepno is never negative. sock assigned from MAX_TCP_CCEP..MAX_TCP_CCEP+MAX_UDP_CCEP */
+        cepno = sock - MAX_TCP_CCEP;
+        udp_ccep[cepno].myaddr.ipaddr = local_addr->sin_addr.S_un.S_addr;
+        udp_ccep[cepno].myaddr.portno = htons(local_addr->sin_port);  /* local's IP and portno */
+    }
+    else
+    {
+        errno = EPROTONOSUPPORT;    /*  Should have failed when create socket */
+        return SOCKET_ERROR;
+    }
+    sockets[sock].state = BSD_BOUND;
+    return E_OK;
+}
+
+
+/******************************************************************************
+* Function Name: connect
+* Description  : The connect function assigns the address of the peer communications
+* Arguments    : sock  - socket descriptor
+*                name    - pointer to the the sockaddr structure containing the
+*                          peer address of the socket to be connected to
+*                namelen - length of the sockaddr structure.
+* Return Value : 0 for success, SOCKET_ERROR indicates an error.
+******************************************************************************/
+int r_connect( int sock, const sockaddr_in *addr)
+{
+    uint32_t remote_ip;
+    uint16_t remote_port;
+    ER ercd = SOCKET_ERROR;
+    signed short i;
+    unsigned short lport;
+    uint32_t this_id;
+
+    errno = E_OK;
+#ifdef R_SOCKET_PAR_CHECK
+    if (connect_par_check(sock, name, namelen) != true)
+    {
+        return E_PAR;
+    }
+#endif  /* R_SOCKET_PAR_CHECK */
+    this_id = sockets[sock].create_id;
+
+    if ( sockets[sock].socket_type == SOCK_STREAM )
+    {
+        if ((sockets[sock].state != BSD_BOUND) && (sockets[sock].state != BSD_CREATED) )
+        {
+            switch (sockets[sock].state)
+            {
+                case BSD_CONNECTING:
+                    errno = EALREADY;   /* A connection request is already in progress for the specified socket. */
+                    break;
+                case BSD_CONNECTED:
+                    errno = EISCONN;    /* The specified socket is connection-mode and is already connected. */
+                    break;
+                case BSD_LISTENING:
+                case BSD_CLOSED:
+                case BSD_CLOSING:
+                default:
+                    errno = EOPNOTSUPP; /* The socket is listening and cannot be connected. */
+                    break;
+            }
+            return SOCKET_ERROR;
+        }
+    }
+    else if ( sockets[sock].socket_type == SOCK_DGRAM )
+    {
+        if ((sockets[sock].state < BSD_CREATED) )
+        {
+            errno = EOPNOTSUPP;
+            return SOCKET_ERROR;
+        }
+    }
+    else
+    {
+        errno = EPROTOTYPE;
+        return SOCKET_ERROR;
+    }
+
+    remote_ip   = addr->sin_addr.S_un.S_addr;
+    remote_port = htons(addr->sin_port);
+
+    if ( (remote_ip == 0) || (remote_port == 0) )
+    {
+        errno = EINVAL;
+        return SOCKET_ERROR;
+    }
+    if ( sockets[sock].socket_type == SOCK_STREAM )
+    {
+        int  t4_cepno;
+
+        t4_cepno = sock + 1;
+        if (sockets[sock].state == BSD_CREATED)
+        {
+            i = 0;
+            while (i < MAX_TCP_CREP)
+            {
+                lport = get_ephemeral_port();
+                for (i = 0;i < MAX_TCP_CREP;i++)
+                {
+                    if (lport == tcp_crep[i].myaddr.portno)
+                    {
+                        break;
+                    }
+                }
+            }
+            tcp_crep[t4_cepno - 1].repatr = 0x0000; /* TCP recp point attribute */
+            tcp_crep[t4_cepno - 1].myaddr.ipaddr = NADR;
+            tcp_crep[t4_cepno - 1].myaddr.portno = lport;/* local 's IP and portno */
+
+            tcp_ccep[t4_cepno - 1].sbuf = 0;   /* Not implemented */
+            tcp_ccep[t4_cepno - 1].sbufsz = 0; /* Not implemented */
+            tcp_ccep[t4_cepno - 1].rbuf = 0;   /* Not implemented */
+            tcp_ccep[t4_cepno - 1].rbufsz = SOCKET_TCP_WINSIZE;
+            tcp_ccep[t4_cepno - 1].callback = t4_tcp_generic_callback;
+        }
+
+        sockets[sock].dstaddr.portno = remote_port;
+        sockets[sock].dstaddr.ipaddr = remote_ip;
+
+        ercd = tcp_con_cep(t4_cepno, (T_IPV4EP*)&tcp_crep[t4_cepno - 1].myaddr,
+                           (T_IPV4EP*)&sockets[sock].dstaddr,
+                           TMO_NBLK);
+        if (ercd == E_WBLK)
+        {
+            sockets[sock].T4proc |= T4_PROC_CON;
+            sockets[sock].state = BSD_CONNECTING; /* State to be completed in callback */
+            if (sockets[sock].tmout == TMO_NBLK)
+            {
+                errno = EINPROGRESS;
+                return SOCKET_ERROR;
+            }
+            else
+            {
+                while (   (0 != (sockets[sock].T4proc & T4_PROC_CON))
+                          && (this_id == sockets[sock].create_id)
+
+                      )
+                {
+                    r_socket_task_switch(sock);
+                }
+                if (this_id != sockets[sock].create_id)
+                {
+                    errno = ECONNABORTED;
+                    return SOCKET_ERROR;
+                }
+                if (sockets[sock].state != BSD_CONNECTED)
+                {
+                    errno = EINVAL;           /* TODO : E_PAR, E_QOVR, E_OBJ */
+                    return SOCKET_ERROR;
+                }
+            }
+        }
+        else
+        {
+            errno = EINVAL;           /* TODO : E_PAR, E_QOVR, E_OBJ */
+            return SOCKET_ERROR;
+        }
+    }
+    else
+    {
+        /* UDP: remote port is used as a filter only.  no need to call connect() */
+        /* TODO any check for addr range, port range? */
+        sockets[sock].dstaddr.portno = remote_port;
+        sockets[sock].dstaddr.ipaddr = remote_ip; /* Does it mean only talk to this ip? */
+        sockets[sock].state = BSD_CONNECTED;
+    }
+    return E_OK;
+}
+
+/******************************************************************************
+* Function Name: listen
+* Description  : The listen function sets the specified socket in a listen mode.
+* Arguments    : sock  - Socket identifier
+*                backlog - maximum number of connection requests that can be
+*                queued (fixed to 1 ONLY - not use internally )
+* Return Value : 0 for success, SOCKET_ERROR indicates an error.
+******************************************************************************/
+int r_listen( int sock, int backlog )
+{
+    SOCKET peer_socket;
+    int     peer_cepid, cepid, ercd;
+
+#ifdef R_SOCKET_PAR_CHECK
+    if (listen_par_check(sock, backlog) != true)
+    {
+        return E_PAR;
+    }
+#endif  /* R_SOCKET_PAR_CHECK */
+
+    if ( (sock >= TOTAL_BSD_SOCKET) || (sock < 0 ))
+    {
+        errno = ENOTSOCK;       /* The socket argument does not refer to a socket. */
+        return SOCKET_ERROR;
+    }
+    if (sockets[sock].socket_type != SOCK_STREAM)
+    {
+        errno = EOPNOTSUPP;
+        return SOCKET_ERROR;
+    }
+    if (sockets[sock].state != BSD_BOUND)
+    {
+        switch ( sockets[sock].state)
+        {
+            case BSD_CLOSING:
+            case BSD_CLOSED:
+                errno = EINVAL;         /* The socket has been shut down */
+                break;
+            case BSD_CREATED:
+                errno = EDESTADDRREQ;   /* The socket is not bound to a local address, and the protocol does not */
+                /* support listening on an unbound socket */
+                break;
+            default:                    /* TODO */
+                errno = EINVAL;         /*  The socket has been shut down */
+                break;
+        }
+        return SOCKET_ERROR;
+    }
+    /* put this socket in listen mode */
+    sockets[sock].state = BSD_LISTENING;
+    sockets[sock].backlog = backlog;  /* Not Used */
+
+    peer_socket = dup_tcp_socket( sock );
+    if ( peer_socket == SOCKET_ERROR )
+    {
+        errno = ENFILE;
+        return SOCKET_ERROR;
+    }
+    peer_cepid = peer_socket + 1;
+    cepid = sock + 1;
+
+    ercd = tcp_acp_cep(peer_cepid, cepid, &sockets[peer_socket].dstaddr, TMO_NBLK);
+    if (ercd == E_WBLK)
+    {
+        sockets[peer_socket].state = BSD_CONNECTING; /* State change in callback */
+        sockets[peer_socket].T4proc |= (uint32_t)T4_PROC_ACP;
+        sockets[sock].peer_socket = peer_socket;
+    }
+    else
+    {
+        reset_socket( peer_socket );
+        sockets[sock].peer_socket = -1;
+        errno = EINVAL;         /* Dont have a proper return code */
+        return SOCKET_ERROR;
+    }
+
+	no_connect_count_ = 0;
+    return E_OK;
+}
+
+/******************************************************************************
+* Function Name: accept
+* Description  : The accept function is used to accept a connection request
+*                queued for a listening socket.
+* Arguments    : sock      Socket descriptor
+*                              must be bound to a local name and in
+*                              listening mode.
+*                address       pointer to the the sockaddr structure that will receive
+*                              the connecting node IP address and port number.
+* Return Value : peersocket for success non-negative descriptor,
+*                   SOCKET_ERROR indicates an error.
+*              : if successful, peersocket = socket
+******************************************************************************/
+int r_accept(int sock, sockaddr_in *padr)
+{
+    uint32_t this_id;
+    uint32_t this_peer_id;
+    int  cepid;
+    int  peer_socket, ret_socket;
+    int  peer_cepid;
+    ER ercd = SOCKET_ERROR;
+
+	memset(padr, 0x00, sizeof(sockaddr_in));
+    ret_socket = peer_socket = SOCKET_ERROR;
+    errno = E_OK;
+
+#ifdef R_SOCKET_PAR_CHECK
+    if (accept_par_check(sock, address, address_len) != true)
+    {
+        return E_PAR;
+    }
+#endif  /* R_SOCKET_PAR_CHECK */
+
+    this_id = sockets[sock].create_id;
+    if ((sockets[sock].tmout != TMO_FEVR) && (sockets[sock].tmout != TMO_NBLK))
+    {
+        errno = EINVAL;
+        return SOCKET_ERROR;
+    }
+    if (sockets[sock].event == SOCKET_ERR_CEP)
+    {
+        errno = ECONNABORTED;
+        return SOCKET_ERROR;
+    }
+    if ( sockets[sock].socket_type != SOCK_STREAM )
+    {
+        errno = EOPNOTSUPP;
+        return SOCKET_ERROR;
+    }
+
+    cepid = sock + 1;
+
+    if ( sockets[sock].state == BSD_LISTENING )/* if listening, do accept */
+    {
+        /* Get the listener's peer socket */
+        ret_socket = sockets[sock].peer_socket;
+        if (ret_socket != -1)
+        {
+            this_peer_id = sockets[ret_socket].create_id;
+            /* Check the state of the peer socket */
+			int connect = 0;
+            if(sockets[ret_socket].state == BSD_CONNECTING) {
+				do {
+					if(( 0 == (sockets[ret_socket].T4proc & T4_PROC_ACP)
+					  || (sockets[sock].state == BSD_CLOSED)
+					  || (this_id != sockets[sock].create_id))
+					  || (this_peer_id != sockets[ret_socket].create_id)) {
+						printf("Connecting\n");
+						connect = 1;
+						break;
+					}
+
+					r_socket_task_switch(sock);
+
+				} while(sockets[sock].tmout == TMO_FEVR) ;
+
+				if((sockets[sock].state == BSD_CLOSED)
+				  || (this_id != sockets[sock].create_id)
+				  || (this_peer_id != sockets[ret_socket].create_id)) {
+					errno = ECONNABORTED;
+					return SOCKET_ERROR;
+				}
+            } else {
+				goto acp_chk_ret_socket;
+			}
+
+			if(connect == 0) {
+				++no_connect_count_;
+				if(no_connect_count_ >= 100) {
+///					printf("r_accept: connection wait\n");
+					no_connect_count_ = 0;
+				}
+		        errno = EAGAIN;
+        		return SOCKET_ERROR;
+			}
+
+            sockets[sock].event = -1;
+
+            peer_socket = dup_tcp_socket(sock);
+            if (peer_socket == SOCKET_ERROR)
+            {
+                sockets[sock].event = -1;
+                sockets[sock].peer_socket = -1;
+                goto acp_chk_ret_socket;
+            }
+            else
+            {
+                sockets[sock].peer_socket = peer_socket;
+            }
+        }
+        else
+        {
+            peer_socket = dup_tcp_socket(sock);
+            if (peer_socket == SOCKET_ERROR)
+            {
+                errno = ENFILE;
+                return SOCKET_ERROR;
+            }
+            else
+            {
+                sockets[sock].peer_socket = peer_socket;
+            }
+        }
+        peer_cepid = peer_socket + 1;
+        sockets[sock].event = -1;
+        ercd = tcp_acp_cep(peer_cepid, cepid, &sockets[peer_socket].dstaddr, TMO_NBLK); /*  Fix bug in case non-blocking */
+
+        if (ercd == E_WBLK)
+        {
+            sockets[peer_socket].T4proc |= (uint32_t)T4_PROC_ACP;
+            sockets[peer_socket].state = BSD_CONNECTING; /* State change in callback */
+            errno = EAGAIN; /* O_NONBLOCK is set for the socket file descriptor and */
+            /* no connections are present to be accepted. */
+            return ret_socket;
+        }
+        else
+        {
+            reset_socket( peer_socket );
+            errno = EINVAL; /* The socket is not accepting connections. */
+            return SOCKET_ERROR;
+        }
+    }
+    else /* Close the peer socket if the sock is not listening/connected */
+    {
+        errno = EOPNOTSUPP; /* The socket type of the specified socket does not */
+        /* support accepting connections. */
+        return SOCKET_ERROR;
+    }
+acp_chk_ret_socket:             /* Check return socket before return */
+    if ( sockets[ret_socket].state != BSD_CONNECTED )
+    {
+        errno = EAGAIN;     /* Poll again.  Socket not established yet */
+        return SOCKET_ERROR;
+    }
+
+	if(ret_socket >= 0) {
+		padr->sin_family = AF_INET;
+		padr->sin_addr.S_un.S_addr = sockets[ret_socket].dstaddr.ipaddr;
+		padr->sin_port = htons(sockets[ret_socket].dstaddr.portno);
+	}
+
+    return ret_socket;
+}
+
+
+/******************************************************************************
+* Function Name: send
+* Description  : The send function is used to send outgoing data to a connected
+*                socket.
+* Arguments    : sock - Socket descriptor
+*                buffer - application data buffer containing data to transmit
+*                length - length of data in bytes
+* Return Value : Number of bytes sent for success, SOCKET_ERROR indicates an error.
+******************************************************************************/
+int r_send( int sock,  const void *buffer, uint32_t length)
+{
+    int  cepid;
+    int ercd = 0;
+    uint32_t this_id;
+
+    errno = E_OK;
+#ifdef R_SOCKET_PAR_CHECK
+    if (send_par_check(sock, buffer, length) != true)
+    {
+        return E_PAR;
+    }
+#endif  /* R_SOCKET_PAR_CHECK */
+
+    this_id = sockets[sock].create_id;
+    if (sockets[sock].event == SOCKET_ERR_CEP)
+    {
+        return SOCKET_ERROR;
+    }
+    /* For NBLK, data is transfer to an internal sndbuf[] so API can return immediately  */
+    /* In callback, data is throttled out depending on available BW */
+
+    /* In TCP data to be send may be broken into segments */
+    /* In UDP data should not be broken up, but send within 1 frame */
+
+    if ( sockets[sock].state < BSD_CONNECTED)
+    {
+        errno = ENOTCONN;   /* The socket is not connected. */
+        return SOCKET_ERROR;
+    }
+
+    if ( sockets[sock].socket_type == SOCK_DGRAM ) /* udp */
+    {
+        errno = EOPNOTSUPP;     /* The socket argument is associated with a socket that */
+        /* does not support one or more of the values set in flags. */
+        return SOCKET_ERROR;
+    }
+    if ( sockets[sock].socket_type == SOCK_STREAM ) /* tcp */
+    {
+        cepid = sock + 1;
+        if ( 0 != (sockets[sock].T4proc & T4_PROC_SND_START))
+        {
+            errno = ENOBUFS;
+            ercd  = SOCKET_ERROR;
+            return ercd;
+        }
+        if ( length > BSD_SND_BUFSZ)
+        {
+            errno = ENOBUFS;
+            return SOCKET_ERROR;
+        }
+
+        memcpy( sockets[sock].snd_buf, buffer, length );
+        sockets[sock].sndLen = 0;
+        sockets[sock].sndSz = length;
+        sockets[sock].pending_sndlen = length;
+        sockets[sock].T4proc &= ~(T4_PROC_SND_END);
+        if ( 0 != (sockets[sock].T4proc & T4_PROC_RCV_START))
+        {
+            sockets[sock].T4proc |= (T4_PROC_SND_START | T4_PROC_CAN_START);
+            ercd = tcp_can_cep( cepid, TFN_TCP_ALL );
+            if (ercd == E_OK)
+            {
+                ercd = length;
+            }
+            else
+            {
+                sockets[sock].T4proc &= ~(T4_PROC_SND_START | T4_PROC_CAN_START);
+                sockets[sock].T4proc |= (T4_PROC_CAN_END);
+
+                sockets[sock].T4proc &= ~(T4_PROC_SND_END);
+                sockets[sock].T4proc |= (T4_PROC_SND_START);
+                ercd = tcp_snd_dat( cepid, (VP)sockets[sock].snd_buf, length,
+                                    TMO_NBLK );
+                if ( ercd == E_WBLK )
+                {
+                    ercd = length;  /* Return length of data even though it may not been sent*/
+
+                }
+                else
+                {
+                    sockets[sock].T4proc &= ~(T4_PROC_SND_START);
+                    errno = ENOBUFS;
+                    return SOCKET_ERROR;
+
+                }
+            }
+
+        }
+        else
+        {
+            sockets[sock].T4proc |= (T4_PROC_SND_START);
+            ercd = tcp_snd_dat( cepid, (VP)sockets[sock].snd_buf, length,
+                                TMO_NBLK );
+            if ( ercd == E_WBLK )
+            {
+                ercd = length;  /* Return length of data even though it may not been sent*/
+            }
+            else
+            {
+                sockets[sock].T4proc &= ~(T4_PROC_SND_START);
+                errno = ENOBUFS;
+                return SOCKET_ERROR;
+            }
+        }
+        if (sockets[sock].tmout == TMO_FEVR)
+        {
+            while (1)
+            {
+                if (  (sockets[sock].sndLen == sockets[sock].sndSz)
+                        || (0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
+                        || (  this_id != sockets[sock].create_id)
+                        || (sockets[sock].socket_type ==  ERR_OTHERS))
+                {
+                    break;
+                }
+                r_socket_task_switch(sock);
+            }
+            if (this_id != sockets[sock].create_id)
+            {
+                errno = ECONNABORTED;
+                ercd  = SOCKET_ERROR;
+            }
+            else
+            {
+                sockets[sock].socket_proc &= ~(SOCKET_PROC_SND);
+                if (sockets[sock].sndLen == sockets[sock].sndSz)
+                {
+                    ercd = length;
+                }
+                else
+                {
+                    errno = ECONNABORTED;
+                    ercd  = SOCKET_ERROR;
+                }
+            }
+        }
+        else
+        {
+            ercd = length;  /* Return length of data even though it may not been sent*/
+        }
+    }
+    return ercd;
+}
+
+
+/******************************************************************************
+* Function Name: sendto
+* Description  : The sendto function is used to send outgoing data on a socket
+*                of type datagram.
+* Arguments    : sock - Socket descriptor returned from a previous call to socket
+*                buffer - application data buffer containing data to transmit
+*                length - length of data in bytes
+*                to - pointer to the the sockaddr structure containing the destination address.
+*                tolen - length of the sockaddr structure.
+* Return Value : Number of bytes sent for success, SOCKET_ERROR indicates an error.
+******************************************************************************/
+int r_sendto( int sock,  const void * buffer, uint32_t length, const sockaddr_in *addr)
+{
+    ER ercd = E_OK;
+    uint32_t this_id;
+    int  cepid;
+
+    errno = E_OK;
+    this_id = sockets[sock].create_id;
+#ifdef R_SOCKET_PAR_CHECK
+    if (sendto_par_check(sock, buffer, length, to, tolen) != true)
+    {
+        return E_PAR;
+    }
+#endif  /* R_SOCKET_PAR_CHECK */
+
+    if (sockets[sock].event == SOCKET_ERR_CEP)
+    {
+        errno = ECONNABORTED;
+        return SOCKET_ERROR;
+    }
+    if ( 0 != (sockets[sock].T4proc & T4_PROC_SND_START))
+    {
+        errno = ENOBUFS;
+        return SOCKET_ERROR;
+    }
+    if ( sockets[sock].socket_type == SOCK_DGRAM )
+    {
+
+        if ( sockets[sock].state < BSD_CREATED ) /* must create and bind before send */
+        {
+            errno = ENOTCONN;
+            return SOCKET_ERROR;
+        }
+        if ( length > BSD_SND_BUFSZ)
+        {
+            errno = ENOBUFS;
+            return SOCKET_ERROR;
+        }
+        cepid = sock + 1 - MAX_TCP_CCEP;
+
+        if ( sockets[sock].state < BSD_CONNECTED )
+        {
+            sockets[sock].dstaddr.ipaddr = addr->sin_addr.S_un.S_addr;
+            sockets[sock].dstaddr.portno = htons(addr->sin_port);
+        }
+
+        memcpy( sockets[sock].snd_buf, buffer, length );
+        sockets[sock].sndLen = 0;
+        sockets[sock].sndSz = length;
+        sockets[sock].pending_sndlen = length;
+        sockets[sock].T4proc &= ~(T4_PROC_SND_END);
+        sockets[sock].T4proc |= (T4_PROC_SND_START);
+        ercd = udp_snd_dat( cepid, (T_IPV4EP*) & sockets[sock].dstaddr, (VP)sockets[sock].snd_buf, length, TMO_NBLK );
+        if ( ercd == E_WBLK )
+        {
+            ercd = length;  /* Return length of data even though it may not been sent*/
+
+        }
+        else
+        {
+            sockets[sock].T4proc &= ~((uint32_t)T4_PROC_SND_START);
+            errno = ENOBUFS;
+            return SOCKET_ERROR;
+        }
+        if (sockets[sock].tmout == TMO_FEVR)
+        {
+            while (1)
+            {
+                if (  (sockets[sock].sndLen == sockets[sock].sndSz)
+                        || (  this_id != sockets[sock].create_id)
+                        || (0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
+                        || (sockets[sock].socket_type ==  ERR_OTHERS))
+                {
+                    break;
+                }
+                r_socket_task_switch(sock);
+            }
+            if (this_id != sockets[sock].create_id)
+            {
+                errno = ECONNABORTED;
+                return SOCKET_ERROR;
+            }
+            if ( 0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
+            {
+                errno = ECONNABORTED;
+                return SOCKET_ERROR;
+            }
+            else
+            {
+                sockets[sock].socket_proc &= ~(SOCKET_PROC_SND);
+                if (sockets[sock].sndLen == sockets[sock].sndSz)
+                {
+                    ercd = length;
+                }
+                else
+                {
+                    errno = ECONNABORTED;
+                    return SOCKET_ERROR;
+                }
+            }
+        }
+        else
+        {
+            ercd = length;  /* Return length of data even though it may not been sent*/
+        }
+
+    }
+    else
+    {
+        errno = EOPNOTSUPP;     /* The socket argument is associated with a socket that */
+        /* does not support one or more of the values set in flags. */
+        return SOCKET_ERROR;
+
+    }
+    return ercd;
+}
+
+
+/******************************************************************************
+* Function Name: recv
+* Description  : The recv() function is used to receive incoming data that has been
+*                queued for a socket.
+* Arguments    : sock - Socket descriptor returned from a previous call to socket
+*                buffer - application data receive buffer
+*                length - buffer length in bytes
+* Return Value : Number of bytes returned for success, SOCKET_ERROR indicates an error.
+******************************************************************************/
+int r_recv(int sock, void * buffer, uint32_t length)
+{
+    sockaddr_in from;      /* No use. To pass par check */
+#ifdef R_SOCKET_PAR_CHECK
+    if (recv_par_check(sock, buffer, length) != true)
+    {
+        return E_PAR;
+    }
+#endif  /* R_SOCKET_PAR_CHECK */
+
+    if ( sockets[sock].socket_type != SOCK_STREAM )
+    {
+        errno = EPROTONOSUPPORT;
+        return SOCKET_ERROR;
+    }
+    return r_recvfrom( sock, buffer, length, &from);
+}
+
+
+/******************************************************************************
+* Function Name: recvfrom
+* Description  : The recvfrom() function is used to receive incoming data that has been
+*                queued for a socket.
+* Arguments    : sock - Socket descriptor returned from a previous call to socket
+*                buffer - application data receive buffer
+*                length - buffer length in bytes
+*                from - pointer to the the sockaddr structure that will be filled
+*                       in with the destination address.
+*                fromlen - size of buffer pointed by from.
+* Return Value : Number of bytes returned for success, SOCKET_ERROR indicates an error.
+******************************************************************************/
+int r_recvfrom( int sock, void * buffer, uint32_t length, sockaddr_in *remoteaddr)
+{
+    int BytesRead = 0;
+    unsigned char * buf;
+    int  cepid;
+    int  len;
+    ER   ercd;
+    uint32_t this_id;
+
+#ifdef R_SOCKET_PAR_CHECK
+    if (recvfrom_par_check(sock, buffer, length, from, fromlen) != true)
+    {
+        return E_PAR;
+    }
+#endif  /* R_SOCKET_PAR_CHECK */
+
+    this_id = sockets[sock].create_id;
+    if ((sockets[sock].tmout != TMO_FEVR) && (sockets[sock].tmout != TMO_NBLK))
+    {
+        errno = EINVAL;
+        return SOCKET_ERROR;
+    }
+    if ((sockets[sock].tmout == TMO_NBLK) && (sockets[sock].event == SOCKET_ERR_CEP))
+    {
+        errno = ECONNRESET;
+        return SOCKET_ERROR;
+    }
+    buf = (unsigned char *)buffer;
+    if ( sockets[sock].socket_type == SOCK_STREAM ) /* TCP */
+    {
+        cepid = sock + 1;
+        if ( sockets[sock].state !=  BSD_CONNECTED && sockets[sock].state !=  BSD_CLOSING)
+        {
+            errno = ENOTCONN;
+            return SOCKET_ERROR;
+        }
+        if ( sockets[sock].rcvLen > 0 ) /* Previous data remain in read_buf. */
+        {
+            if ( length > sockets[sock].rcvLen )
+            {
+                BytesRead = sockets[sock].rcvLen;
+            }
+            else
+            {
+                BytesRead = length;
+            }
+            if (sockets[sock].rcvout_offset + BytesRead > BSD_RCV_BUFSZ)
+            {
+                int cnt;
+                cnt =  BSD_RCV_BUFSZ - sockets[sock].rcvout_offset;
+                memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], cnt);
+                sockets[sock].rcvout_offset = 0;
+                memcpy(&buf[cnt], (const char *)&sockets[sock].rcv_buf[0], BytesRead - cnt);
+                sockets[sock].rcvout_offset += (BytesRead - cnt);
+
+            }
+            else
+            {
+                memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], BytesRead);
+                sockets[sock].rcvout_offset += BytesRead;
+            }
+            len = sockets[sock].rcvLen;
+            sockets[sock].rcvLen -= BytesRead;
+            if ( len == BSD_RCV_BUFSZ && sockets[sock].state ==  BSD_CONNECTED)
+            {
+                int size;
+                if (sockets[sock].rcvin_offset == BSD_RCV_BUFSZ)
+                {
+                    sockets[sock].rcvin_offset = 0;
+                }
+                if ((BSD_RCV_BUFSZ - sockets[sock].rcvin_offset) > BSD_RCV_BUFSZ - sockets[sock].rcvLen)
+                {
+                    size = BSD_RCV_BUFSZ - sockets[sock].rcvLen;
+                }
+                else
+                {
+                    size = BSD_RCV_BUFSZ - sockets[sock].rcvin_offset;
+                }
+                sockets[sock].pending_rcvlen = size;
+                sockets[sock].T4proc &= ~((uint32_t)T4_PROC_RCV_END);
+                sockets[sock].T4proc |= ((uint32_t)T4_PROC_RCV_START);
+                ercd = tcp_rcv_dat(cepid, (VP)(&sockets[sock].rcv_buf[sockets[sock].rcvin_offset]), size, TMO_NBLK);
+                if ((ercd != E_WBLK) && (ercd != E_QOVR))
+                {
+                    /* fatal error */
+                    sockets[sock].state = BSD_FATALERROR;
+                }
+            }
+            return BytesRead;
+        }
+        if ( sockets[sock].rcvLen == 0 ) /* Previous data remain in read_buf. */
+        {
+
+            if (sockets[sock].finrcv == 1)
+            {
+                return 0;
+            }
+            if ( sockets[sock].tmout == TMO_NBLK )
+            {
+                errno = EAGAIN;
+                return SOCKET_ERROR;
+            }
+            else
+            {
+                sockets[sock].T4proc &= ~((uint32_t)T4_PROC_RCV_END);
+                while (1)
+                {
+                    if (  (sockets[sock].rcvLen > 0)
+                            || (sockets[sock].finrcv == 1)
+                            || (0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
+                            || (this_id != sockets[sock].create_id)
+                            || (sockets[sock].socket_type ==  ERR_OTHERS))
+                    {
+                        break;
+                    }
+                    r_socket_task_switch(sock);
+                }
+
+                if ( this_id != sockets[sock].create_id)
+                {
+                    errno = ECONNABORTED;
+                    return SOCKET_ERROR;
+                }
+                if ( 0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
+                {
+                    errno = ECONNABORTED;
+                    return SOCKET_ERROR;
+                }
+                if ( sockets[sock].rcvLen > 0 ) /* Previous data remain in read_buf. */
+                {
+                    if ( length > sockets[sock].rcvLen )
+                    {
+                        BytesRead = sockets[sock].rcvLen;
+                    }
+                    else
+                    {
+                        BytesRead = length;
+                    }
+                    if (sockets[sock].rcvout_offset + BytesRead > BSD_RCV_BUFSZ)
+                    {
+                        int cnt;
+                        cnt =  BSD_RCV_BUFSZ - sockets[sock].rcvout_offset;
+                        memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], cnt);
+                        sockets[sock].rcvout_offset = 0;
+                        memcpy(&buf[cnt], (const char *)&sockets[sock].rcv_buf[0], BytesRead - cnt);
+                        sockets[sock].rcvout_offset += (BytesRead - cnt);
+                    }
+                    else
+                    {
+                        memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], BytesRead);
+                        sockets[sock].rcvout_offset += BytesRead;
+                    }
+                    len = sockets[sock].rcvLen;
+                    sockets[sock].rcvLen -= BytesRead;
+                    if ( len == BSD_RCV_BUFSZ && sockets[sock].state ==  BSD_CONNECTED )
+                    {
+                        int size;
+                        if (sockets[sock].rcvin_offset == BSD_RCV_BUFSZ)
+                        {
+                            sockets[sock].rcvin_offset = 0;
+                        }
+                        if ((BSD_RCV_BUFSZ - sockets[sock].rcvin_offset) > BSD_RCV_BUFSZ - sockets[sock].rcvLen)
+                        {
+                            size = BSD_RCV_BUFSZ - sockets[sock].rcvLen;
+                        }
+                        else
+                        {
+                            size = BSD_RCV_BUFSZ - sockets[sock].rcvin_offset;
+                        }
+                        sockets[sock].pending_rcvlen = size;
+                        sockets[sock].T4proc &= ~((uint32_t)T4_PROC_RCV_END);
+                        sockets[sock].T4proc |= ((uint32_t)T4_PROC_RCV_START);
+                        tcp_rcv_dat(cepid, (VP)(&sockets[sock].rcv_buf[sockets[sock].rcvin_offset]), size, TMO_NBLK);
+                    }
+                    return BytesRead;
+                }
+                if ( sockets[sock].rcvLen == 0 ) /* Previous data remain in read_buf. */
+                {
+                    if (sockets[sock].finrcv == 1)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                    }
+                }
+                return SOCKET_ERROR;
+
+            }
+        }
+    }
+    else
+    {
+        if ( sockets[sock].state < BSD_CREATED ) /* must call bind before recv */
+        {
+            errno = ENOTCONN;
+            return SOCKET_ERROR;
+        }
+        cepid = sock + 1 - MAX_TCP_CCEP;
+
+        if ( sockets[sock].rcvLen > 0 ) /* Previous data remain in read_buf. */
+        {
+            if ( length > sockets[sock].rcvLen )
+            {
+                BytesRead = sockets[sock].rcvLen;
+            }
+            else
+            {
+                BytesRead = length;
+            }
+            if (sockets[sock].rcvout_offset + BytesRead > BSD_RCV_BUFSZ)
+            {
+                int cnt;
+                cnt =  BSD_RCV_BUFSZ - sockets[sock].rcvout_offset;
+                memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], cnt);
+                sockets[sock].rcvout_offset = 0;
+                memcpy(&buf[cnt], (const char *)&sockets[sock].rcv_buf[0], BytesRead - cnt);
+                sockets[sock].rcvout_offset += (BytesRead - cnt);
+
+            }
+            else
+            {
+                memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], BytesRead);
+                sockets[sock].rcvout_offset += BytesRead;
+            }
+            sockets[sock].rcvLen -= BytesRead;
+            /* Must return the addr also */
+            if ( remoteaddr != NULL )
+            {
+//                remoteaddr = (sockaddr_in *)from;
+                remoteaddr->sin_family = AF_INET;
+                remoteaddr->sin_port = sockets[sock].dstaddr.portno;
+                remoteaddr->sin_port = sockets[sock].dstaddr.portno;
+                remoteaddr->sin_addr.S_un.S_addr = sockets[sock].dstaddr.ipaddr;
+            }
+//            if ( fromlen != NULL )
+//            {
+//                *fromlen = sizeof(sockaddr_in); /* fixed? why? */
+//            }
+            return BytesRead;
+        }
+        if ( sockets[sock].rcvLen == 0 ) /* Previous data remain in read_buf. */
+        {
+            if ( sockets[sock].tmout == TMO_NBLK )
+            {
+                errno = EAGAIN;
+                return SOCKET_ERROR;
+            }
+            else
+            {
+                sockets[sock].T4proc &= ~((uint32_t)T4_PROC_RCV_END);
+                while (1)
+                {
+                    if (  (sockets[sock].rcvLen > 0)
+                            || (0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
+                            || (this_id != sockets[sock].create_id)
+                            || (sockets[sock].socket_type ==  ERR_OTHERS))
+                    {
+                        break;
+                    }
+                    r_socket_task_switch(sock);
+                }
+
+                if ( this_id != sockets[sock].create_id)
+                {
+                    errno = ECONNABORTED;
+                    return SOCKET_ERROR;
+                }
+                if ( 0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
+                {
+                    errno = ECONNABORTED;
+                    return SOCKET_ERROR;
+                }
+                if ( sockets[sock].rcvLen > 0 ) /* Previous data remain in read_buf. */
+                {
+                    if ( length > sockets[sock].rcvLen )
+                    {
+                        BytesRead = sockets[sock].rcvLen;
+                    }
+                    else
+                    {
+                        BytesRead = length;
+                    }
+                    if (sockets[sock].rcvout_offset + BytesRead > BSD_RCV_BUFSZ)
+                    {
+                        int cnt;
+                        cnt =  BSD_RCV_BUFSZ - sockets[sock].rcvout_offset;
+                        memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], cnt);
+                        sockets[sock].rcvout_offset = 0;
+                        memcpy(&buf[cnt], (const char *)&sockets[sock].rcv_buf[0], BytesRead - cnt);
+                        sockets[sock].rcvout_offset += (BytesRead - cnt);
+
+                    }
+                    else
+                    {
+                        memcpy(buf, (const char *)&sockets[sock].rcv_buf[sockets[sock].rcvout_offset], BytesRead);
+                        sockets[sock].rcvout_offset += BytesRead;
+                    }
+                    sockets[sock].rcvLen -= BytesRead;
+                    if ( remoteaddr != NULL )
+                    {
+                        remoteaddr->sin_family = AF_INET;
+                        remoteaddr->sin_port = sockets[sock].dstaddr.portno;
+                        remoteaddr->sin_port = sockets[sock].dstaddr.portno;
+                        remoteaddr->sin_addr.S_un.S_addr = sockets[sock].dstaddr.ipaddr;
+                    }
+                    return BytesRead;
+                }
+                if ( sockets[sock].rcvLen == 0 ) /* Previous data remain in read_buf. */
+                {
+                }
+                return SOCKET_ERROR;
+            }
+        }
+    }
+    return BytesRead;
+}
+
+
+/******************************************************************************
+* Function Name: closesocket
+* Description  : The closesocket() function closes an existing socket.
+* Arguments    : sock - Socket descriptor returned from a previous call to socket
+* Return Value : E_OK for success, SOCKET_ERROR indicates an error.
+******************************************************************************/
+int r_closesocket( int sock )
+{
+    ER ercd = E_OK;
+    int  cepid;
+
+    errno = E_OK;
+#ifdef R_SOCKET_PAR_CHECK
+    if (closesocket_par_check(sock) != true)
+    {
+        return E_PAR;
+    }
+#endif  /* R_SOCKET_PAR_CHECK */
+
+
+    if ((sockets[sock].tmout != TMO_FEVR) && (sockets[sock].tmout != TMO_NBLK))
+    {
+        errno = ENOTSOCK;   /* No socket created */
+        return SOCKET_ERROR;
+    }
+
+    if ( sockets[sock].socket_type == SOCK_STREAM )
+    {
+
+        if ((sockets[sock].event == SOCKET_ERR_CEP)) /* if I want to close a socket with error?*/
+        {
+            if ((sockets[sock].state == BSD_CONNECTED))
+            {
+                /* Close a socket error */
+                ercd = tcp_cls_cep(sock + 1, T4_TCP_CLS_CEP_TMOUT);
+            }
+            sockets[sock].state = BSD_CLOSED; /* In callback it will change to BSD_CLOSED */
+            sockets[sock].event = -1;
+            return E_OK;
+        }
+        if ( sockets[sock].event == SOCKET_CLS_CEP)
+        {
+            sockets[sock].state = BSD_CLOSED;
+            sockets[sock].event = -1;
+            return E_OK;
+        }
+        if ( sockets[sock].state == BSD_CLOSED)
+        {
+            errno = EINVAL;
+            return SOCKET_ERROR;
+        }
+        if ( sockets[sock].state <= BSD_BOUND)
+        {
+            reset_socket(sock);
+            sockets[sock].state = BSD_CLOSED;
+            sockets[sock].event = -1;
+            return E_OK;
+        }
+        /*------------------------------*/
+        if ( sockets[sock].state == BSD_LISTENING)
+        {
+            if (sockets[sock].peer_socket != -1)
+            {
+                if (sockets[sockets[sock].peer_socket].state >= BSD_CONNECTING)
+                {
+                    sockets[sockets[sock].peer_socket].T4proc &= ~T4_PROC_CAN_END;
+                    sockets[sockets[sock].peer_socket].T4proc |= T4_PROC_CAN_START;
+                    if (E_OK == tcp_can_cep(sockets[sock].peer_socket + 1, TFN_TCP_ALL))
+                    {
+                        while (0 == (sockets[sockets[sock].peer_socket].T4proc & T4_PROC_CAN_END))
+                        {
+                            r_socket_task_switch(sock);
+                        }
+                    }
+                    else
+                    {
+                        sockets[sockets[sock].peer_socket].T4proc &= ~T4_PROC_CAN_START;
+                    }
+                    if (sockets[sockets[sock].peer_socket].state >= BSD_CLOSING)
+                    {
+                        tcp_cls_cep(sockets[sock].peer_socket + 1, T4_TCP_CLS_CEP_TMOUT);
+                    }
+                    reset_socket(sockets[sock].peer_socket);
+                }
+            }
+            sockets[sock].socket_proc |= SOCKET_PROC_CLS_END;
+            reset_socket(sock);
+            return E_OK;
+        }
+        else if (sockets[sock].state == BSD_CONNECTING)
+        {
+            sockets[sock].T4proc &= ~T4_PROC_CAN_END;
+            sockets[sock].T4proc |= T4_PROC_CAN_START;
+            if (E_OK == tcp_can_cep(sock + 1, TFN_TCP_ALL))
+            {
+                while (0 == (sockets[sock].T4proc & T4_PROC_CAN_END))
+                {
+                    r_socket_task_switch(sock);
+                }
+            }
+            else
+            {
+                sockets[sock].T4proc &= ~T4_PROC_CAN_START;
+            }
+            tcp_cls_cep(sock + 1, T4_TCP_CLS_CEP_TMOUT);
+            sockets[sock].socket_proc |= SOCKET_PROC_CLS_END;
+            reset_socket(sock);
+            return E_OK;
+        }
+        else if (sockets[sock].state == BSD_CLOSING)
+        {
+            sockets[sock].T4proc |= T4_PROC_CAN_START;
+            if (E_OK == tcp_can_cep(sock + 1, TFN_TCP_ALL))
+            {
+                while (0 == (sockets[sock].T4proc & T4_PROC_CAN_END))
+                {
+                    r_socket_task_switch(sock);
+                }
+            }
+            else
+            {
+                sockets[sock].T4proc &= ~T4_PROC_CAN_START;
+            }
+            tcp_cls_cep(sock + 1, T4_TCP_CLS_CEP_TMOUT);
+            sockets[sock].socket_proc |= SOCKET_PROC_CLS_END;
+            reset_socket(sock);
+            return E_OK;
+        }
+        else if (sockets[sock].state == BSD_CONNECTED)
+        {
+            sockets[sock].socket_proc |= SOCKET_PROC_CLS_START;
+            sockets[sock].T4proc &= ~T4_PROC_CAN_END;
+            sockets[sock].T4proc |= T4_PROC_CAN_START;
+            if (E_OK == tcp_can_cep(sock + 1, TFN_TCP_ALL))
+            {
+                while (0 == (sockets[sock].T4proc & T4_PROC_CAN_END))
+                {
+                    r_socket_task_switch(sock);
+                }
+            }
+            else
+            {
+                sockets[sock].T4proc &= ~T4_PROC_CAN_START;
+            }
+            ercd = tcp_cls_cep(sock + 1, T4_TCP_CLS_CEP_TMOUT);
+            sockets[sock].socket_proc |= SOCKET_PROC_CLS_END;
+            reset_socket(sock);
+            return E_OK;
+        }
+    }
+    else
+    {
+        cepid = sock + 1 - MAX_TCP_CCEP;
+        if ( 0 != (sockets[sock].T4proc & T4_PROC_SND_START))
+        {
+            ercd = udp_can_cep(cepid, TFN_UDP_ALL );
+            if (ercd == E_OK)
+            {
+                while (0 == (sockets[sock].T4proc & T4_PROC_CAN_END))
+                {
+                    r_socket_task_switch(sock);
+                }
+            }
+        }
+        sockets[sock].socket_proc |= SOCKET_PROC_CLS_END;
+        reset_socket(sock);
+        ercd = E_OK;
+    }
+    return ercd;
+}
 
 
 /******************************************************************************
@@ -2050,7 +2014,7 @@ int r_select (int nfds, r_fd_set *p_readfds, r_fd_set *p_writefds, r_fd_set *p_e
     {
         timeout->tv_usec /= 10000;
     }
-    timer1 = tcpudp_get_time();
+    timer1 = get_tcpudp_time();
 
     R_FD_COPY(p_readfds,  &readfds);
     R_FD_COPY(p_writefds, &writefds);
@@ -2121,7 +2085,7 @@ int r_select (int nfds, r_fd_set *p_readfds, r_fd_set *p_writefds, r_fd_set *p_e
         }
         if (timeout != NULL)
         {
-            timer2 = tcpudp_get_time();
+            timer2 = get_tcpudp_time();
             if (timer1 != timer2)
             {
                 timer1 = timer2;

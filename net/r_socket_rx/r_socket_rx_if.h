@@ -317,11 +317,13 @@ struct in_addr
 #define s_lh    S_un.S_un_b.s_b3   /* logical host */
 };
 
+#if 0
 typedef struct
 {
     unsigned short  sa_family;              /* address family */
     char    sa_data[14];                    /* up to 14 bytes of direct address */
 } sockaddr;
+#endif
 
 typedef struct
 {
@@ -335,10 +337,11 @@ typedef sockaddr_in SOCKADDR_IN;
 typedef sockaddr_in *PSOCKADDR_IN;
 typedef sockaddr_in *LPSOCKADDR_IN;
 
+#if 0
 typedef sockaddr SOCKADDR;
 typedef sockaddr *PSOCKADDR;
 typedef sockaddr *LPSOCKADDR;
-
+#endif
 
 #define T4_CLOSED      0  /* T4 status */
 #define T4_ACCEPT      1
@@ -478,16 +481,16 @@ extern "C" {
 int R_SOCKET_Open( void );
 void R_SOCKET_Close( void );
 
-int  r_socket( int domain, int type, int protocol );
-int  r_bind( int sock, const sockaddr * name, int namelen );
-int  r_listen( int sock, int backlog );
-int  r_connect( int sock, sockaddr * name, int namelen );
-int  r_accept( int sock, sockaddr * address, int * address_len );
-int  r_sendto( int sock,  const void * buffer, uint32_t length, const sockaddr * to, int tolen );
+int  r_socket(int domain, int type, int protocol);
+int  r_bind(int sock, const sockaddr_in *name);
+int  r_listen(int sock, int backlog );
+int  r_connect(int sock, const sockaddr_in *name);
+int  r_accept(int sock, sockaddr_in *address);
+int  r_sendto( int sock,  const void * buffer, uint32_t length, const sockaddr_in *to);
 int  r_send(int sock,  const void * buffer, uint32_t length);
-int  r_recvfrom(int sock, void * buffer, uint32_t length, sockaddr * from, int * fromlen );
+int  r_recvfrom(int sock, void * buffer, uint32_t length, sockaddr_in *from);
 int  r_recv(int sock, void * buffer, uint32_t length);
-int  r_getpeername(int sock, sockaddr *address, int *address_len);
+int  r_getpeername(int sock, sockaddr_in *address_in);
 int  r_setsockopt( int sock, int level, int option_name, const void * optval,
                  int option_len );
 int  r_closesocket( int sock );
