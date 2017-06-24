@@ -33,10 +33,7 @@ Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
 #include <stdio.h>
 #include <string.h>
-#include "t4define.h"
-#if defined(__GNUC__)
 #include "r_tcpip_private.h"
-#endif /* #if defined(__GNUC__) */
 #include "type.h"
 #include "r_t4_itcpip.h"
 #if defined(_ETHER)

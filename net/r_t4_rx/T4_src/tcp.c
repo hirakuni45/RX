@@ -31,13 +31,9 @@
 /***********************************************************************************************************************
 Includes   <System Includes> , "Project Includes"
 ***********************************************************************************************************************/
-#include "t4define.h"
-
 #include <stdio.h>
 #include <string.h>
-#if defined(__GNUC__)
 #include "r_tcpip_private.h"
-#endif /* #if defined(__GNUC__) */
 #include "type.h"
 #include "r_t4_itcpip.h"
 #if defined(_ETHER)
@@ -854,9 +850,9 @@ if(ptcph->dport == hs2net(_tcp_tcb->loc_port)) {
                 sum16 = _cksum(&phdr, sizeof(_TCP_PHDR), 0);
                 sum16 = _cksum(ptcph, seg_size, ~hs2net(sum16));
 				if(sum16 != 0) {
-dump_ip("src:", phdr.sadr);
-dump_ip("dst:", phdr.dadr);
-printf("sum16 error: %d\n", (int)sum16);
+// dump_ip("src:", phdr.sadr);
+// dump_ip("dst:", phdr.dadr);
+// printf("sum16 error: %d\n", (int)sum16);
                     report_error(_ch_info_tbl->_ch_num, RE_TCP_HEADER2, data_link_buf_ptr);
                     goto _err_proc_rcv;
                 }

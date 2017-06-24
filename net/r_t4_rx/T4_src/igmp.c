@@ -6,10 +6,9 @@
  * @file
  * source ver 1.00 2015/11/12 thu
  */
-#include "t4define.h"
-
 #include <stdio.h>
 #include <string.h>
+#include "r_tcpip_private.h"
 #include "type.h"
 #include "r_t4_itcpip.h"
 #include "global.h"
