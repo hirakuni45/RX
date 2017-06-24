@@ -36,7 +36,6 @@ Includes <System Includes> ,
 #include <stdlib.h>
 #include <string.h>
 #include "dhcp.h"
-
 #include "r_t4_rx/src/config_tcpudp.h"
 
 static void dhcp_dont_care(dhcp_inf_t* pt_dhcpinf);
