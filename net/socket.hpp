@@ -8,6 +8,7 @@
 //=====================================================================//
 #include <cstdint>
 #include <errno.h>
+#include "common/format.hpp"
 #include "r_socket_rx/r_socket_rx_if.h"
 #include "ip_adrs.hpp"
 
@@ -114,6 +115,24 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ソース・アドレスの取得
+			@return ソース・アドレス
+		*/
+		//-----------------------------------------------------------------//
+		const ip_adrs& get_src_adrs() const { return src_adrs_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ソース・ポートの取得
+			@return ソース・ポート
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_src_port() const { return src_port_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  接続先アドレスの取得
 			@return 接続先アドレス
 		*/
@@ -128,6 +147,24 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		uint16_t get_dst_port() const { return dst_port_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ディスクリプタの取得
+			@return ディスクリプタ
+		*/
+		//-----------------------------------------------------------------//
+		int get_desc() const { return fd_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  接続の確認
+			@return 接続なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool connected() const { return task_ == task::connected; }
 
 
 		//-----------------------------------------------------------------//
@@ -268,7 +305,8 @@ namespace net {
 				break;
 
 			case task::close:
-				r_closesocket(fd_);
+				r_close(fd_);
+				fd_ = -1;
 				task_ = task::idle;
 				break;
 
@@ -386,11 +424,12 @@ namespace net {
 		void close()
 		{
 			if(afd_ >= 0) {
-				r_closesocket(afd_);
+				r_close(afd_);
 				afd_ = -1;
 			}
 			if(fd_ >= 0) {
-				r_closesocket(fd_);
+				int ret = r_close(fd_);
+				debug_format("Socket close: %d, %d\n") % ret % fd_;
 				fd_ = -1;
 			}
 			task_ = task::idle;
@@ -410,5 +449,75 @@ namespace net {
 	};
 
 	template <class ETHER_IO> bool socket<ETHER_IO>::init_ = false;
-}
 
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  socket 文字出力テンプレートクラス
+		@param[in]	ID		スタテッック領域の識別子として使用
+		@param[in]	SIZE	バッファ・サイズ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t SIZE>
+	class socket_string
+	{
+	public:
+		typedef utils::fixed_string<SIZE + 1> STR;
+
+	private:
+		STR		str_;
+		int		fd_;
+
+	public:
+		socket_string() : str_(), fd_(-1) { }
+
+		void clear() {
+			str_.clear();
+		}
+
+		void flush() {
+			if(str_.size() > 0) {
+				if(fd_ >= 0) {
+					uint32_t len = str_.size();
+					const char* p = str_.c_str();
+#if 0
+					while(len > 0) {
+						uint32_t l = len;
+						if(l >= 2048) {
+							l = 2048;
+						}
+						r_send(fd_, p, l);
+						len -= l;
+						p += l;
+					}
+#else
+utils::format("%d:   %s\n") % fd_ % p;
+					r_send(fd_, p, len);
+#endif				
+				} else {
+					utils::format("ether_string: FD is null.\n");
+				}
+			}
+			clear();
+		}
+
+		void operator() (char ch) {
+			if(ch == '\n') {
+				str_ += '\r';  // 改行を「CR+LF」とする
+				if(str_.size() >= (str_.capacity() - 1)) {
+					flush();
+				}
+			}
+			str_ += ch;
+			if(str_.size() >= (str_.capacity() - 1)) {
+				flush();
+			}
+		}
+
+		uint32_t size() const { return str_.size(); }
+
+		void set_fd(int fd) { fd_ = fd; }
+
+		STR& at_str() { return str_; }
+	};
+}

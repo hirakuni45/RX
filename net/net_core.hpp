@@ -7,9 +7,9 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "net/dhcp_client.hpp"
+#include "net/ip_adrs.hpp"
 #include "net/socket.hpp"
-
-#include "net/r_tcpip_private.h"
+#include "net/r_t4_rx/src/config_tcpudp.h"
 
 namespace net {
 
@@ -40,9 +40,6 @@ namespace net {
 		typedef dhcp_client<ETHER_IO> DHCP;
 		DHCP		dhcp_;
 
-		typedef socket<ETHER_IO> SOCKET;
-		SOCKET		socket_;
-
 		task		task_;
 
 		uint8_t		link_interval_;
@@ -52,8 +49,6 @@ namespace net {
 		ip_adrs		gw_;
 		ip_adrs		dns_;
 		ip_adrs		dns2_;
-
-///		uint32_t	tcpudp_work_[21504 / sizeof(uint32_t)];
 
 		void set_tcpudp_env_()
 		{
@@ -73,7 +68,7 @@ namespace net {
 			@param[in]	io	インサーネット・ドライバー・クラス
 		*/
 		//-----------------------------------------------------------------//
-		net_core(ETHER_IO& io) : io_(io), dhcp_(io), socket_(io),
+		net_core(ETHER_IO& io) : io_(io), dhcp_(io),
 			task_(task::wait_link), link_interval_(0),
 			ip_(192, 168, 3, 20), mask_(255, 255, 255, 0), gw_(192, 168, 3, 1),
 			dns_(192, 168, 3, 1), dns2_()
@@ -194,45 +189,15 @@ namespace net {
 				break;
 
 			case task::setup_tcpudp:
-				{
-#if 1
-					if(!socket<ETHER_IO>::start()) {
-						task_ = task::stall;
-						break;
-					}
-#else
-					// Get the size of the work area used by the T4 (RAM size).
-					uint32_t ramsize = tcpudp_get_ramsize();
-					if(ramsize > (sizeof(tcpudp_work_))) {
-						// Then reserve as much memory array for the work area as the size
-						// indicated by the returned value.
-						task_ = task::stall;
-						break;
-					}
-					// Initialize the TCP/IP
-					auto ercd = tcpudp_open(tcpudp_work_);
-					if(ercd != E_OK) {
-						task_ = task::stall;
-						break;						
-					}
-
-					const uint8_t* ip = tcpudp_env[0].ipaddr;
-					utils::format("TCP/IP start: (%d.%d.%d.%d) %u bytes\n")
-						% static_cast<int>(ip[0])
-						% static_cast<int>(ip[1])
-						% static_cast<int>(ip[2])
-						% static_cast<int>(ip[3])
-						% ramsize;
-#endif
+				if(!socket<ETHER_IO>::start()) {
+					task_ = task::stall;
+				} else {
 					task_ = task::main_init;
 				}
 				break;
 
 			case task::main_init:
 				io_.link_process();
-
-///				socket_.open(3000, false, ip_adrs(192,168,3,7));  // client socket
-				socket_.open(3000);  // server socket
 
 				task_ = task::main_loop;
 				break;
@@ -253,17 +218,6 @@ namespace net {
 				}
 
 
-				socket_.service();
-				{
-					char tmp[64 + 1];
-					int ret = socket_.recv(tmp, sizeof(tmp) - 1);
-					if(ret > 0) {
-						tmp[ret] = 0;
-						utils::format("%s\n") % tmp;
-						socket_.send(tmp, ret);
-					}
-				}
-
 				break;
 
 			case task::stall:
@@ -281,5 +235,14 @@ namespace net {
 				break;
 			}
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  リンクを確認する
+			@return 「true」なら、リンク
+		*/
+		//-----------------------------------------------------------------//
+		bool check_link() const { return task_ == task::main_loop; }
 	};
 }
