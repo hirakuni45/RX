@@ -34,6 +34,7 @@ Includes   <System Includes> , "Project Includes"
 
 #include "t4define.h"
 
+#include <stdio.h>
 #include <string.h>
 #if defined(__GNUC__)
 #include "r_tcpip_private.h"
@@ -441,6 +442,7 @@ __err__udp_rcv:
 ***********************************************************************************************************************/
 sint16 _udp_rcv_sub(_UDP_CB *pucb, _UDP_HDR *udph, _TCPUDP_PHDR *ph)
 {
+printf("udp_rcv_sub\n");
     T_UDP_CCEP far const *pcep;
     FN    fncd;
     uint16  sport;

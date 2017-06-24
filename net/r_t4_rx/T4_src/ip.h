@@ -241,7 +241,7 @@ void _ip_icmp_clear_tbl(_ARP_ENTRY *ae);
 _ARP_ENTRY *_ip_search_tbl(void);
 #endif
 void _ip_snd_icmp(void);
-uint16 _cksum(uchar *data, uint16 nbytes, uint16 sum0);
+uint16 _cksum(const void *data, uint16 nbytes, uint16 sum0);
 #if defined(M16C) || defined(R8C)   /* assembler */
 #pragma PARAMETER _cksum(a0, r0, r1);
 #elif defined(M16C80) || defined(M32C80) /* assembler */

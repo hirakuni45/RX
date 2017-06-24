@@ -59,6 +59,9 @@ Includes   <System Includes> , "Project Includes"
 
 extern void get_random_number(UB *data, UW len);
 
+void dump_tcb(const _TCB *ptr);
+void dump_ip(const char *head, const uint8_t *ip);
+
 /***********************************************************************************************************************
 Macro definitions
 ***********************************************************************************************************************/
@@ -188,7 +191,7 @@ void _process_tcpip(void)
     if (_process_flag == 0)
     {
         _process_flag = 1;
-        _tcp_timer_cnt = tcpudp_get_time();
+        _tcp_timer_cnt = get_tcpudp_time();
 
         if ( _old_time != _tcp_timer_cnt)
         {
@@ -253,7 +256,7 @@ void _process_tcpip(void)
             }
             for (counter = 0; counter < endpoint; counter++)
             {
-                if ((_udp_cb[counter].req.type != _UDP_API_NON) && \
+                if ((_udp_cb[counter].req.type != _UDP_API_NON) &&
                         (_udp_cb[counter].req.stat == _UDP_API_STAT_UNTREATED))
                 {
                     continue;
@@ -281,6 +284,7 @@ void _process_tcpip(void)
 
     return;
 }
+
 
 /***********************************************************************************************************************
 * Function Name: _proc_api
@@ -750,20 +754,17 @@ void _tcp_cpy_rwdat(void)
 ***********************************************************************************************************************/
 void _proc_rcv(void)
 {
-    _IP_PKT  *pip;
-    _IP_HDR  *piph;
+    _IP_PKT *pip;
+    _IP_HDR *piph;
     _ICMP_PKT *picmp;
     _ICMP_HDR *picmph;
     _TCP_HDR *ptcph;
-    _TCP_PHDR phdr;
-    uint16  seg_size, sum16;
-    uint16  counter = 0;
-    uint8_t  ch;
+    uint16 seg_size, sum16;
 
     _tcp_tcb = head_tcb;
 
-    for (ch = 0; ch < _t4_channel_num; ch++)
-    {
+    uint8_t ch;
+    for(ch = 0; ch < _t4_channel_num; ch++) {
         _ch_info_tbl = &_ch_info_head[ch];
         _ether_proc_rcv();
 
@@ -776,6 +777,7 @@ void _proc_rcv(void)
         {
             _ch_info_tbl->_rcvd = 1;
         } /*2669*/
+
 #if defined(_ETHER)
         if (_ch_info_tbl->_p_rcv_buf.ip_rcv == 0)
         {
@@ -790,7 +792,7 @@ void _proc_rcv(void)
             goto _err_proc_rcv;
         }
 
-
+		uint16  counter = 0;
         switch (piph->ip_proto_num)
         {
 #if defined(_TCP)
@@ -800,12 +802,20 @@ void _proc_rcv(void)
                 while (counter != __tcpcepn)
                 {
                     _tcp_tcb = &head_tcb[counter];
+#if 0
+if(ptcph->dport == hs2net(_tcp_tcb->loc_port)) {
+	printf("sport: %d, rem_port: %d\n", (int)hs2net(ptcph->sport), (int)_tcp_tcb->rem_port);
+	printf("ch_num: %d, cepatr: %d\n", (int)_ch_info_tbl->_ch_num, (int)tcp_ccep[counter].cepatr);
+	dump_ip("rem:", _tcp_tcb->rem_ip);
+	dump_ip("src:", piph->ip_src);
+}
+#endif
                     if ((ptcph->sport == hs2net(_tcp_tcb->rem_port))
                             && (ptcph->dport == hs2net(_tcp_tcb->loc_port))
                             && (_cmp_ipaddr(piph->ip_src, _tcp_tcb->rem_ip) == 0)
                             && (_ch_info_tbl->_ch_num == tcp_ccep[counter].cepatr)
-                            && (  (_tcp_tcb->status != _TCPS_LISTEN)
-                                  || ((_tcp_tcb->status == _TCPS_LISTEN) && \
+                            && ( (_tcp_tcb->status != _TCPS_LISTEN)
+                                  || ((_tcp_tcb->status == _TCPS_LISTEN) &&
                                       (_tcp_tcb->nxt_status == _TCPS_SYN_RECEIVED)))
                             && (_tcp_tcb->status != _TCPS_CLOSED))
                     {
@@ -834,16 +844,19 @@ void _proc_rcv(void)
                         goto _err_proc_rcv;
                     }
                 }
-                _cpy_ipaddr(phdr.sadr, piph->ip_src);
-                _cpy_ipaddr(phdr.dadr, piph->ip_dst);
+			    _TCP_PHDR phdr;
+				_cpy_ipaddr(phdr.sadr, piph->ip_src);
+				_cpy_ipaddr(phdr.dadr, piph->ip_dst);
                 phdr.reserve = 0;
                 phdr.prtcl = _IPH_TCP;
                 seg_size = net2hs(piph->ip_total_len) - _IP_HLEN_MIN;
                 phdr.len = hs2net(seg_size);
-                sum16 = _cksum((uchar *) & phdr, sizeof(_TCP_PHDR), 0);
-                sum16 = _cksum((uchar *)ptcph, seg_size, ~hs2net(sum16));
-                if (sum16 != 0)
-                {
+                sum16 = _cksum(&phdr, sizeof(_TCP_PHDR), 0);
+                sum16 = _cksum(ptcph, seg_size, ~hs2net(sum16));
+				if(sum16 != 0) {
+dump_ip("src:", phdr.sadr);
+dump_ip("dst:", phdr.dadr);
+printf("sum16 error: %d\n", (int)sum16);
                     report_error(_ch_info_tbl->_ch_num, RE_TCP_HEADER2, data_link_buf_ptr);
                     goto _err_proc_rcv;
                 }
@@ -2383,7 +2396,7 @@ void _tcp_snd(void)
                 {
                     if (_tcp_tcb->nxt_status == _TCPS_FIN_WAIT1)
                     {
-                        _tcp_tcb->ack_wait_timer = tcpudp_get_time();
+                        _tcp_tcb->ack_wait_timer = get_tcpudp_time();
                         _tcp_tcb->ack_wait_timercnt = _TCP_FIN_WAIT1_SND_WAIT;
                     }
                 }
@@ -2660,6 +2673,7 @@ uint16  _tcp_is_tcb_queue_over(uint16 api_type, _TCB* pTcb,  _TCP_CB* pTcpcb)
     return bResult;
 }
 
+
 /***********************************************************************************************************************
 * Function Name: _tcp_call_callback
 * Description  :
@@ -2692,6 +2706,7 @@ uint16 _tcp_call_callback(ID cepid, FN fncd, VP p_parblk)
 
     return 0;
 }
+
 
 /***********************************************************************************************************************
 * Function Name: _tcp_api_type_to_fn
@@ -2774,6 +2789,7 @@ ER _tcp_recv_polling(_TCB* pTcb, uchar *buf, uint16 size)
     return api_dsiz;
 }
 
+
 void _tcp_init_callback_info(_TCP_CB* pCallbackInfo)
 {
     memset((void*)pCallbackInfo, 0, sizeof(_TCP_CB));
@@ -2782,3 +2798,18 @@ void _tcp_init_callback_info(_TCP_CB* pCallbackInfo)
 #endif /* _TCP */
 
 
+void dump_tcb(const _TCB *ptr)
+{
+	printf("TCB:\n");
+	printf("  rem_port: %d\n", (int)hs2net(ptr->rem_port));
+	printf("  loc_port: %d\n", (int)hs2net(_tcp_tcb->loc_port));
+	printf("  rem_ip: %d\n", (int)ptr->rem_ip);
+///                            && (_ch_info_tbl->_ch_num == tcp_ccep[counter].cepatr)
+	printf("  status: %d\n", (int)ptr->status);
+	printf("  nxt_status: %d\n", (int)ptr->nxt_status);
+}
+
+void dump_ip(const char *head, const uint8_t *ip)
+{
+	printf("%s %d,%d,%d,%d\n", head, (int)ip[0], (int)ip[1], (int)ip[2], (int)ip[3]);
+}

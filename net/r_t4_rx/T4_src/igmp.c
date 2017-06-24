@@ -12,6 +12,7 @@
 #include <string.h>
 #include "type.h"
 #include "r_t4_itcpip.h"
+#include "global.h"
 
 #include "igmp.h"
 
@@ -23,16 +24,7 @@
 
 const uint8_t IGMP_BENDER_CODE[3] = {0x01,0x00,0x5E};               /* multicast packet mac head 3byte */
 
-
-extern uint16_t get_timer(void);
-
-/// extern UB   _myethaddr[][6];
-/// extern TCPUDP_ENV tcpudp_env[];
-
-extern UB *data_link_buf_ptr;
-
-IGMP_GROUP_ARRAY IGMP_WK[MULTI_CAST_MAX_GROUP_COUNT];               /* multicast group memory */
-
+static IGMP_GROUP_ARRAY IGMP_WK[MULTI_CAST_MAX_GROUP_COUNT];               /* multicast group memory */
 
 static void make_igmp_etherLayerHeader(IGMP_PACKET_EX *sendPacketPt, IGMP_GROUP_ARRAY *settingPt){
     memcpy(sendPacketPt->etherLay.eh_src, _myethaddr[settingPt->RJ45port], EP_ALEN);

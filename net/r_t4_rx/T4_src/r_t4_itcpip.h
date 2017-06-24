@@ -543,7 +543,7 @@ extern "C"
 	void ena_int(void);                 /* temporarily enable interrupt function        */
 	void dis_int(void);                 /* temporarily disable interrupt function       */
 	void tcpudp_act_cyc(uint8_t cycact);           /* Control TCP cyclic processing start/stop     */
-	uint16_t tcpudp_get_time(void);               /* Get time information                         */
+	uint16_t get_tcpudp_time(void);               /* Get time information                         */
 	void tcp_api_slp(int16_t cepid);               /* Wait for completion of TCP API               */
 	void tcp_api_wup(int16_t cepid);               /* Cancel the wait state of TCP API completion  */
 	void udp_api_slp(int16_t cepid);               /* Wait for completion of UDP API               */
