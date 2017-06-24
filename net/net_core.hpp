@@ -7,9 +7,9 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "net/dhcp_client.hpp"
-
-// #include "r_t4_rx/src/config_tcpudp.h"
 #include "net/socket.hpp"
+
+#include "net/r_tcpip_private.h"
 
 namespace net {
 
@@ -29,7 +29,6 @@ namespace net {
 			halt,		// Halt !!!
 			wait_link,	// リンクアップを待つ
 			wait_dhcp,	// DHCP IP アドレスの取得を待つ
-			setup_ip,	// IP アドレスを直接設定
 			setup_tcpudp,
 			main_init,	// メイン初期化
 			main_loop,	// メインループ
@@ -48,34 +47,23 @@ namespace net {
 
 		uint8_t		link_interval_;
 
+		ip_adrs		ip_;
+		ip_adrs		mask_;
+		ip_adrs		gw_;
+		ip_adrs		dns_;
+		ip_adrs		dns2_;
+
 ///		uint32_t	tcpudp_work_[21504 / sizeof(uint32_t)];
 
 		void set_tcpudp_env_()
 		{
 			const DHCP_INFO& info = dhcp_.get_info();
 			info.list();
-
-			int ch = 0;
-			memcpy(tcpudp_env[ch].ipaddr,   info.ipaddr,   4);
-			memcpy(tcpudp_env[ch].maskaddr, info.maskaddr, 4);
-			memcpy(tcpudp_env[ch].gwaddr,   info.gwaddr,   4);
-
-//			memcpy(dnsaddr1, info.dnsaddr, 4);
-//			memcpy(dnsaddr2, info.dnsaddr2, 4);
-		}
-
-
-		void fix_tcpudp_env_()
-		{
-			// 固定 IP の場合
-			static const uint8_t ipaddr[]   = { 192,168,3,20 };
-			static const uint8_t maskaddr[] = { 255,255,255,0 };
-			static const uint8_t gwaddr[]   = { 192,168,3,0 };
-
-			int ch = 0;
-			memcpy(tcpudp_env[ch].ipaddr,   ipaddr,   4);
-			memcpy(tcpudp_env[ch].maskaddr, maskaddr, 4);
-			memcpy(tcpudp_env[ch].gwaddr,   gwaddr,   4);
+			ip_.set(info.ipaddr);
+			mask_.set(info.maskaddr);
+			gw_.set(info.gwaddr);
+			dns_.set(info.dnsaddr);
+			dns2_.set(info.dnsaddr2);
 		}
 
 	public:
@@ -86,8 +74,55 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		net_core(ETHER_IO& io) : io_(io), dhcp_(io), socket_(io),
-			task_(task::wait_link), link_interval_(0)
+			task_(task::wait_link), link_interval_(0),
+			ip_(192, 168, 3, 20), mask_(255, 255, 255, 0), gw_(192, 168, 3, 1),
+			dns_(192, 168, 3, 1), dns2_()
 			{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  IP アドレスを参照
+			@return IP アドレス
+		*/
+		//-----------------------------------------------------------------//
+		const ip_adrs& get_ip_adrs() const { return ip_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  MASK を参照
+			@return MASK
+		*/
+		//-----------------------------------------------------------------//
+		const ip_adrs& get_mask() const { return mask_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  GW アドレスを参照
+			@return GW アドレス
+		*/
+		//-----------------------------------------------------------------//
+		const ip_adrs& get_gw_adrs() const { return gw_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  DNS アドレスを参照
+			@return DNS アドレス
+		*/
+		//-----------------------------------------------------------------//
+		const ip_adrs& get_dns_adrs() const { return dns_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  DNS2 アドレスを参照
+			@return DNS2 アドレス
+		*/
+		//-----------------------------------------------------------------//
+		const ip_adrs& get_dns2_adrs() const { return dns2_; }
 
 
 		//-----------------------------------------------------------------//
@@ -132,7 +167,7 @@ namespace net {
 					bool link = io_.link_process();
 					if(link) {
 						utils::format("Ether Link UP\n");
-						dhcp_.start(200);  // 2 sec
+						dhcp_.start();
 						task_ = task::wait_dhcp;
 					}
 				}
@@ -145,17 +180,17 @@ namespace net {
 					set_tcpudp_env_();
 					task_ = task::setup_tcpudp;
 				} else if(dhcp_.get_info().state == DHCP_INFO::state_t::timeout) {
-					utils::format("DHCP Timeout\n");
-					task_ = task::setup_ip;
+					utils::format("DHCP Timeout (setup fixed)\n");
+					task_ = task::setup_tcpudp;
 				} else if(dhcp_.get_info().state == DHCP_INFO::state_t::error) {
 					utils::format("DHCP Error\n");
 					task_ = task::halt;
 				}
-				break;
-
-			case task::setup_ip:
-				fix_tcpudp_env_();
-				task_ = task::setup_tcpudp;
+				memcpy(tcpudp_env[0].ipaddr,   ip_.get(),   4);
+				memcpy(tcpudp_env[0].maskaddr, mask_.get(), 4);
+				memcpy(tcpudp_env[0].gwaddr,   gw_.get(),   4);
+//				memcpy(dnsaddr1, info.dnsaddr, 4);
+//				memcpy(dnsaddr2, info.dnsaddr2, 4);
 				break;
 
 			case task::setup_tcpudp:
@@ -219,7 +254,15 @@ namespace net {
 
 
 				socket_.service();
-
+				{
+					char tmp[64 + 1];
+					int ret = socket_.recv(tmp, sizeof(tmp) - 1);
+					if(ret > 0) {
+						tmp[ret] = 0;
+						utils::format("%s\n") % tmp;
+						socket_.send(tmp, ret);
+					}
+				}
 
 				break;
 

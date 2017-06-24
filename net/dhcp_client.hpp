@@ -514,10 +514,11 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  DHCP サーバーから、IP アドレスを取得
-			@param[in]	timeout	DHCP 取得最大時間
+			@param[in]	timeout	DHCP 取得最大時間（10ms 単位）@n
+						※通常２秒
 		*/
 		//-----------------------------------------------------------------//
-		void start(uint32_t timeout)
+		void start(uint32_t timeout = 2 * (1000 / 10))
 		{
 			memcpy(info_.macaddr, io_.get_mac(), 6);
 

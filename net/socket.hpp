@@ -8,7 +8,7 @@
 //=====================================================================//
 #include <cstdint>
 #include <errno.h>
-#include "r_socket_rx_if.h"
+#include "r_socket_rx/r_socket_rx_if.h"
 #include "ip_adrs.hpp"
 
 #define SOCKET_DEBUG
@@ -154,7 +154,7 @@ namespace net {
 			fd_ = r_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 			if(fd_ >= 0) {
 				if(server && adrs.is_any()) {
-					src_adrs_.set(tcpudp_env[0].ipaddr);
+///					src_adrs_.set(tcpudp_env[0].ipaddr);
 				} else { 
 					src_adrs_ = adrs;
 				}
@@ -198,7 +198,7 @@ namespace net {
 				{
 					sockaddr_in a;
 					make_adrs_(src_adrs_, src_port_, a);
-					int ret = r_connect(fd_, reinterpret_cast<sockaddr*>(&a), sizeof(a));
+					int ret = r_connect(fd_, &a);
 					if(ret == E_OK) {
 						debug_format("Socket connect: %d, %s (%d)\n") % fd_
 							% src_adrs_.c_str() % static_cast<int>(src_port_);
@@ -212,12 +212,13 @@ namespace net {
 				{
 					sockaddr_in a;
 					make_adrs_(src_adrs_, src_port_, a);
-					int ret = r_bind(fd_, reinterpret_cast<sockaddr*>(&a), sizeof(a));
+					int ret = r_bind(fd_, &a);
 					if(ret == E_OK) {
 						debug_format("Socket bind: %d, %s (%d)\n") % fd_
 							% src_adrs_.c_str() % static_cast<int>(src_port_);
 						task_ = task::listen;
 					} else {
+						debug_format("Socket bind error: %d\n") % ret;
 						task_ = task::close;
 					}
 				}
@@ -232,6 +233,7 @@ namespace net {
 						count_ = 0;
 						task_ = task::accept;
 					} else {
+						debug_format("Socket listen error: %d\n") % ret;
 						task_ = task::close;
 					}
 				}
@@ -240,8 +242,7 @@ namespace net {
 			case task::accept:
 				{
 					sockaddr_in a;
-					int len;
-					afd_ = r_accept(fd_, reinterpret_cast<sockaddr*>(&a), &len);
+					afd_ = r_accept(fd_, &a);
 					if(afd_ >= 0) {
 						dst_adrs_ = htonl(a.sin_addr.s_addr);
 						dst_port_ = htons(a.sin_port);
@@ -293,13 +294,13 @@ namespace net {
 				return -1;
 			}
 
-			if(task_ != task::conected) {
+			if(task_ != task::connected) {
 				return 0;
 			}
 
 			sockaddr_in a;
 			make_adrs_(adrs, port, a);
-			int ret = r_sendto(afd_, src, len, reinterpret_cast<sockaddr*>(&a), sizeof(a));
+			int ret = r_sendto(afd_, src, len, &a);
 			return ret;
 		}
 
@@ -318,7 +319,7 @@ namespace net {
 				return -1;
 			}
 
-			if(task_ != task::conected) {
+			if(task_ != task::connected) {
 				return 0;
 			}
 
@@ -343,13 +344,13 @@ namespace net {
 				return -1;
 			}
 
-			if(task_ != task::conected) {
+			if(task_ != task::connected) {
 				return 0;
 			}
 
 			sockaddr_in a;
 			make_adrs_(adrs, port, a);
-			int ret = r_recvfrom(afd_, dst, len, reinterpret_cast<sockaddr*>(&a), sizeof(a));
+			int ret = r_recvfrom(afd_, dst, len, &a);
 			return ret;
 		}
 
@@ -368,7 +369,7 @@ namespace net {
 				return -1;
 			}
 
-			if(task_ != task::conected) {
+			if(task_ != task::connected) {
 				return 0;
 			}
 
