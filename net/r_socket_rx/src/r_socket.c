@@ -1743,7 +1743,7 @@ int r_recvfrom( int sock, void * buffer, uint32_t length, sockaddr_in *remoteadd
 * Arguments    : sock - Socket descriptor returned from a previous call to socket
 * Return Value : E_OK for success, SOCKET_ERROR indicates an error.
 ******************************************************************************/
-int r_closesocket( int sock )
+int r_close( int sock )
 {
     ER ercd = E_OK;
     int  cepid;

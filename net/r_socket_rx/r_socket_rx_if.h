@@ -493,7 +493,7 @@ int  r_recv(int sock, void * buffer, uint32_t length);
 int  r_getpeername(int sock, sockaddr_in *address_in);
 int  r_setsockopt( int sock, int level, int option_name, const void * optval,
                  int option_len );
-int  r_closesocket( int sock );
+int  r_close( int sock );
 int  r_fcntl ( int sock, int command, int flags );
 int  r_select ( int nfds, r_fd_set *p_readfds, r_fd_set *p_writefds, r_fd_set *p_errorfds, r_timeval *timeout );
 
