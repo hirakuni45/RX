@@ -533,11 +533,10 @@ namespace net {
 					debug_format("Socket open error\n");
 					break;
 				}
-				debug_format("Start HTTP Server: '%s' port(%d), fd(%d)\n")
+				debug_format("Start HTTP Server: '%s' port(%d), desc(%d)\n")
 					% sock_.get_src_adrs().c_str()
 					% static_cast<int>(sock_.get_src_port())
 					% sock_.get_desc();
-				http_format::chaout().set_fd(sock_.get_desc());
 				task_ = task::wait_http;
 				break;
 
@@ -546,6 +545,7 @@ namespace net {
 					debug_format("HTTP Server: New connected, form: %s\n") % sock_.get_dst_adrs().c_str();
 					++count_;
 					line_man_.clear();
+					http_format::chaout().set_fd(sock_.get_desc());
 					task_ = task::main_loop;
 				}
 				break;
@@ -558,7 +558,7 @@ namespace net {
 					auto pos = analize_request(tmp, len);
 					if(pos > 0) {
 						tmp[len] = 0;
-						debug_format("HTTP Server: client -----\n%s-----\n") % tmp;
+///						debug_format("HTTP Server: client -----\n%s-----\n") % tmp;
 						char path[256];
 						path[0] = 0;
 						if(!line_man_.empty()) {

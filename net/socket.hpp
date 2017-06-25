@@ -57,6 +57,8 @@ namespace net {
 
 		task		task_;
 
+		uint32_t	timeout_;
+
 		static bool	init_;
 
 		static void make_adrs_(const ip_adrs& adr, uint16_t port, sockaddr_in& dst)
@@ -79,7 +81,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		socket(ETHER_IO& io) : io_(io), fd_(-1), afd_(-1), afd_back_(-1), count_(0),
 			src_adrs_(), src_port_(0), dst_adrs_(), dst_port_(0), server_(false),
-			task_(task::idle) { }
+			task_(task::idle), timeout_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -155,7 +157,13 @@ namespace net {
 			@return ディスクリプタ
 		*/
 		//-----------------------------------------------------------------//
-		int get_desc() const { return fd_; }
+		int get_desc() const {
+			if(task_ == task::connected) {
+				return afd_;
+			} else {
+				return fd_;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -201,9 +209,9 @@ namespace net {
 					% (server ? "Server" : "Client") % fd_;
 
 				// setup no-block mode
-				if(r_fcntl(fd_, F_SETFL, O_NONBLOCK) != E_OK) {
-					utils::format("r_fcntl: error\n");
-				}
+///				if(r_fcntl(fd_, F_SETFL, O_NONBLOCK) != E_OK) {
+///					utils::format("r_fcntl: error\n");
+///				}
 
 				server_ = server;
 				if(server) {
@@ -240,6 +248,7 @@ namespace net {
 						debug_format("Socket connect: %d, %s (%d)\n") % fd_
 							% src_adrs_.c_str() % static_cast<int>(src_port_);
 						afd_ = fd_;
+						fd_ = -1;
 						task_ = task::connected;
 					}
 				}
@@ -268,6 +277,7 @@ namespace net {
 						debug_format("Socket listen: %d\n") % fd_;
 						afd_back_ = 0;
 						count_ = 0;
+						timeout_ = 5000;  // 5 sec
 						task_ = task::accept;
 					} else {
 						debug_format("Socket listen error: %d\n") % ret;
@@ -283,10 +293,16 @@ namespace net {
 					if(afd_ >= 0) {
 						dst_adrs_ = htonl(a.sin_addr.s_addr);
 						dst_port_ = htons(a.sin_port);
-						debug_format("Socket accept: %d, %s (%d)\n") % fd_
+						debug_format("Socket accept: %d, %s (%d)\n") % afd_
 							% dst_adrs_.c_str() % static_cast<int>(dst_port_);
+						r_close(fd_);
 						task_ = task::connected;
 					} else {
+						if(timeout_ > 0) {
+							--timeout_;
+						} else {
+							task_ = task::close;
+						}
 						int n = errno;
 						if(n != afd_back_) {
 ///							debug_format("Socket accept state: %d\n") % n;
@@ -305,9 +321,12 @@ namespace net {
 				break;
 
 			case task::close:
-				r_close(fd_);
-				fd_ = -1;
-				task_ = task::idle;
+				{
+					int ret = r_close(afd_);
+					debug_format("Socket close: %d, %d\n") % ret % afd_;
+					afd_ = -1;
+					task_ = task::idle;
+				}
 				break;
 
 			default:
@@ -423,16 +442,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void close()
 		{
-			if(afd_ >= 0) {
-				r_close(afd_);
-				afd_ = -1;
-			}
-			if(fd_ >= 0) {
-				int ret = r_close(fd_);
-				debug_format("Socket close: %d, %d\n") % ret % fd_;
-				fd_ = -1;
-			}
-			task_ = task::idle;
+			task_ = task::close;
 		}
 
 
@@ -491,7 +501,6 @@ namespace net {
 						p += l;
 					}
 #else
-utils::format("%d:   %s\n") % fd_ % p;
 					r_send(fd_, p, len);
 #endif				
 				} else {
