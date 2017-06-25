@@ -21,9 +21,9 @@
 
 namespace {
 
-	typedef device::ETHERC0 ETHERC;      // Eternet Controller
+	typedef device::ETHERC0 ETHERC;      // Ethernet Controller
 	typedef device::EDMAC0 EDMAC;        // Ethernet DMA Controller
-	typedef chip::phy_base<ETHERC> PHY;  // Ethernet PHY
+	typedef chip::phy_base<ETHERC> PHY;  // Ethernet PHY (LAN8720)
 	typedef device::ether_io<ETHERC, EDMAC, PHY> ETHER_IO;
 	ETHER_IO 	ether_;
 
@@ -516,7 +516,7 @@ int main(int argc, char** argv)
 		sci_.start(115200, int_level);
 	}
 
-	utils::format("\nStart GR-KAEDE Ethernet Sample\n");
+	utils::format("\nStart GR-KAEDE Net Stack Sample\n");
 
 	// SD カード・クラスの初期化
 	sdc_.start();
