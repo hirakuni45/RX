@@ -233,7 +233,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void service()
 		{
-			if(fd_ < 0) return;
+			if(fd_ < 0 && afd_ < 0) return;
 
 			switch(task_) {
 			case task::idle:
@@ -296,6 +296,7 @@ namespace net {
 						debug_format("Socket accept: %d, %s (%d)\n") % afd_
 							% dst_adrs_.c_str() % static_cast<int>(dst_port_);
 						r_close(fd_);
+						fd_ = -1;
 						task_ = task::connected;
 					} else {
 						if(timeout_ > 0) {

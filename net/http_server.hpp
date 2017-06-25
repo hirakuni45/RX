@@ -530,10 +530,10 @@ namespace net {
 
 			case task::begin_http:
 				if(!sock_.open(http_port)) {
-					debug_format("Socket open error\n");
+					debug_format("HTTP Socket open error\n");
 					break;
 				}
-				debug_format("Start HTTP Server: '%s' port(%d), desc(%d)\n")
+				debug_format("HTTP Start Server: '%s' port(%d), desc(%d)\n")
 					% sock_.get_src_adrs().c_str()
 					% static_cast<int>(sock_.get_src_port())
 					% sock_.get_desc();
@@ -612,9 +612,9 @@ namespace net {
 
 			case task::disconnect:
 			default:
-///				debug_format("HTTP Server: disconnected\n");
-///				http_format::chaout().set_fd(-1);
-///				task_ = task::begin_http;
+				debug_format("HTTP Server: disconnected\n");
+				http_format::chaout().set_fd(-1);
+				task_ = task::begin_http;
 				break;
 			}
 		}
