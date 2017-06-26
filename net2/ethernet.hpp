@@ -45,11 +45,12 @@ namespace net {
 		ip_adrs		gw_;
 
 		struct arp_cash {
-			uint8_t	ip[4];
-			uint8_t	mac[6];
+			uint8_t		ip[4];
+			uint8_t		mac[6];
 		};
 		arp_cash	arp_cash_[ARPN];
 		uint32_t	arp_cash_num_;
+
 
 		bool check_brodcast_(const uint8_t* p) {
 			static uint8_t tbl[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
@@ -109,8 +110,20 @@ namespace net {
 		};
 
 
-		void install_arp_cash_(const arp_t& t)
+		bool install_arp_cash_(const arp_t& t)
 		{
+			if(arp_cash_num_ >= ARPN) {
+				return false;
+			}
+			for(uint32_t i = 0; i < arp_cash_num_; ++i) {				
+				if(std::memcmp(arp_cash_[i].ip, t.ip, 4) == 0) {
+					std::memcpy(arp_cash_[i].mac, t.mac, 6);
+					return true;
+				}
+			}
+			arp_cash_[arp_cash_num_] = t;
+			++arp_cash_num_;
+			return true;
 		}
 
 
