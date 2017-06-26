@@ -296,7 +296,7 @@ extern "C" {
 
 	int16_t lan_check_link(uint16_t lan_port_no)
 	{
-		return (ether_.check_link() ? 1 : 0);
+		return (ether_.check_phy_link() ? 1 : 0);
 	}
 
 
@@ -309,10 +309,10 @@ extern "C" {
 	void tcp_api_slp(int16_t cepid)
 	{
 		// same as udp_api_slp(). ->
-		ether_.enable_interrupt(false);
+///		ether_.enable_interrupt(false);
 		// check LAN link stat
-		ether_.link_process();
-		ether_.enable_interrupt();
+		ether_.service_link();
+///		ether_.enable_interrupt();
 		/*<-*/
 
 		// If user uses "Real time OS", user may define "sleep task" here.
@@ -322,10 +322,10 @@ extern "C" {
 	void udp_api_slp(int16_t cepid)
 	{
 		// R_ETHER_LinkProcess() is used in timer_interrupt(). It isn't necessary here. ->
-		ether_.enable_interrupt(false);
+///		ether_.enable_interrupt(false);
 		// check LAN link stat
-		ether_.link_process();
-		ether_.enable_interrupt();
+		ether_.service_link();
+///		ether_.enable_interrupt();
 		// If user uses "Real time OS", user may define "sleep task" here.
 	}
 
