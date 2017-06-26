@@ -11,6 +11,7 @@
 #include "common/net_tools.hpp"
 #include "common/format.hpp"
 #include "common/ip_adrs.hpp"
+#include "net2/ipv4.hpp"
 
 namespace net {
 
@@ -51,6 +52,8 @@ namespace net {
 		arp_cash	arp_cash_[ARPN];
 		uint32_t	arp_cash_num_;
 
+		ipv4		ipv4_;
+
 
 		bool check_brodcast_(const uint8_t* p) {
 			static uint8_t tbl[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
@@ -58,35 +61,11 @@ namespace net {
 		}
 
 
-		static const char* mac_str_(const uint8_t* p) {
-			static char tmp[20];
-			utils::sformat("%02X:%02X:%02X:%02X:%02X:%02X", tmp, sizeof(tmp))
-				% static_cast<uint32_t>(p[0])
-				% static_cast<uint32_t>(p[1])
-				% static_cast<uint32_t>(p[2])
-				% static_cast<uint32_t>(p[3])
-				% static_cast<uint32_t>(p[4])
-				% static_cast<uint32_t>(p[5]);
-			return tmp;
-		}
-
-
-		static const char* ip_str_(const uint8_t* p) {
-			static char tmp[17];
-			utils::sformat("%d.%d.%d.%d", tmp, sizeof(tmp))
-				% static_cast<int>(p[0])
-				% static_cast<int>(p[1])
-				% static_cast<int>(p[2])
-				% static_cast<int>(p[3]);
-			return tmp;
-		}
-
-
 		void dump_(const char* init, const header* h) {
 			utils::format("%ssrc(%s), dst(%s), type(%04X)\n")
 				% init
-				% mac_str_(h->src)
-				% mac_str_(h->dst)
+				% tools::mac_str(h->src)
+				% tools::mac_str(h->dst)
 				% static_cast<uint32_t>(tools::htons(h->type));
 		}
 
@@ -94,9 +73,11 @@ namespace net {
 		void parse_ipv4_(const header* h, const void* top, int32_t len)
 		{
 			if(std::memcmp(h->dst, eth_.get_mac(), 6) == 0) {  // 自分に宛てたフレーム
-				dump_("Match:    ", h);
+//				dump_("Match:    ", h);
+				ipv4_.parse(top, len, false);
 			} else if(check_brodcast_(h->dst)) {  // ブロード・キャスト
-				dump_("Brodcast: ", h);
+//				dump_("Brodcast: ", h);
+				ipv4_.parse(top, len, true);
 			}
 		}
 
@@ -115,6 +96,7 @@ namespace net {
 			if(arp_cash_num_ >= ARPN) {
 				return false;
 			}
+#if 0
 			for(uint32_t i = 0; i < arp_cash_num_; ++i) {				
 				if(std::memcmp(arp_cash_[i].ip, t.ip, 4) == 0) {
 					std::memcpy(arp_cash_[i].mac, t.mac, 6);
@@ -123,6 +105,7 @@ namespace net {
 			}
 			arp_cash_[arp_cash_num_] = t;
 			++arp_cash_num_;
+#endif
 			return true;
 		}
 
@@ -148,7 +131,9 @@ namespace net {
 				return false;
 			}
 
-			utils::format("ARP: src: %s, dst: %s\n") % ip_str_(r->src_ipa) % ip_str_(r->dst_ipa);
+			utils::format("ARP: src: %s, dst: %s\n")
+				% tools::ip_str(r->src_ipa)
+				% tools::ip_str(r->dst_ipa);
 
 			header eh;
 			std::memcpy(eh.dst, h->src, 6);
@@ -223,7 +208,6 @@ namespace net {
 					parse_ipv4_(h, top, len - sizeof(header));
 					break;
 
-				// 自分の IP アドレスに応答
 				case TYPE_ARP:
 					parse_arp_(h, top, len - sizeof(header));
 					break;
