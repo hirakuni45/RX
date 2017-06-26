@@ -2,6 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX64M グループ・ポート・マッピング @n
+			・ペリフェラル型に従って、ポートの設定をグループ化 @n
 			Copyright 2016, 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
@@ -150,7 +151,7 @@ namespace device {
 				}
 				break;
 
-			case peripheral::ETHERC0:  // only RMII mode
+			case peripheral::ETHERC0:  // only RMII mode, no linkup line
 				{
 					uint8_t  mii = enable ? 0b010001 : 0;
 					uint8_t rmii = enable ? 0b010010 : 0;
@@ -182,7 +183,7 @@ namespace device {
 				}
 				break;
 
-			case peripheral::ETHERCA:  // only RMII mode
+			case peripheral::ETHERCA:  // only RMII mode, no linkup line
 				{
 					uint8_t  mii = enable ? 0b010001 : 0;
 					uint8_t rmii = enable ? 0b010010 : 0;

@@ -11,6 +11,7 @@
 #include "common/format.hpp"
 #include "chip/phy_base.hpp"
 
+// setup byte order
 #if (defined(__GNUC__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__))
 #ifndef BIG_ENDIAN
 #define BIG_ENDIAN
