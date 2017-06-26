@@ -16,6 +16,8 @@
 #error "ether_io.hpp requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
 #endif
 
+#define ETHRC_DEBUG
+
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -121,6 +123,12 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN = 4, uint32_t RXDN = 4>
 	class ether_io {
+
+#ifndef ETHRC_DEBUG
+		typedef utils::null_format debug_format;
+#else
+		typedef utils::format debug_format;
+#endif
 
 		static const int EMAC_BUFSIZE = 1536;  			// Must be 32-byte aligned
 
@@ -247,14 +255,14 @@ namespace device {
 
 	private:
 		// アライメントを使う場合、注意
-		volatile descriptor_s rx_descriptors_[RXDN] __attribute__ ((aligned(32)));
-		volatile descriptor_s tx_descriptors_[TXDN] __attribute__ ((aligned(32)));
-		volatile etherbuffer_s ether_buffers_ __attribute__ ((aligned(32)));
-		volatile descriptor_s* app_rx_desc_;
-		volatile descriptor_s* app_tx_desc_;
+		volatile descriptor_s	rx_descriptors_[RXDN] __attribute__ ((aligned(32)));
+		volatile descriptor_s	tx_descriptors_[TXDN] __attribute__ ((aligned(32)));
+		volatile etherbuffer_s	ether_buffers_ __attribute__ ((aligned(32)));
+		volatile descriptor_s*	app_rx_desc_;
+		volatile descriptor_s*	app_tx_desc_;
 
-		static volatile uint8_t	mpd_flag_;
-		static volatile void*	intr_task_;
+		static volatile bool	mpd_flag_;
+		static volatile void* 	intr_task_;
 
 		PHY		phy_;
 
@@ -360,16 +368,16 @@ namespace device {
 			{
 				uint32_t a = reinterpret_cast<uint32_t>(&ether_buffers_);
 				if(a & 0x1f) {  // 32 bytes aligned test
-					utils::format("Alignd error: Ether buffer adr: %08X\n") % a;
+					debug_format("Alignd error: Ether buffer adr: %08X\n") % a;
 				}
 			}
 			uint32_t rxa = reinterpret_cast<uint32_t>(app_rx_desc_);
 			if(rxa & 0x1f) {  // 32 bytes aligned test
-				utils::format("Alignd error: Ether RX adr: %08X\n") % rxa;
+				debug_format("Alignd error: Ether RX adr: %08X\n") % rxa;
 			}
 			uint32_t txa = reinterpret_cast<uint32_t>(app_tx_desc_);
 			if(txa & 0x1f) {  // 32 bytes aligned test
-				utils::format("Alignd error: Ether TX adr: %08X\n") % txa;
+				debug_format("Alignd error: Ether TX adr: %08X\n") % txa;
 			}
 			EDMAC::RDLAR = rxa;
 			EDMAC::TDLAR = txa;
@@ -439,14 +447,14 @@ namespace device {
 				ETHRC::ECMR.DM  = 0;
 				ETHRC::ECMR.RTM = 1;
 				ret = OK;
-				utils::format("PHY Link 100Mbps / Half\n");
+				debug_format("PHY Link 100Mbps / Half\n");
 				break;
 
 			case chip::phy_link_state::LINK_10H:
 				ETHRC::ECMR.DM  = 0;
 				ETHRC::ECMR.RTM = 0;
 				ret = OK;
-				utils::format("PHY Link 10Mbps / Half\n");
+				debug_format("PHY Link 10Mbps / Half\n");
 				break;
 
 			// Full duplex link
@@ -455,7 +463,7 @@ namespace device {
 				ETHRC::ECMR.RTM = 1;
 				full_duplex = true;
 				ret = OK;
-				utils::format("PHY Link 100Mbps / Full\n");
+				debug_format("PHY Link 100Mbps / Full\n");
 				break;
 
 			case chip::phy_link_state::LINK_10F:
@@ -463,11 +471,11 @@ namespace device {
 				ETHRC::ECMR.RTM = 0;
 				full_duplex = true;
 				ret = OK;
-				utils::format("PHY Link 10Mbps / Full\n");
+				debug_format("PHY Link 10Mbps / Full\n");
 				break;
 
 			default:
-				utils::format("PHY No Link\n");
+				debug_format("PHY No Link\n");
 				ret = ERROR;
 				break;
 			}
@@ -558,7 +566,7 @@ namespace device {
 		}
 
 
-		// EDMA task
+		// EDMA interrupt task
 		static void dmac_task_() __attribute__ ((interrupt))
 		{
 			uint32_t status_ecsr = ETHRC::ECSR();
@@ -579,9 +587,9 @@ namespace device {
 					}
 				}
 #endif
-			// When the Magic Packet detection interrupt is generated
+				// When the Magic Packet detection interrupt is generated
 				if(status_ecsr & EMAC_MPD_INT) {
-					mpd_flag_ = FLAG_ON;
+					mpd_flag_ = true;
 				}
 				// Because each bit of the ECSR register is cleared when one is written, 
 				// the value read from the register is written and the bit is cleared. 
@@ -739,7 +747,7 @@ namespace device {
 		{
 			/* Initialize the flags */
 			transfer_enable_ = false;
-			mpd_flag_        = FLAG_OFF;
+			mpd_flag_        = false;
 			lchng_flag_      = FLAG_OFF;
 
 			mac_addr_[0] = mac_addr[0];
@@ -1025,7 +1033,7 @@ namespace device {
 
 			// Initialize the flags
 			transfer_enable_  = false;
-			mpd_flag_         = FLAG_OFF;
+			mpd_flag_         = false;
 			lchng_flag_       = FLAG_OFF;
 
 			return true;
@@ -1054,8 +1062,8 @@ namespace device {
 		bool service_link()
 		{
 			// When the magic packet is detected.
-			if(FLAG_ON == mpd_flag_) {
-				mpd_flag_ = FLAG_OFF;
+			if(mpd_flag_) {
+				mpd_flag_ = false;
 				callback_wake_on_lan();
 			}
 
@@ -1136,7 +1144,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void callback_link_on()
 		{
-			utils::format("EtherC Link-ON (callback)\n");
+			debug_format("EtherC Link-ON (callback)\n");
 			stat_.link_ = true;
 		}
 
@@ -1148,7 +1156,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void callback_link_off()
 		{
-			utils::format("EtherC Link-OFF (callback)\n");
+			debug_format("EtherC Link-OFF (callback)\n");
 			stat_.link_ = false;
 		}
 
@@ -1160,7 +1168,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void callback_wake_on_lan()
 		{
-			utils::format("EtherC Wake On Lan (callback)\n");
+			debug_format("EtherC Wake On Lan (callback)\n");
 			// Please add necessary processing when magic packet is detected.
 			//
 			// After the close function is called, the open function is called 
@@ -1208,7 +1216,7 @@ namespace device {
 	};
 
 	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN, uint32_t RXDN>
-		volatile uint8_t ether_io<ETHRC, EDMAC, PHY, TXDN, RXDN>::mpd_flag_;
+		volatile bool ether_io<ETHRC, EDMAC, PHY, TXDN, RXDN>::mpd_flag_;
 
 	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN, uint32_t RXDN>
 		volatile void* ether_io<ETHRC, EDMAC, PHY, TXDN, RXDN>::intr_task_;
