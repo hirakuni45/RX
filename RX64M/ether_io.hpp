@@ -7,19 +7,11 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "common/vect.h"
 #include "common/format.hpp"
 #include "chip/phy_base.hpp"
 
-// setup byte order
-#if (defined(__GNUC__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__))
-#ifndef BIG_ENDIAN
-#define BIG_ENDIAN
-#endif
-#elif (defined(__GNUC__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))
-#ifndef LITTLE_ENDIAN
-#define LITTLE_ENDIAN
-#endif
+#if defined(LITTLE_ENDIAN)
+#elif defined(BIG_ENDIAN)
 #else
 #error "ether_io.hpp requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
 #endif
@@ -123,14 +115,14 @@ namespace device {
 		@param[in]	ETHRC	インサーネット・コントローラー
 		@param[in]	EDMAC	インサーネットＤＭＡコントローラー
 		@param[in]	PHY		物理層コントローラー
+		@param[in]	TXDN	送信バッファ数（標準４）
+		@param[in]	RXDN	受信バッファ数（標準４）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHRC, class EDMAC, class PHY>
+	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN = 4, uint32_t RXDN = 4>
 	class ether_io {
 
 		static const int EMAC_BUFSIZE = 1536;  			// Must be 32-byte aligned
-		static const int EMAC_NUM_RX_DESCRIPTORS = 4;	// The number of RX descriptors.
-		static const int EMAC_NUM_TX_DESCRIPTORS = 4;	// The number of TX descriptors.
 
 	private:
 		// Bit definitions of status member of DescriptorS
@@ -228,8 +220,8 @@ namespace device {
 
 		static const int FLAG_OFF         = 0;
 		static const int FLAG_ON          = 1;
-		static const int FLAG_ON_LINK_ON  = 3;
 		static const int FLAG_ON_LINK_OFF = 2;
+		static const int FLAG_ON_LINK_ON  = 3;
 
 		 // Please define the level of the LINKSTA signal when Link becomes up.
 		static const int LINK_PRESENT    = 0;
@@ -250,13 +242,13 @@ namespace device {
 		} __attribute__((__packed__));
 
 		struct etherbuffer_s {
-			uint8_t  buffer[EMAC_NUM_RX_DESCRIPTORS + EMAC_NUM_TX_DESCRIPTORS][EMAC_BUFSIZE];
+			uint8_t  buffer[RXDN + TXDN][EMAC_BUFSIZE];
 		} __attribute__((__packed__));
 
 	private:
 		// アライメントを使う場合、注意
-		volatile descriptor_s rx_descriptors_[EMAC_NUM_RX_DESCRIPTORS] __attribute__ ((aligned(32)));
-		volatile descriptor_s tx_descriptors_[EMAC_NUM_TX_DESCRIPTORS] __attribute__ ((aligned(32)));
+		volatile descriptor_s rx_descriptors_[RXDN] __attribute__ ((aligned(32)));
+		volatile descriptor_s tx_descriptors_[TXDN] __attribute__ ((aligned(32)));
 		volatile etherbuffer_s ether_buffers_ __attribute__ ((aligned(32)));
 		volatile descriptor_s* app_rx_desc_;
 		volatile descriptor_s* app_tx_desc_;
@@ -302,7 +294,7 @@ namespace device {
 			volatile descriptor_s* descriptor;
 
 			// Initialize the receive descriptors
-			for(int i = 0; i < EMAC_NUM_RX_DESCRIPTORS; i++) {
+			for(uint32_t i = 0; i < RXDN; i++) {
 				descriptor = &rx_descriptors_[i];
 				descriptor->buf_p = &ether_buffers_.buffer[i][0];
 				descriptor->bufsize = EMAC_BUFSIZE;
@@ -319,9 +311,9 @@ namespace device {
 			app_rx_desc_ = &rx_descriptors_[0];
 
 			// Initialize the transmit descriptors
-			for(int i = 0; i < EMAC_NUM_TX_DESCRIPTORS; i++) {
+			for(uint32_t i = 0; i < TXDN; i++) {
 				descriptor = &tx_descriptors_[i];
-				descriptor->buf_p = &ether_buffers_.buffer[EMAC_NUM_RX_DESCRIPTORS + i][0];
+				descriptor->buf_p = &ether_buffers_.buffer[RXDN + i][0];
 				descriptor->bufsize = 0;
 				descriptor->size = EMAC_BUFSIZE;
 				descriptor->status = 0;
@@ -747,8 +739,8 @@ namespace device {
 		{
 			/* Initialize the flags */
 			transfer_enable_ = false;
-			mpd_flag_             = FLAG_OFF;
-			lchng_flag_           = FLAG_OFF;
+			mpd_flag_        = FLAG_OFF;
+			lchng_flag_      = FLAG_OFF;
 
 			mac_addr_[0] = mac_addr[0];
 			mac_addr_[1] = mac_addr[1];
@@ -1046,7 +1038,7 @@ namespace device {
 			@return Link is up: true, Link is down: false
 		*/
 		//-----------------------------------------------------------------//
-		bool check_link()
+		bool check_phy_link()
 		{
 			return phy_.get_link_status();
 		}
@@ -1059,7 +1051,7 @@ namespace device {
 			@return リンク・アップなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool link_process()
+		bool service_link()
 		{
 			// When the magic packet is detected.
 			if(FLAG_ON == mpd_flag_) {
@@ -1076,36 +1068,27 @@ namespace device {
 				// The Link Up/Down is confirmed by the Link Status bit of PHY register1, 
 				// because the LINK signal of PHY-LSI is used for LED indicator, and 
 				// isn't used for notifing the Link Up/Down to external device.
-				auto ret = check_link();
-				if(ret) {
+				bool phylink = check_phy_link();
+				if(phylink) {
 					// ETHERC and EDMAC are set after ETHERC and EDMAC are reset in software
 					// and sending and receiving is permitted. 
 					configure_mac_(mac_addr_, magic_packet_mode::no_use);
 					do_link_(magic_packet_mode::no_use);
-
 					transfer_enable_ = true;
 					callback_link_on();
-				} else {
-					// no proccess
 				}
 			} else if(FLAG_ON_LINK_OFF == lchng_flag_) {  // When the link is down
 				lchng_flag_ = FLAG_OFF;
 				// The Link Up/Down is confirmed by the Link Status bit of PHY register1, 
 				// because the LINK signal of PHY-LSI is used for LED indicator, and 
 				// isn't used for notifing the Link Up/Down to external device.
-				auto ret = check_link();
-				if(ret) {
-					// Disable receive and transmit.
+				bool phylink = check_phy_link();
+				if(!phylink) {  // Disable receive and transmit.
 					ETHRC::ECMR.RE = 0;
-					ETHRC::ECMR.TE = 0;
-            
+					ETHRC::ECMR.TE = 0;            
 					transfer_enable_ = false;
 					callback_link_off();
-				} else {
-					// no proccess
 				}
-			} else {
-				// no proccess
 			}
 			return f;
 		}
@@ -1224,10 +1207,10 @@ namespace device {
 		}
 	};
 
-	template <class ETHRC, class EDMAC, class PHY>
-		volatile uint8_t ether_io<ETHRC, EDMAC, PHY>::mpd_flag_;
+	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN, uint32_t RXDN>
+		volatile uint8_t ether_io<ETHRC, EDMAC, PHY, TXDN, RXDN>::mpd_flag_;
 
-	template <class ETHRC, class EDMAC, class PHY>
-		volatile void* ether_io<ETHRC, EDMAC, PHY>::intr_task_;
+	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN, uint32_t RXDN>
+		volatile void* ether_io<ETHRC, EDMAC, PHY, TXDN, RXDN>::intr_task_;
 
 }
