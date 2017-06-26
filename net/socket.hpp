@@ -9,8 +9,8 @@
 #include <cstdint>
 #include <errno.h>
 #include "common/format.hpp"
+#include "common/ip_adrs.hpp"
 #include "r_socket_rx/r_socket_rx_if.h"
-#include "ip_adrs.hpp"
 
 #define SOCKET_DEBUG
 
@@ -348,7 +348,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int send(const void* src, uint32_t len, const ip_adrs& adrs, uint16_t port)
 		{
-			if(afd_ < 0 || src == nullptr) {
+			if(afd_ < 0) {
 				return -1;
 			}
 
@@ -373,7 +373,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int send(const void* src, uint32_t len)
 		{
-			if(afd_ < 0 || src == nullptr) {
+			if(afd_ < 0) {
 				return -1;
 			}
 
@@ -398,7 +398,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int recv(void* dst, uint32_t len, const ip_adrs& adrs, uint16_t port)
 		{
-			if(afd_ < 0 || dst == nullptr) {
+			if(afd_ < 0) {
 				return -1;
 			}
 
@@ -423,7 +423,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int recv(void* dst, uint32_t len)
 		{
-			if(afd_ < 0 || dst == nullptr) {
+			if(afd_ < 0) {
 				return -1;
 			}
 

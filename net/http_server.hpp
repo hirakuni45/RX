@@ -606,6 +606,7 @@ namespace net {
 					--disconnect_loop_;
 				} else {
 					sock_.close();
+					http_format::chaout().set_fd(-1);
 					task_ = task::disconnect;
 				}
 				break;
@@ -613,7 +614,6 @@ namespace net {
 			case task::disconnect:
 			default:
 				debug_format("HTTP Server: disconnected\n");
-				http_format::chaout().set_fd(-1);
 				task_ = task::begin_http;
 				break;
 			}

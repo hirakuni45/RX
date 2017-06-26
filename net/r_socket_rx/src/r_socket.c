@@ -1026,6 +1026,9 @@ int r_accept(int sock, sockaddr_in *padr)
 			}
 
             sockets[sock].event = -1;
+			padr->sin_family = AF_INET;
+			padr->sin_addr.S_un.S_addr = sockets[ret_socket].dstaddr.ipaddr;
+			padr->sin_port = htons(sockets[ret_socket].dstaddr.portno);
 
             peer_socket = dup_tcp_socket(sock);
             if (peer_socket == SOCKET_ERROR)
@@ -1084,12 +1087,6 @@ acp_chk_ret_socket:             /* Check return socket before return */
         return SOCKET_ERROR;
     }
 
-	if(ret_socket >= 0) {
-		padr->sin_family = AF_INET;
-		padr->sin_addr.S_un.S_addr = sockets[ret_socket].dstaddr.ipaddr;
-		padr->sin_port = htons(sockets[ret_socket].dstaddr.portno);
-	}
-
     return ret_socket;
 }
 
@@ -1108,6 +1105,13 @@ int r_send( int sock,  const void *buffer, uint32_t length)
     int  cepid;
     int ercd = 0;
     uint32_t this_id;
+
+	if(buffer == NULL || length == 0) {
+		return 0;
+	}
+	if(length > BSD_SND_BUFSZ) {  // 最大サイズへ切り詰める
+		length = BSD_SND_BUFSZ;
+	}
 
     errno = E_OK;
 #ifdef R_SOCKET_PAR_CHECK
@@ -1149,11 +1153,6 @@ int r_send( int sock,  const void *buffer, uint32_t length)
             ercd  = SOCKET_ERROR;
             return ercd;
         }
-        if ( length > BSD_SND_BUFSZ)
-        {
-            errno = ENOBUFS;
-            return SOCKET_ERROR;
-        }
 
         memcpy( sockets[sock].snd_buf, buffer, length );
         sockets[sock].sndLen = 0;
@@ -1175,9 +1174,8 @@ int r_send( int sock,  const void *buffer, uint32_t length)
 
                 sockets[sock].T4proc &= ~(T4_PROC_SND_END);
                 sockets[sock].T4proc |= (T4_PROC_SND_START);
-                ercd = tcp_snd_dat( cepid, (VP)sockets[sock].snd_buf, length,
-                                    TMO_NBLK );
-                if ( ercd == E_WBLK )
+                ercd = tcp_snd_dat(cepid, (VP)sockets[sock].snd_buf, length, TMO_NBLK);
+                if(ercd == E_WBLK)
                 {
                     ercd = length;  /* Return length of data even though it may not been sent*/
 
@@ -1190,14 +1188,12 @@ int r_send( int sock,  const void *buffer, uint32_t length)
 
                 }
             }
-
         }
         else
         {
             sockets[sock].T4proc |= (T4_PROC_SND_START);
-            ercd = tcp_snd_dat( cepid, (VP)sockets[sock].snd_buf, length,
-                                TMO_NBLK );
-            if ( ercd == E_WBLK )
+            ercd = tcp_snd_dat(cepid, (VP)sockets[sock].snd_buf, length, TMO_NBLK);
+            if(ercd == E_WBLK)
             {
                 ercd = length;  /* Return length of data even though it may not been sent*/
             }
@@ -1208,11 +1204,11 @@ int r_send( int sock,  const void *buffer, uint32_t length)
                 return SOCKET_ERROR;
             }
         }
-        if (sockets[sock].tmout == TMO_FEVR)
+        if(sockets[sock].tmout == TMO_FEVR)
         {
             while (1)
             {
-                if (  (sockets[sock].sndLen == sockets[sock].sndSz)
+                if((sockets[sock].sndLen == sockets[sock].sndSz)
                         || (0 != (sockets[sock].socket_proc & SOCKET_PROC_CLS_END))
                         || (  this_id != sockets[sock].create_id)
                         || (sockets[sock].socket_type ==  ERR_OTHERS))
@@ -1221,7 +1217,7 @@ int r_send( int sock,  const void *buffer, uint32_t length)
                 }
                 r_socket_task_switch(sock);
             }
-            if (this_id != sockets[sock].create_id)
+            if(this_id != sockets[sock].create_id)
             {
                 errno = ECONNABORTED;
                 ercd  = SOCKET_ERROR;
@@ -1265,6 +1261,10 @@ int r_sendto( int sock,  const void * buffer, uint32_t length, const sockaddr_in
     ER ercd = E_OK;
     uint32_t this_id;
     int  cepid;
+
+	if(buffer == NULL || length == 0) {
+		return 0;
+	}
 
     errno = E_OK;
     this_id = sockets[sock].create_id;
@@ -1389,6 +1389,10 @@ int r_sendto( int sock,  const void * buffer, uint32_t length, const sockaddr_in
 ******************************************************************************/
 int r_recv(int sock, void * buffer, uint32_t length)
 {
+	if(buffer == NULL || length == 0) {
+		return 0;
+	}
+
     sockaddr_in from;      /* No use. To pass par check */
 #ifdef R_SOCKET_PAR_CHECK
     if (recv_par_check(sock, buffer, length) != true)
@@ -1420,6 +1424,10 @@ int r_recv(int sock, void * buffer, uint32_t length)
 ******************************************************************************/
 int r_recvfrom( int sock, void * buffer, uint32_t length, sockaddr_in *remoteaddr)
 {
+	if(buffer == NULL || length == 0) {
+		return 0;
+	}
+
     int BytesRead = 0;
     unsigned char * buf;
     int  cepid;

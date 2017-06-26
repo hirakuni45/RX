@@ -6,8 +6,8 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "net/dhcp_client.hpp"
-#include "net/ip_adrs.hpp"
+#include "common/ip_adrs.hpp"
+#include "common/dhcp_client.hpp"
 #include "net/socket.hpp"
 #include "net/r_t4_rx/src/config_tcpudp.h"
 
@@ -156,12 +156,12 @@ namespace net {
 					if(link_interval_ >= 100) {
 						io_.polling_link_status();
 						link_interval_ = 0;
+						utils::format("Link wait loop\n");
 					}
 					++link_interval_;
 
-					bool link = io_.link_process();
+					bool link = io_.service_link();
 					if(link) {
-						utils::format("Ether Link UP\n");
 						dhcp_.start();
 						task_ = task::wait_dhcp;
 					}
@@ -197,14 +197,13 @@ namespace net {
 				break;
 
 			case task::main_init:
-				io_.link_process();
+				io_.service_link();
 
 				task_ = task::main_loop;
 				break;
 
 			case task::main_loop:
-				io_.link_process();
-
+				io_.service_link();
 
 				if(link_interval_ >= 100) {
 					io_.polling_link_status();
@@ -212,11 +211,9 @@ namespace net {
 				}
 				++link_interval_;
 
-
 				if(!io_.get_stat().link_) {
 					task_ = task::wait_link;
 				}
-
 
 				break;
 
