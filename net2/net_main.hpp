@@ -1,3 +1,4 @@
+#pragma once
 //=====================================================================//
 /*! @file
     @brief  ネット・メイン @n
@@ -8,36 +9,47 @@
 #include "common/renesas.hpp"
 #include "common/ip_adrs.hpp"
 #include "common/dhcp_client.hpp"
+#include "net2/ethernet.hpp"
+
+#define NET_MAIN_DEBUG
 
 namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  net_main テンプレート・クラス
-		@param[in]	ETHER_IO	インサーネット・ドライバー
+		@param[in]	ETHER	インサーネット・ドライバー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHER_IO>
+	template <class ETHER>
 	class net_main {
 
+#ifndef NET_MAIN_DEBUG
+		typedef utils::null_format debug_format;
+#else
+		typedef utils::format debug_format;
+#endif
+
 		enum class task : uint8_t {
-			halt,		// Halt !!!
 			wait_link,	// リンクアップを待つ
 			wait_dhcp,	// DHCP IP アドレスの取得を待つ
-			setup_tcpudp,
 			main_init,	// メイン初期化
 			main_loop,	// メインループ
 			stall,		// ストール
 		};
 
-		ETHER_IO&	eth_;
+		ETHER&		eth_;
 
-		typedef dhcp_client<ETHER_IO> DHCP;
+		typedef dhcp_client<ETHER> DHCP;
 		DHCP		dhcp_;
+
+		typedef ethernet<ETHER> ETHERNET;
+		ETHERNET	ethernet_;
 
 		task		task_;
 
 		uint8_t		link_interval_;
+		uint8_t		stall_loop_;
 
 		ip_adrs		ip_;
 		ip_adrs		mask_;
@@ -63,8 +75,8 @@ namespace net {
 			@param[in]	io	インサーネット・ドライバー・クラス
 		*/
 		//-----------------------------------------------------------------//
-		net_main(ETHER_IO& io) : eth_(io), dhcp_(io),
-			task_(task::wait_link), link_interval_(0),
+		net_main(ETHER& eth) : eth_(eth), dhcp_(eth), ethernet_(eth),
+			task_(task::wait_link), link_interval_(0), stall_loop_(0),
 			ip_(192, 168, 3, 20), mask_(255, 255, 255, 0), gw_(192, 168, 3, 1),
 			dns_(192, 168, 3, 1), dns2_()
 			{ }
@@ -125,15 +137,27 @@ namespace net {
 		{
 			bool ret = eth_.open(mac);
 			if(ret) {
-				utils::format("Ether open OK\n");
-///				memcpy(&_myethaddr[0][0], mac, 6);				
+				debug_format("net_main: start OK\n");
+				link_interval_ = 0;
+				task_ = task::wait_link;
 			} else {
-				utils::format("Ether open NG\n");
+				debug_format("net_main: start NG\n");
+				task_ = task::stall;
 			}
-
-			task_ = task::wait_link;
-
 			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  フレーム・サービス
+		*/
+		//-----------------------------------------------------------------//
+		void service_frame()
+		{
+			if(task_ == task::main_loop) {
+				ethernet_.service();
+			}
 		}
 
 
@@ -151,7 +175,7 @@ namespace net {
 					if(link_interval_ >= 100) {
 						eth_.polling_link_status();
 						link_interval_ = 0;
-						utils::format("Link wait loop\n");
+						debug_format("net_main: PHY wait link loop\n");
 					}
 					++link_interval_;
 
@@ -166,33 +190,22 @@ namespace net {
 			case task::wait_dhcp:
 				dhcp_.service();
 				if(dhcp_.get_info().state == DHCP_INFO::state_t::collect) {
-					utils::format("DHCP Collect\n");
+					debug_format("net_main: DHCP Collect\n");
 					set_tcpudp_env_();
-					task_ = task::setup_tcpudp;
+					task_ = task::main_init;
 				} else if(dhcp_.get_info().state == DHCP_INFO::state_t::timeout) {
-					utils::format("DHCP Timeout (setup fixed)\n");
-					task_ = task::setup_tcpudp;
+					debug_format("net_main: DHCP Timeout (setup for fixed IP)\n");
+					task_ = task::main_init;
 				} else if(dhcp_.get_info().state == DHCP_INFO::state_t::error) {
-					utils::format("DHCP Error\n");
-					task_ = task::halt;
+					debug_format("net_main: DHCP Error\n");
+					task_ = task::stall;
 				}
+				ethernet_.set_adrs(ip_, mask_, gw_);
 //				memcpy(tcpudp_env[0].ipaddr,   ip_.get(),   4);
 //				memcpy(tcpudp_env[0].maskaddr, mask_.get(), 4);
 //				memcpy(tcpudp_env[0].gwaddr,   gw_.get(),   4);
 //				memcpy(dnsaddr1, info.dnsaddr, 4);
 //				memcpy(dnsaddr2, info.dnsaddr2, 4);
-				break;
-
-			case task::setup_tcpudp:
-#if 0
-				if(!socket<ETHER_IO>::start()) {
-					task_ = task::stall;
-				} else {
-					task_ = task::main_init;
-				}
-#else
-				task_ = task::main_init;
-#endif
 				break;
 
 			case task::main_init:
@@ -217,14 +230,11 @@ namespace net {
 				break;
 
 			case task::stall:
-				{
-					static uint32_t count = 0;
-					if(count >= 100) {
-						utils::format("Stall net_core\n");
-						count = 0;
-					}
-					++count;
+				if(stall_loop_ >= 250) {
+					debug_format("net_main: stall\n");
+					stall_loop_ = 0;
 				}
+				++stall_loop_;
 				break;
 
 			default:
@@ -235,10 +245,10 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  リンクを確認する
+			@brief  メインを確認する
 			@return 「true」なら、リンク
 		*/
 		//-----------------------------------------------------------------//
-		bool check_link() const { return task_ == task::main_loop; }
+		bool check_main() const { return task_ == task::main_loop; }
 	};
 }
