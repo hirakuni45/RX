@@ -6,6 +6,7 @@
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include "common/byte_order.h"
 #include "common/vect.h"
 #include "common/delay.hpp"
 
