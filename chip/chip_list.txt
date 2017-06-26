@@ -94,3 +94,10 @@ VS1063：
 ・VLSI Solution
 ・MP3 / OGG VORBIS ENCODER AND AUDIO CODEC
 ・http://www.vlsi.fi/fileadmin/datasheets/vs1063ds.pdf
+
+
+phy_base:
+・Ethernet default PHY device
+・LAN8720(A) 10/100M (Microchip)
+・DP83822 10/100M (Texas Instruments) for option
+・KSZ8041NL 10/100M (MICREL) for option
