@@ -33,7 +33,7 @@ namespace chip {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class phy_option {
-		BASE,				///< 一般、標準仕様
+		BASE,				///< 一般、標準仕様（Ex: LAN8720）
 		TI_DP83822_,		///< TI/DP83822
 		MICREL_KSZ8041NL,	///< MICREL/KSZ8041NL
 	};
@@ -567,13 +567,10 @@ namespace chip {
 			reg = read_(REG_STATUS);
 
 			// When the link isn't up, return error
-			if(!(reg & STATUS_LINK_UP)) {
-				asm("nop");
-				// Link is down
-				return false;
-			} else {
-				// Link is up
+			if(reg & STATUS_LINK_UP) {  // Link is up
 				return true;
+			} else {  // Link is down
+				return false;
 			}
 		}
 	};
