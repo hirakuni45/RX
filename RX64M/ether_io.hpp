@@ -224,8 +224,6 @@ namespace device {
 		static const int ERROR_MPDE = -3;
 		static const int ERROR_TACT = -4;	///< Transmission buffer dryness error. 
 
-		static const int NO_DATA = 0;
-
 		static const int FLAG_OFF         = 0;
 		static const int FLAG_ON          = 1;
 		static const int FLAG_ON_LINK_OFF = 2;
@@ -567,7 +565,7 @@ namespace device {
 
 
 		// EDMA interrupt task
-		static void dmac_task_() __attribute__ ((interrupt))
+		static void ether_task_() __attribute__ ((interrupt))
 		{
 			uint32_t status_ecsr = ETHRC::ECSR();
 			uint32_t status_eesr = EDMAC::EESR();
@@ -659,7 +657,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	MAC アドレスの取得
+			@brief	MAC アドレスの取得（６バイト）
 			@return MAC アドレス
 		*/
 		//-----------------------------------------------------------------//
@@ -778,7 +776,7 @@ namespace device {
 				ICU::IPR.GROUPAL1 = intr_level_;
 				ICU::GENAL1.EN4   = 1;
 				ICU::IER.GROUPAL1 = 1;
-				set_interrupt_task(dmac_task_, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
+				set_interrupt_task(ether_task_, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
 
 				stat_.reset();
 
@@ -827,7 +825,7 @@ namespace device {
 			// When the Link up processing is not completed, return error
 			if(!transfer_enable_) {
 				ret = ERROR_LINK;
-			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
+			} else if(ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
 				ret = ERROR_MPDE;
 			} else {  // When the Link up processing is completed
 				while(1) {
@@ -846,7 +844,7 @@ namespace device {
 							break;
 						}
 					} else {
-						ret = NO_DATA;
+						ret = 0;
 						break;
 					}
 				}
