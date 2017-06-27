@@ -69,6 +69,35 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  イーサーネット・チェック・サムの計算
+			@param[in]	src	ソース
+			@param[in]	len	バイト数
+			@return チェック・サム
+		*/
+		//-----------------------------------------------------------------//
+		static uint16_t calc_sum(const void* src, uint32_t len)
+		{
+			const uint8_t* p = static_cast<const uint8_t*>(src);
+			uint32_t sum = 0;
+			bool mod = false;
+			if(len & 1) {
+				len &= 0xfffffffe;
+				mod = true;
+			}
+			for(uint32_t i = 0; i < len; i += 2) {
+				sum += static_cast<uint32_t>(p[0]) << 8;
+				sum += static_cast<uint32_t>(p[1]);
+				p += 2;
+			}
+			if(mod) {
+				sum += static_cast<uint32_t>(p[0]) << 8;
+			}
+			return ((sum & 0xffff) + (sum >> 16)) ^ 0xffff;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ブロード・キャスト型、MAC アドレスの検査
 			@param[in]	src	ソース
 			@return ブロード・キャスト型なら「true」
