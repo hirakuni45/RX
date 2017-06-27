@@ -10,6 +10,7 @@
 #include "common/ip_adrs.hpp"
 #include "common/dhcp_client.hpp"
 #include "net2/ethernet.hpp"
+#include "net2/net_st.hpp"
 
 #define NET_MAIN_DEBUG
 
@@ -51,21 +52,17 @@ namespace net {
 		uint8_t		link_interval_;
 		uint8_t		stall_loop_;
 
-		ip_adrs		ip_;
-		ip_adrs		mask_;
-		ip_adrs		gw_;
-		ip_adrs		dns_;
-		ip_adrs		dns2_;
+		net_info	info_;
 
 		void set_tcpudp_env_()
 		{
 			const DHCP_INFO& info = dhcp_.get_info();
 			info.list();
-			ip_.set(info.ipaddr);
-			mask_.set(info.maskaddr);
-			gw_.set(info.gwaddr);
-			dns_.set(info.dnsaddr);
-			dns2_.set(info.dnsaddr2);
+			info_.ip.set(info.ipaddr);
+			info_.mask.set(info.maskaddr);
+			info_.gw.set(info.gwaddr);
+			info_.dns.set(info.dnsaddr);
+			info_.dns2.set(info.dnsaddr2);
 		}
 
 	public:
@@ -76,55 +73,22 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		net_main(ETHER& eth) : eth_(eth), dhcp_(eth), ethernet_(eth),
-			task_(task::wait_link), link_interval_(0), stall_loop_(0),
-			ip_(192, 168, 3, 20), mask_(255, 255, 255, 0), gw_(192, 168, 3, 1),
-			dns_(192, 168, 3, 1), dns2_()
-			{ }
+			task_(task::wait_link), link_interval_(0), stall_loop_(0)
+			{
+				info_.ip.set(192, 168, 3, 20);
+				info_.mask.set(255, 255, 255, 0);
+				info_.gw.set(192, 168, 3, 1);
+				info_.dns.set(192, 168, 3, 1);
+			}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  IP アドレスを参照
-			@return IP アドレス
+			@brief  ネット情報を参照
+			@return ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		const ip_adrs& get_ip_adrs() const { return ip_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  MASK を参照
-			@return MASK
-		*/
-		//-----------------------------------------------------------------//
-		const ip_adrs& get_mask() const { return mask_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GW アドレスを参照
-			@return GW アドレス
-		*/
-		//-----------------------------------------------------------------//
-		const ip_adrs& get_gw_adrs() const { return gw_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  DNS アドレスを参照
-			@return DNS アドレス
-		*/
-		//-----------------------------------------------------------------//
-		const ip_adrs& get_dns_adrs() const { return dns_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  DNS2 アドレスを参照
-			@return DNS2 アドレス
-		*/
-		//-----------------------------------------------------------------//
-		const ip_adrs& get_dns2_adrs() const { return dns2_; }
+		const net_info& get_info() const { return info_; }
 
 
 		//-----------------------------------------------------------------//
@@ -139,6 +103,7 @@ namespace net {
 			if(ret) {
 				debug_format("net_main: start OK\n");
 				link_interval_ = 0;
+				std::memcpy(info_.mac, eth_.get_mac(), 6);
 				task_ = task::wait_link;
 			} else {
 				debug_format("net_main: start NG\n");
@@ -200,12 +165,7 @@ namespace net {
 					debug_format("net_main: DHCP Error\n");
 					task_ = task::stall;
 				}
-				ethernet_.set_adrs(ip_, mask_, gw_);
-//				memcpy(tcpudp_env[0].ipaddr,   ip_.get(),   4);
-//				memcpy(tcpudp_env[0].maskaddr, mask_.get(), 4);
-//				memcpy(tcpudp_env[0].gwaddr,   gw_.get(),   4);
-//				memcpy(dnsaddr1, info.dnsaddr, 4);
-//				memcpy(dnsaddr2, info.dnsaddr2, 4);
+				ethernet_.set_info(info_);
 				break;
 
 			case task::main_init:
