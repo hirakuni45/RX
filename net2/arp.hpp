@@ -102,9 +102,9 @@ namespace net {
 				return false;
 			}
 
-			utils::format("ARP: src: %s, dst: %s\n")
-				% tools::ip_str(r.src_ipa)
-				% tools::ip_str(r.dst_ipa);
+//			utils::format("ARP: src: %s, dst: %s\n")
+//				% tools::ip_str(r.src_ipa)
+//				% tools::ip_str(r.dst_ipa);
 
 			eth_h eh;
 			std::memcpy(eh.dst, h.src, 6);
