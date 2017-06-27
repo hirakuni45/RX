@@ -12,6 +12,8 @@
 #include "common/format.hpp"
 #include "common/ip_adrs.hpp"
 #include "net2/icmp.hpp"
+#include "net2/udp.hpp"
+#include "net2/tcp.hpp"
 
 namespace net {
 
@@ -31,6 +33,12 @@ namespace net {
 		typedef icmp<ETHER>	ICMP;
 		ICMP		icmp_;
 
+		typedef udp<ETHER> UDP;
+		UDP			udp_;
+
+		typedef tcp<ETHER> TCP;
+		TCP			tcp_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -40,7 +48,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		ipv4(ETHER& eth, net_info& info) : eth_(eth), info_(info),
-			icmp_(eth)
+			icmp_(eth), udp_(eth), tcp_(eth)
 		{ }
 
 
@@ -87,10 +95,10 @@ namespace net {
 				icmp_.parse(eh, ih, msg, len); 
 				break;
 			case ipv4_protocol::TCP:
-
+				tcp_.parse(eh, ih, msg, len);
 				break;
 			case ipv4_protocol::UDP:
-
+				udp_.parse(eh, ih, msg, len);
 				break;
 			default:
 
