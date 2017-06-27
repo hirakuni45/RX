@@ -11,6 +11,7 @@
 #include "common/net_tools.hpp"
 #include "common/format.hpp"
 #include "common/ip_adrs.hpp"
+#include "net2/icmp.hpp"
 
 namespace net {
 
@@ -27,19 +28,8 @@ namespace net {
 
 		net_info&	info_;
 
-		static const uint16_t ICMP_REQ = 0x0008;
-
-		uint16_t sum_(const void* org, uint32_t len)
-		{
-			const uint8_t* p = static_cast<const uint8_t*>(org);
-			uint32_t sum = 0;
-			for(uint32_t i = 0; i < len; ++i) {
-				sum += static_cast<uint32_t>(p[0]) << 8;
-				sum += static_cast<uint32_t>(p[1]);
-				p += 2;
-			}
-			return !((sum & 0xffff) + (sum >> 16));
-		}
+		typedef icmp<ETHER>	ICMP;
+		ICMP		icmp_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -49,7 +39,9 @@ namespace net {
 			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		ipv4(ETHER& eth, net_info& info) : eth_(eth), info_(info) { }
+		ipv4(ETHER& eth, net_info& info) : eth_(eth), info_(info),
+			icmp_(eth)
+		{ }
 
 
 		//-----------------------------------------------------------------//
@@ -76,20 +68,23 @@ namespace net {
 			}
 
 			const ipv4_h& ih = *static_cast<const ipv4_h*>(org);
-			uint16_t sum = sum_(&ih, 10);
+			uint16_t sum = tools::calc_sum(&ih, 20);
 			if(sum != 0) {
-				utils::format("IP Header sum error(%04X): %04X\n")
+				utils::format("IP Header sum error(%04X) -> %04X\n")
 					% static_cast<uint32_t>(tools::htons(ih.csum))
 					% static_cast<uint32_t>(sum);
 				return false;
 			}
 
-			dump(eh);
-			dump(ih);
+			const uint8_t* msg = static_cast<const uint8_t*>(org);
+			msg += sizeof(ipv4_h);
+
+//			dump(eh);
+//			dump(ih);
 
 			switch(ih.get_protocol()) {
 			case ipv4_protocol::ICMP:
-
+				icmp_.parse(eh, ih, msg, len); 
 				break;
 			case ipv4_protocol::TCP:
 

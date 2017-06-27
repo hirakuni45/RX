@@ -73,6 +73,21 @@ namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  イーサーネット・ヘッダー、スワップコピー
+		@param[out]	dst	コピー先
+		@param[in]	src	コピー元
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	void swap_copy_eth_h(eth_h* dst, const eth_h* src)
+	{
+		std::memcpy(dst->dst, src->src, 6);
+		std::memcpy(dst->src, src->dst, 6);
+		dst->type = src->type;
+	}
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  イーサーネット・ヘッダーのダンプ
 		@param[in]	h	イーサーネット・ヘッダー
 	*/
@@ -90,7 +105,7 @@ namespace net {
 		@brief  IPV4 プロトコル
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class ipv4_protcol : uint8_t {
+	enum class ipv4_protocol : uint8_t {
 		ICMP = 0x01,	///< ICMP
 		TCP  = 0x06,	///< TCP
 		UDP  = 0x11,	///< UDP
@@ -108,7 +123,7 @@ namespace net {
 		uint16_t	id;			///< 識別番号
 		uint16_t	f_offset;	///< フラグ(B0-B2)、フラグメントオフセット(B3-B15)
 		uint8_t		time;		///< 生存時間
-		ipv4_protcol	protocol;	///< プロトコル
+		ipv4_protocol	protocol;	///< プロトコル
 		uint16_t	csum;		///< ヘッダ・チェックサム
 
 		uint8_t		src_ipa[4];	///< 送信元 IP アドレス
@@ -124,6 +139,21 @@ namespace net {
 		ipv4_protocol get_protocol() const { return protocol; }
 		uint16_t get_csum() const { return tools::htons(csum); }
 	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  IPV4 ヘッダー、スワップコピー
+		@param[out]	dst	コピー先
+		@param[in]	src	コピー元
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	void swap_copy_ipv4_h(ipv4_h* dst, const ipv4_h* src)
+	{
+		std::memcpy(dst, src, 12);
+		std::memcpy(dst->src_ipa, src->dst_ipa, 4);
+		std::memcpy(dst->dst_ipa, src->src_ipa, 4);
+	}
 
 
 	//-----------------------------------------------------------------//
