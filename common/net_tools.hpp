@@ -69,6 +69,33 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ブロード・キャスト型、MAC アドレスの検査
+			@param[in]	src	ソース
+			@return ブロード・キャスト型なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static inline const uint8_t* get_brodcast_mac()
+		{
+			static uint8_t bmac[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+			return bmac;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ブロード・キャスト型、MAC アドレスの検査
+			@param[in]	src	ソース
+			@return ブロード・キャスト型なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static bool check_brodcast_mac(const uint8_t* top)
+		{
+			return std::memcmp(get_brodcast_mac(), top, 6) == 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  MAC アドレスの文字列を取得
 			@param[in]	src	ソース・アドレス
 			@return 文字列
