@@ -7,6 +7,7 @@
 */
 //=========================================================================//
 #include "net2/net_st.hpp"
+#include "common/fifo.hpp"
 
 namespace net {
 
@@ -31,6 +32,10 @@ namespace net {
 		};
 
 		net_info&	info_;
+
+		typedef utils::fifo<uint16_t, 8, arp_info> ARP_BUFF;
+
+		ARP_BUFF	arp_buff_;
 
 		ip_adrs		req_ipa_;
 		uint16_t	req_wait_;
@@ -90,14 +95,23 @@ namespace net {
 			}
 
 			if(tools::check_brodcast_mac(h.dst) && r.head[7] == 0x01) {  // ARP Request
-				ip_adrs ipa(r.src_ipa[0], r.src_ipa[1], r.src_ipa[2], r.src_ipa[3]);
-				info_.cash.insert(ipa, r.src_mac);
+				if(arp_buff_.length() < (arp_buff_.size() - 1)) {
+					arp_info a;
+					a.ipa.set(r.src_ipa[0], r.src_ipa[1], r.src_ipa[2], r.src_ipa[3]);
+					std::memcpy(a.mac, r.src_mac, 6);
+					arp_buff_.put(a);
+				}
 			} else if(r.head[7] == 0x02) {  // ARP Response
 				// IP/MAC の収集
-				ip_adrs ipa(r.src_ipa[0], r.src_ipa[1], r.src_ipa[2], r.src_ipa[3]);
-				info_.cash.insert(ipa, r.src_mac);
-				ipa.set(r.dst_ipa[0], r.dst_ipa[1], r.dst_ipa[2], r.dst_ipa[3]);
-				info_.cash.insert(ipa, r.dst_mac);
+				if(arp_buff_.length() < (arp_buff_.size() - 2)) {
+					arp_info a;
+					a.ipa.set(r.src_ipa[0], r.src_ipa[1], r.src_ipa[2], r.src_ipa[3]);
+					std::memcpy(a.mac, r.src_mac, 6);
+					arp_buff_.put(a);
+					a.ipa.set(r.dst_ipa[0], r.dst_ipa[1], r.dst_ipa[2], r.dst_ipa[3]);
+					std::memcpy(a.mac, r.dst_mac, 6);
+					arp_buff_.put(a);
+				}
 				return false;
 			} else {
 				return false;
@@ -189,6 +203,11 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void service(ETHER& eth)
 		{
+			while(arp_buff_.length() > 0) {
+				const auto a = arp_buff_.get();
+				info_.cash.insert(a.ipa, a.mac);
+			}
+
 			if(req_wait_) {
 				--req_wait_;
 			} else if(req_num_) {
