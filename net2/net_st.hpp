@@ -195,4 +195,73 @@ namespace net {
 			% tools::ip_str(h.src_ipa)
 			% tools::ip_str(h.dst_ipa);
 	}
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  TCP セグメント・ヘッダー
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	class tcp_segment {
+
+		static void set_flag_(bool f, uint16_t mask, uint16_t& dst) {
+			if(f) {
+				dst |=  mask;
+			} else {
+				dst &= ~mask;
+			}
+		}
+
+	public:
+		uint16_t	src_port_;
+		uint16_t	dst_port_;
+		uint32_t	seq_;
+		uint32_t	ack_;
+		uint16_t	flag_ofs_;
+		uint16_t	window_;
+		uint16_t	csum_;
+		uint16_t	urgent_ptr_;
+
+		uint16_t get_src_port() const { return tools::htons(src_port_); }
+		void set_src_port(uint16_t port) { src_port_ = tools::htons(port); }
+
+		uint16_t get_dst_port() const { return tools::htons(dst_port_); }
+		void set_dst_port(uint16_t port) { dst_port_ = tools::htons(port); }
+
+		uint32_t get_seq() const { return tools::htonl(seq_); }
+		void set_seq(uint32_t seq) { seq_ = tools::htonl(seq); }
+
+		uint32_t get_ack() const { return tools::htonl(ack_); }
+		void set_ack(uint32_t ack) { ack_ = tools::htonl(ack); }
+
+		uint16_t get_flag_ofs() const { return tools::htons(flag_ofs_); }
+		void set_flag_ofs(uint16_t ofs) { flag_ofs_ = tools::htons(ofs); }
+
+		uint16_t get_window() const { return tools::htons(window_); }
+		void set_window(uint16_t win) { window_ = tools::htons(win); }
+
+		uint16_t get_csum() const { return tools::htons(csum_); }
+		void set_csum(uint16_t sum) { csum_ = tools::htons(sum); }
+
+		uint16_t get_urgent_ptr() const { return tools::htons(urgent_ptr_); }
+		void set_urgent_ptr(uint16_t ptr) { urgent_ptr_ = tools::htons(ptr); }
+
+		bool get_flag_urg() const { return (flag_ofs_ & 0x0004) != 0; }
+		void set_flag_urg(bool f) { set_flag_(f, 0x0004, flag_ofs_); }
+
+		bool get_flag_ack() const { return (flag_ofs_ & 0x0008) != 0; }
+		void set_flag_ack(bool f) { set_flag_(f, 0x0008, flag_ofs_); }
+
+		bool get_flag_psh() const { return (flag_ofs_ & 0x0010) != 0; }
+		void set_flag_psh(bool f) { set_flag_(f, 0x0010, flag_ofs_); }
+
+		bool get_flag_rst() const { return (flag_ofs_ & 0x0020) != 0; }
+		void set_flag_rst(bool f) { set_flag_(f, 0x0020, flag_ofs_); }
+
+		bool get_flag_syn() const { return (flag_ofs_ & 0x0040) != 0; }
+		void set_flag_syn(bool f) { set_flag_(f, 0x0040, flag_ofs_); }
+
+		bool get_flag_fin() const { return (flag_ofs_ & 0x0080) != 0; }
+		void set_flag_fin(bool f) { set_flag_(f, 0x0080, flag_ofs_); }
+	};
 }
