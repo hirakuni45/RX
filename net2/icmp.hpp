@@ -19,8 +19,6 @@ namespace net {
 	template<class ETHER>
 	class icmp {
 
-		ETHER&		eth_;
-
 		struct icmp_t {
 			uint8_t		type;
 			uint8_t		code;
@@ -33,16 +31,15 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
-			@param[in]	eth		イーサーネット・ドライバー
 		*/
 		//-----------------------------------------------------------------//
-		icmp(ETHER& eth) : eth_(eth)
-		{ }
+		icmp() { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  パース
+			@param[in]	eth	イーサーネット・ドライバー
 			@param[in]	eh	イーサーネット・ヘッダー
 			@param[in]	ih	IPV4 ヘッダー
 			@param[in]	msg	メッセージ部
@@ -50,7 +47,7 @@ namespace net {
 			@return ICMP、PING 要求の場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool parse(const eth_h& eh, const ipv4_h& ih, const void* msg, int32_t len)
+		bool parse(ETHER& eth, const eth_h& eh, const ipv4_h& ih, const void* msg, int32_t len)
 		{
 			const icmp_t& t = *static_cast<const icmp_t*>(msg);
 
@@ -69,7 +66,7 @@ namespace net {
 
 				void* dst;
 				uint16_t dlen;
-				if(eth_.send_buff(&dst, dlen) != 0) {
+				if(eth.send_buff(&dst, dlen) != 0) {
 					utils::format("ICMP: send_buff error\n");
 					return false;
 				}
@@ -100,11 +97,10 @@ namespace net {
 					d_msg[3] = sum;
 				}
 
-				eth_.send(all);
-
 //				dump(*d_eh);
 //				dump(*d_ih);
 
+				eth.send(all);
 			}
 			return true;
 		}

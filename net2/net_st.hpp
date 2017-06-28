@@ -72,6 +72,40 @@ namespace net {
 		eth_type get_type() const {
 			return static_cast<eth_type>(tools::htons(static_cast<uint16_t>(type)));
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  イーサーネット・タイプの設定 @n
+					※ネット・エンディアンを変換
+			@return イーサーネット・タイプ
+		*/
+		//-----------------------------------------------------------------//
+		void set_type(eth_type t) {
+			type = static_cast<eth_type>(tools::htons(static_cast<uint16_t>(t)));
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ヘッダー終端ポインターの取得
+			@return ヘッダー終端ポインター
+		*/
+		//-----------------------------------------------------------------//
+		static void* next_ptr(void* org) {
+			return static_cast<void*>(static_cast<uint8_t*>(org) + sizeof(eth_h));
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ヘッダー終端ポインターの取得（const）
+			@return ヘッダー終端ポインター
+		*/
+		//-----------------------------------------------------------------//
+		static const void* next_ptr(const void* org) {
+			return static_cast<const void*>(static_cast<const uint8_t*>(org) + sizeof(eth_h));
+		}
 	};
 
 
@@ -97,7 +131,8 @@ namespace net {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	static void dump(const eth_h& h) {
-		utils::format("src(%s), dst(%s), type(%04X)\n")
+		utils::format("Ethernet Header:\n");
+		utils::format("  src(%s), dst(%s), type(%04X)\n")
 			% tools::mac_str(h.src)
 			% tools::mac_str(h.dst)
 			% static_cast<uint32_t>(h.get_type());

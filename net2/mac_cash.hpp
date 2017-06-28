@@ -31,7 +31,7 @@ namespace net {
 	template<uint32_t SIZE>
 	class mac_cash {
 
-		arp_info	cash_[SIZE];
+		arp_info	info_[SIZE];
 		uint32_t	pos_;
 
 	public:
@@ -66,7 +66,7 @@ namespace net {
 			@brief  キャッシュをリセット
 		*/
 		//-----------------------------------------------------------------//
-		void reset()
+		void reset() noexcept
 		{
 			pos_ = 0;
 		}
@@ -79,10 +79,10 @@ namespace net {
 			@return 無ければ「SIZE」
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t lookup(const ip_adrs& ipa)
+		uint32_t lookup(const ip_adrs& ipa) noexcept
 		{
 			for(uint32_t i = 0; i < pos_; ++i) {
-				if(cash_[i].ipa == ipa) {
+				if(info_[i].ipa == ipa) {
 					return i;
 				}
 			}
@@ -98,7 +98,7 @@ namespace net {
 			@return 登録できたら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool insert(const ip_adrs& ipa, const uint8_t* mac)
+		bool insert(const ip_adrs& ipa, const uint8_t* mac) noexcept
 		{
 			if(ipa[3] == 0 || ipa[3] == 255) {  // 末尾「０」ゲートウェイ、「２５５」ブロードキャストは無視
 				return false;
@@ -111,14 +111,14 @@ namespace net {
 			}
 			uint32_t n = lookup(ipa);
 			if(n < SIZE) {
-				std::memcpy(cash_[n].mac, mac, 6);  // MAC アドレス更新
-				cash_[n].time = 0;  // タイムスタンプ、リセット
+				std::memcpy(info_[n].mac, mac, 6);  // MAC アドレス更新
+				info_[n].time = 0;  // タイムスタンプ、リセット
 				return true;
 			} else {
 				if(pos_ < SIZE) {
-					cash_[pos_].ipa = ipa;
-					std::memcpy(cash_[pos_].mac, mac, 6);
-					cash_[pos_].time = 0;
+					info_[pos_].ipa = ipa;
+					std::memcpy(info_[pos_].mac, mac, 6);
+					info_[pos_].time = 0;
 					utils::format("Insert ARP cash (%d): %s -> %s\n")
 						% pos_
 						% tools::ip_str(ipa.get())
@@ -138,11 +138,11 @@ namespace net {
 					登録済みのタイムカウントを進める
 		*/
 		//-----------------------------------------------------------------//
-		void update()
+		void update() noexcept
 		{
 			for(uint32_t i = 0; i < pos_; ++i) {
-				if(cash_[i].time < 0xffff) {
-					++cash_[i].time;
+				if(info_[i].time < 0xffff) {
+					++info_[i].time;
 				}
 			}
 		}
@@ -153,15 +153,34 @@ namespace net {
 			@brief  リスト
 		*/
 		//-----------------------------------------------------------------//
-		void list() const
+		void list() const noexcept
 		{
 			for(uint32_t i = 0; i < pos_; ++i) {
 				utils::format("ARP Cash (%d): %s -> %s (%d)\n")
 					% i
-					% cash_[i].ipa.c_str()
-					% tools::mac_str(cash_[i].mac)
-					% static_cast<uint32_t>(cash_[i].time);
+					% info_[i].ipa.c_str()
+					% tools::mac_str(info_[i].mac)
+					% static_cast<uint32_t>(info_[i].time);
 			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  [] オペレーター
+			@param[in]	idx	参照ポイント
+			@return 参照
+		*/
+		//-----------------------------------------------------------------//
+		const arp_info& operator[] (uint32_t idx) const noexcept
+		{
+			if(idx >= pos_) {
+				static arp_info info;
+				std::memset(info.mac, 0x00, 6);
+				info.time = 0;
+				return info;
+			}
+			return info_[idx];
 		}
 	};
 }

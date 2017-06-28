@@ -42,7 +42,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		ethernet(ETHER& eth) : eth_(eth), info_(),
-			arp_(eth, info_), ipv4_(eth, info_),
+			arp_(info_), ipv4_(eth, info_),
 			info_update_count_(0)
 		{ }
 
@@ -95,7 +95,7 @@ namespace net {
 					break;
 
 				case eth_type::ARP:
-					arp_.parse(h, top, len - sizeof(eth_h));
+					arp_.parse(eth_, h, top, len - sizeof(eth_h));
 					break;
 
 				case eth_type::IPX:
@@ -121,6 +121,14 @@ namespace net {
 		{
 			int dsc = -1;
 
+#if 0
+			uint32_t n = info_.cash.lookup(adrs);
+			if(n == info_.cash.capacity()) {
+
+			} else {
+				
+			}
+#endif
 
 
 			return dsc;
@@ -153,6 +161,8 @@ namespace net {
 			} else {
 				++info_update_count_;
 			}
+
+			arp_.service(eth_);
 
 			ipv4_.service();
 		}

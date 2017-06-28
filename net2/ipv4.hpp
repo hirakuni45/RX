@@ -48,7 +48,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		ipv4(ETHER& eth, net_info& info) : eth_(eth), info_(info),
-			icmp_(eth), udpm_(eth), tcpm_(eth)
+			icmp_(), udpm_(eth), tcpm_(eth)
 		{ }
 
 
@@ -109,7 +109,7 @@ namespace net {
 
 			switch(ih.get_protocol()) {
 			case ipv4_protocol::ICMP:
-				icmp_.parse(eh, ih, msg, len); 
+				icmp_.parse(eth_, eh, ih, msg, len); 
 				break;
 			case ipv4_protocol::TCP:
 				tcpm_.parse(eh, ih, msg, len);

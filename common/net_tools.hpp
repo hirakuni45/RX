@@ -103,7 +103,7 @@ namespace net {
 			@return ブロード・キャスト型なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static inline const uint8_t* get_brodcast_mac()
+		static const uint8_t* get_brodcast_mac()
 		{
 			static uint8_t bmac[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 			return bmac;
