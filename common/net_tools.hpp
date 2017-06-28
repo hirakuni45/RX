@@ -92,7 +92,7 @@ namespace net {
 			if(mod) {
 				sum += static_cast<uint32_t>(p[0]) << 8;
 			}
-			return ((sum & 0xffff) + (sum >> 16)) ^ 0xffff;
+			return ~((sum & 0xffff) + (sum >> 16));
 		}
 
 
