@@ -146,6 +146,23 @@ namespace net {
 				}
 			}
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  リスト
+		*/
+		//-----------------------------------------------------------------//
+		void list() const
+		{
+			for(uint32_t i = 0; i < pos_; ++i) {
+				utils::format("ARP Cash (%d): %s -> %s (%d)\n")
+					% i
+					% cash_[i].ipa.c_str()
+					% tools::mac_str(cash_[i].mac)
+					% static_cast<uint32_t>(cash_[i].time);
+			}
+		}
 	};
 }
 
