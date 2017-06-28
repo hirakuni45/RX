@@ -191,29 +191,70 @@ namespace net {
 		@brief  IPV4 ヘッダー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct ipv4_h {
+	class ipv4_h {
 
-		uint8_t		ver_hlen;	///< バージョン(B0-B3)、ヘッダー長(B4-B7)
-		uint8_t		type;		///< サービス・タイプ
-		uint16_t	length;		///< 全長
-		uint16_t	id;			///< 識別番号
-		uint16_t	f_offset;	///< フラグ(B0-B2)、フラグメントオフセット(B3-B15)
-		uint8_t		time;		///< 生存時間
-		ipv4_protocol	protocol;	///< プロトコル
-		uint16_t	csum;		///< ヘッダ・チェックサム
+		uint8_t		ver_hlen_;      ///< バージョン(B0-B3)、ヘッダー長(B4-B7)
+		uint8_t		type_;          ///< サービス・タイプ
+		uint16_t	length_;        ///< 全長
+		uint16_t	id_;            ///< 識別番号
+		uint16_t	f_offset_;      ///< フラグ(B0-B2)、フラグメントオフセット(B3-B15)
+		uint8_t		time_;          ///< 生存時間
+		ipv4_protocol	protocol_;  ///< プロトコル
+		uint16_t	csum_;          ///< ヘッダ・チェックサム
 
-		uint8_t		src_ipa[4];	///< 送信元 IP アドレス
-		uint8_t		dst_ipa[4];	///< 宛先 IP アドレス
+		uint8_t		src_ipa_[4];    ///< 送信元 IP アドレス
+		uint8_t		dst_ipa_[4];    ///< 宛先 IP アドレス
 
-		uint16_t get_version() const { return ver_hlen & 0x0f; }
-		uint16_t get_header_length() const { return ver_hlen >> 4; }
-		uint16_t get_length() const { return tools::htons(length); }
-		uint16_t get_id() const { return tools::htons(id); }
-		uint16_t get_flag() const { return tools::htons(f_offset) >> 13; }
-		uint16_t get_flagment_offset() const { return tools::htons(f_offset) & 0x1fff; }
-		uint16_t get_time() const { return static_cast<uint16_t>(time); }
-		ipv4_protocol get_protocol() const { return protocol; }
-		uint16_t get_csum() const { return tools::htons(csum); }
+	public:
+		uint16_t get_version() const noexcept { return ver_hlen_ & 0x0f; }
+		void set_version(uint8_t ver) noexcept {
+			ver_hlen_ &= 0xf0;
+			ver_hlen_ |= ver;
+		}
+
+		uint16_t get_header_length() const noexcept { return ver_hlen_ >> 4; }
+		void set_header_length(uint8_t length) noexcept {
+			ver_hlen_ &= 0x0f;
+			ver_hlen_ |= length << 4;
+		}
+
+		uint16_t get_length() const noexcept { return tools::htons(length_); }
+		void set_length(uint16_t length) noexcept { length_ = tools::htons(length); }
+
+		uint16_t get_id() const noexcept { return tools::htons(id_); }
+		void set_id(uint16_t id) noexcept { id_ = tools::htons(id); }
+
+		/// 下位３ビット
+		uint8_t get_flag() const noexcept { return tools::htons(f_offset_) >> 13; }
+		void set_flag(uint8_t flag) noexcept {
+			uint16_t tmp = tools::htons(f_offset_);
+			tmp &= 0x1fff;
+			tmp |= static_cast<uint16_t>(flag) << 13;
+			f_offset_ = tools::htons(tmp);
+		}
+
+		uint16_t get_flagment_offset() const noexcept { return tools::htons(f_offset_) & 0x1fff; }
+		void set_flagment_offset(uint16_t ofs) noexcept {
+			uint16_t tmp = tools::htons(f_offset_);
+			tmp &= 0xe000;
+			tmp |= ofs;
+			f_offset_ = tools::htons(tmp);
+		}
+
+		uint16_t get_time() const noexcept { return static_cast<uint16_t>(time_); }
+		void set_time(uint16_t time) noexcept { time_ = tools::htons(time); }
+
+		ipv4_protocol get_protocol() const noexcept { return protocol_; }
+		void set_protocol(ipv4_protocol prop) noexcept { protocol_ = prop; }
+
+		uint16_t get_csum() const noexcept { return tools::htons(csum_); }
+		void set_csum(uint16_t csum) noexcept { csum_ = tools::htons(csum); }
+
+		const uint8_t* get_src_ipa() const { return src_ipa_; }
+		void set_src_ipa(const uint8_t* src) { std::memcpy(src_ipa_, src, 4); }
+
+		const uint8_t* get_dst_ipa() const { return dst_ipa_; }
+		void set_dst_ipa(const uint8_t* src) { std::memcpy(dst_ipa_, src, 4); }
 	};
 
 
@@ -227,8 +268,8 @@ namespace net {
 	static void swap_copy_ipv4_h(ipv4_h* dst, const ipv4_h* src)
 	{
 		std::memcpy(dst, src, 12);
-		std::memcpy(dst->src_ipa, src->dst_ipa, 4);
-		std::memcpy(dst->dst_ipa, src->src_ipa, 4);
+		dst->set_src_ipa(src->get_dst_ipa());
+		dst->set_dst_ipa(src->get_src_ipa());
 	}
 
 
@@ -268,8 +309,8 @@ namespace net {
 
 		utils::format("  csum: 0x%04X, src: %s, dst: %s\n")
 			% h.get_csum()
-			% tools::ip_str(h.src_ipa)
-			% tools::ip_str(h.dst_ipa);
+			% tools::ip_str(h.get_src_ipa())
+			% tools::ip_str(h.get_dst_ipa());
 	}
 
 

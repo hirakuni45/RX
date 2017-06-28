@@ -81,9 +81,9 @@ namespace net {
 				ipv4_h* d_ih = reinterpret_cast<ipv4_h*>(static_cast<uint8_t*>(dst) + sizeof(eth_h));
 				swap_copy_ipv4_h(d_ih, &ih);
 				{
-					d_ih->csum = 0x0000;
+					d_ih->set_csum(0x0000);
 					uint16_t sum = tools::calc_sum(d_ih, sizeof(ipv4_h));
-					d_ih->csum = tools::htons(sum);
+					d_ih->set_csum(sum);
 				}
 				uint8_t* d_msg = static_cast<uint8_t*>(dst);
 				d_msg += sizeof(eth_h) + sizeof(ipv4_h);

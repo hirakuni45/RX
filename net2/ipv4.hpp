@@ -99,7 +99,7 @@ namespace net {
 			uint16_t sum = tools::calc_sum(&ih, 20);
 			if(sum != 0) {
 				utils::format("IP Header sum error(%04X) -> %04X\n")
-					% static_cast<uint32_t>(tools::htons(ih.csum))
+					% static_cast<uint32_t>(ih.get_csum())
 					% static_cast<uint32_t>(sum);
 				return false;
 			}
