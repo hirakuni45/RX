@@ -7,7 +7,7 @@
 */
 //=========================================================================//
 #include "net2/net_st.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 
 namespace net {
 
@@ -33,7 +33,7 @@ namespace net {
 
 		net_info&	info_;
 
-		typedef utils::fifo<uint16_t, 8, arp_info> ARP_BUFF;
+		typedef utils::fixed_fifo<arp_info, 8> ARP_BUFF;
 
 		ARP_BUFF	arp_buff_;
 
