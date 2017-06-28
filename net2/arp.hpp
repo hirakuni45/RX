@@ -94,7 +94,7 @@ namespace net {
 				return false;
 			}
 
-			if(tools::check_brodcast_mac(h.dst) && r.head[7] == 0x01) {  // ARP Request
+			if(tools::check_brodcast_mac(h.get_dst()) && r.head[7] == 0x01) {  // ARP Request
 				if(arp_buff_.length() < (arp_buff_.size() - 1)) {
 					arp_info a;
 					a.ipa.set(r.src_ipa[0], r.src_ipa[1], r.src_ipa[2], r.src_ipa[3]);
@@ -133,8 +133,8 @@ namespace net {
 			}
 
 			eth_h& eh = *static_cast<eth_h*>(dst);
-			std::memcpy(eh.dst, h.src, 6);
-			std::memcpy(eh.src, info_.mac, 6);
+			eh.set_dst(h.get_src());
+			eh.set_src(info_.mac);
 			eh.set_type(eth_type::ARP);
 
    			arp_t& arp = *static_cast<arp_t*>(eth_h::next_ptr(dst));
@@ -172,8 +172,8 @@ namespace net {
 			}
 
 			eth_h& eh = *static_cast<eth_h*>(dst);
-			std::memcpy(eh.dst, tools::get_brodcast_mac(), 6);
-			std::memcpy(eh.src, info_.mac, 6);
+			eh.set_dst(tools::get_brodcast_mac());
+			eh.set_src(info_.mac);
 			eh.set_type(eth_type::ARP);
 
    			arp_t& arp = *static_cast<arp_t*>(eth_h::next_ptr(dst));

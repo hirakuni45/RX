@@ -21,9 +21,11 @@ namespace net {
 	/*!
 		@brief  ipv4 クラス
 		@param[in]	ETHER	イーサーネット・ドライバー・クラス
+		@param[in]	UDPN	UDP 管理数
+		@param[in]	TCPN	TCP 管理数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHER>
+	template <class ETHER, uint32_t UDPN, uint32_t TCPN>
 	class ipv4 {
 
 		ETHER&		eth_;
@@ -33,10 +35,10 @@ namespace net {
 		typedef icmp<ETHER>	ICMP;
 		ICMP		icmp_;
 
-		typedef udp_manage<ETHER> UDP_M;
+		typedef udp_manage<ETHER, UDPN> UDP_M;
 		UDP_M		udpm_;
 
-		typedef tcp_manage<ETHER> TCP_M;
+		typedef tcp_manage<ETHER, TCPN> TCP_M;
 		TCP_M		tcpm_;
 
 	public:
@@ -60,6 +62,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		uint32_t udp_capacity() const noexcept { return udpm_.capacity(); }
 
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  UDP の格納可能な最大サイズを返す
@@ -79,9 +82,9 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool parse(const eth_h& eh, const void* org, int32_t len)
 		{
-			if(std::memcmp(eh.dst, info_.mac, 6) == 0) {  // 自分に宛てたフレーム
+			if(std::memcmp(eh.get_dst(), info_.mac, 6) == 0) {  // 自分に宛てたフレーム
 //				dump_("Match:    ", h);
-			} else if(tools::check_brodcast_mac(eh.dst)) {  // ブロード・キャスト
+			} else if(tools::check_brodcast_mac(eh.get_dst())) {  // ブロード・キャスト
 //				dump_("Brodcast: ", h);
 			} else {
 				return false;

@@ -14,10 +14,10 @@ namespace net {
 	/*!
 		@brief  UDP マネージメント・クラス
 		@param[in]	ETHER	イーサーネット・ドライバー・クラス
-		@param[in]	NMAX	管理最大数（通常４個）
+		@param[in]	NMAX	管理最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class ETHER, uint32_t NMAX = 4>
+	template<class ETHER, uint32_t NMAX>
 	class udp_manage {
 
 		ETHER&		eth_;
@@ -63,12 +63,12 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  オープン
-			@param[in]	info	アドレス、MAC アドレス情報
+			@param[in]	adrs	アドレス
 			@param[in]	port	ポート
 			@return ディスクリプタ
 		*/
 		//-----------------------------------------------------------------//
-		int open(const arp_info& info, uint16_t port)
+		int open(const ip_adrs& adrs, uint16_t port)
 		{
 			int ds = -1;
 

@@ -29,7 +29,7 @@ namespace net {
 		typedef arp<ETHER> ARP;
 		ARP			arp_;
 
-		typedef ipv4<ETHER> IPV4;
+		typedef ipv4<ETHER, 4, 8> IPV4;
 		IPV4		ipv4_;
 
 		uint32_t	info_update_count_;

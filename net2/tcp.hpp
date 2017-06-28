@@ -51,11 +51,11 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  オープン
-			@param[in]	info	アドレス、MAC アドレス情報
+			@param[in]	adrs	アドレス
 			@param[in]	port	ポート
 		*/
 		//-----------------------------------------------------------------//
-		bool open(const arp_info& info, uint16_t port)
+		bool open(const ip_adrs& adrs, uint16_t port)
 		{
 
 

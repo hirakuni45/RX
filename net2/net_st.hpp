@@ -56,33 +56,68 @@ namespace net {
 		@brief  イーサーネット・ヘッダー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct eth_h {
-		uint8_t		dst[6];    ///< destination MAC address 受信先
-		uint8_t		src[6];    ///< source MAC address 送信元
-		eth_type	type;      ///< type
+	class eth_h {
+
+		uint8_t		dst_[6];  ///< destination MAC address 受信先
+		uint8_t		src_[6];  ///< source MAC address 送信元
+		eth_type	type_;    ///< type
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  Destination MAC の取得
+			@return Destination MAC
+		*/
+		//-----------------------------------------------------------------//
+		const uint8_t* get_dst() const noexcept { return dst_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  イーサーネット・タイプの取得 @n
-					※ネット・エンディアンを変換
+			@brief  Destination MAC の取得
+			@param[in]	ptr	元ポインター
+		*/
+		//-----------------------------------------------------------------//
+		void set_dst(const uint8_t* ptr) noexcept { std::memcpy(dst_, ptr, 6); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  Destination MAC の取得
+			@return Destination MAC
+		*/
+		//-----------------------------------------------------------------//
+		const uint8_t* get_src() const noexcept { return src_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  Destination MAC の取得
+			@param[in]	ptr	元ポインター
+		*/
+		//-----------------------------------------------------------------//
+		void set_src(const uint8_t* ptr) noexcept { std::memcpy(src_, ptr, 6); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  イーサーネット・タイプの取得
 			@return イーサーネット・タイプ
 		*/
 		//-----------------------------------------------------------------//
-		eth_type get_type() const {
-			return static_cast<eth_type>(tools::htons(static_cast<uint16_t>(type)));
+		eth_type get_type() const noexcept {
+			return static_cast<eth_type>(tools::htons(static_cast<uint16_t>(type_)));
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  イーサーネット・タイプの設定 @n
-					※ネット・エンディアンを変換
+			@brief  イーサーネット・タイプの設定
 			@return イーサーネット・タイプ
 		*/
 		//-----------------------------------------------------------------//
-		void set_type(eth_type t) {
-			type = static_cast<eth_type>(tools::htons(static_cast<uint16_t>(t)));
+		void set_type(eth_type t) noexcept {
+			type_ = static_cast<eth_type>(tools::htons(static_cast<uint16_t>(t)));
 		}
 
 
@@ -92,7 +127,7 @@ namespace net {
 			@return ヘッダー終端ポインター
 		*/
 		//-----------------------------------------------------------------//
-		static void* next_ptr(void* org) {
+		static void* next_ptr(void* org) noexcept {
 			return static_cast<void*>(static_cast<uint8_t*>(org) + sizeof(eth_h));
 		}
 
@@ -103,7 +138,7 @@ namespace net {
 			@return ヘッダー終端ポインター
 		*/
 		//-----------------------------------------------------------------//
-		static const void* next_ptr(const void* org) {
+		static const void* next_ptr(const void* org) noexcept {
 			return static_cast<const void*>(static_cast<const uint8_t*>(org) + sizeof(eth_h));
 		}
 	};
@@ -118,9 +153,9 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	static void swap_copy_eth_h(eth_h* dst, const eth_h* src)
 	{
-		std::memcpy(dst->dst, src->src, 6);
-		std::memcpy(dst->src, src->dst, 6);
-		dst->type = src->type;
+		dst->set_dst(src->get_src());
+		dst->set_src(src->get_dst());
+		dst->set_type(src->get_type());
 	}
 
 
@@ -133,8 +168,8 @@ namespace net {
 	static void dump(const eth_h& h) {
 		utils::format("Ethernet Header:\n");
 		utils::format("  src(%s), dst(%s), type(%04X)\n")
-			% tools::mac_str(h.src)
-			% tools::mac_str(h.dst)
+			% tools::mac_str(h.get_src())
+			% tools::mac_str(h.get_dst())
 			% static_cast<uint32_t>(h.get_type());
 	}
 
@@ -150,12 +185,14 @@ namespace net {
 		UDP  = 0x11,	///< UDP
 	};
 
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  IPV4 ヘッダー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct ipv4_h {
+
 		uint8_t		ver_hlen;	///< バージョン(B0-B3)、ヘッダー長(B4-B7)
 		uint8_t		type;		///< サービス・タイプ
 		uint16_t	length;		///< 全長
@@ -241,7 +278,59 @@ namespace net {
 		@brief  TCP セグメント・ヘッダー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	class udp_segment {
+
+		uint16_t	src_port_;	///< 送信元ポート番号
+		uint16_t	dst_port_;	///< あて先ポート番号
+		uint16_t	length_;	///< 長さ
+		uint16_t	csum_;		///< チェックサム
+
+	public:
+
+		uint16_t get_src_port() const noexcept { return tools::htons(src_port_); }
+		void set_src_port(uint16_t port) noexcept { src_port_ = tools::htons(port); }
+
+		uint16_t get_dst_port() const noexcept { return tools::htons(dst_port_); }
+		void set_dst_port(uint16_t port) noexcept { dst_port_ = tools::htons(port); }
+
+		uint16_t get_length() const noexcept { return tools::htons(length_); }
+		void set_length(uint16_t length) noexcept { length_ = tools::htons(length); }
+
+		uint16_t get_csum() const noexcept { return tools::htons(csum_); }
+		void set_csum(uint16_t csum) noexcept { csum_ = tools::htons(csum); }
+	};
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  udp_segment  ヘッダーのダンプ
+		@param[in]	h	udp_segment ヘッダー
+	*/
+	//-----------------------------------------------------------------//
+	static void dump(const udp_segment& h)
+	{
+		utils::format("UDP Segment: src(%d), dst(%d)\n")
+			% h.get_src_port()
+			% h.get_dst_port();
+		utils::format("  Length: %d, CSUM: %04X\n") % h.get_length() % h.get_csum();
+	}
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  TCP セグメント・ヘッダー
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class tcp_segment {
+
+		uint16_t	src_port_;
+		uint16_t	dst_port_;
+		uint32_t	seq_;
+		uint32_t	ack_;
+		uint16_t	flag_ofs_;
+		uint16_t	window_;
+		uint16_t	csum_;
+		uint16_t	urgent_ptr_;
 
 		static void set_flag_(bool f, uint16_t mask, uint16_t& dst) {
 			if(f) {
@@ -252,15 +341,6 @@ namespace net {
 		}
 
 	public:
-		uint16_t	src_port_;
-		uint16_t	dst_port_;
-		uint32_t	seq_;
-		uint32_t	ack_;
-		uint16_t	flag_ofs_;
-		uint16_t	window_;
-		uint16_t	csum_;
-		uint16_t	urgent_ptr_;
-
 		uint16_t get_src_port() const { return tools::htons(src_port_); }
 		void set_src_port(uint16_t port) { src_port_ = tools::htons(port); }
 
