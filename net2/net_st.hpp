@@ -9,8 +9,9 @@
 #include <cstdint>
 #include <cstring>
 #include "common/net_tools.hpp"
-#include "common/format.hpp"
 #include "common/ip_adrs.hpp"
+#include "common/format.hpp"
+#include "net2/mac_cash.hpp"
 
 namespace net {
 
@@ -28,7 +29,10 @@ namespace net {
 		ip_adrs		dns;     ///< Domain Name Server
 		ip_adrs		dns2;    ///< Domain Name Server 2ND
 
-		net_info() : mac{ 0 }, ip(), mask(), gw(), dns(), dns2() { }
+		typedef mac_cash<8> CASH;
+		CASH		cash;
+
+		net_info() : mac{ 0 }, ip(), mask(), gw(), dns(), dns2(), cash() { }
 	};
 
 
@@ -78,7 +82,7 @@ namespace net {
 		@param[in]	src	コピー元
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	void swap_copy_eth_h(eth_h* dst, const eth_h* src)
+	static void swap_copy_eth_h(eth_h* dst, const eth_h* src)
 	{
 		std::memcpy(dst->dst, src->src, 6);
 		std::memcpy(dst->src, src->dst, 6);
@@ -92,7 +96,7 @@ namespace net {
 		@param[in]	h	イーサーネット・ヘッダー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	void dump(const eth_h& h) {
+	static void dump(const eth_h& h) {
 		utils::format("src(%s), dst(%s), type(%04X)\n")
 			% tools::mac_str(h.src)
 			% tools::mac_str(h.dst)
@@ -148,7 +152,7 @@ namespace net {
 		@param[in]	src	コピー元
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	void swap_copy_ipv4_h(ipv4_h* dst, const ipv4_h* src)
+	static void swap_copy_ipv4_h(ipv4_h* dst, const ipv4_h* src)
 	{
 		std::memcpy(dst, src, 12);
 		std::memcpy(dst->src_ipa, src->dst_ipa, 4);
@@ -162,7 +166,7 @@ namespace net {
 		@param[in]	h	IPV4 ヘッダー
 	*/
 	//-----------------------------------------------------------------//
-	void dump(const ipv4_h& h)
+	static void dump(const ipv4_h& h)
 	{
 		utils::format("IP Header:\n");
 		utils::format("  version: %d, header length: %d\n")
@@ -264,4 +268,31 @@ namespace net {
 		bool get_flag_fin() const { return (flag_ofs_ & 0x0080) != 0; }
 		void set_flag_fin(bool f) { set_flag_(f, 0x0080, flag_ofs_); }
 	};
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  tcp_segment  ヘッダーのダンプ
+		@param[in]	h	tcp_segment ヘッダー
+	*/
+	//-----------------------------------------------------------------//
+	static void dump(const tcp_segment& h)
+	{
+		utils::format("TCP Segment: src(%d), dst(%d)\n")
+			% h.get_src_port()
+			% h.get_dst_port();
+		utils::format("  Seq: %d, Aack: %d\n") % h.get_seq() % h.get_ack();
+		utils::format("  flags: URG: %d, ACK: %d, PSH:%d, RST:%d, SYN:%d, FIN:%d\n")
+			% h.get_flag_urg()
+			% h.get_flag_ack()
+			% h.get_flag_psh()
+			% h.get_flag_rst()
+			% h.get_flag_syn()
+			% h.get_flag_fin();
+		utils::format("  offset(header length): %d\n") % h.get_flag_ofs();
+		utils::format("  Window: %d, C-Sum: %04X, Urgent PTR: %d\n")
+			% h.get_window()
+			% h.get_csum()
+			% h.get_urgent_ptr();
+	}
 }

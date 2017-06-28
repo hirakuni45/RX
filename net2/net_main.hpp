@@ -52,17 +52,15 @@ namespace net {
 		uint8_t		link_interval_;
 		uint8_t		stall_loop_;
 
-		net_info	info_;
-
 		void set_tcpudp_env_()
 		{
 			const DHCP_INFO& info = dhcp_.get_info();
 			info.list();
-			info_.ip.set(info.ipaddr);
-			info_.mask.set(info.maskaddr);
-			info_.gw.set(info.gwaddr);
-			info_.dns.set(info.dnsaddr);
-			info_.dns2.set(info.dnsaddr2);
+			ethernet_.at_info().ip.set(info.ipaddr);
+			ethernet_.at_info().mask.set(info.maskaddr);
+			ethernet_.at_info().gw.set(info.gwaddr);
+			ethernet_.at_info().dns.set(info.dnsaddr);
+			ethernet_.at_info().dns2.set(info.dnsaddr2);
 		}
 
 	public:
@@ -75,10 +73,10 @@ namespace net {
 		net_main(ETHER& eth) : eth_(eth), dhcp_(eth), ethernet_(eth),
 			task_(task::wait_link), link_interval_(0), stall_loop_(0)
 			{
-				info_.ip.set(192, 168, 3, 20);
-				info_.mask.set(255, 255, 255, 0);
-				info_.gw.set(192, 168, 3, 1);
-				info_.dns.set(192, 168, 3, 1);
+				ethernet_.at_info().ip.set(192, 168, 3, 20);
+				ethernet_.at_info().mask.set(255, 255, 255, 0);
+				ethernet_.at_info().gw.set(192, 168, 3, 1);
+				ethernet_.at_info().dns.set(192, 168, 3, 1);
 			}
 
 
@@ -88,7 +86,7 @@ namespace net {
 			@return ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		const net_info& get_info() const { return info_; }
+		const net_info& get_info() const { return ethernet_.get_info(); }
 
 
 		//-----------------------------------------------------------------//
@@ -103,7 +101,7 @@ namespace net {
 			if(ret) {
 				debug_format("net_main: start OK\n");
 				link_interval_ = 0;
-				std::memcpy(info_.mac, eth_.get_mac(), 6);
+				std::memcpy(ethernet_.at_info().mac, eth_.get_mac(), 6);
 				task_ = task::wait_link;
 			} else {
 				debug_format("net_main: start NG\n");
@@ -121,7 +119,7 @@ namespace net {
 		void service_frame()
 		{
 			if(task_ == task::main_loop) {
-				ethernet_.service();
+				ethernet_.process();
 			}
 		}
 
@@ -133,6 +131,8 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void service()
 		{
+			ethernet_.service();
+
 			switch(task_) {
 
 			case task::wait_link:
@@ -165,7 +165,6 @@ namespace net {
 					debug_format("net_main: DHCP Error\n");
 					task_ = task::stall;
 				}
-				ethernet_.set_info(info_);
 				break;
 
 			case task::main_init:

@@ -14,23 +14,14 @@ namespace net {
 	/*!
 		@brief  ARP クラス
 		@param[in]	ETHER	イーサーネット・ドライバー・クラス
-		@param[in]	ARPN	ARP キャッシュの最大数（通常８）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class ETHER, uint32_t ARPN = 8>
+	template<class ETHER>
 	class arp {
 
 		ETHER&		eth_;
 
 		net_info&	info_;
-
-		struct arp_cash {
-			uint8_t		ip[4];
-			uint8_t		mac[6];
-		};
-		arp_cash	arp_cash_[ARPN];
-		uint32_t	arp_cash_num_;
-
 
 		struct arp_t {
 			uint8_t	head[8];
@@ -40,26 +31,6 @@ namespace net {
 			uint8_t dst_ipa[4];
 		};
 
-
-		bool install_arp_cash_(const arp_t& t)
-		{
-			if(arp_cash_num_ >= ARPN) {
-				return false;
-			}
-#if 0
-			for(uint32_t i = 0; i < arp_cash_num_; ++i) {				
-				if(std::memcmp(arp_cash_[i].ip, t.ip, 4) == 0) {
-					std::memcpy(arp_cash_[i].mac, t.mac, 6);
-					return true;
-				}
-			}
-			arp_cash_[arp_cash_num_] = t;
-			++arp_cash_num_;
-#endif
-			return true;
-		}
-
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -68,8 +39,7 @@ namespace net {
 			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		arp(ETHER& eth, net_info& info) : eth_(eth), info_(info),
-			arp_cash_{ 0 }, arp_cash_num_(0)
+		arp(ETHER& eth, net_info& info) : eth_(eth), info_(info)
 		{ }
 
 
@@ -91,14 +61,27 @@ namespace net {
 			}
 
 			const arp_t& r = *static_cast<const arp_t*>(top);
-			static const uint8_t head[8] = { 0x00, 0x01, 0x08, 0x00, 0x06, 0x04, 0x00, 0x01 };
-			if(std::memcmp(head, r.head, 8) != 0) {
+			static const uint8_t head[7] = { 0x00, 0x01, 0x08, 0x00, 0x06, 0x04, 0x00 };
+			if(std::memcmp(head, r.head, 7) != 0) {
+				return false;
+			}
+
+			if(r.head[7] == 0x01) {  // ARP request
+				ip_adrs ipa(r.src_ipa[0], r.src_ipa[1], r.src_ipa[2], r.src_ipa[3]);
+				info_.cash.insert(ipa, r.src_mac);
+			} else if(r.head[7] == 0x02) {  // ARP response
+				// IP/MAC の収集
+				ip_adrs ipa(r.src_ipa[0], r.src_ipa[1], r.src_ipa[2], r.src_ipa[3]);
+				info_.cash.insert(ipa, r.src_mac);
+				ipa.set(r.dst_ipa[0], r.dst_ipa[1], r.dst_ipa[2], r.dst_ipa[3]);
+				info_.cash.insert(ipa, r.dst_mac);
+				return false;
+			} else {
 				return false;
 			}
 
 			ip_adrs ipa(r.dst_ipa[0], r.dst_ipa[1], r.dst_ipa[2], r.dst_ipa[3]);
 			if(info_.ip != ipa) {
-				install_arp_cash_(r);
 				return false;
 			}
 

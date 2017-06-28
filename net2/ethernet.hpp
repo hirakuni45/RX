@@ -8,6 +8,7 @@
 //=========================================================================//
 #include "net2/net_st.hpp"
 #include "net2/ipv4.hpp"
+#include "net2/mac_cash.hpp"
 #include "net2/arp.hpp"
 
 namespace net {
@@ -16,21 +17,22 @@ namespace net {
 	/*!
 		@brief  ethernet クラス
 		@param[in]	ETHER	イーサーネット・ドライバー・クラス
-		@param[in]	ARPN	ARP キャッシュの最大数（通常８）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class ETHER, uint32_t ARPN = 8>
+	template<class ETHER>
 	class ethernet {
 
 		ETHER&		eth_;
 
 		net_info	info_;
 
-		typedef arp<ETHER, ARPN> ARP;
+		typedef arp<ETHER> ARP;
 		ARP			arp_;
 
 		typedef ipv4<ETHER> IPV4;
 		IPV4		ipv4_;
+
+		uint32_t	info_update_count_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -40,28 +42,35 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		ethernet(ETHER& eth) : eth_(eth), info_(),
-			arp_(eth, info_), ipv4_(eth, info_)
+			arp_(eth, info_), ipv4_(eth, info_),
+			info_update_count_(0)
 		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ネット情報の登録
-			@param[in]	info	ネット情報
+			@brief  ネット情報の参照
+			@return ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		void set_info(const net_info& info)
-		{
-			info_ = info;
-		}
+		net_info& at_info() { return info_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  サービス
+			@brief  ネット情報の参照（ＲＯ）
+			@return ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		void service()
+		const net_info& get_info() const { return info_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  データ、受信、送信、プロセス
+		*/
+		//-----------------------------------------------------------------//
+		void process()
 		{
 			// recv
 			void* org;
@@ -70,8 +79,9 @@ namespace net {
 
 				return;
 			} else if((len > 1514) || (len < 60)) {  // サイズ範囲外は捨てる
-
-				eth_.recv_buff_release();
+				if(len != 0) {
+					eth_.recv_buff_release();
+				}
 				return;
 			} else {  // recv data
 
@@ -95,6 +105,21 @@ namespace net {
 				}
 
 				eth_.recv_buff_release();
+			}
+		}
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  サービス（１０ｍｓ毎に呼ぶ）
+		*/
+		//-----------------------------------------------------------------//
+		void service()
+		{
+			if(info_update_count_ >= 10) {
+				info_.cash.update();
+				info_update_count_ = 0;
+			} else {
+				++info_update_count_;
 			}
 		}
 	};
