@@ -169,7 +169,7 @@ namespace net {
 		process_end:
 
 			while(arp_send_.length() > 0) {
-				const arp_send_t& t = arp_send_.get();
+				const arp_send_t& t = arp_send_.get_at();
 
 				void* dst;
 				uint16_t dlen;
@@ -179,6 +179,8 @@ namespace net {
 				}
 				std::memcpy(dst, &t, sizeof(arp_send_t));
 				eth.send(sizeof(arp_send_t));
+
+				arp_send_.get_go();
 			}
 
 			return ret;
