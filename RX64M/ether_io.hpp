@@ -259,14 +259,14 @@ namespace device {
 		volatile descriptor_s*	app_rx_desc_;
 		volatile descriptor_s*	app_tx_desc_;
 
-		static volatile bool	mpd_flag_;
 		static volatile void* 	intr_task_;
+   		static volatile bool	mpd_flag_;
 
-		PHY		phy_;
+		PHY				phy_;
 
-		uint8_t	intr_level_;
+		uint8_t			intr_level_;
 
-		uint8_t	mac_addr_[6];
+		uint8_t			mac_addr_[6];
 
 		volatile bool					pause_frame_enable_;
 		volatile magic_packet_mode		magic_packet_detect_;
@@ -637,7 +637,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みタスクを設定（EDMAC)
+			@brief  割り込みタスクを設定（EDMAC 割り込み)
 			@param[in]	task	割り込みタスク
 		*/
 		//-----------------------------------------------------------------//
@@ -710,11 +710,11 @@ namespace device {
 			intr_level_ = level;
 
 			// Initialize the transmit and receive descriptor
-			memset((void*)rx_descriptors_, 0x00, sizeof(rx_descriptors_));
-			memset((void*)tx_descriptors_, 0x00, sizeof(tx_descriptors_));
+			std::memset((void*)rx_descriptors_, 0x00, sizeof(rx_descriptors_));
+			std::memset((void*)tx_descriptors_, 0x00, sizeof(tx_descriptors_));
 
 			// Initialize the Ether buffer */
-			memset((void*)&ether_buffers_, 0x00, sizeof(ether_buffers_));
+			std::memset((void*)&ether_buffers_, 0x00, sizeof(ether_buffers_));
 
 #if 0
     memset(etherc_edmac_power_cont, 0x00, sizeof(etherc_edmac_power_cont));
@@ -790,34 +790,14 @@ namespace device {
 		}
 
 
-		int32_t recv_buff_release()
-		{
-    		int32_t ret;
-
-			// When the Link up processing is not completed, return error
-			if(!transfer_enable_) {
-				ret = ERROR_LINK;
-			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
-				ret = ERROR_MPDE;
-			} else {  // When the Link up processing is completed
-				if(RACT != (app_rx_desc_->status & RACT)) {  // When receive data exists
-					// Move to next descriptor
-					app_rx_desc_->status |= RACT;
-					app_rx_desc_->status &= ~(RFP1 | RFP0 | RFE | RFS9_RFOVER | RFS8_RAD | RFS7_RMAF |
-                                     RFS4_RRF | RFS3_RTLF | RFS2_RTSF | RFS1_PRE | RFS0_CERF);
-					app_rx_desc_ = app_rx_desc_->next;
-				}
-				if(0x00000000L == EDMAC::EDRRR()) {
-					// Restart if stopped
-					EDMAC::EDRRR = 0x00000001L;
-				}
-				ret = OK;
-			}
-    		return ret;
-		}
-
-
-		int32_t recv(void** buf)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	受信バッファの取得
+			@param[out]	buf	受信バッファ・ポインター
+			@return エラー・ステータス
+		*/
+		//-----------------------------------------------------------------//
+		int32_t recv_buff(void** buf)
 		{
 			int32_t num_recvd;
 			int32_t ret;
@@ -853,7 +833,48 @@ namespace device {
 		}
 
 
-		int32_t send_buff(void** buf, uint16_t& buf_size)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	受信バッファ開放
+			@return エラー・ステータス
+		*/
+		//-----------------------------------------------------------------//
+		int32_t recv_buff_release()
+		{
+    		int32_t ret;
+
+			// When the Link up processing is not completed, return error
+			if(!transfer_enable_) {
+				ret = ERROR_LINK;
+			} else if(1 == ETHRC::ECMR.MPDE()) {  // In case of detection mode of magic packet, return error.
+				ret = ERROR_MPDE;
+			} else {  // When the Link up processing is completed
+				if(RACT != (app_rx_desc_->status & RACT)) {  // When receive data exists
+					// Move to next descriptor
+					app_rx_desc_->status |= RACT;
+					app_rx_desc_->status &= ~(RFP1 | RFP0 | RFE | RFS9_RFOVER | RFS8_RAD | RFS7_RMAF |
+                                     RFS4_RRF | RFS3_RTLF | RFS2_RTSF | RFS1_PRE | RFS0_CERF);
+					app_rx_desc_ = app_rx_desc_->next;
+				}
+				if(0x00000000L == EDMAC::EDRRR()) {
+					// Restart if stopped
+					EDMAC::EDRRR = 0x00000001L;
+				}
+				ret = OK;
+			}
+    		return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	転送バッファの取得
+			@param[out]	buf	転送バッファ・ポインター
+			@param[out]	len	転送最大数
+			@return エラー・ステータス
+		*/
+		//-----------------------------------------------------------------//
+		int32_t send_buff(void** buf, uint16_t& len)
 		{
 			int32_t ret;
 			// When the Link up processing is not completed, return error
@@ -868,7 +889,7 @@ namespace device {
 				} else {
 					// Give application another buffer to work with
 					*buf = (void*)app_tx_desc_->buf_p;
-					buf_size = app_tx_desc_->size;
+					len = app_tx_desc_->size;
 					ret = OK;
 				}
 			}
@@ -876,6 +897,13 @@ namespace device {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	転送
+			@param[in]	len	転送バイト数
+			@return エラー・ステータス
+		*/
+		//-----------------------------------------------------------------//
 		int32_t send(uint32_t len)
 		{
 			int32_t ret;
@@ -889,6 +917,7 @@ namespace device {
 				app_tx_desc_->bufsize = len;
 				app_tx_desc_->status &= ~(TFP1 | TFP0);
 				app_tx_desc_->status |= (TFP1 | TFP0 | TACT);
+
 				app_tx_desc_ = app_tx_desc_->next;
 
 				if(0x00000000L == EDMAC::EDTRR()) {
@@ -931,7 +960,7 @@ namespace device {
 			}
 
 			void* ptr;
-			auto l = recv(&ptr);
+			auto l = recv_buff(&ptr);
 			if(l > 0) {
 				if(l > static_cast<int32_t>(len)) {
 					l -= len;
@@ -1214,9 +1243,9 @@ namespace device {
 	};
 
 	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN, uint32_t RXDN>
-		volatile bool ether_io<ETHRC, EDMAC, PHY, TXDN, RXDN>::mpd_flag_;
+		volatile void* ether_io<ETHRC, EDMAC, PHY, TXDN, RXDN>::intr_task_ = nullptr;
 
 	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN, uint32_t RXDN>
-		volatile void* ether_io<ETHRC, EDMAC, PHY, TXDN, RXDN>::intr_task_;
+		volatile bool ether_io<ETHRC, EDMAC, PHY, TXDN, RXDN>::mpd_flag_ = false;
 
 }
