@@ -84,7 +84,7 @@ namespace utils {
 			@return	値の取得参照
         */
         //-----------------------------------------------------------------//
-		const T& get_at() noexcept { return buff_[get_]; }
+		const T& get_at() const noexcept { return buff_[get_]; }
 
 
         //-----------------------------------------------------------------//
