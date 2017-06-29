@@ -176,34 +176,33 @@ namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  IPV4 プロトコル
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class ipv4_protocol : uint8_t {
-		ICMP = 0x01,	///< ICMP
-		TCP  = 0x06,	///< TCP
-		UDP  = 0x11,	///< UDP
-	};
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
 		@brief  IPV4 ヘッダー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class ipv4_h {
+	struct ipv4_h {
+	
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  IPV4 プロトコル
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class protocol : uint8_t {
+			ICMP = 0x01,	///< ICMP
+			TCP  = 0x06,	///< TCP
+			UDP  = 0x11,	///< UDP
+		};
 
-		uint8_t		ver_hlen_;      ///< バージョン(B0-B3)、ヘッダー長(B4-B7)
-		uint8_t		type_;          ///< サービス・タイプ
-		uint16_t	length_;        ///< 全長
-		uint16_t	id_;            ///< 識別番号
-		uint16_t	f_offset_;      ///< フラグ(B0-B2)、フラグメントオフセット(B3-B15)
-		uint8_t		time_;          ///< 生存時間
-		ipv4_protocol	protocol_;  ///< プロトコル
-		uint16_t	csum_;          ///< ヘッダ・チェックサム
+		uint8_t		ver_hlen_;    ///< バージョン(B0-B3)、ヘッダー長(B4-B7)
+		uint8_t		type_;        ///< サービス・タイプ
+		uint16_t	length_;      ///< 全長
+		uint16_t	id_;          ///< 識別番号
+		uint16_t	f_offset_;    ///< フラグ(B0-B2)、フラグメントオフセット(B3-B15)
+		uint8_t		time_;        ///< 生存時間
+		protocol	protocol_;    ///< プロトコル
+		uint16_t	csum_;        ///< ヘッダ・チェックサム
 
-		uint8_t		src_ipa_[4];    ///< 送信元 IP アドレス
-		uint8_t		dst_ipa_[4];    ///< 宛先 IP アドレス
+		uint8_t		src_ipa_[4];  ///< 送信元 IP アドレス
+		uint8_t		dst_ipa_[4];  ///< 宛先 IP アドレス
 
 	public:
 		uint16_t get_version() const noexcept { return ver_hlen_ & 0x0f; }
@@ -244,8 +243,8 @@ namespace net {
 		uint16_t get_time() const noexcept { return static_cast<uint16_t>(time_); }
 		void set_time(uint16_t time) noexcept { time_ = tools::htons(time); }
 
-		ipv4_protocol get_protocol() const noexcept { return protocol_; }
-		void set_protocol(ipv4_protocol prop) noexcept { protocol_ = prop; }
+		protocol get_protocol() const noexcept { return protocol_; }
+		void set_protocol(protocol prop) noexcept { protocol_ = prop; }
 
 		uint16_t get_csum() const noexcept { return tools::htons(csum_); }
 		void set_csum(uint16_t csum) noexcept { csum_ = tools::htons(csum); }
@@ -255,7 +254,7 @@ namespace net {
 
 		const uint8_t* get_dst_ipa() const noexcept { return dst_ipa_; }
 		void set_dst_ipa(const uint8_t* src) noexcept { std::memcpy(dst_ipa_, src, 4); }
-	};
+	} __attribute__((__packed__));
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -293,13 +292,13 @@ namespace net {
 		utils::format("  time: %d") % h.get_time();
 
 		switch(h.get_protocol()) {
-		case ipv4_protocol::ICMP:
+		case ipv4_h::protocol::ICMP:
 			utils::format(", ICMP\n");
 			break;
-		case ipv4_protocol::TCP:
+		case ipv4_h::protocol::TCP:
 			utils::format(", TCP\n");
 			break;
-		case ipv4_protocol::UDP:
+		case ipv4_h::protocol::UDP:
 			utils::format(", UDP\n");
 			break;
 		default:
@@ -319,7 +318,7 @@ namespace net {
 		@brief  UDP セグメント・ヘッダー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class udp_segment {
+	class udp_h {
 
 		uint16_t	src_port_;	///< 送信元ポート番号
 		uint16_t	dst_port_;	///< あて先ポート番号
@@ -339,7 +338,7 @@ namespace net {
 
 		uint16_t get_csum() const noexcept { return tools::htons(csum_); }
 		void set_csum(uint16_t csum) noexcept { csum_ = tools::htons(csum); }
-	};
+	} __attribute__((__packed__));
 
 
 	//-----------------------------------------------------------------//
@@ -348,7 +347,7 @@ namespace net {
 		@param[in]	h	udp_segment ヘッダー
 	*/
 	//-----------------------------------------------------------------//
-	static void dump(const udp_segment& h)
+	static void dump(const udp_h& h)
 	{
 		utils::format("UDP Segment: src(%d), dst(%d)\n")
 			% h.get_src_port()
@@ -362,7 +361,7 @@ namespace net {
 		@brief  TCP セグメント・ヘッダー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class tcp_segment {
+	class tcp_h {
 
 		uint16_t	src_port_;
 		uint16_t	dst_port_;
@@ -373,11 +372,11 @@ namespace net {
 		uint16_t	csum_;
 		uint16_t	urgent_ptr_;
 
-		static void set_flag_(bool f, uint16_t mask, uint16_t& dst) {
+		void set_flag_(bool f, uint16_t mask, uint16_t* dst) {
 			if(f) {
-				dst |=  mask;
+				*dst |=  mask;
 			} else {
-				dst &= ~mask;
+				*dst &= ~mask;
 			}
 		}
 
@@ -407,23 +406,23 @@ namespace net {
 		void set_urgent_ptr(uint16_t ptr) { urgent_ptr_ = tools::htons(ptr); }
 
 		bool get_flag_urg() const { return (flag_ofs_ & 0x0004) != 0; }
-		void set_flag_urg(bool f) { set_flag_(f, 0x0004, flag_ofs_); }
+		void set_flag_urg(bool f) { set_flag_(f, 0x0004, &flag_ofs_); }
 
 		bool get_flag_ack() const { return (flag_ofs_ & 0x0008) != 0; }
-		void set_flag_ack(bool f) { set_flag_(f, 0x0008, flag_ofs_); }
+		void set_flag_ack(bool f) { set_flag_(f, 0x0008, &flag_ofs_); }
 
 		bool get_flag_psh() const { return (flag_ofs_ & 0x0010) != 0; }
-		void set_flag_psh(bool f) { set_flag_(f, 0x0010, flag_ofs_); }
+		void set_flag_psh(bool f) { set_flag_(f, 0x0010, &flag_ofs_); }
 
 		bool get_flag_rst() const { return (flag_ofs_ & 0x0020) != 0; }
-		void set_flag_rst(bool f) { set_flag_(f, 0x0020, flag_ofs_); }
+		void set_flag_rst(bool f) { set_flag_(f, 0x0020, &flag_ofs_); }
 
 		bool get_flag_syn() const { return (flag_ofs_ & 0x0040) != 0; }
-		void set_flag_syn(bool f) { set_flag_(f, 0x0040, flag_ofs_); }
+		void set_flag_syn(bool f) { set_flag_(f, 0x0040, &flag_ofs_); }
 
 		bool get_flag_fin() const { return (flag_ofs_ & 0x0080) != 0; }
-		void set_flag_fin(bool f) { set_flag_(f, 0x0080, flag_ofs_); }
-	};
+		void set_flag_fin(bool f) { set_flag_(f, 0x0080, &flag_ofs_); }
+	} __attribute__((__packed__));
 
 
 	//-----------------------------------------------------------------//
@@ -432,7 +431,7 @@ namespace net {
 		@param[in]	h	tcp_segment ヘッダー
 	*/
 	//-----------------------------------------------------------------//
-	static void dump(const tcp_segment& h)
+	static void dump(const tcp_h& h)
 	{
 		utils::format("TCP Segment: src(%d), dst(%d)\n")
 			% h.get_src_port()

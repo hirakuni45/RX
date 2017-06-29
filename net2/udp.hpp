@@ -24,7 +24,11 @@ namespace net {
 
 		task		task_;
 
-
+		struct frame_t {
+			eth_h	eh_;
+			ipv4_h	ipv4_;
+			udp_h	udp_;
+		} __attribute__((__packed__));
 
 	public:
 		//-----------------------------------------------------------------//
@@ -47,6 +51,10 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool parse(const eth_h& eh, const ipv4_h& ih, const void* msg, int32_t len)
 		{
+			const udp_h* h = reinterpret_cast<const udp_h*>(msg);
+
+
+
 			return true;
 		}
 

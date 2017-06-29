@@ -112,13 +112,13 @@ namespace net {
 //			dump(ih);
 
 			switch(ih.get_protocol()) {
-			case ipv4_protocol::ICMP:
+			case ipv4_h::protocol::ICMP:
 				icmp_.process(eth_, eh, ih, msg, len); 
 				break;
-			case ipv4_protocol::TCP:
+			case ipv4_h::protocol::TCP:
 				tcpm_.process(eh, ih, msg, len);
 				break;
-			case ipv4_protocol::UDP:
+			case ipv4_h::protocol::UDP:
 				udpm_.process(eh, ih, msg, len);
 				break;
 			default:
