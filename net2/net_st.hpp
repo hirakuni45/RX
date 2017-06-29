@@ -141,7 +141,7 @@ namespace net {
 		static const void* next_ptr(const void* org) noexcept {
 			return static_cast<const void*>(static_cast<const uint8_t*>(org) + sizeof(eth_h));
 		}
-	};
+	} __attribute__((__packed__));
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -250,11 +250,11 @@ namespace net {
 		uint16_t get_csum() const noexcept { return tools::htons(csum_); }
 		void set_csum(uint16_t csum) noexcept { csum_ = tools::htons(csum); }
 
-		const uint8_t* get_src_ipa() const { return src_ipa_; }
-		void set_src_ipa(const uint8_t* src) { std::memcpy(src_ipa_, src, 4); }
+		const uint8_t* get_src_ipa() const noexcept { return src_ipa_; }
+		void set_src_ipa(const uint8_t* src) noexcept { std::memcpy(src_ipa_, src, 4); }
 
-		const uint8_t* get_dst_ipa() const { return dst_ipa_; }
-		void set_dst_ipa(const uint8_t* src) { std::memcpy(dst_ipa_, src, 4); }
+		const uint8_t* get_dst_ipa() const noexcept { return dst_ipa_; }
+		void set_dst_ipa(const uint8_t* src) noexcept { std::memcpy(dst_ipa_, src, 4); }
 	};
 
 
@@ -316,7 +316,7 @@ namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  TCP セグメント・ヘッダー
+		@brief  UDP セグメント・ヘッダー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class udp_segment {

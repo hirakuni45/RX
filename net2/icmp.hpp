@@ -38,7 +38,8 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  パース
+			@brief  プロセス
+					※割り込み外から呼ぶ事は禁止
 			@param[in]	eth	イーサーネット・ドライバー
 			@param[in]	eh	イーサーネット・ヘッダー
 			@param[in]	ih	IPV4 ヘッダー
@@ -47,7 +48,7 @@ namespace net {
 			@return ICMP、PING 要求の場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool parse(ETHER& eth, const eth_h& eh, const ipv4_h& ih, const void* msg, int32_t len)
+		bool process(ETHER& eth, const eth_h& eh, const ipv4_h& ih, const void* msg, int32_t len)
 		{
 			const icmp_t& t = *static_cast<const icmp_t*>(msg);
 

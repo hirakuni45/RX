@@ -46,7 +46,8 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  パース
+			@brief  プロセス
+					※割り込み外から呼ぶ事は禁止
 			@param[in]	eh	イーサーネット・ヘッダー
 			@param[in]	ih	IPV4 ヘッダー
 			@param[in]	msg	メッセージ先頭
@@ -54,7 +55,7 @@ namespace net {
 			@return エラーが無い場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool parse(const eth_h& eh, const ipv4_h& ih, const void* msg, int32_t len)
+		bool process(const eth_h& eh, const ipv4_h& ih, const void* msg, int32_t len)
 		{
 			return true;
 		}

@@ -74,7 +74,7 @@ namespace net {
 		{
 			// recv
 			void* org;
-			int32_t len = eth_.recv(&org);
+			int32_t len = eth_.recv_buff(&org);
 			if(len < 0) {  // error state
 
 				return;
@@ -91,11 +91,11 @@ namespace net {
 
 				switch(h.get_type()) {
 				case eth_type::IPV4:
-					ipv4_.parse(h, top, len - sizeof(eth_h));
+					ipv4_.process(h, top, len - sizeof(eth_h));
 					break;
 
 				case eth_type::ARP:
-					arp_.parse(eth_, h, top, len - sizeof(eth_h));
+					arp_.process(eth_, h, top, len - sizeof(eth_h));
 					break;
 
 				case eth_type::IPX:
@@ -162,7 +162,7 @@ namespace net {
 				++info_update_count_;
 			}
 
-			arp_.service(eth_);
+			arp_.service();
 
 			ipv4_.service();
 		}

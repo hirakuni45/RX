@@ -74,13 +74,14 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  パース
+			@brief  プロセス @n
+					※割り込み外から呼ぶ事は禁止
 			@param[in]	h	イーサーネット・ヘッダー
 			@param[in]	org	データ・フレーム
 			@param[in]	len	データ・フレーム長
 		*/
 		//-----------------------------------------------------------------//
-		bool parse(const eth_h& eh, const void* org, int32_t len)
+		bool process(const eth_h& eh, const void* org, int32_t len)
 		{
 			if(std::memcmp(eh.get_dst(), info_.mac, 6) == 0) {  // 自分に宛てたフレーム
 //				dump_("Match:    ", h);
@@ -112,13 +113,13 @@ namespace net {
 
 			switch(ih.get_protocol()) {
 			case ipv4_protocol::ICMP:
-				icmp_.parse(eth_, eh, ih, msg, len); 
+				icmp_.process(eth_, eh, ih, msg, len); 
 				break;
 			case ipv4_protocol::TCP:
-				tcpm_.parse(eh, ih, msg, len);
+				tcpm_.process(eh, ih, msg, len);
 				break;
 			case ipv4_protocol::UDP:
-				udpm_.parse(eh, ih, msg, len);
+				udpm_.process(eh, ih, msg, len);
 				break;
 			default:
 
