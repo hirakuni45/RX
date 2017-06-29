@@ -63,10 +63,10 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  キャッシュをリセット
+			@brief  キャッシュをクリア
 		*/
 		//-----------------------------------------------------------------//
-		void reset() noexcept
+		void clear() noexcept
 		{
 			pos_ = 0;
 		}
@@ -92,7 +92,9 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  登録
+			@brief  登録 @n
+					・「255.255.255.255」、「0.0.0.0」の場合は登録しない @n
+					・「x.x.x.0」、「x.x.x.255」の場合も登録しない
 			@param[in]	ipa	登録アドレス
 			@param[in]	mac	MAC アドレス
 			@return 登録できたら「true」
@@ -103,15 +105,15 @@ namespace net {
 			if(ipa[3] == 0 || ipa[3] == 255) {  // 末尾「０」ゲートウェイ、「２５５」ブロードキャストは無視
 				return false;
 			}
-			if(tools::check_brodcast_mac(mac)) {  // MAC アドレスの確認
+			if(tools::check_brodcast_mac(mac)) {  //「255.255.255.255」の確認
 				return false;
 			}
-			if(tools::check_allzero_mac(mac)) {  // MAC アドレスの確認
+			if(tools::check_allzero_mac(mac)) {  //「0.0.0.0」の確認
 				return false;
 			}
 			uint32_t n = lookup(ipa);
-			if(n < SIZE) {
-				std::memcpy(info_[n].mac, mac, 6);  // MAC アドレス更新
+			if(n < SIZE) {  // 登録済みアドレス
+				std::memcpy(info_[n].mac, mac, 6);  // MAC アドレスを更新
 				info_[n].time = 0;  // タイムスタンプ、リセット
 				return true;
 			} else {
@@ -119,16 +121,38 @@ namespace net {
 					info_[pos_].ipa = ipa;
 					std::memcpy(info_[pos_].mac, mac, 6);
 					info_[pos_].time = 0;
-					utils::format("Insert ARP cash (%d): %s -> %s\n")
-						% pos_
-						% tools::ip_str(ipa.get())
-						% tools::mac_str(mac);
+//					utils::format("Insert ARP cash (%d): %s -> %s\n")
+//						% pos_
+//						% tools::ip_str(ipa.get())
+//						% tools::mac_str(mac);
 					++pos_;
 					return true;
-				} else {
+				} else {  // バッファが満杯の場合の処理
+
 					return false;
 				}
 			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	削除
+			@param[in]	ipa	検索アドレス
+			@return 削除した場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool erase(const ip_adrs& ipa)
+		{
+			auto n = lookup(ipa);
+			if(n < SIZE) {
+				if(n != (pos_ - 1)) {
+					info_[n] = info_[pos_ - 1];
+				}
+				--pos_;
+				return true;
+			}
+			return false;
 		}
 
 
@@ -150,7 +174,7 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  リスト
+			@brief  リスト表示
 		*/
 		//-----------------------------------------------------------------//
 		void list() const noexcept
