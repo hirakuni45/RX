@@ -13,7 +13,7 @@
 #include "common/fixed_memory.hpp"
 #include "common/ip_adrs.hpp"
 #include "net2/icmp.hpp"
-#include "net2/udp_manage.hpp"
+#include "net2/udp.hpp"
 #include "net2/tcp_manage.hpp"
 
 namespace net {
@@ -36,8 +36,8 @@ namespace net {
 		typedef icmp<ETHER>	ICMP;
 		ICMP		icmp_;
 
-		typedef udp_manage<ETHER, UDPN> UDP_M;
-		UDP_M		udpm_;
+		typedef udp<ETHER, UDPN> UDP;
+		UDP			udp_;
 
 		typedef tcp_manage<ETHER, TCPN> TCP_M;
 		TCP_M		tcpm_;
@@ -51,39 +51,19 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		ipv4(ETHER& eth, net_info& info) : eth_(eth), info_(info),
-			icmp_(), udpm_(eth), tcpm_(eth)
+			icmp_(), udp_(eth, info), tcpm_(eth)
 		{ }
 
-#if 0
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  UDP の格納可能な最大サイズを返す
-			@return UDP の格納可能な最大サイズ
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t udp_capacity() const noexcept { return udpm_.capacity(); }
-
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  UDP の格納可能な最大サイズを返す
-			@return UDP の格納可能な最大サイズ
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t tcp_capacity() const noexcept { return tcpm_.capacity(); }
-#endif
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  UDP のオープン
+			@brief  オープン
 			@param[in]	d_ip	相手先のアドレス
 			@param[in]	port	ポート番号
 		*/
 		//-----------------------------------------------------------------//
 		int open_udp(const ip_adrs& d_ip, uint16_t port)
 		{
-
-
 			auto idx = info_.at_cash().lookup(d_ip);
 			if(!info_.at_cash().is_valid(idx)) {  // MAC アドレスが不明な場合
 				// MAC アドレスの収集を依頼
@@ -153,7 +133,7 @@ namespace net {
 
 			case ipv4_h::protocol::UDP:
 				// UDP では、自分に関係するフレーム、及び、ブロードキャスト・フレームを受け取る
-				udpm_.process(eh, ih, msg, len);
+				udp_.process(eh, ih, reinterpret_cast<const udp_h*>(msg), len);
 				break;
 
 			default:
@@ -171,7 +151,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void service()
 		{
-			udpm_.service();
+			udp_.service();
 			tcpm_.service();
 		}
 	};

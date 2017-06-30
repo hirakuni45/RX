@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*! @file
-    @brief  UDP Protocol 全体管理 @n
+    @brief  UDP Protocol @n
 			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
@@ -19,14 +19,30 @@ namespace net {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class ETHER, uint32_t NMAX>
-	class udp_manage {
+	class udp {
+
+		static const uint16_t TIME_OUT = 20 * 1000 / 10;  // 20 sec (unit: 10ms)
 
 		ETHER&		eth_;
+
+		net_info&	info_;
+
+		enum class task : uint16_t {
+			idle,
+			open,
+			main,
+			close,
+		};
 
 		struct context {
 			ip_adrs		adrs_;
 			uint16_t	src_port_;
 			uint16_t	dst_port_;
+			uint16_t	time_;
+			task		task_;
+
+			uint8_t*	recv_;
+			uint8_t*	send_;
 		};
 
 		typedef utils::fixed_block<context, NMAX> UDP_BLOCK;
@@ -50,9 +66,10 @@ namespace net {
 		/*!
 			@brief  コンストラクター
 			@param[in]	eth		イーサーネット・ドライバー
+			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		udp_manage(ETHER& eth) : eth_(eth)
+		udp(ETHER& eth, net_info& info) : eth_(eth), info_(info)
 		{ }
 
 
@@ -82,9 +99,76 @@ namespace net {
 				con.adrs_ = adrs;
 				con.src_port_ = sport;
 				con.dst_port_ = dport;
-				return idx;
+				con.time_ = TIME_OUT;
+				con.task_ = task::open;
+
+				con.recv_ = nullptr;
+				con.send_ = nullptr;
+
+				udps_.unlock(idx);
+				return static_cast<int>(idx);
 			}
 			return -1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信
+			@param[in]	desc	ディスクリプタ
+			@param[in]	src		ソース
+			@param[in]	len		送信バイト数
+			@return 送信バイト
+		*/
+		//-----------------------------------------------------------------//
+		int send(int desc, const void* src, uint32_t len)
+		{
+			uint32_t idx = static_cast<uint32_t>(desc);
+			if(!udps_.is_alloc(idx)) return -1;
+			if(udps_.is_lock(idx)) return -1;
+
+
+
+
+			return 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信
+			@param[in]	desc	ディスクリプタ
+			@param[in]	dst		ソース
+			@param[in]	len		受信バイト数
+			@return 受信バイト
+		*/
+		//-----------------------------------------------------------------//
+		int recv(int desc, void* dst, uint32_t len)
+		{
+			uint32_t idx = static_cast<uint32_t>(desc);
+			if(!udps_.is_alloc(idx)) return -1;
+			if(udps_.is_lock(idx)) return -1;
+
+
+
+			return 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クローズ
+			@param[in]	desc	ディスクリプタ
+		*/
+		//-----------------------------------------------------------------//
+		void close(int desc)
+		{
+			uint32_t idx = static_cast<uint32_t>(desc);
+			if(!udps_.is_alloc(idx)) return;
+
+			udps_.lock(idx);  // ロックする（割り込みで利用不可）
+			context& con = udps_.at(idx);
+			con.task_ = task::close;  // 実際のコンテキスト破棄は、サービスルーチン内で行う
 		}
 
 
@@ -93,13 +177,29 @@ namespace net {
 			@brief  プロセス（割り込みから呼ばれる）
 			@param[in]	eh	イーサーネット・ヘッダー
 			@param[in]	ih	IPV4 ヘッダー
-			@param[in]	msg	メッセージ先頭
+			@param[in]	udp	UDP ヘッダー
 			@param[in]	len	メッセージ長
 			@return エラーが無い場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool process(const eth_h& eh, const ipv4_h& ih, const void* msg, int32_t len)
+		bool process(const eth_h& eh, const ipv4_h& ih, const udp_h* udp, int32_t len)
 		{
+			// 該当するコンテキストを探す
+			uint32_t idx = NMAX;
+			for(uint32_t i = 0; i < NMAX; ++i) {
+				if(!udps_.is_alloc(i)) continue;  // alloc: 有効
+				if(udps_.is_lock(i)) continue;  // lock:  無効
+				context& con = udps_.at(i);
+				if(con.task_ != task::main) continue;  // task: main 以外は無効
+
+				if(udp->get_src_port() == con.dst_port_ && udp->get_dst_port() == con.src_port_) {
+					idx = i;
+					break;
+				} 
+			}
+			if(idx == NMAX) return false;
+
+
 
 
 			return true;
@@ -113,7 +213,24 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void service()
 		{
+			for(uint32_t i = 0; i < NMAX; ++i) {
+				if(!udps_.is_alloc(i)) continue;
 
+				context& con = udps_.at(i);
+				switch(con.task_) {
+				case task::open:					
+					break;
+
+				case task::main:
+					break;
+
+				case task::close:
+					udps_.erase(i);
+					break;
+				default:
+					break;
+				}
+			}
 		}
 	};
 }
