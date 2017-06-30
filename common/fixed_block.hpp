@@ -3,6 +3,7 @@
 /*!	@file
 	@brief	固定サイズ・ブロック管理・クラス @n
 			※最大３２個までのブロックを管理 @n
+			※排他制御用ロック・ビットを含んでいる @n
 			Copyright 2017 Kunihito Hiramatsu
 	@author	平松邦仁 (hira@rvf-rc45.net)
 */
@@ -21,6 +22,7 @@ namespace utils {
 	class fixed_block {
 
 		volatile uint32_t	flags_;
+		volatile uint32_t	lock_;
 
 		UNIT	unit_[SIZE];
 
@@ -30,7 +32,7 @@ namespace utils {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		fixed_block() noexcept : flags_(0) { }
+		fixed_block() noexcept : flags_(0), lock_(-1) { }
 
 
 		//-----------------------------------------------------------------//
@@ -56,7 +58,7 @@ namespace utils {
 			@brief  全体クリア
 		*/
 		//-----------------------------------------------------------------//
-		void clear() { flags_ = 0; }
+		void clear() { flags_ = 0; lock_ = -1; }
 
 
 		//-----------------------------------------------------------------//
@@ -90,6 +92,7 @@ namespace utils {
 			uint32_t tmp = 1;
 			for(uint32_t i = 0; i < 32; ++i) {
 				if(!(tmp & flags_)) {
+					lock_  |= tmp;  // ロックした状態にする
 					flags_ |= tmp;
 					return i;
 				}
@@ -103,10 +106,10 @@ namespace utils {
 		/*!
 			@brief  領域の状態を取得
 			@param[in]	idx	インデックス
-			@return アロケーション中なら「true」、フリーなら「false」、その他のエラーは「false」
+			@return 利用中「true」、フリー「false」、エラー「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool is_alloc(uint32_t idx) noexcept
+		bool is_alloc(uint32_t idx) const noexcept
 		{
 			if(idx >= SIZE) {
 				return false;
@@ -117,7 +120,57 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  領域を消去
+			@brief  ロックを取得
+			@param[in]	idx	インデックス
+			@return ロック「true」、アンロック「false」、エラー「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool is_lock(uint32_t idx) const noexcept
+		{
+			if(idx >= SIZE) {
+				return false;
+			}
+			if(!is_alloc(idx)) return false; 
+			return (lock_ & (1 << idx)) != 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ロックを設定
+			@param[in]	idx	インデックス
+			@return ロック「true」、アンロック「false」、エラー「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool lock(uint32_t idx, bool lock = true) noexcept
+		{
+			if(idx >= SIZE) {
+				return false;
+			}
+			if(!is_alloc(idx)) return false; 
+			if(lock) {
+				lock_ |=  (1 << idx);
+			} else {
+				lock_ &= ~(1 << idx);
+			}
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アン・ロックを設定
+			@param[in]	idx	インデックス
+			@return ロック「true」、アンロック「false」、エラー「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool unlock(uint32_t idx) noexcept { return lock(idx, false); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  領域を消去 @n
+					※ロック状態に関係無く消去する @n
 			@param[in]	idx	インデックス
 			@return idx が不正、又は、既に開放されていた場合「false」
 		*/
