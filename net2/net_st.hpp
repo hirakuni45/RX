@@ -11,9 +11,23 @@
 #include "common/net_tools.hpp"
 #include "common/ip_adrs.hpp"
 #include "common/format.hpp"
+#include "common/fixed_fifo.hpp"
 #include "net2/mac_cash.hpp"
 
 namespace net {
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ネット共有コンテナ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct net_share {
+
+		typedef utils::fixed_fifo<ip_adrs, 8> MAC_REQUEST;
+		MAC_REQUEST		mac_request_;
+
+	};
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -29,10 +43,46 @@ namespace net {
 		ip_adrs		dns;     ///< Domain Name Server
 		ip_adrs		dns2;    ///< Domain Name Server 2ND
 
+	private:
 		typedef mac_cash<8> CASH;
-		CASH		cash;
+		CASH		cash_;
 
-		net_info() : mac{ 0 }, ip(), mask(), gw(), dns(), dns2(), cash() { }
+		net_share	share_;
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		net_info() : mac{ 0 }, ip(), mask(), gw(), dns(), dns2(), cash_() { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  MAC キャッシュの参照
+			@return MAC キャッシュ
+		*/
+		//-----------------------------------------------------------------//
+		CASH& at_cash() { return cash_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  MAC キャッシュの参照（const）
+			@return MAC キャッシュ
+		*/
+		//-----------------------------------------------------------------//
+		const CASH& get_cash() const { return cash_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ネット共有コンテナの参照
+			@return ネット共有コンテナ
+		*/
+		//-----------------------------------------------------------------//
+		net_share& at_share() { return share_; }
 	};
 
 

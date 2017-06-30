@@ -63,13 +63,20 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  インデックスが有効か検査
+			@param[in]	idx	インデックス
+			@return 有効なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool is_valid(uint32_t idx) const { return idx != SIZE; } 
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  キャッシュをクリア
 		*/
 		//-----------------------------------------------------------------//
-		void clear() noexcept
-		{
-			pos_ = 0;
-		}
+		void clear() noexcept { pos_ = 0; }
 
 
 		//-----------------------------------------------------------------//
@@ -105,10 +112,10 @@ namespace net {
 			if(ipa[3] == 0 || ipa[3] == 255) {  // 末尾「０」ゲートウェイ、「２５５」ブロードキャストは無視
 				return false;
 			}
-			if(tools::check_brodcast_mac(mac)) {  //「255.255.255.255」の確認
+			if(tools::check_brodcast_mac(mac)) {  // MAC のブロードキャスト確認
 				return false;
 			}
-			if(tools::check_allzero_mac(mac)) {  //「0.0.0.0」の確認
+			if(tools::check_allzero_mac(mac)) {  // MAC の任意アドレス確認
 				return false;
 			}
 			uint32_t n = lookup(ipa);
@@ -128,8 +135,8 @@ namespace net {
 					++pos_;
 					return true;
 				} else {  // バッファが満杯の場合の処理
-
-					return false;
+					diet();
+					return insert(ipa, mac);
 				}
 			}
 		}
@@ -142,7 +149,7 @@ namespace net {
 			@return 削除した場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase(const ip_adrs& ipa)
+		bool erase(const ip_adrs& ipa) noexcept
 		{
 			auto n = lookup(ipa);
 			if(n < SIZE) {
@@ -158,8 +165,70 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  リセット
+			@param[in]	idx	参照ポイント
+			@return リセット出来た場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool reset(uint32_t idx) noexcept
+		{
+			if(idx < pos_) {
+				info_[idx].time = 0;
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ダイエット @n
+					※利用頻度が最も低い候補を消去する
+		*/
+		//-----------------------------------------------------------------//
+		void diet() noexcept
+		{
+			if(pos_ < SIZE) {
+				return;
+			}
+			uint32_t n = SIZE;
+			uint16_t t = 0;
+			for(uint32_t i = 0; i < pos_; ++i) {
+				if(info_[i].time > t) {
+					t = info_[i].time;
+					n = i;
+				}
+			}
+			if(n < SIZE) {
+				erase(n);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  [] オペレーター
+			@param[in]	idx	参照インデックス
+			@return 参照
+		*/
+		//-----------------------------------------------------------------//
+		const arp_info& operator[] (uint32_t idx) const noexcept
+		{
+			if(idx >= pos_) {
+				static arp_info info;
+				std::memset(info.mac, 0x00, 6);
+				info.time = 0;
+				return info;
+			}
+			return info_[idx];
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  アップデート @n
-					登録済みのタイムカウントを進める
+					※登録済みのタイムカウントを進める
 		*/
 		//-----------------------------------------------------------------//
 		void update() noexcept
@@ -186,25 +255,6 @@ namespace net {
 					% tools::mac_str(info_[i].mac)
 					% static_cast<uint32_t>(info_[i].time);
 			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  [] オペレーター
-			@param[in]	idx	参照ポイント
-			@return 参照
-		*/
-		//-----------------------------------------------------------------//
-		const arp_info& operator[] (uint32_t idx) const noexcept
-		{
-			if(idx >= pos_) {
-				static arp_info info;
-				std::memset(info.mac, 0x00, 6);
-				info.time = 0;
-				return info;
-			}
-			return info_[idx];
 		}
 	};
 }

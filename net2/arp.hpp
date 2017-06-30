@@ -229,7 +229,7 @@ namespace net {
 		{
 			while(arp_buff_.length() > 0) {
 				const arp_info& a = arp_buff_.get_at();
-				info_.cash.insert(a.ipa, a.mac);
+				info_.at_cash().insert(a.ipa, a.mac);
 				arp_buff_.get_go();
 			}
 
@@ -237,8 +237,8 @@ namespace net {
 				--req_wait_;
 			} else if(req_num_) {
 				--req_num_;
-				auto n = info_.cash.lookup(req_ipa_);
-				if(n >= info_.cash.capacity()) {
+				auto n = info_.at_cash().lookup(req_ipa_);
+				if(n >= info_.at_cash().capacity()) {
 					req_wait_ = ARP_REQUEST_WAIT;
 					request(req_ipa_);
 				}

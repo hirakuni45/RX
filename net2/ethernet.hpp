@@ -156,7 +156,7 @@ namespace net {
 		void service()
 		{
 			if(info_update_count_ >= 10) {
-				info_.cash.update();
+				info_.at_cash().update();
 				info_update_count_ = 0;
 			} else {
 				++info_update_count_;
@@ -175,7 +175,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void arp_list() const
 		{
-			info_.cash.list();
+			info_.get_cash().list();
 		}
 	};
 }

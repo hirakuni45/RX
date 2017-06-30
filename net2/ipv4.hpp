@@ -8,8 +8,9 @@
 //=========================================================================//
 #include <cstdint>
 #include <cstring>
-#include "common/net_tools.hpp"
 #include "common/format.hpp"
+#include "common/net_tools.hpp"
+#include "common/fixed_memory.hpp"
 #include "common/ip_adrs.hpp"
 #include "net2/icmp.hpp"
 #include "net2/udp_manage.hpp"
@@ -53,7 +54,7 @@ namespace net {
 			icmp_(), udpm_(eth), tcpm_(eth)
 		{ }
 
-
+#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  UDP の格納可能な最大サイズを返す
@@ -70,12 +71,37 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t tcp_capacity() const noexcept { return tcpm_.capacity(); }
+#endif
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  UDP のオープン
+			@param[in]	d_ip	相手先のアドレス
+			@param[in]	port	ポート番号
+		*/
+		//-----------------------------------------------------------------//
+		int open_udp(const ip_adrs& d_ip, uint16_t port)
+		{
+
+
+			auto idx = info_.at_cash().lookup(d_ip);
+			if(!info_.at_cash().is_valid(idx)) {  // MAC アドレスが不明な場合
+				// MAC アドレスの収集を依頼
+				info_.at_share().mac_request_.put(d_ip);
+			}
+
+
+
+
+
+
+			return -1;
+		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  プロセス @n
-					※割り込み外から呼ぶ事は禁止
+			@brief  プロセス（割り込みから呼ばれる）
 			@param[in]	h	イーサーネット・ヘッダー
 			@param[in]	org	データ・フレーム
 			@param[in]	len	データ・フレーム長
@@ -83,7 +109,9 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool process(const eth_h& eh, const void* org, int32_t len)
 		{
+			bool myframe = false;
 			if(std::memcmp(eh.get_dst(), info_.mac, 6) == 0) {  // 自分に宛てたフレーム
+				myframe = true;
 //				dump_("Match:    ", h);
 			} else if(tools::check_brodcast_mac(eh.get_dst())) {  // ブロード・キャスト
 //				dump_("Brodcast: ", h);
@@ -99,7 +127,7 @@ namespace net {
 			const ipv4_h& ih = *static_cast<const ipv4_h*>(org);
 			uint16_t sum = tools::calc_sum(&ih, 20);
 			if(sum != 0) {
-				utils::format("IP Header sum error(%04X) -> %04X\n")
+				utils::format("IP Header sum error (%04X) -> %04X\n")
 					% static_cast<uint32_t>(ih.get_csum())
 					% static_cast<uint32_t>(sum);
 				return false;
@@ -112,17 +140,23 @@ namespace net {
 //			dump(ih);
 
 			switch(ih.get_protocol()) {
+
 			case ipv4_h::protocol::ICMP:
 				icmp_.process(eth_, eh, ih, msg, len); 
 				break;
+
 			case ipv4_h::protocol::TCP:
-				tcpm_.process(eh, ih, msg, len);
+				if(myframe) {
+					tcpm_.process(eh, ih, msg, len);
+				}
 				break;
+
 			case ipv4_h::protocol::UDP:
+				// UDP では、自分に関係するフレーム、及び、ブロードキャスト・フレームを受け取る
 				udpm_.process(eh, ih, msg, len);
 				break;
-			default:
 
+			default:
 				break;
 			}
 

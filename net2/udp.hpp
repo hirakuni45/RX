@@ -18,17 +18,11 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class udp {
 
-		enum class task : uint8_t {
-			idle,
-		};
+		ip_adrs		adrs_;
+		uint16_t	src_port_;
+		uint16_t	dst_port_;
 
-		task		task_;
-
-		struct frame_t {
-			eth_h	eh_;
-			ipv4_h	ipv4_;
-			udp_h	udp_;
-		} __attribute__((__packed__));
+		bool		open_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -36,53 +30,65 @@ namespace net {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		udp() : task_(task::idle) { }
+		udp() : adrs_(), src_port_(0), dst_port_(0), open_(false) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  パース
-			@param[in]	eh	イーサーネット・ヘッダー
-			@param[in]	ih	IPV4 ヘッダー
-			@param[in]	msg	メッセージ先頭
-			@param[in]	len	メッセージ長
-			@return エラーが無い場合「true」
+			@brief  「空」か検査
+			@return 「空」なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool parse(const eth_h& eh, const ipv4_h& ih, const void* msg, int32_t len)
-		{
-			const udp_h* h = reinterpret_cast<const udp_h*>(msg);
+		bool empty() const { return !open_; }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	転送元ポート番号を返す
+			@return 転送元ポート番号
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_src_port() const noexcept { return src_port_; }
 
-			return true;
-		}
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	転送先ポート番号を返す
+			@return 転送先ポート番号
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_dst_port() const noexcept { return dst_port_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  オープン
 			@param[in]	adrs	アドレス
-			@param[in]	port	ポート
+			@param[in]	sport	転送元ポート
+			@param[in]	dport	転送先ポート
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool open(const ip_adrs& adrs, uint16_t port)
+		bool open(const ip_adrs& adrs, uint16_t sport, uint16_t dport)
 		{
-
-
-
+			if(open_) {  // 既に使われている
+				return false;
+			}
+			adrs_ = adrs;
+			src_port_ = sport;
+			dst_port_ = dport;
 			return true;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  サービス（１０ｍｓ毎に呼ぶ）
+			@brief  クローズ
 		*/
 		//-----------------------------------------------------------------//
-		void service()
+		void close()
 		{
+			open_ = false;
 		}
 	};
 }

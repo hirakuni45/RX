@@ -24,6 +24,19 @@ namespace net {
 
 		udp			udp_[NMAX];
 
+		struct frame_t {
+			eth_h	eh_;
+			ipv4_h	ipv4_;
+			udp_h	udp_;
+		} __attribute__((__packed__));
+
+		struct csum_h {  // UDP checksum header 
+			ip_adrs		src_;
+			ip_adrs		dst_;
+			uint16_t	fix_;
+			uint16_t	len_;
+		};
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -46,8 +59,29 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  プロセス
-					※割り込み外から呼ぶ事は禁止
+			@brief  オープン
+			@param[in]	adrs	アドレス
+			@param[in]	sport	転送元ポート
+			@param[in]	dport	転送先ポート
+			@return ディスクリプタ
+		*/
+		//-----------------------------------------------------------------//
+		int open(const ip_adrs& adrs, uint16_t sport, uint16_t dport)
+		{
+			int ds = 0;
+			for(uint32_t i = 0; i < NMAX; ++i) {
+				if(udp_[i].empty()) {
+					udp_[i].open(adrs, sport, dport);
+					return i;
+				}
+			}
+			return -1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  プロセス（割り込みから呼ばれる）
 			@param[in]	eh	イーサーネット・ヘッダー
 			@param[in]	ih	IPV4 ヘッダー
 			@param[in]	msg	メッセージ先頭
@@ -57,24 +91,9 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool process(const eth_h& eh, const ipv4_h& ih, const void* msg, int32_t len)
 		{
+
+
 			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  オープン
-			@param[in]	adrs	アドレス
-			@param[in]	port	ポート
-			@return ディスクリプタ
-		*/
-		//-----------------------------------------------------------------//
-		int open(const ip_adrs& adrs, uint16_t port)
-		{
-			int ds = -1;
-
-
-			return ds;
 		}
 
 
@@ -85,8 +104,8 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void service()
 		{
-			for(uint32_t i = 0; i < NMAX; ++i) {
-				udp_[i].service();
+			for(udp& u : udp_) {
+///				u.service();
 			}
 		}
 	};
