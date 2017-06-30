@@ -14,7 +14,7 @@
 #include "common/ip_adrs.hpp"
 #include "net2/icmp.hpp"
 #include "net2/udp.hpp"
-#include "net2/tcp_manage.hpp"
+#include "net2/tcp.hpp"
 
 namespace net {
 
@@ -39,8 +39,8 @@ namespace net {
 		typedef udp<ETHER, UDPN> UDP;
 		UDP			udp_;
 
-		typedef tcp_manage<ETHER, TCPN> TCP_M;
-		TCP_M		tcpm_;
+		typedef tcp<ETHER, TCPN> TCP;
+		TCP			tcp_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -51,7 +51,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		ipv4(ETHER& eth, net_info& info) : eth_(eth), info_(info),
-			icmp_(), udp_(eth, info), tcpm_(eth)
+			icmp_(), udp_(eth, info), tcp_(eth, info)
 		{ }
 
 
@@ -126,8 +126,8 @@ namespace net {
 				break;
 
 			case ipv4_h::protocol::TCP:
-				if(myframe) {
-					tcpm_.process(eh, ih, msg, len);
+				if(myframe) {  // TCP では、自分に関係するフレームを受け取る
+					tcp_.process(eh, ih, reinterpret_cast<const tcp_h*>(msg), len);
 				}
 				break;
 
@@ -152,7 +152,7 @@ namespace net {
 		void service()
 		{
 			udp_.service();
-			tcpm_.service();
+			tcp_.service();
 		}
 	};
 }
