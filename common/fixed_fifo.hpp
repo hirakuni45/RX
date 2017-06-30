@@ -13,17 +13,17 @@ namespace utils {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     /*!
         @brief  fifo クラス
-		@param[in]	T		基本形
+		@param[in]	UNIT	基本形
 		@param[in]	SIZE	バッファサイズ（最大６５５３６）
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class T, uint16_t SIZE>
+	template <class UNIT, uint16_t SIZE>
 	class fixed_fifo {
 
 		volatile uint16_t	get_;
 		volatile uint16_t	put_;
 
-		T	buff_[SIZE];
+		UNIT	buff_[SIZE];
 
 	public:
         //-----------------------------------------------------------------//
@@ -32,6 +32,15 @@ namespace utils {
         */
         //-----------------------------------------------------------------//
 		fixed_fifo() noexcept : get_(0), put_(0) { }
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  バッファのサイズを返す
+			@return	バッファのサイズ
+        */
+        //-----------------------------------------------------------------//
+		uint16_t size() const noexcept { return SIZE; }
 
 
         //-----------------------------------------------------------------//
@@ -48,7 +57,7 @@ namespace utils {
 			@return 値の格納参照
         */
         //-----------------------------------------------------------------//
-		inline T& put_at() noexcept { return buff_[put_]; }
+		inline UNIT& put_at() noexcept { return buff_[put_]; }
 
 
         //-----------------------------------------------------------------//
@@ -72,7 +81,7 @@ namespace utils {
 			@param[in]	v	値
         */
         //-----------------------------------------------------------------//
-		void put(const T& v) noexcept {
+		void put(const UNIT& v) noexcept {
 			buff_[put_] = v;
 			put_go();
 		}
@@ -84,7 +93,7 @@ namespace utils {
 			@return	値の取得参照
         */
         //-----------------------------------------------------------------//
-		const T& get_at() const noexcept { return buff_[get_]; }
+		const UNIT& get_at() const noexcept { return buff_[get_]; }
 
 
         //-----------------------------------------------------------------//
@@ -108,8 +117,8 @@ namespace utils {
 			@return	値
         */
         //-----------------------------------------------------------------//
-		T get() noexcept {
-			T v = buff_[get_];
+		UNIT get() noexcept {
+			UNIT v = buff_[get_];
 			get_go();
 			return v;
 		}
@@ -143,14 +152,5 @@ namespace utils {
         */
         //-----------------------------------------------------------------//
 		uint16_t pos_put() const noexcept { return put_; }
-
-
-        //-----------------------------------------------------------------//
-        /*!
-            @brief  バッファのサイズを返す
-			@return	バッファのサイズ
-        */
-        //-----------------------------------------------------------------//
-		uint16_t size() const noexcept { return SIZE; }
 	};
 }
