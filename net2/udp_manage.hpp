@@ -7,6 +7,7 @@
 */
 //=========================================================================//
 #include "net2/udp.hpp"
+#include "common/fixed_block.hpp"
 
 namespace net {
 
@@ -22,7 +23,8 @@ namespace net {
 
 		ETHER&		eth_;
 
-		udp			udp_[NMAX];
+		typedef utils::fixed_block<udp, NMAX> UDP_BLOCK;
+		UDP_BLOCK	udps_;
 
 		struct frame_t {
 			eth_h	eh_;
@@ -68,12 +70,10 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int open(const ip_adrs& adrs, uint16_t sport, uint16_t dport)
 		{
-			int ds = 0;
-			for(uint32_t i = 0; i < NMAX; ++i) {
-				if(udp_[i].empty()) {
-					udp_[i].open(adrs, sport, dport);
-					return i;
-				}
+			uint32_t idx = udps_.alloc();
+			if(udps_.is_alloc(idx)) {
+				 udps_.at(idx).open(adrs, sport, dport);
+				 return idx;
 			}
 			return -1;
 		}
@@ -104,9 +104,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void service()
 		{
-			for(udp& u : udp_) {
-///				u.service();
-			}
+
 		}
 	};
 }
