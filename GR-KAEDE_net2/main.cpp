@@ -239,9 +239,14 @@ extern "C" {
 	}
 
 
-	void ether_frame_(void)
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	イーサーネット・割り込みタスク
+	 */
+	//-----------------------------------------------------------------//
+	void ether_process_(void)
 	{
-		net_.service_frame();
+		net_.process();
 	}
 }
 
@@ -299,14 +304,13 @@ int main(int argc, char** argv)
 	sdc_.start();
 
 	{  // Ethernet の開始
-///		ether_.set_intr_task(lan_inthdr);
 		uint8_t intr_level = 4;
 		ether_.start(intr_level);
 
 		static uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 		net_.start(mac);
 
-		ether_.set_intr_task(ether_frame_);
+		ether_.set_intr_task(ether_process_);
 	}
 
 #if 0
