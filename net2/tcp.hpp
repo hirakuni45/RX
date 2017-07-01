@@ -14,14 +14,14 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  TCP クラス
-		@param[in]	ETHER	イーサーネット・ドライバー・クラス
+		@param[in]	ETHD	イーサーネット・ドライバー・クラス
 		@param[in]	NMAX	管理最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class ETHER, uint32_t NMAX>
+	template<class ETHD, uint32_t NMAX>
 	class tcp {
 
-		ETHER&		eth_;
+		ETHD&		ethd_;
 
 		net_info&	info_;
 
@@ -50,11 +50,11 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
-			@param[in]	eth		イーサーネット・ドライバー
+			@param[in]	ethd	イーサーネット・ドライバー
 			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		tcp(ETHER& eth, net_info& info) : eth_(eth), info_(info)
+		tcp(ETHD& ethd, net_info& info) : ethd_(ethd), info_(info)
 		{ }
 
 

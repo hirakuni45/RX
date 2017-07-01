@@ -16,20 +16,23 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  ethernet クラス
-		@param[in]	ETHER	イーサーネット・ドライバー・クラス
+		@param[in]	ETHD	イーサーネット・ドライバー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class ETHER>
+	template<class ETHD>
 	class ethernet {
+	public:
+		typedef ipv4<ETHD, 4, 8> IPV4;
 
-		ETHER&		eth_;
+	private:
+
+		ETHD&		ethd_;
 
 		net_info	info_;
 
-		typedef arp<ETHER> ARP;
+		typedef arp<ETHD> ARP;
 		ARP			arp_;
 
-		typedef ipv4<ETHER, 4, 8> IPV4;
 		IPV4		ipv4_;
 
 		uint32_t	info_update_count_;
@@ -38,11 +41,11 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
-			@param[in]	eth	イーサーネット・ドライバー・クラス
+			@param[in]	ethd	イーサーネット・ドライバー・クラス
 		*/
 		//-----------------------------------------------------------------//
-		ethernet(ETHER& eth) : eth_(eth), info_(),
-			arp_(info_), ipv4_(eth, info_),
+		ethernet(ETHD& ethd) : ethd_(ethd), info_(),
+			arp_(info_), ipv4_(ethd, info_),
 			info_update_count_(0)
 		{ }
 
@@ -67,6 +70,15 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  IPV4 インスタンスの参照
+			@return IPV4 インスタンス
+		*/
+		//-----------------------------------------------------------------//
+		IPV4& at_ipv4() { return ipv4_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  データ、受信、送信、プロセス
 		*/
 		//-----------------------------------------------------------------//
@@ -74,13 +86,13 @@ namespace net {
 		{
 			// recv
 			void* org;
-			int32_t len = eth_.recv_buff(&org);
+			int32_t len = ethd_.recv_buff(&org);
 			if(len < 0) {  // error state
 
 				return;
 			} else if((len > 1514) || (len < 60)) {  // サイズ範囲外は捨てる
 				if(len != 0) {
-					eth_.recv_buff_release();
+					ethd_.recv_buff_release();
 				}
 				return;
 			} else {  // recv data
@@ -95,7 +107,7 @@ namespace net {
 					break;
 
 				case eth_type::ARP:
-					arp_.process(eth_, h, top, len - sizeof(eth_h));
+					arp_.process(ethd_, h, top, len - sizeof(eth_h));
 					break;
 
 				case eth_type::IPX:
@@ -104,47 +116,8 @@ namespace net {
 					break;
 				}
 
-				eth_.recv_buff_release();
+				ethd_.recv_buff_release();
 			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  オープン
-			@param[in]	adrs	アドレス
-			@param[in]	port	ポート
-			@return ディスクリプタ
-		*/
-		//-----------------------------------------------------------------//
-		int open(const ip_adrs& adrs, uint16_t port)
-		{
-			int dsc = -1;
-
-#if 0
-			uint32_t n = info_.cash.lookup(adrs);
-			if(n == info_.cash.capacity()) {
-
-			} else {
-				
-			}
-#endif
-
-
-			return dsc;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  クローズ
-			@param[in]	dsc	ディスクリプタ
-		*/
-		//-----------------------------------------------------------------//
-		void close(int dsc)
-		{
-///			if(dsc < 0 || dsc >= (
-
 		}
 
 

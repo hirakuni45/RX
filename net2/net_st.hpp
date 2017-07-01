@@ -255,7 +255,21 @@ namespace net {
 		uint8_t		dst_ipa_[4];  ///< 宛先 IP アドレス
 
 	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  IPV4 バージョンの取得
+			@return IPV4 バージョン
+		*/
+		//-----------------------------------------------------------------//
 		uint16_t get_version() const noexcept { return ver_hlen_ & 0x0f; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  IPV4 バージョンの設定
+			@param[in]	ver	IPV4 バージョン
+		*/
+		//-----------------------------------------------------------------//
 		void set_version(uint8_t ver) noexcept {
 			ver_hlen_ &= 0xf0;
 			ver_hlen_ |= ver;
@@ -383,11 +397,23 @@ namespace net {
 		uint16_t get_dst_port() const noexcept { return tools::htons(dst_port_); }
 		void set_dst_port(uint16_t port) noexcept { dst_port_ = tools::htons(port); }
 
+		uint16_t get_length_() const noexcept { return length_; }
 		uint16_t get_length() const noexcept { return tools::htons(length_); }
 		void set_length(uint16_t length) noexcept { length_ = tools::htons(length); }
 
 		uint16_t get_csum() const noexcept { return tools::htons(csum_); }
 		void set_csum(uint16_t csum) noexcept { csum_ = tools::htons(csum); }
+
+		static void* get_data_ptr(udp_h* org) {
+			return reinterpret_cast<uint8_t*>(org) + sizeof(udp_h);
+		}
+
+		static const void* get_data_ptr(const udp_h* org) {
+			return reinterpret_cast<const uint8_t*>(org) + sizeof(udp_h);
+		}
+
+		uint16_t get_data_len() const { return get_length() - sizeof(udp_h); }
+
 	} __attribute__((__packed__));
 
 

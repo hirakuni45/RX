@@ -14,18 +14,19 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  UDP マネージメント・クラス
-		@param[in]	ETHER	イーサーネット・ドライバー・クラス
+		@param[in]	ETHD	イーサーネット・ドライバー・クラス
 		@param[in]	NMAX	管理最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class ETHER, uint32_t NMAX>
+	template<class ETHD, uint32_t NMAX>
 	class udp {
 
 		static const uint16_t TIME_OUT = 20 * 1000 / 10;  // 20 sec (unit: 10ms)
 
-		ETHER&		eth_;
+		ETHD&		ethd_;
 
 		net_info&	info_;
+
 
 		enum class task : uint16_t {
 			idle,
@@ -33,6 +34,7 @@ namespace net {
 			main,
 			close,
 		};
+
 
 		struct context {
 			ip_adrs		adrs_;
@@ -45,14 +47,17 @@ namespace net {
 			uint8_t*	send_;
 		};
 
+
 		typedef utils::fixed_block<context, NMAX> UDP_BLOCK;
 		UDP_BLOCK	udps_;
+
 
 		struct frame_t {
 			eth_h	eh_;
 			ipv4_h	ipv4_;
 			udp_h	udp_;
 		} __attribute__((__packed__));
+
 
 		struct csum_h {  // UDP checksum header 
 			ip_adrs		src_;
@@ -69,7 +74,7 @@ namespace net {
 			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		udp(ETHER& eth, net_info& info) : eth_(eth), info_(info)
+		udp(ETHD& ethd, net_info& info) : ethd_(ethd), info_(info)
 		{ }
 
 
@@ -121,7 +126,7 @@ namespace net {
 			@return 送信バイト
 		*/
 		//-----------------------------------------------------------------//
-		int send(int desc, const void* src, uint32_t len)
+		int send(int desc, const void* src, uint16_t)
 		{
 			uint32_t idx = static_cast<uint32_t>(desc);
 			if(!udps_.is_alloc(idx)) return -1;
@@ -140,10 +145,11 @@ namespace net {
 			@param[in]	desc	ディスクリプタ
 			@param[in]	dst		ソース
 			@param[in]	len		受信バイト数
+			@param[in]	time	最大待ち時間（１０ｍｓ単位）
 			@return 受信バイト
 		*/
 		//-----------------------------------------------------------------//
-		int recv(int desc, void* dst, uint32_t len)
+		int recv(int desc, void* dst, uint16_t len, int16_t time)
 		{
 			uint32_t idx = static_cast<uint32_t>(desc);
 			if(!udps_.is_alloc(idx)) return -1;
@@ -184,6 +190,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool process(const eth_h& eh, const ipv4_h& ih, const udp_h* udp, int32_t len)
 		{
+#if 0
 			// 該当するコンテキストを探す
 			uint32_t idx = NMAX;
 			for(uint32_t i = 0; i < NMAX; ++i) {
@@ -198,9 +205,29 @@ namespace net {
 				} 
 			}
 			if(idx == NMAX) return false;
+#endif
+			if(udp->get_dst_port() != 3000) {
+				return false;
+			}
+			// UDP サムの計算
+			csum_h smh;
+			smh.src_.set(ih.get_src_ipa());
+			smh.dst_.set(ih.get_dst_ipa());
+			smh.fix_ = 0x1100;
+			smh.len_ = udp->get_length_();  // 直接アクセス
+			uint16_t sum = tools::calc_sum(&smh, sizeof(smh));
+			sum = tools::calc_sum(udp, udp->get_length(), ~sum);
+			if(sum != 0) {
+				utils::format("UDP Frame sum error: %04X -> %04X\n") % udp->get_csum() % sum;
+				return false;
+			}
 
+			dump(*udp);
 
-
+			char tmp[16];
+			std::memcpy(tmp, udp->get_data_ptr(udp), udp->get_data_len());
+			tmp[udp->get_data_len()] = 0;
+			utils::format("UDP Data: '%s'\n") % tmp;
 
 			return true;
 		}

@@ -14,10 +14,10 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  ARP クラス
-		@param[in]	ETHER	イーサーネット・ドライバー・クラス
+		@param[in]	ETHD	イーサーネット・ドライバー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class ETHER>
+	template<class ETHD>
 	class arp {
 
 		static const uint16_t ARP_REQUEST_WAIT = 200;   ///< 2 sec
@@ -90,7 +90,7 @@ namespace net {
 			@param[in]	len		長さ
 		*/
 		//-----------------------------------------------------------------//
-		bool process(ETHER& eth, const eth_h& h, const void* top, int32_t len)
+		bool process(ETHD& ethd, const eth_h& h, const void* top, int32_t len)
 		{
 			bool ret = false;
 			if(static_cast<size_t>(len) < sizeof(arp_h)) {
@@ -141,7 +141,7 @@ namespace net {
 //				% tools::ip_str(r.dst_ipa);
 				void* dst;
 				uint16_t dlen;
-				if(eth.send_buff(&dst, dlen) != 0) {
+				if(ethd.send_buff(&dst, dlen) != 0) {
 					utils::format("ARP: ether send_buff error\n");
 					goto process_end;
 				}
@@ -162,7 +162,7 @@ namespace net {
 //			dump(eh);
 //			dump_(arp);
 
-				eth.send(sizeof(eth_h) + sizeof(arp_h));
+				ethd.send(sizeof(eth_h) + sizeof(arp_h));
 			}
 			ret = true;
 
@@ -173,12 +173,12 @@ namespace net {
 
 				void* dst;
 				uint16_t dlen;
-				if(eth.send_buff(&dst, dlen) != 0) {
+				if(ethd.send_buff(&dst, dlen) != 0) {
 					utils::format("ARP: ether send_buff error\n");
 					return false;
 				}
 				std::memcpy(dst, &t, sizeof(arp_send_t));
-				eth.send(sizeof(arp_send_t));
+				ethd.send(sizeof(arp_send_t));
 
 				arp_send_.get_go();
 			}

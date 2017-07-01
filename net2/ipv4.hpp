@@ -21,25 +21,25 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  ipv4 クラス
-		@param[in]	ETHER	イーサーネット・ドライバー・クラス
+		@param[in]	ETHD	イーサーネット・ドライバー・クラス
 		@param[in]	UDPN	UDP 管理数
 		@param[in]	TCPN	TCP 管理数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHER, uint32_t UDPN, uint32_t TCPN>
+	template <class ETHD, uint32_t UDPN, uint32_t TCPN>
 	class ipv4 {
 
-		ETHER&		eth_;
+		ETHD&		ethd_;
 
 		net_info&	info_;
 
-		typedef icmp<ETHER>	ICMP;
+		typedef icmp<ETHD>	ICMP;
 		ICMP		icmp_;
 
-		typedef udp<ETHER, UDPN> UDP;
+		typedef udp<ETHD, UDPN> UDP;
 		UDP			udp_;
 
-		typedef tcp<ETHER, TCPN> TCP;
+		typedef tcp<ETHD, TCPN> TCP;
 		TCP			tcp_;
 
 	public:
@@ -50,8 +50,8 @@ namespace net {
 			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		ipv4(ETHER& eth, net_info& info) : eth_(eth), info_(info),
-			icmp_(), udp_(eth, info), tcp_(eth, info)
+		ipv4(ETHD& ethd, net_info& info) : ethd_(ethd), info_(info),
+			icmp_(), udp_(ethd, info), tcp_(ethd, info)
 		{ }
 
 
@@ -122,7 +122,7 @@ namespace net {
 			switch(ih.get_protocol()) {
 
 			case ipv4_h::protocol::ICMP:
-				icmp_.process(eth_, eh, ih, msg, len); 
+				icmp_.process(ethd_, eh, ih, msg, len); 
 				break;
 
 			case ipv4_h::protocol::TCP:

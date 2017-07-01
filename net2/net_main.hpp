@@ -19,12 +19,15 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  net_main テンプレート・クラス
-		@param[in]	ETHER	インサーネット・ドライバー
+		@param[in]	ETHD	イーサーネット・ドライバー
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHER>
+	template <class ETHD>
 	class net_main {
+	public:
+		typedef ethernet<ETHD> ETHERNET;
 
+	private:
 #ifndef NET_MAIN_DEBUG
 		typedef utils::null_format debug_format;
 #else
@@ -39,12 +42,11 @@ namespace net {
 			stall,		// ストール
 		};
 
-		ETHER&		eth_;
+		ETHD&		ethd_;
 
-		typedef dhcp_client<ETHER> DHCP;
+		typedef dhcp_client<ETHD> DHCP;
 		DHCP		dhcp_;
 
-		typedef ethernet<ETHER> ETHERNET;
 		ETHERNET	ethernet_;
 
 		task		task_;
@@ -67,10 +69,10 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
-			@param[in]	io	インサーネット・ドライバー・クラス
+			@param[in]	ETHD	イーサーネット・ドライバー・クラス
 		*/
 		//-----------------------------------------------------------------//
-		net_main(ETHER& eth) : eth_(eth), dhcp_(eth), ethernet_(eth),
+		net_main(ETHD& ethd) : ethd_(ethd), dhcp_(ethd), ethernet_(ethd),
 			task_(task::wait_link), link_interval_(0), stall_loop_(0)
 			{
 				ethernet_.at_info().ip.set(192, 168, 3, 20);
@@ -91,17 +93,26 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  イーサーネットの参照
+			@return	インサーネット
+		*/
+		//-----------------------------------------------------------------//
+		ETHERNET& at_ethernet() { return ethernet_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  開始
 			@param[in]	mac	インサーネット・コントローラー MAC アドレス
 		*/
 		//-----------------------------------------------------------------//
 		bool start(const uint8_t* mac)
 		{
-			bool ret = eth_.open(mac);
+			bool ret = ethd_.open(mac);
 			if(ret) {
 				debug_format("net_main: start OK\n");
 				link_interval_ = 0;
-				std::memcpy(ethernet_.at_info().mac, eth_.get_mac(), 6);
+				std::memcpy(ethernet_.at_info().mac, ethd_.get_mac(), 6);
 				task_ = task::wait_link;
 			} else {
 				debug_format("net_main: start NG\n");
@@ -113,10 +124,10 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  フレーム・サービス
+			@brief  プロセス（割り込みタスク）
 		*/
 		//-----------------------------------------------------------------//
-		void service_frame()
+		void process()
 		{
 			if(task_ == task::main_loop) {
 				ethernet_.process();
@@ -138,13 +149,13 @@ namespace net {
 			case task::wait_link:
 				{
 					if(link_interval_ >= 100) {
-						eth_.polling_link_status();
+						ethd_.polling_link_status();
 						link_interval_ = 0;
 						debug_format("net_main: PHY wait link loop\n");
 					}
 					++link_interval_;
 
-					bool link = eth_.service_link();
+					bool link = ethd_.service_link();
 					if(link) {
 						dhcp_.start();
 						task_ = task::wait_dhcp;
@@ -168,21 +179,29 @@ namespace net {
 				break;
 
 			case task::main_init:
-				eth_.service_link();
+				ethd_.service_link();
+
+
+				// test code
+				{
+
+				}
+
+
 
 				task_ = task::main_loop;
 				break;
 
 			case task::main_loop:
-				eth_.service_link();
+				ethd_.service_link();
 
 				if(link_interval_ >= 100) {
-					eth_.polling_link_status();
+					ethd_.polling_link_status();
 					link_interval_ = 0;
 				}
 				++link_interval_;
 
-				if(!eth_.get_stat().link_) {
+				if(!ethd_.get_stat().link_) {
 					task_ = task::wait_link;
 				}
 
