@@ -72,25 +72,25 @@ namespace net {
 			@brief  イーサーネット・チェック・サムの計算
 			@param[in]	src	ソース
 			@param[in]	len	バイト数
+			@param[in]	sumorg	サム初期値（通常「０」）
 			@return チェック・サム
 		*/
 		//-----------------------------------------------------------------//
-		static uint16_t calc_sum(const void* src, uint32_t len)
+		static uint16_t calc_sum(const void* src, uint16_t len, uint16_t sumorg = 0)
 		{
-			const uint8_t* p = static_cast<const uint8_t*>(src);
-			uint32_t sum = 0;
+			const uint16_t* d = static_cast<const uint16_t*>(src);
+			uint32_t sum = sumorg;
 			bool mod = false;
 			if(len & 1) {
-				len &= 0xfffffffe;
+				len &= 0xfffe;
 				mod = true;
 			}
-			for(uint32_t i = 0; i < len; i += 2) {
-				sum += static_cast<uint32_t>(p[0]) << 8;
-				sum += static_cast<uint32_t>(p[1]);
-				p += 2;
+			for(uint16_t i = 0; i < len; i += 2) {
+				sum += *d++;
 			}
 			if(mod) {
-				sum += static_cast<uint32_t>(p[0]) << 8;
+				const uint8_t* b = reinterpret_cast<const uint8_t*>(d);
+				sum += *b;
 			}
 			return ~((sum & 0xffff) + (sum >> 16));
 		}
