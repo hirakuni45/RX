@@ -9,3 +9,5 @@
 *.bck
 *.kicad_pcb-bak
 release/
+html/
+*.db
