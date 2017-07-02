@@ -86,7 +86,7 @@ namespace net {
 			@return 無ければ「SIZE」
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t lookup(const ip_adrs& ipa) noexcept
+		uint32_t lookup(const ip_adrs& ipa) const noexcept
 		{
 			for(uint32_t i = 0; i < pos_; ++i) {
 				if(info_[i].ipa == ipa) {
