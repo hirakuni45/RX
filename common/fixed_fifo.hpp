@@ -17,7 +17,7 @@ namespace utils {
 		@param[in]	SIZE	バッファサイズ（最大６５５３６）
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class UNIT, uint16_t SIZE>
+	template <class UNIT, uint32_t SIZE>
 	class fixed_fifo {
 
 		volatile uint16_t	get_;
@@ -40,7 +40,19 @@ namespace utils {
 			@return	バッファのサイズ
         */
         //-----------------------------------------------------------------//
-		uint16_t size() const noexcept { return SIZE; }
+		uint32_t size() const noexcept { return SIZE; }
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  長さを返す
+			@return	長さ
+        */
+        //-----------------------------------------------------------------//
+		uint32_t length() const noexcept {
+			if(put_ >= get_) return (put_ - get_);
+			else return (SIZE + put_ - get_);
+		}
 
 
         //-----------------------------------------------------------------//
@@ -121,18 +133,6 @@ namespace utils {
 			UNIT v = buff_[get_];
 			get_go();
 			return v;
-		}
-
-
-        //-----------------------------------------------------------------//
-        /*!
-            @brief  長さを返す
-			@return	長さ
-        */
-        //-----------------------------------------------------------------//
-		uint16_t length() const noexcept {
-			if(put_ >= get_) return (put_ - get_);
-			else return (SIZE + put_ - get_);
 		}
 
 
