@@ -28,6 +28,11 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ETHD, uint32_t UDPN, uint32_t TCPN>
 	class ipv4 {
+	public:
+		typedef udp<ETHD, UDPN> UDP;
+		typedef tcp<ETHD, TCPN> TCP;
+
+	private:
 
 		ETHD&		ethd_;
 
@@ -36,10 +41,7 @@ namespace net {
 		typedef icmp<ETHD>	ICMP;
 		ICMP		icmp_;
 
-		typedef udp<ETHD, UDPN> UDP;
 		UDP			udp_;
-
-		typedef tcp<ETHD, TCPN> TCP;
 		TCP			tcp_;
 
 	public:
@@ -57,26 +59,20 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  オープン
-			@param[in]	d_ip	相手先のアドレス
-			@param[in]	port	ポート番号
+			@brief  UDP の参照
+			@return UDP
 		*/
 		//-----------------------------------------------------------------//
-		int open_udp(const ip_adrs& d_ip, uint16_t port)
-		{
-			auto idx = info_.at_cash().lookup(d_ip);
-			if(!info_.at_cash().is_valid(idx)) {  // MAC アドレスが不明な場合
-				// MAC アドレスの収集を依頼
-				info_.at_share().mac_request_.put(d_ip);
-			}
+		UDP& at_udp() { return udp_; }
 
 
-
-
-
-
-			return -1;
-		}
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  TCP の参照
+			@return TCP
+		*/
+		//-----------------------------------------------------------------//
+		TCP& at_tcp() { return tcp_; }
 
 
 		//-----------------------------------------------------------------//
