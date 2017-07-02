@@ -54,6 +54,8 @@ namespace net {
 		uint8_t		link_interval_;
 		uint8_t		stall_loop_;
 
+		int			udp_dsc_;
+
 		void set_tcpudp_env_()
 		{
 			const DHCP_INFO& info = dhcp_.get_info();
@@ -73,7 +75,8 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		net_main(ETHD& ethd) : ethd_(ethd), dhcp_(ethd), ethernet_(ethd),
-			task_(task::wait_link), link_interval_(0), stall_loop_(0)
+			task_(task::wait_link), link_interval_(0), stall_loop_(0),
+			udp_dsc_(-1)
 			{
 				ethernet_.at_info().ip.set(192, 168, 3, 20);
 				ethernet_.at_info().mask.set(255, 255, 255, 0);
@@ -184,6 +187,10 @@ namespace net {
 
 				// test code
 				{
+					auto& ipv4 = ethernet_.at_ipv4();
+					auto& udp  = ipv4.at_udp();
+
+					udp_dsc_ = udp.open(ip_adrs(), 3000, 3000);
 
 				}
 
