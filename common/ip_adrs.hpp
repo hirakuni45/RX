@@ -184,36 +184,55 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  比較（自分と同じ型）
+			@brief  一致
+			@param[in]	ipa	ip_adrs「形」のアドレス
 			@return 同じなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool operator==(const ip_adrs& ipa) const {
+		bool operator == (const ip_adrs& ipa) const {
 			return adrs_.dw == ipa.adrs_.dw;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  比較（自分と同じ型）
+			@brief  不一致
+			@param[in]	ipa	ip_adrs「形」のアドレス
 			@return 同じなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool operator == (const uint8_t* addr) const {
-			if(addr == nullptr) return false;
-			return (adrs_.bs[0] == addr[0]
-				 && adrs_.bs[1] == addr[1]
-				 && adrs_.bs[2] == addr[2]
-				 && adrs_.bs[3] == addr[3]);
+		bool operator != (const ip_adrs& ipa) const {
+			return adrs_.dw != ipa.adrs_.dw;
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  []アクセス
+			@param[in]	index	インデックス
+			@return バイト・データ
+		*/
+		//-----------------------------------------------------------------//
 		uint8_t operator [] (int index) const { return adrs_.bs[index]; };
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  []アクセス
+			@param[in]	index	インデックス
+			@return バイト・データ参照
+		*/
+		//-----------------------------------------------------------------//
 		uint8_t& operator [] (int index) { return adrs_.bs[index]; };
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	代入
+			@param[in]	adrs	８ビット列
+			@return 自分
+		*/
+		//-----------------------------------------------------------------//
 		ip_adrs& operator = (const uint8_t* adrs) {
 			adrs_.bs[0] = adrs[0];
 			adrs_.bs[1] = adrs[1];
@@ -223,6 +242,13 @@ namespace net {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	代入
+			@param[in]	adrs	３２ビット値
+			@return 自分
+		*/
+		//-----------------------------------------------------------------//
 		ip_adrs& operator = (uint32_t adrs) {
 			adrs_.dw = adrs;
 			return *this;
@@ -231,7 +257,7 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  文字列で取得
+			@brief  文字列を返す
 			@param[in]	spch	分離キャラクター（通常「.」）
 			@return 文字列
 		*/
@@ -247,4 +273,3 @@ namespace net {
 		}
 	};
 }
-
