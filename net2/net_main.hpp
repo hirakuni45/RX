@@ -189,11 +189,8 @@ namespace net {
 				{
 					auto& ipv4 = ethernet_.at_ipv4();
 					auto& udp  = ipv4.at_udp();
-
 					udp_dsc_ = udp.open(ip_adrs(), 3000, 3000);
-
 				}
-
 
 
 				task_ = task::main_loop;
@@ -211,6 +208,20 @@ namespace net {
 				if(!ethd_.get_stat().link_) {
 					task_ = task::wait_link;
 				}
+
+
+				// test code
+				if(udp_dsc_ >= 0) {
+					auto& ipv4 = ethernet_.at_ipv4();
+					auto& udp  = ipv4.at_udp();
+					char tmp[16];
+					int len = udp.recv(udp_dsc_, tmp, sizeof(tmp));
+					if(len > 0) {
+						tmp[len] = 0;
+						utils::format("UDP Recv: '%s'\n") % tmp;
+					}
+				}
+
 
 				break;
 
