@@ -78,7 +78,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		static uint16_t calc_sum(const void* src, uint16_t len, uint16_t sumorg = 0)
 		{
-			const uint16_t* d = static_cast<const uint16_t*>(src);
+			const uint8_t* d = static_cast<const uint8_t*>(src);
 			uint32_t sum = sumorg;
 			bool mod = false;
 			if(len & 1) {
@@ -86,11 +86,11 @@ namespace net {
 				mod = true;
 			}
 			for(uint16_t i = 0; i < len; i += 2) {
-				sum += *d++;
+				sum += (d[0] << 8) | d[1];
+				d += 2;
 			}
 			if(mod) {
-				const uint8_t* b = reinterpret_cast<const uint8_t*>(d);
-				sum += *b;
+				sum += d[0] << 8;
 			}
 			return ~((sum & 0xffff) + (sum >> 16));
 		}
