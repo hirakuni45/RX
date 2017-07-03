@@ -184,15 +184,6 @@ namespace net {
 			case task::main_init:
 				ethd_.service_link();
 
-
-				// test code
-				{
-					auto& ipv4 = ethernet_.at_ipv4();
-					auto& udp  = ipv4.at_udp();
-					udp_dsc_ = udp.open(ip_adrs(192,168,3,7), 3000, 3000);
-				}
-
-
 				task_ = task::main_loop;
 				break;
 
@@ -211,6 +202,13 @@ namespace net {
 
 
 				// test code
+				if(udp_dsc_ < 0) {
+					auto& ipv4 = ethernet_.at_ipv4();
+					auto& udp  = ipv4.at_udp();
+					udp_dsc_ = udp.open(ip_adrs(192,168,3,7), 3000);
+					utils::format("net_main: UDP Open: (%d)\n") % udp_dsc_;
+					break;
+				}
 				if(udp_dsc_ >= 0) {
 					auto& ipv4 = ethernet_.at_ipv4();
 					auto& udp  = ipv4.at_udp();
@@ -219,12 +217,14 @@ namespace net {
 					int len = udp.recv(udp_dsc_, tmp, sizeof(tmp));
 					if(len > 0) {
 						tmp[len] = 0;
-						utils::format("UDP Recv: '%s'\n") % tmp;
+						utils::format("net_main: UDP Recv: '%s'\n") % tmp;
 						udp.send(udp_dsc_, tmp, len);
+						utils::format("net_main: UDP Send: '%s'\n") % tmp;
+						udp.close(udp_dsc_);
+						utils::format("net_main: UDP Close: (%d)\n") % udp_dsc_;
+						udp_dsc_ = -1;
 					}
 				}
-
-
 				break;
 
 			case task::stall:

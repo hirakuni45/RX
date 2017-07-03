@@ -38,19 +38,20 @@ namespace net {
 
 		enum class task : uint16_t {
 			idle,
-			open,
+			sync_mac,
 			main,
+			sync_close,
 			close,
 		};
 
-		typedef memory<4096>  BUFFER;
+		typedef memory<4096>  RECV_B;
+		typedef memory<4096>  SEND_B;
 
 		struct context {
 			ip_adrs		adrs_;
 			uint8_t		mac_[6];
-			bool		src_port_match_;
-			bool		dst_port_match_;
 			uint16_t	src_port_;
+			uint16_t	port_;
 			uint16_t	dst_port_;
 			uint16_t	time_;
 
@@ -61,8 +62,8 @@ namespace net {
 
 			task		task_;
 
-			BUFFER		recv_;
-			BUFFER		send_;
+			RECV_B		recv_;
+			SEND_B		send_;
 		};
 
 
@@ -85,6 +86,21 @@ namespace net {
 		};
 
 
+		bool get_mac_(context& ctx)
+		{
+			const auto& cash = info_.get_cash();
+			auto idx = cash.lookup(ctx.adrs_);
+			if(cash.is_valid(idx)) {
+				std::memcpy(ctx.mac_, cash[idx].mac, 6);
+				debug_format("UDP MAC lookup: %s at %s\n")
+					% ctx.adrs_.c_str()
+					% tools::mac_str(cash[idx].mac);
+				return true;
+			}
+			return false;
+		}
+
+
 		void send_(context& ctx)
 		{
 			uint16_t len = ctx.send_.length();
@@ -96,9 +112,11 @@ namespace net {
 				return;
 			}
 
-			uint16_t lim = dlen - sizeof(eth_h) - sizeof(ipv4_h) - sizeof(udp_h);
-			if(len > lim) {  // 最大転送サイズ
-				len = lim;
+			{
+				uint16_t lim = dlen - sizeof(eth_h) - sizeof(ipv4_h) - sizeof(udp_h);
+				if(len > lim) {  // 最大転送サイズ
+					len = lim;
+				}
 			}
 
 			frame_t* p = static_cast<frame_t*>(dst);
@@ -121,8 +139,6 @@ namespace net {
 			p->ipv4_.set_dst_ipa(ctx.adrs_.get());
 			p->ipv4_.set_csum(tools::calc_sum(&p->ipv4_, sizeof(ipv4_h)));
 
-// utils::format("IPV4 sum: %04X\n") % tools::calc_sum(&p->ipv4_, sizeof(ipv4_h));
-
 			// データグラムのサム計算
 			csum_h smh;
 			smh.src_ = info_.ip;   // src adrs
@@ -131,7 +147,10 @@ namespace net {
 			smh.len_ = tools::htons(sizeof(udp_h) + len);
 
 			p->udp_.set_src_port(ctx.src_port_);
-			p->udp_.set_dst_port(ctx.dst_port_);
+			if(ctx.port_ == 0) {
+				ctx.port_ = tools::random_port();
+			}
+			p->udp_.set_dst_port(ctx.port_);
 			p->udp_.set_length(sizeof(udp_h) + len);
 			p->udp_.set_csum(0x0000);
 			ctx.send_.get(static_cast<uint8_t*>(dst) + sizeof(frame_t), len);
@@ -154,7 +173,7 @@ namespace net {
 					++all;
 				}
 			}
-			utils::format("UDP Send: %d\n") % all;
+//			utils::format("UDP Send: %d\n") % all;
 			ethd_.send(all);
 
 			++ctx.id_;
@@ -168,14 +187,13 @@ namespace net {
 			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		udp(ETHD& ethd, net_info& info) : ethd_(ethd), info_(info)
-		{ }
+		udp(ETHD& ethd, net_info& info) : ethd_(ethd), info_(info) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  格納可能な最大サイズを返す
-			@return 格納可能な最大サイズ
+			@brief  UDP の同時接続数を返す
+			@return UDP の同時接続数
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t capacity() const noexcept { return NMAX; }
@@ -185,39 +203,43 @@ namespace net {
 		/*!
 			@brief  オープン
 			@param[in]	adrs	アドレス
-			@param[in]	sport	転送元ポート
-			@param[in]	dport	転送先ポート
+			@param[in]	port	ポート
 			@return ディスクリプタ
 		*/
 		//-----------------------------------------------------------------//
-		int open(const ip_adrs& adrs, uint16_t sport, uint16_t dport)
+		int open(const ip_adrs& adrs, uint16_t port)
 		{
 			uint32_t idx = udps_.alloc();
-			if(udps_.is_alloc(idx)) {
-				context& ctx = udps_.at(idx);
-				std::memset(ctx.mac_, 0x00, 6);
-				ctx.adrs_ = adrs;
-				ctx.src_port_ = sport;
-				ctx.src_port_match_ = false;
-				ctx.dst_port_ = dport;
-				ctx.dst_port_match_ = true;
-				ctx.time_ = TIME_OUT;
-				if(adrs.is_any() || adrs.is_brodcast()) {
+			if(!udps_.is_alloc(idx)) {
+				return -1;
+			}
+
+			context& ctx = udps_.at(idx);
+			std::memset(ctx.mac_, 0x00, 6);
+			ctx.adrs_ = adrs;
+			ctx.src_port_ = port;
+			ctx.port_ = 0;  // 初期は「０」
+			ctx.dst_port_ = port;
+			ctx.time_ = TIME_OUT;
+			ctx.id_ = 0;  // 識別子の初期値
+			ctx.life_ = 255;  // 生存時間初期値（ルーターの通過台数）
+			ctx.offset_ = 0;  // フラグメント・オフセット
+
+			ctx.recv_.clear();
+			ctx.send_.clear();
+
+			udps_.unlock(idx);
+
+			if(adrs.is_any() || adrs.is_brodcast()) {
+				ctx.task_ = task::main;
+			} else {
+				if(get_mac_(ctx)) {  // 既に MAC が利用可能なら「main」へ
 					ctx.task_ = task::main;
 				} else {
-					ctx.task_ = task::open;
+					ctx.task_ = task::sync_mac;
 				}
-				ctx.id_ = 0;  // 識別子の初期値
-				ctx.life_ = 255;  // 生存時間初期値（ルーターの通過台数）
-				ctx.offset_ = 0;  // フラグメント・オフセット
-
-				ctx.recv_.clear();
-				ctx.send_.clear();
-
-				udps_.unlock(idx);
-				return static_cast<int>(idx);
 			}
-			return -1;
+			return static_cast<int>(idx);
 		}
 
 
@@ -287,9 +309,8 @@ namespace net {
 			uint32_t idx = static_cast<uint32_t>(desc);
 			if(!udps_.is_alloc(idx)) return;
 
-			udps_.lock(idx);  // ロックする（割り込みで利用不可）
-			context& con = udps_.at(idx);
-			con.task_ = task::close;  // 実際のコンテキスト破棄は、サービスルーチン内で行う
+			context& ctx = udps_.at(idx);
+			ctx.task_ = task::sync_close;
 		}
 
 
@@ -319,16 +340,15 @@ namespace net {
 				if(!ctx.adrs_.is_any() && ctx.adrs_ != ih.get_src_ipa()) continue; 
 
 				// ポート番号の確認
-				if(ctx.src_port_match_) {
-					if(ctx.src_port_ != udp->get_src_port()) {
+				if(ctx.port_ != 0) {
+					if(ctx.port_ != udp->get_src_port()) {
 						continue;
 					}
+				} else {
+					ctx.port_ = udp->get_src_port();
 				}
-
-				if(ctx.dst_port_match_) {
-					if(ctx.dst_port_ != udp->get_dst_port()) {
-						continue;
-					}
+				if(ctx.dst_port_ != udp->get_dst_port()) {
+					continue;
 				}
 
 				// UDP サムの計算
@@ -346,10 +366,6 @@ namespace net {
 
 				if(udp->get_data_len() < (ctx.recv_.size() - ctx.recv_.length() - 1)) {
 					ctx.recv_.put(udp->get_data_ptr(udp), udp->get_data_len());
-// dump(eh);
-// dump(ih);
-// dump(*udp);
-
 				}
 				return true;
 			}
@@ -365,26 +381,28 @@ namespace net {
 		void service()
 		{
 			for(uint32_t i = 0; i < NMAX; ++i) {
+
 				if(!udps_.is_alloc(i)) continue;
 
 				context& ctx = udps_.at(i);
 				switch(ctx.task_) {
-				case task::open:
-					{
-						const auto& cash = info_.get_cash();
-						auto idx = cash.lookup(ctx.adrs_);
-						if(cash.is_valid(idx)) {
-							std::memcpy(ctx.mac_, cash[idx].mac, 6);
-							debug_format("UDP MAC lookup: %s at %s\n")
-								% ctx.adrs_.c_str()
-								% tools::mac_str(cash[idx].mac);
-							ctx.task_ = task::main;
-						}
+				case task::sync_mac:
+					if(get_mac_(ctx)) {
+						ctx.task_ = task::main;
 					}
 					break;
 
 				case task::main:
 					send_(ctx);
+					break;
+
+				case task::sync_close:
+					if(ctx.send_.length() == 0) {
+						udps_.lock(i);  // ロックする（割り込みで利用不可にする）
+						ctx.task_ = task::close;
+					} else {
+						send_(ctx);
+					}
 					break;
 
 				case task::close:

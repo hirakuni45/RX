@@ -498,6 +498,14 @@ namespace net {
 
 		bool get_flag_fin() const { return (flag_ofs_ & 0x0080) != 0; }
 		void set_flag_fin(bool f) { set_flag_(f, 0x0080, &flag_ofs_); }
+
+		static void* get_data_ptr(udp_h* org) {
+			return reinterpret_cast<uint8_t*>(org) + sizeof(tcp_h);
+		}
+
+		static const void* get_data_ptr(const udp_h* org) {
+			return reinterpret_cast<const uint8_t*>(org) + sizeof(tcp_h);
+		}
 	} __attribute__((__packed__));
 
 
