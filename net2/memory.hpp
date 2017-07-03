@@ -7,6 +7,7 @@
 */
 //=====================================================================//
 #include <cstdint>
+#include "common/net_tools.hpp"
 
 namespace net {
 

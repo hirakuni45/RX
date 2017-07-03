@@ -88,10 +88,11 @@ namespace net {
 			bool myframe = false;
 			if(std::memcmp(eh.get_dst(), info_.mac, 6) == 0) {  // 自分に宛てたフレーム
 				myframe = true;
-//				dump_("Match:    ", h);
+//				utils::format("IPV4 Recv MyFrame:\n");
 			} else if(tools::check_brodcast_mac(eh.get_dst())) {  // ブロード・キャスト
-//				dump_("Brodcast: ", h);
+//				utils::format("IPV4 Recv Brodcast:\n");
 			} else {
+//				utils::format("IPV4 Recv Other\n");
 				return false;
 			}
 

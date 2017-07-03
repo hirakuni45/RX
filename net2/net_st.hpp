@@ -247,7 +247,7 @@ namespace net {
 		uint16_t	length_;      ///< 全長
 		uint16_t	id_;          ///< 識別番号
 		uint16_t	f_offset_;    ///< フラグ(B0-B2)、フラグメントオフセット(B3-B15)
-		uint8_t		time_;        ///< 生存時間
+		uint8_t		life_;        ///< 生存時間
 		protocol	protocol_;    ///< プロトコル
 		uint16_t	csum_;        ///< ヘッダ・チェックサム
 
@@ -304,8 +304,8 @@ namespace net {
 			f_offset_ = tools::htons(tmp);
 		}
 
-		uint16_t get_time() const noexcept { return static_cast<uint16_t>(time_); }
-		void set_time(uint16_t time) noexcept { time_ = tools::htons(time); }
+		uint8_t get_life() const noexcept { return life_; }
+		void set_life(uint8_t life) noexcept { life_ = life; }
 
 		protocol get_protocol() const noexcept { return protocol_; }
 		void set_protocol(protocol prop) noexcept { protocol_ = prop; }
@@ -353,7 +353,7 @@ namespace net {
 		utils::format(", flag: %d, flagment ofs: %d\n")
 			% h.get_flag()
 			% h.get_flagment_offset();
-		utils::format("  time: %d") % h.get_time();
+		utils::format("  life: %d") % static_cast<uint32_t>(h.get_life());
 
 		switch(h.get_protocol()) {
 		case ipv4_h::protocol::ICMP:

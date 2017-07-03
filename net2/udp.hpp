@@ -10,6 +10,8 @@
 #include "net2/net_st.hpp"
 #include "net2/memory.hpp"
 
+#define UDP_DEBUG
+
 namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -21,6 +23,12 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class ETHD, uint32_t NMAX>
 	class udp {
+
+#ifndef UDP_DEBUG
+		typedef utils::null_format debug_format;
+#else
+		typedef utils::format debug_format;
+#endif
 
 		static const uint16_t TIME_OUT = 20 * 1000 / 10;  // 20 sec (unit: 10ms)
 
@@ -45,6 +53,12 @@ namespace net {
 			uint16_t	src_port_;
 			uint16_t	dst_port_;
 			uint16_t	time_;
+
+			// IPV4 関係
+			uint16_t	id_;
+			uint16_t	offset_;
+			uint8_t		life_;
+
 			task		task_;
 
 			BUFFER		recv_;
@@ -69,6 +83,82 @@ namespace net {
 			uint16_t	fix_;
 			uint16_t	len_;
 		};
+
+
+		void send_(context& ctx)
+		{
+			uint16_t len = ctx.send_.length();
+			if(len == 0) return;
+
+			void* dst;
+			uint16_t dlen;
+			if(ethd_.send_buff(&dst, dlen) != 0) {
+				return;
+			}
+
+			uint16_t lim = dlen - sizeof(eth_h) - sizeof(ipv4_h) - sizeof(udp_h);
+			if(len > lim) {  // 最大転送サイズ
+				len = lim;
+			}
+
+			frame_t* p = static_cast<frame_t*>(dst);
+			p->eh_.set_dst(ctx.mac_);   // 転送先の MAC
+			p->eh_.set_src(info_.mac);  // 転送元の MAC
+			p->eh_.set_type(eth_type::IPV4);
+
+			p->ipv4_.ver_hlen_ = 0x45;
+			p->ipv4_.type_ = 0x00;
+			p->ipv4_.set_length(sizeof(ipv4_h) + sizeof(udp_h) + len);
+			p->ipv4_.set_id(ctx.id_);  // 識別子（送信パケットごとに＋１する）
+			// 1500バイトより大きなデータを送る場合にフラグメントに分割されて
+			// その連番がオフセットとして設定される。
+			p->ipv4_.set_flag(0);
+			p->ipv4_.set_flagment_offset(ctx.offset_);
+			p->ipv4_.set_life(ctx.life_);  // 生存時間（ルーターの通過台数）
+			p->ipv4_.set_protocol(ipv4_h::protocol::UDP);
+			p->ipv4_.csum_ = 0;
+			p->ipv4_.set_src_ipa(info_.ip.get());
+			p->ipv4_.set_dst_ipa(ctx.adrs_.get());
+			p->ipv4_.set_csum(tools::calc_sum(&p->ipv4_, sizeof(ipv4_h)));
+
+// utils::format("IPV4 sum: %04X\n") % tools::calc_sum(&p->ipv4_, sizeof(ipv4_h));
+
+			// データグラムのサム計算
+			csum_h smh;
+			smh.src_ = info_.ip;   // src adrs
+			smh.dst_ = ctx.adrs_;  // dst adrs
+			smh.fix_ = 0x1100;  // UDP 固定値
+			smh.len_ = tools::htons(sizeof(udp_h) + len);
+
+			p->udp_.set_src_port(ctx.src_port_);
+			p->udp_.set_dst_port(ctx.dst_port_);
+			p->udp_.set_length(sizeof(udp_h) + len);
+			p->udp_.set_csum(0x0000);
+			ctx.send_.get(static_cast<uint8_t*>(dst) + sizeof(frame_t), len);
+
+			uint16_t sum = tools::calc_sum(&smh, sizeof(csum_h));
+			sum = tools::calc_sum(&p->udp_, sizeof(udp_h) + len, ~sum);
+			p->udp_.set_csum(sum);
+
+// dump(p->ipv4_);
+// dump(p->udp_);
+
+//			sum = tools::calc_sum(&smh, sizeof(csum_h));
+//			sum = tools::calc_sum(&p->udp_, sizeof(udp_h) + len, ~sum);
+//			utils::format("Sum: %04X\n") % sum;
+			uint16_t all = sizeof(frame_t) + len;
+			if(all < 60) {
+				uint8_t* mp = static_cast<uint8_t*>(dst) + all;
+				while(all < 60) {
+					*mp++ = 0;
+					++all;
+				}
+			}
+			utils::format("UDP Send: %d\n") % all;
+			ethd_.send(all);
+
+			++ctx.id_;
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -117,6 +207,10 @@ namespace net {
 				} else {
 					ctx.task_ = task::open;
 				}
+				ctx.id_ = 0;  // 識別子の初期値
+				ctx.life_ = 255;  // 生存時間初期値（ルーターの通過台数）
+				ctx.offset_ = 0;  // フラグメント・オフセット
+
 				ctx.recv_.clear();
 				ctx.send_.clear();
 
@@ -136,24 +230,20 @@ namespace net {
 			@return 送信バイト
 		*/
 		//-----------------------------------------------------------------//
-		int send(int desc, const void* src, uint16_t)
+		int send(int desc, const void* src, uint16_t len)
 		{
 			uint32_t idx = static_cast<uint32_t>(desc);
 			if(!udps_.is_alloc(idx)) return -1;
 			if(udps_.is_lock(idx)) return -1;
 
 			context& ctx = udps_.at(idx);
+			uint16_t spc = ctx.send_.size() - ctx.send_.length() - 1;
+			if(spc < len) {
+				len = spc;
+			}
+			ctx.send_.put(src, len);
 
-			frame_t t;
-			t.eh_.set_dst(ctx.mac_);
-			t.eh_.set_src(info_.mac);
-			t.eh_.set_type(eth_type::IPV4);
-			t.ipv4_.ver_hlen_ = 0x45;
-			t.ipv4_.type_ = 0x00;
-//			t.udp_
-
-
-			return 0;
+			return len;
 		}
 
 
@@ -221,11 +311,10 @@ namespace net {
 				if(!udps_.is_alloc(i)) continue;  // alloc: 有効
 				if(udps_.is_lock(i)) continue;  // lock:  無効
 				context& ctx = udps_.at(i);  // コンテキスト取得
-				if(ctx.task_ != task::main) continue;  // task: main 以外は無効
 
 				// 転送先の確認（ブロードキャスト）
-///				if(ih.get_dst_ipa() 
 				if(info_.ip != ih.get_dst_ipa()) continue;
+
 				// 転送元の確認
 				if(!ctx.adrs_.is_any() && ctx.adrs_ != ih.get_src_ipa()) continue; 
 
@@ -257,6 +346,10 @@ namespace net {
 
 				if(udp->get_data_len() < (ctx.recv_.size() - ctx.recv_.length() - 1)) {
 					ctx.recv_.put(udp->get_data_ptr(udp), udp->get_data_len());
+// dump(eh);
+// dump(ih);
+// dump(*udp);
+
 				}
 				return true;
 			}
@@ -282,13 +375,16 @@ namespace net {
 						auto idx = cash.lookup(ctx.adrs_);
 						if(cash.is_valid(idx)) {
 							std::memcpy(ctx.mac_, cash[idx].mac, 6);
+							debug_format("UDP MAC lookup: %s at %s\n")
+								% ctx.adrs_.c_str()
+								% tools::mac_str(cash[idx].mac);
 							ctx.task_ = task::main;
-utils::format("UDP MAC lookup: %s\n") % ctx.adrs_.c_str();
 						}
 					}
 					break;
 
 				case task::main:
+					send_(ctx);
 					break;
 
 				case task::close:
