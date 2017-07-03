@@ -123,16 +123,16 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN = 4, uint32_t RXDN = 4>
 	class ether_io {
+	public:
+		static const int EMAC_BUFSIZE = 1536;  			// Must be 32-byte aligned
 
+	private:
 #ifndef ETHRC_DEBUG
 		typedef utils::null_format debug_format;
 #else
 		typedef utils::format debug_format;
 #endif
 
-		static const int EMAC_BUFSIZE = 1536;  			// Must be 32-byte aligned
-
-	private:
 		// Bit definitions of status member of DescriptorS
 		static const uint32_t TACT = 0x80000000;
 		static const uint32_t RACT = 0x80000000;
