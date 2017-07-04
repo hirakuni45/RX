@@ -196,7 +196,8 @@ namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  イーサーネット・ヘッダー、スワップコピー
+		@brief  イーサーネット・ヘッダー、スワップコピー @n
+				※src、dst を交換してコピーする
 		@param[out]	dst	コピー先
 		@param[in]	src	コピー元
 	*/
@@ -217,7 +218,7 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	static void dump(const eth_h& h) {
 		utils::format("Ethernet Header:\n");
-		utils::format("  src(%s), dst(%s), type(%04X)\n")
+		utils::format("  src(%s), dst(%s), type(0x%04X)\n")
 			% tools::mac_str(h.get_src())
 			% tools::mac_str(h.get_dst())
 			% static_cast<uint32_t>(h.get_type());
@@ -255,37 +256,20 @@ namespace net {
 		uint8_t		dst_ipa_[4];  ///< 宛先 IP アドレス
 
 	public:
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  IPV4 バージョンの取得
-			@return IPV4 バージョン
-		*/
-		//-----------------------------------------------------------------//
-		uint16_t get_version() const noexcept { return ver_hlen_ & 0x0f; }
+		uint8_t get_ver_hlen() const noexcept { return ver_hlen_; }
+		void set_ver_hlen(uint8_t v) noexcept { ver_hlen_ = v; }
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  IPV4 バージョンの設定
-			@param[in]	ver	IPV4 バージョン
-		*/
-		//-----------------------------------------------------------------//
-		void set_version(uint8_t ver) noexcept {
-			ver_hlen_ &= 0xf0;
-			ver_hlen_ |= ver;
-		}
-
-		uint16_t get_header_length() const noexcept { return ver_hlen_ >> 4; }
-		void set_header_length(uint8_t length) noexcept {
-			ver_hlen_ &= 0x0f;
-			ver_hlen_ |= length << 4;
-		}
+		uint8_t get_type() const noexcept { return type_; }
+		void set_type(uint8_t t) noexcept { type_ = t; }
 
 		uint16_t get_length() const noexcept { return tools::htons(length_); }
 		void set_length(uint16_t length) noexcept { length_ = tools::htons(length); }
 
 		uint16_t get_id() const noexcept { return tools::htons(id_); }
 		void set_id(uint16_t id) noexcept { id_ = tools::htons(id); }
+
+		uint16_t get_f_offset() const noexcept { return tools::htons(f_offset_); }
+		void set_f_offset(uint16_t offset) noexcept { f_offset_ = tools::htons(offset); }
 
 		/// 下位３ビット
 		uint8_t get_flag() const noexcept { return tools::htons(f_offset_) >> 13; }
@@ -346,8 +330,8 @@ namespace net {
 	{
 		utils::format("IP Header:\n");
 		utils::format("  version: %d, header length: %d\n")
-			% h.get_version()
-			% h.get_header_length();
+			% (h.get_ver_hlen() >> 4)
+			% (h.get_ver_hlen() & 15);
 		utils::format("  length: %d") % h.get_length();
 		utils::format(", id: %d") % h.get_id();
 		utils::format(", flag: %d, flagment ofs: %d\n")
@@ -428,7 +412,7 @@ namespace net {
 		utils::format("UDP Segment: src(%d), dst(%d)\n")
 			% h.get_src_port()
 			% h.get_dst_port();
-		utils::format("  Length: %d, CSUM: %04X\n") % h.get_length() % h.get_csum();
+		utils::format("  Length: %d, CSUM: 0x%04X\n") % h.get_length() % h.get_csum();
 	}
 
 
@@ -443,67 +427,81 @@ namespace net {
 		uint16_t	dst_port_;
 		uint32_t	seq_;
 		uint32_t	ack_;
-		uint16_t	flag_ofs_;
+		uint8_t		h_len_;
+		uint8_t		flags_;
 		uint16_t	window_;
 		uint16_t	csum_;
 		uint16_t	urgent_ptr_;
 
-		void set_flag_(bool f, uint16_t mask, uint16_t* dst) {
+		void set_flag_(bool f, uint8_t mask) {
 			if(f) {
-				*dst |=  mask;
+				flags_ |= mask;
 			} else {
-				*dst &= ~mask;
+				flags_ &= mask;
 			}
 		}
 
 	public:
-		uint16_t get_src_port() const { return tools::htons(src_port_); }
-		void set_src_port(uint16_t port) { src_port_ = tools::htons(port); }
+		static const uint8_t MASK_FIN = 0x01;
+		static const uint8_t MASK_SYN = 0x02;
+		static const uint8_t MASK_RST = 0x04;
+		static const uint8_t MASK_PSH = 0x08;
+		static const uint8_t MASK_ACK = 0x10;
+		static const uint8_t MASK_URG = 0x20;
 
-		uint16_t get_dst_port() const { return tools::htons(dst_port_); }
-		void set_dst_port(uint16_t port) { dst_port_ = tools::htons(port); }
+		uint16_t get_src_port() const noexcept { return tools::htons(src_port_); }
+		void set_src_port(uint16_t port) noexcept { src_port_ = tools::htons(port); }
 
-		uint32_t get_seq() const { return tools::htonl(seq_); }
-		void set_seq(uint32_t seq) { seq_ = tools::htonl(seq); }
+		uint16_t get_dst_port() const noexcept { return tools::htons(dst_port_); }
+		void set_dst_port(uint16_t port) noexcept { dst_port_ = tools::htons(port); }
 
-		uint32_t get_ack() const { return tools::htonl(ack_); }
-		void set_ack(uint32_t ack) { ack_ = tools::htonl(ack); }
+		uint32_t get_seq() const noexcept { return tools::htonl(seq_); }
+		void set_seq(uint32_t seq) noexcept { seq_ = tools::htonl(seq); }
 
-		uint16_t get_flag_ofs() const { return tools::htons(flag_ofs_); }
-		void set_flag_ofs(uint16_t ofs) { flag_ofs_ = tools::htons(ofs); }
+		uint32_t get_ack() const noexcept { return tools::htonl(ack_); }
+		void set_ack(uint32_t ack) noexcept { ack_ = tools::htonl(ack); }
 
-		uint16_t get_window() const { return tools::htons(window_); }
-		void set_window(uint16_t win) { window_ = tools::htons(win); }
+		uint8_t get_h_len() const noexcept { return h_len_; }
+		void set_h_len(uint8_t h_len) noexcept { h_len_ = h_len; }
 
-		uint16_t get_csum() const { return tools::htons(csum_); }
-		void set_csum(uint16_t sum) { csum_ = tools::htons(sum); }
+		uint8_t get_flags() const noexcept { return flags_; }
+		void set_flags(uint8_t flags) noexcept { flags_ = flags; }
 
-		uint16_t get_urgent_ptr() const { return tools::htons(urgent_ptr_); }
-		void set_urgent_ptr(uint16_t ptr) { urgent_ptr_ = tools::htons(ptr); }
+		uint16_t get_window() const noexcept { return tools::htons(window_); }
+		void set_window(uint16_t win) noexcept { window_ = tools::htons(win); }
 
-		bool get_flag_urg() const { return (flag_ofs_ & 0x0004) != 0; }
-		void set_flag_urg(bool f) { set_flag_(f, 0x0004, &flag_ofs_); }
+		uint16_t get_csum() const noexcept { return tools::htons(csum_); }
+		void set_csum(uint16_t sum) noexcept { csum_ = tools::htons(sum); }
 
-		bool get_flag_ack() const { return (flag_ofs_ & 0x0008) != 0; }
-		void set_flag_ack(bool f) { set_flag_(f, 0x0008, &flag_ofs_); }
+		uint16_t get_urgent_ptr() const noexcept { return tools::htons(urgent_ptr_); }
+		void set_urgent_ptr(uint16_t ptr) noexcept { urgent_ptr_ = tools::htons(ptr); }
 
-		bool get_flag_psh() const { return (flag_ofs_ & 0x0010) != 0; }
-		void set_flag_psh(bool f) { set_flag_(f, 0x0010, &flag_ofs_); }
+		bool get_flag_urg() const noexcept { return (flags_ & MASK_URG) != 0; }
+		void set_flag_urg(bool f) noexcept { set_flag_(f, MASK_URG); }
 
-		bool get_flag_rst() const { return (flag_ofs_ & 0x0020) != 0; }
-		void set_flag_rst(bool f) { set_flag_(f, 0x0020, &flag_ofs_); }
+		bool get_flag_ack() const noexcept { return (flags_ & MASK_ACK) != 0; }
+		void set_flag_ack(bool f) noexcept { set_flag_(f, MASK_ACK); }
 
-		bool get_flag_syn() const { return (flag_ofs_ & 0x0040) != 0; }
-		void set_flag_syn(bool f) { set_flag_(f, 0x0040, &flag_ofs_); }
+		bool get_flag_psh() const noexcept { return (flags_ & MASK_PSH) != 0; }
+		void set_flag_psh(bool f) noexcept { set_flag_(f, MASK_RST); }
 
-		bool get_flag_fin() const { return (flag_ofs_ & 0x0080) != 0; }
-		void set_flag_fin(bool f) { set_flag_(f, 0x0080, &flag_ofs_); }
+		bool get_flag_rst() const noexcept { return (flags_ & MASK_RST) != 0; }
+		void set_flag_rst(bool f) noexcept { set_flag_(f, MASK_RST); }
 
-		static void* get_data_ptr(udp_h* org) {
+		bool get_flag_syn() const noexcept { return (flags_ & MASK_SYN) != 0; }
+		void set_flag_syn(bool f) noexcept { set_flag_(f, MASK_SYN); }
+
+		bool get_flag_fin() const noexcept { return (flags_ & MASK_FIN) != 0; }
+		void set_flag_fin(bool f) noexcept { set_flag_(f, MASK_FIN); }
+
+		uint16_t get_length() const noexcept { return (h_len_ >> 4) * 4; }
+		void set_length(uint16_t len) noexcept { h_len_ = ((len / 4) & 15) << 4; }
+
+		static void* get_data_ptr(udp_h* org) noexcept {
 			return reinterpret_cast<uint8_t*>(org) + sizeof(tcp_h);
 		}
 
-		static const void* get_data_ptr(const udp_h* org) {
+		static const void* get_data_ptr(const udp_h* org) noexcept {
 			return reinterpret_cast<const uint8_t*>(org) + sizeof(tcp_h);
 		}
 	} __attribute__((__packed__));
@@ -520,18 +518,32 @@ namespace net {
 		utils::format("TCP Segment: src(%d), dst(%d)\n")
 			% h.get_src_port()
 			% h.get_dst_port();
-		utils::format("  Seq: %d, Aack: %d\n") % h.get_seq() % h.get_ack();
-		utils::format("  flags: URG: %d, ACK: %d, PSH:%d, RST:%d, SYN:%d, FIN:%d\n")
+		utils::format("  Seq: 0x%08X, Ack: 0x%08X\n") % h.get_seq() % h.get_ack();
+		utils::format("  flags(0x%02X): URG: %d, ACK: %d, PSH:%d, RST:%d, SYN:%d, FIN:%d\n")
+			% static_cast<uint32_t>(h.get_flags())
 			% h.get_flag_urg()
 			% h.get_flag_ack()
 			% h.get_flag_psh()
 			% h.get_flag_rst()
 			% h.get_flag_syn()
 			% h.get_flag_fin();
-		utils::format("  offset(header length): %d\n") % h.get_flag_ofs();
-		utils::format("  Window: %d, C-Sum: %04X, Urgent PTR: %d\n")
+		utils::format("  h_len: 0x%02X, (option bytes: %d)\n")
+			% static_cast<uint32_t>(h.get_h_len()) % (h.get_length() - sizeof(tcp_h));
+		utils::format("  Window: %d, C-Sum: 0x%04X, Urgent PTR: %d\n")
 			% h.get_window()
 			% h.get_csum()
 			% h.get_urgent_ptr();
+		uint16_t len = h.get_length();
+		if(len > sizeof(tcp_h)) {
+			len -= sizeof(tcp_h);
+			const uint8_t* p = reinterpret_cast<const uint8_t*>(&h);
+			p += sizeof(tcp_h);
+			utils::format("  option:");
+			for(uint16_t i = 0; i < len; ++i) {
+				utils::format(" %02X") % static_cast<uint32_t>(*p);
+				++p;
+			}
+			utils::format("\n");
+		}
 	}
 }
