@@ -62,6 +62,22 @@ namespace net {
 
 			RECV_B		recv_;
 			SEND_B		send_;
+
+			void reset(const ip_adrs& adrs, uint16_t port)
+			{
+				adrs_ = adrs;
+				std::memset(mac_, 0x00, 6);
+				cn_port_ = port;
+				port_ = 0;  // 初期は「０」
+				recv_time_ = TIME_OUT;
+				send_time_ = TIME_OUT;
+				id_ = 0;  // 識別子の初期値
+				life_ = 255;  // 生存時間初期値（ルーターの通過台数）
+				offset_ = 0;  // フラグメント・オフセット
+
+				recv_.clear();
+				send_.clear();
+			}
 		};
 
 		typedef udp_tcp_common<context, NMAX> COMMON;
@@ -80,21 +96,6 @@ namespace net {
 			uint16_t	fix_;
 			uint16_t	len_;
 		};
-
-
-		bool get_mac_(context& ctx)
-		{
-			const auto& cash = info_.get_cash();
-			auto idx = cash.lookup(ctx.adrs_);
-			if(cash.is_valid(idx)) {
-				std::memcpy(ctx.mac_, cash[idx].mac, 6);
-				debug_format("UDP MAC lookup: %s at %s\n")
-					% ctx.adrs_.c_str()
-					% tools::mac_str(cash[idx].mac);
-				return true;
-			}
-			return false;
-		}
 
 
 		void send_(context& ctx)
@@ -200,7 +201,7 @@ namespace net {
 			@brief  オープン
 			@param[in]	adrs	アドレス
 			@param[in]	port	ポート
-			@return ディスクリプタ
+			@return ディスクリプタ（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
 		int open(const ip_adrs& adrs, uint16_t port)
@@ -211,25 +212,14 @@ namespace net {
 			}
 
 			context& ctx = common_.at_blocks().at(idx);
-			std::memset(ctx.mac_, 0x00, 6);
-			ctx.adrs_ = adrs;
-			ctx.cn_port_ = port;
-			ctx.port_ = 0;  // 初期は「０」
-			ctx.recv_time_ = TIME_OUT;
-			ctx.send_time_ = TIME_OUT;
-			ctx.id_ = 0;  // 識別子の初期値
-			ctx.life_ = 255;  // 生存時間初期値（ルーターの通過台数）
-			ctx.offset_ = 0;  // フラグメント・オフセット
-
-			ctx.recv_.clear();
-			ctx.send_.clear();
+			ctx.reset(adrs, port);
 
 			common_.at_blocks().unlock(idx);
 
 			if(adrs.is_any() || adrs.is_brodcast()) {
 				ctx.send_task_ = send_task::main;
 			} else {
-				if(get_mac_(ctx)) {  // 既に MAC が利用可能なら「main」へ
+				if(common_.check_mac(ctx, info_)) {  // 既に MAC が利用可能なら「main」へ
 					ctx.send_task_ = send_task::main;
 				} else {
 					ctx.send_task_ = send_task::sync_mac;
@@ -245,10 +235,10 @@ namespace net {
 			@param[in]	desc	ディスクリプタ
 			@param[in]	src		ソース
 			@param[in]	len		送信バイト数
-			@return 送信バイト
+			@return 送信バイト（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		int send(int desc, const void* src, uint16_t len)
+		inline int send(int desc, const void* src, uint16_t len)
 		{
 			return common_.send(desc, src, len);
 		}
@@ -258,10 +248,10 @@ namespace net {
 		/*!
 			@brief  送信バッファの残量取得
 			@param[in]	desc	ディスクリプタ
-			@return 送信バッファの残量
+			@return 送信バッファの残量（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		int get_send_length(int desc) const
+		inline int get_send_length(int desc) const
 		{
 			return common_.get_send_length(desc);
 		}
@@ -273,10 +263,10 @@ namespace net {
 			@param[in]	desc	ディスクリプタ
 			@param[in]	dst		ソース
 			@param[in]	len		受信バイト数
-			@return 受信バイト
+			@return 受信バイト（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		int recv(int desc, void* dst, uint16_t len)
+		inline int recv(int desc, void* dst, uint16_t len)
 		{
 			return common_.recv(desc, dst, len);
 		}
@@ -284,12 +274,12 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  送信バッファの残量取得
+			@brief  受信バッファの残量取得
 			@param[in]	desc	ディスクリプタ
-			@return 送信バッファの残量
+			@return 受信バッファの残量（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		int get_recv_length(int desc) const
+		inline int get_recv_length(int desc) const
 		{
 			return common_.get_recv_length(desc);
 		}
@@ -384,7 +374,7 @@ namespace net {
 				context& ctx = common_.at_blocks().at(i);
 				switch(ctx.send_task_) {
 				case send_task::sync_mac:
-					if(get_mac_(ctx)) {
+					if(common_.check_mac(ctx, info_)) {
 						ctx.send_task_ = send_task::main;
 					}
 					break;
