@@ -37,8 +37,8 @@ namespace net {
 
 		enum class recv_task : uint8_t {
 			idle,
-			sync_mac,
-			main,
+			lissen,
+
 			sync_close,
 			close,
 		};
@@ -78,10 +78,8 @@ namespace net {
 			volatile bool		server_;
 		};
 
-
-		typedef utils::fixed_block<context, NMAX> TCP_BLOCK;
-		TCP_BLOCK	tcps_;
-
+		typedef udp_tcp_common<context, NMAX> COMMON;
+		COMMON		common_;
 
 		struct frame_t {
 			eth_h	eh_;
@@ -110,6 +108,38 @@ namespace net {
 				return true;
 			}
 			return false;
+		}
+
+
+		bool recv_(context& ctx, const ipv4_h& ih, const tcp_h* tcp, uint16_t len)
+		{
+			// TCP サムの計算
+			csum_h smh;
+			smh.src_.set(ih.get_src_ipa());
+			smh.dst_.set(ih.get_dst_ipa());
+			smh.fix_ = 0x0600;
+			smh.len_ = tools::htons(sizeof(tcp_h) + len);
+			uint16_t sum = tools::calc_sum(&smh, sizeof(smh));
+			sum = tools::calc_sum(tcp, sizeof(tcp_h) + len, ~sum);
+			if(sum != 0) {
+				utils::format("TCP Frame sum error: %04X -> %04X\n") % tcp->get_csum() % sum;
+				return false;
+			}
+
+			switch(ctx.recv_task_) {
+
+			case recv_task::lissen:
+				break;
+			default:
+				break;
+			}
+
+
+//			if(tcp->get_data_len() < (ctx.recv_.size() - ctx.recv_.length() - 1)) {
+//				ctx.recv_.put(tcp->get_data_ptr(tcp), tcp->get_data_len());
+//			}
+
+			return true;
 		}
 
 
@@ -218,12 +248,12 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int open(const ip_adrs& adrs, uint16_t port, bool server)
 		{
-			uint32_t idx = tcps_.alloc();
-			if(!tcps_.is_alloc(idx)) {
+			uint32_t idx = common_.at_blocks().alloc();
+			if(!common_.at_blocks().is_alloc(idx)) {
 				return -1;
 			}
 
-			context& ctx = tcps_.at(idx);
+			context& ctx = common_.at_blocks().at(idx);
 			std::memset(ctx.mac_, 0x00, 6);
 			ctx.adrs_ = adrs;
 			ctx.cn_port_ = port;
@@ -239,7 +269,7 @@ namespace net {
 			ctx.recv_.clear();
 			ctx.send_.clear();
 
-			tcps_.unlock(idx);
+			common_.at_blocks().unlock(idx);
 
 			if(adrs.is_any() || adrs.is_brodcast()) {
 				ctx.send_task_ = send_task::main;
@@ -265,18 +295,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int send(int desc, const void* src, uint16_t len)
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!tcps_.is_alloc(idx)) return -1;
-			if(tcps_.is_lock(idx)) return -1;
-
-			context& ctx = tcps_.at(idx);
-			uint16_t spc = ctx.send_.size() - ctx.send_.length() - 1;
-			if(spc < len) {
-				len = spc;
-			}
-			ctx.send_.put(src, len);
-
-			return len;
+			return common_.send(desc, src, len);
 		}
 
 
@@ -289,12 +308,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int get_send_length(int desc) const
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!tcps_.is_alloc(idx)) return -1;
-			if(tcps_.is_lock(idx)) return -1;
-
-			context& ctx = tcps_.at(idx);
-			return ctx.send_.length();
+			return common_.get_send_length(desc);
 		}
 
 
@@ -309,21 +323,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int recv(int desc, void* dst, uint16_t len)
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!tcps_.is_alloc(idx)) return -1;
-			if(tcps_.is_lock(idx)) return -1;
-
-			context& ctx = tcps_.at(idx);
-			int rlen = ctx.recv_.length();
-			if(rlen == 0) {  // 読み込むデータが無い
-				return rlen;
-			}
-
-			if(rlen > len) {
-				rlen = len;
-			}
-			ctx.recv_.get(dst, rlen);
-			return rlen;
+			return common_.recv(desc, dst, len);
 		}
 
 
@@ -336,12 +336,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int get_recv_length(int desc) const
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!tcps_.is_alloc(idx)) return -1;
-			if(tcps_.is_lock(idx)) return -1;
-
-			context& ctx = tcps_.at(idx);
-			return ctx.recv_.length();
+			return common_.get_recv_length(desc);
 		}
 
 
@@ -354,17 +349,16 @@ namespace net {
 		void close(int desc)
 		{
 			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!tcps_.is_alloc(idx)) return;
+			if(!common_.at_blocks().is_alloc(idx)) return;
 
-			context& ctx = tcps_.at(idx);
+			context& ctx = common_.at_blocks().at(idx);
 			ctx.send_task_ = send_task::sync_close;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  プロセス
-					※割り込み外から呼ぶ事は禁止
+			@brief  プロセス（割り込みから呼ばれる）
 			@param[in]	eh	イーサーネット・ヘッダー
 			@param[in]	ih	IPV4 ヘッダー
 			@param[in]	tcp	TCP ヘッダー
@@ -377,9 +371,9 @@ namespace net {
 			// 該当するコンテキストを探す
 			uint32_t idx = NMAX;
 			for(uint32_t i = 0; i < NMAX; ++i) {
-				if(!tcps_.is_alloc(i)) continue;  // alloc: 有効
-				if(tcps_.is_lock(i)) continue;  // lock:  無効
-				context& ctx = tcps_.at(i);  // コンテキスト取得
+				if(!common_.at_blocks().is_alloc(i)) continue;  // alloc: 有効
+				if(common_.at_blocks().is_lock(i)) continue;  // lock:  無効
+				context& ctx = common_.at_blocks().at(i);  // コンテキスト取得
 
 				// 転送先の確認
 				if(info_.ip != ih.get_dst_ipa()) continue;
@@ -399,26 +393,7 @@ namespace net {
 					continue;
 				}
 
-				// TCP サムの計算
-				csum_h smh;
-				smh.src_.set(ih.get_src_ipa());
-				smh.dst_.set(ih.get_dst_ipa());
-				smh.fix_ = 0x0600;
-				smh.len_ = tools::htons(sizeof(tcp_h) + len);
-				uint16_t sum = tools::calc_sum(&smh, sizeof(smh));
-				sum = tools::calc_sum(tcp, sizeof(tcp_h) + len, ~sum);
-				if(sum != 0) {
-					utils::format("TCP Frame sum error: %04X -> %04X\n") % tcp->get_csum() % sum;
-					return false;
-				}
-
-
-
-
-//				if(tcp->get_data_len() < (ctx.recv_.size() - ctx.recv_.length() - 1)) {
-//					ctx.recv_.put(tcp->get_data_ptr(tcp), tcp->get_data_len());
-//				}
-				return true;
+				return recv_(ctx, ih, tcp, len);
 			}
 			return false;
 		}
@@ -433,9 +408,9 @@ namespace net {
 		{
 			for(uint32_t i = 0; i < NMAX; ++i) {
 
-				if(!tcps_.is_alloc(i)) continue;
+				if(!common_.at_blocks().is_alloc(i)) continue;
 
-				context& ctx = tcps_.at(i);
+				context& ctx = common_.at_blocks().at(i);
 				switch(ctx.send_task_) {
 				case send_task::sync_mac:
 					if(get_mac_(ctx)) {
@@ -449,7 +424,7 @@ namespace net {
 
 				case send_task::sync_close:
 					if(ctx.send_.length() == 0) {
-						tcps_.lock(i);  // ロックする（割り込みで利用不可にする）
+						common_.at_blocks().lock(i);  // ロックする（割り込みで利用不可にする）
 						ctx.send_task_ = send_task::close;
 					} else {
 						send_(ctx);
@@ -457,7 +432,7 @@ namespace net {
 					break;
 
 				case send_task::close:
-					tcps_.erase(i);
+					common_.at_blocks().erase(i);
 					break;
 				default:
 					break;

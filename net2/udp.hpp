@@ -6,9 +6,7 @@
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=========================================================================//
-#include "common/fixed_block.hpp"
-#include "net2/net_st.hpp"
-#include "net2/memory.hpp"
+#include "net2/udp_tcp_common.hpp"
 
 #define UDP_DEBUG
 
@@ -66,10 +64,8 @@ namespace net {
 			SEND_B		send_;
 		};
 
-
-		typedef utils::fixed_block<context, NMAX> UDP_BLOCK;
-		UDP_BLOCK	udps_;
-
+		typedef udp_tcp_common<context, NMAX> COMMON;
+		COMMON		common_;
 
 		struct frame_t {
 			eth_h	eh_;
@@ -187,7 +183,7 @@ namespace net {
 			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		udp(ETHD& ethd, net_info& info) : ethd_(ethd), info_(info) { }
+		udp(ETHD& ethd, net_info& info) : ethd_(ethd), info_(info), common_() { }
 
 
 		//-----------------------------------------------------------------//
@@ -209,12 +205,12 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int open(const ip_adrs& adrs, uint16_t port)
 		{
-			uint32_t idx = udps_.alloc();
-			if(!udps_.is_alloc(idx)) {
+			uint32_t idx = common_.at_blocks().alloc();
+			if(!common_.at_blocks().is_alloc(idx)) {
 				return -1;
 			}
 
-			context& ctx = udps_.at(idx);
+			context& ctx = common_.at_blocks().at(idx);
 			std::memset(ctx.mac_, 0x00, 6);
 			ctx.adrs_ = adrs;
 			ctx.cn_port_ = port;
@@ -228,7 +224,7 @@ namespace net {
 			ctx.recv_.clear();
 			ctx.send_.clear();
 
-			udps_.unlock(idx);
+			common_.at_blocks().unlock(idx);
 
 			if(adrs.is_any() || adrs.is_brodcast()) {
 				ctx.send_task_ = send_task::main;
@@ -254,18 +250,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int send(int desc, const void* src, uint16_t len)
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!udps_.is_alloc(idx)) return -1;
-			if(udps_.is_lock(idx)) return -1;
-
-			context& ctx = udps_.at(idx);
-			uint16_t spc = ctx.send_.size() - ctx.send_.length() - 1;
-			if(spc < len) {
-				len = spc;
-			}
-			ctx.send_.put(src, len);
-
-			return len;
+			return common_.send(desc, src, len);
 		}
 
 
@@ -278,12 +263,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int get_send_length(int desc) const
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!udps_.is_alloc(idx)) return -1;
-			if(udps_.is_lock(idx)) return -1;
-
-			context& ctx = udps_.at(idx);
-			return ctx.send_.length();
+			return common_.get_send_length(desc);
 		}
 
 
@@ -298,21 +278,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int recv(int desc, void* dst, uint16_t len)
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!udps_.is_alloc(idx)) return -1;
-			if(udps_.is_lock(idx)) return -1;
-
-			context& ctx = udps_.at(idx);
-			int rlen = ctx.recv_.length();
-			if(rlen == 0) {  // 読み込むデータが無い
-				return rlen;
-			}
-
-			if(rlen > len) {
-				rlen = len;
-			}
-			ctx.recv_.get(dst, rlen);
-			return rlen;
+			return common_.recv(desc, dst, len);
 		}
 
 
@@ -325,12 +291,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		int get_recv_length(int desc) const
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!udps_.is_alloc(idx)) return -1;
-			if(udps_.is_lock(idx)) return -1;
-
-			context& ctx = udps_.at(idx);
-			return ctx.recv_.length();
+			return common_.get_recv_length(desc);
 		}
 
 
@@ -343,9 +304,9 @@ namespace net {
 		void close(int desc)
 		{
 			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!udps_.is_alloc(idx)) return;
+			if(!common_.at_blocks().is_alloc(idx)) return;
 
-			context& ctx = udps_.at(idx);
+			context& ctx = common_.at_blocks().at(idx);
 			ctx.send_task_ = send_task::sync_close;
 		}
 
@@ -365,9 +326,9 @@ namespace net {
 			// 該当するコンテキストを探す
 			uint32_t idx = NMAX;
 			for(uint32_t i = 0; i < NMAX; ++i) {
-				if(!udps_.is_alloc(i)) continue;  // alloc: 有効
-				if(udps_.is_lock(i)) continue;  // lock:  無効
-				context& ctx = udps_.at(i);  // コンテキスト取得
+				if(!common_.at_blocks().is_alloc(i)) continue;  // alloc: 有効
+				if(common_.at_blocks().is_lock(i)) continue;  // lock:  無効
+				context& ctx = common_.at_blocks().at(i);  // コンテキスト取得
 
 				// 転送先の確認
 				if(info_.ip != ih.get_dst_ipa()) continue;
@@ -418,9 +379,9 @@ namespace net {
 		{
 			for(uint32_t i = 0; i < NMAX; ++i) {
 
-				if(!udps_.is_alloc(i)) continue;
+				if(!common_.at_blocks().is_alloc(i)) continue;
 
-				context& ctx = udps_.at(i);
+				context& ctx = common_.at_blocks().at(i);
 				switch(ctx.send_task_) {
 				case send_task::sync_mac:
 					if(get_mac_(ctx)) {
@@ -434,7 +395,7 @@ namespace net {
 
 				case send_task::sync_close:
 					if(ctx.send_.length() == 0) {
-						udps_.lock(i);  // ロックする（割り込みで利用不可にする）
+						common_.at_blocks().lock(i);  // ロックする（割り込みで利用不可にする）
 						ctx.send_task_ = send_task::close;
 					} else {
 						send_(ctx);
@@ -442,7 +403,7 @@ namespace net {
 					break;
 
 				case send_task::close:
-					udps_.erase(i);
+					common_.at_blocks().erase(i);
 					break;
 				default:
 					break;
