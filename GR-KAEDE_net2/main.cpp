@@ -77,7 +77,9 @@ namespace {
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
 
-	typedef net::net_main<ETHER_IO> NET_MAIN;
+	static const uint32_t UDPN = 3;  // UDP の経路数
+ 	static const uint32_t TCPN = 6;  // TCP の経路数
+	typedef net::net_main<ETHER_IO, UDPN, TCPN> NET_MAIN;
 	NET_MAIN	net_(ether_);
 
 //	typedef net::http_server<ETHER_IO, SDC> HTTP;
