@@ -303,7 +303,7 @@ int main(int argc, char** argv)
 		sci_.start(115200, int_level);
 	}
 
-	utils::format("\nStart GR-KAEDE Net Stack 2 Sample\n");
+	utils::format("\nStart GR-KAEDE Net2 Stack Sample\n");
 
 	// SD カード・クラスの初期化
 	sdc_.start();
