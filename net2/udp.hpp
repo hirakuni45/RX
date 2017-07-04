@@ -42,8 +42,8 @@ namespace net {
 			close,
 		};
 
-		typedef memory<4096>  RECV_B;
-		typedef memory<4096>  SEND_B;
+		typedef memory<1024>  RECV_B;
+		typedef memory<1024>  SEND_B;
 
 		struct context {
 			ip_adrs		adrs_;
@@ -184,7 +184,7 @@ namespace net {
 			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		udp(ETHD& ethd, net_info& info) : ethd_(ethd), info_(info), common_() { }
+		udp(ETHD& ethd, net_info& info) noexcept : ethd_(ethd), info_(info), common_() { }
 
 
 		//-----------------------------------------------------------------//
@@ -204,17 +204,21 @@ namespace net {
 			@return ディスクリプタ（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		int open(const ip_adrs& adrs, uint16_t port)
+		int open(const ip_adrs& adrs, uint16_t port) noexcept
 		{
+			if(port == 0) {
+				debug_format("UDP Open fail port: %d\n") % port;
+				return -1;
+			}
+
 			uint32_t idx = common_.at_blocks().alloc();
 			if(!common_.at_blocks().is_alloc(idx)) {
+				debug_format("UDP Context Empty\n"); 
 				return -1;
 			}
 
 			context& ctx = common_.at_blocks().at(idx);
 			ctx.reset(adrs, port);
-
-			common_.at_blocks().unlock(idx);
 
 			if(adrs.is_any() || adrs.is_brodcast()) {
 				ctx.send_task_ = send_task::main;
@@ -225,6 +229,8 @@ namespace net {
 					ctx.send_task_ = send_task::sync_mac;
 				}
 			}
+
+			common_.at_blocks().unlock(idx);
 			return static_cast<int>(idx);
 		}
 
@@ -238,7 +244,7 @@ namespace net {
 			@return 送信バイト（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int send(int desc, const void* src, uint16_t len)
+		inline int send(int desc, const void* src, uint16_t len) noexcept
 		{
 			return common_.send(desc, src, len);
 		}
@@ -251,7 +257,7 @@ namespace net {
 			@return 送信バッファの残量（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int get_send_length(int desc) const
+		inline int get_send_length(int desc) const noexcept
 		{
 			return common_.get_send_length(desc);
 		}
@@ -266,7 +272,7 @@ namespace net {
 			@return 受信バイト（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int recv(int desc, void* dst, uint16_t len)
+		inline int recv(int desc, void* dst, uint16_t len) noexcept
 		{
 			return common_.recv(desc, dst, len);
 		}
@@ -279,7 +285,7 @@ namespace net {
 			@return 受信バッファの残量（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int get_recv_length(int desc) const
+		inline int get_recv_length(int desc) const noexcept
 		{
 			return common_.get_recv_length(desc);
 		}
@@ -291,7 +297,7 @@ namespace net {
 			@param[in]	desc	ディスクリプタ
 		*/
 		//-----------------------------------------------------------------//
-		void close(int desc)
+		void close(int desc) noexcept
 		{
 			uint32_t idx = static_cast<uint32_t>(desc);
 			if(!common_.at_blocks().is_alloc(idx)) return;
@@ -311,7 +317,7 @@ namespace net {
 			@return エラーが無い場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool process(const eth_h& eh, const ipv4_h& ih, const udp_h* udp, int32_t len)
+		bool process(const eth_h& eh, const ipv4_h& ih, const udp_h* udp, int32_t len) noexcept
 		{
 			// 該当するコンテキストを探す
 			uint32_t idx = NMAX;
@@ -362,10 +368,11 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  サービス（１０ｍｓ毎に呼ぶ）
+			@brief  サービス（１０ｍｓ毎に呼ぶ）@n
+					※割り込み外から呼ぶ事
 		*/
 		//-----------------------------------------------------------------//
-		void service()
+		void service() noexcept
 		{
 			for(uint32_t i = 0; i < NMAX; ++i) {
 

@@ -39,7 +39,7 @@ namespace net {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		udp_tcp_common() : blocks_() { }
+		udp_tcp_common() noexcept : blocks_() { }
 
 
 		//-----------------------------------------------------------------//
@@ -50,7 +50,7 @@ namespace net {
 			@return MAC アドレス取得済みなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool check_mac(CTX& ctx, net_info& info)
+		bool check_mac(CTX& ctx, net_info& info) noexcept
 		{
 			const auto& cash = info.get_cash();
 			auto idx = cash.lookup(ctx.adrs_);
@@ -71,7 +71,7 @@ namespace net {
 			@return コンテキスト・ブロック
 		*/
 		//-----------------------------------------------------------------//
-		inline BLOCKS& at_blocks()
+		inline BLOCKS& at_blocks() noexcept
 		{
 			return blocks_;
 		}
