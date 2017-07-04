@@ -22,12 +22,14 @@ namespace net {
 	/*!
 		@brief  net_main テンプレート・クラス
 		@param[in]	ETHD	イーサーネット・ドライバー
+		@param[in]	UDPN	UDP 経路数の最大値
+		@param[in]	TCPN	TCP 経路数の最大値
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHD>
+	template <class ETHD, uint32_t UDPN, uint32_t TCPN>
 	class net_main {
 	public:
-		typedef ethernet<ETHD> ETHERNET;
+		typedef ethernet<ETHD, UDPN, TCPN> ETHERNET;
 
 	private:
 #ifndef NET_MAIN_DEBUG
@@ -203,7 +205,7 @@ namespace net {
 				}
 
 				test_udp_.service(ethernet_);
-				test_tcp_.service(ethernet_, false);
+				test_tcp_.service(ethernet_, true);
 
 				break;
 
