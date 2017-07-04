@@ -17,9 +17,47 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class test_tcp {
 
+		int		desc_;
 
 	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		test_tcp() : desc_(-1) { }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  サービス
+		*/
+		//-----------------------------------------------------------------//
+		template <class ETH>
+		void service(ETH& eth, bool server)
+		{
+			if(desc_ < 0) {
+				auto& ipv4 = eth.at_ipv4();
+				auto& tcp  = ipv4.at_tcp();
+				desc_ = tcp.open(ip_adrs(192,168,3,7), 3000, server);
+				utils::format("net_main: TCP Open: (%d) %s\n")
+					% desc_ % (server ? "Server" : "Client");
+			} else {
+				auto& ipv4 = eth.at_ipv4();
+				auto& tcp  = ipv4.at_udp();
+
+				char tmp[256];
+				int len = tcp.recv(desc_, tmp, sizeof(tmp));
+				if(len > 0) {
+					tmp[len] = 0;
+					utils::format("net_main: TCP Recv: '%s'\n") % tmp;
+					tcp.send(desc_, tmp, len);
+					utils::format("net_main: TCP Send: '%s'\n") % tmp;
+					tcp.close(desc_);
+					utils::format("net_main: TCP Close: (%d)\n") % desc_;
+					desc_ = -1;
+				}
+			}
+		}
 	};
 }

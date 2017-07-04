@@ -11,6 +11,8 @@
 #include "common/dhcp_client.hpp"
 #include "net2/ethernet.hpp"
 #include "net2/net_st.hpp"
+#include "net2/test_udp.hpp"
+#include "net2/test_tcp.hpp"
 
 #define NET_MAIN_DEBUG
 
@@ -54,7 +56,8 @@ namespace net {
 		uint8_t		link_interval_;
 		uint8_t		stall_loop_;
 
-		int			udp_dsc_;
+		test_udp	test_udp_;
+		test_tcp	test_tcp_;
 
 		void set_tcpudp_env_()
 		{
@@ -75,8 +78,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		net_main(ETHD& ethd) : ethd_(ethd), dhcp_(ethd), ethernet_(ethd),
-			task_(task::wait_link), link_interval_(0), stall_loop_(0),
-			udp_dsc_(-1)
+			task_(task::wait_link), link_interval_(0), stall_loop_(0)
 			{
 				ethernet_.at_info().ip.set(192, 168, 3, 20);
 				ethernet_.at_info().mask.set(255, 255, 255, 0);
@@ -200,31 +202,9 @@ namespace net {
 					task_ = task::wait_link;
 				}
 
+				test_udp_.service(ethernet_);
+				test_tcp_.service(ethernet_, false);
 
-				// test code
-				if(udp_dsc_ < 0) {
-					auto& ipv4 = ethernet_.at_ipv4();
-					auto& udp  = ipv4.at_udp();
-					udp_dsc_ = udp.open(ip_adrs(192,168,3,7), 3000);
-					utils::format("net_main: UDP Open: (%d)\n") % udp_dsc_;
-					break;
-				}
-				if(udp_dsc_ >= 0) {
-					auto& ipv4 = ethernet_.at_ipv4();
-					auto& udp  = ipv4.at_udp();
-
-					char tmp[256];
-					int len = udp.recv(udp_dsc_, tmp, sizeof(tmp));
-					if(len > 0) {
-						tmp[len] = 0;
-						utils::format("net_main: UDP Recv: '%s'\n") % tmp;
-						udp.send(udp_dsc_, tmp, len);
-						utils::format("net_main: UDP Send: '%s'\n") % tmp;
-						udp.close(udp_dsc_);
-						utils::format("net_main: UDP Close: (%d)\n") % udp_dsc_;
-						udp_dsc_ = -1;
-					}
-				}
 				break;
 
 			case task::stall:
