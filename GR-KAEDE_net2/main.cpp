@@ -255,8 +255,13 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	// NMI input pull-up
-	device::PORT3::PCR.B5 = 1; // P35(NMI) pull-up
+	device::init_port();
+
+	device::PORTC::PDR.B0 = 1; // output
+	device::PORTC::PDR.B1 = 1; // output
+	device::PORT0::PDR.B2 = 1; // output
+	device::PORT0::PDR.B3 = 1; // output
+
 
 	{  // GR-KAEDE の SPI 端子のハードバグ回避
 	   // ※PC3 から、PC7 へ １K オームで接続
@@ -348,9 +353,10 @@ int main(int argc, char** argv)
 			http_.service();
 		}
 #endif
-		device::PORTC::PDR.B0 = 1; // output
-		device::PORTC::PODR.B0 = (cnt < 10) ? 0 : 1;
+		device::PORTC::PODR.B0 = (((cnt + 0)  & 31) < 8) ? 1 : 0;
+		device::PORTC::PODR.B1 = (((cnt + 8)  & 31) < 8) ? 1 : 0;
+		device::PORT0::PODR.B2 = (((cnt + 16) & 31) < 8) ? 1 : 0;
+		device::PORT0::PODR.B3 = (((cnt + 24) & 31) < 8) ? 1 : 0;
 		++cnt;
-		if(cnt >= 50) cnt = 0;
 	}
 }
