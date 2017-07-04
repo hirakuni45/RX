@@ -35,10 +35,20 @@ namespace net {
 
 		net_info&	info_;
 
-		enum class task : uint16_t {
+		enum class recv_task : uint8_t {
 			idle,
 			sync_mac,
 			main,
+			sync_close,
+			close,
+		};
+
+		enum class send_task : uint8_t {
+			idle,
+			sync_mac,
+
+			main,
+
 			sync_close,
 			close,
 		};
@@ -49,20 +59,23 @@ namespace net {
 		struct context {
 			ip_adrs		adrs_;
 			uint8_t		mac_[6];
-			uint16_t	src_port_;
+			uint16_t	cn_port_;
 			uint16_t	port_;
-			uint16_t	dst_port_;
-			uint16_t	time_;
+			uint16_t	recv_time_;
+			uint16_t	send_time_;
 
 			// IPV4 関係
 			uint16_t	id_;
 			uint16_t	offset_;
 			uint8_t		life_;
 
-			task		task_;
+			send_task	send_task_;
 
 			RECV_B		recv_;
 			SEND_B		send_;
+
+			volatile recv_task	recv_task_;
+			volatile bool		server_;
 		};
 
 
@@ -145,12 +158,13 @@ namespace net {
 			smh.fix_ = 0x0600;  // TCP 固定値
 			smh.len_ = tools::htons(sizeof(tcp_h) + len);
 
-			p->tcp_.set_src_port(ctx.src_port_);
+			p->tcp_.set_src_port(ctx.cn_port_);
 			if(ctx.port_ == 0) {
 				ctx.port_ = tools::random_port();
 			}
 			p->tcp_.set_dst_port(ctx.port_);
-			p->tcp_.set_length(sizeof(tcp_h) + len);
+
+
 
 
 			p->tcp_.set_csum(0x0000);
@@ -198,10 +212,11 @@ namespace net {
 			@brief  オープン
 			@param[in]	adrs	アドレス
 			@param[in]	port	ポート
+			@param[in]	server	サーバーの場合「true」
 			@return ディスクリプタ
 		*/
 		//-----------------------------------------------------------------//
-		int open(const ip_adrs& adrs, uint16_t port)
+		int open(const ip_adrs& adrs, uint16_t port, bool server)
 		{
 			uint32_t idx = tcps_.alloc();
 			if(!tcps_.is_alloc(idx)) {
@@ -211,13 +226,15 @@ namespace net {
 			context& ctx = tcps_.at(idx);
 			std::memset(ctx.mac_, 0x00, 6);
 			ctx.adrs_ = adrs;
-			ctx.src_port_ = port;
+			ctx.cn_port_ = port;
 			ctx.port_ = 0;  // 初期は「０」
-			ctx.dst_port_ = port;
-			ctx.time_ = TIME_OUT;
+			ctx.recv_time_ = TIME_OUT;
+			ctx.send_time_ = TIME_OUT;
 			ctx.id_ = 0;  // 識別子の初期値
 			ctx.life_ = 255;  // 生存時間初期値（ルーターの通過台数）
 			ctx.offset_ = 0;  // フラグメント・オフセット
+
+			ctx.server_ = server;
 
 			ctx.recv_.clear();
 			ctx.send_.clear();
@@ -225,12 +242,12 @@ namespace net {
 			tcps_.unlock(idx);
 
 			if(adrs.is_any() || adrs.is_brodcast()) {
-				ctx.task_ = task::main;
+				ctx.send_task_ = send_task::main;
 			} else {
 				if(get_mac_(ctx)) {  // 既に MAC が利用可能なら「main」へ
-					ctx.task_ = task::main;
+					ctx.send_task_ = send_task::main;
 				} else {
-					ctx.task_ = task::sync_mac;
+					ctx.send_task_ = send_task::sync_mac;
 				}
 			}
 			return static_cast<int>(idx);
@@ -265,6 +282,24 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  送信バッファの残量取得
+			@param[in]	desc	ディスクリプタ
+			@return 送信バッファの残量
+		*/
+		//-----------------------------------------------------------------//
+		int get_send_length(int desc) const
+		{
+			uint32_t idx = static_cast<uint32_t>(desc);
+			if(!tcps_.is_alloc(idx)) return -1;
+			if(tcps_.is_lock(idx)) return -1;
+
+			context& ctx = tcps_.at(idx);
+			return ctx.send_.length();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  受信
 			@param[in]	desc	ディスクリプタ
 			@param[in]	dst		ソース
@@ -294,6 +329,24 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  送信バッファの残量取得
+			@param[in]	desc	ディスクリプタ
+			@return 送信バッファの残量
+		*/
+		//-----------------------------------------------------------------//
+		int get_recv_length(int desc) const
+		{
+			uint32_t idx = static_cast<uint32_t>(desc);
+			if(!tcps_.is_alloc(idx)) return -1;
+			if(tcps_.is_lock(idx)) return -1;
+
+			context& ctx = tcps_.at(idx);
+			return ctx.recv_.length();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  クローズ
 			@param[in]	desc	ディスクリプタ
 		*/
@@ -304,7 +357,7 @@ namespace net {
 			if(!tcps_.is_alloc(idx)) return;
 
 			context& ctx = tcps_.at(idx);
-			ctx.task_ = task::sync_close;
+			ctx.send_task_ = send_task::sync_close;
 		}
 
 
@@ -328,7 +381,7 @@ namespace net {
 				if(tcps_.is_lock(i)) continue;  // lock:  無効
 				context& ctx = tcps_.at(i);  // コンテキスト取得
 
-				// 転送先の確認（ブロードキャスト）
+				// 転送先の確認
 				if(info_.ip != ih.get_dst_ipa()) continue;
 
 				// 転送元の確認
@@ -342,7 +395,7 @@ namespace net {
 				} else {
 					ctx.port_ = tcp->get_src_port();
 				}
-				if(ctx.dst_port_ != tcp->get_dst_port()) {
+				if(ctx.cn_port_ != tcp->get_dst_port()) {
 					continue;
 				}
 
@@ -378,7 +431,38 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void service()
 		{
+			for(uint32_t i = 0; i < NMAX; ++i) {
 
+				if(!tcps_.is_alloc(i)) continue;
+
+				context& ctx = tcps_.at(i);
+				switch(ctx.send_task_) {
+				case send_task::sync_mac:
+					if(get_mac_(ctx)) {
+						ctx.send_task_ = send_task::main;
+					}
+					break;
+
+				case send_task::main:
+					send_(ctx);
+					break;
+
+				case send_task::sync_close:
+					if(ctx.send_.length() == 0) {
+						tcps_.lock(i);  // ロックする（割り込みで利用不可にする）
+						ctx.send_task_ = send_task::close;
+					} else {
+						send_(ctx);
+					}
+					break;
+
+				case send_task::close:
+					tcps_.erase(i);
+					break;
+				default:
+					break;
+				}
+			}
 		}
 	};
 }
