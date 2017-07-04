@@ -56,7 +56,7 @@ namespace net {
 			auto idx = cash.lookup(ctx.adrs_);
 			if(cash.is_valid(idx)) {
 				std::memcpy(ctx.mac_, cash[idx].mac, 6);
-				debug_format("UDP MAC lookup: %s at %s\n")
+				debug_format("UDP/TCP MAC lookup: %s at %s\n")
 					% ctx.adrs_.c_str()
 					% tools::mac_str(cash[idx].mac);
 				return true;
