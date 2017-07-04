@@ -18,6 +18,7 @@ namespace net {
 	class test_udp {
 
 		int		desc_;
+		int		loop_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -25,7 +26,7 @@ namespace net {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		test_udp() : desc_(-1) { }
+		test_udp() : desc_(-1), loop_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -52,9 +53,13 @@ namespace net {
 					utils::format("net_main: UDP Recv: '%s'\n") % tmp;
 					udp.send(desc_, tmp, len);
 					utils::format("net_main: UDP Send: '%s'\n") % tmp;
-					udp.close(desc_);
-					utils::format("net_main: UDP Close: (%d)\n") % desc_;
-					desc_ = -1;
+					++loop_;
+					if(loop_ >= 4) {
+						udp.close(desc_);
+						utils::format("net_main: UDP Close: (%d)\n") % desc_;
+						desc_ = -1;
+						loop_ = 0;
+					}
 				}
 			}
 		}
