@@ -102,6 +102,12 @@ namespace device {
 				ICU::IPR.TXI7 = lvl;
 				ICU::IER.TXI7 = ena;
 				break;
+			case peripheral::SCI12:
+				ICU::IPR.RXI12 = lvl;
+				ICU::IER.RXI12 = ena;
+				ICU::IPR.TXI12 = lvl;
+				ICU::IER.TXI12 = ena;
+				break;
 
 			case peripheral::ETHERC0:
 

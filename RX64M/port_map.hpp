@@ -113,6 +113,18 @@ namespace device {
 				}
 				break;
 
+			case peripheral::SCI12:
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					PORTE::PDR.B2 = enable; // TXD12
+					PORTE::PDR.B1 = 0;  	// RXD12
+					MPC::PE2PFS.PSEL = sel;
+					MPC::PE1PFS.PSEL = sel;
+					PORTE::PMR.B2 = enable;
+					PORTE::PMR.B1 = enable;
+				}
+				break;
+
 			case peripheral::RSPI:
 				{
 					uint8_t sel = enable ? 0b001101 : 0;
@@ -214,6 +226,7 @@ namespace device {
 				break;
 
 			default:
+//				utils::format("Fail port map: %d\n") % static_cast<int>(t);
 				break;
 			}
 		}

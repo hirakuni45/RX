@@ -218,6 +218,9 @@ namespace device {
 			rw8_t<base + 111> GROUPBL1;
 			rw8_t<base + 112> GROUPAL0;
 			rw8_t<base + 113> GROUPAL1;
+
+			rw8_t<base + 116> RXI12;
+			rw8_t<base + 117> TXI12;
 		};
 		static ir_t<0x00087010> IR;
 
@@ -294,6 +297,9 @@ namespace device {
 			typedef rw8_t<base + 0x0E> ier0E;
 			bit_rw_t<ier0E, bitpos::B0>	GROUPAL0;
 			bit_rw_t<ier0E, bitpos::B1> GROUPAL1;
+
+			bit_rw_t<ier0E, bitpos::B4> RXI12;
+			bit_rw_t<ier0E, bitpos::B5> TXI12;
 		};
 		static ier_t<0x00087200> IER;
 
@@ -359,6 +365,9 @@ namespace device {
 			rw8_t<base + 111> GROUPBL1;
 			rw8_t<base + 112> GROUPAL0;
 			rw8_t<base + 113> GROUPAL1;
+
+			rw8_t<base + 116> RXI12;
+			rw8_t<base + 117> TXI12;
 		};
 		static ipr_t<0x00087300> IPR;
 
