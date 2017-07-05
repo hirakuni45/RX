@@ -39,7 +39,6 @@ namespace net {
 			sync_mac,
 			main,
 			sync_close,
-			close,
 		};
 
 		typedef memory<1024>  RECV_B;
@@ -397,15 +396,13 @@ namespace net {
 				case send_task::sync_close:
 					if(ctx.send_.length() == 0) {
 						common_.at_blocks().lock(i);  // ロックする（割り込みで利用不可にする）
-						ctx.send_task_ = send_task::close;
+						ctx.send_task_ = send_task::idle;
+						common_.at_blocks().erase(i);
 					} else {
 						send_(ctx);
 					}
 					break;
 
-				case send_task::close:
-					common_.at_blocks().erase(i);
-					break;
 				default:
 					break;
 				}
