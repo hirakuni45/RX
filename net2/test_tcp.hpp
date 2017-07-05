@@ -18,6 +18,7 @@ namespace net {
 	class test_tcp {
 
 		int		desc_;
+		bool	onetime_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -25,7 +26,7 @@ namespace net {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		test_tcp() : desc_(-1) { }
+		test_tcp() : desc_(-1), onetime_(true) { }
 
 
 		//-----------------------------------------------------------------//
@@ -36,6 +37,8 @@ namespace net {
 		template <class ETH>
 		void service(ETH& eth, bool server)
 		{
+			if(!onetime_) return;
+
 			if(desc_ < 0) {
 				auto& ipv4 = eth.at_ipv4();
 				auto& tcp  = ipv4.at_tcp();
@@ -51,11 +54,13 @@ namespace net {
 				if(len > 0) {
 					tmp[len] = 0;
 					utils::format("Test TCP Recv(%d): '%s'\n") % len % tmp;
-					tcp.send(desc_, tmp, len);
-					utils::format("Test TCP Send(%d): '%s'\n") % len % tmp;
-//					tcp.close(desc_);
-//					utils::format("net_main: TCP Close: (%d)\n") % desc_;
-//					desc_ = -1;
+///					tcp.send(desc_, tmp, len);
+///					utils::format("Test TCP Send(%d): '%s'\n") % len % tmp;
+					tcp.close(desc_);
+					utils::format("Test TCP Close: (%d)\n") % desc_;
+					desc_ = -1;
+
+///					onetime_ = false;
 				}
 			}
 		}
