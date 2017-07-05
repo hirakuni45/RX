@@ -115,7 +115,7 @@ namespace net {
 			if(!blocks_.is_alloc(idx)) return -1;
 			if(blocks_.is_lock(idx)) return -1;
 
-			CTX& ctx = blocks_.at(idx);
+			const CTX& ctx = blocks_.get(idx);
 			return ctx.send_.length();
 		}
 
@@ -162,7 +162,7 @@ namespace net {
 			if(!blocks_.is_alloc(idx)) return -1;
 			if(blocks_.is_lock(idx)) return -1;
 
-			CTX& ctx = blocks_.at(idx);
+			const CTX& ctx = blocks_.get(idx);
 			return ctx.recv_.length();
 		}
 	};
