@@ -103,6 +103,8 @@ namespace net {
 			uint16_t len = ctx.send_.length();
 			if(len == 0) return;
 
+			ethd_.enable_interrupt(false);
+
 			void* dst;
 			uint16_t dlen;
 			if(ethd_.send_buff(&dst, dlen) != 0) {
@@ -172,6 +174,8 @@ namespace net {
 			}
 //			utils::format("UDP Send: %d\n") % all;
 			ethd_.send(all);
+
+			ethd_.enable_interrupt();
 
 			++ctx.id_;
 		}
