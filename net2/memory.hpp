@@ -65,7 +65,7 @@ namespace net {
 
         //-----------------------------------------------------------------//
         /*!
-            @brief  値の格納ポイントの移動
+            @brief  格納ポイントの移動
 			@param[in]	n	移動量
         */
         //-----------------------------------------------------------------//
@@ -84,9 +84,10 @@ namespace net {
             @brief  値の格納
 			@param[in]	src	ソース
 			@param[in]	len	長さ
+			@param[in]	go	ポインターを更新しない場合「false」
         */
         //-----------------------------------------------------------------//
-		void put(const void* src, uint16_t len) noexcept {
+		void put(const void* src, uint16_t len, bool go = true) noexcept {
 			uint16_t all = len;
 			uint16_t fsz = SIZE - put_;
 			uint16_t pos = put_;
@@ -100,13 +101,15 @@ namespace net {
 			if(len > 0) {
 				std::memcpy(&buff_[pos], src, len);
 			}
-			put_go(all);
+			if(go) put_go(all);
 		}
+
+
 
 
         //-----------------------------------------------------------------//
         /*!
-            @brief  値の取得
+            @brief  取得ポイントの移動
 			@param[in]	n	移動量
         */
         //-----------------------------------------------------------------//
@@ -125,9 +128,10 @@ namespace net {
             @brief  値の取得
 			@param[out]	dst	コピー先
 			@param[in]	len	長さ
+			@param[in]	go	ポインターを更新しない場合「false」
         */
         //-----------------------------------------------------------------//
-		void get(void* dst, uint16_t len) noexcept {
+		void get(void* dst, uint16_t len, bool go = true) noexcept {
 			uint16_t all = len;
 			uint16_t fsz = SIZE - get_;
 			uint16_t pos = get_;
@@ -141,7 +145,7 @@ namespace net {
 			if(len > 0) {
 				std::memcpy(dst, &buff_[pos], len);
 			}
-			get_go(all);
+			if(go) get_go(all);
 		}
 
 
