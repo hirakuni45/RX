@@ -41,24 +41,26 @@ namespace net {
 				auto& ipv4 = eth.at_ipv4();
 				auto& udp  = ipv4.at_udp();
 				desc_ = udp.open(ip_adrs(192,168,3,7), 3000);
-				utils::format("net_main: UDP Open: (%d)\n") % desc_;
+				utils::format("Test UDP Open: (%d)\n") % desc_;
 			} else {
 				auto& ipv4 = eth.at_ipv4();
 				auto& udp  = ipv4.at_udp();
 
-				char tmp[256];
-				int len = udp.recv(desc_, tmp, sizeof(tmp));
-				if(len > 0) {
-					tmp[len] = 0;
-					utils::format("net_main: UDP Recv: '%s'\n") % tmp;
-					udp.send(desc_, tmp, len);
-					utils::format("net_main: UDP Send: '%s'\n") % tmp;
-					++loop_;
-					if(loop_ >= 4) {
-						udp.close(desc_);
-						utils::format("net_main: UDP Close: (%d)\n") % desc_;
-						desc_ = -1;
-						loop_ = 0;
+				if(udp.get_recv_length(desc_) > 0) {
+					char tmp[256];
+					int len = udp.recv(desc_, tmp, sizeof(tmp));
+					if(len > 0) {
+						tmp[len] = 0;
+						utils::format("Test UDP Recv: '%s'\n") % tmp;
+						udp.send(desc_, tmp, len);
+						utils::format("Test UDP Send: '%s'\n") % tmp;
+						++loop_;
+						if(loop_ >= 4) {
+							udp.close(desc_);
+							utils::format("Test UDP Close: (%d)\n") % desc_;
+							desc_ = -1;
+							loop_ = 0;
+						}
 					}
 				}
 			}
