@@ -36,6 +36,7 @@ namespace net {
 		net_info&	info_;
 
 		uint32_t	master_seq_;
+		uint16_t	ethd_max_;
 
 		enum class recv_task : uint8_t {
 			idle,
@@ -115,14 +116,17 @@ namespace net {
 			}
 		};
 
+
 		typedef udp_tcp_common<context, NMAX> COMMON;
 		COMMON		common_;
+
 
 		struct frame_t {
 			eth_h	eh_;
 			ipv4_h	ipv4_;
 			tcp_h	tcp_;
 		} __attribute__((__packed__));
+
 
 		// TCP checksum header 
 		struct csum_h {
@@ -133,12 +137,27 @@ namespace net {
 		};
 
 
-		uint16_t create_tcp_frame_(const context& ctx, const eth_h& eh, const ipv4_h& ih, const tcp_h* tcp, frame_t& t)
+		uint16_t make_tcp_frame_(context& ctx, const eth_h& eh, const ipv4_h& ih, const tcp_h* tcp, frame_t& t)
 		{
 			swap_copy_eth_h(&t.eh_, &eh);
 
 			uint16_t all = sizeof(frame_t);
 			uint8_t* p = reinterpret_cast<uint8_t*>(&t) + all;
+
+			// 送信データを上乗せする場合
+			if(ctx.recv_task_ == recv_task::established_server
+			  && ctx.send_.length() > 0
+			  && ctx.send_task_ == send_task::main) {
+				uint16_t out_len = ctx.send_.length();
+				uint16_t max_len = ethd_max_ - sizeof(frame_t);
+				if(max_len < out_len) {
+					out_len = max_len;
+				}
+				ctx.send_.get(p, out_len);
+				all += out_len;
+				ctx.flags_ |= tcp_h::MASK_PSH;
+			}
+
 			while(all < 60) {
 				*p++ = 0;
 				++all;
@@ -183,8 +202,7 @@ namespace net {
 		frame_t* get_send_frame_()
 		{
 			void* dst;
-			uint16_t dlen;
-			if(ethd_.send_buff(&dst, dlen) != 0) {
+			if(ethd_.send_buff(&dst, ethd_max_) != 0) {
 				debug_format("TCP Frame ether_io fail\n");
 				return nullptr;
 			}
@@ -223,12 +241,12 @@ namespace net {
 					ctx.seq_ = tcp->get_seq() + 1;
 					ctx.ack_ = tcp->get_ack();
 					ctx.flags_ = tcp_h::MASK_SYN | tcp_h::MASK_ACK;
-					auto all = create_tcp_frame_(ctx, eh, ih, tcp, *t);
+					auto all = make_tcp_frame_(ctx, eh, ih, tcp, *t);
 // dump(t->ipv4_);
 // dump(t->tcp_);
 // utils::format("\n");
 					ethd_.send(all);
-					++master_seq_;
+					master_seq_ += 1;
 					++ctx.ack_;
 					ctx.recv_task_ = recv_task::syn_rcvd;
 				}
@@ -249,11 +267,28 @@ namespace net {
 				break;
 
 			case recv_task::established_server:
+				if(tcp->get_flag_ack()) {
+dump(*tcp);
+				}
 				if(tcp->get_flag_psh()) {
-//			if(tcp->get_data_len() < (ctx.recv_.size() - ctx.recv_.length() - 1)) {
-//				ctx.recv_.put(tcp->get_data_ptr(tcp), tcp->get_data_len());
-//			}
-///					utils::format("established_server\n");
+					if(data_len > 0 && data_len < (ctx.recv_.size() - ctx.recv_.length() - 1)) {
+///						utils::format("established_server: data(%d)\n") % data_len;
+						const uint8_t* org = reinterpret_cast<const uint8_t*>(tcp);
+						org += tcp->get_length();
+						ctx.recv_.put(org, data_len);
+
+						frame_t* t = get_send_frame_();
+						if(t == nullptr) {
+							return false;
+						}
+						ctx.seq_ = tcp->get_seq() + data_len;
+						ctx.ack_ = tcp->get_ack();
+						ctx.flags_ = tcp_h::MASK_ACK;
+						auto all = make_tcp_frame_(ctx, eh, ih, tcp, *t);
+						ethd_.send(all);
+						master_seq_ += 1;
+						++ctx.ack_;
+					}
 				}
 				if(tcp->get_flag_fin()) {
 					ctx.recv_task_ = recv_task::close_wait_server;
@@ -282,6 +317,7 @@ namespace net {
 
 		void send_(context& ctx)
 		{
+#if 0
 			uint16_t len = ctx.send_.length();
 			if(len == 0) return;
 
@@ -352,7 +388,9 @@ namespace net {
 			ethd_.send(all);
 
 			++ctx.id_;
+#endif
 		}
+
 
 	public:
 		//-----------------------------------------------------------------//
@@ -362,7 +400,8 @@ namespace net {
 			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		tcp(ETHD& ethd, net_info& info) noexcept : ethd_(ethd), info_(info), master_seq_(1)
+		tcp(ETHD& ethd, net_info& info) noexcept : ethd_(ethd), info_(info), master_seq_(1),
+			ethd_max_(0)
 		{ }
 
 
