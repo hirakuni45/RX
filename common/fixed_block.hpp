@@ -24,7 +24,9 @@ namespace utils {
 		volatile uint32_t	flags_;
 		volatile uint32_t	lock_;
 
-		UNIT	unit_[SIZE];
+		uint32_t	idx_;
+
+		UNIT		unit_[SIZE];
 
 	public:
 		//-----------------------------------------------------------------//
@@ -32,7 +34,7 @@ namespace utils {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		fixed_block() noexcept : flags_(0), lock_(-1) { }
+		fixed_block() noexcept : flags_(0), lock_(-1), idx_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -71,7 +73,7 @@ namespace utils {
 		{
 			uint32_t n = 0;
 			uint32_t tmp = 1;
-			for(uint32_t i = 0; i < 32; ++i) {
+			for(uint32_t i = 0; i < SIZE; ++i) {
 				if(tmp & flags_) {
 					++n;
 				}
@@ -89,14 +91,15 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		uint32_t alloc() noexcept
 		{
-			uint32_t tmp = 1;
-			for(uint32_t i = 0; i < 32; ++i) {
-				if(!(tmp & flags_)) {
-					lock_  |= tmp;  // ロックした状態にする
-					flags_ |= tmp;
-					return i;
+			for(uint32_t i = 0; i < SIZE; ++i) {
+				uint32_t mask = 1 << idx_;
+				if(!(mask & flags_)) {
+					lock_  |= mask;  // ロックした状態にする
+					flags_ |= mask;
+					return idx_;
 				}
-				tmp <<= 1;
+				++idx_;
+				if(idx_ >= SIZE) idx_ = 0;
 			}
 			return SIZE;
 		}
