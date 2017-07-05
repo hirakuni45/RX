@@ -214,10 +214,11 @@ namespace net {
 	/*!
 		@brief  イーサーネット・ヘッダーのダンプ
 		@param[in]	h	イーサーネット・ヘッダー
+		@param[in]	m	追加メッセージ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	static void dump(const eth_h& h) {
-		utils::format("Ethernet Header:\n");
+	static void dump(const eth_h& h, const char* m = "") {
+		utils::format("Ethernet Header%s:\n") % m;
 		utils::format("  src(%s), dst(%s), type(0x%04X)\n")
 			% tools::mac_str(h.get_src())
 			% tools::mac_str(h.get_dst())
@@ -324,11 +325,12 @@ namespace net {
 	/*!
 		@brief  IPV4 ヘッダーのダンプ
 		@param[in]	h	IPV4 ヘッダー
+		@param[in]	m	追加メッセージ
 	*/
 	//-----------------------------------------------------------------//
-	static void dump(const ipv4_h& h)
+	static void dump(const ipv4_h& h, const char* m = "")
 	{
-		utils::format("IP Header:\n");
+		utils::format("IP Header%s:\n") % m;
 		utils::format("  version: %d, header length: %d\n")
 			% (h.get_ver_hlen() >> 4)
 			% (h.get_ver_hlen() & 15);
@@ -404,12 +406,14 @@ namespace net {
 	//-----------------------------------------------------------------//
 	/*!
 		@brief  udp_segment  ヘッダーのダンプ
-		@param[in]	h	udp_segment ヘッダー
+		@param[in]	h	udp ヘッダー
+		@param[in]	m	追加メッセージ
 	*/
 	//-----------------------------------------------------------------//
-	static void dump(const udp_h& h)
+	static void dump(const udp_h& h, const char* m = "")
 	{
-		utils::format("UDP Segment: src(%d), dst(%d)\n")
+		utils::format("UDP Segment%s: src(%d), dst(%d)\n")
+			% m
 			% h.get_src_port()
 			% h.get_dst_port();
 		utils::format("  Length: %d, CSUM: 0x%04X\n") % h.get_length() % h.get_csum();
@@ -510,12 +514,14 @@ namespace net {
 	//-----------------------------------------------------------------//
 	/*!
 		@brief  tcp_segment  ヘッダーのダンプ
-		@param[in]	h	tcp_segment ヘッダー
+		@param[in]	h	tcp ヘッダー
+		@param[in]	m	追加メッセージ
 	*/
 	//-----------------------------------------------------------------//
-	static void dump(const tcp_h& h)
+	static void dump(const tcp_h& h, const char* m = "")
 	{
-		utils::format("TCP Segment: src(%d), dst(%d)\n")
+		utils::format("TCP Segment%s: src(%d), dst(%d)\n")
+			% m
 			% h.get_src_port()
 			% h.get_dst_port();
 		utils::format("  Seq: 0x%08X, Ack: 0x%08X\n") % h.get_seq() % h.get_ack();
