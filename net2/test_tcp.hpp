@@ -19,6 +19,7 @@ namespace net {
 
 		int		desc_;
 		bool	onetime_;
+		int		open_delay_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -26,7 +27,7 @@ namespace net {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		test_tcp() : desc_(-1), onetime_(true) { }
+		test_tcp() : desc_(-1), onetime_(true), open_delay_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -40,11 +41,18 @@ namespace net {
 			if(!onetime_) return;
 
 			if(desc_ < 0) {
+				if(open_delay_ > 0) {
+					open_delay_--;
+					return;
+				}
+
 				auto& ipv4 = eth.at_ipv4();
 				auto& tcp  = ipv4.at_tcp();
 				desc_ = tcp.open(ip_adrs(192,168,3,7), 3000, server);
-				utils::format("Test TCP Open: (%d) %s\n")
-					% desc_ % (server ? "Server" : "Client");
+				if(desc_ >= 0) {
+					utils::format("Test TCP Open (%d): %s\n")
+						% desc_ % (server ? "Server" : "Client");
+				}
 			} else {
 				auto& ipv4 = eth.at_ipv4();
 				auto& tcp  = ipv4.at_tcp();
@@ -53,14 +61,17 @@ namespace net {
 				int len = tcp.recv(desc_, tmp, sizeof(tmp));
 				if(len > 0) {
 					tmp[len] = 0;
-					utils::format("Test TCP Recv(%d): '%s'\n") % len % tmp;
-///					tcp.send(desc_, tmp, len);
-///					utils::format("Test TCP Send(%d): '%s'\n") % len % tmp;
-					tcp.close(desc_);
-					utils::format("Test TCP Close: (%d)\n") % desc_;
-					desc_ = -1;
+					utils::format("Test TCP Recv (%d): '%s', %d\n") % desc_ % tmp % len;
 
-///					onetime_ = false;
+					tcp.send(desc_, tmp, len);
+					utils::format("Test TCP Send (%d): '%s', %d\n") % desc_ % tmp % len;
+
+///					tcp.close(desc_);
+///					utils::format("Test TCP Close (%d)\n") % desc_;
+///					desc_ = -1;
+
+					onetime_ = false;
+					open_delay_ = 50;
 				}
 			}
 		}
