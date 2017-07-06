@@ -178,4 +178,73 @@ namespace net {
 			return ctx.recv_.length();
 		}
 	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  UDP/TCP 文字出力テンプレートクラス
+		@param[in]	SIZE	バッファ・サイズ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t SIZE>
+	class desc_string
+	{
+	public:
+		typedef utils::fixed_string<SIZE + 1> STR;  // 終端分を追加
+
+	private:
+		STR		str_;
+		int		desc_;
+
+	public:
+		desc_string() : str_(), desc_(-1) { }
+
+		void clear() {
+			str_.clear();
+		}
+
+		void flush() {
+			if(str_.size() > 0) {
+				if(desc_ >= 0) {
+					uint32_t len = str_.size();
+					const char* p = str_.c_str();
+#if 0
+					while(len > 0) {
+						uint32_t l = len;
+						if(l >= 2048) {
+							l = 2048;
+						}
+						r_send(fd_, p, l);
+						len -= l;
+						p += l;
+					}
+#else
+///					r_send(fd_, p, len);
+#endif				
+				} else {
+					utils::format("ether_string: FD is null.\n");
+				}
+			}
+			clear();
+		}
+
+		void operator() (char ch) {
+			if(ch == '\n') {
+				str_ += '\r';  // 改行を「CR+LF」とする
+				if(str_.size() >= (str_.capacity() - 1)) {
+					flush();
+				}
+			}
+			str_ += ch;
+			if(str_.size() >= (str_.capacity() - 1)) {
+				flush();
+			}
+		}
+
+		uint32_t size() const { return str_.size(); }
+
+		void set_desc(int desc) { desc_ = desc; }
+
+		STR& at_str() { return str_; }
+	};
 }
