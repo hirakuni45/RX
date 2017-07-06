@@ -100,7 +100,7 @@ extern "C" {
 		static volatile bool lock = false;
 		static utils::fifo<uint8_t, 1024> tmp;
 		if(lock) {
-			if((tmp.size() - tmp.length() - 1) > 0) {
+			if((tmp.size() - tmp.length()) >= 2) {
 				tmp.put(ch);
 			}
 		}
