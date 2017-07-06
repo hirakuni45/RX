@@ -18,7 +18,6 @@ namespace net {
 	class test_tcp {
 
 		int		desc_;
-		bool	onetime_;
 		int		open_delay_;
 
 	public:
@@ -27,7 +26,7 @@ namespace net {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		test_tcp() : desc_(-1), onetime_(true), open_delay_(0) { }
+		test_tcp() : desc_(-1), open_delay_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -38,8 +37,6 @@ namespace net {
 		template <class ETH>
 		void service(ETH& eth, bool server)
 		{
-			if(!onetime_) return;
-
 			if(desc_ < 0) {
 				if(open_delay_ > 0) {
 					open_delay_--;
@@ -65,14 +62,16 @@ namespace net {
 
 					tcp.send(desc_, tmp, len);
 					utils::format("Test TCP Send (%d): '%s', %d\n") % desc_ % tmp % len;
+				}
+#if 0
+				if(!tcp.connection(desc_)) {
+					tcp.close(desc_);
+					utils::format("Test TCP Close (%d)\n") % desc_;
+					desc_ = -1;
 
-///					tcp.close(desc_);
-///					utils::format("Test TCP Close (%d)\n") % desc_;
-///					desc_ = -1;
-
-					onetime_ = false;
 					open_delay_ = 50;
 				}
+#endif
 			}
 		}
 	};
