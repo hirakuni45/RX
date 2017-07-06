@@ -18,6 +18,43 @@ namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  NET ステート
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class net_state : uint16_t {
+		OK,
+		FAIL_PORT,      ///< 不正なポート番号
+		FAIL_ADRS,      ///< 不正なアドレス
+		FAIL_ANY,       ///< クライアントでは、「ANY」は不正
+		EVEN_PORT,      ///< 既にそのポート番号は利用されている
+		CONTEXT_EMPTY,  ///< コンテキストが無い
+	};
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  TCP ステート・メッセージを取得
+		@param[in]	state	TCP ステート
+		@return TCP ステート・メッセージ
+	*/
+	//-----------------------------------------------------------------//
+	static const char* get_state_str(net_state state)
+	{
+		switch(state) {
+		case net_state::OK:            return "OK";
+		case net_state::FAIL_PORT:     return "Fail port";
+		case net_state::FAIL_ADRS:     return "Fail ip-address";
+		case net_state::FAIL_ANY:      return "Fail any-address";
+		case net_state::EVEN_PORT:     return "Error even port";
+		case net_state::CONTEXT_EMPTY: return "Context empty";
+		default:
+			return "";
+		}
+	}
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  ネット共有コンテナ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
