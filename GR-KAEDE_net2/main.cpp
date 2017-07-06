@@ -17,7 +17,9 @@
 
 #include "chip/phy_base.hpp"
 #include "net2/net_main.hpp"
-//#include "net/http_server.hpp"
+#include "net2/test_udp.hpp"
+#include "net2/test_tcp.hpp"
+#include "net2/http_server.hpp"
 
 namespace {
 
@@ -30,33 +32,7 @@ namespace {
 	volatile bool tcpip_flag_ = false;
 	volatile uint32_t net_int_cnt_ = 0;
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  CMT タスク
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class cmt_task {
-
-	public:
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  コンストラクター
-		*/
-		//-----------------------------------------------------------------//
-		cmt_task() { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  オペレーター ()
-		*/
-		//-----------------------------------------------------------------//
-		void operator() () {
-		}
-	};
-
-
-	typedef device::cmt_io<device::CMT0, cmt_task> CMT0;
+	typedef device::cmt_io<device::CMT0> CMT0;
 	CMT0	cmt_;
 
 	typedef utils::fifo<uint8_t, 4096> BUFFER;
@@ -82,11 +58,43 @@ namespace {
 	typedef net::net_main<ETHER_IO, UDPN, TCPN> NET_MAIN;
 	NET_MAIN	net_(ether_);
 
+	net::test_udp	test_udp_;
+	net::test_tcp	test_tcp_;
+
 //	typedef net::http_server<ETHER_IO, SDC> HTTP;
 //	HTTP		http_(ether_, sdc_);
+	volatile bool putch_lock_ = false;
+	utils::fifo<uint8_t, 1024> putch_tmp_;
+
+	void servie_putch_tmp_()
+	{
+		while(putch_tmp_.length() > 0) {
+			sci_.putch(putch_tmp_.get());
+		}
+	}
 }
 
 extern "C" {
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	割り込みタイマーカウンタの取得（10ms 単位）
+		@return 割り込みタイマーカウンタ
+	 */
+	//-----------------------------------------------------------------//
+	uint32_t get_counter() { return cmt_.get_counter(); }
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	イーサーネット・割り込みタスク
+	 */
+	//-----------------------------------------------------------------//
+	void ether_process_(void)
+	{
+		net_.process();
+	}
+
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -97,19 +105,15 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	void sci_putch(char ch)
 	{
-		static volatile bool lock = false;
-		static utils::fifo<uint8_t, 1024> tmp;
-		if(lock) {
-			if((tmp.size() - tmp.length()) >= 2) {
-				tmp.put(ch);
+		if(putch_lock_) {
+			if((putch_tmp_.size() - putch_tmp_.length()) >= 2) {
+				putch_tmp_.put(ch);
 			}
+			return;
 		}
-		lock = true;
-		while(tmp.length() > 0) {
-			sci_.putch(tmp.get());
-		}
+		putch_lock_ = true;
 		sci_.putch(ch);
-		lock = false;
+		putch_lock_ = false;
 	}
 
 
@@ -252,17 +256,6 @@ extern "C" {
 	void utf8_to_sjis(const char* src, char* dst) {
 		utils::str::utf8_to_sjis(src, dst);
 	}
-
-
-	//-----------------------------------------------------------------//
-	/*!
-		@brief	イーサーネット・割り込みタスク
-	 */
-	//-----------------------------------------------------------------//
-	void ether_process_(void)
-	{
-		net_.process();
-	}
 }
 
 
@@ -361,13 +354,18 @@ int main(int argc, char** argv)
 
 		sdc_.service();
 
+		servie_putch_tmp_();
+
 		net_.service();
-#if 0
-		bool l = net_.check_link();
-		if(l) {
-			http_.service();
+
+		if(net_.check_main()) {
+			test_udp_.service(net_.at_ethernet());
+			bool server = true;
+			test_tcp_.service(net_.at_ethernet(), server);
+
+//			http_.service();
 		}
-#endif
+
 		device::PORTC::PODR.B0 = (((cnt + 0)  & 31) < 8) ? 1 : 0;
 		device::PORTC::PODR.B1 = (((cnt + 8)  & 31) < 8) ? 1 : 0;
 		device::PORT0::PODR.B2 = (((cnt + 16) & 31) < 8) ? 1 : 0;
