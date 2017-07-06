@@ -91,15 +91,18 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		uint32_t alloc() noexcept
 		{
+			uint32_t idx = idx_;
 			for(uint32_t i = 0; i < SIZE; ++i) {
-				uint32_t mask = 1 << idx_;
+				uint32_t mask = 1 << idx;
 				if(!(mask & flags_)) {
 					lock_  |= mask;  // ロックした状態にする
 					flags_ |= mask;
-					return idx_;
+					++idx_;
+					if(idx_ >= SIZE) idx_ = 0;
+					return idx;
 				}
-				++idx_;
-				if(idx_ >= SIZE) idx_ = 0;
+				++idx;
+				if(idx >= SIZE) idx = 0;
 			}
 			return SIZE;
 		}
