@@ -185,21 +185,23 @@ namespace net {
 			if(ctx.send_len_ == 0 && ctx.recv_task_ == recv_task::established_server
 			  && ctx.send_task_ == send_task::main) {
 				data_len = ctx.send_.length();
-				uint16_t max_len = ethd_max_ - sizeof(frame_t);
-				if(max_len < data_len) {
-					data_len = max_len;
+				if(data_len > 0) {
+					uint16_t max_len = ethd_max_ - sizeof(frame_t);
+					if(max_len < data_len) {
+						data_len = max_len;
+					}
+					ctx.send_len_ = data_len;
+					ctx.send_.get(p, data_len, false);
+///					debug_format("Send step ORG: 0x%08X, %d\n") % ctx.seq_ % data_len;
+					all += data_len;
+					p += data_len;
+					ctx.flags_ |= tcp_h::MASK_PSH;
+
+					t.tcp_.set_seq(ctx.send_seq_);
+					t.tcp_.set_ack(ctx.send_ack_);
+
+					ctx.send_wait_ = RESEND_WAIT;  // ACK が返らない場合の、再送待ち時間
 				}
-				ctx.send_len_ = data_len;
-				ctx.send_.get(p, data_len, false);
-				utils::format("Send step ORG: 0x%08X, %d\n") % ctx.seq_ % ctx.send_len_;
-				all += data_len;
-				p += data_len;
-				ctx.flags_ |= tcp_h::MASK_PSH;
-
-				t.tcp_.set_seq(ctx.send_seq_);
-				t.tcp_.set_ack(ctx.send_ack_);
-
-				ctx.send_wait_ = RESEND_WAIT;  // ACK が返らない場合の、再送待ち時間
 			} else {
 				t.tcp_.set_seq(ctx.seq_);
 				t.tcp_.set_ack(ctx.ack_);
@@ -217,10 +219,10 @@ namespace net {
 			t.ipv4_.set_dst_ipa(dst_ip);
 			t.ipv4_.set_csum(tools::calc_sum(&t.ipv4_, sizeof(ipv4_h)));
 
-			uint16_t tcp_len = all - sizeof(eth_h) - sizeof(ipv4_h) - data_len;
+			uint16_t tcp_len = all - sizeof(eth_h) - sizeof(ipv4_h);
 			t.tcp_.set_src_port(ctx.cn_port_);
 			t.tcp_.set_dst_port(ctx.port_);
-			t.tcp_.set_length(tcp_len);
+			t.tcp_.set_length(tcp_len - data_len);  // TCP Header Length
 			t.tcp_.set_flags(ctx.flags_);
 			t.tcp_.set_window(ctx.window_);
 			t.tcp_.set_csum(0x0000);
@@ -239,11 +241,6 @@ namespace net {
 				*p++ = 0;
 				++all;
 			}
-if(data_len > 0) {
-	dump(t.tcp_, " (Data Send)");
-} else {
-//	dump(t.tcp_, " (     Send)");
-}
 			return all;
 		}
 
@@ -291,7 +288,6 @@ if(data_len > 0) {
 			}
 			uint16_t data_len = len - tcp->get_length();
 
-// dump(*tcp);
 			switch(ctx.recv_task_) {
 
 			case recv_task::listen_server:
@@ -310,7 +306,6 @@ if(data_len > 0) {
 				}
 				if(tcp->get_flag_fin()) {
 					ctx.fin_ = true;
-/// dump(*tcp, " (fin at LISTEN)");
 					send_close_ack_(ctx, eh.get_src(), ih.get_src_ipa(), tcp);
 					ctx.recv_task_ = recv_task::sync_close;
 				}
@@ -318,7 +313,6 @@ if(data_len > 0) {
 
 			case recv_task::syn_rcvd:
 				if(tcp->get_flag_ack() && tcp->get_seq() == ctx.ack_ && tcp->get_ack() > ctx.seq_) {
-//					dump(*tcp, " (SYN_RCVD)");
 					ctx.timeout_ = 0;
 					ctx.recv_task_ = recv_task::established_server;
 				}
@@ -331,23 +325,22 @@ if(data_len > 0) {
 				break;
 
 			case recv_task::established_server:
-				if(tcp->get_flag_ack() || tcp->get_flag_psh()) {
-				}
 				if(tcp->get_flag_ack()) {
 					if(ctx.send_len_ > 0) {  // 転送データの ACK 確認
-dump(*tcp, " (Data ACK)");
-#if 0
-				if(ctx.send_wait_ > 0) {
-					ctx.send_wait_--;
-				} else {
-
-						if(tcp->get_ack() >= (ctx.seq_ + ctx.send_len_)) {
-							utils::format("Send step END: 0x%08X, %d\n") % ctx.seq_ % ctx.send_len_;
+// utils::format("Send SEQ: %08X, ACK: %08X\n") % ctx.send_seq_ % ctx.send_ack_;
+// dump(*tcp, " (Data ACK)");
+						if(tcp->get_seq() == ctx.send_ack_ &&
+						   tcp->get_ack() >= (ctx.send_seq_ + ctx.send_len_)) {
+//							debug_format("Send step END: 0x%08X, %d\n") % ctx.seq_ % ctx.send_len_;
 							ctx.send_.get_go(ctx.send_len_);
 							ctx.send_len_ = 0;
 							ctx.send_wait_ = 0;
 						}
-#endif
+					}
+				} else {
+					// 転送データの再送を行うか？
+					if(ctx.send_len_ > 0) {
+
 					}
 				}
 				if(tcp->get_flag_psh()) {
@@ -538,6 +531,23 @@ dump(*tcp, " (Data ACK)");
 			}
 			common_.at_blocks().unlock(idx);
 			return static_cast<int>(idx);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コネクションの検査
+			@param[in]	desc	ディスクリプタ
+			@return 接続状態「true」、切断状態、ディスクリプタが無効「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool connection(int desc) const noexcept
+		{
+			uint32_t idx = static_cast<uint32_t>(desc);
+			if(!common_.get_blocks().is_alloc(idx)) return false;
+
+			const context& ctx = common_.get_blocks().get(idx);
+			return !ctx.fin_;
 		}
 
 
