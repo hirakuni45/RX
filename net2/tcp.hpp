@@ -11,6 +11,10 @@
 
 #define TCP_DEBUG
 
+extern "C" {
+	extern uint32_t get_counter();
+}
+
 namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -22,22 +26,15 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class ETHD, uint32_t NMAX>
 	class tcp {
-	public:
-		static const int OPEN_FAIL_PORT          = -1;  ///< 不正なポート番号
-		static const int OPEN_FAIL_ADRS          = -2;	///< 不正なアドレス
-		static const int OPEN_FAIL_ANY           = -3;  ///< クライアントでは、「ANY」は不正
-		static const int OPEN_FAIL_EVEN_PORT     = -4;  ///< 既にそのポート番号は利用されている
-		static const int OPEN_FAIL_CONTEXT_EMPTY = -5;  ///< コンテキストが無い
 
-	private:
 #ifndef TCP_DEBUG
 		typedef utils::null_format debug_format;
 #else
 		typedef utils::format debug_format;
 #endif
 
-		static const uint16_t TIME_OUT = 5 * 1000 / 10;  // 5 sec (unit: 10ms)
-		static const uint16_t RESEND_WAIT    = 1 * 1000 / 10;  // 1 sec (unit: 10ms)
+		static const uint16_t RESEND_WAIT    = 1 * 1000 / 10;  // 1 sec (unit: 10ms)再送
+		static const uint16_t RESEND_SPAN    = 20;             // 再送に対する揺らぎ
 		static const uint16_t CLOSE_TIME_OUT = 5 * 1000 / 10;  // 5 sec (unit: 10ms)
 
 		ETHD&		ethd_;
@@ -45,10 +42,8 @@ namespace net {
 		net_info&	info_;
 
 		uint32_t	master_seq_;
-
 		uint16_t	ethd_max_;
-
-		int			last_error_;
+		net_state	last_state_;
 
 		enum class recv_task : uint8_t {
 			idle,
@@ -98,6 +93,7 @@ namespace net {
 			RECV_B		recv_;
 			SEND_B		send_;
 
+			uint32_t	timer_ref_;
 			uint32_t	seq_;
 			uint32_t	ack_;
 			uint32_t	send_seq_;
@@ -120,8 +116,8 @@ namespace net {
 				std::memset(mac_, 0x00, 6);
 				cn_port_ = port;
 				port_ = 0;  // 初期は「０」
-				recv_time_ = TIME_OUT;
-				send_time_ = TIME_OUT;
+				recv_time_ = 0;
+				send_time_ = 0;
 				id_ = 0;  // 識別子の初期値
 				life_ = 255;  // 生存時間初期値（ルーターの通過台数）
 				offset_ = 0;  // フラグメント・オフセット
@@ -131,6 +127,7 @@ namespace net {
 				recv_.clear();
 				send_.clear();
 
+				timer_ref_ = 0;
 				seq_ = 0;
 				ack_ = 0;
 				send_seq_ = 0;
@@ -338,7 +335,7 @@ namespace net {
 						}
 					}
 				} else {
-					// 転送データの再送を行うか？
+					// ACK が来ない場合に、転送データの再送を行うか？
 					if(ctx.send_len_ > 0) {
 
 					}
@@ -374,7 +371,6 @@ namespace net {
 
 			case recv_task::sync_close:
 				if(tcp->get_flag_ack() && tcp->get_seq() == ctx.ack_ && tcp->get_ack() > ctx.seq_) {
-// dump(*tcp, " (SYNC Close)");
 					master_seq_ = tcp->get_ack() + 1;
 ///					debug_format("Sync Close OK (seq: %d)\n") % master_seq_;
 					ctx.recv_task_ = recv_task::close;
@@ -435,7 +431,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		tcp(ETHD& ethd, net_info& info) noexcept : ethd_(ethd), info_(info),
-			master_seq_(1), ethd_max_(0), last_error_(0)
+			master_seq_(1), ethd_max_(0), last_state_(net_state::OK)
 		{ }
 
 
@@ -454,65 +450,73 @@ namespace net {
 			@param[in]	adrs	アドレス
 			@param[in]	port	ポート
 			@param[in]	server	サーバーの場合「true」
-			@return ディスクリプタ
+			@param[out]	ディスクリプタ
+			@return ネット・ステートを返す
 		*/
 		//-----------------------------------------------------------------//
-		int open(const ip_adrs& adrs, uint16_t port, bool server) noexcept
+		net_state open(const ip_adrs& adrs, uint16_t port, bool server, uint32_t& desc) noexcept
 		{
 			if(port == 0) {  // ０番ポートは無効
-				int error = OPEN_FAIL_PORT;
-				if(last_error_ != error) {
+				auto st = net_state::FAIL_PORT;
+				if(last_state_ != st) {
 					debug_format("TCP Open fail port: %d\n") % port;
-					last_error_ = error;
+					last_state_ = st;
 				}
-				return error;
+				desc = NMAX;
+				return st;
 			}
 			if(adrs.is_brodcast()) {  // ブロードキャストアドレスは無効
-				int error = OPEN_FAIL_ADRS;
-				if(last_error_ != error) {
+				auto st = net_state::FAIL_ADRS;
+				if(last_state_ != st) {
 					debug_format("TCP Open fail brodcast address: %s\n") % adrs.c_str();
-					last_error_ = error;
+					last_state_ = st;
 				}
-				return error;
+				desc = NMAX;
+				return st;
 			}
 
 			if(adrs.is_any() && !server) {  // クライアント接続では、ANY アドレスは無効
-				int error = OPEN_FAIL_ANY;
-				if(last_error_ != error) {
+				auto st = net_state::FAIL_ANY;
+				if(last_state_ != st) {
 					debug_format("TCP Open fail any address for client: %s\n") % adrs.c_str();
-					last_error_ = error;
+					last_state_ = st;
 				}
-				return error;
+				desc = NMAX;
+				return st;
 			}
 
 			// 同じポートがある場合は無効
 			for(uint32_t i = 0; i < NMAX; ++i) {
 				if(!common_.at_blocks().is_alloc(i)) continue;
-				context& ctx = common_.at_blocks().at(i);
+				const context& ctx = common_.get_blocks().get(i);
 				if(ctx.cn_port_ == port) {
-					int error = OPEN_FAIL_EVEN_PORT;
-					if(last_error_ != error) {
+					auto st = net_state::EVEN_PORT;
+					if(last_state_ != st) {
 						debug_format("TCP Open fail even port as: %d\n") % port;
-						last_error_ = error;
+						last_state_ = st;
 					}
-					return error;
+					desc = NMAX;
+					return st;
 				}
 			}
 
 			// コンテキスト・スペースが無い
 			uint32_t idx = common_.at_blocks().alloc();
 			if(!common_.at_blocks().is_alloc(idx)) {
-				int error = OPEN_FAIL_CONTEXT_EMPTY;
-				if(last_error_ != error) {
+				auto st = net_state::CONTEXT_EMPTY;
+				if(last_state_ != st) {
 					debug_format("TCP Open fail context empty\n"); 
-					last_error_ = error;
+					last_state_ = st;
 				}
-				return error;
+				desc = NMAX;
+				return st;
 			}
 
-			last_error_ = 0;
+			last_state_ = net_state::OK;
 
 			context& ctx = common_.at_blocks().at(idx);
+
+			// コンテキスト初期化
 			ctx.reset(adrs, port, server);
 
 			if(!server && adrs.is_any()) {
@@ -530,7 +534,22 @@ namespace net {
 				ctx.recv_task_ = recv_task::listen_client;
 			}
 			common_.at_blocks().unlock(idx);
-			return static_cast<int>(idx);
+			desc = idx;
+			return net_state::OK;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ディスクリプタの検査
+			@param[in]	desc	ディスクリプタ
+			@return ディスクリプタが無効「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool probe(int desc) const
+		{
+			uint32_t idx = static_cast<uint32_t>(desc);
+			return common_.get_blocks().is_alloc(idx);
 		}
 
 
@@ -694,7 +713,7 @@ namespace net {
 
 				case send_task::main:
 					send_(ctx);
-					if(ctx.fin_) {
+					if(ctx.fin_ || ctx.close_req_) {
 						ctx.send_task_ = send_task::sync_close;
 						ctx.send_time_ = CLOSE_TIME_OUT;
 					}

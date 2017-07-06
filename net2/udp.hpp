@@ -14,6 +14,21 @@ namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  UDP ステート
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class udp_state : uint8_t {
+		OK,
+		FAIL_PORT,      ///< 不正なポート番号
+		FAIL_ADRS,      ///< 不正なアドレス
+		FAIL_ANY,       ///< クライアントでは、「ANY」は不正
+		EVEN_PORT,      ///< 既にそのポート番号は利用されている
+		CONTEXT_EMPTY,  ///< コンテキストが無い
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  UDP マネージメント・クラス
 		@param[in]	ETHD	イーサーネット・ドライバー・クラス
 		@param[in]	NMAX	管理最大数
@@ -204,20 +219,38 @@ namespace net {
 			@brief  オープン
 			@param[in]	adrs	アドレス
 			@param[in]	port	ポート
-			@return ディスクリプタ（負の値はエラー）
+			@param[out]	desc	ディスクリプタ
+			@return UDP ステート
 		*/
 		//-----------------------------------------------------------------//
-		int open(const ip_adrs& adrs, uint16_t port) noexcept
+		net_state open(const ip_adrs& adrs, uint16_t port, uint32_t& desc) noexcept
 		{
 			if(port == 0) {
 				debug_format("UDP Open fail port: %d\n") % port;
-				return -1;
+				desc = NMAX;
+				return net_state::FAIL_PORT;
 			}
-
+#if 0
+			// 同じポートがある場合は無効
+			for(uint32_t i = 0; i < NMAX; ++i) {
+				if(!common_.at_blocks().is_alloc(i)) continue;
+				const context& ctx = common_.get_blocks().get(i);
+				if(ctx.cn_port_ == port) {
+					auto st = net_state::EVEN_PORT;
+					if(last_state_ != st) {
+						debug_format("TCP Open fail even port as: %d\n") % port;
+						last_state_ = st;
+					}
+					desc = NMAX;
+					return st;
+				}
+			}
+#endif
 			uint32_t idx = common_.at_blocks().alloc();
 			if(!common_.at_blocks().is_alloc(idx)) {
-				debug_format("UDP Context Empty\n"); 
-				return -1;
+				debug_format("UDP Context Empty\n");
+				desc = NMAX;
+				return net_state::CONTEXT_EMPTY;
 			}
 
 			context& ctx = common_.at_blocks().at(idx);
@@ -234,7 +267,22 @@ namespace net {
 			}
 
 			common_.at_blocks().unlock(idx);
-			return static_cast<int>(idx);
+			desc = idx;
+			return net_state::OK;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ディスクリプタの検査
+			@param[in]	desc	ディスクリプタ
+			@return ディスクリプタが無効「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool probe(int desc) const
+		{
+			uint32_t idx = static_cast<uint32_t>(desc);
+			return common_.get_blocks().is_alloc(idx);
 		}
 
 

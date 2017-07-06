@@ -17,8 +17,17 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class test_tcp {
 
-		int		desc_;
-		int		open_delay_;
+		enum class task {
+			idle,
+			open,
+			main,
+			close,
+			wait,
+		};
+
+		task		task_;
+		uint32_t	desc_;
+		uint32_t	wait_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -26,53 +35,78 @@ namespace net {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		test_tcp() : desc_(-1), open_delay_(0) { }
+		test_tcp() : task_(task::idle), desc_(0), wait_(0) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  サービス
+			@param[in]	eth	イーサーネット・コンテキスト
+			@param[in]	server	サーバーの場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		template <class ETH>
-		void service(ETH& eth, bool server)
+		template <class ETHERNET>
+		void service(ETHERNET& eth, bool server)
 		{
-			if(desc_ < 0) {
-				if(open_delay_ > 0) {
-					open_delay_--;
-					return;
-				}
+			auto& ipv4 = eth.at_ipv4();
+			auto& tcp  = ipv4.at_tcp();
 
-				auto& ipv4 = eth.at_ipv4();
-				auto& tcp  = ipv4.at_tcp();
-				desc_ = tcp.open(ip_adrs(192,168,3,7), 3000, server);
-				if(desc_ >= 0) {
-					utils::format("Test TCP Open (%d): %s\n")
-						% desc_ % (server ? "Server" : "Client");
-				}
-			} else {
-				auto& ipv4 = eth.at_ipv4();
-				auto& tcp  = ipv4.at_tcp();
+			switch(task_) {
+			case task::idle:
+				task_ = task::open;
+				break;
 
-				char tmp[256];
-				int len = tcp.recv(desc_, tmp, sizeof(tmp));
-				if(len > 0) {
-					tmp[len] = 0;
-					utils::format("Test TCP Recv (%d): '%s', %d\n") % desc_ % tmp % len;
-
-					tcp.send(desc_, tmp, len);
-					utils::format("Test TCP Send (%d): '%s', %d\n") % desc_ % tmp % len;
+			case task::open:
+				{
+					auto state = tcp.open(ip_adrs(192,168,3,7), 3000, server, desc_);
+					if(state != net_state::OK) {
+						utils::format("Test TCP Open (%s): %s\n")
+							% get_state_str(state) % (server ? "Server" : "Client");
+						wait_ = 500;
+						task_ = task::wait;
+					} else {
+						task_ = task::main;
+					}
 				}
-#if 0
-				if(!tcp.connection(desc_)) {
-					tcp.close(desc_);
-					utils::format("Test TCP Close (%d)\n") % desc_;
-					desc_ = -1;
+				break;
 
-					open_delay_ = 50;
+			case task::main:
+				{
+					char tmp[256];
+					int len = tcp.recv(desc_, tmp, sizeof(tmp));
+					if(len > 0) {
+						tmp[len] = 0;
+						utils::format("Test TCP Recv (%d): '%s', %d\n") % desc_ % tmp % len;
+
+						tcp.send(desc_, tmp, len);
+						utils::format("Test TCP Send (%d): '%s', %d\n") % desc_ % tmp % len;
+					}
+
+					if(!tcp.connection(desc_)) {
+						task_ = task::close;
+					}
 				}
-#endif
+				break;
+
+			case task::close:
+				tcp.close(desc_);
+				utils::format("Test TCP Close (%d)\n") % desc_;
+				wait_ = 10;
+				task_ = task::wait;
+				break;
+
+			case task::wait:
+				if(wait_ > 0) {
+					--wait_;
+				} else {
+					task_ = task::open;
+				}
+				break;
+
+			default:
+				break;
 			}
+
 		}
 	};
 }
