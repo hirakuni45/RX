@@ -90,13 +90,26 @@ extern "C" {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@brief  システム・文字出力
+		@brief  システム・文字出力 @n
+				※割り込み対応
 		@param[in]	ch	文字
 	*/
 	//-----------------------------------------------------------------//
 	void sci_putch(char ch)
 	{
+		static volatile bool lock = false;
+		static utils::fifo<uint8_t, 1024> tmp;
+		if(lock) {
+			if((tmp.size() - tmp.length() - 1) > 0) {
+				tmp.put(ch);
+			}
+		}
+		lock = true;
+		while(tmp.length() > 0) {
+			sci_.putch(tmp.get());
+		}
 		sci_.putch(ch);
+		lock = false;
 	}
 
 
