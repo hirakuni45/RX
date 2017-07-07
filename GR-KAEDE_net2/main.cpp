@@ -26,8 +26,8 @@ namespace {
 	typedef device::ETHERC0 ETHERC;      // Ethernet Controller
 	typedef device::EDMAC0 EDMAC;        // Ethernet DMA Controller
 	typedef chip::phy_base<ETHERC> PHY;  // Ethernet PHY (LAN8720)
-	typedef device::ether_io<ETHERC, EDMAC, PHY> ETHER_IO;
-	ETHER_IO 	ether_;
+	typedef device::ether_io<ETHERC, EDMAC, PHY> ETHD;  // EthernetDriver
+	ETHD 	ethd_;
 
 	volatile bool tcpip_flag_ = false;
 	volatile uint32_t net_int_cnt_ = 0;
@@ -55,26 +55,37 @@ namespace {
 
 	static const uint32_t UDPN = 4;  // UDP の経路数
  	static const uint32_t TCPN = 6;  // TCP の経路数
-	typedef net::net_main<ETHER_IO, UDPN, TCPN> NET_MAIN;
-	NET_MAIN	net_(ether_);
+	typedef net::net_main<ETHD, UDPN, TCPN> NET_MAIN;
+	NET_MAIN	net_(ethd_);
 
 	net::test_udp	test_udp_;
 	net::test_tcp	test_tcp_;
 
-//	typedef net::http_server<ETHER_IO, SDC> HTTP;
-//	HTTP		http_(ether_, sdc_);
+	typedef net::http_server<NET_MAIN::ETHERNET, SDC> HTTP;
+	HTTP		http_(net_.at_ethernet(), sdc_);
+
 	volatile bool putch_lock_ = false;
 	utils::fifo<uint8_t, 1024> putch_tmp_;
 
 	void servie_putch_tmp_()
 	{
+		ethd_.enable_interrupt(false);
 		while(putch_tmp_.length() > 0) {
 			sci_.putch(putch_tmp_.get());
 		}
+		ethd_.enable_interrupt();
 	}
 }
 
 extern "C" {
+
+	int tcp_send(uint32_t desc, const void* src, uint32_t len)
+	{
+		auto& ipv4 = net_.at_ethernet().at_ipv4();
+		auto& tcp  = ipv4.at_tcp();
+		return tcp.send(desc, src, len);
+	}
+
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -87,10 +98,10 @@ extern "C" {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@brief	イーサーネット・割り込みタスク
+		@brief	イーサーネット・ドライバー・プロセス（割り込みタスク）
 	 */
 	//-----------------------------------------------------------------//
-	void ether_process_(void)
+	void ethd_process_(void)
 	{
 		net_.process();
 	}
@@ -318,17 +329,17 @@ int main(int argc, char** argv)
 
 	{  // Ethernet の開始
 		uint8_t intr_level = 4;
-		ether_.start(intr_level);
+		ethd_.start(intr_level);
 
 		static uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 		net_.start(mac);
 
-		ether_.set_intr_task(ether_process_);
+		ethd_.set_intr_task(ethd_process_);
 	}
 
-#if 0
+
 	{  // HTTP サーバーの設定
-		http_.start("GR-KAEDE_net HTTP Server");
+		http_.start("GR-KAEDE_net2 HTTP Server");
 
 		// ルート・ページ設定
 		http_.set_link("/", "", [=](void) {
@@ -346,7 +357,12 @@ int main(int argc, char** argv)
 			http_.tag_hr(500, 3);
 		} );
 	}
-#endif
+
+	// UDP test の許可
+//	test_udp_.enable();
+
+	// TCP test の許可
+//	test_tcp_.enable();
 
 	uint32_t cnt = 0;
 	while(1) {  // 100Hz (10ms interval)
@@ -363,7 +379,7 @@ int main(int argc, char** argv)
 			bool server = true;
 			test_tcp_.service(net_.at_ethernet(), server);
 
-//			http_.service();
+			http_.service();
 		}
 
 		device::PORTC::PODR.B0 = (((cnt + 0)  & 31) < 8) ? 1 : 0;
