@@ -17,17 +17,22 @@
 
 #define HTTP_DEBUG
 
+extern "C" {
+	time_t get_time();
+};
+
 namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  http_server class テンプレート
-		@param[in]	SDC	ＳＤカードファイル操作クラス
+		@param[in]	ETHERNET	イーサーネット・クラス
+		@param[in]	SDC			ＳＤカードファイル操作クラス
 		@param[in]	MAX_LINK	登録リンクの最大数
 		@param[in]	MAX_SIZE	文字列、一時バッファの最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SDC, uint32_t MAX_LINK = 16, uint32_t MAX_SIZE = 4096>
+	template <class ETHERNET, class SDC, uint32_t MAX_LINK = 16, uint32_t MAX_SIZE = 4096>
 	class http_server {
 	public:
 		typedef utils::line_manage<2048, 20> LINE_MAN;
@@ -56,9 +61,12 @@ namespace net {
 		typedef utils::null_format debug_format;
 #endif
 
+		ETHERNET&		eth_;
 		SDC&			sdc_;
 
 		LINE_MAN		line_man_;
+
+		uint32_t		desc_;
 
 		time_t			last_modified_;
 		char			server_name_[32];
@@ -149,9 +157,12 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
+			@param[in]	eth	イーサーネット・コンテキスト
+			@param[in]	sdc	SDC コンテキスト
 		*/
 		//-----------------------------------------------------------------//
-		http_server(SDC& sdc) : sdc_(sdc), line_man_(0x0a),
+		http_server(ETHERNET& eth, SDC& sdc) : eth_(eth), sdc_(sdc),
+			line_man_(0x0a), desc_(0),
 			last_modified_(0), server_name_{ 0 }, timeout_(15), max_(60),
 			count_(0), disconnect_loop_(0),
 			link_num_(0), link_{ },
@@ -210,9 +221,9 @@ namespace net {
 		{
 			std::strncpy(server_name_, server_name, sizeof(server_name_) - 1);
 
-///			last_modified_ = get_time();
+			last_modified_ = get_time();
 
-			http_format::chaout().set_fd(-1);
+///			http_format::chaout().set_desc();
 
 			count_ = 0;
 			disconnect_loop_ = 0;
@@ -237,8 +248,7 @@ namespace net {
 			uint32_t lp = 0;
 			http_format("HTTP/1.1 %d OK\n") % status;
 
-///			time_t t = get_time();
-time_t t = 0;
+			time_t t = get_time();
 			struct tm *m = gmtime(&t);
 			// Sun, 11 Jan 2004 16:06:23 GMT
 			http_format("Date: %s, %02d %s %4d %02d:%02d:%02d GMT\n")
@@ -499,11 +509,11 @@ time_t t = 0;
 			uint32_t total = 0;
 			uint32_t len;
 			while((len = fread(tmp, 1, sizeof(tmp), fp)) == sizeof(tmp)) {
-///				sock_.write(tmp, sizeof(tmp));
+				eth_.at_tcp().send(desc_, tmp, sizeof(tmp));
 				total += len;
 			}
 			if(len > 0) {
-///				sock_.write(tmp, len);
+				eth_.at_tcp().send(desc_, tmp, len);
 				total += len;
 			}
 			fclose(fp);
@@ -518,41 +528,40 @@ time_t t = 0;
 		//-----------------------------------------------------------------//
 		void service(uint16_t http_port = 80)
 		{
-///			sock_.service();
+			auto& ipv4 = eth_.at_ipv4();
+			auto& tcp  = ipv4.at_tcp();
 
 			switch(task_) {
 
 			case task::begin_http:
-#if 0
-				if(!sock_.open(http_port)) {
-					debug_format("HTTP Socket open error\n");
-					break;
+				{
+					ip_adrs adrs;
+					if(tcp.open(adrs, http_port, true, desc_) != net_state::OK) {
+//						debug_format("HTTP Socket open error\n");
+						break;
+					}
+					debug_format("HTTP Start Server: '%s' port(%d), desc(%d)\n")
+						% eth_.at_info().ip.c_str()
+						% static_cast<int>(http_port)
+						% desc_;
+					task_ = task::wait_http;
 				}
-				debug_format("HTTP Start Server: '%s' port(%d), desc(%d)\n")
-					% sock_.get_src_adrs().c_str()
-					% static_cast<int>(sock_.get_src_port())
-					% sock_.get_desc();
-#endif
-				task_ = task::wait_http;
 				break;
 
 			case task::wait_http:
-#if 0
-				if(sock_.connected()) {
-					debug_format("HTTP Server: New connected, form: %s\n") % sock_.get_dst_adrs().c_str();
+				if(tcp.connected(desc_)) {
+					debug_format("HTTP Server: New connected, form: %s\n") % tcp.get_dst_ip(desc_).c_str();
 					++count_;
 					line_man_.clear();
-					http_format::chaout().set_fd(sock_.get_desc());
+					http_format::chaout().set_desc(desc_);
 					task_ = task::main_loop;
 				}
-#endif
 				break;
 
 			case task::main_loop:
-#if 0
-				if(sock_.connected()) {
+				if(tcp.connected(desc_)) {
 					char tmp[2048];  // 大きな POST データに備えた大きさ
-					int len = sock_.recv(tmp, sizeof(tmp));
+					int len = tcp.recv(desc_, tmp, sizeof(tmp));
 					if(len == 0) break;
 					auto pos = analize_request(tmp, len);
 					if(pos > 0) {
@@ -598,15 +607,13 @@ time_t t = 0;
 					task_ = task::disconnect_delay;
 					disconnect_loop_ = 5;
 				}
-#endif
 				break;
 
 			case task::disconnect_delay:
 				if(disconnect_loop_ > 0) {
 					--disconnect_loop_;
 				} else {
-///					sock_.close();
-					http_format::chaout().set_fd(-1);
+///					tcp.close(desc_);
 					task_ = task::disconnect;
 				}
 				break;
