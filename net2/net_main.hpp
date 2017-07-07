@@ -11,8 +11,6 @@
 #include "common/dhcp_client.hpp"
 #include "net2/ethernet.hpp"
 #include "net2/net_st.hpp"
-#include "net2/test_udp.hpp"
-#include "net2/test_tcp.hpp"
 
 #define NET_MAIN_DEBUG
 
@@ -57,9 +55,6 @@ namespace net {
 
 		uint8_t		link_interval_;
 		uint8_t		stall_loop_;
-
-		test_udp	test_udp_;
-		test_tcp	test_tcp_;
 
 		void set_tcpudp_env_()
 		{
