@@ -12,6 +12,10 @@
 
 #define UDP_TCP_DEBUG
 
+extern "C" {
+	int tcp_send(uint32_t desc, const void* src, uint32_t len);
+}
+
 namespace net {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -193,11 +197,11 @@ namespace net {
 		typedef utils::fixed_string<SIZE + 1> STR;  // 終端分を追加
 
 	private:
-		STR		str_;
-		int		desc_;
+		STR			str_;
+		uint32_t	desc_;
 
 	public:
-		desc_string() : str_(), desc_(-1) { }
+		desc_string() : str_(), desc_(0) { }
 
 		void clear() {
 			str_.clear();
@@ -205,25 +209,9 @@ namespace net {
 
 		void flush() {
 			if(str_.size() > 0) {
-				if(desc_ >= 0) {
-					uint32_t len = str_.size();
-					const char* p = str_.c_str();
-#if 0
-					while(len > 0) {
-						uint32_t l = len;
-						if(l >= 2048) {
-							l = 2048;
-						}
-						r_send(fd_, p, l);
-						len -= l;
-						p += l;
-					}
-#else
-///					r_send(fd_, p, len);
-#endif				
-				} else {
-					utils::format("ether_string: FD is null.\n");
-				}
+				uint32_t len = str_.size();
+				const char* p = str_.c_str();
+				tcp_send(desc_, p, len);
 			}
 			clear();
 		}

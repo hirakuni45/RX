@@ -83,6 +83,9 @@ namespace net {
 			uint16_t	recv_time_;
 			uint16_t	send_time_;
 
+			ip_adrs		dst_adrs_;
+			uint8_t		dst_mac_[6];
+
 			// IPV4 関係
 			uint16_t	id_;
 			uint16_t	offset_;
@@ -288,6 +291,9 @@ namespace net {
 			switch(ctx.recv_task_) {
 
 			case recv_task::listen_server:
+				std::memcpy(ctx.dst_mac_, eh.get_src(), 6);
+				ctx.dst_adrs_ = ih.get_src_ipa();
+
 				if(tcp->get_flag_syn()) {
 					frame_t* t = get_send_frame_();
 					if(t == nullptr) {
@@ -555,18 +561,40 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  コネクションの検査
+			@brief  接続の検査
 			@param[in]	desc	ディスクリプタ
 			@return 接続状態「true」、切断状態、ディスクリプタが無効「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool connection(int desc) const noexcept
+		bool connected(int desc) const noexcept
 		{
 			uint32_t idx = static_cast<uint32_t>(desc);
 			if(!common_.get_blocks().is_alloc(idx)) return false;
 
 			const context& ctx = common_.get_blocks().get(idx);
-			return !ctx.fin_;
+			if(ctx.server_) {
+				return ctx.recv_task_ == recv_task::established_server;
+			} else {
+				return ctx.recv_task_ == recv_task::established_client;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  接続 IP の取得
+			@param[in]	desc	ディスクリプタ
+			@return ディスクリプタが無効「false」
+		*/
+		//-----------------------------------------------------------------//
+		const ip_adrs& get_dst_ip(int desc) const
+		{
+			static ip_adrs tmp;
+			uint32_t idx = static_cast<uint32_t>(desc);
+			if(!common_.get_blocks().is_alloc(idx)) return tmp;
+
+			const context& ctx = common_.get_blocks().get(idx);
+			return ctx.dst_adrs_;			
 		}
 
 
