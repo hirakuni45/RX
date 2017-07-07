@@ -30,13 +30,24 @@ namespace net {
 		uint32_t	loop_;
 		uint32_t	wait_;
 
+		bool		enable_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		test_udp() : task_(task::idle), desc_(0), loop_(0), wait_(0) { }
+		test_udp() : task_(task::idle), desc_(0), loop_(0), wait_(0), enable_(false) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  テスト許可
+			@param[in]	ena	不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(bool ena = true) { enable_ = ena; }
 
 
 		//-----------------------------------------------------------------//
@@ -53,18 +64,20 @@ namespace net {
 
 			switch(task_) {
 			case task::idle:
-				task_ = task::open;
+				if(enable_) {
+					task_ = task::open;
+				}
 				break;
 
 			case task::open:
 				{
 					auto state = udp.open(ip_adrs(192,168,3,7), 3000, desc_);
-					if(state != net_state::OK) {
-						utils::format("Test UDP Open: (%s)\n") % desc_;
+					if(state == net_state::OK) {
+						utils::format("Test UDP Open: (%d)\n") % desc_;
+						task_ = task::main;
+					} else {
 						wait_ = 300;
 						task_ = task::wait;
-					} else {
-						task_ = task::main;
 					}
 				}
 				break;

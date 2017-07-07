@@ -267,6 +267,7 @@ namespace net {
 			}
 
 			common_.at_blocks().unlock(idx);
+
 			desc = idx;
 			return net_state::OK;
 		}
