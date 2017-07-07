@@ -204,9 +204,6 @@ namespace net {
 					task_ = task::wait_link;
 				}
 
-				test_udp_.service(ethernet_);
-				test_tcp_.service(ethernet_, true);
-
 				break;
 
 			case task::stall:
