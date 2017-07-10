@@ -20,6 +20,7 @@
 #include "net2/test_udp.hpp"
 #include "net2/test_tcp.hpp"
 #include "net2/http_server.hpp"
+#include "net2/ftp_server.hpp"
 
 namespace {
 
@@ -63,6 +64,9 @@ namespace {
 
 	typedef net::http_server<NET_MAIN::ETHERNET, SDC> HTTP;
 	HTTP		http_(net_.at_ethernet(), sdc_);
+
+	typedef net::ftp_server<NET_MAIN::ETHERNET, SDC> FTPS;
+	FTPS		ftps_(net_.at_ethernet(), sdc_);
 
 	volatile bool putch_lock_ = false;
 	utils::fifo<uint8_t, 1024> putch_tmp_;
@@ -337,8 +341,19 @@ int main(int argc, char** argv)
 		ethd_.set_intr_task(ethd_process_);
 	}
 
+	// UDP test の許可
+//	test_udp_.enable();
 
-	{  // HTTP サーバーの設定
+	// TCP test の許可
+//	test_tcp_.enable();
+
+	bool test_http = true;
+//	bool test_http = false;
+
+	bool test_ftps = true;
+//	bool test_ftps = false;
+
+	if(test_http) {  // HTTP サーバーの設定
 		http_.start("GR-KAEDE_net2 HTTP Server");
 
 		// ルート・ページ設定
@@ -358,11 +373,10 @@ int main(int argc, char** argv)
 		} );
 	}
 
-	// UDP test の許可
-//	test_udp_.enable();
+	if(test_ftps) {  // FTP サーバーの設定
 
-	// TCP test の許可
-//	test_tcp_.enable();
+
+	}
 
 	uint32_t cnt = 0;
 	while(1) {  // 100Hz (10ms interval)
@@ -379,7 +393,9 @@ int main(int argc, char** argv)
 			bool server = true;
 			test_tcp_.service(net_.at_ethernet(), server);
 
-			http_.service();
+			if(test_http) {
+				http_.service();
+			}
 		}
 
 		device::PORTC::PODR.B0 = (((cnt + 0)  & 31) < 8) ? 1 : 0;
