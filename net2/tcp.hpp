@@ -83,9 +83,6 @@ namespace net {
 			uint16_t	recv_time_;
 			uint16_t	send_time_;
 
-			ip_adrs		dst_adrs_;
-			uint8_t		dst_mac_[6];
-
 			// IPV4 関係
 			uint16_t	id_;
 			uint16_t	offset_;
@@ -287,12 +284,20 @@ namespace net {
 				return false;
 			}
 			uint16_t data_len = len - tcp->get_length();
+			bool ackf = tcp->get_flag_ack();
+			bool finf = tcp->get_flag_fin();
+			uint32_t seq = tcp->get_seq();
+			uint32_t ack = tcp->get_ack();
 
 			switch(ctx.recv_task_) {
 
 			case recv_task::listen_server:
-				std::memcpy(ctx.dst_mac_, eh.get_src(), 6);
-				ctx.dst_adrs_ = ih.get_src_ipa();
+				if(ctx.server_) {
+					if(ctx.adrs_.is_any()) {
+						std::memcpy(ctx.mac_, eh.get_src(), 6);
+						ctx.adrs_.set(ih.get_src_ipa());
+					}
+				}
 
 				if(tcp->get_flag_syn()) {
 					frame_t* t = get_send_frame_();
@@ -300,14 +305,14 @@ namespace net {
 						return false;
 					}
 					ctx.seq_ = master_seq_;  // start seq
-					ctx.ack_ = tcp->get_seq() + 1;
+					ctx.ack_ = seq + 1;
 					ctx.flags_ = tcp_h::MASK_SYN | tcp_h::MASK_ACK;
 					auto all = make_tcp_frame_(ctx, eh.get_src(), ih.get_src_ipa(), *t);
 					ethd_.send(all);
 					ctx.timeout_ = 0;
 					ctx.recv_task_ = recv_task::syn_rcvd;
 				}
-				if(tcp->get_flag_fin()) {
+				if(finf) {
 					ctx.fin_ = true;
 					send_close_ack_(ctx, eh.get_src(), ih.get_src_ipa(), tcp);
 					ctx.recv_task_ = recv_task::sync_close;
@@ -315,11 +320,11 @@ namespace net {
 				break;
 
 			case recv_task::syn_rcvd:
-				if(tcp->get_flag_ack() && tcp->get_seq() == ctx.ack_ && tcp->get_ack() > ctx.seq_) {
+				if(ackf && seq == ctx.ack_ && ack > ctx.seq_) {
 					ctx.timeout_ = 0;
 					ctx.recv_task_ = recv_task::established_server;
 				}
-				if(tcp->get_flag_fin()) {
+				if(finf) {
 					ctx.fin_ = true;
 					send_close_ack_(ctx, eh.get_src(), ih.get_src_ipa(), tcp);
 					ctx.recv_task_ = recv_task::sync_close;
@@ -328,12 +333,11 @@ namespace net {
 				break;
 
 			case recv_task::established_server:
-				if(tcp->get_flag_ack()) {
+				if(ackf) {
 					if(ctx.send_len_ > 0) {  // 転送データの ACK 確認
 // utils::format("Send SEQ: %08X, ACK: %08X\n") % ctx.send_seq_ % ctx.send_ack_;
 // dump(*tcp, " (Data ACK)");
-						if(tcp->get_seq() == ctx.send_ack_ &&
-						   tcp->get_ack() >= (ctx.send_seq_ + ctx.send_len_)) {
+						if(seq == ctx.send_ack_ && ack >= (ctx.send_seq_ + ctx.send_len_)) {
 //							debug_format("Send step END: 0x%08X, %d\n") % ctx.seq_ % ctx.send_len_;
 							ctx.send_.get_go(ctx.send_len_);
 							ctx.send_len_ = 0;
@@ -357,10 +361,10 @@ namespace net {
 						if(t == nullptr) {
 							return false;
 						}
-						ctx.seq_ = tcp->get_ack();
-						ctx.ack_ = tcp->get_seq() + data_len;
-						ctx.send_seq_ = tcp->get_ack();
-						ctx.send_ack_ = tcp->get_seq() + data_len;
+						ctx.seq_ = ack;
+						ctx.ack_ = seq + data_len;
+						ctx.send_seq_ = ack;
+						ctx.send_ack_ = seq + data_len;
 						master_seq_ += data_len;
 						ctx.flags_ = tcp_h::MASK_ACK;
 						auto all = make_tcp_frame_(ctx, eh.get_src(), ih.get_src_ipa(), *t);
@@ -368,7 +372,7 @@ namespace net {
 						ctx.timeout_ = 0;
 					}
 				}
-				if(tcp->get_flag_fin()) {
+				if(finf) {
 					ctx.fin_ = true;
 					send_close_ack_(ctx, eh.get_src(), ih.get_src_ipa(), tcp);
 					ctx.recv_task_ = recv_task::sync_close;
@@ -376,8 +380,8 @@ namespace net {
 				break;
 
 			case recv_task::sync_close:
-				if(tcp->get_flag_ack() && tcp->get_seq() == ctx.ack_ && tcp->get_ack() > ctx.seq_) {
-					master_seq_ = tcp->get_ack() + 1;
+				if(ackf && seq == ctx.ack_ && ack > ctx.seq_) {
+					master_seq_ = ack + 1;
 ///					debug_format("Sync Close OK (seq: %d)\n") % master_seq_;
 					ctx.recv_task_ = recv_task::close;
 				}
@@ -423,6 +427,7 @@ namespace net {
 			auto all = make_tcp_frame_(ctx, ctx.mac_, ctx.adrs_.get(), *t);
 			ethd_.send(all);
 			ctx.ack_ += 1;
+			debug_format("TCP out of INTR loop SEND (%d)\n") % all;
 
 			ethd_.enable_interrupt();
 		}
@@ -471,7 +476,7 @@ namespace net {
 				desc = NMAX;
 				return st;
 			}
-			if(adrs.is_brodcast()) {  // ブロードキャストアドレスは無効
+			if(adrs.is_brodcast()) {  // TCP では、ブロードキャストアドレスは無効
 				auto st = net_state::FAIL_ADRS;
 				if(last_state_ != st) {
 					debug_format("TCP Open fail brodcast address: %s\n") % adrs.c_str();
@@ -525,15 +530,18 @@ namespace net {
 			// コンテキスト初期化
 			ctx.reset(adrs, port, server);
 
-			if(!server && adrs.is_any()) {
-				ctx.send_task_ = send_task::main;
-			} else {
+			ctx.send_task_ = send_task::main;
+			if(!adrs.is_any()) {
 				if(common_.check_mac(ctx, info_)) {  // 既に MAC が利用可能なら「main」へ
 					ctx.send_task_ = send_task::main;
 				} else {
+					debug_format("TCP Open (%s): sync MAC\n") % adrs.c_str();
 					ctx.send_task_ = send_task::sync_mac;
 				}
+			} else {  // サーバーの場合、接続先は未定でも OK
+				ctx.send_task_ = send_task::main;
 			}
+
 			if(server) {
 				ctx.recv_task_ = recv_task::listen_server;
 			} else {
@@ -584,17 +592,34 @@ namespace net {
 		/*!
 			@brief  接続 IP の取得
 			@param[in]	desc	ディスクリプタ
-			@return ディスクリプタが無効「false」
+			@return 接続 IP（無効な場合は、ANY）
 		*/
 		//-----------------------------------------------------------------//
-		const ip_adrs& get_dst_ip(int desc) const
+		const ip_adrs& get_ip(int desc) const
 		{
 			static ip_adrs tmp;
 			uint32_t idx = static_cast<uint32_t>(desc);
 			if(!common_.get_blocks().is_alloc(idx)) return tmp;
 
 			const context& ctx = common_.get_blocks().get(idx);
-			return ctx.dst_adrs_;			
+			return ctx.adrs_;			
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  接続ポートの取得
+			@param[in]	desc	ディスクリプタ
+			@return 接続ポート（無効な場合は「０」）
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_port(int desc) const
+		{
+			uint32_t idx = static_cast<uint32_t>(desc);
+			if(!common_.get_blocks().is_alloc(idx)) return 0;
+
+			const context& ctx = common_.get_blocks().get(idx);
+			return ctx.cn_port_;
 		}
 
 
