@@ -72,7 +72,11 @@ namespace net {
 
 			case task::open:
 				{
-					auto state = tcp.open(ip_adrs(192,168,3,7), 3000, server, desc_);
+					ip_adrs adrs;
+					if(!server) {  // Client の場合の接続先（サーバーのアドレス）
+						adrs.set(192,168,3,7);
+					}
+					auto state = tcp.open(adrs, 3000, server, desc_);
 					if(state == net_state::OK) {
 						utils::format("Test TCP Open (%d): %s\n")
 							% desc_ % (server ? "Server" : "Client");
