@@ -439,9 +439,9 @@ namespace net {
 					}
 					ctrl_flush();
 					if(pasv_enable_) {
-						tcp.stop(data_);
+						tcp.close(data_);
 					} else {
-						tcp.stop(port_);
+						tcp.close(port_);
 					}
 				}
 				break;
@@ -521,7 +521,7 @@ namespace net {
 
 			case ftp_command::PASV:
 				{
-					const auto& ip = eth_.get_local_ip();
+					const auto& ip = eth_.get_info().ip;
 					ctrl_format("227 Entering Passive Mode (%d,%d,%d,%d,%d,%d)\n")
 						% ip[0] % ip[1] % ip[2] % ip[3] % (DATA_PORT_PASV >> 8) % (DATA_PORT_PASV & 255);
 					ctrl_flush();
@@ -970,8 +970,8 @@ utils::format("Reconnection CTRL\n");
 					ip_adrs adrs;
 					bool server = true;
 					tcp.open(ip_adrs(), CTRL_PORT, server, ctrl_);
-					debug_format("Start FTP Server (CTRL): %s (%d), fd(%d)\n")
-						% eth_.get_local_ip().c_str() % tcp.get_port(ctrl_) % ctrl_;
+					debug_format("Start FTP Server (CTRL): %s (%d), desc(%d)\n")
+						% eth_.get_info().ip.c_str() % tcp.get_port(ctrl_) % ctrl_;
 					task_ = task::connection;
 					ctrl_format::chaout().set_desc(ctrl_);
 				}
@@ -980,7 +980,7 @@ utils::format("Reconnection CTRL\n");
 			case task::connection:
 				if(tcp.connected(ctrl_)) {
 					debug_format("FTP Server (CTRL): connect form: '%s'\n") % tcp.get_ip(ctrl_).c_str();
-					ctrl_format("220 %s FTP server %s ") % host_ % eth_.get_local_ip().c_str();
+					ctrl_format("220 %s FTP server %s ") % host_ % eth_.at_info().ip.c_str();
 					time_t t = get_time();
 					disp_time_(t);
 					ctrl_format("\n");
@@ -1042,12 +1042,16 @@ utils::format("Reconnection CTRL\n");
 				break;
 
 			case task::start_pasv:
-				data_.open(DATA_PORT_PASV);
-				debug_format("Start FTP Server data (PASV): '%s' (%d) fd(%d)\n")
-					% eth_.get_local_ip().c_str() % tcp.get_port(data_) % data_;
-				data_connect_loop_ = data_connection_timeout_;
-				data_format::chaout().set_desc(data_);
-				task_ = task::data_connection;
+				{
+					bool server = true;
+					ip_adrs adrs;
+					tcp.open(adrs, DATA_PORT_PASV, server, data_);
+					debug_format("Start FTP Server data (PASV): '%s' (%d) desc(%d)\n")
+						% eth_.get_info().ip.c_str() % tcp.get_port(data_) % data_;
+					data_connect_loop_ = data_connection_timeout_;
+					data_format::chaout().set_desc(data_);
+					task_ = task::data_connection;
+				}
 				break;
 
 			case task::data_connection:  // PASV
@@ -1071,14 +1075,22 @@ utils::format("Reconnection CTRL\n");
 				break;
 
 			case task::start_port:
-
-////				port_.connect(data_ip_, data_port_, TMO_NBLK);
-
-				debug_format("Start FTP Server data (PORT): '%s' (%d) fd(%d)\n")
-					% data_ip_.c_str() % data_port_ % port_;
-				data_connect_loop_ = data_connection_timeout_;
-				data_format::chaout().set_desc(port_);
-				task_ = task::port_connection;
+				{
+					bool server = false;  // client connection
+#if 0
+					if(tcp.open(data_ip_, data_port_, server, port_)) {
+						debug_format("Start FTP Server data (PORT): '%s' (%d) desc(%d)\n")
+							% data_ip_.c_str() % data_port_ % port_;
+						data_connect_loop_ = data_connection_timeout_;
+						data_format::chaout().set_desc(port_);
+						task_ = task::port_connection;
+					} else {
+///
+						debug_format("Start FTP Server data open fail\n");
+///						task_ = task::idle;
+					}
+#endif
+				}
 				break;
 
 			case task::port_connection:  // PORT
@@ -1153,9 +1165,9 @@ utils::format("Reconnection CTRL\n");
 				{
 					int32_t sz;
 					if(pasv_enable_) {
-						sz = tcp.read(data_, rw_buf_, sizeof(rw_buf_));
+						sz = tcp.recv(data_, rw_buf_, sizeof(rw_buf_));
 					} else {
-						sz = tcp.read(port_, rw_buf_, sizeof(rw_buf_));
+						sz = tcp.recv(port_, rw_buf_, sizeof(rw_buf_));
 					}
 					if(sz > 0) {
 						fwrite(rw_buf_, 1, sz, file_fp_);
@@ -1214,9 +1226,9 @@ utils::format("Reconnection CTRL\n");
 					uint8_t tmp[256];
 					int32_t rds;
 					if(pasv_enable_) {
-						rds = tcp.read(data_, tmp, sizeof(tmp));
+						rds = tcp.recv(data_, tmp, sizeof(tmp));
 					} else {
-						rds = tcp.read(port_, tmp, sizeof(tmp));
+						rds = tcp.recv(port_, tmp, sizeof(tmp));
 					}
 					if(rds > 0) {
 
