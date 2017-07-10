@@ -162,7 +162,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		http_server(ETHERNET& eth, SDC& sdc) : eth_(eth), sdc_(sdc),
-			line_man_(0x0a), desc_(0),
+			line_man_(0x0a), desc_(ETHERNET::TCP_OPEN_MAX),
 			last_modified_(0), server_name_{ 0 }, timeout_(15), max_(60),
 			count_(0), disconnect_loop_(0),
 			link_num_(0), link_{ },
@@ -550,7 +550,7 @@ namespace net {
 
 			case task::wait_http:
 				if(tcp.connected(desc_)) {
-					debug_format("HTTP Server: New connected, form: %s\n") % tcp.get_dst_ip(desc_).c_str();
+					debug_format("HTTP Server: New connected, form: %s\n") % tcp.get_ip(desc_).c_str();
 					++count_;
 					line_man_.clear();
 					http_format::chaout().set_desc(desc_);
@@ -613,7 +613,7 @@ namespace net {
 				if(disconnect_loop_ > 0) {
 					--disconnect_loop_;
 				} else {
-///					tcp.close(desc_);
+					tcp.close(desc_);
 					task_ = task::disconnect;
 				}
 				break;

@@ -17,13 +17,16 @@ namespace net {
 	/*!
 		@brief  ethernet クラス
 		@param[in]	ETHD	イーサーネット・ドライバー・クラス
-		@param[in]	UDPN	UDP 経路数の最大値
-		@param[in]	TCPN	TCP 経路数の最大値
+		@param[in]	UDPN	UDP 経路数の最大数
+		@param[in]	TCPN	TCP 経路数の最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class ETHD, uint32_t UDPN, uint32_t TCPN>
 	class ethernet {
 	public:
+		static const uint32_t UDP_OPEN_MAX = UDPN;  ///< UDP 経路数の最大数
+		static const uint32_t TCP_OPEN_MAX = TCPN;  ///< TCP 経路数の最大数
+
 		typedef ipv4<ETHD, UDPN, TCPN> IPV4;
 
 	private:
