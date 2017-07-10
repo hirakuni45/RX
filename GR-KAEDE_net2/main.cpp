@@ -374,8 +374,9 @@ int main(int argc, char** argv)
 	}
 
 	if(test_ftps) {  // FTP サーバーの設定
-
-
+		static const char* user = { "KAEDE" };
+		static const char* pass = { "KAEDE" };
+		ftps_.start("GR-KAEDE", "Renesas_RX64M", user, pass);
 	}
 
 	uint32_t cnt = 0;
@@ -395,6 +396,9 @@ int main(int argc, char** argv)
 
 			if(test_http) {
 				http_.service();
+			}
+			if(test_ftps) {
+				ftps_.service();
 			}
 		}
 
