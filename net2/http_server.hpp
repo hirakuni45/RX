@@ -244,11 +244,12 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  応答メッセージの生成
+			@brief  応答メッセージの生成 @n
+					※「Content-Length: 」には５文字のスペースが予約されている
 			@param[in]	status	ステータスコード
-			@param[in]	length	コンテンツ長（バイト）
+			@param[in]	length	コンテンツ長（バイト）負の値なら、５文字の空白
 			@param[in]	keep	セッション・キープの場合「true」
-			@return 「Content-Length: 」後の位置
+			@return 「Content-Length: 」数値を埋め込む位置
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t make_info(int status, int length, bool keep = false)
@@ -291,6 +292,7 @@ namespace net {
 			}
 			http_format("Connection: %s\n") % (keep == true ? "keep-alive" : "close");
 			http_format("Content-Type: text/html\n\n");
+
 			return lp;
 		}
 
@@ -328,6 +330,7 @@ namespace net {
 
 			if(std::strcmp(path, "/favicon.ico") == 0) {
 				clp = make_info(404, -1, false);
+				http_format("\n");
 				uint32_t end = http_format::chaout().size();
 				char tmp[5 + 1];  // 数字５文字＋終端
 				utils::sformat("%5d", tmp, sizeof(tmp)) % (end - org);

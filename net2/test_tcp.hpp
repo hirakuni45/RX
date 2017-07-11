@@ -24,6 +24,8 @@ namespace net {
 			main,
 			close,
 			wait,
+
+			halt,
 		};
 
 		task		task_;
@@ -31,6 +33,7 @@ namespace net {
 		uint32_t	wait_;
 
 		bool		enable_;
+		bool		first_send_;
 
 		void reverse_(char* ptr, uint32_t len)
 		{
@@ -45,7 +48,7 @@ namespace net {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		test_tcp() : task_(task::idle), desc_(0), wait_(0), enable_(false) { }
+		test_tcp() : task_(task::idle), desc_(0), wait_(0), enable_(false), first_send_(true) { }
 
 
 		//-----------------------------------------------------------------//
@@ -107,18 +110,27 @@ namespace net {
 					task_ = task::close;
 				} else {
 					char tmp[256];
-					int len = tcp.recv(desc_, tmp, sizeof(tmp));
-					if(len > 0) {
-						tmp[len] = 0;
-						utils::format("Test TCP Recv (%d): '%s', %d\n") % desc_ % tmp % len;
-
-						reverse_(tmp, len);
-
-						len *= 5;
-						len /= 7;
-						tmp[len] = 0;
-						tcp.send(desc_, tmp, len);
+					if(first_send_) {
+						uint32_t send_len = 20;
+						for(uint32_t i = 0; i < send_len; ++i) { tmp[i] = 0x20 + (rand() & 63); }
+						int len = tcp.send(desc_, tmp, send_len);
+						tmp[send_len] = 0;
 						utils::format("Test TCP Send (%d): '%s', %d\n") % desc_ % tmp % len;
+
+					} else {
+						int len = tcp.recv(desc_, tmp, sizeof(tmp));
+						if(len > 0) {
+							tmp[len] = 0;
+							utils::format("Test TCP Recv (%d): '%s', %d\n") % desc_ % tmp % len;
+
+							reverse_(tmp, len);
+
+							len *= 5;
+							len /= 7;
+							tmp[len] = 0;
+							tcp.send(desc_, tmp, len);
+							utils::format("Test TCP Send (%d): '%s', %d\n") % desc_ % tmp % len;
+						}
 					}
 				}
 				break;
@@ -136,6 +148,9 @@ namespace net {
 				} else {
 					task_ = task::idle;
 				}
+				break;
+
+			case task::halt:
 				break;
 
 			default:
