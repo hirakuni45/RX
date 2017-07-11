@@ -970,7 +970,7 @@ utils::format("Reconnection CTRL\n");
 					ip_adrs adrs;
 					bool server = true;
 					tcp.open(ip_adrs(), CTRL_PORT, server, ctrl_);
-					debug_format("Start FTP Server (CTRL): %s (%d), desc(%d)\n")
+					debug_format("Start FTP Server (CTRL): %s port(%d), desc(%d)\n")
 						% eth_.get_info().ip.c_str() % tcp.get_port(ctrl_) % ctrl_;
 					task_ = task::connection;
 					ctrl_format::chaout().set_desc(ctrl_);
@@ -1076,6 +1076,7 @@ utils::format("Reconnection CTRL\n");
 
 			case task::start_port:
 				{
+utils::format("Start PORT\n");
 					bool server = false;  // client connection
 #if 0
 					if(tcp.open(data_ip_, data_port_, server, port_)) {

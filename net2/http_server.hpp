@@ -54,6 +54,9 @@ namespace net {
 
 
 	private:
+
+		static const uint16_t DISCONNECT_LOOP = 25;   ///< ０．２５秒
+
 		// デバッグ以外で出力を無効にする
 #ifdef HTTP_DEBUG
 		typedef utils::format debug_format;
@@ -104,6 +107,10 @@ namespace net {
 
 		utils::color	back_color_;
 		utils::color	fore_color_;
+
+
+		bool			favicon_;
+		bool			other_link_;
 
 
 		static void get_path_(const char* src, char* dst) {
@@ -167,7 +174,8 @@ namespace net {
 			count_(0), disconnect_loop_(0),
 			link_num_(0), link_{ },
 			task_(task::none),
-			back_color_(255, 255, 255), fore_color_(0, 0, 0)
+			back_color_(255, 255, 255), fore_color_(0, 0, 0),
+			favicon_(false), other_link_(false)
 		{ }
 
 
@@ -246,7 +254,7 @@ namespace net {
 		uint32_t make_info(int status, int length, bool keep = false)
 		{
 			uint32_t lp = 0;
-			http_format("HTTP/1.1 %d OK\n") % status;
+			http_format("HTTP/1.1 %d %s\n") % status % (status == 200 ? "OK" : "Not Found");
 
 			time_t t = get_time();
 			struct tm *m = gmtime(&t);
@@ -315,19 +323,30 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool exec_link(const char* path, bool cgi = false)
 		{
+			uint32_t clp = 0;
+			uint32_t org = 0;
+
 			if(std::strcmp(path, "/favicon.ico") == 0) {
-				make_info(404, -1, false);
+				clp = make_info(404, -1, false);
+				uint32_t end = http_format::chaout().size();
+				char tmp[5 + 1];  // 数字５文字＋終端
+				utils::sformat("%5d", tmp, sizeof(tmp)) % (end - org);
+				strncpy(&http_format::chaout().at_str()[clp], tmp, 5); // 数字部のみコピー
 				http_format::chaout().flush();  // 最終的な書き込み
+
+				debug_format("HTTP Server: '%s', size(%d)\n") % path % (end - org);
+
+				favicon_ = true;
 				return true;
 			}
+
+			other_link_ = true;
 
 			int idx = find_link_(path, cgi);
 			if(idx < 0) return false;
 
 			link_t& t = link_[idx];
 
-			uint32_t clp = 0;
-			uint32_t org = 0;
 			if(!cgi) {
 				http_format::chaout().clear();
 
@@ -349,16 +368,12 @@ namespace net {
 
 			http_format("</html>\n");
 			uint32_t end = http_format::chaout().size();
-
-			debug_format("HTTP Server: body size: %d\n") % (end - org);
-
 			char tmp[5 + 1];  // 数字５文字＋終端
 			utils::sformat("%5d", tmp, sizeof(tmp)) % (end - org);
 			strncpy(&http_format::chaout().at_str()[clp], tmp, 5); // 数字部のみコピー
-
-///			debug_format("HTTP Server: body: -----\n%s\n-----\n") % http_format::chaout().at_str().c_str();
-
 			http_format::chaout().flush();  // 最終的な書き込み
+
+			debug_format("HTTP Server: '%s', size(%d)\n") % path % (end - org);
 
 			return true;
 		}
@@ -537,7 +552,9 @@ namespace net {
 				{
 					ip_adrs adrs;
 					if(tcp.open(adrs, http_port, true, desc_) != net_state::OK) {
-//						debug_format("HTTP Socket open error\n");
+						debug_format("HTTP TCP open error\n");
+						task_ = task::disconnect_delay;
+						disconnect_loop_ = 100; // 1 sec
 						break;
 					}
 					debug_format("HTTP Start Server: '%s' port(%d), desc(%d)\n")
@@ -554,6 +571,9 @@ namespace net {
 					++count_;
 					line_man_.clear();
 					http_format::chaout().set_desc(desc_);
+					favicon_ = false;
+					other_link_ = false;
+					disconnect_loop_ = DISCONNECT_LOOP;
 					task_ = task::main_loop;
 				}
 				break;
@@ -562,54 +582,59 @@ namespace net {
 				if(tcp.connected(desc_)) {
 					char tmp[2048];  // 大きな POST データに備えた大きさ
 					int len = tcp.recv(desc_, tmp, sizeof(tmp));
-					if(len == 0) break;
+					if(len == 0) {
+						break;
+					}
+/// tmp[len] = 0;
+/// utils::format("Recv:\n%s\n") % tmp;
 					auto pos = analize_request(tmp, len);
 					if(pos > 0) {
-						tmp[len] = 0;
-///						debug_format("HTTP Server: client -----\n%s-----\n") % tmp;
-						char path[256];
-						path[0] = 0;
 						if(!line_man_.empty()) {
+							char path[256];
+							path[0] = 0;
 							const char* t = line_man_[0];
 							if(strncmp(t, "GET ", 4) == 0) {
 								get_path_(t + 4, path);
-								debug_format("HTTP Server: GET '%s'\n") % path;
-
+								debug_format("HTTP Server: GET '%s' (%d)\n") % path % len;
 								bool find = exec_link(path, false);
 								if(!find) {
 									debug_format("HTTP Server: can't find GET: '%s'\n") % path;
 									make_info(404, -1, false);
 									http_format::chaout().flush();
 								}
-
 							} else if(strncmp(t, "POST ", 5) == 0) {
 								get_path_(t + 5, path);
-								debug_format("HTTP Server: POST '%s'\n") % path;
+								debug_format("HTTP Server: POST '%s' (%d)\n") % path % len;
 								parse_cgi(pos);
 								bool find = exec_link(path, true);
 								if(!find) {
-									debug_format("HTTP Server: can't find POST: '%s'\n") % path;
+									debug_format("HTTP Server: can't find POST: '%s' (%d)\n") % path % len;
 									make_info(404, -1, false);
 									http_format::chaout().flush();
 								}
-
 							} else {
 								debug_format("HTTP Server: request fail command '%s'\n") % t;
 							}
+							line_man_.clear();
+							task_ = task::disconnect_delay;
 						} else {
 							debug_format("HTTP Server: request fail section.\n");
 						}
-
-						task_ = task::disconnect_delay;
-						disconnect_loop_ = 5;
 					}
 				} else {
+					debug_format("HTTP Server: connection un-link (out main).\n");
 					task_ = task::disconnect_delay;
-					disconnect_loop_ = 5;
 				}
 				break;
 
 			case task::disconnect_delay:
+				{
+					auto len = tcp.get_recv_length(desc_);
+					if(len > 0) {
+						disconnect_loop_ = DISCONNECT_LOOP;
+						task_ = task::main_loop;
+					}
+				}
 				if(disconnect_loop_ > 0) {
 					--disconnect_loop_;
 				} else {
