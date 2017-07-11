@@ -548,6 +548,93 @@ namespace net {
 	} __attribute__((__packed__));
 
 
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  TCP オプション情報
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct tcp_opt_info {
+		uint16_t	mss;			///< 最大セグメントサイズ
+		uint8_t		window_scale;	///< Windows スケール値
+		bool		sack_perm;		///< SACK が利用可能かどうか
+
+		void reset() {
+			mss = 0;
+			window_scale = 0;
+			sack_perm = false;
+		}
+	};
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  TCP オプション
+		@param[in]	SIZE	オプションサイズ（通常１２バイト）
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t SIZE = 12>
+	class tcp_opt {
+		uint8_t		buff_[SIZE];
+	public:
+
+		bool analize(tcp_opt_info& info)
+		{
+			info.reset();
+
+			uint32_t pos = 0;
+			while(pos < SIZE) {
+				auto opc = buff_[pos];
+				++pos;
+				switch(opc) {
+				case 0x00:  // End Of Operation List
+					break;
+				case 0x01:  // No Operation
+					break;
+				case 0x02:  // Maximum Segument Size
+					if(buff_[pos] != 0x04) {
+						return false;
+					}
+					++pos;
+					info.mss = static_cast<uint16_t>(buff_[pos]) << 8;
+					++pos;
+					info.mss |= buff_[pos];
+					++pos;
+					break;
+				case 0x03:  // Window Scale
+					if(buff_[pos] != 0x03) {
+						return false;
+					}
+					++pos;
+					info.window_scale = buff_[pos];
+					++pos;
+					break;
+				case 0x04:  // SACK Permitted
+					if(buff_[pos] != 0x02) {
+						return false;
+					}
+					info.sack_perm = true;
+					break;
+
+				default:
+					return false;
+					break;
+				}
+			}
+			return true;
+		}
+
+
+		bool build(tcp_opt_info& info)
+		{
+			if(SIZE != 12) return false;
+
+
+
+			return true;
+		}
+
+	} __attribute__((__packed__));
+
+
 	//-----------------------------------------------------------------//
 	/*!
 		@brief  tcp_segment  ヘッダーのダンプ
