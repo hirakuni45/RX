@@ -8,13 +8,19 @@
 //=====================================================================//
 #include <cstdint>
 #include <cstring>
+#include <random>
 #include "common/byte_order.h"
+#include "common/time.h"
 
 #if defined(BIG_ENDIAN)
 #elif defined(LITTLE_ENDIAN)
 #else
 #error "net_tools.hpp requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
 #endif
+
+extern "C" {
+	time_t get_time();
+}
 
 namespace net {
 
@@ -177,12 +183,40 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  メルセンヌ・ツイスターを使った乱数生成
+			@return メルセンヌ・ツイスター乱数
+		*/
+		//-----------------------------------------------------------------//
+		static std::mt19937& at_rand_mt()
+		{
+			static std::mt19937 mt(static_cast<int>(get_time()));
+			return mt;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  メルセンヌ・ツイスターを使った乱数生成
+			@param[in]	mask	マスク
+			@return 乱数
+		*/
+		//-----------------------------------------------------------------//
+		static uint32_t rand(uint32_t mask = 0xffffffff) {
+			auto& r = at_rand_mt();
+			return r() & mask;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ランダム・ポート番号の生成（49152～65535）
 			@return ランダム・ポート番号
 		*/
 		//-----------------------------------------------------------------//
 		static uint16_t random_port() {
-			return 49152 + (rand() % (65536 - 49152));
+//			return 49152 + (rand() % (65536 - 49152));
+			static std::uniform_int_distribution<> rand_range(49152, 65535);
+			return rand_range(at_rand_mt());
 		}
 
 
