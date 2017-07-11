@@ -32,6 +32,13 @@ namespace net {
 
 		bool		enable_;
 
+		void reverse_(char* ptr, uint32_t len)
+		{
+			for(uint32_t i = 0; i < len / 2; ++i) {
+				std::swap(ptr[i], ptr[len - 1 - i]);
+			}
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -105,6 +112,8 @@ namespace net {
 						tmp[len] = 0;
 						utils::format("Test TCP Recv (%d): '%s', %d\n") % desc_ % tmp % len;
 
+						reverse_(tmp, len);
+
 						len *= 5;
 						len /= 7;
 						tmp[len] = 0;
@@ -117,7 +126,7 @@ namespace net {
 			case task::close:
 				tcp.close(desc_);
 				utils::format("Test TCP Close (%d)\n") % desc_;
-				wait_ = 100;
+				wait_ = 5;
 				task_ = task::wait;
 				break;
 
