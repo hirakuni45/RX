@@ -77,12 +77,14 @@ namespace net {
 				for(uint32_t i = 0; i < send_len; ++i) { tmp[i] = 0x20 + (rand() & 63); }
 				int len = tcp.send(desc_, tmp, send_len);
 				tmp[send_len] = 0;
-				utils::format("Test TCP Send %s (%d): '%s', %d\n") % desc_ % tmp % len;
+				utils::format("Test TCP Send %s (%d): '%s', %d\n")
+					% (server ? "Server" : "Client") % desc_ % tmp % len;
 			} else {
 				int len = tcp.recv(desc_, tmp, sizeof(tmp));
 				if(len > 0) {
 					tmp[len] = 0;
-					utils::format("Test TCP Recv %s (%d): '%s', %d\n") % desc_ % tmp % len;
+					utils::format("Test TCP Recv %s (%d): '%s', %d\n")
+						% (server ? "Server" : "Client") % desc_ % tmp % len;
 
 					reverse_(tmp, len);
 
