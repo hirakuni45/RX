@@ -13,6 +13,7 @@
 #include "common/fixed_memory.hpp"
 #include "common/ip_adrs.hpp"
 #include "net2/icmp.hpp"
+#include "net2/arp.hpp"
 #include "net2/udp.hpp"
 #include "net2/tcp.hpp"
 
@@ -29,6 +30,7 @@ namespace net {
 	template <class ETHD, uint32_t UDPN, uint32_t TCPN>
 	class ipv4 {
 	public:
+		typedef arp<ETHD> ARP;
 		typedef udp<ETHD, UDPN> UDP;
 		typedef tcp<ETHD, TCPN> TCP;
 
@@ -144,12 +146,13 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  サービス（１０ｍｓ毎に呼ぶ）
+			@param[in]	arp	ARP コンテキスト
 		*/
 		//-----------------------------------------------------------------//
-		void service()
+		void service(ARP& arp)
 		{
 			udp_.service();
-			tcp_.service();
+			tcp_.service(arp);
 		}
 	};
 }

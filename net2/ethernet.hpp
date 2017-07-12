@@ -27,6 +27,8 @@ namespace net {
 		static const uint32_t UDP_OPEN_MAX = UDPN;  ///< UDP 経路数の最大数
 		static const uint32_t TCP_OPEN_MAX = TCPN;  ///< TCP 経路数の最大数
 
+		typedef arp<ETHD> ARP;
+
 		typedef ipv4<ETHD, UDPN, TCPN> IPV4;
 
 	private:
@@ -35,7 +37,6 @@ namespace net {
 
 		net_info	info_;
 
-		typedef arp<ETHD> ARP;
 		ARP			arp_;
 
 		IPV4		ipv4_;
@@ -50,7 +51,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		ethernet(ETHD& ethd) : ethd_(ethd), info_(),
-			arp_(info_), ipv4_(ethd, info_),
+			arp_(ethd, info_), ipv4_(ethd, info_),
 			info_update_count_(0)
 		{ }
 
@@ -121,7 +122,7 @@ namespace net {
 					break;
 
 				case eth_type::ARP:
-					arp_.process(ethd_, h, top, len - sizeof(eth_h));
+					arp_.process(h, top, len - sizeof(eth_h));
 					break;
 
 				case eth_type::IPX:
@@ -149,10 +150,19 @@ namespace net {
 				++info_update_count_;
 			}
 
-			arp_.service();
+			ipv4_.service(arp_);
 
-			ipv4_.service();
+			arp_.service();
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ARP コンテキストの参照
+			@return ARP コンテキスト
+		*/
+		//-----------------------------------------------------------------//
+		ARP& at_arp() noexcept { return arp_; }
 
 
 		//-----------------------------------------------------------------//
