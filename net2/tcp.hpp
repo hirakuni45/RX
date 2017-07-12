@@ -56,14 +56,8 @@ namespace net {
 
 			listen_server,
 			syn_rcvd,
-			established_server,
-
 			syn_cent,
-			established_client,
-			fin_wait1,
-			fin_wait2,
-			time_wait,
-
+			established,
 			sync_close,
 			close,
 		};
@@ -71,6 +65,7 @@ namespace net {
 		enum class send_task : uint8_t {
 			idle,
 			sync_mac,
+			sync_ack,
 
 			main,
 
@@ -230,11 +225,8 @@ namespace net {
 
 			// 送信データを上乗せする場合
 			uint16_t send_len = 0;
-			bool recv_task = false;
-			if(ctx.recv_task_ == recv_task::established_server) recv_task = true;
-			else if(ctx.recv_task_ == recv_task::established_client) recv_task = true;
-
-			if(data && ctx.send_len_ == 0 && recv_task && ctx.send_task_ == send_task::main) {
+			if(data && ctx.send_len_ == 0
+				&& ctx.recv_task_ == recv_task::established && ctx.send_task_ == send_task::main) {
 
 				send_len = ctx.send_.length();
 				if(send_len > 0) {
@@ -359,6 +351,7 @@ namespace net {
 				}
 				break;
 
+			// サーバー、接続シーケンス
 			case recv_task::syn_rcvd:
 // utils::format("(SYN) RECV:   SEQ: 0x%08X, ACK: 0x%08X (%d)\n") % ctx.recv_seq_ % ctx.recv_ack_ % recv_len;
 // utils::format("(SYN) SERVER: SEQ: 0x%08X, ACK: 0x%08X\n") % ctx.send_seq_ % ctx.send_ack_;
@@ -368,7 +361,7 @@ namespace net {
 					ctx.net_time_ref_ = delta_time_(ctx.timer_ref_);
 					if(ctx.net_time_ref_ == 0) ++ctx.net_time_ref_;  // ０の場合、最低値を設定
 					++ctx.send_seq_;
-					ctx.recv_task_ = recv_task::established_server;
+					ctx.recv_task_ = recv_task::established;
 				} else {
 					++ctx.timeout_;
 					if(ctx.timeout_ >= SYN_TIMEOUT) {
@@ -385,8 +378,28 @@ namespace net {
 				}
 				break;
 
-			case recv_task::established_server:
-			case recv_task::established_client:
+
+			// クライアント、接続シーケンス
+			case recv_task::syn_cent:
+// utils::format("(SYN_CENT) RECV: SEQ: 0x%08X, ACK: 0x%08X (%d)\n") % ctx.recv_seq_ % ctx.recv_ack_ % recv_len;
+// utils::format("(SYN_CENT) SEND: SEQ: 0x%08X, ACK: 0x%08X\n") % ctx.send_seq_ % ctx.send_ack_;
+				if(tcp->get_flag_ack() && tcp->get_flag_syn() && ctx.recv_ack_ == (ctx.send_seq_ + 1)) {
+					ctx.net_time_ref_ = delta_time_(ctx.timer_ref_);
+					if(ctx.net_time_ref_ == 0) ++ctx.net_time_ref_;  // ０の場合、最低値を設定
+					ctx.send_ack_ = ctx.recv_seq_ + 1;
+					++ctx.send_seq_;
+					send = true;
+					ctx.flags_ |= tcp_h::MASK_ACK;
+					ctx.recv_task_ = recv_task::established;
+				}
+				if(ctx.recv_fin_) {
+					send = true;
+					ctx.flags_ |= tcp_h::MASK_ACK;
+					ctx.recv_task_ = recv_task::sync_close;
+				}
+				break;
+
+			case recv_task::established:
 // utils::format("(EST) RECV:   SEQ: 0x%08X, ACK: 0x%08X (%d)\n") % ctx.recv_seq_ % ctx.recv_ack_ % recv_len;
 // utils::format("(EST) SERVER: SEQ: 0x%08X, ACK: 0x%08X (%d)\n") % ctx.send_seq_ % ctx.send_ack_ % ctx.send_len_;
 				if(tcp->get_flag_ack()) {
@@ -451,25 +464,6 @@ namespace net {
 				}
 				break;
 
-			case recv_task::syn_cent:
-// utils::format("(SYN_CENT) RECV: SEQ: 0x%08X, ACK: 0x%08X (%d)\n") % ctx.recv_seq_ % ctx.recv_ack_ % recv_len;
-// utils::format("(SYN_CENT) SEND: SEQ: 0x%08X, ACK: 0x%08X\n") % ctx.send_seq_ % ctx.send_ack_;
-				if(tcp->get_flag_ack() && tcp->get_flag_syn() && ctx.recv_ack_ == (ctx.send_seq_ + 1)) {
-					ctx.net_time_ref_ = delta_time_(ctx.timer_ref_);
-					if(ctx.net_time_ref_ == 0) ++ctx.net_time_ref_;  // ０の場合、最低値を設定
-					ctx.send_ack_ = ctx.recv_seq_ + 1;
-					++ctx.send_seq_;
-					send = true;
-					ctx.flags_ |= tcp_h::MASK_ACK;
-					ctx.recv_task_ = recv_task::established_client;
-				}
-				if(ctx.recv_fin_) {
-					send = true;
-					ctx.flags_ |= tcp_h::MASK_ACK;
-					ctx.recv_task_ = recv_task::sync_close;
-				}
-				break;
-
 			case recv_task::sync_close:
 // debug_format("sync_close (Recv Len: %d)\n") % recv_len;
 // utils::format("RECV:      SEQ: 0x%08X, ACK: 0x%08X\n") % ctx.recv_seq_ % ctx.recv_ack_;
@@ -512,8 +506,7 @@ namespace net {
 
 		void send_(context& ctx)
 		{
-			if(ctx.recv_task_ == recv_task::established_server) ;
-			else if(ctx.recv_task_ == recv_task::established_client) ;
+			if(ctx.recv_task_ == recv_task::established) ;
 			else return;
 
 			if(ctx.send_len_ > 0) {
@@ -558,9 +551,9 @@ namespace net {
 // dump(t->eh_);
 // dump(t->ipv4_);
 // dump(t->tcp_);
-				char* str = static_cast<char*>(t->next(t));
-				str[len] = 0;
-				utils::format("Send: '%s' (%d)\n") % str % len;
+//				char* str = static_cast<char*>(t->next(t));
+//				str[len] = 0;
+//				utils::format("Send: '%s' (%d)\n") % str % len;
 			}
 
 			ctx.flags_ = flags;
@@ -689,7 +682,10 @@ namespace net {
 			} else {
 				ctx.recv_task_ = recv_task::idle;
 				if(common_.check_mac(ctx, info_)) {
-					ctx.send_task_ = send_task::main;
+					ctx.recv_task_ = recv_task::syn_cent;
+					send_flags_(ctx, tcp_h::MASK_SYN);
+					ctx.send_wait_ = make_send_wait_();
+					ctx.send_task_ = send_task::sync_ack;
 				} else {
 					ctx.request_ip_ = true;
 					ctx.send_task_ = send_task::sync_mac;
@@ -731,11 +727,7 @@ namespace net {
 			if(!common_.get_blocks().is_alloc(idx)) return false;
 
 			const context& ctx = common_.get_blocks().get(idx);
-			if(ctx.server_) {
-				return ctx.recv_task_ == recv_task::established_server;
-			} else {
-				return ctx.recv_task_ == recv_task::established_client;
-			}
+			return ctx.recv_task_ == recv_task::established;
 		}
 
 
@@ -783,6 +775,31 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		uint16_t get_port(int desc) const
+		{
+			static ip_adrs tmp;
+			uint32_t idx = static_cast<uint32_t>(desc);
+			if(!common_.get_blocks().is_alloc(idx)) return tmp;
+
+			const context& ctx = common_.get_blocks().get(idx);
+			if(ctx.server_) {
+				return ctx.src_port_;
+			} else {
+				return ctx.dst_port_;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  内部接続ポートの取得（内部動作で接続するポート番号）@n
+					・サーバーでは、クライアントが決定したポート番号を使う @n
+					・クライアントでは、自分で、ポート番号を決定する @n
+					※ポート番号は、４９１５２～６５５３５となる
+			@param[in]	desc	ディスクリプタ
+			@return 内部接続ポート
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_internal_port(int desc) const
 		{
 			static ip_adrs tmp;
 			uint32_t idx = static_cast<uint32_t>(desc);
@@ -951,10 +968,25 @@ namespace net {
 						debug_format("TCP sync_mac OK\n");
 						ctx.recv_task_ = recv_task::syn_cent;
 						send_flags_(ctx, tcp_h::MASK_SYN);
-						ctx.send_task_ = send_task::main;
+						ctx.send_wait_ = make_send_wait_();
+						ctx.send_task_ = send_task::sync_ack;
 					} else if(ctx.request_ip_) {
 						ctx.request_ip_ = false;
 						arp.request(ctx.adrs_);
+					}
+					break;
+
+				case send_task::sync_ack:  // SYN に対する ACK の受信確認
+					if(ctx.recv_task_ == recv_task::syn_cent) {
+						if(ctx.send_wait_ > 0) {
+							--ctx.send_wait_;
+						} else {  // 時間内に「ACK」が確認出来ない場合、「SYN」を再送する
+///							debug_format("TCP Client SYN send\n");
+							send_flags_(ctx, tcp_h::MASK_SYN);
+							ctx.send_wait_ = make_send_wait_();
+						}
+					} else {
+						ctx.send_task_ = send_task::main;
 					}
 					break;
 
