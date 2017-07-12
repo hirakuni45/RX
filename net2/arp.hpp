@@ -20,8 +20,15 @@ namespace net {
 	template<class ETHD>
 	class arp {
 
-		static const uint16_t ARP_REQUEST_WAIT = 200;   ///< 2 sec
+		static const uint16_t ARP_REQUEST_WAIT = 100;   ///< 1 sec
 		static const uint16_t ARP_REQUEST_NUM  = 5;     ///< 5 times
+
+		ETHD&		ethd_;
+
+		net_info&	info_;
+
+		typedef utils::fixed_fifo<arp_info, 8> ARP_BUFF;
+		ARP_BUFF	arp_buff_;
 
 		struct arp_h {
 			uint8_t	head[8];
@@ -31,21 +38,15 @@ namespace net {
 			uint8_t dst_ipa[4];
 		} __attribute__((__packed__));
 
-		net_info&	info_;
-
-		typedef utils::fixed_fifo<arp_info, 8> ARP_BUFF;
-		ARP_BUFF	arp_buff_;
-
-		struct arp_send_t {
+		struct arp_frame {
 			eth_h	eh_;
 			arp_h	arp_;
 		} __attribute__((__packed__));
-		typedef utils::fixed_fifo<arp_send_t, 4> ARP_SEND;
-		ARP_SEND	arp_send_;
 
 		ip_adrs		req_ipa_;
 		uint16_t	req_wait_;
 		uint16_t	req_num_;
+
 
 		static const uint8_t* get_arp_head7()
 		{
@@ -69,14 +70,68 @@ namespace net {
 			utils::format("  dst: %s, %s\n") % tools::mac_str(arp.dst_mac) % tools::ip_str(arp.dst_ipa);
 		}
 
+
+		void send_arp_(const arp_frame& t)
+		{
+			void* dst;
+			uint16_t dlen;
+			if(ethd_.send_buff(&dst, dlen) != 0) {
+				utils::format("ARP: ether send_buff error\n");
+				return;
+			}
+
+			uint32_t all = sizeof(arp_frame);
+			std::memcpy(dst, &t, all);
+
+			uint8_t* p = reinterpret_cast<uint8_t*>(&dst);
+			p += all;
+
+			// ６０バイトに満たない場合は、ダミー・データ（０）を追加する。
+			while(all < 60) {
+				*p++ = 0;
+				++all;
+			}
+			ethd_.send(all);
+
+//			dump(eh);
+//			dump_(arp);
+		}
+
+
+		bool request_sub_(const ip_adrs& ipa)
+		{
+			arp_frame t;
+			t.eh_.set_dst(tools::get_brodcast_mac());
+			t.eh_.set_src(info_.mac);
+			t.eh_.set_type(eth_type::ARP);
+
+			std::memcpy(t.arp_.head, get_arp_head7(), 7);
+			t.arp_.head[7] = 0x01;  // request
+			std::memcpy(t.arp_.src_mac, info_.mac, 6);
+			std::memcpy(t.arp_.src_ipa, info_.ip.get(), 4);
+			std::memset(t.arp_.dst_mac, 0x00, 6);
+			std::memcpy(t.arp_.dst_ipa, ipa.get(), 4);
+
+			ethd_.enable_interrupt(false);
+			send_arp_(t);
+			ethd_.enable_interrupt();
+
+			utils::format("ARP request: %s\n") % ipa.c_str();
+
+			return true;
+		}
+
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
+			@param[in]	ethd	イーサーネット・ドライバー
 			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		arp(net_info& info) : info_(info), req_ipa_(), req_wait_(0), req_num_(0)
+		arp(ETHD& ethd, net_info& info) : ethd_(ethd), info_(info), arp_buff_(),
+			req_ipa_(), req_wait_(0), req_num_(0)
 		{ }
 
 
@@ -84,13 +139,12 @@ namespace net {
 		/*!
 			@brief  プロセス @n
 					※割り込み外から呼ぶ事は禁止
-			@param[in]	eth		イーサーネット・ドライバー
 			@param[in]	h		ヘッダー
 			@param[in]	top		先頭ポインター
 			@param[in]	len		長さ
 		*/
 		//-----------------------------------------------------------------//
-		bool process(ETHD& ethd, const eth_h& h, const void* top, int32_t len)
+		bool process(const eth_h& h, const void* top, int32_t len)
 		{
 			bool ret = false;
 			if(static_cast<size_t>(len) < sizeof(arp_h)) {
@@ -136,52 +190,27 @@ namespace net {
 					goto process_end;
 				}
 
+				arp_frame t;
+				t.eh_.set_dst(h.get_src());
+				t.eh_.set_src(info_.mac);
+				t.eh_.set_type(eth_type::ARP);
+
+				std::memcpy(t.arp_.head, get_arp_head7(), 7);
+				t.arp_.head[7] = 0x02;
+				std::memcpy(t.arp_.src_mac, info_.mac, 6);
+				std::memcpy(t.arp_.src_ipa, info_.ip.get(), 4);
+				std::memcpy(t.arp_.dst_mac, r.src_mac, 6);
+				std::memcpy(t.arp_.dst_ipa, r.src_ipa, 4);
+
+				send_arp_(t);
+
 //			utils::format("ARP: src: %s, dst: %s\n")
 //				% tools::ip_str(r.src_ipa)
 //				% tools::ip_str(r.dst_ipa);
-				void* dst;
-				uint16_t dlen;
-				if(ethd.send_buff(&dst, dlen) != 0) {
-					utils::format("ARP: ether send_buff error\n");
-					goto process_end;
-				}
-
-				eth_h& eh = *static_cast<eth_h*>(dst);
-				eh.set_dst(h.get_src());
-				eh.set_src(info_.mac);
-				eh.set_type(eth_type::ARP);
-
-   				arp_h& arp = *static_cast<arp_h*>(eth_h::next_ptr(dst));
-				std::memcpy(arp.head, get_arp_head7(), 7);
-				arp.head[7] = 0x02;
-				std::memcpy(arp.src_mac, info_.mac, 6);
-				std::memcpy(arp.src_ipa, info_.ip.get(), 4);
-				std::memcpy(arp.dst_mac, r.src_mac, 6);
-				std::memcpy(arp.dst_ipa, r.src_ipa, 4);
-
-//			dump(eh);
-//			dump_(arp);
-
-				ethd.send(sizeof(eth_h) + sizeof(arp_h));
 			}
 			ret = true;
 
 		process_end:
-
-			while(arp_send_.length() > 0) {
-				const arp_send_t& t = arp_send_.get_at();
-
-				void* dst;
-				uint16_t dlen;
-				if(ethd.send_buff(&dst, dlen) != 0) {
-					utils::format("ARP: ether send_buff error\n");
-					return false;
-				}
-				std::memcpy(dst, &t, sizeof(arp_send_t));
-				ethd.send(sizeof(arp_send_t));
-
-				arp_send_.get_go();
-			}
 
 			return ret;
 		}
@@ -196,25 +225,13 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool request(const ip_adrs& ipa)
 		{
-			arp_send_t& t = arp_send_.put_at();
-
-			t.eh_.set_dst(tools::get_brodcast_mac());
-			t.eh_.set_src(info_.mac);
-			t.eh_.set_type(eth_type::ARP);
-
-			std::memcpy(t.arp_.head, get_arp_head7(), 7);
-			t.arp_.head[7] = 0x01;  // request
-			std::memcpy(t.arp_.src_mac, info_.mac, 6);
-			std::memcpy(t.arp_.src_ipa, info_.ip.get(), 4);
-			std::memset(t.arp_.dst_mac, 0x00, 6);
-			std::memcpy(t.arp_.dst_ipa, ipa.get(), 4);
-
-			arp_send_.put_go();
+			if(!req_ipa_.is_any()) return false;
 
 			req_ipa_   = ipa;
 			req_wait_  = ARP_REQUEST_WAIT;
 			req_num_   = ARP_REQUEST_NUM;
-			utils::format("ARP request: %s\n") % ipa.c_str();
+
+			request_sub_(ipa);
 
 			return true;
 		}
@@ -233,14 +250,18 @@ namespace net {
 				arp_buff_.get_go();
 			}
 
-			if(req_wait_) {
-				--req_wait_;
-			} else if(req_num_) {
-				--req_num_;
-				auto n = info_.at_cash().lookup(req_ipa_);
-				if(n >= info_.at_cash().capacity()) {
+			if(req_ipa_.is_any()) return;
+
+			auto idx = info_.at_cash().lookup(req_ipa_);
+			if(info_.at_cash().is_valid(idx)) {
+				req_ipa_.set(0);
+			} else {
+				if(req_wait_) {
+					--req_wait_;
+				} else if(req_num_) {
+					--req_num_;
 					req_wait_ = ARP_REQUEST_WAIT;
-					request(req_ipa_);
+					request_sub_(req_ipa_);
 				}
 			}
 		}
