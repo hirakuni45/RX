@@ -7,6 +7,7 @@
 */
 //=========================================================================//
 #include "net2/net_st.hpp"
+#include "net2/arp.hpp"
 #include "common/fixed_block.hpp"
 
 #define TCP_DEBUG
@@ -26,7 +27,10 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class ETHD, uint32_t NMAX>
 	class tcp {
+	public:
+		typedef arp<ETHD> ARP;
 
+	private:
 #ifndef TCP_DEBUG
 		typedef utils::null_format debug_format;
 #else
@@ -80,8 +84,8 @@ namespace net {
 		struct context {
 			ip_adrs		adrs_;
 			uint8_t		mac_[6];
-			uint16_t	cn_port_;
-			uint16_t	port_;
+			uint16_t	src_port_;
+			uint16_t	dst_port_;
 			uint16_t	send_time_;
 
 			// IPV4 関係
@@ -115,13 +119,20 @@ namespace net {
 			volatile bool		recv_fin_;
 			volatile bool		send_fin_;
 			bool	close_req_;
+			bool	request_ip_;
+
 
 			void reset(const ip_adrs& adrs, uint16_t port, bool server)
 			{
 				adrs_ = adrs;
 				std::memset(mac_, 0x00, 6);
-				cn_port_ = port;
-				port_ = 0;  // 初期は「０」
+				if(server) {
+					src_port_ = port;
+					dst_port_ = 0;  // 初期は「０」
+				} else {
+					src_port_ = tools::random_port();
+					dst_port_ = port;
+				}
 				send_time_ = 0;
 				
 				send_max_ = SEND_MAX;  // 通常の最大転送バイト
@@ -157,6 +168,7 @@ namespace net {
 				send_fin_ = false;
 
 				close_req_ = false;
+				request_ip_ = false;
 			}
 		};
 
@@ -218,8 +230,12 @@ namespace net {
 
 			// 送信データを上乗せする場合
 			uint16_t send_len = 0;
-			if(data && ctx.send_len_ == 0 && ctx.recv_task_ == recv_task::established_server
-			  && ctx.send_task_ == send_task::main) {
+			bool recv_task = false;
+			if(ctx.recv_task_ == recv_task::established_server) recv_task = true;
+			else if(ctx.recv_task_ == recv_task::established_client) recv_task = true;
+
+			if(data && ctx.send_len_ == 0 && recv_task && ctx.send_task_ == send_task::main) {
+
 				send_len = ctx.send_.length();
 				if(send_len > 0) {
 					uint16_t max_len = ctx.send_max_ - sizeof(frame_t);
@@ -250,8 +266,8 @@ namespace net {
 			t.ipv4_.set_csum(tools::calc_sum(&t.ipv4_, sizeof(ipv4_h)));
 
 			uint16_t tcp_len = all - sizeof(eth_h) - sizeof(ipv4_h);
-			t.tcp_.set_src_port(ctx.cn_port_);
-			t.tcp_.set_dst_port(ctx.port_);
+			t.tcp_.set_src_port(ctx.src_port_);
+			t.tcp_.set_dst_port(ctx.dst_port_);
 			t.tcp_.set_seq(ctx.send_seq_);
 			t.tcp_.set_ack(ctx.send_ack_);
 			t.tcp_.set_length(tcp_len - send_len);  // TCP Header Length
@@ -316,6 +332,8 @@ namespace net {
 			ctx.recv_ack_ = tcp->get_ack();
 			ctx.recv_fin_ = tcp->get_flag_fin(); 
 
+// dump(*tcp);
+
 			switch(ctx.recv_task_) {
 
 			case recv_task::listen_server:
@@ -368,6 +386,7 @@ namespace net {
 				break;
 
 			case recv_task::established_server:
+			case recv_task::established_client:
 // utils::format("(EST) RECV:   SEQ: 0x%08X, ACK: 0x%08X (%d)\n") % ctx.recv_seq_ % ctx.recv_ack_ % recv_len;
 // utils::format("(EST) SERVER: SEQ: 0x%08X, ACK: 0x%08X (%d)\n") % ctx.send_seq_ % ctx.send_ack_ % ctx.send_len_;
 				if(tcp->get_flag_ack()) {
@@ -433,11 +452,23 @@ namespace net {
 				break;
 
 			case recv_task::syn_cent:
-
-
+// utils::format("(SYN_CENT) RECV: SEQ: 0x%08X, ACK: 0x%08X (%d)\n") % ctx.recv_seq_ % ctx.recv_ack_ % recv_len;
+// utils::format("(SYN_CENT) SEND: SEQ: 0x%08X, ACK: 0x%08X\n") % ctx.send_seq_ % ctx.send_ack_;
+				if(tcp->get_flag_ack() && tcp->get_flag_syn() && ctx.recv_ack_ == (ctx.send_seq_ + 1)) {
+					ctx.net_time_ref_ = delta_time_(ctx.timer_ref_);
+					if(ctx.net_time_ref_ == 0) ++ctx.net_time_ref_;  // ０の場合、最低値を設定
+					ctx.send_ack_ = ctx.recv_seq_ + 1;
+					++ctx.send_seq_;
+					send = true;
+					ctx.flags_ |= tcp_h::MASK_ACK;
+					ctx.recv_task_ = recv_task::established_client;
+				}
+				if(ctx.recv_fin_) {
+					send = true;
+					ctx.flags_ |= tcp_h::MASK_ACK;
+					ctx.recv_task_ = recv_task::sync_close;
+				}
 				break;
-
-
 
 			case recv_task::sync_close:
 // debug_format("sync_close (Recv Len: %d)\n") % recv_len;
@@ -458,9 +489,6 @@ namespace net {
 				if(tcp->get_flag_psh()) {
 					debug_format("sync_close PSH (Recv Len: %d)\n") % recv_len;
 				}
-				break;
-
-			case recv_task::established_client:
 				break;
 
 			case recv_task::close:
@@ -484,9 +512,9 @@ namespace net {
 
 		void send_(context& ctx)
 		{
-			if(ctx.recv_task_ != recv_task::established_server) {
-				return;
-			}
+			if(ctx.recv_task_ == recv_task::established_server) ;
+			else if(ctx.recv_task_ == recv_task::established_client) ;
+			else return;
 
 			if(ctx.send_len_ > 0) {
 
@@ -548,14 +576,9 @@ namespace net {
 
 			frame_t* t = get_send_frame_();
 			if(t != nullptr) {
-///				debug_format("Send FIN at out of INTR\n");
 				ctx.flags_ = flags;
 				auto all = make_seg_(ctx, ctx.mac_, ctx.adrs_.get(), *t, false);
 				ethd_.send(all);
-				ctx.send_fin_ = true;
-				if(ctx.recv_task_ != recv_task::close) {
-				   	ctx.recv_task_ = recv_task::sync_close;  // FIN に対する ACK を待つ
-				}
 			}
 
 			ethd_.enable_interrupt();
@@ -630,7 +653,7 @@ namespace net {
 			for(uint32_t i = 0; i < NMAX; ++i) {
 				if(!common_.at_blocks().is_alloc(i)) continue;
 				const context& ctx = common_.get_blocks().get(i);
-				if(ctx.cn_port_ == port) {
+				if(ctx.dst_port_ == port) {
 					auto st = net_state::EVEN_PORT;
 					if(last_state_ != st) {
 						debug_format("TCP Open fail even port as: %d\n") % port;
@@ -665,7 +688,12 @@ namespace net {
 				ctx.send_task_ = send_task::main;
 			} else {
 				ctx.recv_task_ = recv_task::idle;
-				ctx.send_task_ = send_task::sync_mac;
+				if(common_.check_mac(ctx, info_)) {
+					ctx.send_task_ = send_task::main;
+				} else {
+					ctx.request_ip_ = true;
+					ctx.send_task_ = send_task::sync_mac;
+				}
 			}
 
 			common_.at_blocks().unlock(idx);
@@ -761,7 +789,11 @@ namespace net {
 			if(!common_.get_blocks().is_alloc(idx)) return tmp;
 
 			const context& ctx = common_.get_blocks().get(idx);
-			return ctx.cn_port_;			
+			if(ctx.server_) {
+				return ctx.dst_port_;
+			} else {
+				return ctx.src_port_;
+			}
 		}
 
 
@@ -835,6 +867,10 @@ namespace net {
 			context& ctx = common_.at_blocks().at(idx);
 
 			if(!ctx.send_fin_) {  // FIN を送っていない
+				ctx.send_fin_ = true;
+				if(ctx.recv_task_ != recv_task::close) {
+				   	ctx.recv_task_ = recv_task::sync_close;  // FIN に対する ACK を待つ
+				}
 				send_flags_(ctx, tcp_h::MASK_FIN);
 			}
 			ctx.close_req_ = true;
@@ -872,16 +908,21 @@ namespace net {
 				if(!ctx.adrs_.is_any() && ctx.adrs_ != ih.get_src_ipa()) continue; 
 
 				// ポート番号の確認
-				if(ctx.port_ != 0) {
-					if(ctx.port_ != tcp->get_src_port()) {
+				if(ctx.server_) {
+					if(ctx.dst_port_ != 0) {
+						if(ctx.dst_port_ != tcp->get_src_port()) {
+							continue;
+						}
+					} else {
+						ctx.dst_port_ = tcp->get_src_port();
+						debug_format("TCP First Connection dst_port: %d\n") % ctx.dst_port_;
+					}
+					if(ctx.src_port_ != tcp->get_dst_port()) {
 						continue;
 					}
 				} else {
-					ctx.port_ = tcp->get_src_port();
-					debug_format("TCP connection key port: %d\n") % ctx.port_;
-				}
-				if(ctx.cn_port_ != tcp->get_dst_port()) {
-					continue;
+					if(ctx.src_port_ != tcp->get_dst_port()) continue;
+					if(ctx.dst_port_ != tcp->get_src_port()) continue;
 				}
 
 				return recv_(ctx, eh, ih, tcp);
@@ -894,9 +935,10 @@ namespace net {
 		/*!
 			@brief  サービス（１０ｍｓ毎に呼ぶ）@n
 					※割り込み外から呼ぶ事
+			@param[in]	arp	ARP コンテキスト
 		*/
 		//-----------------------------------------------------------------//
-		void service() noexcept
+		void service(ARP& arp) noexcept
 		{
 			for(uint32_t i = 0; i < NMAX; ++i) {
 
@@ -906,9 +948,13 @@ namespace net {
 				switch(ctx.send_task_) {
 				case send_task::sync_mac:
 					if(common_.check_mac(ctx, info_)) {
+						debug_format("TCP sync_mac OK\n");
 						ctx.recv_task_ = recv_task::syn_cent;
 						send_flags_(ctx, tcp_h::MASK_SYN);
 						ctx.send_task_ = send_task::main;
+					} else if(ctx.request_ip_) {
+						ctx.request_ip_ = false;
+						arp.request(ctx.adrs_);
 					}
 					break;
 
