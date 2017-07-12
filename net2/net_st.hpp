@@ -92,7 +92,8 @@ namespace net {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		net_info() : mac{ 0 }, ip(), mask(), gw(), dns(), dns2(), cash_() { }
+		net_info() noexcept : mac{ 0 }, ip(), mask(), gw(), dns(), dns2(), cash_(),
+			share_() { }
 
 
 		//-----------------------------------------------------------------//
@@ -101,7 +102,7 @@ namespace net {
 			@return MAC キャッシュ
 		*/
 		//-----------------------------------------------------------------//
-		CASH& at_cash() { return cash_; }
+		CASH& at_cash() noexcept { return cash_; }
 
 
 		//-----------------------------------------------------------------//
@@ -110,7 +111,7 @@ namespace net {
 			@return MAC キャッシュ
 		*/
 		//-----------------------------------------------------------------//
-		const CASH& get_cash() const { return cash_; }
+		const CASH& get_cash() const noexcept { return cash_; }
 
 
 		//-----------------------------------------------------------------//
@@ -119,7 +120,7 @@ namespace net {
 			@return ネット共有コンテナ
 		*/
 		//-----------------------------------------------------------------//
-		net_share& at_share() { return share_; }
+		net_share& at_share() noexcept { return share_; }
 	};
 
 
