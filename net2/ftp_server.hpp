@@ -969,11 +969,15 @@ utils::format("Reconnection CTRL\n");
 				{
 					ip_adrs adrs;
 					bool server = true;
-					tcp.open(ip_adrs(), CTRL_PORT, server, ctrl_);
-					debug_format("Start FTP Server (CTRL): %s port(%d), desc(%d)\n")
-						% eth_.get_info().ip.c_str() % tcp.get_port(ctrl_) % ctrl_;
-					task_ = task::connection;
-					ctrl_format::chaout().set_desc(ctrl_);
+					net_state ret = tcp.open(ip_adrs(), CTRL_PORT, server, ctrl_);
+					if(ret == net_state::OK) {
+						debug_format("FTP Server start (CTRL): %s port(%d), desc(%d)\n")
+							% eth_.get_info().ip.c_str() % tcp.get_port(ctrl_) % ctrl_;
+						task_ = task::connection;
+						ctrl_format::chaout().set_desc(ctrl_);
+					} else {
+						debug_format("FTP Server open error (CTRL): '%s'\n") % get_state_str(ret);
+					}
 				}
 				break;
 
@@ -1045,12 +1049,16 @@ utils::format("Reconnection CTRL\n");
 				{
 					bool server = true;
 					ip_adrs adrs;
-					tcp.open(adrs, DATA_PORT_PASV, server, data_);
-					debug_format("Start FTP Server data (PASV): '%s' (%d) desc(%d)\n")
-						% eth_.get_info().ip.c_str() % tcp.get_port(data_) % data_;
-					data_connect_loop_ = data_connection_timeout_;
-					data_format::chaout().set_desc(data_);
-					task_ = task::data_connection;
+					net_state ret = tcp.open(adrs, DATA_PORT_PASV, server, data_);
+					if(ret == net_state::OK) {
+						debug_format("Start FTP Server data (PASV): '%s' (%d) desc(%d)\n")
+							% eth_.get_info().ip.c_str() % tcp.get_port(data_) % data_;
+						data_connect_loop_ = data_connection_timeout_;
+						data_format::chaout().set_desc(data_);
+						task_ = task::data_connection;
+					} else {
+						debug_format("Error FTP Server data (PASV) open: '%s'\n") % get_state_str(ret);
+					}
 				}
 				break;
 
@@ -1076,21 +1084,18 @@ utils::format("Reconnection CTRL\n");
 
 			case task::start_port:
 				{
-utils::format("Start PORT\n");
-					bool server = false;  // client connection
-#if 0
-					if(tcp.open(data_ip_, data_port_, server, port_)) {
+					bool server = false;
+					net_state ret = tcp.open(data_ip_, data_port_, server, port_);
+					if(ret == net_state::OK) {
 						debug_format("Start FTP Server data (PORT): '%s' (%d) desc(%d)\n")
 							% data_ip_.c_str() % data_port_ % port_;
 						data_connect_loop_ = data_connection_timeout_;
 						data_format::chaout().set_desc(port_);
 						task_ = task::port_connection;
 					} else {
-///
-						debug_format("Start FTP Server data open fail\n");
+						debug_format("Error FTP Server data (PORT) open: '%s'\n") % get_state_str(ret);
 ///						task_ = task::idle;
 					}
-#endif
 				}
 				break;
 
