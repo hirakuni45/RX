@@ -2,9 +2,11 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX64M グループ・ポート・マッピング @n
-			・ペリフェラル型に従って、ポートの設定をグループ化 @n
-			Copyright 2016, 2017 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+			・ペリフェラル型に従って、ポートの設定をグループ化 
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "RX600/port.hpp"
