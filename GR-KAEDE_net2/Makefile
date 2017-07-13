@@ -16,10 +16,7 @@ BUILD_ID	=	$(shell date +%Y%m%d%H)
 
 VPATH		=	../
 
-ASOURCES	=	common/start.s \
-				net/r_t4_rx/T4_src/checksum/rx/cksum_rx_little.s
-
-#				GR/core/driver/cksum_rx_little.s
+ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
@@ -42,8 +39,7 @@ MCU_TARGET	=
 
 INC_SYS		=
 
-INC_APP		=	. ../ ../RX64M \
-				../net ../net/r_config ../net/r_t4_rx/T4_src ../net/r_socket_rx/src
+INC_APP		=	. ../ ../RX64M ../net2
 
 OPTIMIZE	=	-Os
 
@@ -52,6 +48,7 @@ AS_OPT		=	-mcpu=rx600
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-maybe-uninitialized \
 				-mcpu=rx600 \
 				-fno-rtti \
 				-fno-exceptions \

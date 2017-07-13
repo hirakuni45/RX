@@ -59,8 +59,10 @@ namespace {
 	typedef net::net_main<ETHD, UDPN, TCPN> NET_MAIN;
 	NET_MAIN	net_(ethd_);
 
-	net::test_udp	test_udp_;
-	net::test_tcp	test_tcp_;
+	typedef net::test_udp TEST_UDP;
+	TEST_UDP	test_udp_;
+	typedef net::test_tcp TEST_TCP;
+	TEST_TCP	test_tcp_;
 
 	typedef net::http_server<NET_MAIN::ETHERNET, SDC> HTTP;
 	HTTP		http_(net_.at_ethernet(), sdc_);
@@ -71,7 +73,7 @@ namespace {
 	volatile bool putch_lock_ = false;
 	utils::fifo<uint8_t, 1024> putch_tmp_;
 
-	void servie_putch_tmp_()
+	void service_putch_tmp_()
 	{
 		ethd_.enable_interrupt(false);
 		while(putch_tmp_.length() > 0) {
@@ -345,13 +347,24 @@ int main(int argc, char** argv)
 //	test_udp_.enable();
 
 	// TCP test の許可
-//	test_tcp_.enable();
+//	test_tcp_.set_type(TEST_TCP::type::client_recv_first);
+//	test_tcp_.set_ip(net::ip_adrs(192, 168, 3, 7));
 
 	bool test_http = true;
 //	bool test_http = false;
 
-	bool test_ftps = true;
-//	bool test_ftps = false;
+//	bool test_ftps = true;
+	bool test_ftps = false;
+
+#if 0
+	HTTP::http_format::chaout().set_desc(0);
+	FTPS::ctrl_format::chaout().set_desc(1);
+	FTPS::data_format::chaout().set_desc(2);
+
+	utils::format("http desc: %d\n") % HTTP::http_format::chaout().get_desc();
+	utils::format("ftps ctrl desc: %d\n") % FTPS::ctrl_format::chaout().get_desc();
+	utils::format("ftps data desc: %d\n") % FTPS::data_format::chaout().get_desc();
+#endif
 
 	if(test_http) {  // HTTP サーバーの設定
 		http_.start("GR-KAEDE_net2 HTTP Server");
@@ -385,7 +398,7 @@ int main(int argc, char** argv)
 
 		sdc_.service();
 
-		servie_putch_tmp_();
+		service_putch_tmp_();
 
 		net_.service();
 
