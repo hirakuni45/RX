@@ -161,7 +161,7 @@ namespace net {
 
 			p->udp_.set_src_port(ctx.cn_port_);
 			if(ctx.port_ == 0) {
-				ctx.port_ = tools::random_port();
+				ctx.port_ = tools::connect_port();
 			}
 			p->udp_.set_dst_port(ctx.port_);
 			p->udp_.set_length(sizeof(udp_h) + len);

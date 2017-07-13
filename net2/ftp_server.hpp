@@ -101,13 +101,13 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ETHERNET, class SDC>
 	class ftp_server {
+	public:
+		static const uint32_t CTRL_BUFF_SIZE = 256;   ///< ctrl ポートで使うフォーマット・バッファサイズ
+		static const uint32_t DATA_BUFF_SIZE = 1024;  ///< data ポートで使うフォーマット・バッファサイズ
+		typedef utils::basic_format<desc_string<format_id::ftps_ctrl, CTRL_BUFF_SIZE> > ctrl_format;
+		typedef utils::basic_format<desc_string<format_id::ftps_data, DATA_BUFF_SIZE> > data_format;
 
-		typedef utils::basic_format<desc_string< 256> > ctrl_format;
-		typedef utils::basic_format<desc_string<1024> > data_format;
-
-		void ctrl_flush() { ctrl_format::chaout().flush(); }
-		void data_flush() { data_format::chaout().flush(); }
-
+	private:
 		static const uint32_t	login_timeout_    = 100 * 30;  ///< 30 sec.
 		static const uint32_t	transfer_timeout_ = 100 * 10;  ///< 10 sec.
 		static const uint32_t	data_connection_timeout_ = 100 * 10;  ///< 10 sec.
@@ -129,7 +129,6 @@ namespace net {
 
 		uint32_t		ctrl_;
 		uint32_t		data_;
-		uint32_t		port_;
 
 		enum class task {
 			begin,
@@ -183,9 +182,13 @@ namespace net {
 
 		bool		pasv_enable_;
 
-		static void disp_time_(time_t t)
+		void ctrl_flush() { ctrl_format::chaout().flush(); }
+		void data_flush() { data_format::chaout().flush(); }
+
+		void disp_time_(time_t t)
 		{
 			struct tm *m = localtime(&t);
+			ctrl_format::chaout().set_desc(ctrl_);
 			ctrl_format("%s %s %d %02d:%02d:%02d  %4d")
 				% get_wday(m->tm_wday)
 				% get_mon(m->tm_mon)
@@ -233,7 +236,7 @@ namespace net {
 		{
 			if(fi == nullptr) return;
 
-			data_format("%s\n") % name;
+			ctrl_format("%s\n") % name;
 		}
 
 
@@ -357,6 +360,7 @@ namespace net {
 			auto& ipv4 = eth_.at_ipv4();
 			auto& tcp  = ipv4.at_tcp();
 
+			ctrl_format::chaout().set_desc(ctrl_);
 			switch(cmd) {
 			case ftp_command::ABOR:
 				ctrl_format("226 Data connection closed\n");
@@ -417,12 +421,7 @@ namespace net {
 
 			case ftp_command::LIST:
 				{
-					bool con;
-					if(pasv_enable_) {
-						con = tcp.connected(data_);
-					} else {
-						con = tcp.connected(port_);
-					}
+					bool con = tcp.connected(data_);
 					if(!con) {
 						ctrl_format("425 No data connection\n");
 						ctrl_flush();
@@ -438,11 +437,7 @@ namespace net {
 						ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
 					}
 					ctrl_flush();
-					if(pasv_enable_) {
-						tcp.close(data_);
-					} else {
-						tcp.close(port_);
-					}
+					tcp.close(data_);
 				}
 				break;
 
@@ -467,12 +462,7 @@ namespace net {
 
 			case ftp_command::NLST:
 				{
-					bool con;
-					if(pasv_enable_) {
-						con = tcp.connected(data_);
-					} else {
-						con = tcp.connected(port_);
-					}
+					bool con = tcp.connected(data_);
 					if(!con) {
 						ctrl_format("425 No data connection\n");
 						ctrl_flush();
@@ -481,18 +471,16 @@ namespace net {
 					ctrl_format("150 Accepted data connection\n");
 					ctrl_flush();
 					if(sdc_.get_mount()) {
+						ctrl_format::chaout().set_desc(data_);
 						int n = sdc_.dir_loop("", dir_nlst_func_, true, nullptr);
-						data_flush();
+						ctrl_flush();
+						ctrl_format::chaout().set_desc(ctrl_);
 						ctrl_format("226 %d matches total\n") % n;
 					} else {
 						ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
 					}
 					ctrl_flush();
-					if(pasv_enable_) {
-						tcp.close(data_);
-					} else {
-						tcp.close(port_);
-					}
+					tcp.close(data_);
 				}
 				break;
 
@@ -585,11 +573,7 @@ namespace net {
 						task_ = task::close_port;
 						break;
 					}
-					if(pasv_enable_) {
-						ctrl_format("150-Connected to port %d\n") % data_;
-					} else {
-						ctrl_format("150-Connected to port %d\n") % port_;
-					}
+					ctrl_format("150-Connected to port %d\n") % data_;
 					ctrl_format("150 %u bytes to download\n") % fsz;
 					ctrl_flush();
 					file_total_ = 0;
@@ -728,11 +712,7 @@ namespace net {
 						task_ = task::close_port;
 						break;
 					}
-					if(pasv_enable_) {
-						ctrl_format("150 Connected to port %d\n") % data_;
-					} else {
-						ctrl_format("150 Connected to port %d\n") % port_;
-					}
+					ctrl_format("150 Connected to port %d\n") % data_;
 					ctrl_flush();
 					file_total_ = 0;
 					file_frame_ = 0;
@@ -825,12 +805,7 @@ namespace net {
 
 			case ftp_command::MLSD:
 				{
-					bool con;
-					if(pasv_enable_) {
-						con = tcp.connected(data_);
-					} else {
-						con = tcp.connected(port_);
-					}
+					bool con = tcp.connected(data_);
 				    if(!con) {
 						ctrl_format("425 No data connection\n");
 						ctrl_flush();
@@ -838,8 +813,10 @@ namespace net {
 						ctrl_format("150 Accepted data connection\n");
 						ctrl_flush();
 						if(sdc_.get_mount()) {
+							ctrl_format::chaout().set_desc(data_);
 							int n = sdc_.dir_loop("", dir_mlsd_func_, true, nullptr);
-							data_flush();
+							ctrl_flush();
+							ctrl_format::chaout().set_desc(ctrl_);
 							ctrl_format("226-options: -a -l\n");
 							ctrl_format("226 %d matches total\n") % n;
 						} else {
@@ -847,11 +824,7 @@ namespace net {
 						}
 						ctrl_flush();
 					}
-					if(pasv_enable_) {
-						tcp.close(data_);
-					} else {
-						tcp.close(port_);
-					}
+					tcp.close(data_);
 #if 0
 					if(task_ == task::command) {
 utils::format("Reconnection CTRL\n");
@@ -916,7 +889,7 @@ utils::format("Reconnection CTRL\n");
 		*/
 		//-----------------------------------------------------------------//
         ftp_server(ETHERNET& eth, SDC& sdc) : eth_(eth), sdc_(sdc),
-			ctrl_(ETHERNET::TCP_OPEN_MAX), data_(ETHERNET::TCP_OPEN_MAX), port_(ETHERNET::TCP_OPEN_MAX),
+			ctrl_(ETHERNET::TCP_OPEN_MAX), data_(ETHERNET::TCP_OPEN_MAX),
 			task_(task::begin), line_man_('\n'),
 			user_{ 0 }, pass_{ 0 }, time_out_(0), delay_loop_(0),
 			param_(nullptr), data_ip_(), data_port_(0),
@@ -949,8 +922,8 @@ utils::format("Reconnection CTRL\n");
 
 			task_ = task::begin;
 
-			ctrl_format::chaout().set_desc(ETHERNET::TCP_OPEN_MAX);
-			data_format::chaout().set_desc(ETHERNET::TCP_OPEN_MAX);
+//			ctrl_format::chaout().set_desc(ETHERNET::TCP_OPEN_MAX);
+//			data_format::chaout().set_desc(ETHERNET::TCP_OPEN_MAX);
 		}
 
 
@@ -1051,7 +1024,7 @@ utils::format("Reconnection CTRL\n");
 					ip_adrs adrs;
 					net_state ret = tcp.open(adrs, DATA_PORT_PASV, server, data_);
 					if(ret == net_state::OK) {
-						debug_format("Start FTP Server data (PASV): '%s' (%d) desc(%d)\n")
+						debug_format("FTP Server data start (PASV): '%s' (%d) desc(%d)\n")
 							% eth_.get_info().ip.c_str() % tcp.get_port(data_) % data_;
 						data_connect_loop_ = data_connection_timeout_;
 						data_format::chaout().set_desc(data_);
@@ -1085,12 +1058,12 @@ utils::format("Reconnection CTRL\n");
 			case task::start_port:
 				{
 					bool server = false;
-					net_state ret = tcp.open(data_ip_, data_port_, server, port_);
+					net_state ret = tcp.open(data_ip_, data_port_, server, data_);
 					if(ret == net_state::OK) {
-						debug_format("Start FTP Server data (PORT): '%s' (%d) desc(%d)\n")
-							% data_ip_.c_str() % data_port_ % port_;
+						debug_format("FTP Server data start (PORT): '%s' (%d) desc(%d)\n")
+							% data_ip_.c_str() % data_port_ % data_;
 						data_connect_loop_ = data_connection_timeout_;
-						data_format::chaout().set_desc(port_);
+						data_format::chaout().set_desc(data_);
 						task_ = task::port_connection;
 					} else {
 						debug_format("Error FTP Server data (PORT) open: '%s'\n") % get_state_str(ret);
@@ -1107,11 +1080,11 @@ utils::format("Reconnection CTRL\n");
 					ctrl_flush();
 					task_ = task::command;
 				}
-				if(tcp.connected(port_)) {
+				if(tcp.connected(data_)) {
 					debug_format("Connection FTP Server data (PORT): '%s' %d [ms] (%d)\n")
-						% tcp.get_ip(port_).c_str()
+						% tcp.get_ip(data_).c_str()
 						% static_cast<int>(data_connection_timeout_ - data_connect_loop_)
-						% tcp.get_port(port_);
+						% tcp.get_port(data_);
 					task_ = task::command;
 					line_man_.clear();
 					pasv_enable_ = false;
@@ -1124,11 +1097,7 @@ utils::format("Reconnection CTRL\n");
 				{
 					uint32_t sz = fread(rw_buf_, 1, sizeof(rw_buf_), file_fp_);
 					if(sz > 0) {
-						if(pasv_enable_) {
-							tcp.send(data_, rw_buf_, sz);
-						} else {
-							tcp.send(port_, rw_buf_, sz);
-						}
+						tcp.send(data_, rw_buf_, sz);
 						file_total_ += sz;
 						file_wait_ = 0;
 					} else {
@@ -1141,11 +1110,7 @@ utils::format("Reconnection CTRL\n");
 						ctrl_flush();
 						fclose(file_fp_);
 						file_fp_ = nullptr;
-						if(pasv_enable_) {
-							tcp.close(data_);
-						} else {
-							tcp.close(port_);
-						}
+						tcp.close(data_);
 						task_ = task::command;
 						debug_format("Data send %u Bytes, %u Kbytes/Sec\n") % file_total_ % krate;
 						break;
@@ -1155,11 +1120,7 @@ utils::format("Reconnection CTRL\n");
 						ctrl_flush();
 						fclose(file_fp_);
 						file_fp_ = nullptr;
-						if(pasv_enable_) {
-							tcp.close(data_);
-						} else {
-							tcp.close(port_);
-						}
+						tcp.close(data_);
 						debug_format("Data send timeout\n");
 						task_ = task::command;
 					}
@@ -1169,12 +1130,7 @@ utils::format("Reconnection CTRL\n");
 			//--------------------------//
 			case task::recv_file:
 				{
-					int32_t sz;
-					if(pasv_enable_) {
-						sz = tcp.recv(data_, rw_buf_, sizeof(rw_buf_));
-					} else {
-						sz = tcp.recv(port_, rw_buf_, sizeof(rw_buf_));
-					}
+					int sz = tcp.recv(data_, rw_buf_, sizeof(rw_buf_));
 					if(sz > 0) {
 						fwrite(rw_buf_, 1, sz, file_fp_);
 						file_total_ += sz;
@@ -1183,20 +1139,14 @@ utils::format("Reconnection CTRL\n");
 						++file_wait_;
 					}
 					++file_frame_;
-					bool con;
-					if(pasv_enable_) con = tcp.connected(data_);
-					else con = tcp.connected(port_);
+					bool con = tcp.connected(data_);
 					if(!con || sz < 0) {
 						uint32_t krate = file_total_ * 100 / file_frame_ / 1024;
 						ctrl_format("226 File successfully transferred (%u KBytes/Sec)\n") % krate;
 						ctrl_flush();
 						fclose(file_fp_);
 						file_fp_ = nullptr;
-						if(pasv_enable_) {
-							tcp.close(data_);
-						} else {
-							tcp.close(port_);
-						}
+						tcp.close(data_);
 						debug_format("Data recv %u Bytes, %u Kbytes/Sec\n") % file_total_ % krate;
 						task_ = task::command;
 						break;
@@ -1206,11 +1156,7 @@ utils::format("Reconnection CTRL\n");
 						ctrl_flush();
 						fclose(file_fp_);
 						file_fp_ = nullptr;
-						if(pasv_enable_) {
-							tcp.close(data_);
-						} else {
-							tcp.close(port_);
-						}
+						tcp.close(data_);
 						debug_format("Data recv timeout\n");
 						task_ = task::command;
 					}
@@ -1218,11 +1164,7 @@ utils::format("Reconnection CTRL\n");
 				break;
 
 			case task::close_port:
-				if(pasv_enable_) {
-					tcp.close(data_);
-				} else {
-					tcp.close(port_);
-				}
+				tcp.close(data_);
 				task_ = task::command;
 				break;
 
@@ -1231,11 +1173,7 @@ utils::format("Reconnection CTRL\n");
 				{
 					uint8_t tmp[256];
 					int32_t rds;
-					if(pasv_enable_) {
-						rds = tcp.recv(data_, tmp, sizeof(tmp));
-					} else {
-						rds = tcp.recv(port_, tmp, sizeof(tmp));
-					}
+					rds = tcp.recv(data_, tmp, sizeof(tmp));
 					if(rds > 0) {
 
 					}

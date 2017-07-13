@@ -36,7 +36,8 @@ namespace net {
 	class http_server {
 	public:
 		typedef utils::line_manage<2048, 20> LINE_MAN;
-		typedef utils::basic_format<desc_string<MAX_SIZE> > http_format;
+
+		typedef utils::basic_format<desc_string<format_id::http, MAX_SIZE> > http_format;
 
 		typedef std::function< void () > http_task_type;
 
@@ -78,6 +79,7 @@ namespace net {
 
 		uint32_t		count_;
 		uint32_t		disconnect_loop_;
+		uint32_t		delay_loop_;
 
 		struct link_t {
 			const char*	path_;
@@ -101,6 +103,7 @@ namespace net {
 			wait_http,
 			main_loop,
 			disconnect_delay,
+			delay_begin,
 			disconnect,
 		};
 		task		task_;
@@ -111,7 +114,6 @@ namespace net {
 
 		bool			favicon_;
 		bool			other_link_;
-
 
 		static void get_path_(const char* src, char* dst) {
 			int n = 0;
@@ -171,7 +173,7 @@ namespace net {
 		http_server(ETHERNET& eth, SDC& sdc) : eth_(eth), sdc_(sdc),
 			line_man_(0x0a), desc_(ETHERNET::TCP_OPEN_MAX),
 			last_modified_(0), server_name_{ 0 }, timeout_(15), max_(60),
-			count_(0), disconnect_loop_(0),
+			count_(0), disconnect_loop_(0), delay_loop_(0),
 			link_num_(0), link_{ },
 			task_(task::none),
 			back_color_(255, 255, 255), fore_color_(0, 0, 0),
@@ -231,14 +233,10 @@ namespace net {
 
 			last_modified_ = get_time();
 
-///			http_format::chaout().set_desc();
-
 			count_ = 0;
 			disconnect_loop_ = 0;
 
 			task_ = task::begin_http;
-
-			debug_format("HTTP Server: format capacity: %d\n") % http_format::chaout().at_str().capacity();
 		}
 
 
@@ -556,14 +554,16 @@ namespace net {
 					ip_adrs adrs;
 					if(tcp.open(adrs, http_port, true, desc_) != net_state::OK) {
 						debug_format("HTTP TCP open error\n");
-						task_ = task::disconnect_delay;
-						disconnect_loop_ = 100; // 1 sec
+						task_ = task::delay_begin;
+						delay_loop_ = 100; // 1 sec
 						break;
 					}
-					debug_format("HTTP Start Server: '%s' port(%d), desc(%d)\n")
+					debug_format("HTTP Server Start: '%s' port(%d), desc(%d)\n")
 						% eth_.at_info().ip.c_str()
 						% static_cast<int>(http_port)
 						% desc_;
+					http_format::chaout().set_desc(desc_);
+					debug_format("HTTP Server: format capacity: %d\n") % http_format::chaout().at_str().capacity();
 					task_ = task::wait_http;
 				}
 				break;
@@ -573,7 +573,6 @@ namespace net {
 					debug_format("HTTP Server: New connected, form: %s\n") % tcp.get_ip(desc_).c_str();
 					++count_;
 					line_man_.clear();
-					http_format::chaout().set_desc(desc_);
 					favicon_ = false;
 					other_link_ = false;
 					disconnect_loop_ = DISCONNECT_LOOP;
@@ -643,6 +642,14 @@ namespace net {
 				} else {
 					tcp.close(desc_);
 					task_ = task::disconnect;
+				}
+				break;
+
+			case task::delay_begin:
+				if(delay_loop_ > 0) {
+					--delay_loop_;
+				} else {
+					task_ = task::begin_http;
 				}
 				break;
 
@@ -752,7 +759,7 @@ namespace net {
 			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		static void insert_color_str(const utils::color& c)
+		void insert_color_str(const utils::color& c)
 		{
 			http_format("color=\"#%02X%02X%02X\"")
 				% static_cast<uint32_t>(c.r)

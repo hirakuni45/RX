@@ -16,6 +16,13 @@
 
 namespace net {
 
+	enum class format_id {
+		http,
+		ftps_ctrl,
+		ftps_data,
+		client0,
+	};
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  NET ステート

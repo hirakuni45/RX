@@ -187,21 +187,20 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  UDP/TCP 文字出力テンプレートクラス
-		@param[in]	SIZE	バッファ・サイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t SIZE>
+	template <format_id ID, uint32_t SIZE>
 	class desc_string
 	{
 	public:
-		typedef utils::fixed_string<SIZE + 1> STR;  // 終端分を追加
+		typedef utils::fixed_string<SIZE> STR;
 
 	private:
-		STR			str_;
 		uint32_t	desc_;
+		STR			str_;
 
 	public:
-		desc_string() : str_(), desc_(0) { }
+		desc_string() : desc_(0) { }
 
 		void clear() {
 			str_.clear();
@@ -231,7 +230,9 @@ namespace net {
 
 		uint32_t size() const { return str_.size(); }
 
-		void set_desc(int desc) { desc_ = desc; }
+		void set_desc(uint32_t desc) { desc_ = desc; }
+
+		uint32_t get_desc() { return desc_; }
 
 		STR& at_str() { return str_; }
 	};

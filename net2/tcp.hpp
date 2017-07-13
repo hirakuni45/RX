@@ -74,7 +74,7 @@ namespace net {
 		};
 
 		typedef memory<4096>  RECV_B;
-		typedef memory<4096>  SEND_B;
+		typedef memory<8192>  SEND_B;
 
 		struct context {
 			ip_adrs		adrs_;
@@ -121,11 +121,12 @@ namespace net {
 			{
 				adrs_ = adrs;
 				std::memset(mac_, 0x00, 6);
+				server_ = server;
 				if(server) {
 					src_port_ = port;
-					dst_port_ = 0;  // 初期は「０」
+					dst_port_ = 0;
 				} else {
-					src_port_ = tools::random_port();
+					src_port_ = tools::connect_port();
 					dst_port_ = port;
 				}
 				send_time_ = 0;
@@ -157,7 +158,6 @@ namespace net {
 				send_wait_ = 0;
 
 				recv_task_ = recv_task::idle;
-				server_ = server;
 
 				recv_fin_ = false;
 				send_fin_ = false;
@@ -230,13 +230,15 @@ namespace net {
 
 				send_len = ctx.send_.length();
 				if(send_len > 0) {
-					uint16_t max_len = ctx.send_max_ - sizeof(frame_t);
-					if(max_len < send_len) {
-						send_len = max_len;
+					if(ctx.send_max_ < send_len) {
+						send_len = ctx.send_max_;
 					}
 					ctx.send_len_ = send_len;
 					ctx.send_.get(p, send_len, false);
-//					debug_format("TCP Send: %d\n") % send_len;
+					debug_format("TCP %s Send: src_port(%d) dst_port(%d) %d bytes\n")
+						% (ctx.server_ ? "Server" : "Client")
+						% ctx.src_port_ % ctx.dst_port_
+						% send_len;
 					all += send_len;
 					p += send_len;
 					ctx.flags_ |= tcp_h::MASK_PSH;
@@ -362,6 +364,7 @@ namespace net {
 					if(ctx.net_time_ref_ == 0) ++ctx.net_time_ref_;  // ０の場合、最低値を設定
 					++ctx.send_seq_;
 					ctx.recv_task_ = recv_task::established;
+					debug_format("TCP Connection Server\n"); 
 				} else {
 					++ctx.timeout_;
 					if(ctx.timeout_ >= SYN_TIMEOUT) {
@@ -387,10 +390,11 @@ namespace net {
 					ctx.net_time_ref_ = delta_time_(ctx.timer_ref_);
 					if(ctx.net_time_ref_ == 0) ++ctx.net_time_ref_;  // ０の場合、最低値を設定
 					ctx.send_ack_ = ctx.recv_seq_ + 1;
-					++ctx.send_seq_;
+///					++ctx.send_seq_;
 					send = true;
 					ctx.flags_ |= tcp_h::MASK_ACK;
 					ctx.recv_task_ = recv_task::established;
+					debug_format("TCP Connection Client\n"); 
 				}
 				if(ctx.recv_fin_) {
 					send = true;
@@ -524,9 +528,6 @@ namespace net {
 
 			ethd_.enable_interrupt(false);
 
-			uint16_t flags = ctx.flags_;
-			ctx.flags_ = 0;
-
 			uint16_t len = ctx.send_.length();
 			if(len == 0) {
 				ethd_.enable_interrupt();
@@ -539,6 +540,9 @@ namespace net {
 				return;
 			}
 
+			uint16_t flags = ctx.flags_;
+			ctx.flags_ = 0;
+
 			if(ctx.resend_cnt_ >= RESEND_LIMIT) {  // 再送がリミットになったら、RSTを送る
 				ctx.flags_ |= tcp_h::MASK_RST;
 				auto all = make_seg_(ctx, ctx.mac_, ctx.adrs_.get(), *t, false);
@@ -548,12 +552,6 @@ namespace net {
 				ctx.flags_ |= tcp_h::MASK_ACK;
 				auto all = make_seg_(ctx, ctx.mac_, ctx.adrs_.get(), *t, true);
 				ethd_.send(all);
-// dump(t->eh_);
-// dump(t->ipv4_);
-// dump(t->tcp_);
-//				char* str = static_cast<char*>(t->next(t));
-//				str[len] = 0;
-//				utils::format("Send: '%s' (%d)\n") % str % len;
 			}
 
 			ctx.flags_ = flags;
@@ -589,6 +587,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		tcp(ETHD& ethd, net_info& info, uint32_t seq = 1) noexcept : ethd_(ethd), info_(info),
 			last_state_(net_state::OK)
+
 		{ }
 
 
@@ -646,7 +645,13 @@ namespace net {
 			for(uint32_t i = 0; i < NMAX; ++i) {
 				if(!common_.at_blocks().is_alloc(i)) continue;
 				const context& ctx = common_.get_blocks().get(i);
-				if(ctx.dst_port_ == port) {
+				uint16_t pp;
+				if(server) {
+					pp = ctx.src_port_;
+				} else {
+					pp = ctx.dst_port_;
+				}
+				if(pp == port) {
 					auto st = net_state::EVEN_PORT;
 					if(last_state_ != st) {
 						debug_format("TCP Open fail even port as: %d\n") % port;
@@ -882,14 +887,6 @@ namespace net {
 			if(!common_.at_blocks().is_alloc(idx)) return;
 
 			context& ctx = common_.at_blocks().at(idx);
-
-			if(!ctx.send_fin_) {  // FIN を送っていない
-				ctx.send_fin_ = true;
-				if(ctx.recv_task_ != recv_task::close) {
-				   	ctx.recv_task_ = recv_task::sync_close;  // FIN に対する ACK を待つ
-				}
-				send_flags_(ctx, tcp_h::MASK_FIN);
-			}
 			ctx.close_req_ = true;
 		}
 
@@ -926,16 +923,19 @@ namespace net {
 
 				// ポート番号の確認
 				if(ctx.server_) {
+					if(ctx.src_port_ != tcp->get_dst_port()) {
+						continue;
+					}
 					if(ctx.dst_port_ != 0) {
 						if(ctx.dst_port_ != tcp->get_src_port()) {
 							continue;
 						}
 					} else {
-						ctx.dst_port_ = tcp->get_src_port();
-						debug_format("TCP First Connection dst_port: %d\n") % ctx.dst_port_;
-					}
-					if(ctx.src_port_ != tcp->get_dst_port()) {
-						continue;
+						if(tcp->get_flag_syn()) {
+							ctx.dst_port_ = tcp->get_src_port();
+							debug_format("TCP Server First Connection dst_port(%d) desc(%d)\n")
+								% ctx.dst_port_ % i;
+						}
 					}
 				} else {
 					if(ctx.src_port_ != tcp->get_dst_port()) continue;
@@ -981,7 +981,7 @@ namespace net {
 						if(ctx.send_wait_ > 0) {
 							--ctx.send_wait_;
 						} else {  // 時間内に「ACK」が確認出来ない場合、「SYN」を再送する
-///							debug_format("TCP Client SYN send\n");
+///							debug_format("TCP Client SYN send desc(%d)\n") % i;
 							send_flags_(ctx, tcp_h::MASK_SYN);
 							ctx.send_wait_ = make_send_wait_();
 						}
@@ -991,11 +991,27 @@ namespace net {
 					break;
 
 				case send_task::main:
-					send_(ctx);
-					// FIN を受け取った、又は、クローズ要求なら「クローズ同期」を始める
-					if(ctx.recv_fin_ || ctx.close_req_) {
-						ctx.send_task_ = send_task::sync_close;
-						ctx.send_time_ = CLOSE_TIME_OUT;
+///					for(uint32_t i = 0; i < ethd_.get_send_num(); ++i) {
+						send_(ctx);
+///					}
+					{
+						bool close_go = ctx.recv_fin_;
+						if(ctx.send_.length() == 0 && ctx.close_req_) {
+							close_go = true;
+						}
+						if(close_go) {
+							debug_format("TCP Close start: desc(%d)\n") % i;
+							if(!ctx.send_fin_) {  // FIN を送っていない
+								ctx.send_fin_ = true;
+								if(ctx.recv_task_ != recv_task::close) {
+								   	ctx.recv_task_ = recv_task::sync_close;  // FIN に対する ACK を待つ
+								}
+								send_flags_(ctx, tcp_h::MASK_FIN);
+							}
+							// FIN を受け取った、又は、クローズ要求なら「クローズ同期」を始める
+							ctx.send_task_ = send_task::sync_close;
+							ctx.send_time_ = CLOSE_TIME_OUT;
+						}
 					}
 					break;
 
