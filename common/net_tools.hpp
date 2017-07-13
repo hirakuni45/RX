@@ -209,14 +209,18 @@ namespace net {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ランダム・ポート番号の生成（49152～65535）
-			@return ランダム・ポート番号
+			@brief  接続ポート番号の生成（49152～65535）
+			@return 接続ポート番号
 		*/
 		//-----------------------------------------------------------------//
-		static uint16_t random_port() {
-//			return 49152 + (rand() % (65536 - 49152));
-			static std::uniform_int_distribution<> rand_range(49152, 65535);
-			return rand_range(at_rand_mt());
+		static uint16_t connect_port() {
+///			static std::uniform_int_distribution<> rand_range(49152, 65535);
+///			return rand_range(at_rand_mt());
+			static uint16_t port = 49152;
+			uint16_t p = port;
+			++port;
+			if(port < 49152) port = 49152;
+			return p;
 		}
 
 
