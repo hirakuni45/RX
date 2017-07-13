@@ -3,9 +3,11 @@
 /*!	@file
 	@brief	BMP280 デジタル圧力センサー・ドライバー @n
 			Bosch Sensotec / Digital Pressure Sensor @n
-			https://www.bosch-sensortec.com/bst/products/all_products/bmp280 @n
-			Copyright 2016 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+			https://www.bosch-sensortec.com/bst/products/all_products/bmp280
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdint>

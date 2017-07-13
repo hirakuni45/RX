@@ -2,9 +2,11 @@
 //=====================================================================//
 /*!	@file
 	@brief	EUI-48/EUI-64 EEPROM クラス @n
-			25AA02E48/25AA02E64 @n
-			Copyright 2017 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+			25AA02E48/25AA02E64
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cmath>
