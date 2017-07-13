@@ -1,8 +1,10 @@
 //=====================================================================//
 /*! @file
-    @brief  RX 起動前、初期化 @n
-			Copyright 2016, 2017 Kunihito Hiramatsu
+    @brief  RX 起動前、初期化
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 int main(int argc, char**argv);

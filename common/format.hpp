@@ -12,9 +12,11 @@
 			+ 2017/06/11 20:00- 標準文字出力クラスの再定義、実装 @n 
 			+ 2017/06/11 21:00- 固定文字列クラス向け chaout、実装 @n
 			+ 2017/06/12 14:50- memory_chaoutと、専用コンストラクター実装 @n
-			+ 2017/06/14 05:34- memory_chaout size() のバグ修正 @n
-			Copyright 2013,2017 Kunihito Hiramatsu
+			+ 2017/06/14 05:34- memory_chaout size() のバグ修正
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <type_traits>

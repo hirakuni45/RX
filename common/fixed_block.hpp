@@ -3,9 +3,11 @@
 /*!	@file
 	@brief	固定サイズ・ブロック管理・クラス @n
 			※最大３２個までのブロックを管理 @n
-			※排他制御用ロック・ビットを含んでいる @n
-			Copyright 2017 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+			※排他制御用ロック・ビットを含んでいる
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 

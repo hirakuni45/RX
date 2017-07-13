@@ -1,9 +1,11 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600, RX200 グループ・CMT I/O 制御 @n
-			Copyright 2013, 2017 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+	@brief	RX600, RX200 グループ・CMT I/O 制御
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/renesas.hpp"
