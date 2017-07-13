@@ -34,7 +34,7 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class phy_option {
 		BASE,				///< 一般、標準仕様（Ex: LAN8720）
-		TI_DP83822_,		///< TI/DP83822
+		TI_DP83822,			///< TI/DP83822
 		MICREL_KSZ8041NL,	///< MICREL/KSZ8041NL
 	};
 
@@ -347,7 +347,7 @@ namespace chip {
 		uint16_t read_(uint16_t addr)
 		{
 			if(addr > 0x1f) {  // 拡張アドレスの場合
-				if(DEV_OPT == phy_option::TI_DP83822_) {
+				if(DEV_OPT == phy_option::TI_DP83822) {
 					write_sub_(REG_DP83822_REGCR, 0x001F);  // address command
 					write_sub_(REG_DP83822_ADDAR, addr);
 					write_sub_(REG_DP83822_REGCR, 0x401F);  // read/write command
@@ -365,7 +365,7 @@ namespace chip {
 		void write_(uint16_t addr, uint16_t data)
 		{
 			if(addr > 0x1f) {  // 拡張アドレスの場合
-				if(DEV_OPT == phy_option::TI_DP83822_) {
+				if(DEV_OPT == phy_option::TI_DP83822) {
 					write_sub_(REG_DP83822_REGCR, 0x001F);  // address command
 					write_sub_(REG_DP83822_ADDAR, addr);
 					write_sub_(REG_DP83822_REGCR, 0x401F);  // read/write command
@@ -429,7 +429,7 @@ namespace chip {
 					reg &= ~0x8000;
 					reg |= 0x4000;
 					write_(REG_PHY_CONTROL_1, reg);
-				} else if(DEV_OPT == phy_option::TI_DP83822_) {
+				} else if(DEV_OPT == phy_option::TI_DP83822) {
 
 					debug_format("DP83822 Boot Strap Latch (0x0462): 0x%04X\n")
 						% static_cast<int>(read_(0x0462));
@@ -438,9 +438,9 @@ namespace chip {
 					debug_format("DP83822 Boot Strap Latch #2(SOR2): 0x%04X\n")
 						% static_cast<int>(read_(0x0468));
 
-					write_(0x0018, 0b0000010001000000);
-					write_(0x0019, 0b0000000000100001);
-					write_(0x0462, 0b0100001100000000);
+					write_(0x0018, 0b0000010001000000);  // LED Control Register LEDCR
+					write_(0x0019, 0b0000000000100001);  // PHY Control Register
+					write_(0x0462, 0b0100001100000000);  // 
 
 					write_(REG_DP83822_RCSR, 0b0000000001100001);
 					debug_format("DP83822 Boot Strap Latch (0x0462): 0x%04X\n")
