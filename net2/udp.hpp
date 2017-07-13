@@ -1,9 +1,11 @@
 #pragma once
 //=========================================================================//
 /*! @file
-    @brief  UDP Protocol @n
-			Copyright 2017 Kunihito Hiramatsu
+    @brief  UDP Protocol
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "net2/udp_tcp_common.hpp"
@@ -280,10 +282,9 @@ namespace net {
 			@return ディスクリプタが無効「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool probe(int desc) const
+		bool probe(uint32_t desc) const
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			return common_.get_blocks().is_alloc(idx);
+			return common_.get_blocks().is_alloc(desc);
 		}
 
 
@@ -296,7 +297,7 @@ namespace net {
 			@return 送信バイト（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int send(int desc, const void* src, uint16_t len) noexcept
+		inline int send(uint32_t desc, const void* src, uint16_t len) noexcept
 		{
 			return common_.send(desc, src, len);
 		}
@@ -309,7 +310,7 @@ namespace net {
 			@return 送信バッファの残量（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int get_send_length(int desc) const noexcept
+		inline int get_send_length(uint32_t desc) const noexcept
 		{
 			return common_.get_send_length(desc);
 		}
@@ -324,7 +325,7 @@ namespace net {
 			@return 受信バイト（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int recv(int desc, void* dst, uint16_t len) noexcept
+		inline int recv(uint32_t desc, void* dst, uint16_t len) noexcept
 		{
 			return common_.recv(desc, dst, len);
 		}
@@ -337,7 +338,7 @@ namespace net {
 			@return 受信バッファの残量（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int get_recv_length(int desc) const noexcept
+		inline int get_recv_length(uint32_t desc) const noexcept
 		{
 			return common_.get_recv_length(desc);
 		}
@@ -347,15 +348,16 @@ namespace net {
 		/*!
 			@brief  クローズ
 			@param[in]	desc	ディスクリプタ
+			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		void close(int desc) noexcept
+		bool close(uint32_t desc) noexcept
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!common_.at_blocks().is_alloc(idx)) return;
+			if(!common_.at_blocks().is_alloc(desc)) return false;
 
-			context& ctx = common_.at_blocks().at(idx);
+			context& ctx = common_.at_blocks().at(desc);
 			ctx.send_task_ = send_task::sync_close;
+			return true;
 		}
 
 

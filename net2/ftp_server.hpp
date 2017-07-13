@@ -10,9 +10,11 @@
 			ようだ、これは、FFFTP のバグ（仕様）と思える。@n
 			・FileZilla: 既定値 (PORT): OK、アクティブ： NG、パッシブ (PASV)： OK @n
 			※「アクティブ」の仕様が不明 @n
-			・ftp（MSYS2）:（PORT）OK @n
-			Copyright 2017 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+			・ftp（MSYS2）:（PORT）OK
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdio>

@@ -1,9 +1,11 @@
 #pragma once
 //=========================================================================//
 /*! @file
-    @brief  ipv4 クラス @n
-			Copyright 2017 Kunihito Hiramatsu
+    @brief  IPV4 クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include <cstdint>

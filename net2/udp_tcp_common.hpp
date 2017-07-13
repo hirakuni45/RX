@@ -1,9 +1,11 @@
 #pragma once
 //=========================================================================//
 /*! @file
-    @brief  UDP/TCP 共通クラス @n
-			Copyright 2017 Kunihito Hiramatsu
+    @brief  UDP/TCP 共通クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "common/fixed_block.hpp"
@@ -102,13 +104,12 @@ namespace net {
 			@return 送信バイト（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		int send(int desc, const void* src, uint16_t len) noexcept
+		int send(uint32_t desc, const void* src, uint16_t len) noexcept
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!blocks_.is_alloc(idx)) return -1;
-			if(blocks_.is_lock(idx)) return -1;
+			if(!blocks_.is_alloc(desc)) return -1;
+			if(blocks_.is_lock(desc)) return -1;
 
-			CTX& ctx = blocks_.at(idx);
+			CTX& ctx = blocks_.at(desc);
 			uint16_t spc = ctx.send_.size() - ctx.send_.length() - 1;
 			if(spc < len) {
 				len = spc;
@@ -125,13 +126,12 @@ namespace net {
 			@return 送信バッファの残量（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		int get_send_length(int desc) const noexcept
+		int get_send_length(uint32_t desc) const noexcept
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!blocks_.is_alloc(idx)) return -1;
-			if(blocks_.is_lock(idx)) return -1;
+			if(!blocks_.is_alloc(desc)) return -1;
+			if(blocks_.is_lock(desc)) return -1;
 
-			const CTX& ctx = blocks_.get(idx);
+			const CTX& ctx = blocks_.get(desc);
 			return ctx.send_.length();
 		}
 
@@ -145,13 +145,13 @@ namespace net {
 			@return 受信バイト（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		int recv(int desc, void* dst, uint16_t len) noexcept
+		int recv(uint32_t desc, void* dst, uint16_t len) noexcept
 		{
 			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!blocks_.is_alloc(idx)) return -1;
-			if(blocks_.is_lock(idx)) return -1;
+			if(!blocks_.is_alloc(desc)) return -1;
+			if(blocks_.is_lock(desc)) return -1;
 
-			CTX& ctx = blocks_.at(idx);
+			CTX& ctx = blocks_.at(desc);
 			int rlen = ctx.recv_.length();
 			if(rlen == 0) {  // 読み込むデータが無い
 				return rlen;
@@ -172,13 +172,12 @@ namespace net {
 			@return 受信バッファの残量（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		int get_recv_length(int desc) const noexcept
+		int get_recv_length(uint32_t desc) const noexcept
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!blocks_.is_alloc(idx)) return -1;
-			if(blocks_.is_lock(idx)) return -1;
+			if(!blocks_.is_alloc(desc)) return -1;
+			if(blocks_.is_lock(desc)) return -1;
 
-			const CTX& ctx = blocks_.get(idx);
+			const CTX& ctx = blocks_.get(desc);
 			return ctx.recv_.length();
 		}
 	};

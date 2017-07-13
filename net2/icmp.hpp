@@ -1,9 +1,11 @@
 #pragma once
 //=========================================================================//
 /*! @file
-    @brief  ICMP Protocol (ping protocol) @n
-			Copyright 2017 Kunihito Hiramatsu
+    @brief  ICMP Protocol (ping protocol)
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "net2/net_st.hpp"

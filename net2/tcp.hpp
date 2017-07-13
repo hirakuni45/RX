@@ -1,9 +1,11 @@
 #pragma once
 //=========================================================================//
 /*! @file
-    @brief  TCP Protocol @n
-			Copyright 2017 Kunihito Hiramatsu
+    @brief  TCP Protocol
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include "net2/net_st.hpp"
@@ -39,6 +41,7 @@ namespace net {
 
 		static const uint16_t SEND_MAX      = 1460;      ///< パケットの最大数
 		static const uint16_t SYN_TIMEOUT   = 30 * 100;  ///< SYN_RCVD を送って、ACK が返るまでの最大時間
+
 		static const uint16_t RESEND_WAIT   = 90;        ///< 0.9 sec (unit: 10ms)再送
 		static const uint16_t RESEND_SPAN   = 20;        ///< 再送に対する揺らぎ
 		static const uint16_t RESEND_LIMIT  = 7;         ///< 再送の最大回数
@@ -82,6 +85,7 @@ namespace net {
 			uint16_t	src_port_;
 			uint16_t	dst_port_;
 			uint16_t	send_time_;
+			uint16_t	idx_;
 
 			// IPV4 関係
 			uint16_t	send_max_;
@@ -117,8 +121,9 @@ namespace net {
 			bool	request_ip_;
 
 
-			void reset(const ip_adrs& adrs, uint16_t port, bool server)
+			void reset(uint16_t idx, const ip_adrs& adrs, uint16_t port, bool server)
 			{
+				idx_ = idx;
 				adrs_ = adrs;
 				std::memset(mac_, 0x00, 6);
 				server_ = server;
@@ -240,6 +245,8 @@ namespace net {
 						% ctx.src_port_ % ctx.dst_port_
 						% send_len;
 					all += send_len;
+p[send_len] = 0;
+utils::format("%s") % (char*)p;
 					p += send_len;
 					ctx.flags_ |= tcp_h::MASK_PSH;
 					ctx.send_wait_ = make_send_wait_();
@@ -364,7 +371,7 @@ namespace net {
 					if(ctx.net_time_ref_ == 0) ++ctx.net_time_ref_;  // ０の場合、最低値を設定
 					++ctx.send_seq_;
 					ctx.recv_task_ = recv_task::established;
-					debug_format("TCP Connection Server\n"); 
+					debug_format("TCP Connection Server: desc(%d)\n") % ctx.idx_; 
 				} else {
 					++ctx.timeout_;
 					if(ctx.timeout_ >= SYN_TIMEOUT) {
@@ -390,11 +397,10 @@ namespace net {
 					ctx.net_time_ref_ = delta_time_(ctx.timer_ref_);
 					if(ctx.net_time_ref_ == 0) ++ctx.net_time_ref_;  // ０の場合、最低値を設定
 					ctx.send_ack_ = ctx.recv_seq_ + 1;
-///					++ctx.send_seq_;
 					send = true;
 					ctx.flags_ |= tcp_h::MASK_ACK;
 					ctx.recv_task_ = recv_task::established;
-					debug_format("TCP Connection Client\n"); 
+					debug_format("TCP Connection Client: desc(%d)\n") % ctx.idx_; 
 				}
 				if(ctx.recv_fin_) {
 					send = true;
@@ -404,8 +410,12 @@ namespace net {
 				break;
 
 			case recv_task::established:
-// utils::format("(EST) RECV:   SEQ: 0x%08X, ACK: 0x%08X (%d)\n") % ctx.recv_seq_ % ctx.recv_ack_ % recv_len;
-// utils::format("(EST) SERVER: SEQ: 0x%08X, ACK: 0x%08X (%d)\n") % ctx.send_seq_ % ctx.send_ack_ % ctx.send_len_;
+if(!ctx.server_) {
+	debug_format("(EST) RECV: SEQ: 0x%08X, ACK: 0x%08X recv_len(%d)\n")
+		% ctx.recv_seq_ % ctx.recv_ack_ % recv_len;
+	debug_format("(EST) HOST: SEQ: 0x%08X, ACK: 0x%08X send_len(%d)\n")
+		% ctx.send_seq_ % ctx.send_ack_ % ctx.send_len_;
+}
 				if(tcp->get_flag_ack()) {
 					if(ctx.send_len_ > 0) {  // 転送データがあるなら ACK 確認
 						if(ctx.recv_seq_ == ctx.send_ack_
@@ -679,7 +689,7 @@ namespace net {
 			context& ctx = common_.at_blocks().at(idx);
 
 			// コンテキスト初期化
-			ctx.reset(adrs, port, server);
+			ctx.reset(idx, adrs, port, server);
 
 			if(server) {
 				ctx.recv_task_ = recv_task::listen_server;
@@ -712,7 +722,7 @@ namespace net {
 			@return ディスクリプタが無効「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool probe(int desc) const
+		bool probe(uint32_t desc) const
 		{
 			uint32_t idx = static_cast<uint32_t>(desc);
 			return common_.get_blocks().is_alloc(idx);
@@ -726,13 +736,36 @@ namespace net {
 			@return 接続状態「true」、切断状態、ディスクリプタが無効「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool connected(int desc) const noexcept
+		bool connected(uint32_t desc) const noexcept
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!common_.get_blocks().is_alloc(idx)) return false;
+			if(!common_.get_blocks().is_alloc(desc)) return false;
 
-			const context& ctx = common_.get_blocks().get(idx);
+			const context& ctx = common_.get_blocks().get(desc);
 			return ctx.recv_task_ == recv_task::established;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  再コネクト要求（クライアント限定）
+			@param[in]	desc	ディスクリプタ
+			@return エラーが無ければ「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool re_connect(uint32_t desc) noexcept
+		{
+			if(!common_.get_blocks().is_alloc(desc)) return false;
+
+			context& ctx = common_.at_blocks().at(desc);
+			if(ctx.server_) return false;  // サーバー接続の場合エラー
+
+			// SYN に対する ACK 待ち以外ならエラー
+			if(ctx.recv_task_ != recv_task::syn_cent) return false;
+
+			send_flags_(ctx, tcp_h::MASK_SYN);
+			debug_format("TCP Client SYN send: desc(%d)\n") % desc;
+
+			return true;
 		}
 
 
@@ -743,12 +776,11 @@ namespace net {
 			@return 接続状態「true」、切断状態、ディスクリプタが無効「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool is_fin(int desc) const noexcept
+		bool is_fin(uint32_t desc) const noexcept
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!common_.get_blocks().is_alloc(idx)) return false;
+			if(!common_.get_blocks().is_alloc(desc)) return false;
 
-			const context& ctx = common_.get_blocks().get(idx);
+			const context& ctx = common_.get_blocks().get(desc);
 			if(!ctx.recv_fin_ && !ctx.send_fin_) return true;
 			else return false;
 		}
@@ -761,13 +793,12 @@ namespace net {
 			@return 接続ＩＰ（ANYなら無効）
 		*/
 		//-----------------------------------------------------------------//
-		const ip_adrs& get_ip(int desc) const
+		const ip_adrs& get_ip(uint32_t desc) const
 		{
 			static ip_adrs tmp;
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!common_.get_blocks().is_alloc(idx)) return tmp;
+			if(!common_.get_blocks().is_alloc(desc)) return tmp;
 
-			const context& ctx = common_.get_blocks().get(idx);
+			const context& ctx = common_.get_blocks().get(desc);
 			return ctx.adrs_;			
 		}
 
@@ -779,13 +810,12 @@ namespace net {
 			@return 接続ポート
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_port(int desc) const
+		uint16_t get_port(uint32_t desc) const
 		{
 			static ip_adrs tmp;
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!common_.get_blocks().is_alloc(idx)) return tmp;
+			if(!common_.get_blocks().is_alloc(desc)) return tmp;
 
-			const context& ctx = common_.get_blocks().get(idx);
+			const context& ctx = common_.get_blocks().get(desc);
 			if(ctx.server_) {
 				return ctx.src_port_;
 			} else {
@@ -801,16 +831,14 @@ namespace net {
 					・クライアントでは、自分で、ポート番号を決定する @n
 					※ポート番号は、４９１５２～６５５３５となる
 			@param[in]	desc	ディスクリプタ
-			@return 内部接続ポート
+			@return 内部接続ポート（「０」の場合エラー）
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_internal_port(int desc) const
+		uint16_t get_internal_port(uint32_t desc) const
 		{
-			static ip_adrs tmp;
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!common_.get_blocks().is_alloc(idx)) return tmp;
+			if(!common_.get_blocks().is_alloc(desc)) return 0;
 
-			const context& ctx = common_.get_blocks().get(idx);
+			const context& ctx = common_.get_blocks().get(desc);
 			if(ctx.server_) {
 				return ctx.dst_port_;
 			} else {
@@ -828,7 +856,7 @@ namespace net {
 			@return 送信バイト（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int send(int desc, const void* src, uint16_t len) noexcept
+		inline int send(uint32_t desc, const void* src, uint16_t len) noexcept
 		{
 			return common_.send(desc, src, len);
 		}
@@ -841,7 +869,7 @@ namespace net {
 			@return 送信バッファの残量（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int get_send_length(int desc) const noexcept
+		inline int get_send_length(uint32_t desc) const noexcept
 		{
 			return common_.get_send_length(desc);
 		}
@@ -856,7 +884,7 @@ namespace net {
 			@return 受信バイト（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int recv(int desc, void* dst, uint16_t len) noexcept
+		inline int recv(uint32_t desc, void* dst, uint16_t len) noexcept
 		{
 			return common_.recv(desc, dst, len);
 		}
@@ -869,7 +897,7 @@ namespace net {
 			@return 受信バッファの残量（負の値はエラー）
 		*/
 		//-----------------------------------------------------------------//
-		inline int get_recv_length(int desc) const noexcept
+		inline int get_recv_length(uint32_t desc) const noexcept
 		{
 			return common_.get_recv_length(desc);
 		}
@@ -879,15 +907,16 @@ namespace net {
 		/*!
 			@brief  クローズ
 			@param[in]	desc	ディスクリプタ
+			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		void close(int desc) noexcept
+		bool close(uint32_t desc) noexcept
 		{
-			uint32_t idx = static_cast<uint32_t>(desc);
-			if(!common_.at_blocks().is_alloc(idx)) return;
+			if(!common_.get_blocks().is_alloc(desc)) return false;
 
-			context& ctx = common_.at_blocks().at(idx);
+			context& ctx = common_.at_blocks().at(desc);
 			ctx.close_req_ = true;
+			return true;
 		}
 
 
@@ -963,6 +992,8 @@ namespace net {
 
 				context& ctx = common_.at_blocks().at(i);
 				switch(ctx.send_task_) {
+
+				// クライアント動作、IP アドレスに対する MAC が判らない場合
 				case send_task::sync_mac:
 					if(common_.check_mac(ctx, info_)) {
 						debug_format("TCP sync_mac OK\n");
@@ -976,16 +1007,8 @@ namespace net {
 					}
 					break;
 
-				case send_task::sync_ack:  // SYN に対する ACK の受信確認
-					if(ctx.recv_task_ == recv_task::syn_cent) {
-						if(ctx.send_wait_ > 0) {
-							--ctx.send_wait_;
-						} else {  // 時間内に「ACK」が確認出来ない場合、「SYN」を再送する
-///							debug_format("TCP Client SYN send desc(%d)\n") % i;
-							send_flags_(ctx, tcp_h::MASK_SYN);
-							ctx.send_wait_ = make_send_wait_();
-						}
-					} else {
+				case send_task::sync_ack:  // クライアント動作、SYN に対する ACK の受信確認
+					if(ctx.recv_task_ != recv_task::syn_cent) {
 						ctx.send_task_ = send_task::main;
 					}
 					break;
