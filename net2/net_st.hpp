@@ -89,6 +89,8 @@ namespace net {
 		ip_adrs		dns;     ///< Domain Name Server
 		ip_adrs		dns2;    ///< Domain Name Server 2ND
 
+		uint32_t	re_send_syn_count_;
+
 	private:
 		typedef mac_cash<8> CASH;
 		CASH		cash_;
@@ -101,7 +103,9 @@ namespace net {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		net_info() noexcept : mac{ 0 }, ip(), mask(), gw(), dns(), dns2(), cash_(),
+		net_info() noexcept : mac{ 0 }, ip(), mask(), gw(), dns(), dns2(),
+			re_send_syn_count_(0),
+			cash_(),
 			share_() { }
 
 
