@@ -12,7 +12,7 @@
 #include "r_ether.h"
 
 /// PHY:DP83822 device is active (for Makefile)
-// #define TI_DP83822
+// #define TI_DP83822_
 
 // #define PHY_DEBUG
 
@@ -25,7 +25,7 @@
  * PHY address selection.
  * Please select one of them.
  */
-#ifdef TI_DP83822
+#ifdef TI_DP83822_
 #define PHY_MII_ADDR                    (1)  /* DP83822 default */
 #else
 #define PHY_MII_ADDR                    (0)  /* LAN8720A default */
@@ -42,7 +42,7 @@
 #define PHY_REG_AN_LINK_PARTNER         (5)
 #define PHY_REG_AN_EXPANSION            (6)
 
-#ifdef TI_DP83822
+#ifdef TI_DP83822_
 #define PHY_REG_DP83822_REGCR     (0x0D)
 #define PHY_REG_DP83822_ADDAR     (0x0E)
 #define PHY_REG_DP83822_RCSR      (0x17)
@@ -380,7 +380,7 @@ static void phy_write_sub_(uint16_t reg_addr, uint16_t data)
 static uint16_t phy_read_(uint16_t reg_addr)
 {
 	if(reg_addr > 0x1f) {
-#ifdef TI_DP83822
+#ifdef TI_DP83822_
 		phy_write_sub_(PHY_REG_DP83822_REGCR, 0x001F);  // address command
 		phy_write_sub_(PHY_REG_DP83822_ADDAR, reg_addr);
 		phy_write_sub_(PHY_REG_DP83822_REGCR, 0x401F);  // read/write command
@@ -398,7 +398,7 @@ static uint16_t phy_read_(uint16_t reg_addr)
 static void phy_write_(uint16_t reg_addr, uint16_t data)
 {
 	if(reg_addr > 0x1f) {
-#ifdef TI_DP83822
+#ifdef TI_DP83822_
 		phy_write_sub_(PHY_REG_DP83822_REGCR, 0x001F);  // address command
 		phy_write_sub_(PHY_REG_DP83822_ADDAR, reg_addr);
 		phy_write_sub_(PHY_REG_DP83822_REGCR, 0x401F);  // read/write command
@@ -464,7 +464,7 @@ int16_t phy_init(void)
         phy_write_(PHY_REG_PHY_CONTROL_1, reg);
 #endif /* MICREL_KSZ8041NL */
 
-#ifdef TI_DP83822
+#ifdef TI_DP83822_
 #ifdef PHY_DEBUG
     reg = phy_read_(0x0462);
 	printf("DP83822 Boot Strap Latch (0x0462): 0x%04X\n", (int)reg);
