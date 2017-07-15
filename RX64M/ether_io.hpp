@@ -126,7 +126,9 @@ namespace device {
 	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN = 4, uint32_t RXDN = 4>
 	class ether_io {
 	public:
-		static const int EMAC_BUFSIZE = 1536;  			// Must be 32-byte aligned
+		static const int EMAC_BUFSIZE = 1536;	///< イーサーネット・バッファ最大値
+		static const uint32_t TXD_NUM = TXDN;	///< 送信バッファ数
+		static const uint32_t RXD_NUM = RXDN;	///< 受信バッファ数
 
 	private:
 #ifndef ETHRC_DEBUG
@@ -673,24 +675,6 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		const ether_stat_t& get_stat() const noexcept { return stat_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	送信バッファ数を取得
-			@return 送信バッファ数
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_send_num() const noexcept { return TXDN; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	受信バッファ数を取得
-			@return 受信バッファ数
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_recv_num() const noexcept { return RXDN; }
 
 
 		//-----------------------------------------------------------------//
