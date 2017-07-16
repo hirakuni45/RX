@@ -46,33 +46,28 @@ const uint32_t tcp_ccep_num = sizeof(tcp_ccep) / sizeof(T_TCP_CCEP);
 
 /***  TCP MSS  ***/
 const uint16_t tcp_mss[] = {
-	1460, 1460, 1460, 1460, 1460, 1460
+	1460, 1460
 };    /* MAX:1460 bytes */
 
 /***  Initial value of sequence number (Set the value other than 0)  ***/
 const uint32_t tcp_initial_seqno[] = {
-	1, 1, 1, 1, 1, 1,
+	1, 1,
 };
 
 /***  2MSL wait time (unit:10ms)  ***/
 const uint16_t tcp_2msl[] = {
-	1, 1, 1, 1, 1, 1
+	1, 1,
 };      /* 10 ms */
 
 /***  Maximum value of retransmission timeout period (unit:10ms)  ***/
 const uint32_t tcp_rt_tmo_rst[] = {
 	(10 * 60 * (1000 / 10)),     /* 10 min */
 	(10 * 60 * (1000 / 10)),
-	(10 * 60 * (1000 / 10)),
-	(10 * 60 * (1000 / 10)),
-	(10 * 60 * (1000 / 10)),
-	(10 * 60 * (1000 / 10)),
-///	(10 * (1000 / 10)),   // test 10 sec
 };
 
 /***  Transmit for delay ack (ON=1/OFF=0) ***/
 const uint8_t tcp_dack[] = {
-	1, 1, 1, 1, 1, 1
+	1, 1
 };
 
 /****************************************************************************/
@@ -86,40 +81,22 @@ T_UDP_CCEP udp_ccep[UDP_CCEP_MAX] = {
     { 0x0000, { 0, 1365 }, t4_udp_callback },
     { 0x0000, { 0, 1365 }, t4_udp_callback },
     { 0x0000, { 0, 1365 }, t4_udp_callback },
-    { 0x0000, { 0, 1365 }, t4_udp_callback },
-    { 0x0000, { 0, 1365 }, t4_udp_callback },
 };
 
 /* Total number of UDP communication end points */
 const uint32_t udp_ccep_num = (sizeof(udp_ccep) / sizeof(T_UDP_CCEP));
 
 /***  TTL for multicast transmission  ***/
-const uint8_t multi_TTL[] = {
-	1,
-	1,
-	1,
-	1,
-	1,
-	1
-};
+const uint8_t multi_TTL[] = { 1, 1 };
 
 /*** Behavior of UDP zero checksum ***/
 /* 0 = disable, other = enable */
-const uint8_t udp_enable_zerochecksum[] = {
-	0,
-	0,
-	0,
-	0,
-	0,
-	0
-};
+const uint8_t udp_enable_zerochecksum[] = {	0, 0 };
 
 /****************************************************************************/
 /**********************     IP-related definition     ***********************/
 /****************************************************************************/
-const uint16_t _ip_tblcnt[] = {
-	3, 3, 3, 3, 3, 3
-};
+const uint16_t _ip_tblcnt[] = { 3, 3 };
 
 #define MY_IP_ADDR     192,168,0,3            /* Local IP address  */
 #define GATEWAY_ADDR   0,0,0,0                /* Gateway address (invalid if all 0s) */

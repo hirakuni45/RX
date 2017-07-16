@@ -57,7 +57,7 @@ static int tcpudp_api_req_(int cepid)
 
         return E_WBLK;
     }
-printf("tcpudp_api_req: error\n");
+// printf("tcpudp_api_req: error\n");
     tcpudp_api_slp_(cepid);
     tcpudp_clr_req_(cepid);
 
@@ -321,6 +321,8 @@ int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmou
 			_TCP_CB_STAT_SET_API_LOCK_FLG(pTcbCb->stat);
 		}
 	}
+
+	printf("TCP Request TCP_API_CONCP: %d\n", cepid);
 
 	head_tcb[cepid - 1].req.type = _TCP_API_CONCP;
 	head_tcb[cepid - 1].req.tmout = tmout;
