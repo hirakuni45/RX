@@ -61,8 +61,8 @@ namespace {
 
 	typedef net::test_udp TEST_UDP;
 	TEST_UDP	test_udp_;
-	typedef net::test_tcp TEST_TCP;
-	TEST_TCP	test_tcp_;
+	typedef net::test_tcp<NET_MAIN::ETHERNET> TEST_TCP;
+	TEST_TCP	test_tcp_(net_.at_ethernet());
 
 	typedef net::http_server<NET_MAIN::ETHERNET, SDC> HTTP;
 	HTTP		http_(net_.at_ethernet(), sdc_);
@@ -348,13 +348,14 @@ int main(int argc, char** argv)
 
 	// TCP test の許可
 //	test_tcp_.set_type(TEST_TCP::type::client_recv_first);
-//	test_tcp_.set_ip(net::ip_adrs(192, 168, 3, 7));
+//	test_tcp_.set_type(TEST_TCP::type::client_send_first);
+	test_tcp_.set_ip(net::ip_adrs(192, 168, 3, 7));  // クライアント接続の場合設定が必要
 
-	bool test_http = true;
-//	bool test_http = false;
+//	bool test_http = true;
+	bool test_http = false;
 
-//	bool test_ftps = true;
-	bool test_ftps = false;
+	bool test_ftps = true;
+//	bool test_ftps = false;
 
 #if 0
 	HTTP::http_format::chaout().set_desc(0);
@@ -404,8 +405,7 @@ int main(int argc, char** argv)
 
 		if(net_.check_main()) {
 			test_udp_.service(net_.at_ethernet());
-			bool server = true;
-			test_tcp_.service(net_.at_ethernet(), server);
+			test_tcp_.service();
 
 			if(test_http) {
 				http_.service();
