@@ -250,6 +250,15 @@ namespace seeda {
 
 extern "C" {
 
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	TCP 送信の関数
+		@param[in]	desc	ディスクリプタ
+		@param[in]	src		ソース
+		@param[in]	len		長さ
+		@return 正の値（送信した長さ）、負の値（エラー）
+	 */
+	//-----------------------------------------------------------------//
 	int tcp_send(uint32_t desc, const void* src, uint32_t len)
 	{
 		auto& ipv4 = nets_.at_net_main().at_ethernet().at_ipv4();
