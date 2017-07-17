@@ -121,7 +121,7 @@ namespace seeda {
 		void init_eui(bool dev)
 		{
 #ifdef SEEDA
-			spi_.start_sdc(4000000);  // Clock/4MHz
+			spi_.start_sdc(1000000);  // Clock/1MHz
 			EUI_HOLD::DIR = 1;
 			EUI_HOLD::P = 1;
 			eui_.start();
@@ -161,6 +161,13 @@ namespace seeda {
 					for(int i = 0; i < 6; ++i) {
 						mac_[i] = tmp[i];
 					}
+					utils::format("EUI MAC: %02X:%02X:%02X:%02X:%02X:%02X\n")
+						% static_cast<uint32_t>(mac_[0])
+						% static_cast<uint32_t>(mac_[1])
+						% static_cast<uint32_t>(mac_[2])
+						% static_cast<uint32_t>(mac_[3])
+						% static_cast<uint32_t>(mac_[4])
+						% static_cast<uint32_t>(mac_[5]);
 				}
 			}
 
