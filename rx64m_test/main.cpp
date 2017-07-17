@@ -399,6 +399,8 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
+///	device::init_port();
+
 	using namespace seeda;
 
 	device::PORT3::PCR.B5 = 1; // P35(NMI) pull-up
@@ -413,20 +415,20 @@ int main(int argc, char** argv)
 	while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
 
 	// Base Clock 12.5MHz
-	// PLLDIV: 1/1, STC: 16 倍(200MHz)
+	// PLLDIV: 1/1, STC: 19 倍(237.5MHz)
 	device::SYSTEM::PLLCR = device::SYSTEM::PLLCR.PLIDIV.b(0) |
-							device::SYSTEM::PLLCR.STC.b(0b011111);
+							device::SYSTEM::PLLCR.STC.b(0b100011);
 	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
 
-	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)		// 1/2 (200/4=50)
-						  | device::SYSTEM::SCKCR.ICK.b(1)		// 1/2 (200/2=100)
-						  | device::SYSTEM::SCKCR.BCK.b(2)		// 1/2 (200/4=50)
-						  | device::SYSTEM::SCKCR.PCKA.b(1)		// 1/2 (200/2=100)
-						  | device::SYSTEM::SCKCR.PCKB.b(2)		// 1/4 (200/4=50)
-						  | device::SYSTEM::SCKCR.PCKC.b(2)		// 1/4 (200/4=50)
-						  | device::SYSTEM::SCKCR.PCKD.b(2);	// 1/4 (200/4=50)
-	device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(0b0011) | 1;  // USB Clock: 1/4 (200/4=50)
+	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)		// 1/2 (237.5/4=59.375)
+						  | device::SYSTEM::SCKCR.ICK.b(1)		// 1/2 (237.5/2=118.75)
+						  | device::SYSTEM::SCKCR.BCK.b(2)		// 1/2 (237.5/4=59.375)
+						  | device::SYSTEM::SCKCR.PCKA.b(1)		// 1/2 (237.5/2=118.75)
+						  | device::SYSTEM::SCKCR.PCKB.b(2)		// 1/4 (237.5/4=59.375)
+						  | device::SYSTEM::SCKCR.PCKC.b(2)		// 1/4 (237.5/4=59.375)
+						  | device::SYSTEM::SCKCR.PCKD.b(2);	// 1/4 (237.5/4=59.375)
+	device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(0b0100) | 1;  // USB Clock: 1/5 (237.5/5=47.5)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	main_init_();
