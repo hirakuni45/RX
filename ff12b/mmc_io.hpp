@@ -23,7 +23,7 @@
 #define CT_SDC		(CT_SD1 | CT_SD2)	/* SD */
 #define CT_BLOCK	0x08				/* Block addressing */
 
-// #define DEBUG
+// #define DEBUG_MMC
 
 namespace fatfs {
 
@@ -90,11 +90,11 @@ namespace fatfs {
 		/* 1:OK, 0:Timeout */
 		int select_() {
 			SEL::P = 0;
-#ifdef DEBUG
+#ifdef DEBUG_MMC
 			utils::format("Select port: %d\n") % static_cast<uint32_t>(SEL::P());
 #endif
 			volatile BYTE d = spi_.xchg();	/* Dummy clock (force DO enabled) */
-#ifdef DEBUG
+#ifdef DEBUG_MMC
 			utils::format("Select dummy: 0x%02X\n") % static_cast<uint32_t>(d);
 #endif
 			if (wait_ready_()) return 1;	/* Wait for card ready */
@@ -116,7 +116,7 @@ namespace fatfs {
 				utils::delay::micro_second(100);
 			}
 			if (d[0] != 0xFE) return 0;		/* If not valid data token, return with error */
-#ifdef DEBUG
+#ifdef DEBUG_MMC
 			utils::format("rcvr_datablock_: 0x%08X, %d\n") % (uint32_t)(buff)
 				% static_cast<uint32_t>(btr);
 			utils::delay::micro_second(100000);
@@ -152,7 +152,7 @@ namespace fatfs {
 
 		BYTE send_cmd_(command cmd, DWORD arg) {
 
-#ifdef DEBUG
+#ifdef DEBUG_MMC
 			utils::format("send_cmd_: 0x%02X, 0x%08X\n") % static_cast<uint32_t>(cmd) % static_cast<uint32_t>(arg);
 #endif
 			uint8_t c = static_cast<uint8_t>(cmd);
@@ -169,7 +169,7 @@ namespace fatfs {
 ///				utils::format("Select...\n");
 				if (!select_()) return 0xFF;
 			}
-#ifdef DEBUG
+#ifdef DEBUG_MMC
 			utils::format("SEL: %d\n") % static_cast<int>(SEL::P());
 			utils::format("CMD: 0x%02X\n") % static_cast<uint32_t>(cmd);
 #endif
@@ -304,7 +304,7 @@ namespace fatfs {
 					}
 				}
 			} else {
-#ifdef DEBUG
+#ifdef DEBUG_MMC
 				utils::format("Idle state error...\n");
 #endif
 			}
@@ -316,7 +316,7 @@ namespace fatfs {
 
 			start_spi_(true);
 
-#ifdef DEBUG
+#ifdef DEBUG_MMC
 			utils::format("init ret: cardtype: %d\n") % static_cast<uint32_t>(ty);
 #endif
 			return s;
