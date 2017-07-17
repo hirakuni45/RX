@@ -415,7 +415,14 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
+	device::init_port();
+
 	using namespace seeda;
+
+	device::PORTC::PDR.B0 = 1; // output
+	device::PORTC::PDR.B1 = 1; // output
+	device::PORT0::PDR.B2 = 1; // output
+	device::PORT0::PDR.B3 = 1; // output
 
 	device::PORT3::PCR.B5 = 1; // P35(NMI) pull-up
 
@@ -480,17 +487,13 @@ int main(int argc, char** argv)
 		nets_.service();
 
 		++cnt;
-		if(cnt >= 30) {
+		if(cnt >= 32) {
 			cnt = 0;
 		}
-///		if(config_) {
-#ifdef SEEDA
-			device::PORTA::PDR.B0 = 1; // output
-			device::PORTA::PODR.B0 = (cnt < 10) ? 0 : 1;
-#else
-			device::PORTC::PDR.B0 = 1; // output
-			device::PORTC::PODR.B0 = (cnt < 10) ? 0 : 1;
-#endif
-///		}
+
+		device::PORTC::PODR.B0 = (((cnt + 0)  & 31) < 8) ? 1 : 0;
+		device::PORTC::PODR.B1 = (((cnt + 8)  & 31) < 8) ? 1 : 0;
+		device::PORT0::PODR.B2 = (((cnt + 16) & 31) < 8) ? 1 : 0;
+		device::PORT0::PODR.B3 = (((cnt + 24) & 31) < 8) ? 1 : 0;
 	}
 }
