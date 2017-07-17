@@ -10,7 +10,8 @@ DEVICE		=	R5F564ML
 
 FATFS_VER	=	ff12b
 
-BUILD		=	release
+# BUILD		=	release
+BUILD		=	debug
 
 BUILD_ID	=	$(shell date +%Y%m%d%H)
 
@@ -99,7 +100,15 @@ AFLAGS		=	$(AS_OPT)
 # ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
 ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
 
-# Override is only needed by avr-lib build system.
+ifeq ($(BUILD),debug)
+#	CP_OPT += -g
+#	CC_OPT += -g
+	DEFS += -DDEBUG
+endif
+
+ifeq ($(BUILD),release)
+	DEFS += -DNDEBUG
+endif
 
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
 PFLAGS		=	-std=c++14 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
