@@ -10,9 +10,11 @@
 			ようだ、これは、FFFTP のバグ（仕様）と思える。@n
 			・FileZilla: 既定値 (PORT): OK、アクティブ： NG、パッシブ (PASV)： OK @n
 			※「アクティブ」の仕様が不明 @n
-			・ftp（MSYS2）:（PORT）OK @n
-			Copyright 2017 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+			・ftp（MSYS2）:（PORT）OK
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdio>
@@ -24,7 +26,7 @@
 #include "common/format.hpp"
 #include "common/string_utils.hpp"
 
-#define FTP_DEBUG
+// #define FTPS_DEBUG
 
 extern "C" {
 	time_t get_time(void);
@@ -110,7 +112,7 @@ namespace net {
 		static const uint32_t	data_connection_timeout_ = 100 * 10;  ///< 10 sec.
 
 		// デバッグ以外で出力を無効にする
-#ifdef FTP_DEBUG
+#ifdef FTPS_DEBUG
 		typedef utils::format debug_format;
 #else
 		typedef utils::null_format debug_format;

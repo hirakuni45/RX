@@ -1,9 +1,11 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ethernet class @n
-			Copyright 2017 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+	@brief	ethernet class
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdio>
@@ -33,8 +35,13 @@ extern "C" {
 	void delay(unsigned long ms);
 };
 
-
+#ifdef DEBUG
 #define ETH_DEBUG
+#define FTPS_DEBUG
+#define HTTP_DEBUG
+#endif
+
+// #define ETH_DEBUG
 
 #ifdef ETH_DEBUG
 typedef utils::format debug_format;
@@ -790,7 +797,7 @@ namespace net {
 			@return 状態コード
 		*/
 		//-----------------------------------------------------------------//
-		TCP_API_STAT get_stat(uint32_t cepid)
+		TCP_API_STAT get_stat(uint32_t cepid) const
 		{
 			TCP_API_STAT ercd = tcp_read_stat(cepid);
 			return ercd;

@@ -1,9 +1,11 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ethernet_client class @n
-			Copyright 2017 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+	@brief	ethernet_client class
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "ethernet.hpp"
@@ -26,6 +28,8 @@ namespace net {
 
 		uint16_t	close_count_;
 
+		uint16_t	re_con_cnt_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -35,7 +39,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		ethernet_client(ethernet& e, uint16_t port) : ethernet_(e), cepid_(0), port_(port),
-			close_count_(0) { }
+			close_count_(0), re_con_cnt_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -115,35 +119,49 @@ namespace net {
 				close_count_ = tcp_get_close_count(cepid_);
 			}
 
-			bool ret = false;
-			if(!connected()) {
-				static T_IPV4EP adr;
-				adr.ipaddr =  (static_cast<uint32_t>(ip[0]) << 24)
-							| (static_cast<uint32_t>(ip[1]) << 16)
-							| (static_cast<uint32_t>(ip[2]) << 8)
-							| (static_cast<uint32_t>(ip[3]));
-				adr.portno = port;
-				int ercd = tcp_con_cep(cepid_, NADR, &adr, timeout);
-				static int ercd_ = 0;
-				if(ercd_ != ercd) {
-					debug_format("Client connection state: %d\n") % ercd;
-					ercd_ = ercd;
-				}
-				if(ercd == E_OK) {
-					ret = true;
-				} else if(ercd == E_QOVR) {
-///					ethernet_.reset(cepid_);
-				}
-
-				if(close_count_ != tcp_get_close_count(cepid_)) {
-//					debug_format("Error close (timeout)\n");
-					stop();  // 強制終了
-				}
-
-			} else {
-				ret = true;
+			if(connected()) {
+				return true;
 			}
-			return ret;
+
+			debug_format("TCP Client Request Connect (%d): %d\n") % re_con_cnt_ % cepid_;
+
+			static T_IPV4EP adr;
+			adr.ipaddr =  (static_cast<uint32_t>(ip[0]) << 24)
+						| (static_cast<uint32_t>(ip[1]) << 16)
+						| (static_cast<uint32_t>(ip[2]) << 8)
+						| (static_cast<uint32_t>(ip[3]));
+			adr.portno = port;
+			int ercd = tcp_con_cep(cepid_, NADR, &adr, timeout);
+			if(ercd == E_OK) {
+				debug_format("TCP Client connect OK: %d\n") % cepid_;
+			} else if(ercd == E_QOVR) {
+				debug_format("TCP Client E_QOVR: %d\n") % cepid_;
+///				tcp_can_cep(cepid_, TFN_TCP_CON_CEP);
+			} else {
+				debug_format("TCP Client connect state(%d): %d\n") % ercd % cepid_;
+			}
+			++re_con_cnt_;
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  再接続要求
+			@return 正常なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool re_connect()
+		{
+			if(cepid_ == 0) {  // ディスクリプタが無効
+				return false;
+			}
+
+			if(tcp_re_con_cep(cepid_) < 0) {
+				return false;
+			} else {
+				return true;
+			}
 		}
 
 
@@ -226,6 +244,7 @@ namespace net {
 			tcp_init(cepid_);
 			ethernet_.end_connection(cepid_);
 			cepid_ = 0;
+			re_con_cnt_ = 0;
 		}
 	};
 }
