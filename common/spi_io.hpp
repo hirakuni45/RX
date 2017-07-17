@@ -10,6 +10,11 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 
+/// F_ICLK はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
+#ifndef F_ICLK
+#  error "spi_io.hpp requires F_ICLK to be defined"
+#endif
+
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -65,11 +70,9 @@ namespace device {
 			MISO::DIR = 0;
 			MISO::PU = 1;
 			MOSI::DIR = 1;
-//			MOSI::PU = 1;
 			SPCK::DIR = 1;
-//			SPCK::PU = 1;
 
-			uint32_t n = 120000000 / speed;
+			uint32_t n = F_ICLK / speed;
 			if(n > 511) n = 511;
 			delay_ = n / 2;
 
