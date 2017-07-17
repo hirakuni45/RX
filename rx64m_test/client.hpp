@@ -36,12 +36,14 @@ namespace seeda {
 
 		enum class task {
 			startup,
-			connect,
+			req_connect,
+			wait_connect,
 			time_sync,
 			make_form,
 			url_decode,
 			send_data,
 			disconnect,
+			sync_close,
 		};
 
 		task		task_;
@@ -118,7 +120,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void start_connect()
 		{
-			task_ = task::connect;
+			task_ = task::req_connect;
 		}
 
 
@@ -146,22 +148,39 @@ namespace seeda {
 			case task::startup:
 				break;
 
-			case task::connect:
+			case task::req_connect:
 				if(client_.connect(ip_, port_, TMO_NBLK)) {
+				}
+				timeout_ = 5 * 100;  // 再接続待ち時間
+				task_ = task::wait_connect;
+				break;
+
+			case task::wait_connect:
+				if(!client_.connected()) {
+					if(timeout_ > 0) {
+						--timeout_;
+					} else {
+						auto st = client_.get_ethernet().get_stat(client_.get_cepid());
+						debug_format("TCP Client stat: %d\n") % static_cast<int>(st);
+						// 接続しないので、「re_connect」要求を出してみる
+						if(client_.re_connect()) {
+							task_ = task::req_connect;
+						} else {
+							task_ = task::disconnect;
+						}
+						timeout_ = 5 * 100;  // 再接続待ち時間
+					}
+					break;
+				} else {
 					debug_format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% ip_.c_str() % port_ % client_.get_cepid();
-					timeout_ = 5 * 100;  // 5 sec
-					time_ = get_sample_data().time_;
 					format::chaout().set_fd(client_.get_cepid());
+					time_ = get_sample_data().time_;
 					task_ = task::time_sync;
 				}
 				break;
 
 			case task::time_sync:
-				if(!client_.connected()) {
-					task_ = task::disconnect;
-					break;
-				}
 				{
 					auto t = get_sample_data().time_;
 					if(time_ == t) break;
@@ -213,8 +232,17 @@ namespace seeda {
 			
 			case task::disconnect:
 				client_.stop();
-				debug_format("Client disconnected: %s\n") % ip_.c_str();
-				task_ = task::connect;
+				timeout_ = 5;
+				task_ = task::sync_close;
+				break;
+
+			case task::sync_close:
+				if(timeout_ > 0) {
+					--timeout_;
+				} else {
+					debug_format("Client disconnected: %s\n") % ip_.c_str();
+					task_ = task::req_connect;
+				}
 				break;
 			}
 		}
