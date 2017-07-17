@@ -298,6 +298,32 @@ int tcp_acp_cep(int cepid, int repid, T_IPVxEP *p_dstaddr, int32_t tmout)
 }
 
 
+int tcp_re_con_cep(int cepid)
+{
+	int ret = _tcp_check_cepid_arg(cepid);
+	if(ret != E_OK) {
+		return E_PAR;
+	}
+
+	// とりあえず、タイムアウトさせない
+	_TCB *tcb = &head_tcb[cepid - 1];
+	tcb->retrans_q.rst_cnt = 0xffff;
+#if 1
+	_API_REQ *areq = &(tcb->req);
+	if(areq->type == 2) {
+		areq->stat = _TCP_API_STAT_UNTREATED;
+		return 0;
+	} else {
+		return -1;
+	}
+#endif
+//    dis_int();
+//	_tcp_api_con();
+//    ena_int();
+	return 0;
+}
+
+
 int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmout)
 {
 	_TCP_CB *pTcbCb = GET_TCP_CALLBACK_INFO_PTR(cepid);
@@ -322,7 +348,9 @@ int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmou
 		}
 	}
 
+#ifdef DEBUG
 	printf("TCP Request TCP_API_CONCP: %d\n", cepid);
+#endif
 
 	head_tcb[cepid - 1].req.type = _TCP_API_CONCP;
 	head_tcb[cepid - 1].req.tmout = tmout;

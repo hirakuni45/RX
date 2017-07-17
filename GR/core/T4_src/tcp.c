@@ -186,7 +186,7 @@ void _proc_api(void)
         _tcp_api_rcvdt
     };
 
-    for (counter = 0;counter < tcp_ccep_num; counter++)
+    for (counter = 0; counter < tcp_ccep_num; counter++)
     {
         _tcp_tcb = &head_tcb[counter];
         _ch_info_tbl = &_ch_info_head[tcp_ccep[counter].cepatr];
@@ -251,6 +251,7 @@ void _tcp_api_acpt(void)
     _tcp_tcb->rwin_bnry = _tcp_tcb->rwin;
     _tcp_tcb->rwin_curr = _tcp_tcb->rwin;
 
+printf("tcp_api_acpt: TCPS_LISTEN\n");
     _tcp_tcb->status = _TCPS_LISTEN;
 
     return;
@@ -1602,8 +1603,9 @@ void _proc_snd(void)
 
             if ((_tcp_tcb->retrans_q.nxt_rtx_cnt != 0xffff) && (_tcp_tcb->retrans_q.nxt_rtx_cnt > 0))
                 _tcp_tcb->retrans_q.nxt_rtx_cnt--;
-            if ((_tcp_tcb->retrans_q.rst_cnt != 0xffff) && (_tcp_tcb->retrans_q.rst_cnt > 0))
+            if ((_tcp_tcb->retrans_q.rst_cnt != 0xffff) && (_tcp_tcb->retrans_q.rst_cnt > 0)) {
                 _tcp_tcb->retrans_q.rst_cnt--;
+			}
 
 
             if (_tcp_tcb->zwp_noack_cnt != 0xffff)
@@ -2270,6 +2272,7 @@ void _tcp_return_listen(void)
     _tcp_init_tcb(_tcp_tcb);
 
     _tcp_tcb->loc_port = tmp;
+printf("tcp_return_listen: TCPS_LISTEN\n");
     _tcp_tcb->status = _TCPS_LISTEN;
 
     return;

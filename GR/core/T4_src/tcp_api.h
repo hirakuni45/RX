@@ -37,6 +37,8 @@ void tcpudp_close(void);
 #if defined(_TCP)
 void tcp_init(uint32_t cepid);
 
+int tcp_re_con_cep(int cepid);
+
 int tcp_acp_cep(int cepid, int repid, T_IPVxEP *p_dstaddr, int32_t tmout);
 int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmout);
 int tcp_sht_cep(int cepid, int32_t tmout);
