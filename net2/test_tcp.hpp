@@ -15,8 +15,10 @@ namespace net {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  Test TCP プロトコル・クラス
+		@param[in]	ETHERNET	イーサーネット・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class ETHERNET>
 	class test_tcp {
 	public:
 
@@ -37,14 +39,19 @@ namespace net {
 
 	private:
 
+		ETHERNET&	eth_;
+
 		enum class task {
 			idle,
 			open,
 			connect,
-			main,
-			close,
-			wait,
 
+			send,
+			recv,
+
+			close,
+
+			wait,
 			halt,
 		};
 
@@ -53,9 +60,15 @@ namespace net {
 		type		type_;
 		uint16_t	port_;
 		task		task_;
+
+		uint8_t		send_buff_[4096];
+		uint8_t		recv_buff_[4096];
 		uint32_t	desc_;
+
 		uint32_t	wait_;
 		uint32_t	loop_;
+
+		uint32_t	data_len_;
 
 		void reverse_(char* ptr, uint32_t len)
 		{
@@ -65,40 +78,43 @@ namespace net {
 		}
 
 
-		template <class ETHERNET>
-		bool trans_(ETHERNET& eth, bool server)
+		int send_(uint32_t send_len, bool server)
 		{
-			auto& ipv4 = eth.at_ipv4();
+			auto& ipv4 = eth_.at_ipv4();
 			auto& tcp  = ipv4.at_tcp();
 
-			char tmp[256];
-			if(type_ == type::server_send_first || type_ == type::client_send_first) {
-				uint32_t send_len = 20;
-				for(uint32_t i = 0; i < send_len; ++i) { tmp[i] = 0x20 + (rand() & 63); }
+			int loop = loop_ / 2;
 
-				int len = tcp.send(desc_, tmp, send_len);
-				if(len < 0) return false;
+			char tmp[send_len + 1];
+			for(uint32_t i = 0; i < send_len; ++i) { tmp[i] = 0x20 + (rand() & 63); }
 
-				tmp[send_len] = 0;
-				utils::format("Test TCP Send %s (%d): '%s', %d\n")
-					% (server ? "Server" : "Client") % desc_ % tmp % len;
+			int len = tcp.send(desc_, tmp, send_len);
+			if(len < 0) return -1;
 
-				len = tcp.recv(desc_, tmp, sizeof(tmp));
-				if(len < 0) return false;
+			tmp[len] = 0;
+			utils::format("TCP Test (%d)Send (%s):  '%s' %d bytes desc(%d)\n")
+				% loop % (server ? "Server" : "Client") % tmp % len % desc_;
 
-				if(len > 0) {
-					tmp[len] = 0;
-					utils::format("Test TCP Recv %s (%d): '%s', %d\n")
-						% (server ? "Server" : "Client") % desc_ % tmp % len;
-				}
-			} else {
-				int len = tcp.recv(desc_, tmp, sizeof(tmp));
-				if(len > 0) {
-					tmp[len] = 0;
-					utils::format("Test TCP Recv %s (%d): '%s', %d\n")
-						% (server ? "Server" : "Client") % desc_ % tmp % len;
+			return len;
+		}
 
-					reverse_(tmp, len);
+		int recv_(uint32_t recv_len, bool server)
+		{
+			auto& ipv4 = eth_.at_ipv4();
+			auto& tcp  = ipv4.at_tcp();
+
+			int loop = loop_ / 2;
+
+			char tmp[recv_len + 1];
+			int len = tcp.recv(desc_, tmp, recv_len);
+			if(len <= 0) return len;
+
+			tmp[len] = 0;
+			utils::format("TCP Test (%d)Recv (%s):  '%s' %d bytes desc(%d)\n")
+				% loop % (server ? "Server" : "Client") % tmp % len % desc_;
+
+#if 0
+			reverse_(tmp, len);
 
 					len *= 5;
 					len /= 7;
@@ -111,17 +127,19 @@ namespace net {
 					return false;
 				}
 			}
-			return true;
+#endif
+			return len;
 		}
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
+			@param[in]	eth	イーサーネット参照
 		*/
 		//-----------------------------------------------------------------//
-		test_tcp() : ip_(), type_(type::idle), port_(3000), task_(task::idle), desc_(0),
-		  wait_(0), loop_(0) { }
+		test_tcp(ETHERNET& eth) : eth_(eth), ip_(), type_(type::idle), port_(3000), task_(task::idle), desc_(0),
+		  wait_(0), loop_(0), data_len_(20) { }
 
 
 		//-----------------------------------------------------------------//
@@ -145,18 +163,34 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  サービス
-			@param[in]	eth	イーサーネット・コンテキスト
 		*/
 		//-----------------------------------------------------------------//
-		template <class ETHERNET>
-		void service(ETHERNET& eth)
+		void service()
 		{
-			auto& ipv4 = eth.at_ipv4();
+			auto& ipv4 = eth_.at_ipv4();
 			auto& tcp  = ipv4.at_tcp();
 
 			bool server = false;
-			if(type_ == type::server_send_first || type_ == type::server_recv_first) {
+			bool send_first = false;
+			switch(type_) {
+			case type::server_send_first:
 				server = true;
+				send_first = true;
+				break;
+			case type::server_recv_first:
+				server = true;
+				send_first = false;
+				break;
+			case type::client_send_first:
+				server = false;
+				send_first = true;
+				break;
+			case type::client_recv_first:
+				server = false;
+				send_first = false;
+				break;
+			default:
+				break;
 			}
 
 			switch(task_) {
@@ -168,13 +202,21 @@ namespace net {
 
 			case task::open:
 				{
-					auto state = tcp.open(ip_, port_, server, desc_);
-					if(state == net_state::OK) {
-						utils::format("Test TCP Open (%d): %s\n")
-							% desc_ % (server ? "Server" : "Client");
-						task_ = task::connect;
-						wait_ = CLIENT_RE_CONNECT_TIME;
+					bool err = false;
+					if(tcp.open(send_buff_, sizeof(send_buff_),
+						recv_buff_, sizeof(recv_buff_), desc_)) {
+						if(tcp.start(desc_, ip_, port_, server)) {
+							utils::format("TCP Test Open (%d): %s\n")
+								% desc_ % (server ? "Server" : "Client");
+							task_ = task::connect;
+							wait_ = CLIENT_RE_CONNECT_TIME;
+						} else {
+							err = true;
+						}
 					} else {
+						err = true;
+					}
+					if(err) {
 						wait_ = 500;
 						task_ = task::wait;
 					}
@@ -183,9 +225,13 @@ namespace net {
 
 			case task::connect:
 				if(tcp.connected(desc_)) {
-					utils::format("Test TCP Connection (%s)\n")
+					utils::format("TCP Test Connection (%s)\n")
 						% (server ? "Server" : "Client");
-					task_ = task::main;
+					if(send_first) {
+						task_ = task::send;
+					} else {
+						task_ = task::recv;
+					}
 				} else {
 					if(!server) {
 						if(wait_ > 0) {
@@ -198,24 +244,35 @@ namespace net {
 				}
 				break;
 
-			case task::main:
-				if(!tcp.connected(desc_)) {
-					utils::format("Test TCP Connection: OFF\n");
+			case task::send:
+				if(!tcp.connected(desc_) || tcp.is_fin(desc_)) {
+					utils::format("TCP Test Connection: OFF\n");
 					task_ = task::close;
 				} else {
-					if(!trans_(eth, server)) {
-						task_ = task::close;
+					int len = send_(data_len_, server);
+					if(len > 0) {
+						++loop_;
+						task_ = task::recv;
 					}
-//					++loop_;
-					if(loop_ >= 10) {
-						task_ = task::close;
+				}
+				break;
+
+			case task::recv:
+				if(!tcp.connected(desc_) || tcp.is_fin(desc_)) {
+					utils::format("TCP Test Connection: OFF\n");
+					task_ = task::close;
+				} else {
+					int len = recv_(data_len_, server);
+					if(len > 0) {
+						++loop_;
+						task_ = task::send;
 					}
 				}
 				break;
 
 			case task::close:
 				tcp.close(desc_);
-				utils::format("Test TCP Close (%d)\n") % desc_;
+				utils::format("TCP Test Close (%d)\n") % desc_;
 				wait_ = 5;
 				task_ = task::wait;
 				break;

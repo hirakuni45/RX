@@ -72,6 +72,8 @@ namespace net {
 
 		LINE_MAN		line_man_;
 
+		uint8_t			recv_buff_[4096];
+		uint8_t			send_buff_[8192];
 		uint32_t		desc_;
 
 		time_t			last_modified_;
@@ -255,7 +257,14 @@ namespace net {
 		uint32_t make_info(int status, int length, bool keep = false)
 		{
 			uint32_t lp = 0;
-			http_format("HTTP/1.1 %d %s\n") % status % (status == 200 ? "OK" : "Not Found");
+			http_format("HTTP/1.1 %d ") % status;
+			if(status == 200) {
+				http_format("OK\n");
+			} else if(status == 404) {
+				http_format("Not Found\n");
+			} else {
+				http_format("NG\n");
+			}
 
 			time_t t = get_time();
 			struct tm *m = gmtime(&t);
@@ -330,7 +339,8 @@ namespace net {
 
 			if(std::strcmp(path, "/favicon.ico") == 0) {
 				clp = make_info(404, -1, false);
-				http_format("\n");
+				http_format("<!DOCTYPE HTML><html><head><title>404 Not Found</title></head>");
+				http_format("<body></body></html>");
 				uint32_t end = http_format::chaout().size();
 				char tmp[5 + 1];  // 数字５文字＋終端
 				utils::sformat("%5d", tmp, sizeof(tmp)) % (end - org);
@@ -554,19 +564,30 @@ namespace net {
 			case task::begin_http:
 				{
 					ip_adrs adrs;
-					if(tcp.open(adrs, http_port, true, desc_) != net_state::OK) {
+					bool err = false;
+					if(tcp.open(send_buff_, sizeof(send_buff_),
+						recv_buff_, sizeof(recv_buff_), desc_)) {
+						if(tcp.start(desc_, adrs, http_port, true)) {
+							debug_format("HTTP Server Start: '%s' port(%d), desc(%d)\n")
+								% eth_.at_info().ip.c_str()
+								% static_cast<int>(http_port)
+								% desc_;
+							http_format::chaout().set_desc(desc_);
+							debug_format("HTTP Server: format capacity: %d\n")
+								% http_format::chaout().at_str().capacity();
+							task_ = task::wait_http;
+						} else {
+							tcp.close(desc_);
+							err = true;
+						}
+					} else {
+						err = true;
+					}
+					if(err) {
 						debug_format("HTTP TCP open error\n");
 						task_ = task::delay_begin;
 						delay_loop_ = 100; // 1 sec
-						break;
 					}
-					debug_format("HTTP Server Start: '%s' port(%d), desc(%d)\n")
-						% eth_.at_info().ip.c_str()
-						% static_cast<int>(http_port)
-						% desc_;
-					http_format::chaout().set_desc(desc_);
-					debug_format("HTTP Server: format capacity: %d\n") % http_format::chaout().at_str().capacity();
-					task_ = task::wait_http;
 				}
 				break;
 

@@ -28,6 +28,9 @@ namespace net {
 		};
 
 		task		task_;
+
+		uint8_t		send_buff_[4096];
+		uint8_t		recv_buff_[4096];
 		uint32_t	desc_;
 		uint32_t	loop_;
 		uint32_t	wait_;
@@ -73,11 +76,19 @@ namespace net {
 
 			case task::open:
 				{
-					auto state = udp.open(ip_adrs(192,168,3,7), 3000, desc_);
-					if(state == net_state::OK) {
-						utils::format("Test UDP Open: (%d)\n") % desc_;
-						task_ = task::main;
+					bool err = false;
+					if(udp.open(send_buff_, sizeof(send_buff_),
+						recv_buff_, sizeof(recv_buff_), desc_)) {
+						if(udp.start(desc_, ip_adrs(192,168,3,7), 3000)) {
+							utils::format("Test UDP Open: (%d)\n") % desc_;
+							task_ = task::main;
+						} else {
+							err = true;
+						}
 					} else {
+						err = true;
+					}
+					if(err) {
 						wait_ = 300;
 						task_ = task::wait;
 					}

@@ -129,7 +129,12 @@ namespace net {
 		ETHERNET&		eth_;
 		SDC&			sdc_;
 
+		uint8_t			ctrl_recv_buff_[1024];
+		uint8_t			ctrl_send_buff_[1024];
 		uint32_t		ctrl_;
+
+		uint8_t			data_recv_buff_[4096];
+		uint8_t			data_send_buff_[4096];
 		uint32_t		data_;
 
 		enum class task {
@@ -330,7 +335,7 @@ namespace net {
 			if(tcp.get_recv_length(ctrl_) > 0) {	
 				len = tcp.recv(ctrl_, tmp, sizeof(tmp));
 				if(len <= 0) return false;
-///				debug_dump_(tmp, len);
+				debug_dump_(tmp, len);
 			} else {
 				return false;
 			}
@@ -815,10 +820,9 @@ namespace net {
 						ctrl_format("150 Accepted data connection\n");
 						ctrl_flush();
 						if(sdc_.get_mount()) {
-							ctrl_format::chaout().set_desc(data_);
+							data_format::chaout().set_desc(data_);
 							int n = sdc_.dir_loop("", dir_mlsd_func_, true, nullptr);
-							ctrl_flush();
-							ctrl_format::chaout().set_desc(ctrl_);
+							data_flush();
 							ctrl_format("226-options: -a -l\n");
 							ctrl_format("226 %d matches total\n") % n;
 						} else {
@@ -944,19 +948,33 @@ utils::format("Reconnection CTRL\n");
 				{
 					ip_adrs adrs;
 					bool server = true;
-					net_state ret = tcp.open(ip_adrs(), CTRL_PORT, server, ctrl_);
-					if(ret == net_state::OK) {
-						debug_format("FTP Server start (CTRL): %s port(%d), desc(%d)\n")
-							% eth_.get_info().ip.c_str() % tcp.get_port(ctrl_) % ctrl_;
-						task_ = task::connection;
-						ctrl_format::chaout().set_desc(ctrl_);
+					bool err = false;
+					if(tcp.open(ctrl_send_buff_, sizeof(ctrl_send_buff_),
+						ctrl_recv_buff_, sizeof(ctrl_recv_buff_), ctrl_)) {
+						if(tcp.start(ctrl_, ip_adrs(), CTRL_PORT, server)) {
+							debug_format("FTP Server start (CTRL): %s port(%d), desc(%d)\n")
+								% eth_.get_info().ip.c_str() % tcp.get_port(ctrl_) % ctrl_;
+							task_ = task::connection;
+							ctrl_format::chaout().set_desc(ctrl_);
+						} else {
+							err = true;
+						}
 					} else {
+						err = true;
+					}
+					if(err) {
+						auto ret = tcp.get_last_state();
 						debug_format("FTP Server open error (CTRL): '%s'\n") % get_state_str(ret);
+						task_ = task::disconnect;
 					}
 				}
 				break;
 
 			case task::connection:
+				if(!tcp.probe(ctrl_)) {  // ディスクリプタが有効か？
+					task_ = task::disconnect;
+					break;					
+				}
 				if(tcp.connected(ctrl_)) {
 					debug_format("FTP Server (CTRL): connect form: '%s'\n") % tcp.get_ip(ctrl_).c_str();
 					ctrl_format("220 %s FTP server %s ") % host_ % eth_.at_info().ip.c_str();
@@ -1022,17 +1040,26 @@ utils::format("Reconnection CTRL\n");
 
 			case task::start_pasv:
 				{
-					bool server = true;
 					ip_adrs adrs;
-					net_state ret = tcp.open(adrs, DATA_PORT_PASV, server, data_);
-					if(ret == net_state::OK) {
-						debug_format("FTP Server data start (PASV): '%s' (%d) desc(%d)\n")
-							% eth_.get_info().ip.c_str() % tcp.get_port(data_) % data_;
-						data_connect_loop_ = data_connection_timeout_;
-						data_format::chaout().set_desc(data_);
-						task_ = task::data_connection;
+					bool server = true;
+					bool err = false;
+					if(tcp.open(data_send_buff_, sizeof(data_send_buff_),
+						data_recv_buff_, sizeof(data_recv_buff_), data_)) {
+						if(tcp.start(data_, adrs, DATA_PORT_PASV, server)) {
+							debug_format("FTP Server data start (PASV): '%s' (%d) desc(%d)\n")
+								% eth_.get_info().ip.c_str() % tcp.get_port(data_) % data_;
+							data_connect_loop_ = data_connection_timeout_;
+							data_format::chaout().set_desc(data_);
+							task_ = task::data_connection;
+						} else {
+							err = true;
+						}
 					} else {
-						debug_format("Error FTP Server data (PASV) open: '%s'\n") % get_state_str(ret);
+						err = true;
+					}
+					if(err) {
+						auto ret = tcp.get_last_state();
+						debug_format("FTP Server error data (PASV) open: '%s'\n") % get_state_str(ret);
 					}
 				}
 				break;
@@ -1060,16 +1087,24 @@ utils::format("Reconnection CTRL\n");
 			case task::start_port:
 				{
 					bool server = false;
-					net_state ret = tcp.open(data_ip_, data_port_, server, data_);
-					if(ret == net_state::OK) {
-						debug_format("FTP Server data start (PORT): '%s' (%d) desc(%d)\n")
-							% data_ip_.c_str() % data_port_ % data_;
-						data_connect_loop_ = data_connection_timeout_;
-						data_format::chaout().set_desc(data_);
-						task_ = task::port_connection;
+					bool err = false;
+					if(tcp.open(data_send_buff_, sizeof(data_send_buff_),
+						data_recv_buff_, sizeof(data_recv_buff_), data_)) {
+						if(tcp.start(data_, data_ip_, data_port_, server)) {
+							debug_format("FTP Server data start (PORT): '%s' (%d) desc(%d)\n")
+								% data_ip_.c_str() % data_port_ % data_;
+							data_connect_loop_ = data_connection_timeout_;
+							data_format::chaout().set_desc(data_);
+							task_ = task::port_connection;
+						} else {
+							err = true;
+						}
 					} else {
-						debug_format("Error FTP Server data (PORT) open: '%s'\n") % get_state_str(ret);
-///						task_ = task::idle;
+						err = true;
+					}
+					if(err) {
+						auto ret = tcp.get_last_state();
+						debug_format("FTP Server error data (PORT) open: '%s'\n") % get_state_str(ret);
 					}
 				}
 				break;
@@ -1202,8 +1237,8 @@ utils::format("Reconnection CTRL\n");
 			case task::disconnect:
 			default:
 				tcp.close(ctrl_);
-				debug_format("FTP Server (CTRL): disconnect\n");
-				delay_loop_ = 4;
+				debug_format("FTP Server (CTRL) disconnect: desc(%d)\n") % ctrl_;
+				delay_loop_ = 5;
 				task_ = task::disconnect_main;
 				break;
 			case task::disconnect_main:

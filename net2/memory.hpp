@@ -16,24 +16,41 @@ namespace net {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     /*!
         @brief  memory(fifo) クラス
-		@param[in]	SIZE	バッファサイズ（最大６５５３６）
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t SIZE>
 	class memory {
 
 		volatile uint16_t	get_;
 		volatile uint16_t	put_;
 
-		uint8_t	buff_[SIZE];
+		uint8_t*	buff_;
+		uint16_t	size_;
 
 	public:
         //-----------------------------------------------------------------//
         /*!
             @brief  コンストラクター
+			@param[in]	buff	バッファのポインター
+			@param[in]	size	バッファのサイズ
         */
         //-----------------------------------------------------------------//
-		memory() noexcept : get_(0), put_(0) { }
+		memory(void* buff = nullptr, uint16_t size = 0) noexcept :
+			get_(0), put_(0), buff_(static_cast<uint8_t*>(buff)), size_(size)
+		{ }
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  バッファを設定
+			@param[in]	buff	バッファのポインター
+			@param[in]	size	バッファのサイズ
+        */
+        //-----------------------------------------------------------------//
+		void set_buff(void* buff, uint16_t size)
+		{
+			buff_ = static_cast<uint8_t*>(buff);
+			size_ = size;
+		}
 
 
         //-----------------------------------------------------------------//
@@ -42,7 +59,7 @@ namespace net {
 			@return	バッファのサイズ
         */
         //-----------------------------------------------------------------//
-		uint32_t size() const noexcept { return SIZE; }
+		uint32_t size() const noexcept { return size_; }
 
 
         //-----------------------------------------------------------------//
@@ -53,7 +70,7 @@ namespace net {
         //-----------------------------------------------------------------//
 		uint32_t length() const noexcept {
 			if(put_ >= get_) return (put_ - get_);
-			else return (SIZE + put_ - get_);
+			else return (size_ + put_ - get_);
 		}
 
 
@@ -74,8 +91,8 @@ namespace net {
 		inline void put_go(uint16_t n) noexcept {
 			volatile uint16_t put = put_;
 			put += n;
-			if(put >= SIZE) {
-				put -= SIZE;
+			if(put >= size_) {
+				put -= size_;
 			}
 			put_ = put;
 		}
@@ -91,13 +108,13 @@ namespace net {
         //-----------------------------------------------------------------//
 		void put(const void* src, uint16_t len, bool go = true) noexcept {
 			uint16_t all = len;
-			uint16_t fsz = SIZE - put_;
+			uint16_t fsz = size_ - put_;
 			uint16_t pos = put_;
 			if(fsz <= len) {
 				std::memcpy(&buff_[pos], src, fsz);
 				len -= fsz;
 				pos += fsz;
-				if(pos >= SIZE) pos -= SIZE;
+				if(pos >= size_) pos -= size_;
 				src = static_cast<const void*>(static_cast<const uint8_t*>(src) + fsz);
 			}
 			if(len > 0) {
@@ -118,8 +135,8 @@ namespace net {
 		inline void get_go(uint16_t n) noexcept {
 			volatile uint16_t get = get_;
 			get += n;
-			if(get >= SIZE) {
-				get -= SIZE;
+			if(get >= size_) {
+				get -= size_;
 			}
 			get_ = get;
 		}
@@ -135,13 +152,13 @@ namespace net {
         //-----------------------------------------------------------------//
 		void get(void* dst, uint16_t len, bool go = true) noexcept {
 			uint16_t all = len;
-			uint16_t fsz = SIZE - get_;
+			uint16_t fsz = size_ - get_;
 			uint16_t pos = get_;
 			if(fsz <= len) {
 				std::memcpy(dst, &buff_[pos], fsz);
 				len -= fsz;
 				pos += fsz;
-				if(pos >= SIZE) pos -= SIZE;
+				if(pos >= size_) pos -= size_;
 				dst = static_cast<void*>(static_cast<uint8_t*>(dst) + fsz);
 			}
 			if(len > 0) {

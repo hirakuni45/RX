@@ -51,15 +51,14 @@ namespace net {
 
 		net_info&	info_;
 
+		net_state	last_state_;
+
 		enum class send_task : uint8_t {
 			idle,
 			sync_mac,
 			main,
 			sync_close,
 		};
-
-		typedef memory<1024>  RECV_B;
-		typedef memory<1024>  SEND_B;
 
 		struct context {
 			ip_adrs		adrs_;
@@ -76,8 +75,16 @@ namespace net {
 
 			send_task	send_task_;
 
-			RECV_B		recv_;
-			SEND_B		send_;
+			memory		recv_;
+			memory		send_;
+
+
+			void init(void* send_buff, uint16_t send_size, void* recv_buff, uint16_t recv_size)
+			{
+				send_.set_buff(send_buff, send_size);
+				recv_.set_buff(recv_buff, recv_size);
+			}
+
 
 			void reset(const ip_adrs& adrs, uint16_t port)
 			{
@@ -204,7 +211,8 @@ namespace net {
 			@param[in]	info	ネット情報
 		*/
 		//-----------------------------------------------------------------//
-		udp(ETHD& ethd, net_info& info) noexcept : ethd_(ethd), info_(info), common_() { }
+		udp(ETHD& ethd, net_info& info) noexcept : ethd_(ethd), info_(info),
+			last_state_(net_state::OK), common_() { }
 
 
 		//-----------------------------------------------------------------//
@@ -219,19 +227,63 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  オープン
-			@param[in]	adrs	アドレス
-			@param[in]	port	ポート
+			@param[in]	send_buff	送信バッファ
+			@param[in]	send_size	送信バッファサイズ
+			@param[in]	recv_buff	受信バッファ
+			@param[in]	recv_size	受信バッファサイズ
 			@param[out]	desc	ディスクリプタ
-			@return UDP ステート
+			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		net_state open(const ip_adrs& adrs, uint16_t port, uint32_t& desc) noexcept
+		bool open(void* send_buff, uint16_t send_size, void* recv_buff, uint16_t recv_size, uint32_t& desc) noexcept
 		{
-			if(port == 0) {
-				debug_format("UDP Open fail port: %d\n") % port;
+			// コンテキスト・スペースが無い
+			uint32_t idx = common_.at_blocks().alloc();  // ロックされた状態
+			if(!common_.at_blocks().is_alloc(idx)) {
+				auto st = net_state::CONTEXT_EMPTY;
+				if(last_state_ != st) {
+					debug_format("TCP Open fail context empty\n"); 
+					last_state_ = st;
+				}
 				desc = NMAX;
-				return net_state::FAIL_PORT;
+				return false;
 			}
+
+			context& ctx = common_.at_blocks().at(idx);
+			ctx.init(send_buff, send_size, recv_buff, recv_size);
+
+			desc = idx;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オープン
+			@param[in]	desc	ディスクリプタ
+			@param[in]	adrs	アドレス
+			@param[in]	port	ポート
+			@return 正常なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool start(uint32_t desc, const ip_adrs& adrs, uint16_t port) noexcept
+		{
+			if(!common_.get_blocks().is_alloc(desc)) return false;
+
+			// ロック状態で、呼ばれるので、ロックが無い場合はエラー
+			if(!common_.get_blocks().is_lock(desc)) {
+				return false;
+			}
+
+			if(port == 0) {
+				debug_format("UDP Open fail port: %d desc(%d)\n") % port % desc;
+				desc = NMAX;
+				last_state_ = net_state::FAIL_PORT;
+				return false;
+			}
+
+			context& ctx = common_.at_blocks().at(desc);
 #if 0
 			// 同じポートがある場合は無効
 			for(uint32_t i = 0; i < NMAX; ++i) {
@@ -248,14 +300,6 @@ namespace net {
 				}
 			}
 #endif
-			uint32_t idx = common_.at_blocks().alloc();
-			if(!common_.at_blocks().is_alloc(idx)) {
-				debug_format("UDP Context Empty\n");
-				desc = NMAX;
-				return net_state::CONTEXT_EMPTY;
-			}
-
-			context& ctx = common_.at_blocks().at(idx);
 			ctx.reset(adrs, port);
 
 			if(adrs.is_any() || adrs.is_brodcast()) {
@@ -268,10 +312,9 @@ namespace net {
 				}
 			}
 
-			common_.at_blocks().unlock(idx);
+			common_.at_blocks().unlock(desc);
 
-			desc = idx;
-			return net_state::OK;
+			return true;
 		}
 
 
