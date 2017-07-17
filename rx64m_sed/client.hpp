@@ -9,7 +9,7 @@
 #include "main.hpp"
 #include "sample.hpp"
 
-// #define CLIENT_DEBUG
+#define CLIENT_DEBUG
 
 namespace seeda {
 
@@ -27,9 +27,12 @@ namespace seeda {
 #endif
 
 		static const uint16_t PORT = 3000;	///< クライアント・ポート
+		static const uint16_t RE_CONNECT_TIME = 5 * 100;  ///< 接続要求再送までの時間
 
 		NET_MAIN::ETHERNET&	eth_;
 
+		uint8_t		recv_buff_[2048];
+		uint8_t		send_buff_[2048];
 		uint32_t	desc_;
 
 		typedef utils::basic_format<net::desc_string<net::format_id::client0, 1024> > format;
@@ -51,8 +54,8 @@ namespace seeda {
 		net::ip_adrs	ip_;
 
 		uint16_t	port_;
+		uint16_t	timeout_;
 		uint32_t	delay_;
-		uint32_t	timeout_;
 
 		time_t		time_;
 
@@ -75,8 +78,8 @@ namespace seeda {
 #else
 			ip_(192, 168, 3, 7),
 #endif
-			port_(PORT),
-			delay_(0), timeout_(0), time_(0) { }
+			port_(PORT), timeout_(0), delay_(0), time_(0)
+			{ }
 
 
 		//-----------------------------------------------------------------//
@@ -158,19 +161,32 @@ namespace seeda {
 				break;
 
 			case task::connect:
-				if(tcp.open(ip_, port_, false, desc_) == net::net_state::OK) {
-					debug_format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
-						% ip_.c_str() % port_ % desc_;
-					timeout_ = 5 * 100;  // 5 sec
-					time_ = get_sample_data().time_;
-					format::chaout().set_desc(desc_);
-					task_ = task::sync_connect;
+				if(tcp.open(send_buff_, sizeof(send_buff_), recv_buff_, sizeof(recv_buff_), desc_)) {
+					if(tcp.start(desc_, ip_, port_, false)) {
+						debug_format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
+							% ip_.c_str() % port_ % desc_;
+						timeout_ = RE_CONNECT_TIME;
+						time_ = get_sample_data().time_;
+						format::chaout().set_desc(desc_);
+						task_ = task::sync_connect;
+					} else {
+						task_ = task::disconnect;
+					}
+				} else {
+					task_ = task::disconnect;
 				}
 				break;
 
 			case task::sync_connect:
 				if(tcp.connected(desc_)) {
 					task_ = task::sync_time;
+				} else {
+					if(timeout_ > 0) {
+						--timeout_;
+					} else {
+						tcp.re_connect(desc_);
+						timeout_ = RE_CONNECT_TIME;
+					}
 				}
 				break;
 
@@ -214,18 +230,25 @@ namespace seeda {
 				break;
 
 			case task::send_data:
-				format::chaout().clear();
-				format("POST /api/?val=%s HTTP/1.1\n") % data_;
-				format("Host: %d.%d.%d.%d\n")
-					% static_cast<int>(ip_[0])
-					% static_cast<int>(ip_[1])
-					% static_cast<int>(ip_[2])
-					% static_cast<int>(ip_[3]);
-				format("Content-Type: application/x-www-form-urlencoded\n");
-				format("User-Agent: SEEDA03 Post Client\n");
-				format("Connection: close\n\n");
-				format::chaout().flush();
-				task_ = task::disconnect;
+				{
+					format::chaout().clear();
+					format("POST /api/?val=%s HTTP/1.1\n") % data_;
+					format("Host: %s:%d\n")
+						% ip_.c_str()
+						% port_;
+					format("Content-Type: application/x-www-form-urlencoded\n");
+					format("User-Agent: SEEDA03 Post Client\n");
+					format("Content-Length: ");
+					uint32_t ins = format::chaout().size();
+					format("     \n");
+					format("Connection: close\n\n");
+					uint32_t end = format::chaout().size();
+					char tmp[5 + 1];  // 数字５文字＋終端
+					utils::sformat("%5d", tmp, sizeof(tmp)) % end;
+					strncpy(&format::chaout().at_str()[ins], tmp, 5); // 数字部のみコピー
+					format::chaout().flush();
+					task_ = task::disconnect;
+				}
 				break;
 			
 			case task::disconnect:
