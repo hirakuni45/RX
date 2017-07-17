@@ -26,6 +26,13 @@
 #include "GR/core/http_server.hpp"
 #include "GR/core/ftp_server.hpp"
 
+#ifdef DEBUG
+#define CLIENT_DEBUG
+#define NETS_DEBUG
+#define WRITE_FILE_DEBUG
+#endif
+
+
 namespace seeda {
 
 	static const int seeda_version_ = 220;
