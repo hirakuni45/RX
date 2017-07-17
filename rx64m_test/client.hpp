@@ -1,8 +1,8 @@
 #pragma once
 //=====================================================================//
 /*! @file
-    @brief  SEEDA03 client クラス @n
-			Copyright 2017 Kunihito Hiramatsu
+    @brief  SEEDA03 client クラス
+	@copyright Copyright 2017 Kunihito Hiramatsu All Right Reserved.
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//

@@ -1,8 +1,8 @@
 #pragma once
 //=====================================================================//
 /*! @file
-    @brief  プリファレンス・クラス@n
-			Copyright 2017 Kunihito Hiramatsu
+    @brief  プリファレンス・クラス
+	@copyright Copyright 2017 Kunihito Hiramatsu All Right Reserved.
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
