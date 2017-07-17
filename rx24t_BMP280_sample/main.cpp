@@ -1,9 +1,11 @@
 //=====================================================================//
 /*! @file
     @brief  RX24T / BMP180/BMP280 サンプル @n
-			・P00(4) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
-			Copyright 2016,2017 Kunihito Hiramatsu
+			・P00(4) ピンに赤色LED（VF:1.9V）を吸い込みで接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/cmt_io.hpp"
