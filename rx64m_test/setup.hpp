@@ -37,7 +37,7 @@ namespace seeda {
 		typedef device::spi_io<MISO, MOSI, SPCK> SPI;
 
 		typedef device::PORT<device::PORT1, device::bitpos::B4> EUI_CS;
-		typedef device::PORT<device::PORTB, device::bitpos::B0> EUI_HOLD;
+		typedef device::PORT<device::PORT8, device::bitpos::B0> EUI_HOLD;
 		typedef chip::EUI_XX<SPI, EUI_CS> EUI;
 		SPI		spi_;
 		EUI		eui_;
@@ -121,7 +121,7 @@ namespace seeda {
 		void init_eui(bool dev)
 		{
 #ifdef SEEDA
-			spi_.start_sdc(1000000);  // Clock/1MHz
+			spi_.start_sdc(500000);  // Clock 500KHz
 			EUI_HOLD::DIR = 1;
 			EUI_HOLD::P = 1;
 			eui_.start();
@@ -233,7 +233,7 @@ namespace seeda {
 
 			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 
-			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n");
+			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
 			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 		}
 

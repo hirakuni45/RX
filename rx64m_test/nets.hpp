@@ -185,7 +185,7 @@ namespace seeda {
 			http_format("<br>\n");
 
 			http_.tag_hr(600, 3);
-			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定\">\n");
+			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
 		}
 
 
@@ -405,7 +405,7 @@ namespace seeda {
 					http_format("ＳＤカードがありません。<br>\n");
 				}
 				http_.tag_hr(600, 3);
-				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"戻る\">\n");
+				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
 			} );
 
 			http_.set_cgi("/cgi/set_rtc.cgi", "SetRTC", [=](void) {
