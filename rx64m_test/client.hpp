@@ -126,17 +126,6 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  再接続
-		*/
-		//-----------------------------------------------------------------//
-		void restart()
-		{
-			task_ = task::disconnect;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  サービス
 		*/
 		//-----------------------------------------------------------------//
@@ -161,17 +150,12 @@ namespace seeda {
 						--timeout_;
 					} else {
 						auto st = client_.get_ethernet().get_stat(client_.get_cepid());
-						debug_format("TCP Client stat: %d\n") % static_cast<int>(st);
+						debug_format("TCP Client re_connect: %d\n") % static_cast<int>(st);
 						// 接続しないので、「re_connect」要求を出してみる
-						if(st == TCP_API_STAT_CLOSED) {
-							task_ = task::disconnect;
-						} else {
-							client_.re_connect();
-							task_ = task::req_connect;
-							timeout_ = 5 * 100;  // 再接続待ち時間
-						}
+						// ※ re_connect では、タイムアウト（１０分）を無効にする。
+						client_.re_connect();
+						timeout_ = 5 * 100;  // 再接続待ち時間
 					}
-					break;
 				} else {
 					debug_format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% ip_.c_str() % port_ % client_.get_cepid();
