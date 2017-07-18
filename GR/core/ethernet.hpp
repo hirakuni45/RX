@@ -17,8 +17,8 @@
 #include "T4_src/config_tcpudp.h"
 #include "T4_src/r_t4_dhcp_client_rx_if.h"
 #include "T4_src/r_dhcp_client.h"
-#include "T4_src/r_t4_dns_client_rx_if.h"
-#include "T4_src/r_dns_client.h"
+/// #include "T4_src/r_t4_dns_client_rx_if.h"
+/// #include "T4_src/r_dns_client.h"
 #include "T4_src/ether.h"
 #include "T4_src/ip.h"
 #include "T4_src/tcp.h"
@@ -62,12 +62,12 @@ typedef utils::null_format debug_format;
 #define UDP_TX_PACKET_MAX_SIZE  24
 
 extern _TCB   *head_tcb;
-extern uint8_t dnsaddr1[];
-extern uint8_t dnsaddr2[];
+/// extern uint8_t dnsaddr1[];
+/// extern uint8_t dnsaddr2[];
 extern volatile uint16_t wait_timer;
 extern uint8_t     cepid_max;
-extern NAME_TABLE  name_table;
-extern DNS_MNG     dns_mng;
+/// extern NAME_TABLE  name_table;
+/// extern DNS_MNG     dns_mng;
 
 #define UDP_RCV_DAT_DATAREAD_MAXIMUM    1472
 
@@ -138,7 +138,7 @@ namespace net {
 
 			memcpy(tcpudp_env[ch].maskaddr, tmpDhcpPt->maskaddr, 4);
 			memcpy(tcpudp_env[ch].gwaddr, tmpDhcpPt->gwaddr, 4);
-			memcpy((char *)dnsaddr1, (char *)tmpDhcpPt->dnsaddr, 4);
+///			memcpy((char *)dnsaddr1, (char *)tmpDhcpPt->dnsaddr, 4);
 			memcpy(dhcpSvMac.bytes, ((DHCP_PACKET*)tcpudp_work_)->ether.source_address, EP_ALEN);
 			memcpy(dhcpSvIp.bytes, ((DHCP_PACKET*)tcpudp_work_)->ipv4.source_ip, IP_ALEN);
 			dhcp_use_ = true;
@@ -408,7 +408,7 @@ namespace net {
 			int ch = 0;
 			memcpy(ethernet_mac[ch].mac, mac, EP_ALEN);
 			memcpy(tcpudp_env[ch].ipaddr, local_ip.get(), IP_ALEN);
-			memcpy(dnsaddr1, dns_server.get(), IP_ALEN);
+///			memcpy(dnsaddr1, dns_server.get(), IP_ALEN);
 			memcpy(tcpudp_env[ch].gwaddr, gateway.get(), IP_ALEN);
 			memcpy(tcpudp_env[ch].maskaddr, subnet.get(), IP_ALEN);
 			dhcp_use_ = false;
@@ -491,7 +491,7 @@ namespace net {
 			return adr;
 		}
 
-
+#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  DNS の IP 取得
@@ -503,7 +503,7 @@ namespace net {
 			adr.set(dnsaddr1);
 			return adr;
 		}
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
