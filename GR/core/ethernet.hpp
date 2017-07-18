@@ -117,7 +117,7 @@ namespace net {
 	private:
 		CEP			cep_[TCP_CCEP_MAX + UDP_CCEP_MAX];
 
-		uint32_t	tcpudp_work_[2700];
+		uint32_t	tcpudp_work_[2514];
 
         uint32_t    dhcpIPAddressLeaseTime_sec;
         uint32_t    dhcpIPuse_sec;
