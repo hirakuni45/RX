@@ -252,7 +252,7 @@ void _tcp_api_acpt(void)
     _tcp_tcb->rwin_bnry = _tcp_tcb->rwin;
     _tcp_tcb->rwin_curr = _tcp_tcb->rwin;
 
-printf("tcp_api_acpt: TCPS_LISTEN\n");
+/// printf("tcp_api_acpt: TCPS_LISTEN\n");
     _tcp_tcb->status = _TCPS_LISTEN;
 
     return;
@@ -2273,7 +2273,7 @@ void _tcp_return_listen(void)
     _tcp_init_tcb(_tcp_tcb);
 
     _tcp_tcb->loc_port = tmp;
-printf("tcp_return_listen: TCPS_LISTEN\n");
+/// printf("tcp_return_listen: TCPS_LISTEN\n");
     _tcp_tcb->status = _TCPS_LISTEN;
 
     return;
