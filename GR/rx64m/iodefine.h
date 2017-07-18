@@ -89,6 +89,11 @@
 #ifndef __RX64MIODEFINE_HEADER__
 #define __RX64MIODEFINE_HEADER__
 
+#if defined(__RX_LITTLE_ENDIAN__)
+#elif defined(__RX_BIG_ENDIAN__)
+#error "iodefine.h requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
+#endif
+
 #pragma pack(4)
 
 struct st_bsc {
