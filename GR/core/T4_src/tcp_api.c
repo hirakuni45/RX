@@ -308,7 +308,7 @@ int tcp_re_con_cep(int cepid)
 	// とりあえず、タイムアウトさせない
 	_TCB *tcb = &head_tcb[cepid - 1];
 	tcb->retrans_q.rst_cnt = 0xffff;
-#if 1
+#if 0
 	_API_REQ *areq = &(tcb->req);
 	if(areq->type == 2) {
 		areq->stat = _TCP_API_STAT_UNTREATED;
