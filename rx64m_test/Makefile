@@ -40,8 +40,7 @@ CSOURCES	=	common/init.c \
 				GR/core/T4_src/udp.c \
 				GR/core/T4_src/tcp.c \
 				GR/core/T4_src/tcp_api.c \
-				GR/core/T4_src/r_dhcp_client.c \
-				GR/core/T4_src/r_dns_client.c
+				GR/core/T4_src/r_dhcp_client.c
 
 PSOURCES	=	main.cpp \
 				GR/core/ethernet.cpp
@@ -54,7 +53,7 @@ USER_DEFS	=	SIG_RX64M F_ICLK=118750000 F_FCLK=59375000 F_PCLKA=118750000 \
 				F_PCLKB=59375000 F_PCLKD=59375000 \
 				B_ID=$(BUILD_ID) SEEDA \
 				FAT_FS FAT_FS_NUM=3 \
-				__RX __RX_LITTLE_ENDIAN__ LITTLE_ENDIAN TI_DP83822_
+				TI_DP83822_
 
 MCU_TARGET	=
 
