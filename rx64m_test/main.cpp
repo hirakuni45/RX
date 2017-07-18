@@ -399,7 +399,57 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-///	device::init_port();
+	// ポート初期化
+	// 設定を除外するポート
+//  DIP-SWITCH: P66, P67
+//	Ethernet:   PB0, PB1, PB2, PB3, PB4, PB5, PB6, PB7, P71, P72
+//  PHY:        P70, P73
+//  LTC2348-16: P40, PC6, PD0, P53, P56, P86, P87, P20, P21, P22, P23
+//  SDC:        PD3, PD4, PD5, PD6, PE6
+//  LED:        PA0
+//  EUI-SPI:    P14, P15, P16, P17, P80
+//  RX64M A/D:  
+	device::PORT0::PDR.B5 = 1;  // (2)
+	device::PORT0::PDR.B3 = 1;  // (4)
+	device::PORT0::PDR.B2 = 1;  // (6)
+	device::PORT0::PDR.B1 = 1;  // (7)
+	device::PORT0::PDR.B0 = 1;  // (8)
+	device::PORTJ::PDR.B5 = 1;  // (11)
+	device::PORTJ::PDR.B3 = 1;  // (13)
+	device::PORT3::PDR.B3 = 1;  // (26)
+	device::PORT3::PDR.B2 = 1;  // (27)
+	device::PORT2::PDR.B5 = 1;  // (32)
+	device::PORT2::PDR.B4 = 1;  // (33)
+	device::PORT1::PDR.B3 = 1;  // (44)
+	device::PORT1::PDR.B2 = 1;  // (45)
+	device::PORT5::PDR.B5 = 1;  // (51)
+	device::PORT5::PDR.B4 = 1;  // (52)
+	device::PORT8::PDR.B3 = 1;  // (58)
+	device::PORTC::PDR.B5 = 1;  // (62)
+	device::PORT8::PDR.B2 = 1;  // (63)
+	device::PORT8::PDR.B1 = 1;  // (64)
+	device::PORTC::PDR.B4 = 1;  // (66)
+	device::PORTC::PDR.B3 = 1;  // (67)
+	device::PORTC::PDR.B2 = 1;  // (70)
+	device::PORTC::PDR.B1 = 1;  // (73)
+	device::PORTC::PDR.B0 = 1;  // (75)
+	device::PORT6::PDR.B5 = 1;  // (100)
+	device::PORTE::PDR.B5 = 1;  // (106)
+	device::PORTE::PDR.B4 = 1;  // (107)
+	device::PORTE::PDR.B3 = 1;  // (108)
+	device::PORTE::PDR.B2 = 1;  // (109)
+	device::PORTE::PDR.B1 = 1;  // (110)
+	device::PORTE::PDR.B0 = 1;  // (111)
+	device::PORT6::PDR.B4 = 1;  // (112)
+	device::PORT6::PDR.B3 = 1;  // (113)
+	device::PORT6::PDR.B2 = 1;  // (114)
+	device::PORT6::PDR.B1 = 1;  // (115)
+	device::PORT6::PDR.B0 = 1;  // (117)
+	device::PORTD::PDR.B1 = 1;  // (125)
+	device::PORT9::PDR.B3 = 1;  // (127)
+	device::PORT9::PDR.B2 = 1;  // (128)
+	device::PORT9::PDR.B0 = 1;  // (131)
+	device::PORT0::PDR.B7 = 1;  // (144)
 
 	using namespace seeda;
 

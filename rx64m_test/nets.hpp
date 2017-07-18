@@ -284,7 +284,6 @@ namespace seeda {
 				}
 			}
 			write_pre_();
-			client_.restart();
 		}
 
 
