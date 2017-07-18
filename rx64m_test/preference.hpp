@@ -23,10 +23,11 @@ namespace seeda {
 			uint32_t	magic_;
 
 			float		gain_[8];
-			float		offset_[8];
+//			float		offset_[8];
 
 			uint16_t	limit_lo_level_[8];
 			uint16_t	limit_hi_level_[8];
+			uint16_t	center_[8];
 
 			uint8_t		mode_[8];
 
@@ -37,8 +38,10 @@ namespace seeda {
 			uint32_t	write_limit_;
 
 			seeda_t() : magic_(0),
-				gain_{ 1.0f }, offset_{ 0.0f },
+				gain_{ 1.0f },
+///				offset_{ 0.0f },
 				limit_lo_level_{ 30000 }, limit_hi_level_{ 40000 },
+				center_{ 0 },
 				mode_{ 0 },
 #ifdef SEEDA
 				client_ip_{ 192, 168, 1, 3 },

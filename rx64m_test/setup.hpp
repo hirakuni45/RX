@@ -248,23 +248,23 @@ namespace seeda {
 		{
 			net_tools::render_version();
 			net_tools::render_date_time();
-			http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+			http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 
 			if(dev) {
 				http_format("Develope mode<br>");
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"リロード\">\n");
-			http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+			http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 
 			http_format("<input type=\"button\" onclick=\"location.href='/data'\" value=\"データ表示\">\n");
-			http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+			http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 
 			{  // 内臓 A/D 表示
 				float v = static_cast<float>(get_adc(5)) / 4095.0f * 3.3f;
 				http_format("バッテリー電圧： %4.2f [V]<br>\n") % v;
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 			// MAC アドレス表示
@@ -276,7 +276,7 @@ namespace seeda {
 					% static_cast<uint32_t>(mac_[3])
 					% static_cast<uint32_t>(mac_[4])
 					% static_cast<uint32_t>(mac_[5]);
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 			// IP 設定
@@ -292,7 +292,7 @@ namespace seeda {
 				}
 				http_format("<td><input type=\"submit\" value=\"ＩＰ設定\"></td>\n");
 				http_format("</table></form>\n");
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 			// RTC 設定
@@ -311,7 +311,7 @@ namespace seeda {
 					% static_cast<int>(m->tm_hour) % static_cast<int>(m->tm_min);
 				http_format("<tr><td><input type=\"submit\" value=\"ＲＴＣ設定\"></td></tr>\n");
 				http_format("</table></form>\n");
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 			// Ａ／Ｄ変換設定
@@ -322,11 +322,12 @@ namespace seeda {
 					http_format("<tr>"
 						"<td>CH%d</td>"
 						"<td><input type=\"radio\" name=\"mode%d\" value=\"none\"%s>数値</td>"
-						"<td><input type=\"radio\" name=\"mode%d\" value=\"real\"%s>係数</td>"
-						"<td>ゲイン：</td>"
+						"<td><input type=\"radio\" name=\"mode%d\" value=\"real\"%s>係数値</td>"
+						"<td><input type=\"radio\" name=\"mode%d\" value=\"abs\"%s>絶対値</td>"
+						"<td>　ゲイン：</td>"
 						"<td><input type=\"text\" name=\"gain%d\" size=\"6\" value=\"%6.2f\"></td>"
-						"<td>オフセット：</td>"
-						"<td><input type=\"text\" name=\"offset%d\" size=\"6\" value=\"%6.2f\"></td>"
+						"<td>中心値：</td>"
+						"<td><input type=\"text\" name=\"center%d\" size=\"6\" value=\"%d\"></td>"
 						"<td>下限：</td>"
 						"<td><input type=\"text\" name=\"level_lo%d\" size=\"6\" value=\"%d\"></td>"
 						"<td>上限：</td>"
@@ -335,34 +336,31 @@ namespace seeda {
 						% ch
 						% ch % (t.mode_ == seeda::sample_t::mode::none ? " checked" : "")
 						% ch % (t.mode_ == seeda::sample_t::mode::real ? " checked" : "")
+						% ch % (t.mode_ == seeda::sample_t::mode::abs  ? " checked" : "")
 						% ch % t.gain_
-						% ch % t.offset_
+						% ch % static_cast<int>(t.center_)
 						% ch % static_cast<int>(t.limit_lo_level_)
 						% ch % static_cast<int>(t.limit_hi_level_);
-
-///						"<td><input type=\"checkbox\" name=\"abs%d\" value=\"on\"%s>絶対値</td>"
-///
-///						% ch % (t.abs_ ? " checked=\"checked\"" : "")
 				}
 				http_format("<tr><td><input type=\"submit\" value=\"設定\"></td></tr>"
 					   "</table></form>\n");
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 			{  // ＳＤカードステータス・ボタン
 				http_format("<input type=\"button\" onclick=\"location.href='/sdc_state'\" value=\"ＳＤカード情報\">\n");
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 
 			{  // プリファレンス消去ボタン
 				http_format("<input type=\"button\" onclick=\"location.href='/preference'\" value=\"プリファレンス消去\">\n");
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 			{  // クライアント機能設定ボタン
 				http_format("<input type=\"button\" onclick=\"location.href='/client'\" value=\"クライアント機能\">\n");
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 			{  // ファイル書き込み設定
@@ -385,7 +383,7 @@ namespace seeda {
 				}
 				http_format("</table></form>\n");
 
-				http_format("<hr align=\"left\" width=\"600\" size=\"3\">\n");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 		}
 	};

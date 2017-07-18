@@ -23,15 +23,17 @@ namespace seeda {
 		enum class mode : uint16_t {
 			none,	///< 無変換
 			real,	///< 係数変換
+			abs,	///< 絶対値変換
 		};
 
 		float		gain_;				///< 係数変換ゲイン
-		float		offset_;			///< 係数オフセット
+///		float		offset_;			///< 係数オフセット
 
 		uint32_t	limit_lo_count_;	///< lo を超えた数
 		uint32_t	limit_hi_count_;	///< hi を超えた数
 		uint16_t	limit_lo_level_;	///< lo レベル
 		uint16_t	limit_hi_level_;	///< hi レベル
+		uint16_t	center_;
 
 		uint16_t	ch_;
 		mode		mode_;
@@ -40,12 +42,13 @@ namespace seeda {
 		uint16_t	average_;
 		uint16_t	median_;
 
-		bool		abs_;
-
-		sample_t() : gain_(1024.0f), offset_(0.0f),
+		sample_t() :
+			gain_(1024.0f),
+///			offset_(0.0f),
 			limit_lo_count_(0), limit_hi_count_(0), limit_lo_level_(30000), limit_hi_level_(40000),
+			center_(0),
 			ch_(0), mode_(mode::none),
-			min_(0), max_(0), average_(0), median_(0), abs_(false) { }
+			min_(0), max_(0), average_(0), median_(0) { }
 
 
 		void value_convert(uint16_t value, char* dst, uint32_t size) const
@@ -53,11 +56,14 @@ namespace seeda {
 			switch(mode_) {
 			case mode::real:
 				{
-					float a = static_cast<float>(value) / 65535.0f * gain_ + offset_;
-// real モードの場合、常に絶対値
-//					if(abs_) {
-						a = std::abs(a);
-//					}
+					int32_t v = static_cast<int32_t>(value) - static_cast<int32_t>(center_);
+					float a = static_cast<float>(v) / 65535.0f * gain_;
+					utils::sformat("%3.2f", dst, size, true) % a;
+				}
+				break;
+			case mode::abs:
+				{
+					float a = static_cast<float>(value) / 65535.0f * gain_;
 					utils::sformat("%3.2f", dst, size, true) % a;
 				}
 				break;
@@ -70,7 +76,7 @@ namespace seeda {
 
 		void make_csv(char* dst, uint32_t size, bool append) const
 		{
-			static const char* modes[] = { "value", "real" };
+			static const char* modes[] = { "value", "real", "abs" };
 
 			utils::sformat("%d,%s", dst, size, append) % ch_ % modes[static_cast<uint32_t>(mode_)];
 			utils::sformat(",",     dst, size, true);
@@ -168,9 +174,10 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void add(uint16_t data)
 		{
-///			if(t_.mode_ == mode::real) {
-///				float a = static_cast<float>(data) / 65535.0f * gain_ + offset_;
-///			}
+			if(t_.mode_ == sample_t::mode::abs) {
+				if(data >= t_.center_) data -= t_.center_;
+				else data = t_.center_ - data;
+			}
 
 			sum_ += data;
 			++count_;

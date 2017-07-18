@@ -85,7 +85,7 @@ namespace seeda {
 			for(int ch = 0; ch < 8; ++ch) {
 				pre_.at().mode_[ch] = static_cast<uint8_t>(at_sample(ch).mode_);
 				pre_.at().gain_[ch] = at_sample(ch).gain_;
-				pre_.at().offset_[ch] = at_sample(ch).offset_;
+				pre_.at().center_[ch] = at_sample(ch).center_;
 				pre_.at().limit_lo_level_[ch] = at_sample(ch).limit_lo_level_;
 				pre_.at().limit_hi_level_[ch] = at_sample(ch).limit_hi_level_;
 			}
@@ -147,7 +147,7 @@ namespace seeda {
 				"<th>下限</th><th>下限数</th>"
 				"<th>上限</th><th>上限数</th><th>Median</th></tr>\n");
 
-			static const char* modes[] = { "数値", "係数" };
+			static const char* modes[] = { "数値", "係数", "絶対" };
 			for(int ch = 0; ch < 8; ++ch) {
 				const auto& t = get_sample_data().smp_[ch];
 				char min[16];
@@ -225,8 +225,10 @@ namespace seeda {
 				if((utils::input("mode%d", t.key) % ch).status()) {
 					if(strcmp(t.val, "none") == 0) {  // 数値（無変換）
 						at_sample(ch).mode_ = seeda::sample_t::mode::none;
-					} else if(strcmp(t.val, "real") == 0) {  // 係数変換
+					} else if(strcmp(t.val, "real") == 0) {  // 係数値変換
 						at_sample(ch).mode_ = seeda::sample_t::mode::real;
+					} else if(strcmp(t.val, "abs") == 0) {  // 絶対値変換
+						at_sample(ch).mode_ = seeda::sample_t::mode::abs;
 					}
 				} else if((utils::input("gain%d", t.key) % ch).status()) {
 					float v = 0.0f;
@@ -234,11 +236,13 @@ namespace seeda {
 					if((utils::input("%f", p) % v).status()) {
 						at_sample(ch).gain_ = v;
 					}
-				} else if((utils::input("offset%d", t.key) % ch).status()) {
-					float v = 0.0f;
+				} else if((utils::input("center%d", t.key) % ch).status()) {
+					int v = 0;
 					const char* p = t.val;
-					if((utils::input("%f", p) % v).status()) {
-						at_sample(ch).offset_ = v;
+					if((utils::input("%d", p) % v).status()) {
+						if(v >= 0 && v <= 65535) {
+							at_sample(ch).center_ = v;
+						}
 					}
 				} else if((utils::input("level_lo%d", t.key) % ch).status()) {
 					int v = 0;
@@ -449,7 +453,7 @@ namespace seeda {
 					for(int ch = 0; ch < 8; ++ch) {
 						at_sample(ch).mode_ = static_cast<sample_t::mode>(pre_.get().mode_[ch]);
 						at_sample(ch).gain_ = pre_.get().gain_[ch];
-						at_sample(ch).offset_ = pre_.get().offset_[ch];
+						at_sample(ch).center_ = pre_.get().center_[ch];
 						at_sample(ch).limit_lo_level_ = pre_.get().limit_lo_level_[ch];
 						at_sample(ch).limit_hi_level_ = pre_.get().limit_hi_level_[ch];
 					}
