@@ -163,12 +163,13 @@ namespace seeda {
 						auto st = client_.get_ethernet().get_stat(client_.get_cepid());
 						debug_format("TCP Client stat: %d\n") % static_cast<int>(st);
 						// 接続しないので、「re_connect」要求を出してみる
-						if(client_.re_connect()) {
-							task_ = task::req_connect;
-						} else {
+						if(st == TCP_API_STAT_CLOSED) {
 							task_ = task::disconnect;
+						} else {
+							client_.re_connect();
+							task_ = task::req_connect;
+							timeout_ = 5 * 100;  // 再接続待ち時間
 						}
-						timeout_ = 5 * 100;  // 再接続待ち時間
 					}
 					break;
 				} else {
