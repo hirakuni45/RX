@@ -1,6 +1,6 @@
 //=====================================================================//
 /*!	@file
-	@brief	TCP @n
+	@brief	TCP
 			Copyright 2017 Kunihito Hiramatsu
 	@author	ïΩèºñMêm (hira@rvf-rc45.net)
 */
@@ -36,7 +36,7 @@ uint16_t _tcp_pre_timer_cnt;  /* previous timer count */
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-#if BIGENDIAN == 0  /* little endian */
+#if defined(LITTLE_ENDIAN)
 void net2hl_yn_xn(void *y, void *x)
 {
     register uint8_t *a1 = (uint8_t *)y;
@@ -47,9 +47,7 @@ void net2hl_yn_xn(void *y, void *x)
     *((uint8_t*)a1 + 1) = *((uint8_t*)a0 + 2);
     *((uint8_t*)a1) = *((uint8_t*)a0 + 3);
 }
-#endif
-
-#if BIGENDIAN == 1  /* big endian */
+#elif defined(BIG_ENDIAN)
 void net2hl_yn_xn(void *y, void *x)
 {
     register uint8_t *a1 = (uint8_t *)y;
@@ -60,7 +58,10 @@ void net2hl_yn_xn(void *y, void *x)
     *((uint8_t*)a1 + 2) = *((uint8_t*)a0 + 2);
     *((uint8_t*)a1 + 3) = *((uint8_t*)a0 + 3);
 }
+#else
+#error "tcp.c requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
 #endif
+
 
 /***********************************************************************************************************************
 * Function Name: _tcp_init_tcb

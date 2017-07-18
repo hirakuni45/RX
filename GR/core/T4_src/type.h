@@ -1,26 +1,9 @@
 #pragma once
 #include <stdint.h>
+#include "common/byte_order.h"
 
 #define TRUE  1
 #define FALSE  0
-
-/* Little Endian */
-#if defined(R8C) || defined(M16C) || defined(M16C80) || defined(M32C80) ||\
- (defined(_SH4) && defined(_LIT)) ||\
- (defined(_SH4A) && defined(_LIT)) ||\
- (defined(__RX) && defined(__LIT)) ||\
-    defined(__v850)
-#define  BIGENDIAN 0
-
-/* Big Endian */
-#elif defined(__300HA__) || defined (__2600A__) ||\
-   defined(_SH2) || defined(_SH2A) || defined(_SH2AFPU) ||\
-   (defined(_SH4) && defined(_BIG)) ||\
-   (defined(_SH4A) && defined(_BIG)) ||\
-   (defined(__RX) && defined(__BIG))
-#define  BIGENDIAN 1
-#endif
-
 
 /*** IP address/Port No. information ***/
 typedef struct t_ipv4ep
@@ -40,16 +23,14 @@ typedef uint8_t Eaddr[EP_ALEN];  /*  MAC address */
 
 
 
-#if BIGENDIAN == 1
+#if defined( BIG_ENDIAN)
 #define hs2net(x) (x)
 #define net2hs(x) (x)
 #define hl2net(x) (x)
 #define net2hl(x) (x)
 void net2hl_yn_xn(void *y, void *x);
 #define hl2net_yn_xn(y, x) net2hl_yn_xn(y, x)
-
-#else /* BIGENDIAN == 0 */
-
+#elif defined(LITTLE_ENDIAN)
 #define hs2net(x) ((uint16_t)((x)>>8)  | (uint16_t)((x)<<8))
 #define net2hs(x) ((uint16_t)((x)>>8)  | (uint16_t)((x)<<8))
 #define hl2net(x) ((uint32_t)((x)>>24) | (uint32_t)((0xff0000&(x))>>8) \
@@ -73,6 +54,8 @@ void net2hl_yn_xn(void *y, void *x);
         *((uint8_t*)a0 + 1) = tmp2;\
         *((uint8_t*)a0 + 2) = tmp1;\
     }
+#else
+#error "type.h requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
 #endif
 
 /*

@@ -308,6 +308,10 @@ int tcp_re_con_cep(int cepid)
 	// とりあえず、タイムアウトさせない
 	_TCB *tcb = &head_tcb[cepid - 1];
 	tcb->retrans_q.rst_cnt = 0xffff;
+
+/// queue をクリアすると、SYN は再度送られない・・・
+///	_tcp_clr_rtq(tcb);
+
 #if 0
 	_API_REQ *areq = &(tcb->req);
 	if(areq->type == 2) {
