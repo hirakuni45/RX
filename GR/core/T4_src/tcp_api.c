@@ -321,9 +321,9 @@ int tcp_re_con_cep(int cepid)
 		return -1;
 	}
 #endif
-//    dis_int();
-//	_tcp_api_con();
-//    ena_int();
+    dis_int();
+	_tcp_api_con();
+    ena_int();
 	return 0;
 }
 
