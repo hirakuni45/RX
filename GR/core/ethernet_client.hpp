@@ -241,7 +241,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void end()
 		{
-			tcp_init(cepid_);
+///			tcp_init(cepid_);
 			ethernet_.end_connection(cepid_);
 			cepid_ = 0;
 			re_con_cnt_ = 0;
