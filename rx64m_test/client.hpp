@@ -37,6 +37,7 @@ namespace seeda {
 		enum class task {
 			startup,
 			req_connect,
+			wait_req_connect,
 			wait_connect,
 			time_sync,
 			make_form,
@@ -53,6 +54,7 @@ namespace seeda {
 		uint16_t	port_;
 		uint32_t	delay_;
 		uint32_t	timeout_;
+		uint32_t	re_connect_cnt_;
 
 		time_t		time_;
 
@@ -74,7 +76,7 @@ namespace seeda {
 			ip_(192, 168, 3, 7),
 #endif
 			port_(PORT),
-			delay_(0), timeout_(0), time_(0) { }
+			delay_(0), timeout_(0), re_connect_cnt_(0), time_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -152,9 +154,21 @@ namespace seeda {
 
 			case task::req_connect:
 				if(client_.connect(ip_, port_, TMO_NBLK)) {
+					re_connect_cnt_ = 0;
+					timeout_ = 5 * 100;  // 再接続待ち時間
+					task_ = task::wait_connect;
+				} else {
+					timeout_ = 1 * 100;
+					task_ = task::wait_req_connect;
 				}
-				timeout_ = 5 * 100;  // 再接続待ち時間
-				task_ = task::wait_connect;
+				break;
+
+			case task::wait_req_connect:
+				if(timeout_ > 0) {
+					--timeout_;
+				} else {
+					task_ = task::req_connect;
+				}
 				break;
 
 			case task::wait_connect:
@@ -162,17 +176,19 @@ namespace seeda {
 					if(timeout_ > 0) {
 						--timeout_;
 					} else {
+						++re_connect_cnt_;
 						auto st = client_.get_ethernet().get_stat(client_.get_cepid());
-						debug_format("TCP Client re_connect: %d\n") % static_cast<int>(st);
-						if(st == 0) {
-							task_ = task::disconnect;
-						} else {
+						debug_format("TCP Client re_connect(%d): status: %d, desc(%d)\n")
+							% re_connect_cnt_ % static_cast<int>(st) % client_.get_cepid();
+///						if(st == 0) {
+///							task_ = task::disconnect;
+///						} else {
 							// 接続しないので、「re_connect」要求を出してみる
 							// ※ re_connect では、タイムアウト（１０分）を無効にする。
-							client_.re_connect();
+							client_.re_connect(ip_, port_);
 							timeout_ = 5 * 100;  // 再接続待ち時間
-							task_ = task::req_connect;
-						}
+///							task_ = task::req_connect;
+///						}
 //						task_ = task::disconnect;
 					}
 				} else {
@@ -236,7 +252,7 @@ namespace seeda {
 			
 			case task::disconnect:
 				client_.stop();
-				timeout_ = 5;
+				timeout_ = 0;
 				task_ = task::sync_close;
 				break;
 
