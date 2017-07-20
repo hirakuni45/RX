@@ -109,6 +109,7 @@ void _tcp_init_tcb(_TCB *_ptcb)
     return;
 }
 
+
 /***********************************************************************************************************************
 * Function Name: _process_tcpip
 * Description  :
@@ -196,6 +197,7 @@ void _proc_api(void)
 
         if (areq->stat == _TCP_API_STAT_UNTREATED)
         {
+/// printf("proc_api call: %d\n", (int)areq->type);
             areq->stat = _TCP_API_STAT_INCOMPLETE;
             functbl_tcp_api[areq->type - 1]();
         }
@@ -290,7 +292,7 @@ void _tcp_api_con(void)
                 _tcp_api_wup(_tcp_tcb->cepid);
             }
         }
-
+/// printf("tcp_api_con error\n");
         return;
     }
 
@@ -302,15 +304,13 @@ void _tcp_api_con(void)
         if ((port < 1024) || (port > 5000))
             port = 1024;
         _tcp_tcb->loc_port = port++;
-    }
-    else
+    } else {
         _tcp_tcb->loc_port = areq->d.cnr.my_port;
+	}
 
     _tcp_tcb->hdr_flg = _TCPF_SYN;
     _tcp_tcb->nxt_status = _TCPS_SYN_SENT;
     _tcp_tcb->flag  |= (_TCBF_NEED_SEND | _TCBF_SND_TCP);
-
-    return;
 }
 
 
@@ -985,6 +985,7 @@ int _tcp_rcv_syn(void)
             }
             break;
     }
+
     _tcp_tcb->hdr_flg = _TCPF_RST;
     _tcp_tcb->flag |= (_TCBF_NEED_SEND | _TCBF_SND_TCP);
     _tcp_tcb->nxt_status = _TCPS_CLOSED;
@@ -1086,7 +1087,6 @@ void _tcp_rcv_ack(void)
         }
 
         _tcp_clr_rtq(_tcp_tcb);
-
 
         switch (_tcp_tcb->status)
         {
@@ -1440,7 +1440,7 @@ void _tcp_swin_updt(void)
     {
         if (_tcp_tcb->sdsize > 0)
         {
-            if ((_tcp_tcb->rmt_rwsize >= _tcp_tcb->mss) || (_tcp_tcb->rmt_rwsize >= _tcp_tcb->sdsize) || (_tcp_tcb->rmt_rwsize != _tcp_tcb->swsize)/*(bug39 fix)*/)
+            if ((_tcp_tcb->rmt_rwsize >= _tcp_tcb->mss) || (_tcp_tcb->rmt_rwsize >= _tcp_tcb->sdsize) || (_tcp_tcb->rmt_rwsize != _tcp_tcb->swsize) /*(bug39 fix)*/ )
             {
                 if (tcp_dack[_ch_info_tbl->_ch_num] == 1)
                 {
@@ -1601,9 +1601,9 @@ void _proc_snd(void)
                 }
             }
 
-
-            if ((_tcp_tcb->retrans_q.nxt_rtx_cnt != 0xffff) && (_tcp_tcb->retrans_q.nxt_rtx_cnt > 0))
+            if ((_tcp_tcb->retrans_q.nxt_rtx_cnt != 0xffff) && (_tcp_tcb->retrans_q.nxt_rtx_cnt > 0)) {
                 _tcp_tcb->retrans_q.nxt_rtx_cnt--;
+			}
             if ((_tcp_tcb->retrans_q.rst_cnt != 0xffff) && (_tcp_tcb->retrans_q.rst_cnt > 0)) {
                 _tcp_tcb->retrans_q.rst_cnt--;
 			}
@@ -1625,6 +1625,7 @@ void _proc_snd(void)
                 _tcp_tcb->hdr_flg  = _TCPF_RST;
                 _tcp_tcb->flag   |= (_TCBF_NEED_SEND | _TCBF_SND_TCP | _TCBF_NEED_API);
             }
+
             if (_tcp_tcb->nxt_zero == 0)
             {
                 _tcp_tcb->zwin_int *= 2;
@@ -1633,7 +1634,6 @@ void _proc_snd(void)
                 _tcp_tcb->nxt_zero = _tcp_tcb->zwin_int;
                 _tcp_tcb->flag |= (_TCBF_NEED_SEND | _TCBF_SND_ZWIN);
             }
-
             else if (_tcp_tcb->retrans_q.rst_cnt == 0)
             {
                 if (cur_req_type != 0)
@@ -1682,6 +1682,7 @@ void _proc_snd(void)
             }
             else if (_tcp_tcb->retrans_q.nxt_rtx_cnt == 0)
             {
+/// printf("Turn into SEND_RTX\n");
                 _tcp_tcb->retrans_q.cur_int *= 2;
                 if (_tcp_tcb->retrans_q.cur_int > _TCP_RTO_INT_MAX)
                     _tcp_tcb->retrans_q.cur_int = _TCP_RTO_INT_MAX;
@@ -1765,6 +1766,13 @@ void _proc_snd(void)
 #if defined(_TCP)
         if (_tcp_tcb->flag & _TCBF_NEED_SEND)
         {
+#if 0
+printf("Send call tcp-snd() %s, %s, %s, %s\n",
+	((_tcp_tcb->flag & _TCBF_NEED_SEND) ? "NEED_SEND" : "-"),
+	((_tcp_tcb->flag & _TCBF_SND_TCP) ? " TCP" : "-"),
+	((_tcp_tcb->flag & _TCBF_SND_RTX) ? " RTX" : "-"),
+	((_tcp_tcb->flag & _TCBF_SND_ZWIN) ? " ZWIN" : "-"));
+#endif
             if (_tcp_tcb->flag & (_TCBF_SND_TCP | _TCBF_SND_RTX | _TCBF_SND_ZWIN))
             {
                 _tcp_snd();
@@ -2120,11 +2128,34 @@ void _tcp_snd(void)
             _tcp_tcb->flag &= ~_TCBF_NEED_SEND;
             return;
         }
+#if 0
+    if (ptcph->flg & _TCPF_SYN && smode == _TCBF_SND_TCP) {
+		const uint8_t *p = _tx_hdr.eh.eh_dst;
+		printf("  MAC dst: %02X-%02X-%02X-%02X-%02X-%02X\n",
+			(unsigned int)p[0], (unsigned int)p[1], (unsigned int)p[2],
+			(unsigned int)p[3], (unsigned int)p[4], (unsigned int)p[5]);
+		p = _tx_hdr.eh.eh_src;
+		printf("  MAC src: %02X-%02X-%02X-%02X-%02X-%02X\n",
+			(unsigned int)p[0], (unsigned int)p[1], (unsigned int)p[2],
+			(unsigned int)p[3], (unsigned int)p[4], (unsigned int)p[5]);
+
+		printf("  src adr: %d.%d.%d.%d\n",
+			(unsigned int)phdr.sadr[0], (unsigned int)phdr.sadr[1],
+			(unsigned int)phdr.sadr[2], (unsigned int)phdr.sadr[3]);
+		printf("  dst adr: %d.%d.%d.%d\n",
+			(unsigned int)phdr.dadr[0], (unsigned int)phdr.dadr[1],
+			(unsigned int)phdr.dadr[2], (unsigned int)phdr.dadr[3]);
+		printf("  loc_port: %d\n", (int)_tcp_tcb->loc_port);
+		printf("  rem_port: %d\n", (int)_tcp_tcb->rem_port);
+		printf("Send SYN: 0x%08X\n", (unsigned int)_tcp_tcb->snxt);
+	}
+#endif
         if (smode == _TCBF_SND_TCP)
         {
             _tcp_tcb->snxt += len;
-            if (_tcp_tcb->hdr_flg & (_TCPF_SYN | _TCPF_FIN))
+            if (_tcp_tcb->hdr_flg & (_TCPF_SYN | _TCPF_FIN)) {
                 _tcp_tcb->snxt++;
+			}
             _tcp_tcb->rmt_rwsize -= len;
             if ((_tcp_tcb->sdsize - len) == 0)
             {
@@ -2150,8 +2181,9 @@ void _tcp_snd(void)
                     }
                 }
                 _tcp_tcb->status = _tcp_tcb->nxt_status;
-                if (_tcp_tcb->status == _TCPS_TIME_WAIT)
+                if (_tcp_tcb->status == _TCPS_TIME_WAIT) {
                     _tcp_tcb->mslcnt = tcp_2msl[_ch_info_tbl->_ch_num];
+				}
             }
 
             else

@@ -71,7 +71,14 @@ void tcp_init(uint32_t cepid)
 
 	_tcp_init_callback_info(&head_tcb[cepid - 1].callback_info);
 
+//	_tcp_tcb[counter].rwin = (uint8_t*)currp;
+//	currp = (uint32_t *)((uint8_t *)currp + tcp_ccep[counter].rbufsz);
+//	uint16_t rem = tcp_ccep[counter].rbufsz % 4;
+//	if(rem != 0) {
+//		currp = (uint32_t *)((uint8_t *)currp + (4 - rem));
+//	}
 	_tcp_init_tcb(&_tcp_tcb[cepid - 1]);
+	head_tcb[cepid-1].req.stat = _TCP_API_STAT_COMPLETE;
 }
 
 
@@ -298,32 +305,44 @@ int tcp_acp_cep(int cepid, int repid, T_IPVxEP *p_dstaddr, int32_t tmout)
 }
 
 
-int tcp_re_con_cep(int cepid)
+int tcp_clear_rst(int cepid)
 {
 	int ret = _tcp_check_cepid_arg(cepid);
 	if(ret != E_OK) {
 		return E_PAR;
 	}
 
-	// とりあえず、タイムアウトさせない
 	_TCB *tcb = &head_tcb[cepid - 1];
-	tcb->retrans_q.rst_cnt = 0xffff;
+//	_tcp_clr_rtq(tcb);
 
-/// queue をクリアすると、SYN は再度送られない・・・
-///	_tcp_clr_rtq(tcb);
+	tcb->retrans_q.rst_cnt = 0xffff;  /// RST を送らない
 
-#if 0
-	_API_REQ *areq = &(tcb->req);
-	if(areq->type == 2) {
-		areq->stat = _TCP_API_STAT_UNTREATED;
-		return 0;
-	} else {
-		return -1;
+	return 0;
+}
+
+
+int tcp_re_con_cep(int cepid, T_IPVxEP *p_dstaddr)
+{
+	int ret = _tcp_check_cepid_arg(cepid);
+	if(ret != E_OK) {
+		return E_PAR;
 	}
-#endif
-    dis_int();
-	_tcp_api_con();
-    ena_int();
+
+	_TCB *tcb = &head_tcb[cepid - 1];
+	_API_REQ *areq = &tcb->req;
+
+	tcb->retrans_q.nxt_rtx_cnt = 0xffff;
+
+///	printf("type: %d\n", areq->type);
+
+	areq->type = 2;
+	areq->stat = _TCP_API_STAT_UNTREATED;
+
+	tcb->status  = _TCPS_CLOSED;
+	tcb->it_stat = _ITS_NORMAL;
+
+	areq->d.cnr.dstaddr = p_dstaddr;
+
 	return 0;
 }
 
@@ -342,7 +361,12 @@ int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmou
 		return ret;
 	}
 
+
 	if(tcp_is_tcb_queue_over(_TCP_API_CONCP, &head_tcb[cepid-1], pTcbCb)) {
+		_tcp_clr_rtq(&head_tcb[cepid - 1]);
+#ifdef DEBUG
+	printf("TCP Can't Request TCP_API_CONCP (E_QOVR): %d\n", cepid);
+#endif
 		return E_QOVR;
 	}
 
@@ -360,6 +384,9 @@ int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmou
 	head_tcb[cepid - 1].req.tmout = tmout;
 	head_tcb[cepid - 1].req.d.cnr.dstaddr = p_dstaddr;
 
+//	head_tcb[cepid - 1].retrans_q.nxt_rtx_cnt = 0xffff;
+	_tcp_clr_rtq(&head_tcb[cepid - 1]);
+
 	if((p_myaddr == (T_IPVxEP *)NADR) || (p_myaddr->portno == TCP_PORTANY)) {
 		head_tcb[cepid-1].req.d.cnr.my_port = 0;
 	} else {
@@ -371,7 +398,7 @@ int tcp_con_cep(int cepid, T_IPVxEP *p_myaddr, T_IPVxEP *p_dstaddr, int32_t tmou
 		if(!_TCP_CB_STAT_IS_VIA_CALLBACK(pTcbCb->stat)) {
 			_TCP_CB_STAT_CLEAR_API_LOCK_FLG(pTcbCb->stat);
 		}
-		ret = *head_tcb[cepid - 1].req.error;
+///		ret = *head_tcb[cepid - 1].req.error;
 	}
 	return ret;
 }
