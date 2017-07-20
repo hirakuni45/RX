@@ -255,6 +255,10 @@ namespace device {
 			}
 
 			if(level_) {
+				volatile bool b = SCI::SSR.ORER();
+				if(b) {
+					SCI::SSR.ORER = 0;
+				}
 				/// 送信バッファの容量が７／８の場合は、空になるまで待つ。
 				if(send_.length() >= (send_.size() * 7 / 8)) {
 					while(send_.length() != 0) sleep_();
