@@ -325,6 +325,28 @@ namespace seeda {
 		}
 #endif
 
+	void list_arp_() const
+	{
+		auto n = ether_arp_num();
+		for(uint32_t i = 0; i < n; ++i) {
+			const auto* p = ether_arp_get(i);
+			if(p->ae_state == AS_FREE) continue;
+
+			utils::format("(%d) %d.%d.%d.%d  --->  %02X:%02X:%02X:%02X:%02X:%02X\n")
+				% i
+				% static_cast<uint32_t>(p->ae_pra[0])
+				% static_cast<uint32_t>(p->ae_pra[1])
+				% static_cast<uint32_t>(p->ae_pra[2])
+				% static_cast<uint32_t>(p->ae_pra[3])
+				% static_cast<uint32_t>(p->ae_hwa[0])
+				% static_cast<uint32_t>(p->ae_hwa[1])
+				% static_cast<uint32_t>(p->ae_hwa[2])
+				% static_cast<uint32_t>(p->ae_hwa[3])
+				% static_cast<uint32_t>(p->ae_hwa[4])
+				% static_cast<uint32_t>(p->ae_hwa[5]);
+		}
+	}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -425,13 +447,16 @@ namespace seeda {
 							if(t != 0) {
 								disp_time(t);
 								utils::format("\n");
+							} else {
+								utils::format("Stall RTC (no setting)\n");
 							}
 						} else {
 							set_time_date_();
 						}
 						f = true;
-//					} else if(cmd_.cmp_word(0, "reset")) {
-//						f = reset_signal_(cmdn);
+					} else if(cmd_.cmp_word(0, "arp")) {  // arp table
+						list_arp_();
+						f = true;
 #ifdef SEEDA
 					} else if(cmd_.cmp_word(0, "eadc")) {
 						f = eadc_conv_(cmdn);
@@ -439,6 +464,8 @@ namespace seeda {
 						f = eadc_span_(cmdn);
 					} else if(cmd_.cmp_word(0, "sample")) {
 						f = eadc_sample_(cmdn);
+//					} else if(cmd_.cmp_word(0, "reset")) {
+//						f = reset_signal_(cmdn);
 #endif
 					} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
 						utils::format("date\n");
@@ -446,11 +473,12 @@ namespace seeda {
 						utils::format("dir [name]\n");
 						utils::format("cd [directory-name]\n");
 						utils::format("pwd\n");
+						utils::format("arp\n");
 #ifdef SEEDA
-///						utils::format("reset [01]  (PHY reset signal)\n");
 						utils::format("eadc [0-7]  (LTC2348 A/D conversion)\n");
 						utils::format("span CH(0-7) SPAN(0-7)  (LTC2348 A/D span setting)\n"); 
 						utils::format("sample -ch 0-7 -rate FRQ -num SAMPLE-NUM file-name (LTC2348 A/D sample)\n");
+///						utils::format("reset [01]  (PHY reset signal)\n");
 #endif
 						f = true;
 					}
