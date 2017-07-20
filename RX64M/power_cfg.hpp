@@ -72,6 +72,10 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB24 = f;	// B24 (SCI7)のストップ状態解除
 				break;
 
+			case peripheral::SCI12:
+				SYSTEM::MSTPCRB.MSTPB4 = f;		// B4 (SCI12)のストップ状態解除
+				break;
+
 			case peripheral::RSPI:
 				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI のストップ状態解除
 				break;

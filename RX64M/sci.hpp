@@ -333,6 +333,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv>
 	struct scih_t : scig_t<base, t, txv, rxv> {
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  拡張シリアルモード有効レジスタ (ESMER) @n
@@ -349,6 +350,27 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> ESME;
 		};
 		static esmer_t ESMER;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コントロールレジスタ 0（CR0） @n
+					※SIC12 にのみ有効なレジスタ
+		*/
+		//-----------------------------------------------------------------//
+		struct cr0_t : public rw8_t<base + 0x21> {
+			typedef rw8_t<base + 0x21> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_ro_t<io_, bitpos::B1> SCSF;
+			bit_ro_t<io_, bitpos::B2> RXDSF;
+			bit_rw_t<io_, bitpos::B3> BRME;
+		};
+		static cr0_t CR0;
+
 	};
 
 	typedef scig_t<0x0008A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0> SCI0;

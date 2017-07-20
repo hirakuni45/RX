@@ -117,7 +117,7 @@ namespace device {
 
 			case peripheral::SCI12:
 				{
-					uint8_t sel = enable ? 0b001010 : 0;
+					uint8_t sel = enable ? 0b001100 : 0;
 					PORTE::PDR.B2 = enable; // TXD12
 					PORTE::PDR.B1 = 0;  	// RXD12
 					MPC::PE2PFS.PSEL = sel;
