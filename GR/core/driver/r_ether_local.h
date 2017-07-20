@@ -29,7 +29,19 @@
 #ifndef R_ETHER_LOCAL_H
 #define R_ETHER_LOCAL_H
 
+#include "common/byte_order.h"
 #include "../T4_src/net_config.h"
+
+#if defined(BIG_ENDIAN)
+#elif defined(LITTLE_ENDIAN)
+#else
+#error "r_ether_local.h requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
+#endif
+
+#ifdef DEBUG
+#define ETHC_DEBUG
+#define LINK_DEBUG
+#endif
 
 /***********************************************************************************************************************
 Macro definitions
@@ -128,7 +140,7 @@ Typedef definitions
 struct DescriptorS
 {
     __evenaccess uint32_t   status;
-#if __LIT
+#if defined(LITTLE_ENDIAN)
 /* Little endian */
     __evenaccess uint16_t   size;
     __evenaccess uint16_t   bufsize;

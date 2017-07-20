@@ -46,7 +46,7 @@ Includes   <System Includes> , "Project Includes"
 void lan_inthdr(void);
 
 // #define ETHC_DEBUG
-/// #define LINK_DEBUG
+// #define LINK_DEBUG
 
 /***********************************************************************************************************************
 Macro definitions
