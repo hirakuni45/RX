@@ -106,6 +106,8 @@ namespace net {
 				cepid_ = ethernet_.create(port);
 				if(cepid_ > 0) {
 					port_ = port;
+					auto& cep = ethernet_.at_cep(cepid_);
+					cep.server = true;
 				}
 			} else {
 				debug_format("port == 0\n");
@@ -174,7 +176,6 @@ namespace net {
 		{
 			tcp_cls_cep(cepid_, TMO_FEVR);
 			ethernet::CEP& cep = ethernet_.at_cep(cepid_);
-			cep.call_flag = false;
 			end();
 		}
 

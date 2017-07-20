@@ -69,7 +69,7 @@ extern uint8_t     cepid_max;
 /// extern NAME_TABLE  name_table;
 /// extern DNS_MNG     dns_mng;
 
-#define UDP_RCV_DAT_DATAREAD_MAXIMUM    1472
+#define UDP_RCV_DAT_DATAREAD_MAXIMUM    1366
 
 #define RING_SIZ			(1024)	/* exsample 1024 */
 #define RING_SIZ_forSize	(RING_SIZ >> 2)
@@ -110,18 +110,19 @@ namespace net {
 			uint32_t	recv_pos_;
 			uint32_t	send_pos_;
 			bool		enable;
-			bool		call_flag;
-			CEP() : recv_pos_(0), send_pos_(0), enable(false), call_flag(false) { }
+			bool		server;
+			CEP() : recv_pos_(0), send_pos_(0), enable(false), server(false) { }
 		};
 
 	private:
 		CEP			cep_[TCP_CCEP_MAX + UDP_CCEP_MAX];
 
-		uint32_t	tcpudp_work_[2514];
+		uint32_t	tcpudp_work_[2800];
 
         uint32_t    dhcpIPAddressLeaseTime_sec;
         uint32_t    dhcpIPuse_sec;
         uint32_t    fromSystemGetLastTime;
+		uint32_t	desc_;
         bool		dhcp_use_;
 
 		static T_IPV4EP remoteIPV4EP_;
@@ -174,7 +175,6 @@ namespace net {
 			debug_format("tcpudp RAM size: need(%d), real(%d)\n") % size % real;
 
 			tcpudp_open(tcpudp_work_);
-            debug_format("tcpudp_open()\n");
         }
 
 	public:
@@ -198,6 +198,7 @@ namespace net {
         ethernet() : dhcpIPAddressLeaseTime_sec(0),
 			dhcpIPuse_sec(0),
 			fromSystemGetLastTime(0),
+			desc_(0),
 			dhcp_use_(false) { }
 
 
@@ -217,11 +218,16 @@ namespace net {
 		//-----------------------------------------------------------------//
 		uint32_t new_connection()
 		{
+			uint32_t idx = desc_;
 			for(uint32_t i = 0; i < tcp_ccep_num; ++i) {
-				if(!cep_[i].enable) {
-					cep_[i].enable = true;
-					return i + 1;
+				if(!cep_[idx].enable) {
+					cep_[idx].enable = true;
+					// ++desc_;
+					// tcp_init(idx + 1);
+					return idx + 1;
 				}
+				++idx;
+				if(idx >= tcp_ccep_num) idx = 0;
 			}
 			return 0;
 		}
@@ -238,7 +244,6 @@ namespace net {
 			if(cepid > 0 && cepid <= tcp_ccep_num) {
 				cep_[cepid - 1].recv_pos_ = 0;
 				cep_[cepid - 1].send_pos_ = 0;
-				cep_[cepid - 1].call_flag = false;
 				cep_[cepid - 1].enable = false;
 			}
 		}
@@ -330,7 +335,6 @@ namespace net {
 			debug_format("close_timer()\n");
 			close_timer();
 			initialize_TCP_IP();
-///			clr_tcp_acp_cep_call_flg();
 			return 1;	/* returns an int: 1 on a successful DHCP connection */
 		}
 
@@ -412,7 +416,6 @@ namespace net {
 			memcpy(tcpudp_env[ch].gwaddr, gateway.get(), IP_ALEN);
 			memcpy(tcpudp_env[ch].maskaddr, subnet.get(), IP_ALEN);
 			dhcp_use_ = false;
-			/// clr_tcp_acp_cep_call_flg();
 #ifdef T4_ETHER_DEBUG
 			Serial.print("t4:EthernetClass::begin(mac:");
 			Serial.print((uchar)mac_address[0],HEX);
@@ -515,27 +518,16 @@ namespace net {
 			if(cepid == 0 || cepid > tcp_ccep_num) return;
 
 			TCP_API_STAT ercd = tcp_read_stat(cepid);
-
+#if 0
 			static TCP_API_STAT ercd_[8];
 			if(ercd != ercd_[cepid - 1]) {
 				debug_format("STAT: %d (%d)\n") % static_cast<int>(ercd) % cepid;
 				ercd_[cepid - 1] = ercd;
 			}
-
+#endif
 			ethernet::CEP& cep = at_cep(cepid);
-///			int cfg = cep.call_flag;
-//			debug_format("ethernet_server::available():tcp_read_stat() = %d, call_flag: %d\n") % ercd;
-
-			if(ercd == TCP_API_STAT_CLOSED && !cep.call_flag) {
+			if(ercd == TCP_API_STAT_CLOSED && cep.server) {
 				int ret = tcp_acp_cep(cepid, cepid, &cep.dst_addr, TMO_NBLK);
-//				debug_format("ethernet_server::available():tcp_acp_cep(TMO_NBLK) = %d") % ret;
-				if(ret == E_WBLK){
-//					debug_format(", E_WBLK(success)\n");
-				} else {
-//					debug_format("fail: %d\n") % ret;
-				}
-				// one time call flag is on
-				cep.call_flag = true;
 			}
 		}
 

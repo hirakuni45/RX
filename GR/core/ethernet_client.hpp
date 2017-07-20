@@ -28,8 +28,6 @@ namespace net {
 
 		uint16_t	close_count_;
 
-		uint16_t	re_con_cnt_;
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -39,7 +37,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		ethernet_client(ethernet& e, uint16_t port) : ethernet_(e), cepid_(0), port_(port),
-			close_count_(0), re_con_cnt_(0) { }
+			close_count_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -119,11 +117,14 @@ namespace net {
 				close_count_ = tcp_get_close_count(cepid_);
 			}
 
+			auto& cep = ethernet_.at_cep(cepid_);
+			cep.server = false;
+
 			if(connected()) {
 				return true;
 			}
 
-			debug_format("TCP Client Request Connect (%d): %d\n") % re_con_cnt_ % cepid_;
+			debug_format("TCP Client Request Connect: %d\n") % cepid_;
 
 			static T_IPV4EP adr;
 			adr.ipaddr =  (static_cast<uint32_t>(ip[0]) << 24)
@@ -132,16 +133,17 @@ namespace net {
 						| (static_cast<uint32_t>(ip[3]));
 			adr.portno = port;
 			int ercd = tcp_con_cep(cepid_, NADR, &adr, timeout);
+			bool ret = true;
 			if(ercd == E_OK) {
 				debug_format("TCP Client connect OK: %d\n") % cepid_;
 			} else if(ercd == E_QOVR) {
 				debug_format("TCP Client E_QOVR: %d\n") % cepid_;
-///				tcp_can_cep(cepid_, TFN_TCP_CON_CEP);
+				ret = false;
 			} else {
 				debug_format("TCP Client connect state(%d): %d\n") % ercd % cepid_;
 			}
-			++re_con_cnt_;
-			return true;
+			tcp_clear_rst(cepid_);
+			return ret;
 		}
 
 
@@ -151,13 +153,20 @@ namespace net {
 			@return 正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool re_connect()
+		bool re_connect(const ip_address& ip, uint16_t port)
 		{
 			if(cepid_ == 0) {  // ディスクリプタが無効
 				return false;
 			}
 
-			if(tcp_re_con_cep(cepid_) < 0) {
+			static T_IPV4EP adr;
+			adr.ipaddr =  (static_cast<uint32_t>(ip[0]) << 24)
+						| (static_cast<uint32_t>(ip[1]) << 16)
+						| (static_cast<uint32_t>(ip[2]) << 8)
+						| (static_cast<uint32_t>(ip[3]));
+			adr.portno = port;
+
+			if(tcp_re_con_cep(cepid_, &adr) < 0) {
 				return false;
 			} else {
 				return true;
@@ -229,7 +238,6 @@ namespace net {
 			}
 			tcp_cls_cep(cepid_, TMO_FEVR);
 			ethernet::CEP& cep = ethernet_.at_cep(cepid_);
-			cep.call_flag = false;
 			end();
 		}
 
@@ -241,10 +249,8 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void end()
 		{
-///			tcp_init(cepid_);
 			ethernet_.end_connection(cepid_);
 			cepid_ = 0;
-			re_con_cnt_ = 0;
 		}
 	};
 }
