@@ -314,6 +314,8 @@ namespace seeda {
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
+			auto mount = at_sdc().get_mount();
+
 			// Ａ／Ｄ変換設定
 			{
 				http_format("<form method=\"POST\" action=\"/cgi/set_adc.cgi\"><table>\n");
@@ -342,28 +344,31 @@ namespace seeda {
 						% ch % static_cast<int>(t.limit_lo_level_)
 						% ch % static_cast<int>(t.limit_hi_level_);
 				}
-				http_format("<tr><td><input type=\"submit\" value=\"設定\"></td></tr>"
-					   "</table></form>\n");
+				http_format("<tr><td><input type=\"submit\" value=\"設定\"%s></td></tr>"
+						   "</table></form>") % (mount ? "" : " disabled=\"disabled\"");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 			{  // ＳＤカードステータス・ボタン
-				http_format("<input type=\"button\" onclick=\"location.href='/sdc_state'\" value=\"ＳＤカード情報\">\n");
+				http_format("<input type=\"button\" onclick=\"location.href='/sdc_state'\""
+							" value=\"ＳＤカード情報\"%s>") % (mount ? "" : " disabled=\"disabled\"");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
-
 			{  // プリファレンス消去ボタン
-				http_format("<input type=\"button\" onclick=\"location.href='/preference'\" value=\"プリファレンス消去\">\n");
+				http_format("<input type=\"button\" onclick=\"location.href='/preference'\""
+							" value=\"プリファレンス消去\"%s>") % (mount ? "" : " disabled=\"disabled\"");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 			{  // クライアント機能設定ボタン
-				http_format("<input type=\"button\" onclick=\"location.href='/client'\" value=\"クライアント機能\">\n");
+				http_format("<input type=\"button\" onclick=\"location.href='/client'\""
+							" value=\"クライアント機能\"%s>") % (mount ? "" : " disabled=\"disabled\"");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
-			{  // ファイル書き込み設定
+			// ファイル書き込み設定
+			{
 				http_format("<form method=\"POST\" action=\"/cgi/set_write.cgi\">\n");
 				http_format("<table><tr><td>ファイル名(ベース)：</td>");
 				if(!write_file_.get_enable()) {
@@ -376,13 +381,19 @@ namespace seeda {
 				if(!write_file_.get_enable()) {
 					http_format("<td><input type=\"text\" name=\"count\" size=\"16\" value=\"%d\"></td></tr>\n")
 						% write_file_.get_limit();
-					http_format("<tr><td><input type=\"submit\" value=\"書き込み開始\"></td></tr>\n");
+					http_format("<tr><td><input type=\"submit\" value=\"書き込み開始\"%s></td></tr>")
+						% (mount ? "" : " disabled=\"disabled\"");
 				} else {
 					http_format("<td>%d/%d</td></tr>\n") % write_file_.get_resume() % write_file_.get_limit();
-					http_format("<tr><td><input type=\"submit\" value=\"書き込み停止\"></td></tr>\n");
+					http_format("<tr><td><input type=\"submit\" value=\"書き込み停止\"%s></td></tr>")
+						% (mount ? "" : " disabled=\"disabled\"");
 				}
 				http_format("</table></form>\n");
 
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
+			}
+			if(!mount) {
+				http_format("ＳＤカードがありません。<br>");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 		}

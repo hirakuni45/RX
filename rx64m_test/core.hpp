@@ -72,7 +72,7 @@ namespace seeda {
 
 		typedef utils::fifo<uint8_t, 2048> BUFFER;
 #ifdef SEEDA
-		typedef device::sci_io<device::SCI5, BUFFER, BUFFER> SCI;
+		typedef device::sci_io<device::SCI12, BUFFER, BUFFER> SCI;
 #else
 		typedef device::sci_io<device::SCI7, BUFFER, BUFFER> SCI;
 #endif
