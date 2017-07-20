@@ -8,7 +8,7 @@
 //=====================================================================//
 #include <cstdio>
 #include <cstring>
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 
 // #define WRITE_FILE_DEBUG
@@ -38,7 +38,7 @@ namespace seeda {
 
 		static const uint32_t BUF_SIZE = 64;
 
-		typedef utils::fifo<uint16_t, BUF_SIZE, sample_t> FIFO;
+		typedef utils::fixed_fifo<sample_t, BUF_SIZE> FIFO;
 		FIFO	fifo_;
 
 		FILE	*fp_;
@@ -160,7 +160,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		bool injection(const sample_t& data)
 		{
-			if(fifo_.length() >= (BUF_SIZE -2)) { // スペースが無い場合
+			if(fifo_.length() >= (BUF_SIZE - 2)) { // スペースが無い場合
 				return false;
 			}
 			fifo_.put(data);
