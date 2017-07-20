@@ -420,6 +420,8 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
+	using namespace seeda;
+
 	// ポート初期化
 	// 設定を除外するポート
 //  DIP-SWITCH: P66, P67
@@ -427,7 +429,6 @@ int main(int argc, char** argv)
 //  PHY:        P70, P73
 //  LTC2348-16: P40, PC6, PD0, P53, P56, P86, P87, P20, P21, P22, P23
 //  SDC:        PD3, PD4, PD5, PD6, PE6
-//  LED:        PA0
 //  EUI-SPI:    P14, P15, P16, P17, P80
 //  RX64M A/D:  
 	device::PORT0::PDR.B5 = 1;  // (2)
@@ -457,7 +458,7 @@ int main(int argc, char** argv)
 	device::PORT6::PDR.B5 = 1;  // (100)
 	device::PORTE::PDR.B5 = 1;  // (106)
 	device::PORTE::PDR.B4 = 1;  // (107)
-	device::PORTE::PDR.B3 = 1;  // (108)
+//	device::PORTE::PDR.B3 = 1;  // (108)
 	device::PORTE::PDR.B2 = 1;  // (109)
 	device::PORTE::PDR.B1 = 1;  // (110)
 	device::PORTE::PDR.B0 = 1;  // (111)
@@ -472,7 +473,7 @@ int main(int argc, char** argv)
 	device::PORT9::PDR.B0 = 1;  // (131)
 	device::PORT0::PDR.B7 = 1;  // (144)
 
-	using namespace seeda;
+	device::PORTE::PDR.B3 = 1;  // LED output
 
 	device::PORT3::PCR.B5 = 1; // P35(NMI) pull-up
 
@@ -542,9 +543,6 @@ int main(int argc, char** argv)
 		if(cnt >= 30) {
 			cnt = 0;
 		}
-///		if(config_) {
-			device::PORTA::PDR.B0 = 1; // output
-			device::PORTA::PODR.B0 = (cnt < 10) ? 0 : 1;
-///		}
+		device::PORTE::PODR.B3 = (cnt < 10) ? 0 : 1;
 	}
 }
