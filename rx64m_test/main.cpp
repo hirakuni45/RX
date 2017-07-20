@@ -45,6 +45,19 @@ namespace {
 			}
 		}
 	}
+
+
+	volatile bool putch_lock_ = false;
+	utils::fifo<uint8_t, 1024> putch_tmp_;
+
+	void service_putch_tmp_()
+	{
+		dis_int();
+		while(putch_tmp_.length() > 0) {
+			core_.sci_.putch(putch_tmp_.get());
+		}
+		ena_int();
+	}
 }
 
 namespace seeda {
@@ -232,7 +245,15 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	void sci_putch(char ch)
 	{
+		if(putch_lock_) {
+			if((putch_tmp_.size() - putch_tmp_.length()) >= 2) {
+				putch_tmp_.put(ch);
+			}
+			return;
+		}
+		putch_lock_ = true;
 		core_.sci_.putch(ch);
+		putch_lock_ = false;
 	}
 
 
@@ -512,6 +533,8 @@ int main(int argc, char** argv)
 		tools_.service();
 
 		sdc_.service();
+
+		service_putch_tmp_();
 
 		nets_.service();
 
