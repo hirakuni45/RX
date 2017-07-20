@@ -210,6 +210,8 @@ namespace seeda {
 			net_tools::render_version();
 			net_tools::render_date_time();
 
+			auto mount = at_sdc().get_mount();
+
 			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 
 			if(dev) {
@@ -228,7 +230,8 @@ namespace seeda {
 			http_format("<tr><td>接続先ポート：</td>"
 				"<td><input type=\"text\" name=\"port\" size=\"5\" value=\"%d\"></td></tr>\n")
 				% static_cast<int>(client_.get_port());
-			http_format("<tr><td><input type=\"submit\" value=\"接続先設定\"></td></tr>\n");
+			http_format("<tr><td><input type=\"submit\" value=\"接続先設定\"%s></td></tr>\n")
+				% (mount ? "" : " disabled=\"disabled\"");
 			http_format("</table></form>\n");
 
 			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
@@ -363,7 +366,7 @@ namespace seeda {
 
 			{  // クライアント機能設定ボタン
 				http_format("<input type=\"button\" onclick=\"location.href='/client'\""
-							" value=\"クライアント機能\"%s>") % (mount ? "" : " disabled=\"disabled\"");
+							" value=\"クライアント機能\">");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
