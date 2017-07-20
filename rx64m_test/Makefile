@@ -14,8 +14,8 @@ DEVICE		=	R5F564ML
 
 FATFS_VER	=	ff12b
 
-# BUILD		=	release
-BUILD		=	debug
+BUILD		=	release
+# BUILD		=	debug
 
 BUILD_ID	=	$(shell date +%Y%m%d%H)
 
