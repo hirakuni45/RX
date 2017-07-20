@@ -93,10 +93,8 @@ const uint8_t multi_TTL[] = { 1, 1 };
 /* 0 = disable, other = enable */
 const uint8_t udp_enable_zerochecksum[] = {	0, 0 };
 
-/****************************************************************************/
-/**********************     IP-related definition     ***********************/
-/****************************************************************************/
-const uint16_t _ip_tblcnt[] = { 3, 3 };
+/// ARP table count
+const uint16_t arp_tbl_count_[] = { 3, 3 };
 
 #define MY_IP_ADDR     192,168,0,3            /* Local IP address  */
 #define GATEWAY_ADDR   0,0,0,0                /* Gateway address (invalid if all 0s) */

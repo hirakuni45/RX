@@ -1,9 +1,12 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ether.h @n
-			Copyright 2017 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+	@brief	ether.h
+	@brief	ether.c
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <stdint.h>
@@ -113,23 +116,40 @@ typedef struct
     uint16_t ae_ttl;   /* time to live    */
     uint8_t ae_state;  /* state of this entry (see above) */
     uint8_t ae_attempts; /* number of retries so far  */
-} _ARP_ENTRY ;
+} ARP_ENTRY;
 
-extern _ARP_ENTRY **_ether_arp_tbl;
+extern ARP_ENTRY **ether_arp_tbl_;
 
 void _ether_rcv_arp(void);
-int16_t _ether_snd_arp(_ARP_ENTRY *ae);
+int16_t _ether_snd_arp(ARP_ENTRY *ae);
 void _ether_arp_resolve(void);
 void _ether_arp_init(void);
-void _ether_arp_del(_ARP_ENTRY *ae);
-_ARP_ENTRY *_ether_arp_add(uint8_t *ipaddr, uint8_t *ethaddr);
+void _ether_arp_del(ARP_ENTRY *ae);
+ARP_ENTRY *_ether_arp_add(uint8_t *ipaddr, uint8_t *ethaddr);
+
+#if defined(__cplusplus)
+extern "C" {
 #endif
 
-/***********************************************************************************************************************
-Exported global variables
-***********************************************************************************************************************/
+//-----------------------------------------------------------------//
+/*!
+	@brief  ARP テーブル数をカウント
+	@return ARP テーブル数
+*/
+//-----------------------------------------------------------------//
+uint32_t ether_arp_num(void);
 
-/***********************************************************************************************************************
-Exported global functions (to be accessed by other files)
-***********************************************************************************************************************/
 
+//-----------------------------------------------------------------//
+/*!
+	@brief  ARP テーブルを取得
+	@return ARP テーブル
+*/
+//-----------------------------------------------------------------//
+const ARP_ENTRY* ether_arp_get(uint32_t idx);
+
+#if defined(__cplusplus)
+}
+#endif
+
+#endif

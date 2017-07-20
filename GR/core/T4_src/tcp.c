@@ -1504,8 +1504,8 @@ void _proc_snd(void)
 
     _TCP_PHDR phdr;
 #if defined(_ETHER)
-    _ARP_ENTRY *ae;
-    ae = _ether_arp_tbl[0];
+    ARP_ENTRY *ae;
+    ae = ether_arp_tbl_[0];
 #endif
     if (_tcp_pre_timer_cnt != _tcp_timer_cnt)
     {
@@ -1514,10 +1514,10 @@ void _proc_snd(void)
 #if defined(_ETHER)
         for (counter = 0;counter < t4_channel_num; counter++)
         {
-            ae = _ether_arp_tbl[counter];
+            ae = ether_arp_tbl_[counter];
             _ch_info_tbl = &_ch_info_head[counter];
 
-            for (i = 0; i < _ip_tblcnt[counter]; i++, ae++)
+            for (i = 0; i < arp_tbl_count_[counter]; i++, ae++)
             {
                 if (((ae->ae_state == AS_RESOLVED)
                         || (ae->ae_state == AS_PENDING)) && (ae->ae_ttl > 0))

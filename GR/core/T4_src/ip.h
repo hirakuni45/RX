@@ -213,8 +213,8 @@ int16_t _ip_snd(uint8_t *data, uint16_t len) ;
 #if defined(_ETHER)
 void _ip_icmp_init_tbl(void);
 void _ip_icmp_update_tbl(void);
-void _ip_icmp_clear_tbl(_ARP_ENTRY *ae);
-_ARP_ENTRY *_ip_search_tbl(void);
+void _ip_icmp_clear_tbl(ARP_ENTRY *ae);
+ARP_ENTRY *_ip_search_tbl(void);
 #endif
 void _ip_snd_icmp(void);
 

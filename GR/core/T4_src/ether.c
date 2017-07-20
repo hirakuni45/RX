@@ -1,8 +1,10 @@
 //=====================================================================//
 /*!	@file
-	@brief	ether.c @n
-			Copyright 2017 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+	@brief	ether.c
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <string.h>
@@ -15,7 +17,7 @@
 #include "core/driver/driver.h"
 
 uint8_t    *_ether_p_rcv_buff;
-_ARP_ENTRY **_ether_arp_tbl;
+ARP_ENTRY **ether_arp_tbl_;
 
 /***********************************************************************************************************************
 * Function Name: _ether_proc_rcv
@@ -107,7 +109,7 @@ void _ether_proc_rcv(void)
 ***********************************************************************************************************************/
 void _ether_rcv_arp(void)
 {
-    _ARP_ENTRY *ae;
+    ARP_ENTRY *ae;
     _ARP_PKT *rpap;
     uint16_t  i;
 
@@ -145,8 +147,8 @@ void _ether_rcv_arp(void)
             /* renew the ARP table when unresolved entry is exist */
         case(hs2net(AR_REPLY)):
             /* Is unresolved entry exist? */
-            ae = _ether_arp_tbl[_ch_info_tbl->_ch_num];
-            for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
+            ae = ether_arp_tbl_[_ch_info_tbl->_ch_num];
+            for (i = 0; i < arp_tbl_count_[_ch_info_tbl->_ch_num]; i++, ae++)
             {
                 if (ae->ae_state == AS_PENDING)
                 {
@@ -198,7 +200,7 @@ void _ether_arp_resolve(void)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-int16_t _ether_snd_arp(_ARP_ENTRY *ae)
+int16_t _ether_snd_arp(ARP_ENTRY *ae)
 {
     _ETH_HDR *peh;
     _ARP_PKT *rpap, *parp;
@@ -269,7 +271,7 @@ int16_t _ether_snd_ip(uint8_t *data, uint16_t dlen)
     static const uint8_t ip_broadcast[] = {0xff, 0xff, 0xff, 0xff};
 #endif
     _ETH_HDR *peh;
-    _ARP_ENTRY *ae;
+    ARP_ENTRY *ae;
 
 
 #if defined(_MULTI)
@@ -324,13 +326,13 @@ int16_t _ether_snd_ip(uint8_t *data, uint16_t dlen)
     }
 
     /* exist nexthop in ARP table? */
-    ae = _ether_arp_tbl[_ch_info_tbl->_ch_num];
-    for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
+    ae = ether_arp_tbl_[_ch_info_tbl->_ch_num];
+    for (i = 0; i < arp_tbl_count_[_ch_info_tbl->_ch_num]; i++, ae++)
     {
         if ((_cmp_ipaddr(&nexthop, ae->ae_pra)) == 0)
             break;
     }
-    if (i < _ip_tblcnt[_ch_info_tbl->_ch_num])
+    if (i < arp_tbl_count_[_ch_info_tbl->_ch_num])
     {
         /* If exist */
         switch (ae->ae_state)
@@ -451,18 +453,18 @@ int16_t _ether_snd(uint16_t type, uint8_t *data, uint16_t dlen)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-_ARP_ENTRY *_ether_arp_add(uint8_t *ipaddr, uint8_t *ethaddr)
+ARP_ENTRY *_ether_arp_add(uint8_t *ipaddr, uint8_t *ethaddr)
 {
     int16_t i;
     uint16_t tmp_ttl = ARP_TIMEOUT;
     uint8_t bcast[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-    _ARP_ENTRY *ae, *ae_tmp, *ae_tmp2;
+    ARP_ENTRY *ae, *ae_tmp, *ae_tmp2;
 
 
     /* Search the existed entry */
     ae_tmp = NULL;
-    ae = _ether_arp_tbl[_ch_info_tbl->_ch_num];
-    for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
+    ae = ether_arp_tbl_[_ch_info_tbl->_ch_num];
+    for (i = 0; i < arp_tbl_count_[_ch_info_tbl->_ch_num]; i++, ae++)
     {
         if ((_cmp_ipaddr(ipaddr, ae->ae_pra)) == 0)
         {
@@ -491,8 +493,8 @@ _ARP_ENTRY *_ether_arp_add(uint8_t *ipaddr, uint8_t *ethaddr)
     {
         ae_tmp2 = NULL;
         /* Select the most smallest TTL */
-        ae = _ether_arp_tbl[_ch_info_tbl->_ch_num];
-        for (i = 0; i < _ip_tblcnt[_ch_info_tbl->_ch_num]; i++, ae++)
+        ae = ether_arp_tbl_[_ch_info_tbl->_ch_num];
+        for (i = 0; i < arp_tbl_count_[_ch_info_tbl->_ch_num]; i++, ae++)
         {
             if (ae->ae_state == AS_RESOLVED)
             {
@@ -543,9 +545,9 @@ _ARP_ENTRY *_ether_arp_add(uint8_t *ipaddr, uint8_t *ethaddr)
 * Arguments    :
 * Return Value :
 ***********************************************************************************************************************/
-void _ether_arp_del(_ARP_ENTRY *ae)
+void _ether_arp_del(ARP_ENTRY *ae)
 {
-    memset(ae->ae_pra, 0, sizeof(_ARP_ENTRY));
+    memset(ae->ae_pra, 0, sizeof(ARP_ENTRY));
     return;
 }
 
@@ -558,14 +560,42 @@ void _ether_arp_del(_ARP_ENTRY *ae)
 void _ether_arp_init(void)
 {
     uint8_t counter;
-    _ARP_ENTRY *ae;
+    ARP_ENTRY *ae;
 
     /* table clear for all channels */
     for (counter = 0; counter < t4_channel_num; counter++)
     {
-        ae = _ether_arp_tbl[counter];
-        memset(ae->ae_pra, 0, (sizeof(_ARP_ENTRY) * _ip_tblcnt[counter]));
+        ae = ether_arp_tbl_[counter];
+        memset(ae->ae_pra, 0, (sizeof(ARP_ENTRY) * arp_tbl_count_[counter]));
     }
     return;
 }
 
+
+//-----------------------------------------------------------------//
+/*!
+	@brief  ARP テーブル数をカウント
+	@return ARP テーブル数
+*/
+//-----------------------------------------------------------------//
+uint32_t ether_arp_num(void)
+{
+//	ARP_ENTRY *ae = ether_arp_tbl_[_ch_info_tbl->_ch_num];
+//	for(uint32_t i = 0; i < arp_tbl_count_[_ch_info_tbl->_ch_num]; i++, ae++) {
+//		if(ae->ae_state == AS_FREE) return i;
+//	}
+	return arp_tbl_count_[_ch_info_tbl->_ch_num];
+}
+
+
+//-----------------------------------------------------------------//
+/*!
+	@brief  ARP テーブルを取得
+	@return ARP テーブル
+*/
+//-----------------------------------------------------------------//
+const ARP_ENTRY* ether_arp_get(uint32_t idx)
+{
+	const ARP_ENTRY *ae = ether_arp_tbl_[_ch_info_tbl->_ch_num];
+	return &ae[idx]; 
+}

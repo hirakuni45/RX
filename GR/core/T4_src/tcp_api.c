@@ -136,13 +136,13 @@ void tcpudp_open(uint32_t *workp)
 	_ppp_init();
 
 #elif defined(_ETHER)
-	_ether_arp_tbl = (_ARP_ENTRY **)currp;
+	ether_arp_tbl_ = (ARP_ENTRY **)currp;
 
-	currp = (uint32_t *)((uint8_t *)currp + t4_channel_num * sizeof(_ARP_ENTRY *));
+	currp = (uint32_t *)((uint8_t *)currp + t4_channel_num * sizeof(ARP_ENTRY *));
 
 	for(int counter = 0; counter < t4_channel_num; counter++) {
-		*(_ether_arp_tbl + counter) = ((_ARP_ENTRY *)currp);
-		currp = (uint32_t *)((uint8_t *)currp + _ip_tblcnt[counter] * sizeof(_ARP_ENTRY));
+		*(ether_arp_tbl_ + counter) = ((ARP_ENTRY *)currp);
+		currp = (uint32_t *)((uint8_t *)currp + arp_tbl_count_[counter] * sizeof(ARP_ENTRY));
 	}
 
 	_ether_arp_init();
@@ -206,9 +206,9 @@ static uint32_t get_ip_memory_size_(void)
 static uint32_t get_ether_memory_size_(void)
 {
 	uint32_t ramsize = 0;
-	ramsize += t4_channel_num * sizeof(_ARP_ENTRY *);
+	ramsize += t4_channel_num * sizeof(ARP_ENTRY *);
 	for(int count = 0; count < t4_channel_num; count++) {
-		ramsize += (_ip_tblcnt[count] * sizeof(_ARP_ENTRY));
+		ramsize += (arp_tbl_count_[count] * sizeof(ARP_ENTRY));
 	}
     get_align_memory_size_(&ramsize);
 
