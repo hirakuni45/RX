@@ -17,8 +17,6 @@
 #include "T4_src/config_tcpudp.h"
 #include "T4_src/r_t4_dhcp_client_rx_if.h"
 #include "T4_src/r_dhcp_client.h"
-/// #include "T4_src/r_t4_dns_client_rx_if.h"
-/// #include "T4_src/r_dns_client.h"
 #include "T4_src/ether.h"
 #include "T4_src/ip.h"
 #include "T4_src/tcp.h"
@@ -111,7 +109,8 @@ namespace net {
 			uint32_t	send_pos_;
 			bool		enable;
 			bool		server;
-			CEP() : recv_pos_(0), send_pos_(0), enable(false), server(false) { }
+			bool		acp;
+			CEP() : recv_pos_(0), send_pos_(0), enable(false), server(false), acp(false) { }
 		};
 
 	private:
@@ -222,8 +221,8 @@ namespace net {
 			for(uint32_t i = 0; i < tcp_ccep_num; ++i) {
 				if(!cep_[idx].enable) {
 					cep_[idx].enable = true;
+					cep_[idx].acp = false;
 					// ++desc_;
-					// tcp_init(idx + 1);
 					return idx + 1;
 				}
 				++idx;
@@ -526,8 +525,9 @@ namespace net {
 			}
 #endif
 			ethernet::CEP& cep = at_cep(cepid);
-			if(ercd == TCP_API_STAT_CLOSED && cep.server) {
+			if(ercd == TCP_API_STAT_CLOSED && cep.server && !cep.acp) {
 				int ret = tcp_acp_cep(cepid, cepid, &cep.dst_addr, TMO_NBLK);
+				cep.acp = true;
 			}
 		}
 
