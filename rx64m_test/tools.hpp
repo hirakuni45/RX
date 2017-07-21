@@ -347,6 +347,12 @@ namespace seeda {
 		}
 	}
 
+
+	void list_service_() const
+	{
+		
+	}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -456,6 +462,9 @@ namespace seeda {
 						f = true;
 					} else if(cmd_.cmp_word(0, "arp")) {  // arp table
 						list_arp_();
+						f = true;
+					} else if(cmd_.cmp_word(0, "service")) {
+						list_service_();
 						f = true;
 #ifdef SEEDA
 					} else if(cmd_.cmp_word(0, "eadc")) {
