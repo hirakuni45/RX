@@ -87,7 +87,7 @@ namespace seeda {
 	typedef net::http_server<SDC, 16, 8192> HTTP;
 	typedef HTTP::http_format http_format;	
 
-	typedef net::ftp_server<SDC> FTP;
+	typedef net::ftp_server<SDC> FTPS;
 
 	//-----------------------------------------------------------------//
 	/*!
