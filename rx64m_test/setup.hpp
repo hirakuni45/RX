@@ -169,19 +169,20 @@ namespace seeda {
 				dhcp_ = true;
 			}
 #endif
-			utils::format("EEPROM DHCP: %s\n") % (dhcp_ ? "Enable" : "Disable");
-			utils::format("EEPROM MAC: %02X:%02X:%02X:%02X:%02X:%02X\n")
+			utils::format("EEPROM EUI-48 Node Identity list\n"); 
+			utils::format("  DHCP: %s\n") % (dhcp_ ? "Enable" : "Disable");
+			utils::format("  IP:   %d.%d.%d.%d\n")
+				% static_cast<uint32_t>(ip_[0])
+				% static_cast<uint32_t>(ip_[1])
+				% static_cast<uint32_t>(ip_[2])
+				% static_cast<uint32_t>(ip_[3]);
+			utils::format("  MAC:  %02X:%02X:%02X:%02X:%02X:%02X\n\n")
 				% static_cast<uint32_t>(mac_[0])
 				% static_cast<uint32_t>(mac_[1])
 				% static_cast<uint32_t>(mac_[2])
 				% static_cast<uint32_t>(mac_[3])
 				% static_cast<uint32_t>(mac_[4])
 				% static_cast<uint32_t>(mac_[5]);
-			utils::format("EEPROM IP:  %d.%d.%d.%d\n\n")
-				% static_cast<uint32_t>(ip_[0])
-				% static_cast<uint32_t>(ip_[1])
-				% static_cast<uint32_t>(ip_[2])
-				% static_cast<uint32_t>(ip_[3]);
 		}
 
 
