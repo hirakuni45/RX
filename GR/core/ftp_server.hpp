@@ -96,9 +96,10 @@ namespace net {
 	/*!
 		@brief  ftp_server class
 		@param[in]	SDC	ＳＤカードファイル操作関係
+		@param[in]	RWBSZ	リード／ライト・バッファサイズ（最低５１２）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SDC>
+	template <class SDC, uint32_t RWBSZ = 2048>
 	class ftp_server {
 
 		typedef utils::basic_format<ether_string<ethernet::format_id::ftps_ctrl, 256 > > ctrl_format;
@@ -145,6 +146,7 @@ namespace net {
 
 			send_file,	///< Server ---> Client
 			recv_file,	///< Client ---> Server
+
 			close_port,	///< ポートをクローズ
 
 			recv_rename,	///< Client ---> Server (rename file name)
@@ -179,7 +181,9 @@ namespace net {
 		uint32_t	file_frame_;
 		uint32_t	file_wait_;
 
-		uint8_t		rw_buf_[8192];
+		uint32_t	rw_limit_;
+
+		uint8_t		rw_buff_[RWBSZ];
 
 		bool		pasv_enable_;
 
@@ -905,6 +909,8 @@ utils::format("Reconnection CTRL\n");
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
+			@param[in]	e	イーサーネット・コンテキスト
+			@param[in]	sdc	SDC コンテキスト
 		*/
 		//-----------------------------------------------------------------//
         ftp_server(ethernet& e, SDC& sdc) : eth_(e), sdc_(sdc),
@@ -914,6 +920,7 @@ utils::format("Reconnection CTRL\n");
 			param_(nullptr), data_ip_(), data_port_(0),
 			data_connect_loop_(0),
 			file_fp_(nullptr), file_total_(0), file_frame_(0), file_wait_(0),
+			rw_limit_(RWBSZ),
 			pasv_enable_(false)
 			{ }
 
@@ -943,6 +950,20 @@ utils::format("Reconnection CTRL\n");
 
 			ctrl_format::chaout().set_fd(0);
 			data_format::chaout().set_fd(0);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  リード・ライト操作リミット
+			@param[in]	limit	最大操作サイズ
+		*/
+		//-----------------------------------------------------------------//
+		void set_rw_limit(uint32_t limit = RWBSZ)
+		{
+			if(limit > RWBSZ) limit = RWBSZ;
+			else if(limit < 512) limit = 512;  // 最低サイズ
+			rw_limit_ = limit;
 		}
 
 
@@ -1084,15 +1105,15 @@ utils::format("Reconnection CTRL\n");
 				}
 				break;
 
-			//--------------------------//
+			//----  Send File ----------------------//
 			case task::send_file:
 				{
-					uint32_t sz = fread(rw_buf_, 1, sizeof(rw_buf_), file_fp_);
+					uint32_t sz = fread(rw_buff_, 1, rw_limit_, file_fp_);
 					if(sz > 0) {
 						if(pasv_enable_) {
-							data_.write(rw_buf_, sz);
+							data_.write(rw_buff_, sz);
 						} else {
-							port_.write(rw_buf_, sz);
+							port_.write(rw_buff_, sz);
 						}
 						file_total_ += sz;
 						file_wait_ = 0;
@@ -1100,7 +1121,7 @@ utils::format("Reconnection CTRL\n");
 						++file_wait_;
 					}
 					++file_frame_;
-					if(sz < sizeof(rw_buf_)) {
+					if(sz < rw_limit_) {
 						uint32_t krate = file_total_ * 100 / file_frame_ / 1024;
 						ctrl_format("226 File successfully transferred (%u KBytes/Sec)\n") % krate;
 						ctrl_flush();
@@ -1136,12 +1157,12 @@ utils::format("Reconnection CTRL\n");
 				{
 					int32_t sz;
 					if(pasv_enable_) {
-						sz = data_.read(rw_buf_, sizeof(rw_buf_));
+						sz = data_.read(rw_buff_, rw_limit_);
 					} else {
-						sz = port_.read(rw_buf_, sizeof(rw_buf_));
+						sz = port_.read(rw_buff_, rw_limit_);
 					}
 					if(sz > 0) {
-						fwrite(rw_buf_, 1, sz, file_fp_);
+						fwrite(rw_buff_, 1, sz, file_fp_);
 						file_total_ += sz;
 						file_wait_ = 0;
 					} else {
@@ -1242,7 +1263,7 @@ utils::format("Reconnection CTRL\n");
 		}
 	};
 
-	template<class SDC> const ftp_key_t ftp_server<SDC>::key_tbl_[] = {
+	template<class SDC, uint32_t RWBSZ> const ftp_key_t ftp_server<SDC, RWBSZ>::key_tbl_[] = {
 		// RFC 959
 		{ "ABOR", ftp_command::ABOR },
 		{ "ACCT", ftp_command::ACCT },
