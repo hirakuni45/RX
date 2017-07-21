@@ -44,14 +44,14 @@ namespace seeda {
 		FILE	*fp_;
 
 		time_t	time_ref_;
+		time_t	time_loop_;
 
 		enum class task : uint8_t {
 			wait_request,
-			sync_time,
+			sync_first,
 			make_filename,
 			open_file,
 			write_header,
-			push_data,
 			make_data,
 			write_body,
 			next_data,
@@ -77,7 +77,8 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		write_file() : limit_(5), count_(0), path_{ "00000" },
 			enable_(false), state_(false),
-			fp_(nullptr), time_ref_(0), task_(task::wait_request), last_data_(false), second_(0) { }
+			fp_(nullptr), time_ref_(0), time_loop_(0),
+			task_(task::wait_request), last_data_(false), second_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -153,23 +154,6 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  インジェクション
-			@param[in]	data	データ
-			@return 成功なら「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool injection(const sample_t& data)
-		{
-			if(fifo_.length() >= (BUF_SIZE - 2)) { // スペースが無い場合
-				return false;
-			}
-			fifo_.put(data);
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  サービス
 		*/
 		//-----------------------------------------------------------------//
@@ -187,27 +171,32 @@ namespace seeda {
 				return;
 			}
 
-			switch(task_) {
+			// データを詰め込む
+			const sample_data& smd = get_sample_data();
+			bool sync = false;
+			if(time_ref_ != smd.time_) {
+				time_ref_ = smd.time_;
+				sync = true;
+			}
 
-			case task::wait_request:
+			switch(task_) {
+			case task::wait_request:  // 書き込みトリガー検出
 				if(enable_ && !back) {
-					task_ = task::sync_time;
+					task_ = task::sync_first;
 				}
 				break;
 
-			case task::sync_time:
-				{
-					const sample_data& smd = get_sample_data();
-					if(time_ref_ != smd.time_) {
-						time_ref_ = smd.time_;
-						task_ = task::make_filename;
-					}
+			case task::sync_first:
+				if(sync) {
+					fifo_.clear();
+					task_ = task::make_filename;
 				}
 				break;
 
 			case task::make_filename:
 				{
-					struct tm *m = localtime(&time_ref_);
+					time_loop_ = time_ref_;
+					struct tm *m = localtime(&time_loop_);
 					utils::sformat("%s_%04d%02d%02d%02d%02d.csv", filename_, sizeof(filename_))
 						% path_
 						% static_cast<uint32_t>(m->tm_year + 1900)
@@ -241,26 +230,15 @@ namespace seeda {
 					utils::sformat("\n", data, sizeof(data), true);
 
 					fwrite(data, 1, utils::sformat::chaout().size(), fp_);
-					fifo_.clear();
-					task_ = task::push_data;
+					task_ = task::make_data;
 				}
-				break;
-
-			case task::push_data:
-				{
-					const sample_data& smd = get_sample_data();
-					for(int i = 0; i < 8; ++i) {
-						fifo_.put(smd.smp_[i]);
-					}
-				}
-				task_ = task::make_data;
 				break;
 
 			case task::make_data:
-				if(fifo_.length() != 0) {
+				if(fifo_.length() > 0) {
 					sample_t smp = fifo_.get();
 					if(smp.ch_ == 0) {
-						struct tm *m = localtime(&time_ref_);
+						struct tm *m = localtime(&time_loop_);
 						utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d,", data_, sizeof(data_))
 							% static_cast<uint32_t>(m->tm_year + 1900)
 							% static_cast<uint32_t>(m->tm_mon + 1)
@@ -274,6 +252,7 @@ namespace seeda {
 					}
 					smp.make_csv2(data_, sizeof(data_), true);
 					if(smp.ch_ == 7) {
+						++time_loop_;
 						utils::sformat("\n", data_, sizeof(data_), true);
 						last_data_ = true;
 					} else {
@@ -290,20 +269,10 @@ namespace seeda {
 					if(second_ == 59) {  // change file.
 						task_ = task::next_file;
 					} else {
-						task_ = task::next_data;
+						task_ = task::make_data;
 					}
 				} else {
 					task_ = task::make_data;
-				}
-				break;
-
-			case task::next_data:
-				{
-					const sample_data& smd = get_sample_data();
-					if(time_ref_ != smd.time_) {
-						time_ref_ = smd.time_;
-						task_ = task::push_data;
-					}
 				}
 				break;
 
@@ -317,12 +286,20 @@ namespace seeda {
 					enable_ = false;
 					task_ = task::wait_request;
 				} else {
-					task_ = task::sync_time;
+					task_ = task::make_filename;
 				}
 				break;
 
 			default:
 				break;
+			}
+
+			if(sync) {
+				if((BUF_SIZE - fifo_.length()) > 8) {
+					for(int i = 0; i < 8; ++i) {
+						fifo_.put(smd.smp_[i]);
+					}
+				}
 			}
 		}
 	};
