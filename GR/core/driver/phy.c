@@ -43,9 +43,12 @@
 #define PHY_REG_AN_EXPANSION            (6)
 
 #ifdef TI_DP83822_
-#define PHY_REG_DP83822_REGCR     (0x0D)
-#define PHY_REG_DP83822_ADDAR     (0x0E)
-#define PHY_REG_DP83822_RCSR      (0x17)
+#define PHY_REG_DP83822_REGCR     (0x000D)
+#define PHY_REG_DP83822_ADDAR     (0x000E)
+#define PHY_REG_DP83822_RCSR      (0x0017)
+#define PHY_REG_DP83822_LEDCR     (0x0018)
+#define PHY_REG_DP83822_PHYCR     (0x0019)
+#define PHY_REG_DP83822_IOCTRL1   (0x0462)
 #endif
 
 /* Vendor Specific PHY Registers */
@@ -478,11 +481,11 @@ int16_t phy_init(void)
 //	reg = read_ext_(0x000A);
 //	printf("DP83822 0x000A: 0x%04X\n", (int)reg);
 
-	phy_write_(0x0018, 0b0000010001000000);
-	phy_write_(0x0019, 0b0000000000100001);
-	phy_write_(0x0462, 0b0100001100000000);
-
-	phy_write_(PHY_REG_DP83822_RCSR, 0b0000000001100001);
+	// LED_0: Blink Rate: 10Hz, Active High
+	phy_write_(PHY_REG_DP83822_LEDCR,   0b0000001010000000);
+	phy_write_(PHY_REG_DP83822_PHYCR,   0b0000000000000001);
+	phy_write_(PHY_REG_DP83822_IOCTRL1, 0b0100001100000001);
+	phy_write_(PHY_REG_DP83822_RCSR,    0b0000000001100001);
 
 #ifdef PHY_DEBUG
     reg = phy_read_(0x0462);
