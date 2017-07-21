@@ -51,7 +51,7 @@ namespace seeda {
 		net::ethernet	ethernet_;
 
 		HTTP			http_;
-		FTP				ftp_;
+		FTPS			ftps_;
 
 		client			client_;
 
@@ -123,7 +123,7 @@ namespace seeda {
 
 			http_format("</font>\n");
 
-			{  // 内臓 A/D 表示（湿度、温度）
+			if(0) {  // 内臓 A/D 表示（湿度、温度）
 				auto v = get_adc(6);
 				http_format("温度： %5.2f [度]\n") % thmister_(v);
 				http_.tag_hr(600, 3);
@@ -348,16 +348,18 @@ namespace seeda {
 			if(setup_.get_dhcp()) {
 				if(ethernet_.begin(mac) == 0) {
 					debug_format("Ethernet Fail: begin (DHCP)...\n");
-					debug_format("SetIP: ");
+					utils::format("Direct IP:  ");
 					ethernet_.begin(mac, ipa);
 				} else {
-					utils::format("DHCP: ");
+					utils::format("GetDHCP IP: ");
 				}
 			} else {
 				ethernet_.begin(mac, ipa);
-				utils::format("SetIP: ");
+				utils::format("Direct IP:  ");
 			}
-			utils::format("%s\n\n") % ethernet_.get_local_ip().c_str();
+			utils::format("%s\n") % ethernet_.get_local_ip().c_str();
+			utils::format("SubnetMask: %s\n") % ethernet_.get_subnet_mask().c_str();
+			utils::format("Gateway IP: %s\n\n") % ethernet_.get_gateway_ip().c_str();
 
 			// HTTP Server
 			http_.start("Seeda03 HTTP Server");
@@ -438,7 +440,7 @@ namespace seeda {
 			} );
 
 			// FTP Server
-			ftp_.start("SEEDA03", "Renesas_RX64M", "SEEDA03", "SEEDA03");
+			ftps_.start("SEEDA03", "Renesas_RX64M", "SEEDA03", "SEEDA03");
 		}
 
 
@@ -474,7 +476,7 @@ namespace seeda {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		nets() : http_(ethernet_, at_sdc()), ftp_(ethernet_, at_sdc()), client_(ethernet_),
+		nets() : http_(ethernet_, at_sdc()), ftps_(ethernet_, at_sdc()), client_(ethernet_),
 			count_(0),
 			write_file_(),
 			setup_(write_file_, client_),
@@ -543,7 +545,13 @@ namespace seeda {
 
 			write_file_.service();
 
-			ftp_.service();
+			if(write_file_.get_enable()) {
+				ftps_.set_rw_limit(512);
+			} else {
+				ftps_.set_rw_limit();
+			}
+
+			ftps_.service();
 
 			service_startup_();
 		}
