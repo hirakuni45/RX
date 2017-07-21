@@ -351,13 +351,13 @@ namespace seeda {
 					debug_format("SetIP: ");
 					ethernet_.begin(mac, ipa);
 				} else {
-					debug_format("DHCP: ");
+					utils::format("DHCP: ");
 				}
 			} else {
 				ethernet_.begin(mac, ipa);
-				debug_format("SetIP: ");
+				utils::format("SetIP: ");
 			}
-			debug_format("%s\n") % ethernet_.get_local_ip().c_str();
+			utils::format("%s\n\n") % ethernet_.get_local_ip().c_str();
 
 			// HTTP Server
 			http_.start("Seeda03 HTTP Server");

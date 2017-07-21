@@ -161,13 +161,6 @@ namespace seeda {
 					for(int i = 0; i < 6; ++i) {
 						mac_[i] = tmp[i];
 					}
-					utils::format("EUI MAC: %02X:%02X:%02X:%02X:%02X:%02X\n")
-						% static_cast<uint32_t>(mac_[0])
-						% static_cast<uint32_t>(mac_[1])
-						% static_cast<uint32_t>(mac_[2])
-						% static_cast<uint32_t>(mac_[3])
-						% static_cast<uint32_t>(mac_[4])
-						% static_cast<uint32_t>(mac_[5]);
 				}
 			}
 
@@ -176,6 +169,19 @@ namespace seeda {
 				dhcp_ = true;
 			}
 #endif
+			utils::format("EEPROM DHCP: %s\n") % (dhcp_ ? "Enable" : "Disable");
+			utils::format("EEPROM MAC: %02X:%02X:%02X:%02X:%02X:%02X\n")
+				% static_cast<uint32_t>(mac_[0])
+				% static_cast<uint32_t>(mac_[1])
+				% static_cast<uint32_t>(mac_[2])
+				% static_cast<uint32_t>(mac_[3])
+				% static_cast<uint32_t>(mac_[4])
+				% static_cast<uint32_t>(mac_[5]);
+			utils::format("EEPROM IP:  %d.%d.%d.%d\n\n")
+				% static_cast<uint32_t>(ip_[0])
+				% static_cast<uint32_t>(ip_[1])
+				% static_cast<uint32_t>(ip_[2])
+				% static_cast<uint32_t>(ip_[3]);
 		}
 
 
