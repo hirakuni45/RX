@@ -18,7 +18,7 @@ BUILD_ID	=	$(shell date +%Y%m%d%H)
 VPATH		=	../
 
 ASOURCES	=	common/start.s \
-				GR/core/driver/cksum_rx_little.s
+				r_net/driver/cksum_rx_little.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
@@ -26,22 +26,20 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c \
-				GR/core/driver/phy.c \
-				GR/core/driver/r_ether.c \
-				GR/core/r_byteq_v1.30/r_byteq.c \
-				GR/core/driver/driver.c \
-				GR/core/T4_src/config_tcpudp.c \
-				GR/core/T4_src/ether.c \
-				GR/core/T4_src/ip.c \
-				GR/core/T4_src/udp.c \
-				GR/core/T4_src/tcp.c \
-				GR/core/T4_src/tcp_api.c \
-				GR/core/T4_src/r_dhcp_client.c
-
-#				GR/core/T4_src/r_dns_client.c
+				r_net/driver/phy.c \
+				r_net/driver/r_ether.c \
+				r_net/r_byteq_v1.30/r_byteq.c \
+				r_net/driver/driver.c \
+				r_net/T4_src/config_tcpudp.c \
+				r_net/T4_src/ether.c \
+				r_net/T4_src/ip.c \
+				r_net/T4_src/udp.c \
+				r_net/T4_src/tcp.c \
+				r_net/T4_src/tcp_api.c \
+				r_net/T4_src/r_dhcp_client.c
 
 PSOURCES	=	main.cpp \
-				GR/core/ethernet.cpp
+				r_net/ethernet.cpp
 
 USER_LIBS	=	stdc++ m
 
@@ -56,7 +54,7 @@ MCU_TARGET	=
 
 INC_SYS		=
 
-INC_APP		=	. ../ ../RX64M ../GR ../GR/core/r_socket_rx ../rx64m_test
+INC_APP		=	. ../ ../RX64M ../r_net ../rx64m_test
 
 OPTIMIZE	=	-Os
 
