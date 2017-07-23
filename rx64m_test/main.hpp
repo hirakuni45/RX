@@ -23,8 +23,8 @@
 
 #include "chip/EUI_XX.hpp"
 
-#include "GR/core/http_server.hpp"
-#include "GR/core/ftp_server.hpp"
+#include "r_net/http_server.hpp"
+#include "r_net/ftp_server.hpp"
 
 #ifdef DEBUG
 #define CLIENT_DEBUG

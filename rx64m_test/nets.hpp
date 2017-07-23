@@ -15,8 +15,8 @@
 #include "write_file.hpp"
 #include "client.hpp"
 
-#include "GR/core/ethernet.hpp"
-#include "GR/core/ethernet_client.hpp"
+#include "r_net/ethernet.hpp"
+#include "r_net/ethernet_client.hpp"
 
 #include "net_tools.hpp"
 #include "setup.hpp"
@@ -56,6 +56,8 @@ namespace seeda {
 		client			client_;
 
 		uint32_t		count_;
+
+		uint32_t		item_;
 
 		// サーミスタ定義
 		// A/D: 12 bits, NT103_41G, 分圧抵抗: 10K オーム、サーミスタ: ＶＣＣ側
@@ -401,14 +403,18 @@ namespace seeda {
 				net_tools::render_version();
 				net_tools::render_date_time();
 				http_.tag_hr(600, 3);
-				uint32_t fspc;
-				uint32_t capa;
-				bool ret = at_sdc().get_disk_space(fspc, capa);
-				if(ret) {
-					http_format("ＳＤカード全容量： %u [KBytes]<br>\n") % capa;
-					http_format("ＳＤカード空容量： %u [KBytes]<br>\n") % fspc;
+				if(write_file_.get_enable()) {
+					http_format("ファイル書き込み中は実行できません。<br>\n");
 				} else {
-					http_format("ＳＤカードがありません。<br>\n");
+					uint32_t fspc;
+					uint32_t capa;
+					bool ret = at_sdc().get_disk_space(fspc, capa);
+					if(ret) {
+						http_format("ＳＤカード全容量： %u [KBytes]<br>\n") % capa;
+						http_format("ＳＤカード空容量： %u [KBytes]<br>\n") % fspc;
+					} else {
+						http_format("ＳＤカードがありません。<br>\n");
+					}
 				}
 				http_.tag_hr(600, 3);
 				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
@@ -477,7 +483,7 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		nets() : http_(ethernet_, at_sdc()), ftps_(ethernet_, at_sdc()), client_(ethernet_),
-			count_(0),
+			count_(0), item_(0),
 			write_file_(),
 			setup_(write_file_, client_),
 			startup_delay_(100), ip_{ 0 },
@@ -537,21 +543,23 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void service()
 		{
+			++item_;
+
 			ethernet_.service();
 
-			http_.service();
+			if(item_ & 1) {
+				http_.service(50);
+				write_file_.service(50);
+			} else {
+				ftps_.service(50);
+				client_.service(50);
+			}
 
-			client_.service();
-
-			write_file_.service();
-
-			if(write_file_.get_enable()) {
+			if(write_file_.get_enable() || client_.probe()) {
 				ftps_.set_rw_limit(512);
 			} else {
 				ftps_.set_rw_limit();
 			}
-
-			ftps_.service();
 
 			service_startup_();
 		}

@@ -545,12 +545,12 @@ int main(int argc, char** argv)
 
 		sample_data_.time_ = get_time();
 
+		service_putch_tmp_();
+
 		core_.service();
 		tools_.service();
 
 		sdc_.service();
-
-		service_putch_tmp_();
 
 		nets_.service();
 

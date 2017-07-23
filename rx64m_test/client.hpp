@@ -8,7 +8,7 @@
 //=====================================================================//
 #include "main.hpp"
 
-#include "GR/core/ethernet_client.hpp"
+#include "r_net/ethernet_client.hpp"
 #include "sample.hpp"
 
 // #define CLIENT_DEBUG
@@ -143,10 +143,26 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  サービス
+			@brief  動作状態
+			@return idle では無い場合[true」
 		*/
 		//-----------------------------------------------------------------//
-		void service()
+		bool probe() const
+		{
+			if(send_task_ == send_task::req_connect) return false;
+			if(send_task_ == send_task::wait_req_connect) return false;
+			if(send_task_ == send_task::wait_connect) return false;
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  サービス
+			@param[in]	cycle	サービス・サイクル（通常１００Ｈｚ）
+		*/
+		//-----------------------------------------------------------------//
+		void service(uint32_t cycle)
 		{
 			++idle_count_;
 
@@ -186,10 +202,10 @@ namespace seeda {
 			case send_task::req_connect:
 				if(client_.connect(ip_, port_, TMO_NBLK)) {
 					re_connect_cnt_ = 0;
-					timeout_ = 5 * 100;  // 再接続待ち時間
+					timeout_ = 5 * cycle;  // 再接続待ち時間
 					send_task_ = send_task::wait_connect;
 				} else {
-					timeout_ = 1 * 100;
+					timeout_ = 1 * cycle;
 					send_task_ = send_task::wait_req_connect;
 				}
 				break;
@@ -214,13 +230,13 @@ namespace seeda {
 						// 接続しないので、「re_connect」要求を出してみる
 						// ※ re_connect では、タイムアウト（１０分）を無効にする。
 						client_.re_connect(ip_, port_);
-						timeout_ = 5 * 100;  // 再接続待ち時間
+						timeout_ = 5 * cycle;  // 再接続待ち時間
 					}
 				} else {
 					debug_format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% ip_.c_str() % port_ % client_.get_cepid();
 					format::chaout().set_fd(client_.get_cepid());
-					if(idle_count_ > 150) {  // 1.5 秒以上、の「間」がある場合、設定初期化
+					if(idle_count_ > (cycle * 3 / 2)) {  // 1.5 秒以上、の「間」がある場合、設定初期化
 						fifo_.clear();
 						time_ = time_ref_;
 					}
