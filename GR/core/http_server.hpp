@@ -523,10 +523,11 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  サービス
+			@param[in]	cycle	サービス・サイクル（通常１００Ｈｚ）
 			@param[in]	http_port	HTTP ポート番号（通常８０番）
 		*/
 		//-----------------------------------------------------------------//
-		void service(uint16_t http_port = 80)
+		void service(uint32_t cycle, uint16_t http_port = 80)
 		{
 			switch(task_) {
 

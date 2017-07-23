@@ -108,9 +108,9 @@ namespace net {
 		void ctrl_flush() { ctrl_format::chaout().flush(); }
 		void data_flush() { data_format::chaout().flush(); }
 
-		static const uint32_t	login_timeout_    = 100 * 30;  ///< 30 sec.
-		static const uint32_t	transfer_timeout_ = 100 * 10;  ///< 10 sec.
-		static const uint32_t	data_connection_timeout_ = 100 * 10;  ///< 10 sec.
+		static const uint32_t	login_timeout_    = 30;  ///< 30 sec.
+		static const uint32_t	transfer_timeout_ = 10;  ///< 10 sec.
+		static const uint32_t	data_connection_timeout_ = 10;  ///< 10 sec.
 
 		// デバッグ以外で出力を無効にする
 #ifdef FTPS_DEBUG
@@ -969,10 +969,11 @@ utils::format("Reconnection CTRL\n");
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  サービス（１０ミリ秒毎に呼ばれるサービス）
+			@brief  サービス
+			@param[in]	cycle	サービス・サイクル（通常１００Ｈｚ）
 		*/
 		//-----------------------------------------------------------------//
-		void service()
+		void service(uint32_t cycle)
 		{
 			switch(task_) {
 			case task::begin:
@@ -1051,7 +1052,7 @@ utils::format("Reconnection CTRL\n");
 				data_.begin(DATA_PORT_PASV);
 				debug_format("Start FTP Server data (PASV): '%s' (%d) fd(%d)\n")
 					% eth_.get_local_ip().c_str() % data_.get_port() % data_.get_cepid();
-				data_connect_loop_ = data_connection_timeout_;
+				data_connect_loop_ = data_connection_timeout_ * cycle;
 				data_format::chaout().set_fd(data_.get_cepid());
 				task_ = task::data_connection;
 				break;
@@ -1067,7 +1068,7 @@ utils::format("Reconnection CTRL\n");
 				if(data_.connected()) {
 					debug_format("Connection FTP Server data (PASV): '%s' %d [ms] (%d)\n")
 						% data_.get_from_ip().c_str()
-						% static_cast<int>(data_connection_timeout_ - data_connect_loop_)
+						% static_cast<int>((data_connection_timeout_ * cycle) - data_connect_loop_)
 						% data_.get_port();
 					task_ = task::command;
 					line_man_.clear();
@@ -1080,7 +1081,7 @@ utils::format("Reconnection CTRL\n");
 				port_.connect(data_ip_, data_port_, TMO_NBLK);
 				debug_format("Start FTP Server data (PORT): '%s' (%d) fd(%d)\n")
 					% data_ip_.c_str() % data_port_ % port_.get_cepid();
-				data_connect_loop_ = data_connection_timeout_;
+				data_connect_loop_ = data_connection_timeout_ * cycle;
 				data_format::chaout().set_fd(port_.get_cepid());
 				task_ = task::port_connection;
 				break;
@@ -1096,7 +1097,7 @@ utils::format("Reconnection CTRL\n");
 				if(port_.connected()) {
 					debug_format("Connection FTP Server data (PORT): '%s' %d [ms] (%d)\n")
 						% port_.get_from_ip().c_str()
-						% static_cast<int>(data_connection_timeout_ - data_connect_loop_)
+						% static_cast<int>((data_connection_timeout_ * cycle) - data_connect_loop_)
 						% port_.get_port();
 					task_ = task::command;
 					line_man_.clear();
@@ -1122,7 +1123,7 @@ utils::format("Reconnection CTRL\n");
 					}
 					++file_frame_;
 					if(sz < rw_limit_) {
-						uint32_t krate = file_total_ * 100 / file_frame_ / 1024;
+						uint32_t krate = file_total_ * cycle / file_frame_ / 1024;
 						ctrl_format("226 File successfully transferred (%u KBytes/Sec)\n") % krate;
 						ctrl_flush();
 						fclose(file_fp_);
@@ -1136,7 +1137,7 @@ utils::format("Reconnection CTRL\n");
 						debug_format("Data send %u Bytes, %u Kbytes/Sec\n") % file_total_ % krate;
 						break;
 					}
-					if(file_wait_ >= transfer_timeout_) {
+					if(file_wait_ >= (transfer_timeout_ * cycle)) {
 						ctrl_format("421 Data timeout. Reconnect. Sorry\n");
 						ctrl_flush();
 						fclose(file_fp_);
@@ -1173,7 +1174,7 @@ utils::format("Reconnection CTRL\n");
 					if(pasv_enable_) con = data_.connected();
 					else con = port_.connected();
 					if(!con || sz < 0) {
-						uint32_t krate = file_total_ * 100 / file_frame_ / 1024;
+						uint32_t krate = file_total_ * cycle / file_frame_ / 1024;
 						ctrl_format("226 File successfully transferred (%u KBytes/Sec)\n") % krate;
 						ctrl_flush();
 						fclose(file_fp_);
@@ -1187,7 +1188,7 @@ utils::format("Reconnection CTRL\n");
 						task_ = task::command;
 						break;
 					}
-					if(file_wait_ >= transfer_timeout_) {
+					if(file_wait_ >= (transfer_timeout_ * cycle)) {
 						ctrl_format("421 Data timeout. Reconnect. Sorry\n");
 						ctrl_flush();
 						fclose(file_fp_);
