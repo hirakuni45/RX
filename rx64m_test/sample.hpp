@@ -44,7 +44,6 @@ namespace seeda {
 
 		sample_t() :
 			gain_(1024.0f),
-///			offset_(0.0f),
 			limit_lo_count_(0), limit_hi_count_(0), limit_lo_level_(30000), limit_hi_level_(40000),
 			center_(0),
 			ch_(0), mode_(mode::none),
@@ -204,6 +203,7 @@ namespace seeda {
 		{
 			uint32_t med = 0;
 			uint32_t sum = 0;
+
 			for(MAP::iterator it = map_.begin(); it != map_.end(); ++it) {
 				uint32_t cnt = it->second;
 				sum += cnt;
@@ -217,6 +217,7 @@ namespace seeda {
 					break;
 				}
 			}
+
 			t_.median_ = med;
 
 			t_.average_ = sum_ / count_;

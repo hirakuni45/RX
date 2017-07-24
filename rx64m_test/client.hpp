@@ -61,7 +61,9 @@ namespace seeda {
 		uint32_t	timeout_;
 		uint32_t	re_connect_cnt_;
 
+		time_t		time_org_;
 		time_t		time_ref_;
+		time_t		time_ofs_;
 		time_t		time_;
 
 		uint32_t	idle_count_;
@@ -90,7 +92,8 @@ namespace seeda {
 			ip_(192, 168, 3, 7),
 #endif
 			port_(PORT),
-			delay_(0), timeout_(0), re_connect_cnt_(0), time_ref_(0), time_(0), idle_count_(0) { }
+			delay_(0), timeout_(0), re_connect_cnt_(0),
+			time_org_(0), time_ref_(0), time_ofs_(0), time_(0), idle_count_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -238,7 +241,9 @@ namespace seeda {
 					format::chaout().set_fd(client_.get_cepid());
 					if(idle_count_ > (cycle * 3 / 2)) {  // 1.5 秒以上、の「間」がある場合、設定初期化
 						fifo_.clear();
-						time_ = time_ref_;
+						time_org_ = get_time();
+						time_ofs_ = time_ref_;
+						time_     = time_ref_;
 					}
 					send_task_ = send_task::make_form;
 				}
@@ -251,7 +256,8 @@ namespace seeda {
 				for(int ch = 0; ch < 8; ++ch) {
 					const auto& smd = fifo_.get_at();
 					if(ch == 0) {
-						struct tm* m = localtime(&time_);
+						time_t t = time_ - time_ofs_ + time_org_;
+						struct tm* m = localtime(&t);
 						tm_ = *m;
 						utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d", form_, sizeof(form_))
 							% static_cast<uint32_t>(tm_.tm_year + 1900)

@@ -12,6 +12,7 @@
 #include "common/format.hpp"
 
 // #define WRITE_FILE_DEBUG
+#define WRITE_FILE_DEBUG
 
 namespace seeda {
 
@@ -43,6 +44,8 @@ namespace seeda {
 
 		FILE	*fp_;
 
+		time_t	time_org_;
+		time_t	time_ofs_;
 		time_t	time_ref_;
 		time_t	time_loop_;
 
@@ -77,7 +80,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		write_file() : limit_(5), count_(0), path_{ "00000" },
 			enable_(false), state_(false),
-			fp_(nullptr), time_ref_(0), time_loop_(0),
+			fp_(nullptr), time_org_(0), time_ref_(0), time_loop_(0),
 			task_(task::wait_request), last_data_(false), second_(0) { }
 
 
@@ -190,6 +193,8 @@ namespace seeda {
 			case task::sync_first:
 				if(sync) {
 					fifo_.clear();
+					time_org_  = get_time();
+					time_ofs_  = time_ref_;
 					time_loop_ = time_ref_;
 					task_ = task::make_filename;
 				}
@@ -197,7 +202,8 @@ namespace seeda {
 
 			case task::make_filename:
 				{
-					struct tm *m = localtime(&time_loop_);
+					time_t t = time_org_ + time_loop_ - time_ofs_;
+					struct tm *m = localtime(&t);
 					utils::sformat("%s_%04d%02d%02d%02d%02d.csv", filename_, sizeof(filename_))
 						% path_
 						% static_cast<uint32_t>(m->tm_year + 1900)
@@ -242,7 +248,8 @@ namespace seeda {
 				if(fifo_.length() > 0) {
 					sample_t smp = fifo_.get();
 					if(smp.ch_ == 0) {
-						struct tm *m = localtime(&time_loop_);
+						time_t t = time_org_ + time_loop_ - time_ofs_;
+						struct tm *m = localtime(&t);
 						utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d,", data_, sizeof(data_))
 							% static_cast<uint32_t>(m->tm_year + 1900)
 							% static_cast<uint32_t>(m->tm_mon + 1)
