@@ -170,8 +170,10 @@ namespace seeda {
 			sample_[i].add(eadc_.get_value(i));
 		}
 #else
+		static uint16_t sig[8];
 		for(int i = 0; i < 8; ++i) {
-			sample_[i].add(32767 + ((rand() & 255) - 127));
+			sample_[i].add(sig[i]);
+			++sig[i];
 		}
 #endif
 		++sample_count_;
@@ -182,6 +184,7 @@ namespace seeda {
 				sample_data_.smp_[i].ch_ = i;
 				sample_[i].clear();
 			}
+			++sample_data_.time_;
 			sample_count_ = 0;			
 		}
 	}
@@ -504,7 +507,7 @@ int main(int argc, char** argv)
 	// Base Clock 12.5MHz
 	// PLLDIV: 1/1, STC: 19 倍(237.5MHz)
 	device::SYSTEM::PLLCR = device::SYSTEM::PLLCR.PLIDIV.b(0) |
-							device::SYSTEM::PLLCR.STC.b(0b100011);
+							device::SYSTEM::PLLCR.STC.b(0b100101);
 	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
 
@@ -542,8 +545,6 @@ int main(int argc, char** argv)
 	uint32_t cnt = 0;
 	while(1) {
 		core_.sync();
-
-		sample_data_.time_ = get_time();
 
 		service_putch_tmp_();
 
