@@ -190,13 +190,13 @@ namespace seeda {
 			case task::sync_first:
 				if(sync) {
 					fifo_.clear();
+					time_loop_ = time_ref_;
 					task_ = task::make_filename;
 				}
 				break;
 
 			case task::make_filename:
 				{
-					time_loop_ = time_ref_;
 					struct tm *m = localtime(&time_loop_);
 					utils::sformat("%s_%04d%02d%02d%02d%02d.csv", filename_, sizeof(filename_))
 						% path_
@@ -205,6 +205,8 @@ namespace seeda {
 						% static_cast<uint32_t>(m->tm_mday)
 						% static_cast<uint32_t>(m->tm_hour)
 						% static_cast<uint32_t>(m->tm_min);
+					last_data_ = false;
+					second_ = 0;
 					task_ = task::open_file;
 				}
 				break;
@@ -216,7 +218,8 @@ namespace seeda {
 					enable_ = false;
 					task_ = task::wait_request;
 				} else {
-					debug_format("Start write file: '%s'\n") % filename_;
+					debug_format("Start write file: '%s' (%d) : (%d)\n")
+						% filename_ % time_ref_ % time_loop_;
 					task_ = task::write_header;
 				}
 				break;
@@ -282,8 +285,9 @@ namespace seeda {
 				fp_ = nullptr;
 				++count_;
 				if(count_ >= limit_) {
+					debug_format("Fin write file: %d files (%d) : (%d)\n")
+						% count_ % time_ref_ % time_loop_;
 					fp_ = nullptr;
-					debug_format("Fin write file: %d files\n") % count_;
 					enable_ = false;
 					task_ = task::wait_request;
 				} else {
