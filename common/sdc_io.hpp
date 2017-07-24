@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	SD カード・アクセス制御 @n
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -7,7 +7,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <cstring>
 #include "common/renesas.hpp"
 #include "common/format.hpp"
@@ -28,12 +28,21 @@ namespace utils {
 	template <class SPI, class SELECT, class POWER, class DETECT>
 	class sdc_io {
 	public:
-		typedef SPI spi_type;
-		typedef fatfs::mmc_io<SPI, SELECT> mmc_type;
+		typedef SPI spi_type;	///< ＳＰＩ型
+
+
+		typedef fatfs::mmc_io<SPI, SELECT> mmc_type;	///< ＭＭＣ型
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  DIR リスト関数型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef void (*dir_loop_func)(const char* name, const FILINFO* fi, bool dir, void* option);
+
 
 	private:
-		static const int path_buff_size_ = 256;
-
 		FATFS	fatfs_;  ///< FatFS コンテキスト
 
 		SPI&	spi_;
@@ -45,7 +54,9 @@ namespace utils {
 		bool	cd_;
 		bool	mount_;
 
-		char	current_[path_buff_size_];
+		uint32_t	dir_list_limit_;
+
+		char	current_[_MAX_LFN + 1];
 
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
 			if(fi == nullptr) return;
@@ -106,6 +117,7 @@ namespace utils {
 			++t->idx_;
 		}
 
+
 		void create_full_path_(const char* path, char* full) const
 		{
 			std::strcpy(full, current_);
@@ -138,7 +150,7 @@ namespace utils {
 		// FATFS で認識できるパス（文字コード）へ変換
 		void create_fatfs_path_(const char* path, char* full) const {
 #if _USE_LFN != 0
-			char tmp[path_buff_size_];
+			char tmp[_MAX_LFN + 1];
 			create_full_path_(path, tmp);
 			str::utf8_to_sjis(tmp, full);
 #else
@@ -147,10 +159,130 @@ namespace utils {
 		}
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  SD カード・ディレクトリー・リスト・クラス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		class dir_list {
+			DIR			dir_;
+			uint32_t	total_;
+			uint32_t	limit_;
+			char*		ptr_;
+
+			bool		init_;
+
+			char full_[_MAX_LFN + 1];
+
+		public:
+			//-----------------------------------------------------------------//
+			/*!
+				@brief	コンストラクター
+			 */
+			//-----------------------------------------------------------------//
+			dir_list() : total_(0), limit_(10), ptr_(nullptr), init_(false) { }
+
+
+			//-----------------------------------------------------------------//
+			/*!
+				@brief	プローブ（状態）
+				@return 取得中なら「true」
+			 */
+			//-----------------------------------------------------------------//
+			bool probe() const { return init_; }
+
+
+			//-----------------------------------------------------------------//
+			/*!
+				@brief	ファイル数を取得
+				@return ファイル数
+			 */
+			//-----------------------------------------------------------------//
+			uint32_t get_total() const { return total_; }
+
+
+			//-----------------------------------------------------------------//
+			/*!
+				@brief	ディレクトリーリスト開始 @n
+						※「probe()」関数が「false」になるまで「service()」を呼ぶ
+				@param[in]	root	ルート・パス
+				@return エラー無ければ「true」
+			 */
+			//-----------------------------------------------------------------//
+			bool start(const char* root)
+			{
+				total_ = 0;
+
+				std::strcpy(full_, root);
+
+				auto st = f_opendir(&dir_, full_);
+				if(st != FR_OK) {
+					return false;
+				}
+
+				std::strcat(full_, "/");
+				ptr_ = &full_[std::strlen(full_)];
+				init_ = true;
+
+				return true;
+			}
+
+
+			//-----------------------------------------------------------------//
+			/*!
+				@brief	ディレクトリーリスト、ループ
+				@param[in]	num		ループ回数
+				@param[in]	func	実行関数
+				@param[in]	todir  「true」の場合、ディレクトリーも関数を呼ぶ
+				@param[in]	option	オプション・ポインター
+				@return エラー無ければ「true」
+			 */
+			//-----------------------------------------------------------------//
+			bool service(uint32_t num, dir_loop_func func = nullptr, bool todir = false, void* option = nullptr)
+			{
+				if(!init_) return false;
+
+				for(uint32_t i = 0; i < num; ++i) {
+					FILINFO fi;
+					// Read a directory item
+					if(f_readdir(&dir_, &fi) != FR_OK) {
+						init_ = false;
+						return false;
+					}
+					if(!fi.fname[0]) {
+						f_closedir(&dir_);
+						init_ = false;
+						break;
+					}
+
+					if(func != nullptr) {
+#if _USE_LFN != 0
+						str::sjis_to_utf8(fi.fname, ptr_);
+#else
+						std::strcpy(ptr_, fi.fname);
+#endif
+						if(fi.fattrib & AM_DIR) {
+							if(todir) {
+								func(ptr_, &fi, true, option);
+							}
+						} else {
+							func(ptr_, &fi, false, option);
+						}
+					}
+					++total_;
+				}
+				return true;
+			}
+		};
+
+
+		dir_list	dir_list_;
+
+		dir_loop_func	dir_func_;
+		bool			dir_todir_;
+		void* 			dir_option_;
+
 	public:
-		typedef void (*dir_loop_func)(const char* name, const FILINFO* fi, bool dir, void* option);
-
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
@@ -159,7 +291,9 @@ namespace utils {
 		 */
 		//-----------------------------------------------------------------//
 		sdc_io(SPI& spi, uint32_t limitc) : spi_(spi), mmc_(spi_, limitc),
-			mount_delay_(0), select_wait_(0), cd_(false), mount_(false) { }
+			mount_delay_(0), select_wait_(0), cd_(false), mount_(false),
+			dir_list_limit_(10),
+			dir_func_(nullptr), dir_todir_(false), dir_option_(nullptr) { }
 
 
 		//-----------------------------------------------------------------//
@@ -231,7 +365,7 @@ namespace utils {
 			if(!mount_) return false;
 			if(fp == nullptr || path == nullptr) return false;
 
-			char full[path_buff_size_];
+			char full[_MAX_LFN + 1];
 			create_fatfs_path_(path, full);
 
 			if(f_open(fp, full, mode) != FR_OK) {
@@ -270,7 +404,7 @@ namespace utils {
 			if(!mount_) return false;
 			if(path == nullptr) return false;
 
-			char full[path_buff_size_];
+			char full[_MAX_LFN + 1];
 			create_fatfs_path_(path, full);
 
 			FILINFO fno;
@@ -294,7 +428,7 @@ namespace utils {
 			if(!mount_) return 0;
 			if(path == nullptr) return 0;
 
-			char full[path_buff_size_];
+			char full[_MAX_LFN + 1];
 			create_fatfs_path_(path, full);
 
 			FILINFO fno;
@@ -318,7 +452,7 @@ namespace utils {
 			if(!mount_) return false;
 			if(path == nullptr) return false;
 
-			char full[path_buff_size_];
+			char full[_MAX_LFN + 1];
 			create_fatfs_path_(path, full);
 
 			return f_unlink(full) == FR_OK;
@@ -338,9 +472,9 @@ namespace utils {
 			if(!mount_) return false;
 			if(org_path == nullptr || new_path == nullptr) return false;
 
-			char org_full[path_buff_size_];
+			char org_full[_MAX_LFN + 1];
 			create_fatfs_path_(org_path, org_full);
-			char new_full[path_buff_size_];
+			char new_full[_MAX_LFN + 1];
 			create_fatfs_path_(new_path, new_full);
 
 			return f_rename(org_full, new_full) == FR_OK;
@@ -359,7 +493,7 @@ namespace utils {
 			if(!mount_) return false;
 			if(path == nullptr) return false;
 
-			char full[path_buff_size_];
+			char full[_MAX_LFN + 1];
 			create_fatfs_path_(path, full);
 
 			return f_mkdir(full) == FR_OK;
@@ -405,11 +539,11 @@ namespace utils {
 
 			if(path == nullptr) return false;
 
-			char full[path_buff_size_];
+			char full[_MAX_LFN + 1];
 			create_full_path_(path, full);
 
 #if _USE_LFN != 0
-			char oem[path_buff_size_];
+			char oem[_MAX_LFN + 1];
 			str::utf8_to_sjis(full, oem);
 			DIR dir;
 			auto st = f_opendir(&dir, oem);
@@ -430,60 +564,50 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	ディレクトリー・リストのフレーム単位での最大数を設定
+			@param[in]	limit	フレーム毎の最大数
+		 */
+		//-----------------------------------------------------------------//
+		void set_dir_list_limit(uint32_t limit) { dir_list_limit_ = limit; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ディレクトリー・リストの状態を取得
+			@param[in]	num	リスト数
+			@return ディレクトリー・リスト処理中なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool probe_dir_list(uint32_t& num) const
+		{
+			num = dir_list_.get_total();
+			return dir_list_.probe();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	SD カードのディレクトリーリストでタスクを実行する
 			@param[in]	root	ルート・パス
 			@param[in]	func	実行関数
 			@param[in]	todir  「true」の場合、ディレクトリーも関数を呼ぶ
 			@param[in]	option	オプション・ポインター
-			@return ファイル数
+			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		uint32_t dir_loop(const char* root, dir_loop_func func = nullptr, bool todir = false,
+		bool start_dir_list(const char* root, dir_loop_func func = nullptr, bool todir = false,
 			void* option = nullptr)
 		{
-			char full[path_buff_size_];
-			DIR dir;
-			FILINFO fi;
+			dir_func_ = func;
+			dir_todir_ = todir;
+			dir_option_ = option;
 
-			if(!mount_) return 0;
-
+			char full[256];
 			create_full_path_(root, full);
 #if _USE_LFN != 0
 			str::utf8_to_sjis(full, full);
 #endif
-			uint32_t num = 0;
-			auto st = f_opendir(&dir, full);
-			if(st != FR_OK) {
-				format("Can't open dir(%d): '%s'\n") % static_cast<uint32_t>(st) % full;
-			} else {
-				std::strcat(full, "/");
-				char* p = &full[std::strlen(full)];
-				for(;;) {
-					// Read a directory item
-					if(f_readdir(&dir, &fi) != FR_OK) {
-						format("Can't read dir\n");
-						break;
-					}
-					if(!fi.fname[0]) break;
-					if(func != nullptr) {
-#if _USE_LFN != 0
-						str::sjis_to_utf8(fi.fname, p);
-#else
-						std::strcpy(p, fi.fname);
-#endif
-						if(fi.fattrib & AM_DIR) {
-							if(todir) {
-								func(p, &fi, true, option);
-							}
-						} else {
-							func(p, &fi, false, option);
-						}
-					}
-					++num;
-				}
-				f_closedir(&dir);
-			}
-			return num;
+			return dir_list_.start(full);
 		}
 
 
@@ -514,9 +638,21 @@ namespace utils {
 			@return ファイル数
 		 */
 		//-----------------------------------------------------------------//
-		uint16_t dir(const char* root)
+		uint32_t dir(const char* root)
 		{
-			return dir_loop(root, dir_list_func_, true);
+			dir_list dl;
+			char full[256];
+			create_full_path_(root, full);
+#if _USE_LFN != 0
+			str::utf8_to_sjis(full, full);
+#endif
+			if(!dl.start(full)) return 0;
+
+			do {
+				dl.service(10, dir_list_func_, true);
+			} while(dl.probe()) ;
+
+			return dl.get_total();
 		}
 
 
@@ -589,6 +725,9 @@ namespace utils {
 						mount_ = true;
 					}
 				}
+			}
+			if(mount_) {
+				dir_list_.service(dir_list_limit_, dir_func_, dir_todir_, dir_option_);
 			}
 			return mount_;
 		}
