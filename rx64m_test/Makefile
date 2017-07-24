@@ -61,7 +61,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX64M ../r_net
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-O3
 
 AS_OPT		=	-mcpu=rx600
 
