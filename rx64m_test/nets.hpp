@@ -8,7 +8,7 @@
 //=====================================================================//
 #include <cstdio>
 #include <cmath>
-#include "rx64m_test/main.hpp"
+#include "main.hpp"
 #include "common/string_utils.hpp"
 #include "chip/NTCTH.hpp"
 
