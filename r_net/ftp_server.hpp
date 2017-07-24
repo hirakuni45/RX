@@ -152,6 +152,10 @@ namespace net {
 			recv_rename,	///< Client ---> Server (rename file name)
 
 			command,
+			dir_list,
+			dir_nlst,
+			dir_mlsd,
+			dir_loop,
 
 			disconnect,
 			disconnect_main,
@@ -415,6 +419,11 @@ namespace net {
 
 			case ftp_command::LIST:
 				{
+					if(!sdc_.get_mount()) {
+						ctrl_format("425 No mount SD-CARD\n");
+						ctrl_flush();
+						break;
+					}
 					bool con;
 					if(pasv_enable_) {
 						con = data_.connected();
@@ -428,19 +437,7 @@ namespace net {
 					}
 					ctrl_format("150 Accepted data connection\n");
 					ctrl_flush();
-					if(sdc_.get_mount()) {
-						int n = sdc_.dir_loop("", dir_list_func_, true, nullptr);
-						data_flush();
-						ctrl_format("226 %d matches total\n") % n;
-					} else {
-						ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
-					}
-					ctrl_flush();
-					if(pasv_enable_) {
-						data_.stop();
-					} else {
-						port_.stop();
-					}
+					task_ = task::dir_list;
 				}
 				break;
 
@@ -465,6 +462,11 @@ namespace net {
 
 			case ftp_command::NLST:
 				{
+					if(!sdc_.get_mount()) {
+						ctrl_format("425 No mount SD-CARD\n");
+						ctrl_flush();
+						break;
+					}
 					bool con;
 					if(pasv_enable_) {
 						con = data_.connected();
@@ -478,19 +480,7 @@ namespace net {
 					}
 					ctrl_format("150 Accepted data connection\n");
 					ctrl_flush();
-					if(sdc_.get_mount()) {
-						int n = sdc_.dir_loop("", dir_nlst_func_, true, nullptr);
-						data_flush();
-						ctrl_format("226 %d matches total\n") % n;
-					} else {
-						ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
-					}
-					ctrl_flush();
-					if(pasv_enable_) {
-						data_.stop();
-					} else {
-						port_.stop();
-					}
+					task_ = task::dir_nlst;
 				}
 				break;
 
@@ -823,6 +813,11 @@ namespace net {
 
 			case ftp_command::MLSD:
 				{
+					if(!sdc_.get_mount()) {
+						ctrl_format("425 No mount SD-CARD\n");
+						ctrl_flush();
+						break;
+					}
 					bool con;
 					if(pasv_enable_) {
 						con = data_.connected();
@@ -835,28 +830,8 @@ namespace net {
 					} else {
 						ctrl_format("150 Accepted data connection\n");
 						ctrl_flush();
-						if(sdc_.get_mount()) {
-							int n = sdc_.dir_loop("", dir_mlsd_func_, true, nullptr);
-							data_flush();
-							ctrl_format("226-options: -a -l\n");
-							ctrl_format("226 %d matches total\n") % n;
-						} else {
-							ctrl_format("550 File system not mount\n");
-						}
-						ctrl_flush();
+						task_ = task::dir_mlsd;
 					}
-					if(pasv_enable_) {
-						data_.stop();
-					} else {
-						port_.stop();
-					}
-#if 0
-					if(task_ == task::command) {
-utils::format("Reconnection CTRL\n");
-						ctrl_.stop();
-						task_ = task::begin;
-					}
-#endif
 				}
 				break;
 
@@ -873,7 +848,6 @@ utils::format("Reconnection CTRL\n");
 				}
 				{
 					uint32_t sz = sdc_.size(param_);
-///					format("450 Can't open %s\n", ctrl_.get_cepid()) % param_;
 					ctrl_format("213 %u\n") % sz;
 					ctrl_flush();
 				}
@@ -1243,6 +1217,53 @@ utils::format("Reconnection CTRL\n");
 						task_ = task::disconnect;
 					}
 					line_man_.clear();
+				}
+				break;
+
+			case task::dir_list:
+				if(!sdc_.start_dir_list("", dir_list_func_, true, nullptr)) {
+					ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
+					ctrl_flush();
+					task_ = task::command;
+					break;
+				}
+				task_ = task::dir_loop;
+				break;
+
+			case task::dir_nlst:
+				if(!sdc_.start_dir_list("", dir_nlst_func_, true, nullptr)) {
+					ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
+					ctrl_flush();
+					task_ = task::command;
+					break;
+				}
+				task_ = task::dir_loop;
+				break;
+
+			case task::dir_mlsd:
+				if(!sdc_.start_dir_list("", dir_mlsd_func_, true, nullptr)) {
+					ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
+					ctrl_flush();
+					task_ = task::command;
+					break;
+				}
+				task_ = task::dir_loop;
+				break;
+
+			case task::dir_loop:
+				{
+					uint32_t n;
+					if(!sdc_.probe_dir_list(n)) {
+						data_flush();
+						ctrl_format("226 %d matches total\n") % n;
+						ctrl_flush();
+						if(pasv_enable_) {
+							data_.stop();
+						} else {
+							port_.stop();
+						}
+						task_ = task::command;
+					}
 				}
 				break;
 
