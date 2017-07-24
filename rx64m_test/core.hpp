@@ -115,12 +115,12 @@ namespace seeda {
 			}
 #endif
 			{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
-				uint8_t int_level = 1;
+				uint8_t int_level = 5;
 				cmt0_.start(1000, int_level);
 			}
 
 			{  // SCI 設定
-				uint8_t int_level = 2;
+				uint8_t int_level = 1;
 				sci_.start(115200, int_level);
 			}
 
