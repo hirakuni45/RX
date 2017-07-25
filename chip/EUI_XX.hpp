@@ -9,14 +9,19 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <cmath>
+#include <cstdint>
+
+/// F_ICLK は速度パラメーター計算で必要で、設定が無いとエラーにします。
+#ifndef F_ICLK
+#  error "EUI_XX.hpp requires F_ICLK to be defined"
+#endif
 
 namespace chip {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  EUI-48/EUI-64 テンプレートクラス
-		@param[in]	SPI	SPI クラス
+		@param[in]	SPI	SPI 型
 		@param[in]	CS	チップ・セレクト
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -42,9 +47,9 @@ namespace chip {
 
 		SPI&	spi_;
 
-
 		inline void cs_setup_() const {
-			utils::delay::loop(25);
+			uint32_t n = static_cast<uint32_t>(F_ICLK) * 20 / 100000000;
+			utils::delay::loop(n);
 		}
 
 
@@ -63,6 +68,7 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	spi	SPI クラス
 		 */
 		//-----------------------------------------------------------------//
 		EUI_XX(SPI& spi) : spi_(spi) { }
@@ -76,8 +82,8 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		void start(BP bp = BP::upq)
 		{
-			CS::DIR = 1;
-			CS::PU  = 0;
+			CS::DIR = 1;  // 出力指定
+			CS::PU  = 0;  // プルアップ無効
 
 			CS::P = 0;
 			cs_setup_();
