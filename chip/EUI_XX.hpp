@@ -42,10 +42,17 @@ namespace chip {
 
 		SPI&	spi_;
 
+
+		inline void cs_setup_() const {
+			utils::delay::loop(25);
+		}
+
+
 		bool get_write_busy_() const
 		{
 			utils::delay::loop(10);
 			CS::P = 0;
+			cs_setup_();
 			spi_.xchg(0x05);  // read state
 			uint8_t v = spi_.xchg(0x00);
 			CS::P = 1;
@@ -73,6 +80,7 @@ namespace chip {
 			CS::PU  = 0;
 
 			CS::P = 0;
+			cs_setup_();
 			spi_.xchg(0x01);  // write status
 			spi_.xchg(static_cast<uint8_t>(bp) << 2);
 			CS::P = 1;
@@ -93,7 +101,9 @@ namespace chip {
 			while(get_write_busy_()) ;
 
 			utils::delay::loop(10);
+
 			CS::P = 0;
+			cs_setup_();
 			spi_.xchg(0x03);
 			spi_.xchg(org);
 			spi_.recv(dst, len);
@@ -118,7 +128,9 @@ namespace chip {
 				while(get_write_busy_()) ;
 
 				utils::delay::loop(10);
+
 				CS::P = 0;
+				cs_setup_();
 				spi_.xchg(0x06);  // write enable
 				CS::P = 1;
 
@@ -126,7 +138,9 @@ namespace chip {
 				if(l > 16) l = 16;
 
 				utils::delay::loop(10);
+
 				CS::P = 0;
+				cs_setup_();
 				spi_.xchg(0x02);
 				spi_.xchg(org);
 				spi_.send(src, l);
