@@ -20,7 +20,7 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct sample_t {
 
-		enum class mode : uint16_t {
+		enum class mode : uint8_t {
 			none,	///< 無変換
 			real,	///< 係数変換
 			abs,	///< 絶対値変換
@@ -37,6 +37,7 @@ namespace seeda {
 
 		uint16_t	ch_;
 		mode		mode_;
+		bool		signal_;
 		uint16_t	min_;
 		uint16_t	max_;
 		uint16_t	average_;
@@ -46,7 +47,7 @@ namespace seeda {
 			gain_(1024.0f),
 			limit_lo_count_(0), limit_hi_count_(0), limit_lo_level_(30000), limit_hi_level_(40000),
 			center_(0),
-			ch_(0), mode_(mode::none),
+			ch_(0), mode_(mode::none), signal_(false),
 			min_(0), max_(0), average_(0), median_(0) { }
 
 
