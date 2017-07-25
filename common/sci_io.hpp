@@ -170,7 +170,9 @@ namespace device {
 
 			SCI::SCR = 0x00;			// TE, RE disable.
 
-			uint32_t brr = F_PCLKB / bps / 4;
+			uint32_t brr = F_PCLKB / bps / 2;
+			if(brr & 1) { brr >>= 1; ++brr; }
+			else { brr >>= 1; }
 			uint8_t cks = 0;
 			while(brr > 256) {
 				brr >>= 2;

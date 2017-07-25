@@ -84,7 +84,10 @@ namespace device {
 
 			if(freq == 0) return false;
 
-			uint32_t cmcor = F_PCLKB / freq / 8;
+			uint32_t cmcor = F_PCLKB / freq / 4;
+			if(cmcor & 1) { cmcor >>= 1; ++cmcor; }
+			else { cmcor >>= 1; }
+
 			uint8_t cks = 0;
 			while(cmcor > 65536) {
 				cmcor >>= 2;
