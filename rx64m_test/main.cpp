@@ -30,6 +30,8 @@ namespace {
 	seeda::sample	sample_[8];
 	seeda::sample_data	sample_data_;
 
+	uint16_t		signal_[8];
+
 	volatile bool	enable_eadc_;
 
 	void main_init_()
@@ -45,6 +47,12 @@ namespace {
 			if(!eadc_.start(2000000, seeda::EADC::span_type::P5_12)) {
 				utils::format("LTC2348_16 not found...\n");
 			}
+		}
+
+		uint16_t v = 0;
+		for(int i = 0; i < 8; ++i) {
+			signal_[i] = v;
+			v += 0x2000;
 		}
 	}
 
@@ -165,15 +173,16 @@ namespace seeda {
 		if(!enable_eadc_) return;
 
 #ifdef SEEDA
-		eadc_.convert();
-		for(int i = 0; i < 8; ++i) {
-			sample_[i].add(eadc_.get_value(i));
-		}
-#else
-		static uint16_t sig[8];
-		for(int i = 0; i < 8; ++i) {
-			sample_[i].add(sig[i]);
-			++sig[i];
+		if(nets_.get_dev_signal()) {
+			for(int i = 0; i < 8; ++i) {
+				sample_[i].add(signal_[i]);
+				++signal_[i];
+			}
+		} else {
+			eadc_.convert();
+			for(int i = 0; i < 8; ++i) {
+				sample_[i].add(eadc_.get_value(i));
+			}
 		}
 #endif
 		++sample_count_;
