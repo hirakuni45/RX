@@ -12,7 +12,6 @@
 #include "common/format.hpp"
 
 // #define WRITE_FILE_DEBUG
-#define WRITE_FILE_DEBUG
 
 namespace seeda {
 
