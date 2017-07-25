@@ -216,6 +216,26 @@ namespace seeda {
 		}
 
 
+		void dev_adc_()
+		{
+			typedef utils::parse_cgi_post<256, 2> CGI_ADC;
+			CGI_ADC cgi;
+			cgi.parse(http_.get_post_body());
+			for(uint32_t i = 0; i < cgi.size(); ++i) {
+				const auto& t = cgi.get_unit(i);
+				if(std::strcmp(t.key, "mode") == 0) {
+					if(std::strcmp(t.val, "normal") == 0) {  // 通常
+						setup_.at_signal() = false;
+						debug_format("Turn Normal\n");
+					} else if(std::strcmp(t.val, "signal") == 0) {  // 信号生成
+						setup_.at_signal() = true;
+						debug_format("Turn Signal\n");
+					}
+				}
+			}
+		}
+
+
 		void set_adc_()
 		{
 			typedef utils::parse_cgi_post<2048, 6 * 8> CGI_ADC;
@@ -410,8 +430,15 @@ namespace seeda {
 					uint32_t capa;
 					bool ret = at_sdc().get_disk_space(fspc, capa);
 					if(ret) {
-						http_format("ＳＤカード全容量： %u [KBytes]<br>\n") % capa;
-						http_format("ＳＤカード空容量： %u [KBytes]<br>\n") % fspc;
+						if(develope_) {  // 開発モードでは、バイト表示
+							http_format("ＳＤカード全容量： %u [Bytes]<br>\n") % capa;
+							http_format("ＳＤカード空容量： %u [Bytes]<br>\n") % fspc;
+						} else {
+							http_format("ＳＤカード全容量： %3.2f [GBytes]<br>\n")
+								% (static_cast<float>(capa) / (1024.0f * 1024.0f));
+							http_format("ＳＤカード空容量： %3.2f [GBytes]<br>\n")
+								% (static_cast<float>(fspc) / (1024.0f * 1024.0f));
+						}
 					} else {
 						http_format("ＳＤカードがありません。<br>\n");
 					}
@@ -424,6 +451,13 @@ namespace seeda {
 				set_rtc_();
 				http_.exec_link("/setup");
 			} );
+
+			if(develope_) {
+				http_.set_cgi("/cgi/dev_adc.cgi", "DevADC", [=](void) {
+					dev_adc_();
+					http_.exec_link("/setup");
+				} );
+			}
 
 			http_.set_cgi("/cgi/set_adc.cgi", "SetADC", [=](void) {
 				set_adc_();
@@ -489,6 +523,15 @@ namespace seeda {
 			startup_delay_(100), ip_{ 0 },
 			develope_(true), dhcp_(false)
 			{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  開発用信号生成フラグの取得
+			@return 開発用信号生成フラグ
+		*/
+		//-----------------------------------------------------------------//
+		bool get_dev_signal() const { return setup_.get_signal(); }
 
 
 		//-----------------------------------------------------------------//

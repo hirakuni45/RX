@@ -29,6 +29,8 @@ namespace seeda {
 		bool		dhcp_;
 		uint8_t		ip_[4];
 
+		bool		signal_;
+
 #ifdef SEEDA
 		// mac address rom I/F
 		typedef device::PORT<device::PORT1, device::bitpos::B5> MISO;
@@ -59,11 +61,17 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		setup(write_file& wf, client& cl) : write_file_(wf), client_(cl),
-			mac_{ 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }, dhcp_(true), ip_{ 192, 168, 3, 20 }
+			mac_{ 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }, dhcp_(true), ip_{ 192, 168, 3, 20 },
+			signal_(false)
 #ifdef SEEDA
 			, spi_(), eui_(spi_)
 #endif
 		{ }
+
+
+		bool& at_signal() { return signal_; }
+
+		bool get_signal() const { return signal_; }
 
 
 		//-----------------------------------------------------------------//
@@ -321,6 +329,20 @@ namespace seeda {
 					% static_cast<int>(m->tm_hour) % static_cast<int>(m->tm_min);
 				http_format("<tr><td><input type=\"submit\" value=\"ＲＴＣ設定\"></td></tr>\n");
 				http_format("</table></form>\n");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
+			}
+
+			// 検査用Ａ／Ｄ設定
+			if(dev) {
+				http_format("<form method=\"POST\" action=\"/cgi/dev_adc.cgi\"><table>\n");
+				http_format("<tr>"
+					"<td><input type=\"radio\" name=\"mode\" value=\"normal\"%s>通常変換</td>"
+					"<td><input type=\"radio\" name=\"mode\" value=\"signal\"%s>信号生成</td>"
+					"</tr>\n")
+					% (!signal_ ? " checked" : "")
+					% ( signal_ ? " checked" : "");
+
+				http_format("<tr><td><input type=\"submit\" value=\"設定\"></td></tr></table></form>");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
