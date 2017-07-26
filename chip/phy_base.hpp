@@ -157,9 +157,12 @@ namespace chip {
 		//    FX_EN: 1, AN_EN: X, AN_1: X, AN_0: 0 ---> 100BASE-FX, Half-Duplex			//
 		//    FX_EN: 1, AN_EN: X, AN_1: X, AN_0: 1 ---> 100BASE-FX, Full-Duplex			//
 		/*==============================================================================*/
-		static const uint16_t REG_DP83822_REGCR  = 0x0D;
-		static const uint16_t REG_DP83822_ADDAR  = 0x0E;
-		static const uint16_t REG_DP83822_RCSR   = 0x17;
+		static const uint16_t REG_DP83822_REGCR   = 0x000D;
+		static const uint16_t REG_DP83822_ADDAR   = 0x000E;
+		static const uint16_t REG_DP83822_RCSR    = 0x0017;
+		static const uint16_t REG_DP83822_LEDCR   = 0x0018;
+		static const uint16_t REG_DP83822_PHYCR   = 0x0019;
+		static const uint16_t REG_DP83822_IOCTRL1 = 0x0462;
 
 		uint16_t local_advertise_;
 
@@ -354,10 +357,9 @@ namespace chip {
 					write_sub_(REG_DP83822_ADDAR, addr);
 					write_sub_(REG_DP83822_REGCR, 0x401F);  // read/write command
 					return read_sub_(REG_DP83822_ADDAR);
-				} else {
-					utils::format("PHY Address Range Error: %04X\n") % static_cast<int>(addr);
-					return 0;
 				}
+				utils::format("PHY Address Range Error: %04X\n") % static_cast<int>(addr);
+				return 0;
 			} else {
 				return read_sub_(addr);
 			}
@@ -372,10 +374,9 @@ namespace chip {
 					write_sub_(REG_DP83822_ADDAR, addr);
 					write_sub_(REG_DP83822_REGCR, 0x401F);  // read/write command
 					write_sub_(REG_DP83822_ADDAR, data);
-				} else {
-					utils::format("PHY Address Range Error: %04X\n") % static_cast<int>(addr);
+					return;
 				}
-				return;
+				utils::format("PHY Address Range Error: %04X\n") % static_cast<int>(addr);
 			} else {
 				write_sub_(addr, data);
 			}
@@ -433,19 +434,21 @@ namespace chip {
 					write_(REG_PHY_CONTROL_1, reg);
 				} else if(DEV_OPT == phy_option::TI_DP83822) {
 
-					debug_format("DP83822 Boot Strap Latch (0x0462): 0x%04X\n")
+					debug_format("DP83822 Boot Strap Latch in  (0x0462): 0x%04X\n")
 						% static_cast<int>(read_(0x0462));
-					debug_format("DP83822 Boot Strap Latch #1(SOR1): 0x%04X\n")
+					debug_format("DP83822 Boot Strap Latch in #1(SOR1): 0x%04X\n")
 						% static_cast<int>(read_(0x0467));
-					debug_format("DP83822 Boot Strap Latch #2(SOR2): 0x%04X\n")
+					debug_format("DP83822 Boot Strap Latch in #2(SOR2): 0x%04X\n")
 						% static_cast<int>(read_(0x0468));
 
-					write_(0x0018, 0b0000010001000000);  // LED Control Register LEDCR
-					write_(0x0019, 0b0000000000100001);  // PHY Control Register
-					write_(0x0462, 0b0100001100000000);  // 
+					// LED_0: Blink Rate: 10Hz, Active High
+					// LED_1: 10M/100M, Active High
+					write_(REG_DP83822_LEDCR,   0b0000001010000000);
+					write_(REG_DP83822_PHYCR,   0b0000000000000001);
+					write_(REG_DP83822_IOCTRL1, 0b0100001100000001);
+					write_(REG_DP83822_RCSR,    0b0000000001100001);
 
-					write_(REG_DP83822_RCSR, 0b0000000001100001);
-					debug_format("DP83822 Boot Strap Latch (0x0462): 0x%04X\n")
+					debug_format("DP83822 Boot Strap Latch out (0x0462): 0x%04X\n")
 						% static_cast<int>(read_(0x0462));
 				}
 
