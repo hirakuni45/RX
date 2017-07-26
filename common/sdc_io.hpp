@@ -651,8 +651,9 @@ namespace utils {
 			do {
 				dl.service(10, dir_list_func_, true);
 			} while(dl.probe()) ;
-
-			return dl.get_total();
+			auto n = dl.get_total();
+			utils::format("Total %d file%s\n") % n % (n > 1 ? "s" : "");
+			return n;
 		}
 
 
