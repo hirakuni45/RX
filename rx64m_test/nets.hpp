@@ -20,6 +20,10 @@
 
 #include "net_tools.hpp"
 #include "setup.hpp"
+
+// プリファレンスの書き込みをＳＤカードに行う場合有効にする
+//#define PREFER_SD
+
 #include "preference.hpp"
 
 extern "C" {
@@ -413,11 +417,17 @@ namespace seeda {
 				net_tools::render_date_time();
 				http_.tag_hr(600, 3);
 				if(pre_.remove()) {
-///					http_format("Succeeded in the removal of the 'seeda03.pre'<br>\n");
+#ifdef PREFER_SD
+					http_format("Succeeded in the removal of the 'seeda03.pre'<br>\n");
+#else
 					http_format("Succeeded in the removal of the 'preference'<br>\n");
+#endif
 				} else {
-///					http_format("Failed in the removal of the 'seeda03.pre'<br>\n");
+#ifdef PREFER_SD
+					http_format("Failed in the removal of the 'seeda03.pre'<br>\n");
+#else
 					http_format("Failed in the removal of the 'preference'<br>\n");
+#endif
 				}
 				http_.tag_hr(600, 3);
 				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"戻る\">\n");

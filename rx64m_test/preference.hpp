@@ -12,9 +12,6 @@
 
 namespace seeda {
 
-// SD カードに書き込む場合
-// #define WRITE_SD
-
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  preference class
@@ -25,7 +22,7 @@ namespace seeda {
 		typedef device::flash_io FLASH_IO;
 
 	public:
-#ifndef WRITE_SD
+#ifndef PREFER_SD
 		struct seeda_h {
 			uint32_t	index_;
 			uint32_t	magic_;
@@ -33,7 +30,7 @@ namespace seeda {
 #endif
 
 		struct seeda_t {
-#ifndef WRITE_SD
+#ifndef PREFER_SD
 			uint32_t	index_;
 #endif
 			uint32_t	magic_;
@@ -53,12 +50,11 @@ namespace seeda {
 			uint32_t	write_limit_;
 
 			seeda_t() :
-#ifndef WRITE_SD
+#ifndef PREFER_SD
 				index_(0),
 #endif
 				magic_(0),
 				gain_{ 1.0f },
-///				offset_{ 0.0f },
 				limit_lo_level_{ 30000 }, limit_hi_level_{ 40000 },
 				center_{ 0 },
 				mode_{ 0 },
@@ -77,7 +73,7 @@ namespace seeda {
 
 		FLASH_IO	fio_;
 
-#ifndef WRITE_SD
+#ifndef PREFER_SD
 
 		uint32_t block_size_()
 		{
@@ -218,8 +214,11 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		bool remove(const char* path = "seeda03.pre")
 		{
-#ifdef WRITE_SD
-			return at_sdc().remove("/seeda03.pre");
+#ifdef PREFER_SD
+			char tmp[16];
+			tmp[0] = '/';
+			std::strcpy(&tmp[1], path);
+			return at_sdc().remove(tmp);
 #else
 			return fio_.erase_all();
 #endif
@@ -235,7 +234,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		bool write(const char* path = "seeda03.pre")
 		{
-#ifdef WRITE_SD
+#ifdef PREFER_SD
 			FILE* fp = fopen(path, "wb");
 			if(fp == nullptr) {
 				utils::format("Can't write preference: '%s'\n") % path;
@@ -273,7 +272,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		bool read(const char* path = "seeda03.pre")
 		{
-#ifdef WRITE_SD
+#ifdef PREFER_SD
 			FILE* fp = fopen(path, "rb");
 			if(fp == nullptr) {
 				utils::format("Can't read preference: '%s'\n") % path;
@@ -287,7 +286,8 @@ namespace seeda {
 			}
 
 			if(seeda_.magic_ != sizeof(seeda_t)) {
-				utils::format("Read error preference magic code: Ref(%d) : File(%d)\n") % sizeof(seeda_t) % seeda_.magic_;
+				utils::format("Read error preference magic code: Ref(%d) : File(%d)\n")
+					% sizeof(seeda_t) % seeda_.magic_;
 				ret = false;
 			}
 

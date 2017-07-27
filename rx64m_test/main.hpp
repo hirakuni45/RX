@@ -32,7 +32,6 @@
 #define WRITE_FILE_DEBUG
 #endif
 
-
 namespace seeda {
 
 	static const int seeda_version_ = 325;
