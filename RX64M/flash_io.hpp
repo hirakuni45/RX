@@ -1,7 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ FLASH 制御
+	@brief	RX64M/RX71M グループ FLASH 制御 @n
+			・データフラッシュ消去サイズ（６４バイト単位）
+			・データフラッシュ書き込みサイズ（４バイト単位）
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -19,12 +21,20 @@ namespace device {
 #  error "flash_io.hpp requires F_FCLK to be defined"
 #endif
 
+#define FIO_DEBUG
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  FLASH 制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class flash_io {
+
+#ifdef FIO_DEBUG
+		typedef utils::format debug_format;
+#else
+		typedef utils::null_format debug_format;
+#endif
 
 	public:
 		//-----------------------------------------------------------------//
@@ -38,6 +48,15 @@ namespace device {
 		static const uint32_t data_flash_bank  = 1024;   ///< データ・フラッシュのバンク数
 
 	private:
+
+		enum class mode : uint8_t {
+			NONE,
+			RD,
+			PE
+		};
+
+		mode	mode_;
+
 		bool	trans_farm_;
 
 		/// FACIコマンド発行領域 007E 0000h 4バイト
@@ -46,6 +65,7 @@ namespace device {
 		static rw16_t<0x007E0000> FACI_CMD_AREA16;	///< word(16) 書き込み
 
 		// return 「true」正常、「false」ロック状態
+		// 強制終了コマンド
 		bool turn_break_() const
 		{
 			FACI_CMD_AREA = 0xB3;
@@ -61,24 +81,20 @@ namespace device {
 				if(cnt == 0) break;
 			}
 			if(cnt == 0) {
-#ifndef NDEBUG
-				utils::format("FACI 'turn_break_' timeout\n");
-#endif
+				debug_format("FACI 'turn_break_' timeout\n");
 				return false;
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() == 0) {
 				return true;
 			} else {
-#ifndef NDEBUG
-				utils::format("FACI 'turn_break_' fail\n");
-#endif
+				debug_format("FACI 'turn_break_' fail\n");
 				return false;
 			}
 		}
 
 
-		void turn_rd_() const
+		void turn_rd_()
 		{
 			uint32_t n = 5;
 			while(device::FLASH::FSTATR.FRDY() == 0) {
@@ -93,34 +109,42 @@ namespace device {
 			device::FLASH::FENTRYR = 0xAA00;
 
 			if(device::FLASH::FENTRYR() != 0x0000) {
-#ifndef NDEBUG
-				utils::format("FACI 'turn_rd_' fail\n"); 
-#endif
+				debug_format("FACI 'turn_rd_' fail\n"); 
 			}
+			mode_ = mode::RD;
 		}
 
 
-		void turn_pe_() const
+		void turn_pe_()
 		{
 			device::FLASH::FENTRYR = 0xAA80;
 
 			if(device::FLASH::FENTRYR() != 0x0080) {
-#ifndef NDEBUG
-				utils::format("FACI 'turn_pe_' fail\n"); 
-#endif
+				debug_format("FACI 'turn_pe_' fail\n");
 			}
+			mode_ = mode::PE;
 		}
 
 
 		/// FCUファームウェア格納領域 FEFF F000h～FEFF FFFFh 4Kバイト
 		/// FCURAM領域 007F 8000h～007F 8FFFh 4Kバイト
 		/// コンフィギュレーション設定領域 0012 0040h～0012 007Fh 64バイト
-		void init_fcu_()
+		bool init_fcu_()
 		{
-			if(trans_farm_) return;
+			if(trans_farm_) return true;
 
 			if(device::FLASH::FENTRYR() != 0) {
 				device::FLASH::FENTRYR = 0xAA00;
+
+				uint32_t wait = 4;
+				while(device::FLASH::FENTRYR() != 0) {
+					if(wait > 0) {
+						--wait;
+					} else {
+						debug_format("FACI Tras FARM timeout\n");
+						return false;
+					}
+				}
 			}
 
 			device::FLASH::FCURAME = 0xC403;  // Write only
@@ -138,13 +162,11 @@ namespace device {
 			auto f = turn_break_();			
 			if(f) {
 				turn_rd_();
-
 				trans_farm_ = true;
 			} else {
-#ifndef NDEBUG
-				utils::format("FACI Lock...\n");
-#endif
+				debug_format("FACI Tras FARM lock\n");
 			}
+			return trans_farm_;
 		}
 
 
@@ -186,16 +208,12 @@ namespace device {
 			}
 			if(cnt == 0) {  // time out
 				turn_break_();
-#ifndef NDEBUG
-				utils::format("FACI 'write32_' timeout\n");
-#endif
+				debug_format("FACI 'write32_' timeout\n");
 				return false;
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() != 0) {
-#ifndef NDEBUG
-				utils::format("FACI 'write32_' CMD Lock fail\n");
-#endif
+				debug_format("FACI 'write32_' CMD Lock fail\n");
 				return false;
 			}
 			return true;
@@ -207,7 +225,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		flash_io() : trans_farm_(false) { }
+		flash_io() noexcept : mode_(mode::NONE), trans_farm_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -215,9 +233,16 @@ namespace device {
 			@brief	開始
 		 */
 		//-----------------------------------------------------------------//
-		void start()
+		void start() noexcept
 		{
 			device::FLASH::FWEPROR.FLWE = 1;
+			uint32_t clk = static_cast<uint32_t>(F_FCLK) / 500000;
+			if(clk & 1) { clk >>= 1; ++clk; }
+			else { clk >>= 1; }
+			if(clk > 60) {
+				clk = 60;
+			}
+			device::FLASH::FPCKAR = 0x1E00 | clk;
 			init_fcu_();
 		}
 
@@ -229,10 +254,12 @@ namespace device {
 			@return データ
 		*/
 		//-----------------------------------------------------------------//
-		uint8_t read(uint32_t org) const
+		uint8_t read(uint32_t org) noexcept
 		{
 			if(org >= data_flash_size) return 0;
-			turn_rd_();
+			if(mode_ != mode::RD) {
+				turn_rd_();
+			}
 			return device::rd8_(0x00100000 + org);
 		}
 
@@ -245,13 +272,15 @@ namespace device {
 			@param[out]	dst	先
 		*/
 		//-----------------------------------------------------------------//
-		void read(uint32_t org, uint32_t len, void* dst) const
+		void read(uint32_t org, uint32_t len, void* dst) noexcept
 		{
 			if(org >= data_flash_size) return;
 			if((org + len) > data_flash_size) {
 				len = data_flash_size - org;
 			}
-			turn_rd_();
+			if(mode_ != mode::RD) {
+				turn_rd_();
+			}
 			const void* src = reinterpret_cast<const void*>(0x00100000 + org);
 			std::memcpy(dst, src, len);
 		}
@@ -264,9 +293,13 @@ namespace device {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_check(uint32_t bank) const
+		bool erase_check(uint32_t bank) noexcept
 		{
 			if(bank >= data_flash_bank) return false;
+
+			if(mode_ != mode::PE) {
+				turn_pe_();
+			}
 
 			device::FLASH::FBCCNT = 0x00;  // address increment
 			device::FLASH::FSADDR =  bank * data_flash_block;
@@ -287,9 +320,7 @@ namespace device {
 			}
 			if(cnt == 0) {  // time out
 				turn_break_();
-#ifndef NDEBUG
-				utils::format("FACI 'erase_check' timeout\n");
-#endif
+				debug_format("FACI 'erase_check' timeout\n");
 				return false;
 			}
 
@@ -299,9 +330,7 @@ namespace device {
 					return false;
 				}
 			} else {
-#ifndef NDEBUG
-				utils::format("FACI 'erase_check' fail\n");
-#endif
+				debug_format("FACI 'erase_check' fail\n");
 				return false;
 			}
 
@@ -316,11 +345,13 @@ namespace device {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase(uint32_t bank) const
+		bool erase(uint32_t bank) noexcept
 		{
 			if(bank >= data_flash_bank) return false;
 
-			turn_pe_();
+			if(mode_ != mode::PE) {
+				turn_pe_();
+			}
 
 			device::FLASH::FPROTR = 0x5501;
 			device::FLASH::FCPSR  = 0x0000;  // サスペンド優先
@@ -341,18 +372,14 @@ namespace device {
 			}
 			if(cnt == 0) {  // time out
 				turn_break_();
-#ifndef NDEBUG
-				utils::format("FACI 'erase' timeout\n");
-#endif
+				debug_format("FACI 'erase' timeout\n");
 				return false;
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() == 0) {
 				return true;
 			} else {
-#ifndef NDEBUG
-				utils::format("FACI 'erase' fail\n");
-#endif
+				debug_format("FACI 'erase' fail\n");
 				return false;
 			}
 		}
@@ -367,7 +394,7 @@ namespace device {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool write(const void* src, uint32_t org, uint32_t len) const
+		bool write(const void* src, uint32_t org, uint32_t len) noexcept
 		{
 ///			if((len & 3) != 0 || (org & 3) != 0) return false;
 
@@ -377,7 +404,9 @@ namespace device {
 				len = data_flash_size - org;
 			}
 
-			turn_pe_();
+			if(mode_ != mode::PE) {
+				turn_pe_();
+			}
 
 			const uint8_t* p = static_cast<const uint8_t*>(src);
 			bool f = false;
@@ -417,7 +446,7 @@ namespace device {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool write(uint32_t org, uint8_t data) const
+		bool write(uint32_t org, uint8_t data) noexcept
 		{
 			uint8_t d = data;
 			return write(&d, org, 1);
