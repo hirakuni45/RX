@@ -13,6 +13,7 @@
 #include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
 #include "common/input.hpp"
+#include "preference.hpp"
 
 namespace seeda {
 
@@ -355,8 +356,10 @@ namespace seeda {
 	// データ flash の操作コマンド　
 	void cmd_flash_(uint8_t cmdn)
 	{
+		typedef device::flash_io FLASH_IO;
+
 		if(cmdn <= 1) {
-			auto& fio = at_flash().at_fio();
+			auto& fio = at_pre().at_fio();
 	 		uint32_t n = 0;
 			for(uint32_t i = 0; i < FLASH_IO::data_flash_size; i += FLASH_IO::data_flash_block) {
 				if((n & 15) == 0) {
@@ -421,7 +424,7 @@ namespace seeda {
 			flash_org_ = flash_end_;
 		}
 
-		auto& fio = at_flash().at_fio();
+		auto& fio = at_pre().at_fio();
 		if(erase) {
 			if(fio.erase_check(flash_org_)) {
 				utils::format("Flash allready erase: 0x%06X\n") % flash_org_;
@@ -436,7 +439,7 @@ namespace seeda {
 //			for(uint32_t i = 0; i < wrn; ++i) {
 //				utils::format("(%06X) %02X\n") % (i + flash_org_) % static_cast<uint32_t>(wrd[i]);
 //			}
-			fio.write(wrd, flash_org_, wrn);
+			fio.write(flash_org_, wrd, wrn);
 			flash_org_ += wrn;
 		} else {
 			if(flash_org_ > flash_end_) {
