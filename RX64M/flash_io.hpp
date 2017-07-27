@@ -450,13 +450,13 @@ namespace device {
 			@brief  書き込み @n
 					※仕様上、４バイト単位で書き込まれる。@n
 					※４バイト未満の場合は、０ｘＦＦが書き込まれる
-			@param[in]	src ソース
 			@param[in]	org	開始オフセット
+			@param[in]	src ソース
 			@param[in]	len	バイト数
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool write(const void* src, uint32_t org, uint32_t len) noexcept
+		bool write(uint32_t org, const void* src, uint32_t len) noexcept
 		{
 			if(org >= data_flash_size) {
 				error_ = error::ADDRESS;
@@ -517,7 +517,7 @@ namespace device {
 		bool write(uint32_t org, uint8_t data) noexcept
 		{
 			uint8_t d = data;
-			return write(&d, org, 1);
+			return write(org, &d, 1);
 		}
 	};
 }
