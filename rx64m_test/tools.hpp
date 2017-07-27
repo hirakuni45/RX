@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
+#include "common/input.hpp"
 
 namespace seeda {
 
@@ -31,9 +32,12 @@ namespace seeda {
 			}
 		};
 		typedef device::cmt_io<device::CMT1, cmt1_task> CMT1;
-		CMT1	cmt1_;
+		CMT1		cmt1_;
 
-		CMD		cmd_;
+		CMD			cmd_;
+
+		uint32_t	flash_org_;
+		uint32_t	flash_end_;
 
 #ifdef SEEDA
 		void adc_capture_(int ch, int rate, int num, const char* fname)
@@ -348,9 +352,124 @@ namespace seeda {
 	}
 
 
-	void list_service_() const
+	// データ flash の操作コマンド　
+	void cmd_flash_(uint8_t cmdn)
 	{
-		
+		if(cmdn <= 1) {
+			auto& fio = at_flash().at_fio();
+	 		uint32_t n = 0;
+			for(uint32_t i = 0; i < FLASH_IO::data_flash_size; i += FLASH_IO::data_flash_block) {
+				if((n & 15) == 0) {
+					utils::format("Flash bank (0x%06X): ") % i;
+				}
+				if((n & 3) == 0) {
+					utils::format(" ");
+				}
+				utils::format("%c") % (fio.erase_check(i) ? 'e' : '-');
+				if((n & 15) == 15) {
+					utils::format("\n");
+				}
+				++n;
+			}
+			return;
+		}
+
+		uint8_t n = 1;
+		uint32_t rdn = 0;
+		uint8_t wrd[64];
+		uint32_t wrn = 0;
+		bool wm = false;
+		bool erase = false;
+		while(n < cmdn) {
+			char tmp[128];
+			cmd_.get_word(n, sizeof(tmp), tmp);
+			if(std::strcmp(tmp, ":") == 0) {
+				wm = true;
+				++n;
+				continue;
+			} else if(std::strcmp(tmp, "-e") == 0) {
+				erase = true;
+				++n;
+				continue;
+			}
+			const char* p = tmp;
+			if(p[0] == ':') {
+				++p;
+				wm = true;
+			}
+			if(wm || wrn > 0) {
+				uint32_t d;
+				if(!(utils::input("%x", p) % d).status()) {
+					utils::format("Flash data fail (%d): '%s'\n") % (n - 1) % tmp;
+					return;
+				}
+				wrd[wrn] = d;
+				++wrn;
+			} else {
+				uint32_t d;
+				if(!(utils::input("%x", p) % d).status()) {
+					utils::format("Flash address fail: %s\n") % tmp;
+					return;
+				}
+				flash_org_ = flash_end_;
+				flash_end_ = d;
+				++rdn;
+			}
+			++n;
+		}
+		if(rdn == 1 || wrn > 0) {
+			flash_org_ = flash_end_;
+		}
+
+		auto& fio = at_flash().at_fio();
+		if(erase) {
+			if(fio.erase_check(flash_org_)) {
+				utils::format("Flash allready erase: 0x%06X\n") % flash_org_;
+			} else {
+				fio.erase(flash_org_);
+			}
+			return;
+		}
+
+		if(wrn > 0) {
+//			utils::format("Write flash: %08X (%d)\n") % flash_org_ % wrn;
+//			for(uint32_t i = 0; i < wrn; ++i) {
+//				utils::format("(%06X) %02X\n") % (i + flash_org_) % static_cast<uint32_t>(wrd[i]);
+//			}
+			fio.write(wrd, flash_org_, wrn);
+			flash_org_ += wrn;
+		} else {
+			if(flash_org_ > flash_end_) {
+				utils::format("Flash read address area fail: 0x%06X to 0x%06X\n") % flash_org_ % flash_end_; 
+				return;
+			}
+//			utils::format("Read flash: %08X to %08X\n") % flash_org_ % flash_end_;
+			bool adrd = true;
+			while(flash_org_ <= flash_end_) {
+				if(adrd) {
+					utils::format("%06X: ") % flash_org_;
+					adrd = false;
+				}
+				auto d = fio.read(flash_org_);
+				if((flash_org_ & 15) == 8) {
+					utils::format(" - ");
+				} else {
+					utils::format(" ");
+				}
+				utils::format("%02X") % d;
+				++flash_org_;
+				if((flash_org_ & 15) == 0) {
+					utils::format("\n");
+					adrd = true;
+				}
+			}
+			if((flash_org_ & 15) != 0) utils::format("\n");
+		}
+	}
+
+
+	void list_service_() const
+	{		
 	}
 
 	public:
@@ -359,7 +478,7 @@ namespace seeda {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		tools() { }
+		tools() : flash_org_(0), flash_end_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -463,6 +582,9 @@ namespace seeda {
 					} else if(cmd_.cmp_word(0, "arp")) {  // arp table
 						list_arp_();
 						f = true;
+					} else if(cmd_.cmp_word(0, "flash")) {
+						cmd_flash_(cmdn);
+						f = true;
 					} else if(cmd_.cmp_word(0, "service")) {
 						list_service_();
 						f = true;
@@ -483,6 +605,7 @@ namespace seeda {
 						utils::format("cd [directory-name]\n");
 						utils::format("pwd\n");
 						utils::format("arp\n");
+						utils::format("flash xxxx [:xx]  (Read/Wite data)\n");
 #ifdef SEEDA
 						utils::format("eadc [0-7]  (LTC2348 A/D conversion)\n");
 						utils::format("span CH(0-7) SPAN(0-7)  (LTC2348 A/D span setting)\n"); 
