@@ -24,6 +24,9 @@ namespace {
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
 
+	seeda::FLASH_IO		fio_;
+	seeda::FLASH_MAN	fman_(fio_);
+
 	seeda::EADC		eadc_;
 
 	uint32_t		sample_count_;
@@ -36,8 +39,11 @@ namespace {
 
 	void main_init_()
 	{
-		// RTC 設定
+		// RTC 開始
 		rtc_.start();
+
+		// FLASH I/O 開始
+		fio_.start();
 
 		enable_eadc_ = false;
 
@@ -49,6 +55,7 @@ namespace {
 			}
 		}
 
+		// 擬似波形発生、初期値
 		uint16_t v = 0;
 		for(int i = 0; i < 8; ++i) {
 			signal_[i] = v;
@@ -56,9 +63,9 @@ namespace {
 		}
 	}
 
-
+	// 文字列表示、割り込み対応ロック／アンロック機構
 	volatile bool putch_lock_ = false;
-	utils::fifo<uint8_t, 1024> putch_tmp_;
+	utils::fixed_fifo<char, 1024> putch_tmp_;
 
 	void service_putch_tmp_()
 	{
@@ -71,6 +78,15 @@ namespace {
 }
 
 namespace seeda {
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  FLASH_MAN クラスへの参照
+		@return FLASH_MAN クラス
+	*/
+	//-----------------------------------------------------------------//
+	FLASH_MAN& at_flash() { return fman_; }
+
 
 	//-----------------------------------------------------------------//
 	/*!

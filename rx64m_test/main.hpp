@@ -35,7 +35,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 322;
+	static const int seeda_version_ = 325;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef utils::command<256> CMD;
@@ -89,6 +89,7 @@ namespace seeda {
 
 	typedef net::ftp_server<SDC> FTPS;
 
+
 	//-----------------------------------------------------------------//
 	/*!
 		@brief  SDC_IO クラスへの参照
@@ -96,6 +97,15 @@ namespace seeda {
 	*/
 	//-----------------------------------------------------------------//
 	SDC& at_sdc();
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  FLASH_MAN クラスへの参照
+		@return FLASH_MAN クラス
+	*/
+	//-----------------------------------------------------------------//
+	FLASH_MAN& at_flash();
 
 
 #ifdef SEEDA
