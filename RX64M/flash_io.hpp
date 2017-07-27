@@ -47,6 +47,19 @@ namespace device {
 		static const uint32_t data_flash_size  = 65536;  ///< データ・フラッシュの容量
 		static const uint32_t data_flash_bank  = 1024;   ///< データ・フラッシュのバンク数
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  エラー型
+		*/
+		//-----------------------------------------------------------------//
+		enum class error : uint8_t {
+			NONE,		///< エラー無し
+			ADDRESS,	///< アドレス・エラー
+			TIMEOUT,	///< タイム・アウト・エラー
+			LOCK,		///< ロック・エラー
+		};
+
 	private:
 
 		enum class mode : uint8_t {
@@ -55,6 +68,7 @@ namespace device {
 			PE
 		};
 
+		error	error_;
 		mode	mode_;
 
 		bool	trans_farm_;
@@ -164,6 +178,7 @@ namespace device {
 				turn_rd_();
 				trans_farm_ = true;
 			} else {
+				turn_break_();
 				debug_format("FACI Tras FARM lock\n");
 			}
 			return trans_farm_;
@@ -172,7 +187,7 @@ namespace device {
 
 		// 4 バイト書き込み
 		// org: align 4 bytes
-		bool write32_(const void* src, uint32_t org) const
+		bool write32_(const void* src, uint32_t org)
 		{
 			device::FLASH::FPROTR = 0x5501;
 			device::FLASH::FSADDR = org;
@@ -208,14 +223,18 @@ namespace device {
 			}
 			if(cnt == 0) {  // time out
 				turn_break_();
+				error_ = error::TIMEOUT;
 				debug_format("FACI 'write32_' timeout\n");
 				return false;
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() != 0) {
+				error_ = error::LOCK;
 				debug_format("FACI 'write32_' CMD Lock fail\n");
 				return false;
 			}
+
+			error_ = error::NONE;
 			return true;
 		}
 
@@ -225,17 +244,30 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		flash_io() noexcept : mode_(mode::NONE), trans_farm_(false) { }
+		flash_io() noexcept : error_(error::NONE), mode_(mode::NONE), trans_farm_(false) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	エラー・ステータスを取得
+			@return エラー・ステータス
+		 */
+		//-----------------------------------------------------------------//
+		error get_last_error() const { return error_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
+			@return エラーが無ければ「true」
 		 */
 		//-----------------------------------------------------------------//
-		void start() noexcept
+		bool start() noexcept
 		{
+			if(trans_farm_) return false;  // ファームが既に転送済み
+
 			device::FLASH::FWEPROR.FLWE = 1;
+
 			uint32_t clk = static_cast<uint32_t>(F_FCLK) / 500000;
 			if(clk & 1) { clk >>= 1; ++clk; }
 			else { clk >>= 1; }
@@ -243,7 +275,12 @@ namespace device {
 				clk = 60;
 			}
 			device::FLASH::FPCKAR = 0x1E00 | clk;
+
 			init_fcu_();
+
+			error_ = error::NONE;
+
+			return true;
 		}
 
 
@@ -256,10 +293,17 @@ namespace device {
 		//-----------------------------------------------------------------//
 		uint8_t read(uint32_t org) noexcept
 		{
-			if(org >= data_flash_size) return 0;
+			if(org >= data_flash_size) {
+				error_ = error::ADDRESS;
+				return 0;
+			}
+
 			if(mode_ != mode::RD) {
 				turn_rd_();
 			}
+
+			error_ = error::NONE;
+
 			return device::rd8_(0x00100000 + org);
 		}
 
@@ -272,38 +316,50 @@ namespace device {
 			@param[out]	dst	先
 		*/
 		//-----------------------------------------------------------------//
-		void read(uint32_t org, uint32_t len, void* dst) noexcept
+		bool read(uint32_t org, uint32_t len, void* dst) noexcept
 		{
-			if(org >= data_flash_size) return;
+			if(org >= data_flash_size) {
+				error_ = error::ADDRESS;
+				return false;
+			}
 			if((org + len) > data_flash_size) {
 				len = data_flash_size - org;
 			}
 			if(mode_ != mode::RD) {
 				turn_rd_();
 			}
+
 			const void* src = reinterpret_cast<const void*>(0x00100000 + org);
 			std::memcpy(dst, src, len);
+
+			error_ = error::NONE;
+
+			return true;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  消去チェック
-			@param[in]	bank	バンク
-			@return エラーがあれば「false」
+			@param[in]	org		開始アドレス
+			@param[in]	len		検査長（バイト単位）
+			@return 消去されていれば「true」（エラーは「false」）
 		*/
 		//-----------------------------------------------------------------//
-		bool erase_check(uint32_t bank) noexcept
+		bool erase_check(uint32_t org, uint32_t len = data_flash_block) noexcept
 		{
-			if(bank >= data_flash_bank) return false;
+			if(org >= data_flash_size) {
+				error_ = error::ADDRESS;
+				return false;
+			}
 
 			if(mode_ != mode::PE) {
 				turn_pe_();
 			}
 
 			device::FLASH::FBCCNT = 0x00;  // address increment
-			device::FLASH::FSADDR =  bank * data_flash_block;
-			device::FLASH::FEADDR = ((bank + 1) * data_flash_block) - 1;
+			device::FLASH::FSADDR = org;
+			device::FLASH::FEADDR = org + len - 1;
 
 			FACI_CMD_AREA = 0x71;
 			FACI_CMD_AREA = 0xD0;
@@ -320,42 +376,42 @@ namespace device {
 			}
 			if(cnt == 0) {  // time out
 				turn_break_();
+				error_ = error::TIMEOUT;
 				debug_format("FACI 'erase_check' timeout\n");
 				return false;
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() == 0) {
-				if(device::FLASH::FBCSTAT.BCST() != 0) {
-					utils::format("FACI 'erase_check' blank check fail: %04X\n") % device::FLASH::FPSADDR();
-					return false;
-				}
+				return device::FLASH::FBCSTAT.BCST() == 0;
 			} else {
-				debug_format("FACI 'erase_check' fail\n");
+				error_ = error::LOCK;
+				debug_format("FACI 'erase_check' lock fail\n");
 				return false;
 			}
-
-			return true;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  消去
-			@param[in]	bank	バンク
+			@param[in]	org		開始アドレス
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool erase(uint32_t bank) noexcept
+		bool erase(uint32_t org) noexcept
 		{
-			if(bank >= data_flash_bank) return false;
+			if(org >= data_flash_size) {
+				error_ = error::ADDRESS;
+				return false;
+			}
 
 			if(mode_ != mode::PE) {
 				turn_pe_();
 			}
 
-			device::FLASH::FPROTR = 0x5501;
+			device::FLASH::FPROTR = 0x5501;  // ロックビットプロテクト無効
 			device::FLASH::FCPSR  = 0x0000;  // サスペンド優先
-			device::FLASH::FSADDR = bank * data_flash_block;
+			device::FLASH::FSADDR = org;
 
 			FACI_CMD_AREA = 0x20;
 			FACI_CMD_AREA = 0xD0;
@@ -370,16 +426,20 @@ namespace device {
 				--cnt;
 				if(cnt == 0) break;
 			}
+
 			if(cnt == 0) {  // time out
 				turn_break_();
+				error_ = error::TIMEOUT;
 				debug_format("FACI 'erase' timeout\n");
 				return false;
 			}
 
 			if(device::FLASH::FASTAT.CMDLK() == 0) {
+				error_ = error::NONE;
 				return true;
 			} else {
-				debug_format("FACI 'erase' fail\n");
+				error_ = error::LOCK;
+				debug_format("FACI 'erase' lock fail\n");
 				return false;
 			}
 		}
@@ -387,18 +447,21 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  書き込み
+			@brief  書き込み @n
+					※仕様上、４バイト単位で書き込まれる。@n
+					※４バイト未満の場合は、０ｘＦＦが書き込まれる
 			@param[in]	src ソース
 			@param[in]	org	開始オフセット
-			@param[in]	len	バイト数（４の倍数）
+			@param[in]	len	バイト数
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
 		bool write(const void* src, uint32_t org, uint32_t len) noexcept
 		{
-///			if((len & 3) != 0 || (org & 3) != 0) return false;
-
-			if(org >= data_flash_size) return false;
+			if(org >= data_flash_size) {
+				error_ = error::ADDRESS;
+				return false;
+			}
 
 			if((org + len) > data_flash_size) {
 				len = data_flash_size - org;
@@ -434,6 +497,11 @@ namespace device {
 				if(!f) break;
 				org += 4;
 			}
+
+			if(f) {
+				error_ = error::NONE;
+			}
+
 			return f;
 		}
 
