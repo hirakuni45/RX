@@ -15,11 +15,11 @@
 #include "common/fifo.hpp"
 #include "common/format.hpp"
 #include "common/input.hpp"
-#include "common/flash_man.hpp"
 #include "common/time.h"
 
 #include "chip/LTC2348_16.hpp"
 #include "sample.hpp"
+#include "preference.hpp"
 
 #include "chip/EUI_XX.hpp"
 
@@ -81,9 +81,6 @@ namespace seeda {
 	typedef chip::LTC2348_16<LTC_CSN, LTC_CNV, LTC_BUSY, LTC_PD, LTC_SDI, LTC_SCKI, LTC_SDO> EADC;
 #endif
 
-	typedef device::flash_io FLASH_IO;
-	typedef utils::flash_man<FLASH_IO> FLASH_MAN;
-
 	typedef net::http_server<SDC, 16, 8192> HTTP;
 	typedef HTTP::http_format http_format;	
 
@@ -101,11 +98,11 @@ namespace seeda {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@brief  FLASH_MAN クラスへの参照
-		@return FLASH_MAN クラス
+		@brief  プリファレンスへの参照
+		@return プリファレンス
 	*/
 	//-----------------------------------------------------------------//
-	FLASH_MAN& at_flash();
+	preference& at_pre();
 
 
 #ifdef SEEDA

@@ -24,9 +24,6 @@ namespace {
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
 
-	seeda::FLASH_IO		fio_;
-	seeda::FLASH_MAN	fman_(fio_);
-
 	seeda::EADC		eadc_;
 
 	uint32_t		sample_count_;
@@ -41,9 +38,6 @@ namespace {
 	{
 		// RTC 開始
 		rtc_.start();
-
-		// FLASH I/O 開始
-		fio_.start();
 
 		enable_eadc_ = false;
 
@@ -81,11 +75,11 @@ namespace seeda {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@brief  FLASH_MAN クラスへの参照
-		@return FLASH_MAN クラス
+		@brief  プリファレンスの参照
+		@return プリファレンス
 	*/
 	//-----------------------------------------------------------------//
-	FLASH_MAN& at_flash() { return fman_; }
+	preference& at_pre() { return nets_.at_pre(); }
 
 
 	//-----------------------------------------------------------------//
