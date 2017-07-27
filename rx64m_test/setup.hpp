@@ -225,7 +225,8 @@ namespace seeda {
 			net_tools::render_version();
 			net_tools::render_date_time();
 
-			auto mount = at_sdc().get_mount();
+			/// auto mount = at_sdc().get_mount();
+			bool mount = true;
 
 			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 
@@ -376,8 +377,10 @@ namespace seeda {
 						% ch % static_cast<int>(t.limit_lo_level_)
 						% ch % static_cast<int>(t.limit_hi_level_);
 				}
-				http_format("<tr><td><input type=\"submit\" value=\"設定\"%s></td></tr>"
-						   "</table></form>") % (mount ? "" : " disabled=\"disabled\"");
+///				http_format("<tr><td><input type=\"submit\" value=\"設定\"%s></td></tr>"
+///						   "</table></form>") % (mount ? "" : " disabled=\"disabled\"");
+				http_format("<tr><td><input type=\"submit\" value=\"設定\"></td></tr>"
+						   "</table></form>");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
@@ -388,8 +391,10 @@ namespace seeda {
 			}
 
 			{  // プリファレンス消去ボタン
+///				http_format("<input type=\"button\" onclick=\"location.href='/preference'\""
+///							" value=\"プリファレンス消去\"%s>") % (mount ? "" : " disabled=\"disabled\"");
 				http_format("<input type=\"button\" onclick=\"location.href='/preference'\""
-							" value=\"プリファレンス消去\"%s>") % (mount ? "" : " disabled=\"disabled\"");
+							" value=\"プリファレンス消去\">");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 

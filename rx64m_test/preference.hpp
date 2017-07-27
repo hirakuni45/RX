@@ -12,18 +12,33 @@
 
 namespace seeda {
 
+// SD カードに書き込む場合
+// #define WRITE_SD
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  preference class
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class preference {
+
+		typedef device::flash_io FLASH_IO;
+
 	public:
+#ifndef WRITE_SD
+		struct seeda_h {
+			uint32_t	index_;
+			uint32_t	magic_;
+		};
+#endif
+
 		struct seeda_t {
+#ifndef WRITE_SD
+			uint32_t	index_;
+#endif
 			uint32_t	magic_;
 
 			float		gain_[8];
-//			float		offset_[8];
 
 			uint16_t	limit_lo_level_[8];
 			uint16_t	limit_hi_level_[8];
@@ -37,7 +52,11 @@ namespace seeda {
 			char		write_path_[16];
 			uint32_t	write_limit_;
 
-			seeda_t() : magic_(0),
+			seeda_t() :
+#ifndef WRITE_SD
+				index_(0),
+#endif
+				magic_(0),
 				gain_{ 1.0f },
 ///				offset_{ 0.0f },
 				limit_lo_level_{ 30000 }, limit_hi_level_{ 40000 },
@@ -56,7 +75,110 @@ namespace seeda {
 	private:
 		seeda_t		seeda_;
 
-		device::flash_io	flash_;
+		FLASH_IO	fio_;
+
+#ifndef WRITE_SD
+
+		uint32_t block_size_()
+		{
+			uint32_t size = sizeof(seeda_t);
+			uint32_t mask = FLASH_IO::data_flash_block - 1;
+			if(size & mask) {
+				size |= mask;
+				++size;
+			}
+			return size;
+		}
+
+		uint32_t scan_flash_()
+		{
+			auto size = block_size_();
+
+			uint32_t pos = 0;
+			while(pos < FLASH_IO::data_flash_size) {
+				if(fio_.erase_check(pos, size)) {
+					return pos;
+				}
+				pos += size;
+			}
+			return FLASH_IO::data_flash_size;
+		}
+
+
+		uint32_t erase_flash_()
+		{
+			auto size = block_size_();
+
+			uint32_t pos = 0;
+			while(pos < FLASH_IO::data_flash_size) {
+				if(!fio_.erase_check(pos, size)) {
+					for(uint32_t p = pos; p < size; p += FLASH_IO::data_flash_block) {
+						fio_.erase(p);
+					}
+					return pos;
+				}
+				pos += size;
+			}
+			return FLASH_IO::data_flash_size;
+		}
+
+
+		uint32_t scan_new_file_(seeda_h& h)
+		{
+			auto size = block_size_();
+
+			h.index_ = 0;
+			h.magic_ = sizeof(seeda_t);
+
+			uint32_t back = FLASH_IO::data_flash_size;
+			uint32_t pos = 0;
+			while(pos < FLASH_IO::data_flash_size) {
+				if(!fio_.erase_check(pos, size)) {  // 使われているブロック
+					seeda_h tmp;
+					if(fio_.read(pos, &tmp, sizeof(seeda_h))) {
+						if(tmp.magic_ == sizeof(seeda_t) && tmp.index_ >= h.index_) {
+							h = tmp;
+							back = pos;
+						}
+					}
+				}
+				pos += size;
+			}
+			return back;
+		}
+
+
+		bool read_flash_()
+		{
+			seeda_h h;
+			h.index_ = 0;
+			h.magic_ = sizeof(seeda_t);
+			auto pos = scan_new_file_(h);
+			if(pos >= FLASH_IO::data_flash_size) {
+// utils::format("Flash read: can't find\n");
+				return false;
+			}
+// utils::format("Flash read: %06X\n") % pos;
+			return fio_.read(pos, &seeda_, sizeof(seeda_t));
+		}
+
+
+		bool write_flash_(uint32_t pos)
+		{
+			seeda_h h;
+			h.index_ = 0;
+			h.magic_ = sizeof(seeda_t);
+			if(scan_new_file_(h) < FLASH_IO::data_flash_size) {
+				seeda_.index_ = h.index_ + 1;
+			} else {
+				seeda_.index_ = 0;
+			}
+			seeda_.magic_ = sizeof(seeda_t);
+// utils::format("Flash write: %06X\n") % pos;
+			return fio_.write(pos, &seeda_, sizeof(seeda_t));
+		}
+
+#endif
 
 	public:
 		//-----------------------------------------------------------------//
@@ -69,12 +191,38 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  フラッシュＩ／Ｏへの参照
+			@return フラッシュＩ／Ｏ
+		*/
+		//-----------------------------------------------------------------//
+		FLASH_IO& at_fio() { return fio_; }		
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  開始
 		*/
 		//-----------------------------------------------------------------//
 		void start()
 		{
-			flash_.start();
+			fio_.start();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  削除
+			@param[in]	path	ファイル・パス
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool remove(const char* path = "seeda03.pre")
+		{
+#ifdef WRITE_SD
+			return at_sdc().remove("/seeda03.pre");
+#else
+			return fio_.erase_all();
+#endif
 		}
 
 
@@ -87,6 +235,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		bool write(const char* path = "seeda03.pre")
 		{
+#ifdef WRITE_SD
 			FILE* fp = fopen(path, "wb");
 			if(fp == nullptr) {
 				utils::format("Can't write preference: '%s'\n") % path;
@@ -104,6 +253,14 @@ namespace seeda {
 			fclose(fp);
 
 			return ret;
+#else
+			auto pos = scan_flash_();  // save area + index
+			if(pos >= FLASH_IO::data_flash_size) {  // no space
+				pos = erase_flash_();
+			}
+
+			return write_flash_(pos);
+#endif
 		}
 
 
@@ -116,6 +273,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		bool read(const char* path = "seeda03.pre")
 		{
+#ifdef WRITE_SD
 			FILE* fp = fopen(path, "rb");
 			if(fp == nullptr) {
 				utils::format("Can't read preference: '%s'\n") % path;
@@ -136,6 +294,9 @@ namespace seeda {
 			fclose(fp);
 
 			return ret;
+#else
+			return read_flash_();
+#endif
 		}
 
 

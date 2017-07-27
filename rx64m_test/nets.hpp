@@ -362,6 +362,8 @@ namespace seeda {
 
 		void startup_()
 		{
+			pre_.start();
+
 			setup_.init_eui(develope_);
 			const uint8_t* ips = setup_.get_ip();
 			const uint8_t* mac = setup_.get_mac();
@@ -410,10 +412,12 @@ namespace seeda {
 				net_tools::render_version();
 				net_tools::render_date_time();
 				http_.tag_hr(600, 3);
-				if(at_sdc().remove("/seeda03.pre")) {
-					http_format("Succeeded in the removal of the 'seeda03.pre'<br>\n");
+				if(pre_.remove()) {
+///					http_format("Succeeded in the removal of the 'seeda03.pre'<br>\n");
+					http_format("Succeeded in the removal of the 'preference'<br>\n");
 				} else {
-					http_format("Failed in the removal of the 'seeda03.pre'<br>\n");
+///					http_format("Failed in the removal of the 'seeda03.pre'<br>\n");
+					http_format("Failed in the removal of the 'preference'<br>\n");
 				}
 				http_.tag_hr(600, 3);
 				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"戻る\">\n");
