@@ -312,11 +312,12 @@ namespace device {
 		/*!
 			@brief  読み出し
 			@param[in]	org	開始アドレス
-			@param[in]	len	バイト数
 			@param[out]	dst	先
+			@param[in]	len	バイト数
+			@return エラー無ければ「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool read(uint32_t org, uint32_t len, void* dst) noexcept
+		bool read(uint32_t org, void* dst, uint32_t len) noexcept
 		{
 			if(org >= data_flash_size) {
 				error_ = error::ADDRESS;
@@ -442,6 +443,26 @@ namespace device {
 				debug_format("FACI 'erase' lock fail\n");
 				return false;
 			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  全消去
+			@return エラーがあれば「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool erase_all() noexcept
+		{
+			for(uint32_t pos = 0; pos < data_flash_size; pos += data_flash_block) {
+				if(!erase_check(pos)) {
+					auto ret = erase(pos);
+					if(!ret) {
+						return false;
+					}
+				}
+			}
+			return true;
 		}
 
 
