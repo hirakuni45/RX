@@ -21,6 +21,7 @@
 //=====================================================================//
 #include <type_traits>
 #include <unistd.h>
+#include <cstring>
 
 /* 
   e, E
@@ -736,7 +737,7 @@ namespace utils {
 			if(mode_ == mode::STR) {
 				if(val == nullptr) {
 					static const char* nullstr = { "(nullptr)" };
-					out_str_(nullstr, 0, strlen(nullstr));					
+					out_str_(nullstr, 0, std::strlen(nullstr));					
 				} else {
 					zerosupp_ = false;
 					uint8_t n = 0;
