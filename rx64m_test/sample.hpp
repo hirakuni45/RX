@@ -212,7 +212,10 @@ namespace seeda {
 					med = it->first;
 					if((count_ & 1) == 0) {
 						++it;
-						med += it->first;
+						if(it == map_.end()) {  // 要素数が１個の場合は、平均しない
+							break;
+						}
+						med += static_cast<uint32_t>(it->first);
 						med /= 2;
 					}
 					break;
