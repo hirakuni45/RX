@@ -107,8 +107,8 @@ int open(const char *path, int flags, ...)
 	if(flags & O_TRUNC) mode |= FA_CREATE_ALWAYS;
 	else if(flags & O_CREAT) mode |= FA_CREATE_NEW;
 
-	char tmp[256];
 #if _USE_LFN != 0
+	char tmp[256];
 	utf8_to_sjis(path, tmp);
 	FRESULT res = f_open(&file_obj_[file - STD_OFS_], tmp, mode);
 #else
