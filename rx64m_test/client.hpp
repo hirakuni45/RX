@@ -239,8 +239,10 @@ namespace seeda {
 					debug_format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% ip_.c_str() % port_ % client_.get_cepid();
 					format::chaout().set_fd(client_.get_cepid());
-					if(idle_count_ > (cycle * 3 / 2)) {  // 1.5 秒以上、の「間」がある場合、設定初期化
+					// 以前接続してから、4 秒以上、の「間」がある場合、設定初期化
+					if(idle_count_ > (cycle * 4)) {
 						fifo_.clear();
+/// utils::format("Reset fifo\n");
 						time_org_ = get_time();
 						time_ofs_ = time_ref_;
 						time_     = time_ref_;
