@@ -159,6 +159,47 @@ namespace utils {
 		}
 
 
+#if 0
+		bool check_dir_(const char* path) const noexcept
+		{
+			FILINFO fno;
+			if(f_stat(path, &fno) != FR_OK) {
+				return false;
+			}
+			return (fno.fattrib & AM_DIR) != 0;
+		}
+#endif
+
+		// パス中のディレクトリーが無かったら生成
+		bool build_dir_path_(const char* path) const noexcept
+		{
+			char tmp[_MAX_LFN + 1];
+			std::strcpy(tmp, path);
+			char* p = tmp;
+			if(p[0] == '/') ++p;
+			while(p[0] != 0) {
+				p = std::strchr(p, '/');
+				if(p == nullptr) break;
+				p[0] = 0;
+#if _USE_LFN != 0
+				char sjis[_MAX_LFN + 1];
+				str::utf8_to_sjis(tmp, sjis);
+				auto ret = f_mkdir(sjis);
+#else
+				auto ret = f_mkdir(tmp);
+#endif
+				if(ret == FR_OK) ;
+				else if(ret == FR_EXIST) ;
+				else {
+					return false;
+				}
+				p[0] = '/';
+				++p;
+			}
+			return true;
+		}
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SD カード・ディレクトリー・リスト・クラス
@@ -353,6 +394,28 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	パス中のディレクトリーを生成
+			@param[in]	path	ファイル名
+			@return 成功なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool build_dir_path(const char* path) noexcept
+		{
+			if(!mount_) return false;
+			if(path == nullptr) return false;
+
+			char full[_MAX_LFN + 1];
+			create_full_path_(path, full);
+
+			if(!build_dir_path_(full)) {
+				return false;
+			}
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	カレント・ファイルのオープン
 			@param[in]	fp		ファイル構造体ポインター
 			@param[in]	path	ファイル名
@@ -360,7 +423,7 @@ namespace utils {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool open(FIL* fp, const char* path, BYTE mode) const
+		bool open(FIL* fp, const char* path, BYTE mode) const noexcept
 		{
 			if(!mount_) return false;
 			if(fp == nullptr || path == nullptr) return false;
