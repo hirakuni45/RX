@@ -1,8 +1,10 @@
-#=======================================================#
-#														#
-#	RX64M Makefile 				        				#
-#														#
-#=======================================================#
+#=======================================================================
+#	RX64M SDC_sample Makefile
+#   @author 平松邦仁 (hira@rvf-rc45.net)
+#	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+#				Released under the MIT license @n
+#				https://github.com/hirakuni45/RX/blob/master/LICENSE
+#=======================================================================
 TARGET		=	sdc_sample
 
 DEVICE		=	R5F564MF
