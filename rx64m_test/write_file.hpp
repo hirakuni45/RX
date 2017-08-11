@@ -52,6 +52,7 @@ namespace seeda {
 			wait_request,
 			sync_first,
 			make_filename,
+			make_dir_path,
 			open_file,
 			write_header,
 			make_data,
@@ -212,8 +213,13 @@ namespace seeda {
 						% static_cast<uint32_t>(m->tm_min);
 					last_data_ = false;
 					second_ = 0;
-					task_ = task::open_file;
+					task_ = task::make_dir_path;
 				}
+				break;
+
+			case task::make_dir_path:
+				at_sdc().build_dir_path(filename_);
+				task_ = task::open_file;
 				break;
 
 			case task::open_file:
