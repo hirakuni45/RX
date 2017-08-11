@@ -47,6 +47,10 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA16 = f;	// S12AD1 のストップ状態解除
 				break;
 
+			case peripheral::R12DA:
+				SYSTEM::MSTPCRA.MSTPA19 = f;	// R12DA のストップ状態解除
+				break;
+
 			case peripheral::SCI0:
 				SYSTEM::MSTPCRB.MSTPB31 = f;	// B31 (SCI0)のストップ状態解除
 				break;

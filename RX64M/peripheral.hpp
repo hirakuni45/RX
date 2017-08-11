@@ -47,6 +47,8 @@ namespace device {
 		S12AD,	///< 12 ビット A/D コンバータ（ユニット０）
 		S12AD1,	///< 12 ビット A/D コンバータ（ユニット１）
 
+		R12DA,	///< 12 ビット D/A コンバーター
+
 		SDHI,	///< SDHI
 
 		ETHERC0,	///< Ethernet 0 (PHY RMII)
