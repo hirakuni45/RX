@@ -17,5 +17,5 @@
 #define LITTLE_ENDIAN
 #endif
 #else
-#error "byte_order.h requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
+#error "byte_order.h requires BIG/LITTLE ENDIAN be defined."
 #endif
