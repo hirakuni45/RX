@@ -82,6 +82,13 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA2 = f;
 				break;
 
+			case peripheral::GPT0:
+			case peripheral::GPT1:
+			case peripheral::GPT2:
+			case peripheral::GPT3:
+				SYSTEM::MSTPCRA.MSTPA7 = f;
+				break;
+
 			case peripheral::MTU0:
 			case peripheral::MTU1:
 			case peripheral::MTU2:
@@ -102,6 +109,17 @@ namespace device {
 				break;
 			case peripheral::S12AD2:
 				SYSTEM::MSTPCRA.MSTPA23 = f;
+				break;
+
+			case peripheral::DA:
+				SYSTEM::MSTPCRA.MSTPA19 = f;
+				break;
+
+			case peripheral::CMPC0:
+			case peripheral::CMPC1:
+			case peripheral::CMPC2:
+			case peripheral::CMPC3:
+				SYSTEM::MSTPCRB.MSTPB10 = f;
 				break;
 
 			default:
