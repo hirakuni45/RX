@@ -27,6 +27,7 @@
 #include "RX24T/icu.hpp"
 #include "RX24T/mtu3.hpp"
 #include "RX24T/poe3.hpp"
+#include "RX24T/gpt.hpp"
 #include "RX24T/tmr.hpp"
 #include "RX600/cmt.hpp"
 #include "RX24T/sci.hpp"
