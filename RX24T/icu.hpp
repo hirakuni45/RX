@@ -59,18 +59,18 @@ namespace device {
 			LVD1    = 88,   // LVD
 			LVD2    = 89,   // LVD
 
-			S12ADI  = 102,  // S12AD
-			GBADI   = 103,  // S12AD
-			GCADI   = 104,  // S12AD
-			S12ADI1 = 105,  // S12AD1
-			GBADI1  = 106,  // S12AD1
-			GCADI1  = 107,  // S12AD1
-			CMPC0   = 108,  // CMPC0
-			CMPC1   = 109,  // CMPC1
-			CMPC2   = 110,  // CMPC2
-			S12ADI2 = 111,  // S12AD2
-			GBADI2  = 112,  // S12AD2
-			GCADI2  = 113,  // S12AD2
+			S12ADI  = 102,  ///< S12ADI
+			GBADI   = 103,  ///< S12AD
+			GCADI   = 104,  ///< S12AD
+			S12ADI1 = 105,  ///< S12ADI1
+			GBADI1  = 106,  ///< S12AD1
+			GCADI1  = 107,  ///< S12AD1
+			CMPC0   = 108,  ///< CMPC0
+			CMPC1   = 109,  ///< CMPC1
+			CMPC2   = 110,  ///< CMPC2
+			S12ADI2 = 111,  ///< S12AD2
+			GBADI2  = 112,  ///< S12AD2
+			GCADI2  = 113,  ///< S12AD2
 
 			TGIA0   = 114,  ///< MTU0
 			TGIB0   = 115,  ///< MTU0
@@ -125,6 +125,8 @@ namespace device {
 			TCIV9   = 163,  ///< MTU9
 			TGIE9   = 164,  ///< MTU9
 			TGIF9   = 165,  ///< MTU9
+
+			CMPC3   = 173,  ///< CMPC3
 
 			CMIA0   = 174,	///< TMR0: CMIA0
 			CMIB0   = 175,	///< TMR0: CMIB0
