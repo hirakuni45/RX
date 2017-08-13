@@ -9,6 +9,8 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
+#include "RX24T/peripheral.hpp"
+#include "RX24T/icu.hpp"
 
 namespace device {
 
@@ -16,9 +18,11 @@ namespace device {
 	/*!
 		@brief  コンパレータ C（CMPC）
 		@param[in]	base	ベース・アドレス
+		@param[in]	t		ペリフェラル型
+		@param[in]	vec		割り込みベクタ型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
+	template <uint32_t base, peripheral t, ICU::VECTOR vec>
 	struct cmpc_t {
 
 		//-----------------------------------------------------------------//
@@ -119,10 +123,28 @@ namespace device {
 		};
 		static cmpioc_t<base + 0x10> CMPIOC;
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ペリフェラル型を返す
+			@return ペリフェラル型
+		*/
+		//-----------------------------------------------------------------//
+		static peripheral get_peripheral() { return t; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_vec() { return vec; }
+
 	};
-	typedef cmpc_t<0x000A0C80> CMPC0;
-	typedef cmpc_t<0x000A0CA0> CMPC1;
-	typedef cmpc_t<0x000A0CC0> CMPC2;
-	typedef cmpc_t<0x000A0CE0> CMPC3;
+	typedef cmpc_t<0x000A0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
+	typedef cmpc_t<0x000A0CA0, peripheral::CMPC1, ICU::VECTOR::CMPC1> CMPC1;
+	typedef cmpc_t<0x000A0CC0, peripheral::CMPC2, ICU::VECTOR::CMPC2> CMPC2;
+	typedef cmpc_t<0x000A0CE0, peripheral::CMPC3, ICU::VECTOR::CMPC3> CMPC3;
 
 }
