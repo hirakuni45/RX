@@ -287,6 +287,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  MSTPA4;
 			bit_rw_t<io_, bitpos::B5>  MSTPA5;
 
+			bit_rw_t<io_, bitpos::B7>  MSTPA7;
+
 			bit_rw_t<io_, bitpos::B9>  MSTPA9;
 
 			bit_rw_t<io_, bitpos::B14> MSTPA14;
