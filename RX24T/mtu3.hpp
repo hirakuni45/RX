@@ -404,7 +404,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> CST6;
 			bit_rw_t<io_, bitpos::B7> CST7;
 		};
-		static tstra_t<0x000C1A80> TSTRB;
+		static tstrb_t<0x000C1A80> TSTRB;
 
 
 		//-----------------------------------------------------------------//
@@ -1181,7 +1181,7 @@ namespace device {
 			@brief  入出力チャネル(MTU0)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class chanel : uint8_t {
+		enum class channel : uint8_t {
 			A,  ///< PB3 / MTIOC0A (LFQFP100:32)
 			B,  ///< PB2 / MTIOC0B (LFQFP100:33)
 			C,  ///< PB1 / MTIOC0C (LFQFP100:34)
@@ -1189,30 +1189,46 @@ namespace device {
 		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  割り込み要因(MTU0)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class interrupt : uint8_t {
+			A,		///< TGIA
+			B,		///< TGIB
+			C,		///< TGIC
+			D,		///< TGID
+			OVF,	///< TCIV オーバーフロー
+			E,		///< TGIE
+			F,		///< TGIF
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートを有効にする(MTU0)
-			@param[in]	chanel	チャネル
+			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(chanel ch, bool enable = true)
+		static void enable(channel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
-			case chanel::A:					
+			case channel::A:					
 					MPC::PB3PFS.PSEL = sel;  // MTIOC0A
 					PORTB::PMR.B3 = enable;
 				break;
-			case chanel::B:
+			case channel::B:
 					MPC::PB2PFS.PSEL = sel;  // MTIOC0B
 					PORTB::PMR.B2 = enable;
 				break;
-			case chanel::C:
+			case channel::C:
 					MPC::PB1PFS.PSEL = sel;  // MTIOC0C
 					PORTB::PMR.B1 = enable;
 				break;
-			case chanel::D:
+			case channel::D:
 					MPC::PB0PFS.PSEL = sel;  // MTIOC0D
 					PORTB::PMR.B0 = enable;
 				break;
@@ -1355,6 +1371,27 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return t; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターを返す
+			@param[in]	intr	割り込み要因
+			@return 割り込みベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_vec(interrupt intr) {
+			switch(intr) {
+			case interrupt::A:   return ICU::VECTOR::TGIA0;
+			case interrupt::B:   return ICU::VECTOR::TGIB0;
+			case interrupt::C:   return ICU::VECTOR::TGIC0;
+			case interrupt::D:   return ICU::VECTOR::TGID0;
+			case interrupt::OVF: return ICU::VECTOR::TCIV0;
+			case interrupt::E:   return ICU::VECTOR::TGIE0;
+			case interrupt::F:   return ICU::VECTOR::TGIF0;
+			}
+			return ICU::VECTOR::NONE;
+		}
 	};
 
 
@@ -1393,28 +1430,41 @@ namespace device {
 			@brief  入出力チャネル(MTU1)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class chanel : uint8_t {
+		enum class channel : uint8_t {
 			A,  ///< PA5 / MTIOC1A (LFQFP100:36)
 			B,  ///< PA4 / MTIOC1B (LFQFP100:37)
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  割り込み要因(MTU1)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class interrupt : uint8_t {
+			A,		///< TGIA
+			B,		///< TGIB
+			OVR,	///< TCIV オーバーフロー
+			UDF,	///< TCIU アンダーフロー
 		};
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートを有効にする(MTU1)
-			@param[in]	chanel	チャネル
+			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(chanel ch, bool enable = true)
+		static void enable(channel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
-			case chanel::A:					
+			case channel::A:					
 					MPC::PA5PFS.PSEL = sel;  // MTIOC1A
 					PORTA::PMR.B5 = enable;
 				break;
-			case chanel::B:
+			case channel::B:
 					MPC::PA4PFS.PSEL = sel;  // MTIOC1B
 					PORTA::PMR.B4 = enable;
 				break;
@@ -1575,6 +1625,24 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return t; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターを返す
+			@param[in]	intr	割り込み要因
+			@return 割り込みベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_vec(interrupt intr) {
+			switch(intr) {
+			case interrupt::A:   return ICU::VECTOR::TGIA1;
+			case interrupt::B:   return ICU::VECTOR::TGIB1;
+			case interrupt::OVF: return ICU::VECTOR::TCIV1;
+			case interrupt::UDF: return ICU::VECTOR::TCIU1;
+			}
+			return ICU::VECTOR::NONE;
+		}
 	};
 
 
@@ -1613,28 +1681,41 @@ namespace device {
 			@brief  入出力チャネル(MTU2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class chanel : uint8_t {
+		enum class channel : uint8_t {
 			A,  ///< PA3 / MTIOC2A (LFQFP100:38)
 			B,  ///< PA2 / MTIOC2B (LFQFP100:39)
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  割り込み要因(MTU2)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class interrupt : uint8_t {
+			A,		///< TGIA
+			B,		///< TGIB
+			OVR,	///< TCIV オーバーフロー
+			UDF,	///< TCIU アンダーフロー
 		};
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートを有効にする(MTU2)
-			@param[in]	chanel	チャネル
+			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(chanel ch, bool enable = true)
+		static void enable(channel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
-			case chanel::A:					
+			case channel::A:					
 					MPC::PA3PFS.PSEL = sel;  // MTIOC2A
 					PORTA::PMR.B3 = enable;
 				break;
-			case chanel::B:
+			case channel::B:
 					MPC::PA2PFS.PSEL = sel;  // MTIOC2B
 					PORTA::PMR.B2 = enable;
 				break;
@@ -1729,6 +1810,24 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return t; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターを返す
+			@param[in]	intr	割り込み要因
+			@return 割り込みベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_vec(interrupt intr) {
+			switch(intr) {
+			case interrupt::A:   return ICU::VECTOR::TGIA2;
+			case interrupt::B:   return ICU::VECTOR::TGIB2;
+			case interrupt::OVF: return ICU::VECTOR::TCIV2;
+			case interrupt::UDF: return ICU::VECTOR::TCIU2;
+			}
+			return ICU::VECTOR::NONE;
+		}
 	};
 
 
@@ -1766,7 +1865,7 @@ namespace device {
 			@brief  入出力チャネル(MTU3)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class chanel : uint8_t {
+		enum class channel : uint8_t {
 			A,  ///< P33 / MTIOC3A (LFQFP100:58)
 			B,  ///< P71 / MTIOC3B (LFQFP100:56)
 			C,  ///< P32 / MTIOC3C (LFQFP100:59)
@@ -1774,30 +1873,44 @@ namespace device {
 		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  割り込み要因(MTU3)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class interrupt : uint8_t {
+			A,		///< TGIA
+			B,		///< TGIB
+			C,		///< TGIC
+			D,		///< TGID
+			OVR,	///< TCIV オーバーフロー
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートを有効にする(MTU3)
-			@param[in]	chanel	チャネル
+			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(chanel ch, bool enable = true)
+		static void enable(channel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
-			case chanel::A:					
+			case channel::A:					
 					MPC::P33PFS.PSEL = sel;  // MTIOC3A
 					PORT3::PMR.B3 = enable;
 				break;
-			case chanel::B:
+			case channel::B:
 					MPC::P71PFS.PSEL = sel;  // MTIOC3B
 					PORT7::PMR.B1 = enable;
 				break;
-			case chanel::C:
+			case channel::C:
 					MPC::P32PFS.PSEL = sel;  // MTIOC3C
 					PORT3::PMR.B2 = enable;
 				break;
-			case chanel::D:
+			case channel::D:
 					MPC::P74PFS.PSEL = sel;  // MTIOC3D
 					PORT7::PMR.B4 = enable;
 				break;
@@ -1932,6 +2045,25 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return t; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターを返す
+			@param[in]	intr	割り込み要因
+			@return 割り込みベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_vec(interrupt intr) {
+			switch(intr) {
+			case interrupt::A:   return ICU::VECTOR::TGIA3;
+			case interrupt::B:   return ICU::VECTOR::TGIB3;
+			case interrupt::C:   return ICU::VECTOR::TGIC3;
+			case interrupt::D:   return ICU::VECTOR::TGID3;
+			case interrupt::OVF: return ICU::VECTOR::TCIV3;
+			}
+			return ICU::VECTOR::NONE;
+		}
 	};
 
 
@@ -1969,7 +2101,7 @@ namespace device {
 			@brief  入出力チャネル(MTU4)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class chanel : uint8_t {
+		enum class channel : uint8_t {
 			A,  ///< P72 / MTIOC4A (LFQFP100:55)
 			B,  ///< P73 / MTIOC4B (LFQFP100:54)
 			C,  ///< P75 / MTIOC4C (LFQFP100:52)
@@ -1977,30 +2109,44 @@ namespace device {
 		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  割り込み要因(MTU4)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class interrupt : uint8_t {
+			A,		///< TGIA
+			B,		///< TGIB
+			C,		///< TGIC
+			D,		///< TGID
+			OVR,	///< TCIV オーバーフロー
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートを有効にする(MTU4)
-			@param[in]	chanel	チャネル
+			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(chanel ch, bool enable = true)
+		static void enable(channel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
-			case chanel::A:					
+			case channel::A:					
 					MPC::P72PFS.PSEL = sel;  // MTIOC4A
 					PORT7::PMR.B2 = enable;
 				break;
-			case chanel::B:
+			case channel::B:
 					MPC::P73PFS.PSEL = sel;  // MTIOC4B
 					PORT7::PMR.B3 = enable;
 				break;
-			case chanel::C:
+			case channel::C:
 					MPC::P75PFS.PSEL = sel;  // MTIOC4C
 					PORT7::PMR.B5 = enable;
 				break;
-			case chanel::D:
+			case channel::D:
 					MPC::P76PFS.PSEL = sel;  // MTIOC4D
 					PORT7::PMR.B6 = enable;
 				break;
@@ -2204,6 +2350,24 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return t; }
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターを返す
+			@param[in]	intr	割り込み要因
+			@return 割り込みベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_vec(interrupt intr) {
+			switch(intr) {
+			case interrupt::A:   return ICU::VECTOR::TGIA4;
+			case interrupt::B:   return ICU::VECTOR::TGIB4;
+			case interrupt::C:   return ICU::VECTOR::TGIC4;
+			case interrupt::D:   return ICU::VECTOR::TGID4;
+			case interrupt::OVF: return ICU::VECTOR::TCIV4;
+			}
+			return ICU::VECTOR::NONE;
+		}
 	};
 
 
@@ -2240,7 +2404,7 @@ namespace device {
 			@brief  入出力チャネル(MTU5)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class chanel : uint8_t {
+		enum class channel : uint8_t {
 			U,   ///< P24 / MTIOC5U (LFQFP100:64)
 			V,   ///< P23 / MTIOC5V (LFQFP100:65)
 			W,   ///< P22 / MTIOC5W (LFQFP100:66)
@@ -2250,38 +2414,50 @@ namespace device {
 		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  割り込み要因(MTU5)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class interrupt : uint8_t {
+			U,		///< TGIU
+			V,		///< TGIV
+			W,		///< TGIW
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートを有効にする(MTU5)
-			@param[in]	chanel	チャネル
+			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(chanel ch, bool enable = true)
+		static void enable(channel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
-			case chanel::U:
+			case channel::U:
 					MPC::P24PFS.PSEL = sel;  // MTIOC5U
 					PORT2::PMR.B4 = enable;
 				break;
-			case chanel::V:
+			case channel::V:
 					MPC::P23PFS.PSEL = sel;  // MTIOC5V
 					PORT2::PMR.B3 = enable;
 				break;
-			case chanel::W:
+			case channel::W:
 					MPC::P22PFS.PSEL = sel;  // MTIOC5W
 					PORT2::PMR.B2 = enable;
 				break;
-			case chanel::U2:
+			case channel::U2:
 					MPC::P82PFS.PSEL = sel;  // MTIOC5U
 					PORT8::PMR.B2 = enable;
 				break;
-			case chanel::V2:
+			case channel::V2:
 					MPC::P81PFS.PSEL = sel;  // MTIOC5V
 					PORT8::PMR.B1 = enable;
 				break;
-			case chanel::W2:
+			case channel::W2:
 					MPC::P80PFS.PSEL = sel;  // MTIOC5W
 					PORT8::PMR.B0 = enable;
 				break;
@@ -2514,6 +2690,23 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return t; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターを返す
+			@param[in]	intr	割り込み要因
+			@return 割り込みベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_vec(interrupt intr) {
+			switch(intr) {
+			case interrupt::U:   return ICU::VECTOR::TGIU5;
+			case interrupt::V:   return ICU::VECTOR::TGIV5;
+			case interrupt::W:   return ICU::VECTOR::TGIW5;
+			}
+			return ICU::VECTOR::NONE;
+		}
 	};
 
 
@@ -2551,7 +2744,7 @@ namespace device {
 			@brief  入出力チャネル(MTU6)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class chanel : uint8_t {
+		enum class channel : uint8_t {
 			A,  ///< PA1 / MTIOC6A (LFQFP100:40)
 			B,  ///< P95 / MTIOC6B (LFQFP100:45)
 			C,  ///< PA0 / MTIOC6C (LFQFP100:41)
@@ -2559,30 +2752,44 @@ namespace device {
 		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  割り込み要因(MTU6)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class interrupt : uint8_t {
+			A,		///< TGIA
+			B,		///< TGIB
+			C,		///< TGIC
+			D,		///< TGID
+			OVR,	///< TCIV オーバーフロー
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートを有効にする(MTU6)
-			@param[in]	chanel	チャネル
+			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(chanel ch, bool enable = true)
+		static void enable(channel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
-			case chanel::A:
+			case channel::A:
 					MPC::PA1PFS.PSEL = sel;  // MTIOC6A
 					PORTA::PMR.B1 = enable;
 				break;
-			case chanel::B:
+			case channel::B:
 					MPC::P95PFS.PSEL = sel;  // MTIOC6B
 					PORT9::PMR.B5 = enable;
 				break;
-			case chanel::C:
+			case channel::C:
 					MPC::PA0PFS.PSEL = sel;  // MTIOC6C
 					PORTA::PMR.B0 = enable;
 				break;
-			case chanel::D:
+			case channel::D:
 					MPC::P92PFS.PSEL = sel;  // MTIOC6D
 					PORT9::PMR.B2 = enable;
 				break;
@@ -2743,6 +2950,25 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return t; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターを返す
+			@param[in]	intr	割り込み要因
+			@return 割り込みベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_vec(interrupt intr) {
+			switch(intr) {
+			case interrupt::A:   return ICU::VECTOR::TGIA6;
+			case interrupt::B:   return ICU::VECTOR::TGIB6;
+			case interrupt::C:   return ICU::VECTOR::TGIC6;
+			case interrupt::D:   return ICU::VECTOR::TGID6;
+			case interrupt::OVF: return ICU::VECTOR::TCIV6;
+			}
+			return ICU::VECTOR::NONE;
+		}
 	};
 
 
@@ -2780,7 +3006,7 @@ namespace device {
 			@brief  入出力チャネル(MTU7)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class chanel : uint8_t {
+		enum class channel : uint8_t {
 			A,  ///< P94 / MTIOC7A (LFQFP100:46)
 			B,  ///< P93 / MTIOC7B (LFQFP100:47)
 			C,  ///< P91 / MTIOC7C (LFQFP100:49)
@@ -2788,30 +3014,44 @@ namespace device {
 		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  割り込み要因(MTU7)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class interrupt : uint8_t {
+			A,		///< TGIA
+			B,		///< TGIB
+			C,		///< TGIC
+			D,		///< TGID
+			OVR,	///< TCIV オーバーフロー
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートを有効にする(MTU7)
-			@param[in]	chanel	チャネル
+			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(chanel ch, bool enable = true)
+		static void enable(channel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
-			case chanel::A:
+			case channel::A:
 					MPC::P94PFS.PSEL = sel;  // MTIOC7A
 					PORT9::PMR.B4 = enable;
 				break;
-			case chanel::B:
+			case channel::B:
 					MPC::P93PFS.PSEL = sel;  // MTIOC7B
 					PORT9::PMR.B3 = enable;
 				break;
-			case chanel::C:
+			case channel::C:
 					MPC::P91PFS.PSEL = sel;  // MTIOC7C
 					PORT9::PMR.B1 = enable;
 				break;
-			case chanel::D:
+			case channel::D:
 					MPC::P90PFS.PSEL = sel;  // MTIOC7D
 					PORT9::PMR.B0 = enable;
 				break;
@@ -3014,6 +3254,25 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return t; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターを返す
+			@param[in]	intr	割り込み要因
+			@return 割り込みベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_vec(interrupt intr) {
+			switch(intr) {
+			case interrupt::A:   return ICU::VECTOR::TGIA7;
+			case interrupt::B:   return ICU::VECTOR::TGIB7;
+			case interrupt::C:   return ICU::VECTOR::TGIC7;
+			case interrupt::D:   return ICU::VECTOR::TGID7;
+			case interrupt::OVF: return ICU::VECTOR::TCIV7;
+			}
+			return ICU::VECTOR::NONE;
+		}
 	};
 
 
@@ -3054,7 +3313,7 @@ namespace device {
 			@brief  入出力チャネル(MTU9)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class chanel : uint8_t {
+		enum class channel : uint8_t {
 			A,  ///< PD7 / MTIOC9A (LFQFP100:18)
 			B,  ///< PE0 / MTIOC9B (LFQFP100:17)
 			C,  ///< PD6 / MTIOC9C (LFQFP100:19)
@@ -3062,30 +3321,46 @@ namespace device {
 		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  割り込み要因(MTU9)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class interrupt : uint8_t {
+			A,		///< TGIA
+			B,		///< TGIB
+			C,		///< TGIC
+			D,		///< TGID
+			OVR,	///< TCIV オーバーフロー
+			E,		///< TGIE
+			F,		///< TGIF
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートを有効にする(MTU9)
-			@param[in]	chanel	チャネル
+			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void enable(chanel ch, bool enable = true)
+		static void enable(channel ch, bool enable = true)
 		{
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
-			case chanel::A:
+			case channel::A:
 					MPC::PD7PFS.PSEL = sel;  // MTIOC9A
 					PORTD::PMR.B7 = enable;
 				break;
-			case chanel::B:
+			case channel::B:
 					MPC::PE0PFS.PSEL = sel;  // MTIOC9B
 					PORTE::PMR.B0 = enable;
 				break;
-			case chanel::C:
+			case channel::C:
 					MPC::PD6PFS.PSEL = sel;  // MTIOC9C
 					PORTD::PMR.B6 = enable;
 				break;
-			case chanel::D:
+			case channel::D:
 					MPC::PE1PFS.PSEL = sel;  // MTIOC9D
 					PORTE::PMR.B1 = enable;
 				break;
@@ -3228,6 +3503,27 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return t; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターを返す
+			@param[in]	intr	割り込み要因
+			@return 割り込みベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_vec(interrupt intr) {
+			switch(intr) {
+			case interrupt::A:   return ICU::VECTOR::TGIA9;
+			case interrupt::B:   return ICU::VECTOR::TGIB9;
+			case interrupt::C:   return ICU::VECTOR::TGIC9;
+			case interrupt::D:   return ICU::VECTOR::TGID9;
+			case interrupt::OVF: return ICU::VECTOR::TCIV9;
+			case interrupt::E:   return ICU::VECTOR::TGIE9;
+			case interrupt::F:   return ICU::VECTOR::TGIF9;
+			}
+			return ICU::VECTOR::NONE;
+		}
 	};
 
 	typedef mtu_t MTU;
