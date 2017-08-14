@@ -98,11 +98,20 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief アドレスの取得
+			@return アドレス
+		*/
+		//-----------------------------------------------------------------//
+		static address_type address() noexcept { return adr; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  書き込み
 			@param[in]	data	書き込み値
 		*/
 		//-----------------------------------------------------------------//
-		static void write(value_type data) { wr8_(adr, data); }
+		static void write(value_type data) noexcept { wr8_(adr, data); }
 
 
 		//-----------------------------------------------------------------//
@@ -111,12 +120,43 @@ namespace device {
 			@return 読み出し値
 		*/
 		//-----------------------------------------------------------------//
-		static value_type read() { return rd8_(adr); }
+		static value_type read() noexcept { return rd8_(adr); }
 
-		void operator = (value_type data) { write(data); }
-		value_type operator () () { return read(); }
-		void operator |= (value_type data) { write(read() | data); }
-		void operator &= (value_type data) { write(read() & data); }
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief = オペレーター
+			@param[in]	data	書き込み値
+		*/
+		//-----------------------------------------------------------------//
+		void operator = (value_type data) noexcept { write(data); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief () オペレーター
+			@return 読み出し値
+		*/
+		//-----------------------------------------------------------------//
+		value_type operator () () noexcept { return read(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief |= オペレーター
+			@param[in]	data	論理和値
+		*/
+		//-----------------------------------------------------------------//
+		void operator |= (value_type data) noexcept { write(read() | data); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief &= オペレーター
+			@param[in]	data	論理積値
+		*/
+		//-----------------------------------------------------------------//
+		void operator &= (value_type data) noexcept { write(read() & data); }
 	};
 
 
@@ -132,13 +172,29 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief アドレスの取得
+			@return アドレス
+		*/
+		//-----------------------------------------------------------------//
+		static address_type address() noexcept { return adr; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief 読み出し
 			@return 読み出し値
 		*/
 		//-----------------------------------------------------------------//
-		static value_type read() { return rd8_(adr); }
+		static value_type read() noexcept { return rd8_(adr); }
 
-		value_type operator () () { return read(); }
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief () オペレーター
+			@return 読み出し値
+		*/
+		//-----------------------------------------------------------------//
+		value_type operator () () noexcept { return read(); }
 	};
 
 
@@ -154,13 +210,29 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief アドレスの取得
+			@return アドレス
+		*/
+		//-----------------------------------------------------------------//
+		static address_type address() noexcept { return adr; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  書き込み
 			@param[in]	data	書き込み値
 		*/
 		//-----------------------------------------------------------------//
-		static void write(value_type data) { wr8_(adr, data); }
+		static void write(value_type data) noexcept { wr8_(adr, data); }
 
-		void operator = (value_type data) { write(data); }
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief = オペレーター
+			@return 書き込み値
+		*/
+		//-----------------------------------------------------------------//
+		void operator = (value_type data) noexcept { write(data); }
 	};
 
 
@@ -176,11 +248,20 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief アドレスの取得
+			@return アドレス
+		*/
+		//-----------------------------------------------------------------//
+		static address_type address() noexcept { return adr; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  書き込み
 			@param[in]	data	書き込み値
 		*/
 		//-----------------------------------------------------------------//
-		static void write(value_type data) { wr16_(adr, data); }
+		static void write(value_type data) noexcept { wr16_(adr, data); }
 
 
 		//-----------------------------------------------------------------//
@@ -189,12 +270,43 @@ namespace device {
 			@return 読み出し値
 		*/
 		//-----------------------------------------------------------------//
-		static value_type read() { return rd16_(adr); }
+		static value_type read() noexcept { return rd16_(adr); }
 
-		void operator = (value_type data) { write(data); }
-		value_type operator () () { return read(); }
-		void operator |= (value_type data) { write(read() | data); }
-		void operator &= (value_type data) { write(read() & data); }
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief = オペレーター
+			@return 読み出し値
+		*/
+		//-----------------------------------------------------------------//
+		void operator = (value_type data) noexcept { write(data); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief () オペレーター
+			@return 読み出し値
+		*/
+		//-----------------------------------------------------------------//
+		value_type operator () () noexcept { return read(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief |= オペレーター
+			@return 論理和値
+		*/
+		//-----------------------------------------------------------------//
+		void operator |= (value_type data) noexcept { write(read() | data); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief &= オペレーター
+			@return 論理積値
+		*/
+		//-----------------------------------------------------------------//
+		void operator &= (value_type data) noexcept { write(read() & data); }
 	};
 
 
@@ -210,13 +322,29 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief アドレスの取得
+			@return アドレス
+		*/
+		//-----------------------------------------------------------------//
+		static address_type address() noexcept { return adr; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief 読み出し
 			@return 読み出し値
 		*/
 		//-----------------------------------------------------------------//
-		static value_type read() { return rd16_(adr); }
+		static value_type read() noexcept { return rd16_(adr); }
 
-		value_type operator () () { return read(); }
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief () オペレーター
+			@return 読み出し値
+		*/
+		//-----------------------------------------------------------------//
+		value_type operator () () noexcept { return read(); }
 	};
 
 
@@ -232,13 +360,29 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief アドレスの取得
+			@return アドレス
+		*/
+		//-----------------------------------------------------------------//
+		static address_type address() noexcept { return adr; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  書き込み
 			@param[in]	data	書き込み値
 		*/
 		//-----------------------------------------------------------------//
-		static void write(value_type data) { wr16_(adr, data); }
+		static void write(value_type data) noexcept { wr16_(adr, data); }
 
-		void operator = (value_type data) { write(data); }
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief = オペレーター
+			@return 書き込み値
+		*/
+		//-----------------------------------------------------------------//
+		void operator = (value_type data) noexcept { write(data); }
 	};
 
 
@@ -254,11 +398,20 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief アドレスの取得
+			@return アドレス
+		*/
+		//-----------------------------------------------------------------//
+		static address_type address() noexcept { return adr; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  書き込み
 			@param[in]	data	書き込み値
 		*/
 		//-----------------------------------------------------------------//
-		static void write(value_type data) { wr32_(adr, data); }
+		static void write(value_type data) noexcept { wr32_(adr, data); }
 
 
 		//-----------------------------------------------------------------//
@@ -267,12 +420,43 @@ namespace device {
 			@return 読み出し値
 		*/
 		//-----------------------------------------------------------------//
-		static value_type read() { return rd32_(adr); }
+		static value_type read() noexcept { return rd32_(adr); }
 
-		void operator = (value_type data) { write(data); }
-		value_type operator () () { return read(); }
-		void operator |= (value_type data) { write(read() | data); }
-		void operator &= (value_type data) { write(read() & data); }
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief = オペレーター
+			@return 書き込み値
+		*/
+		//-----------------------------------------------------------------//
+		void operator = (value_type data) noexcept { write(data); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief () オペレーター
+			@return 読み出し値
+		*/
+		//-----------------------------------------------------------------//
+		value_type operator () () noexcept { return read(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief |= オペレーター
+			@return 論理和値
+		*/
+		//-----------------------------------------------------------------//
+		void operator |= (value_type data) noexcept { write(read() | data); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief &= オペレーター
+			@return 論理積値
+		*/
+		//-----------------------------------------------------------------//
+		void operator &= (value_type data) noexcept { write(read() & data); }
 	};
 
 
@@ -288,13 +472,29 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief アドレスの取得
+			@return アドレス
+		*/
+		//-----------------------------------------------------------------//
+		static address_type address() noexcept { return adr; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief 読み出し
 			@return 読み出し値
 		*/
 		//-----------------------------------------------------------------//
-		static value_type read() { return rd32_(adr); }
+		static value_type read() noexcept { return rd32_(adr); }
 
-		value_type operator () () { return read(); }
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief () オペレーター
+			@return 読み出し値
+		*/
+		//-----------------------------------------------------------------//
+		value_type operator () () noexcept { return read(); }
 	};
 
 
@@ -310,13 +510,29 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief アドレスの取得
+			@return アドレス
+		*/
+		//-----------------------------------------------------------------//
+		static address_type address() noexcept { return adr; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  書き込み
 			@param[in]	data	書き込み値
 		*/
 		//-----------------------------------------------------------------//
-		static void write(value_type data) { wr32_(adr, data); }
+		static void write(value_type data) noexcept { wr32_(adr, data); }
 
-		void operator = (value_type data) { write(data); }
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief = オペレーター
+			@return 書き込み値
+		*/
+		//-----------------------------------------------------------------//
+		void operator = (value_type data) noexcept { write(data); }
 	};
 
 
@@ -463,7 +679,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  標準 Read/Write アクセス・テンプレート
+		@brief  標準バイト Read/Write アクセス・テンプレート
 		@param[in]	T	アクセステンプレート
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -488,7 +704,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  標準 Read アクセス・テンプレート
+		@brief  標準バイト Read アクセス・テンプレート
 		@param[in]	T	アクセステンプレート
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
