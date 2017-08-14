@@ -39,6 +39,14 @@ namespace device {
 				ICU::IPR.CMI1 = lvl;
 				ICU::IER.CMI1 = ena;
 				break;
+			case peripheral::CMT2:
+				ICU::IPR.CMI2 = lvl;
+				ICU::IER.CMI2 = ena;
+				break;
+			case peripheral::CMT3:
+				ICU::IPR.CMI3 = lvl;
+				ICU::IER.CMI3 = ena;
+				break;
 
 			case peripheral::RSPI0:
 				ICU::IPR.RSPI0 = lvl;

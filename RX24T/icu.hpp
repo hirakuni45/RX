@@ -25,16 +25,17 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR {
-			BUSERR  = 16,  // BSC
+			NONE    = 0,	///< none 
+			BUSERR  = 16,   ///< BSC
 
-			FRDYI   = 23,  // FCU
+			FRDYI   = 23,   ///< FCU
 
-			SWINT   = 27,  // ICU
+			SWINT   = 27,   ///< SWINT
 
-			CMI0    = 28,  // CMT0
-			CMI1    = 29,  // CMT1
-			CMI2    = 30,  // CMT2
-			CMI3    = 31,  // CMT3
+			CMI0    = 28,   ///< CMT0
+			CMI1    = 29,   ///< CMT1
+			CMI2    = 30,   ///< CMT2
+			CMI3    = 31,   ///< CMT3
 
 			FEPRF   = 32,  // CAC
 			MENDF   = 33,  // CAC
@@ -87,8 +88,8 @@ namespace device {
 
 			TGIA2   = 125,  ///< MTU2
 			TGIB2   = 126,  ///< MTU2
-			TGIV2   = 127,  ///< MTU2
-			TGIU2   = 128,  ///< MTU2
+			TCIV2   = 127,  ///< MTU2
+			TCIU2   = 128,  ///< MTU2
 
 			TGIA3   = 129,  ///< MTU3
 			TGIB3   = 130,  ///< MTU3
