@@ -23,13 +23,14 @@ namespace utils {
 		@param[in]	SELECT	SD カード選択 I/O ポートクラス
 		@param[in]	POWER	SD カード電源 I/O ポートクラス
 		@param[in]	DETECT	SD カード検出 I/O ポートクラス
+		@param[in]	WP		SD カード書き込み禁止 I/O ポートクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SPI, class SELECT, class POWER, class DETECT>
+	template <class SPI, class SELECT, class POWER, class DETECT, class WP = device::NULL_PORT>
 	class sdc_io {
 	public:
-		typedef SPI spi_type;	///< ＳＰＩ型
 
+		typedef SPI spi_type;	///< ＳＰＩ型
 
 		typedef fatfs::mmc_io<SPI, SELECT> mmc_type;	///< ＭＭＣ型
 
@@ -352,6 +353,10 @@ namespace utils {
 
 			DETECT::DIR = 0;  // input
 			DETECT::PU = 1;  // pull-up
+
+			// 書き込み禁止ノッチ検出
+			WP::DIR = 0; // input
+			WP::PU = 1;  // pull-up
 
 			// SPI を初期化後、廃棄する事で関係ポートを初期化する。
 			// 初期化時 400KHz
