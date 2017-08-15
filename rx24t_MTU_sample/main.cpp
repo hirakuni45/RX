@@ -1,6 +1,7 @@
 //=====================================================================//
 /*! @file
     @brief  RX24T MTU3 サンプル @n
+			・PB2(33) の周波数測定 @n
 			・P00(4) ピンに赤色LED（VF:1.9V）を吸い込みで接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
@@ -16,13 +17,7 @@
 
 namespace {
 
-	class null_task {
-	public:
-		void operator() () {
-		}
-	};
-
-	device::cmt_io<device::CMT0, null_task>  cmt_;
+	device::cmt_io<device::CMT0>  cmt_;
 
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
@@ -77,16 +72,23 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	// タイマー設定（６０Ｈｚ）
-	uint8_t cmt_irq_level = 4;
-	cmt_.start(60, cmt_irq_level);
+	{
+		uint8_t intr_level = 4;
+		cmt_.start(60, intr_level);
+	}
 
 	// SCI 設定
-	static const uint8_t sci_level = 2;
-	sci_.start(115200, sci_level);
+	{
+		uint8_t intr_level = 2;
+		sci_.start(115200, intr_level);
+	}
 
 	// MTU 設定
-	if(!mtu0_io_.start_input_capture(MTU0::channel::B, MTU0_IO::edge_type::positive)) {
-		utils::format("MTU0 input capture start fail...\n");
+	{
+		uint8_t intr_level = 3;		
+		if(!mtu0_io_.start_capture(MTU0::channel::A, MTU0_IO::edge_type::positive, intr_level)) {
+			utils::format("MTU0 input capture start fail...\n");
+		}
 	}
 
 	utils::format("RX24T MTU sample\n");
@@ -97,8 +99,15 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
+		if(mtu0_io_.get_capture_ovf() >= 1221) {
+			mtu0_io_.reset_capture();
+			utils::format("MTU0 reset\n");
+		}
+
 		++cnt;
 		if(cnt >= 30) {
+			auto n = mtu0_io_.get_capture();
+			utils::format("Cap: %d\n") % n;
 			cnt = 0;
 		}
 		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
