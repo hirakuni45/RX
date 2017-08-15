@@ -37,7 +37,7 @@ EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 4 5
+Sheet 5 5
 Title ""
 Date ""
 Rev ""
@@ -47,15 +47,20 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-$Comp
-L SD-CARD-SOCKET CN?
-U 1 1 598D9AEB
-P 7350 3500
-F 0 "CN?" H 7350 4250 60  0000 C CNN
-F 1 "SD-CARD-SOCKET" H 7525 2750 60  0000 C CNN
-F 2 "" H 7275 3425 60  0000 C CNN
-F 3 "" H 7275 3425 60  0000 C CNN
-	1    7350 3500
-	1    0    0    -1  
-$EndComp
+Text HLabel 2400 2600 0    60   BiDi ~ 0
+AN0
+Text HLabel 2400 2700 0    60   BiDi ~ 0
+AN1
+Text HLabel 2400 2800 0    60   BiDi ~ 0
+AN2
+Text HLabel 2400 2900 0    60   BiDi ~ 0
+AN3
+Text HLabel 2400 3000 0    60   BiDi ~ 0
+AN4
+Text HLabel 2400 3100 0    60   BiDi ~ 0
+AN5
+Text HLabel 2400 3200 0    60   BiDi ~ 0
+AN6
+Text HLabel 2400 3300 0    60   BiDi ~ 0
+AN7
 $EndSCHEMATC
