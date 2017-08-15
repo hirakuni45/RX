@@ -2,15 +2,17 @@
 /*! @file
     @brief  RX24T ファースト・サンプル @n
 			・P00(4) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
-			Copyright 2017 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
 #include "common/fifo.hpp"
 #include "common/format.hpp"
-#include "common/mtu_io.hpp"
 
 namespace {
 
@@ -30,6 +32,7 @@ namespace {
 }
 
 extern "C" {
+
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
@@ -39,6 +42,7 @@ extern "C" {
 	{
 		return sci_.getch();
 	}
+
 }
 
 int main(int argc, char** argv);
