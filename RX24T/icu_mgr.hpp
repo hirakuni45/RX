@@ -35,14 +35,17 @@ namespace device {
 				ICU::IPR.CMI0 = lvl;
 				ICU::IER.CMI0 = ena;
 				break;
+
 			case peripheral::CMT1:
 				ICU::IPR.CMI1 = lvl;
 				ICU::IER.CMI1 = ena;
 				break;
+
 			case peripheral::CMT2:
 				ICU::IPR.CMI2 = lvl;
 				ICU::IER.CMI2 = ena;
 				break;
+
 			case peripheral::CMT3:
 				ICU::IPR.CMI3 = lvl;
 				ICU::IER.CMI3 = ena;
@@ -60,12 +63,14 @@ namespace device {
 				ICU::IER.RXI1 = ena;
 				ICU::IER.TEI1 = ena;
 				break;
+
 			case peripheral::SCI5:
 			case peripheral::SCI5C:
 				ICU::IPR.SCI5 = lvl;
 				ICU::IER.RXI5 = ena;
 				ICU::IER.TEI5 = ena;
 				break;
+
 			case peripheral::SCI6:
 			case peripheral::SCI6C:
 				ICU::IPR.SCI6 = lvl;
@@ -92,6 +97,7 @@ namespace device {
 				ICU::IER.GBADI  = ena;
 				ICU::IER.GCADI  = ena;
 				break;
+
 			case peripheral::S12AD1:
 				ICU::IPR.S12ADI1 = lvl;
 				ICU::IPR.GBADI1  = lvl;
@@ -100,6 +106,7 @@ namespace device {
 				ICU::IER.GBADI1  = ena;
 				ICU::IER.GCADI1  = ena;
 				break;
+
 			case peripheral::S12AD2:
 				ICU::IPR.S12ADI2 = lvl;
 				ICU::IPR.GBADI2  = lvl;
@@ -107,6 +114,19 @@ namespace device {
 				ICU::IER.S12ADI2 = ena;
 				ICU::IER.GBADI2  = ena;
 				ICU::IER.GCADI2  = ena;
+				break;
+
+			case peripheral::MTU0:
+				ICU::IPR.TGIA0 = lvl;
+				ICU::IPR.TGIB0 = lvl;
+				ICU::IPR.TGIC0 = lvl;
+				ICU::IPR.TGID0 = lvl;
+				ICU::IPR.TCIV0 = lvl;
+				ICU::IER.TGIA0 = ena;
+				ICU::IER.TGIB0 = ena;
+				ICU::IER.TGIC0 = ena;
+				ICU::IER.TGID0 = ena;
+				ICU::IER.TCIV0 = ena;
 				break;
 
 			default:

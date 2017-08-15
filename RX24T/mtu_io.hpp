@@ -15,6 +15,8 @@
 #include "common/intr_utils.hpp"
 #include "common/vect.h"
 
+#include "common/format.hpp"
+
 /// F_PCLKA は変換パラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCLKA
 #  error "mtu_io.hpp requires F_PCLKA to be defined"
@@ -45,31 +47,27 @@ namespace device {
 		};
 
 	private:
+
 		struct task_t {
-			volatile uint16_t	cap_gnr_;
 			volatile uint16_t	cap_cnt_;
-			volatile uint16_t	overflow_cnt_;
+			volatile uint16_t	ovf_cnt_;
 
-///			MTUX::channel		ch_;
-
-			task_t() : cap_gnr_(0), cap_cnt_(0), overflow_cnt_(0) { }
+			task_t() : cap_cnt_(0), ovf_cnt_(0) { }
 		};
 		static task_t	task_t_;
 		static TASK		task_;
 
 		uint32_t	clk_limit_;
+		uint32_t	tgr_adr_;
 
 		static INTERRUPT_FUNC void cap_task_()
 		{
-
-
-			
 			++task_t_.cap_cnt_;
 		}
 
 		static INTERRUPT_FUNC void ovf_task_()
 		{
-			++task_t_.overflow_cnt_;
+			++task_t_.ovf_cnt_;
 		}
 
 	public:
@@ -78,7 +76,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		mtu_io() : clk_limit_(F_PCLKA) { }
+		mtu_io() : clk_limit_(F_PCLKA), tgr_adr_(MTUX::TGRA.address()) { }
 
 
 		//-----------------------------------------------------------------//
@@ -99,7 +97,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_input_capture(typename MTUX::channel ch, edge_type et, uint8_t level = 0)
+		bool start_capture(typename MTUX::channel ch, edge_type et, uint8_t level = 0)
 		{
 			if(MTUX::get_peripheral() == peripheral::MTU5) {  // MTU5 はインプットキャプチャとして利用不可
 				return false;
@@ -107,28 +105,56 @@ namespace device {
 
 			power_cfg::turn(MTUX::get_peripheral());
 
-			MTUX::enable(ch);
+			MTUX::enable(ch);  // ポートを有効にする
 
-			// 分周比をリミットクロックから求める
+			uint8_t cclr = 0;
+			ICU::VECTOR cvec;
+			switch(static_cast<uint8_t>(ch)) {
+			case 0:
+				cclr = 0b001;
+				cvec = MTUX::get_vec(MTUX::interrupt::A);
+				MTUX::TIOR = MTUX::TIOR.IOA.b(0b1000);
+				break;
+			case 1:
+				cclr = 0b010;
+				cvec = MTUX::get_vec(MTUX::interrupt::B);
+				MTUX::TIOR = MTUX::TIOR.IOB.b(0b1000);
+				break;
+			case 2:
+				cclr = 0b101;
+				cvec = MTUX::get_vec(static_cast<typename MTUX::interrupt>(2));
+//				MTUX::TIORL = MTUX::TIORL.IOC.b(0b1000);
+				break;
+			case 3:
+				cclr = 0b110;
+				cvec = MTUX::get_vec(static_cast<typename MTUX::interrupt>(3));
+//				MTUX::TIORL = MTUX::TIORL.IOD.b(0b1000);
+				break;
+			default:
+				return false;
+			}
 			uint8_t dv = 0;
-
-			MTUX::TCR = MTUX::TCR.CKEG.b(static_cast<uint8_t>(et));
+			MTUX::TCR  = MTUX::TCR.TPSC.b(dv)
+					   | MTUX::TCR.CKEG.b(static_cast<uint8_t>(et))
+					   | MTUX::TCR.CCLR.b(cclr);
+			MTUX::TCR2  = 0x00;
+			MTUX::TMDR1 = 0x00;
+			MTU::TMDR2A = 0x00;
+			MTU::TMDR2B = 0x00;
 
 			if(level > 0) {
 				MTUX::TIER = (1 << static_cast<uint8_t>(ch)) | MTUX::TIER.TCIEV.b();
-				auto vec = MTUX::get_vec(MTUX::interrupt::OVF);
-				set_interrupt_task(ovf_task_, static_cast<uint32_t>(vec));
-
-//				vec = MTU::get_vec(static_cast<MTUX::interrupt>(ch));
-//				if(vec == ICU::VECTOR::NONE) return false;
-//				set_interrupt_task(cap_task_, static_cast<uint32_t>(vec));
-
+				set_interrupt_task(ovf_task_, static_cast<uint32_t>(MTUX::get_vec(MTUX::interrupt::OVF)));
+				set_interrupt_task(cap_task_, static_cast<uint32_t>(cvec));
 				icu_mgr::set_level(MTUX::get_peripheral(), level);
 			}
 
-			task_t_.cap_gnr_ = 0;
 			task_t_.cap_cnt_ = 0;
-			task_t_.overflow_cnt_ = 0;
+			task_t_.ovf_cnt_ = 0;
+
+			tgr_adr_ = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
+// utils::format("TGR: 0x%08X\n") % tgr_adr_;
+			wr16_(tgr_adr_, 0x0000);
 
 			MTUX::TCNT = 0;
 
@@ -162,6 +188,41 @@ namespace device {
 				break;
 			}
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  インプット・キャプチャをリセット
+		*/
+		//-----------------------------------------------------------------//
+		void reset_capture()
+		{
+			MTUX::TCNT = 0;
+			task_t_.ovf_cnt_ = 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  インプット・キャプチャのオーバーフローカウント取得
+			@return インプット・キャプチャのオーバーフローカウント
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_capture_ovf() const {
+			return task_t_.ovf_cnt_;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  インプット・キャプチャ値を取得
+			@return インプット・キャプチャ値
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_capture() const {
+			uint32_t cap = rd16_(tgr_adr_);
+			return (static_cast<uint32_t>(task_t_.ovf_cnt_) << 16) | cap;
 		}
 
 
