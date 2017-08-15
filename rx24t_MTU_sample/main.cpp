@@ -25,6 +25,7 @@ namespace {
 	typedef device::MTU0 MTU0;
 	typedef device::mtu_io<MTU0> MTU0_IO;
 	MTU0_IO mtu0_io_;
+
 }
 
 extern "C" {
@@ -91,27 +92,29 @@ int main(int argc, char** argv)
 		}
 	}
 
-	utils::format("RX24T MTU sample\n");
+	utils::format("RX24T MTU sample (Input Capture)\n");
 
 	device::PORT0::PDR.B0 = 1; // output
 
 	uint32_t cnt = 0;
+	uint16_t cap = mtu0_io_.get_capture_tick();
+	uint32_t capcnt = 0;
 	while(1) {
 		cmt_.sync();
 
-		if(mtu0_io_.get_capture_ovf() >= 1221) {
-			mtu0_io_.reset_capture();
-			utils::format("MTU0 reset\n");
+		auto n = mtu0_io_.get_capture_tick();
+		if(cap != n) {
+			cap = n;
+			capcnt = mtu0_io_.get_capture();
 		}
 
 		++cnt;
 		if(cnt >= 30) {
-			auto n = mtu0_io_.get_capture();
-			utils::format("Cap: %d\n") % n;
+			float a = 80e6 / static_cast<float>(capcnt);
+			utils::format("Capture: %7.2f [Hz]\n") % a;
 			cnt = 0;
 		}
 		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
-
 
 	}
 }
