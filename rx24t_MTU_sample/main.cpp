@@ -110,7 +110,7 @@ int main(int argc, char** argv)
 
 		++cnt;
 		if(cnt >= 30) {
-			float a = 80e6 / static_cast<float>(capcnt);
+			float a = static_cast<float>(mtu0_io_.get_base_clock()) / static_cast<float>(capcnt);
 			utils::format("Capture: %7.2f [Hz]\n") % a;
 			cnt = 0;
 		}
