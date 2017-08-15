@@ -492,32 +492,47 @@ namespace device {
 			rw8_t<base + 112> GBADI2;
 			rw8_t<base + 113> GCADI2;
 
-			rw8_t<base + 114> TGIA0;    ///< MTU0
-			rw8_t<base + 114> TGIB0;    ///< MTU0
-			rw8_t<base + 114> TGIC0;    ///< MTU0
-			rw8_t<base + 114> TGID0;    ///< MTU0
-			rw8_t<base + 118> TCIV0;    ///< MTU0
-			rw8_t<base + 118> TCIE0;    ///< MTU0
-			rw8_t<base + 118> TCIF0;    ///< MTU0
+			rw8_t<base + 114> MTU0_ABCD;	///< MTU0
+			rw8_t<base + 118> MTU0_VEF;		///< MTU0
 
+			rw8_t<base + 121> MTU1_AB;		///< MTU1
+			rw8_t<base + 123> MTU1_VU;		///< MTU1
 
+			rw8_t<base + 125> MTU2_AB;		///< MTU2
+			rw8_t<base + 127> MTU2_VU;		///< MTU2
 
+			rw8_t<base + 129> MTU3_ABCD;	///< MTU3
+			rw8_t<base + 133> MTU3_V;		///< MTU3
 
+			rw8_t<base + 134> MTU4_ABCD;	///< MTU4
+			rw8_t<base + 138> MTU4_V;		///< MTU4
 
-			rw8_t<base + 174> TMR0;
-			rw8_t<base + 177> TMR1;
-			rw8_t<base + 180> TMR2;
-			rw8_t<base + 183> TMR3;
-			rw8_t<base + 186> TMR4;
-			rw8_t<base + 189> TMR5;
-			rw8_t<base + 192> TMR6;
-			rw8_t<base + 195> TMR7;
+			rw8_t<base + 139> MTU5_UVW;		///< MTU5
+
+			rw8_t<base + 142> MTU6_ABCD;	///< MTU6
+			rw8_t<base + 146> MTU6_V;		///< MTU6
+
+			rw8_t<base + 149> MTU7_AB;		///< MTU7
+			rw8_t<base + 151> MTU7_CD;		///< MTU7
+			rw8_t<base + 153> MTU7_V;		///< MTU7
+
+			rw8_t<base + 159> MTU9_ABCD;	///< MTU9
+			rw8_t<base + 163> MTU9_VEF;		///< MTU9
+
+			rw8_t<base + 174> TMR0;		///< TMR0
+			rw8_t<base + 177> TMR1;		///< TMR1
+			rw8_t<base + 180> TMR2;		///< TMR2
+			rw8_t<base + 183> TMR3;		///< TMR3
+			rw8_t<base + 186> TMR4;		///< TMR4
+			rw8_t<base + 189> TMR5;		///< TMR5
+			rw8_t<base + 192> TMR6;		///< TMR6
+			rw8_t<base + 195> TMR7;		///< TMR7
 
 			rw8_t<base + 218> SCI1;
 			rw8_t<base + 222> SCI5;
 			rw8_t<base + 226> SCI6;
 
-			rw8_t<base + 246> EEI0;  ///< RIIC0
+			rw8_t<base + 246> EEI0;  	///< RIIC0
 			rw8_t<base + 247> RXI0;
 			rw8_t<base + 248> TXI0;
 			rw8_t<base + 249> TEI0;
