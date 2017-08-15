@@ -50,15 +50,15 @@ namespace device {
 	private:
 
 		struct task_t {
-			volatile uint16_t	cap_tick_;
-			volatile uint16_t	ovf_tick_;
 			volatile uint32_t	tgr_adr_;
 			volatile uint32_t	cap_count_;
+			volatile uint16_t	cap_tick_;
+			volatile uint16_t	ovf_tick_;
 			volatile uint16_t	ovf_limit_;
 			volatile uint16_t	ovf_count_;
 
-			task_t() : cap_tick_(0), ovf_tick_(0),
-				tgr_adr_(MTUX::TGRA.address()), cap_count_(0),
+			task_t() : tgr_adr_(MTUX::TGRA.address()), cap_count_(0),
+				cap_tick_(0), ovf_tick_(0),
 				ovf_limit_(1221), ovf_count_(0) { }
 
 			void clear() {
@@ -69,8 +69,7 @@ namespace device {
 			}
 
 			void load_cap() {
-				cap_count_ = rd16_(tgr_adr_);
-				cap_count_ |= static_cast<uint32_t>(ovf_tick_) << 16;
+				cap_count_ = (static_cast<uint32_t>(ovf_tick_) << 16) | rd16_(tgr_adr_);
 			}
 		};
 
@@ -78,7 +77,7 @@ namespace device {
 		static MTASK	mtask_;
 		static OTASK	otask_;
 
-		uint32_t	clk_limit_;
+		uint32_t	clk_base_;
 
 		static INTERRUPT_FUNC void cap_task_()
 		{
@@ -105,16 +104,25 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		mtu_io() : clk_limit_(F_PCLKA) { }
+		mtu_io() noexcept : clk_base_(F_PCLKA) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  リミット・クロックの設定
-			@param[in]	clk	リミット・クロック
+			@brief  ベース・クロックの設定
+			@param[in]	clk	ベース・クロック
 		*/
 		//-----------------------------------------------------------------//
-		void set_limit_clock(uint32_t clk) { clk_limit_ = clk; }
+		void set_base_clock(uint32_t clk) noexcept { clk_base_ = clk; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ベース・クロックの取得
+			@return ベース・クロック
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_base_clock() const noexcept { return clk_base_; }
 
 
 		//-----------------------------------------------------------------//
@@ -124,12 +132,14 @@ namespace device {
 					変更が可能。
 			@param[in]	ch		入力チャネル
 			@param[in]	et		エッジ・タイプ
-			@param[in]	level	割り込みレベル
+			@param[in]	level	割り込みレベル（割り込みを使わない場合エラー）
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_capture(typename MTUX::channel ch, edge_type et, uint8_t level = 0)
+		bool start_capture(typename MTUX::channel ch, edge_type et, uint8_t level) noexcept
 		{
+			if(level == 0) return false;
+
 			if(MTUX::get_peripheral() == peripheral::MTU5) {  // MTU5 はインプットキャプチャとして利用不可
 				return false;
 			}
@@ -187,7 +197,7 @@ namespace device {
 			@param[in]	limit	インプット・キャプチャ、リミット
 		*/
 		//-----------------------------------------------------------------//
-		void set_capture_limit(uint16_t limit)
+		void set_capture_limit(uint16_t limit) noexcept
 		{
 			task_t_.limit_ovf_ = limit;
 		}
@@ -199,7 +209,7 @@ namespace device {
 			@return インプット・キャプチャのオーバーフローカウント
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_capture_ovf() const
+		uint16_t get_capture_ovf() const noexcept
 		{
 			return task_t_.ovf_count_;
 		}
@@ -211,7 +221,7 @@ namespace device {
 			@return インプット・キャプチャカウント
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_capture_tick() const
+		uint16_t get_capture_tick() const noexcept
 		{
 			return task_t_.cap_tick_;
 		}
@@ -223,7 +233,7 @@ namespace device {
 			@return インプット・キャプチャ値
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_capture() const
+		uint32_t get_capture() const noexcept
 		{
 			return task_t_.cap_count_;
 		}
@@ -235,7 +245,7 @@ namespace device {
 			@return MTASK クラス
 		*/
 		//-----------------------------------------------------------------//
-		static MTASK& at_main_task() { return mtask_; }
+		static MTASK& at_main_task() noexcept { return mtask_; }
 
 
 		//-----------------------------------------------------------------//
@@ -244,7 +254,7 @@ namespace device {
 			@return OTASK クラス
 		*/
 		//-----------------------------------------------------------------//
-		static OTASK& at_ovfl_task() { return otask_; }
+		static OTASK& at_ovfl_task() noexcept { return otask_; }
 	};
 
 	template <class MTUX, class MTASK, class OTASK>
