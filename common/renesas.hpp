@@ -85,6 +85,7 @@
 #include "RX64M/flash_io.hpp"
 #include "RX64M/ether_io.hpp"
 #include "RX64M/ssi.hpp"
+#include "RX64M/src.hpp"
 #include "RX64M/sdhi.hpp"
 
 #else
