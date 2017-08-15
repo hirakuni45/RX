@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T グループ・MTU3 定義
+	@brief	RX24T グループ・MTU3d 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -174,12 +174,12 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tior_t : public rw8_t<base> {
+		struct tiorh_t : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1142,6 +1142,7 @@ namespace device {
 		static tadstrgr1_t<0x000C1D32> TADSTRGR1;
 
 	};
+	typedef mtu_t MTU;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1207,13 +1208,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  有効にする(MTU0)
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true)
+		{
+			MTU::TSTRA.CST0 = 1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートを有効にする(MTU0)
 			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable_port(channel ch, bool enable = true)
 		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
 			case channel::A:					
@@ -1262,10 +1278,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1302> TIOR;
+		static tiorh_t<0x000C1302> TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -1274,6 +1290,38 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static tiorl_t<0x000C1303> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -1451,13 +1499,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  有効にする(MTU1)
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true)
+		{
+			MTU::TSTRA.CST1 = 1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートを有効にする(MTU1)
 			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable_port(channel ch, bool enable = true)
 		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
 			case channel::A:					
@@ -1518,10 +1581,36 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1382> TIOR;
+		static tiorh_t<0x000C1382> TIORH;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -1702,13 +1791,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  有効にする(MTU2)
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true)
+		{
+			MTU::TSTRA.CST2 = 1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートを有効にする(MTU2)
 			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable_port(channel ch, bool enable = true)
 		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
 			case channel::A:					
@@ -1749,10 +1853,36 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1402> TIOR;
+		static tiorh_t<0x000C1402> TIORH;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -1889,13 +2019,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  有効にする(MTU3)
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true)
+		{
+			MTU::TSTRA.CST3 = 1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートを有効にする(MTU3)
 			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable_port(channel ch, bool enable = true)
 		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
 			case channel::A:					
@@ -1944,10 +2089,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1204> TIOR;
+		static tiorh_t<0x000C1204> TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -1956,6 +2101,38 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static tiorl_t<0x000C1205> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -2125,13 +2302,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  有効にする(MTU4)
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true)
+		{
+			MTU::TSTRA.CST4 = 1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートを有効にする(MTU4)
 			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable_port(channel ch, bool enable = true)
 		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
 			case channel::A:					
@@ -2180,10 +2372,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1206> TIOR;
+		static tiorh_t<0x000C1206> TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -2192,6 +2384,38 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static tiorl_t<0x000C1207> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -2426,6 +2650,20 @@ namespace device {
 		};
 
 
+#if 0
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  有効にする(MTU5)
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true)
+		{
+			MTU::TSTRA.CST5 = 1;
+		}
+#endif
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポートを有効にする(MTU5)
@@ -2433,8 +2671,11 @@ namespace device {
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable_port(channel ch, bool enable = true)
 		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
 			case channel::U:
@@ -2530,7 +2771,7 @@ namespace device {
 			@brief  タイマ I/O コントロールレジスタ（TIORU）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1C86> TIORU;
+		static tior_t<0x000C1C86> TIORU;
 
 
 		//-----------------------------------------------------------------//
@@ -2538,7 +2779,7 @@ namespace device {
 			@brief  タイマ I/O コントロールレジスタ（TIORV）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1C96> TIORV;
+		static tior_t<0x000C1C96> TIORV;
 
 
 		//-----------------------------------------------------------------//
@@ -2546,7 +2787,7 @@ namespace device {
 			@brief  タイマ I/O コントロールレジスタ（TIORW）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1CA6> TIORW;
+		static tior_t<0x000C1CA6> TIORW;
 
 
 		//-----------------------------------------------------------------//
@@ -2768,13 +3009,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  有効にする(MTU6)
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true)
+		{
+			MTU::TSTRB.CST6 = 1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートを有効にする(MTU6)
 			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable_port(channel ch, bool enable = true)
 		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
 			case channel::A:
@@ -2823,10 +3079,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1A04> TIOR;
+		static tiorh_t<0x000C1A04> TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -2835,6 +3091,38 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static tiorl_t<0x000C1A05> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -3030,13 +3318,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  有効にする(MTU7)
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true)
+		{
+			MTU::TSTRB.CST7 = 1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートを有効にする(MTU7)
 			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable_port(channel ch, bool enable = true)
 		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
 			case channel::A:
@@ -3085,10 +3388,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1A06> TIOR;
+		static tiorh_t<0x000C1A06> TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -3097,6 +3400,38 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static tiorl_t<0x000C1A07> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -3339,13 +3674,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  有効にする(MTU9)
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true)
+		{
+			MTU::TSTRA.CST9 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ポートを有効にする(MTU9)
 			@param[in]	channel	チャネル
 			@param[in]	enable	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable_port(channel ch, bool enable = true)
 		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
 			uint8_t sel = enable ? 0b00001 : 0;
 			switch(ch) {
 			case channel::A:
@@ -3394,10 +3744,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1582> TIOR;
+		static tiorh_t<0x000C1582> TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -3406,6 +3756,38 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static tiorl_t<0x000C1583> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -3526,7 +3908,6 @@ namespace device {
 		}
 	};
 
-	typedef mtu_t MTU;
 	typedef mtu0_t<peripheral::MTU0> MTU0;
 	typedef mtu1_t<peripheral::MTU1> MTU1;
 	typedef mtu2_t<peripheral::MTU2> MTU2;

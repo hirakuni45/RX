@@ -28,10 +28,11 @@ namespace device {
 	/*!
 		@brief  MTU 制御クラス
 		@param[in]	MTU	MTU ユニット
-		@param[in]	TASK	割り込みタスク
+		@param[in]	MTASK	メイン割り込みタスク
+		@param[in]	OTASK	オーバーフロー割り込みタスク
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class MTUX, class TASK = utils::null_task>
+	template <class MTUX, class MTASK = utils::null_task, class OTASK = utils::null_task>
 	class mtu_io {
 	public:
 
@@ -43,31 +44,59 @@ namespace device {
 		enum class edge_type : uint8_t {
 			positive,	///< 立ち上がり
 			negative,	///< 立下り
-			dual = 2,	///< 両エッジ
+			dual,		///< 両エッジ
 		};
 
 	private:
 
 		struct task_t {
-			volatile uint16_t	cap_cnt_;
-			volatile uint16_t	ovf_cnt_;
+			volatile uint16_t	cap_tick_;
+			volatile uint16_t	ovf_tick_;
+			volatile uint32_t	tgr_adr_;
+			volatile uint32_t	cap_count_;
+			volatile uint16_t	ovf_limit_;
+			volatile uint16_t	ovf_count_;
 
-			task_t() : cap_cnt_(0), ovf_cnt_(0) { }
+			task_t() : cap_tick_(0), ovf_tick_(0),
+				tgr_adr_(MTUX::TGRA.address()), cap_count_(0),
+				ovf_limit_(1221), ovf_count_(0) { }
+
+			void clear() {
+				cap_tick_ = 0;
+				ovf_tick_ = 0;
+				cap_count_ = 0;
+				ovf_count_ = 0;
+			}
+
+			void load_cap() {
+				cap_count_ = rd16_(tgr_adr_);
+				cap_count_ |= static_cast<uint32_t>(ovf_tick_) << 16;
+			}
 		};
+
 		static task_t	task_t_;
-		static TASK		task_;
+		static MTASK	mtask_;
+		static OTASK	otask_;
 
 		uint32_t	clk_limit_;
-		uint32_t	tgr_adr_;
 
 		static INTERRUPT_FUNC void cap_task_()
 		{
-			++task_t_.cap_cnt_;
+			++task_t_.cap_tick_;
+			task_t_.load_cap();
+			mtask_();
+			task_t_.ovf_tick_ = 0;
 		}
 
 		static INTERRUPT_FUNC void ovf_task_()
 		{
-			++task_t_.ovf_cnt_;
+			++task_t_.ovf_tick_;
+			if(task_t_.ovf_tick_ >= task_t_.ovf_limit_) {
+				task_t_.ovf_tick_ = 0;
+				MTUX::TCNT = 0;
+				++task_t_.ovf_count_;
+			}
+			otask_();
 		}
 
 	public:
@@ -76,7 +105,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		mtu_io() : clk_limit_(F_PCLKA), tgr_adr_(MTUX::TGRA.address()) { }
+		mtu_io() : clk_limit_(F_PCLKA) { }
 
 
 		//-----------------------------------------------------------------//
@@ -90,7 +119,9 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  インプットキャプチャ開始
+			@brief  インプットキャプチャ開始 @n
+					※カウントクロックは「set_limit_clock」により @n
+					変更が可能。
 			@param[in]	ch		入力チャネル
 			@param[in]	et		エッジ・タイプ
 			@param[in]	level	割り込みレベル
@@ -103,103 +134,62 @@ namespace device {
 				return false;
 			}
 
+			uint8_t idx = static_cast<uint8_t>(ch);
+			if(idx >= 4) return false; 
+
 			power_cfg::turn(MTUX::get_peripheral());
+			MTUX::enable_port(ch);
 
-			MTUX::enable(ch);  // ポートを有効にする
-
-			uint8_t cclr = 0;
-			ICU::VECTOR cvec;
-			switch(static_cast<uint8_t>(ch)) {
-			case 0:
-				cclr = 0b001;
-				cvec = MTUX::get_vec(MTUX::interrupt::A);
-				MTUX::TIOR = MTUX::TIOR.IOA.b(0b1000);
-				break;
-			case 1:
-				cclr = 0b010;
-				cvec = MTUX::get_vec(MTUX::interrupt::B);
-				MTUX::TIOR = MTUX::TIOR.IOB.b(0b1000);
-				break;
-			case 2:
-				cclr = 0b101;
-				cvec = MTUX::get_vec(static_cast<typename MTUX::interrupt>(2));
-//				MTUX::TIORL = MTUX::TIORL.IOC.b(0b1000);
-				break;
-			case 3:
-				cclr = 0b110;
-				cvec = MTUX::get_vec(static_cast<typename MTUX::interrupt>(3));
-//				MTUX::TIORL = MTUX::TIORL.IOD.b(0b1000);
-				break;
-			default:
-				return false;
+			uint8_t etd = 0;
+			switch(et) {
+			case edge_type::positive: etd = 0b1000; break;
+			case edge_type::negative: etd = 0b1001; break;
+			case edge_type::dual:     etd = 0b1011; break;
+			default: break;
 			}
+			MTUX::TIOR.set(ch, etd);
+
 			uint8_t dv = 0;
+			static const uint8_t cclr[4] = { 0b001, 0b010, 0b101, 0b110 };
+			// CKEG: 立ち上がりエッジでカウントアップ
 			MTUX::TCR  = MTUX::TCR.TPSC.b(dv)
-					   | MTUX::TCR.CKEG.b(static_cast<uint8_t>(et))
-					   | MTUX::TCR.CCLR.b(cclr);
+					   | MTUX::TCR.CKEG.b(0b00)
+					   | MTUX::TCR.CCLR.b(cclr[idx]);  // ※インプットキャプチャ入力で TCNT はクリア
 			MTUX::TCR2  = 0x00;
-			MTUX::TMDR1 = 0x00;
-			MTU::TMDR2A = 0x00;
-			MTU::TMDR2B = 0x00;
+			MTUX::TMDR1 = 0x00;  // 通常動作
 
 			if(level > 0) {
-				MTUX::TIER = (1 << static_cast<uint8_t>(ch)) | MTUX::TIER.TCIEV.b();
 				set_interrupt_task(ovf_task_, static_cast<uint32_t>(MTUX::get_vec(MTUX::interrupt::OVF)));
+				icu_mgr::set_level(MTUX::get_vec(MTUX::interrupt::OVF), level);
+				ICU::VECTOR cvec = MTUX::get_vec(static_cast<typename MTUX::interrupt>(ch));
 				set_interrupt_task(cap_task_, static_cast<uint32_t>(cvec));
-				icu_mgr::set_level(MTUX::get_peripheral(), level);
+				icu_mgr::set_level(MTUX::get_vec(static_cast<typename MTUX::interrupt>(ch)), level);
+				MTUX::TIER = (1 << static_cast<uint8_t>(ch)) | MTUX::TIER.TCIEV.b();
 			}
 
-			task_t_.cap_cnt_ = 0;
-			task_t_.ovf_cnt_ = 0;
+			task_t_.clear();
 
-			tgr_adr_ = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
-// utils::format("TGR: 0x%08X\n") % tgr_adr_;
-			wr16_(tgr_adr_, 0x0000);
+			// 各チャネルに相当するジャネラルレジスタ
+			task_t_.tgr_adr_ = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
+			wr16_(task_t_.tgr_adr_, 0x0000);
 
 			MTUX::TCNT = 0;
 
-			switch(MTUX::get_peripheral()) {
-			case peripheral::MTU0:
-				MTU::TSTRA.CST0 = 1;
-				break;
-			case peripheral::MTU1:
-				MTU::TSTRA.CST1 = 1;
-				break;
-			case peripheral::MTU2:
-				MTU::TSTRA.CST2 = 1;
-				break;
-			case peripheral::MTU3:
-				MTU::TSTRA.CST3 = 1;
-				break;
-			case peripheral::MTU4:
-				MTU::TSTRA.CST4 = 1;
-				break;
-			case peripheral::MTU6:
-				MTU::TSTRB.CST6 = 1;
-				break;
-			case peripheral::MTU7:
-				MTU::TSTRB.CST7 = 1;
-				break;
-			case peripheral::MTU9:
-				MTU::TSTRA.CST9 = 1;
-				break;
-			default:
-				return false;
-				break;
-			}
+			MTUX::enable();
+
 			return true;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  インプット・キャプチャをリセット
+			@brief  インプット・キャプチャ、リミットの設定
+			@param[in]	limit	インプット・キャプチャ、リミット
 		*/
 		//-----------------------------------------------------------------//
-		void reset_capture()
+		void set_capture_limit(uint16_t limit)
 		{
-			MTUX::TCNT = 0;
-			task_t_.ovf_cnt_ = 0;
+			task_t_.limit_ovf_ = limit;
 		}
 
 
@@ -209,8 +199,21 @@ namespace device {
 			@return インプット・キャプチャのオーバーフローカウント
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_capture_ovf() const {
-			return task_t_.ovf_cnt_;
+		uint16_t get_capture_ovf() const
+		{
+			return task_t_.ovf_count_;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  インプット・キャプチャカウント取得
+			@return インプット・キャプチャカウント
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_capture_tick() const
+		{
+			return task_t_.cap_tick_;
 		}
 
 
@@ -220,21 +223,32 @@ namespace device {
 			@return インプット・キャプチャ値
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_capture() const {
-			uint32_t cap = rd16_(tgr_adr_);
-			return (static_cast<uint32_t>(task_t_.ovf_cnt_) << 16) | cap;
+		uint32_t get_capture() const
+		{
+			return task_t_.cap_count_;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  TASK クラスの参照
-			@return TASK クラス
+			@brief  MTASK クラスの参照
+			@return MTASK クラス
 		*/
 		//-----------------------------------------------------------------//
-		static TASK& at_task() { return task_; }
+		static MTASK& at_main_task() { return mtask_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  OTASK クラスの参照
+			@return OTASK クラス
+		*/
+		//-----------------------------------------------------------------//
+		static OTASK& at_ovfl_task() { return otask_; }
 	};
 
-	template <class MTUX, class TASK> typename mtu_io<MTUX, TASK>::task_t mtu_io<MTUX, TASK>::task_t_;
-	template <class MTUX, class TASK> TASK mtu_io<MTUX, TASK>::task_;
+	template <class MTUX, class MTASK, class OTASK>
+		typename mtu_io<MTUX, MTASK, OTASK>::task_t mtu_io<MTUX, MTASK, OTASK>::task_t_;
+	template <class MTUX, class MTASK, class OTASK> MTASK mtu_io<MTUX, MTASK, OTASK>::mtask_;
+	template <class MTUX, class MTASK, class OTASK> OTASK mtu_io<MTUX, MTASK, OTASK>::otask_;
 }
