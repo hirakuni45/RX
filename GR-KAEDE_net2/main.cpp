@@ -1,8 +1,10 @@
 //=====================================================================//
 /*! @file
-    @brief  GR-KAEDE_net (RX64M) メイン @n
-			Copyright 2017 Kunihito Hiramatsu
+    @brief  GR-KAEDE_net (RX64M) メイン
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/renesas.hpp"
