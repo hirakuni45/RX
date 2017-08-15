@@ -73,7 +73,6 @@
 #include "RX64M/port_map.hpp"
 #include "RX64M/power_cfg.hpp"
 #include "RX64M/icu_mgr.hpp"
-#include "RX64M/sdhi.hpp"
 #include "RX64M/s12adc.hpp"
 #include "RX64M/r12da.hpp"
 #include "RX64M/adc_io.hpp"
@@ -85,6 +84,8 @@
 #include "RX64M/flash.hpp"
 #include "RX64M/flash_io.hpp"
 #include "RX64M/ether_io.hpp"
+#include "RX64M/ssi.hpp"
+#include "RX64M/sdhi.hpp"
 
 #else
 #  error "Requires SIG_XXX to be defined"
