@@ -1492,7 +1492,7 @@ namespace device {
 		enum class interrupt : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 			UDF,	///< TCIU アンダーフロー
 		};
 
@@ -1784,7 +1784,7 @@ namespace device {
 		enum class interrupt : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 			UDF,	///< TCIU アンダーフロー
 		};
 
