@@ -1220,40 +1220,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU0)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static void enable_port(channel ch, bool enable = true)
-		{
-			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:					
-					MPC::PB3PFS.PSEL = sel;  // MTIOC0A
-					PORTB::PMR.B3 = enable;
-				break;
-			case channel::B:
-					MPC::PB2PFS.PSEL = sel;  // MTIOC0B
-					PORTB::PMR.B2 = enable;
-				break;
-			case channel::C:
-					MPC::PB1PFS.PSEL = sel;  // MTIOC0C
-					PORTB::PMR.B1 = enable;
-				break;
-			case channel::D:
-					MPC::PB0PFS.PSEL = sel;  // MTIOC0D
-					PORTB::PMR.B0 = enable;
-				break;
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -1506,32 +1472,6 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST1 = 1;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ポートを有効にする(MTU1)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static void enable_port(channel ch, bool enable = true)
-		{
-			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:					
-					MPC::PA5PFS.PSEL = sel;  // MTIOC1A
-					PORTA::PMR.B5 = enable;
-				break;
-			case channel::B:
-					MPC::PA4PFS.PSEL = sel;  // MTIOC1B
-					PORTA::PMR.B4 = enable;
-				break;
-			}
 		}
 
 
@@ -1803,32 +1743,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU2)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static void enable_port(channel ch, bool enable = true)
-		{
-			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:					
-					MPC::PA3PFS.PSEL = sel;  // MTIOC2A
-					PORTA::PMR.B3 = enable;
-				break;
-			case channel::B:
-					MPC::PA2PFS.PSEL = sel;  // MTIOC2B
-					PORTA::PMR.B2 = enable;
-				break;
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -2026,40 +1940,6 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST3 = 1;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ポートを有効にする(MTU3)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static void enable_port(channel ch, bool enable = true)
-		{
-			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:					
-					MPC::P33PFS.PSEL = sel;  // MTIOC3A
-					PORT3::PMR.B3 = enable;
-				break;
-			case channel::B:
-					MPC::P71PFS.PSEL = sel;  // MTIOC3B
-					PORT7::PMR.B1 = enable;
-				break;
-			case channel::C:
-					MPC::P32PFS.PSEL = sel;  // MTIOC3C
-					PORT3::PMR.B2 = enable;
-				break;
-			case channel::D:
-					MPC::P74PFS.PSEL = sel;  // MTIOC3D
-					PORT7::PMR.B4 = enable;
-				break;
-			}
 		}
 
 
@@ -2309,40 +2189,6 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST4 = 1;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ポートを有効にする(MTU4)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static void enable_port(channel ch, bool enable = true)
-		{
-			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:					
-					MPC::P72PFS.PSEL = sel;  // MTIOC4A
-					PORT7::PMR.B2 = enable;
-				break;
-			case channel::B:
-					MPC::P73PFS.PSEL = sel;  // MTIOC4B
-					PORT7::PMR.B3 = enable;
-				break;
-			case channel::C:
-					MPC::P75PFS.PSEL = sel;  // MTIOC4C
-					PORT7::PMR.B5 = enable;
-				break;
-			case channel::D:
-					MPC::P76PFS.PSEL = sel;  // MTIOC4D
-					PORT7::PMR.B6 = enable;
-				break;
-			}
 		}
 
 
@@ -2664,48 +2510,6 @@ namespace device {
 #endif
 
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ポートを有効にする(MTU5)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static void enable_port(channel ch, bool enable = true)
-		{
-			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::U:
-					MPC::P24PFS.PSEL = sel;  // MTIOC5U
-					PORT2::PMR.B4 = enable;
-				break;
-			case channel::V:
-					MPC::P23PFS.PSEL = sel;  // MTIOC5V
-					PORT2::PMR.B3 = enable;
-				break;
-			case channel::W:
-					MPC::P22PFS.PSEL = sel;  // MTIOC5W
-					PORT2::PMR.B2 = enable;
-				break;
-			case channel::U2:
-					MPC::P82PFS.PSEL = sel;  // MTIOC5U
-					PORT8::PMR.B2 = enable;
-				break;
-			case channel::V2:
-					MPC::P81PFS.PSEL = sel;  // MTIOC5V
-					PORT8::PMR.B1 = enable;
-				break;
-			case channel::W2:
-					MPC::P80PFS.PSEL = sel;  // MTIOC5W
-					PORT8::PMR.B0 = enable;
-				break;
-			}
-		}
-
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  タイマコントロールレジスタ（TCR[UVW]）
@@ -3021,40 +2825,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU6)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static void enable_port(channel ch, bool enable = true)
-		{
-			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:
-					MPC::PA1PFS.PSEL = sel;  // MTIOC6A
-					PORTA::PMR.B1 = enable;
-				break;
-			case channel::B:
-					MPC::P95PFS.PSEL = sel;  // MTIOC6B
-					PORT9::PMR.B5 = enable;
-				break;
-			case channel::C:
-					MPC::PA0PFS.PSEL = sel;  // MTIOC6C
-					PORTA::PMR.B0 = enable;
-				break;
-			case channel::D:
-					MPC::P92PFS.PSEL = sel;  // MTIOC6D
-					PORT9::PMR.B2 = enable;
-				break;
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -3325,40 +3095,6 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRB.CST7 = 1;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ポートを有効にする(MTU7)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static void enable_port(channel ch, bool enable = true)
-		{
-			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:
-					MPC::P94PFS.PSEL = sel;  // MTIOC7A
-					PORT9::PMR.B4 = enable;
-				break;
-			case channel::B:
-					MPC::P93PFS.PSEL = sel;  // MTIOC7B
-					PORT9::PMR.B3 = enable;
-				break;
-			case channel::C:
-					MPC::P91PFS.PSEL = sel;  // MTIOC7C
-					PORT9::PMR.B1 = enable;
-				break;
-			case channel::D:
-					MPC::P90PFS.PSEL = sel;  // MTIOC7D
-					PORT9::PMR.B0 = enable;
-				break;
-			}
 		}
 
 
@@ -3681,40 +3417,6 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST9 = ena;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ポートを有効にする(MTU9)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static void enable_port(channel ch, bool enable = true)
-		{
-			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:
-					MPC::PD7PFS.PSEL = sel;  // MTIOC9A
-					PORTD::PMR.B7 = enable;
-				break;
-			case channel::B:
-					MPC::PE0PFS.PSEL = sel;  // MTIOC9B
-					PORTE::PMR.B0 = enable;
-				break;
-			case channel::C:
-					MPC::PD6PFS.PSEL = sel;  // MTIOC9C
-					PORTD::PMR.B6 = enable;
-				break;
-			case channel::D:
-					MPC::PE1PFS.PSEL = sel;  // MTIOC9D
-					PORTE::PMR.B1 = enable;
-				break;
-			}
 		}
 
 

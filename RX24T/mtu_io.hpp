@@ -38,13 +38,12 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  キャプチャー・タイプ
+			@brief  ＰＷＭタイプ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class capture_type : uint8_t {
-			positive,	///< 立ち上がり
-			negative,	///< 立下り
-			dual,		///< 両エッジ
+		enum class pwm_type : uint8_t {
+			low_to_high,	///< 初期０で、変化で１
+			high_to_low,	///< 初期１で、変化で０
 		};
 
 
@@ -57,6 +56,18 @@ namespace device {
 			low_to_high,		///< 初期０で、変化で１
 			high_to_low,		///< 初期１で、変化で０
 			toggle,				///< トグル出力
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  キャプチャー・タイプ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class capture_type : uint8_t {
+			positive,	///< 立ち上がり
+			negative,	///< 立下り
+			dual,		///< 両エッジ
 		};
 
 
@@ -152,6 +163,24 @@ namespace device {
 			MTUX::TCR2 = MTUX::TCR2.TPSC2.b((ckt[dv] >> 3) & 7);
 		}
 
+
+		bool make_clock_(uint32_t frq, uint8_t& dv, uint32_t& match)
+		{
+			dv = 0;
+			match = F_PCLKA / frq;
+			while(match < 65536) {
+				++dv;
+				bool mod = match & 1;
+				match /= 2;
+				if(mod) ++match;
+			}
+			if(dv > 10) {
+				// overflow clock divide...
+				return false;
+			}
+			return true;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -188,6 +217,36 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ＰＷＭ出力開始
+			@param[in]	ch		出力チャネル
+			@param[in]	ot		出力タイプ
+			@param[in]	frq		周期
+			@param[in]	level	割り込みレベル
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool start_pwm(typename MTUX::channel ch, pwm_type ot, uint32_t frq, uint8_t level = 0)
+		{
+			power_cfg::turn(MTUX::get_peripheral());
+
+			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch));
+
+			uint8_t dv;
+			uint32_t match;
+			if(!make_clock_(frq, dv, match)) {
+				return false;
+			}
+
+
+
+
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  出力開始（コンペア・マッチ・タイマー）
 			@param[in]	ch		出力チャネル
 			@param[in]	ot		出力タイプ
@@ -198,20 +257,17 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start_output(typename MTUX::channel ch, output_type ot, uint32_t frq, uint8_t level = 0) noexcept
 		{
+			if(MTUX::get_peripheral() == peripheral::MTU5) {  // MTU5 は通常出力として利用不可
+				return false;
+			}
+
 			power_cfg::turn(MTUX::get_peripheral());
 
-			MTUX::enable_port(ch);
+			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch));
 
-			uint8_t dv = 0;
-			uint32_t match = F_PCLKA / frq;
-			while(match < 65536) {
-				++dv;
-				bool mod = match & 1;
-				match /= 2;
-				if(mod) ++match;
-			}
-			if(dv > 10) {
-				// overflow clock divide...
+			uint8_t dv;
+			uint32_t match;
+			if(!make_clock_(frq, dv, match)) {
 				return false;
 			}
 
@@ -273,7 +329,7 @@ namespace device {
 
 			power_cfg::turn(MTUX::get_peripheral());
 
-			MTUX::enable_port(ch);
+			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch));
 
 			uint8_t ctd = 0;
 			switch(ct) {
