@@ -45,11 +45,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  systen_io クラス
-		@param[in]	base_clock	ベース・クロック（水晶発信又は、入力クロック）@n
-					※標準１０ＭＨｚ
+		@param[in]	base_clock	ベース・クロック周波数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base_clock = 10000000>
+	template <uint32_t base_clock>
 	struct system_io {
 
 		//-------------------------------------------------------------//
@@ -64,13 +63,19 @@ namespace device {
 		{
 			device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
 
-			device::SYSTEM::MEMWAIT = 0b10; // 80MHz 動作 wait 設定
+			// メモリーの WAIT 設定
+			if(F_ICLK > 64000000) {
+				device::SYSTEM::MEMWAIT = 0b10; // 64MHz 以上 wait 設定
+			} else if(F_ICLK > 32000000) {
+				device::SYSTEM::MEMWAIT = 0b01; // 32MHz 以上 64MHz 以下 wait 設定 
+			} else {
+				device::SYSTEM::MEMWAIT = 0b00; // wait 無し
+			}
 
 			while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
 			device::SYSTEM::OPCCR = 0;  // 高速モード選択
 			while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
 
-			// clock osc 10MHz
 			device::SYSTEM::MOSCWTCR = 9;	// 4ms wait
 			// メインクロック・ドライブ能力設定、内部発信
 			device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV21.b(1);
@@ -106,7 +111,8 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKA.b(pcka)	 // Max: 80MHz
 								  | device::SYSTEM::SCKCR.PCKB.b(pckb)	 // Max: 40MHz
 								  | device::SYSTEM::SCKCR.PCKD.b(pckd);	 // Max: 40MHz
-			device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
+
+			device::SYSTEM::SCKCR3.CKSEL = 0b100;	// PLL 選択
 
 			return true;
 		}
