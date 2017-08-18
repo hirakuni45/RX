@@ -1,7 +1,12 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・ポート・レジスター定義
+	@brief	RX600 グループ・ポート・レジスター定義 @n
+                P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 PA PB PC PD PE PF PG PJ @n
+    RX24T ODR0  o  o  o  o  x  x  x  o  o  o  o  o  x  o  o  -  -  -  @n
+          ODR1  x  x  o  x  x  x  x  o  x  o  o  o  x  o  o  -  -  -  @n
+    RX64M ODR0  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  @n
+          ODR1  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,13 +19,15 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  ポート定義基底クラス（PDR, PODR, PIDR, PMR, ODR0, ODR1, PCR, DSCR）
+		@brief  ポート定義基底クラス（PDR, PODR, PIDR, PMR, PCR, DSCR）
+		@param[in]	base	ベースアドレス
+		@param[in]	option	オプション
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
-	struct port_t {
+	template <uint32_t base, class option>
+	struct port_t : public option {
 
-		static const uint32_t base_address_ = base;
+		static const uint32_t base_address_ = base;	///< ベースアドレス
 
 
 		//-----------------------------------------------------------------//
@@ -57,12 +64,49 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  プルアップ制御レジスタ（PCR）
+		*/
+		//-----------------------------------------------------------------//
+		static basic_rw_t<rw8_t<base + 0xC0> > PCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  駆動能力制御レジスタ（DSCR）
+		*/
+		//-----------------------------------------------------------------//
+		static basic_rw_t<rw8_t<base + 0xE0> > DSCR;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ODR 無し
+		@param[in]	base	ベースアドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base> struct odr_xx_t { };
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ODR 全体定義 (ODR0, ODR1) @n
+				※RX64M, RX71M
+		@param[in]	base	ベースアドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base>
+	struct odr_oo_t {
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  オープンドレイン制御レジスタ 0（ODR0）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
 		struct odr0_t : public rw8_t<ofs> {
+
 			typedef rw8_t<ofs>  io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -71,11 +115,13 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> B0;
 			bit_rw_t<io_, bitpos::B2> B2;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			bit_rw_t<io_, bitpos::B3> B3;
+#endif
 			bit_rw_t<io_, bitpos::B4> B4;
 			bit_rw_t<io_, bitpos::B6> B6;
 		};
-		static odr0_t<base + 0x80> ODR0;
+		static odr0_t<base + 0> ODR0;
 
 
 		//-----------------------------------------------------------------//
@@ -97,44 +143,82 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> B4;
 			bit_rw_t<io_, bitpos::B6> B6;
 		};
-		static odr1_t<base + 0x81> ODR1;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  プルアップ制御レジスタ（PCR）
-		*/
-		//-----------------------------------------------------------------//
-		static basic_rw_t<rw8_t<base + 0xC0> > PCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  駆動能力制御レジスタ（DSCR）
-		*/
-		//-----------------------------------------------------------------//
-		static basic_rw_t<rw8_t<base + 0xE0> > DSCR;
-
+		static odr1_t<base + 1> ODR1;
 	};
 
-	typedef port_t<0x0008C000> PORT0;
-	typedef port_t<0x0008C001> PORT1;
-	typedef port_t<0x0008C002> PORT2;
-	typedef port_t<0x0008C003> PORT3;
-	typedef port_t<0x0008C004> PORT4;
-	typedef port_t<0x0008C005> PORT5;
-	typedef port_t<0x0008C006> PORT6;
-	typedef port_t<0x0008C007> PORT7;
-	typedef port_t<0x0008C008> PORT8;
-	typedef port_t<0x0008C009> PORT9;
-	typedef port_t<0x0008C00A> PORTA;
-	typedef port_t<0x0008C00B> PORTB;
-	typedef port_t<0x0008C00C> PORTC;
-	typedef port_t<0x0008C00D> PORTD;
-	typedef port_t<0x0008C00E> PORTE;
-	typedef port_t<0x0008C00F> PORTF;
-	typedef port_t<0x0008C010> PORTG;
-	typedef port_t<0x0008C012> PORTJ;
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ODR 全体定義 (ODR0)
+		@param[in]	base	ベースアドレス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base>
+	struct odr_ox_t {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オープンドレイン制御レジスタ 0（ODR0）@n
+					※RX24T
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct odr0_t : public rw8_t<ofs> {
+
+			typedef rw8_t<ofs>  io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> B0;
+			bit_rw_t<io_, bitpos::B2> B2;
+			bit_rw_t<io_, bitpos::B4> B4;
+			bit_rw_t<io_, bitpos::B6> B6;
+		};
+		static odr0_t<base> ODR0;
+	};
+
+
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
+	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
+	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
+	typedef port_t<0x0008C003, odr_oo_t<0x0008C086> > PORT3;
+	typedef port_t<0x0008C004, odr_oo_t<0x0008C088> > PORT4;
+	typedef port_t<0x0008C005, odr_oo_t<0x0008C08A> > PORT5;
+	typedef port_t<0x0008C006, odr_oo_t<0x0008C08C> > PORT6;
+	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
+	typedef port_t<0x0008C008, odr_oo_t<0x0008C090> > PORT8;
+	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
+	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
+	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
+	typedef port_t<0x0008C00C, odr_oo_t<0x0008C098> > PORTC;
+	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
+	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
+	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
+	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
+	typedef port_t<0x0008C012, odr_oo_t<0x0008C0A4> > PORTJ;
+#elif defined(SIG_RX24T) || defined(SIG_RX63T)
+//  ODR0  o  o  o  o  x  x  x  o  o  o  o  o  x  o  o  -  -  -
+//  ODR1  x  x  o  x  x  x  x  o  x  o  o  o  x  o  o  -  -  -
+	typedef port_t<0x0008C000, odr_ox_t<0x0008C080> > PORT0;
+	typedef port_t<0x0008C001, odr_ox_t<0x0008C082> > PORT1;
+	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
+	typedef port_t<0x0008C003, odr_ox_t<0x0008C086> > PORT3;
+	typedef port_t<0x0008C004, odr_xx_t<0x0008C088> > PORT4;
+	typedef port_t<0x0008C005, odr_xx_t<0x0008C08A> > PORT5;
+	typedef port_t<0x0008C006, odr_xx_t<0x0008C08C> > PORT6;
+	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
+	typedef port_t<0x0008C008, odr_ox_t<0x0008C090> > PORT8;
+	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
+	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
+	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
+	typedef port_t<0x0008C00C, odr_xx_t<0x0008C098> > PORTC;
+	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
+	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
+#endif
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
