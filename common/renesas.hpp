@@ -23,6 +23,7 @@
 #include "RX24T/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX24T/system.hpp"
+#include "RX24T/system_io.hpp"
 #include "RX24T/dtc.hpp"
 #include "RX24T/icu.hpp"
 #include "RX24T/mtu3.hpp"
