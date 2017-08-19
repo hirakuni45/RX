@@ -409,6 +409,27 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	タイマスタートレジスタ（TSTR）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct tstr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> CSW5;
+			bit_rw_t<io_, bitpos::B1> CSV5;
+			bit_rw_t<io_, bitpos::B2> CSU5;
+		};
+		static tstr_t<0x000C1CB4> TSTR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	タイマシンクロレジスタ（TSYRA）
 			@param[in]	base	ベースアドレス
 		*/
@@ -901,12 +922,12 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>      NFAEN;
-			bit_rw_t <io_, bitpos::B1>      NFBEN;
-			bit_rw_t <io_, bitpos::B2>      NFCEN;
-			bit_rw_t <io_, bitpos::B3>      NFDEN;
+			bit_rw_t <io_, bitpos::B0>     NFAEN;
+			bit_rw_t <io_, bitpos::B1>     NFBEN;
+			bit_rw_t <io_, bitpos::B2>     NFCEN;
+			bit_rw_t <io_, bitpos::B3>     NFDEN;
 
-			bits_rw_t <io_, bitpos::B4, 2>  NFCS;
+			bits_rw_t<io_, bitpos::B4, 2>  NFCS;
 		};
 
 
@@ -1376,6 +1397,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static nfcr_t<0x000C1290> NFCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ノイズフィルタコントロールレジスタクロック（NFCRC）
+		*/
+		//-----------------------------------------------------------------//
+		static nfcr_t<0x000C1299> NFCRC;
 
 
 		//-----------------------------------------------------------------//
