@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T グループ・省電力制御
+	@brief	RX24T グループ・省電力制御 @n
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016,2017 Kunihito Hiramatsu @n
 				Released under the MIT license @n

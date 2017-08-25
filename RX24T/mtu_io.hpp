@@ -38,17 +38,6 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ＰＷＭタイプ
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class pwm_type : uint8_t {
-			low_to_high,	///< 初期０で、変化で１
-			high_to_low,	///< 初期１で、変化で０
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
 			@brief  アウトプット・タイプ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -217,7 +206,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ＰＷＭ出力開始
+			@brief  ＰＷＭ出力開始（モード２）
 			@param[in]	ch		出力チャネル
 			@param[in]	ot		出力タイプ
 			@param[in]	frq		周期
@@ -225,8 +214,13 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_pwm(typename MTUX::channel ch, pwm_type ot, uint32_t frq, uint8_t level = 0)
+		bool start_pwm2(typename MTUX::channel ch, output_type ot, uint32_t frq, uint8_t level = 0)
 		{
+			auto ph = MTUX::get_peripheral();
+			if(peripheral::MTU3 <= ph && ph <= peripheral::MTU7) {
+				return false;
+			}
+
 			power_cfg::turn(MTUX::get_peripheral());
 
 			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch));
@@ -237,9 +231,50 @@ namespace device {
 				return false;
 			}
 
+			uint8_t ctd = 0;
+			switch(ot) {
+			case output_type::low_to_high: ctd = 0b0010; break;
+			case output_type::high_to_low: ctd = 0b0101; break;
+			case output_type::toggle:
+				{
+					ctd = 0b0111;
+					bool mod = match & 1;
+					match /= 2;
+					if(mod) ++match;
+				}
+				break;
+			default: break;
+			}
+			MTUX::TIOR.set(ch, ctd);
+
+			set_TCR_(ch, dv);
+			MTUX::TMDR1.MD = 0b0011;  // PWM mode 2
 
 
 
+
+
+			// 各チャネルに相当するジャネラルレジスタ
+			tt_.tgr_adr_ = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
+			wr16_(tt_.tgr_adr_, match - 1);
+
+			MTUX::TCNT = 0;
+			MTUX::enable();
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  PWM デューティー設定
+			@param[in]	ch		出力チャネル
+			@param[in]	duty	デューティー
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool set_duty(typename MTUX::channel ch, uint16_t duty) noexcept
+		{
 
 			return true;
 		}
@@ -310,6 +345,47 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  周期設定（コンペア・マッチ・タイマー周期）
+			@param[in]	ch		出力チャネル
+			@param[in]	frq		出力周波数
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool set_frq(typename MTUX::channel ch, uint32_t frq) noexcept
+		{
+			if(MTUX::get_peripheral() == peripheral::MTU5) {  // MTU5 は通常出力として利用不可
+				return false;
+			}
+
+			auto tior = MTUX::TIOR.get(ch);
+			// 出力に設定されていない
+			if(tior == 0b0010 || tior == 0b0101 || tior == 0b0111) ;
+			else return false;
+
+			uint8_t dv;
+			uint32_t match;
+			if(!make_clock_(frq, dv, match)) {
+				return false;
+			}
+
+			if(tior == 0b0111) {  // toggle なら１／２にする
+				bool mod = match & 1;
+				match /= 2;
+				if(mod) ++match;
+			}
+
+			if((match - 1) < MTUX::TCNT()) {
+				MTUX::TCNT = 0;
+			}
+
+			wr16_(tt_.tgr_adr_, match - 1);
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  インプットキャプチャ開始 @n
 					※カウントクロックは「set_limit_clock」により @n
 					変更が可能。
@@ -366,6 +442,24 @@ namespace device {
 			MTUX::enable();
 
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  停止
+		*/
+		//-----------------------------------------------------------------//
+		void stop() noexcept
+		{
+//			MTUX::TIOR.set(ch, 0x00);
+			MTUX::TIER = 0x00;
+			MTUX::enable(false);
+//			icu_mgr::set_level(MTUX::get_vec(MTUX::interrupt::OVF), 0);
+//			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch), false);
+			if(MTU::TSTRA() == 0 && MTU::TSTRB() == 0 && MTU::TSTR() == 0) {			
+				power_cfg::turn(MTUX::get_peripheral(), false);
+			}
 		}
 
 

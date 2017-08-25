@@ -1286,6 +1286,13 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
 
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
 			bool set(channel ch, uint8_t val)
 			{
 				switch(ch) {
@@ -1307,6 +1314,32 @@ namespace device {
 				return true;
 			}
 
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
 		};
 		static tior_t TIOR;
 
@@ -1563,6 +1596,13 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
 
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
 			bool set(channel ch, uint8_t val)
 			{
 				switch(ch) {
@@ -1578,6 +1618,26 @@ namespace device {
 				return true;
 			}
 
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				default:
+					return 0x00;
+				}
+			}
 		};
 		static tior_t TIOR;
 
@@ -1809,6 +1869,13 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
 
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
 			bool set(channel ch, uint8_t val)
 			{
 				switch(ch) {
@@ -1824,6 +1891,26 @@ namespace device {
 				return true;
 			}
 
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				default:
+					return 0x00;
+				}
+			}
 		};
 		static tior_t TIOR;
 
@@ -2019,6 +2106,13 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
 
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
 			bool set(channel ch, uint8_t val)
 			{
 				switch(ch) {
@@ -2040,6 +2134,32 @@ namespace device {
 				return true;
 			}
 
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
 		};
 		static tior_t TIOR;
 
@@ -2268,6 +2388,13 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
 
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
 			bool set(channel ch, uint8_t val)
 			{
 				switch(ch) {
@@ -2289,6 +2416,32 @@ namespace device {
 				return true;
 			}
 
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
 		};
 		static tior_t TIOR;
 
@@ -2899,6 +3052,13 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
 
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
 			bool set(channel ch, uint8_t val)
 			{
 				switch(ch) {
@@ -2920,6 +3080,32 @@ namespace device {
 				return true;
 			}
 
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
 		};
 		static tior_t TIOR;
 
@@ -3174,6 +3360,13 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
 
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
 			bool set(channel ch, uint8_t val)
 			{
 				switch(ch) {
@@ -3195,6 +3388,32 @@ namespace device {
 				return true;
 			}
 
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
 		};
 		static tior_t TIOR;
 
@@ -3496,6 +3715,13 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
 
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
 			bool set(channel ch, uint8_t val)
 			{
 				switch(ch) {
@@ -3517,6 +3743,32 @@ namespace device {
 				return true;
 			}
 
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
 		};
 		static tior_t TIOR;
 

@@ -13,35 +13,6 @@
 
 namespace device {
 
-	//-------------------------------------------------------------//
-	/*!
-		@brief  ポートの初期設定
-	*/
-	//-------------------------------------------------------------//
-	static void init_port()
-	{
-		// LFQFP:100
-		PORT0::PCR = 0b00000000;	// P00,P01,P02
-		PORT1::PCR = 0b00000000;	// P10,P11
-		PORT2::PCR = 0b00000000;	// P20,P21,P22,P23,P24
-		PORT3::PCR = 0b00000000;	// P30,P31,P32,P33
-		PORT4::PCR = 0b00000000;	// P40,P41,P42,P43,P44,P45,P46,P47 (analog input)
-		PORT5::PCR = 0b00000000;	// P50,P51,P52,P53,P54,P55 (analog input)
-		PORT6::PCR = 0b00000000;	// P60,P61,P62,P63,P64,P65 (analog input)
-		PORT7::PCR = 0b00000000;	// P70,P71,P72,P73,P74,P75,P76
-		PORT8::PCR = 0b00000000;	// P80,P81,P82
-		PORT9::PCR = 0b00000000;	// P90,P91,P92,P93,P94,P95,P96
-		PORTA::PCR = 0b00000000;	// PA0,PA1,PA2,PA3,PA4,PA5
-		PORTB::PCR = 0b00000000;	// PB0,PB1,PB2,PB3,PB4,PB5,PB6,PB7
-//		PORTC::PCR = 0b00000000;
-		PORTD::PCR = 0b00000000;	// PD0,PD1,PD2,PD3,PD4,PD5,PD6,PD7
-		PORTE::PCR = 0b00000000;	// PE0,PE1,PE2,PE3,PE4,PE5
-//		PORTF::PCR = 0b00000000;
-//		PORTG::PCR = 0b00000000;
-//		PORTJ::PCR = 0b00000000;
-	}
-
-
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  systen_io クラス
