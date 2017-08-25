@@ -85,11 +85,31 @@ namespace chip {
 			CS::DIR = 1;  // 出力指定
 			CS::PU  = 0;  // プルアップ無効
 
+			CS::P = 1;
+			utils::delay::milli_second(10);
+
 			CS::P = 0;
 			cs_setup_();
 			spi_.xchg(0x01);  // write status
 			spi_.xchg(static_cast<uint8_t>(bp) << 2);
 			CS::P = 1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ステートの取得
+			@return ステート
+		 */
+		//-----------------------------------------------------------------//
+		uint8_t get_state()
+		{
+			CS::P = 0;
+			cs_setup_();
+			spi_.xchg(0x05);  // read state
+			uint8_t v = spi_.xchg(0x00);
+			CS::P = 1;
+			return v;
 		}
 
 
@@ -102,11 +122,9 @@ namespace chip {
 			@return 正常なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool read(uint8_t org, void* dst, uint8_t len)
+		bool read(uint16_t org, void* dst, uint16_t len)
 		{
 			while(get_write_busy_()) ;
-
-			utils::delay::loop(10);
 
 			CS::P = 0;
 			cs_setup_();
@@ -127,34 +145,24 @@ namespace chip {
 			@return 正常なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool write(uint8_t org, const void* src, uint8_t len)
+		bool write(uint16_t org, const void* src, uint16_t len)
 		{
-			while(len > 0) {
+			while(get_write_busy_()) ;
 
-				while(get_write_busy_()) ;
+			CS::P = 0;
+			cs_setup_();
+			spi_.xchg(0x06);  // write enable
+			CS::P = 1;
 
-				utils::delay::loop(10);
+			utils::delay::loop(10);
 
-				CS::P = 0;
-				cs_setup_();
-				spi_.xchg(0x06);  // write enable
-				CS::P = 1;
+			CS::P = 0;
+			cs_setup_();
+			spi_.xchg(0x02);  // write
+			spi_.xchg(org);
+			spi_.send(src, len);
+			CS::P = 1;
 
-				uint8_t l = len;
-				if(l > 16) l = 16;
-
-				utils::delay::loop(10);
-
-				CS::P = 0;
-				cs_setup_();
-				spi_.xchg(0x02);
-				spi_.xchg(org);
-				spi_.send(src, l);
-				CS::P = 1;
-
-				len -= l;
-				org += l;
-			}
 			return true;
 		}
 	};
