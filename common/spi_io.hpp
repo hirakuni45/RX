@@ -19,25 +19,46 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  ソフト SPI 制御モード
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class soft_spi_mode : uint8_t {
+		CK10,	///< CLK 1 to 0
+		CK01,	///< CLK 0 to 1
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  ソフト SPI 制御クラス
 		@param[in]	MISO	Master In Slave Out
 		@param[in]	MOSI	Master Out Slave In
 		@param[in]	SPCK	Clock
+		@param[in]	MODE	soft_spi_mode
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class MISO, class MOSI, class SPCK>
+	template <class MISO, class MOSI, class SPCK, soft_spi_mode MODE>
 	class spi_io {
 
 		uint8_t	delay_;
 
 		void clock_()
 		{
-			uint8_t n = delay_;
-			while(n > 3) { --n; asm("nop"); }
-			SPCK::P = 1;
-			n = delay_;
-			while(n > 0) { --n; asm("nop"); }
-			SPCK::P = 0;
+			if(MODE == soft_spi_mode::CK10) {
+				uint8_t n = delay_;
+				while(n > 3) { --n; asm("nop"); }
+				SPCK::P = 1;
+				n = delay_;
+				while(n > 0) { --n; asm("nop"); }
+				SPCK::P = 0;
+			} else {
+				uint8_t n = delay_;
+				while(n > 3) { --n; asm("nop"); }
+				SPCK::P = 0;
+				n = delay_;
+				while(n > 0) { --n; asm("nop"); }
+				SPCK::P = 1;
+			}
 		}
 
 	public:
@@ -68,9 +89,37 @@ namespace device {
 		bool start_sdc(uint32_t speed)
 		{
 			MISO::DIR = 0;
-			MISO::PU = 1;
+			MISO::PU  = 1;
 			MOSI::DIR = 1;
 			SPCK::DIR = 1;
+
+			uint32_t n = F_ICLK / speed;
+			if(n > 511) n = 511;
+			delay_ = n / 2;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  開始
+			@param[in]	speed	通信速度
+			@return エラー（速度設定範囲外）なら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool start(uint32_t speed)
+		{
+			MISO::PU  = 1;
+			MISO::DIR = 0;
+			MOSI::DIR = 1;
+			SPCK::DIR = 1;
+
+			if(MODE == soft_spi_mode::CK10) {
+				SPCK::P = 0;
+			} else {
+				SPCK::P = 1;
+			}
 
 			uint32_t n = F_ICLK / speed;
 			if(n > 511) n = 511;
@@ -89,47 +138,92 @@ namespace device {
 		//----------------------------------------------------------------//
 		uint8_t xchg(uint8_t data = 0xff)
 		{
-			uint8_t r = 0;
-			if(MISO::P()) ++r;  // bit7
-			if(data & 0x80) MOSI::P = 1; else MOSI::P = 0;	// bit7
-			clock_();
+			if(MODE == soft_spi_mode::CK10) {
+				uint8_t r = 0;
+				if(MISO::P()) ++r;  // bit7
+				if(data & 0x80) MOSI::P = 1; else MOSI::P = 0;	// bit7
+				clock_();
 
-			r <<= 1;
-			if(MISO::P()) ++r;  // bit6
-			if(data & 0x40) MOSI::P = 1; else MOSI::P = 0;	// bit6
-			clock_();
+				r <<= 1;
+				if(MISO::P()) ++r;  // bit6
+				if(data & 0x40) MOSI::P = 1; else MOSI::P = 0;	// bit6
+				clock_();
 
-			r <<= 1;
-			if(MISO::P()) ++r;  // bit5
-			if(data & 0x20) MOSI::P = 1; else MOSI::P = 0;	// bit5
-			clock_();
+				r <<= 1;
+				if(MISO::P()) ++r;  // bit5
+				if(data & 0x20) MOSI::P = 1; else MOSI::P = 0;	// bit5
+				clock_();
 
-			r <<= 1;
-			if(MISO::P()) ++r;  // bit4
-			if(data & 0x10) MOSI::P = 1; else MOSI::P = 0;	// bit4
-			clock_();
+				r <<= 1;
+				if(MISO::P()) ++r;  // bit4
+				if(data & 0x10) MOSI::P = 1; else MOSI::P = 0;	// bit4
+				clock_();
 
-			r <<= 1;
-			if(MISO::P()) ++r;  // bit3
-			if(data & 0x08) MOSI::P = 1; else MOSI::P = 0;	// bit3
-			clock_();
+				r <<= 1;
+				if(MISO::P()) ++r;  // bit3
+				if(data & 0x08) MOSI::P = 1; else MOSI::P = 0;	// bit3
+				clock_();
 
-			r <<= 1;
-			if(MISO::P()) ++r;  // bit2
-			if(data & 0x04) MOSI::P = 1; else MOSI::P = 0;	// bit2
-			clock_();
+				r <<= 1;
+				if(MISO::P()) ++r;  // bit2
+				if(data & 0x04) MOSI::P = 1; else MOSI::P = 0;	// bit2
+				clock_();
 
-			r <<= 1;
-			if(MISO::P()) ++r;  // bit1
-			if(data & 0x02) MOSI::P = 1; else MOSI::P = 0;	// bit1
-			clock_();
+				r <<= 1;
+				if(MISO::P()) ++r;  // bit1
+				if(data & 0x02) MOSI::P = 1; else MOSI::P = 0;	// bit1
+				clock_();
 
-			r <<= 1;
-			if(MISO::P()) ++r;  // bit0
-			if(data & 0x01) MOSI::P = 1; else MOSI::P = 0;	// bit0
-			clock_();
+				r <<= 1;
+				if(MISO::P()) ++r;  // bit0
+				if(data & 0x01) MOSI::P = 1; else MOSI::P = 0;	// bit0
+				clock_();
 
-			return r;
+				return r;
+			} else {
+
+				uint8_t r = 0;
+				if(data & 0x80) MOSI::P = 1; else MOSI::P = 0;	// bit7
+				clock_();
+				if(MISO::P()) ++r;  // bit7
+
+				r <<= 1;
+				if(data & 0x40) MOSI::P = 1; else MOSI::P = 0;	// bit6
+				clock_();
+				if(MISO::P()) ++r;  // bit6
+
+				r <<= 1;
+				if(data & 0x20) MOSI::P = 1; else MOSI::P = 0;	// bit5
+				clock_();
+				if(MISO::P()) ++r;  // bit5
+
+				r <<= 1;
+				if(data & 0x10) MOSI::P = 1; else MOSI::P = 0;	// bit4
+				clock_();
+				if(MISO::P()) ++r;  // bit4
+
+				r <<= 1;
+				if(data & 0x08) MOSI::P = 1; else MOSI::P = 0;	// bit3
+				clock_();
+				if(MISO::P()) ++r;  // bit3
+
+				r <<= 1;
+				if(data & 0x04) MOSI::P = 1; else MOSI::P = 0;	// bit2
+				clock_();
+				if(MISO::P()) ++r;  // bit2
+
+				r <<= 1;
+				if(data & 0x02) MOSI::P = 1; else MOSI::P = 0;	// bit1
+				clock_();
+				if(MISO::P()) ++r;  // bit1
+
+				r <<= 1;
+				if(data & 0x01) MOSI::P = 1; else MOSI::P = 0;	// bit0
+				clock_();
+				if(MISO::P()) ++r;  // bit0
+
+				return r;
+			}
 		}
 
 
