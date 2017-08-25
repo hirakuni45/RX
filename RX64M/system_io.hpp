@@ -12,34 +12,6 @@
 
 namespace device {
 
-	//-------------------------------------------------------------//
-	/*!
-		@brief  ポートの初期設定
-	*/
-	//-------------------------------------------------------------//
-	static void init_port()
-	{
-		PORT0::PCR = 0xff;
-		PORT1::PCR = 0xff;
-		PORT2::PCR = 0xff;
-		PORT3::PCR = 0xff;
-		PORT4::PCR = 0xff;
-		PORT5::PCR = 0xff;
-		PORT6::PCR = 0xff;
-		PORT7::PCR = 0xff;
-		PORT8::PCR = 0xff;
-		PORT9::PCR = 0xff;
-		PORTA::PCR = 0xff;
-		PORTB::PCR = 0xff;
-		PORTC::PCR = 0xff;
-		PORTD::PCR = 0xff;
-		PORTE::PCR = 0xff;
-		PORTF::PCR = 0xff;
-		PORTG::PCR = 0xff;
-		PORTJ::PCR = 0xff;
-	}
-
-
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  systen_io クラス
