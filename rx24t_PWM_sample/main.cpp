@@ -52,19 +52,18 @@ int main(int argc, char** argv)
 	typedef device::system_io<10000000> SYSTEM_IO;
 	SYSTEM_IO::setup_system_clock(80000000);
 
-	// タイマー設定（６０Ｈｚ）
-	uint8_t cmt_irq_level = 4;
-	cmt_.start(60, cmt_irq_level);
-
 	// SCI 設定
 	static const uint8_t sci_level = 2;
 	sci_.start(115200, sci_level);
 
-#if 0
+	// タイマー設定（６０Ｈｚ）
+	uint8_t cmt_irq_level = 4;
+	cmt_.start(60, cmt_irq_level);
+
 	// MTU0 設定
 	{
 		uint32_t frq = 10000;
-		if(!mtu0_io_.start_pwm(MTU0::channel::A, MTU0_IO::pwm_type::low_to_high, frq)) {
+		if(!mtu0_io_.start_pwm2(MTU0::channel::A, MTU0_IO::output_type::low_to_high, frq)) {
 			utils::format("MTU0 input capture start fail...\n");
 		}
 	}
@@ -72,11 +71,10 @@ int main(int argc, char** argv)
 	// MTU1 設定
 	{
 		uint32_t frq = 10000;
-		if(!mtu1_io_.start_pwm(MTU1::channel::A, MTU1_IO::pwm_type::high_to_low, frq)) {
+		if(!mtu1_io_.start_pwm2(MTU1::channel::A, MTU1_IO::output_type::high_to_low, frq)) {
 			utils::format("MTU1 output start fail...\n");
 		}
 	}
-#endif
 
 	utils::format("RX24T MTU3 PWM sample: base clock: %4.2f [MHz]\n")
 		% (static_cast<float>(F_PCLKA) * 1e-6);
