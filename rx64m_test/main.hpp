@@ -34,7 +34,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 501;
+	static const int seeda_version_ = 502;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef utils::command<256> CMD;
@@ -49,7 +49,7 @@ namespace seeda {
 	typedef device::PORT<device::PORTD, device::bitpos::B6> MISO;
 	typedef device::PORT<device::PORTD, device::bitpos::B4> MOSI;
 	typedef device::PORT<device::PORTD, device::bitpos::B5> SPCK;
-	typedef device::spi_io<MISO, MOSI, SPCK> SPI;
+	typedef device::spi_io<MISO, MOSI, SPCK, device::soft_spi_mode::CK10> SPI;
 
 	typedef device::PORT<device::PORTD, device::bitpos::B3> SDC_SELECT;	///< カード選択信号
 	typedef device::NULL_PORT  SDC_POWER;	///< カード電源制御（常に電源ＯＮ）

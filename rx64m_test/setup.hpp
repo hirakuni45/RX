@@ -36,18 +36,33 @@ namespace seeda {
 		typedef device::PORT<device::PORT1, device::bitpos::B5> MISO;
 		typedef device::PORT<device::PORT1, device::bitpos::B6> MOSI;
 		typedef device::PORT<device::PORT1, device::bitpos::B7> SPCK;
-		typedef device::spi_io<MISO, MOSI, SPCK> SPI;
+		typedef device::spi_io<MISO, MOSI, SPCK, device::soft_spi_mode::CK01> SPI;
 
 		typedef device::PORT<device::PORT1, device::bitpos::B4> EUI_CS;
-		typedef device::PORT<device::PORT8, device::bitpos::B0> EUI_HOLD;
 		typedef chip::EUI_XX<SPI, EUI_CS> EUI;
 		SPI		spi_;
 		EUI		eui_;
 
+		static const uint16_t key_len = 6;
+		const char* get_magic_() const {
+			static const char* key = { "SEDA03" };
+			return key;
+		}
+
+		bool probe_magic_() {
+			char tmp[8];
+			eui_.read(0x00, tmp, key_len);
+			tmp[key_len] = 0;
+//utils::format("EUI Key: %02X %02X %02X %02X %02X %02X\n")
+//	% static_cast<uint16_t>(tmp[0]) % static_cast<uint16_t>(tmp[1]) % static_cast<uint16_t>(tmp[2])
+//	% static_cast<uint16_t>(tmp[3]) % static_cast<uint16_t>(tmp[4]) % static_cast<uint16_t>(tmp[5]);
+			return strncmp(get_magic_(), tmp, key_len) == 0;
+		}
+
 		void write_eui_()
 		{
-			eui_.write(0x00, "SEDA03", 6);
-			uint8_t tmp[1];
+			eui_.write(0x00, get_magic_(), key_len);
+			char tmp[1];
 			tmp[0] = dhcp_ ? 0x01 : 0x00;
 			eui_.write(0x08, tmp, 1);
 			eui_.write(0x0A, ip_, 4);
@@ -129,16 +144,17 @@ namespace seeda {
 		void init_eui(bool dev)
 		{
 #ifdef SEEDA
-			spi_.start_sdc(500000);  // Clock 500KHz
-			EUI_HOLD::DIR = 1;
-			EUI_HOLD::P = 1;
-			eui_.start();
+			// ソフトループなので、設定値より高目となり、実測で８３３ＫＨｚ
+			spi_.start(5000000);  // Clock 500KHz
+			eui_.start();  // EUI デバイス初期化
 
-			// check magic ID
-			{
-				char tmp[6];
-				eui_.read(0x00, tmp, 6);
-				if(strncmp("SEDA03", tmp, 6) == 0) {
+			{  // state
+				uint8_t st = eui_.get_state();
+				utils::format("EUI State: %02X\n") % static_cast<uint16_t>(st);
+			}
+
+			{  // check magic ID
+				if(probe_magic_()) {
 					uint8_t dhcp[1];
 					eui_.read(0x08, dhcp, 1);
 					dhcp_ = dhcp[0] != 0;
@@ -152,7 +168,17 @@ namespace seeda {
 						dhcp_ = false;
 					}
 					write_eui_();
+					utils::format("EUI Magic code: false (then first write)\n");
 				}
+			}
+
+			if(0) {
+				char tmp[8];
+				eui_.read(0x00, tmp, key_len);
+				tmp[key_len] = 0;
+utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
+	% static_cast<uint16_t>(tmp[0]) % static_cast<uint16_t>(tmp[1]) % static_cast<uint16_t>(tmp[2])
+	% static_cast<uint16_t>(tmp[3]) % static_cast<uint16_t>(tmp[4]) % static_cast<uint16_t>(tmp[5]);
 			}
 
 			{
@@ -177,7 +203,7 @@ namespace seeda {
 				dhcp_ = true;
 			}
 #endif
-			utils::format("EEPROM EUI-48 Node Identity list\n"); 
+			utils::format("EEPROM EUI-48 Node Identity List\n"); 
 			utils::format("  DHCP: %s\n") % (dhcp_ ? "Enable" : "Disable");
 			utils::format("  IP:   %d.%d.%d.%d\n")
 				% static_cast<uint32_t>(ip_[0])
