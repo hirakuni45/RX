@@ -200,7 +200,7 @@ namespace device {
 	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
 	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
 	typedef port_t<0x0008C012, odr_oo_t<0x0008C0A4> > PORTJ;
-#elif defined(SIG_RX24T) || defined(SIG_RX63T)
+#elif defined(SIG_RX24T)
 //  ODR0  o  o  o  o  x  x  x  o  o  o  o  o  x  o  o  -  -  -
 //  ODR1  x  x  o  x  x  x  x  o  x  o  o  o  x  o  o  -  -  -
 	typedef port_t<0x0008C000, odr_ox_t<0x0008C080> > PORT0;
@@ -215,10 +215,61 @@ namespace device {
 	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
 	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
 	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
-	typedef port_t<0x0008C00C, odr_xx_t<0x0008C098> > PORTC;
 	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
 	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
+#else
+#  error "port.hpp requires SIG_XXX to be defined"
 #endif
+
+
+	//-------------------------------------------------------------//
+	/*!
+		@brief  ポートの初期設定
+		@param[in]	dir	方向初期化
+	*/
+	//-------------------------------------------------------------//
+	static void init_port(uint8_t dir)
+	{
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+		// RX64M/LQFP:176(177)
+		PORT0::PCR = dir;	// (6) P00,P01,P02,P05,P07
+		PORT1::PCR = dir;	// (8) P10 to P17
+		PORT2::PCR = dir;	// (8) P20 to P27
+		PORT3::PCR = dir;	// (8) P30 to P37
+		PORT4::PCR = dir;	// (8) P40 to P47
+		PORT5::PCR = dir;	// (4) P50,P51,P52,P53
+		PORT6::PCR = dir;	// (8) P60 to P67
+		PORT7::PCR = dir;	// (8) P70 to P77
+		PORT8::PCR = dir;	// (6) P80,P81,P82,P83,P86,P87
+		PORT9::PCR = dir;	// (8) P90 to P97
+		PORTA::PCR = dir;	// (8) PA0 to PA7
+		PORTB::PCR = dir;	// (8) PB0 to PB7
+		PORTC::PCR = dir;	// (8) PC0 to PC7
+		PORTD::PCR = dir;	// (8) PD0 to PD7
+		PORTE::PCR = dir;	// (8) PE0 to PE7
+		PORTF::PCR = dir;	// (6) PF0,PF1,PF2,PF3,PF4,PF5
+		PORTG::PCR = dir;	// (8) PG0 to PG7
+		PORTJ::PCR = dir;	// (2) PJ3,PJ5
+#elif defined(SIG_RX24T)
+		// RX24T/LFQFP:100
+		PORT0::PCR = dir;	// (3) P00,P01,P02
+		PORT1::PCR = dir;	// (2) P10,P11
+		PORT2::PCR = dir;	// (5) P20,P21,P22,P23,P24
+		PORT3::PCR = dir;	// (6) P30,P31,P32,P33,P36,P37
+		PORT4::PCR = dir;	// (8) P40,P41,P42,P43,P44,P45,P46,P47 (analog input)
+		PORT5::PCR = dir;	// (6) P50,P51,P52,P53,P54,P55 (analog input)
+		PORT6::PCR = dir;	// (6) P60,P61,P62,P63,P64,P65 (analog input)
+		PORT7::PCR = dir;	// (7) P70,P71,P72,P73,P74,P75,P76
+		PORT8::PCR = dir;	// (3) P80,P81,P82
+		PORT9::PCR = dir;	// (7) P90,P91,P92,P93,P94,P95,P96
+		PORTA::PCR = dir;	// (6) PA0,PA1,PA2,PA3,PA4,PA5
+		PORTB::PCR = dir;	// (8) PB0,PB1,PB2,PB3,PB4,PB5,PB6,PB7
+		PORTD::PCR = dir;	// (8) PD0,PD1,PD2,PD3,PD4,PD5,PD6,PD7
+		PORTE::PCR = dir;	// (5) PE0,PE1,PE3,PE4,PE5
+#else
+#  error "port.hpp requires SIG_XXX to be defined"
+#endif
+	}
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
