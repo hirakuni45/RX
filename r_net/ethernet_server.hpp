@@ -174,7 +174,8 @@ namespace net {
 		//-----------------------------------------------------------------//
         void stop()
 		{
-			tcp_cls_cep(cepid_, TMO_FEVR);
+///			tcp_cls_cep(cepid_, TMO_FEVR);
+			tcp_cls_cep(cepid_, TMO_NBLK);
 			ethernet::CEP& cep = ethernet_.at_cep(cepid_);
 			end();
 		}
