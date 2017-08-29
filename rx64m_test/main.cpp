@@ -391,7 +391,7 @@ extern "C" {
 	 */
 	//-----------------------------------------------------------------//
 	DWORD get_fattime(void) {
-		auto t = get_time();
+		time_t t = get_time();
 		return utils::str::get_fattime(t);
 	}
 
