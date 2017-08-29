@@ -77,6 +77,15 @@ namespace seeda {
 
 	//-----------------------------------------------------------------//
 	/*!
+		@brief  プリファレンスの参照
+		@return プリファレンス
+	*/
+	//-----------------------------------------------------------------//
+	preference& at_pre() { return nets_.at_pre(); }
+
+
+	//-----------------------------------------------------------------//
+	/*!
 		@brief  SDC_IO クラスへの参照
 		@return SDC_IO クラス
 	*/
@@ -437,8 +446,6 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	device::init_port();
-
 	using namespace seeda;
 
 	device::PORTC::PDR.B0 = 1; // output
