@@ -225,9 +225,8 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		static DWORD get_fattime(time_t t)
 		{
-//			t = 0;	/* 1970 01-01 00:00:00 */
-//			struct tm *tp = localtime(&t);
-			struct tm *tp = gmtime(&t);
+			time_t ttt = t - (9 * 60 * 60);  // 何故かズレ
+			struct tm *tp = gmtime(&ttt);
 
 #ifdef DEBUG_
 			format("get_fattime: (source) %4d/%d/%d/ %02d:%02d:%02d\n")
@@ -236,14 +235,14 @@ namespace utils {
 #endif
 
 			DWORD tt = 0;
-			tt |= (DWORD)(tp->tm_sec) >> 1;
-			tt |= (DWORD)tp->tm_min  << 5;
-			tt |= (DWORD)tp->tm_hour << 11;
+			tt |= static_cast<DWORD>((tp->tm_sec % 60) >> 1);
+			tt |= static_cast<DWORD>(tp->tm_min % 60) << 5;
+			tt |= static_cast<DWORD>(tp->tm_hour % 24) << 11;
 
-			tt |= (DWORD)tp->tm_mday << 16;
-			tt |= ((DWORD)(tp->tm_mon) + 1) << 21;
+			tt |= static_cast<DWORD>(tp->tm_mday & 31) << 16;
+			tt |= static_cast<DWORD>(tp->tm_mon + 1) << 21;
 			if(tp->tm_year >= 80) {
-				tt |= ((DWORD)(tp->tm_year) - 80) << 25;
+				tt |= (static_cast<DWORD>(tp->tm_year) - 80) << 25;
 			}
 
 			return tt;
