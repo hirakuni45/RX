@@ -26,7 +26,7 @@
 #include "common/format.hpp"
 #include "common/string_utils.hpp"
 
-// #define FTPS_DEBUG
+#define FTPS_DEBUG
 
 extern "C" {
 	time_t get_time(void);
@@ -273,6 +273,7 @@ namespace net {
 			if(fi == nullptr) return;
 
 			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
+			t -= get_timezone_offset();
 			char tmp[32];
 			make_date_time_(t, tmp, sizeof(tmp));
 			data_format("Type=%s;Size=%d;Modify=%s; %s\n")
