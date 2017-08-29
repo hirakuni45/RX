@@ -81,7 +81,7 @@ long get_total_day(short year, char mon, char day);
 	@return	オフセット時間（秒）
 */
 //-----------------------------------------------------------------//
-inline time_t get_timezone_offset(void);
+time_t get_timezone_offset(void);
 
 
 //-----------------------------------------------------------------//
