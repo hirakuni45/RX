@@ -225,8 +225,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		static DWORD get_fattime(time_t t)
 		{
-			time_t ttt = t - (9 * 60 * 60);  // 何故かズレ
-			struct tm *tp = gmtime(&ttt);
+			struct tm *tp = gmtime(&t);
 
 #ifdef DEBUG_
 			format("get_fattime: (source) %4d/%d/%d/ %02d:%02d:%02d\n")
