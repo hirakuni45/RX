@@ -25,6 +25,8 @@ T_TCP_CREP tcp_crep[TCP_CREP_MAX] = {
 	{ 0x0000, { 0, 80 } },
 	{ 0x0000, { 0, 80 } },
 	{ 0x0000, { 0, 80 } },
+	{ 0x0000, { 0, 80 } },
+	{ 0x0000, { 0, 80 } },
 };
 
 /* Total number of TCP reception points */
@@ -33,6 +35,8 @@ const uint32_t tcp_crep_num = sizeof(tcp_crep) / sizeof(T_TCP_CREP);
 /***  Definition of TCP communication end point
       (only receive window size needs to be set) ***/
 T_TCP_CCEP tcp_ccep[TCP_CCEP_MAX] = {
+    { 0, 0, 0, 0, 1460, 0 },
+    { 0, 0, 0, 0, 1460, 0 },
     { 0, 0, 0, 0, 1460, 0 },
     { 0, 0, 0, 0, 1460, 0 },
     { 0, 0, 0, 0, 1460, 0 },

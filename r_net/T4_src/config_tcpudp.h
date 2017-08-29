@@ -290,8 +290,8 @@ extern "C" {
 
 extern const uint8_t t4_channel_num;
 
-#define TCP_CREP_MAX  6
-#define TCP_CCEP_MAX  6
+#define TCP_CREP_MAX  8
+#define TCP_CCEP_MAX  8
 #define UDP_CCEP_MAX  4
 
 #if defined(_TCP)
