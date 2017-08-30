@@ -34,7 +34,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 504;
+	static const int seeda_version_ = 505;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef utils::command<256> CMD;
@@ -165,17 +165,31 @@ namespace seeda {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@brief  設定スイッチの状態を取得
+		@brief	開発モードの取得 @n
+				2: OFF:DEV, ON:通常
+		@return 開発モードの場合「true」
+	*/
+	//-----------------------------------------------------------------//
+	bool get_develope()
+	{
+#ifdef SEEDA
+		return SW2::P();
+#else
+		return true;  // for only develope mode
+#endif
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  チャネル数を取得 @n
+				1: OFF:CH4, ON:CH8
 		@return 設定スイッチの状態
 	*/
 	//-----------------------------------------------------------------//
-	uint8_t get_switch()
+	uint32_t get_channel_num()
 	{
-#ifdef SEEDA
-		return static_cast<uint8_t>(!SW1::P()) | (static_cast<uint8_t>(!SW2::P()) << 1);
-#else
-		return 0;  // for only develope mode
-#endif
+		return SW1::P() ? 4 : 8;
 	}
 
 
