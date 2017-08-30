@@ -151,7 +151,8 @@ namespace seeda {
 			utils::format("Endian: %3b (%s)") % static_cast<uint32_t>(mde) % (mde == 0b111 ? "Little" : "Big");
 			utils::format(", PCLKA: %u [Hz]") % static_cast<uint32_t>(F_PCLKA);
 			utils::format(", PCLKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCLKB);
-			utils::format("DIP-Switch: %d\n") % static_cast<int>(get_switch());
+			utils::format("DIP-Switch-2 (Dev): %s\n") % (get_develope() ? "Enable" : "Disable");
+			utils::format("DIP-Switch-1 (CH):  %d\n") % get_channel_num();
 		}
 
 

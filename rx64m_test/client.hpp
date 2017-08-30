@@ -185,11 +185,11 @@ namespace seeda {
 
 			case recv_task::sample_put:
 				{
-					if((BUF_SIZE - 1 - fifo_.length()) < 8) { // スペースが無い場合
+					if((BUF_SIZE - 1 - fifo_.length()) < get_channel_num()) { // スペースが無い場合
 						break;
 					}
 					const sample_data& smd = get_sample_data();
-					for(int i = 0; i < 8; ++i) {
+					for(uint32_t i = 0; i < get_channel_num(); ++i) {
 						fifo_.put(smd.smp_[i]);
 					}
 					recv_task_ = recv_task::sync_time;
@@ -252,10 +252,10 @@ namespace seeda {
 				break;
 
 			case send_task::make_form:
-				if(fifo_.length() < 8) {
+				if(fifo_.length() < get_channel_num()) {
 					break;
 				} 
-				for(int ch = 0; ch < 8; ++ch) {
+				for(uint32_t ch = 0; ch < get_channel_num(); ++ch) {
 					const auto& smd = fifo_.get_at();
 					if(ch == 0) {
 						time_t t = time_ - time_ofs_ + time_org_;

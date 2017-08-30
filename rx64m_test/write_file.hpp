@@ -239,7 +239,7 @@ namespace seeda {
 				{
 					char data[1024];
 					utils::sformat("DATE,TIME", data, sizeof(data));
-					for(int i = 0; i < 8; ++i) {
+					for(uint32_t i = 0; i < get_channel_num(); ++i) {
 						utils::sformat(",CH,MAX,MIN,AVE,MEDIAN,COUNTUP", data, sizeof(data), true);
 					}
 					utils::sformat("\n", data, sizeof(data), true);
@@ -267,7 +267,7 @@ namespace seeda {
 						utils::sformat(",", data_, sizeof(data_));
 					}
 					smp.make_csv2(data_, sizeof(data_), true);
-					if(smp.ch_ == 7) {
+					if(smp.ch_ == (get_channel_num() - 1)) {
 						++time_loop_;
 						utils::sformat("\n", data_, sizeof(data_), true);
 						last_data_ = true;
@@ -312,8 +312,8 @@ namespace seeda {
 			}
 
 			if(sync) {
-				if((BUF_SIZE - fifo_.length()) > 8) {
-					for(int i = 0; i < 8; ++i) {
+				if((BUF_SIZE - fifo_.length()) > get_channel_num()) {
+					for(uint32_t i = 0; i < get_channel_num(); ++i) {
 						fifo_.put(smd.smp_[i]);
 					}
 				}

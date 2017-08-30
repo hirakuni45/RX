@@ -154,7 +154,7 @@ namespace seeda {
 				"<th>上限</th><th>上限数</th><th>Median</th></tr>\n");
 
 			static const char* modes[] = { "数値", "係数", "絶対" };
-			for(int ch = 0; ch < 8; ++ch) {
+			for(uint32_t ch = 0; ch < get_channel_num(); ++ch) {
 				const auto& t = get_sample_data().smp_[ch];
 				char min[16];
 				t.value_convert(t.min_,     min, sizeof(min));
@@ -584,9 +584,7 @@ namespace seeda {
 			ethernet_.start();
 
 #ifdef SEEDA
-			if(get_switch() != 0) {
-				develope_ = false;
-			}
+			develope_ = get_develope();
 #endif
 			startup_();
 		}
@@ -610,6 +608,10 @@ namespace seeda {
 		void service()
 		{
 			++item_;
+
+#ifdef SEEDA
+			develope_ = get_develope();
+#endif
 
 			ethernet_.service();
 

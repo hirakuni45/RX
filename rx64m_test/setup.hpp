@@ -401,7 +401,7 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 			// Ａ／Ｄ変換設定
 			{
 				http_format("<form method=\"POST\" action=\"/cgi/set_adc.cgi\"><table>\n");
-				for(int ch = 0; ch < 8; ++ch) {
+				for(uint32_t ch = 0; ch < get_channel_num(); ++ch) {
 					const seeda::sample_t& t = at_sample(ch);
 					http_format("<tr>"
 						"<td>CH%d</td>"
