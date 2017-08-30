@@ -91,7 +91,7 @@ namespace net {
 			int len = tcp.send(desc_, tmp, send_len);
 			if(len < 0) return -1;
 
-			tmp[len] = 0;
+			tmp[(len >= 60) ? 60 : len] = 0;
 			utils::format("TCP Test (%d)Send (%s):  '%s' %d bytes desc(%d)\n")
 				% loop % (server ? "Server" : "Client") % tmp % len % desc_;
 
@@ -105,11 +105,11 @@ namespace net {
 
 			int loop = loop_ / 2;
 
-			char tmp[recv_len + 1];
+			char tmp[recv_len];
 			int len = tcp.recv(desc_, tmp, recv_len);
 			if(len <= 0) return len;
 
-			tmp[len] = 0;
+			tmp[(len >= 60) ? 60 : len] = 0;
 			utils::format("TCP Test (%d)Recv (%s):  '%s' %d bytes desc(%d)\n")
 				% loop % (server ? "Server" : "Client") % tmp % len % desc_;
 
@@ -139,7 +139,7 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		test_tcp(ETHERNET& eth) : eth_(eth), ip_(), type_(type::idle), port_(3000), task_(task::idle), desc_(0),
-		  wait_(0), loop_(0), data_len_(20) { }
+		  wait_(0), loop_(0), data_len_(50) { }
 
 
 		//-----------------------------------------------------------------//
