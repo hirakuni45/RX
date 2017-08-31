@@ -644,34 +644,28 @@ namespace device {
 		static rstckcr_t RSTCKCR;
 
 
+//-----------------------------------------------------------------------------//
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ディープスタンバイコントロールレジスタ（DPSBYCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x0008C280> dpsbycr_io;
-		struct dpsbycr_t : public dpsbycr_io {
-			using dpsbycr_io::operator =;
-			using dpsbycr_io::operator ();
-			using dpsbycr_io::operator |=;
-			using dpsbycr_io::operator &=;
+		template <uint32_t base>
+		struct dpsbycr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<dpsbycr_io, bitpos::B0, 2>	DEEPCUT;
-			bit_rw_t <dpsbycr_io, bitpos::B6>		IOKEEP;
-			bit_rw_t <dpsbycr_io, bitpos::B7>		DPSBY;
+			bits_rw_t<io_, bitpos::B0, 2>  DEEPCUT;
+			bit_rw_t <io_, bitpos::B6>	   IOKEEP;
+			bit_rw_t <io_, bitpos::B7>	   DPSBY;
 		};
-		static dpsbycr_t DPSBYCR;
+		static dpsbycr_t<0x0008C280> DPSBYCR;
 
-
-
-
-
-
-
-
-
-
-//-----------------------------------------------------------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -693,6 +687,26 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 8>  PRKEY;
 		};
 		static prcr_t<0x000803FE> PRCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  温度センサコントロールレジスタ（TSCR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct tscr_t : public  rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B4>	TSOE;
+			bit_rw_t<io_, bitpos::B7>	TSEN;
+		};
+		static tscr_t<0x0008C500> TSCR;
+
 	};
 	typedef system_t SYSTEM;
 
