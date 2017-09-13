@@ -108,6 +108,12 @@ namespace chip {
 			ALGO_PHASECAL_CONFIG_TIMEOUT                = 0x30,
 
 			CONST_00 = 0x00,
+			CONST_80 = 0x80,
+			CONST_81 = 0x81,
+			CONST_82 = 0x82,
+			CONST_83 = 0x83,
+			CONST_92 = 0x92,
+			CONST_94 = 0x94,
 			CONST_FF = 0xFF, 
 		};
 
@@ -255,38 +261,38 @@ namespace chip {
 
 		bool get_spad_info_(uint8_t& count, bool& type_is_aperture)
 		{
-			write_(static_cast<reg_addr>(0x80), 0x01);
-			write_(static_cast<reg_addr>(0xFF), 0x01);
-			write_(static_cast<reg_addr>(0x00), 0x00);
+			write_(reg_addr::CONST_80, 0x01);
+			write_(reg_addr::CONST_FF, 0x01);
+			write_(reg_addr::CONST_00, 0x00);
 
-			write_(static_cast<reg_addr>(0xFF), 0x06);
-			write_(static_cast<reg_addr>(0x83), read_(static_cast<reg_addr>(0x83)) | 0x04);
-			write_(static_cast<reg_addr>(0xFF), 0x07);
-			write_(static_cast<reg_addr>(0x81), 0x01);
+			write_(reg_addr::CONST_FF, 0x06);
+			write_(reg_addr::CONST_83, read_(static_cast<reg_addr>(0x83)) | 0x04);
+			write_(reg_addr::CONST_FF, 0x07);
+			write_(reg_addr::CONST_81, 0x01);
 
-			write_(static_cast<reg_addr>(0x80), 0x01);
+			write_(reg_addr::CONST_80, 0x01);
 
-			write_(static_cast<reg_addr>(0x94), 0x6b);
-			write_(static_cast<reg_addr>(0x83), 0x00);
+			write_(reg_addr::CONST_94, 0x6b);
+			write_(reg_addr::CONST_83, 0x00);
 
 			start_timeout_();
-			while(read_(static_cast<reg_addr>(0x83)) == 0x00) {
+			while(read_(reg_addr::CONST_83) == 0x00) {
 				if(check_timeout_expired_()) { return false; }
 			}
-			write_(static_cast<reg_addr>(0x83), 0x01);
-			uint8_t tmp = read_(static_cast<reg_addr>(0x92));
+			write_(reg_addr::CONST_83, 0x01);
+			uint8_t tmp = read_(reg_addr::CONST_92);
 
 			count = tmp & 0x7f;
 			type_is_aperture = (tmp >> 7) & 0x01;
 
-			write_(static_cast<reg_addr>(0x81), 0x00);
-			write_(static_cast<reg_addr>(0xFF), 0x06);
-			write_(static_cast<reg_addr>(0x83), read_(static_cast<reg_addr>(0x83))  & ~0x04);
-			write_(static_cast<reg_addr>(0xFF), 0x01);
-			write_(static_cast<reg_addr>(0x00), 0x01);
+			write_(reg_addr::CONST_81, 0x00);
+			write_(reg_addr::CONST_FF, 0x06);
+			write_(reg_addr::CONST_83, read_(reg_addr::CONST_83)  & ~0x04);
+			write_(reg_addr::CONST_FF, 0x01);
+			write_(reg_addr::CONST_00, 0x01);
 
-			write_(static_cast<reg_addr>(0xFF), 0x00);
-			write_(static_cast<reg_addr>(0x80), 0x00);
+			write_(reg_addr::CONST_FF, 0x00);
+			write_(reg_addr::CONST_80, 0x00);
 
 			return true;
 		}
@@ -595,7 +601,7 @@ namespace chip {
 			@brief	@n
 					Did a timeout occur in one of the read functions since the last call to @n
 					timeoutOccurred()?
-			@return timeout の状態
+			@return タイムアウトなら「true」
 		 */
 		//-----------------------------------------------------------------//
 		bool timeout_occurred()
@@ -882,13 +888,14 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		bool set_measurement_timing_budget(uint32_t budget_us)
 		{
-			uint16_t const StartOverhead      = 1320; // note that this is different than the value in get_
-			uint16_t const EndOverhead        = 960;
-			uint16_t const MsrcOverhead       = 660;
-			uint16_t const TccOverhead        = 590;
-			uint16_t const DssOverhead        = 690;
-			uint16_t const PreRangeOverhead   = 660;
-			uint16_t const FinalRangeOverhead = 550;
+			// note that this is different than the value in get_
+			static const uint16_t StartOverhead      = 1320;
+			static const uint16_t EndOverhead        = 960;
+			static const uint16_t MsrcOverhead       = 660;
+			static const uint16_t TccOverhead        = 590;
+			static const uint16_t DssOverhead        = 690;
+			static const uint16_t PreRangeOverhead   = 660;
+			static const uint16_t FinalRangeOverhead = 550;
 
 			uint32_t const MinTimingBudget = 20000;
 
