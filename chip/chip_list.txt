@@ -96,8 +96,14 @@ VS1063：
 ・http://www.vlsi.fi/fileadmin/datasheets/vs1063ds.pdf
 
 
-phy_base:
+phy_base：
 ・Ethernet default PHY device
 ・LAN8720(A) 10/100M (Microchip)
 ・DP83822 10/100M (Texas Instruments) for option
 ・KSZ8041NL 10/100M (MICREL) for option
+
+
+VL53L0X：
+・STMicroelectronics
+・World smallest Time-of-Flight (ToF) ranging sensor
+・http://www.st.com/ja/imaging-and-photonics-solutions/vl53l0x.html
