@@ -43,6 +43,7 @@ namespace device {
 		};
 
 	private:
+
 		static bool sub_(peripheral t, bool enable) {
 			switch(t) {
 
