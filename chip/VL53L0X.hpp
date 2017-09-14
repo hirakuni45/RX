@@ -10,6 +10,7 @@
 //=====================================================================//
 #include <cstdint>
 #include <cstring>
+#include "common/delay.hpp"
 
 namespace chip {
 
@@ -21,7 +22,41 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class I2C_IO>
 	class VL53L0X {
+	public:
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  シーケンスステップ許可、構造体
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct SequenceStepEnables {
+			bool	tcc;
+			bool	msrc;
+			bool	dss;
+			bool	pre_range;
+			bool	final_range;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  シーケンスステップタイムアウト、構造体
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct SequenceStepTimeouts {
+			uint16_t	pre_range_vcsel_period_pclks;
+			uint16_t	final_range_vcsel_period_pclks;
+
+			uint16_t	msrc_dss_tcc_mclks;
+			uint16_t	pre_range_mclks;
+			uint16_t	final_range_mclks;
+
+			uint32_t	msrc_dss_tcc_us;
+			uint32_t	pre_range_us;
+			uint32_t	final_range_us;
+		};
+
+	private:
 		// R/W ビットを含まない７ビット値
 		static const uint8_t ADR_ = 0b0101001;
 
@@ -112,6 +147,8 @@ namespace chip {
 			CONST_81 = 0x81,
 			CONST_82 = 0x82,
 			CONST_83 = 0x83,
+			CONST_88 = 0x88,
+			CONST_91 = 0x91,
 			CONST_92 = 0x92,
 			CONST_94 = 0x94,
 			CONST_FF = 0xFF, 
@@ -123,29 +160,11 @@ namespace chip {
 			FinalRange
 		};
 
-
-		struct SequenceStepEnables {
-			bool	tcc;
-			bool	msrc;
-			bool	dss;
-			bool	pre_range;
-			bool	final_range;
-		};
-
-
-		struct SequenceStepTimeouts {
-			uint16_t pre_range_vcsel_period_pclks, final_range_vcsel_period_pclks;
-
-			uint16_t msrc_dss_tcc_mclks, pre_range_mclks, final_range_mclks;
-			uint32_t msrc_dss_tcc_us,    pre_range_us,    final_range_us;
-		};
-
-
 		I2C_IO&		i2c_io_;
 
 		uint32_t	measurement_timing_budget_us_;
 
-		volatile uint16_t	timeout_start_ms_;
+		uint16_t	timeout_start_ms_;
 		uint16_t	io_timeout_;
 
 		// read by init and used when starting measurement; is StopVariable field of VL53L0X_
@@ -161,6 +180,8 @@ namespace chip {
 
 
 		bool check_timeout_expired_() {
+			++timeout_start_ms_;
+			utils::delay::micro_second(1000 - 100);  // 1ms から、他の処理を大雑把に100uS引く
 			return (io_timeout_ > 0 && timeout_start_ms_ > io_timeout_);
 		}
 
@@ -345,18 +366,6 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイムアウト時間の追加
-			@param[in]	dms	追加時間（ミリ秒）
-		 */
-		//-----------------------------------------------------------------//
-		void add_millis(uint16_t dms)
-		{
-			timeout_start_ms_ += dms;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	タイムアウトの設定（ミリ秒）
 			@param[in]	timeout	タイムアウト
 		 */
@@ -389,15 +398,15 @@ namespace chip {
 			}
 
 			// "Set I2C standard mode"
-			write_(static_cast<reg_addr>(0x88), 0x00);
+			write_(reg_addr::CONST_88, 0x00);
 
-			write_(static_cast<reg_addr>(0x80), 0x01);
-			write_(static_cast<reg_addr>(0xFF), 0x01);
-			write_(static_cast<reg_addr>(0x00), 0x00);
-			stop_variable_ = read_(static_cast<reg_addr>(0x91));
-			write_(static_cast<reg_addr>(0x00), 0x01);
-			write_(static_cast<reg_addr>(0xFF), 0x00);
-			write_(static_cast<reg_addr>(0x80), 0x00);
+			write_(reg_addr::CONST_80, 0x01);
+			write_(reg_addr::CONST_FF, 0x01);
+			write_(reg_addr::CONST_00, 0x00);
+			stop_variable_ = read_(reg_addr::CONST_91);
+			write_(reg_addr::CONST_00, 0x01);
+			write_(reg_addr::CONST_FF, 0x00);
+			write_(reg_addr::CONST_80, 0x00);
 
 			// disable SIGNAL_RATE_MSRC (bit 1) and SIGNAL_RATE_PRE_RANGE (bit 4) limit checks
 			write_(reg_addr::MSRC_CONFIG_CONTROL, read_(reg_addr::MSRC_CONFIG_CONTROL) | 0x12);
@@ -598,9 +607,9 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	@n
+			@brief	最後のタイムアウトを取得し、タイムアウトフラグを除去する。@n
 					Did a timeout occur in one of the read functions since the last call to @n
-					timeoutOccurred()?
+					timeout_occurred()?
 			@return タイムアウトなら「true」
 		 */
 		//-----------------------------------------------------------------//
@@ -614,7 +623,7 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	@n
+			@brief	VCSEL を設定 @n
 					Set the VCSEL (vertical cavity surface emitting laser) pulse period for the
 					given period type (pre-range or final range) to the given value in PCLKs.
 					Longer periods seem to increase the potential range of the sensor.
@@ -623,7 +632,7 @@ namespace chip {
 					final: 8 to 14 (initialized default: 10)
 					based on VL53L0X_set_vcsel_pulse_period()
 			@param[in]	type	vcselPeriod 型
-			@param[in]	period_pclks	
+			@param[in]	period_pclks PCLK 値	
 		 */
 		//-----------------------------------------------------------------//
 		bool set_vcsel_pulse_period(vcselPeriod type, uint8_t period_pclks)
@@ -795,7 +804,7 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	@n
+			@brief	VCSEL を取得 @n
 				Get the VCSEL pulse period in PCLKs for the given period type. @n
 				based on VL53L0X_get_vcsel_pulse_period()
 			@param[in]	type	vcselPeriod 型
@@ -815,7 +824,7 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	@n
+			@brief	シーケンス許可状態を取得 @n
 					Get sequence step enables @n
 					based on VL53L0X_GetSequenceStepEnables()
 			@param[out]	enables	ビット集合の参照
@@ -835,7 +844,7 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	@n
+			@brief	シーケンス許可状態に対するタイムアウトの取得 @n
 					Get sequence step timeouts @n
 					based on get_sequence_step_timeout(), @n
 					but gets all timeouts instead of just the requested one, and also stores @n
