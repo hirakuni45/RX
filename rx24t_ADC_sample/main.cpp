@@ -10,9 +10,11 @@
                        |        |        |       |  @n
 			         RIGHT     UP      DOWN    LEFT @n
                        |        |        |       |  @n
-                      VSS      VSS      VSS     VSS @n
-			Copyright 2017 Kunihito Hiramatsu
+                      VSS      VSS      VSS     VSS
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/cmt_io.hpp"

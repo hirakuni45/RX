@@ -13,6 +13,7 @@
 #include "common/fifo.hpp"
 #include "common/format.hpp"
 #include "common/iica_io.hpp"
+#include "common/si2c_io.hpp"
 #include "common/command.hpp"
 #include "chip/BMP180.hpp"
 #include "chip/BMP280.hpp"
@@ -30,16 +31,23 @@ namespace {
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
+#ifdef SOFT_I2C
+	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
+	typedef device::PORT<device::PORTB, device::bitpos::B1> SCL;
+	typedef device::si2c_io<SDA, SCL> I2C;
+#else
 	typedef device::iica_io<device::RIIC0> I2C;
+#endif
 	I2C i2c_;
 
-//	chip::BMP180<I2C> bmpx_(i2c_);
-	chip::BMP280<I2C> bmpx_(i2c_);
+	chip::BMP180<I2C> bmpx_(i2c_);
+//	chip::BMP280<I2C> bmpx_(i2c_);
 
 	utils::command<128> command_;
 }
 
 extern "C" {
+
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
@@ -102,8 +110,9 @@ int main(int argc, char** argv)
 	}
 
 	{  // IICA(I2C) の開始
-		uint8_t intr_level = 0;
-		if(!i2c_.start(I2C::speed::fast, intr_level)) {
+		if(!i2c_.start(I2C::speed::fast)) {
+///		uint8_t intr_level = 0;
+///		if(!i2c_.start(I2C::speed::fast, intr_level)) {
 			utils::format("IICA start error (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
 		}
 	}

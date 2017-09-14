@@ -13,8 +13,11 @@
 #include "common/fifo.hpp"
 #include "common/format.hpp"
 #include "common/iica_io.hpp"
+#include "common/si2c_io.hpp"
 #include "common/command.hpp"
 #include "chip/VL53L0X.hpp"
+
+#define SOFT_I2C
 
 namespace {
 
@@ -23,7 +26,13 @@ namespace {
 	typedef utils::fifo<uint8_t, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
+#ifdef SOFT_I2C
+	typedef device::PORT<device::PORTB, device::bitpos::B2> SDA;
+	typedef device::PORT<device::PORTB, device::bitpos::B1> SCL;
+	typedef device::si2c_io<SDA, SCL> I2C;
+#else
 	typedef device::iica_io<device::RIIC0> I2C;
+#endif
 	I2C i2c_;
 
 	typedef chip::VL53L0X<I2C> VLX;
@@ -53,6 +62,7 @@ extern "C" {
 	{
 		return sci_.recv_length();
 	}
+
 }
 
 int main(int argc, char** argv);
@@ -96,9 +106,10 @@ int main(int argc, char** argv)
 	}
 
 	{  // IICA(I2C) の開始
-		uint8_t intr_level = 0;
-		if(!i2c_.start(I2C::speed::fast, intr_level)) {
-			utils::format("IICA start error (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
+//		uint8_t intr_level = 0;
+//		if(!i2c_.start(I2C::speed::fast, intr_level)) {
+		if(!i2c_.start(I2C::speed::fast)) {
+			utils::format("IICA start fail: (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
 		}
 	}
 
@@ -112,7 +123,6 @@ int main(int argc, char** argv)
 		// 20ms
 		vlx_.set_measurement_timing_budget(200000);
 	}
-
 
 
 //	command_.set_prompt("# ");
@@ -130,7 +140,7 @@ int main(int argc, char** argv)
 		}
 		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
 
-//		++n;
+		++n;
 		if(n >= 30) {
 			auto len = vlx_.read_range_single_millimeters();
 			if(vlx_.timeout_occurred()) {
