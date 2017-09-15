@@ -14,10 +14,9 @@
 #include "common/format.hpp"
 #include "common/iica_io.hpp"
 #include "common/si2c_io.hpp"
-#include "common/command.hpp"
 #include "chip/VL53L0X.hpp"
 
-#define SOFT_I2C
+/// #define SOFT_I2C
 
 namespace {
 
@@ -37,8 +36,6 @@ namespace {
 
 	typedef chip::VL53L0X<I2C> VLX;
 	VLX vlx_(i2c_);
-
-	utils::command<128> command_;
 }
 
 extern "C" {
@@ -106,9 +103,12 @@ int main(int argc, char** argv)
 	}
 
 	{  // IICA(I2C) の開始
-//		uint8_t intr_level = 0;
-//		if(!i2c_.start(I2C::speed::fast, intr_level)) {
+#ifdef SOFT_I2C
 		if(!i2c_.start(I2C::speed::fast)) {
+#else
+		uint8_t intr_level = 0;
+		if(!i2c_.start(I2C::speed::fast, intr_level)) {
+#endif
 			utils::format("IICA start fail: (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
 		}
 	}
@@ -117,15 +117,12 @@ int main(int argc, char** argv)
 
 	// VL53L0X の開始
 	if(!vlx_.start()) {
-		utils::format("Start VL53L0X fail\n");
+		utils::format("VL53L0X start NG\n");
 	} else {
-		utils::format("Start VL53L0X\n");
+		utils::format("VL53L0X start OK\n");
 		// 20ms
 		vlx_.set_measurement_timing_budget(200000);
 	}
-
-
-//	command_.set_prompt("# ");
 
 	device::PORT0::PDR.B0 = 1; // output
 
