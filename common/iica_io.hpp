@@ -156,6 +156,7 @@ namespace device {
 			}
 		}
 
+
 		static INTERRUPT_FUNC void tend_task_()
 		{
 			IICA::ICSR2.STOP = 0;
@@ -165,10 +166,31 @@ namespace device {
 			IICA::ICIER.SPIE = 1;
 		}
 
+
 		static uint32_t intr_vec_(ICU::VECTOR v) { return static_cast<uint32_t>(v); }
 
 		void sleep_() {
 			asm("nop");
+		}
+
+
+		void setup_start_() {
+			while(IICA::ICCR2.BBSY() != 0) {
+#if 0
+				if(IICA::ICSR2.TMOF()) {
+					IICA::ICSR2.TMOF = 0;
+					error_ = error::bus_open;
+					return false;
+				}
+#endif
+			}
+		}
+
+
+		void setup_ackbt_() {
+			IICA::ICMR3.ACKWP = 1;
+			IICA::ICMR3.ACKBT = 1;
+			IICA::ICMR3.ACKWP = 0;
 		}
 
 	public:
@@ -193,15 +215,20 @@ namespace device {
 		{
 			level_ = level;
 
-			port_map::turn(IICA::get_peripheral());
-
 			power_cfg::turn(IICA::get_peripheral());
+
+			port_map::turn(IICA::get_peripheral());
 
 			IICA::ICCR1.ICE = 0;
 			IICA::ICCR1.IICRST = 1;
 			IICA::ICCR1.ICE = 1;
 
-			IICA::ICSER = 0x00;
+			IICA::SARL0 = sadr_;
+			IICA::SARU0 = 0x00;
+			IICA::SARL1 = 0x00;
+			IICA::SARU1 = 0x00;
+			IICA::SARL2 = 0x00;
+			IICA::SARU2 = 0x00;
 
 			switch(spd_type) {
 			case speed::standard:	///< 100K b.p.s. (Standard mode)
@@ -224,9 +251,9 @@ namespace device {
 				return false;
 			}
 
-			IICA::ICFER.TMOE = 1;  // TimeOut Enable
+///			IICA::ICFER.TMOE = 1;  // TimeOut Enable
 
-			if(level_) {
+			if(level_ > 0) {
 				set_interrupt_task(event_task_, static_cast<uint32_t>(IICA::get_eei_vec()));
 				set_interrupt_task(recv_task_,  static_cast<uint32_t>(IICA::get_rxi_vec()));
 				set_interrupt_task(send_task_,  static_cast<uint32_t>(IICA::get_txi_vec()));
@@ -237,6 +264,7 @@ namespace device {
 				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_txi_vec()));
 				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_tei_vec()));
 			}
+			IICA::ICIER = 0x00;
 			icu_mgr::set_level(IICA::get_peripheral(), level_);
 
 			IICA::ICCR1.IICRST = 0;
@@ -284,15 +312,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool send(uint8_t adr, const uint8_t* src, uint16_t len, bool sync = true)
 		{
+			if(len == 0) return false;
+
 			error_ = error::none;
 
-			while(IICA::ICCR2.BBSY() != 0) {
-				if(IICA::ICSR2.TMOF()) {
-					IICA::ICSR2.TMOF = 0;
-					error_ = error::bus_open;
-					return false;
-				}
-			}
+			setup_start_();
 
 			bool ret = true;
 			if(level_) {
@@ -321,7 +345,9 @@ namespace device {
 						break;
 					}
 
-					while(IICA::ICSR2.TDRE() == 0) ;
+					if(IICA::ICSR2.TDRE() == 0) {
+						continue;
+					}
 
 					if(first) {
 						IICA::ICDRT = (adr << 1);
@@ -377,17 +403,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool recv(uint8_t adr, uint8_t* dst, uint16_t len)
 		{
+			if(len == 0) return false;
+
 			error_ = error::none;
 
-			while(IICA::ICCR2.BBSY() != 0) {
-				if(IICA::ICSR2.TMOF()) {
-					IICA::ICSR2.TMOF = 0;
-					error_ = error::bus_open;
-					return false;
-				}
-			}
+			setup_start_();
 
-			bool ret = true;
 			if(level_) {
 				volatile auto id = intr_.recv_id_;
 				intr_.firstb_ = (adr << 1) | 0x01;
@@ -397,22 +418,17 @@ namespace device {
 				IICA::ICIER.TIE = 1;
 				IICA::ICCR2.ST = 1;
 
-
-
-
 			} else {
+
 				IICA::ICCR2.ST = 1;
-
 				while(IICA::ICSR2.TDRE() == 0) ;
-
 				IICA::ICDRT = (adr << 1) | 0x01;
-
 				while(IICA::ICSR2.RDRF() == 0) ;
 
 				if(IICA::ICSR2.NACKF() != 0) {
 					IICA::ICSR2.STOP = 0;
 					IICA::ICCR2.SP = 1;
-					IICA::ICDRR();			///< read dummy
+					volatile uint8_t tmp = IICA::ICDRR();
 
 					while(IICA::ICSR2.STOP() == 0) ;
 
@@ -421,47 +437,54 @@ namespace device {
 					return false;
 				}
 
-				volatile uint8_t da;
 				if(len <= 2) {
 					IICA::ICMR3.WAIT = 1;
-				}
-				da = IICA::ICDRR();  // dummy read
-				while(1) {
-					while(IICA::ICSR2.RDRF() == 0) ;
 					if(len == 2) {
-						break;
-					} else if(len == 3) {
-						IICA::ICMR3.WAIT = 1;
+						volatile uint8_t tmp = IICA::ICDRR();  // dummy read
+						while(IICA::ICSR2.RDRF() == 0) ;
 					}
+					setup_ackbt_();
+					{
+						volatile uint8_t tmp = IICA::ICDRR();
+						if(len == 2) {  // 1 バイトの場合ダミーリード
+							*dst++ = tmp;
+						}
+						while(IICA::ICSR2.RDRF() == 0) ;
+					}
+					IICA::ICSR2.STOP = 0;
+					IICA::ICCR2.SP = 1;
+	
+					*dst = IICA::ICDRR();
+				} else {
+					volatile uint8_t tmp = IICA::ICDRR();  // dummy read
+					while(IICA::ICSR2.RDRF() == 0) ;
+
+					while(len > 2) {
+						if(len == 3) {
+							IICA::ICMR3.WAIT = 1;
+						}
+
+						*dst++ = IICA::ICDRR();
+						while(IICA::ICSR2.RDRF() == 0) ;
+						--len;
+					}
+					setup_ackbt_();
 					*dst++ = IICA::ICDRR();
-					--len;
-				}
+					while(IICA::ICSR2.RDRF() == 0) ;
 
-				if(IICA::ICMR3.RDRFS() == 0) {
-					IICA::ICMR3.ACKWP = 1;
-					IICA::ICMR3.ACKBT = 1;
-					IICA::ICMR3.ACKWP = 0;
+					IICA::ICSR2.STOP = 0;
+					IICA::ICCR2.SP = 1;
+	
+					*dst = IICA::ICDRR();
 				}
-				da = IICA::ICDRR();
-				if(len == 2) {
-					*dst++ = da;
-				}
-
-				while(IICA::ICSR2.RDRF() == 0) ;
-				IICA::ICSR2.STOP = 0;
-				IICA::ICCR2.SP = 1;
-				*dst = IICA::ICDRR();
 				IICA::ICMR3.WAIT = 0;
 
 				while(IICA::ICSR2.STOP() == 0) ;
-
 				IICA::ICSR2.NACKF = 0;
 				IICA::ICSR2.STOP = 0;
 			}
-
-			return ret;
+			return true;
 		}
-
 	};
 
 	template<class IICA> typename iica_io<IICA>::intr_t iica_io<IICA>::intr_;
