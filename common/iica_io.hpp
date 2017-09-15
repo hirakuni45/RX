@@ -444,17 +444,11 @@ namespace device {
 						while(IICA::ICSR2.RDRF() == 0) ;
 					}
 					setup_ackbt_();
-					{
-						volatile uint8_t tmp = IICA::ICDRR();
-						if(len == 2) {  // 1 バイトの場合ダミーリード
-							*dst++ = tmp;
-						}
-						while(IICA::ICSR2.RDRF() == 0) ;
+					volatile uint8_t tmp = IICA::ICDRR();
+					if(len == 2) {  // 1 バイトの場合ダミーリード
+						*dst++ = tmp;
 					}
-					IICA::ICSR2.STOP = 0;
-					IICA::ICCR2.SP = 1;
-	
-					*dst = IICA::ICDRR();
+					while(IICA::ICSR2.RDRF() == 0) ;
 				} else {
 					volatile uint8_t tmp = IICA::ICDRR();  // dummy read
 					while(IICA::ICSR2.RDRF() == 0) ;
@@ -471,12 +465,12 @@ namespace device {
 					setup_ackbt_();
 					*dst++ = IICA::ICDRR();
 					while(IICA::ICSR2.RDRF() == 0) ;
-
-					IICA::ICSR2.STOP = 0;
-					IICA::ICCR2.SP = 1;
-	
-					*dst = IICA::ICDRR();
 				}
+				IICA::ICSR2.STOP = 0;
+				IICA::ICCR2.SP = 1;
+	
+				*dst = IICA::ICDRR();
+
 				IICA::ICMR3.WAIT = 0;
 
 				while(IICA::ICSR2.STOP() == 0) ;
