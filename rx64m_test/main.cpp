@@ -185,13 +185,17 @@ namespace seeda {
 #ifdef SEEDA
 		if(nets_.get_dev_signal()) {
 			for(int i = 0; i < 8; ++i) {
-				sample_[i].add(signal_[i]);
+///				sample_[i].add(signal_[i]);
+				// とりあえず、安全の為１４ビットにする
+				sample_[i].add(signal_[i] & 0xfffc);
 				++signal_[i];
 			}
 		} else {
 			eadc_.convert();
 			for(int i = 0; i < 8; ++i) {
-				sample_[i].add(eadc_.get_value(i));
+///				sample_[i].add(eadc_.get_value(i));
+				// とりあえず、安全の為１４ビットにする
+				sample_[i].add(eadc_.get_value(i) & 0xfffc);
 			}
 		}
 #endif
