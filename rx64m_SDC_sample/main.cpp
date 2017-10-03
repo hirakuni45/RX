@@ -19,34 +19,33 @@
 #include "common/spi_io.hpp"
 #include "common/sdc_io.hpp"
 
+#include "RX64M/sdhi_io.hpp"
+
 #include "common/string_utils.hpp"
+
+// #define SDHI
 
 namespace {
 
-	class cmt_task {
-	public:
-		void operator() () {
-		}
-	};
-
-	device::cmt_io<device::CMT0, cmt_task>  cmt_;
+	device::cmt_io<device::CMT0>  cmt_;
 
 	typedef utils::fifo<uint16_t, 256> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
 	utils::rtc_io rtc_;
 
-	// SDC 用定義（SDHI）
-///	fatfs::sdhi_io<device::SDHI> sdc_;
-
 //	typedef device::rspi_io<device::RSPI> RSPI;
 //	RSPI rspi_;
 
+#ifdef SDHI
+	typedef fatfs::sdhi_io<device::SDHI, true> SDC;
+
+#else
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
 	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
 	typedef device::PORT<device::PORT7, device::bitpos::B7> SPCK;
-	typedef device::spi_io<MISO, MOSI, SPCK> SPI;
+	typedef device::spi_io<MISO, MOSI, SPCK, device::soft_spi_mode::CK10> SPI;
 	SPI spi_;
 
 	typedef device::PORT<device::PORTC, device::bitpos::B2> sdc_select;	///< カード選択信号
@@ -54,6 +53,8 @@ namespace {
 	typedef device::PORT<device::PORT8, device::bitpos::B1> sdc_detect;	///< カード検出
 
 	typedef utils::sdc_io<SPI, sdc_select, sdc_power, sdc_detect> SDC;
+#endif
+
 	SDC sdc_(spi_, 20000000);
 
 	utils::command<256> cmd_;
@@ -229,28 +230,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
-
-	device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
-	// メインクロック強制発振とドライブ能力設定
-	device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(0b10)
-						  | device::SYSTEM::MOFCR.MOFXIN.b(1);			
-	device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
-	while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
-
-	device::SYSTEM::PLLCR.STC = 0b010011;		// PLL 10 倍(120MHz)
-	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
-	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
-
-	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.ICK.b(0)		// 1/1 (120/1=120)
-						  | device::SYSTEM::SCKCR.BCK.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKA.b(0)		// 1/1 (120/1=120)
-						  | device::SYSTEM::SCKCR.PCKB.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKC.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (120/2=60)
-	device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
-	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
+	device::system_io<12000000>::setup_system_clock();
 
 	// SDRAM 初期化 128M/32bits bus
 //	sdram_();
