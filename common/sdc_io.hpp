@@ -67,7 +67,7 @@ namespace utils {
 			if(dir) {
 				format("          ");
 			} else {
-				format("%9d ") % fi->fsize;
+				format("%10d ") % fi->fsize;
 			}
 			format("%s %2d %4d %02d:%02d ") 
 				% get_mon(m->tm_mon)
