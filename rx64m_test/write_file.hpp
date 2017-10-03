@@ -36,7 +36,7 @@ namespace seeda {
 		bool		enable_;
 		bool		state_;
 
-		static const uint32_t BUF_SIZE = 64;
+		static const uint32_t BUF_SIZE = 256;
 
 		typedef utils::fixed_fifo<sample_t, BUF_SIZE> FIFO;
 		FIFO	fifo_;
