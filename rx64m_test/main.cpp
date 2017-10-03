@@ -69,6 +69,21 @@ namespace {
 		}
 		ena_int();
 	}
+
+
+	uint8_t v_ = 91;
+	uint8_t m_ = 123;
+	uint8_t rand_()
+	{
+		v_ += v_ << 2;
+		++v_;
+		uint8_t n = 0;
+		if(m_ & 0x02) n = 1;
+		if(m_ & 0x40) n ^= 1;
+		m_ += m_;
+		if(n == 0) ++m_;
+		return v_ ^ m_;
+	}
 }
 
 namespace seeda {
@@ -260,6 +275,60 @@ namespace seeda {
 	uint16_t get_adc(uint32_t ch)
 	{
 		return core_.get_adc(ch);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  ファイル作成テスト
+		@param[in]	fname	ファイル名
+		@param[in]	size	作成サイズ
+		@return 成功なら「true」
+	*/
+	//-----------------------------------------------------------------//
+	bool create_test_file(const char* fname, uint32_t size, sd_speed_t& t)
+	{
+		uint8_t buff[512];
+		FIL fp;
+
+		for(uint16_t i = 0; i < sizeof(buff); ++i) {
+			buff[i] = rand_();
+		}
+
+		auto st = core_.get_cmt_counter();
+		if(!sdc_.open(&fp, fname, FA_WRITE | FA_CREATE_ALWAYS)) {
+			utils::format("Can't create file: '%s'\n") % fname;
+			return false;
+		}
+
+		auto ed = core_.get_cmt_counter();
+		t.open = ed - st;
+		st = ed;
+
+		auto rs = size;
+		while(rs > 0) {
+			UINT sz = sizeof(buff);
+			if(sz > rs) sz = rs;
+			UINT bw;
+			f_write(&fp, buff, sz, &bw);
+			rs -= bw;
+		}
+		ed = core_.get_cmt_counter();
+		t.write = ed - st;
+		st = ed;
+
+		f_close(&fp);
+		ed = core_.get_cmt_counter();
+		t.close = ed - st;
+
+//		auto ed = core_.get_cmt_counter();
+//		uint32_t time = ed - st;
+//		utils::format("Write frame: %d\n") % len;
+//		auto pbyte = size * 1000 / time;
+//		utils::format("Write: %d Bytes/Sec\n") % pbyte;
+//		utils::format("Write: %d KBytes/Sec\n") % (pbyte / 1024);
+
+		return true;
 	}
 }
 

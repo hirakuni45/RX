@@ -10,6 +10,7 @@
 
 #include "common/rspi_io.hpp"
 #include "common/spi_io.hpp"
+#include "common/spi_io2.hpp"
 #include "common/sdc_io.hpp"
 #include "common/command.hpp"
 #include "common/fifo.hpp"
@@ -34,7 +35,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 508;
+	static const int seeda_version_ = 509;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef utils::command<256> CMD;
@@ -49,7 +50,7 @@ namespace seeda {
 	typedef device::PORT<device::PORTD, device::bitpos::B6> MISO;
 	typedef device::PORT<device::PORTD, device::bitpos::B4> MOSI;
 	typedef device::PORT<device::PORTD, device::bitpos::B5> SPCK;
-	typedef device::spi_io<MISO, MOSI, SPCK, device::soft_spi_mode::CK10> SPI;
+	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;
 
 	typedef device::PORT<device::PORTD, device::bitpos::B3> SDC_SELECT;	///< カード選択信号
 	typedef device::NULL_PORT  SDC_POWER;	///< カード電源制御（常に電源ＯＮ）
@@ -84,6 +85,18 @@ namespace seeda {
 	typedef HTTP::http_format http_format;	
 
 	typedef net::ftp_server<SDC> FTPS;
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  ＳＤカード速度構造体
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct sd_speed_t {
+		uint32_t	open;
+		uint32_t	write;
+		uint32_t	close;
+	};
 
 
 	//-----------------------------------------------------------------//
@@ -220,6 +233,17 @@ namespace seeda {
 	*/
 	//-----------------------------------------------------------------//
 	uint16_t get_adc(uint32_t ch);
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  ファイル作成テスト
+		@param[in]	fname	ファイル名
+		@param[in]	size	作成サイズ
+		@return 成功なら「true」
+	*/
+	//-----------------------------------------------------------------//
+	bool create_test_file(const char* fname, uint32_t size, sd_speed_t& t);
 }
 
 extern "C" {

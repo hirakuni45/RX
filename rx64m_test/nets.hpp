@@ -433,7 +433,7 @@ namespace seeda {
 				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"戻る\">\n");
 			} );
 
-			http_.set_link("/sdc_state", "DeletePreference", [=](void) {
+			http_.set_link("/sdc_state", "SD CARD State", [=](void) {
 				net_tools::render_version();
 				net_tools::render_date_time();
 				http_.tag_hr(600, 3);
@@ -453,6 +453,13 @@ namespace seeda {
 							http_format("ＳＤカード空容量： %3.2f [GBytes]<br>\n")
 								% (static_cast<float>(fspc) / (1024.0f * 1024.0f));
 						}
+
+						sd_speed_t t;
+						create_test_file("write_test.bin", 1024 * 1024, t);
+						http_format("ファイルオープン： %d [ms]<br>\n") % t.open;
+						http_format("ファイル書き込み： %3.2f [KB/Sec]<br>\n") 
+							% (1024.0f * 1000.0f / static_cast<float>(t.write));
+						http_format("ファイルクローズ： %d [ms]<br>\n") % t.close;
 					} else {
 						http_format("ＳＤカードがありません。<br>\n");
 					}

@@ -197,5 +197,15 @@ namespace seeda {
 			return adc_io_.get(static_cast<ADC::analog>(ch));
 		}
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマークラスのカウンター値の取得（１ｍｓ）
+			@return カウンター値
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_cmt_counter() const {
+			return cmt0_.get_counter();
+		}
 	};
 }
