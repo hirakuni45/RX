@@ -13,16 +13,18 @@
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
+#if 0
 /* MMC card type flags (MMC_GET_TYPE) */
 #define CT_MMC		0x01		/* MMC ver 3 */
 #define CT_SD1		0x02		/* SD ver 1 */
 #define CT_SD2		0x04		/* SD ver 2 */
 #define CT_SDC		(CT_SD1|CT_SD2)	/* SD */
 #define CT_BLOCK	0x08		/* Block addressing */
+#endif
 
-/// F_PCKB はクロック速度計算などで必要で、設定が無いとエラーにします。
-#ifndef F_PCKB
-#  error "sdhi_io.hpp requires F_PCKB to be defined"
+/// F_PCLKB はクロック速度計算などで必要で、設定が無いとエラーにします。
+#ifndef F_PCLKB
+#  error "sdhi_io.hpp requires F_PCLKB to be defined"
 #endif
 
 namespace fatfs {
@@ -31,13 +33,14 @@ namespace fatfs {
 	/*!
 		@brief  SDHI テンプレートクラス
 		@param[in]	SDHI	SDHI クラス
+		@param[in]	SPI		SPIの場合「true」	
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SDHI>
+	template <class SDHI, bool SPI = true>
 	class sdhi_io {
 
-		DSTATUS Stat_ = STA_NOINIT;	// Disk status
-		BYTE CardType_ = 0;			// b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing
+		DSTATUS stat_ = STA_NOINIT;	// Disk status
+		BYTE card_type_ = 0;		// b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing
 
 		// MMC/SD command (SPI mode)
 		enum class command : uint8_t {
@@ -174,10 +177,9 @@ namespace fatfs {
 		}
 
 
-
-#if 0
 		/* 1:OK, 0:Timeout */
 		int wait_ready_() {
+#if 0
 			BYTE d;
 			UINT tmr;
 			for (tmr = 5000; tmr; tmr--) {	/* Wait for ready in timeout of 500ms */
@@ -186,19 +188,24 @@ namespace fatfs {
 				utils::delay::micro_second(100);
 			}
 			return tmr ? 1 : 0;
+#endif
+			return 1;
 		}
 
 		/* 1:OK, 0:Timeout */
 		int select_() {
+#if 0
 			SEL::P = 0;
 			BYTE d;
 			spi_.recv(&d, 1);	/* Dummy clock (force DO enabled) */
 			if (wait_ready_()) return 1;	/* Wait for card ready */
 			deselect_();
+#endif
 			return 0;			/* Failed */
 		}
 
 
+#if 0
 		void start_spi_(bool fast)
 		{
 			uint32_t speed;
@@ -225,7 +232,7 @@ namespace fatfs {
 			@return カード・タイプ
 		 */
 		//-----------------------------------------------------------------//
-		BYTE card_type() const { return CardType_; }
+		BYTE card_type() const { return card_type_; }
 
 
 		//-----------------------------------------------------------------//
@@ -237,7 +244,7 @@ namespace fatfs {
 		DSTATUS disk_status(BYTE drv) const
 		{
 			if (drv) return STA_NOINIT;
-			return Stat_;
+			return stat_;
 		}
 
 
@@ -247,11 +254,13 @@ namespace fatfs {
 			@param[in]	drv		Physical drive nmuber (0)
 		 */
 		//-----------------------------------------------------------------//
-		DSTATUS disk_initialize (BYTE drv)
+		DSTATUS disk_initialize(BYTE drv)
 		{
-			if (drv) return RES_NOTRDY;
+			if(drv) return RES_NOTRDY;
 
 			device::power_cfg::turn(SDHI::get_peripheral());
+
+			device::port_map::turn(SDHI::get_peripheral());
 
 #if 0
 			/* Apply 80 dummy clocks and the card gets ready to receive command */
@@ -316,17 +325,17 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count)
 		{
-			if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
-			if (!(CardType_ & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
+			if(disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
+			if(!(card_type_ & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
 
 			//  READ_MULTIPLE_BLOCK : READ_SINGLE_BLOCK
 			command cmd = count > 1 ? command::CMD18 : command::CMD17;
-			if (send_cmd_(cmd, sector) == 0) {
+			if(send_cmd_(cmd, sector) == 0) {
 				do {
-					if (!rcvr_datablock_(buff, 512)) break;
+					if(!rcvr_datablock_(buff, 512)) break;
 					buff += 512;
-				} while (--count) ;
-				if (cmd == command::CMD18) send_cmd_(command::CMD12, 0);	/* STOP_TRANSMISSION */
+				} while(--count) ;
+				if(cmd == command::CMD18) send_cmd_(command::CMD12, 0);	/* STOP_TRANSMISSION */
 			}
 			deselect_();
 
@@ -345,21 +354,21 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count)
 		{
-			if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
-			if (!(CardType_ & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
+			if(disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
+			if(!(card_type_ & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
 
-			if (count == 1) {  // Single block write
-			if ((send_cmd_(command::CMD24, sector) == 0)	/* WRITE_BLOCK */
+			if(count == 1) {  // Single block write
+			if((send_cmd_(command::CMD24, sector) == 0)	/* WRITE_BLOCK */
 				&& xmit_datablock_(buff, 0xFE))
 				count = 0;
 			} else {           // Multiple block write
-				if (CardType_ & CT_SDC) send_cmd_(command::ACMD23, count);
+				if(card_type_ & CT_SDC) send_cmd_(command::ACMD23, count);
 				if (send_cmd_(command::CMD25, sector) == 0) {	/* WRITE_MULTIPLE_BLOCK */
 				do {
 					if (!xmit_datablock_(buff, 0xFC)) break;
 					buff += 512;
-				} while (--count) ;
-					if (!xmit_datablock_(0, 0xFD)) {  /* STOP_TRAN token */
+				} while(--count) ;
+					if(!xmit_datablock_(0, 0xFD)) {  /* STOP_TRAN token */
 						count = 1;
 					}
 				}
@@ -380,20 +389,19 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff)
 		{
-#if 0
-			if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;	/* Check if card is in the socket */
+			if(disk_status(drv) & STA_NOINIT) return RES_NOTRDY;	/* Check if card is in the socket */
 
 			DRESULT res = RES_ERROR;
 			switch (ctrl) {
 			case CTRL_SYNC :		/* Make sure that no pending write process */
-				if (select_()) res = RES_OK;
+				if(select_()) res = RES_OK;
 				break;
 
 			case GET_SECTOR_COUNT :	/* Get number of sectors on the disk (DWORD) */
 				{
 					BYTE csd[16];
 					DWORD cs;
-					if ((send_cmd_(command::CMD9, 0) == 0) && rcvr_datablock_(csd, 16)) {
+					if((send_cmd_(command::CMD9, 0) == 0) && rcvr_datablock_(csd, 16)) {
 						if ((csd[0] >> 6) == 1) {	/* SDC ver 2.00 */
 							cs = csd[9] + ((WORD)csd[8] << 8) + ((DWORD)(csd[7] & 63) << 16) + 1;
 							*(DWORD*)buff = cs << 10;
@@ -420,8 +428,6 @@ namespace fatfs {
 			deselect_();
 
 			return res;
-#endif
-			return RES_NOTRDY;
 		}
 	};
 }
