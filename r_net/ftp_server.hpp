@@ -1270,6 +1270,19 @@ namespace net {
 
 			case task::disconnect:
 			default:
+				bool con;
+				if(pasv_enable_) {
+					con = data_.connected();
+				} else {
+					con = port_.connected();
+				}
+				if(con) {				
+					if(pasv_enable_) {
+						data_.stop();
+					} else {
+						port_.stop();
+					}
+				}
 				ctrl_.stop();
 				debug_format("FTP Server (CTRL): disconnect\n");
 				delay_loop_ = 4;
