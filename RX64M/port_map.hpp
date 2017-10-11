@@ -22,7 +22,8 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map {
 
-		static void sub_(peripheral t, bool enable) {
+		static bool sub_(peripheral t, bool enable) {
+			bool ret = true;
 			switch(t) {
 			// ※シリアルポートの MPC 設定では、PDR を制御する必要は無いが、
 			// 出力ポートのインピーダンス制御の一環として入れてある。
@@ -149,7 +150,7 @@ namespace device {
 					MPC::P80PFS.PSEL = sel;  // SDHI_WP
 					MPC::P81PFS.PSEL = sel;  // SDHI_CD
 					PORT8::PMR.B0 = enable;
-					PORT8::PMR.B2 = enable;
+					PORT8::PMR.B1 = enable;
 					MPC::PC2PFS.PSEL = sel;  // SDHI_D3
 					MPC::PC3PFS.PSEL = sel;  // SDHI_D0
 					MPC::PC4PFS.PSEL = sel;  // SDHI_D1
@@ -228,12 +229,14 @@ namespace device {
 				break;
 
 			default:
-//				utils::format("Fail port map: %d\n") % static_cast<int>(t);
+				ret = false;
 				break;
 			}
+			return ret;
 		}
 
 	public:
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  周辺機器に切り替える
@@ -241,14 +244,39 @@ namespace device {
 			@param[in]	ena	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void turn(peripheral t, bool ena = true)
+		static bool turn(peripheral t, bool ena = true) noexcept
 		{
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			sub_(t, ena);
+			auto ret = sub_(t, ena);
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SDHI クロック端子のソフト制御
+			@param[in]	t	周辺機器タイプ
+		*/
+		//-----------------------------------------------------------------//
+		static bool turn_sdhi_clk(peripheral t)
+		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = false;
+			if(t == peripheral::SDHI) {
+				MPC::P77PFS.PSEL = 0;  // SDHI_CLK
+				PORT7::PMR.B7 = 0;
+				ret = true;
+			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+
+			return ret;
 		}
 	};
 }
