@@ -36,10 +36,10 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0,  6> CMDIDX;
-			bits_rw_t<io_, bitpos::B6,  2> ACMD;
-			bits_rw_t<io_, bitpos::B0,  8> CMD;
-			bits_rw_t<io_, bitpos::B8,  3> RSPTP;
+			bits_rw_t<io_, bitpos::B0, 6>  CMDIDX;
+			bits_rw_t<io_, bitpos::B6, 2>  ACMD;
+			bits_rw_t<io_, bitpos::B0, 8>  CMD;
+			bits_rw_t<io_, bitpos::B8, 3>  RSPTP;
 			bit_rw_t <io_, bitpos::B11>    CMDTP;
 			bit_rw_t <io_, bitpos::B12>    CMDRW;
 			bit_rw_t <io_, bitpos::B13>    TRSTP;
@@ -126,14 +126,15 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>  RSPEN;
+			bit_rw_t<io_, bitpos::B0>  RSPEND;
 			bit_rw_t<io_, bitpos::B2>  ACEND;
 			bit_rw_t<io_, bitpos::B3>  SDCDRM;
 			bit_rw_t<io_, bitpos::B4>  SDCDIN;
-			bit_rw_t<io_, bitpos::B7>  SDWPMON;
+			bit_ro_t<io_, bitpos::B5>  SDCDMON;
+			bit_ro_t<io_, bitpos::B7>  SDWPMON;
 			bit_rw_t<io_, bitpos::B8>  SDD3RM;
 			bit_rw_t<io_, bitpos::B9>  SDD3IN;
-			bit_rw_t<io_, bitpos::B10> SDD3MON;
+			bit_ro_t<io_, bitpos::B10> SDD3MON;
 		};
 		static sdsts1_t SDSTS1;
 
@@ -157,12 +158,12 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  ILW;
 			bit_rw_t<io_, bitpos::B5>  ILR;
 			bit_rw_t<io_, bitpos::B6>  RSPTO;
-			bit_rw_t<io_, bitpos::B7>  SDD0MON;
+			bit_ro_t<io_, bitpos::B7>  SDD0MON;
 			bit_rw_t<io_, bitpos::B8>  BRE;
 			bit_rw_t<io_, bitpos::B9>  BWE;
 
-			bit_rw_t<io_, bitpos::B13> SDCLKCREN;
-			bit_rw_t<io_, bitpos::B14> CBSY;
+			bit_ro_t<io_, bitpos::B13> SDCLKCREN;
+			bit_ro_t<io_, bitpos::B14> CBSY;
 			bit_rw_t<io_, bitpos::B15> ILA;
 		};
 		static sdsts2_t SDSTS2;
@@ -407,8 +408,8 @@ namespace device {
 			@brief  SDHI ソフトウェアリセットレジスタ（ SDRST ）
 		*/
 		//-----------------------------------------------------------------//
-		struct sdrst_t : public rw32_t<base + 0x1D0> {
-			typedef rw32_t<base + 0x1D0> io_;
+		struct sdrst_t : public rw32_t<base + 0x1C0> {
+			typedef rw32_t<base + 0x1C0> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
