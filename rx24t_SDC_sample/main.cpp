@@ -15,50 +15,52 @@
 #include "common/command.hpp"
 #include "common/rspi_io.hpp"
 #include "common/spi_io.hpp"
-#include "common/sdc_io.hpp"
+#include "common/sdc_man.hpp"
 
 #ifdef RTC
 #include "common/iica_io.hpp"
 #include "chip/DS3231.hpp"
 #endif
 
+// #define SOFT_SPI
+
 namespace {
 
-	class cmt_task {
-	public:
-		void operator() () {
-		}
-	};
+	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
+	CMT		cmt_;
 
-	device::cmt_io<device::CMT0, cmt_task>  cmt_;
-
-	typedef utils::fifo<uint8_t, 128> buffer;
-	device::sci_io<device::SCI1, buffer, buffer> sci_;
+	typedef utils::fifo<uint8_t, 128> BUFFER;
+	typedef device::sci_io<device::SCI1, BUFFER, BUFFER> SCI;
+	SCI		sci_;
 
 #ifdef RTC
 	typedef device::iica_io<device::RIIC0> I2C;
-	I2C i2c_;
+	I2C		i2c_;
 
-	chip::DS3231<I2C> rtc_(i2c_);
+	typedef chip::DS3231<I2C> RTC;
+	RTC		rtc_(i2c_);
 #endif
 
-#if 0
-	// RSPI SDC 用　SPI 定義（RSPI0）
-	typedef device::rspi_io<device::RSPI0> SPI;
-	SPI spi_;
-#else
+#ifdef SOFT_SPI
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;
 	typedef device::PORT<device::PORT2, device::bitpos::B3> MOSI;
 	typedef device::PORT<device::PORT2, device::bitpos::B4> SPCK;
 	typedef device::spi_io<MISO, MOSI, SPCK> SPI;
-	SPI spi_;
+#else
+	// RSPI SDC 用　SPI 定義（RSPI0）
+	typedef device::rspi_io<device::RSPI0> SPI;
 #endif
-	typedef device::PORT<device::PORT6, device::bitpos::B5> sdc_select;	///< カード選択信号
-	typedef device::PORT<device::PORT6, device::bitpos::B4> sdc_power;	///< カード電源制御
-	typedef device::PORT<device::PORT6, device::bitpos::B3> sdc_detect;	///< カード検出
+	SPI 	spi_;
 
-	utils::sdc_io<SPI, sdc_select, sdc_power, sdc_detect> sdc_(spi_, 20000000);
+	typedef device::PORT<device::PORT6, device::bitpos::B5> SDC_SELECT;	///< カード選択信号
+	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;	///< カード電源制御
+	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
+
+	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;
+	MMC		mmc_(spi_, 20000000);
+
+	utils::sdc_man	sdc_;
 
 	utils::command<128> command_;
 
@@ -190,23 +192,23 @@ extern "C" {
 	}
 
 	DSTATUS disk_initialize(BYTE drv) {
-		return sdc_.at_mmc().disk_initialize(drv);
+		return mmc_.disk_initialize(drv);
 	}
 
 	DSTATUS disk_status(BYTE drv) {
-		return sdc_.at_mmc().disk_status(drv);
+		return mmc_.disk_status(drv);
 	}
 
 	DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
-		return sdc_.at_mmc().disk_read(drv, buff, sector, count);
+		return mmc_.disk_read(drv, buff, sector, count);
 	}
 
 	DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
-		return sdc_.at_mmc().disk_write(drv, buff, sector, count);
+		return mmc_.disk_write(drv, buff, sector, count);
 	}
 
 	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
-		return sdc_.at_mmc().disk_ioctl(drv, ctrl, buff);
+		return mmc_.disk_ioctl(drv, ctrl, buff);
 	}
 
 	DWORD get_fattime(void) {
@@ -373,10 +375,11 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	// SD カード・クラスの初期化
-	sdc_.start();
-
 	utils::format("RX24T SD-CARD Access sample\n");
+
+	// SDC 開始
+	mmc_.start();
+	sdc_.start();
 
 #ifdef RTC
 	// DS3231(RTC) の開始
@@ -395,13 +398,8 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
-		++cnt;
-		if(cnt >= 30) {
-			cnt = 0;
-		}
-		LED::P = (cnt < 10) ? 0 : 1;
-
-		sdc_.service();
+		// SD カード・サービス
+		sdc_.service(mmc_.service());
 
 		// コマンド入力と、コマンド解析
 		if(command_.service()) {
@@ -462,5 +460,11 @@ int main(int argc, char** argv)
 				}
 			}
 		}
+
+		++cnt;
+		if(cnt >= 30) {
+			cnt = 0;
+		}
+		LED::P = (cnt < 10) ? 0 : 1;
 	}
 }
