@@ -13,16 +13,6 @@
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
-#include "common/spi_io.hpp"
-#include "RX600/port.hpp"
-
-/* MMC card type flags (MMC_GET_TYPE) */
-#define CT_MMC		0x01				/* MMC ver 3 */
-#define CT_SD1		0x02				/* SD ver 1 */
-#define CT_SD2		0x04				/* SD ver 2 */
-#define CT_SDC		(CT_SD1 | CT_SD2)	/* SD */
-#define CT_BLOCK	0x08				/* Block addressing */
-
 // #define DEBUG_MMC
 
 namespace fatfs {
@@ -32,17 +22,34 @@ namespace fatfs {
 		@brief  MMC テンプレートクラス
 		@param[in]	SPI	SPI クラス
 		@param[in]	SEL	デバイス選択クラス
+		@param[in]	POW	電源操作クラス
+		@param[in]	CDT	カード検出クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SPI, class SEL>
+	template <class SPI, class SEL, class POW, class CDT>
 	class mmc_io {
 
-		SPI&	spi_;
+		// MMC card type flags (MMC_GET_TYPE)
+		static const BYTE CT_MMC   = 0x01;	///< MMC ver 3
+		static const BYTE CT_SD1   = 0x02;	///< SD ver 1
+		static const BYTE CT_SD2   = 0x04;	///< SD ver 2
+		static const BYTE CT_SDC   = CT_SD1 | CT_SD2;   ///< SD
+		static const BYTE CT_BLOCK = 0x08;	///< Block addressing
+
+		SPI&		spi_;
+
+		FATFS		fatfs_;
 
 		uint32_t	limitc_;
 
 		DSTATUS Stat_;	// Disk status
 		BYTE CardType_;	// b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing
+
+		uint8_t		select_wait_;
+		uint8_t		mount_delay_;
+		bool		cd_;
+		bool		mount_;
+		bool		init_port_;
 
 		// MMC/SD command (SPI mode)
 		enum class command : uint8_t {
@@ -222,8 +229,34 @@ namespace fatfs {
 			@param[in]	limitc	SPI 最大速度
 		 */
 		//-----------------------------------------------------------------//
-		mmc_io(SPI& spi, uint32_t limitc) :
-			spi_(spi), limitc_(limitc), Stat_(STA_NOINIT), CardType_(0) { }
+		mmc_io(SPI& spi, uint32_t limitc) noexcept :
+			spi_(spi), limitc_(limitc), Stat_(STA_NOINIT), CardType_(0),
+			select_wait_(0), mount_delay_(0), cd_(false), mount_(false),
+			init_port_(false) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	開始（初期化）
+		 */
+		//-----------------------------------------------------------------//
+		void start()
+		{
+			if(init_port_) return;
+
+			POW::DIR = 1;
+			POW::P = 1;  // power off
+			POW::PU = 0;
+
+			SEL::DIR = 1;
+			SEL::PU = 0;
+			SEL::P = 0;  // ※電源 OFF 時は、SEL を「１」にすると、SEL から電流が流れるので、「０」にする
+
+			CDT::DIR = 0;
+			CDT::PU  = 1;  // 内部プルアップは標準では有効にしておく
+
+			init_port_ = true;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -232,7 +265,7 @@ namespace fatfs {
 			@return カード・タイプ
 		 */
 		//-----------------------------------------------------------------//
-		BYTE card_type() const { return CardType_; }
+		BYTE card_type() const noexcept { return CardType_; }
 
 
 		//-----------------------------------------------------------------//
@@ -241,7 +274,7 @@ namespace fatfs {
 			@param[in]	drv		Physical drive nmuber (0)
 		 */
 		//-----------------------------------------------------------------//
-		DSTATUS disk_status(BYTE drv) const
+		DSTATUS disk_status(BYTE drv) const noexcept
 		{
 			if (drv) return STA_NOINIT;
 			return Stat_;
@@ -255,11 +288,10 @@ namespace fatfs {
 			@return ステータス
 		 */
 		//-----------------------------------------------------------------//
-		DSTATUS disk_initialize (BYTE drv)
+		DSTATUS disk_initialize (BYTE drv) noexcept
 		{
 			if (drv) return RES_NOTRDY;
 
-			SEL::DIR = 1;  // output
 			SEL::P = 1;
 			SEL::PU = 0;
 
@@ -333,7 +365,7 @@ namespace fatfs {
 			@return リザルト
 		 */
 		//-----------------------------------------------------------------//
-		DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count)
+		DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) noexcept
 		{
 			if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
 			if (!(CardType_ & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
@@ -363,7 +395,7 @@ namespace fatfs {
 			@return リザルト
 		 */
 		//-----------------------------------------------------------------//
-		DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count)
+		DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) noexcept
 		{
 			if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
 			if (!(CardType_ & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
@@ -400,7 +432,7 @@ namespace fatfs {
 			@return リザルト
 		 */
 		//-----------------------------------------------------------------//
-		DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff)
+		DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) noexcept
 		{
 			if (disk_status(drv) & STA_NOINIT) return RES_NOTRDY;	/* Check if card is in the socket */
 
@@ -441,6 +473,60 @@ namespace fatfs {
 			deselect_();
 
 			return res;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	サービス @n
+					※チャタリング除去を行う為、最大で、60Hz 間隔で呼び出す。
+			@return カードがマウントされたら「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool service() noexcept
+		{
+			start();
+
+			auto st = !CDT::P();
+			if(st) {
+				if(select_wait_ < 255) {
+					++select_wait_;
+				}
+			} else {
+				select_wait_ = 0;
+			}
+			if(!cd_ && select_wait_ >= 10) {
+				mount_delay_ = 30;  // 30 フレーム後にマウントする
+				POW::P = 0;
+				SEL::P = 1;
+//				utils::format("Card ditect\n");
+			} else if(cd_ && select_wait_ == 0) {
+				f_mount(&fatfs_, "", 0);
+				spi_.destroy();
+				POW::P = 1;
+				SEL::P = 0;
+				mount_ = false;
+//				utils::format("Card unditect\n");
+			}
+			if(select_wait_ >= 10) cd_ = true;
+			else cd_ = false;
+
+			if(mount_delay_) {
+				--mount_delay_;
+				if(mount_delay_ == 0) {
+					auto st = f_mount(&fatfs_, "", 1);
+					if(st != FR_OK) {
+						utils::format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
+						spi_.destroy();
+						POW::P = 1;
+						SEL::P = 0;
+						mount_ = false;
+					} else {
+						mount_ = true;
+					}
+				}
+			}
+			return mount_;
 		}
 	};
 }
