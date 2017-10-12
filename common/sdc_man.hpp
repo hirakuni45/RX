@@ -147,8 +147,6 @@ namespace utils {
 			}
 		};
 
-
-		FATFS			fatfs_;  ///< FatFS コンテキスト
 		char			current_[_MAX_LFN + 1];
 		bool			cdet_;
 		bool			mount_;
@@ -317,7 +315,6 @@ namespace utils {
 		{
 			mount_ = false;
 			strcpy(current_, "/");
-			memset(&fatfs_, 0, sizeof(FATFS));
 		}
 
 
@@ -697,41 +694,19 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	SD カードアクセス・サービス（毎フレーム呼ぶ）
-			@param[in]	cdet	SD カード検出時「true」
-			@return マウントしている場合「true」
+			@param[in]	mount	マウント時「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool service(bool cdet) noexcept
+		void service(bool mount) noexcept
 		{
-			if(cdet_ != cdet) {
-				if(!cdet_ && cdet) {  // Detect CARD
-//					POWER::P = 0;
-					mount_delay_ = 30;  // マウント初期化を呼ぶ遅延
-				}
-				cdet_ = cdet;
+			if(mount && !mount_) {
+				strcpy(current_, "/");				
 			}
-
-			if(mount_delay_) {
-				--mount_delay_;
-				if(mount_delay_ == 0) {
-					auto st = f_mount(&fatfs_, "", 1);
-					if(st != FR_OK) {
-						format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
-//						spi_.destroy();
-//						POWER::P = 1;
-//						SELECT::P = 0;
-						mount_ = false;
-					} else {
-						strcpy(current_, "/");
-						mount_ = true;
-					}
-				}
-			}
+			mount_ = mount;
 
 			if(mount_) {
 				dir_list_.service(dir_list_limit_, dir_func_, dir_todir_, dir_option_);
 			}
-			return mount_;
 		}
 
 

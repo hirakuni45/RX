@@ -32,7 +32,7 @@ namespace utils {
 
 		typedef SPI spi_type;	///< ＳＰＩ型
 
-		typedef fatfs::mmc_io<SPI, SELECT> mmc_type;	///< ＭＭＣ型
+		typedef fatfs::mmc_io<SPI, SELECT, POWER, DETECT> mmc_type;	///< ＭＭＣ型
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -41,7 +41,6 @@ namespace utils {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		typedef void (*dir_loop_func)(const char* name, const FILINFO* fi, bool dir, void* option);
-
 
 	private:
 		FATFS	fatfs_;  ///< FatFS コンテキスト
@@ -107,7 +106,7 @@ namespace utils {
 		};
 
 		static void path_copy_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
-			copy_t* t = reinterpret_cast<match_t*>(option);
+			copy_t* t = reinterpret_cast<copy_t*>(option);
 			if(t->idx_ == t->match_) {
 				if(t->path_ != nullptr) {
 					char* p = t->path_;
