@@ -42,8 +42,8 @@ namespace fatfs {
 
 		uint32_t	limitc_;
 
-		DSTATUS Stat_;	// Disk status
-		BYTE CardType_;	// b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing
+		DSTATUS		Stat_;		// Disk status
+		BYTE		CardType_;	// b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing
 
 		uint8_t		select_wait_;
 		uint8_t		mount_delay_;
