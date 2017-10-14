@@ -107,6 +107,7 @@ namespace net {
 		/*!
 			@brief  文字列から設定
 			@param[in]	address	配列
+			@return 変換が正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
 		bool from_string(const char *address) {
@@ -115,11 +116,15 @@ namespace net {
 			auto f = (utils::input("%d.%d.%d.%d", address) % a % b % c % d).status();
 			if(f) {
 				if(a >= 0 && a <= 255) address_.bytes[0] = a;
+				else return false;
 				if(a >= 0 && b <= 255) address_.bytes[1] = b;
+				else return false;
 				if(a >= 0 && c <= 255) address_.bytes[2] = c;
+				else return false;
 				if(a >= 0 && d <= 255) address_.bytes[3] = d;
+				else return false;
 			}
-			return f;
+			return true;
 		}
 
 
