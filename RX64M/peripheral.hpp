@@ -75,6 +75,9 @@ namespace device {
 		S12AD1,		///< 12 ビット A/D コンバータ（S12ADC）
 
 		R12DA,		///< 12 ビット D/A コンバータ（R12DA）
+
+		ECCRAM,		///< ECC RAM (32K)
+		STBRAM,		///< Standby RAM (8K)		
 	};
 
 }

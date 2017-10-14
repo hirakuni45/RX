@@ -99,6 +99,14 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB14 = f;	// ETHER1, EDMAC1 のストップ状態解除
 				BUS::BEREN.TOEN = 1;
 				break;
+
+			case peripheral::ECCRAM:
+				SYSTEM::MSTPCRC.MSTPC6 = f;		// ECC RAM のストップ状態解除
+				break;
+
+			case peripheral::STBRAM:
+				SYSTEM::MSTPCRC.MSTPC7 = f;		// STANDBY RAM のストップ状態解除
+				break;
 			default:
 				break;
 			}
