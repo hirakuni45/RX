@@ -101,6 +101,7 @@ namespace utils {
 			not_integer,	///< 整数の不一致
 			not_float,		///< 浮動小数点の不一致
 			terminate,		///< 終端文字の不一致
+			null_form,		///< 無効なフォーム
 		};
 
 	private:
@@ -203,6 +204,11 @@ namespace utils {
 
 		void next_()
 		{
+			if(form_ == nullptr) {
+				error_ = error::null_form;
+				return;				
+			}
+
 			enum class fmm : uint8_t {
 				none,
 				type,
