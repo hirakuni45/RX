@@ -147,22 +147,30 @@ namespace device {
 			case peripheral::SDHI:
 				{
 					uint8_t sel = enable ? 0b011010 : 0;
-					MPC::P80PFS.PSEL = sel;  // SDHI_WP
-					MPC::P81PFS.PSEL = sel;  // SDHI_CD
+					MPC::P80PFS.PSEL = sel;  // SDHI_WP (81)
 					PORT8::PMR.B0 = enable;
+//					PORT8::PCR.B0 = 1;
+					MPC::P81PFS.PSEL = sel;  // SDHI_CD (80)
 					PORT8::PMR.B1 = enable;
-					MPC::PC2PFS.PSEL = sel;  // SDHI_D3
-					MPC::PC3PFS.PSEL = sel;  // SDHI_D0
-					MPC::PC4PFS.PSEL = sel;  // SDHI_D1
+//					PORT8::PCR.B1 = 1;
+					MPC::PC2PFS.PSEL = sel;  // SDHI_D3 (86)
 					PORTC::PMR.B2 = enable;
+//					PORTC::PCR.B2 = 1;
+					MPC::PC3PFS.PSEL = sel;  // SDHI_D0 (83)
 					PORTC::PMR.B3 = enable;
+//					PORTC::PCR.B3 = 1;
+					MPC::PC4PFS.PSEL = sel;  // SDHI_D1 (82)
 					PORTC::PMR.B4 = enable;
-   					MPC::P75PFS.PSEL = sel;  // SDHI_D2
-					MPC::P76PFS.PSEL = sel;  // SDHI_CMD
-					MPC::P77PFS.PSEL = sel;  // SDHI_CLK
+//					PORTC::PCR.B4 = 1;
+   					MPC::P75PFS.PSEL = sel;  // SDHI_D2 (87)
 					PORT7::PMR.B5 = enable;
+//					PORT7::PCR.B5 = 1;
+					MPC::P76PFS.PSEL = sel;  // SDHI_CMD (85)
 					PORT7::PMR.B6 = enable;
+//					PORT7::PCR.B6 = 1;
+					MPC::P77PFS.PSEL = sel;  // SDHI_CLK (84)
 					PORT7::PMR.B7 = enable;
+//					PORT7::PCR.B7 = 1;
 				}
 				break;
 
@@ -261,19 +269,31 @@ namespace device {
 		/*!
 			@brief  SDHI クロック端子のソフト制御
 			@param[in]	t	周辺機器タイプ
+			@param[in]	ena	SDHI のクロック端子にする場合「true」
+			@param[in]	out	SDHI クロック出力設定
+			@return 周辺機器型が異なる場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn_sdhi_clk(peripheral t)
+		static bool turn_sdhi_clk(peripheral t, bool ena, bool out)
 		{
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = false;
 			if(t == peripheral::SDHI) {
-				MPC::P77PFS.PSEL = 0;  // SDHI_CLK
-				PORT7::PMR.B7 = 0;
+				if(ena) {
+					MPC::P77PFS.PSEL = 0b011010;  // enable SDHI_CLK
+					PORT7::PMR.B7 = 1;
+				} else {
+					MPC::P77PFS.PSEL = 0;  		  // disable SDHI_CLK
+					PORT7::PMR.B7 = 0;
+					PORT7::PCR.B7 = 0;  // pullup offline
+					PORT7::PDR.B7 = 1;  // output
+					PORT7::PODR.B7 = out;
+				}
 				ret = true;
 			}
+
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 
 			return ret;
