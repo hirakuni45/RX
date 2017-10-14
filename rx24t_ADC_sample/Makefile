@@ -9,7 +9,12 @@ TARGET		=	adc_sample
 
 DEVICE		=	R5F524TA
 
+FATFS_VER	=	ff12b
+
+# release/debug
 BUILD		=	release
+
+BUILD_ID	=	$(shell date +%Y%m%d%H)
 
 VPATH		=	../
 
