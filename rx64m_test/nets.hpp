@@ -204,10 +204,14 @@ namespace seeda {
 			const char* time = nullptr;
 			for(uint32_t i = 0; i < cgi.size(); ++i) {
 				const auto& t = cgi.get_unit(i);
-				if(strcmp(t.key, "date") == 0) {
+				if(t.key == nullptr) {
+					break;
+				} else if(strcmp(t.key, "date") == 0) {
 					date = t.val;
 				} else if(strcmp(t.key, "time") == 0) {
 					time = t.val;
+				} else {
+					break;
 				}
 			}
 			if(date != nullptr && time != nullptr) {
@@ -227,7 +231,9 @@ namespace seeda {
 			cgi.parse(http_.get_post_body());
 			for(uint32_t i = 0; i < cgi.size(); ++i) {
 				const auto& t = cgi.get_unit(i);
-				if(std::strcmp(t.key, "mode") == 0) {
+				if(t.key == nullptr || t.val == nullptr) {
+					break;
+				} else if(std::strcmp(t.key, "mode") == 0) {
 					if(std::strcmp(t.val, "normal") == 0) {  // 通常
 						setup_.at_signal() = false;
 						debug_format("Turn Normal\n");
@@ -247,27 +253,33 @@ namespace seeda {
 			cgi.parse(http_.get_post_body());
 			for(uint32_t i = 0; i < cgi.size(); ++i) {
 				const auto& t = cgi.get_unit(i);
-				int ch;
-				if((utils::input("mode%d", t.key) % ch).status()) {
+				int ch = 0;
+				bool err = true;
+				if(t.key == nullptr || t.val == nullptr) {
+
+				} else if((utils::input("mode%d", t.key) % ch).status()) {
 					if(strcmp(t.val, "none") == 0) {  // 数値（無変換）
 						at_sample(ch).mode_ = seeda::sample_t::mode::none;
+						err = false;
 					} else if(strcmp(t.val, "real") == 0) {  // 係数値変換
 						at_sample(ch).mode_ = seeda::sample_t::mode::real;
+						err = false;
 					} else if(strcmp(t.val, "abs") == 0) {  // 絶対値変換
 						at_sample(ch).mode_ = seeda::sample_t::mode::abs;
+						err = false;
 					}
 				} else if((utils::input("gain%d", t.key) % ch).status()) {
 					float v = 0.0f;
-					const char* p = t.val;
-					if((utils::input("%f", p) % v).status()) {
+					if((utils::input("%f", t.val) % v).status()) {
 						at_sample(ch).gain_ = v;
+						err = false;
 					}
 				} else if((utils::input("center%d", t.key) % ch).status()) {
 					int v = 0;
-					const char* p = t.val;
-					if((utils::input("%d", p) % v).status()) {
+					if((utils::input("%d", t.val) % v).status()) {
 						if(v >= 0 && v <= 65535) {
 							at_sample(ch).center_ = v;
+							err = false;
 						}
 					}
 				} else if((utils::input("level_lo%d", t.key) % ch).status()) {
@@ -275,6 +287,7 @@ namespace seeda {
 					if((utils::input("%d", t.val) % v).status()) {
 						if(v >= 0 && v <= 65535) {
 							at_sample(ch).limit_lo_level_ = v;
+							err = false;
 						}
 					}
 				} else if((utils::input("level_hi%d", t.key) % ch).status()) {
@@ -282,8 +295,12 @@ namespace seeda {
 					if((utils::input("%d", t.val) % v).status()) {
 						if(v >= 0 && v <= 65535) {
 							at_sample(ch).limit_hi_level_ = v;
+							err = false;
 						}
 					}
+				}
+				if(err) {
+					return;
 				}
 			}
 			write_pre_();
@@ -298,15 +315,24 @@ namespace seeda {
 			cgi.parse(http_.get_post_body());
 			for(uint32_t i = 0; i < cgi.size(); ++i) {
 				const auto& t = cgi.get_unit(i);
-				if(strcmp(t.key, "ip") == 0) {
+				bool err = true;
+				if(t.key == nullptr || t.val == nullptr) {
+
+				} else if(strcmp(t.key, "ip") == 0) {
 					debug_format("Set client IP: '%s'\n") % t.val;
-					client_.at_ip().from_string(t.val);
+					if(client_.at_ip().from_string(t.val)) {
+						err = false;
+					}
 				} else if(strcmp(t.key, "port") == 0) {
 					int port;
 					if((utils::input("%d", t.val) % port).status()) {
 						debug_format("Set client PORT: %d\n") % port;
 						client_.set_port(port);
+						err = false;
 					}
+				}
+				if(err) {
+					return;
 				}
 			}
 			write_pre_();
@@ -322,12 +348,25 @@ namespace seeda {
 				cgi.parse(http_.get_post_body());
 				for(uint32_t i = 0; i < cgi.size(); ++i) {
 					const auto& t = cgi.get_unit(i);
-					if(strcmp(t.key, "fname") == 0) {
-						if(t.val != nullptr) write_file_.set_path(t.val);
+					bool err = true;
+					if(t.key == nullptr || t.val == nullptr) {
+
+					} else if(strcmp(t.key, "fname") == 0) {
+						if(std::strlen(t.val) > 0) {
+							write_file_.set_path(t.val);
+							err = false;
+						}
 					} else if(strcmp(t.key, "count") == 0) {
-						int n;
-						utils::input("%d", t.val) % n;
-						write_file_.set_limit(n);
+						int n = 0;
+						if((utils::input("%d", t.val) % n).status()) {
+							if(n > 0) {
+								write_file_.set_limit(n);
+								err = false;
+							}
+						}
+					}
+					if(err) {
+						return;
 					}
 				}
 				write_file_.enable();
@@ -345,19 +384,30 @@ namespace seeda {
 			dhcp_ = false;
 			for(uint32_t i = 0; i < cgi.size(); ++i) {
 				const auto& t = cgi.get_unit(i);
-				int n;
-				if(strcmp(t.key, "dhcp") == 0) {
+				int n = 0;
+				bool err = true;
+				if(t.key == nullptr || t.val == nullptr) {
+
+				} else if(strcmp(t.key, "dhcp") == 0) {
 					if(strcmp(t.val, "on") == 0) {
 						dhcp_ = true;
+						err = false;
 					}
 				} else if((utils::input("ip%d", t.key) % n).status()) {
 					if(n >= 0 && n <= 3) {
-						int v;
-						utils::input("%d", t.val) % v;
-						debug_format("%d, ") % v;
-						ip_[n] = v;
+						int v = 0;
+						if((utils::input("%d", t.val) % v).status()) {
+							if(v >= 0 && v <= 255) {
+								debug_format("%d, ") % v;
+								ip_[n] = v;
+								err = false;
+							}
+						}
 					}
 					debug_format("\n");
+				}
+				if(err) {
+					return;
 				}
 			}
 			setup_.write_eui(dhcp_, ip_);
