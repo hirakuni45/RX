@@ -1,12 +1,14 @@
-#=======================================================#
-#														#
-#	RX64M Makefile 				        				#
-#														#
-#=======================================================#
+#=======================================================================
+#   @file
+#   @brief  RX64M Makefile
+#   @author 平松邦仁 (hira@rvf-rc45.net)
+#	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+#				Released under the MIT license @n
+#				https://github.com/hirakuni45/RX/blob/master/LICENSE
+#=======================================================================
 TARGET		=	data_flash_sample
 
-# MCU (R5F564MLHDFB 144pin QFP)
-DEVICE		=	R5F564ML
+DEVICE		=	R5F564MF
 
 FATFS_VER	=	ff12b
 
@@ -28,15 +30,15 @@ USER_LIBS	=	stdc++
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX64M F_ICLK=96000000 F_FCLK=48000000 F_PCLKA=96000000 F_PCLKB=48000000 F_PCLKD=48000000
+USER_DEFS	=	SIG_RX64M F_ICLK=120000000 F_FCLK=60000000 F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKD=60000000
 
 MCU_TARGET	=
 
 INC_SYS		=
 
-INC_APP		=	. ../ ../RX64M ../GR
+INC_APP		=	. ../ ../RX64M
 
-OPTIMIZE	=	-O1
+OPTIMIZE	=	-Os
 
 AS_OPT		=	-mcpu=rx600
 

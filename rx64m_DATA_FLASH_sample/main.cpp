@@ -1,9 +1,11 @@
 //=====================================================================//
 /*! @file
     @brief  RX64M Data Flash サンプル @n
-			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
-			Copyright 2017 Kunihito Hiramatsu
+			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/renesas.hpp"
@@ -152,7 +154,7 @@ int main(int argc, char** argv)
 				bool f = false;
 				char buff[16];
 				if(command_.get_word(1, sizeof(buff), buff)) {
-					int bank;
+					int bank = 0;
 					if((utils::input("%d", buff) % bank).status()) {
 						if(static_cast<uint32_t>(bank) < FLASH::data_flash_bank) {
 							f = flash_.erase(bank);
