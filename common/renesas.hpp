@@ -88,6 +88,7 @@
 #include "RX64M/ssi.hpp"
 #include "RX64M/src.hpp"
 #include "RX64M/sdhi.hpp"
+#include "RX64M/standby_ram.hpp"
 
 #else
 #  error "Requires SIG_XXX to be defined"
