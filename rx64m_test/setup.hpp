@@ -482,6 +482,13 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 				http_format("ＳＤカードがありません。<br>");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
+
+			// ログ表示ボタン
+			{
+				http_format("<input type=\"button\" onclick=\"location.href='/log_state'\""
+							" value=\"ログ情報\"%s>") % (mount ? "" : " disabled=\"disabled\"");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
+			}
 		}
 	};
 }

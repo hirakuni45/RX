@@ -28,7 +28,7 @@
 #include "r_net/ftp_server.hpp"
 
 #ifdef DEBUG
-#define CLIENT_DEBUG
+/// #define CLIENT_DEBUG
 #define NETS_DEBUG
 #define WRITE_FILE_DEBUG
 #endif

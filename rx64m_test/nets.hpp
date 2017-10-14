@@ -414,6 +414,12 @@ namespace seeda {
 		}
 
 
+		void output_log_()
+		{
+
+		}
+
+
 		void startup_()
 		{
 			pre_.start();
@@ -548,6 +554,15 @@ namespace seeda {
 			http_.set_cgi("/cgi/set_ip.cgi", "SetIP", [=](void) {
 				set_ip_();
 				http_.exec_link("/setup");
+			} );
+
+			http_.set_link("/log_state", "LOG State", [=](void) {
+				net_tools::render_version();
+				net_tools::render_date_time();
+				http_.tag_hr(600, 3);
+				output_log_();
+				http_.tag_hr(600, 3);
+				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
 			} );
 
 			// FTP Server
