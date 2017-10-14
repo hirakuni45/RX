@@ -402,9 +402,9 @@ namespace utils {
 		};
 
 	private:
-		char				buff_[buff_size];
-		unit_t				units_[unit_size];
-		uint32_t			size_;
+		char		buff_[buff_size];
+		unit_t		units_[unit_size];
+		uint32_t	size_;
 
 	public:
 		//-----------------------------------------------------------------//
