@@ -568,8 +568,8 @@ int main(int argc, char** argv)
 	device::PORT6::PDR.B5 = 1;  // (100)
 	device::PORTE::PDR.B5 = 1;  // (106)
 	device::PORTE::PDR.B4 = 1;  // (107)
-	device::PORTE::PDR.B2 = 1;  // (109)
-	device::PORTE::PDR.B1 = 1;  // (110)
+//	device::PORTE::PDR.B2 = 1;  // (109) RXD12
+//	device::PORTE::PDR.B1 = 1;  // (110) TXD12
 	device::PORTE::PDR.B0 = 1;  // (111)
 	device::PORT6::PDR.B4 = 1;  // (112)
 	device::PORT6::PDR.B3 = 1;  // (113)
