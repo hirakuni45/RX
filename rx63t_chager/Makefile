@@ -1,8 +1,10 @@
-#=======================================================#
-#														#
-#	R8C Makefile 				        				#
-#														#
-#=======================================================#
+#=======================================================================
+#   @brief  RX63T Makefile 
+#   @author 平松邦仁 (hira@rvf-rc45.net)
+#   @copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+#				Released under the MIT license @n
+#				https://github.com/hirakuni45/RX/blob/master/LICENSE
+#=======================================================================
 TARGET		=	chager
 
 DEVICE		=	R5F563T6

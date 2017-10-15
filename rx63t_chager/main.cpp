@@ -1,14 +1,16 @@
 //=====================================================================//
 /*! @file
-    @brief  RX63T メイン @n
-			Copyright 2017 Kunihito Hiramatsu
+    @brief  RX63T メイン
     @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/cmt_io.hpp"
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
-#include "common/ssd1306z_io.hpp"
+#include "chip/SSD1306.hpp"
 #include "common/monograph.hpp"
 #include "monitor.hpp"
 #include "chager.hpp"
