@@ -89,7 +89,6 @@ namespace device {
 			MISO::DIR = 0;
 			MOSI::DIR = 1;
 			SPCK::DIR = 1;
-
 			SPCK::P = 0;
 
 			return true;
