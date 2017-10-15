@@ -87,7 +87,7 @@ namespace utils {
         //-----------------------------------------------------------------//
 		bool service() {
 			if(bpos_ < 0 && pos_ == 0) {
-				if(prompt_) sci_puts(prompt_);
+				if(prompt_ != nullptr) sci_puts(prompt_);
 			}
 			bpos_ = pos_;
 			tab_ = false;
