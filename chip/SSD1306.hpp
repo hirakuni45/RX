@@ -9,8 +9,6 @@
 */
 //=====================================================================//
 #include <cstdint>
-#include "G13/port.hpp"
-#include "common/csi_io.hpp"
 
 namespace chip {
 
