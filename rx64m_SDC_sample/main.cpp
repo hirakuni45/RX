@@ -35,12 +35,11 @@ namespace {
 
 	utils::rtc_io rtc_;
 
+	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 	typedef device::PORT<device::PORT8, device::bitpos::B2> SDC_POWER;	///< カード電源制御
 
 #ifdef SDHI_IF
-	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
-//	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER> SDHI;  ///< ハードウェアー定義
-	typedef fatfs::sdhi_io<device::SDHI, device::NULL_PORT> SDHI;  ///< ハードウェアー定義
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER> SDHI;  ///< ハードウェアー定義
 	SDHI	sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
@@ -302,6 +301,7 @@ extern "C" {
 		}
 	}
 
+
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
 		if(!f) {
@@ -315,8 +315,8 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	SDC_POWER::DIR = 1;
-	SDC_POWER::P = 0;
+//	SDC_POWER::DIR = 1;
+//	SDC_POWER::P = 0;
 
 	device::system_io<12000000>::setup_system_clock();
 
@@ -347,6 +347,11 @@ int main(int argc, char** argv)
 		sdh_.start();
 		sdc_.start();
 	}
+
+	// 電圧検出の表示
+//	utils::format("  LVDA0: %d\n") % static_cast<uint16_t>(device::SYSTEM::RSTSR0.LVD0RF());
+//	utils::format("  LVDA1: %d\n") % static_cast<uint16_t>(device::SYSTEM::RSTSR0.LVD1RF());
+//	utils::format("  LVDA2: %d\n") % static_cast<uint16_t>(device::SYSTEM::RSTSR0.LVD2RF());
 
 	device::PORT0::PDR.B7 = 1; // output
 
@@ -399,6 +404,9 @@ int main(int argc, char** argv)
 						set_time_date_();
 					}
 					f = true;
+///				} else if(cmd_.cmp_word(0, "power")) {
+///					SDC_POWER::P = 0;
+///					f = true;
 				} else if(cmd_.cmp_word(0, "test")) {
 					create_test_file_("write_test.bin", 1024 * 1024);
 					f = true;
