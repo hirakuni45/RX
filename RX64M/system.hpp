@@ -707,6 +707,28 @@ namespace device {
 		};
 		static tscr_t<0x0008C500> TSCR;
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  リセットステータスレジスタ 0（RSTSR0）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct rstsr0_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  PORF;
+			bit_rw_t <io_, bitpos::B1>  LVD0RF;
+			bit_rw_t <io_, bitpos::B2>  LVD1RF;
+			bit_rw_t <io_, bitpos::B3>  LVD2RF;
+
+			bit_rw_t <io_, bitpos::B7>  DPSRSTF;
+		};
+		static rstsr0_t<0x0008C290> RSTSR0;
 	};
 	typedef system_t SYSTEM;
 

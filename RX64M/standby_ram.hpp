@@ -22,11 +22,11 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class standby_ram {
+	public:
 
 		static const uint32_t TOP  = 0x000A4000;  ///< RAM 開始アドレス
 		static const uint32_t SIZE = 8192;  	  ///< RAM サイズ
 
-	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
