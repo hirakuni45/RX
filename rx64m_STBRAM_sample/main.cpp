@@ -8,30 +8,27 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
-#include "rx64m/rtc_io.hpp"
 #include "common/fifo.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/log_man.hpp"
 
 namespace {
 
-	class cmt_task {
-	public:
-		void operator() () {
-		}
-	};
+	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
+	CMT		cmt_;
 
-	device::cmt_io<device::CMT0, cmt_task>  cmt_;
-
-	typedef utils::fifo<uint8_t, 256> buffer;
-	device::sci_io<device::SCI1, buffer, buffer> sci_;
-
-	utils::rtc_io rtc_;
+	typedef utils::fifo<uint8_t, 256> BUFFER;
+	typedef device::sci_io<device::SCI1, BUFFER, BUFFER> SCI;
+	SCI		sci_;
 
 	utils::command<64> command_;
 
+	typedef utils::log_man<device::standby_ram> LOG_MAN;
+	LOG_MAN		log_man_;
 }
 
 extern "C" {
@@ -55,138 +52,13 @@ extern "C" {
 	{
 		return sci_.recv_length();
 	}
-
-	time_t get_time_()
-	{
-		time_t t = 0;
-		if(!rtc_.get_time(t)) {
-			utils::format("Stall RTC read\n");
-		}
-		return t;
-	}
-
-
-	void disp_time_(time_t t)
-	{
-		struct tm *m = localtime(&t);
-		utils::format("%s %s %d %02d:%02d:%02d  %4d\n")
-			% get_wday(m->tm_wday)
-			% get_mon(m->tm_mon)
-			% static_cast<uint32_t>(m->tm_mday)
-			% static_cast<uint32_t>(m->tm_hour)
-			% static_cast<uint32_t>(m->tm_min)
-			% static_cast<uint32_t>(m->tm_sec)
-			% static_cast<uint32_t>(m->tm_year + 1900);
-	}
-
-
-	const char* get_dec_(const char* p, char tmch, int& value) {
-		int v = 0;
-		char ch;
-		while((ch = *p) != 0) {
-			++p;
-			if(ch == tmch) {
-				break;
-			} else if(ch >= '0' && ch <= '9') {
-				v *= 10;
-				v += ch - '0';
-			} else {
-				return nullptr;
-			}
-		}
-		value = v;
-		return p;
-	}
-
-
-	void set_time_date_()
-	{
-		time_t t = get_time_();
-		if(t == 0) return;
-
-		struct tm *m = localtime(&t);
-		bool err = false;
-		if(command_.get_words() == 3) {
-			char buff[12];
-			if(command_.get_word(1, sizeof(buff), buff)) {
-				const char* p = buff;
-				int vs[3];
-				uint8_t i;
-				for(i = 0; i < 3; ++i) {
-					p = get_dec_(p, '/', vs[i]);
-					if(p == nullptr) {
-						break;
-					}
-				}
-				if(p != nullptr && p[0] == 0 && i == 3) {
-					if(vs[0] >= 1900 && vs[0] < 2100) m->tm_year = vs[0] - 1900;
-					if(vs[1] >= 1 && vs[1] <= 12) m->tm_mon = vs[1] - 1;
-					if(vs[2] >= 1 && vs[2] <= 31) m->tm_mday = vs[2];		
-				} else {
-					err = true;
-				}
-			}
-
-			if(command_.get_word(2, sizeof(buff), buff)) {
-				const char* p = buff;
-				int vs[3];
-				uint8_t i;
-				for(i = 0; i < 3; ++i) {
-					p = get_dec_(p, ':', vs[i]);
-					if(p == nullptr) {
-						break;
-					}
-				}
-				if(p != nullptr && p[0] == 0 && (i == 2 || i == 3)) {
-					if(vs[0] >= 0 && vs[0] < 24) m->tm_hour = vs[0];
-					if(vs[1] >= 0 && vs[1] < 60) m->tm_min = vs[1];
-					if(i == 3 && vs[2] >= 0 && vs[2] < 60) m->tm_sec = vs[2];
-					else m->tm_sec = 0;
-				} else {
-					err = true;
-				}
-			}
-		}
-
-		if(err) {
-			sci_puts("Can't analize Time/Date input.\n");
-			return;
-		}
-
-		time_t tt = mktime(m);
-		if(!rtc_.set_time(tt)) {
-			sci_puts("Stall RTC write...\n");
-		}
-	}
 }
 
 int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
-
-	device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
-	// メインクロック強制発振とドライブ能力設定
-	device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(0b10)
-						  | device::SYSTEM::MOFCR.MOFXIN.b(1);			
-	device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
-	while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
-
-	device::SYSTEM::PLLCR.STC = 0b010011;		// PLL 10 倍(120MHz)
-	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
-	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
-
-	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.ICK.b(0)		// 1/1 (120/1=120)
-						  | device::SYSTEM::SCKCR.BCK.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKA.b(0)		// 1/1 (120/1=120)
-						  | device::SYSTEM::SCKCR.PCKB.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKC.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (120/2=60)
-	device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
-	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
-
+	device::system_io<12000000>::setup_system_clock();
 
 	{  // タイマー設定（６０Ｈｚ）
 		uint8_t cmt_irq_level = 4;
@@ -198,42 +70,67 @@ int main(int argc, char** argv)
 		sci_.start(115200, sci_level);
 	}
 
-	{  // RTC 設定
-		rtc_.start();
-	}
+	utils::format("RX64M StadbyRAM/LOG sample\n");
 
-	utils::format("RX64M RTC sample\n");
+	log_man_.start();
 
 	device::PORT0::PDR.B7 = 1; // output
 
 	command_.set_prompt("# ");
 
 	uint32_t cnt = 0;
-	char buff[16];
+	bool loge = false;
 	while(1) {
 		cmt_.sync();
 
 		// コマンド入力と、コマンド解析
-		if(command_.service()) {
+		bool f = command_.service();
+		if(loge) {	
+			if(f) {
+				const char* p = command_.get_command();
+				char ch;
+				while((ch = *p++) != 0) {
+					if(ch == ('C' - 0x40)) {
+						utils::format("Stop LOG\n");
+						command_.set_prompt("# ");
+						loge = false;
+						break;
+					}
+					log_man_.putch(ch);
+				}
+				if(loge) {
+					log_man_.putch('\n');
+				}
+			}
+		} else if(f) {
 			uint8_t cmdn = command_.get_words();
 			if(cmdn >= 1) {
-				if(command_.cmp_word(0, "date")) {
-					if(cmdn == 1) {
-						time_t t = get_time_();
-						if(t != 0) {
-							disp_time_(t);
+				if(command_.cmp_word(0, "log")) {
+					auto len = log_man_.get_length();
+					utils::format("LOG length: %d\n") % len;
+					uint16_t pos = 0;
+					while(pos < len) {
+						char ch = log_man_.getch(pos);
+						if(ch == '\n') {
+							sci_putch('\r');
 						}
-					} else {
-						set_time_date_();
+						sci_putch(ch);
+						++pos;
 					}
+				} else if(command_.cmp_word(0, "start")) {
+					utils::format("Start LOG\n");
+					loge = true;
+					command_.set_prompt("");
+				} else if(command_.cmp_word(0, "clear")) {
+					log_man_.clear();
 				} else if(command_.cmp_word(0, "help") || command_.cmp_word(0, "?")) {
-					sci_puts("date\n");
-					sci_puts("date yyyy/mm/dd hh:mm[:ss]\n");
+					utils::format("start\n");
+					utils::format("clear\n");
+					utils::format("log\n");
 				} else {
+					char buff[32];
 					if(command_.get_word(0, sizeof(buff), buff)) {
-						sci_puts("Command error: ");
-						sci_puts(buff);
-						sci_putch('\n');
+						utils::format("Command error: '%s'\n") % buff;
 					}
 				}
 			}
