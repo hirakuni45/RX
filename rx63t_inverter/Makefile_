@@ -1,8 +1,10 @@
-#=======================================================================#
-#																		#
-#	RX Makefile R5F563T6EDFM (64K Flash, 8K Ram)				        #
-#																		#
-#=======================================================================#
+#=======================================================================
+#   @brief  RX63T Makefile 
+#   @author 平松邦仁 (hira@rvf-rc45.net)
+#   @copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+#				Released under the MIT license @n
+#				https://github.com/hirakuni45/RX/blob/master/LICENSE
+#=======================================================================
 TARGET		=	inverter
 
 ASOURCES	=	start.s
