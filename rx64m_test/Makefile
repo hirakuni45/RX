@@ -5,7 +5,6 @@
 #	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
-#
 #=======================================================================
 TARGET		=	seeda_sample
 
