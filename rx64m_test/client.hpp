@@ -200,6 +200,7 @@ namespace seeda {
 			switch(send_task_) {
 
 			case send_task::idle:
+				time_org_ = get_time();
 				break;
 
 			case send_task::req_connect:
@@ -236,6 +237,7 @@ namespace seeda {
 						timeout_ = 5 * cycle;  // 再接続待ち時間
 					}
 				} else {
+					time_org_ = get_time();
 					debug_format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% ip_.c_str() % port_ % client_.get_cepid();
 					format::chaout().set_fd(client_.get_cepid());
@@ -243,7 +245,6 @@ namespace seeda {
 					if(idle_count_ > (cycle * 4)) {
 						fifo_.clear();
 /// utils::format("Reset fifo\n");
-						time_org_ = get_time();
 						time_ofs_ = time_ref_;
 						time_     = time_ref_;
 					}
