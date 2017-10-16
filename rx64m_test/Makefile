@@ -206,4 +206,10 @@ bin_zip:
 run:
 	rx_prog -P COM11 -d RX64M --progress --erase --write --verify $(TARGET).mot
 
+doxygen:
+	rm -rf seeda03_doc.zip
+	rm -rf SEEDA03_DOC
+	doxygen doxyfile
+	zip -r seeda03_doc.zip SEEDA03_DOC
+
 -include $(DEPENDS)
