@@ -43,6 +43,8 @@
 #define LINK_DEBUG
 #endif
 
+#define LINK_DEBUG
+
 /***********************************************************************************************************************
 Macro definitions
 ***********************************************************************************************************************/
@@ -127,7 +129,7 @@ Macro definitions
 #define USE_MAGIC_PACKET_DETECT    (1)
 
 /* Ethernet interrupt level definition */
-#define ETHER_INTERRUPT_LEVEL      (1)  /* Please define the interruption level within the range of 1-15. */
+#define ETHER_INTERRUPT_LEVEL      (2)  /* Please define the interruption level within the range of 1-15. */
 
 /***********************************************************************************************************************
 Typedef definitions
