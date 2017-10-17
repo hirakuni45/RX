@@ -33,26 +33,22 @@ Functions (for system that has no ET_LINKSTA pin using)
 ******************************************************************************/
 static void polling_link_status_(void)
 {
-	static uint16_t _1s_timer;
+	static uint16_t timer_1s = 0;
 	static int16_t pre_link_stat = R_PHY_ERROR;
 	int16_t link_stat;
 
-	if (!(_1s_timer++ % 100))
-	{
+	if((timer_1s % 100) == 0) {
 		link_stat = phy_get_link_status();
-		if (pre_link_stat != link_stat)
-		{
-			if (link_stat == R_PHY_OK)
-			{
+		if(pre_link_stat != link_stat) {
+			if(link_stat == R_PHY_OK) {
 				g_ether_LchngFlag = ETHER_FLAG_ON_LINK_ON;
-			}
-			else
-			{
+			} else {
 				g_ether_LchngFlag = ETHER_FLAG_ON_LINK_OFF;
 			}
 		}
 		pre_link_stat = link_stat;
 	}
+	timer_1s++;
 }
 
 
