@@ -21,8 +21,24 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class port_map {
+	public:
 
-		static bool sub_(peripheral t, bool enable) {
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ポート・マッピング・候補型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class option : uint8_t {
+			FIRST,		///< 第１候補
+			SECOND,		///< 第２候補
+			THIRD,		///< 第３候補
+		};
+
+
+	private:
+
+		static bool sub1_(peripheral t, bool enable)
+		{
 			bool ret = true;
 			switch(t) {
 			// ※シリアルポートの MPC 設定では、PDR を制御する必要は無いが、
@@ -30,10 +46,8 @@ namespace device {
 			case peripheral::SCI0:
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
-					PORT2::PDR.B0 = enable; // TXD0
-					PORT2::PDR.B1 = 0;  	// RXD0
-					MPC::P20PFS.PSEL = sel;
-					MPC::P21PFS.PSEL = sel;
+					MPC::P20PFS.PSEL = sel;  // TXD0 (P20 LQFP176: 45)
+					MPC::P21PFS.PSEL = sel;  // RXD0 (P21 LQFP176: 44)
 					PORT2::PMR.B0 = enable;
 					PORT2::PMR.B1 = enable;
 				}
@@ -41,10 +55,8 @@ namespace device {
 			case peripheral::SCI1:
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
-					PORTF::PDR.B0 = enable; // TXD1
-					PORTF::PDR.B2 = 0;  	// RXD1
-					MPC::PF0PFS.PSEL = sel;
-					MPC::PF2PFS.PSEL = sel;
+					MPC::PF0PFS.PSEL = sel;  // TXD1 (PF0 LQFP176: 35)
+					MPC::PF2PFS.PSEL = sel;  // RXD1 (PF2 LQFP176: 31)
 					PORTF::PMR.B0 = enable;
 					PORTF::PMR.B2 = enable;
 				}
@@ -52,10 +64,8 @@ namespace device {
 			case peripheral::SCI2:
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
-					PORT1::PDR.B3 = enable; // TXD2
-					PORT1::PDR.B2 = 0;  	// RXD2
-					MPC::P13PFS.PSEL = sel;
-					MPC::P12PFS.PSEL = sel;
+					MPC::P13PFS.PSEL = sel;  // TXD2 (P13 LQFP176: 52)
+					MPC::P12PFS.PSEL = sel;  // RXD2 (P12 LQFP176: 53)
 					PORT1::PMR.B3 = enable;
 					PORT1::PMR.B2 = enable;
 				}
@@ -63,10 +73,8 @@ namespace device {
 			case peripheral::SCI3:
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
-					PORT2::PDR.B3 = enable; // TXD3
-					PORT2::PDR.B5 = 0;  	// RXD3
-					MPC::P23PFS.PSEL = sel;
-					MPC::P25PFS.PSEL = sel;
+					MPC::P23PFS.PSEL = sel;  // TXD3 (P23 LQFP176: 42)
+					MPC::P25PFS.PSEL = sel;  // RXD3 (P25 LQFP176: 38)
 					PORT2::PMR.B3 = enable;
 					PORT2::PMR.B5 = enable;
 				}
@@ -74,10 +82,8 @@ namespace device {
 			case peripheral::SCI4:
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
-					PORTB::PDR.B1 = enable; // TXD4
-					PORTB::PDR.B0 = 0;  	// RXD4
-					MPC::PB1PFS.PSEL = sel;
-					MPC::PB0PFS.PSEL = sel;
+					MPC::PB1PFS.PSEL = sel;  // TXD4 (PB1 LQFP176: 100)
+					MPC::PB0PFS.PSEL = sel;  // RXD4 (PB0 LQFP176: 104)
 					PORTB::PMR.B1 = enable;
 					PORTB::PMR.B0 = enable;
 				}
@@ -85,10 +91,8 @@ namespace device {
 			case peripheral::SCI5:
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
-					PORTA::PDR.B4 = enable; // TXD5
-					PORTA::PDR.B3 = 0;  	// RXD5
-					MPC::PA4PFS.PSEL = sel;
-					MPC::PA3PFS.PSEL = sel;
+					MPC::PA4PFS.PSEL = sel;  // TXD5 (PA4 LQFP176: 109)
+					MPC::PA3PFS.PSEL = sel;  // RXD5 (PA3 LQFP176: 110)
 					PORTA::PMR.B4 = enable;
 					PORTA::PMR.B3 = enable;
 				}
@@ -96,10 +100,8 @@ namespace device {
 			case peripheral::SCI6:
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
-					PORT0::PDR.B0 = enable; // TXD6
-					PORT0::PDR.B1 = 0;  	// RXD6
-					MPC::P00PFS.PSEL = sel;
-					MPC::P01PFS.PSEL = sel;
+					MPC::P00PFS.PSEL = sel;  // TXD6 (P00 LQFP176: 8)
+					MPC::P01PFS.PSEL = sel;  // RXD6 (P01 LQFP176: 7)
 					PORT0::PMR.B0 = enable;
 					PORT0::PMR.B1 = enable;
 				}
@@ -107,10 +109,8 @@ namespace device {
 			case peripheral::SCI7:
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
-					PORT9::PDR.B0 = enable; // TXD7
-					PORT9::PDR.B2 = 0;  	// RXD7
-					MPC::P90PFS.PSEL = sel;
-					MPC::P92PFS.PSEL = sel;
+					MPC::P90PFS.PSEL = sel;  // TXD7 (P90 LQFP176: 163)
+					MPC::P92PFS.PSEL = sel;  // RXD7 (P92 LQFP176: 160)
 					PORT9::PMR.B0 = enable;
 					PORT9::PMR.B2 = enable;
 				}
@@ -119,10 +119,8 @@ namespace device {
 			case peripheral::SCI12:
 				{
 					uint8_t sel = enable ? 0b001100 : 0;
-//					PORTE::PDR.B2 = enable; // RXD12
-//					PORTE::PDR.B1 = 0;  	// TXD12
-					MPC::PE2PFS.PSEL = sel;
-					MPC::PE1PFS.PSEL = sel;
+					MPC::PE2PFS.PSEL = sel;  // RXD12 (PE2 LQFP176: 133)
+					MPC::PE1PFS.PSEL = sel;  // TXD12 (PE1 LQFP176: 134)
 					PORTE::PMR.B2 = enable;
 					PORTE::PMR.B1 = enable;
 				}
@@ -131,13 +129,9 @@ namespace device {
 			case peripheral::RSPI:
 				{
 					uint8_t sel = enable ? 0b001101 : 0;
-//					PORTC::PCR.B7 = 1;		// pull-up
-//					PORTC::PDR.B7 = 0;		// MISOA
-//					PORTC::PDR.B6 = 1;		// MOSIA
-//					PORTC::PDR.B5 = 1;		// RSPCKA
-					MPC::PC7PFS.PSEL = sel;  // MISOA
-					MPC::PC6PFS.PSEL = sel;  // MOSIA
-					MPC::PC5PFS.PSEL = sel;  // RSPCKA
+					MPC::PC7PFS.PSEL = sel;  // MISOA-A  (PC7 LQFP176: 76)
+					MPC::PC6PFS.PSEL = sel;  // MOSIA-A  (PC6 LQFP176: 77)
+					MPC::PC5PFS.PSEL = sel;  // RSPCKA-A (PC5 LQFP176: 78)
 					PORTC::PMR.B7 = enable;
 					PORTC::PMR.B6 = enable;
 					PORTC::PMR.B5 = enable;
@@ -243,6 +237,30 @@ namespace device {
 			return ret;
 		}
 
+
+		static bool sub2_(peripheral t, bool enable)
+		{
+			bool ret = true;
+			switch(t) {
+			case peripheral::RSPI:
+				{
+					uint8_t sel = enable ? 0b001101 : 0;
+					MPC::PA7PFS.PSEL = sel;  // MISOA-B (PA7 LQFP176: 106)
+					PORTA::PMR.B7 = enable;
+					MPC::PA6PFS.PSEL = sel;  // MOSIA-B (PA6 LQFP176: 107)
+					PORTA::PMR.B6 = enable;
+					MPC::PA5PFS.PSEL = sel;  // RSPCKA  (PA5 LQFP176: 108)
+					PORTA::PMR.B5 = enable;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+
 	public:
 
 		//-----------------------------------------------------------------//
@@ -250,14 +268,20 @@ namespace device {
 			@brief  周辺機器に切り替える
 			@param[in]	t	周辺機器タイプ
 			@param[in]	ena	無効にする場合「false」
+			@param[in]	opt	オプション（候補）
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, bool ena = true) noexcept
+		static bool turn(peripheral t, bool ena = true, option opt = option::FIRST) noexcept
 		{
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			auto ret = sub_(t, ena);
+			bool ret = false;
+			if(opt == option::FIRST) {
+				ret = sub1_(t, ena);
+			} else if(opt == option::SECOND) {
+				ret = sub2_(t, ena);
+			}
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 
