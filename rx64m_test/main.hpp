@@ -35,7 +35,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 511;
+	static const int seeda_version_ = 513;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef utils::command<256> CMD;
@@ -93,9 +93,14 @@ namespace seeda {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct sd_speed_t {
-		uint32_t	open;
-		uint32_t	write;
-		uint32_t	close;
+		uint32_t	w_open_;
+		uint32_t	write_;
+		uint32_t	w_close_;
+		uint32_t	r_open_;
+		uint32_t	read_;
+		uint32_t	r_close_;
+		uint32_t	dirlist_num_;
+		uint32_t	dirlist_;
 	};
 
 
