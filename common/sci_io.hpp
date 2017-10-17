@@ -53,7 +53,10 @@ namespace device {
 				SCI::SSR.PER = 0;
 				err = true;
 			}
-			if(!err) recv_.put(SCI::RDR());
+			volatile uint8_t data = SCI::RDR();
+			if(!err) {
+				recv_.put(data);
+			}
 		}
 
 		static INTERRUPT_FUNC void send_task_()
