@@ -512,8 +512,9 @@ namespace seeda {
 #endif
 			{
 				time_t t = get_time();
-				disp_time(t);
-				utils::format("\n");
+				char tmp[128];
+				disp_time(t, tmp, sizeof(tmp));
+				utils::format("%s\n") % tmp;
 			}
 
 //			while(1) {
@@ -573,8 +574,9 @@ namespace seeda {
 						if(cmdn == 1) {
 							time_t t = get_time();
 							if(t != 0) {
-								disp_time(t);
-								utils::format("\n");
+								char tmp[128];
+								disp_time(t, tmp, sizeof(tmp));
+								utils::format("%s\n") % tmp;
 							} else {
 								utils::format("Stall RTC (no setting)\n");
 							}

@@ -35,7 +35,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 513;
+	static const int seeda_version_ = 514;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef utils::command<256> CMD;
@@ -178,7 +178,7 @@ namespace seeda {
 		@return 生成された文字列の長さ
 	*/
 	//-----------------------------------------------------------------//
-	int disp_time(time_t t, char* dst = nullptr, uint32_t size = 0);
+	int disp_time(time_t t, char* dst, uint32_t size);
 
 
 	//-----------------------------------------------------------------//
