@@ -159,7 +159,7 @@ static const pauseresolution_s pause_resolution[PAUSE_TABLE_ENTRIES] =
 static descriptor_s rx_descriptors[EMAC_NUM_RX_DESCRIPTORS] __attribute__ ((aligned(32)));
 static descriptor_s tx_descriptors[EMAC_NUM_TX_DESCRIPTORS] __attribute__ ((aligned(32)));
 static etherbuffer_s ether_buffers __attribute__ ((aligned(32)));
-static uint16_t link_proc_count_;
+static uint32_t link_proc_count_;
 static int link_proc_loop_;
 
 /**
@@ -525,7 +525,7 @@ void R_ETHER_LinkProcess(void)
         }
         else
         {
-///			printf("+");
+//			printf("Link no proccess ST0");
             /* no proccess */
         }
     }
@@ -550,7 +550,7 @@ void R_ETHER_LinkProcess(void)
         }
         else
         {
-///			printf(".");
+//			printf("Link no proccess ST1");
             /* no proccess */
         }
     }
@@ -558,7 +558,7 @@ void R_ETHER_LinkProcess(void)
     {
 #ifdef LINK_DEBUG
 		link_proc_count_++;
-		if(link_proc_count_ >= 100000) {
+		if(link_proc_count_ >= 1000000) {
 			printf("Link no proccess (%d)\n", link_proc_loop_);
 			link_proc_loop_++;
 			link_proc_count_ = 0;
@@ -567,6 +567,7 @@ void R_ETHER_LinkProcess(void)
         /* no proccess */
     }
 } /* End of function R_ETHER_LinkProcess() */
+
 
 /***********************************************************************************************************************
 * Function Name: R_ETHER_WakeOnLAN
