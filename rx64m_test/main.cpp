@@ -88,6 +88,29 @@ namespace {
 		if(n == 0) ++m_;
 		return v_ ^ m_;
 	}
+
+
+	void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+	{
+		if(fi == nullptr) return;
+
+		char cdir = '-';
+		if(dir) {
+			cdir = 'd';
+		}
+		int block = fi->fsize / 512;
+		if(block == 0 && fi->fsize > 0) ++block;
+
+		time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
+		struct tm *m = localtime(&t);
+		utils::format("%crw-rw-rw- %d user root %d %s %d %02d:%02d %s\n")
+			% cdir % block % fi->fsize
+			% get_mon(m->tm_mon)
+			% static_cast<int>(m->tm_mday)
+			% static_cast<int>(m->tm_hour)
+			% static_cast<int>(m->tm_min)
+			% name;
+	}
 }
 
 namespace seeda {
@@ -293,20 +316,19 @@ namespace seeda {
 	bool create_test_file(const char* fname, uint32_t size, sd_speed_t& t)
 	{
 		uint8_t buff[512];
-		FIL fp;
-
 		for(uint16_t i = 0; i < sizeof(buff); ++i) {
 			buff[i] = rand_();
 		}
 
+		FIL fp;
+
 		auto st = core_.get_cmt_counter();
 		if(!sdc_.open(&fp, fname, FA_WRITE | FA_CREATE_ALWAYS)) {
-			utils::format("Can't create file: '%s'\n") % fname;
+			utils::format("Can't write file: '%s'\n") % fname;
 			return false;
 		}
-
 		auto ed = core_.get_cmt_counter();
-		t.open = ed - st;
+		t.w_open_ = ed - st;
 		st = ed;
 
 		auto rs = size;
@@ -318,12 +340,49 @@ namespace seeda {
 			rs -= bw;
 		}
 		ed = core_.get_cmt_counter();
-		t.write = ed - st;
+		t.write_ = ed - st;
 		st = ed;
 
 		f_close(&fp);
 		ed = core_.get_cmt_counter();
-		t.close = ed - st;
+		t.w_close_ = ed - st;
+		st = ed;
+
+		if(!sdc_.open(&fp, fname, FA_READ | FA_OPEN_EXISTING)) {
+			utils::format("Can't read file: '%s'\n") % fname;
+			return false;
+		}
+		ed = core_.get_cmt_counter();
+		t.r_open_ = ed - st;
+		st = ed;
+
+		rs = size;
+		while(rs > 0) {
+			UINT sz = sizeof(buff);
+			if(sz > rs) sz = rs;
+			UINT bw;
+			f_read(&fp, buff, sz, &bw);
+			rs -= bw;
+		}
+		ed = core_.get_cmt_counter();
+		t.read_ = ed - st;
+		st = ed;
+
+		f_close(&fp);
+		ed = core_.get_cmt_counter();
+		t.r_close_ = ed - st;
+		st = ed;
+
+		if(!sdc_.start_dir_list("", dir_list_func_, true, nullptr)) {
+			utils::format("Can't open directories...\n");
+		}
+		uint32_t num = 0;
+		while(sdc_.probe_dir_list(num)) {
+			sdc_.service();
+		}
+		ed = core_.get_cmt_counter();
+		t.dirlist_num_ = num;
+		t.dirlist_ = ed - st;
 
 //		auto ed = core_.get_cmt_counter();
 //		uint32_t time = ed - st;
@@ -572,8 +631,6 @@ int main(int argc, char** argv)
 	device::PORT6::PDR.B5 = 1;  // (100)
 	device::PORTE::PDR.B5 = 1;  // (106)
 	device::PORTE::PDR.B4 = 1;  // (107)
-//	device::PORTE::PDR.B2 = 1;  // (109) RXD12
-//	device::PORTE::PDR.B1 = 1;  // (110) TXD12
 	device::PORTE::PDR.B0 = 1;  // (111)
 	device::PORT6::PDR.B4 = 1;  // (112)
 	device::PORT6::PDR.B3 = 1;  // (113)

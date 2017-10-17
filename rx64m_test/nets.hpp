@@ -512,10 +512,17 @@ namespace seeda {
 
 						sd_speed_t t;
 						create_test_file("write_test.bin", 1024 * 1024, t);
-						http_format("ファイルオープン： %d [ms]<br>\n") % t.open;
-						http_format("ファイル書き込み： %3.2f [KB/Sec]<br>\n") 
-							% (1024.0f * 1000.0f / static_cast<float>(t.write));
-						http_format("ファイルクローズ： %d [ms]<br>\n") % t.close;
+						http_format("ライト・オープン： %d [ms]<br>\n") % t.w_open_;
+						http_format("ライト： %3.2f [KB/Sec]<br>\n") 
+							% (1024.0f * 1000.0f / static_cast<float>(t.write_));
+						http_format("ライト・クローズ： %d [ms]<br>\n") % t.w_close_;
+
+						http_format("リード・オープン： %d [ms]<br>\n") % t.r_open_;
+						http_format("リード： %3.2f [KB/Sec]<br>\n") 
+							% (1024.0f * 1000.0f / static_cast<float>(t.read_));
+						http_format("リード・クローズ： %d [ms]<br>\n") % t.r_close_;
+
+						http_format("ファイルリスト： %d [ms] / %d<br>\n") % t.dirlist_ % t.dirlist_num_;
 					} else {
 						http_format("ＳＤカードがありません。<br>\n");
 					}
