@@ -19,10 +19,16 @@ namespace device {
 		@brief  16 ビットタイマパルスユニット（TPUa）
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	ivx		割り込みベクター
+		@param[in]	intra	割り込み要因Ａ
+		@param[in]	intrb	割り込み要因Ｂ
+		@param[in]	intrc	割り込み要因Ｃ
+		@param[in]	intrd	割り込み要因Ｄ
+		@param[in]	intru	割り込み要因Ｕ
+		@param[in]	intrv	割り込み要因Ｖ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR ivx>
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
 	struct tpux_t {
 
 		//-----------------------------------------------------------------//
@@ -191,6 +197,50 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  タイマスタートレジスタ（TSTR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tstr_t : public rw8_t<0x00088100> {
+			typedef rw8_t<0x00088100> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  CST0;
+			bit_rw_t <io_, bitpos::B1>  CST1;
+			bit_rw_t <io_, bitpos::B2>  CST2;
+			bit_rw_t <io_, bitpos::B3>  CST3;
+			bit_rw_t <io_, bitpos::B4>  CST4;
+			bit_rw_t <io_, bitpos::B5>  CST5;
+		};
+		static tstr_t TSTR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマシンクロレジスタ（TSYR）
+		*/
+		//-----------------------------------------------------------------//
+		struct tsyr_t : public rw8_t<0x00088101> {
+			typedef rw8_t<0x00088101> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  SYNC0;
+			bit_rw_t <io_, bitpos::B1>  SYNC1;
+			bit_rw_t <io_, bitpos::B2>  SYNC2;
+			bit_rw_t <io_, bitpos::B3>  SYNC3;
+			bit_rw_t <io_, bitpos::B4>  SYNC4;
+			bit_rw_t <io_, bitpos::B5>  SYNC5;
+		};
+		static tsyr_t TSYR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -213,6 +263,92 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  タイマスタートレジスタ（TSTR）のエイリアス
+			@param[in]	f	動作停止にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool f = true)
+		{
+			if(f) {
+				TSTR |=  (1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+			} else {
+				TSTR &= ~(1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タイマシンクロレジスタ（TSYR）のエイリアス
+			@param[in]	f	同期解除にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void sync(bool f = true)
+		{
+			if(f) {
+				TSYR |=  (1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+			} else {
+				TSYR &= ~(1 << (static_cast<uint8_t>(per) - static_cast<uint8_t>(peripheral::TPU0)));
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み要因番号を返すＡ
+			@return 割り込み要因番号Ａ
+		*/
+		//-----------------------------------------------------------------//
+		static uint8_t get_TGIA() { return intra; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み要因番号を返すＢ
+			@return 割り込み要因番号Ｂ
+		*/
+		//-----------------------------------------------------------------//
+		static uint8_t get_TGIB() { return intrb; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み要因番号を返すＣ
+			@return 割り込み要因番号Ｃ
+		*/
+		//-----------------------------------------------------------------//
+		static uint8_t get_TGIC() { return intrc; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み要因番号を返すＤ
+			@return 割り込み要因番号Ｄ
+		*/
+		//-----------------------------------------------------------------//
+		static uint8_t get_TGID() { return intrd; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み要因番号を返すＵ
+			@return 割り込み要因番号Ｕ
+		*/
+		//-----------------------------------------------------------------//
+		static uint8_t get_TGIU() { return intru; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み要因番号を返すＶ
+			@return 割り込み要因番号Ｖ
+		*/
+		//-----------------------------------------------------------------//
+		static uint8_t get_TGIV() { return intrv; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ペリフェラル型を返す
 			@return ペリフェラル型
 		*/
@@ -220,15 +356,10 @@ namespace device {
 		static peripheral get_peripheral() { return per; }
 	};
 
-
-	typedef tpux_t<0x00088110, peripheral::TPU0, ICU::VECTOR::TXI0> TPU0;
-	typedef tpux_t<0x00088120, peripheral::TPU1, ICU::VECTOR::TXI0> TPU1;
-	typedef tpux_t<0x00088130, peripheral::TPU2, ICU::VECTOR::TXI0> TPU2;
-	typedef tpux_t<0x00088140, peripheral::TPU3, ICU::VECTOR::TXI0> TPU3;
-	typedef tpux_t<0x00088150, peripheral::TPU4, ICU::VECTOR::TXI0> TPU4;
-	typedef tpux_t<0x00088160, peripheral::TPU5, ICU::VECTOR::TXI0> TPU5;
-
-
-
-
+	typedef tpux_t<0x00088110, peripheral::TPU0, 15, 16, 17, 18,  0, 19> TPU0;
+	typedef tpux_t<0x00088120, peripheral::TPU1, 20, 21,  0,  0, 22, 23> TPU1;
+	typedef tpux_t<0x00088130, peripheral::TPU2, 24, 25,  0,  0, 26, 27> TPU2;
+	typedef tpux_t<0x00088140, peripheral::TPU3, 28, 29, 30, 31,  0, 32> TPU3;
+	typedef tpux_t<0x00088150, peripheral::TPU4, 33, 34,  0,  0, 35, 36> TPU4;
+	typedef tpux_t<0x00088160, peripheral::TPU5, 37, 38,  0,  0, 39, 40> TPU5;
 }
