@@ -12,8 +12,6 @@
 #include "common/intr_utils.hpp"
 #include "common/vect.h"
 
-#include "common/format.hpp"
-
 /// F_PCLKB は周期パラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCLKB
 #  error "tpu_io.hpp requires F_PCLKB to be defined"
@@ -33,11 +31,12 @@ namespace device {
 
 		uint8_t		level_;
 
-		static TASK	task_;
-
 		static volatile uint32_t counter_;
 
+		static TASK	task_;
+
 		static INTERRUPT_FUNC void tpu_task_() {
+			if(TPU::TSR.TGFA()) TPU::TSR.TGFA = 0;
 			++counter_;
 			task_();
 		}
@@ -80,6 +79,8 @@ namespace device {
 			// TPU0: 1/1(0), 1/4(2), 1/16(4), 1/64(6) 
 			uint8_t prs = 0;
 			switch(cks) {
+			case 0:
+				break;
 			case 1:
 				cmt >>= 1;
 			case 2:
@@ -108,13 +109,12 @@ namespace device {
 			TPU::TCNT = 0x0000;
 
 			if(level_ > 0) {  // 割り込み設定
-				bool ena = level_ != 0 ? true : false;
-
+#if (defined(SIG_RX64M) || defined(SIG_RX71M))
 				set_interrupt_task(tpu_task_, static_cast<uint32_t>(ICU::VECTOR::INTB128));
 				ICU::SLIBXR128 = TPU::get_TGIA();
 				ICU::IPR.INTB128 = level_;
-				ICU::IER.INTB128 = ena;
-
+				ICU::IER.INTB128 = true;
+#endif
 				TPU::TIER.TGIEA = 1;  // TGRA interrupt
 			} else {
 				TPU::TIER.TGIEA = 0;
@@ -156,6 +156,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  TCNT レジスターの値を取得
+			@return TCNT レジスター
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_tcnt_count() const { return TPU::TCNT(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  TASK クラスの参照
 			@return TASK クラス
 		*/
@@ -165,5 +174,4 @@ namespace device {
 
 	template <class TPU, class TASK> volatile uint32_t tpu_io<TPU, TASK>::counter_ = 0;
 	template <class TPU, class TASK> TASK tpu_io<TPU, TASK>::task_;
-
 }
