@@ -154,7 +154,134 @@ namespace device {
 			EXDMAC1I = 127,
 
 			INTB128  = 128,
+			INTB129,
+			INTB130,
+			INTB131,
+			INTB132,
+			INTB133,
+			INTB134,
+			INTB135,
+			INTB136,
+			INTB137,
+			INTB138,
+			INTB139,
+			INTB140,
+			INTB141,
+			INTB142,
+			INTB143,
+			INTB144,
+			INTB145,
+			INTB146,
+			INTB147,
+			INTB148,
+			INTB149,
+			INTB150,
+			INTB151,
+			INTB152,
+			INTB153,
+			INTB154,
+			INTB155,
+			INTB156,
+			INTB157,
+			INTB158,
+			INTB159,
+			INTB160,
+			INTB161,
+			INTB162,
+			INTB163,
+			INTB164,
+			INTB165,
+			INTB166,
+			INTB167,
+			INTB168,
+			INTB169,
+			INTB170,
+			INTB171,
+			INTB172,
+			INTB173,
+			INTB174,
+			INTB175,
+			INTB176,
+			INTB177,
+			INTB178,
+			INTB179,
+			INTB180,
+			INTB181,
+			INTB182,
+			INTB183,
+			INTB184,
+			INTB185,
+			INTB186,
+			INTB187,
+			INTB188,
+			INTB189,
+			INTB190,
+			INTB191,
+			INTB192,
+			INTB193,
+			INTB194,
+			INTB195,
+			INTB196,
+			INTB197,
+			INTB198,
+			INTB199,
+			INTB200,
+			INTB201,
+			INTB202,
+			INTB203,
+			INTB204,
+			INTB205,
+			INTB206,
+			INTB207,
+
 			INTA208  = 208,
+			INTA209,
+			INTA210,
+			INTA211,
+			INTA212,
+			INTA213,
+			INTA214,
+			INTA215,
+			INTA216,
+			INTA217,
+			INTA218,
+			INTA219,
+			INTA220,
+			INTA221,
+			INTA222,
+			INTA223,
+			INTA224,
+			INTA225,
+			INTA226,
+			INTA227,
+			INTA228,
+			INTA229,
+			INTA230,
+			INTA231,
+			INTA232,
+			INTA233,
+			INTA234,
+			INTA235,
+			INTA236,
+			INTA237,
+			INTA238,
+			INTA239,
+			INTA240,
+			INTA241,
+			INTA242,
+			INTA243,
+			INTA244,
+			INTA245,
+			INTA246,
+			INTA247,
+			INTA248,
+			INTA249,
+			INTA250,
+			INTA251,
+			INTA252,
+			INTA253,
+			INTA254,
+			INTA255,
 
 			CMI2     = 256,  // CMT2 (group)
 			CMI3     = 257,  // CMT3 (group)
@@ -223,6 +350,79 @@ namespace device {
 
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
+
+			rw8_t<base + 128> INTB128;
+			rw8_t<base + 129> INTB129;
+			rw8_t<base + 130> INTB130;
+			rw8_t<base + 131> INTB131;
+			rw8_t<base + 132> INTB132;
+			rw8_t<base + 133> INTB133;
+			rw8_t<base + 134> INTB134;
+			rw8_t<base + 135> INTB135;
+			rw8_t<base + 136> INTB136;
+			rw8_t<base + 137> INTB137;
+			rw8_t<base + 138> INTB138;
+			rw8_t<base + 139> INTB139;
+			rw8_t<base + 140> INTB140;
+			rw8_t<base + 141> INTB141;
+			rw8_t<base + 142> INTB142;
+			rw8_t<base + 143> INTB143;
+			rw8_t<base + 144> INTB144;
+			rw8_t<base + 145> INTB145;
+			rw8_t<base + 146> INTB146;
+			rw8_t<base + 147> INTB147;
+			rw8_t<base + 148> INTB148;
+			rw8_t<base + 149> INTB149;
+			rw8_t<base + 150> INTB150;
+
+			rw8_t<base + 208> INTA208;
+			rw8_t<base + 209> INTA209;
+			rw8_t<base + 210> INTA210;
+			rw8_t<base + 211> INTA211;
+			rw8_t<base + 212> INTA212;
+			rw8_t<base + 213> INTA213;
+			rw8_t<base + 214> INTA214;
+			rw8_t<base + 215> INTA215;
+			rw8_t<base + 216> INTA216;
+			rw8_t<base + 217> INTA217;
+			rw8_t<base + 218> INTA218;
+			rw8_t<base + 219> INTA219;
+			rw8_t<base + 220> INTA220;
+			rw8_t<base + 221> INTA221;
+			rw8_t<base + 222> INTA222;
+			rw8_t<base + 223> INTA223;
+			rw8_t<base + 224> INTA224;
+			rw8_t<base + 225> INTA225;
+			rw8_t<base + 226> INTA226;
+			rw8_t<base + 227> INTA227;
+			rw8_t<base + 228> INTA228;
+			rw8_t<base + 229> INTA229;
+			rw8_t<base + 230> INTA230;
+			rw8_t<base + 231> INTA231;
+			rw8_t<base + 232> INTA232;
+			rw8_t<base + 233> INTA233;
+			rw8_t<base + 234> INTA234;
+			rw8_t<base + 235> INTA235;
+			rw8_t<base + 236> INTA236;
+			rw8_t<base + 237> INTA237;
+			rw8_t<base + 238> INTA238;
+			rw8_t<base + 239> INTA239;
+			rw8_t<base + 240> INTA240;
+			rw8_t<base + 241> INTA241;
+			rw8_t<base + 242> INTA242;
+			rw8_t<base + 243> INTA243;
+			rw8_t<base + 244> INTA244;
+			rw8_t<base + 245> INTA245;
+			rw8_t<base + 246> INTA246;
+			rw8_t<base + 247> INTA247;
+			rw8_t<base + 248> INTA248;
+			rw8_t<base + 249> INTA249;
+			rw8_t<base + 250> INTA250;
+			rw8_t<base + 251> INTA251;
+			rw8_t<base + 252> INTA252;
+			rw8_t<base + 253> INTA253;
+			rw8_t<base + 254> INTA254;
+			rw8_t<base + 255> INTA255;
 		};
 		static ir_t<0x00087010> IR;
 
@@ -302,6 +502,72 @@ namespace device {
 
 			bit_rw_t<ier0E, bitpos::B4> RXI12;
 			bit_rw_t<ier0E, bitpos::B5> TXI12;
+
+			typedef rw8_t<base + 0x10> ier10;
+			bit_rw_t<ier10, bitpos::B0> INTB128;
+			bit_rw_t<ier10, bitpos::B1> INTB129;
+			bit_rw_t<ier10, bitpos::B2> INTB130;
+			bit_rw_t<ier10, bitpos::B3> INTB131;
+			bit_rw_t<ier10, bitpos::B4> INTB132;
+			bit_rw_t<ier10, bitpos::B5> INTB133;
+			bit_rw_t<ier10, bitpos::B6> INTB134;
+			bit_rw_t<ier10, bitpos::B7> INTB135;
+
+
+			typedef rw8_t<base + 0x1A> ier1A;
+			bit_rw_t<ier1A, bitpos::B0> INTA208;
+			bit_rw_t<ier1A, bitpos::B1> INTA209;
+			bit_rw_t<ier1A, bitpos::B2> INTA210;
+			bit_rw_t<ier1A, bitpos::B3> INTA211;
+			bit_rw_t<ier1A, bitpos::B4> INTA212;
+			bit_rw_t<ier1A, bitpos::B5> INTA213;
+			bit_rw_t<ier1A, bitpos::B6> INTA214;
+			bit_rw_t<ier1A, bitpos::B7> INTA215;
+			typedef rw8_t<base + 0x1B> ier1B;
+			bit_rw_t<ier1B, bitpos::B0> INTA216;
+			bit_rw_t<ier1B, bitpos::B1> INTA217;
+			bit_rw_t<ier1B, bitpos::B2> INTA218;
+			bit_rw_t<ier1B, bitpos::B3> INTA219;
+			bit_rw_t<ier1B, bitpos::B4> INTA220;
+			bit_rw_t<ier1B, bitpos::B5> INTA221;
+			bit_rw_t<ier1B, bitpos::B6> INTA222;
+			bit_rw_t<ier1B, bitpos::B7> INTA223;
+			typedef rw8_t<base + 0x1C> ier1C;
+			bit_rw_t<ier1C, bitpos::B0> INTA224;
+			bit_rw_t<ier1C, bitpos::B1> INTA225;
+			bit_rw_t<ier1C, bitpos::B2> INTA226;
+			bit_rw_t<ier1C, bitpos::B3> INTA227;
+			bit_rw_t<ier1C, bitpos::B4> INTA228;
+			bit_rw_t<ier1C, bitpos::B5> INTA229;
+			bit_rw_t<ier1C, bitpos::B6> INTA230;
+			bit_rw_t<ier1C, bitpos::B7> INTA231;
+			typedef rw8_t<base + 0x1D> ier1D;
+			bit_rw_t<ier1D, bitpos::B0> INTA232;
+			bit_rw_t<ier1D, bitpos::B1> INTA233;
+			bit_rw_t<ier1D, bitpos::B2> INTA234;
+			bit_rw_t<ier1D, bitpos::B3> INTA235;
+			bit_rw_t<ier1D, bitpos::B4> INTA236;
+			bit_rw_t<ier1D, bitpos::B5> INTA237;
+			bit_rw_t<ier1D, bitpos::B6> INTA238;
+			bit_rw_t<ier1D, bitpos::B7> INTA239;
+			typedef rw8_t<base + 0x1E> ier1E;
+			bit_rw_t<ier1E, bitpos::B0> INTA240;
+			bit_rw_t<ier1E, bitpos::B1> INTA241;
+			bit_rw_t<ier1E, bitpos::B2> INTA242;
+			bit_rw_t<ier1E, bitpos::B3> INTA243;
+			bit_rw_t<ier1E, bitpos::B4> INTA244;
+			bit_rw_t<ier1E, bitpos::B5> INTA245;
+			bit_rw_t<ier1E, bitpos::B6> INTA246;
+			bit_rw_t<ier1E, bitpos::B7> INTA247;
+			typedef rw8_t<base + 0x1F> ier1F;
+			bit_rw_t<ier1F, bitpos::B0> INTA248;
+			bit_rw_t<ier1F, bitpos::B1> INTA249;
+			bit_rw_t<ier1F, bitpos::B2> INTA250;
+			bit_rw_t<ier1F, bitpos::B3> INTA251;
+			bit_rw_t<ier1F, bitpos::B4> INTA252;
+			bit_rw_t<ier1F, bitpos::B5> INTA253;
+			bit_rw_t<ier1F, bitpos::B6> INTA254;
+			bit_rw_t<ier1F, bitpos::B7> INTA255;
 		};
 		static ier_t<0x00087200> IER;
 
@@ -370,6 +636,79 @@ namespace device {
 
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
+
+			rw8_t<base + 128> INTB128;
+			rw8_t<base + 129> INTB129;
+			rw8_t<base + 130> INTB130;
+			rw8_t<base + 131> INTB131;
+			rw8_t<base + 132> INTB132;
+			rw8_t<base + 133> INTB133;
+			rw8_t<base + 134> INTB134;
+			rw8_t<base + 135> INTB135;
+			rw8_t<base + 136> INTB136;
+			rw8_t<base + 137> INTB137;
+			rw8_t<base + 138> INTB138;
+			rw8_t<base + 139> INTB139;
+			rw8_t<base + 140> INTB140;
+			rw8_t<base + 141> INTB141;
+			rw8_t<base + 142> INTB142;
+			rw8_t<base + 143> INTB143;
+			rw8_t<base + 144> INTB144;
+			rw8_t<base + 145> INTB145;
+			rw8_t<base + 146> INTB146;
+			rw8_t<base + 147> INTB147;
+			rw8_t<base + 148> INTB148;
+			rw8_t<base + 149> INTB149;
+			rw8_t<base + 150> INTB150;
+
+			rw8_t<base + 208> INTA208;
+			rw8_t<base + 209> INTA209;
+			rw8_t<base + 210> INTA210;
+			rw8_t<base + 211> INTA211;
+			rw8_t<base + 212> INTA212;
+			rw8_t<base + 213> INTA213;
+			rw8_t<base + 214> INTA214;
+			rw8_t<base + 215> INTA215;
+			rw8_t<base + 216> INTA216;
+			rw8_t<base + 217> INTA217;
+			rw8_t<base + 218> INTA218;
+			rw8_t<base + 219> INTA219;
+			rw8_t<base + 220> INTA220;
+			rw8_t<base + 221> INTA221;
+			rw8_t<base + 222> INTA222;
+			rw8_t<base + 223> INTA223;
+			rw8_t<base + 224> INTA224;
+			rw8_t<base + 225> INTA225;
+			rw8_t<base + 226> INTA226;
+			rw8_t<base + 227> INTA227;
+			rw8_t<base + 228> INTA228;
+			rw8_t<base + 229> INTA229;
+			rw8_t<base + 230> INTA230;
+			rw8_t<base + 231> INTA231;
+			rw8_t<base + 232> INTA232;
+			rw8_t<base + 233> INTA233;
+			rw8_t<base + 234> INTA234;
+			rw8_t<base + 235> INTA235;
+			rw8_t<base + 236> INTA236;
+			rw8_t<base + 237> INTA237;
+			rw8_t<base + 238> INTA238;
+			rw8_t<base + 239> INTA239;
+			rw8_t<base + 240> INTA240;
+			rw8_t<base + 241> INTA241;
+			rw8_t<base + 242> INTA242;
+			rw8_t<base + 243> INTA243;
+			rw8_t<base + 244> INTA244;
+			rw8_t<base + 245> INTA245;
+			rw8_t<base + 246> INTA246;
+			rw8_t<base + 247> INTA247;
+			rw8_t<base + 248> INTA248;
+			rw8_t<base + 249> INTA249;
+			rw8_t<base + 250> INTA250;
+			rw8_t<base + 251> INTA251;
+			rw8_t<base + 252> INTA252;
+			rw8_t<base + 253> INTA253;
+			rw8_t<base + 254> INTA254;
+			rw8_t<base + 255> INTA255;
 		};
 		static ipr_t<0x00087300> IPR;
 
@@ -623,22 +962,22 @@ namespace device {
 			@brief  選択型割り込み B 要因選択レジスタ Xn（SLIBXRn）（n = 128 ～ 143）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<0x00087780> SLIBX128;
-		static rw8_t<0x00087781> SLIBX129;
-		static rw8_t<0x00087782> SLIBX130;
-		static rw8_t<0x00087783> SLIBX131;
-		static rw8_t<0x00087784> SLIBX132;
-		static rw8_t<0x00087785> SLIBX133;
-		static rw8_t<0x00087786> SLIBX134;
-		static rw8_t<0x00087787> SLIBX135;
-		static rw8_t<0x00087788> SLIBX136;
-		static rw8_t<0x00087789> SLIBX137;
-		static rw8_t<0x0008778A> SLIBX138;
-		static rw8_t<0x0008778B> SLIBX139;
-		static rw8_t<0x0008778C> SLIBX140;
-		static rw8_t<0x0008778D> SLIBX141;
-		static rw8_t<0x0008778E> SLIBX142;
-		static rw8_t<0x0008778F> SLIBX143;
+		static rw8_t<0x00087780> SLIBXR128;
+		static rw8_t<0x00087781> SLIBXR129;
+		static rw8_t<0x00087782> SLIBXR130;
+		static rw8_t<0x00087783> SLIBXR131;
+		static rw8_t<0x00087784> SLIBXR132;
+		static rw8_t<0x00087785> SLIBXR133;
+		static rw8_t<0x00087786> SLIBXR134;
+		static rw8_t<0x00087787> SLIBXR135;
+		static rw8_t<0x00087788> SLIBXR136;
+		static rw8_t<0x00087789> SLIBXR137;
+		static rw8_t<0x0008778A> SLIBXR138;
+		static rw8_t<0x0008778B> SLIBXR139;
+		static rw8_t<0x0008778C> SLIBXR140;
+		static rw8_t<0x0008778D> SLIBXR141;
+		static rw8_t<0x0008778E> SLIBXR142;
+		static rw8_t<0x0008778F> SLIBXR143;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
