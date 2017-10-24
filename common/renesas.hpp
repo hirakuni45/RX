@@ -67,6 +67,7 @@
 #include "RX64M/bus.hpp"
 #include "RX64M/mpc.hpp"
 #include "RX64M/icu.hpp"
+#include "RX64M/tpu.hpp"
 #include "RX64M/mtu3.hpp"
 #include "RX64M/sci.hpp"
 #include "RX64M/riic.hpp"
