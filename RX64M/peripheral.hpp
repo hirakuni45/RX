@@ -38,6 +38,13 @@ namespace device {
 		CMT2,	///< コンペアマッチタイマ（CMT）
 		CMT3,	///< コンペアマッチタイマ（CMT）
 
+		TPU0,	///< 16 ビットタイマパルスユニット０
+		TPU1,	///< 16 ビットタイマパルスユニット１
+		TPU2,	///< 16 ビットタイマパルスユニット２
+		TPU3,	///< 16 ビットタイマパルスユニット３
+		TPU4,	///< 16 ビットタイマパルスユニット４
+		TPU5,	///< 16 ビットタイマパルスユニット５
+
 		ETHERC0,	///< Ethernet 0 (PHY RMII)
 		ETHERC1,	///< Ethernet 1 (PHY RMII)
 		PTPETHERC,	///< PTP Ethernet

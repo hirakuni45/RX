@@ -40,6 +40,15 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA14 = f;	// CMT2, CMT3 のストップ状態解除
 				break;
 
+			case peripheral::TPU0:
+			case peripheral::TPU1:
+			case peripheral::TPU2:
+			case peripheral::TPU3:
+			case peripheral::TPU4:
+			case peripheral::TPU5:
+				SYSTEM::MSTPCRA.MSTPA13 = f;	// TPU0 to TPU5 のストップ状態解除
+				break;
+
 			case peripheral::S12AD:
 				SYSTEM::MSTPCRA.MSTPA17 = f;	// S12AD のストップ状態解除
 				break;
