@@ -3,15 +3,12 @@
 /*!	@file
 	@brief	RX グループ・GPT I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX63T/gpt.hpp"
-#include "RX63T/system.hpp"
-#include "RX63T/icu.hpp"
-#include "common/vect.h"
+#include "common/renesas.hpp"
 
 /// F_PCLKA タイマーのクロックに必要なので定義が無い場合エラーにします。
 #ifndef F_PCLKA
@@ -26,7 +23,7 @@ namespace device {
 		@param[in]	GPT	GPTx定義クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GPTX>
+	template <class GPT>
 	class gpt_io {
 
 		// ※必要なら、実装する
@@ -41,14 +38,15 @@ namespace device {
 		gpt_io() { }
 
 
+#if 0
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  機能を開始
+			@brief  PWM を開始
 			@param[in]	limit	PWM カウンターのリミット
 		*/
 		//-----------------------------------------------------------------//
 		void start_pwm(uint16_t limit) {
-			uint32_t ch = GPTX::get_chanel();
+			uint32_t ch = GPT::get_chanel();
 
 			// 書き込み保護を解除
 			switch(ch) {
@@ -78,9 +76,9 @@ namespace device {
 				break;
 			}
 
-			GPTX::GTIOR.GTIOA = 0b011001;
-			GPTX::GTONCR = GPTX::GTONCR.OAE.b();
-			GPTX::GTUDC = GPTX::GTUDC.UD.b() | GPTX::GTUDC.UDF.b(); // UP カウント設定
+			GPT::GTIOR.GTIOA = 0b011001;
+			GPT::GTONCR = GPT::GTONCR.OAE.b();
+			GPT::GTUDC = GPT::GTUDC.UD.b() | GPT::GTUDC.UDF.b(); // UP カウント設定
 
 			// バッファ動作設定
 			switch(ch) {
@@ -134,8 +132,8 @@ namespace device {
 				break;
 			}
 
-			GPTX::GTPR = limit;
-			GPTX::GTCCRA = 0;
+			GPT::GTPR = limit;
+			GPT::GTCCRA = 0;
 
 			// カウント開始
 			switch(ch) {
@@ -165,7 +163,7 @@ namespace device {
 				break;
 			}
 		}
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -174,7 +172,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		void set_r(uint16_t n) {
-			GPTX::GTPR = n;
+			GPT::GTPR = n;
 		}
 
 
@@ -184,7 +182,7 @@ namespace device {
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_a(uint16_t n) { GPTX::GTCCRA = n; }
+		void set_a(uint16_t n) { GPT::GTCCRA = n; }
 
 
 		//-----------------------------------------------------------------//
@@ -193,7 +191,7 @@ namespace device {
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_b(uint16_t n) { GPTX::GTCCRB = n; }
+		void set_b(uint16_t n) { GPT::GTCCRB = n; }
 
 
 		//-----------------------------------------------------------------//
@@ -202,7 +200,7 @@ namespace device {
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_c(uint16_t n) { GPTX::GTCCRC = n; }
+		void set_c(uint16_t n) { GPT::GTCCRC = n; }
 
 
 		//-----------------------------------------------------------------//
@@ -211,7 +209,7 @@ namespace device {
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_d(uint16_t n) { GPTX::GTCCRD = n; }
+		void set_d(uint16_t n) { GPT::GTCCRD = n; }
 
 
 		//-----------------------------------------------------------------//
@@ -220,7 +218,7 @@ namespace device {
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_e(uint16_t n) { GPTX::GTCCRE = n; }
+		void set_e(uint16_t n) { GPT::GTCCRE = n; }
 
 
 		//-----------------------------------------------------------------//
@@ -229,7 +227,7 @@ namespace device {
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_f(uint16_t n) { GPTX::GTCCRF = n; }
+		void set_f(uint16_t n) { GPT::GTCCRF = n; }
 
 
 		//-----------------------------------------------------------------//
@@ -238,7 +236,7 @@ namespace device {
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_ad_a(uint16_t n) { GPTX::GTADTRA = n; }
+		void set_ad_a(uint16_t n) { GPT::GTADTRA = n; }
 
 
 		//-----------------------------------------------------------------//
@@ -247,7 +245,7 @@ namespace device {
 			@param[in]	n	値
 		*/
 		//-----------------------------------------------------------------//
-		void set_ad_b(uint16_t n) { GPTX::GTADTRB = n; }
+		void set_ad_b(uint16_t n) { GPT::GTADTRB = n; }
 
 	};
 }
