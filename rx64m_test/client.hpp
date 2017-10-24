@@ -171,6 +171,7 @@ namespace seeda {
 
 			switch(recv_task_) {
 			case recv_task::idle:
+				time_org_ = get_time();
 				break;
 
 			case recv_task::sync_time:
@@ -185,11 +186,11 @@ namespace seeda {
 
 			case recv_task::sample_put:
 				{
-					if((BUF_SIZE - 1 - fifo_.length()) < get_channel_num()) { // スペースが無い場合
+					if((BUF_SIZE - 1 - fifo_.length()) < 8) { // スペースが無い場合
 						break;
 					}
 					const sample_data& smd = get_sample_data();
-					for(uint32_t i = 0; i < get_channel_num(); ++i) {
+					for(int i = 0; i < 8; ++i) {
 						fifo_.put(smd.smp_[i]);
 					}
 					recv_task_ = recv_task::sync_time;
@@ -200,7 +201,6 @@ namespace seeda {
 			switch(send_task_) {
 
 			case send_task::idle:
-				time_org_ = get_time();
 				break;
 
 			case send_task::req_connect:
@@ -229,15 +229,15 @@ namespace seeda {
 					} else {
 						++re_connect_cnt_;
 						auto st = client_.get_ethernet().get_stat(client_.get_cepid());
-						debug_format("TCP Client re_connect(%d): status: %d, desc(%d)\n")
-							% re_connect_cnt_ % static_cast<int>(st) % client_.get_cepid();
+///						debug_format("TCP Client re_connect(%d): status: %d, desc(%d)\n")
+///							% re_connect_cnt_ % static_cast<int>(st) % client_.get_cepid();
 						// 接続しないので、「re_connect」要求を出してみる
 						// ※ re_connect では、タイムアウト（１０分）を無効にする。
 						client_.re_connect(ip_, port_);
 						timeout_ = 5 * cycle;  // 再接続待ち時間
 					}
 				} else {
-					time_org_ = get_time();
+///					debug_format("[%d] [%d] ") % get_time() % (time_ - time_ofs_ + time_org_);
 					debug_format("Start SEEDA03 Client: %s port(%d), fd(%d)\n")
 						% ip_.c_str() % port_ % client_.get_cepid();
 					format::chaout().set_fd(client_.get_cepid());
@@ -245,6 +245,7 @@ namespace seeda {
 					if(idle_count_ > (cycle * 4)) {
 						fifo_.clear();
 /// utils::format("Reset fifo\n");
+						time_org_ = get_time();
 						time_ofs_ = time_ref_;
 						time_     = time_ref_;
 					}
@@ -253,10 +254,10 @@ namespace seeda {
 				break;
 
 			case send_task::make_form:
-				if(fifo_.length() < get_channel_num()) {
+				if(fifo_.length() < 8) {
 					break;
 				} 
-				for(uint32_t ch = 0; ch < get_channel_num(); ++ch) {
+				for(int ch = 0; ch < 8; ++ch) {
 					const auto& smd = fifo_.get_at();
 					if(ch == 0) {
 						time_t t = time_ - time_ofs_ + time_org_;
