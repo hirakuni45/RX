@@ -957,6 +957,8 @@ namespace net {
 					% eth_.get_local_ip().c_str() % ctrl_.get_port() % ctrl_.get_cepid();
 				task_ = task::connection;
 				ctrl_format::chaout().set_fd(ctrl_.get_cepid());
+				data_.stop();
+				port_.stop();
 				break;
 
 			case task::connection:
@@ -1030,6 +1032,7 @@ namespace net {
 				data_connect_loop_ = data_connection_timeout_ * cycle;
 				data_format::chaout().set_fd(data_.get_cepid());
 				task_ = task::data_connection;
+				pasv_enable_ = true;
 				break;
 
 			case task::data_connection:  // PASV
@@ -1047,7 +1050,6 @@ namespace net {
 						% data_.get_port();
 					task_ = task::command;
 					line_man_.clear();
-					pasv_enable_ = true;
 					break;
 				}
 				break;
@@ -1270,18 +1272,12 @@ namespace net {
 
 			case task::disconnect:
 			default:
-				bool con;
 				if(pasv_enable_) {
-					con = data_.connected();
+					data_.stop();
+					debug_format("FTP Server data (PASV): disconnect\n");
 				} else {
-					con = port_.connected();
-				}
-				if(con) {				
-					if(pasv_enable_) {
-						data_.stop();
-					} else {
-						port_.stop();
-					}
+					port_.stop();
+					debug_format("FTP Server data (PORT): disconnect\n");
 				}
 				ctrl_.stop();
 				debug_format("FTP Server (CTRL): disconnect\n");
