@@ -9,8 +9,7 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
-#include "RX24T/peripheral.hpp"
-#include "RX24T/icu.hpp"
+#include "common/peripheral.hpp"
 
 namespace device {
 
