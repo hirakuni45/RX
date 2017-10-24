@@ -8,7 +8,6 @@
 //=====================================================================//
 #include "main.hpp"
 
-#include "common/cmt_io.hpp"
 #include "common/tpu_io.hpp"
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
@@ -22,7 +21,7 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct core {
 
-		class cmt_task {
+		class timer_task {
 			void (*task_10ms_)();
 
 			volatile unsigned long millis_;
@@ -31,7 +30,7 @@ namespace seeda {
 			volatile uint32_t cmtdiv_;
 
 		public:
-			cmt_task() : task_10ms_(nullptr),
+			timer_task() : task_10ms_(nullptr),
 				millis_(0), delay_(0), millis10x_(0), cmtdiv_(0) { }
 
 			void operator() () {
@@ -48,7 +47,6 @@ namespace seeda {
 				if(delay_) {
 					--delay_;
 				}
-				
 			}
 
 			void set_task_10ms(void (*task)(void)) {
@@ -68,10 +66,7 @@ namespace seeda {
 			void set_delay(volatile unsigned long n) { delay_ = n; }
 		};
 
-		typedef device::cmt_io<device::CMT0, cmt_task> CMT0;
-		CMT0	cmt0_;
-
-		typedef device::tpu_io<device::TPU0, cmt_task> TPU0;
+		typedef device::tpu_io<device::TPU0, timer_task> TPU0;
 		TPU0	tpu0_;
 
 		typedef utils::fifo<uint8_t, 2048> BUFFER;
@@ -118,14 +113,16 @@ namespace seeda {
 				SW2::PU = 1;
 			}
 #endif
-			{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
-				uint8_t int_level = 5;
-				cmt0_.start(1000, int_level);
-			}
-
 			{  // SCI 設定
 				uint8_t int_level = 1;
 				sci_.start(115200, int_level);
+			}
+
+			{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
+				uint8_t int_level = 5;
+				if(!tpu0_.start(1000, int_level)) {
+					utils::format("TPU0 not start ...\n");
+				}
 			}
 
 			{  // 内臓 A/D 変換設定
@@ -167,7 +164,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void sync()
 		{
-			cmt0_.at_task().sync_100hz();
+			tpu0_.at_task().sync_100hz();
 		}
 
 
@@ -209,7 +206,7 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_cmt_counter() const {
-			return cmt0_.get_counter();
+			return tpu0_.get_counter();
 		}
 	};
 }

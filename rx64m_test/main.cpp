@@ -560,19 +560,19 @@ extern "C" {
 
 	unsigned long millis(void)
 	{
-		return core_.cmt0_.at_task().get_millis();
+		return core_.tpu0_.at_task().get_millis();
 	}
 
 
 	void delay(unsigned long ms)
 	{
-		core_.cmt0_.at_task().set_delay(ms);
-		while(core_.cmt0_.at_task().get_delay() != 0) ;		
+		core_.tpu0_.at_task().set_delay(ms);
+		while(core_.tpu0_.at_task().get_delay() != 0) ;		
 	}
 
 
 	void set_task_10ms(void (*task)(void)) {
-		core_.cmt0_.at_task().set_task_10ms(task);
+		core_.tpu0_.at_task().set_task_10ms(task);
 	}
 }
 
