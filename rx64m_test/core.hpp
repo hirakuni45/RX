@@ -9,6 +9,7 @@
 #include "main.hpp"
 
 #include "common/cmt_io.hpp"
+#include "common/tpu_io.hpp"
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
 
@@ -69,6 +70,9 @@ namespace seeda {
 
 		typedef device::cmt_io<device::CMT0, cmt_task> CMT0;
 		CMT0	cmt0_;
+
+		typedef device::tpu_io<device::TPU0, cmt_task> TPU0;
+		TPU0	tpu0_;
 
 		typedef utils::fifo<uint8_t, 2048> BUFFER;
 #ifdef SEEDA
