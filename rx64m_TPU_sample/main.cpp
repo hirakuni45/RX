@@ -63,6 +63,7 @@ int main(int argc, char** argv)
 		sci_.start(115200, int_level);
 	}
 
+	utils::format("RX64M TPU sample start\n");
 
 	{  // TPU タイマー設定（６０Ｈｚ）
 		uint8_t int_level = 4;
@@ -70,8 +71,6 @@ int main(int argc, char** argv)
 			utils::format("TPU not start...\n");
 		}
 	}
-
-	utils::format("RX64M TPU sample start\n");
 
 	cmd_.set_prompt("# ");
 
@@ -83,6 +82,7 @@ int main(int argc, char** argv)
 		tpu_.sync();
 
 		if(cmd_.service()) {
+			utils::format("Count: %d\n") % tpu_.get_counter();
 		}
 
 		++cnt;
