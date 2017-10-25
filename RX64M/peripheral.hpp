@@ -17,7 +17,7 @@ namespace device {
 		@brief  ペリフェラル種別
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class peripheral {
+	enum class peripheral : uint16_t {
 
 		MTU0,	///< マルチファンクションタイマパルスユニット０
 		MTU1,	///< マルチファンクションタイマパルスユニット１
@@ -86,5 +86,4 @@ namespace device {
 		ECCRAM,		///< ECC RAM (32K)
 		STBRAM,		///< Standby RAM (8K)		
 	};
-
 }
