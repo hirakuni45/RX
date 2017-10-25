@@ -3,13 +3,14 @@
 /*!	@file
 	@brief	RX64M グループ・省電力制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "RX64M/system.hpp"
 #include "RX64M/peripheral.hpp"
+#include "common/static_holder.hpp"
 
 namespace device {
 
@@ -18,8 +19,28 @@ namespace device {
 		@brief  省電力制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct power_cfg {
+	class power_cfg {
 
+		struct pad_t {
+
+			uint8_t		cmt_;
+			uint8_t		tpu_;
+
+			pad_t() : cmt_(0), tpu_(0) { }
+		};
+
+		typedef utils::static_holder<pad_t> STH;
+
+		static void set_(bool f, uint8_t& pad, peripheral org, peripheral tgt)
+		{
+			if(f) {
+				pad |= 1 << (static_cast<uint16_t>(tgt) - static_cast<uint16_t>(org));
+			} else {
+				pad &= ~(1 << (static_cast<uint16_t>(tgt) - static_cast<uint16_t>(org)));
+			}
+		}
+
+	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  周辺機器に切り替える
@@ -33,11 +54,15 @@ namespace device {
 			switch(t) {
 			case peripheral::CMT0:
 			case peripheral::CMT1:
-				SYSTEM::MSTPCRA.MSTPA15 = f;	// CMT0, CMT1 のストップ状態解除
+				// CMT0, CMT1 のストップ状態設定
+				set_(ena, STH::st.cmt_, peripheral::CMT0, t);
+				SYSTEM::MSTPCRA.MSTPA15 = ((STH::st.cmt_ & 0b0011) == 0);
 				break;
 			case peripheral::CMT2:
 			case peripheral::CMT3:
-				SYSTEM::MSTPCRA.MSTPA14 = f;	// CMT2, CMT3 のストップ状態解除
+				// CMT2, CMT3 のストップ状態設定
+				set_(ena, STH::st.cmt_, peripheral::CMT0, t);
+				SYSTEM::MSTPCRA.MSTPA14 = ((STH::st.cmt_ & 0b1100) == 0);
 				break;
 
 			case peripheral::TPU0:
@@ -46,7 +71,9 @@ namespace device {
 			case peripheral::TPU3:
 			case peripheral::TPU4:
 			case peripheral::TPU5:
-				SYSTEM::MSTPCRA.MSTPA13 = f;	// TPU0 to TPU5 のストップ状態解除
+				// TPU0 to TPU5 のストップ状態設定
+				set_(ena, STH::st.tpu_, peripheral::TPU0, t);
+				SYSTEM::MSTPCRA.MSTPA13 = (STH::st.tpu_ == 0);
 				break;
 
 			case peripheral::S12AD:
