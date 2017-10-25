@@ -68,33 +68,38 @@ namespace device {
 
 			uint32_t cmt = F_PCLKB / freq;
 
-			uint8_t cks = 0;
+			uint8_t shift = 0;
 			while(cmt > 65536) {
 				cmt >>= 1;
-				++cks;
+				++shift;
 			}
 
-			// プリスケーラーの算出 cks
+			// プリスケーラーの算出と指定 (shift)
 			// 1: 1/2, 2: 1/4, 3: 1/8, ...
 			// TPU0: 1/1(0), 1/4(2), 1/16(4), 1/64(6) 
-			uint8_t prs = 0;
-			switch(cks) {
+			// TPU1: 1/1(0), 1/4(2), 1/16(4), 1/64(6), 1/256(8)
+ 			// TPU2: 1/1(0), 1/4(2), 1/16(4), 1/64(6), 1/1024(10)
+ 			// TPU3: 1/1(0), 1/4(2), 1/16(4), 1/64(6), 1/256(8), 1/1024(10), 1/4096(12)
+			// TPU4: 1/1(0), 1/4(2), 1/16(4), 1/64(6), 1/1024(10)
+			// TPU5: 1/1(0), 1/4(2), 1/16(4), 1/64(6), 1/256(8)
+			uint8_t tpsc = 0;
+			switch(shift) {
 			case 0:
 				break;
 			case 1:
 				cmt >>= 1;
 			case 2:
-				prs = 1;
+				tpsc = 1;
 				break;
 			case 3:
 				cmt >>= 1;
 			case 4:
-				prs = 2;
+				tpsc = 2;
 				break;
 			case 5:
 				cmt >>= 1;
 			case 6:
-				prs = 3;
+				tpsc = 3;
 				break;
 			default:
 				return false;
@@ -103,7 +108,7 @@ namespace device {
 
 			power_cfg::turn(TPU::get_peripheral());
 
-			TPU::TCR = TPU::TCR.CCLR.b(1) | TPU::TCR.TPSC.b(prs);  // TGRA のコンペアマッチ
+			TPU::TCR = TPU::TCR.CCLR.b(1) | TPU::TCR.TPSC.b(tpsc);  // TGRA のコンペアマッチ
 			if(cmt > 0) cmt--;
 			TPU::TGRA = cmt;
 			TPU::TCNT = 0x0000;
@@ -123,6 +128,19 @@ namespace device {
 			TPU::enable();
 
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  廃棄
+		*/
+		//-----------------------------------------------------------------//
+		void destroy()
+		{
+			TPU::TIER = 0;
+			TPU::enable(false);
+			power_cfg::turn(TPU::get_peripheral(), false);
 		}
 
 
