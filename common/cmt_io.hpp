@@ -176,6 +176,7 @@ namespace device {
 			} else {
 				auto ref = CMT::CMCNT();
 				while(ref <= CMT::CMCNT()) sleep_();
+				task_();
 				++counter_;
 			}
 		}
