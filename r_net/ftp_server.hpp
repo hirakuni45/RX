@@ -919,6 +919,8 @@ namespace net {
 			strncpy(user_, user, sizeof(user_) - 1);
 			strncpy(pass_, pass, sizeof(pass_) - 1);
 
+			sdc_.set_dir_list_limit(5);
+
 			sdc_.cd("/");
 
 			task_ = task::begin;
