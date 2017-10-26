@@ -78,6 +78,8 @@ namespace seeda {
 		char		form_[1024];
 		char		data_[2048];
 
+		bool		enable_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -93,7 +95,7 @@ namespace seeda {
 #endif
 			port_(PORT),
 			delay_(0), timeout_(0), re_connect_cnt_(0),
-			time_org_(0), time_ref_(0), time_ofs_(0), time_(0), idle_count_(0) { }
+			time_org_(0), time_ref_(0), time_ofs_(0), time_(0), idle_count_(0), enable_(true) { }
 
 
 		//-----------------------------------------------------------------//
@@ -134,11 +136,31 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  有効、無効の取得
+			@return 許可
+		*/
+		//-----------------------------------------------------------------//
+		bool get_enable() const { return enable_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  有効、無効の設定
+			@param[in]	ena	無効にする場合「false」
+			@return 許可
+		*/
+		//-----------------------------------------------------------------//
+		void set_enable(bool ena = true) { enable_ = ena; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  接続開始
 		*/
 		//-----------------------------------------------------------------//
 		void start_connect()
 		{
+			if(!enable_) return;
 			recv_task_ = recv_task::sync_time;
 			send_task_ = send_task::req_connect;
 		}
@@ -152,6 +174,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		bool probe() const
 		{
+			if(!enable_) return false;
 			if(send_task_ == send_task::req_connect) return false;
 			if(send_task_ == send_task::wait_req_connect) return false;
 			if(send_task_ == send_task::wait_connect) return false;
@@ -167,6 +190,8 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void service(uint32_t cycle)
 		{
+			if(!enable_) return;
+
 			++idle_count_;
 
 			switch(recv_task_) {

@@ -286,7 +286,10 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 
 			// クライアント機能設定
 			http_format("<form method=\"POST\" action=\"/cgi/set_client.cgi\">\n");
-			http_format("<table><tr><td>接続先 IP：</td>"
+			http_format("<table><tr><td>クライアント機能：</td>"
+			   "<td><input type=\"checkbox\" name=\"enable\" value=\"on\"%s>有効</td></tr>\n")
+					% (client_.get_enable() ? " checked=\"checked\"" : "");
+			http_format("<tr><td>接続先 IP：</td>"
 				"<td><input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\"></td></tr>\n")
 				% static_cast<int>(client_.get_ip()[0])
 				% static_cast<int>(client_.get_ip()[1])

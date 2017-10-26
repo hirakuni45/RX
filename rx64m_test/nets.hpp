@@ -85,6 +85,7 @@ namespace seeda {
 
 		void write_pre_()
 		{
+			pre_.at().client_enable_ = client_.get_enable();
 			for(int i = 0; i < 4; ++i) pre_.at().client_ip_[i] = (client_.get_ip())[i];
 			pre_.at().client_port_ = client_.get_port();
 
@@ -310,14 +311,21 @@ namespace seeda {
 
 		void set_client_()
 		{
-			typedef utils::parse_cgi_post<256, 2> CGI_IP;
+			typedef utils::parse_cgi_post<256, 3> CGI_IP;
 			CGI_IP cgi;
 			cgi.parse(http_.get_post_body());
+
+			bool enable = false;
 			for(uint32_t i = 0; i < cgi.size(); ++i) {
 				const auto& t = cgi.get_unit(i);
 				bool err = true;
 				if(t.key == nullptr || t.val == nullptr) {
 
+				} else if(strcmp(t.key, "enable") == 0) {
+					if(strcmp(t.val, "on") == 0) {
+						enable = true;
+						err = false;
+					}
 				} else if(strcmp(t.key, "ip") == 0) {
 					debug_format("Set client IP: '%s'\n") % t.val;
 					if(client_.at_ip().from_string(t.val)) {
@@ -335,6 +343,8 @@ namespace seeda {
 					return;
 				}
 			}
+			debug_format("Set client %s\n") % (enable ? "ENABLE" : "DISABLE");
+			client_.set_enable(enable);
 			write_pre_();
 ///			client_.re_start();
 		}
@@ -592,6 +602,7 @@ namespace seeda {
 						at_sample(ch).limit_lo_level_ = pre_.get().limit_lo_level_[ch];
 						at_sample(ch).limit_hi_level_ = pre_.get().limit_hi_level_[ch];
 					}
+					client_.set_enable(pre_.get().client_enable_);
 					for(int i = 0; i < 4; ++i) client_.at_ip()[i] = pre_.get().client_ip_[i];
 					client_.set_port(pre_.get().client_port_);
 
