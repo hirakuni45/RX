@@ -207,7 +207,11 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	uint32_t get_channel_num()
 	{
+#ifdef SEEDA
 		return SW1::P() ? 4 : 8;
+#else
+		return 8;  // for only 8 chanels
+#endif
 	}
 
 
