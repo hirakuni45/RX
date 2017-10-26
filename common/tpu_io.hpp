@@ -28,7 +28,18 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class TPU, class TASK = utils::null_task>
 	class tpu_io {
+	public:
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  タイプ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class TYPE : uint8_t {
+			MATCH,	///< コンペアー・マッチ
+		};
+
+	private:
 		uint8_t		level_;
 
 		static volatile uint32_t counter_;
@@ -54,7 +65,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  動作開始					
+			@brief  タイマー動作開始
 			@param[in]	freq	タイマー周波数
 			@param[in]	level	割り込みレベル（０ならポーリング）
 			@return レンジオーバーなら「false」を返す
@@ -67,50 +78,61 @@ namespace device {
 			level_ = level;
 
 			uint32_t cmt = F_PCLKB / freq;
-
 			uint8_t shift = 0;
 			while(cmt > 65536) {
-				cmt >>= 1;
+				cmt >>= 2;
 				++shift;
 			}
+			if(cmt == 0) return false;
+
+			auto per = TPU::get_peripheral();
 
 			// プリスケーラーの算出と指定 (shift)
 			// 1: 1/2, 2: 1/4, 3: 1/8, ...
-			// TPU0: 1/1(0), 1/4(2), 1/16(4), 1/64(6) 
-			// TPU1: 1/1(0), 1/4(2), 1/16(4), 1/64(6), 1/256(8)
- 			// TPU2: 1/1(0), 1/4(2), 1/16(4), 1/64(6), 1/1024(10)
- 			// TPU3: 1/1(0), 1/4(2), 1/16(4), 1/64(6), 1/256(8), 1/1024(10), 1/4096(12)
-			// TPU4: 1/1(0), 1/4(2), 1/16(4), 1/64(6), 1/1024(10)
-			// TPU5: 1/1(0), 1/4(2), 1/16(4), 1/64(6), 1/256(8)
+			// TPU0: 1/1(0), 1/4(1), 1/16(2), 1/64(3) 
+			// TPU1: 1/1(0), 1/4(1), 1/16(2), 1/64(3), 1/256(4)
+ 			// TPU2: 1/1(0), 1/4(1), 1/16(2), 1/64(3), 1/1024(5)
+ 			// TPU3: 1/1(0), 1/4(1), 1/16(2), 1/64(3), 1/256(4), 1/1024(5), 1/4096(6)
+			// TPU4: 1/1(0), 1/4(1), 1/16(2), 1/64(3), 1/1024(5)
+			// TPU5: 1/1(0), 1/4(1), 1/16(2), 1/64(3), 1/256(4)
 			uint8_t tpsc = 0;
-			switch(shift) {
-			case 0:
-				break;
-			case 1:
-				cmt >>= 1;
-			case 2:
-				tpsc = 1;
-				break;
-			case 3:
-				cmt >>= 1;
-			case 4:
-				tpsc = 2;
-				break;
-			case 5:
-				cmt >>= 1;
-			case 6:
-				tpsc = 3;
-				break;
-			default:
+			if(shift == 0) {
+			} else if(shift == 1) {
+				tpsc = 0b001;
+			} else if(shift == 2) {
+				tpsc = 0b010;
+			} else if(shift == 3) {
+				tpsc = 0b011;
+			} else if(shift == 6) {
+				if(per == peripheral::TPU3) {  // 1/4096
+					tpsc = 0b111;
+				} else {
+					return false;
+				}
+			} else if(shift == 5) {
+				if(per == peripheral::TPU2) {
+					tpsc = 0b111;
+				} else if(per == peripheral::TPU3) {
+					tpsc = 0b101;
+				} else if(per == peripheral::TPU4) {
+					tpsc = 0b110;
+				} else {
+					return false;
+				}
+			} else if(shift == 4) {
+				if(per == peripheral::TPU1 || per == peripheral::TPU3 || per == peripheral::TPU5) {
+					tpsc = 0b110;
+				} else {
+					return false;
+				}
+			} else {
 				return false;
-				break;
 			}
 
-			power_cfg::turn(TPU::get_peripheral());
+			power_cfg::turn(per);
 
 			TPU::TCR = TPU::TCR.CCLR.b(1) | TPU::TCR.TPSC.b(tpsc);  // TGRA のコンペアマッチ
-			if(cmt > 0) cmt--;
-			TPU::TGRA = cmt;
+			TPU::TGRA = cmt - 1;
 			TPU::TCNT = 0x0000;
 
 			if(level_ > 0) {  // 割り込み設定
