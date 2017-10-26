@@ -112,7 +112,9 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void set_path(const char* path)
 		{
-			utils::sformat("%s", path_, sizeof(path_)) % path;
+			if(path == nullptr) return;
+			if(path[0] == '/') ++path;
+			utils::sformat("/%s", path_, sizeof(path_)) % path;
 		}
 
 
