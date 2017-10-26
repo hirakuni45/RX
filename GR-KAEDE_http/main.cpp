@@ -16,8 +16,8 @@
 #include "common/input.hpp"
 #include "common/time.h"
 
-#include "GR/core/ethernet.hpp"
-#include "GR/core/http_server.hpp"
+#include "r_net/ethernet.hpp"
+#include "r_net/http_server.hpp"
 
 extern "C" {
 	void INT_Excep_ICU_GROUPAL1(void);
@@ -423,7 +423,7 @@ int main(int argc, char** argv)
 
 		ethernet_.service();
 
-		http_.service();
+		http_.service(100);
 
 		sdc_.service();
 
