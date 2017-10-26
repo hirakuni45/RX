@@ -19,16 +19,26 @@ namespace device {
 		@brief  割り込みマネージャー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct icu_mgr {
+	class icu_mgr {
 
+//		static ICU::VECTOR set_selectable_level_(uint8_t id, uint8_t lvl)
+//		{
+//
+//		}
+//			ICU::SLIBXR128 = TPU::get_TGIA();
+//			ICU::IPR.INTB128 = level_;
+//			ICU::IER.INTB128 = true;
+
+	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みを設定する
 			@param[in]	t	周辺機器タイプ
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
+			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static void set_level(peripheral t, uint8_t lvl)
+		static bool set_level(peripheral t, uint8_t lvl)
 		{
 			bool ena = lvl != 0 ? true : false;
 			switch(t) {
@@ -111,15 +121,54 @@ namespace device {
 				ICU::IER.TXI12 = ena;
 				break;
 
-			case peripheral::ETHERC0:
+			case peripheral::TPU0:
+			case peripheral::TPU1:
+			case peripheral::TPU2:
+			case peripheral::TPU3:
+			case peripheral::TPU4:
+			case peripheral::TPU5:
 
+				break;
+
+			case peripheral::ETHERC0:
 				break;
 			case peripheral::ETHERC1:
-
 				break;
 			default:
+				return false;
 				break;
 			}
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターの取得
+			@param[in]	per	周辺機器タイプ
+			@param[in]	id	割り込み要因
+			@return 割り込みベクター（マッチするベクターが無ければ「VEC0」を返す）
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_vector(peripheral per, uint8_t id)
+		{
+			switch(per) {
+			case peripheral::TPU0:
+			case peripheral::TPU1:
+			case peripheral::TPU2:
+			case peripheral::TPU3:
+			case peripheral::TPU4:
+			case peripheral::TPU5:
+				// INTB128 to INTB207
+				for(uint8_t i = 128; i <= 207; ++i) {
+					
+				}
+				break;
+			default:
+				return ICU::VECTOR::VEC0;
+			}
+
+			return ICU::VECTOR::INTB128;
 		}
 
 
@@ -213,19 +262,6 @@ namespace device {
 			default:
 				break;
 			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  選択型割り込みを設定する
-			@param[in]	vec	グループ割り込み・インデックス
-			@param[in]	lvl	割り込みレベル（０なら割り込み禁止）
-		*/
-		//-----------------------------------------------------------------//
-		static void set_selectable_vector(ICU::VECTOR vec, uint8_t lvl)
-		{
-			
 		}
 	};
 }

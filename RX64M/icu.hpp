@@ -25,13 +25,15 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR {
-			BUSERR = 16,  // BSC
+			VEC0 = 0,     ///< ベクター０
 
-			RAMERR = 18,  // RAM
+			BUSERR = 16,  ///< BSC
 
-			FIFERR = 21,  // FCU
+			RAMERR = 18,  ///< RAM
 
-			FRDYI  = 23,  // FCU
+			FIFERR = 21,  ///< FCU
+
+			FRDYI  = 23,  ///< FCU
 
 			SWINT2 = 26,  // ICU
 			SWINT  = 27,  // ICU
