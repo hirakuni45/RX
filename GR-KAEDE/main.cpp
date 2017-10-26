@@ -71,6 +71,44 @@ namespace {
 		ena_int();
 //		ethd_.enable_interrupt();
 	}
+
+
+	uint8_t v_ = 91;
+	uint8_t m_ = 123;
+	uint8_t rand_()
+	{
+		v_ += v_ << 2;
+		++v_;
+		uint8_t n = 0;
+		if(m_ & 0x02) n = 1;
+		if(m_ & 0x40) n ^= 1;
+		m_ += m_;
+		if(n == 0) ++m_;
+		return v_ ^ m_;
+	}
+
+
+	void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+	{
+		if(fi == nullptr) return;
+
+		char cdir = '-';
+		if(dir) {
+			cdir = 'd';
+		}
+		int block = fi->fsize / 512;
+		if(block == 0 && fi->fsize > 0) ++block;
+
+		time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
+		struct tm *m = localtime(&t);
+		utils::format("%crw-rw-rw- %d user root %d %s %d %02d:%02d %s\n")
+			% cdir % block % fi->fsize
+			% get_mon(m->tm_mon)
+			% static_cast<int>(m->tm_mday)
+			% static_cast<int>(m->tm_hour)
+			% static_cast<int>(m->tm_min)
+			% name;
+	}
 }
 
 namespace seeda {
@@ -257,6 +295,96 @@ namespace seeda {
 	{
 		return core_.get_adc(ch);
 	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  ファイル作成テスト
+		@param[in]	fname	ファイル名
+		@param[in]	size	作成サイズ
+		@return 成功なら「true」
+	*/
+	//-----------------------------------------------------------------//
+	bool create_test_file(const char* fname, uint32_t size, sd_speed_t& t)
+	{
+		uint8_t buff[512];
+		for(uint16_t i = 0; i < sizeof(buff); ++i) {
+			buff[i] = rand_();
+		}
+
+		FIL fp;
+
+		auto st = core_.get_cmt_counter();
+		if(!sdc_.open(&fp, fname, FA_WRITE | FA_CREATE_ALWAYS)) {
+			utils::format("Can't write file: '%s'\n") % fname;
+			return false;
+		}
+		auto ed = core_.get_cmt_counter();
+		t.w_open_ = ed - st;
+		st = ed;
+
+		auto rs = size;
+		while(rs > 0) {
+			UINT sz = sizeof(buff);
+			if(sz > rs) sz = rs;
+			UINT bw;
+			f_write(&fp, buff, sz, &bw);
+			rs -= bw;
+		}
+		ed = core_.get_cmt_counter();
+		t.write_ = ed - st;
+		st = ed;
+
+		f_close(&fp);
+		ed = core_.get_cmt_counter();
+		t.w_close_ = ed - st;
+		st = ed;
+
+		if(!sdc_.open(&fp, fname, FA_READ | FA_OPEN_EXISTING)) {
+			utils::format("Can't read file: '%s'\n") % fname;
+			return false;
+		}
+		ed = core_.get_cmt_counter();
+		t.r_open_ = ed - st;
+		st = ed;
+
+		rs = size;
+		while(rs > 0) {
+			UINT sz = sizeof(buff);
+			if(sz > rs) sz = rs;
+			UINT bw;
+			f_read(&fp, buff, sz, &bw);
+			rs -= bw;
+		}
+		ed = core_.get_cmt_counter();
+		t.read_ = ed - st;
+		st = ed;
+
+		f_close(&fp);
+		ed = core_.get_cmt_counter();
+		t.r_close_ = ed - st;
+		st = ed;
+
+		if(!sdc_.start_dir_list("", dir_list_func_, true, nullptr)) {
+			utils::format("Can't open directories...\n");
+		}
+		uint32_t num = 0;
+		while(sdc_.probe_dir_list(num)) {
+			sdc_.service();
+		}
+		ed = core_.get_cmt_counter();
+		t.dirlist_num_ = num;
+		t.dirlist_ = ed - st;
+
+//		auto ed = core_.get_cmt_counter();
+//		uint32_t time = ed - st;
+//		utils::format("Write frame: %d\n") % len;
+//		auto pbyte = size * 1000 / time;
+//		utils::format("Write: %d Bytes/Sec\n") % pbyte;
+//		utils::format("Write: %d KBytes/Sec\n") % (pbyte / 1024);
+
+		return true;
+	}
 }
 
 extern "C" {
@@ -424,22 +552,20 @@ extern "C" {
 
 	unsigned long millis(void)
 	{
-		return core_.cmt0_.at_task().get_millis();
+		return core_.tpu0_.at_task().get_millis();
 	}
 
 
 	void delay(unsigned long ms)
 	{
-		core_.cmt0_.at_task().set_delay(ms);
-		while(core_.cmt0_.at_task().get_delay() != 0) ;		
+		core_.tpu0_.at_task().set_delay(ms);
+		while(core_.tpu0_.at_task().get_delay() != 0) ;		
 	}
 
 
 	void set_task_10ms(void (*task)(void)) {
-		core_.cmt0_.at_task().set_task_10ms(task);
+		core_.tpu0_.at_task().set_task_10ms(task);
 	}
-
-
 }
 
 int main(int argc, char** argv);
