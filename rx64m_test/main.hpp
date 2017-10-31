@@ -17,6 +17,7 @@
 #include "common/format.hpp"
 #include "common/input.hpp"
 #include "common/time.h"
+#include "common/fixed_fifo.hpp"
 
 #include "chip/LTC2348_16.hpp"
 #include "sample.hpp"
@@ -35,7 +36,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 516;
+	static const int seeda_version_ = 517;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef utils::command<256> CMD;
@@ -236,6 +237,32 @@ namespace seeda {
 
 	//-----------------------------------------------------------------//
 	/*!
+		@brief  Write File FIFO の RESET
+	*/
+	//-----------------------------------------------------------------//
+	void reset_wf_fifo();
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  Write File FIFO の取得
+		@return Write File FIFO
+	*/
+	//-----------------------------------------------------------------//
+	const EADC_FIFO& get_wf_fifo();
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  Write File FIFO の取得
+		@return Write File FIFO
+	*/
+	//-----------------------------------------------------------------//
+	EADC_FIFO& at_wf_fifo();
+
+
+	//-----------------------------------------------------------------//
+	/*!
 		@brief  内臓 A/D 変換値の取得
 		@param[in]	ch	チャネル（５、６、７）
 		@return A/D 変換値
@@ -253,6 +280,15 @@ namespace seeda {
 	*/
 	//-----------------------------------------------------------------//
 	bool create_test_file(const char* fname, uint32_t size, sd_speed_t& t);
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  write data
+		@return OK: true, NG: false
+	*/
+	//-----------------------------------------------------------------//
+	bool start_write_data(const char* path, uint32_t limit);
 }
 
 extern "C" {
