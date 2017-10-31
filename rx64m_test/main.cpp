@@ -35,8 +35,11 @@ namespace {
 
 	volatile bool	enable_eadc_;
 
-	typedef utils::log_man<device::standby_ram> LOG_MAN;
-	LOG_MAN		log_man_;
+	seeda::EADC_FIFO   	wf_fifo_;
+
+//	typedef utils::log_man<device::standby_ram> LOG_MAN;
+//	LOG_MAN		log_man_;
+
 
 	void main_init_()
 	{
@@ -111,9 +114,30 @@ namespace {
 			% static_cast<int>(m->tm_min)
 			% name;
 	}
+
+
+	void disp_time_(time_t t, char* dst, uint32_t size)
+	{
+		t += 9 * 60 * 60;  // GMT +9
+		uint32_t s = t % 60;
+		t /= 60;
+		uint32_t m = t % 60;
+		t /= 60;
+		uint32_t h = t % 24;
+		utils::sformat("%02u:%02u:%02u", dst, size) % h % m % s;
+	}
 }
 
 namespace seeda {
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  nets の参照
+		@return nets
+	*/
+	//-----------------------------------------------------------------//
+	nets& at_nets() { return nets_; }
+
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -227,17 +251,13 @@ namespace seeda {
 #ifdef SEEDA
 		if(nets_.get_dev_signal()) {
 			for(int i = 0; i < 8; ++i) {
-///				sample_[i].add(signal_[i]);
-				// とりあえず、安全の為１４ビットにする
-				sample_[i].add(signal_[i] & 0xfffc);
+				sample_[i].add(signal_[i]);
 				++signal_[i];
 			}
 		} else {
 			eadc_.convert();
 			for(int i = 0; i < 8; ++i) {
-///				sample_[i].add(eadc_.get_value(i));
-				// とりあえず、安全の為１４ビットにする
-				sample_[i].add(eadc_.get_value(i) & 0xfffc);
+				sample_[i].add(eadc_.get_value(i));
 			}
 		}
 #endif
@@ -250,6 +270,9 @@ namespace seeda {
 				sample_[i].clear();
 			}
 			++sample_data_.time_;
+			if(wf_fifo_.length() < (wf_fifo_.size() - 2)) {
+				wf_fifo_.put(sample_data_);
+			}
 			sample_count_ = 0;			
 		}
 	}
@@ -290,6 +313,32 @@ namespace seeda {
 	{
 		return sample_data_;
 	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  Write File FIFO の RESET
+	*/
+	//-----------------------------------------------------------------//
+	void reset_wf_fifo() { wf_fifo_.clear(); }
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  Write File FIFO の取得
+		@return Write File FIFO
+	*/
+	//-----------------------------------------------------------------//
+	const EADC_FIFO& get_wf_fifo() { return wf_fifo_; }
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  Write File FIFO の取得
+		@return Write File FIFO
+	*/
+	//-----------------------------------------------------------------//
+	EADC_FIFO& at_wf_fifo() { return wf_fifo_; }
 
 
 	//-----------------------------------------------------------------//
@@ -675,7 +724,7 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	// ログ初期化、開始
-	log_man_.start();
+//	log_man_.start();
 
 	main_init_();
 
@@ -699,10 +748,28 @@ int main(int argc, char** argv)
 	enable_eadc_server();
 
 	uint32_t cnt = 0;
+	sample_data_.time_ = get_time();
+	time_t tref = sample_data_.time_;
 	while(1) {
 		core_.sync();
 
 		service_putch_tmp_();
+
+		{
+			const sample_data& smd = get_sample_data();
+			bool sync = false;
+			if(tref != smd.time_) {
+				tref = smd.time_;
+				if((tref % 60) == 0) {
+					char tmp[128];
+					time_t t = get_time();
+					disp_time_(t, tmp, sizeof(tmp));
+					debug_format("RTC: %s, ") % tmp;
+					disp_time_(tref, tmp, sizeof(tmp));
+					debug_format("SYSTEM: %s\n") % tmp;
+				}
+			}
+		}
 
 		core_.service();
 		tools_.service();

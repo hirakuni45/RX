@@ -10,6 +10,7 @@
 #include <complex>
 #include "common/format.hpp"
 #include "common/time.h"
+#include "common/fixed_fifo.hpp"
 
 namespace seeda {
 
@@ -119,6 +120,8 @@ namespace seeda {
 		time_t		time_;
 		sample_t	smp_[8];
 	};
+	// sample_data FIFO (sizeof 16[sec])
+	typedef utils::fixed_fifo<sample_data, 16> EADC_FIFO;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
