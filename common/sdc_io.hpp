@@ -62,7 +62,7 @@ namespace utils {
 			if(fi == nullptr) return;
 
 			time_t t = str::fatfs_time_to(fi->fdate, fi->ftime);
-			struct tm *m = localtime(&t);
+			struct tm *m = gmtime(&t);
 			if(dir) {
 				format("          ");
 			} else {
