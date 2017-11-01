@@ -527,6 +527,13 @@ namespace seeda {
 	}
 
 
+
+	bool cmd_setup_(uint8_t cmdn)
+	{
+		return false;
+	}
+
+
 	void list_service_() const
 	{		
 	}
@@ -648,6 +655,8 @@ namespace seeda {
 						f = true;
 					} else if(cmd_.cmp_word(0, "writedata")) {
 						f = write_data_(cmdn);
+					} else if(cmd_.cmp_word(0, "setup")) {
+						f = cmd_setup_(cmdn);
 					} else if(cmd_.cmp_word(0, "service")) {
 						list_service_();
 						f = true;
@@ -683,6 +692,7 @@ namespace seeda {
 ///						utils::format("reset [01]  (PHY reset signal)\n");
 #endif
 						utils::format("writedata base-str num(minits)\n");
+						utils::format("setup\n");
 						f = true;
 					}
 					if(!f) {
