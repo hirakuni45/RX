@@ -33,12 +33,15 @@ namespace {
 
 	uint16_t		signal_[8];
 
-	volatile bool	enable_eadc_;
-
 	seeda::EADC_FIFO   	wf_fifo_;
+
+	time_t			sys_time_;
 
 //	typedef utils::log_man<device::standby_ram> LOG_MAN;
 //	LOG_MAN		log_man_;
+
+
+	volatile bool	enable_eadc_;
 
 
 	void main_init_()
@@ -105,7 +108,7 @@ namespace {
 		if(block == 0 && fi->fsize > 0) ++block;
 
 		time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
-		struct tm *m = localtime(&t);
+		struct tm *m = gmtime(&t);
 		utils::format("%crw-rw-rw- %d user root %d %s %d %02d:%02d %s\n")
 			% cdir % block % fi->fsize
 			% get_mon(m->tm_mon)
@@ -203,20 +206,6 @@ namespace seeda {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@brief  GMT 時間の設定
-		@param[in]	t	GMT 時間
-	*/
-	//-----------------------------------------------------------------//
-	void set_time(time_t t)
-	{
-		if(!rtc_.set_time(t)) {
-			utils::format("Stall RTC write...\n");
-		}
-	}
-
-
-	//-----------------------------------------------------------------//
-	/*!
 		@brief  時間の表示
 		@param[in]	t		時間
 		@param[in]	dst		出力文字列
@@ -269,7 +258,8 @@ namespace seeda {
 				sample_data_.smp_[i].ch_ = i;
 				sample_[i].clear();
 			}
-			++sample_data_.time_;
+			++sys_time_;
+			sample_data_.time_ = sys_time_;
 			if(wf_fifo_.length() < (wf_fifo_.size() - 2)) {
 				wf_fifo_.put(sample_data_);
 			}
@@ -442,6 +432,33 @@ namespace seeda {
 
 		return true;
 	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  RTC GMT 時間の設定
+		@param[in]	t	GMT 時間
+	*/
+	//-----------------------------------------------------------------//
+	void set_rtc_time(time_t t)
+	{
+		if(!rtc_.set_time(t)) {
+			utils::format("Stall RTC write...\n");
+		}
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  SYS GMT 時間の設定
+		@param[in]	t	GMT 時間
+	*/
+	//-----------------------------------------------------------------//
+	void set_time(time_t t)
+	{
+		set_rtc_time(t);
+		sys_time_ = t;
+	}
 }
 
 extern "C" {
@@ -577,6 +594,7 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	DWORD get_fattime(void) {
 		time_t t = get_time();
+		t += get_timezone_offset();  // SD Card time stamp is not GMT
 		return utils::str::get_fattime(t);
 	}
 
@@ -595,15 +613,27 @@ extern "C" {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@brief  GMT 時間の取得
+		@brief  RTC GMT 時間の取得
+		@return GMT 時間
+	*/
+	//-----------------------------------------------------------------//
+	time_t get_rtc_time()
+	{
+		time_t t = 0;
+		rtc_.get_time(t);
+		return t;
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  SYS GMT 時間の取得
 		@return GMT 時間
 	*/
 	//-----------------------------------------------------------------//
 	time_t get_time()
 	{
-		time_t t = 0;
-		rtc_.get_time(t);
-		return t;
+		return sys_time_;
 	}
 
 
@@ -730,6 +760,7 @@ int main(int argc, char** argv)
 
 	sample_count_ = 0;
 
+	sys_time_ = get_rtc_time();
 	core_.init();
 
 	// SD カード・クラスの初期化
@@ -745,16 +776,18 @@ int main(int argc, char** argv)
 	nets_.init();
 	nets_.title();
 
+	sys_time_ = get_rtc_time();
 	enable_eadc_server();
 
+	sys_time_ = get_rtc_time();
 	uint32_t cnt = 0;
-	sample_data_.time_ = get_time();
-	time_t tref = sample_data_.time_;
+	uint16_t rtc_set_loop = 0;
 	while(1) {
 		core_.sync();
 
 		service_putch_tmp_();
 
+#if 0
 		{
 			const sample_data& smd = get_sample_data();
 			bool sync = false;
@@ -770,6 +803,7 @@ int main(int argc, char** argv)
 				}
 			}
 		}
+#endif
 
 		core_.service();
 		tools_.service();
@@ -783,5 +817,12 @@ int main(int argc, char** argv)
 			cnt = 0;
 		}
 		device::PORTE::PODR.B3 = (cnt < 10) ? 0 : 1;
+
+		//
+		++rtc_set_loop;
+		if(rtc_set_loop >= (100 * 60 * 5)) {  // 5 minits / setting RTC
+			rtc_set_loop = 0;
+			set_rtc_time(sys_time_);
+		}
 	}
 }
