@@ -219,7 +219,13 @@ namespace seeda {
 					}
 					utils::sformat("\n", data, sizeof(data), true);
 
-					fwrite(data, 1, utils::sformat::chaout().size(), fp_);
+					uint32_t sz = utils::sformat::chaout().size();
+					if(fwrite(data, 1, sz, fp_) != sz) {
+						debug_format("File write error (header): '%s'\n") % filename_;
+						enable_ = false;
+						task_ = task::wait_request;
+						break;
+					}
 					task_ = task::make_data;
 					ch_loop_ = 0;
 				}
@@ -259,7 +265,12 @@ namespace seeda {
 
 			case task::write_body:
 				if(get_wf_fifo().length() > 0) {
-					fwrite(data_, 1, data_len_, fp_);
+					if(fwrite(data_, 1, data_len_, fp_) != data_len_) {
+						debug_format("File write error (body): '%s'\n") % filename_;
+						enable_ = false;
+						task_ = task::wait_request;
+						break;
+					}
 					if(last_channel_) {
 						at_wf_fifo().get_go();
 						if(second_ == 59) {  // change file.
