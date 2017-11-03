@@ -19,6 +19,31 @@ namespace seeda {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class setup {
+	public:
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ＩＰ設定構造体
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct ip_t {
+			bool		dhcp_;
+			uint8_t		ip_[4];
+			uint8_t		gw_[4];
+			uint8_t		mask_[4];
+
+			ip_t() :
+				dhcp_(true),
+				ip_{ 192, 168, 3, 20 },
+				gw_{ 192, 168, 3, 1 },
+				mask_{ 255, 255, 255, 0 }
+			{ }
+		};
+
+	private:
+		static const uint8_t EUI_DHCP = 0x08;	// DHCP offset
+		static const uint8_t EUI_IP   = 0x0A;	// IP offset
+		static const uint8_t EUI_GW   = 0x10;	// GW offset
+		static const uint8_t EUI_MASK = 0x14;	// MASK offset
 
 		write_file&	write_file_;
 
@@ -26,8 +51,7 @@ namespace seeda {
 
 		uint8_t		mac_[6];
 
-		bool		dhcp_;
-		uint8_t		ip_[4];
+		ip_t		ipt_;
 
 		bool		signal_;
 
@@ -43,29 +67,20 @@ namespace seeda {
 		SPI		spi_;
 		EUI		eui_;
 
-		static const uint16_t key_len = 6;
+		static const uint16_t key_len = 7;
 		const char* get_magic_() const {
-			static const char* key = { "SEDA03" };
+			static const char* key = { "SEEDA03" };
 			return key;
 		}
 
 		bool probe_magic_() {
-			char tmp[8];
+			char tmp[16];
 			eui_.read(0x00, tmp, key_len);
 			tmp[key_len] = 0;
 //utils::format("EUI Key: %02X %02X %02X %02X %02X %02X\n")
 //	% static_cast<uint16_t>(tmp[0]) % static_cast<uint16_t>(tmp[1]) % static_cast<uint16_t>(tmp[2])
 //	% static_cast<uint16_t>(tmp[3]) % static_cast<uint16_t>(tmp[4]) % static_cast<uint16_t>(tmp[5]);
 			return strncmp(get_magic_(), tmp, key_len) == 0;
-		}
-
-		void write_eui_()
-		{
-			eui_.write(0x00, get_magic_(), key_len);
-			char tmp[1];
-			tmp[0] = dhcp_ ? 0x01 : 0x00;
-			eui_.write(0x08, tmp, 1);
-			eui_.write(0x0A, ip_, 4);
 		}
 #endif
 
@@ -76,7 +91,8 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		setup(write_file& wf, client& cl) : write_file_(wf), client_(cl),
-			mac_{ 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }, dhcp_(true), ip_{ 192, 168, 3, 20 },
+			mac_{ 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED },
+			ipt_(),
 			signal_(false)
 #ifdef SEEDA
 			, spi_(), eui_(spi_)
@@ -91,24 +107,6 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  DHCP への参照
-			@return DHCP
-		*/
-		//-----------------------------------------------------------------//
-		bool& at_dhcp() { return dhcp_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  DHCP への参照
-			@return DHCP
-		*/
-		//-----------------------------------------------------------------//
-		bool get_dhcp() const { return dhcp_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  MAC アドレスへの参照
 			@return 配列への参照
 		*/
@@ -118,21 +116,54 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  IP アドレスへの参照
-			@param[in]	idx	0 to 3
-			@return 配列への参照
+			@brief  ip_t への参照
+			@return ip_t
 		*/
 		//-----------------------------------------------------------------//
-		uint8_t& at_ip(uint8_t idx) { return ip_[idx]; }
+		ip_t& at_ipt() { return ipt_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  IP アドレスのポインター
-			@return 配列ポインター
+			@brief  ip_t の取得
+			@return ip_t
 		*/
 		//-----------------------------------------------------------------//
-		const uint8_t* get_ip() const { return ip_; }
+		const ip_t& get_ipt() const { return ipt_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  EUI デバイスの表示
+		*/
+		//-----------------------------------------------------------------//
+		void list_eui() const
+		{
+			utils::format("EEPROM EUI-48 Node Identity List\n"); 
+			utils::format("  DHCP: %s\n") % (ipt_.dhcp_ ? "Enable" : "Disable");
+			utils::format("  IP:   %d.%d.%d.%d\n")
+				% static_cast<uint32_t>(ipt_.ip_[0])
+				% static_cast<uint32_t>(ipt_.ip_[1])
+				% static_cast<uint32_t>(ipt_.ip_[2])
+				% static_cast<uint32_t>(ipt_.ip_[3]);
+			utils::format("  GW:   %d.%d.%d.%d\n")
+				% static_cast<uint32_t>(ipt_.gw_[0])
+				% static_cast<uint32_t>(ipt_.gw_[1])
+				% static_cast<uint32_t>(ipt_.gw_[2])
+				% static_cast<uint32_t>(ipt_.gw_[3]);
+			utils::format("  MASK: %d.%d.%d.%d\n")
+				% static_cast<uint32_t>(ipt_.mask_[0])
+				% static_cast<uint32_t>(ipt_.mask_[1])
+				% static_cast<uint32_t>(ipt_.mask_[2])
+				% static_cast<uint32_t>(ipt_.mask_[3]);
+			utils::format("  MAC:  %02X:%02X:%02X:%02X:%02X:%02X\n\n")
+				% static_cast<uint32_t>(mac_[0])
+				% static_cast<uint32_t>(mac_[1])
+				% static_cast<uint32_t>(mac_[2])
+				% static_cast<uint32_t>(mac_[3])
+				% static_cast<uint32_t>(mac_[4])
+				% static_cast<uint32_t>(mac_[5]);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -156,18 +187,42 @@ namespace seeda {
 			{  // check magic ID
 				if(probe_magic_()) {
 					uint8_t dhcp[1];
-					eui_.read(0x08, dhcp, 1);
-					dhcp_ = dhcp[0] != 0;
-					eui_.read(0x0A, ip_, 4);
+					eui_.read(EUI_DHCP, dhcp, 1);
+					ipt_.dhcp_ = dhcp[0] != 0;
+					eui_.read(EUI_IP,   ipt_.ip_, 4);
+					eui_.read(EUI_GW,   ipt_.gw_, 4);
+					eui_.read(EUI_MASK, ipt_.mask_, 4);
 				} else {
-					if(!dev) {
-						ip_[0] = 192;
-						ip_[1] = 168;
-						ip_[2] = 1;
-						ip_[3] = 22;
-						dhcp_ = false;
+					if(dev) {
+						ipt_.dhcp_ = true;
+						ipt_.ip_[0] = 192;
+						ipt_.ip_[1] = 168;
+						ipt_.ip_[2] = 3;
+						ipt_.ip_[3] = 100;
+						ipt_.gw_[0] = 192;
+						ipt_.gw_[1] = 168;
+						ipt_.gw_[2] = 3;
+						ipt_.gw_[3] = 1;
+						ipt_.mask_[0] = 255;
+						ipt_.mask_[1] = 255;
+						ipt_.mask_[2] = 255;
+						ipt_.mask_[3] = 0;
+					} else {
+						ipt_.dhcp_ = false;
+						ipt_.ip_[0] = 192;
+						ipt_.ip_[1] = 168;
+						ipt_.ip_[2] = 1;
+						ipt_.ip_[3] = 22;
+						ipt_.gw_[0] = 192;
+						ipt_.gw_[1] = 168;
+						ipt_.gw_[2] = 1;
+						ipt_.gw_[3] = 1;
+						ipt_.mask_[0] = 255;
+						ipt_.mask_[1] = 255;
+						ipt_.mask_[2] = 255;
+						ipt_.mask_[3] = 0;
 					}
-					write_eui_();
+					write_eui();
 					utils::format("EUI Magic code: false (then first write)\n");
 				}
 			}
@@ -200,42 +255,28 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 
 			// develope の場合、常に DHCP は有効
 			if(dev) {
-				dhcp_ = true;
+				ipt_.dhcp_ = true;
 			}
 #endif
-			utils::format("EEPROM EUI-48 Node Identity List\n"); 
-			utils::format("  DHCP: %s\n") % (dhcp_ ? "Enable" : "Disable");
-			utils::format("  IP:   %d.%d.%d.%d\n")
-				% static_cast<uint32_t>(ip_[0])
-				% static_cast<uint32_t>(ip_[1])
-				% static_cast<uint32_t>(ip_[2])
-				% static_cast<uint32_t>(ip_[3]);
-			utils::format("  MAC:  %02X:%02X:%02X:%02X:%02X:%02X\n\n")
-				% static_cast<uint32_t>(mac_[0])
-				% static_cast<uint32_t>(mac_[1])
-				% static_cast<uint32_t>(mac_[2])
-				% static_cast<uint32_t>(mac_[3])
-				% static_cast<uint32_t>(mac_[4])
-				% static_cast<uint32_t>(mac_[5]);
+			list_eui();
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*
 			@brief  EUI デバイスへＩＰ書き込み
-			@param[in]	dhcp	DHCP フラグ
-			@param[in]	ip		IP 値
 		*/
 		//-----------------------------------------------------------------//
-		void write_eui(bool dhcp, const uint8_t* ip)
+		void write_eui()
 		{
-			dhcp_ = dhcp;
-			ip_[0] = ip[0];
-			ip_[1] = ip[1];
-			ip_[2] = ip[2];
-			ip_[3] = ip[3];
 #ifdef SEEDA
-			write_eui_();
+			eui_.write(0x00, get_magic_(), key_len);
+			char tmp[1];
+			tmp[0] = ipt_.dhcp_ ? 0x01 : 0x00;
+			eui_.write(EUI_DHCP, tmp, 1);
+			eui_.write(EUI_IP,   ipt_.ip_,   4);
+			eui_.write(EUI_GW,   ipt_.gw_,   4);
+			eui_.write(EUI_MASK, ipt_.mask_, 4);
 #endif
 		}
 
@@ -353,14 +394,28 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 			// IP 設定
 			{
 				http_format("<form method=\"POST\" action=\"/cgi/set_ip.cgi\">\n");
-				http_format("<table><tr>"
-					   "<td><input type=\"checkbox\" name=\"dhcp\" value=\"on\"%s>ＤＨＣＰ</td>")
-						% (dhcp_ ? " checked=\"checked\"" : "");
+				http_format("<table>"
+					   "<tr><td><input type=\"checkbox\" name=\"dhcp\" value=\"on\"%s>ＤＨＣＰ</td></tr>")
+						% (ipt_.dhcp_ ? " checked=\"checked\"" : "");
+				http_format("<tr><td>IP:</td>");
 				for(int i = 0; i < 4; ++i) {
 					http_format("<td><input type=\"text\" name=\"ip%d\" size=\"3\" value=\"%d\"></td>")
 						% i
-						% static_cast<uint32_t>(ip_[i]);
+						% static_cast<uint32_t>(ipt_.ip_[i]);
 				}
+				http_format("</tr><tr><td>GW:</td>");
+				for(int i = 0; i < 4; ++i) {
+					http_format("<td><input type=\"text\" name=\"gw%d\" size=\"3\" value=\"%d\"></td>")
+						% i
+						% static_cast<uint32_t>(ipt_.gw_[i]);
+				}
+				http_format("</tr><tr><td>MASK:</td>");
+				for(int i = 0; i < 4; ++i) {
+					http_format("<td><input type=\"text\" name=\"mask%d\" size=\"3\" value=\"%d\"></td>")
+						% i
+						% static_cast<uint32_t>(ipt_.mask_[i]);
+				}
+				http_format("</tr>");
 				http_format("<td><input type=\"submit\" value=\"ＩＰ設定\"></td>\n");
 				http_format("</table></form>\n");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");

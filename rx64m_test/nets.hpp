@@ -76,10 +76,7 @@ namespace seeda {
 
 		uint32_t	startup_delay_;
 
-		uint8_t	ip_[4];
-
 		bool 	develope_;
-		bool	dhcp_;
 
 		//-------------------------------------------------------------------------//
 
@@ -388,10 +385,10 @@ namespace seeda {
 
 		void set_ip_()
 		{
-			typedef utils::parse_cgi_post<256, 5> CGI_IP;
+			typedef utils::parse_cgi_post<256, 13> CGI_IP;
 			CGI_IP cgi;
 			cgi.parse(http_.get_post_body());
-			dhcp_ = false;
+			setup_.at_ipt().dhcp_ = false;
 			for(uint32_t i = 0; i < cgi.size(); ++i) {
 				const auto& t = cgi.get_unit(i);
 				int n = 0;
@@ -400,7 +397,7 @@ namespace seeda {
 
 				} else if(strcmp(t.key, "dhcp") == 0) {
 					if(strcmp(t.val, "on") == 0) {
-						dhcp_ = true;
+						setup_.at_ipt().dhcp_ = true;
 						err = false;
 					}
 				} else if((utils::input("ip%d", t.key) % n).status()) {
@@ -409,18 +406,41 @@ namespace seeda {
 						if((utils::input("%d", t.val) % v).status()) {
 							if(v >= 0 && v <= 255) {
 								debug_format("%d, ") % v;
-								ip_[n] = v;
+								setup_.at_ipt().ip_[n] = v;
+								err = false;
+							}
+						}
+					}
+				} else if((utils::input("gw%d", t.key) % n).status()) {
+					if(n >= 0 && n <= 3) {
+						int v = 0;
+						if((utils::input("%d", t.val) % v).status()) {
+							if(v >= 0 && v <= 255) {
+								debug_format("%d, ") % v;
+								setup_.at_ipt().gw_[n] = v;
+								err = false;
+							}
+						}
+					}
+				} else if((utils::input("mask%d", t.key) % n).status()) {
+					if(n >= 0 && n <= 3) {
+						int v = 0;
+						if((utils::input("%d", t.val) % v).status()) {
+							if(v >= 0 && v <= 255) {
+								debug_format("%d, ") % v;
+								setup_.at_ipt().mask_[n] = v;
 								err = false;
 							}
 						}
 					}
 					debug_format("\n");
 				}
+
 				if(err) {
 					return;
 				}
 			}
-			setup_.write_eui(dhcp_, ip_);
+			setup_.write_eui();
 		}
 
 
@@ -435,15 +455,17 @@ namespace seeda {
 			pre_.start();
 
 			setup_.init_eui(develope_);
-			const uint8_t* ips = setup_.get_ip();
+			const setup::ip_t& ipt = setup_.get_ipt();
 			const uint8_t* mac = setup_.get_mac();
 
-			net::ip_address ipa(ips[0], ips[1], ips[2], ips[3]);
-			if(setup_.get_dhcp()) {
+			net::ip_address ipa(ipt.ip_[0], ipt.ip_[1], ipt.ip_[2], ipt.ip_[3]);
+			net::ip_address mask(ipt.mask_[0], ipt.mask_[1], ipt.mask_[2], ipt.mask_[3]);
+			net::ip_address gw(ipt.gw_[0], ipt.gw_[1], ipt.gw_[2], ipt.gw_[3]);
+			if(setup_.get_ipt().dhcp_) {
 				if(ethernet_.begin(mac) == 0) {
 					debug_format("Ethernet Fail: begin (DHCP)...\n");
 					utils::format("Direct IP:  ");
-					ethernet_.begin(mac, ipa);
+					ethernet_.begin(mac, ipa, gw, gw, mask);
 				} else {
 					utils::format("GetDHCP IP: ");
 				}
@@ -624,8 +646,8 @@ namespace seeda {
 			count_(0), item_(0),
 			write_file_(),
 			setup_(write_file_, client_),
-			startup_delay_(100), ip_{ 0 },
-			develope_(true), dhcp_(false)
+			startup_delay_(100),
+			develope_(true)
 			{ }
 
 
@@ -645,6 +667,15 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		setup& at_setup() { return setup_; }		
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  setup への参照(RO)
+			@return setup
+		*/
+		//-----------------------------------------------------------------//
+		const setup& get_setup() const { return setup_; }		
 
 
 		//-----------------------------------------------------------------//
