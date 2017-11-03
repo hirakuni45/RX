@@ -168,7 +168,6 @@ namespace device {
 		bool start_spi(bool master, uint32_t bps, uint8_t level = 0)
 		{
 			send_stall_ = true;
-			crlf_ = false;
 			level_ = level;
 
 			SCI::SCR = 0x00;			// TE, RE disable.
@@ -343,6 +342,61 @@ namespace device {
 			char ch;
 			while((ch = *s++) != 0) {
 				putch(ch);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送受信
+			@param[in]	ch	送信データ
+			@return	受信データ
+		*/
+		//-----------------------------------------------------------------//
+		inline uint8_t xchg(uint8_t ch = 0xff)
+		{
+			if(level_) {
+				return 0;
+			} else {
+				SCI::TDR = ch;
+				while(recv_length() == 0) sleep_();
+				return SCI::RDR();
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  シリアル送信
+			@param[in]	src	送信ソース
+			@param[in]	cnt	送信サイズ
+		*/
+		//-----------------------------------------------------------------//
+		void send(const void* src, uint16_t size)
+		{
+			const uint8_t* p = static_cast<const uint8_t*>(src);
+			auto end = p + size;
+			while(p < end) {
+				xchg(*p);
+				++p;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  シリアル受信
+			@param[out]	dst	受信先
+			@param[in]	cnt	受信サイズ
+		*/
+		//-----------------------------------------------------------------//
+		void recv(void* dst, uint16_t size)
+		{
+			uint8_t* p = static_cast<uint8_t*>(dst);
+			auto end = p + size;
+			while(p < end) {
+				*p = xchg();
+				++p;
 			}
 		}
 	};
