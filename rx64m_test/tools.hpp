@@ -14,8 +14,11 @@
 #include "common/cmt_io.hpp"
 #include "common/input.hpp"
 #include "preference.hpp"
+#include "nets.hpp"
 
 namespace seeda {
+
+	nets& at_nets();
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -471,6 +474,66 @@ namespace seeda {
 	}
 
 
+	// write data 操作コマンド　
+	bool write_data_(uint8_t cmdn)
+	{
+		if(cmdn == 1) {
+			if(at_nets().at_write_file().get_enable()) {
+				utils::format("write file: '%s' at %d/%d\n")
+					% at_nets().at_write_file().get_path()
+					% at_nets().at_write_file().get_resume()
+					% at_nets().at_write_file().get_limit();
+			} else {
+				utils::format("write file: ready (no write file)\n");
+			}
+			return true;
+		} else if(cmdn <= 3) {
+			char tmp[128];
+			int val = 0;
+			if(cmd_.get_word(2, sizeof(tmp), tmp)) {
+				if(!(utils::input("%d", tmp) % val).status()) {
+					return false;
+				}
+				if(val <= 0) return false;
+				if(cmd_.get_word(1, sizeof(tmp), tmp)) {
+					at_nets().at_write_file().set_path(tmp);
+					at_nets().at_write_file().set_limit(val);
+					at_nets().at_write_file().enable();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+
+	bool create_test_file_()
+	{
+		sd_speed_t t;
+		utils::format("Start SD-CARD performance, wait for about 30 sec...\n");
+		create_test_file("/write_test.bin", 1024 * 1024, t);
+		utils::format("ライト・オープン： %d [ms]\n") % t.w_open_;
+		utils::format("ライト： %3.2f [KB/Sec]\n") 
+			% (1024.0f * 1000.0f / static_cast<float>(t.write_));
+		utils::format("ライト・クローズ： %d [ms]\n") % t.w_close_;
+
+		utils::format("リード・オープン： %d [ms]\n") % t.r_open_;
+		utils::format("リード： %3.2f [KB/Sec]\n") 
+			% (1024.0f * 1000.0f / static_cast<float>(t.read_));
+		utils::format("リード・クローズ： %d [ms]\n") % t.r_close_;
+
+		utils::format("ファイルリスト： %d [ms] / %d\n") % t.dirlist_ % t.dirlist_num_;
+		return true;
+	}
+
+
+
+	bool cmd_setup_(uint8_t cmdn)
+	{
+		return false;
+	}
+
+
 	void list_service_() const
 	{		
 	}
@@ -590,9 +653,18 @@ namespace seeda {
 					} else if(cmd_.cmp_word(0, "flash")) {
 						cmd_flash_(cmdn);
 						f = true;
+					} else if(cmd_.cmp_word(0, "writedata")) {
+						f = write_data_(cmdn);
+					} else if(cmd_.cmp_word(0, "setup")) {
+						f = cmd_setup_(cmdn);
 					} else if(cmd_.cmp_word(0, "service")) {
 						list_service_();
 						f = true;
+					} else if(cmd_.cmp_word(0, "fifo")) {
+						utils::format("Write File FIFO: %d\n") % get_wf_fifo().length();
+						f = true;
+					} else if(cmd_.cmp_word(0, "testsd")) {
+						f = create_test_file_();
 #ifdef SEEDA
 					} else if(cmd_.cmp_word(0, "eadc")) {
 						f = eadc_conv_(cmdn);
@@ -610,6 +682,8 @@ namespace seeda {
 						utils::format("cd [directory-name]\n");
 						utils::format("pwd\n");
 						utils::format("arp\n");
+						utils::format("fifo\n");
+						utils::format("testsd\n");
 						utils::format("flash xxxx [:xx]  (Read/Wite data)\n");
 #ifdef SEEDA
 						utils::format("eadc [0-7]  (LTC2348 A/D conversion)\n");
@@ -617,6 +691,8 @@ namespace seeda {
 						utils::format("sample -ch 0-7 -rate FRQ -num SAMPLE-NUM file-name (LTC2348 A/D sample)\n");
 ///						utils::format("reset [01]  (PHY reset signal)\n");
 #endif
+						utils::format("writedata base-str num(minits)\n");
+						utils::format("setup\n");
 						f = true;
 					}
 					if(!f) {

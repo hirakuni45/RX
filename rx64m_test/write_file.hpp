@@ -8,7 +8,7 @@
 //=====================================================================//
 #include <cstdio>
 #include <cstring>
-#include "common/fixed_fifo.hpp"
+#include "main.hpp"
 #include "common/format.hpp"
 
 // #define WRITE_FILE_DEBUG
@@ -36,21 +36,12 @@ namespace seeda {
 		bool		enable_;
 		bool		state_;
 
-		static const uint32_t BUF_SIZE = 256;
-
-		typedef utils::fixed_fifo<sample_t, BUF_SIZE> FIFO;
-		FIFO	fifo_;
-
 		FILE	*fp_;
 
-		time_t	time_org_;
-		time_t	time_ofs_;
-		time_t	time_ref_;
-		time_t	time_loop_;
+		uint32_t	ch_loop_;
 
 		enum class task : uint8_t {
 			wait_request,
-			sync_first,
 			make_filename,
 			make_dir_path,
 			open_file,
@@ -63,8 +54,7 @@ namespace seeda {
 
 		task	task_;
 
-		bool	last_data_;
-
+		bool	last_channel_;
 		uint8_t	second_;
 
 		char	filename_[256];
@@ -80,8 +70,9 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		write_file() : limit_(5), count_(0), path_{ "00000" },
 			enable_(false), state_(false),
-			fp_(nullptr), time_org_(0), time_ref_(0), time_loop_(0),
-			task_(task::wait_request), last_data_(false), second_(0) { }
+			fp_(nullptr),
+			ch_loop_(0),
+			task_(task::wait_request), last_channel_(false), second_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -177,34 +168,17 @@ namespace seeda {
 				return;
 			}
 
-			// データを詰め込む
-			const sample_data& smd = get_sample_data();
-			bool sync = false;
-			if(time_ref_ != smd.time_) {
-				time_ref_ = smd.time_;
-				sync = true;
-			}
-
 			switch(task_) {
 			case task::wait_request:  // 書き込みトリガー検出
 				if(enable_ && !back) {
-					task_ = task::sync_first;
-				}
-				break;
-
-			case task::sync_first:
-				if(sync) {
-					fifo_.clear();
-					time_org_  = get_time();
-					time_ofs_  = time_ref_;
-					time_loop_ = time_ref_;
 					task_ = task::make_filename;
+					reset_wf_fifo();
 				}
 				break;
 
 			case task::make_filename:
-				{
-					time_t t = time_org_ + time_loop_ - time_ofs_;
+				if(get_wf_fifo().length() > 0) {
+					time_t t = get_wf_fifo().get_at().time_;
 					struct tm *m = localtime(&t);
 					utils::sformat("%s_%04d%02d%02d%02d%02d.csv", filename_, sizeof(filename_))
 						% path_
@@ -213,7 +187,7 @@ namespace seeda {
 						% static_cast<uint32_t>(m->tm_mday)
 						% static_cast<uint32_t>(m->tm_hour)
 						% static_cast<uint32_t>(m->tm_min);
-					last_data_ = false;
+					last_channel_ = false;
 					second_ = 0;
 					task_ = task::make_dir_path;
 				}
@@ -231,8 +205,7 @@ namespace seeda {
 					enable_ = false;
 					task_ = task::wait_request;
 				} else {
-					debug_format("Start write file: '%s' (%d) : (%d)\n")
-						% filename_ % time_ref_ % time_loop_;
+					debug_format("Start write file: '%s'\n") % filename_;
 					task_ = task::write_header;
 				}
 				break;
@@ -246,16 +219,22 @@ namespace seeda {
 					}
 					utils::sformat("\n", data, sizeof(data), true);
 
-					fwrite(data, 1, utils::sformat::chaout().size(), fp_);
+					uint32_t sz = utils::sformat::chaout().size();
+					if(fwrite(data, 1, sz, fp_) != sz) {
+						debug_format("File write error (header): '%s'\n") % filename_;
+						enable_ = false;
+						task_ = task::wait_request;
+						break;
+					}
 					task_ = task::make_data;
+					ch_loop_ = 0;
 				}
 				break;
 
 			case task::make_data:
-				if(fifo_.length() > 0) {
-					sample_t smp = fifo_.get();
-					if(smp.ch_ == 0) {
-						time_t t = time_org_ + time_loop_ - time_ofs_;
+				if(get_wf_fifo().length() > 0) {
+					time_t t = get_wf_fifo().get_at().time_;
+					if(ch_loop_ == 0) {
 						struct tm *m = localtime(&t);
 						utils::sformat("%04d/%02d/%02d,%02d:%02d:%02d,", data_, sizeof(data_))
 							% static_cast<uint32_t>(m->tm_year + 1900)
@@ -265,16 +244,19 @@ namespace seeda {
 							% static_cast<uint32_t>(m->tm_min)
 							% static_cast<uint32_t>(m->tm_sec);
 						second_ = m->tm_sec;
+// debug_format("WF: '%s'\n") % data_;
 					} else {
 						utils::sformat(",", data_, sizeof(data_));
 					}
+					const sample_t& smp = get_wf_fifo().get_at().smp_[ch_loop_];
 					smp.make_csv2(data_, sizeof(data_), true);
-					if(smp.ch_ == (get_channel_num() - 1)) {
-						++time_loop_;
+					++ch_loop_;
+					if(ch_loop_ >= get_channel_num()) {
 						utils::sformat("\n", data_, sizeof(data_), true);
-						last_data_ = true;
+						ch_loop_ = 0;
+						last_channel_ = true;
 					} else {
-						last_data_ = false;
+						last_channel_ = false;
 					}
 					data_len_ = utils::sformat::chaout().size();
 					task_ = task::write_body;
@@ -282,15 +264,23 @@ namespace seeda {
 				break;
 
 			case task::write_body:
-				fwrite(data_, 1, data_len_, fp_);
-				if(last_data_) {
-					if(second_ == 59) {  // change file.
-						task_ = task::next_file;
+				if(get_wf_fifo().length() > 0) {
+					if(fwrite(data_, 1, data_len_, fp_) != data_len_) {
+						debug_format("File write error (body): '%s'\n") % filename_;
+						enable_ = false;
+						task_ = task::wait_request;
+						break;
+					}
+					if(last_channel_) {
+						at_wf_fifo().get_go();
+						if(second_ == 59) {  // change file.
+							task_ = task::next_file;
+						} else {
+							task_ = task::make_data;
+						}
 					} else {
 						task_ = task::make_data;
 					}
-				} else {
-					task_ = task::make_data;
 				}
 				break;
 
@@ -299,9 +289,8 @@ namespace seeda {
 				fp_ = nullptr;
 				++count_;
 				if(count_ >= limit_) {
-					debug_format("Fin write file: %d files (%d) : (%d)\n")
-						% count_ % time_ref_ % time_loop_;
-					fp_ = nullptr;
+					debug_format("Fin write file: %d files\n")
+						% count_;
 					enable_ = false;
 					task_ = task::wait_request;
 				} else {
@@ -311,14 +300,6 @@ namespace seeda {
 
 			default:
 				break;
-			}
-
-			if(sync) {
-				if((BUF_SIZE - fifo_.length()) > get_channel_num()) {
-					for(uint32_t i = 0; i < get_channel_num(); ++i) {
-						fifo_.put(smd.smp_[i]);
-					}
-				}
 			}
 		}
 	};

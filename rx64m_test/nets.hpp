@@ -521,7 +521,7 @@ namespace seeda {
 						}
 
 						sd_speed_t t;
-						create_test_file("write_test.bin", 1024 * 1024, t);
+						create_test_file("/write_test.bin", 1024 * 1024, t);
 						http_format("ライト・オープン： %d [ms]<br>\n") % t.w_open_;
 						http_format("ライト： %3.2f [KB/Sec]<br>\n") 
 							% (1024.0f * 1000.0f / static_cast<float>(t.write_));
@@ -640,6 +640,15 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  setup への参照
+			@return setup
+		*/
+		//-----------------------------------------------------------------//
+		setup& at_setup() { return setup_; }		
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  開発用信号生成フラグの取得
 			@return 開発用信号生成フラグ
 		*/
@@ -721,6 +730,15 @@ namespace seeda {
 
 			service_startup_();
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  write_file クラスへの参照
+			@return write_file クラス
+		*/
+		//-----------------------------------------------------------------//
+		write_file& at_write_file() { return write_file_; }
 
 
 #ifdef SEEDA
