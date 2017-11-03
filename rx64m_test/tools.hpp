@@ -18,6 +18,7 @@
 
 namespace seeda {
 
+	const nets& get_nets();
 	nets& at_nets();
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -507,7 +508,7 @@ namespace seeda {
 	}
 
 
-	bool create_test_file_()
+	bool cmd_testsd_(uint8_t cmdn)
 	{
 		sd_speed_t t;
 		utils::format("Start SD-CARD performance, wait for about 30 sec...\n");
@@ -527,10 +528,85 @@ namespace seeda {
 	}
 
 
-
-	bool cmd_setup_(uint8_t cmdn)
+	bool set_ip_(const char* str, uint8_t* out)
 	{
-		return false;
+		int a[4];
+		if((utils::input("%d.%d.%d.%d", str) % a[0] % a[1] % a[2] % a[3]).status()) {
+//			utils::format("IP: %d.%d.%d.%d\n") % a[0] % a[1] % a[2] % a[3];						
+			if(a[0] >= 0 && a[0] <= 255) {
+				out[0] = a[0];
+			} else {
+				return false;
+			}
+			if(a[1] >= 0 && a[1] <= 255) {
+				out[1] = a[1];
+			} else {
+				return false;
+			}
+			if(a[2] >= 0 && a[2] <= 255) {
+				out[2] = a[2];
+			} else {
+				return false;
+			}
+			if(a[3] >= 0 && a[3] <= 255) {
+				out[3] = a[3];
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+		return true;
+	}
+
+
+	bool cmd_ip_(uint8_t cmdn)
+	{
+		if(cmdn == 1) {
+			get_nets().get_setup().list_eui();
+			return true;
+		}
+
+		bool err = false;
+		for(uint8_t i = 1; i < cmdn; ++i) {
+			char tmp[128];
+			if(cmd_.get_word(i, sizeof(tmp), tmp)) {
+
+				if(strncmp("dhcp=", tmp, 5) == 0) {
+					if(strcmp(&tmp[5], "on") == 0) {
+						at_nets().at_setup().at_ipt().dhcp_ = true;
+					} else if(strcmp(&tmp[5], "off") == 0) {
+						at_nets().at_setup().at_ipt().dhcp_ = false;
+					} else {
+						err = true;
+						break;
+					}
+				} else if(strncmp("ip=", tmp, 3) == 0) {
+					if(!set_ip_(&tmp[3], at_nets().at_setup().at_ipt().ip_)) {
+						err = true;
+						break;
+					}
+				} else if(strncmp("gw=", tmp, 3) == 0) {
+					if(!set_ip_(&tmp[3], at_nets().at_setup().at_ipt().gw_)) {
+						err = true;
+						break;
+					}
+				} else if(strncmp("mask=", tmp, 5) == 0) {
+					if(!set_ip_(&tmp[5], at_nets().at_setup().at_ipt().mask_)) {
+						err = true;
+						break;
+					}
+				} else {
+					err = true;
+					break;
+				}
+			}
+		}
+		if(!err) {
+			at_nets().at_setup().write_eui();
+		}
+
+		return !err;
 	}
 
 
@@ -655,8 +731,6 @@ namespace seeda {
 						f = true;
 					} else if(cmd_.cmp_word(0, "writedata")) {
 						f = write_data_(cmdn);
-					} else if(cmd_.cmp_word(0, "setup")) {
-						f = cmd_setup_(cmdn);
 					} else if(cmd_.cmp_word(0, "service")) {
 						list_service_();
 						f = true;
@@ -664,7 +738,9 @@ namespace seeda {
 						utils::format("Write File FIFO: %d\n") % get_wf_fifo().length();
 						f = true;
 					} else if(cmd_.cmp_word(0, "testsd")) {
-						f = create_test_file_();
+						f = cmd_testsd_(cmdn);
+					} else if(cmd_.cmp_word(0, "ip")) {
+						f = cmd_ip_(cmdn);
 #ifdef SEEDA
 					} else if(cmd_.cmp_word(0, "eadc")) {
 						f = eadc_conv_(cmdn);
@@ -681,9 +757,10 @@ namespace seeda {
 						utils::format("dir [name]\n");
 						utils::format("cd [directory-name]\n");
 						utils::format("pwd\n");
-						utils::format("arp\n");
-						utils::format("fifo\n");
-						utils::format("testsd\n");
+						utils::format("arp      (arp テーブル表示)\n");
+						utils::format("fifo     (FIFO バッファの利用量)\n");
+						utils::format("testsd   (ＳＤカード、性能検査)\n");
+						utils::format("ip dhcp=[on/off] ip=[x.x.x.x] gw=[x.x.x.x] mask=[x.x.x.x]\n");
 						utils::format("flash xxxx [:xx]  (Read/Wite data)\n");
 #ifdef SEEDA
 						utils::format("eadc [0-7]  (LTC2348 A/D conversion)\n");
@@ -691,8 +768,7 @@ namespace seeda {
 						utils::format("sample -ch 0-7 -rate FRQ -num SAMPLE-NUM file-name (LTC2348 A/D sample)\n");
 ///						utils::format("reset [01]  (PHY reset signal)\n");
 #endif
-						utils::format("writedata base-str num(minits)\n");
-						utils::format("setup\n");
+						utils::format("writedata base-str num(minits)   (A/Dデータ書き込み開始)\n");
 						f = true;
 					}
 					if(!f) {
