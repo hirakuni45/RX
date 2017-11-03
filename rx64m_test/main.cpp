@@ -37,11 +37,15 @@ namespace {
 
 	time_t			sys_time_;
 
-//	typedef utils::log_man<device::standby_ram> LOG_MAN;
-//	LOG_MAN		log_man_;
-
-
 	volatile bool	enable_eadc_;
+
+	uint16_t		soft_reset_delay_;
+
+
+	// ソフトリセット機能
+	void restart_()
+	{
+	}
 
 
 	void main_init_()
@@ -132,6 +136,15 @@ namespace {
 }
 
 namespace seeda {
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  nets の参照
+		@return nets
+	*/
+	//-----------------------------------------------------------------//
+	const nets& get_nets() { return nets_; }
+
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -823,6 +836,13 @@ int main(int argc, char** argv)
 		if(rtc_set_loop >= (100 * 60 * 5)) {  // 5 minits / setting RTC
 			rtc_set_loop = 0;
 			set_rtc_time(sys_time_);
+		}
+
+		if(soft_reset_delay_ > 0) {
+			--soft_reset_delay_;
+			if(soft_reset_delay_ == 0) {
+				restart_();
+			}
 		}
 	}
 }
