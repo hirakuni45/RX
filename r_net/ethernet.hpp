@@ -402,7 +402,7 @@ namespace net {
 			@param[in]	local_ip	ローカルＩＰ
 			@param[in]	dns_server	ＤＮＳサーバー
 			@param[in]	gateway		ゲートウェイ
-			@param[in]	
+			@param[in]	subnet		サブネット・マスク	
 		*/
 		//-----------------------------------------------------------------//
 		void begin(const uint8_t* mac, const ip_address& local_ip, const ip_address& dns_server,
