@@ -511,7 +511,7 @@ namespace seeda {
 	{
 		sd_speed_t t;
 		utils::format("Start SD-CARD performance, wait for about 30 sec...\n");
-		create_test_file("write_test.bin", 1024 * 1024, t);
+		create_test_file("/write_test.bin", 1024 * 1024, t);
 		utils::format("ライト・オープン： %d [ms]\n") % t.w_open_;
 		utils::format("ライト： %3.2f [KB/Sec]\n") 
 			% (1024.0f * 1000.0f / static_cast<float>(t.write_));
