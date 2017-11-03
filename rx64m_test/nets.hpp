@@ -521,7 +521,7 @@ namespace seeda {
 						}
 
 						sd_speed_t t;
-						create_test_file("write_test.bin", 1024 * 1024, t);
+						create_test_file("/write_test.bin", 1024 * 1024, t);
 						http_format("ライト・オープン： %d [ms]<br>\n") % t.w_open_;
 						http_format("ライト： %3.2f [KB/Sec]<br>\n") 
 							% (1024.0f * 1000.0f / static_cast<float>(t.write_));
