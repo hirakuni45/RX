@@ -18,7 +18,7 @@ namespace {
 	seeda::nets		nets_;
 
 	seeda::SPI		spi_;
-	seeda::SDC		sdc_(spi_, 20000000);
+	seeda::SDC		sdc_(spi_, 30000000);
 
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
@@ -33,6 +33,9 @@ namespace {
 
 	volatile bool	enable_eadc_;
 
+	seeda::EADC_FIFO   	wf_fifo_;
+
+	time_t			sys_time_;
 
 	void main_init_()
 	{
@@ -112,6 +115,15 @@ namespace {
 }
 
 namespace seeda {
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  nets の参照
+		@return nets
+	*/
+	//-----------------------------------------------------------------//
+	nets& at_nets() { return nets_; }
+
 
 	//-----------------------------------------------------------------//
 	/*!
@@ -282,6 +294,32 @@ namespace seeda {
 	{
 		return sample_data_;
 	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  Write File FIFO の RESET
+	*/
+	//-----------------------------------------------------------------//
+	void reset_wf_fifo() { wf_fifo_.clear(); }
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  Write File FIFO の取得
+		@return Write File FIFO
+	*/
+	//-----------------------------------------------------------------//
+	const EADC_FIFO& get_wf_fifo() { return wf_fifo_; }
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  Write File FIFO の取得
+		@return Write File FIFO
+	*/
+	//-----------------------------------------------------------------//
+	EADC_FIFO& at_wf_fifo() { return wf_fifo_; }
 
 
 	//-----------------------------------------------------------------//
