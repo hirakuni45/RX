@@ -83,6 +83,7 @@
 #include "RX64M/edmac.hpp"
 #include "RX64M/rtc.hpp"
 #include "RX64M/rtc_io.hpp"
+#include "RX64M/wdta.hpp"
 #include "RX64M/flash.hpp"
 #include "RX64M/flash_io.hpp"
 #include "RX64M/ether_io.hpp"
