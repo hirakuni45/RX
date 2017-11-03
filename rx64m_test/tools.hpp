@@ -759,9 +759,9 @@ namespace seeda {
 						utils::format("pwd\n");
 						utils::format("arp      (arp テーブル表示)\n");
 						utils::format("fifo     (FIFO バッファの利用量)\n");
-						utils::format("testsd   (ＳＤカード、性能検査)\n");
+						utils::format("testsd   (ＳＤカード、性能評価)\n");
 						utils::format("ip dhcp=[on/off] ip=[x.x.x.x] gw=[x.x.x.x] mask=[x.x.x.x]\n");
-						utils::format("flash xxxx [:xx]  (Read/Wite data)\n");
+						utils::format("flash xxxx [:xx]  (Read/Wite for DATA-FLASH)\n");
 #ifdef SEEDA
 						utils::format("eadc [0-7]  (LTC2348 A/D conversion)\n");
 						utils::format("span CH(0-7) SPAN(0-7)  (LTC2348 A/D span setting)\n"); 
