@@ -26,7 +26,7 @@ namespace device {
 			@brief  WDT リフレッシュレジスタ（WDTRR）
 		*/
 		//-----------------------------------------------------------------//
-		rw8_t<base + 0x00> WDTRR;
+		static rw8_t<base + 0x00> WDTRR;
 
 
 		//-----------------------------------------------------------------//
@@ -43,12 +43,12 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0,  2> TOPS;
 
-			bits_rw_t<io_, bitpos::B4,  2> CKS;
+			bits_rw_t<io_, bitpos::B4,  4> CKS;
 			bits_rw_t<io_, bitpos::B8,  2> RPES;
 
 			bits_rw_t<io_, bitpos::B12, 2> RPSS;
 		};
-		wdtcr_t WDTCR;
+		static wdtcr_t WDTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -68,7 +68,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>    UNDFF;
 			bit_rw_t <io_, bitpos::B15>    REFEF;
 		};
-		wdtsr_t WDTSR;
+		static wdtsr_t WDTSR;
 
 
 		//-----------------------------------------------------------------//
@@ -85,8 +85,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>  RSTIRQS;
 		};
-		wdtrcr_t WDTRCR;
+		static wdtrcr_t WDTRCR;
 
 	};
-	static rtc_t<0x00088020> WDT;
+	typedef wdta_t<0x00088020> WDT;
 }
