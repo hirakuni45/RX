@@ -39,11 +39,20 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	WDT 開始
+			@brief	WDT 開始 @n
+					※最大のインターバルは、F_PCLKB が 60MHz の場合 @n
+					2.2 秒程度、それより大きい時間は設定不可
+			@param[in]	interval	インターバル時間（単位ミリ秒）
 		*/
 		//-----------------------------------------------------------------//
-		void start()
+		bool start(uint32_t interval = 35)
 		{
+			uint32_t max = (16384 * 1000) / (F_PCLKB / 8192);
+			if(interval == 0 || interval > max) {
+				return false;
+			}
+
+			// ※工事中
 			// 60MHz 35ms 以内にリフレッシュ
 			// PCLK/512, 4096 cycle
 			WDT::WDTCR = WDT::WDTCR.RPES.b(0b11) | WDT::WDTCR.RPSS.b(0b11) |
@@ -51,12 +60,14 @@ namespace utils {
 
 			start_ = true;
 			refresh();
+
+			return true;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	リフレッシュ（ダウンカウンタ再設定）
+			@brief	リフレッシュ（再カウント）
 		*/
 		//-----------------------------------------------------------------//
 		void refresh()
