@@ -1,6 +1,6 @@
 //=====================================================================//
 /*!	@file
-	@brief	標準ライブラリーハード依存「syscalls」モジュール@n
+	@brief	標準ライブラリーハード依存「syscalls」モジュール @n
 			通常は libc.a にアーカイブされているモジュールを @n
 			置き換える。
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -30,6 +30,14 @@ void utf8_to_sjis(const char* src, char* dst);
 // FatFS を使う場合有効にする（通常 Makefile で定義）
 // #define FAT_FS
 
+// ファイル・システム関係のログギングを有効にする場合（通常 Makefile で定義）
+// #define LOGGING_FS
+
+#ifdef LOGGING_FS
+unsigned long millis(void) __attribute__((weak));
+unsigned long millis(void) { return 0; }
+#endif
+
 #ifdef FAT_FS
 #include "ff12b/src/diskio.h"
 #include "ff12b/src/ff.h"
@@ -46,6 +54,7 @@ void utf8_to_sjis(const char* src, char* dst);
 
 static FIL file_obj_[OPEN_MAX_ - STD_OFS_];
 static char fd_pads_[OPEN_MAX_];
+
 #endif
 
 // システムコール関係のデバッグ用
@@ -55,6 +64,15 @@ static char fd_pads_[OPEN_MAX_];
 
 #ifdef SYSCALLS_DEBUG
 static char debug_tmp_[256];
+#endif
+
+#ifdef LOGGING_FS
+uint32_t fs_open_w_max = 0;
+uint32_t fs_open_w_cnt = 0;
+uint32_t fs_open_r_max = 0;
+uint32_t fs_open_r_cnt = 0;
+uint32_t fs_close_max = 0;
+uint32_t fs_close_cnt = 0;
 #endif
 
 //-----------------------------------------------------------------//
@@ -71,6 +89,10 @@ static char debug_tmp_[256];
 //-----------------------------------------------------------------//
 int open(const char *path, int flags, ...)
 {
+#ifdef LOGGING_FS
+	uint32_t orgt = millis();
+#endif
+
 	if(path == NULL) {
 		errno = EFAULT;
 		return -1;
@@ -130,6 +152,18 @@ int open(const char *path, int flags, ...)
 		file = -1;
 	}
 #endif
+
+#ifdef LOGGING_FS
+	uint32_t t = millis() - orgt;
+	if(mode & FA_WRITE) {
+		if(fs_open_w_max < t) fs_open_w_max = t;
+		++fs_open_w_cnt;
+	} else {
+		if(fs_open_r_max < t) fs_open_r_max = t;
+		++fs_open_r_cnt;
+	}
+#endif
+
 	return file;
 }
 
@@ -475,6 +509,10 @@ int fstat(int file, struct stat *st)
 //-----------------------------------------------------------------//
 int close(int file)
 {
+#ifdef LOGGING_FS
+	uint32_t orgt = millis();
+#endif
+
 #ifdef FAT_FS
 	FRESULT res;
 	if(file >= 0 && file <= 2) {
@@ -490,6 +528,13 @@ int close(int file)
 			sprintf(debug_tmp_, "syscalls: close ok.(%d):\n", file);
 			sci_puts(debug_tmp_);
 #endif
+
+#ifdef LOGGING_FS
+			uint32_t t = millis() - orgt;
+			if(fs_close_max < t) fs_close_max = t;
+			++fs_close_cnt;
+#endif
+
 			return 0;
 		} else {
 #ifdef SYSCALLS_DEBUG
