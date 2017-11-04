@@ -49,7 +49,10 @@ namespace seeda {
 			char		write_path_[16];
 			uint32_t	write_limit_;
 
-			uint16_t	client_enable_;
+			uint8_t		client_enable_;
+
+			uint8_t		watchdog_enable_;
+			uint16_t	watchdog_time_;
 
 			seeda_t() :
 #ifndef PREFER_SD
@@ -68,7 +71,9 @@ namespace seeda {
 				client_port_(3000),
 				write_path_{ "00000" }, write_limit_(60),
 
-				client_enable_(1)
+				client_enable_(1),
+				watchdog_enable_(0),
+				watchdog_time_(5)
 			{ }
 		};
 
