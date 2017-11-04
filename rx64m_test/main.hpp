@@ -82,7 +82,7 @@ namespace seeda {
 	typedef chip::LTC2348_16<LTC_CSN, LTC_CNV, LTC_BUSY, LTC_PD, LTC_SDI, LTC_SCKI, LTC_SDO> EADC;
 #endif
 
-	typedef net::http_server<SDC, 16, 8192> HTTP;
+	typedef net::http_server<SDC, 16, 8192 + 1024> HTTP;
 	typedef HTTP::http_format http_format;	
 
 	typedef net::ftp_server<SDC> FTPS;
