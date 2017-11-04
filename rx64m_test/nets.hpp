@@ -493,7 +493,7 @@ namespace seeda {
 			http_format("<table>");
 			char tmp[64];
 			disp_time_(get_operating_time(), tmp, sizeof(tmp));
-			http_format("<tr><td>オペレーション時間:</td><td>%s</td></tr>") % tmp;
+			http_format("<tr><td>稼動時間:</td><td>%s</td></tr>") % tmp;
 			http_format("</table>\n");
 		}
 
