@@ -13,6 +13,8 @@
 
 namespace seeda {
 
+	uint32_t get_wf_lost();
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  setup クラス
@@ -55,6 +57,8 @@ namespace seeda {
 
 		bool		signal_;
 
+		uint32_t	restart_time_;
+
 #ifdef SEEDA
 		// mac address rom I/F
 		typedef device::PORT<device::PORT1, device::bitpos::B5> MISO;
@@ -93,7 +97,8 @@ namespace seeda {
 		setup(write_file& wf, client& cl) : write_file_(wf), client_(cl),
 			mac_{ 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED },
 			ipt_(),
-			signal_(false)
+			signal_(false),
+			restart_time_(5)
 #ifdef SEEDA
 			, spi_(), eui_(spi_)
 #endif
@@ -352,6 +357,51 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  システム設定画面
+		*/
+		//-----------------------------------------------------------------//
+		void render_system()
+		{
+			net_tools::render_version();
+			net_tools::render_date_time();
+
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+
+#if 0
+			http_format("<form method=\"POST\" action=\"/cgi/set_client.cgi\">\n");
+			http_format("<table><tr><td>クライアント機能：</td>"
+			   "<td><input type=\"checkbox\" name=\"enable\" value=\"on\"%s>有効</td></tr>\n")
+					% (client_.get_enable() ? " checked=\"checked\"" : "");
+			http_format("<tr><td>接続先 IP：</td>"
+				"<td><input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\"></td></tr>\n")
+				% static_cast<int>(client_.get_ip()[0])
+				% static_cast<int>(client_.get_ip()[1])
+				% static_cast<int>(client_.get_ip()[2])
+				% static_cast<int>(client_.get_ip()[3]);
+			http_format("<tr><td>接続先ポート：</td>"
+				"<td><input type=\"text\" name=\"port\" size=\"5\" value=\"%d\"></td></tr>\n")
+				% static_cast<int>(client_.get_port());
+			http_format("<tr><td><input type=\"submit\" value=\"接続先設定\"%s></td></tr>\n")
+				% (mount ? "" : " disabled=\"disabled\"");
+			http_format("</table></form>\n");
+#endif
+
+			http_format("<form method=\"POST\" action=\"/cgi/restart.cgi\"><table>");
+			http_format("<tr><td>ハードリセット：</td>");
+			http_format("<td><input type=\"text\" name=\"restime\" size=\"4\" value=\"%d\"></td></tr>\n")
+				% restart_time_;
+			http_format("<td><input type=\"submit\" value=\"予約設定\"></td></tr>\n");
+			http_format("</table></form>\n");
+
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+
+			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  設定ページ、レンダリング・メイン
 			@param[in]	dev	develope の場合「true」
 		*/
@@ -529,6 +579,7 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 						% (mount ? "" : " disabled=\"disabled\"");
 				} else {
 					http_format("<td>%d/%d</td></tr>\n") % write_file_.get_resume() % write_file_.get_limit();
+					http_format("<tr><td>ロスト時間：</td><td>%u 秒</td></tr>") % get_wf_lost();
 					http_format("<tr><td><input type=\"submit\" value=\"書き込み停止\"%s></td></tr>")
 						% (mount ? "" : " disabled=\"disabled\"");
 				}
@@ -541,10 +592,18 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
-			// ログ表示ボタン
-			if(0) {
+			// 情報表示ボタン
+			{
 				http_format("<input type=\"button\" onclick=\"location.href='/log_state'\""
-							" value=\"ログ情報\"%s>") % (mount ? "" : " disabled=\"disabled\"");
+							" value=\"ログ情報\">");
+///							" value=\"ログ情報\"%s>") % (mount ? "" : " disabled=\"disabled\"");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
+			}
+
+			// システム設定
+			{
+				http_format("<input type=\"button\" onclick=\"location.href='/system'\""
+							" value=\"システム設定\">");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 		}

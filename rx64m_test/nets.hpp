@@ -385,7 +385,7 @@ namespace seeda {
 
 		void set_ip_()
 		{
-			typedef utils::parse_cgi_post<256, 13> CGI_IP;
+			typedef utils::parse_cgi_post<512, 13> CGI_IP;
 			CGI_IP cgi;
 			cgi.parse(http_.get_post_body());
 			setup_.at_ipt().dhcp_ = false;
@@ -444,9 +444,57 @@ namespace seeda {
 		}
 
 
+		void set_restart_()
+		{
+			typedef utils::parse_cgi_post<256, 2> CGI_REST;
+			CGI_REST cgi;
+			cgi.parse(http_.get_post_body());
+			for(uint32_t i = 0; i < cgi.size(); ++i) {
+				const auto& t = cgi.get_unit(i);
+				if(t.key == nullptr || t.val == nullptr) {
+
+				} else if(strcmp(t.key, "restime") == 0) {
+					int n = 0;
+					if((utils::input("%d", t.val) % n).status()) {
+						set_restart_delay(n * 100);
+					}
+				}
+			}
+		}
+
+
+		void disp_time_(time_t t, char* dst, uint32_t size)
+		{
+			uint32_t s = t % 60;
+			t /= 60;
+			uint32_t m = t % 60;
+			t /= 60;
+			uint32_t h = t % 24;
+			t /= 24;
+			utils::sformat("%d %02u:%02u:%02u", dst, size) % t % h % m % s;
+		}
+
+
+		// ログ表示
 		void output_log_()
 		{
+			http_format("<table>");
+			http_format("<tr><td>書き込み時間:</td><td>%u [分]</td></tr>") % write_file_.get_resume();
+			http_format("<tr><td>ロスト時間:</td><td>%u [秒]</td></tr>") % get_wf_lost();
+			http_format("<tr><td>FIFO バッファ:</td><td>%u / %u [秒]</td></tr>")
+				% get_wf_fifo().length()
+				% (get_wf_fifo().size() - 2);
+			http_format("<tr><td>FIFO バッファ最大:</td><td>%u [秒]</td></tr>")
+				% get_wf_max();
+			http_format("</table>\n");
 
+			http_.tag_hr(600, 3);
+
+			http_format("<table>");
+			char tmp[64];
+			disp_time_(get_operating_time(), tmp, sizeof(tmp));
+			http_format("<tr><td>オペレーション時間:</td><td>%s</td></tr>") % tmp;
+			http_format("</table>\n");
 		}
 
 
@@ -595,6 +643,11 @@ namespace seeda {
 				http_.exec_link("/setup");
 			} );
 
+			http_.set_cgi("/cgi/restart.cgi", "RestartTime", [=](void) {
+				set_restart_();
+				http_.exec_link("/setup");
+			} );
+
 			http_.set_link("/log_state", "LOG State", [=](void) {
 				net_tools::render_version();
 				net_tools::render_date_time();
@@ -602,6 +655,10 @@ namespace seeda {
 				output_log_();
 				http_.tag_hr(600, 3);
 				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
+			} );
+
+			http_.set_link("/system", "SystemSetup", [=](void) {
+				setup_.render_system();
 			} );
 
 			// FTP Server

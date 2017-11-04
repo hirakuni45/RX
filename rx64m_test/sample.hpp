@@ -120,8 +120,8 @@ namespace seeda {
 		time_t		time_;
 		sample_t	smp_[8];
 	};
-	// sample_data FIFO (sizeof 16[sec])
-	typedef utils::fixed_fifo<sample_data, 16> EADC_FIFO;
+	// sample_data FIFO (sizeof 32[sec])
+	typedef utils::fixed_fifo<sample_data, 32> EADC_FIFO;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

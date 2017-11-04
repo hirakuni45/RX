@@ -9,7 +9,6 @@
 #include "core.hpp"
 #include "tools.hpp"
 #include "nets.hpp"
-#include "common/log_man.hpp"
 
 namespace {
 
@@ -34,19 +33,15 @@ namespace {
 	uint16_t		signal_[8];
 
 	seeda::EADC_FIFO   	wf_fifo_;
+	volatile uint32_t	wf_lost_;
+	volatile uint32_t	wf_max_;
 
+	time_t			operating_org_;
 	time_t			sys_time_;
 
+	uint32_t		restart_delay_;
+
 	volatile bool	enable_eadc_;
-
-	uint16_t		soft_reset_delay_;
-
-
-	// ソフトリセット機能
-	void restart_()
-	{
-	}
-
 
 	void main_init_()
 	{
@@ -275,6 +270,11 @@ namespace seeda {
 			sample_data_.time_ = sys_time_;
 			if(wf_fifo_.length() < (wf_fifo_.size() - 2)) {
 				wf_fifo_.put(sample_data_);
+			} else {
+				if(nets_.at_write_file().get_enable()) {
+					++wf_lost_;
+					if(wf_max_ < wf_lost_) wf_max_ = wf_lost_;
+				}
 			}
 			sample_count_ = 0;			
 		}
@@ -323,7 +323,12 @@ namespace seeda {
 		@brief  Write File FIFO の RESET
 	*/
 	//-----------------------------------------------------------------//
-	void reset_wf_fifo() { wf_fifo_.clear(); }
+	void reset_wf_fifo()
+	{
+		wf_fifo_.clear();
+		wf_lost_ = 0;
+		wf_max_ = 0;
+	}
 
 
 	//-----------------------------------------------------------------//
@@ -342,6 +347,24 @@ namespace seeda {
 	*/
 	//-----------------------------------------------------------------//
 	EADC_FIFO& at_wf_fifo() { return wf_fifo_; }
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  Write File のロストを取得（秒）
+		@return Write File のロスト
+	*/
+	//-----------------------------------------------------------------//
+	uint32_t get_wf_lost() { return wf_lost_; }
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  Write File FIFO の最大値を取得（秒）
+		@return Write File FIFO の最大値
+	*/
+	//-----------------------------------------------------------------//
+	uint32_t get_wf_max() { return wf_lost_; }
 
 
 	//-----------------------------------------------------------------//
@@ -471,6 +494,18 @@ namespace seeda {
 	{
 		set_rtc_time(t);
 		sys_time_ = t;
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  リスタート時間の設定
+		@param[in]	rest	リスタート時間（単位１０ミリ秒）
+	*/
+	//-----------------------------------------------------------------//
+	void set_restart_delay(uint32_t rest)
+	{
+		restart_delay_ = rest;
 	}
 }
 
@@ -668,6 +703,20 @@ extern "C" {
 	}
 }
 
+namespace seeda {
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  駆動時間の取得
+		@return 駆動時間
+	*/
+	//-----------------------------------------------------------------//
+	time_t get_operating_time()
+	{
+		return get_rtc_time() - operating_org_;
+	}
+}
+
 int main(int argc, char** argv);
 
 int main(int argc, char** argv)
@@ -771,6 +820,8 @@ int main(int argc, char** argv)
 
 	main_init_();
 
+	operating_org_ = get_rtc_time();
+
 	sample_count_ = 0;
 
 	sys_time_ = get_rtc_time();
@@ -800,24 +851,6 @@ int main(int argc, char** argv)
 
 		service_putch_tmp_();
 
-#if 0
-		{
-			const sample_data& smd = get_sample_data();
-			bool sync = false;
-			if(tref != smd.time_) {
-				tref = smd.time_;
-				if((tref % 60) == 0) {
-					char tmp[128];
-					time_t t = get_time();
-					disp_time_(t, tmp, sizeof(tmp));
-					debug_format("RTC: %s, ") % tmp;
-					disp_time_(tref, tmp, sizeof(tmp));
-					debug_format("SYSTEM: %s\n") % tmp;
-				}
-			}
-		}
-#endif
-
 		core_.service();
 		tools_.service();
 
@@ -838,11 +871,17 @@ int main(int argc, char** argv)
 			set_rtc_time(sys_time_);
 		}
 
-		if(soft_reset_delay_ > 0) {
-			--soft_reset_delay_;
-			if(soft_reset_delay_ == 0) {
-				restart_();
+		if(restart_delay_ > 0) {
+			--restart_delay_;
+			if(restart_delay_ == 5) {
+				utils::format("Restart SEEDA03\n");
+			} else if(restart_delay_ == 0) {
+				// リフレッシュを停止
+				core_.stop_wdt_refresh();
 			}
 		}
+
+		// メインループでのウオッチ・ドッグのクリア
+		core_.clear_wdt();
 	}
 }

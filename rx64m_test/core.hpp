@@ -11,6 +11,7 @@
 #include "common/tpu_io.hpp"
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
+#include "common/wdt_man.hpp"
 
 namespace seeda {
 
@@ -29,21 +30,37 @@ namespace seeda {
 			volatile uint32_t millis10x_;
 			volatile uint32_t cmtdiv_;
 
+			utils::wdt_man<device::WDT> wdt_man_;
+
+			volatile uint32_t wdt_count_;
+			volatile bool stop_refresh_;
+
 		public:
 			timer_task() : task_10ms_(nullptr),
-				millis_(0), delay_(0), millis10x_(0), cmtdiv_(0) { }
+				millis_(0), delay_(0), millis10x_(0), cmtdiv_(0),
+				wdt_man_(), wdt_count_(0), stop_refresh_(false)
+				{ }
 
-			void operator() () {
-
+			void operator() ()
+			{
 				eadc_server();
 
 				++millis_;
 				++cmtdiv_;
 				if(cmtdiv_ >= 10) {
+
+					++wdt_count_;
+					if(wdt_count_ < (100 * 60 * 5)) {  // ５分以内にクリア
+						if(!stop_refresh_) {
+							wdt_man_.refresh();
+						}
+					}
+
 					if(task_10ms_ != nullptr) (*task_10ms_)();
 					cmtdiv_ = 0;
 					++millis10x_;
 				}
+
 				if(delay_) {
 					--delay_;
 				}
@@ -64,12 +81,18 @@ namespace seeda {
 			volatile unsigned long get_delay() const { return delay_; }
 
 			void set_delay(volatile unsigned long n) { delay_ = n; }
+
+			void start_wdt() { wdt_man_.start(); }
+
+			void clear_wdt() { wdt_count_ = 0; }
+
+			void stop_wdt_refresh() { stop_refresh_ = true; }
 		};
 
 		typedef device::tpu_io<device::TPU0, timer_task> TPU0;
 		TPU0	tpu0_;
 
-		typedef utils::fifo<uint8_t, 2048> BUFFER;
+		typedef utils::fifo<uint8_t, 1024> BUFFER;
 #ifdef SEEDA
 		typedef device::sci_io<device::SCI12, BUFFER, BUFFER> SCI;
 #else
@@ -123,6 +146,7 @@ namespace seeda {
 				if(!tpu0_.start(1000, int_level)) {
 					utils::format("TPU0 not start ...\n");
 				}
+				tpu0_.at_task().start_wdt();
 			}
 
 			{  // 内臓 A/D 変換設定
@@ -207,6 +231,28 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		uint32_t get_cmt_counter() const {
 			return tpu0_.get_counter();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ウオッチ・ドッグをクリア
+		*/
+		//-----------------------------------------------------------------//
+		void clear_wdt()
+		{
+			tpu0_.at_task().clear_wdt();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ウオッチ・ドッグ、リフレッシュを停止
+		*/
+		//-----------------------------------------------------------------//
+		void stop_wdt_refresh()
+		{
+			tpu0_.at_task().stop_wdt_refresh();
 		}
 	};
 }

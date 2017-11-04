@@ -610,6 +610,25 @@ namespace seeda {
 	}
 
 
+	bool cmd_restart_(uint8_t cmdn)
+	{
+		if(cmdn == 2) {
+			char tmp[128];
+			if(cmd_.get_word(1, sizeof(tmp), tmp)) {
+				int v;
+				if((utils::input("%d", tmp) % v).status()) {
+					if(v >= 5 && v <= 30) {
+						utils::format("Restart SEEDA03 at %d second.\n") % v;
+						set_restart_delay(v * 100);
+						return true;
+					}
+				}
+			}			
+		}
+		return false;
+	}
+
+
 	void list_service_() const
 	{		
 	}
@@ -734,13 +753,15 @@ namespace seeda {
 					} else if(cmd_.cmp_word(0, "service")) {
 						list_service_();
 						f = true;
-					} else if(cmd_.cmp_word(0, "fifo")) {
-						utils::format("Write File FIFO: %d\n") % get_wf_fifo().length();
+					} else if(cmd_.cmp_word(0, "lost")) {
+						utils::format("Write File LOST: %d [s]\n") % get_wf_lost();
 						f = true;
 					} else if(cmd_.cmp_word(0, "testsd")) {
 						f = cmd_testsd_(cmdn);
 					} else if(cmd_.cmp_word(0, "ip")) {
 						f = cmd_ip_(cmdn);
+					} else if(cmd_.cmp_word(0, "restart")) {
+						f = cmd_restart_(cmdn);
 #ifdef SEEDA
 					} else if(cmd_.cmp_word(0, "eadc")) {
 						f = eadc_conv_(cmdn);
@@ -757,10 +778,11 @@ namespace seeda {
 						utils::format("dir [name]\n");
 						utils::format("cd [directory-name]\n");
 						utils::format("pwd\n");
-						utils::format("arp      (arp テーブル表示)\n");
-						utils::format("fifo     (FIFO バッファの利用量)\n");
-						utils::format("testsd   (ＳＤカード、性能評価)\n");
+						utils::format("arp         (arp テーブル表示)\n");
+						utils::format("lost        (Write File LOST 時間「秒」)\n");
+						utils::format("testsd      (ＳＤカード、性能評価)\n");
 						utils::format("ip dhcp=[on/off] ip=[x.x.x.x] gw=[x.x.x.x] mask=[x.x.x.x]\n");
+						utils::format("restart x   (x 秒後にリスタート)\n");
 						utils::format("flash xxxx [:xx]  (Read/Wite for DATA-FLASH)\n");
 #ifdef SEEDA
 						utils::format("eadc [0-7]  (LTC2348 A/D conversion)\n");
