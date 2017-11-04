@@ -384,15 +384,13 @@ namespace utils {
 		bool probe(const char* path) const
 		{
 			if(!mount_) return false;
+			if(path == nullptr) return false;
 
-			FIL fp;
-			bool ret = open(&fp, path, FA_READ | FA_OPEN_EXISTING);
-			if(ret) {
-				if(f_close(&fp) != FR_OK) {
-					return false;
-				}
-			}
-			return ret;
+			char full[_MAX_LFN + 1];
+			create_fatfs_path_(path, full);
+
+			FILINFO fno;
+			return f_stat(full, &fno) == FR_OK;
 		}
 
 
