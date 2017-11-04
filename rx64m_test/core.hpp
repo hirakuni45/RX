@@ -32,39 +32,16 @@ namespace seeda {
 
 			utils::wdt_man<device::WDT> wdt_man_;
 
-			volatile uint32_t wdt_count_;
-			volatile bool stop_refresh_;
+			volatile uint32_t	wdt_count_;
+			volatile uint32_t	wdt_limit_;
+			volatile bool		wdt_enable_;
+			volatile bool		wdt_stop_;
 
 		public:
 			timer_task() : task_10ms_(nullptr),
 				millis_(0), delay_(0), millis10x_(0), cmtdiv_(0),
-				wdt_man_(), wdt_count_(0), stop_refresh_(false)
+				wdt_man_(), wdt_count_(0), wdt_limit_(10 * 60 * 100), wdt_enable_(false), wdt_stop_(false)
 				{ }
-
-			void operator() ()
-			{
-				eadc_server();
-
-				++millis_;
-				++cmtdiv_;
-				if(cmtdiv_ >= 10) {
-
-					++wdt_count_;
-					if(wdt_count_ < (100 * 60 * 5)) {  // ５分以内にクリア
-						if(!stop_refresh_) {
-							wdt_man_.refresh();
-						}
-					}
-
-					if(task_10ms_ != nullptr) (*task_10ms_)();
-					cmtdiv_ = 0;
-					++millis10x_;
-				}
-
-				if(delay_) {
-					--delay_;
-				}
-			}
 
 			void set_task_10ms(void (*task)(void)) {
 				task_10ms_ = task;
@@ -86,11 +63,45 @@ namespace seeda {
 
 			void clear_wdt() { wdt_count_ = 0; }
 
-			void stop_wdt_refresh() { stop_refresh_ = true; }
+			void stop_wdt(bool stop = true) { wdt_stop_ = stop; }
+
+			void enable_wdt(bool ena = true) { wdt_enable_ = ena; }
+
+			void limit_wdt(uint32_t lim) { wdt_limit_ = lim; }
+
+			void operator() ()
+			{
+				eadc_server();
+
+				++millis_;
+				++cmtdiv_;
+				if(cmtdiv_ >= 10) {
+
+					if(wdt_stop_) {
+						// リフレッシュが止まり、強制リセット
+					} else if(wdt_enable_) {
+						++wdt_count_;
+						if(wdt_count_ < wdt_limit_) {
+							wdt_man_.refresh();
+						}
+					} else {
+						// WDT 無効： 常にリフレッシュ
+						wdt_man_.refresh();
+					}
+
+					if(task_10ms_ != nullptr) (*task_10ms_)();
+					cmtdiv_ = 0;
+					++millis10x_;
+				}
+
+				if(delay_ != 0) {
+					--delay_;
+				}
+			}
 		};
 
 		typedef device::tpu_io<device::TPU0, timer_task> TPU0;
-		TPU0	tpu0_;
+		TPU0		tpu0_;
 
 		typedef utils::fifo<uint8_t, 1024> BUFFER;
 #ifdef SEEDA
@@ -98,17 +109,11 @@ namespace seeda {
 #else
 		typedef device::sci_io<device::SCI7, BUFFER, BUFFER> SCI;
 #endif
-		SCI		sci_;
-
-		// 内臓 A/D 変換 タスク
-		struct adc_task {
-			void operator () () {
-			}
-		};
+		SCI			sci_;
 
 		typedef device::S12AD ADC;
-		typedef device::adc_io<ADC, adc_task> ADC_IO;
-		ADC_IO	adc_io_;
+		typedef device::adc_io<ADC, utils::null_task> ADC_IO;
+		ADC_IO		adc_io_;
 
 		uint32_t	list_cnt_;
 
@@ -247,12 +252,37 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ウオッチ・ドッグ、リフレッシュを停止
+			@brief  ウオッチ・ドッグ、リフレッシュを停止 @n
+					※強制リセット
 		*/
 		//-----------------------------------------------------------------//
-		void stop_wdt_refresh()
+		void stop_wdt()
 		{
-			tpu0_.at_task().stop_wdt_refresh();
+			tpu0_.at_task().stop_wdt();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ウオッチ・ドッグを許可
+			@param[in]	ena	「false」の場合無効
+		*/
+		//-----------------------------------------------------------------//
+		void enable_wdt(bool ena = true)
+		{
+			tpu0_.at_task().enable_wdt(ena);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ウオッチ・ドッグ制限時間の設定
+			@param[in]	lim	制限時間「ミリ秒」
+		*/
+		//-----------------------------------------------------------------//
+		void limit_wdt(uint32_t lim)
+		{
+			tpu0_.at_task().limit_wdt(lim);
 		}
 	};
 }
