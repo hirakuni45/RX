@@ -403,13 +403,16 @@ namespace net {
 					ctrl_flush();
 					break;
 				}
+#if 0
 				if(!sdc_.probe(param_)) {
 					ctrl_format("550 File %s not found\n") % param_;
 					ctrl_flush();
 					break;
 				}
+#endif
 				if(sdc_.remove(param_)) {
-					ctrl_format("250 \"%s\" deleted\n") % param_;
+					ctrl_format("550 File %s not found\n") % param_;
+///					ctrl_format("250 \"%s\" deleted\n") % param_;
 				} else {
 					ctrl_format("450 Can't delete %s\n") % param_;
 				}
@@ -451,13 +454,16 @@ namespace net {
 					ctrl_flush();
 					break;
 				}
+#if 0
 				if(sdc_.probe(param_)) {
 					ctrl_format("521 \"%s\" directory already exists\n") % param_;
 					ctrl_flush();
 					break;
 				}
+#endif
 				if(sdc_.mkdir(param_)) {
-					ctrl_format("257 \"%s\" created\n") % param_;
+					ctrl_format("521 \"%s\" directory already exists\n") % param_;
+///					ctrl_format("257 \"%s\" created\n") % param_;
 				} else {
 					ctrl_format("550 Can't create \"%s\"\n") % param_;
 				}
@@ -564,16 +570,21 @@ namespace net {
 					auto t = millis();
 					char path[256 + 1];
 					sdc_.make_full_path(param_, path);
+#if 0
 					if(!sdc_.probe(path)) {
 						ctrl_format("550 File '%s' not found\n") % path;
 						ctrl_flush();
 						task_ = task::close_port;
 						break;
 					}
+					auto tt = millis() - t;
+					debug_format("RETR File Probe: %d [ms]\n") % tt;
+#endif
 					uint32_t fsz = sdc_.size(path);
 					file_fp_ = fopen(path, "rb");
 					if(file_fp_ == nullptr) {
-						ctrl_format("450 Can't open %s \n") % path;
+						ctrl_format("550 File '%s' not found\n") % path;
+///						ctrl_format("450 Can't open %s \n") % path;
 						ctrl_flush();
 						task_ = task::close_port;
 						break;
@@ -600,13 +611,16 @@ namespace net {
 					ctrl_flush();
 					break;
 				}
+#if 0
 				if(!sdc_.probe(param_)) {
 					ctrl_format("550 File %s not found\n") % param_;
 					ctrl_flush();
 					break;
 				}
+#endif
 				if(sdc_.remove(param_)) {
-					ctrl_format("250 \"%s\" deleted\n") % param_;
+					ctrl_format("550 File %s not found\n") % param_;
+///					ctrl_format("250 \"%s\" deleted\n") % param_;
 				} else {
 					ctrl_format("501 Can't delete %s\n") % param_;
 				}
