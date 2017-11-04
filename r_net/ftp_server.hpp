@@ -570,21 +570,9 @@ namespace net {
 					auto t = millis();
 					char path[256 + 1];
 					sdc_.make_full_path(param_, path);
-#if 0
-					if(!sdc_.probe(path)) {
-						ctrl_format("550 File '%s' not found\n") % path;
-						ctrl_flush();
-						task_ = task::close_port;
-						break;
-					}
-					auto tt = millis() - t;
-					debug_format("RETR File Probe: %d [ms]\n") % tt;
-#endif
-					uint32_t fsz = sdc_.size(path);
 					file_fp_ = fopen(path, "rb");
 					if(file_fp_ == nullptr) {
 						ctrl_format("550 File '%s' not found\n") % path;
-///						ctrl_format("450 Can't open %s \n") % path;
 						ctrl_flush();
 						task_ = task::close_port;
 						break;
@@ -594,7 +582,7 @@ namespace net {
 					} else {
 						ctrl_format("150-Connected to port %d\n") % port_.get_port();
 					}
-					ctrl_format("150 %u bytes to download\n") % fsz;
+					ctrl_format("150 download file\n");
 					ctrl_flush();
 					file_total_ = 0;
 					file_frame_ = 0;
