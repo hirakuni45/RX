@@ -30,6 +30,15 @@ extern "C" {
 	void INT_Excep_ICU_GROUPAL1(void);
 }
 
+#ifdef LOGGING_FS
+extern uint32_t fs_open_w_max;
+extern uint32_t fs_open_r_max;
+extern uint32_t fs_open_w_cnt;
+extern uint32_t fs_open_r_cnt;
+extern uint32_t fs_close_max;
+extern uint32_t fs_close_cnt;
+#endif
+
 // #define NETS_DEBUG
 
 namespace seeda {
@@ -532,6 +541,19 @@ namespace seeda {
 			disp_time_(get_operating_time(), tmp, sizeof(tmp));
 			http_format("<tr><td>稼動時間:</td><td>%s</td></tr>") % tmp;
 			http_format("</table>\n");
+
+#ifdef LOGGING_FS
+			http_.tag_hr(600, 3);
+
+			http_format("<table>");
+			http_format("<tr><td>Ｗオープン最大時間:</td><td>%d [ms]</td></tr>") % fs_open_w_max;
+			http_format("<tr><td>Ｗオープン回数:</td><td>%d</td></tr>") % fs_open_w_cnt;
+			http_format("<tr><td>Ｒオープン最大時間:</td><td>%d [ms]</td></tr>") % fs_open_r_max;
+			http_format("<tr><td>Ｒオープン回数:</td><td>%d</td></tr>") % fs_open_r_cnt;
+			http_format("<tr><td>クローズ最大時間:</td><td>%d [ms]</td></tr>") % fs_close_max;
+			http_format("<tr><td>クローズ回数:</td><td>%d</td></tr>") % fs_close_cnt;
+			http_format("</table>\n");
+#endif
 		}
 
 
