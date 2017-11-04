@@ -367,30 +367,23 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 
 			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 
-#if 0
-			http_format("<form method=\"POST\" action=\"/cgi/set_client.cgi\">\n");
-			http_format("<table><tr><td>クライアント機能：</td>"
-			   "<td><input type=\"checkbox\" name=\"enable\" value=\"on\"%s>有効</td></tr>\n")
-					% (client_.get_enable() ? " checked=\"checked\"" : "");
-			http_format("<tr><td>接続先 IP：</td>"
-				"<td><input type=\"text\" name=\"ip\" size=\"15\" value=\"%d.%d.%d.%d\"></td></tr>\n")
-				% static_cast<int>(client_.get_ip()[0])
-				% static_cast<int>(client_.get_ip()[1])
-				% static_cast<int>(client_.get_ip()[2])
-				% static_cast<int>(client_.get_ip()[3]);
-			http_format("<tr><td>接続先ポート：</td>"
-				"<td><input type=\"text\" name=\"port\" size=\"5\" value=\"%d\"></td></tr>\n")
-				% static_cast<int>(client_.get_port());
-			http_format("<tr><td><input type=\"submit\" value=\"接続先設定\"%s></td></tr>\n")
-				% (mount ? "" : " disabled=\"disabled\"");
+			http_format("<form method=\"POST\" action=\"/cgi/watchdog.cgi\">\n");
+			http_format("<table><tr><td>ウオッチドッグ：</td>"
+			   "<td><input type=\"checkbox\" name=\"enable\" value=\"on\"%s>有効</td></tr>")
+					% (get_pre().get().watchdog_enable_  ? " checked=\"checked\"" : "");
+			http_format("<tr><td>規定時間（分）：</td>"
+				"<td><input type=\"text\" name=\"wdtime\" size=\"3\" value=\"%d\"></td></tr>")
+				% get_pre().get().watchdog_time_;
+			http_format("<tr><td><input type=\"submit\" value=\"規定設定\"></td></tr>");
 			http_format("</table></form>\n");
-#endif
+
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 
 			http_format("<form method=\"POST\" action=\"/cgi/restart.cgi\"><table>");
-			http_format("<tr><td>ハードリセット：</td>");
-			http_format("<td><input type=\"text\" name=\"restime\" size=\"4\" value=\"%d\"></td></tr>\n")
+			http_format("<tr><td>リセット（秒）：</td>");
+			http_format("<td><input type=\"text\" name=\"restime\" size=\"3\" value=\"%d\"></td></tr>")
 				% restart_time_;
-			http_format("<td><input type=\"submit\" value=\"予約設定\"></td></tr>\n");
+			http_format("<td><input type=\"submit\" value=\"予約設定\"></td></tr>");
 			http_format("</table></form>\n");
 
 			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");

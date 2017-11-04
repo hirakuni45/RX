@@ -156,6 +156,15 @@ namespace seeda {
 		@return プリファレンス
 	*/
 	//-----------------------------------------------------------------//
+	const preference& get_pre() { return nets_.at_pre(); }
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  プリファレンスの参照
+		@return プリファレンス
+	*/
+	//-----------------------------------------------------------------//
 	preference& at_pre() { return nets_.at_pre(); }
 
 
@@ -494,6 +503,21 @@ namespace seeda {
 	{
 		set_rtc_time(t);
 		sys_time_ = t;
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  ウォッチドッグ時間の設定
+		@param[in]	limit	時間（１０ミリ秒単位）
+		@param[in]	ena		許可
+	*/
+	//-----------------------------------------------------------------//
+	void set_watchdog(uint32_t limit, bool ena)
+	{
+		debug_format("Watchdog %s: limit: %d [sec]\n") % (ena ? "enable" : "disable") % (limit * 10 / 1000);
+		core_.limit_wdt(limit);
+		core_.enable_wdt(ena);
 	}
 
 
@@ -877,7 +901,7 @@ int main(int argc, char** argv)
 				utils::format("Restart SEEDA03\n");
 			} else if(restart_delay_ == 0) {
 				// リフレッシュを停止
-				core_.stop_wdt_refresh();
+				core_.stop_wdt();
 			}
 		}
 

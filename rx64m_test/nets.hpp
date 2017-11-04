@@ -47,6 +47,8 @@ namespace seeda {
 		typedef utils::null_format debug_format;
 #endif
 
+		static const uint16_t WATCHDOG_MIN = 1;  ///< WatchDog の最低時間（分）
+
 #ifdef SEEDA
 		typedef device::PORT<device::PORT7, device::bitpos::B0> LAN_RESN;
 		typedef device::PORT<device::PORT7, device::bitpos::B3> LAN_PDN;
@@ -444,6 +446,41 @@ namespace seeda {
 		}
 
 
+		void set_watchdog_()
+		{
+			typedef utils::parse_cgi_post<256, 2> CGI_REST;
+			CGI_REST cgi;
+			cgi.parse(http_.get_post_body());
+			bool enable = false;
+			bool err = true;
+			uint32_t time = 5;
+			for(uint32_t i = 0; i < cgi.size(); ++i) {
+				const auto& t = cgi.get_unit(i);
+				if(t.key == nullptr || t.val == nullptr) {
+
+				} else if(strcmp(t.key, "enable") == 0) {
+					if(strcmp(t.val, "on") == 0) {
+						enable = true;
+					}
+				} else if(strcmp(t.key, "wdtime") == 0) {
+					int n = 0;
+					if((utils::input("%d", t.val) % n).status()) {
+						if(n >= WATCHDOG_MIN) {
+							time = n;
+							err = false;
+						}
+					}
+				}
+			}
+			if(!err) {
+				pre_.at().watchdog_enable_ = enable;
+				pre_.at().watchdog_time_ = time;
+				write_pre_();
+				set_watchdog(static_cast<uint32_t>(time) * 60 * 100, enable);
+			}
+		}
+
+
 		void set_restart_()
 		{
 			typedef utils::parse_cgi_post<256, 2> CGI_REST;
@@ -643,6 +680,11 @@ namespace seeda {
 				http_.exec_link("/setup");
 			} );
 
+			http_.set_cgi("/cgi/watchdog.cgi", "RestartTime", [=](void) {
+				set_watchdog_();
+				http_.exec_link("/setup");
+			} );
+
 			http_.set_cgi("/cgi/restart.cgi", "RestartTime", [=](void) {
 				set_restart_();
 				http_.exec_link("/setup");
@@ -687,6 +729,11 @@ namespace seeda {
 
 					write_file_.set_path(pre_.get().write_path_);
 					write_file_.set_limit(pre_.get().write_limit_); 
+
+					uint32_t time = pre_.get().watchdog_time_;
+					if(time >= WATCHDOG_MIN) {
+						set_watchdog(time * 60 * 100, pre_.get().watchdog_enable_);
+					}
 				}
 				client_.start_connect();
 			}
