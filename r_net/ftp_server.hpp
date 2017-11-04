@@ -29,7 +29,8 @@
 #define FTPS_DEBUG
 
 extern "C" {
-	time_t get_time(void);
+	time_t get_time(void);			///< GMT 時間の取得
+	unsigned long millis(void);		///< ミリ秒単位の経過時間
 };
 
 namespace net {
@@ -188,6 +189,8 @@ namespace net {
 		uint32_t	rw_limit_;
 
 		uint8_t		rw_buff_[RWBSZ];
+
+		uint32_t	elapsed_time_;
 
 		bool		pasv_enable_;
 
@@ -558,6 +561,7 @@ namespace net {
 					break;
 				}
 				{
+					auto t = millis();
 					char path[256 + 1];
 					sdc_.make_full_path(param_, path);
 					if(!sdc_.probe(path)) {
@@ -585,6 +589,8 @@ namespace net {
 					file_frame_ = 0;
 					file_wait_ = 0;
 					task_ = task::send_file;
+					elapsed_time_ = millis() - t;
+					debug_format("RETR Read open: '%s' (%d [ms])\n") % path % elapsed_time_;
 				}
 				break;
 
@@ -708,6 +714,7 @@ namespace net {
 					break;
 				}
 				{
+					auto t = millis();
 					char path[256 + 1];
 					sdc_.make_full_path(param_, path);
 					file_fp_ = fopen(path, "wb");
@@ -727,6 +734,8 @@ namespace net {
 					file_frame_ = 0;
 					file_wait_ = 0;
 					task_ = task::recv_file;
+					elapsed_time_ = millis() - t;
+					debug_format("STOR Write open: '%s' (%d [ms])\n") % path % elapsed_time_;
 				}
 				break;
 
@@ -896,6 +905,7 @@ namespace net {
 			data_connect_loop_(0),
 			file_fp_(nullptr), file_total_(0), file_frame_(0), file_wait_(0),
 			rw_limit_(RWBSZ),
+			elapsed_time_(0),
 			pasv_enable_(false)
 			{ }
 
@@ -1088,6 +1098,7 @@ namespace net {
 			//----  Send File ----------------------//
 			case task::send_file:
 				{
+					auto t = millis();
 					uint32_t sz = fread(rw_buff_, 1, rw_limit_, file_fp_);
 					if(sz > 0) {
 						if(pasv_enable_) {
@@ -1113,7 +1124,9 @@ namespace net {
 							port_.stop();
 						}
 						task_ = task::command;
-						debug_format("Data send %u Bytes, %u Kbytes/Sec\n") % file_total_ % krate;
+						elapsed_time_ += millis() - t;
+						debug_format("Data send %u Bytes, %u Kbytes/Sec (Total: %d [ms])\n")
+							% file_total_ % krate % elapsed_time_;
 						break;
 					}
 					if(file_wait_ >= (transfer_timeout_ * cycle)) {
@@ -1126,15 +1139,19 @@ namespace net {
 						} else {
 							port_.stop();
 						}
-						debug_format("Data send timeout\n");
+						elapsed_time_ += millis() - t;
+						debug_format("Data send timeout: (%d [ms])\n") % elapsed_time_;
 						task_ = task::command;
+						break;
 					}
+					elapsed_time_ += millis() - t;
 				}
 				break;
 
 			//--------------------------//
 			case task::recv_file:
 				{
+					auto t = millis();
 					int32_t sz;
 					if(pasv_enable_) {
 						sz = data_.read(rw_buff_, rw_limit_);
@@ -1163,7 +1180,9 @@ namespace net {
 						} else {
 							port_.stop();
 						}
-						debug_format("Data recv %u Bytes, %u Kbytes/Sec\n") % file_total_ % krate;
+						elapsed_time_ += millis() - t;
+						debug_format("Data recv %u Bytes, %u Kbytes/Sec (Total: %d [ms])\n")
+							% file_total_ % krate % elapsed_time_;
 						task_ = task::command;
 						break;
 					}
@@ -1177,9 +1196,12 @@ namespace net {
 						} else {
 							port_.stop();
 						}
-						debug_format("Data recv timeout\n");
+						elapsed_time_ += millis() - t;
+						debug_format("Data recv timeout: %d [ms]\n") % elapsed_time_;
 						task_ = task::command;
+						break;
 					}
+					elapsed_time_ += millis() - t;
 				}
 				break;
 
@@ -1226,33 +1248,45 @@ namespace net {
 				break;
 
 			case task::dir_list:
-				if(!sdc_.start_dir_list("", dir_list_func_, true, nullptr)) {
-					ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
-					ctrl_flush();
-					task_ = task::command;
-					break;
+				{
+					auto t = millis();
+					if(!sdc_.start_dir_list("", dir_list_func_, true, nullptr)) {
+						ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
+						ctrl_flush();
+						task_ = task::command;
+						break;
+					}
+					elapsed_time_ = millis() - t;
+					task_ = task::dir_loop;
 				}
-				task_ = task::dir_loop;
 				break;
 
 			case task::dir_nlst:
-				if(!sdc_.start_dir_list("", dir_nlst_func_, true, nullptr)) {
-					ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
-					ctrl_flush();
-					task_ = task::command;
-					break;
+				{
+					auto t = millis();
+					if(!sdc_.start_dir_list("", dir_nlst_func_, true, nullptr)) {
+						ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
+						ctrl_flush();
+						task_ = task::command;
+						break;
+					}
+					elapsed_time_ = millis() - t;
+					task_ = task::dir_loop;
 				}
-				task_ = task::dir_loop;
 				break;
 
 			case task::dir_mlsd:
-				if(!sdc_.start_dir_list("", dir_mlsd_func_, true, nullptr)) {
-					ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
-					ctrl_flush();
-					task_ = task::command;
-					break;
+				{
+					auto t = millis();
+					if(!sdc_.start_dir_list("", dir_mlsd_func_, true, nullptr)) {
+						ctrl_format("550 Can't open directory %s\n") % sdc_.get_current();
+						ctrl_flush();
+						task_ = task::command;
+						break;
+					}
+					elapsed_time_ = millis() - t;
+					task_ = task::dir_loop;
 				}
-				task_ = task::dir_loop;
 				break;
 
 			case task::dir_loop:
@@ -1268,6 +1302,7 @@ namespace net {
 							port_.stop();
 						}
 						task_ = task::command;
+///						debug_format("DIR loop for (total): %d [ms]\n") % elapsed_time_;
 					}
 				}
 				break;
