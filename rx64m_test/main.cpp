@@ -666,7 +666,7 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	DWORD get_fattime(void) {
 		time_t t = get_time();
-		t += get_timezone_offset();  // SD Card time stamp is not GMT
+
 		return utils::str::get_fattime(t);
 	}
 
