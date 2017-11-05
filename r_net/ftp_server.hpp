@@ -407,16 +407,8 @@ namespace net {
 					ctrl_flush();
 					break;
 				}
-#if 0
-				if(!sdc_.probe(param_)) {
-					ctrl_format("550 File %s not found\n") % param_;
-					ctrl_flush();
-					break;
-				}
-#endif
 				if(sdc_.remove(param_)) {
-					ctrl_format("550 File %s not found\n") % param_;
-///					ctrl_format("250 \"%s\" deleted\n") % param_;
+					ctrl_format("250 '%s' deleted\n") % param_;
 				} else {
 					ctrl_format("450 Can't delete %s\n") % param_;
 				}
