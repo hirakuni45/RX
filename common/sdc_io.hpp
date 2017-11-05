@@ -118,43 +118,45 @@ namespace utils {
 		}
 
 
-		void create_full_path_(const char* path, char* full) const
+		void create_full_path_(const char* src, char* dst, uint16_t dsz) const
 		{
-			std::strcpy(full, current_);
-
-			if(path == nullptr || path[0] == 0) {
-				if(full[0] == 0) {
-					std::strcpy(full, "/");
+			if(std::strcmp(src, "..") == 0) {
+				std::strncpy(dst, current_, dsz - 1);
+				uint16_t len = std::strlen(dst);
+				if(len == 0) {  // カレントが何も無い場合は無視
+					return;
+				} else if(len == 1 && dst[0] == '/') {  // ルートなので無視
+					return;
+				} else if(dst[len - 1] == '/') {  // 終端が「/」の場合は無視する
+					dst[len - 1] = 0;
+					--len;
 				}
-			} else if(std::strcmp(path, "..") == 0) {
-				char* p = std::strrchr(full, '/');
-				if(p != nullptr) {
-					if(&full[0] == p) {
-						p[1] = 0;
-					} else {
-						*p = 0;
+				while(len >= 0) {
+					if(dst[len] == '/') {
+						dst[len] = 0;
+						break;
 					}
+					--len;
 				}
-			} else if(path[0] == '/') {
-				std::strcpy(full, path);				
+				if(dst[0] == 0) {
+					dst[0] = '/';
+					dst[1] = 0;
+				}
 			} else {
-				uint32_t len = strlen(full);
-				if(len > 0 && full[len - 1] != '/') {
-					std::strcat(full, "/");
-				}
-				std::strcat(full, path);
+				make_full_path(src, dst, dsz);
 			}
 		}
 
 
 		// FATFS で認識できるパス（文字コード）へ変換
-		void create_fatfs_path_(const char* path, char* full) const {
+		void create_fatfs_path_(const char* path, char* dst, uint16_t dsz) const
+		{
 #if _USE_LFN != 0
 			char tmp[_MAX_LFN + 1];
-			create_full_path_(path, tmp);
-			str::utf8_to_sjis(tmp, full);
+			create_full_path_(path, tmp, sizeof(tmp));
+			str::utf8_to_sjis(tmp, dst, dsz);
 #else
-			create_full_path_(path, full);
+			create_full_path_(path, dst, dsz);
 #endif
 		}
 
@@ -183,7 +185,7 @@ namespace utils {
 				p[0] = 0;
 #if _USE_LFN != 0
 				char sjis[_MAX_LFN + 1];
-				str::utf8_to_sjis(tmp, sjis);
+				str::utf8_to_sjis(tmp, sjis, sizeof(sjis));
 				auto ret = f_mkdir(sjis);
 #else
 				auto ret = f_mkdir(tmp);
@@ -254,7 +256,7 @@ namespace utils {
 			{
 				total_ = 0;
 
-				std::strcpy(full_, root);
+				std::strncpy(full_, root, sizeof(full_));
 
 				auto st = f_opendir(&dir_, full_);
 				if(st != FR_OK) {
@@ -387,7 +389,7 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_fatfs_path_(path, full);
+			create_fatfs_path_(path, full, sizeof(full));
 
 			FILINFO fno;
 			return f_stat(full, &fno) == FR_OK;
@@ -407,7 +409,7 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_full_path_(path, full);
+			create_full_path_(path, full, sizeof(full));
 
 			if(!build_dir_path_(full)) {
 				return false;
@@ -431,7 +433,7 @@ namespace utils {
 			if(fp == nullptr || path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_fatfs_path_(path, full);
+			create_fatfs_path_(path, full, sizeof(full));
 
 			if(f_open(fp, full, mode) != FR_OK) {
 				return false;
@@ -470,7 +472,7 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_fatfs_path_(path, full);
+			create_fatfs_path_(path, full, sizeof(full));
 
 			FILINFO fno;
 			if(f_stat(full, &fno) != FR_OK) {
@@ -494,7 +496,7 @@ namespace utils {
 			if(path == nullptr) return 0;
 
 			char full[_MAX_LFN + 1];
-			create_fatfs_path_(path, full);
+			create_fatfs_path_(path, full, sizeof(full));
 
 			FILINFO fno;
 			if(f_stat(full, &fno) != FR_OK) {
@@ -518,7 +520,7 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_fatfs_path_(path, full);
+			create_fatfs_path_(path, full, sizeof(full));
 
 			return f_unlink(full) == FR_OK;
 		}
@@ -538,9 +540,9 @@ namespace utils {
 			if(org_path == nullptr || new_path == nullptr) return false;
 
 			char org_full[_MAX_LFN + 1];
-			create_fatfs_path_(org_path, org_full);
+			create_fatfs_path_(org_path, org_full, sizeof(org_full));
 			char new_full[_MAX_LFN + 1];
-			create_fatfs_path_(new_path, new_full);
+			create_fatfs_path_(new_path, new_full, sizeof(new_full));
 
 			return f_rename(org_full, new_full) == FR_OK;
 		}
@@ -559,7 +561,7 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_fatfs_path_(path, full);
+			create_fatfs_path_(path, full, sizeof(full));
 
 			return f_mkdir(full) == FR_OK;
 		}
@@ -605,11 +607,11 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_full_path_(path, full);
+			create_full_path_(path, full, sizeof(full));
 
 #if _USE_LFN != 0
 			char oem[_MAX_LFN + 1];
-			str::utf8_to_sjis(full, oem);
+			str::utf8_to_sjis(full, oem, sizeof(oem));
 			DIR dir;
 			auto st = f_opendir(&dir, oem);
 #else
@@ -620,7 +622,7 @@ namespace utils {
 				format("Can't open dir(%d): '%s'\n") % static_cast<uint32_t>(st) % full;
 				return false;
 			}
-			std::strcpy(current_, full);
+			std::strncpy(current_, full, sizeof(full));
 
 			f_closedir(&dir);
 			return true;
@@ -667,10 +669,10 @@ namespace utils {
 			dir_todir_ = todir;
 			dir_option_ = option;
 
-			char full[256];
-			create_full_path_(root, full);
+			char full[_MAX_LFN + 1];
+			create_full_path_(root, full, sizeof(full));
 #if _USE_LFN != 0
-			str::utf8_to_sjis(full, full);
+			str::utf8_to_sjis(full, full, sizeof(full));
 #endif
 			return dir_list_.start(full);
 		}
@@ -706,11 +708,13 @@ namespace utils {
 		uint32_t dir(const char* root)
 		{
 			dir_list dl;
-			char full[256];
-			create_full_path_(root, full);
+			char full[_MAX_LFN + 1];
+			create_full_path_(root, full, sizeof(full));
 #if _USE_LFN != 0
-			str::utf8_to_sjis(full, full);
+			str::utf8_to_sjis(full, full, sizeof(full));
 #endif
+utils::format("dir: '%s'\n") % full;
+
 			if(!dl.start(full)) return 0;
 
 			do {
@@ -810,7 +814,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		bool make_full_path(const char* src, char* dst, uint16_t dsz) const
 		{
-			if(src == nullptr || dst == nullptr) return false;
+			if(src == nullptr || dst == nullptr || dsz <= 1) return false;
 
 			if(src[0] == '/') {  // フルパスの場合
 				for(uint16_t i = 0; i < (dsz - 1); ++i) {
@@ -832,13 +836,18 @@ namespace utils {
 					break;
 				}
 			}
-			if(pos >= (dsz - 1)) {
-				dst[dsz - 1] = 0;
+			if(pos == (dsz - 1)) {  // サイズ最大か？
+				dst[pos] = 0;
 				return false;
 			}
 
-			if(pos > 0 && dst[pos - 1] != '/') {
-				dst[pos - 1] = '/';
+			if(std::strlen(src) == 0) return true;  // 追加無し
+
+			if(pos == 1 && dst[0] == '/' && dst[1] == 0) ;  // ルート・パスなので、何もしない
+			else if(pos > 2 && dst[pos - 1] != '/') {  // [/] を追加する必要がある場合 
+				dst[pos] = '/';
+				++pos;
+				dst[pos] = 0;
 			}
 
 			while(pos < (dsz - 1)) {
