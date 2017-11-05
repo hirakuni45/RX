@@ -25,7 +25,7 @@ void sci_putch(char ch) { }
 char sci_getch(void) __attribute__((weak));
 char sci_getch(void) { return 0; }
 
-void utf8_to_sjis(const char* src, char* dst);
+void utf8_to_sjis(const char* src, char* dst, uint16_t dsz);
 
 // FatFS を使う場合有効にする（通常 Makefile で定義）
 // #define FAT_FS
@@ -130,8 +130,8 @@ int open(const char *path, int flags, ...)
 	else if(flags & O_CREAT) mode |= FA_CREATE_NEW;
 
 #if _USE_LFN != 0
-	char tmp[256];
-	utf8_to_sjis(path, tmp);
+	char tmp[_MAX_LFN + 1];
+	utf8_to_sjis(path, tmp, sizeof(tmp));
 	FRESULT res = f_open(&file_obj_[file - STD_OFS_], tmp, mode);
 #else
 	FRESULT res = f_open(&file_obj_[file - STD_OFS_], path, mode);
@@ -359,10 +359,10 @@ int link(const char *oldpath, const char *newpath)
 #ifdef FAT_FS
 
 #if _USE_LFN != 0
-	char oldtmp[256];
-	utf8_to_sjis(oldpath, oldtmp);
-	char newtmp[256];
-	utf8_to_sjis(newpath, newtmp);
+	char oldtmp[_MAX_LFN + 1];
+	utf8_to_sjis(oldpath, oldtmp, sizeof(oldtmp));
+	char newtmp[_MAX_LFN + 1];
+	utf8_to_sjis(newpath, newtmp, sizeof(newtmp));
 	FRESULT res = f_rename(oldtmp, newtmp);
 #else
 	FRESULT res = f_rename(oldpath, newpath);
@@ -395,8 +395,8 @@ int unlink(const char *path)
 {
 #ifdef FAT_FS
 #if _USE_LFN != 0
-	char tmp[256];
-	utf8_to_sjis(path, tmp);
+	char tmp[_MAX_LFN + 1];
+	utf8_to_sjis(path, tmp, sizeof(tmp));
 	FRESULT res = f_unlink(tmp);
 #else
 	FRESULT res = f_unlink(path);
