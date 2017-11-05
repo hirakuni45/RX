@@ -802,22 +802,55 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	フル・パスを生成
-			@param[in]	name	ファイル名
-			@param[out]	dst		生成先（オーバーランに注意）
+			@param[in]	src		生成元
+			@param[out]	dst		生成先
+			@param[in]	dsz		生成先サイズ
+			@return 正常コピー出来ない場合「false」
 		 */
 		//-----------------------------------------------------------------//
-		void make_full_path(const char* name, char* dst) const {
-			if(name == nullptr || dst == nullptr) return;
-			if(name[0] == '/') {
-				std::strcpy(dst, name);
-				return;
+		bool make_full_path(const char* src, char* dst, uint16_t dsz) const
+		{
+			if(src == nullptr || dst == nullptr) return false;
+
+			if(src[0] == '/') {  // フルパスの場合
+				for(uint16_t i = 0; i < (dsz - 1); ++i) {
+					auto ch = src[i];
+					dst[i] = ch;
+					if(ch == 0) {
+						return true;
+					}
+				}
+				dst[dsz - 1] = 0;
+				return false;
 			}
-			std::strcpy(dst, current_);
-			auto len = std::strlen(dst);
-			if(len > 0 && dst[len - 1] != '/') {
-				std::strcat(dst, "/");
+
+			uint16_t pos = 0;
+			for(pos = 0; pos < (dsz - 1); ++pos) {
+				auto ch = current_[pos];
+				dst[pos] = ch;
+				if(ch == 0) {
+					break;
+				}
 			}
-			std::strcat(dst, name);
+			if(pos >= (dsz - 1)) {
+				dst[dsz - 1] = 0;
+				return false;
+			}
+
+			if(pos > 0 && dst[pos - 1] != '/') {
+				dst[pos - 1] = '/';
+			}
+
+			while(pos < (dsz - 1)) {
+				auto ch = *src++;
+				dst[pos] = ch;
+				if(ch == 0) {
+					return true;
+				}
+				++pos;
+			}
+			dst[dsz - 1] = 0;
+			return false;
 		}
 
 
