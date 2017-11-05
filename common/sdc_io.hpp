@@ -62,7 +62,7 @@ namespace utils {
 			if(fi == nullptr) return;
 
 			time_t t = str::fatfs_time_to(fi->fdate, fi->ftime);
-			struct tm *m = gmtime(&t);
+			struct tm *m = localtime(&t);
 			if(dir) {
 				format("          ");
 			} else {
@@ -713,8 +713,6 @@ namespace utils {
 #if _USE_LFN != 0
 			str::utf8_to_sjis(full, full, sizeof(full));
 #endif
-utils::format("dir: '%s'\n") % full;
-
 			if(!dl.start(full)) return 0;
 
 			do {

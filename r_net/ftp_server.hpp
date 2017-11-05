@@ -196,7 +196,7 @@ namespace net {
 
 		static void disp_time_(time_t t)
 		{
-			struct tm *m = gmtime(&t);
+			struct tm *m = localtime(&t);
 			ctrl_format("%s %s %d %02d:%02d:%02d  %4d")
 				% get_wday(m->tm_wday)
 				% get_mon(m->tm_mon)
@@ -211,7 +211,7 @@ namespace net {
 		// Create string YYYYMMDDHHMMSS
 		static void make_date_time_(time_t t, char* tmp, uint32_t size)
 		{
-			struct tm *m = gmtime(&t);
+			struct tm *m = localtime(&t);
 		 	utils::sformat("%04u%02u%02u%02u%02u%02u", tmp, size)
 				% static_cast<uint32_t>(m->tm_year + 1900)
 				% static_cast<uint32_t>(m->tm_mon + 1)
@@ -260,7 +260,7 @@ namespace net {
 			if(block == 0 && fi->fsize > 0) ++block;
 
 			time_t t = utils::str::fatfs_time_to(fi->fdate, fi->ftime);
-			struct tm *m = gmtime(&t);
+			struct tm *m = localtime(&t);
 			data_format("%crw-rw-rw- %d user root %d %s %d %02d:%02d %s\n")
 				% cdir % block % fi->fsize
 				% get_mon(m->tm_mon)
@@ -819,7 +819,7 @@ namespace net {
 					}
 					time_t t = sdc_.get_time(path);
 					if(t != 0) {
-						struct tm *m = gmtime(&t);
+						struct tm *m = localtime(&t);
 						ctrl_format("213 %04d%02d%02d%02d%02d%02d\n")
 							% static_cast<int>(m->tm_year + 1900)
 							% static_cast<int>(m->tm_mon + 1)

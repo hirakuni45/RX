@@ -236,7 +236,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		static DWORD get_fattime(time_t t)
 		{
-			struct tm *tp = gmtime(&t);
+			struct tm *tp = localtime(&t);
 
 #ifdef DEBUG_
 			format("get_fattime: (source) %4d/%d/%d/ %02d:%02d:%02d\n")
@@ -288,7 +288,7 @@ namespace utils {
 			ttm.tm_mon  = ((date >> 5) & 0xf) - 1;
 			ttm.tm_year = ((date >> 9) & 0x7f) + 1980 - 1900;
 
-			return mktime_gmt(&ttm);
+			return mktime(&ttm);
 		}
 
 
