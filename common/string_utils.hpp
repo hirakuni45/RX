@@ -173,20 +173,29 @@ namespace utils {
 		/*!
 			@brief  UTF-8 から sjis への変換
 			@param[in]	src	ソース
-			@param[in]	dst	変換先
+			@param[out]	dst	変換先
+			@param[in]	dsz	変換先のサイズ
 		*/
 		//-----------------------------------------------------------------//
-		static void utf8_to_sjis(const char* src, char* dst)
+		static void utf8_to_sjis(const char* src, char* dst, uint16_t dsz)
 		{
 			int8_t cnt = 0;
 			uint16_t code = 0;
 			char tc;
 			while((tc = *src++) != 0) {
 				uint8_t c = static_cast<uint8_t>(tc);
-				if(c < 0x80) { *dst++ = tc; code = 0; }
-				else if((c & 0xf0) == 0xe0) { code = (c & 0x0f); cnt = 2; }
-				else if((c & 0xe0) == 0xc0) { code = (c & 0x1f); cnt = 1; }
-				else if((c & 0xc0) == 0x80) {
+				if(c < 0x80) {
+					if(dsz <= 1) break;
+					*dst++ = tc;
+					code = 0;
+					--dsz;
+				} else if((c & 0xf0) == 0xe0) {
+					code = (c & 0x0f);
+					cnt = 2;
+				} else if((c & 0xe0) == 0xc0) {
+					code = (c & 0x1f);
+					cnt = 1;
+				} else if((c & 0xc0) == 0x80) {
 					code <<= 6;
 					code |= c & 0x3f;
 					cnt--;
@@ -198,9 +207,11 @@ namespace utils {
 					}
 				}
 				if(cnt == 0 && code != 0) {
+					if(dsz <= 2) break;
 					auto wc = ff_convert(code, 0);
 					*dst++ = static_cast<char>(wc >> 8);
 					*dst++ = static_cast<char>(wc & 0xff);
+					dsz -= 2;
 					code = 0;
 				}			
 			}
