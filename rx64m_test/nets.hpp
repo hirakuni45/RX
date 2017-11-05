@@ -30,15 +30,6 @@ extern "C" {
 	void INT_Excep_ICU_GROUPAL1(void);
 }
 
-#ifdef LOGGING_FS
-extern uint32_t fs_open_w_max;
-extern uint32_t fs_open_r_max;
-extern uint32_t fs_open_w_cnt;
-extern uint32_t fs_open_r_cnt;
-extern uint32_t fs_close_max;
-extern uint32_t fs_close_cnt;
-#endif
-
 // #define NETS_DEBUG
 
 namespace seeda {
@@ -492,68 +483,35 @@ namespace seeda {
 
 		void set_restart_()
 		{
-			typedef utils::parse_cgi_post<256, 2> CGI_REST;
+			typedef utils::parse_cgi_post<256, 3> CGI_REST;
 			CGI_REST cgi;
 			cgi.parse(http_.get_post_body());
+			bool err = false;
+			int delay = 0;
 			for(uint32_t i = 0; i < cgi.size(); ++i) {
 				const auto& t = cgi.get_unit(i);
 				if(t.key == nullptr || t.val == nullptr) {
-
+					err = true;
 				} else if(strcmp(t.key, "restime") == 0) {
 					int n = 0;
 					if((utils::input("%d", t.val) % n).status()) {
-						set_restart_delay(n * 100);
+						delay = n;
+					} else {
+						err = true;
 					}
+				} else if(strcmp(t.key, "reskey") == 0) {
+					if(strcmp(t.val, setup_.get_restart_key()) == 0) {
+					} else {
+						err = true;
+					}
+				} else {
+					err = true;
 				}
 			}
-		}
-
-
-		void disp_time_(time_t t, char* dst, uint32_t size)
-		{
-			uint32_t s = t % 60;
-			t /= 60;
-			uint32_t m = t % 60;
-			t /= 60;
-			uint32_t h = t % 24;
-			t /= 24;
-			utils::sformat("%d %02u:%02u:%02u", dst, size) % t % h % m % s;
-		}
-
-
-		// ログ表示
-		void output_log_()
-		{
-			http_format("<table>");
-			http_format("<tr><td>書き込み時間:</td><td>%u [分]</td></tr>") % write_file_.get_resume();
-			http_format("<tr><td>ロスト時間:</td><td>%u [秒]</td></tr>") % get_wf_lost();
-			http_format("<tr><td>FIFO バッファ:</td><td>%u / %u [秒]</td></tr>")
-				% get_wf_fifo().length()
-				% (get_wf_fifo().size() - 2);
-			http_format("<tr><td>FIFO バッファ最大:</td><td>%u [秒]</td></tr>")
-				% get_wf_max();
-			http_format("</table>\n");
-
-			http_.tag_hr(600, 3);
-
-			http_format("<table>");
-			char tmp[64];
-			disp_time_(get_operating_time(), tmp, sizeof(tmp));
-			http_format("<tr><td>稼動時間:</td><td>%s</td></tr>") % tmp;
-			http_format("</table>\n");
-
-#ifdef LOGGING_FS
-			http_.tag_hr(600, 3);
-
-			http_format("<table>");
-			http_format("<tr><td>Ｗオープン最大時間:</td><td>%d [ms]</td></tr>") % fs_open_w_max;
-			http_format("<tr><td>Ｗオープン回数:</td><td>%d</td></tr>") % fs_open_w_cnt;
-			http_format("<tr><td>Ｒオープン最大時間:</td><td>%d [ms]</td></tr>") % fs_open_r_max;
-			http_format("<tr><td>Ｒオープン回数:</td><td>%d</td></tr>") % fs_open_r_cnt;
-			http_format("<tr><td>クローズ最大時間:</td><td>%d [ms]</td></tr>") % fs_close_max;
-			http_format("<tr><td>クローズ回数:</td><td>%d</td></tr>") % fs_close_cnt;
-			http_format("</table>\n");
-#endif
+			if(!err && delay > 1) {
+				utils::format("Restart: %d after, key: %s\n") % delay % setup_.get_restart_key();
+				set_restart_delay(delay * 100);
+			}
 		}
 
 
@@ -710,15 +668,6 @@ namespace seeda {
 			http_.set_cgi("/cgi/restart.cgi", "RestartTime", [=](void) {
 				set_restart_();
 				http_.exec_link("/setup");
-			} );
-
-			http_.set_link("/log_state", "LOG State", [=](void) {
-				net_tools::render_version();
-				net_tools::render_date_time();
-				http_.tag_hr(600, 3);
-				output_log_();
-				http_.tag_hr(600, 3);
-				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
 			} );
 
 			http_.set_link("/system", "SystemSetup", [=](void) {

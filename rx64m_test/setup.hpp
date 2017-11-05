@@ -11,6 +11,15 @@
 
 #include "chip/EUI_XX.hpp"
 
+#ifdef LOGGING_FS
+extern uint32_t fs_open_w_max;
+extern uint32_t fs_open_r_max;
+extern uint32_t fs_open_w_cnt;
+extern uint32_t fs_open_r_cnt;
+extern uint32_t fs_close_max;
+extern uint32_t fs_close_cnt;
+#endif
+
 namespace seeda {
 
 	uint32_t get_wf_lost();
@@ -58,6 +67,7 @@ namespace seeda {
 		bool		signal_;
 
 		uint32_t	restart_time_;
+		char		restart_key_[8];
 
 #ifdef SEEDA
 		// mac address rom I/F
@@ -88,6 +98,53 @@ namespace seeda {
 		}
 #endif
 
+		void disp_time_(time_t t, char* dst, uint32_t size)
+		{
+			uint32_t s = t % 60;
+			t /= 60;
+			uint32_t m = t % 60;
+			t /= 60;
+			uint32_t h = t % 24;
+			t /= 24;
+			utils::sformat("%d %02u:%02u:%02u", dst, size) % t % h % m % s;
+		}
+
+
+		// ログ表示
+		void output_log_()
+		{
+			http_format("<table>");
+			http_format("<tr><td>書き込み時間:</td><td>%u [分]</td></tr>") % write_file_.get_resume();
+			http_format("<tr><td>ロスト時間:</td><td>%u [秒]</td></tr>") % get_wf_lost();
+			http_format("<tr><td>FIFO バッファ:</td><td>%u / %u [秒]</td></tr>")
+				% get_wf_fifo().length()
+				% (get_wf_fifo().size() - 2);
+			http_format("<tr><td>FIFO バッファ最大:</td><td>%u [秒]</td></tr>")
+				% get_wf_max();
+			http_format("</table>\n");
+
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+
+			http_format("<table>");
+			char tmp[64];
+			disp_time_(get_operating_time(), tmp, sizeof(tmp));
+			http_format("<tr><td>稼動時間:</td><td>%s</td></tr>") % tmp;
+			http_format("</table>\n");
+
+#ifdef LOGGING_FS
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+
+			http_format("<table>");
+			http_format("<tr><td>Ｗオープン最大時間:</td><td>%d [ms]</td></tr>") % fs_open_w_max;
+			http_format("<tr><td>Ｗオープン回数:</td><td>%d</td></tr>") % fs_open_w_cnt;
+			http_format("<tr><td>Ｒオープン最大時間:</td><td>%d [ms]</td></tr>") % fs_open_r_max;
+			http_format("<tr><td>Ｒオープン回数:</td><td>%d</td></tr>") % fs_open_r_cnt;
+			http_format("<tr><td>クローズ最大時間:</td><td>%d [ms]</td></tr>") % fs_close_max;
+			http_format("<tr><td>クローズ回数:</td><td>%d</td></tr>") % fs_close_cnt;
+			http_format("</table>\n");
+#endif
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -98,7 +155,7 @@ namespace seeda {
 			mac_{ 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED },
 			ipt_(),
 			signal_(false),
-			restart_time_(5)
+			restart_time_(5), restart_key_{ 0 }
 #ifdef SEEDA
 			, spi_(), eui_(spi_)
 #endif
@@ -288,6 +345,15 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  リスタート・キーの取得
+			@return リスタート・キー
+		*/
+		//-----------------------------------------------------------------//
+		const char* get_restart_key() const { return restart_key_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  クライアント機能設定画面
 			@param[in]	dev	develope の場合「true」
 		*/
@@ -357,44 +423,6 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  システム設定画面
-		*/
-		//-----------------------------------------------------------------//
-		void render_system()
-		{
-			net_tools::render_version();
-			net_tools::render_date_time();
-
-			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
-
-			http_format("<form method=\"POST\" action=\"/cgi/watchdog.cgi\">\n");
-			http_format("<table><tr><td>ウオッチドッグ：</td>"
-			   "<td><input type=\"checkbox\" name=\"enable\" value=\"on\"%s>有効</td></tr>")
-					% (get_pre().get().watchdog_enable_  ? " checked=\"checked\"" : "");
-			http_format("<tr><td>規定時間（分）：</td>"
-				"<td><input type=\"text\" name=\"wdtime\" size=\"3\" value=\"%d\"></td></tr>")
-				% get_pre().get().watchdog_time_;
-			http_format("<tr><td><input type=\"submit\" value=\"規定設定\"></td></tr>");
-			http_format("</table></form>\n");
-
-			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
-
-			http_format("<form method=\"POST\" action=\"/cgi/restart.cgi\"><table>");
-			http_format("<tr><td>リセット（秒）：</td>");
-			http_format("<td><input type=\"text\" name=\"restime\" size=\"3\" value=\"%d\"></td></tr>")
-				% restart_time_;
-			http_format("<td><input type=\"submit\" value=\"予約設定\"></td></tr>");
-			http_format("</table></form>\n");
-
-			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
-
-			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
-			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  設定ページ、レンダリング・メイン
 			@param[in]	dev	develope の場合「true」
 		*/
@@ -416,9 +444,28 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 			http_format("<input type=\"button\" onclick=\"location.href='/data'\" value=\"データ表示\">\n");
 			http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 
-			{  // 内臓 A/D 表示
+			if(0) {  // 内臓 A/D 表示
 				float v = static_cast<float>(get_adc(5)) / 4095.0f * 3.3f;
 				http_format("バッテリー電圧： %4.2f [V]<br>\n") % v;
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
+			}
+
+			// RTC 設定
+			{
+				http_format("<form method=\"POST\" action=\"/cgi/set_rtc.cgi\">\n");
+				auto t = get_time();
+				struct tm *m = localtime(&t);
+				http_format("<table><tr>"
+					"<td>年月日(yyyy/mm/dd)：</td>"
+					"<td><input type=\"text\" name=\"date\" size=\"10\" value=\"%d/%d/%d\"></td></tr>\n")
+					% static_cast<int>(m->tm_year + 1900)
+					% static_cast<int>(m->tm_mon + 1) % static_cast<int>(m->tm_mday);
+				http_format("<tr>"
+					"<td>時間(hh:mm[:ss])：</td>"
+					"<td><input type=\"text\" name=\"time\" size=\"8\" value=\"%d:%d\"></td></tr>\n")
+					% static_cast<int>(m->tm_hour) % static_cast<int>(m->tm_min);
+				http_format("<tr><td><input type=\"submit\" value=\"ＲＴＣ設定\"></td></tr>\n");
+				http_format("</table></form>\n");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
@@ -431,7 +478,6 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 					% static_cast<uint32_t>(mac_[3])
 					% static_cast<uint32_t>(mac_[4])
 					% static_cast<uint32_t>(mac_[5]);
-				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
 			// IP 設定
@@ -464,25 +510,6 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
-			// RTC 設定
-			{
-				http_format("<form method=\"POST\" action=\"/cgi/set_rtc.cgi\">\n");
-				auto t = get_time();
-				struct tm *m = localtime(&t);
-				http_format("<table><tr>"
-					"<td>年月日(yyyy/mm/dd)：</td>"
-					"<td><input type=\"text\" name=\"date\" size=\"10\" value=\"%d/%d/%d\"></td></tr>\n")
-					% static_cast<int>(m->tm_year + 1900)
-					% static_cast<int>(m->tm_mon + 1) % static_cast<int>(m->tm_mday);
-				http_format("<tr>"
-					"<td>時間(hh:mm[:ss])：</td>"
-					"<td><input type=\"text\" name=\"time\" size=\"8\" value=\"%d:%d\"></td></tr>\n")
-					% static_cast<int>(m->tm_hour) % static_cast<int>(m->tm_min);
-				http_format("<tr><td><input type=\"submit\" value=\"ＲＴＣ設定\"></td></tr>\n");
-				http_format("</table></form>\n");
-				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
-			}
-
 			// 検査用Ａ／Ｄ設定
 			if(dev) {
 				http_format("<form method=\"POST\" action=\"/cgi/dev_adc.cgi\"><table>\n");
@@ -496,8 +523,6 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 				http_format("<tr><td><input type=\"submit\" value=\"設定\"></td></tr></table></form>");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
-
-			auto mount = at_sdc().get_mount();
 
 			// Ａ／Ｄ変換設定
 			{
@@ -534,25 +559,13 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
 
-			{  // ＳＤカードステータス・ボタン
-				http_format("<input type=\"button\" onclick=\"location.href='/sdc_state'\""
-							" value=\"ＳＤカード情報\"%s>") % (mount ? "" : " disabled=\"disabled\"");
-				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
-			}
-
-			{  // プリファレンス消去ボタン
-///				http_format("<input type=\"button\" onclick=\"location.href='/preference'\""
-///							" value=\"プリファレンス消去\"%s>") % (mount ? "" : " disabled=\"disabled\"");
-				http_format("<input type=\"button\" onclick=\"location.href='/preference'\""
-							" value=\"プリファレンス消去\">");
-				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
-			}
-
 			{  // クライアント機能設定ボタン
 				http_format("<input type=\"button\" onclick=\"location.href='/client'\""
 							" value=\"クライアント機能\">");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
+
+			auto mount = at_sdc().get_mount();
 
 			// ファイル書き込み設定
 			{
@@ -580,18 +593,6 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
-			if(!mount) {
-				http_format("ＳＤカードがありません。<br>");
-				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
-			}
-
-			// 情報表示ボタン
-			{
-				http_format("<input type=\"button\" onclick=\"location.href='/log_state'\""
-							" value=\"ログ情報\">");
-///							" value=\"ログ情報\"%s>") % (mount ? "" : " disabled=\"disabled\"");
-				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
-			}
 
 			// システム設定
 			{
@@ -599,6 +600,85 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 							" value=\"システム設定\">");
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}
+
+			if(!mount) {
+				http_format("ＳＤカードがありません。<br>");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  システム設定画面
+		*/
+		//-----------------------------------------------------------------//
+		void render_system()
+		{
+			net_tools::render_version();
+			net_tools::render_date_time();
+
+			auto mount = at_sdc().get_mount();
+
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+
+			{  // プリファレンス消去ボタン
+///				http_format("<input type=\"button\" onclick=\"location.href='/preference'\""
+///							" value=\"プリファレンス消去\"%s>") % (mount ? "" : " disabled=\"disabled\"");
+				http_format("<input type=\"button\" onclick=\"location.href='/preference'\""
+							" value=\"プリファレンス消去\">");
+				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+			}
+
+			{  // ＳＤカードステータス・ボタン
+				http_format("<input type=\"button\" onclick=\"location.href='/sdc_state'\""
+							" value=\"ＳＤカード情報\"%s>") % (mount ? "" : " disabled=\"disabled\"");
+				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+			}
+
+			// 各種情報表示
+			{
+				output_log_();
+				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+			}
+
+			{
+				http_format("<form method=\"POST\" action=\"/cgi/watchdog.cgi\">\n");
+				http_format("<table><tr><td>ウオッチドッグ：</td>"
+				   "<td><input type=\"checkbox\" name=\"enable\" value=\"on\"%s>有効</td></tr>")
+						% (get_pre().get().watchdog_enable_  ? " checked=\"checked\"" : "");
+				http_format("<tr><td>規定時間（分）：</td>"
+					"<td><input type=\"text\" name=\"wdtime\" size=\"3\" value=\"%d\"></td></tr>")
+					% get_pre().get().watchdog_time_;
+				http_format("<tr><td><input type=\"submit\" value=\"規定設定\"></td></tr>");
+				http_format("</table></form>\n");
+
+				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+			}
+
+			{
+				for(int i = 0; i < 6; ++i) {
+					char o = rand() & 0xffff;
+					if(o & 1) { o >>= 1; o %= 10; o += '0'; }
+					else { o >>= 1; o %= 26; o += 'A'; }
+					restart_key_[i] = o;
+				}
+				restart_key_[6] = 0;
+
+				http_format("<form method=\"POST\" action=\"/cgi/restart.cgi\"><table>");
+				http_format("<tr><td>リセット（秒）：</td>");
+				http_format("<td><input type=\"text\" name=\"restime\" size=\"3\" value=\"%d\"></td>")
+					% restart_time_;
+				http_format("<td>キー：</td>");
+				http_format("<td><input type=\"text\" name=\"reskey\" size=\"6\" value=\"------\"></td>");
+				http_format("<td>　%s</td></tr>") % restart_key_;
+				http_format("<tr><td><input type=\"submit\" value=\"予約設定\"></td></tr>");
+				http_format("</table></form>\n");
+				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+			}
+
+			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 		}
 	};
 }
