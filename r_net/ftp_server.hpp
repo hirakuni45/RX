@@ -339,15 +339,19 @@ namespace net {
 				return false;
 			}
 
+			char ch = 0;
+			bool over = false;
 			for(int i = 0; i < len; ++i) {
-				char ch = tmp[i];
+				ch = tmp[i];
 				if(ch == 0 || ch == 0x0d) continue;
 				if(!line_man_.add(ch)) {
-					debug_format("line_man: memory over\n");
-					return false;
+					over = true;;
 				}
 			}
-			if(static_cast<size_t>(len) < sizeof(tmp)) {
+			if(over) {
+				debug_format("FTP line_man: memory over.\n");
+			}
+			if(static_cast<size_t>(len) < sizeof(tmp) || ch == '\n') {
 				line_man_.set_term();
 				return true;
 			}
@@ -569,7 +573,12 @@ namespace net {
 				{
 					auto t = millis();
 					char path[256 + 1];
-					sdc_.make_full_path(param_, path);
+					if(!sdc_.make_full_path(param_, path, sizeof(path))) {
+						ctrl_format("501 RETR error in parameters or arguments.\n");
+						ctrl_flush();
+						task_ = task::close_port;
+						break;
+					}
 					file_fp_ = fopen(path, "rb");
 					if(file_fp_ == nullptr) {
 						ctrl_format("550 File '%s' not found\n") % path;
@@ -718,7 +727,12 @@ namespace net {
 				{
 					auto t = millis();
 					char path[256 + 1];
-					sdc_.make_full_path(param_, path);
+					if(!sdc_.make_full_path(param_, path, sizeof(path))) {
+						ctrl_format("501 RETR error in parameters or arguments.\n");
+						ctrl_flush();
+						task_ = task::close_port;
+						break;
+					}
 					file_fp_ = fopen(path, "wb");
 					if(file_fp_ == nullptr) {
 						ctrl_format("451 Can't open/create %s\n") % path;
@@ -800,7 +814,12 @@ namespace net {
 						break;
 					}
 					char path[256 + 1];
-					sdc_.make_full_path(param_, path);
+					if(!sdc_.make_full_path(param_, path, sizeof(path))) {
+						ctrl_format("501 RETR error in parameters or arguments.\n");
+						ctrl_flush();
+						task_ = task::close_port;
+						break;
+					}
 					if(!sdc_.probe(path)) {
 						ctrl_format("550 No such file %s\n") % path;
 						ctrl_flush();
@@ -1213,6 +1232,7 @@ namespace net {
 				} else {
 					port_.stop();
 				}
+				debug_format("FTP close port successful.\n");
 				task_ = task::command;
 				break;
 
