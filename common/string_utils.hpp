@@ -622,6 +622,7 @@ namespace utils {
 				back_ = ch;
 				return true;
 			} else {
+				buff_[buff_size - 1] = 0;
 				return false;
 			}
 		}
