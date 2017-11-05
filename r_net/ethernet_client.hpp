@@ -234,12 +234,12 @@ namespace net {
         void stop()
 		{
 			if(!connected()) {
-				tcp_sht_cep(cepid_, TMO_FEVR);
-///				tcp_sht_cep(cepid_, TMO_NBLK);
+///				tcp_sht_cep(cepid_, TMO_FEVR);
+				tcp_sht_cep(cepid_, TMO_NBLK);
 			}
 			if(cepid_ > 0) {
-				tcp_cls_cep(cepid_, TMO_FEVR);
-///				tcp_cls_cep(cepid_, TMO_NBLK);
+///				tcp_cls_cep(cepid_, TMO_FEVR);
+				tcp_cls_cep(cepid_, TMO_NBLK);
 			}
 			end();
 		}
