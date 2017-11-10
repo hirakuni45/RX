@@ -156,7 +156,7 @@ namespace seeda {
 		@return プリファレンス
 	*/
 	//-----------------------------------------------------------------//
-	const preference& get_pre() { return nets_.at_pre(); }
+	const preference& get_pre() { return nets_.get_pre(); }
 
 
 	//-----------------------------------------------------------------//
