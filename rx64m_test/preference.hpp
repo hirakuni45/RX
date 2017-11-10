@@ -19,6 +19,12 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class preference {
 
+#ifdef DEBUG
+		typedef utils::format debug_format;
+#else
+		typedef utils::null_format debug_format;
+#endif
+
 		typedef device::flash_io FLASH_IO;
 
 	public:
@@ -124,6 +130,7 @@ namespace seeda {
 				}
 				pos += size;
 			}
+			debug_format("Flash (preference) erase: %06X\n") % pos;
 			return FLASH_IO::data_flash_size;
 		}
 
@@ -149,6 +156,7 @@ namespace seeda {
 				}
 				pos += size;
 			}
+			debug_format("Flash (preference) scan: %06X\n") % back;
 			return back;
 		}
 
@@ -160,10 +168,11 @@ namespace seeda {
 			h.magic_ = sizeof(seeda_t);
 			auto pos = scan_new_file_(h);
 			if(pos >= FLASH_IO::data_flash_size) {
-// utils::format("Flash read: can't find\n");
+				debug_format("Flash (preference) read: can't find\n");
+
 				return false;
 			}
-// utils::format("Flash read: %06X\n") % pos;
+			debug_format("Flash (preference) read: %06X\n") % pos;
 			return fio_.read(pos, &seeda_, sizeof(seeda_t));
 		}
 
@@ -179,7 +188,7 @@ namespace seeda {
 				seeda_.index_ = 0;
 			}
 			seeda_.magic_ = sizeof(seeda_t);
-// utils::format("Flash write: %06X\n") % pos;
+			debug_format("Flash (preference) write: %06X\n") % pos;
 			return fio_.write(pos, &seeda_, sizeof(seeda_t));
 		}
 
@@ -227,10 +236,15 @@ namespace seeda {
 			char tmp[16];
 			tmp[0] = '/';
 			std::strcpy(&tmp[1], path);
-			return at_sdc().remove(tmp);
+			auto f = at_sdc().remove(tmp);
 #else
-			return fio_.erase_all();
+			auto f = fio_.erase_all();
 #endif
+			if(f) {
+				seeda_t	tmp;
+				seeda_ = tmp;
+			}
+			return f;
 		}
 
 
@@ -246,7 +260,7 @@ namespace seeda {
 #ifdef PREFER_SD
 			FILE* fp = fopen(path, "wb");
 			if(fp == nullptr) {
-				utils::format("Can't write preference: '%s'\n") % path;
+				debug_format("Can't write preference: '%s'\n") % path;
 				return false;
 			}
 
@@ -254,7 +268,7 @@ namespace seeda {
 
 			bool ret = true;
 			if(fwrite(&seeda_, 1, sizeof(seeda_t), fp) != sizeof(seeda_t)) {
-				utils::format("Write error preference: '%s'\n") % path;
+				debug_format("Write error preference: '%s'\n") % path;
 				ret = false;
 			}
 
@@ -284,18 +298,18 @@ namespace seeda {
 #ifdef PREFER_SD
 			FILE* fp = fopen(path, "rb");
 			if(fp == nullptr) {
-				utils::format("Can't read preference: '%s'\n") % path;
+				debug_format("Can't read preference: '%s'\n") % path;
 				return false;
 			}
 
 			bool ret = true;
 			if(fread(&seeda_, 1, sizeof(seeda_t), fp) != sizeof(seeda_t)) {
-				utils::format("Read error preference: '%s'\n") % path;
+				debug_format("Read error preference: '%s'\n") % path;
 				ret = false;
 			}
 
 			if(seeda_.magic_ != sizeof(seeda_t)) {
-				utils::format("Read error preference magic code: Ref(%d) : File(%d)\n")
+				debug_format("Read error preference magic code: Ref(%d) : File(%d)\n")
 					% sizeof(seeda_t) % seeda_.magic_;
 				ret = false;
 			}
