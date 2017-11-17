@@ -988,7 +988,7 @@ namespace net {
 
 			case task::connection:
 				if(ctrl_.connected()) {
-					debug_format("FTP Server (CTRL): connect form: '%s'\n") % ctrl_.get_from_ip().c_str();
+					debug_format("FTP Server (CTRL): connect from: '%s'\n") % ctrl_.get_from_ip().c_str();
 					ctrl_format("220 %s FTP server %s ") % host_ % eth_.get_local_ip().c_str();
 					time_t t = get_time();
 					disp_time_(t);

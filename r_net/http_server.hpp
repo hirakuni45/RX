@@ -542,7 +542,7 @@ namespace net {
 
 			case task::wait_http:
 				if(http_.connected()) {
-					debug_format("HTTP Server: New connected, form: %s\n") % http_.get_from_ip().c_str();
+					debug_format("HTTP Server: New connected, from: %s\n") % http_.get_from_ip().c_str();
 					++count_;
 					line_man_.clear();
 					task_ = task::main_loop;
