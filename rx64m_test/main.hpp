@@ -27,6 +27,7 @@
 
 #include "r_net/http_server.hpp"
 #include "r_net/ftp_server.hpp"
+#include "r_net/telnet_server.hpp"
 
 #ifdef DEBUG
 /// #define CLIENT_DEBUG
@@ -36,7 +37,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 520;
+	static const int seeda_version_ = 521;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef utils::command<256> CMD;
@@ -86,6 +87,8 @@ namespace seeda {
 	typedef HTTP::http_format http_format;	
 
 	typedef net::ftp_server<SDC> FTPS;
+
+	typedef net::telnet_server<1024, 256> TELNETS;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
