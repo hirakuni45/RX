@@ -74,7 +74,9 @@ namespace {
 	{
 		dis_int();
 		while(putch_tmp_.length() > 0) {
-			core_.sci_.putch(putch_tmp_.get());
+			auto ch = putch_tmp_.get();
+			core_.sci_.putch(ch);
+			nets_.telnet_putch(ch);
 		}
 		ena_int();
 	}
@@ -551,6 +553,7 @@ extern "C" {
 		}
 		putch_lock_ = true;
 		core_.sci_.putch(ch);
+		nets_.telnet_putch(ch);
 		putch_lock_ = false;
 	}
 

@@ -58,6 +58,7 @@ namespace seeda {
 
 		HTTP			http_;
 		FTPS			ftps_;
+		TELNETS			telnets_;
 
 		client			client_;
 
@@ -676,6 +677,9 @@ namespace seeda {
 
 			// FTP Server
 			ftps_.start("SEEDA03", "Renesas_RX64M", "SEEDA03", "SEEDA03");
+
+			// TELNET Server
+			telnets_.start("SEEDA03");
 		}
 
 
@@ -717,7 +721,10 @@ namespace seeda {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		nets() : http_(ethernet_, at_sdc()), ftps_(ethernet_, at_sdc()), client_(ethernet_),
+		nets() : http_(ethernet_, at_sdc()),
+			ftps_(ethernet_, at_sdc()),
+			telnets_(ethernet_),
+			client_(ethernet_),
 			count_(0), item_(0),
 			write_file_(),
 			setup_(write_file_, client_),
@@ -806,6 +813,17 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  telnet 文字出力
+		*/
+		//-----------------------------------------------------------------//
+		void telnet_putch(char ch)
+		{
+			telnets_.putch(ch);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  タイトル表示（ネット関係）
 		*/
 		//-----------------------------------------------------------------//
@@ -835,6 +853,7 @@ namespace seeda {
 			} else {
 				ftps_.service(50);
 				client_.service(50);
+				telnets_.service(50);
 			}
 
 			if(write_file_.get_enable() || client_.probe()) {

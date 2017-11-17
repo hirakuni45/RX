@@ -677,6 +677,20 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 			}
 
+#if 0
+			// TELNET 接続
+			http_format("<form method=\"POST\" action=\"/cgi/set_telnet.cgi\">\n");
+			http_format("<table><tr><td>TELNET 機能：</td>"
+			   "<td><input type=\"checkbox\" name=\"enable\" value=\"on\"%s>有効</td></tr>\n")
+					% (client_.get_enable() ? " checked=\"checked\"" : "");
+			http_format("<tr><td>接続先ポート：</td>"
+				"<td><input type=\"text\" name=\"port\" size=\"5\" value=\"%d\"></td></tr>")
+				% static_cast<int>(client_.get_port());
+			http_format("<tr><td><input type=\"submit\" value=\"TELNET 設定\"%s></td></tr>")
+				% (mount ? "" : " disabled=\"disabled\"");
+			http_format("</table></form>\n");
+#endif
+
 			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
 			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 		}
