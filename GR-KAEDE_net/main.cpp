@@ -260,10 +260,11 @@ extern "C" {
 		@brief	UTF-8 から ShiftJIS への変換
 		@param[in]	src	UTF-8 文字列ソース
 		@param[out]	dst	ShiftJIS 文字列出力
+		@param[in]	dsz	出力サイズ
 	 */
 	//-----------------------------------------------------------------//
-	void utf8_to_sjis(const char* src, char* dst) {
-		utils::str::utf8_to_sjis(src, dst);
+	void utf8_to_sjis(const char* src, char* dst, uint16_t dsz) {
+		utils::str::utf8_to_sjis(src, dst, dsz);
 	}
 
 
@@ -369,7 +370,7 @@ extern "C" {
 
 	int16_t lan_read(uint8_t lan_port_no, void **buf)
 	{
-		auto ret = ether_.recv(buf);
+		auto ret = ether_.recv_buff(buf);
 		int16_t rc;
 		if(ret > 0) {
 			rc = ret;
