@@ -291,10 +291,11 @@ extern "C" {
 		@brief	UTF-8 から ShiftJIS への変換
 		@param[in]	src	UTF-8 文字列ソース
 		@param[out]	dst	ShiftJIS 文字列出力
+		@param[in]	dsz	文字列出力サイズ
 	 */
 	//-----------------------------------------------------------------//
-	void utf8_to_sjis(const char* src, char* dst) {
-		utils::str::utf8_to_sjis(src, dst);
+	void utf8_to_sjis(const char* src, char* dst, uint16_t dsz) {
+		utils::str::utf8_to_sjis(src, dst, dsz);
 	}
 
 
@@ -371,6 +372,9 @@ int main(int argc, char** argv)
 		utils::format(", PCLKA: %u [Hz]") % static_cast<uint32_t>(F_PCLKA);
 		utils::format(", PCLKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCLKB);
 	}
+
+	// SD カード・クラスの初期化
+	sdc_.start();
 
 	device::power_cfg::turn(device::peripheral::ETHERC0);
 	device::port_map::turn(device::peripheral::ETHERC0);
