@@ -73,10 +73,9 @@ namespace {
 	CMT0	cmt0_;
 
 	typedef utils::fifo<uint8_t, 2048> BUFFER;
+
 	typedef device::sci_io<device::SCI7, BUFFER, BUFFER> SCI;
-
 	SCI		sci_;
-
 
 	// SDC 用　SPI 定義（RSPI）
 	typedef device::rspi_io<device::RSPI> SPI;
@@ -286,10 +285,11 @@ extern "C" {
 		@brief	UTF-8 から ShiftJIS への変換
 		@param[in]	src	UTF-8 文字列ソース
 		@param[out]	dst	ShiftJIS 文字列出力
+		@param[in]	dsz	文字列出力サイズ
 	 */
 	//-----------------------------------------------------------------//
-	void utf8_to_sjis(const char* src, char* dst) {
-		utils::str::utf8_to_sjis(src, dst);
+	void utf8_to_sjis(const char* src, char* dst, uint16_t dsz) {
+		utils::str::utf8_to_sjis(src, dst, dsz);
 	}
 
 
@@ -368,6 +368,8 @@ int main(int argc, char** argv)
 		utils::format(", PCLKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCLKB);
 	}
 
+	// SD カード・クラスの初期化
+	sdc_.start();
 
 	device::power_cfg::turn(device::peripheral::ETHERC0);
 	device::port_map::turn(device::peripheral::ETHERC0);
@@ -395,9 +397,7 @@ int main(int argc, char** argv)
 		utils::format("%s\n") % ethernet_.get_local_ip().c_str();
 	}
 
-
 	ftp_.start("GR-KAEDE", "Renesas_RX64M", "KAEDE", "KAEDE");
-
 
 	uint32_t cnt = 0;
 	while(1) {
