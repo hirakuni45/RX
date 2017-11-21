@@ -48,8 +48,11 @@ namespace net {
 		task		task_;
 
 		char		server_name_[32];
+		char		user_[32];
+		char		pass_[32];
 		uint32_t	count_;
 		uint32_t	disconnect_loop_;
+		uint32_t	recv_lost_;
 
 		typedef utils::fixed_fifo<char, SEND_SIZE> SEND_FIFO;
 		typedef utils::fixed_fifo<char, RECV_SIZE> RECV_FIFO;
@@ -82,21 +85,27 @@ namespace net {
 		*/
 		//-----------------------------------------------------------------//
 		telnet_server(ethernet& e) : eth_(e), telnet_(e), task_(task::none),
-			server_name_{ 0 }, count_(0), disconnect_loop_(0) { }
+			server_name_{ 0 }, user_{ 0 }, pass_{ 0 },
+			count_(0), disconnect_loop_(0), recv_lost_(0) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  スタート
 			@param[in]	server_name	サーバー名
+			@param[in]	user		ユーザー名
+			@param[in]	pass		パスワード
 		*/
 		//-----------------------------------------------------------------//
-		void start(const char* server_name)
+		void start(const char* server_name, const char* user = nullptr, const char* pass = nullptr)
 		{
 			std::strncpy(server_name_, server_name, sizeof(server_name_) - 1);
+			if(user != nullptr) std::strncpy(user_, user, sizeof(user_) - 1);
+			if(pass != nullptr) std::strncpy(pass_, pass, sizeof(pass_) - 1);
 
 			count_ = 0;
 			disconnect_loop_ = 0;
+			recv_lost_ = 0;
 
 			task_ = task::begin;
 
@@ -136,9 +145,17 @@ namespace net {
 			case task::main_loop:
 				if(telnet_.connected()) {
 					if(telnet_.available() > 0) {  // リードデータがあるか？
-						char tmp[RECV_SIZE];
+						char tmp[256];
 						int len = telnet_.read(tmp, sizeof(tmp));
-//						recv_.length()
+						if(len > 0) {  
+							int l = 0;
+							while((recv_.size() - recv_.length()) > 2) {
+								recv_.put(tmp[l]);
+								++l;
+								if(l >= len) break;
+							}
+							recv_lost_ += len - l;
+						}
 					}
 					write_();
 				} else {
@@ -182,6 +199,7 @@ namespace net {
 				}
 				send_.put(ch);
 //				if(ch == '\r') {					
+//					flush_();
 //				}
 			}
 		}
@@ -214,7 +232,23 @@ namespace net {
 		//-----------------------------------------------------------------//
 		uint32_t length() const
 		{
-			return 0;
+			return recv_.length();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  入力文字取得
+			@return 入力文字（入力文字が無い場合「０」が返る）
+		*/
+		//-----------------------------------------------------------------//
+		char getch() const
+		{
+			if(recv_.length() > 0) {
+				return recv_.get();
+			} else {
+				return 0;
+			}
 		}
 	};
 }
