@@ -11,21 +11,39 @@ TARGET		=	igniter_tester
 # GR-KAEDE MCU (R5F564MLCDFB 144pin QFP)
 DEVICE		=	R5F564ML
 
+FATFS_VER	=	ff12b
+
 BUILD		=	release
 
 BUILD_ID	=	$(shell date +%Y%m%d%H)
 
 VPATH		=	../
 
-ASOURCES	=	common/start.s
+ASOURCES	=	common/start.s \
+				r_net/driver/cksum_rx_little.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c
+				common/syscalls.c \
+				$(FATFS_VER)/src/ff.c \
+				$(FATFS_VER)/src/option/unicode.c \
+				common/time.c \
+				r_net/driver/phy.c \
+				r_net/driver/r_ether.c \
+				r_net/r_byteq_v1.30/r_byteq.c \
+				r_net/driver/driver.c \
+				r_net/T4_src/config_tcpudp.c \
+				r_net/T4_src/ether.c \
+				r_net/T4_src/ip.c \
+				r_net/T4_src/udp.c \
+				r_net/T4_src/tcp.c \
+				r_net/T4_src/tcp_api.c \
+				r_net/T4_src/r_dhcp_client.c
 
-PSOURCES	=	main.cpp
+PSOURCES	=	main.cpp \
+				r_net/ethernet.cpp
 
-USER_LIBS	=	stdc++
+USER_LIBS	=	stdc++ m
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
@@ -36,7 +54,7 @@ MCU_TARGET	=
 
 INC_SYS		=
 
-INC_APP		=	. ../ ../RX64M
+INC_APP		=	. ../ ../RX64M ../r_net
 
 OPTIMIZE	=	-Os
 
