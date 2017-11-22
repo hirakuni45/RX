@@ -8,9 +8,8 @@
 */
 //=====================================================================//
 #include "main.hpp"
-
-// GR-KAEDE による代理テストの場合有効にする
-#define KAEDE
+#include "http.hpp"
+#include "ign_server.hpp"
 
 namespace {
 
@@ -21,21 +20,22 @@ namespace {
 	{
 		void (*task_10ms_)();
 
-		volatile unsigned long delay_;
+//		volatile unsigned long delay_;
 		volatile uint32_t millis10x_;
 
 	public:
 		cmt_task() : task_10ms_(nullptr),
-			delay_(0), millis10x_(0) { }
+//			delay_(0),
+			millis10x_(0) { }
 
 		void operator() () {
 
 			if(task_10ms_ != nullptr) (*task_10ms_)();
 			++millis10x_;
 
-			if(delay_) {
-				--delay_;
-			}
+//			if(delay_) {
+//				--delay_;
+//			}
 			
 		}
 
@@ -43,11 +43,10 @@ namespace {
 			task_10ms_ = task;
 		}
 
-		volatile unsigned long get_millis10x() const { return millis10x_; }
+		volatile unsigned long get_millis() const { return millis10x_ * 10; }
 
-		volatile unsigned long get_delay() const { return delay_; }
-
-		void set_delay(volatile unsigned long n) { delay_ = n; }
+//		volatile unsigned long get_delay() const { return delay_; }
+//		void set_delay(volatile unsigned long n) { delay_ = n; }
 	};
 
 	typedef device::cmt_io<device::CMT0, cmt_task> CMT;
@@ -61,35 +60,18 @@ namespace {
 #endif
 	SCI		sci_;
 
-	// SDC 用　SPI 定義（RSPI）
-#ifdef KAEDE
-	typedef device::rspi_io<device::RSPI> SPI;
-	typedef device::PORT<device::PORTC, device::bitpos::B4> SDC_SELECT;	///< カード選択信号
-	typedef device::NULL_PORT  SDC_POWER;	///< カード電源制御（常に電源ＯＮ）
-	typedef device::PORT<device::PORTB, device::bitpos::B7> SDC_DETECT;	///< カード検出
-#else
-
-#endif
-
-	SPI		spi_;
-
-	typedef utils::sdc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC;
-	SDC		sdc_(spi_, 20000000);
-
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
 
+	SPI		spi_;
+
+	SDC		sdc_(spi_, 20000000);
+
 	net::ethernet	ethernet_;
 
-	typedef net::http_server<SDC, 16, 8192> HTTP_SERVER;
 	HTTP_SERVER		https_(ethernet_, sdc_);
 
-	typedef HTTP_SERVER::http_format format;	
-
-	typedef net::ftp_server<SDC> FTP_SERVER;
 	FTP_SERVER		ftps_(ethernet_, sdc_);
-
-	typedef net::telnet_server<1024, 256> TELNETS;
 
 	TELNETS			telnets_(ethernet_);
 
@@ -108,8 +90,58 @@ namespace {
 		ena_int();
 	}
 
-
 	utils::command<256> cmd_;
+
+	http<HTTP_SERVER>	http_(https_);
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  時間の作成
+		@param[in]	date	日付
+		@param[in]	time	時間
+	*/
+	//-----------------------------------------------------------------//
+	size_t make_time(const char* date, const char* time)
+	{
+		time_t t = get_time();
+		struct tm *m = localtime(&t);
+		int vs[3];
+		if((utils::input("%d/%d/%d", date) % vs[0] % vs[1] % vs[2]).status()) {
+			if(vs[0] >= 1900 && vs[0] < 2100) m->tm_year = vs[0] - 1900;
+			if(vs[1] >= 1 && vs[1] <= 12) m->tm_mon = vs[1] - 1;
+			if(vs[2] >= 1 && vs[2] <= 31) m->tm_mday = vs[2];		
+		} else {
+			return 0;
+		}
+
+		if((utils::input("%d:%d:%d", time) % vs[0] % vs[1] % vs[2]).status()) {
+			if(vs[0] >= 0 && vs[0] < 24) m->tm_hour = vs[0];
+			if(vs[1] >= 0 && vs[1] < 60) m->tm_min = vs[1];
+			if(vs[2] >= 0 && vs[2] < 60) m->tm_sec = vs[2];
+		} else if((utils::input("%d:%d", time) % vs[0] % vs[1]).status()) {
+			if(vs[0] >= 0 && vs[0] < 24) m->tm_hour = vs[0];
+			if(vs[1] >= 0 && vs[1] < 60) m->tm_min = vs[1];
+			m->tm_sec = 0;
+		} else {
+			return 0;
+		}
+		return mktime(m);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  GMT 時間の設定
+		@param[in]	t	GMT 時間
+	*/
+	//-----------------------------------------------------------------//
+	void set_time(time_t t)
+	{
+		if(t != 0) {
+			rtc_.set_time(t);
+		}
+	}
 }
 
 extern "C" {
@@ -279,16 +311,17 @@ extern "C" {
 
 	unsigned long millis(void)
 	{
-		return cmt_.at_task().get_millis10x() * 10;
+		return cmt_.at_task().get_millis();
 	}
 
 
+#if 0
 	void delay(unsigned long ms)
 	{
 		cmt_.at_task().set_delay(ms);
 		while(cmt_.at_task().get_delay() != 0) ;		
 	}
-
+#endif
 
 	void set_task_10ms(void (*task)(void)) {
 		cmt_.at_task().set_task_10ms(task);
@@ -367,22 +400,7 @@ int main(int argc, char** argv)
 		utils::format("%s\n") % ethernet_.get_local_ip().c_str();
 	}
 
-
-	https_.start("GR-KAEDE HTTP Server");
-	https_.set_link("/", "", [=](void) {
-		time_t t = get_time();
-		struct tm *m = localtime(&t);
-		format("%s %s %d %02d:%02d:%02d  %4d<br>\n")
-			% get_wday(m->tm_wday)
-			% get_mon(m->tm_mon)
-			% static_cast<uint32_t>(m->tm_mday)
-			% static_cast<uint32_t>(m->tm_hour)
-			% static_cast<uint32_t>(m->tm_min)
-			% static_cast<uint32_t>(m->tm_sec)
-			% static_cast<uint32_t>(m->tm_year + 1900);
-
-		https_.tag_hr(500, 3);
-	} );
+	http_.start();
 
 	ftps_.start("GR-KAEDE", "Renesas_RX64M", "KAEDE", "KAEDE");
 
