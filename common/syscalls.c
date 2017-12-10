@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 void sci_putch(char ch) __attribute__((weak));
 void sci_putch(char ch) { }
