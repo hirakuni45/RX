@@ -315,39 +315,42 @@ namespace net {
 		//-----------------------------------------------------------------//
 		bool exec_link(const char* path, bool cgi = false)
 		{
-			if(std::strcmp(path, "/favicon.ico") == 0) {
-				make_info(404, -1, false);
-				http_format::chaout().flush();  // 最終的な書き込み
-				return true;
-			}
+//			if(std::strcmp(path, "/favicon.ico") == 0) {
+//				make_info(404, -1, false);
+//				http_format::chaout().flush();  // 最終的な書き込み
+//				return false;
+//			}
 
 			int idx = find_link_(path, cgi);
-			if(idx < 0) return false;
-
-			link_t& t = link_[idx];
-
+			uint32_t org = http_format::chaout().size();
 			uint32_t clp = 0;
-			uint32_t org = 0;
-			if(!cgi) {
-				http_format::chaout().clear();
+			if(idx >= 0) {
 
-				clp = make_info(200, -1, true);
-				org = http_format::chaout().size();
-				http_format("<!DOCTYPE HTML>\n");
-				http_format("<html>\n");
+				link_t& t = link_[idx];
 
-				make_head(t.title_);
+				if(!cgi) {
+					http_format::chaout().clear();
+
+					clp = make_info(200, -1, true);
+					org = http_format::chaout().size();
+
+					http_format("<!DOCTYPE HTML>\n");
+					http_format("<html>\n");
+					make_head(t.title_);
+				}
+
+				if(t.task_) {
+					t.task_();
+				}
+
+				if(!cgi) {
+					http_format("</html>\n");
+				}
+
+			} else {
+				clp = make_info(404, -1, false);
 			}
 
-			if(t.task_) {
-				t.task_();
-			}
-
-			if(cgi) {
-				return true;
-			}
-
-			http_format("</html>\n");
 			uint32_t end = http_format::chaout().size();
 
 			debug_format("HTTP Server: body size: %d\n") % (end - org);
@@ -355,8 +358,6 @@ namespace net {
 			char tmp[5 + 1];  // 数字５文字＋終端
 			utils::sformat("%5d", tmp, sizeof(tmp)) % (end - org);
 			strncpy(&http_format::chaout().at_str()[clp], tmp, 5); // 数字部のみコピー
-
-///			debug_format("HTTP Server: body: -----\n%s\n-----\n") % http_format::chaout().at_str().c_str();
 
 			http_format::chaout().flush();  // 最終的な書き込み
 
