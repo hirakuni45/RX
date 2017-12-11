@@ -108,7 +108,6 @@ namespace net {
 		utils::color	back_color_;
 		utils::color	fore_color_;
 
-
 		static void get_path_(const char* src, char* dst) {
 			int n = 0;
 			char ch;
@@ -324,8 +323,9 @@ namespace net {
 			int idx = find_link_(path, cgi);
 			uint32_t org = http_format::chaout().size();
 			uint32_t clp = 0;
+			bool ret = false;
 			if(idx >= 0) {
-
+				ret = true;
 				link_t& t = link_[idx];
 
 				if(!cgi) {
@@ -361,7 +361,7 @@ namespace net {
 
 			http_format::chaout().flush();  // 最終的な書き込み
 
-			return true;
+			return ret;
 		}
 
 
@@ -559,8 +559,10 @@ namespace net {
 					int len = http_.read(tmp, sizeof(tmp));
 					auto pos = analize_request(tmp, len);
 					if(pos > 0) {
+
 						tmp[len] = 0;
-///						debug_format("HTTP Server: client -----\n%s-----\n") % tmp;
+///						debug_format("HTTP Server: client \n'%s'\n") % tmp;
+
 						char path[256];
 						path[0] = 0;
 						if(!line_man_.empty()) {
@@ -594,8 +596,7 @@ namespace net {
 							debug_format("HTTP Server: request fail section.\n");
 						}
 
-						task_ = task::disconnect_delay;
-						disconnect_loop_ = 5;
+						line_man_.clear();
 					}
 				} else {
 					task_ = task::disconnect_delay;
