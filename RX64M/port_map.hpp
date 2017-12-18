@@ -38,7 +38,7 @@ namespace device {
 
 	private:
 
-		static bool sub1_(peripheral t, bool enable)
+		static bool sub_1st_(peripheral t, bool enable)
 		{
 			bool ret = true;
 			switch(t) {
@@ -232,7 +232,36 @@ namespace device {
 				break;
 
 			case peripheral::IRQ0:
-
+				MPC::PD0PFS.ISEL = enable;  // PD0
+				PORTD::PMR.B0 = 0;
+				break;
+			case peripheral::IRQ1:
+				MPC::PD1PFS.ISEL = enable;  // PD1
+				PORTD::PMR.B1 = 0;
+				break;
+			case peripheral::IRQ2:
+				MPC::PD2PFS.ISEL = enable;  // PD2
+				PORTD::PMR.B2 = 0;
+				break;
+			case peripheral::IRQ3:
+				MPC::PD3PFS.ISEL = enable;  // PD3
+				PORTD::PMR.B3 = 0;
+				break;
+			case peripheral::IRQ4:
+				MPC::PD4PFS.ISEL = enable;  // PD4
+				PORTD::PMR.B4 = 0;
+				break;
+			case peripheral::IRQ5:
+				MPC::PD5PFS.ISEL = enable;  // PD5
+				PORTD::PMR.B5 = 0;
+				break;
+			case peripheral::IRQ6:
+				MPC::PD6PFS.ISEL = enable;  // PD6
+				PORTD::PMR.B6 = 0;
+				break;
+			case peripheral::IRQ7:
+				MPC::PD7PFS.ISEL = enable;  // PD7
+				PORTD::PMR.B7 = 0;
 				break;
 
 			default:
@@ -243,7 +272,7 @@ namespace device {
 		}
 
 
-		static bool sub2_(peripheral t, bool enable)
+		static bool sub_2nd_(peripheral t, bool enable)
 		{
 			bool ret = true;
 			switch(t) {
@@ -258,6 +287,12 @@ namespace device {
 					PORTA::PMR.B5 = enable;
 				}
 				break;
+
+			case peripheral::IRQ4:
+				MPC::PF5PFS.ISEL = enable;  // PF5
+				PORTF::PMR.B5 = 0;
+				break;
+
 			default:
 				ret = false;
 				break;
@@ -283,9 +318,9 @@ namespace device {
 
 			bool ret = false;
 			if(opt == option::FIRST) {
-				ret = sub1_(t, ena);
+				ret = sub_1st_(t, ena);
 			} else if(opt == option::SECOND) {
-				ret = sub2_(t, ena);
+				ret = sub_2nd_(t, ena);
 			}
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
@@ -335,10 +370,9 @@ namespace device {
 			@brief  アナログ入出力に切り替える
 			@param[in]	t	周辺機器タイプ
 			@param[in]	ena	無効にする場合「false」
-			@param[in]	opt	オプション（候補）
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, bool ena = true, option opt = option::FIRST) noexcept
+		static bool turn_analog(bool ena = true) noexcept
 		{
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可

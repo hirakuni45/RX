@@ -174,6 +174,7 @@ namespace device {
 				ICU::IPR.IRQ7 = lvl;
 				ICU::IER.IRQ7 = ena;
 				break;
+#if 0
 			case peripheral::IRQ8:
 				ICU::IER.IRQ8 = 0;
 				ICU::IPR.IRQ8 = lvl;
@@ -214,7 +215,7 @@ namespace device {
 				ICU::IPR.IRQ15 = lvl;
 				ICU::IER.IRQ15 = ena;
 				break;
-
+#endif
 			default:
 				return false;
 				break;

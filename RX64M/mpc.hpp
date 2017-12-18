@@ -347,6 +347,9 @@ namespace device {
 		static pfsy_t<0x0008C1B8> PF0PFS;
 		static pfsy_t<0x0008C1B9> PF1PFS;
 		static pfsy_t<0x0008C1BA> PF2PFS;
+		static pfsy_t<0x0008C1BB> PF3PFS;
+		static pfsy_t<0x0008C1BC> PF4PFS;
+		static pfsy_t<0x0008C1BD> PF5PFS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

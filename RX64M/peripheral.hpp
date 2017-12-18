@@ -86,21 +86,14 @@ namespace device {
 		ECCRAM,		///< ECC RAM (32K)
 		STBRAM,		///< Standby RAM (8K)
 
-		IRQ0,		///< 外部入力 IRQ0
-		IRQ1,		///< 外部入力 IRQ1
-		IRQ2,		///< 外部入力 IRQ2
-		IRQ3,		///< 外部入力 IRQ3
-		IRQ4,		///< 外部入力 IRQ4
-		IRQ5,		///< 外部入力 IRQ5
-		IRQ6,		///< 外部入力 IRQ6
-		IRQ7,		///< 外部入力 IRQ7
-		IRQ8,		///< 外部入力 IRQ8
-		IRQ9,		///< 外部入力 IRQ9
-		IRQ10,		///< 外部入力 IRQ10
-		IRQ11,		///< 外部入力 IRQ11
-		IRQ12,		///< 外部入力 IRQ12
-		IRQ13,		///< 外部入力 IRQ13
-		IRQ14,		///< 外部入力 IRQ14
-		IRQ15,		///< 外部入力 IRQ15
+		// 仮の仕様
+		IRQ0,
+		IRQ1,
+		IRQ2,
+		IRQ3,
+		IRQ4,
+		IRQ5,
+		IRQ6,
+		IRQ7,
 	};
 }
