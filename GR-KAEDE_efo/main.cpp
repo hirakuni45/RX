@@ -10,6 +10,7 @@
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
+#include "common/irq_man.hpp"
 
 namespace {
 
@@ -24,6 +25,16 @@ namespace {
 	typedef device::dac_out	DAC;
 	DAC		dac_;
 
+	class irq_task {
+	public:
+		void operator() ()
+		{
+			utils::format("IRQ\n");
+		}
+	};
+
+	typedef device::irq_man<device::peripheral::IRQ4, irq_task> IRQ;
+	IRQ		irq_;
 }
 
 extern "C" {
@@ -136,6 +147,14 @@ int main(int argc, char** argv)
 		dac_.start(DAC::output::CH0, true);
 	}
 
+	{  // IRQ4 設定
+		uint8_t int_level = 2;
+		bool ret = irq_.start(int_level, IRQ::edge::POSITIVE, device::port_map::option::SECOND);
+		if(!ret) {
+			utils::format("IRQ start fail...\n");
+		}
+	}
+
 	utils::format("\nStart KAEDE for EFO\n");
 
 	uint32_t cnt = 0;
@@ -144,7 +163,7 @@ int main(int argc, char** argv)
 		cmt_.sync();
 
 		++cnt;
-		if(cnt >= 32) {
+		if(cnt >= 320) {
 			cnt = 0;
 		}
 
