@@ -717,6 +717,144 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  IRQ コントロールレジスタ i（IRQCRi）（i = 0 ～ 15）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct irqcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B2, 2>  IRQMD;
+		};
+		static irqcr_t<0x00087500>  IRQCR0;
+		static irqcr_t<0x00087501>  IRQCR1;
+		static irqcr_t<0x00087502>  IRQCR2;
+		static irqcr_t<0x00087503>  IRQCR3;
+		static irqcr_t<0x00087504>  IRQCR4;
+		static irqcr_t<0x00087505>  IRQCR5;
+		static irqcr_t<0x00087506>  IRQCR6;
+		static irqcr_t<0x00087507>  IRQCR7;
+		static irqcr_t<0x00087508>  IRQCR8;
+		static irqcr_t<0x00087509>  IRQCR9;
+		static irqcr_t<0x0008750A>  IRQCR10;
+		static irqcr_t<0x0008750B>  IRQCR11;
+		static irqcr_t<0x0008750C>  IRQCR12;
+		static irqcr_t<0x0008750D>  IRQCR13;
+		static irqcr_t<0x0008750E>  IRQCR14;
+		static irqcr_t<0x0008750F>  IRQCR15;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  IRQ 端子デジタルフィルタ許可レジスタ 0（IRQFLTE0）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct irqflte0_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> FLTEN0;
+			bit_rw_t<io_, bitpos::B1> FLTEN1;
+			bit_rw_t<io_, bitpos::B2> FLTEN2;
+			bit_rw_t<io_, bitpos::B3> FLTEN3;
+			bit_rw_t<io_, bitpos::B4> FLTEN4;
+			bit_rw_t<io_, bitpos::B5> FLTEN5;
+			bit_rw_t<io_, bitpos::B6> FLTEN6;
+			bit_rw_t<io_, bitpos::B7> FLTEN7;
+		};
+		static irqflte0_t<0x00087520> IRQFLTE0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  IRQ 端子デジタルフィルタ許可レジスタ 1（IRQFLTE1）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct irqflte1_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> FLTEN8;
+			bit_rw_t<io_, bitpos::B1> FLTEN9;
+			bit_rw_t<io_, bitpos::B2> FLTEN10;
+			bit_rw_t<io_, bitpos::B3> FLTEN11;
+			bit_rw_t<io_, bitpos::B4> FLTEN12;
+			bit_rw_t<io_, bitpos::B5> FLTEN13;
+			bit_rw_t<io_, bitpos::B6> FLTEN14;
+			bit_rw_t<io_, bitpos::B7> FLTEN15;
+		};
+		static irqflte1_t<0x00087521> IRQFLTE1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	IRQ 端子デジタルフィルタ設定レジスタ 0（IRQFLTC0）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct irqfltc0_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  2> FCLKSEL0;
+			bits_rw_t<io_, bitpos::B2,  2> FCLKSEL1;
+			bits_rw_t<io_, bitpos::B4,  2> FCLKSEL2;
+			bits_rw_t<io_, bitpos::B6,  2> FCLKSEL3;
+			bits_rw_t<io_, bitpos::B8,  2> FCLKSEL4;
+			bits_rw_t<io_, bitpos::B10, 2> FCLKSEL5;
+			bits_rw_t<io_, bitpos::B12, 2> FCLKSEL6;
+			bits_rw_t<io_, bitpos::B14, 2> FCLKSEL7;
+		};
+		static irqfltc0_t<0x00087528> IRQFLTC0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	IRQ 端子デジタルフィルタ設定レジスタ 1（IRQFLTC1）
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct irqfltc1_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  2> FCLKSEL8;
+			bits_rw_t<io_, bitpos::B2,  2> FCLKSEL9;
+			bits_rw_t<io_, bitpos::B4,  2> FCLKSEL10;
+			bits_rw_t<io_, bitpos::B6,  2> FCLKSEL11;
+			bits_rw_t<io_, bitpos::B8,  2> FCLKSEL12;
+			bits_rw_t<io_, bitpos::B10, 2> FCLKSEL13;
+			bits_rw_t<io_, bitpos::B12, 2> FCLKSEL14;
+			bits_rw_t<io_, bitpos::B14, 2> FCLKSEL15;
+		};
+		static irqfltc1_t<0x0008752A> IRQFLTC1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  グループ割り込み要求レジスタ
 			@param[in]	base	ベースアドレス
 		*/
