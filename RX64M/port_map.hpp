@@ -32,6 +32,7 @@ namespace device {
 			FIRST,		///< 第１候補
 			SECOND,		///< 第２候補
 			THIRD,		///< 第３候補
+			FORCE,		///< 第４候補
 		};
 
 
@@ -230,6 +231,10 @@ namespace device {
 				}
 				break;
 
+			case peripheral::IRQ0:
+
+				break;
+
 			default:
 				ret = false;
 				break;
@@ -322,6 +327,29 @@ namespace device {
 
 			return ret;
 		}
+
+
+#if 0
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アナログ入出力に切り替える
+			@param[in]	t	周辺機器タイプ
+			@param[in]	ena	無効にする場合「false」
+			@param[in]	opt	オプション（候補）
+		*/
+		//-----------------------------------------------------------------//
+		static bool turn(peripheral t, bool ena = true, option opt = option::FIRST) noexcept
+		{
+			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+
+
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
+#endif
 	};
 }
 

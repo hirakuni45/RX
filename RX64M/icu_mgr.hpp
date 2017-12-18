@@ -127,13 +127,94 @@ namespace device {
 			case peripheral::TPU3:
 			case peripheral::TPU4:
 			case peripheral::TPU5:
-
 				break;
 
 			case peripheral::ETHERC0:
 				break;
 			case peripheral::ETHERC1:
 				break;
+
+			case peripheral::IRQ0:
+				ICU::IER.IRQ0 = 0;
+				ICU::IPR.IRQ0 = lvl;
+				ICU::IER.IRQ0 = ena;
+				break;
+			case peripheral::IRQ1:
+				ICU::IER.IRQ1 = 0;
+				ICU::IPR.IRQ1 = lvl;
+				ICU::IER.IRQ1 = ena;
+				break;
+			case peripheral::IRQ2:
+				ICU::IER.IRQ2 = 0;
+				ICU::IPR.IRQ2 = lvl;
+				ICU::IER.IRQ2 = ena;
+				break;
+			case peripheral::IRQ3:
+				ICU::IER.IRQ3 = 0;
+				ICU::IPR.IRQ3 = lvl;
+				ICU::IER.IRQ3 = ena;
+				break;
+			case peripheral::IRQ4:
+				ICU::IER.IRQ4 = 0;
+				ICU::IPR.IRQ4 = lvl;
+				ICU::IER.IRQ4 = ena;
+				break;
+			case peripheral::IRQ5:
+				ICU::IER.IRQ5 = 0;
+				ICU::IPR.IRQ5 = lvl;
+				ICU::IER.IRQ5 = ena;
+				break;
+			case peripheral::IRQ6:
+				ICU::IER.IRQ6 = 0;
+				ICU::IPR.IRQ6 = lvl;
+				ICU::IER.IRQ6 = ena;
+				break;
+			case peripheral::IRQ7:
+				ICU::IER.IRQ7 = 0;
+				ICU::IPR.IRQ7 = lvl;
+				ICU::IER.IRQ7 = ena;
+				break;
+			case peripheral::IRQ8:
+				ICU::IER.IRQ8 = 0;
+				ICU::IPR.IRQ8 = lvl;
+				ICU::IER.IRQ8 = ena;
+				break;
+			case peripheral::IRQ9:
+				ICU::IER.IRQ9 = 0;
+				ICU::IPR.IRQ9 = lvl;
+				ICU::IER.IRQ9 = ena;
+				break;
+			case peripheral::IRQ10:
+				ICU::IER.IRQ10 = 0;
+				ICU::IPR.IRQ10 = lvl;
+				ICU::IER.IRQ10 = ena;
+				break;
+			case peripheral::IRQ11:
+				ICU::IER.IRQ11 = 0;
+				ICU::IPR.IRQ11 = lvl;
+				ICU::IER.IRQ11 = ena;
+				break;
+			case peripheral::IRQ12:
+				ICU::IER.IRQ12 = 0;
+				ICU::IPR.IRQ12 = lvl;
+				ICU::IER.IRQ12 = ena;
+				break;
+			case peripheral::IRQ13:
+				ICU::IER.IRQ13 = 0;
+				ICU::IPR.IRQ13 = lvl;
+				ICU::IER.IRQ13 = ena;
+				break;
+			case peripheral::IRQ14:
+				ICU::IER.IRQ14 = 0;
+				ICU::IPR.IRQ14 = lvl;
+				ICU::IER.IRQ14 = ena;
+				break;
+			case peripheral::IRQ15:
+				ICU::IER.IRQ15 = 0;
+				ICU::IPR.IRQ15 = lvl;
+				ICU::IER.IRQ15 = ena;
+				break;
+
 			default:
 				return false;
 				break;
@@ -263,5 +344,6 @@ namespace device {
 				break;
 			}
 		}
+
 	};
 }
