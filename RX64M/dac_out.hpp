@@ -63,12 +63,23 @@ namespace device {
 			R12DA::DADPR.DPSEL = 1;  // 左詰め（上位１２ビット無視）
 
 			R12DA::DACR.DAE = 0;
+
 			if(otype == output::CH0) {
 				R12DA::DACR.DAOE0 = 1;
 				R12DA::DAAMPCR.DAAMP0 = ampe;
+
+				MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+				MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+				MPC::P03PFS.ASEL = 1;
+				MPC::PWPR = device::MPC::PWPR.B0WI.b();
 			} else if(otype == output::CH1) {
 				R12DA::DACR.DAOE1 = 1;
 				R12DA::DAAMPCR.DAAMP1 = ampe;
+
+				MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
+				MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+				MPC::P05PFS.ASEL = 1;
+				MPC::PWPR = device::MPC::PWPR.B0WI.b();
 			} else {
 				return false;
 			}
