@@ -276,6 +276,19 @@ namespace device {
 		{
 			bool ret = true;
 			switch(t) {
+
+			case peripheral::SCI2:
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					MPC::P50PFS.PSEL = sel;  // TXD2/SMOSI2
+					MPC::P51PFS.PSEL = sel;  // SCK2
+					MPC::P52PFS.PSEL = sel;  // RXD2/SMISO2
+					PORT5::PMR.B0 = enable;
+					PORT5::PMR.B1 = enable;
+					PORT5::PMR.B2 = enable;
+				}
+				break;
+
 			case peripheral::RSPI:
 				{
 					uint8_t sel = enable ? 0b001101 : 0;
