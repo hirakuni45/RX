@@ -90,7 +90,7 @@ namespace chip {
 			uint8_t a = spi_.xchg(span >> 16);
 			uint8_t b = spi_.xchg(span >> 8);
 			spi_.xchg(span);
-			return (static_cast<uint16_t>(a) << 8) | b; 
+			return (static_cast<uint16_t>(a) << 8) | static_cast<uint16_t>(b); 
 		}
 
 	public:
@@ -207,11 +207,10 @@ namespace chip {
 		{
 ///			SCKI::P = 0;
 ///			SDI::P = 0;
-
 #if 0
-			if(BUSY::P() != 0) {
-				return false;
-			}
+//			if(BUSY::P() != 0) {
+//				return false;
+//			}
 
 			// tBUSYLH: CNV=1 で BUSY が応答する最大時間 (max 30ns) @n
 			// tCNVH: CNV 要求パルス (min 40ns)
