@@ -26,10 +26,15 @@ namespace {
 	DAC		dac_;
 
 	class irq_task {
+		uint32_t	cnt_;
+
 	public:
+		irq_task() : cnt_(0) { }
+
 		void operator() ()
 		{
-			utils::format("IRQ\n");
+			++cnt_;
+			utils::format("IRQ: %d\n") % cnt_;
 		}
 	};
 
@@ -167,7 +172,7 @@ int main(int argc, char** argv)
 			cnt = 0;
 		}
 
-		da += 1024;
+		da += 128;
 		dac_.out0(da);
 
 		auto n = cnt / 10;
