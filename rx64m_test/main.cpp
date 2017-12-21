@@ -491,7 +491,9 @@ namespace seeda {
 	{
 		if(!rtc_.set_time(t)) {
 			utils::format("Stall RTC write...\n");
+			return;
 		}
+		operating_org_ = t;
 	}
 
 
