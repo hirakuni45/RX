@@ -204,6 +204,7 @@ namespace device {
 			SCI::SPMR.CKPH  = 0;
 
 			if(brr) --brr;
+brr = 1;
 			SCI::BRR = static_cast<uint8_t>(brr);
 
 			uint8_t scr = 0;
