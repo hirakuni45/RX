@@ -25,7 +25,7 @@
 
 namespace {
 
-	static const int main_version_ = 40;
+	static const int main_version_ = 41;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -81,16 +81,18 @@ namespace {
 #endif
 	EADC		eadc_;
 
-	uint16_t ch0_src_[1024];
-	uint16_t ch1_src_[1024];
+	uint16_t ch0_src_[1024+1];
+	uint16_t ch1_src_[1024+1];
 
 	volatile uint16_t	cap_num_;
 	volatile uint16_t	cap_pos_;
 
-	void capture_(uint16_t num)
+	void capture_request_(uint16_t num)
 	{
+		if(num > 1024) num = 1024;
+		else if(num == 0) return;
 		cap_pos_ = 0;
-		cap_num_ = num;
+		cap_num_ = num + 1;
 	}
 
 	class capture_task {
@@ -101,11 +103,10 @@ namespace {
 				LED::P = 1;
 				eadc_.convert();
 				LED::P = 0;
+				--cap_num_;
 				ch0_src_[cap_pos_] = eadc_.get_value(0);
 				ch1_src_[cap_pos_] = eadc_.get_value(1);	
-				--cap_num_;
 				++cap_pos_;
-				cap_pos_ &= 1023;
 			}
 		}
 	};
@@ -133,6 +134,8 @@ namespace {
 	DAC		dac_;
 
 	volatile uint16_t cap_count_;
+	volatile uint16_t irq_count_;
+	uint16_t irq_state_;
 
 	// trigger task
 	class irq_task {
@@ -140,8 +143,9 @@ namespace {
 		void operator() ()
 		{
 			if(cap_count_ > 0) {
-				capture_(cap_count_);
+				capture_request_(cap_count_);
 			}
+			++irq_count_;
 		}
 	};
 
@@ -329,7 +333,7 @@ int main(int argc, char** argv)
 	if(0) {
 		while(1) {
 			while(cap_num_ > 0) ;
-			capture_(1024);
+			capture_request_(1024);
 		}
 	}
 
@@ -348,17 +352,20 @@ int main(int argc, char** argv)
 			v += 64;
 		}
 	} else {
-		for(int i = 0; i < 1024; ++i) {
+		for(int i = 0; i <= 1024; ++i) {
 			ch0_src_[i] = 0;
 			ch1_src_[i] = 0;
 		}
 	}
 
 	// キャプチャー
-	capture_(1024);
+	capture_request_(1024);
 
 	// 初期設定
 	dac_.out0(32768);  // トリガー電圧０Ｖ
+
+	irq_count_ = 0;
+	irq_state_ = 0;
 
 	uint8_t cnt = 0;
 	while(1) {
@@ -371,10 +378,10 @@ int main(int argc, char** argv)
 				if(cmd == CMD::START) {
 					task_ = TASK::LENGTH;
 				} else if(cmd == CMD::ASC_CNVTEST) {
-					capture_(1024);
+					capture_request_(1024);
 					send_task_ = SEND_TASK::ASCII;
 				} else if(cmd == CMD::ASC_CNVTESTS) {
-					capture_(1);
+					capture_request_(1);
 					send_task_ = SEND_TASK::ASCII2;
 				} else if(cmd == CMD::END) {
 					if(send_task_ == SEND_TASK::MULTI) {  // 波形取得を強制終了
@@ -413,6 +420,7 @@ int main(int argc, char** argv)
 				if(volt_ < 32768) trg = false;
 				cap_count_ = length_;
 				 setup_irq_(trg);
+				irq_state_ = irq_count_;
 				irq_.enable();
 				if(length_ == 0) {
 					send_task_ = SEND_TASK::SINGLE;
@@ -437,15 +445,16 @@ int main(int argc, char** argv)
 			break;
 
 		case SEND_TASK::MULTI:
+			if(irq_state_ == irq_count_) break;
 			if(cap_num_ > 0) break;
-			send_wave_(0x01, length_, ch0_src_);
-			send_wave_(0x02, length_, ch1_src_);
+			send_wave_(0x01, length_, ch0_src_ + 1);
+			send_wave_(0x02, length_, ch1_src_ + 1);
 			send_task_ = SEND_TASK::READY;
 			break;
 
 		case SEND_TASK::ASCII:
 			if(cap_num_ > 0) break;
-			for(uint16_t i = 0; i < 1024; ++i) {
+			for(uint16_t i = 1; i <= 1024; ++i) {
 				char tmp[128];
 				utils::sformat("%d,%d,%d\r\n", tmp, sizeof(tmp)) % i % ch0_src_[i] % ch1_src_[i];
 				m_sci_.puts(tmp);
@@ -456,7 +465,7 @@ int main(int argc, char** argv)
 			if(cap_num_ > 0) break;
 			{
 				char tmp[128];
-				utils::sformat("%d,%d\r\n", tmp, sizeof(tmp)) % ch0_src_[0] % ch1_src_[0];
+				utils::sformat("%d,%d\r\n", tmp, sizeof(tmp)) % ch0_src_[1] % ch1_src_[1];
 				m_sci_.puts(tmp);
 			}
 			send_task_ = SEND_TASK::READY;
