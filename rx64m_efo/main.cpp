@@ -6,6 +6,7 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
+#include "common/cmt_io.hpp"
 #include "common/tpu_io.hpp"
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
@@ -24,7 +25,7 @@
 
 namespace {
 
-	static const int main_version_ = 11;
+	static const int main_version_ = 40;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -35,6 +36,7 @@ namespace {
 		VER   = 0x21,
 
 		ASC_CNVTEST = 'T',
+		ASC_CNVTESTS = 't',
 	};
 
 	enum class TASK : uint8_t {
@@ -47,64 +49,14 @@ namespace {
 		READY,
 		SINGLE,
 		MULTI,
-		ASCII,
+		ASCII,		///< T コマンド（１０２４サンプルテスト）
+		ASCII2,		///< t コマンド（１サンプルテスト）
 	};
-
-	class timer_task {
-
-	public:
-		void operator() ()
-		{
-		}
-	};
-
-
-	typedef device::tpu_io<device::TPU0, timer_task> TPU0;
-	TPU0		tpu0_;
 
 	typedef device::PORT<device::PORTJ, device::bitpos::B5> LED;
 
-#ifdef UART_DEBUG
-	typedef device::PORT<device::PORTF, device::bitpos::B5> TRG;
-
-	typedef utils::fifo<uint8_t, 1024> BUFFER;
-	typedef device::sci_io<device::SCI12, BUFFER, BUFFER> D_SCI;
-	D_SCI			d_sci_;
-#else
-	typedef utils::fifo<uint8_t, 1024> BUFFER;
-	typedef device::sci_io<device::SCI0,  BUFFER, BUFFER> D_SCI;
-	D_SCI			d_sci_;
-
-	typedef utils::fifo<uint8_t, 4096> SENDBUF;
-	typedef device::sci_io<device::SCI12, BUFFER, SENDBUF> M_SCI;
-	M_SCI			m_sci_;
-#endif
-
-	typedef device::dac_out	DAC;
-	DAC		dac_;
-
-	volatile uint32_t irq_count_;
-
-	// trigger task
-	class irq_task {
-	public:
-		void operator() ()
-		{
-			irq_count_++;
-		}
-	};
-
-	typedef device::irq_man<device::peripheral::IRQ4, irq_task> IRQ;
-	IRQ		irq_;
-
-	TASK	task_ = TASK::STATE;
-
-	uint16_t	length_;
-	uint16_t	volt_;
-	uint16_t	count_;
-	uint16_t	test_wait_;
-
-	volatile uint32_t irq_state_;
+	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
+	CMT		cmt_;
 
 	// LTC2348-16 A/D 制御ポート定義
 	// LTC2348ILX-16 (38:BUSY) ---> P16(40) / IRQ6
@@ -129,12 +81,80 @@ namespace {
 #endif
 	EADC		eadc_;
 
+	uint16_t ch0_src_[1024];
+	uint16_t ch1_src_[1024];
+
+	volatile uint16_t	cap_num_;
+	volatile uint16_t	cap_pos_;
+
+	void capture_(uint16_t num)
+	{
+		cap_pos_ = 0;
+		cap_num_ = num;
+	}
+
+	class capture_task {
+	public:
+		void operator() ()
+		{
+			if(cap_num_ > 0) {
+				LED::P = 1;
+				eadc_.convert();
+				LED::P = 0;
+				ch0_src_[cap_pos_] = eadc_.get_value(0);
+				ch1_src_[cap_pos_] = eadc_.get_value(1);	
+				--cap_num_;
+				++cap_pos_;
+				cap_pos_ &= 1023;
+			}
+		}
+	};
+
+	typedef device::tpu_io<device::TPU0, capture_task> TPU0;
+	TPU0		tpu0_;
+
+#ifdef UART_DEBUG
+	typedef device::PORT<device::PORTF, device::bitpos::B5> TRG;
+
+	typedef utils::fifo<uint8_t, 1024> BUFFER;
+	typedef device::sci_io<device::SCI12, BUFFER, BUFFER> D_SCI;
+	D_SCI			d_sci_;
+#else
+	typedef utils::fifo<uint8_t, 1024> BUFFER;
+	typedef device::sci_io<device::SCI0,  BUFFER, BUFFER> D_SCI;
+	D_SCI			d_sci_;
+
+	typedef utils::fifo<uint8_t, 4096> SENDBUF;
+	typedef device::sci_io<device::SCI12, BUFFER, SENDBUF> M_SCI;
+	M_SCI			m_sci_;
+#endif
+
+	typedef device::dac_out	DAC;
+	DAC		dac_;
+
+	volatile uint16_t cap_count_;
+
+	// trigger task
+	class irq_task {
+	public:
+		void operator() ()
+		{
+			if(cap_count_ > 0) {
+				capture_(cap_count_);
+			}
+		}
+	};
+
+	typedef device::irq_man<device::peripheral::IRQ4, irq_task> IRQ;
+	IRQ		irq_;
+
+	TASK	task_ = TASK::STATE;
+
+	uint16_t	length_;
+	uint16_t	volt_;
+	uint16_t	count_;
+
 	SEND_TASK  	send_task_;
-
-#ifndef UART_DEBUG
-	
-
-
 
 	void send_wave_(char ch, uint16_t src)
 	{
@@ -144,9 +164,6 @@ namespace {
 		m_sci_.putch(src & 0xff);
 	}
 
-
-	uint16_t ch0_src_[1024];
-	uint16_t ch1_src_[1024];
 
 	void send_wave_(char ch, uint16_t len, const uint16_t* src)
 	{
@@ -158,7 +175,6 @@ namespace {
 			m_sci_.putch(src[i] & 0xff);
 		}
 	}
-#endif
 
 	void setup_irq_(bool positive)
 	{
@@ -170,17 +186,6 @@ namespace {
 		if(!ret) {
 			utils::format("IRQ start fail...\n");
 			return;
-		}
-		irq_.enable();   // 割り込み待機
-	}
-
-
-	void capture_(uint16_t num)
-	{
-		for(int i = 0; i < num; ++i) {
-			eadc_.convert();
-			ch0_src_[i] = eadc_.get_value(0);
-			ch1_src_[i] = eadc_.get_value(1);
 		}
 	}
 }
@@ -264,7 +269,7 @@ int main(int argc, char** argv)
 	// Base Clock 12.5MHz
 	// PLLDIV: 1/1, STC: 16 倍(200MHz)
 	device::SYSTEM::PLLCR = device::SYSTEM::PLLCR.PLIDIV.b(0) |
-							device::SYSTEM::PLLCR.STC.b(0b011111);
+							device::SYSTEM::PLLCR.STC.b(0b100011);
 	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
 
@@ -280,16 +285,28 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
+	{
+		// タイマー設定（100Hz）
+		uint8_t cmt_irq_level = 3;
+		cmt_.start(100, cmt_irq_level);
+	}
+
+	{  // TPU0 設定
+		uint8_t int_level = 4;
+		if(!tpu0_.start(100000, int_level)) {
+			utils::format("TPU0 not start ...\n");
+		}
+	}
+
 	{  // DEBUG SCI 設定
 		uint8_t int_level = 1;
 		d_sci_.start(115200, int_level);
 	}
 
-	{  // タイマー設定、１００Ｈｚ（１０ｍｓ）
-		uint8_t int_level = 5;
-		if(!tpu0_.start(100, int_level)) {
-///			utils::format("TPU0 not start ...\n");
-		}
+	{  // MAIN SCI 設定
+		uint8_t int_level = 1;
+		m_sci_.start(115200, int_level);
+		m_sci_.auto_crlf(false);
 	}
 
 	{  // D/A CH0, AMP enable
@@ -302,81 +319,50 @@ int main(int argc, char** argv)
 		device::port_map::turn(device::peripheral::SCI2, true, device::port_map::option::SECOND);
 		// 内臓リファレンスと内臓バッファ
 		// VREFIN: 2.024V、VREFBUF: 4.096V、Analog range: -10.24V to +10.24V
-		if(!eadc_.start(750000, EADC::span_type::M10_24P10_24)) {
+///		if(!eadc_.start(750000, EADC::span_type::M10_24P10_24)) {
+		if(!eadc_.start(800000, EADC::span_type::M10_24P10_24)) {
 			utils::format("LTC2348_16 not found...\n");
 		}
 	}
 
-	utils::format("\nStart EFO\n");
-
-#if 0
-	while(1) {
-		LED::P = !LED::P();
-		capture_(1024);
-	}
-#endif
-
-#ifdef UART_DEBUG	
-	dac_.out0(32768 + 8192);  // トリガー電圧５Ｖ
-	irq_state_ = irq_count_;
-	setup_irq_(true);
-
-	uint8_t cnt = 0;
-	uint32_t nnn = 0;
-	while(1) {
-		tpu0_.sync();
-
-		eadc_.convert();
-		auto ch0 = eadc_.get_value(0);
-		auto ch1 = eadc_.get_value(1);
-#if 0
-		if(irq_state_ != irq_count_) {
-			utils::format("Trigger: %d\n") % nnn;
-			++nnn;
-			irq_state_ = irq_count_;
-			irq_.enable();
-		}
-#endif
-		++cnt;
-		if(cnt >= 50) {
-//			utils::format("TRG: %d\n") % static_cast<uint16_t>(TRG::P());
-			utils::format("(%d) CH0: %d, CH1: %d\n") % nnn % ch0 % ch1;
-			++nnn;
-			cnt = 0;
-		}
-		if(cnt >= 35) {
-			LED::P = 1;
-		} else {
-			LED::P = 0;
+	// キャプチャー時間計測
+	if(0) {
+		while(1) {
+			while(cap_num_ > 0) ;
+			capture_(1024);
 		}
 	}
 
-#else
-	{  // MAIN SCI 設定
-		uint8_t int_level = 1;
-		m_sci_.start(115200, int_level);
-		m_sci_.auto_crlf(false);
+	if(0) {
+		uint16_t brr = device::SCI2::BRR();
+		char tmp[128];
+		utils::sformat("BRR: %d\r\n", tmp, sizeof(tmp)) % brr;
+		m_sci_.puts(tmp);
 	}
 
-	utils::format("\nStart EFO\n");
-
-	if(1) {  // test wave data
+	if(0) {  // test wave data
 		uint16_t v = 0;
 		for(int i = 0; i < 1024; ++i) {
 			ch0_src_[i] = v;
 			ch1_src_[i] = v + 32768;
 			v += 64;
 		}
+	} else {
+		for(int i = 0; i < 1024; ++i) {
+			ch0_src_[i] = 0;
+			ch1_src_[i] = 0;
+		}
 	}
 
+	// キャプチャー
+	capture_(1024);
+
 	// 初期設定
-	dac_.out0(32768 + 8192);  // トリガー電圧５Ｖ
-	irq_state_ = irq_count_;
-	setup_irq_(true);
+	dac_.out0(32768);  // トリガー電圧０Ｖ
 
 	uint8_t cnt = 0;
 	while(1) {
-		tpu0_.sync();
+		cmt_.sync();
 
 		switch(task_) {
 		case TASK::STATE:
@@ -385,7 +371,11 @@ int main(int argc, char** argv)
 				if(cmd == CMD::START) {
 					task_ = TASK::LENGTH;
 				} else if(cmd == CMD::ASC_CNVTEST) {
+					capture_(1024);
 					send_task_ = SEND_TASK::ASCII;
+				} else if(cmd == CMD::ASC_CNVTESTS) {
+					capture_(1);
+					send_task_ = SEND_TASK::ASCII2;
 				} else if(cmd == CMD::END) {
 					if(send_task_ == SEND_TASK::MULTI) {  // 波形取得を強制終了
 						send_task_ = SEND_TASK::READY;
@@ -421,14 +411,13 @@ int main(int argc, char** argv)
 				dac_.out0(volt_);  // トリガー電圧設定
 				bool trg = true;
 				if(volt_ < 32768) trg = false;
-				irq_state_ = irq_count_;
-				setup_irq_(trg);
+				cap_count_ = length_;
+				 setup_irq_(trg);
 				irq_.enable();
 				if(length_ == 0) {
 					send_task_ = SEND_TASK::SINGLE;
 				} else {
 					send_task_ = SEND_TASK::MULTI;
-					test_wait_ = 100;
 				}
 			}
 			break;
@@ -440,6 +429,7 @@ int main(int argc, char** argv)
 		switch(send_task_) {
 
 		case SEND_TASK::SINGLE:
+			if(cap_num_ > 0) break;
 			eadc_.convert();
 			send_wave_(0x01, eadc_.get_value(0));
 			send_wave_(0x02, eadc_.get_value(1));
@@ -447,38 +437,31 @@ int main(int argc, char** argv)
 			break;
 
 		case SEND_TASK::MULTI:
-			if(test_wait_ > 0) {
-				test_wait_--;
-				break;
-			}
-			if(irq_state_ != irq_count_) {
-				capture_(length_);
-				irq_state_ = irq_count_;
-				irq_.enable();
-				send_wave_(0x01, length_, ch0_src_);
-				send_wave_(0x02, length_, ch1_src_);
-				send_task_ = SEND_TASK::READY;
-			}
+			if(cap_num_ > 0) break;
+			send_wave_(0x01, length_, ch0_src_);
+			send_wave_(0x02, length_, ch1_src_);
+			send_task_ = SEND_TASK::READY;
 			break;
 
 		case SEND_TASK::ASCII:
-			if(0) {
-				eadc_.convert();
+			if(cap_num_ > 0) break;
+			for(uint16_t i = 0; i < 1024; ++i) {
 				char tmp[128];
-				uint16_t ch0 = eadc_.get_value(0);
-				uint16_t ch1 = eadc_.get_value(1);
-				utils::sformat("%d,%d\r\n", tmp, sizeof(tmp)) % ch0 % ch1;
+				utils::sformat("%d,%d,%d\r\n", tmp, sizeof(tmp)) % i % ch0_src_[i] % ch1_src_[i];
 				m_sci_.puts(tmp);
-			} else {
-				capture_(1024);
-				for(uint16_t i = 0; i < 1024; ++i) {
-					char tmp[128];
-					utils::sformat("%d,%d,%d\r\n", tmp, sizeof(tmp)) % i % ch0_src_[i] % ch1_src_[i];
-					m_sci_.puts(tmp);
-				}
 			}
 			send_task_ = SEND_TASK::READY;
 			break;
+		case SEND_TASK::ASCII2:
+			if(cap_num_ > 0) break;
+			{
+				char tmp[128];
+				utils::sformat("%d,%d\r\n", tmp, sizeof(tmp)) % ch0_src_[0] % ch1_src_[0];
+				m_sci_.puts(tmp);
+			}
+			send_task_ = SEND_TASK::READY;
+			break;
+
 
 		default:
 			break;
@@ -494,6 +477,5 @@ int main(int argc, char** argv)
 			LED::P = 0;
 		}
 	}
-#endif
 }
 
