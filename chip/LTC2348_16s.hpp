@@ -69,15 +69,15 @@ namespace chip {
 			uint32_t mask = 0x00800000;
 			uint32_t d0 = 0;
 			while(mask > 0) {
-				d0 <<= 1;
-				d0 |= SDO::P();
-
 				SCKI::P = 0;
-
 				SDI::P = span & mask;
+
+				d0 <<= 1;
 				mask >>= 1;
 
 				SCKI::P = 1;
+
+				d0 |= SDO::P();
 			}
 			data_[0 + ofs] = d0;
 		}

@@ -85,7 +85,7 @@ namespace chip {
 		}
 #endif
 
-		uint16_t get_data_loop_(uint32_t span)
+		inline uint16_t get_data_loop_(uint32_t span)
 		{
 			uint8_t a = spi_.xchg(span >> 16);
 			uint8_t b = spi_.xchg(span >> 8);
@@ -131,7 +131,7 @@ namespace chip {
 			{  // tCONV: 500ns/ch 200ksps
 				uint32_t cnt = static_cast<uint32_t>(F_ICLK) / 200000;
 				if(cnt > 65535) return false;
-				cnv_loop_ = cnt;
+				cnv_loop_ = cnt * 2;
 			}
 
 			uint32_t ss = 0;
@@ -208,9 +208,9 @@ namespace chip {
 ///			SCKI::P = 0;
 ///			SDI::P = 0;
 #if 0
-//			if(BUSY::P() != 0) {
-//				return false;
-//			}
+			if(BUSY::P() != 0) {
+				return false;
+			}
 
 			// tBUSYLH: CNV=1 で BUSY が応答する最大時間 (max 30ns) @n
 			// tCNVH: CNV 要求パルス (min 40ns)
@@ -230,27 +230,33 @@ namespace chip {
 				}
 			}
 #endif
+
+#if 0
 			CSN::P = 0;
 			CNV::P = 1;
 
 			// 変換待ち 最大 500ns
-			{
+			if(1) {
 				uint16_t n = cnv_loop_;
 				while(n > 0) {
 					if(BUSY::P() == 0) break;
 					--n;
 				}
-				CNV::P = 0;
 				if(n == 0) {
 					CSN::P = 1;
 					return false;
 				}
+				CNV::P = 0;
 			}
+#endif
+			CNV::P = 0;
 
+			CSN::P = 0;
 			data_[0] = get_data_loop_(span_);
 			data_[1] = get_data_loop_(0x000000);
-
 			CSN::P = 1;
+
+			CNV::P = 1;
 
 			return true;
 		}
