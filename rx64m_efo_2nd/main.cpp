@@ -9,12 +9,13 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
-#include "common/tpu_io.hpp"
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
+#include "common/tpu_io.hpp"
+#include "common/fixed_fifo.hpp"
 
-// GR-KAEDE を使う場合有効にする
-#define GR_KAEDE
+// GR-KAEDE を使う場合有効にする（通常 Makefile で設定）
+//#define GR_KAEDE
 
 namespace {
 
@@ -52,9 +53,6 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B2> LED2;
 	typedef device::PORT<device::PORT0, device::bitpos::B3> LED3;
 
-	typedef device::cmt_io<device::CMT0, utils::null_task> CMT0;
-	CMT0	cmt_;
-
 	typedef utils::fifo<uint8_t, 4096> BUFFER;
 	typedef device::sci_io<device::SCI7, BUFFER, BUFFER> SCI;
 
@@ -64,41 +62,38 @@ namespace {
 
 #endif
 
-#if 0
-	typedef device::PORT<device::PORTJ, device::bitpos::B5> LED;
-
 	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
 	CMT		cmt_;
 
-	// LTC2348-16 A/D 制御ポート定義
-	// LTC2348ILX-16 (38:BUSY) ---> P16(40) / IRQ6
-	// LTC2348ILX-16 (24:CNV)  ---> PB3(82) / MTIOC0A
-	// LTC2348ILX-16 (37:SDI)  ---> P50(56) / SMOSI2
-	// LTC2348ILX-16 (25:SDO0) ---> P52(54) / SMISO2
-	// LTC2348ILX-16 (26:SDO1) ---> P25(32) / SMISO3
-	// LTC2348ILX-16 (29:SCKI) ---> P51(55) / SCK2、P24(33) / SCK3
-	typedef device::PORT<device::PORT4, device::bitpos::B0> LTC_CSN;   // P40(141)
-	typedef device::PORT<device::PORTB, device::bitpos::B3> LTC_CNV;
-	typedef device::PORT<device::PORT1, device::bitpos::B6> LTC_BUSY;
-	typedef device::PORT<device::PORT5, device::bitpos::B3> LTC_PD;    // P53(53)
-#ifdef SOFT_SPI
-	typedef device::PORT<device::PORT5, device::bitpos::B0> LTC_SDI;
-	typedef device::PORT<device::PORT5, device::bitpos::B1> LTC_SCKI;
-	typedef device::PORT<device::PORT5, device::bitpos::B2> LTC_SDO0;
-	typedef chip::LTC2348_16a<LTC_CSN, LTC_CNV, LTC_BUSY, LTC_SDI, LTC_SCKI, LTC_SDO0> EADC;
-#else
-	typedef utils::fifo<uint8_t, 256> SPI_BF;
-	typedef device::sci_io<device::SCI2, SPI_BF, SPI_BF> LTC_SPI_IO;
-	typedef chip::LTC2348_16a<LTC_CSN, LTC_CNV, LTC_BUSY, LTC_SPI_IO> EADC;
-#endif
-	EADC		eadc_;
+	typedef device::tpu_io<device::TPU0, utils::null_task> TPU;
+	TPU		tpu_;
 
 	uint16_t ch0_src_[1024+1];
 	uint16_t ch1_src_[1024+1];
 
-	volatile uint16_t	cap_num_;
-	volatile uint16_t	cap_pos_;
+	TASK	task_ = TASK::STATE;
 
+	SEND_TASK  	send_task_;
+
+
+
+	// 文字列表示、割り込み対応ロック／アンロック機構
+	volatile bool putch_lock_ = false;
+	utils::fixed_fifo<char, 1024> putch_tmp_;
+
+	void service_putch_tmp_()
+	{
+///		dis_int();
+		while(putch_tmp_.length() > 0) {
+			auto ch = putch_tmp_.get();
+			sci_.putch(ch);
+			// telnet_putch(ch);
+		}
+///		ena_int();
+	}
+
+
+#if 0
 	void capture_request_(uint16_t num)
 	{
 		if(num > 1024) num = 1024;
@@ -106,25 +101,6 @@ namespace {
 		cap_pos_ = 0;
 		cap_num_ = num + 1;
 	}
-
-	class capture_task {
-	public:
-		void operator() ()
-		{
-			if(cap_num_ > 0) {
-				LED::P = 1;
-				eadc_.convert();
-				LED::P = 0;
-				--cap_num_;
-				ch0_src_[cap_pos_] = eadc_.get_value(0);
-				ch1_src_[cap_pos_] = eadc_.get_value(1);	
-				++cap_pos_;
-			}
-		}
-	};
-
-	typedef device::tpu_io<device::TPU0, capture_task> TPU0;
-	TPU0		tpu0_;
 
 
 	volatile uint16_t cap_count_;
@@ -143,16 +119,6 @@ namespace {
 		}
 	};
 
-	typedef device::irq_man<device::peripheral::IRQ4, irq_task> IRQ;
-	IRQ		irq_;
-
-	TASK	task_ = TASK::STATE;
-
-	uint16_t	length_;
-	uint16_t	volt_;
-	uint16_t	count_;
-
-	SEND_TASK  	send_task_;
 
 	void send_wave_(char ch, uint16_t src)
 	{
@@ -199,7 +165,6 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	void sci_putch(char ch)
 	{
-#if 0
 		if(putch_lock_) {
 			if((putch_tmp_.size() - putch_tmp_.length()) >= 2) {
 				putch_tmp_.put(ch);
@@ -207,9 +172,8 @@ extern "C" {
 			return;
 		}
 		putch_lock_ = true;
-#endif
 		sci_.putch(ch);
-//		putch_lock_ = false;
+		putch_lock_ = false;
 	}
 
 
@@ -313,9 +277,16 @@ int main(int argc, char** argv)
 	{  // MAIN SCI 設定
 		uint8_t int_level = 1;
 		sci_.start(115200, int_level);
-//		sci_.auto_crlf(false);
+		sci_.auto_crlf(false);
 	}
 
+#ifdef GR_KAEDE
+	utils::format("Start EFO (GR-KAEDE) Version %d.%02d Build: %d\r\n")
+		% (main_version_ / 100) % (main_version_ % 100) % B_ID;
+#else
+	utils::format("Start EFO Version %d.%02d Build: %d\r\n")
+		% (main_version_ / 100) % (main_version_ % 100) % B_ID;
+#endif
 
 #if 0
 	{  // TPU0 設定
@@ -324,33 +295,6 @@ int main(int argc, char** argv)
 			utils::format("TPU0 not start ...\n");
 		}
 	}
-
-	{  // D/A CH0, AMP enable
-		dac_.start(DAC::output::CH0, true);
-	}
-
-	if(0) {  // test wave data
-		uint16_t v = 0;
-		for(int i = 0; i < 1024; ++i) {
-			ch0_src_[i] = v;
-			ch1_src_[i] = v + 32768;
-			v += 64;
-		}
-	} else {
-		for(int i = 0; i <= 1024; ++i) {
-			ch0_src_[i] = 0;
-			ch1_src_[i] = 0;
-		}
-	}
-
-	// キャプチャー
-	capture_request_(1024);
-
-	// 初期設定
-	dac_.out0(32768);  // トリガー電圧０Ｖ
-
-	irq_count_ = 0;
-	irq_state_ = 0;
 
 	uint8_t cnt = 0;
 	while(1) {
