@@ -15,9 +15,9 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX600 chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0007F000 /* 512k - (USTACK+ISTACK)(0x1000) */
-	USTACK (w) : ORIGIN = 0x0007FC00, LENGTH = 4 /* ustack 3072 */
-	ISTACK (w) : ORIGIN = 0x00080000, LENGTH = 4 /* istack 1024 */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0007E000 /* 512k - (USTACK+ISTACK)(0x2000) */
+	USTACK (w) : ORIGIN = 0x0007F800, LENGTH = 4 /* ustack 6144 */
+	ISTACK (w) : ORIGIN = 0x00080000, LENGTH = 4 /* istack 2048 */
 	ROM (w)    : ORIGIN = 0xFFD00000, LENGTH = 0x002FFFD0 /* 3M */
 }
 
