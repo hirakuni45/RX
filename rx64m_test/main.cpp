@@ -271,12 +271,16 @@ namespace seeda {
 #endif
 		++sample_count_;
 		if(sample_count_ >= 1000) {  // 1sec
-			for(int i = 0; i < 8; ++i) {
-				sample_[i].collect();
-				sample_data_.smp_[i] = sample_[i].get();
-				sample_data_.smp_[i].ch_ = i;
-				sample_[i].clear();
-			}
+			sample_count_ = 0;			
+		}
+		if(sample_count_ < 8) {
+			auto i = sample_count_ & 7;
+			sample_[i].collect();
+			sample_data_.smp_[i] = sample_[i].get();
+			sample_data_.smp_[i].ch_ = i;
+		} else if(sample_count_ < 16) {
+			sample_[sample_count_ & 7].clear();
+		} else if(sample_count_ == 16) {
 			++sys_time_;
 			sample_data_.time_ = sys_time_;
 			if(wf_fifo_.length() < (wf_fifo_.size() - 2)) {
@@ -287,7 +291,6 @@ namespace seeda {
 					if(wf_max_ < wf_lost_) wf_max_ = wf_lost_;
 				}
 			}
-			sample_count_ = 0;			
 		}
 	}
 
@@ -729,7 +732,7 @@ extern "C" {
 
 
 	void set_task_10ms(void (*task)(void)) {
-		core_.tpu0_.at_task().set_task_10ms(task);
+		core_.cmt0_.at_task().set_task_10ms(task);
 	}
 }
 
@@ -815,7 +818,7 @@ int main(int argc, char** argv)
 	device::PORT9::PDR.B0 = 1;  // (131)
 	device::PORT0::PDR.B7 = 1;  // (144)
 
-	device::PORTE::PDR.B3 = 1;  // LED output
+	LED::DIR = 1;
 
 	device::PORT3::PCR.B5 = 1; // P35(NMI) pull-up
 
@@ -892,7 +895,7 @@ int main(int argc, char** argv)
 		if(cnt >= 30) {
 			cnt = 0;
 		}
-		device::PORTE::PODR.B3 = (cnt < 10) ? 0 : 1;
+		LED::P = (cnt < 10) ? 0 : 1;
 
 		//
 		++rtc_set_loop;

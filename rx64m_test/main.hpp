@@ -37,10 +37,10 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 523;
+	static const int seeda_version_ = 524;
 	static const uint32_t build_id_ = B_ID;
 
-	typedef utils::command<256> CMD;
+	typedef device::PORT<device::PORTE, device::bitpos::B3> LED;
 
 #ifdef SEEDA
 	typedef device::PORT<device::PORT6, device::bitpos::B7> SW1;
@@ -90,6 +90,7 @@ namespace seeda {
 
 	typedef net::telnet_server<1024, 256> TELNETS;
 
+	typedef utils::command<256> CMD;
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
