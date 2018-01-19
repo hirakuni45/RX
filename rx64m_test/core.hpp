@@ -8,6 +8,7 @@
 //=====================================================================//
 #include "main.hpp"
 
+#include "common/cmt_io.hpp"
 #include "common/tpu_io.hpp"
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
@@ -23,12 +24,42 @@ namespace seeda {
 	struct core {
 
 		class timer_task {
-			void (*task_10ms_)();
 
 			volatile unsigned long millis_;
 			volatile unsigned long delay_;
+
+		public:
+			timer_task() : millis_(0), delay_(0) { }
+
+			volatile unsigned long get_millis() const { return millis_; }
+
+			volatile unsigned long get_delay() const { return delay_; }
+
+			void set_delay(volatile unsigned long n) { delay_ = n; }
+
+			void operator() ()
+			{
+// LED::P = !LED::P();
+// LED::P = 1;
+				eadc_server();
+
+				++millis_;
+
+				if(delay_ != 0) {
+					--delay_;
+				}
+// LED::P = 0;
+			}
+		};
+
+		typedef device::tpu_io<device::TPU0, timer_task> TPU0;
+		TPU0		tpu0_;
+
+		class cmt_task {
+
+			void (*task_10ms_)();
+
 			volatile uint32_t millis10x_;
-			volatile uint32_t cmtdiv_;
 
 			utils::wdt_man<device::WDT> wdt_man_;
 
@@ -38,8 +69,8 @@ namespace seeda {
 			volatile bool		wdt_stop_;
 
 		public:
-			timer_task() : task_10ms_(nullptr),
-				millis_(0), delay_(0), millis10x_(0), cmtdiv_(0),
+			cmt_task() : task_10ms_(nullptr),
+				millis10x_(0),
 				wdt_man_(), wdt_count_(0), wdt_limit_(10 * 60 * 100), wdt_enable_(false), wdt_stop_(false)
 				{ }
 
@@ -47,17 +78,12 @@ namespace seeda {
 				task_10ms_ = task;
 			}
 
-			void sync_100hz()
+			void sync()
 			{
 				volatile uint32_t tmp = millis10x_;
 				while(tmp == millis10x_) ;
 			}
 
-			volatile unsigned long get_millis() const { return millis_; }
-
-			volatile unsigned long get_delay() const { return delay_; }
-
-			void set_delay(volatile unsigned long n) { delay_ = n; }
 
 			void start_wdt() { wdt_man_.start(); }
 
@@ -71,37 +97,25 @@ namespace seeda {
 
 			void operator() ()
 			{
-				eadc_server();
-
-				++millis_;
-				++cmtdiv_;
-				if(cmtdiv_ >= 10) {
-
-					if(wdt_stop_) {
-						// リフレッシュが止まり、強制リセット
-					} else if(wdt_enable_) {
-						++wdt_count_;
-						if(wdt_count_ < wdt_limit_) {
-							wdt_man_.refresh();
-						}
-					} else {
-						// WDT 無効： 常にリフレッシュ
+				if(wdt_stop_) {
+					// リフレッシュが止まり、強制リセット
+				} else if(wdt_enable_) {
+					++wdt_count_;
+					if(wdt_count_ < wdt_limit_) {
 						wdt_man_.refresh();
 					}
-
-					if(task_10ms_ != nullptr) (*task_10ms_)();
-					cmtdiv_ = 0;
-					++millis10x_;
+				} else {
+					// WDT 無効： 常にリフレッシュ
+					wdt_man_.refresh();
 				}
 
-				if(delay_ != 0) {
-					--delay_;
-				}
+				if(task_10ms_ != nullptr) (*task_10ms_)();
+				++millis10x_;
 			}
 		};
 
-		typedef device::tpu_io<device::TPU0, timer_task> TPU0;
-		TPU0		tpu0_;
+		typedef device::cmt_io<device::CMT0, cmt_task> CMT0;
+		CMT0		cmt0_;
 
 		typedef utils::fifo<uint8_t, 1024> BUFFER;
 #ifdef SEEDA
@@ -146,12 +160,17 @@ namespace seeda {
 				sci_.start(115200, int_level);
 			}
 
-			{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
+			{  // タイマー設定、１００Ｈｚ（１０ｍｓ）
 				uint8_t int_level = 5;
+				cmt0_.start(100, int_level);
+				cmt0_.at_task().start_wdt();
+			}
+
+			{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
+				uint8_t int_level = 6;
 				if(!tpu0_.start(1000, int_level)) {
 					utils::format("TPU0 not start ...\n");
 				}
-				tpu0_.at_task().start_wdt();
 			}
 
 			{  // 内臓 A/D 変換設定
@@ -193,7 +212,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void sync()
 		{
-			tpu0_.at_task().sync_100hz();
+			cmt0_.at_task().sync();
 		}
 
 
@@ -235,7 +254,7 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_cmt_counter() const {
-			return tpu0_.get_counter();
+			return cmt0_.get_counter();
 		}
 
 
@@ -246,7 +265,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void clear_wdt()
 		{
-			tpu0_.at_task().clear_wdt();
+			cmt0_.at_task().clear_wdt();
 		}
 
 
@@ -258,7 +277,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void stop_wdt()
 		{
-			tpu0_.at_task().stop_wdt();
+			cmt0_.at_task().stop_wdt();
 		}
 
 
@@ -270,7 +289,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void enable_wdt(bool ena = true)
 		{
-			tpu0_.at_task().enable_wdt(ena);
+			cmt0_.at_task().enable_wdt(ena);
 		}
 
 
@@ -282,7 +301,7 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void limit_wdt(uint32_t lim)
 		{
-			tpu0_.at_task().limit_wdt(lim);
+			cmt0_.at_task().limit_wdt(lim);
 		}
 	};
 }
