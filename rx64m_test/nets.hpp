@@ -678,8 +678,9 @@ namespace seeda {
 			// FTP Server
 			ftps_.start("SEEDA03", "Renesas_RX64M", "SEEDA03", "SEEDA03");
 
-			// TELNET Server
-			telnets_.start("SEEDA03");
+			if(develope_) {  // TELNET Server（開発モード時のみ）
+				telnets_.start("SEEDA03");
+			}
 		}
 
 
