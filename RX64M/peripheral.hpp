@@ -45,6 +45,8 @@ namespace device {
 		TPU4,	///< 16 ビットタイマパルスユニット４
 		TPU5,	///< 16 ビットタイマパルスユニット５
 
+		DTC,		///< データトランスファコントローラ
+
 		ETHERC0,	///< Ethernet 0 (PHY RMII)
 		ETHERC1,	///< Ethernet 1 (PHY RMII)
 		PTPETHERC,	///< PTP Ethernet
