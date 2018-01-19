@@ -11,6 +11,7 @@
 #include "common/format.hpp"
 #include "common/time.h"
 #include "common/fixed_fifo.hpp"
+#include "allocator.hpp"
 
 namespace seeda {
 
@@ -136,7 +137,7 @@ namespace seeda {
 		uint32_t	sum_;
 		uint32_t	count_;
 
-		typedef std::map<uint16_t, uint16_t> MAP;
+		typedef std::map<uint16_t, uint16_t, std::less<uint16_t>, allocator_map16<uint16_t>> MAP;
 		MAP		map_;
 
 	public:
