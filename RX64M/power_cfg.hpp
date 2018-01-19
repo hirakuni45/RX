@@ -87,6 +87,10 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA19 = f;	// R12DA のストップ状態解除
 				break;
 
+			case peripheral::DTC:
+				SYSTEM::MSTPCRA.MSTPA28 = f;	// DMAC/DTC のストップ状態解除
+				break;
+
 			case peripheral::SCI0:
 				SYSTEM::MSTPCRB.MSTPB31 = f;	// B31 (SCI0)のストップ状態解除
 				break;
