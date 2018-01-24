@@ -25,6 +25,7 @@ namespace device {
 	enum class soft_spi_mode : uint8_t {
 		CK10,	///< CLK 1 to 0
 		CK01,	///< CLK 0 to 1
+		LTC,	///< LTC SPI モード
 	};
 
 
@@ -138,7 +139,58 @@ namespace device {
 		//----------------------------------------------------------------//
 		uint8_t xchg(uint8_t data = 0xff)
 		{
-			if(MODE == soft_spi_mode::CK10) {
+			if(MODE == soft_spi_mode::LTC) {
+				uint8_t r = 0;
+
+				if(data & 0x80) MOSI::P = 1; else MOSI::P = 0;	// bit7
+				SPCK::P = 0;
+				if(MISO::P()) ++r;
+				SPCK::P = 1;
+
+				r <<= 1;
+				if(data & 0x40) MOSI::P = 1; else MOSI::P = 0;	// bit6
+				SPCK::P = 0;
+				if(MISO::P()) ++r;
+				SPCK::P = 1;
+
+				r <<= 1;
+				if(data & 0x20) MOSI::P = 1; else MOSI::P = 0;	// bit5
+				SPCK::P = 0;
+				if(MISO::P()) ++r;
+				SPCK::P = 1;
+
+				r <<= 1;
+				if(data & 0x10) MOSI::P = 1; else MOSI::P = 0;	// bit4
+				SPCK::P = 0;
+				if(MISO::P()) ++r;
+				SPCK::P = 1;
+
+				r <<= 1;
+				if(data & 0x08) MOSI::P = 1; else MOSI::P = 0;	// bit3
+				SPCK::P = 0;
+				if(MISO::P()) ++r;
+				SPCK::P = 1;
+
+				r <<= 1;
+				if(data & 0x04) MOSI::P = 1; else MOSI::P = 0;	// bit2
+				SPCK::P = 0;
+				if(MISO::P()) ++r;
+				SPCK::P = 1;
+
+				r <<= 1;
+				if(data & 0x02) MOSI::P = 1; else MOSI::P = 0;	// bit1
+				SPCK::P = 0;
+				if(MISO::P()) ++r;
+				SPCK::P = 1;
+
+				r <<= 1;
+				if(data & 0x01) MOSI::P = 1; else MOSI::P = 0;	// bit0
+				SPCK::P = 0;
+				if(MISO::P()) ++r;
+				SPCK::P = 1;
+
+				return r;
+			} else if(MODE == soft_spi_mode::CK10) {
 				uint8_t r = 0;
 				if(MISO::P()) ++r;  // bit7
 				if(data & 0x80) MOSI::P = 1; else MOSI::P = 0;	// bit7

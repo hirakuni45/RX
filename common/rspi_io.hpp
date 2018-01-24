@@ -113,10 +113,11 @@ namespace device {
 			@param[in]	speed	通信速度
 			@param[in]	dctype	データ、クロック位相タイプ
 			@param[in]	level	割り込みレベル（１～２）、０の場合はポーリング
+			@param[in]	port2nd	第二ポートを利用する場合「true」
 			@return エラー（速度設定範囲外）なら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t speed, PHASE dctype, uint8_t level = 0)
+		bool start(uint32_t speed, PHASE dctype, uint8_t level = 0, bool port2nd = false)
 		{
 			level_ = level;
 
@@ -124,7 +125,11 @@ namespace device {
 			RSPI::SPCR = 0x00;
 
 			// ポートを有効にする
-			port_map::turn(RSPI::get_peripheral());
+			port_map::option portopt = port_map::option::FIRST;
+			if(port2nd) {
+				portopt = port_map::option::SECOND;
+			}
+			port_map::turn(RSPI::get_peripheral(), true, portopt);
 
 			bool f = true;
 			uint8_t brdv;
