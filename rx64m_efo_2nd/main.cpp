@@ -1,25 +1,33 @@
 //=====================================================================//
 /*! @file
-    @brief  EFO 2ND (RX64M) メイン @n
-			・A/D 入力は、内臓 A/D 変換を使う。@n
-			・トリガー入力も内臓 A/D 変換を使う。
+    @brief  EFO (RX64M) メイン
 	@copyright Copyright 2017 Kunihito Hiramatsu All Right Reserved.
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
+#include "common/tpu_io.hpp"
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
-#include "common/tpu_io.hpp"
-#include "common/fixed_fifo.hpp"
+#include "common/spi_io.hpp"
+#include "common/rspi_io.hpp"
+#include "common/irq_man.hpp"
+#include "chip/LTC2348_16a.hpp"
 
-// GR-KAEDE を使う場合有効にする（通常 Makefile で設定）
-//#define GR_KAEDE
+#if 0
+・デバッグ用LED出力 ---> PJ5(11)
+・デバッグ用シリアルＲＸＤ  --->  P21(36) / RXD0
+・デバッグ用シリアルＴＸＤ  --->  P20(37) / TXD0
+・変換トリガー閾値（コンパレーター入力+へ)   ---> P03(4) / DA0
+・変換トリガー入力（コンパレーター出力から） ---> PF5(9) / IRQ4
+#endif
+
+// #define UART_DEBUG
 
 namespace {
 
-	static const int main_version_ = 10;
+	static const int main_version_ = 50;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -47,53 +55,46 @@ namespace {
 		ASCII2,		///< t コマンド（１サンプルテスト）
 	};
 
-#ifdef GR_KAEDE
-	typedef device::PORT<device::PORTC, device::bitpos::B0> LED0;
-	typedef device::PORT<device::PORTC, device::bitpos::B1> LED1;
-	typedef device::PORT<device::PORT0, device::bitpos::B2> LED2;
-	typedef device::PORT<device::PORT0, device::bitpos::B3> LED3;
-
-	typedef utils::fifo<uint8_t, 4096> BUFFER;
-	typedef device::sci_io<device::SCI7, BUFFER, BUFFER> SCI;
-
-	SCI		sci_;
-#else
-
-
-#endif
+	typedef device::PORT<device::PORTJ, device::bitpos::B5> LED;
 
 	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
 	CMT		cmt_;
 
-	typedef device::tpu_io<device::TPU0, utils::null_task> TPU;
-	TPU		tpu_;
+	// LTC2348-16 A/D 制御ポート定義
+	// LTC2348ILX-16 (38:BUSY) ---> P16(40/144) / IRQ6
+	// LTC2348ILX-16 (24:CNV)  ---> PB3(82/144) / MTIOC0A
+	// LTC2348ILX-16 (29:SCKI) ---> PA5(90/144) / RSPCKA-B
+	// LTC2348ILX-16 (37:SDI)  ---> PA6(89/144) / MOSIA-B
+	// LTC2348ILX-16 (25:SDO0) ---> PA7(88/144) / MISOA-B
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LTC_CSN;   // P40(141)
+	typedef device::PORT<device::PORTB, device::bitpos::B3> LTC_CNV;   // PB3(82)
+	typedef device::PORT<device::PORT1, device::bitpos::B6> LTC_BUSY;
+	typedef device::PORT<device::PORT5, device::bitpos::B3> LTC_PD;    // P53(53)
+
+#define SOFT_SPI
+#ifdef SOFT_SPI
+#if 0
+	typedef device::PORT<device::PORT5, device::bitpos::B1> SPCK;
+	typedef device::PORT<device::PORT5, device::bitpos::B2> MISO;
+	typedef device::PORT<device::PORT5, device::bitpos::B0> MOSI;
+#else
+	typedef device::PORT<device::PORTA, device::bitpos::B5> SPCK;
+	typedef device::PORT<device::PORTA, device::bitpos::B7> MISO;
+	typedef device::PORT<device::PORTA, device::bitpos::B6> MOSI;
+#endif
+	typedef device::spi_io<MISO, MOSI, SPCK, device::soft_spi_mode::LTC> SPI_IO;
+#else
+	typedef device::rspi_io<device::RSPI> LTC_SPI_IO;
+#endif
+	typedef chip::LTC2348_16a<LTC_CSN, LTC_CNV, LTC_BUSY, SPI_IO> EADC;
+	EADC		eadc_;
 
 	uint16_t ch0_src_[1024+1];
 	uint16_t ch1_src_[1024+1];
 
-	TASK	task_ = TASK::STATE;
+	volatile uint16_t	cap_num_;
+	volatile uint16_t	cap_pos_;
 
-	SEND_TASK  	send_task_;
-
-
-
-	// 文字列表示、割り込み対応ロック／アンロック機構
-	volatile bool putch_lock_ = false;
-	utils::fixed_fifo<char, 1024> putch_tmp_;
-
-	void service_putch_tmp_()
-	{
-///		dis_int();
-		while(putch_tmp_.length() > 0) {
-			auto ch = putch_tmp_.get();
-			sci_.putch(ch);
-			// telnet_putch(ch);
-		}
-///		ena_int();
-	}
-
-
-#if 0
 	void capture_request_(uint16_t num)
 	{
 		if(num > 1024) num = 1024;
@@ -102,6 +103,43 @@ namespace {
 		cap_num_ = num + 1;
 	}
 
+	class capture_task {
+	public:
+		void operator() ()
+		{
+			if(cap_num_ > 0) {
+				LED::P = 1;
+				eadc_.convert();
+				LED::P = 0;
+				--cap_num_;
+				ch0_src_[cap_pos_] = eadc_.get_value(0);
+				ch1_src_[cap_pos_] = eadc_.get_value(1);	
+				++cap_pos_;
+			}
+		}
+	};
+
+	typedef device::tpu_io<device::TPU0, capture_task> TPU0;
+	TPU0		tpu0_;
+
+#ifdef UART_DEBUG
+	typedef device::PORT<device::PORTF, device::bitpos::B5> TRG;
+
+	typedef utils::fifo<uint8_t, 1024> BUFFER;
+	typedef device::sci_io<device::SCI12, BUFFER, BUFFER> D_SCI;
+	D_SCI			d_sci_;
+#else
+	typedef utils::fifo<uint8_t, 1024> BUFFER;
+	typedef device::sci_io<device::SCI0,  BUFFER, BUFFER> D_SCI;
+	D_SCI			d_sci_;
+
+	typedef utils::fifo<uint8_t, 4096> SENDBUF;
+	typedef device::sci_io<device::SCI12, BUFFER, SENDBUF> M_SCI;
+	M_SCI			m_sci_;
+#endif
+
+	typedef device::dac_out	DAC;
+	DAC		dac_;
 
 	volatile uint16_t cap_count_;
 	volatile uint16_t irq_count_;
@@ -119,6 +157,16 @@ namespace {
 		}
 	};
 
+	typedef device::irq_man<device::peripheral::IRQ4, irq_task> IRQ;
+	IRQ		irq_;
+
+	TASK	task_ = TASK::STATE;
+
+	uint16_t	length_;
+	uint16_t	volt_;
+	uint16_t	count_;
+
+	SEND_TASK  	send_task_;
 
 	void send_wave_(char ch, uint16_t src)
 	{
@@ -152,7 +200,6 @@ namespace {
 			return;
 		}
 	}
-#endif
 }
 
 extern "C" {
@@ -165,6 +212,7 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	void sci_putch(char ch)
 	{
+#if 0
 		if(putch_lock_) {
 			if((putch_tmp_.size() - putch_tmp_.length()) >= 2) {
 				putch_tmp_.put(ch);
@@ -172,8 +220,9 @@ extern "C" {
 			return;
 		}
 		putch_lock_ = true;
-		sci_.putch(ch);
-		putch_lock_ = false;
+#endif
+		d_sci_.putch(ch);
+//		putch_lock_ = false;
 	}
 
 
@@ -185,7 +234,7 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	void sci_puts(const char* s)
 	{
-		sci_.puts(s);
+		d_sci_.puts(s);
 	}
 
 
@@ -197,7 +246,7 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	char sci_getch(void)
 	{
-		return sci_.getch();
+		return d_sci_.getch();
 	}
 
 
@@ -209,7 +258,7 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	uint16_t sci_length(void)
 	{
-		return sci_.recv_length();
+		return d_sci_.recv_length();
 	}
 }
 
@@ -229,27 +278,6 @@ int main(int argc, char** argv)
 	device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
 	while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
 
-#ifdef GR_KAEDE
-	// Base Clock 12.0MHz
-	device::SYSTEM::PLLCR.STC = 0b010011;		// PLL 10 倍(120MHz)
-	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
-	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
-
-	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.ICK.b(0)		// 1/1 (120/1=120)
-						  | device::SYSTEM::SCKCR.BCK.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKA.b(0)		// 1/1 (120/1=120)
-						  | device::SYSTEM::SCKCR.PCKB.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKC.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (120/2=60)
-	device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
-	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
-
-	LED0::DIR = 1;
-	LED1::DIR = 1;
-	LED2::DIR = 1;
-	LED3::DIR = 1;
-#else
 	// Base Clock 12.5MHz
 	// PLLDIV: 1/1, STC: 16 倍(200MHz)
 	device::SYSTEM::PLLCR = device::SYSTEM::PLLCR.PLIDIV.b(0) |
@@ -266,7 +294,8 @@ int main(int argc, char** argv)
 						  | device::SYSTEM::SCKCR.PCKD.b(2);	// 1/4 (200.5/4=50)
 	device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(0b0100) | 1;  // USB Clock: 1/5 (200/5=40)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
-#endif
+
+	LED::DIR = 1;
 
 	{
 		// タイマー設定（100Hz）
@@ -274,27 +303,77 @@ int main(int argc, char** argv)
 		cmt_.start(100, cmt_irq_level);
 	}
 
-	{  // MAIN SCI 設定
-		uint8_t int_level = 1;
-		sci_.start(115200, int_level);
-		sci_.auto_crlf(false);
-	}
-
-#ifdef GR_KAEDE
-	utils::format("Start EFO (GR-KAEDE) Version %d.%02d Build: %d\r\n")
-		% (main_version_ / 100) % (main_version_ % 100) % B_ID;
-#else
-	utils::format("Start EFO Version %d.%02d Build: %d\r\n")
-		% (main_version_ / 100) % (main_version_ % 100) % B_ID;
-#endif
-
-#if 0
 	{  // TPU0 設定
 		uint8_t int_level = 4;
-		if(!tpu0_.start(100000, int_level)) {
+//		if(!tpu0_.start(100000, int_level)) {
+		if(!tpu0_.start(25000, int_level)) {
 			utils::format("TPU0 not start ...\n");
 		}
 	}
+
+	{  // DEBUG SCI 設定
+		uint8_t int_level = 1;
+		d_sci_.start(115200, int_level);
+	}
+
+	{  // MAIN SCI 設定
+		uint8_t int_level = 1;
+		m_sci_.start(115200, int_level);
+		m_sci_.auto_crlf(false);
+	}
+
+	{  // D/A CH0, AMP enable
+		dac_.start(DAC::output::CH0, true);
+	}
+
+	{  // LTC2348ILX-16 初期化
+		LTC_PD::DIR = 1;
+		LTC_PD::P = 0;  // パワーダウンしない！
+		// 内臓リファレンスと内臓バッファ
+		// VREFIN: 2.024V、VREFBUF: 4.096V、Analog range: -10.24V to +10.24V
+///		if(!eadc_.start(750000, EADC::span_type::M10_24P10_24)) {
+		if(!eadc_.start(800000, EADC::span_type::M10_24P10_24)) {
+			utils::format("LTC2348_16 not found...\n");
+		}
+	}
+
+	// キャプチャー時間計測
+	if(0) {
+		while(1) {
+			while(cap_num_ > 0) ;
+			capture_request_(1024);
+		}
+	}
+
+	if(0) {
+		uint16_t brr = device::SCI2::BRR();
+		char tmp[128];
+		utils::sformat("BRR: %d\r\n", tmp, sizeof(tmp)) % brr;
+		m_sci_.puts(tmp);
+	}
+
+	if(0) {  // test wave data
+		uint16_t v = 0;
+		for(int i = 0; i < 1024; ++i) {
+			ch0_src_[i] = v;
+			ch1_src_[i] = v + 32768;
+			v += 64;
+		}
+	} else {
+		for(int i = 0; i <= 1024; ++i) {
+			ch0_src_[i] = 0;
+			ch1_src_[i] = 0;
+		}
+	}
+
+	// キャプチャー
+	capture_request_(1024);
+
+	// 初期設定
+	dac_.out0(32768);  // トリガー電圧０Ｖ
+
+	irq_count_ = 0;
+	irq_state_ = 0;
 
 	uint8_t cnt = 0;
 	while(1) {
@@ -414,26 +493,6 @@ int main(int argc, char** argv)
 		} else {
 			LED::P = 0;
 		}
-#endif
-
-	uint8_t cnt = 0;
-	while(1) {
-		cmt_.sync();
-
-
-
-		++cnt;
-		if(cnt >= 40) {
-			cnt = 0;
-		}
-		auto sel = cnt / 10;
-		static const uint8_t ledtbl[4] = {
-			0b0001, 0b0010, 0b0100, 0b1000
-		}; 
-		LED0::P = (ledtbl[sel]     ) & 1;
-		LED1::P = (ledtbl[sel] >> 1) & 1;
-		LED2::P = (ledtbl[sel] >> 2) & 1;
-		LED3::P = (ledtbl[sel] >> 3) & 1;
 	}
 }
 
