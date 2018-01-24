@@ -292,11 +292,11 @@ namespace device {
 			case peripheral::RSPI:
 				{
 					uint8_t sel = enable ? 0b001101 : 0;
-					MPC::PA7PFS.PSEL = sel;  // MISOA-B (PA7 LQFP176: 106)
+					MPC::PA7PFS.PSEL = sel;  // MISOA-B  (PA7 LQFP176: 106)
 					PORTA::PMR.B7 = enable;
-					MPC::PA6PFS.PSEL = sel;  // MOSIA-B (PA6 LQFP176: 107)
+					MPC::PA6PFS.PSEL = sel;  // MOSIA-B  (PA6 LQFP176: 107)
 					PORTA::PMR.B6 = enable;
-					MPC::PA5PFS.PSEL = sel;  // RSPCKA  (PA5 LQFP176: 108)
+					MPC::PA5PFS.PSEL = sel;  // RSPCKA-B (PA5 LQFP176: 108)
 					PORTA::PMR.B5 = enable;
 				}
 				break;
