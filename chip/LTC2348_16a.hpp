@@ -148,7 +148,10 @@ namespace chip {
 			CNV::P    = 0;
 			BUSY::DIR = 0;
 
-			if(!spi_.start_spi(true, speed)) {
+			uint8_t int_level = 0;
+			bool port_opt = true;
+///			if(!spi_.start(56250000 / 8, SPI::PHASE::TYPE1, int_level, port_opt)) {
+			if(!spi_.start(56250000 / 8)) {
 				utils::format("Fail EADC SPI...\n");
 			}
 
