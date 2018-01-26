@@ -6,12 +6,10 @@
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include <map>
-#include <complex>
 #include "common/format.hpp"
 #include "common/time.h"
 #include "common/fixed_fifo.hpp"
-#include "allocator.hpp"
+#include "fixed_map.hpp"
 
 namespace seeda {
 
@@ -137,8 +135,44 @@ namespace seeda {
 		uint32_t	sum_;
 		uint32_t	count_;
 
-		typedef std::map<uint16_t, uint16_t, std::less<uint16_t>, allocator_map16<uint16_t>> MAP;
-		MAP		map_;
+		typedef utils::fixed_map<uint16_t, uint16_t, 1000> MAP;
+		MAP			map_;
+
+#if 0
+		uint32_t	trav_sum_;
+		uint32_t	trav_med_;
+		bool		exit_trav_;
+
+		void in_trav_(uint16_t idx)
+		{
+			if(exit_trav_) return;
+
+			if(map_.get_left(idx) != -1) {
+				in_trav_(map_.get_left(idx));
+			}
+
+			uint32_t cnt = map_.get_pad(idx);
+			trav_sum_ += cnt;
+			if(trav_sum_ >= (count_ / 2)) {
+				trav_med_ = map_.get_key(idx);
+				if((count_ & 1) == 0) {
+					++idx;
+					if(idx == 1000) {  // 要素数が１個の場合は、平均しない
+						exit_trav_ = true;
+						return;
+					}
+					trav_med_ += static_cast<uint32_t>(map_.get_key(idx));
+					trav_med_ /= 2;
+				}
+				exit_trav_ = true;
+				return;
+			}
+
+			if(map_.get_right(idx) != -1) {
+				in_trav_(map_.get_right(idx));
+			}
+		}
+#endif
 
 	public:
 		//-----------------------------------------------------------------//
@@ -147,6 +181,7 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		sample() : t_(), sum_(0), count_(0), map_() { }
+///			trav_sum_(0), trav_med_(0), exit_trav_(true) { }
 
 
 		//-----------------------------------------------------------------//
@@ -184,18 +219,14 @@ namespace seeda {
 			}
 
 			sum_ += data;
-			++count_;
 			if(t_.min_ > data) t_.min_ = data;
 			if(t_.max_ < data) t_.max_ = data;
 
 			if(t_.limit_hi_level_ < data) ++t_.limit_hi_count_;
 			if(t_.limit_lo_level_ > data) ++t_.limit_lo_count_;
 
-			auto ret = map_.emplace(data, 1);
-			if(!ret.second) {
-				auto& v = ret.first;
-				++v->second;
-			}
+			map_.insert(data, 1);
+			++count_;
 		}
 
 
@@ -206,28 +237,37 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		void collect()
 		{
+#if 0
+			trav_med_ = 0;
+			trav_sum_ = 0;
+			exit_trav_ = false;
+
+///			in_trav_(0);
+
+			t_.median_  = trav_med_;
+			t_.average_ = trav_sum_ / count_;
+#endif
 			uint32_t med = 0;
 			uint32_t sum = 0;
-
-			for(MAP::iterator it = map_.begin(); it != map_.end(); ++it) {
-				uint32_t cnt = it->second;
+			uint32_t i = 0;
+			while(i < 1000) {
+				uint32_t cnt = map_.get_pad(i);
 				sum += cnt;
 				if(sum >= (count_ / 2)) {
-					med = it->first;
+					med = map_.get_key(i);
 					if((count_ & 1) == 0) {
-						++it;
-						if(it == map_.end()) {  // 要素数が１個の場合は、平均しない
+						++i;
+						if(i >= map_.size()) {  // 要素数が１個の場合は、平均しない
 							break;
 						}
-						med += static_cast<uint32_t>(it->first);
+						med += static_cast<uint32_t>(map_.get_key(i));
 						med /= 2;
 					}
 					break;
 				}
+				++i;
 			}
-
 			t_.median_ = med;
-
 			t_.average_ = sum_ / count_;
 		}
 

@@ -255,7 +255,7 @@ namespace seeda {
 	void eadc_server()
 	{
 		if(!enable_eadc_) return;
-
+LED::P = 1;
 #ifdef SEEDA
 		if(nets_.get_dev_signal()) {
 			for(int i = 0; i < 8; ++i) {
@@ -274,13 +274,12 @@ namespace seeda {
 			sample_count_ = 0;			
 		}
 		if(sample_count_ < 8) {
-			auto i = sample_count_ & 7;
+			auto i = sample_count_;
 			sample_[i].collect();
 			sample_data_.smp_[i] = sample_[i].get();
 			sample_data_.smp_[i].ch_ = i;
-		} else if(sample_count_ < 16) {
-			sample_[sample_count_ & 7].clear();
-		} else if(sample_count_ == 16) {
+			sample_[i].clear();
+		} else if(sample_count_ == 8) {
 			++sys_time_;
 			sample_data_.time_ = sys_time_;
 			if(wf_fifo_.length() < (wf_fifo_.size() - 2)) {
@@ -292,6 +291,7 @@ namespace seeda {
 				}
 			}
 		}
+LED::P = 0;
 	}
 
 
@@ -895,7 +895,7 @@ int main(int argc, char** argv)
 		if(cnt >= 30) {
 			cnt = 0;
 		}
-		LED::P = (cnt < 10) ? 0 : 1;
+//		LED::P = (cnt < 10) ? 0 : 1;
 
 		//
 		++rtc_set_loop;
