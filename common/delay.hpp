@@ -48,7 +48,7 @@ namespace utils {
 		static void micro_second(uint32_t us)
 		{
 			while(us > 0) {
-#if defined(SIG_RX64M) || defined(SIG_RX63T)
+#if defined(SIG_RX64M) || defined(SIG_RX63T) || defined(SIG_RX71M)
 				for(uint32_t n = 0; n < (F_ICLK / 4285714); ++n) {
 					asm("nop");
 				}
