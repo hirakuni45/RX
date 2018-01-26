@@ -1,7 +1,7 @@
 /*!	@file
 	@brief	RX71M R5F571MF リンカー・スクリプト
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -13,14 +13,12 @@ ENTRY(_start)
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 
-/* This memory layout corresponds to the smallest predicted RX600 chip.  */
+/* This memory layout corresponds to the smallest predicted RX64M chip.  */
 MEMORY {
-	RAM (w)   : ORIGIN = 0x00000000, LENGTH = 0x00080000 /* 512K bytes (+32K) */
-	STACK (w) : ORIGIN = 0x00080000, LENGTH = 16 /* top of RAM */
-
-	ROM (w)   : ORIGIN = 0xFFE00000, LENGTH = 0x001FFFD0 /* 2M bytes */
-/* This is the largest RX6000: */
-/*	ROM (w)   : ORIGIN = 0xFFE00000, LENGTH = 0x001FFFD0 */ /* 2Mb */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0007C000 /* 512k - (USTACK+ISTACK)(0x2000) */
+	USTACK (w) : ORIGIN = 0x0007E000, LENGTH = 4 /* ustack 8192 */
+	ISTACK (w) : ORIGIN = 0x00080000, LENGTH = 4 /* istack 8192 */
+	ROM (w)    : ORIGIN = 0xFFE00000, LENGTH = 0x001FFFD0 /* 2M */
 }
 
 SECTIONS
@@ -135,10 +133,16 @@ SECTIONS
   } > RAM
   PROVIDE (__bsssize = SIZEOF(.bss) / 4);
 
-  .stack (ORIGIN (STACK)) :
+  .istack (ORIGIN (ISTACK)) :
   {
-    PROVIDE (__stack = .);
-    *(.stack)
+    PROVIDE (__istack = .);
+    *(.istack)
+  }
+
+  .ustack (ORIGIN (USTACK)) :
+  {
+    PROVIDE (__ustack = .);
+    *(.ustack)
   }
 
   /* Providing one of these symbols in your code is sufficient to have
