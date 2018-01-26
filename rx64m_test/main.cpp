@@ -255,7 +255,7 @@ namespace seeda {
 	void eadc_server()
 	{
 		if(!enable_eadc_) return;
-LED::P = 1;
+// LED::P = 1;
 #ifdef SEEDA
 		if(nets_.get_dev_signal()) {
 			for(int i = 0; i < 8; ++i) {
@@ -291,7 +291,8 @@ LED::P = 1;
 				}
 			}
 		}
-LED::P = 0;
+// LED::P = 0;
+		LED::P = (sample_count_ < 500) ? 0 : 1;
 	}
 
 
@@ -877,7 +878,6 @@ int main(int argc, char** argv)
 	enable_eadc_server();
 
 	sys_time_ = get_rtc_time();
-	uint32_t cnt = 0;
 	uint16_t rtc_set_loop = 0;
 	while(1) {
 		core_.sync();
@@ -890,12 +890,6 @@ int main(int argc, char** argv)
 		sdc_.service();
 
 		nets_.service();
-
-		++cnt;
-		if(cnt >= 30) {
-			cnt = 0;
-		}
-//		LED::P = (cnt < 10) ? 0 : 1;
 
 		//
 		++rtc_set_loop;
