@@ -15,8 +15,8 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX64M chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0007E000 /* 512k - (USTACK+ISTACK)(0x2000) */
-	USTACK (w) : ORIGIN = 0x0007F800, LENGTH = 4 /* ustack 6144 */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0007C000 /* 512k - (USTACK+ISTACK)(0x4000) */
+	USTACK (w) : ORIGIN = 0x0007E000, LENGTH = 4 /* ustack 6144 */
 	ISTACK (w) : ORIGIN = 0x00080000, LENGTH = 4 /* istack 2048 */
 	ROM (w)    : ORIGIN = 0xFFE00000, LENGTH = 0x001FFFD0 /* 2M */
 }
