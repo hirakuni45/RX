@@ -775,7 +775,7 @@ namespace device {
 					0xA501 を書き込むとリセットされます。
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<0x000800C2> SWRR;
+		static rw16_t<0x000800C2> SWRR;
 	};
 	typedef system_t SYSTEM;
 
