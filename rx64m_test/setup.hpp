@@ -98,6 +98,8 @@ namespace seeda {
 		}
 #endif
 
+		device::standby_ram		sram_;
+
 		void disp_time_(time_t t, char* dst, uint32_t size)
 		{
 			uint32_t s = t % 60;
@@ -145,6 +147,16 @@ namespace seeda {
 #endif
 		}
 
+		static const uint32_t RES_MAGIC_ID_ = 0xA501;
+		static const uint16_t RES_MAGIC_ = 0x0000;
+		static const uint16_t RES_COUNT_ = 0x0004;
+
+		uint32_t get_reset_count_() const {
+			uint32_t n;
+			sram_.get32(RES_COUNT_, n);
+			return n;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -159,11 +171,37 @@ namespace seeda {
 #ifdef SEEDA
 			, spi_(), eui_(spi_)
 #endif
-		{ }
+		{
+			sram_.start();
+			uint32_t magic;
+			sram_.get32(RES_MAGIC_, magic);
+			if(magic != RES_MAGIC_ID_) {
+				sram_.put32(RES_MAGIC_, RES_MAGIC_ID_);
+				sram_.put32(RES_COUNT_, 0x0001);
+			} else {
+				uint32_t cnt;
+				sram_.get32(RES_COUNT_, cnt);
+				++cnt;
+				sram_.put32(RES_COUNT_, cnt);
+			}
+		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  シグナルの参照
+			@return シグナル
+		*/
+		//-----------------------------------------------------------------//
 		bool& at_signal() { return signal_; }
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  シグナルの取得
+			@return シグナル
+		*/
+		//-----------------------------------------------------------------//
 		bool get_signal() const { return signal_; }
 
 
@@ -577,14 +615,15 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 				} else {
 					http_format("<td>%s</td></tr>\n") % write_file_.get_path();
 				}
-				http_format("<tr><td>書き込み数：</td>");
+
 				if(!write_file_.get_enable()) {
-					http_format("<td><input type=\"text\" name=\"count\" size=\"16\" value=\"%d\"></td></tr>\n")
-						% write_file_.get_limit();
+///					http_format("<td><input type=\"text\" name=\"count\" size=\"16\" value=\"%d\"></td></tr>\n")
+///						% write_file_.get_limit();
 					http_format("<tr><td><input type=\"submit\" value=\"書き込み開始\"%s></td></tr>")
 						% (mount ? "" : " disabled=\"disabled\"");
 				} else {
-					http_format("<td>%d/%d</td></tr>\n") % write_file_.get_resume() % write_file_.get_limit();
+///					http_format("<td>%d/%d</td></tr>\n") % write_file_.get_resume() % write_file_.get_limit();
+					http_format("<tr><td>書き込み数：</td><td>%d 回</td></tr>") % write_file_.get_resume();
 					http_format("<tr><td>ロスト時間：</td><td>%u 秒</td></tr>") % get_wf_lost();
 					http_format("<tr><td><input type=\"submit\" value=\"書き込み停止\"%s></td></tr>")
 						% (mount ? "" : " disabled=\"disabled\"");
@@ -619,6 +658,14 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 			net_tools::render_date_time();
 
 			auto mount = at_sdc().get_mount();
+
+			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+
+			{  // リセット情報表示
+				http_format("<table>");
+				http_format("<tr><td>リセット回数:</td><td>%u</td></tr>") % get_reset_count_();
+				http_format("</table>\n");
+			}
 
 			http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 

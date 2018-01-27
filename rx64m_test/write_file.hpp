@@ -28,7 +28,7 @@ namespace seeda {
 		typedef utils::null_format debug_format;
 #endif
 
-		uint32_t	limit_;
+///		uint32_t	limit_;
 		uint32_t	count_;
 
 		char		path_[128];
@@ -68,7 +68,7 @@ namespace seeda {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		write_file() : limit_(5), count_(0), path_{ "00000" },
+		write_file() : count_(0), path_{ "00000" },
 			enable_(false), state_(false),
 			fp_(nullptr),
 			ch_loop_(0),
@@ -118,6 +118,7 @@ namespace seeda {
 		const char* get_path() const { return path_; }
 
 
+#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  書き込み回数の設定
@@ -137,6 +138,7 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_limit() const { return limit_; }
+#endif
 
 
 		//-----------------------------------------------------------------//
@@ -288,14 +290,15 @@ namespace seeda {
 				fclose(fp_);
 				fp_ = nullptr;
 				++count_;
-				if(count_ >= limit_) {
-					debug_format("Fin write file: %d files\n")
-						% count_;
-					enable_ = false;
-					task_ = task::wait_request;
-				} else {
+/// 書き込み数制限を廃止
+///				if(count_ >= limit_) {
+///					debug_format("Fin write file: %d files\n")
+///						% count_;
+///					enable_ = false;
+///					task_ = task::wait_request;
+///				} else {
 					task_ = task::make_filename;
-				}
+///				}
 				break;
 
 			default:

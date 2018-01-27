@@ -480,10 +480,10 @@ namespace seeda {
 	{
 		if(cmdn == 1) {
 			if(at_nets().at_write_file().get_enable()) {
-				utils::format("write file: '%s' at %d/%d\n")
+				utils::format("write file: '%s' at %d (%s)\n")
 					% at_nets().at_write_file().get_path()
 					% at_nets().at_write_file().get_resume()
-					% at_nets().at_write_file().get_limit();
+					% (at_nets().at_write_file().get_enable() ? "Enable" : "Disable");
 			} else {
 				utils::format("write file: ready (no write file)\n");
 			}
@@ -498,7 +498,7 @@ namespace seeda {
 				if(val <= 0) return false;
 				if(cmd_.get_word(1, sizeof(tmp), tmp)) {
 					at_nets().at_write_file().set_path(tmp);
-					at_nets().at_write_file().set_limit(val);
+///					at_nets().at_write_file().set_limit(val);
 					at_nets().at_write_file().enable();
 					return true;
 				}

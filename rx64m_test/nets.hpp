@@ -98,7 +98,7 @@ namespace seeda {
 			}
 
 			strcpy(pre_.at().write_path_, write_file_.get_path());
-			pre_.at().write_limit_ = write_file_.get_limit();
+			pre_.at().write_enable_ = write_file_.get_enable();
 
 			pre_.write();
 		}
@@ -353,7 +353,8 @@ namespace seeda {
 		void set_write_()
 		{
 			if(!write_file_.get_enable()) {
-				typedef utils::parse_cgi_post<256, 2> CGI_IP;
+///				typedef utils::parse_cgi_post<256, 2> CGI_IP;
+				typedef utils::parse_cgi_post<256, 1> CGI_IP;
 				CGI_IP cgi;
 				cgi.parse(http_.get_post_body());
 				for(uint32_t i = 0; i < cgi.size(); ++i) {
@@ -366,14 +367,14 @@ namespace seeda {
 							write_file_.set_path(t.val);
 							err = false;
 						}
-					} else if(strcmp(t.key, "count") == 0) {
-						int n = 0;
-						if((utils::input("%d", t.val) % n).status()) {
-							if(n > 0) {
-								write_file_.set_limit(n);
-								err = false;
-							}
-						}
+///					} else if(strcmp(t.key, "count") == 0) {
+///						int n = 0;
+///						if((utils::input("%d", t.val) % n).status()) {
+///							if(n > 0) {
+///								write_file_.set_limit(n);
+///								err = false;
+///							}
+///						}
 					}
 					if(err) {
 						return;
@@ -383,6 +384,7 @@ namespace seeda {
 			} else {
 				write_file_.enable(false);
 			}
+			write_pre_();
 		}
 
 
@@ -704,7 +706,7 @@ namespace seeda {
 					client_.set_port(pre_.get().client_port_);
 
 					write_file_.set_path(pre_.get().write_path_);
-					write_file_.set_limit(pre_.get().write_limit_); 
+					write_file_.enable(pre_.get().write_enable_); 
 
 					uint32_t time = pre_.get().watchdog_time_;
 					if(time >= WATCHDOG_MIN) {

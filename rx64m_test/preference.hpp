@@ -53,7 +53,8 @@ namespace seeda {
 			uint16_t	client_port_;
 
 			char		write_path_[16];
-			uint32_t	write_limit_;
+			uint8_t		write_enable_;	// write_limit_ を廃止
+			uint8_t		dummy[3];
 
 			uint8_t		client_enable_;
 
@@ -75,12 +76,28 @@ namespace seeda {
 				client_ip_{ 192, 168, 3, 7 },
 #endif
 				client_port_(3000),
-				write_path_{ "00000" }, write_limit_(60),
+				write_path_{ "/00000" }, write_enable_(0),
 
 				client_enable_(1),
 				watchdog_enable_(0),
 				watchdog_time_(5)
 			{ }
+
+			void dump() const
+			{
+				utils::format("Index: %d\n") % index_;
+				utils::format("Magic: %08X\n") % magic_;
+				for(int i = 0; i < 8; ++i) {
+					utils::format("(%d) Gain: %f, ") % i % gain_[i];
+					utils::format("LimitL: %d, ") % limit_lo_level_[i];
+					utils::format("LimitH: %d, ") % limit_hi_level_[i];
+					utils::format("Center: %d, ") % center_[i];
+					utils::format("Mode: %d\n") % static_cast<uint16_t>(mode_[i]);
+				}
+				utils::format("Write path: '%s', ") % write_path_;
+				utils::format("enable: %d\n") % static_cast<uint16_t>(write_enable_);
+				utils::format("\n");
+			}
 		};
 
 	private:
@@ -173,7 +190,11 @@ namespace seeda {
 				return false;
 			}
 			debug_format("Flash (preference) read: %06X\n") % pos;
-			return fio_.read(pos, &seeda_, sizeof(seeda_t));
+			auto ret = fio_.read(pos, &seeda_, sizeof(seeda_t));
+
+			seeda_.dump();
+
+			return ret;
 		}
 
 
@@ -189,7 +210,11 @@ namespace seeda {
 			}
 			seeda_.magic_ = sizeof(seeda_t);
 			debug_format("Flash (preference) write: %06X\n") % pos;
-			return fio_.write(pos, &seeda_, sizeof(seeda_t));
+			auto ret = fio_.write(pos, &seeda_, sizeof(seeda_t));
+
+			seeda_.dump();
+
+			return ret;
 		}
 
 #endif
