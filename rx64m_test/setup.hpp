@@ -6,9 +6,9 @@
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
+#include <random>
 #include "client.hpp"
 #include "write_file.hpp"
-
 #include "chip/EUI_XX.hpp"
 
 #ifdef LOGGING_FS
@@ -30,6 +30,19 @@ namespace seeda {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class setup {
+
+		static std::mt19937& at_rand_mt_()
+		{
+			static std::mt19937 mt(static_cast<int>(get_time()));
+			return mt;
+		}
+
+		static uint32_t rand_(uint32_t mask = 0xffffffff) {
+			auto& r = at_rand_mt_();
+			return r() & mask;
+		}
+
+
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -689,6 +702,7 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 			}
 
+#ifdef WATCH_DOG
 			{
 				http_format("<form method=\"POST\" action=\"/cgi/watchdog.cgi\">\n");
 				http_format("<table><tr><td>ウオッチドッグ：</td>"
@@ -702,10 +716,10 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 
 				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 			}
-
+#endif
 			{
 				for(int i = 0; i < 6; ++i) {
-					char o = rand() & 0xffff;
+					char o = rand_() & 0xffff;
 					if(o & 1) { o >>= 1; o %= 10; o += '0'; }
 					else { o >>= 1; o %= 26; o += 'A'; }
 					restart_key_[i] = o;

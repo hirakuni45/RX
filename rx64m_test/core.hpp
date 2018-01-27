@@ -12,7 +12,9 @@
 #include "common/tpu_io.hpp"
 #include "common/fifo.hpp"
 #include "common/sci_io.hpp"
+#ifdef WATCH_DOG
 #include "common/wdt_man.hpp"
+#endif
 
 namespace seeda {
 
@@ -60,18 +62,20 @@ namespace seeda {
 			void (*task_10ms_)();
 
 			volatile uint32_t millis10x_;
-
+#ifdef WATCH_DOG
 			utils::wdt_man<device::WDT> wdt_man_;
 
 			volatile uint32_t	wdt_count_;
 			volatile uint32_t	wdt_limit_;
 			volatile bool		wdt_enable_;
 			volatile bool		wdt_stop_;
-
+#endif
 		public:
 			cmt_task() : task_10ms_(nullptr),
-				millis10x_(0),
-				wdt_man_(), wdt_count_(0), wdt_limit_(10 * 60 * 100), wdt_enable_(false), wdt_stop_(false)
+				millis10x_(0)
+#ifdef WATCH_DOG
+				, wdt_man_(), wdt_count_(0), wdt_limit_(10 * 60 * 100), wdt_enable_(false), wdt_stop_(false)
+#endif
 				{ }
 
 			void set_task_10ms(void (*task)(void)) {
@@ -84,7 +88,7 @@ namespace seeda {
 				while(tmp == millis10x_) ;
 			}
 
-
+#ifdef WATCH_DOG
 			void start_wdt() { wdt_man_.start(); }
 
 			void clear_wdt() { wdt_count_ = 0; }
@@ -94,9 +98,10 @@ namespace seeda {
 			void enable_wdt(bool ena = true) { wdt_enable_ = ena; }
 
 			void limit_wdt(uint32_t lim) { wdt_limit_ = lim; }
-
+#endif
 			void operator() ()
 			{
+#ifdef WATCH_DOG
 				if(wdt_stop_) {
 					// リフレッシュが止まり、強制リセット
 				} else if(wdt_enable_) {
@@ -108,7 +113,7 @@ namespace seeda {
 					// WDT 無効： 常にリフレッシュ
 					wdt_man_.refresh();
 				}
-
+#endif
 				if(task_10ms_ != nullptr) (*task_10ms_)();
 				++millis10x_;
 			}
@@ -163,7 +168,9 @@ namespace seeda {
 			{  // タイマー設定、１００Ｈｚ（１０ｍｓ）
 				uint8_t int_level = 5;
 				cmt0_.start(100, int_level);
+#ifdef WATCH_DOG
 				cmt0_.at_task().start_wdt();
+#endif
 			}
 
 			{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
@@ -257,7 +264,7 @@ namespace seeda {
 			return cmt0_.get_counter();
 		}
 
-
+#ifdef WATCH_DOG
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ウオッチ・ドッグをクリア
@@ -303,5 +310,6 @@ namespace seeda {
 		{
 			cmt0_.at_task().limit_wdt(lim);
 		}
+#endif
 	};
 }

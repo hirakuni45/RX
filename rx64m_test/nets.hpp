@@ -448,7 +448,7 @@ namespace seeda {
 			setup_.write_eui();
 		}
 
-
+#ifdef WATCH_DOG
 		void set_watchdog_()
 		{
 			typedef utils::parse_cgi_post<256, 2> CGI_REST;
@@ -482,7 +482,7 @@ namespace seeda {
 				set_watchdog(static_cast<uint32_t>(time) * 60 * 100, enable);
 			}
 		}
-
+#endif
 
 		void set_restart_()
 		{
@@ -662,12 +662,12 @@ namespace seeda {
 				set_ip_();
 				http_.exec_link("/setup");
 			} );
-
+#ifdef WATCH_DOG
 			http_.set_cgi("/cgi/watchdog.cgi", "RestartTime", [=](void) {
 				set_watchdog_();
 				http_.exec_link("/setup");
 			} );
-
+#endif
 			http_.set_cgi("/cgi/restart.cgi", "RestartTime", [=](void) {
 				set_restart_();
 				http_.exec_link("/setup");
@@ -707,11 +707,12 @@ namespace seeda {
 
 					write_file_.set_path(pre_.get().write_path_);
 					write_file_.enable(pre_.get().write_enable_); 
-
+#ifdef WATCH_DOG
 					uint32_t time = pre_.get().watchdog_time_;
 					if(time >= WATCHDOG_MIN) {
 						set_watchdog(time * 60 * 100, pre_.get().watchdog_enable_);
 					}
+#endif
 				}
 				client_.start_connect();
 			}

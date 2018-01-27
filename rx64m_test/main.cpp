@@ -514,6 +514,7 @@ namespace seeda {
 	}
 
 
+#ifdef WATCH_DOG
 	//-----------------------------------------------------------------//
 	/*!
 		@brief  ウォッチドッグ時間の設定
@@ -527,6 +528,7 @@ namespace seeda {
 		core_.limit_wdt(limit);
 		core_.enable_wdt(ena);
 	}
+#endif
 
 
 	//-----------------------------------------------------------------//
@@ -903,12 +905,12 @@ int main(int argc, char** argv)
 			if(restart_delay_ == 5) {
 				utils::format("Restart SEEDA03\n");
 			} else if(restart_delay_ == 0) {
-				// リフレッシュを停止
-				core_.stop_wdt();
+				device::SYSTEM::SWRR = 0xA501;				
 			}
 		}
-
+#ifdef WATCH_DOG
 		// メインループでのウオッチ・ドッグのクリア
 		core_.clear_wdt();
+#endif
 	}
 }
