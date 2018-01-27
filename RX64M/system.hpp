@@ -729,6 +729,53 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>  DPSRSTF;
 		};
 		static rstsr0_t<0x0008C290> RSTSR0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  リセットステータスレジスタ 1（RSTSR1）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct rstsr1_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  CWSF;
+		};
+		static rstsr1_t<0x0008C291> RSTSR1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  リセットステータスレジスタ 2（RSTSR2）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct rstsr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>  IWDTRF;
+			bit_rw_t <io_, bitpos::B1>  WDTRF;
+			bit_rw_t <io_, bitpos::B2>  SWRF;
+		};
+		static rstsr2_t<0x000800C0> RSTSR2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ソフトウェアリセットレジスタ（SWRR）@n
+					0xA501 を書き込むとリセットされます。
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static rw32_t<0x000800C2> SWRR;
 	};
 	typedef system_t SYSTEM;
 
