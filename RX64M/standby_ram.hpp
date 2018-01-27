@@ -48,12 +48,12 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	書き込み
+			@brief	書き込み（８ビット）
 			@param[in]	pos		位置
 			@param[in]	data	データ
 		 */
 		//-----------------------------------------------------------------//
-		static bool put(uint32_t pos, uint8_t data) noexcept
+		static bool put8(uint32_t pos, uint8_t data) noexcept
 		{
 			if(pos >= SIZE) {
 				return false;
@@ -65,7 +65,41 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	コピー書き込み
+			@brief	書き込み（１６ビット）
+			@param[in]	pos		位置
+			@param[in]	data	データ
+		 */
+		//-----------------------------------------------------------------//
+		static bool put16(uint32_t pos, uint16_t data) noexcept
+		{
+			if(pos >= SIZE) {
+				return false;
+			}
+			device::wr16_(TOP + pos, data);
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	書き込み（３２ビット）
+			@param[in]	pos		位置
+			@param[in]	data	データ
+		 */
+		//-----------------------------------------------------------------//
+		static bool put32(uint32_t pos, uint32_t data) noexcept
+		{
+			if(pos >= SIZE) {
+				return false;
+			}
+			device::wr32_(TOP + pos, data);
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コピー（SRAM へ書き込み）
 			@param[in]	src		ソース
 			@param[in]	len		長さ
 			@param[in]	dst		書き込み先
@@ -84,12 +118,12 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	読み出し
+			@brief	読み出し（８ビット）
 			@param[in]	pos		位置
 			@param[out]	data	データ
 		 */
 		//-----------------------------------------------------------------//
-		static bool get(uint32_t pos, uint8_t& data) noexcept
+		static bool get8(uint32_t pos, uint8_t& data) noexcept
 		{
 			if(pos >= SIZE) {
 				return false;
@@ -101,7 +135,41 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	コピー書き込み
+			@brief	読み出し（１６ビット）
+			@param[in]	pos		位置
+			@param[out]	data	データ
+		 */
+		//-----------------------------------------------------------------//
+		static bool get16(uint32_t pos, uint16_t& data) noexcept
+		{
+			if(pos >= SIZE) {
+				return false;
+			}
+			data = device::rd16_(TOP + pos);
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	読み出し（３２ビット）
+			@param[in]	pos		位置
+			@param[out]	data	データ
+		 */
+		//-----------------------------------------------------------------//
+		static bool get32(uint32_t pos, uint32_t& data) noexcept
+		{
+			if(pos >= SIZE) {
+				return false;
+			}
+			data = device::rd32_(TOP + pos);
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コピー（SRAM から読み出し）
 			@param[in]	src		ソース
 			@param[in]	len		長さ
 			@param[in]	dst		書き込み先
