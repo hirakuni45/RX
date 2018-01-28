@@ -42,6 +42,8 @@ namespace device {
 	class rspi_io {
 	public:
 
+//		typedef device::PORT<device::PORTJ, device::bitpos::B5> LED;
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  データ、クロック位相タイプ
@@ -147,7 +149,10 @@ namespace device {
 			RSPI::SPSCR = 0x00;	// disable sequence control
 			RSPI::SPDCR = 0x20;	// SPLW=1 (long word access) 
 ///			RSPI::SPCMD0 = RSPI::SPCMD0.LSBF.b() | RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0100);
-			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0111);
+			// 8 bits
+//			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0111);
+			// 24 bits
+			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0001);
 
 			RSPI::SPCR.SPMS = 1;
 			RSPI::SPCR.MSTR = 1;
@@ -219,12 +224,24 @@ namespace device {
 		//----------------------------------------------------------------//
 		uint8_t xchg(uint8_t data = 0xff)
 		{
-//			RSPI::SPCR.SPTIE = 0;
-//			RSPI::SPCR.SPRIE = 0;
 			RSPI::SPDR = static_cast<uint32_t>(data);
 			while(RSPI::SPSR.SPRF() == 0) sleep_();
-			uint32_t d = RSPI::SPDR();
-		    return d & 0xff;
+		    return RSPI::SPDR();
+		}
+
+
+		//----------------------------------------------------------------//
+		/*!
+			@brief	リード・ライト
+			@param[in]	data	書き込みデータ
+			@return 読み出しデータ
+		*/
+		//----------------------------------------------------------------//
+		uint32_t xchg32(uint32_t data = 0)
+		{
+			RSPI::SPDR = static_cast<uint32_t>(data);
+			while(RSPI::SPSR.SPRF() == 0) sleep_();
+		    return RSPI::SPDR();
 		}
 
 
