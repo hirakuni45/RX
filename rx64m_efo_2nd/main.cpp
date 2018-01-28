@@ -27,7 +27,7 @@
 
 namespace {
 
-	static const int main_version_ = 50;
+	static const int main_version_ = 75;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -71,50 +71,41 @@ namespace {
 	typedef device::PORT<device::PORT1, device::bitpos::B6> LTC_BUSY;
 	typedef device::PORT<device::PORT5, device::bitpos::B3> LTC_PD;    // P53(53)
 
-#define SOFT_SPI
+// #define SOFT_SPI
 #ifdef SOFT_SPI
-#if 0
-	typedef device::PORT<device::PORT5, device::bitpos::B1> SPCK;
-	typedef device::PORT<device::PORT5, device::bitpos::B2> MISO;
-	typedef device::PORT<device::PORT5, device::bitpos::B0> MOSI;
-#else
+//  旧タイプ、SCI 簡易 SPI タイプ
+//	typedef device::PORT<device::PORT5, device::bitpos::B1> SPCK;
+//	typedef device::PORT<device::PORT5, device::bitpos::B2> MISO;
+//	typedef device::PORT<device::PORT5, device::bitpos::B0> MOSI;
 	typedef device::PORT<device::PORTA, device::bitpos::B5> SPCK;
 	typedef device::PORT<device::PORTA, device::bitpos::B7> MISO;
 	typedef device::PORT<device::PORTA, device::bitpos::B6> MOSI;
-#endif
 	typedef device::spi_io<MISO, MOSI, SPCK, device::soft_spi_mode::LTC> SPI_IO;
 #else
-	typedef device::rspi_io<device::RSPI> LTC_SPI_IO;
+	typedef device::rspi_io<device::RSPI> SPI_IO;
 #endif
 	typedef chip::LTC2348_16a<LTC_CSN, LTC_CNV, LTC_BUSY, SPI_IO> EADC;
 	EADC		eadc_;
 
-	uint16_t ch0_src_[1024+1];
-	uint16_t ch1_src_[1024+1];
+	// バッファ・サイズは２のｎ乗のみ設定可能
+	static const uint32_t CAP_BUFF_SIZE = 4096;
+	uint16_t ch0_src_[CAP_BUFF_SIZE];
+	uint16_t ch1_src_[CAP_BUFF_SIZE];
 
-	volatile uint16_t	cap_num_;
-	volatile uint16_t	cap_pos_;
-
-	void capture_request_(uint16_t num)
-	{
-		if(num > 1024) num = 1024;
-		else if(num == 0) return;
-		cap_pos_ = 0;
-		cap_num_ = num + 1;
-	}
+	volatile uint16_t cap_pos_ = 0;
+	volatile bool cap_enable_ = false;
 
 	class capture_task {
 	public:
 		void operator() ()
 		{
-			if(cap_num_ > 0) {
-				LED::P = 1;
-				eadc_.convert();
-				LED::P = 0;
-				--cap_num_;
-				ch0_src_[cap_pos_] = eadc_.get_value(0);
-				ch1_src_[cap_pos_] = eadc_.get_value(1);	
+			if(cap_enable_) {
+///				LED::P = 1;
 				++cap_pos_;
+				cap_pos_ &= CAP_BUFF_SIZE - 1;
+				ch0_src_[cap_pos_] = eadc_.convert0();
+				ch1_src_[cap_pos_] = eadc_.convert1();
+///				LED::P = 0;
 			}
 		}
 	};
@@ -141,19 +132,28 @@ namespace {
 	typedef device::dac_out	DAC;
 	DAC		dac_;
 
-	volatile uint16_t cap_count_;
-	volatile uint16_t irq_count_;
-	uint16_t irq_state_;
+	uint16_t ch0_trg_[1024];
+	uint16_t ch1_trg_[1024];
+
+	void copy_trg_(uint32_t len)
+	{
+		uint32_t pos = cap_pos_;
+		pos -= len;
+		for(uint32_t i = 0; i < len; ++i) {
+			pos &= (CAP_BUFF_SIZE - 1);
+			ch0_trg_[i] = ch0_src_[pos];
+			ch1_trg_[i] = ch1_src_[pos];
+			++pos;
+		}
+	}
 
 	// trigger task
 	class irq_task {
 	public:
 		void operator() ()
 		{
-			if(cap_count_ > 0) {
-				capture_request_(cap_count_);
-			}
-			++irq_count_;
+			LED::P = 1;
+
 		}
 	};
 
@@ -279,20 +279,20 @@ int main(int argc, char** argv)
 	while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
 
 	// Base Clock 12.5MHz
-	// PLLDIV: 1/1, STC: 16 倍(200MHz)
+	// PLLDIV: 1/1, STC: 19 倍(237.5MHz)
 	device::SYSTEM::PLLCR = device::SYSTEM::PLLCR.PLIDIV.b(0) |
-							device::SYSTEM::PLLCR.STC.b(0b100011);
+							device::SYSTEM::PLLCR.STC.b(0b100101);
 	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
 
-	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)		// 1/2 (200/4=50)
-						  | device::SYSTEM::SCKCR.ICK.b(1)		// 1/2 (200/2=100)
-						  | device::SYSTEM::SCKCR.BCK.b(2)		// 1/2 (200.5/4=50)
-						  | device::SYSTEM::SCKCR.PCKA.b(1)		// 1/2 (200.5/2=100)
-						  | device::SYSTEM::SCKCR.PCKB.b(2)		// 1/4 (200.5/4=50)
-						  | device::SYSTEM::SCKCR.PCKC.b(2)		// 1/4 (200.5/4=50)
-						  | device::SYSTEM::SCKCR.PCKD.b(2);	// 1/4 (200.5/4=50)
-	device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(0b0100) | 1;  // USB Clock: 1/5 (200/5=40)
+	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)		// 1/2 (237.5/4= 59.375)
+						  | device::SYSTEM::SCKCR.ICK.b(1)		// 1/2 (237.5/2=118.75)
+						  | device::SYSTEM::SCKCR.BCK.b(2)		// 1/2 (237.5/4= 59.375)
+						  | device::SYSTEM::SCKCR.PCKA.b(1)		// 1/2 (237.5/2=118.75)
+						  | device::SYSTEM::SCKCR.PCKB.b(2)		// 1/4 (237.5/4= 59.375)
+						  | device::SYSTEM::SCKCR.PCKC.b(2)		// 1/4 (237.5/4= 59.375)
+						  | device::SYSTEM::SCKCR.PCKD.b(2);	// 1/4 (237.5/4= 59.375)
+	device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(0b0100) | 1;  // USB Clock: 1/5 (237/5)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	LED::DIR = 1;
@@ -305,8 +305,7 @@ int main(int argc, char** argv)
 
 	{  // TPU0 設定
 		uint8_t int_level = 4;
-//		if(!tpu0_.start(100000, int_level)) {
-		if(!tpu0_.start(25000, int_level)) {
+		if(!tpu0_.start(375000, int_level)) {
 			utils::format("TPU0 not start ...\n");
 		}
 	}
@@ -331,19 +330,12 @@ int main(int argc, char** argv)
 		LTC_PD::P = 0;  // パワーダウンしない！
 		// 内臓リファレンスと内臓バッファ
 		// VREFIN: 2.024V、VREFBUF: 4.096V、Analog range: -10.24V to +10.24V
-///		if(!eadc_.start(750000, EADC::span_type::M10_24P10_24)) {
 		if(!eadc_.start(800000, EADC::span_type::M10_24P10_24)) {
 			utils::format("LTC2348_16 not found...\n");
 		}
 	}
 
-	// キャプチャー時間計測
-	if(0) {
-		while(1) {
-			while(cap_num_ > 0) ;
-			capture_request_(1024);
-		}
-	}
+	cap_enable_ = true;
 
 	if(0) {
 		uint16_t brr = device::SCI2::BRR();
@@ -352,28 +344,9 @@ int main(int argc, char** argv)
 		m_sci_.puts(tmp);
 	}
 
-	if(0) {  // test wave data
-		uint16_t v = 0;
-		for(int i = 0; i < 1024; ++i) {
-			ch0_src_[i] = v;
-			ch1_src_[i] = v + 32768;
-			v += 64;
-		}
-	} else {
-		for(int i = 0; i <= 1024; ++i) {
-			ch0_src_[i] = 0;
-			ch1_src_[i] = 0;
-		}
-	}
-
-	// キャプチャー
-	capture_request_(1024);
-
 	// 初期設定
-	dac_.out0(32768);  // トリガー電圧０Ｖ
-
-	irq_count_ = 0;
-	irq_state_ = 0;
+//	dac_.out0(32768);  // トリガー電圧０Ｖ
+	dac_.out0(32768 + 20000);  // トリガー電圧３．７５Ｖ
 
 	uint8_t cnt = 0;
 	while(1) {
@@ -386,10 +359,8 @@ int main(int argc, char** argv)
 				if(cmd == CMD::START) {
 					task_ = TASK::LENGTH;
 				} else if(cmd == CMD::ASC_CNVTEST) {
-					capture_request_(1024);
 					send_task_ = SEND_TASK::ASCII;
 				} else if(cmd == CMD::ASC_CNVTESTS) {
-					capture_request_(1);
 					send_task_ = SEND_TASK::ASCII2;
 				} else if(cmd == CMD::END) {
 					if(send_task_ == SEND_TASK::MULTI) {  // 波形取得を強制終了
@@ -426,9 +397,9 @@ int main(int argc, char** argv)
 				dac_.out0(volt_);  // トリガー電圧設定
 				bool trg = true;
 				if(volt_ < 32768) trg = false;
-				cap_count_ = length_;
+///				cap_count_ = length_;
 				 setup_irq_(trg);
-				irq_state_ = irq_count_;
+///				irq_state_ = irq_count_;
 				irq_.enable();
 				if(length_ == 0) {
 					send_task_ = SEND_TASK::SINGLE;
@@ -445,35 +416,34 @@ int main(int argc, char** argv)
 		switch(send_task_) {
 
 		case SEND_TASK::SINGLE:
-			if(cap_num_ > 0) break;
-			eadc_.convert();
-			send_wave_(0x01, eadc_.get_value(0));
-			send_wave_(0x02, eadc_.get_value(1));
+			send_wave_(0x01, ch0_trg_[0]);
+			send_wave_(0x02, ch1_trg_[0]);
 			send_task_ = SEND_TASK::READY;
 			break;
 
 		case SEND_TASK::MULTI:
-			if(irq_state_ == irq_count_) break;
-			if(cap_num_ > 0) break;
-			send_wave_(0x01, length_, ch0_src_ + 1);
-			send_wave_(0x02, length_, ch1_src_ + 1);
+			send_wave_(0x01, length_, ch0_trg_);
+			send_wave_(0x02, length_, ch1_trg_);
 			send_task_ = SEND_TASK::READY;
 			break;
 
 		case SEND_TASK::ASCII:
-			if(cap_num_ > 0) break;
-			for(uint16_t i = 1; i <= 1024; ++i) {
-				char tmp[128];
-				utils::sformat("%d,%d,%d\r\n", tmp, sizeof(tmp)) % i % ch0_src_[i] % ch1_src_[i];
-				m_sci_.puts(tmp);
+			{
+				copy_trg_(1024);
+				for(uint16_t i = 0; i < 1024; ++i) {
+					char tmp[128];
+					utils::sformat("%d,%d,%d\r\n", tmp, sizeof(tmp))
+						% i % ch0_trg_[i] % ch1_trg_[i];
+					m_sci_.puts(tmp);
+				}
 			}
 			send_task_ = SEND_TASK::READY;
 			break;
 		case SEND_TASK::ASCII2:
-			if(cap_num_ > 0) break;
 			{
+				copy_trg_(1);
 				char tmp[128];
-				utils::sformat("%d,%d\r\n", tmp, sizeof(tmp)) % ch0_src_[1] % ch1_src_[1];
+				utils::sformat("%d,%d\r\n", tmp, sizeof(tmp)) % ch0_trg_[0] % ch1_trg_[0];
 				m_sci_.puts(tmp);
 			}
 			send_task_ = SEND_TASK::READY;
@@ -483,7 +453,7 @@ int main(int argc, char** argv)
 		default:
 			break;
 		}
-
+#if 0
 		++cnt;
 		if(cnt >= 50) {
 			cnt = 0;
@@ -493,6 +463,7 @@ int main(int argc, char** argv)
 		} else {
 			LED::P = 0;
 		}
+#endif
 	}
 }
 
