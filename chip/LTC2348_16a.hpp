@@ -87,10 +87,14 @@ namespace chip {
 
 		inline uint16_t get_data_loop_(uint32_t span)
 		{
+#if 0
 			uint8_t a = spi_.xchg(span >> 16);
 			uint8_t b = spi_.xchg(span >> 8);
 			spi_.xchg(span);
 			return (static_cast<uint16_t>(a) << 8) | static_cast<uint16_t>(b); 
+#else
+			return spi_.xchg32(span) >> 8;
+#endif
 		}
 
 	public:
@@ -150,8 +154,7 @@ namespace chip {
 
 			uint8_t int_level = 0;
 			bool port_opt = true;
-///			if(!spi_.start(56250000 / 8, SPI::PHASE::TYPE1, int_level, port_opt)) {
-			if(!spi_.start(56250000 / 8)) {
+			if(!spi_.start(59375000, SPI::PHASE::TYPE1, int_level, port_opt)) {
 				utils::format("Fail EADC SPI...\n");
 			}
 
@@ -208,50 +211,6 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		bool convert()
 		{
-///			SCKI::P = 0;
-///			SDI::P = 0;
-#if 0
-			if(BUSY::P() != 0) {
-				return false;
-			}
-
-			// tBUSYLH: CNV=1 で BUSY が応答する最大時間 (max 30ns) @n
-			// tCNVH: CNV 要求パルス (min 40ns)
-			{
-				CNV::P = 1;
-				uint16_t n = busy_loop_;
-				while(n > 0) {
-					if(BUSY::P() == 1) {
-						break;
-					}
-					--n;
-				}
-				if(n == 0) {
-					CNV::P = 0;
-					CSN::P = 1;
-					return false;
-				}
-			}
-#endif
-
-#if 0
-			CSN::P = 0;
-			CNV::P = 1;
-
-			// 変換待ち 最大 500ns
-			if(1) {
-				uint16_t n = cnv_loop_;
-				while(n > 0) {
-					if(BUSY::P() == 0) break;
-					--n;
-				}
-				if(n == 0) {
-					CSN::P = 1;
-					return false;
-				}
-				CNV::P = 0;
-			}
-#endif
 			CNV::P = 0;
 
 			CSN::P = 0;
@@ -259,9 +218,26 @@ namespace chip {
 			data_[1] = get_data_loop_(0x000000);
 			CSN::P = 1;
 
-			CNV::P = 1;
+			CNV::P = 1;  // 変換開始
 
 			return true;
+		}
+
+		// convert first step
+		inline uint16_t convert0()
+		{
+			CNV::P = 0;
+			CSN::P = 0;
+			return get_data_loop_(span_);
+		}
+
+		// convert final step
+		inline uint16_t convert1()
+		{
+			uint16_t d = get_data_loop_(0x000000);
+			CSN::P = 1;
+			CNV::P = 1;  // 変換開始
+			return d;
 		}
 
 
