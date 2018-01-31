@@ -1,14 +1,14 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M システム制御
+	@brief	RX600 グループ・システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX64M/system.hpp"
+#include "RX600/system.hpp"
 
 #ifndef F_ICLK
 #  error "system_io.hpp requires F_ICLK to be defined"
@@ -19,10 +19,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  systen_io クラス
-		@param[in]	base_clock	ベース・クロック周波数（１２ＭＨｚ）
+		@param[in]	BASE_CLOCK	ベース・クロック周波数（１２ＭＨｚ）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base_clock = 12000000>
+	template <uint32_t BASE_CLOCK = 12000000>
 	struct system_io {
 
 		//-------------------------------------------------------------//
@@ -41,11 +41,16 @@ namespace device {
 			device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
 			while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
 
-			// Base Clock 12MHz
-			device::SYSTEM::PLLCR.STC = 0b010011;		// PLL 10 倍(120MHz)
+			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
+			// ... MAX x30.0
+			uint32_t n = F_ICLK / BASE_CLOCK;
+			if(n < 10) n = 10;
+			else if(n > 30) n = 30;
+			n -= 10;
+			device::SYSTEM::PLLCR.STC = n + 0b010011;
 			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
-
+#if defined(SIG_RX64M)
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)    // 1/2 (120/2=60)
 								  | device::SYSTEM::SCKCR.ICK.b(0)    // 1/1 (120/1=120)
 								  | device::SYSTEM::SCKCR.BCK.b(1)    // 1/2 (120/2=60)
@@ -53,6 +58,27 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKB.b(1)   // 1/2 (120/2=60)
 								  | device::SYSTEM::SCKCR.PCKC.b(1)   // 1/2 (120/2=60)
 								  | device::SYSTEM::SCKCR.PCKD.b(1);  // 1/2 (120/2=60)
+#elif defined(SIG_RX71M)
+//			device::SYSTEM::MEM
+			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)    // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.ICK.b(0)    // 1/1 (240/1=240)
+								  | device::SYSTEM::SCKCR.BCK.b(1)    // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.PCKA.b(0)   // 1/2 (240/2=120)
+								  | device::SYSTEM::SCKCR.PCKB.b(1)   // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.PCKC.b(1)   // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.PCKD.b(1);  // 1/4 (240/4=60)
+#if 0
+			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)    // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.ICK.b(0)    // 1/1 (240/1=240)
+								  | device::SYSTEM::SCKCR.BCK.b(2)    // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.PCKA.b(1)   // 1/2 (240/2=120)
+								  | device::SYSTEM::SCKCR.PCKB.b(2)   // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.PCKC.b(2)   // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.PCKD.b(2);  // 1/4 (240/4=60)
+#endif
+#else
+#  error "system_io.hpp requires SIG_xxx to be defined"
+#endif
 			device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 		}

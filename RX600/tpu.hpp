@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M グループ・16 ビットタイマパルスユニット定義
+	@brief	RX600 グループ・16 ビットタイマパルスユニット定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -9,8 +9,8 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
-#include "RX64M/peripheral.hpp"
-#include "RX64M/icu.hpp"
+#include "RX600/peripheral.hpp"
+#include "RX600/icu.hpp"
 
 namespace device {
 

@@ -1,15 +1,15 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ Standby RAM 制御
+	@brief	RX600 グループ Standby RAM 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstring>
-#include "RX64M/power_cfg.hpp"
+#include "RX600/power_cfg.hpp"
 #include "common/io_utils.hpp"
 #include "common/delay.hpp"
 #include "common/format.hpp"
