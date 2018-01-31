@@ -153,8 +153,8 @@ namespace chip {
 			BUSY::DIR = 0;
 
 			uint8_t int_level = 0;
-			bool port_opt = true;
-			if(!spi_.start(59375000, SPI::PHASE::TYPE1, int_level, port_opt)) {
+			if(!spi_.start(59375000, SPI::PHASE::TYPE1, int_level)) {
+
 				utils::format("Fail EADC SPI...\n");
 			}
 
