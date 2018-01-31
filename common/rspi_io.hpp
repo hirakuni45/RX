@@ -20,7 +20,7 @@
 #define PCLK F_PCLKB
 #define PCLK_MAX (F_PCLKB / 4)
 #endif
-#elif defined(SIG_RX64M)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M)
 #ifndef F_PCLKA
 #  error "rspi_io.hpp requires F_PCLKA to be defined"
 #else
@@ -36,13 +36,12 @@ namespace device {
 	/*!
 		@brief  RSPI 制御クラス
 		@param[in]	RSPI	RSPI 定義クラス
+		@param[in]	PSEL	ポート選択
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class RSPI>
+	template <class RSPI, port_map::option PSEL = port_map::option::FIRST>
 	class rspi_io {
 	public:
-
-//		typedef device::PORT<device::PORTJ, device::bitpos::B5> LED;
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -115,11 +114,10 @@ namespace device {
 			@param[in]	speed	通信速度
 			@param[in]	dctype	データ、クロック位相タイプ
 			@param[in]	level	割り込みレベル（１～２）、０の場合はポーリング
-			@param[in]	port2nd	第二ポートを利用する場合「true」
 			@return エラー（速度設定範囲外）なら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t speed, PHASE dctype, uint8_t level = 0, bool port2nd = false)
+		bool start(uint32_t speed, PHASE dctype, uint8_t level = 0)
 		{
 			level_ = level;
 
@@ -127,11 +125,7 @@ namespace device {
 			RSPI::SPCR = 0x00;
 
 			// ポートを有効にする
-			port_map::option portopt = port_map::option::FIRST;
-			if(port2nd) {
-				portopt = port_map::option::SECOND;
-			}
-			port_map::turn(RSPI::get_peripheral(), true, portopt);
+			port_map::turn(RSPI::get_peripheral(), true, PSEL);
 
 			bool f = true;
 			uint8_t brdv;
@@ -183,7 +177,7 @@ namespace device {
 				f = false;
 			}
 			power_cfg::turn(RSPI::get_peripheral());
-			port_map::turn(RSPI::get_peripheral());
+			port_map::turn(RSPI::get_peripheral(), true, PSEL);
 
 #if 0
 			utils::format("RSPI Request Speed: %u [Hz]\n") % speed;
