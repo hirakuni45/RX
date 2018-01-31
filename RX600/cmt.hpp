@@ -11,8 +11,8 @@
 #include "common/io_utils.hpp"
 #if defined(SIG_RX63T)
 #include "RX63T/peripheral.hpp"
-#elif defined(SIG_RX64M)
-#include "RX64M/peripheral.hpp"
+#elif defined(SIG_RX64M) || defined(SIG_RX71M)
+#include "RX600/peripheral.hpp"
 #elif defined(SIG_RX24T)
 #include "RX24T/peripheral.hpp"
 #endif
