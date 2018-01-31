@@ -1,65 +1,275 @@
 //=====================================================================//
 /*! @file
-    @brief  RX64M UART(SCI1)サンプル @n
-			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
+    @brief  RX71M イグナイター
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/renesas.hpp"
-
-#include "common/sci_io.hpp"
-#include "common/cmt_io.hpp"
-#include "common/fifo.hpp"
-#include "common/format.hpp"
-#include "common/delay.hpp"
-#include "common/command.hpp"
+#include "main.hpp"
 
 namespace {
 
-	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
-	CMT		cmt_;
+	class cmt_task
+	{
+		void (*task_10ms_)();
 
-//	typedef utils::fifo<uint8_t, 128> BUFFER;
-//	typedef device::sci_io<device::SCI1, BUFFER, BUFFER> SCI;
-//	SCI		sci_;
+//		volatile unsigned long delay_;
+		volatile uint32_t millis10x_;
+
+	public:
+		cmt_task() : task_10ms_(nullptr),
+//			delay_(0),
+			millis10x_(0) { }
+
+		void operator() () {
+
+			if(task_10ms_ != nullptr) (*task_10ms_)();
+			++millis10x_;
+
+//			if(delay_) {
+//				--delay_;
+//			}
+			
+		}
+
+		void set_task_10ms(void (*task)(void)) {
+			task_10ms_ = task;
+		}
+
+		volatile unsigned long get_millis() const { return millis10x_ * 10; }
+
+//		volatile unsigned long get_delay() const { return delay_; }
+//		void set_delay(volatile unsigned long n) { delay_ = n; }
+	};
+
+	typedef device::cmt_io<device::CMT0, cmt_task> CMT;
+	CMT		cmt_;
 
 	typedef utils::fifo<uint8_t, 128> RX_BUF;
 	typedef utils::fifo<uint8_t, 256> TX_BUF;
 
+	// CRM interface (SCI10, FIRST)
+//	typedef device::sci_io<device::SCI10, RX_BUF, TX_BUF, device::port_map::option::SECOND> CRM;
+
 	// DC2 interface (SCI2, SECOND)
-	typedef device::sci_io<device::SCI2, RX_BUF, TX_BUF, device::port_map::option::SECOND> SCI2;
+	typedef device::sci_io<device::SCI2, RX_BUF, TX_BUF, device::port_map::option::SECOND> DC2;
 
 	// DC1 interface (SCI6, FIRST)
-	typedef device::sci_io<device::SCI6, RX_BUF, TX_BUF> SCI6;
+	typedef device::sci_io<device::SCI6, RX_BUF, TX_BUF> DC1;
 
-	SCI6	sci_;
+	// WGM interface (SCI7, FIRST)
+	typedef device::sci_io<device::SCI7, RX_BUF, TX_BUF> WGM;
+
+	// ICM interface (SCI3, FIRST)
+	typedef device::sci_io<device::SCI3, RX_BUF, TX_BUF> ICM;
+
+	ICM		sci_;
 
 	utils::command<256> cmd_;
+
+	typedef utils::rtc_io RTC;
+	RTC		rtc_;
+
+	RSPI	spi_;
+
+	typedef utils::sdc_io<RSPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC;
+	SDC		sdc_(spi_, 20000000);
+
+	net::ethernet   ethernet_;
+
+	HTTP_SERVER     https_(ethernet_, sdc_);
+
+	// 文字列表示、割り込み対応ロック／アンロック機構
+	volatile bool putch_lock_ = false;
+	utils::fixed_fifo<char, 1024> putch_tmp_;
+
+	void service_putch_tmp_()
+	{
+		dis_int();
+		while(putch_tmp_.length() > 0) {
+			auto ch = putch_tmp_.get();
+			sci_.putch(ch);
+//			telnets_.putch(ch);
+		}
+		ena_int();
+	}
 }
 
 extern "C" {
 
-	void sci_putch(char ch)
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  GMT 時間の取得
+		@return GMT 時間
+	*/
+	//-----------------------------------------------------------------//
+	time_t get_time()
 	{
-		sci_.putch(ch);
+		time_t t = 0;
+		rtc_.get_time(t);
+		return t;
 	}
 
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  システム・文字出力
+		@param[in]	ch	文字
+	*/
+	//-----------------------------------------------------------------//
+	void sci_putch(char ch)
+	{
+		if(putch_lock_) {
+			if((putch_tmp_.size() - putch_tmp_.length()) >= 2) {
+				putch_tmp_.put(ch);
+			}
+			return;
+		}
+		putch_lock_ = true;
+		sci_.putch(ch);
+//		telnets_.putch(ch);
+		putch_lock_ = false;
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  システム・文字列出力
+		@param[in]	s	文字列
+	*/
+	//-----------------------------------------------------------------//
+	void sci_puts(const char* s)
+	{
+		sci_.puts(s);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  システム・文字入力
+		@return	文字
+	*/
+	//-----------------------------------------------------------------//
 	char sci_getch(void)
 	{
 		return sci_.getch();
 	}
 
-	void sci_puts(const char *str)
-	{
-		sci_.puts(str);
-	}
 
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  システム・文字列長の取得
+		@return	文字列長
+	*/
+	//-----------------------------------------------------------------//
 	uint16_t sci_length(void)
 	{
 		return sci_.recv_length();
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へ初期化関数を提供
+		@param[in]	drv		Physical drive nmuber (0)
+		@return ステータス
+	 */
+	//-----------------------------------------------------------------//
+	DSTATUS disk_initialize(BYTE drv) {
+		return sdc_.at_mmc().disk_initialize(drv);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へステータスを提供
+		@param[in]	drv		Physical drive nmuber (0)
+	 */
+	//-----------------------------------------------------------------//
+	DSTATUS disk_status(BYTE drv) {
+		return sdc_.at_mmc().disk_status(drv);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へリード・セクターを提供
+		@param[in]	drv		Physical drive nmuber (0)
+		@param[out]	buff	Pointer to the data buffer to store read data
+		@param[in]	sector	Start sector number (LBA)
+		@param[in]	count	Sector count (1..128)
+		@return リザルト
+	 */
+	//-----------------------------------------------------------------//
+	DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
+		return sdc_.at_mmc().disk_read(drv, buff, sector, count);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へライト・セクターを提供
+		@param[in]	drv		Physical drive nmuber (0)
+		@param[in]	buff	Pointer to the data to be written	
+		@param[in]	sector	Start sector number (LBA)
+		@param[in]	count	Sector count (1..128)
+		@return リザルト
+	 */
+	//-----------------------------------------------------------------//
+	DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
+		return sdc_.at_mmc().disk_write(drv, buff, sector, count);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へI/O コントロールを提供
+		@param[in]	drv		Physical drive nmuber (0)
+		@param[in]	ctrl	Control code
+		@param[in]	buff	Buffer to send/receive control data
+		@return リザルト
+	 */
+	//-----------------------------------------------------------------//
+	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
+		return sdc_.at_mmc().disk_ioctl(drv, ctrl, buff);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	FatFs へ時間を提供
+		@return FatFs 時間
+	 */
+	//-----------------------------------------------------------------//
+	DWORD get_fattime(void) {
+		auto t = get_time();
+		return utils::str::get_fattime(t);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	UTF-8 から ShiftJIS への変換
+		@param[in]	src	UTF-8 文字列ソース
+		@param[out]	dst	ShiftJIS 文字列出力
+		@param[in]	dsz	文字列出力サイズ
+	 */
+	//-----------------------------------------------------------------//
+	void utf8_to_sjis(const char* src, char* dst, uint16_t dsz) {
+		utils::str::utf8_to_sjis(src, dst, dsz);
+	}
+
+
+	unsigned long millis(void)
+	{
+		return cmt_.at_task().get_millis();
+	}
+
+
+	void set_task_10ms(void (*task)(void)) {
+		cmt_.at_task().set_task_10ms(task);
 	}
 }
 
@@ -69,9 +279,13 @@ int main(int argc, char** argv)
 {
 	device::system_io<12000000>::setup_system_clock();
 
-	{  // タイマー設定（６０Ｈｚ）
+	{  // タイマー設定 (100Hz) 10ms
 		uint8_t int_level = 4;
-		cmt_.start(60, int_level);
+		cmt_.start(100, int_level);
+	}
+
+	{  // RTC 開始
+		rtc_.start();
 	}
 
 	{  // SCI 設定
@@ -81,14 +295,41 @@ int main(int argc, char** argv)
 
 	utils::format("Start RX71M Ignitor\n");
 
-#if 0
-	{  // SCI 設定
-		uint8_t int_level = 2;
-		sci_.start(115200, int_level);
-	}
-#endif
-
 	cmd_.set_prompt("# ");
+
+	// SD カード・クラスの初期化
+	sdc_.start();
+
+	device::power_cfg::turn(device::peripheral::ETHERC0);
+	device::port_map::turn(device::peripheral::ETHERC0);
+
+	set_interrupt_task(INT_Excep_ICU_GROUPAL1,
+		static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
+
+	ethernet_.start();
+
+	{
+		static const uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+		net::ip_address ipa(192, 168, 0, 20);
+		bool dhcp = true;
+		if(dhcp) {
+			if(ethernet_.begin(mac) == 0) {
+				utils::format("Ethernet Fail: begin (DHCP)...\n");
+				utils::format("SetIP: ");
+				ethernet_.begin(mac, ipa);
+			} else {
+				utils::format("DHCP: ");
+			}
+		} else {
+			ethernet_.begin(mac, ipa);
+			utils::format("SetIP: ");
+		}
+		utils::format("%s\n") % ethernet_.get_local_ip().c_str();
+	}
+
+	https_.start("GRAVITON HTTP Server");
+//	ftps_.start("GR-KAEDE", "Renesas_RX64M", "KAEDE", "KAEDE");
+//	telnets_.start("SEEDA03");
 
 	device::PORTC::PDR.B0 = 1; // output
 	device::PORTC::PDR.B1 = 1; // output
@@ -98,6 +339,14 @@ int main(int argc, char** argv)
 	uint32_t cnt = 0;
 	while(1) {
 		cmt_.sync();
+
+		ethernet_.service();
+
+		https_.service(100);
+//		ftps_.service(100);
+//		telnets_.service(100);
+
+		sdc_.service();
 
 		if(cmd_.service()) {
 		}
