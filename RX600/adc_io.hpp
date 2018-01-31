@@ -8,9 +8,9 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX64M/port_map.hpp"
-#include "RX64M/power_cfg.hpp"
-#include "RX64M/icu_mgr.hpp"
+#include "RX600/port_map.hpp"
+#include "RX600/power_cfg.hpp"
+#include "RX600/icu_mgr.hpp"
 #include "common/vect.h"
 
 /// F_PCLKD は変換パラメーター計算で必要で、設定が無いとエラーにします。

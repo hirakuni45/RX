@@ -1,16 +1,16 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M グループ D/A 制御
+	@brief	RX600 グループ D/A 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX64M/power_cfg.hpp"
-#include "RX64M/icu_mgr.hpp"
-#include "RX64M/r12da.hpp"
+#include "RX600/power_cfg.hpp"
+#include "RX600/icu_mgr.hpp"
+#include "RX600/r12da.hpp"
 #include "common/delay.hpp"
 
 namespace device {
