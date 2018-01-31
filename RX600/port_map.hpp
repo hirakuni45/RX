@@ -1,17 +1,17 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M グループ・ポート・マッピング @n
+	@brief	RX600 グループ・ポート・マッピング @n
 			・ペリフェラル型に従って、ポートの設定をグループ化 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "RX600/port.hpp"
-#include "RX64M/mpc.hpp"
-#include "RX64M/peripheral.hpp"
+#include "RX600/mpc.hpp"
+#include "RX600/peripheral.hpp"
 
 namespace device {
 
@@ -25,7 +25,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ポート・マッピング・候補型
+			@brief  ポート・マッピング・オプション型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class option : uint8_t {
@@ -34,7 +34,6 @@ namespace device {
 			THIRD,		///< 第３候補
 			FORCE,		///< 第４候補
 		};
-
 
 	private:
 
@@ -321,7 +320,7 @@ namespace device {
 			@brief  周辺機器に切り替える
 			@param[in]	t	周辺機器タイプ
 			@param[in]	ena	無効にする場合「false」
-			@param[in]	opt	オプション（候補）
+			@param[in]	opt	ポート・マップ・オプション
 		*/
 		//-----------------------------------------------------------------//
 		static bool turn(peripheral t, bool ena = true, option opt = option::FIRST) noexcept

@@ -1,15 +1,15 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M グループ・RTC 制御
+	@brief	RX600 グループ・RTC 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX64M/rtc.hpp"
-#include "RX64M/system.hpp"
+#include "RX600/rtc.hpp"
+#include "RX600/system.hpp"
 #include "common/time.h"
 
 namespace utils {
