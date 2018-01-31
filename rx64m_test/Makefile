@@ -59,7 +59,7 @@ MCU_TARGET	=
 
 INC_SYS		=
 
-INC_APP		=	. ../ ../RX64M ../r_net
+INC_APP		=	. ../ ../RX600 ../RX64M ../r_net
 
 OPTIMIZE	=	-O3
 

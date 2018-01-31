@@ -497,7 +497,7 @@ namespace seeda {
 			utils::format("Stall RTC write...\n");
 			return;
 		}
-		operating_org_ = t;
+//		operating_org_ = t;
 	}
 
 
