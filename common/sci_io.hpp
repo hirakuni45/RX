@@ -10,6 +10,7 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
+#include "RX600/port_map.hpp"
 
 /// F_PCLKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCLKB
@@ -24,9 +25,11 @@ namespace device {
 		@param[in]	SCI	SCI 定義クラス
 		@param[in]	RECV_BUFF	受信バッファクラス
 		@param[in]	SEND_BUFF	送信バッファクラス
+		@param[in]	PSEL		ポート選択
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI, class RECV_BUFF, class SEND_BUFF>
+	template <class SCI, class RECV_BUFF, class SEND_BUFF,
+		port_map::option PSEL = port_map::option::FIRST>
 	class sci_io {
 
 		static RECV_BUFF recv_;
@@ -61,7 +64,7 @@ namespace device {
 
 		static INTERRUPT_FUNC void send_task_()
 		{
-#if SIG_RX64M
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			if(send_.length() > 0) {
 				SCI::TDR = send_.get();
 			}
@@ -88,7 +91,7 @@ namespace device {
 		}
 
 		void set_intr_() {
-#if SIG_RX64M
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
 #else
 			set_vector_(SCI::get_rx_vec(), SCI::get_te_vec());
@@ -124,7 +127,7 @@ namespace device {
 
 			SCI::SCR = 0x00;			// TE, RE disable.
 
-			port_map::turn(SCI::get_peripheral());
+			port_map::turn(SCI::get_peripheral(), true, PSEL);
 
 			uint32_t brr = F_PCLKB / baud / 16;
 			uint8_t cks = 0;
@@ -269,7 +272,7 @@ brr = 1;
 					while(send_.length() != 0) sleep_();
 				}
 				send_.put(ch);
-#if SIG_RX64M
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 				SCI::SCR.TIE = 0;
 				if(send_stall_) {
 					while(SCI::SSR.TEND() == 0) sleep_();
@@ -304,7 +307,7 @@ brr = 1;
 				if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
 					SCI::SSR.ORER = 0;	///< 受信オーバランエラークリア
 				}
-#if defined(SIG_RX64M) || defined(SIG_RX24T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX24T)
 				auto n = SCI::SSR.RDRF();
 #else
 				uint32_t n = 0;
@@ -402,10 +405,10 @@ brr = 1;
 		}
 	};
 
-	template<class SCI, class RECV_BUFF, class SEND_BUFF>
-		RECV_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF>::recv_;
-	template<class SCI, class RECV_BUFF, class SEND_BUFF>
-		SEND_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF>::send_;
-	template<class SCI, class RECV_BUFF, class SEND_BUFF>
-		volatile bool sci_io<SCI, RECV_BUFF, SEND_BUFF>::send_stall_;
+	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::option PSEL>
+		RECV_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::recv_;
+	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::option PSEL>
+		SEND_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::send_;
+	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::option PSEL>
+		volatile bool sci_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::send_stall_;
 }
