@@ -125,10 +125,8 @@ namespace device {
 
 			RXIF8   = 100, // SCIFA8
 			TXIF8   = 101,
-
 			RXIF9   = 102, // SCIFA9
 			TXIF9   = 103,
-
 			RXIF10  = 104, // SCIFA10
 			TXIF10  = 105,
 
@@ -344,12 +342,21 @@ namespace device {
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
 
+			rw8_t<base + 100> RXIF8;
+			rw8_t<base + 101> TXIF8;
+			rw8_t<base + 102> RXIF9;
+			rw8_t<base + 103> TXIF9;
+			rw8_t<base + 104> RXIF10;
+			rw8_t<base + 105> TXIF10;
+
 			rw8_t<base + 106> GROUPBE0;
 			rw8_t<base + 110> GROUPBL0;
 			rw8_t<base + 111> GROUPBL1;
 			rw8_t<base + 112> GROUPAL0;
 			rw8_t<base + 113> GROUPAL1;
 
+			rw8_t<base + 114> RXIF11;
+			rw8_t<base + 115> TXIF11;
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
 
@@ -493,15 +500,23 @@ namespace device {
 			typedef rw8_t<base + 0x0C> ier0C;
 			bit_rw_t<ier0C, bitpos::B2>	RXI7;
 			bit_rw_t<ier0C, bitpos::B3>	TXI7;
+			bit_rw_t<ier0C, bitpos::B4>	RXIF8;
+			bit_rw_t<ier0C, bitpos::B5>	TXIF8;
+			bit_rw_t<ier0C, bitpos::B6>	RXIF9;
+			bit_rw_t<ier0C, bitpos::B7>	TXIF9;
 
 			typedef rw8_t<base + 0x0D> ier0D;
+			bit_rw_t<ier0D, bitpos::B0>	RXIF10;
+			bit_rw_t<ier0D, bitpos::B1>	TXIF10;
 			bit_rw_t<ier0D, bitpos::B2>	GROUPBE0;
 			bit_rw_t<ier0D, bitpos::B6>	GROUPBL0;
 			bit_rw_t<ier0D, bitpos::B7>	GROUPBL1;
+
 			typedef rw8_t<base + 0x0E> ier0E;
 			bit_rw_t<ier0E, bitpos::B0>	GROUPAL0;
 			bit_rw_t<ier0E, bitpos::B1> GROUPAL1;
-
+			bit_rw_t<ier0E, bitpos::B2>	RXIF11;
+			bit_rw_t<ier0E, bitpos::B3>	TXIF11;
 			bit_rw_t<ier0E, bitpos::B4> RXI12;
 			bit_rw_t<ier0E, bitpos::B5> TXI12;
 
@@ -629,6 +644,12 @@ namespace device {
 
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
+			rw8_t<base + 100> RXIF8;
+			rw8_t<base + 101> TXIF8;
+			rw8_t<base + 102> RXIF9;
+			rw8_t<base + 103> TXIF9;
+			rw8_t<base + 104> RXIF10;
+			rw8_t<base + 105> TXIF10;
 
 			rw8_t<base + 106> GROUPBE0;
 			rw8_t<base + 110> GROUPBL0;
@@ -636,6 +657,8 @@ namespace device {
 			rw8_t<base + 112> GROUPAL0;
 			rw8_t<base + 113> GROUPAL1;
 
+			rw8_t<base + 114> RXIF11;
+			rw8_t<base + 115> TXIF11;
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
 
