@@ -2,7 +2,7 @@
 //=====================================================================//
 /*! @file
     @brief  サンプリング・クラス
-	@copyright Copyright 2017 Kunihito Hiramatsu All Right Reserved.
+	@copyright Copyright 2017, 2018 Kunihito Hiramatsu All Right Reserved.
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -10,6 +10,8 @@
 #include "common/time.h"
 #include "common/fixed_fifo.hpp"
 #include "fixed_map.hpp"
+
+// #define MEDIAN
 
 namespace seeda {
 
@@ -224,8 +226,9 @@ namespace seeda {
 
 			if(t_.limit_hi_level_ < data) ++t_.limit_hi_count_;
 			if(t_.limit_lo_level_ > data) ++t_.limit_lo_count_;
-
+#ifdef MEDIAN
 			map_.insert(data, 1);
+#endif
 			++count_;
 		}
 
@@ -242,11 +245,11 @@ namespace seeda {
 			trav_sum_ = 0;
 			exit_trav_ = false;
 
-///			in_trav_(0);
-
 			t_.median_  = trav_med_;
 			t_.average_ = trav_sum_ / count_;
 #endif
+
+#ifdef MEDIAN
 			uint32_t med = 0;
 			uint32_t sum = 0;
 			uint32_t i = 0;
@@ -268,6 +271,9 @@ namespace seeda {
 				++i;
 			}
 			t_.median_ = med;
+#else
+			t_.median_ = (static_cast<uint32_t>(t_.min_) + static_cast<uint32_t>(t_.max_)) / 2;
+#endif
 			t_.average_ = sum_ / count_;
 		}
 
