@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M グループ・S12ADC 定義
+	@brief	RX600 グループ・S12ADC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -9,10 +9,10 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
-#include "RX64M/peripheral.hpp"
+#include "RX600/peripheral.hpp"
 #include "RX600/port.hpp"
-#include "RX64M/mpc.hpp"
-#include "RX64M/icu.hpp"
+#include "RX600/mpc.hpp"
+#include "RX600/icu.hpp"
 
 namespace device {
 

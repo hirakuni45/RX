@@ -1,16 +1,16 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	SDHI（SD カード）FatFS ドライバー
+	@brief	RX600 グループ、SDHI（SD カード）FatFS ドライバー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "ff12b/src/diskio.h"
 #include "ff12b/src/ff.h"
-#include "RX64M/sdhi.hpp"
+#include "RX600/sdhi.hpp"
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
