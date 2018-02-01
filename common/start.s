@@ -2,7 +2,7 @@
 /*!	@file
 	@brief	RX スタート・アップ
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -66,6 +66,35 @@ _start:
 # init() 関数から開始
 	.extern	_init
 	bra		_init
+
+	.global _turn_usermode
+_turn_usermode:
+	mvfc	psw,r1
+	or		#0x00100000,r1
+	push.l	r1
+	mvfc	pc,r1
+	add		#10,r1
+	push.l	r1
+	rte
+	nop
+	nop
+	nop
+	nop
+
+	.global _turn_supervisor
+_turn_supervisor:
+	mvfc	psw,r1
+	and		#0xffefffff,r1
+	push.l	r1
+	mvfc	pc,r1
+	add		#10,r1
+	push.l	r1
+	rte
+	nop
+	nop
+	nop
+	nop
+
 
 	.global	_rx_run_preinit_array
 	.type	_rx_run_preinit_array,@function
