@@ -45,7 +45,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  データ、クロック位相タイプ
+			@brief  データ、クロック位相タイプ型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class PHASE : uint8_t {
@@ -53,6 +53,27 @@ namespace device {
 			TYPE2,  ///< タイプ２
 			TYPE3,  ///< タイプ３
 			TYPE4,  ///< タイプ４ (SD カードアクセス）
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  データ長型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class DLEN : uint8_t {
+			W8  = 0b0111,	///< 8 Bits
+			W9  = 0b1000,	///< 9 Bits
+			W10 = 0b1001,	///< 10 Bits
+			W11 = 0b1010,	///< 11 Bits
+			W12 = 0b1011,	///< 12 Bits
+			W13 = 0b1100,	///< 13 Bits
+			W14 = 0b1101,	///< 14 Bits
+			W15 = 0b1110,	///< 15 Bits
+			W16 = 0b1111,	///< 16 Bits
+			W20 = 0b0000,	///< 20 Bits
+			W24 = 0b0001,	///< 24 Bits
+			W32 = 0b0011,	///< 32 Bits
 		};
 
 	private:
@@ -113,11 +134,12 @@ namespace device {
 			@brief  通信速度を設定して、CSI を有効にする
 			@param[in]	speed	通信速度
 			@param[in]	dctype	データ、クロック位相タイプ
+			@param[in]	dlen	データ長設定
 			@param[in]	level	割り込みレベル（１～２）、０の場合はポーリング
 			@return エラー（速度設定範囲外）なら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t speed, PHASE dctype, uint8_t level = 0)
+		bool start(uint32_t speed, PHASE dctype, DLEN dlen, uint8_t level = 0)
 		{
 			level_ = level;
 
@@ -143,10 +165,9 @@ namespace device {
 			RSPI::SPSCR = 0x00;	// disable sequence control
 			RSPI::SPDCR = 0x20;	// SPLW=1 (long word access) 
 ///			RSPI::SPCMD0 = RSPI::SPCMD0.LSBF.b() | RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0100);
-			// 8 bits
-//			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0111);
-			// 24 bits
-			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0001);
+
+			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv)
+				| RSPI::SPCMD0.SPB.b(static_cast<uint8_t>(dlen));
 
 			RSPI::SPCR.SPMS = 1;
 			RSPI::SPCR.MSTR = 1;
