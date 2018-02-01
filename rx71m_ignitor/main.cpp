@@ -7,31 +7,38 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "common/cmt_io.hpp"
+#include "common/scif_io.hpp"
+#include "common/sci_io.hpp"
+#include "common/rspi_io.hpp"
+#include "common/fifo.hpp"
+#include "common/format.hpp"
+#include "common/delay.hpp"
+#include "common/command.hpp"
+
 #include "main.hpp"
+#include "http.hpp"
 
 namespace {
+
+	typedef device::PORT<device::PORT0, device::bitpos::B2> LED0;
+	typedef device::PORT<device::PORT0, device::bitpos::B3> LED1;
+	typedef device::PORT<device::PORTC, device::bitpos::B0> LED2;
+	typedef device::PORT<device::PORTC, device::bitpos::B1> LED3;
 
 	class cmt_task
 	{
 		void (*task_10ms_)();
 
-//		volatile unsigned long delay_;
 		volatile uint32_t millis10x_;
 
 	public:
 		cmt_task() : task_10ms_(nullptr),
-//			delay_(0),
 			millis10x_(0) { }
 
 		void operator() () {
-
 			if(task_10ms_ != nullptr) (*task_10ms_)();
 			++millis10x_;
-
-//			if(delay_) {
-//				--delay_;
-//			}
-			
 		}
 
 		void set_task_10ms(void (*task)(void)) {
@@ -39,9 +46,6 @@ namespace {
 		}
 
 		volatile unsigned long get_millis() const { return millis10x_ * 10; }
-
-//		volatile unsigned long get_delay() const { return delay_; }
-//		void set_delay(volatile unsigned long n) { delay_ = n; }
 	};
 
 	typedef device::cmt_io<device::CMT0, cmt_task> CMT;
@@ -50,22 +54,26 @@ namespace {
 	typedef utils::fifo<uint8_t, 128> RX_BUF;
 	typedef utils::fifo<uint8_t, 256> TX_BUF;
 
-	// CRM interface (SCI10, FIRST)
-//	typedef device::sci_io<device::SCI10, RX_BUF, TX_BUF, device::port_map::option::SECOND> CRM;
+	// CRM interface (SCIF10, FIRST)
+	typedef device::scif_io<device::SCIF10, RX_BUF, TX_BUF> CRM;
+//	CRM		crm_;
+	CRM		sci_;
 
 	// DC2 interface (SCI2, SECOND)
 	typedef device::sci_io<device::SCI2, RX_BUF, TX_BUF, device::port_map::option::SECOND> DC2;
+	DC2		dc2_;
 
 	// DC1 interface (SCI6, FIRST)
 	typedef device::sci_io<device::SCI6, RX_BUF, TX_BUF> DC1;
+	DC1		dc1_;
 
 	// WGM interface (SCI7, FIRST)
 	typedef device::sci_io<device::SCI7, RX_BUF, TX_BUF> WGM;
+	WGM		wgm_;
 
 	// ICM interface (SCI3, FIRST)
 	typedef device::sci_io<device::SCI3, RX_BUF, TX_BUF> ICM;
-
-	ICM		sci_;
+	ICM		icm_;
 
 	utils::command<256> cmd_;
 
@@ -78,8 +86,10 @@ namespace {
 	SDC		sdc_(spi_, 20000000);
 
 	net::ethernet   ethernet_;
-
 	HTTP_SERVER     https_(ethernet_, sdc_);
+	TELNETS			telnets_(ethernet_);
+
+	http<HTTP_SERVER>	http_(https_);
 
 	// 文字列表示、割り込み対応ロック／アンロック機構
 	volatile bool putch_lock_ = false;
@@ -91,9 +101,57 @@ namespace {
 		while(putch_tmp_.length() > 0) {
 			auto ch = putch_tmp_.get();
 			sci_.putch(ch);
-//			telnets_.putch(ch);
+			telnets_.putch(ch);
 		}
 		ena_int();
+	}
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  時間の作成
+		@param[in]	date	日付
+		@param[in]	time	時間
+	*/
+	//-----------------------------------------------------------------//
+	size_t make_time(const char* date, const char* time)
+	{
+		time_t t = get_time();
+		struct tm *m = localtime(&t);
+		int vs[3];
+		if((utils::input("%d/%d/%d", date) % vs[0] % vs[1] % vs[2]).status()) {
+			if(vs[0] >= 1900 && vs[0] < 2100) m->tm_year = vs[0] - 1900;
+			if(vs[1] >= 1 && vs[1] <= 12) m->tm_mon = vs[1] - 1;
+			if(vs[2] >= 1 && vs[2] <= 31) m->tm_mday = vs[2];		
+		} else {
+			return 0;
+		}
+
+		if((utils::input("%d:%d:%d", time) % vs[0] % vs[1] % vs[2]).status()) {
+			if(vs[0] >= 0 && vs[0] < 24) m->tm_hour = vs[0];
+			if(vs[1] >= 0 && vs[1] < 60) m->tm_min = vs[1];
+			if(vs[2] >= 0 && vs[2] < 60) m->tm_sec = vs[2];
+		} else if((utils::input("%d:%d", time) % vs[0] % vs[1]).status()) {
+			if(vs[0] >= 0 && vs[0] < 24) m->tm_hour = vs[0];
+			if(vs[1] >= 0 && vs[1] < 60) m->tm_min = vs[1];
+			m->tm_sec = 0;
+		} else {
+			return 0;
+		}
+		return mktime(m);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  GMT 時間の設定
+		@param[in]	t	GMT 時間
+	*/
+	//-----------------------------------------------------------------//
+	void set_time(time_t t)
+	{
+		if(t != 0) {
+			rtc_.set_time(t);
+		}
 	}
 }
 
@@ -129,7 +187,7 @@ extern "C" {
 		}
 		putch_lock_ = true;
 		sci_.putch(ch);
-//		telnets_.putch(ch);
+		telnets_.putch(ch);
 		putch_lock_ = false;
 	}
 
@@ -279,6 +337,11 @@ int main(int argc, char** argv)
 {
 	device::system_io<12000000>::setup_system_clock();
 
+	LED0::DIR = 1;
+	LED1::DIR = 1;
+	LED2::DIR = 1;
+	LED3::DIR = 1;
+
 	{  // タイマー設定 (100Hz) 10ms
 		uint8_t int_level = 4;
 		cmt_.start(100, int_level);
@@ -291,10 +354,13 @@ int main(int argc, char** argv)
 	{  // SCI 設定
 		uint8_t int_level = 2;
 		sci_.start(115200, int_level);
+//		crm_.start(115200, int_level);
+		dc2_.start(115200, int_level);
+		dc1_.start(115200, int_level);
+		wgm_.start(115200, int_level);
+		icm_.start(115200, int_level);
 	}
-
 	utils::format("Start RX71M Ignitor\n");
-
 	cmd_.set_prompt("# ");
 
 	// SD カード・クラスの初期化
@@ -307,7 +373,6 @@ int main(int argc, char** argv)
 		static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
 
 	ethernet_.start();
-
 	{
 		static const uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 		net::ip_address ipa(192, 168, 0, 20);
@@ -315,26 +380,23 @@ int main(int argc, char** argv)
 		if(dhcp) {
 			if(ethernet_.begin(mac) == 0) {
 				utils::format("Ethernet Fail: begin (DHCP)...\n");
-				utils::format("SetIP: ");
+				utils::format("Direct IP: ");
 				ethernet_.begin(mac, ipa);
 			} else {
-				utils::format("DHCP: ");
+				utils::format("Get DHCP: ");
 			}
 		} else {
 			ethernet_.begin(mac, ipa);
-			utils::format("SetIP: ");
+			utils::format("Direct IP: ");
 		}
 		utils::format("%s\n") % ethernet_.get_local_ip().c_str();
 	}
 
-	https_.start("GRAVITON HTTP Server");
-//	ftps_.start("GR-KAEDE", "Renesas_RX64M", "KAEDE", "KAEDE");
-//	telnets_.start("SEEDA03");
+	https_.start("Graviton HTTP Server");
+	telnets_.start("Graviton TELNET Server");
+//	ftps_.start("Graviton FTP Server", "Renesas_RX71M", "GRAVITON", "GRAVITON");
 
-	device::PORTC::PDR.B0 = 1; // output
-	device::PORTC::PDR.B1 = 1; // output
-	device::PORT0::PDR.B2 = 1; // output
-	device::PORT0::PDR.B3 = 1; // output
+	http_.start();
 
 	uint32_t cnt = 0;
 	while(1) {
@@ -343,8 +405,8 @@ int main(int argc, char** argv)
 		ethernet_.service();
 
 		https_.service(100);
+		telnets_.service(100);
 //		ftps_.service(100);
-//		telnets_.service(100);
 
 		sdc_.service();
 
@@ -355,9 +417,9 @@ int main(int argc, char** argv)
 		if(cnt >= 32) {
 			cnt = 0;
 		}
-		device::PORTC::PODR.B0 = (((cnt + 0)  & 31) < 8) ? 1 : 0;
-		device::PORTC::PODR.B1 = (((cnt + 8)  & 31) < 8) ? 1 : 0;
-		device::PORT0::PODR.B2 = (((cnt + 16) & 31) < 8) ? 1 : 0;
-		device::PORT0::PODR.B3 = (((cnt + 24) & 31) < 8) ? 1 : 0;
+		LED0::P = (((cnt + 0)  & 31) < 8) ? 1 : 0;
+		LED1::P = (((cnt + 8)  & 31) < 8) ? 1 : 0;
+		LED2::P = (((cnt + 16) & 31) < 8) ? 1 : 0;
+		LED3::P = (((cnt + 24) & 31) < 8) ? 1 : 0;
 	}
 }

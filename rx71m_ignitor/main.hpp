@@ -12,14 +12,6 @@
 
 #define HTTP_DEBUG
 
-#include "common/cmt_io.hpp"
-#include "common/sci_io.hpp"
-#include "common/rspi_io.hpp"
-#include "common/fifo.hpp"
-#include "common/format.hpp"
-#include "common/delay.hpp"
-#include "common/command.hpp"
-
 #include "r_net/ethernet.hpp"
 #include "r_net/http_server.hpp"
 #include "r_net/ftp_server.hpp"
