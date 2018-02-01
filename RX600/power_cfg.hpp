@@ -117,7 +117,20 @@ namespace device {
 				break;
 
 			case peripheral::SCI12:
-				SYSTEM::MSTPCRB.MSTPB4 = f;		// B4 (SCI12)のストップ状態解除
+				SYSTEM::MSTPCRB.MSTPB4 = f;		// B-B4 (SCI12)のストップ状態解除
+				break;
+
+			case peripheral::SCIF8:
+				SYSTEM::MSTPCRC.MSTPC27 = f;	// C-B27 (SCIF8)のストップ状態解除
+				break;
+			case peripheral::SCIF9:
+				SYSTEM::MSTPCRC.MSTPC26 = f;	// C-B26 (SCIF9)のストップ状態解除
+				break;
+			case peripheral::SCIF10:
+				SYSTEM::MSTPCRC.MSTPC25 = f;	// C-B25 (SCIF10のストップ状態解除
+				break;
+			case peripheral::SCIF11:
+				SYSTEM::MSTPCRC.MSTPC24 = f;	// C-B24 (SCIF11のストップ状態解除
 				break;
 
 			case peripheral::RSPI:

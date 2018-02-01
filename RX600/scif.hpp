@@ -279,8 +279,8 @@ namespace device {
 		static ICU::VECTOR get_rx_vec() { return rxv; }
 	};
 
-	typedef scig_t<0x000D0000, peripheral::SCIF8,  ICU::VECTOR::TXIF8,  ICU::VECTOR::RXIF8>  SCIF8;
-	typedef scig_t<0x000D0020, peripheral::SCIF9,  ICU::VECTOR::TXIF9,  ICU::VECTOR::RXIF9>  SCIF9;
-	typedef scig_t<0x000D0040, peripheral::SCIF10, ICU::VECTOR::TXIF10, ICU::VECTOR::RXIF10> SCIF10;
-	typedef scig_t<0x000D0060, peripheral::SCIF10, ICU::VECTOR::TXIF10, ICU::VECTOR::RXIF10> SCIF11;
+	typedef scif_t<0x000D0000, peripheral::SCIF8,  ICU::VECTOR::TXIF8,  ICU::VECTOR::RXIF8>  SCIF8;
+	typedef scif_t<0x000D0020, peripheral::SCIF9,  ICU::VECTOR::TXIF9,  ICU::VECTOR::RXIF9>  SCIF9;
+	typedef scif_t<0x000D0040, peripheral::SCIF10, ICU::VECTOR::TXIF10, ICU::VECTOR::RXIF10> SCIF10;
+	typedef scif_t<0x000D0060, peripheral::SCIF10, ICU::VECTOR::TXIF10, ICU::VECTOR::RXIF10> SCIF11;
 }
