@@ -3,14 +3,13 @@
 /*!	@file
 	@brief	RX グループ・SCI I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
-#include "RX600/port_map.hpp"
 
 /// F_PCLKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCLKB
