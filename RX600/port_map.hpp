@@ -116,6 +116,43 @@ namespace device {
 				}
 				break;
 
+			case peripheral::SCIF8:
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					MPC::PC7PFS.PSEL = sel;  // TXDF8 (PC7 LQFP176: 76)
+					MPC::PC6PFS.PSEL = sel;  // RXDF8 (PC6 LQFP176: 77)
+					PORTC::PMR.B7 = enable;
+					PORTC::PMR.B6 = enable;
+				}
+				break;
+			case peripheral::SCIF9:
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					MPC::PB7PFS.PSEL = sel;  // TXDF9 (PB7 LQFP176: 94)
+					MPC::PB6PFS.PSEL = sel;  // RXDF9 (PB6 LQFP176: 95)
+					PORTB::PMR.B7 = enable;
+					PORTB::PMR.B6 = enable;
+				}
+				break;
+			case peripheral::SCIF10:
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					MPC::P87PFS.PSEL = sel;  // TXDF10 (P86 LQFP176: 47)
+					MPC::P86PFS.PSEL = sel;  // RXDF10 (P87 LQFP176: 49)
+					PORT8::PMR.B7 = enable;
+					PORT8::PMR.B6 = enable;
+				}
+				break;
+			case peripheral::SCIF11:
+				{
+					uint8_t sel = enable ? 0b001010 : 0;
+					MPC::P77PFS.PSEL = sel;  // TXDF11 (P77 LQFP176: 84)
+					MPC::P76PFS.PSEL = sel;  // RXDF11 (P76 LQFP176: 85)
+					PORT7::PMR.B7 = enable;
+					PORT7::PMR.B6 = enable;
+				}
+				break;
+
 			case peripheral::SCI12:
 				{
 					uint8_t sel = enable ? 0b001100 : 0;
