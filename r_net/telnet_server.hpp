@@ -60,6 +60,8 @@ namespace net {
 		SEND_FIFO	send_;
 		RECV_FIFO	recv_;
 
+		bool		crlf_;
+
 		void write_()
 		{
 			char tmp[256];
@@ -82,11 +84,13 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
+			@param[in]	e	イーサーネット・コンテキスト
+			@param[in]	crlf	LF コードを CR/LF に変換しない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		telnet_server(ethernet& e) : eth_(e), telnet_(e), task_(task::none),
+		telnet_server(ethernet& e, bool crlf = true) : eth_(e), telnet_(e), task_(task::none),
 			server_name_{ 0 }, user_{ 0 }, pass_{ 0 },
-			count_(0), disconnect_loop_(0), recv_lost_(0) { }
+			count_(0), disconnect_loop_(0), recv_lost_(0), crlf_(crlf) { }
 
 
 		//-----------------------------------------------------------------//
@@ -111,6 +115,15 @@ namespace net {
 
 			debug_format("TELNET Server: SEND_BUFF: %d, RECV_BUFF: %d\n") % SEND_SIZE % RECV_SIZE;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  接続の確認
+			@return 接続中なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool probe() const { return task_ == task::main_loop; }
 
 
 		//-----------------------------------------------------------------//
@@ -185,12 +198,12 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  出力
-			@param[in]	text	出力文字列
+			@param[in]	ch	出力文字
 		*/
 		//-----------------------------------------------------------------//
 		void putch(char ch)
 		{
-			if(ch == '\n') {
+			if(crlf_ && ch == '\n') {
 				putch('\r');
 			}
 			if(task_ == task::main_loop) {
@@ -208,18 +221,16 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  出力
-			@param[in]	text	出力文字列
+			@param[in]	str	出力文字列
 		*/
 		//-----------------------------------------------------------------//
-		void puts(const char* text)
+		void puts(const char* str)
 		{
-			if(text == nullptr) return;
+			if(str == nullptr) return;
 
-			if(task_ == task::main_loop) {
-				char ch;
-				while((ch = *text++) != 0) {
-					putch(ch);
-				}
+			char ch;
+			while((ch = *str++) != 0) {
+				putch(ch);
 			}
 		}
 
@@ -242,7 +253,7 @@ namespace net {
 			@return 入力文字（入力文字が無い場合「０」が返る）
 		*/
 		//-----------------------------------------------------------------//
-		char getch() const
+		char getch()
 		{
 			if(recv_.length() > 0) {
 				return recv_.get();
