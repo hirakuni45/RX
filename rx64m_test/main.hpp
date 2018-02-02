@@ -22,6 +22,7 @@
 #include "chip/LTC2348_16.hpp"
 #include "sample.hpp"
 #include "preference.hpp"
+#include "logs.hpp"
 
 #include "chip/EUI_XX.hpp"
 
@@ -37,7 +38,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 527;
+	static const int seeda_version_ = 528;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef device::PORT<device::PORTE, device::bitpos::B3> LED;
@@ -83,7 +84,7 @@ namespace seeda {
 	typedef chip::LTC2348_16<LTC_CSN, LTC_CNV, LTC_BUSY, LTC_PD, LTC_SDI, LTC_SCKI, LTC_SDO> EADC;
 #endif
 
-	typedef net::http_server<SDC, 16, 8192> HTTP;
+	typedef net::http_server<SDC, 18, 8192> HTTP;
 	typedef HTTP::http_format http_format;	
 
 	typedef net::ftp_server<SDC> FTPS;
@@ -149,6 +150,15 @@ namespace seeda {
 
 	//-----------------------------------------------------------------//
 	/*!
+		@brief  logs クラスへの参照
+		@return logs クラス
+	*/
+	//-----------------------------------------------------------------//
+	logs& at_logs();
+
+
+	//-----------------------------------------------------------------//
+	/*!
 		@brief  EADC サーバー
 	*/
 	//-----------------------------------------------------------------//
@@ -181,6 +191,16 @@ namespace seeda {
 	*/
 	//-----------------------------------------------------------------//
 	void set_time(time_t t);
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  システム稼動時間の起点設定
+		@param[in]	t	GMT 時間
+	*/
+	//-----------------------------------------------------------------//
+	void set_org_time(time_t t);
+
 
 #ifdef WATCH_DOG
 	//-----------------------------------------------------------------//
