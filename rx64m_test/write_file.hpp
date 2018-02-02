@@ -203,10 +203,17 @@ namespace seeda {
 			case task::open_file:
 				fp_ = fopen(filename_, "wb");
 				if(fp_ == nullptr) {  // error then disable write.
-					debug_format("File open error: '%s'\n") % filename_;
+					char tmp[64];
+					utils::sformat("File open error: '%s'", tmp, sizeof(tmp)) % filename_;
+					at_logs().add(get_time(), tmp);
+					debug_format("%s\n") % tmp; 
 					enable_ = false;
 					task_ = task::wait_request;
 				} else {
+// log 確認テスト用
+//			char tmp[64];
+//			utils::sformat("File open: '%s'", tmp, sizeof(tmp)) % filename_;
+//			at_logs().add(get_time(), tmp);
 					debug_format("Start write file: '%s'\n") % filename_;
 					task_ = task::write_header;
 				}
@@ -223,7 +230,11 @@ namespace seeda {
 
 					uint32_t sz = utils::sformat::chaout().size();
 					if(fwrite(data, 1, sz, fp_) != sz) {
-						debug_format("File write error (header): '%s'\n") % filename_;
+						char tmp[64];
+						utils::sformat("File write error (header): '%s'", tmp, sizeof(tmp))
+							% filename_;
+						at_logs().add(get_time(), tmp);
+						debug_format("%s\n") % tmp; 
 						enable_ = false;
 						task_ = task::wait_request;
 						break;
@@ -268,7 +279,11 @@ namespace seeda {
 			case task::write_body:
 				if(get_wf_fifo().length() > 0) {
 					if(fwrite(data_, 1, data_len_, fp_) != data_len_) {
-						debug_format("File write error (body): '%s'\n") % filename_;
+						char tmp[64];
+						utils::sformat("File write error (body): '%s'", tmp, sizeof(tmp))
+							% filename_;
+						at_logs().add(get_time(), tmp);
+						debug_format("%s\n") % tmp; 
 						enable_ = false;
 						task_ = task::wait_request;
 						break;
