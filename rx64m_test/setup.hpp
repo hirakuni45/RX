@@ -690,9 +690,15 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 			}
 
-			{  // ＳＤカードステータス・ボタン
+			{  // ＳＤカード・ステータス・ボタン
 				http_format("<input type=\"button\" onclick=\"location.href='/sdc_state'\""
 							" value=\"ＳＤカード情報\"%s>") % (mount ? "" : " disabled=\"disabled\"");
+				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
+			}
+
+			{  // ＳＤカード・ログ表示・ボタン
+				http_format("<input type=\"button\" onclick=\"location.href='/sdc_elog'\""
+							" value=\"ＳＤカードログ\">");
 				http_format("<hr align=\"left\" width=\"400\" size=\"3\">\n");
 			}
 

@@ -219,6 +219,7 @@ namespace seeda {
 				time_t t = seeda::make_time(date, time);
 				if(t != 0) {
 					seeda::set_time(t);
+					seeda::set_org_time(t);  // 稼動時間の起点変更
 				}
 			}
 //			cgi.list();
@@ -631,6 +632,23 @@ namespace seeda {
 				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
 			} );
 
+			http_.set_link("/sdc_elog", "SD CARD Error Log", [=](void) {
+				net_tools::render_version();
+				net_tools::render_date_time();
+				http_.tag_hr(600, 3);
+				http_format("<table>");
+				for(uint32_t i = 0; i < at_logs().size(); ++i) {
+					const auto& l = at_logs().get(i);
+					char tmp[64];
+					disp_time(l.time_, tmp, sizeof(tmp));
+					http_format("<tr><td>%s: </td>") % tmp;
+					http_format("<td>%s</td></tr>") % l.msg_;
+				}
+				http_format("</table>");
+				http_.tag_hr(600, 3);
+				http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
+			} );
+
 			http_.set_cgi("/cgi/set_rtc.cgi", "SetRTC", [=](void) {
 				set_rtc_();
 				http_.exec_link("/setup");
@@ -857,7 +875,9 @@ namespace seeda {
 			} else {
 				ftps_.service(50);
 				client_.service(50);
-				telnets_.service(50);
+				if(develope_) {  // 開発モード時のみ
+					telnets_.service(50);
+				}
 			}
 
 			if(write_file_.get_enable() || client_.probe()) {

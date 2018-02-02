@@ -130,6 +130,9 @@ namespace {
 		uint32_t h = t % 24;
 		utils::sformat("%02u:%02u:%02u", dst, size) % h % m % s;
 	}
+
+	seeda::logs	logs_;
+	uint32_t	auto_write_count_;
 }
 
 namespace seeda {
@@ -186,6 +189,15 @@ namespace seeda {
 	*/
 	//-----------------------------------------------------------------//
 	EADC& at_eadc() { return eadc_; }
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  logs クラスへの参照
+		@return logs クラス
+	*/
+	//-----------------------------------------------------------------//
+	logs& at_logs() { return logs_; }
 
 
 	//-----------------------------------------------------------------//
@@ -497,7 +509,6 @@ namespace seeda {
 			utils::format("Stall RTC write...\n");
 			return;
 		}
-//		operating_org_ = t;
 	}
 
 
@@ -511,6 +522,18 @@ namespace seeda {
 	{
 		set_rtc_time(t);
 		sys_time_ = t;
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  システム稼動時間の起点設定
+		@param[in]	t	GMT 時間
+	*/
+	//-----------------------------------------------------------------//
+	void set_org_time(time_t t)
+	{
+		operating_org_ = t;
 	}
 
 
@@ -856,11 +879,8 @@ int main(int argc, char** argv)
 
 	main_init_();
 
-	operating_org_ = get_rtc_time();
-
 	sample_count_ = 0;
 
-	sys_time_ = get_rtc_time();
 	core_.init();
 
 	// SD カード・クラスの初期化
@@ -876,10 +896,11 @@ int main(int argc, char** argv)
 	nets_.init();
 	nets_.title();
 
-	sys_time_ = get_rtc_time();
 	enable_eadc_server();
 
+	operating_org_ = get_rtc_time();
 	sys_time_ = get_rtc_time();
+
 	uint16_t rtc_set_loop = 0;
 	while(1) {
 		core_.sync();
@@ -893,11 +914,25 @@ int main(int argc, char** argv)
 
 		nets_.service();
 
-		//
 		++rtc_set_loop;
 		if(rtc_set_loop >= (100 * 60 * 5)) {  // 5 minits / setting RTC
 			rtc_set_loop = 0;
 			set_rtc_time(sys_time_);
+		}
+
+		// リジュームで、ファイル書き込みが有効な場合
+		// なのに、ファイルの書き込みが３秒以上されていない場合、もう一度
+		// ファイル書き込みを始める
+		if(get_pre().get().write_enable_) {
+			if(!nets_.at_write_file().get_enable()) {
+				++auto_write_count_;
+				if(auto_write_count_ > (100 * 3)) {
+					nets_.at_write_file().set_path(get_pre().get().write_path_);
+					nets_.at_write_file().enable();
+				}
+			} else {
+				auto_write_count_ = 0;
+			}
 		}
 
 		if(restart_delay_ > 0) {
