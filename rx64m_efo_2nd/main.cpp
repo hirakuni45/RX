@@ -27,7 +27,7 @@
 
 namespace {
 
-	static const int main_version_ = 75;
+	static const int main_version_ = 85;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -37,8 +37,11 @@ namespace {
 		MODE_SENSE  = 0x12,
 		VER   = 0x21,
 
-		ASC_CNVTEST = 'T',
-		ASC_CNVTESTS = 't',
+		BIN_CNVTESTS = 'B',
+		BIN_CNVTEST  = 'b',
+
+		ASC_CNVTESTS = 'T',
+		ASC_CNVTEST  = 't',
 	};
 
 	enum class TASK : uint8_t {
@@ -51,8 +54,12 @@ namespace {
 		READY,
 		SINGLE,
 		MULTI,
-		ASCII,		///< T コマンド（１０２４サンプルテスト）
-		ASCII2,		///< t コマンド（１サンプルテスト）
+
+		ASCII_SINGLE,	///< t コマンド（１サンプルテスト）
+		ASCII_MULTI,	///< T コマンド（１０２４サンプルテスト）
+
+		BIN_SINGLE,		///< b コマンド（１サンプルテスト）
+		BIN_MULTI,		///< B コマンド（１０２４サンプルテスト）
 	};
 
 	typedef device::PORT<device::PORTJ, device::bitpos::B5> LED;
@@ -82,7 +89,7 @@ namespace {
 	typedef device::PORT<device::PORTA, device::bitpos::B6> MOSI;
 	typedef device::spi_io<MISO, MOSI, SPCK, device::soft_spi_mode::LTC> SPI_IO;
 #else
-	typedef device::rspi_io<device::RSPI> SPI_IO;
+	typedef device::rspi_io<device::RSPI, device::port_map::option::SECOND> SPI_IO;
 #endif
 	typedef chip::LTC2348_16a<LTC_CSN, LTC_CNV, LTC_BUSY, SPI_IO> EADC;
 	EADC		eadc_;
@@ -147,13 +154,17 @@ namespace {
 		}
 	}
 
+	volatile uint32_t irq_state_;
+	volatile uint32_t irq_count_;
+	volatile uint16_t trg_pos_;
+
 	// trigger task
 	class irq_task {
 	public:
 		void operator() ()
 		{
-			LED::P = 1;
-
+			trg_pos_ = cap_pos_;
+			++irq_count_;
 		}
 	};
 
@@ -188,6 +199,7 @@ namespace {
 		}
 	}
 
+
 	void setup_irq_(bool positive)
 	{
 		uint8_t int_level = 2;
@@ -201,6 +213,7 @@ namespace {
 		}
 	}
 }
+
 
 extern "C" {
 
@@ -336,17 +349,11 @@ int main(int argc, char** argv)
 	}
 
 	cap_enable_ = true;
-
-	if(0) {
-		uint16_t brr = device::SCI2::BRR();
-		char tmp[128];
-		utils::sformat("BRR: %d\r\n", tmp, sizeof(tmp)) % brr;
-		m_sci_.puts(tmp);
-	}
+	irq_state_ = 0;
+	irq_count_ = 0;
 
 	// 初期設定
-//	dac_.out0(32768);  // トリガー電圧０Ｖ
-	dac_.out0(32768 + 20000);  // トリガー電圧３．７５Ｖ
+	dac_.out0(32768);  // トリガー電圧０Ｖ
 
 	uint8_t cnt = 0;
 	while(1) {
@@ -356,25 +363,38 @@ int main(int argc, char** argv)
 		case TASK::STATE:
 			if(m_sci_.recv_length() >= 1) {
 				CMD cmd = static_cast<CMD>(m_sci_.getch());
-				if(cmd == CMD::START) {
+				switch(cmd) {
+				case CMD::START:
 					task_ = TASK::LENGTH;
-				} else if(cmd == CMD::ASC_CNVTEST) {
-					send_task_ = SEND_TASK::ASCII;
-				} else if(cmd == CMD::ASC_CNVTESTS) {
-					send_task_ = SEND_TASK::ASCII2;
-				} else if(cmd == CMD::END) {
+					break;
+				case CMD::ASC_CNVTEST:
+					send_task_ = SEND_TASK::ASCII_SINGLE;
+					break;
+				case CMD::ASC_CNVTESTS:
+					send_task_ = SEND_TASK::ASCII_MULTI;
+					break;
+				case CMD::BIN_CNVTEST:
+					send_task_ = SEND_TASK::BIN_SINGLE;
+					break;
+				case CMD::BIN_CNVTESTS:
+					send_task_ = SEND_TASK::BIN_MULTI;
+					break;
+				case CMD::END:
 					if(send_task_ == SEND_TASK::MULTI) {  // 波形取得を強制終了
 						send_task_ = SEND_TASK::READY;
 					}
-				} else if(cmd == CMD::MODE_SELECT) {
+					break;
+				case CMD::MODE_SELECT:
+					break;
 
+				case CMD::MODE_SENSE:
+					break;
 
-				} else if(cmd == CMD::MODE_SENSE) {
+				case CMD::VER:
+					break;
 
-
-				} else if(cmd == CMD::VER) {
-
-
+				default:
+					break;
 				}
 			}
 			break;
@@ -397,9 +417,8 @@ int main(int argc, char** argv)
 				dac_.out0(volt_);  // トリガー電圧設定
 				bool trg = true;
 				if(volt_ < 32768) trg = false;
-///				cap_count_ = length_;
 				 setup_irq_(trg);
-///				irq_state_ = irq_count_;
+				irq_state_ = irq_count_;
 				irq_.enable();
 				if(length_ == 0) {
 					send_task_ = SEND_TASK::SINGLE;
@@ -416,18 +435,44 @@ int main(int argc, char** argv)
 		switch(send_task_) {
 
 		case SEND_TASK::SINGLE:
+			if(irq_state_ == irq_count_) break;
+
 			send_wave_(0x01, ch0_trg_[0]);
 			send_wave_(0x02, ch1_trg_[0]);
 			send_task_ = SEND_TASK::READY;
 			break;
 
 		case SEND_TASK::MULTI:
+			if(irq_state_ == irq_count_) break;
+
 			send_wave_(0x01, length_, ch0_trg_);
 			send_wave_(0x02, length_, ch1_trg_);
 			send_task_ = SEND_TASK::READY;
 			break;
 
-		case SEND_TASK::ASCII:
+		case SEND_TASK::BIN_SINGLE:
+			copy_trg_(1);
+			send_wave_(0x01, ch0_trg_[0]);
+			send_wave_(0x02, ch1_trg_[0]);
+			send_task_ = SEND_TASK::READY;
+			break;
+		case SEND_TASK::BIN_MULTI:
+			copy_trg_(1024);
+			send_wave_(0x01, 1024, ch0_trg_);
+			send_wave_(0x02, 1024, ch1_trg_);
+			send_task_ = SEND_TASK::READY;
+			break;
+
+		case SEND_TASK::ASCII_SINGLE:
+			{
+				copy_trg_(1);
+				char tmp[128];
+				utils::sformat("%d,%d\r\n", tmp, sizeof(tmp)) % ch0_trg_[0] % ch1_trg_[0];
+				m_sci_.puts(tmp);
+			}
+			send_task_ = SEND_TASK::READY;
+			break;
+		case SEND_TASK::ASCII_MULTI:
 			{
 				copy_trg_(1024);
 				for(uint16_t i = 0; i < 1024; ++i) {
@@ -439,21 +484,11 @@ int main(int argc, char** argv)
 			}
 			send_task_ = SEND_TASK::READY;
 			break;
-		case SEND_TASK::ASCII2:
-			{
-				copy_trg_(1);
-				char tmp[128];
-				utils::sformat("%d,%d\r\n", tmp, sizeof(tmp)) % ch0_trg_[0] % ch1_trg_[0];
-				m_sci_.puts(tmp);
-			}
-			send_task_ = SEND_TASK::READY;
-			break;
-
 
 		default:
 			break;
 		}
-#if 0
+#if 1
 		++cnt;
 		if(cnt >= 50) {
 			cnt = 0;
