@@ -13,8 +13,7 @@
 #define HTTP_DEBUG
 
 #include "r_net/ethernet.hpp"
-#include "r_net/http_server.hpp"
-#include "r_net/ftp_server.hpp"
+#include "r_net/http_server_.hpp"
 #include "r_net/telnet_server.hpp"
 
 extern "C" {
@@ -70,16 +69,16 @@ extern "C" {
 
 namespace {
 
+#if 0
 	// SDC 用　SPI 定義（RSPI）
-	typedef device::rspi_io<device::RSPI> RSPI;
+	typedef device::rspi_io<device::RSPI> SDC_RSPI;
 	typedef device::PORT<device::PORTC, device::bitpos::B4> SDC_SELECT;	///< カード選択信号
 	typedef device::NULL_PORT  SDC_POWER;	///< カード電源制御（常に電源ＯＮ）
 	typedef device::PORT<device::PORTB, device::bitpos::B7> SDC_DETECT;	///< カード検出
-
-	typedef utils::sdc_io<RSPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC;
-	typedef net::http_server<SDC, 16, 8192> HTTP_SERVER;
-	typedef net::ftp_server<SDC> FTP_SERVER;
+#endif
+	typedef net::http_server<16, 8192> HTTP_SERVER;
 	typedef net::telnet_server<1024, 256> TELNETS;
+//	typedef utils::sdc_io<SDC_RSPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC;
 
 
 	//-----------------------------------------------------------------//

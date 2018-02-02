@@ -24,8 +24,8 @@ ASOURCES	=	common/start.s \
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-                $(FATFS_VER)/src/ff.c \
-                $(FATFS_VER)/src/option/unicode.c \
+				$(FATFS_VER)/src/ff.c \
+				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c \
                 r_net/driver/phy.c \
                 r_net/driver/r_ether.c \
@@ -46,7 +46,9 @@ USER_LIBS	=	stdc++ m
 
 LDSCRIPT	=	../RX71M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX71M F_ICLK=120000000 F_FCLK=60000000 F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKD=60000000
+USER_DEFS	=	SIG_RX71M F_ICLK=120000000 \
+				F_FCLK=60000000 F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKD=60000000 \
+				B_ID=$(BUILD_ID)
 
 MCU_TARGET	=	
 
