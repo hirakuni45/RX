@@ -92,9 +92,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
+			@param[in]	crlf	LF 時、CR の送出をしないばあい「false」
 		*/
 		//-----------------------------------------------------------------//
-		scif_io() : level_(0), crlf_(true) { }
+		scif_io(bool crlf = true) : level_(0), crlf_(crlf) { }
 
 
 		//-----------------------------------------------------------------//
@@ -110,7 +111,6 @@ namespace device {
 		{
 			send_stall_ = true;
 
-			crlf_ = true;
 			level_ = level;
 
 			SCIF::SCR = 0x00;			// TE, RE disable.
