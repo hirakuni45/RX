@@ -58,10 +58,15 @@ namespace {
 	typedef utils::fifo<uint8_t, 128> RX_BUF;
 	typedef utils::fifo<uint8_t, 256> TX_BUF;
 
+	typedef utils::fifo<uint8_t, 1024> RX_SCI;
+	typedef utils::fifo<uint8_t, 4096> TX_SCI;
+
+	typedef device::sci_io<device::SCI12, RX_SCI, TX_SCI> SCI;
+	SCI		sci_;
+
 	// CRM interface (SCIF10, FIRST)
 	typedef device::scif_io<device::SCIF10, RX_BUF, TX_BUF> CRM;
-//	CRM		crm_(false);
-	CRM		sci_;
+	CRM		crm_(false);
 
 	// WDM interface (RSPI, SECOND)
 	typedef device::PORT<device::PORTA, device::bitpos::B4> WDM_SEL;
@@ -369,7 +374,7 @@ int main(int argc, char** argv)
 		uint8_t int_level = 2;
 		sci_.start(115200, int_level);
 
-//		crm_.start(115200, int_level);
+		crm_.start(115200, int_level);
 		dc2_.start(115200, int_level);
 		dc1_.start(115200, int_level);
 		wgm_.start(115200, int_level);

@@ -28,7 +28,7 @@ namespace utils {
 
 		void analize_()
 		{
-			utils::format("command: '%s'\n") % line_;
+			utils::format("recv command: '%s'\n") % line_;
 		}
 
 	public:
@@ -54,29 +54,16 @@ namespace utils {
 			auto len = telnets_.length();
 			if(len == 0) return;
 
-			char tmp[len];
-			uint32_t n = 0;
 			while(len > 0) {
-				tmp[n] = telnets_.getch();
-				++n;
+				char ch = telnets_.getch();
 				--len;
-			}
-
-			for(uint32_t i = 0; i < n; ++i) {
-				char ch = tmp[i];
-//				utils::format("%c") % ch;
-				if(ch == '\n') {  // LF
-					continue;
-				} else if(ch == '\r') {  // CR code
-					analize_();
-					pos_ = 0;
-					line_[pos_] = 0;
-				} else {
-					line_[pos_] = ch;
-					++pos_;
-					line_[pos_] = 0;
+				if(ch == '\r') continue;
+				else if(ch == '\n') {  // LF code
+					ch = 0;
 				}
-				if(pos_ >= (sizeof(line_) - 1)) {
+				line_[pos_] = ch;
+				++pos_;
+				if(ch == 0 || pos_ >= (sizeof(line_) - 1)) {
 					analize_();
 					pos_ = 0;
 					line_[pos_] = 0;
