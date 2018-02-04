@@ -27,15 +27,15 @@
 
 namespace {
 
-	static const int main_version_ = 85;
+	static const int main_version_ = 86;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
-		START = 0x01,
-		END   = 0x03,
+		START       = 0x01,
+		END         = 0x03,
 		MODE_SELECT = 0x11,
 		MODE_SENSE  = 0x12,
-		VER   = 0x21,
+		VER         = 0x21,
 
 		BIN_CNVTESTS = 'B',
 		BIN_CNVTEST  = 'b',
@@ -80,17 +80,22 @@ namespace {
 
 // #define SOFT_SPI
 #ifdef SOFT_SPI
-//  旧タイプ、SCI 簡易 SPI タイプ
-//	typedef device::PORT<device::PORT5, device::bitpos::B1> SPCK;
-//	typedef device::PORT<device::PORT5, device::bitpos::B2> MISO;
-//	typedef device::PORT<device::PORT5, device::bitpos::B0> MOSI;
+#if 0
+//  旧タイプハード、SCI 簡易 SPI タイプ
+	typedef device::PORT<device::PORT5, device::bitpos::B1> SPCK;
+	typedef device::PORT<device::PORT5, device::bitpos::B2> MISO;
+	typedef device::PORT<device::PORT5, device::bitpos::B0> MOSI;
+#else
 	typedef device::PORT<device::PORTA, device::bitpos::B5> SPCK;
 	typedef device::PORT<device::PORTA, device::bitpos::B7> MISO;
 	typedef device::PORT<device::PORTA, device::bitpos::B6> MOSI;
+#endif
 	typedef device::spi_io<MISO, MOSI, SPCK, device::soft_spi_mode::LTC> SPI_IO;
 #else
+	// RSPI ハード（ポートの割り当ては、port_map クラスを参照）
 	typedef device::rspi_io<device::RSPI, device::port_map::option::SECOND> SPI_IO;
 #endif
+	// LTC2348_16a: EFO 専用、サンプリング方法によるドライバー
 	typedef chip::LTC2348_16a<LTC_CSN, LTC_CNV, LTC_BUSY, SPI_IO> EADC;
 	EADC		eadc_;
 
@@ -100,14 +105,19 @@ namespace {
 	uint16_t ch1_src_[CAP_BUFF_SIZE];
 
 	volatile uint16_t cap_pos_ = 0;
+	volatile uint16_t cap_cnt_ = 0;
 	volatile bool cap_enable_ = false;
 
+	// サンプリング割り込み起動のファンクタ
 	class capture_task {
 	public:
 		void operator() ()
 		{
 			if(cap_enable_) {
 ///				LED::P = 1;
+				if(cap_cnt_) {
+					--cap_cnt_;
+				}
 				++cap_pos_;
 				cap_pos_ &= CAP_BUFF_SIZE - 1;
 				ch0_src_[cap_pos_] = eadc_.convert0();
@@ -179,9 +189,9 @@ namespace {
 
 	SEND_TASK  	send_task_;
 
-	void send_wave_(char ch, uint16_t src)
+	void send_wave_legacy_(char ch, uint16_t src)
 	{
-		m_sci_.putch(0x01);  // A/D 通知
+		m_sci_.putch(0x01);  // A/D シングル通知
 		m_sci_.putch(ch);    // chanel NO
 		m_sci_.putch(src >> 8);
 		m_sci_.putch(src & 0xff);
@@ -190,9 +200,10 @@ namespace {
 
 	void send_wave_(char ch, uint16_t len, const uint16_t* src)
 	{
-		m_sci_.putch(0x01);  // A/D 通知
+		m_sci_.putch(0x02);  // A/D マルチ通知
 		m_sci_.putch(ch);    // chanel NO
-
+		m_sci_.putch(len >> 8);
+		m_sci_.putch(len & 0xff);
 		for(uint16_t i = 0; i < len; ++i) {
 			m_sci_.putch(src[i] >> 8);
 			m_sci_.putch(src[i] & 0xff);
@@ -437,23 +448,23 @@ int main(int argc, char** argv)
 		case SEND_TASK::SINGLE:
 			if(irq_state_ == irq_count_) break;
 
-			send_wave_(0x01, ch0_trg_[0]);
-			send_wave_(0x02, ch1_trg_[0]);
+//			send_wave_(0x01, ch0_trg_[0]);
+//			send_wave_(0x02, ch1_trg_[0]);
 			send_task_ = SEND_TASK::READY;
 			break;
 
 		case SEND_TASK::MULTI:
 			if(irq_state_ == irq_count_) break;
 
-			send_wave_(0x01, length_, ch0_trg_);
-			send_wave_(0x02, length_, ch1_trg_);
+//			send_wave_(0x01, length_, ch0_trg_);
+//			send_wave_(0x02, length_, ch1_trg_);
 			send_task_ = SEND_TASK::READY;
 			break;
 
 		case SEND_TASK::BIN_SINGLE:
 			copy_trg_(1);
-			send_wave_(0x01, ch0_trg_[0]);
-			send_wave_(0x02, ch1_trg_[0]);
+			send_wave_(0x01, 1, ch0_trg_);
+			send_wave_(0x02, 1, ch1_trg_);
 			send_task_ = SEND_TASK::READY;
 			break;
 		case SEND_TASK::BIN_MULTI:
