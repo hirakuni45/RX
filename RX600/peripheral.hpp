@@ -77,7 +77,9 @@ namespace device {
 		RIIC2,		///< I 2 C バスインタフェース（RIICa）
 
 		RSPI,		///< シリアルペリフェラルインタフェース（RSPIa）
-
+#ifdef SIG_RX71M
+		RSPI2,		///< シリアルペリフェラルインタフェース（RSPIb）
+#endif
 		SSI0,		///< シリアルサウンドインタフェース（SSI）
 		SSI1,		///< シリアルサウンドインタフェース（SSI）
 

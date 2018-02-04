@@ -358,4 +358,7 @@ namespace device {
 	};
 
 	typedef rspi_t<0x000D0100, peripheral::RSPI, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI;
+#ifdef SIG_RX71M
+	typedef rspi_t<0x000D0120, peripheral::RSPI2, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI2;
+#endif
 }
