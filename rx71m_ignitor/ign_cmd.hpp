@@ -28,7 +28,39 @@ namespace utils {
 
 		void analize_()
 		{
-			utils::format("recv command: '%s'\n") % line_;
+			auto n = str::get_words(line_);
+			if(n >= 1) {
+				char cmd[128];
+				if(!str::get_word(line_, 0, cmd, sizeof(cmd))) {
+					return;
+				}
+				if(strcmp(cmd, "help") == 0) {
+					utils::format("Ignitor command shell\n");
+					utils::format("  help\n");
+					utils::format("  crm\n");
+					utils::format("  wdm\n");
+					utils::format("  dc2\n");
+					utils::format("  dc1\n");
+					utils::format("  wgm\n");
+					utils::format("  icm\n");
+				} else if(strcmp(cmd, "crm") == 0) {
+
+				} else if(strcmp(cmd, "wdm") == 0) {
+
+				} else if(strcmp(cmd, "dc2") == 0) {
+
+				} else if(strcmp(cmd, "dc1") == 0) {
+
+				} else if(strcmp(cmd, "wgm") == 0) {
+
+				} else if(strcmp(cmd, "icm") == 0) {
+
+				} else {
+					utils::format("Command error: '%s'\n") % cmd;
+				}
+			}
+
+//			utils::format("recv command: '%s'\n") % line_;
 		}
 
 	public:
