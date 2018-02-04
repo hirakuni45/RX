@@ -299,7 +299,7 @@ namespace utils {
 			@return ワード数を返す
         */
         //-----------------------------------------------------------------//
-		static uint8_t get_words(const char* src)
+		static uint16_t get_words(const char* src)
 		{
 			if(src == nullptr) return 0;
 
