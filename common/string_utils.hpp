@@ -292,6 +292,122 @@ namespace utils {
 		}
 
 
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  ワード数を取得
+			@param[in]	src	ソース
+			@return ワード数を返す
+        */
+        //-----------------------------------------------------------------//
+		static uint8_t get_words(const char* src)
+		{
+			if(src == nullptr) return 0;
+
+			const char* p = src;
+			char bc = ' ';
+			uint16_t n = 0;
+			bool esc = false;
+			while(1) {
+				char ch = *p++;
+				if(ch == 0) break;
+				if(esc) {
+					esc = false;
+					continue;
+				}
+				if(ch == '\\') {
+					esc = true;
+					continue;
+				} 
+				if(bc == ' ' && ch != ' ') {
+					++n;
+				}
+				bc = ch;
+			}
+			return n;
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  ワードを取得
+			@param[in]	src	ソース
+			@param[in]	argc	ワード位置
+			@param[out]	dst		ワード文字列格納ポインター
+			@param[in]	size	ワード文字列サイズ
+			@return 取得できたら「true」を返す
+        */
+        //-----------------------------------------------------------------//
+		static bool get_word(const char* src, uint16_t argc, char* dst, uint16_t size) 
+		{
+			if(src == nullptr || dst == nullptr) return false;
+
+			const char* p = src;
+			char bc = ' ';
+			const char* wd = p;
+			while(1) {
+				char ch = *p;
+				if(bc == ' ' && ch != ' ') {
+					wd = p;
+				}
+				if(bc != ' ' && (ch == ' ' || ch == 0)) {
+					if(argc == 0) {
+						uint8_t i;
+						for(i = 0; i < (p - wd); ++i) {
+							--size;
+							if(size == 0) break;
+							dst[i] = wd[i];
+						}
+						dst[i] = 0;
+						return true;
+					}
+					--argc;
+				}
+				if(ch == 0) break;
+				bc = ch;
+				++p;
+			}
+			return false;
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  ワードを比較
+			@param[in]	src	ソース
+			@param[in]	argc	ワード位置
+			@param[in]	key		比較文字列
+			@return 
+        */
+        //-----------------------------------------------------------------//
+		static bool cmp_word(const char* src, uint16_t argc, const char* key)
+		{
+			if(src == nullptr) return false;
+			if(key == nullptr) return false;
+
+			const char* p = src;
+			char bc = ' ';
+			int keylen = std::strlen(key);
+			const char* top = p;
+			while(1) {
+				char ch = *p;
+				if(bc == ' ' && ch != ' ') {
+					top = p;
+				}
+				if(bc != ' ' && (ch == ' ' || ch == 0)) {
+					int len = p - top;					
+					if(argc == 0 && len == keylen) {
+						return std::strncmp(key, top, keylen) == 0;
+					}
+					--argc;
+				}
+				if(ch == 0) break;
+				bc = ch;
+				++p;
+			}
+			return false;
+		}
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  URL エンコード文字列を通常文字列へ変換
