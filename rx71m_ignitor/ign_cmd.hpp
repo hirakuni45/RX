@@ -21,6 +21,8 @@ namespace utils {
 	template <class TELNETS>
 	class ign_cmd {
 
+		static const uint32_t VERSION = 20;
+
 		TELNETS&	telnets_;
 
 		uint32_t	pos_;
@@ -35,7 +37,8 @@ namespace utils {
 					return;
 				}
 				if(strcmp(cmd, "help") == 0) {
-					utils::format("Ignitor command shell\n");
+					utils::format("Ignitor command shell Version %d.%02d\n")
+						% (VERSION / 100) % (VERSION % 100);
 					utils::format("  help\n");
 					utils::format("  crm\n");
 					utils::format("  wdm\n");

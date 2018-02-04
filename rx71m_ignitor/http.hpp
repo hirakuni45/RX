@@ -12,7 +12,7 @@
 
 namespace {
 
-	static const int VERSION = 50;
+	static const int HTTP_VERSION = 50;
 	static const uint32_t BUILD_ID = B_ID;
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -144,7 +144,7 @@ namespace {
 			https_.set_link("/", "Root", [=](void) {
 
 				http_format("Graviton Ignitor CNT Build: %u, Version %d.%02d<br>")
-					% BUILD_ID % (VERSION / 100) % (VERSION % 100);
+					% BUILD_ID % (HTTP_VERSION / 100) % (HTTP_VERSION % 100);
 				https_.tag_hr(500, 3);
 
 				time_t t = get_time();

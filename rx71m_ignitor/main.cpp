@@ -25,6 +25,8 @@
 
 namespace {
 
+	static const int MAIN_VERSION = 50;
+
 	typedef device::PORT<device::PORT0, device::bitpos::B2> LED0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3> LED1;
 	typedef device::PORT<device::PORTC, device::bitpos::B0> LED2;
@@ -89,7 +91,7 @@ namespace {
 	typedef device::sci_io<device::SCI3, RX_BUF, TX_BUF> ICM;
 	ICM		icm_(false);
 
-	utils::command<256> cmd_;
+//	utils::command<256> cmd_;
 
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
@@ -392,8 +394,9 @@ int main(int argc, char** argv)
 		wdm_.xchg(0xaa);
 	}
 #endif
-	utils::format("Start RX71M Ignitor\n");
-	cmd_.set_prompt("# ");
+	utils::format("\nStart RX71M Ignitor Build: %d Verision %d.%02d\n") % BUILD_ID
+		% (MAIN_VERSION / 100) % (MAIN_VERSION % 100);
+//	cmd_.set_prompt("# ");
 
 	// SD カード・クラスの初期化
 //	sdc_.start();
