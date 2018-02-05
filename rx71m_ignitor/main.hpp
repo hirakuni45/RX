@@ -98,4 +98,20 @@ namespace {
 	*/
 	//-----------------------------------------------------------------//
 	void set_time(time_t t);
+
+
+	void crm_out(const char* out);
+
+
+	void dc2_out(const char* out);
+
+
+	void dc1_out(const char* out);
+
+
+	void wgm_out(const char* out);
+
+
+	void icm_out(const char* out);
+
 }

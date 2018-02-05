@@ -169,6 +169,35 @@ namespace {
 			rtc_.set_time(t);
 		}
 	}
+
+
+	void crm_out(const char* out)
+	{
+		crm_.puts(out);
+	}
+
+
+	void dc2_out(const char* out)
+	{
+		dc2_.puts(out);
+	}
+
+
+	void dc1_out(const char* out)
+	{
+		dc1_.puts(out);
+	}
+
+
+	void wgm_out(const char* out)
+	{
+		wgm_.puts(out);
+	}
+
+	void icm_out(const char* out)
+	{
+		icm_.puts(out);
+	}
 }
 
 extern "C" {
