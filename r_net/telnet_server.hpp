@@ -243,7 +243,7 @@ namespace net {
 								char ch = tmp[l];
 								++l;
 								if(service_options_(ch)) {
-									putch(ch);  // local echo
+///									putch(ch);  // local echo
 ///	utils::format("%d: %02X\n") % l % static_cast<uint16_t>(ch);
 									recv_.put(ch);
 								}
