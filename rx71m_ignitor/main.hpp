@@ -101,6 +101,8 @@ namespace {
 
 
 	void crm_out(const char* out);
+	uint32_t crm_len();
+	char crm_inp();
 
 
 	void dc2_out(const char* out);

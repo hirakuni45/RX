@@ -29,6 +29,9 @@ namespace utils {
 		uint32_t	pos_;
 		char		line_[256];
 
+		char		crm_ans_[16];
+		uint32_t	crm_ans_pos_;
+
 		void filter9_(char* buf)
 		{
 			uint32_t len = strlen(buf);
@@ -75,10 +78,6 @@ namespace utils {
 					dc1_out(para);
 				} else if(strcmp(cmd, "wgm") == 0) {
 					wgm_out(para);
-//					wgm_out("WGSP1    \n");
-//					wgm_out("WGFQ40   \n");
-//					wgm_out("WGPV200  \n");
-//					wgm_out("WGOE1    \n");
 				} else if(strcmp(cmd, "icm") == 0) {
 					icm_out(para);
 				} else {
@@ -97,7 +96,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		ign_cmd(TELNETS& telnets) : telnets_(telnets),
-			pos_(0), line_{ 0 } { }
+			pos_(0), line_{ 0 }, crm_ans_{ 0, }, crm_ans_pos_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -107,6 +106,24 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void service()
 		{
+			{
+				while(crm_len() > 0) {
+					char ch = crm_inp();
+					crm_ans_[crm_ans_pos_] = ch;
+					++crm_ans_pos_;
+					if(crm_ans_pos_ >= sizeof(crm_ans_)) {
+						crm_ans_pos_ = 0;
+						break;
+					}
+					if(ch == '\n') {
+						crm_ans_[crm_ans_pos_] = 0;
+						telnets_.puts(crm_ans_);
+						utils::format("CRM ANS: %s") % crm_ans_;
+						crm_ans_pos_ = 0;
+					}
+				}
+			}
+
 			if(!telnets_.probe()) return;
 
 			auto len = telnets_.length();

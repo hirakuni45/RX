@@ -177,6 +177,18 @@ namespace {
 	}
 
 
+	uint32_t crm_len()
+	{
+		return crm_.recv_length();
+	}
+
+
+	char crm_inp()
+	{
+		return crm_.getch();
+	}
+
+
 	void dc2_out(const char* out)
 	{
 		dc2_.puts(out);
@@ -193,6 +205,7 @@ namespace {
 	{
 		wgm_.puts(out);
 	}
+
 
 	void icm_out(const char* out)
 	{
