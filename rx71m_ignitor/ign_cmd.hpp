@@ -84,7 +84,6 @@ namespace utils {
 					utils::format("Command error: '%s'\n") % cmd;
 				}
 			}
-
 //			utils::format("recv command: '%s'\n") % line_;
 		}
 
