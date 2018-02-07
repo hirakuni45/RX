@@ -13,6 +13,7 @@
 #include "common/rspi_io.hpp"
 #include "common/fifo.hpp"
 #include "common/format.hpp"
+#include "common/input.hpp"
 #include "common/delay.hpp"
 #include "common/command.hpp"
 
@@ -22,6 +23,7 @@
 #include "http.hpp"
 
 #include "ign_cmd.hpp"
+#include "wdmc.hpp"
 
 namespace {
 
@@ -57,6 +59,8 @@ namespace {
 	typedef device::cmt_io<device::CMT0, cmt_task> CMT;
 	CMT		cmt_;
 
+	utils::wdmc		wdmc_;
+
 	typedef utils::fifo<uint8_t, 128> RX_BUF;
 	typedef utils::fifo<uint8_t, 256> TX_BUF;
 
@@ -69,11 +73,6 @@ namespace {
 	// CRM interface (SCIF10, FIRST)
 	typedef device::scif_io<device::SCIF10, RX_BUF, TX_BUF> CRM;
 	CRM		crm_(false);
-
-	// WDM interface (RSPI, SECOND)
-	typedef device::PORT<device::PORTA, device::bitpos::B4> WDM_SEL;
-	typedef device::rspi_io<device::RSPI, device::port_map::option::SECOND> WDM;
-	WDM		wdm_;
 
 	// DC2 interface (SCI2, SECOND)
 	typedef device::sci_io<device::SCI2, RX_BUF, TX_BUF, device::port_map::option::SECOND> DC2;
@@ -91,7 +90,7 @@ namespace {
 	typedef device::sci_io<device::SCI3, RX_BUF, TX_BUF> ICM;
 	ICM		icm_(false);
 
-//	utils::command<256> cmd_;
+	utils::command<256> cmd_;
 
 	typedef utils::rtc_io RTC;
 	RTC		rtc_;
@@ -425,20 +424,11 @@ int main(int argc, char** argv)
 		icm_.start(115200, int_level);
 	}
 
-	{  // RSPI (for WDM) 7.5M bps
-		wdm_.start(7500000, WDM::PHASE::TYPE1, WDM::DLEN::W8);
-		WDM_SEL::DIR = 1;  // select output;
-	}
-//  RSPI test
-#if 0
-	while(1) {
-		WDM_SEL::P = !WDM_SEL::P();
-		wdm_.xchg(0xaa);
-	}
-#endif
+	wdmc_.start();
+
 	utils::format("\nStart RX71M Ignitor Build: %d Verision %d.%02d\n") % BUILD_ID
 		% (MAIN_VERSION / 100) % (MAIN_VERSION % 100);
-//	cmd_.set_prompt("# ");
+	cmd_.set_prompt("# ");
 
 	// SD カード・クラスの初期化
 //	sdc_.start();
@@ -491,8 +481,32 @@ int main(int argc, char** argv)
 
 //		sdc_.service();
 
-//		if(cmd_.service()) {
-//		}
+		if(cmd_.service()) {
+			uint8_t cmdn = cmd_.get_words();
+			if(cmdn >= 1) {
+				char tmp[128];
+				tmp[0] = 0;
+				if(cmdn >= 2) {
+					cmd_.get_word(1, sizeof(tmp), tmp);
+				}
+				if(cmd_.cmp_word(0, "st")) {  // get status
+					auto st = wdmc_.get_status();
+					utils::format("WDM st: %04X\n") % st;
+				} else if(cmd_.cmp_word(0, "get")) {
+					int val = 0;
+					if(cmdn >= 2 && (utils::input("%d", tmp) % val).status()) {
+
+					}
+				} else if(cmd_.cmp_word(0, "help")) {
+					utils::format("WDM command help\n");
+					utils::format("  st           read status\n");
+					utils::format("  get [num]    get wave data\n");
+				} else {
+					cmd_.get_word(0, sizeof(tmp), tmp);
+					utils::format("command error: '%s'\n") % tmp;
+				}
+			}
+		}
 
 		++cnt;
 		if(cnt >= 32) {
