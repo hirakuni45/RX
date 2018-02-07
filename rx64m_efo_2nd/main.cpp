@@ -1,7 +1,12 @@
 //=====================================================================//
 /*! @file
-    @brief  EFO (RX64M) メイン
-	@copyright Copyright 2017 Kunihito Hiramatsu All Right Reserved.
+    @brief  EFO 2ND (RX64M) メイン @n
+			・デバッグ用LED出力 ---> PJ5(11) @n
+			・デバッグ用シリアルＲＸＤ  --->  P21(36) / RXD0 @n
+			・デバッグ用シリアルＴＸＤ  --->  P20(37) / TXD0 @n
+			・変換トリガー閾値（コンパレーター入力+へ)   ---> P03(4) / DA0  @n
+			・変換トリガー入力（コンパレーター出力から） ---> PF5(9) / IRQ4
+	@copyright Copyright 2018 Kunihito Hiramatsu All Right Reserved.
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -15,19 +20,11 @@
 #include "common/irq_man.hpp"
 #include "chip/LTC2348_16a.hpp"
 
-#if 0
-・デバッグ用LED出力 ---> PJ5(11)
-・デバッグ用シリアルＲＸＤ  --->  P21(36) / RXD0
-・デバッグ用シリアルＴＸＤ  --->  P20(37) / TXD0
-・変換トリガー閾値（コンパレーター入力+へ)   ---> P03(4) / DA0
-・変換トリガー入力（コンパレーター出力から） ---> PF5(9) / IRQ4
-#endif
-
 // #define UART_DEBUG
 
 namespace {
 
-	static const int main_version_ = 86;
+	static const int main_version_ = 88;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -37,11 +34,13 @@ namespace {
 		MODE_SENSE  = 0x12,
 		VER         = 0x21,
 
-		BIN_CNVTESTS = 'B',
-		BIN_CNVTEST  = 'b',
+//		OFFSET = 'O';			///< トリガーオフセット、'O', L, H 
 
-		ASC_CNVTESTS = 'T',
-		ASC_CNVTEST  = 't',
+		BIN_CNVTESTS = 'B',		///< １０２４キャプチャーバイナリ転送
+		BIN_CNVTEST  = 'b',		///< １キャプチャーバイナリ転送
+
+		ASC_CNVTESTS = 'T',		///< １０２４キャプチャー、文字表示
+		ASC_CNVTEST  = 't',		///< １キャプチャー、文字表示
 	};
 
 	enum class TASK : uint8_t {
@@ -117,6 +116,9 @@ namespace {
 ///				LED::P = 1;
 				if(cap_cnt_) {
 					--cap_cnt_;
+					if(cap_cnt_ == 0) {
+						cap_enable_ = false;
+					}
 				}
 				++cap_pos_;
 				cap_pos_ &= CAP_BUFF_SIZE - 1;
@@ -152,29 +154,26 @@ namespace {
 	uint16_t ch0_trg_[1024];
 	uint16_t ch1_trg_[1024];
 
-	void copy_trg_(uint32_t len)
+	void copy_(uint32_t org, uint32_t len)
 	{
-		uint32_t pos = cap_pos_;
-		pos -= len;
 		for(uint32_t i = 0; i < len; ++i) {
-			pos &= (CAP_BUFF_SIZE - 1);
-			ch0_trg_[i] = ch0_src_[pos];
-			ch1_trg_[i] = ch1_src_[pos];
-			++pos;
+			org &= (CAP_BUFF_SIZE - 1);
+			ch0_trg_[i] = ch0_src_[org];
+			ch1_trg_[i] = ch1_src_[org];
+			++org;
 		}
 	}
 
-	volatile uint32_t irq_state_;
-	volatile uint32_t irq_count_;
 	volatile uint16_t trg_pos_;
+	volatile uint16_t req_cnt_;
 
 	// trigger task
 	class irq_task {
 	public:
 		void operator() ()
 		{
+			cap_cnt_ = req_cnt_;
 			trg_pos_ = cap_pos_;
-			++irq_count_;
 		}
 	};
 
@@ -185,16 +184,18 @@ namespace {
 
 	uint16_t	length_;
 	uint16_t	volt_;
-	uint16_t	count_;
 
 	SEND_TASK  	send_task_;
 
-	void send_wave_legacy_(char ch, uint16_t src)
+
+	void send_wave_legacy_(char ch, uint16_t len, const uint16_t* src)
 	{
 		m_sci_.putch(0x01);  // A/D シングル通知
 		m_sci_.putch(ch);    // chanel NO
-		m_sci_.putch(src >> 8);
-		m_sci_.putch(src & 0xff);
+		for(uint16_t i = 0; i < len; ++i) {
+			m_sci_.putch(src[i] >> 8);
+			m_sci_.putch(src[i] & 0xff);
+		}
 	}
 
 
@@ -359,9 +360,9 @@ int main(int argc, char** argv)
 		}
 	}
 
+	cap_pos_ = 0;
+	cap_cnt_ = 0;
 	cap_enable_ = true;
-	irq_state_ = 0;
-	irq_count_ = 0;
 
 	// 初期設定
 	dac_.out0(32768);  // トリガー電圧０Ｖ
@@ -376,18 +377,22 @@ int main(int argc, char** argv)
 				CMD cmd = static_cast<CMD>(m_sci_.getch());
 				switch(cmd) {
 				case CMD::START:
+					cap_enable_ = true;
 					task_ = TASK::LENGTH;
 					break;
 				case CMD::ASC_CNVTEST:
+					cap_enable_ = true;
 					send_task_ = SEND_TASK::ASCII_SINGLE;
 					break;
 				case CMD::ASC_CNVTESTS:
 					send_task_ = SEND_TASK::ASCII_MULTI;
 					break;
 				case CMD::BIN_CNVTEST:
+					cap_enable_ = true;
 					send_task_ = SEND_TASK::BIN_SINGLE;
 					break;
 				case CMD::BIN_CNVTESTS:
+					cap_enable_ = true;
 					send_task_ = SEND_TASK::BIN_MULTI;
 					break;
 				case CMD::END:
@@ -429,13 +434,17 @@ int main(int argc, char** argv)
 				bool trg = true;
 				if(volt_ < 32768) trg = false;
 				 setup_irq_(trg);
-				irq_state_ = irq_count_;
-				irq_.enable();
 				if(length_ == 0) {
+					req_cnt_ = 1;
 					send_task_ = SEND_TASK::SINGLE;
 				} else {
+					uint16_t n = length_;
+					if(length_ > 1024) n = 1024;
+					req_cnt_ = n;
 					send_task_ = SEND_TASK::MULTI;
 				}
+				cap_enable_ = true;
+				irq_.enable();
 			}
 			break;
 
@@ -446,29 +455,29 @@ int main(int argc, char** argv)
 		switch(send_task_) {
 
 		case SEND_TASK::SINGLE:
-			if(irq_state_ == irq_count_) break;
-
-//			send_wave_(0x01, ch0_trg_[0]);
-//			send_wave_(0x02, ch1_trg_[0]);
+			if(cap_cnt_ != 0) break;
+			copy_(trg_pos_, 1);
+			send_wave_legacy_(0x01, 1, ch0_trg_);
+			send_wave_legacy_(0x02, 1, ch1_trg_);
 			send_task_ = SEND_TASK::READY;
 			break;
 
 		case SEND_TASK::MULTI:
-			if(irq_state_ == irq_count_) break;
-
-//			send_wave_(0x01, length_, ch0_trg_);
-//			send_wave_(0x02, length_, ch1_trg_);
+			if(cap_cnt_ != 0) break;
+			copy_(trg_pos_, length_);
+			send_wave_legacy_(0x01, length_, ch0_trg_);
+			send_wave_legacy_(0x02, length_, ch1_trg_);
 			send_task_ = SEND_TASK::READY;
 			break;
 
 		case SEND_TASK::BIN_SINGLE:
-			copy_trg_(1);
+			copy_(cap_pos_, 1);
 			send_wave_(0x01, 1, ch0_trg_);
 			send_wave_(0x02, 1, ch1_trg_);
 			send_task_ = SEND_TASK::READY;
 			break;
 		case SEND_TASK::BIN_MULTI:
-			copy_trg_(1024);
+			copy_(cap_pos_, 1024);
 			send_wave_(0x01, 1024, ch0_trg_);
 			send_wave_(0x02, 1024, ch1_trg_);
 			send_task_ = SEND_TASK::READY;
@@ -476,7 +485,7 @@ int main(int argc, char** argv)
 
 		case SEND_TASK::ASCII_SINGLE:
 			{
-				copy_trg_(1);
+				copy_(cap_pos_, 1);
 				char tmp[128];
 				utils::sformat("%d,%d\r\n", tmp, sizeof(tmp)) % ch0_trg_[0] % ch1_trg_[0];
 				m_sci_.puts(tmp);
@@ -485,7 +494,7 @@ int main(int argc, char** argv)
 			break;
 		case SEND_TASK::ASCII_MULTI:
 			{
-				copy_trg_(1024);
+				copy_(cap_pos_, 1024);
 				for(uint16_t i = 0; i < 1024; ++i) {
 					char tmp[128];
 					utils::sformat("%d,%d,%d\r\n", tmp, sizeof(tmp))
