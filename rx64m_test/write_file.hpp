@@ -206,14 +206,13 @@ namespace seeda {
 					char tmp[64];
 					utils::sformat("File open error: '%s'", tmp, sizeof(tmp)) % filename_;
 					at_logs().add(get_time(), tmp);
-					debug_format("%s\n") % tmp; 
+					debug_format("%s\n") % tmp;
+
+					set_restart_delay(60 * 1);
+
 					enable_ = false;
 					task_ = task::wait_request;
 				} else {
-// log 確認テスト用
-//			char tmp[64];
-//			utils::sformat("File open: '%s'", tmp, sizeof(tmp)) % filename_;
-//			at_logs().add(get_time(), tmp);
 					debug_format("Start write file: '%s'\n") % filename_;
 					task_ = task::write_header;
 				}
@@ -234,7 +233,10 @@ namespace seeda {
 						utils::sformat("File write error (header): '%s'", tmp, sizeof(tmp))
 							% filename_;
 						at_logs().add(get_time(), tmp);
-						debug_format("%s\n") % tmp; 
+						debug_format("%s\n") % tmp;
+
+						set_restart_delay(60 * 1);
+ 
 						enable_ = false;
 						task_ = task::wait_request;
 						break;
@@ -257,7 +259,6 @@ namespace seeda {
 							% static_cast<uint32_t>(m->tm_min)
 							% static_cast<uint32_t>(m->tm_sec);
 						second_ = m->tm_sec;
-// debug_format("WF: '%s'\n") % data_;
 					} else {
 						utils::sformat(",", data_, sizeof(data_));
 					}
@@ -283,7 +284,10 @@ namespace seeda {
 						utils::sformat("File write error (body): '%s'", tmp, sizeof(tmp))
 							% filename_;
 						at_logs().add(get_time(), tmp);
-						debug_format("%s\n") % tmp; 
+						debug_format("%s\n") % tmp;
+
+						set_restart_delay(60 * 1); 
+
 						enable_ = false;
 						task_ = task::wait_request;
 						break;
