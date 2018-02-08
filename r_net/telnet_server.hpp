@@ -96,7 +96,7 @@ namespace net {
 
 		void write_()
 		{
-			char tmp[256];
+			char tmp[1024];
 			uint16_t l = 0;
 			while(send_.length() > 0) {
 				auto ch = send_.get();
