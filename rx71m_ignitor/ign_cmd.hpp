@@ -49,13 +49,15 @@ namespace utils {
 				if(!str::get_word(line_, 0, cmd, sizeof(cmd))) {
 					return;
 				}
-				char para[128];
+				char para[64];
+				char para9[64];
 				para[0] = 0;
 				if(n >= 2 && str::get_word(line_, 1, para, sizeof(para))) {
-					filter9_(para);
-					utils::format("%s: '%s'\n") % cmd % para;
-					para[9] = '\n';
-					para[10] = 0;
+					strcpy(para9, para);
+					filter9_(para9);
+//					utils::format("%s: '%s'\n") % cmd % para;
+					para9[9] = '\n';
+					para9[10] = 0;
 				}
 
 				if(strcmp(cmd, "help") == 0) {
@@ -69,17 +71,20 @@ namespace utils {
 					utils::format("  wgm ...\n");
 					utils::format("  icm ...\n");
 				} else if(strcmp(cmd, "crm") == 0) {
-					crm_out(para);
+					crm_out(para9);
 				} else if(strcmp(cmd, "wdm") == 0) {
-
+// utils::format("%s\n") % para;
+					uint32_t cmd = 0;
+					utils::input("%x", para) % cmd;
+					wdm_out(cmd);
 				} else if(strcmp(cmd, "dc2") == 0) {
-					dc2_out(para);
+					dc2_out(para9);
 				} else if(strcmp(cmd, "dc1") == 0) {
-					dc1_out(para);
+					dc1_out(para9);
 				} else if(strcmp(cmd, "wgm") == 0) {
-					wgm_out(para);
+					wgm_out(para9);
 				} else if(strcmp(cmd, "icm") == 0) {
-					icm_out(para);
+					icm_out(para9);
 				} else {
 					utils::format("Command error: '%s'\n") % cmd;
 				}

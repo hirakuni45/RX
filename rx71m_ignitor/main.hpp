@@ -77,7 +77,7 @@ namespace {
 	typedef device::PORT<device::PORTB, device::bitpos::B7> SDC_DETECT;	///< カード検出
 #endif
 	typedef net::http_server<16, 8192> HTTP_SERVER;
-	typedef net::telnet_server<1024, 256> TELNETS;
+	typedef net::telnet_server<4096, 4096> TELNETS;
 //	typedef utils::sdc_io<SDC_RSPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC;
 
 
@@ -116,4 +116,6 @@ namespace {
 
 	void icm_out(const char* out);
 
+
+	void wdm_out(uint32_t cmd);
 }

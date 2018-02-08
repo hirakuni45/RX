@@ -107,6 +107,8 @@ namespace {
 
 	utils::ign_cmd<TELNETS>	ign_cmd_(telnets_);
 
+	char	wdm_buff_[8192];
+
 	// 文字列表示、割り込み対応ロック／アンロック機構
 	volatile bool putch_lock_ = false;
 	utils::fixed_fifo<char, 1024> putch_tmp_;
@@ -209,6 +211,37 @@ namespace {
 	void icm_out(const char* out)
 	{
 		icm_.puts(out);
+	}
+
+
+	void wdm_out(uint32_t cmd)
+	{
+		wdmc_.output(cmd);
+	}
+
+	void test_wave_out_(uint32_t num)
+	{
+		static uint16_t tri = 0;
+		memcpy(wdm_buff_, "WDMW", 4);
+		uint32_t idx = 4;
+		for(uint32_t i = 0; i < num; ++i) {
+			char tmp[8];
+			utils::sformat("%04X", tmp, sizeof(tmp)) % tri;
+			tri += 256;
+			memcpy(&wdm_buff_[idx], tmp, 4);
+			idx += 4;
+				if(idx >= (sizeof(wdm_buff_) - 4)) {
+				wdm_buff_[idx] = '\n';
+				wdm_buff_[idx + 1] = 0;
+				telnets_.puts(wdm_buff_);
+				idx = 0;
+			}
+		}
+		if(idx > 0) {
+			wdm_buff_[idx] = '\n';
+			wdm_buff_[idx + 1] = 0;
+			telnets_.puts(wdm_buff_);
+		}
 	}
 }
 
@@ -493,14 +526,28 @@ int main(int argc, char** argv)
 					auto st = wdmc_.get_status();
 					utils::format("WDM st: %04X\n") % st;
 				} else if(cmd_.cmp_word(0, "get")) {
-					int val = 0;
-					if(cmdn >= 2 && (utils::input("%d", tmp) % val).status()) {
-
+					int num = 0;
+					if(cmdn >= 2 && (utils::input("%d", tmp) % num).status()) {
+						for(int i = 0; i < num; ++i) {
+							auto w = wdmc_.get_wave(1, 0);
+							utils::format("%d\n") % w;
+						}
 					}
+				} else if(cmd_.cmp_word(0, "ptw")) {
+					int num = 0;
+					if(cmdn >= 2 && (utils::input("%d", tmp) % num).status()) {
+						while(num > 0) {
+							uint32_t sub = num;
+							if(sub > 128) sub = 128;
+							test_wave_out_(sub);
+							num -= sub;
+						}
+					}					
 				} else if(cmd_.cmp_word(0, "help")) {
 					utils::format("WDM command help\n");
 					utils::format("  st           read status\n");
 					utils::format("  get [num]    get wave data\n");
+					utils::format("  ptw [num]    put test wave data\n");
 				} else {
 					cmd_.get_word(0, sizeof(tmp), tmp);
 					utils::format("command error: '%s'\n") % tmp;
