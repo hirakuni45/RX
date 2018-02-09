@@ -523,7 +523,7 @@ int main(int argc, char** argv)
 
 		if(send_all_) {
 			if(send_idx_ < 2048) {
-				wave_send_(256);
+				wave_send_(512);
 			} else {
 				send_all_ = false;
 			}
