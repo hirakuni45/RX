@@ -17,10 +17,10 @@ namespace device {
 	/*!
 		@brief	シリアルサウンドインタフェース（SSI）
 		@param[in]	base	ベースアドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
+	template <uint32_t base, peripheral per>
 	struct ssi_t {
 
 		//-----------------------------------------------------------------//
@@ -186,7 +186,7 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 	};
 	typedef ssi_t<0x0008A500, peripheral::SSI0> SSI0;
