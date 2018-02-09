@@ -109,6 +109,11 @@ namespace {
 
 	char	wdm_buff_[8192];
 
+	uint16_t	wave_buff_[2048];
+	uint32_t	send_idx_;
+
+	bool		send_all_;
+
 	// 文字列表示、割り込み対応ロック／アンロック機構
 	volatile bool putch_lock_ = false;
 	utils::fixed_fifo<char, 1024> putch_tmp_;
@@ -219,15 +224,15 @@ namespace {
 		wdmc_.output(cmd);
 	}
 
-	void test_wave_out_(uint32_t num)
+
+	void wave_send_(uint32_t num)
 	{
-		static uint16_t tri = 0;
 		memcpy(wdm_buff_, "WDMW", 4);
 		uint32_t idx = 4;
 		for(uint32_t i = 0; i < num; ++i) {
 			char tmp[8];
-			utils::sformat("%04X", tmp, sizeof(tmp)) % tri;
-			tri += 256;
+			utils::sformat("%04X", tmp, sizeof(tmp)) % wave_buff_[send_idx_ & 2047];
+			++send_idx_;
 			memcpy(&wdm_buff_[idx], tmp, 4);
 			idx += 4;
 				if(idx >= (sizeof(wdm_buff_) - 4)) {
@@ -459,6 +464,8 @@ int main(int argc, char** argv)
 
 	wdmc_.start();
 
+	send_all_ = false;
+
 	utils::format("\nStart RX71M Ignitor Build: %d Verision %d.%02d\n") % BUILD_ID
 		% (MAIN_VERSION / 100) % (MAIN_VERSION % 100);
 	cmd_.set_prompt("# ");
@@ -514,6 +521,14 @@ int main(int argc, char** argv)
 
 //		sdc_.service();
 
+		if(send_all_) {
+			if(send_idx_ < 2048) {
+				wave_send_(256);
+			} else {
+				send_all_ = false;
+			}
+		}
+
 		if(cmd_.service()) {
 			uint8_t cmdn = cmd_.get_words();
 			if(cmdn >= 1) {
@@ -529,25 +544,41 @@ int main(int argc, char** argv)
 					int num = 0;
 					if(cmdn >= 2 && (utils::input("%d", tmp) % num).status()) {
 						for(int i = 0; i < num; ++i) {
-							auto w = wdmc_.get_wave(1, 0);
+							auto w = wdmc_.get_wave(1, i);
 							utils::format("%d\n") % w;
 						}
 					}
-				} else if(cmd_.cmp_word(0, "ptw")) {
+				} else if(cmd_.cmp_word(0, "cap")) {
+					for(int i = 0; i < 2048; ++i) {
+						wave_buff_[i] = wdmc_.get_wave(1, i);
+					}
+					send_idx_ = 0;
+				} else if(cmd_.cmp_word(0, "pgw")) {
 					int num = 0;
 					if(cmdn >= 2 && (utils::input("%d", tmp) % num).status()) {
-						while(num > 0) {
-							uint32_t sub = num;
-							if(sub > 128) sub = 128;
-							test_wave_out_(sub);
-							num -= sub;
-						}
+						wave_send_(num);
 					}					
+				} else if(cmd_.cmp_word(0, "mtw")) {
+					int num = 0;
+					uint16_t d = 0;
+					if(cmdn >= 2 && (utils::input("%d", tmp) % num).status()) {
+						for(int i = 0; i < 2048; ++i) {
+							wave_buff_[i] = d;
+							d += num;
+						}
+						send_idx_ = 0;
+					}					
+				} else if(cmd_.cmp_word(0, "all")) {
+					send_idx_ = 0;
+					send_all_ = true;
 				} else if(cmd_.cmp_word(0, "help")) {
 					utils::format("WDM command help\n");
 					utils::format("  st           read status\n");
 					utils::format("  get [num]    get wave data\n");
-					utils::format("  ptw [num]    put test wave data\n");
+					utils::format("  cap          capture\n");
+					utils::format("  pgw [num]    put wave data\n");
+					utils::format("  mtw [dlt]    make test wave data\n");
+					utils::format("  all          all capture and send\n");
 				} else {
 					cmd_.get_word(0, sizeof(tmp), tmp);
 					utils::format("command error: '%s'\n") % tmp;
