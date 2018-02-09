@@ -73,13 +73,14 @@ namespace utils {
 				} else if(strcmp(cmd, "crm") == 0) {
 					crm_out(para9);
 				} else if(strcmp(cmd, "wdm") == 0) {
-// utils::format("%s\n") % para;
 					uint32_t cmd = 0;
 					utils::input("%x", para) % cmd;
+utils::format("WDM: 0x%06X\n") % cmd;
 					wdm_out(cmd);
 				} else if(strcmp(cmd, "dc2") == 0) {
 					dc2_out(para9);
 				} else if(strcmp(cmd, "dc1") == 0) {
+utils::format("DC1: %s") % para9;
 					dc1_out(para9);
 				} else if(strcmp(cmd, "wgm") == 0) {
 					wgm_out(para9);
