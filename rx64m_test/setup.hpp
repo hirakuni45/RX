@@ -111,8 +111,6 @@ namespace seeda {
 		}
 #endif
 
-		device::standby_ram		sram_;
-
 		void disp_time_(time_t t, char* dst, uint32_t size)
 		{
 			uint32_t s = t % 60;
@@ -166,7 +164,7 @@ namespace seeda {
 
 		uint32_t get_reset_count_() const {
 			uint32_t n;
-			sram_.get32(RES_COUNT_, n);
+			at_sram().get32(RES_COUNT_, n);
 			return n;
 		}
 
@@ -184,18 +182,22 @@ namespace seeda {
 #ifdef SEEDA
 			, spi_(), eui_(spi_)
 #endif
+		{ }
+
+		void init()
 		{
-			sram_.start();
+			at_sram().start();
 			uint32_t magic;
-			sram_.get32(RES_MAGIC_, magic);
+			at_sram().get32(RES_MAGIC_, magic);
 			if(magic != RES_MAGIC_ID_) {
-				sram_.put32(RES_MAGIC_, RES_MAGIC_ID_);
-				sram_.put32(RES_COUNT_, 0x0001);
+				at_sram().put32(RES_MAGIC_, RES_MAGIC_ID_);
+				at_sram().put32(RES_COUNT_, 0x0001);
+				at_logs().clear();
 			} else {
 				uint32_t cnt;
-				sram_.get32(RES_COUNT_, cnt);
+				at_sram().get32(RES_COUNT_, cnt);
 				++cnt;
-				sram_.put32(RES_COUNT_, cnt);
+				at_sram().put32(RES_COUNT_, cnt);
 			}
 		}
 

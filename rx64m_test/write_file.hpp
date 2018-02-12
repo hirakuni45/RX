@@ -205,7 +205,7 @@ namespace seeda {
 				if(fp_ == nullptr) {  // error then disable write.
 					char tmp[64];
 					utils::sformat("File open error: '%s'", tmp, sizeof(tmp)) % filename_;
-					at_logs().add(get_time(), tmp);
+					at_logs().add(get_time(), "WOP");
 					debug_format("%s\n") % tmp;
 
 					set_restart_delay(60 * 1);
@@ -213,6 +213,7 @@ namespace seeda {
 					enable_ = false;
 					task_ = task::wait_request;
 				} else {
+///					at_logs().add(get_time(), "WOP");  // for log test
 					debug_format("Start write file: '%s'\n") % filename_;
 					task_ = task::write_header;
 				}
@@ -232,7 +233,7 @@ namespace seeda {
 						char tmp[64];
 						utils::sformat("File write error (header): '%s'", tmp, sizeof(tmp))
 							% filename_;
-						at_logs().add(get_time(), tmp);
+						at_logs().add(get_time(), "WR");
 						debug_format("%s\n") % tmp;
 
 						set_restart_delay(60 * 1);
@@ -283,7 +284,7 @@ namespace seeda {
 						char tmp[64];
 						utils::sformat("File write error (body): '%s'", tmp, sizeof(tmp))
 							% filename_;
-						at_logs().add(get_time(), tmp);
+						at_logs().add(get_time(), "WR");
 						debug_format("%s\n") % tmp;
 
 						set_restart_delay(60 * 1); 

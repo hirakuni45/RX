@@ -11,6 +11,8 @@
 
 namespace seeda {
 
+	device::standby_ram& at_sram();
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  ログ・クラス
@@ -26,17 +28,23 @@ namespace seeda {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct log_t {
 			time_t	time_;		///< 発生時間
-			char	msg_[64];	///< 内容
+///			char	msg_[64];	///< 内容
+			char	msg_[4];	///< 内容
 			log_t() : time_(0), msg_{ 0 } { }
 		};
 
 	private:
-		static const uint32_t LOG_NUM = 48;
+		static const uint32_t LOG_NUM = 16;
 
-		log_t		log_[LOG_NUM];
+		static const uint16_t LOG_SIZE = 8;
+		static const uint16_t LOG_POS  = 12;
+		static const uint16_t LOG_T    = 16;
 
-		uint32_t	size_;
-		uint32_t	pos_;
+//		log_t		log_[LOG_NUM];
+//		uint32_t	size_;
+//		uint32_t	pos_;
+
+		log_t		log_tmp_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -44,7 +52,19 @@ namespace seeda {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		logs() : log_(), size_(0), pos_(0) { }
+		logs() : /* log_(nullptr), size_(0), pos_(0) */ log_tmp_() { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ログの消去
+		*/
+		//-----------------------------------------------------------------//
+		void clear()
+		{
+			at_sram().put32(LOG_SIZE, 0x0000);
+			at_sram().put32(LOG_POS,  0x0000);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -53,7 +73,16 @@ namespace seeda {
 			@return ログのサイズ
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t size() const { return size_; }
+//		uint32_t size() const { return size_; }
+		uint32_t size() {
+			uint32_t sz;
+			at_sram().get32(LOG_SIZE, sz);
+			if(sz > LOG_NUM) {
+				clear();
+				sz = 0;
+			}
+			return sz;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -67,12 +96,28 @@ namespace seeda {
 		{
 			if(msg == nullptr) return;
 
+			uint32_t pos;
+			at_sram().get32(LOG_POS, pos);
+			log_t tmp;
+			tmp.time_ = t;
+			strncpy(tmp.msg_, msg, sizeof(log_t::msg_));
+			at_sram().copy(&tmp, sizeof(log_t), LOG_T + sizeof(log_t) * pos);
+
+			uint32_t sz = size();
+			++sz;
+			if(sz > LOG_NUM) sz = LOG_NUM;
+			at_sram().put32(LOG_SIZE, sz);
+			++pos;
+			if(pos >= LOG_NUM) pos = 0;
+			at_sram().put32(LOG_POS, pos);
+#if 0
 			log_[pos_].time_ = t;
  			strncpy(log_[pos_].msg_, msg, sizeof(log_t::msg_));
 			++size_;
 			if(size_ > LOG_NUM) size_ = LOG_NUM;
 			++pos_;
 			if(pos_ >= LOG_NUM) pos_ = 0;
+#endif
 		}
 
 
@@ -83,11 +128,18 @@ namespace seeda {
 			@return ログ
 		*/
 		//-----------------------------------------------------------------//
-		const log_t& get(uint32_t pos) const {
+		const log_t& get(uint32_t pos) {
+#if 0
 			if(pos >= size_) {
 				return log_[0];
 			}
 			return log_[pos];
+#endif
+			if(pos >= size()) {
+				return log_tmp_;
+			}
+			at_sram().copy(LOG_T + sizeof(log_t) * pos, sizeof(log_t), &log_tmp_);
+			return log_tmp_;
 		}
 	};
 }
