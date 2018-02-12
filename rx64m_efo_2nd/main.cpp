@@ -24,7 +24,7 @@
 
 namespace {
 
-	static const int main_version_ = 88;
+	static const int main_version_ = 89;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -166,6 +166,7 @@ namespace {
 
 	volatile uint16_t trg_pos_;
 	volatile uint16_t req_cnt_;
+	volatile uint32_t irq_count_;
 
 	// trigger task
 	class irq_task {
@@ -174,6 +175,7 @@ namespace {
 		{
 			cap_cnt_ = req_cnt_;
 			trg_pos_ = cap_pos_;
+			++irq_count_;
 		}
 	};
 
@@ -184,6 +186,7 @@ namespace {
 
 	uint16_t	length_;
 	uint16_t	volt_;
+	uint32_t	irq_state_;
 
 	SEND_TASK  	send_task_;
 
@@ -360,6 +363,9 @@ int main(int argc, char** argv)
 		}
 	}
 
+	irq_count_ = 0;
+	irq_state_ = 0;
+
 	cap_pos_ = 0;
 	cap_cnt_ = 0;
 	cap_enable_ = true;
@@ -443,6 +449,7 @@ int main(int argc, char** argv)
 					req_cnt_ = n;
 					send_task_ = SEND_TASK::MULTI;
 				}
+				irq_state_ = irq_count_;
 				cap_enable_ = true;
 				irq_.enable();
 			}
@@ -455,7 +462,9 @@ int main(int argc, char** argv)
 		switch(send_task_) {
 
 		case SEND_TASK::SINGLE:
+			if(irq_count_ == irq_state_) break;
 			if(cap_cnt_ != 0) break;
+			irq_state_ = irq_count_;
 			copy_(trg_pos_, 1);
 			send_wave_legacy_(0x01, 1, ch0_trg_);
 			send_wave_legacy_(0x02, 1, ch1_trg_);
@@ -463,7 +472,9 @@ int main(int argc, char** argv)
 			break;
 
 		case SEND_TASK::MULTI:
+			if(irq_count_ == irq_state_) break;
 			if(cap_cnt_ != 0) break;
+			irq_state_ = irq_count_;
 			copy_(trg_pos_, length_);
 			send_wave_legacy_(0x01, length_, ch0_trg_);
 			send_wave_legacy_(0x02, length_, ch1_trg_);
