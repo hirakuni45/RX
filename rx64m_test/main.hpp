@@ -38,7 +38,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 529;
+	static const int seeda_version_ = 530;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef device::PORT<device::PORTE, device::bitpos::B3> LED;
@@ -146,6 +146,14 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	EADC& at_eadc();
 #endif
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  sram クラスへの参照
+		@return sram クラス
+	*/
+	//-----------------------------------------------------------------//
+	device::standby_ram& at_sram();
 
 
 	//-----------------------------------------------------------------//
