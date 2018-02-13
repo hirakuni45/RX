@@ -101,11 +101,11 @@ namespace {
 
 	net::ethernet   ethernet_;
 	HTTP_SERVER     https_(ethernet_);
-	TELNETS			telnets_(ethernet_);
+	TELNETS			telnets_(ethernet_, false);
 
 	http<HTTP_SERVER>	http_(https_);
 
-	utils::ign_cmd<TELNETS>	ign_cmd_(telnets_);
+	utils::ign_cmd<TELNETS>	ign_cmd_(telnets_, wdmc_);
 
 	char	wdm_buff_[8192];
 
@@ -225,7 +225,15 @@ namespace {
 	}
 
 
-	void wave_send_(uint32_t num)
+	void wdm_capture(uint32_t ch)
+	{
+		for(int i = 0; i < 2048; ++i) {
+			wave_buff_[i] = wdmc_.get_wave(ch + 1, i);
+		}
+	}
+
+
+	void wdm_send_(uint32_t num)
 	{
 		memcpy(wdm_buff_, "WDMW", 4);
 		uint32_t idx = 4;
@@ -523,7 +531,7 @@ int main(int argc, char** argv)
 
 		if(send_all_) {
 			if(send_idx_ < 2048) {
-				wave_send_(512);
+				wdm_send_(512);
 			} else {
 				send_all_ = false;
 			}
@@ -556,7 +564,7 @@ int main(int argc, char** argv)
 				} else if(cmd_.cmp_word(0, "pgw")) {
 					int num = 0;
 					if(cmdn >= 2 && (utils::input("%d", tmp) % num).status()) {
-						wave_send_(num);
+						wdm_send_(num);
 					}					
 				} else if(cmd_.cmp_word(0, "mtw")) {
 					int num = 0;
