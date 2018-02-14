@@ -38,10 +38,9 @@ namespace utils {
 
 		uint32_t	delay_;
 
-		uint32_t	cap_req_;
-
-		uint16_t	wave_buff_[2048];
+		uint16_t	wave_buff_[2048 * 4];
 		uint32_t	send_idx_;
+		uint32_t	send_ch_;
 
 		char		wdm_buff_[8192];
 
@@ -102,7 +101,7 @@ namespace utils {
 					utils::input("%x", para) % cmd;
 					wdm_out(cmd);
 					if((cmd >> 19) == 0b00100) {
-						cap_req_ = (cmd >> 14) & 3;  // channel 0 to 3
+						// start wait
 						task_ = task::wait;
 					}
 				} else if(strcmp(cmd, "dc2") == 0) {
@@ -123,27 +122,29 @@ namespace utils {
 
 		void wdm_capture_(uint32_t ch, int ofs)
 		{
-			for(int i = 0; i < 1024; ++i) {
-				wave_buff_[i] = wdmc_.get_wave(ch + 1, i + ofs);
+			wdmc_.set_wave_pos(ch + 1, ofs);
+			for(int i = 0; i < 2048; ++i) {
+				wave_buff_[ch * 2048 + i] = wdmc_.get_wave(ch + 1);
 			}
 		}
 
 
-		void wdm_send_ch_()
+		void wdm_send_ch_(uint32_t ch)
 		{
 			char tmp[16];
-			utils::sformat("WDCH%d\n", tmp, sizeof(tmp)) % cap_req_;
+			utils::sformat("WDCH%d\n", tmp, sizeof(tmp)) % ch;
 			telnets_.puts(tmp);
 		}
 
 
-		void wdm_send_(uint32_t num)
+		void wdm_send_(uint32_t ch, uint32_t num)
 		{
 			memcpy(wdm_buff_, "WDMW", 4);
+			const uint16_t* src = &wave_buff_[ch * 2048];
 			uint32_t idx = 4;
 			for(uint32_t i = 0; i < num; ++i) {
 				char tmp[8];
-				utils::sformat("%04X", tmp, sizeof(tmp)) % wave_buff_[send_idx_ & 2047];
+				utils::sformat("%04X", tmp, sizeof(tmp)) % src[send_idx_ & 2047];
 				++send_idx_;
 				memcpy(&wdm_buff_[idx], tmp, 4);
 				idx += 4;
@@ -172,7 +173,7 @@ namespace utils {
 		ign_cmd(TELNETS& telnets, utils::wdmc& wdmc) : telnets_(telnets),
 			wdmc_(wdmc),
 			pos_(0), line_{ 0 }, crm_ans_{ 0, }, crm_ans_pos_(0),
-			delay_(0), cap_req_(0),
+			delay_(0), send_idx_(0), send_ch_(0),
 			task_(task::idle) { }
 
 
@@ -189,10 +190,14 @@ namespace utils {
 
 			case task::wait:
 				if(wdmc_.get_status() & 0b010) {  // end record
-					int ofs = 0;
-					wdm_capture_(cap_req_, ofs);
-					wdmc_.output((0b00100000 << 16) | (cap_req_ << 14));  // trg off
-					wdm_send_ch_();
+					int ofs = -1024;
+					wdm_capture_(0, ofs);
+					wdm_capture_(1, ofs);
+					wdm_capture_(2, ofs);
+					wdm_capture_(3, ofs);
+					wdmc_.output(0b00100000 << 16);  // trg off
+					send_ch_ = 0;
+					wdm_send_ch_(send_ch_);
 					send_idx_ = 0;
 					task_ = task::send;
 				}
@@ -200,9 +205,16 @@ namespace utils {
 
 			case task::send:
 				if(send_idx_ < 2048) {
-					wdm_send_(512);
+					wdm_send_(send_ch_, 512);
 				} else {
-					task_ = task::idle;
+					++send_ch_;
+					if(send_ch_ < 4) {
+						wdm_send_ch_(send_ch_);
+						send_idx_ = 0;
+						task_ = task::send;
+					} else {
+						task_ = task::idle;
+					}
 				}
 				break;
 
