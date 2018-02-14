@@ -10,6 +10,8 @@
 //=====================================================================//
 #include "main.hpp"
 
+#define W24_MODE
+
 namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -24,17 +26,23 @@ namespace utils {
 		typedef device::rspi_io<device::RSPI, device::port_map::option::SECOND> WDM;
 		WDM			wdm_;
 
-		uint32_t	ch_;
-		int32_t		pos_;
-
 		uint16_t output_(uint8_t a, uint8_t b, uint8_t c)
 		{
-			uint16_t d;
 			WDM_SEL::P = 0;
+			uint16_t d;
+#ifdef W24_MODE
+			uint32_t out = a;
+			out <<= 8;
+			out |= b;
+			out <<= 8;
+			out |= c;
+			d = wdm_.xchg32(out);
+#else
 			wdm_.xchg(a);
 			d  = wdm_.xchg(b);
 			d <<= 8;
 			d |= wdm_.xchg(c);
+#endif
 			WDM_SEL::P = 1;
 			return d;
 		}
@@ -45,7 +53,7 @@ namespace utils {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		wdmc() : wdm_(), ch_(0), pos_(0) { }
+		wdmc() : wdm_() { }
 
 
 		//-----------------------------------------------------------------//
@@ -56,14 +64,17 @@ namespace utils {
 		void start()
 		{
 			{  // RSPI (for WDM) 7.5M bps
+#ifdef W24_MODE
+				wdm_.start(7500000, WDM::PHASE::TYPE1, WDM::DLEN::W24);
+#else
 				wdm_.start(7500000, WDM::PHASE::TYPE1, WDM::DLEN::W8);
+#endif
 				WDM_SEL::DIR = 1;  // select output;
 			}
 //  RSPI test
 #if 0
 			while(1) {
-				WDM_SEL::P = !WDM_SEL::P();
-				wdm_.xchg(0xaa);
+				get_status();
 			}
 #endif
 		}
@@ -78,11 +89,17 @@ namespace utils {
 		uint16_t get_status()
 		{
 			WDM_SEL::P = 0;
+#ifdef W24_MODE
+			auto st = wdm_.xchg32(0x800000);
+			WDM_SEL::P = 1;
+			return st;
+#else
 			wdm_.xchg(0x80);
 			uint16_t st1 = wdm_.xchg(0);
 			uint16_t st2 = wdm_.xchg(0);
 			WDM_SEL::P = 1;
 			return (st1 << 8) | st2;
+#endif
 		}
 
 
@@ -95,9 +112,13 @@ namespace utils {
 		void output(uint32_t cmd)
 		{
 			WDM_SEL::P = 0;
+#ifdef W24_MODE
+			wdm_.xchg32(cmd);
+#else
 			wdm_.xchg((cmd >> 16) & 0xff);
 			wdm_.xchg((cmd >> 8) & 0xff);
 			wdm_.xchg(cmd & 0xff);
+#endif
 			WDM_SEL::P = 1;
 		}
 
@@ -110,17 +131,22 @@ namespace utils {
 			@return 波形
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_wave(uint32_t ch, int32_t pos)
+		void set_wave_pos(uint32_t ch, int32_t pos)
 		{
-			if(pos != pos_ || ch != ch_) {
-				pos_ = pos;
-				ch_ = ch;
-				output_(0b00110000 | ch, 0b10001000 | ((pos >> 8) & 0x7), pos & 0xff);
-			}
+			output_(0b00110000 | ch, 0b10001000 | ((pos >> 8) & 0x7), pos & 0xff);
+		}
 
-			auto data = output_(0b10000000 | ch, 0, 0);
-			++pos_;
-			return data;
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  波形の取得
+			@param[in]	ch		チャネル（１、２、３、４）
+			@return 波形
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_wave(uint32_t ch)
+		{
+			return output_(0b10000000 | ch, 0, 0);
 		}
 	};
 }
