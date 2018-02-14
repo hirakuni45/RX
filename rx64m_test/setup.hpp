@@ -199,6 +199,7 @@ namespace seeda {
 				++cnt;
 				at_sram().put32(RES_COUNT_, cnt);
 			}
+			at_logs().add(get_time(), "UN");  // リセット記録
 		}
 
 

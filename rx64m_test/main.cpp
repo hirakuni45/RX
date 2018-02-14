@@ -45,9 +45,6 @@ namespace {
 
 	void main_init_()
 	{
-		// RTC 開始
-		rtc_.start();
-
 		enable_eadc_ = false;
 
 		{  // LTC2348ILX-16 初期化
@@ -885,9 +882,12 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(0b0100) | 1;  // USB Clock: 1/5 (237.5/5=47.5)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
+	// RTC 開始
+	rtc_.start();
+	sys_time_ = get_rtc_time();
 	nets_.at_setup().init();
 
-	// ログ初期化、開始
+	// ログマネージャー初期化、開始
 //	log_man_.start();
 
 	main_init_();
