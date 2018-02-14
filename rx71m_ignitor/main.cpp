@@ -227,8 +227,9 @@ namespace {
 
 	void wdm_capture(uint32_t ch)
 	{
+		wdmc_.set_wave_pos(ch, -2048);
 		for(int i = 0; i < 2048; ++i) {
-			wave_buff_[i] = wdmc_.get_wave(ch + 1, i);
+			wave_buff_[i] = wdmc_.get_wave(ch + 1);
 		}
 	}
 
@@ -552,13 +553,14 @@ int main(int argc, char** argv)
 					int num = 0;
 					if(cmdn >= 2 && (utils::input("%d", tmp) % num).status()) {
 						for(int i = 0; i < num; ++i) {
-							auto w = wdmc_.get_wave(1, i);
+							auto w = wdmc_.get_wave(0);
 							utils::format("%d\n") % w;
 						}
 					}
 				} else if(cmd_.cmp_word(0, "cap")) {
+					wdmc_.set_wave_pos(0, 0);
 					for(int i = 0; i < 2048; ++i) {
-						wave_buff_[i] = wdmc_.get_wave(1, i);
+						wave_buff_[i] = wdmc_.get_wave(1);
 					}
 					send_idx_ = 0;
 				} else if(cmd_.cmp_word(0, "pgw")) {
