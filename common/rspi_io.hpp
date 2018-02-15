@@ -167,7 +167,8 @@ namespace device {
 ///			RSPI::SPCMD0 = RSPI::SPCMD0.LSBF.b() | RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0100);
 
 			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv)
-				| RSPI::SPCMD0.SPB.b(static_cast<uint8_t>(dlen));
+				| RSPI::SPCMD0.SPB.b(static_cast<uint8_t>(dlen))
+				| RSPI::SPCMD0.CPHA.b(0);
 
 			RSPI::SPCR.SPMS = 1;
 			RSPI::SPCR.MSTR = 1;
