@@ -65,7 +65,8 @@ namespace utils {
 		{
 			{  // RSPI (for WDM) 7.5M bps
 #ifdef W24_MODE
-				wdm_.start(7500000, WDM::PHASE::TYPE1, WDM::DLEN::W24);
+//				wdm_.start(7500000, WDM::PHASE::TYPE1, WDM::DLEN::W24);
+				wdm_.start(2500000, WDM::PHASE::TYPE1, WDM::DLEN::W24);
 #else
 				wdm_.start(7500000, WDM::PHASE::TYPE1, WDM::DLEN::W8);
 #endif
@@ -113,6 +114,7 @@ namespace utils {
 		{
 			WDM_SEL::P = 0;
 #ifdef W24_MODE
+utils::format("%08X\n") % cmd;
 			wdm_.xchg32(cmd);
 #else
 			wdm_.xchg((cmd >> 16) & 0xff);

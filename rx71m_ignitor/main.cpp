@@ -557,6 +557,11 @@ int main(int argc, char** argv)
 							utils::format("%d\n") % w;
 						}
 					}
+				} else if(cmd_.cmp_word(0, "ttt")) {
+					wdmc_.set_wave_pos(1 + 1, 0);
+					auto w = wdmc_.get_wave(1 + 1);
+					utils::format("%d\n") % w;
+
 				} else if(cmd_.cmp_word(0, "cap")) {
 					wdmc_.set_wave_pos(0, 0);
 					for(int i = 0; i < 2048; ++i) {

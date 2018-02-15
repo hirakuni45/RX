@@ -38,7 +38,7 @@ namespace utils {
 
 		uint32_t	delay_;
 
-		uint16_t	wave_buff_[2048 * 4];
+		uint16_t	wave_buff_[1024 * 4];
 		uint32_t	send_idx_;
 		uint32_t	send_ch_;
 
@@ -123,8 +123,8 @@ namespace utils {
 		void wdm_capture_(uint32_t ch, int ofs)
 		{
 			wdmc_.set_wave_pos(ch + 1, ofs);
-			for(int i = 0; i < 2048; ++i) {
-				wave_buff_[ch * 2048 + i] = wdmc_.get_wave(ch + 1);
+			for(int i = 0; i < 1024; ++i) {
+				wave_buff_[ch * 1024 + i] = wdmc_.get_wave(ch + 1);
 			}
 		}
 
@@ -140,11 +140,11 @@ namespace utils {
 		void wdm_send_(uint32_t ch, uint32_t num)
 		{
 			memcpy(wdm_buff_, "WDMW", 4);
-			const uint16_t* src = &wave_buff_[ch * 2048];
+			const uint16_t* src = &wave_buff_[ch * 1024];
 			uint32_t idx = 4;
 			for(uint32_t i = 0; i < num; ++i) {
 				char tmp[8];
-				utils::sformat("%04X", tmp, sizeof(tmp)) % src[send_idx_ & 2047];
+				utils::sformat("%04X", tmp, sizeof(tmp)) % src[send_idx_ & (1024 - 1)];
 				++send_idx_;
 				memcpy(&wdm_buff_[idx], tmp, 4);
 				idx += 4;
@@ -190,7 +190,7 @@ namespace utils {
 
 			case task::wait:
 				if(wdmc_.get_status() & 0b010) {  // end record
-					int ofs = -1024;
+					int ofs = -512;
 					wdm_capture_(0, ofs);
 					wdm_capture_(1, ofs);
 					wdm_capture_(2, ofs);
@@ -204,7 +204,7 @@ namespace utils {
 				break;
 
 			case task::send:
-				if(send_idx_ < 2048) {
+				if(send_idx_ < 1024) {
 					wdm_send_(send_ch_, 512);
 				} else {
 					++send_ch_;
