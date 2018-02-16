@@ -26,6 +26,9 @@ namespace utils {
 
 		static const uint32_t VERSION = 20;
 
+		static const uint32_t WAVE_CH_SIZE = 2048;
+		static const uint32_t WAVE_CH_NUM = 4;
+
 		TELNETS&	telnets_;
 
 		utils::wdmc&	wdmc_;
@@ -38,11 +41,12 @@ namespace utils {
 
 		uint32_t	delay_;
 
-		uint16_t	wave_buff_[1024 * 4];
+		uint16_t	wave_buff_[WAVE_CH_SIZE * WAVE_CH_NUM];
 		uint32_t	send_idx_;
 		uint32_t	send_ch_;
 
-		char		wdm_buff_[8192];
+		// WDM 通信用データバッファ
+		char		wdm_buff_[WAVE_CH_SIZE * 2 + 1024];
 
 		enum class task {
 			idle,
@@ -123,8 +127,8 @@ namespace utils {
 		void wdm_capture_(uint32_t ch, int ofs)
 		{
 			wdmc_.set_wave_pos(ch + 1, ofs);
-			for(int i = 0; i < 1024; ++i) {
-				wave_buff_[ch * 1024 + i] = wdmc_.get_wave(ch + 1);
+			for(uint32_t i = 0; i < WAVE_CH_SIZE; ++i) {
+				wave_buff_[ch * WAVE_CH_SIZE + i] = wdmc_.get_wave(ch + 1);
 			}
 		}
 
@@ -137,14 +141,23 @@ namespace utils {
 		}
 
 
+		void wdm_send_size_(uint32_t size)
+		{
+			char tmp[16];
+			utils::sformat("WDSZ%d\n", tmp, sizeof(tmp)) % size;
+			telnets_.puts(tmp);
+		}
+
+
 		void wdm_send_(uint32_t ch, uint32_t num)
 		{
 			memcpy(wdm_buff_, "WDMW", 4);
-			const uint16_t* src = &wave_buff_[ch * 1024];
+			const uint16_t* src = &wave_buff_[ch * WAVE_CH_SIZE];
 			uint32_t idx = 4;
 			for(uint32_t i = 0; i < num; ++i) {
 				char tmp[8];
-				utils::sformat("%04X", tmp, sizeof(tmp)) % src[send_idx_ & (1024 - 1)];
+				utils::sformat("%04X", tmp, sizeof(tmp))
+					% src[send_idx_ % WAVE_CH_SIZE];
 				++send_idx_;
 				memcpy(&wdm_buff_[idx], tmp, 4);
 				idx += 4;
@@ -190,7 +203,7 @@ namespace utils {
 
 			case task::wait:
 				if(wdmc_.get_status() & 0b010) {  // end record
-					int ofs = -512;
+					int ofs = -WAVE_CH_SIZE / 2;
 					wdm_capture_(0, ofs);
 					wdm_capture_(1, ofs);
 					wdm_capture_(2, ofs);
@@ -204,8 +217,8 @@ namespace utils {
 				break;
 
 			case task::send:
-				if(send_idx_ < 1024) {
-					wdm_send_(send_ch_, 512);
+				if(send_idx_ < WAVE_CH_SIZE) {
+					wdm_send_(send_ch_, 768);  // 1 turn 768 ワード
 				} else {
 					++send_ch_;
 					if(send_ch_ < 4) {

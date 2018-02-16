@@ -63,12 +63,15 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void start()
 		{
-			{  // RSPI (for WDM) 7.5M bps
+			{
+			// RSPI (for WDM) 2.5M bps
+			// ※RS-422 ドライバーの遅延が３５ｎｓくらいあるので、高ビット
+			// レートは難しい・・・
 #ifdef W24_MODE
 //				wdm_.start(7500000, WDM::PHASE::TYPE1, WDM::DLEN::W24);
-				wdm_.start(2500000, WDM::PHASE::TYPE1, WDM::DLEN::W24);
+				wdm_.start(2000000, WDM::PHASE::TYPE1, WDM::DLEN::W24);
 #else
-				wdm_.start(7500000, WDM::PHASE::TYPE1, WDM::DLEN::W8);
+				wdm_.start(2000000, WDM::PHASE::TYPE1, WDM::DLEN::W8);
 #endif
 				WDM_SEL::DIR = 1;  // select output;
 			}
@@ -89,12 +92,13 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		uint16_t get_status()
 		{
-			WDM_SEL::P = 0;
 #ifdef W24_MODE
+			WDM_SEL::P = 0;
 			auto st = wdm_.xchg32(0x800000);
 			WDM_SEL::P = 1;
 			return st;
 #else
+			WDM_SEL::P = 0;
 			wdm_.xchg(0x80);
 			uint16_t st1 = wdm_.xchg(0);
 			uint16_t st2 = wdm_.xchg(0);
@@ -112,9 +116,9 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void output(uint32_t cmd)
 		{
-			WDM_SEL::P = 0;
+//			utils::format("%08X\n") % cmd;
 #ifdef W24_MODE
-utils::format("%08X\n") % cmd;
+			WDM_SEL::P = 0;
 			wdm_.xchg32(cmd);
 #else
 			wdm_.xchg((cmd >> 16) & 0xff);

@@ -27,7 +27,7 @@
 
 namespace {
 
-	static const int MAIN_VERSION = 50;
+	static const int MAIN_VERSION = 75;
 
 	typedef device::PORT<device::PORT0, device::bitpos::B2> LED0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3> LED1;
@@ -227,7 +227,7 @@ namespace {
 
 	void wdm_capture(uint32_t ch)
 	{
-		wdmc_.set_wave_pos(ch, -2048);
+		wdmc_.set_wave_pos(ch, -1024);
 		for(int i = 0; i < 2048; ++i) {
 			wave_buff_[i] = wdmc_.get_wave(ch + 1);
 		}
