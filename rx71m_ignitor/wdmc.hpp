@@ -116,7 +116,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void output(uint32_t cmd)
 		{
-//			utils::format("%08X\n") % cmd;
+			utils::format("%08X\n") % cmd;
 #ifdef W24_MODE
 			WDM_SEL::P = 0;
 			wdm_.xchg32(cmd);

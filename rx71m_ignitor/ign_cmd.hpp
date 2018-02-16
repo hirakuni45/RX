@@ -129,6 +129,7 @@ namespace utils {
 			wdmc_.set_wave_pos(ch + 1, ofs);
 			for(uint32_t i = 0; i < WAVE_CH_SIZE; ++i) {
 				wave_buff_[ch * WAVE_CH_SIZE + i] = wdmc_.get_wave(ch + 1);
+				utils::delay::micro_second(1);
 			}
 		}
 
@@ -203,6 +204,7 @@ namespace utils {
 
 			case task::wait:
 				if(wdmc_.get_status() & 0b010) {  // end record
+utils::format("Trigger !\n");
 					int ofs = -WAVE_CH_SIZE / 2;
 					wdm_capture_(0, ofs);
 					wdm_capture_(1, ofs);
@@ -218,7 +220,7 @@ namespace utils {
 
 			case task::send:
 				if(send_idx_ < WAVE_CH_SIZE) {
-					wdm_send_(send_ch_, 768);  // 1 turn 768 ワード
+					wdm_send_(send_ch_, 512);  // 1 turn 512 ワード
 				} else {
 					++send_ch_;
 					if(send_ch_ < 4) {
