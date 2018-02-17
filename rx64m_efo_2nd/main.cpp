@@ -24,7 +24,7 @@
 
 namespace {
 
-	static const int main_version_ = 89;
+	static const int main_version_ = 90;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -41,12 +41,16 @@ namespace {
 
 		ASC_CNVTESTS = 'T',		///< １０２４キャプチャー、文字表示
 		ASC_CNVTEST  = 't',		///< １キャプチャー、文字表示
+
+		TEST_TRG_N = 'Q',		///< テストトリガ立ち下がり
+		TEST_TRG_P = 'q'		///< テストトリガ立ち上がり
 	};
 
 	enum class TASK : uint8_t {
-		STATE,	// コマンド待ち
-		LENGTH,	// 長さ取得
-		VOLT,	// トリガー電圧取得
+		STATE,		// コマンド待ち
+		LENGTH,		// 長さ取得
+		VOLT,		// トリガー電圧取得
+		TRG,		// トリガー
 	};
 
 	enum class SEND_TASK : uint8_t {
@@ -54,12 +58,16 @@ namespace {
 		SINGLE,
 		MULTI,
 
+		TRG,
+
 		ASCII_SINGLE,	///< t コマンド（１サンプルテスト）
 		ASCII_MULTI,	///< T コマンド（１０２４サンプルテスト）
 
 		BIN_SINGLE,		///< b コマンド（１サンプルテスト）
 		BIN_MULTI,		///< B コマンド（１０２４サンプルテスト）
 	};
+
+	typedef device::PORT<device::PORTF, device::bitpos::B5> TRIGGER;
 
 	typedef device::PORT<device::PORTJ, device::bitpos::B5> LED;
 
@@ -105,7 +113,13 @@ namespace {
 
 	volatile uint16_t cap_pos_ = 0;
 	volatile uint16_t cap_cnt_ = 0;
+	volatile uint16_t trg_pos_ = 0;
+	volatile uint16_t req_cnt_ = 0;
 	volatile bool cap_enable_ = false;
+	volatile bool trg_enable_ = false;
+	volatile bool trg_slope_ = true;
+
+	bool trigger_ = false;
 
 	// サンプリング割り込み起動のファンクタ
 	class capture_task {
@@ -114,16 +128,37 @@ namespace {
 		{
 			if(cap_enable_) {
 ///				LED::P = 1;
+				eadc_.convert_0();
+
+				bool f = TRIGGER::P();
+				bool trg = false;
+				if(trg_slope_) {
+					if( f && !trigger_) {  // pos
+						trg = true;
+					}
+				} else {
+					if(!f &&  trigger_) {  // neg
+						trg = true;
+					}
+				}
+				trigger_ = f;
+				if(trg && trg_enable_) {
+					trg_pos_ = cap_pos_;
+					cap_cnt_ = req_cnt_;
+				}
+				++cap_pos_;
+				cap_pos_ &= CAP_BUFF_SIZE - 1;
+				ch0_src_[cap_pos_] = eadc_.convert_1();
+
 				if(cap_cnt_) {
 					--cap_cnt_;
 					if(cap_cnt_ == 0) {
 						cap_enable_ = false;
+						trg_enable_ = false;
 					}
 				}
-				++cap_pos_;
-				cap_pos_ &= CAP_BUFF_SIZE - 1;
-				ch0_src_[cap_pos_] = eadc_.convert0();
-				ch1_src_[cap_pos_] = eadc_.convert1();
+
+				ch1_src_[cap_pos_] = eadc_.convert_2();
 ///				LED::P = 0;
 			}
 		}
@@ -164,8 +199,7 @@ namespace {
 		}
 	}
 
-	volatile uint16_t trg_pos_;
-	volatile uint16_t req_cnt_;
+#if 0
 	volatile uint32_t irq_count_;
 
 	// trigger task
@@ -181,6 +215,7 @@ namespace {
 
 	typedef device::irq_man<device::peripheral::IRQ4, irq_task> IRQ;
 	IRQ		irq_;
+#endif
 
 	TASK	task_ = TASK::STATE;
 
@@ -214,7 +249,7 @@ namespace {
 		}
 	}
 
-
+#if 0
 	void setup_irq_(bool positive)
 	{
 		uint8_t int_level = 2;
@@ -227,6 +262,7 @@ namespace {
 			return;
 		}
 	}
+#endif
 }
 
 
@@ -363,12 +399,14 @@ int main(int argc, char** argv)
 		}
 	}
 
+#if 0
 	irq_count_ = 0;
 	irq_state_ = 0;
+#endif
 
 	cap_pos_ = 0;
 	cap_cnt_ = 0;
-	cap_enable_ = true;
+	cap_enable_ = false;
 
 	// 初期設定
 	dac_.out0(32768);  // トリガー電圧０Ｖ
@@ -391,6 +429,7 @@ int main(int argc, char** argv)
 					send_task_ = SEND_TASK::ASCII_SINGLE;
 					break;
 				case CMD::ASC_CNVTESTS:
+					cap_enable_ = true;
 					send_task_ = SEND_TASK::ASCII_MULTI;
 					break;
 				case CMD::BIN_CNVTEST:
@@ -406,6 +445,24 @@ int main(int argc, char** argv)
 						send_task_ = SEND_TASK::READY;
 					}
 					break;
+
+				case CMD::TEST_TRG_P:
+					trg_slope_ = true;
+					req_cnt_ = 1024;
+					trg_enable_ = true;
+					trigger_ = TRIGGER::P();
+					cap_enable_ = true;
+					send_task_ = SEND_TASK::TRG;
+					break;
+				case CMD::TEST_TRG_N:
+					trg_slope_ = false;
+					req_cnt_ = 1024;
+					trg_enable_ = true;
+					trigger_ = TRIGGER::P();
+					cap_enable_ = true;
+					send_task_ = SEND_TASK::TRG;
+					break;
+
 				case CMD::MODE_SELECT:
 					break;
 
@@ -437,21 +494,20 @@ int main(int argc, char** argv)
 				volt_ |= static_cast<uint8_t>(m_sci_.getch());
 				task_ = TASK::STATE;
 				dac_.out0(volt_);  // トリガー電圧設定
-				bool trg = true;
-				if(volt_ < 32768) trg = false;
-				 setup_irq_(trg);
+				if(volt_ < 32768) trg_slope_ = false;
+				else trg_slope_ = true;
 				if(length_ == 0) {
-					req_cnt_ = 1;
+					cap_enable_ = true;
 					send_task_ = SEND_TASK::SINGLE;
 				} else {
 					uint16_t n = length_;
 					if(length_ > 1024) n = 1024;
 					req_cnt_ = n;
+					trg_enable_ = true;
+					trigger_ = TRIGGER::P();
+					cap_enable_ = true;
 					send_task_ = SEND_TASK::MULTI;
 				}
-				irq_state_ = irq_count_;
-				cap_enable_ = true;
-				irq_.enable();
 			}
 			break;
 
@@ -462,22 +518,27 @@ int main(int argc, char** argv)
 		switch(send_task_) {
 
 		case SEND_TASK::SINGLE:
-			if(irq_count_ == irq_state_) break;
-			if(cap_cnt_ != 0) break;
-			irq_state_ = irq_count_;
-			copy_(trg_pos_, 1);
+			copy_(cap_pos_, 1);
 			send_wave_legacy_(0x01, 1, ch0_trg_);
 			send_wave_legacy_(0x02, 1, ch1_trg_);
 			send_task_ = SEND_TASK::READY;
 			break;
 
 		case SEND_TASK::MULTI:
-			if(irq_count_ == irq_state_) break;
-			if(cap_cnt_ != 0) break;
-			irq_state_ = irq_count_;
+			if(cap_cnt_ == 0 && !trg_enable_) ;
+			else break;
 			copy_(trg_pos_, length_);
 			send_wave_legacy_(0x01, length_, ch0_trg_);
 			send_wave_legacy_(0x02, length_, ch1_trg_);
+			send_task_ = SEND_TASK::READY;
+			break;
+
+		case SEND_TASK::TRG:
+			if(cap_cnt_ == 0 && !trg_enable_) ;
+			else break;
+			copy_(trg_pos_, 1024);
+			send_wave_(0x01, 1024, ch0_trg_);
+			send_wave_(0x02, 1024, ch1_trg_);
 			send_task_ = SEND_TASK::READY;
 			break;
 
@@ -487,6 +548,7 @@ int main(int argc, char** argv)
 			send_wave_(0x02, 1, ch1_trg_);
 			send_task_ = SEND_TASK::READY;
 			break;
+
 		case SEND_TASK::BIN_MULTI:
 			copy_(cap_pos_, 1024);
 			send_wave_(0x01, 1024, ch0_trg_);
