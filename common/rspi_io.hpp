@@ -46,6 +46,10 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  データ、クロック位相タイプ型
+					TYPE1(MODE0): CPOL:0 CPHA:0 @n
+					TYPE2(MODE1): CPOL:0 CPHA:1 @n
+					TYPE3(MODE2): CPOL:1 CPHA:0 @n
+					TYPE4(MODE3): CPOL:1 CPHA:1
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class PHASE : uint8_t {
@@ -133,13 +137,13 @@ namespace device {
 		/*!
 			@brief  通信速度を設定して、CSI を有効にする
 			@param[in]	speed	通信速度
-			@param[in]	dctype	データ、クロック位相タイプ
+			@param[in]	ctype	クロック位相タイプ
 			@param[in]	dlen	データ長設定
 			@param[in]	level	割り込みレベル（１～２）、０の場合はポーリング
 			@return エラー（速度設定範囲外）なら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t speed, PHASE dctype, DLEN dlen, uint8_t level = 0)
+		bool start(uint32_t speed, PHASE ctype, DLEN dlen, uint8_t level = 0)
 		{
 			level_ = level;
 
@@ -165,10 +169,27 @@ namespace device {
 			RSPI::SPSCR = 0x00;	// disable sequence control
 			RSPI::SPDCR = 0x20;	// SPLW=1 (long word access) 
 ///			RSPI::SPCMD0 = RSPI::SPCMD0.LSBF.b() | RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0100);
-
+			bool cpol = 0;
+			bool cpha = 0;
+			switch(ctype) {
+			case PHASE::TYPE1:
+				break;
+			case PHASE::TYPE2:
+				cpha = 1;
+				break;
+			case PHASE::TYPE3:
+				cpol = 1;
+				break;
+			case PHASE::TYPE4:
+				cpol = 1;
+				cpha = 1;
+				break;
+			default:
+				break;
+			}
 			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv)
 				| RSPI::SPCMD0.SPB.b(static_cast<uint8_t>(dlen))
-				| RSPI::SPCMD0.CPHA.b(0);
+				| RSPI::SPCMD0.CPOL.b(cpol) | RSPI::SPCMD0.CPHA.b(cpha);
 
 			RSPI::SPCR.SPMS = 1;
 			RSPI::SPCR.MSTR = 1;
@@ -256,6 +277,19 @@ namespace device {
 		uint32_t xchg32(uint32_t data = 0)
 		{
 			RSPI::SPDR = static_cast<uint32_t>(data);
+			while(RSPI::SPSR.SPRF() == 0) sleep_();
+		    return RSPI::SPDR();
+		}
+
+
+		inline void xchg32_start(uint32_t data = 0)
+		{
+			RSPI::SPDR = static_cast<uint32_t>(data);
+		}
+
+
+		inline uint32_t xchg32_sync()
+		{
 			while(RSPI::SPSR.SPRF() == 0) sleep_();
 		    return RSPI::SPDR();
 		}
