@@ -40,8 +40,40 @@ namespace device {
 
 		static INTERRUPT_FUNC void irq_task_()
 		{
-			ICU::IER.IRQ4 = 0;
-			ICU::IR.IRQ4  = 0;
+			switch(PER) {
+			case peripheral::IRQ0:
+				ICU::IER.IRQ0 = 0;
+				ICU::IR.IRQ0  = 0;
+				break;
+			case peripheral::IRQ1:
+				ICU::IER.IRQ1 = 0;
+				ICU::IR.IRQ1  = 0;
+				break;
+			case peripheral::IRQ2:
+				ICU::IER.IRQ2 = 0;
+				ICU::IR.IRQ2  = 0;
+				break;
+			case peripheral::IRQ3:
+				ICU::IER.IRQ3 = 0;
+				ICU::IR.IRQ3  = 0;
+				break;
+			case peripheral::IRQ4:
+				ICU::IER.IRQ4 = 0;
+				ICU::IR.IRQ4  = 0;
+				break;
+			case peripheral::IRQ5:
+				ICU::IER.IRQ5 = 0;
+				ICU::IR.IRQ5  = 0;
+				break;
+			case peripheral::IRQ6:
+				ICU::IER.IRQ6 = 0;
+				ICU::IR.IRQ6  = 0;
+				break;
+			case peripheral::IRQ7:
+				ICU::IER.IRQ7 = 0;
+				ICU::IR.IRQ7  = 0;
+				break;
+			}
 			task_();
 		}
 
@@ -85,6 +117,8 @@ namespace device {
 				ICU::IRQCR3.IRQMD = static_cast<uint8_t>(egt);
 				break;
 			case peripheral::IRQ4:
+				ICU::IRQFLTE0.FLTEN4 = 0;
+				ICU::IRQFLTC0.FCLKSEL4 = 3;
 				ICU::IRQCR4.IRQMD = static_cast<uint8_t>(egt);
 				break;
 			case peripheral::IRQ5:
@@ -120,8 +154,41 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void enable(bool ena = true)
 		{
-			ICU::IR.IRQ4  = 0;
-			ICU::IER.IRQ4 = ena;
+			switch(PER) {
+			case peripheral::IRQ0:
+				ICU::IR.IRQ0  = 0;
+				ICU::IER.IRQ0 = ena;
+				break;
+			case peripheral::IRQ1:
+				ICU::IR.IRQ1  = 0;
+				ICU::IER.IRQ1 = ena;
+				break;
+			case peripheral::IRQ2:
+				ICU::IR.IRQ2  = 0;
+				ICU::IER.IRQ2 = ena;
+				break;
+			case peripheral::IRQ3:
+				ICU::IR.IRQ3  = 0;
+				ICU::IER.IRQ3 = ena;
+				break;
+			case peripheral::IRQ4:
+				ICU::IR.IRQ4  = 0;
+				ICU::IRQFLTE0.FLTEN4 = 1;
+				ICU::IER.IRQ4 = ena;
+				break;
+			case peripheral::IRQ5:
+				ICU::IR.IRQ5  = 0;
+				ICU::IER.IRQ5 = ena;
+				break;
+			case peripheral::IRQ6:
+				ICU::IR.IRQ6  = 0;
+				ICU::IER.IRQ6 = ena;
+				break;
+			case peripheral::IRQ7:
+				ICU::IR.IRQ7  = 0;
+				ICU::IER.IRQ7 = ena;
+				break;
+			}
 		}
 	};
 
