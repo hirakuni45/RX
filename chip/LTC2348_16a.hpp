@@ -223,13 +223,30 @@ namespace chip {
 		}
 
 		// convert first step
-		inline uint16_t convert0()
+		inline void convert_0()
 		{
 			CNV::P = 0;
 			CSN::P = 0;
-			return get_data_loop_(span_);
+			spi_.xchg32_start(span_);
 		}
 
+		inline uint16_t convert_1()
+		{
+			uint16_t data = spi_.xchg32_sync() >> 8;
+			spi_.xchg32_start(0x00000000);
+			return data;
+		}
+
+
+		inline uint16_t convert_2()
+		{
+			uint16_t data = spi_.xchg32_sync() >> 8;
+			CSN::P = 1;
+			CNV::P = 1;  // 変換開始
+			return data;
+		}
+
+#if 0
 		// convert final step
 		inline uint16_t convert1()
 		{
@@ -238,7 +255,7 @@ namespace chip {
 			CNV::P = 1;  // 変換開始
 			return d;
 		}
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
