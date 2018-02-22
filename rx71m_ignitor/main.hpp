@@ -106,6 +106,8 @@ namespace {
 
 
 	void dc2_out(const char* out);
+	uint32_t dc2_len();
+	char dc2_inp();
 
 
 	void dc1_out(const char* out);

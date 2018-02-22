@@ -39,6 +39,9 @@ namespace utils {
 		char		crm_ans_[16];
 		uint32_t	crm_ans_pos_;
 
+		char		dc2_ans_[16];
+		uint32_t	dc2_ans_pos_;
+
 		uint32_t	delay_;
 
 		uint16_t	wave_buff_[WAVE_CH_SIZE * WAVE_CH_NUM];
@@ -186,7 +189,9 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		ign_cmd(TELNETS& telnets, utils::wdmc& wdmc) : telnets_(telnets),
 			wdmc_(wdmc),
-			pos_(0), line_{ 0 }, crm_ans_{ 0, }, crm_ans_pos_(0),
+			pos_(0), line_{ 0 },
+			crm_ans_{ 0, }, crm_ans_pos_(0),
+			dc2_ans_{ 0, }, dc2_ans_pos_(0),
 			delay_(0), send_idx_(0), send_ch_(0),
 			task_(task::idle) { }
 
@@ -204,7 +209,7 @@ namespace utils {
 
 			case task::wait:
 				if(wdmc_.get_status() & 0b010) {  // end record
-utils::format("Trigger !\n");
+// utils::format("Trigger !\n");
 					int ofs = -WAVE_CH_SIZE / 2;
 					wdm_capture_(0, ofs);
 					wdm_capture_(1, ofs);
@@ -237,28 +242,55 @@ utils::format("Trigger !\n");
 				break;
 			}
 
-			{
-				while(crm_len() > 0) {
-					char ch = crm_inp();
-					crm_ans_[crm_ans_pos_] = ch;
-					++crm_ans_pos_;
-					if(crm_ans_pos_ >= sizeof(crm_ans_)) {
-						crm_ans_pos_ = 0;
-						break;
-					}
-					if(ch == '\n') {
-						crm_ans_[crm_ans_pos_] = 0;
-						telnets_.puts(crm_ans_);
-						utils::format("CRM ANS: %s") % crm_ans_;
-						crm_ans_pos_ = 0;
-					}
-				}
-			}
-
 			// 遅延タイマー
 			if(delay_ > 0) {
 				--delay_;
 				return;
+			}
+
+			while(crm_len() > 0) {
+				char ch = crm_inp();
+				crm_ans_[crm_ans_pos_] = ch;
+				++crm_ans_pos_;
+				if(crm_ans_pos_ >= sizeof(crm_ans_)) {
+					crm_ans_pos_ = 0;
+					break;
+				}
+				if(crm_ans_pos_ >= 9 && ch == '\n') {
+					crm_ans_[crm_ans_pos_] = 0;
+					// バイナリーデータ
+					uint8_t tmp[4];
+					tmp[0] = crm_ans_[4];
+					tmp[1] = crm_ans_[5];
+					tmp[2] = crm_ans_[6];
+					tmp[3] = crm_ans_[7];
+					for(int i = 0; i < 4; ++i) {
+						char out[8];
+						utils::sformat("%02X", out, sizeof(out)) % static_cast<uint16_t>(tmp[i]);
+						strcpy(&crm_ans_[4 + i * 2], out); 
+					}
+					crm_ans_[12] = '\n';
+					crm_ans_[13] = 0;
+					telnets_.puts(crm_ans_);
+					utils::format("CRM ANS: %s") % crm_ans_;
+					crm_ans_pos_ = 0;
+				}
+			}
+
+			while(dc2_len() > 0) {
+				char ch = dc2_inp();
+				dc2_ans_[dc2_ans_pos_] = ch;
+				++dc2_ans_pos_;
+				if(dc2_ans_pos_ >= sizeof(dc2_ans_)) {
+					dc2_ans_pos_ = 0;
+					break;
+				}
+				if(ch == '\n') {
+					dc2_ans_[dc2_ans_pos_] = 0;
+					telnets_.puts(dc2_ans_);
+					utils::format("DC2 ANS: %s") % dc2_ans_;
+					dc2_ans_pos_ = 0;
+				}
 			}
 
 			if(!telnets_.probe()) return;

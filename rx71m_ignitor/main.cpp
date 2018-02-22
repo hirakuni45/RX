@@ -27,7 +27,7 @@
 
 namespace {
 
-	static const int MAIN_VERSION = 75;
+	static const int MAIN_VERSION = 85;
 
 	typedef device::PORT<device::PORT0, device::bitpos::B2> LED0;
 	typedef device::PORT<device::PORT0, device::bitpos::B3> LED1;
@@ -198,6 +198,18 @@ namespace {
 	void dc2_out(const char* out)
 	{
 		dc2_.puts(out);
+	}
+
+
+	uint32_t dc2_len()
+	{
+		return dc2_.recv_length();
+	}
+
+
+	char dc2_inp()
+	{
+		return dc2_.getch();
 	}
 
 
