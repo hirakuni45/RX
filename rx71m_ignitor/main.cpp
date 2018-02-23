@@ -598,6 +598,8 @@ int main(int argc, char** argv)
 				} else if(cmd_.cmp_word(0, "all")) {
 					send_idx_ = 0;
 					send_all_ = true;
+				} else if(cmd_.cmp_word(0, "crr")) {
+					crm_.puts("CRR?1    \n");
 				} else if(cmd_.cmp_word(0, "help")) {
 					utils::format("WDM command help\n");
 					utils::format("  st           read status\n");
@@ -606,6 +608,7 @@ int main(int argc, char** argv)
 					utils::format("  pgw [num]    put wave data\n");
 					utils::format("  mtw [dlt]    make test wave data\n");
 					utils::format("  all          all capture and send\n");
+					utils::format("  crr          CRR\n");
 				} else {
 					cmd_.get_word(0, sizeof(tmp), tmp);
 					utils::format("command error: '%s'\n") % tmp;

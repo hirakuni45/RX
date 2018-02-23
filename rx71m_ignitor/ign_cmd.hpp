@@ -265,6 +265,7 @@ namespace utils {
 					tmp[2] = crm_ans_[6];
 					tmp[3] = crm_ans_[7];
 					for(int i = 0; i < 4; ++i) {
+//						utils::format("CRM: %02X\n") % static_cast<uint16_t>(tmp[i]);
 						char out[8];
 						utils::sformat("%02X", out, sizeof(out)) % static_cast<uint16_t>(tmp[i]);
 						strcpy(&crm_ans_[4 + i * 2], out); 
