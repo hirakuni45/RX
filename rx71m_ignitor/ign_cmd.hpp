@@ -48,13 +48,19 @@ namespace utils {
 		uint32_t	send_idx_;
 		uint32_t	send_ch_;
 
+		uint16_t	treg_buff_[WAVE_CH_SIZE * 2];
+
 		// WDM 通信用データバッファ
 		char		wdm_buff_[WAVE_CH_SIZE * 2 + 1024];
 
 		enum class task {
 			idle,
-			wait,
-			send,
+			wdm_wait,
+			wdm_send,
+			treg_wait1,  // 熱抵抗測定待ち1
+			treg_wait2,
+			treg_send,
+			
 		};
 		task		task_;
 
@@ -108,8 +114,12 @@ namespace utils {
 					utils::input("%x", para) % cmd;
 					wdm_out(cmd);
 					if((cmd >> 19) == 0b00100) {
-						// start wait
-						task_ = task::wait;
+						if((cmd >> 8) & 0x02) {  // 熱抵抗トリガ待ち（外部トリガ）
+							task_ = task::treg_wait1;
+utils::format("Wait For THREG first Trigger\n");
+						} else {  // 通常波形トリガ待ち
+							task_ = task::wdm_wait;
+						}
 					}
 				} else if(strcmp(cmd, "dc2") == 0) {
 					dc2_out(para9);
@@ -137,10 +147,28 @@ namespace utils {
 		}
 
 
+		void treg_capture_(uint32_t ch, int ofs, uint32_t dst)
+		{
+			wdmc_.set_wave_pos(ch + 1, ofs);
+			for(uint32_t i = 0; i < WAVE_CH_SIZE; ++i) {
+				treg_buff_[dst * WAVE_CH_SIZE + i] = wdmc_.get_wave(ch + 1);
+				utils::delay::micro_second(1);
+			}
+		}
+
+
 		void wdm_send_ch_(uint32_t ch)
 		{
 			char tmp[16];
 			utils::sformat("WDCH%d\n", tmp, sizeof(tmp)) % ch;
+			telnets_.puts(tmp);
+		}
+
+
+		void treg_send_ch_(uint32_t ch)
+		{
+			char tmp[16];
+			utils::sformat("TRCH%d\n", tmp, sizeof(tmp)) % ch;
 			telnets_.puts(tmp);
 		}
 
@@ -180,6 +208,32 @@ namespace utils {
 		}
 
 
+		void treg_send_(uint32_t ch, uint32_t num)
+		{
+			memcpy(wdm_buff_, "TRMW", 4);
+			const uint16_t* src = &treg_buff_[ch * WAVE_CH_SIZE];
+			uint32_t idx = 4;
+			for(uint32_t i = 0; i < num; ++i) {
+				char tmp[8];
+				utils::sformat("%04X", tmp, sizeof(tmp))
+					% src[send_idx_ % WAVE_CH_SIZE];
+				++send_idx_;
+				memcpy(&wdm_buff_[idx], tmp, 4);
+				idx += 4;
+					if(idx >= (sizeof(wdm_buff_) - 4)) {
+					wdm_buff_[idx] = '\n';
+					wdm_buff_[idx + 1] = 0;
+					telnets_.puts(wdm_buff_);
+					idx = 0;
+				}
+			}
+			if(idx > 0) {
+				wdm_buff_[idx] = '\n';
+				wdm_buff_[idx + 1] = 0;
+				telnets_.puts(wdm_buff_);
+			}
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -207,9 +261,9 @@ namespace utils {
 			case task::idle:
 				break;
 
-			case task::wait:
+			case task::wdm_wait:
 				if(wdmc_.get_status() & 0b010) {  // end record
-// utils::format("Trigger !\n");
+// utils::format("WDM Trigger !\n");
 					int ofs = -WAVE_CH_SIZE / 2;
 					wdm_capture_(0, ofs);
 					wdm_capture_(1, ofs);
@@ -219,11 +273,11 @@ namespace utils {
 					send_ch_ = 0;
 					wdm_send_ch_(send_ch_);
 					send_idx_ = 0;
-					task_ = task::send;
+					task_ = task::wdm_send;
 				}
 				break;
 
-			case task::send:
+			case task::wdm_send:
 				if(send_idx_ < WAVE_CH_SIZE) {
 					wdm_send_(send_ch_, 512);  // 1 turn 512 ワード
 				} else {
@@ -231,7 +285,48 @@ namespace utils {
 					if(send_ch_ < 4) {
 						wdm_send_ch_(send_ch_);
 						send_idx_ = 0;
-						task_ = task::send;
+						task_ = task::wdm_send;
+					} else {
+						task_ = task::idle;
+					}
+				}
+				break;
+
+			case task::treg_wait1:
+				if(wdmc_.get_status() & 0b010) {  // end record
+utils::format("Recv 1st trigger\n");
+					int ofs = -WAVE_CH_SIZE / 2;
+					treg_capture_(1, ofs, 0);
+					wdmc_.output(0x200201);  // trg off
+					utils::delay::micro_second(1);
+					wdmc_.output(0x200281);
+					task_ = task::treg_wait2;
+utils::format("Wair For 2nd trigger\n");
+				}
+				break;
+
+			case task::treg_wait2:
+				if(wdmc_.get_status() & 0b010) {  // end record
+utils::format("Recv 2nd trigger\n");
+					int ofs = -WAVE_CH_SIZE / 2;
+					treg_capture_(1, ofs, 1);
+					wdmc_.output(0b00100000 << 16);  // trg off
+					send_ch_ = 0;
+					treg_send_ch_(0);
+					send_idx_ = 0;
+					task_ = task::treg_send;
+				}
+				break;
+
+			case task::treg_send:
+				if(send_idx_ < WAVE_CH_SIZE) {
+					treg_send_(send_ch_, 512);  // 1 turn 512 ワード
+				} else {
+					++send_ch_;
+					if(send_ch_ < 2) {
+						treg_send_ch_(send_ch_);
+						send_idx_ = 0;
+						task_ = task::treg_send;
 					} else {
 						task_ = task::idle;
 					}
