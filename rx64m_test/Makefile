@@ -197,7 +197,8 @@ lst: $(TARGET).lst
 
 tarball:
 	tar cfvz $(subst .elf,,$(TARGET))_$(shell date +%Y%m%d%H).tgz \
-	*.[hc]pp Makefile ../common/*/*.[hc]pp ../common/*/*.[hc]
+	*.[hc]pp Makefile ../common/*.[hc]pp ../common/*.[hcs] ../RX600/*.hpp \
+	../RX64M/*.ld ../$(FATFS_VER)/* 
 
 bin_zip:
 	$(LK) $(LFLAGS) $(LIBS) $(OBJECTS) $(ICON_OBJ) $(LIBN) -mwindows -o $(TARGET) 
