@@ -24,7 +24,7 @@
 
 namespace {
 
-	static const int main_version_ = 90;
+	static const int main_version_ = 91;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -142,7 +142,7 @@ namespace {
 					}
 				}
 				trigger_ = f;
-				if(trg && trg_enable_) {
+				if(cap_cnt_ == 0 && trg && trg_enable_) {
 					trg_pos_ = cap_pos_;
 					cap_cnt_ = req_cnt_;
 				}
