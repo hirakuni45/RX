@@ -764,14 +764,14 @@ namespace utils {
 			}
 			if(!cd_ && select_wait_ >= 10) {
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
-///				POWER::P = 0;
+				POWER::P = 0;
 				SELECT::P = 1;
 ///				format("Card ditect\n");
 			} else if(cd_ && select_wait_ == 0) {
 				f_mount(&fatfs_, "", 0);
 				spi_.destroy();
-				POWER::P = 1;
-				SELECT::P = 0;
+///				POWER::P = 1;
+///				SELECT::P = 0;
 				mount_ = false;
 ///				format("Card unditect\n");
 			}
