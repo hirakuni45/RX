@@ -35,6 +35,7 @@ namespace seeda {
 
 		bool		enable_;
 		bool		state_;
+		bool		req_close_;
 
 		FILE	*fp_;
 
@@ -69,7 +70,7 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		write_file() : count_(0), path_{ "00000" },
-			enable_(false), state_(false),
+			enable_(false), state_(false), req_close_(false),
 			fp_(nullptr),
 			ch_loop_(0),
 			task_(task::wait_request), last_channel_(false), second_(0) { }
@@ -160,14 +161,8 @@ namespace seeda {
 		{
 			bool back = state_;
 			state_ = enable_;
-			if(!enable_) {
-				if(back && fp_ != nullptr) {
-					debug_format("Write file aborted\n");
-					fclose(fp_);
-					fp_ = nullptr;
-					task_ = task::wait_request;
-				}
-				return;
+			if(back && !state_ && fp_ != nullptr) {
+				req_close_ = true;
 			}
 
 			switch(task_) {
@@ -295,6 +290,17 @@ namespace seeda {
 					}
 					if(last_channel_) {
 						at_wf_fifo().get_go();
+
+						// 書き込みがキャンセルされた場合。
+						if(req_close_) {
+							req_close_ = false;
+							debug_format("Write file aborted\n");
+							fclose(fp_);
+							fp_ = nullptr;
+							task_ = task::wait_request;
+							break;
+						}
+
 						if(second_ == 59) {  // change file.
 							task_ = task::next_file;
 						} else {
