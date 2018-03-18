@@ -808,6 +808,7 @@ namespace net {
 	class ether_string
 	{
 	public:
+		// EOT(0) の分を拡張
 		typedef utils::fixed_string<SIZE + 1> STR;
 
 	private:
@@ -826,19 +827,7 @@ namespace net {
 				if(fd_ > 0) {
 					uint32_t len = str_.size();
 					const char* p = str_.c_str();
-#if 0
-					while(len > 0) {
-						uint32_t l = len;
-						if(l >= 2048) {
-							l = 2048;
-						}
-						ethernet::write(fd_, p, l);
-						len -= l;
-						p += l;
-					}
-#else
 					ethernet::write(fd_, p, len);
-#endif				
 				} else {
 					utils::format("ether_string: FD is null.\n");
 				}
@@ -846,18 +835,17 @@ namespace net {
 			clear();
 		}
 
-		void operator() (char ch) {
-			if(ch == '\n') {
-				str_ += '\r';  // 改行を「CR+LF」とする
-				if(str_.size() >= (str_.capacity() - 1)) {
-					flush();
-				}
-			}
-			str_ += ch;
-			if(str_.size() >= (str_.capacity() - 1)) {
+		void putch(char ch) {
+			if(str_.size() >= str_.capacity()) {
 				flush();
 			}
+			if(ch == '\n') {
+				putch('\r');
+			}
+			str_ += ch;
 		}
+
+		void operator() (char ch) { putch(ch); }
 
 		uint32_t size() const { return str_.size(); }
 
