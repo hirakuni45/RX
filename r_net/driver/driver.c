@@ -17,6 +17,8 @@
 extern H lan_read_for_test(uint8_t lan_port_no, int8_t **buf, H return_code);
 #endif
 
+void enable_interrupt(void);
+void disable_interrupt(void);
 
 /******************************************************************************
 Private global variables and functions
@@ -321,7 +323,9 @@ void lan_inthdr(void)	// callback from r_ether.c
 {
 	if (tcpip_flag_ != 0)
 	{
+		enable_interrupt();  // 多重割り込み許可
 		_process_tcpip();
+		disable_interrupt();
 	}
 }
 
