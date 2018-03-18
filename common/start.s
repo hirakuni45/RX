@@ -96,6 +96,28 @@ _turn_supervisor:
 	nop
 
 
+# 割り込み許可（スーパーバイザモード）
+	.global _enable_interrupt
+_enable_interrupt:
+	push	r1
+	mvfc	psw,r1
+	or		#0x00010000, r1
+	mvtc	r1,psw
+	pop		r1
+	rts;
+
+
+# 割り込み不許可（スーパーバイザモード）
+	.global _disable_interrupt
+_disable_interrupt:
+	push	r1
+	mvfc	psw,r1
+	and		#0xFFFEFFFF, r1
+	mvtc	r1,psw
+	pop		r1
+	rts;
+
+
 	.global	_rx_run_preinit_array
 	.type	_rx_run_preinit_array,@function
 _rx_run_preinit_array:
