@@ -131,6 +131,7 @@
 #include "RX600/sdhi.hpp"
 #include "RX600/standby_ram.hpp"
 #include "RX600/ssi_io.hpp"
+#include "RX600/glcdc.hpp"
 
 #elif defined(SIG_RX71M)
 #include "RX600/peripheral.hpp"
