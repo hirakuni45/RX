@@ -41,6 +41,9 @@ namespace device {
 			device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
 			while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
 
+#if defined(SIG_RX65N)
+			device::SYSTEM::ROMWT = 0b10;
+#endif
 			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
 			// ... MAX x30.0
 			uint32_t n = F_ICLK / BASE_CLOCK;
@@ -50,7 +53,7 @@ namespace device {
 			device::SYSTEM::PLLCR.STC = n + 0b010011;
 			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
-#if defined(SIG_RX64M)
+#if defined(SIG_RX64M) || defined(SIG_RX65N)
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)    // 1/2 (120/2=60)
 								  | device::SYSTEM::SCKCR.ICK.b(0)    // 1/1 (120/1=120)
 								  | device::SYSTEM::SCKCR.BCK.b(1)    // 1/2 (120/2=60)

@@ -136,6 +136,26 @@ namespace device {
 		static sckcr_t<0x00080020> SCKCR;
 
 
+#if defined(SIG_RX65N)
+  		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct romwt_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2> ROMWT;
+		};
+		static romwt_t<0x0008101C> ROMWT;
+#endif
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  システムクロックコントロールレジスタ 2（SCKCR2）

@@ -8,7 +8,7 @@
     RX64M ODR0  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  @n
           ODR1  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -115,7 +115,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> B0;
 			bit_rw_t<io_, bitpos::B2> B2;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			bit_rw_t<io_, bitpos::B3> B3;
 #endif
 			bit_rw_t<io_, bitpos::B4> B4;
@@ -141,7 +141,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> B0;
 			bit_rw_t<io_, bitpos::B2> B2;
 			bit_rw_t<io_, bitpos::B4> B4;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			bit_rw_t<io_, bitpos::B6> B6;
 #endif
 		};
@@ -183,7 +183,7 @@ namespace device {
 	};
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
 	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
 	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
@@ -250,7 +250,7 @@ namespace device {
 	//-------------------------------------------------------------//
 	static void init_port(uint8_t dir)
 	{
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 		// RX64M/LQFP:176(177)
 		PORT0::PCR = dir;	// (6) P00,P01,P02,P05,P07
 		PORT1::PCR = dir;	// (8) P10 to P17
