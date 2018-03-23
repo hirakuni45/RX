@@ -52,6 +52,10 @@ namespace utils {
 				for(uint32_t n = 0; n < (F_ICLK / 4285714); ++n) {
 					asm("nop");
 				}
+#elif defined(SIG_RX65N)
+				for(uint32_t n = 0; n < (F_ICLK / 4444444); ++n) {
+					asm("nop");
+				}
 #elif defined(SIG_RX24T)
 				for(uint32_t n = 0; n < (F_ICLK / 5333333); ++n) {
 					asm("nop");
