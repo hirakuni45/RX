@@ -25,11 +25,9 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 	while(1) {
-//		utils::delay::milli_second(250);
-		utils::delay::micro_second(2);
+		utils::delay::milli_second(250);
 		LED::P = 0;
-//		utils::delay::milli_second(250);
-		utils::delay::micro_second(2);
+		utils::delay::milli_second(250);
 		LED::P = 1;
 	}
 }
