@@ -104,5 +104,7 @@ namespace device {
 		IRQ5,
 		IRQ6,
 		IRQ7,
+
+		GLCDC,		///< グラフィック LCD コントローラ (GLCDC)
 	};
 }
