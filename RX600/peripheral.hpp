@@ -105,6 +105,9 @@ namespace device {
 		IRQ6,
 		IRQ7,
 
+#ifdef SIG_RX65N
 		GLCDC,		///< グラフィック LCD コントローラ (GLCDC)
+		DRW2D,		///< 2D 描画エンジン (DRW2D)
+#endif
 	};
 }
