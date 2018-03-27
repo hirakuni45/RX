@@ -11,7 +11,7 @@
 #include "common/fixed_fifo.hpp"
 #include "fixed_map.hpp"
 
-// #define MEDIAN
+#define MEDIAN
 
 namespace seeda {
 
