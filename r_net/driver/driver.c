@@ -323,9 +323,9 @@ void lan_inthdr(void)	// callback from r_ether.c
 {
 	if (tcpip_flag_ != 0)
 	{
-		enable_interrupt();  // 多重割り込み許可
+//		enable_interrupt();  // 多重割り込み許可
 		_process_tcpip();
-		disable_interrupt();
+//		disable_interrupt();
 	}
 }
 
