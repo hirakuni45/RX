@@ -1,5 +1,5 @@
 /*!	@file
-	@brief	RX71M R5F571MF リンカー・スクリプト
+	@brief	RX71M R5F571ML リンカー・スクリプト
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -18,7 +18,7 @@ MEMORY {
 	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0007C000 /* 512k - (USTACK+ISTACK)(0x2000) */
 	USTACK (w) : ORIGIN = 0x0007E000, LENGTH = 4 /* ustack 8192 */
 	ISTACK (w) : ORIGIN = 0x00080000, LENGTH = 4 /* istack 8192 */
-	ROM (w)    : ORIGIN = 0xFFE00000, LENGTH = 0x001FFFD0 /* 2M */
+	ROM (w)    : ORIGIN = 0xFFC00000, LENGTH = 0x003FFFD0 /* 4M */
 }
 
 SECTIONS
