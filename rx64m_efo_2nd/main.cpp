@@ -24,7 +24,7 @@
 
 namespace {
 
-	static const int main_version_ = 91;
+	static const int main_version_ = 92;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -231,6 +231,11 @@ namespace {
 		m_sci_.putch(0x01);  // A/D シングル通知
 		m_sci_.putch(ch);    // chanel NO
 		for(uint16_t i = 0; i < len; ++i) {
+			if(m_sci_.recv_length() > 0) {
+				if(static_cast<CMD>(m_sci_.getch()) == CMD::END) {  // END command
+					return;
+				}
+			}
 			m_sci_.putch(src[i] >> 8);
 			m_sci_.putch(src[i] & 0xff);
 		}
@@ -244,6 +249,11 @@ namespace {
 		m_sci_.putch(len >> 8);
 		m_sci_.putch(len & 0xff);
 		for(uint16_t i = 0; i < len; ++i) {
+			if(m_sci_.recv_length() > 0) {
+				if(static_cast<CMD>(m_sci_.getch()) == CMD::END) {  // END command
+					return;
+				}
+			}
 			m_sci_.putch(src[i] >> 8);
 			m_sci_.putch(src[i] & 0xff);
 		}
@@ -470,6 +480,23 @@ int main(int argc, char** argv)
 					break;
 
 				case CMD::VER:
+					m_sci_.putch(0x21);  // VERデータID
+					m_sci_.putch(20);  // 電圧レンジ（+-20V）
+					{
+						char tmp[4];
+						auto v = main_version_;
+						tmp[3] = (v % 10) + '0';
+						v /= 10;
+						tmp[2] = (v % 10) + '0';
+						v /= 10;
+						tmp[1] = (v % 10) + '0';
+						v /= 10;
+						tmp[0] = (v % 10) + '0';
+						m_sci_.putch(tmp[3]);
+						m_sci_.putch(tmp[2]);
+						m_sci_.putch(tmp[1]);
+						m_sci_.putch(tmp[0]);
+					}
 					break;
 
 				default:
