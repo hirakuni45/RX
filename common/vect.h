@@ -34,6 +34,28 @@ extern "C" {
 	void set_interrupt_task(void (*task)(void), uint32_t idx);
 
 
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	ユーザーモードに移行する
+	 */
+	//-----------------------------------------------------------------//
+	inline void turn_usermode(void)
+	{
+		asm("mvfc psw,r1");
+		asm("or #0x00100000,r1");
+		asm("push.l r1");
+		asm("mvfc pc,r1");
+		asm("add #10,r1");
+		asm("push.l r1");
+		asm("rte");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+		asm("nop");
+	}
+
 #ifdef __cplusplus
 };
 #endif

@@ -67,20 +67,6 @@ _start:
 	.extern	_init
 	bra		_init
 
-	.global _turn_usermode
-_turn_usermode:
-	mvfc	psw,r1
-	or		#0x00100000,r1
-	push.l	r1
-	mvfc	pc,r1
-	add		#10,r1
-	push.l	r1
-	rte
-	nop
-	nop
-	nop
-	nop
-
 	.global _turn_supervisor
 _turn_supervisor:
 	mvfc	psw,r1
@@ -94,6 +80,9 @@ _turn_supervisor:
 	nop
 	nop
 	nop
+	nop
+	nop
+
 
 
 # 割り込み許可（スーパーバイザモード）
