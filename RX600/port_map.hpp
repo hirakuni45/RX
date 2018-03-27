@@ -115,8 +115,11 @@ namespace device {
 					PORT9::PMR.B2 = enable;
 				}
 				break;
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::SCIF8:
+#elif defined(SIG_RX65N)
+			case peripheral::SCI8:
+#endif
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PC7PFS.PSEL = sel;  // TXDF8 (PC7 LQFP176: 76)
@@ -125,7 +128,11 @@ namespace device {
 					PORTC::PMR.B6 = enable;
 				}
 				break;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::SCIF9:
+#elif defined(SIG_RX65N)
+			case peripheral::SCI9:
+#endif
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PB7PFS.PSEL = sel;  // TXDF9 (PB7 LQFP176: 94)
@@ -134,7 +141,11 @@ namespace device {
 					PORTB::PMR.B6 = enable;
 				}
 				break;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::SCIF10:
+#elif defined(SIG_RX65N)
+			case peripheral::SCI10:
+#endif
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P87PFS.PSEL = sel;  // TXDF10 (P86 LQFP176: 47)
@@ -143,7 +154,11 @@ namespace device {
 					PORT8::PMR.B6 = enable;
 				}
 				break;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::SCIF11:
+#elif defined(SIG_RX65N)
+			case peripheral::SCI11:
+#endif
 				{
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P77PFS.PSEL = sel;  // TXDF11 (P77 LQFP176: 84)

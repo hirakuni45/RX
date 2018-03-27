@@ -41,6 +41,13 @@ namespace device {
 			device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
 			while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
 
+#if defined(SIG_RX71M)
+			if(F_ICLK > 120000000) {
+				device::SYSTEM::MEMWAIT = 1;
+//				turn_usermode();
+			}
+#endif
+
 #if defined(SIG_RX65N)
 			device::SYSTEM::ROMWT = 0b10;
 #endif
@@ -53,7 +60,6 @@ namespace device {
 			device::SYSTEM::PLLCR.STC = n + 0b010011;
 			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
-#if defined(SIG_RX64M) || defined(SIG_RX65N)
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)    // 1/2 (120/2=60)
 								  | device::SYSTEM::SCKCR.ICK.b(0)    // 1/1 (120/1=120)
 								  | device::SYSTEM::SCKCR.BCK.b(1)    // 1/2 (120/2=60)
@@ -61,27 +67,6 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKB.b(1)   // 1/2 (120/2=60)
 								  | device::SYSTEM::SCKCR.PCKC.b(1)   // 1/2 (120/2=60)
 								  | device::SYSTEM::SCKCR.PCKD.b(1);  // 1/2 (120/2=60)
-#elif defined(SIG_RX71M)
-//			device::SYSTEM::MEM
-			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)    // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.ICK.b(0)    // 1/1 (240/1=240)
-								  | device::SYSTEM::SCKCR.BCK.b(1)    // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.PCKA.b(0)   // 1/2 (240/2=120)
-								  | device::SYSTEM::SCKCR.PCKB.b(1)   // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.PCKC.b(1)   // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.PCKD.b(1);  // 1/4 (240/4=60)
-#if 0
-			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)    // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.ICK.b(0)    // 1/1 (240/1=240)
-								  | device::SYSTEM::SCKCR.BCK.b(2)    // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.PCKA.b(1)   // 1/2 (240/2=120)
-								  | device::SYSTEM::SCKCR.PCKB.b(2)   // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.PCKC.b(2)   // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.PCKD.b(2);  // 1/4 (240/4=60)
-#endif
-#else
-#  error "system_io.hpp requires SIG_xxx to be defined"
-#endif
 			device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 		}

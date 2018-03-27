@@ -136,6 +136,24 @@ namespace device {
 		static sckcr_t<0x00080020> SCKCR;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct memwait_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> MEMWAIT;
+		};
+		static memwait_t<0x00086610> MEMWAIT;
+
+
 #if defined(SIG_RX65N)
   		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

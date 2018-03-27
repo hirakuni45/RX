@@ -381,6 +381,11 @@ namespace device {
 	typedef scig_t<0x0008A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5> SCI5;
 	typedef scig_t<0x0008A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6> SCI6;
 	typedef scig_t<0x0008A0E0, peripheral::SCI7, ICU::VECTOR::TXI7, ICU::VECTOR::RXI7> SCI7;
-
+#if defined(SIG_RX65N)
+//	typedef scii_t<0x000D0000, peripheral::SCI8,  ICU::VECTOR::TXI8,  ICU::VECTOR::RXI8>  SCI8;
+//	typedef scii_t<0x000D0020, peripheral::SCI9,  ICU::VECTOR::TXI9,  ICU::VECTOR::RXI9>  SCI9;
+//	typedef scii_t<0x000D0040, peripheral::SCI10, ICU::VECTOR::TXI10, ICU::VECTOR::RXI10> SCI10;
+//	typedef scii_t<0x000D0060, peripheral::SCI11, ICU::VECTOR::TXI11, ICU::VECTOR::RXI11> SCI11;
+#endif
 	typedef scih_t<0x0008B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12> SCI12;
 }

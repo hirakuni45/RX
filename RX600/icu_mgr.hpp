@@ -114,6 +114,7 @@ namespace device {
 				ICU::IPR.TXI7 = lvl;
 				ICU::IER.TXI7 = ena;
 				break;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::SCIF8:
 				ICU::IPR.RXIF8 = lvl;
 				ICU::IER.RXIF8 = ena;
@@ -138,6 +139,32 @@ namespace device {
 				ICU::IPR.TXIF11 = lvl;
 				ICU::IER.TXIF11 = ena;
 				break;
+#elif defined(SIG_RX65N)
+			case peripheral::SCI8:
+				ICU::IPR.RXI8 = lvl;
+				ICU::IER.RXI8 = ena;
+				ICU::IPR.TXI8 = lvl;
+				ICU::IER.TXI8 = ena;
+				break;
+			case peripheral::SCI9:
+				ICU::IPR.RXI9 = lvl;
+				ICU::IER.RXI9 = ena;
+				ICU::IPR.TXI9 = lvl;
+				ICU::IER.TXI9 = ena;
+				break;
+			case peripheral::SCI10:
+				ICU::IPR.RXI10 = lvl;
+				ICU::IER.RXI10 = ena;
+				ICU::IPR.TXI10 = lvl;
+				ICU::IER.TXI10 = ena;
+				break;
+			case peripheral::SCI11:
+				ICU::IPR.RXI11 = lvl;
+				ICU::IER.RXI11 = ena;
+				ICU::IPR.TXI11 = lvl;
+				ICU::IER.TXI11 = ena;
+				break;
+#endif
 			case peripheral::SCI12:
 				ICU::IPR.RXI12 = lvl;
 				ICU::IER.RXI12 = ena;

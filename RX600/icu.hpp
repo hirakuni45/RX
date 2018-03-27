@@ -50,95 +50,117 @@ namespace device {
 
 			SPRI0   = 38,  // RSPI0
 			SPTI0   = 39,  // RSPI0
-
+#if defined(SIG_RX65N) || defined(SIG_RX71M)
+			SPRI1   = 40,  // RSPI1
+			SPTI1   = 41,  // RSPI1
+#endif
 			SPRI    = 42,  // QSPI
 			SPTI    = 43,  // QSPI
 
 			SBFAI   = 44,  // SDHI
 
 			MBFAI   = 45,  // MMCIF
-
+#if defined(SIG_RX64M)
 			SSITXI0 = 46,  // SSI0
 			SSIRXI0 = 47,  // SSI0
-
 			SSIRTI1 = 48,  // SSI1
-
-			IDEI    = 50,  // SRC
-			ODFI    = 51,  // SRC
-
+#endif
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			IDEI         = 50,  // SRC
+			ODFI         = 51,  // SRC
+#elif defined(SIG_RX65N)
+			RIIC_RXI1    = 50,
+			RIIC_TXI1    = 51,
+#endif
 			RIIC_RXI0    = 52,  // RIIC0
 			RIIC_TXI0    = 53,
 			RIIC_RXI2    = 54,  // RIIC2
 			RIIC_TXI2    = 55,
 
-			RXI0    = 58,  // SCI0
-			TXI0    = 59,
-			RXI1    = 60,  // SCI1
-			TXI1    = 61,
-			RXI2    = 62,  // SCI2
-			TXI2    = 63, 
+			RXI0         = 58,  // SCI0
+			TXI0         = 59,
+			RXI1         = 60,  // SCI1
+			TXI1         = 61,
+			RXI2         = 62,  // SCI2
+			TXI2         = 63, 
 
-			IRQ0    = 64,  // ICU
-			IRQ1    = 65,
-			IRQ2    = 66,
-			IRQ3    = 67,
-			IRQ4    = 68,
-			IRQ5    = 69,
-			IRQ6    = 70,
-			IRQ7    = 71,
-			IRQ8    = 72,
-			IRQ9    = 73,
-			IRQ10   = 74,
-			IRQ11   = 75,
-			IRQ12   = 76,
-			IRQ13   = 77,
-			IRQ14   = 78,
-			IRQ15   = 79,
+			IRQ0         = 64,  // ICU
+			IRQ1         = 65,
+			IRQ2         = 66,
+			IRQ3         = 67,
+			IRQ4         = 68,
+			IRQ5         = 69,
+			IRQ6         = 70,
+			IRQ7         = 71,
+			IRQ8         = 72,
+			IRQ9         = 73,
+			IRQ10        = 74,
+			IRQ11        = 75,
+			IRQ12        = 76,
+			IRQ13        = 77,
+			IRQ14        = 78,
+			IRQ15        = 79,
 
-			RXI3    = 80,  // SCI3
-			TXI3    = 81,
-			RXI4    = 82,  // SCI4
-			TXI4    = 83,
-			RXI5    = 84,  // SCI5
-			TXI5    = 85,
-			RXI6    = 86,  // SCI6
-			TXI6    = 87,
+			RXI3         = 80,  // SCI3
+			TXI3         = 81,
+			RXI4         = 82,  // SCI4
+			TXI4         = 83,
+			RXI5         = 84,  // SCI5
+			TXI5         = 85,
+			RXI6         = 86,  // SCI6
+			TXI6         = 87,
 
-			LVD1    = 88,  // LVD1
-			LVD2    = 89,  // LVD2
+			LVD1         = 88,  // LVD1
+			LVD2         = 89,  // LVD2
 
-			USBR0   = 90,  // USB0
+			USBR0        = 90,  // USB0
 
-			ALM     = 92,  // RTC
-			PRD     = 93,
+			ALM          = 92,  // RTC
+			PRD          = 93,
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			USBAR        = 94,  // USBA
+#endif
+			IWUNI        = 95,  // IWDT
 
-			USBAR   = 94,  // USBA
+			WUNI         = 96,  // WDT
 
-			IWUNI   = 95,  // IWDT
+			PCDFI        = 97,  // PDC
 
-			WUNI    = 96,  // WDT
+			RXI7         = 98,  // SCI7
+			TXI7         = 99,
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			RXIF8        = 100, // SCIFA8
+			TXIF8        = 101,
+			RXIF9        = 102, // SCIFA9
+			TXIF9        = 103,
+			RXIF10       = 104, // SCIFA10
+			TXIF10       = 105,
+#elif defined(SIG_RX65N)
+			RXI8         = 100, // SCI8
+			TXI8         = 101,
+			RXI9         = 102, // SCI9
+			TXI9         = 103,
+			RXI10        = 104, // SCI10
+			TXI10        = 105,
+#endif
+			GROUPBE0     = 106,  // ICU
+#if defined(SIG_RX65N)
+			GROUPBL2     = 107,
 
-			PCDFI   = 97,  // PDC
-
-			RXI7    = 98,  // SCI7
-			TXI7    = 99,
-
-			RXIF8   = 100, // SCIFA8
-			TXIF8   = 101,
-			RXIF9   = 102, // SCIFA9
-			TXIF9   = 103,
-			RXIF10  = 104, // SCIFA10
-			TXIF10  = 105,
-
-			GROUPBE0 = 106,  // ICU
+			SPRI2        = 108,
+			SPTI2        = 109,
+#endif
 			GROUPBL0 = 110,
 			GROUPBL1 = 111,
 			GROUPAL0 = 112,
 			GROUPAL1 = 113,
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			RXIF11   = 114,  // SCIFA11
 			TXIF11   = 115,
-
+#elif defined(SIG_RX65N)
+			RXI11    = 114,  // SCI11
+			TXI11    = 115,
+#endif
 			RXI12    = 116,  // SCI12
 			TXI12    = 117,
 
@@ -341,22 +363,33 @@ namespace device {
 
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			rw8_t<base + 100> RXIF8;
 			rw8_t<base + 101> TXIF8;
 			rw8_t<base + 102> RXIF9;
 			rw8_t<base + 103> TXIF9;
 			rw8_t<base + 104> RXIF10;
 			rw8_t<base + 105> TXIF10;
-
+#elif defined(SIG_RX65N)
+			rw8_t<base + 100> RXI8;
+			rw8_t<base + 101> TXI8;
+			rw8_t<base + 102> RXI9;
+			rw8_t<base + 103> TXI9;
+			rw8_t<base + 104> RXI10;
+			rw8_t<base + 105> TXI10;
+#endif
 			rw8_t<base + 106> GROUPBE0;
 			rw8_t<base + 110> GROUPBL0;
 			rw8_t<base + 111> GROUPBL1;
 			rw8_t<base + 112> GROUPAL0;
 			rw8_t<base + 113> GROUPAL1;
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			rw8_t<base + 114> RXIF11;
 			rw8_t<base + 115> TXIF11;
+#elif defined(SIG_RX65N)
+			rw8_t<base + 114> RXI11;
+			rw8_t<base + 115> TXI11;
+#endif
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
 
@@ -500,6 +533,7 @@ namespace device {
 			typedef rw8_t<base + 0x0C> ier0C;
 			bit_rw_t<ier0C, bitpos::B2>	RXI7;
 			bit_rw_t<ier0C, bitpos::B3>	TXI7;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			bit_rw_t<ier0C, bitpos::B4>	RXIF8;
 			bit_rw_t<ier0C, bitpos::B5>	TXIF8;
 			bit_rw_t<ier0C, bitpos::B6>	RXIF9;
@@ -508,6 +542,16 @@ namespace device {
 			typedef rw8_t<base + 0x0D> ier0D;
 			bit_rw_t<ier0D, bitpos::B0>	RXIF10;
 			bit_rw_t<ier0D, bitpos::B1>	TXIF10;
+#elif defined(SIG_RX65N)
+			bit_rw_t<ier0C, bitpos::B4>	RXI8;
+			bit_rw_t<ier0C, bitpos::B5>	TXI8;
+			bit_rw_t<ier0C, bitpos::B6>	RXI9;
+			bit_rw_t<ier0C, bitpos::B7>	TXI9;
+
+			typedef rw8_t<base + 0x0D> ier0D;
+			bit_rw_t<ier0D, bitpos::B0>	RXI10;
+			bit_rw_t<ier0D, bitpos::B1>	TXI10;
+#endif
 			bit_rw_t<ier0D, bitpos::B2>	GROUPBE0;
 			bit_rw_t<ier0D, bitpos::B6>	GROUPBL0;
 			bit_rw_t<ier0D, bitpos::B7>	GROUPBL1;
@@ -515,8 +559,13 @@ namespace device {
 			typedef rw8_t<base + 0x0E> ier0E;
 			bit_rw_t<ier0E, bitpos::B0>	GROUPAL0;
 			bit_rw_t<ier0E, bitpos::B1> GROUPAL1;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			bit_rw_t<ier0E, bitpos::B2>	RXIF11;
 			bit_rw_t<ier0E, bitpos::B3>	TXIF11;
+#elif defined(SIG_RX65N)
+			bit_rw_t<ier0E, bitpos::B2>	RXI11;
+			bit_rw_t<ier0E, bitpos::B3>	TXI11;
+#endif
 			bit_rw_t<ier0E, bitpos::B4> RXI12;
 			bit_rw_t<ier0E, bitpos::B5> TXI12;
 
@@ -644,21 +693,33 @@ namespace device {
 
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			rw8_t<base + 100> RXIF8;
 			rw8_t<base + 101> TXIF8;
 			rw8_t<base + 102> RXIF9;
 			rw8_t<base + 103> TXIF9;
 			rw8_t<base + 104> RXIF10;
 			rw8_t<base + 105> TXIF10;
-
+#elif defined(SIG_RX65N)
+			rw8_t<base + 100> RXI8;
+			rw8_t<base + 101> TXI8;
+			rw8_t<base + 102> RXI9;
+			rw8_t<base + 103> TXI9;
+			rw8_t<base + 104> RXI10;
+			rw8_t<base + 105> TXI10;
+#endif
 			rw8_t<base + 106> GROUPBE0;
 			rw8_t<base + 110> GROUPBL0;
 			rw8_t<base + 111> GROUPBL1;
 			rw8_t<base + 112> GROUPAL0;
 			rw8_t<base + 113> GROUPAL1;
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			rw8_t<base + 114> RXIF11;
 			rw8_t<base + 115> TXIF11;
+#elif defined(SIG_RX65N)
+			rw8_t<base + 114> RXI11;
+			rw8_t<base + 115> TXI11;
+#endif
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
 

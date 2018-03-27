@@ -119,7 +119,7 @@ namespace device {
 			case peripheral::SCI12:
 				SYSTEM::MSTPCRB.MSTPB4 = f;		// B-B4 (SCI12)のストップ状態解除
 				break;
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::SCIF8:
 				SYSTEM::MSTPCRC.MSTPC27 = f;	// C-B27 (SCIF8)のストップ状態解除
 				break;
@@ -132,7 +132,20 @@ namespace device {
 			case peripheral::SCIF11:
 				SYSTEM::MSTPCRC.MSTPC24 = f;	// C-B24 (SCIF11のストップ状態解除
 				break;
-
+#elif defined(SIG_RX65N)
+			case peripheral::SCI8:
+				SYSTEM::MSTPCRC.MSTPC27 = f;	// C-B27 (SCI8)のストップ状態解除
+				break;
+			case peripheral::SCI9:
+				SYSTEM::MSTPCRC.MSTPC26 = f;	// C-B26 (SCI9)のストップ状態解除
+				break;
+			case peripheral::SCI10:
+				SYSTEM::MSTPCRC.MSTPC25 = f;	// C-B25 (SCI10のストップ状態解除
+				break;
+			case peripheral::SCI11:
+				SYSTEM::MSTPCRC.MSTPC24 = f;	// C-B24 (SCI11のストップ状態解除
+				break;
+#endif
 			case peripheral::RSPI:
 				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI のストップ状態解除
 				break;
