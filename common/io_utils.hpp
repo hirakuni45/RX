@@ -111,7 +111,9 @@ namespace device {
 			@param[in]	data	書き込み値
 		*/
 		//-----------------------------------------------------------------//
-		static void write(value_type data) noexcept { wr8_(adr, data); }
+		static void write(value_type data) noexcept {
+			wr8_(adr, data);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -120,7 +122,9 @@ namespace device {
 			@return 読み出し値
 		*/
 		//-----------------------------------------------------------------//
-		static value_type read() noexcept { return rd8_(adr); }
+		static value_type read() noexcept {
+			return rd8_(adr);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -156,7 +160,7 @@ namespace device {
 			@param[in]	data	論理積値
 		*/
 		//-----------------------------------------------------------------//
-		void operator &= (value_type data) noexcept { write(read() & data); }
+		void operator &= (value_type data) noexcept { write(read() & data); }		
 	};
 
 
