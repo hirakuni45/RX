@@ -304,8 +304,8 @@ namespace device {
 	template <class PORTx, bitpos bpos>
 	struct PORT {
 
-		static const uint8_t port_no  = static_cast<uint8_t>(PORTx::base_address_ & 0x1f);
-		static const uint8_t port_bit = static_cast<uint8_t>(bpos);
+		static const uint8_t PNO     = static_cast<uint8_t>(PORTx::base_address_ & 0x1f);
+		static const uint8_t BIT_POS = static_cast<uint8_t>(bpos);
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -379,6 +379,9 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct NULL_PORT {
+
+		static const uint8_t PNO     = 0xff;
+		static const uint8_t BIT_POS = 0xff;
 
 		struct null_t {
 			void operator = (bool f) { }
