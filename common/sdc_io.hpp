@@ -347,17 +347,20 @@ namespace utils {
 		void start()
 		{
 			SELECT::DIR = 1;
-			SELECT::P = 0;  // 電源ＯＦＦ時、「０」にしておかないと電流が回り込む
+			if(POWER::BIT_POS < 32) {
+				SELECT::P = 0;  // 電源ＯＦＦ時、「０」にしておかないと電流が回り込む
 
-			POWER::DIR = 1;
-			POWER::P = 1; 
-
+				POWER::DIR = 1;
+				POWER::P = 1; 
+			} else {
+				SELECT::P = 1;  // 電源制御が無い場合は、単純に「不許可」
+			}
 			DETECT::DIR = 0;  // input
-			DETECT::PU = 1;  // pull-up
+			DETECT::PU = 1;   // pull-up
 
 			// 書き込み禁止ノッチ検出
 			WP::DIR = 0; // input
-			WP::PU = 1;  // pull-up
+			WP::PU  = 1;  // pull-up
 
 			// SPI を初期化後、廃棄する事で関係ポートを初期化する。
 			// 初期化時 400KHz
@@ -764,14 +767,20 @@ namespace utils {
 			}
 			if(!cd_ && select_wait_ >= 10) {
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
-				POWER::P = 0;
+				if(POWER::BIT_POS < 32) {
+					POWER::P = 0;
+				}
 				SELECT::P = 1;
 ///				format("Card ditect\n");
-			} else if(cd_ && select_wait_ == 0) {
+			} else if(cd_ && select_wait_ == 0) {  // unmount
 				f_mount(&fatfs_, "", 0);
 				spi_.destroy();
-///				POWER::P = 1;
-///				SELECT::P = 0;
+				if(POWER::BIT_POS < 32) {
+					POWER::P = 1;
+					SELECT::P = 0;
+				} else {
+					SELECT::P = 1;
+				}
 				mount_ = false;
 ///				format("Card unditect\n");
 			}
@@ -785,8 +794,12 @@ namespace utils {
 					if(st != FR_OK) {
 						format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
 						spi_.destroy();
-						POWER::P = 1;
-						SELECT::P = 0;
+						if(POWER::BIT_POS < 32) {
+							POWER::P  = 1;
+							SELECT::P = 0;
+						} else {
+							SELECT::P = 1;
+						}
 						mount_ = false;
 					} else {
 						strcpy(current_, "/");

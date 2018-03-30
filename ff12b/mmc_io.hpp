@@ -244,13 +244,20 @@ namespace fatfs {
 		{
 			if(init_port_) return;
 
-			POW::DIR = 1;
-			POW::P = 1;  // power off
-			POW::PU = 0;
+			if(POW::BIT_POS < 32) {
+				POW::DIR = 1;
+				POW::P = 1;  // power off
+				POW::PU = 0;
 
-			SEL::DIR = 1;
-			SEL::PU = 0;
-			SEL::P = 0;  // ※電源 OFF 時は、SEL を「１」にすると、SEL から電流が流れるので、「０」にする
+				SEL::DIR = 1;
+				SEL::PU = 0;
+			  // ※電源 OFF 時は、SEL を「１」にすると、SEL から電流が流れるので、「０」にする
+				SEL::P = 0;
+			} else {
+				SEL::DIR = 1;
+				SEL::PU = 0;
+				SEL::P = 1;
+			}
 
 			CDT::DIR = 0;
 			CDT::PU  = 1;  // 内部プルアップは標準では有効にしておく
@@ -497,14 +504,22 @@ namespace fatfs {
 			}
 			if(!cd_ && select_wait_ >= 10) {
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
-				POW::P = 0;
-				SEL::P = 1;
+				if(POW::BIT_POS < 32) {
+					POW::P = 0;
+					SEL::P = 1;
+				} else {
+					SEL::P = 1;
+				}
 //				utils::format("Card ditect\n");
 			} else if(cd_ && select_wait_ == 0) {
 				f_mount(&fatfs_, "", 0);
 				spi_.destroy();
-				POW::P = 1;
-				SEL::P = 0;
+				if(POW::BIT_POS < 32) {
+					POW::P = 1;
+					SEL::P = 0;
+				} else {
+					SEL::P = 1;
+				}
 				mount_ = false;
 //				utils::format("Card unditect\n");
 			}
@@ -518,8 +533,12 @@ namespace fatfs {
 					if(st != FR_OK) {
 						utils::format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
 						spi_.destroy();
-						POW::P = 1;
-						SEL::P = 0;
+						if(POW::BIT_POS < 32) {
+							POW::P = 1;
+							SEL::P = 0;
+						} else {
+							SEL::P = 1;
+						}
 						mount_ = false;
 					} else {
 						mount_ = true;
