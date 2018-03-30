@@ -10,6 +10,9 @@
 #include "tools.hpp"
 #include "nets.hpp"
 
+// EADC を強制的に無効にする場合
+// #define DISABLE_EADC
+
 namespace {
 
 	static const bool wifi_enable_ = false;
@@ -47,6 +50,7 @@ namespace {
 	{
 		enable_eadc_ = false;
 
+#ifndef DISABLE_EADC
 		{  // LTC2348ILX-16 初期化
 			// 内臓リファレンスと内臓バッファ
 			// VREFIN: 2.024V、VREFBUF: 4.096V、Analog range: 0V to 5.12V
@@ -54,7 +58,7 @@ namespace {
 				utils::format("LTC2348_16 not found...\n");
 			}
 		}
-
+#endif
 		// 擬似波形発生、初期値
 		uint16_t v = 0;
 		for(int i = 0; i < 8; ++i) {
@@ -283,10 +287,17 @@ namespace seeda {
 				++signal_[i];
 			}
 		} else {
+#ifndef DISABLE_EADC
 			eadc_.convert();
 			for(int i = 0; i < 8; ++i) {
 				sample_[i].add(eadc_.get_value(i));
 			}
+#else
+			for(int i = 0; i < 8; ++i) {
+				sample_[i].add(signal_[i]);
+				++signal_[i];
+			}
+#endif
 		}
 #endif
 		++sample_count_;
@@ -872,9 +883,9 @@ int main(int argc, char** argv)
 	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
 
-	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)		// 1/2 (237.5/4=59.375)
+	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)		// 1/4 (237.5/4=59.375)
 						  | device::SYSTEM::SCKCR.ICK.b(1)		// 1/2 (237.5/2=118.75)
-						  | device::SYSTEM::SCKCR.BCK.b(2)		// 1/2 (237.5/4=59.375)
+						  | device::SYSTEM::SCKCR.BCK.b(2)		// 1/4 (237.5/4=59.375)
 						  | device::SYSTEM::SCKCR.PCKA.b(1)		// 1/2 (237.5/2=118.75)
 						  | device::SYSTEM::SCKCR.PCKB.b(2)		// 1/4 (237.5/4=59.375)
 						  | device::SYSTEM::SCKCR.PCKC.b(2)		// 1/4 (237.5/4=59.375)

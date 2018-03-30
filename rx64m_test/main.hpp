@@ -36,9 +36,12 @@
 #define WRITE_FILE_DEBUG
 #endif
 
+// ハードウェア RSPI 制御により SD カードを操作する場合
+#define RSPI_HW
+
 namespace seeda {
 
-	static const int seeda_version_ = 533;
+	static const int seeda_version_ = 534;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef device::PORT<device::PORTE, device::bitpos::B3> LED;
@@ -50,11 +53,14 @@ namespace seeda {
 
 	// Soft SDC 用　SPI 定義（SPI）
 #ifdef SEEDA
+#ifdef RSPI_HW
+	typedef device::rspi_io<device::RSPI, device::port_map::option::SECOND> SPI;
+#else
 	typedef device::PORT<device::PORTD, device::bitpos::B6> MISO;
 	typedef device::PORT<device::PORTD, device::bitpos::B4> MOSI;
 	typedef device::PORT<device::PORTD, device::bitpos::B5> SPCK;
 	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;
-
+#endif
 	typedef device::PORT<device::PORTD, device::bitpos::B3> SDC_SELECT;	///< カード選択信号
 	typedef device::NULL_PORT  SDC_POWER;	///< カード電源制御（常に電源ＯＮ）
 	typedef device::PORT<device::PORTE, device::bitpos::B6> SDC_DETECT;	///< カード検出
