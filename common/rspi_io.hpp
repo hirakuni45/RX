@@ -18,15 +18,13 @@
 #else
 #undef PCLK
 #define PCLK F_PCLKB
-#define PCLK_MAX (F_PCLKB / 4)
 #endif
-#elif defined(SIG_RX64M) || defined(SIG_RX71M)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 #ifndef F_PCLKA
 #  error "rspi_io.hpp requires F_PCLKA to be defined"
 #else
 #undef PCLK
 #define PCLK F_PCLKA
-#define PCLK_MAX (F_PCLKA / 2)
 #endif
 #endif
 
@@ -130,7 +128,17 @@ namespace device {
 			@return 最大速度
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_max_speed() const { return PCLK_MAX; }
+		uint32_t get_max_speed() const {
+			uint32_t clk = PCLK;
+#ifdef SEEDA
+			while(clk > 20000000) {
+#else
+			while(clk > 40000000) {
+#endif
+				clk >>= 1;
+			}
+			return clk;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -221,13 +229,11 @@ namespace device {
 			}
 			power_cfg::turn(RSPI::get_peripheral());
 			port_map::turn(RSPI::get_peripheral(), true, PSEL);
-
 #if 0
 			utils::format("RSPI Request Speed: %u [Hz]\n") % speed;
-//			utils::format("RSPI SPBR: %d\n") % static_cast<uint32_t>(spbr);
-//			utils::format("RSPI BRDV: %d\n") % static_cast<uint32_t>(brdv);
+			utils::format("RSPI SPBR: %d\n") % static_cast<uint32_t>(spbr);
+			utils::format("RSPI BRDV: %d\n") % static_cast<uint32_t>(brdv);
 #endif
-
 		    RSPI::SPBR = spbr;
 
 			// 実際のクロックを表示
