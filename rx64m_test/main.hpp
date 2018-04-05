@@ -41,7 +41,7 @@
 
 namespace seeda {
 
-	static const int seeda_version_ = 534;
+	static const int seeda_version_ = 535;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef device::PORT<device::PORTE, device::bitpos::B3> LED;
@@ -56,9 +56,12 @@ namespace seeda {
 #ifdef RSPI_HW
 	typedef device::rspi_io<device::RSPI, device::port_map::option::SECOND> SPI;
 #else
-	typedef device::PORT<device::PORTD, device::bitpos::B6> MISO;
-	typedef device::PORT<device::PORTD, device::bitpos::B4> MOSI;
-	typedef device::PORT<device::PORTD, device::bitpos::B5> SPCK;
+//	typedef device::PORT<device::PORTD, device::bitpos::B6> MISO;
+//	typedef device::PORT<device::PORTD, device::bitpos::B4> MOSI;
+//	typedef device::PORT<device::PORTD, device::bitpos::B5> SPCK;
+	typedef device::PORT<device::PORTA, device::bitpos::B7> MISO;
+	typedef device::PORT<device::PORTA, device::bitpos::B6> MOSI;
+	typedef device::PORT<device::PORTA, device::bitpos::B5> SPCK;
 	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;
 #endif
 	typedef device::PORT<device::PORTD, device::bitpos::B3> SDC_SELECT;	///< カード選択信号
