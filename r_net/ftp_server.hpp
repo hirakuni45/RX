@@ -194,6 +194,8 @@ namespace net {
 
 		bool		pasv_enable_;
 
+		uint32_t	login_loop_;
+
 		static void disp_time_(time_t t)
 		{
 			struct tm *m = localtime(&t);
@@ -919,7 +921,8 @@ namespace net {
 			file_fp_(nullptr), file_total_(0), file_frame_(0), file_wait_(0),
 			rw_limit_(RWBSZ),
 			elapsed_time_(0),
-			pasv_enable_(false)
+			pasv_enable_(false),
+			login_loop_(0)
 			{ }
 
 
@@ -995,11 +998,17 @@ namespace net {
 					ctrl_format("\n");
 					ctrl_flush();
 					line_man_.clear();
+					login_loop_ = t;
 					task_ = task::user_identity;
 				}
 				break;
 
 			case task::user_identity:
+				if((login_loop_ + login_timeout_) <= static_cast<uint32_t>(get_time())) {
+					debug_format("FTP Server Identity Timeout: %d\n") % login_timeout_;
+					ctrl_format("221 user identity timeout\n") % param_;
+					task_ = task::disconnect;
+				}
 				if(!service_line_()) break;
 				if(!line_man_.empty()) {
 					ftp_command cmd = scan_command_(line_man_[0]);
