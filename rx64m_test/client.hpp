@@ -95,7 +95,7 @@ namespace seeda {
 #endif
 			port_(PORT),
 			delay_(0), timeout_(0), re_connect_cnt_(0),
-			time_org_(0), time_ref_(0), time_ofs_(0), time_(0), idle_count_(0), enable_(true) { }
+			time_org_(0), time_ref_(0), time_ofs_(0), time_(0), idle_count_(0), enable_(false) { }
 
 
 		//-----------------------------------------------------------------//

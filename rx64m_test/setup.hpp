@@ -56,7 +56,7 @@ namespace seeda {
 			uint8_t		mask_[4];
 
 			ip_t() :
-				dhcp_(true),
+				dhcp_(false),
 				ip_{ 192, 168, 3, 20 },
 				gw_{ 192, 168, 3, 1 },
 				mask_{ 255, 255, 255, 0 }
