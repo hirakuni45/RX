@@ -4,7 +4,7 @@
 			通常は libc.a にアーカイブされているモジュールを @n
 			置き換える。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2015, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2015, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -42,6 +42,9 @@ unsigned long millis(void) { return 0; }
 #ifdef FAT_FS
 #include "ff12b/src/diskio.h"
 #include "ff12b/src/ff.h"
+
+int fatfs_get_mount(void) __attribute__((weak));
+int fatfs_get_mount(void) { return 1; }
 
 // stdin, stdout, stderr のオフセット
 #define STD_OFS_ (3)
@@ -101,10 +104,14 @@ int open(const char *path, int flags, ...)
 
 	int file = -1;
 #ifdef FAT_FS
-//	if(g_sd_init_enable == 0 || g_sd_mount_enable == 0) {
-//		errno = EACCES;
-//		return -1;
-//	}
+	if(fatfs_get_mount() == 0) {
+#ifdef SYSCALLS_DEBUG
+		sprintf(debug_tmp_, "syscalls: open mount(%d)\n", fatfs_get_mount());
+		sci_puts(debug_tmp_);
+#endif
+		errno = EFAULT;
+		return -1;
+	}
 
 	for(int i = 3; i < OPEN_MAX_; ++i) {
 		if(fd_pads_[i] == 0) {
@@ -198,9 +205,9 @@ int read(int file, void *ptr, int len)
 	}
 #ifdef FAT_FS
 	else if(file < OPEN_MAX_) {
-		UINT rl;
-		FRESULT res;
-		if(fd_pads_[file] != 0) {
+		if(fatfs_get_mount() != 0 && fd_pads_[file] != 0) {
+			UINT rl;
+			FRESULT res;
 #ifdef SYSCALLS_READ_DEBUG
 			sprintf(debug_tmp_, "syscalls: read(%d): request: %d at %08X\n", file, len, (int)ptr);
 			sci_puts(debug_tmp_);
@@ -208,14 +215,14 @@ int read(int file, void *ptr, int len)
 			res = f_read(&file_obj_[file - STD_OFS_], ptr, len, &rl);
 			if(res == FR_OK) {
 #ifdef SYSCALLS_READ_DEBUG
-				sprintf(debug_tmp_, "syscalls: read(%d): %d->%d\n", file, len, rl);
+				sprintf(debug_tmp_, "syscalls: read(%d): bytes: %d->%d\n", file, len, rl);
 				sci_puts(debug_tmp_);
 #endif
 				errno = 0;
 				l = (int)rl;
 			} else {
 #ifdef SYSCALLS_DEBUG
-				sprintf(debug_tmp_, "(%d)read error: %x\n", file, (int)res);
+				sprintf(debug_tmp_, "syscalls: read(%d) error: %x\n", file, (int)res);
 				sci_puts(debug_tmp_);
 #endif
 				errno = EIO;
@@ -259,7 +266,7 @@ int write(int file, const void *ptr, int len)
 	}
 #ifdef FAT_FS
 	else if(file < OPEN_MAX_) {
-		if(fd_pads_[file] != 0) {
+		if(fatfs_get_mount() != 0 && fd_pads_[file] != 0) {
 			UINT rl;
 			FRESULT res = f_write(&file_obj_[file - STD_OFS_], ptr, len, &rl);
 			if(res == FR_OK) {
@@ -304,11 +311,10 @@ int lseek(int file, int offset, int dir)
 	}
 #ifdef FAT_FS
 	else if(file < OPEN_MAX_) {
-		FRESULT res;
-		DWORD ofs;
-		FIL *fp;
-
-		if(fd_pads_[file] != 0) {
+		if(fatfs_get_mount() != 0 && fd_pads_[file] != 0) {
+			FRESULT res;
+			DWORD ofs;
+			FIL *fp;
 			fp = &file_obj_[file - STD_OFS_];
 			if(dir == SEEK_SET) {
 				ofs = (DWORD)offset;
@@ -358,7 +364,10 @@ int lseek(int file, int offset, int dir)
 int link(const char *oldpath, const char *newpath)
 {
 #ifdef FAT_FS
-
+	if(fatfs_get_mount() == 0) {
+		errno = EIO;
+		return -1;
+	}
 #if _USE_LFN != 0
 	char oldtmp[_MAX_LFN + 1];
 	utf8_to_sjis(oldpath, oldtmp, sizeof(oldtmp));
@@ -374,12 +383,14 @@ int link(const char *oldpath, const char *newpath)
 		return 0;
 	} else {
 #ifdef SYSCALLS_DEBUG
-		sprintf(debug_tmp_, "('%s' -> '%s')link error: %x\n", oldpath, newpath, (int)res);
+		sprintf(debug_tmp_, "syscalls: '%s' -> '%s' link error: %x\n", oldpath, newpath, (int)res);
 		sci_puts(debug_tmp_);
 #endif
+		errno = EIO;
 		return -1;
 	}
 #else
+	errno = EIO;
 	return -1;
 #endif
 }
@@ -395,6 +406,10 @@ int link(const char *oldpath, const char *newpath)
 int unlink(const char *path)
 {
 #ifdef FAT_FS
+	if(fatfs_get_mount() == 0) {
+		errno = EIO;
+		return -1;
+	}
 #if _USE_LFN != 0
 	char tmp[_MAX_LFN + 1];
 	utf8_to_sjis(path, tmp, sizeof(tmp));
@@ -431,7 +446,6 @@ int fstat(int file, struct stat *st)
 		errno = 0;
 		ret = 0;
 	}
-
 
 #if 0
 	FILINFO finf;
@@ -519,7 +533,7 @@ int close(int file)
 	if(file >= 0 && file <= 2) {
 		errno = EBADF;
 		return -1;
-	} else if(file < OPEN_MAX_) {
+	} else if(fatfs_get_mount() != 0 && file < OPEN_MAX_) {
 		fd_pads_[file] = 0;
 
 		res = f_close(&file_obj_[file - STD_OFS_]);
