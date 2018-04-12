@@ -69,7 +69,7 @@ namespace seeda {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		write_file() : count_(0), path_{ "00000" },
+		write_file() : count_(0), path_{ "/00000" },
 			enable_(false), state_(false), req_close_(false),
 			fp_(nullptr),
 			ch_loop_(0),
