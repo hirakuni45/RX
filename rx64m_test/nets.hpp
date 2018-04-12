@@ -351,7 +351,7 @@ namespace seeda {
 		}
 
 
-		void set_write_()
+		bool set_write_()
 		{
 			if(!write_file_.get_enable()) {
 ///				typedef utils::parse_cgi_post<256, 2> CGI_IP;
@@ -364,9 +364,12 @@ namespace seeda {
 					if(t.key == nullptr || t.val == nullptr) {
 
 					} else if(strcmp(t.key, "fname") == 0) {
-						if(std::strlen(t.val) > 0) {
+						auto len = std::strlen(t.val);
+						if(len > 0 && len < preference::WRITE_FILE_MAX_PATH) {
 							write_file_.set_path(t.val);
 							err = false;
+						} else {
+							debug_format("Write file path length error: '%s'\n") % t.val;
 						}
 ///					} else if(strcmp(t.key, "count") == 0) {
 ///						int n = 0;
@@ -378,7 +381,7 @@ namespace seeda {
 ///						}
 					}
 					if(err) {
-						return;
+						return false;
 					}
 				}
 				write_file_.enable();
@@ -386,6 +389,7 @@ namespace seeda {
 				write_file_.enable(false);
 			}
 			write_pre_();
+			return true;
 		}
 
 
@@ -637,8 +641,13 @@ namespace seeda {
 				net_tools::render_date_time();
 				http_.tag_hr(600, 3);
 				http_format("<table>");
+				uint32_t ofs = 0;
+				if(at_logs().size() > 0) {
+					ofs = at_logs().current();
+				}
 				for(uint32_t i = 0; i < at_logs().size(); ++i) {
-					const auto& l = at_logs().get(i);
+					uint32_t n = (i + ofs) % at_logs().size();
+					const auto& l = at_logs().get(n);
 					char tmp[64];
 					disp_time(l.time_, tmp, sizeof(tmp));
 					http_format("<tr><td>%s: </td>") % tmp;
@@ -672,8 +681,11 @@ namespace seeda {
 			} );
 
 			http_.set_cgi("/cgi/set_write.cgi", "SetWrite", [=](void) {
-				set_write_();
-				http_.exec_link("/setup");
+				if(set_write_()) {
+					http_.exec_link("/setup");
+				} else {
+					http_.exec_link("/error");
+				}
 			} );
 
 			http_.set_cgi("/cgi/set_ip.cgi", "SetIP", [=](void) {
@@ -693,6 +705,10 @@ namespace seeda {
 
 			http_.set_link("/system", "SystemSetup", [=](void) {
 				setup_.render_system();
+			} );
+
+			http_.set_link("/error", "SystemError", [=](void) {
+				setup_.render_system_error();
 			} );
 
 			// FTP Server

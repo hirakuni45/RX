@@ -57,6 +57,15 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  キャパシティを返す
+			@return キャパシティ
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t capacity() const { return LOG_NUM; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ログの消去
 		*/
 		//-----------------------------------------------------------------//
@@ -87,17 +96,47 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  カレント位置を返す
+			@return カレント位置
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t current() const
+		{
+			uint32_t pos;
+			at_sram().get32(LOG_POS, pos);
+			return pos;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  文書を追加
 			@param[in]	t	時間
 			@param[in]	msg	ログ文書
+			@param[in]	ftc	２０秒以内のログ追加を抑制する場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void add(time_t t, const char* msg)
+		void add(time_t t, const char* msg, bool ftc = false)
 		{
 			if(msg == nullptr) return;
 
 			uint32_t pos;
 			at_sram().get32(LOG_POS, pos);
+
+			if(ftc && size() >= 7) {  // 7 個以上の記録がある場合
+				// 一つ手前のログから２０秒以内の場合
+				uint32_t np = (pos + LOG_NUM - 1) % LOG_NUM;
+				log_t tmp = get(np);
+				if(t < (tmp.time_ + 20)) {
+					tmp.time_ = t;
+					if(strlen(tmp.msg_) <= 2) {
+						// strcat(tmp.msg_, "+");
+					}
+					at_sram().copy(&tmp, sizeof(log_t), LOG_T + sizeof(log_t) * np);
+					return;
+				}
+			}
+
 			log_t tmp;
 			tmp.time_ = t;
 			strncpy(tmp.msg_, msg, sizeof(log_t::msg_));
