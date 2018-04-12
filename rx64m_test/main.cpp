@@ -11,7 +11,7 @@
 #include "nets.hpp"
 
 // EADC を強制的に無効にする場合
-// #define DISABLE_EADC
+#define DISABLE_EADC
 
 namespace {
 
@@ -708,6 +708,18 @@ extern "C" {
 	//-----------------------------------------------------------------//
 	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
 		return sdc_.at_mmc().disk_ioctl(drv, ctrl, buff);
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  FatFS のマウント状態を返す @n
+				syscalls で参照される。
+		@return マウントされていれば０以外の正の値
+	*/
+	//-----------------------------------------------------------------//
+	int fatfs_get_mount(void) {
+		return sdc_.get_mount() ? 1 : 0;
 	}
 
 
