@@ -1,7 +1,7 @@
 //=====================================================================//
 /*! @file
     @brief  SEEDA03 (RX64M) メイン
-	@copyright Copyright 2017 Kunihito Hiramatsu All Right Reserved.
+	@copyright Copyright 2017, 2018 Kunihito Hiramatsu All Right Reserved.
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
