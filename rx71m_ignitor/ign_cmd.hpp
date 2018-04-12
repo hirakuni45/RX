@@ -250,6 +250,12 @@ utils::format("Wait For THREG first Trigger\n");
 			task_(task::idle) { }
 
 
+		void start_treg()
+		{
+			task_ = task::treg_wait1;
+		}
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  サービス
