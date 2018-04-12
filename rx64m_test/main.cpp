@@ -11,7 +11,7 @@
 #include "nets.hpp"
 
 // EADC を強制的に無効にする場合
-#define DISABLE_EADC
+// #define DISABLE_EADC
 
 namespace {
 
