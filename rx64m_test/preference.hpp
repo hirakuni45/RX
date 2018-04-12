@@ -2,7 +2,7 @@
 //=====================================================================//
 /*! @file
     @brief  プリファレンス・クラス
-	@copyright Copyright 2017 Kunihito Hiramatsu All Right Reserved.
+	@copyright Copyright 2017, 2018 Kunihito Hiramatsu All Right Reserved.
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -28,6 +28,9 @@ namespace seeda {
 		typedef device::flash_io FLASH_IO;
 
 	public:
+
+	static const uint32_t WRITE_FILE_MAX_PATH = 32;
+
 #ifndef PREFER_SD
 		struct seeda_h {
 			uint32_t	index_;
@@ -52,7 +55,7 @@ namespace seeda {
 			uint8_t		client_ip_[4];
 			uint16_t	client_port_;
 
-			char		write_path_[16];
+			char		dummy2[16];  // write path for 16 bytes
 			uint8_t		write_enable_;	// write_limit_ を廃止
 			uint8_t		dummy[3];
 
@@ -60,6 +63,10 @@ namespace seeda {
 
 			uint8_t		watchdog_enable_;
 			uint16_t	watchdog_time_;
+
+			char		write_path_[WRITE_FILE_MAX_PATH];
+
+			char		dummy3[64];
 
 			seeda_t() :
 #ifndef PREFER_SD
@@ -76,11 +83,15 @@ namespace seeda {
 				client_ip_{ 192, 168, 3, 7 },
 #endif
 				client_port_(3000),
-				write_path_{ "/00000" }, write_enable_(0),
+				dummy2{ 0 }, write_enable_(0), dummy{ 0 },
 
 				client_enable_(1),
 				watchdog_enable_(0),
-				watchdog_time_(5)
+				watchdog_time_(5),
+
+				write_path_{ "/00000" },
+
+				dummy3{ 0 }
 			{ }
 
 			void dump() const
@@ -186,7 +197,6 @@ namespace seeda {
 			auto pos = scan_new_file_(h);
 			if(pos >= FLASH_IO::data_flash_size) {
 				debug_format("Flash (preference) read: can't find\n");
-
 				return false;
 			}
 			debug_format("Flash (preference) read: %06X\n") % pos;
