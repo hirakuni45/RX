@@ -530,7 +530,7 @@ namespace seeda {
 
 	bool set_ip_(const char* str, uint8_t* out)
 	{
-		int a[4];
+		int a[4] = { 0 };
 		if((utils::input("%d.%d.%d.%d", str) % a[0] % a[1] % a[2] % a[3]).status()) {
 //			utils::format("IP: %d.%d.%d.%d\n") % a[0] % a[1] % a[2] % a[3];						
 			if(a[0] >= 0 && a[0] <= 255) {
