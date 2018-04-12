@@ -866,6 +866,7 @@ namespace net {
 			}
 			str_ += ch;
 			if(str_.size() >= str_.capacity()) {
+				
 				flush();
 			}
 		}
