@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	SD カード・アクセス制御 @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2015, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2015, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -43,6 +43,10 @@ namespace utils {
 		typedef void (*dir_loop_func)(const char* name, const FILINFO* fi, bool dir, void* option);
 
 	private:
+
+		static const uint8_t MOUNT_RETRY_LIMIT = 3;   ///< 再マウントの最大回数
+		static const uint8_t MOUNT_RETRY_DELAY = 60;  ///< 再マウントの遅延時間（単位：フレーム）
+
 		FATFS	fatfs_;  ///< FatFS コンテキスト
 
 		SPI&	spi_;
@@ -57,6 +61,7 @@ namespace utils {
 		uint32_t	dir_list_limit_;
 
 		char	current_[_MAX_LFN + 1];
+
 
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option) {
 			if(fi == nullptr) return;
@@ -325,6 +330,8 @@ namespace utils {
 		bool			dir_todir_;
 		void* 			dir_option_;
 
+		uint8_t			mount_retry_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -336,7 +343,9 @@ namespace utils {
 		sdc_io(SPI& spi, uint32_t limitc) : spi_(spi), mmc_(spi_, limitc),
 			mount_delay_(0), select_wait_(0), cd_(false), mount_(false),
 			dir_list_limit_(10),
-			dir_func_(nullptr), dir_todir_(false), dir_option_(nullptr) { }
+			dir_func_(nullptr), dir_todir_(false), dir_option_(nullptr),
+			mount_retry_(MOUNT_RETRY_LIMIT)
+			{ }
 
 
 		//-----------------------------------------------------------------//
@@ -767,22 +776,21 @@ namespace utils {
 			}
 			if(!cd_ && select_wait_ >= 10) {
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
-				if(POWER::BIT_POS < 32) {
+				if(POWER::BIT_POS < 32) {  // 電源制御を行なう場合
 					POWER::P = 0;
 				}
 				SELECT::P = 1;
-///				format("Card ditect\n");
 			} else if(cd_ && select_wait_ == 0) {  // unmount
 				f_mount(&fatfs_, "", 0);
 				spi_.destroy();
-				if(POWER::BIT_POS < 32) {
+				if(POWER::BIT_POS < 32) {  // 電源制御を行なう場合
 					POWER::P = 1;
 					SELECT::P = 0;
-				} else {
+				} else {  // 電源制御を行わない場合
 					SELECT::P = 1;
 				}
 				mount_ = false;
-///				format("Card unditect\n");
+				mount_retry_ = MOUNT_RETRY_LIMIT;
 			}
 			if(select_wait_ >= 10) cd_ = true;
 			else cd_ = false;
@@ -801,7 +809,13 @@ namespace utils {
 							SELECT::P = 1;
 						}
 						mount_ = false;
+						if(mount_retry_ > 0) {
+							format("Retry mount: %d\n") % static_cast<uint32_t>(mount_retry_);
+							--mount_retry_;
+							mount_delay_ = MOUNT_RETRY_DELAY;
+						}
 					} else {
+						mount_retry_ = MOUNT_RETRY_LIMIT;
 						strcpy(current_, "/");
 						mount_ = true;
 					}
