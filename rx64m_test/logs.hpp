@@ -83,13 +83,13 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 //		uint32_t size() const { return size_; }
-		uint32_t size() {
+		uint32_t size() const {
 			uint32_t sz;
 			at_sram().get32(LOG_SIZE, sz);
-			if(sz > LOG_NUM) {
-				clear();
-				sz = 0;
-			}
+//			if(sz > LOG_NUM) {
+//				clear();
+//				sz = 0;
+//			}
 			return sz;
 		}
 
@@ -110,32 +110,77 @@ namespace seeda {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  キー検索
+			@param[in]	key		キー
+			@return あれば「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool find(const char* key)
+		{
+			for(uint32_t i = 0; i < size(); ++i) {
+				const log_t& log = get(i);
+				if(strcmp(key, log.msg_) == 0) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  時間スパンのキー数を取得
+			@param[in]	t		時間
+			@param[in]	key		キー
+			@return キー数
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t find(time_t t, const char* key)
+		{
+			// 最も最新のキーを検査
+			time_t rt = 0;
+			uint32_t idx = size();
+			for(uint32_t i = 0; i < size(); ++i) {
+				const log_t& log = get(i);
+				if(strcmp(key, log.msg_) == 0) {
+					if(rt < log.time_) {
+						rt = log.time_;
+						idx = i;
+					}
+				}
+			}
+
+			if(idx >= size()) {
+				return 0;
+			}
+
+			uint32_t cnt = 0;
+			for(uint32_t i = 0; i < size(); ++i) {
+				const log_t& log = get(i);
+				if(strcmp(key, log.msg_) == 0) {
+					if(rt <= (log.time_ + t)) {
+						++cnt;
+					}
+				}
+			}
+
+			return cnt;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  文書を追加
 			@param[in]	t	時間
 			@param[in]	msg	ログ文書
-			@param[in]	ftc	２０秒以内のログ追加を抑制する場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void add(time_t t, const char* msg, bool ftc = false)
+		void add(time_t t, const char* msg)
 		{
 			if(msg == nullptr) return;
 
 			uint32_t pos;
 			at_sram().get32(LOG_POS, pos);
-
-			if(ftc && size() >= 7) {  // 7 個以上の記録がある場合
-				// 一つ手前のログから２０秒以内の場合
-				uint32_t np = (pos + LOG_NUM - 1) % LOG_NUM;
-				log_t tmp = get(np);
-				if(t < (tmp.time_ + 20)) {
-					tmp.time_ = t;
-					if(strlen(tmp.msg_) <= 2) {
-						// strcat(tmp.msg_, "+");
-					}
-					at_sram().copy(&tmp, sizeof(log_t), LOG_T + sizeof(log_t) * np);
-					return;
-				}
-			}
 
 			log_t tmp;
 			tmp.time_ = t;
