@@ -22,6 +22,8 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class write_file {
 
+		static const uint8_t OPEN_RETRY_LIMIT = 3;
+
 #ifdef WRITE_FILE_DEBUG
 		typedef utils::format debug_format;
 #else
@@ -45,6 +47,7 @@ namespace seeda {
 			wait_request,
 			make_filename,
 			make_dir_path,
+			open_retry_wait,
 			open_file,
 			write_header,
 			make_data,
@@ -63,6 +66,9 @@ namespace seeda {
 		char		data_[512];
 		uint32_t	data_len_;
 
+		uint8_t		open_retry_;
+		uint8_t		open_retry_delay_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -73,7 +79,9 @@ namespace seeda {
 			enable_(false), state_(false), req_close_(false),
 			fp_(nullptr),
 			ch_loop_(0),
-			task_(task::wait_request), last_channel_(false), second_(0) { }
+			task_(task::wait_request), last_channel_(false), second_(0),
+			open_retry_(OPEN_RETRY_LIMIT), open_retry_delay_(0)
+			{ }
 
 
 		//-----------------------------------------------------------------//
@@ -195,21 +203,36 @@ namespace seeda {
 				task_ = task::open_file;
 				break;
 
+			case task::open_retry_wait:
+				if(open_retry_delay_ > 0) {
+					--open_retry_delay_;
+				} else {
+					task_ = task::open_file;
+				}
+				break;
+
 			case task::open_file:
 				fp_ = fopen(filename_, "wb");
 				if(fp_ == nullptr) {  // error then disable write.
 					char tmp[64];
 					utils::sformat("File open error: '%s'", tmp, sizeof(tmp)) % filename_;
-					at_logs().add(get_time(), "WOP");
 					debug_format("%s\n") % tmp;
-
-					set_restart_delay(60 * 1);
-
-					enable_ = false;
-					task_ = task::wait_request;
+					if(open_retry_ > 0) {
+						--open_retry_;
+						open_retry_delay_ = 60;
+						debug_format("Write Open Retry: %d\n")
+							% static_cast<uint32_t>(open_retry_);
+						task_ = task::open_retry_wait;
+					} else {
+						at_logs().add(get_time(), "WOP");
+						set_restart_delay(60 * 1);
+						enable_ = false;
+						task_ = task::wait_request;
+					}
 				} else {
 ///					at_logs().add(get_time(), "WOP");  // for log test
 					debug_format("Start write file: '%s'\n") % filename_;
+					open_retry_ = OPEN_RETRY_LIMIT;
 					task_ = task::write_header;
 				}
 				break;
@@ -224,15 +247,22 @@ namespace seeda {
 					utils::sformat("\n", data, sizeof(data), true);
 
 					uint32_t sz = utils::sformat::chaout().size();
-					if(fwrite(data, 1, sz, fp_) != sz) {
+					uint32_t tl = 0;
+					uint32_t loop = 0;
+					while(tl < sz && loop < 10) {
+						tl += fwrite(&data[tl], 1, sz - tl, fp_);
+						if(loop > 0) {
+							debug_format("Write data retry: %d/%d in header\n") % tl % sz;
+						}
+						++loop;
+					}
+					if(sz != tl) {
 						char tmp[64];
 						utils::sformat("File write error (header): '%s'", tmp, sizeof(tmp))
 							% filename_;
 						at_logs().add(get_time(), "WR");
 						debug_format("%s\n") % tmp;
-
 						set_restart_delay(60 * 1);
- 
 						enable_ = false;
 						task_ = task::wait_request;
 						break;
@@ -275,15 +305,22 @@ namespace seeda {
 
 			case task::write_body:
 				if(get_wf_fifo().length() > 0) {
-					if(fwrite(data_, 1, data_len_, fp_) != data_len_) {
+					uint32_t tl = 0;
+					uint32_t loop = 0;
+					while(tl < data_len_ && loop < 10) {
+						tl += fwrite(&data_[tl], 1, data_len_ - tl, fp_);
+						if(loop > 0) {
+							debug_format("Write data retry: %d/%d in body\n") % tl % data_len_;
+						}
+						++loop;
+					}
+					if(tl != data_len_) {
 						char tmp[64];
 						utils::sformat("File write error (body): '%s'", tmp, sizeof(tmp))
 							% filename_;
 						at_logs().add(get_time(), "WR");
 						debug_format("%s\n") % tmp;
-
 						set_restart_delay(60 * 1); 
-
 						enable_ = false;
 						task_ = task::wait_request;
 						break;
