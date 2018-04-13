@@ -516,7 +516,7 @@ namespace seeda {
 					err = true;
 				}
 			}
-			if(!err && delay > 1) {
+			if(!err && delay >= 1) {
 				utils::format("Restart: %d after, key: %s\n") % delay % setup_.get_restart_key();
 				set_restart_delay(delay * 100);
 			}

@@ -200,7 +200,7 @@ namespace seeda {
 				at_sram().put32(RES_COUNT_, cnt);
 			}
 			
-			at_logs().add(get_time(), "UN", true);  // リセット記録
+			at_logs().add(get_time(), "UN");  // リセット記録
 		}
 
 
@@ -501,8 +501,8 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 
 			if(0) {  // 内臓 A/D 表示
 				float v = static_cast<float>(get_adc(5)) / 4095.0f * 3.3f;
-				http_format("バッテリー電圧： %4.2f [V]<br>\n") % v;
-				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
+				http_format("バッテリー電圧： %4.2f [V]<br>") % v;
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">");
 			}
 
 			// RTC 設定
@@ -623,7 +623,10 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 			auto mount = at_sdc().get_mount();
 
 			// ファイル書き込み設定
-			{
+			if(at_logs().find("*")) {
+				http_format("システム障害（自動リセット・リミット）<br>");
+				http_format("<hr align=\"left\" width=\"750\" size=\"3\">");
+			} else {
 				http_format("<form method=\"POST\" action=\"/cgi/set_write.cgi\">\n");
 				http_format("<table><tr><td>ファイル名(ベース)：</td>");
 				if(!write_file_.get_enable()) {
