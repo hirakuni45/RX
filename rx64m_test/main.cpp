@@ -581,6 +581,13 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	void set_restart_delay(uint32_t rest)
 	{
+		auto n = logs_.find(120, "UN");
+		utils::format("UN count at 120 sec: %d\n") % n;
+		if(n >= 7) {
+			logs_.add(get_time(), "*");
+			at_pre().at().write_enable_ = false;
+			at_pre().write();
+		}
 		restart_delay_ = rest;
 	}
 }
