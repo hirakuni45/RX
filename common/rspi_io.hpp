@@ -131,8 +131,8 @@ namespace device {
 		uint32_t get_max_speed() const {
 			uint32_t clk = PCLK;
 #ifdef SEEDA
-//			while(clk > 20000000) {
-			while(clk > 10000000) {
+			while(clk > 20000000) {  // 15MHz
+//			while(clk > 10000000) {  // 7MHz
 #else
 			while(clk > 40000000) {
 #endif
