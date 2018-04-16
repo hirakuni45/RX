@@ -69,6 +69,16 @@ namespace seeda {
 		uint8_t		open_retry_;
 		uint8_t		open_retry_delay_;
 
+
+		void cancel_write_()
+		{
+			enable_ = false;
+			task_ = task::wait_request;
+//			logs_.add(get_time(), "*");
+			at_pre().at().write_enable_ = false;
+			at_pre().write();
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -212,6 +222,11 @@ namespace seeda {
 				break;
 
 			case task::open_file:
+				if(!at_sdc().get_mount()) {
+					debug_format("Write open: 'unmounted'\n");
+					cancel_write_();
+					break;					
+				}
 				fp_ = fopen(filename_, "wb");
 				if(fp_ == nullptr) {  // error then disable write.
 					char tmp[64];
@@ -239,6 +254,11 @@ namespace seeda {
 
 			case task::write_header:
 				{
+					if(!at_sdc().get_mount()) {
+						debug_format("Write data header: 'unmounted'\n");
+						cancel_write_();
+						break;
+					}
 					char data[1024];
 					utils::sformat("DATE,TIME", data, sizeof(data));
 					for(uint32_t i = 0; i < get_channel_num(); ++i) {
@@ -249,12 +269,13 @@ namespace seeda {
 					uint32_t sz = utils::sformat::chaout().size();
 					uint32_t tl = 0;
 					uint32_t loop = 0;
-					while(tl < sz && loop < 10) {
+					while(tl < sz) {
 						tl += fwrite(&data[tl], 1, sz - tl, fp_);
 						if(loop > 0) {
 							debug_format("Write data retry: %d/%d in header\n") % tl % sz;
 						}
 						++loop;
+						if(loop >= 10) break;
 					}
 					if(sz != tl) {
 						char tmp[64];
@@ -305,14 +326,20 @@ namespace seeda {
 
 			case task::write_body:
 				if(get_wf_fifo().length() > 0) {
+					if(!at_sdc().get_mount()) {
+						debug_format("Write data body: 'unmounted'\n");
+						cancel_write_();
+						break;
+					}
 					uint32_t tl = 0;
 					uint32_t loop = 0;
-					while(tl < data_len_ && loop < 10) {
+					while(tl < data_len_) {
 						tl += fwrite(&data_[tl], 1, data_len_ - tl, fp_);
 						if(loop > 0) {
 							debug_format("Write data retry: %d/%d in body\n") % tl % data_len_;
 						}
 						++loop;
+						if(loop >= 10) break;
 					}
 					if(tl != data_len_) {
 						char tmp[64];
