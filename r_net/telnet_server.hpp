@@ -225,7 +225,8 @@ namespace net {
 
 			case task::wait:
 				if(telnet_.connected()) {
-					debug_format("TELNET Server: New connected, from: %s\n") % telnet_.get_from_ip().c_str();
+					debug_format("TELNET Server: New connected, from: %s\n")
+						% telnet_.get_from_ip().c_str();
 					++count_;
 					task_ = task::main_loop;
 				}
