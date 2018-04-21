@@ -63,7 +63,7 @@ namespace device {
 
 		static INTERRUPT_FUNC void send_task_()
 		{
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			if(send_.length() > 0) {
 				SCI::TDR = send_.get();
 			}
@@ -90,7 +90,7 @@ namespace device {
 		}
 
 		void set_intr_() {
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
 #else
 			set_vector_(SCI::get_rx_vec(), SCI::get_te_vec());
@@ -271,7 +271,7 @@ brr = 1;
 					while(send_.length() != 0) sleep_();
 				}
 				send_.put(ch);
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 				SCI::SCR.TIE = 0;
 				if(send_stall_) {
 					while(SCI::SSR.TEND() == 0) sleep_();
@@ -306,7 +306,7 @@ brr = 1;
 				if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
 					SCI::SSR.ORER = 0;	///< 受信オーバランエラークリア
 				}
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX24T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX24T) || defined(SIG_RX65N)
 				auto n = SCI::SSR.RDRF();
 #else
 				uint32_t n = 0;
