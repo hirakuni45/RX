@@ -51,6 +51,7 @@ namespace device {
 		}
 
 
+#if 0
 		void set_hsync_(glcdc_tcon_pin_t tcon, glcdc_timing_t const * const p_timing, glcdc_signal_polarity_t polarity)
 		{
 #if 0
@@ -89,7 +90,7 @@ namespace device {
     GLCDC.TCONSTHA1.BIT.HW = p_timing->sync_width & TCON_STHx1_HW_MASK;
 #endif
 		}
-
+#endif
 
 		void set_sync_signal_(const cfg_t& t)
 		{
