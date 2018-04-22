@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  RX56N ファースト・サンプル
+    @brief  RTK5RX65N ファースト・サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
