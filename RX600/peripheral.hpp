@@ -85,6 +85,8 @@ namespace device {
 #ifdef SIG_RX71M
 		RSPI2,		///< シリアルペリフェラルインタフェース（RSPIb）
 #endif
+		QSPI,		///< クワッドシリアルペリフェラルインタフェース（QSPI）
+
 		SSI0,		///< シリアルサウンドインタフェース（SSI）
 		SSI1,		///< シリアルサウンドインタフェース（SSI）
 
