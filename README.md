@@ -8,18 +8,22 @@ Renesas RX マイコン
    
  現在は、Windows、OS-X、Linux で動作確認が済んだ、専用書き込みプログラムも実装してあり、   
  複数の環境で、開発が出来るようになっています。   
- ※現在サポートされ、動作確認済みデバイスは RX63T、RX24T、RX64M となっており、デバイス   
-   クラスを日々拡張しています。   
+ ※現在サポートされ、動作確認済みデバイスは RX63T、RX24T、RX64M、RX65N となっており、   
+ デバイスクラスを日々拡張しています。   
+ ※ディレクトリー構成など日々アップデートしており、乖離も発生するので注意下さい。
+ ※不明な点などあったら気軽にメールか、BBS にて質問を下さい。   
    
- プロジェクトは、Makefile、及び、関連ヘッダー、ソースコードからなり、専用のスタートアップルーチン、   
- リンカースクリプトで構成されています。   
+ プロジェクトは、Makefile、及び、関連ヘッダー、ソースコードからなり、専用のスタートアップ   
+ ルーチン、リンカースクリプトで構成されています。   
    
- 通常「make」コマンド一発で、従属規則生成から、コンパイル、リンクまで完了する為、IDE を必要としません。  
- その為、専用のブートプログラムやローダーは必要なく、作成したバイナリーをそのまま ROM へ書いて実行   
- できます。   
+ 通常「make」コマンド一発で、従属規則生成から、コンパイル、リンクまで完了する為、IDE を   
+ 必要としません。  
+ その為、専用のブートプログラムやローダーは必要なく、作成したバイナリーをそのまま ROM へ   
+ 書いて実行できます。   
    
  デバイスＩ／Ｏ操作では、C++ で実装されたテンプレート・クラス・ライブラリーを活用して専用の   
- ヘッダーを用意してあり、ユーティリティー的クラス・ライブラリーの充実も行っています。   
+ ヘッダーを用意してあり、ユーティリティー的クラス・ライブラリーの充実も行っています。
+ ※一部、ルネサス製のライブラリを利用しています。   
    
 ## RX プロジェクト・リスト
  - /RX600              ---> RX マイコン共通デバイス定義クラス
@@ -44,12 +48,14 @@ Renesas RX マイコン
  - /rx64m_SDRAM_sample ---> RX64M を使った SDRAM の制御サンプル（128Mビット×2、32ビットバス）
  - /rx64m_RTC_sample   ---> RX64M を使った 内臓 RTC の動作サンプル
  - /GR-KAEDE           ---> ガジェット・ルネサス製の RX64M 搭載マイコンボード向けサンプル   
-   
+ - /RTK5_first_sample  ---> ルネサス製 RTK5RX65N マイコンボード向け初期サンプル   
+ - /RTK5_LCD_sample    ---> ルネサス製 RTK5RX65N マイコンボード向けＬＣＤサンプル   
+
 ## RX 開発環境準備（Windows、MSYS2）
    
  - Windows では、事前に MSYS2 環境をインストールしておきます。
  - MSYS2 には、msys2、mingw32、mingw64 と３つの異なった環境がありますが、RX マイコン用 gcc    
-   の構築を行う必要があるので、msys2 で行います。 
+   の構築を行う必要があるので、msys2 で行います。
    
  - msys2 のアップグレード
 
@@ -66,7 +72,7 @@ Renesas RX マイコン
  - アップデートは、複数回行われ、その際、コンソールの指示に従う事。
  - ※複数回、コンソールを開きなおす必要がある。
 
- - gcc、texinfo、gmp、mpfr、mpc、diffutils、automake、zlib、tar、make、unzip コマンドなどをインストール
+ - gcc、texinfo、gmp、mpfr、mpc、diffutils、automake、zlib、tar、make、unzip、git コマンドなどをインストール
 ```
    pacman -S gcc
    pacman -S texinfo
@@ -148,7 +154,7 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
  - binutils-2.27.tar.gz をダウンロードしておく
  - ~~gcc-6.2.0.tar.gz~~ gcc-4.9.4.tar.gz をダウンロードしておく
  - ~~newlib-2.4.0.tar.gz~~ newlib-2.2.0.tar.gz をダウンロードしておく
- - gcc-6.2.0 newlib-2.4.0 の組み合わせは、微妙に動作しないバイナリーが出来るようです。
+ - gcc-6.2.0 newlib-2.4.0 の組み合わせは、ネットワーク関係が微妙に動作しないバイナリーが出来るようです。（アライメントが機能していないようです。）
    
 ---
    
@@ -159,7 +165,7 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
    cd binutils-2.27
    mkdir rx_build
    cd rx_build
-   ../configure --target=rx-elf --prefix=/usr/local/rx-elf --disable-nls --with-system-zlib
+   ../configure --target=rx-elf --prefix=/usr/local/rx-elf --disable-nls
    make
    make install     OS-X,Linux: (sudo make install)
 ```
@@ -185,7 +191,7 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
     cd gcc-4.9.4
     mkdir rx_build
 	cd rx_build
-    ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto --with-system-zlib
+    ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto
     make
     make install     OS-X,Linux: (sudo make install)
 ```
@@ -299,7 +305,10 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
 ## Renesus ENVISION KIT-RX65N を使った開発
 ![R5F564ML](RTK5RX65N.jpg)
 
- - 工事中
+ - ルネサスが販売する「RTK5RX65N」は、LCD 付きでありながら低価格で高機能なボードです。   
+ - もちろんラズベリーPiなどとは比較はできませんが、スタンドアロンで動かす事の出来る手頃なマイコンボードだと思えます。
+ - また、このボードには、「E1 Lite エミュレーター」が内臓されており、USB 接続で、簡単にプログラムを書き込む事が出来ます。（Windows 環境で、Renesus Flash Programmer を使って書き込める）   
+ - 初期状態では、SD カード、イーサーネット関係の部品などが抜けていますが、後から自分で取り付ける事が出来ると思います。   
    
 ---
       
