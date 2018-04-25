@@ -235,6 +235,7 @@ namespace seeda {
 					if(open_retry_ > 0) {
 						--open_retry_;
 						open_retry_delay_ = 60;
+						at_logs().add(get_time(), "WOr");
 						debug_format("Write Open Retry: %d\n")
 							% static_cast<uint32_t>(open_retry_);
 						task_ = task::open_retry_wait;
@@ -272,6 +273,7 @@ namespace seeda {
 					while(tl < sz) {
 						tl += fwrite(&data[tl], 1, sz - tl, fp_);
 						if(loop > 0) {
+							at_logs().add(get_time(), "WRr");
 							debug_format("Write data retry: %d/%d in header\n") % tl % sz;
 						}
 						++loop;
@@ -336,6 +338,7 @@ namespace seeda {
 					while(tl < data_len_) {
 						tl += fwrite(&data_[tl], 1, data_len_ - tl, fp_);
 						if(loop > 0) {
+							at_logs().add(get_time(), "WRr");
 							debug_format("Write data retry: %d/%d in body\n") % tl % data_len_;
 						}
 						++loop;
