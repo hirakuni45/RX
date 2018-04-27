@@ -14,6 +14,7 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
+#include <tuple>
 
 namespace device {
 
@@ -421,15 +422,98 @@ namespace device {
 	};
 
 
-#if 0
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  複ポート定義テンプレート
-		@param[in]	PORTx	ポート・クラス
+		@brief  複数ポート定義テンプレート（最大８ビット）
+		@param[in]	Args	ポート・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class... Args>
-	struct PORTS {
+	class PORTS {
+		static constexpr std::size_t pack_size = sizeof...(Args);
+		static std::tuple<Args...> pack_; 
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートの読み出し @n
+					※個別のポート制御なので、遅延が発生する
+			@return 値
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t operator () () {
+			uint32_t bits = 0;
+			if(pack_size > 7) {
+				bits <<= 1;
+				if(std::get<7>(pack_).P()) ++bits;
+			}
+			if(pack_size > 6) {
+				bits <<= 1;
+				if(std::get<6>(pack_).P()) ++bits;
+			}
+			if(pack_size > 5) {
+				bits <<= 1;
+				if(std::get<5>(pack_).P()) ++bits;
+			}
+			if(pack_size > 4) {
+				bits <<= 1;
+				if(std::get<4>(pack_).P()) ++bits;
+			}
+			if(pack_size > 3) {
+				bits <<= 1;
+				if(std::get<3>(pack_).P()) ++bits;
+			}
+			if(pack_size > 2) {
+				bits <<= 1;
+				if(std::get<2>(pack_).P()) ++bits;
+			}
+			if(pack_size > 1) {
+				bits <<= 1;
+				if(std::get<1>(pack_).P()) ++bits;
+			}
+			bits <<= 1;
+			if(std::get<0>(pack_).P()) ++bits;
+
+			return bits;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートへの書き込み @n
+					※個別のポート制御なので、グリッチが発生する
+			@param[in]	bits	値
+		*/
+		//-----------------------------------------------------------------//
+		void operator = (uint32_t bits) {	
+			std::get<0>(pack_).P = bits;
+			if(pack_size > 1) {
+				bits >>= 1;
+				std::get<1>(pack_).P = bits;
+			}
+			if(pack_size > 2) {
+				bits >>= 1;
+				std::get<2>(pack_).P = bits;
+			}
+			if(pack_size > 3) {
+				bits >>= 1;
+				std::get<3>(pack_).P = bits;
+			}
+			if(pack_size > 4) {
+				bits >>= 1;
+				std::get<4>(pack_).P = bits;
+			}
+			if(pack_size > 5) {
+				bits >>= 1;
+				std::get<5>(pack_).P = bits;
+			}
+			if(pack_size > 6) {
+				bits >>= 1;
+				std::get<6>(pack_).P = bits;
+			}
+			if(pack_size > 7) {
+				bits >>= 1;
+				std::get<7>(pack_).P = bits;
+			}
+		}
 	};
-#endif
 }
