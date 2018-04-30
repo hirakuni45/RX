@@ -150,19 +150,30 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 ---
 ## RX 開発環境構築
 
- - RX 用コンパイラ（rx-elf-gcc,g++）は ~~gcc-6.2.0~~ gcc-4.9.4 を使います。
- - binutils-2.27.tar.gz をダウンロードしておく
- - ~~gcc-6.2.0.tar.gz~~ gcc-4.9.4.tar.gz をダウンロードしておく
- - ~~newlib-2.4.0.tar.gz~~ newlib-2.2.0.tar.gz をダウンロードしておく
- - gcc-6.2.0 newlib-2.4.0 の組み合わせは、ネットワーク関係が微妙に動作しないバイナリーが出来るようです。（アライメントが機能していないようです。）
+ - RX 用コンパイラ（rx-elf-gcc,g++）は gcc-6.4.0 を使います。   
+ - binutils-2.28.tar.gz をダウンロードしておく。   
+ - gcc-6.4.0.tar.gz をダウンロードしておく。   
+ - newlib-2.4.0.tar.gz をダウンロードしておく。   
+ - binutils, gcc, newlib には複数のバージョンがありますが、組み合わせによっては   
+   不適格なバイナリー（微妙に動作に問題がある）がビルドされる事が判っています。   
+ - この不具合は、ルネサスのネットワークスタック（net_T4）を使った場合に起こります。   
+ - 現状で調査した組み合わせを列挙しておきます。
+```
+   binutils-2.27, gcc-4.9.4, newlib-2.2.0 ---> OK
+   binutils-2.27, gcc-5.5.0, newlib-2.2.0 ---> OK
+   binutils-2.27, gcc-5.5.0, newlib-2.4.0 ---> OK
+   binutils-2.27, gcc-6.4.0, newlib-2.4.0 ---> OK
+   binutils-2.28, gcc-6.4.0, newlib-2.4.0 ---> OK
+   binutils-2.30, gcc-6.4.0, newlib-3.0.0 ---> NG 
+```
    
 ---
    
-#### binutils-2.27 をビルド
+#### binutils-2.28 をビルド
 ```
    cd
-   tar xfvz binutils-2.27.tar.gz
-   cd binutils-2.27
+   tar xfvz binutils-2.28.tar.gz
+   cd binutils-2.28
    mkdir rx_build
    cd rx_build
    ../configure --target=rx-elf --prefix=/usr/local/rx-elf --disable-nls
@@ -187,8 +198,8 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 #### C コンパイラをビルド
 ```
     cd
-    tar xfvz gcc-4.9.4.tar.gz
-    cd gcc-4.9.4
+    tar xfvz gcc-6.4.0.tar.gz
+    cd gcc-6.4.0
     mkdir rx_build
 	cd rx_build
     ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto
@@ -199,8 +210,8 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 #### newlib をビルド
 ```
     cd
-    tar xfvz newlib-2.2.0.tar.gz
-	cd newlib-2.2.0
+    tar xfvz newlib-2.4.0.tar.gz
+	cd newlib-2.4.0
     mkdir rx_build
     cd rx_build
     ../configure --target=rx-elf --prefix=/usr/local/rx-elf
@@ -226,7 +237,7 @@ make install
 #### C++ コンパイラをビルド
 ```
     cd
-    cd gcc-4.9.4
+    cd gcc-6.4.0
     cd rx_build
     ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c,c++ --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto --with-system-zlib
     make
