@@ -2,7 +2,7 @@
 /*! @file
     @brief  RX71M イグナイター・テスター・コントローラー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -334,6 +334,11 @@ int main(int argc, char** argv)
 {
 #ifdef KAEDE
 	device::PORT3::PCR.B5 = 1; // P35(NMI) pull-up
+
+	// GR-KAEDE の SPI 端子のハードバグ回避
+	// ※PC3 から、PC7 へ １K オームで接続
+	device::PORTC::PDR.B3 = 1; // output
+	device::PORTC::PODR.B3 = 1;
 #endif
 
 	device::system_io<12000000>::setup_system_clock();
@@ -370,6 +375,8 @@ int main(int argc, char** argv)
 		utils::format(", PCLKA: %u [Hz]") % static_cast<uint32_t>(F_PCLKA);
 		utils::format(", PCLKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCLKB);
 	}
+
+
 
 	// SD カード・クラスの初期化
 	sdc_.start();
