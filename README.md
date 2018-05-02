@@ -164,6 +164,7 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
    binutils-2.27, gcc-5.5.0, newlib-2.4.0 ---> OK
    binutils-2.27, gcc-6.4.0, newlib-2.4.0 ---> OK
    binutils-2.28, gcc-6.4.0, newlib-2.4.0 ---> OK
+   binutils-2.30, gcc-6.4.0, newlib-2.4.0 ---> OK
    binutils-2.30, gcc-6.4.0, newlib-3.0.0 ---> NG 
 ```
    
