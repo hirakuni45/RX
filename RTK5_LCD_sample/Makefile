@@ -10,6 +10,8 @@ TARGET		=	lcd_sample
 
 DEVICE		=	R5F565NE
 
+FATFS_VER	=	ff12b
+
 BUILD		=	release
 
 VPATH		=	../
@@ -17,7 +19,14 @@ VPATH		=	../
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c
+				common/vect.c \
+				common/syscalls.c \
+				r_lcd/r_glcdc_private.c \
+				r_lcd/r_glcdc_rx.c \
+				r_lcd/r_glcdc_rx65n.c \
+				$(FATFS_VER)/src/ff.c \
+				$(FATFS_VER)/src/option/unicode.c \
+				common/time.c
 
 PSOURCES	=	main.cpp
 
@@ -25,7 +34,7 @@ USER_LIBS	=	stdc++
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX65N F_ICLK=120000000 F_FCLK=60000000 F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKD=60000000
+USER_DEFS	=	SIG_RX65N F_ICLK=120000000 F_FCLK=60000000 F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKD=60000000 FAT_FS
 
 MCU_TARGET	=	
 
