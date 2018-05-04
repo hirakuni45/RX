@@ -244,8 +244,8 @@ namespace utils {
 			} else if(path[0] == '/') {
 				std::strncpy(full, path, len);
 			} else {
-				uint32_t len = strlen(full);
-				if(len > 0 && full[len - 1] != '/') {
+				uint32_t l = strlen(full);
+				if(l > 0 && full[l - 1] != '/') {
 					std::strncat(full, "/", len);
 				}
 				std::strncat(full, path, len);
