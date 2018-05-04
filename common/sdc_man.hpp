@@ -224,13 +224,13 @@ namespace utils {
 		}
 
 
-		void create_full_path_(const char* path, char* full) const noexcept
+		void create_full_path_(const char* path, char* full, uint32_t len) const noexcept
 		{
-			std::strcpy(full, current_);
+			std::strncpy(full, current_, len);
 
 			if(path == nullptr || path[0] == 0) {
 				if(full[0] == 0) {
-					std::strcpy(full, "/");
+					std::strncpy(full, "/", len);
 				}
 			} else if(std::strcmp(path, "..") == 0) {
 				char* p = std::strrchr(full, '/');
@@ -242,25 +242,25 @@ namespace utils {
 					}
 				}
 			} else if(path[0] == '/') {
-				std::strcpy(full, path);				
+				std::strncpy(full, path, len);
 			} else {
 				uint32_t len = strlen(full);
 				if(len > 0 && full[len - 1] != '/') {
-					std::strcat(full, "/");
+					std::strncat(full, "/", len);
 				}
-				std::strcat(full, path);
+				std::strncat(full, path, len);
 			}
 		}
 
 
 		// FATFS で認識できるパス（文字コード）へ変換
-		void create_fatfs_path_(const char* path, char* full) const noexcept {
+		void create_fatfs_path_(const char* path, char* full, uint32_t len) const noexcept {
 #if _USE_LFN != 0
 			char tmp[_MAX_LFN + 1];
-			create_full_path_(path, tmp);
-			str::utf8_to_sjis(tmp, full);
+			create_full_path_(path, tmp, sizeof(tmp));
+			str::utf8_to_sjis(tmp, full, len);
 #else
-			create_full_path_(path, full);
+			create_full_path_(path, full, len);
 #endif
 		}
 
@@ -278,7 +278,7 @@ namespace utils {
 				p[0] = 0;
 #if _USE_LFN != 0
 				char sjis[_MAX_LFN + 1];
-				str::utf8_to_sjis(tmp, sjis);
+				str::utf8_to_sjis(tmp, sjis, sizeof(sjis));
 				auto ret = f_mkdir(sjis);
 #else
 				auto ret = f_mkdir(tmp);
@@ -353,7 +353,7 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_full_path_(path, full);
+			create_full_path_(path, full, sizeof(full));
 
 			if(!build_dir_path_(full)) {
 				return false;
@@ -377,7 +377,7 @@ namespace utils {
 			if(fp == nullptr || path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_fatfs_path_(path, full);
+			create_fatfs_path_(path, full, sizeof(full));
 
 			if(f_open(fp, full, mode) != FR_OK) {
 				return false;
@@ -416,7 +416,7 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_fatfs_path_(path, full);
+			create_fatfs_path_(path, full, sizeof(full));
 
 			FILINFO fno;
 			if(f_stat(full, &fno) != FR_OK) {
@@ -440,7 +440,7 @@ namespace utils {
 			if(path == nullptr) return 0;
 
 			char full[_MAX_LFN + 1];
-			create_fatfs_path_(path, full);
+			create_fatfs_path_(path, full, sizeof(full));
 
 			FILINFO fno;
 			if(f_stat(full, &fno) != FR_OK) {
@@ -464,7 +464,7 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_fatfs_path_(path, full);
+			create_fatfs_path_(path, full, sizeof(full));
 
 			return f_unlink(full) == FR_OK;
 		}
@@ -484,9 +484,9 @@ namespace utils {
 			if(org_path == nullptr || new_path == nullptr) return false;
 
 			char org_full[_MAX_LFN + 1];
-			create_fatfs_path_(org_path, org_full);
+			create_fatfs_path_(org_path, org_full, sizeof(org_full));
 			char new_full[_MAX_LFN + 1];
-			create_fatfs_path_(new_path, new_full);
+			create_fatfs_path_(new_path, new_full, sizeof(new_full));
 
 			return f_rename(org_full, new_full) == FR_OK;
 		}
@@ -505,7 +505,7 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_fatfs_path_(path, full);
+			create_fatfs_path_(path, full, sizeof(full));
 
 			return f_mkdir(full) == FR_OK;
 		}
@@ -551,11 +551,11 @@ namespace utils {
 			if(path == nullptr) return false;
 
 			char full[_MAX_LFN + 1];
-			create_full_path_(path, full);
+			create_full_path_(path, full, sizeof(full));
 
 #if _USE_LFN != 0
 			char oem[_MAX_LFN + 1];
-			str::utf8_to_sjis(full, oem);
+			str::utf8_to_sjis(full, oem, sizeof(oem));
 			DIR dir;
 			auto st = f_opendir(&dir, oem);
 #else
@@ -566,7 +566,7 @@ namespace utils {
 				format("Can't open dir(%d): '%s'\n") % static_cast<uint32_t>(st) % full;
 				return false;
 			}
-			std::strcpy(current_, full);
+			std::strncpy(current_, full, sizeof(current_));
 
 			f_closedir(&dir);
 			return true;
@@ -614,9 +614,9 @@ namespace utils {
 			dir_option_ = option;
 
 			char full[256];
-			create_full_path_(root, full);
+			create_full_path_(root, full, sizeof(full));
 #if _USE_LFN != 0
-			str::utf8_to_sjis(full, full);
+			str::utf8_to_sjis(full, full, sizeof(full));
 #endif
 			return dir_list_.start(full);
 		}
@@ -655,9 +655,9 @@ namespace utils {
 		{
 			dir_list dl;
 			char full[256];
-			create_full_path_(root, full);
+			create_full_path_(root, full, sizeof(full));
 #if _USE_LFN != 0
-			str::utf8_to_sjis(full, full);
+			str::utf8_to_sjis(full, full, sizeof(full));
 #endif
 			if(!dl.start(full)) return 0;
 
