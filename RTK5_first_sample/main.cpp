@@ -194,6 +194,11 @@ int main(int argc, char** argv)
 				} else if(cmd_.cmp_word(0, "pwd")) { // pwd
 					utils::format("%s\n") % sdc_.get_current();
 					f = true;
+				} else if(cmd_.cmp_word(0, "help")) {
+					utils::format("    dir [path]\n");
+					utils::format("    cd [path]\n");
+					utils::format("    pwd\n");
+					f = true;
 				}
 				if(!f) {
 					char tmp[128];
