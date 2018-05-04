@@ -10,10 +10,11 @@
 #include "main.hpp"
 #include "http.hpp"
 #include "ign_server.hpp"
+#include "ign_cmd.hpp"
 
 namespace {
 
-	static const int version_ = 1;
+	static const int version_ = 50;
 	static const uint32_t build_id_ = B_ID;
 
 	class cmt_task
@@ -74,6 +75,8 @@ namespace {
 	FTP_SERVER		ftps_(ethernet_, sdc_);
 
 	TELNETS			telnets_(ethernet_);
+
+	utils::ign_cmd<TELNETS>	ign_cmd_(telnets_);
 
 	// 文字列表示、割り込み対応ロック／アンロック機構
 	volatile bool putch_lock_ = false;
@@ -376,8 +379,6 @@ int main(int argc, char** argv)
 		utils::format(", PCLKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCLKB);
 	}
 
-
-
 	// SD カード・クラスの初期化
 	sdc_.start();
 
@@ -425,10 +426,11 @@ int main(int argc, char** argv)
 		ftps_.service(100);
 		telnets_.service(100);
 
+		ign_cmd_.service();
+
 		sdc_.service();
 
 		if(cmd_.service()) {
-
 		}
 
 #ifdef KAEDE
