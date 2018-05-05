@@ -151,12 +151,13 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 ## RX 開発環境構築
 
  - RX 用コンパイラ（rx-elf-gcc,g++）は gcc-6.4.0 を使います。   
- - binutils-2.28.tar.gz をダウンロードしておく。   
+ - binutils-2.30.tar.gz をダウンロードしておく。   
  - gcc-6.4.0.tar.gz をダウンロードしておく。   
  - newlib-2.4.0.tar.gz をダウンロードしておく。   
  - binutils, gcc, newlib には複数のバージョンがありますが、組み合わせによっては   
    不適格なバイナリー（微妙に動作に問題がある）がビルドされる事が判っています。   
- - この不具合は、ルネサスのネットワークスタック（net_T4）を使った場合に起こります。   
+ - この不具合は、ルネサスのネットワークスタック（net_T4）を使った場合に起こります。
+ - 何故そのような動作不良を起こすのかは、原因を特定出来ていません。
  - 現状で調査した組み合わせを列挙しておきます。
 ```
    binutils-2.27, gcc-4.9.4, newlib-2.2.0 ---> OK
@@ -164,17 +165,17 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
    binutils-2.27, gcc-5.5.0, newlib-2.4.0 ---> OK
    binutils-2.27, gcc-6.4.0, newlib-2.4.0 ---> OK
    binutils-2.28, gcc-6.4.0, newlib-2.4.0 ---> OK
-   binutils-2.30, gcc-6.4.0, newlib-2.4.0 ---> OK
+   binutils-2.30, gcc-6.4.0, newlib-2.4.0 ---> OK (current)
    binutils-2.30, gcc-6.4.0, newlib-3.0.0 ---> NG 
 ```
    
 ---
    
-#### binutils-2.28 をビルド
+#### binutils-2.30 をビルド
 ```
    cd
-   tar xfvz binutils-2.28.tar.gz
-   cd binutils-2.28
+   tar xfvz binutils-2.30.tar.gz
+   cd binutils-2.30
    mkdir rx_build
    cd rx_build
    ../configure --target=rx-elf --prefix=/usr/local/rx-elf --disable-nls
@@ -319,9 +320,14 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
 
  - ルネサスが販売する「RTK5RX65N」は、LCD 付きでありながら低価格で高機能なボードです。   
  - もちろんラズベリーPiなどとは比較はできませんが、スタンドアロンで動かす事の出来る手頃なマイコンボードだと思えます。
- - また、このボードには、「E1 Lite エミュレーター」が内臓されており、USB 接続で、簡単にプログラムを書き込む事が出来ます。（Windows 環境で、Renesus Flash Programmer を使って書き込める）   
- - 初期状態では、SD カード、イーサーネット関係の部品などが抜けていますが、後から自分で取り付ける事が出来ると思います。   
-   
+ - また、このボードには、「E1 Lite エミュレーター」が内臓されており、USB 接続で、簡単にプログラムを書き込む事が出来ます。（Windows 環境で、Renesus Flash Programmer を使って書き込める）
+ - DIP SW 1, 1 を「ON」にする事で、内臓エミュレーターが有効になり、「Renesas Flash Programmer」
+   で書き込めます。   
+ - 初期状態では、SD カード、イーサーネット関係の部品などが抜けていますが、後から自分で取り付ける事が出来ると思います。
+ - このボード標準の SD カードソケットは、製造が終了しており、また日本では、入手製が困難
+   で、価格も高い為、別の方法を推奨します。
+ - 秋月電子製のマイクロ SD ソケットアダプタを介して接続するのが簡単です。   
+      
 ---
       
 License
