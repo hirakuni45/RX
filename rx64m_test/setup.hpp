@@ -640,11 +640,20 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 					http_format("<tr><td><input type=\"submit\" value=\"書き込み開始\"%s></td></tr>")
 						% (mount ? "" : " disabled=\"disabled\"");
 				} else {
-					http_format("<tr><td>書き込み数：</td><td>%d 回</td></tr>") % write_file_.get_resume();
-					http_format("<tr><td>ロスト時間：</td><td>%u 秒</td></tr>") % get_wf_lost();
+#if 0
+					char tmp[256];
+					strcpy(tmp, write_file_.get_filename());
+					char* p = strrchr(tmp, '/');
+					if(p != nullptr) *p = 0;
+					http_format("<tr><td>書き込みパス：</td><td>%s</td></tr>") % tmp;
+#endif
+					http_format("<tr><td>書き込み数：</td><td>%d 回</td></tr>")
+						% write_file_.get_resume();
+					http_format("<tr><td>ロスト時間：</td><td>%u 秒</td></tr>")
+						% get_wf_lost();
 					http_format("<tr><td><input type=\"submit\" value=\"書き込み停止\"></td></tr>");
 				}
-				http_format("</table></form>\n");
+				http_format("</table></form>");
 
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 			}

@@ -2,7 +2,7 @@
 //=====================================================================//
 /*! @file
     @brief  ファイル書き込みクラス@n
-			Copyright 2017 Kunihito Hiramatsu
+			Copyright 2017, 2018 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -23,6 +23,7 @@ namespace seeda {
 	class write_file {
 
 		static const uint8_t OPEN_RETRY_LIMIT = 3;
+		static const time_t DIR_LIMIT_TIME = 60 * 60 * 24 * 7;
 
 #ifdef WRITE_FILE_DEBUG
 		typedef utils::format debug_format;
@@ -33,7 +34,8 @@ namespace seeda {
 ///		uint32_t	limit_;
 		uint32_t	count_;
 
-		char		path_[128];
+		char		path_org_[256];
+		char		path_[256];
 
 		bool		enable_;
 		bool		state_;
@@ -45,6 +47,7 @@ namespace seeda {
 
 		enum class task : uint8_t {
 			wait_request,
+			make_filepath,
 			make_filename,
 			make_dir_path,
 			open_retry_wait,
@@ -69,6 +72,13 @@ namespace seeda {
 		uint8_t		open_retry_;
 		uint8_t		open_retry_delay_;
 
+		uint16_t	index_;
+
+		SDC::dir_list dir_list_;
+
+		bool		wildcards_;
+
+		time_t		dir_time_;
 
 		void cancel_write_()
 		{
@@ -79,18 +89,80 @@ namespace seeda {
 			at_pre().write();
 		}
 
+
+		static void dir_func_(const char* name, const FILINFO* fi, bool dir, void* opt)
+		{
+			if(!dir) return;
+//			utils::format(": '%s'\n") % name;
+			if(std::strlen(name) != 3) {
+				return;
+			}
+			uint16_t v;
+			if((utils::input("%d", name) % v).status()) {
+				if(v > 0 && v < 1000) {
+					uint16_t* vp = static_cast<uint16_t*>(opt);
+					if(vp != nullptr && *vp < v) {
+						*vp = v;
+					}
+				}
+			}
+		}
+
+
+		bool scan_dir_()
+		{
+			char tmp[256];
+			strcpy(tmp, path_org_);
+			char* p = strrchr(tmp, '*');
+			if(p != nullptr) {
+				p[0] = 0;
+				utils::format("Dir List Start: '%s'\n") % tmp;
+				if(dir_list_.start(tmp)) {
+					debug_format("Can't start dir list: '%s'\n") % tmp;
+				}
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+
+		void make_wildcards_(uint16_t idx)
+		{
+			if(idx > 0 && idx < 1000) ;
+			else return;
+
+			const char* ptr = std::strrchr(path_org_, '*');
+			if(ptr != nullptr) {
+				char tmp[256];
+				strcpy(tmp, path_org_);
+				uint32_t ofs = ptr - path_org_;
+				tmp[ofs] = 0;
+				utils::sformat("%s%03d%s", path_, sizeof(path_)) % tmp % idx % &tmp[ofs + 1];
+			} else {
+				utils::sformat("/%s", path_, sizeof(path_)) % path_org_;
+			}
+			if(std::strrchr(path_, '*') != nullptr) {
+				debug_format("Illegual character for path: '%s'\n") % path_;
+				path_[0] = 0;
+			}
+			utils::format("Write file org: '%s'\n") % path_org_;
+			utils::format("Write file mak: '%s'\n") % path_;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		write_file() : count_(0), path_{ "/00000" },
+		write_file() : count_(0), path_org_{ "/00000" }, path_{ 0 },
 			enable_(false), state_(false), req_close_(false),
 			fp_(nullptr),
 			ch_loop_(0),
 			task_(task::wait_request), last_channel_(false), second_(0),
-			open_retry_(OPEN_RETRY_LIMIT), open_retry_delay_(0)
+			open_retry_(OPEN_RETRY_LIMIT), open_retry_delay_(0),
+			index_(0), dir_list_(), wildcards_(false), dir_time_(0)
 			{ }
 
 
@@ -124,40 +196,26 @@ namespace seeda {
 		{
 			if(path == nullptr) return;
 			if(path[0] == '/') ++path;
-			utils::sformat("/%s", path_, sizeof(path_)) % path;
+			utils::sformat("/%s", path_org_, sizeof(path_org_)) % path;			
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  書き込みパス取得
-			@param[in]	path	ファイルパス
+			@return 書き込みパス
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_path() const { return path_; }
-
-
-#if 0
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  書き込み回数の設定
-			@param[in]	limit	書き込み回数
-		*/
-		//-----------------------------------------------------------------//
-		void set_limit(uint32_t limit)
-		{
-			limit_ = limit;
-		}
+		const char* get_path() const { return path_org_; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  書き込み時間設定
-			@return	書き込み時間（秒）
+			@brief  ファイル名取得
+			@return ファイル名
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_limit() const { return limit_; }
-#endif
+		const char* get_filename() const { return filename_; }
 
 
 		//-----------------------------------------------------------------//
@@ -184,10 +242,35 @@ namespace seeda {
 			}
 
 			switch(task_) {
+
 			case task::wait_request:  // 書き込みトリガー検出
 				if(enable_ && !back) {
-					task_ = task::make_filename;
+					if(path_org_[0] != 0) {
+						wildcards_ = scan_dir_();
+						index_ = 0;
+						task_ = task::make_filepath;
+					}
+				}
+				break;
+
+			case task::make_filepath:
+				if(wildcards_) {
+					dir_list_.service(20, dir_func_, true, &index_);
+					if(!dir_list_.probe()) {
+						if(index_ > 0 && index_ < 1000) {
+							if(index_ != 999) ++index_;
+							else index_ = 1;
+						} else {
+							index_ = 1;
+						}
+						make_wildcards_(index_);
+						dir_time_ = get_time();
+						reset_wf_fifo();
+						task_ = task::make_filename;
+					}
+				} else {
 					reset_wf_fifo();
+					task_ = task::make_filename;
 				}
 				break;
 
@@ -383,15 +466,17 @@ namespace seeda {
 				fclose(fp_);
 				fp_ = nullptr;
 				++count_;
-/// 書き込み数制限を廃止
-///				if(count_ >= limit_) {
-///					debug_format("Fin write file: %d files\n")
-///						% count_;
-///					enable_ = false;
-///					task_ = task::wait_request;
-///				} else {
+				if(wildcards_) {
+					if((dir_time_ + DIR_LIMIT_TIME) < get_time()) {
+						wildcards_ = scan_dir_();
+						index_ = 0;
+						task_ = task::make_filepath;
+					} else {
+						task_ = task::make_filename;
+					}
+				} else {
 					task_ = task::make_filename;
-///				}
+				}
 				break;
 
 			default:
