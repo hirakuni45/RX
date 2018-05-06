@@ -207,6 +207,7 @@ namespace utils {
 		}
 
 
+		public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SD カード・ディレクトリー・リスト・クラス
@@ -262,6 +263,11 @@ namespace utils {
 				total_ = 0;
 
 				std::strncpy(full_, root, sizeof(full_));
+				// 終端が「/」なら取り除く
+				char* last = strrchr(full_, '/');
+				if(last != nullptr && last[1] == 0) {
+					last[0] = 0;
+				}
 
 				auto st = f_opendir(&dir_, full_);
 				if(st != FR_OK) {
@@ -322,7 +328,7 @@ namespace utils {
 				return true;
 			}
 		};
-
+		private:
 
 		dir_list	dir_list_;
 
