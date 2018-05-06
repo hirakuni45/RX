@@ -34,7 +34,7 @@ namespace device {
 	/*!
 		@brief  RSPI 制御クラス
 		@param[in]	RSPI	RSPI 定義クラス
-		@param[in]	PSEL	ポート選択
+		@param[in]	PSEL	ポート候補
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class RSPI, port_map::option PSEL = port_map::option::FIRST>

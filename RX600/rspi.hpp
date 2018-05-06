@@ -357,7 +357,13 @@ namespace device {
 		static ICU::VECTOR get_tx_vec() { return txv; }
 	};
 
+#ifdef SIG_RX65N
+	typedef rspi_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI0;
+	typedef rspi_t<0x000D0140, peripheral::RSPI1, ICU::VECTOR::SPRI1, ICU::VECTOR::SPTI1>  RSPI1;
+	typedef rspi_t<0x000D0300, peripheral::RSPI1, ICU::VECTOR::SPRI2, ICU::VECTOR::SPTI2>  RSPI2;
+#else
 	typedef rspi_t<0x000D0100, peripheral::RSPI, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI;
+#endif
 #ifdef SIG_RX71M
 	typedef rspi_t<0x000D0120, peripheral::RSPI2, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI2;
 #endif
