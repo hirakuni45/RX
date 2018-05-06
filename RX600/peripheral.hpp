@@ -81,7 +81,12 @@ namespace device {
 		RIIC0,		///< I 2 C バスインタフェース（RIICa）
 		RIIC2,		///< I 2 C バスインタフェース（RIICa）
 
+#if defined(SIG_RX65N)
+		RSPI0,		///< シリアルペリフェラルインタフェース（RSPI0）
+		RSPI1,		///< シリアルペリフェラルインタフェース（RSPI1）
+#else
 		RSPI,		///< シリアルペリフェラルインタフェース（RSPIa）
+#endif
 #ifdef SIG_RX71M
 		RSPI2,		///< シリアルペリフェラルインタフェース（RSPIb）
 #endif

@@ -150,6 +150,12 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI のストップ状態解除
 				break;
 
+#if defined(SIG_RX65N)
+			case peripheral::RSPI1:
+				SYSTEM::MSTPCRB.MSTPB16 = f;	// RSPI のストップ状態解除
+				break;
+#endif
+
 			case peripheral::SDHI:
 				SYSTEM::MSTPCRD.MSTPD19 = f;	// SDHI のストップ状態解除
 				break;

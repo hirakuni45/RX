@@ -397,6 +397,40 @@ namespace device {
 		}
 
 
+		static bool sub_3rd_(peripheral t, bool enable)
+		{
+			bool ret = true;
+			switch(t) {
+
+			case peripheral::SDHI:
+				{
+					uint8_t sel = enable ? 0b011010 : 0;
+					MPC::P25PFS.PSEL = sel;  // SDHI_CD P25(32)
+					PORT2::PMR.B5 = enable;
+					MPC::P24PFS.PSEL = sel;  // SDHI_WP P24(33)
+					PORT2::PMR.B4 = enable;
+					MPC::P23PFS.PSEL = sel;  // SDHI_D1-C  P23(34)
+					PORT2::PMR.B3 = enable;
+					MPC::P22PFS.PSEL = sel;  // SDHI_D0-C  P22(35)
+					PORT2::PMR.B2 = enable;
+					MPC::P21PFS.PSEL = sel;  // SDHI_CLK-C P21(36)
+					PORT2::PMR.B1 = enable;
+					MPC::P20PFS.PSEL = sel;  // SDHI_CMD-C P20(37)
+					PORT2::PMR.B0 = enable;
+					MPC::P17PFS.PSEL = sel;  // SDHI_D3-C  P17(38)
+					PORT1::PMR.B7 = enable;
+   					MPC::P87PFS.PSEL = sel;  // SDHI_D2-C  P87(39)
+					PORT8::PMR.B7 = enable;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+
 	public:
 
 		//-----------------------------------------------------------------//
@@ -417,6 +451,8 @@ namespace device {
 				ret = sub_1st_(t, ena);
 			} else if(opt == option::SECOND) {
 				ret = sub_2nd_(t, ena);
+			} else if(opt == option::THIRD) {
+				ret = sub_3rd_(t, ena);
 			}
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
@@ -431,27 +467,42 @@ namespace device {
 			@param[in]	t	周辺機器タイプ
 			@param[in]	ena	SDHI のクロック端子にする場合「true」
 			@param[in]	out	SDHI クロック出力設定
+			@param[in]	opt	ポート・マップ・オプション
 			@return 周辺機器型が異なる場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn_sdhi_clk(peripheral t, bool ena, bool out)
+		static bool turn_sdhi_clk(peripheral t, bool ena, bool out, option opt = option::FIRST) noexcept
 		{
 			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = false;
 			if(t == peripheral::SDHI) {
-				if(ena) {
-					MPC::P77PFS.PSEL = 0b011010;  // enable SDHI_CLK
-					PORT7::PMR.B7 = 1;
-				} else {
-					MPC::P77PFS.PSEL = 0;  		  // disable SDHI_CLK
-					PORT7::PMR.B7 = 0;
-					PORT7::PCR.B7 = 0;  // pullup offline
-					PORT7::PDR.B7 = 1;  // output
-					PORT7::PODR.B7 = out;
+				if(opt == option::FIRST) {
+					if(ena) {
+						MPC::P77PFS.PSEL = 0b011010;  // enable SDHI_CLK
+						PORT7::PMR.B7 = 1;
+					} else {
+						MPC::P77PFS.PSEL = 0;  		  // disable SDHI_CLK
+						PORT7::PMR.B7 = 0;
+						PORT7::PCR.B7 = 0;  // pullup offline
+						PORT7::PDR.B7 = 1;  // output
+						PORT7::PODR.B7 = out;
+					}
+					ret = true;
+				} else if(opt == option::THIRD) {
+					if(ena) {
+						MPC::P21PFS.PSEL = 0b011010;  // enable SDHI_CLK
+						PORT2::PMR.B1 = 1;
+					} else {
+						MPC::P21PFS.PSEL = 0;  		  // disable SDHI_CLK
+						PORT2::PMR.B1 = 0;
+						PORT2::PCR.B1 = 0;  // pullup offline
+						PORT2::PDR.B1 = 1;  // output
+						PORT2::PODR.B1 = out;
+					}
+					ret = true;
 				}
-				ret = true;
 			}
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();

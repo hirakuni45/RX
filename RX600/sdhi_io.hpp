@@ -11,6 +11,7 @@
 #include "ff12b/src/diskio.h"
 #include "ff12b/src/ff.h"
 #include "RX600/sdhi.hpp"
+#include "RX600/port_map.hpp"
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
@@ -26,15 +27,15 @@ namespace fatfs {
 		@brief  SDHI テンプレートクラス
 		@param[in]	SDHI	SDHI クラス
 		@param[in]	POW		電源制御ポート・クラス
-		@param[in]	ONEW	シングルワイヤの場合「true」	
+		@param[in]	PSEL	ポート候補
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SDHI, class POW, bool ONEW = true>
+	template <class SDHI, class POW, device::port_map::option PSEL = device::port_map::option::FIRST>
 	class sdhi_io {
 
 		static const uint8_t CARD_DETECT_DIVIDE_ = 11;			///< CD 信号サンプリング周期
-		static const uint8_t CLOCK_SLOW_DIVIDE_ = 0b01000000;	///< 初期化時のクロック周期 (1/256)
-		static const uint8_t CLOCK_FAST_DIVIDE_ = 0b00000010;	///< 通常クロック周期 (1/8)
+		static const uint8_t CLOCK_SLOW_DIVIDE_  = 0b01000000;	///< 初期化時のクロック周期 (1/256)
+		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000010;	///< 通常クロック周期 (1/8)
 
 		// MMC card type flags (MMC_GET_TYPE)
 		static const BYTE CT_MMC   = 0x01;	///< MMC ver 3
@@ -53,6 +54,7 @@ namespace fatfs {
 		bool		mount_;
 		bool		start_;
 		bool		fast_;
+		bool		onew_;
 
 		// MMC/SD command (SPI mode)
 		enum class command : uint8_t {
@@ -89,7 +91,7 @@ namespace fatfs {
 			SDHI::SDSTS2 = 0;
 			while(SDHI::SDSTS2.SDCLKCREN() == 0) ;
 			if(fast_) {
-				SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.WIDTH.b(ONEW)
+				SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.WIDTH.b(onew_)
 					| SDHI::SDOPT.TOP.b(12);
 				// F_PCLKB / 4 (15MHz)
 				SDHI::SDCLKCR = SDHI::SDCLKCR.CLKSEL.b(CLOCK_FAST_DIVIDE_)
@@ -138,10 +140,12 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	onew	１ビットモードの場合「true」
 		 */
 		//-----------------------------------------------------------------//
-		sdhi_io() noexcept : stat_(STA_NOINIT), card_type_(0),
-			mount_delay_(0), cd_(false), mount_(false), start_(false), fast_(false) { }
+		sdhi_io(bool onew = false) noexcept : stat_(STA_NOINIT), card_type_(0),
+			mount_delay_(0), cd_(false), mount_(false), start_(false), fast_(false),
+			onew_(onew) { }
 
 
 		//-----------------------------------------------------------------//
@@ -155,10 +159,10 @@ namespace fatfs {
 				POW::DIR = 1;
 				POW::P   = 1;  // offline power
 				POW::PU  = 0;
-				POW::OD  = 1; // Open Drain
+				POW::OD  = 1;  // Open Drain
 
 				device::power_cfg::turn(SDHI::get_peripheral());
-				device::port_map::turn(SDHI::get_peripheral());
+				device::port_map::turn(SDHI::get_peripheral(), true, PSEL);
 
 				start_ = true;
 			}
@@ -206,13 +210,13 @@ namespace fatfs {
 #if 1
 			// クロック・ポートを強制制御してダミークロックを７４個入れる
 			for(uint8_t i = 0; i < 74; ++i) {
-				device::port_map::turn_sdhi_clk(SDHI::get_peripheral(), false, 0);
+				device::port_map::turn_sdhi_clk(SDHI::get_peripheral(), false, 0, PSEL);
 				utils::delay::micro_second(1);
-				device::port_map::turn_sdhi_clk(SDHI::get_peripheral(), false, 1);
+				device::port_map::turn_sdhi_clk(SDHI::get_peripheral(), false, 1, PSEL);
 				utils::delay::micro_second(1);
 			}
 			// ポートを SDHI 配下に戻す
-			device::port_map::turn_sdhi_clk(SDHI::get_peripheral(), true, 0);
+			device::port_map::turn_sdhi_clk(SDHI::get_peripheral(), true, 0, PSEL);
 #else
 			// ダミークロックを７４個以上入れる
 			// CLK: 60MHz / 256
@@ -355,7 +359,7 @@ namespace fatfs {
 						utils::format("%s CRC error\n") % cmdstr;
 						return RES_ERROR;
 					}
-//					++loop;
+					++loop;
 					utils::delay::micro_second(10);
 				}
 				SDHI::SDSTS2 = 0x0000FEFF;
@@ -525,9 +529,11 @@ namespace fatfs {
 
 			bool cd = SDHI::SDSTS1.SDCDMON();
 			if(cd && !cd_) {
+				utils::format("Card Detect\n");
 				POW::P = 0;  // power ON!
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
 			} else if(!cd && cd_) {
+				utils::format("Card Eject\n");
 				f_mount(&fatfs_, "", 0);
 				POW::P = 1;
 				mount_ = false;
