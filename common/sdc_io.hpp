@@ -69,7 +69,7 @@ namespace utils {
 			time_t t = str::fatfs_time_to(fi->fdate, fi->ftime);
 			struct tm *m = localtime(&t);
 			if(dir) {
-				format("          ");
+				format("           ");
 			} else {
 				format("%10d ") % fi->fsize;
 			}
