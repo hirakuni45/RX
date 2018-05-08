@@ -563,7 +563,7 @@ namespace device {
 
 			bit_rw_t<mstpcrb_io, bitpos::B14>	MSTPB14;
 			bit_rw_t<mstpcrb_io, bitpos::B15>	MSTPB15;
-
+			bit_rw_t<mstpcrb_io, bitpos::B16>	MSTPB16;
 			bit_rw_t<mstpcrb_io, bitpos::B17>	MSTPB17;
 
 			bit_rw_t<mstpcrb_io, bitpos::B19>	MSTPB19;

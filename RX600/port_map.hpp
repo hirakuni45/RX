@@ -177,8 +177,11 @@ namespace device {
 					PORTE::PMR.B1 = enable;
 				}
 				break;
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::RSPI:
+#elif defined(SIG_RX65N)
+			case peripheral::RSPI0:
+#endif
 				{
 					uint8_t sel = enable ? 0b001101 : 0;
 					MPC::PC7PFS.PSEL = sel;  // MISOA-A  (PC7 LQFP176: 76)
@@ -356,7 +359,11 @@ namespace device {
 				}
 				break;
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::RSPI:  // RSPI-B
+#elif defined(SIG_RX65N)
+			case peripheral::RSPI0:
+#endif
 				{
 					uint8_t sel = enable ? 0b001101 : 0;
 					MPC::PA7PFS.PSEL = sel;  // MISOA-B  (PA7 LQFP176: 106)

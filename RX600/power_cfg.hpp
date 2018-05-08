@@ -146,11 +146,12 @@ namespace device {
 				SYSTEM::MSTPCRC.MSTPC24 = f;	// C-B24 (SCI11のストップ状態解除
 				break;
 #endif
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::RSPI:
+#elif defined(SIG_RX65N)
+			case peripheral::RSPI0:
 				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI のストップ状態解除
 				break;
-
-#if defined(SIG_RX65N)
 			case peripheral::RSPI1:
 				SYSTEM::MSTPCRB.MSTPB16 = f;	// RSPI のストップ状態解除
 				break;
