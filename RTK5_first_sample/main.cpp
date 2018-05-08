@@ -15,6 +15,13 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 
+// SDHI interface を使う場合有効にする。
+#define SDHI_IF
+
+#ifdef SDHI_IF
+#include "RX600/sdhi_io.hpp"
+#endif
+
 namespace {
 
 	typedef device::system_io<12000000> SYSTEM_IO;
