@@ -329,6 +329,15 @@ extern "C" {
 	void set_task_10ms(void (*task)(void)) {
 		cmt_.at_task().set_task_10ms(task);
 	}
+
+
+	bool check_mount_() {
+		auto f = sdc_.get_mount();
+		if(!f) {
+			utils::format("SD card not mount.\n");
+		}
+		return f;
+	}
 }
 
 int main(int argc, char** argv);
@@ -431,6 +440,47 @@ int main(int argc, char** argv)
 		sdc_.service();
 
 		if(cmd_.service()) {
+			uint8_t cmdn = cmd_.get_words();
+			if(cmdn >= 1) {
+				bool f = false;
+				if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
+					if(check_mount_()) {
+						if(cmdn >= 2) {
+							char tmp[128];
+							cmd_.get_word(1, sizeof(tmp), tmp);
+							sdc_.dir(tmp);
+						} else {
+							sdc_.dir("");
+						}
+					}
+					f = true;
+				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
+					if(check_mount_()) {
+						if(cmdn >= 2) {
+							char tmp[128];
+							cmd_.get_word(1, sizeof(tmp), tmp);
+							sdc_.cd(tmp);						
+						} else {
+							sdc_.cd("/");
+						}
+					}
+					f = true;
+				} else if(cmd_.cmp_word(0, "pwd")) { // pwd
+					utils::format("%s\n") % sdc_.get_current();
+					f = true;
+				} else if(cmd_.cmp_word(0, "help")) {
+					utils::format("    dir [path]\n");
+					utils::format("    cd [path]\n");
+					utils::format("    pwd\n");
+					f = true;
+				}
+				if(!f) {
+					char tmp[128];
+					if(cmd_.get_word(0, sizeof(tmp), tmp)) {
+						utils::format("Command error: '%s'\n") % tmp;
+					}
+				}
+			}
 		}
 
 #ifdef KAEDE
