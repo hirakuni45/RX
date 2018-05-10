@@ -903,7 +903,11 @@ int main(int argc, char** argv)
 	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
 
 	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)		// 1/4 (237.5/4=59.375)
+#if defined(SIG_RX71M)
+						  | device::SYSTEM::SCKCR.ICK.b(0)		// 1/1 (237.5/1=237.5)
+#else
 						  | device::SYSTEM::SCKCR.ICK.b(1)		// 1/2 (237.5/2=118.75)
+#endif
 						  | device::SYSTEM::SCKCR.BCK.b(2)		// 1/4 (237.5/4=59.375)
 						  | device::SYSTEM::SCKCR.PCKA.b(1)		// 1/2 (237.5/2=118.75)
 						  | device::SYSTEM::SCKCR.PCKB.b(2)		// 1/4 (237.5/4=59.375)
@@ -911,6 +915,15 @@ int main(int argc, char** argv)
 						  | device::SYSTEM::SCKCR.PCKD.b(2);	// 1/4 (237.5/4=59.375)
 	device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(0b0100) | 1;  // USB Clock: 1/5 (237.5/5=47.5)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
+
+#if 0
+	while(1) {
+		LED::P = 1;
+		utils::delay::micro_second(1);
+		LED::P = 0;
+		utils::delay::micro_second(1);
+	}
+#endif
 
 	// RTC 開始
 	rtc_.start();

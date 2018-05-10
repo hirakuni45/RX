@@ -20,6 +20,7 @@ BUILD_ID	=	$(shell date +%Y%m%d%H)
 
 VPATH		=	../
 
+# ASOURCES	=	common/start.s
 ASOURCES	=	common/start.s \
 				r_net/driver/cksum_rx_little.s
 

@@ -22,7 +22,8 @@ namespace seeda {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class write_file {
 
-		static const uint8_t OPEN_RETRY_LIMIT = 3;
+		static const uint8_t OPEN_RETRY_LIMIT = 10;
+		static const uint8_t OPEN_RETRY_DELAY = 30;
 		static const time_t DIR_LIMIT_TIME = 60 * 60 * 24 * 7;
 
 #ifdef WRITE_FILE_DEBUG
@@ -317,7 +318,7 @@ namespace seeda {
 					debug_format("%s\n") % tmp;
 					if(open_retry_ > 0) {
 						--open_retry_;
-						open_retry_delay_ = 60;
+						open_retry_delay_ = OPEN_RETRY_DELAY;
 						at_logs().add(get_time(), "WOr");
 						debug_format("Write Open Retry: %d\n")
 							% static_cast<uint32_t>(open_retry_);
