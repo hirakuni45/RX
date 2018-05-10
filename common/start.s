@@ -43,6 +43,13 @@ _start:
 	mov	#__romdatacopysize, r3
 	smovf
 
+# MEMWAIT を設定
+.ifdef MEMWAIT
+	mov #0x86610,r1
+	mov # 0x00000001,r2
+	mov.l r2,[r1] 
+.endif
+
 # I レジスタを設定し、割り込みを許可する
 	mov.l	#0x00010000, r5
 	mvtc	r5,psw
