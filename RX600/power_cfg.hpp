@@ -148,6 +148,8 @@ namespace device {
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::RSPI:
+				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI のストップ状態解除
+				break;
 #elif defined(SIG_RX65N)
 			case peripheral::RSPI0:
 				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI のストップ状態解除
