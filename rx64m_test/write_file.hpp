@@ -270,6 +270,7 @@ namespace seeda {
 						task_ = task::make_filename;
 					}
 				} else {
+					strncpy(path_, path_org_, sizeof(path_));
 					reset_wf_fifo();
 					task_ = task::make_filename;
 				}
