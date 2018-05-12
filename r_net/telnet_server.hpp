@@ -49,7 +49,6 @@ namespace net {
 	template <uint32_t SEND_SIZE, uint32_t RECV_SIZE>
 	class telnet_server {
 
-
 	private:
 		// デバッグ以外で出力を無効にする
 #ifdef TELNETS_DEBUG
@@ -60,6 +59,7 @@ namespace net {
 
 		ethernet&		eth_;
 		ethernet_server	telnet_;
+		uint16_t		port_;
 
 		enum class task : uint8_t {
 			none,
@@ -85,6 +85,10 @@ namespace net {
 
 		bool		crlf_;
 
+		char		line_[RECV_SIZE];
+		char		line_copy_[RECV_SIZE];
+		uint32_t	line_pos_;
+
 		enum class esc_task : uint8_t {
 			none,
 			entry,
@@ -104,6 +108,7 @@ namespace net {
 				++l;
 				if(l >= sizeof(tmp)) {
 					telnet_.write(tmp, l);
+					
 					l = 0;
 				}
 			}
@@ -154,17 +159,46 @@ namespace net {
 			return ret;
 		}
 
+		bool service_line_()
+		{
+			while(length() > 0) {
+				auto ch = getch();
+				if(ch == 0x00) {  // TERM
+					line_[line_pos_] = 0;
+					strcpy(line_copy_, line_);
+					line_pos_ = 0;
+					return true;
+				} else if(ch == '\n') {  // LF 
+				} else if(ch == '\r') {  // CR
+				} else if(ch == 0x08) {  // BS
+					if(line_pos_ > 0) {
+						--line_pos_;
+					}
+				} else if(ch >= ' ') {
+					if(line_pos_ < (sizeof(line_) - 1)) {
+						line_[line_pos_] = ch;
+						++line_pos_;
+					}
+				}
+			}
+			return false;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
 			@param[in]	e	イーサーネット・コンテキスト
 			@param[in]	crlf	LF コードを CR/LF に変換しない場合「false」
+			@param[in]	port	TELNET ポート番号（通常２３番）
 		*/
 		//-----------------------------------------------------------------//
-		telnet_server(ethernet& e, bool crlf = true) : eth_(e), telnet_(e), task_(task::none),
+		telnet_server(ethernet& e, bool crlf = true, uint16_t port = 23) :
+			eth_(e), telnet_(e), port_(port),
+			task_(task::none),
 			server_name_{ 0 }, user_{ 0 }, pass_{ 0 },
 			count_(0), disconnect_loop_(0), crlf_(crlf),
+			line_{ 0 }, line_copy_{ 0 }, line_pos_(0),
 			esc_task_(esc_task::none)
 		{ }
 
@@ -189,6 +223,8 @@ namespace net {
 
 			task_ = task::begin;
 
+			line_pos_ = 0;
+
 			debug_format("TELNET Server: SEND_BUFF: %d, RECV_BUFF: %d\n") % SEND_SIZE % RECV_SIZE;
 		}
 
@@ -196,7 +232,7 @@ namespace net {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  接続の確認
-			@return 接続中なら「true」
+			@return 接続していれば「true」
 		*/
 		//-----------------------------------------------------------------//
 		bool probe() const { return task_ == task::main_loop; }
@@ -206,17 +242,19 @@ namespace net {
 		/*!
 			@brief  サービス
 			@param[in]	cycle	サービス・サイクル（通常１００Ｈｚ）
-			@param[in]	port	TELNET ポート番号（通常２３番）
+			@param[in]	lns		ライン・サービスを行う場合「true」
+			@return 改行されたら「true」
 		*/
 		//-----------------------------------------------------------------//
-		void service(uint32_t cycle, uint16_t port = 23)
+		bool service(uint32_t cycle, bool lns = false)
 		{
+			bool ret = false;
 			switch(task_) {
 			case task::none:
 				break;
 
 			case task::begin:
-				telnet_.begin(port);
+				telnet_.begin(port_);
 				debug_format("Start TELNET Server: '%s' port(%d), fd(%d)\n")
 					% eth_.get_local_ip().c_str()
 					% static_cast<int>(telnet_.get_port()) % telnet_.get_cepid();
@@ -228,6 +266,7 @@ namespace net {
 					debug_format("TELNET Server: New connected, from: %s\n")
 						% telnet_.get_from_ip().c_str();
 					++count_;
+					line_pos_ = 0;
 					task_ = task::main_loop;
 				}
 				break;
@@ -239,18 +278,20 @@ namespace net {
 						int len = telnet_.read(tmp, sizeof(tmp));
 						if(len > 0) {
 							int l = 0;
-// utils::format("Len: %d\n") % len;
 							while((recv_.size() - recv_.length()) > 2) {
 								char ch = tmp[l];
 								++l;
 								if(service_options_(ch)) {
 ///									putch(ch);  // local echo
-///	utils::format("%d: %02X\n") % l % static_cast<uint16_t>(ch);
+/// utils::format("%d: %02X\n") % l % static_cast<uint16_t>(ch);
 									recv_.put(ch);
 								}
 								if(l >= len) break;
 							}
 						}
+					}
+					if(lns) {
+						ret = service_line_();
 					}
 					write_();
 				} else {
@@ -274,6 +315,7 @@ namespace net {
 				task_ = task::begin;
 				break;
 			}
+			return ret;
 		}
 
 
@@ -293,7 +335,7 @@ namespace net {
 					write_();
 				}
 				send_.put(ch);
-//				if(ch == '\r') {					
+//				if(ch == '\r') {
 //					flush_();
 //				}
 			}
@@ -340,10 +382,18 @@ namespace net {
 			if(recv_.length() > 0) {
 				return recv_.get();
 			} else {
-utils::format("!!!!\n");
 				return 0;
 			}
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  行を取得
+			@return 行
+		*/
+		//-----------------------------------------------------------------//
+		const char* get_line() const { return line_copy_; }
 	};
 }
 
