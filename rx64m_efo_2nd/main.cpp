@@ -24,7 +24,7 @@
 
 namespace {
 
-	static const int main_version_ = 92;
+	static const int main_version_ = 93;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -221,6 +221,8 @@ namespace {
 
 	uint16_t	length_;
 	uint16_t	volt_;
+	uint8_t		edge_;
+
 	uint32_t	irq_state_;
 
 	SEND_TASK  	send_task_;
@@ -506,7 +508,7 @@ int main(int argc, char** argv)
 			break;
 
 		case TASK::LENGTH:
-			if(m_sci_.recv_length() >= 2) {
+			if(m_sci_.recv_length() >= (2 + 1)) {
 				length_  = static_cast<uint8_t>(m_sci_.getch());
 				length_ <<= 8;
 				length_ |= static_cast<uint8_t>(m_sci_.getch());
@@ -515,14 +517,18 @@ int main(int argc, char** argv)
 			break;
 
 		case TASK::VOLT:
-			if(m_sci_.recv_length() >= 2) {
+			if(m_sci_.recv_length() >= (2 + 1)) {
 				volt_  = static_cast<uint8_t>(m_sci_.getch());
 				volt_ <<= 8;
 				volt_ |= static_cast<uint8_t>(m_sci_.getch());
+				// start command 追加仕様（５月１４日、２０１８年）
+				edge_ = static_cast<uint8_t>(m_sci_.getch());
 				task_ = TASK::STATE;
 				dac_.out0(volt_);  // トリガー電圧設定
-				if(volt_ < 32768) trg_slope_ = false;
-				else trg_slope_ = true;
+///				if(volt_ < 32768) trg_slope_ = false;
+///				else trg_slope_ = true;
+				if(edge_ == 0) trg_slope_ = true;
+				else trg_slope_ = false;
 				if(length_ == 0) {
 					cap_enable_ = true;
 					send_task_ = SEND_TASK::SINGLE;
