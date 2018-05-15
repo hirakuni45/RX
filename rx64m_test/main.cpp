@@ -624,6 +624,7 @@ extern "C" {
 	void sci_puts(const char* s)
 	{
 		core_.sci_.puts(s);
+		nets_.telnet_puts(s);
 	}
 
 

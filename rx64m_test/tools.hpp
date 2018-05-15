@@ -2,7 +2,7 @@
 //=====================================================================//
 /*! @file
     @brief  SEEDA03 tools クラス
-	@copyright Copyright 2017 Kunihito Hiramatsu All Right Reserved.
+	@copyright Copyright 2017, 2018 Kunihito Hiramatsu All Right Reserved.
     @author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
@@ -333,28 +333,6 @@ namespace seeda {
 			return true;
 		}
 #endif
-
-	void list_arp_() const
-	{
-		auto n = ether_arp_num();
-		for(uint32_t i = 0; i < n; ++i) {
-			const auto* p = ether_arp_get(i);
-			if(p->ae_state == AS_FREE) continue;
-
-			utils::format("(%d) %d.%d.%d.%d  --->  %02X:%02X:%02X:%02X:%02X:%02X\n")
-				% i
-				% static_cast<uint32_t>(p->ae_pra[0])
-				% static_cast<uint32_t>(p->ae_pra[1])
-				% static_cast<uint32_t>(p->ae_pra[2])
-				% static_cast<uint32_t>(p->ae_pra[3])
-				% static_cast<uint32_t>(p->ae_hwa[0])
-				% static_cast<uint32_t>(p->ae_hwa[1])
-				% static_cast<uint32_t>(p->ae_hwa[2])
-				% static_cast<uint32_t>(p->ae_hwa[3])
-				% static_cast<uint32_t>(p->ae_hwa[4])
-				% static_cast<uint32_t>(p->ae_hwa[5]);
-		}
-	}
 
 
 	// データ flash の操作コマンド　
@@ -743,7 +721,7 @@ namespace seeda {
 						}
 						f = true;
 					} else if(cmd_.cmp_word(0, "arp")) {  // arp table
-						list_arp_();
+						net_tools::list_arp();
 						f = true;
 					} else if(cmd_.cmp_word(0, "flash")) {
 						cmd_flash_(cmdn);

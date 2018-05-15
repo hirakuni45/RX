@@ -852,11 +852,24 @@ namespace seeda {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  telnet 文字出力
+			@param[in]	ch	文字
 		*/
 		//-----------------------------------------------------------------//
 		void telnet_putch(char ch)
 		{
 			telnets_.putch(ch);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  telnet 文字列出力
+			@param[in]	str	文字列
+		*/
+		//-----------------------------------------------------------------//
+		void telnet_puts(const char* str)
+		{
+			telnets_.puts(str);
 		}
 
 
@@ -892,7 +905,19 @@ namespace seeda {
 				ftps_.service(50);
 				client_.service(50);
 				if(develope_) {  // 開発モード時のみ
-					telnets_.service(50);
+					if(telnets_.service(50, true)) {
+						const char* line = telnets_.get_line();
+						if(line == nullptr) ;
+						else if(line[0] == 0) ;
+						else if(std::strcmp(line, "restart") == 0) {
+							utils::format("Restart 5 sec\n");
+							set_restart_delay(5 * 100);
+						} else if(std::strcmp(line, "arp") == 0) {
+							net_tools::list_arp();
+						} else {
+							utils::format("Command: '%s' error\n") % line;
+						}
+					}
 				}
 			}
 
