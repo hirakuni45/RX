@@ -182,6 +182,15 @@ namespace device {
 			case peripheral::STBRAM:
 				SYSTEM::MSTPCRC.MSTPC7 = f;		// STANDBY RAM のストップ状態解除
 				break;
+
+#if defined(SIG_RX65N)
+			case peripheral::DRW2D:
+				SYSTEM::MSTPCRC.MSTPC28 = f;	// DRW2D のストップ状態解除
+				break;
+			case peripheral::GLCDC:
+				SYSTEM::MSTPCRC.MSTPC29 = f;	// GLCDC のストップ状態解除
+				break;
+#endif
 			default:
 				break;
 			}

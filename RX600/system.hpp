@@ -609,6 +609,10 @@ namespace device {
 			bit_rw_t<mstpcrc_io, bitpos::B25>	MSTPC25;
 			bit_rw_t<mstpcrc_io, bitpos::B26>	MSTPC26;
 			bit_rw_t<mstpcrc_io, bitpos::B27>	MSTPC27;
+#if defined(SIG_RX65N)
+			bit_rw_t<mstpcrc_io, bitpos::B28>	MSTPC28;
+			bit_rw_t<mstpcrc_io, bitpos::B29>	MSTPC29;
+#endif
 		};
 		static mstpcrc_t MSTPCRC;
 
