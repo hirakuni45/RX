@@ -301,6 +301,54 @@ namespace device {
 				}
 				break;
 
+#if defined(SIG_RX65N)
+			case peripheral::GLCDC:
+				{
+					uint8_t sel = enable ? 0b100101 : 0;
+					MPC::PB5PFS.PSEL = sel;  // LCD_CLK
+					PORTB::PMR.B5 = enable;
+					MPC::PB4PFS.PSEL = sel;  // LCD_TCON0
+					PORTB::PMR.B4 = enable;
+					MPC::PB2PFS.PSEL = sel;  // LCD_TCON2
+					PORTB::PMR.B2 = enable;
+					MPC::PB1PFS.PSEL = sel;  // LCD_TCON3
+					PORTB::PMR.B1 = enable;
+					MPC::PB0PFS.PSEL = sel;  // LCD_DATA0
+					PORTB::PMR.B0 = enable;
+					MPC::PA7PFS.PSEL = sel;  // LCD_DATA1
+					PORTA::PMR.B7 = enable;
+					MPC::PA6PFS.PSEL = sel;  // LCD_DATA2
+					PORTA::PMR.B6 = enable;
+					MPC::PA5PFS.PSEL = sel;  // LCD_DATA3
+					PORTA::PMR.B5 = enable;
+					MPC::PA4PFS.PSEL = sel;  // LCD_DATA4
+					PORTA::PMR.B4 = enable;
+					MPC::PA3PFS.PSEL = sel;  // LCD_DATA5
+					PORTA::PMR.B3 = enable;
+					MPC::PA2PFS.PSEL = sel;  // LCD_DATA6
+					PORTA::PMR.B2 = enable;
+					MPC::PA1PFS.PSEL = sel;  // LCD_DATA7
+					PORTA::PMR.B1 = enable;
+					MPC::PA0PFS.PSEL = sel;  // LCD_DATA8
+					PORTA::PMR.B0 = enable;
+					MPC::PE7PFS.PSEL = sel;  // LCD_DATA9
+					PORTE::PMR.B7 = enable;
+					MPC::PE6PFS.PSEL = sel;  // LCD_DATA10
+					PORTE::PMR.B6 = enable;
+					MPC::PE5PFS.PSEL = sel;  // LCD_DATA11
+					PORTE::PMR.B5 = enable;
+					MPC::PE4PFS.PSEL = sel;  // LCD_DATA12
+					PORTE::PMR.B4 = enable;
+					MPC::PE3PFS.PSEL = sel;  // LCD_DATA13
+					PORTE::PMR.B3 = enable;
+					MPC::PE2PFS.PSEL = sel;  // LCD_DATA14
+					PORTE::PMR.B2 = enable;
+					MPC::PE1PFS.PSEL = sel;  // LCD_DATA15
+					PORTE::PMR.B1 = enable;
+				}
+				break;
+#endif
+
 			case peripheral::IRQ0:
 				MPC::PD0PFS.ISEL = enable;  // PD0
 				PORTD::PMR.B0 = 0;
