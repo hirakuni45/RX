@@ -30,7 +30,19 @@ namespace device {
 	template <class SCI, class RECV_BUFF, class SEND_BUFF,
 		port_map::option PSEL = port_map::option::FIRST>
 	class sci_io {
+	public:
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  I2C の速度タイプ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class speed : uint8_t {
+			standard,	///< 100K b.p.s. (Standard mode)
+			fast,		///< 400K b.p.s. (Fast mode)
+			fast_plus,	///< 1M b.p.s. (Fast plus mode)
+		};
 
+	private:
 		static RECV_BUFF recv_;
 		static SEND_BUFF send_;
 		static volatile bool send_stall_;
@@ -221,6 +233,34 @@ brr = 1;
 			} else {
 				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
 			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  簡易 I2C を有効にする
+			@param[in]	spd		スピード・タイプ
+			@param[in]	master	マスターモードの場合「true」
+			@param[in]	level	割り込みレベル（０の場合ポーリング）
+			@return エラーなら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool start_i2c(speed spd, bool master = true, uint8_t level = 0)
+		{
+			// 現在の実装では、割り込みはサポートされない。
+			if(level != 0) return false;
+
+			level_ = level;
+
+			SCI::SCR = 0x00;		// TE, RE disable.
+			port_map::turn(SCI::get_peripheral(), true, PSEL);
+
+
+
+
+
 
 			return true;
 		}
