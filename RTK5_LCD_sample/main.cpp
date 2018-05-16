@@ -63,6 +63,65 @@ namespace {
 	SDC		sdc_;
 
 	utils::command<256> cmd_;
+
+
+	bool check_mount_() {
+		auto f = sdc_.get_mount();
+		if(!f) {
+			utils::format("SD card not mount.\n");
+		}
+		return f;
+	}
+
+
+	void command_()
+	{
+		if(!cmd_.service()) {
+			return;
+		}
+
+		uint8_t cmdn = cmd_.get_words();
+		if(cmdn >= 1) {
+			bool f = false;
+			if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
+				if(check_mount_()) {
+					if(cmdn >= 2) {
+						char tmp[128];
+						cmd_.get_word(1, sizeof(tmp), tmp);
+						sdc_.dir(tmp);
+					} else {
+						sdc_.dir("");
+					}
+				}
+				f = true;
+			} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
+				if(check_mount_()) {
+					if(cmdn >= 2) {
+						char tmp[128];
+						cmd_.get_word(1, sizeof(tmp), tmp);
+						sdc_.cd(tmp);						
+					} else {
+						sdc_.cd("/");
+					}
+				}
+				f = true;
+			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
+				utils::format("%s\n") % sdc_.get_current();
+				f = true;
+			} else if(cmd_.cmp_word(0, "help")) {
+				utils::format("    dir [path]\n");
+				utils::format("    cd [path]\n");
+				utils::format("    pwd\n");
+				f = true;
+			}
+			if(!f) {
+				char tmp[128];
+				if(cmd_.get_word(0, sizeof(tmp), tmp)) {
+					utils::format("Command error: '%s'\n") % tmp;
+				}
+			}
+		}
+	}
 }
 
 extern "C" {
@@ -128,12 +187,8 @@ extern "C" {
 	}
 
 
-	bool check_mount_() {
-		auto f = sdc_.get_mount();
-		if(!f) {
-			utils::format("SD card not mount.\n");
-		}
-		return f;
+	int fatfs_get_mount() {
+		return check_mount_();
 	}
 }
 
@@ -162,12 +217,16 @@ int main(int argc, char** argv)
 
 	cmd_.set_prompt("# ");
 
-	if(0) {  // GLCDC 初期化
+	{  // GLCDC 初期化
 		LCD_DISP::DIR  = 1;
 		LCD_LIGHT::DIR = 1;
 		LCD_DISP::P  = 1;  // DISP Enable
 		LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-		glcdc_io_.start();
+		if(glcdc_io_.start()) {
+			utils::format("Start GLCDC\n");
+		} else {
+			utils::format("Fail GLCDC\n");
+		}
 	}
 
 #if 0
@@ -199,49 +258,7 @@ int main(int argc, char** argv)
 
 		sdc_.service(sdh_.service());
 
-		if(cmd_.service()) {
-			uint8_t cmdn = cmd_.get_words();
-			if(cmdn >= 1) {
-				bool f = false;
-				if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-					if(check_mount_()) {
-						if(cmdn >= 2) {
-							char tmp[128];
-							cmd_.get_word(1, sizeof(tmp), tmp);
-							sdc_.dir(tmp);
-						} else {
-							sdc_.dir("");
-						}
-					}
-					f = true;
-				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-					if(check_mount_()) {
-						if(cmdn >= 2) {
-							char tmp[128];
-							cmd_.get_word(1, sizeof(tmp), tmp);
-							sdc_.cd(tmp);						
-						} else {
-							sdc_.cd("/");
-						}
-					}
-					f = true;
-				} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-					utils::format("%s\n") % sdc_.get_current();
-					f = true;
-				} else if(cmd_.cmp_word(0, "help")) {
-					utils::format("    dir [path]\n");
-					utils::format("    cd [path]\n");
-					utils::format("    pwd\n");
-					f = true;
-				}
-				if(!f) {
-					char tmp[128];
-					if(cmd_.get_word(0, sizeof(tmp), tmp)) {
-						utils::format("Command error: '%s'\n") % tmp;
-					}
-				}
-			}
-		}
+		command_();
 
 		++n;
 		if(n >= 30) {

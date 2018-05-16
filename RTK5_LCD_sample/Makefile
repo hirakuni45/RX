@@ -21,12 +21,11 @@ ASOURCES	=	common/start.s
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-				r_lcd/r_glcdc_private.c \
-				r_lcd/r_glcdc_rx.c \
-				r_lcd/r_glcdc_rx65n.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c
+
+# r_lcd/r_glcdc_rx_pinset.c
 
 PSOURCES	=	main.cpp
 
@@ -47,6 +46,7 @@ OPTIMIZE	=	-Os
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-unused-but-set-variable \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
