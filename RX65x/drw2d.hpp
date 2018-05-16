@@ -29,34 +29,38 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct control_t : public rw32_t<ofs> {
-			typedef rw32_t<ofs> io_;
+		struct control_t : public wo32_t<ofs> {
+			typedef wo32_t<ofs> io_;
 			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0>   LIM1EN;
-			bit_rw_t<io_, bitpos::B1>   LIM2EN;
-			bit_rw_t<io_, bitpos::B2>   LIM3EN;
-			bit_rw_t<io_, bitpos::B3>   LIM4EN;
-			bit_rw_t<io_, bitpos::B4>   LIM5EN;
-			bit_rw_t<io_, bitpos::B5>   LIM6EN;
-			bit_rw_t<io_, bitpos::B6>   QUAD1EN;
-			bit_rw_t<io_, bitpos::B7>   QUAD2EN;
-			bit_rw_t<io_, bitpos::B8>   QUAD3EN;
-			bit_rw_t<io_, bitpos::B9>   LIM1TH;
-			bit_rw_t<io_, bitpos::B10>  LIM2TH;
-			bit_rw_t<io_, bitpos::B11>  LIM3TH;
-			bit_rw_t<io_, bitpos::B12>  LIM4TH;
-			bit_rw_t<io_, bitpos::B13>  LIM5TH;
-			bit_rw_t<io_, bitpos::B14>  LIM6TH;
-			bit_rw_t<io_, bitpos::B15>  BAND1EN;
-			bit_rw_t<io_, bitpos::B16>  BAND2EN;
-			bit_rw_t<io_, bitpos::B17>  UNION12;
-			bit_rw_t<io_, bitpos::B18>  UNION34;
+#if 0
+			bit_wo_t<io_, bitpos::B0>   LIM1EN;
+			bit_wo_t<io_, bitpos::B1>   LIM2EN;
+			bit_wo_t<io_, bitpos::B2>   LIM3EN;
+			bit_wo_t<io_, bitpos::B3>   LIM4EN;
+			bit_wo_t<io_, bitpos::B4>   LIM5EN;
+			bit_wo_t<io_, bitpos::B5>   LIM6EN;
+			bit_wo_t<io_, bitpos::B6>   QUAD1EN;
+			bit_wo_t<io_, bitpos::B7>   QUAD2EN;
+			bit_wo_t<io_, bitpos::B8>   QUAD3EN;
+			bit_wo_t<io_, bitpos::B9>   LIM1TH;
+			bit_wo_t<io_, bitpos::B10>  LIM2TH;
+			bit_wo_t<io_, bitpos::B11>  LIM3TH;
+			bit_wo_t<io_, bitpos::B12>  LIM4TH;
+			bit_wo_t<io_, bitpos::B13>  LIM5TH;
+			bit_wo_t<io_, bitpos::B14>  LIM6TH;
+			bit_wo_t<io_, bitpos::B15>  BAND1EN;
+			bit_wo_t<io_, bitpos::B16>  BAND2EN;
+			bit_wo_t<io_, bitpos::B17>  UNION12;
+			bit_wo_t<io_, bitpos::B18>  UNION34;
+			bit_wo_t<io_, bitpos::B19>  UNION56;
+			bit_wo_t<io_, bitpos::B20>  UNIONAB;
+			bit_wo_t<io_, bitpos::B21>  UNIONCD;
+			bit_wo_t<io_, bitpos::B22>  SPANABT;
+			bit_wo_t<io_, bitpos::B23>  SPANSTR;
+#endif
 		};
 		static control_t<base + 0x00> CONTROL;
+
 
 
 
