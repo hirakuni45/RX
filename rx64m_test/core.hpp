@@ -204,9 +204,15 @@ namespace seeda {
 			utils::format("\nStart GR-KAEDE Build: %u\n") % build_id_;
 #endif
 			uint8_t mde = device::SYSTEM::MDE.MDE();
-			utils::format("Endian: %3b (%s)") % static_cast<uint32_t>(mde) % (mde == 0b111 ? "Little" : "Big");
+			utils::format("Endian: %3b (%s)")
+				% static_cast<uint32_t>(mde) % (mde == 0b111 ? "Little" : "Big");
 			utils::format(", PCLKA: %u [Hz]") % static_cast<uint32_t>(F_PCLKA);
 			utils::format(", PCLKB: %u [Hz]\n") % static_cast<uint32_t>(F_PCLKB);
+			static const char* vdsel[4] = { "---", "2.94V", "2.87V", "2.80V" };
+			utils::format("OFS1: VDSEL: %s, LVDAS: %s, HOCOEN: %s\n")
+				% vdsel[device::SYSTEM::OFS1.VDSEL()]
+				% (device::SYSTEM::OFS1.LVDAS() ? "Disable" : "Enable")
+				% (device::SYSTEM::OFS1.HOCOEN() ? "Disable" : "Enable");
 			utils::format("DIP-Switch-2 (Dev): %s\n") % (get_develope() ? "Enable" : "Disable");
 			utils::format("DIP-Switch-1 (CH):  %d\n") % get_channel_num();
 		}
