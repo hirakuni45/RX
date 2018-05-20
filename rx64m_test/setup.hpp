@@ -310,35 +310,19 @@ namespace seeda {
 					eui_.read(EUI_GW,   ipt_.gw_, 4);
 					eui_.read(EUI_MASK, ipt_.mask_, 4);
 				} else {
-					if(dev) {
-						ipt_.dhcp_ = true;
-						ipt_.ip_[0] = 192;
-						ipt_.ip_[1] = 168;
-						ipt_.ip_[2] = 3;
-						ipt_.ip_[3] = 100;
-						ipt_.gw_[0] = 192;
-						ipt_.gw_[1] = 168;
-						ipt_.gw_[2] = 3;
-						ipt_.gw_[3] = 1;
-						ipt_.mask_[0] = 255;
-						ipt_.mask_[1] = 255;
-						ipt_.mask_[2] = 255;
-						ipt_.mask_[3] = 0;
-					} else {
-						ipt_.dhcp_ = false;
-						ipt_.ip_[0] = 192;
-						ipt_.ip_[1] = 168;
-						ipt_.ip_[2] = 1;
-						ipt_.ip_[3] = 22;
-						ipt_.gw_[0] = 192;
-						ipt_.gw_[1] = 168;
-						ipt_.gw_[2] = 1;
-						ipt_.gw_[3] = 1;
-						ipt_.mask_[0] = 255;
-						ipt_.mask_[1] = 255;
-						ipt_.mask_[2] = 255;
-						ipt_.mask_[3] = 0;
-					}
+					ipt_.dhcp_ = false;
+					ipt_.ip_[0] = 192;
+					ipt_.ip_[1] = 168;
+					ipt_.ip_[2] = 1;
+					ipt_.ip_[3] = 22;
+					ipt_.gw_[0] = 192;
+					ipt_.gw_[1] = 168;
+					ipt_.gw_[2] = 1;
+					ipt_.gw_[3] = 1;
+					ipt_.mask_[0] = 255;
+					ipt_.mask_[1] = 255;
+					ipt_.mask_[2] = 255;
+					ipt_.mask_[3] = 0;
 					write_eui();
 					utils::format("EUI Magic code: false (then first write)\n");
 				}
