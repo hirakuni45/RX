@@ -24,7 +24,8 @@ VPATH		=	../
 ASOURCES	=	common/start.s \
 				r_net/driver/cksum_rx_little.s
 
-CSOURCES	=	common/init.c \
+CSOURCES	=	common/ofs.c \
+				common/init.c \
 				common/vect.c \
 				common/syscalls.c \
 				$(FATFS_VER)/src/ff.c \
