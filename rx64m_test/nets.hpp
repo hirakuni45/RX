@@ -714,9 +714,7 @@ namespace seeda {
 			// FTP Server
 			ftps_.start("SEEDA03", "Renesas_RX64M", "SEEDA03", "SEEDA03");
 
-			if(develope_) {  // TELNET Server（開発モード時のみ）
-				telnets_.start("SEEDA03");
-			}
+			telnets_.start("SEEDA03");
 		}
 
 
@@ -904,19 +902,18 @@ namespace seeda {
 			} else {
 				ftps_.service(50);
 				client_.service(50);
-				if(develope_) {  // 開発モード時のみ
-					if(telnets_.service(50, true)) {
-						const char* line = telnets_.get_line();
-						if(line == nullptr) ;
-						else if(line[0] == 0) ;
-						else if(std::strcmp(line, "restart") == 0) {
-							utils::format("Restart 5 sec\n");
-							set_restart_delay(5 * 100);
-						} else if(std::strcmp(line, "arp") == 0) {
-							net_tools::list_arp();
-						} else {
-							utils::format("Command: '%s' error\n") % line;
-						}
+
+				if(telnets_.service(50, true)) {
+					const char* line = telnets_.get_line();
+					if(line == nullptr) ;
+					else if(line[0] == 0) ;
+					else if(std::strcmp(line, "restart") == 0) {
+						utils::format("Restart 5 sec\n");
+						set_restart_delay(5 * 100);
+					} else if(std::strcmp(line, "arp") == 0) {
+						net_tools::list_arp();
+					} else {
+						utils::format("Command: '%s' error\n") % line;
 					}
 				}
 			}
