@@ -171,6 +171,31 @@ SECTIONS
     LONG (_start);
   }
 
+  /* Option Setting Memory: SPCC */ 
+  .spcc (0x00120040) :
+  {
+    PROVIDE (__spcc = .);
+    *(.spcc)
+  }
+  /* Option Setting Memory: OSIC */ 
+  .osic (0x00120050) :
+  {
+    PROVIDE (__osic = .);
+    *(.osic)
+  }
+  /* Option Setting Memory: OFS0 */ 
+  .ofs0 (0x00120068) :
+  {
+    PROVIDE (__ofs0 = .);
+    *(.ofs0)
+  }
+  /* Option Setting Memory: OFS1 */ 
+  .ofs1 (0x0012006C) :
+  {
+    PROVIDE (__ofs1 = .);
+    *(.ofs1)
+  }
+
   /* The rest are all not normally part of the runtime image.  */
 
   /* Stabs debugging sections.  */
