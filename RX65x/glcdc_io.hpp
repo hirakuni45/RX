@@ -10,10 +10,7 @@
 //=====================================================================//
 #include "RX65x/glcdc.hpp"
 #include "common/delay.hpp"
-
-extern "C" {
-#include "r_lcd/r_glcdc_rx_if.h"
-};
+#include "glcdc_def.hpp"
 
 #define BITS_PER_PIXEL 16  // Allowed values: 1, 4, 8, 16, 32
 
@@ -33,7 +30,7 @@ namespace device {
 
 #if (BITS_PER_PIXEL == 16)
 		static constexpr uint32_t BufferPTR[] = {
-			0x00000100,  // Begin of On-Chip RAM
+			0x00010000,  // Begin of On-Chip RAM
 			0x00800000   // Begin of Expansion RAM
 		};
 #endif
@@ -185,6 +182,8 @@ namespace device {
 
 		static const uint32_t SYSCNT_PANEL_CLK_DCDR_MASK = 0x3F;
 
+
+
 		/** Timing signals for driving the LCD panel */
 		typedef enum e_glcdc_tcon_signal_select
 		{
@@ -216,6 +215,14 @@ namespace device {
 		} glcdc_plane_blend_t;
 
 
+		/** Clut plane select */
+		typedef enum e_glcdc_clut_plane
+		{
+			GLCDC_CLUT_PLANE_0 = 0,                // GLCD CLUT plane 0.
+			GLCDC_CLUT_PLANE_1 = 1                 // GLCD CLUT plane 1.
+		} glcdc_clut_plane_t;
+
+
 		/** Dithering output format */
 		typedef enum e_glcdc_dithering_output_format
 		{
@@ -224,6 +231,35 @@ namespace device {
 			GLCDC_DITHERING_OUTPUT_FORMAT_RGB565 = 2   // Dithering output format RGB565.
 		} glcdc_dithering_output_format_t;
 
+
+		/** Coordinate */
+		struct glcdc_coordinate_t
+		{
+    		int16_t x;                           // Coordinate X, this allows to set signed value.
+    		int16_t y;                           // Coordinate Y, this allows to set signed value.
+			glcdc_coordinate_t(int16_t x_ = 0, int16_t y_ = 0) : x(x_), y(y_)
+			{ }
+		};
+
+
+		/** GLCDC driver operation state */
+		typedef enum e_glcdc_state
+		{
+			GLCDC_STATE_CLOSED = 0,                // GLCDC closed.
+			GLCDC_STATE_NOT_DISPLAYING = 1,        // Not Displaying (opened).
+			GLCDC_STATE_DISPLAYING = 2             // Displaying.
+		} glcdc_operating_status_t;
+
+
+		/** Interrupt enable setting */
+		struct glcdc_interrupt_cfg_t {
+			bool vpos_enable;                    // Line detection interrupt enable.
+			bool gr1uf_enable;                   // Graphics plane1 underflow interrupt enable.
+			bool gr2uf_enable;                   // Graphics plane2 underflow interrupt enable.
+			glcdc_interrupt_cfg_t() :
+				vpos_enable(false), gr1uf_enable(false), gr2uf_enable(false)
+			{ }
+		};
 
 
 		// GLCD hardware specific control block
@@ -241,12 +277,12 @@ namespace device {
 			glcdc_ctrl_t() :
 				state(GLCDC_STATE_CLOSED),
 				is_entry(false),
-				active_start_pos{ 0 },
+				active_start_pos(),
 				hsize(0), vsize(0),
 				graphics_read_enable{ false },
 				p_callback(nullptr),
 				first_vpos_interrupt_flag(false),
-				interrupt{ false }
+				interrupt()
 			{ }
 		};
 		glcdc_ctrl_t	ctrl_blk_;
@@ -1049,20 +1085,53 @@ namespace device {
 		}
 
 
-#if 0
 		glcdc_clut_plane_t is_clutplane_selected_(glcdc_frame_layer_t frame)
 		{
 			/* GRnCLUTINT - Graphic n CLUT/Interrupt Control Register
 			b16 SEL - CLUT Control. - Select Color Look-up Table. */
 			if(frame == 0) {
-//				GLC::GR1
+				return (glcdc_clut_plane_t)GLC::GR1CLUTINT.SEL();
 			} else {
-
+				return (glcdc_clut_plane_t)GLC::GR2CLUTINT.SEL();
 			}
-			return (glcdc_clut_plane_t)gp_gr[frame]->grxclutint.bit.sel;
 		}
 
 
+		void clutplane_select_(glcdc_frame_layer_t frame, glcdc_clut_plane_t clut_plane)
+		{
+			/* GRnCLUTINT - Graphic n CLUT/Interrupt Control Register
+			b16 SEL - CLUT Control. - Select Color Look-up Table. */
+			if(frame == 0) {
+				GLC::GR1CLUTINT.SEL = (uint32_t)clut_plane;
+			} else {
+				GLC::GR2CLUTINT.SEL = (uint32_t)clut_plane;
+			}
+		}
+
+
+		void clut_set_(glcdc_frame_layer_t frame, glcdc_clut_plane_t clut_plane,
+					   uint32_t entry, uint32_t data)
+		{
+			/* GRnCLUTm[k] - Color Look-up Table
+			b31:b24 A[7:0] - Color Look-up Table A Value Setting.
+			b23:b16 R[7:0] - Color Look-up Table R Value Setting.
+			b15:b8  G[7:0] - Color Look-up Table G Value Setting.
+			b7:b0   B[7:0] - Color Look-up Table B Value Setting. */
+    		// gp_gr_clut[frame][clut_plane]->grxclut[entry].lsize = data;
+			if(frame == 0) {
+				if(clut_plane == 0) {
+					GLC::GR1CLUT0[entry] = data;
+				} else {
+					GLC::GR1CLUT1[entry] = data;
+				}
+			} else {
+				if(clut_plane == 0) {
+					GLC::GR2CLUT0[entry] = data;
+				} else {
+					GLC::GR2CLUT1[entry] = data;
+				}
+			}
+		}
 
 
 		void clut_update_(const glcdc_clut_cfg_t& clut, glcdc_frame_layer_t frame)
@@ -1074,9 +1143,10 @@ namespace device {
 
 			if(true == clut.enable) {
 				const uint32_t* p_base = clut.p_base;
-				glcdc_clut_plane_t set_clutplane;
 
-				if(GLCDC_CLUT_PLANE_1 == is_clutplane_selected_(frame)) {
+				glcdc_clut_plane_t set_clutplane;
+///				if(GLCDC_CLUT_PLANE_1 == is_clutplane_selected_(frame)) {
+				if(GLCDC_CLUT_PLANE_0 == is_clutplane_selected_(frame)) {
 					set_clutplane = GLCDC_CLUT_PLANE_0;
 				} else {
 					set_clutplane = GLCDC_CLUT_PLANE_1;
@@ -1092,11 +1162,6 @@ namespace device {
 				clutplane_select_(frame, set_clutplane);
 			}
 		}
-#endif
-
-
-
-
 
 
 		void output_block_set_(const glcdc_cfg_t& cfg)
@@ -1251,8 +1316,6 @@ namespace device {
 
 		void gamma_correction_(const glcdc_gamma_correction_t& gamma)
 		{
-			uint32_t *p_lut_table;
-
 			if(true == gamma.enable) {
 				/* ---- Gamma correction enable and set gamma setting ---- */
 				/* GAMSW - Gamma Correction Block Function Switch Register
@@ -1261,18 +1324,18 @@ namespace device {
 				GLC::GAMSW.GAMON = 1;
 #if 0
 				/* Green */
-        p_lut_table = (uint32_t *) (&GLCDC.GAMGLUT1);
-        for (i = 0; i < GLCDC_GAMMA_CURVE_GAIN_ELEMENT_NUM; i += 2)
-        {
-            /* GAMGLUTx - Gamma Correction G Table Setting Register x */
-            *p_lut_table = ((((uint32_t)p_gamma->p_g->gain[i] & GAMX_LUTX_GAIN_MASK) << 16)
-                    | ((uint32_t)p_gamma->p_g->gain[i + 1] & GAMX_LUTX_GAIN_MASK));
-            p_lut_table++;
-        }
+				uint32_t *p_lut_table;
+				p_lut_table = (uint32_t*)(&GLCDC.GAMGLUT1);
+				for(uint32_t i = 0; i < GLCDC_GAMMA_CURVE_GAIN_ELEMENT_NUM; i += 2) {
+					/* GAMGLUTx - Gamma Correction G Table Setting Register x */
+					*p_lut_table = ((((uint32_t)p_gamma->p_g->gain[i] & GAMX_LUTX_GAIN_MASK) << 16)
+						| ((uint32_t)p_gamma->p_g->gain[i + 1] & GAMX_LUTX_GAIN_MASK));
+					p_lut_table++;
+				}
 
-        p_lut_table = (uint32_t *) (&GLCDC.GAMGAREA1);
-        for (i = 0; i < GLCDC_GAMMA_CURVE_THRESHOLD_ELEMENT_NUM; i += 3)
-        {
+				p_lut_table = (uint32_t *) (&GLCDC.GAMGAREA1);
+				for(uint32_t i = 0; i < GLCDC_GAMMA_CURVE_THRESHOLD_ELEMENT_NUM; i += 3) {
+///////
             /* GAMGAREAx - Gamma Correction G Area Setting Register x */
             *p_lut_table = ((((uint32_t)p_gamma->p_g->threshold[i] & GAMX_AREAX_MASK) << 20)
                     | (((uint32_t)p_gamma->p_g->threshold[i + 1] & GAMX_AREAX_MASK) << 10)
@@ -1372,109 +1435,93 @@ namespace device {
 
 		void interrupt_setting_(const glcdc_interrupt_cfg_t& interrupt)
 		{
-#if 0
-    bsp_int_ctrl_t grpal1;
+///			bsp_int_ctrl_t grpal1;
 
-    grpal1.ipl = GLCDC_CFG_INTERRUPT_PRIORITY_LEVEL;
+///			grpal1.ipl = GLCDC_CFG_INTERRUPT_PRIORITY_LEVEL;
 
-    if (true == p_interrupt->vpos_enable)
-    {
-        /* INTEN - Interrupt Request Enable Control Register
-        b31:b3 Reserved   - These bits are read as 0. Writing to these bits have no effect.
-        b2     GR2UFINTEN - GR2UF Interrupt Enable.
-        b1     GR1UFINTEN - GR1UF Interrupt Enable.
-        b0     VPOSINTEN  - VPOS Interrupt Enable. - Enable VPOS interrupt request. */
-        GLCDC.INTEN.BIT.VPOSINTEN = 1;
+			if(true == interrupt.vpos_enable) {
+				/* INTEN - Interrupt Request Enable Control Register
+				b31:b3 Reserved   - These bits are read as 0. Writing to these bits have no effect.
+				b2     GR2UFINTEN - GR2UF Interrupt Enable.
+				b1     GR1UFINTEN - GR1UF Interrupt Enable.
+				b0     VPOSINTEN  - VPOS Interrupt Enable. - Enable VPOS interrupt request. */
+				GLC::INTEN.VPOSINTEN = 1;
 
-        /* GENAL1 - Group AL1 Interrupt Request Enable Register
-        b8 EN8 - Interrupt Request Enable 8 - Interrupt request is enabled. */
-        EN(GLCDC,VPOS) = 1;
-    }
-    else
-    {
-        /* INTEN - Interrupt Request Enable Control Register
-        b0 VPOSINTEN  - VPOS Interrupt Enable. - Disable VPOS interrupt request. */
-        GLCDC.INTEN.BIT.VPOSINTEN = 0;
+				/* GENAL1 - Group AL1 Interrupt Request Enable Register
+				b8 EN8 - Interrupt Request Enable 8 - Interrupt request is enabled. */
+///				EN(GLCDC,VPOS) = 1;
+			} else {
+				/* INTEN - Interrupt Request Enable Control Register
+				b0 VPOSINTEN  - VPOS Interrupt Enable. - Disable VPOS interrupt request. */
+				GLC::INTEN.VPOSINTEN = 0;
 
-        /* GENAL1 - Group AL1 Interrupt Request Enable Register
-        b8 EN8 - Interrupt Request Enable 8 - Interrupt request is disabled. */
-        EN(GLCDC,VPOS) = 0;
+				/* GENAL1 - Group AL1 Interrupt Request Enable Register
+				b8 EN8 - Interrupt Request Enable 8 - Interrupt request is disabled. */
+///				EN(GLCDC,VPOS) = 0;
 
-        /* GRPAL1 - Group AL1 Interrupt Request Register
-        b8 IS8 - Interrupt Status Flag 8. */
-        while (0 != IS(GLCDC,VPOS))
-        {
-            nop();
-        }
-    }
+				/* GRPAL1 - Group AL1 Interrupt Request Register
+				b8 IS8 - Interrupt Status Flag 8. */
+///				while(0 != IS(GLCDC,VPOS)) {
+///					asm("nop");
+///				}
+			}
 
-    if (true == p_interrupt->gr1uf_enable)
-    {
-        /* INTEN - Interrupt Request Enable Control Register
-        b1 GR1UFINTEN - GR1UF Interrupt enable. */
-        GLCDC.INTEN.BIT.GR1UFINTEN = 1;
+			if(true == interrupt.gr1uf_enable) {
+				/* INTEN - Interrupt Request Enable Control Register
+				b1 GR1UFINTEN - GR1UF Interrupt enable. */
+				GLC::INTEN.GR1UFINTEN = 1;
 
-        /* GENAL1 - Group AL1 Interrupt Request Enable Register
-        b9 EN9 - Interrupt Request Enable 9 - Interrupt request is enabled. */
-        EN(GLCDC,GR1UF) = 1;
-    }
-    else
-    {
-        /* INTEN - Interrupt Request Enable Control Register
-        b1 GR1UFINTEN - GR1UF Interrupt disable. */
-        GLCDC.INTEN.BIT.GR1UFINTEN = 0;
+				/* GENAL1 - Group AL1 Interrupt Request Enable Register
+				b9 EN9 - Interrupt Request Enable 9 - Interrupt request is enabled. */
+///				EN(GLCDC,GR1UF) = 1;
+			} else {
+				/* INTEN - Interrupt Request Enable Control Register
+				b1 GR1UFINTEN - GR1UF Interrupt disable. */
+				GLC::INTEN.GR1UFINTEN = 0;
 
-        /* GENAL1 - Group AL1 Interrupt Request Enable Register
-        b9 EN9 - Interrupt Request Enable 9 - Interrupt request is disabled. */
-        EN(GLCDC,GR1UF) = 0;
+				/* GENAL1 - Group AL1 Interrupt Request Enable Register
+				b9 EN9 - Interrupt Request Enable 9 - Interrupt request is disabled. */
+///				EN(GLCDC,GR1UF) = 0;
 
-        /* GRPAL1 - Group AL1 Interrupt Request Register
-        b9 IS9 - Interrupt Status Flag 9. */
-        while (0 != IS(GLCDC,GR1UF))
-        {
-            nop();
-        }
-    }
+				/* GRPAL1 - Group AL1 Interrupt Request Register
+				b9 IS9 - Interrupt Status Flag 9. */
+///				while(0 != IS(GLCDC,GR1UF)) {
+///					asm("nop");
+///				}
+			}
 
-    if (true == p_interrupt->gr2uf_enable)
-    {
-        /* INTEN - Interrupt Request Enable Control Register
-        b2 GR2UFINTEN - GR2UF Interrupt enable. */
-        GLCDC.INTEN.BIT.GR2UFINTEN = 1;
+			if(true == interrupt.gr2uf_enable) {
+				/* INTEN - Interrupt Request Enable Control Register
+				b2 GR2UFINTEN - GR2UF Interrupt enable. */
+				GLC::INTEN.GR2UFINTEN = 1;
 
-        /* GENAL1 - Group AL1 Interrupt Request Enable Register
-        b10 EN10 - Interrupt Request Enable 10 - Interrupt request is enabled. */
-        EN(GLCDC,GR2UF) = 1;
-    }
-    else
-    {
-        /* INTEN - Interrupt Request Enable Control Register
-        b2 GR2UFINTEN - GR2UF Interrupt disable. */
-        GLCDC.INTEN.BIT.GR2UFINTEN = 0;
+				/* GENAL1 - Group AL1 Interrupt Request Enable Register
+				b10 EN10 - Interrupt Request Enable 10 - Interrupt request is enabled. */
+///				EN(GLCDC,GR2UF) = 1;
+			} else {
+				/* INTEN - Interrupt Request Enable Control Register
+				b2 GR2UFINTEN - GR2UF Interrupt disable. */
+				GLC::INTEN.GR2UFINTEN = 0;
 
-        /* GENAL1 - Group AL1 Interrupt Request Enable Register
-        b10 EN10 - Interrupt Request Enable 10 - Interrupt request is disabled. */
-        EN(GLCDC,GR2UF) = 0;
+				/* GENAL1 - Group AL1 Interrupt Request Enable Register
+				b10 EN10 - Interrupt Request Enable 10 - Interrupt request is disabled. */
+///				EN(GLCDC,GR2UF) = 0;
 
-        /* GRPAL1 - Group AL1 Interrupt Request Register
-        b10 IS10 - Interrupt Status Flag 10. */
-        while (0 != IS(GLCDC,GR2UF))
-        {
-            nop();
-        }
-    }
+				/* GRPAL1 - Group AL1 Interrupt Request Register
+				b10 IS10 - Interrupt Status Flag 10. */
+///				while (0 != IS(GLCDC,GR2UF)) {
+///					asm("nop");
+///				}
+			}
 
-    /* Set GROUPAL1 interrupt request to enable, if GLCDC interrupt parameter is enabled
-       Set GROUPAL1 interrupt request to disable, if GLCDC interrupt parameter is disabled */
-    if ((true == p_interrupt->vpos_enable) || (true == p_interrupt->gr1uf_enable) || (true == p_interrupt->gr2uf_enable))
-    {
-        R_BSP_InterruptControl(BSP_INT_SRC_AL1_GLCDC_VPOS, BSP_INT_CMD_GROUP_INTERRUPT_ENABLE, (void *) &grpal1.ipl);
-    }
-    else
-    {
-        R_BSP_InterruptControl(BSP_INT_SRC_AL1_GLCDC_VPOS, BSP_INT_CMD_GROUP_INTERRUPT_DISABLE, NULL);
-    }
-#endif
+			/* Set GROUPAL1 interrupt request to enable, if GLCDC interrupt parameter is enabled
+			Set GROUPAL1 interrupt request to disable, if GLCDC interrupt parameter is disabled */
+			if((true == interrupt.vpos_enable) || (true == interrupt.gr1uf_enable) ||
+			   (true == interrupt.gr2uf_enable)) {
+///				R_BSP_InterruptControl(BSP_INT_SRC_AL1_GLCDC_VPOS, BSP_INT_CMD_GROUP_INTERRUPT_ENABLE, (void *) &grpal1.ipl);
+			} else {
+///				R_BSP_InterruptControl(BSP_INT_SRC_AL1_GLCDC_VPOS, BSP_INT_CMD_GROUP_INTERRUPT_DISABLE, NULL);
+			}
 		}
 
 
@@ -1577,8 +1624,6 @@ namespace device {
 		R_BSP_InterruptWrite (BSP_INT_SRC_AL1_GLCDC_GR1UF, (bsp_int_cb_t) r_glcdc_underflow_1_isr);
 		R_BSP_InterruptWrite (BSP_INT_SRC_AL1_GLCDC_GR2UF, (bsp_int_cb_t) r_glcdc_underflow_2_isr);
 #endif
-				utils::format("R_GLCDC_Open: BSP_INT...\n");
-
 				ctrl_blk_.is_entry = true;
 			}
 
@@ -1632,8 +1677,8 @@ namespace device {
 			if(false == R_BSP_HardwareLock ((mcu_lock_t) BSP_LOCK_GLCDC)) {
 				return GLCDC_ERR_LOCK_FUNC;
 			}
-#endif
 			utils::format("R_GLCDC_Open: R_BSP_HardwareLock...\n");
+#endif
 
 			// Supply the peripheral clock to the GLCD module
 			power_cfg::turn(GLC::get_peripheral());
@@ -1643,8 +1688,6 @@ namespace device {
 
 			// Set the dot clock frequency
 			clock_set_(cfg);
-
-			utils::format("OK!\n");
 
 			// Set the panel signal timing
 			sync_signal_set_(cfg);
@@ -1657,7 +1700,7 @@ namespace device {
 				graphics_layer_set_(cfg.input[frame], (glcdc_frame_layer_t)frame);
 				blend_condition_set_(cfg.blend[frame], (glcdc_frame_layer_t)frame);
 				graphics_chromakey_set_(cfg.chromakey[frame], (glcdc_frame_layer_t)frame);
-///				clut_update_(cfg.clut[frame], (glcdc_frame_layer_t) frame);
+				clut_update_(cfg.clut[frame], (glcdc_frame_layer_t)frame);
 			}
 
 			// Configure the output control block

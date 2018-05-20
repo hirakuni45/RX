@@ -24,19 +24,30 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  
+			@brief  CLUT カラー構造体
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct clut_t {
+			uint8_t		B;	///< B0-B7
+			uint8_t		G;	///< B8-B15
+			uint8_t		R;	///< B16-B23
+			uint8_t		A;	///< B24-B31
+			clut_t(uint8_t r = 0, uint8_t g = 0, uint8_t b = 0, uint8_t a = 0) :
+				B(b), G(g), R(r), A(a) { }
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  カラールックアップテーブル (GRnCLUTm[k]) (n = 1, 2、m = 0, 1、k = 0 ～ 255)
 			@param[in]	ofs	オフセット
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
 		struct grclut_t {
-//			byte_t<ofs + 0> B;
-//			byte_t<ofs + 1> G;
-//			byte_t<ofs + 2> R;
-//			byte_t<ofs + 3> A;
 
 			volatile uint32_t& operator[] (uint32_t idx) {
-				return reinterpret_cast<volatile uint32_t*>(ofs)[idx & 0xff];
+				return *reinterpret_cast<volatile uint32_t*>((ofs + idx) & 0xff);
 			}
 		};
 		static grclut_t<base + 0x0000> GR1CLUT0;
