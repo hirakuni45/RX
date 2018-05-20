@@ -87,6 +87,14 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA19 = f;	// R12DA のストップ状態解除
 				break;
 
+			case peripheral::DMAC0:
+			case peripheral::DMAC1:
+			case peripheral::DMAC2:
+			case peripheral::DMAC3:
+			case peripheral::DMAC4:
+			case peripheral::DMAC5:
+			case peripheral::DMAC6:
+			case peripheral::DMAC7:
 			case peripheral::DTC:
 				SYSTEM::MSTPCRA.MSTPA28 = f;	// DMAC/DTC のストップ状態解除
 				break;
