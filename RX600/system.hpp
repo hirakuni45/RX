@@ -21,7 +21,71 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  シリアルプログラマコマンド制御レジスタ（SPCC）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct spcc_t : public ro32_t<base> {
+			typedef ro32_t<base> io_;
+			using io_::operator ();
+
+			bit_ro_t <io_, bitpos::B24>    IDE;
+			bit_ro_t <io_, bitpos::B27>    SPE;
+			bit_ro_t <io_, bitpos::B29>    SEPR;
+			bit_ro_t <io_, bitpos::B30>    SWRPR;
+			bit_ro_t <io_, bitpos::B31>    RDPR;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  オプション機能選択レジスタ 0（OFS0）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct ofs0_t : public ro32_t<base> {
+			typedef ro32_t<base> io_;
+			using io_::operator ();
+
+			bit_ro_t <io_, bitpos::B1>      IWDTSTRT;
+			bits_ro_t<io_, bitpos::B2,  2>  IWDTTOPS;
+			bits_ro_t<io_, bitpos::B4,  4>  IWDTCKS;
+			bits_ro_t<io_, bitpos::B8,  2>  IWDTRPES;
+			bits_ro_t<io_, bitpos::B10, 2>  IWDTRPSS;
+			bit_ro_t <io_, bitpos::B12>     IWDTRSTIRQS;
+			bit_ro_t <io_, bitpos::B14>     IWDTSLCSTP;
+			bit_ro_t <io_, bitpos::B17>     WDTSTRT;
+			bits_ro_t<io_, bitpos::B18, 2>  WDTTOPS;
+			bits_ro_t<io_, bitpos::B20, 4>  WDTCKS;
+			bits_ro_t<io_, bitpos::B24, 2>  WDTRPES;
+			bits_ro_t<io_, bitpos::B26, 2>  WDTRPSS;
+			bit_ro_t <io_, bitpos::B28>     WDTRSTIRQS;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  オプション機能選択レジスタ 1（OFS1）
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct ofs1_t : public ro32_t<base> {
+			typedef ro32_t<base> io_;
+			using io_::operator ();
+
+			bits_ro_t<io_, bitpos::B0, 2>  VDSEL;
+			bit_ro_t <io_, bitpos::B2>     LVDAS;
+			bit_ro_t <io_, bitpos::B8>     HOCOEN;
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  エンディアン選択レジスタ（MDE）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -31,12 +95,23 @@ namespace device {
 
 			bits_ro_t<io_, bitpos::B0, 3> MDE;
 		};
-		static mde_t<0x00120064> MDE;
+#if defined(SIG_RX65N)
+		static spcc_t<0xFE7F5D40> SPCC;
+		static ofs0_t<0xFE7F5D04> OFS0;
+		static ofs1_t<0xFE7F5D08> OFS1;
+		static mde_t <0xFE7F5D00> MDE;
+#else
+		static spcc_t<0x00120040> SPCC;
+		static ofs0_t<0x00120068> OFS0;
+		static ofs1_t<0x0012006C> OFS1;
+		static mde_t <0x00120064> MDE;
+#endif
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  モードモニタレジスタ（MDMONR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -55,6 +130,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  モードステータスレジスタ（MDSR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -73,6 +149,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  システムコントロールレジスタ 0（SYSCR0）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -93,6 +170,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  システムコントロールレジスタ 1（SYSCR1）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -113,6 +191,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  システムクロックコントロールレジスタ（SCKCR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -139,6 +218,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -158,6 +238,7 @@ namespace device {
   		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ROM ウェイトサイクル設定レジスタ (ROMWT)
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -177,6 +258,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  システムクロックコントロールレジスタ 2（SCKCR2）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
