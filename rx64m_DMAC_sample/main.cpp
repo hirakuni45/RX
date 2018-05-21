@@ -22,7 +22,7 @@ namespace {
 
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 
-	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
+	typedef device::cmt_io<device::CMT0> CMT;
 	CMT		cmt_;
 
 	typedef utils::fixed_fifo<char, 128> BUFFER;
@@ -31,7 +31,21 @@ namespace {
 
 	utils::command<256> cmd_;
 
-	typedef device::dmac_man<device::DMAC0> DMAC_MAN;
+	/// DMAC 終了割り込み
+	class dmac_task {
+		uint32_t	count_;
+	public:
+		dmac_task() : count_(0) { }
+
+		void operator() () {
+			++count_;
+		}
+
+		uint32_t get_count() const { return count_; }
+	};
+
+
+	typedef device::dmac_man<device::DMAC0, dmac_task> DMAC_MAN;
 	DMAC_MAN	dmac_man_;
 
 	char	tmp_[256];
@@ -82,7 +96,10 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
-	dmac_man_.start(1);
+	{
+		uint8_t intr_level = 4;
+		dmac_man_.start(intr_level);
+	}
 
 	// copy 機能の確認
 	std::memset(tmp_, 0, sizeof(tmp_));
@@ -96,7 +113,7 @@ int main(int argc, char** argv)
 
 	utils::format("ORG(%d): '%s'\n") % std::strlen(tmp_) % tmp_;
 	utils::format("CPY(%d): '%s'\n") % std::strlen(&tmp_[128]) % &tmp_[128];
-
+	utils::format("DMAC task: %d\n") % dmac_man_.at_task().get_count();
 
 
 	uint32_t cnt = 0;
