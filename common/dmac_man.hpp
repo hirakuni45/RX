@@ -43,23 +43,22 @@ namespace device {
 
 		uint32_t	src_;
 
-		uint8_t		level_;
-
 
 		static INTERRUPT_FUNC void dmac_task_() noexcept
 		{
 			task_();
+			DMAC::DMSTS.DTIF = 0;
 		}
 
 
-		void set_vector_(ICU::VECTOR vec) noexcept
+		void set_vector_(uint32_t lvl, ICU::VECTOR vec) const noexcept
 		{
-			if(level_) {
+			if(lvl) {
 				set_interrupt_task(dmac_task_, static_cast<uint32_t>(vec));
 			} else {
 				set_interrupt_task(nullptr, static_cast<uint32_t>(vec));
 			}
-			icu_mgr::set_level(DMAC::get_peripheral(), level_);
+			icu_mgr::set_level(DMAC::get_peripheral(), lvl);
 		}
 
 	public:
@@ -68,7 +67,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		dmac_man() noexcept : src_(0), level_(0) { }
+		dmac_man() noexcept : src_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -77,13 +76,17 @@ namespace device {
 			@param[in]	lvl		割り込みレベル
 		 */
 		//-----------------------------------------------------------------//
-		void start(uint32_t lvl = 0) noexcept
+		void start(uint32_t lvl = 0) const noexcept
 		{
-			level_ = lvl;
-
 			power_cfg::turn(DMAC::get_peripheral());
 
-			set_vector_(DMAC::get_vec());
+			set_vector_(lvl, DMAC::get_vec());
+
+			if(lvl) {
+				DMAC::DMINT.DTIE = 1;
+			} else {
+				DMAC::DMINT.DTIE = 0;
+			}
 
 			DMAST.DMST = 1;
 		}
@@ -167,5 +170,16 @@ namespace device {
 
 			return true;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  TASK クラスの参照
+			@return TASK クラス
+		*/
+		//-----------------------------------------------------------------//
+		static TASK& at_task() noexcept { return task_; }
 	};
+
+	template <class DMAC, class TASK> TASK dmac_man<DMAC, TASK>::task_;
 }
