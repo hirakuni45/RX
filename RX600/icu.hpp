@@ -150,32 +150,32 @@ namespace device {
 			SPRI2        = 108,
 			SPTI2        = 109,
 #endif
-			GROUPBL0 = 110,
-			GROUPBL1 = 111,
-			GROUPAL0 = 112,
-			GROUPAL1 = 113,
+			GROUPBL0	 = 110,
+			GROUPBL1	 = 111,
+			GROUPAL0	 = 112,
+			GROUPAL1	 = 113,
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-			RXIF11   = 114,  // SCIFA11
-			TXIF11   = 115,
+			RXIF11  	 = 114,  // SCIFA11
+			TXIF11   	 = 115,
 #elif defined(SIG_RX65N)
-			RXI11    = 114,  // SCI11
-			TXI11    = 115,
+			RXI11   	 = 114,  // SCI11
+			TXI11   	 = 115,
 #endif
-			RXI12    = 116,  // SCI12
-			TXI12    = 117,
+			RXI12   	 = 116,  // SCI12
+			TXI12   	 = 117,
 
-			DMAC0I   = 120,  // DMAC
-			DMAC1I   = 121,
-			DMAC2I   = 122,
-			DMAC3I   = 123,
-			DMAC74I  = 124,
+			DMAC0I  	 = 120,  // DMAC
+			DMAC1I  	 = 121,
+			DMAC2I  	 = 122,
+			DMAC3I  	 = 123,
+			DMAC74I 	 = 124,
 
-			OSTDI    = 125,  // OST
+			OSTDI    	 = 125,  // OST
 
-			EXDMAC0I = 126,  // EXDMAC
-			EXDMAC1I = 127,
+			EXDMAC0I 	 = 126,  // EXDMAC
+			EXDMAC1I 	 = 127,
 
-			INTB128  = 128,
+			INTB128  	 = 128,
 			INTB129,
 			INTB130,
 			INTB131,
@@ -393,6 +393,12 @@ namespace device {
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
 
+			rw8_t<base + 120> DMAC0I;
+			rw8_t<base + 121> DMAC1I;
+			rw8_t<base + 122> DMAC2I;
+			rw8_t<base + 123> DMAC3I;
+			rw8_t<base + 124> DMAC74I;
+
 			rw8_t<base + 128> INTB128;
 			rw8_t<base + 129> INTB129;
 			rw8_t<base + 130> INTB130;
@@ -569,6 +575,13 @@ namespace device {
 			bit_rw_t<ier0E, bitpos::B4> RXI12;
 			bit_rw_t<ier0E, bitpos::B5> TXI12;
 
+			typedef rw8_t<base + 0x0F> ier0F;
+			bit_rw_t<ier0F, bitpos::B0> DMAC0I;
+			bit_rw_t<ier0F, bitpos::B1> DMAC1I;
+			bit_rw_t<ier0F, bitpos::B2> DMAC2I;
+			bit_rw_t<ier0F, bitpos::B3> DMAC3I;
+			bit_rw_t<ier0F, bitpos::B4> DMAC74I;
+
 			typedef rw8_t<base + 0x10> ier10;
 			bit_rw_t<ier10, bitpos::B0> INTB128;
 			bit_rw_t<ier10, bitpos::B1> INTB129;
@@ -722,6 +735,12 @@ namespace device {
 #endif
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
+
+			rw8_t<base + 120> DMAC0I;
+			rw8_t<base + 121> DMAC1I;
+			rw8_t<base + 122> DMAC2I;
+			rw8_t<base + 123> DMAC3I;
+			rw8_t<base + 124> DMAC74I;
 
 			rw8_t<base + 128> INTB128;
 			rw8_t<base + 129> INTB129;

@@ -42,6 +42,35 @@ namespace device {
 		{
 			bool ena = lvl != 0 ? true : false;
 			switch(t) {
+			case peripheral::DMAC0:
+				ICU::IER.DMAC0I = 0;
+				ICU::IPR.DMAC0I = lvl;
+				ICU::IER.DMAC0I = ena;
+				break;
+			case peripheral::DMAC1:
+				ICU::IER.DMAC1I = 0;
+				ICU::IPR.DMAC1I = lvl;
+				ICU::IER.DMAC1I = ena;
+				break;
+			case peripheral::DMAC2:
+				ICU::IER.DMAC2I = 0;
+				ICU::IPR.DMAC2I = lvl;
+				ICU::IER.DMAC2I = ena;
+				break;
+			case peripheral::DMAC3:
+				ICU::IER.DMAC3I = 0;
+				ICU::IPR.DMAC3I = lvl;
+				ICU::IER.DMAC3I = ena;
+				break;
+			case peripheral::DMAC4:
+			case peripheral::DMAC5:
+			case peripheral::DMAC6:
+			case peripheral::DMAC7:
+				ICU::IER.DMAC74I = 0;
+				ICU::IPR.DMAC74I = lvl;
+				ICU::IER.DMAC74I = ena;
+				break;
+
 			case peripheral::CMT0:
 				ICU::IER.CMI0 = 0;
 				ICU::IPR.CMI0 = lvl;
