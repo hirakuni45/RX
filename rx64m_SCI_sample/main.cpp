@@ -19,6 +19,8 @@
 
 namespace {
 
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+
 	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
 	CMT		cmt_;
 
@@ -72,8 +74,7 @@ int main(int argc, char** argv)
 
 	cmd_.set_prompt("# ");
 
-	device::PORT0::PDR.B5 = 1;
-	device::PORT0::PDR.B7 = 1;
+	LED::DIR = 1;
 
 	uint32_t cnt = 0;
 	while(1) {
@@ -87,6 +88,6 @@ int main(int argc, char** argv)
 		if(cnt >= 30) {
 			cnt = 0;
 		}
-		device::PORT0::PODR.B7 = (cnt < 10) ? 0 : 1;
+		LED::P = (cnt < 10) ? 0 : 1;
 	}
 }
