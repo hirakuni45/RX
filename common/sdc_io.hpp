@@ -271,6 +271,8 @@ namespace utils {
 
 				auto st = f_opendir(&dir_, full_);
 				if(st != FR_OK) {
+					init_ = false;
+					utils::format("f_opendir error: '%s'\n") % full_;
 					return false;
 				}
 
