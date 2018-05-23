@@ -32,7 +32,6 @@ namespace seeda {
 		typedef utils::null_format debug_format;
 #endif
 
-///		uint32_t	limit_;
 		uint32_t	count_;
 
 		char		path_org_[256];
@@ -73,7 +72,26 @@ namespace seeda {
 		uint8_t		open_retry_;
 		uint8_t		open_retry_delay_;
 
-		uint16_t	index_;
+		struct dir_info_t {
+			static const uint32_t NUM = 1000 / 8;
+			uint8_t		find_[NUM];
+			dir_info_t() { }
+			void clear() { for(uint32_t i = 0; i < NUM; ++i) find_[i] = 0; }
+			void set(uint32_t i) {
+				if(i < 999) {
+					find_[i >> 3] |= 1 << (i & 7);
+				}
+			}
+			uint32_t first_free() const {
+				for(uint32_t i = 0; i < 999; ++i) {
+					if((find_[i >> 3] & (1 << (i & 7))) == 0) {
+						return i;
+					}
+				}
+				return 1000 - 2;
+			}
+		};
+		dir_info_t	dir_info_;
 
 		SDC::dir_list dir_list_;
 
@@ -94,16 +112,16 @@ namespace seeda {
 		static void dir_func_(const char* name, const FILINFO* fi, bool dir, void* opt)
 		{
 			if(!dir) return;
-//			utils::format(": '%s'\n") % name;
+
 			if(std::strlen(name) != 3) {
 				return;
 			}
 			uint16_t v;
 			if((utils::input("%d", name) % v).status()) {
-				if(v > 0 && v < 1000) {
-					uint16_t* vp = static_cast<uint16_t*>(opt);
-					if(vp != nullptr && *vp < v) {
-						*vp = v;
+				if(v > 0 && v < 1000) {  // 1 to 999
+					dir_info_t* t = static_cast<dir_info_t*>(opt);
+					if(t != nullptr) {
+						t->set(v - 1);
 					}
 				}
 			}
@@ -118,7 +136,7 @@ namespace seeda {
 			if(p != nullptr) {
 				p[0] = 0;
 				utils::format("Dir List Start: '%s'\n") % tmp;
-				if(dir_list_.start(tmp)) {
+				if(!dir_list_.start(tmp)) {
 					debug_format("Can't start dir list: '%s'\n") % tmp;
 				}
 				return true;
@@ -163,7 +181,7 @@ namespace seeda {
 			ch_loop_(0),
 			task_(task::wait_request), last_channel_(false), second_(0),
 			open_retry_(OPEN_RETRY_LIMIT), open_retry_delay_(0),
-			index_(0), dir_list_(), wildcards_(false), dir_time_(0)
+			dir_info_(), dir_list_(), wildcards_(false), dir_time_(0)
 			{ }
 
 
@@ -248,7 +266,7 @@ namespace seeda {
 				if(enable_ && !back) {
 					if(path_org_[0] != 0) {
 						wildcards_ = scan_dir_();
-						index_ = 0;
+						dir_info_.clear();
 						task_ = task::make_filepath;
 					}
 				}
@@ -256,15 +274,12 @@ namespace seeda {
 
 			case task::make_filepath:
 				if(wildcards_) {
-					dir_list_.service(20, dir_func_, true, &index_);
+					dir_list_.service(20, dir_func_, true, &dir_info_);
 					if(!dir_list_.probe()) {
-						if(index_ > 0 && index_ < 1000) {
-							if(index_ != 999) ++index_;
-							else index_ = 1;
-						} else {
-							index_ = 1;
-						}
-						make_wildcards_(index_);
+						uint32_t idx = dir_info_.first_free();
+						++idx;
+utils::format("First Free Index: %d\n") % idx;
+						make_wildcards_(idx);
 						dir_time_ = get_time();
 						reset_wf_fifo();
 						task_ = task::make_filename;
@@ -471,7 +486,7 @@ namespace seeda {
 				if(wildcards_) {
 					if((dir_time_ + DIR_LIMIT_TIME) < get_time()) {
 						wildcards_ = scan_dir_();
-						index_ = 0;
+						dir_info_.clear();
 						task_ = task::make_filepath;
 					} else {
 						task_ = task::make_filename;
