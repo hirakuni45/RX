@@ -16,7 +16,6 @@
 #include "common/format.hpp"
 #include "common/delay.hpp"
 #include "common/command.hpp"
-#include "common/dmac_man.hpp"
 
 namespace {
 
@@ -45,8 +44,8 @@ namespace {
 	};
 
 
-	typedef device::dmac_man<device::DMAC0, dmac_task> DMAC_MAN;
-	DMAC_MAN	dmac_man_;
+	typedef device::dmac_mgr<device::DMAC0, dmac_task> DMAC_MGR;
+	DMAC_MGR	dmac_mgr_;
 
 	char	tmp_[256];
 }
@@ -98,22 +97,39 @@ int main(int argc, char** argv)
 
 	{
 		uint8_t intr_level = 4;
-		dmac_man_.start(intr_level);
+		dmac_mgr_.start(intr_level);
 	}
 
 	// copy 機能の確認
 	std::memset(tmp_, 0, sizeof(tmp_));
 	std::strcpy(tmp_, "ASDFGHJKLQWERTYUZXCVBNMIOP");
 	uint32_t copy_len = 16;
-	dmac_man_.copy(&tmp_[0], &tmp_[128], copy_len); 
+	dmac_mgr_.copy(&tmp_[0], &tmp_[128], copy_len, true); 
 
 	utils::format("DMA Copy: %d\n") % copy_len;
-
-	while(dmac_man_.probe()) ;
+	while(dmac_mgr_.probe()) ;
 
 	utils::format("ORG(%d): '%s'\n") % std::strlen(tmp_) % tmp_;
 	utils::format("CPY(%d): '%s'\n") % std::strlen(&tmp_[128]) % &tmp_[128];
-	utils::format("DMAC task: %d\n") % dmac_man_.at_task().get_count();
+	utils::format("DMAC task: %d\n") % dmac_mgr_.at_task().get_count();
+
+	dmac_mgr_.fill(&tmp_[0], 4, copy_len, true);
+
+	utils::format("DMA fill: %d\n") % copy_len;
+	while(dmac_mgr_.probe()) ;
+
+	utils::format("ORG(%d): '%s'\n") % std::strlen(tmp_) % tmp_;
+	utils::format("DMAC task: %d\n") % dmac_mgr_.at_task().get_count();
+
+	uint8_t val = 'Z';
+	copy_len = 31;
+	dmac_mgr_.memset(&tmp_[0], val, copy_len, true);
+
+	utils::format("DMA memset: %d\n") % copy_len;
+	while(dmac_mgr_.probe()) ;
+
+	utils::format("ORG(%d): '%s'\n") % std::strlen(tmp_) % tmp_;
+	utils::format("DMAC task: %d\n") % dmac_mgr_.at_task().get_count();
 
 
 	uint32_t cnt = 0;
