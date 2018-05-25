@@ -180,7 +180,7 @@ static short randTapTables[] = {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	SIN テーブル生成 @n
+		@brief	SIN テーブル生成テンプレート @n
 				X' = X * COS(s) - Y * SIN(s) @n
 				Y' = X * SIN(s) + Y * COS(s) @n
 				※角度「s」が十分小さい場合、以下のように近似できる。@n
@@ -189,13 +189,14 @@ static short randTapTables[] = {
 				X' = X   - Y・s @n
 				Y' = X'・s + Y  @n
 				上記の原理を使って、三角関数テーブルを作成する
-		@param[in]	shi	テーブルサイズ（２のＮ乗）1/4 周期分
-		@param[in]	len	正規化された値の最大値（腕の長さ）
-		@param[in]	ofs	オフセット
+		@param[in]	qlp		1/4 周期のループ数
+		@param[in]	len		正規化された値の最大値（腕の長さ）
+		@param[in]	ofs		オフセット
+		@param[in]	loop	ループ数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <typename UNT>
-	static void build_sin(void* tbl, uint16_t shi, uint16_t len, uint16_t ofs, uint16_t loop)
+	static void build_sin(void* tbl, uint16_t qlp, uint16_t len, uint16_t ofs, uint16_t loop)
 	{
 		static const uint32_t pai_ = 0xC90FDAA2;	///< 円周率(3.141592654 * 2^30)
 		static const uint32_t pai_shift_ = 30;		///< 円周率、小数点位置
@@ -207,8 +208,8 @@ static short randTapTables[] = {
 		for(uint16_t i = 0; i < loop; ++i) {
 			out[i] = (y >> gain) + ofs;   // pai_ のビット位置補正
 			// 全周は、２・πなので＋１
-			x -= (static_cast<int64_t>(pai_) * y) >> (pai_shift_ + shi + 1);
-			y += (static_cast<int64_t>(pai_) * x) >> (pai_shift_ + shi + 1);
+			x -= ((static_cast<int64_t>(pai_) * y) >> (pai_shift_ + 1)) / qlp;
+			y += ((static_cast<int64_t>(pai_) * x) >> (pai_shift_ + 1)) / qlp;
 		}
 	}
 
@@ -216,25 +217,17 @@ static short randTapTables[] = {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	SIN, COS テーブル生成 @n
-				1/4 周期の sin テーブルの生成 @n
-				X' = X * COS(s) - Y * SIN(s) @n
-				Y' = X * SIN(s) + Y * COS(s) @n
-				※角度「s」が十分小さい場合、以下のように近似できる。@n
-				COS(s) ≒ 1 @n
-				SIN(s) ≒ s @n
-				X' = X   - Y・s @n
-				Y' = X'・s + Y  @n
-				上記の原理を使って、三角関数テーブルを作成する
-		@param[in]	shi	テーブルサイズ（２のＮ乗ビット数）
+				整数でアクセスしやすいように、テーブルサイズは、2のN乗
+		@param[in]	shi	1/4 周期のテーブルサイズ（ビット数）
 		@param[in]	len	正規化された値の最大値（腕の長さ）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint16_t shi, uint16_t len>
 	class sin_cos {
 
-		static const uint16_t tnum = (1 << shi) + 1;
+		static const uint16_t TN = 1 << shi;
 
-		int16_t tbl_[tnum];
+		int16_t tbl_[TN + 1];
 
 	public:
 		//-----------------------------------------------------------------//
@@ -242,7 +235,7 @@ static short randTapTables[] = {
 			@brief	コンストラクタ
 		 */
 		//-----------------------------------------------------------------//
-		sin_cos() { build_sin(tbl_, shi, len, 0, tnum); }
+		sin_cos() { build_sin<int16_t>(tbl_, TN, len, 0, TN + 1); }
 
 
 		//-----------------------------------------------------------------//
