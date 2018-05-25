@@ -180,6 +180,41 @@ static short randTapTables[] = {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief	SIN テーブル生成 @n
+				X' = X * COS(s) - Y * SIN(s) @n
+				Y' = X * SIN(s) + Y * COS(s) @n
+				※角度「s」が十分小さい場合、以下のように近似できる。@n
+				COS(s) ≒ 1 @n
+				SIN(s) ≒ s @n
+				X' = X   - Y・s @n
+				Y' = X'・s + Y  @n
+				上記の原理を使って、三角関数テーブルを作成する
+		@param[in]	shi	テーブルサイズ（２のＮ乗）1/4 周期分
+		@param[in]	len	正規化された値の最大値（腕の長さ）
+		@param[in]	ofs	オフセット
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <typename UNT>
+	static void build_sin(void* tbl, uint16_t shi, uint16_t len, uint16_t ofs, uint16_t loop)
+	{
+		static const uint32_t pai_ = 0xC90FDAA2;	///< 円周率(3.141592654 * 2^30)
+		static const uint32_t pai_shift_ = 30;		///< 円周率、小数点位置
+
+		int16_t gain = 16;  // 精度を確保する為の下駄
+		int64_t x = static_cast<int64_t>(len) << gain;  // cos(0) の値
+		int64_t y = 0;    // sin(0) の値
+		UNT* out = static_cast<UNT*>(tbl);
+		for(uint16_t i = 0; i < loop; ++i) {
+			out[i] = (y >> gain) + ofs;   // pai_ のビット位置補正
+			// 全周は、２・πなので＋１
+			x -= (static_cast<int64_t>(pai_) * y) >> (pai_shift_ + shi + 1);
+			y += (static_cast<int64_t>(pai_) * x) >> (pai_shift_ + shi + 1);
+		}
+	}
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief	SIN, COS テーブル生成 @n
 				1/4 周期の sin テーブルの生成 @n
 				X' = X * COS(s) - Y * SIN(s) @n
@@ -190,33 +225,24 @@ static short randTapTables[] = {
 				X' = X   - Y・s @n
 				Y' = X'・s + Y  @n
 				上記の原理を使って、三角関数テーブルを作成する
-		@param[in]	shi	テーブルサイズ（２のＮ乗）
+		@param[in]	shi	テーブルサイズ（２のＮ乗ビット数）
 		@param[in]	len	正規化された値の最大値（腕の長さ）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint16_t shi, uint16_t len>
 	class sin_cos {
 
-		static const uint32_t pai_ = 0xC90FDAA2;	///< 円周率(3.141592654 * 2^30)
-		static const uint32_t pai_shift_ = 30;		///< 円周率、小数点位置
+		static const uint16_t tnum = (1 << shi) + 1;
 
-		uint16_t tbl_[(1 << shi) + 1];
-
-		void build_()
-		{
-			int16_t gain = 16;  // 精度を確保する為の下駄
-			int64_t x = len << gain;  // cos(0) の値
-			int64_t y = 0;    // sin(0) の値
-			for(uint16_t i = 0; i < ((1 << shi) + 1); ++i) {
-				tbl_[i] = y >> gain;   // pai_ のビット位置補正
-				// 全周は、２・πなので＋１
-				x -= (static_cast<int64_t>(pai_) * y) >> (pai_shift_ + shi + 1);
-				y += (static_cast<int64_t>(pai_) * x) >> (pai_shift_ + shi + 1);
-			}
-		}
+		int16_t tbl_[tnum];
 
 	public:
-		sin_cos() { build_(); }
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンストラクタ
+		 */
+		//-----------------------------------------------------------------//
+		sin_cos() { build_sin(tbl_, shi, len, 0, tnum); }
 
 
 		//-----------------------------------------------------------------//
