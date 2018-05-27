@@ -90,6 +90,11 @@ namespace device {
 		RIIC0,		///< I 2 C バスインタフェース（RIICa）
 		RIIC2,		///< I 2 C バスインタフェース（RIICa）
 
+		CAN0,		///< CAN インタフェース（CAN0）
+		CAN1,		///< CAN インタフェース（CAN1）
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+		CAN2,		///< CAN インタフェース（CAN2）
+#endif
 #if defined(SIG_RX65N)
 		RSPI0,		///< シリアルペリフェラルインタフェース（RSPI0）
 		RSPI1,		///< シリアルペリフェラルインタフェース（RSPI1）
