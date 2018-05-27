@@ -47,7 +47,7 @@ namespace device {
 		static TASK	task_;
 
 		static INTERRUPT_FUNC void tpu_task_() {
-			if(TPU::TSR.TGFA()) TPU::TSR.TGFA = 0;
+///			if(TPU::TSR.TGFA()) TPU::TSR.TGFA = 0;
 			++counter_;
 			task_();
 		}
