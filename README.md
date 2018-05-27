@@ -246,7 +246,7 @@ make install
     make install     OS-X,Linux: (sudo make install)
 ```
 
- - ビルドしたコンパイラーコレクションを以下のリンクに上げてある。（MSYS2のみ）
+ - ビルドしたコンパイラーコレクションを以下のリンクに上げてある。（MSYS2のみ）   
 http://www.rvf-rc45.net/Renesas_GNU_Tools/ 
 
 ---
