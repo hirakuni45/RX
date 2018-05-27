@@ -11,6 +11,7 @@
 #include "RX600/icu.hpp"
 #include "RX600/peripheral.hpp"
 #include "common/vect.h"
+#include "RX600/dmac.hpp"
 
 namespace device {
 
@@ -293,12 +294,55 @@ namespace device {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  DMAC 要因の設定
+			@param[in]	dma_per	DMAC ペリフェラル
+			@param[in]	target	DMA 要因のベクター番号
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static bool set_dmac(peripheral dma_per, ICU::VECTOR target)
+		{
+			switch(dma_per) {
+			case peripheral::DMAC0:
+			case peripheral::DMAC1:
+			case peripheral::DMAC2:
+			case peripheral::DMAC3:
+			case peripheral::DMAC4:
+			case peripheral::DMAC5:
+			case peripheral::DMAC6:
+			case peripheral::DMAC7:
+				break;
+			default:
+				return false;
+				break;
+			}
+
+
+
+			return true;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  DMAC74 ハンドラ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static INTERRUPT_FUNC void dmac74_handler_() noexcept
+		{
+			uint8_t f = DMIST();
+			
+		}
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  グループ割り込み・ハンドラ GROUPBE0
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group_be0_handler_()
+		static INTERRUPT_FUNC void group_be0_handler_() noexcept
 		{
 		}
 
@@ -308,7 +352,7 @@ namespace device {
 			@brief  グループ割り込み・ハンドラ GROUPBL0
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group_bl0_handler_()
+		static INTERRUPT_FUNC void group_bl0_handler_() noexcept
 		{
 
 		}
@@ -319,7 +363,7 @@ namespace device {
 			@brief  グループ割り込み・ハンドラ GROUPBL1
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group_bl1_handler_()
+		static INTERRUPT_FUNC void group_bl1_handler_() noexcept
 		{
 		}
 
@@ -329,7 +373,7 @@ namespace device {
 			@brief  グループ割り込み・ハンドラ GROUPAL0
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group_al0_handler_()
+		static INTERRUPT_FUNC void group_al0_handler_() noexcept
 		{
 		}
 
@@ -339,7 +383,7 @@ namespace device {
 			@brief  グループ割り込み・ハンドラ GROUPAL1
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group_al1_handler_()
+		static INTERRUPT_FUNC void group_al1_handler_() noexcept
 		{
 		}
 
@@ -384,6 +428,5 @@ namespace device {
 				break;
 			}
 		}
-
 	};
 }
