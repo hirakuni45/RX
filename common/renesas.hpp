@@ -73,6 +73,7 @@
 #include "RX600/sci.hpp"
 #include "RX600/scif.hpp"
 #include "RX600/riic.hpp"
+#include "RX600/can.hpp"
 #include "RX600/rspi.hpp"
 #include "RX600/qspi.hpp"
 #include "RX600/port_map.hpp"
@@ -96,6 +97,7 @@
 #include "RX600/sdhi.hpp"
 #include "RX600/standby_ram.hpp"
 #include "RX600/ssi_io.hpp"
+#include "RX600/dmac_mgr.hpp"
 
 #elif defined(SIG_RX65N)
 #include "RX600/peripheral.hpp"
@@ -112,6 +114,7 @@
 #include "RX600/sci.hpp"
 #include "RX600/scif.hpp"
 #include "RX600/riic.hpp"
+#include "RX600/can.hpp"
 #include "RX600/rspi.hpp"
 #include "RX600/qspi.hpp"
 #include "RX600/port_map.hpp"
@@ -138,6 +141,7 @@
 #include "RX65x/glcdc.hpp"
 #include "RX65x/glcdc_io.hpp"
 #include "RX65x/drw2d.hpp"
+#include "RX600/dmac_mgr.hpp"
 
 #elif defined(SIG_RX71M)
 #include "RX600/peripheral.hpp"
@@ -154,6 +158,7 @@
 #include "RX600/sci.hpp"
 #include "RX600/scif.hpp"
 #include "RX600/riic.hpp"
+#include "RX600/can.hpp"
 #include "RX600/rspi.hpp"
 #include "RX600/qspi.hpp"
 #include "RX600/port_map.hpp"
@@ -177,6 +182,7 @@
 #include "RX600/sdhi.hpp"
 #include "RX600/standby_ram.hpp"
 #include "RX600/ssi_io.hpp"
+#include "RX600/dmac_mgr.hpp"
 
 #else
 #  error "Requires SIG_XXX to be defined"
