@@ -23,7 +23,7 @@ namespace seeda {
 	class write_file {
 
 		static const uint8_t OPEN_RETRY_LIMIT = 10;
-		static const uint8_t OPEN_RETRY_DELAY = 30;
+		static const uint8_t OPEN_RETRY_DELAY = 25;
 		static const time_t DIR_LIMIT_TIME = 60 * 60 * 24 * 7;
 
 #ifdef WRITE_FILE_DEBUG
@@ -278,7 +278,7 @@ namespace seeda {
 					if(!dir_list_.probe()) {
 						uint32_t idx = dir_info_.first_free();
 						++idx;
-utils::format("First Free Index: %d\n") % idx;
+						utils::format("First Free Index: %d\n") % idx;
 						make_wildcards_(idx);
 						dir_time_ = get_time();
 						reset_wf_fifo();
@@ -341,7 +341,7 @@ utils::format("First Free Index: %d\n") % idx;
 						task_ = task::open_retry_wait;
 					} else {
 						at_logs().add(get_time(), "WOP");
-						set_restart_delay(60 * 1);
+						set_restart_delay(25 * 1);
 						enable_ = false;
 						task_ = task::wait_request;
 					}
