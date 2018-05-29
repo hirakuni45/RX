@@ -306,20 +306,33 @@ namespace device {
 		{
 			switch(dma_per) {
 			case peripheral::DMAC0:
+				ICU::DMRSR0 = static_cast<uint8_t>(target);
+				break;
 			case peripheral::DMAC1:
+				ICU::DMRSR1 = static_cast<uint8_t>(target);
+				break;
 			case peripheral::DMAC2:
+				ICU::DMRSR2 = static_cast<uint8_t>(target);
+				break;
 			case peripheral::DMAC3:
+				ICU::DMRSR3 = static_cast<uint8_t>(target);
+				break;
 			case peripheral::DMAC4:
+				ICU::DMRSR4 = static_cast<uint8_t>(target);
+				break;
 			case peripheral::DMAC5:
+				ICU::DMRSR5 = static_cast<uint8_t>(target);
+				break;
 			case peripheral::DMAC6:
+				ICU::DMRSR6 = static_cast<uint8_t>(target);
+				break;
 			case peripheral::DMAC7:
+				ICU::DMRSR7 = static_cast<uint8_t>(target);
 				break;
 			default:
 				return false;
 				break;
 			}
-
-
 
 			return true;
 		}
