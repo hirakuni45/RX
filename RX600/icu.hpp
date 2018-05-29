@@ -823,14 +823,14 @@ namespace device {
 			@brief  DMAC 起動要因選択レジスタ m（DMRSRm）（m = DMAC チャネル番号）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		rw8_t<0x00087400> DMRSR0;
-		rw8_t<0x00087404> DMRSR1;
-		rw8_t<0x00087408> DMRSR2;
-		rw8_t<0x0008740C> DMRSR3;
-		rw8_t<0x00087410> DMRSR4;
-		rw8_t<0x00087414> DMRSR5;
-		rw8_t<0x00087418> DMRSR6;
-		rw8_t<0x0008741C> DMRSR7;
+		static rw8_t<0x00087400> DMRSR0;
+		static rw8_t<0x00087404> DMRSR1;
+		static rw8_t<0x00087408> DMRSR2;
+		static rw8_t<0x0008740C> DMRSR3;
+		static rw8_t<0x00087410> DMRSR4;
+		static rw8_t<0x00087414> DMRSR5;
+		static rw8_t<0x00087418> DMRSR6;
+		static rw8_t<0x0008741C> DMRSR7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
