@@ -1,7 +1,9 @@
 //=====================================================================//
 /*! @file
-    @brief  RX64M DA サンプル @n
-			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
+    @brief  RX64M D/A 出力サンプル @n
+			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する。@n
+			・DA0(P03)、DA1(P05) からアナログ出力する。@n
+			・サンプリング間隔は 48KHz
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -16,7 +18,12 @@
 #include "common/format.hpp"
 #include "common/delay.hpp"
 #include "common/command.hpp"
-#include "common/dmac_man.hpp"
+#include "common/tpu_io.hpp"
+#include "common/intmath.hpp"
+
+// ソフトウェアー（タイマー割り込みタスク）で転送を行う場合に有効にする。
+// ※無効にした場合、ＤＭＡ転送で行われる。
+// #define SOFT_TRANS
 
 namespace {
 
@@ -33,7 +40,7 @@ namespace {
 
 	/// DMAC 終了割り込み
 	class dmac_task {
-		uint32_t	count_;
+		volatile uint32_t	count_;
 	public:
 		dmac_task() : count_(0) { }
 
@@ -45,10 +52,44 @@ namespace {
 	};
 
 
-	typedef device::dmac_man<device::DMAC0, dmac_task> DMAC_MAN;
-	DMAC_MAN	dmac_man_;
+	typedef device::dmac_mgr<device::DMAC0, dmac_task> DMAC_MGR;
+	DMAC_MGR	dmac_mgr_;
 
-	char	tmp_[256];
+	typedef device::R12DA DAC;
+	typedef device::dac_out<DAC> DAC_OUT;
+	DAC_OUT		dac_out_;
+
+	struct wave_t {
+		uint16_t	l;	///< D/A CH0
+		uint16_t	r;	///< D/A CH1
+	};
+	static const uint32_t WAVE_NUM = 2048;
+	wave_t	wave_[WAVE_NUM];
+
+	// 48KHz サンプリング割り込み
+	class timer_task {
+
+		uint16_t	pos_;
+
+	public:
+		timer_task() : pos_(0) { }
+
+		void operator() () {
+			const wave_t& w = wave_[pos_];
+			dac_out_.out0(w.l);
+			dac_out_.out1(w.r);
+			++pos_;
+			pos_ &= WAVE_NUM - 1;
+		}
+
+		uint16_t get_pos() const { return pos_; }
+	};
+#ifdef SOFT_TRANS
+	typedef device::tpu_io<device::TPU0, timer_task> TPU0;
+#else
+	typedef device::tpu_io<device::TPU0, utils::null_task> TPU0;
+#endif
+	TPU0		tpu0_;
 }
 
 extern "C" {
@@ -90,48 +131,53 @@ int main(int argc, char** argv)
 		sci_.start(115200, int_level);
 	}
 
-	utils::format("RX64M DMAC sample start\n");
+	utils::format("RX64M Internal D/A sample start\n");
 
 	cmd_.set_prompt("# ");
 
 	LED::DIR = 1;
 
-	{
-		uint8_t intr_level = 4;
-		dmac_man_.start(intr_level);
+	{  // タイマー設定
+		uint8_t intr_level = 5;
+		if(!tpu0_.start(48000, intr_level)) {
+///		if(!tpu0_.start(100, intr_level)) {
+			utils::format("TPU0 start error...\n");
+		}
 	}
 
-	// copy 機能の確認
-	std::memset(tmp_, 0, sizeof(tmp_));
-	std::strcpy(tmp_, "ASDFGHJKLQWERTYUZXCVBNMIOP");
-	uint32_t copy_len = 16;
-	dmac_man_.copy(&tmp_[0], &tmp_[128], copy_len, true); 
+	{  // 内臓１２ビット D/A の設定
+		bool amp_ena = true;
+		dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
+		dac_out_.out0(32767);
+		dac_out_.out1(32767);
 
-	utils::format("DMA Copy: %d\n") % copy_len;
-	while(dmac_man_.probe()) ;
+		for(uint32_t i = 0; i < WAVE_NUM; ++i) {
+			wave_t w;
+			if(i & 1) {
+				w.l = 0xffff;
+				w.r = 0x0000;
+			} else {
+				w.l = 0x0000;
+				w.r = 0xffff;
+			}
+			wave_[i] = w;
+		}
+//		imath::build_sin<int16_t>(wave_ch0_, 128, 32767, 0x8000, 2048);
+//		imath::build_sin<int16_t>(wave_ch1_, 128, 32767, 0x8000, 2048);
+	}
 
-	utils::format("ORG(%d): '%s'\n") % std::strlen(tmp_) % tmp_;
-	utils::format("CPY(%d): '%s'\n") % std::strlen(&tmp_[128]) % &tmp_[128];
-	utils::format("DMAC task: %d\n") % dmac_man_.at_task().get_count();
-
-	dmac_man_.fill(&tmp_[0], 4, copy_len, true);
-
-	utils::format("DMA fill: %d\n") % copy_len;
-	while(dmac_man_.probe()) ;
-
-	utils::format("ORG(%d): '%s'\n") % std::strlen(tmp_) % tmp_;
-	utils::format("DMAC task: %d\n") % dmac_man_.at_task().get_count();
-
-	uint8_t val = 'Z';
-	copy_len = 31;
-	dmac_man_.memset(&tmp_[0], val, copy_len, true);
-
-	utils::format("DMA memset: %d\n") % copy_len;
-	while(dmac_man_.probe()) ;
-
-	utils::format("ORG(%d): '%s'\n") % std::strlen(tmp_) % tmp_;
-	utils::format("DMAC task: %d\n") % dmac_man_.at_task().get_count();
-
+#ifndef SOFT_TRANS
+	{  // DMAC マネージャー開始
+		uint8_t intr_level = 4;
+		bool rept = true;
+		auto ret = dmac_mgr_.start(DMAC_MGR::trans_type::SP_DN_32,
+			reinterpret_cast<uint32_t>(wave_), DAC::DADR0.address(), 1024,
+			tpu0_.get_intr_vec(), rept, intr_level);
+		if(!ret) {
+			utils::format("DMAC Not start...\n");
+		}
+	}
+#endif
 
 	uint32_t cnt = 0;
 	while(1) {
