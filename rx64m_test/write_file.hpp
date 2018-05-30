@@ -335,7 +335,7 @@ namespace seeda {
 					if(open_retry_ > 0) {
 						--open_retry_;
 						open_retry_delay_ = OPEN_RETRY_DELAY;
-						at_logs().add(get_time(), "WOr");
+///						at_logs().add(get_time(), "WOr");
 						debug_format("Write Open Retry: %d\n")
 							% static_cast<uint32_t>(open_retry_);
 						task_ = task::open_retry_wait;
@@ -346,7 +346,6 @@ namespace seeda {
 						task_ = task::wait_request;
 					}
 				} else {
-///					at_logs().add(get_time(), "WOP");  // for log test
 					debug_format("Start write file: '%s'\n") % filename_;
 					open_retry_ = OPEN_RETRY_LIMIT;
 					task_ = task::write_header;
