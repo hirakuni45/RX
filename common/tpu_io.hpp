@@ -42,17 +42,19 @@ namespace device {
 	private:
 		uint8_t		level_;
 
+		ICU::VECTOR	intr_vec_;
+
 		static volatile uint32_t counter_;
 
 		static TASK	task_;
 
-		static INTERRUPT_FUNC void tpu_task_() {
+		static INTERRUPT_FUNC void tpu_task_() noexcept {
 ///			if(TPU::TSR.TGFA()) TPU::TSR.TGFA = 0;
 			++counter_;
 			task_();
 		}
 
-		void sleep_() const { asm("nop"); }
+		void sleep_() const noexcept { asm("nop"); }
 
 	public:
 		//-----------------------------------------------------------------//
@@ -60,7 +62,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		tpu_io() : level_(0) { }
+		tpu_io() noexcept : level_(0), intr_vec_(ICU::VECTOR::VEC0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -71,7 +73,7 @@ namespace device {
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level = 0)
+		bool start(uint32_t freq, uint8_t level = 0) noexcept
 		{
 			if(freq == 0) return false;
 
@@ -136,8 +138,9 @@ namespace device {
 			TPU::TCNT = 0x0000;
 
 			if(level_ > 0) {  // 割り込み設定
-#if (defined(SIG_RX64M) || defined(SIG_RX71M))
-				set_interrupt_task(tpu_task_, static_cast<uint32_t>(ICU::VECTOR::INTB128));
+#if (defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N))
+				intr_vec_ = ICU::VECTOR::INTB128;
+				set_interrupt_task(tpu_task_, static_cast<uint32_t>(intr_vec_));
 				ICU::SLIBXR128 = TPU::get_TGIA();
 				ICU::IPR.INTB128 = level_;
 				ICU::IER.INTB128 = true;
@@ -158,7 +161,7 @@ namespace device {
 			@brief  廃棄
 		*/
 		//-----------------------------------------------------------------//
-		void destroy()
+		void destroy() noexcept
 		{
 			TPU::TIER = 0;
 			TPU::enable(false);
@@ -171,7 +174,7 @@ namespace device {
 			@brief  タイマー同期
 		*/
 		//-----------------------------------------------------------------//
-		void sync() const
+		void sync() const noexcept
 		{
 			if(level_ > 0) {
 				volatile uint32_t cnt = counter_;
@@ -191,7 +194,7 @@ namespace device {
 			@return 割り込みカウンターの値
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_counter() const { return counter_; }
+		uint32_t get_counter() const noexcept { return counter_; }
 
 
 		//-----------------------------------------------------------------//
@@ -200,7 +203,16 @@ namespace device {
 			@return TCNT レジスター
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_tcnt_count() const { return TPU::TCNT(); }
+		uint16_t get_tcnt_count() const noexcept { return TPU::TCNT(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターの取得
+			@return 割り込みベクター
+		*/
+		//-----------------------------------------------------------------//
+		ICU::VECTOR get_intr_vec() const noexcept { return intr_vec_; }
 
 
 		//-----------------------------------------------------------------//
@@ -209,7 +221,7 @@ namespace device {
 			@return TASK クラス
 		*/
 		//-----------------------------------------------------------------//
-		static TASK& at_task() { return task_; }
+		static TASK& at_task() noexcept { return task_; }
 	};
 
 	template <class TPU, class TASK> volatile uint32_t tpu_io<TPU, TASK>::counter_ = 0;
