@@ -12,11 +12,6 @@
 #include "common/intr_utils.hpp"
 #include "common/vect.h"
 
-/// RX24T には DMAC が無い為、エラーにする。
-#ifdef SIG_RX24T
-#  error "dmac_man.hpp not support for RX24T"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -53,17 +48,18 @@ namespace device {
 		{
 			task_();
 			DMAC::DMSTS.DTIF = 0;
+			DMAC::DMCNT.DTE = 1;  // 再開
 		}
 
 
-		void set_vector_(uint32_t lvl, ICU::VECTOR vec) const noexcept
+		void set_vector_(ICU::VECTOR vec) const noexcept
 		{
-			if(lvl) {
+			if(level_) {
 				set_interrupt_task(dmac_task_, static_cast<uint32_t>(vec));
 			} else {
 				set_interrupt_task(nullptr, static_cast<uint32_t>(vec));
 			}
-			icu_mgr::set_level(DMAC::get_peripheral(), lvl);
+			icu_mgr::set_level(DMAC::get_peripheral(), level_);
 		}
 
 
@@ -111,7 +107,7 @@ namespace device {
 			DMAC::DMAMD = DMAC::DMAMD.DM.b(0b11) | DMAC::DMAMD.SM.b(0b11);
 
 			DMAC::DMTMD = DMAC::DMTMD.DCTG.b(0b00) | DMAC::DMTMD.SZ.b(sz) |
-						  DMAC::DMTMD.DTS.b(0b10) | DMAC::DMTMD.MD.b(0b00);
+						  DMAC::DMTMD.DTS.b(0b10)  | DMAC::DMTMD.MD.b(0b00);
 
 			DMAC::DMSAR = src_adr + len - sz;
 			DMAC::DMDAR = dst_adr + len - sz;
@@ -133,7 +129,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始（メモリー操作関係）
-			@param[in]	lvl		割り込みレベル（０以上）@n
+			@param[in]	lvl		転送完了割り込みレベル（０以上）@n
 								※無指定（０）なら割り込みを起動しない。
 		 */
 		//-----------------------------------------------------------------//
@@ -141,9 +137,8 @@ namespace device {
 		{
 			power_cfg::turn(DMAC::get_peripheral());
 
-			set_vector_(lvl, DMAC::get_vec());
-
 			level_ = lvl;
+			set_vector_(DMAC::get_vec());
 
 			DMAST.DMST = 1;
 		}
@@ -155,27 +150,88 @@ namespace device {
 			@param[in]	tft		転送タイプ
 			@param[in]	src		元アドレス
 			@param[in]	dst		先アドレス
-			@param[in]	lim		転送リミット
+			@param[in]	lim		転送リミット（※カウント数なので注意）
+			@param[in]	target	転送開始要因
+			@param[in]	rep		リピート転送の場合「true」
+			@param[in]	lvl		転送完了割り込みレベル（０以上）@n
+								※無指定（０）なら割り込みを起動しない。
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start(trans_type tft, uint32_t src, uint32_t dst, uint32_t lim) noexcept
+		bool start(trans_type tft, uint32_t src, uint32_t dst, uint32_t lim, ICU::VECTOR target,
+			bool rep = false, uint32_t lvl = 0) noexcept
 		{
 			power_cfg::turn(DMAC::get_peripheral());
 
+			DMAC::DMCNT.DTE = 0;  // 念のため停止させる。
 
+			uint8_t dm = 0;
+			uint8_t sm = 0;
+			uint8_t sz = 0;
+			switch(tft) {
+			case trans_type::SN_DP_8:
+				sm = 0b00;  // n
+				dm = 0b10;  // ++
+				sz = 0;
+				break;
+			case trans_type::SP_DN_8:
+				sm = 0b10;  // ++
+				dm = 0b00;  // n
+				sz = 0;
+				break;
+			case trans_type::SN_DP_16:
+				sm = 0b00;  // n
+				dm = 0b10;  // ++
+				sz = 1;
+				break;
+			case trans_type::SP_DN_16:
+				sm = 0b10;  // ++
+				dm = 0b00;  // n
+				sz = 1;
+				break;
+			case trans_type::SN_DP_32:
+				sm = 0b00;  // n
+				dm = 0b10;  // ++
+				sz = 2;
+				break;
+			case trans_type::SP_DN_32:
+				sm = 0b10;  // ++
+				dm = 0b00;  // n
+				sz = 2;
+				break;
+			default:
+				break;
+			}
 
+			DMAC::DMAMD = DMAC::DMAMD.DM.b(dm) | DMAC::DMAMD.SM.b(sm);
+			uint8_t md = rep ? 0b01 : 0b00;
+			DMAC::DMTMD = DMAC::DMTMD.DCTG.b(0b01) | DMAC::DMTMD.SZ.b(sz) |
+						  DMAC::DMTMD.DTS.b(0b01)  | DMAC::DMTMD.MD.b(md);
+			DMAC::DMSAR = src;
+			DMAC::DMDAR = dst;
 
-#if 0			
-			// 転送元 (+1)、転送先 (+1)
-			DMAC::DMAMD = DMAC::DMAMD.DM.b(0b10) | DMAC::DMAMD.SM.b(0b10);
+			DMAC::DMCRA = (512 << 16) | 512;
+			DMAC::DMCRB = 4;
+// utils::format("DMAC src: %08X\n") % src;
+// utils::format("DMAC dst: %08X\n") % dst;
+// utils::format("ICU DMA target: %d\n") % static_cast<uint32_t>(target);
 
-			DMAC::DMTMD = DMAC::DMTMD.DCTG.b(0b00) | DMAC::DMTMD.SZ.b(sz) |
-						  DMAC::DMTMD.DTS.b(0b10) | DMAC::DMTMD.MD.b(0b00);
+			level_ = lvl;
+			if(level_ > 0) {
+				  // リピートサイズ終了割り込み
+///				DMAC::DMINT = DMAC::DMINT.RPTIE.b() | DMAC::DMINT.DTIE.b();
+				DMAC::DMINT = DMAC::DMINT.DTIE.b();
+				DMAC::DMCSL.DISEL = 1;
+				icu_mgr::set_dmac(DMAC::get_peripheral(), target);
+			} else {
+				DMAC::DMINT = 0x00;
+				DMAC::DMCSL.DISEL = 0;
+			}
+			set_vector_(DMAC::get_vec());
 
-#endif
+			DMAC::DMCNT.DTE = 1;
 
-
+			DMAST.DMST = 1;
 
 			return true;
 		}
@@ -183,7 +239,23 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	動作中か検査
+			@brief	停止
+			@param[in]	power	電源も切断する場合「true」
+		 */
+		//-----------------------------------------------------------------//
+		void stop(bool power = false) noexcept
+		{
+			DMAC::DMCNT.DTE = 0;
+
+			if(power) {
+				power_cfg::turn(DMAC::get_peripheral(), false);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	DMA 動作中か検査
 			@return 動作中なら「true」
 		 */
 		//-----------------------------------------------------------------//
@@ -220,7 +292,7 @@ namespace device {
 			if(tae && level_ > 0) {
 				DMAC::DMINT.DTIE = 1;
 			} else {
-				DMAC::DMINT.DTIE = 0;
+				DMAC::DMINT = 0x00;
 			}
 
 			DMAC::DMCNT.DTE = 1;
@@ -234,8 +306,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	定数で埋める
-			@param[out]	org		定数先頭 @n
+			@brief	定数で埋める（８ビット）
+			@param[out]	org		定数先頭
 			@param[in]	val		定数
 			@param[in]	len		埋める数（バイト）
 			@param[in]	tae		終了時タスクを起動する場合「true」
@@ -259,6 +331,59 @@ namespace device {
 				*dst++ = val;
 				*dst++ = val;
 			}
+			return fill(org, frz, len, tae);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	定数で埋める（１６ビット）
+			@param[out]	org		定数先頭
+			@param[in]	val		定数
+			@param[in]	len		埋める数（バイト）
+			@param[in]	tae		終了時タスクを起動する場合「true」
+			@return 出来ない場合「false」
+		 */
+		//-----------------------------------------------------------------//
+		bool memset16(void* org, uint16_t val, uint32_t len, bool tae = false) noexcept
+		{
+			if(org == nullptr || len < 2) return false;
+			uint32_t adr = reinterpret_cast<uint32_t>(org);
+			if(adr & 1) return false;  // 奇数アドレスはNG
+
+			uint16_t* dst = static_cast<uint16_t*>(org);
+			*dst++ = val;
+			uint32_t frz = 2;
+
+			if((adr & 3) == 0 && (len & 3) == 0 && len > 4) {
+				frz += 2;
+				*dst++ = val;
+			}
+			return fill(org, frz, len, tae);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	定数で埋める（３２ビット）
+			@param[out]	org		定数先頭
+			@param[in]	val		定数
+			@param[in]	len		埋める数（バイト）
+			@param[in]	tae		終了時タスクを起動する場合「true」
+			@return 出来ない場合「false」
+		 */
+		//-----------------------------------------------------------------//
+		bool memset32(void* org, uint32_t val, uint32_t len, bool tae = false) noexcept
+		{
+			if(org == nullptr || len < 4) return false;
+
+			uint32_t adr = reinterpret_cast<uint32_t>(org);
+			if((adr & 3) != 0 || (len & 4) != 0) return false;  // 32ビット境界がNGの場合・・
+
+			uint32_t* dst = static_cast<uint32_t*>(org);
+			*dst = val;
+			uint32_t frz = 4;
+
 			return fill(org, frz, len, tae);
 		}
 
@@ -300,7 +425,7 @@ namespace device {
 			if(tae && level_ > 0) {
 				DMAC::DMINT.DTIE = 1;
 			} else {
-				DMAC::DMINT.DTIE = 0;
+				DMAC::DMINT = 0x00;
 			}
 
 			DMAC::DMCNT.DTE = 1;

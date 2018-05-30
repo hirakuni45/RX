@@ -333,7 +333,6 @@ namespace device {
 				return false;
 				break;
 			}
-
 			return true;
 		}
 
