@@ -11,6 +11,7 @@
 #include "RX65x/glcdc.hpp"
 #include "common/delay.hpp"
 #include "glcdc_def.hpp"
+#include "common/dmac_man.hpp"
 
 #define BITS_PER_PIXEL 16  // Allowed values: 1, 4, 8, 16, 32
 
