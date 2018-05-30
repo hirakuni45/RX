@@ -136,7 +136,7 @@ namespace net {
 		operator uint32_t() const { return address_.dword; };
 
 
-		bool operator==(const ip_address& addr) const {
+		bool operator == (const ip_address& addr) const {
 			return address_.dword == addr.address_.dword;
 		}
 
@@ -200,6 +200,87 @@ namespace net {
 			return ((src >> 24) & 0x000000FF) | ((src >> 8 ) & 0x0000FF00)
 				 | ((src << 8 ) & 0x00FF0000) | ((src << 24) & 0xFF000000);
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  有効なマスクを検査
+			@param[in]	mask	マスク
+		*/
+		//-----------------------------------------------------------------//
+		static bool check_mask(uint32_t mask)
+		{
+			static const uint32_t oktbls[] = {
+				0xfffffffe, 0xfffffffc, 0xfffffff8, 0xfffffff0,
+				0xfffffffe, 0xfffffffc, 0xfffffff8, 0xfffffff0,
+				0xffffffe0, 0xffffffc0, 0xffffff80, 0xffffff00,
+				0xfffffe00, 0xfffffc00, 0xfffff800, 0xfffff000,
+				0xffffe000, 0xffffc000, 0xffff8000, 0xffff0000,
+				0xfffe0000, 0xfffc0000, 0xfff80000, 0xfff00000,
+				0xffe00000, 0xffc00000, 0xff800000, 0xff000000,
+				0xfe000000, 0xfc000000, 0xf8000000, 0xf0000000,
+				0xe0000000, 0xc0000000, 0x80000000,
+			};
+
+			auto m = endian_convert(mask);
+
+			for(auto v : oktbls) {
+				if(m == v) return true;
+			}
+
+			return false;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  有効なアドレスを検査
+			@param[in]	adrs	アドレス
+			@param[in]	mask	サブ・ネット・マスク
+		*/
+		//-----------------------------------------------------------------//
+		static bool check_adrs(uint32_t adrs, uint32_t mask)
+		{
+			// マスクを検査
+			if(!check_mask(mask)) return false;
+
+			auto a = endian_convert(adrs);
+			address_t t(a);
+
+			// 先頭が０は NG!
+			if(t.bytes[3] == 0) {
+				utils::format("NG first zero\n");
+				return false;
+			}
+
+			// マルチキャストは NG!
+			if(t.bytes[3] >= 224) {
+				utils::format("NG multi cast\n");
+				return false;
+			}
+
+			// ループバックアドレスとして予約されているは NG!			
+			if(t.bytes[3] == 127 && t.bytes[2] == 0 && t.bytes[1] == 0) {
+				utils::format("NG loop back\n");
+				return false;
+			}
+
+			auto m = endian_convert(mask);
+			uint32_t host = (m ^ 0xffffffff) & a;
+
+			// ネットワーク・アドレスは NG!
+			if(host == 0) {
+				utils::format("NG net work adrs\n");
+				return false;
+			}
+
+			// ブロード・キャスト・アドレスは NG!
+			if(host == (m ^ 0xffffffff)) {
+				utils::format("NG broadcast adrs\n");
+				return false;
+			}
+
+			return true;
+		}
 	};
 }
-
