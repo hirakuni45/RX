@@ -612,7 +612,7 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 				http_format("<hr align=\"left\" width=\"750\" size=\"3\">");
 			} else {
 				http_format("<form method=\"POST\" action=\"/cgi/set_write.cgi\">\n");
-				http_format("<table><tr><td>ファイル名(ベース)：</td>");
+				http_format("<table><tr><td>ファイルパス：</td>");
 				if(!write_file_.get_enable()) {
 					http_format("<td><input type=\"text\" name=\"fname\" size=\"32\" value=\"%s\"></td></tr>\n")
 						% write_file_.get_path();
@@ -770,7 +770,7 @@ utils::format("EUI load: %02X %02X %02X %02X %02X %02X\n")
 			net_tools::render_date_time();
 
 			http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
-			http_format("入力フォーム・エラー<br>");
+			http_format("ファイルパスは31文字以内で入力して下さい<br>");
 			http_format("<input type=\"button\" onclick=\"location.href='/setup'\" value=\"設定画面\">\n");
 			http_format("<hr align=\"left\" width=\"750\" size=\"3\">\n");
 		}
