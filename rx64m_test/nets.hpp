@@ -398,7 +398,10 @@ namespace seeda {
 			typedef utils::parse_cgi_post<512, 13> CGI_IP;
 			CGI_IP cgi;
 			cgi.parse(http_.get_post_body());
-			setup_.at_ipt().dhcp_ = false;
+			bool dhcp = false;
+			net::ip_address ip;
+ 			net::ip_address gw;
+			net::ip_address mask;
 			for(uint32_t i = 0; i < cgi.size(); ++i) {
 				const auto& t = cgi.get_unit(i);
 				int n = 0;
@@ -407,7 +410,7 @@ namespace seeda {
 
 				} else if(strcmp(t.key, "dhcp") == 0) {
 					if(strcmp(t.val, "on") == 0) {
-						setup_.at_ipt().dhcp_ = true;
+						dhcp = true;
 						err = false;
 					}
 				} else if((utils::input("ip%d", t.key) % n).status()) {
@@ -415,8 +418,7 @@ namespace seeda {
 						int v = 0;
 						if((utils::input("%d", t.val) % v).status()) {
 							if(v >= 0 && v <= 255) {
-								debug_format("%d, ") % v;
-								setup_.at_ipt().ip_[n] = v;
+								ip[n] = v;
 								err = false;
 							}
 						}
@@ -426,8 +428,7 @@ namespace seeda {
 						int v = 0;
 						if((utils::input("%d", t.val) % v).status()) {
 							if(v >= 0 && v <= 255) {
-								debug_format("%d, ") % v;
-								setup_.at_ipt().gw_[n] = v;
+								gw[n] = v;
 								err = false;
 							}
 						}
@@ -437,18 +438,53 @@ namespace seeda {
 						int v = 0;
 						if((utils::input("%d", t.val) % v).status()) {
 							if(v >= 0 && v <= 255) {
-								debug_format("%d, ") % v;
-								setup_.at_ipt().mask_[n] = v;
+								mask[n] = v;
 								err = false;
 							}
 						}
 					}
-					debug_format("\n");
 				}
 
 				if(err) {
+					utils::format("IP/GW/MASK NG\n");
 					return;
 				}
+			}
+
+			uint32_t mm = static_cast<uint32_t>(mask);
+			if(!net::ip_address::check_mask(mm)) {
+				utils::format("NG Mask: %d.%d.%d.%d\n")
+					% static_cast<uint16_t>(mask[0])
+					% static_cast<uint16_t>(mask[1])
+					% static_cast<uint16_t>(mask[2])
+					% static_cast<uint16_t>(mask[3]);
+				return;
+			}
+			if(!net::ip_address::check_adrs(static_cast<uint32_t>(ip), mm)) {
+				utils::format("NG IP: %d.%d.%d.%d\n")
+					% static_cast<uint16_t>(ip[0])
+					% static_cast<uint16_t>(ip[1])
+					% static_cast<uint16_t>(ip[2])
+					% static_cast<uint16_t>(ip[3]);
+				return;
+			}
+			if(!net::ip_address::check_adrs(static_cast<uint32_t>(gw), mm)) {
+				utils::format("NG GW: %d.%d.%d.%d\n")
+					% static_cast<uint16_t>(gw[0])
+					% static_cast<uint16_t>(gw[1])
+					% static_cast<uint16_t>(gw[2])
+					% static_cast<uint16_t>(gw[3]);
+				return;
+			}
+			if(ip == gw) {
+				utils::format("NG IP/GW: even address\n");
+				return;
+			}
+			setup_.at_ipt().dhcp_ = dhcp;
+			for(uint32_t i = 0; i < 4; ++i) {
+				setup_.at_ipt().ip_[i] = ip[i];
+				setup_.at_ipt().gw_[i] = gw[i];
+				setup_.at_ipt().mask_[i] = mask[i];
 			}
 			setup_.write_eui();
 		}
