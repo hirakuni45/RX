@@ -19,10 +19,9 @@
 #include "common/spi_io.hpp"
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
-#include "RX64M/sdhi_io.hpp"
 #include "common/string_utils.hpp"
 
-#define SDHI_IF
+// #define SDHI_IF
 
 namespace {
 
@@ -193,8 +192,8 @@ extern "C" {
 	}
 
 
-	void utf8_to_sjis(const char* src, char* dst) {
-		utils::str::utf8_to_sjis(src, dst);
+	void utf8_to_sjis(const char* src, char* dst, uint32_t len) {
+		utils::str::utf8_to_sjis(src, dst, len);
 	}
 
 
