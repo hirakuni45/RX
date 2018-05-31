@@ -47,6 +47,7 @@ Renesas RX マイコン
  - /rx64m_SCI_sample   ---> RX64M を使った UART (SCI1) の制御サンプル
  - /rx64m_SDRAM_sample ---> RX64M を使った SDRAM の制御サンプル（128Mビット×2、32ビットバス）
  - /rx64m_RTC_sample   ---> RX64M を使った 内臓 RTC の動作サンプル
+ - /rx64m_DA_sample    ---> RX64M を使った D/A 変換、TPU、DMAC のサンプル
  - /GR-KAEDE           ---> ガジェット・ルネサス製の RX64M 搭載マイコンボード向けサンプル   
  - /RTK5_first_sample  ---> ルネサス製 RTK5RX65N マイコンボード向け初期サンプル   
  - /RTK5_LCD_sample    ---> ルネサス製 RTK5RX65N マイコンボード向けＬＣＤサンプル   
