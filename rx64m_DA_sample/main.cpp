@@ -16,6 +16,7 @@
 #include "common/cmt_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
+#include "common/input.hpp"
 #include "common/delay.hpp"
 #include "common/command.hpp"
 #include "common/tpu_io.hpp"
@@ -39,12 +40,14 @@ namespace {
 	utils::command<256> cmd_;
 
 	/// DMAC 終了割り込み
-	class dmac_task {
+	class dmac_term_task {
 		volatile uint32_t	count_;
 	public:
-		dmac_task() : count_(0) { }
+		dmac_term_task() : count_(0) { }
 
 		void operator() () {
+			// DMA を再スタート
+			device::DMAC0::DMCNT.DTE = 1;  // DMA 再開
 			++count_;
 		}
 
@@ -52,7 +55,7 @@ namespace {
 	};
 
 
-	typedef device::dmac_mgr<device::DMAC0, dmac_task> DMAC_MGR;
+	typedef device::dmac_mgr<device::DMAC0, dmac_term_task> DMAC_MGR;
 	DMAC_MGR	dmac_mgr_;
 
 	typedef device::R12DA DAC;
@@ -63,7 +66,7 @@ namespace {
 		uint16_t	l;	///< D/A CH0
 		uint16_t	r;	///< D/A CH1
 	};
-	static const uint32_t WAVE_NUM = 2048;
+	static const uint32_t WAVE_NUM = 1024;
 	wave_t	wave_[WAVE_NUM];
 
 	// 48KHz サンプリング割り込み
@@ -79,7 +82,7 @@ namespace {
 			dac_out_.out0(w.l);
 			dac_out_.out1(w.r);
 			++pos_;
-			pos_ &= WAVE_NUM - 1;
+			pos_ %= WAVE_NUM;
 		}
 
 		uint16_t get_pos() const { return pos_; }
@@ -90,6 +93,36 @@ namespace {
 	typedef device::tpu_io<device::TPU0, utils::null_task> TPU0;
 #endif
 	TPU0		tpu0_;
+
+	bool		init_ = false;
+	float		freq_ = 100.0f;
+	uint32_t	wpos_ = 0;
+	imath::sincos_t sico_(0);
+	void service_sin_cos_()
+	{
+		uint32_t pos = (dmac_mgr_.get_count() & 0x3ff) ^ 0x3ff;
+		int32_t gain_shift = 16; 
+		if(!init_) {
+			sico_.x = static_cast<int64_t>(32767) << gain_shift;
+			sico_.y = 0;
+			wpos_ = pos & 0x3ff;
+			init_ = true;
+		}
+
+		int32_t dt = static_cast<int32_t>(48000.0f / freq_);
+
+		uint32_t d = pos - wpos_;
+		if(d >= WAVE_NUM) d += WAVE_NUM;
+		for(uint32_t i = 0; i < d; ++i) {
+			wave_t w;
+			w.l = (sico_.x >> gain_shift) + 32768;
+			w.r = (sico_.y >> gain_shift) + 32768;
+			wave_[(wpos_ + (WAVE_NUM / 2)) & (WAVE_NUM - 1)] = w;
+			++wpos_;
+			wpos_ &= WAVE_NUM - 1;
+			imath::build_sincos(sico_, dt);
+		}
+	}
 }
 
 extern "C" {
@@ -121,26 +154,19 @@ int main(int argc, char** argv)
 {
 	device::system_io<12000000>::setup_system_clock();
 
-	{  // タイマー設定（６０Ｈｚ）
-		uint8_t int_level = 4;
-		cmt_.start(60, int_level);
+	{  // タイマー設定（１００Ｈｚ）
+		uint8_t intr_level = 4;
+		cmt_.start(100, intr_level);
 	}
 
 	{  // SCI 設定
-		uint8_t int_level = 2;
-		sci_.start(115200, int_level);
+		uint8_t intr_level = 2;
+		sci_.start(115200, intr_level);
 	}
 
-	utils::format("RX64M Internal D/A sample start\n");
-
-	cmd_.set_prompt("# ");
-
-	LED::DIR = 1;
-
-	{  // タイマー設定
+	{  // サンプリング・タイマー設定
 		uint8_t intr_level = 5;
 		if(!tpu0_.start(48000, intr_level)) {
-///		if(!tpu0_.start(100, intr_level)) {
 			utils::format("TPU0 start error...\n");
 		}
 	}
@@ -151,8 +177,11 @@ int main(int argc, char** argv)
 		dac_out_.out0(32767);
 		dac_out_.out1(32767);
 
+		int32_t gain_shift = 16; 
+		imath::sincos_t sico(static_cast<int64_t>(32767) << gain_shift);
 		for(uint32_t i = 0; i < WAVE_NUM; ++i) {
 			wave_t w;
+#if 0
 			if(i & 1) {
 				w.l = 0xffff;
 				w.r = 0x0000;
@@ -160,31 +189,49 @@ int main(int argc, char** argv)
 				w.l = 0x0000;
 				w.r = 0xffff;
 			}
+#else
+			w.l = (sico.x >> gain_shift) + 32768;
+			w.r = (sico.y >> gain_shift) + 32768;
+			imath::build_sincos(sico, WAVE_NUM / 4);
+#endif
 			wave_[i] = w;
 		}
-//		imath::build_sin<int16_t>(wave_ch0_, 128, 32767, 0x8000, 2048);
-//		imath::build_sin<int16_t>(wave_ch1_, 128, 32767, 0x8000, 2048);
 	}
 
 #ifndef SOFT_TRANS
 	{  // DMAC マネージャー開始
 		uint8_t intr_level = 4;
-		bool rept = true;
-		auto ret = dmac_mgr_.start(DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(wave_), DAC::DADR0.address(), 1024,
-			tpu0_.get_intr_vec(), rept, intr_level);
+		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
+			reinterpret_cast<uint32_t>(wave_), DAC::DADR0.address(), WAVE_NUM, intr_level);
 		if(!ret) {
 			utils::format("DMAC Not start...\n");
 		}
 	}
 #endif
 
+	utils::format("RX64M Internal D/A sample start\n");
+
+	cmd_.set_prompt("# ");
+
+	LED::DIR = 1;
+
 	uint32_t cnt = 0;
 	while(1) {
 		cmt_.sync();
 
-		if(cmd_.service()) {
+		service_sin_cos_();
 
+//		uint32_t pos = dmac_mgr_.get_count() & 0x3ff;
+//		utils::format("WP: %d\n") % pos;
+
+		if(cmd_.service()) {
+			char tmp[32];
+			if(cmd_.get_word(0, sizeof(tmp), tmp)) {
+				float freq = 0.0f;
+				if((utils::input("%f", tmp) % freq).status()) {
+					freq_ = freq;
+				}
+			}
 		}
 
 		++cnt;
