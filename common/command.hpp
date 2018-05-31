@@ -205,7 +205,7 @@ namespace utils {
 			@return 取得できたら「true」を返す
         */
         //-----------------------------------------------------------------//
-		bool get_word(uint8_t argc, uint8_t limit, char* word) const {
+		bool get_word(uint8_t argc, uint16_t limit, char* word) const {
 			const char* p = buff_;
 			char bc = ' ';
 			const char* wd = p;
