@@ -3,7 +3,9 @@
     @brief  RX64M D/A 出力サンプル @n
 			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する。@n
 			・DA0(P03)、DA1(P05) からアナログ出力する。@n
-			・サンプリング間隔は 48KHz
+			・サンプリング間隔は 48KHz @n
+			・コンソールから、周波数を入力すると、その周波数で sin/cos @n
+			を出力する。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -176,7 +178,7 @@ int main(int argc, char** argv)
 		dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
 		dac_out_.out0(32767);
 		dac_out_.out1(32767);
-
+#if 0
 		int32_t gain_shift = 16; 
 		imath::sincos_t sico(static_cast<int64_t>(32767) << gain_shift);
 		for(uint32_t i = 0; i < WAVE_NUM; ++i) {
@@ -196,6 +198,7 @@ int main(int argc, char** argv)
 #endif
 			wave_[i] = w;
 		}
+#endif
 	}
 
 #ifndef SOFT_TRANS
@@ -209,7 +212,7 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	utils::format("RX64M Internal D/A sample start\n");
+	utils::format("RX64M Internal D/A stream sample start\n");
 
 	cmd_.set_prompt("# ");
 
