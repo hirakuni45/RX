@@ -23,7 +23,7 @@ namespace device {
 	/*!
 		@brief  TPU I/O クラス
 		@param[in]	TPU	チャネルクラス
-		@param[in]	TASK	タイマー動作クラス
+		@param[in]	TASK	タイマー動作ファンクタ・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class TPU, class TASK = utils::null_task>
