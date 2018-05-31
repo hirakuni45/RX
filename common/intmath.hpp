@@ -201,36 +201,36 @@ static short randTapTables[] = {
 				X' = X   - Y・s @n
 				Y' = X'・s + Y  @n
 				上記の原理を使って、三角関数テーブルを作成する
-		@param[in]	qlp		1/4 周期のループ数
+		@param[in]	alp		1 周期のループ数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	static void build_sincos(sincos_t& t, int16_t qlp)
+	static void build_sincos(sincos_t& t, int16_t alp)
 	{
 		static const uint32_t pai_ = 0xC90FDAA2;	///< 円周率(3.141592654 * 2^30)
 		static const uint32_t pai_shift_ = 30;		///< 円周率、小数点位置
-		t.x -= ((static_cast<int64_t>(pai_) * t.y) >> (pai_shift_ + 1)) / qlp;
-		t.y += ((static_cast<int64_t>(pai_) * t.x) >> (pai_shift_ + 1)) / qlp;
+		t.x -= ((static_cast<int64_t>(pai_) * t.y) >> (pai_shift_ - 1)) / alp;
+		t.y += ((static_cast<int64_t>(pai_) * t.x) >> (pai_shift_ - 1)) / alp;
 	}
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	SIN テーブル生成テンプレート
-		@param[in]	qlp		1/4 周期のループ数
+		@param[in]	alp		1 周期のループ数
 		@param[in]	len		正規化された値の最大値（腕の長さ）
 		@param[in]	ofs		オフセット
 		@param[in]	loop	ループ数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <typename UNT>
-	static void build_sin(void* tbl, uint16_t qlp, uint16_t len, uint16_t ofs, uint16_t loop)
+	static void build_sin(void* tbl, uint16_t alp, uint16_t len, uint16_t ofs, uint16_t loop)
 	{
 		int16_t gain = 16;  // 精度を確保する為の下駄
 		sincos_t t(static_cast<int64_t>(len) << gain);  // cos(0) の値
 		UNT* out = static_cast<UNT*>(tbl);
 		for(uint16_t i = 0; i < loop; ++i) {
 			out[i] = (t.y >> gain) + ofs;   // pai_ のビット位置補正
-			build_sincos(t, qlp);
+			build_sincos(t, alp);
 		}
 	}
 
@@ -256,7 +256,7 @@ static short randTapTables[] = {
 			@brief	コンストラクタ
 		 */
 		//-----------------------------------------------------------------//
-		sin_cos() { build_sin<int16_t>(tbl_, TN, len, 0, TN + 1); }
+		sin_cos() { build_sin<int16_t>(tbl_, TN << 2, len, 0, TN + 1); }
 
 
 		//-----------------------------------------------------------------//
