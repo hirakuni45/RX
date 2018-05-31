@@ -146,7 +146,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	割り込み要因による開始
-			@param[in]	target	転送開始要因
+			@param[in]	trg		転送開始要因
 			@param[in]	tft		転送タイプ
 			@param[in]	src		元アドレス
 			@param[in]	dst		先アドレス
@@ -156,7 +156,7 @@ namespace device {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start(ICU::VECTOR target, trans_type tft, uint32_t src, uint32_t dst, uint32_t lim,
+		bool start(ICU::VECTOR trg, trans_type tft, uint32_t src, uint32_t dst, uint32_t lim,
 			uint32_t ilvl = 0) noexcept
 		{
 			if(lim > 1024) return false;
@@ -216,7 +216,7 @@ namespace device {
 			level_ = ilvl;
 			set_vector_(DMAC::get_vec());
 			if(level_ > 0) {
-				icu_mgr::set_dmac(DMAC::get_peripheral(), target);
+				icu_mgr::set_dmac(DMAC::get_peripheral(), trg);
 				DMAC::DMINT = DMAC::DMINT.DTIE.b();
 				DMAC::DMCSL.DISEL = 1;
 			} else {
@@ -257,6 +257,17 @@ namespace device {
 			if(power) {
 				power_cfg::turn(DMAC::get_peripheral(), false);
 			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	DMA カウンタの取得
+			@return DMA カウンタ
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_count() const noexcept {
+			return DMAC::DMCRA();
 		}
 
 
