@@ -48,7 +48,6 @@ namespace device {
 		{
 			task_();
 			DMAC::DMSTS.DTIF = 0;
-			DMAC::DMCNT.DTE = 1;  // 再開
 		}
 
 
@@ -147,20 +146,21 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	割り込み要因による開始
+			@param[in]	target	転送開始要因
 			@param[in]	tft		転送タイプ
 			@param[in]	src		元アドレス
 			@param[in]	dst		先アドレス
 			@param[in]	lim		転送リミット（※カウント数なので注意）
-			@param[in]	target	転送開始要因
-			@param[in]	rep		リピート転送の場合「true」
-			@param[in]	lvl		転送完了割り込みレベル（０以上）@n
+			@param[in]	ilvl	転送完了割り込みレベル（０以上）@n
 								※無指定（０）なら割り込みを起動しない。
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start(trans_type tft, uint32_t src, uint32_t dst, uint32_t lim, ICU::VECTOR target,
-			bool rep = false, uint32_t lvl = 0) noexcept
+		bool start(ICU::VECTOR target, trans_type tft, uint32_t src, uint32_t dst, uint32_t lim,
+			uint32_t ilvl = 0) noexcept
 		{
+			if(lim > 1024) return false;
+
 			power_cfg::turn(DMAC::get_peripheral());
 
 			DMAC::DMCNT.DTE = 0;  // 念のため停止させる。
@@ -204,36 +204,43 @@ namespace device {
 			}
 
 			DMAC::DMAMD = DMAC::DMAMD.DM.b(dm) | DMAC::DMAMD.SM.b(sm);
-			uint8_t md = rep ? 0b01 : 0b00;
+			// リピート転送
 			DMAC::DMTMD = DMAC::DMTMD.DCTG.b(0b01) | DMAC::DMTMD.SZ.b(sz) |
-						  DMAC::DMTMD.DTS.b(0b01)  | DMAC::DMTMD.MD.b(md);
+						  DMAC::DMTMD.DTS.b(0b01)  | DMAC::DMTMD.MD.b(0b01);
 			DMAC::DMSAR = src;
 			DMAC::DMDAR = dst;
 
-			DMAC::DMCRA = (512 << 16) | 512;
-			DMAC::DMCRB = 4;
-// utils::format("DMAC src: %08X\n") % src;
-// utils::format("DMAC dst: %08X\n") % dst;
-// utils::format("ICU DMA target: %d\n") % static_cast<uint32_t>(target);
+			DMAC::DMCRA = ((lim & 0x3FF) << 16) | (lim & 0x3FF);
+			DMAC::DMCRB = 1;
 
-			level_ = lvl;
+			level_ = ilvl;
+			set_vector_(DMAC::get_vec());
 			if(level_ > 0) {
-				  // リピートサイズ終了割り込み
-///				DMAC::DMINT = DMAC::DMINT.RPTIE.b() | DMAC::DMINT.DTIE.b();
+				icu_mgr::set_dmac(DMAC::get_peripheral(), target);
 				DMAC::DMINT = DMAC::DMINT.DTIE.b();
 				DMAC::DMCSL.DISEL = 1;
-				icu_mgr::set_dmac(DMAC::get_peripheral(), target);
 			} else {
 				DMAC::DMINT = 0x00;
 				DMAC::DMCSL.DISEL = 0;
 			}
-			set_vector_(DMAC::get_vec());
 
 			DMAC::DMCNT.DTE = 1;
 
 			DMAST.DMST = 1;
 
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	転送再開 @n
+					※設定をしていない状態で呼んではいけない。
+		 */
+		//-----------------------------------------------------------------//
+		void restart() const noexcept
+		{
+			DMAC::DMCNT.DTE = 1;
 		}
 
 
