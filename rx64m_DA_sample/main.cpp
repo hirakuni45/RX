@@ -233,6 +233,7 @@ int main(int argc, char** argv)
 				float freq = 0.0f;
 				if((utils::input("%f", tmp) % freq).status()) {
 					freq_ = freq;
+					init_ = false;
 				}
 			}
 		}
