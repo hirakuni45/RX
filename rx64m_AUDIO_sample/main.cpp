@@ -241,18 +241,24 @@ namespace {
 		auto ti = wav_in_.get_time();
 		utils::format("Time:   %02d:%02d:%02d\n") % (ti / 3600) % (ti / 60) % (ti % 60);
 
-///		master_.at_task().set_rate(wav_in_.get_rate());
-		// Supports: 8/16 bits, 1(mono)/2(stereo) chennel
-		if(wav_in_.get_bits() == 8) {
-
-		} else if(wav_in_.get_bits() == 16) {
-
-		} else {
-			f_close(&fil);
-			utils::format("Fail WAV file (bits): '%s'\n") % fname;
-			return;
+		{
+			uint8_t intr_level = 5;
+			if(!tpu0_.start(wav_in_.get_rate(), intr_level)) {
+				utils::format("TPU0 init fail...\n");
+				return;
+			}
 		}
-///		master_.at_task().set_param(skip, l_ofs, r_ofs, wofs);
+		{  // Supports: 8/16 bits, 1(mono)/2(stereo) chennel
+			auto ch = wav_in_.get_chanel();
+			auto bt = wav_in_.get_bits();
+			if(bt == 8 && ch <= 2) {
+			} else if(bt == 16 && ch <= 2) {
+			} else {
+				f_close(&fil);
+				utils::format("Fail WAV file format (8 or 16 bits, mono/stereo): '%s'\n") % fname;
+				return;
+			}
+		}
 
 		uint32_t fpos = 0;
 		uint16_t wpos = get_wave_pos_();
@@ -270,18 +276,46 @@ namespace {
 				while(((wpos ^ pos) & 128) == 0) {
 					pos = get_wave_pos_();
 				}
+				uint32_t unit = (wav_in_.get_bits() / 8) * wav_in_.get_chanel();
 				UINT br;
-				wave_t* buff = &wave_[(nnn + 512) & 0x3ff];
-				if(f_read(&fil, buff, 512, &br) != FR_OK) {
-					utils::format("Abort f_read: '%s'\n") % fname;
+				uint8_t tmp[512];
+				if(f_read(&fil, tmp, unit * 128, &br) != FR_OK) {
+					utils::format("f_read fail abort: '%s'\n") % fname;
 					break;
 				}
-				for(uint32_t i = 0; i < 128; ++i) {
-					buff[i].l_ch ^= 0x8000;
-					buff[i].r_ch ^= 0x8000;
+				wave_t* dst = &wave_[(nnn + 512) & 0x3ff];
+				if(wav_in_.get_bits() == 16) {
+					const uint16_t* src = reinterpret_cast<const uint16_t*>(tmp);
+					for(uint32_t i = 0; i < 128; ++i) {
+						if(wav_in_.get_chanel() == 2) {
+							dst[i].l_ch = src[0] ^ 0x8000;
+							dst[i].r_ch = src[1] ^ 0x8000;
+							src += 2;
+						} else {
+							dst[i].l_ch = src[0] ^ 0x8000;
+							dst[i].r_ch = dst[i].l_ch;
+							++src;
+						}
+					}
+				} else {  // 8 bits
+					const uint8_t* src = reinterpret_cast<const uint8_t*>(tmp);
+					for(uint32_t i = 0; i < 128; ++i) {
+						if(wav_in_.get_chanel() == 2) {
+							dst[i].l_ch = static_cast<uint16_t>(src[0] ^ 0x80) << 8;
+							dst[i].l_ch |= (src[0] & 0x7f) << 1;
+							dst[i].r_ch = static_cast<uint16_t>(src[1] ^ 0x80) << 8;
+							dst[i].l_ch |= (src[1] & 0x7f) << 1;
+							src += 2;
+						} else {
+							dst[i].l_ch = static_cast<uint16_t>(src[0] ^ 0x80) << 8;
+							dst[i].l_ch |= (src[0] & 0x7f) << 1;
+							dst[i].r_ch = dst[i].l_ch;
+							++src;
+						}
+					}
 				}
 				nnn += 128;
-				fpos += 512;  // file position
+				fpos += unit * 128;  // file position
 				wpos = pos;   // wave memory position
 
 				// LED モニターの点滅
@@ -335,9 +369,6 @@ namespace {
 				btime += dtime;
 			}
 		}
-
-///		master_.at_task().set_param(skip, l_ofs, r_ofs, wofs);
-
 		f_close(&fil);
 
 		utils::format("\n\n");
@@ -379,8 +410,7 @@ int main(int argc, char** argv)
 
 	{  // サンプリング・タイマー設定
 		uint8_t intr_level = 5;
-///		if(!tpu0_.start(48000, intr_level)) {
-		if(!tpu0_.start(44100, intr_level)) {
+		if(!tpu0_.start(48000, intr_level)) {
 			utils::format("TPU0 start error...\n");
 		}
 	}
