@@ -51,7 +51,8 @@ Renesas RX マイコン
  - /rx64m_DMAC_sample  ---> RX64M を使った DMAC 制御のサンプル（メモリー操作）
  - /rx64m_DA_sample    ---> RX64M を使った D/A 変換、TPU、DMAC のサンプル
  - /rx64m_AUDIO_sample ---> RX64M を使った D/A を使い、SD カード上の WAV ファイルを再生する
- - /GR-KAEDE           ---> ガジェット・ルネサス製の RX64M 搭載マイコンボード向けサンプル   
+ - /GR-KAEDE_ftps      ---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（FTP サーバー）
+ - /GR-KAEDE_http      ---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（http サーバー）
  - /RTK5_first_sample  ---> ルネサス製 RTK5RX65N マイコンボード向け初期サンプル   
  - /RTK5_LCD_sample    ---> ルネサス製 RTK5RX65N マイコンボード向けＬＣＤサンプル   
 
