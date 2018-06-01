@@ -3,7 +3,15 @@
     @brief  RX64M AUDIO サンプル @n
 			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
 			・DA0(P03):Left、DA1(P05):Right からアナログ出力する。@n
-			・WAV 形式ファイルの再生
+			・WAV 形式ファイルの再生 @n
+			※GR-KAEDE で動かす場合、GR_KAEDE を有効にする。@n
+			GR-KAEDE の SD カードハードウェアーには致命的な問題がある @n
+			（SD カードを SPI モードで使う場合「DO」端子をプルアップ @n
+			しておく必要があるのだが、プルダウンされている、なので、@n
+			それを回避する為、PC3 を制御ポートして使う、PC3 から、PC7 @n
+			へ １K オームで接続しておく。 @n
+			また、GR-KAEDE の D/A-0 出力(P03)はボード上の LED4 に接続 @n
+			されている。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -26,32 +34,48 @@
 #include "common/tpu_io.hpp"
 #include "common/wav_in.hpp"
 
+// GR-KAEDE の場合有効にする。
+// #define GR_KAEDE
+
 namespace {
 
+#ifdef GR_KAEDE
+	typedef device::PORT<device::PORTC, device::bitpos::B0> LED;
+#else
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+#endif
 
 	typedef device::cmt_io<device::CMT0> CMT;
 	CMT		cmt_;
 
 	typedef utils::fixed_fifo<char, 256> BUFFER;
+#ifdef GR_KAEDE
+	typedef device::sci_io<device::SCI7, BUFFER, BUFFER> SCI;
+#else
 	typedef device::sci_io<device::SCI1, BUFFER, BUFFER> SCI;
+#endif
 	SCI		sci_;
 
-	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
-	typedef device::PORT<device::PORT8, device::bitpos::B2> SDC_POWER;	///< カード電源制御
+#ifdef GR_KAEDE
+	// SDC 用　SPI 定義（RSPI）
+	typedef device::NULL_PORT  SDC_POWER;	///< カード電源制御（常に電源ＯＮ）
+	typedef device::PORT<device::PORTC, device::bitpos::B4> SDC_SELECT;	///< カード選択信号
+	typedef device::PORT<device::PORTB, device::bitpos::B7> SDC_DETECT;	///< カード検出
 
+	typedef device::rspi_io<device::RSPI> SPI;
+#else
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
 	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
 	typedef device::PORT<device::PORT7, device::bitpos::B7> SPCK;
-
 	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;  ///< Soft SPI 定義
-//	typedef device::rspi_io<device::RSPI> RSPI;  ///< Hard SPI 定義
-//	RSPI rspi_;
-	SPI		spi_;
 
+	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
+	typedef device::PORT<device::PORT8, device::bitpos::B2> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;  ///< カード選択信号
 	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;  ///< カード検出
+#endif
+	SPI		spi_;
 
 	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   ///< ハードウェアー定義
 
@@ -379,6 +403,13 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
+#ifdef GR_KAEDE
+	// GR-KAEDE の SD カードバグ回避
+	// ※PC3 から、PC7 へ １K オームで接続
+	device::PORTC::PDR.B3 = 1; // output
+	device::PORTC::PODR.B3 = 1;
+#endif
+
 	device::system_io<12000000>::setup_system_clock();
 
 	{  // タイマー設定（１００Ｈｚ）
@@ -398,7 +429,11 @@ int main(int argc, char** argv)
 		dac_out_.out1(0x8000);
 	}
 
+#ifdef GR_KAEDE
+	utils::format("\nRX64M (GR-KAEDE) WAV Player sample\n");
+#else
 	utils::format("\nRX64M WAV Player sample\n");
+#endif
 
 	{  // SD カード・クラスの初期化
 		sdh_.start();
