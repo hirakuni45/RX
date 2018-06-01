@@ -244,13 +244,13 @@ namespace {
 
 		FIL fil;
 		if(!sdc_.open(&fil, fname, FA_READ)) {
-///			master_.at_task().set_param(4, 0, 2, 0x80);
+			mute_();
 			utils::format("Can't open input file: '%s'\n") % fname;
 			return;
 		}
 
 		if(!wav_in_.load_header(&fil)) {
-///			master_.at_task().set_param(4, 0, 2, 0x80);
+			mute_();
 			f_close(&fil);
 			utils::format("WAV file load fail: '%s'\n") % fname;
 			return;
@@ -306,6 +306,7 @@ namespace {
 				uint8_t tmp[512];
 				if(f_read(&fil, tmp, unit * 128, &br) != FR_OK) {
 					utils::format("f_read fail abort: '%s'\n") % fname;
+					mute_();
 					break;
 				}
 				wave_t* dst = &wave_[(nnn + 512) & 0x3ff];
