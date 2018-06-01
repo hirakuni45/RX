@@ -11,6 +11,10 @@
 *.kicad_mod
 *-cache.lib
 release/
+debug/
 html/
 ff12b/doc/
 *.db
+!libmad/mad.h
+!libmad/.libs/libmad.a
+libmad/
