@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  RX64M AUDIO サンプル @n
+    @brief  RX64M AUDIO（WAV ファイルの再生） サンプル @n
 			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
 			・DA0(P03):Left、DA1(P05):Right からアナログ出力する。@n
 			・WAV 形式ファイルの再生 @n
@@ -11,7 +11,8 @@
 			それを回避する為、PC3 を制御ポートして使う、PC3 から、PC7 @n
 			へ １K オームで接続しておく。 @n
 			また、GR-KAEDE の D/A-0 出力(P03)はボード上の LED4 に接続 @n
-			されている。
+			されている。 @n
+			コンソール出力は、J14（SCI7）を使う。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
