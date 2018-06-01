@@ -26,8 +26,6 @@
 #include "common/tpu_io.hpp"
 #include "common/wav_in.hpp"
 
-// #define SDHI_IF
-
 namespace {
 
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
@@ -42,10 +40,6 @@ namespace {
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 	typedef device::PORT<device::PORT8, device::bitpos::B2> SDC_POWER;	///< カード電源制御
 
-#ifdef SDHI_IF
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER> SDHI;  ///< ハードウェアー定義
-	SDHI	sdh_;
-#else
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
 	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
@@ -62,7 +56,7 @@ namespace {
 	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   ///< ハードウェアー定義
 
 	MMC		sdh_(spi_, 20000000);
-#endif
+
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
 
@@ -72,8 +66,7 @@ namespace {
 	class dmac_term_task {
 	public:
 		void operator() () {
-			// DMA を再スタート
-			device::DMAC0::DMCNT.DTE = 1;  // DMA を再開
+			device::DMAC0::DMCNT.DTE = 1;  // DMA を再スタート
 		}
 	};
 
@@ -81,53 +74,31 @@ namespace {
 	typedef device::dmac_mgr<device::DMAC0, dmac_term_task> DMAC_MGR;
 	DMAC_MGR	dmac_mgr_;
 
+	uint32_t get_wave_pos_() { return (dmac_mgr_.get_count() & 0x3ff) ^ 0x3ff; }
+
 	typedef device::R12DA DAC;
 	typedef device::dac_out<DAC> DAC_OUT;
 	DAC_OUT		dac_out_;
 
 	struct wave_t {
-		uint16_t	l;	///< D/A CH0
-		uint16_t	r;	///< D/A CH1
+		uint16_t	l_ch;	///< D/A CH0
+		uint16_t	r_ch;	///< D/A CH1
 	};
 
 	// DMAC の転送最大値
 	static const uint32_t WAVE_NUM = 1024;
-	wave_t	wave_[WAVE_NUM];
+	wave_t		wave_[WAVE_NUM];
 
-	typedef device::tpu_io<device::TPU0, utils::null_task> TPU0;
-	TPU0		tpu0_;
-
-#if 0
-	bool		init_ = false;
-	float		freq_ = 100.0f;
-	uint32_t	wpos_ = 0;
-	imath::sincos_t sico_(0);
-	void service_sin_cos_()
+	void mute_()
 	{
-		uint32_t pos = (dmac_mgr_.get_count() & 0x3ff) ^ 0x3ff;
-		int32_t gain_shift = 16; 
-		if(!init_) {
-			sico_.x = static_cast<int64_t>(32767) << gain_shift;
-			sico_.y = 0;
-			wpos_ = pos & 0x3ff;
-			init_ = true;
-		}
-
-		int32_t dt = static_cast<int32_t>(48000.0f / freq_);
-
-		uint32_t d = pos - wpos_;
-		if(d >= WAVE_NUM) d += WAVE_NUM;
-		for(uint32_t i = 0; i < d; ++i) {
-			wave_t w;
-			w.l = (sico_.x >> gain_shift) + 32768;
-			w.r = (sico_.y >> gain_shift) + 32768;
-			wave_[(wpos_ + (WAVE_NUM / 2)) & (WAVE_NUM - 1)] = w;
-			++wpos_;
-			wpos_ &= WAVE_NUM - 1;
-			imath::build_sincos(sico_, dt);
+		for(uint32_t i = 0; i < WAVE_NUM; ++i) {
+			wave_[i].l_ch = 0x8000;
+			wave_[i].r_ch = 0x8000;
 		}
 	}
-#endif
+
+	typedef device::tpu_io<device::TPU0, utils::null_task> TPU0;
+	TPU0		tpu0_;	
 }
 
 
@@ -209,6 +180,7 @@ extern "C" {
 		}
 		return f;
 	}
+
 }
 
 
@@ -232,7 +204,8 @@ namespace {
 
 	void play_loop_(const char* root)
 	{
-///		sdc_.dir_loop(root, play_loop_func_);
+		sdc_.set_dir_list_limit(1);
+		sdc_.start_dir_list(root, play_loop_func_);
 	}
 
 
@@ -259,7 +232,7 @@ namespace {
 		}
 
 		auto fsize = wav_in_.get_size();
-		utils::format("File:   '%s'\n") % fname;
+		utils::format("File:  '%s'\n") % fname;
 		utils::format("Size:   %d\n") % fsize;
 		utils::format("Rate:   %d\n") % wav_in_.get_rate();
 		utils::format("Chanel: %d\n") % static_cast<uint32_t>(wav_in_.get_chanel());
@@ -269,41 +242,20 @@ namespace {
 		utils::format("Time:   %02d:%02d:%02d\n") % (ti / 3600) % (ti / 60) % (ti % 60);
 
 ///		master_.at_task().set_rate(wav_in_.get_rate());
-		uint8_t skip = 0;
-		uint8_t l_ofs = 0;
-		uint8_t r_ofs = 0;
-		uint8_t wofs = 0;
+		// Supports: 8/16 bits, 1(mono)/2(stereo) chennel
 		if(wav_in_.get_bits() == 8) {
-			skip = wav_in_.get_chanel();
-			if(wav_in_.get_chanel() == 1) {
-				l_ofs = 0;
-				r_ofs = 0;
-			} else {
-				l_ofs = 0;
-				r_ofs = 1;
-			}
+
 		} else if(wav_in_.get_bits() == 16) {
-			skip = wav_in_.get_chanel() * 2;
-			if(wav_in_.get_chanel() == 1) {
-				l_ofs = 1;
-				r_ofs = 1;
-			} else {
-				l_ofs = 1;
-				r_ofs = 3;
-			}
-			wofs = 0x80;
+
 		} else {
 			f_close(&fil);
-			utils::format("Fail bits: '%s'\n") % fname;
+			utils::format("Fail WAV file (bits): '%s'\n") % fname;
 			return;
 		}
 ///		master_.at_task().set_param(skip, l_ofs, r_ofs, wofs);
 
 		uint32_t fpos = 0;
-
-///		uint16_t wpos = master_.at_task().get_pos();
-		uint16_t wpos = 0;
-
+		uint16_t wpos = get_wave_pos_();
 		uint16_t pos = wpos;
 		uint8_t n = 0;
 		bool pause = false;
@@ -312,19 +264,25 @@ namespace {
 		uint8_t h_time = 0;
 		uint16_t btime = 0;
 		uint16_t dtime = 512 / (wav_in_.get_bits() / 8) / wav_in_.get_chanel();
+		uint16_t nnn = wpos & 0x380;
 		while(fpos < fsize) {
 			if(!pause) {
-///				while(((wpos ^ pos) & 512) == 0) {
-///					pos = master_.at_task().get_pos();
-///				}
-///				uint8_t* buff = master_.at_task().get_buff();
-///				UINT br;
-///				if(f_read(&fil, &buff[wpos & 512], 512, &br) != FR_OK) {
-///					utils::format("Abort: '%s'\n") % fname;
-///					break;
-///				}
-				fpos += 512;
-				wpos = pos;
+				while(((wpos ^ pos) & 128) == 0) {
+					pos = get_wave_pos_();
+				}
+				UINT br;
+				wave_t* buff = &wave_[(nnn + 512) & 0x3ff];
+				if(f_read(&fil, buff, 512, &br) != FR_OK) {
+					utils::format("Abort f_read: '%s'\n") % fname;
+					break;
+				}
+				for(uint32_t i = 0; i < 128; ++i) {
+					buff[i].l_ch ^= 0x8000;
+					buff[i].r_ch ^= 0x8000;
+				}
+				nnn += 128;
+				fpos += 512;  // file position
+				wpos = pos;   // wave memory position
 
 				// LED モニターの点滅
 				if(n >= 20) {  // play 時
@@ -340,6 +298,7 @@ namespace {
 				}
 				utils::delay::milli_second(2);
 				++n;
+				nnn = get_wave_pos_() & 0x380;
 			}
 
 			char ch = 0;
@@ -348,17 +307,18 @@ namespace {
 			}
 
 			if(ch == '>') {  // '>'
+				mute_();
 				break;
 			} else if(ch == '<') {  // '<'
+				mute_();
 				fpos = 0;
 				f_lseek(&fil, wav_in_.get_top());
+				s_time = m_time = h_time = 0;
 			} else if(ch == ' ') {  // [space]
-				if(pause) {
-///					master_.at_task().pause(skip);
-				} else {
-///					master_.at_task().pause(0);
-				}
 				pause = !pause;
+				if(pause) {  // pause になった・・
+					mute_();
+				}
 			}
 
 			// 時間の積算と表示
@@ -400,26 +360,29 @@ int main(int argc, char** argv)
 		sci_.start(115200, sci_level);
 	}
 
-#ifdef SDHI_IF
-	utils::format("RX64M SDHI SD-Card sample\n");
-#else
-	utils::format("RX64M Soft SPI SD-Card sample\n");
-#endif
+	{  // 内臓１２ビット D/A の設定
+		bool amp_ena = true;
+		dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
+		dac_out_.out0(0x8000);
+		dac_out_.out1(0x8000);
+	}
+
+	utils::format("\nRX64M WAV Player sample\n");
+
 	{  // SD カード・クラスの初期化
 		sdh_.start();
 		sdc_.start();
 	}
 
+	// 波形メモリーの無音状態初期化
+	mute_();
+
 	{  // サンプリング・タイマー設定
 		uint8_t intr_level = 5;
-		if(!tpu0_.start(48000, intr_level)) {
+///		if(!tpu0_.start(48000, intr_level)) {
+		if(!tpu0_.start(44100, intr_level)) {
 			utils::format("TPU0 start error...\n");
 		}
-	}
-
-	{  // 内臓１２ビット D/A の設定
-		bool amp_ena = true;
-		dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
 	}
 
 	{  // DMAC マネージャー開始
@@ -484,13 +447,12 @@ int main(int argc, char** argv)
 					} else {
 						play_loop_("");
 					}
-///				} else if(cmd_.cmp_word(0, "power")) {
-///					SDC_POWER::P = 0;
-///					f = true;
+					f = true;
 				} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
 					utils::format("dir [name]\n");
 					utils::format("cd [directory-name]\n");
 					utils::format("pwd\n");
+					utils::format("play file-name\n");
 					f = true;
 				}
 				if(!f) {
