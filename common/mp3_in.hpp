@@ -14,6 +14,12 @@
 #include "common/audio_out.hpp"
 #include "common/id3_mgr.hpp"
 
+extern "C" {
+	void set_sample_rate(uint32_t freq);
+	uint16_t sci_length(void);
+	char sci_getch(void);
+};
+
 namespace audio {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -123,10 +129,7 @@ namespace audio {
 					for(int s = 0; s < num; ++s) {
 						for(int sb = 0; sb < 32; ++sb) {
 							frame.sbsample[ch][s][sb] =
-// #pragma clang diagnostic push
-// #pragma clang diagnostic ignored "-Wdeprecated-register"
 								mad_f_mul(frame.sbsample[ch][s][sb], subband_filter_[sb]);
-// #pragma clang diagnostic pop
 						}
 					}
 				}
@@ -134,10 +137,7 @@ namespace audio {
 				for(int s = 0; s < num; ++s) {
 					for(int sb = 0; sb < 32; ++sb) {
 						frame.sbsample[0][s][sb] =
-// #pragma clang diagnostic push
-// #pragma clang diagnostic ignored "-Wdeprecated-register"
 							mad_f_mul(frame.sbsample[0][s][sb], subband_filter_[sb]);
-// #pragma clang diagnostic pop
 					}
 				}
 			}
@@ -185,7 +185,22 @@ namespace audio {
 
 
 	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		mp3_in() : subband_filter_enable_(false), id3v1_(false),
+				   time_(0) { }
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	デコード
+			@param[in]	fin		file_io コンテキスト（参照）
+			@param[in]	out		オーディオ出力（参照）
+		*/
+		//-----------------------------------------------------------------//
 		template <class AUDIO_OUT>
 		bool decode(utils::file_io& fin, AUDIO_OUT& out)
 		{
@@ -197,11 +212,35 @@ namespace audio {
 			mad_synth_init(&mad_synth_);
 			mad_timer_reset(&mad_timer_);
 
+			uint32_t forg = fin.tell();
 			bool info = false;
 			uint32_t pos = 0;
 			uint32_t frame_count = 0;
 			bool status = true;
+			bool pause = false;
 			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
+
+				if(sci_length() > 0) {
+					char ch = sci_getch();
+					if(ch == '>') {
+						out.mute();
+						break;
+					} else if(ch == '<') {
+						out.mute();
+						fin.seek(utils::file_io::SEEK::SET, forg);
+						info = false;
+						pos = 0;
+						time_ = 0;
+						frame_count = 0;
+						status = true;
+						pause = false;
+						continue;
+					} else if(ch == ' ') {
+						out.mute();
+						pause = !pause;
+					}
+				}
+				if(pause) continue;
 
 				if(mad_frame_decode(&mad_frame_, &mad_stream_)) {
 					if(MAD_RECOVERABLE(mad_stream_.error)) {
@@ -217,6 +256,7 @@ namespace audio {
 				}
 
 				if(!info) {
+					set_sample_rate(mad_frame_.header.samplerate);
 					utils::format("Sample Rate: %d\n") % mad_frame_.header.samplerate;
 					info = true;
 				}
@@ -262,19 +302,6 @@ namespace audio {
 
 			return status;
 		}
-
-	public:
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	コンストラクター
-		*/
-		//-----------------------------------------------------------------//
-		mp3_in() : subband_filter_enable_(false), id3v1_(false),
-				   time_(0) { }
-
-
-
-
 	};
 }
 

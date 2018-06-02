@@ -135,6 +135,15 @@ namespace {
 
 extern "C" {
 
+	void set_sample_rate(uint32_t freq)
+	{
+		uint8_t intr_level = 5;
+		if(!tpu0_.start(freq, intr_level)) {
+			utils::format("TPU0 start error...\n");
+		}
+	}
+
+
 	void bmp_putch(char ch)
 	{
 	}
@@ -284,13 +293,8 @@ namespace {
 		auto ti = wav_in_.get_time();
 		utils::format("Time:   %02d:%02d:%02d\n") % (ti / 3600) % (ti / 60) % (ti % 60);
 
-		{
-			uint8_t intr_level = 5;
-			if(!tpu0_.start(wav_in_.get_rate(), intr_level)) {
-				utils::format("TPU0 init fail...\n");
-				return;
-			}
-		}
+		set_sample_rate(wav_in_.get_rate());
+
 		{  // Supports: 8/16 bits, 1(mono)/2(stereo) chennel
 			auto ch = wav_in_.get_chanel();
 			auto bt = wav_in_.get_bits();
@@ -485,10 +489,7 @@ int main(int argc, char** argv)
 	audio_out_.mute();
 
 	{  // サンプリング・タイマー設定
-		uint8_t intr_level = 5;
-		if(!tpu0_.start(44100, intr_level)) {
-			utils::format("TPU0 start error...\n");
-		}
+		set_sample_rate(44100);
 	}
 
 	{  // DMAC マネージャー開始

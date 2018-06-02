@@ -53,6 +53,7 @@ namespace utils {
 
 		void mute() noexcept
 		{
+			fifo_.clear();
 			for(uint32_t i = 0; i < 1024; ++i) {
 				wave_[i].zero();
 			}
