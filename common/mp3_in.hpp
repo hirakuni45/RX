@@ -12,6 +12,7 @@
 #include <mad.h>
 #include "common/file_io.hpp"
 #include "common/audio_out.hpp"
+#include "common/id3_mgr.hpp"
 
 namespace audio {
 
@@ -35,6 +36,8 @@ namespace audio {
 		mad_fixed_t		subband_filter_[32];
 		bool			subband_filter_enable_;
 		bool			id3v1_;
+
+		uint32_t		time_;
 
 		int fill_read_buffer_(utils::file_io& fin, mad_stream& strm)
  		{
@@ -183,8 +186,12 @@ namespace audio {
 
 	public:
 
-		bool decode(utils::file_io& fin, utils::audio_out& out)
+		template <class AUDIO_OUT>
+		bool decode(utils::file_io& fin, AUDIO_OUT& out)
 		{
+			id3_mgr id3;
+			id3.analize(fin);
+
 			mad_stream_init(&mad_stream_);
 			mad_frame_init(&mad_frame_);
 			mad_synth_init(&mad_synth_);
@@ -210,7 +217,7 @@ namespace audio {
 				}
 
 				if(!info) {
-					utils::format("  Sample Rate: %d\n") % mad_frame_.header.samplerate;
+					utils::format("Sample Rate: %d\n") % mad_frame_.header.samplerate;
 					info = true;
 				}
 
@@ -226,7 +233,7 @@ namespace audio {
 				for(uint32_t i = 0; i < mad_synth_.pcm.length; ++i) {
 					while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
 					}
-					utils::audio_out::wave_t t;
+					audio::wave_t t;
 					if(MAD_NCHANNELS(&mad_frame_.header) == 1) {
 						t.l_ch = t.r_ch = MadFixedToSshort(mad_synth_.pcm.samples[0][i]);
 					} else {
@@ -239,10 +246,13 @@ namespace audio {
 
 				{
 					uint32_t s = pos / mad_frame_.header.samplerate;
-					uint16_t sec = s % 60;
-					uint16_t min = (s / 60) % 60;
-					uint16_t hor = (s / 3600) % 24;
-					utils::format("\r%02d:%02d:%02d") % hor % min % sec;
+					if(s != time_) {
+						uint16_t sec = s % 60;
+						uint16_t min = (s / 60) % 60;
+						uint16_t hor = (s / 3600) % 24;
+						utils::format("\r%02d:%02d:%02d") % hor % min % sec;
+						time_ = s;
+					}
 				}
 			}
 
@@ -259,7 +269,8 @@ namespace audio {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		mp3_in() : subband_filter_enable_(false), id3v1_(false) { }
+		mp3_in() : subband_filter_enable_(false), id3v1_(false),
+				   time_(0) { }
 
 
 
