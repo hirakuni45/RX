@@ -29,7 +29,8 @@ namespace audio {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class mp3_in {
 
-		static const uint32_t INPUT_BUFFER_SIZE = (5 * 8192);
+//		static const uint32_t INPUT_BUFFER_SIZE = (5 * 8192);
+		static const uint32_t INPUT_BUFFER_SIZE = (2048);
 
 		mad_stream	mad_stream_;
 		mad_frame	mad_frame_;
