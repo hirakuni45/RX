@@ -38,6 +38,13 @@
 // GR-KAEDE の場合有効にする。
 // #define GR_KAEDE
 
+// MP3 のデコードを有効にする場合
+#define MP3
+
+#ifdef MP3
+#include "common/mp3_in.hpp"
+#endif
+
 namespace {
 
 #ifdef GR_KAEDE
@@ -87,14 +94,16 @@ namespace {
 
 	utils::command<256> cmd_;
 
+	volatile uint32_t	wpos_;
+
 	/// DMAC 終了割り込み
 	class dmac_term_task {
 	public:
 		void operator() () {
 			device::DMAC0::DMCNT.DTE = 1;  // DMA を再スタート
+			wpos_ = 0;
 		}
 	};
-
 
 	typedef device::dmac_mgr<device::DMAC0, dmac_term_task> DMAC_MGR;
 	DMAC_MGR	dmac_mgr_;
@@ -105,24 +114,21 @@ namespace {
 	typedef device::dac_out<DAC> DAC_OUT;
 	DAC_OUT		dac_out_;
 
-	struct wave_t {
-		uint16_t	l_ch;	///< D/A CH0
-		uint16_t	r_ch;	///< D/A CH1
+	typedef utils::audio_out<16384> AUDIO_OUT;
+	AUDIO_OUT	audio_out_;
+
+	class tpu_task {
+	public:
+		void operator() () {
+			uint32_t tmp = wpos_;
+			++wpos_;
+			if((tmp ^ wpos_) & 64) {
+				audio_out_.service(64);
+			}
+		}
 	};
 
-	// DMAC の転送最大値
-	static const uint32_t WAVE_NUM = 1024;
-	wave_t		wave_[WAVE_NUM];
-
-	void mute_()
-	{
-		for(uint32_t i = 0; i < WAVE_NUM; ++i) {
-			wave_[i].l_ch = 0x8000;
-			wave_[i].r_ch = 0x8000;
-		}
-	}
-
-	typedef device::tpu_io<device::TPU0, utils::null_task> TPU0;
+	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
 	TPU0		tpu0_;	
 }
 
@@ -212,8 +218,13 @@ extern "C" {
 namespace {
 
 	audio::wav_in	wav_in_;
+	void play_wav_(const char* fname);
 
-	void play_(const char* fname);
+#ifdef MP3
+	audio::mp3_in	mp3_in_;
+	void play_mp3_(const char* fname);
+#endif
+
 	void play_loop_(const char*);
 
 
@@ -222,7 +233,14 @@ namespace {
 		if(dir) {
 			play_loop_(name);
 		} else {
-			play_(name);
+			const char* ext = strrchr(name, '.');
+			if(ext != nullptr) {
+				if(strcmp(ext, ".wav") == 0) {
+					play_wav_(name);
+				} else if(strcmp(ext, ".mp3") == 0) {
+					play_mp3_(name);
+				}
+			}
 		}
 	}
 
@@ -234,7 +252,7 @@ namespace {
 	}
 
 
-	void play_(const char* fname)
+	void play_wav_(const char* fname)
 	{
 		if(!sdc_.get_mount()) {
 ///			master_.at_task().set_param(4, 0, 2, 0x80);
@@ -244,13 +262,13 @@ namespace {
 
 		FIL fil;
 		if(!sdc_.open(&fil, fname, FA_READ)) {
-			mute_();
+			audio_out_.mute();
 			utils::format("Can't open input file: '%s'\n") % fname;
 			return;
 		}
 
 		if(!wav_in_.load_header(&fil)) {
-			mute_();
+			audio_out_.mute();
 			f_close(&fil);
 			utils::format("WAV file load fail: '%s'\n") % fname;
 			return;
@@ -306,10 +324,10 @@ namespace {
 				uint8_t tmp[512];
 				if(f_read(&fil, tmp, unit * 128, &br) != FR_OK) {
 					utils::format("f_read fail abort: '%s'\n") % fname;
-					mute_();
+					audio_out_.mute();
 					break;
 				}
-				wave_t* dst = &wave_[(nnn + 512) & 0x3ff];
+				audio::wave_t* dst = audio_out_.get_wave((nnn + 512) & 0x3ff);
 				if(wav_in_.get_bits() == 16) {
 					const uint16_t* src = reinterpret_cast<const uint16_t*>(tmp);
 					for(uint32_t i = 0; i < 128; ++i) {
@@ -367,17 +385,17 @@ namespace {
 			}
 
 			if(ch == '>') {  // '>'
-				mute_();
+				audio_out_.mute();
 				break;
 			} else if(ch == '<') {  // '<'
-				mute_();
+				audio_out_.mute();
 				fpos = 0;
 				f_lseek(&fil, wav_in_.get_top());
 				s_time = m_time = h_time = 0;
 			} else if(ch == ' ') {  // [space]
 				pause = !pause;
 				if(pause) {  // pause になった・・
-					mute_();
+					audio_out_.mute();
 				}
 			}
 
@@ -399,6 +417,27 @@ namespace {
 
 		utils::format("\n\n");
 	}
+
+#ifdef MP3
+
+	void play_mp3_(const char* fname)
+	{
+		utils::file_io fin(sdc_);
+
+		if(!fin.open(fname, "rb")) {
+			return;
+		}
+
+		utils::format("%s\n") % fname;
+
+		mp3_in_.decode(fin, audio_out_);
+
+		fin.close();
+
+		utils::format("\n");
+	}
+
+#endif
 }
 
 int main(int argc, char** argv);
@@ -432,9 +471,9 @@ int main(int argc, char** argv)
 	}
 
 #ifdef GR_KAEDE
-	utils::format("\nRX64M (GR-KAEDE) WAV Player sample\n");
+	utils::format("\nRX64M (GR-KAEDE) AUDIO Player sample\n");
 #else
-	utils::format("\nRX64M WAV Player sample\n");
+	utils::format("\nRX64M AUDIO Player sample\n");
 #endif
 
 	{  // SD カード・クラスの初期化
@@ -443,11 +482,11 @@ int main(int argc, char** argv)
 	}
 
 	// 波形メモリーの無音状態初期化
-	mute_();
+	audio_out_.mute();
 
 	{  // サンプリング・タイマー設定
 		uint8_t intr_level = 5;
-		if(!tpu0_.start(48000, intr_level)) {
+		if(!tpu0_.start(44100, intr_level)) {
 			utils::format("TPU0 start error...\n");
 		}
 	}
@@ -455,7 +494,8 @@ int main(int argc, char** argv)
 	{  // DMAC マネージャー開始
 		uint8_t intr_level = 4;
 		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(wave_), DAC::DADR0.address(), WAVE_NUM, intr_level);
+			reinterpret_cast<uint32_t>(audio_out_.get_wave()), DAC::DADR0.address(),
+			audio_out_.size(), intr_level);
 		if(!ret) {
 			utils::format("DMAC Not start...\n");
 		}
@@ -509,7 +549,7 @@ int main(int argc, char** argv)
 						if(std::strcmp(tmp, "*") == 0) {
 							play_loop_("");
 						} else {
-							play_(tmp);
+							play_wav_(tmp);
 						}
 					} else {
 						play_loop_("");
@@ -535,6 +575,6 @@ int main(int argc, char** argv)
 		if(cnt >= 50) {
 			cnt = 0;
 		}
-		device::PORT0::PODR.B7 = (cnt < 15) ? 0 : 1;
+		LED::P = (cnt < 15) ? 0 : 1;
 	}
 }
