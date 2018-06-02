@@ -1,52 +1,198 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	MP3 ファイルを扱うクラス
+	@brief	libmad を使った MP3 デコード・クラス @n
+			※このクラスを使うには、libmad ライブラリーが必要
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
-				https://github.com/hirakuni45/RL78/blob/master/LICENSE
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <mad.h>
+#include "common/file_io.hpp"
+#include "common/audio_out.hpp"
 
 namespace audio {
 
-	//-----------------------------------------------------------------//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	MP3 形式ファイルクラス
+		@brief	MP3 形式デコード・クラス
 	*/
-	//-----------------------------------------------------------------//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class mp3_in {
+
+		static const uint32_t INPUT_BUFFER_SIZE = (5 * 8192);
 
 		mad_stream	mad_stream_;
 		mad_frame	mad_frame_;
 		mad_synth	mad_synth_;
 		mad_timer_t	mad_timer_;
 
-	public:
+		uint8_t		input_buffer_[INPUT_BUFFER_SIZE + MAD_BUFFER_GUARD];
 
-		void test()
-		{
-			mad_stream_init(&mad_stream_);
-			mad_frame_init(&mad_frame_);
-			mad_synth_init(&mad_synth_);
-			mad_timer_reset(&mad_timer_);
+		// サブバンド領域フィルター特性用。
+		mad_fixed_t		subband_filter_[32];
+		bool			subband_filter_enable_;
+		bool			id3v1_;
 
+		int fill_read_buffer_(utils::file_io& fin, mad_stream& strm)
+ 		{
+			/* The input bucket must be filled if it becomes empty or if
+			 * it's the first execution of the loop.
+			 */
+			if(strm.buffer == NULL || strm.error == MAD_ERROR_BUFLEN) {
+				size_t size;
+				size_t remaining;
+				unsigned char* ptr;
 
-			mad_frame_decode(&mad_frame_, &mad_stream_);
+				/* {2} libmad may not consume all bytes of the input
+				 * buffer. If the last frame in the buffer is not wholly
+				 * contained by it, then that frame's start is pointed by
+				 * the next_frame member of the Stream structure. This
+				 * common situation occurs when mad_frame_decode() fails,
+				 * sets the stream error code to MAD_ERROR_BUFLEN, and
+				 * sets the next_frame pointer to a non NULL value. (See
+				 * also the comment marked {4} bellow.)
+				 *
+				 * When this occurs, the remaining unused bytes must be
+				 * put back at the beginning of the buffer and taken in
+				 * account before refilling the buffer. This means that
+				 * the input buffer must be large enough to hold a whole
+				 * frame at the highest observable bit-rate (currently 448
+				 * kb/s). XXX=XXX Is 2016 bytes the size of the largest
+				 * frame? (448000*(1152/32000))/8
+				 */
+				if(strm.next_frame != NULL) {
+					remaining = strm.bufend - strm.next_frame;
+					memmove(&input_buffer_[0], strm.next_frame, remaining);
+					ptr  = &input_buffer_[remaining];
+					size = INPUT_BUFFER_SIZE - remaining;
+				} else {
+					size = INPUT_BUFFER_SIZE;
+					ptr  = &input_buffer_[0];
+					remaining = 0;
+				}
+
+				/* Fill-in the buffer. If an error occurs print a message
+				 * and leave the decoding loop. If the end of stream is
+				 * reached we also leave the loop but the return status is
+				 * left untouched.
+				 */
+				// ReadSize = BstdRead(ReadStart, 1, ReadSize, BstdFile);
+				size_t req = size;
+				size_t rs = fin.read(ptr, 1, req);
+				if(id3v1_) {
+					if(fin.tell() >= (fin.get_file_size() - 128)) return -1;
+				} else {
+					if(fin.eof()) return -1;
+				}
+				size = rs;
+				if(rs < req) {
+					memset(&ptr[rs], 0, MAD_BUFFER_GUARD);
+					size += MAD_BUFFER_GUARD;
+				}
+
+				/* Pipe the new buffer content to libmad's stream decoder
+				 * facility.
+				 */
+				mad_stream_buffer(&strm, &input_buffer_[0], size + remaining);
+				strm.error = MAD_ERROR_NONE;
+				return 0;
+			} else {
+				return 1;
+			}
 		}
 
-#if 0
-		bool decode_(file_io& fin, audio out)
+
+		/****************************************************************************
+		 * Applies a frequency-domain filter to audio data in the subband-domain.	*
+		 ****************************************************************************/
+		void apply_filter_(mad_frame& frame)
+		{
+			/* There is two application loops, each optimized for the number
+			 * of audio channels to process. The first alternative is for
+			 * two-channel frames, the second is for mono-audio.
+			 */
+			int num = MAD_NSBSAMPLES(&frame.header);
+			if(frame.header.mode != MAD_MODE_SINGLE_CHANNEL) {
+				for(int ch = 0; ch < 2; ++ch) {
+					for(int s = 0; s < num; ++s) {
+						for(int sb = 0; sb < 32; ++sb) {
+							frame.sbsample[ch][s][sb] =
+// #pragma clang diagnostic push
+// #pragma clang diagnostic ignored "-Wdeprecated-register"
+								mad_f_mul(frame.sbsample[ch][s][sb], subband_filter_[sb]);
+// #pragma clang diagnostic pop
+						}
+					}
+				}
+			} else {
+				for(int s = 0; s < num; ++s) {
+					for(int sb = 0; sb < 32; ++sb) {
+						frame.sbsample[0][s][sb] =
+// #pragma clang diagnostic push
+// #pragma clang diagnostic ignored "-Wdeprecated-register"
+							mad_f_mul(frame.sbsample[0][s][sb], subband_filter_[sb]);
+// #pragma clang diagnostic pop
+					}
+				}
+			}
+		}
+
+
+		static const short SHRT_MAX_ = 32767;
+
+		/****************************************************************************
+		 * Converts a sample from mad's fixed point number format to a signed		*
+		 * short (16 bits).															*
+		 ****************************************************************************/
+		static short MadFixedToSshort(mad_fixed_t v)
+		{
+			/* A fixed point number is formed of the following bit pattern:
+			 *
+			 * SWWWFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+			 * MSB                          LSB
+			 * S ==> Sign (0 is positive, 1 is negative)
+			 * W ==> Whole part bits
+			 * F ==> Fractional part bits
+			 *
+			 * This pattern contains MAD_F_FRACBITS fractional bits, one
+			 * should alway use this macro when working on the bits of a fixed
+			 * point number. It is not guaranteed to be constant over the
+			 * different platforms supported by libmad.
+			 *
+			 * The signed short value is formed, after clipping, by the least
+			 * significant whole part bit, followed by the 15 most significant
+			 * fractional part bits. Warning: this is a quick and dirty way to
+			 * compute the 16-bit number, madplay includes much better
+			 * algorithms.
+			 */
+
+			// Clipping..
+			if(v >= MAD_F_ONE) {
+				return SHRT_MAX_;
+			}
+			if(v <= -MAD_F_ONE) {
+				return -SHRT_MAX_;
+			}
+
+			return (signed short)(v >> (MAD_F_FRACBITS - 15));
+		}
+
+
+	public:
+
+		bool decode(utils::file_io& fin, utils::audio_out& out)
 		{
 			mad_stream_init(&mad_stream_);
 			mad_frame_init(&mad_frame_);
 			mad_synth_init(&mad_synth_);
 			mad_timer_reset(&mad_timer_);
 
-			int pos = 0;
-			int frame_count = 0;
+			bool info = false;
+			uint32_t pos = 0;
+			uint32_t frame_count = 0;
 			bool status = true;
 			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
 
@@ -63,6 +209,11 @@ namespace audio {
 					}
 				}
 
+				if(!info) {
+					utils::format("  Sample Rate: %d\n") % mad_frame_.header.samplerate;
+					info = true;
+				}
+
 				frame_count++;
 				mad_timer_add(&mad_timer_, mad_frame_.header.duration);
 
@@ -72,18 +223,26 @@ namespace audio {
 
 				mad_synth_frame(&mad_synth_, &mad_frame_);
 
-				for(int i = 0; i < mad_synth_.pcm.length; ++i) {
-					if(MAD_NCHANNELS(&mad_frame_.header) == 1) {
-						pcm16_m pcm;
-						pcm.w = MadFixedToSshort(mad_synth_.pcm.samples[0][i]);
-						out->put(pos, pcm);
-					} else {
-						pcm16_s pcm;
-						pcm.l = MadFixedToSshort(mad_synth_.pcm.samples[0][i]);
-						pcm.r = MadFixedToSshort(mad_synth_.pcm.samples[1][i]);
-						out->put(pos, pcm);
+				for(uint32_t i = 0; i < mad_synth_.pcm.length; ++i) {
+					while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
 					}
+					utils::audio_out::wave_t t;
+					if(MAD_NCHANNELS(&mad_frame_.header) == 1) {
+						t.l_ch = t.r_ch = MadFixedToSshort(mad_synth_.pcm.samples[0][i]);
+					} else {
+						t.l_ch = MadFixedToSshort(mad_synth_.pcm.samples[0][i]);
+						t.r_ch = MadFixedToSshort(mad_synth_.pcm.samples[1][i]);
+					}
+					out.at_fifo().put(t);
 					++pos;
+				}
+
+				{
+					uint32_t s = pos / mad_frame_.header.samplerate;
+					uint16_t sec = s % 60;
+					uint16_t min = (s / 60) % 60;
+					uint16_t hor = (s / 3600) % 24;
+					utils::format("\r%02d:%02d:%02d") % hor % min % sec;
 				}
 			}
 
@@ -93,7 +252,18 @@ namespace audio {
 
 			return status;
 		}
-#endif
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		mp3_in() : subband_filter_enable_(false), id3v1_(false) { }
+
+
+
+
 	};
 }
 
