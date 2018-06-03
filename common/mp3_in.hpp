@@ -239,6 +239,10 @@ namespace audio {
 					} else if(ch == ' ') {
 						out.mute();
 						pause = !pause;
+					} else if(ch == ('C' - 0x40)) {
+						out.mute();
+						status = false;
+						break;
 					}
 				}
 				if(pause) continue;
