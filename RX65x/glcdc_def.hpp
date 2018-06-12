@@ -280,7 +280,7 @@ struct glcdc_dithering_t
 /** Graphics plane input configuration */
 struct glcdc_input_cfg_t
 {
-    uint32_t * p_base;                   // Base address to the frame buffer.
+    void*	 base;                   // Base address to the frame buffer.
     uint16_t hsize;                      // Horizontal pixel size in a line.
     uint16_t vsize;                      // Vertical pixel size in a frame.
     int32_t offset;                      // offset value to next line.

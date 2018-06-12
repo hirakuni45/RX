@@ -609,9 +609,9 @@ namespace device {
 
 			/* ---- Set the base address of graphics plane ---- */
 			if(frame == 0) {
-				GLC::GR1FLM2 = (uint32_t)input.p_base;
+				GLC::GR1FLM2 = (uint32_t)input.base;
 			} else {
-				GLC::GR2FLM2 = (uint32_t)input.p_base;
+				GLC::GR2FLM2 = (uint32_t)input.base;
 			}
 
 			/* ---- Set the background color on graphics plane ---- */
@@ -1382,13 +1382,13 @@ namespace device {
 			}
 
 			// Save status of frame buffer read enable
-			if(nullptr == cfg.input[FRAME_LAYER_1].p_base) {
+			if(nullptr == cfg.input[FRAME_LAYER_1].base) {
 				ctrl_blk_.graphics_read_enable[FRAME_LAYER_1] = false;
 			} else {
 				ctrl_blk_.graphics_read_enable[FRAME_LAYER_1] = true;
 			}
 
-			if(nullptr == cfg.input[FRAME_LAYER_2].p_base) {
+			if(nullptr == cfg.input[FRAME_LAYER_2].base) {
 				ctrl_blk_.graphics_read_enable[FRAME_LAYER_2] = false;
 			} else {
 				ctrl_blk_.graphics_read_enable[FRAME_LAYER_2] = true;
@@ -1521,10 +1521,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  開始
+			@param[in]	ly1		レイヤー１アドレス
+			@param[in]	ly2		レイヤー２アドレス
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start() noexcept
+		bool start(void* ly1 = nullptr, void* ly2 = reinterpret_cast<void*>(0x00800000)) noexcept
 		{
 			cfg_t cfg;
 			//
@@ -1536,9 +1538,9 @@ namespace device {
 			// and set the PANELCLK.CLKEN bit to 1
 			//
 			cfg.output.clksrc = GLCDC_CLK_SRC_INTERNAL;   			  // Select PLL clock
-			cfg.output.clock_div_ratio = GLCDC_PANEL_CLK_DIVISOR_24;    // 240 / 24 = 10 MHz
-  																          // No frequency division
-  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	          // Enable LCD_CLK output
+			cfg.output.clock_div_ratio = GLCDC_PANEL_CLK_DIVISOR_24;  // 240 / 24 = 10 MHz
+  																      // No frequency division
+  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	      // Enable LCD_CLK output
 			//
 			// Definition of LCD
 			//
@@ -1561,21 +1563,14 @@ namespace device {
 			//
 			// Graphic 1 configuration
 			//
-			cfg.input[FRAME_LAYER_1].p_base = nullptr;	  // Disable Graphics 1
+			cfg.input[FRAME_LAYER_1].base = ly1;	  // Disable Graphics 1
 
 			//
 			// Graphic 2 configuration
 			//
   			// Enable reading of the frame buffer
 			// Specify the start address of the frame buffer
-			{
-				static constexpr uint32_t bptr[] = {
-//					0x00010000,  // Begin of On-Chip RAM
-					0x00800000,  // Begin of Expansion RAM
-					0x00800000   // Begin of Expansion RAM
-				};
-				cfg.input[FRAME_LAYER_2].p_base = (uint32_t *)bptr[0];
-			}
+			cfg.input[FRAME_LAYER_2].base = ly2;
 			// Offset value from the end address of the line to the start address of the next line
 			cfg.input[FRAME_LAYER_2].offset = LINE_OFFSET;
 			// Single Line Data Transfer Count
@@ -1737,6 +1732,14 @@ namespace device {
 			BSC.EBMAPCR.BIT.PR4SEL = 2;
 			BSC.EBMAPCR.BIT.PR5SEL = 4;
 #endif
+
+			if(cfg.input[FRAME_LAYER_1].base != nullptr) {
+				memset(cfg.input[FRAME_LAYER_1].base, 0x00, BYTES_PER_BUFFER);
+			}
+			if(cfg.input[FRAME_LAYER_2].base != nullptr) {
+				memset(cfg.input[FRAME_LAYER_2].base, 0x00, BYTES_PER_BUFFER);
+			}
+
 			return true;
 		}
 
