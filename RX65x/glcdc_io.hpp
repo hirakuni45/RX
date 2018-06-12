@@ -694,21 +694,17 @@ namespace device {
 			}
 
 			if(frame == 0) {
-				GLC::GR1AB1.GRCDISPON = input.frame_edge == true ? 1 : 0;
+				GLC::GR1AB1.GRCDISPON = input.frame_edge ? 1 : 0;
 			} else {
-				GLC::GR2AB1.GRCDISPON = input.frame_edge == true ? 1 : 0;
+				GLC::GR2AB1.GRCDISPON = input.frame_edge ? 1 : 0;
 			}
 		}
 
 
 		void blend_condition_set_(const glcdc_blend_t& blend, uint32_t frame)
 		{
-
 			/* if enable graphics data read from memory */
 			if(false == ctrl_blk_.graphics_read_enable[frame]) {
-				/* GRnAB1 - Graphic n Alpha Blending Control Register 1
-				b1:b0   DISPSEL[1:0] - Display Screen Control. - Blended display of current
-									   graphics with lower-layer graphics */
 				/* Set layer transparent */
 				if(frame == 0) {
 					GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_TRANSPARENT
@@ -723,18 +719,6 @@ namespace device {
 			switch(blend.blend_control)
 			{
 			case GLCDC_BLEND_CONTROL_NONE:
-            /* GRnAB1 - Graphic n Alpha Blending Control Register 1
-            b31:b13 Reserved  - These bits are read as 0. Writing to these bits have no effect.
-            b12     ARCON     - Alpha Blending Control. - Per-pixel alpha blending.
-            b11:b9  Reserved  - These bits are read as 0. Writing to these bits have no effect.
-            b8      ARCDISPON - Rectangular Alpha Blending Area Frame Display Control.
-                              - Area Frame is displayed or not displayed.
-            b7:b5   Reserved  - These bits are read as 0. Writing to these bits have no effect.
-            b4      GRCDISPON - Graphics Area Frame Display Control.
-                              - Area Frame is displayed or not displayed.
-            b3:b2   Reserved  - These bits are read as 0. Writing to these bits have no effect.
-            b1:b0   DISPSEL[1:0] - Display Screen Control. - Displays the background, lower-layer,
-                                   current graphics or blend graphics with lower-layer */
 
 				if(frame == 0) {
 					GLC::GR1AB1.ARCON = 0;
@@ -742,8 +726,6 @@ namespace device {
 					GLC::GR2AB1.ARCON = 0;
 				}
 				if(true == blend.visible) {
-					/* GRnAB1 - Graphic n Alpha Blending Control Register 1
-					b1:b0   DISPSEL[1:0] - Display Screen Control. - Displays current graphics */
 					if(frame == 0) {
 						GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_NON_TRANSPARENT
 						   					  & GRn_AB1_DISPSEL_MASK;
@@ -752,9 +734,6 @@ namespace device {
 						   					  & GRn_AB1_DISPSEL_MASK;
 					}
 				} else {
-					/* GRnAB1 - Graphic n Alpha Blending Control Register 1
-					b1:b0   DISPSEL[1:0] - Display Screen Control. - Blended display of current
-										   graphics with lower-layer graphics */
 					if(frame == 0) {
 						GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_TRANSPARENT
 											  & GRn_AB1_DISPSEL_MASK;
@@ -767,15 +746,6 @@ namespace device {
 			case GLCDC_BLEND_CONTROL_FADEIN:
 			case GLCDC_BLEND_CONTROL_FADEOUT:
 			case GLCDC_BLEND_CONTROL_FIXED:
-				/* ---- Set the start position of the rectangle area in the graphics layers ---- */
-				/* GRnAB5 - Graphic n Alpha Blending Control Register 5
-				b31:b27  Reserved    - These bits are read as 0. Writing to these bits have
-									   no effect.
-				b26:b16  ARCHS[10:0] - Rectangular Alpha Blending Area Horizontal Start
-									   Position Setting.
-				b15:b11  Reserved    - These bits are read as 0. Writing to these bits have
-									   no effect.
-				b10:b0   ARCHW[10:0] - Rectangular Alpha Blending Area Horizontal Width Setting. */
 				// gp_gr[frame]->grxab5.bit.archs = 
                 //    
 				if(frame == 0) {
@@ -786,14 +756,6 @@ namespace device {
 										+ blend.start_coordinate.x)) & GRn_AB5_ARCHS_MASK;
 				}
 
-				/* GRnAB4 - Graphic n Alpha Blending Control Register 4
-				b31:b27  Reserved    - These bits are read as 0. Writing to these bits have
-									   no effect.
-				b26:b16  ARCVS[10:0] - Rectangular Alpha Blending Area Vertical Start Position
-									   Setting.
-				b15:b11  Reserved    - These bits are read as 0. Writing to these bits have
-									   no effect.
-				b10:b0   ARCVW[10:0] - Rectangular Alpha Blending Area Vertical Width Setting. */
 				if(frame == 0) {
 					GLC::GR1AB4.ARCVS = ((uint32_t)(ctrl_blk_.active_start_pos.y
 										+ blend.start_coordinate.y))& GRn_AB4_ARCVS_MASK;
@@ -803,8 +765,6 @@ namespace device {
 				}
 
 				/* ---- Set the width of the graphics layers ---- */
-				/* GRnAB5 - Graphic n Alpha Blending Control Register 5
-				b10:b0   ARCHW[10:0] - Rectangular Alpha Blending Area Horizontal Width Setting. */
 				if(frame == 0) {
 					GLC::GR1AB5.ARCHW = (blend.end_coordinate.x - blend.start_coordinate.x)
 										& GRn_AB5_ARCHW_MASK;
@@ -812,9 +772,6 @@ namespace device {
 					GLC::GR2AB5.ARCHW = (blend.end_coordinate.x - blend.start_coordinate.x)
 										& GRn_AB5_ARCHW_MASK;
 				}
-
-				/* GRnAB4 - Graphic n Alpha Blending Control Register 4
-				b10:b0   ARCVW[10:0] - Rectangular Alpha Blending Area Vertical Width Setting. */
 				if(frame == 0) {
 					GLC::GR1AB4.ARCVW = (blend.end_coordinate.y - blend.start_coordinate.y)
 					                    & GRn_AB4_ARCVW_MASK;
@@ -824,21 +781,12 @@ namespace device {
 				}
 
 				/*---- Enable rectangular alpha blending ---- */
-				/* GRnAB1 - Graphic n Alpha Blending Control Register 1
-				b12     ARCON     - Alpha Blending Control. - Set rectangular alpha blending. */
 				if(frame == 0) {
 					GLC::GR1AB1.ARCON = 1;
 				} else {
 					GLC::GR2AB1.ARCON = 1;
 				}
 
-				/* GRnAB6 - Graphic n Alpha Blending Control Register 6
-				b31:b25  Reserved    - These bits are read as 0. Writing to these bits have
-									   no effect.
-				b24:b16  ARCCOEF[8:0]- Alpha Coefficient Setting.
-				b15:b8   Reserved    - These bits are read as 0. Writing to these bits have
-									   no effect.
-				b7:b0    ARCRATE[7:0]- Alpha Blending Updating Rate Setting. Set 1 frame. */
             	// gp_gr[frame]->grxab6.bit.arcrate = 0x00;
 				if(frame == 0) {
 					GLC::GR1AB6.ARCRATE = 0x00;
@@ -847,13 +795,6 @@ namespace device {
 				}
 
 	            if(GLCDC_BLEND_CONTROL_FADEIN == blend.blend_control) {
-					/* GRnAB7 - Graphic n Alpha Blending Control Register 7
-                	b31:b24 Reserved    - These bits are read as 0. Writing to these bits have
-										  no effect.
-					b23:b16 ARCDEF[7:0] - Initial Alpha Value Setting. - Set is 0.
-                	b15:b1  Reserved    - These bits are read as 0. Writing to these bits have
-										  no effect.
-                	b0      CKON        - Chroma Key Compositing Control. */
 					if(frame == 0) {
 						GLC::GR1AB7.ARCDEF = (uint32_t)GLCDC_FADING_CONTROL_INITIAL_ALPHA_MIN
 											 & GRn_AB7_ARCDEF_MASK;
@@ -861,16 +802,13 @@ namespace device {
 						GLC::GR2AB7.ARCDEF = (uint32_t)GLCDC_FADING_CONTROL_INITIAL_ALPHA_MIN
 											 & GRn_AB7_ARCDEF_MASK;
 					}
-                	/* GRnAB6 - Graphic n Alpha Blending Control Register 6
-                	b24:b16  ARCCOEF[8:0]- Alpha Coefficient Setting. */
+
 					if(frame == 0) {
 						GLC::GR1AB6.ARCCOEF = (uint32_t)blend.fade_speed & GRn_AB6_ARCCOEF_MASK;
 					} else {
 						GLC::GR2AB6.ARCCOEF = (uint32_t)blend.fade_speed & GRn_AB6_ARCCOEF_MASK;
 					}
             	} else if (GLCDC_BLEND_CONTROL_FADEOUT == blend.blend_control) {
-					/* GRnAB7 - Graphic n Alpha Blending Control Register 7
-					b23:b16 ARCDEF[7:0] - Initial Alpha Value Setting. - Set is 0. */
 					if(frame == 0) {
 						GLC::GR1AB7.ARCDEF = (uint32_t)GLCDC_FADING_CONTROL_INITIAL_ALPHA_MAX
 											 & GRn_AB7_ARCDEF_MASK;
@@ -879,8 +817,6 @@ namespace device {
 											 & GRn_AB7_ARCDEF_MASK;
 					}
 
-					/* GRnAB6 - Graphic n Alpha Blending Control Register 6
-					b24:b16  ARCCOEF[8:0]- Alpha Coefficient Setting. */
 					if(frame == 0) {
 						GLC::GR1AB6.ARCCOEF = ((uint32_t) blend.fade_speed | (1 << 8))
 											  & GRn_AB6_ARCCOEF_MASK;
@@ -899,8 +835,6 @@ namespace device {
 											 & GRn_AB7_ARCDEF_MASK;
 					}
 
-					/* GRnAB6 - Graphic n Alpha Blending Control Register 6
-					b24:b16  ARCCOEF[8:0]- Alpha Coefficient Setting. - Set is 0 */
 					if(frame == 0) {
 						GLC::GR1AB6.ARCCOEF = 0x000;
 					} else {
@@ -908,10 +842,6 @@ namespace device {
 					}
 				}
 
-				/* GRnAB1 - Graphic n Alpha Blending Control Register 1
-				b8      ARCDISPON - Rectangular Alpha Blending Area Frame Display Control.
-								  - Area Frame is displayed or not displayed. */
-				/* Set the frame of the rectangular alpha blending area to displayed */
                	// gp_gr[frame]->grxab1.bit.arcdispon = 1;
 				if(frame == 0) {
 					GLC::GR1AB1.ARCDISPON = blend.frame_edge == true ? 1 : 0;
@@ -919,9 +849,6 @@ namespace device {
 					GLC::GR2AB1.ARCDISPON = blend.frame_edge == true ? 1 : 0;
 				}
 
-				/* GRnAB1 - Graphic n Alpha Blending Control Register 1
-				b1:b0   DISPSEL[1:0] - Display Screen Control. - Blended display of current
-									   graphics with lower-layer graphics */
 				if(frame == 0) {
 					GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_ON_LOWER_LAYER
 										  & GRn_AB1_DISPSEL_MASK;
@@ -932,8 +859,6 @@ namespace device {
 				break;
 			case GLCDC_BLEND_CONTROL_PIXEL:
 			default:
-				/* GRnAB1 - Graphic n Alpha Blending Control Register 1
-				b12     ARCON     - Alpha Blending Control. - Per-pixel alpha blending. */
 				if(frame == 0) {
 					GLC::GR1AB1.ARCON = 0;
 				} else {
@@ -941,9 +866,6 @@ namespace device {
 				}
 
 				if(true == blend.visible) {
-					/* GRnAB1 - Graphic n Alpha Blending Control Register 1
-					b1:b0   DISPSEL[1:0] - Display Screen Control. - Blended display of
-										   current graphics with lower-layer graphics */
 					if(frame == 0) {
 						GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_ON_LOWER_LAYER
 											  & GRn_AB1_DISPSEL_MASK;
@@ -952,9 +874,6 @@ namespace device {
 											  & GRn_AB1_DISPSEL_MASK;
 					}
 				} else {
-					/* GRnAB1 - Graphic n Alpha Blending Control Register 1
-					b1:b0   DISPSEL[1:0] - Display Screen Control. - Blended display of
-										   current graphics with lower-layer graphics */
 					/* Set layer transparent */
 					if(frame == 0) {
 						GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_TRANSPARENT
@@ -978,9 +897,6 @@ namespace device {
 
 			if(true == chromakey.enable) {
 				/* ---- Chroma key enable ---- */
-				/* GRnAB7 - Graphic n Alpha Blending Control Register 7
-				b0 CKON - Chroma Key Compositing Control. - Enable RGB reference chroma key
-						  compositing. */
 				if(frame == 0) {
 					GLC::GR1AB7.CKON = 1;
 				} else {
@@ -988,11 +904,6 @@ namespace device {
 				}
 
 				/* ---- Before ---- */
-				/* GRnAB8 - Graphic n Alpha Blending Control Register 8
-				b31:b24  Reserved - These bits are read as 0. Writing to these bits have no effect.
-				b23:b16  CKKG[7:0] - Chroma Key Compositing Target G Value Setting.
-				b15:b8   CKKB[7:0] - Chroma Key Compositing Target B Value Setting.
-				b7:b0    CKKR[7:0] - Chroma Key Compositing Target R Value Setting. */
 				if(frame == 0) {
 					GLC::GR1AB8.CKKR = chromakey.before.byte.r;
 					GLC::GR1AB8.CKKG = chromakey.before.byte.g;
@@ -1004,11 +915,6 @@ namespace device {
 				}
 
 				/* ---- After ---- */
-				/* GRnAB9 - Graphic n Alpha Blending Control Register 9
-				b31:b24  CKA[7:0] - Chroma Key Compositing Replacing A Value Setting.
-				b23:b16  CKG[7:0] - Chroma Key Compositing Replacing G Value Setting.
-				b15:b8   CKB[7:0] - Chroma Key Compositing Replacing B Value Setting.
-				b7:b0    CKR[7:0] - Chroma Key Compositing Replacing R Value Setting. */
 				if(frame == 0) {
 					GLC::GR1AB9.CKA = chromakey.after.byte.a;
 					GLC::GR1AB9.CKR = chromakey.after.byte.r;
@@ -1022,9 +928,6 @@ namespace device {
 				}
 			} else {
 				/* ---- Chroma key disable ---- */
-				/* GRnAB7 - Graphic n Alpha Blending Control Register 7
-				b0 CKON - Chroma Key Compositing Control. - Disable RGB reference chroma key
-						  compositing. */
 				if(frame == 0) {
 					GLC::GR1AB7.CKON = 0;
 				} else {
@@ -1061,11 +964,6 @@ namespace device {
 		void clut_set_(uint32_t frame, glcdc_clut_plane_t clut_plane,
 					   uint32_t entry, uint32_t data)
 		{
-			/* GRnCLUTm[k] - Color Look-up Table
-			b31:b24 A[7:0] - Color Look-up Table A Value Setting.
-			b23:b16 R[7:0] - Color Look-up Table R Value Setting.
-			b15:b8  G[7:0] - Color Look-up Table G Value Setting.
-			b7:b0   B[7:0] - Color Look-up Table B Value Setting. */
     		// gp_gr_clut[frame][clut_plane]->grxclut[entry].lsize = data;
 			if(frame == 0) {
 				if(clut_plane == 0) {
@@ -1094,8 +992,7 @@ namespace device {
 				const uint32_t* p_base = clut.p_base;
 
 				glcdc_clut_plane_t set_clutplane;
-///				if(GLCDC_CLUT_PLANE_1 == is_clutplane_selected_(frame)) {
-				if(GLCDC_CLUT_PLANE_0 == is_clutplane_selected_(frame)) {
+				if(GLCDC_CLUT_PLANE_1 == is_clutplane_selected_(frame)) {
 					set_clutplane = GLCDC_CLUT_PLANE_0;
 				} else {
 					set_clutplane = GLCDC_CLUT_PLANE_1;
@@ -1115,23 +1012,6 @@ namespace device {
 
 		void output_block_set_(const cfg_t& cfg)
 		{
-			/* OUTSET - Output Interface Register
-			b31:b29 Reserved   - These bits are read as 0. Writing to these bits have no effect.
-			b28     ENDIANON   - Bit Endian Control. - Little endian or big endian.
-			b27:b25 Reserved   - These bits are read as 0. Writing to these bits have no effect.
-			b24     SWAPON     - Pixel Order Control. - R-G-B order or B-G-R order.
-			b23:b14 Reserved   - These bits are read as 0. Writing to these bits have no effect.
-			b13:b12 FORMAT[1:0]- Output Data Format Select. - RGB(888), RGB(666), RGB(565)
-								 or Serial RGB.
-			b11:b10 Reserved   - These bits are read as 0. Writing to these bits have no effect.
-			b9      FRQSEL[1:0]- Pixel Clock Division Control. - No division (parallel RGB)
-								 or Divide-by-4 (serial RGB).
-			b8      Reserved   - This bit is read as 0. The write value should be 0.
-			b7:b5   Reserved   - These bits are read as 0. Writing to these bits have no effect.
-			b4      DIRSEL     - Serial RGB Scan Direction Select. - Forward scan or Reverse scan.
-			b3:b2   Reserved   - These bits are read as 0. Writing to these bits have no effect.
-			b1:b0   PHASE[1:0] - Serial RGB Data Output Delay Control. - 0 to 3 cycles */
-
 			// Selects big or little endian for output data
 			GLC::OUTSET.ENDIANON = (uint32_t)cfg.output.endian;
 
@@ -1174,20 +1054,6 @@ namespace device {
 			b12     FRONTGAM  - Correction Sequence Control. */
 			GLC::CLKPHASE.FRONTGAM = (uint32_t)cfg.output.correction_proc_order;
 
-			/* PANELDTHA - Panel Dither Control Register
-			b31:b22 Reserved  - These bits are read as 0. Writing to these bits have no effect.
-			b21:b20 SEL[1:0]  - Rounding Mode Setting. - Truncate, Round-off, 2*2 pattern dither.
-			b19:b18 Reserved  - These bits are read as 0. Writing to these bits have no effect.
-			b17:b16 FORM[1:0] - Output Format Select. - RGB(888), RGB(666), RGB(565).
-			b15:b14 Reserved  - These bits are read as 0. Writing to these bits have no effect.
-			b13:b12 PA[1:0]   - Dither Pattern Value A Setting.
-			b11:b10 Reserved  - These bits are read as 0. Writing to these bits have no effect.
-			b9:b8   PB[1:0]   - Dither Pattern Value B Setting.
-			b7:b6   Reserved  - These bits are read as 0. Writing to these bits have no effect.
-			b5:b4   PC[1:0]   - Dither Pattern Value C Setting.
-			b3:b2   Reserved  - These bits are read as 0. Writing to these bits have no effect.
-			b1:b0   PD[1:0]   - Dither Pattern Value D Setting. */
-
 			/* ---- Set the dithering mode ---- */
 			if(true == cfg.output.dithering.dithering_on) {
 				if(GLCDC_DITHERING_MODE_2X2PATTERN == cfg.output.dithering.dithering_mode) {
@@ -1209,27 +1075,12 @@ namespace device {
 
 			if(true == brightness.enable) {
 				/* ---- Sets brightness correction register for each color in a pixel. ---- */
-				/* BRIGHT1 - Brightness Adjustment Register 1
-				b31:b10 Reserved  - These bits are read as 0. Writing to these bits have no effect.
-				b9:b0   BRTG[9:0] - G Channel Brightness Adjustment Value Setting */
 				GLC::BRIGHT1.BRTG = brightness.g & OUT_BRIGHT1_BRTG_MASK;
-
-				/* BRIGHT2 - Brightness Adjustment Register 2
-				b31:b26 Reserved  - These bits are read as 0. Writing to these bits have no effect.
-				b25:b16 BRTB[9:0] - B Channel Brightness Adjustment Value Setting.
-				b15:b10 Reserved  - These bits are read as 0. Writing to these bits have no effect.
-				b9:b0   BRTR[9:0] - R Channel Brightness Adjustment Value Setting */
 				GLC::BRIGHT2.BRTB = brightness.b & OUT_BRIGHT2_BRTB_MASK;
 				GLC::BRIGHT2.BRTR = brightness.r & OUT_BRIGHT2_BRTR_MASK;
 			} else {
 				/* --- If brightness setting in configuration is 'off', apply default value --- */
-				/* BRIGHT1 - Brightness Adjustment Register 1
-				b9:b0   BRTG[9:0] - G Channel Brightness Adjustment Value Setting */
 				GLC::BRIGHT1.BRTG = GLCDC_BRIGHTNESS_DEFAULT & OUT_BRIGHT1_BRTG_MASK;
-
-				/* BRIGHT2 - Brightness Adjustment Register 2
-				b25:b16 BRTB[9:0] - B Channel Brightness Adjustment Value Setting.
-				b9:b0   BRTR[9:0] - R Channel Brightness Adjustment Value Setting */
 				GLC::BRIGHT2.BRTB = GLCDC_BRIGHTNESS_DEFAULT & OUT_BRIGHT2_BRTB_MASK;
 				GLC::BRIGHT2.BRTR = GLCDC_BRIGHTNESS_DEFAULT & OUT_BRIGHT2_BRTR_MASK;
 			}
@@ -1238,24 +1089,14 @@ namespace device {
 
 		void contrast_correction_(const glcdc_contrast_t& contrast)
 		{
-
 			if(true == contrast.enable) {
 				/* ---- Sets the contrast correction register for each color in a pixel. ---- */
-				/* CONTRAST - Contrast Adjustment Register
-				b31:b24 Reserved  - These bits are read as 0. Writing to these bits have no effect.
-				b23:b16 CONTG[7:0]- G Channel Contrast Adjustment Value Setting.
-				b15:b8  CONTB[7:0]- B Channel Contrast Adjustment Value Setting.
-				b7:b0   CONTR[7:0]- R Channel Contrast Adjustment Value Setting. */
 				GLC::CONTRAST.CONTG = contrast.g & OUT_CONTRAST_CONTG_MASK;
 				GLC::CONTRAST.CONTB = contrast.b & OUT_CONTRAST_CONTB_MASK;
 				GLC::CONTRAST.CONTR = contrast.r & OUT_CONTRAST_CONTR_MASK;
 			} else {
 				/* ---- If the contrast setting in the configuration is set to 'off',
 						apply default value ---- */
-				/* CONTRAST - Contrast Adjustment Register
-				b23:b16 CONTG[7:0]- G Channel Contrast Adjustment Value Setting.
-				b15:b8  CONTB[7:0]- B Channel Contrast Adjustment Value Setting.
-				b7:b0   CONTR[7:0]- R Channel Contrast Adjustment Value Setting. */
 				GLC::CONTRAST.CONTG = GLCDC_CONTRAST_DEFAULT & OUT_CONTRAST_CONTG_MASK;
 				GLC::CONTRAST.CONTB = GLCDC_CONTRAST_DEFAULT & OUT_CONTRAST_CONTB_MASK;
 				GLC::CONTRAST.CONTR = GLCDC_CONTRAST_DEFAULT & OUT_CONTRAST_CONTR_MASK;
@@ -1267,9 +1108,6 @@ namespace device {
 		{
 			if(true == gamma.enable) {
 				/* ---- Gamma correction enable and set gamma setting ---- */
-				/* GAMSW - Gamma Correction Block Function Switch Register
-				b31:b1 Reserved - These bits are read as 0. Writing to these bits have no effect.
-				b0     GAMON    - Gamma Correction Enable. - Enables gamma correction. */
 				GLC::GAMSW.GAMON = 1;
 #if 0
 				/* Green */
@@ -1336,8 +1174,6 @@ namespace device {
 #endif
 			} else {
 				/* ---- Gamma Correction Disable ---- */
-				/* GAMSW - Gamma Correction Block Function Switch Register
-				b0     GAMON    - Gamma Correction Enable. - Disables gamma correction. */
 				GLC::GAMSW.GAMON = 0;
 			}
 		}
@@ -1345,11 +1181,6 @@ namespace device {
 
 		void line_detect_number_set_(uint32_t line)
 		{
-			/* GR2CLUTINT - Graphic 2 CLUT/Interrupt Control Register
-			b31:b17 Reserved   - These bits are read as 0. Writing to these bits have no effect.
-			b16     SEL        - CLUT Control. - Select Color Look-up Table.
-			b15:b11 Reserved   - These bits are read as 0. Writing to these bits have no effect.
-			b10:b0  LINE[10:0] - Detecting Scan line Setting. */
 			GLC::GR2CLUTINT.LINE = line & GRn_CLUTINT_LINE_MASK;
 		}
 
@@ -1389,15 +1220,8 @@ namespace device {
 ///			grpal1.ipl = GLCDC_CFG_INTERRUPT_PRIORITY_LEVEL;
 
 			if(true == interrupt.vpos_enable) {
-				/* INTEN - Interrupt Request Enable Control Register
-				b31:b3 Reserved   - These bits are read as 0. Writing to these bits have no effect.
-				b2     GR2UFINTEN - GR2UF Interrupt Enable.
-				b1     GR1UFINTEN - GR1UF Interrupt Enable.
-				b0     VPOSINTEN  - VPOS Interrupt Enable. - Enable VPOS interrupt request. */
 				GLC::INTEN.VPOSINTEN = 1;
 
-				/* GENAL1 - Group AL1 Interrupt Request Enable Register
-				b8 EN8 - Interrupt Request Enable 8 - Interrupt request is enabled. */
 ///				EN(GLCDC,VPOS) = 1;
 			} else {
 				/* INTEN - Interrupt Request Enable Control Register
@@ -1477,23 +1301,14 @@ namespace device {
 		void graphics_read_enable_()
 		{
 			if(true == ctrl_blk_.graphics_read_enable[FRAME_LAYER_1]) {
-				/* GR1FLMRD - Graphic 1 Frame Buffer Read Control Register
-				b31:b1 Reserved   - These bits are read as 0. Writing to these bits have no effect.
-				b0     RENB - Frame Buffer Read Enable. - Enable reading of the frame buffer. */
 				GLC::GR1FLMRD.RENB = 1;    /* Enable reading. */
 			} else {
-				/* GR1FLMRD - Graphic 1 Frame Buffer Read Control Register
-				b0     RENB - Frame Buffer Read Enable. - Disable reading of the frame buffer. */
 				GLC::GR1FLMRD.RENB = 0;    /* Disable reading. */
 			}
 
 			if(true == ctrl_blk_.graphics_read_enable[FRAME_LAYER_2]) {
-				/* GR2FLMRD - Graphic 2 Frame Buffer Read Control Register
-				b0     RENB - Frame Buffer Read Enable. - Enable reading of the frame buffer. */
 				GLC::GR2FLMRD.RENB = 1;    /* Enable reading. */
 			} else {
-				/* GR2FLMRD - Graphic 2 Frame Buffer Read Control Register
-				b0     RENB - Frame Buffer Read Enable. - Enable reading of the frame buffer. */
 				GLC::GR2FLMRD.RENB = 0;    /* Disable reading. */
 			}
 		}
@@ -1709,7 +1524,7 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start()
+		bool start() noexcept
 		{
 			cfg_t cfg;
 			//
