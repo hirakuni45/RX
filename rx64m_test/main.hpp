@@ -42,7 +42,7 @@
 namespace seeda {
 
 //	static const int seeda_version_ = 549;
-	static const int seeda_version_ = 600;
+	static const int seeda_version_ = 601;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef device::PORT<device::PORTE, device::bitpos::B3> LED;
@@ -264,14 +264,14 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	/*!
 		@brief	開発モードの取得 @n
-				2: OFF:DEV, ON:通常
+				2: ON:DEV, OFF:通常
 		@return 開発モードの場合「true」
 	*/
 	//-----------------------------------------------------------------//
 	bool get_develope()
 	{
 #ifdef SEEDA
-		return SW2::P();
+		return !SW2::P();
 #else
 		return true;  // for only develope mode
 #endif
@@ -281,14 +281,14 @@ namespace seeda {
 	//-----------------------------------------------------------------//
 	/*!
 		@brief  チャネル数を取得 @n
-				1: OFF:CH4, ON:CH8
+				1: OFF:CH8, ON:CH4
 		@return 設定スイッチの状態
 	*/
 	//-----------------------------------------------------------------//
 	uint32_t get_channel_num()
 	{
 #ifdef SEEDA
-		return SW1::P() ? 4 : 8;
+		return SW1::P() ? 8 : 4;
 #else
 		return 8;  // for only 8 chanels
 #endif
