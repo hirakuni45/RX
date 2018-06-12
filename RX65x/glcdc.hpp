@@ -1246,16 +1246,13 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct stmon_t : public rw32_t<ofs> {
-			typedef rw32_t<ofs> io_;
-			using io_::operator =;
+		struct stmon_t : public ro32_t<ofs> {
+			typedef ro32_t<ofs> io_;
 			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B2>  GR2UF;
-			bit_rw_t<io_, bitpos::B1>  GR1UF;
-			bit_rw_t<io_, bitpos::B0>  VPOS;
+			bit_ro_t<io_, bitpos::B2>  GR2UF;
+			bit_ro_t<io_, bitpos::B1>  GR1UF;
+			bit_ro_t<io_, bitpos::B0>  VPOS;
 		};
 		static stmon_t<base + 0x144C>  STMON;
 

@@ -9,44 +9,13 @@
 */
 //=====================================================================//
 
-/* Version Number of API. */
-#define GLCDC_RX_VERSION_MAJOR         (1)
-#define GLCDC_RX_VERSION_MINOR         (0)
-
 /* Number of Gamma correction setting items  */
 #define GLCDC_GAMMA_CURVE_GAIN_ELEMENT_NUM      (16)
 #define GLCDC_GAMMA_CURVE_THRESHOLD_ELEMENT_NUM (15)
 
-/* Number of graphics layers */
-#define GLCDC_FRAME_LAYER_NUM                   (2)
-
-/* Number of color palletes for each graphic */
-#define GLCDC_CLUT_PLANE_NUM                    (2)
-
-/* Number of clock division ratio setting items */
-#define GLCDC_PANEL_CLKDIV_NUM                  (13)
-
 /**********************************************************************************************************************
  Typedef definitions
  **********************************************************************************************************************/
-/** Return value */
-typedef enum e_glcdc_err
-{
-    GLCDC_SUCCESS = 0,                     // Success.
-    GLCDC_ERR_INVALID_PTR,                 // Pointer points to invalid memory location.
-    GLCDC_ERR_LOCK_FUNC,                   // GLCDC resource is in use by another process.
-    GLCDC_ERR_INVALID_ARG,                 // Invalid input parameter.
-    GLCDC_ERR_INVALID_MODE,                // Unsupported or incorrect mode.
-    GLCDC_ERR_NOT_OPEN,                    // Requested channel is not configured or API not open.
-    GLCDC_ERR_INVALID_TIMING_SETTING,      // Invalid timing parameter.
-    GLCDC_ERR_INVALID_LAYER_SETTING,       // Invalid layer parameter.
-    GLCDC_ERR_INVALID_ALIGNMENT,           // Invalid memory alignment found.
-    GLCDC_ERR_INVALID_GAMMA_SETTING,       // Invalid gamma correction parameter.
-    GLCDC_ERR_INVALID_UPDATE_TIMING,       // Invalid timing for register update.
-    GLCDC_ERR_INVALID_CLUT_ACCESS,         // Invalid access to CLUT entry.
-    GLCDC_ERR_INVALID_BLEND_SETTING,       // Invalid blending setting.
-} glcdc_err_t;
-
 /** Correction Command */
 typedef enum e_glcdc_correction_cmd
 {
@@ -55,31 +24,6 @@ typedef enum e_glcdc_correction_cmd
     GLCDC_CORRECTION_CMD_CONTRAST,         // Contrast setting command.
     GLCDC_CORRECTION_CMD_GAMMA,            // Gamma setting command.
 } glcdc_correction_cmd_t;
-
-/** Control Command */
-typedef enum e_glcdc_control_cmd
-{
-    GLCDC_CMD_START_DISPLAY,               // Start display command.
-    GLCDC_CMD_STOP_DISPLAY,                // Stop display command.
-    GLCDC_CMD_SET_INTERRUPT,               // Interrupt setting command.
-    GLCDC_CMD_CLR_DETECTED_STATUS,         // Detected status clear command.
-    GLCDC_CMD_CHANGE_BG_COLOR,             // Change background color in background screen.
-} glcdc_control_cmd_t;
-
-/** Graphics frame number */
-typedef enum e_glcdc_frame_layer
-{
-    GLCDC_FRAME_LAYER_1 = 0,               // Frame layer 1.
-    GLCDC_FRAME_LAYER_2 = 1                // Frame layer 2.
-} glcdc_frame_layer_t;
-
-/** GLCDC driver operation state */
-typedef enum e_glcdc_state
-{
-    GLCDC_STATE_CLOSED = 0,                // GLCDC closed.
-    GLCDC_STATE_NOT_DISPLAYING = 1,        // Not Displaying (opened).
-    GLCDC_STATE_DISPLAYING = 2             // Displaying.
-} glcdc_operating_status_t;
 
 /** Detected event codes */
 typedef enum e_glcdc_event
@@ -108,14 +52,14 @@ typedef enum e_glcdc_out_format
     GLCDC_OUT_FORMAT_24BITS_RGB888 = 0,    // Output format RGB888, 24 bits.
     GLCDC_OUT_FORMAT_18BITS_RGB666 = 1,    // Output format RGB666, 18 bits.
     GLCDC_OUT_FORMAT_16BITS_RGB565 = 2,    // Output format RGB565, 16 bits.
-    GLCDC_OUT_FORMAT_8BITS_SERIAL =3       // Output format SERIAL,  8 bits (this function is not supported).
+    GLCDC_OUT_FORMAT_8BITS_SERIAL  = 3     // Output format SERIAL,  8 bits (this function is not supported).
 } glcdc_out_format_t;
 
 /** Data endian select ( Don't change this value, because this value is set to the register ) */
 typedef enum e_glcdc_endian
 {
     GLCDC_ENDIAN_LITTLE = 0,               // Little endian.
-    GLCDC_ENDIAN_BIG = 1,                  // Big endian.
+    GLCDC_ENDIAN_BIG    = 1,               // Big endian.
 } glcdc_endian_t;
 
 /** RGB color order select ( Don't change this value, because this value is set to the register ) */
@@ -239,93 +183,91 @@ typedef enum e_glcdc_serial_scan_direction
 } glcdc_serial_scan_direction_t;
 
 /** Display output signal timing setting */
-typedef struct st_glcdc_timing
+struct glcdc_timing_t
 {
     uint16_t display_cyc;                  // Active video cycles or lines.
     uint16_t front_porch;                  // Front poach cycles or lines.
     uint16_t back_porch;                   // Back poach cycles or lines.
     uint16_t sync_width;                   // Sync signal asserting width.
-} glcdc_timing_t;
+};
+
 
 /** RGB Color setting */
-// #pragma bit_order left
-// #pragma unpack
-typedef struct st_glcdc_color
+struct glcdc_color_t
 {
+	// little endian
     union
     {
         uint32_t argb;
         struct
         {
-            uint32_t a:8;                  // alpha.
-            uint32_t r:8;                  // red.
-            uint32_t g:8;                  // green.
             uint32_t b:8;                  // blue.
+            uint32_t g:8;                  // green.
+            uint32_t r:8;                  // red.
+            uint32_t a:8;                  // alpha.
         } byte;
     };
-} glcdc_color_t;
-// #pragma bit_order
-// #pragma packoption
+};
 
 /** Coordinate */
-typedef struct st_glcdc_coordinate
+struct glcdc_coordinate_t
 {
     int16_t x;                           // Coordinate X, this allows to set signed value.
     int16_t y;                           // Coordinate Y, this allows to set signed value.
-} glcdc_coordinate_t;
+};
 
 /** Brightness (DC) correction setting */
-typedef struct st_glcdc_brightness
+struct glcdc_brightness_t
 {
     bool enable;                         // Brightness Correction On/Off.
     uint16_t r;                          // Brightness (DC) adjustment for R channel.
     uint16_t g;                          // Brightness (DC) adjustment for G channel.
     uint16_t b;                          // Brightness (DC) adjustment for B channel.
-} glcdc_brightness_t;
+};
 
 /** Contrast (gain) correction setting */
-typedef struct st_glcdc_contrast
+struct glcdc_contrast_t
 {
     bool enable;                         // Contrast Correction On/Off.
     uint8_t r;                           // Contrast (gain) adjustment for R channel.
     uint8_t g;                           // Contrast (gain) adjustment for G channel.
     uint8_t b;                           // Contrast (gain) adjustment for B channel.
-} glcdc_contrast_t;
+};
 
 /** Gamma correction setting for gain and threshold  */
-typedef struct st_gamma_correction
+struct gamma_correction_t
 {
     uint16_t gain[GLCDC_GAMMA_CURVE_GAIN_ELEMENT_NUM];               // Gain adjustment.
     uint16_t threshold[GLCDC_GAMMA_CURVE_THRESHOLD_ELEMENT_NUM];     // Start threshold.
-} gamma_correction_t;
+};
 
 /** Gamma correction setting */
-typedef struct st_glcdc_gamma_correction
+struct glcdc_gamma_correction_t
 {
     bool enable;                         // Gamma Correction On/Off.
     gamma_correction_t * p_r;            // Gamma correction for R channel.
     gamma_correction_t * p_g;            // Gamma correction for G channel.
     gamma_correction_t * p_b;            // Gamma correction for B channel.
-} glcdc_gamma_correction_t;
+};
 
 /** Chroma key setting */
-typedef struct st_glcdc_chromakey
+struct glcdc_chromakey_t
 {
     bool enable;                         // Chroma key On/Off.
     glcdc_color_t before;                // Compare Color for -RGB.
     glcdc_color_t after;                 // Replace Color for ARGB.
-} glcdc_chromakey_t;
+};
 
 /** Color correction setting */
-typedef struct st_glcdc_correction
+struct glcdc_correction_t
 {
     glcdc_brightness_t brightness;       // Brightness setting.
     glcdc_contrast_t contrast;           // Contrast setting.
     glcdc_gamma_correction_t gamma;      // Gamma setting.
-} glcdc_correction_t;
+};
 
 /** Dithering setup parameter */
-typedef struct st_glcdc_dithering
+struct glcdc_dithering_t
 {
     bool dithering_on;                               // Dithering on/off.
     glcdc_dithering_mode_t dithering_mode;           // Dithering mode.
@@ -333,10 +275,10 @@ typedef struct st_glcdc_dithering
     glcdc_dithering_pattern_t dithering_pattern_b;   // Dithering pattern B.
     glcdc_dithering_pattern_t dithering_pattern_c;   // Dithering pattern C.
     glcdc_dithering_pattern_t dithering_pattern_d;   // Dithering pattern D.
-}glcdc_dithering_t;
+};
 
 /** Graphics plane input configuration */
-typedef struct st_glcdc_input_cfg
+struct glcdc_input_cfg_t
 {
     uint32_t * p_base;                   // Base address to the frame buffer.
     uint16_t hsize;                      // Horizontal pixel size in a line.
@@ -346,11 +288,11 @@ typedef struct st_glcdc_input_cfg
     bool frame_edge;                     // Show/hide setting of the frame of the graphics area.
     glcdc_coordinate_t coordinate;       // Starting point of image.
     glcdc_color_t bg_color;              // Color outside region.
-} glcdc_input_cfg_t;
+};
 
 
 /** Display output configuration */
-typedef struct st_glcdc_output_cfg
+struct glcdc_output_cfg_t
 {
     glcdc_timing_t                 htiming;                // Horizontal display cycle setting.
     glcdc_timing_t                 vtiming;                // Vertical display cycle setting.
@@ -381,10 +323,10 @@ typedef struct st_glcdc_output_cfg
     glcdc_serial_output_delay_t    serial_output_delay;    // Serial RGB Data output delay cycle select (this function is not supported).
     glcdc_serial_scan_direction_t  serial_scan_direction;  // Serial RGB Scan direction select (this function is not supported).
 
-} glcdc_output_cfg_t;
+};
 
 /** Graphics layer blend setup parameter */
-typedef struct st_glcdc_blend
+struct glcdc_blend_t
 {
     glcdc_blend_control_t blend_control;   // Layer fade-in/out , blending on/off.
     bool visible;                          // Visible or hide graphics.
@@ -393,73 +335,36 @@ typedef struct st_glcdc_blend
     uint8_t fade_speed;                    // Layer fade-in/out frame rate.
     glcdc_coordinate_t  start_coordinate;  // Start coordinate of rectangle blending.
     glcdc_coordinate_t  end_coordinate;    // End coordinate of rectangle blending.
-} glcdc_blend_t;
+};
 
 /** CLUT configuration */
-typedef struct st_glcdc_clut_cfg
+struct glcdc_clut_cfg_t
 {
     bool enable;                         // CLUT update enable/disable.
     uint32_t * p_base;                   // Pointer to CLUT source data.
     uint16_t start;                      // Beginning of CLUT entry to be updated.
     uint16_t size;                       // Size of CLUT entry to be updated.
-} glcdc_clut_cfg_t;
+};
 
 /** Interrupt enable setting */
-typedef struct st_glcdc_interrupt_cfg
+struct glcdc_interrupt_cfg_t
 {
     bool vpos_enable;                    // Line detection interrupt enable.
     bool gr1uf_enable;                   // Graphics plane1 underflow interrupt enable.
     bool gr2uf_enable;                   // Graphics plane2 underflow interrupt enable.
-} glcdc_interrupt_cfg_t;
+};
 
 /** Detect enable setting */
-typedef struct st_glcdc_detect_cfg
+struct glcdc_detect_cfg_t
 {
     bool vpos_detect;           // Line detection enable.
     bool gr1uf_detect;          // Graphics plane1 underflow detection enable.
     bool gr2uf_detect;          // Graphics plane2 underflow detection enable.
-} glcdc_detect_cfg_t;
+};
 
 /** Display callback parameter definition */
-typedef struct st_glcdc_callback_args
+struct glcdc_callback_args_t
 {
     glcdc_event_t event;                 // Event code.
-} glcdc_callback_args_t;
+};
 
-/** GLCDC main configuration */
-typedef struct st_glcdc_cfg
-{
-    /** Generic configuration for display devices */
-    glcdc_input_cfg_t input[GLCDC_FRAME_LAYER_NUM];     // Graphics input frame setting.
-    glcdc_output_cfg_t output;                          // Graphics output frame setting.
-    glcdc_blend_t blend[GLCDC_FRAME_LAYER_NUM];         // Graphics layer blend setting.
-    glcdc_chromakey_t chromakey[GLCDC_FRAME_LAYER_NUM]; // Graphics chroma key setting.
-    glcdc_clut_cfg_t clut[GLCDC_FRAME_LAYER_NUM];       // Graphics CLUT setting.
-
-    /** Interrupt setting*/
-    glcdc_detect_cfg_t     detection;                   // Detection enable/disable setting.
-    glcdc_interrupt_cfg_t  interrupt;                   // Interrupt enable/disable setting.
-
-    /** Configuration for display event processing */
-    void (*p_callback)(void *);                         // Pointer to callback function.
-
-} glcdc_cfg_t;
-
-/** Runtime configuration */
-typedef struct st_glcdc_runtime_cfg
-{
-    /** Generic configuration for display devices */
-    glcdc_input_cfg_t input;             // Graphics input frame setting
-    glcdc_blend_t blend;                 // Graphics layer blend setting.
-    glcdc_chromakey_t chromakey;         // Graphics chroma key setting.
-} glcdc_runtime_cfg_t;
-
-/** GLCDC status */
-typedef struct st_glcdc_status
-{
-    glcdc_operating_status_t state;                          // Status of GLCD module
-    glcdc_detected_status_t state_vpos;                      // Status of line detection.
-    glcdc_detected_status_t state_gr1uf;                     // Status of graphics plane1 underflow.
-    glcdc_detected_status_t state_gr2uf;                     // Status of graphics plane2 underflow.
-    glcdc_fade_status_t fade_status[GLCDC_FRAME_LAYER_NUM];  // Status of fade-in/fade-out status
-} glcdc_status_t;

@@ -13,71 +13,172 @@
 #include "glcdc_def.hpp"
 #include "RX600/dmac_mgr.hpp"
 
-#define BITS_PER_PIXEL 16  // Allowed values: 1, 4, 8, 16, 32
-
 namespace device {
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  GLCDC ピクセル・タイプ
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class PIX_TYPE {
+		CLUT1,		///<  1 bits / pixel
+		CLUT4,		///<  4 bits / pixel
+		CLUT8,		///<  8 bits / pixel
+		RGB565,		///< 16 bits / pixel
+		RGB888,		///< 32 bits / pixel
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  オペレーション・ステート
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class glcdc_operating_status {
+		CLOSED = 0,                ///< GLCDC closed.
+		NOT_DISPLAYING = 1,        ///< Not Displaying (opened).
+		DISPLAYING = 2             ///< Displaying.
+	};
+
+
+
+
+
+	// GLCD hardware specific control block
+	struct glcdc_ctrl_t {
+		glcdc_operating_status	state;			// Status of GLCD module.
+		bool				is_entry;			// Flag of subcribed GLCDC interrupt function.
+		glcdc_coordinate_t active_start_pos;  // Zero coordinate for gra phics plane.
+		uint16_t hsize;                       // Horizontal pixel size in a line.
+		uint16_t vsize;                       // Vertical pixel size in a frame.
+///		bool graphics_read_enable[FRAME_LAYER_NUM];  // Graphics data read enable.
+		bool graphics_read_enable[2];  // Graphics data read enable.
+		void (*p_callback)(void *);           // Pointer to callback function.
+		bool first_vpos_interrupt_flag;       // First vpos interrupt after release 
+												  // software reset.
+		glcdc_interrupt_cfg_t interrupt;      // Interrupt setting values.
+		glcdc_ctrl_t() :
+			state(glcdc_operating_status::CLOSED),
+			is_entry(false),
+			active_start_pos(),
+			hsize(0), vsize(0),
+			graphics_read_enable{ false },
+			p_callback(nullptr),
+			first_vpos_interrupt_flag(false),
+			interrupt()
+		{ }
+	};
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  GLCDC I/O 制御
 		@param[in]	GLC		glcdc クラス
+		@param[in]	PXT		ピクセル・タイプ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GLC>
+	template <class GLC, PIX_TYPE PXT = PIX_TYPE::RGB565>
 	class glcdc_io {
 
+		static const uint32_t PIX_WIDTH  = 16;		///< 16 bits / pixel
 		static const uint32_t XSIZE_PHYS = 480;		///< Physical display size by X
 		static const uint32_t YSIZE_PHYS = 272;		///< Physical display size by Y
 
-#if (BITS_PER_PIXEL == 16)
-		static constexpr uint32_t BufferPTR[] = {
-			0x00010000,  // Begin of On-Chip RAM
-			0x00800000   // Begin of Expansion RAM
+		/* Number of graphics layers */
+		static const uint32_t FRAME_LAYER_NUM  = 2;
+
+		/* Number of color palletes for each graphic */
+		static const uint32_t CLUT_PLANE_NUM   = 2;
+
+		/* Number of clock division ratio setting items */
+		static const uint32_t PANEL_CLKDIV_NUM = 13;
+
+	public:
+		static const uint32_t FRAME_LAYER_1 = 0;	///< Frame layer 1.
+		static const uint32_t FRAME_LAYER_2 = 1;	///< Frame layer 2.
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  Control Command
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class control_cmd {
+			START_DISPLAY,			///< Start display command.
+			STOP_DISPLAY,			///< Stop display command.
+			SET_INTERRUPT,			///< Interrupt setting command.
+			CLR_DETECTED_STATUS,	///< Detected status clear command.
+			CHANGE_BG_COLOR,		///< Change background color in background screen.
 		};
-#endif
 
-#define FORMAT_RGB_565   (GLCDC_IN_FORMAT_16BITS_RGB565)
-#define FORMAT_RGB_888   (GLCDC_IN_FORMAT_32BITS_RGB888)
-#define FORMAT_ARGB_1555 (GLCDC_IN_FORMAT_16BITS_ARGB1555)
-#define FORMAT_ARGB_4444 (GLCDC_IN_FORMAT_16BITS_ARGB4444)
-#define FORMAT_ARGB_8888 (GLCDC_IN_FORMAT_32BITS_ARGB8888)
-#define FORMAT_CLUT_8    (GLCDC_IN_FORMAT_CLUT8)
-#define FORMAT_CLUT_4    (GLCDC_IN_FORMAT_CLUT4)
-#define FORMAT_CLUT_1    (GLCDC_IN_FORMAT_CLUT1)
 
-#if   (BITS_PER_PIXEL == 32)
-  $define COLOR_CONVERSION GUICC_M8888I
-  #define DISPLAY_DRIVER   GUIDRV_LIN_32
-  #define COLOR_FORMAT     FORMAT_RGB_888
-  #define NUM_BUFFERS      1
-#elif (BITS_PER_PIXEL == 16)
-  #define COLOR_CONVERSION GUICC_M565
-  #define DISPLAY_DRIVER   GUIDRV_LIN_16
-  #define COLOR_FORMAT     FORMAT_RGB_565
-  #define NUM_BUFFERS      2
-#elif (BITS_PER_PIXEL == 8)
-  #define COLOR_CONVERSION GUICC_8666
-  #define DISPLAY_DRIVER   GUIDRV_LIN_8
-  #define COLOR_FORMAT     FORMAT_CLUT_8
-  #define NUM_BUFFERS      2
-#elif (BITS_PER_PIXEL == 4)
-  #define COLOR_CONVERSION GUICC_16
-  #define DISPLAY_DRIVER   GUIDRV_LIN_4
-  #define COLOR_FORMAT     FORMAT_CLUT_4
-  #define NUM_BUFFERS      3
-#elif (BITS_PER_PIXEL == 1)
-  #define COLOR_CONVERSION GUICC_1
-  #define DISPLAY_DRIVER   GUIDRV_LIN_1
-  #define COLOR_FORMAT     FORMAT_CLUT_1
-  #define NUM_BUFFERS      3
-#endif
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  エラー
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class error_t {
+			SUCCESS = 0,                 ///< Success.
+			INVALID_PTR,             ///< Pointer points to invalid memory location.
+			LOCK_FUNC,               ///< GLCDC resource is in use by another process.
+			INVALID_ARG,             ///< Invalid input parameter.
+			INVALID_MODE,            ///< Unsupported or incorrect mode.
+			NOT_OPEN,                ///< Requested channel is not configured or API not open.
+			INVALID_TIMING_SETTING,      // Invalid timing parameter.
+			INVALID_LAYER_SETTING,       // Invalid layer parameter.
+			INVALID_ALIGNMENT,           // Invalid memory alignment found.
+			INVALID_GAMMA_SETTING,       // Invalid gamma correction parameter.
+			INVALID_UPDATE_TIMING,       // Invalid timing for register update.
+			INVALID_CLUT_ACCESS,         // Invalid access to CLUT entry.
+			INVALID_BLEND_SETTING,       // Invalid blending setting.
+		};
 
+
+		/** GLCDC main configuration */
+		struct cfg_t
+		{
+		    /** Generic configuration for display devices */
+		    glcdc_input_cfg_t input[FRAME_LAYER_NUM];     // Graphics input frame setting.
+		    glcdc_output_cfg_t output;                    // Graphics output frame setting.
+		    glcdc_blend_t blend[FRAME_LAYER_NUM];         // Graphics layer blend setting.
+		    glcdc_chromakey_t chromakey[FRAME_LAYER_NUM]; // Graphics chroma key setting.
+		    glcdc_clut_cfg_t clut[FRAME_LAYER_NUM];       // Graphics CLUT setting.
+
+		    /** Interrupt setting*/
+		    glcdc_detect_cfg_t     detection;           // Detection enable/disable setting.
+		    glcdc_interrupt_cfg_t  interrupt;           // Interrupt enable/disable setting.
+
+		    /** Configuration for display event processing */
+		    void (*p_callback)(void *);                 // Pointer to callback function.
+		};
+
+
+		/** Runtime configuration */
+		struct runtime_cfg_t
+		{
+		    /** Generic configuration for display devices */
+		    glcdc_input_cfg_t input;             // Graphics input frame setting
+		    glcdc_blend_t blend;                 // Graphics layer blend setting.
+		    glcdc_chromakey_t chromakey;         // Graphics chroma key setting.
+		};
+
+
+		/** status */
+		struct status_t
+		{
+			glcdc_operating_status state;               // Status of GLCD module
+		    glcdc_detected_status_t state_vpos;           // Status of line detection.
+		    glcdc_detected_status_t state_gr1uf;          // Status of graphics plane1 underflow.
+		    glcdc_detected_status_t state_gr2uf;          // Status of graphics plane2 underflow.
+		    glcdc_fade_status_t fade_status[FRAME_LAYER_NUM];  // Status of fade-in/fade-out status
+		};
+
+	private:
 		//
 		// Buffer size and stride
 		//
-		static const uint32_t BYTES_PER_LINE   = ((BITS_PER_PIXEL * XSIZE_PHYS) / 8);
+		static const uint32_t BYTES_PER_LINE   = ((PIX_WIDTH * XSIZE_PHYS) / 8);
 		static const uint32_t LINE_OFFSET      = (((BYTES_PER_LINE + 63) / 64) * 64);
-		static const uint32_t VXSIZE_PHYS      = ((LINE_OFFSET * 8) / BITS_PER_PIXEL);
+		static const uint32_t VXSIZE_PHYS      = ((LINE_OFFSET * 8) / PIX_WIDTH);
 		static const uint32_t BYTES_PER_BUFFER = (LINE_OFFSET * YSIZE_PHYS);
 
 
@@ -155,35 +256,39 @@ namespace device {
 
 
 		/* Panel timing, Minimum threshold */
-		static const uint32_t BG_PLANE_H_CYC_MIN  = 24;  // BG_PERI.FH (Min=24)
-		static const uint32_t BG_PLANE_V_CYC_MIN  = 20;  // BG_PERI.FV (Min=20)
-		#define BG_PLANE_HSYNC_POS_MIN         (1)              /* BG_HSYNC.HP (Min=1) */
-		#define BG_PLANE_VSYNC_POS_MIN         (1)              /* BG_HSYNC.VP (Min=1) */
-		#define BG_PLANE_H_CYC_ACTIVE_SIZE_MIN (16)             /* BG_HSIZE.HW (Min=16) */
-		#define BG_PLANE_V_CYC_ACTIVE_SIZE_MIN (16)             /* BG_VSIZE.VW (Min=16) */
-		#define BG_PLANE_H_ACTIVE_POS_MIN      (6)              /* BG_HSIZE.HP (Min=6) */
-		#define BG_PLANE_V_ACTIVE_POS_MIN      (3)              /* BG_VSIZE.VP (Min=3) */
-		#define GR_PLANE_LNOFF_POS_MIN         (-32768)         /* GRn_FLM3_LNOFF(positive num min=-32768) */
-#define GR_PLANE_H_CYC_ACTIVE_SIZE_MIN (16)             /* GRn_AB3.GRCHW (Min=16) */
-#define GR_PLANE_V_CYC_ACTIVE_SIZE_MIN (16)             /* GRn_AB2.GRCVW (Min=16) */
-#define GR_PLANE_H_ACTIVE_POS_MIN      (5)              /* GRn_AB2.GRCHS (Min=5) */
-#define GR_PLANE_V_ACTIVE_POS_MIN      (2)              /* GRn_AB2.GRCVS (Min=2) */
-#define BG_PLANE_H_FRONT_PORCH_MIN     (3)              /* Horizontal front porch parameter (MIN=3) */
-#define BG_PLANE_V_FRONT_PORCH_MIN     (2)              /* Vertical front porch parameter (MIN=2) */
-#define BG_PLANE_H_BACK_PORCH_MIN      (1)              /* Horizontal back porch parameter (MIN=1) */
-#define BG_PLANE_V_BACK_PORCH_MIN      (1)              /* Vertical back porch parameter (MIN=1) */
-#define BG_PLANE_H_SYNC_WIDTH_MIN      (4)              /* Horizontal sync signal width parameter (MIN=4) */
-#define BG_PLANE_V_SYNC_WIDTH_MIN      (1)              /* Vertical sync signal width parameter (MIN=1) */
-#define GR_BLEND_H_ACTIVE_POS_MIN      (5)              /* GRn_AB5_GRCHS (Min=5) */
-#define GR_BLEND_V_ACTIVE_POS_MIN      (2)              /* GRn_AB4_GRCVS (Min=2) */
-#define GR_BLEND_H_CYC_ACTIVE_SIZE_MIN (1)              /* GRn_AB5_GRCHW (Min=1) */
-#define GR_BLEND_V_CYC_ACTIVE_SIZE_MIN (1)              /* GRn_AB4_GRCVW (Min=1) */
+		static const int32_t BG_PLANE_H_CYC_MIN  = 24;             // BG_PERI.FH (Min=24)
+		static const int32_t BG_PLANE_V_CYC_MIN  = 20;             // BG_PERI.FV (Min=20)
+		static const int32_t BG_PLANE_HSYNC_POS_MIN = 1;           // BG_HSYNC.HP (Min=1)
+		static const int32_t BG_PLANE_VSYNC_POS_MIN = 1;           // BG_HSYNC.VP (Min=1)
+		static const int32_t BG_PLANE_H_CYC_ACTIVE_SIZE_MIN = 16;  // BG_HSIZE.HW (Min=16)
+		static const int32_t BG_PLANE_V_CYC_ACTIVE_SIZE_MIN = 16;  // BG_VSIZE.VW (Min=16)
+		static const int32_t BG_PLANE_H_ACTIVE_POS_MIN = 6;        // BG_HSIZE.HP (Min=6)
+		static const int32_t BG_PLANE_V_ACTIVE_POS_MIN = 3;        // BG_VSIZE.VP (Min=3)
 
-
+		// GRn_FLM3_LNOFF(positive num min=-32768)
+		static const int32_t GR_PLANE_LNOFF_POS_MIN = -32768;
+		static const int32_t GR_PLANE_H_CYC_ACTIVE_SIZE_MIN = 16;  // GRn_AB3.GRCHW (Min=16)
+		static const int32_t GR_PLANE_V_CYC_ACTIVE_SIZE_MIN = 16;  // GRn_AB2.GRCVW (Min=16)
+		static const int32_t GR_PLANE_H_ACTIVE_POS_MIN = 5;        // GRn_AB2.GRCHS (Min=5)
+		static const int32_t GR_PLANE_V_ACTIVE_POS_MIN = 2;        // GRn_AB2.GRCVS (Min=2)
+		// Horizontal front porch parameter (MIN=3)
+		static const int32_t BG_PLANE_H_FRONT_PORCH_MIN = 3;
+		// Vertical front porch parameter (MIN=2)
+		static const int32_t BG_PLANE_V_FRONT_PORCH_MIN = 2;
+		// Horizontal back porch parameter (MIN=1)
+		static const int32_t BG_PLANE_H_BACK_PORCH_MIN = 1;
+		// Vertical back porch parameter (MIN=1)
+		static const int32_t BG_PLANE_V_BACK_PORCH_MIN = 1;
+		// Horizontal sync signal width parameter (MIN=4)
+		static const int32_t BG_PLANE_H_SYNC_WIDTH_MIN = 4;
+		// Vertical sync signal width parameter (MIN=1)
+		static const int32_t BG_PLANE_V_SYNC_WIDTH_MIN = 1;  
+		static const int32_t GR_BLEND_H_ACTIVE_POS_MIN = 5;       // GRn_AB5_GRCHS (Min=5)
+		static const int32_t GR_BLEND_V_ACTIVE_POS_MIN = 2;       // GRn_AB4_GRCVS (Min=2)
+		static const int32_t GR_BLEND_H_CYC_ACTIVE_SIZE_MIN = 1;  // GRn_AB5_GRCHW (Min=1)
+		static const int32_t GR_BLEND_V_CYC_ACTIVE_SIZE_MIN = 1;  // GRn_AB4_GRCVW (Min=1)
 
 		static const uint32_t SYSCNT_PANEL_CLK_DCDR_MASK = 0x3F;
-
-
 
 		/** Timing signals for driving the LCD panel */
 		typedef enum e_glcdc_tcon_signal_select
@@ -242,16 +347,6 @@ namespace device {
 			{ }
 		};
 
-
-		/** GLCDC driver operation state */
-		typedef enum e_glcdc_state
-		{
-			GLCDC_STATE_CLOSED = 0,                // GLCDC closed.
-			GLCDC_STATE_NOT_DISPLAYING = 1,        // Not Displaying (opened).
-			GLCDC_STATE_DISPLAYING = 2             // Displaying.
-		} glcdc_operating_status_t;
-
-
 		/** Interrupt enable setting */
 		struct glcdc_interrupt_cfg_t {
 			bool vpos_enable;                    // Line detection interrupt enable.
@@ -262,31 +357,12 @@ namespace device {
 			{ }
 		};
 
+		static glcdc_ctrl_t	ctrl_blk_;
 
-		// GLCD hardware specific control block
-		struct glcdc_ctrl_t {
-			glcdc_operating_status_t state;		  // Status of GLCD module.
-			bool is_entry;						  // Flag of subcribed GLCDC interrupt function.
-			glcdc_coordinate_t active_start_pos;  // Zero coordinate for gra phics plane.
-			uint16_t hsize;                       // Horizontal pixel size in a line.
-			uint16_t vsize;                       // Vertical pixel size in a frame.
-			bool graphics_read_enable[GLCDC_FRAME_LAYER_NUM];  // Graphics data read enable.
-			void (*p_callback)(void *);           // Pointer to callback function.
-			bool first_vpos_interrupt_flag;       // First vpos interrupt after release 
-												  // software reset.
-			glcdc_interrupt_cfg_t interrupt;      // Interrupt setting values.
-			glcdc_ctrl_t() :
-				state(GLCDC_STATE_CLOSED),
-				is_entry(false),
-				active_start_pos(),
-				hsize(0), vsize(0),
-				graphics_read_enable{ false },
-				p_callback(nullptr),
-				first_vpos_interrupt_flag(false),
-				interrupt()
-			{ }
-		};
-		glcdc_ctrl_t	ctrl_blk_;
+		error_t			last_error_;
+
+
+
 
 
 
@@ -294,37 +370,12 @@ namespace device {
 
 		void release_software_reset_()
 		{
-			/* ---- Releases software reset. ---- */
-			/* BGEN - Background Generating Block Operation Control Register
-			b31:b17 Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b16     SWRST    - GLCDC Software Reset Release. - Release GLCDC software reset.
-			b15:b9  Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b8      VEN      - Register Value Reflection Enable.
-			b7:b1   Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b0      EN       - Background Generating Block Operation Enable. */
 			GLC::BGEN.SWRST = 1;
 		}
 
 
-		void clock_set_(const glcdc_cfg_t& cfg)
+		void clock_set_(const cfg_t& cfg)
 		{
-			/* PANELCLK - Panel Clock Control Register
-			b31:b25 Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b24     Reserved - These bits are read as 1. Writing to this bit has no effect.
-			b23:b21 Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b20     Reserved - These bits are read as 1. Writing to this bit has no effect.
-			b19:b16 Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b15:b13 Reserved - These bits are read as 0. The write value should be 0.
-			b12     PIXSEL   - Pixel Clock Select. - No frequency division (parallel RGB) or
-							   Divided-by-4 (serial RGB)
-			b11:b9  Reserved - These bits are read as 0. The write value should be 0.
-			b8      CLKSEL   - Clock Source Select. - Select LCD_EXTCLK (external clock) or
-							   Select PLL clock.
-			b7      Reserved - This bit is read as 0. The write value should be 0.
-			b6      CLKEN    - Panel Clock Output Enable. - Disable LCD_CLK output or
-							   Enable LCD_CLK output.
-			b5      DCDR[5:0]- Clock Division Ratio Setting. - Divide-by-2 to Divide-by-32. */
-
 			// Selects input source for panel clock
 			GLC::PANELCLK.CLKSEL = (uint32_t)cfg.output.clksrc;
 
@@ -347,6 +398,7 @@ namespace device {
 				asm("nop");
 			}
 		}
+
 
 		void hsync_set_(glcdc_tcon_pin_t tcon, const glcdc_timing_t& timing,
 			glcdc_signal_polarity_t polarity)
@@ -371,16 +423,6 @@ namespace device {
 				break;
 			}
 
-			/* Polarity of a signal select */
-			/* TCONSTHA2 - Horizontal Timing Setting Register A2
-			b31:b9 Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b8     HSSEL    - STHy Signal Reference Timing Select. - Select HS signal or
-							  the TCONTIM.OFFSET[10:0] bits as reference for signal generation.
-			b7:b5  Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b4     INV      - STHy Signal Polarity Inversion. - Do not invert the STHy signal
-							  or Invert the STHy signal.
-			b3     Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b2:b0  SEL[2:0] - Output Signal Select. - Select as STVA, STVB, STHA, STHB or DE */
 			GLC::TCONSTHA2.INV = (uint32_t)polarity; /* Hsync(STHA) -> Invert or Not Invert */
 
 			// Hsync beginning position
@@ -430,7 +472,7 @@ namespace device {
 		void data_enable_set_(glcdc_tcon_pin_t tcon, const glcdc_timing_t& vtiming,
                               const glcdc_timing_t& htiming, glcdc_signal_polarity_t polarity)
 		{
-			switch (tcon) {
+			switch(tcon) {
 			case GLCDC_TCON_PIN_0:
 				/* DE -> TCON0 */
 				GLC::TCONSTVA2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_DE;
@@ -458,40 +500,16 @@ namespace device {
 		}
 
 
-
-
-		void sync_signal_set_(const glcdc_cfg_t& cfg)
+		void sync_signal_set_(const cfg_t& cfg)
 		{
-			/* CLKPHASE - Output Phase Control Register
-			b31:b13 Reserved  - These bits are read as 0. Writing to these bits have no effect.
-			b12     FRONTGAM  - Correction Sequence Control.
-			b11:b9  Reserved  - These bits are read as 0. Writing to these bits have no effect.
-			b8      LCDEDG    - DATA Output Phase Control. - synchronized with rising or falling
-								edges of LCD_CLK
-			b7      Reserved  - This bit is read as 0. The write value should be 0.
-			b6      TCON0EDGE - TCON0 Output Phase Control. - synchronized with rising or falling
-								edges of LCD_CLK
-			b5      TCON1EDGE - TCON1 Output Phase Control. - synchronized with rising or falling
-								edges of LCD_CLK
-			b4      TCON2EDGE - TCON2 Output Phase Control. - synchronized with rising or falling
-								edges of LCD_CLK
-			b3      TCON3EDGE - TCON3 Output Phase Control. - synchronized with rising or falling
-								edges of LCD_CLK
-			b2:b0   Reserved  - These bits are read as 0. Writing to these bits have no effect. */
-			GLC::CLKPHASE.LCDEDG = (uint32_t)cfg.output.sync_edge;
-			GLC::CLKPHASE.TCON0EDG = (uint32_t)cfg.output.sync_edge;
-			GLC::CLKPHASE.TCON1EDG = (uint32_t)cfg.output.sync_edge;
-			GLC::CLKPHASE.TCON2EDG = (uint32_t)cfg.output.sync_edge;
-			GLC::CLKPHASE.TCON3EDG = (uint32_t)cfg.output.sync_edge;
+			GLC::CLKPHASE.LCDEDG   = cfg.output.sync_edge;
+			GLC::CLKPHASE.TCON0EDG = cfg.output.sync_edge;
+			GLC::CLKPHASE.TCON1EDG = cfg.output.sync_edge;
+			GLC::CLKPHASE.TCON2EDG = cfg.output.sync_edge;
+			GLC::CLKPHASE.TCON3EDG = cfg.output.sync_edge;
 
-			/* TCONTIM - Reference Timing Setting Register
-			b31:b27  Reserved     - These bits are read as 0. Writing to these bits have no effect.
-			b26:b16  HALF[10:0]   - Vertical synchronization signal change timing setting.
-			b15:b11  Reserved     - These bits are read as 0. Writing to these bits have no effect.
-			b10:b0   OFFSET[10:0] - Horizontal synchronization signal generation reference timing.
-			*/
 			GLC::TCONTIM.OFFSET = 0; // 1 pixel
-			GLC::TCONTIM.HALF = 0;   // 1 pixel (No delay)
+			GLC::TCONTIM.HALF   = 0; // 1 pixel (No delay)
 
 			hsync_set_(cfg.output.tcon_hsync, cfg.output.htiming, cfg.output.hsync_polarity);
 			vsync_set_(cfg.output.tcon_vsync, cfg.output.vtiming, cfg.output.vsync_polarity);
@@ -500,7 +518,7 @@ namespace device {
 		}
 
 
-		void background_screen_set_(const glcdc_cfg_t& cfg)
+		void background_screen_set_(const cfg_t& cfg)
 		{
 			uint32_t hsync_total_cyc;
 			uint32_t vsync_total_cyc;
@@ -510,60 +528,28 @@ namespace device {
 			vsync_total_cyc = (((cfg.output.vtiming.front_porch  + cfg.output.vtiming.sync_width)
 							  +  cfg.output.vtiming.display_cyc) + cfg.output.vtiming.back_porch);
 
-			/* - Set number of total cycle for a line including Sync & Back poach, Front poach - */
-			/* BGPERI - Free-Running Period Register
-			b31:b27  Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b26:b16  FV[10:0] - Vertical Synchronization Signal Period Setting.
-			b15:b11  Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b10:b0   FH[10:0] - Horizontal Synchronization Signal Period Setting. */
 			GLC::BGPERI.FH = (hsync_total_cyc - 1) & BG_PERI_FH_MASK;
 			GLC::BGPERI.FV = (vsync_total_cyc - 1) & BG_PERI_FV_MASK;
 
-			/* BGSYNC - Synchronization Position Register
-			b31:b20 Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b19:b16 VP[3:0]  - Vertical Synchronization Assertion Position Setting.
-			b15:b4  Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b3:b0   HP[3:0]  - Horizontal Synchronization Signal Assertion Position Setting. */
 			GLC::BGSYNC.HP = (cfg.output.htiming.front_porch - BG_PLANE_H_CYC_MARGIN_MIN)
 							 & BG_SYNC_HP_MASK;
 			GLC::BGSYNC.VP = (cfg.output.vtiming.front_porch - BG_PLANE_V_CYC_MARGIN_MIN)
 							 & BG_SYNC_VP_MASK;
 
-			/* ---- Set the start position of Background screen ---- */
-			/* BGHSIZE - Horizontal Size Register
-			b31:b27  Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b26:b16  HP[10:0] - Horizontal Active Pixel Start Position Setting.
-			b15:b11  Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b10:b0   HW[10:0] - Horizontal Active Pixel Width Setting. */
 			GLC::BGHSIZE.HP = (uint16_t) ((cfg.output.htiming.front_porch
 				- BG_PLANE_H_CYC_MARGIN_MIN)
 				+ cfg.output.htiming.sync_width + cfg.output.htiming.back_porch)
 				& BG_HSIZE_HP_MASK;
 
-			/* BGVSIZE - Vertical Size Register
-			b31:b27  Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b26:b16  VP[10:0] - Vertical Active Pixel Start Position Setting.
-			b15:b11  Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b10:b0   VW[10:0] - Vertical Active Pixel Width Setting. */
 			GLC::BGVSIZE.VP = (uint16_t) ((cfg.output.vtiming.front_porch
 				- BG_PLANE_V_CYC_MARGIN_MIN)
 				+ cfg.output.vtiming.sync_width + cfg.output.vtiming.back_porch)
 				& BG_VSIZE_VP_MASK;
 			/* ---- Set the width of Background screen ---- */
-			/* BGHSIZE - Horizontal Size Register
-			b10:b0   HW[10:0] - Horizontal Active Pixel Width Setting. */
 			GLC::BGHSIZE.HW = cfg.output.htiming.display_cyc & BG_HSIZE_HW_MASK;
-
-			/* BGVSIZE - Vertical Size Register
-			b10:b0   VW[10:0] - Vertical Active Pixel Width Setting. */
 			GLC::BGVSIZE.VW = cfg.output.vtiming.display_cyc & BG_VSIZE_VW_MASK;
 
 			/* ---- Set the Background color ---- */
-			/* BGCOLOR - Background Color Register
-			b31:b24  Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b23:b16  R[7:0] - Background Color R Value Setting.
-			b15:b8   G[7:0] - Background Color G Value Setting.
-			b7:b0    B[7:0] - Background Color B Value Setting. */
 			GLC::BGCOLOR.R = cfg.output.bg_color.byte.r;
 			GLC::BGCOLOR.G = cfg.output.bg_color.byte.g;
 			GLC::BGCOLOR.B = cfg.output.bg_color.byte.b;
@@ -600,13 +586,8 @@ namespace device {
 		}
 
 
-		void gr_plane_format_set_(glcdc_in_format_t format, glcdc_frame_layer_t frame)
+		void gr_plane_format_set_(glcdc_in_format_t format, uint32_t frame)
 		{
-			/* GRnFLM6 - Graphic n Frame Buffer Control Register 6
-			b31     Reserved    - This bit is read as 0. The write value should be 0.
-			b30:b28 FORMAT[2:0] - Frame Buffer Color Format Setting.
-			b27:b0  Reserved    - These bits are read as 0.
-								  Writing to these bits have no effect. */
 			if(frame == 0) {
 				GLC::GR1FLM6.FORMAT = (uint32_t)format;
 			} else { 
@@ -615,7 +596,7 @@ namespace device {
 		}
 
 
-		void graphics_layer_set_(const glcdc_input_cfg_t& input, glcdc_frame_layer_t frame)
+		void graphics_layer_set_(const glcdc_input_cfg_t& input, uint32_t frame)
 		{
 			uint32_t bit_size = get_bit_size_(input.format);
 
@@ -627,8 +608,6 @@ namespace device {
 			gr_plane_format_set_(input.format, frame);
 
 			/* ---- Set the base address of graphics plane ---- */
-			/* GRnFLM2 - Graphic n Frame Buffer Control Register 2 */
-			// gp_gr[frame]->grxflm2 = (uint32_t)input.p_base;
 			if(frame == 0) {
 				GLC::GR1FLM2 = (uint32_t)input.p_base;
 			} else {
@@ -636,11 +615,6 @@ namespace device {
 			}
 
 			/* ---- Set the background color on graphics plane ---- */
-			/* GRnBASE - Graphic n Background Color Control Register
-			b31:b24  Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b23:b16  G[7:0] - Background Color G Value Setting.
-			b15:b8   B[7:0] - Background Color B Value Setting.
-			b7:b0    R[7:0] - Background Color R Value Setting. */
 			if(frame == 0) {
 				GLC::GR1BASE.R = input.bg_color.byte.r;
 				GLC::GR1BASE.G = input.bg_color.byte.g;
@@ -653,11 +627,6 @@ namespace device {
 
 			// --- Set the number of data transfer times per line, 64 bytes are transferred
 			//     in each transfer ----
-			/* GRnFLM5 - Graphic n Frame Buffer Control Register 5
-			b31:b27 Reserved - These bits are read as 0. Writing to these bits have no effect.
-			b26:b16 LNNUM[10:0] - Single Frame Line Count Setting.
-			b15:b0  DATANUM[15:0] - Single Line Data Transfer Count Setting */
-
 			// Convert to byte size of Single line data transfer, round up fractions below
 			// the decimal point
 			uint32_t line_byte_num = ((bit_size * input.hsize) / 8);
@@ -678,8 +647,6 @@ namespace device {
 			}
 
 			/* ---- Set the line offset address for accessing the graphics data ---- */
-			/* GRnFLM5 - Graphic n Frame Buffer Control Register 5
-			b26:b16 LNNUM[10:0] - Single Frame Line Count Setting. */
 			if(frame == 0) {
 				GLC::GR1FLM5.LNNUM = ((uint32_t)(input.vsize - 1)) & GRn_FLM5_LNNUM_MASK;
 			} else {
@@ -688,26 +655,18 @@ namespace device {
 
 			// ---- Set the line offset address for accessing the graphics data on graphics
 			// plane ----
-			/* GRnFLM3 - Graphic n Frame Buffer Control Register 3
-			b31:b16 LNOFF[15:0] - Macro Line Offset Setting. - Set the offset value from the
-								  end address of the line on the frame buffer (macro line) to
-								  the start address of the next macro line. */
 			if(frame == 0) {
 				GLC::GR1FLM3.LNOFF = (uint32_t)input.offset & GRn_FLM3_LNOFF_MASK;
 			} else {
 				GLC::GR2FLM3.LNOFF = (uint32_t)input.offset & GRn_FLM3_LNOFF_MASK;
 			}
 
-			/* GRnAB2 - Graphic n Alpha Blending Control Register 2
-			b10:b0  GRCVW[10:0] - Graphics Area Vertical Width Setting. */
 			if(frame == 0) {
 				GLC::GR1AB2.GRCVW = input.vsize & GRn_AB2_GRCVW_MASK;
 			} else {
 				GLC::GR2AB2.GRCVW = input.vsize & GRn_AB2_GRCVW_MASK;
 			}
 
-			/* GRnAB2 - Graphic n Alpha Blending Control Register 2
-			b26:b16 GRCVS[10:0] - Graphics Area Vertical Start Position Setting. */
 			if(frame == 0) {
 				GLC::GR1AB2.GRCVS = ((uint32_t)(ctrl_blk_.active_start_pos.y
 									+ input.coordinate.y)) & GRn_AB2_GRCVS_MASK;
@@ -717,9 +676,6 @@ namespace device {
 			}
 
 			/* ---- Set the width of the graphics layers ---- */
-			/* GRnAB3 - Graphic n Alpha Blending Control Register 3
-			b10:b0  GRCHW[10:0] - Graphics Area Horizontal Width Setting. */
-			// gp_gr[frame]->grxab3.bit.grchw = input.hsize & GRn_AB3_GRCHW_MASK;
 			if(frame == 0) {
 				GLC::GR1AB3.GRCHW = input.hsize & GRn_AB3_GRCHW_MASK;
 			} else {
@@ -727,11 +683,6 @@ namespace device {
 			}
 
 			/* ---- Set the start position of the graphics layers ---- */
-			/* GRnAB3 - Graphic n Alpha Blending Control Register 3
-			b31:b27 Reserved    - These bits are read as 0. Writing to these bits have no effect.
-			b26:b16 GRCHS[10:0] - Graphics Area Horizontal Start Position Setting.
-			b15:b11 Reserved    - These bits are read as 0. Writing to these bits have no effect.
-			b10:b0  GRCHW[10:0] - Graphics Area Horizontal Width Setting. */
 			// gp_gr[frame]->grxab3.bit.grchs = ((uint32_t)(ctrl_blk_.active_start_pos.x
 			//								 + input.coordinate.x)) & GRn_AB3_GRCHS_MASK;
 			if(frame == 0) {
@@ -742,9 +693,6 @@ namespace device {
 									+ input.coordinate.x)) & GRn_AB3_GRCHS_MASK;
 			}
 
-			/* GRnAB1 - Graphic n Alpha Blending Control Register 1
-			b4      GRCDISPON - Graphics Area Frame Display Control.
-                                  - Area Frame is displayed or not displayed. */
 			if(frame == 0) {
 				GLC::GR1AB1.GRCDISPON = input.frame_edge == true ? 1 : 0;
 			} else {
@@ -753,7 +701,7 @@ namespace device {
 		}
 
 
-		void blend_condition_set_(const glcdc_blend_t& blend, glcdc_frame_layer_t frame)
+		void blend_condition_set_(const glcdc_blend_t& blend, uint32_t frame)
 		{
 
 			/* if enable graphics data read from memory */
@@ -1021,7 +969,7 @@ namespace device {
 		}
 
 
-		void graphics_chromakey_set_(const glcdc_chromakey_t& chromakey, glcdc_frame_layer_t frame)
+		void graphics_chromakey_set_(const glcdc_chromakey_t& chromakey, uint32_t frame)
 		{
 			/* if enable graphics data read from memory */
 			if(false == ctrl_blk_.graphics_read_enable[frame]) {
@@ -1086,7 +1034,7 @@ namespace device {
 		}
 
 
-		glcdc_clut_plane_t is_clutplane_selected_(glcdc_frame_layer_t frame)
+		glcdc_clut_plane_t is_clutplane_selected_(uint32_t frame)
 		{
 			/* GRnCLUTINT - Graphic n CLUT/Interrupt Control Register
 			b16 SEL - CLUT Control. - Select Color Look-up Table. */
@@ -1098,7 +1046,7 @@ namespace device {
 		}
 
 
-		void clutplane_select_(glcdc_frame_layer_t frame, glcdc_clut_plane_t clut_plane)
+		void clutplane_select_(uint32_t frame, glcdc_clut_plane_t clut_plane)
 		{
 			/* GRnCLUTINT - Graphic n CLUT/Interrupt Control Register
 			b16 SEL - CLUT Control. - Select Color Look-up Table. */
@@ -1110,7 +1058,7 @@ namespace device {
 		}
 
 
-		void clut_set_(glcdc_frame_layer_t frame, glcdc_clut_plane_t clut_plane,
+		void clut_set_(uint32_t frame, glcdc_clut_plane_t clut_plane,
 					   uint32_t entry, uint32_t data)
 		{
 			/* GRnCLUTm[k] - Color Look-up Table
@@ -1135,7 +1083,7 @@ namespace device {
 		}
 
 
-		void clut_update_(const glcdc_clut_cfg_t& clut, glcdc_frame_layer_t frame)
+		void clut_update_(const glcdc_clut_cfg_t& clut, uint32_t frame)
 		{
 			/* If enable graphics data read from memory */
 			if(false == ctrl_blk_.graphics_read_enable[frame]) {
@@ -1165,7 +1113,7 @@ namespace device {
 		}
 
 
-		void output_block_set_(const glcdc_cfg_t& cfg)
+		void output_block_set_(const cfg_t& cfg)
 		{
 			/* OUTSET - Output Interface Register
 			b31:b29 Reserved   - These bits are read as 0. Writing to these bits have no effect.
@@ -1528,7 +1476,7 @@ namespace device {
 
 		void graphics_read_enable_()
 		{
-			if(true == ctrl_blk_.graphics_read_enable[GLCDC_FRAME_LAYER_1]) {
+			if(true == ctrl_blk_.graphics_read_enable[FRAME_LAYER_1]) {
 				/* GR1FLMRD - Graphic 1 Frame Buffer Read Control Register
 				b31:b1 Reserved   - These bits are read as 0. Writing to these bits have no effect.
 				b0     RENB - Frame Buffer Read Enable. - Enable reading of the frame buffer. */
@@ -1539,7 +1487,7 @@ namespace device {
 				GLC::GR1FLMRD.RENB = 0;    /* Disable reading. */
 			}
 
-			if(true == ctrl_blk_.graphics_read_enable[GLCDC_FRAME_LAYER_2]) {
+			if(true == ctrl_blk_.graphics_read_enable[FRAME_LAYER_2]) {
 				/* GR2FLMRD - Graphic 2 Frame Buffer Read Control Register
 				b0     RENB - Frame Buffer Read Enable. - Enable reading of the frame buffer. */
 				GLC::GR2FLMRD.RENB = 1;    /* Enable reading. */
@@ -1571,7 +1519,7 @@ namespace device {
     Addr = FRAMEBUFFER_START
          + BYTES_PER_BUFFER * _PendingBuffer;   // Calculate address of buffer to be used  as visible frame buffer
     runtime_cfg.input.p_base = (uint32_t *)Addr; // Specify the start address of the frame buffer
-    ret = R_GLCDC_LayerChange(GLCDC_FRAME_LAYER_2, &runtime_cfg);	// Graphic 2 Register Value Reflection Enable
+    ret = R_GLCDC_LayerChange(FRAME_LAYER_2, &runtime_cfg);	// Graphic 2 Register Value Reflection Enable
     if (ret != GLCDC_SUCCESS) {
     	while(1);
     }
@@ -1589,25 +1537,15 @@ namespace device {
 		}
 
 
-		bool open_(const glcdc_cfg_t& cfg)
+		bool open_(const cfg_t& cfg)
 		{
-#if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
-			glcdc_err_t err = GLCDC_SUCCESS;
-#endif
+			last_error_ = error_t::SUCCESS;
 
 			// Status check
-			if(GLCDC_STATE_CLOSED != ctrl_blk_.state) {
-//				return GLCDC_ERR_INVALID_MODE;
+			if(glcdc_operating_status::CLOSED != ctrl_blk_.state) {
+				last_error_ = error_t::INVALID_MODE;
 				return false;
 			}
-
-#if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
-			// Argument check
-			if(nullptr == p_cfg) {
-//				return GLCDC_ERR_INVALID_PTR;
-				return false;
-			}
-#endif
 
 			// Store position information to the control block
 			// (it is necessary to set the layer and blending section later)
@@ -1629,16 +1567,16 @@ namespace device {
 			}
 
 			// Save status of frame buffer read enable
-			if(nullptr == cfg.input[GLCDC_FRAME_LAYER_1].p_base) {
-				ctrl_blk_.graphics_read_enable[GLCDC_FRAME_LAYER_1] = false;
+			if(nullptr == cfg.input[FRAME_LAYER_1].p_base) {
+				ctrl_blk_.graphics_read_enable[FRAME_LAYER_1] = false;
 			} else {
-				ctrl_blk_.graphics_read_enable[GLCDC_FRAME_LAYER_1] = true;
+				ctrl_blk_.graphics_read_enable[FRAME_LAYER_1] = true;
 			}
 
-			if(nullptr == cfg.input[GLCDC_FRAME_LAYER_2].p_base) {
-				ctrl_blk_.graphics_read_enable[GLCDC_FRAME_LAYER_2] = false;
+			if(nullptr == cfg.input[FRAME_LAYER_2].p_base) {
+				ctrl_blk_.graphics_read_enable[FRAME_LAYER_2] = false;
 			} else {
-				ctrl_blk_.graphics_read_enable[GLCDC_FRAME_LAYER_2] = true;
+				ctrl_blk_.graphics_read_enable[FRAME_LAYER_2] = true;
 			}
 
 			// Save callback function
@@ -1665,24 +1603,28 @@ namespace device {
 				initial_interrupt.gr2uf_enable = false;
 			}
 
-#if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
 			// Check parameters
-			err = r_glcdc_open_param_check (p_cfg);
-			if(GLCDC_SUCCESS != err) {
-				return err;
-			}
-#endif
+//			err = r_glcdc_open_param_check (p_cfg);
+//			if(GLCDC_SUCCESS != err) {
+//				return err;
+//			}
 
-			// Check GLCDC resource is locked by another process
+// この中で行うべきでない処理
 #if 0
+			// Check GLCDC resource is locked by another process
 			if(false == R_BSP_HardwareLock ((mcu_lock_t) BSP_LOCK_GLCDC)) {
 				return GLCDC_ERR_LOCK_FUNC;
 			}
-			utils::format("R_GLCDC_Open: R_BSP_HardwareLock...\n");
 #endif
 
 			// Supply the peripheral clock to the GLCD module
 			power_cfg::turn(GLC::get_peripheral());
+
+			// LCD_DATA0 to LCD_DATA15, LCD_CLK, LCD_TCON0, LCD_TCON2, LCD_TCON3
+			if(!port_map::turn(GLC::get_peripheral())) {
+				utils::format("GLCDC: port map fail...\n");
+				return false;
+			}
 
 			// Release GLCD from a SW reset status.
 			release_software_reset_();
@@ -1697,11 +1639,11 @@ namespace device {
 			background_screen_set_(cfg);
 
 			// Configure the graphics plane layers
-			for(uint32_t frame = 0; frame <= GLCDC_FRAME_LAYER_2; ++frame) {
-				graphics_layer_set_(cfg.input[frame], (glcdc_frame_layer_t)frame);
-				blend_condition_set_(cfg.blend[frame], (glcdc_frame_layer_t)frame);
-				graphics_chromakey_set_(cfg.chromakey[frame], (glcdc_frame_layer_t)frame);
-				clut_update_(cfg.clut[frame], (glcdc_frame_layer_t)frame);
+			for(uint32_t frame = 0; frame <= FRAME_LAYER_2; ++frame) {
+				graphics_layer_set_(cfg.input[frame], frame);
+				blend_condition_set_(cfg.blend[frame], frame);
+				graphics_chromakey_set_(cfg.chromakey[frame], frame);
+				clut_update_(cfg.clut[frame], frame);
 			}
 
 			// Configure the output control block
@@ -1726,7 +1668,7 @@ namespace device {
 			graphics_read_enable_();
 
 			// Change GLCDC driver state
-			ctrl_blk_.state = GLCDC_STATE_NOT_DISPLAYING;
+			ctrl_blk_.state = glcdc_operating_status::NOT_DISPLAYING;
 
 			return true;
 		}		
@@ -1735,22 +1677,41 @@ namespace device {
 	public:
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	コンストラクタ
+		*/
+		//-----------------------------------------------------------------//
+		glcdc_io() noexcept : last_error_(error_t::SUCCESS)
+		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	BG の許可（不許可）
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void bg_operation_enable(bool ena = true) noexcept
+		{
+			if(ena) {
+				GLC::BGEN = 0x00010101;
+			} else {
+				GLC::BGEN.EN = 1;
+				while(GLC::BGMON.EN() != 0) {
+					asm("nop");
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  開始
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
 		bool start()
 		{
-			//
-			// Release stop state of GLCDC
-			//
-			// R_GLCDC_Open function release stop state of GLCDC.
-			//
-			// Function select of multiplex pins (Display B)
-			//
-			port_map::turn(GLC::get_peripheral());
-
-			glcdc_cfg_t glcdc_cfg;
+			cfg_t cfg;
 			//
 			// Set the BGEN.SWRST bit to 1 to release the GLCDC from a software reset
 			//
@@ -1759,72 +1720,97 @@ namespace device {
 			// Set the frequency of the LCD_CLK and PXCLK to suit the format
 			// and set the PANELCLK.CLKEN bit to 1
 			//
-			glcdc_cfg.output.clksrc = GLCDC_CLK_SRC_INTERNAL;   			  // Select PLL clock
-			glcdc_cfg.output.clock_div_ratio = GLCDC_PANEL_CLK_DIVISOR_24;    // 240 / 24 = 10 MHz
+			cfg.output.clksrc = GLCDC_CLK_SRC_INTERNAL;   			  // Select PLL clock
+			cfg.output.clock_div_ratio = GLCDC_PANEL_CLK_DIVISOR_24;    // 240 / 24 = 10 MHz
   																          // No frequency division
   	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	          // Enable LCD_CLK output
 			//
-			// Definition of Background Screen
+			// Definition of LCD
 			//
 			// Horizontal cycle (whole control screen)
 			// Vertical cycle (whole control screen)
 			// Horizontal Synchronization Signal Assertion Position
-			glcdc_cfg.output.htiming.front_porch = 5;
+			cfg.output.htiming.front_porch = 5;
 			// Vertical Synchronization Assertion Position
-			glcdc_cfg.output.vtiming.front_porch = 8;
+			cfg.output.vtiming.front_porch = 8;
 			// Horizontal Active Pixel Start Position (min. 6 pixels)
-			glcdc_cfg.output.htiming.back_porch = 40;
-			glcdc_cfg.output.vtiming.back_porch = 8;
+			cfg.output.htiming.back_porch = 40;
+			cfg.output.vtiming.back_porch = 8;
 			// Horizontal Active Pixel Width
-			glcdc_cfg.output.htiming.display_cyc = XSIZE_PHYS;
+			cfg.output.htiming.display_cyc = XSIZE_PHYS;
 			// Vertical Active Display Width
-			glcdc_cfg.output.vtiming.display_cyc = YSIZE_PHYS;
+			cfg.output.vtiming.display_cyc = YSIZE_PHYS;
 			// Vertical Active Display Start Position (min. 3 lines)
-			glcdc_cfg.output.htiming.sync_width = 1;
-			glcdc_cfg.output.vtiming.sync_width = 1;
+			cfg.output.htiming.sync_width = 1;
+			cfg.output.vtiming.sync_width = 1;
 			//
 			// Graphic 1 configuration
 			//
-			glcdc_cfg.input[GLCDC_FRAME_LAYER_1].p_base = nullptr;	  // Disable Graphics 1
+			cfg.input[FRAME_LAYER_1].p_base = nullptr;	  // Disable Graphics 1
 
 			//
 			// Graphic 2 configuration
 			//
   			// Enable reading of the frame buffer
 			// Specify the start address of the frame buffer
-			glcdc_cfg.input[GLCDC_FRAME_LAYER_2].p_base = (uint32_t *)BufferPTR[0];
+			{
+				static constexpr uint32_t bptr[] = {
+//					0x00010000,  // Begin of On-Chip RAM
+					0x00800000,  // Begin of Expansion RAM
+					0x00800000   // Begin of Expansion RAM
+				};
+				cfg.input[FRAME_LAYER_2].p_base = (uint32_t *)bptr[0];
+			}
 			// Offset value from the end address of the line to the start address of the next line
-			glcdc_cfg.input[GLCDC_FRAME_LAYER_2].offset = LINE_OFFSET;
+			cfg.input[FRAME_LAYER_2].offset = LINE_OFFSET;
 			// Single Line Data Transfer Count
 			// Single Frame Line Count
 
-			// Frame Buffer Color Format RGB565
-			glcdc_cfg.input[GLCDC_FRAME_LAYER_2].format = COLOR_FORMAT;
-			glcdc_cfg.blend[GLCDC_FRAME_LAYER_2].visible = true;
+			switch(PXT) {
+			case PIX_TYPE::CLUT1:
+				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT_CLUT1;
+				break;
+			case PIX_TYPE::CLUT4:
+				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT_CLUT4;
+				break;
+			case PIX_TYPE::CLUT8:
+				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT_CLUT8;
+				break;
+			case PIX_TYPE::RGB565:
+				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT_16BITS_RGB565;
+				break;
+//  (GLCDC_IN_FORMAT_16BITS_ARGB1555)
+//  (GLCDC_IN_FORMAT_16BITS_ARGB4444)
+			case PIX_TYPE::RGB888:
+				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT_32BITS_RGB888;
+				break;
+//  (GLCDC_IN_FORMAT_32BITS_ARGB8888)
+			}
+			cfg.blend[FRAME_LAYER_2].visible = true;
 			// Display Screen Control (current graphics)
-			glcdc_cfg.blend[GLCDC_FRAME_LAYER_2].blend_control = GLCDC_BLEND_CONTROL_NONE;
+			cfg.blend[FRAME_LAYER_2].blend_control = GLCDC_BLEND_CONTROL_NONE;
 			// Rectangular Alpha Blending Area Frame Display Control
-			glcdc_cfg.blend[GLCDC_FRAME_LAYER_2].frame_edge = false;
+			cfg.blend[FRAME_LAYER_2].frame_edge = false;
 			// Graphics Area Frame Display Control
-			glcdc_cfg.input[GLCDC_FRAME_LAYER_2].frame_edge = false;
+			cfg.input[FRAME_LAYER_2].frame_edge = false;
 
   			// Alpha Blending Control (Per-pixel alpha blending)
 			// Graphics Area Vertical Start Position
-			glcdc_cfg.input[GLCDC_FRAME_LAYER_2].coordinate.y = 0;
+			cfg.input[FRAME_LAYER_2].coordinate.y = 0;
 			// Graphics Area Vertical Width
-			glcdc_cfg.input[GLCDC_FRAME_LAYER_2].vsize = YSIZE_PHYS;
+			cfg.input[FRAME_LAYER_2].vsize = YSIZE_PHYS;
 			// Graphics Area Horizontal Start Position
-			glcdc_cfg.input[GLCDC_FRAME_LAYER_2].coordinate.x = 0;
+			cfg.input[FRAME_LAYER_2].coordinate.x = 0;
 			// Graphics Area Horizontal Width
-			glcdc_cfg.input[GLCDC_FRAME_LAYER_2].hsize = XSIZE_PHYS;
+			cfg.input[FRAME_LAYER_2].hsize = XSIZE_PHYS;
 			// Rectangular Alpha Blending Area Vertical Start Position
-			glcdc_cfg.blend[GLCDC_FRAME_LAYER_2].start_coordinate.x = 0;
+			cfg.blend[FRAME_LAYER_2].start_coordinate.x = 0;
 			// Rectangular Alpha Blending Area Vertical Width
-			glcdc_cfg.blend[GLCDC_FRAME_LAYER_2].end_coordinate.x= YSIZE_PHYS;
+			cfg.blend[FRAME_LAYER_2].end_coordinate.x= YSIZE_PHYS;
 			// Rectangular Alpha Blending Area Horizontal Start Position
-			glcdc_cfg.blend[GLCDC_FRAME_LAYER_2].start_coordinate.y = 0;
+			cfg.blend[FRAME_LAYER_2].start_coordinate.y = 0;
 			// Rectangular Alpha Blending Area Horizontal Width
-			glcdc_cfg.blend[GLCDC_FRAME_LAYER_2].end_coordinate.y= XSIZE_PHYS;
+			cfg.blend[FRAME_LAYER_2].end_coordinate.y= XSIZE_PHYS;
   			// Graphic 2 Register Value Reflection Enable
 
 			//
@@ -1836,15 +1822,15 @@ namespace device {
 			//   STVB Signal Pulse Width
 			//   STHB Signal Pulse Width
 			// TCON0 Output Signal Select STVA (VSYNC)
-			glcdc_cfg.output.tcon_vsync = GLCDC_TCON_PIN_0;
+			cfg.output.tcon_vsync = GLCDC_TCON_PIN_0;
 			// TCON2 Output Signal Select STHA (HSYNC)
-			glcdc_cfg.output.tcon_hsync = GLCDC_TCON_PIN_2;
+			cfg.output.tcon_hsync = GLCDC_TCON_PIN_2;
 			// TCON3 Output Signal Select DE (DEN)
-			glcdc_cfg.output.tcon_de    = GLCDC_TCON_PIN_3;
-			glcdc_cfg.output.data_enable_polarity = GLCDC_SIGNAL_POLARITY_HIACTIVE;
-			glcdc_cfg.output.hsync_polarity = GLCDC_SIGNAL_POLARITY_LOACTIVE;
-			glcdc_cfg.output.vsync_polarity = GLCDC_SIGNAL_POLARITY_LOACTIVE;
-			glcdc_cfg.output.sync_edge = GLCDC_SIGNAL_SYNC_EDGE_RISING;
+			cfg.output.tcon_de    = GLCDC_TCON_PIN_3;
+			cfg.output.data_enable_polarity = GLCDC_SIGNAL_POLARITY_HIACTIVE;
+			cfg.output.hsync_polarity = GLCDC_SIGNAL_POLARITY_LOACTIVE;
+			cfg.output.vsync_polarity = GLCDC_SIGNAL_POLARITY_LOACTIVE;
+			cfg.output.sync_edge = GLCDC_SIGNAL_SYNC_EDGE_RISING;
 			//
 			// Output interface
 			//
@@ -1852,64 +1838,64 @@ namespace device {
 			//   Serial RGB Scan Direction Select (forward) (not support)
 			//   Pixel Clock Division Control (no division)
 			// Output Data Format Select (RGB565)
-			glcdc_cfg.output.format = GLCDC_OUT_FORMAT_16BITS_RGB565;
+			cfg.output.format = GLCDC_OUT_FORMAT_16BITS_RGB565;
 			// Pixel Order Control (B-G-R)
-			glcdc_cfg.output.color_order = GLCDC_COLOR_ORDER_RGB;	// GLCDC_COLOR_ORDER_BGR;
+			cfg.output.color_order = GLCDC_COLOR_ORDER_RGB;	// GLCDC_COLOR_ORDER_BGR;
 			// Bit Endian Control (Little endian)
-			glcdc_cfg.output.endian = GLCDC_ENDIAN_LITTLE;
+			cfg.output.endian = GLCDC_ENDIAN_LITTLE;
 			//
 			// Brightness Adjustment
 			//
-			glcdc_cfg.output.brightness.b = BRIGHTNESS_;  // B
-			glcdc_cfg.output.brightness.g = BRIGHTNESS_;  // G
-			glcdc_cfg.output.brightness.r = BRIGHTNESS_;  // R
+			cfg.output.brightness.b = BRIGHTNESS_;  // B
+			cfg.output.brightness.g = BRIGHTNESS_;  // G
+			cfg.output.brightness.r = BRIGHTNESS_;  // R
 			//
 			// Contrast Adjustment Value
 			//
-			glcdc_cfg.output.contrast.b = CONTRAST_;  // B
-			glcdc_cfg.output.contrast.g = CONTRAST_;  // G
-			glcdc_cfg.output.contrast.r = CONTRAST_;  // R
+			cfg.output.contrast.b = CONTRAST_;  // B
+			cfg.output.contrast.g = CONTRAST_;  // G
+			cfg.output.contrast.r = CONTRAST_;  // R
 
 			//
 			// Disable Gamma
 			//
-			glcdc_cfg.output.gamma.enable = false;
+			cfg.output.gamma.enable = false;
 			//
 			// Disable Chromakey
 			//
-			glcdc_cfg.chromakey[GLCDC_FRAME_LAYER_2].enable = false;
+			cfg.chromakey[FRAME_LAYER_2].enable = false;
 			//
 			// Disable Dithering
 			//
-			glcdc_cfg.output.dithering.dithering_on = false;
+			cfg.output.dithering.dithering_on = false;
 			//
 			// CLUT Adjustment Value
 			//
-			glcdc_cfg.clut[GLCDC_FRAME_LAYER_2].enable = false;
+			cfg.clut[FRAME_LAYER_2].enable = false;
 			//
 			// Enable VPOS ISR
 			//
 			//   Detecting Scanline Setting
 			// Enable detection of specified line notification in graphic 2
-			glcdc_cfg.detection.vpos_detect = true;
+			cfg.detection.vpos_detect = true;
 			// Enable VPOS interrupt request
-			glcdc_cfg.interrupt.vpos_enable = true;
+			cfg.interrupt.vpos_enable = true;
 			//   Interrupt Priority Level (r_glcdc_rx_config.h)
 			//   Interrupt Request Enable
 			//   Clears the STMON.VPOS flag
 			//   VPOS (line detection)
-			glcdc_cfg.detection.gr1uf_detect = false;
-			glcdc_cfg.detection.gr2uf_detect = false;
-			glcdc_cfg.interrupt.gr1uf_enable = false;
-			glcdc_cfg.interrupt.gr2uf_enable = false;
+			cfg.detection.gr1uf_detect = false;
+			cfg.detection.gr2uf_detect = false;
+			cfg.interrupt.gr1uf_enable = false;
+			cfg.interrupt.gr2uf_enable = false;
 			//
 			// Set function to be called on VSYNC
 			//
-			glcdc_cfg.p_callback = vsync_task_;
+			cfg.p_callback = vsync_task_;
 #if 0
-			runtime_cfg.blend = glcdc_cfg.blend[GLCDC_FRAME_LAYER_2];
-			runtime_cfg.input = glcdc_cfg.input[GLCDC_FRAME_LAYER_2];
-			runtime_cfg.chromakey = glcdc_cfg.chromakey[GLCDC_FRAME_LAYER_2];
+			runtime_cfg.blend = cfg.blend[FRAME_LAYER_2];
+			runtime_cfg.input = cfg.input[FRAME_LAYER_2];
+			runtime_cfg.chromakey = cfg.chromakey[FRAME_LAYER_2];
 			//
 			// Register Dave2D interrupt
 			//
@@ -1918,7 +1904,7 @@ namespace device {
 			//
 			// Register Reflection
 			//
-			auto ret = open_(glcdc_cfg);
+			auto ret = open_(cfg);
 			if(!ret) {
 				return false;
 			}
@@ -1938,5 +1924,144 @@ namespace device {
 #endif
 			return true;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  制御
+			@param[in]	cmd		制御種別
+			@param[in]	args	パラメーター
+			@return エラーなら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool control(control_cmd cmd, const void* args = nullptr)
+		{
+			glcdc_detect_cfg_t* p_detection;
+
+			if(glcdc_operating_status::CLOSED == ctrl_blk_.state) {
+				last_error_ = error_t::NOT_OPEN;
+				return false;
+			}
+
+			switch(cmd) {
+			case control_cmd::START_DISPLAY:
+
+				if(glcdc_operating_status::DISPLAYING == ctrl_blk_.state) {
+					last_error_ = error_t::INVALID_MODE;
+					return false;
+				}
+
+				/* Change GLCDC driver state */
+				ctrl_blk_.state = glcdc_operating_status::DISPLAYING;
+
+				/* Start to output the vertical and horizontal synchronization signals and
+				   screen data. */
+				bg_operation_enable();
+				break;
+
+			case control_cmd::STOP_DISPLAY:
+
+				if(glcdc_operating_status::NOT_DISPLAYING == ctrl_blk_.state) {
+					last_error_ = error_t::INVALID_MODE;
+					return false;
+				}
+#if 0
+				/* Return immediately if the register is being updated */
+				if(true == r_glcdc_is_gr_plane_updating(FRAME_LAYER_1)) {
+					last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+					return false;
+				}
+				if(true == r_glcdc_is_gr_plane_updating(FRAME_LAYER_2)) {
+					last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+					return false;
+				}
+				if(true == r_glcdc_is_output_ctrl_updating()) {
+					last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+					return false;
+				}
+				if(true == r_glcdc_is_gamma_updating()) {
+					last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+					return false;
+				}
+				if(true == r_glcdc_is_register_reflecting()) {
+					last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+					return false;
+				}
+#endif
+				/* Stop outputting the vertical and horizontal synchronization signals
+				   and screen data. */
+				bg_operation_enable(false);
+
+				/* status update */
+				ctrl_blk_.state = glcdc_operating_status::NOT_DISPLAYING;
+
+				break;
+
+			case control_cmd::SET_INTERRUPT:
+#if 0
+#if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
+				if(NULL == args) {
+					return GLCDC_ERR_INVALID_PTR;
+				}
+#endif
+
+				if(false == g_ctrl_blk.first_vpos_interrupt_flag) {
+                	last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+					return false;
+				}
+
+				/* interrupt setting */
+///				r_glcdc_interrupt_setting ((glcdc_interrupt_cfg_t *) args);
+
+				break;
+
+        case control_cmd::CLR_DETECTED_STATUS:
+
+#if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
+            if (NULL == args)
+            {
+                return GLCDC_ERR_INVALID_PTR;
+            }
+#endif
+            p_detection = static_cast<glcdc_detect_cfg_t*>(args);
+
+            if (true == p_detection->vpos_detect)
+            {
+                r_glcdc_vpos_int_status_clear ();
+            }
+            if (true == p_detection->gr1uf_detect)
+            {
+                r_glcdc_gr1uf_int_status_clear ();
+            }
+            if (true == p_detection->gr2uf_detect)
+            {
+                r_glcdc_gr2uf_int_status_clear ();
+            }
+
+        break;
+
+        case control_cmd::CHANGE_BG_COLOR:
+
+#if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
+            if (NULL == args)
+            {
+                return error_t::INVALID_PTR;
+            }
+#endif
+
+            r_glcdc_bg_color_setting(static_cast<glcdc_color_t*>(args));
+
+        break;
+#endif
+			default:
+				last_error_ = error_t::INVALID_ARG;
+				return false;
+			}
+
+			last_error_ = error_t::SUCCESS;
+			return true;
+		}
 	};
+
+	template <class GLC, PIX_TYPE PXT> glcdc_ctrl_t glcdc_io<GLC, PXT>::ctrl_blk_;
 }
