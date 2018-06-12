@@ -11,6 +11,10 @@
 #include "main.hpp"
 #include "common/format.hpp"
 
+extern "C" {
+	unsigned long miliis();
+};
+
 // #define WRITE_FILE_DEBUG
 
 namespace seeda {
@@ -71,6 +75,8 @@ namespace seeda {
 
 		uint8_t		open_retry_;
 		uint8_t		open_retry_delay_;
+
+		unsigned long	open_file_time_;
 
 		struct dir_info_t {
 			static const uint32_t NUM = 1000 / 8;
@@ -180,7 +186,7 @@ namespace seeda {
 			fp_(nullptr),
 			ch_loop_(0),
 			task_(task::wait_request), last_channel_(false), second_(0),
-			open_retry_(OPEN_RETRY_LIMIT), open_retry_delay_(0),
+			open_retry_(OPEN_RETRY_LIMIT), open_retry_delay_(0), open_file_time_(0),
 			dir_info_(), dir_list_(), wildcards_(false), dir_time_(0)
 			{ }
 
@@ -264,11 +270,13 @@ namespace seeda {
 
 			case task::wait_request:  // 書き込みトリガー検出
 				if(enable_ && !back) {
+					open_file_time_ = millis();
 					if(path_org_[0] != 0) {
 						wildcards_ = scan_dir_();
 						dir_info_.clear();
 						task_ = task::make_filepath;
 					}
+
 				}
 				break;
 
@@ -346,7 +354,8 @@ namespace seeda {
 						task_ = task::wait_request;
 					}
 				} else {
-					debug_format("Start write file: '%s'\n") % filename_;
+					uint32_t t = millis() - open_file_time_;
+					debug_format("Start write file: '%s', %d [ms]\n") % filename_ % t;
 					open_retry_ = OPEN_RETRY_LIMIT;
 					task_ = task::write_header;
 				}
@@ -482,6 +491,7 @@ namespace seeda {
 				fclose(fp_);
 				fp_ = nullptr;
 				++count_;
+				open_file_time_ = millis();
 				if(wildcards_) {
 					if((dir_time_ + DIR_LIMIT_TIME) < get_time()) {
 						wildcards_ = scan_dir_();
