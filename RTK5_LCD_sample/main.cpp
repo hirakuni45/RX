@@ -213,17 +213,22 @@ int main(int argc, char** argv)
 		sdc_.start();
 	}
 
-	utils::format("RTK5RX65N Start for LCD sample\n");
+	utils::format("\rRTK5RX65N Start for LCD sample\n");
 
 	cmd_.set_prompt("# ");
 
 	{  // GLCDC 初期化
 		LCD_DISP::DIR  = 1;
 		LCD_LIGHT::DIR = 1;
-		LCD_DISP::P  = 1;  // DISP Enable
-		LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
+		LCD_DISP::P  = 0;  // DISP Disable
+		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
 		if(glcdc_io_.start()) {
 			utils::format("Start GLCDC\n");
+			LCD_DISP::P  = 1;  // DISP Enable
+			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
+			if(!glcdc_io_.control(GLCDC_IO::control_cmd::START_DISPLAY)) {
+				utils::format("GLCDC ctrl fail...\n");
+			}
 		} else {
 			utils::format("Fail GLCDC\n");
 		}
@@ -238,13 +243,13 @@ int main(int argc, char** argv)
 
 
 	LED::DIR = 1;
-	SW2::DIR = 0;
+//	SW2::DIR = 0;
 
 	uint8_t n = 0;
-	bool sw2 = SW2::P();
+//	bool sw2 = SW2::P();
 	while(1) {
 		cmt_.sync();
-
+#if 0
 		{  // SW2 の検出
 			auto f = SW2::P();
 			if(sw2 && !f) {
@@ -255,7 +260,7 @@ int main(int argc, char** argv)
 			}
 			sw2 = f;
 		}
-
+#endif
 		sdc_.service(sdh_.service());
 
 		command_();
