@@ -45,7 +45,8 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX600 ../RX56x
 
-OPTIMIZE	=	-Os
+# OPTIMIZE	=	-Os
+OPTIMIZE	=	-O2
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

@@ -16,7 +16,7 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 
-#include "side/arcade.h"
+#include "spinv.hpp"
 
 namespace {
 
@@ -64,9 +64,9 @@ namespace {
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
 
-	utils::command<256> cmd_;
+	emu::spinv		spinv_;
 
-	InvadersMachine side_;
+	utils::command<256> cmd_;
 
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
@@ -191,7 +191,7 @@ extern "C" {
 
 
 	int fatfs_get_mount() {
-		return check_mount_();
+		return sdc_.get_mount();
 	}
 }
 
@@ -237,34 +237,34 @@ int main(int argc, char** argv)
 		}
 	}
 
-#if 0
-	device::GLCDC::GR1CLUT0[0].R = 0xcc;
-	device::GLCDC::GR1CLUT0[1] = 0x123456;
-	uint32_t rgba = device::GLCDC::GR1CLUT0[2];
-	utils::format("%08X\n") % rgba;
-#endif
-
-
 	LED::DIR = 1;
-//	SW2::DIR = 0;
+
+	uint8_t nnn = 100;
+	bool init_inv = false;
 
 	uint8_t n = 0;
-//	bool sw2 = SW2::P();
 	while(1) {
 		cmt_.sync();
-#if 0
-		{  // SW2 の検出
-			auto f = SW2::P();
-			if(sw2 && !f) {
-				utils::format("SW2: Positive\n");
-			}
-			if(!sw2 && f) {
-				utils::format("SW2: Negative\n");
-			}
-			sw2 = f;
-		}
-#endif
+
 		sdc_.service(sdh_.service());
+
+		if(nnn > 0) {
+			--nnn;
+		} else {
+			if(init_inv) {
+				spinv_.service();
+			} else if(sdc_.get_mount()) {
+				if(!spinv_.start("/inv_roms")) {
+					utils::format("Space Invaders not start...(fail)\n");
+				} else {
+					utils::format("Space Invaders start...\n");
+					init_inv = true;
+				}
+			} else {
+				utils::format("SD card not found\n");
+				nnn = 60;
+			}
+		}
 
 		command_();
 
