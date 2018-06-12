@@ -195,8 +195,9 @@ namespace utils {
 #else
 				auto ret = f_mkdir(tmp);
 #endif
-				if(ret == FR_OK) ;
-				else if(ret == FR_EXIST) ;
+				if(ret == FR_OK) {
+					format("Build directory path: '%s'\n") % tmp;
+				} else if(ret == FR_EXIST) ;
 				else {
 					return false;
 				}
