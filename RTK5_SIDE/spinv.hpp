@@ -21,7 +21,7 @@ namespace emu {
 
 		InvadersMachine im_;
 
-		uint16_t	backc_;
+		uint16_t	scan_lines_[InvadersMachine::ScreenHeight];
 
 	public:
 		//-----------------------------------------------------------------//
@@ -29,7 +29,7 @@ namespace emu {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		spinv() : im_(), backc_(0) { }
+		spinv() : im_() { }
 
 
 		//-----------------------------------------------------------------//
@@ -73,31 +73,48 @@ namespace emu {
             for(uint32_t i = 0; i < 0x2000; ++i) {
             	sum += (uint8_t)rom[i];
             }
-            utils::format("SUM: %08X\n") % sum;
+            utils::format("ROM SUM: %08X\n") % sum;
 
 			im_.setROM(rom);
 
 			im_.reset();
 
-			auto fr = im_.getFrameRate();
-			utils::format("FrameRate: %d\n") % fr;
+//			auto fr = im_.getFrameRate();
+//			utils::format("FrameRate: %d\n") % fr;
+
+			for(int i = 0; i < InvadersMachine::ScreenHeight; ++i) {
+				uint16_t c = 0b11111'111111'11111;
+				if( i >=  32 && i <  64 ) c = 0b11111'000000'00000; // Red
+				if( i >= 184 && i < 240 ) c = 0b00000'111111'00000; // Green
+				scan_lines_[i] = c;
+			}
 
 			return true;
 		}
 
 
-		void service()
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  サービス
+			@param[in]	org		フレームバッファアドレス
+			@param[in]	w		横幅
+			@param[in]	h		高さ
+		*/
+		//-----------------------------------------------------------------//
+		void service(void* org, int w, int h)
 		{
 			const uint8_t* video = im_.getVideo();
 			if(video != nullptr) {
-				uint16_t* fb = (uint16_t*)0x00800000;
+				uint16_t* fb = static_cast<uint16_t*>(org);
+				uint32_t yo = (h - InvadersMachine::ScreenHeight) / 2;
+				uint32_t xo = (w - InvadersMachine::ScreenWidth) / 2;
 				for(uint32_t y = 0; y < InvadersMachine::ScreenHeight; ++y) {
-///					uint32_t c = scan_line_color_[y];
+					uint32_t c = scan_lines_[y];
 					for(uint32_t x = 0; x < InvadersMachine::ScreenWidth; ++x) {
 						if( *video ) {
-							fb[y * 480 + x] = 0xffff;
+							fb[(y + yo) * w + x + xo] = c;
 						} else {
-							fb[y * 480 + x] = backc_;
+							fb[(y + yo) * w + x + xo] = 0x0000;
 						}
 						++video;
 					}

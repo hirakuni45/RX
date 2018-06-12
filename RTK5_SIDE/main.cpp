@@ -252,7 +252,7 @@ int main(int argc, char** argv)
 			--nnn;
 		} else {
 			if(init_inv) {
-				spinv_.service();
+				spinv_.service((void*)0x00800000, 480, 272);
 			} else if(sdc_.get_mount()) {
 				if(!spinv_.start("/inv_roms")) {
 					utils::format("Space Invaders not start...(fail)\n");
