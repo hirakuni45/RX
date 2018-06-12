@@ -19,6 +19,19 @@
 */
 #include "arcade.h"
 
+InvadersMachine::InvadersMachine()
+{
+    cpu_ = new I8080( *this );
+    reset();
+    memset( ram_, 0, 0x2000 );  // Clear the ROM area
+    setFrameRate( 60 );
+}
+
+InvadersMachine::~InvadersMachine()
+{
+    delete cpu_;
+}
+
 unsigned char InvadersMachine::readByte( unsigned addr ) 
 {
     return addr < sizeof(ram_) ? ram_[addr] : 0xFF;
@@ -104,7 +117,7 @@ void InvadersMachine::reset( int ships, int easy )
     if( ships < 3 || ships > 6 ) ships = 3;
 
     // Reset the CPU and the other machine settings
-    cpu_.reset();
+    cpu_->reset();
     port1_ = 0;
     port2i_ = (ships - 3) & 0x03;   // DIP switches
     port2o_ = 0;
@@ -131,14 +144,14 @@ void InvadersMachine::step()
     // Before a frame is fully rendered, two interrupts have to occur
     for( int i=0; i<2; i++ ) {
         // Go on until an interrupt occurs
-        while( cpu_.getCycles() < cycles_per_interrupt_ )
-            cpu_.step();
+        while( cpu_->getCycles() < cycles_per_interrupt_ )
+            cpu_->step();
 
         // Adjust the cycles count
-        cpu_.setCycles( cpu_.getCycles() - cycles_per_interrupt_ );
+        cpu_->setCycles( cpu_->getCycles() - cycles_per_interrupt_ );
     
         // Call the proper interrupt
-        cpu_.interrupt( i ? 0x10 : 0x08 );
+        cpu_->interrupt( i ? 0x10 : 0x08 );
     }
 }
 

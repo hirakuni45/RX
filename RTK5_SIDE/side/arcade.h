@@ -44,11 +44,8 @@
     @see I8080
     @see I8080Environment
 */
-class InvadersMachine
+class InvadersMachine : public I8080Environment
 {
-	I8080Environment env_;
-    I8080            cpu_;
-
 public:
     /** Machine-related definitions. */
     enum Constants {
@@ -86,13 +83,10 @@ public:
 
 public:
     /** Constructor. */
-    InvadersMachine() : cpu_(env_) {
-	    reset();
-	    memset( ram_, 0, 0x2000 );  // Clear the ROM area
-		setFrameRate( 60 );
-	}
+    InvadersMachine();
 
-	~InvadersMachine() { }
+    /** Destructor. */
+    virtual ~InvadersMachine();
 
     /**
         Resets the machine.
@@ -242,10 +236,11 @@ private:
     unsigned char   port4hi_;   // Port 4 out (hi)
     unsigned char   port5o_;    // Port 5 out
     unsigned char   ram_[0x4000];
-    unsigned char   video_[ScreenWidth * ScreenHeight];
+    unsigned char   video_[ScreenWidth*ScreenHeight];
     unsigned        sounds_;
     unsigned        fps_;
     unsigned        cycles_per_interrupt_;
+    I8080 *         cpu_;
 };
 
 #endif // ARCADE_H_
