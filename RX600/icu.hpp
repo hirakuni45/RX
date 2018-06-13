@@ -150,10 +150,10 @@ namespace device {
 			SPRI2        = 108,
 			SPTI2        = 109,
 #endif
-			GROUPBL0	 = 110,
-			GROUPBL1	 = 111,
-			GROUPAL0	 = 112,
-			GROUPAL1	 = 113,
+			GROUPBL0	 = 110,  // ICU
+			GROUPBL1	 = 111,  // ICU
+			GROUPAL0	 = 112,  // ICU
+			GROUPAL1	 = 113,  // ICU
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 			RXIF11  	 = 114,  // SCIFA11
 			TXIF11   	 = 115,
@@ -559,6 +559,9 @@ namespace device {
 			bit_rw_t<ier0D, bitpos::B1>	TXI10;
 #endif
 			bit_rw_t<ier0D, bitpos::B2>	GROUPBE0;
+#if defined(SIG_RX65N)
+			bit_rw_t<ier0D, bitpos::B3>	GROUPBL2;
+#endif
 			bit_rw_t<ier0D, bitpos::B6>	GROUPBL0;
 			bit_rw_t<ier0D, bitpos::B7>	GROUPBL1;
 
@@ -722,6 +725,9 @@ namespace device {
 			rw8_t<base + 105> TXI10;
 #endif
 			rw8_t<base + 106> GROUPBE0;
+#if defined(SIG_RX65N)
+			rw8_t<base + 107> GROUPBL2;
+#endif
 			rw8_t<base + 110> GROUPBL0;
 			rw8_t<base + 111> GROUPBL1;
 			rw8_t<base + 112> GROUPAL0;

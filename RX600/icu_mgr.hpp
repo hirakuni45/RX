@@ -12,6 +12,7 @@
 #include "RX600/peripheral.hpp"
 #include "common/vect.h"
 #include "RX600/dmac.hpp"
+#include "common/dispatch.hpp"
 
 namespace device {
 
@@ -22,27 +23,79 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class icu_mgr {
 
-//		static ICU::VECTOR set_selectable_level_(uint8_t id, uint8_t lvl)
-//		{
-//
-//		}
-//			ICU::SLIBXR128 = TPU::get_TGIA();
-//			ICU::IPR.INTB128 = level_;
-//			ICU::IER.INTB128 = true;
+		static utils::dispatch<icu_t::VECTOR::GROUPBE0, 2>  GROUPBE0_dispatch_;
+#if defined(SIG_RX65N)
+		static utils::dispatch<icu_t::VECTOR::GROUPBL2, 1>  GROUPBL2_dispatch_;
+#endif
+		static utils::dispatch<icu_t::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_;
+		static utils::dispatch<icu_t::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_;
+		static utils::dispatch<icu_t::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_;
+		static utils::dispatch<icu_t::VECTOR::GROUPAL1, 12> GROUPAL1_dispatch_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みを設定する
-			@param[in]	t	周辺機器タイプ
+			@brief  割り込みレベルを設定する
+			@param[in]	icu	割り込み要因
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool set_level(peripheral t, uint8_t lvl)
+		static bool set_level(icu_t::VECTOR vec, uint8_t lvl) noexcept
 		{
 			bool ena = lvl != 0 ? true : false;
-			switch(t) {
+			switch(vec) {
+			case icu_t::VECTOR::GROUPBE0:
+				ICU::IER.GROUPBE0 = 0;
+				ICU::IPR.GROUPBE0 = lvl;
+				ICU::IER.GROUPBE0 = ena;
+				break;
+#if defined(SIG_RX65N)
+			case icu_t::VECTOR::GROUPBL2:
+				ICU::IER.GROUPBL2 = 0;
+				ICU::IPR.GROUPBL2 = lvl;
+				ICU::IER.GROUPBL2 = ena;
+				break;
+#endif
+			case icu_t::VECTOR::GROUPBL0:
+				ICU::IER.GROUPBL0 = 0;
+				ICU::IPR.GROUPBL0 = lvl;
+				ICU::IER.GROUPBL0 = ena;
+				break;
+			case icu_t::VECTOR::GROUPBL1:
+				ICU::IER.GROUPBL1 = 0;
+				ICU::IPR.GROUPBL1 = lvl;
+				ICU::IER.GROUPBL1 = ena;
+				break;
+			case icu_t::VECTOR::GROUPAL0:
+				ICU::IER.GROUPAL0 = 0;
+				ICU::IPR.GROUPAL0 = lvl;
+				ICU::IER.GROUPAL0 = ena;
+				break;
+			case icu_t::VECTOR::GROUPAL1:
+				ICU::IER.GROUPAL1 = 0;
+				ICU::IPR.GROUPAL1 = lvl;
+				ICU::IER.GROUPAL1 = ena;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みレベルを設定する
+			@param[in]	per	周辺機器タイプ
+			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static bool set_level(peripheral per, uint8_t lvl) noexcept
+		{
+			bool ena = lvl != 0 ? true : false;
+			switch(per) {
 			case peripheral::DMAC0:
 				ICU::IER.DMAC0I = 0;
 				ICU::IPR.DMAC0I = lvl;
@@ -272,7 +325,7 @@ namespace device {
 			@return 割り込みベクター（マッチするベクターが無ければ「VEC0」を返す）
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vector(peripheral per, uint8_t id)
+		static ICU::VECTOR get_vector(peripheral per, uint8_t id) noexcept
 		{
 			switch(per) {
 			case peripheral::TPU0:
@@ -302,7 +355,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool set_dmac(peripheral dma_per, ICU::VECTOR target)
+		static bool set_dmac(peripheral dma_per, ICU::VECTOR target) noexcept
 		{
 			switch(dma_per) {
 			case peripheral::DMAC0:
@@ -334,18 +387,6 @@ namespace device {
 				break;
 			}
 			return true;
-		}
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  DMAC74 ハンドラ
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void dmac74_handler_() noexcept
-		{
-			uint8_t f = DMIST();
-			
 		}
 
 
@@ -397,48 +438,53 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static INTERRUPT_FUNC void group_al1_handler_() noexcept
 		{
+
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  グループ割り込みを設定する
-			@param[in]	vec	グループ割り込み・インデックス
-			@param[in]	lvl	割り込みレベル（０なら割り込み禁止）
+			@param[in]	vec		グループ割り込みベクター
+			@param[in]	idx		グループ内インデックス
+			@param[in]	task	割り込み応答タスク
+			@return グループ割り込み以外なら「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void set_group_vector(ICU::VECTOR vec, uint8_t lvl)
+		static bool install_group_task(ICU::VECTOR vec, uint32_t idx, utils::TASK task) noexcept
 		{
-			bool ena = lvl != 0 ? true : false;
+			bool ret = false;
 			switch(vec) {
 			case ICU::VECTOR::GROUPBE0:
 				set_interrupt_task(group_be0_handler_, static_cast<uint32_t>(vec));
-				ICU::IPR.GROUPBE0 = lvl;
-				ICU::IER.GROUPBE0 = ena;
+				ret = GROUPBE0_dispatch_.set_task(idx, task);
 				break;
+#if defined(SIG_RX65N)
+			case ICU::VECTOR::GROUPBL2:
+				set_interrupt_task(group_be0_handler_, static_cast<uint32_t>(vec));
+				ret = GROUPBL2_dispatch_.set_task(idx, task);
+				break;
+#endif
 			case ICU::VECTOR::GROUPBL0:
 				set_interrupt_task(group_bl0_handler_, static_cast<uint32_t>(vec));
-				ICU::IPR.GROUPBL0 = lvl;
-				ICU::IER.GROUPBL0 = ena;
+				ret = GROUPBL0_dispatch_.set_task(idx, task);
 				break;
 			case ICU::VECTOR::GROUPBL1:
 				set_interrupt_task(group_bl1_handler_, static_cast<uint32_t>(vec));
-				ICU::IPR.GROUPBL1 = lvl;
-				ICU::IER.GROUPBL1 = ena;
+				ret = GROUPBL1_dispatch_.set_task(idx, task);
 				break;
 			case ICU::VECTOR::GROUPAL0:
 				set_interrupt_task(group_al0_handler_, static_cast<uint32_t>(vec));
-				ICU::IPR.GROUPAL0 = lvl;
-				ICU::IER.GROUPAL0 = ena;
+				ret = GROUPAL0_dispatch_.set_task(idx, task);
 				break;
 			case ICU::VECTOR::GROUPAL1:
 				set_interrupt_task(group_al1_handler_, static_cast<uint32_t>(vec));
-				ICU::IPR.GROUPAL1 = lvl;
-				ICU::IER.GROUPAL1 = ena;
+				ret = GROUPAL1_dispatch_.set_task(idx, task);
 				break;
 			default:
 				break;
 			}
+			return ret;
 		}
 	};
 }
