@@ -13,17 +13,19 @@
 
 namespace utils {
 
+	typedef void (*TASK)();		///< 関数呼び出し型
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  dispatch class
-		@param[in]	PER	ペリフェラル
+		@param[in]	VEC	グループ・ベクター
 		@param[in]	NUM	分岐数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<device::peripheral PER, uint32_t NUM>
+	template<device::icu_t::VECTOR VEC, uint32_t NUM>
 	class dispatch {
 
-		void*	task_[NUM];
+		TASK	task_[NUM];
 
 	public:
 		//-----------------------------------------------------------------//
@@ -36,14 +38,61 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	分岐タスクを登録
-			@param[in]	task	タスク
+			@brief	サイズを返す
+			@return サイズ
 		*/
 		//-----------------------------------------------------------------//
-		void set_task(void* task, uint32_t index) noexcept
+		uint32_t size() const noexcept { return NUM; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	分岐タスクを登録
+			@param[in]	index	インデックス
+			@param[in]	task	タスク
+			@return 不正なインデックスの場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool set_task(uint32_t index, TASK task) noexcept
 		{
 			if(index < NUM) {
 				task_[index] = task;
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	分岐タスクを取得
+			@param[in]	index	インデックス
+			@return 分岐タスク
+		*/
+		//-----------------------------------------------------------------//
+		TASK get_task(uint32_t index) noexcept
+		{
+			if(index < NUM) {
+				return task_[index];
+			} else {
+				return nullptr;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	分岐タスクを実行
+			@param[in]	index	インデックス
+		*/
+		//-----------------------------------------------------------------//
+		void run_task(uint32_t index) noexcept
+		{
+			if(index < NUM) {
+				if(task_[index] != nullptr) {
+					(*task_[index])();
+				}
 			}
 		}
 	};
