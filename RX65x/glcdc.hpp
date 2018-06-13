@@ -577,7 +577,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grmxven_t : public rw32_t<ofs> {
+		struct gamxven_t : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -586,9 +586,9 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  VEN;
 		};
-		static grmxven_t<base + 0x1300> GRMGVEN;
-		static grmxven_t<base + 0x1340> GRMBVEN;
-		static grmxven_t<base + 0x1380> GR2RVEN;
+		static gamxven_t<base + 0x1300> GAMGVEN;
+		static gamxven_t<base + 0x1340> GAMBVEN;
+		static gamxven_t<base + 0x1380> GAMRVEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
