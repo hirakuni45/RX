@@ -57,16 +57,16 @@ namespace device {
 			if(n < 10) n = 10;
 			else if(n > 30) n = 30;
 			n -= 10;
-			device::SYSTEM::PLLCR.STC = n + 0b010011;
+			device::SYSTEM::PLLCR.STC = n + 0b100111;  // base 240MHz(12MHz)
 			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
-			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)    // 1/2 (120/2=60)
-								  | device::SYSTEM::SCKCR.ICK.b(0)    // 1/1 (120/1=120)
-								  | device::SYSTEM::SCKCR.BCK.b(1)    // 1/2 (120/2=60)
-								  | device::SYSTEM::SCKCR.PCKA.b(0)   // 1/1 (120/1=120)
-								  | device::SYSTEM::SCKCR.PCKB.b(1)   // 1/2 (120/2=60)
-								  | device::SYSTEM::SCKCR.PCKC.b(1)   // 1/2 (120/2=60)
-								  | device::SYSTEM::SCKCR.PCKD.b(1);  // 1/2 (120/2=60)
+			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)    // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.ICK.b(1)    // 1/2 (240/2=120)
+								  | device::SYSTEM::SCKCR.BCK.b(2)    // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.PCKA.b(1)   // 1/2 (240/2=120)
+								  | device::SYSTEM::SCKCR.PCKB.b(2)   // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.PCKC.b(2)   // 1/4 (240/4=60)
+								  | device::SYSTEM::SCKCR.PCKD.b(2);  // 1/4 (240/4=60)
 			device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 		}
