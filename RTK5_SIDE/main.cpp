@@ -246,8 +246,6 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
-		sdc_.service(sdh_.service());
-
 		if(nnn > 0) {
 			--nnn;
 		} else {
@@ -265,11 +263,16 @@ int main(int argc, char** argv)
 				nnn = 60;
 			}
 		}
+//		uint32_t cnt = cmt_.get_cmt_count();
+//		uint32_t cmp = cmt_.get_cmp_count();
+
+		sdc_.service(sdh_.service());
 
 		command_();
 
 		++n;
 		if(n >= 30) {
+//			utils::format("CMT count: %d/%d\n") % cnt % cmp;
 			n = 0;
 		}
 		if(n < 10) {
