@@ -1095,13 +1095,16 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  グループ BE0 割り込み要求許可レジスタ（GENBE0）@n
-					グループ BL0/1 割り込み要求許可レジスタ（GENBL0/GENBL1）@n
+					グループ BL0/1 割り込み要求許可レジスタ（GENBL0/GENBL1/GENBL2）@n
 					グループ AL0/1 割り込み要求許可レジスタ（GENAL0/GENAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static gen_t<0x00087640> GENBE0;
 		static gen_t<0x00087670> GENBL0;
 		static gen_t<0x00087674> GENBL1;
+#if defined(SIG_RX65N)
+		static gen_t<0x00087678> GENBL2;
+#endif
 		static gen_t<0x00087870> GENAL0;
 		static gen_t<0x00087874> GENAL1;
 

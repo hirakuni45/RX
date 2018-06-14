@@ -392,53 +392,92 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ割り込み・ハンドラ GROUPBE0
+			@brief  グループ割り込み・ハンドラ GROUPBE0（エッジ割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static INTERRUPT_FUNC void group_be0_handler_() noexcept
 		{
+			uint32_t bits = ICU::GRPBE0() & GROUPBE0_dispatch_.get_mask();
+			uint32_t sign = 1;
+			for(uint32_t idx = 0; idx < GROUPBE0_dispatch_.size(); ++idx) {
+				if(bits & sign) {
+					GROUPBE0_dispatch_.run_task(idx);
+					ICU::GCRBE0 = sign;
+				}
+				sign <<= 1;
+			}
 		}
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ割り込み・ハンドラ GROUPBL0
+			@brief  グループ割り込み・ハンドラ GROUPBL0（レベル割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static INTERRUPT_FUNC void group_bl0_handler_() noexcept
 		{
-
+			uint32_t bits = ICU::GRPBL0() & GROUPBL0_dispatch_.get_mask();
+			uint32_t sign = 1;
+			for(uint32_t idx = 0; idx < GROUPBL0_dispatch_.size(); ++idx) {
+				if(bits & sign) {
+					GROUPBL0_dispatch_.run_task(idx);
+				}
+				sign <<= 1;
+			}
 		}
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ割り込み・ハンドラ GROUPBL1
+			@brief  グループ割り込み・ハンドラ GROUPBL1（レベル割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static INTERRUPT_FUNC void group_bl1_handler_() noexcept
 		{
+			uint32_t bits = ICU::GRPBL1() & GROUPBL1_dispatch_.get_mask();
+			uint32_t sign = 1;
+			for(uint32_t idx = 0; idx < GROUPBL1_dispatch_.size(); ++idx) {
+				if(bits & sign) {
+					GROUPBL1_dispatch_.run_task(idx);
+				}
+				sign <<= 1;
+			}
 		}
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ割り込み・ハンドラ GROUPAL0
+			@brief  グループ割り込み・ハンドラ GROUPAL0（レベル割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static INTERRUPT_FUNC void group_al0_handler_() noexcept
 		{
+			uint32_t bits = ICU::GRPAL0() & GROUPAL0_dispatch_.get_mask();
+			uint32_t sign = 1;
+			for(uint32_t idx = 0; idx < GROUPAL0_dispatch_.size(); ++idx) {
+				if(bits & sign) {
+					GROUPAL0_dispatch_.run_task(idx);
+				}
+				sign <<= 1;
+			}
 		}
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループ割り込み・ハンドラ GROUPAL1
+			@brief  グループ割り込み・ハンドラ GROUPAL1（レベル割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static INTERRUPT_FUNC void group_al1_handler_() noexcept
 		{
-
+			uint32_t bits = ICU::GRPAL1() & GROUPAL1_dispatch_.get_mask();
+			uint32_t sign = 1;
+			for(uint32_t idx = 0; idx < GROUPAL1_dispatch_.size(); ++idx) {
+				if(bits & sign) {
+					GROUPAL1_dispatch_.run_task(idx);
+				}
+				sign <<= 1;
+			}
 		}
 
 
@@ -454,32 +493,39 @@ namespace device {
 		static bool install_group_task(ICU::VECTOR vec, uint32_t idx, utils::TASK task) noexcept
 		{
 			bool ret = false;
+			bool ena = task != nullptr ? true : false;
 			switch(vec) {
 			case ICU::VECTOR::GROUPBE0:
 				set_interrupt_task(group_be0_handler_, static_cast<uint32_t>(vec));
 				ret = GROUPBE0_dispatch_.set_task(idx, task);
+				if(ena) ICU::GENBE0 |= 1 << idx; 
 				break;
 #if defined(SIG_RX65N)
 			case ICU::VECTOR::GROUPBL2:
 				set_interrupt_task(group_be0_handler_, static_cast<uint32_t>(vec));
 				ret = GROUPBL2_dispatch_.set_task(idx, task);
+				if(ena) ICU::GENBL2 |= 1 << idx; 
 				break;
 #endif
 			case ICU::VECTOR::GROUPBL0:
 				set_interrupt_task(group_bl0_handler_, static_cast<uint32_t>(vec));
 				ret = GROUPBL0_dispatch_.set_task(idx, task);
+				if(ena) ICU::GENBL0 |= 1 << idx; 
 				break;
 			case ICU::VECTOR::GROUPBL1:
 				set_interrupt_task(group_bl1_handler_, static_cast<uint32_t>(vec));
 				ret = GROUPBL1_dispatch_.set_task(idx, task);
+				if(ena) ICU::GENBL1 |= 1 << idx; 
 				break;
 			case ICU::VECTOR::GROUPAL0:
 				set_interrupt_task(group_al0_handler_, static_cast<uint32_t>(vec));
 				ret = GROUPAL0_dispatch_.set_task(idx, task);
+				if(ena) ICU::GENAL0 |= 1 << idx; 
 				break;
 			case ICU::VECTOR::GROUPAL1:
 				set_interrupt_task(group_al1_handler_, static_cast<uint32_t>(vec));
 				ret = GROUPAL1_dispatch_.set_task(idx, task);
+				if(ena) ICU::GENAL1 |= 1 << idx; 
 				break;
 			default:
 				break;
