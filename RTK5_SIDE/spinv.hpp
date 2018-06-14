@@ -23,6 +23,18 @@ namespace emu {
 
 		uint16_t	scan_lines_[InvadersMachine::ScreenHeight];
 
+		bool load_sounds_(const char* root)
+		{
+			static const char* sdf[] = {
+				"BaseHit.wav", "InvHit.Wav", "Shot.wav", "Ufo.wav",
+				"UfoHit.wav", "Walk1.wav", "Walk2.wav", "Walk3.wav",
+				"Walk4.wav"
+			};
+
+
+			return true;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -44,38 +56,45 @@ namespace emu {
 			static const char* rom_files[] = {
 				"invaders.h", "invaders.g", "invaders.f", "invaders.e"
 			};
-			char rom[0x2000];
-			for(uint32_t i = 0; i < 4; ++i) {
-				char tmp[256];
-				if(root != nullptr) {
-					strcpy(tmp, root);
-				} else {
-					strcpy(tmp, "/");
-				}
-				strcat(tmp, "/");
-				strcat(tmp, rom_files[i]);
 
-				FILE* fp = fopen(tmp, "rb");
-				if(fp == nullptr) {
-					utils::format("Can't open: '%s'\n") % tmp;
-					return false;
-				}
-				if(fread(&rom[i * 0x800], 1, 0x800, fp) != 0x800) {
-					utils::format("Can't read data: '%s'\n") % tmp;
+			{
+				char rom[0x2000];
+				for(uint32_t i = 0; i < 4; ++i) {
+					char tmp[256];
+					if(root != nullptr) {
+						strcpy(tmp, root);
+					} else {
+						strcpy(tmp, "/");
+					}
+					strcat(tmp, "/");
+					strcat(tmp, rom_files[i]);
+
+					FILE* fp = fopen(tmp, "rb");
+					if(fp == nullptr) {
+						utils::format("Can't open: '%s'\n") % tmp;
+						return false;
+					}
+					if(fread(&rom[i * 0x800], 1, 0x800, fp) != 0x800) {
+						utils::format("Can't read data: '%s'\n") % tmp;
+						fclose(fp);
+						return false;
+					}
+					utils::format("Read ROM: '%s'\n") % tmp;
 					fclose(fp);
-					return false;
 				}
-				utils::format("Read ROM: '%s'\n") % tmp;
-				fclose(fp);
+
+				uint32_t sum = 0;
+				for(uint32_t i = 0; i < 0x2000; ++i) {
+					sum += (uint8_t)rom[i];
+				}
+				utils::format("ROM SUM: %08X\n") % sum;
+
+				im_.setROM(rom);
 			}
 
-            uint32_t sum = 0;
-            for(uint32_t i = 0; i < 0x2000; ++i) {
-            	sum += (uint8_t)rom[i];
-            }
-            utils::format("ROM SUM: %08X\n") % sum;
-
-			im_.setROM(rom);
+			if(!load_sounds_(root)) {
+				utils::format("Sound files not found. no sound\n");
+			}
 
 			im_.reset();
 
