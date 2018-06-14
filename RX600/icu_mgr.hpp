@@ -483,6 +483,25 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  GROUPAL1 割り込みタスクを登録する
+			@param[in]	idx		グループ内インデックス
+			@param[in]	task	割り込みタスク（※nullptr なら無効）
+			@return グループ割り込み以外なら「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool install_group_task(ICU::VECTOR_AL1 idx, utils::TASK task) noexcept
+		{
+			bool ena = task != nullptr ? true : false;
+			set_interrupt_task(group_al1_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPAL1));
+			auto i = static_cast<uint32_t>(idx);
+			bool ret = GROUPAL1_dispatch_.set_task(i, task);
+			if(ret && ena) ICU::GENAL1 |= 1 << i;
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  グループ割り込みを設定する
 			@param[in]	vec		グループ割り込みベクター
 			@param[in]	idx		グループ内インデックス

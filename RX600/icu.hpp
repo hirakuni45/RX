@@ -312,6 +312,74 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  GROUPBE0・ベクター・インデックス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR_BE0 {
+			ERS0,	///< CAN0/ERS0
+			ERS1	///< CAN1/ERS1
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUPBL0・ベクター・インデックス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR_BL0 {
+			TEI0,	///< SCI0/TEI0（送信完了）
+			ERI0,	///< SCI0/ERI0（受信エラー）
+			TEI1,	///< SCI1/TEI1（送信完了）
+			ERI1,	///< SCI1/ERI1（受信エラー）
+			TEI2,	///< SCI2/TEI2（送信完了）
+			ERI2,	///< SCI2/ERI2（受信エラー）
+			TEI3,	///< SCI3/TEI3（送信完了）
+			ERI3,	///< SCI3/ERI3（受信エラー）
+			TEI4,	///< SCI4/TEI4（送信完了）
+			ERI4,	///< SCI4/ERI4（受信エラー）
+			TEI5,	///< SCI5/TEI5（送信完了）
+			ERI5,	///< SCI5/ERI5（受信エラー）
+			TEI6,	///< SCI6/TEI6（送信完了）
+			ERI6,	///< SCI6/ERI6（受信エラー）
+			TEI7,	///< SCI7/TEI7（送信完了）
+			ERI7,	///< SCI7/ERI7（受信エラー）
+			TEI12,	///< SCI12/TEI12（送信完了）
+			ERI12,	///< SCI12/ERI12（受信エラー）
+			SCIX0,	///< SCI12/SCIX0
+			SCIX1,	///< SCI12/SCIX1
+			SCIX2,	///< SCI12/SCIX2
+			SCIX3,	///< SCI12/SCIX3
+
+			QSPSSLI = 24,	///< QSPI/QSPSSLI
+
+			FERRI = 26,		///< CAC/FERRI
+			MENDI,			///< CAC/MENDI
+			OVFI,			///< CAC/OVFI
+			DOPCI,			///< DOC/DOPCI
+			PCFEI,			///< PDC/PCFEI
+			PCERI			///< PDC/PCERI
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUPAL1・ベクター・インデックス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR_AL1 {
+			EINT0 = 4,	///< EDMAC0/EINT0
+
+#if defined(SIG_RX65N)
+			VPOS = 8,	///< GLCDC/VPOS
+			GR1UF,		///< GLCDC/GR1UF
+			GR2UF,		///< GLCDC/GR2UF
+			DRW_IRQ		///< DRW2D/DRW_IRQ
+#endif
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  IR レジスタ
 			@param[in]	base	ベースアドレス
 		*/
