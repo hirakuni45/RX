@@ -28,6 +28,7 @@ CSOURCES	=	common/init.c \
 # r_lcd/r_glcdc_rx_pinset.c
 
 PSOURCES	=	main.cpp \
+				RX600/icu_mgr.cpp \
 				side/arcade.cpp \
 				side/i8080.cpp \
 				side/i8080opc.cpp \
