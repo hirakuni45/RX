@@ -346,13 +346,6 @@ struct glcdc_clut_cfg_t
     uint16_t size;                       // Size of CLUT entry to be updated.
 };
 
-/** Interrupt enable setting */
-struct glcdc_interrupt_cfg_t
-{
-    bool vpos_enable;                    // Line detection interrupt enable.
-    bool gr1uf_enable;                   // Graphics plane1 underflow interrupt enable.
-    bool gr2uf_enable;                   // Graphics plane2 underflow interrupt enable.
-};
 
 /** Detect enable setting */
 struct glcdc_detect_cfg_t

@@ -43,6 +43,21 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  Interrupt enable setting
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct glcdc_interrupt_cfg_t
+	{
+    	bool vpos_enable;          // Line detection interrupt enable.
+    	bool gr1uf_enable;         // Graphics plane1 underflow interrupt enable.
+    	bool gr2uf_enable;         // Graphics plane2 underflow interrupt enable.
+		glcdc_interrupt_cfg_t() : vpos_enable(false), gr1uf_enable(false), gr2uf_enable(false)
+		{ }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief	GLCD hardware specific control block
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -58,6 +73,9 @@ namespace device {
 		bool first_vpos_interrupt_flag;       // First vpos interrupt after release 
 											  // software reset.
 		glcdc_interrupt_cfg_t interrupt;      // Interrupt setting values.
+
+		volatile uint32_t	vpos_count;
+
 		glcdc_ctrl_t() :
 			state(glcdc_operating_status::CLOSED),
 			is_entry(false),
@@ -66,7 +84,8 @@ namespace device {
 			graphics_read_enable{ false },
 			p_callback(nullptr),
 			first_vpos_interrupt_flag(false),
-			interrupt()
+			interrupt(),
+			vpos_count(0)
 		{ }
 	};
 
@@ -348,16 +367,6 @@ namespace device {
 			{ }
 		};
 
-		/** Interrupt enable setting */
-		struct glcdc_interrupt_cfg_t {
-			bool vpos_enable;                    // Line detection interrupt enable.
-			bool gr1uf_enable;                   // Graphics plane1 underflow interrupt enable.
-			bool gr2uf_enable;                   // Graphics plane2 underflow interrupt enable.
-			glcdc_interrupt_cfg_t() :
-				vpos_enable(false), gr1uf_enable(false), gr2uf_enable(false)
-			{ }
-		};
-
 		static glcdc_ctrl_t	ctrl_blk_;
 		uint8_t			intr_lvl_;
 		error_t			last_error_;
@@ -522,7 +531,7 @@ namespace device {
 							  +  cfg.output.htiming.display_cyc) + cfg.output.htiming.back_porch);
 			vsync_total_cyc = (((cfg.output.vtiming.front_porch  + cfg.output.vtiming.sync_width)
 							  +  cfg.output.vtiming.display_cyc) + cfg.output.vtiming.back_porch);
-
+//			utils::format("Total LCD count: %d, %d\n") % hsync_total_cyc % vsync_total_cyc;
 			GLC::BGPERI.FH = (hsync_total_cyc - 1) & BG_PERI_FH_MASK;
 			GLC::BGPERI.FV = (vsync_total_cyc - 1) & BG_PERI_FV_MASK;
 
@@ -1208,10 +1217,8 @@ namespace device {
 		}
 
 
-		void interrupt_setting_(const glcdc_interrupt_cfg_t& interrupt)
+		static void interrupt_setting_(const glcdc_interrupt_cfg_t& interrupt)
 		{
-			icu_mgr::set_level(icu_t::VECTOR::GROUPAL1, intr_lvl_);
-
 			if(interrupt.vpos_enable) {
 				GLC::INTEN.VPOSINTEN = 1;
 			} else {
@@ -1415,7 +1422,6 @@ namespace device {
   //
   _PendingBuffer = 0;
 #endif
-
 #endif
 		}
 
@@ -1424,27 +1430,26 @@ namespace device {
 		{
 			glcdc_callback_args_t args;
 
-			/* Call back callback function if it is registered */
-///			&& ((uint32_t)FIT_NO_FUNC != (uint32_t)ctrl_blk_.p_callback))
 			if(ctrl_blk_.p_callback != nullptr) {
 				args.event = GLCDC_EVENT_LINE_DETECTION;
 				ctrl_blk_.p_callback((void *)&args);
 			}
 
-			/* Clear interrupt flag in the register of the GLCD module */
 			vpos_int_status_clear_();
 
-			if(false == ctrl_blk_.first_vpos_interrupt_flag) {
-				/* Clear interrupt flag in the register of the GLCD module */
+			if(!ctrl_blk_.first_vpos_interrupt_flag) {
+				// Clear interrupt flag in the register of the GLCD module
 				gr1uf_int_status_clear_();
 				gr2uf_int_status_clear_();
 
-				/* Set the GLCD interrupts */
+				// Set the GLCD interrupts
 				interrupt_setting_(ctrl_blk_.interrupt);
 
-				/* Set the first VPOS interrupt flag */
+				// Set the first VPOS interrupt flag
 				ctrl_blk_.first_vpos_interrupt_flag = true;
 			}
+
+			++ctrl_blk_.vpos_count;
 		}
 
 
@@ -1452,14 +1457,12 @@ namespace device {
 		{
 			glcdc_callback_args_t args;
 
-			/* Call back callback function if it is registered */
 			if(ctrl_blk_.p_callback != nullptr) {
-///  && ((uint32_t)FIT_NO_FUNC != (uint32_t)g_ctrl_blk.p_callback))
 				args.event = GLCDC_EVENT_GR1_UNDERFLOW;
-				ctrl_blk_.p_callback ((void *)&args);
+				ctrl_blk_.p_callback((void *)&args);
 			}
 
-			/* Clear interrupt flag in the register of the GLCD module */
+			// Clear interrupt flag in the register of the GLCD module
 			gr1uf_int_status_clear_();
 		}
 
@@ -1468,14 +1471,12 @@ namespace device {
 		{
 			glcdc_callback_args_t args;
 
-			/* Call the callback function if it is registered */
 			if(ctrl_blk_.p_callback != nullptr) {
-// && ((uint32_t)FIT_NO_FUNC != (uint32_t)g_ctrl_blk.p_callback))
 				args.event = GLCDC_EVENT_GR2_UNDERFLOW;
 				ctrl_blk_.p_callback ((void *)&args);
 			}
 
-			/* Clear interrupt flag in the register of the GLCD module */
+			// Clear interrupt flag in the register of the GLCD module
 			gr2uf_int_status_clear_();
 		}
 
@@ -1498,16 +1499,6 @@ namespace device {
 				+ cfg.output.vtiming.sync_width);
 			ctrl_blk_.hsize = cfg.output.htiming.display_cyc;
 			ctrl_blk_.vsize = cfg.output.vtiming.display_cyc;
-
-			// Subscribe each interrupt function
-			if(false == ctrl_blk_.is_entry) {
-#if 0
-		R_BSP_InterruptWrite (BSP_INT_SRC_AL1_GLCDC_VPOS, (bsp_int_cb_t) r_glcdc_line_detect_isr);
-		R_BSP_InterruptWrite (BSP_INT_SRC_AL1_GLCDC_GR1UF, (bsp_int_cb_t) r_glcdc_underflow_1_isr);
-		R_BSP_InterruptWrite (BSP_INT_SRC_AL1_GLCDC_GR2UF, (bsp_int_cb_t) r_glcdc_underflow_2_isr);
-#endif
-				ctrl_blk_.is_entry = true;
-			}
 
 			// Save status of frame buffer read enable
 			if(nullptr == cfg.input[FRAME_LAYER_1].base) {
@@ -1533,15 +1524,15 @@ namespace device {
 			// If one of the interrupt setting is enable, setting value is
 			// set after first vpos interrupt
 			glcdc_interrupt_cfg_t initial_interrupt;
-			if((true == cfg.interrupt.vpos_enable) || (true == cfg.interrupt.gr1uf_enable)
-				|| (true == cfg.interrupt.gr2uf_enable)) {
+			if(cfg.interrupt.vpos_enable || cfg.interrupt.gr1uf_enable
+			  || cfg.interrupt.gr2uf_enable) {
 				ctrl_blk_.first_vpos_interrupt_flag = false;
-				initial_interrupt.vpos_enable = true;
+				initial_interrupt.vpos_enable  = true;
 				initial_interrupt.gr1uf_enable = false;
 				initial_interrupt.gr2uf_enable = false;
 			} else {
 				ctrl_blk_.first_vpos_interrupt_flag = true;
-				initial_interrupt.vpos_enable = false;
+				initial_interrupt.vpos_enable  = false;
 				initial_interrupt.gr1uf_enable = false;
 				initial_interrupt.gr2uf_enable = false;
 			}
@@ -1604,6 +1595,16 @@ namespace device {
 				+ cfg.output.vtiming.display_cyc) + BG_PLANE_HSYNC_POS_MIN));
 
 			// Enable the GLCD detections and interrupts
+			if(!ctrl_blk_.is_entry) {
+				icu_mgr::set_level(ICU::VECTOR::GROUPAL1, intr_lvl_);
+				if(intr_lvl_ > 0) {
+					icu_mgr::install_group_task(ICU::VECTOR_AL1::VPOS,  line_detect_isr_);
+					icu_mgr::install_group_task(ICU::VECTOR_AL1::GR1UF, underflow_1_isr_);
+					icu_mgr::install_group_task(ICU::VECTOR_AL1::GR2UF, underflow_2_isr_);
+				}
+				ctrl_blk_.is_entry = true;
+			}
+
 			detect_setting_(cfg.detection);
 			interrupt_setting_(initial_interrupt);
 
@@ -1689,23 +1690,23 @@ namespace device {
   																      // No frequency division
   	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	      // Enable LCD_CLK output
 			//
-			// Definition of LCD
+			// Definition of LCD for 480x272 LCD by 60Hz
 			//
-			// Horizontal cycle (whole control screen)
-			// Vertical cycle (whole control screen)
+			// Horizontal cycle (whole control screen) 529
+			// Vertical cycle (whole control screen) 315
 			// Horizontal Synchronization Signal Assertion Position
-			cfg.output.htiming.front_porch = 5;
+			cfg.output.htiming.front_porch = 8;
 			// Vertical Synchronization Assertion Position
-			cfg.output.vtiming.front_porch = 8;
+			cfg.output.vtiming.front_porch = 10;
 			// Horizontal Active Pixel Start Position (min. 6 pixels)
-			cfg.output.htiming.back_porch = 40;
-			cfg.output.vtiming.back_porch = 8;
+			cfg.output.htiming.back_porch = 39;
+			cfg.output.vtiming.back_porch = 32;
 			// Horizontal Active Pixel Width
 			cfg.output.htiming.display_cyc = XSIZE;
 			// Vertical Active Display Width
 			cfg.output.vtiming.display_cyc = YSIZE;
 			// Vertical Active Display Start Position (min. 3 lines)
-			cfg.output.htiming.sync_width = 1;
+			cfg.output.htiming.sync_width = 2;
 			cfg.output.vtiming.sync_width = 1;
 			//
 			// Graphic 1 configuration
@@ -1866,9 +1867,7 @@ namespace device {
 			if(!ret) {
 				return false;
 			}
-			//
-			// Init DMA
-			//
+
 #if 0
 			R_DMACA_Init();
 			//
@@ -1974,8 +1973,11 @@ namespace device {
 				}
 
 				/* interrupt setting */
-///				r_glcdc_interrupt_setting ((glcdc_interrupt_cfg_t *) args);
-
+				{
+					const glcdc_interrupt_cfg_t* t =
+						static_cast<const glcdc_interrupt_cfg_t*>(args);
+					interrupt_setting_(*t);
+				}
 				break;
 
 	        case control_cmd::CLR_DETECTED_STATUS:
@@ -2019,6 +2021,20 @@ namespace device {
 
 			last_error_ = error_t::SUCCESS;
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  VPOS との同期
+		*/
+		//-----------------------------------------------------------------//
+		void sync_vpos() const noexcept
+		{
+			volatile auto n = ctrl_blk_.vpos_count;
+			while(n == ctrl_blk_.vpos_count) {
+				asm("nop");
+			}
 		}
 	};
 
