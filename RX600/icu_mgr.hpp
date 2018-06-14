@@ -444,6 +444,24 @@ namespace device {
 			}
 		}
 
+#if defined(SIG_RX65N)
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み・ハンドラ GROUPBL2（レベル割り込み）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static INTERRUPT_FUNC void group_bl2_handler_() noexcept
+		{
+			uint32_t bits = ICU::GRPBL2() & GROUPBL2_dispatch_.get_mask();
+			uint32_t sign = 1;
+			for(uint32_t idx = 0; idx < GROUPBL2_dispatch_.size(); ++idx) {
+				if(bits & sign) {
+					GROUPBL2_dispatch_.run_task(idx);
+				}
+				sign <<= 1;
+			}
+		}
+#endif
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -483,6 +501,102 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  GROUPBE0 割り込みタスクを登録する
+			@param[in]	idx		グループ内インデックス
+			@param[in]	task	割り込みタスク（※nullptr なら無効）
+			@return グループ割り込み以外なら「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool install_group_task(ICU::VECTOR_BE0 idx, utils::TASK task) noexcept
+		{
+			bool ena = task != nullptr ? true : false;
+			set_interrupt_task(group_be0_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPBE0));
+			auto i = static_cast<uint32_t>(idx);
+			bool ret = GROUPBE0_dispatch_.set_task(i, task);
+			if(ret && ena) ICU::GENBE0 |= 1 << i;
+			return ret;
+		}
+
+#if defined(SIG_RX65N)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  GROUPBL2 割り込みタスクを登録する
+			@param[in]	idx		グループ内インデックス
+			@param[in]	task	割り込みタスク（※nullptr なら無効）
+			@return グループ割り込み以外なら「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool install_group_task(ICU::VECTOR_BL2 idx, utils::TASK task) noexcept
+		{
+			bool ena = task != nullptr ? true : false;
+			set_interrupt_task(group_bl2_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPBL2));
+			auto i = static_cast<uint32_t>(idx);
+			bool ret = GROUPBL2_dispatch_.set_task(i, task);
+			if(ret && ena) ICU::GENBL2 |= 1 << i;
+			return ret;
+		}
+#endif
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  GROUPBL0 割り込みタスクを登録する
+			@param[in]	idx		グループ内インデックス
+			@param[in]	task	割り込みタスク（※nullptr なら無効）
+			@return グループ割り込み以外なら「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool install_group_task(ICU::VECTOR_BL0 idx, utils::TASK task) noexcept
+		{
+			bool ena = task != nullptr ? true : false;
+			set_interrupt_task(group_bl0_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPBL0));
+			auto i = static_cast<uint32_t>(idx);
+			bool ret = GROUPBL0_dispatch_.set_task(i, task);
+			if(ret && ena) ICU::GENBL0 |= 1 << i;
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  GROUPBL1 割り込みタスクを登録する
+			@param[in]	idx		グループ内インデックス
+			@param[in]	task	割り込みタスク（※nullptr なら無効）
+			@return グループ割り込み以外なら「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool install_group_task(ICU::VECTOR_BL1 idx, utils::TASK task) noexcept
+		{
+			bool ena = task != nullptr ? true : false;
+			set_interrupt_task(group_bl1_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPBL1));
+			auto i = static_cast<uint32_t>(idx);
+			bool ret = GROUPBL1_dispatch_.set_task(i, task);
+			if(ret && ena) ICU::GENBL1 |= 1 << i;
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  GROUPAL0 割り込みタスクを登録する
+			@param[in]	idx		グループ内インデックス
+			@param[in]	task	割り込みタスク（※nullptr なら無効）
+			@return グループ割り込み以外なら「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool install_group_task(ICU::VECTOR_AL0 idx, utils::TASK task) noexcept
+		{
+			bool ena = task != nullptr ? true : false;
+			set_interrupt_task(group_al0_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPAL0));
+			auto i = static_cast<uint32_t>(idx);
+			bool ret = GROUPAL0_dispatch_.set_task(i, task);
+			if(ret && ena) ICU::GENAL0 |= 1 << i;
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  GROUPAL1 割り込みタスクを登録する
 			@param[in]	idx		グループ内インデックス
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
@@ -496,59 +610,6 @@ namespace device {
 			auto i = static_cast<uint32_t>(idx);
 			bool ret = GROUPAL1_dispatch_.set_task(i, task);
 			if(ret && ena) ICU::GENAL1 |= 1 << i;
-			return ret;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  グループ割り込みを設定する
-			@param[in]	vec		グループ割り込みベクター
-			@param[in]	idx		グループ内インデックス
-			@param[in]	task	割り込み応答タスク
-			@return グループ割り込み以外なら「false」
-		*/
-		//-----------------------------------------------------------------//
-		static bool install_group_task(ICU::VECTOR vec, uint32_t idx, utils::TASK task) noexcept
-		{
-			bool ret = false;
-			bool ena = task != nullptr ? true : false;
-			switch(vec) {
-			case ICU::VECTOR::GROUPBE0:
-				set_interrupt_task(group_be0_handler_, static_cast<uint32_t>(vec));
-				ret = GROUPBE0_dispatch_.set_task(idx, task);
-				if(ena) ICU::GENBE0 |= 1 << idx; 
-				break;
-#if defined(SIG_RX65N)
-			case ICU::VECTOR::GROUPBL2:
-				set_interrupt_task(group_be0_handler_, static_cast<uint32_t>(vec));
-				ret = GROUPBL2_dispatch_.set_task(idx, task);
-				if(ena) ICU::GENBL2 |= 1 << idx; 
-				break;
-#endif
-			case ICU::VECTOR::GROUPBL0:
-				set_interrupt_task(group_bl0_handler_, static_cast<uint32_t>(vec));
-				ret = GROUPBL0_dispatch_.set_task(idx, task);
-				if(ena) ICU::GENBL0 |= 1 << idx; 
-				break;
-			case ICU::VECTOR::GROUPBL1:
-				set_interrupt_task(group_bl1_handler_, static_cast<uint32_t>(vec));
-				ret = GROUPBL1_dispatch_.set_task(idx, task);
-				if(ena) ICU::GENBL1 |= 1 << idx; 
-				break;
-			case ICU::VECTOR::GROUPAL0:
-				set_interrupt_task(group_al0_handler_, static_cast<uint32_t>(vec));
-				ret = GROUPAL0_dispatch_.set_task(idx, task);
-				if(ena) ICU::GENAL0 |= 1 << idx; 
-				break;
-			case ICU::VECTOR::GROUPAL1:
-				set_interrupt_task(group_al1_handler_, static_cast<uint32_t>(vec));
-				ret = GROUPAL1_dispatch_.set_task(idx, task);
-				if(ena) ICU::GENAL1 |= 1 << idx; 
-				break;
-			default:
-				break;
-			}
 			return ret;
 		}
 	};

@@ -316,8 +316,11 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BE0 {
-			ERS0,	///< CAN0/ERS0
-			ERS1	///< CAN1/ERS1
+			ERS0,	///< CAN0 / ERS0
+			ERS1,	///< CAN1 / ERS1
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			ERS2	///< CAN2 / ERS2
+#endif
 		};
 
 
@@ -327,37 +330,131 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL0 {
-			TEI0,	///< SCI0/TEI0（送信完了）
-			ERI0,	///< SCI0/ERI0（受信エラー）
-			TEI1,	///< SCI1/TEI1（送信完了）
-			ERI1,	///< SCI1/ERI1（受信エラー）
-			TEI2,	///< SCI2/TEI2（送信完了）
-			ERI2,	///< SCI2/ERI2（受信エラー）
-			TEI3,	///< SCI3/TEI3（送信完了）
-			ERI3,	///< SCI3/ERI3（受信エラー）
-			TEI4,	///< SCI4/TEI4（送信完了）
-			ERI4,	///< SCI4/ERI4（受信エラー）
-			TEI5,	///< SCI5/TEI5（送信完了）
-			ERI5,	///< SCI5/ERI5（受信エラー）
-			TEI6,	///< SCI6/TEI6（送信完了）
-			ERI6,	///< SCI6/ERI6（受信エラー）
-			TEI7,	///< SCI7/TEI7（送信完了）
-			ERI7,	///< SCI7/ERI7（受信エラー）
-			TEI12,	///< SCI12/TEI12（送信完了）
-			ERI12,	///< SCI12/ERI12（受信エラー）
-			SCIX0,	///< SCI12/SCIX0
-			SCIX1,	///< SCI12/SCIX1
-			SCIX2,	///< SCI12/SCIX2
-			SCIX3,	///< SCI12/SCIX3
+			TEI0,	///< SCI0 / TEI0（送信完了）
+			ERI0,	///< SCI0 / ERI0（受信エラー）
+			TEI1,	///< SCI1 / TEI1（送信完了）
+			ERI1,	///< SCI1 / ERI1（受信エラー）
+			TEI2,	///< SCI2 / TEI2（送信完了）
+			ERI2,	///< SCI2 / ERI2（受信エラー）
+			TEI3,	///< SCI3 / TEI3（送信完了）
+			ERI3,	///< SCI3 / ERI3（受信エラー）
+			TEI4,	///< SCI4 / TEI4（送信完了）
+			ERI4,	///< SCI4 / ERI4（受信エラー）
+			TEI5,	///< SCI5 / TEI5（送信完了）
+			ERI5,	///< SCI5 / ERI5（受信エラー）
+			TEI6,	///< SCI6 / TEI6（送信完了）
+			ERI6,	///< SCI6 / ERI6（受信エラー）
+			TEI7,	///< SCI7 / TEI7（送信完了）
+			ERI7,	///< SCI7 / ERI7（受信エラー）
+			TEI12,	///< SCI12 / TEI12（送信完了）
+			ERI12,	///< SCI12 / ERI12（受信エラー）
+			SCIX0,	///< SCI12 / SCIX0
+			SCIX1,	///< SCI12 / SCIX1
+			SCIX2,	///< SCI12 / SCIX2
+			SCIX3,	///< SCI12 / SCIX3
 
-			QSPSSLI = 24,	///< QSPI/QSPSSLI
+			QSPSSLI = 24,	///< QSPI / QSPSSLI
 
-			FERRI = 26,		///< CAC/FERRI
-			MENDI,			///< CAC/MENDI
-			OVFI,			///< CAC/OVFI
-			DOPCI,			///< DOC/DOPCI
-			PCFEI,			///< PDC/PCFEI
-			PCERI			///< PDC/PCERI
+			FERRI = 26,		///< CAC / FERRI
+			MENDI,			///< CAC / MENDI
+			OVFI,			///< CAC / OVFI
+			DOPCI,			///< DOC / DOPCI
+			PCFEI,			///< PDC / PCFEI
+			PCERI			///< PDC / PCERI
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUPBL1・ベクター・インデックス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR_BL1 {
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			OVFI = 0,		///< SRC / OVFI
+			UDFI,			///< SRC / UDFI
+			CEFI,			///< SRC / CEFI
+#endif
+			CDETI = 3,		///< SDHI / CDETI
+			CACI,			///< SDHI / CACI
+			SDACI,			///< SDHI / SDACI
+			CDETIO,			///< MMCIF / CDETIO
+			ERRIO,			///< MMCIF / ERRIO
+			ACCIO,			///< MMCIF / ACCIO
+			OEI1,			///< POE3 / OEI1
+			OEI2,			///< POE3 / OEI2
+			OEI3,			///< POE3 / OEI3
+			OEI4,			///< POE3 / OEI4
+			TEI0,			///< RIIC0 / TEI0
+			EEI0,			///< RIIC0 / EEI0
+			TEI2,			///< RIIC2 / TEI2
+			EEI2,			///< RIIC2 / EEI2
+
+			S12CMPAI = 20,	///< S12AD / S12CMPAI
+			S12CMPBI,		///< S12AD / S12CMPBI
+			S12CMPAI1,		///< S12AD1 / S12CMPAI1
+			S12CMPBI1,		///< S12AD1 / S12CMPBI1
+			TEI8,			///< SCI8 / TEI8
+			ERI8,			///< SCI8 / ERI8
+			TEI9,			///< SCI9 / TEI9
+			ERI9,			///< SCI9 / ERI9
+			TEI1,			///< RIIC1 / TEI1
+			EEI1,			///< RIIC1 / EEI1
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUPBL2・ベクター・インデックス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR_BL2 {
+			SDIOI,			///< SDSI / SDIOI
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GROUPAL0・ベクター・インデックス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR_AL0 {
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			TEIF8 = 0,		///< SCIFA8 / TEIF8
+			ERIF8,			///< SCIFA8 / ERIF8
+			BRIF8,			///< SCIFA8 / BRIF8
+			DRIF8,			///< SCIFA8 / DRIF8
+			TEIF9,			///< SCIFA9 / TEIF9
+			ERIF9,			///< SCIFA9 / ERIF9
+			BRIF9,			///< SCIFA9 / BRIF9
+			DRIF9,			///< SCIFA9 / DRIF9
+#endif
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			TEIF10,			///< SCIFA10 / TEIF10
+			ERIF10,			///< SCIFA10 / ERIF10
+			BRIF10,			///< SCIFA10 / BRIF10
+			DRIF10,			///< SCIFA10 / DRIF10
+			TEIF11,			///< SCIFA11 / TEIF11
+			ERIF11,			///< SCIFA11 / ERIF11
+			BRIF11,			///< SCIFA11 / BRIF11
+			DRIF11,			///< SCIFA11 / DRIF11
+#elif defined(SIG_RX65N)
+			TEI10 = 8,		///< SCI10 / TEI10
+			ERI10,			///< SCI10 / ERI10
+
+			TEI11 = 12,		///< SCI11 / TEI11
+			ERI11,			///< SCI11 / ERI11
+#endif
+			SPII0 = 16,		///< RSPI0 / SPII0
+			SPEI0,			///< RSPI0 / SPEI0
+#if defined(SIG_RX71M) || defined(SIG_RX65N)
+			SPII1,			///< RSPI1 / SPII1
+			SPEI1,			///< RSPI1 / SPEI1
+#endif
+#if defined(SIG_RX65N)
+			SPII2,			///< RSPI2 / SPII2
+			SPEI2,			///< RSPI2 / SPEI2
+#endif
 		};
 
 
@@ -367,13 +464,19 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_AL1 {
-			EINT0 = 4,	///< EDMAC0/EINT0
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			MINT = 0,		///< EPTPC / MINT
+			PINT,			///< PTPEDMAC / PINT
+#endif
+			EINT0 = 4,		///< EDMAC0/EINT0
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			EINT1 = 5,		///< EDMAC1/EINT1
+#endif
 #if defined(SIG_RX65N)
-			VPOS = 8,	///< GLCDC/VPOS
-			GR1UF,		///< GLCDC/GR1UF
-			GR2UF,		///< GLCDC/GR2UF
-			DRW_IRQ		///< DRW2D/DRW_IRQ
+			VPOS = 8,		///< GLCDC/VPOS
+			GR1UF,			///< GLCDC/GR1UF
+			GR2UF,			///< GLCDC/GR2UF
+			DRW_IRQ			///< DRW2D/DRW_IRQ
 #endif
 		};
 
@@ -1104,6 +1207,9 @@ namespace device {
 		static grp_t<0x00087600> GRPBE0;
 		static grp_t<0x00087630> GRPBL0;
 		static grp_t<0x00087634> GRPBL1;
+#if defined(SIG_RX65N)
+		static grp_t<0x00087638> GRPBL2;
+#endif
 		static grp_t<0x00087830> GRPAL0;
 		static grp_t<0x00087834> GRPAL1;
 
