@@ -244,7 +244,8 @@ int main(int argc, char** argv)
 
 	uint8_t n = 0;
 	while(1) {
-		cmt_.sync();
+//		cmt_.sync();
+		glcdc_io_.sync_vpos();
 
 		if(nnn > 0) {
 			--nnn;
