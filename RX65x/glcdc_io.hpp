@@ -10,8 +10,8 @@
 //=====================================================================//
 #include "RX65x/glcdc.hpp"
 #include "common/delay.hpp"
-#include "glcdc_def.hpp"
 #include "RX600/dmac_mgr.hpp"
+#include "glcdc_def.hpp"
 
 namespace device {
 
@@ -58,6 +58,28 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  Display output signal timing setting
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct glcdc_timing_t
+	{
+		uint16_t display_cyc;		///< Active video cycles or lines.
+		uint16_t front_porch;		///< Front poach cycles or lines.
+		uint16_t back_porch;		///< Back poach cycles or lines.
+		uint16_t sync_width;		///< Sync signal asserting width.
+	};
+
+
+	/** Coordinate */
+	struct glcdc_coordinate_t
+	{
+	    int16_t x;              // Coordinate X, this allows to set signed value.
+	    int16_t y;              // Coordinate Y, this allows to set signed value.
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief	GLCD hardware specific control block
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -69,7 +91,7 @@ namespace device {
 		uint16_t vsize;                       // Vertical pixel size in a frame.
 ///		bool graphics_read_enable[FRAME_LAYER_NUM];  // Graphics data read enable.
 		bool graphics_read_enable[2];  // Graphics data read enable.
-		void (*p_callback)(void *);           // Pointer to callback function.
+		void (*callback)(void *);           // Pointer to callback function.
 		bool first_vpos_interrupt_flag;       // First vpos interrupt after release 
 											  // software reset.
 		glcdc_interrupt_cfg_t interrupt;      // Interrupt setting values.
@@ -82,7 +104,7 @@ namespace device {
 			active_start_pos(),
 			hsize(0), vsize(0),
 			graphics_read_enable{ false },
-			p_callback(nullptr),
+			callback(nullptr),
 			first_vpos_interrupt_flag(false),
 			interrupt(),
 			vpos_count(0)
@@ -112,6 +134,206 @@ namespace device {
 
 		/* Number of clock division ratio setting items */
 		static const uint32_t PANEL_CLKDIV_NUM = 13;
+
+
+
+
+
+
+		/** Serial RGB data output delay cycles select (this function is not supported) */
+		enum class SERIAL_OUTPUT_DELAY
+		{
+		    CYCLE_0 = 0,        // 0 cycles delay.
+		    CYCLE_1 = 1,        // 1 cycle delay.
+		    CYCLE_2 = 2,        // 2 cycles delay.
+		    CYCLE_3 = 3,        // 3 cycles delay.
+		};
+
+
+		/** Serial RGB scan direction select (this function is not supported) */
+		enum class SERIAL_SCAN_DIRECTION
+		{
+			FORWARD = 0,     // Forward scan.
+			REVERSE = 1,     // Reverse scan.
+		};
+
+
+		/** RGB Color setting */
+		struct color_t
+		{
+			// little endian
+		    union
+		    {
+		        uint32_t argb;
+		        struct
+		        {
+		            uint32_t b:8;      // blue.
+		            uint32_t g:8;      // green.
+		            uint32_t r:8;      // red.
+		            uint32_t a:8;      // alpha.
+		        } byte;
+		    };
+		};
+
+
+		struct gamma_correction_t
+		{
+			static const uint32_t GAMMA_CURVE_GAIN_ELEMENT_NUM      = 16;
+			static const uint32_t GAMMA_CURVE_THRESHOLD_ELEMENT_NUM = 15;
+
+			struct correction_t
+			{
+				uint16_t gain[GAMMA_CURVE_GAIN_ELEMENT_NUM];               // Gain adjustment.
+				uint16_t threshold[GAMMA_CURVE_THRESHOLD_ELEMENT_NUM];     // Start threshold.
+			};
+
+			bool enable;                  // Gamma Correction On/Off.
+			correction_t* p_r;            // Gamma correction for R channel.
+			correction_t* p_g;            // Gamma correction for G channel.
+			correction_t* p_b;            // Gamma correction for B channel.
+		};
+
+
+		struct contrast_t
+		{
+			bool enable;			// Contrast Correction On/Off.
+			uint8_t r;				// Contrast (gain) adjustment for R channel.
+			uint8_t g;				// Contrast (gain) adjustment for G channel.
+			uint8_t b;				// Contrast (gain) adjustment for B channel.
+		};
+
+
+		/** Brightness (DC) correction setting */
+		struct brightness_t
+		{
+		    bool enable;        // Brightness Correction On/Off.
+		    uint16_t r;         // Brightness (DC) adjustment for R channel.
+		    uint16_t g;         // Brightness (DC) adjustment for G channel.
+		    uint16_t b;         // Brightness (DC) adjustment for B channel.
+		};
+
+
+		/** Chroma key setting */
+		struct chromakey_t
+		{
+		    bool enable;                         // Chroma key On/Off.
+		    color_t before;                // Compare Color for -RGB.
+		    color_t after;                 // Replace Color for ARGB.
+		};
+
+
+		/** Color correction setting */
+		struct correction_t
+		{
+		    brightness_t brightness;       // Brightness setting.
+		    contrast_t contrast;           // Contrast setting.
+		    gamma_correction_t gamma;      // Gamma setting.
+		};
+
+
+		/** Dithering setup parameter */
+		struct dithering_t
+		{
+		    bool dithering_on;                               // Dithering on/off.
+		    glcdc_dithering_mode_t dithering_mode;           // Dithering mode.
+		    glcdc_dithering_pattern_t dithering_pattern_a;   // Dithering pattern A.
+		    glcdc_dithering_pattern_t dithering_pattern_b;   // Dithering pattern B.
+		    glcdc_dithering_pattern_t dithering_pattern_c;   // Dithering pattern C.
+		    glcdc_dithering_pattern_t dithering_pattern_d;   // Dithering pattern D.
+		};
+
+
+		/** Graphics plane input configuration */
+		struct input_cfg_t
+		{
+			void*	 base;                   // Base address to the frame buffer.
+			uint16_t hsize;                      // Horizontal pixel size in a line.
+			uint16_t vsize;                      // Vertical pixel size in a frame.
+			int32_t offset;                      // offset value to next line.
+			glcdc_in_format_t format;            // Input format setting.
+			bool frame_edge;                     // Show/hide setting of the frame of the graphics area.
+			glcdc_coordinate_t coordinate;       // Starting point of image.
+			color_t bg_color;              // Color outside region.
+		};
+
+
+		/** Display output configuration */
+		struct output_cfg_t
+		{
+			glcdc_timing_t                 htiming;                // Horizontal display cycle setting.
+			glcdc_timing_t                 vtiming;                // Vertical display cycle setting.
+			glcdc_out_format_t             format;                 // Output format setting.
+			glcdc_endian_t                 endian;                 // Bit order of output data.
+			glcdc_color_order_t            color_order;            // Color order in pixel.
+			glcdc_sync_edge_t              sync_edge;              // Signal sync edge selection.
+
+			color_t                  bg_color;               // Background color.
+
+			brightness_t             brightness;             // Brightness setting.
+			contrast_t               contrast;               // Contrast setting.
+			gamma_correction_t       gamma;                  // Gamma correction setting.
+			glcdc_correction_proc_order_t  correction_proc_order;  // Correction control route select.
+
+			dithering_t              dithering;              // Dithering setting.
+
+			glcdc_tcon_pin_t               tcon_hsync;             // GLCD TCON output pin select.
+			glcdc_tcon_pin_t               tcon_vsync;             // GLCD TCON output pin select.
+			glcdc_tcon_pin_t               tcon_de;                // GLCD TCON output pin select.
+			glcdc_signal_polarity_t        data_enable_polarity;   // Data Enable signal polarity.
+			glcdc_signal_polarity_t        hsync_polarity;         // Horizontal sync signal polarity.
+			glcdc_signal_polarity_t        vsync_polarity;         // Vertical sync signal polarity.
+
+			glcdc_clk_src_t                clksrc;                 // Clock Source selection.
+			glcdc_panel_clk_div_t          clock_div_ratio;        // Clock divide ratio for dot clock.
+
+			SERIAL_OUTPUT_DELAY		serial_output_delay;    // Serial RGB Data output delay cycle select (this function is not supported).
+			SERIAL_SCAN_DIRECTION	serial_scan_direction;  // Serial RGB Scan direction select (this function is not supported).
+		};
+
+
+		/** Graphics layer blend setup parameter */
+		struct blend_t
+		{
+			glcdc_blend_control_t blend_control;   // Layer fade-in/out , blending on/off.
+			bool visible;                          // Visible or hide graphics.
+			bool frame_edge;                       // Show/hide setting of the frame of rectangular alpha blending area.
+			uint8_t fixed_blend_value;             // Blend value. Valid only when blend_control is _FIXED.
+			uint8_t fade_speed;                    // Layer fade-in/out frame rate.
+			glcdc_coordinate_t  start_coordinate;  // Start coordinate of rectangle blending.
+			glcdc_coordinate_t  end_coordinate;    // End coordinate of rectangle blending.
+		};
+
+
+		/** CLUT configuration */
+		struct clut_cfg_t
+		{
+			bool enable;        // CLUT update enable/disable.
+			uint32_t * p_base;  // Pointer to CLUT source data.
+			uint16_t start;     // Beginning of CLUT entry to be updated.
+			uint16_t size;      // Size of CLUT entry to be updated.
+		};
+
+
+		/** Detect enable setting */
+		struct detect_cfg_t
+		{
+			bool vpos_detect;   // Line detection enable.
+			bool gr1uf_detect;  // Graphics plane1 underflow detection enable.
+			bool gr2uf_detect;  // Graphics plane2 underflow detection enable.
+		};
+
+
+		/** Display callback parameter definition */
+		struct callback_args_t
+		{
+			enum class EVENT {
+				GR1_UNDERFLOW = 1,         // Graphics plane1 underflow occurs
+				GR2_UNDERFLOW = 2,         // Graphics plane2 underflow occurs
+				LINE_DETECTION = 3,        // Designated line is processed.
+			};
+			EVENT event;      // Event code.
+		};
+
 
 	public:
 		static const uint32_t FRAME_LAYER_1 = 0;	///< Frame layer 1.
@@ -153,22 +375,23 @@ namespace device {
 		};
 
 
-		/** GLCDC main configuration */
+
+
 		struct cfg_t
 		{
 		    /** Generic configuration for display devices */
-		    glcdc_input_cfg_t input[FRAME_LAYER_NUM];     // Graphics input frame setting.
-		    glcdc_output_cfg_t output;                    // Graphics output frame setting.
-		    glcdc_blend_t blend[FRAME_LAYER_NUM];         // Graphics layer blend setting.
-		    glcdc_chromakey_t chromakey[FRAME_LAYER_NUM]; // Graphics chroma key setting.
-		    glcdc_clut_cfg_t clut[FRAME_LAYER_NUM];       // Graphics CLUT setting.
+		    input_cfg_t input[FRAME_LAYER_NUM];     // Graphics input frame setting.
+		    output_cfg_t output;                    // Graphics output frame setting.
+		    blend_t blend[FRAME_LAYER_NUM];         // Graphics layer blend setting.
+		    chromakey_t chromakey[FRAME_LAYER_NUM]; // Graphics chroma key setting.
+		    clut_cfg_t clut[FRAME_LAYER_NUM];       // Graphics CLUT setting.
 
 		    /** Interrupt setting*/
-		    glcdc_detect_cfg_t     detection;           // Detection enable/disable setting.
+		    detect_cfg_t     detection;           // Detection enable/disable setting.
 		    glcdc_interrupt_cfg_t  interrupt;           // Interrupt enable/disable setting.
 
 		    /** Configuration for display event processing */
-		    void (*p_callback)(void *);                 // Pointer to callback function.
+		    void (*callback)(void *);                 // Pointer to callback function.
 		};
 
 
@@ -176,9 +399,9 @@ namespace device {
 		struct runtime_cfg_t
 		{
 		    /** Generic configuration for display devices */
-		    glcdc_input_cfg_t input;             // Graphics input frame setting
-		    glcdc_blend_t blend;                 // Graphics layer blend setting.
-		    glcdc_chromakey_t chromakey;         // Graphics chroma key setting.
+		    input_cfg_t input;             // Graphics input frame setting
+		    blend_t blend;                 // Graphics layer blend setting.
+		    chromakey_t chromakey;         // Graphics chroma key setting.
 		};
 
 
@@ -186,26 +409,26 @@ namespace device {
 		struct status_t
 		{
 			glcdc_operating_status state;               // Status of GLCD module
-		    glcdc_detected_status_t state_vpos;           // Status of line detection.
-		    glcdc_detected_status_t state_gr1uf;          // Status of graphics plane1 underflow.
-		    glcdc_detected_status_t state_gr2uf;          // Status of graphics plane2 underflow.
+		    bool state_vpos;           // Status of line detection.
+		    bool state_gr1uf;          // Status of graphics plane1 underflow.
+		    bool state_gr2uf;          // Status of graphics plane2 underflow.
 		    glcdc_fade_status_t fade_status[FRAME_LAYER_NUM];  // Status of fade-in/fade-out status
 		};
 
-	private:
-		//
-		// Buffer size and stride
-		//
+		private:
+
 		static const uint32_t BYTES_PER_LINE   = ((PIX_WIDTH * XSIZE) / 8);
 		static const uint32_t LINE_OFFSET      = (((BYTES_PER_LINE + 63) / 64) * 64);
 		static const uint32_t VXSIZE_PHYS      = ((LINE_OFFSET * 8) / PIX_WIDTH);
 		static const uint32_t BYTES_PER_BUFFER = (LINE_OFFSET * YSIZE);
 
-
 		static const uint32_t BRIGHTNESS_ = 0x200;
 		static const uint32_t CONTRAST_   = 0x80;
 
-		static const uint32_t GLCDC_ADDRESS_ALIGNMENT_64B = 0x0000003F;
+		static const uint32_t ADDRESS_ALIGNMENT_64B = 0x0000003F;
+
+		static const uint32_t GAMMA_CURVE_GAIN_ELEMENT_NUM      = 16;
+		static const uint32_t GAMMA_CURVE_THRESHOLD_ELEMENT_NUM = 15;
 
 		/* Fixed margin by Hardware operation */
 		static const uint32_t BG_PLANE_H_CYC_MARGIN_MIN  = 2;    /* Hsync signal margin is 2 */
@@ -310,66 +533,47 @@ namespace device {
 
 		static const uint32_t SYSCNT_PANEL_CLK_DCDR_MASK = 0x3F;
 
-		/** Timing signals for driving the LCD panel */
-		typedef enum e_glcdc_tcon_signal_select
-		{
-		    GLCDC_TCON_SIGNAL_SELECT_STVA_VS = 0,  // STVA/VS
-		    GLCDC_TCON_SIGNAL_SELECT_STVB_VE = 1,  // STVB/VE
-		    GLCDC_TCON_SIGNAL_SELECT_STHA_HS = 2,  // STH/SP/HS
-		    GLCDC_TCON_SIGNAL_SELECT_STHB_HE = 3,  // STB/LP/HE
-		    GLCDC_TCON_SIGNAL_SELECT_DE      = 7   // DE
-		} glcdc_tcon_signal_select_t;
 
-
-		/** Fade control initial value set */
-		typedef enum e_glcd_fading_ctrl_initial_alpha
-		{
-			// Initial alpha value setting for a graphics plane is zero.
-			GLCDC_FADING_CONTROL_INITIAL_ALPHA_MIN = 0,
-			// Initial alpha value setting for a graphics plane is maximum.
-			GLCDC_FADING_CONTROL_INITIAL_ALPHA_MAX = 0xff
-		} glcdc_fade_ctrl_initial_alpha_t;
-
-		/** Blend plane select */
-		typedef enum e_glcdc_plane_blend
-		{
-    		GLCDC_PLANE_BLEND_TRANSPARENT = 1,     // Current graphics layer is transparent
-												   // and the lower layer is displayed.
-			GLCDC_PLANE_BLEND_NON_TRANSPARENT = 2, // Current graphics layer is displayed.
-			GLCDC_PLANE_BLEND_ON_LOWER_LAYER = 3   // Current graphics layer is blended with
-												   // the lower layer.
-		} glcdc_plane_blend_t;
-
-
-		/** Clut plane select */
-		typedef enum e_glcdc_clut_plane
-		{
-			GLCDC_CLUT_PLANE_0 = 0,                // GLCD CLUT plane 0.
-			GLCDC_CLUT_PLANE_1 = 1                 // GLCD CLUT plane 1.
-		} glcdc_clut_plane_t;
-
-
-		/** Dithering output format */
-		typedef enum e_glcdc_dithering_output_format
-		{
-			GLCDC_DITHERING_OUTPUT_FORMAT_RGB888 = 0,  // Dithering output format RGB888.
-			GLCDC_DITHERING_OUTPUT_FORMAT_RGB666 = 1,  // Dithering output format RGB666.
-			GLCDC_DITHERING_OUTPUT_FORMAT_RGB565 = 2   // Dithering output format RGB565.
-		} glcdc_dithering_output_format_t;
-
-
-		/** Coordinate */
-		struct glcdc_coordinate_t
-		{
-    		int16_t x;                           // Coordinate X, this allows to set signed value.
-    		int16_t y;                           // Coordinate Y, this allows to set signed value.
-			glcdc_coordinate_t(int16_t x_ = 0, int16_t y_ = 0) : x(x_), y(y_)
-			{ }
+		struct TCON_SIGNAL_SELECT {
+		    static const uint32_t STVA_VS = 0;  // STVA/VS
+		    static const uint32_t STVB_VE = 1;  // STVB/VE
+		    static const uint32_t STHA_HS = 2;  // STH/SP/HS
+		    static const uint32_t STHB_HE = 3;  // STB/LP/HE
+		    static const uint32_t DE      = 7;  // DE
 		};
 
+
+		struct FADING_CONTROL_INITIAL_ALPHA {
+			// Initial alpha value setting for a graphics plane is zero.
+			static const uint32_t MIN = 0x00;
+			// Initial alpha value setting for a graphics plane is maximum.
+			static const uint32_t MAX = 0xff;
+		};
+
+
+		struct PLANE_BLEND {
+    		static const uint32_t TRANSPARENT     = 1; // Current graphics layer is transparent
+								 					   // and the lower layer is displayed.
+			static const uint32_t NON_TRANSPARENT = 2; // Current graphics layer is displayed.
+			static const uint32_t ON_LOWER_LAYER  = 3; // Current graphics layer is blended with
+								 					   // the lower layer.
+		};
+
+
+		static const uint32_t CLUT_PLANE_0 = 0;    // GLCD CLUT plane 0.
+		static const uint32_t CLUT_PLANE_1 = 1;    // GLCD CLUT plane 1.
+
+
+		struct DITHERING_OUTPUT_FORMAT {
+			static const uint32_t RGB888 = 0;  // Dithering output format RGB888.
+			static const uint32_t RGB666 = 1;  // Dithering output format RGB666.
+			static const uint32_t RGB565 = 2;  // Dithering output format RGB565.
+		};
+
+
 		static glcdc_ctrl_t	ctrl_blk_;
-		uint8_t			intr_lvl_;
-		error_t			last_error_;
+		uint8_t				intr_lvl_;
+		error_t				last_error_;
 
 
 		void release_software_reset_()
@@ -410,20 +614,20 @@ namespace device {
 			switch(tcon) {
 			case GLCDC_TCON_PIN_1:
 				/* Hsync(STHA) -> TCON1 */
-				GLC::TCONSTVB2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_STHA_HS;
+				GLC::TCONSTVB2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
 				break;
 			case GLCDC_TCON_PIN_2:
 				/* Hsync(STHA) ->  TCON2 */
-				GLC::TCONSTHA2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_STHA_HS;
+				GLC::TCONSTHA2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
 				break;
 			case GLCDC_TCON_PIN_3:
 				/* Hsync(STHA) -> TCON3 */
-				GLC::TCONSTHB2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_STHA_HS;
+				GLC::TCONSTHB2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
 				break;
 			case GLCDC_TCON_PIN_0: /* Intentionally go though to the default case */
 			default:
 				/* Hsync(STHA) -> TCON0 */
-				GLC::TCONSTVA2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_STHA_HS;
+				GLC::TCONSTVA2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
 				break;
 			}
 
@@ -445,20 +649,20 @@ namespace device {
 			switch(tcon) {
 			case GLCDC_TCON_PIN_0:
 				/* Vsync(STVA) -> TCON0 */
-				GLC::TCONSTVA2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_STVA_VS;
+				GLC::TCONSTVA2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
 				break;
 			case GLCDC_TCON_PIN_2:
 				/* Vsync(STVA) -> TCON2 */
-				GLC::TCONSTHA2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_STVA_VS;
+				GLC::TCONSTHA2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
 				break;
 			case GLCDC_TCON_PIN_3:
 				/* Vsync(STVA) -> TCON3 */
-				GLC::TCONSTHB2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_STVA_VS;
+				GLC::TCONSTHB2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
 				break;
 			case GLCDC_TCON_PIN_1: /* Intentionally go though to the default case */
 			default:
 				/* Vsync(STVA) -> TCON1 */
-				GLC::TCONSTVB2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_STVA_VS;
+				GLC::TCONSTVB2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
 				break;
 			}
 
@@ -479,17 +683,20 @@ namespace device {
 			switch(tcon) {
 			case GLCDC_TCON_PIN_0:
 				/* DE -> TCON0 */
-				GLC::TCONSTVA2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_DE;
+				GLC::TCONSTVA2.SEL = TCON_SIGNAL_SELECT::DE;
 				break;
 			case GLCDC_TCON_PIN_1:
-				GLC::TCONSTVB2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_DE; /* DE -> TCON1 */
+				// DE -> TCON1
+				GLC::TCONSTVB2.SEL = TCON_SIGNAL_SELECT::DE;
 				break;
 			case GLCDC_TCON_PIN_3:
-				GLC::TCONSTHB2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_DE; /* DE -> TCON3 */
+				// DE -> TCON3
+				GLC::TCONSTHB2.SEL = TCON_SIGNAL_SELECT::DE;
 				break;
 			case GLCDC_TCON_PIN_2: /* Intentionally go though to the default case */
 			default:
-				GLC::TCONSTHA2.SEL = (uint32_t)GLCDC_TCON_SIGNAL_SELECT_DE; /* DE -> TCON2 */
+				// DE -> TCON2
+				GLC::TCONSTHA2.SEL = TCON_SIGNAL_SELECT::DE;
 				break;
 			}
 
@@ -600,7 +807,7 @@ namespace device {
 		}
 
 
-		void graphics_layer_set_(const glcdc_input_cfg_t& input, uint32_t frame)
+		void graphics_layer_set_(const input_cfg_t& input, uint32_t frame)
 		{
 			uint32_t bit_size = get_bit_size_(input.format);
 
@@ -641,7 +848,7 @@ namespace device {
 			// Convert to Single line data transfer count, round up fractions below the
 			// decimal point
 			uint32_t line_trans_num = (line_byte_num >> 6);
-			if(0 != (line_byte_num & GLCDC_ADDRESS_ALIGNMENT_64B)) {
+			if(0 != (line_byte_num & ADDRESS_ALIGNMENT_64B)) {
 				line_trans_num += 1;
 			}
 			if(frame == 0) {
@@ -705,17 +912,15 @@ namespace device {
 		}
 
 
-		void blend_condition_set_(const glcdc_blend_t& blend, uint32_t frame)
+		void blend_condition_set_(const blend_t& blend, uint32_t frame)
 		{
 			/* if enable graphics data read from memory */
 			if(false == ctrl_blk_.graphics_read_enable[frame]) {
 				/* Set layer transparent */
 				if(frame == 0) {
-					GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_TRANSPARENT
-										  & GRn_AB1_DISPSEL_MASK;
+					GLC::GR1AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
 				} else {
-					GLC::GR2AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_TRANSPARENT
-										  & GRn_AB1_DISPSEL_MASK;
+					GLC::GR2AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
 				}
 				return;
 			}
@@ -731,19 +936,15 @@ namespace device {
 				}
 				if(true == blend.visible) {
 					if(frame == 0) {
-						GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_NON_TRANSPARENT
-						   					  & GRn_AB1_DISPSEL_MASK;
+						GLC::GR1AB1.DISPSEL = PLANE_BLEND::NON_TRANSPARENT & GRn_AB1_DISPSEL_MASK;
 					} else {
-						GLC::GR2AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_NON_TRANSPARENT
-						   					  & GRn_AB1_DISPSEL_MASK;
+						GLC::GR2AB1.DISPSEL = PLANE_BLEND::NON_TRANSPARENT & GRn_AB1_DISPSEL_MASK;
 					}
 				} else {
 					if(frame == 0) {
-						GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_TRANSPARENT
-											  & GRn_AB1_DISPSEL_MASK;
+						GLC::GR1AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
 					} else {
-						GLC::GR2AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_TRANSPARENT
-											  & GRn_AB1_DISPSEL_MASK;
+						GLC::GR2AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
 					}
 				}
 				break;
@@ -800,11 +1001,11 @@ namespace device {
 
 	            if(GLCDC_BLEND_CONTROL_FADEIN == blend.blend_control) {
 					if(frame == 0) {
-						GLC::GR1AB7.ARCDEF = (uint32_t)GLCDC_FADING_CONTROL_INITIAL_ALPHA_MIN
-											 & GRn_AB7_ARCDEF_MASK;
+						GLC::GR1AB7.ARCDEF
+							= FADING_CONTROL_INITIAL_ALPHA::MIN & GRn_AB7_ARCDEF_MASK;
 					} else {
-						GLC::GR2AB7.ARCDEF = (uint32_t)GLCDC_FADING_CONTROL_INITIAL_ALPHA_MIN
-											 & GRn_AB7_ARCDEF_MASK;
+						GLC::GR2AB7.ARCDEF
+							= FADING_CONTROL_INITIAL_ALPHA::MIN & GRn_AB7_ARCDEF_MASK;
 					}
 
 					if(frame == 0) {
@@ -814,11 +1015,11 @@ namespace device {
 					}
             	} else if (GLCDC_BLEND_CONTROL_FADEOUT == blend.blend_control) {
 					if(frame == 0) {
-						GLC::GR1AB7.ARCDEF = (uint32_t)GLCDC_FADING_CONTROL_INITIAL_ALPHA_MAX
-											 & GRn_AB7_ARCDEF_MASK;
+						GLC::GR1AB7.ARCDEF
+							= FADING_CONTROL_INITIAL_ALPHA::MAX & GRn_AB7_ARCDEF_MASK;
 					} else {
-						GLC::GR2AB7.ARCDEF = (uint32_t)GLCDC_FADING_CONTROL_INITIAL_ALPHA_MAX
-											 & GRn_AB7_ARCDEF_MASK;
+						GLC::GR2AB7.ARCDEF
+							= FADING_CONTROL_INITIAL_ALPHA::MAX & GRn_AB7_ARCDEF_MASK;
 					}
 
 					if(frame == 0) {
@@ -854,11 +1055,9 @@ namespace device {
 				}
 
 				if(frame == 0) {
-					GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_ON_LOWER_LAYER
-										  & GRn_AB1_DISPSEL_MASK;
+					GLC::GR1AB1.DISPSEL = PLANE_BLEND::ON_LOWER_LAYER & GRn_AB1_DISPSEL_MASK;
 				} else {
-					GLC::GR2AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_ON_LOWER_LAYER
-										  & GRn_AB1_DISPSEL_MASK;
+					GLC::GR2AB1.DISPSEL = PLANE_BLEND::ON_LOWER_LAYER & GRn_AB1_DISPSEL_MASK;
 				}
 				break;
 			case GLCDC_BLEND_CONTROL_PIXEL:
@@ -871,20 +1070,16 @@ namespace device {
 
 				if(true == blend.visible) {
 					if(frame == 0) {
-						GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_ON_LOWER_LAYER
-											  & GRn_AB1_DISPSEL_MASK;
+						GLC::GR1AB1.DISPSEL = PLANE_BLEND::ON_LOWER_LAYER & GRn_AB1_DISPSEL_MASK;
 					} else {
-						GLC::GR2AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_ON_LOWER_LAYER
-											  & GRn_AB1_DISPSEL_MASK;
+						GLC::GR2AB1.DISPSEL = PLANE_BLEND::ON_LOWER_LAYER & GRn_AB1_DISPSEL_MASK;
 					}
 				} else {
 					/* Set layer transparent */
 					if(frame == 0) {
-						GLC::GR1AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_TRANSPARENT
-											  & GRn_AB1_DISPSEL_MASK;
+						GLC::GR1AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
 					} else {
-						GLC::GR2AB1.DISPSEL = (uint32_t)GLCDC_PLANE_BLEND_TRANSPARENT
-											  & GRn_AB1_DISPSEL_MASK;
+						GLC::GR2AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
 					}
 				}
 				break;
@@ -892,7 +1087,7 @@ namespace device {
 		}
 
 
-		void graphics_chromakey_set_(const glcdc_chromakey_t& chromakey, uint32_t frame)
+		void graphics_chromakey_set_(const chromakey_t& chromakey, uint32_t frame)
 		{
 			/* if enable graphics data read from memory */
 			if(false == ctrl_blk_.graphics_read_enable[frame]) {
@@ -941,32 +1136,27 @@ namespace device {
 		}
 
 
-		glcdc_clut_plane_t is_clutplane_selected_(uint32_t frame)
+		uint32_t is_clutplane_selected_(uint32_t frame)
 		{
-			/* GRnCLUTINT - Graphic n CLUT/Interrupt Control Register
-			b16 SEL - CLUT Control. - Select Color Look-up Table. */
 			if(frame == 0) {
-				return (glcdc_clut_plane_t)GLC::GR1CLUTINT.SEL();
+				return GLC::GR1CLUTINT.SEL();
 			} else {
-				return (glcdc_clut_plane_t)GLC::GR2CLUTINT.SEL();
+				return GLC::GR2CLUTINT.SEL();
 			}
 		}
 
 
-		void clutplane_select_(uint32_t frame, glcdc_clut_plane_t clut_plane)
+		void clutplane_select_(uint32_t frame, uint32_t clut_plane)
 		{
-			/* GRnCLUTINT - Graphic n CLUT/Interrupt Control Register
-			b16 SEL - CLUT Control. - Select Color Look-up Table. */
 			if(frame == 0) {
-				GLC::GR1CLUTINT.SEL = (uint32_t)clut_plane;
+				GLC::GR1CLUTINT.SEL = clut_plane;
 			} else {
-				GLC::GR2CLUTINT.SEL = (uint32_t)clut_plane;
+				GLC::GR2CLUTINT.SEL = clut_plane;
 			}
 		}
 
 
-		void clut_set_(uint32_t frame, glcdc_clut_plane_t clut_plane,
-					   uint32_t entry, uint32_t data)
+		void clut_set_(uint32_t frame, uint32_t clut_plane, uint32_t entry, uint32_t data)
 		{
     		// gp_gr_clut[frame][clut_plane]->grxclut[entry].lsize = data;
 			if(frame == 0) {
@@ -985,7 +1175,7 @@ namespace device {
 		}
 
 
-		void clut_update_(const glcdc_clut_cfg_t& clut, uint32_t frame)
+		void clut_update_(const clut_cfg_t& clut, uint32_t frame)
 		{
 			/* If enable graphics data read from memory */
 			if(false == ctrl_blk_.graphics_read_enable[frame]) {
@@ -995,11 +1185,11 @@ namespace device {
 			if(true == clut.enable) {
 				const uint32_t* p_base = clut.p_base;
 
-				glcdc_clut_plane_t set_clutplane;
-				if(GLCDC_CLUT_PLANE_1 == is_clutplane_selected_(frame)) {
-					set_clutplane = GLCDC_CLUT_PLANE_0;
+				uint32_t set_clutplane;
+				if(CLUT_PLANE_1 == is_clutplane_selected_(frame)) {
+					set_clutplane = CLUT_PLANE_0;
 				} else {
-					set_clutplane = GLCDC_CLUT_PLANE_1;
+					set_clutplane = CLUT_PLANE_1;
 				}
 
 				/* Copy the new CLUT data on the source memory to the CLUT SRAM in
@@ -1028,20 +1218,20 @@ namespace device {
 				GLC::OUTSET.FORMAT = (uint32_t)GLCDC_OUT_FORMAT_8BITS_SERIAL;
 				GLC::OUTSET.PHASE = (uint32_t)cfg.output.serial_output_delay;
 				GLC::OUTSET.DIRSEL = (uint32_t)cfg.output.serial_scan_direction;
-				GLC::PANELDTHA.FORM = (uint32_t)GLCDC_DITHERING_OUTPUT_FORMAT_RGB888;
+				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB888;
 				break;
 			case GLCDC_OUT_FORMAT_16BITS_RGB565:
 				GLC::OUTSET.FORMAT = (uint32_t)GLCDC_OUT_FORMAT_16BITS_RGB565;
-				GLC::PANELDTHA.FORM = (uint32_t)GLCDC_DITHERING_OUTPUT_FORMAT_RGB565;
+				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB565;
 				break;
 			case GLCDC_OUT_FORMAT_18BITS_RGB666:
 				GLC::OUTSET.FORMAT = (uint32_t)GLCDC_OUT_FORMAT_18BITS_RGB666;
-				GLC::PANELDTHA.FORM = (uint32_t)GLCDC_DITHERING_OUTPUT_FORMAT_RGB666;
+				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB666;
 				break;
 			case GLCDC_OUT_FORMAT_24BITS_RGB888:
 			default:
 				GLC::OUTSET.FORMAT = (uint32_t)GLCDC_OUT_FORMAT_24BITS_RGB888;
-				GLC::PANELDTHA.FORM = (uint32_t)GLCDC_DITHERING_OUTPUT_FORMAT_RGB888;
+				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB888;
 				break;
 			}
 
@@ -1074,7 +1264,7 @@ namespace device {
 		}
 
 
-		void brightness_correction_(const glcdc_brightness_t& brightness)
+		void brightness_correction_(const brightness_t& brightness)
 		{
 
 			if(true == brightness.enable) {
@@ -1091,7 +1281,7 @@ namespace device {
 		}
 
 
-		void contrast_correction_(const glcdc_contrast_t& contrast)
+		void contrast_correction_(const contrast_t& contrast)
 		{
 			if(true == contrast.enable) {
 				/* ---- Sets the contrast correction register for each color in a pixel. ---- */
@@ -1108,73 +1298,66 @@ namespace device {
 		}
 
 
-		void gamma_correction_(const glcdc_gamma_correction_t& gamma)
+		void gamma_correction_(const gamma_correction_t& gamma)
 		{
 			if(true == gamma.enable) {
 				/* ---- Gamma correction enable and set gamma setting ---- */
 				GLC::GAMSW.GAMON = 1;
 #if 0
 				/* Green */
-				uint32_t *p_lut_table;
+				uint32_t* lut_table;
 				p_lut_table = (uint32_t*)(&GLCDC.GAMGLUT1);
 				for(uint32_t i = 0; i < GLCDC_GAMMA_CURVE_GAIN_ELEMENT_NUM; i += 2) {
 					/* GAMGLUTx - Gamma Correction G Table Setting Register x */
-					*p_lut_table = ((((uint32_t)p_gamma->p_g->gain[i] & GAMX_LUTX_GAIN_MASK) << 16)
+					*lut_table = ((((uint32_t)p_gamma->p_g->gain[i] & GAMX_LUTX_GAIN_MASK) << 16)
 						| ((uint32_t)p_gamma->p_g->gain[i + 1] & GAMX_LUTX_GAIN_MASK));
-					p_lut_table++;
+					lut_table++;
 				}
 
-				p_lut_table = (uint32_t *) (&GLCDC.GAMGAREA1);
+				lut_table = (uint32_t*)(&GLCDC.GAMGAREA1);
 				for(uint32_t i = 0; i < GLCDC_GAMMA_CURVE_THRESHOLD_ELEMENT_NUM; i += 3) {
-///////
-            /* GAMGAREAx - Gamma Correction G Area Setting Register x */
-            *p_lut_table = ((((uint32_t)p_gamma->p_g->threshold[i] & GAMX_AREAX_MASK) << 20)
-                    | (((uint32_t)p_gamma->p_g->threshold[i + 1] & GAMX_AREAX_MASK) << 10)
-                    | ((uint32_t)p_gamma->p_g->threshold[i + 2] & GAMX_AREAX_MASK));
-            p_lut_table++;
-        }
+					/* GAMGAREAx - Gamma Correction G Area Setting Register x */
+					*lut_table = ((((uint32_t)p_gamma->p_g->threshold[i] & GAMX_AREAX_MASK) << 20)
+							| (((uint32_t)p_gamma->p_g->threshold[i + 1] & GAMX_AREAX_MASK) << 10)
+							| ((uint32_t)p_gamma->p_g->threshold[i + 2] & GAMX_AREAX_MASK));
+					lut_table++;
+				}
 
+				/* Blue */
+				lut_table = (uint32_t *)(&GLCDC.GAMBLUT1);
+				for(uint32_t i = 0; i < GLCDC_GAMMA_CURVE_GAIN_ELEMENT_NUM; i += 2) {
+					/* GAMBLUTx - Gamma Correction B Table Setting Register x */
+					*lut_table = ((((uint32_t)p_gamma->p_b->gain[i] & GAMX_LUTX_GAIN_MASK) << 16)
+                    		| ((uint32_t)p_gamma->p_b->gain[i + 1] & GAMX_LUTX_GAIN_MASK));
+					lut_table++;
+				}
 
-        /* Blue */
-        p_lut_table = (uint32_t *)(&GLCDC.GAMBLUT1);
-        for (i = 0; i < GLCDC_GAMMA_CURVE_GAIN_ELEMENT_NUM; i += 2)
-        {
-            /* GAMBLUTx - Gamma Correction B Table Setting Register x */
-            *p_lut_table = ((((uint32_t)p_gamma->p_b->gain[i] & GAMX_LUTX_GAIN_MASK) << 16)
-                    | ((uint32_t)p_gamma->p_b->gain[i + 1] & GAMX_LUTX_GAIN_MASK));
-            p_lut_table++;
-        }
+				lut_table = (uint32_t*)(&GLCDC.GAMBAREA1);
+				for(uint32_t i = 0; i < GLCDC_GAMMA_CURVE_THRESHOLD_ELEMENT_NUM; i += 3) {
+					/* GAMBAREAx - Gamma Correction B Area Setting Register x */
+					*lut_table = ((((uint32_t)p_gamma->p_b->threshold[i] & GAMX_AREAX_MASK) << 20)
+							| (((uint32_t)p_gamma->p_b->threshold[i + 1] & GAMX_AREAX_MASK) << 10)
+							| ((uint32_t)p_gamma->p_b->threshold[i + 2] & GAMX_AREAX_MASK));
+					lut_table++;
+				}
 
-        p_lut_table = (uint32_t *) (&GLCDC.GAMBAREA1);
-        for (i = 0; i < GLCDC_GAMMA_CURVE_THRESHOLD_ELEMENT_NUM; i += 3)
-        {
-            /* GAMBAREAx - Gamma Correction B Area Setting Register x */
-            *p_lut_table = ((((uint32_t)p_gamma->p_b->threshold[i] & GAMX_AREAX_MASK) << 20)
-                    | (((uint32_t)p_gamma->p_b->threshold[i + 1] & GAMX_AREAX_MASK) << 10)
-                    | ((uint32_t)p_gamma->p_b->threshold[i + 2] & GAMX_AREAX_MASK));
-            p_lut_table++;
-        }
+				/* Red */
+				lut_table = (uint32_t*)(&GLCDC.GAMRLUT1);
+				for(uint32_t i = 0; i < GLCDC_GAMMA_CURVE_GAIN_ELEMENT_NUM; i += 2) {
+					/* GAMRLUTx - Gamma Correction R Table Setting Register x */
+					*lut_table = ((((uint32_t)p_gamma->p_r->gain[i] & GAMX_LUTX_GAIN_MASK) << 16)
+							| ((uint32_t)p_gamma->p_r->gain[i + 1] & GAMX_LUTX_GAIN_MASK));
+					lut_table++;
+				}
 
-
-        /* Red */
-        p_lut_table = (uint32_t *) (&GLCDC.GAMRLUT1);
-        for (i = 0; i < GLCDC_GAMMA_CURVE_GAIN_ELEMENT_NUM; i += 2)
-        {
-            /* GAMRLUTx - Gamma Correction R Table Setting Register x */
-            *p_lut_table = ((((uint32_t)p_gamma->p_r->gain[i] & GAMX_LUTX_GAIN_MASK) << 16)
-                    | ((uint32_t)p_gamma->p_r->gain[i + 1] & GAMX_LUTX_GAIN_MASK));
-            p_lut_table++;
-        }
-
-        p_lut_table = (uint32_t *) (&GLCDC.GAMRAREA1);
-        for (i = 0; i < GLCDC_GAMMA_CURVE_THRESHOLD_ELEMENT_NUM; i += 3)
-        {
-            /* GAMRAREAx - Gamma Correction R Area Setting Register x */
-            *p_lut_table = ((((uint32_t)p_gamma->p_r->threshold[i] & GAMX_AREAX_MASK) << 20)
-                    | (((uint32_t)p_gamma->p_r->threshold[i + 1] & GAMX_AREAX_MASK) << 10)
-                    | ((uint32_t)p_gamma->p_r->threshold[i + 2] & GAMX_AREAX_MASK));
-            p_lut_table++;
-        }
+				lut_table = (uint32_t*)(&GLCDC.GAMRAREA1);
+				for(uint32_t i = 0; i < GLCDC_GAMMA_CURVE_THRESHOLD_ELEMENT_NUM; i += 3) {
+					/* GAMRAREAx - Gamma Correction R Area Setting Register x */
+					*lut_table = ((((uint32_t)p_gamma->p_r->threshold[i] & GAMX_AREAX_MASK) << 20)
+							| (((uint32_t)p_gamma->p_r->threshold[i + 1] & GAMX_AREAX_MASK) << 10)
+							| ((uint32_t)p_gamma->p_r->threshold[i + 2] & GAMX_AREAX_MASK));
+					lut_table++;
+				}
 #endif
 			} else {
 				/* ---- Gamma Correction Disable ---- */
@@ -1189,7 +1372,7 @@ namespace device {
 		}
 
 
-		void detect_setting_(const glcdc_detect_cfg_t& detection)
+		void detect_setting_(const detect_cfg_t& detection)
 		{
 			if(true == detection.vpos_detect) {
 				// Set Graphic 2 Specified Line Notification Detection to enable
@@ -1223,12 +1406,8 @@ namespace device {
 				GLC::INTEN.VPOSINTEN = 1;
 			} else {
 				GLC::INTEN.VPOSINTEN = 0;
-				/* GENAL1 - Group AL1 Interrupt Request Enable Register
-				b8 EN8 - Interrupt Request Enable 8 - Interrupt request is disabled. */
+				// 割り込みを止める場合は注意
 ///				EN(GLCDC,VPOS) = 0;
-
-				/* GRPAL1 - Group AL1 Interrupt Request Register
-				b8 IS8 - Interrupt Status Flag 8. */
 ///				while(0 != IS(GLCDC,VPOS)) {
 ///					asm("nop");
 ///				}
@@ -1236,20 +1415,9 @@ namespace device {
 
 			if(interrupt.gr1uf_enable) {
 				GLC::INTEN.GR1UFINTEN = 1;
-				/* GENAL1 - Group AL1 Interrupt Request Enable Register
-				b9 EN9 - Interrupt Request Enable 9 - Interrupt request is enabled. */
-///				EN(GLCDC,GR1UF) = 1;
 			} else {
-				/* INTEN - Interrupt Request Enable Control Register
-				b1 GR1UFINTEN - GR1UF Interrupt disable. */
 				GLC::INTEN.GR1UFINTEN = 0;
-
-				/* GENAL1 - Group AL1 Interrupt Request Enable Register
-				b9 EN9 - Interrupt Request Enable 9 - Interrupt request is disabled. */
 ///				EN(GLCDC,GR1UF) = 0;
-
-				/* GRPAL1 - Group AL1 Interrupt Request Register
-				b9 IS9 - Interrupt Status Flag 9. */
 ///				while(0 != IS(GLCDC,GR1UF)) {
 ///					asm("nop");
 ///				}
@@ -1257,20 +1425,8 @@ namespace device {
 
 			if(interrupt.gr2uf_enable) {
 				GLC::INTEN.GR2UFINTEN = 1;
-				/* GENAL1 - Group AL1 Interrupt Request Enable Register
-				b10 EN10 - Interrupt Request Enable 10 - Interrupt request is enabled. */
-///				EN(GLCDC,GR2UF) = 1;
 			} else {
-				/* INTEN - Interrupt Request Enable Control Register
-				b2 GR2UFINTEN - GR2UF Interrupt disable. */
 				GLC::INTEN.GR2UFINTEN = 0;
-
-				/* GENAL1 - Group AL1 Interrupt Request Enable Register
-				b10 EN10 - Interrupt Request Enable 10 - Interrupt request is disabled. */
-///				EN(GLCDC,GR2UF) = 0;
-
-				/* GRPAL1 - Group AL1 Interrupt Request Register
-				b10 IS10 - Interrupt Status Flag 10. */
 ///				while (0 != IS(GLCDC,GR2UF)) {
 ///					asm("nop");
 ///				}
@@ -1428,11 +1584,11 @@ namespace device {
 
 		static void line_detect_isr_()
 		{
-			glcdc_callback_args_t args;
+			callback_args_t args;
 
-			if(ctrl_blk_.p_callback != nullptr) {
-				args.event = GLCDC_EVENT_LINE_DETECTION;
-				ctrl_blk_.p_callback((void *)&args);
+			if(ctrl_blk_.callback != nullptr) {
+				args.event = callback_args_t::EVENT::LINE_DETECTION;
+				ctrl_blk_.callback((void *)&args);
 			}
 
 			vpos_int_status_clear_();
@@ -1455,11 +1611,11 @@ namespace device {
 
 		static void underflow_1_isr_()
 		{
-			glcdc_callback_args_t args;
+			callback_args_t args;
 
-			if(ctrl_blk_.p_callback != nullptr) {
-				args.event = GLCDC_EVENT_GR1_UNDERFLOW;
-				ctrl_blk_.p_callback((void *)&args);
+			if(ctrl_blk_.callback != nullptr) {
+				args.event = callback_args_t::EVENT::GR1_UNDERFLOW;
+				ctrl_blk_.callback((void *)&args);
 			}
 
 			// Clear interrupt flag in the register of the GLCD module
@@ -1469,11 +1625,11 @@ namespace device {
 
 		static void underflow_2_isr_()
 		{
-			glcdc_callback_args_t args;
+			callback_args_t args;
 
-			if(ctrl_blk_.p_callback != nullptr) {
-				args.event = GLCDC_EVENT_GR2_UNDERFLOW;
-				ctrl_blk_.p_callback ((void *)&args);
+			if(ctrl_blk_.callback != nullptr) {
+				args.event = callback_args_t::EVENT::GR2_UNDERFLOW;
+				ctrl_blk_.callback ((void *)&args);
 			}
 
 			// Clear interrupt flag in the register of the GLCD module
@@ -1514,7 +1670,7 @@ namespace device {
 			}
 
 			// Save callback function
-			ctrl_blk_.p_callback = cfg.p_callback;
+			ctrl_blk_.callback = cfg.callback;
 
 			// Save setting of interrupt
 			ctrl_blk_.interrupt.vpos_enable  = cfg.interrupt.vpos_enable;
@@ -1617,6 +1773,13 @@ namespace device {
 			return true;
 		}		
 
+
+		void bg_color_setting_(const color_t& color)
+		{
+			GLC::BGCOLOR.R = color.byte.r;
+			GLC::BGCOLOR.G = color.byte.g;
+			GLC::BGCOLOR.B = color.byte.b;
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -1849,7 +2012,7 @@ namespace device {
 			//
 			// Set function to be called on VSYNC
 			//
-			cfg.p_callback = vsync_task_;
+			cfg.callback = vsync_task_;
 #if 0
 			runtime_cfg.blend = cfg.blend[FRAME_LAYER_2];
 			runtime_cfg.input = cfg.input[FRAME_LAYER_2];
@@ -1988,8 +2151,8 @@ namespace device {
 				}
 #endif
 				{
-					const glcdc_detect_cfg_t* p_detection;
-					p_detection = static_cast<const glcdc_detect_cfg_t*>(args);
+					const detect_cfg_t* p_detection;
+					p_detection = static_cast<const detect_cfg_t*>(args);
 
 					if(true == p_detection->vpos_detect) {
 						vpos_int_status_clear_();
@@ -2004,14 +2167,15 @@ namespace device {
 				break;
 
 			case control_cmd::CHANGE_BG_COLOR:
-
-#if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
-				if(NULL == args) {
-					last_error_ = error_t::INVALID_PTR;
-					return false;
+				{
+					const color_t* t = static_cast<const color_t*>(args);
+					if(t != nullptr) {
+						bg_color_setting_(*t);
+					} else {
+						last_error_ = error_t::INVALID_PTR;
+						return false;
+					}
 				}
-#endif
-///				r_glcdc_bg_color_setting(static_cast<glcdc_color_t*>(args));
 				break;
 
 			default:

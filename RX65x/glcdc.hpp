@@ -45,7 +45,6 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
 		struct grclut_t {
-
 			volatile uint32_t& operator[] (uint32_t idx) {
 				return *reinterpret_cast<volatile uint32_t*>((ofs + idx) & 0xff);
 			}
