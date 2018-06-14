@@ -19,13 +19,14 @@ namespace utils {
 	/*!
 		@brief  dispatch class
 		@param[in]	VEC	グループ・ベクター
-		@param[in]	NUM	分岐数
+		@param[in]	NUM	分岐数（最大３２）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<device::icu_t::VECTOR VEC, uint32_t NUM>
 	class dispatch {
 
-		TASK	task_[NUM];
+		TASK		task_[NUM];
+		uint32_t	mask_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -33,7 +34,7 @@ namespace utils {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		dispatch() noexcept : task_{ nullptr } { }
+		dispatch() noexcept : task_{ nullptr }, mask_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -43,6 +44,15 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t size() const noexcept { return NUM; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	マスクを返す
+			@return マスク
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_mask() const noexcept { return mask_; }
 
 
 		//-----------------------------------------------------------------//
@@ -57,6 +67,11 @@ namespace utils {
 		{
 			if(index < NUM) {
 				task_[index] = task;
+				if(task != nullptr) {
+					mask_ |= 1 << index;
+				} else {
+					mask_ &= ~(1 << index);
+				}
 				return true;
 			} else {
 				return false;
