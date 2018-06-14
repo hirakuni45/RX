@@ -41,13 +41,14 @@ namespace device {
 	};
 
 
-
-
-
-	// GLCD hardware specific control block
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	GLCD hardware specific control block
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct glcdc_ctrl_t {
-		glcdc_operating_status	state;			// Status of GLCD module.
-		bool				is_entry;			// Flag of subcribed GLCDC interrupt function.
+		glcdc_operating_status	state;		  // Status of GLCD module.
+		bool			   is_entry;		  // Flag of subcribed GLCDC interrupt function.
 		glcdc_coordinate_t active_start_pos;  // Zero coordinate for gra phics plane.
 		uint16_t hsize;                       // Horizontal pixel size in a line.
 		uint16_t vsize;                       // Vertical pixel size in a frame.
@@ -55,7 +56,7 @@ namespace device {
 		bool graphics_read_enable[2];  // Graphics data read enable.
 		void (*p_callback)(void *);           // Pointer to callback function.
 		bool first_vpos_interrupt_flag;       // First vpos interrupt after release 
-												  // software reset.
+											  // software reset.
 		glcdc_interrupt_cfg_t interrupt;      // Interrupt setting values.
 		glcdc_ctrl_t() :
 			state(glcdc_operating_status::CLOSED),
@@ -74,15 +75,15 @@ namespace device {
 	/*!
 		@brief  GLCDC I/O 制御
 		@param[in]	GLC		glcdc クラス
+		@param[in]	XSIZE	X 方向ピクセルサイズ
+		@param[in]	YSIZE	Y 方向ピクセルサイズ
 		@param[in]	PXT		ピクセル・タイプ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GLC, PIX_TYPE PXT = PIX_TYPE::RGB565>
+	template <class GLC, int32_t XSIZE, int32_t YSIZE, PIX_TYPE PXT>
 	class glcdc_io {
 
 		static const uint32_t PIX_WIDTH  = 16;		///< 16 bits / pixel
-		static const uint32_t XSIZE_PHYS = 480;		///< Physical display size by X
-		static const uint32_t YSIZE_PHYS = 272;		///< Physical display size by Y
 
 		/* Number of graphics layers */
 		static const uint32_t FRAME_LAYER_NUM  = 2;
@@ -176,10 +177,10 @@ namespace device {
 		//
 		// Buffer size and stride
 		//
-		static const uint32_t BYTES_PER_LINE   = ((PIX_WIDTH * XSIZE_PHYS) / 8);
+		static const uint32_t BYTES_PER_LINE   = ((PIX_WIDTH * XSIZE) / 8);
 		static const uint32_t LINE_OFFSET      = (((BYTES_PER_LINE + 63) / 64) * 64);
 		static const uint32_t VXSIZE_PHYS      = ((LINE_OFFSET * 8) / PIX_WIDTH);
-		static const uint32_t BYTES_PER_BUFFER = (LINE_OFFSET * YSIZE_PHYS);
+		static const uint32_t BYTES_PER_BUFFER = (LINE_OFFSET * YSIZE);
 
 
 		static const uint32_t BRIGHTNESS_ = 0x200;
@@ -358,14 +359,8 @@ namespace device {
 		};
 
 		static glcdc_ctrl_t	ctrl_blk_;
-
+		uint8_t			intr_lvl_;
 		error_t			last_error_;
-
-
-
-
-
-
 
 
 		void release_software_reset_()
@@ -1215,19 +1210,12 @@ namespace device {
 
 		void interrupt_setting_(const glcdc_interrupt_cfg_t& interrupt)
 		{
-///			bsp_int_ctrl_t grpal1;
+			icu_mgr::set_level(icu_t::VECTOR::GROUPAL1, intr_lvl_);
 
-///			grpal1.ipl = GLCDC_CFG_INTERRUPT_PRIORITY_LEVEL;
-
-			if(true == interrupt.vpos_enable) {
+			if(interrupt.vpos_enable) {
 				GLC::INTEN.VPOSINTEN = 1;
-
-///				EN(GLCDC,VPOS) = 1;
 			} else {
-				/* INTEN - Interrupt Request Enable Control Register
-				b0 VPOSINTEN  - VPOS Interrupt Enable. - Disable VPOS interrupt request. */
 				GLC::INTEN.VPOSINTEN = 0;
-
 				/* GENAL1 - Group AL1 Interrupt Request Enable Register
 				b8 EN8 - Interrupt Request Enable 8 - Interrupt request is disabled. */
 ///				EN(GLCDC,VPOS) = 0;
@@ -1239,11 +1227,8 @@ namespace device {
 ///				}
 			}
 
-			if(true == interrupt.gr1uf_enable) {
-				/* INTEN - Interrupt Request Enable Control Register
-				b1 GR1UFINTEN - GR1UF Interrupt enable. */
+			if(interrupt.gr1uf_enable) {
 				GLC::INTEN.GR1UFINTEN = 1;
-
 				/* GENAL1 - Group AL1 Interrupt Request Enable Register
 				b9 EN9 - Interrupt Request Enable 9 - Interrupt request is enabled. */
 ///				EN(GLCDC,GR1UF) = 1;
@@ -1263,11 +1248,8 @@ namespace device {
 ///				}
 			}
 
-			if(true == interrupt.gr2uf_enable) {
-				/* INTEN - Interrupt Request Enable Control Register
-				b2 GR2UFINTEN - GR2UF Interrupt enable. */
+			if(interrupt.gr2uf_enable) {
 				GLC::INTEN.GR2UFINTEN = 1;
-
 				/* GENAL1 - Group AL1 Interrupt Request Enable Register
 				b10 EN10 - Interrupt Request Enable 10 - Interrupt request is enabled. */
 ///				EN(GLCDC,GR2UF) = 1;
@@ -1289,8 +1271,7 @@ namespace device {
 
 			/* Set GROUPAL1 interrupt request to enable, if GLCDC interrupt parameter is enabled
 			Set GROUPAL1 interrupt request to disable, if GLCDC interrupt parameter is disabled */
-			if((true == interrupt.vpos_enable) || (true == interrupt.gr1uf_enable) ||
-			   (true == interrupt.gr2uf_enable)) {
+			if(interrupt.vpos_enable || interrupt.gr1uf_enable || interrupt.gr2uf_enable) {
 ///				R_BSP_InterruptControl(BSP_INT_SRC_AL1_GLCDC_VPOS, BSP_INT_CMD_GROUP_INTERRUPT_ENABLE, (void *) &grpal1.ipl);
 			} else {
 ///				R_BSP_InterruptControl(BSP_INT_SRC_AL1_GLCDC_VPOS, BSP_INT_CMD_GROUP_INTERRUPT_DISABLE, NULL);
@@ -1313,6 +1294,93 @@ namespace device {
 			}
 		}
 
+
+		static void gr_plane_update_(uint32_t frame)
+		{
+			if(frame = 0) {
+				GLC::GR1VEN.VEN = 1;
+			} else {
+				GLC::GR2VEN.VEN = 1;
+			}
+		}
+
+
+		static bool is_gr_plane_updating_(uint32_t frame)
+		{
+			if(frame == 0) {
+				return GLC::GR1VEN.VEN();
+			} else {
+				return GLC::GR2VEN.VEN();
+			}
+		}
+
+
+		static void gamma_update_()
+		{
+			GLC::GAMGVEN.VEN = 1;
+			GLC::GAMBVEN.VEN = 1;
+			GLC::GAMRVEN.VEN = 1;
+		}
+
+
+		static bool is_gamma_updating_()
+		{
+			return (GLC::GAMGVEN.VEN() | GLC::GAMBVEN.VEN() | GLC::GAMRVEN.VEN());
+		}
+
+
+		static bool vpos_int_status_check_()
+		{
+			return GLC::STMON.VPOS();
+		}
+
+
+		static bool gr1uf_int_status_check_()
+		{
+			return GLC::STMON.GR1UF();
+		}
+
+
+		static bool gr2uf_int_status_check_()
+		{
+			return GLC::STMON.GR2UF();
+		}
+
+
+		static void vpos_int_status_clear_()
+		{
+			GLC::STCLR.VPOSCLR = 1;
+		}
+
+
+		static void gr1uf_int_status_clear_()
+		{
+			GLC::STCLR.GR1UFCLR = 1;
+		}
+
+
+		static void gr2uf_int_status_clear_()
+		{
+			GLC::STCLR.GR2UFCLR = 1;
+		}
+
+
+		static void output_ctrl_update_()
+		{
+			GLC::OUTVEN.VEN = 1;
+		}
+
+
+		static bool is_output_ctrl_updating_()
+		{
+			return GLC::OUTVEN.VEN();
+		}
+
+
+		static bool is_register_reflecting_()
+		{
+			return GLC::BGEN.VEN();
+		}
 
 
 		static void vsync_task_(void* ptr)
@@ -1349,6 +1417,66 @@ namespace device {
 #endif
 
 #endif
+		}
+
+
+		static void line_detect_isr_()
+		{
+			glcdc_callback_args_t args;
+
+			/* Call back callback function if it is registered */
+///			&& ((uint32_t)FIT_NO_FUNC != (uint32_t)ctrl_blk_.p_callback))
+			if(ctrl_blk_.p_callback != nullptr) {
+				args.event = GLCDC_EVENT_LINE_DETECTION;
+				ctrl_blk_.p_callback((void *)&args);
+			}
+
+			/* Clear interrupt flag in the register of the GLCD module */
+			vpos_int_status_clear_();
+
+			if(false == ctrl_blk_.first_vpos_interrupt_flag) {
+				/* Clear interrupt flag in the register of the GLCD module */
+				gr1uf_int_status_clear_();
+				gr2uf_int_status_clear_();
+
+				/* Set the GLCD interrupts */
+				interrupt_setting_(ctrl_blk_.interrupt);
+
+				/* Set the first VPOS interrupt flag */
+				ctrl_blk_.first_vpos_interrupt_flag = true;
+			}
+		}
+
+
+		static void underflow_1_isr_()
+		{
+			glcdc_callback_args_t args;
+
+			/* Call back callback function if it is registered */
+			if(ctrl_blk_.p_callback != nullptr) {
+///  && ((uint32_t)FIT_NO_FUNC != (uint32_t)g_ctrl_blk.p_callback))
+				args.event = GLCDC_EVENT_GR1_UNDERFLOW;
+				ctrl_blk_.p_callback ((void *)&args);
+			}
+
+			/* Clear interrupt flag in the register of the GLCD module */
+			gr1uf_int_status_clear_();
+		}
+
+
+		static void underflow_2_isr_()
+		{
+			glcdc_callback_args_t args;
+
+			/* Call the callback function if it is registered */
+			if(ctrl_blk_.p_callback != nullptr) {
+// && ((uint32_t)FIT_NO_FUNC != (uint32_t)g_ctrl_blk.p_callback))
+				args.event = GLCDC_EVENT_GR2_UNDERFLOW;
+				ctrl_blk_.p_callback ((void *)&args);
+			}
+
+			/* Clear interrupt flag in the register of the GLCD module */
+			gr2uf_int_status_clear_();
 		}
 
 
@@ -1495,8 +1623,27 @@ namespace device {
 			@brief	コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		glcdc_io() noexcept : last_error_(error_t::SUCCESS)
+		glcdc_io(uint8_t intr_lvl = 5) noexcept :
+			intr_lvl_(intr_lvl), last_error_(error_t::SUCCESS)
 		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	X 軸幅を取得
+			@return X 軸幅
+		*/
+		//-----------------------------------------------------------------//
+		int32_t get_xsize() const noexcept { return XSIZE; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	Y 軸幅を取得
+			@return Y 軸幅
+		*/
+		//-----------------------------------------------------------------//
+		int32_t get_ysize() const noexcept { return YSIZE; }
 
 
 		//-----------------------------------------------------------------//
@@ -1554,9 +1701,9 @@ namespace device {
 			cfg.output.htiming.back_porch = 40;
 			cfg.output.vtiming.back_porch = 8;
 			// Horizontal Active Pixel Width
-			cfg.output.htiming.display_cyc = XSIZE_PHYS;
+			cfg.output.htiming.display_cyc = XSIZE;
 			// Vertical Active Display Width
-			cfg.output.vtiming.display_cyc = YSIZE_PHYS;
+			cfg.output.vtiming.display_cyc = YSIZE;
 			// Vertical Active Display Start Position (min. 3 lines)
 			cfg.output.htiming.sync_width = 1;
 			cfg.output.vtiming.sync_width = 1;
@@ -1608,19 +1755,19 @@ namespace device {
 			// Graphics Area Vertical Start Position
 			cfg.input[FRAME_LAYER_2].coordinate.y = 0;
 			// Graphics Area Vertical Width
-			cfg.input[FRAME_LAYER_2].vsize = YSIZE_PHYS;
+			cfg.input[FRAME_LAYER_2].vsize = YSIZE;
 			// Graphics Area Horizontal Start Position
 			cfg.input[FRAME_LAYER_2].coordinate.x = 0;
 			// Graphics Area Horizontal Width
-			cfg.input[FRAME_LAYER_2].hsize = XSIZE_PHYS;
+			cfg.input[FRAME_LAYER_2].hsize = XSIZE;
 			// Rectangular Alpha Blending Area Vertical Start Position
 			cfg.blend[FRAME_LAYER_2].start_coordinate.x = 0;
 			// Rectangular Alpha Blending Area Vertical Width
-			cfg.blend[FRAME_LAYER_2].end_coordinate.x= YSIZE_PHYS;
+			cfg.blend[FRAME_LAYER_2].end_coordinate.x= YSIZE;
 			// Rectangular Alpha Blending Area Horizontal Start Position
 			cfg.blend[FRAME_LAYER_2].start_coordinate.y = 0;
 			// Rectangular Alpha Blending Area Horizontal Width
-			cfg.blend[FRAME_LAYER_2].end_coordinate.y= XSIZE_PHYS;
+			cfg.blend[FRAME_LAYER_2].end_coordinate.y= XSIZE;
   			// Graphic 2 Register Value Reflection Enable
 
 			//
@@ -1706,11 +1853,12 @@ namespace device {
 			runtime_cfg.blend = cfg.blend[FRAME_LAYER_2];
 			runtime_cfg.input = cfg.input[FRAME_LAYER_2];
 			runtime_cfg.chromakey = cfg.chromakey[FRAME_LAYER_2];
+#endif
 			//
 			// Register Dave2D interrupt
 			//
-			R_BSP_InterruptWrite(BSP_INT_SRC_AL1_DRW2D_DRW_IRQ, (bsp_int_cb_t)drw_int_isr);
-#endif
+///			R_BSP_InterruptWrite(BSP_INT_SRC_AL1_DRW2D_DRW_IRQ, (bsp_int_cb_t)drw_int_isr);
+
 			//
 			// Register Reflection
 			//
@@ -1752,10 +1900,8 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool control(control_cmd cmd, const void* args = nullptr)
+		bool control(control_cmd cmd, const void* args = nullptr) noexcept
 		{
-			glcdc_detect_cfg_t* p_detection;
-
 			if(glcdc_operating_status::CLOSED == ctrl_blk_.state) {
 				last_error_ = error_t::NOT_OPEN;
 				return false;
@@ -1783,29 +1929,28 @@ namespace device {
 					last_error_ = error_t::INVALID_MODE;
 					return false;
 				}
-#if 0
 				/* Return immediately if the register is being updated */
-				if(true == r_glcdc_is_gr_plane_updating(FRAME_LAYER_1)) {
-					last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+				if(is_gr_plane_updating_(FRAME_LAYER_1)) {
+					last_error_ = error_t::INVALID_UPDATE_TIMING;
 					return false;
 				}
-				if(true == r_glcdc_is_gr_plane_updating(FRAME_LAYER_2)) {
-					last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+				if(is_gr_plane_updating_(FRAME_LAYER_2)) {
+					last_error_ = error_t::INVALID_UPDATE_TIMING;
 					return false;
 				}
-				if(true == r_glcdc_is_output_ctrl_updating()) {
-					last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+				if(is_output_ctrl_updating_()) {
+					last_error_ = error_t::INVALID_UPDATE_TIMING;
 					return false;
 				}
-				if(true == r_glcdc_is_gamma_updating()) {
-					last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+				if(is_gamma_updating_()) {
+					last_error_ = error_t::INVALID_UPDATE_TIMING;
 					return false;
 				}
-				if(true == r_glcdc_is_register_reflecting()) {
-					last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+				if(is_register_reflecting_()) {
+					last_error_ = error_t::INVALID_UPDATE_TIMING;
 					return false;
 				}
-#endif
+
 				/* Stop outputting the vertical and horizontal synchronization signals
 				   and screen data. */
 				bg_operation_enable(false);
@@ -1816,15 +1961,15 @@ namespace device {
 				break;
 
 			case control_cmd::SET_INTERRUPT:
-#if 0
 #if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
 				if(NULL == args) {
-					return GLCDC_ERR_INVALID_PTR;
+					last_error_ = error_t::INVALID_PTR;
+					return false;
 				}
 #endif
 
-				if(false == g_ctrl_blk.first_vpos_interrupt_flag) {
-                	last_error_ = GLCDC_ERR_INVALID_UPDATE_TIMING;
+				if(false == ctrl_blk_.first_vpos_interrupt_flag) {
+                	last_error_ = error_t::INVALID_UPDATE_TIMING;
 					return false;
 				}
 
@@ -1833,44 +1978,40 @@ namespace device {
 
 				break;
 
-        case control_cmd::CLR_DETECTED_STATUS:
+	        case control_cmd::CLR_DETECTED_STATUS:
 
 #if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
-            if (NULL == args)
-            {
-                return GLCDC_ERR_INVALID_PTR;
-            }
+				if (NULL == args) {
+					return GLCDC_ERR_INVALID_PTR;
+				}
 #endif
-            p_detection = static_cast<glcdc_detect_cfg_t*>(args);
+				{
+					const glcdc_detect_cfg_t* p_detection;
+					p_detection = static_cast<const glcdc_detect_cfg_t*>(args);
 
-            if (true == p_detection->vpos_detect)
-            {
-                r_glcdc_vpos_int_status_clear ();
-            }
-            if (true == p_detection->gr1uf_detect)
-            {
-                r_glcdc_gr1uf_int_status_clear ();
-            }
-            if (true == p_detection->gr2uf_detect)
-            {
-                r_glcdc_gr2uf_int_status_clear ();
-            }
+					if(true == p_detection->vpos_detect) {
+						vpos_int_status_clear_();
+					}
+					if(true == p_detection->gr1uf_detect) {
+						gr1uf_int_status_clear_();
+					}
+					if(true == p_detection->gr2uf_detect) {
+						gr2uf_int_status_clear_();
+					}
+				}
+				break;
 
-        break;
-
-        case control_cmd::CHANGE_BG_COLOR:
+			case control_cmd::CHANGE_BG_COLOR:
 
 #if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
-            if (NULL == args)
-            {
-                return error_t::INVALID_PTR;
-            }
+				if(NULL == args) {
+					last_error_ = error_t::INVALID_PTR;
+					return false;
+				}
 #endif
+///				r_glcdc_bg_color_setting(static_cast<glcdc_color_t*>(args));
+				break;
 
-            r_glcdc_bg_color_setting(static_cast<glcdc_color_t*>(args));
-
-        break;
-#endif
 			default:
 				last_error_ = error_t::INVALID_ARG;
 				return false;
@@ -1881,5 +2022,6 @@ namespace device {
 		}
 	};
 
-	template <class GLC, PIX_TYPE PXT> glcdc_ctrl_t glcdc_io<GLC, PXT>::ctrl_blk_;
+	template <class GLC, int32_t XSIZE, int32_t YSIZE, PIX_TYPE PXT>
+		glcdc_ctrl_t glcdc_io<GLC, XSIZE, YSIZE, PXT>::ctrl_blk_;
 }
