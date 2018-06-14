@@ -29,39 +29,149 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct control_t : public wo32_t<ofs> {
-			typedef wo32_t<ofs> io_;
+		struct control_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
 			using io_::operator =;
-#if 0
-			bit_wo_t<io_, bitpos::B0>   LIM1EN;
-			bit_wo_t<io_, bitpos::B1>   LIM2EN;
-			bit_wo_t<io_, bitpos::B2>   LIM3EN;
-			bit_wo_t<io_, bitpos::B3>   LIM4EN;
-			bit_wo_t<io_, bitpos::B4>   LIM5EN;
-			bit_wo_t<io_, bitpos::B5>   LIM6EN;
-			bit_wo_t<io_, bitpos::B6>   QUAD1EN;
-			bit_wo_t<io_, bitpos::B7>   QUAD2EN;
-			bit_wo_t<io_, bitpos::B8>   QUAD3EN;
-			bit_wo_t<io_, bitpos::B9>   LIM1TH;
-			bit_wo_t<io_, bitpos::B10>  LIM2TH;
-			bit_wo_t<io_, bitpos::B11>  LIM3TH;
-			bit_wo_t<io_, bitpos::B12>  LIM4TH;
-			bit_wo_t<io_, bitpos::B13>  LIM5TH;
-			bit_wo_t<io_, bitpos::B14>  LIM6TH;
-			bit_wo_t<io_, bitpos::B15>  BAND1EN;
-			bit_wo_t<io_, bitpos::B16>  BAND2EN;
-			bit_wo_t<io_, bitpos::B17>  UNION12;
-			bit_wo_t<io_, bitpos::B18>  UNION34;
-			bit_wo_t<io_, bitpos::B19>  UNION56;
-			bit_wo_t<io_, bitpos::B20>  UNIONAB;
-			bit_wo_t<io_, bitpos::B21>  UNIONCD;
-			bit_wo_t<io_, bitpos::B22>  SPANABT;
-			bit_wo_t<io_, bitpos::B23>  SPANSTR;
-#endif
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   LIM1EN;
+			bit_rw_t<io_, bitpos::B1>   LIM2EN;
+			bit_rw_t<io_, bitpos::B2>   LIM3EN;
+			bit_rw_t<io_, bitpos::B3>   LIM4EN;
+			bit_rw_t<io_, bitpos::B4>   LIM5EN;
+			bit_rw_t<io_, bitpos::B5>   LIM6EN;
+			bit_rw_t<io_, bitpos::B6>   QUAD1EN;
+			bit_rw_t<io_, bitpos::B7>   QUAD2EN;
+			bit_rw_t<io_, bitpos::B8>   QUAD3EN;
+			bit_rw_t<io_, bitpos::B9>   LIM1TH;
+			bit_rw_t<io_, bitpos::B10>  LIM2TH;
+			bit_rw_t<io_, bitpos::B11>  LIM3TH;
+			bit_rw_t<io_, bitpos::B12>  LIM4TH;
+			bit_rw_t<io_, bitpos::B13>  LIM5TH;
+			bit_rw_t<io_, bitpos::B14>  LIM6TH;
+			bit_rw_t<io_, bitpos::B15>  BAND1EN;
+			bit_rw_t<io_, bitpos::B16>  BAND2EN;
+			bit_rw_t<io_, bitpos::B17>  UNION12;
+			bit_rw_t<io_, bitpos::B18>  UNION34;
+			bit_rw_t<io_, bitpos::B19>  UNION56;
+			bit_rw_t<io_, bitpos::B20>  UNIONAB;
+			bit_rw_t<io_, bitpos::B21>  UNIONCD;
+			bit_rw_t<io_, bitpos::B22>  SPANABT;
+			bit_rw_t<io_, bitpos::B23>  SPANSTR;
 		};
 		static control_t<base + 0x00> CONTROL;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  サーフェスコントロールレジスタ (CONTROL2)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct control2_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      PTNEN;
+			bit_rw_t <io_, bitpos::B1>      TEXENA;
+			bit_rw_t <io_, bitpos::B2>      PTNSRCL5;
+			bit_rw_t <io_, bitpos::B3>      USEACB;
+			bits_rw_t<io_, bitpos::B4, 2>   RDFMT2;
+			bit_rw_t <io_, bitpos::B6>      BSFA;
+			bit_rw_t <io_, bitpos::B7>      BDFA;
+			bit_rw_t <io_, bitpos::B8>      WRFMT2;
+			bit_rw_t <io_, bitpos::B9>      BSF;
+			bit_rw_t <io_, bitpos::B10>     BDF;
+			bit_rw_t <io_, bitpos::B11>     BSI;
+			bit_rw_t <io_, bitpos::B12>     BDI;
+			bit_rw_t <io_, bitpos::B13>     BC2;
+			bit_rw_t <io_, bitpos::B14>     TEXCLPX;
+			bit_rw_t <io_, bitpos::B15>     TEXCLPY;
+			bit_rw_t <io_, bitpos::B16>     TEXFILTX;
+			bit_rw_t <io_, bitpos::B17>     TEXFILTY;
+			bits_rw_t<io_, bitpos::B18, 2>  RDFMT;
+			bits_rw_t<io_, bitpos::B20, 2>  WRFMT;
+			bits_rw_t<io_, bitpos::B22, 2>  WRALPHA;
+			bit_rw_t <io_, bitpos::B24>     RLEEN;
+			bit_rw_t <io_, bitpos::B25>     CLUTEN;
+			bit_rw_t <io_, bitpos::B26>     COLKEYEN;
+			bit_rw_t <io_, bitpos::B27>     CLUTFORM;
+			bit_rw_t <io_, bitpos::B28>     BSIA;
+			bit_rw_t <io_, bitpos::B29>     BDIA;
+			bits_rw_t<io_, bitpos::B30, 2>  RLEPIXW;
+		};
+		static control2_t<base + 0x04> CONTROL2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  割り込みコントロールレジスタ (IRQCTL)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct irqctl_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      ENUIREN;
+			bit_rw_t <io_, bitpos::B1>      DLIREN;
+			bit_rw_t <io_, bitpos::B2>      ENUIRCLR;
+			bit_rw_t <io_, bitpos::B3>      DLIRCLR;
+		};
+		static irqctl_t<base + 0xC0> IRQCTL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  キャッシュコントロールレジスタ (CACHECTL)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct cachectl_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>      CENFX;
+			bit_rw_t <io_, bitpos::B1>      CFLUFX;
+			bit_rw_t <io_, bitpos::B2>      CENTX;
+			bit_rw_t <io_, bitpos::B3>      CFLUTX;
+		};
+		static cachectl_t<base + 0xC4> CACHECTL;
+
+
+#if 0
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ステータスレジスタ (STATUS)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct cachectl_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+
+			bit_rw_t <io_, bitpos::B0>      CENFX;
+			bit_rw_t <io_, bitpos::B1>      CFLUFX;
+			bit_rw_t <io_, bitpos::B2>      CENTX;
+			bit_rw_t <io_, bitpos::B3>      CFLUTX;
+		};
+		static cachectl_t<base + 0xC4> CACHECTL;
+#endif
 
 
 
