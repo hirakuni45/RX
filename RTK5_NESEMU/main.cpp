@@ -66,6 +66,8 @@ namespace {
 
 	utils::command<256> cmd_;
 
+	emu::nesemu		nesemu_;
+
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
 		if(!f) {
@@ -130,6 +132,7 @@ extern "C" {
     int emu_log(const char* text)
     {
 //        emu::tools::put(text);
+		sci_puts(text);
         return 0;
     }
 
@@ -243,12 +246,16 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
+	nesemu_.start();
+
 	uint8_t n = 0;
 	while(1) {
-		cmt_.sync();
+		glcdc_io_.sync_vpos();
+
+		void* org = reinterpret_cast<void*>(0x00800000);
+		nesemu_.service(org, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
 
 		sdc_.service(sdh_.service());
-
 
 		command_();
 
