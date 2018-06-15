@@ -6,9 +6,10 @@
 	@author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
-#include "main.hpp"
-#include "utils/file_io.hpp"
-#include "utils/format.hpp"
+// #include "main.hpp"
+#include <vector>
+#include "common/file_io.hpp"
+#include "common/format.hpp"
 
 #include "emu/cpu/nes6502.h"
 #include "emu/nes/nes_rom.h"
@@ -202,7 +203,7 @@ namespace emu {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool open(const std::string& filename)
+		bool open(const char* filename)
 		{
 			utils::file_io fi;
 			if(!fi.open(filename, "rb")) {
@@ -214,6 +215,7 @@ namespace emu {
 			if(fi.read(&info_, 128) != 128) {
 				return false;
 			}
+
 			if(!info_.probe()) {
 				return false;
 			}
