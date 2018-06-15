@@ -74,7 +74,7 @@ namespace utils {
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool open(const char* filename, const char* mode)
+		bool open(const char* filename, const char* mode) noexcept
 		{
 			if(filename == nullptr || mode == nullptr) return false;
 
@@ -118,7 +118,7 @@ namespace utils {
 			@return 成功なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool close()
+		bool close() noexcept
 		{
 			if(!open_) {
 				return false;
@@ -136,13 +136,15 @@ namespace utils {
 			@return 読み込みサイズ
 		*/
 		//-------------------------------------------------------------//
-		int read(void* dst, uint32_t len)
+		uint32_t read(void* dst, uint32_t len) noexcept
 		{
 			if(!open_) return 0; 
 
 			UINT rl = 0;
 			FRESULT res = f_read(&fp_, dst, len, &rl);
-
+			if(res != FR_OK) {
+				return 0;
+			}
 			return rl;
 		}
 
@@ -156,7 +158,7 @@ namespace utils {
 			@return 読み込みサイズ
 		*/
 		//-------------------------------------------------------------//
-		int read(void* dst, uint32_t block, uint32_t num)
+		uint32_t read(void* dst, uint32_t block, uint32_t num) noexcept
 		{
 			return read(dst, block * num);
 		}
@@ -197,7 +199,7 @@ namespace utils {
 			@return ファイル位置
 		*/
 		//-------------------------------------------------------------//
-		uint32_t tell()
+		uint32_t tell() noexcept
 		{
 			return f_tell(&fp_);
 		}
@@ -209,7 +211,7 @@ namespace utils {
 			@return ファイルの終端なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool eof()
+		bool eof() noexcept
 		{
 			if(!open_) return false;
 			return f_eof(&fp_);
@@ -222,7 +224,7 @@ namespace utils {
 			@return ファイルサイズ
 		*/
 		//-------------------------------------------------------------//
-		uint32_t get_file_size() const
+		uint32_t get_file_size() const noexcept
 		{
 			if(!open_) return 0;
 			return f_size(&fp_);
