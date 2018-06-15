@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include "side/arcade.h"
+#include "common/file_io.hpp"
 
 namespace emu {
 
@@ -69,18 +70,18 @@ namespace emu {
 					strcat(tmp, "/");
 					strcat(tmp, rom_files[i]);
 
-					FILE* fp = fopen(tmp, "rb");
-					if(fp == nullptr) {
+					utils::file_io fi;
+					if(!fi.open(tmp, "rb")) {
 						utils::format("Can't open: '%s'\n") % tmp;
 						return false;
 					}
-					if(fread(&rom[i * 0x800], 1, 0x800, fp) != 0x800) {
+					if(fi.read(&rom[i * 0x800], 0x800) != 0x800) {
 						utils::format("Can't read data: '%s'\n") % tmp;
-						fclose(fp);
+						fi.close();
 						return false;
 					}
 					utils::format("Read ROM: '%s'\n") % tmp;
-					fclose(fp);
+					fi.close();
 				}
 
 				uint32_t sum = 0;
