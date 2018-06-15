@@ -218,7 +218,6 @@ namespace device {
 			SCI::SPMR.CKPH  = 0;
 
 			if(brr) --brr;
-brr = 1;
 			SCI::BRR = static_cast<uint8_t>(brr);
 
 			uint8_t scr = 0;
@@ -254,9 +253,11 @@ brr = 1;
 
 			level_ = level;
 
-			SCI::SCR = 0x00;		// TE, RE disable.
+			SCI::SCR = 0x00;		// TE, RE disable. CKE = 0
 			port_map::turn(SCI::get_peripheral(), true, PSEL);
 
+
+			SCI::SIMR3 = SCI::SIMR3.IICSDAS.b(0b11) | SCI::SIMR3.IISCLSS.b(0b11);
 
 
 
@@ -391,7 +392,7 @@ brr = 1;
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  送受信
+			@brief  送受信（SPI）
 			@param[in]	ch	送信データ
 			@return	受信データ
 		*/
@@ -410,7 +411,7 @@ brr = 1;
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  シリアル送信
+			@brief  ブロック送信（SPI）
 			@param[in]	src	送信ソース
 			@param[in]	cnt	送信サイズ
 		*/
@@ -428,7 +429,7 @@ brr = 1;
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  シリアル受信
+			@brief  ブロック受信（SPI）
 			@param[out]	dst	受信先
 			@param[in]	cnt	受信サイズ
 		*/

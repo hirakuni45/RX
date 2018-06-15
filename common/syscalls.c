@@ -26,7 +26,7 @@ void sci_putch(char ch) { }
 char sci_getch(void) __attribute__((weak));
 char sci_getch(void) { return 0; }
 
-void utf8_to_sjis(const char* src, char* dst, uint16_t dsz);
+void utf8_to_sjis(const char* src, char* dst, uint32_t dsz);
 
 // FatFS を使う場合有効にする（通常 Makefile で定義）
 // #define FAT_FS

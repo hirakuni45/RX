@@ -137,6 +137,7 @@ namespace utils {
 			@brief  sjis から UTF-8 への変換
 			@param[in]	src	ソース
 			@param[in]	dst	変換先
+///			@param[in]	len	変換先サイズ
 		*/
 		//-----------------------------------------------------------------//
 		static void sjis_to_utf8(const char* src, char* dst)
@@ -177,7 +178,7 @@ namespace utils {
 			@param[in]	dsz	変換先のサイズ
 		*/
 		//-----------------------------------------------------------------//
-		static void utf8_to_sjis(const char* src, char* dst, uint16_t dsz)
+		static void utf8_to_sjis(const char* src, char* dst, uint32_t dsz)
 		{
 			int8_t cnt = 0;
 			uint16_t code = 0;
