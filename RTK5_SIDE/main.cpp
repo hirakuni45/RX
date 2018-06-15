@@ -239,33 +239,28 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
-	uint8_t nnn = 100;
-	bool init_inv = false;
-
+	uint32_t delay_inv = 120;
 	uint8_t n = 0;
 	while(1) {
-//		cmt_.sync();
 		glcdc_io_.sync_vpos();
 
-		if(nnn > 0) {
-			--nnn;
-		} else {
-			if(init_inv) {
-				spinv_.service((void*)0x00800000, 480, 272);
-			} else if(sdc_.get_mount()) {
-				if(!spinv_.start("/inv_roms")) {
-					utils::format("Space Invaders not start...(fail)\n");
+		if(delay_inv > 0) {
+			--delay_inv;
+			if(delay_inv == 0) {
+				if(sdc_.get_mount()) {
+					if(spinv_.start("/inv_roms")) {
+						utils::format("Space Invaders start...\n");
+					} else {
+						utils::format("Space Invaders not start...(fail)\n");
+					}
 				} else {
-					utils::format("Space Invaders start...\n");
-					init_inv = true;
+					delay_inv = 60;
+					utils::format("SD card not mount\n");
 				}
-			} else {
-				utils::format("SD card not found\n");
-				nnn = 60;
 			}
+		} else {
+			spinv_.service((void*)0x00800000, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
 		}
-//		uint32_t cnt = cmt_.get_cmt_count();
-//		uint32_t cmp = cmt_.get_cmp_count();
 
 		sdc_.service(sdh_.service());
 
