@@ -326,7 +326,7 @@ int lseek(int file, int offset, int dir)
 				errno = EINVAL;
 				return -1;
 			}
-			if(ofs < 0 || ofs >= f_size(fp)) {
+			if(ofs < 0 || ofs > f_size(fp)) {
 				errno = EINVAL;
 				return -1;
 			}
@@ -446,7 +446,6 @@ int fstat(int file, struct stat *st)
 		errno = 0;
 		ret = 0;
 	}
-
 #if 0
 	FILINFO finf;
 	struct tm ttm;
