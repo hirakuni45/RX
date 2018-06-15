@@ -246,13 +246,13 @@ namespace device {
 		/** Graphics plane input configuration */
 		struct input_cfg_t
 		{
-			void*	 base;                   // Base address to the frame buffer.
-			uint16_t hsize;                      // Horizontal pixel size in a line.
-			uint16_t vsize;                      // Vertical pixel size in a frame.
-			int32_t offset;                      // offset value to next line.
-			glcdc_in_format_t format;            // Input format setting.
-			bool frame_edge;                     // Show/hide setting of the frame of the graphics area.
-			glcdc_coordinate_t coordinate;       // Starting point of image.
+			void*	 base;                 // Base address to the frame buffer.
+			uint16_t hsize;                // Horizontal pixel size in a line.
+			uint16_t vsize;                // Vertical pixel size in a frame.
+			int32_t offset;                // offset value to next line.
+			glcdc_in_format_t format;      // Input format setting.
+			bool frame_edge;               // Show/hide setting of the frame of the graphics area.
+			glcdc_coordinate_t coordinate; // Starting point of image.
 			color_t bg_color;              // Color outside region.
 		};
 
@@ -1657,13 +1657,13 @@ namespace device {
 			ctrl_blk_.vsize = cfg.output.vtiming.display_cyc;
 
 			// Save status of frame buffer read enable
-			if(nullptr == cfg.input[FRAME_LAYER_1].base) {
+			if(cfg.input[FRAME_LAYER_1].offset == 0) {
 				ctrl_blk_.graphics_read_enable[FRAME_LAYER_1] = false;
 			} else {
 				ctrl_blk_.graphics_read_enable[FRAME_LAYER_1] = true;
 			}
 
-			if(nullptr == cfg.input[FRAME_LAYER_2].base) {
+			if(cfg.input[FRAME_LAYER_2].offset == 0) {
 				ctrl_blk_.graphics_read_enable[FRAME_LAYER_2] = false;
 			} else {
 				ctrl_blk_.graphics_read_enable[FRAME_LAYER_2] = true;
@@ -1837,7 +1837,8 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(void* ly1 = nullptr, void* ly2 = reinterpret_cast<void*>(0x00800000)) noexcept
+		bool start(void* ly1 = reinterpret_cast<void*>(0x0),
+			void* ly2 = reinterpret_cast<void*>(0x0)) noexcept
 		{
 			cfg_t cfg;
 			//
@@ -1871,10 +1872,12 @@ namespace device {
 			// Vertical Active Display Start Position (min. 3 lines)
 			cfg.output.htiming.sync_width = 2;
 			cfg.output.vtiming.sync_width = 1;
+
 			//
 			// Graphic 1 configuration
 			//
-			cfg.input[FRAME_LAYER_1].base = ly1;	  // Disable Graphics 1
+			cfg.input[FRAME_LAYER_1].base = ly1;
+			cfg.input[FRAME_LAYER_2].offset = 0;	  // Disable Graphics 1
 
 			//
 			// Graphic 2 configuration
@@ -1884,6 +1887,7 @@ namespace device {
 			cfg.input[FRAME_LAYER_2].base = ly2;
 			// Offset value from the end address of the line to the start address of the next line
 			cfg.input[FRAME_LAYER_2].offset = LINE_OFFSET;
+
 			// Single Line Data Transfer Count
 			// Single Frame Line Count
 
@@ -2043,10 +2047,10 @@ namespace device {
 			BSC.EBMAPCR.BIT.PR5SEL = 4;
 #endif
 
-			if(cfg.input[FRAME_LAYER_1].base != nullptr) {
+			if(cfg.input[FRAME_LAYER_1].offset != 0) {
 				memset(cfg.input[FRAME_LAYER_1].base, 0x00, BYTES_PER_BUFFER);
 			}
-			if(cfg.input[FRAME_LAYER_2].base != nullptr) {
+			if(cfg.input[FRAME_LAYER_2].offset != 0) {
 				memset(cfg.input[FRAME_LAYER_2].base, 0x00, BYTES_PER_BUFFER);
 			}
 
