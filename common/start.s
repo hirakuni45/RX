@@ -24,7 +24,7 @@ _start:
     mvtc    #100h, fpsw
 
 # RAM 全領域のゼロクリア
-	mov	#0, r1
+	mov	#__datastart, r1
 	mov	#0, r2
 	mov	#__istack, r3
 	sub r1, r3
