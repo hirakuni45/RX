@@ -61,7 +61,29 @@ namespace emu {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  エミュレーター・ファイルを開く
+			@param[in]	filename	ファイル名
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool open(const char* filename)
+		{
+			nesrom_ = false;
+			if(nsfplay_.open(filename)) {
+				nesrom_ = true;
+			} else if(nes_insertcart(filename) == 0) {
+				nesrom_ = true;
+			}
+			return nesrom_;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  サービス
+			@param[in]	org		フレームバッファのアドレス
+			@param[in]	xs		フレームバッファのＸ幅
+			@param[in]	ys		フレームバッファのＹ幅
 		*/
 		//-----------------------------------------------------------------//
 		void service(void* org, uint32_t xs, uint32_t ys)
@@ -69,38 +91,39 @@ namespace emu {
 			if(delay_ > 0) {
 				--delay_;
 				if(delay_ == 0) {
-					if(nsfplay_.open("GALAXIAN.NES")) {
-						nesrom_ = true;
-					} else if(nes_insertcart("GALAXIAN.NES") == 0) {
-						nesrom_ = true;
-					}
+					open("GRADIUS.nes");
+//					open("Dragon_Quest2_fix.nes");
+//					open("Solstice_J.nes");
+// low memory		open("Zombie.nes");
 				}
 			}
 
 			auto nes = nes_getcontext();
 			bitmap_t* v = nes->vidbuf;
 			const rgb_t* lut = get_palette();
-			if(v != nullptr && lut != nullptr) {
-				uint16_t luttmp[64];
-				for(uint32_t i = 0; i < 64; ++i) {
-                	uint16_t r = lut[i].r;  // R
-                    uint16_t g = lut[i].g;  // G
-                    uint16_t b = lut[i].b;  // B
-					luttmp[i] = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | (b >> 3);
+			if(v == nullptr || lut == nullptr) {
+				return;
+			}
+			uint16_t luttmp[64];
+			for(uint32_t i = 0; i < 64; ++i) {
+               	uint16_t r = lut[i].r;  // R
+				uint16_t g = lut[i].g;  // G
+				uint16_t b = lut[i].b;  // B
+				// R(5), G(6), B(5)
+				luttmp[i] = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | (b >> 3);
+			}
+			uint16_t* dst = static_cast<uint16_t*>(org);
+			dst += ((ys - nes_height_) / 2) * xs;
+			for(int h = 0; h < nes_height_; ++h) {
+				const uint8_t* src = &v->data[h * v->pitch];
+				uint16_t* tmp = dst;
+				tmp += (xs - nes_width_) / 2;
+				for(int w = 0; w < nes_width_; ++w) {
+					auto idx = *src++;
+					idx &= 63;
+					*tmp++ = luttmp[idx];
 				}
-				uint16_t* dst = static_cast<uint16_t*>(org);
-				dst += ((ys - nes_height_) / 2) * xs;
-				for(int h = 0; h < nes_height_; ++h) {
-					const uint8_t* src = &v->data[h * v->pitch];
-					uint16_t* tmp = dst;
-					tmp += (xs - nes_width_) / 2;
-					for(int w = 0; w < nes_width_; ++w) {
-						auto idx = *src++;
-						idx &= 63;
-						*tmp++ = luttmp[idx];
-					}
-					dst += xs;
-				}
+				dst += xs;
 			}
 			if(nesrom_) {
 				nes_emulate(1);

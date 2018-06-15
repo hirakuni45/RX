@@ -111,10 +111,19 @@ namespace {
 			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
 				utils::format("%s\n") % sdc_.get_current();
 				f = true;
+			} else if(cmd_.cmp_word(0, "nes")) {
+				if(check_mount_()) {
+					if(cmdn >= 2) {
+						char tmp[128];
+						cmd_.get_word(1, sizeof(tmp), tmp);
+						f = nesemu_.open(tmp);						
+					}
+				}
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    dir [path]\n");
 				utils::format("    cd [path]\n");
 				utils::format("    pwd\n");
+				utils::format("    nes path\n");
 				f = true;
 			}
 			if(!f) {
@@ -223,8 +232,7 @@ int main(int argc, char** argv)
 		sdc_.start();
 	}
 
-	utils::format("\rRTK5RX65N Start for LCD sample\n");
-
+	utils::format("\rRTK5RX65N Start for NES Emulator sample\n");
 	cmd_.set_prompt("# ");
 
 	{  // GLCDC 初期化
@@ -237,10 +245,10 @@ int main(int argc, char** argv)
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
 			if(!glcdc_io_.control(GLCDC_IO::control_cmd::START_DISPLAY)) {
-				utils::format("GLCDC ctrl fail...\n");
+				utils::format("GLCDC Ctrl Fail\n");
 			}
 		} else {
-			utils::format("Fail GLCDC\n");
+			utils::format("GLCDC Fail\n");
 		}
 	}
 
@@ -252,7 +260,7 @@ int main(int argc, char** argv)
 	while(1) {
 		glcdc_io_.sync_vpos();
 
-		void* org = reinterpret_cast<void*>(0x00800000);
+		void* org = reinterpret_cast<void*>(0x00000000);
 		nesemu_.service(org, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
 
 		sdc_.service(sdh_.service());

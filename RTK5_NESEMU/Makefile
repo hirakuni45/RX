@@ -206,8 +206,7 @@ lst:  $(TARGET).lst
 
 # Rules for building the .text rom images
 
-# text: mot lst
-text: mot
+text: mot lst
 
 bin: $(TARGET).bin
 mot: $(TARGET).mot
