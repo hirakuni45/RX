@@ -1,14 +1,25 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ファイル・入出力クラス
+	@brief	ファイル・入出力クラス @n
+			※ fopen 系の機能を提供するクラス。@n
+			※ FATFS が必要
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/sdc_man.hpp"
+#ifndef FAT_FS
+#  error "file_io.hpp requires FAT_FS to be defined and include FATFS module"
+#endif
+
+#include "ff12b/src/diskio.h"
+#include "ff12b/src/ff.h"
+
+extern "C" {
+	void utf8_to_sjis(const char* src, char* dst, uint32_t dsz);
+};
 
 namespace utils {
 
@@ -19,6 +30,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class file_io {
 	public:
+
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
         /*!
             @brief  SEEK タイプ
@@ -31,9 +43,7 @@ namespace utils {
         };
 
 	private: 
-		sdc_man&	sdcman_;
 		FIL			fp_;
-
 		bool		open_;
 
 	public:
@@ -42,8 +52,7 @@ namespace utils {
 			@brief	コンストラクター
 		*/
 		//-------------------------------------------------------------//
-		file_io(sdc_man& sdcman) noexcept :
-			sdcman_(sdcman),
+		file_io() noexcept :
 			fp_(),
 			open_(false)
 		{ }
@@ -83,12 +92,13 @@ namespace utils {
 				mdf |= FA_OPEN_APPEND;
 			}
 
-			if(!sdcman_.open(&fp_, filename, mdf)) {
+			char tmp[_MAX_LFN + 1];
+			utf8_to_sjis(filename, tmp, sizeof(tmp));
+			FRESULT res = f_open(&fp_, tmp, mdf);
+			if(res != FR_OK) {
 				return false;
 			}
-
 			open_ = true;
-
 			return true;
 		}
 
@@ -121,14 +131,34 @@ namespace utils {
 		//-------------------------------------------------------------//
 		/*!
 			@brief	リード
+			@param[in]	dst		読込先
+			@param[in]	num		読み込みサイズ
+			@return 読み込みサイズ
 		*/
 		//-------------------------------------------------------------//
-		int read(void* ptr, uint32_t block, uint32_t num)
+		int read(void* dst, uint32_t len)
 		{
 			if(!open_) return 0; 
-			UINT sz = 0;
-			f_read(&fp_, ptr, block * num, &sz);
-			return sz;
+
+			UINT rl = 0;
+			FRESULT res = f_read(&fp_, dst, len, &rl);
+
+			return rl;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	リード
+			@param[in]	dst		読込先
+			@param[in]	block	ブロックサイズ
+			@param[in]	num		個数
+			@return 読み込みサイズ
+		*/
+		//-------------------------------------------------------------//
+		int read(void* dst, uint32_t block, uint32_t num)
+		{
+			return read(dst, block * num);
 		}
 
 
