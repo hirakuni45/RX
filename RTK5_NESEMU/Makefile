@@ -81,7 +81,8 @@ CSOURCES	=	common/init.c \
 				./emu/mappers/mapvrc.c \
 				./emu/libsnss/libsnss.c
 
-PSOURCES	=	main.cpp
+PSOURCES	=	main.cpp \
+				RX600/icu_mgr.cpp
 
 USER_LIBS	=	stdc++ m
 
@@ -205,7 +206,8 @@ lst:  $(TARGET).lst
 
 # Rules for building the .text rom images
 
-text: mot lst
+# text: mot lst
+text: mot
 
 bin: $(TARGET).bin
 mot: $(TARGET).mot
