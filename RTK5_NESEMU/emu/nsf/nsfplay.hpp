@@ -2,12 +2,12 @@
 //=====================================================================//
 /*! @file
 	@brief  NSF Player クラス @n
-			Copyright 2017 Kunihito Hiramatsu
+			Copyright 2017, 2018 Kunihito Hiramatsu
 	@author 平松邦仁 (hira@rvf-rc45.net)
 */
 //=====================================================================//
 // #include "main.hpp"
-#include <vector>
+// #include <vector>
 #include "common/file_io.hpp"
 #include "common/format.hpp"
 
@@ -81,7 +81,7 @@ namespace emu {
 
 		uint8_t				nes_ram_[0x800];
 
-		std::vector<uint8_t>	code_;
+		uint8_t*			code_;
 
 		static uint8_t ram_read_(uint32_t address) {
 ///			return nes_ram_[address & (sizeof(nes_ram_) - 1)];
@@ -193,7 +193,7 @@ namespace emu {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		nsfplay() : info_(), cpu_(nullptr) { }
+		nsfplay() : info_(), cpu_(nullptr), code_(nullptr) { }
 
 
 		//-----------------------------------------------------------------//
@@ -221,7 +221,8 @@ namespace emu {
 			}
 
 			uint32_t csz = fsz - 128;
-			code_.resize(csz);	
+			if(code_ != nullptr) free(code_);
+			code_ = (uint8_t*)malloc(csz);	
 			if(fi.read(&code_[0], csz) != csz) {
 				return false;
 			}
