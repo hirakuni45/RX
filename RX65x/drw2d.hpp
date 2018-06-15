@@ -153,7 +153,6 @@ namespace device {
 		static cachectl_t<base + 0xC4> CACHECTL;
 
 
-#if 0
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ステータスレジスタ (STATUS)
@@ -161,17 +160,115 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct cachectl_t : public trw32_t<ofs> {
+		struct status_t : public ro32_t<ofs> {
+			typedef ro32_t<ofs> io_;
+			using io_::operator ();
+
+			bit_ro_t <io_, bitpos::B0>      BSYENUM;
+			bit_ro_t <io_, bitpos::B1>      BSYWR;
+			bit_ro_t <io_, bitpos::B2>      CACHEDTY;
+			bit_ro_t <io_, bitpos::B3>      DLSTACT;
+			bit_ro_t <io_, bitpos::B4>      ENUIR;
+			bit_ro_t <io_, bitpos::B5>      DLIR;
+		};
+		static status_t<base + 0x00> STATUS;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ハードウェアバージョンレジスタ (HWVER)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct hwver_t : public ro32_t<ofs> {
+			typedef ro32_t<ofs> io_;
+			using io_::operator ();
+
+			bits_ro_t<io_, bitpos::B0, 12>  REV;
+			bit_ro_t <io_, bitpos::B17>     DLR;
+			bit_ro_t <io_, bitpos::B18>     FBCACHE;
+			bit_ro_t <io_, bitpos::B19>     TXCACHE;
+			bit_ro_t <io_, bitpos::B20>     PERFCNT;
+			bit_ro_t <io_, bitpos::B21>     TEXCLUT;
+
+			bit_ro_t <io_, bitpos::B23>     RLEUNIT;
+			bit_ro_t <io_, bitpos::B24>     TEXCLUT256;
+			bit_ro_t <io_, bitpos::B25>     COLKEY;
+
+			bit_ro_t <io_, bitpos::B27>     ACBLD;
+		};
+		static hwver_t<base + 0x04> HWVER;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ベースカラーレジスタ (COLOR1)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct color1_t : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>      CENFX;
-			bit_rw_t <io_, bitpos::B1>      CFLUFX;
-			bit_rw_t <io_, bitpos::B2>      CENTX;
-			bit_rw_t <io_, bitpos::B3>      CFLUTX;
+			bits_rw_t<io_, bitpos::B0,  8>    COL1B;
+			bits_rw_t<io_, bitpos::B8,  8>    COL1G;
+			bits_rw_t<io_, bitpos::B16, 8>    COL1R;
+			bits_rw_t<io_, bitpos::B24, 8>    COL1A;
 		};
-		static cachectl_t<base + 0xC4> CACHECTL;
-#endif
+		static color1_t<base + 0x64> COLOR1;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  セカンダリカラーレジスタ (COLOR2)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct color2_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  8>    COL2B;
+			bits_rw_t<io_, bitpos::B8,  8>    COL2G;
+			bits_rw_t<io_, bitpos::B16, 8>    COL2R;
+			bits_rw_t<io_, bitpos::B24, 8>    COL2A;
+		};
+		static color2_t<base + 0x68> COLOR2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	パターンレジスタ (PATTERN)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct pattern_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  8>    PATTERN;
+		};
+		static pattern_t<base + 0x74> PATTERN;
+
+
+
+
+
+
+
 
 
 
