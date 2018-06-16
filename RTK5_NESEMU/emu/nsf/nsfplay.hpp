@@ -2,8 +2,10 @@
 //=====================================================================//
 /*! @file
 	@brief  NSF Player クラス @n
-			Copyright 2017, 2018 Kunihito Hiramatsu
-	@author 平松邦仁 (hira@rvf-rc45.net)
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 // #include "main.hpp"
@@ -78,10 +80,6 @@ namespace emu {
 
 		rominfo_t			rominfo_;
 		mmc_t*				mmc_;
-
-		uint8_t				nes_ram_[0x800];
-
-		uint8_t*			code_;
 
 		static uint8_t ram_read_(uint32_t address) {
 ///			return nes_ram_[address & (sizeof(nes_ram_) - 1)];
@@ -193,7 +191,7 @@ namespace emu {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		nsfplay() : info_(), cpu_(nullptr), code_(nullptr) { }
+		nsfplay() : info_(), cpu_(nullptr) { }
 
 
 		//-----------------------------------------------------------------//
@@ -221,22 +219,21 @@ namespace emu {
 			}
 
 			uint32_t csz = fsz - 128;
-			if(code_ != nullptr) free(code_);
-			code_ = (uint8_t*)malloc(csz);	
-			if(fi.read(&code_[0], csz) != csz) {
+			uint8_t* code = (uint8_t*)malloc(csz);	
+			if(fi.read(code, csz) != csz) {
 				return false;
 			}
 
 			info_.list();
 
-			rominfo_.rom = &code_[0];
-			rominfo_.vrom = NULL;
-			rominfo_.sram = nes_ram_;
-			rominfo_.vram = NULL;
+			rominfo_.rom = code;
+			rominfo_.vrom = nullptr;
+			rominfo_.sram = (uint8_t*)malloc(0x800);
+			rominfo_.vram = nullptr;
 
 			rominfo_.rom_banks = csz / 0x4000;
 			rominfo_.vrom_banks = 0;
-			rominfo_.sram_banks = sizeof(nes_ram_) / 0x400;
+			rominfo_.sram_banks = 2;  // 0x800 / 0x400
 			rominfo_.vram_banks = 0;
 
 			rominfo_.mapper_number = 0;
@@ -247,7 +244,7 @@ namespace emu {
 			mmc_create(&rominfo_);
 			mmc_ = mmc_getcontext();
 
-			cpu_->mem_page[0] = nes_ram_;
+			cpu_->mem_page[0] = rominfo_.sram;
 			cpu_->read_handler  = read_handler_;
 			cpu_->write_handler = write_handler_;
 
@@ -258,17 +255,6 @@ namespace emu {
 			nes6502_reset();
 
 			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  サービス
-		*/
-		//-----------------------------------------------------------------//
-		void service()
-		{
-
 		}
 
 	};
