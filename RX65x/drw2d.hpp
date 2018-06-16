@@ -264,14 +264,317 @@ namespace device {
 		static pattern_t<base + 0x74> PATTERN;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	リミッタ n 開始値レジスタ (LnSTART) (n = 1 ～ 6)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0x10> L1START;
+		static trw32_t<base + 0x14> L2START;
+		static trw32_t<base + 0x18> L3START;
+		static trw32_t<base + 0x1C> L4START;
+		static trw32_t<base + 0x20> L5START;
+		static trw32_t<base + 0x24> L6START;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	リミッタ n X 軸インクリメントレジスタ (LnXADD) (n = 1 ～ 6)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0x28> L1XADD;
+		static trw32_t<base + 0x2C> L2XADD;
+		static trw32_t<base + 0x30> L3XADD;
+		static trw32_t<base + 0x34> L4XADD;
+		static trw32_t<base + 0x38> L5XADD;
+		static trw32_t<base + 0x3C> L6XADD;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	リミッタ n Y 軸インクリメントレジスタ (LnYADD) (n = 1 ～ 6)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0x40> L1YADD;
+		static trw32_t<base + 0x44> L2YADD;
+		static trw32_t<base + 0x48> L3YADD;
+		static trw32_t<base + 0x4C> L4YADD;
+		static trw32_t<base + 0x50> L5YADD;
+		static trw32_t<base + 0x54> L6YADD;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	リミッタ m バンド幅パラメータレジスタ (LmBAND) (m = 1, 2)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0x58> L1BAND;
+		static trw32_t<base + 0x5C> L2BAND;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	テクスチャベースアドレスレジスタ (TEXORG)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0xBC> TEXORG;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	テクスチャラインテクセル数レジスタ (TEXPITCH)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0xB4> TEXPITCH;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	テクスチャマスクレジスタ (TEXMSK)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct texmsk_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  11>  TEXUMASK;
+			bits_rw_t<io_, bitpos::B11, 21>  TEXVMASK;
+		};
+		static texmsk_t<base + 0xB8> TEXMSK;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	U リミッタ開始値レジスタ (LUST)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0x90> LUST;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	U リミッタ X 軸インクリメントレジスタ (LUXADD)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0x94> LUXADD;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	U リミッタ Y 軸インクリメントレジスタ (LUYADD)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0x98> LUYADD;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	V リミッタ開始値整数部レジスタ (LVSTI)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0x9C> LVSTI;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	V リミッタ開始値小数部レジスタ (LVSTF) @n
+					※下位１６ビットのみが有効
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0xA0> LVSTF;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	V リミッタ X 軸インクリメント整数部レジスタ (LVXADDI)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0xA4> LVXADDI;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	V リミッタ Y 軸インクリメント整数部レジスタ (LVYADDI)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0xA8> LVYADDI;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	V リミッタインクリメント小数部レジスタ (LVYXADDF)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct lvyxaddf_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  16>  LVYADDF;
+			bits_rw_t<io_, bitpos::B16, 16>  LVXADDF;
+		};
+		static lvyxaddf_t<base + 0xAC> LVYXADDF;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	CLUT 開始アドレスレジスタ (TEXCLADDR)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct texcladdr_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  8>  CLADDR;
+		};
+		static texcladdr_t<base + 0xDC> TEXCLADDR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	CLUT データレジスタ (TEXCLDATA)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0xE0> TEXCLDATA;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	CLUT オフセットレジスタ (TEXCLOFST)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct texclofst_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  8>  CLOFST;
+		};
+		static texclofst_t<base + 0xE4> TEXCLOFST;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	クロマキーレジスタ (COLKEY)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct colkey_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  8>  B;
+			bits_rw_t<io_, bitpos::B8,  8>  G;
+			bits_rw_t<io_, bitpos::B16, 8>  R;
+		};
+		static colkey_t<base + 0xE8> COLKEY;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	バウンディングボックスサイズレジスタ (SIZE)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct size_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  16>  X;
+			bits_rw_t<io_, bitpos::B16, 16>  Y;
+		};
+		static size_t<base + 0x78> SIZE;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	フレームバッファピッチレジスタ (PITCH)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct pitch_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  16>  PITCH;
+			bits_rw_t<io_, bitpos::B16, 16>  SSD;
+		};
+		static pitch_t<base + 0x7C> PITCH;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	フレームバッファベースアドレスレジスタ (ORIGIN)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0x80> ORIGIN;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ディスプレイリスト開始アドレスレジスタ (DLISTST)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0xC8> DLISTST;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	パフォーマンスカウンタコントロールレジスタ (PERFTRG)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct perftrg_t : public trw32_t<ofs> {
+			typedef trw32_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  16>  TRG1;
+			bits_rw_t<io_, bitpos::B16, 16>  TRG2;
+		};
+		static perftrg_t<base + 0xD4> PERFTRG;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	パフォーマンスカウンタ k (PERFCNTk) (k = 1, 2)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static trw32_t<base + 0xCC> PERFCNT1;
+		static trw32_t<base + 0xD0> PERFCNT2;
 
 
 		//-----------------------------------------------------------------//
