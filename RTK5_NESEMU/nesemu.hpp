@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	NES Emulator
+	@brief	NES Emulator ハンドラー
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,7 +14,15 @@
 #include "emu/nes/nesstate.h"
 #include "emu/nes/nes_pal.h"
 
-#include "emu/nsf/nsfplay.hpp"
+// #include "emu/nsf/nsfplay.hpp"
+
+extern "C" {
+
+	uint16_t sci_length(void);
+	char sci_getch(void);
+
+}
+
 
 namespace emu {
 
@@ -27,14 +35,19 @@ namespace emu {
 
 		static const int nes_width_  = 256;
 		static const int nes_height_ = 240;
-//        static const int sample_rate_ = 44100;
-//        static const int audio_len_ = sample_rate_ / 60;
+        static const int sample_rate_ = 22050;
+		static const int sample_bits_ = 16;
+		static const int audio_len_ = sample_rate_ / 60;
 
-		emu::nsfplay	nsfplay_;
+		uint16_t		audio_buf_[audio_len_ + 16];
+
+//		emu::nsfplay	nsfplay_;
 
 		bool			nesrom_;
 
 		uint32_t		delay_;
+
+		nesinput_t		inp_[2];
 
 	public:
 		//-----------------------------------------------------------------//
@@ -48,13 +61,22 @@ namespace emu {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  開始
+			@param[in]	オーディオをサポートしない場合「false」
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start()
+		bool start(bool audio_ena = true)
 		{
 			log_init();
-			nes_create(22050, 8);
+			nes_create(sample_rate_, sample_bits_);
+
+            inp_[0].type = INP_JOYPAD0;
+            inp_[0].data = 0;
+            input_register(&inp_[0]);
+            inp_[1].type = INP_JOYPAD1;
+            inp_[1].data = 0;
+            input_register(&inp_[1]);
+
 			return true;
 		}
 
@@ -69,11 +91,12 @@ namespace emu {
 		bool open(const char* filename)
 		{
 			nesrom_ = false;
-			if(nsfplay_.open(filename)) {
-				nesrom_ = true;
-			} else if(nes_insertcart(filename) == 0) {
+			if(nes_insertcart(filename) == 0) {
 				nesrom_ = true;
 			}
+//			} else if(nsfplay_.open(filename)) {
+//				nesrom_ = true;
+//			}
 			return nesrom_;
 		}
 
@@ -91,10 +114,12 @@ namespace emu {
 			if(delay_ > 0) {
 				--delay_;
 				if(delay_ == 0) {
-					open("GRADIUS.nes");
+//					open("GALAXIAN.NES");
+//					open("GRADIUS.nes");
+					open("DragonQuest_J_fix.nes");
 //					open("Dragon_Quest2_fix.nes");
 //					open("Solstice_J.nes");
-// low memory		open("Zombie.nes");
+//					open("Zombie.nes");
 				}
 			}
 
@@ -104,31 +129,78 @@ namespace emu {
 			if(v == nullptr || lut == nullptr) {
 				return;
 			}
-			uint16_t luttmp[64];
+			inp_[0].data = 0;
+			inp_[1].data = 0;
+			char ch = 0;
+			while(sci_length() > 0) {
+				ch = sci_getch();
+
+				if(ch == 'z' || ch == 'Z') {
+					inp_[0].data |= INP_PAD_A;
+				}
+				if(ch == 'x' || ch == 'X') {
+					inp_[0].data |= INP_PAD_B;
+				}
+				if(ch == '1') {
+					inp_[0].data |= INP_PAD_SELECT;
+				}
+				if(ch == '2') {
+					inp_[0].data |= INP_PAD_START;
+				}
+			}
+
+			uint16_t luttmp[256];
 			for(uint32_t i = 0; i < 64; ++i) {
                	uint16_t r = lut[i].r;  // R
 				uint16_t g = lut[i].g;  // G
 				uint16_t b = lut[i].b;  // B
 				// R(5), G(6), B(5)
 				luttmp[i] = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | (b >> 3);
+				luttmp[i+128+64] = luttmp[i+128] = luttmp[i+64] = luttmp[i];
 			}
 			uint16_t* dst = static_cast<uint16_t*>(org);
-			dst += ((ys - nes_height_) / 2) * xs;
-			for(int h = 0; h < nes_height_; ++h) {
-				const uint8_t* src = &v->data[h * v->pitch];
+			dst += ((ys - (nes_height_ - 16)) / 2) * xs;
+			const uint8_t* src = v->data;
+			src += v->pitch * 16;
+			for(int h = 0; h < (nes_height_ - 16); ++h) {
 				uint16_t* tmp = dst;
 				tmp += (xs - nes_width_) / 2;
-				for(int w = 0; w < nes_width_; ++w) {
-					auto idx = *src++;
-					idx &= 63;
-					*tmp++ = luttmp[idx];
+				for(int w = 0; w < nes_width_ / 16; ++w) {
+					*tmp++ = luttmp[*src++]; *tmp++ = luttmp[*src++];
+					*tmp++ = luttmp[*src++]; *tmp++ = luttmp[*src++];
+					*tmp++ = luttmp[*src++]; *tmp++ = luttmp[*src++];
+					*tmp++ = luttmp[*src++]; *tmp++ = luttmp[*src++];
+					*tmp++ = luttmp[*src++]; *tmp++ = luttmp[*src++];
+					*tmp++ = luttmp[*src++]; *tmp++ = luttmp[*src++];
+					*tmp++ = luttmp[*src++]; *tmp++ = luttmp[*src++];
+					*tmp++ = luttmp[*src++]; *tmp++ = luttmp[*src++];
 				}
+				src += v->pitch - nes_width_;
 				dst += xs;
 			}
 			if(nesrom_) {
+				apu_process(audio_buf_, audio_len_);
 				nes_emulate(1);
 			}
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オーディオ・バッファの長さを取得
+			@return オーディオ・バッファの長さ
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_audio_len() const noexcept { return audio_len_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オーディオ・バッファを取得
+			@return オーディオ・バッファのポインター
+		*/
+		//-----------------------------------------------------------------//
+		const uint16_t* get_audio_buf() const noexcept { return audio_buf_; }
 	};
 }
 
