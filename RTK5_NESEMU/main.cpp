@@ -1,6 +1,9 @@
 //=====================================================================//
 /*! @file
-    @brief  RX65N NESEMU
+    @brief  RX65N NESEMU @n
+			・NES Emulator（NES Emulator のソースは GPL）@n
+			・SD カードを使えるようにする必要がある。@n
+			・オーディオとして、DA0、DA1 出力を繋ぐ必要がある。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
