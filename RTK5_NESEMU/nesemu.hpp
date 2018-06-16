@@ -18,6 +18,7 @@
 
 extern "C" {
 
+	uint8_t get_fami_pad();
 	uint16_t sci_length(void);
 	char sci_getch(void);
 
@@ -115,8 +116,8 @@ namespace emu {
 				--delay_;
 				if(delay_ == 0) {
 //					open("GALAXIAN.NES");
-//					open("GRADIUS.nes");
-					open("DragonQuest_J_fix.nes");
+					open("GRADIUS.nes");
+//					open("DragonQuest_J_fix.nes");
 //					open("Dragon_Quest2_fix.nes");
 //					open("Solstice_J.nes");
 //					open("Zombie.nes");
@@ -129,23 +130,34 @@ namespace emu {
 			if(v == nullptr || lut == nullptr) {
 				return;
 			}
-			inp_[0].data = 0;
-			inp_[1].data = 0;
-			char ch = 0;
-			while(sci_length() > 0) {
-				ch = sci_getch();
 
-				if(ch == 'z' || ch == 'Z') {
+			{
+				inp_[0].data = 0;
+				inp_[1].data = 0;
+				uint8_t pad = get_fami_pad();
+				if(pad & 0b10000000) {
 					inp_[0].data |= INP_PAD_A;
 				}
-				if(ch == 'x' || ch == 'X') {
+				if(pad & 0b01000000) {
 					inp_[0].data |= INP_PAD_B;
 				}
-				if(ch == '1') {
+				if(pad & 0b00100000) {
 					inp_[0].data |= INP_PAD_SELECT;
 				}
-				if(ch == '2') {
+				if(pad & 0b00010000) {
 					inp_[0].data |= INP_PAD_START;
+				}
+				if(pad & 0b00001000) {
+					inp_[0].data |= INP_PAD_UP;
+				}
+				if(pad & 0b00000100) {
+					inp_[0].data |= INP_PAD_DOWN;
+				}
+				if(pad & 0b00000010) {
+					inp_[0].data |= INP_PAD_LEFT;
+				}
+				if(pad & 0b00000001) {
+					inp_[0].data |= INP_PAD_RIGHT;
 				}
 			}
 

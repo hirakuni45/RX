@@ -26,7 +26,13 @@
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
+// オーディオの D/A として使用
+//	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
+
+	// Famicon PAD
+	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_PS;
+	typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_CLK;
+	typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_OUT;
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
@@ -110,6 +116,7 @@ namespace {
 
 	emu::nesemu		nesemu_;
 
+
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
 		if(!f) {
@@ -176,9 +183,38 @@ namespace {
 			}
 		}
 	}
+
+
+	uint8_t get_fami_pad_()
+	{
+		static bool init = false;
+		if(!init) {
+			init = true;
+			PAD_PS::DIR = 1;
+			PAD_CLK::DIR = 1;
+		}
+		PAD_PS::P = 0; // seirial
+		uint8_t d = 0;
+		for(uint32_t i = 0; i < 8; ++i) {
+			d <<= 1;
+			if(!PAD_OUT::P()) ++d;
+			PAD_CLK::P = 1;
+			utils::delay::micro_second(1);
+			PAD_CLK::P = 0;
+			utils::delay::micro_second(1);
+		}
+		PAD_PS::P = 1; // parallel
+		return d;
+	}
 }
 
 extern "C" {
+
+	uint8_t get_fami_pad()
+	{
+		return get_fami_pad_();
+	}
+
 
 	void set_sample_rate(uint32_t freq)
 	{
@@ -188,12 +224,14 @@ extern "C" {
 		}
 	}
 
+
     int emu_log(const char* text)
     {
 //        emu::tools::put(text);
 		sci_puts(text);
         return 0;
     }
+
 
 	void sci_putch(char ch)
 	{
@@ -351,7 +389,7 @@ int main(int argc, char** argv)
 
 		sdc_.service(sdh_.service());
 
-//		command_();
+		command_();
 
 		++n;
 		if(n >= 30) {
