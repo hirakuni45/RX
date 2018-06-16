@@ -30,7 +30,7 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp
 
-USER_LIBS	=	stdc++
+USER_LIBS	=
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 

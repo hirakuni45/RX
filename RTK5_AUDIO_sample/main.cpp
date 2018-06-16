@@ -117,7 +117,7 @@ namespace {
 
 	bool play_mp3_(const char* fname)
 	{
-		utils::file_io fin(sdc_);
+		utils::file_io fin;
 		if(!fin.open(fname, "rb")) {
 			return false;
 		}
