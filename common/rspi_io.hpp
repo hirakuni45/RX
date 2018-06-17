@@ -117,7 +117,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		rspi_io() : level_(0) { }
+		rspi_io() noexcept : level_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -128,7 +128,7 @@ namespace device {
 			@return 最大速度
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_max_speed() const {
+		uint32_t get_max_speed() const noexcept {
 			uint32_t clk = PCLK;
 #ifdef SEEDA
 			while(clk > 20000000) {  // 15MHz
@@ -152,7 +152,7 @@ namespace device {
 			@return エラー（速度設定範囲外）なら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t speed, PHASE ctype, DLEN dlen, uint8_t level = 0)
+		bool start(uint32_t speed, PHASE ctype, DLEN dlen, uint8_t level = 0) noexcept
 		{
 			level_ = level;
 
@@ -216,7 +216,7 @@ namespace device {
 			@return エラー（速度設定範囲外）なら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_sdc(uint32_t speed)
+		bool start_sdc(uint32_t speed) noexcept
 		{
 			level_ = 0;
 
@@ -266,7 +266,7 @@ namespace device {
 			@return 読み出しデータ
 		*/
 		//----------------------------------------------------------------//
-		uint8_t xchg(uint8_t data = 0xff)
+		uint8_t xchg(uint8_t data = 0xff) noexcept
 		{
 			RSPI::SPDR = static_cast<uint32_t>(data);
 			while(RSPI::SPSR.SPRF() == 0) sleep_();
@@ -281,7 +281,7 @@ namespace device {
 			@return 読み出しデータ
 		*/
 		//----------------------------------------------------------------//
-		uint32_t xchg32(uint32_t data = 0)
+		uint32_t xchg32(uint32_t data = 0) noexcept
 		{
 			RSPI::SPDR = static_cast<uint32_t>(data);
 			while(RSPI::SPSR.SPRF() == 0) sleep_();
@@ -289,13 +289,13 @@ namespace device {
 		}
 
 
-		inline void xchg32_start(uint32_t data = 0)
+		inline void xchg32_start(uint32_t data = 0) noexcept
 		{
 			RSPI::SPDR = static_cast<uint32_t>(data);
 		}
 
 
-		inline uint32_t xchg32_sync()
+		inline uint32_t xchg32_sync() noexcept
 		{
 			while(RSPI::SPSR.SPRF() == 0) sleep_();
 		    return RSPI::SPDR();
@@ -309,7 +309,7 @@ namespace device {
 			@param[in]	cnt	送信サイズ
 		*/
 		//-----------------------------------------------------------------//
-		void send(const uint8_t* src, uint16_t size)
+		void send(const uint8_t* src, uint16_t size) noexcept
 		{
 			auto end = src + size;
 			while(src < end) {
@@ -326,7 +326,7 @@ namespace device {
 			@param[in]	cnt	受信サイズ
 		*/
 		//-----------------------------------------------------------------//
-		void recv(uint8_t* dst, uint16_t size)
+		void recv(uint8_t* dst, uint16_t size) noexcept
 		{
 			auto end = dst + size;
 			while(dst < end) {
@@ -342,7 +342,7 @@ namespace device {
 			@param[in]	power パワーダウンをしない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void destroy(bool power = true)
+		void destroy(bool power = true) noexcept
 		{
 			RSPI::SPCR = 0x00;
 			port_map::turn(RSPI::get_peripheral(), false);
