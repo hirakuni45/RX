@@ -141,6 +141,7 @@
 #include "RX65x/glcdc.hpp"
 #include "RX65x/glcdc_io.hpp"
 #include "RX65x/drw2d.hpp"
+#include "RX65x/drw2d_mgr.hpp"
 #include "RX600/dmac_mgr.hpp"
 
 #elif defined(SIG_RX71M)
