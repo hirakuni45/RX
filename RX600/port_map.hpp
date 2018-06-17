@@ -2,7 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX600 グループ・ポート・マッピング @n
-			・ペリフェラル型に従って、ポートの設定をグループ化 
+			・ペリフェラル型に従って、ポートの設定をグループ化して設定 
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -29,8 +29,8 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class option : uint8_t {
-			FIRST,		///< 第１候補
-			SECOND,		///< 第２候補
+			FIRST,		///< 第１候補 (XXX-A グループ)
+			SECOND,		///< 第２候補 (XXX-B グループ)
 			THIRD,		///< 第３候補
 			FORCE,		///< 第４候補
 			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合
@@ -238,10 +238,10 @@ namespace device {
 				{
 					uint8_t sel = enable ? 0b001101 : 0;
 					MPC::PC7PFS.PSEL = sel;  // MISOA-A  (PC7 LQFP176: 76)
-					MPC::PC6PFS.PSEL = sel;  // MOSIA-A  (PC6 LQFP176: 77)
-					MPC::PC5PFS.PSEL = sel;  // RSPCKA-A (PC5 LQFP176: 78)
 					PORTC::PMR.B7 = enable;
+					MPC::PC6PFS.PSEL = sel;  // MOSIA-A  (PC6 LQFP176: 77)
 					PORTC::PMR.B6 = enable;
+					MPC::PC5PFS.PSEL = sel;  // RSPCKA-A (PC5 LQFP176: 78)
 					PORTC::PMR.B5 = enable;
 				}
 				break;
@@ -250,15 +250,17 @@ namespace device {
 				{
 					uint8_t sel = enable ? 0b011011 : 0;
 					MPC::P81PFS.PSEL = sel;  // QIO3-A   (P81 LQFP176: 80)
-					MPC::P80PFS.PSEL = sel;  // QIO2-A   (P80 LQFP176: 81)
-					MPC::PC4PFS.PSEL = sel;  // QIO1-A   (PC4 LQFP176: 82)
-					MPC::PC3PFS.PSEL = sel;  // QIO0-A   (PC3 LQFP176: 83)
-					MPC::P77PFS.PSEL = sel;  // QSPCLK-A (P77 LQFP176: 84)
 					PORT8::PMR.B1 = enable;
+					MPC::P80PFS.PSEL = sel;  // QIO2-A   (P80 LQFP176: 81)
 					PORT8::PMR.B0 = enable;
+					MPC::PC4PFS.PSEL = sel;  // QIO1-A   (PC4 LQFP176: 82)
 					PORTC::PMR.B4 = enable;
+					MPC::PC3PFS.PSEL = sel;  // QIO0-A   (PC3 LQFP176: 83)
 					PORTC::PMR.B3 = enable;
+					MPC::P77PFS.PSEL = sel;  // QSPCLK-A (P77 LQFP176: 84)
 					PORT7::PMR.B7 = enable;
+					MPC::P76PFS.PSEL = sel;  // QSPSSL-A (P76 LQFP176: 85)
+					PORT7::PMR.B6 = enable;
 				}
 				break;
 
@@ -443,7 +445,7 @@ namespace device {
 		}
 
 
-		static bool sub_2nd_(peripheral t, bool enable)
+		static bool sub_2nd_(peripheral t, bool enable, bool i2c)
 		{
 			bool ret = true;
 			switch(t) {
@@ -480,15 +482,17 @@ namespace device {
 				{
 					uint8_t sel = enable ? 0b011011 : 0;
 					MPC::PD7PFS.PSEL = sel;  // QIO1-B   (PD7 LQFP176: 143)
-					MPC::PD6PFS.PSEL = sel;  // QIO0-B   (PD6 LQFP176: 145)
-					MPC::PD5PFS.PSEL = sel;  // QSPCLK-B (PD5 LQFP176: 147)
-					MPC::PD3PFS.PSEL = sel;  // QIO3-B   (PD3 LQFP176: 150)
-					MPC::PD2PFS.PSEL = sel;  // QIO2-B   (PD2 LQFP176: 154)
 					PORTD::PMR.B7 = enable;
+					MPC::PD6PFS.PSEL = sel;  // QIO0-B   (PD6 LQFP176: 145)
 					PORTD::PMR.B6 = enable;
+					MPC::PD5PFS.PSEL = sel;  // QSPCLK-B (PD5 LQFP176: 147)
 					PORTD::PMR.B5 = enable;
+					MPC::PD3PFS.PSEL = sel;  // QIO3-B   (PD3 LQFP176: 150)
 					PORTD::PMR.B3 = enable;
+					MPC::PD2PFS.PSEL = sel;  // QIO2-B   (PD2 LQFP176: 154)
 					PORTD::PMR.B2 = enable;
+					MPC::PD4PFS.PSEL = sel;  // QSSL-B   (PD4 LQFP176: 142)
+					PORTD::PMR.B4 = enable;
 				}
 				break;
 
@@ -505,7 +509,7 @@ namespace device {
 		}
 
 
-		static bool sub_3rd_(peripheral t, bool enable)
+		static bool sub_3rd_(peripheral t, bool enable, bool i2c)
 		{
 			bool ret = true;
 			switch(t) {
@@ -555,14 +559,21 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = false;
-			if(opt == option::FIRST) {
+			switch(opt) {
+			case option::FIRST:
 				ret = sub_1st_(t, ena, false);
-			} else if(opt == option::SECOND) {
-				ret = sub_2nd_(t, ena);
-			} else if(opt == option::THIRD) {
-				ret = sub_3rd_(t, ena);
-			} else if(opt == option::FIRST_I2C) {
+				break;
+			case option::SECOND:
+				ret = sub_2nd_(t, ena, false);
+				break;
+			case option::THIRD:
+				ret = sub_3rd_(t, ena, false);
+				break;
+			case option::FIRST_I2C:
 				ret = sub_1st_(t, ena, true);
+				break;
+			default:
+				break;
 			}
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
