@@ -31,10 +31,13 @@ namespace {
 // オーディオの D/A として使用
 //	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 
-	// Famicon PAD
-	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_P_S;
-	typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_CLK;
-	typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_OUT;
+	// Famicon PAD (CMOS 4021B Shift Register)
+	// 電源は、微小なので、接続を簡単に行う為、ポートを使う
+	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_VCC;
+	typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_GND;
+	typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_P_S;
+	typedef device::PORT<device::PORT6, device::bitpos::B5> PAD_CLK;
+	typedef device::PORT<device::PORT7, device::bitpos::B3> PAD_OUT;
 	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT> FAMIPAD;
 	FAMIPAD		famipad_;
 
@@ -341,7 +344,13 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
-	famipad_.start();
+	{
+		PAD_VCC::DIR = 1;
+		PAD_VCC::P = 1;
+		PAD_GND::DIR = 1;
+		PAD_GND::P = 0;
+		famipad_.start();
+	}
 
 	nesemu_.start();
 
