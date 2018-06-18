@@ -8,13 +8,14 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "common/cmt_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
+#include "common/tpu_io.hpp"
+#include "common/audio_out.hpp"
 
 #include "chip/FAMIPAD.hpp"
 
@@ -34,8 +35,6 @@ namespace {
 	FAMIPAD		famipad_;
 
 	typedef device::system_io<12000000> SYSTEM_IO;
-
-	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
@@ -73,6 +72,43 @@ namespace {
 #endif
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
+
+	volatile uint32_t	wpos_;
+
+	/// DMAC 終了割り込み
+	class dmac_term_task {
+	public:
+		void operator() () {
+			device::DMAC0::DMCNT.DTE = 1;  // DMA を再スタート
+			wpos_ = 0;
+		}
+	};
+
+	typedef device::dmac_mgr<device::DMAC0, dmac_term_task> DMAC_MGR;
+	DMAC_MGR	dmac_mgr_;
+
+	uint32_t get_wave_pos_() { return (dmac_mgr_.get_count() & 0x3ff) ^ 0x3ff; }
+
+	typedef device::R12DA DAC;
+	typedef device::dac_out<DAC> DAC_OUT;
+	DAC_OUT		dac_out_;
+
+	typedef utils::audio_out<4096> AUDIO_OUT;
+	AUDIO_OUT	audio_out_;
+
+	class tpu_task {
+	public:
+		void operator() () {
+			uint32_t tmp = wpos_;
+			++wpos_;
+			if((tmp ^ wpos_) & 64) {
+				audio_out_.service(64);
+			}
+		}
+	};
+
+	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
+	TPU0		tpu0_;
 
 	emu::spinv		spinv_;
 
@@ -142,6 +178,15 @@ extern "C" {
 	uint8_t get_fami_pad()
 	{
 		return famipad_.update();
+	}
+
+
+	void set_sample_rate(uint32_t freq)
+	{
+		uint8_t intr_level = 5;
+		if(!tpu0_.start(freq, intr_level)) {
+			utils::format("TPU0 start error...\n");
+		}
 	}
 
 
@@ -217,9 +262,11 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::setup_system_clock();
 
-	{  // タイマー設定（６０Ｈｚ）
-		uint8_t cmt_irq_level = 4;
-		cmt_.start(60, cmt_irq_level);
+	{  // 内臓１２ビット D/A の設定
+		bool amp_ena = true;
+		dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
+		dac_out_.out0(0x8000);
+		dac_out_.out1(0x8000);
 	}
 
 	{  // SCI 設定
@@ -230,6 +277,23 @@ int main(int argc, char** argv)
 	{  // SD カード・クラスの初期化
 		sdh_.start();
 		sdc_.start();
+	}
+
+	// 波形メモリーの無音状態初期化
+	audio_out_.mute();
+
+	{  // サンプリング・タイマー設定
+		set_sample_rate(11127);
+	}
+
+	{  // DMAC マネージャー開始
+		uint8_t intr_level = 4;
+		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
+			reinterpret_cast<uint32_t>(audio_out_.get_wave()), DAC::DADR0.address(),
+			audio_out_.size(), intr_level);
+		if(!ret) {
+			utils::format("DMAC Not start...\n");
+		}
 	}
 
 	utils::format("\rRTK5RX65N Start for Space Invaders\n");
@@ -266,7 +330,7 @@ int main(int argc, char** argv)
 			--delay_inv;
 			if(delay_inv == 0) {
 				if(sdc_.get_mount()) {
-					if(spinv_.start("/inv_roms")) {
+					if(spinv_.start("/inv_roms", "/inv_wavs")) {
 						utils::format("Space Invaders start...\n");
 					} else {
 						utils::format("Space Invaders not start...(fail)\n");

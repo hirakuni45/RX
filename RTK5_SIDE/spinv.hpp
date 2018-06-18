@@ -10,6 +10,7 @@
 //=====================================================================//
 #include "side/arcade.h"
 #include "common/file_io.hpp"
+#include "common/wav_in.hpp"
 
 extern "C" {
 	uint8_t get_fami_pad();
@@ -28,14 +29,63 @@ namespace emu {
 
 		uint16_t	scan_lines_[InvadersMachine::ScreenHeight];
 
+		uint32_t	wav_ofs_[9];
+		uint32_t	wav_size_[9];
+		uint8_t*	wav_org_;
+
 		bool load_sounds_(const char* root)
 		{
+			if(root == nullptr) {
+				return false;
+			}
+
 			static const char* sdf[] = {
 				"BaseHit.wav", "InvHit.Wav", "Shot.wav", "Ufo.wav",
 				"UfoHit.wav", "Walk1.wav", "Walk2.wav", "Walk3.wav",
 				"Walk4.wav"
 			};
 
+			uint32_t allsize = 0;
+			for(uint32_t i = 0; i < 9; ++i) {
+				char tmp[256];
+				strcpy(tmp, root);
+				strcat(tmp, "/");
+				strcat(tmp, sdf[i]);
+				utils::file_io fi;
+				if(!fi.open(tmp, "rb")) {
+					return false;
+				}
+				audio::wav_in w;
+				if(!w.load_header(&fi.at_fd())) {
+					return false;
+				}
+				fi.close();
+
+				allsize += w.get_size();
+				wav_size_[i] = w.get_size();
+				wav_ofs_[i] = w.get_top();
+				utils::format("'%s' Size: %d, Rate: %d, CH: %d, Bits: %d\n") % sdf[i]
+					% w.get_size() % w.get_rate()
+					% static_cast<uint16_t>(w.get_channel())
+					% static_cast<uint16_t>(w.get_bits());
+			}
+
+			wav_org_ = static_cast<uint8_t*>(malloc(allsize));
+			uint32_t pos = 0;
+			for(uint32_t i = 0; i < 9; ++i) {
+				char tmp[256];
+				strcpy(tmp, root);
+				strcat(tmp, "/");
+				strcat(tmp, sdf[i]);
+				utils::file_io fi;
+				if(!fi.open(tmp, "rb")) {
+					return false;
+				}
+				fi.seek(utils::file_io::SEEK::SET, wav_ofs_[i]);
+				fi.read(&wav_org_[pos], wav_size_[i]);
+				fi.close();
+				pos += wav_size_[i];
+			}
 
 			return true;
 		}
@@ -46,17 +96,26 @@ namespace emu {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		spinv() : im_() { }
+		spinv() noexcept : im_(), wav_org_(nullptr) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  デストラクタ
+		*/
+		//-----------------------------------------------------------------//
+		~spinv() { free(wav_org_); } 
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  開始
-			@param[in]	root	ルート・パス
+			@param[in]	rom_path	ROM ファイル・ルート・パス
+			@param[in]	wav_path	WAV ファイル・ルート・パス
 			@return 成功なら「tue」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(const char* root)
+		bool start(const char* rom_path, const char* wav_path = nullptr)
 		{
 			static const char* rom_files[] = {
 				"invaders.h", "invaders.g", "invaders.f", "invaders.e"
@@ -66,8 +125,8 @@ namespace emu {
 				char rom[0x2000];
 				for(uint32_t i = 0; i < 4; ++i) {
 					char tmp[256];
-					if(root != nullptr) {
-						strcpy(tmp, root);
+					if(rom_path != nullptr) {
+						strcpy(tmp, rom_path);
 					} else {
 						strcpy(tmp, "/");
 					}
@@ -97,7 +156,7 @@ namespace emu {
 				im_.setROM(rom);
 			}
 
-			if(!load_sounds_(root)) {
+			if(!load_sounds_(wav_path)) {
 				utils::format("Sound files not found. no sound\n");
 			}
 
