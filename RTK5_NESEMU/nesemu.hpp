@@ -14,6 +14,8 @@
 #include "emu/nes/nesstate.h"
 #include "emu/nes/nes_pal.h"
 
+#include "chip/FAMIPAD.hpp"
+
 // #include "emu/nsf/nsfplay.hpp"
 
 extern "C" {
@@ -135,28 +137,28 @@ namespace emu {
 				inp_[0].data = 0;
 				inp_[1].data = 0;
 				uint8_t pad = get_fami_pad();
-				if(pad & 0b10000000) {
+				if(chip::on(pad, chip::FAMIPAD_ST::A)) {
 					inp_[0].data |= INP_PAD_A;
 				}
-				if(pad & 0b01000000) {
+				if(chip::on(pad, chip::FAMIPAD_ST::B)) {
 					inp_[0].data |= INP_PAD_B;
 				}
-				if(pad & 0b00100000) {
+				if(chip::on(pad, chip::FAMIPAD_ST::SELECT)) {
 					inp_[0].data |= INP_PAD_SELECT;
 				}
-				if(pad & 0b00010000) {
+				if(chip::on(pad, chip::FAMIPAD_ST::START)) {
 					inp_[0].data |= INP_PAD_START;
 				}
-				if(pad & 0b00001000) {
+				if(chip::on(pad, chip::FAMIPAD_ST::UP)) {
 					inp_[0].data |= INP_PAD_UP;
 				}
-				if(pad & 0b00000100) {
+				if(chip::on(pad, chip::FAMIPAD_ST::DOWN)) {
 					inp_[0].data |= INP_PAD_DOWN;
 				}
-				if(pad & 0b00000010) {
+				if(chip::on(pad, chip::FAMIPAD_ST::LEFT)) {
 					inp_[0].data |= INP_PAD_LEFT;
 				}
-				if(pad & 0b00000001) {
+				if(chip::on(pad, chip::FAMIPAD_ST::RIGHT)) {
 					inp_[0].data |= INP_PAD_RIGHT;
 				}
 			}
