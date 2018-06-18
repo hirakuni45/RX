@@ -11,6 +11,10 @@
 #include "side/arcade.h"
 #include "common/file_io.hpp"
 
+extern "C" {
+	uint8_t get_fami_pad();
+};
+
 namespace emu {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -123,6 +127,8 @@ namespace emu {
 		//-----------------------------------------------------------------//
 		void service(void* org, int w, int h)
 		{
+			uint8_t pad = get_fami_pad();
+
 			const uint8_t* video = im_.getVideo();
 			if(video != nullptr) {
 				uint16_t* fb = static_cast<uint16_t*>(org);
@@ -139,6 +145,45 @@ namespace emu {
 						++video;
 					}
 				}
+			}
+
+			// 1P
+			if(chip::on(pad, chip::FAMIPAD_ST::START)) {
+				im_.fireEvent(InvadersMachine::KeyOnePlayerDown);
+			} else {
+				im_.fireEvent(InvadersMachine::KeyOnePlayerUp);
+			}
+			// 2P
+//			if(dev.get_positive(gl::device::key::_2)) {
+//				im_.fireEvent(InvadersMachine::KeyTwoPlayersDown);
+//			}
+//			if(dev.get_negative(gl::device::key::_2)) {
+//				im_.fireEvent(InvadersMachine::KeyTwoPlayersUp);
+//			}
+			// coin
+			if(chip::on(pad, chip::FAMIPAD_ST::SELECT)) {
+				im_.fireEvent(InvadersMachine::CoinInserted);
+			}
+
+			// Left
+			if(chip::on(pad, chip::FAMIPAD_ST::LEFT)) {
+   			 	im_.fireEvent( InvadersMachine::KeyLeftDown);
+			} else {
+				im_.fireEvent( InvadersMachine::KeyLeftUp);
+			}
+
+			// Right
+			if(chip::on(pad, chip::FAMIPAD_ST::RIGHT)) {
+				im_.fireEvent( InvadersMachine::KeyRightDown);
+			} else {
+				im_.fireEvent( InvadersMachine::KeyRightUp);
+			}
+
+			// Fire
+			if(chip::on(pad, chip::FAMIPAD_ST::A)) {
+				im_.fireEvent( InvadersMachine::KeyFireDown);
+			} else {
+				im_.fireEvent( InvadersMachine::KeyFireUp);
 			}
 
 			im_.step();

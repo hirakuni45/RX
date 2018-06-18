@@ -16,12 +16,22 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 
+#include "chip/FAMIPAD.hpp"
+
 #include "spinv.hpp"
 
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
+// オーディオの D/A として使用
+//	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
+
+	// Famicon PAD
+	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_P_S;
+	typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_CLK;
+	typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_OUT;
+	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT> FAMIPAD;
+	FAMIPAD		famipad_;
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
@@ -129,6 +139,12 @@ namespace {
 
 extern "C" {
 
+	uint8_t get_fami_pad()
+	{
+		return famipad_.update();
+	}
+
+
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
@@ -216,7 +232,7 @@ int main(int argc, char** argv)
 		sdc_.start();
 	}
 
-	utils::format("\rRTK5RX65N Start for LCD sample\n");
+	utils::format("\rRTK5RX65N Start for Space Invaders\n");
 
 	cmd_.set_prompt("# ");
 
@@ -239,6 +255,8 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
+	famipad_.start();
+
 	uint32_t delay_inv = 120;
 	uint8_t n = 0;
 	while(1) {
@@ -259,7 +277,7 @@ int main(int argc, char** argv)
 				}
 			}
 		} else {
-			spinv_.service((void*)0x00800000, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
+			spinv_.service((void*)0x00000000, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
 		}
 
 		sdc_.service(sdh_.service());
