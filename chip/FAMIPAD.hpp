@@ -14,6 +14,36 @@ namespace chip {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  PAD 情報型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class FAMIPAD_ST : uint8_t {
+		RIGHT  = 0b00000001,
+		LEFT   = 0b00000010,
+		DOWN   = 0b00000100,
+		UP     = 0b00001000,
+		START  = 0b00010000,
+		SELECT = 0b00100000,
+		B      = 0b01000000,
+		A      = 0b10000000,
+	};
+
+
+	//---------------------------------------------------------------------//
+	/*!
+		@brief	状態を検査
+		@param[in]	data	パッドの状態
+		@param[in]	pad		検査パッド
+	 */
+	//---------------------------------------------------------------------//
+	static inline bool on(uint8_t data, FAMIPAD_ST pad) noexcept
+	{
+		return data & static_cast<uint8_t>(pad);
+	}
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  FAMIPAD テンプレートクラス
 		@param[in]	P_S		P/S ポート
 		@param[in]	CLK		CLK ポート
@@ -22,24 +52,7 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class P_S, class CLK, class OUT>
 	class FAMIPAD {
-	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  PAD 情報型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class PAD : uint8_t {
-			RIGHT  = 0b00000001,
-			LEFT   = 0b00000010,
-			DOWN   = 0b00000100,
-			UP     = 0b00001000,
-			START  = 0b00010000,
-			SELECT = 0b00100000,
-			B      = 0b01000000,
-			A      = 0b10000000,
-		};
 
-	private:
 		uint8_t		data_;
 
 	public:
@@ -93,23 +106,10 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	状態を検査
-			@param[in]	data	パッドの状態
 			@param[in]	pad		検査パッド
 		 */
 		//-----------------------------------------------------------------//
-		static bool on(uint8_t data, PAD pad) noexcept
-		{
-			return data & static_cast<uint8_t>(pad);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	状態を検査
-			@param[in]	pad		検査パッド
-		 */
-		//-----------------------------------------------------------------//
-		bool on(PAD pad) const noexcept
+		bool on(FAMIPAD_ST pad) const noexcept
 		{
 			return data_ & static_cast<uint8_t>(pad);
 		}
@@ -121,9 +121,9 @@ namespace chip {
 			@param[in]	pad		検査パッド
 		 */
 		//-----------------------------------------------------------------//
-		bool operator [] (PAD pad) const noexcept
+		bool operator [] (FAMIPAD_ST pad) const noexcept
 		{
-			return test(pad);
+			return on(pad);
 		}
 	};
 }
