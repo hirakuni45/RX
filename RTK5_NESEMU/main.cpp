@@ -40,8 +40,6 @@ namespace {
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
-//	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
-
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
 	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
@@ -116,9 +114,9 @@ namespace {
 	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
 	TPU0		tpu0_;
 
-	utils::command<256> cmd_;
-
 	emu::nesemu		nesemu_;
+
+	utils::command<256> cmd_;
 
 
 	bool check_mount_() {
@@ -187,24 +185,13 @@ namespace {
 			}
 		}
 	}
-
-
-	uint8_t get_fami_pad_()
-	{
-		static bool init = false;
-		if(!init) {
-			init = true;
-			famipad_.start();
-		}
-		return famipad_.update();
-	}
 }
 
 extern "C" {
 
 	uint8_t get_fami_pad()
 	{
-		return get_fami_pad_();
+		return famipad_.update();
 	}
 
 
@@ -353,6 +340,8 @@ int main(int argc, char** argv)
 	}
 
 	LED::DIR = 1;
+
+	famipad_.start();
 
 	nesemu_.start();
 
