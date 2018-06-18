@@ -53,10 +53,11 @@ Renesas RX マイコン
  - /rx64m_AUDIO_sample ---> RX64M を使った SD カード上のオーディオファイルを内臓 D/A で再生する 
  - /GR-KAEDE_ftps      ---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（FTP サーバー）
  - /GR-KAEDE_http      ---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（http サーバー）
- - /RTK5_first_sample  ---> ルネサス製 RTK5RX65N マイコンボード、初期サンプル   
- - /RTK5_LCD_sample    ---> ルネサス製 RTK5RX65N マイコンボード、ＬＣＤサンプル
- - /RTK5_AUDIO_sample  ---> ルネサス製 RTK5RX65N マイコンボード、オーディオプレイヤー
- - /RTK5_SIDE          ---> ルネサス製 RTK5RX65N マイコンボード SpaceInvaders エミュレーター   
+ - /RTK5_first_sample  ---> ルネサス製 RTK5RX65N マイコンボード 初期サンプル   
+ - /RTK5_LCD_sample    ---> ルネサス製 RTK5RX65N マイコンボード ＬＣＤサンプル
+ - /RTK5_AUDIO_sample  ---> ルネサス製 RTK5RX65N マイコンボード オーディオプレイヤー
+ - /RTK5_SIDE          ---> ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター
+ - /RTK5_NESEMU        ---> ルネサス製 RTK5RX65N マイコンボード NES エミュレーター   
 
 ## RX 開発環境準備（Windows、MSYS2）
    
