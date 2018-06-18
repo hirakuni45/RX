@@ -54,7 +54,7 @@ namespace audio {
 		uint32_t	data_size_;
 
 		uint32_t	rate_;
-		uint8_t		chanel_;
+		uint8_t		channel_;
 		uint8_t		bits_;
 
 		bool list_tag_(FIL* fp, uint16_t size, int8_t idx) {
@@ -82,7 +82,7 @@ namespace audio {
 			@brief	コンストラクター
 		*/
 		//-------------------------------------------------------------//
-		wav_in() : data_top_(0), data_size_(0), rate_(0), chanel_(0), bits_(0) { }
+		wav_in() : data_top_(0), data_size_(0), rate_(0), channel_(0), bits_(0) { }
 
 
 		//-------------------------------------------------------------//
@@ -123,7 +123,7 @@ namespace audio {
 					}
 					if(br != sizeof(wf)) return false;
 					rate_ = wf.ulSamplesPerSec;
-					chanel_ = wf.usChannels;
+					channel_ = wf.usChannels;
 					bits_ = wf.usBitsPerSample;
 				} else if(std::strncmp(rc.szChunkName, "data", 4) == 0) {
 					data_size_ = rc.ulChunkSize;
@@ -203,7 +203,7 @@ namespace audio {
 			@return チャネル数
 		*/
 		//-------------------------------------------------------------//
-		uint8_t get_chanel() const { return chanel_; }
+		uint8_t get_channel() const { return channel_; }
 
 
 		//-------------------------------------------------------------//
@@ -221,6 +221,6 @@ namespace audio {
 			@return 時間
 		*/
 		//-------------------------------------------------------------//
-		uint32_t get_time() const { return data_size_ / (chanel_ * bits_ / 8) / rate_; }
+		uint32_t get_time() const { return data_size_ / (channel_ * bits_ / 8) / rate_; }
 	};
 }
