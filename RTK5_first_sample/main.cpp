@@ -16,7 +16,7 @@
 #include "common/sdc_man.hpp"
 
 // SDHI interface を使う場合有効にする。
-#define SDHI_IF
+// #define SDHI_IF
 
 #ifdef SDHI_IF
 #include "RX600/sdhi_io.hpp"
@@ -166,6 +166,7 @@ int main(int argc, char** argv)
 	cmd_.set_prompt("# ");
 
 	LED::DIR = 1;
+
 	uint32_t cnt = 0;
 	while(1) {
 		cmt_.sync();
