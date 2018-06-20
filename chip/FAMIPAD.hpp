@@ -93,9 +93,9 @@ namespace chip {
 				d <<= 1;
 				if(!OUT::P()) ++d;
 				CLK::P = 1;
-				utils::delay::loop(12);  // 多分「100ns」くらい
+				utils::delay::loop(6);  // 多分「250ns」くらい
 				CLK::P = 0;
-				utils::delay::loop(12);
+				utils::delay::loop(6);
 			}
 			P_S::P = 1; // parallel
 			data_ = d;
