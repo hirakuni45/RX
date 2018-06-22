@@ -11,7 +11,7 @@
 #include "common/renesas.hpp"
 #include "common/vect.h"
 
-/// F_PCLKB はボーレートパラメーター計算で必要で、設定が無いとエラーにします。
+/// F_PCLKB はボーレートパラメーター計算に必要で、設定が無いとエラーにします。
 #ifndef F_PCLKB
 #  error "sci_io.hpp requires F_PCLKB to be defined"
 #endif
@@ -22,29 +22,34 @@ namespace device {
 	/*!
 		@brief  SCI I/O 制御クラス
 		@param[in]	SCI	SCI 定義クラス
-		@param[in]	RECV_BUFF	受信バッファクラス
-		@param[in]	SEND_BUFF	送信バッファクラス
+		@param[in]	RBF	受信バッファクラス
+		@param[in]	SBF	送信バッファクラス
 		@param[in]	PSEL		ポート選択
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI, class RECV_BUFF, class SEND_BUFF,
-		port_map::option PSEL = port_map::option::FIRST>
+	template <class SCI, class RBF, class SBF, port_map::option PSEL = port_map::option::FIRST>
 	class sci_io {
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  I2C の速度タイプ
+			@brief  簡易 I2C の速度タイプ @n
+					※誤差が大きいので注意
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class speed : uint8_t {
+			_50K,		///<  50K b.p.s.
 			standard,	///< 100K b.p.s. (Standard mode)
+			_150K,		///< 150K b.p.s.
+			_200K,		///< 200K b.p.s.
+			_250K,		///< 250K b.p.s.
+			_300K,		///< 300K b.p.s.
+			_350K,		///< 350K b.p.s.
 			fast,		///< 400K b.p.s. (Fast mode)
-			fast_plus,	///< 1M b.p.s. (Fast plus mode)
 		};
 
 	private:
-		static RECV_BUFF recv_;
-		static SEND_BUFF send_;
+		static RBF	recv_;
+		static SBF	send_;
 		static volatile bool send_stall_;
 
 		uint8_t	level_;
@@ -136,29 +141,32 @@ namespace device {
 #endif
 			level_ = level;
 
+			power_cfg::turn(SCI::get_peripheral());
+
 			SCI::SCR = 0x00;			// TE, RE disable.
 
 			port_map::turn(SCI::get_peripheral(), true, PSEL);
 
-			uint32_t brr = F_PCLKB / baud / 16;
+			uint32_t brr = F_PCLKB / baud * 16;
 			uint8_t cks = 0;
-			while(brr > 512) {
+			while(brr > (512 << 8)) {
 				brr >>= 2;
 				++cks;
 			}
 			if(cks > 3) return false;
 			bool abcs = true;
-			if(brr > 256) { brr /= 2; abcs = false; }
-
-			power_cfg::turn(SCI::get_peripheral());
+			if(brr > (256 << 8)) { brr /= 2; abcs = false; }
+			uint32_t mddr = ((brr & 0xff00) << 8) / brr;
+			brr >>= 8;
 
 			set_intr_();
 
 			// 8 bits, 1 stop bit, no-parrity
 			SCI::SMR = cks;
-			SCI::SEMR.ABCS = abcs;
+			SCI::SEMR = SCI::SEMR.ABCS.b(abcs) | SCI::SEMR.BRME.b();
 			if(brr) --brr;
-			SCI::BRR = static_cast<uint8_t>(brr);
+			SCI::BRR = brr;
+			SCI::MDDR = mddr;
 
 			if(level) {
 				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b();
@@ -184,6 +192,8 @@ namespace device {
 			send_stall_ = true;
 			level_ = level;
 
+			power_cfg::turn(SCI::get_peripheral());
+
 			SCI::SCR = 0x00;			// TE, RE disable.
 
 			uint32_t brr = F_PCLKB / bps / 2;
@@ -195,8 +205,6 @@ namespace device {
 				++cks;
 			}
 			if(cks > 3 || brr > 256) return false;
-
-			power_cfg::turn(SCI::get_peripheral());
 
 			set_intr_();
 
@@ -251,15 +259,59 @@ namespace device {
 			// 現在の実装では、割り込みはサポートされない。
 			if(level != 0) return false;
 
+			// I2C オプションが無い場合エラー
+			if(PSEL != port_map::option::FIRST_I2C) {
+				return false;
+			}
+
+			uint32_t clk = 0;
+			switch(spd) {
+			case speed::_50K:		///<  50K b.p.s.
+				clk =  50000;
+				break;
+			case speed::standard:	///< 100K b.p.s. (Standard mode)
+				clk = 100000;
+				break;
+			case speed::_150K:		///< 150K b.p.s.
+				clk = 150000;
+				break;
+			case speed::_200K:		///< 200K b.p.s.
+				clk = 200000;
+				break;
+			case speed::_250K:		///< 250K b.p.s.
+				clk = 250000;
+				break;
+			case speed::_300K:		///< 300K b.p.s.
+				clk = 300000;
+				break;
+			case speed::_350K:		///< 350K b.p.s.
+				clk = 350000;
+			case speed::fast:		///< 400K b.p.s. (Fast mode)
+				clk = 400000;
+				break;
+			default:
+				return false;
+			}
+			uint32_t brr = F_PCLKB / clk * 4;
+			uint32_t mddr = ((brr & 0xff00) << 8) / brr;
+			brr >>= 8;
+			if(brr >= 256 || brr == 0) {
+				return false;
+			}
+			--brr;
+
 			level_ = level;
+
+			power_cfg::turn(SCI::get_peripheral());
 
 			SCI::SCR = 0x00;		// TE, RE disable. CKE = 0
 			port_map::turn(SCI::get_peripheral(), true, PSEL);
 
-
 			SCI::SIMR3 = SCI::SIMR3.IICSDAS.b(0b11) | SCI::SIMR3.IISCLSS.b(0b11);
-
-
+			SCI::SMR   = 0x00;
+			SCI::SCMR  = SCI::SCMR.SDIR.b(1);
+			SCI::BRR   = brr;
+			SCI::MDDR  = mddr;
 
 
 
@@ -445,10 +497,10 @@ namespace device {
 		}
 	};
 
-	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::option PSEL>
-		RECV_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::recv_;
-	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::option PSEL>
-		SEND_BUFF sci_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::send_;
-	template<class SCI, class RECV_BUFF, class SEND_BUFF, port_map::option PSEL>
-		volatile bool sci_io<SCI, RECV_BUFF, SEND_BUFF, PSEL>::send_stall_;
+	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+		RBF sci_io<SCI, RBF, SBF, PSEL>::recv_;
+	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+		SBF sci_io<SCI, RBF, SBF, PSEL>::send_;
+	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+		volatile bool sci_io<SCI, RBF, SBF, PSEL>::send_stall_;
 }
