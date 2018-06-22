@@ -69,13 +69,13 @@ namespace device {
 			IDEI         = 50,  // SRC
 			ODFI         = 51,  // SRC
 #elif defined(SIG_RX65N)
-			RIIC_RXI1    = 50,
-			RIIC_TXI1    = 51,
+			RIIC_RXI1    = 50,	// RIIC1 RXI
+			RIIC_TXI1    = 51,	// RIIC1 TXI
 #endif
-			RIIC_RXI0    = 52,  // RIIC0
-			RIIC_TXI0    = 53,
-			RIIC_RXI2    = 54,  // RIIC2
-			RIIC_TXI2    = 55,
+			RIIC_RXI0    = 52,  // RIIC0 RXI
+			RIIC_TXI0    = 53,	// RIIC0 TXI
+			RIIC_RXI2    = 54,  // RIIC2 RXI
+			RIIC_TXI2    = 55,	// RIIC2 TXI
 
 			RXI0         = 58,  // SCI0
 			TXI0         = 59,

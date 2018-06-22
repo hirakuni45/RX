@@ -230,6 +230,37 @@ namespace device {
 					}
 				}
 				break;
+
+			case peripheral::RIIC0:
+				{
+					uint8_t sel = enable ? 0b001111 : 0;
+					MPC::P12PFS.PSEL = sel;  // SCL0 (P12 LQFP176: 53)
+					PORT1::PMR.B2 = enable;
+					MPC::P13PFS.PSEL = sel;  // SDA0 (P13 LQFP176: 52)
+					PORT1::PMR.B3 = enable;
+				}
+				break;
+#if defined(SIG_RX65N)
+			case peripheral::RIIC1:
+				{  // 100ピン未満未対応
+					uint8_t sel = enable ? 0b001111 : 0;
+					MPC::P20PFS.PSEL = sel;  // SCL1 (P20 LQFP176: 45)
+					PORT2::PMR.B0 = enable;
+					MPC::P21PFS.PSEL = sel;  // SDA1 (P21 LQFP176: 44)
+					PORT2::PMR.B1 = enable;
+				}
+				break;
+#endif
+			case peripheral::RIIC2:
+				{
+					uint8_t sel = enable ? 0b001111 : 0;
+					MPC::P16PFS.PSEL = sel;  // SCL2 (P16 LQFP176: 48)
+					PORT1::PMR.B6 = enable;
+					MPC::P17PFS.PSEL = sel;  // SDA2 (P17 LQFP176: 46)
+					PORT1::PMR.B7 = enable;
+				}
+				break;
+
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::RSPI:
 #elif defined(SIG_RX65N)

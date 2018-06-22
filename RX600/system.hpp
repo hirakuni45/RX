@@ -649,7 +649,9 @@ namespace device {
 			bit_rw_t<mstpcrb_io, bitpos::B17>	MSTPB17;
 
 			bit_rw_t<mstpcrb_io, bitpos::B19>	MSTPB19;
-
+#if defined(SIG_RX65N)
+			bit_rw_t<mstpcrb_io, bitpos::B20>	MSTPB20;
+#endif
 			bit_rw_t<mstpcrb_io, bitpos::B21>	MSTPB21;
 			bit_rw_t<mstpcrb_io, bitpos::B22>	MSTPB22;
 			bit_rw_t<mstpcrb_io, bitpos::B23>	MSTPB23;

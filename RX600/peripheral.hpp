@@ -87,8 +87,11 @@ namespace device {
 #endif
 		SCI12,		///< シリアルコミュニケーションインタフェース
 
-		RIIC0,		///< I 2 C バスインタフェース（RIICa）
-		RIIC2,		///< I 2 C バスインタフェース（RIICa）
+		RIIC0,		///< I 2 C バスインタフェース０（RIICa）
+#if defined(SIG_RX65N)
+		RIIC1,		///< I 2 C バスインタフェース１（RIICa）
+#endif
+		RIIC2,		///< I 2 C バスインタフェース２（RIICa）
 
 		CAN0,		///< CAN インタフェース（CAN0）
 		CAN1,		///< CAN インタフェース（CAN1）
