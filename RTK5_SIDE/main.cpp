@@ -113,7 +113,8 @@ namespace {
 	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
 	TPU0		tpu0_;
 
-	emu::spinv		spinv_;
+	typedef emu::spinv SPINV;
+	SPINV		spinv_;
 
 	utils::command<256> cmd_;
 
@@ -351,6 +352,17 @@ int main(int argc, char** argv)
 			}
 		} else {
 			spinv_.service((void*)0x00000000, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
+
+			SPINV::SND_MGR& snd = spinv_.at_sound();
+			uint32_t len = snd.get_length();
+			const int16_t* wav = snd.get_buffer();
+			for(uint32_t i = 0; i < len; ++i) {
+				while((audio_out_.at_fifo().size() - audio_out_.at_fifo().length()) < 8) {
+				}
+				audio::wave_t t;
+				t.l_ch = t.r_ch = *wav++;
+				audio_out_.at_fifo().put(t);
+			}
 		}
 
 		sdc_.service(sdh_.service());
@@ -359,7 +371,6 @@ int main(int argc, char** argv)
 
 		++n;
 		if(n >= 30) {
-//			utils::format("CMT count: %d/%d\n") % cnt % cmp;
 			n = 0;
 		}
 		if(n < 10) {
