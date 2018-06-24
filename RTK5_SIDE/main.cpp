@@ -96,7 +96,7 @@ namespace {
 	typedef device::dac_out<DAC> DAC_OUT;
 	DAC_OUT		dac_out_;
 
-	typedef utils::audio_out<4096> AUDIO_OUT;
+	typedef utils::audio_out<1024, 256> AUDIO_OUT;
 	AUDIO_OUT	audio_out_;
 
 	class tpu_task {
