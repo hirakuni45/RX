@@ -33,15 +33,14 @@ namespace audio {
 			uint32_t	len_;
 			ctx_t() : org_(), len_(0) { }
 		};
-
 		ctx_t	ctx_[CTXMAX];
 
 		struct snd_t {
 			uint32_t	ctx_;
 			uint32_t	pos_;
-			snd_t() : ctx_(CTXMAX), pos_(0) { }
+			bool		loop_;
+			snd_t() : ctx_(CTXMAX), pos_(0), loop_(false) { }
 		};
-
 		snd_t	snd_[SNDMAX];
 
 		int16_t	final_[RDRLEN];
@@ -62,6 +61,15 @@ namespace audio {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t context_max() const noexcept { return CTXMAX; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  最大発音数を取得
+			@return	最大発音数
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t sound_max() const noexcept { return SNDMAX; }
 
 
 		//-----------------------------------------------------------------//
@@ -131,10 +139,11 @@ namespace audio {
 		/*!
 			@brief  サウンド・リクエスト
 			@param[in]	ctxhnd	コンテキスト・ハンドル
+			@param[in]	loop	ループの場合「true」
 			@return	発音ハンドル
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t request(uint32_t ctxhnd) noexcept
+		uint32_t request(uint32_t ctxhnd, bool loop = false) noexcept
 		{
 			if(ctxhnd >= CTXMAX) return SNDMAX;
 
@@ -142,11 +151,33 @@ namespace audio {
 				if(snd_[i].ctx_ < CTXMAX) {
 					continue;
 				}
-				snd_[i].ctx_ = ctxhnd;
-				snd_[i].pos_ = 0;
+				snd_[i].ctx_  = ctxhnd;
+				snd_[i].pos_  = 0;
+				snd_[i].loop_ = loop;
 				return i;
 			}
 			return SNDMAX;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  サウンド停止
+			@param[in]	sndhnd	発音ハンドル
+			@return	成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool stop(uint32_t sndhnd) noexcept
+		{
+			if(sndhnd >= SNDMAX) return false;
+
+			snd_t& snd = snd_[sndhnd];
+			if(snd.ctx_ < CTXMAX) {
+				snd.ctx_ = CTXMAX;
+				return true;
+			} else {
+				return false;
+			}
 		}
 
 
@@ -186,7 +217,11 @@ namespace audio {
 				const int8_t* org = ctx.org_.get();
 				for(uint32_t j = 0; j < RDRLEN; ++j) {
 					if(snd.pos_ >= ctx.len_) {
-						snd.ctx_ = CTXMAX;
+						if(snd.loop_) {
+							snd.pos_ = 0;
+						} else {
+							snd.ctx_ = CTXMAX;
+						}
 						break;
 					}
 					final_[j] += org[snd.pos_];
