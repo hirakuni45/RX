@@ -10,7 +10,7 @@
 //=====================================================================//
 #include "side/arcade.h"
 #include "common/file_io.hpp"
-#include "common/wav_in.hpp"
+#include "common/snd_mgr.hpp"
 
 extern "C" {
 	uint8_t get_fami_pad();
@@ -24,14 +24,17 @@ namespace emu {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class spinv {
+	public:
+		typedef audio::snd_mgr<9, 8, 184> SND_MGR;
 
+	private:
 		InvadersMachine im_;
 
 		uint16_t	scan_lines_[InvadersMachine::ScreenHeight];
 
-		uint32_t	wav_ofs_[9];
-		uint32_t	wav_size_[9];
-		uint8_t*	wav_org_;
+		SND_MGR		snd_mgr_;
+
+		uint32_t	se_hnd_[9];
 
 		bool load_sounds_(const char* root)
 		{
@@ -51,40 +54,9 @@ namespace emu {
 				strcpy(tmp, root);
 				strcat(tmp, "/");
 				strcat(tmp, sdf[i]);
-				utils::file_io fi;
-				if(!fi.open(tmp, "rb")) {
-					return false;
-				}
-				audio::wav_in w;
-				if(!w.load_header(&fi.at_fd())) {
-					return false;
-				}
-				fi.close();
 
-				allsize += w.get_size();
-				wav_size_[i] = w.get_size();
-				wav_ofs_[i] = w.get_top();
-				utils::format("'%s' Size: %d, Rate: %d, CH: %d, Bits: %d\n") % sdf[i]
-					% w.get_size() % w.get_rate()
-					% static_cast<uint16_t>(w.get_channel())
-					% static_cast<uint16_t>(w.get_bits());
-			}
-
-			wav_org_ = static_cast<uint8_t*>(malloc(allsize));
-			uint32_t pos = 0;
-			for(uint32_t i = 0; i < 9; ++i) {
-				char tmp[256];
-				strcpy(tmp, root);
-				strcat(tmp, "/");
-				strcat(tmp, sdf[i]);
-				utils::file_io fi;
-				if(!fi.open(tmp, "rb")) {
-					return false;
-				}
-				fi.seek(utils::file_io::SEEK::SET, wav_ofs_[i]);
-				fi.read(&wav_org_[pos], wav_size_[i]);
-				fi.close();
-				pos += wav_size_[i];
+				se_hnd_[i] = snd_mgr_.set_sound(tmp);
+				utils::format("Load SE: '%s' at %d\n") % sdf[i] % se_hnd_[i];
 			}
 
 			return true;
@@ -96,15 +68,7 @@ namespace emu {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		spinv() noexcept : im_(), wav_org_(nullptr) { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  デストラクタ
-		*/
-		//-----------------------------------------------------------------//
-		~spinv() { free(wav_org_); } 
+		spinv() noexcept : im_() { }
 
 
 		//-----------------------------------------------------------------//
@@ -246,6 +210,35 @@ namespace emu {
 			}
 
 			im_.step();
+
+			static const unsigned se_mask[9] = {
+				InvadersMachine::SoundBaseHit,
+				InvadersMachine::SoundInvaderHit,
+				InvadersMachine::SoundShot,
+				InvadersMachine::SoundUfo,
+				InvadersMachine::SoundUfoHit,
+				InvadersMachine::SoundWalk1,
+				InvadersMachine::SoundWalk2,
+				InvadersMachine::SoundWalk3,
+				InvadersMachine::SoundWalk4
+			};
+
+			unsigned bits = im_.getSounds();
+			for(int i = 0; i < 9; ++i) {
+				if(!snd_mgr_.status(se_hnd_[i]) && (bits & se_mask[i]) != 0) {
+					snd_mgr_.request(se_hnd_[i]);
+				}
+			}
+			snd_mgr_.update();
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  サウンド・マネージャーの参照
+			@return サウンド・マネージャー
+		*/
+		//-----------------------------------------------------------------//
+		SND_MGR& at_sound() noexcept { return snd_mgr_; }		
 	};
 }
