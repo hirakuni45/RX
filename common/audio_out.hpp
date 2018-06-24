@@ -33,9 +33,11 @@ namespace utils {
 	/*!
 		@brief	オーディオ出力クラス
 		@param[in]	BFS		fifo バッファのサイズ
+		@param[in]	OUTS	出力バッファのサイズ @n
+							２のＮ乗サイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<uint32_t BFS>
+	template<uint32_t BFS, uint32_t OUTS = 1024>
 	class audio_out {
 	public:
 
@@ -43,7 +45,7 @@ namespace utils {
 
 	private:
 
-		audio::wave_t	wave_[1024];
+		audio::wave_t	wave_[OUTS];
 		uint32_t	w_put_;
 
 		FIFO		fifo_;
@@ -66,7 +68,7 @@ namespace utils {
 		void mute() noexcept
 		{
 			fifo_.clear();
-			for(uint32_t i = 0; i < 1024; ++i) {
+			for(uint32_t i = 0; i < OUTS; ++i) {
 				wave_[i].zero();
 			}
 		}
@@ -96,7 +98,7 @@ namespace utils {
 			@return 波形サイズ
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t size() const noexcept { return 1024; }
+		uint32_t size() const noexcept { return OUTS; }
 
 
 		//-----------------------------------------------------------------//
@@ -107,7 +109,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void start(uint32_t org) noexcept
 		{
-			w_put_ = org & 1023;
+			w_put_ = org & (OUTS - 1);
 		}
 
 
@@ -126,7 +128,7 @@ namespace utils {
 				wave_[w_put_].l_ch ^= 0x8000;
 				wave_[w_put_].r_ch ^= 0x8000;
 				++w_put_;
-				w_put_ &= 1023;
+				w_put_ &= (OUTS - 1);
 			}
 		}
 	};
