@@ -118,9 +118,10 @@ namespace emu {
 				--delay_;
 				if(delay_ == 0) {
 //					open("GALAXIAN.NES");
-					open("GRADIUS.nes");
+//					open("GRADIUS.nes");
 //					open("DragonQuest_J_fix.nes");
-//					open("Dragon_Quest2_fix.nes");
+//					open("High_Speed_E.nes");
+					open("Dragon_Quest2_fix.nes");
 //					open("Solstice_J.nes");
 //					open("Zombie.nes");
 				}
