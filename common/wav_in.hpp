@@ -9,10 +9,10 @@
 */
 //=====================================================================//
 #include <cstring>
-#include "ff12b/src/ff.h"
+#include "common/file_io.hpp"
 #include "common/format.hpp"
 
-extern "C" {	
+extern "C" {
 	void bmp_putch(char ch);
 	void bmp_locate(int8_t idx);
 };

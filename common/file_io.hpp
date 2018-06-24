@@ -173,10 +173,19 @@ namespace utils {
 		}
 
 
-		bool seek(SEEK sek, int32_t ofs) noexcept
+		//-------------------------------------------------------------//
+		/*!
+			@brief	シーク（fseek 準拠）
+			@param[in]	seek	シーク形式
+			@param[in]	ofs		オフセット
+			@return 成功なら「true」
+		*/
+		//-------------------------------------------------------------//
+		bool seek(SEEK seek, int32_t ofs) noexcept
 		{
+			if(!open_) return false;
 			FRESULT ret;
-			switch(sek) {
+			switch(seek) {
 			case SEEK::SET:
 				ret = f_lseek(&fp_, ofs);
 				break;
@@ -208,8 +217,9 @@ namespace utils {
 			@return ファイル位置
 		*/
 		//-------------------------------------------------------------//
-		uint32_t tell() noexcept
+		uint32_t tell() const noexcept
 		{
+			if(!open_) return false;
 			return f_tell(&fp_);
 		}
 
@@ -220,7 +230,7 @@ namespace utils {
 			@return ファイルの終端なら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool eof() noexcept
+		bool eof() const noexcept
 		{
 			if(!open_) return false;
 			return f_eof(&fp_);

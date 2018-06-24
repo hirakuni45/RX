@@ -2,8 +2,8 @@
 //=====================================================================//
 /*! @file
     @brief  format クラス @n
-			・安全性を考慮した、[s]printf 表示に準じたクラス
-			・二進表記として、「%b」をサポート
+			・安全性を考慮した、[s]printf 表示に準じたクラス @n
+			・二進表記として、「%b」をサポート @n
 			・固定小数点表示「%N.M:Ly」形式をサポート @n
 			※ N：全桁数、M：小数部桁数、L：小数部のビット数 @n
 			※ N には、小数点、符号が含まれる @n
@@ -14,7 +14,7 @@
 			+ 2017/06/12 14:50- memory_chaoutと、専用コンストラクター実装 @n
 			+ 2017/06/14 05:34- memory_chaout size() のバグ修正
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
