@@ -37,7 +37,7 @@ namespace utils {
 							２のＮ乗サイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<uint32_t BFS, uint32_t OUTS = 1024>
+	template<uint32_t BFS, uint32_t OUTS>
 	class audio_out {
 	public:
 
