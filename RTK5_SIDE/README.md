@@ -9,6 +9,7 @@ Envision Kit RX65N で実現する Space Invaders エミュレーター
  - main.cpp
  - spinv.hpp
  - Makefile
+ - wavs/ 効果音ファイル
    
 ## ハードウェアーの準備
  - SD カードインターフェースの準備
