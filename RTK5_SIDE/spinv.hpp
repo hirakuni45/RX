@@ -25,7 +25,7 @@ namespace emu {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class spinv {
 	public:
-		typedef audio::snd_mgr<9, 8, 184> SND_MGR;
+		typedef audio::snd_mgr<9, 6, 184> SND_MGR;
 
 	private:
 		InvadersMachine im_;
@@ -35,6 +35,8 @@ namespace emu {
 		SND_MGR		snd_mgr_;
 
 		uint32_t	se_hnd_[9];
+		unsigned	req_lvl_;
+		uint32_t	ufo_hnd_;
 
 		bool load_sounds_(const char* root)
 		{
@@ -68,7 +70,7 @@ namespace emu {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		spinv() noexcept : im_() { }
+		spinv() noexcept : im_(), se_hnd_{ 9 }, req_lvl_(0), ufo_hnd_(6) { }
 
 
 		//-----------------------------------------------------------------//
@@ -223,12 +225,26 @@ namespace emu {
 				InvadersMachine::SoundWalk4
 			};
 
-			unsigned bits = im_.getSounds();
+			unsigned lvl = im_.getSounds();
+			unsigned pos = ~req_lvl_ &  lvl;
+			unsigned neg =  req_lvl_ & ~lvl;
 			for(int i = 0; i < 9; ++i) {
-				if(!snd_mgr_.status(se_hnd_[i]) && (bits & se_mask[i]) != 0) {
-					snd_mgr_.request(se_hnd_[i]);
+				if(i == 3) {
+					if(pos & se_mask[i]) {
+						ufo_hnd_ = snd_mgr_.request(se_hnd_[i], true);
+					}
+					if(neg & se_mask[i]) {
+						snd_mgr_.stop(ufo_hnd_);
+						ufo_hnd_ = snd_mgr_.sound_max();
+					}
+				} else {
+					if(pos & se_mask[i]) {
+						snd_mgr_.request(se_hnd_[i]);
+					}
 				}
 			}
+			req_lvl_ = lvl;
+
 			snd_mgr_.update();
 		}
 
