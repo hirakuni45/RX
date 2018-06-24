@@ -76,6 +76,7 @@ namespace chip {
 			CLK::DIR = 1;
 			OUT::DIR = 0;
 			if(pullup) OUT::PU = 1;
+			update();
 		}
 
 
