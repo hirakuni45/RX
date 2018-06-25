@@ -45,7 +45,7 @@ namespace graphics {
 			@return 文字のビットマップ
 		*/
 		//-----------------------------------------------------------------//
-		static const uint8_t* get(uint8_t code) {
+		static const uint8_t* get(uint8_t code) noexcept {
 			return &bitmap_[static_cast<uint16_t>(code) << 4];
 		}
 
@@ -57,7 +57,7 @@ namespace graphics {
 			@return 文字幅
 		*/
 		//-----------------------------------------------------------------//
-		static int8_t get_width(uint8_t code) {
+		static int8_t get_width(uint8_t code) noexcept {
 			if(code < 32 || code >= 128) return width;
 			else return width_tbl_[code - 32];
 		}
