@@ -286,6 +286,7 @@ int main(int argc, char** argv)
 				tmp[26] = 0;
 				graph_.draw_text(0, 16, tmp);
 				graph_.draw_text(0, 32, "金の貸し借りをしてはならない。\n金を貸せば金も友も失う。\n金を借りれば倹約が馬鹿らしくなる。");
+				graph_.draw_text(0, 16*5, "Graphics Image Turn IgIiIrliiljL\n", true);
 			}
 		}
 #if 0
