@@ -743,13 +743,18 @@ namespace utils {
 					break;
 				}
 			}
-			if(pos >= (dsz - 1)) {
-				dst[dsz - 1] = 0;
+			if(pos == (dsz - 1)) {  // サイズ最大か？
+				dst[pos] = 0;
 				return false;
 			}
 
-			if(pos > 0 && dst[pos - 1] != '/') {
-				dst[pos - 1] = '/';
+			if(std::strlen(src) == 0) return true;  // 追加無し
+
+			if(pos == 1 && dst[0] == '/' && dst[1] == 0) ;  // ルート・パスなので、何もしない
+			else if(pos > 2 && dst[pos - 1] != '/') {  // [/] を追加する必要がある場合 
+				dst[pos] = '/';
+				++pos;
+				dst[pos] = 0;
 			}
 
 			while(pos < (dsz - 1)) {
