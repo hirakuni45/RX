@@ -28,9 +28,11 @@ namespace graphics {
 	template <int8_t WIDTH, int8_t HEIGHT, uint8_t CASHN>
 	class kfont {
 
+		static const uint32_t FONTS = ((WIDTH * HEIGHT) + 7) / 8;
+
 		struct kanji_cash {
 			uint16_t	code;
-			uint8_t		bitmap[((WIDTH * HEIGHT) + 7) / 8];
+			uint8_t		bitmap[FONTS];
 			kanji_cash() noexcept : code(0), bitmap{ 0 } { }
 		};
 		kanji_cash cash_[CASHN];
@@ -131,13 +133,13 @@ namespace graphics {
 				return nullptr;
 			}
  
-			if(f_lseek(&fp, lin * 32) != FR_OK) {
+			if(f_lseek(&fp, lin * FONTS) != FR_OK) {
 				f_close(&fp);
 				return nullptr;
 			}
 
 			UINT rs;
-			if(f_read(&fp, &cash_[cash_idx_].bitmap[0], 32, &rs) != FR_OK) {
+			if(f_read(&fp, &cash_[cash_idx_].bitmap[0], FONTS, &rs) != FR_OK) {
 				f_close(&fp);
 				return nullptr;
 			}
