@@ -40,9 +40,9 @@ namespace emu {
 		static const int nes_height_ = 240;
         static const int sample_rate_ = 22050;
 		static const int sample_bits_ = 16;
-		static const int audio_len_ = sample_rate_ / 60;
+		static const int audio_len_ = (sample_rate_ / 60) + 1;
 
-		uint16_t		audio_buf_[audio_len_ + 16];
+		uint16_t		audio_buf_[audio_len_];
 
 //		emu::nsfplay	nsfplay_;
 
@@ -120,10 +120,13 @@ namespace emu {
 //					open("GALAXIAN.NES");
 //					open("GRADIUS.nes");
 //					open("DragonQuest_J_fix.nes");
-//					open("High_Speed_E.nes");
 					open("Dragon_Quest2_fix.nes");
 //					open("Solstice_J.nes");
+
+// メモリー不足で動作しない・・
 //					open("Zombie.nes");
+// メモリーマッパーが未対応
+//					open("High_Speed_E.nes");
 				}
 			}
 
