@@ -287,6 +287,7 @@ int main(int argc, char** argv)
 				graph_.draw_text(0, 16, tmp);
 				graph_.draw_text(0, 32, "金の貸し借りをしてはならない。\n金を貸せば金も友も失う。\n金を借りれば倹約が馬鹿らしくなる。");
 				graph_.draw_text(0, 16*5, "Graphics Image Light Bilk IgIiIrliiljkffkL\n", true);
+				graph_.draw_text(0, 16*6, "012:;,.(i),[i],{i},{|}.(`)\n", true);
 			}
 		}
 #if 0
