@@ -156,6 +156,8 @@ namespace device {
 		{
 			level_ = level;
 
+			power_cfg::turn(RSPI::get_peripheral());
+
 			// デバイスを不許可
 			RSPI::SPCR = 0x00;
 
@@ -168,8 +170,6 @@ namespace device {
 			if(!clock_div_(speed, brdv, spbr)) {
 				f = false;
 			}
-
-			power_cfg::turn(RSPI::get_peripheral());
 
 			// 設定
 		    RSPI::SPBR = spbr;
@@ -220,6 +220,8 @@ namespace device {
 		{
 			level_ = 0;
 
+			power_cfg::turn(RSPI::get_peripheral());
+
 			RSPI::SPCR = 0x00;			
 
 			bool f = true;
@@ -228,7 +230,6 @@ namespace device {
 			if(!clock_div_(speed, brdv, spbr)) {
 				f = false;
 			}
-			power_cfg::turn(RSPI::get_peripheral());
 			port_map::turn(RSPI::get_peripheral(), true, PSEL);
 #if 0
 			utils::format("RSPI Request Speed: %u [Hz]\n") % speed;
