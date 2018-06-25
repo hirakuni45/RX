@@ -45,13 +45,15 @@ namespace audio {
 
 		int16_t	final_[RDRLEN];
 
+		uint32_t	dec_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		snd_mgr() noexcept { }
+		snd_mgr() noexcept : dec_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -200,15 +202,18 @@ namespace audio {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  サウンドバッファを更新
+			@param[in]	dec	レンダリング数のマイナス調整
 		*/
 		//-----------------------------------------------------------------//
-		void update() noexcept
+		void update(uint32_t dec = 0) noexcept
 		{
-			for(uint32_t i = 0; i < RDRLEN; ++i) {
+			dec_ = dec;
+
+			for(uint32_t i = 0; i < (RDRLEN - dec); ++i) {
 				final_[i] = 0;
 			}
 
-			for(uint32_t i = 0; i < SNDMAX; ++i) {
+			for(uint32_t i = 0; i < (SNDMAX - dec); ++i) {
 				snd_t& snd = snd_[i];
 				if(snd.ctx_ >= CTXMAX) {
 					continue;
@@ -230,7 +235,7 @@ namespace audio {
 			}
 
 			// 最終ゲイン調整
-			for(uint32_t i = 0; i < RDRLEN; ++i) {
+			for(uint32_t i = 0; i < (RDRLEN - dec); ++i) {
 				final_[i] *= 256 / SNDMAX;
 			}
 		}
@@ -243,7 +248,7 @@ namespace audio {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_length() const noexcept {
-			return RDRLEN;
+			return RDRLEN - dec_;
 		}
 
 
