@@ -8,13 +8,16 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "common/cmt_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
+#include "common/qspi_io.hpp"
+#include "graphics/font8x16.hpp"
+#include "graphics/kfont.hpp"
+#include "graphics/graphics.hpp"
 
 namespace {
 
@@ -23,17 +26,10 @@ namespace {
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
-	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
-
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
 	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
 	SCI		sci_;
-
-	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
-	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, 480, 272, device::PIX_TYPE::RGB565> GLCDC_IO;
-	GLCDC_IO	glcdc_io_;
 
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
@@ -61,6 +57,26 @@ namespace {
 #endif
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
+
+	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
+	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
+	typedef device::glcdc_io<device::GLCDC, 480, 272, device::PIX_TYPE::RGB565> GLCDC_IO;
+	GLCDC_IO	glcdc_io_;
+
+	// QSPI B グループ
+	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
+	QSPI		qspi_;
+
+	typedef device::drw2d_mgr<device::DRW2D> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_;
+
+	typedef graphics::font8x16 AFONT;
+	typedef graphics::kfont<16, 16, 64> KFONT;
+	KFONT		kfont_;
+
+	typedef graphics::base<uint16_t, 480, 272, AFONT, KFONT> GRAPH;
+	GRAPH		graph_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
+
 
 	utils::command<256> cmd_;
 
@@ -188,7 +204,7 @@ extern "C" {
 
 
 	int fatfs_get_mount() {
-		return check_mount_();
+		return sdc_.get_mount();
 	}
 }
 
@@ -197,11 +213,6 @@ int main(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	SYSTEM_IO::setup_system_clock();
-
-	{  // タイマー設定（６０Ｈｚ）
-		uint8_t cmt_irq_level = 4;
-		cmt_.start(60, cmt_irq_level);
-	}
 
 	{  // SCI 設定
 		static const uint8_t sci_level = 2;
@@ -217,7 +228,13 @@ int main(int argc, char** argv)
 
 	cmd_.set_prompt("# ");
 
-	{  // GLCDC 初期化
+	{  // QSPI の初期化（Flash Memory Read/Write Interface)
+		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
+			utils::format("QSPI not start.\n");
+		}
+	}
+
+	{  // GLCDC の初期化
 		LCD_DISP::DIR  = 1;
 		LCD_LIGHT::DIR = 1;
 		LCD_DISP::P  = 0;  // DISP Disable
@@ -230,25 +247,47 @@ int main(int argc, char** argv)
 				utils::format("GLCDC ctrl fail...\n");
 			}
 		} else {
-			utils::format("Fail GLCDC\n");
+			utils::format("GLCDC Fail\n");
 		}
 	}
 
-#if 0
-	device::GLCDC::GR1CLUT0[0].R = 0xcc;
-	device::GLCDC::GR1CLUT0[1] = 0x123456;
-	uint32_t rgba = device::GLCDC::GR1CLUT0[2];
-	utils::format("%08X\n") % rgba;
-#endif
+	{  // DRW2D 初期化
+		auto ver = drw2d_mgr_.get_version();
+		utils::format("DRW2D Version: %04X\n") % ver;
 
+		if(drw2d_mgr_.start()) {
+			utils:: format("Start DRW2D\n");
+		} else {
+			utils:: format("DRW2D Fail\n");
+		}
+	}
 
 	LED::DIR = 1;
 //	SW2::DIR = 0;
 
+	uint8_t task = 100;
+
 	uint8_t n = 0;
 //	bool sw2 = SW2::P();
 	while(1) {
-		cmt_.sync();
+		glcdc_io_.sync_vpos();
+
+		sdc_.service(sdh_.service());
+
+		if(task > 0) {
+			--task;
+			if(task == 0) {
+//				graph_.line(0, 0, 480-1, 272-1, 0xffff);
+				char tmp[32];
+				for(int i = 0; i < 26; ++i) tmp[i] = 'A' + i;
+				tmp[26] = 0;
+				graph_.draw_text(0, 0, tmp);
+				for(int i = 0; i < 26; ++i) tmp[i] = 'a' + i;
+				tmp[26] = 0;
+				graph_.draw_text(0, 16, tmp);
+				graph_.draw_text(0, 32, "金の貸し借りをしてはならない。\n金を貸せば金も友も失う。\n金を借りれば倹約が馬鹿らしくなる。");
+			}
+		}
 #if 0
 		{  // SW2 の検出
 			auto f = SW2::P();
@@ -261,7 +300,6 @@ int main(int argc, char** argv)
 			sw2 = f;
 		}
 #endif
-		sdc_.service(sdh_.service());
 
 		command_();
 
