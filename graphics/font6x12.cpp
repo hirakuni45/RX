@@ -7,7 +7,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/font6x12.hpp"
+#include "graphics/font6x12.hpp"
 
 namespace graphics {
 
