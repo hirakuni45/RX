@@ -28,7 +28,8 @@ CSOURCES	=	common/init.c \
 # r_lcd/r_glcdc_rx_pinset.c
 
 PSOURCES	=	main.cpp \
-				RX600/icu_mgr.cpp
+				RX600/icu_mgr.cpp \
+				graphics/font8x16.cpp
 
 USER_LIBS	=
 
