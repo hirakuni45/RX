@@ -15,11 +15,11 @@
 #if defined(SIG_RX24T)
 #  error "qspi_io.hpp not support for RX24T"
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-#ifndef F_PCLKA
-#  error "qspi_io.hpp requires F_PCLKA to be defined"
+#ifndef F_PCLKB
+#  error "qspi_io.hpp requires F_PCLKB to be defined"
 #else
 #undef PCLK
-#define PCLK F_PCLKA
+#define PCLK F_PCLKB
 #endif
 #endif
 
