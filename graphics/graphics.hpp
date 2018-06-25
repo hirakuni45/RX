@@ -374,9 +374,9 @@ namespace graphics {
 				if(p != nullptr) {
 					draw_bitmap(x, y, p, KFONT::width, KFONT::height);
 				} else {
-					draw_bitmap(x, y, AFONT::get(0x12), AFONT::width, AFONT::height);
+					draw_bitmap(x, y, AFONT::get('['), AFONT::width, AFONT::height);
 					x += AFONT::width;
-					draw_bitmap(x, y, AFONT::get(0x13), AFONT::width, AFONT::height);
+					draw_bitmap(x, y, AFONT::get(']'), AFONT::width, AFONT::height);
 				}
 			}
 		}
@@ -450,7 +450,12 @@ namespace graphics {
 		{
 			char ch;
 			while((ch = *text++) != 0) {
-				x = draw_font(x, y, ch, prop);
+				if(ch == '\n') {
+					x = 0;
+					y += KFONT::height;
+				} else {
+					x = draw_font(x, y, ch, prop);
+				}
 			}
 			return x;
 		}
