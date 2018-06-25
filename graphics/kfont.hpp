@@ -1,0 +1,151 @@
+#pragma once
+//=====================================================================//
+/*!	@file
+	@brief	漢字フォント・クラス
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
+*/
+//=====================================================================//
+#include <cstdint>
+#include "ff12b/src/ff.h"
+
+extern "C" {
+	int fatfs_get_mount();
+};
+
+namespace graphics {
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	漢字フォント・テンプレート・クラス
+		@param[in]	WIDTH	フォントの横幅
+		@param[in]	HEIGHT	フォントの高さ
+		@param[in]	CASHN	キャッシュ数
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <int8_t WIDTH, int8_t HEIGHT, uint8_t CASHN>
+	class kfont {
+
+		struct kanji_cash {
+			uint16_t	code;
+			uint8_t		bitmap[((WIDTH * HEIGHT) + 7) / 8];
+			kanji_cash() noexcept : code(0), bitmap{ 0 } { }
+		};
+		kanji_cash cash_[CASHN];
+		uint8_t cash_idx_;
+
+		static uint16_t sjis_to_liner_(uint16_t sjis)
+		{
+			uint16_t code;
+			uint8_t up = sjis >> 8;
+			uint8_t lo = sjis & 0xff;
+			if(0x81 <= up && up <= 0x9f) {
+				code = up - 0x81;
+			} else if(0xe0 <= up && up <= 0xef) {
+				code = (0x9f + 1 - 0x81) + up - 0xe0;
+			} else {
+				return 0xffff;
+			}
+			uint16_t loa = (0x7e + 1 - 0x40) + (0xfc + 1 - 0x80);
+			if(0x40 <= lo && lo <= 0x7e) {
+				code *= loa;
+				code += lo - 0x40;
+			} else if(0x80 <= lo && lo <= 0xfc) {
+				code *= loa;
+				code += 0x7e + 1 - 0x40;
+				code += lo - 0x80;
+			} else {
+				return 0xffff;
+			}
+			return code;
+		}
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		kfont() : cash_(), cash_idx_(0) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	文字の横幅
+		*/
+		//-----------------------------------------------------------------//
+		static const int8_t width = WIDTH;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	文字の高さ
+		*/
+		//-----------------------------------------------------------------//
+		static const int8_t height = HEIGHT;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	文字のビットマップを取得
+			@param[in]	code	文字コード（unicode）
+			@return 文字のビットマップ
+		*/
+		//-----------------------------------------------------------------//
+		const uint8_t* get(uint16_t code) noexcept {
+
+			if(code == 0) return nullptr;
+
+			// キャッシュ内検索
+			int8_t n = -1;
+			for(uint8_t i = 0; i < CASHN; ++i) {
+				if(cash_[i].code == code) {
+					return &cash_[i].bitmap[0];
+				} else if(cash_[i].code == 0) {
+					n = i;
+				}
+			}
+			if(n >= 0) cash_idx_ = n;
+			else {
+				for(uint8_t i = 0; i < CASHN; ++i) {
+					++cash_idx_;
+					if(cash_idx_ >= CASHN) cash_idx_ = 0;
+					if(cash_[cash_idx_].code != 0) {
+						break;
+					}
+				}
+			}
+
+			if(fatfs_get_mount() == 0) return nullptr;
+
+			uint32_t lin = sjis_to_liner_(ff_convert(code, 0));
+
+			if(lin == 0xffff) {
+				return nullptr;
+			}
+
+			FIL fp;
+			if(f_open(&fp, "/kfont16.bin", FA_READ) != FR_OK) {
+				return nullptr;
+			}
+ 
+			if(f_lseek(&fp, lin * 32) != FR_OK) {
+				f_close(&fp);
+				return nullptr;
+			}
+
+			UINT rs;
+			if(f_read(&fp, &cash_[cash_idx_].bitmap[0], 32, &rs) != FR_OK) {
+				f_close(&fp);
+				return nullptr;
+			}
+			cash_[cash_idx_].code = code;
+
+			f_close(&fp);
+
+			return &cash_[cash_idx_].bitmap[0];
+		}
+	};
+}
