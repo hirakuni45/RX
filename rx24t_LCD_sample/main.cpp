@@ -15,7 +15,7 @@
 #include "common/rspi_io.hpp"
 #include "chip/ST7565.hpp"
 #include "chip/UC1701.hpp"
-#include "common/monograph.hpp"
+#include "graphics/monograph.hpp"
 
 // LCD を選択する
 #define LCD_ST7565
@@ -134,7 +134,7 @@ int main(int argc, char** argv)
 #ifdef LCD_UC1701
 		uint32_t clk = 8000000;
 #endif
-		if(!spi_.start(clk, SPI::PHASE::TYPE4)) {
+		if(!spi_.start(clk, SPI::PHASE::TYPE4, SPI::DLEN::W8)) {
 			utils::format("RSPI speed fail...\n");
 		}
 	}
