@@ -258,6 +258,12 @@ extern "C" {
 	int fatfs_get_mount() {
 		return sdc_.get_mount();
 	}
+
+
+	int make_full_path(const char* src, char* dst, uint16_t len)
+	{
+		return sdc_.make_full_path(src, dst, len);
+	}
 }
 
 int main(int argc, char** argv);
