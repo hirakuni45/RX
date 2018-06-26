@@ -139,8 +139,8 @@ extern "C" {
 		return utils::str::get_fattime(t);
 	}
 
-	void utf8_to_sjis(const char* src, char* dst) {
-		utils::str::utf8_to_sjis(src, dst);
+	void utf8_to_sjis(const char* src, char* dst, uint32_t len) {
+		utils::str::utf8_to_sjis(src, dst, len);
 	}
 }
 
@@ -195,9 +195,10 @@ int main(int argc, char** argv)
 				core_.bitmap_.clear(0);
 			}
 			scene_.service();
-			core_.spi_.start(8000000, core_t::SPI::PHASE::TYPE4);  // LCD 用速度と設定
+			// LCD 用速度と設定
+////			core_.spi_.start(8000000, core_t::SPI::PHASE::TYPE4, core_t::SPI::DLEN::W8);
 			core_.lcd_.copy(core_.bitmap_.fb(), core_.bitmap_.page_num());
-			core_.sdc_.setup_speed();  //  SDC 用速度と設定
+////			core_.sdc_.setup_speed();  //  SDC 用速度と設定
 		}
 
 		++core_.loop_count_;

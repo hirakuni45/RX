@@ -26,9 +26,9 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	main.cpp \
 				resource.cpp \
-				common/font6x12.cpp
+				graphics/font6x12.cpp
 
-USER_LIBS	=	stdc++
+USER_LIBS	=
 
 LDSCRIPT	=	../RX24T/$(DEVICE).ld
 

@@ -13,13 +13,12 @@
 #include "common/rspi_io.hpp"
 #include "common/sdc_io.hpp"
 #include "chip/ST7565.hpp"
-#include "common/monograph.hpp"
-#include "common/font6x12.hpp"
+#include "graphics/monograph.hpp"
+#include "graphics/font6x12.hpp"
+#include "graphics/menu.hpp"
 
 #include "common/format.hpp"
 #include "common/command.hpp"
-
-#include "common/menu.hpp"
 
 #include "common/adc_io.hpp"
 #include "common/bitset.hpp"
@@ -170,8 +169,9 @@ struct core_t {
 		@brief	コンストラクター
 	*/
 	//-----------------------------------------------------------------//
-	core_t() : nmea_(sci5_),
-			   sdc_(spi_),
+	core_t() :
+			   nmea_(sci5_),
+			   sdc_(spi_, 15000000),
 			   lcd_(spi_),
 			   bitmap_(kfont_),
 			   resource_(bitmap_),
@@ -254,7 +254,7 @@ struct core_t {
 		}
 
 		{  // LCD 開始
-			spi_.start(8000000, SPI::PHASE::TYPE4);  // LCD 用設定、速度
+			spi_.start(8000000, SPI::PHASE::TYPE4, SPI::DLEN::W8);  // LCD 用設定、速度
 			bool comrvs = true;
 			lcd_.start(0x10, comrvs);
 			bitmap_.clear(0);
