@@ -36,15 +36,15 @@ namespace device {
 					※誤差が大きいので注意
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class speed : uint8_t {
-			_50K,		///<  50K b.p.s.
-			standard,	///< 100K b.p.s. (Standard mode)
-			_150K,		///< 150K b.p.s.
-			_200K,		///< 200K b.p.s.
-			_250K,		///< 250K b.p.s.
-			_300K,		///< 300K b.p.s.
-			_350K,		///< 350K b.p.s.
-			fast,		///< 400K b.p.s. (Fast mode)
+		enum class speed {
+			_50K     =  50000,	///<  50K b.p.s.
+			standard = 100000,	///< 100K b.p.s. (Standard mode)
+			_150K    = 150000,	///< 150K b.p.s.
+			_200K    = 200000,	///< 200K b.p.s.
+			_250K    = 250000,	///< 250K b.p.s.
+			_300K    = 300000,	///< 300K b.p.s.
+			_350K    = 350000,	///< 350K b.p.s.
+			fast     = 400000,	///< 400K b.p.s. (Fast mode)
 		};
 
 	private:
@@ -155,6 +155,7 @@ namespace device {
 			}
 			if(cks > 3) return false;
 			bool abcs = true;
+			bool brme = false;
 			if(brr > (256 << 8)) { brr /= 2; abcs = false; }
 			uint32_t mddr = ((brr & 0xff00) << 8) / brr;
 			brr >>= 8;
@@ -163,7 +164,8 @@ namespace device {
 
 			// 8 bits, 1 stop bit, no-parrity
 			SCI::SMR = cks;
-			SCI::SEMR = SCI::SEMR.ABCS.b(abcs) | SCI::SEMR.BRME.b();
+			if(mddr >= 128) brme = true;
+			SCI::SEMR = SCI::SEMR.ABCS.b(abcs) | SCI::SEMR.BRME.b(brme);
 			if(brr) --brr;
 			SCI::BRR = brr;
 			SCI::MDDR = mddr;
@@ -264,34 +266,7 @@ namespace device {
 				return false;
 			}
 
-			uint32_t clk = 0;
-			switch(spd) {
-			case speed::_50K:		///<  50K b.p.s.
-				clk =  50000;
-				break;
-			case speed::standard:	///< 100K b.p.s. (Standard mode)
-				clk = 100000;
-				break;
-			case speed::_150K:		///< 150K b.p.s.
-				clk = 150000;
-				break;
-			case speed::_200K:		///< 200K b.p.s.
-				clk = 200000;
-				break;
-			case speed::_250K:		///< 250K b.p.s.
-				clk = 250000;
-				break;
-			case speed::_300K:		///< 300K b.p.s.
-				clk = 300000;
-				break;
-			case speed::_350K:		///< 350K b.p.s.
-				clk = 350000;
-			case speed::fast:		///< 400K b.p.s. (Fast mode)
-				clk = 400000;
-				break;
-			default:
-				return false;
-			}
+			uint32_t clk = static_cast<uint32_t>(spd);
 			uint32_t brr = F_PCLKB / clk * 4;
 			uint32_t mddr = ((brr & 0xff00) << 8) / brr;
 			brr >>= 8;
