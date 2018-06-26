@@ -83,7 +83,7 @@ namespace utils {
         //-----------------------------------------------------------------//
 		void putch(char ch) noexcept
 		{
-			MEMIO::put(sizeof(area_t) + area_.pos_, ch);
+			MEMIO::put8(sizeof(area_t) + area_.pos_, ch);
 			++area_.pos_;
 			uint16_t limit = MEMIO::SIZE - sizeof(area_t);
 			if(area_.pos_ >= limit) area_.pos_ = 0;
@@ -134,7 +134,7 @@ namespace utils {
 			pos += area_.pos_ - area_.len_;
 			pos %= MEMIO::SIZE - sizeof(area_t);
 			uint8_t data;
-			if(MEMIO::get(pos + sizeof(area_t), data)) {
+			if(MEMIO::get8(pos + sizeof(area_t), data)) {
 				return static_cast<char>(data);
 			} else {
 				return 0;
