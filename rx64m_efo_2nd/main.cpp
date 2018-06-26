@@ -24,7 +24,7 @@
 
 namespace {
 
-	static const int main_version_ = 93;
+	static const int main_version_ = 100;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
