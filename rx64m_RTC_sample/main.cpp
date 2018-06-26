@@ -10,7 +10,6 @@
 //=====================================================================//
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
-#include "rx64m/rtc_io.hpp"
 #include "common/fifo.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
