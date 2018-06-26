@@ -114,7 +114,7 @@ namespace {
 	typedef device::dac_out<DAC> DAC_OUT;
 	DAC_OUT		dac_out_;
 
-	typedef utils::audio_out<8192> AUDIO_OUT;
+	typedef utils::audio_out<8192, 1024> AUDIO_OUT;
 	AUDIO_OUT	audio_out_;
 
 	class tpu_task {
@@ -214,13 +214,14 @@ extern "C" {
 
 
 	bool check_mount_() {
-		auto f = sdc_.get_mount();
-		if(!f) {
-			utils::format("SD card not mount.\n");
-		}
-		return f;
+		return sdc_.get_mount();
 	}
 
+
+	int make_full_path(const char* src, char* dst, uint16_t len)
+	{
+		return sdc_.make_full_path(src, dst, len);
+	}
 }
 
 
@@ -284,11 +285,11 @@ namespace {
 		}
 
 		auto fsize = wav_in_.get_size();
-		utils::format("File:  '%s'\n") % fname;
-		utils::format("Size:   %d\n") % fsize;
-		utils::format("Rate:   %d\n") % wav_in_.get_rate();
-		utils::format("Chanel: %d\n") % static_cast<uint32_t>(wav_in_.get_chanel());
-		utils::format("Bits:   %d\n") % static_cast<uint32_t>(wav_in_.get_bits());
+		utils::format("File:   '%s'\n") % fname;
+		utils::format("Size:    %d\n") % fsize;
+		utils::format("Rate:    %d\n") % wav_in_.get_rate();
+		utils::format("Channel: %d\n") % static_cast<uint32_t>(wav_in_.get_channel());
+		utils::format("Bits:    %d\n") % static_cast<uint32_t>(wav_in_.get_bits());
 
 		auto ti = wav_in_.get_time();
 		utils::format("Time:   %02d:%02d:%02d\n") % (ti / 3600) % (ti / 60) % (ti % 60);
@@ -296,7 +297,7 @@ namespace {
 		set_sample_rate(wav_in_.get_rate());
 
 		{  // Supports: 8/16 bits, 1(mono)/2(stereo) chennel
-			auto ch = wav_in_.get_chanel();
+			auto ch = wav_in_.get_channel();
 			auto bt = wav_in_.get_bits();
 			if(bt == 8 && ch <= 2) {
 			} else if(bt == 16 && ch <= 2) {
@@ -316,14 +317,14 @@ namespace {
 		uint8_t m_time = 0;
 		uint8_t h_time = 0;
 		uint16_t btime = 0;
-		uint16_t dtime = 512 / (wav_in_.get_bits() / 8) / wav_in_.get_chanel();
+		uint16_t dtime = 512 / (wav_in_.get_bits() / 8) / wav_in_.get_channel();
 		uint16_t nnn = wpos & 0x380;
 		while(fpos < fsize) {
 			if(!pause) {
 				while(((wpos ^ pos) & 128) == 0) {
 					pos = get_wave_pos_();
 				}
-				uint32_t unit = (wav_in_.get_bits() / 8) * wav_in_.get_chanel();
+				uint32_t unit = (wav_in_.get_bits() / 8) * wav_in_.get_channel();
 				UINT br;
 				uint8_t tmp[512];
 				if(f_read(&fil, tmp, unit * 128, &br) != FR_OK) {
@@ -335,7 +336,7 @@ namespace {
 				if(wav_in_.get_bits() == 16) {
 					const uint16_t* src = reinterpret_cast<const uint16_t*>(tmp);
 					for(uint32_t i = 0; i < 128; ++i) {
-						if(wav_in_.get_chanel() == 2) {
+						if(wav_in_.get_channel() == 2) {
 							dst[i].l_ch = src[0] ^ 0x8000;
 							dst[i].r_ch = src[1] ^ 0x8000;
 							src += 2;
@@ -348,7 +349,7 @@ namespace {
 				} else {  // 8 bits
 					const uint8_t* src = reinterpret_cast<const uint8_t*>(tmp);
 					for(uint32_t i = 0; i < 128; ++i) {
-						if(wav_in_.get_chanel() == 2) {
+						if(wav_in_.get_channel() == 2) {
 							dst[i].l_ch = static_cast<uint16_t>(src[0] ^ 0x80) << 8;
 							dst[i].l_ch |= (src[0] & 0x7f) << 1;
 							dst[i].r_ch = static_cast<uint16_t>(src[1] ^ 0x80) << 8;
@@ -426,7 +427,7 @@ namespace {
 
 	void play_mp3_(const char* fname)
 	{
-		utils::file_io fin(sdc_);
+		utils::file_io fin;
 
 		if(!fin.open(fname, "rb")) {
 			return;
