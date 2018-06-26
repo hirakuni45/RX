@@ -272,8 +272,8 @@ extern "C" {
 		@param[out]	dst	ShiftJIS 文字列出力
 	 */
 	//-----------------------------------------------------------------//
-	void utf8_to_sjis(const char* src, char* dst) {
-		utils::str::utf8_to_sjis(src, dst);
+	void utf8_to_sjis(const char* src, char* dst, uint32_t len) {
+		utils::str::utf8_to_sjis(src, dst, len);
 	}
 }
 
@@ -282,7 +282,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	device::init_port();
+//	device::init_port();
 
 	device::PORTC::PDR.B0 = 1; // output
 	device::PORTC::PDR.B1 = 1; // output

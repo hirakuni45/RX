@@ -437,7 +437,8 @@ namespace net {
 					ctrl_format("150 Accepted data connection\n");
 					ctrl_flush();
 					if(sdc_.get_mount()) {
-						int n = sdc_.dir_loop("", dir_list_func_, true, nullptr);
+////						int n = sdc_.dir_loop("", dir_list_func_, true, nullptr);
+int n = 0;
 						data_flush();
 						ctrl_format("226 %d matches total\n") % n;
 					} else {
@@ -479,7 +480,8 @@ namespace net {
 					ctrl_flush();
 					if(sdc_.get_mount()) {
 						ctrl_format::chaout().set_desc(data_);
-						int n = sdc_.dir_loop("", dir_nlst_func_, true, nullptr);
+////						int n = sdc_.dir_loop("", dir_nlst_func_, true, nullptr);
+int n = 0;
 						ctrl_flush();
 						ctrl_format::chaout().set_desc(ctrl_);
 						ctrl_format("226 %d matches total\n") % n;
@@ -565,7 +567,7 @@ namespace net {
 				}
 				{
 					char path[256 + 1];
-					sdc_.make_full_path(param_, path);
+					sdc_.make_full_path(param_, path, sizeof(path));
 					if(!sdc_.probe(path)) {
 						ctrl_format("550 File '%s' not found\n") % path;
 						ctrl_flush();
@@ -711,7 +713,7 @@ namespace net {
 				}
 				{
 					char path[256 + 1];
-					sdc_.make_full_path(param_, path);
+					sdc_.make_full_path(param_, path, sizeof(path));
 					file_fp_ = fopen(path, "wb");
 					if(file_fp_ == nullptr) {
 						ctrl_format("451 Can't open/create %s\n") % path;
@@ -787,7 +789,7 @@ namespace net {
 						break;
 					}
 					char path[256 + 1];
-					sdc_.make_full_path(param_, path);
+					sdc_.make_full_path(param_, path, sizeof(path));
 					if(!sdc_.probe(path)) {
 						ctrl_format("550 No such file %s\n") % path;
 						ctrl_flush();
@@ -821,7 +823,8 @@ namespace net {
 						ctrl_flush();
 						if(sdc_.get_mount()) {
 							data_format::chaout().set_desc(data_);
-							int n = sdc_.dir_loop("", dir_mlsd_func_, true, nullptr);
+////							int n = sdc_.dir_loop("", dir_mlsd_func_, true, nullptr);
+int n = 0;
 							data_flush();
 							ctrl_format("226-options: -a -l\n");
 							ctrl_format("226 %d matches total\n") % n;
