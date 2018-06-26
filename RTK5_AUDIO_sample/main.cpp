@@ -18,11 +18,28 @@
 #include "common/tpu_io.hpp"
 #include "common/audio_out.hpp"
 #include "common/mp3_in.hpp"
+#include "common/qspi_io.hpp"
+#include "graphics/font8x16.hpp"
+#include "graphics/kfont.hpp"
+#include "graphics/graphics.hpp"
+#include "graphics/filer.hpp"
+
+#include "chip/FAMIPAD.hpp"
+
 
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-//	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
+
+	// Famicon PAD (CMOS 4021B Shift Register)
+	// 電源は、微小なので、接続を簡単に行う為、ポートを使う
+	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_VCC;
+	typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_GND;
+	typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_P_S;
+	typedef device::PORT<device::PORT6, device::bitpos::B5> PAD_CLK;
+	typedef device::PORT<device::PORT7, device::bitpos::B3> PAD_OUT;
+	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT> FAMIPAD;
+	FAMIPAD		famipad_;
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
@@ -32,11 +49,6 @@ namespace {
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
 	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
 	SCI		sci_;
-
-	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
-	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, 480, 272, device::PIX_TYPE::RGB565> GLCDC_IO;
-	GLCDC_IO	glcdc_io_;
 
 	// カード電源制御は使わないので、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
@@ -104,7 +116,27 @@ namespace {
 	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
 	TPU0		tpu0_;
 
+	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
+	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
+	typedef device::glcdc_io<device::GLCDC, 480, 272, device::PIX_TYPE::RGB565> GLCDC_IO;
+	GLCDC_IO	glcdc_io_;
+
+	// QSPI B グループ
+	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
+	QSPI		qspi_;
+
+	typedef device::drw2d_mgr<device::DRW2D> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_;
+
+	typedef graphics::font8x16 AFONT;
+	typedef graphics::kfont<16, 16, 64> KFONT;
+	KFONT		kfont_;
+
+	typedef graphics::base<uint16_t, 480, 272, AFONT, KFONT> GRAPH;
+	GRAPH		graph_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
+
 	audio::mp3_in	mp3_in_;
+
 
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
@@ -219,6 +251,12 @@ namespace {
 
 extern "C" {
 
+	uint8_t get_fami_pad()
+	{
+		return famipad_.update();
+	}
+
+
 	void set_sample_rate(uint32_t freq)
 	{
 		uint8_t intr_level = 5;
@@ -292,6 +330,12 @@ extern "C" {
 	int fatfs_get_mount() {
 		return check_mount_();
 	}
+
+
+	int make_full_path(const char* src, char* dst, uint16_t len)
+	{
+		return sdc_.make_full_path(src, dst, len);
+	}
 }
 
 int main(int argc, char** argv);
@@ -342,30 +386,54 @@ int main(int argc, char** argv)
 	utils::format("RTK5RX65N Start for AUDIO sample\n");
 	cmd_.set_prompt("# ");
 
-	{  // GLCDC 初期化
-		LCD_DISP::DIR  = 1;
-		LCD_LIGHT::DIR = 1;
-		LCD_DISP::P  = 1;  // DISP Enable
-		LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-		if(glcdc_io_.start()) {
-			utils::format("Start GLCDC\n");
-		} else {
-			utils::format("Fail GLCDC\n");
+
+	{  // QSPI の初期化（Flash Memory Read/Write Interface)
+		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
+			utils::format("QSPI not start.\n");
 		}
 	}
 
-#if 0
-	device::GLCDC::GR1CLUT0[0].R = 0xcc;
-	device::GLCDC::GR1CLUT0[1] = 0x123456;
-	uint32_t rgba = device::GLCDC::GR1CLUT0[2];
-	utils::format("%08X\n") % rgba;
-#endif
+	{  // GLCDC の初期化
+		LCD_DISP::DIR  = 1;
+		LCD_LIGHT::DIR = 1;
+		LCD_DISP::P  = 0;  // DISP Disable
+		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
+		if(glcdc_io_.start()) {
+			utils::format("Start GLCDC\n");
+			LCD_DISP::P  = 1;  // DISP Enable
+			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
+			if(!glcdc_io_.control(GLCDC_IO::control_cmd::START_DISPLAY)) {
+				utils::format("GLCDC ctrl fail...\n");
+			}
+		} else {
+			utils::format("GLCDC Fail\n");
+		}
+	}
+
+	{  // DRW2D 初期化
+		auto ver = drw2d_mgr_.get_version();
+		utils::format("DRW2D Version: %04X\n") % ver;
+
+		if(drw2d_mgr_.start()) {
+			utils:: format("Start DRW2D\n");
+		} else {
+			utils:: format("DRW2D Fail\n");
+		}
+	}
+
+	{
+		PAD_VCC::DIR = 1;
+		PAD_VCC::P = 1;
+		PAD_GND::DIR = 1;
+		PAD_GND::P = 0;
+		famipad_.start();
+	}
 
 	LED::DIR = 1;
 
 	uint8_t n = 0;
 	while(1) {
-		cmt_.sync();
+		glcdc_io_.sync_vpos();
 
 		sdc_.service(sdh_.service());
 
