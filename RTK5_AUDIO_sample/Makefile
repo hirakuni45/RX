@@ -47,7 +47,7 @@ INC_APP		=	. ../ ../RX600 ../RX56x ../libmad
 LIB_ROOT	=	../libmad/.libs
 USER_LIBS	=	mad
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
