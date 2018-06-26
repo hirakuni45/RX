@@ -132,8 +132,11 @@ namespace {
 	typedef graphics::kfont<16, 16, 64> KFONT;
 	KFONT		kfont_;
 
-	typedef graphics::base<uint16_t, 480, 272, AFONT, KFONT> GRAPH;
-	GRAPH		graph_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
+	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
+	RENDER		render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
+
+	typedef graphics::filer<SDC, RENDER> FILER;
+	FILER		filer_(sdc_, render_);
 
 	audio::mp3_in	mp3_in_;
 
