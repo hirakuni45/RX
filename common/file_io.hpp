@@ -18,6 +18,7 @@
 #include "ff12b/src/ff.h"
 
 extern "C" {
+	int make_full_path(const char* src, char* dst, uint16_t dsz);
 	void utf8_to_sjis(const char* src, char* dst, uint32_t dsz);
 };
 
@@ -93,7 +94,11 @@ namespace utils {
 			}
 
 			char tmp[_MAX_LFN + 1];
-			utf8_to_sjis(filename, tmp, sizeof(tmp));
+			if(!make_full_path(filename, tmp, sizeof(tmp))) {
+				return false;
+			}
+
+			utf8_to_sjis(tmp, tmp, sizeof(tmp));
 			FRESULT res = f_open(&fp_, tmp, mdf);
 			if(res != FR_OK) {
 				return false;
