@@ -223,8 +223,8 @@ extern "C" {
 #endif
 	}
 
-	void utf8_to_sjis(const char* src, char* dst) {
-		utils::str::utf8_to_sjis(src, dst);
+	void utf8_to_sjis(const char* src, char* dst, uint32_t len) {
+		utils::str::utf8_to_sjis(src, dst, len);
 	}
 
 	uint8_t v_ = 91;
