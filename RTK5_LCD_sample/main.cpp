@@ -74,8 +74,8 @@ namespace {
 	typedef graphics::kfont<16, 16, 64> KFONT;
 	KFONT		kfont_;
 
-	typedef graphics::base<uint16_t, 480, 272, AFONT, KFONT> GRAPH;
-	GRAPH		graph_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
+	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
+	RENDER		render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
 
 
 	utils::command<256> cmd_;
@@ -277,17 +277,17 @@ int main(int argc, char** argv)
 		if(task > 0) {
 			--task;
 			if(task == 0) {
-//				graph_.line(0, 0, 480-1, 272-1, 0xffff);
+//				render_.line(0, 0, 480-1, 272-1, 0xffff);
 				char tmp[32];
 				for(int i = 0; i < 26; ++i) tmp[i] = 'A' + i;
 				tmp[26] = 0;
-				graph_.draw_text(0, 0, tmp);
+				render_.draw_text(0, 0, tmp);
 				for(int i = 0; i < 26; ++i) tmp[i] = 'a' + i;
 				tmp[26] = 0;
-				graph_.draw_text(0, 16, tmp);
-				graph_.draw_text(0, 32, "金の貸し借りをしてはならない。\n金を貸せば金も友も失う。\n金を借りれば倹約が馬鹿らしくなる。");
-				graph_.draw_text(0, 16*5, "Graphics Image Light Bilk IgIiIrliiljkffkL\n", true);
-				graph_.draw_text(0, 16*6, "012:;,.(i),[i],{i},{|}.(`)\n", true);
+				render_.draw_text(0, 16, tmp);
+				render_.draw_text(0, 32, "金の貸し借りをしてはならない。\n金を貸せば金も友も失う。\n金を借りれば倹約が馬鹿らしくなる。");
+				render_.draw_text(0, 16*5, "Graphics Image Light Bilk IgIiIrliiljkffkL\n", true);
+				render_.draw_text(0, 16*6, "012:;,.(i),[i],{i},{|}.(`)\n", true);
 			}
 		}
 #if 0
