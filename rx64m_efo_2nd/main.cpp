@@ -345,6 +345,117 @@ int main(int argc, char** argv)
 {
 	device::PORT3::PCR.B5 = 1; // P35(NMI) pull-up
 
+	device::PORT0::PDR.B5 = 1;  // (2)
+	device::PORT0::PDR.B2 = 1;  // (6)
+	device::PORT0::PDR.B1 = 1;  // (7)
+	device::PORT0::PDR.B0 = 1;  // (8)
+	device::PORTJ::PDR.B5 = 1;  // (11)
+	device::PORTJ::PDR.B3 = 1;  // (13)
+
+	device::PORT3::PDR.B3 = 1;  // (26)
+	device::PORT3::PDR.B2 = 1;  // (27)
+
+	device::PORT2::PDR.B5 = 1;  // (32)
+	device::PORT2::PDR.B4 = 1;  // (33)
+	device::PORT2::PDR.B3 = 1;  // (34)
+	device::PORT2::PDR.B2 = 1;  // (35)
+
+	device::PORT1::PDR.B7 = 1;  // (38)
+	device::PORT8::PDR.B6 = 1;  // (41)
+	device::PORT1::PDR.B5 = 1;  // (42)
+	device::PORT1::PDR.B4 = 1;  // (43)
+	device::PORT1::PDR.B3 = 1;  // (44)
+	device::PORT1::PDR.B2 = 1;  // (45)
+
+	device::PORT5::PDR.B6 = 1;  // (50)
+	device::PORT5::PDR.B5 = 1;  // (51)
+	device::PORT5::PDR.B4 = 1;  // (52)
+
+	device::PORT5::PDR.B2 = 1;  // (54)
+	device::PORT5::PDR.B1 = 1;  // (55)
+	device::PORT5::PDR.B0 = 1;  // (56)
+
+	device::PORT8::PDR.B3 = 1;  // (58)
+	device::PORTC::PDR.B6 = 1;  // (61)
+	device::PORTC::PDR.B5 = 1;  // (62)
+	device::PORT8::PDR.B2 = 1;  // (63)
+	device::PORT8::PDR.B1 = 1;  // (64)
+	device::PORT8::PDR.B0 = 1;  // (65)
+	device::PORTC::PDR.B4 = 1;  // (66)
+	device::PORTC::PDR.B3 = 1;  // (67)
+	device::PORT7::PDR.B7 = 1;  // (68)
+	device::PORT7::PDR.B6 = 1;  // (69)
+	device::PORTC::PDR.B2 = 1;  // (70)
+	device::PORT7::PDR.B5 = 1;  // (71)
+	device::PORT7::PDR.B4 = 1;  // (72)
+	device::PORTC::PDR.B1 = 1;  // (73)
+
+	device::PORTC::PDR.B0 = 1;  // (75)
+	device::PORT8::PDR.B7 = 1;  // (77)
+	device::PORTB::PDR.B7 = 1;  // (78)
+	device::PORTB::PDR.B6 = 1;  // (79)
+	device::PORTB::PDR.B5 = 1;  // (80)
+	device::PORTB::PDR.B4 = 1;  // (81)
+
+	device::PORTB::PDR.B2 = 1;  // (83)
+	device::PORTB::PDR.B1 = 1;  // (84)
+	device::PORT7::PDR.B2 = 1;  // (85)
+	device::PORT7::PDR.B1 = 1;  // (86)
+	device::PORTB::PDR.B0 = 1;  // (87)
+
+	device::PORTA::PDR.B4 = 1;  // (92)
+
+	device::PORTA::PDR.B3 = 1;  // (94)
+	device::PORTA::PDR.B2 = 1;  // (95)
+	device::PORTA::PDR.B1 = 1;  // (96)
+	device::PORTA::PDR.B0 = 1;  // (97)
+	device::PORT6::PDR.B7 = 1;  // (98)
+	device::PORT6::PDR.B6 = 1;  // (99)
+	device::PORT6::PDR.B5 = 1;  // (100)
+	device::PORTE::PDR.B7 = 1;  // (101)
+	device::PORTE::PDR.B6 = 1;  // (102)
+
+	device::PORT7::PDR.B0 = 1;  // (104)
+
+	device::PORTE::PDR.B5 = 1;  // (106)
+	device::PORTE::PDR.B4 = 1;  // (107)
+
+	device::PORTE::PDR.B0 = 1;  // (111)
+	device::PORT6::PDR.B4 = 1;  // (112)
+	device::PORT6::PDR.B3 = 1;  // (113)
+	device::PORT6::PDR.B2 = 1;  // (114)
+	device::PORT6::PDR.B1 = 1;  // (115)
+
+	device::PORT6::PDR.B0 = 1;  // (117)
+
+	device::PORTD::PDR.B7 = 1;  // (119)
+	device::PORTD::PDR.B6 = 1;  // (120)
+	device::PORTD::PDR.B5 = 1;  // (121)
+	device::PORTD::PDR.B4 = 1;  // (122)
+	device::PORTD::PDR.B3 = 1;  // (123)
+	device::PORTD::PDR.B2 = 1;  // (124)
+	device::PORTD::PDR.B1 = 1;  // (125)
+	device::PORTD::PDR.B0 = 1;  // (126)
+
+	device::PORT9::PDR.B3 = 1;  // (127)
+	device::PORT9::PDR.B2 = 1;  // (128)
+	device::PORT9::PDR.B1 = 1;  // (129)
+
+	device::PORT9::PDR.B0 = 1;  // (131)
+
+	device::PORT4::PDR.B7 = 1;  // (133)
+	device::PORT4::PDR.B6 = 1;  // (134)
+	device::PORT4::PDR.B5 = 1;  // (135)
+	device::PORT4::PDR.B4 = 1;  // (136)
+	device::PORT4::PDR.B3 = 1;  // (137)
+	device::PORT4::PDR.B2 = 1;  // (138)
+	device::PORT4::PDR.B1 = 1;  // (139)
+
+	device::PORT4::PDR.B0 = 1;  // (141)
+
+	device::PORT0::PDR.B7 = 1;  // (144)
+
+
 	device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
 
 	device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
