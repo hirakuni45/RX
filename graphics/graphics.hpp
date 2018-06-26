@@ -41,7 +41,7 @@ namespace graphics {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	ビットマップ描画クラス
+		@brief	レンダリング
 		@param[in]	WIDTH	横幅
 		@param[in]	HEIGHT	高さ
 		@param[in]	AFONT	ASCII フォント・クラス
@@ -49,7 +49,7 @@ namespace graphics {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <typename T, uint16_t WIDTH, uint16_t HEIGHT, class AFONT = afont_null, class KFONT = kfont_null>
-	class base {
+	class render {
 
 		T*			fb_;
 
@@ -67,7 +67,7 @@ namespace graphics {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		base(T* org, KFONT& kf) noexcept : fb_(org), kfont_(kf),
+		render(T* org, KFONT& kf) noexcept : fb_(org), kfont_(kf),
 			fc_(0xffff), bc_(0x0000),
 			code_(0), cnt_(0)
 		{ }
