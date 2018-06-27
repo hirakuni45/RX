@@ -53,7 +53,7 @@ namespace graphics {
 		static const int16_t FLN = RDR::font_height + SPC;      ///< 行幅
 		static const int16_t SCN = (RDR::height - SPC) / FLN;   ///< 行数
 
-		static const uint32_t PATH_MAX = 256;
+		static const uint32_t PATH_MAX = 128;					///< パスの最大文字数
 
 		SDC&	sdc_;
 		RDR&	rdr_;
