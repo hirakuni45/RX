@@ -50,7 +50,17 @@ namespace graphics {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <typename T, uint16_t WIDTH, uint16_t HEIGHT, class AFONT = afont_null, class KFONT = kfont_null>
 	class render {
+	public:
+		static const int16_t width  = static_cast<int16_t>(WIDTH);
+		static const int16_t height = static_cast<int16_t>(HEIGHT);
+		static const int16_t afont_width  = AFONT::width;
+		static const int16_t afont_height = AFONT::height;
+		static const int16_t kfont_width  = KFONT::width;
+		static const int16_t kfont_height = KFONT::height;
+		static const int16_t font_height  = KFONT::height < AFONT::height
+			? AFONT::height : KFONT::height;
 
+	private:
 		T*			fb_;
 
 		KFONT& 		kfont_;
@@ -71,60 +81,6 @@ namespace graphics {
 			fc_(0xffff), bc_(0x0000),
 			code_(0), cnt_(0)
 		{ }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	横幅の取得
-			@return 横幅
-		*/
-		//-----------------------------------------------------------------//
-		int16_t get_width() const noexcept { return WIDTH; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	高さの取得
-			@return 高さ
-		*/
-		//-----------------------------------------------------------------//
-		int16_t get_height() const noexcept { return HEIGHT; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	フォントの幅を取得
-			@return フォントの幅
-		*/
-		//-----------------------------------------------------------------//
-		int8_t get_afont_width() const noexcept { return AFONT::width; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	フォントの高さを取得
-			@return フォントの高さ
-		*/
-		//-----------------------------------------------------------------//
-		int8_t get_afont_height() const noexcept { return AFONT::height; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	漢字フォントの幅を取得
-			@return フォントの幅
-		*/
-		//-----------------------------------------------------------------//
-		int8_t get_kfont_width() const noexcept { return KFONT::width; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	漢字フォントの高さを取得
-			@return フォントの高さ
-		*/
-		//-----------------------------------------------------------------//
-		int8_t get_kfont_height() const noexcept { return KFONT::height; }
 
 
 		//-----------------------------------------------------------------//
@@ -203,7 +159,7 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		void clear(T c) noexcept {
-			for(uint16_t i = 0; i < (WIDTH * HEIGHT); ++i) {
+			for(uint32_t i = 0; i < (WIDTH * HEIGHT); ++i) {
 				fb_[i] = c;
 			}
 		}
@@ -474,7 +430,7 @@ namespace graphics {
 			char ch;
 			int16_t x = 0;
 			while((ch = *text++) != 0) {
-				x = draw_font(x, get_height(), ch, prop);
+				x = draw_font(x, height, ch, prop);
 			}
 			return x;
 		}
