@@ -45,16 +45,17 @@ namespace graphics {
 		@brief	ファイラー
 		@param[in]	SDC	sdc_man クラス型
 		@param[in]	RDR	render クラス型
+		@param[in]	PTM	パス文字列最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SDC, class RDR>
+	template <class SDC, class RDR, uint32_t PTM>
 	class filer {
 
 		static const int16_t SPC = 2;                           ///< 文字間隙間
 		static const int16_t FLN = RDR::font_height + SPC;      ///< 行幅
 		static const int16_t SCN = (RDR::height - SPC) / FLN;   ///< 行数
 
-		static const uint32_t PATH_MAX = 128;					///< パスの最大文字数
+		static const uint32_t PATH_MAX = PTM;					///< パスの最大文字数
 
 		SDC&	sdc_;
 		RDR&	rdr_;
@@ -191,10 +192,9 @@ namespace graphics {
 
 			if(ptrg & ctrl_mask_(filer_ctrl::OPEN)) {
 				open_ = !open_;
+				rdr_.clear(RDR::COLOR::Black);
 				if(open_) {
 					scan_dir_(false);
-				} else {
-					rdr_.clear(RDR::COLOR::Black);
 				}
 			}
 
