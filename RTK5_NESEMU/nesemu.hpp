@@ -93,14 +93,27 @@ namespace emu {
 		//-----------------------------------------------------------------//
 		bool open(const char* filename)
 		{
-			nesrom_ = false;
-			if(nes_insertcart(filename) == 0) {
+			if(nes_insert_cart(filename) == 0) {
 				nesrom_ = true;
 			}
 //			} else if(nsfplay_.open(filename)) {
 //				nesrom_ = true;
 //			}
 			return nesrom_;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  エミュレーターを終了
+		*/
+		//-----------------------------------------------------------------//
+		void close()
+		{
+			if(nesrom_) {
+				nes_eject_cart();
+				nesrom_ = false;
+			}
 		}
 
 
@@ -118,9 +131,11 @@ namespace emu {
 				--delay_;
 				if(delay_ == 0) {
 //					open("GALAXIAN.NES");
+//					open("Galaga_j.NES");
+//					open("Pac-Man.NES");
 //					open("GRADIUS.nes");
 //					open("DragonQuest_J_fix.nes");
-					open("Dragon_Quest2_fix.nes");
+//					open("Dragon_Quest2_fix.nes");
 //					open("Solstice_J.nes");
 
 // メモリー不足で動作しない・・

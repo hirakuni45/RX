@@ -20,6 +20,10 @@
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
 #include "common/audio_out.hpp"
+#include "graphics/font8x16.hpp"
+#include "graphics/kfont.hpp"
+#include "graphics/graphics.hpp"
+#include "graphics/filer.hpp"
 
 #include "chip/FAMIPAD.hpp"
 
@@ -43,8 +47,8 @@ namespace {
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
-	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
-	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
+	typedef utils::fixed_fifo<char, 256> RECV_BUFF;
+	typedef utils::fixed_fifo<char, 256> SEND_BUFF;
 	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
 	SCI		sci_;
 
@@ -117,10 +121,21 @@ namespace {
 	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
 	TPU0		tpu0_;
 
+	typedef graphics::font8x16 AFONT;
+	typedef graphics::kfont<16, 16, 32> KFONT;
+	KFONT		kfont_;
+
+	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
+	RENDER		render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
+
+	typedef graphics::filer<SDC, RENDER, 32> FILER;
+	FILER		filer_(sdc_, render_);
+
 	emu::nesemu		nesemu_;
 
-	utils::command<256> cmd_;
+//	utils::command<256> cmd_;
 
+	uint8_t			fami_pad_data_;
 
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
@@ -130,7 +145,7 @@ namespace {
 		return f;
 	}
 
-
+#if 0
 	void command_()
 	{
 		if(!cmd_.service()) {
@@ -188,13 +203,30 @@ namespace {
 			}
 		}
 	}
+#endif
+
+	void update_nesemu_()
+	{
+		void* org = reinterpret_cast<void*>(0x00000000);
+		nesemu_.service(org, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
+
+		uint32_t len = nesemu_.get_audio_len();
+		const uint16_t* wav = nesemu_.get_audio_buf();
+		for(uint32_t i = 0; i < len; ++i) {
+			while((audio_out_.at_fifo().size() - audio_out_.at_fifo().length()) < 8) {
+			}
+			audio::wave_t t;
+			t.l_ch = t.r_ch = *wav++;
+			audio_out_.at_fifo().put(t);
+		}
+	}
 }
 
 extern "C" {
 
 	uint8_t get_fami_pad()
 	{
-		return famipad_.update();
+		return fami_pad_data_;
 	}
 
 
@@ -279,6 +311,12 @@ extern "C" {
 	int fatfs_get_mount() {
 		return sdc_.get_mount();
 	}
+
+
+	int make_full_path(const char* src, char* dst, uint16_t len)
+	{
+		return sdc_.make_full_path(src, dst, len);
+	}
 }
 
 int main(int argc, char** argv);
@@ -323,7 +361,7 @@ int main(int argc, char** argv)
 	}
 
 	utils::format("\rRTK5RX65N Start for NES Emulator sample\n");
-	cmd_.set_prompt("# ");
+//	cmd_.set_prompt("# ");
 
 	{  // GLCDC 初期化
 		LCD_DISP::DIR  = 1;
@@ -355,26 +393,58 @@ int main(int argc, char** argv)
 	nesemu_.start();
 
 	uint8_t n = 0;
+	uint8_t flt = 0;
+	bool filer = false;
 	while(1) {
 		glcdc_io_.sync_vpos();
+		fami_pad_data_ = famipad_.update();
 
-		void* org = reinterpret_cast<void*>(0x00000000);
-		nesemu_.service(org, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
-		{
-			uint32_t len = nesemu_.get_audio_len();
-			const uint16_t* wav = nesemu_.get_audio_buf();
-			for(uint32_t i = 0; i < len; ++i) {
-				while((audio_out_.at_fifo().size() - audio_out_.at_fifo().length()) < 8) {
-				}
-				audio::wave_t t;
-				t.l_ch = t.r_ch = *wav++;
-				audio_out_.at_fifo().put(t);
-			}			
+		uint8_t data = fami_pad_data_;
+		if(chip::on(data, chip::FAMIPAD_ST::SELECT) && chip::on(data, chip::FAMIPAD_ST::START)) {
+			++flt;
+		} else {
+			flt = 0;
+		}
+
+		uint32_t ctrl = 0;
+		if(flt >= 120) {
+			audio_out_.mute();
+			graphics::set(graphics::filer_ctrl::OPEN, ctrl);
+			filer = true;
+			flt = 0;
+		}
+
+		if(filer) {
+//			if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
+//				graphics::set(graphics::filer_ctrl::OPEN, ctrl);
+//			}
+			if(chip::on(data, chip::FAMIPAD_ST::UP)) {
+				graphics::set(graphics::filer_ctrl::UP, ctrl);
+			}
+			if(chip::on(data, chip::FAMIPAD_ST::DOWN)) {
+				graphics::set(graphics::filer_ctrl::DOWN, ctrl);
+			}
+			if(chip::on(data, chip::FAMIPAD_ST::LEFT)) {
+				graphics::set(graphics::filer_ctrl::BACK, ctrl);
+			}
+			if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
+				graphics::set(graphics::filer_ctrl::SELECT, ctrl);
+			}
+			const char* path = filer_.update(ctrl);
+			if(path != nullptr) {
+				char tmp[256];
+				sdc_.make_full_path(path, tmp, sizeof(tmp));
+				nesemu_.close();
+				nesemu_.open(tmp);
+				filer = false;
+			}
+		} else {
+			update_nesemu_();
 		}
 
 		sdc_.service(sdh_.service());
 
-		command_();
+//		command_();
 
 		++n;
 		if(n >= 30) {
