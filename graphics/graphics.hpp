@@ -8,7 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <cstdint>
+#include "graphics/color.hpp"
 
 namespace graphics {
 
@@ -42,6 +42,7 @@ namespace graphics {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	レンダリング
+		@param[in]	T		ピクセル型（８、１６、３２）
 		@param[in]	WIDTH	横幅
 		@param[in]	HEIGHT	高さ
 		@param[in]	AFONT	ASCII フォント・クラス
@@ -51,6 +52,8 @@ namespace graphics {
 	template <typename T, uint16_t WIDTH, uint16_t HEIGHT, class AFONT = afont_null, class KFONT = kfont_null>
 	class render {
 	public:
+		typedef base_color<T> COLOR;
+
 		static const int16_t width  = static_cast<int16_t>(WIDTH);
 		static const int16_t height = static_cast<int16_t>(HEIGHT);
 		static const int16_t afont_width  = AFONT::width;
@@ -78,7 +81,7 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		render(T* org, KFONT& kf) noexcept : fb_(org), kfont_(kf),
-			fc_(0xffff), bc_(0x0000),
+			fc_(COLOR::White), bc_(COLOR::Black),
 			code_(0), cnt_(0)
 		{ }
 
