@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include "common/sdc_man.hpp"
+#include "common/fixed_stack.hpp"
 
 namespace graphics {
 
@@ -71,11 +72,21 @@ namespace graphics {
 
 			char		path_[PATH_MAX * SCN];
 
-			rdr_st(RDR& rdr) : rdr_(rdr), vofs_(0), vpos_(0), hmax_(0), sel_pos_(0),
+			rdr_st(RDR& rdr) noexcept : rdr_(rdr), vofs_(0), vpos_(0), hmax_(0), sel_pos_(0),
 				num_(0), path_{ 0 }
 			{ }
 		};
 		rdr_st	rdr_st_;
+
+		struct pos_t {
+			int16_t		vofs_;
+			int16_t		sel_pos_;
+			pos_t(int16_t vofs = 0, int16_t sel_pos = 0) noexcept :
+				vofs_(vofs), sel_pos_(sel_pos) { }
+		};
+		typedef utils::fixed_stack<pos_t, 16> POS_STACK;
+		POS_STACK		pos_stack_;
+
 
 		static uint32_t ctrl_mask_(filer_ctrl ctrl) noexcept
 		{
@@ -87,8 +98,16 @@ namespace graphics {
 			noexcept
 		{
 			rdr_st& t = *static_cast<rdr_st*>(opt);
-			t.rdr_.fill(SPC, t.vpos_, RDR::width - SPC * 2, RDR::font_height, 0x0000);
-			if(dir) t.rdr_.draw_font(SPC, t.vpos_, '/');
+			if(t.vpos_ >= 0 && t.vpos_ < RDR::height) {
+				t.rdr_.set_fore_color(RDR::COLOR::White);
+				t.rdr_.fill(SPC, t.vpos_, RDR::width - SPC * 2, RDR::font_height, 0x0000);
+				if(dir) t.rdr_.draw_font(SPC, t.vpos_, '/');
+			}
+			if(dir) {
+				t.rdr_.set_fore_color(RDR::COLOR::Blue);
+			} else {
+				t.rdr_.set_fore_color(RDR::COLOR::White);
+			}
 			auto w = t.rdr_.draw_text(SPC + 8, t.vpos_, name);
 			if(t.hmax_ < w) t.hmax_ = w;
 			uint32_t n = t.num_ + t.vofs_ / FLN;
@@ -120,10 +139,21 @@ namespace graphics {
 		}
 
 
-		void scan_dir_()
+		void scan_dir_(bool back)
 		{
-			rdr_st_.vofs_ = 0;
-			rdr_st_.sel_pos_ = 0;
+			if(back) {
+				if(pos_stack_.empty()) {
+					rdr_st_.vofs_ = 0;
+					rdr_st_.sel_pos_ = 0;
+				} else {
+					const auto& t = pos_stack_.pull();
+					rdr_st_.vofs_ = t.vofs_;
+					rdr_st_.sel_pos_ = t.sel_pos_;
+				}
+			} else {
+				rdr_st_.vofs_ = 0;
+				rdr_st_.sel_pos_ = 0;
+			}
 			start_dir_draw_();
 		}
 
@@ -152,14 +182,19 @@ namespace graphics {
 			uint32_t ntrg =  ctrl_ & ~ctrl;
 			ctrl_ = ctrl;
 
-			if(!sdc_.get_mount()) return nullptr;
+			if(!sdc_.get_mount()) {
+				open_ = false;
+				pos_stack_.clear();
+				rdr_.clear(RDR::COLOR::Black);
+				return nullptr;
+			}
 
 			if(ptrg & ctrl_mask_(filer_ctrl::OPEN)) {
 				open_ = !open_;
 				if(open_) {
-					scan_dir_();
+					scan_dir_(false);
 				} else {
-					rdr_.clear(0x0000);
+					rdr_.clear(RDR::COLOR::Black);
 				}
 			}
 
@@ -214,21 +249,24 @@ namespace graphics {
 				char* p = &rdr_st_.path_[PATH_MAX * rdr_st_.sel_pos_];
 				uint32_t l = strlen(p);
 				if(p[l - 1] == '/') {
+					pos_stack_.push(pos_t(rdr_st_.vofs_, rdr_st_.sel_pos_));
 					p[l - 1] = 0;
 					sdc_.cd(p);
-					rdr_.clear(0x0000);
-					scan_dir_();
+					rdr_.clear(RDR::COLOR::Black);
+					scan_dir_(false);
 				} else {
-					rdr_.clear(0x0000);
+					rdr_.clear(RDR::COLOR::Black);
 					open_ = false;
 					return static_cast<const char*>(p);
 				}
 			}
 
 			if(ptrg & ctrl_mask_(filer_ctrl::BACK)) {
-				sdc_.cd("..");
-				rdr_.clear(0x0000);
-				scan_dir_();
+				if(!pos_stack_.empty()) {
+					sdc_.cd("..");
+					rdr_.clear(RDR::COLOR::Black);
+					scan_dir_(true);
+				}
 			}
 
 			return nullptr;
