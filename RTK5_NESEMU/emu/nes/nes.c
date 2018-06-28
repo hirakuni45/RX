@@ -367,7 +367,7 @@ void nes_pause(int enable)
 }
 
 /* insert a cart into the NES */
-int nes_insertcart(const char *filename)
+int nes_insert_cart(const char *filename)
 {
 	/* rom file */
 	nes_.rominfo = rom_load(filename);
@@ -397,8 +397,16 @@ int nes_insertcart(const char *filename)
 	nes6502_setup_page();
 
 	nes_reset(HARD_RESET);
+
 	return 0;
 }
+
+
+void nes_eject_cart(void)
+{
+	rom_free(nes_.rominfo);
+}
+
 
 /* Initialize NES CPU, hardware, etc. */
 int nes_create(int sample_rate, int sample_bits)
