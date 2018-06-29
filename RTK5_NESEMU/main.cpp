@@ -128,7 +128,7 @@ namespace {
 	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
 	RENDER		render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
 
-	typedef graphics::filer<SDC, RENDER, 32> FILER;
+	typedef graphics::filer<SDC, RENDER> FILER;
 	FILER		filer_(sdc_, render_);
 
 	emu::nesemu		nesemu_;
@@ -430,8 +430,8 @@ int main(int argc, char** argv)
 			if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
 				graphics::set(graphics::filer_ctrl::SELECT, ctrl);
 			}
-			const char* path = filer_.update(ctrl);
-			if(path != nullptr) {
+			char path[256];
+			if(filer_.update(ctrl, path, sizeof(path))) {
 				char tmp[256];
 				sdc_.make_full_path(path, tmp, sizeof(tmp));
 				nesemu_.close();
