@@ -236,7 +236,9 @@ namespace utils {
 			if(t->idx_ == t->match_) {
 				if(t->dst_ != nullptr && t->dstlen_ > 0) {
 					std::strncpy(t->dst_, name, t->dstlen_);
-					std::strncat(t->dst_, "/", t->dstlen_);
+					if(dir) {
+						std::strncat(t->dst_, "/", t->dstlen_);
+					}
 				}
 			}
 			++t->idx_;
@@ -656,21 +658,26 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	SD カードのディレクトリから、ファイル名の取得
-			@param[in]	root	ルート・パス
 			@param[in]	match	所得パスのインデックス
 			@param[out]	dst		パスのコピー先
 			@param[in]	dstlen	コピー先サイズ
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool get_dir_path(const char* root, uint16_t match, char* dst, uint32_t dstlen)
+		bool get_dir_path(uint16_t match, char* dst, uint32_t dstlen)
 		{
+			dir_list dl;
+			if(!dl.start(current_)) return false;
+
 			copy_t t;
 			t.idx_ = 0;
 			t.match_ = match;
 			t.dst_ = dst;
 			t.dstlen_ = dstlen;
-			start_dir_list(root, path_copy_func_, true, &t);
+			do {
+				dl.service(10, path_copy_func_, true, &t);
+			} while(dl.probe()) ;
+
 			return true;
 		}
 
@@ -713,13 +720,20 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		uint16_t match(const char* key, uint8_t no, char* dst, uint32_t dstlen) noexcept
 		{
+			dir_list dl;
+
+			if(!dl.start(current_)) return 0;
+
 			match_t t;
 			t.key_ = key;
 			t.dst_ = dst;
 			t.dstlen_ = dstlen;
 			t.cnt_ = 0;
 			t.no_ = no;
-			start_dir_list(current_, match_func_, true, &t);
+			do {
+				dl.service(10, match_func_, true, &t);
+			} while(dl.probe()) ;
+
 			return t.cnt_;
 		}
 

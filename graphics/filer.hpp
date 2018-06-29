@@ -45,17 +45,14 @@ namespace graphics {
 		@brief	ファイラー
 		@param[in]	SDC	sdc_man クラス型
 		@param[in]	RDR	render クラス型
-		@param[in]	PTM	パス文字列最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SDC, class RDR, uint32_t PTM>
+	template <class SDC, class RDR>
 	class filer {
 
 		static const int16_t SPC = 2;                           ///< 文字間隙間
 		static const int16_t FLN = RDR::font_height + SPC;      ///< 行幅
 		static const int16_t SCN = (RDR::height - SPC) / FLN;   ///< 行数
-
-		static const uint32_t PATH_MAX = PTM;					///< パスの最大文字数
 
 		SDC&	sdc_;
 		RDR&	rdr_;
@@ -71,10 +68,8 @@ namespace graphics {
 			int16_t		sel_pos_;
 			uint16_t	num_;
 
-			char		path_[PATH_MAX * SCN];
-
 			rdr_st(RDR& rdr) noexcept : rdr_(rdr), vofs_(0), vpos_(0), hmax_(0), sel_pos_(0),
-				num_(0), path_{ 0 }
+				num_(0)
 			{ }
 		};
 		rdr_st	rdr_st_;
@@ -111,13 +106,7 @@ namespace graphics {
 			}
 			auto w = t.rdr_.draw_text(SPC + 8, t.vpos_, name);
 			if(t.hmax_ < w) t.hmax_ = w;
-			uint32_t n = t.num_ + t.vofs_ / FLN;
-			if(n < SCN) {
-				strncpy(&t.path_[n * PATH_MAX], name, PATH_MAX);
-				if(dir) {
-					strncat(&t.path_[n * PATH_MAX], "/", PATH_MAX);
-				}
-			}
+
 			t.vpos_ += FLN;
 			++t.num_;
 		}
@@ -174,10 +163,12 @@ namespace graphics {
 		/*!
 			@brief	アップデート（毎フレーム呼ぶ）
 			@param[in]	ctrl	ファイラー制御
-			@return ファイルが選択された場合、ファイルパス
+			@param[in]	dst		ファイル・パスを受け取り先
+			@param[in]	dstlen	ファイル・パスを受け取りサイズ
+			@return ファイルが選択された場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		const char* update(uint32_t ctrl) noexcept
+		bool update(uint32_t ctrl, char* dst, uint32_t dstlen) noexcept
 		{
 			uint32_t ptrg = ~ctrl_ &  ctrl;
 			uint32_t ntrg =  ctrl_ & ~ctrl;
@@ -187,7 +178,7 @@ namespace graphics {
 				open_ = false;
 				pos_stack_.clear();
 				rdr_.clear(RDR::COLOR::Black);
-				return nullptr;
+				return false;
 			}
 
 			if(ptrg & ctrl_mask_(filer_ctrl::OPEN)) {
@@ -198,13 +189,13 @@ namespace graphics {
 				}
 			}
 
-			if(!open_) return nullptr;
+			if(!open_) return false;
 
 			{
 				uint32_t n;
 				bool f = sdc_.probe_dir_list(n);
-				if(f) return nullptr;
-				if(rdr_st_.num_ < static_cast<int16_t>(n)) return nullptr;
+				if(f) return false;
+				if(rdr_st_.num_ < static_cast<int16_t>(n)) return false;
 			}
 
 			// 選択フレームの描画
@@ -246,18 +237,21 @@ namespace graphics {
 			}
 
 			if(ptrg & ctrl_mask_(filer_ctrl::SELECT)) {
-				char* p = &rdr_st_.path_[PATH_MAX * rdr_st_.sel_pos_];
-				uint32_t l = strlen(p);
-				if(p[l - 1] == '/') {
+				uint32_t n = rdr_st_.sel_pos_ - rdr_st_.vofs_ / FLN;
+				if(!sdc_.get_dir_path(n, dst, dstlen)) {
+					return false;
+				}
+				uint32_t l = strlen(dst);
+				if(dst[l - 1] == '/') {
 					pos_stack_.push(pos_t(rdr_st_.vofs_, rdr_st_.sel_pos_));
-					p[l - 1] = 0;
-					sdc_.cd(p);
+					dst[l - 1] = 0;
+					sdc_.cd(dst);
 					rdr_.clear(RDR::COLOR::Black);
 					scan_dir_(false);
 				} else {
 					rdr_.clear(RDR::COLOR::Black);
 					open_ = false;
-					return static_cast<const char*>(p);
+					return true;
 				}
 			}
 
@@ -269,7 +263,7 @@ namespace graphics {
 				}
 			}
 
-			return nullptr;
+			return false;
 		}
 	};
 }
