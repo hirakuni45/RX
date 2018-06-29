@@ -96,9 +96,6 @@ namespace emu {
 			if(nes_insert_cart(filename) == 0) {
 				nesrom_ = true;
 			}
-//			} else if(nsfplay_.open(filename)) {
-//				nesrom_ = true;
-//			}
 			return nesrom_;
 		}
 
