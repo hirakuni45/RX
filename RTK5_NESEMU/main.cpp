@@ -435,8 +435,11 @@ int main(int argc, char** argv)
 				char tmp[256];
 				sdc_.make_full_path(path, tmp, sizeof(tmp));
 				nesemu_.close();
-				nesemu_.open(tmp);
-				filer = false;
+				if(nesemu_.open(tmp)) {
+					filer = false;
+				} else {
+					render_.draw_dialog(400, 80, "Not NES file");
+				}
 			}
 		} else {
 			update_nesemu_();
