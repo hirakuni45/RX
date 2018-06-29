@@ -52,7 +52,7 @@ namespace utils {
 				@brief	コンストラクター
 			 */
 			//-----------------------------------------------------------------//
-			dir_list() : total_(0), limit_(10), ptr_(nullptr), init_(false) { }
+			dir_list() noexcept : total_(0), limit_(10), ptr_(nullptr), init_(false) { }
 
 
 			//-----------------------------------------------------------------//
@@ -61,7 +61,7 @@ namespace utils {
 				@return 取得中なら「true」
 			 */
 			//-----------------------------------------------------------------//
-			bool probe() const { return init_; }
+			bool probe() const noexcept { return init_; }
 
 
 			//-----------------------------------------------------------------//
@@ -70,7 +70,7 @@ namespace utils {
 				@return ファイル数
 			 */
 			//-----------------------------------------------------------------//
-			uint32_t get_total() const { return total_; }
+			uint32_t get_total() const noexcept { return total_; }
 
 
 			//-----------------------------------------------------------------//
@@ -81,7 +81,7 @@ namespace utils {
 				@return エラー無ければ「true」
 			 */
 			//-----------------------------------------------------------------//
-			bool start(const char* root)
+			bool start(const char* root) noexcept
 			{
 				total_ = 0;
 
@@ -102,6 +102,22 @@ namespace utils {
 
 			//-----------------------------------------------------------------//
 			/*!
+				@brief	取得を停止する
+				@return 成功なら「true」
+			 */
+			//-----------------------------------------------------------------//
+			bool stop() noexcept
+			{
+				if(!init_) return false;
+
+				init_ = false;
+				f_closedir(&dir_);
+				return true;
+			}
+
+
+			//-----------------------------------------------------------------//
+			/*!
 				@brief	ディレクトリーリスト、ループ
 				@param[in]	num		ループ回数
 				@param[in]	func	実行関数
@@ -110,7 +126,8 @@ namespace utils {
 				@return エラー無ければ「true」
 			 */
 			//-----------------------------------------------------------------//
-			bool service(uint32_t num, dir_loop_func func = nullptr, bool todir = false, void* option = nullptr)
+			bool service(uint32_t num, dir_loop_func func = nullptr, bool todir = false,
+						 void* option = nullptr) noexcept
 			{
 				if(!init_) return false;
 
@@ -161,15 +178,17 @@ namespace utils {
 
 		struct match_t {
 			const char* key_;
-			char* dst_;
-			uint8_t cnt_;
-			uint8_t no_;
+			char* 		dst_;
+			uint32_t	dstlen_;
+			uint16_t 	cnt_;
+			uint16_t 	no_;
 		};
 
 		struct copy_t {
 			uint16_t	idx_;
 			uint16_t	match_;
-			char*		path_;
+			char*		dst_;
+			uint32_t	dstlen_;
 		};
 
 
@@ -203,21 +222,21 @@ namespace utils {
 			match_t* t = reinterpret_cast<match_t*>(option);
 			if(std::strncmp(name, t->key_, std::strlen(t->key_)) == 0) {
 				if(t->dst_ != nullptr && t->cnt_ == t->no_) {
-					std::strcpy(t->dst_, name);
+					std::strncpy(t->dst_, name, t->dstlen_);
 				}
 				++t->cnt_;
 			}
 		}
 
 
-		static void path_copy_func_(const char* name, const FILINFO* fi, bool dir, void* option) noexcept
+		static void path_copy_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+			noexcept
 		{
 			copy_t* t = reinterpret_cast<copy_t*>(option);
 			if(t->idx_ == t->match_) {
-				if(t->path_ != nullptr) {
-					char* p = t->path_;
-					if(dir) *p++ = '/';
-					std::strcpy(p, name);
+				if(t->dst_ != nullptr && t->dstlen_ > 0) {
+					std::strncpy(t->dst_, name, t->dstlen_);
+					std::strncat(t->dst_, "/", t->dstlen_);
 				}
 			}
 			++t->idx_;
@@ -630,7 +649,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		bool stall_dir_list() noexcept
 		{
-			return true;
+			return dir_list_.stop();
 		}
 
 
@@ -639,19 +658,19 @@ namespace utils {
 			@brief	SD カードのディレクトリから、ファイル名の取得
 			@param[in]	root	ルート・パス
 			@param[in]	match	所得パスのインデックス
-			@param[out]	path	パスのコピー先
+			@param[out]	dst		パスのコピー先
+			@param[in]	dstlen	コピー先サイズ
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool get_dir_path(const char* root, uint16_t match, char* path)
+		bool get_dir_path(const char* root, uint16_t match, char* dst, uint32_t dstlen)
 		{
-#if 0
 			copy_t t;
 			t.idx_ = 0;
 			t.match_ = match;
-			t.path_ = path;
-			dir_loop(root, path_copy_func_, true, &t);
-#endif
+			t.dst_ = dst;
+			t.dstlen_ = dstlen;
+			start_dir_list(root, path_copy_func_, true, &t);
 			return true;
 		}
 
@@ -684,21 +703,23 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ファイル名候補の取得
+			@brief	ファイル名候補の取得（ディレクトリも含む）
 			@param[in]	name	候補のキー
 			@param[in]	no		候補の順番
-			@param[out]	dst		候補の格納先
+			@param[in]	dst		候補の格納先
+			@param[in]	dstlen	格納先サイズ
 			@return 候補の数
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t match(const char* key, uint8_t no, char* dst) noexcept
+		uint16_t match(const char* key, uint8_t no, char* dst, uint32_t dstlen) noexcept
 		{
 			match_t t;
 			t.key_ = key;
 			t.dst_ = dst;
+			t.dstlen_ = dstlen;
 			t.cnt_ = 0;
 			t.no_ = no;
-///			dir_loop(current_, match_func_, false, &t);
+			start_dir_list(current_, match_func_, true, &t);
 			return t.cnt_;
 		}
 
