@@ -425,9 +425,22 @@ rominfo_t *rom_load(const char *filename)
 		return NULL;
 	}
 
+	{
+		char id[4];
+		if(fread(id, 1, 4, fp) != 4) {
+			return NULL;
+		}
+		if(memcmp(id, ROM_INES_MAGIC, 4) != 0) {
+			return NULL;
+		}
+	}
+
 	fseek(fp, 0, SEEK_END);
 	long sz = ftell( fp );
  	uint8_t *rom = (uint8_t *)malloc(sz);
+	if(rom == NULL) {
+		return NULL;
+	}
 
 	fseek(fp, 0, SEEK_SET);
 
@@ -439,7 +452,7 @@ rominfo_t *rom_load(const char *filename)
 	}
 
 	fclose(fp);
-//	printf("LOAD ROM: %s (%d)\n", filename, sz);
+
 
 	rominfo_t *rominfo;
 
