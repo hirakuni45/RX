@@ -315,7 +315,7 @@ namespace graphics {
 			@param[in]	code	キャラクター・コード
 		*/
 		//-----------------------------------------------------------------//
-		void draw_font_utf16(int16_t x, int16_t y, uint16_t code)
+		void draw_font_utf16(int16_t x, int16_t y, uint16_t code) noexcept
 		{
 			if(y <= -AFONT::height || y >= static_cast<int16_t>(HEIGHT)) {
 				return;
@@ -405,7 +405,7 @@ namespace graphics {
 			@return 文字の終端座標（Ｘ）
 		*/
 		//-----------------------------------------------------------------//
-		int16_t draw_text(int16_t x, int16_t y, const char* text, bool prop = false)
+		int16_t draw_text(int16_t x, int16_t y, const char* text, bool prop = false) noexcept
 		{
 			char ch;
 			while((ch = *text++) != 0) {
@@ -428,7 +428,7 @@ namespace graphics {
 			@return 描画サイズ
 		*/
 		//-----------------------------------------------------------------//
-		int16_t get_text_length(const char* text, bool prop = false)
+		int16_t get_text_length(const char* text, bool prop = false) noexcept
 		{
 			char ch;
 			int16_t x = 0;
@@ -439,5 +439,24 @@ namespace graphics {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ダイアログ表示（画面の中心に表示される）
+			@param[in]	w		横幅
+			@param[in]	h		高さ
+			@param[in]	text	テキスト
+		*/
+		//-----------------------------------------------------------------//
+		void draw_dialog(uint16_t w, uint16_t h, const char* text) noexcept
+		{
+			int16_t x = (width  - w) / 2;
+			int16_t y = (height - h) / 2;
+			frame(x, y, w, h, COLOR::White);
+			fill(x + 1, y + 1, w - 2, h - 2, COLOR::Black);
+			auto l = get_text_length(text);
+			x += (w - l) / 2;
+			y += (h - font_height) / 2;
+			draw_text(x, y, text);
+		} 
 	};
 }
