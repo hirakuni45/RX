@@ -11,8 +11,16 @@
 #include <cstdint>
 #include "ff12b/src/ff.h"
 
+// 漢字フォントデータをＳＤカード上に置いて、キャッシュアクセスする場合有効にする
+#define CASH_KFONT
+
 extern "C" {
+#ifdef CASH_KFONT
 	int fatfs_get_mount();
+#else
+	extern uint8_t binary____graphics_kfont16_bin_start;
+	extern uint8_t binary____graphics_kfont16_bin_end;
+#endif
 };
 
 namespace graphics {
@@ -25,11 +33,16 @@ namespace graphics {
 		@param[in]	CASHN	キャッシュ数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+#ifdef CASH_KFONT
 	template <int8_t WIDTH, int8_t HEIGHT, uint8_t CASHN>
+#else
+	template <int8_t WIDTH, int8_t HEIGHT>
+#endif
 	class kfont {
 
 		static const uint32_t FONTS = ((WIDTH * HEIGHT) + 7) / 8;
 
+#ifdef CASH_KFONT
 		struct kanji_cash {
 			uint16_t	code;
 			uint8_t		bitmap[FONTS];
@@ -37,6 +50,7 @@ namespace graphics {
 		};
 		kanji_cash cash_[CASHN];
 		uint8_t cash_idx_;
+#endif
 
 		static uint16_t sjis_to_liner_(uint16_t sjis)
 		{
@@ -70,7 +84,11 @@ namespace graphics {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		kfont() noexcept : cash_(), cash_idx_(0) { }
+		kfont() noexcept 
+#ifdef CASH_KFONT
+			: cash_(), cash_idx_(0)
+#endif
+			{ }
 
 
 		//-----------------------------------------------------------------//
@@ -100,6 +118,7 @@ namespace graphics {
 
 			if(code == 0) return nullptr;
 
+#ifdef CASH_KFONT
 			// キャッシュ内検索
 			int8_t n = -1;
 			for(uint8_t i = 0; i < CASHN; ++i) {
@@ -121,13 +140,13 @@ namespace graphics {
 			}
 
 			if(fatfs_get_mount() == 0) return nullptr;
-
+#endif
 			uint32_t lin = sjis_to_liner_(ff_convert(code, 0));
 
 			if(lin == 0xffff) {
 				return nullptr;
 			}
-
+#ifdef CASH_KFONT
 			FIL fp;
 			if(f_open(&fp, "/kfont16.bin", FA_READ) != FR_OK) {
 				return nullptr;
@@ -148,6 +167,10 @@ namespace graphics {
 			f_close(&fp);
 
 			return &cash_[cash_idx_].bitmap[0];
+#else
+			const uint8_t* org = &binary____graphics_kfont16_bin_start;
+			return &org[lin * FONTS];
+#endif
 		}
 	};
 }
