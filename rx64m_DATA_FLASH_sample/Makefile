@@ -141,11 +141,6 @@ clean:
 clean_depend:
 	rm -f $(DEPENDS)
 
-lst:  $(TARGET).lst
-
-%.lst: %.elf
-	$(OBJDUMP) -h -S $< > $@
-
 # Rules for building the .text rom images
 
 text: mot lst

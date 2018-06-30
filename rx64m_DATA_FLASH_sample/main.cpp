@@ -10,23 +10,17 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
-#include "common/command.hpp"
 #include "common/input.hpp"
+#include "common/command.hpp"
 
 namespace {
 
-	class cmt_task {
-	public:
-		void operator() () {
-		}
-	};
+	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
 
-	device::cmt_io<device::CMT0, cmt_task>  cmt_;
-
-	typedef utils::fifo<uint8_t, 256> BUFFER;
+	typedef utils::fixed_fifo<char, 256> BUFFER;
 	device::sci_io<device::SCI1, BUFFER, BUFFER> sci_;
 
 	utils::command<256> command_;
@@ -100,28 +94,7 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
-
-	device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
-	// メインクロック強制発振とドライブ能力設定
-	device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(0b10)
-						  | device::SYSTEM::MOFCR.MOFXIN.b(1);			
-	device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
-	while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
-
-	device::SYSTEM::PLLCR.STC = 0b010011;		// PLL 10 倍(120MHz)
-	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
-	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
-
-	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.ICK.b(0)		// 1/1 (120/1=120)
-						  | device::SYSTEM::SCKCR.BCK.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKA.b(0)		// 1/1 (120/1=120)
-						  | device::SYSTEM::SCKCR.PCKB.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKC.b(1)		// 1/2 (120/2=60)
-						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (120/2=60)
-	device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
-	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
+	device::system_io<12000000>::setup_system_clock();
 
 	// タイマー設定（６０Ｈｚ）
 	uint8_t cmt_irq_level = 4;
