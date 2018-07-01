@@ -11,8 +11,8 @@
 //=====================================================================//
 #include <mad.h>
 #include "common/file_io.hpp"
-#include "common/audio_out.hpp"
-#include "common/id3_mgr.hpp"
+#include "sound/audio_out.hpp"
+#include "sound/id3_mgr.hpp"
 
 extern "C" {
 	void set_sample_rate(uint32_t freq);
