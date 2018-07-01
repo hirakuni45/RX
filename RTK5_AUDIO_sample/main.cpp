@@ -77,7 +77,7 @@ namespace {
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
 
-	utils::command<256> cmd_;
+//	utils::command<256> cmd_;
 
 	volatile uint32_t	wpos_;
 
@@ -138,8 +138,10 @@ namespace {
 	typedef graphics::filer<SDC, RENDER> FILER;
 	FILER		filer_(sdc_, render_);
 
-	audio::mp3_in	mp3_in_;
+	typedef audio::mp3_in MP3_IN;
+	MP3_IN		mp3_in_;
 
+	uint8_t		pad_level_;
 
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
@@ -150,31 +152,91 @@ namespace {
 	}
 
 
+	void update_led_()
+	{
+		static uint8_t n = 0;
+		++n;
+		if(n >= 30) {
+			n = 0;
+		}
+		if(n < 10) {
+			LED::P = 0;
+		} else {
+			LED::P = 1;
+		}
+	}
+
+
+	MP3_IN::CTRL mp3_ctrl_task_()
+	{
+		auto ctrl = MP3_IN::CTRL::NONE;
+
+		uint8_t level = famipad_.update();
+		uint8_t ptrg = ~pad_level_ &  level;
+		uint8_t ntrg =  pad_level_ & ~level;
+		pad_level_ = level;
+
+		if(chip::on(ptrg, chip::FAMIPAD_ST::SELECT)) {
+			ctrl = MP3_IN::CTRL::PAUSE;
+		}
+		if(chip::on(ptrg, chip::FAMIPAD_ST::RIGHT)) {
+			ctrl = MP3_IN::CTRL::NEXT;
+		}
+		if(chip::on(ptrg, chip::FAMIPAD_ST::LEFT)) {
+			ctrl = MP3_IN::CTRL::REPLAY;
+		}
+		if(chip::on(ptrg, chip::FAMIPAD_ST::START)) {
+			ctrl = MP3_IN::CTRL::STOP;
+		}
+
+		update_led_();
+
+		return ctrl;
+	}
+
+
 	bool play_mp3_(const char* fname)
 	{
+// utils::format("MP3: '%s'\n") % fname;
 		utils::file_io fin;
 		if(!fin.open(fname, "rb")) {
 			return false;
 		}
+		mp3_in_.set_user_ctrl(mp3_ctrl_task_);
 		bool ret = mp3_in_.decode(fin, audio_out_);
 		fin.close();
 		return ret;
 	}
 
 
-	void play_loop_(const char*);
+	void play_loop_(const char*, const char*);
+
+
+	struct loop_t {
+		const char*	start;
+		bool	enable;
+	};
 
 
 	void play_loop_func_(const char* name, const FILINFO* fi, bool dir, void* option)
 	{
+		loop_t* t = static_cast<loop_t*>(option);
+		if(t->enable) {
+			if(strcmp(name, t->start) != 0) {
+				return;
+			} else {
+				t->enable = false;
+			}
+		}
 		if(dir) {
-			play_loop_(name);
+			play_loop_(name, "");
 		} else {
 			const char* ext = strrchr(name, '.');
 			if(ext != nullptr) {
-				if(strcmp(ext, ".wav") == 0) {
+///				if(strcmp(ext, ".wav") == 0) {
 ///					play_wav_(name);
-				} else if(strcmp(ext, ".mp3") == 0) {
+///				} else if(strcmp(ext, ".mp3") == 0) {
+				if(strcmp(ext, ".mp3") == 0) {
 					play_mp3_(name);
 				}
 			}
@@ -182,13 +244,21 @@ namespace {
 	}
 
 
-	void play_loop_(const char* root)
+	void play_loop_(const char* root, const char* start)
 	{
+		loop_t t;
+		t.start = start;
+		if(strlen(start) != 0) {
+			t.enable = true;
+		} else {
+			t.enable = false;
+		}
 		sdc_.set_dir_list_limit(1);
-		sdc_.start_dir_list(root, play_loop_func_);
+		sdc_.start_dir_list(root, play_loop_func_, true, &t);
 	}
 
 
+#if 0
 	void command_()
 	{
 		if(!cmd_.service()) {
@@ -228,12 +298,12 @@ namespace {
 					char tmp[128];
 					cmd_.get_word(1, sizeof(tmp), tmp);
 					if(std::strcmp(tmp, "*") == 0) {
-						play_loop_("");
+						play_loop_("", "");
 					} else {
 						play_mp3_(tmp);
 					}
 				} else {
-					play_loop_("");
+					play_loop_("", "");
 				}
 				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
@@ -250,6 +320,7 @@ namespace {
 			}
 		}
 	}
+#endif
 }
 
 extern "C" {
@@ -387,8 +458,7 @@ int main(int argc, char** argv)
 	}
 
 	utils::format("RTK5RX65N Start for AUDIO sample\n");
-	cmd_.set_prompt("# ");
-
+//	cmd_.set_prompt("# ");
 
 	{  // QSPI の初期化（Flash Memory Read/Write Interface)
 		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
@@ -434,22 +504,36 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
-	uint8_t n = 0;
 	while(1) {
 		glcdc_io_.sync_vpos();
+		{
+			auto data = get_fami_pad();
+			uint32_t ctrl = 0;
+			if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
+				graphics::set(graphics::filer_ctrl::OPEN, ctrl);
+			}
+			if(chip::on(data, chip::FAMIPAD_ST::UP)) {
+				graphics::set(graphics::filer_ctrl::UP, ctrl);
+			}
+			if(chip::on(data, chip::FAMIPAD_ST::DOWN)) {
+				graphics::set(graphics::filer_ctrl::DOWN, ctrl);
+			}
+			if(chip::on(data, chip::FAMIPAD_ST::LEFT)) {
+				graphics::set(graphics::filer_ctrl::BACK, ctrl);
+			}
+			if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
+				graphics::set(graphics::filer_ctrl::SELECT, ctrl);
+			}
+			char path[256];
+			if(filer_.update(ctrl, path, sizeof(path))) {
+				play_loop_("", path);
+			}
+		}
 
 		sdc_.service(sdh_.service());
 
-		command_();
+		update_led_();
+//		command_();
 
-		++n;
-		if(n >= 30) {
-			n = 0;
-		}
-		if(n < 10) {
-			LED::P = 0;
-		} else {
-			LED::P = 1;
-		}
 	}
 }
