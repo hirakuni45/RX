@@ -16,8 +16,6 @@
 
 extern "C" {
 	void set_sample_rate(uint32_t freq);
-	uint16_t sci_length(void);
-	char sci_getch(void);
 };
 
 namespace audio {
@@ -28,9 +26,24 @@ namespace audio {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class mp3_in {
+	public:
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	制御型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class CTRL {
+			NONE,		///< 無し
+			STOP,		///< 停止（排他ビット）
+			PAUSE,		///< 一時停止（排他ビット）
+			NEXT,		///< 次の曲（排他ビット）
+			REPLAY,		///< 曲の先頭（排他ビット）
+		};
 
-//		static const uint32_t INPUT_BUFFER_SIZE = (5 * 8192);
-		static const uint32_t INPUT_BUFFER_SIZE = (2048);
+		typedef CTRL (*TASK)();
+
+	private:
+		static const uint32_t INPUT_BUFFER_SIZE = 2048;
 
 		mad_stream	mad_stream_;
 		mad_frame	mad_frame_;
@@ -45,6 +58,8 @@ namespace audio {
 		bool			id3v1_;
 
 		uint32_t		time_;
+
+		TASK			task_;
 
 		int fill_read_buffer_(utils::file_io& fin, mad_stream& strm)
  		{
@@ -184,7 +199,6 @@ namespace audio {
 			return (signed short)(v >> (MAD_F_FRACBITS - 15));
 		}
 
-
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -192,7 +206,19 @@ namespace audio {
 		*/
 		//-----------------------------------------------------------------//
 		mp3_in() : subband_filter_enable_(false), id3v1_(false),
-				   time_(0) { }
+				   time_(0), task_(nullptr) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ユーザー制御の設定
+			@param[in]	task	ユーザー制御タスク
+		*/
+		//-----------------------------------------------------------------//
+		void set_user_ctrl(TASK task)
+		{
+			task_ = task;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -200,6 +226,7 @@ namespace audio {
 			@brief	デコード
 			@param[in]	fin		file_io コンテキスト（参照）
 			@param[in]	out		オーディオ出力（参照）
+			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
 		template <class AUDIO_OUT>
@@ -221,31 +248,35 @@ namespace audio {
 			bool pause = false;
 			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
 
-				if(sci_length() > 0) {
-					char ch = sci_getch();
-					if(ch == '>') {
-						out.mute();
-						break;
-					} else if(ch == '<') {
-						out.mute();
-						fin.seek(utils::file_io::SEEK::SET, forg);
-						info = false;
-						pos = 0;
-						time_ = 0;
-						frame_count = 0;
-						status = true;
-						pause = false;
-						continue;
-					} else if(ch == ' ') {
-						out.mute();
-						pause = !pause;
-					} else if(ch == ('C' - 0x40)) {
-						out.mute();
-						status = false;
-						break;
-					}
+				CTRL ctrl = CTRL::NONE;
+				if(task_ != nullptr) {
+					ctrl = (*task_)();
 				}
-				if(pause) continue;
+				if(ctrl == CTRL::NEXT) {
+					out.mute();
+					break;
+				} else if(ctrl == CTRL::REPLAY) {
+					out.mute();
+					fin.seek(utils::file_io::SEEK::SET, forg);
+					info = false;
+					pos = 0;
+					time_ = 0;
+					frame_count = 0;
+					status = true;
+					pause = false;
+					continue;
+				} else if(ctrl == CTRL::PAUSE) {
+					out.mute();
+					pause = !pause;
+				} else if(ctrl == CTRL::STOP) {
+					out.mute();
+					status = false;
+					break;
+				}
+				if(pause) {
+					utils::delay::milli_second(5);
+					continue;
+				}
 
 				if(mad_frame_decode(&mad_frame_, &mad_stream_)) {
 					if(MAD_RECOVERABLE(mad_stream_.error)) {
