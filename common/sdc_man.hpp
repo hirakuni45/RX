@@ -666,8 +666,13 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		bool get_dir_path(uint16_t match, char* dst, uint32_t dstlen)
 		{
+			char current[256];
+			create_full_path_(current_, current, sizeof(current));
+#if _USE_LFN != 0
+			str::utf8_to_sjis(current, current, sizeof(current));
+#endif
 			dir_list dl;
-			if(!dl.start(current_)) return false;
+			if(!dl.start(current)) return false;
 
 			copy_t t;
 			t.idx_ = 0;
