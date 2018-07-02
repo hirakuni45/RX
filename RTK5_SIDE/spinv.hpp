@@ -10,7 +10,7 @@
 //=====================================================================//
 #include "side/arcade.h"
 #include "common/file_io.hpp"
-#include "common/snd_mgr.hpp"
+#include "sound/snd_mgr.hpp"
 
 extern "C" {
 	uint8_t get_fami_pad();

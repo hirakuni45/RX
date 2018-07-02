@@ -15,7 +15,7 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
-#include "common/audio_out.hpp"
+#include "sound/audio_out.hpp"
 
 #include "chip/FAMIPAD.hpp"
 

@@ -11,7 +11,7 @@
 */
 //=====================================================================//
 #include <memory>
-#include "common/wav_in.hpp"
+#include "sound/wav_in.hpp"
 
 namespace audio {
 
