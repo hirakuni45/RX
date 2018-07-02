@@ -314,7 +314,7 @@ namespace utils {
 
 					if(func != nullptr) {
 #if _USE_LFN != 0
-						str::sjis_to_utf8(fi.fname, ptr_);
+						str::sjis_to_utf8(fi.fname, ptr_, sizeof(full_));
 #else
 						std::strcpy(ptr_, fi.fname);
 #endif
