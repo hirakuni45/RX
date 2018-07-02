@@ -85,6 +85,8 @@ PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp \
 				graphics/font8x16.cpp
 
+# BINARIES	=	graphics/kfont16.bin
+
 USER_LIBS	=	m
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
@@ -153,7 +155,8 @@ OBJCOPY_OPT	=	--srec-forceS3 --srec-len 32
 
 OBJECTS	=	$(addprefix $(BUILD)/,$(patsubst %.s,%.o,$(ASOURCES))) \
 			$(addprefix $(BUILD)/,$(patsubst %.c,%.o,$(CSOURCES))) \
-			$(addprefix $(BUILD)/,$(patsubst %.cpp,%.o,$(PSOURCES)))
+			$(addprefix $(BUILD)/,$(patsubst %.cpp,%.o,$(PSOURCES))) \
+			$(addprefix $(BUILD)/,$(patsubst %.bin,%.o,$(BINARIES)))
 
 DOBJECTS =	$(addprefix $(BUILD)/,$(patsubst %.c,%.o,$(CSOURCES))) \
 			$(addprefix $(BUILD)/,$(patsubst %.cpp,%.o,$(PSOURCES)))
@@ -162,7 +165,7 @@ DEPENDS =   $(patsubst %.o,%.d, $(DOBJECTS))
 
 .PHONY: all clean
 .SUFFIXES :
-.SUFFIXES : .rc .hpp .s .h .c .cpp .d .o
+.SUFFIXES : .rc .hpp .s .h .c .cpp .bin .d .o
 
 all: $(BUILD) $(TARGET).elf text
 
@@ -181,6 +184,10 @@ $(BUILD)/%.o : %.c
 $(BUILD)/%.o : %.cpp
 	mkdir -p $(dir $@); \
 	$(CP) -c $(POPT) $(PFLAGS) $(PINCS) $(CPWARN) -o $@ $<
+
+$(BUILD)/%.o: %.bin
+	mkdir -p $(dir $@); \
+	$(OBJCOPY) --readonly-text -I binary -O elf32-rx-le -B rx $< $@ 
 
 $(BUILD)/%.d: %.c
 	mkdir -p $(dir $@); \
@@ -202,26 +209,23 @@ clean_depend:
 
 lst:  $(TARGET).lst
 
-%.lst: %.elf
-	$(OBJDUMP) -h -S $< > $@
-
 # Rules for building the .text rom images
 
-text: mot lst
+# text: mot lst
+text: mot
 
 bin: $(TARGET).bin
 mot: $(TARGET).mot
 lst: $(TARGET).lst
 
 %.lst: %.elf
-	$(OBJDUMP) -h -S $< > $@
+	$(OBJDUMP) -h -d $< > $@
 
 %.mot: %.elf
 	$(OBJCOPY) $(OBJCOPY_OPT) -O srec $< $@
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
-#	$(OBJCOPY) -j .vects -j .text -j .data -O binary $< $@
 
 tarball:
 	tar cfvz $(subst .elf,,$(TARGET))_$(shell date +%Y%m%d%H).tgz \
