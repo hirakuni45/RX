@@ -195,6 +195,22 @@ namespace {
 	}
 
 
+	void mp3_tag_task_(const audio::tag_t& tag)
+	{
+		render_.clear(RENDER::COLOR::Black);
+		utils::format("Album:  '%s'\n") % tag.album_;
+		render_.draw_text(0, 0 * 20, tag.album_);
+		utils::format("Title:  '%s'\n") % tag.title_;
+		render_.draw_text(0, 1 * 20, tag.title_);
+		utils::format("Artist: '%s'\n") % tag.artist_;
+		render_.draw_text(0, 2 * 20, tag.artist_);
+		utils::format("Year:    %s\n") % tag.year_;
+		render_.draw_text(0, 3 * 20, tag.year_);
+		utils::format("Track:   %s\n") % tag.track_;
+		render_.draw_text(0, 4 * 20, tag.track_);
+	}
+
+
 	bool play_mp3_(const char* fname)
 	{
 // utils::format("MP3: '%s'\n") % fname;
@@ -202,7 +218,8 @@ namespace {
 		if(!fin.open(fname, "rb")) {
 			return false;
 		}
-		mp3_in_.set_user_ctrl(mp3_ctrl_task_);
+		mp3_in_.set_ctrl_task(mp3_ctrl_task_);
+		mp3_in_.set_tag_task(mp3_tag_task_);
 		bool ret = mp3_in_.decode(fin, audio_out_);
 		fin.close();
 		return ret;
@@ -396,6 +413,7 @@ extern "C" {
 	}
 
 
+	// for syscalls API (POSIX API)
 	void utf8_to_sjis(const char* src, char* dst, uint32_t len) {
 		utils::str::utf8_to_sjis(src, dst, len);
 	}
