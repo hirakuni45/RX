@@ -216,9 +216,9 @@ namespace audio {
 
 			id = scan_id_(&tmp[0]);
 
-			utils::format("ID: %c%c%c%c, ") % tmp[0] % tmp[1] % tmp[2] % tmp[3];
-			utils::format("Flag: %04X, ") % get16_(&tmp[8]);
-			utils::format("%d bytes\n") % size;
+//			utils::format("ID: %c%c%c%c, ") % tmp[0] % tmp[1] % tmp[2] % tmp[3];
+//			utils::format("Flag: %04X, ") % get16_(&tmp[8]);
+//			utils::format("%d bytes\n") % size;
 
 			set_info_(id, fin, size);
 
