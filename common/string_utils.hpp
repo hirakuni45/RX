@@ -59,14 +59,19 @@ namespace utils {
 			@brief  UTF-8 から UTF-16 への変換
 			@param[in]	src	ソース
 			@param[in]	dst	変換先
+			@param[in]	dsz	変換先のサイズ（バイトサイズ）
+			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static void utf8_to_utf16(const char* src, WCHAR* dst)
+		static bool utf8_to_utf16(const char* src, WCHAR* dst, uint32_t dsz)
 		{
+			uint32_t len = dsz / 2;
+			if(len <= 1) return false;
+ 
 			uint8_t cnt = 0;
 			uint16_t code = 0;
 			char tc;
-			while((tc = *src++) != 0) {
+			while((tc = *src++) != 0 && len > 1) {
 				uint8_t c = static_cast<uint8_t>(tc);
 				if(c < 0x80) { code = c; cnt = 0; }
 				else if((c & 0xf0) == 0xe0) { code = (c & 0x0f); cnt = 2; }
@@ -84,10 +89,12 @@ namespace utils {
 				}
 				if(cnt == 0 && code != 0) {
 					*dst++ = code;
+					--len;
 					code = 0;
 				}
 			}
 			*dst = 0;
+			return len >= 1;
 		}
 
 
@@ -96,22 +103,33 @@ namespace utils {
 			@brief  UTF-16 から UTF-8 への変換
 			@param[in]	code	UTF-16 コード
 			@param[in]	dst	変換先
-			@return 変換先の最終ポインター
+			@param[in]	dsz	変換先のサイズ（バイトサイズ）
+			@return 格納サイズ（０の場合エラー）
 		*/
 		//-----------------------------------------------------------------//
-		static char* utf16_to_utf8(uint16_t code, char* dst)
+		static uint32_t utf16_to_utf8(uint16_t code, char* dst, uint32_t dsz)
 		{
+			uint32_t len = 0;
 			if(code < 0x0080) {
-				*dst++ = code;
+				if(dsz >= 1) {
+					*dst++ = code;
+					len = 1;
+				}
 			} else if(code >= 0x0080 && code <= 0x07ff) {
-				*dst++ = 0xc0 | ((code >> 6) & 0x1f);
-				*dst++ = 0x80 | (code & 0x3f);
+				if(dsz >= 2) {
+					*dst++ = 0xc0 | ((code >> 6) & 0x1f);
+					*dst++ = 0x80 | (code & 0x3f);
+					len = 2;
+				}
 			} else if(code >= 0x0800) {
-				*dst++ = 0xe0 | ((code >> 12) & 0x0f);
-				*dst++ = 0x80 | ((code >> 6) & 0x3f);
-				*dst++ = 0x80 | (code & 0x3f);
+				if(dsz >= 3) {
+					*dst++ = 0xe0 | ((code >> 12) & 0x0f);
+					*dst++ = 0x80 | ((code >> 6) & 0x3f);
+					*dst++ = 0x80 | (code & 0x3f);
+					len = 3;
+				}
 			}
-			return dst;
+			return len;
 		}
 
 
@@ -120,15 +138,26 @@ namespace utils {
 			@brief  UTF-16 から UTF-8 への変換
 			@param[in]	src	ソース
 			@param[in]	dst	変換先
+			@param[in]	dsz	変換先のサイズ（バイトサイズ）
+			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static void utf16_to_utf8(const WCHAR* src, char* dst) 
+		static bool utf16_to_utf8(const WCHAR* src, char* dst, uint32_t dsz) 
 		{
+			if(dsz <= 1) return false;
+
 			uint16_t code;
 			while((code = static_cast<uint16_t>(*src++)) != 0) {
-				dst = utf16_to_utf8(code, dst);
+				auto len = utf16_to_utf8(code, dst, dsz);
+				if(dsz > len) {
+					dsz -= len;
+					dst += len;
+				} else {
+					break;
+				}
 			}
 			*dst = 0;
+			return dsz >= 1;
 		}
 
 #if _USE_LFN != 0
@@ -137,36 +166,48 @@ namespace utils {
 			@brief  sjis から UTF-8 への変換
 			@param[in]	src	ソース
 			@param[in]	dst	変換先
-///			@param[in]	len	変換先サイズ
+			@param[in]	dsz	変換先のサイズ
+			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static void sjis_to_utf8(const char* src, char* dst)
+		static bool sjis_to_utf8(const char* src, char* dst, uint32_t dsz)
 		{
-			if(src == nullptr) return;
+			if(src == nullptr) return false;
+
 			uint16_t wc = 0;
 			char ch;
-			while((ch = *src++) != 0) {
+			while((ch = *src++) != 0 && dsz > 1) {
 				uint8_t c = static_cast<uint8_t>(ch);
 				if(wc) {
 					if(0x40 <= c && c <= 0x7e) {
 						wc <<= 8;
 						wc |= c;
-						dst = utf16_to_utf8(ff_convert(wc, 1), dst);
+						auto len = utf16_to_utf8(ff_convert(wc, 1), dst, dsz);
+						if(len == 0) break;
+						dst += len;
+						dsz -= len;
 					} else if(0x80 <= c && c <= 0xfc) {
 						wc <<= 8;
 						wc |= c;
-						dst = utf16_to_utf8(ff_convert(wc, 1), dst);
+						auto len = utf16_to_utf8(ff_convert(wc, 1), dst, dsz);
+						if(len == 0) break;
+						dst += len;
+						dsz -= len;
 					}
 					wc = 0;
 				} else {
 					if(0x81 <= c && c <= 0x9f) wc = c;
 					else if(0xe0 <= c && c <= 0xfc) wc = c;
 					else {
-						dst = utf16_to_utf8(ff_convert(c, 1), dst);
+						auto len = utf16_to_utf8(ff_convert(c, 1), dst, dsz);
+						if(len == 0) break;
+						dst += len;
+						dsz -= len;
 					}
 				}
 			}
 			*dst = 0;
+			return dsz > 0;
 		}
 
 
@@ -176,9 +217,10 @@ namespace utils {
 			@param[in]	src	ソース
 			@param[out]	dst	変換先
 			@param[in]	dsz	変換先のサイズ
+			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static void utf8_to_sjis(const char* src, char* dst, uint32_t dsz)
+		static bool utf8_to_sjis(const char* src, char* dst, uint32_t dsz)
 		{
 			int8_t cnt = 0;
 			uint16_t code = 0;
@@ -208,7 +250,7 @@ namespace utils {
 					}
 				}
 				if(cnt == 0 && code != 0) {
-					if(dsz <= 2) break;
+					if(dsz <= 3) break;
 					auto wc = ff_convert(code, 0);
 					*dst++ = static_cast<char>(wc >> 8);
 					*dst++ = static_cast<char>(wc & 0xff);
@@ -217,6 +259,7 @@ namespace utils {
 				}			
 			}
 			*dst = 0;
+			return dsz > 0;
 		}
 #endif
 
