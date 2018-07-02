@@ -18,9 +18,9 @@ namespace audio {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct tag_t {
-		char		album_[64];		///< アルバム名
-		char		title_[64];		///< タイトル（曲名）
-		char		artist_[64];	///< アーティスト
+		char		album_[128];	///< アルバム名
+		char		title_[128];	///< タイトル（曲名）
+		char		artist_[128];	///< アーティスト
 		char		year_[16];		///< リリース年
 		char		track_[8];		///< トラック
 
