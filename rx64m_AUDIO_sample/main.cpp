@@ -33,7 +33,7 @@
 #include "common/sdc_man.hpp"
 #include "common/string_utils.hpp"
 #include "common/tpu_io.hpp"
-#include "common/wav_in.hpp"
+#include "sound/wav_in.hpp"
 
 // GR-KAEDE の場合有効にする。
 // #define GR_KAEDE
@@ -42,7 +42,7 @@
 #define MP3
 
 #ifdef MP3
-#include "common/mp3_in.hpp"
+#include "sound/mp3_in.hpp"
 #endif
 
 namespace {
