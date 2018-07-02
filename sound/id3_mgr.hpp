@@ -104,11 +104,24 @@ namespace audio {
 				tmp[len] = 0;
 				utils::str::sjis_to_utf8(tmp, dst, dstlen); 
 			} else if(code == 0x01) {  // UTF-16 (with BOM)
-				utils::format("UTF-16 under constructions\n");
-				fin.seek(utils::file_io::SEEK::CUR, len);
+				WCHAR tmp[len / 2 + 1];
+				if(fin.read(tmp, len) != len) {
+					return false;
+				}
+				tmp[len / 2] = 0;
+				utils::str::utf16_to_utf8(&tmp[1], dst, dstlen);
 			} else if(code == 0x02) {  // UTF-16BE (no BOM)
-				utils::format("UTF-16BE under constructions\n");
-				fin.seek(utils::file_io::SEEK::CUR, len);
+				WCHAR tmp[len / 2 + 1];
+				if(fin.read(tmp, len) != len) {
+					return false;
+				}
+				char* p = reinterpret_cast<char*>(&tmp[0]);
+				for(uint32_t i = 0; i < len; i += 2) {
+					std::swap(p[0], p[1]);
+					p += 2;
+				}
+				tmp[len / 2] = 0;
+				utils::str::utf16_to_utf8(tmp, dst, dstlen);
 			} else if(code == 0x03) {  // UTF-8
 				if(len > dstlen) {
 					return false;
