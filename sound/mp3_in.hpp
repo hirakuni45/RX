@@ -57,6 +57,14 @@ namespace audio {
 		typedef void (*TAG_TASK)(const tag_t&);
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	更新タスク型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef void (*UPDATE_TASK)(uint32_t);
+
+
 	private:
 		static const uint32_t INPUT_BUFFER_SIZE = 2048;
 
@@ -75,8 +83,8 @@ namespace audio {
 		uint32_t		time_;
 
 		CTRL_TASK		ctrl_task_;
-
 		TAG_TASK		tag_task_;
+		UPDATE_TASK		update_task_;
 
 		int fill_read_buffer_(utils::file_io& fin, mad_stream& strm)
  		{
@@ -222,8 +230,8 @@ namespace audio {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		mp3_in() : subband_filter_enable_(false), id3v1_(false),
-				   time_(0), ctrl_task_(nullptr), tag_task_(nullptr) { }
+		mp3_in() : subband_filter_enable_(false), id3v1_(false), time_(0),
+				   ctrl_task_(nullptr), tag_task_(nullptr), update_task_(nullptr) { }
 
 
 		//-----------------------------------------------------------------//
@@ -247,6 +255,18 @@ namespace audio {
 		void set_tag_task(TAG_TASK task)
 		{
 			tag_task_ = task;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	アップデート・タスクの設定
+			@param[in]	task	アップデート・タスク
+		*/
+		//-----------------------------------------------------------------//
+		void set_update_task(UPDATE_TASK task)
+		{
+			update_task_ = task;
 		}
 
 
@@ -361,10 +381,9 @@ namespace audio {
 				{
 					uint32_t s = pos / mad_frame_.header.samplerate;
 					if(s != time_) {
-						uint16_t sec = s % 60;
-						uint16_t min = (s / 60) % 60;
-						uint16_t hor = (s / 3600) % 24;
-						utils::format("\r%02d:%02d:%02d") % hor % min % sec;
+						if(update_task_ != nullptr) {
+							(*update_task_)(s);
+						}
 						time_ = s;
 					}
 				}
