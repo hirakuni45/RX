@@ -211,6 +211,18 @@ namespace {
 	}
 
 
+	void mp3_update_task_(uint32_t t)
+	{
+		uint16_t sec = t % 60;
+		uint16_t min = (t / 60) % 60;
+		uint16_t hor = (t / 3600) % 24;
+		char tmp[16];
+		utils::sformat("%02d:%02d:%02d", tmp, sizeof(tmp)) % hor % min % sec;
+		render_.fill(0, 5 * 20, 8 * 8, 16, RENDER::COLOR::Black);
+		render_.draw_text(0, 5 * 20, tmp);
+	}
+
+
 	bool play_mp3_(const char* fname)
 	{
 // utils::format("MP3: '%s'\n") % fname;
@@ -220,6 +232,7 @@ namespace {
 		}
 		mp3_in_.set_ctrl_task(mp3_ctrl_task_);
 		mp3_in_.set_tag_task(mp3_tag_task_);
+		mp3_in_.set_update_task(mp3_update_task_);
 		bool ret = mp3_in_.decode(fin, audio_out_);
 		fin.close();
 		return ret;
