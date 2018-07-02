@@ -19,7 +19,7 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
-#include "common/audio_out.hpp"
+#include "sound/audio_out.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
