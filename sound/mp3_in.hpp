@@ -29,18 +29,33 @@ namespace audio {
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	制御型
+			@brief	制御列挙型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class CTRL {
-			NONE,		///< 無し
-			STOP,		///< 停止（排他ビット）
-			PAUSE,		///< 一時停止（排他ビット）
-			NEXT,		///< 次の曲（排他ビット）
-			REPLAY,		///< 曲の先頭（排他ビット）
+			NONE,		///< 何もしない
+			STOP,		///< 停止
+			PAUSE,		///< 一時停止
+			NEXT,		///< 次の曲
+			REPLAY,		///< 曲の先頭に戻って再生
 		};
 
-		typedef CTRL (*TASK)();
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	制御タスク型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef CTRL (*CTRL_TASK)();
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	情報タスク型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef void (*TAG_TASK)(const tag_t&);
+
 
 	private:
 		static const uint32_t INPUT_BUFFER_SIZE = 2048;
@@ -59,7 +74,9 @@ namespace audio {
 
 		uint32_t		time_;
 
-		TASK			task_;
+		CTRL_TASK		ctrl_task_;
+
+		TAG_TASK		tag_task_;
 
 		int fill_read_buffer_(utils::file_io& fin, mad_stream& strm)
  		{
@@ -206,18 +223,30 @@ namespace audio {
 		*/
 		//-----------------------------------------------------------------//
 		mp3_in() : subband_filter_enable_(false), id3v1_(false),
-				   time_(0), task_(nullptr) { }
+				   time_(0), ctrl_task_(nullptr), tag_task_(nullptr) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ユーザー制御の設定
-			@param[in]	task	ユーザー制御タスク
+			@brief	制御タスクの設定
+			@param[in]	task	制御タスク
 		*/
 		//-----------------------------------------------------------------//
-		void set_user_ctrl(TASK task)
+		void set_ctrl_task(CTRL_TASK task)
 		{
-			task_ = task;
+			ctrl_task_ = task;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タグ・タスクの設定
+			@param[in]	task	タグ・タスク
+		*/
+		//-----------------------------------------------------------------//
+		void set_tag_task(TAG_TASK task)
+		{
+			tag_task_ = task;
 		}
 
 
@@ -234,6 +263,15 @@ namespace audio {
 		{
 			id3_mgr id3;
 			id3.analize(fin);
+			if(tag_task_ != nullptr) {
+				const auto& tag = id3.get_tag();
+				(*tag_task_)(tag);
+//				utils::format("Album:  '%s'\n") % tag.album_;
+//				utils::format("Title:  '%s'\n") % tag.title_;
+//				utils::format("Artist: '%s'\n") % tag.artist_;
+//				utils::format("Year:    %s\n") % tag.year_;
+//				utils::format("Track:   %s\n") % tag.track_;
+			}
 
 			mad_stream_init(&mad_stream_);
 			mad_frame_init(&mad_frame_);
@@ -249,8 +287,8 @@ namespace audio {
 			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
 
 				CTRL ctrl = CTRL::NONE;
-				if(task_ != nullptr) {
-					ctrl = (*task_)();
+				if(ctrl_task_ != nullptr) {
+					ctrl = (*ctrl_task_)();
 				}
 				if(ctrl == CTRL::NEXT) {
 					out.mute();

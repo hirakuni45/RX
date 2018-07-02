@@ -10,6 +10,8 @@
 //=====================================================================//
 #include "common/file_io.hpp"
 #include "common/format.hpp"
+#include "common/string_utils.hpp"
+#include "sound/tag.hpp"
 
 namespace audio {
 
@@ -35,6 +37,7 @@ namespace audio {
 		uint8_t		flag_;
 		uint32_t	size_;
 
+		tag_t		tag_;
 
 		static ID scan_id_(char* id) noexcept
 		{
@@ -49,6 +52,77 @@ namespace audio {
 			if(strncmp(id, "TRCK", 4) == 0) return ID::TRCK;
 			if(strncmp(id, "TRK", 3) == 0) return ID::TRCK;
 			return ID::NA;
+		}
+
+
+		bool set_info_(ID id, utils::file_io& fin, uint32_t len) noexcept
+		{
+			char* dst = nullptr;
+			uint32_t dstlen = 0;
+			switch(id) {
+			case ID::TIT2:
+				dst = tag_.title_;
+				dstlen = sizeof(tag_.title_);
+				break;
+			case ID::TPE1:
+				dst = tag_.artist_;
+				dstlen = sizeof(tag_.artist_);
+				break;
+			case ID::TALB:
+				dst = tag_.album_;
+				dstlen = sizeof(tag_.album_);
+				break;
+			case ID::TYER:
+				dst = tag_.year_;
+				dstlen = sizeof(tag_.year_);
+				break;
+			case ID::TRCK:
+				dst = tag_.track_;
+				dstlen = sizeof(tag_.track_);
+				break;
+			default:
+				break;
+			}
+
+			uint8_t code;
+			if(fin.read(&code, 1) != 1) {
+				return false;
+			}
+			--len;
+
+			if(dst == nullptr) {
+				utils::format("No load, Code: %d\n") % static_cast<uint16_t>(code);
+				fin.seek(utils::file_io::SEEK::CUR, len);
+				return false;
+			}
+
+			if(code == 0x00) {  // ISO-8859-1
+				char tmp[len + 1];
+				if(fin.read(tmp, len) != len) {
+					return false;
+				}
+				tmp[len] = 0;
+				utils::str::sjis_to_utf8(tmp, dst, dstlen); 
+			} else if(code == 0x01) {  // UTF-16 (with BOM)
+				utils::format("UTF-16 under constructions\n");
+				fin.seek(utils::file_io::SEEK::CUR, len);
+			} else if(code == 0x02) {  // UTF-16BE (no BOM)
+				utils::format("UTF-16BE under constructions\n");
+				fin.seek(utils::file_io::SEEK::CUR, len);
+			} else if(code == 0x03) {  // UTF-8
+				if(len > dstlen) {
+					return false;
+				}
+				if(fin.read(dst, len) != len) {
+					return false;
+				}
+				dst[len] = 0;
+			} else {
+				fin.seek(utils::file_io::SEEK::CUR, len);
+				return false;
+			}
+
+			return true;
 		}
 
 
@@ -127,16 +201,12 @@ namespace audio {
 
 			id = scan_id_(&tmp[0]);
 
-			utils::format("ID: %c%c%c%c, ") % tmp[0] % tmp[1] % tmp[2] % tmp[3];
-			utils::format("Flag: %04X, ") % get16_(&tmp[8]);
-			utils::format("%d bytes\n") % size;
+//			utils::format("ID: %c%c%c%c, ") % tmp[0] % tmp[1] % tmp[2] % tmp[3];
+//			utils::format("Flag: %04X, ") % get16_(&tmp[8]);
+//			utils::format("%d bytes\n") % size;
 
-			for(uint32_t i = 0; i < size; ++i) {
-				char ch[1];
-				fin.read(ch, 1);
-//				utils::format(" %02X") % static_cast<uint16_t>(ch);
-			}
-//			utils::format("\n");
+			set_info_(id, fin, size);
+
 			return true;
 		}
 
@@ -157,15 +227,11 @@ namespace audio {
 
 			id = scan_id_(&tmp[0]);
 
-			utils::format("ID: %c%c%c, ") % tmp[0] % tmp[1] % tmp[2];
-			utils::format("%d bytes\n") % size;
+//			utils::format("ID: %c%c%c, ") % tmp[0] % tmp[1] % tmp[2];
+//			utils::format("%d bytes\n") % size;
 
-			for(uint32_t i = 0; i < size; ++i) {
-				char ch[1];
-				fin.read(ch, 1);
-//				utils::format(" %02X") % static_cast<uint16_t>(ch);
-			}
-//			utils::format("\n");
+			set_info_(id, fin, size);
+
 			return true;
 		}
 
@@ -176,7 +242,7 @@ namespace audio {
 		*/
 		//-----------------------------------------------------------------//
 		id3_mgr() noexcept : org_pos_(0),
-			ver_(0), flag_(0), size_(0)
+			ver_(0), flag_(0), size_(0), tag_()
 		{ }
 
 
@@ -244,5 +310,14 @@ namespace audio {
 
 			return true;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タグ情報を取得
+			@return タグ情報
+		*/
+		//-----------------------------------------------------------------//
+		const tag_t& get_tag() const noexcept { return tag_; }
 	};
 }
