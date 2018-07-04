@@ -1,7 +1,7 @@
 //=====================================================================//
 /*! @file
     @brief  EFO 2ND (RX64M) メイン @n
-			・デバッグ用LED出力 ---> PJ5(11) @n
+			・デバッグ用LED出力 ---> PE3(108) @n
 			・デバッグ用シリアルＲＸＤ  --->  P21(36) / RXD0 @n
 			・デバッグ用シリアルＴＸＤ  --->  P20(37) / TXD0 @n
 			・変換トリガー閾値（コンパレーター入力+へ)   ---> P03(4) / DA0  @n
@@ -24,7 +24,7 @@
 
 namespace {
 
-	static const int main_version_ = 100;
+	static const int main_version_ = 101;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -69,7 +69,7 @@ namespace {
 
 	typedef device::PORT<device::PORTF, device::bitpos::B5> TRIGGER;
 
-	typedef device::PORT<device::PORTJ, device::bitpos::B5> LED;
+	typedef device::PORT<device::PORTE, device::bitpos::B3> LED;
 
 	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
 	CMT		cmt_;
