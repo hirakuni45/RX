@@ -36,7 +36,6 @@ namespace audio {
 			NONE,		///< 何もしない
 			STOP,		///< 停止
 			PAUSE,		///< 一時停止
-			NEXT,		///< 次の曲
 			REPLAY,		///< 曲の先頭に戻って再生
 		};
 
@@ -310,8 +309,9 @@ namespace audio {
 				if(ctrl_task_ != nullptr) {
 					ctrl = (*ctrl_task_)();
 				}
-				if(ctrl == CTRL::NEXT) {
+				if(ctrl == CTRL::STOP) {
 					out.mute();
+					status = false;
 					break;
 				} else if(ctrl == CTRL::REPLAY) {
 					out.mute();
@@ -326,10 +326,6 @@ namespace audio {
 				} else if(ctrl == CTRL::PAUSE) {
 					out.mute();
 					pause = !pause;
-				} else if(ctrl == CTRL::STOP) {
-					out.mute();
-					status = false;
-					break;
 				}
 				if(pause) {
 					utils::delay::milli_second(5);
