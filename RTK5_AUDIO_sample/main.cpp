@@ -143,6 +143,7 @@ namespace {
 
 	uint8_t		pad_level_;
 
+
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
 		if(!f) {
@@ -180,13 +181,15 @@ namespace {
 			ctrl = MP3_IN::CTRL::PAUSE;
 		}
 		if(chip::on(ptrg, chip::FAMIPAD_ST::RIGHT)) {
-			ctrl = MP3_IN::CTRL::NEXT;
+			ctrl = MP3_IN::CTRL::STOP;
 		}
 		if(chip::on(ptrg, chip::FAMIPAD_ST::LEFT)) {
 			ctrl = MP3_IN::CTRL::REPLAY;
 		}
 		if(chip::on(ptrg, chip::FAMIPAD_ST::START)) {
 			ctrl = MP3_IN::CTRL::STOP;
+			sdc_.stall_dir_list();
+			render_.clear(RENDER::COLOR::Black);
 		}
 
 		update_led_();
