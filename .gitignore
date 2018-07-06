@@ -18,3 +18,8 @@ ff12b/doc/
 !libmad/mad.h
 !libmad/.libs/libmad.a
 libmad/
+!jpeg-6b/jpeglib.h
+!jpeg-6b/jconfig.h
+!jpeg-6b/jmorecfg.h
+!jpeg-6b/libjpeg.a
+jpeg-6b/
