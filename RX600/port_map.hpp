@@ -46,106 +46,106 @@ namespace device {
 			// 出力ポートのインピーダンス制御の一環として入れてある。
 			case peripheral::SCI0:
 				{
+					if(i2c) {
+						PORT2::ODR0.B0 = 1;  // P20 N-OpenDrain
+						PORT2::ODR0.B2 = 1;  // P21 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P20PFS.PSEL = sel;  // TXD0/SMISO0/SSCL0 (P20 LQFP176: 45)
 					PORT2::PMR.B0 = enable;
 					MPC::P21PFS.PSEL = sel;  // RXD0/SMOSI0/SSDA0 (P21 LQFP176: 44)
 					PORT2::PMR.B1 = enable;
-					if(i2c) {
-						PORT2::ODR0.B0 = 1;  // P20 N-OpenDrain
-						PORT2::ODR0.B2 = 1;  // P21 N-OpenDrain
-					}
 				}
 				break;
 			case peripheral::SCI1:
 				{
+					if(i2c) {
+						PORTF::ODR0.B0 = 1;  // PF0 N-OpenDrain
+						PORTF::ODR0.B4 = 1;  // PF2 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PF0PFS.PSEL = sel;  // TXD1/SMISO1/SSCL1 (PF0 LQFP176: 35)
 					PORTF::PMR.B0 = enable;
 					MPC::PF2PFS.PSEL = sel;  // RXD1/SMOSI1/SSDA1 (PF2 LQFP176: 31)
 					PORTF::PMR.B2 = enable;
-					if(i2c) {
-						PORTF::ODR0.B0 = 1;  // PF0 N-OpenDrain
-						PORTF::ODR0.B4 = 1;  // PF2 N-OpenDrain
-					}
 				}
 				break;
 			case peripheral::SCI2:
 				{
+					if(i2c) {
+						PORT1::ODR0.B6 = 1;  // P13 N-OpenDrain
+						PORT1::ODR0.B4 = 1;  // P12 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P13PFS.PSEL = sel;  // TXD2/SMISO2/SSCL2 (P13 LQFP176: 52)
 					PORT1::PMR.B3 = enable;
 					MPC::P12PFS.PSEL = sel;  // RXD2/SMOSI2/SSDA2 (P12 LQFP176: 53)
 					PORT1::PMR.B2 = enable;
-					if(i2c) {
-						PORT1::ODR0.B6 = 1;  // P13 N-OpenDrain
-						PORT1::ODR0.B4 = 1;  // P12 N-OpenDrain
-					}
 				}
 				break;
 			case peripheral::SCI3:
 				{
+					if(i2c) {
+						PORT2::ODR0.B6 = 1;  // P23 N-OpenDrain
+						PORT2::ODR1.B2 = 1;  // P25 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P23PFS.PSEL = sel;  // TXD3/SMISO3/SSCL3 (P23 LQFP176: 42)
 					PORT2::PMR.B3 = enable;
 					MPC::P25PFS.PSEL = sel;  // RXD3/SMOSI3/SSDA3 (P25 LQFP176: 38)
 					PORT2::PMR.B5 = enable;
-					if(i2c) {
-						PORT2::ODR0.B6 = 1;  // P23 N-OpenDrain
-						PORT2::ODR1.B2 = 1;  // P25 N-OpenDrain
-					}
 				}
 				break;
 			case peripheral::SCI4:
 				{
+					if(i2c) {
+						PORTB::ODR0.B2 = 1;  // PB1 N-OpenDrain
+						PORTB::ODR0.B0 = 1;  // PB0 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PB1PFS.PSEL = sel;  // TXD4/SMISO4/SSCL4 (PB1 LQFP176: 100)
 					PORTB::PMR.B1 = enable;
 					MPC::PB0PFS.PSEL = sel;  // RXD4/SMOSI4/SSDA4 (PB0 LQFP176: 104)
 					PORTB::PMR.B0 = enable;
-					if(i2c) {
-						PORTB::ODR0.B2 = 1;  // PB1 N-OpenDrain
-						PORTB::ODR0.B0 = 1;  // PB0 N-OpenDrain
-					}
 				}
 				break;
 			case peripheral::SCI5:
 				{
+					if(i2c) {
+						PORTA::ODR1.B0 = 1;  // PA4 N-OpenDrain
+						PORTA::ODR0.B6 = 1;  // PA3 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PA4PFS.PSEL = sel;  // TXD5/SMISO5/SSCL5 (PA4 LQFP176: 109)
 					PORTA::PMR.B4 = enable;
 					MPC::PA3PFS.PSEL = sel;  // RXD5/SMOSI5/SSDA5 (PA3 LQFP176: 110)
 					PORTA::PMR.B3 = enable;
-					if(i2c) {
-						PORTA::ODR1.B0 = 1;  // PA4 N-OpenDrain
-						PORTA::ODR0.B6 = 1;  // PA3 N-OpenDrain
-					}
 				}
 				break;
 			case peripheral::SCI6:
 				{
+					if(i2c) {
+						PORT0::ODR0.B0 = 1;  // P00 N-OpenDrain
+						PORT0::ODR0.B2 = 1;  // P01 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P00PFS.PSEL = sel;  // TXD6/SMISO6/SSCL6 (P00 LQFP176: 8)
 					PORT0::PMR.B0 = enable;
 					MPC::P01PFS.PSEL = sel;  // RXD6/SMOSI6/SSDA6 (P01 LQFP176: 7)
 					PORT0::PMR.B1 = enable;
-					if(i2c) {
-						PORT0::ODR0.B0 = 1;  // P00 N-OpenDrain
-						PORT0::ODR0.B2 = 1;  // P01 N-OpenDrain
-					}
 				}
 				break;
 			case peripheral::SCI7:
 				{
+					if(i2c) {
+						PORT9::ODR0.B0 = 1;  // P90 N-OpenDrain
+						PORT9::ODR0.B4 = 1;  // P92 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P90PFS.PSEL = sel;  // TXD7/SMISO7/SSCL7 (P90 LQFP176: 163)
 					PORT9::PMR.B0 = enable;
 					MPC::P92PFS.PSEL = sel;  // RXD7/SMOSI7/SSDA7 (P92 LQFP176: 160)
 					PORT9::PMR.B2 = enable;
-					if(i2c) {
-						PORT9::ODR0.B0 = 1;  // P90 N-OpenDrain
-						PORT9::ODR0.B4 = 1;  // P92 N-OpenDrain
-					}
 				}
 				break;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
@@ -154,15 +154,15 @@ namespace device {
 			case peripheral::SCI8:
 #endif
 				{
+					if(i2c) {
+						PORTC::ODR1.B6 = 1;  // PC7 N-OpenDrain
+						PORTC::ODR1.B4 = 1;  // PC6 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PC7PFS.PSEL = sel;  // TXD(F)8/SMISO8/SSCL8 (PC7 LQFP176: 76)
 					PORTC::PMR.B7 = enable;
 					MPC::PC6PFS.PSEL = sel;  // RXD(F)8/SMOSI8/SSDA8 (PC6 LQFP176: 77)
 					PORTC::PMR.B6 = enable;
-					if(i2c) {
-						PORTC::ODR1.B6 = 1;  // PC7 N-OpenDrain
-						PORTC::ODR1.B4 = 1;  // PC6 N-OpenDrain
-					}
 				}
 				break;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
@@ -171,15 +171,15 @@ namespace device {
 			case peripheral::SCI9:
 #endif
 				{
+					if(i2c) {
+						PORTB::ODR1.B6 = 1;  // PB7 N-OpenDrain
+						PORTB::ODR1.B4 = 1;  // PB6 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PB7PFS.PSEL = sel;  // TXD(F)9/SMISO9/SSCL9 (PB7 LQFP176: 94)
 					PORTB::PMR.B7 = enable;
 					MPC::PB6PFS.PSEL = sel;  // RXD(F)9/SMOSI9/SSDA9 (PB6 LQFP176: 95)
 					PORTB::PMR.B6 = enable;
-					if(i2c) {
-						PORTB::ODR1.B6 = 1;  // PB7 N-OpenDrain
-						PORTB::ODR1.B4 = 1;  // PB6 N-OpenDrain
-					}
 				}
 				break;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
@@ -188,15 +188,15 @@ namespace device {
 			case peripheral::SCI10:
 #endif
 				{
+					if(i2c) {
+						PORT8::ODR1.B6 = 1;  // P87 N-OpenDrain
+						PORT8::ODR1.B4 = 1;  // P86 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P87PFS.PSEL = sel;  // TXD(F)10/SMISO10/SSCL10 (P86 LQFP176: 47)
 					PORT8::PMR.B7 = enable;
 					MPC::P86PFS.PSEL = sel;  // RXD(F)10/SMOSI10/SSDA10 (P87 LQFP176: 49)
 					PORT8::PMR.B6 = enable;
-					if(i2c) {
-						PORT8::ODR1.B6 = 1;  // P87 N-OpenDrain
-						PORT8::ODR1.B4 = 1;  // P86 N-OpenDrain
-					}
 				}
 				break;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
@@ -205,29 +205,29 @@ namespace device {
 			case peripheral::SCI11:
 #endif
 				{
+					if(i2c) {
+						PORT7::ODR1.B6 = 1;  // P77 N-OpenDrain
+						PORT7::ODR1.B4 = 1;  // P76 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P77PFS.PSEL = sel;  // TXD(F)11/SMISO11/SSCL11 (P77 LQFP176: 84)
 					PORT7::PMR.B7 = enable;
 					MPC::P76PFS.PSEL = sel;  // RXD(F)11/SMOSI11/SSDA11 (P76 LQFP176: 85)
 					PORT7::PMR.B6 = enable;
-					if(i2c) {
-						PORT7::ODR1.B6 = 1;  // P77 N-OpenDrain
-						PORT7::ODR1.B4 = 1;  // P76 N-OpenDrain
-					}
 				}
 				break;
 
 			case peripheral::SCI12:
 				{
+					if(i2c) {
+						PORTE::ODR0.B4 = 1;  // PE2 N-OpenDrain
+						PORTE::ODR0.B2 = 1;  // PE1 N-OpenDrain
+					}
 					uint8_t sel = enable ? 0b001100 : 0;
 					MPC::PE2PFS.PSEL = sel;  // RXD12/SMISO12/SSCL12 (PE2 LQFP176: 133)
 					PORTE::PMR.B2 = enable;
 					MPC::PE1PFS.PSEL = sel;  // TXD12/SMOSI12/SSDA12 (PE1 LQFP176: 134)
 					PORTE::PMR.B1 = enable;
-					if(i2c) {
-						PORTE::ODR0.B4 = 1;  // PE2 N-OpenDrain
-						PORTE::ODR0.B2 = 1;  // PE1 N-OpenDrain
-					}
 				}
 				break;
 
