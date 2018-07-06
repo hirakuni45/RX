@@ -19,6 +19,7 @@
 #include "common/qspi_io.hpp"
 #include "sound/audio_out.hpp"
 #include "sound/mp3_in.hpp"
+#include "sound/wav_in.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"

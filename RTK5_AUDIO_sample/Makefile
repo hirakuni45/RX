@@ -44,8 +44,8 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX600 ../RX56x ../libmad
 
-LIB_ROOT	=	../libmad/.libs
-USER_LIBS	=	mad
+LIB_ROOT	=	../libmad/.libs ../jpeg-6b
+USER_LIBS	=	mad jpeg
 
 OPTIMIZE	=	-O3
 
