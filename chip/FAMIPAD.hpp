@@ -1,7 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ファミリーコンピューター JOY PAD 読み込み
+	@brief	ファミリーコンピューター JOY PAD 読み込み @n
+			CMOS 4021B Shift Register
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n

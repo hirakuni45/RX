@@ -43,10 +43,12 @@ EUI_XX：
 ・25AA02E48/25AA02E64
 ・Interface: SPI
 
+
 LTC2348_16：
 ・LINEAR TECHNOLOGY
 ・Octal, 16-Bit, 200ksps Differential +-10.24V Input SoftSpan ADC
 ・Interface: wide SPI
+
 
 MAX7219：
 ・Maxim Integrated
@@ -65,12 +67,6 @@ NTCTH：
 ・muRata
 ・NTC サーミスタ
 ・Interface: Analog
-
-
-phy_base：
-・各社
-・10/100 Mbps Ethernet PHY
-・Interface: RMMI
 
 
 SH1106：
@@ -124,3 +120,9 @@ VL53L0X：
 ・http://www.st.com/ja/imaging-and-photonics-solutions/vl53l0x.html
 ・Interface: I2C
 
+
+AD9833：
+・ANALOG DEVICES
+・Programmable Waveform Generator
+・http://www.analog.com/media/jp/technical-documentation/data-sheets/AD9833_JP.pdf
+・Interface: SPI

@@ -3,6 +3,7 @@
 /*!	@file
 	@brief	AD9833 class @n
 			ANALOG DEVICES @n
+			Programmable Waveform Generator @n
 			Interface: SPI, Vcc: 3.3V to 5V
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
@@ -163,6 +164,7 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクタ
+			@param[in]	spi	SPI インターフェース・クラス
 		 */
 		//-----------------------------------------------------------------//
 		AD9833(SPI& spi) noexcept : spi_(spi),
@@ -178,7 +180,7 @@ namespace chip {
 			@brief	開始
 		 */
 		//-----------------------------------------------------------------//
-		void start()
+		void start() noexcept
 		{
 			SEL::DIR = 1;  // output
 		}
@@ -189,7 +191,7 @@ namespace chip {
 			@brief	デバイスをリセットする
 		 */
 		//-----------------------------------------------------------------//
-		void reset()
+		void reset() noexcept
 		{
 			write_(RESET_CMD);
 			utils::delay::milli_second(10);
@@ -203,7 +205,7 @@ namespace chip {
 			@param[in]	freq	周波数（０＜＝１２．５ＭＨｚ）
 		 */
 		//-----------------------------------------------------------------//
-		void set_frequency(REGISTERS regs, float freq)
+		void set_frequency(REGISTERS regs, float freq) noexcept
 		{
 			if(freq > 12.5e6 ) {
 				freq = 12.5e6;
@@ -240,7 +242,7 @@ namespace chip {
 			@param[in]	phase	フェーズ [0 to 360]
 		 */
 		//-----------------------------------------------------------------//
-		void set_phase(REGISTERS regs, float phase)
+		void set_phase(REGISTERS regs, float phase) noexcept
 		{
 			float ph = fmod(phase, 360.0f);
 			if(ph < 0.0f) ph += 360.0f;
@@ -268,7 +270,7 @@ namespace chip {
 			@param[in]	form	波形タイプ
 		 */
 		//-----------------------------------------------------------------//
-		void set_waveform(REGISTERS regs, WAVE_FORM form)
+		void set_waveform(REGISTERS regs, WAVE_FORM form) noexcept
 		{
 			if(regs == REGISTERS::REG0) {
 				wave_form0_ = get_form_(form);
@@ -285,7 +287,7 @@ namespace chip {
 			@param[in]	ena		無効にする場合「false」
 		 */
 		//-----------------------------------------------------------------//
-		void enable_output(bool ena = true)
+		void enable_output(bool ena = true) noexcept
 		{
 			output_enabled_ = ena;
 			write_ctrl_();
@@ -299,7 +301,7 @@ namespace chip {
 			@param[in]	ph_regs	フェーズレジスタ選択
 		 */
 		//-----------------------------------------------------------------//
-		void set_output_source(REGISTERS fq_regs, REGISTERS ph_regs)
+		void set_output_source(REGISTERS fq_regs, REGISTERS ph_regs) noexcept
 		{
 			active_freq_ = fq_regs;
 			if(ph_regs == REGISTERS::SAME_AS_REG0) {
@@ -321,7 +323,7 @@ namespace chip {
 			@param[in]	phase	フェーズ
 		 */
 		//-----------------------------------------------------------------//
-		void setup(WAVE_FORM form, REGISTERS fq_regs, float freq, REGISTERS ph_regs, float phase)
+		void setup(WAVE_FORM form, REGISTERS fq_regs, float freq, REGISTERS ph_regs, float phase) noexcept
 		{
 			set_frequency(fq_regs, freq);
 			set_phase(ph_regs, phase);
