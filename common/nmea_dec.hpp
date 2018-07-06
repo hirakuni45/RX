@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	NMEA デコード・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -175,7 +175,7 @@ namespace utils {
             @brief  コンストラクター
         */
         //-----------------------------------------------------------------//
-		nmea_dec(SCI_IO& sci) : sci_(sci), pos_(0), sidx_(0), id_(0), iid_(0) {
+		nmea_dec(SCI_IO& sci) noexcept : sci_(sci), pos_(0), sidx_(0), id_(0), iid_(0) {
 			line_[0] = 0;
 			time_[0] = 0;
 			lat_[0] = 0;
@@ -198,7 +198,7 @@ namespace utils {
 			@return 処理ＩＤ
         */
         //-----------------------------------------------------------------//
-		uint32_t get_id() const { return id_; }
+		uint32_t get_id() const noexcept { return id_; }
 
 
         //-----------------------------------------------------------------//
@@ -207,7 +207,7 @@ namespace utils {
 			@return 情報処理ＩＤ
         */
         //-----------------------------------------------------------------//
-		uint32_t get_iid() const { return iid_; }
+		uint32_t get_iid() const noexcept { return iid_; }
 
 
         //-----------------------------------------------------------------//
@@ -216,7 +216,7 @@ namespace utils {
 			@return 時間
         */
         //-----------------------------------------------------------------//
-		const char* get_time() const { return time_; }
+		const char* get_time() const noexcept { return time_; }
 
 
         //-----------------------------------------------------------------//
@@ -225,7 +225,7 @@ namespace utils {
 			@return 日付
         */
         //-----------------------------------------------------------------//
-		const char* get_date() const { return date_; }
+		const char* get_date() const noexcept { return date_; }
 
 
         //-----------------------------------------------------------------//
@@ -234,7 +234,7 @@ namespace utils {
 			@return 時間「time_t」
         */
         //-----------------------------------------------------------------//
-		time_t get_gmtime() const {
+		time_t get_gmtime() const noexcept {
 			tm ts;
 			ts.tm_sec  = get_dec_(&time_[4], 2);
 			ts.tm_min  = get_dec_(&time_[2], 2);
@@ -253,7 +253,7 @@ namespace utils {
 			@return 緯度
         */
         //-----------------------------------------------------------------//
-		const char* get_lat() const { return lat_; }
+		const char* get_lat() const noexcept { return lat_; }
 
 
         //-----------------------------------------------------------------//
@@ -262,7 +262,7 @@ namespace utils {
 			@return 経度
         */
         //-----------------------------------------------------------------//
-		const char* get_lon() const { return lon_; }
+		const char* get_lon() const noexcept { return lon_; }
 
 
         //-----------------------------------------------------------------//
@@ -271,7 +271,7 @@ namespace utils {
 			@return 品質
         */
         //-----------------------------------------------------------------//
-		const char* get_quality() const { return q_; }
+		const char* get_quality() const noexcept { return q_; }
 
 
         //-----------------------------------------------------------------//
@@ -280,7 +280,7 @@ namespace utils {
 			@return 衛星数
         */
         //-----------------------------------------------------------------//
-		const char* get_satellite() const { return satellite_; }
+		const char* get_satellite() const noexcept { return satellite_; }
 
 
         //-----------------------------------------------------------------//
@@ -289,7 +289,7 @@ namespace utils {
 			@return 水平品質
         */
         //-----------------------------------------------------------------//
-		const char* get_holizontal_quality() const { return hq_; }
+		const char* get_holizontal_quality() const noexcept { return hq_; }
 
 
         //-----------------------------------------------------------------//
@@ -298,7 +298,7 @@ namespace utils {
 			@return 海抜高度
         */
         //-----------------------------------------------------------------//
-		const char* get_altitude() const { return alt_; }
+		const char* get_altitude() const noexcept { return alt_; }
 
 
         //-----------------------------------------------------------------//
@@ -307,7 +307,7 @@ namespace utils {
 			@return 海抜高度単位
         */
         //-----------------------------------------------------------------//
-		const char* get_altitude_unit() const { return alt_unit_; }
+		const char* get_altitude_unit() const noexcept { return alt_unit_; }
 
 
         //-----------------------------------------------------------------//
@@ -317,7 +317,7 @@ namespace utils {
 			@return 衛星情報
         */
         //-----------------------------------------------------------------//
-		const sat_info& get_satellite_info(uint16_t idx) const
+		const sat_info& get_satellite_info(uint16_t idx) const noexcept
 		{
 			if(idx < sinfo_num_) {
 				return sinfo_[idx];
@@ -345,7 +345,7 @@ namespace utils {
 			@return 更新されたら「true」
         */
         //-----------------------------------------------------------------//
-		bool service()
+		bool service() noexcept
 		{
 			char ch;
 			bool ret = false;
@@ -374,7 +374,7 @@ namespace utils {
 			@param[in]	bpsno	ボーレート番号
 		 */
 		//-----------------------------------------------------------------//
-		void set_baudrate(BAUDRATE bpsno)
+		void set_baudrate(BAUDRATE bpsno) noexcept
 		{
 //			"$PMTK251,38400*27\r\n"
 // SUP500 GPS
@@ -428,4 +428,3 @@ namespace utils {
 		}
 	};
 }
-
