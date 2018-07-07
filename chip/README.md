@@ -5,11 +5,11 @@
 I2C、SPI、等のインターフェースで通信を行うデバイス制御クラス
    
 ## デバイス・リスト
- - BMP180
-1.BOSCH
-2.digital barometric pressure sensor
-3.<http://akizukidenshi.com/catalog/g/gI-06585/>
-4.Interface: I2C
+ - BMP180   
+*BOSCH   
+*digital barometric pressure sensor   
+*<http://akizukidenshi.com/catalog/g/gI-06585/>   
+*Interface: I2C   
    
  - BMP280：
 ・BOSCH
