@@ -126,7 +126,7 @@ namespace {
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
 
-	typedef device::drw2d_mgr<device::DRW2D> DRW2D_MGR;
+	typedef device::drw2d_mgr<device::DRW2D, 480, 272> DRW2D_MGR;
 	DRW2D_MGR	drw2d_mgr_;
 
 	typedef graphics::font8x16 AFONT;
@@ -395,7 +395,7 @@ int main(int argc, char** argv)
 		auto ver = drw2d_mgr_.get_version();
 		utils::format("DRW2D Version: %04X\n") % ver;
 
-		if(drw2d_mgr_.start()) {
+		if(drw2d_mgr_.start(0x00000000)) {
 			utils:: format("Start DRW2D\n");
 		} else {
 			utils:: format("DRW2D Fail\n");
