@@ -82,7 +82,7 @@ namespace device {
 			_250K    = 250000,	///< 250K b.p.s.
 			_300K    = 300000,	///< 300K b.p.s.
 			_350K    = 350000,	///< 350K b.p.s.
-			FAST     = 400000,	///< 400K b.p.s. (Fast mode)
+			FAST     = 400000,	///< 400K b.p.s. (Fast mode) 60MHz では、対応していません。
 		};
 
 	private:
@@ -162,21 +162,31 @@ namespace device {
 
 		void i2c_start_() noexcept
 		{
+			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSTAREQ.b() |
 						 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
-			while(SCI::SIMR3.IICSTIF() == 0) sleep_();
+			uint32_t n = 0;
+			while(SCI::SIMR3.IICSTIF() == 0) {
+				++n;
+			}
+			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSCLS.b(0b00) | SCI::SIMR3.IICSDAS.b(0b00);
+//			utils::format("Start sync: %d\n") % n;
 		}
 
 
 		void i2c_stop_() noexcept
 		{
+			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSTPREQ.b() |
 						 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
+			uint32_t n = 0;
 			while(SCI::SIMR3.IICSTIF() == 0) {
-				sleep_();
+				++n;
 			}
+			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSCLS.b(0b11) | SCI::SIMR3.IICSDAS.b(0b11);
+//			utils::format("Stop sync: %d\n") % n;
 		}
 
 	public:
@@ -277,73 +287,6 @@ namespace device {
 				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b();
 			} else {
 				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
-			}
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  簡易 SPI を有効にする
-			@param[in]	master	マスターモードの場合「true」
-			@param[in]	bps	ビットレート
-			@param[in]	level	割り込みレベル（０の場合ポーリング）
-			@return エラーなら「false」
-		*/
-		//-----------------------------------------------------------------//
-		bool start_spi(bool master, uint32_t bps, uint8_t level = 0)  noexcept
-		{
-			send_stall_ = true;
-			level_ = level;
-
-			power_cfg::turn(SCI::get_peripheral());
-
-			SCI::SCR = 0x00;			// TE, RE disable.
-
-			uint32_t brr = F_PCLKB / bps / 2;
-			if(brr & 1) { brr >>= 1; ++brr; }
-			else { brr >>= 1; }
-			uint8_t cks = 0;
-			while(brr > 256) {
-				brr >>= 2;
-				++cks;
-			}
-			if(cks > 3 || brr > 256) return false;
-
-			set_intr_();
-
-			// LSB(0), MSB(1) first
-			SCI::SCMR.SDIR = 1;
-
-			SCI::SIMR1.IICM = 0;
-			SCI::SMR = cks | SCI::SMR.CM.b();
-			SCI::SPMR.SSE = 0;		///< SS 端子制御しない「０」
-
-			if(master) {
-				SCI::SPMR.MSS = 0;
-			} else {
-				SCI::SPMR.MSS = 1;
-			}
-
-			// クロックタイミング種別選択
-			SCI::SPMR.CKPOL = 0;
-			SCI::SPMR.CKPH  = 0;
-
-			if(brr) --brr;
-			SCI::BRR = static_cast<uint8_t>(brr);
-
-			uint8_t scr = 0;
-			if(master) {
-				scr = SCI::SCR.CKE.b(0b01);
-			} else {
-				scr = SCI::SCR.CKE.b(0b10);
-			}
-
-			if(level_) {
-				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
-			} else {
-				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
 			}
 
 			return true;
@@ -478,6 +421,73 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  簡易 SPI を有効にする
+			@param[in]	master	マスターモードの場合「true」
+			@param[in]	bps	ビットレート
+			@param[in]	level	割り込みレベル（０の場合ポーリング）
+			@return エラーなら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool start_spi(bool master, uint32_t bps, uint8_t level = 0)  noexcept
+		{
+			send_stall_ = true;
+			level_ = level;
+
+			power_cfg::turn(SCI::get_peripheral());
+
+			SCI::SCR = 0x00;			// TE, RE disable.
+
+			uint32_t brr = F_PCLKB / bps / 2;
+			if(brr & 1) { brr >>= 1; ++brr; }
+			else { brr >>= 1; }
+			uint8_t cks = 0;
+			while(brr > 256) {
+				brr >>= 2;
+				++cks;
+			}
+			if(cks > 3 || brr > 256) return false;
+
+			set_intr_();
+
+			// LSB(0), MSB(1) first
+			SCI::SCMR.SDIR = 1;
+
+			SCI::SIMR1.IICM = 0;
+			SCI::SMR = cks | SCI::SMR.CM.b();
+			SCI::SPMR.SSE = 0;		///< SS 端子制御しない「０」
+
+			if(master) {
+				SCI::SPMR.MSS = 0;
+			} else {
+				SCI::SPMR.MSS = 1;
+			}
+
+			// クロックタイミング種別選択
+			SCI::SPMR.CKPOL = 0;
+			SCI::SPMR.CKPH  = 0;
+
+			if(brr) --brr;
+			SCI::BRR = static_cast<uint8_t>(brr);
+
+			uint8_t scr = 0;
+			if(master) {
+				scr = SCI::SCR.CKE.b(0b01);
+			} else {
+				scr = SCI::SCR.CKE.b(0b10);
+			}
+
+			if(level_) {
+				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
+			} else {
+				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
+			}
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  送受信（SPI）
 			@param[in]	ch	送信データ
 			@return	受信データ
@@ -551,13 +561,14 @@ namespace device {
 			}
 
 			uint32_t clk = static_cast<uint32_t>(spd);
-			uint32_t brr = F_PCLKB / clk * 4;
+			uint32_t brr = F_PCLKB * 8 / clk;
 			uint32_t mddr = ((brr & 0xff00) << 8) / brr;
 			brr >>= 8;
-			if(brr >= 256 || brr == 0) {
+			if(brr >= 256 || brr <= 1) {
 				return false;
 			}
 			--brr;
+//			utils::format("BRR: %d\n") % static_cast<uint16_t>(brr);
 
 			level_ = level;
 
@@ -568,16 +579,16 @@ namespace device {
 
 			SCI::SIMR3 = SCI::SIMR3.IICSDAS.b(0b11) | SCI::SIMR3.IICSCLS.b(0b11);
 			SCI::SMR   = 0x00;
-			SCI::SCMR  = SCI::SCMR.SDIR.b(1);
+			SCI::SCMR  = SCI::SCMR.SDIR.b();
 			SCI::BRR   = brr;
 			SCI::MDDR  = mddr;
 
 			bool brme = false;
 			if(mddr >= 128) brme = true;
 			// NFEN: ノイズ除去有効の場合「１」
-			SCI::SEMR = SCI::SEMR.NFEN.b(1) | SCI::SEMR.BRME.b(brme);
+			SCI::SEMR = SCI::SEMR.NFEN.b(0) | SCI::SEMR.BRME.b(brme);
 			SCI::SNFR = SCI::SNFR.NFCS.b(0b001);  // 1/1
-			SCI::SIMR1 = SCI::SIMR1.IICM.b(0b01) | SCI::SIMR1.IICDL.b(0b00001); 
+			SCI::SIMR1 = SCI::SIMR1.IICM.b() | SCI::SIMR1.IICDL.b(0b00001); 
 			SCI::SIMR2 = SCI::SIMR2.IICACKT.b() | SCI::SIMR2.IICCSC.b() | SCI::SIMR2.IICINTM.b();
 
 			SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
@@ -599,24 +610,28 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool send(uint8_t adr, const void* src, uint32_t siz) noexcept
 		{
-			if(src == nullptr || siz < 1) return false;
+			if(src == nullptr || siz == 0) return false;
 
 			i2c_start_();
 
 			SCI::TDR = adr << 1;  // R/W = 0 (write)
 
+			while(SCI::SSR.TDRE() == 0) {
+				sleep_();
+			}
+
 			const uint8_t* p = static_cast<const uint8_t*>(src);
 			while(siz > 0) {
-				while(SCI::SSR.TEND() == 0) {
-					sleep_();
-				}
 				if(SCI::SISR.IICACKR()) {
 					break;
 				}
 				SCI::TDR = *p++;
-				--siz;		
+				--siz;
+				while(SCI::SSR.TDRE() == 0) {
+					sleep_();
+				}
 			}
-
+///			utils::format("send count: %d\n") % siz;
 			i2c_stop_();
 
 			return true;
@@ -634,19 +649,23 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool recv(uint8_t adr, void* dst, uint32_t siz) noexcept
 		{
-			if(dst == nullptr || siz < 1) return false;
+			if(dst == nullptr || siz == 0) return false;
 
 			i2c_start_();
 
 			SCI::TDR = (adr << 1) | 1;  // R/W = 1 (read)
+			uint32_t n = 0;
+			while(SCI::SSR.TDRE() == 0) {
+				++n;
+			}
+			utils::format("recv: send slave address: %d\n") % n;
 
-			while(SCI::SSR.RDRF() == 0) {
-				sleep_();
-			}
-			if(SCI::SISR.IICACKR() == 0) {
+			if(SCI::SISR.IICACKR() != 0) {
+				utils::format("Recv Ack fail...\n");
 				i2c_stop_();
-				return true;
+				return false;
 			}
+
 			SCI::SIMR2.IICACKT = 0;
 
 			uint8_t* p = static_cast<uint8_t*>(dst);
@@ -657,7 +676,7 @@ namespace device {
 				}
 				*p++ = SCI::RDR();
 				--siz;
-				while(SCI::SSR.TEND() == 0) {
+				while(SCI::SSR.TDRE() == 0) {
 					sleep_();
 				}
 			}
@@ -668,7 +687,7 @@ namespace device {
 				sleep_();
 			}
 			*p = SCI::RDR();
-			while(SCI::SSR.TEND() == 0) {
+			while(SCI::SSR.TDRE() == 0) {
 				sleep_();
 			}
 
