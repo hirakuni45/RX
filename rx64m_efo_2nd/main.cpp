@@ -24,7 +24,7 @@
 
 namespace {
 
-	static const int main_version_ = 101;
+	static const int main_version_ = 103;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -146,6 +146,9 @@ namespace {
 					trg_pos_ = cap_pos_;
 					cap_cnt_ = req_cnt_;
 				}
+				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
+				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
+
 				++cap_pos_;
 				cap_pos_ &= CAP_BUFF_SIZE - 1;
 				ch0_src_[cap_pos_] = eadc_.convert_1();
@@ -359,8 +362,11 @@ int main(int argc, char** argv)
 	device::PORT2::PDR.B4 = 1;  // (33)
 	device::PORT2::PDR.B3 = 1;  // (34)
 	device::PORT2::PDR.B2 = 1;  // (35)
-
+	device::PORT2::PDR.B1 = 1;  // (36)
+	device::PORT2::PDR.B0 = 1;  // (37)
 	device::PORT1::PDR.B7 = 1;  // (38)
+	device::PORT8::PDR.B7 = 1;  // (39)
+
 	device::PORT8::PDR.B6 = 1;  // (41)
 	device::PORT1::PDR.B5 = 1;  // (42)
 	device::PORT1::PDR.B4 = 1;  // (43)
@@ -376,6 +382,7 @@ int main(int argc, char** argv)
 	device::PORT5::PDR.B0 = 1;  // (56)
 
 	device::PORT8::PDR.B3 = 1;  // (58)
+
 	device::PORTC::PDR.B6 = 1;  // (61)
 	device::PORTC::PDR.B5 = 1;  // (62)
 	device::PORT8::PDR.B2 = 1;  // (63)
@@ -391,7 +398,7 @@ int main(int argc, char** argv)
 	device::PORTC::PDR.B1 = 1;  // (73)
 
 	device::PORTC::PDR.B0 = 1;  // (75)
-	device::PORT8::PDR.B7 = 1;  // (77)
+	device::PORT7::PDR.B3 = 1;  // (77)
 	device::PORTB::PDR.B7 = 1;  // (78)
 	device::PORTB::PDR.B6 = 1;  // (79)
 	device::PORTB::PDR.B5 = 1;  // (80)
@@ -451,10 +458,7 @@ int main(int argc, char** argv)
 	device::PORT4::PDR.B2 = 1;  // (138)
 	device::PORT4::PDR.B1 = 1;  // (139)
 
-	device::PORT4::PDR.B0 = 1;  // (141)
-
 	device::PORT0::PDR.B7 = 1;  // (144)
-
 
 	device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
 
@@ -641,6 +645,8 @@ int main(int argc, char** argv)
 				if(edge_ == 0) trg_slope_ = true;
 				else trg_slope_ = false;
 				if(length_ == 0) {
+					cap_cnt_ = 1;
+					trg_enable_ = false;
 					cap_enable_ = true;
 					send_task_ = SEND_TASK::SINGLE;
 				} else {
