@@ -24,7 +24,7 @@
 
 namespace {
 
-	static const int main_version_ = 103;
+	static const int main_version_ = 104;
 	static const uint32_t build_id_ = B_ID;
 
 	enum class CMD : uint8_t {
@@ -146,8 +146,6 @@ namespace {
 					trg_pos_ = cap_pos_;
 					cap_cnt_ = req_cnt_;
 				}
-				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
-				asm("nop"); asm("nop"); asm("nop"); asm("nop"); asm("nop");
 
 				++cap_pos_;
 				cap_pos_ &= CAP_BUFF_SIZE - 1;
