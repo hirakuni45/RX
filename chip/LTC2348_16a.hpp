@@ -240,9 +240,10 @@ namespace chip {
 
 		inline uint16_t convert_2()
 		{
+			CNV::P = 1;  // 変換開始
 			uint16_t data = spi_.xchg32_sync() >> 8;
 			CSN::P = 1;
-			CNV::P = 1;  // 変換開始
+///			CNV::P = 1;  // 変換開始
 			return data;
 		}
 
