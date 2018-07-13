@@ -35,6 +35,9 @@ Envision Kit RX65N で実現する NES(ファミコン) エミュレーター
  - エミュレーションは、おおよそ、1MBits ROM １個の場合まで可能。
  - メモリーの余裕が殆どありませんから、同じような構成でも起動出来ない場合があります。
    
+## 参考動画
+<https://www.youtube.com/watch?v=frRI-cbzGus>
+   
 -----
    
 License
