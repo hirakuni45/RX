@@ -25,6 +25,9 @@ Envision Kit RX65N で実現する Space Invaders エミュレーター
  - make する。
  - side.mot ファイルを書き込む。
    
+## 参考動画
+<https://www.youtube.com/watch?v=AkgoFYMugng>
+   
 -----
    
 License
