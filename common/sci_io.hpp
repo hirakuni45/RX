@@ -577,21 +577,45 @@ namespace device {
 			SCI::SCR = 0x00;		// TE, RE disable. CKE = 0
 			port_map::turn(SCI::get_peripheral(), true, PSEL);
 
+// SCI6.SIMR3.BIT.IICSDAS = 3;
+// SCI6.SIMR3.BIT.IICSCLS = 3;
 			SCI::SIMR3 = SCI::SIMR3.IICSDAS.b(0b11) | SCI::SIMR3.IICSCLS.b(0b11);
+// SCI6.SMR.BYTE = 0x01;
 			SCI::SMR   = 0x00;
+// SCI6.SCMR.BIT.SDIR = 1;
+// SCI6.SCMR.BIT.SINV = 0;
+// SCI6.SCMR.BIT.SMIF = 0;
 			SCI::SCMR  = SCI::SCMR.SDIR.b();
+// SCI6.BRR = 48000000 / ((64/2) * u32_BaudRate) - 1;
 			SCI::BRR   = brr;
 			SCI::MDDR  = mddr;
 
 			bool brme = false;
 			if(mddr >= 128) brme = true;
 			// NFEN: ノイズ除去有効の場合「１」
+// SCI6.SEMR.BIT.NFEN = 0;
 			SCI::SEMR = SCI::SEMR.NFEN.b(0) | SCI::SEMR.BRME.b(brme);
+// SCI6.SNFR.BIT.NFCS = 0;
 			SCI::SNFR = SCI::SNFR.NFCS.b(0b001);  // 1/1
+// SCI6.SIMR1.BIT.IICM = 1;
+// SCI6.SIMR1.BIT.IICDL = 0;
 			SCI::SIMR1 = SCI::SIMR1.IICM.b() | SCI::SIMR1.IICDL.b(0b00001); 
+// SCI6.SIMR2.BIT.IICACKT = 1;
+// SCI6.SIMR2.BIT.IICCSC = 1;
+// SCI6.SIMR2.BIT.IICINTM = 1;
 			SCI::SIMR2 = SCI::SIMR2.IICACKT.b() | SCI::SIMR2.IICCSC.b() | SCI::SIMR2.IICINTM.b();
-
+// SCI6.SPMR.BYTE = 0;
+			SCI::SPMR = 0x00;
+// SCI6.SCR.BYTE = 0x30;
 			SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
+#if 0
+IR(SCI6, RXI6) = 0;
+   IR(SCI6, TXI6) = 0;
+IEN(SCI6, RXI6) = 1;
+   IEN(SCI6, TXI6) = 1;
+IPR(SCI6, TXI6) = 3;
+IPR(SCI6, RXI6) = 3;
+#endif
 
 			crlf_ = false;
 
