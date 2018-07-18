@@ -50,6 +50,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void turn(peripheral t, bool ena = true)
 		{
+			device::SYSTEM::PRCR = 0xA500 | device::SYSTEM::PRCR.PRC1.b();
+
 			bool f = !ena;
 			switch(t) {
 			case peripheral::CMT0:
@@ -214,6 +216,7 @@ namespace device {
 			default:
 				break;
 			}
+			device::SYSTEM::PRCR = 0xA500;
 		}
 	};
 }

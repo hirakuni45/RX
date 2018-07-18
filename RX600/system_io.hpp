@@ -69,6 +69,9 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKD.b(2);  // 1/4 (240/4=60)
 			device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
+
+			// クロック関係書き込み不許可
+			device::SYSTEM::PRCR = 0xA500;
 		}
 	};
 
