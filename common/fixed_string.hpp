@@ -10,6 +10,7 @@
 //=====================================================================//
 #include <algorithm>
 #include <cstring>
+#include <iterator>
 
 namespace utils {
 
@@ -37,6 +38,7 @@ namespace utils {
 				pos_ = std::strlen(text_);
 			}
 			text_[pos_] = 0;
+			text_[SIZE] = 0;
 		}
 
 
@@ -71,6 +73,42 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  配列の先頭
+			@return 配列の先頭
+		*/
+		//-----------------------------------------------------------------//
+		const char* begin() const noexcept { return &text_[0]; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  配列の先頭
+			@return 配列の先頭
+		*/
+		//-----------------------------------------------------------------//
+		char* begin() noexcept { return &text_[0]; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  配列の終端
+			@return 配列の終端
+		*/
+		//-----------------------------------------------------------------//
+		const char* end() const noexcept { return &text_[pos_]; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  配列の終端
+			@return 配列の終端
+		*/
+		//-----------------------------------------------------------------//
+		char* end() noexcept { return &text_[pos_]; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  文字列を返す
 			@return 文字列
 		*/
@@ -98,7 +136,21 @@ namespace utils {
 			@return 自分
 		*/
 		//-----------------------------------------------------------------//
-		fixed_string& operator = (const fixed_string& src) {
+		fixed_string& operator = (const char* src) noexcept {
+			std::strncpy(text_, src, SIZE);
+			pos_ = std::strlen(text_);
+			return *this;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  代入
+			@param[in]	src	ソース
+			@return 自分
+		*/
+		//-----------------------------------------------------------------//
+		fixed_string& operator = (const fixed_string& src) noexcept {
 			std::strncpy(text_, src.c_str(), SIZE);
 			pos_ = src.pos_;
 			return *this;
@@ -112,7 +164,7 @@ namespace utils {
 			@return 自分
 		*/
 		//-----------------------------------------------------------------//
-		fixed_string& operator += (char ch) {
+		fixed_string& operator += (char ch) noexcept {
 			if(pos_ < SIZE) {
 				text_[pos_] = ch;
 				++pos_;
@@ -129,7 +181,7 @@ namespace utils {
 			@return 自分
 		*/
 		//-----------------------------------------------------------------//
-		fixed_string& operator += (const char* str) {
+		fixed_string& operator += (const char* str) noexcept {
 			if(str == nullptr) {
 				return *this;
 			}
@@ -186,7 +238,7 @@ namespace utils {
 			@return 同じなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool operator == (const char* text) const { return cmp(text); }
+		bool operator == (const char* text) const noexcept { return cmp(text); }
 
 
 		//-----------------------------------------------------------------//
@@ -196,7 +248,7 @@ namespace utils {
 			@return 同じなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool operator != (const char* text) const { return !cmp(text); }
+		bool operator != (const char* text) const noexcept { return !cmp(text); }
 
 
 		//-----------------------------------------------------------------//
@@ -206,7 +258,7 @@ namespace utils {
 			@return 同じなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool operator == (const fixed_string& th) const {
+		bool operator == (const fixed_string& th) const noexcept {
 			return std::strcmp(c_str(), th.c_str()) == 0;
 		}
 
@@ -218,7 +270,7 @@ namespace utils {
 			@return 同じなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool operator != (const fixed_string& th) const {
+		bool operator != (const fixed_string& th) const noexcept {
 			return std::strcmp(c_str(), th.c_str()) != 0;
 		}
 	};
