@@ -17,7 +17,7 @@
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
 #include "common/qspi_io.hpp"
-#include "sound/audio_out.hpp"
+#include "sound/sound_out.hpp"
 #include "sound/mp3_in.hpp"
 #include "sound/wav_in.hpp"
 #include "graphics/font8x16.hpp"
@@ -100,8 +100,8 @@ namespace {
 	typedef device::dac_out<DAC> DAC_OUT;
 	DAC_OUT		dac_out_;
 
-	typedef utils::audio_out<8192, 1024> AUDIO_OUT;
-	AUDIO_OUT	audio_out_;
+	typedef utils::sound_out<8192, 1024> SOUND_OUT;
+	SOUND_OUT	sound_out_;
 
 	class tpu_task {
 	public:
@@ -109,7 +109,7 @@ namespace {
 			uint32_t tmp = wpos_;
 			++wpos_;
 			if((tmp ^ wpos_) & 64) {
-				audio_out_.service(64);
+				sound_out_.service(64);
 			}
 		}
 	};
@@ -126,8 +126,8 @@ namespace {
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
 
-	typedef device::drw2d_mgr<device::DRW2D> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_;
+//	typedef device::drw2d_mgr<device::DRW2D> DRW2D_MGR;
+//	DRW2D_MGR	drw2d_mgr_;
 
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont<16, 16, 64> KFONT;
@@ -139,7 +139,7 @@ namespace {
 	typedef graphics::filer<SDC, RENDER> FILER;
 	FILER		filer_(sdc_, render_);
 
-	typedef audio::mp3_in MP3_IN;
+	typedef sound::mp3_in MP3_IN;
 	MP3_IN		mp3_in_;
 
 	uint8_t		pad_level_;
@@ -199,19 +199,19 @@ namespace {
 	}
 
 
-	void mp3_tag_task_(const audio::tag_t& tag)
+	void mp3_tag_task_(const sound::tag_t& tag)
 	{
 		render_.clear(RENDER::COLOR::Black);
-		utils::format("Album:  '%s'\n") % tag.album_;
-		render_.draw_text(0, 0 * 20, tag.album_);
-		utils::format("Title:  '%s'\n") % tag.title_;
-		render_.draw_text(0, 1 * 20, tag.title_);
-		utils::format("Artist: '%s'\n") % tag.artist_;
-		render_.draw_text(0, 2 * 20, tag.artist_);
-		utils::format("Year:    %s\n") % tag.year_;
-		render_.draw_text(0, 3 * 20, tag.year_);
-		utils::format("Track:   %s\n") % tag.track_;
-		render_.draw_text(0, 4 * 20, tag.track_);
+		utils::format("Album:  '%s'\n") % tag.album_.c_str();
+		render_.draw_text(0, 0 * 20, tag.album_.c_str());
+		utils::format("Title:  '%s'\n") % tag.title_.c_str();
+		render_.draw_text(0, 1 * 20, tag.title_.c_str());
+		utils::format("Artist: '%s'\n") % tag.artist_.c_str();
+		render_.draw_text(0, 2 * 20, tag.artist_.c_str());
+		utils::format("Year:    %s\n") % tag.year_.c_str();
+		render_.draw_text(0, 3 * 20, tag.year_.c_str());
+		utils::format("Track:   %s\n") % tag.track_.c_str();
+		render_.draw_text(0, 4 * 20, tag.track_.c_str());
 	}
 
 
@@ -229,7 +229,6 @@ namespace {
 
 	bool play_mp3_(const char* fname)
 	{
-// utils::format("MP3: '%s'\n") % fname;
 		utils::file_io fin;
 		if(!fin.open(fname, "rb")) {
 			return false;
@@ -237,7 +236,7 @@ namespace {
 		mp3_in_.set_ctrl_task(mp3_ctrl_task_);
 		mp3_in_.set_tag_task(mp3_tag_task_);
 		mp3_in_.set_update_task(mp3_update_task_);
-		bool ret = mp3_in_.decode(fin, audio_out_);
+		bool ret = mp3_in_.decode(fin, sound_out_);
 		fin.close();
 		return ret;
 	}
@@ -267,11 +266,10 @@ namespace {
 		} else {
 			const char* ext = strrchr(name, '.');
 			if(ext != nullptr) {
-///				if(strcmp(ext, ".wav") == 0) {
-///					play_wav_(name);
-///				} else if(strcmp(ext, ".mp3") == 0) {
 				if(strcmp(ext, ".mp3") == 0) {
 					play_mp3_(name);
+///				else if(strcmp(ext, ".wav") == 0) {
+///					play_wav_(name);
 				}
 			}
 		}
@@ -476,7 +474,7 @@ int main(int argc, char** argv)
 	}
 
 	// 波形メモリーの無音状態初期化
-	audio_out_.mute();
+	sound_out_.mute();
 
 	{  // サンプリング・タイマー設定
 		set_sample_rate(44100);
@@ -485,8 +483,8 @@ int main(int argc, char** argv)
 	{  // DMAC マネージャー開始
 		uint8_t intr_level = 4;
 		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(audio_out_.get_wave()), DAC::DADR0.address(),
-			audio_out_.size(), intr_level);
+			reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
+			sound_out_.size(), intr_level);
 		if(!ret) {
 			utils::format("DMAC Not start...\n");
 		}
@@ -517,7 +515,7 @@ int main(int argc, char** argv)
 			utils::format("GLCDC Fail\n");
 		}
 	}
-
+#if 0
 	{  // DRW2D 初期化
 		auto ver = drw2d_mgr_.get_version();
 		utils::format("DRW2D Version: %04X\n") % ver;
@@ -528,7 +526,7 @@ int main(int argc, char** argv)
 			utils:: format("DRW2D Fail\n");
 		}
 	}
-
+#endif
 	{
 		PAD_VCC::DIR = 1;
 		PAD_VCC::P = 1;

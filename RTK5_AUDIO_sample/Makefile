@@ -25,8 +25,6 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c
 
-# r_lcd/r_glcdc_rx_pinset.c
-
 PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp \
 				graphics/font8x16.cpp
