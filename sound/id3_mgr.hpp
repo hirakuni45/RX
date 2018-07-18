@@ -61,24 +61,24 @@ namespace audio {
 			uint32_t dstlen = 0;
 			switch(id) {
 			case ID::TIT2:
-				dst = tag_.title_;
-				dstlen = sizeof(tag_.title_);
+				dst = tag_.title_.begin();
+				dstlen = tag_.title_.capacity();
 				break;
 			case ID::TPE1:
-				dst = tag_.artist_;
-				dstlen = sizeof(tag_.artist_);
+				dst = tag_.artist_.begin();
+				dstlen = tag_.artist_.capacity();
 				break;
 			case ID::TALB:
-				dst = tag_.album_;
-				dstlen = sizeof(tag_.album_);
+				dst = tag_.album_.begin();
+				dstlen = tag_.album_.capacity();
 				break;
 			case ID::TYER:
-				dst = tag_.year_;
-				dstlen = sizeof(tag_.year_);
+				dst = tag_.year_.begin();
+				dstlen = tag_.year_.capacity();
 				break;
 			case ID::TRCK:
-				dst = tag_.track_;
-				dstlen = sizeof(tag_.track_);
+				dst = tag_.track_.begin();
+				dstlen = tag_.track_.capacity();
 				break;
 			default:
 				break;
@@ -89,12 +89,6 @@ namespace audio {
 				return false;
 			}
 			--len;
-
-			if(dst == nullptr) {
-				utils::format("No load, Code: %d\n") % static_cast<uint16_t>(code);
-				fin.seek(utils::file_io::SEEK::CUR, len);
-				return false;
-			}
 
 			if(code == 0x00) {  // ISO-8859-1
 				char tmp[len + 1];

@@ -143,14 +143,14 @@ namespace audio {
 							char* dst = nullptr;
 							uint32_t dstlen = 0;
 							if(std::strncmp(rch.szChunkName, "IART", 4) == 0) {
-								dst = tag.album_;
-								dstlen = sizeof(tag.album_);
+								dst = tag.album_.begin();
+								dstlen = tag.album_.capacity();
 							} else if(std::strncmp(rch.szChunkName, "INAM", 4) == 0) {
-								dst = tag.title_;
-								dstlen = sizeof(tag.title_);
+								dst = tag.title_.begin();
+								dstlen = tag.title_.capacity();
 							} else if(std::strncmp(rch.szChunkName, "IPRD", 4) == 0) {
-								dst = tag.artist_;
-								dstlen = sizeof(tag.artist_);
+								dst = tag.artist_.begin();
+								dstlen = tag.artist_.capacity();
 							}
 							uint16_t n = rch.ulChunkSize;
 							if(n & 1) ++n;
