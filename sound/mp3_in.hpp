@@ -13,58 +13,21 @@
 #include "common/file_io.hpp"
 #include "sound/audio_out.hpp"
 #include "sound/id3_mgr.hpp"
+#include "sound/af_play.hpp"
 
 extern "C" {
 	void set_sample_rate(uint32_t freq);
 };
 
-namespace audio {
+namespace sound {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	MP3 形式デコード・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class mp3_in {
-	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief	制御列挙型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CTRL {
-			NONE,		///< 何もしない
-			STOP,		///< 停止
-			PAUSE,		///< 一時停止
-			REPLAY,		///< 曲の先頭に戻って再生
-		};
+	class mp3_in : public af_play {
 
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief	制御タスク型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef CTRL (*CTRL_TASK)();
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief	情報タスク型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef void (*TAG_TASK)(const tag_t&);
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief	更新タスク型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef void (*UPDATE_TASK)(uint32_t);
-
-
-	private:
 		static const uint32_t INPUT_BUFFER_SIZE = 2048;
 
 		mad_stream	mad_stream_;
@@ -81,9 +44,6 @@ namespace audio {
 
 		uint32_t		time_;
 
-		CTRL_TASK		ctrl_task_;
-		TAG_TASK		tag_task_;
-		UPDATE_TASK		update_task_;
 
 		int fill_read_buffer_(utils::file_io& fin, mad_stream& strm)
  		{
@@ -229,44 +189,7 @@ namespace audio {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		mp3_in() : subband_filter_enable_(false), id3v1_(false), time_(0),
-				   ctrl_task_(nullptr), tag_task_(nullptr), update_task_(nullptr) { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	制御タスクの設定
-			@param[in]	task	制御タスク
-		*/
-		//-----------------------------------------------------------------//
-		void set_ctrl_task(CTRL_TASK task)
-		{
-			ctrl_task_ = task;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	タグ・タスクの設定
-			@param[in]	task	タグ・タスク
-		*/
-		//-----------------------------------------------------------------//
-		void set_tag_task(TAG_TASK task)
-		{
-			tag_task_ = task;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	アップデート・タスクの設定
-			@param[in]	task	アップデート・タスク
-		*/
-		//-----------------------------------------------------------------//
-		void set_update_task(UPDATE_TASK task)
-		{
-			update_task_ = task;
-		}
+		mp3_in() : subband_filter_enable_(false), id3v1_(false), time_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -363,7 +286,7 @@ namespace audio {
 				for(uint32_t i = 0; i < mad_synth_.pcm.length; ++i) {
 					while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
 					}
-					audio::wave_t t;
+					sound::wave_t t;
 					if(MAD_NCHANNELS(&mad_frame_.header) == 1) {
 						t.l_ch = t.r_ch = MadFixedToSshort(mad_synth_.pcm.samples[0][i]);
 					} else {
@@ -393,4 +316,3 @@ namespace audio {
 		}
 	};
 }
-

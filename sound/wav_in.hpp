@@ -13,15 +13,16 @@
 #include "common/format.hpp"
 #include "sound/audio_out.hpp"
 #include "sound/tag.hpp"
+#include "sound/af_play.hpp"
 
-namespace audio {
+namespace sound {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	WAV 形式ファイルクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class wav_in {
+	class wav_in : public af_play {
 
 		struct WAVEFILEHEADER {
 			char	   	szRIFF[4];

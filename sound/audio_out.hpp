@@ -10,7 +10,7 @@
 //=====================================================================//
 #include "common/fixed_fifo.hpp"
 
-namespace audio {
+namespace sound {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -41,11 +41,11 @@ namespace utils {
 	class audio_out {
 	public:
 
-		typedef utils::fixed_fifo<audio::wave_t, BFS> FIFO;		
+		typedef utils::fixed_fifo<sound::wave_t, BFS> FIFO;		
 
 	private:
 
-		audio::wave_t	wave_[OUTS];
+		sound::wave_t	wave_[OUTS];
 		uint32_t	w_put_;
 
 		FIFO		fifo_;
@@ -89,7 +89,7 @@ namespace utils {
 			@return 波形
 		*/
 		//-----------------------------------------------------------------//
-		audio::wave_t* get_wave(uint32_t pos = 0) noexcept { return &wave_[pos]; }
+		sound::wave_t* get_wave(uint32_t pos = 0) noexcept { return &wave_[pos]; }
 
 
 		//-----------------------------------------------------------------//
