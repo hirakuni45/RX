@@ -19,7 +19,7 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
-#include "sound/audio_out.hpp"
+#include "sound/sound_out.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
@@ -104,8 +104,8 @@ namespace {
 	typedef device::dac_out<DAC> DAC_OUT;
 	DAC_OUT		dac_out_;
 
-	typedef utils::audio_out<1024, 512> AUDIO_OUT;
-	AUDIO_OUT	audio_out_;
+	typedef utils::sound_out<1024, 512> SOUND_OUT;
+	SOUND_OUT	sound_out_;
 
 	class tpu_task {
 	public:
@@ -113,7 +113,7 @@ namespace {
 			uint32_t tmp = wpos_;
 			++wpos_;
 			if((tmp ^ wpos_) & 64) {
-				audio_out_.service(64);
+				sound_out_.service(64);
 			}
 		}
 	};
@@ -139,9 +139,6 @@ namespace {
 
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
-		if(!f) {
-			utils::format("SD card not mount.\n");
-		}
 		return f;
 	}
 
@@ -213,11 +210,11 @@ namespace {
 		uint32_t len = nesemu_.get_audio_len();
 		const uint16_t* wav = nesemu_.get_audio_buf();
 		for(uint32_t i = 0; i < len; ++i) {
-			while((audio_out_.at_fifo().size() - audio_out_.at_fifo().length()) < 8) {
+			while((sound_out_.at_fifo().size() - sound_out_.at_fifo().length()) < 8) {
 			}
-			audio::wave_t t;
+			sound::wave_t t;
 			t.l_ch = t.r_ch = *wav++;
-			audio_out_.at_fifo().put(t);
+			sound_out_.at_fifo().put(t);
 		}
 	}
 }
@@ -343,7 +340,7 @@ int main(int argc, char** argv)
 	}
 
 	// 波形メモリーの無音状態初期化
-	audio_out_.mute();
+	sound_out_.mute();
 
 	{  // サンプリング・タイマー設定（初期 44.1KHz ）
 //		set_sample_rate(44100);
@@ -353,8 +350,8 @@ int main(int argc, char** argv)
 	{  // DMAC マネージャー開始
 		uint8_t intr_level = 4;
 		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(audio_out_.get_wave()), DAC::DADR0.address(),
-			audio_out_.size(), intr_level);
+			reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
+			sound_out_.size(), intr_level);
 		if(!ret) {
 			utils::format("DMAC Not start...\n");
 		}
@@ -395,6 +392,7 @@ int main(int argc, char** argv)
 	uint8_t n = 0;
 	uint8_t flt = 0;
 	bool filer = false;
+	bool mount = check_mount_();
 	while(1) {
 		glcdc_io_.sync_vpos();
 		fami_pad_data_ = famipad_.update();
@@ -408,10 +406,22 @@ int main(int argc, char** argv)
 
 		uint32_t ctrl = 0;
 		if(flt >= 120) {
-			audio_out_.mute();
+			sound_out_.mute();
 			graphics::set(graphics::filer_ctrl::OPEN, ctrl);
 			filer = true;
 			flt = 0;
+		}
+
+		{
+			bool m = check_mount_();
+			if(!mount && m) {
+				render_.fill(480-24, 0, 24, 16, 0x0000);
+			}
+			if(mount && !m) {
+				render_.draw_text(480-24, 0, "?SD");
+				filer = false;
+			}
+			mount = m;
 		}
 
 		if(filer) {
