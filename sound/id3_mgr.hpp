@@ -84,6 +84,11 @@ namespace audio {
 				break;
 			}
 
+			if(dst == nullptr) {
+				fin.seek(utils::file_io::SEEK::CUR, len);
+				return false;
+			}
+
 			uint8_t code;
 			if(fin.read(&code, 1) != 1) {
 				return false;
@@ -282,6 +287,8 @@ namespace audio {
 			ver_ = get16_(&tmp[3]);
 			flag_ = static_cast<uint8_t>(tmp[5]);
 			size_ = get_size_syncsafe_(&tmp[6]);
+
+///			utils::format("FS: %d\n") % fin.get_file_size();
 
 			utils::format("ID3v2: Ver: %04X, Flag: %02X (%d)\n")
 				% ver_ % static_cast<uint16_t>(flag_) % size_;
