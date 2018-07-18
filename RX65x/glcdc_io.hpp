@@ -1841,14 +1841,6 @@ namespace device {
 			void* ly2 = reinterpret_cast<void*>(0x0)) noexcept
 		{
 			cfg_t cfg;
-			//
-			// Set the BGEN.SWRST bit to 1 to release the GLCDC from a software reset
-			//
-			// R_GLCDC_Open function release the GLCDC from a software reset.
-			//
-			// Set the frequency of the LCD_CLK and PXCLK to suit the format
-			// and set the PANELCLK.CLKEN bit to 1
-			//
 			cfg.output.clksrc = GLCDC_CLK_SRC_INTERNAL;   			  // Select PLL clock
 			cfg.output.clock_div_ratio = GLCDC_PANEL_CLK_DIVISOR_24;  // 240 / 24 = 10 MHz
   																      // No frequency division
