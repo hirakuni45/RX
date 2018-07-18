@@ -25,7 +25,7 @@ namespace emu {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class spinv {
 	public:
-		typedef audio::snd_mgr<9, 6, 184> SND_MGR;
+		typedef sound::snd_mgr<9, 6, 184> SND_MGR;
 
 	private:
 		InvadersMachine im_;

@@ -15,7 +15,7 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
-#include "sound/audio_out.hpp"
+#include "sound/sound_out.hpp"
 
 #include "chip/FAMIPAD.hpp"
 
@@ -96,8 +96,8 @@ namespace {
 	typedef device::dac_out<DAC> DAC_OUT;
 	DAC_OUT		dac_out_;
 
-	typedef utils::audio_out<1024, 256> AUDIO_OUT;
-	AUDIO_OUT	audio_out_;
+	typedef utils::sound_out<1024, 256> SOUND_OUT;
+	SOUND_OUT	sound_out_;
 
 	class tpu_task {
 	public:
@@ -105,7 +105,7 @@ namespace {
 			uint32_t tmp = wpos_;
 			++wpos_;
 			if((tmp ^ wpos_) & 64) {
-				audio_out_.service(64);
+				sound_out_.service(64);
 			}
 		}
 	};
@@ -290,7 +290,7 @@ int main(int argc, char** argv)
 	}
 
 	// 波形メモリーの無音状態初期化
-	audio_out_.mute();
+	sound_out_.mute();
 
 	{  // サンプリング・タイマー設定
 		set_sample_rate(11127);
@@ -299,8 +299,8 @@ int main(int argc, char** argv)
 	{  // DMAC マネージャー開始
 		uint8_t intr_level = 4;
 		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(audio_out_.get_wave()), DAC::DADR0.address(),
-			audio_out_.size(), intr_level);
+			reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
+			sound_out_.size(), intr_level);
 		if(!ret) {
 			utils::format("DMAC Not start...\n");
 		}
@@ -363,11 +363,11 @@ int main(int argc, char** argv)
 			uint32_t len = snd.get_length();
 			const int16_t* wav = snd.get_buffer();
 			for(uint32_t i = 0; i < len; ++i) {
-				while((audio_out_.at_fifo().size() - audio_out_.at_fifo().length()) < 8) {
+				while((sound_out_.at_fifo().size() - sound_out_.at_fifo().length()) < 8) {
 				}
-				audio::wave_t t;
+				sound::wave_t t;
 				t.l_ch = t.r_ch = *wav++;
-				audio_out_.at_fifo().put(t);
+				sound_out_.at_fifo().put(t);
 			}
 		}
 
