@@ -176,6 +176,7 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
    binutils-2.30, gcc-6.4.0, newlib-2.4.0 ---> OK (current)
    binutils-2.30, gcc-6.4.0, newlib-3.0.0 ---> NG 
 ```
+ - 最新の gcc を使った方がより高速なコードになるようで、C++ の場合に特に効果が大きいです。
    
 ---
    
