@@ -31,14 +31,14 @@ namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	オーディオ出力クラス
+		@brief	サウンド出力クラス
 		@param[in]	BFS		fifo バッファのサイズ
 		@param[in]	OUTS	出力バッファのサイズ @n
 							２のＮ乗サイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<uint32_t BFS, uint32_t OUTS>
-	class audio_out {
+	class sound_out {
 	public:
 
 		typedef utils::fixed_fifo<sound::wave_t, BFS> FIFO;		
@@ -56,7 +56,7 @@ namespace utils {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		audio_out() noexcept : w_put_(0), fifo_()
+		sound_out() noexcept : w_put_(0), fifo_()
 		{ }
 
 

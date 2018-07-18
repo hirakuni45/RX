@@ -11,7 +11,6 @@
 #include <cstring>
 #include "common/file_io.hpp"
 #include "common/format.hpp"
-#include "sound/audio_out.hpp"
 #include "sound/tag.hpp"
 #include "sound/af_play.hpp"
 

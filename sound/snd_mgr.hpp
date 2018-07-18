@@ -13,7 +13,7 @@
 #include <memory>
 #include "sound/wav_in.hpp"
 
-namespace audio {
+namespace sound {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!

@@ -11,7 +11,6 @@
 //=====================================================================//
 #include <mad.h>
 #include "common/file_io.hpp"
-#include "sound/audio_out.hpp"
 #include "sound/id3_mgr.hpp"
 #include "sound/af_play.hpp"
 
