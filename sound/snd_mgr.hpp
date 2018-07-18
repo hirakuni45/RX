@@ -110,7 +110,8 @@ namespace sound {
 			}
 
 			wav_in wav;
-			if(!wav.load_header(&in.at_fd())) {
+			tag_t tag;
+			if(!wav.load_header(in, tag)) {
 				in.close();
 				return false;
 			}
