@@ -18,11 +18,12 @@
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
+#include "chip/FT5206.hpp"
 
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
+//	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
@@ -58,16 +59,18 @@ namespace {
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
 
+	static const int16_t LCD_X = 480;
+	static const int16_t LCD_Y = 272;
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, 480, 272, device::PIX_TYPE::RGB565> GLCDC_IO;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, device::PIX_TYPE::RGB565> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
 
 	// QSPI B グループ
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
 
-	typedef device::drw2d_mgr<device::DRW2D> DRW2D_MGR;
+	typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y> DRW2D_MGR;
 	DRW2D_MGR	drw2d_mgr_;
 
 	typedef graphics::font8x16 AFONT;
@@ -77,6 +80,15 @@ namespace {
 	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
 	RENDER		render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
 
+	// FT5206, SCI6 簡易 I2C 定義
+	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+	typedef utils::fixed_fifo<char, 4> RECV6_BUFF;
+	typedef utils::fixed_fifo<char, 4> SEND6_BUFF;
+	typedef device::sci_io<device::SCI6, RECV6_BUFF, SEND6_BUFF,
+			device::port_map::option::FIRST_I2C> SCI_I2C;
+	SCI_I2C		sci_i2c_;
+	typedef chip::FT5206<SCI_I2C> FT5206;
+	FT5206		ft5206_(sci_i2c_);
 
 	utils::command<256> cmd_;
 
@@ -251,11 +263,22 @@ int main(int argc, char** argv)
 		}
 	}
 
+	{
+		FT5206_RESET::DIR = 1;
+		FT5206_RESET::P = 0;
+		utils::delay::milli_second(10);
+		FT5206_RESET::P = 1;
+		if(!sci_i2c_.start_i2c(SCI_I2C::I2C_SPEED::STANDARD)) {
+			utils::format("SCI6/I2C Start Fail...\n");
+		}
+		ft5206_.start();
+	}
+
 	{  // DRW2D 初期化
 		auto ver = drw2d_mgr_.get_version();
 		utils::format("DRW2D Version: %04X\n") % ver;
 
-		if(drw2d_mgr_.start()) {
+		if(drw2d_mgr_.start(0x00000000)) {
 			utils:: format("Start DRW2D\n");
 		} else {
 			utils:: format("DRW2D Fail\n");
@@ -271,6 +294,8 @@ int main(int argc, char** argv)
 //	bool sw2 = SW2::P();
 	while(1) {
 		glcdc_io_.sync_vpos();
+
+		ft5206_.update();
 
 		sdc_.service(sdh_.service());
 
@@ -290,6 +315,7 @@ int main(int argc, char** argv)
 				render_.draw_text(0, 16*6, "012:;,.(i),[i],{i},{|}.(`)\n", true);
 			}
 		}
+
 #if 0
 		{  // SW2 の検出
 			auto f = SW2::P();
