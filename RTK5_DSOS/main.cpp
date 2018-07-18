@@ -18,7 +18,7 @@
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
 #include "common/qspi_io.hpp"
-#include "sound/audio_out.hpp"
+#include "sound/sound_out.hpp"
 #include "sound/mp3_in.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
@@ -100,8 +100,8 @@ namespace {
 	typedef device::dac_out<DAC> DAC_OUT;
 	DAC_OUT		dac_out_;
 
-	typedef utils::audio_out<8192, 1024> AUDIO_OUT;
-	AUDIO_OUT	audio_out_;
+	typedef utils::sound_out<8192, 1024> SOUND_OUT;
+	SOUND_OUT	sound_out_;
 
 	class tpu_task {
 	public:
@@ -109,7 +109,7 @@ namespace {
 			uint32_t tmp = wpos_;
 			++wpos_;
 			if((tmp ^ wpos_) & 64) {
-				audio_out_.service(64);
+				sound_out_.service(64);
 			}
 		}
 	};
@@ -122,12 +122,12 @@ namespace {
 	typedef device::glcdc_io<device::GLCDC, 480, 272, device::PIX_TYPE::RGB565> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
 
+	typedef device::drw2d_mgr<device::DRW2D, 480, 272> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_;
+
 	// QSPI B グループ
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
-
-	typedef device::drw2d_mgr<device::DRW2D, 480, 272> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_;
 
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont<16, 16, 64> KFONT;
@@ -349,7 +349,7 @@ int main(int argc, char** argv)
 	}
 
 	// 波形メモリーの無音状態初期化
-	audio_out_.mute();
+	sound_out_.mute();
 
 	{  // サンプリング・タイマー設定
 		set_sample_rate(44100);
@@ -358,8 +358,8 @@ int main(int argc, char** argv)
 	{  // DMAC マネージャー開始
 		uint8_t intr_level = 4;
 		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(audio_out_.get_wave()), DAC::DADR0.address(),
-			audio_out_.size(), intr_level);
+			reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
+			sound_out_.size(), intr_level);
 		if(!ret) {
 			utils::format("DMAC Not start...\n");
 		}
@@ -367,12 +367,6 @@ int main(int argc, char** argv)
 
 	utils::format("RTK5RX65N Start for AUDIO sample\n");
 //	cmd_.set_prompt("# ");
-
-	{  // QSPI の初期化（Flash Memory Read/Write Interface)
-		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
-			utils::format("QSPI not start.\n");
-		}
-	}
 
 	{  // GLCDC の初期化
 		LCD_DISP::DIR  = 1;
@@ -399,6 +393,12 @@ int main(int argc, char** argv)
 			utils:: format("Start DRW2D\n");
 		} else {
 			utils:: format("DRW2D Fail\n");
+		}
+	}
+
+	{  // QSPI の初期化（Flash Memory Read/Write Interface)
+		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
+			utils::format("QSPI not start.\n");
 		}
 	}
 
