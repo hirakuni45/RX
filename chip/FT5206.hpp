@@ -148,10 +148,20 @@ namespace chip {
 		{
 			uint8_t tmp[3];
 			tmp[0] = static_cast<uint8_t>(REG::ID_G_LIB_VERSION_H);
-			i2c_.send(FT5206_ADR, tmp, 1);
-			i2c_.recv(FT5206_ADR, tmp, sizeof(tmp));
+			if(!i2c_.send(FT5206_ADR, tmp, 1)) {
+				utils::format("Send fail\n");
+				return false;
+			}
+			tmp[0] = 0xff;
+			tmp[1] = 0xff;
+			tmp[2] = 0xff;
+			if(!i2c_.recv(FT5206_ADR, tmp, sizeof(tmp))) {
+				utils::format("Recv fail\n");
+				return false;
+			}
 			uint16_t ver = (static_cast<uint16_t>(tmp[0]) << 8) | tmp[1];
-			utils::format("Ver: %04X, Chip: %02X\n") % ver % static_cast<uint16_t>(tmp[2]);
+			utils::format("FT5206 Version: %04X, Chip: %02X\n")
+				% ver % static_cast<uint16_t>(tmp[2]);
 
 			write_(REG::DEVICE_MODE, 0x00);
 
