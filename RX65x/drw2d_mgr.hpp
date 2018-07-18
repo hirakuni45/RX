@@ -16,11 +16,14 @@ namespace device {
 	/*!
 		@brief  DRW2D 制御／マネージャー
 		@param[in]	DRW		DRW2D クラス
+		@param[in]	XSIZE	X 方向ピクセルサイズ
+		@param[in]	YSIZE	Y 方向ピクセルサイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class DRW>
+	template <class DRW, int16_t XSIZE, int16_t YSIZE>
 	class drw2d_mgr {
 
+		uint32_t	fba_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -28,7 +31,7 @@ namespace device {
 			@brief	コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		drw2d_mgr() noexcept
+		drw2d_mgr() noexcept : fba_(0)
 		{ }
 
 
@@ -44,15 +47,26 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
+			@param[in]	fba		フレーム・バッファ・アドレス
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start() noexcept
+		bool start(uint32_t fba) noexcept
 		{
+			// DRW2D power management
+			power_cfg::turn(DRW::get_peripheral());
+
+			DRW::SIZE.X = XSIZE;
+			DRW::SIZE.Y = YSIZE;
+
+			fba_ = fba;
+
+
 
 
 			return true;
 		}
+
 
 	};
 }
