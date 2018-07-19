@@ -23,7 +23,15 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class I2C>
 	class FT5206 {
+	public:
+		struct xy {
+			uint8_t		st;
+			uint16_t	x;
+			uint16_t	y;
+			xy() : st(0), x(0), y(0) { }
+		};
 
+	private:
 		static const uint8_t	FT5206_ADR = 0x38;
 
 		I2C&	i2c_;
@@ -87,6 +95,7 @@ namespace chip {
 		};
 
 		uint8_t		touch_num_;
+		xy			xy_[2];
 
 
 		void write_(REG reg, uint8_t data) noexcept
@@ -118,14 +127,19 @@ namespace chip {
 		}
 
 
-		void read_xy_(REG reg, uint16_t& x, uint16_t& y) noexcept
+		void read_touch_() noexcept
 		{
-			uint8_t tmp[4];
-			tmp[0] = static_cast<uint8_t>(reg);
+			uint8_t tmp[10];
+			tmp[0] = static_cast<uint8_t>(REG::TOUCH_XH);
 			i2c_.send(FT5206_ADR, tmp, 1);
 			i2c_.recv(FT5206_ADR, tmp, sizeof(tmp));
-			x = static_cast<uint16_t>(tmp[0]) | static_cast<uint16_t>(tmp[1]);
-			y = static_cast<uint16_t>(tmp[2]) | static_cast<uint16_t>(tmp[3]);
+			xy_[0].st = tmp[0] >> 6;
+			xy_[0].x = (static_cast<uint16_t>(tmp[0] & 0x3F) << 8) | static_cast<uint16_t>(tmp[1]);
+			xy_[0].y = (static_cast<uint16_t>(tmp[2]) << 8) | static_cast<uint16_t>(tmp[3]);
+
+			xy_[1].st = tmp[6] >> 6;
+			xy_[1].x = (static_cast<uint16_t>(tmp[6] & 0x3F) << 8) | static_cast<uint16_t>(tmp[7]);
+			xy_[1].y = (static_cast<uint16_t>(tmp[8]) << 8) | static_cast<uint16_t>(tmp[9]);
 		}
 
 	public:
@@ -176,16 +190,29 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		void update() noexcept
 		{
-#if 0
-			auto id = read_(REG::GEST_ID);
-			if(id != 0) {
-				utils::format("%02X\n") % static_cast<uint16_t>(id);
+			touch_num_ = read_(REG::TD_STATUS);
+			if(touch_num_ != 0) {
+				read_touch_();
 			}
-#endif
-//			uint16_t x;
-//			uint16_t y;
-//			read_xy_(REG::TOUCH_XH, x, y);
-//			if(x & 0b
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タッチ数を取得
+			@return タッチ数
+		 */
+		//-----------------------------------------------------------------//
+		uint8_t get_touch_num() const noexcept { return touch_num_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タッチ位置を取得
+			@param[in]	idx	タッチ・インデックス（０～１）
+			@return タッチ位置
+		 */
+		//-----------------------------------------------------------------//
+		const xy& get_touch_pos(uint8_t idx) const noexcept { return xy_[idx & 1]; }
 	};
 }
