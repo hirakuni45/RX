@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ソフト制御 I2C テンプレートクラス 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -28,10 +28,10 @@ namespace device {
 			@brief  I2C の速度タイプ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class speed : uint8_t {
-			standard,	///< 100K b.p.s. (Standard mode)
-			fast,		///< 400K b.p.s. (Fast mode)
-			fast_plus,	///< 1M b.p.s. (Fast plus mode)
+		enum class SPEED : uint8_t {
+			STANDARD,	///< 100K b.p.s. (Standard mode)
+			FAST,		///< 400K b.p.s. (Fast mode)
+			FAST_PLUS,	///< 1M b.p.s. (Fast plus mode)
 		};
 
 
@@ -195,7 +195,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(speed spd)
+		bool start(SPEED spd)
 		{
 			SCL::OD = 1;
 			SDA::OD = 1;
@@ -203,9 +203,9 @@ namespace device {
 			SDA::DIR = 1;
 			SCL::P = 1;
 			SDA::P = 1;
-			if(spd == speed::standard) {
+			if(spd == SPEED::STANDARD) {
 				set_standard();
-			} else if(spd == speed::fast) {
+			} else if(spd == SPEED::FAST) {
 				set_fast();
 			} else {
 				error_ = error::start;
