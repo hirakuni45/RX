@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  RX64M AUDIO（WAV ファイルの再生） サンプル @n
+    @brief  RX64M SOUND（WAV ファイルの再生） サンプル @n
 			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
 			・DA0(P03):Left、DA1(P05):Right からアナログ出力する。@n
 			・WAV 形式ファイルの再生 @n
@@ -33,17 +33,12 @@
 #include "common/sdc_man.hpp"
 #include "common/string_utils.hpp"
 #include "common/tpu_io.hpp"
+#include "sound/sound_out.hpp"
 #include "sound/wav_in.hpp"
+#include "sound/mp3_in.hpp"
 
 // GR-KAEDE の場合有効にする。
 // #define GR_KAEDE
-
-// MP3 のデコードを有効にする場合
-#define MP3
-
-#ifdef MP3
-#include "sound/mp3_in.hpp"
-#endif
 
 namespace {
 
@@ -114,8 +109,8 @@ namespace {
 	typedef device::dac_out<DAC> DAC_OUT;
 	DAC_OUT		dac_out_;
 
-	typedef utils::audio_out<8192, 1024> AUDIO_OUT;
-	AUDIO_OUT	audio_out_;
+	typedef utils::sound_out<8192, 1024> SOUND_OUT;
+	SOUND_OUT	sound_out_;
 
 	class tpu_task {
 	public:
@@ -123,13 +118,161 @@ namespace {
 			uint32_t tmp = wpos_;
 			++wpos_;
 			if((tmp ^ wpos_) & 64) {
-				audio_out_.service(64);
+				sound_out_.service(64);
 			}
 		}
 	};
 
 	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
 	TPU0		tpu0_;	
+
+	typedef sound::mp3_in MP3_IN;
+	MP3_IN		mp3_in_;
+	typedef sound::wav_in WAV_IN;
+	WAV_IN		wav_in_;
+
+	void update_led_()
+	{
+		static uint8_t n = 0;
+		++n;
+		if(n >= 30) {
+			n = 0;
+		}
+		if(n < 10) {
+			LED::P = 0;
+		} else {
+			LED::P = 1;
+		}
+	}
+
+
+	sound::af_play::CTRL sound_ctrl_task_()
+	{
+		auto ctrl = sound::af_play::CTRL::NONE;
+
+#if 0
+		uint8_t level = famipad_.update();
+		uint8_t ptrg = ~pad_level_ &  level;
+		uint8_t ntrg =  pad_level_ & ~level;
+		pad_level_ = level;
+
+		if(chip::on(ptrg, chip::FAMIPAD_ST::SELECT)) {
+			ctrl = sound::af_play::CTRL::PAUSE;
+		}
+		if(chip::on(ptrg, chip::FAMIPAD_ST::RIGHT)) {
+			ctrl = sound::af_play::CTRL::STOP;
+		}
+		if(chip::on(ptrg, chip::FAMIPAD_ST::LEFT)) {
+			ctrl = sound::af_play::CTRL::REPLAY;
+		}
+		if(chip::on(ptrg, chip::FAMIPAD_ST::START)) {
+			ctrl = sound::af_play::CTRL::STOP;
+			sdc_.stall_dir_list();
+			render_.clear(RENDER::COLOR::Black);
+		}
+#endif
+		update_led_();
+
+		return ctrl;
+	}
+
+
+	void sound_tag_task_(const sound::tag_t& tag)
+	{
+		utils::format("Album:  '%s'\n") % tag.album_.c_str();
+		utils::format("Title:  '%s'\n") % tag.title_.c_str();
+		utils::format("Artist: '%s'\n") % tag.artist_.c_str();
+		utils::format("Year:    %s\n") % tag.year_.c_str();
+		utils::format("Disc:    %s\n") % tag.disc_.c_str();
+		utils::format("Track:   %s\n") % tag.track_.c_str();
+	}
+
+
+	void sound_update_task_(uint32_t t)
+	{
+		uint16_t sec = t % 60;
+		uint16_t min = (t / 60) % 60;
+		uint16_t hor = (t / 3600) % 24;
+		utils::format("\r%02d:%02d:%02d") % hor % min % sec;
+	}
+
+
+	bool play_mp3_(const char* fname)
+	{
+		utils::file_io fin;
+		if(!fin.open(fname, "rb")) {
+			return false;
+		}
+		mp3_in_.set_ctrl_task(sound_ctrl_task_);
+		mp3_in_.set_tag_task(sound_tag_task_);
+		mp3_in_.set_update_task(sound_update_task_);
+		bool ret = mp3_in_.decode(fin, sound_out_);
+		fin.close();
+		return ret;
+	}
+
+
+	bool play_wav_(const char* fname)
+	{
+		utils::file_io fin;
+		if(!fin.open(fname, "rb")) {
+			return false;
+		}
+		wav_in_.set_ctrl_task(sound_ctrl_task_);
+		wav_in_.set_tag_task(sound_tag_task_);
+		wav_in_.set_update_task(sound_update_task_);
+		bool ret = wav_in_.decode(fin, sound_out_);
+		fin.close();
+		return ret;
+	}
+
+
+	void play_loop_(const char*, const char*);
+
+
+	struct loop_t {
+		const char*	start;
+		bool	enable;
+	};
+
+
+	void play_loop_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+	{
+		loop_t* t = static_cast<loop_t*>(option);
+		if(t->enable) {
+			if(strcmp(name, t->start) != 0) {
+				return;
+			} else {
+				t->enable = false;
+			}
+		}
+		if(dir) {
+			play_loop_(name, "");
+		} else {
+			const char* ext = strrchr(name, '.');
+			if(ext != nullptr) {
+				if(strcmp(ext, ".mp3") == 0) {
+					play_mp3_(name);
+				} else if(strcmp(ext, ".wav") == 0) {
+					play_wav_(name);
+				}
+			}
+		}
+	}
+
+
+	void play_loop_(const char* root, const char* start)
+	{
+		loop_t t;
+		t.start = start;
+		if(strlen(start) != 0) {
+			t.enable = true;
+		} else {
+			t.enable = false;
+		}
+		sdc_.set_dir_list_limit(1);
+		sdc_.start_dir_list(root, play_loop_func_, true, &t);
+	}
 }
 
 
@@ -225,226 +368,6 @@ extern "C" {
 }
 
 
-namespace {
-
-	audio::wav_in	wav_in_;
-	void play_wav_(const char* fname);
-
-#ifdef MP3
-	audio::mp3_in	mp3_in_;
-	void play_mp3_(const char* fname);
-#endif
-
-	void play_loop_(const char*);
-
-
-	void play_loop_func_(const char* name, const FILINFO* fi, bool dir, void* option)
-	{
-		if(dir) {
-			play_loop_(name);
-		} else {
-			const char* ext = strrchr(name, '.');
-			if(ext != nullptr) {
-				if(strcmp(ext, ".wav") == 0) {
-					play_wav_(name);
-				} else if(strcmp(ext, ".mp3") == 0) {
-					play_mp3_(name);
-				}
-			}
-		}
-	}
-
-
-	void play_loop_(const char* root)
-	{
-		sdc_.set_dir_list_limit(1);
-		sdc_.start_dir_list(root, play_loop_func_);
-	}
-
-
-	void play_wav_(const char* fname)
-	{
-		if(!sdc_.get_mount()) {
-///			master_.at_task().set_param(4, 0, 2, 0x80);
-			utils::format("SD Card unmount.\n");
-			return;
-		}
-
-		FIL fil;
-		if(!sdc_.open(&fil, fname, FA_READ)) {
-			audio_out_.mute();
-			utils::format("Can't open input file: '%s'\n") % fname;
-			return;
-		}
-
-		if(!wav_in_.load_header(&fil)) {
-			audio_out_.mute();
-			f_close(&fil);
-			utils::format("WAV file load fail: '%s'\n") % fname;
-			return;
-		}
-
-		auto fsize = wav_in_.get_size();
-		utils::format("File:   '%s'\n") % fname;
-		utils::format("Size:    %d\n") % fsize;
-		utils::format("Rate:    %d\n") % wav_in_.get_rate();
-		utils::format("Channel: %d\n") % static_cast<uint32_t>(wav_in_.get_channel());
-		utils::format("Bits:    %d\n") % static_cast<uint32_t>(wav_in_.get_bits());
-
-		auto ti = wav_in_.get_time();
-		utils::format("Time:   %02d:%02d:%02d\n") % (ti / 3600) % (ti / 60) % (ti % 60);
-
-		set_sample_rate(wav_in_.get_rate());
-
-		{  // Supports: 8/16 bits, 1(mono)/2(stereo) chennel
-			auto ch = wav_in_.get_channel();
-			auto bt = wav_in_.get_bits();
-			if(bt == 8 && ch <= 2) {
-			} else if(bt == 16 && ch <= 2) {
-			} else {
-				f_close(&fil);
-				utils::format("Fail WAV file format (8 or 16 bits, mono/stereo): '%s'\n") % fname;
-				return;
-			}
-		}
-
-		uint32_t fpos = 0;
-		uint16_t wpos = get_wave_pos_();
-		uint16_t pos = wpos;
-		uint8_t n = 0;
-		bool pause = false;
-		uint8_t s_time = 0;
-		uint8_t m_time = 0;
-		uint8_t h_time = 0;
-		uint16_t btime = 0;
-		uint16_t dtime = 512 / (wav_in_.get_bits() / 8) / wav_in_.get_channel();
-		uint16_t nnn = wpos & 0x380;
-		while(fpos < fsize) {
-			if(!pause) {
-				while(((wpos ^ pos) & 128) == 0) {
-					pos = get_wave_pos_();
-				}
-				uint32_t unit = (wav_in_.get_bits() / 8) * wav_in_.get_channel();
-				UINT br;
-				uint8_t tmp[512];
-				if(f_read(&fil, tmp, unit * 128, &br) != FR_OK) {
-					utils::format("f_read fail abort: '%s'\n") % fname;
-					audio_out_.mute();
-					break;
-				}
-				audio::wave_t* dst = audio_out_.get_wave((nnn + 512) & 0x3ff);
-				if(wav_in_.get_bits() == 16) {
-					const uint16_t* src = reinterpret_cast<const uint16_t*>(tmp);
-					for(uint32_t i = 0; i < 128; ++i) {
-						if(wav_in_.get_channel() == 2) {
-							dst[i].l_ch = src[0] ^ 0x8000;
-							dst[i].r_ch = src[1] ^ 0x8000;
-							src += 2;
-						} else {
-							dst[i].l_ch = src[0] ^ 0x8000;
-							dst[i].r_ch = dst[i].l_ch;
-							++src;
-						}
-					}
-				} else {  // 8 bits
-					const uint8_t* src = reinterpret_cast<const uint8_t*>(tmp);
-					for(uint32_t i = 0; i < 128; ++i) {
-						if(wav_in_.get_channel() == 2) {
-							dst[i].l_ch = static_cast<uint16_t>(src[0] ^ 0x80) << 8;
-							dst[i].l_ch |= (src[0] & 0x7f) << 1;
-							dst[i].r_ch = static_cast<uint16_t>(src[1] ^ 0x80) << 8;
-							dst[i].l_ch |= (src[1] & 0x7f) << 1;
-							src += 2;
-						} else {
-							dst[i].l_ch = static_cast<uint16_t>(src[0] ^ 0x80) << 8;
-							dst[i].l_ch |= (src[0] & 0x7f) << 1;
-							dst[i].r_ch = dst[i].l_ch;
-							++src;
-						}
-					}
-				}
-				nnn += 128;
-				fpos += unit * 128;  // file position
-				wpos = pos;   // wave memory position
-
-				// LED モニターの点滅
-				if(n >= 20) {  // play 時
-					n = 0;
-					LED::P = !LED::P();
-				}
-				++n;
-			} else {  // pause 時
-				if(n < 192) {
-					LED::P = (n >> 5) & 1;
-				} else {
-					LED::P = 1;
-				}
-				utils::delay::milli_second(2);
-				++n;
-				nnn = get_wave_pos_() & 0x380;
-			}
-
-			char ch = 0;
-			if(sci_length() > 0) {
-				ch = sci_getch();
-			}
-
-			if(ch == '>') {  // '>'
-				audio_out_.mute();
-				break;
-			} else if(ch == '<') {  // '<'
-				audio_out_.mute();
-				fpos = 0;
-				f_lseek(&fil, wav_in_.get_top());
-				s_time = m_time = h_time = 0;
-			} else if(ch == ' ') {  // [space]
-				pause = !pause;
-				if(pause) {  // pause になった・・
-					audio_out_.mute();
-				}
-			}
-
-			// 時間の積算と表示
-			if(btime >= wav_in_.get_rate()) {
-				btime -= wav_in_.get_rate();
-				++s_time;
-				if(s_time >= 60) { s_time = 0; ++m_time; }
-				if(m_time >= 60) { m_time = 0; ++h_time; }
-				utils::format("\r%02d:%02d:%02d")
-					% static_cast<uint32_t>(h_time)
-					% static_cast<uint32_t>(m_time)
-					% static_cast<uint32_t>(s_time); 
-			} else if(!pause) {
-				btime += dtime;
-			}
-		}
-		f_close(&fil);
-
-		utils::format("\n\n");
-	}
-
-#ifdef MP3
-
-	void play_mp3_(const char* fname)
-	{
-		utils::file_io fin;
-
-		if(!fin.open(fname, "rb")) {
-			return;
-		}
-
-		utils::format("%s\n") % fname;
-
-		mp3_in_.decode(fin, audio_out_);
-
-		fin.close();
-
-		utils::format("\n");
-	}
-
-#endif
-}
-
 int main(int argc, char** argv);
 
 int main(int argc, char** argv)
@@ -487,7 +410,7 @@ int main(int argc, char** argv)
 	}
 
 	// 波形メモリーの無音状態初期化
-	audio_out_.mute();
+	sound_out_.mute();
 
 	{  // サンプリング・タイマー設定
 		set_sample_rate(44100);
@@ -496,8 +419,8 @@ int main(int argc, char** argv)
 	{  // DMAC マネージャー開始
 		uint8_t intr_level = 4;
 		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(audio_out_.get_wave()), DAC::DADR0.address(),
-			audio_out_.size(), intr_level);
+			reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
+			sound_out_.size(), intr_level);
 		if(!ret) {
 			utils::format("DMAC Not start...\n");
 		}
@@ -549,12 +472,12 @@ int main(int argc, char** argv)
 					if(cmdn >= 2) {
 						cmd_.get_word(1, sizeof(tmp), tmp);
 						if(std::strcmp(tmp, "*") == 0) {
-							play_loop_("");
+							play_loop_("", "");
 						} else {
-							play_wav_(tmp);
+							play_loop_("", tmp);
 						}
 					} else {
-						play_loop_("");
+						play_loop_("", "");
 					}
 					f = true;
 				} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
