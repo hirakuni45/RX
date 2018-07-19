@@ -141,6 +141,8 @@ namespace {
 
 	typedef sound::mp3_in MP3_IN;
 	MP3_IN		mp3_in_;
+	typedef sound::wav_in WAV_IN;
+	WAV_IN		wav_in_;
 
 	uint8_t		pad_level_;
 
@@ -169,9 +171,9 @@ namespace {
 	}
 
 
-	MP3_IN::CTRL mp3_ctrl_task_()
+	sound::af_play::CTRL sound_ctrl_task_()
 	{
-		auto ctrl = MP3_IN::CTRL::NONE;
+		auto ctrl = sound::af_play::CTRL::NONE;
 
 		uint8_t level = famipad_.update();
 		uint8_t ptrg = ~pad_level_ &  level;
@@ -179,16 +181,16 @@ namespace {
 		pad_level_ = level;
 
 		if(chip::on(ptrg, chip::FAMIPAD_ST::SELECT)) {
-			ctrl = MP3_IN::CTRL::PAUSE;
+			ctrl = sound::af_play::CTRL::PAUSE;
 		}
 		if(chip::on(ptrg, chip::FAMIPAD_ST::RIGHT)) {
-			ctrl = MP3_IN::CTRL::STOP;
+			ctrl = sound::af_play::CTRL::STOP;
 		}
 		if(chip::on(ptrg, chip::FAMIPAD_ST::LEFT)) {
-			ctrl = MP3_IN::CTRL::REPLAY;
+			ctrl = sound::af_play::CTRL::REPLAY;
 		}
 		if(chip::on(ptrg, chip::FAMIPAD_ST::START)) {
-			ctrl = MP3_IN::CTRL::STOP;
+			ctrl = sound::af_play::CTRL::STOP;
 			sdc_.stall_dir_list();
 			render_.clear(RENDER::COLOR::Black);
 		}
@@ -199,7 +201,7 @@ namespace {
 	}
 
 
-	void mp3_tag_task_(const sound::tag_t& tag)
+	void sound_tag_task_(const sound::tag_t& tag)
 	{
 		render_.clear(RENDER::COLOR::Black);
 		utils::format("Album:  '%s'\n") % tag.album_.c_str();
@@ -210,12 +212,15 @@ namespace {
 		render_.draw_text(0, 2 * 20, tag.artist_.c_str());
 		utils::format("Year:    %s\n") % tag.year_.c_str();
 		render_.draw_text(0, 3 * 20, tag.year_.c_str());
+		utils::format("Disc:    %s\n") % tag.disc_.c_str();
+		auto x = render_.draw_text(0, 4 * 20, tag.disc_.c_str());
+		if(x > 0) x += 8;
 		utils::format("Track:   %s\n") % tag.track_.c_str();
-		render_.draw_text(0, 4 * 20, tag.track_.c_str());
+		render_.draw_text(x, 4 * 20, tag.track_.c_str());
 	}
 
 
-	void mp3_update_task_(uint32_t t)
+	void sound_update_task_(uint32_t t)
 	{
 		uint16_t sec = t % 60;
 		uint16_t min = (t / 60) % 60;
@@ -233,10 +238,25 @@ namespace {
 		if(!fin.open(fname, "rb")) {
 			return false;
 		}
-		mp3_in_.set_ctrl_task(mp3_ctrl_task_);
-		mp3_in_.set_tag_task(mp3_tag_task_);
-		mp3_in_.set_update_task(mp3_update_task_);
+		mp3_in_.set_ctrl_task(sound_ctrl_task_);
+		mp3_in_.set_tag_task(sound_tag_task_);
+		mp3_in_.set_update_task(sound_update_task_);
 		bool ret = mp3_in_.decode(fin, sound_out_);
+		fin.close();
+		return ret;
+	}
+
+
+	bool play_wav_(const char* fname)
+	{
+		utils::file_io fin;
+		if(!fin.open(fname, "rb")) {
+			return false;
+		}
+		wav_in_.set_ctrl_task(sound_ctrl_task_);
+		wav_in_.set_tag_task(sound_tag_task_);
+		wav_in_.set_update_task(sound_update_task_);
+		bool ret = wav_in_.decode(fin, sound_out_);
 		fin.close();
 		return ret;
 	}
@@ -268,8 +288,8 @@ namespace {
 			if(ext != nullptr) {
 				if(strcmp(ext, ".mp3") == 0) {
 					play_mp3_(name);
-///				else if(strcmp(ext, ".wav") == 0) {
-///					play_wav_(name);
+				} else if(strcmp(ext, ".wav") == 0) {
+					play_wav_(name);
 				}
 			}
 		}
