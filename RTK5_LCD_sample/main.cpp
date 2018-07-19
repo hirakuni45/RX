@@ -20,6 +20,12 @@
 #include "graphics/graphics.hpp"
 #include "chip/FT5206.hpp"
 
+#define SOFT_I2C
+
+#ifdef SOFT_I2C
+#include "common/si2c_io.hpp"
+#endif
+
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -82,13 +88,19 @@ namespace {
 
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+#ifdef SOFT_I2C
+	typedef device::PORT<device::PORT0, device::bitpos::B0> FT5206_SDA;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> FT5206_SCL;
+	typedef device::si2c_io<FT5206_SDA, FT5206_SCL> FT5206_I2C;
+#else
 	typedef utils::fixed_fifo<char, 4> RECV6_BUFF;
 	typedef utils::fixed_fifo<char, 4> SEND6_BUFF;
 	typedef device::sci_io<device::SCI6, RECV6_BUFF, SEND6_BUFF,
-			device::port_map::option::FIRST_I2C> SCI_I2C;
-	SCI_I2C		sci_i2c_;
-	typedef chip::FT5206<SCI_I2C> FT5206;
-	FT5206		ft5206_(sci_i2c_);
+			device::port_map::option::FIRST_I2C> FT5206_I2C;
+#endif
+	FT5206_I2C	ft5206_i2c_;
+	typedef chip::FT5206<FT5206_I2C> FT5206;
+	FT5206		ft5206_(ft5206_i2c_);
 
 	utils::command<256> cmd_;
 
@@ -263,15 +275,18 @@ int main(int argc, char** argv)
 		}
 	}
 
-	{
-		FT5206_RESET::DIR = 1;
-		FT5206_RESET::P = 0;
-		utils::delay::milli_second(10);
-		FT5206_RESET::P = 1;
-		if(!sci_i2c_.start_i2c(SCI_I2C::I2C_SPEED::STANDARD)) {
-			utils::format("SCI6/I2C Start Fail...\n");
+	{  // FT5206 touch screen controller
+		FT5206::reset<FT5206_RESET>();
+#ifdef SOFT_I2C
+		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD)) {
+#else
+		if(!ft5206_i2c_.start_i2c(FT5206_I2C::I2C_SPEED::STANDARD)) {
+#endif
+			utils::format("FT5206 I2C Start Fail...\n");
 		}
-		ft5206_.start();
+		if(!ft5206_.start()) {
+			utils::format("FT5206 Start Fail...\n");
+		}
 	}
 
 	{  // DRW2D 初期化
@@ -289,6 +304,8 @@ int main(int argc, char** argv)
 //	SW2::DIR = 0;
 
 	uint8_t task = 100;
+
+	FT5206::xy	pos;
 
 	uint8_t n = 0;
 //	bool sw2 = SW2::P();
@@ -314,6 +331,19 @@ int main(int argc, char** argv)
 				render_.draw_text(0, 16*5, "Graphics Image Light Bilk IgIiIrliiljkffkL\n", true);
 				render_.draw_text(0, 16*6, "012:;,.(i),[i],{i},{|}.(`)\n", true);
 			}
+		}
+
+		if(ft5206_.get_touch_num() == 3) {
+			render_.clear(RENDER::COLOR::Black);
+		}
+		if(ft5206_.get_touch_num() > 0) {
+			const auto& npos = ft5206_.get_touch_pos(0);
+			if(pos.st != 0) {
+				render_.line(pos.x, pos.y, npos.x, npos.y, RENDER::COLOR::White);
+			}
+			pos = npos;
+		} else {
+			pos.st = 0;
 		}
 
 #if 0
