@@ -243,6 +243,7 @@ namespace sound {
 				if(fin.read(tmp, unit * 128) != (unit * 128)) {
 					utils::format("Read fail abort...\n");
 					out.mute();
+					status = false;
 					break;
 				}
 				if(bits_ == 16) {
