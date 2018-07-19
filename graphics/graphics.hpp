@@ -178,7 +178,7 @@ namespace graphics {
 			@param[in]	c	描画色
 		*/
 		//-----------------------------------------------------------------//
-		void line(int16_t x1, int16_t y1, int16_t x2, int16_t y2, T c) {
+		void line(int16_t x1, int16_t y1, int16_t x2, int16_t y2, T c) noexcept {
 			int16_t dx;
 			int16_t dy;
 			int16_t sx;
