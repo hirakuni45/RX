@@ -26,6 +26,7 @@ namespace sound {
 		STR128	title_;		///< タイトル（曲名）
 		STR128	artist_;	///< アーティスト
 		STR16	year_;		///< リリース年
+		STR8	disc_;		///< ディスク
 		STR8	track_;		///< トラック
 
 
@@ -48,6 +49,7 @@ namespace sound {
 			title_.clear();
 			artist_.clear();
 			year_.clear();
+			disc_.clear();
 			track_.clear();
 		}
 
@@ -86,6 +88,15 @@ namespace sound {
 		*/
 		//-------------------------------------------------------------//
 		STR16& at_ayear() noexcept { return year_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	ディスクへの参照
+			@return ディスク
+		*/
+		//-------------------------------------------------------------//
+		STR8& at_disc() noexcept { return disc_; }
 
 
 		//-------------------------------------------------------------//

@@ -211,6 +211,7 @@ namespace sound {
 //				utils::format("Title:  '%s'\n") % tag.title_;
 //				utils::format("Artist: '%s'\n") % tag.artist_;
 //				utils::format("Year:    %s\n") % tag.year_;
+//				utils::format("Disc:    %s\n") % tag.disc_;
 //				utils::format("Track:   %s\n") % tag.track_;
 			}
 

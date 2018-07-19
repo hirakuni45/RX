@@ -55,7 +55,7 @@ namespace sound {
 		uint8_t		channel_;
 		uint8_t		bits_;
 
-		bool		pause_;
+		uint32_t	time_;
 
 
 		bool list_tag_(utils::file_io& fi, uint16_t size, char* dst, uint32_t dstlen) noexcept
@@ -84,7 +84,7 @@ namespace sound {
 		*/
 		//-------------------------------------------------------------//
 		wav_in() noexcept : data_top_(0), data_size_(0), data_pos_(0),
-			rate_(0), channel_(0), bits_(0), pause_(false) { }
+			rate_(0), channel_(0), bits_(0), time_(0) { }
 
 
 		//-------------------------------------------------------------//
@@ -151,12 +151,30 @@ namespace sound {
 							} else if(std::strncmp(rch.szChunkName, "IPRD", 4) == 0) {
 								dst = tag.artist_.begin();
 								dstlen = tag.artist_.capacity();
+							} else if(std::strncmp(rch.szChunkName, "ICRD", 4) == 0) {
+								dst = tag.year_.begin();
+								dstlen = tag.year_.capacity();
+							} else if(std::strncmp(rch.szChunkName, "IPRT", 4) == 0) {
+								dst = tag.track_.begin();
+								dstlen = tag.track_.capacity();
+							} else {
+//								utils::format("TAG: %c%c%c%c\n")
+//									% rch.szChunkName[0] % rch.szChunkName[1]
+//									% rch.szChunkName[2] % rch.szChunkName[3];
 							}
 							uint16_t n = rch.ulChunkSize;
 							if(n & 1) ++n;
+//							char tmp[256];
+//							if(dst == nullptr) {
+//								dst = tmp;
+//								dstlen = sizeof(tmp);
+//							}
 							if(!list_tag_(fi, n, dst, dstlen)) {
 								return false;
 							}
+//							if(tmp == dst) {
+//								utils::format("  '%s'\n") % dst;
+//							}
 							sz -= n;
 						}
 					}
@@ -176,94 +194,110 @@ namespace sound {
 		/*!
 			@brief	デコード
 			@param[in]	fi	ファイルＩ／Ｏ
+			@return 正常終了なら「true」
 		*/
 		//-------------------------------------------------------------//
-		template <class AUDIO_OUT>
-		bool decode(utils::file_io& fin, AUDIO_OUT& out) noexcept
+		template <class SOUND_OUT>
+		bool decode(utils::file_io& fin, SOUND_OUT& out) noexcept
 		{
-			while(data_pos_ < data_size_) {
-#if 0
-
-				if(!pause_) {
-					while(((wpos ^ pos) & 128) == 0) {
-						pos = get_wave_pos_();
-					}
-					uint32_t unit = (wav_in_.get_bits() / 8) * wav_in_.get_channel();
-					uint8_t tmp[512];
-					if(fi.read(tmp, unit * 128) != (unit * 128)) {
-						utils::format("read fail abort: '%s'\n") % fname;
-						out.mute();
-						break;
-					}
-					audio::wave_t* dst = out.get_wave((nnn + 512) & 0x3ff);
-					if(wav_in_.get_bits() == 16) {
-						const uint16_t* src = reinterpret_cast<const uint16_t*>(tmp);
-						for(uint32_t i = 0; i < 128; ++i) {
-							if(get_channel() == 2) {
-								dst[i].l_ch = src[0] ^ 0x8000;
-								dst[i].r_ch = src[1] ^ 0x8000;
-								src += 2;
-							} else {
-								dst[i].l_ch = src[0] ^ 0x8000;
-								dst[i].r_ch = dst[i].l_ch;
-								++src;
-							}
-						}
-					} else {  // 8 bits
-						const uint8_t* src = reinterpret_cast<const uint8_t*>(tmp);
-						for(uint32_t i = 0; i < 128; ++i) {
-							if(get_channel() == 2) {
-								dst[i].l_ch = static_cast<uint16_t>(src[0] ^ 0x80) << 8;
-								dst[i].l_ch |= (src[0] & 0x7f) << 1;
-								dst[i].r_ch = static_cast<uint16_t>(src[1] ^ 0x80) << 8;
-								dst[i].l_ch |= (src[1] & 0x7f) << 1;
-								src += 2;
-							} else {
-								dst[i].l_ch = static_cast<uint16_t>(src[0] ^ 0x80) << 8;
-								dst[i].l_ch |= (src[0] & 0x7f) << 1;
-								dst[i].r_ch = dst[i].l_ch;
-								++src;
-							}
-						}
-					}
-					nnn += 128;
-					fpos += unit * 128;  // file position
-					wpos = pos;   // wave memory position
-
-
-
-                // LED モニターの点滅
-                if(n >= 20) {  // play 時
-                    n = 0;
-                    LED::P = !LED::P();
-                }
-                ++n;
-            } else {  // pause 時
-                // LED モニターの点滅
-                if(n >= 20) {  // play 時
-                    n = 0;
-                    LED::P = !LED::P();
-                }
-                ++n;
-            } else {  // pause 時
-                // LED モニターの点滅
-                if(n >= 20) {  // play 時
-                    n = 0;
-                    LED::P = !LED::P();
-                }
-                ++n;
-            } else {  // pause 時
-                if(n < 192) {
-                    LED::P = (n >> 5) & 1;
-                } else {
-                    LED::P = 1;
-                }
-                utils::delay::milli_second(2);
-                ++n;
-                nnn = get_wave_pos_() & 0x380;
-#endif
+			tag_t tag;
+			if(!load_header(fin, tag)) {
+				return false;
 			}
-			return true;
+			if(tag_task_ != nullptr) {
+				(*tag_task_)(tag);
+			}
+
+			bool status = true;
+			bool pause = false;
+			uint32_t pos = 0;
+			time_ = 0;
+			while(data_pos_ < data_size_) {
+				CTRL ctrl = CTRL::NONE;
+				if(ctrl_task_ != nullptr) {
+					ctrl = (*ctrl_task_)();
+				}
+				if(ctrl == CTRL::STOP) {
+					out.mute();
+					status = false;
+					break;
+				} else if(ctrl == CTRL::REPLAY) {
+					out.mute();
+					fin.seek(utils::file_io::SEEK::SET, data_top_);
+					pos = 0;
+					time_ = 0;
+					status = true;
+					pause = false;
+					continue;
+				} else if(ctrl == CTRL::PAUSE) {
+					out.mute();
+					pause = !pause;
+				}
+				if(pause) {
+					utils::delay::milli_second(2);
+					continue;
+				}
+
+				uint32_t unit = (bits_ / 8) * channel_;
+				uint8_t tmp[512];
+				if(fin.read(tmp, unit * 128) != (unit * 128)) {
+					utils::format("Read fail abort...\n");
+					out.mute();
+					break;
+				}
+				if(bits_ == 16) {
+					const uint16_t* src = reinterpret_cast<const uint16_t*>(tmp);
+					for(uint32_t i = 0; i < 128; ++i) {
+						while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
+						}
+						sound::wave_t t;
+						if(get_channel() == 2) {
+							t.l_ch = src[0];
+							t.r_ch = src[1];
+							src += 2;
+						} else {
+							t.l_ch = src[0];
+							t.r_ch = t.l_ch;
+							++src;
+						}
+						out.at_fifo().put(t);
+						++pos;
+					}
+				} else {  // 8 bits
+					const uint8_t* src = reinterpret_cast<const uint8_t*>(tmp);
+					for(uint32_t i = 0; i < 128; ++i) {
+						while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
+						}
+						sound::wave_t t;
+						if(get_channel() == 2) {
+							t.l_ch = static_cast<uint16_t>(src[0] ^ 0x80) << 8;
+							t.l_ch |= (src[0] & 0x7f) << 1;
+							t.r_ch = static_cast<uint16_t>(src[1] ^ 0x80) << 8;
+							t.r_ch |= (src[1] & 0x7f) << 1;
+							src += 2;
+						} else {
+							t.l_ch = static_cast<uint16_t>(src[0] ^ 0x80) << 8;
+							t.l_ch |= (src[0] & 0x7f) << 1;
+							t.r_ch = t.l_ch;
+							++src;
+						}
+						out.at_fifo().put(t);
+						++pos;
+					}
+				}
+
+				{
+					uint32_t s = pos / rate_;
+					if(s != time_) {
+						if(update_task_ != nullptr) {
+							(*update_task_)(s);
+						}
+						time_ = s;
+					}
+				}
+				data_pos_ += unit;
+			}
+			return status;
 		}
 
 

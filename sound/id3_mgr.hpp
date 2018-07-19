@@ -29,6 +29,7 @@ namespace sound {
 			TPE1,	///< アーティスト
 			TALB,	///< アルバム名
 			TYER,	///< 年
+			TPOS,	///< Part Of Set
 			TRCK,	///< トラック
 		};
 
@@ -49,6 +50,7 @@ namespace sound {
 			if(strncmp(id, "TAL", 3) == 0) return ID::TALB;
 			if(strncmp(id, "TYER", 4) == 0) return ID::TYER;
 			if(strncmp(id, "TYE", 3) == 0) return ID::TYER;
+			if(strncmp(id, "TPOS", 4) == 0) return ID::TPOS;
 			if(strncmp(id, "TRCK", 4) == 0) return ID::TRCK;
 			if(strncmp(id, "TRK", 3) == 0) return ID::TRCK;
 			return ID::NA;
@@ -75,6 +77,10 @@ namespace sound {
 			case ID::TYER:
 				dst = tag_.year_.begin();
 				dstlen = tag_.year_.capacity();
+				break;
+			case ID::TPOS:
+				dst = tag_.disc_.begin();
+				dstlen = tag_.disc_.capacity();
 				break;
 			case ID::TRCK:
 				dst = tag_.track_.begin();
@@ -215,7 +221,7 @@ namespace sound {
 
 			id = scan_id_(&tmp[0]);
 
-//			utils::format("ID: %c%c%c%c, ") % tmp[0] % tmp[1] % tmp[2] % tmp[3];
+//			utils::format("ID: %c%c%c%c\n") % tmp[0] % tmp[1] % tmp[2] % tmp[3];
 //			utils::format("Flag: %04X, ") % get16_(&tmp[8]);
 //			utils::format("%d bytes\n") % size;
 
