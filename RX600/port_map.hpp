@@ -49,6 +49,10 @@ namespace device {
 					if(i2c) {
 						PORT2::ODR0.B0 = 1;  // P20 N-OpenDrain
 						PORT2::ODR0.B2 = 1;  // P21 N-OpenDrain
+						PORT2::PDR.B0 = 1;
+						PORT2::PDR.B1 = 1;
+						PORT2::PODR.B0 = 1;
+						PORT2::PODR.B1 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P20PFS.PSEL = sel;  // TXD0/SMISO0/SSCL0 (P20 LQFP176: 45)
@@ -62,6 +66,10 @@ namespace device {
 					if(i2c) {
 						PORTF::ODR0.B0 = 1;  // PF0 N-OpenDrain
 						PORTF::ODR0.B4 = 1;  // PF2 N-OpenDrain
+						PORTF::PDR.B0 = 1;
+						PORTF::PDR.B2 = 1;
+						PORTF::PODR.B0 = 1;
+						PORTF::PODR.B2 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PF0PFS.PSEL = sel;  // TXD1/SMISO1/SSCL1 (PF0 LQFP176: 35)
@@ -75,6 +83,10 @@ namespace device {
 					if(i2c) {
 						PORT1::ODR0.B6 = 1;  // P13 N-OpenDrain
 						PORT1::ODR0.B4 = 1;  // P12 N-OpenDrain
+						PORT1::PDR.B3 = 1;
+						PORT1::PDR.B2 = 1;
+						PORT1::PODR.B3 = 1;
+						PORT1::PODR.B2 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P13PFS.PSEL = sel;  // TXD2/SMISO2/SSCL2 (P13 LQFP176: 52)
@@ -88,6 +100,10 @@ namespace device {
 					if(i2c) {
 						PORT2::ODR0.B6 = 1;  // P23 N-OpenDrain
 						PORT2::ODR1.B2 = 1;  // P25 N-OpenDrain
+						PORT2::PDR.B3 = 1;
+						PORT2::PDR.B5 = 1;
+						PORT2::PODR.B3 = 1;
+						PORT2::PODR.B5 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P23PFS.PSEL = sel;  // TXD3/SMISO3/SSCL3 (P23 LQFP176: 42)
@@ -101,6 +117,10 @@ namespace device {
 					if(i2c) {
 						PORTB::ODR0.B2 = 1;  // PB1 N-OpenDrain
 						PORTB::ODR0.B0 = 1;  // PB0 N-OpenDrain
+						PORTB::PDR.B1 = 1;
+						PORTB::PDR.B0 = 1;
+						PORTB::PODR.B1 = 1;
+						PORTB::PODR.B0 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PB1PFS.PSEL = sel;  // TXD4/SMISO4/SSCL4 (PB1 LQFP176: 100)
@@ -114,6 +134,10 @@ namespace device {
 					if(i2c) {
 						PORTA::ODR1.B0 = 1;  // PA4 N-OpenDrain
 						PORTA::ODR0.B6 = 1;  // PA3 N-OpenDrain
+						PORTA::PDR.B4 = 1;
+						PORTA::PDR.B3 = 1;
+						PORTA::PODR.B4 = 1;
+						PORTA::PODR.B3 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PA4PFS.PSEL = sel;  // TXD5/SMISO5/SSCL5 (PA4 LQFP176: 109)
@@ -127,6 +151,10 @@ namespace device {
 					if(i2c) {
 						PORT0::ODR0.B0 = 1;  // P00 N-OpenDrain
 						PORT0::ODR0.B2 = 1;  // P01 N-OpenDrain
+						PORT0::PDR.B0 = 1;
+						PORT0::PDR.B1 = 1;
+						PORT0::PODR.B0 = 1;
+						PORT0::PODR.B1 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P00PFS.PSEL = sel;  // TXD6/SMISO6/SSCL6 (P00 LQFP176: 8)
@@ -140,6 +168,10 @@ namespace device {
 					if(i2c) {
 						PORT9::ODR0.B0 = 1;  // P90 N-OpenDrain
 						PORT9::ODR0.B4 = 1;  // P92 N-OpenDrain
+						PORT9::PDR.B0 = 1;
+						PORT9::PDR.B2 = 1;
+						PORT9::PODR.B0 = 1;
+						PORT9::PODR.B2 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P90PFS.PSEL = sel;  // TXD7/SMISO7/SSCL7 (P90 LQFP176: 163)
@@ -157,6 +189,10 @@ namespace device {
 					if(i2c) {
 						PORTC::ODR1.B6 = 1;  // PC7 N-OpenDrain
 						PORTC::ODR1.B4 = 1;  // PC6 N-OpenDrain
+						PORTC::PDR.B7 = 1;
+						PORTC::PDR.B6 = 1;
+						PORTC::PODR.B7 = 1;
+						PORTC::PODR.B6 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PC7PFS.PSEL = sel;  // TXD(F)8/SMISO8/SSCL8 (PC7 LQFP176: 76)
@@ -174,6 +210,10 @@ namespace device {
 					if(i2c) {
 						PORTB::ODR1.B6 = 1;  // PB7 N-OpenDrain
 						PORTB::ODR1.B4 = 1;  // PB6 N-OpenDrain
+						PORTB::PDR.B7 = 1;
+						PORTB::PDR.B6 = 1;
+						PORTB::PODR.B7 = 1;
+						PORTB::PODR.B6 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::PB7PFS.PSEL = sel;  // TXD(F)9/SMISO9/SSCL9 (PB7 LQFP176: 94)
@@ -191,6 +231,10 @@ namespace device {
 					if(i2c) {
 						PORT8::ODR1.B6 = 1;  // P87 N-OpenDrain
 						PORT8::ODR1.B4 = 1;  // P86 N-OpenDrain
+						PORT8::PDR.B7 = 1;
+						PORT8::PDR.B6 = 1;
+						PORT8::PODR.B7 = 1;
+						PORT8::PODR.B6 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P87PFS.PSEL = sel;  // TXD(F)10/SMISO10/SSCL10 (P86 LQFP176: 47)
@@ -208,6 +252,10 @@ namespace device {
 					if(i2c) {
 						PORT7::ODR1.B6 = 1;  // P77 N-OpenDrain
 						PORT7::ODR1.B4 = 1;  // P76 N-OpenDrain
+						PORT7::PDR.B7 = 1;
+						PORT7::PDR.B6 = 1;
+						PORT7::PODR.B7 = 1;
+						PORT7::PODR.B6 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P77PFS.PSEL = sel;  // TXD(F)11/SMISO11/SSCL11 (P77 LQFP176: 84)
@@ -222,6 +270,10 @@ namespace device {
 					if(i2c) {
 						PORTE::ODR0.B4 = 1;  // PE2 N-OpenDrain
 						PORTE::ODR0.B2 = 1;  // PE1 N-OpenDrain
+						PORTE::PDR.B2 = 1;
+						PORTE::PDR.B1 = 1;
+						PORTE::PODR.B2 = 1;
+						PORTE::PODR.B1 = 1;
 					}
 					uint8_t sel = enable ? 0b001100 : 0;
 					MPC::PE2PFS.PSEL = sel;  // RXD12/SMISO12/SSCL12 (PE2 LQFP176: 133)
