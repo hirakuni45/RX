@@ -95,6 +95,7 @@ namespace chip {
 		};
 
 		uint8_t		touch_num_;
+		bool		start_;
 		xy			xy_[2];
 
 
@@ -149,7 +150,7 @@ namespace chip {
 			@param[in]	i2c	i2c 制御クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		FT5206(I2C& i2c) noexcept : i2c_(i2c), touch_num_(0) { }
+		FT5206(I2C& i2c) noexcept : i2c_(i2c), touch_num_(0), start_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -195,6 +196,7 @@ namespace chip {
 
 			write_(REG::DEVICE_MODE, 0x00);
 
+			start_ = true;
 			return true;
 		}
 
@@ -206,6 +208,8 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		void update() noexcept
 		{
+			if(!start_) return;
+
 			touch_num_ = read_(REG::TD_STATUS);
 			if(touch_num_ != 0) {
 				read_touch_();
