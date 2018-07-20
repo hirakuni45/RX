@@ -20,7 +20,7 @@
 #include "graphics/graphics.hpp"
 #include "chip/FT5206.hpp"
 
-#define SOFT_I2C
+// #define SOFT_I2C
 
 #ifdef SOFT_I2C
 #include "common/si2c_io.hpp"
@@ -280,7 +280,7 @@ int main(int argc, char** argv)
 #ifdef SOFT_I2C
 		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD)) {
 #else
-		if(!ft5206_i2c_.start_i2c(FT5206_I2C::I2C_SPEED::STANDARD)) {
+		if(!ft5206_i2c_.start_i2c(FT5206_I2C::SPEED::STANDARD)) {
 #endif
 			utils::format("FT5206 I2C Start Fail...\n");
 		}
