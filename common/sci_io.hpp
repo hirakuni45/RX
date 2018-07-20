@@ -5,6 +5,8 @@
 			・DMAC による転送をサポートしていませんが、必要性を感じていません。@n
 			・同期通信で、ブロック転送を行うような場合は、必要かもしれません。@n
 			Ex: 定義例 @n
+			・受信バッファ、送信バッファの大きさは、最低１６バイトは必要です。@n
+			・ボーレート、サービスする内容に応じて適切に設定して下さい。@n
 			  typedef utils::fixed_fifo<char, 512>  RECV_BUFF;  // 受信バッファ定義 @n
 			  typedef utils::fixed_fifo<char, 1024> SEND_BUFF;  // 送信バッファ定義 @n
 			  typedef device::sci_io<device::SCI1, RECV_BUFF, SEND_BUFF> SCI;  // SCI1 の場合 @n
@@ -70,11 +72,11 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  簡易 I2C の速度タイプ型 @n
-					※ SCI の簡易 I2C では誤差が大きいので注意
+			@brief  速度タイプ型 @n
+					※簡易 I2C では誤差が大きいので注意
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class I2C_SPEED {
+		enum class SPEED {
 			_50K     =  50000,	///<  50K b.p.s.
 			STANDARD = 100000,	///< 100K b.p.s. (Standard mode)
 			_150K    = 150000,	///< 150K b.p.s.
@@ -85,16 +87,27 @@ namespace device {
 			FAST     = 400000,	///< 400K b.p.s. (Fast mode) 60MHz では、対応していません。
 		};
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  エラー型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ERROR : uint8_t {
+			NONE,	///< エラー無し
+		};
+
 	private:
 		static RBF	recv_;
 		static SBF	send_;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 		static volatile bool send_stall_;
-
+#endif
 		uint8_t	level_;
-		bool	crlf_;
+		bool	auto_crlf_;
+		ERROR	error_;
 
-
-		// ※マルチタスクの場合適切な実装する
+		// ※マルチタスクの場合適切な実装をする
 		void sleep_() noexcept { asm("nop"); }
 
 
@@ -162,41 +175,43 @@ namespace device {
 
 		void i2c_start_() noexcept
 		{
-			SCI::SIMR3.IICSTIF = 0;
+///			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSTAREQ.b() |
 						 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
 			uint32_t n = 0;
 			while(SCI::SIMR3.IICSTIF() == 0) {
 				++n;
 			}
-			SCI::SIMR3.IICSTIF = 0;
+///			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSCLS.b(0b00) | SCI::SIMR3.IICSDAS.b(0b00);
-//			utils::format("Start sync: %d\n") % n;
+///			utils::format("Start loop: %d\n") % n;
 		}
 
 
 		void i2c_stop_() noexcept
 		{
-			SCI::SIMR3.IICSTIF = 0;
+///			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSTPREQ.b() |
 						 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
 			uint32_t n = 0;
 			while(SCI::SIMR3.IICSTIF() == 0) {
 				++n;
 			}
-			SCI::SIMR3.IICSTIF = 0;
+///			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSCLS.b(0b11) | SCI::SIMR3.IICSDAS.b(0b11);
-//			utils::format("Stop sync: %d\n") % n;
+///			utils::format("Stop sync: %d\n") % n;
 		}
+
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
-			@param[in]	crlf	LF 時、CR の送出をしないばあい「false」
+			@param[in]	autocrlf	LF 時、CR の送出をしない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		sci_io(bool crlf = true) : level_(0), crlf_(crlf) { }
+		sci_io(bool autocrlf = true) : level_(0), auto_crlf_(autocrlf),
+			error_(ERROR::NONE) { }
 
 
 		//-----------------------------------------------------------------//
@@ -205,13 +220,15 @@ namespace device {
 					※RX63T では、ポーリングはサポート外
 			@param[in]	baud	ボーレート
 			@param[in]	level	割り込みレベル（０の場合ポーリング）
-			@param[in]	prot	通信プロトコル
+			@param[in]	prot	通信プロトコル（標準は、８ビット、パリティ無し、１ストップ）
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
 		bool start(uint32_t baud, uint8_t level = 0, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
 		{
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			send_stall_ = true;
+#endif
 #if defined(SIG_RX63T)
 			if(level == 0) return false;
 #endif
@@ -283,7 +300,7 @@ namespace device {
 			SCI::BRR = brr;
 			SCI::MDDR = mddr;
 
-			if(level) {
+			if(level > 0) {
 				SCI::SCR = SCI::SCR.RIE.b() | SCI::SCR.TE.b() | SCI::SCR.RE.b();
 			} else {
 				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
@@ -295,11 +312,11 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	CR 自動送出
+			@brief	LF 時、CR 自動送出
 			@param[in]	f	「false」なら無効
 		 */
 		//-----------------------------------------------------------------//
-		void auto_crlf(bool f = true)  noexcept { crlf_ = f; }
+		void auto_crlf(bool f = true) noexcept { auto_crlf_ = f; }
 
 
 		//-----------------------------------------------------------------//
@@ -308,7 +325,7 @@ namespace device {
 			@return　バッファのサイズ
 		 */
 		//-----------------------------------------------------------------//
-		uint32_t send_length() const  noexcept
+		uint32_t send_length() const noexcept
 		{
 			if(level_) {
 				return send_.length();
@@ -326,7 +343,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void putch(char ch)  noexcept
 		{
-			if(crlf_ && ch == '\n') {
+			if(auto_crlf_ && ch == '\n') {
 				putch('\r');
 			}
 
@@ -430,7 +447,9 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start_spi(bool master, uint32_t bps, uint8_t level = 0)  noexcept
 		{
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			send_stall_ = true;
+#endif
 			level_ = level;
 
 			power_cfg::turn(SCI::get_peripheral());
@@ -481,6 +500,8 @@ namespace device {
 			} else {
 				SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b() | scr;
 			}
+
+			auto_crlf_ = false;
 
 			return true;
 		}
@@ -550,7 +571,7 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start_i2c(I2C_SPEED spd, bool master = true, uint8_t level = 0)  noexcept
+		bool start_i2c(SPEED spd, bool master = true, uint8_t level = 0) noexcept
 		{
 			// 現在の実装では、割り込みはサポートされない。
 			if(level != 0) return false;
@@ -568,7 +589,8 @@ namespace device {
 				return false;
 			}
 			--brr;
-//			utils::format("BRR: %d\n") % static_cast<uint16_t>(brr);
+//			utils::format("BRR: %d, MDDR: %d\n")
+//				% static_cast<uint16_t>(brr) % static_cast<uint16_t>(mddr);
 
 			level_ = level;
 
@@ -577,47 +599,23 @@ namespace device {
 			SCI::SCR = 0x00;		// TE, RE disable. CKE = 0
 			port_map::turn(SCI::get_peripheral(), true, PSEL);
 
-// SCI6.SIMR3.BIT.IICSDAS = 3;
-// SCI6.SIMR3.BIT.IICSCLS = 3;
 			SCI::SIMR3 = SCI::SIMR3.IICSDAS.b(0b11) | SCI::SIMR3.IICSCLS.b(0b11);
-// SCI6.SMR.BYTE = 0x01;
 			SCI::SMR   = 0x00;
-// SCI6.SCMR.BIT.SDIR = 1;
-// SCI6.SCMR.BIT.SINV = 0;
-// SCI6.SCMR.BIT.SMIF = 0;
 			SCI::SCMR  = SCI::SCMR.SDIR.b();
-// SCI6.BRR = 48000000 / ((64/2) * u32_BaudRate) - 1;
 			SCI::BRR   = brr;
 			SCI::MDDR  = mddr;
 
 			bool brme = false;
 			if(mddr >= 128) brme = true;
 			// NFEN: ノイズ除去有効の場合「１」
-// SCI6.SEMR.BIT.NFEN = 0;
 			SCI::SEMR = SCI::SEMR.NFEN.b(0) | SCI::SEMR.BRME.b(brme);
-// SCI6.SNFR.BIT.NFCS = 0;
 			SCI::SNFR = SCI::SNFR.NFCS.b(0b001);  // 1/1
-// SCI6.SIMR1.BIT.IICM = 1;
-// SCI6.SIMR1.BIT.IICDL = 0;
-			SCI::SIMR1 = SCI::SIMR1.IICM.b() | SCI::SIMR1.IICDL.b(0b00001); 
-// SCI6.SIMR2.BIT.IICACKT = 1;
-// SCI6.SIMR2.BIT.IICCSC = 1;
-// SCI6.SIMR2.BIT.IICINTM = 1;
+			SCI::SIMR1 = SCI::SIMR1.IICM.b() | SCI::SIMR1.IICDL.b(0b00000);
 			SCI::SIMR2 = SCI::SIMR2.IICACKT.b() | SCI::SIMR2.IICCSC.b() | SCI::SIMR2.IICINTM.b();
-// SCI6.SPMR.BYTE = 0;
 			SCI::SPMR = 0x00;
-// SCI6.SCR.BYTE = 0x30;
 			SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
-#if 0
-IR(SCI6, RXI6) = 0;
-   IR(SCI6, TXI6) = 0;
-IEN(SCI6, RXI6) = 1;
-   IEN(SCI6, TXI6) = 1;
-IPR(SCI6, TXI6) = 3;
-IPR(SCI6, RXI6) = 3;
-#endif
 
-			crlf_ = false;
+			auto_crlf_ = false;
 
 			return true;
 		}
@@ -639,8 +637,10 @@ IPR(SCI6, RXI6) = 3;
 			i2c_start_();
 
 			SCI::TDR = adr << 1;  // R/W = 0 (write)
-
 			while(SCI::SSR.TDRE() == 0) {
+				sleep_();
+			}
+			while(SCI::SSR.TEND() == 0) {
 				sleep_();
 			}
 
@@ -651,11 +651,15 @@ IPR(SCI6, RXI6) = 3;
 				}
 				SCI::TDR = *p++;
 				--siz;
+
 				while(SCI::SSR.TDRE() == 0) {
 					sleep_();
 				}
+				while(SCI::SSR.TEND() == 0) {
+					sleep_();
+				}
 			}
-///			utils::format("send count: %d\n") % siz;
+
 			i2c_stop_();
 
 			return true;
@@ -678,20 +682,25 @@ IPR(SCI6, RXI6) = 3;
 			i2c_start_();
 
 			SCI::TDR = (adr << 1) | 1;  // R/W = 1 (read)
-			uint32_t n = 0;
 			while(SCI::SSR.TDRE() == 0) {
-				++n;
+				sleep_();
 			}
-			utils::format("recv: send slave address: %d\n") % n;
+			while(SCI::SSR.TEND() == 0) {
+				sleep_();
+			}
 
 			if(SCI::SISR.IICACKR() != 0) {
-				utils::format("Recv Ack fail...\n");
+				utils::format("I2C Recv: Ack fail...\n");
 				i2c_stop_();
 				return false;
 			}
 
-			SCI::SIMR2.IICACKT = 0;
+			// ダミーリード
+			volatile uint8_t tmp = SCI::RDR();
 
+			if(siz > 1) {
+				SCI::SIMR2.IICACKT = 0;
+			}
 			uint8_t* p = static_cast<uint8_t*>(dst);
 			while(siz > 1) {
 				SCI::TDR = 0xff;  // dummy data
@@ -700,7 +709,7 @@ IPR(SCI6, RXI6) = 3;
 				}
 				*p++ = SCI::RDR();
 				--siz;
-				while(SCI::SSR.TDRE() == 0) {
+				while(SCI::SSR.TEND() == 0) {
 					sleep_();
 				}
 			}
@@ -711,7 +720,7 @@ IPR(SCI6, RXI6) = 3;
 				sleep_();
 			}
 			*p = SCI::RDR();
-			while(SCI::SSR.TDRE() == 0) {
+			while(SCI::SSR.TEND() == 0) {
 				sleep_();
 			}
 
@@ -726,6 +735,8 @@ IPR(SCI6, RXI6) = 3;
 		RBF sci_io<SCI, RBF, SBF, PSEL>::recv_;
 	template<class SCI, class RBF, class SBF, port_map::option PSEL>
 		SBF sci_io<SCI, RBF, SBF, PSEL>::send_;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	template<class SCI, class RBF, class SBF, port_map::option PSEL>
 		volatile bool sci_io<SCI, RBF, SBF, PSEL>::send_stall_;
+#endif
 }
