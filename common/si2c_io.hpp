@@ -1,7 +1,10 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ソフト制御 I2C テンプレートクラス 
+	@brief	ソフト制御 I2C テンプレートクラス @n
+			※ポート定義は、オープンドレイン指定が可能な事 @n
+			※速度指定は、正確ではなく目安程度 @n
+			※「FAST_PLUS」は選択出来ない、エラーとなる
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -40,19 +43,19 @@ namespace device {
 			@brief  I2C のエラー
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class error : uint8_t {
-			none,		///< エラー無し
-			start,		///< スタート（初期化）
-			bus_open,	///< バス・オープン
-			address,	///< アドレス転送
-			send_data,	///< 送信データ転送
-			recv_data,	///< 受信データ転送
-			stop,		///< ストップ・コンディション
+		enum class ERROR : uint8_t {
+			NONE,		///< エラー無し
+			START,		///< スタート（初期化）
+			BUS_OPEN,	///< バス・オープン
+			ADDRESS,	///< アドレス転送
+			SEND_DATA,	///< 送信データ転送
+			RECV_DATA,	///< 受信データ転送
+			STOP,		///< ストップ・コンディション
 		};
 
 	private:
 		uint8_t		clock_;
-		error		error_;
+		ERROR		error_;
 		uint16_t	busy_;
 
 		static const uint8_t slow_clock_ = 10 / 2;
@@ -185,20 +188,25 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		si2c_io() : clock_(slow_clock_), error_(error::none), busy_(200) { }
+		si2c_io() : clock_(slow_clock_), error_(ERROR::NONE), busy_(200) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  初期化
-			@param[in]	spd	スピード
+			@param[in]	spd		スピード
+			@param[in]	pullup	プルアップを有効にする場合「true」
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(SPEED spd)
+		bool start(SPEED spd, bool pullup = false)
 		{
 			SCL::OD = 1;
 			SDA::OD = 1;
+			if(pullup) {
+				SCL::PU = 1;
+				SDA::PU = 1;
+			}
 			SCL::DIR = 1;
 			SDA::DIR = 1;
 			SCL::P = 1;
@@ -208,7 +216,7 @@ namespace device {
 			} else if(spd == SPEED::FAST) {
 				set_fast();
 			} else {
-				error_ = error::start;
+				error_ = ERROR::START;
 				return false;
 			}
 			return true;
@@ -255,7 +263,7 @@ namespace device {
 			@return エラー・タイプ
 		 */
 		//-----------------------------------------------------------------//
-		error get_last_error() const { return error_; }
+		ERROR get_last_error() const { return error_; }
 
 
 		//-----------------------------------------------------------------//
@@ -272,14 +280,14 @@ namespace device {
 			write_((address << 1) | 1, false);
 			if(ack_()) {
 				stop_();
-				error_ = error::address;
+				error_ = ERROR::ADDRESS;
 				return false;
 			}
 
 			for(uint8_t n = 0; n < num; ++n) {
 				if(!read_(*dst, true)) {
 					stop_();
-					error_ = error::recv_data;
+					error_ = ERROR::RECV_DATA;
 					return false;
 				}
 				bool f = 0;
@@ -306,13 +314,13 @@ namespace device {
 			write_(address << 1, false);
 			if(ack_()) {
 				stop_();
-				error_ = error::address;
+				error_ = ERROR::ADDRESS;
 				return false;
 			}
 
 			if(!write_(src, num)) {
 				stop_();
-				error_ = error::send_data;
+				error_ = ERROR::SEND_DATA;
 				return false;
 			}
 			stop_();
@@ -335,19 +343,19 @@ namespace device {
 			write_(address << 1, false);
 			if(ack_()) {
 				stop_();
-				error_ = error::address;
+				error_ = ERROR::ADDRESS;
 				return false;
 			}
 
 			if(!write_(first)) {
 				stop_();
-				error_ = error::send_data;
+				error_ = ERROR::SEND_DATA;
 				return false;
 			}
 
 			if(!write_(src, num)) {
 				stop_();
-				error_ = error::send_data;
+				error_ = ERROR::SEND_DATA;
 				return false;
 			}
 			stop_();
@@ -371,23 +379,23 @@ namespace device {
 			write_(address << 1, false);
 			if(ack_()) {
 				stop_();
-				error_ = error::address;
+				error_ = ERROR::ADDRESS;
 				return false;
 			}
 
 			if(!write_(first)) {
 				stop_();
-				error_ = error::send_data;
+				error_ = ERROR::SEND_DATA;
 				return false;
 			}
 			if(!write_(second)) {
 				stop_();
-				error_ = error::send_data;
+				error_ = ERROR::SEND_DATA;
 				return false;
 			}
 			if(!write_(src, num)) {
 				stop_();
-				error_ = error::send_data;
+				error_ = ERROR::SEND_DATA;
 				return false;
 			}
 			stop_();
