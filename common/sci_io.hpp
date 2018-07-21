@@ -94,7 +94,8 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ERROR : uint8_t {
-			NONE,	///< エラー無し
+			NONE,		///< エラー無し
+			I2C_ACK,	///< I2C ACK エラー
 		};
 
 	private:
@@ -210,8 +211,17 @@ namespace device {
 			@param[in]	autocrlf	LF 時、CR の送出をしない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		sci_io(bool autocrlf = true) : level_(0), auto_crlf_(autocrlf),
+		sci_io(bool autocrlf = true) noexcept : level_(0), auto_crlf_(autocrlf),
 			error_(ERROR::NONE) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  最終エラーコードを取得
+			@return 最終エラーコード
+		*/
+		//-----------------------------------------------------------------//
+		ERROR get_last_error() const noexcept { return error_; }
 
 
 		//-----------------------------------------------------------------//
@@ -688,21 +698,22 @@ namespace device {
 			while(SCI::SSR.TEND() == 0) {
 				sleep_();
 			}
+			volatile uint8_t tmp = SCI::RDR();  // ダミーリード
 
 			if(SCI::SISR.IICACKR() != 0) {
-				utils::format("I2C Recv: Ack fail...\n");
+				error_ = ERROR::I2C_ACK;
 				i2c_stop_();
 				return false;
 			}
-
-			// ダミーリード
-			volatile uint8_t tmp = SCI::RDR();
 
 			if(siz > 1) {
 				SCI::SIMR2.IICACKT = 0;
 			}
 			uint8_t* p = static_cast<uint8_t*>(dst);
-			while(siz > 1) {
+			while(siz > 0) {
+				if(siz == 1) {
+					SCI::SIMR2.IICACKT = 1;
+				}
 				SCI::TDR = 0xff;  // dummy data
 				while(SCI::SSR.RDRF() == 0) {
 					sleep_();
@@ -712,16 +723,6 @@ namespace device {
 				while(SCI::SSR.TEND() == 0) {
 					sleep_();
 				}
-			}
-
-			SCI::SIMR2.IICACKT = 1;
-			SCI::TDR = 0xff;  // dummy data
-			while(SCI::SSR.RDRF() == 0) {
-				sleep_();
-			}
-			*p = SCI::RDR();
-			while(SCI::SSR.TEND() == 0) {
-				sleep_();
 			}
 
 			i2c_stop_();
