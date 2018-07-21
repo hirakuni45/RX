@@ -67,7 +67,7 @@ namespace device {
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 			IDEI         = 50,  // SRC
-			ODFI         = 51,  // SRC
+			ODFI         = 511,  // SRC
 #elif defined(SIG_RX65N)
 			RIIC_RXI1    = 50,	// RIIC1 RXI
 			RIIC_TXI1    = 51,	// RIIC1 TXI

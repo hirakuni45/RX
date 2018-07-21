@@ -18,12 +18,12 @@ namespace device {
 	/*!
 		@brief  SCIg 定義基底クラス
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 		@param[in]	txv		送信ベクター
 		@param[in]	rxv		受信ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv>
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv>
 	struct scig_t {
 
 		//-----------------------------------------------------------------//
@@ -293,12 +293,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  チャネルを返す
-			@return チャネル（０、１、２、３、４、５、６、７、１２）
+			@return チャネル
 		*/
 		//-----------------------------------------------------------------//
 		static uint32_t get_chanel() {
-			if(base == 0x0008B300) return 12; 
-			return (base >> 5) & 7;
+			return static_cast<uint32_t>(per) - static_cast<uint32_t>(peripheral::SCI0);
 		}
 
 
@@ -308,7 +307,7 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 
 		//-----------------------------------------------------------------//
@@ -350,13 +349,14 @@ namespace device {
 	/*!
 		@brief  SCIg, SCIh 定義基底クラス
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 		@param[in]	txv		送信ベクター
 		@param[in]	rxv		受信ベクター
+		@param[in]	tev		送信終了ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv>
-	struct scih_t : scig_t<base, t, txv, rxv> {
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv>
+	struct scih_t : scig_t<base, per, txv, rxv> {
 
 		//-----------------------------------------------------------------//
 		/*!
