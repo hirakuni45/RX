@@ -46,7 +46,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCI I/O 制御クラス
-		@param[in]	SCI		SCI 定義クラス
+		@param[in]	SCI		SCI 型
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
 		@param[in]	PSEL	ポート選択

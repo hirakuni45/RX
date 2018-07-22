@@ -1,7 +1,8 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ・SCI/SPI I/O 制御
+	@brief	RX グループ・SCI/SPI I/O 制御 @n
+			※現在、実装中で「未完」となっている。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -20,8 +21,8 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCI I/O 制御クラス
-		@param[in]	SCI		SCI 定義クラス
+		@brief  SCI/SPI I/O 制御クラス
+		@param[in]	SCI		SCI 型
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
 		@param[in]	PSEL	ポート選択
