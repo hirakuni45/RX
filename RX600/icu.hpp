@@ -389,10 +389,16 @@ namespace device {
 			EEI0,			///< RIIC0 / EEI0
 			TEI2,			///< RIIC2 / TEI2
 			EEI2,			///< RIIC2 / EEI2
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			SSIF0,			///< SSI0 / SSIF0
+			SSIF1,			///< SSI1 / SSIF1
+#endif
 			S12CMPAI = 20,	///< S12AD / S12CMPAI
+#if defined(SIG_RX65N)
 			S12CMPBI,		///< S12AD / S12CMPBI
-			S12CMPAI1,		///< S12AD1 / S12CMPAI1
+#endif
+			S12CMPAI1 = 22,	///< S12AD1 / S12CMPAI1
+#if defined(SIG_RX65N)
 			S12CMPBI1,		///< S12AD1 / S12CMPBI1
 			TEI8,			///< SCI8 / TEI8
 			ERI8,			///< SCI8 / ERI8
@@ -400,9 +406,11 @@ namespace device {
 			ERI9,			///< SCI9 / ERI9
 			TEI1,			///< RIIC1 / TEI1
 			EEI1,			///< RIIC1 / EEI1
+#endif
 		};
 
 
+#if defined(SIG_RX65N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  GROUPBL2・ベクター・インデックス
@@ -411,6 +419,7 @@ namespace device {
 		enum class VECTOR_BL2 {
 			SDIOI,			///< SDSI / SDIOI
 		};
+#endif
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -430,7 +439,7 @@ namespace device {
 			DRIF9,			///< SCIFA9 / DRIF9
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-			TEIF10,			///< SCIFA10 / TEIF10
+			TEIF10 = 8,		///< SCIFA10 / TEIF10
 			ERIF10,			///< SCIFA10 / ERIF10
 			BRIF10,			///< SCIFA10 / BRIF10
 			DRIF10,			///< SCIFA10 / DRIF10
