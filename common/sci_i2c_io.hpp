@@ -150,7 +150,7 @@ namespace device {
 					break;
 				}
 				SCI::TDR = send_.get();
-				trans_len_--;
+				--trans_len_;
 				break;
 
 			case sci_i2c_t::task::start_recv:
@@ -182,7 +182,7 @@ namespace device {
 						SCI::SIMR2.IICACKT = 1;
 					}
 					recv_.put(SCI::RDR());
-					trans_len_--;
+					--trans_len_;
 					SCI::TDR = 0xff;  // dummy data
 					if(trans_len_ == 0) {
 						SCI::SCR.TEIE = 1;
@@ -242,21 +242,17 @@ namespace device {
 			if(level_) {
 				set_interrupt_task(recv_task_, static_cast<uint32_t>(rx_vec));
 				set_interrupt_task(send_task_, static_cast<uint32_t>(tx_vec));
-			} else {
-				set_interrupt_task(nullptr, static_cast<uint32_t>(rx_vec));
-				set_interrupt_task(nullptr, static_cast<uint32_t>(tx_vec));
 			}
 		}
 
 
 		void set_intr_() noexcept
 		{
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
-#else
-			set_vector_(SCI::get_rx_vec(), SCI::get_te_vec());
-#endif
 			icu_mgr::set_level(SCI::get_peripheral(), level_);
+#if defined(SIG_RX24T)
+			set_interrupt_task(i2c_condition_task_, static_cast<uint32_t>(SCI::get_te_vec()));
+#endif
 		}
 
 
@@ -371,9 +367,11 @@ namespace device {
 
 			if(level_ > 0) {
 				task_ = sci_i2c_t::task::idle;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 				// TEIx (STI interrupt)
 				icu_mgr::set_level(SCI::get_group_vec(), level_);
 				icu_mgr::install_group_task(SCI::get_te_vec(), i2c_condition_task_);
+#endif
 				set_intr_();
 			}
 
@@ -446,7 +444,7 @@ namespace device {
 					error_ = ERROR::STOP;
 					return false;
 				}
-				if(task) (*task)();
+				if(task != nullptr) (*task)();
 				error_ = ERROR::NONE;
 			} else {
 				const uint8_t* p = static_cast<const uint8_t*>(src);
@@ -531,7 +529,7 @@ namespace device {
 					error_ = ERROR::STOP;
 					return false;
 				}
-				if(task) (*task)();
+				if(task != nullptr) (*task)();
 				error_ = ERROR::NONE;
 			} else {
 				sci_i2c_t t;
