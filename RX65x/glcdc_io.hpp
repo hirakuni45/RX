@@ -8,10 +8,10 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX65x/glcdc.hpp"
-#include "common/delay.hpp"
 #include "RX600/dmac_mgr.hpp"
+#include "RX65x/glcdc.hpp"
 #include "glcdc_def.hpp"
+#include "common/delay.hpp"
 
 namespace device {
 
