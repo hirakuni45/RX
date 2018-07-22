@@ -3,7 +3,8 @@
 /*!	@file
 	@brief	FT5206 class @n
 			FocalTech @n
-			Capacitive Touch Panel Controller ドライバー
+			Capacitive Touch Panel Controller ドライバー @n
+			・I2C 割り込み対応
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -96,6 +97,9 @@ namespace chip {
 
 		uint8_t		touch_num_;
 		bool		start_;
+		uint16_t	version_;
+		uint8_t		chip_;
+		uint8_t		touch_tmp_[11];
 		xy			xy_[2];
 
 
@@ -105,6 +109,7 @@ namespace chip {
 			tmp[0] = static_cast<uint8_t>(reg);
 			tmp[1] = data;
 			i2c_.send(FT5206_ADR, tmp, sizeof(tmp));
+			i2c_.sync();
 		}
 
 
@@ -114,33 +119,38 @@ namespace chip {
 			tmp[0] = static_cast<uint8_t>(reg);
 			i2c_.send(FT5206_ADR, tmp, sizeof(tmp));
 			i2c_.recv(FT5206_ADR, tmp, sizeof(tmp));
+			i2c_.sync();
 			return tmp[0];
 		}
 
 
-		uint16_t read16_(REG reg) noexcept
+		void convert_touch_() noexcept
 		{
-			uint8_t tmp[2];
-			tmp[0] = static_cast<uint8_t>(reg);
-			i2c_.send(FT5206_ADR, tmp, 1);
-			i2c_.recv(FT5206_ADR, tmp, sizeof(tmp));
-			return (static_cast<uint16_t>(tmp[0]) << 8) | tmp[1];
+			touch_num_ = touch_tmp_[0];
+			if(touch_num_ == 0) return;
+
+			if(touch_num_ >= 1) {
+				xy_[0].st = touch_tmp_[1] >> 6;
+				xy_[0].x = (static_cast<uint16_t>(touch_tmp_[1] & 0x3F) << 8)
+					| static_cast<uint16_t>(touch_tmp_[2]);
+				xy_[0].y = (static_cast<uint16_t>(touch_tmp_[3]) << 8)
+					| static_cast<uint16_t>(touch_tmp_[4]);
+			}
+			if(touch_num_ > 1) {
+				xy_[1].st = touch_tmp_[7] >> 6;
+				xy_[1].x = (static_cast<uint16_t>(touch_tmp_[7] & 0x3F) << 8)
+					| static_cast<uint16_t>(touch_tmp_[8]);
+				xy_[1].y = (static_cast<uint16_t>(touch_tmp_[9]) << 8)
+					| static_cast<uint16_t>(touch_tmp_[10]);
+			}
 		}
 
 
-		void read_touch_() noexcept
+		void request_touch_() noexcept
 		{
-			uint8_t tmp[10];
-			tmp[0] = static_cast<uint8_t>(REG::TOUCH_XH);
-			i2c_.send(FT5206_ADR, tmp, 1);
-			i2c_.recv(FT5206_ADR, tmp, sizeof(tmp));
-			xy_[0].st = tmp[0] >> 6;
-			xy_[0].x = (static_cast<uint16_t>(tmp[0] & 0x3F) << 8) | static_cast<uint16_t>(tmp[1]);
-			xy_[0].y = (static_cast<uint16_t>(tmp[2]) << 8) | static_cast<uint16_t>(tmp[3]);
-
-			xy_[1].st = tmp[6] >> 6;
-			xy_[1].x = (static_cast<uint16_t>(tmp[6] & 0x3F) << 8) | static_cast<uint16_t>(tmp[7]);
-			xy_[1].y = (static_cast<uint16_t>(tmp[8]) << 8) | static_cast<uint16_t>(tmp[9]);
+			touch_tmp_[0] = static_cast<uint8_t>(REG::TD_STATUS);
+			i2c_.send(FT5206_ADR, touch_tmp_, 1);
+			i2c_.recv(FT5206_ADR, touch_tmp_, sizeof(touch_tmp_));
 		}
 
 	public:
@@ -150,7 +160,26 @@ namespace chip {
 			@param[in]	i2c	i2c 制御クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		FT5206(I2C& i2c) noexcept : i2c_(i2c), touch_num_(0), start_(false) { }
+		FT5206(I2C& i2c) noexcept : i2c_(i2c), touch_num_(0), start_(false),
+			version_(0), chip_(0) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	デバイスのバージョンを取得
+			@return デバイスのバージョン
+		 */
+		//-----------------------------------------------------------------//
+		uint16_t get_version() const noexcept { return version_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	チップ・コードを取得
+			@return チップ・コード
+		 */
+		//-----------------------------------------------------------------//
+		uint8_t get_chip() const noexcept { return chip_; }
 
 
 		//-----------------------------------------------------------------//
@@ -183,6 +212,8 @@ namespace chip {
 				utils::format("Send fail\n");
 				return false;
 			}
+			i2c_.sync();
+
 			tmp[0] = 0xff;
 			tmp[1] = 0xff;
 			tmp[2] = 0xff;
@@ -190,13 +221,17 @@ namespace chip {
 				utils::format("Recv fail\n");
 				return false;
 			}
-			uint16_t ver = (static_cast<uint16_t>(tmp[0]) << 8) | tmp[1];
-			utils::format("FT5206 Version: %04X, Chip: %02X\n")
-				% ver % static_cast<uint16_t>(tmp[2]);
+			i2c_.sync();
+			version_ = (static_cast<uint16_t>(tmp[0]) << 8) | tmp[1];
+			chip_ = tmp[2];
 
 			write_(REG::DEVICE_MODE, 0x00);
 
 			start_ = true;
+
+			request_touch_();
+			i2c_.sync();
+
 			return true;
 		}
 
@@ -210,10 +245,8 @@ namespace chip {
 		{
 			if(!start_) return;
 
-			touch_num_ = read_(REG::TD_STATUS);
-			if(touch_num_ != 0) {
-				read_touch_();
-			}
+			convert_touch_();
+			request_touch_();
 		}
 
 
