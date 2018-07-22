@@ -1,7 +1,9 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	RX グループ・SCI 簡易 I2C I/O 制御
+	@brief	RX グループ SCI 簡易 I2C 制御 @n
+			※RX600 シリーズでは、グループ割り込みとして TEIx を共有する @n
+			ので、割り込みレベルには注意する事（上書きされる）
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -9,6 +11,7 @@
 */
 //=========================================================================//
 #include "common/renesas.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/vect.h"
 
 /// F_PCLKB はボーレートパラメーター計算に必要で、設定が無いとエラーにします。
@@ -18,27 +21,47 @@
 
 namespace device {
 
-	// SCI/I2C task type
-	enum class sci_i2c_task : uint8_t {
-		start,		// start condition
-		slave_adr,	// Slave Address Send
-		send,		// send data
-		recv,		// recv data
-		stop,		// stop condition
-	};
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  SCI/I2C 送信、受信タスク型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	typedef void (*I2C_TASK)(); 
 
-	// SCI/I2C pad
-	struct sci_i2c_pad {
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  SCI/I2C 構造体
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct sci_i2c_t {
+
+		enum class task : uint8_t {
+			idle,
+
+			start_send,		// start send
+			send_data,		// send data
+
+			start_recv,		// start recv
+			recv_data_pre,	// recv data pre (first 1)
+			recv_data,		// recv data
+
+			stop,			// stop condition
+		};
+
 		uint8_t		adr_;
 		uint16_t	len_;
-		sci_i2c_pad(uint8_t adr = 0) noexcept : adr_(adr), len_(0) { }
+		I2C_TASK	task_;
+		sci_i2c_t(uint8_t adr = 0) noexcept : adr_(adr), len_(0), task_(nullptr) { }
 	};
+	// I2C の最大コマンド受付数は（１６－１）個
+	typedef utils::fixed_fifo<sci_i2c_t, 16> I2C_BUFF;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCI I2C I/O 制御クラス
-		@param[in]	SCI		SCI 定義クラス
+		@param[in]	SCI		SCI 型
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
 		@param[in]	PSEL	ポート選択
@@ -73,9 +96,9 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ERROR : uint8_t {
 			NONE,		///< エラー無し
-			I2C_START,	///< I2C Start コンディション・エラー
-			I2C_ACK,	///< I2C ACK エラー
-			I2C_STOP,	///< I2C Stop コンディション・エラー
+			START,		///< Start コンディション・エラー
+			ACK,		///< ACK エラー
+			STOP,		///< Stop コンディション・エラー
 		};
 
 	private:
@@ -86,31 +109,111 @@ namespace device {
 		ERROR		error_;
 		uint16_t	i2c_loop_;
 
-		static volatile sci_i2c_task	i2c_task_;
-		static sci_i2c_pad	i2c_pad_;
+		static volatile sci_i2c_t::task	task_;
+		static volatile uint8_t	state_;
+		static uint16_t	trans_len_;
+		static I2C_BUFF	i2c_buff_;
 
 		// ※マルチタスクの場合適切な実装をする
 		void sleep_() noexcept { asm("nop"); }
 
 
+		static void i2c_service_()
+		{
+			const auto& t = i2c_buff_.get_at();
+			switch(task_) {
+			case sci_i2c_t::task::idle:
+				break;
+
+			case sci_i2c_t::task::start_send:
+				SCI::SCR.TEIE = 0;
+				trans_len_ = t.len_;
+				SCI::SCR.TIE = 1;
+				SCI::TDR = t.adr_ << 1;  // R/W = 0 (write)
+				task_ = sci_i2c_t::task::send_data;
+				break;
+			case sci_i2c_t::task::send_data:
+				if(trans_len_ == 0) {
+					SCI::SCR.TEIE = 1;
+					SCI::SCR.TIE = 0;
+					task_ = sci_i2c_t::task::stop;
+					break;
+				}
+				if(SCI::SISR.IICACKR()) {
+					SCI::SCR.TEIE = 1;
+					SCI::SCR.TIE = 0;
+					task_ = sci_i2c_t::task::stop;
+					state_ = static_cast<uint8_t>(ERROR::ACK);
+					break;
+				}
+				SCI::TDR = send_.get();
+				trans_len_--;
+				break;
+
+			case sci_i2c_t::task::start_recv:
+				trans_len_ = t.len_;
+				SCI::SCR.TIE = 1;
+				SCI::TDR = (t.adr_ << 1) | 1;  // R/W = 1 (read)
+				task_ = sci_i2c_t::task::recv_data_pre;
+				break;
+
+			case sci_i2c_t::task::recv_data_pre:
+				if(SCI::SISR.IICACKR() != 0) {
+					SCI::SCR.TEIE = 1;
+					SCI::SCR.RIE = 0;
+					task_ = sci_i2c_t::task::stop;
+					state_ = static_cast<uint8_t>(ERROR::ACK);
+				} else {
+					if(trans_len_ > 1) {
+						SCI::SIMR2.IICACKT = 0;
+					} else {
+						SCI::SIMR2.IICACKT = 1;
+					}
+					SCI::SCR.RIE = 1;
+					SCI::TDR = 0xff;  // dummy data
+					task_ = sci_i2c_t::task::recv_data;
+				}
+				break;
+			case sci_i2c_t::task::recv_data:
+					if(trans_len_ == 1) {
+						SCI::SIMR2.IICACKT = 1;
+					}
+					recv_.put(SCI::RDR());
+					trans_len_--;
+					SCI::TDR = 0xff;  // dummy data
+					if(trans_len_ == 0) {
+						SCI::SCR.TEIE = 1;
+						SCI::SCR.RIE = 0;
+						task_ = sci_i2c_t::task::stop;
+					}
+				break;
+
+			case sci_i2c_t::task::stop:
+				SCI::SCR.TEIE = 0;
+				if(t.task_ != nullptr) (*t.task_)();
+				i2c_buff_.get_go();
+				if(i2c_buff_.length() > 0) {
+
+				} else {
+					task_ = sci_i2c_t::task::idle;
+				}
+				break;
+
+			default:
+				break;
+			}
+		}
+
+
 		static INTERRUPT_FUNC void recv_task_()
 		{
+			i2c_service_();
 		}
 
 
 		static INTERRUPT_FUNC void send_task_()
 		{
-		}
-
-
-		static void i2c_service_()
-		{
-			switch(i2c_task_) {
-			case sci_i2c_task::start:
-				break;
-			default:
-				break;
-			}
+			i2c_service_();
 		}
 
 
@@ -120,7 +223,6 @@ namespace device {
 		}
 
 
-#if 0
 		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) noexcept
 		{
 			if(level_) {
@@ -132,6 +234,7 @@ namespace device {
 			}
 		}
 
+
 		void set_intr_() noexcept
 		{
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
@@ -141,7 +244,7 @@ namespace device {
 #endif
 			icu_mgr::set_level(SCI::get_peripheral(), level_);
 		}
-#endif
+
 
 		bool i2c_start_() noexcept
 		{
@@ -224,6 +327,7 @@ namespace device {
 //			utils::format("BRR: %d, MDDR: %d\n")
 //				% static_cast<uint16_t>(brr) % static_cast<uint16_t>(mddr);
 
+			// ポーリング時の I2C ループ定数
 			// 200 ---> I2C Start/Stop loop for STANDARD
 			// 5 ---> マージン倍率
 			i2c_loop_ = 200 * 5;
@@ -252,8 +356,11 @@ namespace device {
 			SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
 
 			if(level_ > 0) {
-				// TEIx (STI)
+				task_ = sci_i2c_t::task::idle;
+				// TEIx (STI interrupt)
+				icu_mgr::set_level(SCI::get_group_vec(), level_);
 				icu_mgr::install_group_task(SCI::get_te_vec(), i2c_condition_task_);
+				set_intr_();
 			}
 
 			error_ = ERROR::NONE;
@@ -265,19 +372,20 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  I2C 送信
-			@param[in]	adr	I2C アドレス（下位７ビット）
-			@param[in]	src	送信データ
-			@param[in]	len	送信長
+			@param[in]	adr		I2C アドレス（下位７ビット）
+			@param[in]	src		送信データ
+			@param[in]	len		送信長
+			@param[in]	task	送信終了タスク（ポーリングでは無効）
 			@return 送信正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool send(uint8_t adr, const void* src, uint32_t len) noexcept
+		bool send(uint8_t adr, const void* src, uint16_t len, I2C_TASK task = nullptr) noexcept
 		{
 			if(src == nullptr || len == 0) return false;
 
 			if(level_ == 0) {
 				if(!i2c_start_()) {
-					error_ = ERROR::I2C_START;
+					error_ = ERROR::START;
 					i2c_stop_();
 					return false;
 				}
@@ -307,18 +415,31 @@ namespace device {
 				}
 
 				if(!i2c_stop_()) {
-					error_ = ERROR::I2C_STOP;
+					error_ = ERROR::STOP;
 					return false;
 				}
 				error_ = ERROR::NONE;
 			} else {
+				state_ = 0;
+				task_ = sci_i2c_t::task::start_send;
+				const uint8_t* p = static_cast<const uint8_t*>(src);
+				for(uint32_t i = 0; i < len; ++i) {
+					send_.put(*p);
+					++p;
+				}
+				sci_i2c_t t;
+				t.adr_ = adr;
+				t.len_ = len;
+				t.task_ = task;
+				auto n = i2c_buff_.length();
+				i2c_buff_.put(t);
+				if(n == 0) {
+					SCI::SCR.TEIE = 1;
+					SCI::SIMR3 = SCI::SIMR3.IICSTAREQ.b() |
+								 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
+				}
 
-				i2c_task_ = sci_i2c_task::start;
-				i2c_pad_.adr_ = adr;
-				i2c_pad_.len_ = len;
-//				i2c_src_ = src;
-				SCI::SCR.TEIE = 1;
-
+				while(task_ != sci_i2c_t::task::idle) ;
 			}
 			return true;
 		}
@@ -330,16 +451,17 @@ namespace device {
 			@param[in]	adr	I2C アドレス（下位７ビット）
 			@param[in]	dst	受信データ
 			@param[in]	len	受信長
+			@param[in]	task	送信終了タスク（ポーリングでは無効）
 			@return 送信正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool recv(uint8_t adr, void* dst, uint32_t len) noexcept
+		bool recv(uint8_t adr, void* dst, uint16_t len, I2C_TASK task = nullptr) noexcept
 		{
 			if(dst == nullptr || len == 0) return false;
 
 			if(level_ == 0) {
 				if(!i2c_start_()) {
-					error_ = ERROR::I2C_START;
+					error_ = ERROR::START;
 					i2c_stop_();
 					return false;
 				}
@@ -354,7 +476,7 @@ namespace device {
 				volatile uint8_t tmp = SCI::RDR();  // ダミーリード
 
 				if(SCI::SISR.IICACKR() != 0) {
-					error_ = ERROR::I2C_ACK;
+					error_ = ERROR::ACK;
 					i2c_stop_();
 					return false;
 				}
@@ -379,17 +501,30 @@ namespace device {
 				}
 
 				if(!i2c_stop_()) {
-					error_ = ERROR::I2C_STOP;
+					error_ = ERROR::STOP;
 					return false;
 				}
 				error_ = ERROR::NONE;
 			} else {
+				state_ = 0;
+				task_ = sci_i2c_t::task::start_recv;
+				sci_i2c_t t;
+				t.adr_ = adr;
+				t.len_ = len;
+				t.task_ = task;
+				auto n = i2c_buff_.length();
+				i2c_buff_.put(t);
+				if(n == 0) {
+					SCI::SCR.TEIE = 1;
+					SCI::SIMR3 = SCI::SIMR3.IICSTAREQ.b() |
+								 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
+				}
 
-				i2c_task_ = sci_i2c_task::start;
-				i2c_pad_.adr_ = adr;
-				i2c_pad_.len_ = len;
-				SCI::SCR.TEIE = 1;
-
+				while(task_ != sci_i2c_t::task::idle) ;
+				uint8_t* p = static_cast<uint8_t*>(dst);
+				for(uint16_t i = 0; i < len; ++i) {
+					*p++ = recv_.get();
+				}
 			}
 			return true;
 		}
@@ -401,7 +536,11 @@ namespace device {
 	template<class SCI, class RBF, class SBF, port_map::option PSEL>
 		SBF sci_i2c_io<SCI, RBF, SBF, PSEL>::send_;
 	template<class SCI, class RBF, class SBF, port_map::option PSEL>
-		volatile sci_i2c_task sci_i2c_io<SCI, RBF, SBF, PSEL>::i2c_task_;
+		volatile sci_i2c_t::task sci_i2c_io<SCI, RBF, SBF, PSEL>::task_;
 	template<class SCI, class RBF, class SBF, port_map::option PSEL>
-		sci_i2c_pad sci_i2c_io<SCI, RBF, SBF, PSEL>::i2c_pad_;
+		volatile uint8_t sci_i2c_io<SCI, RBF, SBF, PSEL>::state_;
+	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+		uint16_t sci_i2c_io<SCI, RBF, SBF, PSEL>::trans_len_;
+	template<class SCI, class RBF, class SBF, port_map::option PSEL>
+		I2C_BUFF sci_i2c_io<SCI, RBF, SBF, PSEL>::i2c_buff_;
 }
