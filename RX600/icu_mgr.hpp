@@ -8,10 +8,10 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/icu.hpp"
 #include "RX600/peripheral.hpp"
-#include "common/vect.h"
+#include "RX600/icu.hpp"
 #include "RX600/dmac.hpp"
+#include "common/vect.h"
 #include "common/dispatch.hpp"
 
 namespace device {
@@ -501,7 +501,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  GROUPBE0 割り込みタスクを登録する
+			@brief  GROUPBE0 割り込みタスクを登録する @n
+					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	idx		グループ内インデックス
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 			@return グループ割り込み以外なら「false」
@@ -520,7 +521,8 @@ namespace device {
 #if defined(SIG_RX65N)
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  GROUPBL2 割り込みタスクを登録する
+			@brief  GROUPBL2 割り込みタスクを登録する @n
+					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	idx		グループ内インデックス
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 			@return グループ割り込み以外なら「false」
@@ -540,7 +542,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  GROUPBL0 割り込みタスクを登録する
+			@brief  GROUPBL0 割り込みタスクを登録する @n
+					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	idx		グループ内インデックス
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 			@return グループ割り込み以外なら「false」
@@ -559,7 +562,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  GROUPBL1 割り込みタスクを登録する
+			@brief  GROUPBL1 割り込みタスクを登録する @n
+					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	idx		グループ内インデックス
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 			@return グループ割り込み以外なら「false」
@@ -578,7 +582,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  GROUPAL0 割り込みタスクを登録する
+			@brief  GROUPAL0 割り込みタスクを登録する @n
+					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	idx		グループ内インデックス
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 			@return グループ割り込み以外なら「false」
@@ -597,7 +602,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  GROUPAL1 割り込みタスクを登録する
+			@brief  GROUPAL1 割り込みタスクを登録する @n
+					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
 			@param[in]	idx		グループ内インデックス
 			@param[in]	task	割り込みタスク（※nullptr なら無効）
 			@return グループ割り込み以外なら「false」
