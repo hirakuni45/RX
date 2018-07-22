@@ -379,7 +379,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCIg, SCIi 定義基底クラス
+		@brief  SCIi 定義基底クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	t		ペリフェラル型
 		@param[in]	txv		送信ベクター
@@ -403,7 +403,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SCIg, SCIh 定義基底クラス
+		@brief  SCIh 定義基底クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
 		@param[in]	txv		送信ベクター
