@@ -195,11 +195,12 @@ namespace device {
 		/*!
 			@brief  初期化
 			@param[in]	spd		スピード
+			@param[in]	lvl		割り込みレベル（設定しても無効）
 			@param[in]	pullup	プルアップを有効にする場合「true」
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(SPEED spd, bool pullup = false)
+		bool start(SPEED spd, uint8_t lvl = 0, bool pullup = false)
 		{
 			SCL::OD = 1;
 			SDA::OD = 1;
