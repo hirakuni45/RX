@@ -95,8 +95,8 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B1> FT5206_SCL;
 	typedef device::si2c_io<FT5206_SDA, FT5206_SCL> FT5206_I2C;
 #else
-	typedef utils::fixed_fifo<char, 4> RECV6_BUFF;
-	typedef utils::fixed_fifo<char, 4> SEND6_BUFF;
+	typedef utils::fixed_fifo<uint8_t, 64> RECV6_BUFF;
+	typedef utils::fixed_fifo<uint8_t, 64> SEND6_BUFF;
 	typedef device::sci_i2c_io<device::SCI6, RECV6_BUFF, SEND6_BUFF,
 			device::port_map::option::FIRST_I2C> FT5206_I2C;
 #endif
