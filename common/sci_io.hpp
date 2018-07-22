@@ -95,7 +95,9 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class ERROR : uint8_t {
 			NONE,		///< エラー無し
+			I2C_START,	///< I2C Start コンディション・エラー
 			I2C_ACK,	///< I2C ACK エラー
+			I2C_STOP,	///< I2C Stop コンディション・エラー
 		};
 
 	private:
@@ -104,9 +106,10 @@ namespace device {
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 		static volatile bool send_stall_;
 #endif
-		uint8_t	level_;
-		bool	auto_crlf_;
-		ERROR	error_;
+		uint8_t		level_;
+		bool		auto_crlf_;
+		ERROR		error_;
+		uint32_t	i2c_loop_;
 
 		// ※マルチタスクの場合適切な実装をする
 		void sleep_() noexcept { asm("nop"); }
@@ -174,33 +177,39 @@ namespace device {
 		}
 
 
-		void i2c_start_() noexcept
+		bool i2c_start_() noexcept
 		{
-///			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSTAREQ.b() |
 						 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
 			uint32_t n = 0;
+			bool ret = true;
 			while(SCI::SIMR3.IICSTIF() == 0) {
 				++n;
+				if(n >= i2c_loop_) {
+					ret = false;
+					break;
+				}
 			}
-///			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSCLS.b(0b00) | SCI::SIMR3.IICSDAS.b(0b00);
-///			utils::format("Start loop: %d\n") % n;
+			return ret;
 		}
 
 
-		void i2c_stop_() noexcept
+		bool i2c_stop_() noexcept
 		{
-///			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSTPREQ.b() |
 						 SCI::SIMR3.IICSCLS.b(0b01) | SCI::SIMR3.IICSDAS.b(0b01);
 			uint32_t n = 0;
+			bool ret = true;
 			while(SCI::SIMR3.IICSTIF() == 0) {
 				++n;
+				if(n >= i2c_loop_) {
+					ret = false;
+					break;
+				}
 			}
-///			SCI::SIMR3.IICSTIF = 0;
 			SCI::SIMR3 = SCI::SIMR3.IICSCLS.b(0b11) | SCI::SIMR3.IICSDAS.b(0b11);
-///			utils::format("Stop sync: %d\n") % n;
+			return ret;
 		}
 
 
@@ -212,7 +221,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		sci_io(bool autocrlf = true) noexcept : level_(0), auto_crlf_(autocrlf),
-			error_(ERROR::NONE) { }
+			error_(ERROR::NONE), i2c_loop_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -583,9 +592,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start_i2c(SPEED spd, bool master = true, uint8_t level = 0) noexcept
 		{
-			// 現在の実装では、割り込みはサポートされない。
-			if(level != 0) return false;
-
 			// I2C オプションが無い場合エラー
 			if(PSEL != port_map::option::FIRST_I2C) {
 				return false;
@@ -601,6 +607,10 @@ namespace device {
 			--brr;
 //			utils::format("BRR: %d, MDDR: %d\n")
 //				% static_cast<uint16_t>(brr) % static_cast<uint16_t>(mddr);
+
+			// 200 ---> I2C Start/Stop loop for STANDARD
+			// 5 ---> マージン倍率
+			i2c_loop_ = 200 * 5;
 
 			level_ = level;
 
@@ -625,7 +635,15 @@ namespace device {
 			SCI::SPMR = 0x00;
 			SCI::SCR = SCI::SCR.TE.b() | SCI::SCR.RE.b();
 
+			if(level_ > 0) {
+				// TEIx (STI)
+				icu_mgr::install_group_task(SCI::get_te_vec(), nullptr);
+
+			}
+
 			auto_crlf_ = false;
+
+			error_ = ERROR::NONE;
 
 			return true;
 		}
@@ -644,34 +662,46 @@ namespace device {
 		{
 			if(src == nullptr || siz == 0) return false;
 
-			i2c_start_();
-
-			SCI::TDR = adr << 1;  // R/W = 0 (write)
-			while(SCI::SSR.TDRE() == 0) {
-				sleep_();
-			}
-			while(SCI::SSR.TEND() == 0) {
-				sleep_();
-			}
-
-			const uint8_t* p = static_cast<const uint8_t*>(src);
-			while(siz > 0) {
-				if(SCI::SISR.IICACKR()) {
-					break;
+			if(level_ == 0) {
+				if(!i2c_start_()) {
+					error_ = ERROR::I2C_START;
+					i2c_stop_();
+					return false;
 				}
-				SCI::TDR = *p++;
-				--siz;
 
+				SCI::TDR = adr << 1;  // R/W = 0 (write)
 				while(SCI::SSR.TDRE() == 0) {
 					sleep_();
 				}
 				while(SCI::SSR.TEND() == 0) {
 					sleep_();
 				}
+
+				const uint8_t* p = static_cast<const uint8_t*>(src);
+				while(siz > 0) {
+					if(SCI::SISR.IICACKR()) {
+						break;
+					}
+					SCI::TDR = *p++;
+					--siz;
+
+					while(SCI::SSR.TDRE() == 0) {
+						sleep_();
+					}
+					while(SCI::SSR.TEND() == 0) {
+						sleep_();
+					}
+				}
+
+				if(!i2c_stop_()) {
+					error_ = ERROR::I2C_STOP;
+					return false;
+				}
+				error_ = ERROR::NONE;
+			} else {
+
+
 			}
-
-			i2c_stop_();
-
 			return true;
 		}
 
@@ -689,44 +719,56 @@ namespace device {
 		{
 			if(dst == nullptr || siz == 0) return false;
 
-			i2c_start_();
-
-			SCI::TDR = (adr << 1) | 1;  // R/W = 1 (read)
-			while(SCI::SSR.TDRE() == 0) {
-				sleep_();
-			}
-			while(SCI::SSR.TEND() == 0) {
-				sleep_();
-			}
-			volatile uint8_t tmp = SCI::RDR();  // ダミーリード
-
-			if(SCI::SISR.IICACKR() != 0) {
-				error_ = ERROR::I2C_ACK;
-				i2c_stop_();
-				return false;
-			}
-
-			if(siz > 1) {
-				SCI::SIMR2.IICACKT = 0;
-			}
-			uint8_t* p = static_cast<uint8_t*>(dst);
-			while(siz > 0) {
-				if(siz == 1) {
-					SCI::SIMR2.IICACKT = 1;
+			if(level_ == 0) {
+				if(!i2c_start_()) {
+					error_ = ERROR::I2C_START;
+					i2c_stop_();
+					return false;
 				}
-				SCI::TDR = 0xff;  // dummy data
-				while(SCI::SSR.RDRF() == 0) {
+
+				SCI::TDR = (adr << 1) | 1;  // R/W = 1 (read)
+				while(SCI::SSR.TDRE() == 0) {
 					sleep_();
 				}
-				*p++ = SCI::RDR();
-				--siz;
 				while(SCI::SSR.TEND() == 0) {
 					sleep_();
 				}
+				volatile uint8_t tmp = SCI::RDR();  // ダミーリード
+
+				if(SCI::SISR.IICACKR() != 0) {
+					error_ = ERROR::I2C_ACK;
+					i2c_stop_();
+					return false;
+				}
+
+				if(siz > 1) {
+					SCI::SIMR2.IICACKT = 0;
+				}
+				uint8_t* p = static_cast<uint8_t*>(dst);
+				while(siz > 0) {
+					if(siz == 1) {
+						SCI::SIMR2.IICACKT = 1;
+					}
+					SCI::TDR = 0xff;  // dummy data
+					while(SCI::SSR.RDRF() == 0) {
+						sleep_();
+					}
+					*p++ = SCI::RDR();
+					--siz;
+					while(SCI::SSR.TEND() == 0) {
+						sleep_();
+					}
+				}
+
+				if(!i2c_stop_()) {
+					error_ = ERROR::I2C_STOP;
+					return false;
+				}
+				error_ = ERROR::NONE;
+			} else {
+
+
 			}
-
-			i2c_stop_();
-
 			return true;
 		}
 	};
