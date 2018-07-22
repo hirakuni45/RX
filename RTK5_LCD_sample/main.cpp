@@ -24,6 +24,8 @@
 
 #ifdef SOFT_I2C
 #include "common/si2c_io.hpp"
+#else
+#include "common/sci_i2c_io.hpp"
 #endif
 
 namespace {
@@ -95,7 +97,7 @@ namespace {
 #else
 	typedef utils::fixed_fifo<char, 4> RECV6_BUFF;
 	typedef utils::fixed_fifo<char, 4> SEND6_BUFF;
-	typedef device::sci_io<device::SCI6, RECV6_BUFF, SEND6_BUFF,
+	typedef device::sci_i2c_io<device::SCI6, RECV6_BUFF, SEND6_BUFF,
 			device::port_map::option::FIRST_I2C> FT5206_I2C;
 #endif
 	FT5206_I2C	ft5206_i2c_;
@@ -277,11 +279,7 @@ int main(int argc, char** argv)
 
 	{  // FT5206 touch screen controller
 		FT5206::reset<FT5206_RESET>();
-#ifdef SOFT_I2C
 		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD)) {
-#else
-		if(!ft5206_i2c_.start_i2c(FT5206_I2C::SPEED::STANDARD)) {
-#endif
 			utils::format("FT5206 I2C Start Fail...\n");
 		}
 		if(!ft5206_.start()) {
