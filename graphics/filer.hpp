@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ファイル操作ユーティリティー
+	@brief	ファイル選択ユーティリティー
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -10,6 +10,7 @@
 //=====================================================================//
 #include "common/sdc_man.hpp"
 #include "common/fixed_stack.hpp"
+#include "chip/FT5206.hpp"
 
 namespace graphics {
 
@@ -42,9 +43,9 @@ namespace graphics {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	ファイラー
-		@param[in]	SDC	sdc_man クラス型
-		@param[in]	RDR	render クラス型
+		@brief	ファイラー・クラス
+		@param[in]	SDC	sdc_man クラス型（SD カード操作）
+		@param[in]	RDR	render クラス型（描画）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SDC, class RDR>
@@ -67,9 +68,10 @@ namespace graphics {
 			int16_t		hmax_;
 			int16_t		sel_pos_;
 			uint16_t	num_;
+			int16_t		match_;
 
-			rdr_st(RDR& rdr) noexcept : rdr_(rdr), vofs_(0), vpos_(0), hmax_(0), sel_pos_(0),
-				num_(0)
+			rdr_st(RDR& rdr) noexcept : rdr_(rdr), vofs_(0), vpos_(0), hmax_(0),
+				sel_pos_(0), num_(0), match_(-1)
 			{ }
 		};
 		rdr_st	rdr_st_;
@@ -94,29 +96,34 @@ namespace graphics {
 			noexcept
 		{
 			rdr_st& t = *static_cast<rdr_st*>(opt);
-			if(t.vpos_ >= 0 && t.vpos_ < RDR::height) {
+			bool draw = false;
+			if(t.match_ < 0) {
+				draw = true;
+			} else if(t.num_ == static_cast<uint16_t>(t.match_)) {
+				draw = true;
+			}
+			if(draw && t.vpos_ >= 0 && t.vpos_ < RDR::height) {
 				t.rdr_.set_fore_color(RDR::COLOR::White);
 				t.rdr_.fill(SPC, t.vpos_, RDR::width - SPC * 2, RDR::font_height, 0x0000);
 				if(dir) t.rdr_.draw_font(SPC, t.vpos_, '/');
+				if(dir) {
+					t.rdr_.set_fore_color(RDR::COLOR::Blue);
+				} else {
+					t.rdr_.set_fore_color(RDR::COLOR::White);
+				}
+				auto w = t.rdr_.draw_text(SPC + 8, t.vpos_, name);
+				if(t.hmax_ < w) t.hmax_ = w;
 			}
-			if(dir) {
-				t.rdr_.set_fore_color(RDR::COLOR::Blue);
-			} else {
-				t.rdr_.set_fore_color(RDR::COLOR::White);
-			}
-			auto w = t.rdr_.draw_text(SPC + 8, t.vpos_, name);
-			if(t.hmax_ < w) t.hmax_ = w;
-
 			t.vpos_ += FLN;
 			++t.num_;
 		}
 
 
-		void start_dir_draw_() noexcept
+		void start_dir_draw_(int16_t match = -1) noexcept
 		{
-			uint32_t num = (RDR::height - 2) / (RDR::font_height + 2);
 			rdr_st_.vpos_ = rdr_st_.vofs_ + 2;
 			rdr_st_.num_ = 0;
+			rdr_st_.match_ = match;
 			sdc_.start_dir_list("", dir_draw_func_, true, &rdr_st_);
 		}
 
@@ -151,20 +158,32 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	sdc		ファイルシステム・インスタンス
+			@param[in]	rdr		レンダリング・インスタンス
 		*/
 		//-----------------------------------------------------------------//
 		filer(SDC& sdc, RDR& rdr) noexcept : sdc_(sdc), rdr_(rdr),
-			ctrl_(0), open_(false),
-			rdr_st_(rdr_)
-		{ }
+			ctrl_(0), open_(false), rdr_st_(rdr_) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	スクリーン・タッチ位置設定
+			@param[in]	src		タッチ位置
+			@param[in]	num		タッチ数
+		*/
+		//-----------------------------------------------------------------//
+		void set_touch(const int16_t* src, uint32_t num) noexcept
+		{
+		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	アップデート（毎フレーム呼ぶ）
 			@param[in]	ctrl	ファイラー制御
-			@param[in]	dst		ファイル・パスを受け取り先
-			@param[in]	dstlen	ファイル・パスを受け取りサイズ
+			@param[in]	dst		選択パス受け取り先
+			@param[in]	dstlen	選択パス最大サイズ
 			@return ファイルが選択された場合「true」
 		*/
 		//-----------------------------------------------------------------//
@@ -227,8 +246,17 @@ namespace graphics {
 				vofs = lim;
 			}
 			if(vofs != rdr_st_.vofs_) {
+				draw_sel_frame_(rdr_st_.sel_pos_, 0x0000);  // delete frame
+				int16_t match = -1;
+				if(vofs < rdr_st_.vofs_) {  // down
+					rdr_.scroll(FLN);
+					match = -vofs / FLN + (RDR::height / FLN) - 1;
+				} else if(vofs > rdr_st_.vofs_) {  // up
+					rdr_.scroll(-FLN);
+					match = -vofs / FLN;
+				}
 				rdr_st_.vofs_ = vofs;
-				start_dir_draw_();
+				start_dir_draw_(match);
 			}
 			
 			if(pos != rdr_st_.sel_pos_) {
