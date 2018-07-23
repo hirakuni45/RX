@@ -46,6 +46,26 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	ハードウェアー仕様の表示
+		*/
+		//-----------------------------------------------------------------//
+		void list_info() const noexcept
+		{
+			utils::format("REV:             0x%03X\n") % get_version();
+			utils::format("Alpha Blend:       %d\n") % static_cast<uint16_t>(DRW::HWVER.ACBLD());
+			utils::format("Clomakey:          %d\n") % static_cast<uint16_t>(DRW::HWVER.COLKEY());
+			utils::format("Texture CLUT:      %s\n") % (DRW::HWVER.TEXCLUT256() ? "256" : "16");
+			utils::format("RLE unit:          %d\n") % static_cast<uint16_t>(DRW::HWVER.RLEUNIT());
+			utils::format("Texture CLUT func: %d\n") % static_cast<uint16_t>(DRW::HWVER.TEXCLUT());
+			utils::format("Pefrmance CNT:     %d\n") % static_cast<uint16_t>(DRW::HWVER.PERFCNT());
+			utils::format("Texture CASH:      %d\n") % static_cast<uint16_t>(DRW::HWVER.TXCACHE());
+			utils::format("FB CASH:           %d\n") % static_cast<uint16_t>(DRW::HWVER.FBCACHE());
+			utils::format("Display List R:    %d\n") % static_cast<uint16_t>(DRW::HWVER.DLR());
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	開始
 			@param[in]	fba		フレーム・バッファ・アドレス
 			@return 成功なら「true」
