@@ -277,6 +277,15 @@ int main(int argc, char** argv)
 		}
 	}
 
+	{  // DRW2D 初期化
+		drw2d_mgr_.list_info();
+		if(drw2d_mgr_.start(0x00000000)) {
+			utils:: format("Start DRW2D\n");
+		} else {
+			utils:: format("DRW2D Fail\n");
+		}
+	}
+
 	{  // FT5206 touch screen controller
 		FT5206::reset<FT5206_RESET>();
 		uint8_t intr_lvl = 1;
@@ -285,17 +294,6 @@ int main(int argc, char** argv)
 		}
 		if(!ft5206_.start()) {
 			utils::format("FT5206 Start Fail...\n");
-		}
-	}
-
-	{  // DRW2D 初期化
-		auto ver = drw2d_mgr_.get_version();
-		utils::format("DRW2D Version: %04X\n") % ver;
-
-		if(drw2d_mgr_.start(0x00000000)) {
-			utils:: format("Start DRW2D\n");
-		} else {
-			utils:: format("DRW2D Fail\n");
 		}
 	}
 
