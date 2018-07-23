@@ -237,6 +237,27 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	スクロール
+			@param[in]	h		スクロール高さ（+up、-down）
+		*/
+		//-----------------------------------------------------------------//
+		void scroll(int16_t h) noexcept
+		{
+			if(h > 0) {
+				for(int32_t i = 0; i < (WIDTH * (HEIGHT - h)); ++i) {
+					fb_[i] = fb_[i + (WIDTH * h)];
+				}
+			} else if(h < 0) {
+				h = -h;
+				for(int32_t i = (WIDTH * (HEIGHT - h)) - 1; i >= 0; --i) {
+					fb_[i + (WIDTH * h)] = fb_[i];
+				}
+			}			
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	ビットマップイメージを描画する
 			@param[in]	x	開始点Ｘ軸を指定
 			@param[in]	y	開始点Ｙ軸を指定
@@ -457,6 +478,6 @@ namespace graphics {
 			x += (w - l) / 2;
 			y += (h - font_height) / 2;
 			draw_text(x, y, text);
-		} 
+		}
 	};
 }
