@@ -1,7 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	MX25L3233F/EEPROM ドライバー
+	@brief	MX25L3233F class @n
+			Macronix International Co.,Ltd. @n
+			3V, 32M-BIT [x 1/x 2/x 4] FLASH MEMORY ドライバー
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -9,33 +11,67 @@
 */
 //=====================================================================//
 #include <cstdint>
-#include "common/iica_io.hpp"
-#include "common/delay.hpp"
 
 namespace chip {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  EEPROM テンプレートクラス
-		@param[in]	IOIF SPI/QSPI I/O クラス
+		@brief  MX25L3233F テンプレートクラス
+		@param[in]	QSPI	QSPI 制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class IOIF>
+	template <class QSPI>
 	class MX25L3233F {
 
-		IOIF&	ioif_;
+		QSPI&	qspi_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
-			@param[in]	i2c	i2c_io クラスを参照で渡す
+			@param[in]	qspi	qspi 制御クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		MX25L3233F(IOIF& ioif) noexcept : ioif_(ioif)
-			{ }
+		MX25L3233F(QSPI& qspi) noexcept : qspi_(qspi) { }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	開始
+		 */
+		//-----------------------------------------------------------------//
+		void start() noexcept
+		{
+		}
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	読み出し
+			@param[in]	adr	読み出しアドレス
+			@param[out]	dst	先
+			@param[in]	len	長さ
+			@return 成功なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool read(uint32_t adr, void* dst, uint32_t len) const
+		{
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	書き込み
+			@param[in]	adr	書き込みアドレス
+			@param[out]	src	元
+			@param[in]	len	長さ
+			@return 成功なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		bool write(uint32_t adr, const void* src, uint32_t len) const
+		{
+			return true;
+		}
 	};
 }
