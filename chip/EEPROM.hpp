@@ -3,13 +3,12 @@
 /*!	@file
 	@brief	I2C EEPROM ドライバー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdint>
-#include "common/iica_io.hpp"
 #include "common/delay.hpp"
 
 namespace chip {
@@ -17,15 +16,15 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  EEPROM テンプレートクラス
-		@param[in]	I2C_IO	i2c I/O クラス
+		@param[in]	I2C	i2c I/O クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class I2C_IO>
+	template <class I2C>
 	class EEPROM {
 
 		static const uint8_t	EEPROM_ADR_ = 0x50;
 
-		I2C_IO&	i2c_;
+		I2C&	i2c_;
 
 		uint8_t	ds_;
 		bool	exp_;
@@ -98,7 +97,7 @@ namespace chip {
 			@param[in]	i2c	i2c_io クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		EEPROM(I2C_IO& i2c) : i2c_(i2c), ds_(0),
+		EEPROM(I2C& i2c) : i2c_(i2c), ds_(0),
 			exp_(false), ad_mix_(false), pagen_(1) { }
 
 
@@ -191,15 +190,17 @@ namespace chip {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool read(uint32_t adr, uint8_t* dst, uint16_t len) const {
-			uint8_t tmp[2];
+		bool read(uint32_t adr, void* dst, uint16_t len) const
+		{
 			if(exp_) {
+				uint8_t tmp[2];
 				tmp[0] = (adr >> 8) & 255;
 				tmp[1] =  adr & 255;
 				if(!i2c_.send(i2c_adr_(adr), tmp, 2)) {
 					return false;
 				}
 			} else {
+				uint8_t tmp[1];
 				tmp[0] = adr & 255;
 				if(!i2c_.send(i2c_adr_(adr), tmp, 1)) {
 					return false;
@@ -216,25 +217,27 @@ namespace chip {
 		/*!
 			@brief	EEPROM 書き込み
 			@param[in]	adr	書き込みアドレス
-			@param[out]	src	元
+			@param[in]	src	元
 			@param[in]	len	長さ
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool write(uint32_t adr, const uint8_t* src, uint16_t len) const {
+		bool write(uint32_t adr, const void* src, uint16_t len) const
+		{
+			const uint8_t* p = static_cast<const uint8_t*>(src);
 			while(len > 0) {
 				uint16_t l = pagen_ - (adr & (pagen_ - 1));
 				if(len < l) l = len;
 				if(exp_) {
-					if(!i2c_.send(i2c_adr_(adr), adr >> 8, adr & 255, src, l)) {
+					if(!i2c_.send(i2c_adr_(adr), adr >> 8, adr & 255, p, l)) {
 						return false;
 					}
 				} else {
-					if(!i2c_.send(i2c_adr_(adr), adr & 255, src, l)) {
+					if(!i2c_.send(i2c_adr_(adr), adr & 255, p, l)) {
 						return false;
 					}
 				}
-				src += l;
+				p += l;
 				len -= l;
 				if(len) {  // 書き込み終了を待つポーリング
 					if(!sync_write(adr)) {
