@@ -1,5 +1,5 @@
 #pragma once
-//=====================================================================//
+//=========================================================================//
 /*!	@file
 	@brief	FT5206 class @n
 			FocalTech @n
@@ -10,7 +10,7 @@
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
-//=====================================================================//
+//=========================================================================//
 #include <cstdint>
 #include "common/delay.hpp"
 
@@ -25,14 +25,33 @@ namespace chip {
 	template <class I2C>
 	class FT5206 {
 	public:
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  Touch Event Type
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class EVENT : uint8_t {
+			DOWN,
+			UP,
+			CONTACT,
+			NONE
+		};
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  Touch Struct
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct xy {
-			uint8_t		st;
-			uint16_t	x;
-			uint16_t	y;
-			xy() : st(0), x(0), y(0) { }
+			EVENT		event;	///< Touch Event
+			uint8_t		id;		///< Touch ID
+			uint16_t	x;		///< Touch Position X
+			uint16_t	y;		///< Touch Position Y
+			xy() : event(EVENT::NONE), id(0), x(0), y(0) { }
 		};
 
 	private:
+
 		static const uint8_t	FT5206_ADR = 0x38;
 
 		I2C&	i2c_;
@@ -130,17 +149,19 @@ namespace chip {
 			if(touch_num_ == 0) return;
 
 			if(touch_num_ >= 1) {
-				xy_[0].st = touch_tmp_[1] >> 6;
-				xy_[0].x = (static_cast<uint16_t>(touch_tmp_[1] & 0x3F) << 8)
+				xy_[0].event = static_cast<EVENT>(touch_tmp_[1] >> 6);
+				xy_[0].id = touch_tmp_[3] >> 4;
+				xy_[0].x = (static_cast<uint16_t>(touch_tmp_[1] & 0x0F) << 8)
 					| static_cast<uint16_t>(touch_tmp_[2]);
-				xy_[0].y = (static_cast<uint16_t>(touch_tmp_[3]) << 8)
+				xy_[0].y = (static_cast<uint16_t>(touch_tmp_[3] & 0x0F) << 8)
 					| static_cast<uint16_t>(touch_tmp_[4]);
 			}
 			if(touch_num_ > 1) {
-				xy_[1].st = touch_tmp_[7] >> 6;
-				xy_[1].x = (static_cast<uint16_t>(touch_tmp_[7] & 0x3F) << 8)
+				xy_[1].event = static_cast<EVENT>(touch_tmp_[7] >> 6);
+				xy_[1].id = touch_tmp_[9] >> 4;
+				xy_[1].x = (static_cast<uint16_t>(touch_tmp_[7] & 0x0F) << 8)
 					| static_cast<uint16_t>(touch_tmp_[8]);
-				xy_[1].y = (static_cast<uint16_t>(touch_tmp_[9]) << 8)
+				xy_[1].y = (static_cast<uint16_t>(touch_tmp_[9] & 0x0F) << 8)
 					| static_cast<uint16_t>(touch_tmp_[10]);
 			}
 		}
