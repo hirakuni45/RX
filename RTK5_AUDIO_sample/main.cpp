@@ -11,8 +11,7 @@
 #include "common/cmt_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
-#include "common/format.hpp"
-#include "common/command.hpp"
+#include "common/sci_i2c_io.hpp"
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
@@ -24,9 +23,11 @@
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
+#include "common/format.hpp"
+#include "common/command.hpp"
 
 #include "chip/FAMIPAD.hpp"
-
+#include "chip/FT5206.hpp"
 
 namespace {
 
@@ -117,17 +118,21 @@ namespace {
 	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
 	TPU0		tpu0_;
 
+	// GLCDC
+	static const int16_t LCD_X = 480;
+	static const int16_t LCD_Y = 272;
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, 480, 272, device::PIX_TYPE::RGB565> GLCDC_IO;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, device::PIX_TYPE::RGB565> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
+
+	// DRW2D
+	typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_;
 
 	// QSPI B グループ
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
-
-//	typedef device::drw2d_mgr<device::DRW2D> DRW2D_MGR;
-//	DRW2D_MGR	drw2d_mgr_;
 
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont<16, 16, 64> KFONT;
@@ -145,6 +150,17 @@ namespace {
 	WAV_IN		wav_in_;
 
 	uint8_t		pad_level_;
+
+	// FT5206, SCI6 簡易 I2C 定義
+	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+	typedef utils::fixed_fifo<uint8_t, 64> RB6;
+	typedef utils::fixed_fifo<uint8_t, 64> SB6;
+	typedef device::sci_i2c_io<device::SCI6, RB6, SB6,
+		device::port_map::option::FIRST_I2C> FT5206_I2C;
+
+	FT5206_I2C	ft5206_i2c_;
+	typedef chip::FT5206<FT5206_I2C> FT5206;
+	FT5206		ft5206_(ft5206_i2c_);
 
 
 	bool check_mount_() {
@@ -535,24 +551,35 @@ int main(int argc, char** argv)
 			utils::format("GLCDC Fail\n");
 		}
 	}
-#if 0
+
 	{  // DRW2D 初期化
 		auto ver = drw2d_mgr_.get_version();
 		utils::format("DRW2D Version: %04X\n") % ver;
 
-		if(drw2d_mgr_.start()) {
+		if(drw2d_mgr_.start(0x00000000)) {
 			utils:: format("Start DRW2D\n");
 		} else {
 			utils:: format("DRW2D Fail\n");
 		}
 	}
-#endif
-	{
+
+	{  // ファミコンパッド初期化
 		PAD_VCC::DIR = 1;
 		PAD_VCC::P = 1;
 		PAD_GND::DIR = 1;
 		PAD_GND::P = 0;
 		famipad_.start();
+	}
+
+	{  // FT5206 touch screen controller
+		FT5206::reset<FT5206_RESET>();
+		uint8_t intr_lvl = 1;
+		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
+			utils::format("FT5206 I2C Start Fail...\n");
+		}
+		if(!ft5206_.start()) {
+			utils::format("FT5206 Start Fail...\n");
+		}
 	}
 
 	LED::DIR = 1;
