@@ -114,6 +114,12 @@ Programmable Waveform Generator
 <http://www.analog.com/media/jp/technical-documentation/data-sheets/AD9833_JP.pdf>   
 Interface: SPI   
    
+ - FT5206
+FocalTech   
+Capacitive Touch Panel Controller   
+<https://www.buydisplay.com/download/ic/FT5206.pdf>   
+Interface: I2C   
+   
 -----
    
 License
