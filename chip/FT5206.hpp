@@ -4,7 +4,8 @@
 	@brief	FT5206 class @n
 			FocalTech @n
 			Capacitive Touch Panel Controller ドライバー @n
-			・I2C 割り込み対応
+			・I2C 割り込み対応 @n
+			・２点同時までのタッチ位置を補足
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -31,9 +32,9 @@ namespace chip {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class EVENT : uint8_t {
-			DOWN,
-			UP,
-			CONTACT,
+			DOWN,		///< Touch Down
+			UP,			///< Touch Up
+			CONTACT,	///< Contact
 			NONE
 		};
 
@@ -45,9 +46,34 @@ namespace chip {
 		struct xy {
 			EVENT		event;	///< Touch Event
 			uint8_t		id;		///< Touch ID
-			uint16_t	x;		///< Touch Position X
-			uint16_t	y;		///< Touch Position Y
-			xy() : event(EVENT::NONE), id(0), x(0), y(0) { }
+			int16_t		x;		///< Touch Position X
+			int16_t		y;		///< Touch Position Y
+			int16_t		org_x;	///< Touch Down Position X
+			int16_t		org_y;	///< Touch Down Position Y
+			int16_t		end_x;	///< Touch Up Position X
+			int16_t		end_y;	///< Touch Up Position Y
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief	コンストラクター
+			 */
+			//-------------------------------------------------------------//
+			xy() noexcept : event(EVENT::NONE), id(0), x(0), y(0),
+				   org_x(0), org_y(0), end_x(0), end_y(0) { }
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief	ドラッグされた距離の二乗を返す
+				@return ドラッグされた距離の二乗
+			 */
+			//-------------------------------------------------------------//
+			uint32_t length_sqr() const noexcept
+			{
+				auto dx = end_x - org_x;
+				auto dy = end_y - org_y;
+				return dx * dx + dy * dy;
+			} 
 		};
 
 	private:
@@ -149,16 +175,16 @@ namespace chip {
 
 			xy_[0].event = static_cast<EVENT>(touch_tmp_[1] >> 6);
 			xy_[0].id = touch_tmp_[3] >> 4;
-			xy_[0].x = (static_cast<uint16_t>(touch_tmp_[1] & 0x0F) << 8)
-				| static_cast<uint16_t>(touch_tmp_[2]);
-			xy_[0].y = (static_cast<uint16_t>(touch_tmp_[3] & 0x0F) << 8)
-				| static_cast<uint16_t>(touch_tmp_[4]);
+			xy_[0].x = (static_cast<int16_t>(touch_tmp_[1] & 0x0F) << 8)
+				| static_cast<int16_t>(touch_tmp_[2]);
+			xy_[0].y = (static_cast<int16_t>(touch_tmp_[3] & 0x0F) << 8)
+				| static_cast<int16_t>(touch_tmp_[4]);
 			xy_[1].event = static_cast<EVENT>(touch_tmp_[7] >> 6);
 			xy_[1].id = touch_tmp_[9] >> 4;
-			xy_[1].x = (static_cast<uint16_t>(touch_tmp_[7] & 0x0F) << 8)
-				| static_cast<uint16_t>(touch_tmp_[8]);
-			xy_[1].y = (static_cast<uint16_t>(touch_tmp_[9] & 0x0F) << 8)
-				| static_cast<uint16_t>(touch_tmp_[10]);
+			xy_[1].x = (static_cast<int16_t>(touch_tmp_[7] & 0x0F) << 8)
+				| static_cast<int16_t>(touch_tmp_[8]);
+			xy_[1].y = (static_cast<int16_t>(touch_tmp_[9] & 0x0F) << 8)
+				| static_cast<int16_t>(touch_tmp_[10]);
 		}
 
 
@@ -177,7 +203,7 @@ namespace chip {
 		 */
 		//-----------------------------------------------------------------//
 		FT5206(I2C& i2c) noexcept : i2c_(i2c), touch_num_(0), start_(false),
-			version_(0), chip_(0) { }
+			version_(0), chip_(0), touch_tmp_{ 0 }, xy_{ } { }
 
 
 		//-----------------------------------------------------------------//
@@ -263,6 +289,16 @@ namespace chip {
 
 			convert_touch_();
 			request_touch_();
+
+			for(uint8_t i = 0; i < 2; ++i) {
+				if(xy_[i].event == EVENT::DOWN) {
+					xy_[i].org_x = xy_[i].x;
+					xy_[i].org_y = xy_[i].y;
+				} else if(xy_[i].event == EVENT::UP) {
+					xy_[i].end_x = xy_[i].x;
+					xy_[i].end_y = xy_[i].y;
+				}
+			}
 		}
 
 
