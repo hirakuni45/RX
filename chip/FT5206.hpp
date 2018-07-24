@@ -145,25 +145,20 @@ namespace chip {
 
 		void convert_touch_() noexcept
 		{
-			touch_num_ = touch_tmp_[0];
-			if(touch_num_ == 0) return;
+			touch_num_ = touch_tmp_[0] & 0x0f;
 
-			if(touch_num_ >= 1) {
-				xy_[0].event = static_cast<EVENT>(touch_tmp_[1] >> 6);
-				xy_[0].id = touch_tmp_[3] >> 4;
-				xy_[0].x = (static_cast<uint16_t>(touch_tmp_[1] & 0x0F) << 8)
-					| static_cast<uint16_t>(touch_tmp_[2]);
-				xy_[0].y = (static_cast<uint16_t>(touch_tmp_[3] & 0x0F) << 8)
-					| static_cast<uint16_t>(touch_tmp_[4]);
-			}
-			if(touch_num_ > 1) {
-				xy_[1].event = static_cast<EVENT>(touch_tmp_[7] >> 6);
-				xy_[1].id = touch_tmp_[9] >> 4;
-				xy_[1].x = (static_cast<uint16_t>(touch_tmp_[7] & 0x0F) << 8)
-					| static_cast<uint16_t>(touch_tmp_[8]);
-				xy_[1].y = (static_cast<uint16_t>(touch_tmp_[9] & 0x0F) << 8)
-					| static_cast<uint16_t>(touch_tmp_[10]);
-			}
+			xy_[0].event = static_cast<EVENT>(touch_tmp_[1] >> 6);
+			xy_[0].id = touch_tmp_[3] >> 4;
+			xy_[0].x = (static_cast<uint16_t>(touch_tmp_[1] & 0x0F) << 8)
+				| static_cast<uint16_t>(touch_tmp_[2]);
+			xy_[0].y = (static_cast<uint16_t>(touch_tmp_[3] & 0x0F) << 8)
+				| static_cast<uint16_t>(touch_tmp_[4]);
+			xy_[1].event = static_cast<EVENT>(touch_tmp_[7] >> 6);
+			xy_[1].id = touch_tmp_[9] >> 4;
+			xy_[1].x = (static_cast<uint16_t>(touch_tmp_[7] & 0x0F) << 8)
+				| static_cast<uint16_t>(touch_tmp_[8]);
+			xy_[1].y = (static_cast<uint16_t>(touch_tmp_[9] & 0x0F) << 8)
+				| static_cast<uint16_t>(touch_tmp_[10]);
 		}
 
 
@@ -250,9 +245,6 @@ namespace chip {
 
 			start_ = true;
 
-			request_touch_();
-			i2c_.sync();
-
 			return true;
 		}
 
@@ -264,7 +256,10 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		void update() noexcept
 		{
-			if(!start_) return;
+			if(!start_) {
+				touch_num_ = 0;
+				return;
+			}
 
 			convert_touch_();
 			request_touch_();
