@@ -16,8 +16,8 @@ ENTRY(_start)
 /* This memory layout corresponds to the smallest predicted RX65N chip.  */
 MEMORY {
 	RAM (w)    : ORIGIN = 0x00800000, LENGTH = 0x0005C000 /* 384k - (USTACK+ISTACK)(0x4000) */
-	USTACK (w) : ORIGIN = 0x0085E000, LENGTH = 4 /* ustack 8192 */
-	ISTACK (w) : ORIGIN = 0x00860000, LENGTH = 4 /* istack 8192 */
+	USTACK (w) : ORIGIN = 0x0085F000, LENGTH = 4 /* ustack 8192+4096 */
+	ISTACK (w) : ORIGIN = 0x00860000, LENGTH = 4 /* istack 4096 */
 	EXTRAM (w) : ORIGIN = 0x00000000, LENGTH = 0x00040000 /* 256k for video ram */
 	ROM (w)    : ORIGIN = 0xFFE00000, LENGTH = 0x001FFFD0 /* 2M */
 }
