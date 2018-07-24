@@ -229,6 +229,8 @@ namespace img {
 			// 解凍の開始
 			error_code_ = 0;
 
+			utils::format("Input Scan: %d\n") % cinfo.input_scan_number;
+
 			jpeg_start_decompress(&cinfo);
 			if(error_code_) {
 				utils::format("JPEG decode error: 'decompress'(%d)\n") % error_code_;
