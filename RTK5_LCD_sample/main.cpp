@@ -18,6 +18,7 @@
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
+#include "graphics/jpeg_in.hpp"
 #include "chip/FT5206.hpp"
 
 // #define SOFT_I2C
@@ -232,6 +233,20 @@ extern "C" {
 	int fatfs_get_mount() {
 		return sdc_.get_mount();
 	}
+
+
+	int make_full_path(const char* src, char* dst, uint16_t len)
+	{
+		return sdc_.make_full_path(src, dst, len);
+	}
+
+	void gr_plot(int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b)
+	{
+		uint16_t c =   (static_cast<uint16_t>(r & 0xf8) << 8)
+              | (static_cast<uint16_t>(g & 0xfc) << 3)
+              | (static_cast<uint16_t>(b & 0xf8) >> 3);
+		render_.plot(x, y, c);
+	}
 }
 
 int main(int argc, char** argv);
@@ -301,7 +316,6 @@ int main(int argc, char** argv)
 //	SW2::DIR = 0;
 
 	uint8_t task = 100;
-
 	FT5206::xy	pos;
 
 	uint8_t n = 0;
@@ -316,7 +330,16 @@ int main(int argc, char** argv)
 		if(task > 0) {
 			--task;
 			if(task == 0) {
-//				render_.line(0, 0, 480-1, 272-1, 0xffff);
+
+				img::jpeg_in jpeg;
+				utils::file_io fin;
+				if(fin.open("bbbbb.jpg", "rb")) {
+					if(!jpeg.load(fin)) {
+						utils::format("JPEG load fail...\n");
+					}
+					fin.close();
+				}
+#if 0
 				char tmp[32];
 				for(int i = 0; i < 26; ++i) tmp[i] = 'A' + i;
 				tmp[26] = 0;
@@ -327,20 +350,25 @@ int main(int argc, char** argv)
 				render_.draw_text(0, 32, "金の貸し借りをしてはならない。\n金を貸せば金も友も失う。\n金を借りれば倹約が馬鹿らしくなる。");
 				render_.draw_text(0, 16*5, "Graphics Image Light Bilk IgIiIrliiljkffkL\n", true);
 				render_.draw_text(0, 16*6, "012:;,.(i),[i],{i},{|}.(`)\n", true);
+#endif
 			}
 		}
 
-		if(ft5206_.get_touch_num() == 3) {
+		command_();
+
+		auto tnum = ft5206_.get_touch_num();
+		if(tnum == 3) {
 			render_.clear(RENDER::COLOR::Black);
 		}
-		if(ft5206_.get_touch_num() > 0) {
+		if(tnum > 0) {
 			const auto& npos = ft5206_.get_touch_pos(0);
-			if(pos.st != 0) {
+			if(npos.event != FT5206::EVENT::CONTACT) {
+				pos.event = FT5206::EVENT::NONE;
+			}
+			if(pos.event == FT5206::EVENT::CONTACT) {
 				render_.line(pos.x, pos.y, npos.x, npos.y, RENDER::COLOR::White);
 			}
 			pos = npos;
-		} else {
-			pos.st = 0;
 		}
 
 #if 0
@@ -355,8 +383,6 @@ int main(int argc, char** argv)
 			sw2 = f;
 		}
 #endif
-
-		command_();
 
 		++n;
 		if(n >= 30) {
