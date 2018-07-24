@@ -31,7 +31,7 @@ PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp \
 				graphics/font8x16.cpp
 
-USER_LIBS	=
+USER_LIBS	=	jpeg
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
@@ -41,7 +41,9 @@ MCU_TARGET	=
 
 INC_SYS		=
 
-INC_APP		=	. ../ ../RX600 ../RX56x
+INC_APP		=	. ../ ../RX600 ../RX56x ../jpeg-6b
+
+LIB_ROOT	=	../jpeg-6b
 
 OPTIMIZE	=	-Os
 
