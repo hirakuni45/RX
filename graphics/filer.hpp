@@ -54,8 +54,6 @@ namespace graphics {
 		static const int16_t FLN = RDR::font_height + SPC;      ///< 行幅
 		static const int16_t SCN = (RDR::height - SPC) / FLN;   ///< 行数
 
-		static const uint16_t TOUCH_OPEN = 60;	///< タッチでファイラーが有効になるフレーム数
-
 		SDC&	sdc_;
 		RDR&	rdr_;
 
@@ -89,13 +87,15 @@ namespace graphics {
 		bool			touch_lvl_;
 		bool			touch_pos_;
 		bool			touch_neg_;
+		uint8_t			touch_num_;
 		int16_t			touch_x_;
 		int16_t			touch_y_;
 		int16_t			touch_org_x_;
 		int16_t			touch_org_y_;
 		int16_t			touch_end_x_;
 		int16_t			touch_end_y_;
-		uint16_t		touch_hold_;
+
+		uint8_t			back_num_;
 
 		static uint32_t ctrl_mask_(filer_ctrl ctrl) noexcept
 		{
@@ -175,8 +175,10 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		filer(SDC& sdc, RDR& rdr) noexcept : sdc_(sdc), rdr_(rdr),
 			ctrl_(0), open_(false), rdr_st_(rdr_),
-			touch_lvl_(false), touch_pos_(false), touch_neg_(false), touch_x_(0), touch_y_(0),
-			touch_org_x_(0), touch_org_y_(0), touch_end_x_(0), touch_end_y_(0), touch_hold_(0)
+			touch_lvl_(false), touch_pos_(false), touch_neg_(false), touch_num_(0),
+			touch_x_(0), touch_y_(0),
+			touch_org_x_(0), touch_org_y_(0), touch_end_x_(0), touch_end_y_(0),
+			back_num_(0)
 		{ }
 
 
@@ -184,16 +186,18 @@ namespace graphics {
 		/*!
 			@brief	スクリーン・タッチ位置設定 @n
 					※タッチ情報は毎フレーム設定する事。
-			@param[in]	touch	タッチなら「true」
+			@param[in]	num		タッチ数
 			@param[in]	x		タッチＸ
 			@param[in]	y		タッチＹ
 		*/
 		//-----------------------------------------------------------------//
-		void set_touch(bool touch, int16_t x, int16_t y) noexcept
+		void set_touch(uint8_t num, int16_t x, int16_t y) noexcept
 		{
-			touch_pos_ = !touch_lvl_ &  touch;
-			touch_neg_ =  touch_lvl_ & !touch;
-			touch_lvl_ = touch;
+			touch_num_ = num;
+			bool lvl = num > 0;
+			touch_pos_ = !touch_lvl_ &  lvl;
+			touch_neg_ =  touch_lvl_ & !lvl;
+			touch_lvl_ = lvl;
 			touch_x_ = x;
 			touch_y_ = y;
 			if(touch_pos_) {
@@ -229,21 +233,14 @@ namespace graphics {
 				return false;
 			}
 
-			if(!open_ && touch_lvl_) {
-				++touch_hold_;
-				if(touch_hold_ >= TOUCH_OPEN) {
-					ptrg |= ctrl_mask_(filer_ctrl::OPEN);
-				}
-			} else {
-				touch_hold_ = 0;
-			}
-			if(ptrg & ctrl_mask_(filer_ctrl::OPEN)) {
+			if((ptrg & ctrl_mask_(filer_ctrl::OPEN)) != 0 || (back_num_ == 3 && touch_num_ < 3)) {
 				open_ = !open_;
 				rdr_.clear(RDR::COLOR::Black);
 				if(open_) {
 					scan_dir_(false);
 				}
 			}
+			back_num_ = touch_num_;
 
 			if(!open_) {
 				return false;
