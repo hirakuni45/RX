@@ -79,7 +79,7 @@ namespace {
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
 
-//	utils::command<256> cmd_;
+	utils::command<256> cmd_;
 
 	volatile uint32_t	wpos_;
 
@@ -171,6 +171,8 @@ namespace {
 		return f;
 	}
 
+	uint8_t		touch_num_ = 0;
+	int16_t		touch_org_ = 0;
 
 	void update_led_()
 	{
@@ -189,6 +191,8 @@ namespace {
 
 	sound::af_play::CTRL sound_ctrl_task_()
 	{
+		ft5206_.update();
+
 		auto ctrl = sound::af_play::CTRL::NONE;
 
 		uint8_t level = famipad_.update();
@@ -205,13 +209,37 @@ namespace {
 		if(chip::on(ptrg, chip::FAMIPAD_ST::LEFT)) {
 			ctrl = sound::af_play::CTRL::REPLAY;
 		}
-		if(chip::on(ptrg, chip::FAMIPAD_ST::START)) {
+		if(chip::on(ptrg, chip::FAMIPAD_ST::START)) { // Cancel Play
 			ctrl = sound::af_play::CTRL::STOP;
 			sdc_.stall_dir_list();
 			render_.clear(RENDER::COLOR::Black);
 		}
 
 		update_led_();
+
+		auto tnum = ft5206_.get_touch_num();
+		const auto& xy = ft5206_.get_touch_pos(0);
+		if(touch_num_ == 2 && tnum < 2) {  // pause（２点タッチが離された瞬間）
+			ctrl = sound::af_play::CTRL::PAUSE;
+			touch_org_ = xy.x;
+		} else if(touch_num_ == 3 && tnum < 3) {  // Cancel Play（３点タッチが離れた瞬間）
+			ctrl = sound::af_play::CTRL::STOP;
+			sdc_.stall_dir_list();
+			render_.clear(RENDER::COLOR::Black);
+			touch_org_ = xy.x;
+		} else if(touch_num_ == 0 && tnum == 1) {
+			touch_org_ = xy.x;
+		} else if(touch_num_ == 1 && tnum == 0) {
+			auto d = xy.x - touch_org_;
+			if(d >= 16) {  // Next
+				ctrl = sound::af_play::CTRL::STOP;
+				touch_org_ = xy.x;
+			} else if(d <= -16) {  // Replay
+				ctrl = sound::af_play::CTRL::REPLAY;
+				touch_org_ = xy.x;
+			}
+		}
+		touch_num_ = tnum;
 
 		return ctrl;
 	}
@@ -326,7 +354,6 @@ namespace {
 	}
 
 
-#if 0
 	void command_()
 	{
 		if(!cmd_.service()) {
@@ -378,6 +405,7 @@ namespace {
 				utils::format("    dir [path]\n");
 				utils::format("    cd [path]\n");
 				utils::format("    pwd\n");
+				utils::format("    play [filename, *]\n");
 				f = true;
 			}
 			if(!f) {
@@ -388,7 +416,6 @@ namespace {
 			}
 		}
 	}
-#endif
 }
 
 extern "C" {
@@ -459,7 +486,6 @@ extern "C" {
 
 	DWORD get_fattime(void) {
 		time_t t = 0;
-///		rtc_.get_time(t);
 		return utils::str::get_fattime(t);
 	}
 
@@ -527,7 +553,7 @@ int main(int argc, char** argv)
 	}
 
 	utils::format("RTK5RX65N Start for AUDIO sample\n");
-//	cmd_.set_prompt("# ");
+	cmd_.set_prompt("# ");
 
 	{  // QSPI の初期化（Flash Memory Read/Write Interface)
 		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
@@ -586,6 +612,10 @@ int main(int argc, char** argv)
 
 	while(1) {
 		glcdc_io_.sync_vpos();
+
+		ft5206_.update();
+		command_();
+
 		{
 			auto data = get_fami_pad();
 			uint32_t ctrl = 0;
@@ -604,6 +634,10 @@ int main(int argc, char** argv)
 			if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
 				graphics::set(graphics::filer_ctrl::SELECT, ctrl);
 			}
+
+			auto tnum = ft5206_.get_touch_num();
+			const auto& xy = ft5206_.get_touch_pos(0);
+			filer_.set_touch(tnum, xy.x, xy.y); 
 			char path[256];
 			if(filer_.update(ctrl, path, sizeof(path))) {
 				play_loop_("", path);
@@ -613,7 +647,5 @@ int main(int argc, char** argv)
 		sdc_.service(sdh_.service());
 
 		update_led_();
-//		command_();
-
 	}
 }
