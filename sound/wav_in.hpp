@@ -239,8 +239,8 @@ namespace sound {
 				}
 
 				uint32_t unit = (bits_ / 8) * channel_;
-				uint8_t tmp[512];
-				if(fin.read(tmp, unit * 128) != (unit * 128)) {
+				uint8_t tmp[1024];
+				if(fin.read(tmp, unit * 256) != (unit * 256)) {
 					utils::format("Read fail abort...\n");
 					out.mute();
 					status = false;
@@ -248,7 +248,7 @@ namespace sound {
 				}
 				if(bits_ == 16) {
 					const uint16_t* src = reinterpret_cast<const uint16_t*>(tmp);
-					for(uint32_t i = 0; i < 128; ++i) {
+					for(uint32_t i = 0; i < 256; ++i) {
 						while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
 						}
 						sound::wave_t t;
@@ -266,7 +266,7 @@ namespace sound {
 					}
 				} else {  // 8 bits
 					const uint8_t* src = reinterpret_cast<const uint8_t*>(tmp);
-					for(uint32_t i = 0; i < 128; ++i) {
+					for(uint32_t i = 0; i < 256; ++i) {
 						while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
 						}
 						sound::wave_t t;
