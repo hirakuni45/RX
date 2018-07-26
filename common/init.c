@@ -2,7 +2,7 @@
 /*! @file
     @brief  RX 起動前、初期化
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -19,7 +19,7 @@ extern void set_intr_level(int);
 
 extern void null_task_(void);
 
-int init(void)
+void init(void)
 {
 	init_interrupt();
 
@@ -35,7 +35,8 @@ int init(void)
 	static char **argv = 0;
 	int ret = main(argc, argv);
 
-	return ret;
+	// メイン関数の「return」
+	while(1) ;
 }
 
 // EOF
