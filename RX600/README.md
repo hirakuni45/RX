@@ -31,6 +31,3 @@ License
 
 MIT
 
-and
-
-NES Emulator for G.P.L.
