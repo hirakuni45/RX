@@ -14,8 +14,9 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 ## ハードウェアーの準備
  - ベースクリスタルが異なる場合は、typedef のパラメーターを変更する。
  - Makefile で、各モジュール別の設定周波数を宣言している。
+ - RX24T: 80MHz、RX64M: 120MHz、RX71M: 240MHz、RX65N: 120MHz
  - LED を指定のポートに接続する。
- `
+```
 #if defined(SIG_RX64M) | defined(SIG_RX71M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
@@ -26,7 +27,8 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #endif
- `
+```
+ - RX24T の場合「10MHz」、他 CPU は「12MHz」
  - Envision kit RX65N の場合は、ボード上の青色 LED を利用する。
    
 ## リソースの準備
