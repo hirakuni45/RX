@@ -41,6 +41,7 @@ Renesas RX マイコン
  - /libmad　　　　　　 ---> MP3 デコード、mad ライブラリ
  - /jpeg-6b　　　　　　---> JPEG ライブラリ
  - /rxprog　　　　　　 ---> RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
+ - [FIRST_sample](./FIRST_sample)　　　　---> 各プラットホーム対応 LED 点滅プログラム
  - /rx24t_SCI_sample　 ---> RX24T を使った SCI1 の制御サンプル
  - /rx24t_SDC_sample　 ---> RX24T を使った SD カードの動作サンプル
  - /rx24t_GPS_sample　 ---> RX24T を使った GPS の動作サンプル
