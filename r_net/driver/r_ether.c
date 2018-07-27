@@ -162,6 +162,8 @@ static etherbuffer_s ether_buffers __attribute__ ((aligned(32)));
 static uint32_t link_proc_count_;
 static int link_proc_loop_;
 
+volatile uint8_t g_request_all_reset_ = 0;
+
 /**
  * Renesas Ethernet API functions
  */
@@ -1049,6 +1051,13 @@ static int32_t ether_do_link(const uint8_t mode)
 void INT_Excep_ICU_GROUPAL1(void) __attribute__ ((interrupt));
 void INT_Excep_ICU_GROUPAL1(void)
 {
+	// 異常フレームの検出と対処
+	if((EPTPC0.SYSR & 0x00004000) != 0) { // INFABT
+		EPTPC0.SYSR |= 0x00004000;  // 1 を書くとフラグが「０」になる・・
+		// ETHERC0, EDMAC0 をリセットする。
+		g_request_all_reset_ = 1;
+	}
+
     uint32_t status_ecsr = ETHERC0.ECSR.LONG;
     uint32_t status_eesr = EDMAC0.EESR.LONG;
                                       

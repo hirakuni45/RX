@@ -17,6 +17,8 @@
 extern H lan_read_for_test(uint8_t lan_port_no, int8_t **buf, H return_code);
 #endif
 
+extern volatile uint8_t g_request_all_reset_;
+
 void enable_interrupt(void);
 void disable_interrupt(void);
 
@@ -111,6 +113,12 @@ int lan_close(void)
 	R_ETHER_Close_ZC2();
 	return 0;
 }
+
+int lan_restart_flag(void)
+{
+	return g_request_all_reset_;
+}
+
 
 /******************************************************************************
 Functions (Use definiton function that called from T4 library)
