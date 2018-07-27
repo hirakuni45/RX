@@ -3,34 +3,35 @@
 /*!	@file
 	@brief	RX24T システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/port.hpp"
 #include "RX24T/system.hpp"
+
+#ifndef F_ICLK
+#  error "system_io.hpp requires F_ICLK to be defined"
+#endif
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  systen_io クラス
-		@param[in]	base_clock	ベース・クロック周波数
+		@param[in]	base_clock	ベース・クロック周波数（標準：１０ＭＨｚ）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base_clock>
+	template <uint32_t base_clock = 10000000>
 	struct system_io {
 
 		//-------------------------------------------------------------//
 		/*!
 			@brief  システム・クロックの設定
-			@param[in]	system_clock	システム・クロック @n
-						※内部ＰＬＬの最大周波数（８０ＭＨｚ）
 			@return エラーなら「false」
 		*/
 		//-------------------------------------------------------------//
-		static bool setup_system_clock(uint32_t system_clock = 80000000)
+		static bool setup_system_clock()
 		{
 			device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
 
@@ -53,7 +54,8 @@ namespace device {
 			device::SYSTEM::MOSCCR.MOSTP = 0;  // メインクロック発振器動作
 			while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
 
-			uint8_t x = system_clock * 2 / base_clock;
+			// ベースクロックからマルチプライヤを計算
+			uint8_t x = F_ICLK * 2 / base_clock;
 			if(x < (4 * 2) || x >= (16 * 2)) return false;
 			x -= 1;
 			device::SYSTEM::PLLCR.STC = x;
