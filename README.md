@@ -28,34 +28,38 @@ Renesas RX マイコン
 ## RX プロジェクト・リスト
  - /RX600　　　　　　　---> RX マイコン共通デバイス定義クラス
  - /RX24T　　　　　　　---> RX24T 専用のデバイス定義クラス、リンカースクリプト
- - /RX63T　　　　　　　---> RX63T 専用のデバイス定義クラス、リンカースクリプト（メンテ対象外） 
- - /RX64M              ---> RX64M 専用のデバイス定義クラス、リンカースクリプト
- - /RX71M              ---> RX71M 専用のデバイス定義クラス、リンカースクリプト
- - /RX65x              ---> RX651, RX65N 専用デバイス定義クラス、リンカースクリプト
- - /ff12b              ---> ChaN 氏作成の fatfs ソースコードと RX マイコン向け RSPI コード
- - /common             ---> 共有クラス、ヘッダーなど
- - /graphocs           ---> 
- - /rxprog             ---> RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
- - /rx63t_chager       ---> RX63T を使ったモバイルバッテリー・チャージャー・プロジェクト（未完）
- - /rx24t_SCI_sample   ---> RX24T を使った SCI1 の制御サンプル
- - /rx24t_SDC_sample   ---> RX24T を使った SD カードの動作サンプル
- - /rx24t_GPS_sample   ---> RX24T を使った GPS の動作サンプル
+ - /RX63T　　　　　　　---> RX63T 専用のデバイス定義クラス、リンカースクリプト
+ - /RX64M　　　　　　　---> RX64M 専用のデバイス定義クラス、リンカースクリプト
+ - /RX71M　　　　　　　---> RX71M 専用のデバイス定義クラス、リンカースクリプト
+ - /RX65x　　　　　　　---> RX651, RX65N 専用デバイス定義クラス、リンカースクリプト
+ - /ff12b　　　　　　　---> ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ
+ - /common　　　　　　 ---> 共有クラス、ヘッダーなど
+ - /chip　　　　　　　 ---> I2C、SPI、など各種デバイス固有制御ライブラリ
+ - /graphocs　　　　　 ---> グラフィックス関係操作クラス
+ - /sound　　　　　　　---> サウンド関係操作クラス
+ - /r_net　　　　　　　---> ルネサス T4 ライブラリと、C++ ハンドラ、各種ネットワークライブラリ
+ - /libmad　　　　　　 ---> MP3 デコード、mad ライブラリ
+ - /jpeg-6b　　　　　　---> JPEG ライブラリ
+ - /rxprog　　　　　　 ---> RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
+ - /rx24t_SCI_sample　 ---> RX24T を使った SCI1 の制御サンプル
+ - /rx24t_SDC_sample　 ---> RX24T を使った SD カードの動作サンプル
+ - /rx24t_GPS_sample　 ---> RX24T を使った GPS の動作サンプル
  - /rx24t_DATA_FLASH_sample ---> RX24T を使った内臓データ・フラッシュ操作サンプル
- - /rx24t_LOGGER       ---> RX24T を使ったデータロガー・プロジェクト
- - /rx64m_SCI_sample   ---> RX64M を使った UART (SCI1) の制御サンプル
+ - /rx24t_LOGGER　　　 ---> RX24T を使ったデータロガー・プロジェクト
+ - /rx64m_SCI_sample　 ---> RX64M を使った UART (SCI1) の制御サンプル
  - /rx64m_SDRAM_sample ---> RX64M を使った SDRAM の制御サンプル（128Mビット×2、32ビットバス）
- - /rx64m_RTC_sample   ---> RX64M を使った 内臓 RTC の動作サンプル
- - /rx64m_TPU_sample   ---> RX64M を使った TPU の制御サンプル（タイマー割り込み）
- - /rx64m_DMAC_sample  ---> RX64M を使った DMAC 制御のサンプル（メモリー操作）
- - /rx64m_DA_sample    ---> RX64M を使った 内臓 D/A 変換、TPU、DMAC のサンプル
+ - /rx64m_RTC_sample　 ---> RX64M を使った 内臓 RTC の動作サンプル
+ - /rx64m_TPU_sample　 ---> RX64M を使った TPU の制御サンプル（タイマー割り込み）
+ - /rx64m_DMAC_sample　---> RX64M を使った DMAC 制御のサンプル（メモリー操作）
+ - /rx64m_DA_sample　　---> RX64M を使った 内臓 D/A 変換、TPU、DMAC のサンプル
  - /rx64m_AUDIO_sample ---> RX64M を使った SD カード上のオーディオファイルを内臓 D/A で再生する 
- - /GR-KAEDE_ftps      ---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（FTP サーバー）
- - /GR-KAEDE_http      ---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（http サーバー）
- - /RTK5_LCD_sample    ---> ルネサス製 RTK5RX65N マイコンボード ＬＣＤサンプル
- - /RTK5_AUDIO_sample  ---> ルネサス製 RTK5RX65N マイコンボード オーディオプレイヤー
- - /RTK5_SIDE          ---> ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター
- - /RTK5_NESEMU        ---> ルネサス製 RTK5RX65N マイコンボード NES エミュレーター   
-
+ - /GR-KAEDE_ftps　　　---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（FTP サーバー）
+ - /GR-KAEDE_http　　　---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（http サーバー）
+ - /RTK5_AUDIO_sample　---> ルネサス製 RTK5RX65N マイコンボード オーディオプレイヤー
+ - /RTK5_SIDE　　　　　---> ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター
+ - /RTK5_NESEMU　　　　---> ルネサス製 RTK5RX65N マイコンボード NES エミュレーター
+ - /LICENSE　　　　　　---> ライセンス表記ファイル
+   
 ## RX 開発環境準備（Windows、MSYS2）
    
  - Windows では、事前に MSYS2 環境をインストールしておきます。
