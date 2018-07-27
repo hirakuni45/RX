@@ -26,24 +26,22 @@ Renesas RX マイコン
  ※一部、ルネサス製のライブラリを利用しています。   
    
 ## RX プロジェクト・リスト
- - /RX600              ---> RX マイコン共通デバイス定義クラス
+ - /RX600``              ---> RX マイコン共通デバイス定義クラス``
+ - /RX24T              ---> RX24T 専用のデバイス定義クラス、リンカースクリプト
+ - /RX63T              ---> RX63T 専用のデバイス定義クラス、リンカースクリプト（メンテ対象外） 
+ - /RX64M              ---> RX64M 専用のデバイス定義クラス、リンカースクリプト
  - /RX71M              ---> RX71M 専用のデバイス定義クラス、リンカースクリプト
  - /RX65x              ---> RX651, RX65N 専用デバイス定義クラス、リンカースクリプト
- - /RX64M              ---> RX64M 専用のデバイス定義クラス、リンカースクリプト
- - /RX63T              ---> RX63T 専用のデバイス定義クラス、リンカースクリプト（メンテ対象外）
- - /RX24T              ---> RX24T 専用のデバイス定義クラス、リンカースクリプト
- - /RX621              ---> RX621 専用のデバイス定義クラス、リンカースクリプト（メンテ対象外）
  - /ff12b              ---> ChaN 氏作成の fatfs ソースコードと RX マイコン向け RSPI コード
  - /common             ---> 共有クラス、ヘッダーなど
+ - /graphocs           ---> 
  - /rxprog             ---> RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
  - /rx63t_chager       ---> RX63T を使ったモバイルバッテリー・チャージャー・プロジェクト（未完）
- - /rx24t_first_sample ---> RX24T を使った LED 点滅
  - /rx24t_SCI_sample   ---> RX24T を使った SCI1 の制御サンプル
  - /rx24t_SDC_sample   ---> RX24T を使った SD カードの動作サンプル
  - /rx24t_GPS_sample   ---> RX24T を使った GPS の動作サンプル
  - /rx24t_DATA_FLASH_sample ---> RX24T を使った内臓データ・フラッシュ操作サンプル
  - /rx24t_LOGGER       ---> RX24T を使ったデータロガー・プロジェクト
- - /rx64m_first_sample ---> RX64M を使った LED 点滅
  - /rx64m_SCI_sample   ---> RX64M を使った UART (SCI1) の制御サンプル
  - /rx64m_SDRAM_sample ---> RX64M を使った SDRAM の制御サンプル（128Mビット×2、32ビットバス）
  - /rx64m_RTC_sample   ---> RX64M を使った 内臓 RTC の動作サンプル
@@ -53,7 +51,6 @@ Renesas RX マイコン
  - /rx64m_AUDIO_sample ---> RX64M を使った SD カード上のオーディオファイルを内臓 D/A で再生する 
  - /GR-KAEDE_ftps      ---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（FTP サーバー）
  - /GR-KAEDE_http      ---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（http サーバー）
- - /RTK5_first_sample  ---> ルネサス製 RTK5RX65N マイコンボード 初期サンプル   
  - /RTK5_LCD_sample    ---> ルネサス製 RTK5RX65N マイコンボード ＬＣＤサンプル
  - /RTK5_AUDIO_sample  ---> ルネサス製 RTK5RX65N マイコンボード オーディオプレイヤー
  - /RTK5_SIDE          ---> ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター
