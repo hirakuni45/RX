@@ -665,6 +665,22 @@ namespace device {
 		}
 
 
+		static bool probe_sdhi_clock(option opt = option::FIRST) noexcept
+		{
+			bool ret = 0;
+			switch(opt) {
+			case option::FIRST:
+				break;
+			case option::THIRD:
+				ret = PORT2::PIDR.B1();
+				break;
+			default:
+				break;
+			}
+			return ret;
+		}
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  SDHI クロック端子のソフト制御
