@@ -323,7 +323,7 @@ namespace net {
 			}
 
 			debug_format("r_dhcp_open:\n");
-			if(r_dhcp_open(&tmpDhcp, (uint8_t*)tcpudp_work_, mac) == -1) {
+			if(r_dhcp_open(&tmpDhcp, tcpudp_work_, mac) == -1) {
 				debug_format("fail...\n");
 				close_timer();
 				return 0;	/* 0 on failure */
