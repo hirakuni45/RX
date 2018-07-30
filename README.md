@@ -33,14 +33,14 @@ Renesas RX マイコン
  - /RX71M　　　　　　　---> RX71M 専用のデバイス定義クラス、リンカースクリプト
  - /RX65x　　　　　　　---> RX651, RX65N 専用デバイス定義クラス、リンカースクリプト
  - /ff12b　　　　　　　---> ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ
- - /common　　　　　　 ---> 共有クラス、ヘッダーなど
- - /chip　　　　　　　 ---> I2C、SPI、など各種デバイス固有制御ライブラリ
- - /graphocs　　　　　 ---> グラフィックス関係操作クラス
- - /sound　　　　　　　---> サウンド関係操作クラス
+ - [common](./common)　　　　　　 ---> 共有クラス、ヘッダーなど
+ - [chip](./chip)　　　　　　　 ---> I2C、SPI、など各種デバイス固有制御ライブラリ
+ - [graphics](./graphics)　　　　　 ---> グラフィックス関係操作クラス
+ - [sound](./sound)　　　　　　　---> サウンド関係操作クラス
  - /r_net　　　　　　　---> ルネサス T4 ライブラリと、C++ ハンドラ、各種ネットワークライブラリ
  - /libmad　　　　　　 ---> MP3 デコード、mad ライブラリ
  - /jpeg-6b　　　　　　---> JPEG ライブラリ
- - /rxprog　　　　　　 ---> RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
+ - [rxprog](./rxprog)　　　　　　 ---> RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
  - [FIRST_sample](./FIRST_sample)　　　　---> 各プラットホーム対応 LED 点滅プログラム
  - /rx24t_SCI_sample　 ---> RX24T を使った SCI1 の制御サンプル
  - /rx24t_SDC_sample　 ---> RX24T を使った SD カードの動作サンプル
