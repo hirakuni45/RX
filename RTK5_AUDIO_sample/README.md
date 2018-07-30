@@ -53,7 +53,11 @@ Envision Kit RX65N で実現するオーディオプレイヤー
  - MP3 形式の場合、256Kbps まで対応
  - WAV 内タグのパース（一部）
  - ID3V2 タグのパース（ID3V1 タグは未対応）
+
+## 参考ページ
    
+[RX65N Envision Kit で実現するオーディオプレイヤー](http://www.rvf-rc45.net/wordpress/?p=2546)
+
 -----
    
 License
