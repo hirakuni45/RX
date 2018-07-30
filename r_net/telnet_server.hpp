@@ -89,6 +89,7 @@ namespace net {
 		char		line_copy_[RECV_SIZE];
 		uint32_t	line_pos_;
 
+
 		enum class esc_task : uint8_t {
 			none,
 			entry,
@@ -327,6 +328,8 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void putch(char ch)
 		{
+			if(!probe()) return;
+
 			if(crlf_ && ch == '\n') {
 				putch('\r');
 			}

@@ -231,6 +231,8 @@ namespace net {
 
 			task_ = task::begin_http;
 
+			clear_link();
+
 			debug_format("HTTP Server: link capacity: %d\n") % http_format::chaout().at_str().capacity();
 		}
 
