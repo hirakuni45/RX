@@ -67,7 +67,7 @@ static uint16_t checksum_udp(uint16_t *pre_header, uint16_t *data, int32_t len);
 * Arguments		: none
 * Return value	: none
 ******************************************************************************/
-int32_t r_dhcp_open(DHCP *dhcp, uint8_t *work, const uint8_t *mac_addr)
+int32_t r_dhcp_open(DHCP *dhcp, void *work, const uint8_t *mac_addr)
 {
 
 	DHCP_PACKET *dhcp_packet;
@@ -78,18 +78,22 @@ int32_t r_dhcp_open(DHCP *dhcp, uint8_t *work, const uint8_t *mac_addr)
 
 	if (dhcp_discover(dhcp, dhcp_packet) != 0)
 	{
+		printf("DHCP discover error\n");
 		return -1;
 	}
 	if (dhcp_wait_offer(dhcp, dhcp_packet) != 0)
 	{
+		printf("DHCP wait offer error\n");
 		return -1;
 	}
 	if (dhcp_request(dhcp, dhcp_packet) != 0)
 	{
+		printf("DHCP request error\n");
 		return -1;
 	}
 	if (dhcp_wait_ack(dhcp, dhcp_packet) != 0)
 	{
+		printf("DHCP wait ack error\n");
 		return -1;
 	}
 
@@ -167,16 +171,16 @@ int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 
 int32_t dhcp_wait_offer(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 {
-	volatile uint16_t	timer;
-
-	reset_timer();
 	memset(dhcp_packet, 0, sizeof(DHCP_PACKET));
 
+	reset_timer();
 	while (1)
 	{
+		volatile uint16_t timer;
 		timer = get_timer();
-		if (timer > DHCP_TIMEOUT)
+		if(timer >= DHCP_TIMEOUT)
 		{
+			printf("DHCP wait offer timeout\n");
 			return -1;
 		}
 		int16_t	len;
@@ -280,15 +284,14 @@ int32_t dhcp_wait_ack(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 	uint8_t	flag = 0;
 	char none[5] = {"none"};
 
-	volatile uint16_t	timer;
-
 	reset_timer();
-
 	while (1)
 	{
+		volatile uint16_t timer;
 		timer = get_timer();
-		if (timer > DHCP_TIMEOUT)
+		if (timer >= DHCP_TIMEOUT)
 		{
+			printf("DHCP wait ack timeout\n");
 			return -1;
 		}
 		len	= lan_read(ETHER_CHANNEL_0, (int8_t **) & p);

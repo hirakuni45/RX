@@ -84,6 +84,8 @@ void tcp_init(uint32_t cepid)
 
 void tcpudp_open(uint32_t *workp)
 {
+	tcpudp_close();
+
 	uint32_t *currp = workp;
 
 	_tcp_timer_cnt = 0;

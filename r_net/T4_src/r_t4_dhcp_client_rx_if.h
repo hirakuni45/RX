@@ -66,7 +66,7 @@ Exported global functions (to be accessed by other files)
 #if defined(__cplusplus)
 extern "C" {
 #endif /* __cplusplus */
-int32_t  r_dhcp_open(DHCP *dhcp, uint8_t *work, const uint8_t *mac_addr);
+int32_t  r_dhcp_open(DHCP *dhcp, void *work, const uint8_t *mac_addr);
 uint32_t R_T4_DHCP_CLIENT_GetVersion(void);
 #ifdef __cplusplus
 }

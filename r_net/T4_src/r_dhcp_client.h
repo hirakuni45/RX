@@ -139,23 +139,3 @@ typedef struct _dhcp_packet
 #else
 }DHCP_PACKET;
 #endif
-
-/***********************************************************************************************************************
-Exported global variables
-***********************************************************************************************************************/
-
-/***********************************************************************************************************************
-Exported global functions (to be accessed by other files)
-***********************************************************************************************************************/
-#if !defined(__GNUC__) && !defined(GRSAKURA)
-static int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet);
-static int32_t dhcp_wait_offer(DHCP *dhcp, DHCP_PACKET *dhcp_packet);
-static int32_t dhcp_request(DHCP *dhcp, DHCP_PACKET *dhcp_packet);
-static int32_t dhcp_wait_ack(DHCP *dhcp, DHCP_PACKET *dhcp_packet);
-static int32_t dchp_release(DHCP *dhcp, DHCP_PACKET *dhcp_packet);
-static uint16_t htons(uint16_t data);
-static uint32_t htonl(uint32_t data);
-static uint16_t checksum(uint16_t *data, int32_t len);
-static uint16_t checksum_udp(uint16_t *pre_header, uint16_t *data, int32_t len);
-#endif
-
