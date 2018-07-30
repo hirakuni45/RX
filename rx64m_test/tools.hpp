@@ -747,6 +747,9 @@ namespace seeda {
 						f = eadc_span_(cmdn);
 					} else if(cmd_.cmp_word(0, "sample")) {
 						f = eadc_sample_(cmdn);
+					} else if(cmd_.cmp_word(0, "restart_net")) {
+						lan_restart();
+						f = true;
 //					} else if(cmd_.cmp_word(0, "reset")) {
 //						f = reset_signal_(cmdn);
 #endif
@@ -769,6 +772,7 @@ namespace seeda {
 ///						utils::format("reset [01]  (PHY reset signal)\n");
 #endif
 						utils::format("writedata base-str num(minits)   (A/Dデータ書き込み開始)\n");
+						utils::format("restart_net (ネットワークを再スタートする)\n");
 						f = true;
 					}
 					if(!f) {

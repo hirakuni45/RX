@@ -386,6 +386,7 @@ namespace seeda {
 	*/
 	//-----------------------------------------------------------------//
 	bool start_write_data(const char* path, uint32_t limit);
+
 }
 
 extern "C" {

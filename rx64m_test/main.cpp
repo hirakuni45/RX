@@ -46,9 +46,13 @@ namespace {
 
 	volatile bool	enable_eadc_;
 
+	bool			net_init_;
+
 	void main_init_()
 	{
 		enable_eadc_ = false;
+
+		net_init_ = false;
 
 #ifndef DISABLE_EADC
 		{  // LTC2348ILX-16 初期化
@@ -917,6 +921,8 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(0b0100) | 1;  // USB Clock: 1/5 (237.5/5=47.5)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
+	device::SYSTEM::PRCR = 0xA500;
+
 #if 0
 	while(1) {
 		LED::P = 1;
@@ -950,8 +956,8 @@ int main(int argc, char** argv)
 	tools_.init();
 	tools_.title();
 
-	nets_.init();
-	nets_.title();
+//	nets_.init();
+//	nets_.title();
 
 	enable_eadc_server();
 
@@ -962,13 +968,27 @@ int main(int argc, char** argv)
 	while(1) {
 		core_.sync();
 
-		service_putch_tmp_();
+		// 通信異常により、ネットワークをリスタートする。
+		if(lan_restart_flag() != 0) {
+			utils::format("ETHERNET frame anomaly detection: ---> restart network...\n");
+			net_init_ = false;
+		}
+
+		if(net_init_) {
+			service_putch_tmp_();
+		}
 
 		core_.service();
 		tools_.service();
 
 		sdc_.service();
 
+		if(!net_init_) {
+			nets_.init();
+			nets_.title();
+			net_init_ = true;
+			continue;
+		}
 		nets_.service();
 
 		++rtc_set_loop;
