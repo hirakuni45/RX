@@ -18,6 +18,7 @@ extern "C"{
 
 	int lan_open(void);
 	int lan_close(void);
+	void lan_restart(void);
 	int lan_restart_flag(void);
 
 	void ena_int(void);

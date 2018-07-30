@@ -164,6 +164,8 @@ static int link_proc_loop_;
 
 volatile uint8_t g_request_all_reset_ = 0;
 
+volatile uint8_t g_inetfbad_ = 0;
+
 /**
  * Renesas Ethernet API functions
  */
@@ -181,6 +183,8 @@ int32_t R_ETHER_Open_ZC2(const uint8_t *mac_addr)
 {
     int16_t phy_ret;
     int32_t ret;
+
+	g_request_all_reset_ = 0;
 
     /* Initialize the flags */
     g_ether_TransferEnableFlag = ETHER_FLAG_OFF;
@@ -1052,10 +1056,18 @@ void INT_Excep_ICU_GROUPAL1(void) __attribute__ ((interrupt));
 void INT_Excep_ICU_GROUPAL1(void)
 {
 	// 異常フレームの検出と対処
-	if((EPTPC0.SYSR & 0x00004000) != 0) { // INFABT
+	if((EPTPC0.SYSR & 0x00004000) != 0 || g_inetfbad_ != 0) { // INFABT
 		EPTPC0.SYSR |= 0x00004000;  // 1 を書くとフラグが「０」になる・・
+
+		g_inetfbad_ = 0;
+
 		// ETHERC0, EDMAC0 をリセットする。
+		EDMAC0.EDMR.BIT.SWR = 1;
+		for(uint32_t i = 0; i < 64 * 2 * 2; ++i) asm("nop");
+
 		g_request_all_reset_ = 1;
+
+		return;
 	}
 
     uint32_t status_ecsr = ETHERC0.ECSR.LONG;
