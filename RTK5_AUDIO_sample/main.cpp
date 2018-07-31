@@ -641,6 +641,7 @@ int main(int argc, char** argv)
 			filer_.set_touch(tnum, xy.x, xy.y); 
 			char path[256];
 			if(filer_.update(ctrl, path, sizeof(path))) {
+				glcdc_io_.sync_vpos();
 				play_loop_("", path);
 			}
 		}
