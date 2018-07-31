@@ -247,7 +247,7 @@ namespace graphics {
 			}
 
 			{  // ドラッグでフォーカス移動
-				if(touch_lvl_) {
+				if(touch_neg_) {
 					auto dx = touch_x_ - touch_org_x_;
 					if(dx >= FLN * 2) {
 						ptrg |= ctrl_mask_(filer_ctrl::SELECT);
@@ -256,6 +256,8 @@ namespace graphics {
 						ptrg |= ctrl_mask_(filer_ctrl::BACK);
 						touch_org_x_ = touch_x_;
 					}
+				}
+				if(touch_lvl_) {
 					auto dy = touch_y_ - touch_org_y_;
 					if(dy >= FLN) {
 						ptrg |= ctrl_mask_(filer_ctrl::DOWN);
