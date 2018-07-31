@@ -42,7 +42,7 @@
 namespace seeda {
 
 //	static const int seeda_version_ = 549;
-	static const int seeda_version_ = 601;
+	static const int seeda_version_ = 602;
 	static const uint32_t build_id_ = B_ID;
 
 	typedef device::PORT<device::PORTE, device::bitpos::B3> LED;
