@@ -12,13 +12,15 @@ Envision Kit RX65N で実現するオーディオプレイヤー
 ## ハードウェアーの準備
  - SD カードインターフェースの準備
  - オーディオの接続（DA0、DA1 から出力、GND レベルは、1.65V）
+ - P03_JOY_RIGHT_IRQ11 (DA0) Left 出力
+ - P05_IRQ13_SW (DA1) Right 出力
  - ファミコン（互換）パッドの接続（main.cpp を参照）
  - Pmod (10) PB6_RXD9_PMOD_10 ---> RXD として使用
  - Pmod ( 9) PB7_TXD9_PMOD_9  ---> TXD として使用
  - RXD/TXD は 115200 Baud, 8-bits, 1-Stop, No-Parity 内部動作表示等
    
 ## リソースの準備
- - SD カードのルートに「kfont16.bin」ファイルを書き込む。（ファイラーでの漢字表示）
+ - SD カードのルートに「kfont16.bin」ファイルを書き込む。（漢字表示用）
  RX/graphics/kfont16.bin
  - SD カードに、「mp3、wav」形式のファイルを書き込む。
    
