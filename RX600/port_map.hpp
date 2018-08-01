@@ -33,7 +33,8 @@ namespace device {
 			SECOND,		///< 第２候補 (XXX-B グループ)
 			THIRD,		///< 第３候補
 			FORCE,		///< 第４候補
-			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合
+			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合、第１候補
+			SECOND_I2C,	///< SCI ポートを簡易 I2C として使う場合、第２候補
 		};
 
 	private:
@@ -535,13 +536,21 @@ namespace device {
 
 			case peripheral::SCI2:
 				{
+					if(i2c) {
+						PORT5::ODR0.B0 = 1;  // P50 N-OpenDrain
+						PORT5::ODR0.B4 = 1;  // P52 N-OpenDrain
+						PORT5::PDR.B0 = 1;
+						PORT5::PDR.B2 = 1;
+						PORT5::PODR.B0 = 1;
+						PORT5::PODR.B2 = 1;
+					}
 					uint8_t sel = enable ? 0b001010 : 0;
 					MPC::P50PFS.PSEL = sel;  // TXD2/SMOSI2
-					MPC::P51PFS.PSEL = sel;  // SCK2
 					MPC::P52PFS.PSEL = sel;  // RXD2/SMISO2
 					PORT5::PMR.B0 = enable;
-					PORT5::PMR.B1 = enable;
 					PORT5::PMR.B2 = enable;
+//					MPC::P51PFS.PSEL = sel;  // SCK2
+//					PORT5::PMR.B1 = enable;
 				}
 				break;
 
@@ -654,6 +663,9 @@ namespace device {
 				break;
 			case option::FIRST_I2C:
 				ret = sub_1st_(t, ena, true);
+				break;
+			case option::SECOND_I2C:
+				ret = sub_2nd_(t, ena, true);
 				break;
 			default:
 				break;
