@@ -16,19 +16,32 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
  - Makefile で、各モジュール別の設定周波数を宣言している。
  - RX24T: 80MHz、RX64M: 120MHz、RX71M: 240MHz、RX65N: 120MHz
  - LED を指定のポートに接続する。
+ - USB シリアルの信号と設定の SCI ポートを接続する。
+ - SCI の標準ポートは、「RX600/port_map.hpp」参照。
 ```
-#if defined(SIG_RX64M) | defined(SIG_RX71M)
+#if defined(SIG_RX64M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX64M" };
+#elif defined(SIG_RX71M)
+	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX71M" };
 #elif defined(SIG_RX65N)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+	typedef device::SCI9 SCI_CH;
+	static const char* system_str_ = { "RX65N" };
 #elif defined(SIG_RX24T)
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX24T" };
 #endif
 ```
- - RX24T の場合「10MHz」、他 CPU は「12MHz」
+ - RX24T の場合「10MHz」、他 CPU は「12MHz」のクリスタル。
  - Envision kit RX65N の場合は、ボード上の青色 LED を利用する。
    
 ## リソースの準備
