@@ -42,12 +42,11 @@ Renesas RX マイコン
  - /jpeg-6b　　　　　　---> JPEG ライブラリ
  - [rxprog](./rxprog)　　　　　　 ---> RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
  - [FIRST_sample](./FIRST_sample)　　　　---> 各プラットホーム対応 LED 点滅プログラム
- - /rx24t_SCI_sample　 ---> RX24T を使った SCI1 の制御サンプル
+ - [SCI_sample](./SCI_sample)　　　　　---> 各プラットホーム対応 SCI サンプルプログラム
  - /rx24t_SDC_sample　 ---> RX24T を使った SD カードの動作サンプル
  - /rx24t_GPS_sample　 ---> RX24T を使った GPS の動作サンプル
  - /rx24t_DATA_FLASH_sample ---> RX24T を使った内臓データ・フラッシュ操作サンプル
  - /rx24t_LOGGER　　　 ---> RX24T を使ったデータロガー・プロジェクト
- - /rx64m_SCI_sample　 ---> RX64M を使った UART (SCI1) の制御サンプル
  - /rx64m_SDRAM_sample ---> RX64M を使った SDRAM の制御サンプル（128Mビット×2、32ビットバス）
  - /rx64m_RTC_sample　 ---> RX64M を使った 内臓 RTC の動作サンプル
  - /rx64m_TPU_sample　 ---> RX64M を使った TPU の制御サンプル（タイマー割り込み）
