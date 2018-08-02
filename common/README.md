@@ -13,6 +13,52 @@
  - 動的に記憶を割り当てる必要が無い場合には重宝します。
  - 多くの場合、設計を最適化する事で、有限のメモリーでも、十分な機能を提供できます。
  - 例外をスローする事を極力控えています。（現段階では、それが「良い」か「悪い」か判断できない）
+
+## FatFs について
+ - SD カードのファイルシステム操作などに [ChaN さんの FatFs](http://elm-chan.org/fsw/ff/00index_e.html) を使っています。
+ - このライブラリは、FAT ファイルシステムの操作、文字コード変換など利用しています。
+ - C++ で実装する、SD カードのハードウェアードライバー、コンテキストと FatFs を繋ぐ仕組みを実装   
+ する必要があります。
+```
+extern "C" {
+
+    DSTATUS disk_initialize(BYTE drv) {
+        return sdh_.disk_initialize(drv);
+    }
+
+
+    DSTATUS disk_status(BYTE drv) {
+        return sdh_.disk_status(drv);
+    }
+
+
+    DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
+        return sdh_.disk_read(drv, buff, sector, count);
+    }
+
+
+    DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
+        return sdh_.disk_write(drv, buff, sector, count);
+    }
+
+
+    DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
+        return sdh_.disk_ioctl(drv, ctrl, buff);
+    }
+
+
+    DWORD get_fattime(void) {
+        time_t t = 0;  // RTC が無いので、1970年１月１日を使う。
+        return utils::str::get_fattime(t);
+    }
+};
+```
+ - 上記のように、C の関数から呼べるように、FatFs が要求する低レベルドライバーをアサインします。
+ - また、ファイル書き込みのタイムスタンプとして、「get_fattime」を実装します。
+ - 上記関数では、RTC から読み取った「time_t」形式の時間を FatFs が要求する形式に変換しています。
+ - このフレームワークでは、ソフト SPI、ハード SPI（RSPI)、SDHI などを選択できます。
+ - SD カードに関連するライセンスは、製品を作る場合において注意を要します。
+ - このフレームワークでは、それらに関わるいかなる法的な義務や保障を行いません。
    
 ### start.s
  - ＲＸマイコン用のスタートアップ用アセンブラプログラムです。   
@@ -97,6 +143,11 @@
  - IEEE-754 浮動小数点フォーマットのパースを独自に行います。（整数計算のみで実装されています）
  - 外部の関数（sprintf）などを一切使用していません。
    
+### input.hpp
+ - C の関数、scanf に相当する C++ 関数。
+ - 可変引数を使わず、スタックベースでは無いので安全。
+   
+
 -----
    
 License
