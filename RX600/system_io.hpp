@@ -81,7 +81,10 @@ namespace device {
 		@brief  ソフト・リセットの起動
 	*/
 	//-------------------------------------------------------------//
-	inline void assert_soft_reset() {
+	inline void assert_soft_reset()
+	{
+		device::SYSTEM::PRCR = 0xA502;
 		device::SYSTEM::SWRR = 0xA501;
+		device::SYSTEM::PRCR = 0xA500;
 	}
 }
