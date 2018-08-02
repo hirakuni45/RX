@@ -1017,7 +1017,7 @@ int main(int argc, char** argv)
 			if(restart_delay_ == 5) {
 				utils::format("Restart SEEDA03\n");
 			} else if(restart_delay_ == 0) {
-				device::SYSTEM::SWRR = 0xA501;				
+				device::assert_soft_reset();
 			}
 		}
 #ifdef WATCH_DOG
