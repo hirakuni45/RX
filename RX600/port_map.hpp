@@ -35,13 +35,21 @@ namespace device {
 			FORCE,		///< 第４候補
 			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合、第１候補
 			SECOND_I2C,	///< SCI ポートを簡易 I2C として使う場合、第２候補
+			FIRST_SPI,	///< SCI ポートを簡易 SPI として使う場合、第１候補
+			SECOND_SPI,	///< SCI ポートを簡易 SPI として使う場合、第２候補
 		};
 
 	private:
 
-		static bool sub_1st_(peripheral t, bool enable, bool i2c)
+		static bool sub_1st_(peripheral t, bool enable, option opt)
 		{
 			bool ret = true;
+
+			bool i2c = false;
+			bool spi = false;
+			if(opt == option::FIRST_I2C || opt == option::SECOND_I2C) i2c = true;
+			else if(opt == option::FIRST_SPI || opt == option::SECOND_SPI) spi = true;
+
 			switch(t) {
 			// ※シリアルポートの MPC 設定では、PDR を制御する必要は無いが、
 			// 出力ポートのインピーダンス制御の一環として入れてある。
@@ -60,6 +68,10 @@ namespace device {
 					PORT2::PMR.B0 = enable;
 					MPC::P21PFS.PSEL = sel;  // RXD0/SMOSI0/SSDA0 (P21 LQFP176: 44)
 					PORT2::PMR.B1 = enable;
+					if(spi) {
+						MPC::P22PFS.PSEL = sel;  // SCK0 (P22 LQFP176: 43)
+						PORT2::PMR.B2 = enable;
+					}
 				}
 				break;
 			case peripheral::SCI1:
@@ -77,6 +89,10 @@ namespace device {
 					PORTF::PMR.B0 = enable;
 					MPC::PF2PFS.PSEL = sel;  // RXD1/SMOSI1/SSDA1 (PF2 LQFP176: 31)
 					PORTF::PMR.B2 = enable;
+					if(spi) {
+						MPC::PF1PFS.PSEL = sel;  // SCK1 (PF1 LQFP176: 34)
+						PORTF::PMR.B1 = enable;
+					}
 				}
 				break;
 			case peripheral::SCI2:
@@ -94,6 +110,10 @@ namespace device {
 					PORT1::PMR.B3 = enable;
 					MPC::P12PFS.PSEL = sel;  // RXD2/SMOSI2/SSDA2 (P12 LQFP176: 53)
 					PORT1::PMR.B2 = enable;
+					if(spi) {
+						MPC::P11PFS.PSEL = sel;  // SCK2 (P11 LQFP176: 67)
+						PORT1::PMR.B1 = enable;
+					}
 				}
 				break;
 			case peripheral::SCI3:
@@ -111,6 +131,10 @@ namespace device {
 					PORT2::PMR.B3 = enable;
 					MPC::P25PFS.PSEL = sel;  // RXD3/SMOSI3/SSDA3 (P25 LQFP176: 38)
 					PORT2::PMR.B5 = enable;
+					if(spi) {
+						MPC::P24PFS.PSEL = sel;  // SCK3 (P24 LQFP176: 40)
+						PORT2::PMR.B4 = enable;
+					}
 				}
 				break;
 			case peripheral::SCI4:
@@ -128,6 +152,10 @@ namespace device {
 					PORTB::PMR.B1 = enable;
 					MPC::PB0PFS.PSEL = sel;  // RXD4/SMOSI4/SSDA4 (PB0 LQFP176: 104)
 					PORTB::PMR.B0 = enable;
+					if(spi) {
+						MPC::PB3PFS.PSEL = sel;  // SCK4 (PB3 LQFP176: 98)
+						PORTB::PMR.B3 = enable;
+					}
 				}
 				break;
 			case peripheral::SCI5:
@@ -145,6 +173,10 @@ namespace device {
 					PORTA::PMR.B4 = enable;
 					MPC::PA3PFS.PSEL = sel;  // RXD5/SMOSI5/SSDA5 (PA3 LQFP176: 110)
 					PORTA::PMR.B3 = enable;
+					if(spi) {
+						MPC::PA1PFS.PSEL = sel;  // SCK5 (PA1 LQFP176: 114)
+						PORTA::PMR.B1 = enable;
+					}
 				}
 				break;
 			case peripheral::SCI6:
@@ -162,6 +194,10 @@ namespace device {
 					PORT0::PMR.B0 = enable;
 					MPC::P01PFS.PSEL = sel;  // RXD6/SMOSI6/SSDA6 (P01 LQFP176: 7)
 					PORT0::PMR.B1 = enable;
+					if(spi) {
+						MPC::P02PFS.PSEL = sel;  // SCK6 (P02 LQFP176: 6)
+						PORT0::PMR.B2 = enable;
+					}
 				}
 				break;
 			case peripheral::SCI7:
@@ -179,6 +215,10 @@ namespace device {
 					PORT9::PMR.B0 = enable;
 					MPC::P92PFS.PSEL = sel;  // RXD7/SMOSI7/SSDA7 (P92 LQFP176: 160)
 					PORT9::PMR.B2 = enable;
+					if(spi) {
+						MPC::P91PFS.PSEL = sel;  // SCK7 (P91 LQFP176: 161)
+						PORT9::PMR.B1 = enable;
+					}
 				}
 				break;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
@@ -200,6 +240,10 @@ namespace device {
 					PORTC::PMR.B7 = enable;
 					MPC::PC6PFS.PSEL = sel;  // RXD(F)8/SMOSI8/SSDA8 (PC6 LQFP176: 77)
 					PORTC::PMR.B6 = enable;
+					if(spi) {
+						MPC::PC5PFS.PSEL = sel;  // SCK8 (PC5 LQFP176: 78)
+						PORTC::PMR.B5 = enable;
+					}
 				}
 				break;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
@@ -221,6 +265,10 @@ namespace device {
 					PORTB::PMR.B7 = enable;
 					MPC::PB6PFS.PSEL = sel;  // RXD(F)9/SMOSI9/SSDA9 (PB6 LQFP176: 95)
 					PORTB::PMR.B6 = enable;
+					if(spi) {
+						MPC::PB5PFS.PSEL = sel;  // SCK9 (PB5 LQFP176: 96)
+						PORTB::PMR.B5 = enable;
+					}
 				}
 				break;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
@@ -242,6 +290,9 @@ namespace device {
 					PORT8::PMR.B7 = enable;
 					MPC::P86PFS.PSEL = sel;  // RXD(F)10/SMOSI10/SSDA10 (P87 LQFP176: 49)
 					PORT8::PMR.B6 = enable;
+					if(spi) {
+						ret = false;
+					}
 				}
 				break;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
@@ -263,6 +314,10 @@ namespace device {
 					PORT7::PMR.B7 = enable;
 					MPC::P76PFS.PSEL = sel;  // RXD(F)11/SMOSI11/SSDA11 (P76 LQFP176: 85)
 					PORT7::PMR.B6 = enable;
+					if(spi) {
+						MPC::P75PFS.PSEL = sel;  // SCK11 (P75 LQFP176: 87)
+						PORT7::PMR.B5 = enable;
+					}
 				}
 				break;
 
@@ -281,6 +336,10 @@ namespace device {
 					PORTE::PMR.B2 = enable;
 					MPC::PE1PFS.PSEL = sel;  // TXD12/SMOSI12/SSDA12 (PE1 LQFP176: 134)
 					PORTE::PMR.B1 = enable;
+					if(spi) {
+						MPC::PE0PFS.PSEL = sel;  // SCK12 (PE0 LQFP176: 135)
+						PORTE::PMR.B0 = enable;
+					}
 				}
 				break;
 
@@ -529,10 +588,37 @@ namespace device {
 		}
 
 
-		static bool sub_2nd_(peripheral t, bool enable, bool i2c)
+		static bool sub_2nd_(peripheral t, bool enable, option opt)
 		{
 			bool ret = true;
+
+			bool i2c = false;
+			bool spi = false;
+			if(opt == option::FIRST_I2C || opt == option::SECOND_I2C) i2c = true;
+			else if(opt == option::FIRST_SPI || opt == option::SECOND_SPI) spi = true;
+
 			switch(t) {
+			case peripheral::SCI0:
+				{
+					if(i2c) {
+						PORT3::ODR0.B4 = 1;  // P32 N-OpenDrain
+						PORT3::ODR0.B6 = 1;  // P33 N-OpenDrain
+						PORT3::PDR.B2 = 1;
+						PORT3::PDR.B3 = 1;
+						PORT3::PODR.B2 = 1;
+						PORT3::PODR.B3 = 1;
+					}
+					uint8_t sel = enable ? 0b001010 : 0;
+					MPC::P32PFS.PSEL = sel;  // TXD0/SMOSI0/SSDA0 (P32 LQFP176: 29)
+					MPC::P33PFS.PSEL = sel;  // RXD0/SMISO0/SSCL0 (P33 LQFP176: 28)
+					PORT3::PMR.B2 = enable;
+					PORT3::PMR.B3 = enable;
+					if(spi) {
+						MPC::P34PFS.PSEL = sel;  // SCK0 (P34 LQFP176: 27)
+						PORT3::PMR.B4 = enable;
+					}
+				}
+				break;
 
 			case peripheral::SCI2:
 				{
@@ -545,12 +631,58 @@ namespace device {
 						PORT5::PODR.B2 = 1;
 					}
 					uint8_t sel = enable ? 0b001010 : 0;
-					MPC::P50PFS.PSEL = sel;  // TXD2/SMOSI2
-					MPC::P52PFS.PSEL = sel;  // RXD2/SMISO2
+					MPC::P50PFS.PSEL = sel;  // TXD2/SMOSI2/SSDA2 (P50 LQFP176: 72)
+					MPC::P52PFS.PSEL = sel;  // RXD2/SMISO2/SSCL2 (P52 LQFP176: 70)
 					PORT5::PMR.B0 = enable;
 					PORT5::PMR.B2 = enable;
-//					MPC::P51PFS.PSEL = sel;  // SCK2
-//					PORT5::PMR.B1 = enable;
+					if(spi) {
+						MPC::P51PFS.PSEL = sel;  // SCK2 (P52 LQFP176: 71)
+						PORT5::PMR.B1 = enable;
+					}
+				}
+				break;
+
+			case peripheral::SCI3:
+				{
+					if(i2c) {
+						PORT1::ODR1.B6 = 1;  // P17 N-OpenDrain
+						PORT1::ODR1.B4 = 1;  // P16 N-OpenDrain
+						PORT1::PDR.B7 = 1;
+						PORT1::PDR.B6 = 1;
+						PORT1::PODR.B7 = 1;
+						PORT1::PODR.B6 = 1;
+					}
+					uint8_t sel = enable ? 0b001010 : 0;
+					MPC::P17PFS.PSEL = sel;  // TXD3/SMOSI3/SSDA3 (P17 LQFP176: 46)
+					MPC::P16PFS.PSEL = sel;  // RXD3/SMISO3/SSCL3 (P16 LQFP176: 48)
+					PORT1::PMR.B7 = enable;
+					PORT1::PMR.B6 = enable;
+					if(spi) {
+						MPC::P15PFS.PSEL = sel;  // SCK3 (P15 LQFP176: 50)
+						PORT1::PMR.B5 = enable;
+					}
+				}
+				break;
+
+			case peripheral::SCI6:
+				{
+					if(i2c) {
+						PORTB::ODR0.B2 = 1;  // PB1 N-OpenDrain
+						PORTB::ODR0.B0 = 1;  // PB0 N-OpenDrain
+						PORTB::PDR.B1 = 1;
+						PORTB::PDR.B0 = 1;
+						PORTB::PODR.B1 = 1;
+						PORTB::PODR.B0 = 1;
+					}
+					uint8_t sel = enable ? 0b001010 : 0;
+					MPC::PB1PFS.PSEL = sel;  // TXD6/SMOSI6/SSDA6 (PB1 LQFP176: 100)
+					MPC::PB0PFS.PSEL = sel;  // RXD6/SMISO6/SSCL6 (PB0 LQFP176: 104)
+					PORTB::PMR.B1 = enable;
+					PORTB::PMR.B0 = enable;
+					if(spi) {
+						MPC::PB3PFS.PSEL = sel;  // SCK6 (PB3 LQFP176: 98)
+						PORTB::PMR.B3 = enable;
+					}
 				}
 				break;
 
@@ -601,11 +733,11 @@ namespace device {
 		}
 
 
-		static bool sub_3rd_(peripheral t, bool enable, bool i2c)
+		static bool sub_3rd_(peripheral t, bool enable, option opt)
 		{
 			bool ret = true;
-			switch(t) {
 
+			switch(t) {
 			case peripheral::SDHI:
 				{
 					uint8_t sel = enable ? 0b011010 : 0;
@@ -653,20 +785,19 @@ namespace device {
 			bool ret = false;
 			switch(opt) {
 			case option::FIRST:
-				ret = sub_1st_(t, ena, false);
+			case option::FIRST_I2C:
+			case option::FIRST_SPI:
+				ret = sub_1st_(t, ena, opt);
 				break;
 			case option::SECOND:
-				ret = sub_2nd_(t, ena, false);
+			case option::SECOND_I2C:
+			case option::SECOND_SPI:
+				ret = sub_2nd_(t, ena, opt);
 				break;
 			case option::THIRD:
-				ret = sub_3rd_(t, ena, false);
+				ret = sub_3rd_(t, ena, opt);
 				break;
-			case option::FIRST_I2C:
-				ret = sub_1st_(t, ena, true);
-				break;
-			case option::SECOND_I2C:
-				ret = sub_2nd_(t, ena, true);
-				break;
+
 			default:
 				break;
 			}
