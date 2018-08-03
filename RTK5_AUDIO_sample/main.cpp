@@ -8,7 +8,6 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "common/cmt_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/sci_i2c_io.hpp"
@@ -44,8 +43,6 @@ namespace {
 	FAMIPAD		famipad_;
 
 	typedef device::system_io<12000000> SYSTEM_IO;
-
-	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
@@ -513,11 +510,6 @@ int main(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	SYSTEM_IO::setup_system_clock();
-
-	{  // タイマー設定（６０Ｈｚ）
-		uint8_t cmt_irq_level = 4;
-		cmt_.start(60, cmt_irq_level);
-	}
 
 	{  // SCI 設定
 		static const uint8_t sci_level = 2;
