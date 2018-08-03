@@ -11,7 +11,6 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "common/cmt_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
