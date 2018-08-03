@@ -145,7 +145,7 @@ namespace utils {
 		//-------------------------------------------------------------//
 		/*!
 			@brief	リード
-			@param[in]	dst		読込先
+			@param[out]	dst		読込先
 			@param[in]	num		読み込みサイズ
 			@return 読み込みサイズ
 		*/
@@ -166,7 +166,7 @@ namespace utils {
 		//-------------------------------------------------------------//
 		/*!
 			@brief	リード
-			@param[in]	dst		読込先
+			@param[out]	dst		読込先
 			@param[in]	block	ブロックサイズ
 			@param[in]	num		個数
 			@return 読み込みサイズ
@@ -181,6 +181,7 @@ namespace utils {
 		//-------------------------------------------------------------//
 		/*!
 			@brief	１文字取得
+			@param[out]	ch	文字（参照）
 			@return 正常なら「true」
 		*/
 		//-------------------------------------------------------------//
@@ -192,6 +193,27 @@ namespace utils {
 			}
 			ch = tmp[0];
 			return true;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	ライト
+			@param[in]	src		ソース
+			@param[in]	num		書き込みサイズ
+			@return 書き込みサイズ
+		*/
+		//-------------------------------------------------------------//
+		uint32_t write(const void* src, uint32_t len) noexcept
+		{
+			if(!open_) return 0; 
+
+			UINT wl = 0;
+			FRESULT res = f_write(&fp_, src, len, &wl);
+			if(res != FR_OK) {
+				return 0;
+			}
+			return wl;
 		}
 
 

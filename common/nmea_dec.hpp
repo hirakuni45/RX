@@ -333,7 +333,7 @@ namespace utils {
             @brief  スタート
         */
         //-----------------------------------------------------------------//
-		void start()
+		void start() noexcept
 		{
 		}
 

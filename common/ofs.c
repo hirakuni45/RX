@@ -8,6 +8,7 @@
 */
 //=====================================================================//
 #include <stdint.h>
+#include "common/byte_order.h"
 
 // オプション機能選択レジスタ 0（OFS0）
 #define SECT_SPCC __attribute__ ((section (".spcc"))) /* 0x00120040 */
@@ -41,9 +42,10 @@ const unsigned long __OSISreg[4] OSIC = {
 };
 
 // MDE register (Single Chip Mode)
-#ifdef __RX_BIG_ENDIAN__
+#ifdef BIG_ENDIAN
     const unsigned long __MDEreg OFS_REG = 0xfffffff8;    // big
-#else
+#endif
+#ifdef LITTLE_ENDIAN
     const unsigned long __MDEreg OFS_REG = 0xffffffff;    // little
 #endif
 
