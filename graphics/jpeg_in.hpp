@@ -231,6 +231,8 @@ namespace img {
 
 			utils::format("Input Scan: %d\n") % cinfo.input_scan_number;
 
+//			cinfo.image_height = 8;
+
 			jpeg_start_decompress(&cinfo);
 			if(error_code_) {
 				utils::format("JPEG decode error: 'decompress'(%d)\n") % error_code_;
@@ -261,7 +263,7 @@ namespace img {
 			uint8_t line[cinfo.output_components * cinfo.image_width];
 			uint8_t* lines[1];
 			lines[0] = &line[0];
-			for(uint32_t y = 0; y < cinfo.image_height; ++y) {
+			for(int y = 0; y < cinfo.output_scan_number; ++y) {
 				jpeg_read_scanlines(&cinfo, (JSAMPLE**)lines, 1);
 				uint8_t* p = &line[0];
 				if(cinfo.output_components == 4) {

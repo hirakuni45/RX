@@ -104,18 +104,18 @@ namespace image {
 		};
 
 		struct bmp_info {
-			int		offbits;
-			int		bihsize;
-			int		skip;
-			int		width;
-			int		height;
-			int		depth;
-			int		compression;
-			int		palette_size;
+			int			offbits;
+			int			bihsize;
+			int			skip;
+			int			width;
+			int			height;
+			int			depth;
+			int			compression;
+			int			palette_size;
 
 			BGRA_PAD	color_mask;
-			bool	topdown;
-			bool	alpha_chanel;
+			bool		topdown;
+			bool		alpha_chanel;
 		};
 
 		uint32_t	prgl_ref_;
@@ -275,8 +275,8 @@ namespace image {
 		/*----------------------------------------------------------------------/
 		/	インデックス・カラー(無圧縮 1, 4, 8 ビット) 形式の画像データを展開	/
 		/----------------------------------------------------------------------*/
-//		bool read_idx_(utils::file_io& fin, shared_img img, const bmp_info& bmp)
-		bool read_idx_(utils::file_io& fin, const bmp_info& bmp)
+		template <class render>
+		bool read_idx_(utils::file_io& fin, render& pix, const bmp_info& bmp)
 		{
 			size_t stride = bmp.width * bmp.depth;
 			if(stride & 7) stride += 8;
@@ -309,9 +309,7 @@ namespace image {
 						idx &= 1;
 					}
 					depth += bmp.depth;
-///					img::idx8 c;
-///					c.i = idx;
-///					img->put_pixel(pos, c);
+					pix(pos.x, pos.y, idx);
 				}
 				pos.y += d;
 				++prgl_pos_;
@@ -323,8 +321,8 @@ namespace image {
 		/*------------------------------------------------------/
 		/	BGR (無圧縮 24/32 ビット) 形式の画像データを展開	/
 		/------------------------------------------------------*/
-//		bool read_rgb_(utils::file_io& fin, shared_img img, const bmp_info& bmp)
-		bool read_rgb_(utils::file_io& fin, const bmp_info& bmp)
+		template <class render>
+		bool read_rgb_(utils::file_io& fin, render& pix, const bmp_info& bmp)
 		{
 			int pads = bmp.depth / 8;
 			size_t stride = bmp.width * pads;
@@ -347,12 +345,10 @@ namespace image {
 				}
 				char* src = buf;
 				for(pos.x = 0; pos.x < bmp.width; ++pos.x) {
-///					img::rgba8 c;
-///					c.r = src[2];
-///					c.g = src[1];
-///					c.b = src[0];
-///					c.a = 255;
-///					img->put_pixel(pos, c);
+					auto r = src[2];
+					auto g = src[1];
+					auto b = src[0];
+					pix(pos.x, pos.y, r, g, b);
 					src += pads;
 				}
 				pos.y += d;
@@ -394,8 +390,8 @@ namespace image {
 		/*----------------------------------------------/
 		/	BI_BITFIELDS 形式の画像データを展開			/
 		/----------------------------------------------*/
-//		bool read_bitfield_(utils::file_io& fin, shared_img img, const bmp_info& bmp)
-		bool read_bitfield_(utils::file_io& fin, const bmp_info& bmp)
+		template<class render>
+		bool read_bitfield_(utils::file_io& fin, render& pix, const bmp_info& bmp)
 		{
 			volatile BGRA_PAD shift_cnt;
 			volatile BGRA_PAD bits_cnt;
@@ -433,43 +429,35 @@ namespace image {
 					return false;
 				}
 
-			char* src = rowb;
-			switch(bmp.depth) {
-			case 16:
-				{
+				char* src = rowb;
+				switch(bmp.depth) {
+				case 16:
 					for(pos.x = 0; pos.x < bmp.width; ++pos.x) {
 						unsigned int v = *(unsigned char *)src++;
 						v |= ( *(unsigned char *)src++ ) << 8;
-///						rgba8 c;
-///						c.r = (v & bmp.color_mask.r) >> (shift_cnt.r - bits_cnt.r);
-///						c.g = (v & bmp.color_mask.g) >> (shift_cnt.g - bits_cnt.g);
-///						c.b = (v & bmp.color_mask.b) >> (shift_cnt.b - bits_cnt.b);
-///						c.r = (c.r << (8 - bits_cnt.r)) | (c.r >> (8 - bits_cnt.r));
-///						c.g = (c.g << (8 - bits_cnt.g)) | (c.g >> (8 - bits_cnt.g));
-///						c.b = (c.b << (8 - bits_cnt.b)) | (c.b >> (8 - bits_cnt.b));
-///						c.a = 255;
-///						img->put_pixel(pos, c);
+						uint16_t r = (v & bmp.color_mask.r) >> (shift_cnt.r - bits_cnt.r);
+						uint16_t g = (v & bmp.color_mask.g) >> (shift_cnt.g - bits_cnt.g);
+						uint16_t b = (v & bmp.color_mask.b) >> (shift_cnt.b - bits_cnt.b);
+						r = (r << (8 - bits_cnt.r)) | (r >> (8 - bits_cnt.r));
+						g = (g << (8 - bits_cnt.g)) | (g >> (8 - bits_cnt.g));
+						b = (b << (8 - bits_cnt.b)) | (b >> (8 - bits_cnt.b));
+						pix(pos.x, pos.y, r, g, b);
 					}
-				}
-				break;
+					break;
 
-			case 32:
-				{
+				case 32:
 					for(pos.x = 0; pos.x < bmp.width; ++pos.x) {
-///						rgba8 c;
-///						c.r = src[2];
-///						c.g = src[1];
-///						c.b = src[0];
-///						if(img->test_alpha()) c.a = src[3];
-///						else c.a = 255;
+						auto r = src[2];
+						auto g = src[1];
+						auto b = src[0];
+						auto a = src[3];
 						src += 4;
-///						img->put_pixel(pos, c);
+						pix(pos.x, pos.y, r, g, b, a);
 					}
+					break;
 				}
-				break;
-			}
-			pos.y += d;
-			++prgl_pos_;
+				pos.y += d;
+				++prgl_pos_;
 			}
 
 			return true;
@@ -479,8 +467,8 @@ namespace image {
 		/*----------------------------------------------/
 		/	BI_RLE8 / BI_RLE4 形式の画像データを展開	/
 		/----------------------------------------------*/
-//		bool decompress_rle_(utils::file_io& fin, shared_img img, const bmp_info& bmp)
-		bool decompress_rle_(utils::file_io& fin, const bmp_info& bmp)
+		template <class render>
+		bool decompress_rle_(utils::file_io& fin, render& pix, const bmp_info& bmp)
 		{
 			size_t stride = bmp.width * bmp.depth;
 			if(stride & 7) stride += 8;
@@ -527,22 +515,22 @@ namespace image {
 				}
 				if(bfptr[0] != 0) {				/* Encoded-mode record */
 					int n = bfptr[0];
-///					idx8 c(bfptr[1]);
+					uint8_t c = bfptr[1];
 					switch(bmp.depth) {
 					case 8:						/* BI_RLE8 */
 						while(n > 0 && pos.x < bmp.width) {
-///							img->put_pixel(pos, c);
+							pix(pos.x, pos.y, c);
 							--n;
 							++pos.x;
 						}
 						break;
 					case 4:						/* BI_RLE4 */
 						int o = 0;
-///						idx8 c0(c.i >> 4);
-///						idx8 c1(c.i & 0xf);
+						uint8_t c0 = c >> 4;
+						uint8_t c1 = c & 0xf;
 						while(n > 0 && pos.x < bmp.width) {
-///							if(o & 1) img->put_pixel(pos, c1);
-///							else img->put_pixel(pos, c0);
+							if(o & 1) pix(pos.x, pos.y, c1);
+							else pix(pos.x, pos.y, c0);
 							--n;
 							++pos.x;
 							++o;
@@ -555,8 +543,8 @@ namespace image {
 					switch(bmp.depth) {
 					case 8:						/* BI_RLE8 */
 						while(n > 0 && pos.x < bmp.width) {
-///							idx8 c( *p++ );
-///							img->put_pixel(pos, c);
+							uint8_t c = *p++;
+							pix(pos.x, pos.y, c);
 							--n;
 							++pos.x;
 						}
@@ -564,10 +552,10 @@ namespace image {
 					case 4:						/* BI_RLE4 */
 						int o = 0;
 						while(n > 0 && pos.x < bmp.width) {
-///							idx8 c0(p[o >> 1] >> 4);
-///							idx8 c1(p[o >> 1] & 0xf);
-///							if(o & 1) img->put_pixel(pos, c1);
-///							else img->put_pixel(pos, c0);
+							uint8_t c0 = p[o >> 1] >> 4;
+							uint8_t c1 = p[o >> 1] & 0xf;
+							if(o & 1) pix(pos.x, pos.y, c1);
+							else pix(pos.x, pos.y, c0);
 							--n;
 							++pos.x;
 							++o;
@@ -619,169 +607,167 @@ namespace image {
 		}
 
 #if 0
-	//-----------------------------------------------------------------//
-	/*!
-		@brief	画像ファイルの情報を取得する
-		@param[in]	fin	file_io クラス
-		@param[in]	fo	情報を受け取る構造体
-		@return エラーなら「false」を返す
-	*/
-	//-----------------------------------------------------------------//
-	bool bmp_io::info(utils::file_io& fin, img::img_info& fo)
-	{
-		long pos = fin.tell();
-		fin.seek(pos, utils::file_io::seek::set);
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	画像ファイルの情報を取得する
+			@param[in]	fin	file_io クラス
+			@param[in]	fo	情報を受け取る構造体
+			@return エラーなら「false」を返す
+		*/
+		//-----------------------------------------------------------------//
+		bool info(utils::file_io& fin, img::img_info& fo)
+		{
+			long pos = fin.tell();
+			fin.seek(utils::file_io::SEEK::SET, pos);
 
-		bmp_info bmp;
-		if(!read_header_bmp(fin, bmp)) {
-			return false;
-		}
-
-		fo.width  = bmp.width;
-		fo.height = bmp.height;
-		fo.mipmap_level = 0;
-		fo.multi_level = 0;
-		fo.grayscale = false;
-
-		if(bmp.depth <= 8) {
-			fo.i_depth = 8;
-			fo.r_depth = 8;
-			fo.g_depth = 8;
-			fo.b_depth = 8;
-			fo.a_depth = 0;
-			fo.clut_num = 1 << bmp.depth;
-		} else if(bmp.depth == 16) {
-			fo.i_depth = 0;
-			fo.r_depth = 5;
-			fo.g_depth = 6;
-			fo.b_depth = 5;
-			fo.a_depth = 0;
-			fo.clut_num = 0;
-		} else if(bmp.depth == 24) {
-			fo.i_depth = 0;
-			fo.r_depth = 8;
-			fo.g_depth = 8;
-			fo.b_depth = 8;
-			fo.a_depth = 0;
-			fo.clut_num = 0;
-		} else if(bmp.depth == 32) {
-			fo.i_depth = 0;
-			fo.r_depth = 8;
-			fo.g_depth = 8;
-			fo.b_depth = 8;
-			fo.a_depth = 8;
-			fo.clut_num = 0;
-		} else {
-			fo.i_depth = 0;
-			fo.r_depth = 0;
-			fo.g_depth = 0;
-			fo.b_depth = 0;
-			fo.a_depth = 0;
-			fo.clut_num = 0;
-			return false;
-		}
-		return true;
-	}
-
-
-	//-----------------------------------------------------------------//
-	/*!
-		@brief	BMP ファイルをロードする
-		@param[in]	fin	ファイル I/O クラス
-		@param[in]	opt	フォーマット固有の設定文字列
-		@return エラーがあれば「false」
-	*/
-	//-----------------------------------------------------------------//
-	bool bmp_io::load(utils::file_io& fin, const std::string& opt)
-	{
-		long pos = fin.tell();
-		bmp_info bmp;
-		if(!read_header_bmp(fin, bmp)) {
-			fin.seek(pos, utils::file_io::seek::set);
-			return false;
-		}
-
-		if(bmp.depth <= 8) {
-			img_ = shared_img(new img_idx8);
-			img_->create(vtx::spos(bmp.width, bmp.height));
-		} else {
-			img_ = shared_img(new img_rgba8);
-			img_->create(vtx::spos(bmp.width, bmp.height), bmp.alpha_chanel);
-		}
-
-		prgl_pos_ = 0;
-		prgl_ref_ = bmp.height;
-
-		int clutnum = 0;
-		if(bmp.depth <= 8) {
-			if(bmp.skip >= bmp.palette_size << bmp.depth) {
-				clutnum = 1 << bmp.depth;
-				bmp.skip -= bmp.palette_size << bmp.depth;
-			} else {
-				clutnum = bmp.skip / bmp.palette_size;
-				bmp.skip = bmp.skip % bmp.palette_size;
-			}
-			if(clutnum == 0) {
-				fin.seek(pos, utils::file_io::seek::set);
+			bmp_info bmp;
+			if(!read_header_bmp(fin, bmp)) {
 				return false;
 			}
-		} else {
-			clutnum = 0;
-		}
 
-		if(clutnum) {
-			unsigned char rgbq[RGBQUAD_SIZE];
-			for(int i = 0; i < clutnum; ++i) {
-				if(fin.read(rgbq, bmp.palette_size, 1) != 1) {
-					fin.seek(pos, utils::file_io::seek::set);
+			fo.width  = bmp.width;
+			fo.height = bmp.height;
+			fo.mipmap_level = 0;
+			fo.multi_level = 0;
+			fo.grayscale = false;
+
+			if(bmp.depth <= 8) {
+				fo.i_depth = 8;
+				fo.r_depth = 8;
+				fo.g_depth = 8;
+				fo.b_depth = 8;
+				fo.a_depth = 0;
+				fo.clut_num = 1 << bmp.depth;
+			} else if(bmp.depth == 16) {
+				fo.i_depth = 0;
+				fo.r_depth = 5;
+				fo.g_depth = 6;
+				fo.b_depth = 5;
+				fo.a_depth = 0;
+				fo.clut_num = 0;
+			} else if(bmp.depth == 24) {
+				fo.i_depth = 0;
+				fo.r_depth = 8;
+				fo.g_depth = 8;
+				fo.b_depth = 8;
+				fo.a_depth = 0;
+				fo.clut_num = 0;
+			} else if(bmp.depth == 32) {
+				fo.i_depth = 0;
+				fo.r_depth = 8;
+				fo.g_depth = 8;
+				fo.b_depth = 8;
+				fo.a_depth = 8;
+				fo.clut_num = 0;
+			} else {
+				fo.i_depth = 0;
+				fo.r_depth = 0;
+				fo.g_depth = 0;
+				fo.b_depth = 0;
+				fo.a_depth = 0;
+				fo.clut_num = 0;
+				return false;
+			}
+			return true;
+		}
+#endif
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	BMP ファイルをロードする
+			@param[in]	fin	ファイル I/O クラス
+			@param[in]	opt	フォーマット固有の設定文字列
+			@return エラーがあれば「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool load(utils::file_io& fin, const std::string& opt)
+		{
+			long pos = fin.tell();
+			bmp_info bmp;
+			if(!read_header_bmp_(fin, bmp)) {
+				fin.seek(utils::file_io::SEEK::SET, pos);
+				return false;
+			}
+
+			if(bmp.depth <= 8) {
+///				img_ = shared_img(new img_idx8);
+///				img_->create(vtx::spos(bmp.width, bmp.height));
+			} else {
+///				img_ = shared_img(new img_rgba8);
+///				img_->create(vtx::spos(bmp.width, bmp.height), bmp.alpha_chanel);
+			}
+
+			prgl_pos_ = 0;
+			prgl_ref_ = bmp.height;
+
+			int clutnum = 0;
+			if(bmp.depth <= 8) {
+				if(bmp.skip >= bmp.palette_size << bmp.depth) {
+					clutnum = 1 << bmp.depth;
+					bmp.skip -= bmp.palette_size << bmp.depth;
+				} else {
+					clutnum = bmp.skip / bmp.palette_size;
+					bmp.skip = bmp.skip % bmp.palette_size;
+				}
+				if(clutnum == 0) {
+					fin.seek(utils::file_io::SEEK::SET, pos);
 					return false;
 				}
-				img::rgba8 c;
-				c.a = 255;
-				c.r = rgbq[RGBQ_RED];
-				c.g = rgbq[RGBQ_GREEN];
-				c.b = rgbq[RGBQ_BLUE];
-				img_->put_clut(i, c);
+			} else {
+				clutnum = 0;
 			}
-		}
 
-		int i = 0;
-		while(i < bmp.skip) {
-			char c;
-			if(!fin.get_char(c)) {
-				fin.seek(pos, utils::file_io::seek::set);
-				return false;
+			if(clutnum) {
+				unsigned char rgbq[RGBQUAD_SIZE];
+				for(int i = 0; i < clutnum; ++i) {
+					if(fin.read(rgbq, bmp.palette_size, 1) != 1) {
+						fin.seek(utils::file_io::SEEK::SET, pos);
+						return false;
+					}
+///					img::rgba8 c;
+///					c.a = 255;
+///					c.r = rgbq[RGBQ_RED];
+///					c.g = rgbq[RGBQ_GREEN];
+///					c.b = rgbq[RGBQ_BLUE];
+///					img_->put_clut(i, c);
+				}
 			}
-			i++;
-		}
 
-		bool f = false;
-		switch(bmp.compression) {
-		case BI_RGB:		// 1, 4, 8, 24, 32 bits
-			if(bmp.depth == 24 || bmp.depth == 32) {
-				f = read_rgb_(fin, img_, bmp);
-			} else if(bmp.depth == 1 || bmp.depth == 4 || bmp.depth == 8) {
-				f = read_idx_(fin, img_, bmp);
+			int i = 0;
+			while(i < bmp.skip) {
+				char c;
+				if(!fin.get_char(c)) {
+					fin.seek(utils::file_io::SEEK::SET, pos);
+					return false;
+				}
+				i++;
 			}
-			break;
-		case BI_BITFIELDS:	// 16, 32
-			f = read_bitfield_(fin, img_, bmp);
-			break;
-		case BI_RLE8:
-		case BI_RLE4:
-			f = decompress_rle_(fin, img_, bmp);
-			break;
-		default:
-			break;
-		}
-		if(!f) {
-			img_ = nullptr;
-			fin.seek(pos, utils::file_io::seek::set);
-		}
 
-		return f;
-	}
+			bool f = false;
+			switch(bmp.compression) {
+			case BI_RGB:		// 1, 4, 8, 24, 32 bits
+				if(bmp.depth == 24 || bmp.depth == 32) {
+///					f = read_rgb_(fin, img_, bmp);
+				} else if(bmp.depth == 1 || bmp.depth == 4 || bmp.depth == 8) {
+///					f = read_idx_(fin, img_, bmp);
+				}
+				break;
+			case BI_BITFIELDS:	// 16, 32
+///				f = read_bitfield_(fin, img_, bmp);
+				break;
+			case BI_RLE8:
+			case BI_RLE4:
+///				f = decompress_rle_(fin, img_, bmp);
+				break;
+			default:
+				break;
+			}
+			if(!f) {
+///				img_ = nullptr;
+				fin.seek(utils::file_io::SEEK::SET, pos);
+			}
 
-#endif
+			return f;
+		}
 	};
 }
