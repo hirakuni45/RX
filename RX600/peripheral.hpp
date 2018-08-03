@@ -66,6 +66,11 @@ namespace device {
 		EDMAC1,		///< Ethernet DMA 1
 		PTPEDMAC,	///< PTP Ethernet DMA
 
+		USB,		///< USB2.0FSホスト/ファンクションモジュール（USBb）
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+		USBA,		///< USB 2.0 Full-Speed ホスト / ファンクションモジュール（USBA）
+#endif
+
 		SCI0,		///< シリアルコミュニケーションインタフェース (P20:TXD0, P21:RXD0)
 		SCI1,		///< シリアルコミュニケーションインタフェース (PF0:TXD1, PF2:RXD1)
 		SCI2,		///< シリアルコミュニケーションインタフェース (P13:TXD2, P12:RXD2)

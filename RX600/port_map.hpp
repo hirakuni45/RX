@@ -51,6 +51,15 @@ namespace device {
 			else if(opt == option::FIRST_SPI || opt == option::SECOND_SPI) spi = true;
 
 			switch(t) {
+			case peripheral::USB:
+				{
+					uint8_t sel = enable ? 0b010011 : 0;
+					MPC::P24PFS.PSEL = sel;  // USB0_VBUSEN (P24 LQFP176: 40)
+					PORT2::PMR.B4 = enable;
+					MPC::P22PFS.PSEL = sel;  // USB0_OVRCURB (P22 LQFP176: 43)
+					PORT2::PMR.B2 = enable;
+				}
+				break;
 			// ※シリアルポートの MPC 設定では、PDR を制御する必要は無いが、
 			// 出力ポートのインピーダンス制御の一環として入れてある。
 			case peripheral::SCI0:
