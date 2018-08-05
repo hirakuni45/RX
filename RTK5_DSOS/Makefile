@@ -50,6 +50,7 @@ OPTIMIZE	=	-O3
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-maybe-uninitialized \
 				-Wno-unused-but-set-variable \
 				-fno-exceptions
 
