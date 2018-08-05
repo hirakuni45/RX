@@ -479,9 +479,15 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct addr_t {
-			uint16_t operator() (analog an) {
-				return rd16_(base + 0x20 + static_cast<uint32_t>(an) * 2);
+
+			uint32_t get_address(analog an) {
+				return base + 0x20 + static_cast<uint32_t>(an) * 2;
 			}
+
+			uint16_t operator() (analog an) {
+				return rd16_(get_address(an));
+			}
+
 		};
 		static addr_t ADDR;
 
@@ -1524,15 +1530,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  スキャン終了割り込みベクターを返す
 			@return ベクター型
 		*/
@@ -1557,6 +1554,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 //		static ICU::VECTOR get_gc_vec() { return ICU::VECTOR::GCADI1; }
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ペリフェラル型を返す
+			@return ペリフェラル型
+		*/
+		//-----------------------------------------------------------------//
+		static peripheral get_peripheral() { return t; }
 	};
 
 	typedef s12ad0_t<0x00089000, peripheral::S12AD>   S12AD;

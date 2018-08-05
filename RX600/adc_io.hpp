@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M グループ A/D 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -61,7 +61,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		adc_io() : level_(0) { }
+		adc_io() noexcept : level_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -72,7 +72,7 @@ namespace device {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start(typename ADCU::analog ana, uint8_t level = 0)
+		bool start(typename ADCU::analog ana, uint8_t level = 0) noexcept
 		{
 			level_ = level;
 
@@ -94,7 +94,8 @@ namespace device {
 			@brief	スキャン開始
 		 */
 		//-----------------------------------------------------------------//
-		void scan() {
+		void scan() noexcept
+		{
 			if(level_) {
 ///				set_interrupt_task(adi_task_, static_cast<uint32_t>(ADCU::get_vec()));
 ///				icu_mgr::set_level(ADCU::get_peripheral(), level_);
@@ -111,7 +112,7 @@ namespace device {
 			@return 変換中なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool get_state() const {
+		bool get_state() const noexcept {
 			return ADCU::ADCSR.ADST();
 		}
 
@@ -121,7 +122,7 @@ namespace device {
 			@brief	読み込み同期
 		 */
 		//-----------------------------------------------------------------//
-		void sync() const {
+		void sync() const noexcept {
 			while(ADCU::ADCSR.ADST() != 0) sleep_();
 		}
 
@@ -133,9 +134,22 @@ namespace device {
 			@return 変換結果（上位１０ビットが有効な値）
 		 */
 		//-----------------------------------------------------------------//
-		uint16_t get(typename ADCU::analog an) const {
+		uint16_t get(typename ADCU::analog an) const noexcept {
 			return ADCU::ADDR(an);
 		}
+
+#if 0
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	変換結果アドレスの取得
+			@param[in]	an	アナログチャネル型
+			@return 変換結果アドレス
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_adc_adr(typename ADCU::analog an) const noexcept {
+			return ADCU::ADDR.get_address(an);
+		}
+#endif
 	};
 
 	template <class ADCU, class TASK>
