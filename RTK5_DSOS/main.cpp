@@ -27,6 +27,7 @@
 
 #include "chip/FAMIPAD.hpp"
 
+#include "capture.hpp"
 
 namespace {
 
@@ -79,48 +80,10 @@ namespace {
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
 
-//	utils::command<256> cmd_;
-
-	volatile uint32_t	wpos_;
-
-	/// DMAC 終了割り込み
-	class dmac_term_task {
-	public:
-		void operator() () {
-			device::DMAC0::DMCNT.DTE = 1;  // DMA を再スタート
-			wpos_ = 0;
-		}
-	};
-
-	typedef device::dmac_mgr<device::DMAC0, dmac_term_task> DMAC_MGR;
-	DMAC_MGR	dmac_mgr_;
-
-	uint32_t get_wave_pos_() { return (dmac_mgr_.get_count() & 0x3ff) ^ 0x3ff; }
-
-	typedef device::R12DA DAC;
-	typedef device::dac_out<DAC> DAC_OUT;
-	DAC_OUT		dac_out_;
-
-	typedef utils::sound_out<8192, 1024> SOUND_OUT;
-	SOUND_OUT	sound_out_;
-
-	class tpu_task {
-	public:
-		void operator() () {
-			uint32_t tmp = wpos_;
-			++wpos_;
-			if((tmp ^ wpos_) & 64) {
-				sound_out_.service(64);
-			}
-		}
-	};
-
-	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
-	TPU0		tpu0_;
-
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, 480, 272, device::PIX_TYPE::RGB565> GLCDC_IO;
+	typedef device::glcdc_io<device::GLCDC, 480, 272,
+		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
 
 	typedef device::drw2d_mgr<device::DRW2D, 480, 272> DRW2D_MGR;
@@ -142,12 +105,10 @@ namespace {
 
 	uint8_t		pad_level_;
 
+//	utils::command<256> cmd_;
+
 	bool check_mount_() {
-		auto f = sdc_.get_mount();
-		if(!f) {
-			utils::format("SD card not mount.\n");
-		}
-		return f;
+		return sdc_.get_mount();
 	}
 
 
@@ -239,15 +200,6 @@ extern "C" {
 	}
 
 
-	void set_sample_rate(uint32_t freq)
-	{
-		uint8_t intr_level = 5;
-		if(!tpu0_.start(freq, intr_level)) {
-			utils::format("TPU0 start error...\n");
-		}
-	}
-
-
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
@@ -327,43 +279,14 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::setup_system_clock();
 
-	{  // タイマー設定（６０Ｈｚ）
-		uint8_t cmt_irq_level = 4;
-		cmt_.start(60, cmt_irq_level);
-	}
-
 	{  // SCI 設定
 		static const uint8_t sci_level = 2;
 		sci_.start(115200, sci_level);
 	}
 
-	{  // 内臓１２ビット D/A の設定
-		bool amp_ena = true;
-		dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
-		dac_out_.out0(0x8000);
-		dac_out_.out1(0x8000);
-	}
-
 	{  // SD カード・クラスの初期化
 		sdh_.start();
 		sdc_.start();
-	}
-
-	// 波形メモリーの無音状態初期化
-	sound_out_.mute();
-
-	{  // サンプリング・タイマー設定
-		set_sample_rate(44100);
-	}
-
-	{  // DMAC マネージャー開始
-		uint8_t intr_level = 4;
-		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
-			sound_out_.size(), intr_level);
-		if(!ret) {
-			utils::format("DMAC Not start...\n");
-		}
 	}
 
 	utils::format("RTK5RX65N Start for AUDIO sample\n");
@@ -378,7 +301,7 @@ int main(int argc, char** argv)
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-			if(!glcdc_io_.control(GLCDC_IO::control_cmd::START_DISPLAY)) {
+			if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC ctrl fail...\n");
 			}
 		} else {
@@ -416,6 +339,7 @@ int main(int argc, char** argv)
 	while(1) {
 		glcdc_io_.sync_vpos();
 		{
+#if 0
 			auto data = get_fami_pad();
 			uint32_t ctrl = 0;
 			if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
@@ -436,12 +360,12 @@ int main(int argc, char** argv)
 			char path[256];
 			if(filer_.update(ctrl, path, sizeof(path))) {
 			}
+#endif
 		}
 
 		sdc_.service(sdh_.service());
 
 		update_led_();
 //		command_();
-
 	}
 }
