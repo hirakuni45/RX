@@ -15,6 +15,9 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 #include "common/qspi_io.hpp"
+#include "common/nmea_dec.hpp"
+
+// #define SDHI_IF
 
 namespace {
 
@@ -23,17 +26,26 @@ namespace {
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
-	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
-	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
-	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
+	typedef utils::fixed_fifo<char, 512>  REB;
+	typedef utils::fixed_fifo<char, 1024> SEB;
+	typedef device::sci_io<device::SCI9, REB, SEB> SCI;
 	SCI		sci_;
+
+	// GPS 専用シリアル定義
+	typedef device::sci_io<device::SCI2, REB, SEB, device::port_map::option::SECOND> GPS;
+	GPS		gps_;
+
+	// GPS の測位位置のデコード
+	typedef utils::nmea_dec<GPS> NMEA;
+	NMEA	nmea_(gps_);
 
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 	typedef device::NULL_PORT SDC_POWER;
 
 #ifdef SDHI_IF
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER> SDHI;
+	// RX65N Envision Kit の SDHI ポートは、候補３になっている
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
 	SDHI	sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
@@ -55,17 +67,22 @@ namespace {
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
 
+	// GLCDC
+	static const int16_t LCD_X = 480;
+	static const int16_t LCD_Y = 272;
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, 480, 272, device::PIX_TYPE::RGB565> GLCDC_IO;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y,
+		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
+
+	// DRW2D
+	typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_;
 
 	// QSPI B グループ
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
-
-	typedef device::drw2d_mgr<device::DRW2D> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_;
 
 	utils::command<256> cmd_;
 
@@ -204,8 +221,15 @@ int main(int argc, char** argv)
 	SYSTEM_IO::setup_system_clock();
 
 	{  // SCI 設定
-		static const uint8_t sci_level = 2;
-		sci_.start(115200, sci_level);
+		uint8_t intr = 2;
+		sci_.start(115200, intr);
+	}
+	{  // SCI GPS
+		uint8_t intr = 1;
+		gps_.start(9600, intr);
+	}
+	{
+		nmea_.start();
 	}
 
 	{  // SD カード・クラスの初期化
@@ -232,7 +256,7 @@ int main(int argc, char** argv)
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-			if(!glcdc_io_.control(GLCDC_IO::control_cmd::START_DISPLAY)) {
+			if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC ctrl fail...\n");
 			}
 		} else {
@@ -244,7 +268,7 @@ int main(int argc, char** argv)
 		auto ver = drw2d_mgr_.get_version();
 		utils::format("DRW2D Version: %04X\n") % ver;
 
-		if(drw2d_mgr_.start()) {
+		if(drw2d_mgr_.start(0x00000000)) {
 			utils:: format("Start DRW2D\n");
 		} else {
 			utils:: format("DRW2D Fail\n");
@@ -252,31 +276,23 @@ int main(int argc, char** argv)
 	}
 
 
-
-
 	LED::DIR = 1;
-//	SW2::DIR = 0;
 
 	uint8_t n = 0;
-//	bool sw2 = SW2::P();
 	while(1) {
 		glcdc_io_.sync_vpos();
 
-#if 0
-		{  // SW2 の検出
-			auto f = SW2::P();
-			if(sw2 && !f) {
-				utils::format("SW2: Positive\n");
-			}
-			if(!sw2 && f) {
-				utils::format("SW2: Negative\n");
-			}
-			sw2 = f;
-		}
-#endif
+		nmea_.service();
+
 		sdc_.service(sdh_.service());
 
 		command_();
+
+		// GPS のステータス表示
+//		while(gps_.recv_length() > 0) {
+//			auto ch = gps_.getch();
+//			sci_.putch(ch);
+//		}
 
 		++n;
 		if(n >= 30) {
