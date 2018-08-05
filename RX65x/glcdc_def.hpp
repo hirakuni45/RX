@@ -8,33 +8,50 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include <cstdint>
 
 namespace device {
 
-	/** Correction Command */
-	enum class GLCDC_CORRECTION_CMD {
-		SET_ALL,          // All correction setting command.
-		BRIGHTNESS,       // Brightness setting command.
-		CONTRAST,         // Contrast setting command.
-		GAMMA,            // Gamma setting command.
-	};
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  GLCDC 関係定義
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct glcdc_def {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  Correction Command
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class CORRECTION_CMD {
+			SET_ALL,          ///< All correction setting command.
+			BRIGHTNESS,       ///< Brightness setting command.
+			CONTRAST,         ///< Contrast setting command.
+			GAMMA,            ///< Gamma setting command.
+		};
 
 
-	/** Input format select ( Don't change this value, because this value is set to the register ) */
-	enum class GLCDC_IN_FORMAT {
-		RGB565   = 0,   // Input format RGB565,   16 bits.
-		RGB888   = 1,   // Input format RGB888,   32 bits.
-		ARGB1555 = 2,   // Input format ARGB1555, 16 bits.
-		ARGB4444 = 3,   // Input format ARGB4444, 16 bits.
-		ARGB8888 = 4,   // Input format ARGB8888, 32 bits.
-		CLUT8    = 5,   // Input format CLUT8,     8 bits.
-		CLUT4    = 6,   // Input format CLUT4,     4 bits.
-		CLUT1    = 7,   // Input format CLUT1,     1 bits.
-	};
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  Input format select @n
+					Don't change this value, because this value is set to the register
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class IN_FORMAT {
+			RGB565   = 0,   // Input format RGB565,   16 bits.
+			RGB888   = 1,   // Input format RGB888,   32 bits.
+			ARGB1555 = 2,   // Input format ARGB1555, 16 bits.
+			ARGB4444 = 3,   // Input format ARGB4444, 16 bits.
+			ARGB8888 = 4,   // Input format ARGB8888, 32 bits.
+			CLUT8    = 5,   // Input format CLUT8,     8 bits.
+			CLUT4    = 6,   // Input format CLUT4,     4 bits.
+			CLUT1    = 7,   // Input format CLUT1,     1 bits.
+		};
 
 
 	/** Output format select ( Don't change this value, because this value is set to the register ) */
-	enum class GLCDC_OUT_FORMAT {
+	enum class OUT_FORMAT {
 		RGB888 = 0,    // Output format RGB888, 24 bits.
 		RGB666 = 1,    // Output format RGB666, 18 bits.
 		RGB565 = 2,    // Output format RGB565, 16 bits.
@@ -43,7 +60,7 @@ namespace device {
 
 
 	/** Data endian select ( Don't change this value, because this value is set to the register ) */
-	enum class GLCDC_ENDIAN
+	enum class ENDIAN
 	{
 		LITTLE = 0,     // Little endian.
 		BIG    = 1,     // Big endian.
@@ -51,7 +68,7 @@ namespace device {
 
 
 	/** RGB color order select ( Don't change this value, because this value is set to the register ) */
-	enum class GLCDC_COLOR_ORDER
+	enum class COLOR_ORDER
 	{
 		RGB = 0,         // Color order RGB.
 		BGR = 1          // Color order BGR.
@@ -59,7 +76,7 @@ namespace device {
 
 
 	/** Polarity of a signal select ( Don't change this value, because this value is set to the register ) */
-	enum class GLCDC_SIGNAL_POLARITY
+	enum class SIGNAL_POLARITY
 	{
 		HIACTIVE = 0,    // High active signal.
 		LOACTIVE = 1     // Low active signal.
@@ -67,7 +84,7 @@ namespace device {
 
 
 	/** Signal synchronization edge select ( Don't change this value, because this value is set to the register ) */
-	enum class GLCDC_SIGNAL_SYNC_EDGE
+	enum class SIGNAL_SYNC_EDGE
 	{
 		RISING = 0,     // Signal is synchronized to rising edge.
 		FALLING = 1     // Signal is synchronized to falling edge.
@@ -75,7 +92,7 @@ namespace device {
 
 
 	/** Blending control select */
-	enum class GLCDC_BLEND_CONTROL
+	enum class BLEND_CONTROL
 	{
 		NONE    = 0,     // Applying no fading control.
 		FADEIN  = 1,     // Applying fade-in control.
@@ -86,7 +103,7 @@ namespace device {
 
 
 	/** Fading status */
-	enum class GLCDC_FADE_STATUS
+	enum class FADE_STATUS
 	{
 		NOT_UNDERWAY,    // Fade-in/fade-out is not in progress.
 		FADING_UNDERWAY, // Fade-in or fade-out is in progress.
@@ -95,7 +112,7 @@ namespace device {
 
 
 	/** Clock source select ( Don't change this value, because this value is set to the register ) */
-	enum class GLCDC_CLK_SRC
+	enum class CLK_SRC
 	{
 		EXTERNAL = 0,    // External clock (LCD_EXTCLK) (this function is not supported).
 		INTERNAL = 1     // Internal clock (PLL).
@@ -103,7 +120,7 @@ namespace device {
 
 
 /** Clock frequency division ratio ( Don't change this value, because this value is set to the register ) */
-	enum class GLCDC_PANEL_CLK_DIVISOR
+	enum class PANEL_CLK_DIVISOR
 	{
 		_1  = 1,        // Division Ratio 1/1.
 		_2  = 2,        // Division Ratio 1/2.
@@ -122,7 +139,7 @@ namespace device {
 
 
 	/** LCD TCON output pin select */
-	enum class GLCDC_TCON_PIN
+	enum class TCON_PIN
 	{
 		_0 = 0,         // LCD_TCON0.
 		_1 = 1,         // LCD_TCON1.
@@ -131,30 +148,56 @@ namespace device {
 	};
 
 
+	/** Correction circuit sequence control select ( Don't change this value, because this value is set to the register ) */
+	enum class CORRECTION_PROC_ORDER
+	{
+		BRIGHTNESS_CONTRAST_TO_GAMMA = 0, // Brightness, contrast -> gamma correction.
+		GAMMA_TO_BRIGHTNESS_CONTRAST = 1  // Gamma correction -> brightness, contrast.
+	};
+
+
+	/** Dithering mode select ( Don't change this value, because this value is set to the register ) */
+	enum class DITHERING_MODE
+	{
+		TRUNCATE   = 0,   // No dithering (truncate).
+		ROUND_OFF  = 1,   // Dithering with round off.
+		PATTERN2X2 = 2    // Dithering with 2x2 pattern.
+	};
+
+
+	/** Dithering 2x2 pattern ( Don't change this value, because this value is set to the register ) */
+	enum class DITHERING_PATTERN
+	{
+		_00 = 0,        // 2x2 pattern '00'.
+		_01 = 1,        // 2x2 pattern '01'.
+		_10 = 2,        // 2x2 pattern '10'.
+		_11 = 3         // 2x2 pattern '11'.
+	};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  GLCDC ピクセル・タイプ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class PIX_TYPE {
+			CLUT1,		///<  1 bits / pixel
+			CLUT4,		///<  4 bits / pixel
+			CLUT8,		///<  8 bits / pixel
+			RGB565,		///< 16 bits / pixel
+			RGB888,		///< 32 bits / pixel
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  オペレーション・ステータス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class OPERATING_STATUS {
+			CLOSED = 0,                ///< GLCDC closed.
+			NOT_DISPLAYING = 1,        ///< Not Displaying (opened).
+			DISPLAYING = 2             ///< Displaying.
+		};
+	};
 }
-
-
-/** Correction circuit sequence control select ( Don't change this value, because this value is set to the register ) */
-typedef enum e_glcdc_correction_proc_order
-{
-    GLCDC_BRIGHTNESS_CONTRAST_TO_GAMMA = 0, // Brightness, contrast -> gamma correction.
-    GLCDC_GAMMA_TO_BRIGHTNESS_CONTRAST = 1  // Gamma correction -> brightness, contrast.
-} glcdc_correction_proc_order_t;
-
-/** Dithering mode select ( Don't change this value, because this value is set to the register ) */
-typedef enum e_glcdc_dithering_mode
-{
-    GLCDC_DITHERING_MODE_TRUNCATE   = 0,   // No dithering (truncate).
-    GLCDC_DITHERING_MODE_ROUND_OFF  = 1,   // Dithering with round off.
-    GLCDC_DITHERING_MODE_2X2PATTERN = 2    // Dithering with 2x2 pattern.
-} glcdc_dithering_mode_t;
-
-/** Dithering 2x2 pattern ( Don't change this value, because this value is set to the register ) */
-typedef enum e_glcdc_dithering_pattern
-{
-    GLCDC_DITHERING_PATTERN_00 = 0,        // 2x2 pattern '00'.
-    GLCDC_DITHERING_PATTERN_01 = 1,        // 2x2 pattern '01'.
-    GLCDC_DITHERING_PATTERN_10 = 2,        // 2x2 pattern '10'.
-    GLCDC_DITHERING_PATTERN_11 = 3         // 2x2 pattern '11'.
-} glcdc_dithering_pattern_t;
-

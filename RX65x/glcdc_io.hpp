@@ -15,32 +15,6 @@
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  GLCDC ピクセル・タイプ
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class PIX_TYPE {
-		CLUT1,		///<  1 bits / pixel
-		CLUT4,		///<  4 bits / pixel
-		CLUT8,		///<  8 bits / pixel
-		RGB565,		///< 16 bits / pixel
-		RGB888,		///< 32 bits / pixel
-	};
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  オペレーション・ステート
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class glcdc_operating_status {
-		CLOSED = 0,                ///< GLCDC closed.
-		NOT_DISPLAYING = 1,        ///< Not Displaying (opened).
-		DISPLAYING = 2             ///< Displaying.
-	};
-
-
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  Interrupt enable setting
@@ -84,7 +58,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct glcdc_ctrl_t {
-		glcdc_operating_status	state;		  // Status of GLCD module.
+		glcdc_def::OPERATING_STATUS	state;	  // Status of GLCD module.
 		bool			   is_entry;		  // Flag of subcribed GLCDC interrupt function.
 		glcdc_coordinate_t active_start_pos;  // Zero coordinate for gra phics plane.
 		uint16_t hsize;                       // Horizontal pixel size in a line.
@@ -99,7 +73,7 @@ namespace device {
 		volatile uint32_t	vpos_count;
 
 		glcdc_ctrl_t() :
-			state(glcdc_operating_status::CLOSED),
+			state(glcdc_def::OPERATING_STATUS::CLOSED),
 			is_entry(false),
 			active_start_pos(),
 			hsize(0), vsize(0),
@@ -121,7 +95,7 @@ namespace device {
 		@param[in]	PXT		ピクセル・タイプ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GLC, int32_t XSIZE, int32_t YSIZE, PIX_TYPE PXT>
+	template <class GLC, int32_t XSIZE, int32_t YSIZE, device::glcdc_def::PIX_TYPE PXT>
 	class glcdc_io {
 
 		static const uint32_t PIX_WIDTH  = 16;		///< 16 bits / pixel
@@ -234,12 +208,12 @@ namespace device {
 		/** Dithering setup parameter */
 		struct dithering_t
 		{
-		    bool dithering_on;                               // Dithering on/off.
-		    glcdc_dithering_mode_t dithering_mode;           // Dithering mode.
-		    glcdc_dithering_pattern_t dithering_pattern_a;   // Dithering pattern A.
-		    glcdc_dithering_pattern_t dithering_pattern_b;   // Dithering pattern B.
-		    glcdc_dithering_pattern_t dithering_pattern_c;   // Dithering pattern C.
-		    glcdc_dithering_pattern_t dithering_pattern_d;   // Dithering pattern D.
+		    bool                    dithering_on;          // Dithering on/off.
+		    glcdc_def::DITHERING_MODE    dithering_mode;        // Dithering mode.
+		    glcdc_def::DITHERING_PATTERN dithering_pattern_a;   // Dithering pattern A.
+		    glcdc_def::DITHERING_PATTERN dithering_pattern_b;   // Dithering pattern B.
+		    glcdc_def::DITHERING_PATTERN dithering_pattern_c;   // Dithering pattern C.
+		    glcdc_def::DITHERING_PATTERN dithering_pattern_d;   // Dithering pattern D.
 		};
 
 
@@ -250,13 +224,13 @@ namespace device {
 			uint16_t hsize;                // Horizontal pixel size in a line.
 			uint16_t vsize;                // Vertical pixel size in a frame.
 			int32_t offset;                // offset value to next line.
-			GLCDC_IN_FORMAT format;        // Input format setting.
+			glcdc_def::IN_FORMAT format;   // Input format setting.
 			bool frame_edge;               // Show/hide setting of the frame of the graphics area.
 			glcdc_coordinate_t coordinate; // Starting point of image.
 			color_t bg_color;              // Color outside region.
 
 			input_cfg_t() : base(nullptr), hsize(0), vsize(0), offset(0),
-				format(GLCDC_IN_FORMAT::RGB565), frame_edge(false), coordinate(), bg_color()
+				format(glcdc_def::IN_FORMAT::RGB565), frame_edge(false), coordinate(), bg_color()
 			{ }
 		};
 
@@ -266,29 +240,28 @@ namespace device {
 		{
 			glcdc_timing_t           htiming;                // Horizontal display cycle setting.
 			glcdc_timing_t           vtiming;                // Vertical display cycle setting.
-			GLCDC_OUT_FORMAT         format;                 // Output format setting.
-			GLCDC_ENDIAN             endian;                 // Bit order of output data.
-			GLCDC_COLOR_ORDER        color_order;            // Color order in pixel.
-			GLCDC_SIGNAL_SYNC_EDGE   sync_edge;              // Signal sync edge selection.
+			glcdc_def::OUT_FORMAT    format;                 // Output format setting.
+			glcdc_def::ENDIAN        endian;                 // Bit order of output data.
+			glcdc_def::COLOR_ORDER   color_order;            // Color order in pixel.
+			glcdc_def::SIGNAL_SYNC_EDGE sync_edge;              // Signal sync edge selection.
 
 			color_t                  bg_color;               // Background color.
 
 			brightness_t             brightness;             // Brightness setting.
 			contrast_t               contrast;               // Contrast setting.
 			gamma_correction_t       gamma;                  // Gamma correction setting.
-			glcdc_correction_proc_order_t  correction_proc_order;  // Correction control route select.
-
+			glcdc_def::CORRECTION_PROC_ORDER  correction_proc_order;  // Correction control route select.
 			dithering_t              dithering;              // Dithering setting.
 
-			GLCDC_TCON_PIN           tcon_hsync;             // GLCD TCON output pin select.
-			GLCDC_TCON_PIN           tcon_vsync;             // GLCD TCON output pin select.
-			GLCDC_TCON_PIN           tcon_de;                // GLCD TCON output pin select.
-			GLCDC_SIGNAL_POLARITY    data_enable_polarity;   // Data Enable signal polarity.
-			GLCDC_SIGNAL_POLARITY    hsync_polarity;         // Horizontal sync signal polarity.
-			GLCDC_SIGNAL_POLARITY    vsync_polarity;         // Vertical sync signal polarity.
+			glcdc_def::TCON_PIN           tcon_hsync;             // GLCD TCON output pin select.
+			glcdc_def::TCON_PIN           tcon_vsync;             // GLCD TCON output pin select.
+			glcdc_def::TCON_PIN           tcon_de;                // GLCD TCON output pin select.
+			glcdc_def::SIGNAL_POLARITY    data_enable_polarity;   // Data Enable signal polarity.
+			glcdc_def::SIGNAL_POLARITY    hsync_polarity;    // Horizontal sync signal polarity.
+			glcdc_def::SIGNAL_POLARITY    vsync_polarity;    // Vertical sync signal polarity.
 
-			GLCDC_CLK_SRC            clksrc;                 // Clock Source selection.
-			GLCDC_PANEL_CLK_DIVISOR  clock_div_ratio;        // Clock divide ratio for dot clock.
+			glcdc_def::CLK_SRC            clksrc;                 // Clock Source selection.
+			glcdc_def::PANEL_CLK_DIVISOR  clock_div_ratio;        // Clock divide ratio for dot clock.
 
 			SERIAL_OUTPUT_DELAY		 serial_output_delay;    // Serial RGB Data output delay cycle select (this function is not supported).
 			SERIAL_SCAN_DIRECTION	serial_scan_direction;   // Serial RGB Scan direction select (this function is not supported).
@@ -298,7 +271,7 @@ namespace device {
 		/** Graphics layer blend setup parameter */
 		struct blend_t
 		{
-			GLCDC_BLEND_CONTROL blend_control;     // Layer fade-in/out , blending on/off.
+			glcdc_def::BLEND_CONTROL blend_control;     // Layer fade-in/out , blending on/off.
 			bool visible;                          // Visible or hide graphics.
 			bool frame_edge;                       // Show/hide setting of the frame of rectangular alpha blending area.
 			uint8_t fixed_blend_value;             // Blend value. Valid only when blend_control is _FIXED.
@@ -348,7 +321,7 @@ namespace device {
 			@brief  Control Command
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class control_cmd {
+		enum class CONTROL_CMD {
 			START_DISPLAY,			///< Start display command.
 			STOP_DISPLAY,			///< Stop display command.
 			SET_INTERRUPT,			///< Interrupt setting command.
@@ -362,7 +335,7 @@ namespace device {
 			@brief  エラー
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class error_t {
+		enum class ERROR {
 			SUCCESS = 0,                 ///< Success.
 			INVALID_PTR,             ///< Pointer points to invalid memory location.
 			LOCK_FUNC,               ///< GLCDC resource is in use by another process.
@@ -412,11 +385,11 @@ namespace device {
 		/** status */
 		struct status_t
 		{
-			glcdc_operating_status state;               // Status of GLCD module
+			glcdc_def::OPERATING_STATUS		state;   // Status of GLCD module
 		    bool state_vpos;           // Status of line detection.
 		    bool state_gr1uf;          // Status of graphics plane1 underflow.
 		    bool state_gr2uf;          // Status of graphics plane2 underflow.
-		    GLCDC_FADE_STATUS  fade_status[FRAME_LAYER_NUM];  // Status of fade-in/fade-out status
+		    glcdc_def::FADE_STATUS  fade_status[FRAME_LAYER_NUM];  // Status of fade-in/fade-out status
 		};
 
 		private:
@@ -440,17 +413,17 @@ namespace device {
 
 		/* Color correction setting threshold */
 		// OUT_BRIGHT1.BRTG, OUT_BRIGHT2.BRTR and .BRTB (Mid=512)
-		static const uint32_t GLCDC_BRIGHTNESS_DEFAULT  = 512;
+		static const uint32_t BRIGHTNESS_DEFAULT  = 512;
 		// OUT_BRIGHT1.BRTG, OUT_BRIGHT2.BRTR and .BRTB (Max=1023)
-		static const uint32_t GLCDC_BRIGHTNESS_MAX      = 1023;
+		static const uint32_t BRIGHTNESS_MAX      = 1023;
 		// OUT_CONTRAST.CONTG and .CONTB and .CONTR (Mid=128)
-		static const uint32_t GLCDC_CONTRAST_DEFAULT    = 128;
+		static const uint32_t CONTRAST_DEFAULT    = 128;
 		// OUT_CONTRAST.CONTG and .CONTB and .CONTR (Max=255)
-		static const uint32_t GLCDC_CONTRAST_MAX        = 255;
+		static const uint32_t CONTRAST_MAX        = 255;
 		// GAMx_LUTn.GAIN15 - GAIN0 (Max=2047)
-		static const uint32_t GLCDC_GAMMA_GAIN_MAX      = 2047;
+		static const uint32_t GAMMA_GAIN_MAX      = 2047;
 		// GAMx_AREAn.TH15  - TH0   (Max=1023)
-		static const uint32_t GLCDC_GAMMA_THRESHOLD_MAX = 1023;
+		static const uint32_t GAMMA_THRESHOLD_MAX = 1023;
 
 
 
@@ -577,7 +550,7 @@ namespace device {
 
 		static glcdc_ctrl_t	ctrl_blk_;
 		uint8_t				intr_lvl_;
-		error_t				last_error_;
+		ERROR				last_error_;
 
 
 		void release_software_reset_()
@@ -595,7 +568,7 @@ namespace device {
 			GLC::PANELCLK.DCDR = (uint32_t)cfg.output.clock_div_ratio & SYSCNT_PANEL_CLK_DCDR_MASK;
 
 			// Selects pixel clock output
-			if(GLCDC_OUT_FORMAT::SERIAL != cfg.output.format) {
+			if(glcdc_def::OUT_FORMAT::SERIAL != cfg.output.format) {
 				GLC::PANELCLK.PIXSEL = 0; /* ParallelRGBSelect */
 			} else {
 				GLC::PANELCLK.PIXSEL = 1; /* SerialRGBSelect */
@@ -612,23 +585,23 @@ namespace device {
 		}
 
 
-		void hsync_set_(GLCDC_TCON_PIN tcon, const glcdc_timing_t& timing,
-			GLCDC_SIGNAL_POLARITY polarity)
+		void hsync_set_(glcdc_def::TCON_PIN tcon, const glcdc_timing_t& timing,
+			glcdc_def::SIGNAL_POLARITY polarity)
 		{
 			switch(tcon) {
-			case GLCDC_TCON_PIN::_1:
+			case glcdc_def::TCON_PIN::_1:
 				/* Hsync(STHA) -> TCON1 */
 				GLC::TCONSTVB2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
 				break;
-			case GLCDC_TCON_PIN::_2:
+			case glcdc_def::TCON_PIN::_2:
 				/* Hsync(STHA) ->  TCON2 */
 				GLC::TCONSTHA2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
 				break;
-			case GLCDC_TCON_PIN::_3:
+			case glcdc_def::TCON_PIN::_3:
 				/* Hsync(STHA) -> TCON3 */
 				GLC::TCONSTHB2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
 				break;
-			case GLCDC_TCON_PIN::_0: /* Intentionally go though to the default case */
+			case glcdc_def::TCON_PIN::_0: /* Intentionally go though to the default case */
 			default:
 				/* Hsync(STHA) -> TCON0 */
 				GLC::TCONSTVA2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
@@ -647,24 +620,24 @@ namespace device {
 		}
 
 
-		void vsync_set_(GLCDC_TCON_PIN tcon, const glcdc_timing_t& timing,
-			GLCDC_SIGNAL_POLARITY polarity)
+		void vsync_set_(glcdc_def::TCON_PIN tcon, const glcdc_timing_t& timing,
+			glcdc_def::SIGNAL_POLARITY polarity)
 		{
 
 			switch(tcon) {
-			case GLCDC_TCON_PIN::_0:
+			case glcdc_def::TCON_PIN::_0:
 				/* Vsync(STVA) -> TCON0 */
 				GLC::TCONSTVA2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
 				break;
-			case GLCDC_TCON_PIN::_2:
+			case glcdc_def::TCON_PIN::_2:
 				/* Vsync(STVA) -> TCON2 */
 				GLC::TCONSTHA2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
 				break;
-			case GLCDC_TCON_PIN::_3:
+			case glcdc_def::TCON_PIN::_3:
 				/* Vsync(STVA) -> TCON3 */
 				GLC::TCONSTHB2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
 				break;
-			case GLCDC_TCON_PIN::_1: /* Intentionally go though to the default case */
+			case glcdc_def::TCON_PIN::_1: /* Intentionally go though to the default case */
 			default:
 				/* Vsync(STVA) -> TCON1 */
 				GLC::TCONSTVB2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
@@ -682,23 +655,23 @@ namespace device {
 		}
 
 
-		void data_enable_set_(GLCDC_TCON_PIN tcon, const glcdc_timing_t& vtiming,
-                              const glcdc_timing_t& htiming, GLCDC_SIGNAL_POLARITY polarity)
+		void data_enable_set_(glcdc_def::TCON_PIN tcon, const glcdc_timing_t& vtiming,
+                              const glcdc_timing_t& htiming, glcdc_def::SIGNAL_POLARITY polarity)
 		{
 			switch(tcon) {
-			case GLCDC_TCON_PIN::_0:
+			case glcdc_def::TCON_PIN::_0:
 				/* DE -> TCON0 */
 				GLC::TCONSTVA2.SEL = TCON_SIGNAL_SELECT::DE;
 				break;
-			case GLCDC_TCON_PIN::_1:
+			case glcdc_def::TCON_PIN::_1:
 				// DE -> TCON1
 				GLC::TCONSTVB2.SEL = TCON_SIGNAL_SELECT::DE;
 				break;
-			case GLCDC_TCON_PIN::_3:
+			case glcdc_def::TCON_PIN::_3:
 				// DE -> TCON3
 				GLC::TCONSTHB2.SEL = TCON_SIGNAL_SELECT::DE;
 				break;
-			case GLCDC_TCON_PIN::_2: /* Intentionally go though to the default case */
+			case glcdc_def::TCON_PIN::_2: /* Intentionally go though to the default case */
 			default:
 				// DE -> TCON2
 				GLC::TCONSTHA2.SEL = TCON_SIGNAL_SELECT::DE;
@@ -772,28 +745,28 @@ namespace device {
 		}
 
 
-		static uint16_t get_bit_size_(GLCDC_IN_FORMAT format)
+		static uint16_t get_bit_size_(glcdc_def::IN_FORMAT format)
 		{
 			uint16_t bit_size = 0;
 
 			/* ---- Get bit size and set color format ---- */
 			switch (format) {
-			case GLCDC_IN_FORMAT::ARGB8888:         ///< ARGB8888, 32bits
-			case GLCDC_IN_FORMAT::RGB888:           ///< RGB888,   32bits
+			case glcdc_def::IN_FORMAT::ARGB8888:         ///< ARGB8888, 32bits
+			case glcdc_def::IN_FORMAT::RGB888:           ///< RGB888,   32bits
 				bit_size = 32;
 				break;
-			case GLCDC_IN_FORMAT::RGB565:           ///< RGB565,   16bits
-			case GLCDC_IN_FORMAT::ARGB1555:         ///< ARGB1555, 16bits
-			case GLCDC_IN_FORMAT::ARGB4444:         ///< ARGB4444, 16bits
+			case glcdc_def::IN_FORMAT::RGB565:           ///< RGB565,   16bits
+			case glcdc_def::IN_FORMAT::ARGB1555:         ///< ARGB1555, 16bits
+			case glcdc_def::IN_FORMAT::ARGB4444:         ///< ARGB4444, 16bits
 				bit_size = 16;
 				break;
-			case GLCDC_IN_FORMAT::CLUT8:                   ///< CLUT8
+			case glcdc_def::IN_FORMAT::CLUT8:                   ///< CLUT8
 				bit_size = 8;
 				break;
-			case GLCDC_IN_FORMAT::CLUT4:                   ///< CLUT4
+			case glcdc_def::IN_FORMAT::CLUT4:                   ///< CLUT4
 				bit_size = 4;
 				break;
-			case GLCDC_IN_FORMAT::CLUT1:                   ///< CLUT1
+			case glcdc_def::IN_FORMAT::CLUT1:                   ///< CLUT1
 			default:
 				bit_size = 1;
 				break;
@@ -802,7 +775,7 @@ namespace device {
 		}
 
 
-		void gr_plane_format_set_(GLCDC_IN_FORMAT format, uint32_t frame)
+		void gr_plane_format_set_(glcdc_def::IN_FORMAT format, uint32_t frame)
 		{
 			if(frame == 0) {
 				GLC::GR1FLM6.FORMAT = static_cast<uint32_t>(format);
@@ -932,7 +905,7 @@ namespace device {
 
 			switch(blend.blend_control)
 			{
-			case GLCDC_BLEND_CONTROL::NONE:
+			case glcdc_def::BLEND_CONTROL::NONE:
 
 				if(frame == 0) {
 					GLC::GR1AB1.ARCON = 0;
@@ -953,9 +926,9 @@ namespace device {
 					}
 				}
 				break;
-			case GLCDC_BLEND_CONTROL::FADEIN:
-			case GLCDC_BLEND_CONTROL::FADEOUT:
-			case GLCDC_BLEND_CONTROL::FIXED:
+			case glcdc_def::BLEND_CONTROL::FADEIN:
+			case glcdc_def::BLEND_CONTROL::FADEOUT:
+			case glcdc_def::BLEND_CONTROL::FIXED:
 				// gp_gr[frame]->grxab5.bit.archs = 
                 //    
 				if(frame == 0) {
@@ -1004,7 +977,7 @@ namespace device {
 					GLC::GR2AB6.ARCRATE = 0x00;
 				}
 
-	            if(GLCDC_BLEND_CONTROL::FADEIN == blend.blend_control) {
+	            if(glcdc_def::BLEND_CONTROL::FADEIN == blend.blend_control) {
 					if(frame == 0) {
 						GLC::GR1AB7.ARCDEF
 							= FADING_CONTROL_INITIAL_ALPHA::MIN & GRn_AB7_ARCDEF_MASK;
@@ -1018,7 +991,7 @@ namespace device {
 					} else {
 						GLC::GR2AB6.ARCCOEF = (uint32_t)blend.fade_speed & GRn_AB6_ARCCOEF_MASK;
 					}
-            	} else if (GLCDC_BLEND_CONTROL::FADEOUT == blend.blend_control) {
+            	} else if (glcdc_def::BLEND_CONTROL::FADEOUT == blend.blend_control) {
 					if(frame == 0) {
 						GLC::GR1AB7.ARCDEF
 							= FADING_CONTROL_INITIAL_ALPHA::MAX & GRn_AB7_ARCDEF_MASK;
@@ -1065,7 +1038,7 @@ namespace device {
 					GLC::GR2AB1.DISPSEL = PLANE_BLEND::ON_LOWER_LAYER & GRn_AB1_DISPSEL_MASK;
 				}
 				break;
-			case GLCDC_BLEND_CONTROL::PIXEL:
+			case glcdc_def::BLEND_CONTROL::PIXEL:
 			default:
 				if(frame == 0) {
 					GLC::GR1AB1.ARCON = 0;
@@ -1219,30 +1192,30 @@ namespace device {
 
 			// Selects the output format
 			switch(cfg.output.format) {
-			case GLCDC_OUT_FORMAT::SERIAL: /* In case of serial RGB, set as RGB888 format */
-				GLC::OUTSET.FORMAT = static_cast<uint32_t>(GLCDC_OUT_FORMAT::SERIAL);
+			case glcdc_def::OUT_FORMAT::SERIAL: /* In case of serial RGB, set as RGB888 format */
+				GLC::OUTSET.FORMAT = static_cast<uint32_t>(glcdc_def::OUT_FORMAT::SERIAL);
 				GLC::OUTSET.PHASE = (uint32_t)cfg.output.serial_output_delay;
 				GLC::OUTSET.DIRSEL = (uint32_t)cfg.output.serial_scan_direction;
 				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB888;
 				break;
-			case GLCDC_OUT_FORMAT::RGB565:
-				GLC::OUTSET.FORMAT = static_cast<uint32_t>(GLCDC_OUT_FORMAT::RGB565);
+			case glcdc_def::OUT_FORMAT::RGB565:
+				GLC::OUTSET.FORMAT = static_cast<uint32_t>(glcdc_def::OUT_FORMAT::RGB565);
 				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB565;
 				break;
-			case GLCDC_OUT_FORMAT::RGB666:
-				GLC::OUTSET.FORMAT = static_cast<uint32_t>(GLCDC_OUT_FORMAT::RGB666);
+			case glcdc_def::OUT_FORMAT::RGB666:
+				GLC::OUTSET.FORMAT = static_cast<uint32_t>(glcdc_def::OUT_FORMAT::RGB666);
 				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB666;
 				break;
-			case GLCDC_OUT_FORMAT::RGB888:
+			case glcdc_def::OUT_FORMAT::RGB888:
 			default:
-				GLC::OUTSET.FORMAT = static_cast<uint32_t>(GLCDC_OUT_FORMAT::RGB888);
+				GLC::OUTSET.FORMAT = static_cast<uint32_t>(glcdc_def::OUT_FORMAT::RGB888);
 				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB888;
 				break;
 			}
 
 			/* Sets the pixel clock (the GLCD internal signal) frequency in case that
 			the output format is 8-bit serial RGB */
-			if(GLCDC_OUT_FORMAT::SERIAL == cfg.output.format) {
+			if(glcdc_def::OUT_FORMAT::SERIAL == cfg.output.format) {
 				GLC::OUTSET.FRQSEL = OUT_SET_FRQSEL_QUATER_DIVISION;
 			} else {
 				GLC::OUTSET.FRQSEL = OUT_SET_FRQSEL_NO_DIVISION;
@@ -1255,7 +1228,7 @@ namespace device {
 
 			/* ---- Set the dithering mode ---- */
 			if(true == cfg.output.dithering.dithering_on) {
-				if(GLCDC_DITHERING_MODE_2X2PATTERN == cfg.output.dithering.dithering_mode) {
+				if(glcdc_def::DITHERING_MODE::PATTERN2X2 == cfg.output.dithering.dithering_mode) {
 					GLC::PANELDTHA.PA = (uint32_t)cfg.output.dithering.dithering_pattern_a;
 					GLC::PANELDTHA.PB = (uint32_t)cfg.output.dithering.dithering_pattern_b;
 					GLC::PANELDTHA.PC = (uint32_t)cfg.output.dithering.dithering_pattern_c;
@@ -1264,7 +1237,7 @@ namespace device {
 
 				GLC::PANELDTHA.SEL = (uint32_t)cfg.output.dithering.dithering_mode;
 			} else {
-				GLC::PANELDTHA.SEL = (uint32_t)GLCDC_DITHERING_MODE_TRUNCATE;
+				GLC::PANELDTHA.SEL = static_cast<uint32_t>(glcdc_def::DITHERING_MODE::TRUNCATE);
 			}
 		}
 
@@ -1279,9 +1252,9 @@ namespace device {
 				GLC::BRIGHT2.BRTR = brightness.r & OUT_BRIGHT2_BRTR_MASK;
 			} else {
 				/* --- If brightness setting in configuration is 'off', apply default value --- */
-				GLC::BRIGHT1.BRTG = GLCDC_BRIGHTNESS_DEFAULT & OUT_BRIGHT1_BRTG_MASK;
-				GLC::BRIGHT2.BRTB = GLCDC_BRIGHTNESS_DEFAULT & OUT_BRIGHT2_BRTB_MASK;
-				GLC::BRIGHT2.BRTR = GLCDC_BRIGHTNESS_DEFAULT & OUT_BRIGHT2_BRTR_MASK;
+				GLC::BRIGHT1.BRTG = BRIGHTNESS_DEFAULT & OUT_BRIGHT1_BRTG_MASK;
+				GLC::BRIGHT2.BRTB = BRIGHTNESS_DEFAULT & OUT_BRIGHT2_BRTB_MASK;
+				GLC::BRIGHT2.BRTR = BRIGHTNESS_DEFAULT & OUT_BRIGHT2_BRTR_MASK;
 			}
 		}
 
@@ -1296,9 +1269,9 @@ namespace device {
 			} else {
 				/* ---- If the contrast setting in the configuration is set to 'off',
 						apply default value ---- */
-				GLC::CONTRAST.CONTG = GLCDC_CONTRAST_DEFAULT & OUT_CONTRAST_CONTG_MASK;
-				GLC::CONTRAST.CONTB = GLCDC_CONTRAST_DEFAULT & OUT_CONTRAST_CONTB_MASK;
-				GLC::CONTRAST.CONTR = GLCDC_CONTRAST_DEFAULT & OUT_CONTRAST_CONTR_MASK;
+				GLC::CONTRAST.CONTG = CONTRAST_DEFAULT & OUT_CONTRAST_CONTG_MASK;
+				GLC::CONTRAST.CONTB = CONTRAST_DEFAULT & OUT_CONTRAST_CONTB_MASK;
+				GLC::CONTRAST.CONTR = CONTRAST_DEFAULT & OUT_CONTRAST_CONTR_MASK;
 			}
 		}
 
@@ -1644,11 +1617,11 @@ namespace device {
 
 		bool open_(const cfg_t& cfg)
 		{
-			last_error_ = error_t::SUCCESS;
+			last_error_ = ERROR::SUCCESS;
 
 			// Status check
-			if(glcdc_operating_status::CLOSED != ctrl_blk_.state) {
-				last_error_ = error_t::INVALID_MODE;
+			if(glcdc_def::OPERATING_STATUS::CLOSED != ctrl_blk_.state) {
+				last_error_ = ERROR::INVALID_MODE;
 				return false;
 			}
 
@@ -1773,7 +1746,7 @@ namespace device {
 			graphics_read_enable_();
 
 			// Change GLCDC driver state
-			ctrl_blk_.state = glcdc_operating_status::NOT_DISPLAYING;
+			ctrl_blk_.state = glcdc_def::OPERATING_STATUS::NOT_DISPLAYING;
 
 			return true;
 		}		
@@ -1793,7 +1766,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		glcdc_io(uint8_t intr_lvl = 5) noexcept :
-			intr_lvl_(intr_lvl), last_error_(error_t::SUCCESS)
+			intr_lvl_(intr_lvl), last_error_(ERROR::SUCCESS)
 		{ }
 
 
@@ -1846,8 +1819,8 @@ namespace device {
 			void* ly2 = reinterpret_cast<void*>(0x0)) noexcept
 		{
 			cfg_t cfg;
-			cfg.output.clksrc = GLCDC_CLK_SRC::INTERNAL;   			  // Select PLL clock
-			cfg.output.clock_div_ratio = GLCDC_PANEL_CLK_DIVISOR::_24;  // 240 / 24 = 10 MHz
+			cfg.output.clksrc = glcdc_def::CLK_SRC::INTERNAL;   			  // Select PLL clock
+			cfg.output.clock_div_ratio = glcdc_def::PANEL_CLK_DIVISOR::_24;  // 240 / 24 = 10 MHz
   																      // No frequency division
   	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	      // Enable LCD_CLK output
 			//
@@ -1889,28 +1862,28 @@ namespace device {
 			// Single Frame Line Count
 
 			switch(PXT) {
-			case PIX_TYPE::CLUT1:
-				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT::CLUT1;
+			case glcdc_def::PIX_TYPE::CLUT1:
+				cfg.input[FRAME_LAYER_2].format = glcdc_def::IN_FORMAT::CLUT1;
 				break;
-			case PIX_TYPE::CLUT4:
-				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT::CLUT4;
+			case glcdc_def::PIX_TYPE::CLUT4:
+				cfg.input[FRAME_LAYER_2].format = glcdc_def::IN_FORMAT::CLUT4;
 				break;
-			case PIX_TYPE::CLUT8:
-				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT::CLUT8;
+			case glcdc_def::PIX_TYPE::CLUT8:
+				cfg.input[FRAME_LAYER_2].format = glcdc_def::IN_FORMAT::CLUT8;
 				break;
-			case PIX_TYPE::RGB565:
-				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT::RGB565;
+			case glcdc_def::PIX_TYPE::RGB565:
+				cfg.input[FRAME_LAYER_2].format = glcdc_def::IN_FORMAT::RGB565;
 				break;
 //  (GLCDC_IN_FORMAT_16BITS_ARGB1555)
 //  (GLCDC_IN_FORMAT_16BITS_ARGB4444)
-			case PIX_TYPE::RGB888:
-				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT::RGB888;
+			case glcdc_def::PIX_TYPE::RGB888:
+				cfg.input[FRAME_LAYER_2].format = glcdc_def::IN_FORMAT::RGB888;
 				break;
 //  (GLCDC_IN_FORMAT_32BITS_ARGB8888)
 			}
 			cfg.blend[FRAME_LAYER_2].visible = true;
 			// Display Screen Control (current graphics)
-			cfg.blend[FRAME_LAYER_2].blend_control = GLCDC_BLEND_CONTROL::NONE;
+			cfg.blend[FRAME_LAYER_2].blend_control = glcdc_def::BLEND_CONTROL::NONE;
 			// Rectangular Alpha Blending Area Frame Display Control
 			cfg.blend[FRAME_LAYER_2].frame_edge = false;
 			// Graphics Area Frame Display Control
@@ -1944,15 +1917,15 @@ namespace device {
 			//   STVB Signal Pulse Width
 			//   STHB Signal Pulse Width
 			// TCON0 Output Signal Select STVA (VSYNC)
-			cfg.output.tcon_vsync = GLCDC_TCON_PIN::_0;
+			cfg.output.tcon_vsync = glcdc_def::TCON_PIN::_0;
 			// TCON2 Output Signal Select STHA (HSYNC)
-			cfg.output.tcon_hsync = GLCDC_TCON_PIN::_2;
+			cfg.output.tcon_hsync = glcdc_def::TCON_PIN::_2;
 			// TCON3 Output Signal Select DE (DEN)
-			cfg.output.tcon_de    = GLCDC_TCON_PIN::_3;
-			cfg.output.data_enable_polarity = GLCDC_SIGNAL_POLARITY::HIACTIVE;
-			cfg.output.hsync_polarity = GLCDC_SIGNAL_POLARITY::LOACTIVE;
-			cfg.output.vsync_polarity = GLCDC_SIGNAL_POLARITY::LOACTIVE;
-			cfg.output.sync_edge = GLCDC_SIGNAL_SYNC_EDGE::RISING;
+			cfg.output.tcon_de    = glcdc_def::TCON_PIN::_3;
+			cfg.output.data_enable_polarity = glcdc_def::SIGNAL_POLARITY::HIACTIVE;
+			cfg.output.hsync_polarity = glcdc_def::SIGNAL_POLARITY::LOACTIVE;
+			cfg.output.vsync_polarity = glcdc_def::SIGNAL_POLARITY::LOACTIVE;
+			cfg.output.sync_edge = glcdc_def::SIGNAL_SYNC_EDGE::RISING;
 			//
 			// Output interface
 			//
@@ -1960,11 +1933,11 @@ namespace device {
 			//   Serial RGB Scan Direction Select (forward) (not support)
 			//   Pixel Clock Division Control (no division)
 			// Output Data Format Select (RGB565)
-			cfg.output.format = GLCDC_OUT_FORMAT::RGB565;
+			cfg.output.format = glcdc_def::OUT_FORMAT::RGB565;
 			// Pixel Order Control (B-G-R)
-			cfg.output.color_order = GLCDC_COLOR_ORDER::RGB;	// GLCDC_COLOR_ORDER_BGR;
+			cfg.output.color_order = glcdc_def::COLOR_ORDER::RGB;	// GLCDC_COLOR_ORDER_BGR;
 			// Bit Endian Control (Little endian)
-			cfg.output.endian = GLCDC_ENDIAN::LITTLE;
+			cfg.output.endian = glcdc_def::ENDIAN::LITTLE;
 			//
 			// Brightness Adjustment
 			//
@@ -2063,54 +2036,54 @@ namespace device {
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool control(control_cmd cmd, const void* args = nullptr) noexcept
+		bool control(CONTROL_CMD cmd, const void* args = nullptr) noexcept
 		{
-			if(glcdc_operating_status::CLOSED == ctrl_blk_.state) {
-				last_error_ = error_t::NOT_OPEN;
+			if(glcdc_def::OPERATING_STATUS::CLOSED == ctrl_blk_.state) {
+				last_error_ = ERROR::NOT_OPEN;
 				return false;
 			}
 
 			switch(cmd) {
-			case control_cmd::START_DISPLAY:
+			case CONTROL_CMD::START_DISPLAY:
 
-				if(glcdc_operating_status::DISPLAYING == ctrl_blk_.state) {
-					last_error_ = error_t::INVALID_MODE;
+				if(glcdc_def::OPERATING_STATUS::DISPLAYING == ctrl_blk_.state) {
+					last_error_ = ERROR::INVALID_MODE;
 					return false;
 				}
 
 				/* Change GLCDC driver state */
-				ctrl_blk_.state = glcdc_operating_status::DISPLAYING;
+				ctrl_blk_.state = glcdc_def::OPERATING_STATUS::DISPLAYING;
 
 				/* Start to output the vertical and horizontal synchronization signals and
 				   screen data. */
 				bg_operation_enable();
 				break;
 
-			case control_cmd::STOP_DISPLAY:
+			case CONTROL_CMD::STOP_DISPLAY:
 
-				if(glcdc_operating_status::NOT_DISPLAYING == ctrl_blk_.state) {
-					last_error_ = error_t::INVALID_MODE;
+				if(glcdc_def::OPERATING_STATUS::NOT_DISPLAYING == ctrl_blk_.state) {
+					last_error_ = ERROR::INVALID_MODE;
 					return false;
 				}
 				/* Return immediately if the register is being updated */
 				if(is_gr_plane_updating_(FRAME_LAYER_1)) {
-					last_error_ = error_t::INVALID_UPDATE_TIMING;
+					last_error_ = ERROR::INVALID_UPDATE_TIMING;
 					return false;
 				}
 				if(is_gr_plane_updating_(FRAME_LAYER_2)) {
-					last_error_ = error_t::INVALID_UPDATE_TIMING;
+					last_error_ = ERROR::INVALID_UPDATE_TIMING;
 					return false;
 				}
 				if(is_output_ctrl_updating_()) {
-					last_error_ = error_t::INVALID_UPDATE_TIMING;
+					last_error_ = ERROR::INVALID_UPDATE_TIMING;
 					return false;
 				}
 				if(is_gamma_updating_()) {
-					last_error_ = error_t::INVALID_UPDATE_TIMING;
+					last_error_ = ERROR::INVALID_UPDATE_TIMING;
 					return false;
 				}
 				if(is_register_reflecting_()) {
-					last_error_ = error_t::INVALID_UPDATE_TIMING;
+					last_error_ = ERROR::INVALID_UPDATE_TIMING;
 					return false;
 				}
 
@@ -2119,20 +2092,20 @@ namespace device {
 				bg_operation_enable(false);
 
 				/* status update */
-				ctrl_blk_.state = glcdc_operating_status::NOT_DISPLAYING;
+				ctrl_blk_.state = glcdc_def::OPERATING_STATUS::NOT_DISPLAYING;
 
 				break;
 
-			case control_cmd::SET_INTERRUPT:
+			case CONTROL_CMD::SET_INTERRUPT:
 #if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
 				if(NULL == args) {
-					last_error_ = error_t::INVALID_PTR;
+					last_error_ = ERROR::INVALID_PTR;
 					return false;
 				}
 #endif
 
 				if(false == ctrl_blk_.first_vpos_interrupt_flag) {
-                	last_error_ = error_t::INVALID_UPDATE_TIMING;
+                	last_error_ = ERROR::INVALID_UPDATE_TIMING;
 					return false;
 				}
 
@@ -2144,7 +2117,7 @@ namespace device {
 				}
 				break;
 
-	        case control_cmd::CLR_DETECTED_STATUS:
+	        case CONTROL_CMD::CLR_DETECTED_STATUS:
 
 #if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
 				if (NULL == args) {
@@ -2167,24 +2140,24 @@ namespace device {
 				}
 				break;
 
-			case control_cmd::CHANGE_BG_COLOR:
+			case CONTROL_CMD::CHANGE_BG_COLOR:
 				{
 					const color_t* t = static_cast<const color_t*>(args);
 					if(t != nullptr) {
 						bg_color_setting_(*t);
 					} else {
-						last_error_ = error_t::INVALID_PTR;
+						last_error_ = ERROR::INVALID_PTR;
 						return false;
 					}
 				}
 				break;
 
 			default:
-				last_error_ = error_t::INVALID_ARG;
+				last_error_ = ERROR::INVALID_ARG;
 				return false;
 			}
 
-			last_error_ = error_t::SUCCESS;
+			last_error_ = ERROR::SUCCESS;
 			return true;
 		}
 
@@ -2203,6 +2176,6 @@ namespace device {
 		}
 	};
 
-	template <class GLC, int32_t XSIZE, int32_t YSIZE, PIX_TYPE PXT>
+	template <class GLC, int32_t XSIZE, int32_t YSIZE, glcdc_def::PIX_TYPE PXT>
 		glcdc_ctrl_t glcdc_io<GLC, XSIZE, YSIZE, PXT>::ctrl_blk_;
 }
