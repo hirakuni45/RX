@@ -250,22 +250,26 @@ namespace device {
 			uint16_t hsize;                // Horizontal pixel size in a line.
 			uint16_t vsize;                // Vertical pixel size in a frame.
 			int32_t offset;                // offset value to next line.
-			glcdc_in_format_t format;      // Input format setting.
+			GLCDC_IN_FORMAT format;        // Input format setting.
 			bool frame_edge;               // Show/hide setting of the frame of the graphics area.
 			glcdc_coordinate_t coordinate; // Starting point of image.
 			color_t bg_color;              // Color outside region.
+
+			input_cfg_t() : base(nullptr), hsize(0), vsize(0), offset(0),
+				format(GLCDC_IN_FORMAT::RGB565), frame_edge(false), coordinate(), bg_color()
+			{ }
 		};
 
 
 		/** Display output configuration */
 		struct output_cfg_t
 		{
-			glcdc_timing_t                 htiming;                // Horizontal display cycle setting.
-			glcdc_timing_t                 vtiming;                // Vertical display cycle setting.
-			glcdc_out_format_t             format;                 // Output format setting.
-			glcdc_endian_t                 endian;                 // Bit order of output data.
-			glcdc_color_order_t            color_order;            // Color order in pixel.
-			glcdc_sync_edge_t              sync_edge;              // Signal sync edge selection.
+			glcdc_timing_t           htiming;                // Horizontal display cycle setting.
+			glcdc_timing_t           vtiming;                // Vertical display cycle setting.
+			GLCDC_OUT_FORMAT         format;                 // Output format setting.
+			GLCDC_ENDIAN             endian;                 // Bit order of output data.
+			GLCDC_COLOR_ORDER        color_order;            // Color order in pixel.
+			GLCDC_SIGNAL_SYNC_EDGE   sync_edge;              // Signal sync edge selection.
 
 			color_t                  bg_color;               // Background color.
 
@@ -276,25 +280,25 @@ namespace device {
 
 			dithering_t              dithering;              // Dithering setting.
 
-			glcdc_tcon_pin_t               tcon_hsync;             // GLCD TCON output pin select.
-			glcdc_tcon_pin_t               tcon_vsync;             // GLCD TCON output pin select.
-			glcdc_tcon_pin_t               tcon_de;                // GLCD TCON output pin select.
-			glcdc_signal_polarity_t        data_enable_polarity;   // Data Enable signal polarity.
-			glcdc_signal_polarity_t        hsync_polarity;         // Horizontal sync signal polarity.
-			glcdc_signal_polarity_t        vsync_polarity;         // Vertical sync signal polarity.
+			GLCDC_TCON_PIN           tcon_hsync;             // GLCD TCON output pin select.
+			GLCDC_TCON_PIN           tcon_vsync;             // GLCD TCON output pin select.
+			GLCDC_TCON_PIN           tcon_de;                // GLCD TCON output pin select.
+			GLCDC_SIGNAL_POLARITY    data_enable_polarity;   // Data Enable signal polarity.
+			GLCDC_SIGNAL_POLARITY    hsync_polarity;         // Horizontal sync signal polarity.
+			GLCDC_SIGNAL_POLARITY    vsync_polarity;         // Vertical sync signal polarity.
 
-			glcdc_clk_src_t                clksrc;                 // Clock Source selection.
-			glcdc_panel_clk_div_t          clock_div_ratio;        // Clock divide ratio for dot clock.
+			GLCDC_CLK_SRC            clksrc;                 // Clock Source selection.
+			GLCDC_PANEL_CLK_DIVISOR  clock_div_ratio;        // Clock divide ratio for dot clock.
 
-			SERIAL_OUTPUT_DELAY		serial_output_delay;    // Serial RGB Data output delay cycle select (this function is not supported).
-			SERIAL_SCAN_DIRECTION	serial_scan_direction;  // Serial RGB Scan direction select (this function is not supported).
+			SERIAL_OUTPUT_DELAY		 serial_output_delay;    // Serial RGB Data output delay cycle select (this function is not supported).
+			SERIAL_SCAN_DIRECTION	serial_scan_direction;   // Serial RGB Scan direction select (this function is not supported).
 		};
 
 
 		/** Graphics layer blend setup parameter */
 		struct blend_t
 		{
-			glcdc_blend_control_t blend_control;   // Layer fade-in/out , blending on/off.
+			GLCDC_BLEND_CONTROL blend_control;     // Layer fade-in/out , blending on/off.
 			bool visible;                          // Visible or hide graphics.
 			bool frame_edge;                       // Show/hide setting of the frame of rectangular alpha blending area.
 			uint8_t fixed_blend_value;             // Blend value. Valid only when blend_control is _FIXED.
@@ -412,7 +416,7 @@ namespace device {
 		    bool state_vpos;           // Status of line detection.
 		    bool state_gr1uf;          // Status of graphics plane1 underflow.
 		    bool state_gr2uf;          // Status of graphics plane2 underflow.
-		    glcdc_fade_status_t fade_status[FRAME_LAYER_NUM];  // Status of fade-in/fade-out status
+		    GLCDC_FADE_STATUS  fade_status[FRAME_LAYER_NUM];  // Status of fade-in/fade-out status
 		};
 
 		private:
@@ -591,7 +595,7 @@ namespace device {
 			GLC::PANELCLK.DCDR = (uint32_t)cfg.output.clock_div_ratio & SYSCNT_PANEL_CLK_DCDR_MASK;
 
 			// Selects pixel clock output
-			if(GLCDC_OUT_FORMAT_8BITS_SERIAL != cfg.output.format) {
+			if(GLCDC_OUT_FORMAT::SERIAL != cfg.output.format) {
 				GLC::PANELCLK.PIXSEL = 0; /* ParallelRGBSelect */
 			} else {
 				GLC::PANELCLK.PIXSEL = 1; /* SerialRGBSelect */
@@ -608,30 +612,31 @@ namespace device {
 		}
 
 
-		void hsync_set_(glcdc_tcon_pin_t tcon, const glcdc_timing_t& timing,
-			glcdc_signal_polarity_t polarity)
+		void hsync_set_(GLCDC_TCON_PIN tcon, const glcdc_timing_t& timing,
+			GLCDC_SIGNAL_POLARITY polarity)
 		{
 			switch(tcon) {
-			case GLCDC_TCON_PIN_1:
+			case GLCDC_TCON_PIN::_1:
 				/* Hsync(STHA) -> TCON1 */
 				GLC::TCONSTVB2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
 				break;
-			case GLCDC_TCON_PIN_2:
+			case GLCDC_TCON_PIN::_2:
 				/* Hsync(STHA) ->  TCON2 */
 				GLC::TCONSTHA2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
 				break;
-			case GLCDC_TCON_PIN_3:
+			case GLCDC_TCON_PIN::_3:
 				/* Hsync(STHA) -> TCON3 */
 				GLC::TCONSTHB2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
 				break;
-			case GLCDC_TCON_PIN_0: /* Intentionally go though to the default case */
+			case GLCDC_TCON_PIN::_0: /* Intentionally go though to the default case */
 			default:
 				/* Hsync(STHA) -> TCON0 */
 				GLC::TCONSTVA2.SEL = TCON_SIGNAL_SELECT::STHA_HS;
 				break;
 			}
 
-			GLC::TCONSTHA2.INV = (uint32_t)polarity; /* Hsync(STHA) -> Invert or Not Invert */
+			// Hsync(STHA) -> Invert or Not Invert
+			GLC::TCONSTHA2.INV = static_cast<uint32_t>(polarity);
 
 			// Hsync beginning position
 			GLC::TCONSTHA1.HS = 0;    /* No delay */
@@ -642,24 +647,24 @@ namespace device {
 		}
 
 
-		void vsync_set_(glcdc_tcon_pin_t tcon, const glcdc_timing_t& timing,
-			glcdc_signal_polarity_t polarity)
+		void vsync_set_(GLCDC_TCON_PIN tcon, const glcdc_timing_t& timing,
+			GLCDC_SIGNAL_POLARITY polarity)
 		{
 
 			switch(tcon) {
-			case GLCDC_TCON_PIN_0:
+			case GLCDC_TCON_PIN::_0:
 				/* Vsync(STVA) -> TCON0 */
 				GLC::TCONSTVA2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
 				break;
-			case GLCDC_TCON_PIN_2:
+			case GLCDC_TCON_PIN::_2:
 				/* Vsync(STVA) -> TCON2 */
 				GLC::TCONSTHA2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
 				break;
-			case GLCDC_TCON_PIN_3:
+			case GLCDC_TCON_PIN::_3:
 				/* Vsync(STVA) -> TCON3 */
 				GLC::TCONSTHB2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
 				break;
-			case GLCDC_TCON_PIN_1: /* Intentionally go though to the default case */
+			case GLCDC_TCON_PIN::_1: /* Intentionally go though to the default case */
 			default:
 				/* Vsync(STVA) -> TCON1 */
 				GLC::TCONSTVB2.SEL = TCON_SIGNAL_SELECT::STVA_VS;
@@ -667,7 +672,7 @@ namespace device {
 			}
 
 			/* Vsync(STVA) -> Invert or Vsync(STVA) -> Not Invert */
-			GLC::TCONSTVA2.INV = (uint32_t)polarity;
+			GLC::TCONSTVA2.INV = static_cast<uint32_t>(polarity);
 
 			/* Vsync beginning position */
 			GLC::TCONSTVA1.VS = 0;      /* No delay. */
@@ -677,30 +682,30 @@ namespace device {
 		}
 
 
-		void data_enable_set_(glcdc_tcon_pin_t tcon, const glcdc_timing_t& vtiming,
-                              const glcdc_timing_t& htiming, glcdc_signal_polarity_t polarity)
+		void data_enable_set_(GLCDC_TCON_PIN tcon, const glcdc_timing_t& vtiming,
+                              const glcdc_timing_t& htiming, GLCDC_SIGNAL_POLARITY polarity)
 		{
 			switch(tcon) {
-			case GLCDC_TCON_PIN_0:
+			case GLCDC_TCON_PIN::_0:
 				/* DE -> TCON0 */
 				GLC::TCONSTVA2.SEL = TCON_SIGNAL_SELECT::DE;
 				break;
-			case GLCDC_TCON_PIN_1:
+			case GLCDC_TCON_PIN::_1:
 				// DE -> TCON1
 				GLC::TCONSTVB2.SEL = TCON_SIGNAL_SELECT::DE;
 				break;
-			case GLCDC_TCON_PIN_3:
+			case GLCDC_TCON_PIN::_3:
 				// DE -> TCON3
 				GLC::TCONSTHB2.SEL = TCON_SIGNAL_SELECT::DE;
 				break;
-			case GLCDC_TCON_PIN_2: /* Intentionally go though to the default case */
+			case GLCDC_TCON_PIN::_2: /* Intentionally go though to the default case */
 			default:
 				// DE -> TCON2
 				GLC::TCONSTHA2.SEL = TCON_SIGNAL_SELECT::DE;
 				break;
 			}
 
-			GLC::TCONDE.INV = (uint32_t)polarity; /* DE -> Invert or Not Invert */
+			GLC::TCONDE.INV = static_cast<uint32_t>(polarity); /* DE -> Invert or Not Invert */
 
 			/* Set data enable timing */
 			GLC::TCONSTHB1.HS = (htiming.back_porch + htiming.sync_width) & TCON_STHx1_HS_MASK;
@@ -713,11 +718,11 @@ namespace device {
 
 		void sync_signal_set_(const cfg_t& cfg)
 		{
-			GLC::CLKPHASE.LCDEDG   = cfg.output.sync_edge;
-			GLC::CLKPHASE.TCON0EDG = cfg.output.sync_edge;
-			GLC::CLKPHASE.TCON1EDG = cfg.output.sync_edge;
-			GLC::CLKPHASE.TCON2EDG = cfg.output.sync_edge;
-			GLC::CLKPHASE.TCON3EDG = cfg.output.sync_edge;
+			GLC::CLKPHASE.LCDEDG   = static_cast<uint32_t>(cfg.output.sync_edge);
+			GLC::CLKPHASE.TCON0EDG = static_cast<uint32_t>(cfg.output.sync_edge);
+			GLC::CLKPHASE.TCON1EDG = static_cast<uint32_t>(cfg.output.sync_edge);
+			GLC::CLKPHASE.TCON2EDG = static_cast<uint32_t>(cfg.output.sync_edge);
+			GLC::CLKPHASE.TCON3EDG = static_cast<uint32_t>(cfg.output.sync_edge);
 
 			GLC::TCONTIM.OFFSET = 0; // 1 pixel
 			GLC::TCONTIM.HALF   = 0; // 1 pixel (No delay)
@@ -767,28 +772,28 @@ namespace device {
 		}
 
 
-		static uint16_t get_bit_size_(glcdc_in_format_t format)
+		static uint16_t get_bit_size_(GLCDC_IN_FORMAT format)
 		{
 			uint16_t bit_size = 0;
 
 			/* ---- Get bit size and set color format ---- */
 			switch (format) {
-			case GLCDC_IN_FORMAT_32BITS_ARGB8888:         ///< ARGB8888, 32bits
-			case GLCDC_IN_FORMAT_32BITS_RGB888:           ///< RGB888,   32bits
+			case GLCDC_IN_FORMAT::ARGB8888:         ///< ARGB8888, 32bits
+			case GLCDC_IN_FORMAT::RGB888:           ///< RGB888,   32bits
 				bit_size = 32;
 				break;
-			case GLCDC_IN_FORMAT_16BITS_RGB565:           ///< RGB565,   16bits
-			case GLCDC_IN_FORMAT_16BITS_ARGB1555:         ///< ARGB1555, 16bits
-			case GLCDC_IN_FORMAT_16BITS_ARGB4444:         ///< ARGB4444, 16bits
+			case GLCDC_IN_FORMAT::RGB565:           ///< RGB565,   16bits
+			case GLCDC_IN_FORMAT::ARGB1555:         ///< ARGB1555, 16bits
+			case GLCDC_IN_FORMAT::ARGB4444:         ///< ARGB4444, 16bits
 				bit_size = 16;
 				break;
-			case GLCDC_IN_FORMAT_CLUT8:                   ///< CLUT8
+			case GLCDC_IN_FORMAT::CLUT8:                   ///< CLUT8
 				bit_size = 8;
 				break;
-			case GLCDC_IN_FORMAT_CLUT4:                   ///< CLUT4
+			case GLCDC_IN_FORMAT::CLUT4:                   ///< CLUT4
 				bit_size = 4;
 				break;
-			case GLCDC_IN_FORMAT_CLUT1:                   ///< CLUT1
+			case GLCDC_IN_FORMAT::CLUT1:                   ///< CLUT1
 			default:
 				bit_size = 1;
 				break;
@@ -797,12 +802,12 @@ namespace device {
 		}
 
 
-		void gr_plane_format_set_(glcdc_in_format_t format, uint32_t frame)
+		void gr_plane_format_set_(GLCDC_IN_FORMAT format, uint32_t frame)
 		{
 			if(frame == 0) {
-				GLC::GR1FLM6.FORMAT = (uint32_t)format;
+				GLC::GR1FLM6.FORMAT = static_cast<uint32_t>(format);
 			} else { 
-				GLC::GR2FLM6.FORMAT = (uint32_t)format;
+				GLC::GR2FLM6.FORMAT = static_cast<uint32_t>(format);
 			}
 		}
 
@@ -927,7 +932,7 @@ namespace device {
 
 			switch(blend.blend_control)
 			{
-			case GLCDC_BLEND_CONTROL_NONE:
+			case GLCDC_BLEND_CONTROL::NONE:
 
 				if(frame == 0) {
 					GLC::GR1AB1.ARCON = 0;
@@ -948,9 +953,9 @@ namespace device {
 					}
 				}
 				break;
-			case GLCDC_BLEND_CONTROL_FADEIN:
-			case GLCDC_BLEND_CONTROL_FADEOUT:
-			case GLCDC_BLEND_CONTROL_FIXED:
+			case GLCDC_BLEND_CONTROL::FADEIN:
+			case GLCDC_BLEND_CONTROL::FADEOUT:
+			case GLCDC_BLEND_CONTROL::FIXED:
 				// gp_gr[frame]->grxab5.bit.archs = 
                 //    
 				if(frame == 0) {
@@ -999,7 +1004,7 @@ namespace device {
 					GLC::GR2AB6.ARCRATE = 0x00;
 				}
 
-	            if(GLCDC_BLEND_CONTROL_FADEIN == blend.blend_control) {
+	            if(GLCDC_BLEND_CONTROL::FADEIN == blend.blend_control) {
 					if(frame == 0) {
 						GLC::GR1AB7.ARCDEF
 							= FADING_CONTROL_INITIAL_ALPHA::MIN & GRn_AB7_ARCDEF_MASK;
@@ -1013,7 +1018,7 @@ namespace device {
 					} else {
 						GLC::GR2AB6.ARCCOEF = (uint32_t)blend.fade_speed & GRn_AB6_ARCCOEF_MASK;
 					}
-            	} else if (GLCDC_BLEND_CONTROL_FADEOUT == blend.blend_control) {
+            	} else if (GLCDC_BLEND_CONTROL::FADEOUT == blend.blend_control) {
 					if(frame == 0) {
 						GLC::GR1AB7.ARCDEF
 							= FADING_CONTROL_INITIAL_ALPHA::MAX & GRn_AB7_ARCDEF_MASK;
@@ -1060,7 +1065,7 @@ namespace device {
 					GLC::GR2AB1.DISPSEL = PLANE_BLEND::ON_LOWER_LAYER & GRn_AB1_DISPSEL_MASK;
 				}
 				break;
-			case GLCDC_BLEND_CONTROL_PIXEL:
+			case GLCDC_BLEND_CONTROL::PIXEL:
 			default:
 				if(frame == 0) {
 					GLC::GR1AB1.ARCON = 0;
@@ -1214,30 +1219,30 @@ namespace device {
 
 			// Selects the output format
 			switch(cfg.output.format) {
-			case GLCDC_OUT_FORMAT_8BITS_SERIAL: /* In case of serial RGB, set as RGB888 format */
-				GLC::OUTSET.FORMAT = (uint32_t)GLCDC_OUT_FORMAT_8BITS_SERIAL;
+			case GLCDC_OUT_FORMAT::SERIAL: /* In case of serial RGB, set as RGB888 format */
+				GLC::OUTSET.FORMAT = static_cast<uint32_t>(GLCDC_OUT_FORMAT::SERIAL);
 				GLC::OUTSET.PHASE = (uint32_t)cfg.output.serial_output_delay;
 				GLC::OUTSET.DIRSEL = (uint32_t)cfg.output.serial_scan_direction;
 				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB888;
 				break;
-			case GLCDC_OUT_FORMAT_16BITS_RGB565:
-				GLC::OUTSET.FORMAT = (uint32_t)GLCDC_OUT_FORMAT_16BITS_RGB565;
+			case GLCDC_OUT_FORMAT::RGB565:
+				GLC::OUTSET.FORMAT = static_cast<uint32_t>(GLCDC_OUT_FORMAT::RGB565);
 				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB565;
 				break;
-			case GLCDC_OUT_FORMAT_18BITS_RGB666:
-				GLC::OUTSET.FORMAT = (uint32_t)GLCDC_OUT_FORMAT_18BITS_RGB666;
+			case GLCDC_OUT_FORMAT::RGB666:
+				GLC::OUTSET.FORMAT = static_cast<uint32_t>(GLCDC_OUT_FORMAT::RGB666);
 				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB666;
 				break;
-			case GLCDC_OUT_FORMAT_24BITS_RGB888:
+			case GLCDC_OUT_FORMAT::RGB888:
 			default:
-				GLC::OUTSET.FORMAT = (uint32_t)GLCDC_OUT_FORMAT_24BITS_RGB888;
+				GLC::OUTSET.FORMAT = static_cast<uint32_t>(GLCDC_OUT_FORMAT::RGB888);
 				GLC::PANELDTHA.FORM = DITHERING_OUTPUT_FORMAT::RGB888;
 				break;
 			}
 
 			/* Sets the pixel clock (the GLCD internal signal) frequency in case that
 			the output format is 8-bit serial RGB */
-			if(GLCDC_OUT_FORMAT_8BITS_SERIAL == cfg.output.format) {
+			if(GLCDC_OUT_FORMAT::SERIAL == cfg.output.format) {
 				GLC::OUTSET.FRQSEL = OUT_SET_FRQSEL_QUATER_DIVISION;
 			} else {
 				GLC::OUTSET.FRQSEL = OUT_SET_FRQSEL_NO_DIVISION;
@@ -1841,8 +1846,8 @@ namespace device {
 			void* ly2 = reinterpret_cast<void*>(0x0)) noexcept
 		{
 			cfg_t cfg;
-			cfg.output.clksrc = GLCDC_CLK_SRC_INTERNAL;   			  // Select PLL clock
-			cfg.output.clock_div_ratio = GLCDC_PANEL_CLK_DIVISOR_24;  // 240 / 24 = 10 MHz
+			cfg.output.clksrc = GLCDC_CLK_SRC::INTERNAL;   			  // Select PLL clock
+			cfg.output.clock_div_ratio = GLCDC_PANEL_CLK_DIVISOR::_24;  // 240 / 24 = 10 MHz
   																      // No frequency division
   	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	      // Enable LCD_CLK output
 			//
@@ -1885,27 +1890,27 @@ namespace device {
 
 			switch(PXT) {
 			case PIX_TYPE::CLUT1:
-				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT_CLUT1;
+				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT::CLUT1;
 				break;
 			case PIX_TYPE::CLUT4:
-				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT_CLUT4;
+				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT::CLUT4;
 				break;
 			case PIX_TYPE::CLUT8:
-				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT_CLUT8;
+				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT::CLUT8;
 				break;
 			case PIX_TYPE::RGB565:
-				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT_16BITS_RGB565;
+				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT::RGB565;
 				break;
 //  (GLCDC_IN_FORMAT_16BITS_ARGB1555)
 //  (GLCDC_IN_FORMAT_16BITS_ARGB4444)
 			case PIX_TYPE::RGB888:
-				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT_32BITS_RGB888;
+				cfg.input[FRAME_LAYER_2].format = GLCDC_IN_FORMAT::RGB888;
 				break;
 //  (GLCDC_IN_FORMAT_32BITS_ARGB8888)
 			}
 			cfg.blend[FRAME_LAYER_2].visible = true;
 			// Display Screen Control (current graphics)
-			cfg.blend[FRAME_LAYER_2].blend_control = GLCDC_BLEND_CONTROL_NONE;
+			cfg.blend[FRAME_LAYER_2].blend_control = GLCDC_BLEND_CONTROL::NONE;
 			// Rectangular Alpha Blending Area Frame Display Control
 			cfg.blend[FRAME_LAYER_2].frame_edge = false;
 			// Graphics Area Frame Display Control
@@ -1939,15 +1944,15 @@ namespace device {
 			//   STVB Signal Pulse Width
 			//   STHB Signal Pulse Width
 			// TCON0 Output Signal Select STVA (VSYNC)
-			cfg.output.tcon_vsync = GLCDC_TCON_PIN_0;
+			cfg.output.tcon_vsync = GLCDC_TCON_PIN::_0;
 			// TCON2 Output Signal Select STHA (HSYNC)
-			cfg.output.tcon_hsync = GLCDC_TCON_PIN_2;
+			cfg.output.tcon_hsync = GLCDC_TCON_PIN::_2;
 			// TCON3 Output Signal Select DE (DEN)
-			cfg.output.tcon_de    = GLCDC_TCON_PIN_3;
-			cfg.output.data_enable_polarity = GLCDC_SIGNAL_POLARITY_HIACTIVE;
-			cfg.output.hsync_polarity = GLCDC_SIGNAL_POLARITY_LOACTIVE;
-			cfg.output.vsync_polarity = GLCDC_SIGNAL_POLARITY_LOACTIVE;
-			cfg.output.sync_edge = GLCDC_SIGNAL_SYNC_EDGE_RISING;
+			cfg.output.tcon_de    = GLCDC_TCON_PIN::_3;
+			cfg.output.data_enable_polarity = GLCDC_SIGNAL_POLARITY::HIACTIVE;
+			cfg.output.hsync_polarity = GLCDC_SIGNAL_POLARITY::LOACTIVE;
+			cfg.output.vsync_polarity = GLCDC_SIGNAL_POLARITY::LOACTIVE;
+			cfg.output.sync_edge = GLCDC_SIGNAL_SYNC_EDGE::RISING;
 			//
 			// Output interface
 			//
@@ -1955,11 +1960,11 @@ namespace device {
 			//   Serial RGB Scan Direction Select (forward) (not support)
 			//   Pixel Clock Division Control (no division)
 			// Output Data Format Select (RGB565)
-			cfg.output.format = GLCDC_OUT_FORMAT_16BITS_RGB565;
+			cfg.output.format = GLCDC_OUT_FORMAT::RGB565;
 			// Pixel Order Control (B-G-R)
-			cfg.output.color_order = GLCDC_COLOR_ORDER_RGB;	// GLCDC_COLOR_ORDER_BGR;
+			cfg.output.color_order = GLCDC_COLOR_ORDER::RGB;	// GLCDC_COLOR_ORDER_BGR;
 			// Bit Endian Control (Little endian)
-			cfg.output.endian = GLCDC_ENDIAN_LITTLE;
+			cfg.output.endian = GLCDC_ENDIAN::LITTLE;
 			//
 			// Brightness Adjustment
 			//

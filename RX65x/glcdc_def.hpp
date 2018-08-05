@@ -9,120 +9,130 @@
 */
 //=====================================================================//
 
-/**********************************************************************************************************************
- Typedef definitions
- **********************************************************************************************************************/
-/** Correction Command */
-typedef enum e_glcdc_correction_cmd
-{
-    GLCDC_CORRECTION_CMD_SET_ALL,          // All correction setting command.
-    GLCDC_CORRECTION_CMD_BRIGHTNESS,       // Brightness setting command.
-    GLCDC_CORRECTION_CMD_CONTRAST,         // Contrast setting command.
-    GLCDC_CORRECTION_CMD_GAMMA,            // Gamma setting command.
-} glcdc_correction_cmd_t;
+namespace device {
+
+	/** Correction Command */
+	enum class GLCDC_CORRECTION_CMD {
+		SET_ALL,          // All correction setting command.
+		BRIGHTNESS,       // Brightness setting command.
+		CONTRAST,         // Contrast setting command.
+		GAMMA,            // Gamma setting command.
+	};
 
 
-/** Input format select ( Don't change this value, because this value is set to the register ) */
-typedef enum e_glcdc_in_format
-{
-    GLCDC_IN_FORMAT_16BITS_RGB565   = 0,   // Input format RGB565,   16 bits.
-    GLCDC_IN_FORMAT_32BITS_RGB888   = 1,   // Input format RGB888,   32 bits.
-    GLCDC_IN_FORMAT_16BITS_ARGB1555 = 2,   // Input format ARGB1555, 16 bits.
-    GLCDC_IN_FORMAT_16BITS_ARGB4444 = 3,   // Input format ARGB4444, 16 bits.
-    GLCDC_IN_FORMAT_32BITS_ARGB8888 = 4,   // Input format ARGB8888, 32 bits.
-    GLCDC_IN_FORMAT_CLUT8           = 5,   // Input format CLUT8,     8 bits.
-    GLCDC_IN_FORMAT_CLUT4           = 6,   // Input format CLUT4,     4 bits.
-    GLCDC_IN_FORMAT_CLUT1           = 7,   // Input format CLUT1,     1 bits.
-} glcdc_in_format_t;
+	/** Input format select ( Don't change this value, because this value is set to the register ) */
+	enum class GLCDC_IN_FORMAT {
+		RGB565   = 0,   // Input format RGB565,   16 bits.
+		RGB888   = 1,   // Input format RGB888,   32 bits.
+		ARGB1555 = 2,   // Input format ARGB1555, 16 bits.
+		ARGB4444 = 3,   // Input format ARGB4444, 16 bits.
+		ARGB8888 = 4,   // Input format ARGB8888, 32 bits.
+		CLUT8    = 5,   // Input format CLUT8,     8 bits.
+		CLUT4    = 6,   // Input format CLUT4,     4 bits.
+		CLUT1    = 7,   // Input format CLUT1,     1 bits.
+	};
 
-/** Output format select ( Don't change this value, because this value is set to the register ) */
-typedef enum e_glcdc_out_format
-{
-    GLCDC_OUT_FORMAT_24BITS_RGB888 = 0,    // Output format RGB888, 24 bits.
-    GLCDC_OUT_FORMAT_18BITS_RGB666 = 1,    // Output format RGB666, 18 bits.
-    GLCDC_OUT_FORMAT_16BITS_RGB565 = 2,    // Output format RGB565, 16 bits.
-    GLCDC_OUT_FORMAT_8BITS_SERIAL  = 3     // Output format SERIAL,  8 bits (this function is not supported).
-} glcdc_out_format_t;
 
-/** Data endian select ( Don't change this value, because this value is set to the register ) */
-typedef enum e_glcdc_endian
-{
-    GLCDC_ENDIAN_LITTLE = 0,               // Little endian.
-    GLCDC_ENDIAN_BIG    = 1,               // Big endian.
-} glcdc_endian_t;
+	/** Output format select ( Don't change this value, because this value is set to the register ) */
+	enum class GLCDC_OUT_FORMAT {
+		RGB888 = 0,    // Output format RGB888, 24 bits.
+		RGB666 = 1,    // Output format RGB666, 18 bits.
+		RGB565 = 2,    // Output format RGB565, 16 bits.
+		SERIAL = 3     // Output format SERIAL,  8 bits (this function is not supported).
+	};
 
-/** RGB color order select ( Don't change this value, because this value is set to the register ) */
-typedef enum e_glcdc_color_order
-{
-    GLCDC_COLOR_ORDER_RGB = 0,             // Color order RGB.
-    GLCDC_COLOR_ORDER_BGR = 1              // Color order BGR.
-} glcdc_color_order_t;
 
-/** Polarity of a signal select ( Don't change this value, because this value is set to the register ) */
-typedef enum e_glcdc_signal_polarity
-{
-    GLCDC_SIGNAL_POLARITY_HIACTIVE = 0,    // High active signal.
-    GLCDC_SIGNAL_POLARITY_LOACTIVE = 1     // Low active signal.
-} glcdc_signal_polarity_t;
+	/** Data endian select ( Don't change this value, because this value is set to the register ) */
+	enum class GLCDC_ENDIAN
+	{
+		LITTLE = 0,     // Little endian.
+		BIG    = 1,     // Big endian.
+	};
 
-/** Signal synchronization edge select ( Don't change this value, because this value is set to the register ) */
-typedef enum e_glcdc_sync_edge
-{
-    GLCDC_SIGNAL_SYNC_EDGE_RISING = 0,     // Signal is synchronized to rising edge.
-    GLCDC_SIGNAL_SYNC_EDGE_FALLING = 1     // Signal is synchronized to falling edge.
-} glcdc_sync_edge_t;
 
-/** Blending control select */
-typedef enum e_glcdc_blend_control
-{
-    GLCDC_BLEND_CONTROL_NONE = 0,          // Applying no fading control.
-    GLCDC_BLEND_CONTROL_FADEIN = 1,        // Applying fade-in control.
-    GLCDC_BLEND_CONTROL_FADEOUT = 2,       // Applying fade-out control.
-    GLCDC_BLEND_CONTROL_FIXED = 3,         // Applying fixed blend control.
-    GLCDC_BLEND_CONTROL_PIXEL = 4          // Applying pixel blend control.
-} glcdc_blend_control_t;
+	/** RGB color order select ( Don't change this value, because this value is set to the register ) */
+	enum class GLCDC_COLOR_ORDER
+	{
+		RGB = 0,         // Color order RGB.
+		BGR = 1          // Color order BGR.
+	};
 
-/** Fading status */
-typedef enum e_glcdc_fade_status
-{
-    GLCDC_FADE_STATUS_NOT_UNDERWAY,        // Fade-in/fade-out is not in progress.
-    GLCDC_FADE_STATUS_FADING_UNDERWAY,     // Fade-in or fade-out is in progress.
-    GLCDC_FADE_STATUS_UNCERTAIN            // Fade-in/fade-out status is uncertain just before hardware working.
-} glcdc_fade_status_t;
 
-/** Clock source select ( Don't change this value, because this value is set to the register ) */
-typedef enum e_glcdc_clk_src
-{
-    GLCDC_CLK_SRC_EXTERNAL = 0,            // External clock (LCD_EXTCLK) (this function is not supported).
-    GLCDC_CLK_SRC_INTERNAL = 1             // Internal clock (PLL).
-} glcdc_clk_src_t;
+	/** Polarity of a signal select ( Don't change this value, because this value is set to the register ) */
+	enum class GLCDC_SIGNAL_POLARITY
+	{
+		HIACTIVE = 0,    // High active signal.
+		LOACTIVE = 1     // Low active signal.
+	};
+
+
+	/** Signal synchronization edge select ( Don't change this value, because this value is set to the register ) */
+	enum class GLCDC_SIGNAL_SYNC_EDGE
+	{
+		RISING = 0,     // Signal is synchronized to rising edge.
+		FALLING = 1     // Signal is synchronized to falling edge.
+	};
+
+
+	/** Blending control select */
+	enum class GLCDC_BLEND_CONTROL
+	{
+		NONE    = 0,     // Applying no fading control.
+		FADEIN  = 1,     // Applying fade-in control.
+		FADEOUT = 2,     // Applying fade-out control.
+		FIXED   = 3,     // Applying fixed blend control.
+		PIXEL   = 4      // Applying pixel blend control.
+	};
+
+
+	/** Fading status */
+	enum class GLCDC_FADE_STATUS
+	{
+		NOT_UNDERWAY,    // Fade-in/fade-out is not in progress.
+		FADING_UNDERWAY, // Fade-in or fade-out is in progress.
+		UNCERTAIN        // Fade-in/fade-out status is uncertain just before hardware working.
+	};
+
+
+	/** Clock source select ( Don't change this value, because this value is set to the register ) */
+	enum class GLCDC_CLK_SRC
+	{
+		EXTERNAL = 0,    // External clock (LCD_EXTCLK) (this function is not supported).
+		INTERNAL = 1     // Internal clock (PLL).
+	};
+
 
 /** Clock frequency division ratio ( Don't change this value, because this value is set to the register ) */
-typedef enum e_glcdc_panel_clk_div
-{
-    GLCDC_PANEL_CLK_DIVISOR_1  = 1,        // Division Ratio 1/1.
-    GLCDC_PANEL_CLK_DIVISOR_2  = 2,        // Division Ratio 1/2.
-    GLCDC_PANEL_CLK_DIVISOR_3  = 3,        // Division Ratio 1/3.
-    GLCDC_PANEL_CLK_DIVISOR_4  = 4,        // Division Ratio 1/4.
-    GLCDC_PANEL_CLK_DIVISOR_5  = 5,        // Division Ratio 1/5.
-    GLCDC_PANEL_CLK_DIVISOR_6  = 6,        // Division Ratio 1/6.
-    GLCDC_PANEL_CLK_DIVISOR_7  = 7,        // Division Ratio 1/7.
-    GLCDC_PANEL_CLK_DIVISOR_8  = 8,        // Division Ratio 1/8.
-    GLCDC_PANEL_CLK_DIVISOR_9  = 9,        // Division Ratio 1/9.
-    GLCDC_PANEL_CLK_DIVISOR_12 = 12,       // Division Ratio 1/12.
-    GLCDC_PANEL_CLK_DIVISOR_16 = 16,       // Division Ratio 1/16.
-    GLCDC_PANEL_CLK_DIVISOR_24 = 24,       // Division Ratio 1/24.
-    GLCDC_PANEL_CLK_DIVISOR_32 = 32,       // Division Ratio 1/32.
-} glcdc_panel_clk_div_t;
+	enum class GLCDC_PANEL_CLK_DIVISOR
+	{
+		_1  = 1,        // Division Ratio 1/1.
+		_2  = 2,        // Division Ratio 1/2.
+		_3  = 3,        // Division Ratio 1/3.
+		_4  = 4,        // Division Ratio 1/4.
+		_5  = 5,        // Division Ratio 1/5.
+		_6  = 6,        // Division Ratio 1/6.
+		_7  = 7,        // Division Ratio 1/7.
+		_8  = 8,        // Division Ratio 1/8.
+		_9  = 9,        // Division Ratio 1/9.
+		_12 = 12,       // Division Ratio 1/12.
+		_16 = 16,       // Division Ratio 1/16.
+		_24 = 24,       // Division Ratio 1/24.
+		_32 = 32,       // Division Ratio 1/32.
+	};
 
-/** LCD TCON output pin select */
-typedef enum e_glcdc_tcon_pin
-{
-    GLCDC_TCON_PIN_0 = 0,                  // LCD_TCON0.
-    GLCDC_TCON_PIN_1 = 1,                  // LCD_TCON1.
-    GLCDC_TCON_PIN_2 = 2,                  // LCD_TCON2.
-    GLCDC_TCON_PIN_3 = 3                   // LCD_TCON3.
-} glcdc_tcon_pin_t;
+
+	/** LCD TCON output pin select */
+	enum class GLCDC_TCON_PIN
+	{
+		_0 = 0,         // LCD_TCON0.
+		_1 = 1,         // LCD_TCON1.
+		_2 = 2,         // LCD_TCON2.
+		_3 = 3          // LCD_TCON3.
+	};
+
+
+}
+
 
 /** Correction circuit sequence control select ( Don't change this value, because this value is set to the register ) */
 typedef enum e_glcdc_correction_proc_order
