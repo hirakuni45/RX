@@ -23,9 +23,36 @@ CSOURCES	=	common/init.c \
 				common/syscalls.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
-				common/time.c
-
-# r_lcd/r_glcdc_rx_pinset.c
+				common/time.c \
+				RX65x/drw_2d_ver1.02/src/rx/dave_base_rx.c \
+				RX65x/drw_2d_ver1.02/src/rx/dave_irq_rx.c \
+				RX65x/drw_2d_ver1.02/src/rx/dave_memory_rx.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_base.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_blit.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_box.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_circle.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_context.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_curve.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_dlist.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_driver.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_edge.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_errorcodes.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_gradient.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_hardware.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_line.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_math.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_memory.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_pattern.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_perfcount.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_polyline.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_quad.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_rbuffer.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_render.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_texture.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_triangle.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_utility.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_viewport.c \
+				RX65x/drw_2d_ver1.02/src/tes/dave_wedge.c
 
 PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp \
@@ -39,9 +66,10 @@ USER_DEFS	=	SIG_RX65N F_ICLK=120000000 F_FCLK=60000000 F_PCLKA=120000000 F_PCLKB
 
 MCU_TARGET	=	
 
-INC_SYS		=
+# for boost
+INC_SYS		=	/mingw64/include
 
-INC_APP		=	. ../ ../RX600 ../RX56x ../jpeg-6b
+INC_APP		=	. ../ ../jpeg-6b ../RX65x/drw_2d_ver1.02/inc/tes
 
 LIB_ROOT	=	../jpeg-6b
 
@@ -55,6 +83,7 @@ CP_OPT		=	-Wall -Werror \
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
+				-Wno-unused-function \
 				-fno-exceptions
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
