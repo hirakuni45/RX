@@ -3,7 +3,7 @@
     @brief  RX64M SOUND（WAV ファイルの再生） サンプル @n
 			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
 			・DA0(P03):Left、DA1(P05):Right からアナログ出力する。@n
-			・WAV 形式ファイルの再生 @n
+			・MP3/WAV 形式ファイルの再生 @n
 			※GR-KAEDE で動かす場合、GR_KAEDE を有効にする。@n
 			GR-KAEDE の SD カードハードウェアーには致命的な問題がある @n
 			（SD カードを SPI モードで使う場合「DO」端子をプルアップ @n
