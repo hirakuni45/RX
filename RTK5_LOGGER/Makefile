@@ -40,9 +40,9 @@ MCU_TARGET	=
 
 INC_SYS		=
 
-INC_APP		=	. ../ ../RX600 ../RX56x
+INC_APP		=	. ../
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
