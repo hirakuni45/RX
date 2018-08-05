@@ -121,7 +121,8 @@ namespace {
 	static const int16_t LCD_Y = 272;
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, device::PIX_TYPE::RGB565> GLCDC_IO;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y,
+		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
 
 	// DRW2D
@@ -563,7 +564,7 @@ int main(int argc, char** argv)
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-			if(!glcdc_io_.control(GLCDC_IO::control_cmd::START_DISPLAY)) {
+			if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC ctrl fail...\n");
 			}
 		} else {

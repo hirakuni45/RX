@@ -19,6 +19,7 @@
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/jpeg_in.hpp"
+#include "graphics/bmp_in.hpp"
 #include "chip/FT5206.hpp"
 
 // #define SOFT_I2C
@@ -72,7 +73,8 @@ namespace {
 	static const int16_t LCD_Y = 272;
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, device::PIX_TYPE::RGB565> GLCDC_IO;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y,
+		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
 
 	// QSPI B グループ
@@ -284,7 +286,7 @@ int main(int argc, char** argv)
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-			if(!glcdc_io_.control(GLCDC_IO::control_cmd::START_DISPLAY)) {
+			if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC ctrl fail...\n");
 			}
 		} else {
@@ -331,14 +333,17 @@ int main(int argc, char** argv)
 			--task;
 			if(task == 0) {
 
+#if 0
 				img::jpeg_in jpeg;
 				utils::file_io fin;
-				if(fin.open("bbbbb.jpg", "rb")) {
+				if(fin.open("aaaaa.jpg", "rb")) {
 					if(!jpeg.load(fin)) {
 						utils::format("JPEG load fail...\n");
 					}
 					fin.close();
 				}
+#endif
+
 #if 0
 				char tmp[32];
 				for(int i = 0; i < 26; ++i) tmp[i] = 'A' + i;
