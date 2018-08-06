@@ -20,8 +20,7 @@ Envision Kit RX65N で実現するオーディオプレイヤー
  - RXD/TXD は 115200 Baud, 8-bits, 1-Stop, No-Parity 内部動作表示等
    
 ## リソースの準備
- - SD カードのルートに「kfont16.bin」ファイルを書き込む。（漢字表示用）
- RX/graphics/kfont16.bin
+ - SD カードのルートに [kfont16.bin](RX/graphics/kfont16.bin)ファイルを書き込む。（漢字表示用）   
  ※現在は、「kfont16.cpp」として、ソースコードに埋め込んでいる。
  - SD カードに、「mp3、wav」形式のファイルを書き込む。
    
