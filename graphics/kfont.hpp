@@ -12,18 +12,21 @@
 #include "ff12b/src/ff.h"
 
 // 漢字フォントデータをＳＤカード上に置いて、キャッシュアクセスする場合有効にする
-#define CASH_KFONT
+// #define CASH_KFONT
 
 extern "C" {
 #ifdef CASH_KFONT
 	int fatfs_get_mount();
-#else
-	extern uint8_t binary____graphics_kfont16_bin_start;
-	extern uint8_t binary____graphics_kfont16_bin_end;
 #endif
 };
 
 namespace graphics {
+
+#ifndef CASH_KFONT
+	struct kfont_bitmap {
+		static const uint8_t kfont_start[];
+	};
+#endif
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -168,8 +171,7 @@ namespace graphics {
 
 			return &cash_[cash_idx_].bitmap[0];
 #else
-			const uint8_t* org = &binary____graphics_kfont16_bin_start;
-			return &org[lin * FONTS];
+			return &kfont_bitmap::kfont_start[lin * FONTS];
 #endif
 		}
 	};
