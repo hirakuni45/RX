@@ -18,6 +18,7 @@ Envision Kit RX65N で実現するオーディオプレイヤー
  - Pmod (10) PB6_RXD9_PMOD_10 ---> RXD として使用
  - Pmod ( 9) PB7_TXD9_PMOD_9  ---> TXD として使用
  - RXD/TXD は 115200 Baud, 8-bits, 1-Stop, No-Parity 内部動作表示等
+![Audio PreAmp](RTK5_audio_amp.png)
    
 ## リソースの準備
  - SD カードのルートに [kfont16.bin](../graphics/kfont16.bin)ファイルを書き込む。（漢字表示用）   
