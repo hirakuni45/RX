@@ -83,7 +83,8 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp \
-				graphics/font8x16.cpp
+				graphics/font8x16.cpp \
+				graphics/kfont16.cpp
 
 # BINARIES	=	graphics/kfont16.bin
 

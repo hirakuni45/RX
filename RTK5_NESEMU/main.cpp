@@ -123,7 +123,8 @@ namespace {
 	TPU0		tpu0_;
 
 	typedef graphics::font8x16 AFONT;
-	typedef graphics::kfont<16, 16, 32> KFONT;
+//	typedef graphics::kfont<16, 16, 32> KFONT;
+	typedef graphics::kfont<16, 16> KFONT;
 	KFONT		kfont_;
 
 	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
