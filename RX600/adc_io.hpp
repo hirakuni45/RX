@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M グループ A/D 制御
+	@brief	RX600 グループ A/D 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -11,6 +11,7 @@
 #include "RX600/port_map.hpp"
 #include "RX600/power_cfg.hpp"
 #include "RX600/icu_mgr.hpp"
+#include "common/intr_utils.hpp"
 #include "common/vect.h"
 
 /// F_PCLKD は変換パラメーター計算で必要で、設定が無いとエラーにします。
@@ -27,21 +28,11 @@ namespace device {
 		@param[in]	TASK	割り込みタスク・ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ADCU, class TASK>
+	template <class ADCU, class TASK = utils::null_task>
 	class adc_io {
 	public:
 
 		typedef ADCU value_type;
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	変換タイプ
-		 */
-		//-----------------------------------------------------------------//
-		enum class cnv_type : uint8_t {
-			
-		};
-
 
 	private:
 		static TASK task_;
@@ -137,21 +128,7 @@ namespace device {
 		uint16_t get(typename ADCU::analog an) const noexcept {
 			return ADCU::ADDR(an);
 		}
-
-#if 0
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	変換結果アドレスの取得
-			@param[in]	an	アナログチャネル型
-			@return 変換結果アドレス
-		 */
-		//-----------------------------------------------------------------//
-		uint32_t get_adc_adr(typename ADCU::analog an) const noexcept {
-			return ADCU::ADDR.get_address(an);
-		}
-#endif
 	};
 
-	template <class ADCU, class TASK>
-	TASK adc_io<ADCU, TASK>::task_;
+	template <class ADCU, class TASK> TASK adc_io<ADCU, TASK>::task_;
 }
