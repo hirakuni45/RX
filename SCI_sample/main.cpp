@@ -46,6 +46,8 @@ namespace {
 	static const char* system_str_ = { "RX24T" };
 #endif
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
+// 第二候補を選択する場合
+//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
 	SCI		sci_;
 
 }
