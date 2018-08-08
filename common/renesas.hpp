@@ -122,7 +122,7 @@
 #include "RX600/port_map.hpp"
 #include "RX600/power_cfg.hpp"
 #include "RX600/icu_mgr.hpp"
-#include "RX600/s12adc.hpp"
+#include "RX65x/s12adf.hpp"
 #include "RX600/adc_io.hpp"
 #include "RX600/r12da.hpp"
 #include "RX600/dac_out.hpp"
