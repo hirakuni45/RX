@@ -194,7 +194,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0, 2>  ADPRC;
+			bits_rw_t<io_, bitpos::B1, 2>  ADPRC;
 			bit_rw_t <io_, bitpos::B5>     ACE;
 			bits_rw_t<io_, bitpos::B8, 2>  DIAGVAL;
 			bit_rw_t <io_, bitpos::B10>    DIAGLD;
@@ -380,7 +380,6 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static rw16_t<base + 0x9E> ADCMPDR1;
-
 	};
 
 
@@ -617,8 +616,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		struct adsstr_t {
 			void set(analog an, uint8_t v) {
-				static const uint16_t tbl[8] = { 0x60, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79 };
-				wr8_(base + tbl[static_cast<uint32_t>(an)], v);
+				wr8_(base + 0xE0 + static_cast<uint32_t>(an), v);
 			}
 		};
 		static adsstr_t ADSSTR;
@@ -1339,7 +1337,6 @@ namespace device {
 		static adsstrx_t<base + 0x71> ADSSTRO;
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  A/D サンプリングステートレジスタ
@@ -1351,7 +1348,6 @@ namespace device {
 			}
 		};
 		static adsstr_t ADSSTR;
-#endif
 
 
 		//-----------------------------------------------------------------//
