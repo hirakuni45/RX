@@ -29,6 +29,8 @@ PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp \
 				graphics/font8x16.cpp
 
+#				graphics/kfont16.cpp
+
 USER_LIBS	=
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
@@ -40,10 +42,10 @@ MCU_TARGET	=
 
 INC_SYS		=
 
-INC_APP		=	. ../ ../RX600 ../RX56x ../libmad
+INC_APP		=	. ../
 
-LIB_ROOT	=	../libmad/.libs
-USER_LIBS	=	mad
+LIB_ROOT	=
+USER_LIBS	=
 
 OPTIMIZE	=	-O3
 

@@ -12,36 +12,26 @@
 #include "common/cmt_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
+#include "common/sci_i2c_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
 #include "common/qspi_io.hpp"
-#include "sound/sound_out.hpp"
-#include "sound/mp3_in.hpp"
 #include "graphics/font8x16.hpp"
-#include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
 
-#include "chip/FAMIPAD.hpp"
+#define CASH_KFONT
+#include "graphics/kfont.hpp"
 
 #include "capture.hpp"
+#include "chip/FT5206.hpp"
 
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-
-	// Famicon PAD (CMOS 4021B Shift Register)
-	// 電源は、微小なので、接続を簡単に行う為、ポートを使う
-	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_VCC;
-	typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_GND;
-	typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_P_S;
-	typedef device::PORT<device::PORT6, device::bitpos::B5> PAD_CLK;
-	typedef device::PORT<device::PORT7, device::bitpos::B3> PAD_OUT;
-	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT> FAMIPAD;
-	FAMIPAD		famipad_;
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
@@ -89,21 +79,30 @@ namespace {
 	typedef device::drw2d_mgr<device::DRW2D, 480, 272> DRW2D_MGR;
 	DRW2D_MGR	drw2d_mgr_;
 
-	// QSPI B グループ
-	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
-	QSPI		qspi_;
-
 	typedef graphics::font8x16 AFONT;
+#ifdef CASH_KFONT
 	typedef graphics::kfont<16, 16, 64> KFONT;
+#else
+	typedef graphics::kfont<16, 16> KFONT;
+#endif
 	KFONT		kfont_;
 
 	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
 	RENDER		render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
 
-	typedef graphics::filer<SDC, RENDER> FILER;
-	FILER		filer_(sdc_, render_);
+	typedef utils::capture<2048> CAPTURE;
+	CAPTURE		capture_;
 
-	uint8_t		pad_level_;
+	// FT5206, SCI6 簡易 I2C 定義
+	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+	typedef utils::fixed_fifo<uint8_t, 64> RB6;
+	typedef utils::fixed_fifo<uint8_t, 64> SB6;
+	typedef device::sci_i2c_io<device::SCI6, RB6, SB6,
+		device::port_map::option::FIRST_I2C> FT5206_I2C;
+
+	FT5206_I2C	ft5206_i2c_;
+	typedef chip::FT5206<FT5206_I2C> FT5206;
+	FT5206		ft5206_(ft5206_i2c_);
 
 //	utils::command<256> cmd_;
 
@@ -194,12 +193,6 @@ namespace {
 
 extern "C" {
 
-	uint8_t get_fami_pad()
-	{
-		return famipad_.update();
-	}
-
-
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
@@ -289,6 +282,13 @@ int main(int argc, char** argv)
 		sdc_.start();
 	}
 
+	{  // キャプチャー開始
+		uint32_t freq = 500000;  // 500 KHz
+		if(!capture_.start(freq)) {
+			utils::format("Capture not start...\n");
+		}
+	}
+
 	utils::format("RTK5RX65N Start for AUDIO sample\n");
 //	cmd_.set_prompt("# ");
 
@@ -320,50 +320,33 @@ int main(int argc, char** argv)
 		}
 	}
 
-	{  // QSPI の初期化（Flash Memory Read/Write Interface)
-		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
-			utils::format("QSPI not start.\n");
+	{  // FT5206 touch screen controller
+		FT5206::reset<FT5206_RESET>();
+		uint8_t intr_lvl = 1;
+		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
+			utils::format("FT5206 I2C Start Fail...\n");
 		}
-	}
-
-	{
-		PAD_VCC::DIR = 1;
-		PAD_VCC::P = 1;
-		PAD_GND::DIR = 1;
-		PAD_GND::P = 0;
-		famipad_.start();
+		if(!ft5206_.start()) {
+			utils::format("FT5206 Start Fail...\n");
+		}
 	}
 
 	LED::DIR = 1;
 
+	uint8_t n = 0;
 	while(1) {
 		glcdc_io_.sync_vpos();
-		{
-#if 0
-			auto data = get_fami_pad();
-			uint32_t ctrl = 0;
-			if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
-				graphics::set(graphics::filer_ctrl::OPEN, ctrl);
-			}
-			if(chip::on(data, chip::FAMIPAD_ST::UP)) {
-				graphics::set(graphics::filer_ctrl::UP, ctrl);
-			}
-			if(chip::on(data, chip::FAMIPAD_ST::DOWN)) {
-				graphics::set(graphics::filer_ctrl::DOWN, ctrl);
-			}
-			if(chip::on(data, chip::FAMIPAD_ST::LEFT)) {
-				graphics::set(graphics::filer_ctrl::BACK, ctrl);
-			}
-			if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
-				graphics::set(graphics::filer_ctrl::SELECT, ctrl);
-			}
-			char path[256];
-			if(filer_.update(ctrl, path, sizeof(path))) {
-			}
-#endif
-		}
+
+		ft5206_.update();
 
 		sdc_.service(sdh_.service());
+
+		++n;
+		if(n >= 60) {
+			n = 0;
+			const auto& d = capture_.get(0);
+			utils::format("%d, %d\n") % d.ch0_ % d.ch1_;
+		}
 
 		update_led_();
 //		command_();
