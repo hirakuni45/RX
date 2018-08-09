@@ -26,8 +26,10 @@
 #define CASH_KFONT
 #include "graphics/kfont.hpp"
 
-#include "capture.hpp"
 #include "chip/FT5206.hpp"
+
+#include "capture.hpp"
+#include "render_wave.hpp"
 
 namespace {
 
@@ -93,6 +95,9 @@ namespace {
 	typedef utils::capture<2048> CAPTURE;
 	CAPTURE		capture_;
 
+	typedef utils::render_wave<RENDER, CAPTURE> RENDER_WAVE;
+	RENDER_WAVE	render_wave_(render_, capture_);
+
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 	typedef utils::fixed_fifo<uint8_t, 64> RB6;
@@ -104,7 +109,10 @@ namespace {
 	typedef chip::FT5206<FT5206_I2C> FT5206;
 	FT5206		ft5206_(ft5206_i2c_);
 
-//	utils::command<256> cmd_;
+	utils::command<256> cmd_;
+
+	utils::capture_trigger	trigger_ = utils::capture_trigger::NONE;
+
 
 	bool check_mount_() {
 		return sdc_.get_mount();
@@ -126,7 +134,6 @@ namespace {
 	}
 
 
-#if 0
 	void command_()
 	{
 		if(!cmd_.service()) {
@@ -161,18 +168,10 @@ namespace {
 			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
 				utils::format("%s\n") % sdc_.get_current();
 				f = true;
-			} else if(cmd_.cmp_word(0, "play")) {
-				if(cmdn >= 2) {
-					char tmp[128];
-					cmd_.get_word(1, sizeof(tmp), tmp);
-					if(std::strcmp(tmp, "*") == 0) {
-						play_loop_("", "");
-					} else {
-						play_mp3_(tmp);
-					}
-				} else {
-					play_loop_("", "");
-				}
+			} else if(cmd_.cmp_word(0, "cap")) { // capture
+				trigger_ = utils::capture_trigger::SINGLE;
+				capture_.set_trigger(trigger_);
+			
 				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    dir [path]\n");
@@ -188,7 +187,6 @@ namespace {
 			}
 		}
 	}
-#endif
 }
 
 extern "C" {
@@ -283,14 +281,15 @@ int main(int argc, char** argv)
 	}
 
 	{  // キャプチャー開始
-		uint32_t freq = 500000;  // 500 KHz
+//		uint32_t freq = 2000000;  // 2 MHz
+		uint32_t freq = 100000;  // 100 KHz
 		if(!capture_.start(freq)) {
 			utils::format("Capture not start...\n");
 		}
 	}
 
 	utils::format("RTK5RX65N Start for AUDIO sample\n");
-//	cmd_.set_prompt("# ");
+	cmd_.set_prompt("# ");
 
 	{  // GLCDC の初期化
 		LCD_DISP::DIR  = 1;
@@ -333,7 +332,6 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
-	uint8_t n = 0;
 	while(1) {
 		glcdc_io_.sync_vpos();
 
@@ -341,14 +339,27 @@ int main(int argc, char** argv)
 
 		sdc_.service(sdh_.service());
 
-		++n;
-		if(n >= 60) {
-			n = 0;
+		command_();
+
+		{
 			const auto& d = capture_.get(0);
-			utils::format("%d, %d\n") % d.ch0_ % d.ch1_;
+			char s[32];
+			utils::sformat("CH0: %d", s, sizeof(s)) % d.ch0_;
+			render_.fill(0,  0, 11*8, 16, 0x0000);
+			render_.draw_text(0, 0, s);
+			utils::sformat("CH1: %d", s, sizeof(s)) % d.ch1_;
+			render_.fill(0, 16, 11*8, 16, 0x0000);
+			render_.draw_text(0, 16, s);
+		}
+
+		// 波形をキャプチャーしたら描画
+		if(trigger_ != utils::capture_trigger::NONE
+			&& capture_.get_trigger() == utils::capture_trigger::NONE) {
+			trigger_ = utils::capture_trigger::NONE;
+			render_.clear(0x0000);
+			render_wave_.update();
 		}
 
 		update_led_();
-//		command_();
 	}
 }

@@ -26,15 +26,22 @@ namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  キャプチャー・トリガー
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class capture_trigger : uint8_t {
+		NONE,		///< 何もしない
+		SINGLE,		///< シングル取り込み
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  キャプチャー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t CAPN>
 	class capture {
-	public:
-
-	private:
-		static capture_data	data_[CAPN];
 
 		/// DMAC 終了割り込み
 		class dmac_term_task {
@@ -47,26 +54,40 @@ namespace utils {
 //		typedef device::dmac_mgr<device::DMAC0, dmac_term_task> DMAC_MGR;
 //		DMAC_MGR    dmac_mgr_;
 
+		static capture_data				data_[CAPN];
+
 		typedef device::S12AD  ADC0;
 		typedef device::S12AD1 ADC1;
 
-		static uint16_t	pos_;
+		static volatile uint16_t		pos_;
+		static volatile capture_trigger	trigger_;
 
 		class tpu_task {
 		public:
-			void operator() () {
-				data_[pos_].ch0_ = ADC0::ADDR(ADC0::analog::AIN000);
-				data_[pos_].ch1_ = ADC1::ADDR(ADC1::analog::AIN114);
-				++pos_;
-				pos_ &= CAPN - 1;
-
-				ADC0::ADCSR.ADST = 1;
-				ADC1::ADCSR.ADST = 1;
+			void operator() ()
+			{
+				switch(trigger_) {
+				case capture_trigger::NONE:
+					ADC0::ADCSR = ADC0::ADCSR.ADCS.b(0b01) | ADC0::ADCSR.ADST.b();
+					ADC1::ADCSR = ADC1::ADCSR.ADCS.b(0b01) | ADC1::ADCSR.ADST.b();
+					break;
+				case capture_trigger::SINGLE:
+					data_[pos_].ch0_ = ADC0::ADDR(ADC0::analog::AIN000);
+					data_[pos_].ch1_ = ADC1::ADDR(ADC1::analog::AIN114);
+					ADC0::ADCSR = ADC0::ADCSR.ADCS.b(0b01) | ADC0::ADCSR.ADST.b();
+					ADC1::ADCSR = ADC1::ADCSR.ADCS.b(0b01) | ADC1::ADCSR.ADST.b();
+					++pos_;
+					if(pos_ >= CAPN) {
+						trigger_ = capture_trigger::NONE;
+					}
+				}
 			}
 		};
 
 		typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
 		TPU0        tpu0_;
+
+		bool		start_cap_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -74,7 +95,7 @@ namespace utils {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		capture() { }
+		capture() noexcept : start_cap_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -125,15 +146,41 @@ namespace utils {
 		}
 
 
-		uint32_t get_pos() noexcept { return pos_; }
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  トリガー設定
+			@param[in]	trg		トリガー種別
+		*/
+		//-----------------------------------------------------------------//
+		void set_trigger(capture_trigger trigger) noexcept
+		{
+			pos_ = 0;
+			trigger_ = trigger;
+		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  トリガー取得
+			@return トリガー
+		*/
+		//-----------------------------------------------------------------//
+		capture_trigger  get_trigger() const noexcept { return trigger_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  波形を取得
+		*/
+		//-----------------------------------------------------------------//
 		const capture_data& get(uint32_t pos) noexcept
 		{
 			return data_[pos & (CAPN - 1)];
 		}
 	};
 
-	template <uint32_t CAPN> uint16_t capture<CAPN>::pos_;
 	template <uint32_t CAPN> capture_data capture<CAPN>::data_[CAPN];
+	template <uint32_t CAPN> volatile uint16_t capture<CAPN>::pos_ = 0;
+	template <uint32_t CAPN>
+	volatile capture_trigger capture<CAPN>::trigger_ = capture_trigger::NONE;
 }
