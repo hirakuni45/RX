@@ -170,8 +170,7 @@ namespace {
 				f = true;
 			} else if(cmd_.cmp_word(0, "cap")) { // capture
 				trigger_ = utils::capture_trigger::SINGLE;
-				capture_.set_trigger(trigger_);
-			
+				capture_.set_trigger(trigger_);			
 				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    dir [path]\n");
@@ -332,6 +331,11 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
+	{  // startup trigger...
+		trigger_ = utils::capture_trigger::SINGLE;
+		capture_.set_trigger(trigger_);			
+	}
+
 	while(1) {
 		glcdc_io_.sync_vpos();
 
@@ -341,22 +345,10 @@ int main(int argc, char** argv)
 
 		command_();
 
-		{
-			const auto& d = capture_.get(0);
-			char s[32];
-			utils::sformat("CH0: %d", s, sizeof(s)) % d.ch0_;
-			render_.fill(0,  0, 11*8, 16, 0x0000);
-			render_.draw_text(0, 0, s);
-			utils::sformat("CH1: %d", s, sizeof(s)) % d.ch1_;
-			render_.fill(0, 16, 11*8, 16, 0x0000);
-			render_.draw_text(0, 16, s);
-		}
-
 		// 波形をキャプチャーしたら描画
 		if(trigger_ != utils::capture_trigger::NONE
 			&& capture_.get_trigger() == utils::capture_trigger::NONE) {
 			trigger_ = utils::capture_trigger::NONE;
-			render_.clear(0x0000);
 			render_wave_.update();
 		}
 
