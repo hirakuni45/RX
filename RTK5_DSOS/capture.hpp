@@ -43,17 +43,6 @@ namespace utils {
 	template <uint32_t CAPN>
 	class capture {
 
-		/// DMAC 終了割り込み
-		class dmac_term_task {
-		public:
-			void operator() () {
-//				device::DMAC0::DMCNT.DTE = 1;  // DMA を再スタート
-			}
-		};
-
-//		typedef device::dmac_mgr<device::DMAC0, dmac_term_task> DMAC_MGR;
-//		DMAC_MGR    dmac_mgr_;
-
 		static capture_data				data_[CAPN];
 
 		typedef device::S12AD  ADC0;
@@ -100,6 +89,21 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  サンプルレートの設定
+			@param[in]	freq	サンプリング周波数
+		*/
+		//-----------------------------------------------------------------//
+		void set_samplerate(uint32_t freq)
+		{
+			uint8_t intr_level = 5;
+			if(!tpu0_.start(freq, intr_level)) {
+				utils::format("TPU0 start error...\n");
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  開始
 			@param[in]	freq	サンプリング周波数
 			@return 成功なら「true」
@@ -107,10 +111,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t freq) noexcept
 		{
-			uint8_t intr_level = 5;
-			if(!tpu0_.start(freq, intr_level)) {
-				utils::format("TPU0 start error...\n");
-			}
+			set_samplerate(freq);
 
 			{  // A/D 設定
 				device::power_cfg::turn(ADC0::get_peripheral());

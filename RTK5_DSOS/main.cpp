@@ -95,9 +95,6 @@ namespace {
 	typedef utils::capture<2048> CAPTURE;
 	CAPTURE		capture_;
 
-	typedef utils::render_wave<RENDER, CAPTURE> RENDER_WAVE;
-	RENDER_WAVE	render_wave_(render_, capture_);
-
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 	typedef utils::fixed_fifo<uint8_t, 64> RB6;
@@ -108,6 +105,9 @@ namespace {
 	FT5206_I2C	ft5206_i2c_;
 	typedef chip::FT5206<FT5206_I2C> FT5206;
 	FT5206		ft5206_(ft5206_i2c_);
+
+	typedef utils::render_wave<RENDER, CAPTURE, FT5206> RENDER_WAVE;
+	RENDER_WAVE	render_wave_(render_, capture_, ft5206_);
 
 	utils::command<256> cmd_;
 
@@ -287,7 +287,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	utils::format("RTK5RX65N Start for AUDIO sample\n");
+	utils::format("RTK5RX65N Start for Digital Storage Oscilloscope\n");
 	cmd_.set_prompt("# ");
 
 	{  // GLCDC の初期化
@@ -341,16 +341,19 @@ int main(int argc, char** argv)
 
 		ft5206_.update();
 
-		sdc_.service(sdh_.service());
-
-		command_();
+		// タッチ操作による画面更新が必要か？
+		bool f = render_wave_.ui_service();
 
 		// 波形をキャプチャーしたら描画
-		if(trigger_ != utils::capture_trigger::NONE
-			&& capture_.get_trigger() == utils::capture_trigger::NONE) {
+		if(f || (trigger_ != utils::capture_trigger::NONE
+			&& capture_.get_trigger() == utils::capture_trigger::NONE)) {
 			trigger_ = utils::capture_trigger::NONE;
 			render_wave_.update();
 		}
+
+		sdc_.service(sdh_.service());
+
+		command_();
 
 		update_led_();
 	}
