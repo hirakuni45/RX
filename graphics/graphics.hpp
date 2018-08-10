@@ -74,6 +74,9 @@ namespace graphics {
 		uint16_t	code_;
 		uint8_t		cnt_;
 
+		uint32_t	stipple_;
+		uint32_t	stipple_mask_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -82,7 +85,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		render(T* org, KFONT& kf) noexcept : fb_(org), kfont_(kf),
 			fc_(COLOR::White), bc_(COLOR::Black),
-			code_(0), cnt_(0)
+			code_(0), cnt_(0), stipple_(-1), stipple_mask_(1)
 		{ }
 
 
@@ -123,13 +126,33 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	破線パターンの設定
+			@param[in]	stipple	破線パターン
+		*/
+		//-----------------------------------------------------------------//
+		void set_stipple(uint32_t stipple = -1) noexcept {
+			stipple_ = stipple;
+			stipple_mask_ = 1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	点を描画する
 			@param[in]	x	開始点Ｘ軸を指定
 			@param[in]	y	開始点Ｙ軸を指定
 			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void plot(int16_t x, int16_t y, T c) noexcept {
+		void plot(int16_t x, int16_t y, T c) noexcept
+		{
+			auto m = stipple_mask_;
+			stipple_mask_ <<= 1;
+			if(stipple_mask_ == 0) stipple_mask_ = 1;
+
+			if((stipple_ & m) == 0) {
+				return;
+			}
 			if(static_cast<uint16_t>(x) >= WIDTH) return;
 			if(static_cast<uint16_t>(y) >= HEIGHT) return;
 			fb_[y * WIDTH + x] = c;
