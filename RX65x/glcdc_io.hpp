@@ -425,54 +425,8 @@ namespace device {
 		// GAMx_AREAn.TH15  - TH0   (Max=1023)
 		static const uint32_t GAMMA_THRESHOLD_MAX = 1023;
 
-
-
-		/* Register bit definition for Graphics Frame Control Block */
-		static const uint32_t GRn_FLM3_LNOFF_MASK   = 0x0000FFFF;
-		static const uint32_t GRn_FLM5_LNNUM_MASK   = 0x000007FF;
-		static const uint32_t GRn_FLM5_DATANUM_MASK = 0x0000FFFF;
-
-		static const uint32_t GRn_AB1_DISPSEL_MASK  = 0x00000003;
-		static const uint32_t GRn_AB2_GRCVS_MASK    = 0x000007FF;
-		static const uint32_t GRn_AB2_GRCVW_MASK    = 0x07FF;
-		static const uint32_t GRn_AB3_GRCHS_MASK    = 0x000007FF;
-		static const uint32_t GRn_AB3_GRCHW_MASK    = 0x07FF;
-		static const uint32_t GRn_AB4_ARCVS_MASK    = 0x000007FF;
-		static const uint32_t GRn_AB4_ARCVW_MASK    = 0x07FF;
-		static const uint32_t GRn_AB5_ARCHS_MASK    = 0x000007FF;
-		static const uint32_t GRn_AB5_ARCHW_MASK    = 0x07FF;
-		static const uint32_t GRn_AB6_ARCCOEF_MASK  = 0x000001FF;
-		static const uint32_t GRn_AB7_ARCDEF_MASK   = 0x000000FF;
-		static const uint32_t GRn_CLUTINT_LINE_MASK = 0x000007FF;
-
-		/* Registers for Background Frame Control Block */
-		static const uint32_t BG_PERI_FV_MASK  = 0x000007FF;
-		static const uint32_t BG_PERI_FH_MASK  = 0x000007FF;
-		static const uint32_t BG_SYNC_VP_MASK  = 0x000F;
-		static const uint32_t BG_SYNC_HP_MASK  = 0x000F;
-		static const uint32_t BG_VSIZE_VP_MASK = 0x07FF;
-		static const uint32_t BG_VSIZE_VW_MASK = 0x07FF;
-		static const uint32_t BG_HSIZE_HP_MASK = 0x07FF;
-		static const uint32_t BG_HSIZE_HW_MASK = 0x07FF;
-
-
-		static const uint32_t TCON_STHx1_HS_MASK   = 0x07FF;
-		static const uint32_t TCON_STHx1_HW_MASK   = 0x07FF;
-		static const uint32_t TCON_STVx1_VS_MASK   = 0x07FF;
-		static const uint32_t TCON_STVx1_VW_MASK   = 0x07FF;
-
-
 		static const uint32_t OUT_SET_FRQSEL_NO_DIVISION     = 0;
 		static const uint32_t OUT_SET_FRQSEL_QUATER_DIVISION = 1;
-
-		static const uint32_t OUT_BRIGHT1_BRTG_MASK  = 0x03FF;
-		static const uint32_t OUT_BRIGHT2_BRTB_MASK  = 0x03FF;
-		static const uint32_t OUT_BRIGHT2_BRTR_MASK  = 0x03FF;
-
-		static const uint32_t OUT_CONTRAST_CONTG_MASK  = 0xFF;
-		static const uint32_t OUT_CONTRAST_CONTB_MASK  = 0xFF;
-		static const uint32_t OUT_CONTRAST_CONTR_MASK  = 0xFF;
-
 
 
 		/* Panel timing, Minimum threshold */
@@ -508,7 +462,6 @@ namespace device {
 		static const int32_t GR_BLEND_H_CYC_ACTIVE_SIZE_MIN = 1;  // GRn_AB5_GRCHW (Min=1)
 		static const int32_t GR_BLEND_V_CYC_ACTIVE_SIZE_MIN = 1;  // GRn_AB4_GRCVW (Min=1)
 
-		static const uint32_t SYSCNT_PANEL_CLK_DCDR_MASK = 0x3F;
 
 
 		struct TCON_SIGNAL_SELECT {
@@ -528,12 +481,12 @@ namespace device {
 		};
 
 
-		struct PLANE_BLEND {
-    		static const uint32_t TRANSPARENT     = 1; // Current graphics layer is transparent
-								 					   // and the lower layer is displayed.
-			static const uint32_t NON_TRANSPARENT = 2; // Current graphics layer is displayed.
-			static const uint32_t ON_LOWER_LAYER  = 3; // Current graphics layer is blended with
-								 					   // the lower layer.
+		enum class PLANE_BLEND {
+    		TRANSPARENT     = 1, // Current graphics layer is transparent
+								 // and the lower layer is displayed.
+			NON_TRANSPARENT = 2, // Current graphics layer is displayed.
+			ON_LOWER_LAYER  = 3  // Current graphics layer is blended with
+					 			 // the lower layer.
 		};
 
 
@@ -562,10 +515,10 @@ namespace device {
 		void clock_set_(const cfg_t& cfg)
 		{
 			// Selects input source for panel clock
-			GLC::PANELCLK.CLKSEL = (uint32_t)cfg.output.clksrc;
+			GLC::PANELCLK.CLKSEL = static_cast<uint32_t>(cfg.output.clksrc);
 
 			// Sets division ratio
-			GLC::PANELCLK.DCDR = (uint32_t)cfg.output.clock_div_ratio & SYSCNT_PANEL_CLK_DCDR_MASK;
+			GLC::PANELCLK.DCDR = static_cast<uint32_t>(cfg.output.clock_div_ratio);
 
 			// Selects pixel clock output
 			if(glcdc_def::OUT_FORMAT::SERIAL != cfg.output.format) {
@@ -616,7 +569,7 @@ namespace device {
 			GLC::TCONSTHA2.HSSEL = 0; /* Select input Hsync as reference */
 
 			// HSync Width Setting
-			GLC::TCONSTHA1.HW = timing.sync_width & TCON_STHx1_HW_MASK;
+			GLC::TCONSTHA1.HW = timing.sync_width;
 		}
 
 
@@ -651,7 +604,7 @@ namespace device {
 			GLC::TCONSTVA1.VS = 0;      /* No delay. */
 
 			/* VSync Width Setting */
-			GLC::TCONSTVA1.VW = timing.sync_width & TCON_STVx1_VW_MASK;
+			GLC::TCONSTVA1.VW = timing.sync_width;
 		}
 
 
@@ -681,11 +634,11 @@ namespace device {
 			GLC::TCONDE.INV = static_cast<uint32_t>(polarity); /* DE -> Invert or Not Invert */
 
 			/* Set data enable timing */
-			GLC::TCONSTHB1.HS = (htiming.back_porch + htiming.sync_width) & TCON_STHx1_HS_MASK;
-			GLC::TCONSTHB1.HW = htiming.display_cyc & TCON_STHx1_HW_MASK;
+			GLC::TCONSTHB1.HS = htiming.back_porch + htiming.sync_width;
+			GLC::TCONSTHB1.HW = htiming.display_cyc;
 			GLC::TCONSTHB2.HSSEL = 0; /* Select input Hsync as reference */
-			GLC::TCONSTVB1.VS = (vtiming.back_porch + vtiming.sync_width) & TCON_STVx1_VS_MASK;
-			GLC::TCONSTVB1.VW = vtiming.display_cyc & TCON_STVx1_VW_MASK;
+			GLC::TCONSTVB1.VS = vtiming.back_porch + vtiming.sync_width;
+			GLC::TCONSTVB1.VW = vtiming.display_cyc;
 		}
 
 
@@ -717,26 +670,21 @@ namespace device {
 			vsync_total_cyc = (((cfg.output.vtiming.front_porch  + cfg.output.vtiming.sync_width)
 							  +  cfg.output.vtiming.display_cyc) + cfg.output.vtiming.back_porch);
 //			utils::format("Total LCD count: %d, %d\n") % hsync_total_cyc % vsync_total_cyc;
-			GLC::BGPERI.FH = (hsync_total_cyc - 1) & BG_PERI_FH_MASK;
-			GLC::BGPERI.FV = (vsync_total_cyc - 1) & BG_PERI_FV_MASK;
+			GLC::BGPERI.FH = hsync_total_cyc - 1;
+			GLC::BGPERI.FV = vsync_total_cyc - 1;
 
-			GLC::BGSYNC.HP = (cfg.output.htiming.front_porch - BG_PLANE_H_CYC_MARGIN_MIN)
-							 & BG_SYNC_HP_MASK;
-			GLC::BGSYNC.VP = (cfg.output.vtiming.front_porch - BG_PLANE_V_CYC_MARGIN_MIN)
-							 & BG_SYNC_VP_MASK;
+			GLC::BGSYNC.HP = cfg.output.htiming.front_porch - BG_PLANE_H_CYC_MARGIN_MIN;
+			GLC::BGSYNC.VP = cfg.output.vtiming.front_porch - BG_PLANE_V_CYC_MARGIN_MIN;
 
-			GLC::BGHSIZE.HP = (uint16_t) ((cfg.output.htiming.front_porch
-				- BG_PLANE_H_CYC_MARGIN_MIN)
-				+ cfg.output.htiming.sync_width + cfg.output.htiming.back_porch)
-				& BG_HSIZE_HP_MASK;
+			GLC::BGHSIZE.HP = cfg.output.htiming.front_porch - BG_PLANE_H_CYC_MARGIN_MIN
+				+ cfg.output.htiming.sync_width + cfg.output.htiming.back_porch;
 
-			GLC::BGVSIZE.VP = (uint16_t) ((cfg.output.vtiming.front_porch
-				- BG_PLANE_V_CYC_MARGIN_MIN)
-				+ cfg.output.vtiming.sync_width + cfg.output.vtiming.back_porch)
-				& BG_VSIZE_VP_MASK;
+			GLC::BGVSIZE.VP = cfg.output.vtiming.front_porch - BG_PLANE_V_CYC_MARGIN_MIN
+				+ cfg.output.vtiming.sync_width + cfg.output.vtiming.back_porch;
+
 			/* ---- Set the width of Background screen ---- */
-			GLC::BGHSIZE.HW = cfg.output.htiming.display_cyc & BG_HSIZE_HW_MASK;
-			GLC::BGVSIZE.VW = cfg.output.vtiming.display_cyc & BG_VSIZE_VW_MASK;
+			GLC::BGHSIZE.HW = cfg.output.htiming.display_cyc;
+			GLC::BGVSIZE.VW = cfg.output.vtiming.display_cyc;
 
 			/* ---- Set the Background color ---- */
 			GLC::BGCOLOR.R = cfg.output.bg_color.byte.r;
@@ -830,56 +778,50 @@ namespace device {
 				line_trans_num += 1;
 			}
 			if(frame == 0) {
-				GLC::GR1FLM5.DATANUM = (line_trans_num - 1) & GRn_FLM5_DATANUM_MASK;
+				GLC::GR1FLM5.DATANUM = line_trans_num - 1;
 			} else {
-				GLC::GR2FLM5.DATANUM = (line_trans_num - 1) & GRn_FLM5_DATANUM_MASK;
+				GLC::GR2FLM5.DATANUM = line_trans_num - 1;
 			}
 
 			/* ---- Set the line offset address for accessing the graphics data ---- */
 			if(frame == 0) {
-				GLC::GR1FLM5.LNNUM = ((uint32_t)(input.vsize - 1)) & GRn_FLM5_LNNUM_MASK;
+				GLC::GR1FLM5.LNNUM = input.vsize - 1;
 			} else {
-				GLC::GR2FLM5.LNNUM = ((uint32_t)(input.vsize - 1)) & GRn_FLM5_LNNUM_MASK;
+				GLC::GR2FLM5.LNNUM = input.vsize - 1;
 			}
 
 			// ---- Set the line offset address for accessing the graphics data on graphics
 			// plane ----
 			if(frame == 0) {
-				GLC::GR1FLM3.LNOFF = (uint32_t)input.offset & GRn_FLM3_LNOFF_MASK;
+				GLC::GR1FLM3.LNOFF = input.offset;
 			} else {
-				GLC::GR2FLM3.LNOFF = (uint32_t)input.offset & GRn_FLM3_LNOFF_MASK;
+				GLC::GR2FLM3.LNOFF = input.offset;
 			}
 
 			if(frame == 0) {
-				GLC::GR1AB2.GRCVW = input.vsize & GRn_AB2_GRCVW_MASK;
+				GLC::GR1AB2.GRCVW = input.vsize;
 			} else {
-				GLC::GR2AB2.GRCVW = input.vsize & GRn_AB2_GRCVW_MASK;
+				GLC::GR2AB2.GRCVW = input.vsize;
 			}
 
 			if(frame == 0) {
-				GLC::GR1AB2.GRCVS = ((uint32_t)(ctrl_blk_.active_start_pos.y
-									+ input.coordinate.y)) & GRn_AB2_GRCVS_MASK;
+				GLC::GR1AB2.GRCVS = ctrl_blk_.active_start_pos.y + input.coordinate.y;
 			} else {
-				GLC::GR2AB2.GRCVS = ((uint32_t)(ctrl_blk_.active_start_pos.y
-									+ input.coordinate.y)) & GRn_AB2_GRCVS_MASK;
+				GLC::GR2AB2.GRCVS = ctrl_blk_.active_start_pos.y + input.coordinate.y;
 			}
 
 			/* ---- Set the width of the graphics layers ---- */
 			if(frame == 0) {
-				GLC::GR1AB3.GRCHW = input.hsize & GRn_AB3_GRCHW_MASK;
+				GLC::GR1AB3.GRCHW = input.hsize;
 			} else {
-				GLC::GR2AB3.GRCHW = input.hsize & GRn_AB3_GRCHW_MASK;
+				GLC::GR2AB3.GRCHW = input.hsize;
 			}
 
 			/* ---- Set the start position of the graphics layers ---- */
-			// gp_gr[frame]->grxab3.bit.grchs = ((uint32_t)(ctrl_blk_.active_start_pos.x
-			//								 + input.coordinate.x)) & GRn_AB3_GRCHS_MASK;
 			if(frame == 0) {
-				GLC::GR1AB3.GRCHS = ((uint32_t)(ctrl_blk_.active_start_pos.x
-									+ input.coordinate.x)) & GRn_AB3_GRCHS_MASK;
+				GLC::GR1AB3.GRCHS = ctrl_blk_.active_start_pos.x + input.coordinate.x;
 			} else {
-				GLC::GR2AB3.GRCHS = ((uint32_t)(ctrl_blk_.active_start_pos.x
-									+ input.coordinate.x)) & GRn_AB3_GRCHS_MASK;
+				GLC::GR2AB3.GRCHS = ctrl_blk_.active_start_pos.x + input.coordinate.x;
 			}
 
 			if(frame == 0) {
@@ -896,9 +838,9 @@ namespace device {
 			if(false == ctrl_blk_.graphics_read_enable[frame]) {
 				/* Set layer transparent */
 				if(frame == 0) {
-					GLC::GR1AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
+					GLC::GR1AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::TRANSPARENT);
 				} else {
-					GLC::GR2AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
+					GLC::GR2AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::TRANSPARENT);
 				}
 				return;
 			}
@@ -914,15 +856,15 @@ namespace device {
 				}
 				if(true == blend.visible) {
 					if(frame == 0) {
-						GLC::GR1AB1.DISPSEL = PLANE_BLEND::NON_TRANSPARENT & GRn_AB1_DISPSEL_MASK;
+						GLC::GR1AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::NON_TRANSPARENT);
 					} else {
-						GLC::GR2AB1.DISPSEL = PLANE_BLEND::NON_TRANSPARENT & GRn_AB1_DISPSEL_MASK;
+						GLC::GR2AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::NON_TRANSPARENT);
 					}
 				} else {
 					if(frame == 0) {
-						GLC::GR1AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
+						GLC::GR1AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::TRANSPARENT);
 					} else {
-						GLC::GR2AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
+						GLC::GR2AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::TRANSPARENT);
 					}
 				}
 				break;
@@ -932,35 +874,27 @@ namespace device {
 				// gp_gr[frame]->grxab5.bit.archs = 
                 //    
 				if(frame == 0) {
-					GLC::GR1AB5.ARCHS = ((uint32_t)(ctrl_blk_.active_start_pos.x
-										+ blend.start_coordinate.x)) & GRn_AB5_ARCHS_MASK;
+					GLC::GR1AB5.ARCHS = ctrl_blk_.active_start_pos.x + blend.start_coordinate.x;
 				} else {
-					GLC::GR2AB5.ARCHS = ((uint32_t)(ctrl_blk_.active_start_pos.x
-										+ blend.start_coordinate.x)) & GRn_AB5_ARCHS_MASK;
+					GLC::GR2AB5.ARCHS = ctrl_blk_.active_start_pos.x + blend.start_coordinate.x;
 				}
 
 				if(frame == 0) {
-					GLC::GR1AB4.ARCVS = ((uint32_t)(ctrl_blk_.active_start_pos.y
-										+ blend.start_coordinate.y))& GRn_AB4_ARCVS_MASK;
+					GLC::GR1AB4.ARCVS = ctrl_blk_.active_start_pos.y + blend.start_coordinate.y;
 				} else {
-					GLC::GR2AB4.ARCVS = ((uint32_t)(ctrl_blk_.active_start_pos.y
-										+ blend.start_coordinate.y))& GRn_AB4_ARCVS_MASK;
+					GLC::GR2AB4.ARCVS = ctrl_blk_.active_start_pos.y + blend.start_coordinate.y;
 				}
 
 				/* ---- Set the width of the graphics layers ---- */
 				if(frame == 0) {
-					GLC::GR1AB5.ARCHW = (blend.end_coordinate.x - blend.start_coordinate.x)
-										& GRn_AB5_ARCHW_MASK;
+					GLC::GR1AB5.ARCHW = blend.end_coordinate.x - blend.start_coordinate.x;
 				} else {
-					GLC::GR2AB5.ARCHW = (blend.end_coordinate.x - blend.start_coordinate.x)
-										& GRn_AB5_ARCHW_MASK;
+					GLC::GR2AB5.ARCHW = blend.end_coordinate.x - blend.start_coordinate.x;
 				}
 				if(frame == 0) {
-					GLC::GR1AB4.ARCVW = (blend.end_coordinate.y - blend.start_coordinate.y)
-					                    & GRn_AB4_ARCVW_MASK;
+					GLC::GR1AB4.ARCVW = blend.end_coordinate.y - blend.start_coordinate.y;
 				} else {
-					GLC::GR2AB4.ARCVW = (blend.end_coordinate.y - blend.start_coordinate.y)
-					                    & GRn_AB4_ARCVW_MASK;
+					GLC::GR2AB4.ARCVW = blend.end_coordinate.y - blend.start_coordinate.y;
 				}
 
 				/*---- Enable rectangular alpha blending ---- */
@@ -977,45 +911,38 @@ namespace device {
 					GLC::GR2AB6.ARCRATE = 0x00;
 				}
 
+
 	            if(glcdc_def::BLEND_CONTROL::FADEIN == blend.blend_control) {
 					if(frame == 0) {
-						GLC::GR1AB7.ARCDEF
-							= FADING_CONTROL_INITIAL_ALPHA::MIN & GRn_AB7_ARCDEF_MASK;
+						GLC::GR1AB7.ARCDEF = FADING_CONTROL_INITIAL_ALPHA::MIN;
 					} else {
-						GLC::GR2AB7.ARCDEF
-							= FADING_CONTROL_INITIAL_ALPHA::MIN & GRn_AB7_ARCDEF_MASK;
+						GLC::GR2AB7.ARCDEF = FADING_CONTROL_INITIAL_ALPHA::MIN;
 					}
 
 					if(frame == 0) {
-						GLC::GR1AB6.ARCCOEF = (uint32_t)blend.fade_speed & GRn_AB6_ARCCOEF_MASK;
+						GLC::GR1AB6.ARCCOEF = blend.fade_speed;
 					} else {
-						GLC::GR2AB6.ARCCOEF = (uint32_t)blend.fade_speed & GRn_AB6_ARCCOEF_MASK;
+						GLC::GR2AB6.ARCCOEF = blend.fade_speed;
 					}
             	} else if (glcdc_def::BLEND_CONTROL::FADEOUT == blend.blend_control) {
 					if(frame == 0) {
-						GLC::GR1AB7.ARCDEF
-							= FADING_CONTROL_INITIAL_ALPHA::MAX & GRn_AB7_ARCDEF_MASK;
+						GLC::GR1AB7.ARCDEF = FADING_CONTROL_INITIAL_ALPHA::MAX;
 					} else {
-						GLC::GR2AB7.ARCDEF
-							= FADING_CONTROL_INITIAL_ALPHA::MAX & GRn_AB7_ARCDEF_MASK;
+						GLC::GR2AB7.ARCDEF = FADING_CONTROL_INITIAL_ALPHA::MAX;
 					}
 
 					if(frame == 0) {
-						GLC::GR1AB6.ARCCOEF = ((uint32_t) blend.fade_speed | (1 << 8))
-											  & GRn_AB6_ARCCOEF_MASK;
+						GLC::GR1AB6.ARCCOEF = blend.fade_speed | (1 << 8);
 					} else {
-						GLC::GR2AB6.ARCCOEF = ((uint32_t) blend.fade_speed | (1 << 8))
-											  & GRn_AB6_ARCCOEF_MASK;
+						GLC::GR2AB6.ARCCOEF = blend.fade_speed | (1 << 8);
 					}
 				} else {  /* ---- GLCDC_FADE_CONTROL_FIXED ---- */
 					/* GRnAB7 - Graphic n Alpha Blending Control Register 7
 					b23:b16 ARCDEF[7:0] - Initial Alpha Value Setting. - Set is 0. */
 					if(frame == 0) {
-						GLC::GR1AB7.ARCDEF = (uint32_t)blend.fixed_blend_value
-											 & GRn_AB7_ARCDEF_MASK;
+						GLC::GR1AB7.ARCDEF = blend.fixed_blend_value;
 					} else {
-						GLC::GR2AB7.ARCDEF = (uint32_t)blend.fixed_blend_value
-											 & GRn_AB7_ARCDEF_MASK;
+						GLC::GR2AB7.ARCDEF = blend.fixed_blend_value;
 					}
 
 					if(frame == 0) {
@@ -1033,9 +960,9 @@ namespace device {
 				}
 
 				if(frame == 0) {
-					GLC::GR1AB1.DISPSEL = PLANE_BLEND::ON_LOWER_LAYER & GRn_AB1_DISPSEL_MASK;
+					GLC::GR1AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::ON_LOWER_LAYER);
 				} else {
-					GLC::GR2AB1.DISPSEL = PLANE_BLEND::ON_LOWER_LAYER & GRn_AB1_DISPSEL_MASK;
+					GLC::GR2AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::ON_LOWER_LAYER);
 				}
 				break;
 			case glcdc_def::BLEND_CONTROL::PIXEL:
@@ -1048,16 +975,16 @@ namespace device {
 
 				if(true == blend.visible) {
 					if(frame == 0) {
-						GLC::GR1AB1.DISPSEL = PLANE_BLEND::ON_LOWER_LAYER & GRn_AB1_DISPSEL_MASK;
+						GLC::GR1AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::ON_LOWER_LAYER);
 					} else {
-						GLC::GR2AB1.DISPSEL = PLANE_BLEND::ON_LOWER_LAYER & GRn_AB1_DISPSEL_MASK;
+						GLC::GR2AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::ON_LOWER_LAYER);
 					}
 				} else {
 					/* Set layer transparent */
 					if(frame == 0) {
-						GLC::GR1AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
+						GLC::GR1AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::TRANSPARENT);
 					} else {
-						GLC::GR2AB1.DISPSEL = PLANE_BLEND::TRANSPARENT & GRn_AB1_DISPSEL_MASK;
+						GLC::GR2AB1.DISPSEL = static_cast<uint32_t>(PLANE_BLEND::TRANSPARENT);
 					}
 				}
 				break;
@@ -1247,14 +1174,14 @@ namespace device {
 
 			if(true == brightness.enable) {
 				/* ---- Sets brightness correction register for each color in a pixel. ---- */
-				GLC::BRIGHT1.BRTG = brightness.g & OUT_BRIGHT1_BRTG_MASK;
-				GLC::BRIGHT2.BRTB = brightness.b & OUT_BRIGHT2_BRTB_MASK;
-				GLC::BRIGHT2.BRTR = brightness.r & OUT_BRIGHT2_BRTR_MASK;
+				GLC::BRIGHT1.BRTG = brightness.g;
+				GLC::BRIGHT2.BRTB = brightness.b;
+				GLC::BRIGHT2.BRTR = brightness.r;
 			} else {
 				/* --- If brightness setting in configuration is 'off', apply default value --- */
-				GLC::BRIGHT1.BRTG = BRIGHTNESS_DEFAULT & OUT_BRIGHT1_BRTG_MASK;
-				GLC::BRIGHT2.BRTB = BRIGHTNESS_DEFAULT & OUT_BRIGHT2_BRTB_MASK;
-				GLC::BRIGHT2.BRTR = BRIGHTNESS_DEFAULT & OUT_BRIGHT2_BRTR_MASK;
+				GLC::BRIGHT1.BRTG = BRIGHTNESS_DEFAULT;
+				GLC::BRIGHT2.BRTB = BRIGHTNESS_DEFAULT;
+				GLC::BRIGHT2.BRTR = BRIGHTNESS_DEFAULT;
 			}
 		}
 
@@ -1263,15 +1190,15 @@ namespace device {
 		{
 			if(true == contrast.enable) {
 				/* ---- Sets the contrast correction register for each color in a pixel. ---- */
-				GLC::CONTRAST.CONTG = contrast.g & OUT_CONTRAST_CONTG_MASK;
-				GLC::CONTRAST.CONTB = contrast.b & OUT_CONTRAST_CONTB_MASK;
-				GLC::CONTRAST.CONTR = contrast.r & OUT_CONTRAST_CONTR_MASK;
+				GLC::CONTRAST.CONTG = contrast.g;
+				GLC::CONTRAST.CONTB = contrast.b;
+				GLC::CONTRAST.CONTR = contrast.r;
 			} else {
 				/* ---- If the contrast setting in the configuration is set to 'off',
 						apply default value ---- */
-				GLC::CONTRAST.CONTG = CONTRAST_DEFAULT & OUT_CONTRAST_CONTG_MASK;
-				GLC::CONTRAST.CONTB = CONTRAST_DEFAULT & OUT_CONTRAST_CONTB_MASK;
-				GLC::CONTRAST.CONTR = CONTRAST_DEFAULT & OUT_CONTRAST_CONTR_MASK;
+				GLC::CONTRAST.CONTG = CONTRAST_DEFAULT;
+				GLC::CONTRAST.CONTB = CONTRAST_DEFAULT;
+				GLC::CONTRAST.CONTR = CONTRAST_DEFAULT;
 			}
 		}
 
@@ -1346,7 +1273,7 @@ namespace device {
 
 		void line_detect_number_set_(uint32_t line)
 		{
-			GLC::GR2CLUTINT.LINE = line & GRn_CLUTINT_LINE_MASK;
+			GLC::GR2CLUTINT.LINE = line;
 		}
 
 
@@ -1847,7 +1774,7 @@ namespace device {
 			// Graphic 1 configuration
 			//
 			cfg.input[FRAME_LAYER_1].base = ly1;
-			cfg.input[FRAME_LAYER_2].offset = 0;	  // Disable Graphics 1
+			cfg.input[FRAME_LAYER_1].offset = 0;	  // Disable Graphics 1
 
 			//
 			// Graphic 2 configuration
