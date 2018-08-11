@@ -44,6 +44,7 @@ namespace chip {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct xy {
+			EVENT		before;	///< Touch Event (before)
 			EVENT		event;	///< Touch Event
 			uint8_t		id;		///< Touch ID
 			int16_t		x;		///< Touch Position X
@@ -58,7 +59,7 @@ namespace chip {
 				@brief	コンストラクター
 			 */
 			//-------------------------------------------------------------//
-			xy() noexcept : event(EVENT::NONE), id(0), x(0), y(0),
+			xy() noexcept : before(EVENT::NONE), event(EVENT::NONE), id(0), x(0), y(0),
 				   org_x(0), org_y(0), end_x(0), end_y(0) { }
 
 
@@ -173,12 +174,15 @@ namespace chip {
 		{
 			touch_num_ = touch_tmp_[0] & 0x0f;
 
+			xy_[0].before = xy_[0].event;
 			xy_[0].event = static_cast<EVENT>(touch_tmp_[1] >> 6);
 			xy_[0].id = touch_tmp_[3] >> 4;
 			xy_[0].x = (static_cast<int16_t>(touch_tmp_[1] & 0x0F) << 8)
 				| static_cast<int16_t>(touch_tmp_[2]);
 			xy_[0].y = (static_cast<int16_t>(touch_tmp_[3] & 0x0F) << 8)
 				| static_cast<int16_t>(touch_tmp_[4]);
+
+			xy_[1].before = xy_[1].event;
 			xy_[1].event = static_cast<EVENT>(touch_tmp_[7] >> 6);
 			xy_[1].id = touch_tmp_[9] >> 4;
 			xy_[1].x = (static_cast<int16_t>(touch_tmp_[7] & 0x0F) << 8)
