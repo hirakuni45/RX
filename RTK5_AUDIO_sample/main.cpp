@@ -605,6 +605,21 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
+	// タッチパネルの安定待ち
+	{
+		uint8_t nnn = 0;
+		while(1) {
+			glcdc_io_.sync_vpos();
+			ft5206_.update();
+			if(ft5206_.get_touch_num() == 0) {
+				++nnn;
+				if(nnn >= 60) break;
+			} else {
+				nnn = 0;
+			}
+		}
+	}
+
 	while(1) {
 		glcdc_io_.sync_vpos();
 
