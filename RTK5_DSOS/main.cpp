@@ -76,6 +76,7 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	typedef device::glcdc_io<device::GLCDC, 480, 272,
 		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
+///		device::glcdc_def::PIX_TYPE::CLUT8> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
 
 	typedef device::drw2d_mgr<device::DRW2D, 480, 272> DRW2D_MGR;
@@ -336,10 +337,29 @@ int main(int argc, char** argv)
 		capture_.set_trigger(trigger_);			
 	}
 
+	// タッチパネルの安定待ち
+	{
+		uint8_t nnn = 0;
+		while(1) {
+			glcdc_io_.sync_vpos();
+			ft5206_.update();
+			if(ft5206_.get_touch_num() == 0) {
+				++nnn;
+				if(nnn >= 60) break;
+			} else {
+				nnn = 0;
+			}
+		}
+	}
+
 	while(1) {
 		glcdc_io_.sync_vpos();
 
 		ft5206_.update();
+
+		sdc_.service(sdh_.service());
+
+		command_();
 
 		// タッチ操作による画面更新が必要か？
 		bool f = render_wave_.ui_service();
@@ -350,10 +370,6 @@ int main(int argc, char** argv)
 			trigger_ = utils::capture_trigger::NONE;
 			render_wave_.update();
 		}
-
-		sdc_.service(sdh_.service());
-
-		command_();
 
 		update_led_();
 	}
