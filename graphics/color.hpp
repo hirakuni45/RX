@@ -15,7 +15,7 @@ namespace graphics {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	基本カラー定数
-		@param[in]	T		ピクセル型（１６、３２）
+		@param[in]	T		ピクセル型（uint16_t、uint32_t）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <typename T>
@@ -41,7 +41,9 @@ namespace graphics {
 
 		static constexpr T rgb_(uint8_t r, uint8_t g, uint8_t b)
 		{
-			if(sizeof(T) == 2) return rgb565_(r, g, b);
+			if(sizeof(T) == 1) {
+				return (r & 0b11100000) | ((g & 0b11100000) >> 3) | ((b & 0b11000000) >> 6);
+			} else if(sizeof(T) == 2) return rgb565_(r, g, b);
 			else if(sizeof(T) == 4) return rgb888_(r, g, b);
 			else return 0;
 		}
