@@ -19,7 +19,7 @@ namespace graphics {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class afont_null {
 	public:
-		static const int8_t width = 0;
+		static const int8_t width  = 0;
 		static const int8_t height = 0;
 		static const uint8_t* get(uint8_t code) { return nullptr; }
 		static const int8_t get_width(uint8_t code) { return 0; }
@@ -62,6 +62,8 @@ namespace graphics {
 		static const int16_t kfont_height = KFONT::height;
 		static const int16_t font_height  = KFONT::height < AFONT::height
 			? AFONT::height : KFONT::height;
+
+		static const int16_t line_offset = (((width * sizeof(T)) + 63) & 0x7fc0) / sizeof(T);
 
 	private:
 		T*			fb_;
@@ -155,7 +157,64 @@ namespace graphics {
 			}
 			if(static_cast<uint16_t>(x) >= WIDTH) return;
 			if(static_cast<uint16_t>(y) >= HEIGHT) return;
-			fb_[y * WIDTH + x] = c;
+			fb_[y * line_offset + x] = c;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	水平ラインを描画
+			@param[in]	y	開始位置 Y
+			@param[in]	x	水平開始位置
+			@param[in]	w	水平幅
+			@param[in]	c	カラー
+		*/
+		//-----------------------------------------------------------------//
+		void line_h(int16_t y, int16_t x, int16_t w, T c) noexcept
+		{
+			if(static_cast<uint16_t>(y) >= HEIGHT) return;
+			if(x < 0) {
+				w += x;
+				x = 0;
+			} else if(x >= static_cast<int16_t>(WIDTH)) {
+				return;
+			}
+			if((x + w) >= static_cast<int16_t>(WIDTH)) {
+				w = static_cast<int16_t>(WIDTH) - x;
+			}
+			T* out = &fb_[y * line_offset + x];
+			for(int16_t i = 0; i < w; ++i) {
+				*out++ = c;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	垂直ラインを描画
+			@param[in]	x	開始位置 x
+			@param[in]	y	垂直開始位置
+			@param[in]	h	垂直幅
+			@param[in]	c	カラー
+		*/
+		//-----------------------------------------------------------------//
+		void line_v(int16_t x, int16_t y, int16_t h, T c) noexcept
+		{
+			if(static_cast<uint16_t>(x) >= WIDTH) return;
+			if(y < 0) {
+				h += y;
+				y = 0;
+			} else if(y >= static_cast<int16_t>(HEIGHT)) {
+				return;
+			}
+			if((y + h) >= static_cast<int16_t>(HEIGHT)) {
+				h = static_cast<int16_t>(HEIGHT) - y;
+			}
+			T* out = &fb_[y * line_offset + x];
+			for(int16_t i = 0; i < h; ++i) {
+				*out = c;
+				out += line_offset;
+			}
 		}
 
 
@@ -169,11 +228,9 @@ namespace graphics {
 			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void fill(int16_t x, int16_t y, int16_t w, int16_t h, T c) {
-			for(int16_t i = y; i < (y + h); ++i) {
-				for(int16_t j = x; j < (x + w); ++j) {
-					plot(j, i, c);
-				}
+		void fill(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept {
+			for(int16_t yy = y; yy < (y + h); ++yy) {
+				line_h(yy, x, w, c);
 			}
 		}
 
@@ -185,8 +242,26 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		void clear(T c) noexcept {
-			for(uint32_t i = 0; i < (WIDTH * HEIGHT); ++i) {
-				fb_[i] = c;
+			if(sizeof(T) == 2) {  // 16 bits pixel
+				uint32_t c32 = (static_cast<uint32_t>(c) << 16) | c;
+				uint32_t* out = reinterpret_cast<uint32_t*>(fb_);
+				for(uint32_t i = 0; i < (WIDTH * HEIGHT) / 16; ++i) {
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
+				}
+			} else {
+				for(uint32_t y = 0; y < HEIGHT; ++y) {
+					T* p = &fb_[line_offset * y];
+					for(uint32_t x = 0; x < WIDTH; ++x) {
+						*p++ = c;
+					}
+				}
 			}
 		}
 
@@ -246,7 +321,7 @@ namespace graphics {
 			@param[in]	c	描画色
 		*/
 		//-----------------------------------------------------------------//
-		void frame(int16_t x, int16_t y, int16_t w, int16_t h, T c) {
+		void frame(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept {
 			for(int16_t i = 0; i < w; ++i) {
 				plot(x + i, y, c);
 				plot(x + i, y + h - 1, c);
@@ -267,13 +342,13 @@ namespace graphics {
 		void scroll(int16_t h) noexcept
 		{
 			if(h > 0) {
-				for(int32_t i = 0; i < (WIDTH * (HEIGHT - h)); ++i) {
-					fb_[i] = fb_[i + (WIDTH * h)];
+				for(int32_t i = 0; i < (line_offset * (HEIGHT - h)); ++i) {
+					fb_[i] = fb_[i + (line_offset * h)];
 				}
 			} else if(h < 0) {
 				h = -h;
-				for(int32_t i = (WIDTH * (HEIGHT - h)) - 1; i >= 0; --i) {
-					fb_[i + (WIDTH * h)] = fb_[i];
+				for(int32_t i = (line_offset * (HEIGHT - h)) - 1; i >= 0; --i) {
+					fb_[i + (line_offset * h)] = fb_[i];
 				}
 			}			
 		}
