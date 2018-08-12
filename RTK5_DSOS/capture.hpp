@@ -42,7 +42,10 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t CAPN>
 	class capture {
+	public:
+		static const uint32_t CAP_NUM = CAPN;
 
+	private:
 		static capture_data				data_[CAPN];
 
 		typedef device::S12AD  ADC0;
