@@ -15,77 +15,6 @@
 
 namespace device {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  Interrupt enable setting
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct glcdc_interrupt_cfg_t
-	{
-    	bool vpos_enable;          // Line detection interrupt enable.
-    	bool gr1uf_enable;         // Graphics plane1 underflow interrupt enable.
-    	bool gr2uf_enable;         // Graphics plane2 underflow interrupt enable.
-		glcdc_interrupt_cfg_t() : vpos_enable(false), gr1uf_enable(false), gr2uf_enable(false)
-		{ }
-	};
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  Display output signal timing setting
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct glcdc_timing_t
-	{
-		uint16_t display_cyc;		///< Active video cycles or lines.
-		uint16_t front_porch;		///< Front poach cycles or lines.
-		uint16_t back_porch;		///< Back poach cycles or lines.
-		uint16_t sync_width;		///< Sync signal asserting width.
-	};
-
-
-	/** Coordinate */
-	struct glcdc_coordinate_t
-	{
-	    int16_t x;              // Coordinate X, this allows to set signed value.
-	    int16_t y;              // Coordinate Y, this allows to set signed value.
-	};
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief	GLCD hardware specific control block
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct glcdc_ctrl_t {
-		glcdc_def::OPERATING_STATUS	state;	  // Status of GLCD module.
-		bool			   is_entry;		  // Flag of subcribed GLCDC interrupt function.
-		glcdc_coordinate_t active_start_pos;  // Zero coordinate for gra phics plane.
-		uint16_t hsize;                       // Horizontal pixel size in a line.
-		uint16_t vsize;                       // Vertical pixel size in a frame.
-///		bool graphics_read_enable[FRAME_LAYER_NUM];  // Graphics data read enable.
-		bool graphics_read_enable[2];  // Graphics data read enable.
-		void (*callback)(void *);           // Pointer to callback function.
-		bool first_vpos_interrupt_flag;       // First vpos interrupt after release 
-											  // software reset.
-		glcdc_interrupt_cfg_t interrupt;      // Interrupt setting values.
-
-		volatile uint32_t	vpos_count;
-
-		glcdc_ctrl_t() :
-			state(glcdc_def::OPERATING_STATUS::CLOSED),
-			is_entry(false),
-			active_start_pos(),
-			hsize(0), vsize(0),
-			graphics_read_enable{ false },
-			callback(nullptr),
-			first_vpos_interrupt_flag(false),
-			interrupt(),
-			vpos_count(0)
-		{ }
-	};
-
-
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  GLCDC I/O 制御
@@ -98,20 +27,9 @@ namespace device {
 	template <class GLC, int32_t XSIZE, int32_t YSIZE, device::glcdc_def::PIX_TYPE PXT>
 	class glcdc_io {
 
-		static const uint32_t PIX_WIDTH  = 16;		///< 16 bits / pixel
-
-		/* Number of graphics layers */
-		static const uint32_t FRAME_LAYER_NUM  = 2;
-
-		/* Number of color palletes for each graphic */
-		static const uint32_t CLUT_PLANE_NUM   = 2;
-
-		/* Number of clock division ratio setting items */
-		static const uint32_t PANEL_CLKDIV_NUM = 13;
-
-
-
-
+		static const uint32_t FRAME_LAYER_NUM  = 2;		///< Number of graphics layers
+		static const uint32_t CLUT_PLANE_NUM   = 2;		///< Number of color palletes
+		static const uint32_t PANEL_CLKDIV_NUM = 13;	///< Number of clock division ratio
 
 
 		/** Serial RGB data output delay cycles select (this function is not supported) */
@@ -132,24 +50,6 @@ namespace device {
 		};
 
 
-		/** RGB Color setting */
-		struct color_t
-		{
-			// little endian
-		    union
-		    {
-		        uint32_t argb;
-		        struct
-		        {
-		            uint32_t b:8;      // blue.
-		            uint32_t g:8;      // green.
-		            uint32_t r:8;      // red.
-		            uint32_t a:8;      // alpha.
-		        } byte;
-		    };
-		};
-
-
 		struct gamma_correction_t
 		{
 			static const uint32_t GAMMA_CURVE_GAIN_ELEMENT_NUM      = 16;
@@ -159,56 +59,63 @@ namespace device {
 			{
 				uint16_t gain[GAMMA_CURVE_GAIN_ELEMENT_NUM];               // Gain adjustment.
 				uint16_t threshold[GAMMA_CURVE_THRESHOLD_ELEMENT_NUM];     // Start threshold.
+				correction_t() : gain{ 0 }, threshold{ 0 } { }
 			};
 
-			bool enable;                  // Gamma Correction On/Off.
-			correction_t* p_r;            // Gamma correction for R channel.
-			correction_t* p_g;            // Gamma correction for G channel.
-			correction_t* p_b;            // Gamma correction for B channel.
+			bool			enable;		// Gamma Correction On/Off.
+			correction_t*	p_r;        // Gamma correction for R channel.
+			correction_t*	p_g;        // Gamma correction for G channel.
+			correction_t*	p_b;        // Gamma correction for B channel.
+			gamma_correction_t() : enable(false), p_r(nullptr),  p_g(nullptr),  p_b(nullptr)
+			{ }
 		};
 
 
 		struct contrast_t
 		{
-			bool enable;			// Contrast Correction On/Off.
+			bool	enable;			// Contrast Correction On/Off.
 			uint8_t r;				// Contrast (gain) adjustment for R channel.
 			uint8_t g;				// Contrast (gain) adjustment for G channel.
 			uint8_t b;				// Contrast (gain) adjustment for B channel.
+			contrast_t() : enable(false), r(0), g(0), b(0) { }
 		};
 
 
 		/** Brightness (DC) correction setting */
 		struct brightness_t
 		{
-		    bool enable;        // Brightness Correction On/Off.
+		    bool	 enable;    // Brightness Correction On/Off.
 		    uint16_t r;         // Brightness (DC) adjustment for R channel.
 		    uint16_t g;         // Brightness (DC) adjustment for G channel.
 		    uint16_t b;         // Brightness (DC) adjustment for B channel.
+			brightness_t() : enable(false), r(0), g(0), b(0) { }
 		};
 
 
 		/** Chroma key setting */
 		struct chromakey_t
 		{
-		    bool enable;                         // Chroma key On/Off.
-		    color_t before;                // Compare Color for -RGB.
-		    color_t after;                 // Replace Color for ARGB.
+		    bool	enable;		// Chroma key On/Off.
+		    glcdc_def::color_t before;		// Compare Color for -RGB.
+		    glcdc_def::color_t after;		// Replace Color for ARGB.
+			chromakey_t() : enable(false), before(), after() { }
 		};
 
 
 		/** Color correction setting */
 		struct correction_t
 		{
-		    brightness_t brightness;       // Brightness setting.
-		    contrast_t contrast;           // Contrast setting.
-		    gamma_correction_t gamma;      // Gamma setting.
+		    brightness_t		brightness;	// Brightness setting.
+		    contrast_t			contrast;   // Contrast setting.
+		    gamma_correction_t	gamma;      // Gamma setting.
+			correction_t() : brightness(), contrast(), gamma() { }
 		};
 
 
 		/** Dithering setup parameter */
 		struct dithering_t
 		{
-		    bool                    dithering_on;          // Dithering on/off.
+		    bool                    	 dithering_on;          // Dithering on/off.
 		    glcdc_def::DITHERING_MODE    dithering_mode;        // Dithering mode.
 		    glcdc_def::DITHERING_PATTERN dithering_pattern_a;   // Dithering pattern A.
 		    glcdc_def::DITHERING_PATTERN dithering_pattern_b;   // Dithering pattern B.
@@ -220,14 +127,14 @@ namespace device {
 		/** Graphics plane input configuration */
 		struct input_cfg_t
 		{
-			void*	 base;                 // Base address to the frame buffer.
-			uint16_t hsize;                // Horizontal pixel size in a line.
-			uint16_t vsize;                // Vertical pixel size in a frame.
-			int32_t offset;                // offset value to next line.
-			glcdc_def::IN_FORMAT format;   // Input format setting.
-			bool frame_edge;               // Show/hide setting of the frame of the graphics area.
-			glcdc_coordinate_t coordinate; // Starting point of image.
-			color_t bg_color;              // Color outside region.
+			void*					base;		// Base address to the frame buffer.
+			uint16_t				hsize;		// Horizontal pixel size in a line.
+			uint16_t				vsize;		// Vertical pixel size in a frame.
+			int32_t 				offset;		// offset value to next line.
+			glcdc_def::IN_FORMAT	format;		// Input format setting.
+			bool 				frame_edge;	// Show/hide setting of the frame of the graphics area.
+			glcdc_def::coordinate_t	coordinate;	// Starting point of image.
+			glcdc_def::color_t		bg_color;	// Color outside region.
 
 			input_cfg_t() : base(nullptr), hsize(0), vsize(0), offset(0),
 				format(glcdc_def::IN_FORMAT::RGB565), frame_edge(false), coordinate(), bg_color()
@@ -238,14 +145,14 @@ namespace device {
 		/** Display output configuration */
 		struct output_cfg_t
 		{
-			glcdc_timing_t           htiming;                // Horizontal display cycle setting.
-			glcdc_timing_t           vtiming;                // Vertical display cycle setting.
-			glcdc_def::OUT_FORMAT    format;                 // Output format setting.
-			glcdc_def::ENDIAN        endian;                 // Bit order of output data.
-			glcdc_def::COLOR_ORDER   color_order;            // Color order in pixel.
-			glcdc_def::SIGNAL_SYNC_EDGE sync_edge;              // Signal sync edge selection.
+			glcdc_def::timing_t         htiming;             // Horizontal display cycle setting.
+			glcdc_def::timing_t         vtiming;             // Vertical display cycle setting.
+			glcdc_def::OUT_FORMAT       format;              // Output format setting.
+			glcdc_def::ENDIAN           endian;              // Bit order of output data.
+			glcdc_def::COLOR_ORDER      color_order;         // Color order in pixel.
+			glcdc_def::SIGNAL_SYNC_EDGE sync_edge;           // Signal sync edge selection.
 
-			color_t                  bg_color;               // Background color.
+			glcdc_def::color_t          bg_color;               // Background color.
 
 			brightness_t             brightness;             // Brightness setting.
 			contrast_t               contrast;               // Contrast setting.
@@ -276,27 +183,29 @@ namespace device {
 			bool frame_edge;                       // Show/hide setting of the frame of rectangular alpha blending area.
 			uint8_t fixed_blend_value;             // Blend value. Valid only when blend_control is _FIXED.
 			uint8_t fade_speed;                    // Layer fade-in/out frame rate.
-			glcdc_coordinate_t  start_coordinate;  // Start coordinate of rectangle blending.
-			glcdc_coordinate_t  end_coordinate;    // End coordinate of rectangle blending.
+			glcdc_def::coordinate_t  start_coordinate;  // Start coordinate of rectangle blending.
+			glcdc_def::coordinate_t  end_coordinate;    // End coordinate of rectangle blending.
 		};
 
 
 		/** CLUT configuration */
 		struct clut_cfg_t
 		{
-			bool enable;        // CLUT update enable/disable.
-			uint32_t * p_base;  // Pointer to CLUT source data.
-			uint16_t start;     // Beginning of CLUT entry to be updated.
-			uint16_t size;      // Size of CLUT entry to be updated.
+			bool		enable; // CLUT update enable/disable.
+			uint32_t*	p_base;	// Pointer to CLUT source data.
+			uint16_t	start;  // Beginning of CLUT entry to be updated.
+			uint16_t	size;   // Size of CLUT entry to be updated.
+			clut_cfg_t() : enable(false), p_base(nullptr), start(0), size(0) { }
 		};
 
 
 		/** Detect enable setting */
 		struct detect_cfg_t
 		{
-			bool vpos_detect;   // Line detection enable.
-			bool gr1uf_detect;  // Graphics plane1 underflow detection enable.
-			bool gr2uf_detect;  // Graphics plane2 underflow detection enable.
+			bool	vpos_detect;	// Line detection enable.
+			bool	gr1uf_detect;	// Graphics plane1 underflow detection enable.
+			bool	gr2uf_detect;	// Graphics plane2 underflow detection enable.
+			detect_cfg_t() : vpos_detect(false), gr1uf_detect(false), gr2uf_detect(false) { }
 		};
 
 
@@ -315,6 +224,7 @@ namespace device {
 	public:
 		static const uint32_t FRAME_LAYER_1 = 0;	///< Frame layer 1.
 		static const uint32_t FRAME_LAYER_2 = 1;	///< Frame layer 2.
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -357,15 +267,15 @@ namespace device {
 		struct cfg_t
 		{
 		    /** Generic configuration for display devices */
-		    input_cfg_t input[FRAME_LAYER_NUM];     // Graphics input frame setting.
-		    output_cfg_t output;                    // Graphics output frame setting.
-		    blend_t blend[FRAME_LAYER_NUM];         // Graphics layer blend setting.
-		    chromakey_t chromakey[FRAME_LAYER_NUM]; // Graphics chroma key setting.
-		    clut_cfg_t clut[FRAME_LAYER_NUM];       // Graphics CLUT setting.
+		    input_cfg_t		input[FRAME_LAYER_NUM];		// Graphics input frame setting.
+		    output_cfg_t	output;						// Graphics output frame setting.
+		    blend_t			blend[FRAME_LAYER_NUM];		// Graphics layer blend setting.
+		    chromakey_t		chromakey[FRAME_LAYER_NUM];	// Graphics chroma key setting.
+		    clut_cfg_t		clut[FRAME_LAYER_NUM];		// Graphics CLUT setting.
 
 		    /** Interrupt setting*/
-		    detect_cfg_t     detection;           // Detection enable/disable setting.
-		    glcdc_interrupt_cfg_t  interrupt;           // Interrupt enable/disable setting.
+		    detect_cfg_t	detection;					// Detection enable/disable setting.
+		    glcdc_def::interrupt_cfg_t	interrupt;           // Interrupt enable/disable setting.
 
 		    /** Configuration for display event processing */
 		    void (*callback)(void *);                 // Pointer to callback function.
@@ -394,6 +304,7 @@ namespace device {
 
 		private:
 
+		static const uint32_t PIX_WIDTH        = static_cast<uint32_t>(PXT);
 		static const uint32_t BYTES_PER_LINE   = ((PIX_WIDTH * XSIZE) / 8);
 		static const uint32_t LINE_OFFSET      = (((BYTES_PER_LINE + 63) / 64) * 64);
 		static const uint32_t VXSIZE_PHYS      = ((LINE_OFFSET * 8) / PIX_WIDTH);
@@ -501,7 +412,7 @@ namespace device {
 		};
 
 
-		static glcdc_ctrl_t	ctrl_blk_;
+		static glcdc_def::ctrl_t	ctrl_blk_;
 		uint8_t				intr_lvl_;
 		ERROR				last_error_;
 
@@ -538,7 +449,7 @@ namespace device {
 		}
 
 
-		void hsync_set_(glcdc_def::TCON_PIN tcon, const glcdc_timing_t& timing,
+		void hsync_set_(glcdc_def::TCON_PIN tcon, const glcdc_def::timing_t& timing,
 			glcdc_def::SIGNAL_POLARITY polarity)
 		{
 			switch(tcon) {
@@ -573,7 +484,7 @@ namespace device {
 		}
 
 
-		void vsync_set_(glcdc_def::TCON_PIN tcon, const glcdc_timing_t& timing,
+		void vsync_set_(glcdc_def::TCON_PIN tcon, const glcdc_def::timing_t& timing,
 			glcdc_def::SIGNAL_POLARITY polarity)
 		{
 
@@ -608,8 +519,9 @@ namespace device {
 		}
 
 
-		void data_enable_set_(glcdc_def::TCON_PIN tcon, const glcdc_timing_t& vtiming,
-                              const glcdc_timing_t& htiming, glcdc_def::SIGNAL_POLARITY polarity)
+		void data_enable_set_(glcdc_def::TCON_PIN tcon, const glcdc_def::timing_t& vtiming,
+                              const glcdc_def::timing_t& htiming,
+							  glcdc_def::SIGNAL_POLARITY polarity)
 		{
 			switch(tcon) {
 			case glcdc_def::TCON_PIN::_0:
@@ -687,9 +599,9 @@ namespace device {
 			GLC::BGVSIZE.VW = cfg.output.vtiming.display_cyc;
 
 			/* ---- Set the Background color ---- */
-			GLC::BGCOLOR.R = cfg.output.bg_color.byte.r;
-			GLC::BGCOLOR.G = cfg.output.bg_color.byte.g;
-			GLC::BGCOLOR.B = cfg.output.bg_color.byte.b;
+			GLC::BGCOLOR.R = cfg.output.bg_color.r;
+			GLC::BGCOLOR.G = cfg.output.bg_color.g;
+			GLC::BGCOLOR.B = cfg.output.bg_color.b;
 		}
 
 
@@ -746,20 +658,20 @@ namespace device {
 
 			/* ---- Set the base address of graphics plane ---- */
 			if(frame == 0) {
-				GLC::GR1FLM2 = (uint32_t)input.base;
+				GLC::GR1FLM2 = reinterpret_cast<uint32_t>(input.base);
 			} else {
-				GLC::GR2FLM2 = (uint32_t)input.base;
+				GLC::GR2FLM2 = reinterpret_cast<uint32_t>(input.base);
 			}
 
 			/* ---- Set the background color on graphics plane ---- */
 			if(frame == 0) {
-				GLC::GR1BASE.R = input.bg_color.byte.r;
-				GLC::GR1BASE.G = input.bg_color.byte.g;
-				GLC::GR1BASE.B = input.bg_color.byte.b;
+				GLC::GR1BASE.R = input.bg_color.r;
+				GLC::GR1BASE.G = input.bg_color.g;
+				GLC::GR1BASE.B = input.bg_color.b;
 			} else {
-				GLC::GR2BASE.R = input.bg_color.byte.r;
-				GLC::GR2BASE.G = input.bg_color.byte.g;
-				GLC::GR2BASE.B = input.bg_color.byte.b;
+				GLC::GR2BASE.R = input.bg_color.r;
+				GLC::GR2BASE.G = input.bg_color.g;
+				GLC::GR2BASE.B = input.bg_color.b;
 			}
 
 			// --- Set the number of data transfer times per line, 64 bytes are transferred
@@ -1009,26 +921,26 @@ namespace device {
 
 				/* ---- Before ---- */
 				if(frame == 0) {
-					GLC::GR1AB8.CKKR = chromakey.before.byte.r;
-					GLC::GR1AB8.CKKG = chromakey.before.byte.g;
-					GLC::GR1AB8.CKKB = chromakey.before.byte.b;
+					GLC::GR1AB8.CKKR = chromakey.before.r;
+					GLC::GR1AB8.CKKG = chromakey.before.g;
+					GLC::GR1AB8.CKKB = chromakey.before.b;
 				} else {
-					GLC::GR2AB8.CKKR = chromakey.before.byte.r;
-					GLC::GR2AB8.CKKG = chromakey.before.byte.g;
-					GLC::GR2AB8.CKKB = chromakey.before.byte.b;
+					GLC::GR2AB8.CKKR = chromakey.before.r;
+					GLC::GR2AB8.CKKG = chromakey.before.g;
+					GLC::GR2AB8.CKKB = chromakey.before.b;
 				}
 
 				/* ---- After ---- */
 				if(frame == 0) {
-					GLC::GR1AB9.CKA = chromakey.after.byte.a;
-					GLC::GR1AB9.CKR = chromakey.after.byte.r;
-					GLC::GR1AB9.CKG = chromakey.after.byte.g;
-					GLC::GR1AB9.CKB = chromakey.after.byte.b;
+					GLC::GR1AB9.CKA = chromakey.after.a;
+					GLC::GR1AB9.CKR = chromakey.after.r;
+					GLC::GR1AB9.CKG = chromakey.after.g;
+					GLC::GR1AB9.CKB = chromakey.after.b;
 				} else {
-					GLC::GR2AB9.CKA = chromakey.after.byte.a;
-					GLC::GR2AB9.CKR = chromakey.after.byte.r;
-					GLC::GR2AB9.CKG = chromakey.after.byte.g;
-					GLC::GR2AB9.CKB = chromakey.after.byte.b;
+					GLC::GR2AB9.CKA = chromakey.after.a;
+					GLC::GR2AB9.CKR = chromakey.after.r;
+					GLC::GR2AB9.CKG = chromakey.after.g;
+					GLC::GR2AB9.CKB = chromakey.after.b;
 				}
 			} else {
 				/* ---- Chroma key disable ---- */
@@ -1063,7 +975,6 @@ namespace device {
 
 		void clut_set_(uint32_t frame, uint32_t clut_plane, uint32_t entry, uint32_t data)
 		{
-    		// gp_gr_clut[frame][clut_plane]->grxclut[entry].lsize = data;
 			if(frame == 0) {
 				if(clut_plane == 0) {
 					GLC::GR1CLUT0[entry] = data;
@@ -1083,11 +994,11 @@ namespace device {
 		void clut_update_(const clut_cfg_t& clut, uint32_t frame)
 		{
 			/* If enable graphics data read from memory */
-			if(false == ctrl_blk_.graphics_read_enable[frame]) {
+			if(!ctrl_blk_.graphics_read_enable[frame]) {
 				return;
 			}
 
-			if(true == clut.enable) {
+			if(clut.enable) {
 				const uint32_t* p_base = clut.p_base;
 
 				uint32_t set_clutplane;
@@ -1305,7 +1216,7 @@ namespace device {
 		}
 
 
-		static void interrupt_setting_(const glcdc_interrupt_cfg_t& interrupt)
+		static void interrupt_setting_(const glcdc_def::interrupt_cfg_t& interrupt)
 		{
 			if(interrupt.vpos_enable) {
 				GLC::INTEN.VPOSINTEN = 1;
@@ -1584,7 +1495,7 @@ namespace device {
 
 			// If one of the interrupt setting is enable, setting value is
 			// set after first vpos interrupt
-			glcdc_interrupt_cfg_t initial_interrupt;
+			glcdc_def::interrupt_cfg_t initial_interrupt;
 			if(cfg.interrupt.vpos_enable || cfg.interrupt.gr1uf_enable
 			  || cfg.interrupt.gr2uf_enable) {
 				ctrl_blk_.first_vpos_interrupt_flag = false;
@@ -1650,6 +1561,22 @@ namespace device {
 			contrast_correction_(cfg.output.contrast);
 			gamma_correction_(cfg.output.gamma);
 
+			{  // setup default CLUT
+				// rrr_ggg_bb
+				for(uint32_t i = 0; i < 256; ++i) {
+					uint8_t r = (i & 0b11100000) | ((i & 11100000) >> 3) | ((i & 0b11100000) >> 6);
+					uint8_t g = (i & 0b00011100) | ((i & 00011100) << 3) | ((i & 0b00011100) >> 3);
+					uint8_t b = (i & 0b00000011) | ((i & 00000011) << 2) | ((i & 0b00000011) << 4)
+								| ((i & 0b00000011) << 6);
+					uint8_t a = 0;
+					uint32_t rgba = (r << 24) | (g << 16) | (b << 8) | a;
+					GLC::GR1CLUT0[i] = rgba;
+					GLC::GR1CLUT1[i] = rgba;
+					GLC::GR2CLUT0[i] = rgba;
+					GLC::GR2CLUT1[i] = rgba;
+				}
+			}
+
 			// Set the line number which is suppose to happen the line detect interrupt
 			line_detect_number_set_(
 				(uint16_t) (((cfg.output.vtiming.sync_width + cfg.output.vtiming.back_porch)
@@ -1679,11 +1606,11 @@ namespace device {
 		}		
 
 
-		void bg_color_setting_(const color_t& color)
+		void bg_color_setting_(const glcdc_def::color_t& color)
 		{
-			GLC::BGCOLOR.R = color.byte.r;
-			GLC::BGCOLOR.G = color.byte.g;
-			GLC::BGCOLOR.B = color.byte.b;
+			GLC::BGCOLOR.R = color.r;
+			GLC::BGCOLOR.G = color.g;
+			GLC::BGCOLOR.B = color.b;
 		}
 
 	public:
@@ -2025,7 +1952,7 @@ namespace device {
 
 			case CONTROL_CMD::SET_INTERRUPT:
 #if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
-				if(NULL == args) {
+				if(nullptr == args) {
 					last_error_ = ERROR::INVALID_PTR;
 					return false;
 				}
@@ -2038,8 +1965,8 @@ namespace device {
 
 				/* interrupt setting */
 				{
-					const glcdc_interrupt_cfg_t* t =
-						static_cast<const glcdc_interrupt_cfg_t*>(args);
+					const glcdc_def::interrupt_cfg_t* t =
+						static_cast<const glcdc_def::interrupt_cfg_t*>(args);
 					interrupt_setting_(*t);
 				}
 				break;
@@ -2047,7 +1974,7 @@ namespace device {
 	        case CONTROL_CMD::CLR_DETECTED_STATUS:
 
 #if (GLCDC_CFG_PARAM_CHECKING_ENABLE)
-				if (NULL == args) {
+				if (nullptr == args) {
 					return GLCDC_ERR_INVALID_PTR;
 				}
 #endif
@@ -2069,7 +1996,7 @@ namespace device {
 
 			case CONTROL_CMD::CHANGE_BG_COLOR:
 				{
-					const color_t* t = static_cast<const color_t*>(args);
+					const auto* t = static_cast<const glcdc_def::color_t*>(args);
 					if(t != nullptr) {
 						bg_color_setting_(*t);
 					} else {
@@ -2101,8 +2028,25 @@ namespace device {
 				asm("nop");
 			}
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CLUT の直接アクセス
+			@param[in]	rgba	カラー
+			@param[in]	index	インデックス
+			@return エラーなら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool set_clut(glcdc_def::color_t& rgba, uint32_t index) noexcept
+		{
+			if(index >= 256) return false;
+
+			GLC::GR1CLUT0[index] = rgba;
+			return true;
+		}
 	};
 
 	template <class GLC, int32_t XSIZE, int32_t YSIZE, glcdc_def::PIX_TYPE PXT>
-		glcdc_ctrl_t glcdc_io<GLC, XSIZE, YSIZE, PXT>::ctrl_blk_;
+		glcdc_def::ctrl_t glcdc_io<GLC, XSIZE, YSIZE, PXT>::ctrl_blk_;
 }

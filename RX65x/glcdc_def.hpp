@@ -243,11 +243,11 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class PIX_TYPE {
-			CLUT1,		///<  1 bits / pixel
-			CLUT4,		///<  4 bits / pixel
-			CLUT8,		///<  8 bits / pixel
-			RGB565,		///< 16 bits / pixel
-			RGB888,		///< 32 bits / pixel
+			CLUT1  = 1,		///<  1 bits / pixel
+			CLUT4  = 4,		///<  4 bits / pixel
+			CLUT8  = 8,		///<  8 bits / pixel
+			RGB565 = 16,	///< 16 bits / pixel
+			RGB888 = 32,	///< 32 bits / pixel
 		};
 
 
@@ -260,6 +260,98 @@ namespace device {
 			CLOSED = 0,                ///< GLCDC closed.
 			NOT_DISPLAYING = 1,        ///< Not Displaying (opened).
 			DISPLAYING = 2             ///< Displaying.
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  Interrupt enable setting
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct interrupt_cfg_t
+		{
+			bool vpos_enable;          // Line detection interrupt enable.
+			bool gr1uf_enable;         // Graphics plane1 underflow interrupt enable.
+			bool gr2uf_enable;         // Graphics plane2 underflow interrupt enable.
+			interrupt_cfg_t() : vpos_enable(false), gr1uf_enable(false), gr2uf_enable(false)
+			{ }
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  Display output signal timing setting
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct timing_t
+		{
+			uint16_t display_cyc;		///< Active video cycles or lines.
+			uint16_t front_porch;		///< Front poach cycles or lines.
+			uint16_t back_porch;		///< Back poach cycles or lines.
+			uint16_t sync_width;		///< Sync signal asserting width.
+			timing_t() : display_cyc(0), front_porch(0), back_porch(0), sync_width(0) { }
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  Coordinate
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct coordinate_t
+		{
+		    int16_t x;              // Coordinate X, this allows to set signed value.
+		    int16_t y;              // Coordinate Y, this allows to set signed value.
+			coordinate_t() : x(0), y(0) { }
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  RGBA Color
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct color_t
+		{
+			uint8_t		b;
+			uint8_t		g;
+			uint8_t		r;
+			uint8_t		a;
+			color_t(uint8_t r_ = 0, uint8_t g_ = 0, uint8_t b_ = 0, uint8_t a_ = 255) :
+				b(b_), g(g_), r(r_), a(a_) { }
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	GLCD hardware specific control block
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct ctrl_t {
+			OPERATING_STATUS	state;						// Status of GLCD module.
+			bool				is_entry;			// Flag of subcribed GLCDC interrupt function.
+			coordinate_t		active_start_pos;			// Zero coordinate for gra phics plane.
+			uint16_t			hsize;              		// Horizontal pixel size in a line.
+			uint16_t			vsize;              		// Vertical pixel size in a frame.
+			bool				graphics_read_enable[2];	// Graphics data read enable.
+			void (*callback)(void *);						// Pointer to callback function.
+			bool				first_vpos_interrupt_flag;  // First vpos interrupt after release 
+											  				// software reset.
+			interrupt_cfg_t		interrupt;					// Interrupt setting values.
+
+			volatile uint32_t	vpos_count;
+
+			ctrl_t() :
+				state(OPERATING_STATUS::CLOSED),
+				is_entry(false),
+				active_start_pos(),
+				hsize(0), vsize(0),
+				graphics_read_enable{ false },
+				callback(nullptr),
+				first_vpos_interrupt_flag(false),
+				interrupt(),
+				vpos_count(0)
+			{ }
 		};
 	};
 }

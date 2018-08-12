@@ -32,7 +32,7 @@ namespace device {
 			uint8_t		G;	///< B8-B15
 			uint8_t		R;	///< B16-B23
 			uint8_t		A;	///< B24-B31
-			clut_t(uint8_t r = 0, uint8_t g = 0, uint8_t b = 0, uint8_t a = 0) :
+			clut_t(uint8_t r = 0, uint8_t g = 0, uint8_t b = 0, uint8_t a = 255) :
 				B(b), G(g), R(r), A(a) { }
 		};
 
@@ -46,7 +46,7 @@ namespace device {
 		template <uint32_t ofs>
 		struct grclut_t {
 			volatile uint32_t& operator[] (uint32_t idx) {
-				return *reinterpret_cast<volatile uint32_t*>((ofs + idx) & 0xff);
+				return *reinterpret_cast<volatile uint32_t*>(ofs + (idx & 0xff));
 			}
 		};
 		static grclut_t<base + 0x0000> GR1CLUT0;
