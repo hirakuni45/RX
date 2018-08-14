@@ -99,7 +99,7 @@ namespace {
 	bool		init_ = false;
 	float		freq_ = 100.0f;
 	uint32_t	wpos_ = 0;
-	imath::sincos_t sico_(0);
+	intmath::sincos_t sico_(0);
 	void service_sin_cos_()
 	{
 		uint32_t pos = (dmac_mgr_.get_count() & 0x3ff) ^ 0x3ff;
@@ -122,7 +122,7 @@ namespace {
 			wave_[(wpos_ + (WAVE_NUM / 2)) & (WAVE_NUM - 1)] = w;
 			++wpos_;
 			wpos_ &= WAVE_NUM - 1;
-			imath::build_sincos(sico_, dt);
+			intmath::build_sincos(sico_, dt);
 		}
 	}
 }
@@ -180,7 +180,7 @@ int main(int argc, char** argv)
 		dac_out_.out1(32767);
 #if 0
 		int32_t gain_shift = 16; 
-		imath::sincos_t sico(static_cast<int64_t>(32767) << gain_shift);
+		intmath::sincos_t sico(static_cast<int64_t>(32767) << gain_shift);
 		for(uint32_t i = 0; i < WAVE_NUM; ++i) {
 			wave_t w;
 #if 0
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
 #else
 			w.l = (sico.x >> gain_shift) + 32768;
 			w.r = (sico.y >> gain_shift) + 32768;
-			imath::build_sincos(sico, WAVE_NUM / 4);
+			intmath::build_sincos(sico, WAVE_NUM / 4);
 #endif
 			wave_[i] = w;
 		}
