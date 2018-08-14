@@ -20,26 +20,18 @@ extern "C" {
 };
 
 /*------------------------------------------------------------------------
-  (For non-arduino platforms)
-------------------------------------------------------------------------*/
-#ifndef PROGMEM
-#define PROGMEM
-float pgm_read_float(const float *f) {  return *f;  }
-#endif
-
-/*------------------------------------------------------------------------
   Values you can play with...
 ------------------------------------------------------------------------*/
 
 // Position of the camera (nb. 'Z' is up/down)
-static const float cameraX = 0.0;
-static const float cameraY = 0.0;
-static const float cameraZ = 3.0;
+static const float cameraX = 0.0f;
+static const float cameraY = 0.0f;
+static const float cameraZ = 3.0f;
 
 // What the camera is pointing at
-static const float targetX = 1.0;
-static const float targetY = 8.0;
-static const float targetZ = 4.0;
+static const float targetX = 1.0f;
+static const float targetY = 8.0f;
+static const float targetZ = 4.0f;
 
 // We cast this many rays per pixel for stochastic antialiasing and soft-shadows. 
 //
@@ -56,7 +48,7 @@ static const float shadowRegion = 0.125f;
   Materials
 ------------------------------------------------------------------------*/
 static const float ambient = 0.05f;
-static const float materials[] PROGMEM = {
+static const float materials[] = {
 // R,    G,    B,   REFLECTIVITY
   0.8f, 0.8f, 0.8f,   0.5f,    // Mirror
 //  1.0f, 0.0f, 0.0f,   0.3f,    // Red
@@ -69,7 +61,7 @@ static const float materials[] PROGMEM = {
   The spheres in the world
 ------------------------------------------------------------------------*/
 #define NUM_SPHERES 4
-static const float spheres[] PROGMEM = {
+static const float spheres[] = {
 // center  radius material
    5,15,8,   5,     0,
   -6,12,4,   3,     0,
@@ -122,7 +114,7 @@ uint8_t trace(const ray& r, float& distance, vec3& normal)
 
   // Does the ray go downwards?
   float d = -r.o.z/r.d.z;
-  if (d > 0.01) {
+  if (d > 0.01f) {
     // Yes, assume it hits the floor
     result = true;
     distance = d;
@@ -134,11 +126,11 @@ uint8_t trace(const ray& r, float& distance, vec3& normal)
   for (uint8_t i=0; i<NUM_SPHERES; ++i) {
     vec3 oc = r.o;
     // Read a sphere from progmem, calculate vector 'oc'
-    const float *n = spheres+(i*5);
-    oc.x -= pgm_read_float(n++);
-    oc.y -= pgm_read_float(n++);
-    oc.z -= pgm_read_float(n++);
-    d = pgm_read_float(n++);  // Radius
+    const float* n = spheres+(i*5);
+    oc.x -= *n++;
+    oc.y -= *n++;
+    oc.z -= *n++;
+    d = *n++;  // Radius
 
     // Ray-sphere intersection test
     // Math is here: http://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
@@ -156,7 +148,7 @@ uint8_t trace(const ray& r, float& distance, vec3& normal)
         // Yes, save results
         distance = d;
         normal = !(oc+r.d*d);
-        result = uint8_t(pgm_read_float(n));  // The sphere's material
+        result = static_cast<uint8_t>(*n);  // The sphere's material
       }
     }
   }
@@ -193,7 +185,7 @@ uint8_t randomByte()
 float randomFloat()
 {
   char r = char(randomByte());
-  return float(r)/256.0;
+  return float(r)/256.0f;
 }
 #define RF randomFloat()
 #define SH (RF*shadowRegion)
@@ -211,7 +203,7 @@ float sample(ray& r, vec3& color)
   if (hit == SKY) {
     // Generate a sky color if the ray goes upwards without hitting anything
     color = vec3(0.1f,0.0f,0.3f) + vec3(.7f,.2f,0.5f)*raise(1.0-r.d.z,2);
-    return 0.0;
+    return 0.0f;
   }
 
   // New ray origin
@@ -235,7 +227,7 @@ float sample(ray& r, vec3& color)
   // Did we hit the floor?
   if (hit == FLOOR) {
     // Yes, generate a floor color
-    d=(d*0.2)+0.1;   t=d*3.0;  // d=dark, t=light
+    d=(d*0.2f)+0.1f;   t=d*3.0f;  // d=dark, t=light
     color = vec3(t,t,t);       // Assume grey color
     t = 1.0f/5.0f;     // Floor tiles are 5m across
 //    int fx = int(ceil(r.o.x*t));
@@ -247,10 +239,10 @@ float sample(ray& r, vec3& color)
   }
 
   // No, we hit the scene, read material color from progmem
-  const float *mat = materials+(hit*4);
-  color.x = pgm_read_float(mat++);
-  color.y = pgm_read_float(mat++);
-  color.z = pgm_read_float(mat++);
+  const float* mat = materials+(hit*4);
+  color.x = *mat++;
+  color.y = *mat++;
+  color.z = *mat++;
  
   // Specular light in 't'
   t = d;
@@ -264,7 +256,7 @@ float sample(ray& r, vec3& color)
 
   // We need to trace a reflection ray...need to modify 'r' for the recursion
   r.d = half;
-  return pgm_read_float(mat);    // Reflectivity of this material
+  return *mat;    // Reflectivity of this material
 }
 
 /*------------------------------------------------------------------------
@@ -317,7 +309,7 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
       }
       
       // Output the pixel
-      acc = acc*(255.0/float(raysPerPixel));
+      acc = acc*(255.0f/float(raysPerPixel));
       int r = acc.x;    if (r>255) { r=255; }
       int g = acc.y;    if (g>255) { g=255; }
       int b = acc.z;    if (b>255) { b=255; }
