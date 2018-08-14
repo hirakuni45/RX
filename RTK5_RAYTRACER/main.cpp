@@ -24,8 +24,7 @@
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-// オーディオの D/A として使用
-//	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
+	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
@@ -81,6 +80,7 @@ namespace {
 
 	utils::command<256> cmd_;
 
+	bool run_ = false;
 
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
@@ -125,10 +125,15 @@ namespace {
 			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
 				utils::format("%s\n") % sdc_.get_current();
 				f = true;
+			} else if(cmd_.cmp_word(0, "render")) { // render
+				render_.clear(0x0000);
+				run_ = false;
+				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    dir [path]\n");
 				utils::format("    cd [path]\n");
 				utils::format("    pwd\n");
+				utils::format("    render\n");
 				f = true;
 			}
 			if(!f) {
@@ -261,23 +266,31 @@ int main(int argc, char** argv)
 	}
 
 	LED::DIR = 1;
+	SW2::DIR = 0;
 
 	uint8_t n = 0;
-	bool run = false;
+	bool sw = false;
 	while(1) {
 		glcdc_io_.sync_vpos();
+		bool v = !SW2::P();
+		if(!sw && v) {
+			render_.clear(0x0);
+			run_ = false;
+		}
+		sw = v;
 
 		sdc_.service(sdh_.service());
 
 		command_();
-		if(!run) {
+		if(!run_) {
 			uint32_t org = glcdc_io_.get_vpos();
 			doRaytrace();
 			uint32_t t = glcdc_io_.get_vpos() - org;
 			char tmp[32];
 			utils::sformat("%d.%d [sec]", tmp, sizeof(tmp)) % (t / 60) % ((t / 6) % 10);
 			render_.draw_text(320, 0, tmp);
-			run = true;
+			utils::format("%s\n") % tmp;
+			run_ = true;
 		}
 
 		++n;

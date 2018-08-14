@@ -321,7 +321,7 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
       int r = acc.x;    if (r>255) { r=255; }
       int g = acc.y;    if (g>255) { g=255; }
       int b = acc.z;    if (b>255) { b=255; }
-	draw_pixel(x, y, r, g, b);
+	  draw_pixel(x, y, r, g, b);
 ///      if(q==1) display.drawPixel(x, y, RGBTO565(r,g,b));
 ///      else display.fillRect(x, y, q, q, RGBTO565(r,g,b));
     }
@@ -335,4 +335,3 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
 ///    display.println(buf);
   }
 }
-
