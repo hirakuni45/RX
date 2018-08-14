@@ -80,7 +80,10 @@ namespace {
 
 	utils::command<256> cmd_;
 
-	bool run_ = false;
+	bool	run_ = false;
+
+	int		render_width_  = 320;
+	int		render_height_ = 240;
 
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
@@ -125,15 +128,28 @@ namespace {
 			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
 				utils::format("%s\n") % sdc_.get_current();
 				f = true;
-			} else if(cmd_.cmp_word(0, "render")) { // render
+			} else if(cmd_.cmp_word(0, "clear")) {
 				render_.clear(0x0000);
+				f = true;
+			} else if(cmd_.cmp_word(0, "render")) {
+				render_.clear(0x0000);
+				render_width_  = 320;
+				render_height_ = 240;
+				run_ = false;
+				f = true;
+			} else if(cmd_.cmp_word(0, "full")) {
+				render_.clear(0x0000);
+				render_width_  = 480;
+				render_height_ = 272;
 				run_ = false;
 				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    dir [path]\n");
 				utils::format("    cd [path]\n");
 				utils::format("    pwd\n");
-				utils::format("    render\n");
+				utils::format("    clear     clear screen\n");
+				utils::format("    render    renderring 320x240\n");
+				utils::format("    full      renderring 480x272\n");
 				f = true;
 			}
 			if(!f) {
@@ -275,6 +291,13 @@ int main(int argc, char** argv)
 		bool v = !SW2::P();
 		if(!sw && v) {
 			render_.clear(0x0);
+			if(render_width_ == 320) {
+				render_width_ = 480;
+				render_height_ = 272;
+			} else {
+				render_width_ = 320;
+				render_height_ = 240;
+			}
 			run_ = false;
 		}
 		sw = v;
@@ -284,11 +307,11 @@ int main(int argc, char** argv)
 		command_();
 		if(!run_) {
 			uint32_t org = glcdc_io_.get_vpos();
-			doRaytrace();
+			doRaytrace(4, render_width_, render_height_);
 			uint32_t t = glcdc_io_.get_vpos() - org;
 			char tmp[32];
 			utils::sformat("%d.%d [sec]", tmp, sizeof(tmp)) % (t / 60) % ((t / 6) % 10);
-			render_.draw_text(320, 0, tmp);
+			render_.draw_text(0, 0, tmp);
 			utils::format("%s\n") % tmp;
 			run_ = true;
 		}
