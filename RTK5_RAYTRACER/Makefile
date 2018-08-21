@@ -43,7 +43,6 @@ INC_SYS		=
 
 INC_APP		=	. ../
 
-# OPTIMIZE	=	-Os
 OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
