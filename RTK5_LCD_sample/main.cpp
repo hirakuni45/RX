@@ -16,6 +16,8 @@
 #include "common/sdc_man.hpp"
 #include "common/qspi_io.hpp"
 #include "graphics/font8x16.hpp"
+
+#define CASH_KFONT
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/jpeg_in.hpp"
@@ -75,6 +77,7 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y,
 		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
+//		device::glcdc_def::PIX_TYPE::CLUT8> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
 
 	// QSPI B グループ
@@ -88,7 +91,7 @@ namespace {
 	typedef graphics::kfont<16, 16, 64> KFONT;
 	KFONT		kfont_;
 
-	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
+	typedef graphics::render<uint16_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
 	RENDER		render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
 
 	// FT5206, SCI6 簡易 I2C 定義
@@ -295,7 +298,7 @@ int main(int argc, char** argv)
 	}
 
 	{  // DRW2D 初期化
-		drw2d_mgr_.list_info();
+//		drw2d_mgr_.list_info();
 		if(drw2d_mgr_.start(0x00000000)) {
 			utils:: format("Start DRW2D\n");
 		} else {
