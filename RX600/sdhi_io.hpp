@@ -62,7 +62,7 @@ namespace fatfs {
             CMD0   = 0x00000000,  // -            R1    -           ソフトウェア・リセット
 			CMD1   = 0x00000001,  // -            R1    -           初期化開始
 			CMD6   = 0x00000006,  // 
-			CMD8   = 0x00000008,  // *3           R7    -           SDC V2 専用、動作電圧確認
+			CMD8   = 0x00000408,  // *3           R7    -           SDC V2 専用、動作電圧確認
 			CMD9   = 0x00000009,  // -            R1    あり        CSD 読み出し
 			CMD10  = 0x0000000A,  // -            R1    あり        CID 読み出し
 			CMD12  = 0x0000000C,  // -            R1b   -           リード動作停止
@@ -73,7 +73,7 @@ namespace fatfs {
 			CMD24  = 0x00000018,  // Address(32)  R1    あり        シングル・ブロック・ライト
 			CMD25  = 0x00000019,  // Address(32)  R1    あり        マルチ・ブロック・ライト
 			CMD55  = 0x00000037,  // -            R1    -           アプリケーション特化コマンド
-			CMD58  = 0x00000039,
+			CMD58  = 0x0000003A,  // -            R3    -           OCR レジスタ取得    
 			ACMD23 = 0x00000057,  // Block(23)    R1    -           SDC 専用次のマルチブロックブロック数設定
 			ACMD41 = 0x00000069,  // *2           R1    -           SDC 専用、初期化開始
 		};
@@ -116,23 +116,32 @@ namespace fatfs {
 		}
 
 
-		state send_cmd_(command cmd, uint32_t arg)
+		state send_cmd_(command cmd, uint32_t arg, bool check_err = true)
 		{
 			set_clk_();
 			SDHI::SDARG = arg;
 			while(SDHI::SDSTS2.CBSY() != 0) ;
 			SDHI::SDCMD = static_cast<uint32_t>(cmd);
+			state st = state::no_error;
 			while(SDHI::SDSTS1.RSPEND() == 0) {
-				auto st = SDHI::SDSTS2();
-				if(st & SDHI::SDSTS2.CMDE.b()) {
-					return state::cmd_error;
-				}
-				if(st & SDHI::SDSTS2.RSPTO.b()) {
-					return state::timeout;
+				if(check_err) {
+					auto sts = SDHI::SDSTS2();
+					if(sts & SDHI::SDSTS2.CMDE.b()) {
+						SDHI::SDSTS2.CMDE = 0;
+						utils::format("CMDE...\n");
+						st = state::cmd_error;
+						break;
+					}
+					if(sts & SDHI::SDSTS2.RSPTO.b()) {
+						SDHI::SDSTS2.RSPTO = 0;
+						utils::format("RSPTO...\n");
+						st = state::timeout;
+						break;
+					}
 				}
 			}
 			SDHI::SDSTS1 = 0x0000FFFE;
-			return state::no_error;
+			return st;
 		}
 
 
@@ -165,8 +174,13 @@ namespace fatfs {
 				device::port_map::turn(SDHI::get_peripheral(), true, PSEL);
 
 				while(SDHI::SDSTS2.CBSY() != 0) ;
-				SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.WIDTH.b(1)
+				SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.WIDTH.b()
 					| SDHI::SDOPT.TOP.b(12);
+
+#ifdef LITTLE_ENDIAN
+				// データ読み出し、書き込み時のエンディアン変換を有効にする
+//				SDHI::SDSWAP = SDHI::SDSWAP.BWSWP.b(1) | SDHI::SDSWAP.BRSWP.b(1);
+#endif
 
 				fast_ = false;
 				start_ = true;
@@ -240,27 +254,14 @@ namespace fatfs {
 			if(drv) return RES_NOTRDY;
 
 			utils::format("Start: disk_initialize\n");
+#if 0
 			utils::format("  Version IP1: 0x%02X, IP2: 0x%1X, CLKRAT: %d, CPRM: %d\n")
 				% static_cast<uint16_t>(SDHI::SDVER.IP1())
 				% static_cast<uint16_t>(SDHI::SDVER.IP2())
 				% static_cast<uint16_t>(SDHI::SDVER.CLKRAT())
 				% static_cast<uint16_t>(SDHI::SDVER.CPRM());
 			utils::format("  SDSIZE: %d\n") % SDHI::SDSIZE();
-
-#if 0
-			// クロック・ポートを強制制御してダミークロックを７４個入れる
-			for(uint8_t i = 0; i < 80; ++i) {
-				device::port_map::turn_sdhi_clk(SDHI::get_peripheral(), false, 0, PSEL);
-				utils::delay::micro_second(1);
-				device::port_map::turn_sdhi_clk(SDHI::get_peripheral(), false, 1, PSEL);
-				utils::delay::micro_second(1);
-			}
-			// ポートを SDHI 配下に戻す
-			device::port_map::turn_sdhi_clk(SDHI::get_peripheral(), true, 0, PSEL);
-
-			SDHI::SDCLKCR.CLKCTRLEN = 1;
-			set_clk_();
-#else
+#endif
 			// ダミークロックを７４個以上入れる
 			SDHI::SDCLKCR.CLKCTRLEN = 1;
 			set_clk_();
@@ -270,132 +271,66 @@ namespace fatfs {
 				while(device::port_map::probe_sdhi_clock(PSEL) == 1) ;
 			}
 			SDHI::SDCLKCR.CLKCTRLEN = 1;
-#endif
 
-#ifdef LITTLE_ENDIAN
-			// データ読み出し、書き込み時のエンディアン変換を有効にする
-			SDHI::SDSWAP = SDHI::SDSWAP.BWSWP.b(1) | SDHI::SDSWAP.BRSWP.b(1);
-#endif
 			BYTE ty = 0;
-			SDHI::SDIMSK1 = 0x0000FFFE;
-			SDHI::SDIMSK2 = 0x00007F80;
 			if(send_cmd_(command::CMD0, 0) != state::no_error) {  // Enter Idle state
 				utils::format("Error CMD0:\n");
-				list_error_state1("  ");
 				stat_ = STA_NOINIT;
 				return stat_;
 			}
+			utils::format("CMD0:\n");
 
-			SDHI::SDIMSK1 = 0x0000FFFE;
-			SDHI::SDIMSK2 = 0x00007F80;
 			if(send_cmd_(command::CMD8, 0x01AA) != state::no_error) {  // SDv2?
 				// Reject for SDSC/MMC
 				utils::format("Reject CMD8:\n");
-				list_error_state1("  ");
 				stat_ = STA_NOINIT;
 				return stat_;
 			}
 			uint32_t val = SDHI::SDRSP10();
+			utils::format("CMD8: %08X\n") % val;
+
 			if((val & 0xFFF) != 0x01AA) {
 				utils::format("Card fail...\n");
 				return STA_NOINIT;
-			} else {  // The card can work at vdd range of 2.7-3.6V
-				utils::format("CMD8: (SDCv2) %08X\n") % val;
-
-				uint16_t cnt = 0;
-				uint16_t limit = 1000;
-				while(cnt < limit) {
-					SDHI::SDIMSK1 = 0x0000FFFE;
-					SDHI::SDIMSK2 = 0x00007F80;
-					auto st = send_cmd_(command::ACMD41, 1UL << 30);
-					if(st == state::no_error) {
-						uint32_t val = SDHI::SDRSP10();
-						utils::format("ACMD41 res(%d): %08X\n") % cnt % val;
-						break;
-					}
-					utils::delay::micro_second(1000);
-					++cnt;
-				}
-//				utils::format("ACMD41: count = %d\n") % cnt;
-				// Check CCS bit in the OCR
-				SDHI::SDIMSK1 = 0x0000FFFE;
-				SDHI::SDIMSK2 = 0x00007F80;
-				if(cnt < limit && send_cmd_(command::CMD58, 0) == state::no_error) {
-					uint32_t val = SDHI::SDRSP10();
-					utils::format("CMD58: %08X\n") % val;
-					ty = (val & 0x40000000) ? CT_SD2 | CT_BLOCK : CT_SD2;  // SDCv2
-				} else {
-					utils::format("Error CMD58:\n");
-					return STA_NOINIT;
-				}
-
-				SDHI::SDIMSK1 = 0x0000FFFE;
-				SDHI::SDIMSK2 = 0x00007F80;
-				if(send_cmd_(command::CMD9, 0) != state::no_error) {
-					utils::format("Error CMD9:\n");
-					return STA_NOINIT;
-				}
-				{
-					uint32_t val = SDHI::SDRSP10();
-					utils::format("CMD9: %08X\n") % val;
-					val = SDHI::SDRSP54();
-					utils::format("CMD9: %08X\n") % val;
-				}
-
+			}
 #if 0
-				SDHI::SDIMSK1 = 0x0000FFFE;
-				SDHI::SDIMSK2 = 0x00007F80;
-				if(send_cmd_(command::CMD16, 512) != state::no_error) {
-					utils::format("Error CMD16:\n");
+			uint32_t loop = 0;
+			while(1) {
+				if(send_cmd_(command::CMD58, 0, false) == state::no_error) {
+					break;
+				}
+				++loop;
+				utils::delay::milli_second(10);
+				if(loop >= 100) {
+					utils::format("CMD58: fail...\n");
 					return STA_NOINIT;
 				}
+			}
+			uint32_t val = SDHI::SDRSP10();
+			utils::format("CMD58: %08X\n") % val;
 #endif
-				SDHI::SDIMSK1 = 0x0000FFFE;
-				SDHI::SDIMSK2 = 0x00007F80;
+			uint16_t cnt = 0;
+			while(cnt < 1000) {
 				if(send_cmd_(command::CMD55, 0) != state::no_error) {
-					utils::format("Error CMD55:\n");
+					utils::format("CMD55: fail...\n");
 					return STA_NOINIT;
 				}
+				utils::format("CMD55: (%d)\n") % cnt;
+				auto st = send_cmd_(command::ACMD41, 1UL << 30);
+				uint32_t res = SDHI::SDRSP10();
+				utils::format("ACMD41: (%d), %08X\n") % cnt % res;
+				if(st == state::no_error && (res & 0xff000000) == 0) {
+					break;
+				}
+				utils::delay::micro_second(1000);
+				++cnt;
 			}
+//			utils::format("ACMD41: count = %d\n") % cnt;
+			// Check CCS bit in the OCR
 
+//	ty = CT_SD2 | CT_BLOCK;
+	ty = CT_SD2;
 
-#if 0
-			} else {  // SDv1 or MMCv3
-				utils::format("SDv1 / MMCv3\n");
-				SDHI::SDIMSK1 = 0x0000FFFE;
-				SDHI::SDIMSK2 = 0x00007F80;
-				if(send_cmd_(command::ACMD41, 0) != state::no_error) {
-					utils::format("Error ACMD41:\n");
-					list_error_state1("  ");
-					stat_ = STA_NOINIT;
-					return stat_;
-				}
-//				utils::format("ACMD41 OK.\n");
-
-				command cmd;
-				uint32_t val = SDHI::SDRSP10();
-				if(val == 0x00ff8000) {
-					ty = CT_SD1;
-					cmd = command::ACMD41;	/* SDv1 */
-				} else {
-					ty = CT_MMC;
-					cmd = command::CMD1;	/* MMCv3 */
-				}
-				uint16_t tmr;
-				for(tmr = 1000; tmr; tmr--) {			/* Wait for leaving idle state */
-					SDHI::SDIMSK1 = 0x0000FFFE;
-					SDHI::SDIMSK2 = 0x00007F80;
-					if(send_cmd_(cmd, 0) == state::no_error) break;
-					utils::delay::micro_second(1000);
-				}
-				// Set R/W block length to 512
-				SDHI::SDIMSK1 = 0x0000FFFE;
-				SDHI::SDIMSK2 = 0x00007F80;
-				if(!tmr || send_cmd_(command::CMD16, 512) != state::no_error) {
-					ty = 0;
-				}
-			}
-#endif
 			card_type_ = ty;
 			stat_ = ty ? 0 : STA_NOINIT;
 
@@ -430,16 +365,14 @@ namespace fatfs {
 
 			set_clk_();
 			SDHI::SDSIZE   = 512;
-			SDHI::SDIMSK1  = 0x0000FFFE;
-			SDHI::SDIMSK2  = 0x00007F80;
+//			SDHI::SDIMSK1  = 0x0000FFFE;
+//			SDHI::SDIMSK2  = 0x00007F80;
 			SDHI::SDSTOP   = 0x00000100;  // for multi block
 			SDHI::SDBLKCNT = count;  // for multi block read
 			SDHI::SDARG    = sector;
 			command cmd = count > 1 ? command::CMD18 : command::CMD17;
-			SDHI::SDCMD = static_cast<uint32_t>(cmd);
-
 			const char* cmdstr = cmd == command::CMD17 ? "CMD17" : "CMD18";
-
+			SDHI::SDCMD = static_cast<uint32_t>(cmd);
 			while(SDHI::SDSTS1.RSPEND() == 0) {
 				if(SDHI::SDSTS2.CRCE()) {
 					utils::format("%s CRC Error (CRCE)\n") % cmdstr;
@@ -456,47 +389,42 @@ namespace fatfs {
 			}
 			SDHI::SDSTS1 = 0x0000FFFE;
 			auto sp10 = SDHI::SDRSP10();
-			utils::format("%s: Response OK\n") % cmdstr;
-			SDHI::SDIMSK1 = 0x0000FFFB;
-			SDHI::SDIMSK2 = 0x00007E80;
-			do {
-				uint32_t loop = 0;
-				while(SDHI::SDSTS2.BRE() == 0) {
-					if(loop >= 100000) {
-						utils::format("%s time out\n") % cmdstr;
-						return RES_ERROR;
-					}
-					auto st = SDHI::SDSTS2();
-					if(st & SDHI::SDSTS2.DTO.b()) {
-						utils::format("%s DTO error\n") % cmdstr;
-						return RES_ERROR;
-					}
-					if(st & SDHI::SDSTS2.CRCE.b()) {
-						utils::format("%s CRC error\n") % cmdstr;
-						return RES_ERROR;
-					}
-					++loop;
-					utils::delay::micro_second(10);
+			utils::format("%s: Response: %08X\n") % cmdstr % sp10;
+			uint32_t loop = 0;
+			while(SDHI::SDSTS2.BRE() == 0) {				
+				if(loop >= 1000000) {
+					utils::format("%s time out\n") % cmdstr;
+					return RES_ERROR;
 				}
-
-				SDHI::SDSTS2 = 0x0000FEFF;
-				utils::format("%s BRE: OK\n") % cmdstr;
-
-				if((reinterpret_cast<uint32_t>(buff) & 0x3) == 0) {
-					uint32_t* p = static_cast<uint32_t*>(buff);
-					for(uint32_t n = 0; n < 128; ++n) {
-						*p++ = SDHI::SDBUFR(); 
-					}
-				} else {
-					uint8_t* p = static_cast<uint8_t*>(buff);
-					for(uint32_t n = 0; n < 128; ++n) {
-						uint32_t tmp = SDHI::SDBUFR();
-						std::memcpy(p, &tmp, 4);
-						p += 4;
-					}
+				auto st = SDHI::SDSTS2();
+				if(st & SDHI::SDSTS2.DTO.b()) {
+					utils::format("%s DTO error\n") % cmdstr;
+					return RES_ERROR;
 				}
-				--count;
-			} while(count > 0) ;
+				if(st & SDHI::SDSTS2.CRCE.b()) {
+					utils::format("%s CRC error\n") % cmdstr;
+					return RES_ERROR;
+				}
+				++loop;
+				utils::delay::micro_second(100);
+			}
+
+			SDHI::SDSTS2 = 0x0000FEFF;
+			utils::format("%s BRE: OK\n") % cmdstr;
+
+			if((reinterpret_cast<uint32_t>(buff) & 0x3) == 0) {
+				uint32_t* p = static_cast<uint32_t*>(buff);
+				for(uint32_t n = 0; n < (512 / 4); ++n) {
+					*p++ = SDHI::SDBUFR(); 
+				}
+			} else {
+				uint8_t* p = static_cast<uint8_t*>(buff);
+				for(uint32_t n = 0; n < 128; ++n) {
+					uint32_t tmp = SDHI::SDBUFR();
+					std::memcpy(p, &tmp, 4);
+					p += 4;
+				}
+			}
 
 			utils::format("Data trans: OK\n");
 
