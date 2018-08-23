@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include "graphics/color.hpp"
+#include "common/intmath.hpp"
 
 namespace graphics {
 
@@ -65,6 +66,8 @@ namespace graphics {
 
 		static const int16_t line_offset = (((width * sizeof(T)) + 63) & 0x7fc0) / sizeof(T);
 
+		static const int16_t round_radius = 8;
+
 	private:
 		T*			fb_;
 
@@ -79,6 +82,8 @@ namespace graphics {
 		uint32_t	stipple_;
 		uint32_t	stipple_mask_;
 
+		int8_t		round_[round_radius];
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -88,7 +93,11 @@ namespace graphics {
 		render(T* org, KFONT& kf) noexcept : fb_(org), kfont_(kf),
 			fc_(COLOR::White), bc_(COLOR::Black),
 			code_(0), cnt_(0), stipple_(-1), stipple_mask_(1)
-		{ }
+		{
+			for(int16_t r = 0; r < round_radius; ++r) {
+				round_[r] = intmath::sqrt16(r * r).val;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -172,6 +181,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		void line_h(int16_t y, int16_t x, int16_t w, T c) noexcept
 		{
+			if(w <= 0) return;
 			if(static_cast<uint16_t>(y) >= HEIGHT) return;
 			if(x < 0) {
 				w += x;
@@ -200,6 +210,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		void line_v(int16_t x, int16_t y, int16_t h, T c) noexcept
 		{
+			if(h <= 0) return;
 			if(static_cast<uint16_t>(x) >= WIDTH) return;
 			if(y < 0) {
 				h += y;
@@ -228,9 +239,35 @@ namespace graphics {
 			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void fill(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept {
+		void fill(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept
+		{
+			if(w <= 0 || h <= 0) return;
+
 			for(int16_t yy = y; yy < (y + h); ++yy) {
 				line_h(yy, x, w, c);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	角がラウンドした四角を塗りつぶす
+			@param[in]	x	開始位置 X
+			@param[in]	y	開始位置 Y
+			@param[in]	w	横幅 
+			@param[in]	h	高さ
+			@param[in]	c	カラー
+		*/
+		//-----------------------------------------------------------------//
+		void fill_r(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept {
+			for(int16_t yy = y; yy < (y + h); ++yy) {
+				int16_t o = 0;
+				if(yy < round_radius) {
+					o = round_radius - round_[yy];
+///				} else if(yy >= (y + h - round_radius)) {
+///					o = round_radius - round_[round_radius - yy - (y + h) - 1];
+				}
+				line_h(yy, x + o, w - o * 2, c);
 			}
 		}
 
@@ -321,15 +358,12 @@ namespace graphics {
 			@param[in]	c	描画色
 		*/
 		//-----------------------------------------------------------------//
-		void frame(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept {
-			for(int16_t i = 0; i < w; ++i) {
-				plot(x + i, y, c);
-				plot(x + i, y + h - 1, c);
-			}
-			for(int16_t i = 0; i < h; ++i) {
-				plot(x, y + i, c);
-				plot(x + w - 1, y + i, c);
-			}
+		void frame(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept
+		{
+			line_h(y, x, w, c);
+			line_h(y + h - 1, x, w, c);
+			line_v(x, y + 1, h - 2, c);
+			line_v(x + w - 1, y + 1, h - 2, c);
 		}
 
 
@@ -574,6 +608,28 @@ namespace graphics {
 			fill(x + 1, y + 1, w - 2, h - 2, COLOR::Black);
 			auto l = get_text_length(text);
 			x += (w - l) / 2;
+			y += (h - font_height) / 2;
+			draw_text(x, y, text);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	標準ボタンの描画 @n
+					・背景色は「back_color」が使われる。@n
+					・フォントの描画色は「fore_color」が利用
+			@param[in]	x		X 位置
+			@param[in]	y		Y 位置
+			@param[in]	w		横幅
+			@param[in]	h		高さ
+			@param[in]	text	テキスト
+		*/
+		//-----------------------------------------------------------------//
+		void draw_button(int16_t x, int16_t y, int16_t w, int16_t h, const char* text) noexcept
+		{
+			auto len = get_text_length(text);
+			fill(x, y, w, h, bc_);
+			x += (w - len) / 2;
 			y += (h - font_height) / 2;
 			draw_text(x, y, text);
 		}
