@@ -25,8 +25,6 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c
 
-# r_lcd/r_glcdc_rx_pinset.c
-
 PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp
 
@@ -38,7 +36,7 @@ USER_DEFS	=	SIG_RX65N F_ICLK=120000000 F_FCLK=60000000 F_PCLKA=120000000 F_PCLKB
 
 MCU_TARGET	=	
 
-INC_SYS		=
+INC_SYS		=	/mingw64/include
 
 INC_APP		=	. ../
 

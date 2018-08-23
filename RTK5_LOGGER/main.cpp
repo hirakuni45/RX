@@ -17,6 +17,8 @@
 #include "common/qspi_io.hpp"
 #include "common/nmea_dec.hpp"
 
+#include "scenes.hpp"
+
 // #define SDHI_IF
 
 namespace {
@@ -67,24 +69,14 @@ namespace {
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
 
-	// GLCDC
-	static const int16_t LCD_X = 480;
-	static const int16_t LCD_Y = 272;
-	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
-	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y,
-		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
-	GLCDC_IO	glcdc_io_;
-
-	// DRW2D
-	typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_;
-
 	// QSPI B グループ
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
 
 	utils::command<256> cmd_;
+
+
+	app::scenes	scenes_;
 
 
 	bool check_mount_() {
@@ -145,6 +137,19 @@ namespace {
 		}
 	}
 }
+
+
+void change_scene(app::scenes_id id)
+{
+	scenes_.change(id);
+}
+
+
+app::scenes_base& at_scenes_base()
+{
+	return scenes_.at_base();
+}
+
 
 extern "C" {
 
@@ -237,7 +242,7 @@ int main(int argc, char** argv)
 		sdc_.start();
 	}
 
-	utils::format("\rRTK5RX65N Start for LCD sample\n");
+	utils::format("\rRTK5RX65N Start for Data Logger\n");
 
 	cmd_.set_prompt("# ");
 
@@ -247,44 +252,21 @@ int main(int argc, char** argv)
 		}
 	}
 
-	{  // GLCDC の初期化
-		LCD_DISP::DIR  = 1;
-		LCD_LIGHT::DIR = 1;
-		LCD_DISP::P  = 0;  // DISP Disable
-		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-		if(glcdc_io_.start()) {
-			utils::format("Start GLCDC\n");
-			LCD_DISP::P  = 1;  // DISP Enable
-			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-			if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
-				utils::format("GLCDC ctrl fail...\n");
-			}
-		} else {
-			utils::format("GLCDC Fail\n");
-		}
-	}
-
-	{  // DRW2D 初期化
-		auto ver = drw2d_mgr_.get_version();
-		utils::format("DRW2D Version: %04X\n") % ver;
-
-		if(drw2d_mgr_.start(0x00000000)) {
-			utils:: format("Start DRW2D\n");
-		} else {
-			utils:: format("DRW2D Fail\n");
-		}
-	}
+	// シーン初期化
+	scenes_.at_base().init();
 
 
 	LED::DIR = 1;
 
 	uint8_t n = 0;
 	while(1) {
-		glcdc_io_.sync_vpos();
+		scenes_.at_base().at_glcdc_io().sync_vpos();
 
 		nmea_.service();
 
 		sdc_.service(sdh_.service());
+
+		scenes_.service();
 
 		command_();
 
