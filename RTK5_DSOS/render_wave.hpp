@@ -10,6 +10,7 @@
 //=====================================================================//
 #include <cstdint>
 #include "common/enum_utils.hpp"
+#include "common/intmath.hpp"
 
 namespace utils {
 
@@ -235,7 +236,6 @@ namespace utils {
 			}
 
 			if(num == 1) {
-				touch_down_ = true;
 				if(p.event == TOUCH::EVENT::DOWN) {
 					time_org_ = time_pos_;
 					ch0_vorg_ = ch0_vpos_;
@@ -245,7 +245,9 @@ namespace utils {
 				} else if(p.event == TOUCH::EVENT::CONTACT) {
 					int16_t dx = p.x - p.org_x;
 					int16_t dy = p.y - p.org_y;
-					if(measere_ == MEASERE::TIME) {
+					if(CH1_MOVE_AREA <= p.x && p.x < RENDER::width) {
+						menu_ = static_cast<MENU>((p.y - 16) / MENU_SIZE + 1);
+					} else if(measere_ == MEASERE::TIME) {
 						if(TIME_BEGIN_POS <= p.y && p.y < TIME_LIMIT_POS
 							&& VOLT_BEGIN_POS <= p.x && p.x < VOLT_LIMIT_POS) {
 							mes_time_begin_ = mes_time_org_ + dx;
@@ -262,21 +264,31 @@ namespace utils {
 					} else {
 						if(0 <= p.y && p.y < TIME_SCROLL_AREA) {
 							time_pos_ = time_org_ + dx;
+							touch_down_ = true;
 						} else if(0 <= p.x && p.x < CH0_MOVE_AREA) {
 							ch0_vpos_ = ch0_vorg_ + dy;
+							touch_down_ = true;
 						} else if(CH0_MOVE_AREA <= p.x && p.x < CH1_MOVE_AREA) {
 							ch1_vpos_ = ch1_vorg_ + dy;
+							touch_down_ = true;
 						}
-					}
-					if(CH1_MOVE_AREA <= p.x && p.x < RENDER::width) {
-						menu_ = static_cast<MENU>((p.y - 16) / MENU_SIZE + 1);
 					}
 				}
 			} else if(num == 2) {
-				touch_down_ = true;
-return false;
-			} else {
-return false;
+				const auto& p2 = touch_.get_touch_pos(1);
+				if(measere_ == MEASERE::TIME) {
+					auto dx = p.x - p2.x;
+					auto dy = p.y - p2.y;
+					auto len = intmath::sqrt16(dx * dx + dy * dy);
+				} else if(measere_ == MEASERE::VOLT) {
+
+				} else {
+
+				}
+				return false;
+			} else if(num == 3) {
+
+				return false;
 			}
 
 			return true;
@@ -305,17 +317,16 @@ return false;
 			}
 
 			// メニュー・ボタンの描画
-			for(int16_t i = 0; i < 6; ++i) {
-				uint16_t c = RENDER::COLOR::Olive;
-				if(static_cast<MENU>(i + 1) == menu_) c = RENDER::COLOR::Yellow;
-				render_.fill(441, 16 + GRID * i + 1, GRID - 1, GRID - 1, c);
+			{
+				static const char* menu[] = {
+					"CH0", "CH1", "Trg", "Smp", "Mes", "Opt" };
+				for(int16_t i = 0; i < 6; ++i) {
+					uint16_t c = RENDER::COLOR::Olive;
+					if(static_cast<MENU>(i + 1) == menu_) c = RENDER::COLOR::Yellow;
+					render_.set_back_color(c);
+					render_.draw_button(441, 16 + GRID * i + 1, GRID - 1, GRID - 1, menu[i]);
+				}
 			}
-			render_.draw_text(441 + 7, 16 + GRID * 0 + 1 + 11, "CH0");
-			render_.draw_text(441 + 7, 16 + GRID * 1 + 1 + 11, "CH1");
-			render_.draw_text(441 + 7, 16 + GRID * 2 + 1 + 11, "Trg");
-			render_.draw_text(441 + 7, 16 + GRID * 3 + 1 + 11, "Smp");
-			render_.draw_text(441 + 7, 16 + GRID * 4 + 1 + 11, "Mes");
-			render_.draw_text(441 + 7, 16 + GRID * 5 + 1 + 11, "Opt");
 
 			for(int16_t x = 0; x < (440 - 1); ++x) {
 				int16_t p0 = time_pos_ + x;
