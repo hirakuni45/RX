@@ -260,7 +260,7 @@ int main(int argc, char** argv)
 
 	uint8_t n = 0;
 	while(1) {
-		scenes_.at_base().at_glcdc_io().sync_vpos();
+		scenes_.at_base().sync();
 
 		nmea_.service();
 

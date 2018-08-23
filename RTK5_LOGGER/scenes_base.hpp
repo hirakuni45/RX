@@ -17,6 +17,14 @@
 #include "graphics/bmp_in.hpp"
 #include "chip/FT5206.hpp"
 
+// #define SOFT_I2C
+
+#ifdef SOFT_I2C
+#include "common/si2c_io.hpp"
+#else
+#include "common/sci_i2c_io.hpp"
+#endif
+
 namespace app {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -62,13 +70,30 @@ namespace app {
 
 		RENDER		render_;
 
+		// FT5206, SCI6 簡易 I2C 定義
+		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+#ifdef SOFT_I2C
+		typedef device::PORT<device::PORT0, device::bitpos::B0> FT5206_SDA;
+		typedef device::PORT<device::PORT0, device::bitpos::B1> FT5206_SCL;
+		typedef device::si2c_io<FT5206_SDA, FT5206_SCL> FT5206_I2C;
+#else
+		typedef utils::fixed_fifo<uint8_t, 64> RECV6_BUFF;
+		typedef utils::fixed_fifo<uint8_t, 64> SEND6_BUFF;
+		typedef device::sci_i2c_io<device::SCI6, RECV6_BUFF, SEND6_BUFF,
+				device::port_map::option::FIRST_I2C> FT5206_I2C;
+#endif
+		FT5206_I2C	ft5206_i2c_;
+		typedef chip::FT5206<FT5206_I2C> FT5206;
+		FT5206		ft5206_;
+
 	public:
 		//-------------------------------------------------------------//
 		/*!
 			@brief	コンストラクタ
 		*/
 		//-------------------------------------------------------------//
-		scenes_base() : render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_) { }
+		scenes_base() : render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_),
+			ft5206_(ft5206_i2c_) { }
 
 
 		//-------------------------------------------------------------//
@@ -105,6 +130,28 @@ namespace app {
 					utils:: format("DRW2D Fail\n");
 				}
 			}
+			{  // FT5206 touch screen controller
+				FT5206::reset<FT5206_RESET>();
+				uint8_t intr_lvl = 1;
+				if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
+					utils::format("FT5206 I2C Start Fail...\n");
+				}
+				if(!ft5206_.start()) {
+					utils::format("FT5206 Start Fail...\n");
+				}
+			}
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	同期と、タッチパネルデータ更新
+		*/
+		//-------------------------------------------------------------//
+		void sync() noexcept
+		{
+			glcdc_io_.sync_vpos();
+			ft5206_.update();
 		}
 
 
