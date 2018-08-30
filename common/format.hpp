@@ -445,7 +445,7 @@ namespace utils {
 			uint8_t n = 0;
 			do {
 				--p;
-				*p = (v & 3) + '0';
+				*p = (v & 0b111) + '0';
 				v >>= 3;
 				++n;
 			} while(v != 0) ;
