@@ -26,7 +26,8 @@ CSOURCES	=	common/init.c \
 				common/time.c
 
 PSOURCES	=	main.cpp \
-				RX600/icu_mgr.cpp
+				RX600/icu_mgr.cpp \
+				graphics/font8x16.cpp
 
 USER_LIBS	=
 
