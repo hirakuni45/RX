@@ -13,6 +13,9 @@
 #include "scenes_base.hpp"
 #include "title.hpp"
 #include "root_menu.hpp"
+#include "laptime.hpp"
+#include "recall.hpp"
+#include "setup.hpp"
 
 namespace app {
 
@@ -23,12 +26,16 @@ namespace app {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class scenes {
 
-		typedef utils::scene<title, root_menu> SCENE;
+		typedef utils::scene<title, root_menu, laptime, recall, setup> SCENE;
 
 		SCENE		scene_;
 
 		title		title_;
 		root_menu	root_menu_;
+
+		laptime		laptime_;
+		recall		recall_;
+		setup		setup_;
 
 		scenes_base	scenes_base_;
 
@@ -65,6 +72,17 @@ namespace app {
 			case scenes_id::root_menu:
 				scene_.change(root_menu_);
 				break;
+
+			case scenes_id::laptime:
+				scene_.change(laptime_);
+				break;
+			case scenes_id::recall:
+				scene_.change(recall_);
+				break;
+			case scenes_id::setup:
+				scene_.change(setup_);
+				break;
+
 			default:
 				break;
 			}

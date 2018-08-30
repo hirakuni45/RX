@@ -10,11 +10,13 @@
 //=====================================================================//
 #include "graphics/font8x16.hpp"
 
+// 漢字フォントをキャッシュする場合
 #define CASH_KFONT
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/jpeg_in.hpp"
 #include "graphics/bmp_in.hpp"
+#include "graphics/menu.hpp"
 #include "chip/FT5206.hpp"
 
 // #define SOFT_I2C
@@ -35,6 +37,10 @@ namespace app {
 	enum class scenes_id {
 		title,
 		root_menu,
+
+		laptime,
+		recall,
+		setup
 	};
 
 
@@ -58,6 +64,9 @@ namespace app {
 		typedef graphics::kfont<16, 16, 64> KFONT;
 
 		typedef graphics::render<uint16_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
+
+		// 最大８個のメニュー
+		typedef graphics::menu<RENDER, 8> MENU;
 
 	private:
 		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
@@ -86,14 +95,16 @@ namespace app {
 		typedef chip::FT5206<FT5206_I2C> FT5206;
 		FT5206		ft5206_;
 
+		MENU		menu_;
+
 	public:
 		//-------------------------------------------------------------//
 		/*!
 			@brief	コンストラクタ
 		*/
 		//-------------------------------------------------------------//
-		scenes_base() : render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_),
-			ft5206_(ft5206_i2c_) { }
+		scenes_base() noexcept : render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_),
+			ft5206_(ft5206_i2c_), menu_(render_) { }
 
 
 		//-------------------------------------------------------------//
@@ -171,6 +182,15 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		RENDER& at_render() noexcept { return render_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	MENU の参照
+			@return MENU
+		*/
+		//-------------------------------------------------------------//
+		MENU& at_menu() noexcept { return menu_; }
 	};
 }
 
