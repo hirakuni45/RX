@@ -43,6 +43,8 @@ namespace app {
 			at_scenes_base().at_render().clear(0);
 			at_scenes_base().at_render().line(0, 0, 480-1, 272-1,
 				scenes_base::RENDER::COLOR::White);
+			at_scenes_base().at_render().line(0, 480 - 1, 0, 272-1,
+				scenes_base::RENDER::COLOR::White);
 		}
 
 

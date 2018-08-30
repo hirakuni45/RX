@@ -36,15 +36,12 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init()
 		{
-#if 0
-			auto& core = at_core();
-
-			core.menu_.set_space(4);
-			core.menu_.add(core_t::MENU::type::PROP, "Laptimer");
-			core.menu_.add(core_t::MENU::type::PROP, "Logging");
-			core.menu_.add(core_t::MENU::type::PROP, "Recall");
-			core.menu_.add(core_t::MENU::type::PROP, "Setup");
-#endif
+			at_scenes_base().at_menu().clear();
+			at_scenes_base().at_menu().set_gap(20);
+			at_scenes_base().at_menu().set_space(12, 8);
+			at_scenes_base().at_menu().add(scenes_base::MENU::type::TEXT, "Lap Time");
+			at_scenes_base().at_menu().add(scenes_base::MENU::type::TEXT, "Recall");
+			at_scenes_base().at_menu().add(scenes_base::MENU::type::TEXT, "Setup");
 		}
 
 
@@ -56,6 +53,8 @@ namespace app {
 		void service()
 		{
 			at_scenes_base().at_render().clear(0);
+
+			at_scenes_base().at_menu().render();
 
 #if 0
 			auto& core = at_core();
