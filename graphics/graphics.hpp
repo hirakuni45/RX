@@ -53,6 +53,8 @@ namespace graphics {
 	template <typename T, uint16_t WIDTH, uint16_t HEIGHT, class AFONT = afont_null, class KFONT = kfont_null>
 	class render {
 	public:
+		typedef T value_type;
+
 		typedef base_color<T> COLOR;
 
 		static const int16_t width  = static_cast<int16_t>(WIDTH);
@@ -95,7 +97,7 @@ namespace graphics {
 			code_(0), cnt_(0), stipple_(-1), stipple_mask_(1)
 		{
 			for(int16_t r = 0; r < round_radius; ++r) {
-				round_[r] = intmath::sqrt16(r * r).val;
+				round_[r] = intmath::sqrt16((round_radius * round_radius) - (r * r)).val;
 			}
 		}
 
@@ -111,11 +113,29 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	フォア・カラーの取得
+			@return フォア・カラー
+		*/
+		//-----------------------------------------------------------------//
+		T get_fore_color() const noexcept { return fc_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	フォア・カラーの設定
 			@param[in]	c	フォア・カラー
 		*/
 		//-----------------------------------------------------------------//
 		void set_fore_color(T c) noexcept { fc_ = c; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	バック・カラーの取得
+			@return バック・カラー
+		*/
+		//-----------------------------------------------------------------//
+		T get_back_color() const noexcept { return bc_; }
 
 
 		//-----------------------------------------------------------------//
@@ -260,14 +280,16 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		void fill_r(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept {
-			for(int16_t yy = y; yy < (y + h); ++yy) {
+			for(int16_t yy = 0; yy < h; ++yy) {
 				int16_t o = 0;
-				if(yy < round_radius) {
-					o = round_radius - round_[yy];
-///				} else if(yy >= (y + h - round_radius)) {
-///					o = round_radius - round_[round_radius - yy - (y + h) - 1];
+				if(h >= (round_radius * 2)) {
+					if(yy < round_radius) {
+						o = round_radius - round_[round_radius - yy - 1];
+					} else if((h - round_radius) <= yy) {
+						o = round_radius - round_[yy - (h - round_radius)];
+					}
 				}
-				line_h(yy, x + o, w - o * 2, c);
+				line_h(y + yy, x + o, w - o * 2, c);
 			}
 		}
 
