@@ -50,6 +50,18 @@ namespace graphics {
 
 
 	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	RGB 値から、パックされた RGB 値に変換
+			@param[in]	r	R 値
+			@param[in]	g	G 値
+			@param[in]	b	B 値
+			@return パックされた RGB 値
+		*/
+		//-----------------------------------------------------------------//
+		T rgb(uint8_t r, uint8_t g, uint8_t b) const noexcept { return rgb_(r, g, b); }
+
+
 		// https://jonasjacek.github.io/colors/
 		static constexpr T Black   = rgb_(  0,   0,   0);
 		static constexpr T Maroon  = rgb_(128,   0,   0);
@@ -59,7 +71,8 @@ namespace graphics {
 		static constexpr T Purple  = rgb_(128,   0, 128);
 		static constexpr T Teal    = rgb_(  0, 128, 128);
 		static constexpr T Silver  = rgb_(192, 192, 192);
-		static constexpr T Grey    = rgb_(128, 128, 128);
+		static constexpr T Gray    = rgb_(128, 128, 128);  // 米国
+		static constexpr T Grey    = rgb_(128, 128, 128);  // 英国
 		static constexpr T Red     = rgb_(255,   0,   0);
 		static constexpr T Lime    = rgb_(  0, 255,   0);
 		static constexpr T Yellow  = rgb_(255, 255,   0);
