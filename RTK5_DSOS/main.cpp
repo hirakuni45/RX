@@ -177,6 +177,7 @@ namespace {
 				utils::format("    dir [path]\n");
 				utils::format("    cd [path]\n");
 				utils::format("    pwd\n");
+				utils::format("    cap   single trigger\n");
 				f = true;
 			}
 			if(!f) {
@@ -338,19 +339,22 @@ int main(int argc, char** argv)
 	}
 
 	// タッチパネルの安定待ち
+#if 0
 	{
 		uint8_t nnn = 0;
 		while(1) {
 			glcdc_io_.sync_vpos();
 			ft5206_.update();
-			if(ft5206_.get_touch_num() == 0) {
-				++nnn;
-				if(nnn >= 60) break;
-			} else {
-				nnn = 0;
-			}
+//			if(ft5206_.get_touch_num() == 0) {
+//				++nnn;
+///				if(nnn >= 60) break;
+//			} else {
+// utils::format("%d\n") % static_cast<uint16_t>(ft5206_.get_touch_num());
+//				nnn = 0;
+//			}
 		}
 	}
+#endif
 
 	while(1) {
 		glcdc_io_.sync_vpos();
