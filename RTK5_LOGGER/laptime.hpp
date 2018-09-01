@@ -36,7 +36,6 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init()
 		{
-//			at_scenes_base().at_render().clear(0);
 		}
 
 
@@ -47,6 +46,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void service()
 		{
+			at_scenes_base().at_render().clear(0);
 		}
 	};
 }

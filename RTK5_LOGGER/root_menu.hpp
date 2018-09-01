@@ -39,9 +39,9 @@ namespace app {
 			at_scenes_base().at_menu().clear();
 			at_scenes_base().at_menu().set_gap(20);
 			at_scenes_base().at_menu().set_space(12, 8);
-			at_scenes_base().at_menu().add(scenes_base::MENU::type::TEXT, "Lap Time");
-			at_scenes_base().at_menu().add(scenes_base::MENU::type::TEXT, "Recall");
-			at_scenes_base().at_menu().add(scenes_base::MENU::type::TEXT, "Setup");
+			at_scenes_base().at_menu().add("Lap Time");
+			at_scenes_base().at_menu().add("Recall");
+			at_scenes_base().at_menu().add("Setup");
 		}
 
 
@@ -54,44 +54,26 @@ namespace app {
 		{
 			at_scenes_base().at_render().clear(0);
 
-			at_scenes_base().at_menu().render();
-
-#if 0
-			auto& core = at_core();
-
-			core.bitmap_.frame(0, 0, 128, 64, 1);
-			core.menu_.render();
-
-			// 衛星数の表示
-			core.bitmap_.draw_text(2, 1, core.nmea_.get_satellite());
-
-			// マウント状態の表示
-			if(core.sdc_.get_mount()) {
-				core.bitmap_.draw_font(128 - 8, 1, '*'); 
+			const auto& touch = at_scenes_base().at_touch();
+			bool t = touch.get_touch_num() == 1 ? true : false;
+			int16_t x = touch.get_touch_pos(0).x;
+			int16_t y = touch.get_touch_pos(0).y;
+			bool trg = at_scenes_base().at_menu().render(x, y, t);
+			if(trg) {
+				auto pos = at_scenes_base().at_menu().get_pos();
+//				utils::format("Menu: %d\n") % static_cast<int>(pos);
+				switch(pos) {
+				case 0:
+					change_scene(scenes_id::laptime);
+					break;
+				case 1:
+					change_scene(scenes_id::recall);
+					break;
+				case 2:
+					change_scene(scenes_id::setup);
+					break;
+				}
 			}
-
-			int n = core.menu_run_;
-			switch(n) {
-			case 0:
-				select_scene(app::scene_id::laptimer);
-				core.menu_.clear();
-				break;
-			case 1:
-				select_scene(app::scene_id::logging);
-				core.menu_.clear();
-				break;
-			case 2:
-				select_scene(app::scene_id::recall);
-				core.menu_.clear();
-				break;
-			case 3:
-				select_scene(app::scene_id::setup);
-				core.menu_.clear();
-				break;
-			default:
-				break;
-			}
-#endif
 		}
 	};
 }

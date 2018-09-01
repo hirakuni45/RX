@@ -65,19 +65,32 @@ namespace app {
 
 		typedef graphics::render<uint16_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
 
-		// 最大８個のメニュー
-		typedef graphics::menu<RENDER, 8> MENU;
-
 	private:
-		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
-		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-
 		GLCDC_IO	glcdc_io_;
 		DRW2D_MGR	drw2d_mgr_;
 
 		KFONT		kfont_;
 
 		RENDER		render_;
+
+	public:
+		// 最大８個のメニュー
+		class BACK {
+			RENDER&	render_;
+		public:
+			BACK(RENDER& render) : render_(render) { }
+
+			void operator () (int16_t x, int16_t y, int16_t w, int16_t h, RENDER::value_type c)
+			{
+				render_.fill_r(x, y, w, h, c);
+//				render_.fill_r(x + 3, y + 3, w - 6, h - 6, c);
+			}
+		};
+		typedef graphics::menu<RENDER, BACK, 8> MENU;
+
+	private:
+		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
+		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 
 		// FT5206, SCI6 簡易 I2C 定義
 		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
@@ -96,6 +109,9 @@ namespace app {
 		FT5206		ft5206_;
 
 		MENU		menu_;
+		BACK		back_;
+
+		
 
 	public:
 		//-------------------------------------------------------------//
@@ -104,7 +120,7 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		scenes_base() noexcept : render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_),
-			ft5206_(ft5206_i2c_), menu_(render_) { }
+			ft5206_(ft5206_i2c_), menu_(render_, back_), back_(render_) { }
 
 
 		//-------------------------------------------------------------//
@@ -173,6 +189,15 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		GLCDC_IO& at_glcdc_io() noexcept { return glcdc_io_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	タッチデバイスの参照
+			@return タッチデバイス
+		*/
+		//-------------------------------------------------------------//
+		FT5206& at_touch() noexcept { return ft5206_; }
 
 
 		//-------------------------------------------------------------//
