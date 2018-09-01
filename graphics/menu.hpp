@@ -16,41 +16,31 @@ namespace graphics {
 	/*!
 		@brief	メニュー・クラス
 		@param[in]	REND	描画クラス
+		@param[in]	BACK	背面の描画クラス	
 		@param[in]	MAX		最大メニュー数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class REND, uint16_t MAX>
+	template <class REND, class BACK, uint16_t MAX>
 	class menu {
 
-	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief	オブジェクト・タイプ
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class type : uint8_t {
-			TEXT,	///< 等幅フォント
-			PROP,	///< プロポーショナル・フォント
-			MOBJ,	///< モーション・オブジェクト
-		};
-
-	private:
 		REND&		rend_;
+		BACK&		back_;
 
 		uint16_t	size_;
 
 		struct obj_t {
-			type		type_;
 			uint8_t		w_;
 			uint8_t		h_;
 			const void* src_;
 
-			obj_t() : type_(type::TEXT), w_(0), h_(0), src_(nullptr) { }
+			obj_t() : w_(0), h_(0), src_(nullptr) { }
 		};
 		obj_t	obj_[MAX];
 
 		int16_t		mx_;
 		int16_t		my_;
+		int16_t		ox_;
+		int16_t		oy_;
 
 		int8_t		gap_;
 		int8_t		space_w_;
@@ -59,9 +49,9 @@ namespace graphics {
 		uint16_t	pos_;
 
 		typename REND::value_type	fc_;
+		typename REND::value_type	hc_;
 		typename REND::value_type	bc_;
 
-		bool		frame_;
 		bool		focus_;
 
 	public:
@@ -71,16 +61,31 @@ namespace graphics {
 			@param[in]	rend	描画クラス
 		*/
 		//-----------------------------------------------------------------//
-		menu(REND& rend) noexcept : rend_(rend), size_(0), mx_(0), my_(0),
+		menu(REND& rend, BACK& back) noexcept : rend_(rend), back_(back),
+			size_(0), mx_(0), my_(0), ox_(0), oy_(0),
 			gap_(0), space_w_(0), space_h_(0), pos_(0),
-			fc_(REND::COLOR::Black), bc_(REND::COLOR::White),
-			frame_(true), focus_(true)
+			fc_(REND::COLOR::Black), hc_(REND::COLOR::White), bc_(REND::COLOR::Gray),
+			focus_(true)
 		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	スペースの設定
+			@brief	描画オフセットの設定
+			@param[in]	ox	X オフセット
+			@param[in]	oy	Y オフセット
+		*/
+		//-----------------------------------------------------------------//
+		void set_offset(int16_t ox, int16_t oy) noexcept
+		{
+			ox_ = ox;
+			oy_ = oy;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	描画スペースの設定
 			@param[in]	w	横幅
 			@param[in]	h	高さ
 		*/
@@ -94,7 +99,7 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ギャップの設定
+			@brief	ギャップの設定（縦）
 			@param[in]	gap	ギャップ
 		*/
 		//-----------------------------------------------------------------//
@@ -103,7 +108,8 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	サイズを返す（登録されているメニュー数）
+			@brief	メニュー・サイズを返す（登録されているメニュー数）
+			@return メニュー・サイズ
 		*/
 		//-----------------------------------------------------------------//
 		uint16_t size() const noexcept { return size_; }
@@ -111,36 +117,12 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	フォーカスを許可
-			@param[in]	f	不許可の場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		void enable_focus(bool f = true) noexcept
-		{
-			focus_ = f;
-		} 
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	フレームの描画
-			@param[in]	f	不許可の場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		void draw_frame(bool f = true) noexcept
-		{
-			frame_ = f;
-		} 
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	フォーカスを戻す
 		*/
 		//-----------------------------------------------------------------//
-		void focus_prev() noexcept
+		void prev_focus() noexcept
 		{
-			if(!focus_) return;
+			if(size_ == 0) return;
 
 			if(pos_ > 0) {
 				pos_--;
@@ -153,9 +135,9 @@ namespace graphics {
 			@brief	フォーカスを進める
 		*/
 		//-----------------------------------------------------------------//
-		void focus_next() noexcept
+		void next_focus() noexcept
 		{
-			if(!focus_) return;
+			if(size_ == 0) return;
 
 			++pos_;
 			if(pos_ >= size_) {
@@ -175,7 +157,7 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	クリア
+			@brief	登録メニューを全てクリア
 		*/
 		//-----------------------------------------------------------------//
 		void clear() noexcept
@@ -184,42 +166,39 @@ namespace graphics {
 			mx_ = 0;
 			my_ = 0;
 			pos_ = 0;
+			focus_ = false;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	オブジェクトを追加
-			@param[in]	t	オブジェクト・タイプ
-			@param[in]	src	オブジェクト・ソース
+			@param[in]	src		オブジェクト・ソース
+			@param[in]	bitmap	ビットマップの場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void add(type t, const void* src) noexcept {
+		void add(const void* src, bool bitmap = false) noexcept
+		{
 			if(size_ >= MAX) return;
 
-			if(t == type::TEXT) {
-				obj_[size_].w_ = rend_.get_text_length(static_cast<const char*>(src), false);
-				obj_[size_].h_ = REND::font_height;
-			} else if(t == type::PROP) {
-				obj_[size_].w_ = rend_.get_text_length(static_cast<const char*>(src), true);
-				obj_[size_].h_ = REND::font_height;
-			} else if(t == type::MOBJ) {
+			if(bitmap) {
 				uint8_t w;
 				uint8_t h;
 				rend_.get_mobj_size(src, w, h);
 				obj_[size_].w_ = w;
 				obj_[size_].h_ = h;
 			} else {
-				return;
+				obj_[size_].w_ = rend_.get_text_length(static_cast<const char*>(src), false);
+				obj_[size_].h_ = REND::font_height;
 			}
-			obj_[size_].type_ = t;
-			obj_[size_].src_  = src;
+			obj_[size_].src_ = src;
 			++size_;
 
 			int16_t x = 0;
 			int16_t y = 0;
 			for(auto i = 0; i < size_; ++i) {
-				if(x < obj_[i].w_) x = obj_[i].w_;
+				auto xx = obj_[i].w_ + space_w_ * 2;
+				if(x < xx) x = xx;
 				y += obj_[i].h_;
 				y += gap_;
 				y += space_h_ * 2;
@@ -232,47 +211,52 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	レンダリング
-			@param[in]	ox	描画オフセットＸ
-			@param[in]	oy	描画オフセットＹ
+			@param[in]	px	X 位置
+			@param[in]	py	Y 位置
+			@param[in]	touch	タッチ状態
+			@return メニューが選択された場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void render(int16_t ox = 0, int16_t oy = 0) const noexcept
+		bool render(int16_t px = -1, int16_t py = -1, bool touch = false) noexcept
 		{
-			if(size_ == 0) return;
+			if(size_ == 0) return false;
 
-			int16_t x = (REND::width  - ox - mx_) / 2;
-			int16_t y = (REND::height - oy - my_) / 2;
-			x += ox;
-			y += oy;
+			int16_t x = (REND::width  - ox_ - mx_) / 2;
+			int16_t y = (REND::height - oy_ - my_) / 2;
+			x += ox_;
+			y += oy_;
 			auto tmp_fc = rend_.get_fore_color();
 			rend_.set_fore_color(fc_);
+			int16_t idx = -1;
 			for(auto i = 0; i < size_; ++i) {
+				const auto& obj = obj_[i];
 				y += gap_ / 2;
-				uint8_t w;
-				uint8_t h;
-				if(obj_[i].type_ == type::TEXT) {
-					rend_.fill_r(x, y, mx_ + space_w_ * 2, obj_[i].h_ + space_h_ * 2, bc_);
-					y += space_h_;
-					auto t = static_cast<const char*>(obj_[i].src_);
-					rend_.draw_text(x + space_w_, y, t);
-						
-				} else if(obj_[i].type_ == type::PROP) {
-					rend_.fill_r(x, y, mx_ + space_w_ * 2, obj_[i].h_ + space_h_ * 2, bc_);
-					y += space_h_;
-					auto t = static_cast<const char*>(obj_[i].src_);
-					rend_.draw_text(x + space_w_, y, t, true);
-				} else if(obj_[i].type_ == type::MOBJ) {
-					y += space_h_;
-					rend_.draw_mobj(x, y, obj_[i].src_);
+				auto c = bc_;
+				if(x <= px && px < (x + mx_) && y <= py && py < (y + obj.h_ + space_h_ * 2)) {
+					idx = i;
+					if(touch) {
+						c = hc_;
+					}
 				}
-//				if(focus_ && i == pos_) {
-//					rend_.reverse(x - 1, y, obj_[i].w_ + 2, obj_[i].h_);
-//				}
-				y += REND::font_height;
+				back_(x, y, mx_, obj.h_ + space_h_ * 2, c);
+				y += space_h_;
+				auto t = static_cast<const char*>(obj_[i].src_);
+				rend_.draw_text(x + space_w_, y, t);
+				y += obj.h_;
 				y += space_h_;
 				y += gap_ - (gap_ / 2);
 			}
 			rend_.set_fore_color(tmp_fc);
+
+			bool focus = focus_;
+			focus_ = touch;
+			if(idx >= 0) {
+				pos_ = idx;
+				if(focus && !focus_) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 
@@ -282,6 +266,15 @@ namespace graphics {
 			@return REND クラス
 		*/
 		//-----------------------------------------------------------------//
-		REND& at() noexcept { return rend_; }
+		REND& at_render() noexcept { return rend_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	BACK クラスの参照
+			@return BACK クラス
+		*/
+		//-----------------------------------------------------------------//
+		BACK& at_back() noexcept { return back_; }
 	};
 }
