@@ -81,6 +81,8 @@ namespace utils {
 		int16_t		mes_volt_begin_;
 		int16_t		mes_volt_size_;
 		int16_t		mes_volt_org_;
+		int16_t		mes_ref_size_;
+		int16_t		mes_ref_len_;
 
 		bool		touch_down_;
 
@@ -91,12 +93,16 @@ namespace utils {
 				auto org = mes_time_begin_;
 				render_.line(org, TIME_BEGIN_POS, org, TIME_LIMIT_POS, RENDER::COLOR::White);
 				auto end = mes_time_begin_ + mes_time_size_;
-				render_.line(end, TIME_BEGIN_POS, end, TIME_LIMIT_POS, RENDER::COLOR::White);
+				if(0 < end && end < VOLT_LIMIT_POS) {
+					render_.line(end, TIME_BEGIN_POS, end, TIME_LIMIT_POS, RENDER::COLOR::White);
+				}
 			} else if(measere_ == MEASERE::VOLT) {
 				auto org = mes_volt_begin_;
 				render_.line(VOLT_BEGIN_POS, org, VOLT_LIMIT_POS, org, RENDER::COLOR::White);
 				auto end = mes_volt_begin_ + mes_volt_size_;
-				render_.line(VOLT_BEGIN_POS, end, VOLT_LIMIT_POS, end, RENDER::COLOR::White);
+				if(0 < end && end < VOLT_LIMIT_POS) {
+					render_.line(VOLT_BEGIN_POS, end, VOLT_LIMIT_POS, end, RENDER::COLOR::White);
+				}
 			}
 		}
 
@@ -117,6 +123,7 @@ namespace utils {
 			measere_(MEASERE::NONE),
 			mes_time_begin_(0), mes_time_size_(40), mes_time_org_(0),
 			mes_volt_begin_(0), mes_volt_size_(40), mes_volt_org_(0),
+			mes_ref_size_(0), mes_ref_len_(0),
 			touch_down_(false)
 		{ }
 
@@ -226,7 +233,10 @@ namespace utils {
 				if(p.before == TOUCH::EVENT::CONTACT && p.event == TOUCH::EVENT::UP) {
 					menu_run_ = menu_;
 					menu_ = MENU::NONE;
-					if(menu_run_ == MENU::MES) {
+					if(menu_run_ == MENU::TRG) {
+						// とりあえず、シングル・トリガー
+						capture_.set_trigger(utils::capture_trigger::SINGLE);
+					} else if(menu_run_ == MENU::MES) {
 						measere_ = enum_utils::inc(measere_, MEASERE::NONE, MEASERE::VOLT);
 					}
 					return true;
@@ -280,12 +290,28 @@ namespace utils {
 					auto dx = p.x - p2.x;
 					auto dy = p.y - p2.y;
 					auto len = intmath::sqrt16(dx * dx + dy * dy);
+					if(p2.event == TOUCH::EVENT::DOWN) {
+						mes_ref_size_ = mes_time_size_;
+						mes_ref_len_  = len.val;
+					} else {
+						mes_time_size_ = mes_ref_size_
+							+ static_cast<int16_t>(len.val) - mes_ref_len_;
+					}
 				} else if(measere_ == MEASERE::VOLT) {
-
+					auto dx = p.x - p2.x;
+					auto dy = p.y - p2.y;
+					auto len = intmath::sqrt16(dx * dx + dy * dy);
+					if(p2.event == TOUCH::EVENT::DOWN) {
+						mes_ref_size_ = mes_volt_size_;
+						mes_ref_len_  = len.val;
+					} else {
+						mes_volt_size_ = mes_ref_size_
+							+ static_cast<int16_t>(len.val) - mes_ref_len_;
+					}
 				} else {
 
+					return false;
 				}
-				return false;
 			} else if(num == 3) {
 
 				return false;
