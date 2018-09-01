@@ -141,11 +141,13 @@ namespace chip {
 			LOG_CUR_CHA					// R
 		};
 
+		uint8_t		touch_id_;
 		uint8_t		touch_num_;
 		bool		start_;
+		bool		startup_;
 		uint16_t	version_;
 		uint8_t		chip_;
-		uint8_t		touch_tmp_[11];
+		uint8_t		touch_tmp_[12];
 		xy			xy_[2];
 
 
@@ -172,29 +174,37 @@ namespace chip {
 
 		void convert_touch_() noexcept
 		{
-			touch_num_ = touch_tmp_[0] & 0x0f;
+			touch_id_  = touch_tmp_[0];
+			touch_num_ = touch_tmp_[1] & 0x0f;
 
 			xy_[0].before = xy_[0].event;
-			xy_[0].event = static_cast<EVENT>(touch_tmp_[1] >> 6);
-			xy_[0].id = touch_tmp_[3] >> 4;
-			xy_[0].x = (static_cast<int16_t>(touch_tmp_[1] & 0x0F) << 8)
-				| static_cast<int16_t>(touch_tmp_[2]);
-			xy_[0].y = (static_cast<int16_t>(touch_tmp_[3] & 0x0F) << 8)
-				| static_cast<int16_t>(touch_tmp_[4]);
+			xy_[0].event = static_cast<EVENT>(touch_tmp_[2] >> 6);
+			xy_[0].id = touch_tmp_[4] >> 4;
+			xy_[0].x = (static_cast<int16_t>(touch_tmp_[2] & 0x0F) << 8)
+				| static_cast<int16_t>(touch_tmp_[3]);
+			xy_[0].y = (static_cast<int16_t>(touch_tmp_[4] & 0x0F) << 8)
+				| static_cast<int16_t>(touch_tmp_[5]);
 
 			xy_[1].before = xy_[1].event;
-			xy_[1].event = static_cast<EVENT>(touch_tmp_[7] >> 6);
-			xy_[1].id = touch_tmp_[9] >> 4;
-			xy_[1].x = (static_cast<int16_t>(touch_tmp_[7] & 0x0F) << 8)
-				| static_cast<int16_t>(touch_tmp_[8]);
-			xy_[1].y = (static_cast<int16_t>(touch_tmp_[9] & 0x0F) << 8)
-				| static_cast<int16_t>(touch_tmp_[10]);
+			xy_[1].event = static_cast<EVENT>(touch_tmp_[8] >> 6);
+			xy_[1].id = touch_tmp_[10] >> 4;
+			xy_[1].x = (static_cast<int16_t>(touch_tmp_[8] & 0x0F) << 8)
+				| static_cast<int16_t>(touch_tmp_[9]);
+			xy_[1].y = (static_cast<int16_t>(touch_tmp_[10] & 0x0F) << 8)
+				| static_cast<int16_t>(touch_tmp_[11]);
+
+			if(xy_[0].event == EVENT::DOWN || xy_[1].event == EVENT::DOWN) {
+				startup_ = true;
+			}
+			if(!startup_) {
+				touch_num_ = 0;
+			}
 		}
 
 
 		void request_touch_() noexcept
 		{
-			touch_tmp_[0] = static_cast<uint8_t>(REG::TD_STATUS);
+			touch_tmp_[0] = static_cast<uint8_t>(REG::GEST_ID);
 			i2c_.send(FT5206_ADR, touch_tmp_, 1);
 			i2c_.recv(FT5206_ADR, touch_tmp_, sizeof(touch_tmp_));
 		}
@@ -206,7 +216,8 @@ namespace chip {
 			@param[in]	i2c	i2c 制御クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		FT5206(I2C& i2c) noexcept : i2c_(i2c), touch_num_(0), start_(false),
+		FT5206(I2C& i2c) noexcept : i2c_(i2c), touch_id_(0), touch_num_(0),
+			start_(false), startup_(false),
 			version_(0), chip_(0), touch_tmp_{ 0 }, xy_{ } { }
 
 
@@ -273,7 +284,10 @@ namespace chip {
 
 			write_(REG::DEVICE_MODE, 0x00);
 
+			touch_num_ = 0;
+
 			start_ = true;
+			startup_ = false;
 
 			return true;
 		}
@@ -287,7 +301,6 @@ namespace chip {
 		void update() noexcept
 		{
 			if(!start_) {
-				touch_num_ = 0;
 				return;
 			}
 
