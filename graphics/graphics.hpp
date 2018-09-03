@@ -391,6 +391,48 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	円（線）を描画する
+			@param[in]	x0	開始点Ｘ軸を指定
+			@param[in]	y0	開始点Ｙ軸を指定
+			@param[in]	r	半径を指定
+			@param[in]	c	描画色
+		*/
+		//-----------------------------------------------------------------//
+		void circle(int16_t x0, int16_t y0, int16_t r, T c) noexcept
+		{
+			int16_t x = r - 1;
+			int16_t y = 0;
+			int16_t dx = 1;
+			int16_t dy = 1;
+			int16_t err = dx - (r << 1);
+
+			while(x >= y) {
+				plot(x0 + x, y0 + y, c);
+				plot(x0 + y, y0 + x, c);
+				plot(x0 - y, y0 + x, c);
+				plot(x0 - x, y0 + y, c);
+				plot(x0 - x, y0 - y, c);
+				plot(x0 - y, y0 - x, c);
+				plot(x0 + y, y0 - x, c);
+				plot(x0 + x, y0 - y, c);
+
+				if(err <= 0) {
+					y++;
+					err += dy;
+					dy += 2;
+				}
+        
+				if(err > 0) {
+					x--;
+					dx += 2;
+					err += dx - (r << 1);
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	スクロール
 			@param[in]	h		スクロール高さ（+up、-down）
 		*/
