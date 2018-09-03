@@ -380,6 +380,11 @@ int main(int argc, char** argv)
 		}
 
 #if 0
+		render_.fill_circle(480/2, 272/2, 100, RENDER::COLOR::Red);
+		render_.circle(480/2, 272/2, 100, RENDER::COLOR::Blue);
+#endif
+
+#if 0
 		{  // SW2 の検出
 			auto f = SW2::P();
 			if(sw2 && !f) {
