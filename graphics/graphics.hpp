@@ -259,7 +259,7 @@ namespace graphics {
 			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void fill(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept
+		void fill_box(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept
 		{
 			if(w <= 0 || h <= 0) return;
 
@@ -279,7 +279,7 @@ namespace graphics {
 			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void fill_r(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept {
+		void fill_box_r(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept {
 			for(int16_t yy = 0; yy < h; ++yy) {
 				int16_t o = 0;
 				if(h >= (round_radius * 2)) {
@@ -420,6 +420,48 @@ namespace graphics {
 					y++;
 					err += dy;
 					dy += 2;
+				}
+        
+				if(err > 0) {
+					x--;
+					dx += 2;
+					err += dx - (r << 1);
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	円を描画する
+			@param[in]	x0	開始点Ｘ軸を指定
+			@param[in]	y0	開始点Ｙ軸を指定
+			@param[in]	r	半径を指定
+			@param[in]	c	描画色
+		*/
+		//-----------------------------------------------------------------//
+		void fill_circle(int16_t x0, int16_t y0, int16_t r, T c) noexcept
+		{
+			int16_t x = r - 1;
+			int16_t y = 0;
+			int16_t dx = 1;
+			int16_t dy = 1;
+			int16_t err = dx - (r << 1);
+			bool yy = true;
+			while(x >= y) {
+				if(yy) {
+					line_h(y0 - y, x0 - x, x + x + 1, c);
+					line_h(y0 + y, x0 - x, x + x + 1, c);
+					line_h(y0 - x, x0 - y, y + y + 1, c);
+					line_h(y0 + x, x0 - y, y + y + 1, c);
+					yy = false;
+				}
+
+				if(err <= 0) {
+					y++;
+					err += dy;
+					dy += 2;
+					yy = true;
 				}
         
 				if(err > 0) {
