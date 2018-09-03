@@ -304,7 +304,15 @@ namespace graphics {
 			if(sizeof(T) == 2) {  // 16 bits pixel
 				uint32_t c32 = (static_cast<uint32_t>(c) << 16) | c;
 				uint32_t* out = reinterpret_cast<uint32_t*>(fb_);
-				for(uint32_t i = 0; i < (WIDTH * HEIGHT) / 16; ++i) {
+				for(uint32_t i = 0; i < (WIDTH * HEIGHT) / 32; ++i) {
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
+					*out++ = c32;
 					*out++ = c32;
 					*out++ = c32;
 					*out++ = c32;
