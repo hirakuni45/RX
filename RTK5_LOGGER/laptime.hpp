@@ -20,19 +20,31 @@ namespace app {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class laptime {
 
-		void draw_lap_(int16_t x, int16_t y, uint32_t no, uint32_t n) noexcept
+		uint32_t	lap_best_t_;
+		uint32_t	lap_best_n_;
+
+		int16_t draw_time_(int16_t x, int16_t y, uint32_t t) noexcept
 		{
-			auto mod = n % 100;
-			n /= 100;
-			auto sec = n % 60;
-			n /= 60;
-			auto min = n % 60;
-			n /= 60;
-			auto hur = n % 24;
-			char tmp[24];
-			utils::sformat("%03d %02d:%02d:%02d.%02d", tmp, sizeof(tmp))
-				% no % hur % min % sec % mod;
-			at_scenes_base().at_render().draw_text(x, y, tmp);
+			auto mod = t % 100;
+			t /= 100;
+			auto sec = t % 60;
+			t /= 60;
+			auto min = t % 60;
+			t /= 60;
+			auto hur = t % 24;
+			char tmp[16];
+			utils::sformat("%02d:%02d:%02d.%02d", tmp, sizeof(tmp))
+				% hur % min % sec % mod;
+			return at_scenes_base().at_render().draw_text(x, y, tmp);
+		}
+
+
+		int16_t draw_lap_(int16_t x, int16_t y, uint32_t no, uint32_t t) noexcept
+		{
+			char tmp[8];
+			utils::sformat("%03d ", tmp, sizeof(tmp)) % no;
+			x = at_scenes_base().at_render().draw_text(x, y, tmp);
+			return draw_time_(x, y, t);
 		}
 
 	public:
@@ -41,7 +53,7 @@ namespace app {
 			@brief	コンストラクター
 		*/
 		//-------------------------------------------------------------//
-		laptime() { }
+		laptime() : lap_best_t_(0), lap_best_n_(0) { }
 
 
 		//-------------------------------------------------------------//
@@ -52,6 +64,8 @@ namespace app {
 		void init()
 		{
 			at_scenes_base().at_cmt().at_task().enable();
+			lap_best_t_ = 0;
+			lap_best_n_ = 0;
 		}
 
 
@@ -62,12 +76,46 @@ namespace app {
 		//-------------------------------------------------------------//
 		void service()
 		{
-			at_scenes_base().at_render().clear(0);
+			typedef scenes_base::RENDER RENDER;
+
+			auto& render = at_scenes_base().at_render();
+			render.clear(RENDER::COLOR::Black);
 
 			auto& watch = at_scenes_base().at_cmt().at_task();
-			auto n = watch.get();
+			auto t = watch.get();
 			auto pos = watch.get_lap_pos();
-			draw_lap_(0, 16, pos, n);
+			uint32_t dt = t;
+			if(pos > 0) {
+				dt -= watch.get_lap(pos - 1);
+			}
+
+			int16_t y = 16;
+			auto x = draw_lap_(0, y, pos, t);
+			x = draw_time_(x + 8, y, dt);
+			draw_lap_(x + 16, y, lap_best_n_, lap_best_t_);
+
+			render.frame(0, RENDER::height - 10, RENDER::width, 10, RENDER::COLOR::White);
+			uint32_t bt = 0;
+			if(pos > 0) {
+				bt = watch.get_lap(pos - 1);
+				if(pos > 1) {
+					bt -= watch.get_lap(pos - 2);
+				}
+				if(lap_best_t_ == 0 || lap_best_t_ > bt) {
+					lap_best_t_ = bt;
+					lap_best_n_ = pos;
+				}
+			}
+			if(bt > 0) {
+				uint32_t ref = RENDER::width - 2;
+				uint32_t per = ref * dt / bt;
+				auto c = RENDER::COLOR::Lime;
+				if(per > ref) {
+					per = ref;
+					c = RENDER::COLOR::Red;
+				}
+				render.fill_box(1, RENDER::height - 10 + 1, per, 10 - 2, c);
+			}
 
 			for(uint32_t i = 0; i < 4; ++i) {
 				if(i >= pos) {
@@ -79,6 +127,9 @@ namespace app {
 				}
 				draw_lap_(0, 32 + 16 * 4 - i * 16, pos - i, t);
 			}
+
+			auto& res = at_scenes_base().at_resource();
+			res.draw_nmb_24(0, 272 - 10 - 24 - 1, "0123456789:.");
 		}
 	};
 }

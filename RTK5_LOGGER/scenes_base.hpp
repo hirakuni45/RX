@@ -29,6 +29,8 @@
 
 #include "common/cmt_io.hpp"
 
+#include "resource.hpp"
+
 namespace app {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -84,6 +86,8 @@ namespace app {
 #endif
 		// FT5206 touch device
 		typedef chip::FT5206<FT5206_I2C> FT5206;
+
+		typedef resource<RENDER> RESOURCE;
 
 	private:
 		GLCDC_IO	glcdc_io_;
@@ -171,6 +175,8 @@ namespace app {
 
 		CMT			cmt_;
 
+		RESOURCE	resource_;
+
 	public:
 		//-------------------------------------------------------------//
 		/*!
@@ -178,7 +184,7 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		scenes_base() noexcept : render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_),
-			ft5206_(ft5206_i2c_), menu_(render_, back_), back_(render_) { }
+			ft5206_(ft5206_i2c_), menu_(render_, back_), back_(render_), resource_(render_) { }
 
 
 		//-------------------------------------------------------------//
@@ -291,6 +297,15 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		CMT& at_cmt() noexcept { return cmt_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	RESOURCE の参照
+			@return RESOURCE
+		*/
+		//-------------------------------------------------------------//
+		RESOURCE& at_resource() noexcept { return resource_; }
 	};
 }
 
