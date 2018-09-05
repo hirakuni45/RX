@@ -300,7 +300,8 @@ namespace graphics {
 			@param[in]	c	クリアカラー
 		*/
 		//-----------------------------------------------------------------//
-		void clear(T c) noexcept {
+		void clear(T c) noexcept
+		{
 			if(sizeof(T) == 2) {  // 16 bits pixel
 				uint32_t c32 = (static_cast<uint32_t>(c) << 16) | c;
 				uint32_t* out = reinterpret_cast<uint32_t*>(fb_);
@@ -510,10 +511,11 @@ namespace graphics {
 			@param[in]	img	描画ソースのポインター
 			@param[in]	w	描画ソースの幅
 			@param[in]	h	描画ソースの高さ
+			@param[in]	b	背景を描画する場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void draw_bitmap(int16_t x, int16_t y, const void* img, uint8_t w, uint8_t h) noexcept
-		{
+		void draw_bitmap(int16_t x, int16_t y, const void* img, uint8_t w, uint8_t h, bool b = false)
+		noexcept {
 			if(img == nullptr) return;
 
 			const uint8_t* p = static_cast<const uint8_t*>(img);
@@ -523,6 +525,7 @@ namespace graphics {
 				int16_t xx = x;
 				for(uint8_t j = 0; j < w; ++j) {
 					if(c & k) plot(xx, y, fc_);
+					else if(b) plot(xx, y, bc_);
 					k <<= 1;
 					if(k == 0) {
 						k = 1;
@@ -561,16 +564,17 @@ namespace graphics {
 			@param[in]	x	開始点Ｘ軸を指定
 			@param[in]	y	開始点Ｙ軸を指定
 			@param[in]	src	描画オブジェクト
+			@param[in]	b	背景を描画する場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void draw_mobj(int16_t x, int16_t y, const void* src) noexcept
+		void draw_mobj(int16_t x, int16_t y, const void* src, bool b) noexcept
 		{
 			if(src == nullptr) return;
 
 			const uint8_t* p = static_cast<const uint8_t*>(src);
 			uint8_t w = *p++;
 			uint8_t h = *p++;
-			draw_bitmap(x, y, p, w, h);
+			draw_bitmap(x, y, p, w, h, b);
 		}
 
 
