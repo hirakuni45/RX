@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	固定サイズ・スタック・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -101,12 +101,12 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  プル @n
+			@brief  ポップ @n
 					※格納要素が無い場合、要素型の初期値が返される。
 			@return 要素を返す
 		*/
 		//-----------------------------------------------------------------//
-		const UNIT& pull() noexcept
+		const UNIT& pop() noexcept
 		{
 			if(pos_ == 0) {
 				static const UNIT u;
