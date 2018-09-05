@@ -10,3 +10,4 @@ bmc -offset  8*24,32 -size 16,24 -text -header 8 -c_style nmb24_8 font12_24.png 
 bmc -offset  9*24,32 -size 16,24 -text -header 8 -c_style nmb24_9 font12_24.png ../resource/nmb24_9.h
 bmc -offset 10*24,32 -size 16,24 -text -header 8 -c_style nmb24_co font12_24.png ../resource/nmb24_co.h
 bmc -offset  0*24,32+32 -size 16,24 -text -header 8 -c_style nmb24_do font12_24.png ../resource/nmb24_do.h
+bmc -offset  1*24,32+32 -size 16,24 -text -header 8 -c_style nmb24_x font12_24.png ../resource/nmb24_x.h
