@@ -20,7 +20,10 @@ namespace app {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class title {
 
+		typedef scenes_base::RENDER RENDER;
+
 		uint8_t		count_;
+		bool		logo_;
 
 	public:
 		//-------------------------------------------------------------//
@@ -28,7 +31,7 @@ namespace app {
 			@brief	コンストラクター
 		*/
 		//-------------------------------------------------------------//
-		title() { }
+		title() : count_(0), logo_(false) { }
 
 
 		//-------------------------------------------------------------//
@@ -38,13 +41,12 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init()
 		{
-			count_ = 90;  // 1.5sec
+			auto& render = at_scenes_base().at_render();
 
-			at_scenes_base().at_render().clear(0);
-			at_scenes_base().at_render().line(0, 0, 480-1, 272-1,
-				scenes_base::RENDER::COLOR::White);
-			at_scenes_base().at_render().line(0, 480 - 1, 0, 272-1,
-				scenes_base::RENDER::COLOR::White);
+			count_ = 90;  // 1.5sec
+			logo_ = false;
+
+			render.clear(RENDER::COLOR::White);
 		}
 
 
@@ -57,6 +59,21 @@ namespace app {
 		{
 			if(count_ > 0) {
 				--count_;
+				if(!logo_ && fatfs_get_mount() != 0) {
+					auto& bmp = at_scenes_base().at_bmp();
+					utils::file_io fin;
+					if(fin.open("HRC_logo_s.bmp", "rb")) {
+						img::img_info ifo;
+						if(bmp.info(fin, ifo)) {
+							int16_t xo = (RENDER::width  - ifo.width) / 2;
+							int16_t yo = (RENDER::height - ifo.height) / 2;
+							bmp.set_draw_offset(xo, yo);
+							logo_ = bmp.load(fin);
+							if(logo_) count_ = 90;
+						}
+						fin.close();
+					}
+				}
 			} else {
 				change_scene(scenes_id::root_menu);
 			}
