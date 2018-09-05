@@ -59,7 +59,7 @@ namespace graphics {
 			@return パックされた RGB 値
 		*/
 		//-----------------------------------------------------------------//
-		T rgb(uint8_t r, uint8_t g, uint8_t b) const noexcept { return rgb_(r, g, b); }
+		static T rgb(uint8_t r, uint8_t g, uint8_t b) { return rgb_(r, g, b); }
 
 
 		// https://jonasjacek.github.io/colors/
