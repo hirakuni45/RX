@@ -110,6 +110,10 @@ namespace app {
 		};
 		typedef graphics::menu<RENDER, BACK, 8> MENU;
 
+
+		typedef image::bmp_in<RENDER> BMP_IN;
+
+
 		// CMT 1/100 秒計測
 		class watch_task {
 		public:
@@ -177,6 +181,8 @@ namespace app {
 
 		RESOURCE	resource_;
 
+		BMP_IN		bmp_in_;
+
 	public:
 		//-------------------------------------------------------------//
 		/*!
@@ -184,7 +190,8 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		scenes_base() noexcept : render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_),
-			ft5206_(ft5206_i2c_), menu_(render_, back_), back_(render_), resource_(render_) { }
+			ft5206_(ft5206_i2c_), menu_(render_, back_), back_(render_), resource_(render_),
+			bmp_in_(render_) { }
 
 
 		//-------------------------------------------------------------//
@@ -306,6 +313,15 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		RESOURCE& at_resource() noexcept { return resource_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	BMP_IN の参照
+			@return BMP_IN
+		*/
+		//-------------------------------------------------------------//
+		BMP_IN& at_bmp() noexcept { return bmp_in_; }
 	};
 }
 
