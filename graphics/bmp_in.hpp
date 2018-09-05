@@ -11,15 +11,20 @@
 #include <cstdint>
 #include "common/file_io.hpp"
 #include "common/vtx.hpp"
+#include "graphics/img.hpp"
 
 namespace image {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	BMP 形式ファイルクラス
+		@param[in]	RENDER	描画ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class RENDER>
 	class bmp_in {
+
+		RENDER&		render_;
 
 		static const uint16_t BMP_SIGNATURE		 = 0x4D42;
 		static const uint16_t BMP_SIG_BYTES		 = 2;
@@ -121,6 +126,29 @@ namespace image {
 		uint32_t	prgl_ref_;
 		uint32_t	prgl_pos_;
 
+		uint8_t		rgbq_[RGBQUAD_SIZE];
+
+		int16_t		ofs_x_;
+		int16_t		ofs_y_;
+
+		void render_rgb_(int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b)
+		{
+			auto c = RENDER::COLOR::rgb(r, g, b);
+			render_.plot(ofs_x_ + x, ofs_y_ + y, c);
+		}
+
+
+		void render_idx_(int16_t x, int16_t y, uint8_t idx)
+		{
+			auto i = idx * RGBQUAD_SIZE;
+			uint8_t r = rgbq_[i + RGBT_RED];
+			uint8_t g = rgbq_[i + RGBT_GREEN];
+			uint8_t b = rgbq_[i + RGBT_BLUE];
+			auto c = RENDER::COLOR::rgb(r, g, b);
+			render_.plot(ofs_x_ + x, ofs_y_ + y, c);
+		}
+
+
 		/*----------------------------------------------------------/
 		/	メモリから little-endien 形式 4バイト無符号整数を読む	/
 		/----------------------------------------------------------*/
@@ -145,8 +173,8 @@ namespace image {
 		/----------------------------------------------------------*/
 		static bool read_header_bmp_(utils::file_io& fin, bmp_info& bmp)
 		{
-			unsigned char bfh[FILEHED_SIZE + BMPV5HED_SIZE];
-			unsigned char *const bih = bfh + FILEHED_SIZE;
+			uint8_t bfh[FILEHED_SIZE + BMPV5HED_SIZE];
+			uint8_t *const bih = bfh + FILEHED_SIZE;
 
 			// skip MAC-Binary header がある場合を考えてヘッダーを特定
 			for(int i = 0; i < 512; i++) {
@@ -272,11 +300,11 @@ namespace image {
 			return true;
 		}
 
+
 		/*----------------------------------------------------------------------/
 		/	インデックス・カラー(無圧縮 1, 4, 8 ビット) 形式の画像データを展開	/
 		/----------------------------------------------------------------------*/
-		template <class render>
-		bool read_idx_(utils::file_io& fin, render& pix, const bmp_info& bmp)
+		bool read_idx_(utils::file_io& fin, const bmp_info& bmp)
 		{
 			size_t stride = bmp.width * bmp.depth;
 			if(stride & 7) stride += 8;
@@ -309,7 +337,7 @@ namespace image {
 						idx &= 1;
 					}
 					depth += bmp.depth;
-					pix(pos.x, pos.y, idx);
+					render_idx_(pos.x, pos.y, idx);
 				}
 				pos.y += d;
 				++prgl_pos_;
@@ -321,8 +349,7 @@ namespace image {
 		/*------------------------------------------------------/
 		/	BGR (無圧縮 24/32 ビット) 形式の画像データを展開	/
 		/------------------------------------------------------*/
-		template <class render>
-		bool read_rgb_(utils::file_io& fin, render& pix, const bmp_info& bmp)
+		bool read_rgb_(utils::file_io& fin, const bmp_info& bmp)
 		{
 			int pads = bmp.depth / 8;
 			size_t stride = bmp.width * pads;
@@ -348,7 +375,7 @@ namespace image {
 					auto r = src[2];
 					auto g = src[1];
 					auto b = src[0];
-					pix(pos.x, pos.y, r, g, b);
+					render_rgb_(pos.x, pos.y, r, g, b);
 					src += pads;
 				}
 				pos.y += d;
@@ -390,8 +417,7 @@ namespace image {
 		/*----------------------------------------------/
 		/	BI_BITFIELDS 形式の画像データを展開			/
 		/----------------------------------------------*/
-		template<class render>
-		bool read_bitfield_(utils::file_io& fin, render& pix, const bmp_info& bmp)
+		bool read_bitfield_(utils::file_io& fin, const bmp_info& bmp)
 		{
 			volatile BGRA_PAD shift_cnt;
 			volatile BGRA_PAD bits_cnt;
@@ -441,7 +467,7 @@ namespace image {
 						r = (r << (8 - bits_cnt.r)) | (r >> (8 - bits_cnt.r));
 						g = (g << (8 - bits_cnt.g)) | (g >> (8 - bits_cnt.g));
 						b = (b << (8 - bits_cnt.b)) | (b >> (8 - bits_cnt.b));
-						pix(pos.x, pos.y, r, g, b);
+						render_rgb_(pos.x, pos.y, r, g, b);
 					}
 					break;
 
@@ -452,7 +478,7 @@ namespace image {
 						auto b = src[0];
 						auto a = src[3];
 						src += 4;
-						pix(pos.x, pos.y, r, g, b, a);
+						render_rgb_(pos.x, pos.y, r, g, b);
 					}
 					break;
 				}
@@ -467,8 +493,7 @@ namespace image {
 		/*----------------------------------------------/
 		/	BI_RLE8 / BI_RLE4 形式の画像データを展開	/
 		/----------------------------------------------*/
-		template <class render>
-		bool decompress_rle_(utils::file_io& fin, render& pix, const bmp_info& bmp)
+		bool decompress_rle_(utils::file_io& fin, const bmp_info& bmp)
 		{
 			size_t stride = bmp.width * bmp.depth;
 			if(stride & 7) stride += 8;
@@ -519,7 +544,7 @@ namespace image {
 					switch(bmp.depth) {
 					case 8:						/* BI_RLE8 */
 						while(n > 0 && pos.x < bmp.width) {
-							pix(pos.x, pos.y, c);
+							render_idx_(pos.x, pos.y, c);
 							--n;
 							++pos.x;
 						}
@@ -529,8 +554,8 @@ namespace image {
 						uint8_t c0 = c >> 4;
 						uint8_t c1 = c & 0xf;
 						while(n > 0 && pos.x < bmp.width) {
-							if(o & 1) pix(pos.x, pos.y, c1);
-							else pix(pos.x, pos.y, c0);
+							if(o & 1) render_idx_(pos.x, pos.y, c1);
+							else render_idx_(pos.x, pos.y, c0);
 							--n;
 							++pos.x;
 							++o;
@@ -544,7 +569,7 @@ namespace image {
 					case 8:						/* BI_RLE8 */
 						while(n > 0 && pos.x < bmp.width) {
 							uint8_t c = *p++;
-							pix(pos.x, pos.y, c);
+							render_idx_(pos.x, pos.y, c);
 							--n;
 							++pos.x;
 						}
@@ -554,8 +579,8 @@ namespace image {
 						while(n > 0 && pos.x < bmp.width) {
 							uint8_t c0 = p[o >> 1] >> 4;
 							uint8_t c1 = p[o >> 1] & 0xf;
-							if(o & 1) pix(pos.x, pos.y, c1);
-							else pix(pos.x, pos.y, c0);
+							if(o & 1) render_idx_(pos.x, pos.y, c1);
+							else render_idx_(pos.x, pos.y, c0);
 							--n;
 							++pos.x;
 							++o;
@@ -587,7 +612,22 @@ namespace image {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		bmp_in() : prgl_ref_(0), prgl_pos_(0) { }
+		bmp_in(RENDER& render) noexcept : render_(render), prgl_ref_(0), prgl_pos_(0),
+			rgbq_{ 0 }, ofs_x_(0), ofs_y_(0) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	描画オフセットの設定
+			@param[in]	x	X 軸オフセット
+			@param[in]	y	Y 軸オフセット
+		*/
+		//-----------------------------------------------------------------//
+		void set_draw_offset(int16_t x = 0, int16_t y = 0) noexcept
+		{
+			ofs_x_ = x;
+			ofs_y_ = y;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -597,7 +637,7 @@ namespace image {
 			@return エラーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool probe(utils::file_io& fin)
+		bool probe(utils::file_io& fin) noexcept
 		{
 			bmp_info bmp;
 			long pos = fin.tell();
@@ -606,7 +646,7 @@ namespace image {
 			return ret;
 		}
 
-#if 0
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	画像ファイルの情報を取得する
@@ -615,20 +655,21 @@ namespace image {
 			@return エラーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool info(utils::file_io& fin, img::img_info& fo)
+		bool info(utils::file_io& fin, img::img_info& fo) noexcept
 		{
 			long pos = fin.tell();
-			fin.seek(utils::file_io::SEEK::SET, pos);
 
 			bmp_info bmp;
-			if(!read_header_bmp(fin, bmp)) {
+			if(!read_header_bmp_(fin, bmp)) {
 				return false;
 			}
 
+			fin.seek(utils::file_io::SEEK::SET, pos);
+
 			fo.width  = bmp.width;
 			fo.height = bmp.height;
-			fo.mipmap_level = 0;
-			fo.multi_level = 0;
+//			fo.mipmap_level = 0;
+//			fo.multi_level = 0;
 			fo.grayscale = false;
 
 			if(bmp.depth <= 8) {
@@ -670,7 +711,7 @@ namespace image {
 			}
 			return true;
 		}
-#endif
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -680,7 +721,7 @@ namespace image {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool load(utils::file_io& fin, const std::string& opt)
+		bool load(utils::file_io& fin, const char* opt = nullptr) noexcept
 		{
 			long pos = fin.tell();
 			bmp_info bmp;
@@ -700,7 +741,7 @@ namespace image {
 			prgl_pos_ = 0;
 			prgl_ref_ = bmp.height;
 
-			int clutnum = 0;
+			uint32_t clutnum = 0;
 			if(bmp.depth <= 8) {
 				if(bmp.skip >= bmp.palette_size << bmp.depth) {
 					clutnum = 1 << bmp.depth;
@@ -717,19 +758,10 @@ namespace image {
 				clutnum = 0;
 			}
 
-			if(clutnum) {
-				unsigned char rgbq[RGBQUAD_SIZE];
-				for(int i = 0; i < clutnum; ++i) {
-					if(fin.read(rgbq, bmp.palette_size, 1) != 1) {
-						fin.seek(utils::file_io::SEEK::SET, pos);
-						return false;
-					}
-///					img::rgba8 c;
-///					c.a = 255;
-///					c.r = rgbq[RGBQ_RED];
-///					c.g = rgbq[RGBQ_GREEN];
-///					c.b = rgbq[RGBQ_BLUE];
-///					img_->put_clut(i, c);
+			if(clutnum > 0) {
+				if(fin.read(rgbq_, bmp.palette_size, clutnum) != clutnum) {
+					fin.seek(utils::file_io::SEEK::SET, pos);
+					return false;
 				}
 			}
 
@@ -747,27 +779,48 @@ namespace image {
 			switch(bmp.compression) {
 			case BI_RGB:		// 1, 4, 8, 24, 32 bits
 				if(bmp.depth == 24 || bmp.depth == 32) {
-///					f = read_rgb_(fin, img_, bmp);
+					f = read_rgb_(fin, bmp);
 				} else if(bmp.depth == 1 || bmp.depth == 4 || bmp.depth == 8) {
-///					f = read_idx_(fin, img_, bmp);
+					f = read_idx_(fin, bmp);
 				}
 				break;
 			case BI_BITFIELDS:	// 16, 32
-///				f = read_bitfield_(fin, img_, bmp);
+				f = read_bitfield_(fin, bmp);
 				break;
 			case BI_RLE8:
 			case BI_RLE4:
-///				f = decompress_rle_(fin, img_, bmp);
+				f = decompress_rle_(fin, bmp);
 				break;
 			default:
 				break;
 			}
 			if(!f) {
-///				img_ = nullptr;
 				fin.seek(utils::file_io::SEEK::SET, pos);
 			}
 
 			return f;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	BMP ファイルをロードする
+			@param[in]	fin	ファイル I/O クラス
+			@param[in]	opt	フォーマット固有の設定文字列
+			@return エラーがあれば「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool load(const char* fname, const char* opt = nullptr) noexcept
+		{
+			if(fname == nullptr) return false;
+
+			utils::file_io fin;
+			if(!fin.open(fname, "rb")) {
+				return false;
+			}
+			auto ret = load(fin, opt);
+			fin.close();
+			return ret;
 		}
 	};
 }
