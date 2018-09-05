@@ -80,11 +80,7 @@ namespace {
 
 
 	bool check_mount_() {
-		auto f = sdc_.get_mount();
-		if(!f) {
-			utils::format("SD card not mount.\n");
-		}
-		return f;
+		return sdc_.get_mount();
 	}
 
 
@@ -216,6 +212,12 @@ extern "C" {
 
 	int fatfs_get_mount() {
 		return check_mount_();
+	}
+
+
+	int make_full_path(const char* src, char* dst, uint16_t len)
+	{
+		return sdc_.make_full_path(src, dst, len);
 	}
 }
 

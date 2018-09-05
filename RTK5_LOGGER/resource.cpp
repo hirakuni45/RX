@@ -24,8 +24,9 @@ namespace app {
 	#include "resource/nmb24_9.h"
 	#include "resource/nmb24_co.h"
 	#include "resource/nmb24_do.h"
+	#include "resource/nmb24_x.h"
 
-	const uint8_t* nmb24[12] = {
+	const uint8_t* nmb24[] = {
 		nmb24_0,
 		nmb24_1,
 		nmb24_2,
@@ -38,5 +39,6 @@ namespace app {
 		nmb24_9,
 		nmb24_co,  // idx: 10
 		nmb24_do,  // idx: 11
+		nmb24_x,   // idx: 12
 	};
 }
