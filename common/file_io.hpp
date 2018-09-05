@@ -174,7 +174,7 @@ namespace utils {
 		//-------------------------------------------------------------//
 		uint32_t read(void* dst, uint32_t block, uint32_t num) noexcept
 		{
-			return read(dst, block * num);
+			return read(dst, block * num) / block;
 		}
 
 
