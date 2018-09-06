@@ -26,6 +26,7 @@ namespace utils {
 	class render_wave {
 
 		static const int16_t GRID             = 40;
+		static constexpr float   GRID_SCALE   = 1.0f / static_cast<float>(GRID);
 		static const int16_t MENU_SIZE        = 40;
 		static const int16_t TIME_SCROLL_AREA = RENDER::afont_height + GRID;
 		static const int16_t CH0_MOVE_AREA    = (RENDER::width - MENU_SIZE) / 2;
@@ -85,6 +86,7 @@ namespace utils {
 		int16_t		mes_ref_len_;
 
 		bool		touch_down_;
+		uint8_t		touch_num_;
 
 
 		void update_measere_() noexcept
@@ -106,6 +108,45 @@ namespace utils {
 			}
 		}
 
+
+		void auto_scale_(float a, char unit, char* out, uint32_t len)
+		{
+			char sc = 0;
+			if(a < 1e-6) {
+				a *= 1e9;
+				sc = 'n';
+			} else if(a < 1e-3) {
+				a *= 1e6;
+				sc = 'u';
+			} else if(a < 1.0f) {
+				a *= 1e3;
+				sc = 'm';
+			}
+			if(sc != 0) {
+				utils::sformat("%4.3f [%c%c]", out, len) % a % sc % unit;
+			} else {
+				utils::sformat("%4.3f [%c]", out, len) % a % unit;
+			}
+		}
+
+
+		void freq_scale_(float a, char* out, uint32_t len)
+		{
+			char sc = 0;
+			if(a >= 1e6) {
+				a /= 1e6;
+				sc = 'M';
+			} else if(a >= 1e3) {
+				a /= 1e3;
+				sc = 'K';
+			}
+			if(sc != 0) {
+				utils::sformat("%3.2f [%cHz]", out, len) % a % sc;
+			} else {
+				utils::sformat("%3.2f [Hz]", out, len) % a;
+			}
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -124,7 +165,7 @@ namespace utils {
 			mes_time_begin_(0), mes_time_size_(40), mes_time_org_(0),
 			mes_volt_begin_(0), mes_volt_size_(40), mes_volt_org_(0),
 			mes_ref_size_(0), mes_ref_len_(0),
-			touch_down_(false)
+			touch_down_(false), touch_num_(0)
 		{ }
 
 
@@ -182,11 +223,29 @@ namespace utils {
 				"1mS", "200uS", "100uS", "40uS", "20uS",
 				"10uS", "4uS", "2uS", "1uS", "500nS"
 			};
+			static const float rate_f[] = {
+				10e-3, 4e-3, 2e-3,
+				1e-3, 200e-6, 100e-6, 40e-6, 20e-6,
+				10e-6, 4e-6, 2e-6, 1e-6, 500e-9
+			};
 
 			char tmp[64];
 			utils::sformat("%s (%s)", tmp, sizeof(tmp)) % freq[rate_div_] % rate[rate_div_];
 			render_.fill(0, 0, 480, 16, RENDER::COLOR::Black);
-			render_.draw_text(0, 0, tmp);
+			auto x = render_.draw_text(0, 0, tmp);
+
+			// 計測モード時結果
+			if(measere_ == MEASERE::TIME) {
+				float a = static_cast<float>(mes_time_size_) * GRID_SCALE * rate_f[rate_div_];
+				auto_scale_(a, 'S', tmp, sizeof(tmp));
+				x = render_.draw_text(x + 8, 0, tmp);
+				freq_scale_(1.0f / a, tmp, sizeof(tmp));
+				render_.draw_text(x + 8, 0, tmp);
+			} else if(measere_ == MEASERE::VOLT) {
+//				float a = static_cast<float>(mes_time_size_) * GRID_SCALE * rate_f[rate_div_];
+//				utils::sformat("%4.3f", tmp, sizeof(tmp)) % a;
+//				render_.draw_text(x + 8, 0, tmp);
+			}
 		}
 
 
@@ -226,6 +285,8 @@ namespace utils {
 		bool ui_service() noexcept
 		{
 			auto num = touch_.get_touch_num();
+			auto num_back = touch_num_;
+			touch_num_ = num;
 			const auto& p = touch_.get_touch_pos(0);
 
 			if(num == 0) {
@@ -296,6 +357,7 @@ namespace utils {
 					} else {
 						mes_time_size_ = mes_ref_size_
 							+ static_cast<int16_t>(len.val) - mes_ref_len_;
+						if(mes_time_size_ < 0) mes_time_size_ = 0;
 					}
 				} else if(measere_ == MEASERE::VOLT) {
 					auto dx = p.x - p2.x;
@@ -307,6 +369,7 @@ namespace utils {
 					} else {
 						mes_volt_size_ = mes_ref_size_
 							+ static_cast<int16_t>(len.val) - mes_ref_len_;
+						if(mes_volt_size_ < 0) mes_volt_size_ = 0;
 					}
 				} else {
 
