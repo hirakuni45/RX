@@ -10,22 +10,32 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
 
+#include "cnc_pulse.hpp"
+
 namespace {
+
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 
 	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
 
-	typedef utils::fifo<uint8_t, 1024> RBF;
-	typedef utils::fifo<uint8_t, 128> SBF;
+	typedef utils::fixed_fifo<char, 1024> RBF;
+	typedef utils::fixed_fifo<char,  128> SBF;
 	typedef device::sci_io<device::SCI1, RBF, SBF> SCI;
 	SCI		sci_;
 
-	utils::command<256> command_;
+	typedef utils::command<256> COMMAND;
+	COMMAND command_;
+
+	typedef cnc::pulse<COMMAND>	CNC;
+	CNC		cnc_(command_);
+	
 }
 
 extern "C" {
@@ -83,8 +93,10 @@ int main(int argc, char** argv)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	// タイマー設定（６０Ｈｚ）
-	uint8_t cmt_irq_level = 4;
-	cmt_.start(60, cmt_irq_level);
+	{
+		uint8_t intr = 4;
+		cmt_.start(60, intr);
+	}
 
 	// SCI 設定
 	static const uint8_t sci_level = 2;
@@ -92,9 +104,11 @@ int main(int argc, char** argv)
 
 	utils::format("RX24T CNC Driver\n");
 
+	cnc_.start();
+
 	command_.set_prompt("# ");
 
-	device::PORT0::PDR.B0 = 1; // output
+	LED::DIR = 1;
 
 	uint32_t cnt = 0;
 	while(1) {
@@ -102,13 +116,16 @@ int main(int argc, char** argv)
 
 		// コマンド入力と、コマンド解析
 		if(command_.service()) {
-
+			auto f = cnc_.service_command();
+			if(!f) {
+				utils::format("Error: '%s'\n") % command_.get_command();
+			}
 		}
 
 		++cnt;
 		if(cnt >= 30) {
 			cnt = 0;
 		}
-		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
+		LED::P = (cnt < 10) ? 0 : 1;
 	}
 }
