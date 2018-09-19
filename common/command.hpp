@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include <cstring>
+#include "common/input.hpp"
 
 extern "C" {
 	void sci_putch(char ch);
@@ -200,12 +201,12 @@ namespace utils {
         /*!
             @brief  ワードを取得
 			@param[in]	argc	ワード位置
-			@param[in]	limit	ワード文字列リミット数
 			@param[out]	word	ワード文字列格納ポインター
+			@param[in]	limit	ワード文字列リミット数
 			@return 取得できたら「true」を返す
         */
         //-----------------------------------------------------------------//
-		bool get_word(uint8_t argc, uint16_t limit, char* word) const {
+		bool get_word(uint8_t argc, char* word, uint16_t limit) const {
 			const char* p = buff_;
 			char bc = ' ';
 			const char* wd = p;
@@ -266,6 +267,40 @@ namespace utils {
 				++p;
 			}
 			return false;
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  整数を取得
+			@param[in]	argc	ワード位置
+			@param[out]	out		整数
+			@return 取得できたら「true」を返す
+        */
+        //-----------------------------------------------------------------//
+		bool get_integer(uint8_t argc, int32_t& out) const
+		{
+			char tmp[32];
+			if(!get_word(argc, tmp, sizeof(tmp))) return false;
+
+			return (utils::input("%d", tmp) % out).status();
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  小数を取得
+			@param[in]	argc	ワード位置
+			@param[out]	out		小数
+			@return 取得できたら「true」を返す
+        */
+        //-----------------------------------------------------------------//
+		bool get_float(uint8_t argc, float& out) const
+		{
+			char tmp[32];
+			if(!get_word(argc, tmp, sizeof(tmp))) return false;
+
+			return (utils::input("%f", tmp) % out).status();
 		}
 
 
