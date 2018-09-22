@@ -458,7 +458,7 @@ namespace device {
 			@return	キャプチャ構造体
 		*/
 		//-----------------------------------------------------------------//
-		const capture_t& get_capture() const noexcept { return tt_.cap_; }
+		static const capture_t& get_capture() noexcept { return tt_.cap_; }
 
 
 		//-----------------------------------------------------------------//
@@ -467,7 +467,16 @@ namespace device {
 			@return	キャプチャ構造体
 		*/
 		//-----------------------------------------------------------------//
-		capture_t& at_capture() noexcept { return tt_.cap_; }
+		static capture_t& at_capture() noexcept { return tt_.cap_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  MAIN tick の取得
+			@return	MAIN tick
+		*/
+		//-----------------------------------------------------------------//
+		static uint32_t get_main_tick() noexcept { return tt_.main_tick_; }
 
 
 		//-----------------------------------------------------------------//
