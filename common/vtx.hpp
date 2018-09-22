@@ -13,6 +13,7 @@
 #include <boost/unordered_map.hpp>
 #include <cmath>
 #include <cfloat>
+#include <cstdint>
 
 namespace vtx {
 
@@ -24,15 +25,15 @@ namespace vtx {
 	const double deg2rad_d_ = get_pi<double>() / 180.0;		///< DEG -> RAD の変換定数(double)
 	const double radian_d_  = 2.0 * get_pi<double>();		///< RADIAN のπ変換定数(double)
 
-	inline void min_level(char& min) { min = 1; }
-	inline void min_level(short& min) { min = 1; }
-	inline void min_level(int& min) { min = 1; }
+	inline void min_level(int8_t& min) { min = 1; }
+	inline void min_level(int16_t& min) { min = 1; }
+	inline void min_level(int32_t& min) { min = 1; }
 	inline void min_level(float& min) { min = FLT_MIN; }
 	inline void min_level(double& min) { min = DBL_MIN; }
 
-	inline void max_level(char& min) { min = 0x7f; }
-	inline void max_level(short& min) { min = 0x7fff; }
-	inline void max_level(int& min) { min = 0x7fffffff; }
+	inline void max_level(int8_t& min) { min = 0x7f; }
+	inline void max_level(int16_t& min) { min = 0x7fff; }
+	inline void max_level(int32_t& min) { min = 0x7fffffff; }
 	inline void max_level(float& max) { max = FLT_MAX; }
 	inline void max_level(double& max) { max = DBL_MAX; }
 
@@ -59,7 +60,7 @@ namespace vtx {
 		@brief	8 ビット整数、二次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex2<char>	bpos;
+	typedef vertex2<int8_t>	bpos;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -67,7 +68,7 @@ namespace vtx {
 		@brief	16 ビット整数、二次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex2<short>	spos;
+	typedef vertex2<int16_t> spos;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -75,7 +76,7 @@ namespace vtx {
 		@brief	32 ビット整数、二次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex2<int>	ipos;
+	typedef vertex2<int32_t> ipos;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -99,7 +100,7 @@ namespace vtx {
 		@brief	8 ビット整数、三次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex3<char>	bvtx;
+	typedef vertex3<int8_t> bvtx;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -107,7 +108,7 @@ namespace vtx {
 		@brief	16 ビット整数、三次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex3<short>	svtx;
+	typedef vertex3<int16_t> svtx;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -115,7 +116,7 @@ namespace vtx {
 		@brief	32 ビット整数、三次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex3<int>	ivtx;
+	typedef vertex3<int32_t> ivtx;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -123,7 +124,7 @@ namespace vtx {
 		@brief	32 ビット浮動小数点、三次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex3<float>	fvtx;
+	typedef vertex3<float> fvtx;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -131,7 +132,7 @@ namespace vtx {
 		@brief	64 ビット倍精度浮動小数点、三次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex3<double>	dvtx;
+	typedef vertex3<double> dvtx;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -139,7 +140,7 @@ namespace vtx {
 		@brief	8 ビット整数、四次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex4<char>	bvtx4;
+	typedef vertex4<int8_t> bvtx4;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -147,7 +148,7 @@ namespace vtx {
 		@brief	16 ビット整数、四次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex4<short>	svtx4;
+	typedef vertex4<int16_t> svtx4;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -155,7 +156,7 @@ namespace vtx {
 		@brief	32 ビット整数、四次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex4<int>	ivtx4;
+	typedef vertex4<int32_t> ivtx4;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -163,7 +164,7 @@ namespace vtx {
 		@brief	32 ビット浮動小数点、四次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex4<float>	fvtx4;
+	typedef vertex4<float> fvtx4;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -171,7 +172,7 @@ namespace vtx {
 		@brief	64 ビット倍精度浮動小数点、四次元、位置情報
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	typedef vertex4<double>	dvtx4;
+	typedef vertex4<double> dvtx4;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -214,6 +215,9 @@ namespace vtx {
 		inline T sqrY() const { return y * y; }
 		inline T sqr() const { return sqrX() + sqrY(); }
 		inline T len() const { return std::sqrt(sqr()); }
+
+		inline T min() const { return x < y ? x : y; }
+		inline T max() const { return x > y ? x : y; }
 
 		inline void set(T c) { x = y = c; }
 		inline void set(T xx, T yy) { x = xx; y = yy; }
@@ -361,6 +365,23 @@ namespace vtx {
 		inline T sqrZ() const { return z * z; }
 		inline T sqr() const { return sqrX() + sqrY() + sqrZ(); }
 		inline T len() const { return std::sqrt(sqr()); }
+
+		inline T min() const {
+			if(x < y) {
+				if(x < z) return x;
+			} else {
+				if(y < z) return y;
+			}
+			return z;
+		}
+		inline T max() const {
+			if(x > y) {
+				if(x > z) return x;
+			} else {
+				if(y > z) return y;
+			}
+			return z;
+		}
 
 		inline void set(T c) { x = y = z = c; }
 		inline void set(T xx, T yy, T zz = static_cast<T>(0)) { x = xx; y = yy; z = zz; }
@@ -519,6 +540,39 @@ namespace vtx {
 		inline T sqrW() const { return w * w; }
 		inline T sqr() const { return (sqrX() + sqrY() + sqrZ() + sqrW()); }
 		inline T len() const { return std::sqrt(sqrX() + sqrY() + sqrZ() + sqrW()); }
+
+		inline T min() const {
+			if(x < y) {
+				if(x < z) {
+					if(x < w) return x;
+				} else {
+					if(z < w) return z;
+				}
+			} else {
+				if(y < z) {
+					if(y < w) return y;
+				} else {
+					if(z < w) return z;
+				}
+			}
+			return w;
+		}
+		inline T max() const {
+			if(x > y) {
+				if(x > z) {
+					if(x > w) return x;
+				} else {
+					if(z > w) return z;
+				}
+			} else {
+				if(y > z) {
+					if(y > w) return y;
+				} else {
+					if(z > w) return z;
+				}
+			}
+			return w;
+		}
 
 		inline void set(T c) { x = y = z = w = c; }
 		inline void set(T xx, T yy, T zz, T ww = static_cast<T>(1)) { x = xx; y = yy; z = zz; w = ww; }
@@ -939,10 +993,10 @@ namespace vtx {
 		}
 	};
 
-	typedef rectangle<short>	srect;
-	typedef rectangle<int>		irect;
-	typedef rectangle<float>	frect;
-	typedef rectangle<double>	drect;
+	typedef rectangle<int16_t> srect;
+	typedef rectangle<int32_t> irect;
+	typedef rectangle<float>   frect;
+	typedef rectangle<double>  drect;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
