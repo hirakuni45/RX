@@ -21,6 +21,8 @@
 
 namespace {
 
+	static const uint16_t VERSION = 10;
+
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 
 	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
@@ -92,17 +94,17 @@ int main(int argc, char** argv)
 						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (80/2=40)
 	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
-	// タイマー設定（６０Ｈｚ）
+	// タイマー設定（１００Ｈｚ）
 	{
-		uint8_t intr = 4;
-		cmt_.start(60, intr);
+		uint8_t intr = 3;
+		cmt_.start(100, intr);
 	}
 
 	// SCI 設定
 	static const uint8_t sci_level = 2;
 	sci_.start(115200, sci_level);
 
-	utils::format("RX24T CNC Driver\n");
+	utils::format("CNC Driver Version %1d.%02d\n") % (VERSION / 100) % (VERSION % 100);
 
 	cnc_.start();
 
@@ -113,6 +115,8 @@ int main(int argc, char** argv)
 	uint32_t cnt = 0;
 	while(1) {
 		cmt_.sync();
+
+		cnc_.update();
 
 		// コマンド入力と、コマンド解析
 		if(command_.service()) {
