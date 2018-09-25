@@ -417,7 +417,7 @@ int main(int argc, char** argv)
 		{
 			bool m = check_mount_();
 			if(!mount && m) {
-				render_.fill(480-24, 0, 24, 16, 0x0000);
+				render_.fill_box(480-24, 0, 24, 16, 0x0000);
 			}
 			if(mount && !m) {
 				render_.draw_text(480-24, 0, "?SD");
