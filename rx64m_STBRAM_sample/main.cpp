@@ -129,7 +129,7 @@ int main(int argc, char** argv)
 					utils::format("log\n");
 				} else {
 					char buff[32];
-					if(command_.get_word(0, sizeof(buff), buff)) {
+					if(command_.get_word(0, buff, sizeof(buff))) {
 						utils::format("Command error: '%s'\n") % buff;
 					}
 				}
