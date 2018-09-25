@@ -13,6 +13,7 @@
 #include "common/sci_io.hpp"
 #include "common/fifo.hpp"
 #include "common/format.hpp"
+#include "common/mtu_io.hpp"
 
 namespace {
 
@@ -50,7 +51,7 @@ int main(int argc, char** argv)
 {
 	// 10MHz X-Tal, 80MHz
 	typedef device::system_io<10000000> SYSTEM_IO;
-	SYSTEM_IO::setup_system_clock(80000000);
+	SYSTEM_IO::setup_system_clock();
 
 	// SCI 設定
 	static const uint8_t sci_level = 2;
@@ -63,7 +64,7 @@ int main(int argc, char** argv)
 	// MTU0 設定
 	{
 		uint32_t frq = 10000;
-		if(!mtu0_io_.start_pwm2(MTU0::channel::A, MTU0_IO::output_type::low_to_high, frq)) {
+		if(!mtu0_io_.start_pwm2(MTU0::channel::A, MTU0_IO::OUTPUT_TYPE::LOW_TO_HIGH, frq)) {
 			utils::format("MTU0 input capture start fail...\n");
 		}
 	}
@@ -71,7 +72,7 @@ int main(int argc, char** argv)
 	// MTU1 設定
 	{
 		uint32_t frq = 10000;
-		if(!mtu1_io_.start_pwm2(MTU1::channel::A, MTU1_IO::output_type::high_to_low, frq)) {
+		if(!mtu1_io_.start_pwm2(MTU1::channel::A, MTU1_IO::OUTPUT_TYPE::HIGH_TO_LOW, frq)) {
 			utils::format("MTU1 output start fail...\n");
 		}
 	}
