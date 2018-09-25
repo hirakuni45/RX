@@ -117,7 +117,7 @@ namespace {
 		bool err = false;
 		if(command_.get_words() == 3) {
 			char buff[12];
-			if(command_.get_word(1, sizeof(buff), buff)) {
+			if(command_.get_word(1, buff, sizeof(buff))) {
 				const char* p = buff;
 				int vs[3];
 				uint8_t i;
@@ -136,7 +136,7 @@ namespace {
 				}
 			}
 
-			if(command_.get_word(2, sizeof(buff), buff)) {
+			if(command_.get_word(2, buff, sizeof(buff))) {
 				const char* p = buff;
 				int vs[3];
 				uint8_t i;
@@ -410,7 +410,7 @@ int main(int argc, char** argv)
 					if(check_mount_()) {
 						if(cmdn >= 2) {
 							char tmp[128];
-							command_.get_word(1, sizeof(tmp), tmp);
+							command_.get_word(1, tmp, sizeof(tmp));
 							sdc_.dir(tmp);
 						} else {
 							sdc_.dir("");
@@ -421,7 +421,7 @@ int main(int argc, char** argv)
 					if(check_mount_()) {
 						if(cmdn >= 2) {
 							char tmp[128];
-							command_.get_word(1, sizeof(tmp), tmp);
+							command_.get_word(1, tmp, sizeof(tmp));
 							sdc_.cd(tmp);						
 						} else {
 							sdc_.cd("/");
@@ -455,7 +455,7 @@ int main(int argc, char** argv)
 #endif
 				if(!f) {
 					char tmp[128];
-					command_.get_word(0, sizeof(tmp), tmp);
+					command_.get_word(0, tmp, sizeof(tmp));
 					utils::format("Command error: '%s'\n") % tmp;
 				}
 			}
