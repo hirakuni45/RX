@@ -231,7 +231,7 @@ namespace utils {
 
 			char tmp[64];
 			utils::sformat("%s (%s)", tmp, sizeof(tmp)) % freq[rate_div_] % rate[rate_div_];
-			render_.fill(0, 0, 480, 16, RENDER::COLOR::Black);
+			render_.fill_box(0, 0, 480, 16, RENDER::COLOR::Black);
 			auto x = render_.draw_text(0, 0, tmp);
 
 			// 計測モード時結果
@@ -263,14 +263,14 @@ namespace utils {
 
 			char tmp[32];
 			if(ch == 0) {
-				render_.fill(  0, 272 - 16 + 1, 15, 15, RENDER::COLOR::Lime);
-				render_.fill( 16, 272 - 16 + 1, 240 - 16, 15, RENDER::COLOR::Black);
+				render_.fill_box(  0, 272 - 16 + 1, 15, 15, RENDER::COLOR::Lime);
+				render_.fill_box( 16, 272 - 16 + 1, 240 - 16, 15, RENDER::COLOR::Black);
 				utils::sformat("CH0: %s [V]", tmp, sizeof(tmp)) % divs[ch0_div_];
 				render_.draw_text(  16, 272 - 16 + 1, tmp);
 			} else {
-				render_.fill(240, 272 - 16 + 1, 15, 15, RENDER::COLOR::Fuchsi);
+				render_.fill_box(240, 272 - 16 + 1, 15, 15, RENDER::COLOR::Fuchsi);
 				utils::sformat("CH1: %s [V]", tmp, sizeof(tmp)) % divs[ch1_div_];
-				render_.fill(240 + 16, 272 - 16 + 1, 240 - 16, 15, RENDER::COLOR::Black);
+				render_.fill_box(240 + 16, 272 - 16 + 1, 240 - 16, 15, RENDER::COLOR::Black);
 				render_.draw_text(240 + 16, 272 - 16 + 1, tmp);
 			}
 		}
@@ -391,7 +391,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void update() noexcept
 		{
-			render_.fill(0, 16, 440, 240, RENDER::COLOR::Black);
+			render_.fill_box(0, 16, 440, 240, RENDER::COLOR::Black);
 			draw_grid(0, 16, 440, 240, GRID);
 
 			if(measere_ != MEASERE::NONE) {
