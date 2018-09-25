@@ -229,7 +229,7 @@ int main(int argc, char** argv)
 
 		if(cmd_.service()) {
 			char tmp[32];
-			if(cmd_.get_word(0, sizeof(tmp), tmp)) {
+			if(cmd_.get_word(0, tmp, sizeof(tmp))) {
 				float freq = 0.0f;
 				if((utils::input("%f", tmp) % freq).status()) {
 					freq_ = freq;

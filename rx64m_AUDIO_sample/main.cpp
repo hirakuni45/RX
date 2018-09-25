@@ -447,7 +447,7 @@ int main(int argc, char** argv)
 					if(check_mount_()) {
 						if(cmdn >= 2) {
 							char tmp[128];
-							cmd_.get_word(1, sizeof(tmp), tmp);
+							cmd_.get_word(1, tmp, sizeof(tmp));
 							sdc_.dir(tmp);
 						} else {
 							sdc_.dir("");
@@ -458,8 +458,8 @@ int main(int argc, char** argv)
 					if(check_mount_()) {
 						if(cmdn >= 2) {
 							char tmp[128];
-							cmd_.get_word(1, sizeof(tmp), tmp);
-							sdc_.cd(tmp);						
+							cmd_.get_word(1, tmp, sizeof(tmp));
+							sdc_.cd(tmp);
 						} else {
 							sdc_.cd("/");
 						}
@@ -470,7 +470,7 @@ int main(int argc, char** argv)
 					f = true;
 				} else if(cmd_.cmp_word(0, "play")) {  // play [xxx]
 					if(cmdn >= 2) {
-						cmd_.get_word(1, sizeof(tmp), tmp);
+						cmd_.get_word(1, tmp, sizeof(tmp));
 						if(std::strcmp(tmp, "*") == 0) {
 							play_loop_("", "");
 						} else {
@@ -489,7 +489,7 @@ int main(int argc, char** argv)
 				}
 				if(!f) {
 					char tmp[128];
-					if(cmd_.get_word(0, sizeof(tmp), tmp)) {
+					if(cmd_.get_word(0, tmp, sizeof(tmp))) {
 						utils::format("Command error: '%s'\n") % tmp;
 					}
 				}
