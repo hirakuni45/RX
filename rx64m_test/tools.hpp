@@ -93,7 +93,7 @@ namespace seeda {
 
 		bool get_int_(uint8_t argc, int& val) {
 			char tmp[32];
-			if(cmd_.get_word(argc, sizeof(tmp), tmp)) {
+			if(cmd_.get_word(argc, tmp, sizeof(tmp))) {
 				if((utils::input("%d", tmp) % val).status()) {
 					return true;
 				}
@@ -105,7 +105,7 @@ namespace seeda {
 		{
 			char tmp[32];
 			tmp[0] = 0;
-			cmd_.get_word(argc, sizeof(tmp), tmp);					
+			cmd_.get_word(argc, tmp, sizeof(tmp));					
 			utils::format("param error: '%s'\n") % tmp;
 		}
 
@@ -137,7 +137,7 @@ namespace seeda {
 			bool err = false;
 			if(cmd_.get_words() == 3) {
 				char buff[12];
-				if(cmd_.get_word(1, sizeof(buff), buff)) {
+				if(cmd_.get_word(1, buff, sizeof(buff))) {
 					const char* p = buff;
 					int vs[3];
 					uint8_t i;
@@ -156,7 +156,7 @@ namespace seeda {
 					}
 				}
 
-				if(cmd_.get_word(2, sizeof(buff), buff)) {
+				if(cmd_.get_word(2, buff, sizeof(buff))) {
 					const char* p = buff;
 					int vs[3];
 					uint8_t i;
@@ -213,7 +213,7 @@ namespace seeda {
 				return true;
 			} else if(cmdn > 1) {
 				char tmp[16];
-				if(cmd_.get_word(1, sizeof(tmp), tmp)) {
+				if(cmd_.get_word(1, tmp, sizeof(tmp))) {
 					if(tmp[0] >= '0' && tmp[0] <= '7' && tmp[1] == 0) {
 						if(at_eadc().convert()) {
 							int ch = tmp[0] - '0';
@@ -257,7 +257,7 @@ namespace seeda {
 				} else {
 					char tmp[32];
 					tmp[0] = 0;
-					cmd_.get_word(1, sizeof(tmp), tmp);					
+					cmd_.get_word(1, tmp, sizeof(tmp));					
 					utils::format("param error: '%s'\n") % tmp;
 				}
 			} else {
@@ -286,7 +286,7 @@ namespace seeda {
 				fname[0] = 0;
 				for(uint8_t i = 1; i < cmdn; ++i) {
 					char tmp[32];
-					if(cmd_.get_word(i, sizeof(tmp), tmp)) {
+					if(cmd_.get_word(i, tmp, sizeof(tmp))) {
 						if(tmp[0] == '-') {
 							if(strcmp(tmp, "-ch") == 0) {
 								mode = 1;
@@ -367,7 +367,7 @@ namespace seeda {
 		bool erase = false;
 		while(n < cmdn) {
 			char tmp[128];
-			cmd_.get_word(n, sizeof(tmp), tmp);
+			cmd_.get_word(n, tmp, sizeof(tmp));
 			if(std::strcmp(tmp, ":") == 0) {
 				wm = true;
 				++n;
@@ -469,12 +469,12 @@ namespace seeda {
 		} else if(cmdn <= 3) {
 			char tmp[128];
 			int val = 0;
-			if(cmd_.get_word(2, sizeof(tmp), tmp)) {
+			if(cmd_.get_word(2, tmp, sizeof(tmp))) {
 				if(!(utils::input("%d", tmp) % val).status()) {
 					return false;
 				}
 				if(val <= 0) return false;
-				if(cmd_.get_word(1, sizeof(tmp), tmp)) {
+				if(cmd_.get_word(1, tmp, sizeof(tmp))) {
 					at_nets().at_write_file().set_path(tmp);
 ///					at_nets().at_write_file().set_limit(val);
 					at_nets().at_write_file().enable();
@@ -548,7 +548,7 @@ namespace seeda {
 		bool err = false;
 		for(uint8_t i = 1; i < cmdn; ++i) {
 			char tmp[128];
-			if(cmd_.get_word(i, sizeof(tmp), tmp)) {
+			if(cmd_.get_word(i, tmp, sizeof(tmp))) {
 
 				if(strncmp("dhcp=", tmp, 5) == 0) {
 					if(strcmp(&tmp[5], "on") == 0) {
@@ -592,7 +592,7 @@ namespace seeda {
 	{
 		if(cmdn == 2) {
 			char tmp[128];
-			if(cmd_.get_word(1, sizeof(tmp), tmp)) {
+			if(cmd_.get_word(1, tmp, sizeof(tmp))) {
 				int v;
 				if((utils::input("%d", tmp) % v).status()) {
 					if(v >= 5 && v <= 30) {
@@ -685,7 +685,7 @@ namespace seeda {
 						if(check_mount_()) {
 							if(cmdn >= 2) {
 								char tmp[128];
-								cmd_.get_word(1, sizeof(tmp), tmp);
+								cmd_.get_word(1, tmp, sizeof(tmp));
 								at_sdc().dir(tmp);
 							} else {
 								at_sdc().dir("");
@@ -696,7 +696,7 @@ namespace seeda {
 						if(check_mount_()) {
 							if(cmdn >= 2) {
 								char tmp[128];
-								cmd_.get_word(1, sizeof(tmp), tmp);
+								cmd_.get_word(1, tmp, sizeof(tmp));
 								at_sdc().cd(tmp);						
 							} else {
 								at_sdc().cd("/");
@@ -777,7 +777,7 @@ namespace seeda {
 					}
 					if(!f) {
 						char tmp[128];
-						if(cmd_.get_word(0, sizeof(tmp), tmp)) {
+						if(cmd_.get_word(0, tmp, sizeof(tmp))) {
 							utils::format("Command error: '%s'\n") % tmp;
 						}
 					}

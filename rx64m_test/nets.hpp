@@ -990,7 +990,7 @@ namespace seeda {
 				return true;
 			} else if(cmdn > 1) {
 				char tmp[16];
-				if(cmd.get_word(1, sizeof(tmp), tmp)) {
+				if(cmd.get_word(1, tmp, sizeof(tmp))) {
 					// Reset signal
 					if(strcmp(tmp, "0") == 0) {
 						device::PORT7::PODR.B0 = 0;
