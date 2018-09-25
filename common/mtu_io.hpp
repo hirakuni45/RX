@@ -399,7 +399,7 @@ namespace device {
 			uint8_t ctd = 0;
 			switch(ct) {
 			case CAPTURE_TYPE::POSITIVE: ctd = 0b1000; break;
-			case CAPTURE_TYPE::NEFATIVE: ctd = 0b1001; break;
+			case CAPTURE_TYPE::NEGATIVE: ctd = 0b1001; break;
 			case CAPTURE_TYPE::DUAL:     ctd = 0b1011; break;
 			default: break;
 			}
