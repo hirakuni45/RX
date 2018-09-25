@@ -34,7 +34,9 @@ namespace {
 	SCI		sci_;
 
 	// GPS 専用シリアル定義
-	typedef device::sci_io<device::SCI2, REB, SEB, device::port_map::option::SECOND> GPS;
+	typedef utils::fixed_fifo<char, 512>  G_REB;
+	typedef utils::fixed_fifo<char, 2048> G_SEB;
+	typedef device::sci_io<device::SCI2, G_REB, G_SEB, device::port_map::option::SECOND> GPS;
 	GPS		gps_;
 
 	// GPS の測位位置のデコード
@@ -280,6 +282,9 @@ int main(int argc, char** argv)
 
 		++n;
 		if(n >= 30) {
+
+			nmea_.list_all();
+
 			n = 0;
 		}
 		if(n < 10) {
