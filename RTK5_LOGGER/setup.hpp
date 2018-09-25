@@ -20,6 +20,8 @@ namespace app {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class setup {
 
+		typedef scenes_base::RENDER RENDER;
+
 	public:
 		//-------------------------------------------------------------//
 		/*!
@@ -36,7 +38,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init() noexcept
 		{
-//			at_scenes_base().at_render().clear(0);
+			at_scenes_base().at_render().clear(RENDER::COLOR::Black);
 		}
 
 

@@ -62,6 +62,7 @@ namespace app {
 				if(!logo_ && fatfs_get_mount() != 0) {
 					auto& bmp = at_scenes_base().at_bmp();
 					utils::file_io fin;
+//					if(fin.open("wim02.bmp", "rb")) {
 					if(fin.open("HRC_logo_s.bmp", "rb")) {
 						img::img_info ifo;
 						if(bmp.info(fin, ifo)) {
