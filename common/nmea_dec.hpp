@@ -1,7 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	NMEA デコード・クラス（GPS 測位コードパース）
+	@brief	NMEA デコード・クラス（GPS 測位コードパース）@n
+			http://www.hiramine.com/physicalcomputing/general/gps_nmeaformat.html
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -11,6 +12,8 @@
 #include <cstdint>
 #include <cstring>
 #include "common/time.h"
+#include "common/format.hpp"
+#include "common/input.hpp"
 
 namespace utils {
 
@@ -60,7 +63,7 @@ namespace utils {
 		SCI_IO&		sci_;
 
 		uint16_t	pos_;
-		char		line_[128];
+		char		line_[256];
 
 		char		time_[12];  // 時間
 		char		lat_[12];   // 緯度(latitude)
@@ -175,20 +178,11 @@ namespace utils {
             @brief  コンストラクター
         */
         //-----------------------------------------------------------------//
-		nmea_dec(SCI_IO& sci) noexcept : sci_(sci), pos_(0), sidx_(0), id_(0), iid_(0) {
-			line_[0] = 0;
-			time_[0] = 0;
-			lat_[0] = 0;
-			ns_[0] = 0;
-			lon_[0] = 0;
-			ew_[0] = 0;
-			q_[0] = 0;
-			satellite_[0] = 0;
-			hq_[0] = 0;
-			alt_[0] = 0;
-			alt_unit_[0] = 0;
-
-			date_[0] = 0;
+		nmea_dec(SCI_IO& sci) noexcept : sci_(sci), pos_(0), line_{ 0 },
+			time_{ 0 }, lat_{ 0 }, ns_{ 0 }, lon_{ 0 },
+			ew_{ 0 }, q_{ 0 }, satellite_{ 0 }, hq_{ 0 },
+			alt_{ 0 }, alt_unit_{ 0 }, date_{ 0 },
+			sidx_(0), id_(0), iid_(0) {
 		}
 
 
@@ -249,7 +243,7 @@ namespace utils {
 
         //-----------------------------------------------------------------//
         /*!
-            @brief  緯度を取得
+            @brief  緯度を取得(dddmm.mmmm)
 			@return 緯度
         */
         //-----------------------------------------------------------------//
@@ -258,7 +252,7 @@ namespace utils {
 
         //-----------------------------------------------------------------//
         /*!
-            @brief  経度を取得
+            @brief  経度を取得(dddmm.mmmm)
 			@return 経度
         */
         //-----------------------------------------------------------------//
@@ -280,7 +274,12 @@ namespace utils {
 			@return 衛星数
         */
         //-----------------------------------------------------------------//
-		const char* get_satellite() const noexcept { return satellite_; }
+		int get_satellite() const noexcept
+		{
+			int n = 0;
+			utils::input("%d", satellite_) % n;
+			return n;
+		}
 
 
         //-----------------------------------------------------------------//
@@ -330,12 +329,36 @@ namespace utils {
 
         //-----------------------------------------------------------------//
         /*!
+            @brief  GPS 情報の表示
+        */
+        //-----------------------------------------------------------------//
+		void list_all() const noexcept
+		{
+			utils::format("ID: %d, IID: %d %s %s\n")
+				% get_id() % get_iid() % get_date() % get_time();
+			char lat[10];
+			if(!conv_latlon(get_lat(), lat, sizeof(lat))) {
+				return;
+			}
+			char lon[10];
+			if(!conv_latlon(get_lon(), lon, sizeof(lon))) {
+				return;
+			}
+			utils::format("(%d)LatLon: %s,%s (%s m)\n")
+				% get_satellite() % lat % lon % get_altitude();
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
             @brief  スタート
         */
         //-----------------------------------------------------------------//
 		void start() noexcept
 		{
 			sci_.auto_crlf(false);
+			line_[0] = 0;
+			pos_ = 0;
 		}
 
 
@@ -348,23 +371,84 @@ namespace utils {
         //-----------------------------------------------------------------//
 		bool service() noexcept
 		{
-			char ch;
 			bool ret = false;
-			while(sci_.recv_length() > 0) {
-				ch = sci_.getch();
-				if(ch == 0x0d) {
+			auto len = sci_.recv_length();
+			while(len > 0) {
+				auto ch = sci_.getch();
+				if(ch == 0x0d || ch == 0x0a || ch == 0) {
 					line_[pos_] = 0;
 					ret = decode_();
 					pos_ = 0;
 				} else {
 					if(ch >= ' ' && ch <= 0x7f) {
-						if(pos_ < sizeof(line_)) {
+						if(pos_ < (sizeof(line_) - 1)) {
 							line_[pos_] = ch;
 							++pos_;
+						} else {
+							pos_ = 0;
 						}
 					}
 				}
+				--len;
 			}
+			return ret;
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  軽度、緯度情報を、google などで使える形式に変換
+			@param[in]	src	ddmm.mmmm 度形式
+			@param[out]	up	ddd 度表記
+			@param[out]	dn	.dddd 度表記
+			@return 成功なら「true」
+        */
+        //-----------------------------------------------------------------//
+		static bool conv_latlon(const char* src, int32_t& up, int32_t& dn) noexcept
+		{
+			const char* p = strchr(src, '.');
+			if(p == nullptr) return false;
+			if((p - src) < 3) return false;
+			p -= 2;
+			char tmp[8];
+			strncpy(tmp, src, p - src);
+			tmp[p - src] = 0;
+			if(!(utils::input("%d", tmp) % up).status()) {
+				return false;
+			}
+
+			tmp[0] = p[0];
+			tmp[1] = p[1];
+			tmp[2] = p[3];
+			tmp[3] = p[4];
+			tmp[4] = p[5];
+			tmp[5] = p[6];
+			tmp[6] = 0;
+			if(!(utils::input("%d", tmp) % dn).status()) {
+				return false;
+			}
+			dn /= 60;
+			return true;
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  軽度、緯度情報を、google などで使える形式に変換
+			@param[in]	src	ddmm.mmmm 度形式
+			@param[out]	dst	ddd.dddd 度表記
+			@param[in]	len	dst のサイズ
+			@return 成功なら「true」
+        */
+        //-----------------------------------------------------------------//
+		static bool conv_latlon(const char* src, char* dst, uint32_t len) noexcept
+		{
+			if(src == nullptr || dst == nullptr || len < 8) return false;
+
+			int32_t up = 0;
+			int32_t dn = 0;
+			auto ret = conv_latlon(src, up, dn);
+			utils::sformat("%d.%d", dst, len) % up % dn;
 			return ret;
 		}
 
