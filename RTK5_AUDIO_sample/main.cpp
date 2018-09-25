@@ -271,7 +271,7 @@ namespace {
 		uint16_t hor = (t / 3600) % 24;
 		char tmp[16];
 		utils::sformat("%02d:%02d:%02d", tmp, sizeof(tmp)) % hor % min % sec;
-		render_.fill(0, 5 * 20, 8 * 8, 16, RENDER::COLOR::Black);
+		render_.fill_box(0, 5 * 20, 8 * 8, 16, RENDER::COLOR::Black);
 		render_.draw_text(0, 5 * 20, tmp);
 	}
 
@@ -367,7 +367,7 @@ namespace {
 				if(check_mount_()) {
 					if(cmdn >= 2) {
 						char tmp[128];
-						cmd_.get_word(1, sizeof(tmp), tmp);
+						cmd_.get_word(1, tmp, sizeof(tmp));
 						sdc_.dir(tmp);
 					} else {
 						sdc_.dir("");
@@ -378,7 +378,7 @@ namespace {
 				if(check_mount_()) {
 					if(cmdn >= 2) {
 						char tmp[128];
-						cmd_.get_word(1, sizeof(tmp), tmp);
+						cmd_.get_word(1, tmp, sizeof(tmp));
 						sdc_.cd(tmp);						
 					} else {
 						sdc_.cd("/");
@@ -391,7 +391,7 @@ namespace {
 			} else if(cmd_.cmp_word(0, "play")) {
 				if(cmdn >= 2) {
 					char tmp[128];
-					cmd_.get_word(1, sizeof(tmp), tmp);
+					cmd_.get_word(1, tmp, sizeof(tmp));
 					if(std::strcmp(tmp, "*") == 0) {
 						play_loop_("", "");
 					} else {
@@ -410,7 +410,7 @@ namespace {
 			}
 			if(!f) {
 				char tmp[128];
-				if(cmd_.get_word(0, sizeof(tmp), tmp)) {
+				if(cmd_.get_word(0, tmp, sizeof(tmp))) {
 					utils::format("Command error: '%s'\n") % tmp;
 				}
 			}
