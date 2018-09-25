@@ -746,7 +746,7 @@ namespace graphics {
 		void draw_button(int16_t x, int16_t y, int16_t w, int16_t h, const char* text) noexcept
 		{
 			auto len = get_text_length(text);
-			fill(x, y, w, h, bc_);
+			fill_box(x, y, w, h, bc_);
 			x += (w - len) / 2;
 			y += (h - font_height) / 2;
 			draw_text(x, y, text);
