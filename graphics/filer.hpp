@@ -115,7 +115,7 @@ namespace graphics {
 			}
 			if(draw && t.vpos_ >= 0 && t.vpos_ < RDR::height) {
 				t.rdr_.set_fore_color(RDR::COLOR::White);
-				t.rdr_.fill(SPC, t.vpos_, RDR::width - SPC * 2, RDR::font_height, 0x0000);
+				t.rdr_.fill_box(SPC, t.vpos_, RDR::width - SPC * 2, RDR::font_height, 0x0000);
 				if(dir) t.rdr_.draw_font(SPC, t.vpos_, '/');
 				if(dir) {
 					t.rdr_.set_fore_color(RDR::COLOR::Blue);
@@ -154,7 +154,7 @@ namespace graphics {
 					rdr_st_.vofs_ = 0;
 					rdr_st_.sel_pos_ = 0;
 				} else {
-					const auto& t = pos_stack_.pull();
+					const auto& t = pos_stack_.pop();
 					rdr_st_.vofs_ = t.vofs_;
 					rdr_st_.sel_pos_ = t.sel_pos_;
 				}
