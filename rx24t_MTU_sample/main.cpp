@@ -15,6 +15,7 @@
 #include "common/sci_io.hpp"
 #include "common/fifo.hpp"
 #include "common/format.hpp"
+#include "common/mtu_io.hpp"
 
 namespace {
 
@@ -90,8 +91,8 @@ int main(int argc, char** argv)
 
 	// MTU0 設定
 	{
-		uint8_t intr_level = 3;		
-		if(!mtu0_io_.start_capture(MTU0::channel::A, MTU0_IO::capture_type::positive, intr_level)) {
+		uint8_t intr = 3;		
+		if(!mtu0_io_.start_capture(MTU0::channel::A, MTU0_IO::CAPTURE_TYPE::POSITIVE, intr)) {
 			utils::format("MTU0 input capture start fail...\n");
 		}
 	}
@@ -99,7 +100,7 @@ int main(int argc, char** argv)
 	// MTU1 設定
 	{
 		uint32_t frq = 1000;
-		if(!mtu1_io_.start_output(MTU1::channel::A, MTU1_IO::output_type::toggle, frq)) {
+		if(!mtu1_io_.start_normal(MTU1::channel::A, MTU1_IO::OUTPUT_TYPE::TOGGLE, frq)) {
 			utils::format("MTU1 output start fail...\n");
 		}
 	}
