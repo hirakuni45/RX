@@ -153,7 +153,7 @@ int main(int argc, char** argv)
 			if(command_.cmp_word(0, "erase") && n >= 2) {
 				bool f = false;
 				char buff[8];
-				if(command_.get_word(1, sizeof(buff), buff)) {
+				if(command_.get_word(1, buff, sizeof(buff))) {
 					char nb = buff[4];
 					if(buff[5] == 0 && std::strncmp(buff, "bank", 4) == 0 && nb >= '0' && nb <= '7') {
 						f = flash_.erase(static_cast<FLASH::data_area>(nb - '0'));
@@ -170,14 +170,14 @@ int main(int argc, char** argv)
 				bool f = true;
 				uint16_t org = 0;
 				char buff[8];
-				if(command_.get_word(1, sizeof(buff), buff)) {
+				if(command_.get_word(1, buff, sizeof(buff))) {
 					org = get_hexadecimal_(buff);
 				} else {
 					f = false;
 				}
 				uint16_t len = 1;
 				if(n >= 3) {
-					if(command_.get_word(2, sizeof(buff), buff)) {
+					if(command_.get_word(2, buff, sizeof(buff))) {
 						len = get_hexadecimal_(buff);
 					} else {
 						f = false;
@@ -190,10 +190,10 @@ int main(int argc, char** argv)
 				}
 			} else if(command_.cmp_word(0, "write") && n >= 3) {
 				char buff[8];
-				if(command_.get_word(1, sizeof(buff), buff)) {
+				if(command_.get_word(1, buff, sizeof(buff))) {
 					uint16_t org = get_hexadecimal_(buff);
 					for(uint8_t i = 2; i < n; ++i) {
-						if(command_.get_word(i, sizeof(buff), buff)) {
+						if(command_.get_word(i, buff, sizeof(buff))) {
 							uint16_t data = get_hexadecimal_(buff);
 							if(!flash_.write(org, data)) {
 								utils::format("Write error: %04X: %02X\n")
