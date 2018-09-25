@@ -120,6 +120,12 @@ Capacitive Touch Panel Controller
 <https://www.buydisplay.com/download/ic/FT5206.pdf>   
 Interface: I2C   
    
+ - VFD
+?
+Variable Frequency Drive
+?
+Interface: RS-485 (8 Bits 1 Stop No-Parity, 9600 Baud)
+   
 -----
    
 License
