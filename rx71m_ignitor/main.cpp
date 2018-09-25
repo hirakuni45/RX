@@ -556,7 +556,7 @@ int main(int argc, char** argv)
 				char tmp[128];
 				tmp[0] = 0;
 				if(cmdn >= 2) {
-					cmd_.get_word(1, sizeof(tmp), tmp);
+					cmd_.get_word(1, tmp, sizeof(tmp));
 				}
 				if(cmd_.cmp_word(0, "st")) {  // get status
 					auto st = wdmc_.get_status();
@@ -619,7 +619,7 @@ int main(int argc, char** argv)
 					utils::format("  crr          CRR\n");
 					utils::format("  thr          thrmal registance request\n");
 				} else {
-					cmd_.get_word(0, sizeof(tmp), tmp);
+					cmd_.get_word(0, tmp, sizeof(tmp));
 					utils::format("command error: '%s'\n") % tmp;
 				}
 			}
