@@ -88,7 +88,7 @@ namespace {
 		bool err = false;
 		if(command_.get_words() == 3) {
 			char buff[12];
-			if(command_.get_word(1, sizeof(buff), buff)) {
+			if(command_.get_word(1, buff, sizeof(buff))) {
 				const char* p = buff;
 				int vs[3];
 				uint8_t i;
@@ -107,7 +107,7 @@ namespace {
 				}
 			}
 
-			if(command_.get_word(2, sizeof(buff), buff)) {
+			if(command_.get_word(2, buff, sizeof(buff))) {
 				const char* p = buff;
 				int vs[3];
 				uint8_t i;
@@ -248,7 +248,7 @@ int main(int argc, char** argv)
 					utils::format("date yyyy/mm/dd hh:mm[:ss]\n");
 				} else {
 					char buff[128];
-					if(command_.get_word(0, sizeof(buff), buff)) {
+					if(command_.get_word(0, buff, sizeof(buff))) {
 						utils::format("Command error: %s\n") % buff;
 					}
 				}
