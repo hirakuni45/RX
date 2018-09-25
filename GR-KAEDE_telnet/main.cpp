@@ -432,7 +432,7 @@ int main(int argc, char** argv)
 					if(check_mount_()) {
 						if(cmdn >= 2) {
 							char tmp[128];
-							cmd_.get_word(1, sizeof(tmp), tmp);
+							cmd_.get_word(1, tmp, sizeof(tmp));
 							sdc_.dir(tmp);
 						} else {
 							sdc_.dir("");
@@ -443,7 +443,7 @@ int main(int argc, char** argv)
 					if(check_mount_()) {
 						if(cmdn >= 2) {
 							char tmp[128];
-							cmd_.get_word(1, sizeof(tmp), tmp);
+							cmd_.get_word(1, tmp, sizeof(tmp));
 							sdc_.cd(tmp);						
 						} else {
 							sdc_.cd("/");
@@ -461,7 +461,7 @@ int main(int argc, char** argv)
 				}
 				if(!f) {
 					char tmp[128];
-					if(cmd_.get_word(0, sizeof(tmp), tmp)) {
+					if(cmd_.get_word(0, tmp, sizeof(tmp))) {
 						utils::format("Command error: '%s'\n") % tmp;
 					}
 				}
