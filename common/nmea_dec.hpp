@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	NMEA デコード・クラス
+	@brief	NMEA デコード・クラス（GPS 測位コードパース）
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -335,6 +335,7 @@ namespace utils {
         //-----------------------------------------------------------------//
 		void start() noexcept
 		{
+			sci_.auto_crlf(false);
 		}
 
 
@@ -377,7 +378,7 @@ namespace utils {
 		void set_baudrate(BAUDRATE bpsno) noexcept
 		{
 //			"$PMTK251,38400*27\r\n"
-// SUP500 GPS
+// for SUP500 GPS
 #if 0
 			sci_.putch(0xA0);
 			sci_.putch(0xA1);
