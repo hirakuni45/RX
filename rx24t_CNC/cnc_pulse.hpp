@@ -27,14 +27,19 @@ namespace cnc {
 
 		CMDL&	cmdl_;
 
-		static const uint8_t DIR_X_BIT  = 0b00000001;
-		static const uint8_t DIR_Y_BIT  = 0b00000010;
-		static const uint8_t DIR_Z_BIT  = 0b00000100;
-		static const uint8_t DIR_W_BIT  = 0b00001000;
-		static const uint8_t STEP_X_BIT = 0b00010000;
-		static const uint8_t STEP_Y_BIT = 0b00100000;
-		static const uint8_t STEP_Z_BIT = 0b01000000;
-		static const uint8_t STEP_W_BIT = 0b10000000;
+		static const uint8_t DIR_X_BIT    = 0b00000001;
+		static const uint8_t DIR_Y_BIT    = 0b00000010;
+		static const uint8_t DIR_Z_BIT    = 0b00000100;
+		static const uint8_t DIR_W_BIT    = 0b00001000;
+		static const uint8_t DIR_ALL_BITS = 0b00001111;
+		static const uint8_t STEP_X_BIT   = 0b00010000;
+		static const uint8_t STEP_Y_BIT   = 0b00100000;
+		static const uint8_t STEP_Z_BIT   = 0b01000000;
+		static const uint8_t STEP_W_BIT   = 0b10000000;
+		static const uint8_t LIM_X_BIT    = 0b00010000;
+		static const uint8_t LIM_Y_BIT    = 0b00100000;
+		static const uint8_t LIM_Z_BIT    = 0b01000000;
+		static const uint8_t LIM_W_BIT    = 0b10000000;
 
 		typedef device::PORTB PULSE_OUT;
 		typedef device::PORT<device::PORTB, device::bitpos::B0> DIR_X;
@@ -54,20 +59,20 @@ namespace cnc {
 		typedef utils::fixed_fifo<uint8_t, 2048> STEP_PAD;
 
 		class mtu_task {
+
 			uint32_t	count_;
-
 			vtx::ivtx4	pos_;
-
 			STEP_PAD	step_;
+			uint8_t		mask_;
 
 		public:
-			mtu_task() noexcept : count_(0), pos_(0) { }
+			mtu_task() noexcept : count_(0), pos_(0), mask_(0) { }
 
 			void operator() () noexcept {
 				if(count_ & 1) {
 					if(step_.length() > 0) {
 						auto bits = step_.get();
-						PULSE_OUT::PODR = bits;
+						PULSE_OUT::PODR = bits & (mask_ | DIR_ALL_BITS);
 						if(bits & STEP_X_BIT) pos_.x += (bits & DIR_X_BIT) ? -1 : 1;
 						if(bits & STEP_Y_BIT) pos_.y += (bits & DIR_Y_BIT) ? -1 : 1;
 						if(bits & STEP_Z_BIT) pos_.z += (bits & DIR_Z_BIT) ? -1 : 1;
@@ -85,18 +90,27 @@ namespace cnc {
 			STEP_PAD& at_step() noexcept { return step_; }
 
 			vtx::ivtx4& at_pos() noexcept { return pos_; }
+
+			void set_mask(uint8_t mask) noexcept { mask_ = mask; }
 		};
 
 		typedef device::mtu_io<device::MTU0, mtu_task> MTU;
 		MTU			mtu_;
 
-		uint32_t	speed_;
+		uint32_t	speed_limit_;    // 最大速度 [mm/sec]
+		uint32_t	speed_current_;  // 現在速度 [mm/sec]
+		uint32_t	accel_;
+		uint32_t	frq_;
 
 		vtx::ivtx4	min_;
 		vtx::ivtx4	max_;
-		vtx::ivtx4	org_;  // 基点
-		vtx::ivtx4	pos_;  // 現在位置
-		vtx::ivtx4	fin_;  // 最終位置
+		vtx::ivtx4	org_;   // 基点
+		vtx::ivtx4	pos_;   // 現在位置
+		vtx::ivtx4	fin_;   // 最終位置
+		vtx::ivtx4	pulse_;	// 回転辺りのパルス数
+		vtx::ivtx4	lead_;  // ボールネジのリード（回転辺りの移動量）単位「ｍｍ」
+
+		uint32_t	length_;
 
 		typedef imath::fraction<uint32_t> FRACTION;
 		FRACTION	frac_x_;
@@ -106,12 +120,24 @@ namespace cnc {
 
 		uint8_t		dir_;
 
+		uint8_t		limit_lvl_;
+		uint8_t		limit_pos_;
+		uint8_t		limit_neg_;
+
 		enum class CMD {
 			ERR,	///< error
+
 			HELP,	///< command help
+
 			SPEED,	///< speed
 			MOVE,	///< move
 			POS,	///< position
+			ACCEL,	///< acceleration/deceleration
+			LEAD,	///< lead per rad
+			PULSE,	///< pulse per rad
+			STOP,	///< stop
+			PAUSE,	///< pause
+			START,	///< start
 		};
 
 		CMD scan_cmd_(uint32_t& n) const
@@ -125,6 +151,12 @@ namespace cnc {
 				else if(cmdl_.cmp_word(0, "move")) return CMD::MOVE;
 				else if(cmdl_.cmp_word(0, "pos")) return CMD::POS;
 				else if(cmdl_.cmp_word(0, "position")) return CMD::POS;
+				else if(cmdl_.cmp_word(0, "accel")) return CMD::ACCEL;
+				else if(cmdl_.cmp_word(0, "lead")) return CMD::LEAD;
+				else if(cmdl_.cmp_word(0, "pulse")) return CMD::PULSE;
+				else if(cmdl_.cmp_word(0, "stop")) return CMD::STOP;
+				else if(cmdl_.cmp_word(0, "pause")) return CMD::PAUSE;
+				else if(cmdl_.cmp_word(0, "start")) return CMD::START;
 				else if(cmdl_.cmp_word(0, "help")) return CMD::HELP;
 			}
 			return CMD::ERR;
@@ -132,10 +164,43 @@ namespace cnc {
 
 		void help_cmd_() noexcept
 		{
-			utils::format("s[peed] [new speed]\n");
+			utils::format("s[peed] [new speed]  Setup speed limit (mm/sec)\n");
 			utils::format("m[ove] [new position]\n");
-			utils::format("p[os]\n");
+			utils::format("p[os]            Indication of the position\n");
+			utils::format("accel [freq]     Acceleration and deceleration (Hz)\n");
+			utils::format("lead [x y z w]   Quantity of movement per turn of the ball screw (um/rad)\n");
+			utils::format("pulse [x y z w]  The number of the pulses per turn (pulse/rad)\n");
+			utils::format("stop\n");
+			utils::format("pause\n");
+			utils::format("start\n");
 			utils::format("help\n");
+		}
+
+
+		bool get_int_(int32_t& val) noexcept
+		{
+			if(!cmdl_.get_integer(1, val)) {
+				return false;
+			}
+			return true;
+		}
+
+
+		bool get_xyzw_(vtx::ivtx4& val) noexcept
+		{
+			if(!cmdl_.get_integer(1, val.x)) {
+				return false;
+			}
+			if(!cmdl_.get_integer(2, val.y)) {
+				return false;
+			}
+			if(!cmdl_.get_integer(3, val.z)) {
+				return false;
+			}
+			if(!cmdl_.get_integer(4, val.w)) {
+				return false;
+			}
+			return true;
 		}
 
  	public:
@@ -145,8 +210,11 @@ namespace cnc {
 			@param[in]	CMDL	コマンド・ライン・クラス			
 		*/
 		//-----------------------------------------------------------------//
-		pulse(CMDL& cmdl) noexcept : cmdl_(cmdl), speed_(100),
-			min_(0), max_(0), org_(0), pos_(0), dir_(0)
+		pulse(CMDL& cmdl) noexcept : cmdl_(cmdl),
+			speed_limit_(50), speed_current_(0), accel_(100), frq_(0),
+			min_(0), max_(0), org_(0), pos_(0), fin_(0),
+			pulse_(6400), lead_(5000), length_(0),
+			dir_(0), limit_lvl_(0), limit_pos_(0), limit_neg_(0)
 		{ }
 
 
@@ -184,10 +252,14 @@ namespace cnc {
 			LIM_W::DIR = 0;
 			LIM_W::PU  = 1;
 
-			// MTU3 をノーマルモードで起動
+			limit_lvl_ = 0;
+			limit_pos_ = 0;
+			limit_neg_ = 0;
+
+			// MTU3 をノーマルモードで起動、初期 100Hz
 			uint8_t intr = 4;
 			auto f = mtu_.start_normal(device::MTU0::channel::A, MTU::OUTPUT_TYPE::NONE,
-				speed_, intr);
+				100, intr);
 
 			return f;
 		}
@@ -209,7 +281,11 @@ namespace cnc {
 			d.y = std::abs(sub.y);
 			d.z = std::abs(sub.z);
 			d.w = std::abs(sub.w);
-			auto max = std::abs(d.max());
+			auto bot = d.max();  // 差分が最大の値を分母とする
+			frac_x_.set(d.x, bot);
+			frac_y_.set(d.y, bot);
+			frac_z_.set(d.z, bot);
+			frac_w_.set(d.w, bot);
 
 			dir_ = 0;
 			if(sub.x < 0) dir_ |= DIR_X_BIT;
@@ -217,21 +293,68 @@ namespace cnc {
 			if(sub.z < 0) dir_ |= DIR_Z_BIT;
 			if(sub.w < 0) dir_ |= DIR_W_BIT;
 
-			frac_x_.set(d.x, max);
-			frac_y_.set(d.y, max);
-			frac_z_.set(d.z, max);
-			frac_w_.set(d.w, max);
+			// 距離に対する、加減速の算出
+			length_ = d.len();  // 全体距離
+			// 加速領域
+
+			// 減速領域
+
+			speed_current_ = 1;
+
+			mtu_.set_frq(10000);
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  サービス
+			@brief  アップデート（１／１００秒、１０ｍｓ）
 		*/
 		//-----------------------------------------------------------------//
 		void update() noexcept
 		{
-			if(fin_ != pos_) {
+			uint8_t lvl = 0;
+			if(!LIM_X::P()) lvl |= LIM_X_BIT;
+			if(!LIM_Y::P()) lvl |= LIM_Y_BIT;
+			if(!LIM_Z::P()) lvl |= LIM_Z_BIT;
+			if(!LIM_W::P()) lvl |= LIM_W_BIT;
+			limit_pos_ = ~limit_lvl_ &  lvl;
+			limit_neg_ =  limit_lvl_ & ~lvl;
+			limit_lvl_ =  lvl;
+			mtu_.at_main_task().set_mask(lvl);
+
+			if(limit_pos_ & LIM_X_BIT) {
+				utils::format("Limit X ON\n");
+			}
+			if(limit_pos_ & LIM_Y_BIT) {
+				utils::format("Limit Y ON\n");
+			}
+			if(limit_pos_ & LIM_Z_BIT) {
+				utils::format("Limit Z ON\n");
+			}
+			if(limit_pos_ & LIM_W_BIT) {
+				utils::format("Limit W ON\n");
+			}
+			if(limit_neg_ & LIM_X_BIT) {
+				utils::format("Limit X OFF\n");
+			}
+			if(limit_neg_ & LIM_Y_BIT) {
+				utils::format("Limit Y OFF\n");
+			}
+			if(limit_neg_ & LIM_Z_BIT) {
+				utils::format("Limit Z OFF\n");
+			}
+			if(limit_neg_ & LIM_W_BIT) {
+				utils::format("Limit W OFF\n");
+			}
+
+			//　速度の計算（１／１００秒毎の更新）
+
+
+			// パルス生成
+			auto& step = mtu_.at_main_task().at_step();
+			while((step.size() - step.length()) >= (step.size() / 32)) {
+				if(fin_ == pos_) break;
+
 				auto bits = dir_;
 				if(frac_x_.add()) {
 					bits |= STEP_X_BIT;
@@ -254,7 +377,7 @@ namespace cnc {
 					else ++pos_.w;
 				}
 				if(bits != dir_) {
-					mtu_.at_main_task().at_step().put(bits);
+					step.put(bits);
 				}
 			}
 		}
@@ -270,21 +393,22 @@ namespace cnc {
 		{
 			uint32_t n;
 			auto cmd = scan_cmd_(n);
+			if(n == 0) return true;
+
 			switch(cmd) {
 			case CMD::HELP:
 				help_cmd_();
 				break;
 			case CMD::SPEED:
 				if(n > 1) {
-					int32_t a = speed_;
-					if(cmdl_.get_integer(1, a)) {
+					int32_t a = speed_limit_;
+					if(!get_int_(a)) {
 						if(a > 0) {
-							speed_ = a;
-							mtu_.set_frq(speed_);
+							speed_limit_ = a;
 						}
 					}
 				} else {
-					utils::format("Speed: %d\n") % speed_;
+					utils::format("Speed limit: %d\n") % speed_limit_;
 				}
 				break;
 			case CMD::POS:
@@ -333,6 +457,46 @@ namespace cnc {
 					}
 					move(target);
 				}
+				break;
+			case CMD::ACCEL:
+				if(n == 1) {
+					utils::format("Acceleration/Deceleration: %u[Hz]\n") % accel_;
+				} else if(n == 2) {
+					int32_t a = accel_;
+					if(!get_int_(a)) {
+						accel_ = a;
+					} else {
+						utils::format("decimal input error:\n");
+					}
+				}
+				break;
+			case CMD::LEAD:
+				if(n == 1) {
+					utils::format("Lead/Rad: %d, %d, %d, %d [um/rad]\n")
+						% lead_.x % lead_.y % lead_.z % lead_.w;
+				} else if(n == 5) {
+					if(!get_xyzw_(lead_)) {
+						utils::format("decimal input error:\n");
+					}
+				}
+				break;
+			case CMD::PULSE:
+				if(n == 1) {
+					utils::format("Pulse/Rad: %d, %d, %d, %d\n")
+						% pulse_.x % pulse_.y % pulse_.z % pulse_.w;
+				} else if(n == 5) {
+					get_xyzw_(pulse_);
+				} else {
+//					utils::format("
+				}
+				break;
+			case CMD::STOP:
+				fin_ = pos_;  // 最終位置を現在の位置とする。
+				mtu_.at_main_task().at_step().clear();
+				break;
+			case CMD::PAUSE:
+				break;
+			case CMD::START:
 				break;
 			default:
 				return false;
