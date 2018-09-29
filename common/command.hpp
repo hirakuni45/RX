@@ -280,7 +280,7 @@ namespace utils {
         //-----------------------------------------------------------------//
 		bool get_integer(uint8_t argc, int32_t& out) const
 		{
-			char tmp[32];
+			char tmp[16];
 			if(!get_word(argc, tmp, sizeof(tmp))) return false;
 
 			return (utils::input("%d", tmp) % out).status();
