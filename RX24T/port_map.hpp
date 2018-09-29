@@ -58,7 +58,8 @@ namespace device {
 
 	private:
 
-		static bool sub_(peripheral t, bool enable) {
+		static bool sub_1st_(peripheral t, bool enable) noexcept
+		{
 			switch(t) {
 
 			case peripheral::RIIC0:
@@ -138,21 +139,70 @@ namespace device {
 			return true;
 		}
 
+
+		static bool sub_2nd_(peripheral t, bool enable) noexcept
+		{
+			switch(t) {
+//			case peripheral::SCI5C:
+//				{
+//					uint8_t sel = enable ? 0b01010 : 0;
+//					MPC::PB7PFS.PSEL = sel;  // PB7/SCK5 (26/100)
+//					PORTB::PMR.B7 = enable;
+//				}
+			case peripheral::SCI5:
+				{
+					uint8_t sel = enable ? 0b01010 : 0;
+					MPC::PE0PFS.PSEL = sel;  // PE0/TXD5 (17/100)
+					MPC::PD7PFS.PSEL = sel;  // PD7/RXD5 (18/100)
+					PORTE::PMR.B0 = enable;
+					PORTD::PMR.B7 = enable;
+				}
+				break;
+
+			case peripheral::SCI6C:
+				{
+					uint8_t sel = enable ? 0b01010 : 0;
+					MPC::PB3PFS.PSEL = sel;  // PB3/SCK6 (32/100)
+					PORTB::PMR.B3 = enable;
+				}
+			case peripheral::SCI6:
+				{
+					uint8_t sel = enable ? 0b01010 : 0;
+					MPC::PB2PFS.PSEL = sel;  // PB2/TXD6 (33/100)
+					MPC::PB1PFS.PSEL = sel;  // PB1/RXD6 (34/100)
+					PORTB::PMR.B2 = enable;
+					PORTB::PMR.B1 = enable;
+				}
+				break;
+
+			default:
+				return false;
+				break;
+			}
+			return true;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  周辺機器別ポート切り替え
 			@param[in]	t	周辺機器タイプ
 			@param[in]	f	無効にする場合「false」
+			@param[in]	opt	候補を選択する場合
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, bool f = true, option opt = option::FIRST)
+		static bool turn(peripheral t, bool f = true, option opt = option::FIRST) noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
-			auto ret = sub_(t, f);
+			bool ret = false;
+			if(opt == option::FIRST) {
+				ret = sub_1st_(t, f);
+			} else if(opt == option::SECOND) {
+				ret = sub_2nd_(t, f);
+			}
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();
 
@@ -168,7 +218,7 @@ namespace device {
 			@param[in]	ena	無効にする場合場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, channel ch, bool ena = true)
+		static bool turn(peripheral t, channel ch, bool ena = true) noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
