@@ -21,7 +21,7 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	main.cpp
 
-USER_LIBS	=	stdc++
+USER_LIBS	=	m
 
 LDSCRIPT	=	../RX24T/$(DEVICE).ld
 
