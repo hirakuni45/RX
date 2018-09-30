@@ -131,7 +131,7 @@ namespace device {
 
 		// ch: A, B, C, D (0 to 3)
 		// dv: 0 to 10
-		void set_TCR_(typename MTUX::channel ch, uint8_t dv)
+		static void set_TCR_(typename MTUX::channel ch, uint8_t dv)
 		{
 			static const uint8_t ckt[] = {
 				0b000000,  // (0)  1/1
@@ -154,7 +154,7 @@ namespace device {
 		}
 
 
-		bool make_clock_(uint32_t frq, uint8_t& dv, uint32_t& match)
+		static bool make_clock_(uint32_t frq, uint8_t& dv, uint32_t& match)
 		{
 			dv = 0;
 			match = F_PCLKA / frq;
@@ -256,6 +256,41 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  周期設定（コンペア・マッチ・タイマー周期）
+			@param[in]	ch		出力チャネル
+			@param[in]	frq		出力周波数
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static bool set_frq(typename MTUX::channel ch, uint32_t frq) noexcept
+		{
+			uint8_t dv;
+			uint32_t match;
+			if(!make_clock_(frq, dv, match)) {
+				return false;
+			}
+
+			set_TCR_(ch, dv);
+
+			auto tior = MTUX::TIOR.get(ch);
+			if(tior == 0b0111) {  // toggle なら１／２にする
+				bool mod = match & 1;
+				match /= 2;
+				if(mod) ++match;
+			}
+
+			if((match - 1) < MTUX::TCNT()) {
+				MTUX::TCNT = 0;
+			}
+			auto adr = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
+			wr16_(adr, match - 1);
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  周期設定（コンペア・マッチ・タイマー周期）
 			@param[in]	frq		出力周波数
 			@return 成功なら「true」
 		*/
@@ -282,7 +317,6 @@ namespace device {
 			}
 			auto adr = MTUX::TGRA.address() + static_cast<uint32_t>(channel_) * 2;
 			wr16_(adr, match - 1);
-//			wr16_(tt_.tgr_adr_, match - 1);
 
 			return true;
 		}
