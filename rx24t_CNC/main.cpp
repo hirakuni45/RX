@@ -21,7 +21,7 @@
 
 namespace {
 
-	static const uint16_t VERSION = 10;
+	static const uint16_t VERSION = 40;
 
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 
