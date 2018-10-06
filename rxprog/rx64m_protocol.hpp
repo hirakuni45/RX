@@ -550,6 +550,7 @@ namespace rx64m {
 			case 230400:
 				baud_rate_ = B230400;
 				break;
+#ifdef WIN32
 			case 460800:
 				baud_rate_ = B460800;
 				break;
@@ -559,6 +560,7 @@ namespace rx64m {
 			case 576000:
 				baud_rate_ = B576000;
 				break;
+#endif
 			default:
 				return false;
 			}
