@@ -46,7 +46,7 @@ namespace rx64m {
 		typedef std::set<uint32_t> erase_map;
 		erase_map erase_map_;
 
-		uint8_t				last_error_ = 0;
+//		uint8_t				last_error_ = 0;
 
 
 		static uint32_t get16_big_(const uint8_t* p) {
