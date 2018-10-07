@@ -85,10 +85,8 @@ namespace graphics {
 		uint32_t	stipple_;
 		uint32_t	stipple_mask_;
 
-		int8_t		round_[round_radius];
-
-
-		void circle_set_(int16_t xc, int16_t yc, int16_t x, int16_t y, T c) noexcept
+		// 1/8 円を拡張して、全周に点を打つ
+		void circle_pset_(int16_t xc, int16_t yc, int16_t x, int16_t y, T c) noexcept
 		{
 			plot(xc + x, yc + y, c);
 			plot(xc + y, yc + x, c);
@@ -122,11 +120,7 @@ namespace graphics {
 		render(T* org, KFONT& kf) noexcept : fb_(org), kfont_(kf),
 			fc_(COLOR::White), bc_(COLOR::Black),
 			code_(0), cnt_(0), stipple_(-1), stipple_mask_(1)
-		{
-			for(int16_t r = 0; r < round_radius; ++r) {
-				round_[r] = intmath::sqrt16((round_radius * round_radius) - (r * r)).val;
-			}
-		}
+		{ }
 
 
 		//-----------------------------------------------------------------//
@@ -298,31 +292,6 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	角がラウンドした四角を塗りつぶす
-			@param[in]	x	開始位置 X
-			@param[in]	y	開始位置 Y
-			@param[in]	w	横幅 
-			@param[in]	h	高さ
-			@param[in]	c	カラー
-		*/
-		//-----------------------------------------------------------------//
-		void fill_box_r(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept {
-			for(int16_t yy = 0; yy < h; ++yy) {
-				int16_t o = 0;
-				if(h >= (round_radius * 2)) {
-					if(yy < round_radius) {
-						o = round_radius - round_[round_radius - yy - 1];
-					} else if((h - round_radius) <= yy) {
-						o = round_radius - round_[yy - (h - round_radius)];
-					}
-				}
-				line_h(y + yy, x + o, w - o * 2, c);
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	全画面クリアをする
 			@param[in]	c	クリアカラー
 		*/
@@ -427,43 +396,87 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	フレーム（線の箱）を描画する
+			@brief	角がラウンドしたフレーム（線）を描画する
 			@param[in]	x	開始点Ｘ軸を指定
 			@param[in]	y	開始点Ｙ軸を指定
 			@param[in]	w	横幅
 			@param[in]	h	高さ
-			@param[in]	r	ラウンドの半径
-			@param[in]	c	描画色
+			@param[in]	rad	ラウンドの半径
+			@param[in]	col	描画色
 		*/
 		//-----------------------------------------------------------------//
-		void round_frame(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, T c) noexcept
+		void round_frame(int16_t x, int16_t y, int16_t w, int16_t h, int16_t rad, T col) noexcept
 		{
-			if(w < (r + r) || h < (r + r)) {
-				if(w < h) r = w / 2;
-				else r = h / 2;
+			if(w < (rad + rad) || h < (rad + rad)) {
+				if(w < h) rad = w / 2;
+				else rad = h / 2;
 			} 
-			int16_t xc = x + r;
-			int16_t yc = y + r;
-			int16_t xo = w - r * 2 - 2;
-			int16_t yo = h - r * 2 - 2;
-			line_h(y, xc, xo, c);
-			line_h(y + h - 1, xc, xo, c);
-			line_v(x, yc, yo, c);
-			line_v(x + w - 1, yc, yo, c);
+			int16_t xc = x + rad;
+			int16_t yc = y + rad;
+			int16_t xo = w - rad * 2 - 2;
+			int16_t yo = h - rad * 2 - 2;
+			line_h(y, xc, xo, col);
+			line_h(y + h - 1, xc, xo, col);
+			line_v(x, yc, yo, col);
+			line_v(x + w - 1, yc, yo, col);
 			int16_t xx = 0;
-			int16_t yy = r;
-			int16_t p = (5 - r * 4) / 4;
-			circle_offset_(xc, yc, xx, yy, xo, yo, c);
-            while(xx < yy) {
-                xx++;
-                if(p < 0) {
-                    p += 2 * xx + 1;
-                } else {
-                    yy--;
-                    p += 2 * (xx - yy) + 1;
-                }
-				circle_offset_(xc, yc, xx, yy, xo, yo, c);
-            }
+			int16_t yy = rad;
+			int16_t p = (5 - rad * 4) / 4;
+			circle_offset_(xc, yc, xx, yy, xo, yo, col);
+			while(xx < yy) {
+				xx++;
+				if(p < 0) {
+					p += 2 * xx + 1;
+				} else {
+					yy--;
+					p += 2 * (xx - yy) + 1;
+				}
+				circle_offset_(xc, yc, xx, yy, xo, yo, col);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	角がラウンドした塗りつぶされた箱を描画する
+			@param[in]	x	開始点Ｘ軸を指定
+			@param[in]	y	開始点Ｙ軸を指定
+			@param[in]	w	横幅
+			@param[in]	h	高さ
+			@param[in]	rad	ラウンドの半径
+			@param[in]	col	描画色
+		*/
+		//-----------------------------------------------------------------//
+		void round_box(int16_t x, int16_t y, int16_t w, int16_t h, int16_t rad, T col) noexcept
+		{
+			if(w < (rad + rad) || h < (rad + rad)) {
+				if(w < h) rad = w / 2;
+				else rad = h / 2;
+			}
+			int16_t xc = x + rad;
+			int16_t yc = y + rad;
+			int16_t xo = w - rad * 2 - 2;
+			int16_t yo = h - rad * 2 - 2;
+			fill_box(x, yc, w, yo, col);
+			int16_t xx = 0;
+			int16_t yy = rad;
+			int16_t p = (5 - rad * 4) / 4;
+			line_h(yc + yo, xc - yy, yy + yy + 1 + xo, col);
+			line_h(yc + yy + yo + 1, xc - xx, xx + xx + xo, col);
+			while(xx < yy) {
+				xx++;
+				if(p < 0) {
+					p += 2 * xx + 1;
+				} else {
+					// x` = x - 1
+					line_h(yc - yy,      xc - xx + 1, xx + xx + xo - 1, col);
+					line_h(yc + yy + yo, xc - xx + 1, xx + xx + xo - 1, col);
+					yy--;
+					p += 2 * (xx - yy) + 1;
+				}
+				line_h(yc - xx,      xc - yy, yy + yy + xo + 1, col);
+				line_h(yc + xx + yo, xc - yy, yy + yy + xo + 1, col);
+			}
 		}
 
 
@@ -490,22 +503,34 @@ namespace graphics {
 			auto dy1 = y1 - yc;
 			auto r1 = dx1 * dx1 + dy1 * dy1;
 			if(r0 != r1) return false;
-#if 0
+
+		line(xc, yc, x0, y0, COLOR::Blue);
+		line(xc, yc, x1, y1, COLOR::Blue);
+
+			int16_t r = std::sqrt((r0 + r1) / 2);
 			int16_t x = 0;
-			int16_t y = rad;
-			int16_t p = (5 - rad * 4) / 4;
-			circle_ext_(xc, yc, x, y, col);
-            while(x < y) {
-                x++;
-                if(p < 0) {
-                    p += 2 * x + 1;
-                } else {
-                    y--;
-                    p += 2 * (x - y) + 1;
-                }
-				circle_ext_(xc, yc, x, y, col);
+			int16_t y = r;
+			int16_t p = (5 - r * 4) / 4;
+            while(y > 0) {
+				if(x < y) {
+	                ++x;
+					if(p < 0) {
+						p += 2 * x + 1;
+					} else {
+						y--;
+						p += 2 * (x - y) + 1;
+					}
+				} else {
+					y--;
+					if(p < 0) {
+						p += 2 * y + 1;
+					} else {
+						++x;
+						p += 2 * (y - x) + 1;
+					}
+				}
+				plot(xc + x, yc - y, col);
             }
-#endif
 			return true;
 		}
 
@@ -524,17 +549,17 @@ namespace graphics {
 			int16_t x = 0;
 			int16_t y = rad;
 			int16_t p = (5 - rad * 4) / 4;
-			circle_set_(xc, yc, x, y, col);
-            while(x < y) {
-                x++;
-                if(p < 0) {
-                    p += 2 * x + 1;
-                } else {
-                    y--;
-                    p += 2 * (x - y) + 1;
-                }
-				circle_set_(xc, yc, x, y, col);
-            }
+			circle_pset_(xc, yc, x, y, col);
+			while(x < y) {
+				x++;
+				if(p < 0) {
+					p += 2 * x + 1;
+				} else {
+					y--;
+					p += 2 * (x - y) + 1;
+				}
+				circle_pset_(xc, yc, x, y, col);
+			}
 		}
 
 
@@ -553,17 +578,17 @@ namespace graphics {
 			int16_t y = rad;
 			int16_t p = (5 - rad * 4) / 4;
 			line_h(yc, xc - y, y + y + 1, col);
-            while(x < y) {
-                x++;
-                if(p < 0) {
-                    p += 2 * x + 1;
-                } else {
-					auto xx = x - 1;
-					line_h(yc - y, xc - xx, xx + xx + 1, col);
-					line_h(yc + y, xc - xx, xx + xx + 1, col);
+			while(x < y) {
+				x++;
+				if(p < 0) {
+					p += 2 * x + 1;
+				} else {
+					// x` = x - 1
+					line_h(yc - y, xc - x + 1, x + x - 1, col);
+					line_h(yc + y, xc - x + 1, x + x - 1, col);
 					y--;
-                    p += 2 * (x - y) + 1;
-                }
+					p += 2 * (x - y) + 1;
+				}
 				line_h(yc - x, xc - y, y + y + 1, col);
 				line_h(yc + x, xc - y, y + y + 1, col);
 			}
