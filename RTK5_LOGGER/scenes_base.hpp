@@ -104,7 +104,7 @@ namespace app {
 
 			void operator () (int16_t x, int16_t y, int16_t w, int16_t h, RENDER::value_type c)
 			{
-				render_.fill_box_r(x, y, w, h, c);
+				render_.round_box(x, y, w, h, 8, c);
 //				render_.fill_box_r(x + 3, y + 3, w - 6, h - 6, c);
 			}
 		};
