@@ -12,6 +12,7 @@
 #include "common/mtu_io.hpp"
 #include "common/vtx.hpp"
 #include "common/fraction.hpp"
+#include "common/circle.hpp"
 #include "common/fixed_fifo.hpp"
 
 namespace cnc {
@@ -162,9 +163,11 @@ namespace cnc {
 
 			HELP,	///< command help
 
-			SPEED,	///< speed
 			MOVE,	///< move
+			CURVE,	///< curve
+			CENTER,	///< setup curve center position
 			POS,	///< position
+			SPEED,	///< setup speed limit
 			ACCEL,	///< acceleration/deceleration
 			LEAD,	///< lead per rad
 			PULSE,	///< pulse per rad
@@ -177,12 +180,14 @@ namespace cnc {
 		{
 			n = cmdl_.get_words();
 			if(n >= 1) {
-				if(cmdl_.cmp_word(0, "s")) return CMD::SPEED;
-				else if(cmdl_.cmp_word(0, "m")) return CMD::MOVE;
+				if(cmdl_.cmp_word(0, "m")) return CMD::MOVE;
+				else if(cmdl_.cmp_word(0, "c")) return CMD::CURVE;
 				else if(cmdl_.cmp_word(0, "p")) return CMD::POS;
-				else if(cmdl_.cmp_word(0, "speed")) return CMD::SPEED;
 				else if(cmdl_.cmp_word(0, "move")) return CMD::MOVE;
+				else if(cmdl_.cmp_word(0, "curve")) return CMD::CURVE;
+				else if(cmdl_.cmp_word(0, "center")) return CMD::CENTER;
 				else if(cmdl_.cmp_word(0, "pos")) return CMD::POS;
+				else if(cmdl_.cmp_word(0, "speed")) return CMD::SPEED;
 				else if(cmdl_.cmp_word(0, "position")) return CMD::POS;
 				else if(cmdl_.cmp_word(0, "accel")) return CMD::ACCEL;
 				else if(cmdl_.cmp_word(0, "lead")) return CMD::LEAD;
@@ -197,12 +202,14 @@ namespace cnc {
 
 		void help_cmd_() noexcept
 		{
-			utils::format("s[peed] [new speed]  Setup speed limit (Hz)\n");
-			utils::format("m[ove] [new position]\n");
-			utils::format("p[os]            Indication of the position\n");
-			utils::format("accel [freq]     Acceleration and deceleration (Hz)\n");
-			utils::format("lead [x y z w]   Quantity of movement per turn of the ball screw (um/rad)\n");
-			utils::format("pulse [x y z w]  The number of the pulses per turn (pulse/rad)\n");
+			utils::format("m[ove] [new position]    Straight line movement\n");
+			utils::format("c[urve] [new position]   Curve movement\n");
+			utils::format("center [new position]    Setup curve center\n");
+			utils::format("p[os]                    Indication of the position\n");
+			utils::format("speed [new speed]        Setup speed limit (Hz)\n");
+			utils::format("accel [freq]             Acceleration and deceleration (Hz)\n");
+			utils::format("lead [x y z w]           Quantity of movement per turn of the ball screw (um/rad)\n");
+			utils::format("pulse [x y z w]          The number of the pulses per turn (pulse/rad)\n");
 //			utils::format("stop\n");
 //			utils::format("pause\n");
 //			utils::format("start\n");
