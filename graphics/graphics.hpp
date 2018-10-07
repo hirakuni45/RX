@@ -10,6 +10,7 @@
 //=====================================================================//
 #include "graphics/color.hpp"
 #include "common/intmath.hpp"
+#include "common/circle.hpp"
 
 namespace graphics {
 
@@ -85,6 +86,32 @@ namespace graphics {
 		uint32_t	stipple_mask_;
 
 		int8_t		round_[round_radius];
+
+
+		void circle_set_(int16_t xc, int16_t yc, int16_t x, int16_t y, T c) noexcept
+		{
+			plot(xc + x, yc + y, c);
+			plot(xc + y, yc + x, c);
+			plot(xc - y, yc + x, c);
+			plot(xc - x, yc + y, c);
+			plot(xc - x, yc - y, c);
+			plot(xc - y, yc - x, c);
+			plot(xc + y, yc - x, c);
+			plot(xc + x, yc - y, c);
+		}
+
+
+		void circle_offset_(int16_t xc, int16_t yc, int16_t x, int16_t y, int16_t ox, int16_t oy, T c) noexcept
+		{
+			plot(xc + ox + x, yc + oy + y, c);
+			plot(xc + ox + y, yc + oy + x, c);
+			plot(xc - y,      yc + oy + x, c);
+			plot(xc - x,      yc + oy + y, c);
+			plot(xc - x,      yc - y,      c);
+			plot(xc - y,      yc - x,      c);
+			plot(xc + ox + y, yc - x,      c);
+			plot(xc + ox + x, yc - y,      c);
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -381,7 +408,7 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	フレームを描画する
+			@brief	フレーム（線の箱）を描画する
 			@param[in]	x	開始点Ｘ軸を指定
 			@param[in]	y	開始点Ｙ軸を指定
 			@param[in]	w	横幅
@@ -400,84 +427,144 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	円（線）を描画する
-			@param[in]	x0	開始点Ｘ軸を指定
-			@param[in]	y0	開始点Ｙ軸を指定
-			@param[in]	r	半径を指定
+			@brief	フレーム（線の箱）を描画する
+			@param[in]	x	開始点Ｘ軸を指定
+			@param[in]	y	開始点Ｙ軸を指定
+			@param[in]	w	横幅
+			@param[in]	h	高さ
+			@param[in]	r	ラウンドの半径
 			@param[in]	c	描画色
 		*/
 		//-----------------------------------------------------------------//
-		void circle(int16_t x0, int16_t y0, int16_t r, T c) noexcept
+		void round_frame(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, T c) noexcept
 		{
-			int16_t x = r - 1;
-			int16_t y = 0;
-			int16_t dx = 1;
-			int16_t dy = 1;
-			int16_t err = dx - (r << 1);
+			if(w < (r + r) || h < (r + r)) {
+				if(w < h) r = w / 2;
+				else r = h / 2;
+			} 
+			int16_t xc = x + r;
+			int16_t yc = y + r;
+			int16_t xo = w - r * 2 - 2;
+			int16_t yo = h - r * 2 - 2;
+			line_h(y, xc, xo, c);
+			line_h(y + h - 1, xc, xo, c);
+			line_v(x, yc, yo, c);
+			line_v(x + w - 1, yc, yo, c);
+			int16_t xx = 0;
+			int16_t yy = r;
+			int16_t p = (5 - r * 4) / 4;
+			circle_offset_(xc, yc, xx, yy, xo, yo, c);
+            while(xx < yy) {
+                xx++;
+                if(p < 0) {
+                    p += 2 * xx + 1;
+                } else {
+                    yy--;
+                    p += 2 * (xx - yy) + 1;
+                }
+				circle_offset_(xc, yc, xx, yy, xo, yo, c);
+            }
+		}
 
-			while(x >= y) {
-				plot(x0 + x, y0 + y, c);
-				plot(x0 + y, y0 + x, c);
-				plot(x0 - y, y0 + x, c);
-				plot(x0 - x, y0 + y, c);
-				plot(x0 - x, y0 - y, c);
-				plot(x0 - y, y0 - x, c);
-				plot(x0 + y, y0 - x, c);
-				plot(x0 + x, y0 - y, c);
 
-				if(err <= 0) {
-					y++;
-					err += dy;
-					dy += 2;
-				}
-        
-				if(err > 0) {
-					x--;
-					dx += 2;
-					err += dx - (r << 1);
-				}
-			}
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	円弧（線）を描画する
+			@param[in]	x0	開始点Ｘ軸
+			@param[in]	y0	開始点Ｙ軸
+			@param[in]	xc	中心点Ｘ軸
+			@param[in]	yc	中心点Ｙ軸
+			@param[in]	x1	終了点Ｘ軸
+			@param[in]	y1	終了点Ｙ軸
+			@param[in]	col	描画色
+			@return 座標指定が不整合な場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool arc(int16_t x0, int16_t y0, int16_t xc, int16_t yc, int16_t x1, int16_t y1, T col)
+			noexcept
+		{
+			auto dx0 = x0 - xc;
+			auto dy0 = y0 - yc;
+			auto r0 = dx0 * dx0 + dy0 * dy0;
+			auto dx1 = x1 - xc;
+			auto dy1 = y1 - yc;
+			auto r1 = dx1 * dx1 + dy1 * dy1;
+			if(r0 != r1) return false;
+#if 0
+			int16_t x = 0;
+			int16_t y = rad;
+			int16_t p = (5 - rad * 4) / 4;
+			circle_ext_(xc, yc, x, y, col);
+            while(x < y) {
+                x++;
+                if(p < 0) {
+                    p += 2 * x + 1;
+                } else {
+                    y--;
+                    p += 2 * (x - y) + 1;
+                }
+				circle_ext_(xc, yc, x, y, col);
+            }
+#endif
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	円（線）を描画する
+			@param[in]	xc	中心点Ｘ軸
+			@param[in]	yc	中心点Ｙ軸
+			@param[in]	rad	半径を指定
+			@param[in]	col	描画色
+		*/
+		//-----------------------------------------------------------------//
+		void circle(int16_t xc, int16_t yc, int16_t rad, T col) noexcept
+		{
+			int16_t x = 0;
+			int16_t y = rad;
+			int16_t p = (5 - rad * 4) / 4;
+			circle_set_(xc, yc, x, y, col);
+            while(x < y) {
+                x++;
+                if(p < 0) {
+                    p += 2 * x + 1;
+                } else {
+                    y--;
+                    p += 2 * (x - y) + 1;
+                }
+				circle_set_(xc, yc, x, y, col);
+            }
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	円を描画する
-			@param[in]	x0	開始点Ｘ軸を指定
-			@param[in]	y0	開始点Ｙ軸を指定
-			@param[in]	r	半径を指定
-			@param[in]	c	描画色
+			@param[in]	xc	中心点Ｘ軸
+			@param[in]	yc	中心点Ｙ軸
+			@param[in]	rad	半径を指定
+			@param[in]	col	描画色
 		*/
 		//-----------------------------------------------------------------//
-		void fill_circle(int16_t x0, int16_t y0, int16_t r, T c) noexcept
+		void fill_circle(int16_t xc, int16_t yc, int16_t rad, T col) noexcept
 		{
-			int16_t x = r - 1;
-			int16_t y = 0;
-			int16_t dx = 1;
-			int16_t dy = 1;
-			int16_t err = dx - (r << 1);
-			bool yy = true;
-			while(x >= y) {
-				if(yy) {
-					line_h(y0 - y, x0 - x, x + x + 1, c);
-					line_h(y0 + y, x0 - x, x + x + 1, c);
-					line_h(y0 - x, x0 - y, y + y + 1, c);
-					line_h(y0 + x, x0 - y, y + y + 1, c);
-					yy = false;
-				}
-
-				if(err <= 0) {
-					y++;
-					err += dy;
-					dy += 2;
-					yy = true;
-				}
-        
-				if(err > 0) {
-					x--;
-					dx += 2;
-					err += dx - (r << 1);
-				}
+			int16_t x = 0;
+			int16_t y = rad;
+			int16_t p = (5 - rad * 4) / 4;
+			line_h(yc, xc - y, y + y, col);
+            while(x < y) {
+                x++;
+                if(p < 0) {
+                    p += 2 * x + 1;
+                } else {
+                    y--;
+                    p += 2 * (x - y) + 1;
+					line_h(yc - y, xc - x, x + x, col);
+					line_h(yc + y, xc - x, x + x, col);
+                }
+				line_h(yc - x, xc - y, y + y, col);
+				line_h(yc + x, xc - y, y + y, col);
 			}
 		}
 
