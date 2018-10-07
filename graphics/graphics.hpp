@@ -552,19 +552,20 @@ namespace graphics {
 			int16_t x = 0;
 			int16_t y = rad;
 			int16_t p = (5 - rad * 4) / 4;
-			line_h(yc, xc - y, y + y, col);
+			line_h(yc, xc - y, y + y + 1, col);
             while(x < y) {
                 x++;
                 if(p < 0) {
                     p += 2 * x + 1;
                 } else {
-                    y--;
+					auto xx = x - 1;
+					line_h(yc - y, xc - xx, xx + xx + 1, col);
+					line_h(yc + y, xc - xx, xx + xx + 1, col);
+					y--;
                     p += 2 * (x - y) + 1;
-					line_h(yc - y, xc - x, x + x, col);
-					line_h(yc + y, xc - x, x + x, col);
                 }
-				line_h(yc - x, xc - y, y + y, col);
-				line_h(yc + x, xc - y, y + y, col);
+				line_h(yc - x, xc - y, y + y + 1, col);
+				line_h(yc + x, xc - y, y + y + 1, col);
 			}
 		}
 
