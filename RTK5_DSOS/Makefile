@@ -40,7 +40,7 @@ USER_DEFS	=	SIG_RX65N F_ICLK=120000000 \
 
 MCU_TARGET	=	
 
-INC_SYS		=
+INC_SYS		=	/mingw64/include
 
 INC_APP		=	. ../
 
