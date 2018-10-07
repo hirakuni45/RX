@@ -501,6 +501,7 @@ namespace utils {
 // $PMTK220,1000*1F<CR><LF> 1Hz
 // $PMTK220,200*2C<CR><LF> 5Hz
 // $PMTK220,100*2F<CR><LF> 10Hz
+			return true;
 		}
 
 
