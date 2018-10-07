@@ -35,7 +35,7 @@
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-//	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
+	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
@@ -44,7 +44,7 @@ namespace {
 	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
 	SCI		sci_;
 
-	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
+	// ＳＤカード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 	typedef device::NULL_PORT SDC_POWER;
 
@@ -318,13 +318,14 @@ int main(int argc, char** argv)
 	}
 
 	LED::DIR = 1;
-//	SW2::DIR = 0;
+	SW2::DIR = 0;
 
 	uint8_t task = 100;
 	FT5206::xy	pos;
 
 	uint8_t n = 0;
-//	bool sw2 = SW2::P();
+	bool render = true;
+	bool sw2 = SW2::P();
 	while(1) {
 		glcdc_io_.sync_vpos();
 
@@ -379,23 +380,37 @@ int main(int argc, char** argv)
 			pos = npos;
 		}
 
+		if(render) {
+			int16_t x = 470 / 2;
+			int16_t y = 272 / 2;
+			render_.arc(x + 0, y - 100, x, y, x + 100, y + 0, RENDER::COLOR::White);
 #if 0
-		render_.fill_circle(480/2, 272/2, 100, RENDER::COLOR::Red);
-		render_.circle(480/2, 272/2, 100, RENDER::COLOR::Blue);
-#endif
+			render_.round_frame(20, 20, 400, 200, 16, RENDER::COLOR::Red);
+//			render_.round_frame(20 + 5, 20 + 5, 400 - 10, 200 - 10, 16 - 5, RENDER::COLOR::Green);
 
-#if 0
+			render_.round_frame(20 + 5, 20 + 5, 400 - 10, 200 - 10, 16 - 5, RENDER::COLOR::Red);
+			render_.round_box(20 + 5, 20 + 5, 400 - 10, 200 - 10, 16 - 5, RENDER::COLOR::Green);
+
+			render_.circle(480/2, 272/2, 100, RENDER::COLOR::Blue);
+			render_.fill_circle(480/2, 272/2, 100, RENDER::COLOR::Aqua);
+
+			render_.fill_box(5, 5, 4, 4, RENDER::COLOR::White);
+			render_.frame(4, 4, 6, 6, RENDER::COLOR::Gray);
+#endif
+			render = false;
+		}
+
 		{  // SW2 の検出
 			auto f = SW2::P();
 			if(sw2 && !f) {
 				utils::format("SW2: Positive\n");
+				render = true;
 			}
 			if(!sw2 && f) {
 				utils::format("SW2: Negative\n");
 			}
 			sw2 = f;
 		}
-#endif
 
 		++n;
 		if(n >= 30) {
