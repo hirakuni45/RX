@@ -19,14 +19,29 @@ namespace imath {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class circle {
 
-		vtx::ipos	center_;
 		vtx::ipos	start_;
+		vtx::ipos	center_;
 		vtx::ipos	term_;
 
-		int32_t		x_;
-		int32_t		y_;
-		int32_t		p_;
-		int32_t		radius_;
+		vtx::ipos	pos_;
+		vtx::ipos	fin_;
+		int32_t		rad_;
+		int32_t		rad_sqr_;
+		int32_t		oct_;
+
+		bool		cw_;
+
+		static int32_t octant_(const vtx::ipos& p) noexcept
+		{
+			uint32_t n = 0;
+			if(std::abs(p.x) > std::abs(p.y)) n |= 0b001;
+			if(p.x < 0) n |= 0b100;
+			if(p.y < 0) n |= 0b010;
+			static const int8_t map[8] = {
+				0, 1, 3, 2, 7, 6, 4, 5
+			};
+			return map[n];
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -34,20 +49,49 @@ namespace imath {
 			@brief	コンストラクタ
 		 */
 		//-----------------------------------------------------------------//
-		circle() noexcept :  center_(0), start_(0), term_(0),
-			x_(0), y_(0), p_(0), radius_(0)
+		circle() noexcept :  start_(0), center_(0), term_(0),
+			pos_(0), fin_(0), rad_(0), rad_sqr_(0), oct_(0), cw_(true)
 		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	中心を設定
-			@param[in]	center	中心座標
+			@brief	角度に対する座標
+			@param[in]	an	角度（０～１．０）@n
+							※０：３時、０．２５：６時、０．５：９時、０．７５：１２時
+			@param[in]	rad	半径
 		 */
 		//-----------------------------------------------------------------//
-		void set_center(const vtx::ipos& center) noexcept
+		static vtx::ipos angle_to_position(float an, int32_t rad) noexcept
 		{
-			center_ = center;
+			vtx::ipos pos;
+			pos.x = cosf(an * vtx::radian_f_) * static_cast<float>(rad);
+			pos.y = sinf(an * vtx::radian_f_) * static_cast<float>(rad);
+			return pos;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	機能テスト用
+		 */
+		//-----------------------------------------------------------------//
+		void test() noexcept
+		{
+			for(uint32_t i = 0; i < 8; ++i) {
+				static const int pp[8 * 2] = {
+					 50,  90,
+					 90,  50,
+					 90, -50,
+					 50, -90,
+					-50, -90,
+					-90, -50,
+					-90,  50,
+					-50,  90
+				};
+				auto n = octant_(vtx::ipos(pp[i*2+0], pp[i*2+1]));
+				utils::format("%d\n") % n;
+			}
 		}
 
 
@@ -55,26 +99,36 @@ namespace imath {
 		/*!
 			@brief	開始、終点を設定（１８０度以内である事）@n
 					※円にする場合「開始」と「終点」を逆にしてもう一度呼ぶ
-			@param[in]	start	開始位置
-			@param[in]	term	終端位置
+			@param[in]	sta	開始位置
+			@param[in]	cen	中心位置
+			@param[in]	fin	終端位置
+			@param[in]	cw	反時計方向なら「false」
 			@return 不整合なら「false」
 		 */
 		//-----------------------------------------------------------------//
-		bool set_start(const vtx::ipos& start, const vtx::ipos& term) noexcept
+		bool start(const vtx::ipos& sta, const vtx::ipos& cen, const vtx::ipos& fin, bool cw = true) noexcept
 		{
-			start_ = start;
-			term_ = term;
-			int32_t len0 = (start - center_).len();
-			int32_t len1 = (term - center_).len();
-			int32_t d = len0 - len1;
-			if(-1 <= d && d <= 1) {
-				radius_ = (len0 + len1) / 2;
-				x_ = start.x;
-				y_ = start.y;
-//				p = (5 - radius_ * 4) / 4;
-				return true;
+			vtx::ipos d0 = sta - cen;
+			vtx::ipos d1 = fin - cen;
+			int32_t len0 = d0.len();
+			int32_t len1 = d1.len();
+			if(len0 != len1) {
+				return false;
 			}
-			else return false;
+			start_  = sta;
+			center_ = cen;
+			term_   = fin;
+			cw_ = cw;
+			oct_ = octant_(d1);
+
+			rad_ = len0 * 2;
+			rad_sqr_ = rad_ * rad_;
+			pos_.x = d0.x * 2;
+			pos_.y = d0.y * 2;
+			fin_.x = d1.x * 2;
+			fin_.y = d1.y * 2;
+
+			return true;
 		}
 
 
@@ -86,21 +140,87 @@ namespace imath {
 		//-----------------------------------------------------------------//
 		bool step() noexcept
 		{
-			int32_t x = 0;
-			int32_t y = radius_;
-			int32_t p = (5 - radius_ * 4) / 4;
-			// circlePoints(xCenter, yCenter, x, y, pix);
-			while(x < y) {
-				x++;
-				if(p < 0) {
-					p += 2 * x + 1;
-				} else {
-					y--;
-					p += 2 * (x - y) + 1;
-				}
-				// circlePoints(xCenter, yCenter, x, y, pix);
+			bool limit = false;
+			auto oct = octant_(pos_);
+			switch(oct) {
+			case 0:
+			case 7:
+				if(cw_) pos_.x += 2;
+				else pos_.x -= 2;
+				pos_.y = std::sqrt(rad_sqr_ - pos_.x * pos_.x);
+				break;
+			case 1:
+			case 2:
+				if(cw_) pos_.y -= 2;
+				else pos_.y += 2;
+				pos_.x = std::sqrt(rad_sqr_ - pos_.y * pos_.y);
+				break;
+			case 3:
+			case 4:
+				if(cw_) pos_.x -= 2;
+				else pos_.x += 2;
+				pos_.y = -std::sqrt(rad_sqr_ - pos_.x * pos_.x);
+				break;
+			case 5:
+			case 6:
+				if(cw_) pos_.y += 2;
+				else pos_.y -= 2;
+				pos_.x = -std::sqrt(rad_sqr_ - pos_.y * pos_.y);
+				break;
 			}
-			return true;
+			if(oct != oct_) return false;
+
+			switch(oct_) {
+			case 0:
+			case 1:
+				if(cw_) {
+					if(pos_.x >= fin_.x && pos_.y <= fin_.y) limit = true;
+				} else {
+					if(pos_.x <= fin_.x && pos_.y >= fin_.y) limit = true;
+				}
+				break;
+			case 2:
+			case 3:
+				if(cw_) {
+					if(pos_.x <= fin_.x && pos_.y <= fin_.y) limit = true;
+				} else {
+					if(pos_.x >= fin_.x && pos_.y >= fin_.y) limit = true;
+				}
+				break;
+			case 4:
+			case 5:
+				if(cw_) {
+					if(pos_.x <= fin_.x && pos_.y <= fin_.y) limit = true;
+				} else {
+					if(pos_.x >= fin_.x && pos_.y >= fin_.y) limit = true;
+				}
+				break;
+			case 6:
+			case 7:
+				if(cw_) {
+					if(pos_.x >= fin_.x && pos_.y >= fin_.y) limit = true;
+				} else {
+					if(pos_.x <= fin_.x && pos_.y <= fin_.y) limit = true;
+				}
+				break;
+			}
+
+			return limit;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	生成された位置を取得
+			@return 生成された位置
+		 */
+		//-----------------------------------------------------------------//
+		vtx::ipos get_position() const noexcept
+		{
+			vtx::ipos p;
+			p.x = (pos_.x + 1) / 2 + center_.x;
+			p.y = (pos_.y + 1) / 2 + center_.y;
+			return p;
 		}
 	};
 }
