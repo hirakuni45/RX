@@ -58,7 +58,7 @@ PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp \
 				graphics/font8x16.cpp
 
-USER_LIBS	=	jpeg
+USER_LIBS	=	jpeg m
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 

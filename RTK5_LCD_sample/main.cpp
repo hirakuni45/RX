@@ -383,7 +383,8 @@ int main(int argc, char** argv)
 		if(render) {
 			int16_t x = 470 / 2;
 			int16_t y = 272 / 2;
-			render_.arc(x + 0, y - 100, x, y, x + 100, y + 0, RENDER::COLOR::White);
+			render_.arc(x + 0, y + 100, x, y, x + 0, y - 100, RENDER::COLOR::White);
+			render_.arc(x + 0, y - 100, x, y, x + 0, y + 100, RENDER::COLOR::Green);
 #if 0
 			render_.round_frame(20, 20, 400, 200, 16, RENDER::COLOR::Red);
 //			render_.round_frame(20 + 5, 20 + 5, 400 - 10, 200 - 10, 16 - 5, RENDER::COLOR::Green);
