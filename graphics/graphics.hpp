@@ -496,41 +496,17 @@ namespace graphics {
 		bool arc(int16_t x0, int16_t y0, int16_t xc, int16_t yc, int16_t x1, int16_t y1, T col)
 			noexcept
 		{
-			auto dx0 = x0 - xc;
-			auto dy0 = y0 - yc;
-			auto r0 = dx0 * dx0 + dy0 * dy0;
-			auto dx1 = x1 - xc;
-			auto dy1 = y1 - yc;
-			auto r1 = dx1 * dx1 + dy1 * dy1;
-			if(r0 != r1) return false;
+			imath::circle cir;
+//			cir.test();
+//			return false;
+			if(!cir.start(vtx::ipos(x0, y0), vtx::ipos(xc, yc), vtx::ipos(x1, y1))) {
+				return false;
+			}
+			do {
+				vtx::ipos pos = cir.get_position();
+				plot(pos.x, pos.y, col);
+			} while(!cir.step()) ;
 
-		line(xc, yc, x0, y0, COLOR::Blue);
-		line(xc, yc, x1, y1, COLOR::Blue);
-
-			int16_t r = std::sqrt((r0 + r1) / 2);
-			int16_t x = 0;
-			int16_t y = r;
-			int16_t p = (5 - r * 4) / 4;
-            while(y > 0) {
-				if(x < y) {
-	                ++x;
-					if(p < 0) {
-						p += 2 * x + 1;
-					} else {
-						y--;
-						p += 2 * (x - y) + 1;
-					}
-				} else {
-					y--;
-					if(p < 0) {
-						p += 2 * y + 1;
-					} else {
-						++x;
-						p += 2 * (y - x) + 1;
-					}
-				}
-				plot(xc + x, yc - y, col);
-            }
 			return true;
 		}
 
