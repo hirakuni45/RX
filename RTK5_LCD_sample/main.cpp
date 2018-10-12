@@ -381,10 +381,18 @@ int main(int argc, char** argv)
 		}
 
 		if(render) {
-			int16_t x = 470 / 2;
-			int16_t y = 272 / 2;
-			render_.arc(x + 0, y + 100, x, y, x + 0, y - 100, RENDER::COLOR::White);
-			render_.arc(x + 0, y - 100, x, y, x + 0, y + 100, RENDER::COLOR::Green);
+			int16_t xc = 470 / 2;
+			int16_t yc = 272 / 2;
+			render_.arc(xc + 0, yc + 100, xc, yc, xc + 0, yc - 100, RENDER::COLOR::White);
+			render_.arc(xc + 0, yc - 100, xc, yc, xc + 0, yc + 100, RENDER::COLOR::Green);
+
+			auto p0 = imath::circle::angle_to_position( 0.25f - 1.0f / 16.0f, 50);
+			auto p1 = imath::circle::angle_to_position(-0.25f + 1.0f / 16.0f, 50);
+			render_.arc(xc + p0.x, yc + p0.y, xc, yc, xc + p1.x, yc + p1.y, RENDER::COLOR::Red);
+
+//			imath::circle cir;
+//			cir.func_test();
+
 #if 0
 			render_.round_frame(20, 20, 400, 200, 16, RENDER::COLOR::Red);
 //			render_.round_frame(20 + 5, 20 + 5, 400 - 10, 200 - 10, 16 - 5, RENDER::COLOR::Green);
