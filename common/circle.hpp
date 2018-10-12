@@ -1,7 +1,10 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	サークル・クラス
+	@brief	サークル・クラス @n
+			・XY プロッタ(CNC)用の円周位置を生成するクラス @n
+			・XY 座標は、一般的数学的座標系を使う。 @n
+			・入出力は整数で行い、桁落ちなどの対策を行う。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -76,21 +79,29 @@ namespace imath {
 			@brief	機能テスト用
 		 */
 		//-----------------------------------------------------------------//
-		void test() noexcept
+		void func_test() noexcept
 		{
-			for(uint32_t i = 0; i < 8; ++i) {
-				static const int pp[8 * 2] = {
-					 50,  90,
-					 90,  50,
-					 90, -50,
-					 50, -90,
-					-50, -90,
-					-90, -50,
-					-90,  50,
-					-50,  90
-				};
-				auto n = octant_(vtx::ipos(pp[i*2+0], pp[i*2+1]));
-				utils::format("%d\n") % n;
+			{
+				float an = 0.0f;
+				for(int32_t i = 0; i < 20; ++i) {
+					auto pos = angle_to_position(an, 10 * 2);
+					auto len = pos.len();
+					++len;
+					len /= 2;
+					utils::format("%5.4f %d\n") % an % len;
+					an += 0.05f;
+				}
+			}
+
+			{
+				float an = 1.0f / 4.0f;
+				an -= 1.0f / 16.0f;
+				for(uint32_t i = 0; i < 8; ++i) {
+					auto pos = angle_to_position(an, 100);
+					auto n = octant_(pos);
+					utils::format("%d\n") % n;
+					an -= 1.0f / 8.0f;
+				}
 			}
 		}
 
@@ -110,8 +121,14 @@ namespace imath {
 		{
 			vtx::ipos d0 = sta - cen;
 			vtx::ipos d1 = fin - cen;
+			d0 *= 2;
+			d1 *= 2;
 			int32_t len0 = d0.len();
+			++len0;
+			len0 /= 2;
 			int32_t len1 = d1.len();
+			++len1;
+			len1 /= 2;
 			if(len0 != len1) {
 				return false;
 			}
@@ -123,10 +140,10 @@ namespace imath {
 
 			rad_ = len0 * 2;
 			rad_sqr_ = rad_ * rad_;
-			pos_.x = d0.x * 2;
-			pos_.y = d0.y * 2;
-			fin_.x = d1.x * 2;
-			fin_.y = d1.y * 2;
+			pos_.x = d0.x;
+			pos_.y = d0.y;
+			fin_.x = d1.x;
+			fin_.y = d1.y;
 
 			return true;
 		}
