@@ -149,7 +149,7 @@ namespace device {
 //					MPC::PB7PFS.PSEL = sel;  // PB7/SCK5 (26/100)
 //					PORTB::PMR.B7 = enable;
 //				}
-			case peripheral::SCI5:
+			case peripheral::SCI5:  // Version B device only
 				{
 					uint8_t sel = enable ? 0b01010 : 0;
 					MPC::PE0PFS.PSEL = sel;  // PE0/TXD5 (17/100)
