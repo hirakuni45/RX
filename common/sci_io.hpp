@@ -4,6 +4,7 @@
 	@brief	RX グループ・SCI I/O 制御 @n
 			・DMAC による転送をサポートしていませんが、必要性を感じていません。@n
 			・同期通信で、ブロック転送を行うような場合は、必要かもしれません。@n
+			・RS-485 半二重通信用ポート制御を追加。@n
 			Ex: 定義例 @n
 			・受信バッファ、送信バッファの大きさは、最低１６バイトは必要でしょう。@n
 			・ボーレート、サービスする内容に応じて適切に設定して下さい。@n
@@ -50,9 +51,10 @@ namespace device {
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
 		@param[in]	PSEL	ポート選択
+		@param[in]	HCTL	半二重通信制御ポート（RS-485）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI, class RBF, class SBF, port_map::option PSEL = port_map::option::FIRST>
+	template <class SCI, class RBF, class SBF, port_map::option PSEL = port_map::option::FIRST, class HCTL = NULL_PORT>
 	class sci_io {
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -72,9 +74,7 @@ namespace device {
 	private:
 		static RBF	recv_;
 		static SBF	send_;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-		static volatile bool send_stall_;
-#endif
+
 		uint8_t		level_;
 		bool		auto_crlf_;
 
@@ -105,20 +105,12 @@ namespace device {
 
 		static INTERRUPT_FUNC void send_task_()
 		{
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			if(send_.length() > 0) {
 				SCI::TDR = send_.get();
-			}
-			if(send_.length() == 0) {
+			} else {
 				SCI::SCR.TIE = 0;
-				send_stall_ = true;
+				HCTL::P = 0;
 			}
-#else
-			SCI::TDR = send_.get();
-			if(send_.length() == 0) {
-				SCI::SCR.TEIE = 0;
-			}
-#endif
 		}
 
 
@@ -135,11 +127,7 @@ namespace device {
 
 		void set_intr_() noexcept
 		{
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
-#else
-			set_vector_(SCI::get_rx_vec(), SCI::get_te_vec());
-#endif
 			icu_mgr::set_level(SCI::get_peripheral(), level_);
 		}
 
@@ -165,9 +153,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t baud, uint8_t level = 0, PROTOCOL prot = PROTOCOL::B8_N_1S) noexcept
 		{
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-			send_stall_ = true;
-#endif
 #if defined(SIG_RX63T)
 			if(level == 0) return false;
 #endif
@@ -178,6 +163,10 @@ namespace device {
 			SCI::SCR = 0x00;			// TE, RE disable.
 
 			port_map::turn(SCI::get_peripheral(), true, PSEL);
+
+			// RS-484 半二重制御ポート
+			HCTL::DIR = 1;
+			HCTL::P = 0;  // disable send driver
 
 			uint32_t brr = F_PCLKB / baud * 16;
 			uint8_t cks = 0;
@@ -296,23 +285,15 @@ namespace device {
 					while(send_.length() != 0) sleep_();
 				}
 				send_.put(ch);
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-				SCI::SCR.TIE = 0;
-				if(send_stall_) {
+				if(SCI::SCR.TIE() == 0) {
 					while(SCI::SSR.TEND() == 0) sleep_();
+					HCTL::P = 1;
+					SCI::SCR.TIE = 1;
 					SCI::TDR = send_.get();
-					if(send_.length() > 0) {
-						send_stall_ = false;
-					}
 				}
-				SCI::SCR.TIE = !send_stall_;
-#else
-				if(SCI::SCR.TEIE() == 0) {
-					SCI::SCR.TEIE = 1;
-				}
-#endif
 			} else {
 				while(SCI::SSR.TEND() == 0) sleep_();
+				HCTL::P = 1;
 				SCI::TDR = ch;
 			}
 		}
@@ -332,11 +313,7 @@ namespace device {
 				if(SCI::SSR.ORER()) {	///< 受信オーバランエラー状態確認
 					SCI::SSR.ORER = 0;	///< 受信オーバランエラークリア
 				}
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX24T) || defined(SIG_RX65N)
 				return SCI::SSR.RDRF();
-#else
-				return 0;
-#endif
 			}
 		}
 
@@ -376,12 +353,8 @@ namespace device {
 	};
 
 	// テンプレート関数、実態の定義
-	template<class SCI, class RBF, class SBF, port_map::option PSEL>
-		RBF sci_io<SCI, RBF, SBF, PSEL>::recv_;
-	template<class SCI, class RBF, class SBF, port_map::option PSEL>
-		SBF sci_io<SCI, RBF, SBF, PSEL>::send_;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-	template<class SCI, class RBF, class SBF, port_map::option PSEL>
-		volatile bool sci_io<SCI, RBF, SBF, PSEL>::send_stall_;
-#endif
+	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
+		RBF sci_io<SCI, RBF, SBF, PSEL, HCTL>::recv_;
+	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
+		SBF sci_io<SCI, RBF, SBF, PSEL, HCTL>::send_;
 }
