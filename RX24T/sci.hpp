@@ -20,10 +20,10 @@ namespace device {
 		@param[in]	base	ベース・アドレス
 		@param[in]	t		ペリフェラル型
 		@param[in]	rxv		受信ベクター
-		@param[in]	tev		送信ベクター
+		@param[in]	txv		送信ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t, ICU::VECTOR rxv, ICU::VECTOR tev>
+	template <uint32_t base, peripheral t, ICU::VECTOR rxv, ICU::VECTOR txv>
 	struct scig_t {
 
 		//-----------------------------------------------------------------//
@@ -326,14 +326,14 @@ namespace device {
 			@return ベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_te_vec() { return tev; }
+		static ICU::VECTOR get_tx_vec() { return txv; }
 	};
 
-	typedef scig_t<0x0008A020, peripheral::SCI1,  ICU::VECTOR::RXI1, ICU::VECTOR::TEI1> SCI1;
-	typedef scig_t<0x0008A020, peripheral::SCI1C, ICU::VECTOR::RXI1, ICU::VECTOR::TEI1> SCI1C;
+	typedef scig_t<0x0008A020, peripheral::SCI1,  ICU::VECTOR::RXI1, ICU::VECTOR::TXI1> SCI1;
+	typedef scig_t<0x0008A020, peripheral::SCI1C, ICU::VECTOR::RXI1, ICU::VECTOR::TXI1> SCI1C;
 
-	typedef scig_t<0x0008A0A0, peripheral::SCI5,  ICU::VECTOR::RXI5, ICU::VECTOR::TEI5> SCI5;
-	typedef scig_t<0x0008A0A0, peripheral::SCI5C, ICU::VECTOR::RXI5, ICU::VECTOR::TEI5> SCI5C;
-	typedef scig_t<0x0008A0C0, peripheral::SCI6,  ICU::VECTOR::RXI6, ICU::VECTOR::TEI6> SCI6;
-	typedef scig_t<0x0008A0C0, peripheral::SCI6C, ICU::VECTOR::RXI6, ICU::VECTOR::TEI6> SCI6C;
+	typedef scig_t<0x0008A0A0, peripheral::SCI5,  ICU::VECTOR::RXI5, ICU::VECTOR::TXI5> SCI5;
+	typedef scig_t<0x0008A0A0, peripheral::SCI5C, ICU::VECTOR::RXI5, ICU::VECTOR::TXI5> SCI5C;
+	typedef scig_t<0x0008A0C0, peripheral::SCI6,  ICU::VECTOR::RXI6, ICU::VECTOR::TXI6> SCI6;
+	typedef scig_t<0x0008A0C0, peripheral::SCI6C, ICU::VECTOR::RXI6, ICU::VECTOR::TXI6> SCI6C;
 }
