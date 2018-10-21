@@ -18,13 +18,12 @@ namespace chip {
 	/*!
 		@brief  VFD テンプレートクラス
 		@param[in]	SCI	sci クラス
-		@param[in]	SEL	デバイス・セレクト
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SCI, class SEL>
+	template <class SCI>
 	class VFD {
 
-		VFD&	vfd_;
+		SCI&	sci_;
 
 	public:
 		//-----------------------------------------------------------------//

@@ -9,9 +9,6 @@
 */
 //=====================================================================//
 #include <cstdint>
-#include <cstring>
-#include "common/iica_io.hpp"
-#include "common/time.h"
 
 namespace chip {
 
@@ -65,7 +62,7 @@ namespace chip {
 			@param[in]	spi	SPI クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		MAX7219(SPI& spi) : spi_(spi), limit_(0) { }
+		MAX7219(SPI& spi) noexcept : spi_(spi), limit_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -75,7 +72,7 @@ namespace chip {
 			@return エラーなら「false」を返す
 		 */
 		//-----------------------------------------------------------------//
-		bool start(uint8_t limit = (CHAIN * 8)) {
+		bool start(uint8_t limit = (CHAIN * 8)) noexcept {
 			if(limit_ > (8 * CHAIN) || limit == 0) {
 				return false;
 			}
@@ -107,7 +104,7 @@ namespace chip {
 			@return エラー（初期化不良）なら「false」
 		 */
 		//-----------------------------------------------------------------//
-		bool set_intensity(uint8_t inten) {
+		bool set_intensity(uint8_t inten) noexcept {
 			if(limit_ == 0) return false;
 			out_(command::INTENSITY, inten);
 			return true;
@@ -120,7 +117,7 @@ namespace chip {
 			@return エラー（初期化不良）なら「false」
 		 */
 		//-----------------------------------------------------------------//
-		bool service() {
+		bool service() noexcept {
 			if(limit_ == 0) return false;
 
 			for(uint8_t i = 0; i < limit_; ++i) {
@@ -137,7 +134,7 @@ namespace chip {
 			@return 値
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t get(uint8_t idx) {
+		uint8_t get(uint8_t idx) const noexcept {
 			if(idx < limit_) {
 				return data_[idx];
 			}
@@ -152,7 +149,7 @@ namespace chip {
 			@param[in]	dat	データ
 		 */
 		//-----------------------------------------------------------------//
-		void set(uint8_t idx, uint8_t dat) {
+		void set(uint8_t idx, uint8_t dat) noexcept {
 			if(idx < limit_) {
 				data_[idx] = dat;
 			}
@@ -167,7 +164,7 @@ namespace chip {
 			@param[in]	dp	小数点
 		 */
 		//-----------------------------------------------------------------//
-		void set_cha(uint8_t idx, char cha, bool dp = false) {
+		void set_cha(uint8_t idx, char cha, bool dp = false) noexcept {
 			uint8_t d = 0;
 			switch(cha) {
 			case ' ':
@@ -331,7 +328,7 @@ namespace chip {
 			@param[in]	fill	埋めるデータ
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t shift_top(uint8_t fill = 0) {
+		uint8_t shift_top(uint8_t fill = 0) noexcept {
 			uint8_t full = data_[0];
 			std::memmove(&data_[1], &data_[0], 7);
 			data_[0] = fill;
@@ -345,7 +342,7 @@ namespace chip {
 			@param[in]	fill	埋めるデータ
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t shift_end(uint8_t fill = 0) {
+		uint8_t shift_end(uint8_t fill = 0) noexcept {
 			uint8_t full = data_[7];
 			std::memmove(&data_[0], &data_[1], 7);
 			data_[7] = fill;
