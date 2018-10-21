@@ -8,6 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#if 0
 #include "main.hpp"
 
 #include "common/scene.hpp"
@@ -143,11 +144,13 @@ extern "C" {
 		utils::str::utf8_to_sjis(src, dst, len);
 	}
 }
+#endif
 
 int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
+#if 0
 	core_.init();
 
 	core_.init_device();
@@ -209,4 +212,5 @@ int main(int argc, char** argv)
 		}
 		LED::P = (cnt < 5) ? 0 : 1;
 	}
+#endif
 }

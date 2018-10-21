@@ -18,15 +18,16 @@ VPATH		=	../
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c \
-				common/syscalls.c \
-				$(FATFS_VER)/src/ff.c \
-				$(FATFS_VER)/src/option/unicode.c \
-				common/time.c
+				common/vect.c
+#				common/syscalls.c
+#				$(FATFS_VER)/src/ff.c \
+#				$(FATFS_VER)/src/option/unicode.c \
+#				common/time.c
 
-PSOURCES	=	main.cpp \
-				resource.cpp \
-				graphics/font6x12.cpp
+PSOURCES	=	main.cpp
+
+#				resource.cpp \
+#				graphics/font6x12.cpp
 
 USER_LIBS	=
 
