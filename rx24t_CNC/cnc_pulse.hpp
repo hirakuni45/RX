@@ -158,6 +158,8 @@ namespace cnc {
 		uint8_t		limit_pos_;
 		uint8_t		limit_neg_;
 
+		imath::circle	cir_;
+
 		enum class CMD {
 			ERR,	///< error
 
@@ -165,7 +167,7 @@ namespace cnc {
 
 			MOVE,	///< move
 			CURVE,	///< curve
-			CENTER,	///< setup curve center position
+			CENTER,	///< setup circle center position
 			POS,	///< position
 			SPEED,	///< setup speed limit
 			ACCEL,	///< acceleration/deceleration
@@ -346,6 +348,24 @@ namespace cnc {
 			speed_current_ = 100;
 			mtu_.at_main_task().set_frq(speed_current_, accel_);
 			mtu_.set_frq(speed_current_);  // 初期周期
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  曲線移動 @n
+					※中心座標をあらかじめ設定しておく。@n
+					※ターゲット
+			@param[in]	target
+			@return 不正な終端なら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool curve(const vtx::ivtx4& target) noexcept
+		{
+
+
+
+			return true;
 		}
 
 

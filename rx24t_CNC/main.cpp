@@ -17,6 +17,8 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 
+#include "chip/VFD.hpp"
+
 #include "cnc_pulse.hpp"
 
 namespace {
@@ -27,10 +29,19 @@ namespace {
 
 	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
 
+	// 標準シリアルポート設定
 	typedef utils::fixed_fifo<char, 1024> RBF;
 	typedef utils::fixed_fifo<char,  128> SBF;
 	typedef device::sci_io<device::SCI1, RBF, SBF> SCI;
 	SCI		sci_;
+
+	// RS485 VFD ポート設定
+	typedef utils::fixed_fifo<char, 256> RS_RBF;
+	typedef utils::fixed_fifo<char, 256> RS_SBF;
+	static const device::port_map::option RS_PORT = device::port_map::option::SECOND;
+	typedef device::PORT<device::PORTE, device::bitpos::B1> RS_CTRL;
+	typedef device::sci_io<device::SCI5, RS_RBF, RS_SBF, RS_PORT, RS_CTRL> RS485;
+	RS485	rs485_;
 
 	typedef utils::command<256> COMMAND;
 	COMMAND command_;
@@ -101,8 +112,16 @@ int main(int argc, char** argv)
 	}
 
 	// SCI 設定
-	static const uint8_t sci_level = 2;
-	sci_.start(115200, sci_level);
+	{
+		uint8_t sci_level = 2;
+		sci_.start(115200, sci_level);
+	}
+
+	// RS485/VFD 設定
+	{
+		uint8_t sci_level = 1;
+		rs485_.start(9600, sci_level);
+	}
 
 	utils::format("CNC Driver Version %1d.%02d\n") % (VERSION / 100) % (VERSION % 100);
 
@@ -124,6 +143,10 @@ int main(int argc, char** argv)
 			if(!f) {
 				utils::format("Error: '%s'\n") % command_.get_command();
 			}
+		}
+
+		for(int i = 0; i < 10; ++i) {
+			rs485_.putch('A');
 		}
 
 		++cnt;
