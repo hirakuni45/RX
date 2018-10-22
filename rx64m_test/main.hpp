@@ -13,7 +13,6 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_io.hpp"
 #include "common/command.hpp"
-#include "common/fifo.hpp"
 #include "common/format.hpp"
 #include "common/input.hpp"
 #include "common/time.h"
