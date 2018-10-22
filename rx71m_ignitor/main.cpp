@@ -11,7 +11,7 @@
 #include "common/scif_io.hpp"
 #include "common/sci_io.hpp"
 #include "common/rspi_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 #include "common/input.hpp"
 #include "common/delay.hpp"
@@ -61,11 +61,11 @@ namespace {
 
 	utils::wdmc		wdmc_;
 
-	typedef utils::fifo<uint8_t, 128> RX_BUF;
-	typedef utils::fifo<uint8_t, 256> TX_BUF;
+	typedef utils::fixed_fifo<char, 128> RX_BUF;
+	typedef utils::fixed_fifo<char, 256> TX_BUF;
 
-	typedef utils::fifo<uint8_t, 1024> RX_SCI;
-	typedef utils::fifo<uint8_t, 4096> TX_SCI;
+	typedef utils::fixed_fifo<char, 1024> RX_SCI;
+	typedef utils::fixed_fifo<char, 4096> TX_SCI;
 
 	typedef device::sci_io<device::SCI12, RX_SCI, TX_SCI> SCI;
 	SCI		sci_;
