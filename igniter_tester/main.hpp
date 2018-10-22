@@ -18,7 +18,7 @@
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
 #include "common/rspi_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 #include "common/delay.hpp"
 #include "common/command.hpp"
