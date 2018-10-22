@@ -10,7 +10,7 @@
 #include "common/renesas.hpp"
 #include "common/rspi_io.hpp"
 #include "common/sdc_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
@@ -38,7 +38,7 @@ namespace {
 	typedef device::cmt_io<device::CMT0> CMT0;
 	CMT0	cmt_;
 
-	typedef utils::fifo<uint8_t, 4096> BUFFER;
+	typedef utils::fixed_fifo<char, 4096> BUFFER;
 	typedef device::sci_io<device::SCI7, BUFFER, BUFFER> SCI;
 	SCI		sci_;
 
@@ -73,7 +73,7 @@ namespace {
 	FTPS		ftps_(net_.at_ethernet(), sdc_);
 
 	volatile bool putch_lock_ = false;
-	utils::fifo<uint8_t, 1024> putch_tmp_;
+	utils::fixed_fifo<char, 1024> putch_tmp_;
 
 	void service_putch_tmp_()
 	{

@@ -11,7 +11,7 @@
 #include "common/sci_io.hpp"
 #include "common/rspi_io.hpp"
 #include "common/sdc_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 #include "common/input.hpp"
 #include "common/time.h"
@@ -72,7 +72,7 @@ namespace {
 	typedef device::cmt_io<device::CMT0, cmt_task> CMT0;
 	CMT0	cmt0_;
 
-	typedef utils::fifo<uint8_t, 2048> BUFFER;
+	typedef utils::fixed_fifo<char, 2048> BUFFER;
 
 	typedef device::sci_io<device::SCI7, BUFFER, BUFFER> SCI;
 	SCI		sci_;
