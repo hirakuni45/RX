@@ -10,7 +10,7 @@
 
 #include "common/cmt_io.hpp"
 #include "common/tpu_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #ifdef WATCH_DOG
 #include "common/wdt_man.hpp"
@@ -122,7 +122,7 @@ namespace seeda {
 		typedef device::cmt_io<device::CMT0, cmt_task> CMT0;
 		CMT0		cmt0_;
 
-		typedef utils::fifo<uint8_t, 1024> BUFFER;
+		typedef utils::fixed_fifo<char, 1024> BUFFER;
 #ifdef SEEDA
 		typedef device::sci_io<device::SCI12, BUFFER, BUFFER> SCI;
 #else
