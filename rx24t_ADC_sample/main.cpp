@@ -19,7 +19,7 @@
 //=====================================================================//
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 #include "common/adc_io.hpp"
 #include "common/bitset.hpp"
@@ -44,7 +44,7 @@ namespace {
 
 	device::cmt_io<device::CMT0, null_task>  cmt_;
 
-	typedef utils::fifo<uint8_t, 128> buffer;
+	typedef utils::fixed_fifo<char, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
 	typedef device::S12AD adc;

@@ -9,7 +9,7 @@
 */
 //=====================================================================//
 #include "common/cmt_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
@@ -24,7 +24,7 @@ namespace {
 
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
-	typedef utils::fifo<uint8_t, 128> fifo128;
+	typedef utils::fixed_fifo<char, 128> fifo128;
 	device::sci_io<device::SCI1, fifo128, fifo128> sci_;
 
 	utils::command<256> command_;

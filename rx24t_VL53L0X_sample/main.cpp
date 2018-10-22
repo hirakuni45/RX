@@ -10,7 +10,7 @@
 //=====================================================================//
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 #include "common/iica_io.hpp"
 #include "common/si2c_io.hpp"
@@ -22,7 +22,7 @@ namespace {
 
 	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
 
-	typedef utils::fifo<uint8_t, 128> buffer;
+	typedef utils::fixed_fifo<char, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
 #ifdef SOFT_I2C

@@ -12,7 +12,7 @@
 //=====================================================================//
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 #include "common/nmea_dec.hpp"
 
@@ -26,8 +26,8 @@ namespace {
 
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
-	typedef utils::fifo<uint8_t,  256> fifo256;
-	typedef utils::fifo<uint16_t, 512> fifo512;
+	typedef utils::fixed_fifo<char, 256> fifo256;
+	typedef utils::fixed_fifo<char, 512> fifo512;
 	device::sci_io<device::SCI1, fifo256, fifo256> sci1_;
 	typedef device::sci_io<device::SCI5, fifo512, fifo256> SCI5;
 	SCI5	sci5_;

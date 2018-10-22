@@ -13,7 +13,7 @@
 #include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 #include "common/mtu_io.hpp"
 
@@ -21,7 +21,7 @@ namespace {
 
 	device::cmt_io<device::CMT0>  cmt_;
 
-	typedef utils::fifo<uint8_t, 128> buffer;
+	typedef utils::fixed_fifo<char, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
 	typedef device::MTU0 MTU0;
