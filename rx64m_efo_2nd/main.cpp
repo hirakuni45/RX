@@ -13,7 +13,7 @@
 #include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
 #include "common/tpu_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/spi_io.hpp"
 #include "common/rspi_io.hpp"
@@ -171,15 +171,15 @@ namespace {
 #ifdef UART_DEBUG
 	typedef device::PORT<device::PORTF, device::bitpos::B5> TRG;
 
-	typedef utils::fifo<uint8_t, 1024> BUFFER;
+	typedef utils::fixed_fifo<char, 1024> BUFFER;
 	typedef device::sci_io<device::SCI12, BUFFER, BUFFER> D_SCI;
 	D_SCI			d_sci_;
 #else
-	typedef utils::fifo<uint8_t, 1024> BUFFER;
+	typedef utils::fixed_fifo<char, 1024> BUFFER;
 	typedef device::sci_io<device::SCI0,  BUFFER, BUFFER> D_SCI;
 	D_SCI			d_sci_;
 
-	typedef utils::fifo<uint8_t, 4096> SENDBUF;
+	typedef utils::fixed_fifo<char, 4096> SENDBUF;
 	typedef device::sci_io<device::SCI12, BUFFER, SENDBUF> M_SCI;
 	M_SCI			m_sci_;
 #endif

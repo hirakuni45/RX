@@ -10,7 +10,7 @@
 //=====================================================================//
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
 
@@ -24,7 +24,7 @@ namespace {
 
 	device::cmt_io<device::CMT0, cmt_task>  cmt_;
 
-	typedef utils::fifo<uint8_t, 256> buffer;
+	typedef utils::fixed_fifo<char, 256> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
 	utils::rtc_io rtc_;

@@ -10,7 +10,7 @@
 //=====================================================================//
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
-#include "common/fifo.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 #include <random>
 
@@ -19,7 +19,7 @@ namespace {
 	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
 	CMT		cmt_;
 
-	typedef utils::fifo<uint16_t, 128> BUFFER;
+	typedef utils::fixed_fifo<char, 128> BUFFER;
 	typedef device::sci_io<device::SCI1, BUFFER, BUFFER> SCI;
 	SCI		sci_;
 
