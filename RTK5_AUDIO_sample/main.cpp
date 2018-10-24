@@ -28,6 +28,10 @@
 #include "chip/FAMIPAD.hpp"
 #include "chip/FT5206.hpp"
 
+#include "Cartridge.h"
+#include "bgm_data.hpp"
+
+
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -102,6 +106,8 @@ namespace {
 	typedef utils::sound_out<8192, 1024> SOUND_OUT;
 	SOUND_OUT	sound_out_;
 
+	volatile uint32_t cycle_count_;
+
 	class tpu_task {
 	public:
 		void operator() () {
@@ -110,6 +116,7 @@ namespace {
 			if((tmp ^ wpos_) & 64) {
 				sound_out_.service(64);
 			}
+			cycle_count_ += 1361;
 		}
 	};
 
@@ -173,6 +180,8 @@ namespace {
 
 	uint8_t		touch_num_ = 0;
 	int16_t		touch_org_ = 0;
+
+	Cartridge cart_;
 
 	void update_led_()
 	{
@@ -505,6 +514,22 @@ extern "C" {
 	{
 		return sdc_.make_full_path(src, dst, len);
 	}
+
+
+	uint32_t getCycleCount()
+	{
+		return cycle_count_;
+	}
+
+
+	void dacWrite(uint8_t ch, uint16_t val)
+	{
+		sound::wave_t t;
+		val ^= 0x80;
+		t.l_ch = (val << 8) | ((val & 0x7f) << 1);
+		t.r_ch = (val << 8) | ((val & 0x7f) << 1);
+		sound_out_.at_fifo().put(t);
+	}
 }
 
 int main(int argc, char** argv);
@@ -604,6 +629,14 @@ int main(int argc, char** argv)
 	}
 
 	LED::DIR = 1;
+
+
+	cart_.play_nes(bgm_data::jumping);
+	cart_.play_nes(bgm_data::swimming);
+	cart_.play_nes(bgm_data::teleporting);
+	cart_.play_nes(bgm_data::saving);
+
+
 
 	// タッチパネルの安定待ち
 	{
