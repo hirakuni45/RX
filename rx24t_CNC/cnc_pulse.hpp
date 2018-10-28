@@ -166,8 +166,8 @@ namespace cnc {
 			HELP,	///< command help
 
 			MOVE,	///< move
-			CURVE,	///< curve
-			CENTER,	///< setup circle center position
+			CURVE,	///< curve(circle)
+			CENTER,	///< setup curve(circle) center position
 			POS,	///< position
 			SPEED,	///< setup speed limit
 			ACCEL,	///< acceleration/deceleration
@@ -300,8 +300,9 @@ namespace cnc {
 
 			// MTU3 をノーマルモードで起動、初期 100Hz
 			uint8_t intr = 4;
-			auto f = mtu_.start_normal(device::MTU0::channel::A, MTU::OUTPUT_TYPE::NONE,
-				100, intr);
+			auto ch = device::MTU0::channel::A;
+			auto ot = MTU::OUTPUT_TYPE::NONE;
+			auto f = mtu_.start_normal(ch, ot, 100, intr);
 
 			return f;
 		}
