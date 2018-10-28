@@ -139,8 +139,7 @@ namespace utils {
 						return false;
 					}
 					if(!fi.fname[0]) {
-						f_closedir(&dir_);
-						init_ = false;
+						stop();
 						break;
 					}
 
