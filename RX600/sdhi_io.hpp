@@ -33,7 +33,9 @@ namespace fatfs {
 	template <class SDHI, class POW, device::port_map::option PSEL = device::port_map::option::FIRST>
 	class sdhi_io {
 
+		// 通常 PCLKB は 60MHz
 		static const uint8_t CARD_DETECT_DIVIDE_ = 11;			///< CD 信号サンプリング周期
+		// SD カード初期化時100～400KBPS(224KBPS）
 		static const uint8_t CLOCK_SLOW_DIVIDE_  = 0b01000000;	///< 初期化時のクロック周期 (1/256)
 		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000100;	///< 通常クロック周期 (1/16)
 
@@ -128,13 +130,13 @@ namespace fatfs {
 					auto sts = SDHI::SDSTS2();
 					if(sts & SDHI::SDSTS2.CMDE.b()) {
 						SDHI::SDSTS2.CMDE = 0;
-						utils::format("CMDE...\n");
+///						utils::format("send_cmd_: CMDE...\n");
 						st = state::cmd_error;
 						break;
 					}
 					if(sts & SDHI::SDSTS2.RSPTO.b()) {
 						SDHI::SDSTS2.RSPTO = 0;
-						utils::format("RSPTO...\n");
+///						utils::format("send_cmd_: RSPTO... (timeout)\n");
 						st = state::timeout;
 						break;
 					}
@@ -181,7 +183,6 @@ namespace fatfs {
 				// データ読み出し、書き込み時のエンディアン変換を有効にする
 //				SDHI::SDSWAP = SDHI::SDSWAP.BWSWP.b(1) | SDHI::SDSWAP.BRSWP.b(1);
 #endif
-
 				fast_ = false;
 				start_ = true;
 			}
@@ -262,79 +263,87 @@ namespace fatfs {
 				% static_cast<uint16_t>(SDHI::SDVER.CPRM());
 			utils::format("  SDSIZE: %d\n") % SDHI::SDSIZE();
 #endif
-			// ダミークロックを７４個以上入れる
+			// ダミークロックを７４個以上入った事を確認する。
+			// ※CS(D3) = 1, DI = 1 が「１」の状態である事。
 			SDHI::SDCLKCR.CLKCTRLEN = 1;
 			set_clk_();
 			SDHI::SDCLKCR.CLKCTRLEN = 0;
-			for(uint8_t i = 0; i < 76; ++i) {
+			for(uint32_t i = 0; i < 75; ++i) {
 				while(device::port_map::probe_sdhi_clock(PSEL) == 0) ;
 				while(device::port_map::probe_sdhi_clock(PSEL) == 1) ;
 			}
 			SDHI::SDCLKCR.CLKCTRLEN = 1;
 
+			if(send_cmd_(command::CMD0, 0) != state::no_error) {  // soft reset
+				utils::format("CMD0: Error\n");
+				stat_ = STA_NOINIT;
+				return stat_;
+			}
+			utils::format("CMD0: OK!\n");
+
 			BYTE ty = 0;
-			if(send_cmd_(command::CMD0, 0) != state::no_error) {  // Enter Idle state
-				utils::format("Error CMD0:\n");
-				stat_ = STA_NOINIT;
-				return stat_;
+			if(send_cmd_(command::CMD8, 0x01AA) == state::no_error) {
+				uint32_t res = SDHI::SDRSP10() & 0xFFF;
+				if(res != 0x1AA) {  // No Match for SD-V1
+					utils::format("CMD8: State Miss Match (%03X)\n") % res;
+					stat_ = STA_NOINIT;
+					return stat_;
+				} else {
+					utils::format("CMD8: OK! for 'SD-V2'\n");
+					ty = CT_SD2;  // for SD Ver 2.x
+				}
+			} else {  // Error, No Response for SD-V1, MMC-V3, Error
+				ty = CT_SD1;
+				utils::format("CMD8: NG! for 'SD-V1, MMC-V3 or Fail'\n");
 			}
-			utils::format("CMD0:\n");
 
-			if(send_cmd_(command::CMD8, 0x01AA) != state::no_error) {  // SDv2?
-				// Reject for SDSC/MMC
-				utils::format("Reject CMD8:\n");
-				stat_ = STA_NOINIT;
-				return stat_;
-			}
-			uint32_t val = SDHI::SDRSP10();
-			utils::format("CMD8: %08X\n") % val;
+///////////////////////////////////////////////////////////////
 
-			if((val & 0xFFF) != 0x01AA) {
-				utils::format("Card fail...\n");
-				return STA_NOINIT;
-			}
-#if 0
-			uint32_t loop = 0;
-			while(1) {
-				if(send_cmd_(command::CMD58, 0, false) == state::no_error) {
-					break;
+			// 初期化コマンド(CMD55/ACMD41)
+			// retray loop count: 1 turn 640 clock for 234KHz(60MHz / 256) 2.735ms
+			// 750 ms: 
+			static const uint32_t init_limit = 300;
+			uint32_t init_loop = 0;
+			while(init_loop < init_limit) {
+				auto st = send_cmd_(command::CMD55, 0);
+				if(st != state::no_error) {
+					utils::format("CMD55: Error\n");
 				}
-				++loop;
-				utils::delay::milli_second(10);
-				if(loop >= 100) {
-					utils::format("CMD58: fail...\n");
-					return STA_NOINIT;
-				}
-			}
-			uint32_t val = SDHI::SDRSP10();
-			utils::format("CMD58: %08X\n") % val;
-#endif
-			uint16_t cnt = 0;
-			while(cnt < 1000) {
-				if(send_cmd_(command::CMD55, 0) != state::no_error) {
-					utils::format("CMD55: fail...\n");
-					return STA_NOINIT;
-				}
-				utils::format("CMD55: (%d)\n") % cnt;
-				auto st = send_cmd_(command::ACMD41, 1UL << 30);
+				uint32_t send = (ty == CT_SD2) ? 0x40000000 : 0x00000000;
+				st = send_cmd_(command::ACMD41, send);
 				uint32_t res = SDHI::SDRSP10();
-				utils::format("ACMD41: (%d), %08X\n") % cnt % res;
-				if(st == state::no_error && (res & 0xff000000) == 0) {
+// utils::format("ACM41: %08X\n") % res;
+				if(st == state::no_error && res == 0) {
 					break;
+				} else {
+					++init_loop;
 				}
-				utils::delay::micro_second(1000);
-				++cnt;
 			}
-//			utils::format("ACMD41: count = %d\n") % cnt;
-			// Check CCS bit in the OCR
+			if(init_loop >= init_limit) {  // timeout
+				utils::format("ACMD41: Time Out\n");
+				stat_ = STA_NOINIT;
+				return stat_;
+			}
 
-//	ty = CT_SD2 | CT_BLOCK;
-	ty = CT_SD2;
+			if(ty == CT_SD2) {
+				utils::format("ACMD41: OK! (SD-V2), %d loops\n") % init_loop;
+
+				// Block for 512 bytes
+				if(send_cmd_(command::CMD16, 512) == state::no_error) {
+					utils::format("CMD16: OK!\n");
+				} else {
+					utils::format("CMD16: NG!\n");
+				}
+			} else { // SD-V1
+				utils::format("ACMD41: OK! (SD-V1), %d loops\n") % init_loop;
+			}
+
+//	ty |= CT_BLOCK;
 
 			card_type_ = ty;
 			stat_ = ty ? 0 : STA_NOINIT;
 
-			// クロックをブーストする。
+			// boost for CLK
 			fast_ = true;
 
 			if(card_type_ & CT_BLOCK) {
