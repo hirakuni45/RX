@@ -28,8 +28,8 @@
 #include "chip/FAMIPAD.hpp"
 #include "chip/FT5206.hpp"
 
-#include "Cartridge.h"
-#include "bgm_data.hpp"
+//#include "Cartridge.h"
+//#include "bgm_data.hpp"
 
 
 namespace {
@@ -76,7 +76,7 @@ namespace {
 
 	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
 
-	MMC		sdh_(spi_, 20000000);
+	MMC		sdh_(spi_, 35000000);
 #endif
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
@@ -181,7 +181,7 @@ namespace {
 	uint8_t		touch_num_ = 0;
 	int16_t		touch_org_ = 0;
 
-	Cartridge cart_;
+//	Cartridge cart_;
 
 	void update_led_()
 	{
@@ -631,10 +631,10 @@ int main(int argc, char** argv)
 	LED::DIR = 1;
 
 
-	cart_.play_nes(bgm_data::jumping);
-	cart_.play_nes(bgm_data::swimming);
-	cart_.play_nes(bgm_data::teleporting);
-	cart_.play_nes(bgm_data::saving);
+//	cart_.play_nes(bgm_data::jumping);
+//	cart_.play_nes(bgm_data::swimming);
+//	cart_.play_nes(bgm_data::teleporting);
+//	cart_.play_nes(bgm_data::saving);
 
 
 

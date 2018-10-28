@@ -28,9 +28,10 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp \
 				graphics/font8x16.cpp \
-				graphics/kfont16.cpp \
-				Cartridge.cpp \
-				bgm_data.cpp
+				graphics/kfont16.cpp
+
+#				Cartridge.cpp
+#				bgm_data.cpp
 
 USER_LIBS	=
 
