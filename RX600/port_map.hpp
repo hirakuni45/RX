@@ -421,28 +421,20 @@ namespace device {
 					uint8_t sel = enable ? 0b011010 : 0;
 					MPC::P80PFS.PSEL = sel;  // SDHI_WP (81)
 					PORT8::PMR.B0 = enable;
-//					PORT8::PCR.B0 = 1;
 					MPC::P81PFS.PSEL = sel;  // SDHI_CD (80)
 					PORT8::PMR.B1 = enable;
-//					PORT8::PCR.B1 = 1;
 					MPC::PC2PFS.PSEL = sel;  // SDHI_D3 (86)
 					PORTC::PMR.B2 = enable;
-//					PORTC::PCR.B2 = 1;
 					MPC::PC3PFS.PSEL = sel;  // SDHI_D0 (83)
 					PORTC::PMR.B3 = enable;
-//					PORTC::PCR.B3 = 1;
 					MPC::PC4PFS.PSEL = sel;  // SDHI_D1 (82)
 					PORTC::PMR.B4 = enable;
-//					PORTC::PCR.B4 = 1;
    					MPC::P75PFS.PSEL = sel;  // SDHI_D2 (87)
 					PORT7::PMR.B5 = enable;
-//					PORT7::PCR.B5 = 1;
 					MPC::P76PFS.PSEL = sel;  // SDHI_CMD (85)
 					PORT7::PMR.B6 = enable;
-//					PORT7::PCR.B6 = 1;
 					MPC::P77PFS.PSEL = sel;  // SDHI_CLK (84)
 					PORT7::PMR.B7 = enable;
-//					PORT7::PCR.B7 = 1;
 				}
 				break;
 
@@ -817,11 +809,19 @@ namespace device {
 		}
 
 
-		static bool probe_sdhi_clock(option opt = option::FIRST) noexcept
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SDHI クロック・ポートの状態を取得
+			@param[in]	opt		ポート・マップ・オプション（ポート候補）
+			@return SDHI クロック・ポートの状態
+		*/
+		//-----------------------------------------------------------------//
+		static bool probe_sdhi_clock(option opt) noexcept
 		{
 			bool ret = 0;
 			switch(opt) {
 			case option::FIRST:
+				ret = PORT7::PIDR.B7();
 				break;
 			case option::THIRD:
 				ret = PORT2::PIDR.B1();
