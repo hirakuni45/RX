@@ -32,6 +32,9 @@
 #include "common/sci_i2c_io.hpp"
 #endif
 
+// SDHI インターフェースを使う場合
+// #define SDHI_IF
+
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -49,7 +52,7 @@ namespace {
 	typedef device::NULL_PORT SDC_POWER;
 
 #ifdef SDHI_IF
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER> SDHI;
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
 	SDHI	sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
