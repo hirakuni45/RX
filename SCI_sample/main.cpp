@@ -94,11 +94,18 @@ int main(int argc, char** argv)
 	utils::format("Start SCI (UART) sample for '%s'\n") % system_str_;
 
 	LED::DIR = 1;
+	uint8_t cnt = 0;
 	while(1) {
-		utils::delay::milli_second(250);
-		LED::P = 0;
-		utils::delay::milli_second(250);
-		LED::P = 1;
+		utils::delay::milli_second(10);
+		++cnt;
+		if(cnt >= 50) {
+			cnt = 0;
+		}
+		if(cnt < 25) {
+			LED::P = 0;
+		} else {
+			LED::P = 1;
+		}
 
 		// エコーバック処理
 		while(sci_length() > 0) {
