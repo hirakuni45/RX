@@ -37,13 +37,10 @@ namespace device {
 
 		static volatile uint32_t counter_;
 
-		static INTERRUPT_FUNC void cmt_task_() {
+		static INTERRUPT_FUNC void i_task_()
+		{
 			++counter_;
 			task_();
-		}
-
-		void set_vector_(ICU::VECTOR vec) {
-			set_interrupt_task(cmt_task_, static_cast<uint32_t>(vec));
 		}
 
 	public:
@@ -63,10 +60,8 @@ namespace device {
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level = 0) {
-
-			level_ = level;
-
+		bool start(uint32_t freq, uint8_t level = 0) noexcept
+		{
 			if(freq == 0) return false;
 
 			uint32_t cmcor = F_PCLKB / freq / 4;
@@ -82,55 +77,28 @@ namespace device {
 				return false;
 			}
 
+			level_ = level;
+
 			power_cfg::turn(CMT::get_peripheral());
 
-			auto chanel = CMT::get_chanel();
-			switch(chanel) {
-			case 0:
-				set_vector_(ICU::VECTOR::CMI0);
-				CMT::CMSTR0.STR0 = 0;
-				break;
-			case 1:
-				set_vector_(ICU::VECTOR::CMI1);
-				CMT::CMSTR0.STR1 = 0;
-				break;
-			case 2:
-				set_vector_(ICU::VECTOR::CMI2);
-				CMT::CMSTR1.STR2 = 0;
-				break;
-			case 3:
-				set_vector_(ICU::VECTOR::CMI3);
-				CMT::CMSTR1.STR3 = 0;
-				break;
-			}
+			CMT::enable(false);
 
 			CMT::CMCNT = 0;
 		    CMT::CMCOR = cmcor - 1;
 
 			counter_ = 0;
 
-			if(level_) {
-			    CMT::CMCR = CMT::CMCR.CMIE.b() | CMT::CMCR.CKS.b(cks);
+			auto vec = CMT::get_ivec();
+
+			if(level_ > 0) {
+				set_interrupt_task(i_task_, static_cast<uint32_t>(vec));
+			    CMT::CMCR = CMT::CMCR.CKS.b(cks) | CMT::CMCR.CMIE.b();
 			} else {
+				set_interrupt_task(nullptr, static_cast<uint32_t>(vec));
 			    CMT::CMCR = CMT::CMCR.CKS.b(cks);
 			}
-
-			icu_mgr::set_level(CMT::get_peripheral(), level_);
-
-			switch(chanel) {
-			case 0:
-				CMT::CMSTR0.STR0 = 1;
-				break;
-			case 1:
-				CMT::CMSTR0.STR1 = 1;
-				break;
-			case 2:
-				CMT::CMSTR1.STR2 = 1;
-				break;
-			case 3:
-				CMT::CMSTR1.STR3 = 1;
-				break;
-			}
+			icu_mgr::set_level(vec, level_);
+			CMT::enable();
 
 			return true;
 		}
@@ -141,26 +109,10 @@ namespace device {
 			@brief  廃棄（割り込みを停止して、ユニットを停止）
 		*/
 		//-----------------------------------------------------------------//
-		void destroy()
+		void destroy() noexcept
 		{
-			if(level_) {
-			    CMT::CMCR.CMIE = 0;
-			}
-			auto chanel = CMT::get_chanel();
-			switch(chanel) {
-			case 0:
-				CMT::CMSTR0.STR0 = 0;
-				break;
-			case 1:
-				CMT::CMSTR0.STR1 = 0;
-				break;
-			case 2:
-				CMT::CMSTR1.STR2 = 0;
-				break;
-			case 3:
-				CMT::CMSTR1.STR3 = 0;
-				break;
-			}
+		    CMT::CMCR.CMIE = 0;
+			CMT::enable(false);
 		}
 
 
@@ -169,8 +121,9 @@ namespace device {
 			@brief  割り込みと同期
 		*/
 		//-----------------------------------------------------------------//
-		void sync() const {
-			if(level_) {
+		void sync() const noexcept
+		{
+			if(level_ > 0) {
 				volatile uint32_t cnt = counter_;
 				while(cnt == counter_) sleep_();
 			} else {
@@ -188,7 +141,7 @@ namespace device {
 			@return 割り込みカウンターの値
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_counter() const { return counter_; }
+		static uint32_t get_counter() noexcept { return counter_; }
 
 
 		//-----------------------------------------------------------------//
@@ -197,7 +150,7 @@ namespace device {
 			@return CMCNT レジスター
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_cmt_count() const { return CMT::CMCNT(); }
+		uint16_t get_cmt_count() const noexcept { return CMT::CMCNT(); }
 
 
 		//-----------------------------------------------------------------//
@@ -206,7 +159,7 @@ namespace device {
 			@return CMCOR レジスター
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_cmp_count() const { return CMT::CMCOR(); }
+		uint16_t get_cmp_count() const noexcept { return CMT::CMCOR(); }
 
 
 		//-----------------------------------------------------------------//
@@ -215,7 +168,7 @@ namespace device {
 			@return TASK クラス
 		*/
 		//-----------------------------------------------------------------//
-		static TASK& at_task() { return task_; }
+		static TASK& at_task() noexcept { return task_; }
 	};
 
 	template <class CMT, class TASK> volatile uint32_t cmt_io<CMT, TASK>::counter_ = 0;
