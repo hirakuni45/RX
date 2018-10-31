@@ -3,13 +3,13 @@
 /*!	@file
 	@brief	RX24T グループ・割り込みマネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016,2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016,2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX24T/icu.hpp"
 #include "RX24T/peripheral.hpp"
+#include "RX24T/icu.hpp"
 
 namespace device {
 
@@ -33,6 +33,23 @@ namespace device {
 			bool ret = true;
 			bool ena = lvl != 0 ? true : false;
 			switch(vec) {
+
+			case ICU::VECTOR::CMI0:
+				ICU::IPR.CMI0 = lvl;
+				ICU::IER.CMI0 = ena;
+				break;
+			case ICU::VECTOR::CMI1:
+				ICU::IPR.CMI1 = lvl;
+				ICU::IER.CMI1 = ena;
+				break;
+			case ICU::VECTOR::CMI2:
+				ICU::IPR.CMI2 = lvl;
+				ICU::IER.CMI2 = ena;
+				break;
+			case ICU::VECTOR::CMI3:
+				ICU::IPR.CMI3 = lvl;
+				ICU::IER.CMI3 = ena;
+				break;
 
 			case ICU::VECTOR::TGIA0:
 				ICU::IPR.MTU0_ABCD = lvl;
@@ -244,25 +261,6 @@ namespace device {
 			bool ret = true;
 			bool ena = lvl != 0 ? true : false;
 			switch(t) {
-			case peripheral::CMT0:
-				ICU::IPR.CMI0 = lvl;
-				ICU::IER.CMI0 = ena;
-				break;
-
-			case peripheral::CMT1:
-				ICU::IPR.CMI1 = lvl;
-				ICU::IER.CMI1 = ena;
-				break;
-
-			case peripheral::CMT2:
-				ICU::IPR.CMI2 = lvl;
-				ICU::IER.CMI2 = ena;
-				break;
-
-			case peripheral::CMT3:
-				ICU::IPR.CMI3 = lvl;
-				ICU::IER.CMI3 = ena;
-				break;
 
 			case peripheral::RSPI0:
 				ICU::IPR.RSPI0 = lvl;
@@ -274,21 +272,21 @@ namespace device {
 			case peripheral::SCI1C:
 				ICU::IPR.SCI1 = lvl;
 				ICU::IER.RXI1 = ena;
-				ICU::IER.TEI1 = ena;
+				ICU::IER.TXI1 = ena;
 				break;
 
 			case peripheral::SCI5:
 			case peripheral::SCI5C:
 				ICU::IPR.SCI5 = lvl;
 				ICU::IER.RXI5 = ena;
-				ICU::IER.TEI5 = ena;
+				ICU::IER.TXI5 = ena;
 				break;
 
 			case peripheral::SCI6:
 			case peripheral::SCI6C:
 				ICU::IPR.SCI6 = lvl;
 				ICU::IER.RXI6 = ena;
-				ICU::IER.TEI6 = ena;
+				ICU::IER.TXI6 = ena;
 				break;
 
 			case peripheral::RIIC0:
