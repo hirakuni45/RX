@@ -245,6 +245,8 @@ namespace device {
 		static pfsw_t<0x0008C181> P81PFS;
 		static pfsw_t<0x0008C182> P82PFS;
 		static pfsw_t<0x0008C183> P83PFS;
+		static pfsw_t<0x0008C184> P84PFS;
+		static pfsw_t<0x0008C185> P85PFS;
 		static pfsw_t<0x0008C186> P86PFS;
 		static pfsw_t<0x0008C187> P87PFS;
 
