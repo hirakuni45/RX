@@ -15,12 +15,12 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  QSPI 定義基底クラス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 		@param[in]	rxv		受信ベクター
 		@param[in]	txv		送信ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t, ICU::VECTOR rxv, ICU::VECTOR txv>
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv>
 	struct qspi_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -292,7 +292,7 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 
 		//-----------------------------------------------------------------//

@@ -60,10 +60,10 @@ namespace device {
 			SBFAI   = 44,  // SDHI
 
 			MBFAI   = 45,  // MMCIF
-#if defined(SIG_RX64M)
-			SSITXI0 = 46,  // SSI0
-			SSIRXI0 = 47,  // SSI0
-			SSIRTI1 = 48,  // SSI1
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			SSITXI0 = 46,  // SSI0 シリアルサウンドインタフェース
+			SSIRXI0 = 47,  // SSI0 シリアルサウンドインタフェース
+			SSIRTI1 = 48,  // SSI1 シリアルサウンドインタフェース
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 			IDEI         = 50,  // SRC
@@ -315,6 +315,20 @@ namespace device {
 		enum class VECTOR_SELB {
 			CMI2 = 1,	///< CMT2
 			CMI3 = 2,	///< CMT3
+
+			RXF0 = 50,	///< CAN0（受信 FIFO 割り込み）
+			TXF0 = 51,	///< CAN0（送信 FIFO 割り込み）
+			RXM0 = 52,	///< CAN0（メールボックス０～３１メッセージ受信完了）
+			TXM0 = 53,	///< CAN0（メールボックス０～３１メッセージ送信完了）
+			RXF1 = 54,	///< CAN1（受信 FIFO 割り込み）
+			TXF1 = 55,	///< CAN1（送信 FIFO 割り込み）
+			RXM1 = 56,	///< CAN1（メールボックス０～３１メッセージ受信完了）
+			TXM1 = 57,	///< CAN1（メールボックス０～３１メッセージ送信完了）
+			RXF2 = 58,	///< CAN2（受信 FIFO 割り込み）
+			TXF2 = 59,	///< CAN2（送信 FIFO 割り込み）
+			RXM2 = 60,	///< CAN2（メールボックス０～３１メッセージ受信完了）
+			TXM2 = 61,	///< CAN2（メールボックス０～３１メッセージ送信完了）
+
 		};
 
 

@@ -10,6 +10,7 @@
 //=====================================================================//
 #include "common/io_utils.hpp"
 #include "RX600/peripheral.hpp"
+#include "RX600/icu.hpp"
 
 namespace device {
 
@@ -18,9 +19,11 @@ namespace device {
 		@brief	シリアルサウンドインタフェース（SSI）
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
+		@param[in]	rxi		受信データフル割り込みベクタ
+		@param[in]	txi		送信データエンプティ割り込みベクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
+	template <uint32_t base, peripheral per, ICU::VECTOR rxi, ICU::VECTOR txi>
 	struct ssi_t {
 
 		//-----------------------------------------------------------------//
@@ -188,7 +191,25 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return per; }
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信データフル割り込みベクタを取得
+			@return 受信データフル割り込みベクタ
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_rx_vec() { return rxi; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信データエンプティ割り込みベクタを取得
+			@return 送信データエンプティ割り込みベクタ
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_tx_vec() { return txi; }
 	};
-	typedef ssi_t<0x0008A500, peripheral::SSI0> SSI0;
-	typedef ssi_t<0x0008A540, peripheral::SSI1> SSI1;
+
+	typedef ssi_t<0x0008A500, peripheral::SSI0, ICU::VECTOR::SSIRXI0, ICU::VECTOR::SSITXI0> SSI0;
+	typedef ssi_t<0x0008A540, peripheral::SSI1, ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1> SSI1;
 }
