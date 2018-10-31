@@ -67,6 +67,13 @@ namespace device {
 				SYSTEM::MSTPCRA.MSTPA14 = ((STH::st.cmt_ & 0b1100) == 0);
 				break;
 
+			case peripheral::CMTW0:
+				SYSTEM::MSTPCRA.MSTPA0 = f;
+				break;
+			case peripheral::CMTW1:
+				SYSTEM::MSTPCRA.MSTPA1 = f;
+				break;
+
 			case peripheral::TPU0:
 			case peripheral::TPU1:
 			case peripheral::TPU2:

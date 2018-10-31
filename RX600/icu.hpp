@@ -25,23 +25,23 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR {
-			VEC0 = 0,     ///< ベクター０
+			VEC0    = 0,   ///< ベクター０
 
-			BUSERR = 16,  ///< BSC
+			BUSERR  = 16,  ///< BSC
 
-			RAMERR = 18,  ///< RAM
+			RAMERR  = 18,  ///< RAM
 
-			FIFERR = 21,  ///< FCU
+			FIFERR  = 21,  ///< FCU
 
-			FRDYI  = 23,  ///< FCU
+			FRDYI   = 23,  ///< FCU
 
-			SWINT2 = 26,  // ICU
-			SWINT  = 27,  // ICU
+			SWINT2  = 26,  // ICU
+			SWINT   = 27,  // ICU
 
-			CMI0   = 28,  // CMT0
-			CMI1   = 29,  // CMT1
-			CMWI0  = 30,  // CMTW0
-			CMWI1  = 31,  // CMTW1
+			CMI0    = 28,  // CMT0
+			CMI1    = 29,  // CMT1
+			CMWI0   = 30,  // CMTW0
+			CMWI1   = 31,  // CMTW1
 
 			D0FIFO2 = 32,  // USBA
 			D1FIFO2 = 33,  // USBA
@@ -67,7 +67,7 @@ namespace device {
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 			IDEI         = 50,  // SRC
-			ODFI         = 511,  // SRC
+			ODFI         = 51,  // SRC
 #elif defined(SIG_RX65N)
 			RIIC_RXI1    = 50,	// RIIC1 RXI
 			RIIC_TXI1    = 51,	// RIIC1 TXI
@@ -304,9 +304,17 @@ namespace device {
 			INTA253,
 			INTA254,
 			INTA255,
+		};
 
-			CMI2     = 256,  // CMT2 (group)
-			CMI3     = 257,  // CMT3 (group)
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込みＢ要因・ベクター・インデックス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class VECTOR_SELB {
+			CMI2 = 1,	///< CMT2
+			CMI3 = 2,	///< CMT3
 		};
 
 
@@ -500,6 +508,10 @@ namespace device {
 		struct ir_t {
 			rw8_t<base + 28> CMI0;
 			rw8_t<base + 29> CMI1;
+			rw8_t<base + 30> CMWI0;
+			rw8_t<base + 31> CMWI1;
+
+			rw8_t<base + 44> SDHI;
 
 			rw8_t<base + 52> RIIC_RXI0;
 			rw8_t<base + 53> RIIC_TXI0;
@@ -671,6 +683,11 @@ namespace device {
 			bit_rw_t<ier03, bitpos::B3>	SWINT;
 			bit_rw_t<ier03, bitpos::B4>	CMI0;
 			bit_rw_t<ier03, bitpos::B5>	CMI1;
+			bit_rw_t<ier03, bitpos::B6>	CMWI0;
+			bit_rw_t<ier03, bitpos::B7>	CMWI1;
+
+			typedef rw8_t<base + 0x05> ier05;
+			bit_rw_t<ier05, bitpos::B4>	SDHI;
 
 			typedef rw8_t<base + 0x06> ier06;
 			bit_rw_t<ier06, bitpos::B4>	RIIC_RXI0;
@@ -846,6 +863,10 @@ namespace device {
 
 			rw8_t<base + 4> CMI0;
 			rw8_t<base + 5> CMI1;
+			rw8_t<base + 6> CMWI0;
+			rw8_t<base + 7> CMWI1;
+
+			rw8_t<base + 44> SDHI;
 
 			rw8_t<base + 52> RIIC_RXI0;
 			rw8_t<base + 53> RIIC_TXI0;

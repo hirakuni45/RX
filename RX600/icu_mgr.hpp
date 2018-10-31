@@ -45,6 +45,29 @@ namespace device {
 		{
 			bool ena = lvl != 0 ? true : false;
 			switch(vec) {
+
+			case ICU::VECTOR::CMI0:
+				ICU::IER.CMI0 = 0;
+				ICU::IPR.CMI0 = lvl;
+				ICU::IER.CMI0 = ena;
+				break;
+			case ICU::VECTOR::CMI1:
+				ICU::IER.CMI1 = 0;
+				ICU::IPR.CMI1 = lvl;
+				ICU::IER.CMI1 = ena;
+				break;
+
+			case ICU::VECTOR::CMWI0:
+				ICU::IER.CMWI0 = 0;
+				ICU::IPR.CMWI0 = lvl;
+				ICU::IER.CMWI0 = ena;
+				break;
+			case ICU::VECTOR::CMWI1:
+				ICU::IER.CMWI1 = 0;
+				ICU::IPR.CMWI1 = lvl;
+				ICU::IER.CMWI1 = ena;
+				break;
+
 			case icu_t::VECTOR::GROUPBE0:
 				ICU::IER.GROUPBE0 = 0;
 				ICU::IPR.GROUPBE0 = lvl;
@@ -123,17 +146,6 @@ namespace device {
 				ICU::IER.DMAC74I = 0;
 				ICU::IPR.DMAC74I = lvl;
 				ICU::IER.DMAC74I = ena;
-				break;
-
-			case peripheral::CMT0:
-				ICU::IER.CMI0 = 0;
-				ICU::IPR.CMI0 = lvl;
-				ICU::IER.CMI0 = ena;
-				break;
-			case peripheral::CMT1:
-				ICU::IER.CMI1 = 0;
-				ICU::IPR.CMI1 = lvl;
-				ICU::IER.CMI1 = ena;
 				break;
 
 			case peripheral::RIIC0:
