@@ -19,9 +19,10 @@ namespace device {
 		@brief  SDHI 定義基底クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
+		@param[in]	ivec	割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
 	struct sdhi_t {
 
 		//-----------------------------------------------------------------//
@@ -127,10 +128,12 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>  RSPEND;
+
 			bit_rw_t<io_, bitpos::B2>  ACEND;
 			bit_rw_t<io_, bitpos::B3>  SDCDRM;
 			bit_rw_t<io_, bitpos::B4>  SDCDIN;
 			bit_ro_t<io_, bitpos::B5>  SDCDMON;
+
 			bit_ro_t<io_, bitpos::B7>  SDWPMON;
 			bit_rw_t<io_, bitpos::B8>  SDD3RM;
 			bit_rw_t<io_, bitpos::B9>  SDD3IN;
@@ -182,9 +185,11 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>  RSPENDM;
+
 			bit_rw_t<io_, bitpos::B2>  ACENDM;
 			bit_rw_t<io_, bitpos::B3>  SDCDRMM;
 			bit_rw_t<io_, bitpos::B4>  SDCDINM;
+
 			bit_rw_t<io_, bitpos::B8>  SDD3RMM;
 			bit_rw_t<io_, bitpos::B9>  SDD3INM;
 		};
@@ -269,6 +274,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  CTOP;
 			bits_rw_t<io_, bitpos::B4, 4>  TOP;
+
 			bit_rw_t <io_, bitpos::B15>    WIDTH;
 		};
 		static sdopt_t SDOPT;
@@ -283,19 +289,18 @@ namespace device {
 			typedef ro32_t<base + 0x58> io_;
 			using io_::operator ();
 
-			bit_ro_t <io_, bitpos::B0>  CMDE0;
-			bit_ro_t <io_, bitpos::B1>  CMDE1;
-			bit_ro_t <io_, bitpos::B2>  RSPLENE0;
-			bit_ro_t <io_, bitpos::B3>  RSPLENE1;
-			bit_ro_t <io_, bitpos::B4>  RDLENE;
-			bit_ro_t <io_, bitpos::B5>  CRCLENE;
+			bit_ro_t <io_, bitpos::B0>      CMDE0;
+			bit_ro_t <io_, bitpos::B1>      CMDE1;
+			bit_ro_t <io_, bitpos::B2>      RSPLENE0;
+			bit_ro_t <io_, bitpos::B3>      RSPLENE1;
+			bit_ro_t <io_, bitpos::B4>      RDLENE;
+			bit_ro_t <io_, bitpos::B5>      CRCLENE;
 
-			bit_ro_t <io_, bitpos::B8>  RSPCRCE0;
-			bit_ro_t <io_, bitpos::B9>  RSPCRCE1;
-			bit_ro_t <io_, bitpos::B10> RDCRCE;
-			bit_ro_t <io_, bitpos::B11> CRCTKE;
-
-			bits_ro_t<io_, bitpos::B12, 3> CRCTK;
+			bit_ro_t <io_, bitpos::B8>      RSPCRCE0;
+			bit_ro_t <io_, bitpos::B9>      RSPCRCE1;
+			bit_ro_t <io_, bitpos::B10>     RDCRCE;
+			bit_ro_t <io_, bitpos::B11>     CRCTKE;
+			bits_ro_t<io_, bitpos::B12, 3>  CRCTK;
 		};
 		static sdersts1_t SDERSTS1;
 
@@ -341,7 +346,9 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>  INTEN;
+
 			bit_rw_t<io_, bitpos::B2>  RWREQ;
+
 			bit_rw_t<io_, bitpos::B8>  IOABT;
 			bit_rw_t<io_, bitpos::B9>  C52PUB;
 		};
@@ -361,6 +368,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>  IOIRQ;
+
 			bit_rw_t<io_, bitpos::B14> EXPUB52;
 			bit_rw_t<io_, bitpos::B15> EXWT;
 		};
@@ -380,6 +388,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>  IOIRQM;
+
 			bit_rw_t<io_, bitpos::B14> EXPUB52M;
 			bit_rw_t<io_, bitpos::B15> EXWTM;
 		};
@@ -431,6 +440,7 @@ namespace device {
 
 			bits_ro_t<io_, bitpos::B0, 8>  IP1;
 			bits_ro_t<io_, bitpos::B8, 4>  IP2;
+
 			bit_ro_t <io_, bitpos::B14>    CLKRAT;
 			bit_ro_t <io_, bitpos::B15>    CPRM;
 		};
@@ -462,7 +472,17 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return per; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SDHI 割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_ivec() { return ivec; }
+
 	};
 
-	typedef sdhi_t<0x0008AC00, peripheral::SDHI> SDHI;
+	typedef sdhi_t<0x0008AC00, peripheral::SDHI, ICU::VECTOR::SBFAI> SDHI;
 }

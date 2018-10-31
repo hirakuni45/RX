@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ、SDHI（SD カード）FatFS ドライバー
+	@brief	RX600 グループ、SDHI（SD ホストインターフェース）FatFS ドライバー
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -11,6 +11,7 @@
 #include "ff12b/src/diskio.h"
 #include "ff12b/src/ff.h"
 #include "RX600/sdhi.hpp"
+#include "RX600/icu_mgr.hpp"
 #include "RX600/port_map.hpp"
 #include "common/delay.hpp"
 #include "common/format.hpp"
@@ -30,7 +31,8 @@ namespace fatfs {
 		@param[in]	PSEL	ポート候補
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SDHI, class POW, device::port_map::option PSEL = device::port_map::option::FIRST>
+	template <class SDHI, class POW,
+		device::port_map::option PSEL = device::port_map::option::FIRST>
 	class sdhi_io {
 
 		// 通常 PCLKB は 60MHz
@@ -52,6 +54,7 @@ namespace fatfs {
 		BYTE		card_type_;		// b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing
 
 		uint8_t		mount_delay_;
+		uint8_t		intr_lvl_;
 		bool		cd_;
 		bool		mount_;
 		bool		start_;
@@ -88,7 +91,7 @@ namespace fatfs {
 		};
 
 
-		void set_clk_()
+		void set_clk_() noexcept
 		{
 			SDHI::SDSTS1 = 0;
 			SDHI::SDSTS2 = 0;
@@ -118,7 +121,7 @@ namespace fatfs {
 		}
 
 
-		state send_cmd_(command cmd, uint32_t arg, bool check_err = true)
+		state send_cmd_(command cmd, uint32_t arg, bool check_err = true) noexcept
 		{
 			set_clk_();
 			SDHI::SDARG = arg;
@@ -146,6 +149,17 @@ namespace fatfs {
 			return st;
 		}
 
+		static uint32_t i_count_;
+
+		static INTERRUPT_FUNC void i_task_()
+		{
+			++i_count_;
+		}
+
+
+		static void sync_data_end_() noexcept
+		{
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -155,37 +169,54 @@ namespace fatfs {
 		 */
 		//-----------------------------------------------------------------//
 		sdhi_io(bool onew = false) noexcept : stat_(STA_NOINIT), card_type_(0),
-			mount_delay_(0), cd_(false), mount_(false), start_(false), fast_(false),
-			onew_(onew) { }
+			mount_delay_(0), intr_lvl_(0),
+			cd_(false), mount_(false), start_(false), fast_(false),
+			onew_(onew)
+		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
+			@param[in]	lvl		割り込みレベル
 		 */
 		//-----------------------------------------------------------------//
-		void start()
+		void start(uint8_t lvl = 0)
 		{
-			if(!start_) {
-				POW::DIR = 1;
-				POW::P   = 1;  // offline power
-				POW::PU  = 0;
-				POW::OD  = 1;  // Open Drain
-
-				device::power_cfg::turn(SDHI::get_peripheral());
-				device::port_map::turn(SDHI::get_peripheral(), true, PSEL);
-
-				while(SDHI::SDSTS2.CBSY() != 0) ;
-				SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.WIDTH.b()
-					| SDHI::SDOPT.TOP.b(12);
-
-#ifdef LITTLE_ENDIAN
-				// データ読み出し、書き込み時のエンディアン変換を有効にする
-//				SDHI::SDSWAP = SDHI::SDSWAP.BWSWP.b(1) | SDHI::SDSWAP.BRSWP.b(1);
-#endif
-				fast_ = false;
-				start_ = true;
+			if(start_) {
+				return;
 			}
+
+			POW::DIR = 1;
+			POW::P   = 1;  // offline power
+			POW::PU  = 0;
+			POW::OD  = 1;  // Open Drain
+
+			device::power_cfg::turn(SDHI::get_peripheral());
+			device::port_map::turn(SDHI::get_peripheral(), true, PSEL);
+
+			while(SDHI::SDSTS2.CBSY() != 0) ;
+			SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.TOP.b(1)
+				| SDHI::SDOPT.WIDTH.b();
+//			SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.TOP.b(1);
+
+			// データ読み出し、書き込み時のエンディアン変換を有効にする
+#ifdef LITTLE_ENDIAN
+//			SDHI::SDSWAP = SDHI::SDSWAP.BWSWP.b(1) | SDHI::SDSWAP.BRSWP.b(1);
+#else
+
+#endif
+
+			intr_lvl_ = lvl;
+			if(intr_lvl_) {
+				set_interrupt_task(i_task_, static_cast<uint32_t>(SDHI::get_ivec()));
+			} else {
+				set_interrupt_task(nullptr, static_cast<uint32_t>(SDHI::get_ivec()));
+			}
+			device::icu_mgr::set_level(SDHI::get_peripheral(), intr_lvl_);
+
+			fast_ = false;
+			start_ = true;
 		}
 
 
@@ -297,26 +328,31 @@ namespace fatfs {
 				utils::format("CMD8: NG! for 'SD-V1, MMC-V3 or Fail'\n");
 			}
 
-///////////////////////////////////////////////////////////////
 
 			// 初期化コマンド(CMD55/ACMD41)
 			// retray loop count: 1 turn 640 clock for 234KHz(60MHz / 256) 2.735ms
 			// 750 ms: 
-			static const uint32_t init_limit = 300;
+			static const uint32_t init_limit = 500;
 			uint32_t init_loop = 0;
 			while(init_loop < init_limit) {
-				auto st = send_cmd_(command::CMD55, 0);
-				if(st != state::no_error) {
-					utils::format("CMD55: Error\n");
+				{
+					auto st = send_cmd_(command::CMD55, 0);
+					if(st != state::no_error) {
+						utils::format("CMD55: Error\n");
+						stat_ = STA_NOINIT;
+						return stat_;
+					}
 				}
-				uint32_t send = (ty == CT_SD2) ? 0x40000000 : 0x00000000;
-				st = send_cmd_(command::ACMD41, send);
-				uint32_t res = SDHI::SDRSP10();
-// utils::format("ACM41: %08X\n") % res;
-				if(st == state::no_error && res == 0) {
-					break;
-				} else {
-					++init_loop;
+
+				{
+					uint32_t send = (ty == CT_SD2) ? 0x40000000 : 0x00000000;
+					auto st = send_cmd_(command::ACMD41, send);
+					auto res = SDHI::SDRSP10();
+					if(st == state::no_error && ((res & 0xff) == 0x00)) {
+						break;
+					} else {
+						++init_loop;
+					}
 				}
 			}
 			if(init_loop >= init_limit) {  // timeout
@@ -327,17 +363,35 @@ namespace fatfs {
 
 			if(ty == CT_SD2) {
 				utils::format("ACMD41: OK! (SD-V2), %d loops\n") % init_loop;
-
+#if 0
 				// Block for 512 bytes
 				if(send_cmd_(command::CMD16, 512) == state::no_error) {
 					utils::format("CMD16: OK!\n");
 				} else {
 					utils::format("CMD16: NG!\n");
+					stat_ = STA_NOINIT;
+					return stat_;
 				}
+#endif
 			} else { // SD-V1
 				utils::format("ACMD41: OK! (SD-V1), %d loops\n") % init_loop;
 			}
 
+			// CMD58 (read OCR)
+			if(send_cmd_(command::CMD58, 0) == state::no_error) {
+				auto res = SDHI::SDRSP10();
+				utils::format("CMD58: OK! %02X\n") % res;
+			} else {
+				utils::format("CMD58: NG!\n");
+				stat_ = STA_NOINIT;
+				return stat_;
+			}
+
+			// CMD9 (CSD)
+
+			// CMD10 (CID)
+
+///////////////////////////////////////////////////////////////
 //	ty |= CT_BLOCK;
 
 			card_type_ = ty;
@@ -400,7 +454,7 @@ namespace fatfs {
 			auto sp10 = SDHI::SDRSP10();
 			utils::format("%s: Response: %08X\n") % cmdstr % sp10;
 			uint32_t loop = 0;
-			while(SDHI::SDSTS2.BRE() == 0) {				
+			while(SDHI::SDSTS2.BRE() == 0) {
 				if(loop >= 1000000) {
 					utils::format("%s time out\n") % cmdstr;
 					return RES_ERROR;
@@ -612,4 +666,8 @@ namespace fatfs {
 			return mount_;
 		}
 	};
+
+	// テンプレート関数、実態の定義
+	template <class SDHI, class POW, device::port_map::option PSEL>
+		uint32_t sdhi_io<SDHI, POW, PSEL>::i_count_ = 0;
 }
