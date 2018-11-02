@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX71M, RX65N LED 点滅サンプル
+Renesas RX71M, RX64M, RX65N, RX24T LED 点滅サンプル
 =========
 
 ## 概要
@@ -17,7 +17,10 @@ RX マイコンを使った LED 点滅のサンプルプログラム
  - RX24T: 80MHz、RX64M: 120MHz、RX71M: 240MHz、RX65N: 120MHz
  - LED を指定のポートに接続する。
 ```
-#if defined(SIG_RX64M) | defined(SIG_RX71M)
+#if defined(SIG_RX71M)
+	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+#elif defined(SIG_RX64M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX65N)

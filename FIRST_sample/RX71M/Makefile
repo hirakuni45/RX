@@ -8,7 +8,7 @@
 #=======================================================================
 TARGET		=	led_sample
 
-DEVICE		=	R5F571MF
+DEVICE		=	R5F571ML
 
 BUILD		=	release
 
