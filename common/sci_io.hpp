@@ -286,7 +286,8 @@ namespace device {
 				}
 				send_.put(ch);
 				if(SCI::SCR.TIE() == 0) {
-					while(SCI::SSR.TEND() == 0) sleep_();
+/// この部分を取り除いても問題無いか評価中・・・
+///					while(SCI::SSR.TEND() == 0) sleep_();
 					HCTL::P = 1;
 					SCI::SCR.TIE = 1;
 					SCI::TDR = send_.get();
