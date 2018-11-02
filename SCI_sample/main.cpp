@@ -2,10 +2,13 @@
 /*! @file
     @brief  SCI (UART) サンプル @n
 			RX64M, RX71M: @n
+					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
 			RX65N (Renesas Envision kit RX65N): @n
+					12MHz のベースクロックを使用する @n
 			　　　　P70 に接続された LED を利用する @n
 			RX24T: @n
+					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
@@ -19,21 +22,22 @@
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 
+#include "common/cmt_io.hpp"
+
+#define USE_CMT
+
 namespace {
 
-	typedef utils::fixed_fifo<char, 256> RXB;  // RX (RECV) バッファの定義
-	typedef utils::fixed_fifo<char, 512> TXB;  // TX (SEND) バッファの定義
-
-#if defined(SIG_RX64M)
-	typedef device::system_io<12000000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX64M" };
-#elif defined(SIG_RX71M)
+#if defined(SIG_RX71M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX71M" };
+#elif defined(SIG_RX64M)
+	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX64M" };
 #elif defined(SIG_RX65N)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -45,11 +49,18 @@ namespace {
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX24T" };
 #endif
+
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
+
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 // SCI ポートの第二候補を選択する場合
 //	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
 	SCI		sci_;
 
+#ifdef USE_CMT
+	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
+#endif
 }
 
 
@@ -85,18 +96,31 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::setup_system_clock();
 
+#ifdef USE_CMT
+	{  // タイマー設定（100Hz）
+		uint8_t intr = 4;
+		cmt_.start(100, intr);
+	}
+#endif
+
 	{  // SCI の開始
 		uint8_t intr = 2;        // 割り込みレベル
 		uint32_t baud = 115200;  // ボーレート
 		sci_.start(baud, intr);
 	}
 
-	utils::format("Start SCI (UART) sample for '%s'\n") % system_str_;
+	auto clk = F_ICLK / 1000000;
+	utils::format("Start SCI (UART) sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
 	LED::DIR = 1;
 	uint8_t cnt = 0;
+//	char cha = 0x20;
 	while(1) {
-		utils::delay::milli_second(10);
+#ifdef USE_CMT
+		cmt_.sync();
+#else
+		utils::delay::milli_second(10);  // 100Hz
+#endif
 		++cnt;
 		if(cnt >= 50) {
 			cnt = 0;
@@ -112,5 +136,9 @@ int main(int argc, char** argv)
 			auto ch = sci_getch();
 			sci_putch(ch);
 		}
+
+//		sci_putch(cha);
+//		++cha;
+//		if(cha >= 0x7f) cha = 0x20;
 	}
 }
