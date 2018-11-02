@@ -20,9 +20,10 @@ namespace device {
 	/*!
 		@brief  systen_io クラス
 		@param[in]	BASE_CLOCK	ベース・クロック周波数（１２ＭＨｚ）
+		@param[in]	EXT_CLOCK	外部クロックに入力を行う場合「true」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t BASE_CLOCK = 12000000>
+	template <uint32_t BASE_CLOCK = 12000000, bool EXT_CLOCK = false>
 	struct system_io {
 
 		//-------------------------------------------------------------//
@@ -36,32 +37,36 @@ namespace device {
 
 			device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
 			// メインクロック強制発振とドライブ能力設定
-			device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(0b10)
-						  | device::SYSTEM::MOFCR.MOFXIN.b(1);
+			uint8_t modrv2 = 0b11;
+			if(BASE_CLOCK > 20000000) modrv2 = 0b00;
+			else if(BASE_CLOCK > 16000000) modrv2 = 0b01;
+			else if(BASE_CLOCK > 8000000) modrv2 = 0b10;
+			device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(modrv2)
+						  | device::SYSTEM::MOFCR.MOSEL.b(EXT_CLOCK);
+///						  device::SYSTEM::MOFCR.MOFXIN.b(1)
 			device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
-			while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
+			while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) { asm("nop"); }
 
-#if defined(SIG_RX71M)
-			if(F_ICLK > 120000000) {
-				device::SYSTEM::MEMWAIT = 1;
-//				turn_usermode();
-			}
-#endif
+			// RX71M、240MHz 時の MEMWAIT はスーパーバイザモードでの設定が必須なので、
+			// device::SYSTEM::MEMWAIT = 1; は、start.s で設定される。
 
 #if defined(SIG_RX65N)
+			// RX65N の場合、120MHz 動作が標準
 			device::SYSTEM::ROMWT = 0b10;
 #endif
 			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
 			// ... MAX x30.0
-			uint32_t n = F_ICLK / BASE_CLOCK;
-			if(n < 10) n = 10;
-			else if(n > 30) n = 30;
-			n -= 10;
-			device::SYSTEM::PLLCR.STC = n + 0b100111;  // base 240MHz(12MHz)
+			uint32_t n = F_ICLK * 2 / BASE_CLOCK;
+			if(n < 20) n = 20;
+			else if(n > 60) n = 60;
+			n -= 20;
+			device::SYSTEM::PLLCR.STC = n + 0b010011;  // base 240MHz(12MHz)
 			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
+			uint8_t id = 1;
+			if(F_ICLK > 120000000) id = 0;
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)    // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.ICK.b(1)    // 1/2 (240/2=120)
+								  | device::SYSTEM::SCKCR.ICK.b(id)   // 1/2 (240/2=120)
 								  | device::SYSTEM::SCKCR.BCK.b(2)    // 1/4 (240/4=60)
 								  | device::SYSTEM::SCKCR.PCKA.b(1)   // 1/2 (240/2=120)
 								  | device::SYSTEM::SCKCR.PCKB.b(2)   // 1/4 (240/4=60)
