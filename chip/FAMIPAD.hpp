@@ -2,7 +2,13 @@
 //=====================================================================//
 /*!	@file
 	@brief	ファミリーコンピューター JOY PAD 読み込み @n
-			CMOS 4021B Shift Register
+			CMOS 4021B Shift Register @n
+			※互換パッドの配線と信号：@n
+			赤：Vcc @n
+			黄：Vss @n
+			青：P/S @n
+			茶：CLK @n
+			白：OUT
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
