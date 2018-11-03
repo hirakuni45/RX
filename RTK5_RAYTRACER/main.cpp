@@ -73,7 +73,7 @@ namespace {
 
 	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
 
-	MMC		sdh_(spi_, 20000000);
+	MMC		sdh_(spi_, 35000000);
 #endif
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
