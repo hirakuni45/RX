@@ -26,6 +26,16 @@ namespace device {
 	template <uint32_t BASE_CLOCK = 12000000, bool EXT_CLOCK = false>
 	struct system_io {
 
+		static uint8_t clock_div_(uint32_t clk) noexcept
+		{
+			uint8_t div = 0;
+			while(clk < 240000000) {
+				++div;
+				clk <<= 1;
+			}
+			return div;
+		}
+
 		//-------------------------------------------------------------//
 		/*!
 			@brief  システム・クロックの設定
@@ -56,27 +66,32 @@ namespace device {
 #endif
 			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
 			// ... MAX x30.0
-			uint32_t n = F_ICLK * 2 / BASE_CLOCK;
+			// 内部クロックは 240MHz にする。
+			uint32_t n = 240000000 * 2 / BASE_CLOCK;
 			if(n < 20) n = 20;
 			else if(n > 60) n = 60;
 			n -= 20;
 			device::SYSTEM::PLLCR.STC = n + 0b010011;  // base 240MHz(12MHz)
 			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
-			uint8_t id = 1;
-			if(F_ICLK > 120000000) id = 0;
-			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)    // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.ICK.b(id)   // 1/2 (240/2=120)
-								  | device::SYSTEM::SCKCR.BCK.b(2)    // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.PCKA.b(1)   // 1/2 (240/2=120)
-								  | device::SYSTEM::SCKCR.PCKB.b(2)   // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.PCKC.b(2)   // 1/4 (240/4=60)
-								  | device::SYSTEM::SCKCR.PCKD.b(2);  // 1/4 (240/4=60)
+
+			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(F_FCLK))
+								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(F_ICLK))
+								  | device::SYSTEM::SCKCR.BCK.b(clock_div_(120000000))
+								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(F_PCLKA))
+								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(F_PCLKB))
+								  | device::SYSTEM::SCKCR.PCKC.b(clock_div_(60000000))
+								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(F_PCLKD));
 			device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 			// クロック関係書き込み不許可
 			device::SYSTEM::PRCR = 0xA500;
+
+#if defined(SIG_RX65N)
+			// ROM キャッシュを有効（標準）
+			device::SYSTEM::ROMCE = 1;
+#endif
 		}
 	};
 
