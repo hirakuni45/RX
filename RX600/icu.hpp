@@ -25,45 +25,45 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR {
-			VEC0    = 0,   ///< ベクター０
+			VEC0         = 0,   ///< ベクター０
 
-			BUSERR  = 16,  ///< BSC
+			BUSERR       = 16,  ///< BSC
 
-			RAMERR  = 18,  ///< RAM
+			RAMERR       = 18,  ///< RAM
 
-			FIFERR  = 21,  ///< FCU
+			FIFERR       = 21,  ///< FCU
 
-			FRDYI   = 23,  ///< FCU
+			FRDYI        = 23,  ///< FCU
 
-			SWINT2  = 26,  // ICU
-			SWINT   = 27,  // ICU
+			SWINT2       = 26,  // ICU
+			SWINT        = 27,  // ICU
 
-			CMI0    = 28,  // CMT0
-			CMI1    = 29,  // CMT1
-			CMWI0   = 30,  // CMTW0
-			CMWI1   = 31,  // CMTW1
+			CMI0         = 28,  // CMT0
+			CMI1         = 29,  // CMT1
+			CMWI0        = 30,  // CMTW0
+			CMWI1        = 31,  // CMTW1
 
-			D0FIFO2 = 32,  // USBA
-			D1FIFO2 = 33,  // USBA
-			D0FIFO0 = 34,  // USB0
-			D1FIFO0 = 35,  // USB0
+			D0FIFO2      = 32,  // USBA
+			D1FIFO2      = 33,  // USBA
+			D0FIFO0      = 34,  // USB0
+			D1FIFO0      = 35,  // USB0
 
-			SPRI0   = 38,  // RSPI0
-			SPTI0   = 39,  // RSPI0
+			SPRI0        = 38,  // RSPI0
+			SPTI0        = 39,  // RSPI0
 #if defined(SIG_RX65N) || defined(SIG_RX71M)
-			SPRI1   = 40,  // RSPI1
-			SPTI1   = 41,  // RSPI1
+			SPRI1        = 40,  // RSPI1
+			SPTI1        = 41,  // RSPI1
 #endif
-			SPRI    = 42,  // QSPI
-			SPTI    = 43,  // QSPI
+			SPRI         = 42,  // QSPI
+			SPTI         = 43,  // QSPI
 
-			SBFAI   = 44,  // SDHI
+			SBFAI        = 44,  // SDHI
 
-			MBFAI   = 45,  // MMCIF
+			MBFAI        = 45,  // MMCIF
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-			SSITXI0 = 46,  // SSI0 シリアルサウンドインタフェース
-			SSIRXI0 = 47,  // SSI0 シリアルサウンドインタフェース
-			SSIRTI1 = 48,  // SSI1 シリアルサウンドインタフェース
+			SSITXI0      = 46,  // SSI0 シリアルサウンドインタフェース
+			SSIRXI0      = 47,  // SSI0 シリアルサウンドインタフェース
+			SSIRTI1      = 48,  // SSI1 シリアルサウンドインタフェース
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 			IDEI         = 50,  // SRC
