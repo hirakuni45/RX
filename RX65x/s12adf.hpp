@@ -476,10 +476,12 @@ namespace device {
 	/*!
 		@brief  S12AD0 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
+		@param[in]	avec	CMPA 割り込みベクター
+		@param[in]	bvec	CMPB 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec>
 	struct s12adf0_t : public s12adf_t<base> {
 
 		typedef s12adf_t<base> base_class;
@@ -911,35 +913,25 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  スキャン終了割り込みベクターを返す
-			@return ベクター型
+			@brief  スキャン終了割り込みベクターＡを返す
+			@return スキャン終了割り込みベクターＡ
 		*/
 		//-----------------------------------------------------------------//
-//		static ICU::VECTOR get_vec() { return ICU::VECTOR::S12ADI; }
+		static ICU::VECTOR_BL1 get_cmpa_vec() { return avec; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  グループＢスキャン終了割り込みベクターを返す
-			@return ベクター型
+			@brief  スキャン終了割り込みベクターＡを返す
+			@return スキャン終了割り込みベクターＡ
 		*/
 		//-----------------------------------------------------------------//
-//		static ICU::VECTOR get_gb_vec() { return ICU::VECTOR::GBADI; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  グループＣスキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-//		static ICU::VECTOR get_gc_vec() { return ICU::VECTOR::GCADI; }
-
+		static ICU::VECTOR_BL1 get_cmpb_vec() { return bvec; }
 	};
 
 
@@ -947,10 +939,12 @@ namespace device {
 	/*!
 		@brief  S12AD1 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
+		@param[in]	avec	CMPA 割り込みベクター
+		@param[in]	bvec	CMPB 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec>
 	struct s12adf1_t : public s12adf_t<base> {
 
 		typedef s12adf_t<base> base_class;
@@ -1945,40 +1939,33 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  スキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-//		static ICU::VECTOR get_vec() { return ICU::VECTOR::S12ADI1; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  グループＢスキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-//		static ICU::VECTOR get_gb_vec() { return ICU::VECTOR::GBADI1; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  グループＣスキャン終了割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-//		static ICU::VECTOR get_gc_vec() { return ICU::VECTOR::GCADI1; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  ペリフェラル型を返す
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  スキャン終了割り込みベクターＡを返す
+			@return スキャン終了割り込みベクターＡ
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR_BL1 get_cmpa_vec() { return avec; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  スキャン終了割り込みベクターＡを返す
+			@return スキャン終了割り込みベクターＡ
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR_BL1 get_cmpb_vec() { return bvec; }
 	};
 
-	typedef s12adf0_t<0x00089000, peripheral::S12AD>   S12AD;
-	typedef s12adf1_t<0x00089100, peripheral::S12AD1>  S12AD1;
+	typedef s12adf0_t<0x00089000, peripheral::S12AD,
+		ICU::VECTOR_BL1::S12CMPAI,  ICU::VECTOR_BL1::S12CMPBI>   S12AD;
+	typedef s12adf1_t<0x00089100, peripheral::S12AD1,
+		ICU::VECTOR_BL1::S12CMPAI1, ICU::VECTOR_BL1::S12CMPBI1>  S12AD1;
 }
