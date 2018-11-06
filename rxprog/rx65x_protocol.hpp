@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX651/RX65N プログラミング・プロトコル・クラス
+	@brief	RX65N/RX651 プログラミング・プロトコル・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -416,7 +416,7 @@ namespace rx65x {
 			tv.tv_sec  = 1;
 			tv.tv_usec = 0;
 			int ch = rs232c_.recv(tv);
-			if(ch == 0xC1) {
+			if(ch == 0xC2) {  // RX65N, RX651 (RX64M,RX71M->0XC1)
 				connection_ = true;
 				return true;
 			}
