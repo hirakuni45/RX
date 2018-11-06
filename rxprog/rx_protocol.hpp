@@ -46,12 +46,19 @@ namespace rx {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct device_type {
 			uint8_t		TYP[8];
-			uint32_t	OSA = 0;
-			uint32_t	OSI = 0;
-			uint32_t	CPA = 0;
-			uint32_t	CPI = 0;
+			uint32_t	OSA;
+			uint32_t	OSI;
+			uint32_t	CPA;
+			uint32_t	CPI;
+
+			device_type() : TYP{ 0 }, OSA(0), OSI(0), CPA(0), CPI(0) { }
 
 			void info(const std::string& head = "") const {
+				std::cout << head << "Device Type TYP:";
+				for(int i = 0; i < 8; ++i) {
+					std::cout << boost::format(" %02X") % static_cast<uint32_t>(TYP[i]);
+				}
+				std::cout << std::endl;
 				std::cout << head << (boost::format("Device Type OSA: %d") % OSA) << std::endl;
 				std::cout << head << (boost::format("Device Type OSI: %d") % OSI) << std::endl;
 				std::cout << head << (boost::format("Device Type CPA: %d") % CPA) << std::endl;

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX programmer クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -25,7 +25,8 @@ namespace rx {
 	class prog {
 		bool		verbose_;
 
-		utils::rs232c_io	rs232c_;
+		typedef utils::rs232c_io RS232C;
+		RS232C		rs232c_;
 
 		using protocol_type = boost::variant<rx63t::protocol, rx24t::protocol, rx64m::protocol, rx65x::protocol>;
 		protocol_type protocol_;
@@ -138,7 +139,7 @@ namespace rx {
 				protocol_ = rx63t::protocol();
 			} else if(rx.cpu_type_ == "RX24T") {
 				protocol_ = rx24t::protocol();
-			} else if(rx.cpu_type_ == "RX64M") {
+			} else if(rx.cpu_type_ == "RX64M" || rx.cpu_type_ == "RX71M") {
 				protocol_ = rx64m::protocol();
 			} else if(rx.cpu_type_ == "RX651" || rx.cpu_type_ == "RX65N") {
 				protocol_ = rx65x::protocol();
@@ -146,7 +147,6 @@ namespace rx {
 				std::cerr << "CPU type missmatch: '" << rx.cpu_type_ << "'" << std::endl;
 				return false;
 			}
-
 
 			{  // 開始
 				bind_visitor vis(path, brate, rx);
