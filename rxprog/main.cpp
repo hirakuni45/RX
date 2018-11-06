@@ -16,7 +16,7 @@
 
 namespace {
 
-	const std::string version_ = "0.88b";
+	const std::string version_ = "0.90b";
 	const std::string conf_file_ = "rx_prog.conf";
 	const uint32_t progress_num_ = 50;
 	const char progress_cha_ = '#';
@@ -317,10 +317,16 @@ int main(int argc, char* argv[])
 		std::cout << "# Serial port speed: " << opts.com_speed << std::endl;
 	}
 
+	// デバイス・リスト表示
+	if(!conf_path.empty() && opts.device_list) {
+		for(const auto& s : conf_in_.get_device_list()) {
+			std::cout << s << std::endl;
+		}
+		return 0;
+	}
 	// HELP 表示
-	if(opts.help || opts.com_path.empty() || (opts.inp_file.empty() && !opts.device_list)
+	if(opts.help || opts.com_path.empty() || opts.com_speed.empty() || opts.device.empty()) {
 ///			&& opts.sequrity_set.empty() && !opts.sequrity_get && !opts.sequrity_release)
-		|| opts.com_speed.empty() || opts.device.empty()) {
 		if(opts.device.empty()) {
 			std::cout << "Device name null." << std::endl;
 		}
@@ -329,13 +335,6 @@ int main(int argc, char* argv[])
 		}
 		help_(argv[0]);
 		return 0;
-	}
-
-	// デバイス・リスト表示
-	if(opts.device_list) {
-		for(const auto& s : conf_in_.get_device_list()) {
-			std::cout << s << std::endl;
-		}
 	}
 
 	// 入力ファイルの読み込み
@@ -381,51 +380,46 @@ int main(int argc, char* argv[])
 	int com_speed = 0;
 	if(!utils::string_to_int(opts.com_speed, com_speed)) {
 		std::cerr << "Serial speed conversion error: '" << opts.com_speed << '\'' << std::endl;
-		return -1;		
+		return -1;
 	}
-
-	if(!opts.erase && !opts.write && !opts.verify) return 0;
-//		&& opts.sequrity_set.empty() && !opts.sequrity_get && !opts.sequrity_release) return 0;
 
 	rx::protocol::rx_t rx;
-	{
-		rx.verbose_ = opts.verbose;
+	rx.verbose_ = opts.verbose;
+	rx.cpu_type_ = opts.device;
 
-		rx.cpu_type_ = opts.device;
-
-		if(rx.cpu_type_ == "RX63T") {
-			// rx.master_ = 1200;  // 12.00MHz
-			// rx.sys_div_ = 8;    // x8 (96MHz)
-			// rx.ext_div_ = 4;    // x4 (48MHz)
-			auto devt = conf_in_.get_device();
-			int32_t val = 0;;
-			if(!utils::string_to_int(devt.clock_, val)) {
-				std::cerr << "RX63T 'clock' tag conversion error: '" << devt.clock_ << '\'' << std::endl;
-				return -1;
-			}
-			rx.master_ = val;
-
-			if(!utils::string_to_int(devt.divide_sys_, val)) {
-				std::cerr << "RX63T 'divide_sys' tag conversion error: '" << devt.divide_sys_ << '\'' << std::endl;
-				return -1;
-			}
-			rx.sys_div_ = val;
-
-			if(!utils::string_to_int(devt.divide_ext_, val)) {
-				std::cerr << "RX63T 'divide_ext' tag conversion error: '" << devt.divide_ext_ << '\'' << std::endl;
-				return -1;
-			}
-			rx.ext_div_ = val;
+	if(rx.cpu_type_ == "RX63T") {
+		// rx.master_ = 1200;  // 12.00MHz
+		// rx.sys_div_ = 8;    // x8 (96MHz)
+		// rx.ext_div_ = 4;    // x4 (48MHz)
+		auto devt = conf_in_.get_device();
+		int32_t val = 0;;
+		if(!utils::string_to_int(devt.clock_, val)) {
+			std::cerr << "RX63T 'clock' tag conversion error: '" << devt.clock_ << '\'' << std::endl;
+			return -1;
 		}
+		rx.master_ = val;
+
+		if(!utils::string_to_int(devt.divide_sys_, val)) {
+			std::cerr << "RX63T 'divide_sys' tag conversion error: '" << devt.divide_sys_ << '\'' << std::endl;
+			return -1;
+		}
+		rx.sys_div_ = val;
+
+		if(!utils::string_to_int(devt.divide_ext_, val)) {
+			std::cerr << "RX63T 'divide_ext' tag conversion error: '" << devt.divide_ext_ << '\'' << std::endl;
+			return -1;
+		}
+		rx.ext_div_ = val;
 	}
 
+	//============================ 接続
 	rx::prog prog_(opts.verbose);
 	if(!prog_.start(opts.com_path, com_speed, rx)) {
 		prog_.end();
 		return -1;
 	}
 
-	//=====================================
+	//============================ 消去
 	if(opts.erase) {  // erase
 		auto areas = motsx_.create_area_map();
 
