@@ -2032,11 +2032,11 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  VPOS の取得
-			@return VPOS
+			@brief  VPOS カウントの取得
+			@return VPOS カウント
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_vpos() const noexcept
+		uint32_t get_vpos_count() const noexcept
 		{
 			return ctrl_blk_.vpos_count;
 		}
