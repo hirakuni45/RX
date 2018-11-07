@@ -523,5 +523,4 @@ namespace device {
 	};
 	
 	typedef bus_t BUS;
-
 }
