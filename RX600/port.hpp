@@ -376,6 +376,85 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief  ８ビット・ポート定義
+		@param[in]	PORTx	ポート・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class PORTx>
+	struct PORT_BYTE {
+
+//		static const uint8_t PNO     = static_cast<uint8_t>(PORTx::base_address_ & 0x1f);
+//		static const uint8_t BIT_POS = static_cast<uint8_t>(bpos);
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポート方向レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<PORTx::base_address_ + 0x00> DIR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  プルアップ制御・レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<PORTx::base_address_ + 0xC0> PU;
+
+
+#if 0
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  オープンドレイン制御・レジスタ
+		*/
+		//-----------------------------------------------------------------//
+		struct od_t {
+			static rw8_t<PORTx::base_address_ + 0x80> ODR0;
+			static rw8_t<PORTx::base_address_ + 0x81> ODR1;
+
+			void operator = (bool val) {
+				uint8_t pos = static_cast<uint8_t>(bpos);
+				if(pos < 4) { 
+					if(val) ODR0 |= 1 << (pos * 2);
+					else ODR0 &= ~(1 << (pos * 2));
+				} else {
+					pos -= 4;
+					if(val) ODR1 |= 1 << (pos * 2);
+					else ODR1 &= ~(1 << (pos * 2));
+				}
+			}
+			bool operator () () {
+				uint8_t pos = static_cast<uint8_t>(bpos);
+				if(pos < 4) {
+					return ODR0() & (1 << (pos * 2));
+				} else {
+					pos -= 4;
+					return ODR1() & (1 << (pos * 2));
+				}
+			}
+		};
+		static od_t OD;
+#endif
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポート・レジスタ @n
+					※ポート出力と、ポート入力が異なる
+		*/
+		//-----------------------------------------------------------------//
+		struct port_t {
+			static rw8_t<PORTx::base_address_ + 0x20> PO;  // ポート出力用
+			static ro8_t<PORTx::base_address_ + 0x40> PI;  // ポート入力用
+
+			void operator = (uint8_t val) { PO = val; }
+			uint8_t operator () () { return PI(); }
+		};
+		static port_t P;
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief  無効ポート定義
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
