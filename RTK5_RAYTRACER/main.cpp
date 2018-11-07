@@ -172,6 +172,21 @@ extern "C" {
 		render_.plot(x, y, c);
 	}
 
+
+	void draw_text(int x, int y, const char* t)
+	{
+		render_.fill_box(x, y, strlen(t) * 8, 16, RENDER::COLOR::Black);
+		render_.draw_text(x, y, t);
+	}
+
+
+	uint32_t millis(void)
+	{
+		// x 16.6667
+		return (glcdc_io_.get_vpos_count() * 4267) >> 8; 
+	}
+
+
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
@@ -306,13 +321,13 @@ int main(int argc, char** argv)
 
 		command_();
 		if(!run_) {
-			uint32_t org = glcdc_io_.get_vpos();
+//			uint32_t org = glcdc_io_.get_vpos();
 			doRaytrace(4, render_width_, render_height_);
-			uint32_t t = glcdc_io_.get_vpos() - org;
-			char tmp[32];
-			utils::sformat("%d.%d [sec]", tmp, sizeof(tmp)) % (t / 60) % ((t / 6) % 10);
-			render_.draw_text(0, 0, tmp);
-			utils::format("%s\n") % tmp;
+//			uint32_t t = glcdc_io_.get_vpos() - org;
+//			char tmp[32];
+//			utils::sformat("%d.%d [sec]", tmp, sizeof(tmp)) % (t / 60) % ((t / 6) % 10);
+//			render_.draw_text(0, 0, tmp);
+//			utils::format("%s\n") % tmp;
 			run_ = true;
 		}
 

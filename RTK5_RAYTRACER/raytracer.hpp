@@ -17,6 +17,8 @@
 
 extern "C" {
 	void draw_pixel(int x, int y, int r, int g, int b);
+	void draw_text(int x, int y, const char* t);
+	uint32_t millis(void);
 };
 
 /*------------------------------------------------------------------------
@@ -273,8 +275,7 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
   const vec3 camera = vec3(cameraX,cameraY,cameraZ);
   const vec3 target = vec3(targetX,targetY,targetZ);
   
-///  unsigned long t = millis();
-  unsigned long t = 0;
+  auto t = millis();
 
   for (int y=0; y<dh; y+=q) {
     for (int x=0; x<dw; x+=q) {
@@ -321,9 +322,12 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
 #ifdef ESP8266
     delay(1);
 #endif
-///    char buf[100];
+    char buf[50];
+	auto tm = (millis() - t) / 100;
 ///    snprintf(buf,100,"%3d%% %3ds", (y+q)*100/dh, (millis()-t)/1000);
+	utils::sformat("%3d%% %3d.%ds", buf, sizeof(buf)) % ((y+q)*100/dh) % (tm / 10) % (t % 10);
 ///    display.setCursor(8,0);
 ///    display.println(buf);
+	draw_text(8, 0, buf);
   }
 }
