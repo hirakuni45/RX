@@ -793,9 +793,67 @@ namespace graphics {
 			char ch;
 			int16_t x = 0;
 			while((ch = *text++) != 0) {
+				// 画面外描画
 				x = draw_font(x, height, ch, prop);
 			}
 			return x;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	テキストの背景を描画する
+			@param[in]	x	開始点Ｘ軸を指定
+			@param[in]	y	開始点Ｙ軸を指定
+			@param[in]	text	テキスト（UTF-8）
+			@param[in]	prop	プロポーショナルの場合「true」
+			@return 文字の終端座標（Ｘ）
+		*/
+		//-----------------------------------------------------------------//
+		int16_t draw_text_back(int16_t x, int16_t y, const char* text, bool prop = false) noexcept
+		{
+			char ch;
+			bool fill = false;
+			auto xx = x;
+			uint16_t code = 0;
+			uint16_t cnt = 0;
+			while((ch = *text++) != 0) {
+				auto c = static_cast<uint8_t>(ch);
+				if(c < 0x80) {
+					if(ch == 0x20) {
+						fill_box(x, y, xx - x, AFONT::height, bc_);
+						x = xx;
+						fill = true;
+					} else {
+						fill = false;
+					}
+					if(prop) {
+						xx += AFONT::get_kern(ch);
+						xx += AFONT::get_width(ch);
+					} else {
+						xx += AFONT::width;
+					}
+				} else if((c & 0xf0) == 0xe0) {
+					code = (c & 0x0f);
+					cnt = 2;
+				} else if((c & 0xe0) == 0xc0) {
+					code = (c & 0x1f);
+					cnt = 1;
+				} else if((c & 0xc0) == 0x80) {
+					code <<= 6;
+					code |= c & 0x3f;
+					cnt--;
+					if(cnt == 0 && code != 0) {
+						xx += KFONT::width;
+					} else if(cnt_ < 0) {
+						code = 0;
+					}
+				}
+			}
+			if(!fill) {
+				fill_box(x, y, xx - x, AFONT::height, bc_);
+			}
+			return xx;
 		}
 
 
