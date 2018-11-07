@@ -1,6 +1,7 @@
 Renesas Envision Kit RX65N ガジェット
 =========
-![R5F564ML](RayTracerRTK5.jpg)
+![RayTraceRenderImage320x240](Render0.jpg)
+![RayTraceRenderImage480x272](Render1.jpg)
 
 ## 概要
 Envision Kit RX65N を使ったレイ・トレーサー
