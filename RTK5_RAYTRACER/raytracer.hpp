@@ -81,7 +81,7 @@ struct vec3 {
   vec3 operator*(float s)       const { return vec3(x*s,y*s,z*s);        }    // Vector scale
   float operator%(const vec3& v)const { return x*v.x+y*v.y+z*v.z;        }    // Scalar product
   vec3 operator^(const vec3& v) const { return vec3(y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x);  } // Vector product
-  vec3 operator!()              const { return *this*(1.0/sqrt(*this%*this));  }  // Normalized vector
+  vec3 operator!()              const { return *this*(1.0/sqrtf(*this%*this));  }  // Normalized vector
   void operator+=(const vec3& v)      { x+=v.x;  y+=v.y;  z+=v.z;        }
   void operator*=(float s)            { x*=s;    y*=s;    z*=s;          }
 };
@@ -141,7 +141,7 @@ uint8_t trace(const ray& r, float& distance, vec3& normal)
     d = (b*b)-c;
     if (d > 0) {
       // Yes, compute the distance to the hit
-      d = (-b)-sqrt(d);
+      d = (-b)-sqrtf(d);
 
       // Is it the closest hit so far?
       if ((d > 0.01) and ((result==SKY) or (d<distance))) {
