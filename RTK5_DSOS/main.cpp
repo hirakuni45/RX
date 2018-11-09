@@ -190,6 +190,7 @@ namespace {
 	}
 }
 
+
 extern "C" {
 
 	void sci_putch(char ch)
