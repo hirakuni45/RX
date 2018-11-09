@@ -44,9 +44,10 @@ CSOURCES	=	common/ofs.c \
 				r_net/T4_src/r_dhcp_client.c
 
 PSOURCES	=	main.cpp \
-				r_net/ethernet.cpp
+				r_net/ethernet.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=	stdc++ m
+USER_LIBS	=	supc++ m
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
