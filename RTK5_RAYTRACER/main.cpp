@@ -162,6 +162,7 @@ namespace {
 	}
 }
 
+
 extern "C" {
 
 	void draw_pixel(int x, int y, int r, int g, int b)
