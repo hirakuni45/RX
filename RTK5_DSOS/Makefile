@@ -27,11 +27,12 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp \
-				graphics/font8x16.cpp
+				graphics/font8x16.cpp \
+				common/stdapi.cpp
 
 #				graphics/kfont16.cpp
 
-USER_LIBS	=
+USER_LIBS	=	supc++
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
@@ -45,7 +46,6 @@ INC_SYS		=	/mingw64/include
 INC_APP		=	. ../
 
 LIB_ROOT	=
-USER_LIBS	=
 
 OPTIMIZE	=	-O3
 

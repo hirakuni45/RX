@@ -24,9 +24,10 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c
 
-PSOURCES	=	main.cpp
+PSOURCES	=	main.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=	stdc++
+USER_LIBS	=	mad supc++
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
@@ -41,7 +42,6 @@ INC_SYS		=
 INC_APP		=	. ../ ../RX64M ../libmad
 
 LIB_ROOT	=	../libmad/.libs
-USER_LIBS	=	mad
 
 OPTIMIZE	=	-Os
 
