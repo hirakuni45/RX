@@ -268,12 +268,6 @@ namespace {
 	}
 }
 
-namespace std {
-    void __throw_bad_function_call()
-	{
-		abort();
-	}
-}
 
 extern "C" {
 
