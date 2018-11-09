@@ -133,6 +133,7 @@ namespace device {
 	};
 
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  CMT01 定義クラス
@@ -189,9 +190,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR_SELB get_ivec() noexcept { return ivec; }
 	};
+#endif
 
 	typedef cmt01_t<0x00088002, peripheral::CMT0, ICU::VECTOR::CMI0> CMT0;
 	typedef cmt01_t<0x00088008, peripheral::CMT1, ICU::VECTOR::CMI1> CMT1;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	typedef cmt23_t<0x00088012, peripheral::CMT2, ICU::VECTOR_SELB::CMI2> CMT2;
 	typedef cmt23_t<0x00088018, peripheral::CMT3, ICU::VECTOR_SELB::CMI3> CMT3;
+#endif
 }
