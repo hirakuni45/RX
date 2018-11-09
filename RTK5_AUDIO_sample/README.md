@@ -3,15 +3,16 @@ Renesas Envision Kit RX65N ガジェット
 ![R5F564ML](../RTK5RX65N.jpg)
 
 ## 概要
-Envision Kit RX65N で実現するオーディオプレイヤー
+Envision Kit RX65N で実現する簡易オーディオプレイヤー
    
 ## プロジェクト・リスト
  - main.cpp
+ - audio_codec.hpp
  - Makefile
    
 ## ハードウェアーの準備
  - SD カードインターフェースの準備
- - オーディオの接続（DA0、DA1 から出力、GND レベルは、1.65V）
+ - オーディオの接続（DA0、DA1 から出力、GND レベルは、1.65V）3.3V p-p
  - P03_JOY_RIGHT_IRQ11 (DA0) Left 出力
  - P05_IRQ13_SW (DA1) Right 出力
  - ファミコン（互換）パッドの接続（main.cpp を参照）
@@ -53,7 +54,7 @@ Envision Kit RX65N で実現するオーディオプレイヤー
     
 ## MP3、WAV ファイルの対応状況
  - WAV 形式の場合、最大 48KHz、16 ビット、ステレオのファイルフォーマットまで対応
- - MP3 形式の場合、256Kbps まで対応
+ - MP3 形式の場合、320Kbps まで対応 (44.1KHz, 48KHz, 16 Bits)
  - WAV 内タグのパース（一部）
  - ID3V2 タグのパース（ID3V1 タグは未対応）
 
