@@ -47,7 +47,7 @@ INC_SYS		=	/mingw64/include
 INC_APP		=	. ../ ../libmad
 
 LIB_ROOT	=	../libmad/.libs ../jpeg-6b
-USER_LIBS	=	mad jpeg
+USER_LIBS	=	supc++ mad
 
 OPTIMIZE	=	-O3
 
@@ -59,6 +59,7 @@ CP_OPT		=	-Wall -Werror \
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
+				-Wno-maybe-uninitialized \
 				-fno-exceptions
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
