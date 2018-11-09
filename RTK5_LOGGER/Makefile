@@ -28,9 +28,10 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp \
 				graphics/font8x16.cpp \
-				resource.cpp
+				resource.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=
+USER_LIBS	=	supc++
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
