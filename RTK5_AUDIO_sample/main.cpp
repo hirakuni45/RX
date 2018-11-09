@@ -15,9 +15,6 @@
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
 #include "common/qspi_io.hpp"
-#include "sound/sound_out.hpp"
-#include "sound/mp3_in.hpp"
-#include "sound/wav_in.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
@@ -28,9 +25,7 @@
 #include "chip/FAMIPAD.hpp"
 #include "chip/FT5206.hpp"
 
-//#include "Cartridge.h"
-//#include "bgm_data.hpp"
-
+#include "audio_codec.hpp"
 
 namespace {
 
@@ -83,46 +78,6 @@ namespace {
 
 	utils::command<256> cmd_;
 
-	volatile uint32_t	wpos_;
-
-	/// DMAC 終了割り込み
-	class dmac_term_task {
-	public:
-		void operator() () {
-			device::DMAC0::DMCNT.DTE = 1;  // DMA を再スタート
-			wpos_ = 0;
-		}
-	};
-
-	typedef device::dmac_mgr<device::DMAC0, dmac_term_task> DMAC_MGR;
-	DMAC_MGR	dmac_mgr_;
-
-	uint32_t get_wave_pos_() { return (dmac_mgr_.get_count() & 0x3ff) ^ 0x3ff; }
-
-	typedef device::R12DA DAC;
-	typedef device::dac_out<DAC> DAC_OUT;
-	DAC_OUT		dac_out_;
-
-	typedef utils::sound_out<8192, 1024> SOUND_OUT;
-	SOUND_OUT	sound_out_;
-
-	volatile uint32_t cycle_count_;
-
-	class tpu_task {
-	public:
-		void operator() () {
-			uint32_t tmp = wpos_;
-			++wpos_;
-			if((tmp ^ wpos_) & 64) {
-				sound_out_.service(64);
-			}
-			cycle_count_ += 1361;
-		}
-	};
-
-	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
-	TPU0		tpu0_;
-
 	// GLCDC
 	static const int16_t LCD_X = 480;
 	static const int16_t LCD_Y = 272;
@@ -151,13 +106,6 @@ namespace {
 	typedef graphics::filer<SDC, RENDER> FILER;
 	FILER		filer_(sdc_, render_);
 
-	typedef sound::mp3_in MP3_IN;
-	MP3_IN		mp3_in_;
-	typedef sound::wav_in WAV_IN;
-	WAV_IN		wav_in_;
-
-	uint8_t		pad_level_;
-
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 	typedef utils::fixed_fifo<uint8_t, 64> RB6;
@@ -169,6 +117,12 @@ namespace {
 	typedef chip::FT5206<FT5206_I2C> FT5206;
 	FT5206		ft5206_(ft5206_i2c_);
 
+	typedef audio::codec<SDC, RENDER> AUDIO;
+	AUDIO		audio_(sdc_, render_);
+
+	uint8_t		pad_level_ = 0;
+	uint8_t		touch_num_ = 0;
+	int16_t		touch_org_ = 0;
 
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
@@ -178,10 +132,6 @@ namespace {
 		return f;
 	}
 
-	uint8_t		touch_num_ = 0;
-	int16_t		touch_org_ = 0;
-
-//	Cartridge cart_;
 
 	void update_led_()
 	{
@@ -254,115 +204,6 @@ namespace {
 	}
 
 
-	void sound_tag_task_(const sound::tag_t& tag)
-	{
-		render_.clear(RENDER::COLOR::Black);
-		utils::format("Album:  '%s'\n") % tag.album_.c_str();
-		render_.draw_text(0, 0 * 20, tag.album_.c_str());
-		utils::format("Title:  '%s'\n") % tag.title_.c_str();
-		render_.draw_text(0, 1 * 20, tag.title_.c_str());
-		utils::format("Artist: '%s'\n") % tag.artist_.c_str();
-		render_.draw_text(0, 2 * 20, tag.artist_.c_str());
-		utils::format("Year:    %s\n") % tag.year_.c_str();
-		render_.draw_text(0, 3 * 20, tag.year_.c_str());
-		utils::format("Disc:    %s\n") % tag.disc_.c_str();
-		auto x = render_.draw_text(0, 4 * 20, tag.disc_.c_str());
-		if(x > 0) x += 8;
-		utils::format("Track:   %s\n") % tag.track_.c_str();
-		render_.draw_text(x, 4 * 20, tag.track_.c_str());
-	}
-
-
-	void sound_update_task_(uint32_t t)
-	{
-		uint16_t sec = t % 60;
-		uint16_t min = (t / 60) % 60;
-		uint16_t hor = (t / 3600) % 24;
-		char tmp[16];
-		utils::sformat("%02d:%02d:%02d", tmp, sizeof(tmp)) % hor % min % sec;
-		render_.fill_box(0, 5 * 20, 8 * 8, 16, RENDER::COLOR::Black);
-		render_.draw_text(0, 5 * 20, tmp);
-	}
-
-
-	bool play_mp3_(const char* fname)
-	{
-		utils::file_io fin;
-		if(!fin.open(fname, "rb")) {
-			return false;
-		}
-		mp3_in_.set_ctrl_task(sound_ctrl_task_);
-		mp3_in_.set_tag_task(sound_tag_task_);
-		mp3_in_.set_update_task(sound_update_task_);
-		bool ret = mp3_in_.decode(fin, sound_out_);
-		fin.close();
-		return ret;
-	}
-
-
-	bool play_wav_(const char* fname)
-	{
-		utils::file_io fin;
-		if(!fin.open(fname, "rb")) {
-			return false;
-		}
-		wav_in_.set_ctrl_task(sound_ctrl_task_);
-		wav_in_.set_tag_task(sound_tag_task_);
-		wav_in_.set_update_task(sound_update_task_);
-		bool ret = wav_in_.decode(fin, sound_out_);
-		fin.close();
-		return ret;
-	}
-
-
-	void play_loop_(const char*, const char*);
-
-
-	struct loop_t {
-		const char*	start;
-		bool	enable;
-	};
-
-
-	void play_loop_func_(const char* name, const FILINFO* fi, bool dir, void* option)
-	{
-		loop_t* t = static_cast<loop_t*>(option);
-		if(t->enable) {
-			if(strcmp(name, t->start) != 0) {
-				return;
-			} else {
-				t->enable = false;
-			}
-		}
-		if(dir) {
-			play_loop_(name, "");
-		} else {
-			const char* ext = strrchr(name, '.');
-			if(ext != nullptr) {
-				if(strcmp(ext, ".mp3") == 0) {
-					play_mp3_(name);
-				} else if(strcmp(ext, ".wav") == 0) {
-					play_wav_(name);
-				}
-			}
-		}
-	}
-
-
-	void play_loop_(const char* root, const char* start)
-	{
-		loop_t t;
-		t.start = start;
-		if(strlen(start) != 0) {
-			t.enable = true;
-		} else {
-			t.enable = false;
-		}
-		sdc_.set_dir_list_limit(1);
-		sdc_.start_dir_list(root, play_loop_func_, true, &t);
-	}
-
-
 	void command_()
 	{
 		if(!cmd_.service()) {
@@ -402,12 +243,12 @@ namespace {
 					char tmp[128];
 					cmd_.get_word(1, tmp, sizeof(tmp));
 					if(std::strcmp(tmp, "*") == 0) {
-						play_loop_("", "");
+						audio_.play_loop("", "");
 					} else {
-						play_mp3_(tmp);
+						audio_.play_file(tmp);
 					}
 				} else {
-					play_loop_("", "");
+					audio_.play_loop("", "");
 				}
 				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
@@ -427,20 +268,24 @@ namespace {
 	}
 }
 
+namespace std {
+    void __throw_bad_function_call()
+	{
+		abort();
+	}
+}
+
 extern "C" {
+
+	void set_sample_rate(uint32_t freq)
+	{
+		audio_.set_sample_rate(freq);
+	}
+
 
 	uint8_t get_fami_pad()
 	{
 		return famipad_.update();
-	}
-
-
-	void set_sample_rate(uint32_t freq)
-	{
-		uint8_t intr_level = 5;
-		if(!tpu0_.start(freq, intr_level)) {
-			utils::format("TPU0 start error...\n");
-		}
 	}
 
 
@@ -514,22 +359,6 @@ extern "C" {
 	{
 		return sdc_.make_full_path(src, dst, len);
 	}
-
-
-	uint32_t getCycleCount()
-	{
-		return cycle_count_;
-	}
-
-
-	void dacWrite(uint8_t ch, uint16_t val)
-	{
-		sound::wave_t t;
-		val ^= 0x80;
-		t.l_ch = (val << 8) | ((val & 0x7f) << 1);
-		t.r_ch = (val << 8) | ((val & 0x7f) << 1);
-		sound_out_.at_fifo().put(t);
-	}
 }
 
 int main(int argc, char** argv);
@@ -543,33 +372,9 @@ int main(int argc, char** argv)
 		sci_.start(115200, sci_level);
 	}
 
-	{  // 内臓１２ビット D/A の設定
-		bool amp_ena = true;
-		dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
-		dac_out_.out0(0x8000);
-		dac_out_.out1(0x8000);
-	}
-
 	{  // SD カード・クラスの初期化
 		sdh_.start();
 		sdc_.start();
-	}
-
-	// 波形メモリーの無音状態初期化
-	sound_out_.mute();
-
-	{  // サンプリング・タイマー設定
-		set_sample_rate(44100);
-	}
-
-	{  // DMAC マネージャー開始
-		uint8_t intr_level = 4;
-		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
-			sound_out_.size(), intr_level);
-		if(!ret) {
-			utils::format("DMAC Not start...\n");
-		}
 	}
 
 	utils::format("RTK5RX65N Start for AUDIO sample\n");
@@ -630,13 +435,11 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
-
-//	cart_.play_nes(bgm_data::jumping);
-//	cart_.play_nes(bgm_data::swimming);
-//	cart_.play_nes(bgm_data::teleporting);
-//	cart_.play_nes(bgm_data::saving);
-
-
+	// オーディオの開始
+	{
+		audio_.set_ctrl_task(sound_ctrl_task_);
+		audio_.start();
+	}
 
 	// タッチパネルの安定待ち
 	{
@@ -684,7 +487,7 @@ int main(int argc, char** argv)
 			char path[256];
 			if(filer_.update(ctrl, path, sizeof(path))) {
 				glcdc_io_.sync_vpos();
-				play_loop_("", path);
+				audio_.play_loop("", path);
 			}
 		}
 
