@@ -204,8 +204,8 @@ namespace sound {
 			if(!load_header(fin, tag)) {
 				return false;
 			}
-			if(tag_task_ != nullptr) {
-				(*tag_task_)(tag);
+			if(tag_task_) {
+				tag_task_(tag);
 			}
 
 			bool status = true;
@@ -214,8 +214,8 @@ namespace sound {
 			time_ = 0;
 			while(data_pos_ < data_size_) {
 				CTRL ctrl = CTRL::NONE;
-				if(ctrl_task_ != nullptr) {
-					ctrl = (*ctrl_task_)();
+				if(ctrl_task_) {
+					ctrl = ctrl_task_();
 				}
 				if(ctrl == CTRL::STOP) {
 					out.mute();
@@ -290,8 +290,8 @@ namespace sound {
 				{
 					uint32_t s = pos / rate_;
 					if(s != time_) {
-						if(update_task_ != nullptr) {
-							(*update_task_)(s);
+						if(update_task_) {
+							update_task_(s);
 						}
 						time_ = s;
 					}

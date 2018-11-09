@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include <cstdint>
+#include <functional>
 
 namespace sound {
 
@@ -38,7 +39,7 @@ namespace sound {
 			@brief	制御タスク型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef CTRL (*CTRL_TASK)();
+		typedef std::function<CTRL ()> CTRL_TASK;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -46,7 +47,7 @@ namespace sound {
 			@brief	情報タスク型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef void (*TAG_TASK)(const tag_t&);
+		typedef std::function<void (const tag_t&)> TAG_TASK;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -54,7 +55,7 @@ namespace sound {
 			@brief	更新タスク型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef void (*UPDATE_TASK)(uint32_t);
+		typedef std::function<void (uint32_t)> UPDATE_TASK;
 
 			CTRL_TASK	ctrl_task_;
 			TAG_TASK	tag_task_;
@@ -66,7 +67,7 @@ namespace sound {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		af_play() noexcept : ctrl_task_(nullptr), tag_task_(nullptr), update_task_(nullptr) { }
+		af_play() noexcept : ctrl_task_(), tag_task_(), update_task_() { }
 
 
 		//-----------------------------------------------------------------//

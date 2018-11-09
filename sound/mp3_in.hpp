@@ -204,9 +204,9 @@ namespace sound {
 		{
 			id3_mgr id3;
 			id3.analize(fin);
-			if(tag_task_ != nullptr) {
+			if(tag_task_) {
 				const auto& tag = id3.get_tag();
-				(*tag_task_)(tag);
+				tag_task_(tag);
 //				utils::format("Album:  '%s'\n") % tag.album_;
 //				utils::format("Title:  '%s'\n") % tag.title_;
 //				utils::format("Artist: '%s'\n") % tag.artist_;
@@ -229,8 +229,8 @@ namespace sound {
 			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
 
 				CTRL ctrl = CTRL::NONE;
-				if(ctrl_task_ != nullptr) {
-					ctrl = (*ctrl_task_)();
+				if(ctrl_task_) {
+					ctrl = ctrl_task_();
 				}
 				if(ctrl == CTRL::STOP) {
 					out.mute();
@@ -300,8 +300,8 @@ namespace sound {
 				{
 					uint32_t s = pos / mad_frame_.header.samplerate;
 					if(s != time_) {
-						if(update_task_ != nullptr) {
-							(*update_task_)(s);
+						if(update_task_) {
+							update_task_(s);
 						}
 						time_ = s;
 					}
