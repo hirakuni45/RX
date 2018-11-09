@@ -220,6 +220,7 @@ namespace {
 	}
 }
 
+
 extern "C" {
 
 	uint8_t get_fami_pad()
