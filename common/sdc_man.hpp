@@ -9,6 +9,7 @@
 */
 //=========================================================================//
 #include <cstring>
+#include <functional>
 #include "common/format.hpp"
 #include "common/string_utils.hpp"
 #include "ff12b/mmc_io.hpp"
@@ -28,7 +29,8 @@ namespace utils {
 			@brief  DIR リスト関数型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef void (*dir_loop_func)(const char* name, const FILINFO* fi, bool dir, void* option);
+//		typedef void (*dir_loop_func)(const char* name, const FILINFO* fi, bool dir, void* option);
+		typedef std::function<void (const char* name, const FILINFO* fi, bool dir, void* option)> dir_loop_func;
 
 	private:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -126,7 +128,7 @@ namespace utils {
 				@return エラー無ければ「true」
 			 */
 			//-----------------------------------------------------------------//
-			bool service(uint32_t num, dir_loop_func func = nullptr, bool todir = false,
+			bool service(uint32_t num, dir_loop_func func, bool todir = false,
 						 void* option = nullptr) noexcept
 			{
 				if(!init_) return false;
@@ -143,7 +145,8 @@ namespace utils {
 						break;
 					}
 
-					if(func != nullptr) {
+//					if(func != nullptr) {
+					if(func) {
 #if _USE_LFN != 0
 						str::sjis_to_utf8(fi.fname, ptr_, sizeof(full_));
 #else
@@ -323,7 +326,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		sdc_man() noexcept : current_{ 0 }, cdet_(false), mount_(false), mount_delay_(0),
 			dir_list_(), dir_list_limit_(10),
-			dir_func_(nullptr), dir_todir_(false), dir_option_(nullptr) { }
+			dir_func_(), dir_todir_(false), dir_option_(nullptr) { }
 
 
 		//-----------------------------------------------------------------//
@@ -626,7 +629,7 @@ namespace utils {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool start_dir_list(const char* root, dir_loop_func func = nullptr, bool todir = false,
+		bool start_dir_list(const char* root, dir_loop_func func, bool todir = false,
 			void* option = nullptr)
 		{
 			dir_func_ = func;
