@@ -32,9 +32,10 @@ PSOURCES	=	main.cpp \
 				side/arcade.cpp \
 				side/i8080.cpp \
 				side/i8080opc.cpp \
-				side/i8080sub.cpp
+				side/i8080sub.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=	stdc++
+USER_LIBS	=	supc++
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
