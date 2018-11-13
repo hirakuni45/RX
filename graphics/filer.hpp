@@ -61,7 +61,6 @@ namespace graphics {
 		bool		open_;
 
 		struct rdr_st {
-			RDR&		rdr_;
 			int16_t		vofs_;
 			int16_t		vpos_;
 			int16_t		hmax_;
@@ -69,7 +68,7 @@ namespace graphics {
 			uint16_t	num_;
 			int16_t		match_;
 
-			rdr_st(RDR& rdr) noexcept : rdr_(rdr), vofs_(0), vpos_(0), hmax_(0),
+			rdr_st() noexcept : vofs_(0), vpos_(0), hmax_(0),
 				sel_pos_(0), num_(0), match_(-1)
 			{ }
 		};
@@ -103,8 +102,7 @@ namespace graphics {
 		}
 
 
-		static void dir_draw_func_(const char* name, const FILINFO* fi, bool dir, void* opt)
-			noexcept
+		void dir_draw_func_(const char* name, const FILINFO* fi, bool dir, void* opt) noexcept
 		{
 			rdr_st& t = *static_cast<rdr_st*>(opt);
 			bool draw = false;
@@ -114,15 +112,15 @@ namespace graphics {
 				draw = true;
 			}
 			if(draw && t.vpos_ >= 0 && t.vpos_ < RDR::height) {
-				t.rdr_.set_fore_color(RDR::COLOR::White);
-				t.rdr_.fill_box(SPC, t.vpos_, RDR::width - SPC * 2, RDR::font_height, 0x0000);
-				if(dir) t.rdr_.draw_font(SPC, t.vpos_, '/');
+				rdr_.set_fore_color(RDR::COLOR::White);
+				rdr_.fill_box(SPC, t.vpos_, RDR::width - SPC * 2, RDR::font_height, 0x0000);
+				if(dir) rdr_.draw_font(SPC, t.vpos_, '/');
 				if(dir) {
-					t.rdr_.set_fore_color(RDR::COLOR::Blue);
+					rdr_.set_fore_color(RDR::COLOR::Blue);
 				} else {
-					t.rdr_.set_fore_color(RDR::COLOR::White);
+					rdr_.set_fore_color(RDR::COLOR::White);
 				}
-				auto w = t.rdr_.draw_text(SPC + 8, t.vpos_, name);
+				auto w = rdr_.draw_text(SPC + 8, t.vpos_, name);
 				if(t.hmax_ < w) t.hmax_ = w;
 			}
 			t.vpos_ += FLN;
@@ -135,7 +133,9 @@ namespace graphics {
 			rdr_st_.vpos_ = rdr_st_.vofs_ + 2;
 			rdr_st_.num_ = 0;
 			rdr_st_.match_ = match;
-			sdc_.start_dir_list("", dir_draw_func_, true, &rdr_st_);
+			sdc_.start_dir_list("",
+				[&](const char* name, const FILINFO* fi, bool dir, void* opt) {
+					dir_draw_func_(name, fi, dir, opt); }, true, &rdr_st_);
 		}
 
 
@@ -174,7 +174,7 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		filer(SDC& sdc, RDR& rdr) noexcept : sdc_(sdc), rdr_(rdr),
-			ctrl_(0), open_(false), rdr_st_(rdr_),
+			ctrl_(0), open_(false), rdr_st_(),
 			touch_lvl_(false), touch_pos_(false), touch_neg_(false), touch_num_(0),
 			touch_x_(0), touch_y_(0),
 			touch_org_x_(0), touch_org_y_(0), touch_end_x_(0), touch_end_y_(0),
