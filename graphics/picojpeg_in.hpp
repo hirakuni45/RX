@@ -133,9 +133,9 @@ namespace img {
 				if(xt >= image_info_.m_MCUSPerRow) {
 					xt = 0;
 					++yt;
-					if(yt >= image_info_.m_MCUSPerCol) {
-						break;
-					}
+///					if(yt >= image_info_.m_MCUSPerCol) {
+///						break;
+///					}
 				}
 			}
 			if(status_ != PJPG_NO_MORE_BLOCKS) {
