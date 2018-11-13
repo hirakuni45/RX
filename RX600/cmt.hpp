@@ -9,13 +9,16 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
-#if defined(SIG_RX24T)
+#if defined(SIG_RX63T)
+#include "RX63T/peripheral.hpp"
+#include "RX63T/icu.hpp"
+#elif defined(SIG_RX24T)
 #include "RX24T/peripheral.hpp"
 #include "RX24T/icu.hpp"
 #elif defined(SIG_RX64M) | defined(SIG_RX65N) | defined(SIG_RX71M)
 #include "RX600/peripheral.hpp"
 #include "RX600/icu.hpp"
-#elif
+#else
 #  error "cmt.hpp requires SIG_XXXX to be defined"
 #endif
 
@@ -30,6 +33,43 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per>
 	struct cmt_t {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CMSTR0 レジスタ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct cmstr0_t : public rw16_t<0x00088000> {
+			typedef rw16_t<0x00088000> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> STR0;
+			bit_rw_t<io_, bitpos::B1> STR1;
+		};
+		static cmstr0_t	CMSTR0;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CMSTR1 レジスタ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct cmstr1_t : public rw16_t<0x00088010> {
+			typedef rw16_t<0x00088010> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> STR2;
+			bit_rw_t<io_, bitpos::B1> STR3;
+		};
+		static cmstr1_t	CMSTR1;
+
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -67,6 +107,31 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  許可
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true) noexcept
+		{
+			switch(per) {
+			case peripheral::CMT0:
+				CMSTR0.STR0 = ena;
+				break;
+			case peripheral::CMT1:
+				CMSTR0.STR1 = ena;
+				break;
+			case peripheral::CMT2:
+				CMSTR1.STR2 = ena;
+				break;
+			case peripheral::CMT3:
+				CMSTR1.STR3 = ena;
+				break;
+			} 			
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ペリフェラル型を返す
 			@return ペリフェラル型
 		*/
@@ -85,43 +150,6 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
 	struct cmt01_t : cmt_t<base, per> {
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  CMSTR0 レジスタ
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct cmstr0_t : public rw16_t<0x00088000> {
-			typedef rw16_t<0x00088000> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> STR0;
-			bit_rw_t<io_, bitpos::B1> STR1;
-		};
-		static cmstr0_t	CMSTR0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  許可
-			@param[in]	ena		不許可の場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static void enable(bool ena = true) noexcept
-		{
-			switch(per) {
-			case peripheral::CMT0:
-				CMSTR0.STR0 = ena;
-				break;
-			case peripheral::CMT1:
-				CMSTR0.STR1 = ena;
-				break;
-			} 			
-		}
-
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -145,43 +173,6 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR_SELB ivec>
 	struct cmt23_t : cmt_t<base, per> {
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  CMSTR1 レジスタ
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct cmstr1_t : public rw16_t<0x00088010> {
-			typedef rw16_t<0x00088010> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
-
-			bit_rw_t<io_, bitpos::B0> STR2;
-			bit_rw_t<io_, bitpos::B1> STR3;
-		};
-		static cmstr1_t	CMSTR1;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  許可
-			@param[in]	ena		不許可の場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static void enable(bool ena = true) noexcept
-		{
-			switch(per) {
-			case peripheral::CMT2:
-				CMSTR1.STR2 = ena;
-				break;
-			case peripheral::CMT3:
-				CMSTR1.STR3 = ena;
-				break;
-			} 			
-		}
-
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みベクターを返す
@@ -194,6 +185,10 @@ namespace device {
 
 	typedef cmt01_t<0x00088002, peripheral::CMT0, ICU::VECTOR::CMI0> CMT0;
 	typedef cmt01_t<0x00088008, peripheral::CMT1, ICU::VECTOR::CMI1> CMT1;
+#if defined(SIG_RX24T) || defined(SIG_RX63T)
+	typedef cmt01_t<0x00088012, peripheral::CMT2, ICU::VECTOR::CMI2> CMT2;
+	typedef cmt01_t<0x00088018, peripheral::CMT3, ICU::VECTOR::CMI3> CMT3;
+#endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	typedef cmt23_t<0x00088012, peripheral::CMT2, ICU::VECTOR_SELB::CMI2> CMT2;
 	typedef cmt23_t<0x00088018, peripheral::CMT3, ICU::VECTOR_SELB::CMI3> CMT3;
