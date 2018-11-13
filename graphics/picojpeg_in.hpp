@@ -68,6 +68,7 @@ namespace img {
 		{
 			int16_t xt = 0;
 			int16_t yt = 0;
+// utils::format("MCU: %d, %d\n") % image_info_.m_MCUWidth % image_info_.m_MCUHeight;
 			while((status_ = pjpeg_decode_mcu()) == 0) {
 
 				if(reduce_) {
@@ -91,21 +92,21 @@ namespace img {
 						}
 					}
 				} else {
+					auto xx = xt * image_info_.m_MCUWidth  + ofs_x_;
+					auto yy = yt * image_info_.m_MCUHeight + ofs_y_;
 					for(int16_t y = 0; y < image_info_.m_MCUHeight; y += 8) {
-						auto yy = yt * image_info_.m_MCUHeight + ofs_y_;
 						auto by_limit = std::min(8,
 							image_info_.m_height - (yt * image_info_.m_MCUHeight + y));
 						for(int16_t x = 0; x < image_info_.m_MCUWidth; x += 8) {
 							auto bx_limit = std::min(8,
 								image_info_.m_width - (xt * image_info_.m_MCUWidth + x));
-							auto xx = xt * image_info_.m_MCUWidth + ofs_x_;
 							auto ofs = (x * 8) + (y * 16);
 							if(image_info_.m_scanType == PJPG_GRAYSCALE) {
 								const uint8_t* pGS = image_info_.m_pMCUBufR + ofs;
 								for(int16_t by = 0; by < by_limit; ++by) {
 									for(int16_t bx = 0; bx < bx_limit; ++bx) {
-										auto gs = *pGS++; 
-										render_rgb_(xx + bx, yy + by, gs, gs, gs);
+										auto gs = *pGS++;
+										render_rgb_(x + xx + bx, y + yy + by, gs, gs, gs);
 									}
 									pGS += (8 - bx_limit);
 								}
@@ -118,7 +119,7 @@ namespace img {
 										auto r = *pR++; 
 										auto g = *pG++; 
 										auto b = *pB++;
-										render_rgb_(xx + bx, yy + by, r, g, b);
+										render_rgb_(x + xx + bx, y + yy + by, r, g, b);
 									}
 									pR += (8 - bx_limit);
 									pG += (8 - bx_limit);
@@ -132,6 +133,9 @@ namespace img {
 				if(xt == image_info_.m_MCUSPerRow) {
 					xt = 0;
 					++yt;
+					if(yt >= image_info_.m_MCUSPerCol) {
+						return false;
+					}
 				}
 			}
 			if(status_ != PJPG_NO_MORE_BLOCKS) {
@@ -294,7 +298,6 @@ namespace img {
 				} else {
 //					utils::format("pjpeg_decode_init() failed with status: %d\n") % status_;
 				}
-				fin.close();
 				return false;
 			}
 
@@ -304,10 +307,7 @@ namespace img {
 			height_ = reduce_ ?
 				(image_info_.m_MCUSPerCol * image_info_.m_MCUHeight) / 8 : image_info_.m_height;
 
-			auto ret = pixel_(fin);
-			fin.close();
-
-			return ret;
+			return pixel_(fin);
 		}
 
 
