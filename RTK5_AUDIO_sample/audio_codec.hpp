@@ -96,10 +96,14 @@ namespace audio {
 				if(!jpeg_.load(fin)) {
 					jpeg_.set_draw_offset(480 - 272, 0);
 					jpeg_.load("/NoImage.jpg");
-//					utils::format("APIC: load error (%d, %d)\n")
-//						% tag.get_apic().ofs_ % tag.get_apic().len_;
+					render_.swap_color();
+					render_.draw_text(480 - 272, 0, "JPEG decode error.");
+					render_.swap_color();
 				}
 				fin.seek(utils::file_io::SEEK::SET, pos);
+			} else {
+				jpeg_.set_draw_offset(480 - 272, 0);
+				jpeg_.load("/NoImage.jpg");
 			}
 
 			utils::format("Album:  '%s'\n") % tag.get_album().c_str();
