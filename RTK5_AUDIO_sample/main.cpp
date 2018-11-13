@@ -27,6 +27,8 @@
 
 #include "audio_codec.hpp"
 
+#include "graphics/picojpeg_in.hpp"
+
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -123,6 +125,13 @@ namespace {
 	uint8_t		pad_level_ = 0;
 	uint8_t		touch_num_ = 0;
 	int16_t		touch_org_ = 0;
+
+
+
+	typedef img::picojpeg_in<RENDER> JPEG_IN;
+	JPEG_IN		jpeg_(render_);
+
+
 
 	bool check_mount_() {
 		auto f = sdc_.get_mount();
@@ -251,11 +260,21 @@ namespace {
 					audio_.play_loop("", "");
 				}
 				f = true;
+			} else if(cmd_.cmp_word(0, "jpeg")) {
+				if(cmdn >= 2) {
+					char tmp[128];
+					cmd_.get_word(1, tmp, sizeof(tmp));
+					if(!jpeg_.load(tmp)) {
+						utils::format("Can't load JPEG file: '%s'\n") % tmp;
+					}
+				}
+				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    dir [path]\n");
 				utils::format("    cd [path]\n");
 				utils::format("    pwd\n");
 				utils::format("    play [filename, *]\n");
+				utils::format("    jpeg [filename]\n");
 				f = true;
 			}
 			if(!f) {
