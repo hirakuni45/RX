@@ -14,6 +14,7 @@
 #include "sound/sound_out.hpp"
 #include "sound/mp3_in.hpp"
 #include "sound/wav_in.hpp"
+#include "graphics/picojpeg_in.hpp"
 
 namespace audio {
 
@@ -30,6 +31,7 @@ namespace audio {
 	class codec {
 	public:
 		typedef std::function<sound::af_play::CTRL ()> CTRL_TASK;
+		typedef img::picojpeg_in<RENDER> JPEG_IN;
 
 	private:
 		SDC&		sdc_;
@@ -81,23 +83,35 @@ namespace audio {
 
 		CTRL_TASK	ctrl_task_;
 
+		JPEG_IN		jpeg_;
 
-		void sound_tag_task_(const sound::tag_t& tag)
+		void sound_tag_task_(utils::file_io& fin, const sound::tag_t& tag)
 		{
 			render_.clear(RENDER::COLOR::Black);
-			utils::format("Album:  '%s'\n") % tag.album_.c_str();
-			render_.draw_text(0, 0 * 20, tag.album_.c_str());
-			utils::format("Title:  '%s'\n") % tag.title_.c_str();
-			render_.draw_text(0, 1 * 20, tag.title_.c_str());
-			utils::format("Artist: '%s'\n") % tag.artist_.c_str();
-			render_.draw_text(0, 2 * 20, tag.artist_.c_str());
-			utils::format("Year:    %s\n") % tag.year_.c_str();
-			render_.draw_text(0, 3 * 20, tag.year_.c_str());
-			utils::format("Disc:    %s\n") % tag.disc_.c_str();
-			auto x = render_.draw_text(0, 4 * 20, tag.disc_.c_str());
+
+			if(tag.get_apic().len_ > 0) {
+				auto pos = fin.tell();
+				fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
+				if(!jpeg_.load(fin)) {
+					utils::format("APIC: load error (%d, %d)\n")
+						% tag.get_apic().ofs_ % tag.get_apic().len_;
+				}
+				fin.seek(utils::file_io::SEEK::SET, pos);
+			}
+
+			utils::format("Album:  '%s'\n") % tag.get_album().c_str();
+			render_.draw_text(0, 0 * 20, tag.get_album().c_str());
+			utils::format("Title:  '%s'\n") % tag.get_title().c_str();
+			render_.draw_text(0, 1 * 20, tag.get_title().c_str());
+			utils::format("Artist: '%s'\n") % tag.get_artist().c_str();
+			render_.draw_text(0, 2 * 20, tag.get_artist().c_str());
+			utils::format("Year:    %s\n") % tag.get_year().c_str();
+			render_.draw_text(0, 3 * 20, tag.get_year().c_str());
+			utils::format("Disc:    %s\n") % tag.get_disc().c_str();
+			auto x = render_.draw_text(0, 4 * 20, tag.get_disc().c_str());
 			if(x > 0) x += 8;
-			utils::format("Track:   %s\n") % tag.track_.c_str();
-			render_.draw_text(x, 4 * 20, tag.track_.c_str());
+			utils::format("Track:   %s\n") % tag.get_track().c_str();
+			render_.draw_text(x, 4 * 20, tag.get_track().c_str());
 		}
 
 
@@ -120,7 +134,8 @@ namespace audio {
 				return false;
 			}
 			mp3_in_.set_ctrl_task([&]() { return ctrl_task_(); } );
-			mp3_in_.set_tag_task([&](const sound::tag_t& tag) { sound_tag_task_(tag); } );
+			mp3_in_.set_tag_task([&](utils::file_io& fin, const sound::tag_t& tag) {
+				sound_tag_task_(fin, tag); } );
 			mp3_in_.set_update_task([&](uint32_t t) { sound_update_task_(t); } );
 			bool ret = mp3_in_.decode(fin, sound_out_);
 			fin.close();
@@ -135,7 +150,8 @@ namespace audio {
 				return false;
 			}
 			wav_in_.set_ctrl_task([&]() { return ctrl_task_(); } );
-			wav_in_.set_tag_task([&](const sound::tag_t& tag) { sound_tag_task_(tag); } );
+			wav_in_.set_tag_task([&](utils::file_io& fin, const sound::tag_t& tag) {
+				sound_tag_task_(fin, tag); } );
 			wav_in_.set_update_task([&](uint32_t t) { sound_update_task_(t); } );
 			bool ret = wav_in_.decode(fin, sound_out_);
 			fin.close();
@@ -191,7 +207,18 @@ namespace audio {
 		*/
 		//-----------------------------------------------------------------//
 		codec(SDC& sdc, RENDER& render) noexcept :
-			sdc_(sdc), render_(render) { }
+			sdc_(sdc), render_(render),
+			jpeg_(render_)
+		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	JPEG デコーダーの参照
+			@return JPEG デコーダー
+		*/
+		//-----------------------------------------------------------------//
+		JPEG_IN& at_jpeg_in() noexcept { return jpeg_; }
 
 
 		//-----------------------------------------------------------------//
