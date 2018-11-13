@@ -12,6 +12,7 @@
 #include <functional>
 #include "common/format.hpp"
 #include "common/string_utils.hpp"
+#include "common/fixed_stack.hpp"
 #include "ff12b/mmc_io.hpp"
 
 namespace utils {
@@ -29,7 +30,6 @@ namespace utils {
 			@brief  DIR リスト関数型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-//		typedef void (*dir_loop_func)(const char* name, const FILINFO* fi, bool dir, void* option);
 		typedef std::function<void (const char* name, const FILINFO* fi, bool dir, void* option)> dir_loop_func;
 
 	private:
