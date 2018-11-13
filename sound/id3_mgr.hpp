@@ -31,6 +31,7 @@ namespace sound {
 			TYER,	///< 年
 			TPOS,	///< Part Of Set
 			TRCK,	///< トラック
+			APIC,	///< アルバム画像
 		};
 
 		uint32_t	org_pos_;
@@ -53,44 +54,92 @@ namespace sound {
 			if(strncmp(id, "TPOS", 4) == 0) return ID::TPOS;
 			if(strncmp(id, "TRCK", 4) == 0) return ID::TRCK;
 			if(strncmp(id, "TRK", 3) == 0) return ID::TRCK;
+			if(strncmp(id, "APIC", 4) == 0) return ID::APIC;
+			if(strncmp(id, "PIC", 3) == 0) return ID::APIC;
 			return ID::NA;
 		}
 
 
-		bool set_info_(ID id, utils::file_io& fin, uint32_t len) noexcept
+		static bool get_text_(utils::file_io& fin, char* dst, uint32_t& len) noexcept
+		{
+			for(int i = 0; i < 64; ++i) {
+				char ch;
+				if(fin.read(&ch, 1) != 1) return false;
+				len--;
+				dst[i] = ch;
+				if(ch == 0) return true;
+			}
+			return false;
+		}
+
+
+		static bool skip_text_(uint8_t code, utils::file_io& fin, uint32_t& len) noexcept
+		{
+			for(int i = 0; i < 64; ++i) {
+				switch(code) {
+				case 0:  // ISO-8859-1
+				case 3:  // UTF-8
+					{
+						char ch;
+						if(fin.read(&ch, 1) != 1) return false;
+						len--;
+						if(ch == 0) return true;
+					}
+					break;
+				case 1:  // UTF-16 ( BOM つき )
+				case 2:  // UTF-16
+					{
+						uint16_t ch;
+						if(fin.read(&ch, 2) != 2) return false;
+						len -= 2;
+						if(ch == 0) return true;
+					}
+					break;
+				}
+			}
+			return false;
+		}
+
+
+		bool set_info_(ID id, utils::file_io& fin, uint32_t len, bool v2_3) noexcept
 		{
 			char* dst = nullptr;
 			uint32_t dstlen = 0;
+			bool apic = false;
 			switch(id) {
 			case ID::TIT2:
-				dst = tag_.title_.begin();
-				dstlen = tag_.title_.capacity();
+				dst    = tag_.at_title().begin();
+				dstlen = tag_.at_title().capacity();
 				break;
 			case ID::TPE1:
-				dst = tag_.artist_.begin();
-				dstlen = tag_.artist_.capacity();
+				dst    = tag_.at_artist().begin();
+				dstlen = tag_.at_artist().capacity();
 				break;
 			case ID::TALB:
-				dst = tag_.album_.begin();
-				dstlen = tag_.album_.capacity();
+				dst    = tag_.at_album().begin();
+				dstlen = tag_.at_album().capacity();
 				break;
 			case ID::TYER:
-				dst = tag_.year_.begin();
-				dstlen = tag_.year_.capacity();
+				dst    = tag_.at_year().begin();
+				dstlen = tag_.at_year().capacity();
 				break;
 			case ID::TPOS:
-				dst = tag_.disc_.begin();
-				dstlen = tag_.disc_.capacity();
+				dst    = tag_.at_disc().begin();
+				dstlen = tag_.at_disc().capacity();
 				break;
 			case ID::TRCK:
-				dst = tag_.track_.begin();
-				dstlen = tag_.track_.capacity();
+				dst    = tag_.at_track().begin();
+				dstlen = tag_.at_track().capacity();
+				break;
+			case ID::APIC:
+				apic = true;
 				break;
 			default:
 				break;
 			}
 
-			if(dst == nullptr) {
+			if(apic) ;
+			else if(dst == nullptr) {
 				fin.seek(utils::file_io::SEEK::CUR, len);
 				return false;
 			}
@@ -99,7 +148,39 @@ namespace sound {
 			if(fin.read(&code, 1) != 1) {
 				return false;
 			}
-			--len;
+			len--;
+
+			if(apic) {
+				if(v2_3) {
+					char tmp[64];
+					if(!get_text_(fin, tmp, len)) {
+						return false;
+					}
+					if(strcmp(tmp, "image/jpeg") == 0) {
+						strcpy(tag_.at_apic().ext_, "jpg");
+					}
+					if(fin.read(&tag_.at_apic().typ_, 1) != 1) {
+						return false;
+					}
+					len--;
+					utils::format("V2.3: '%s'\n") % tmp;
+				} else {
+					if(fin.read(tag_.at_apic().ext_, 3) != 3) {
+						return false;
+					}
+					len -= 3;
+					if(fin.read(&tag_.at_apic().typ_, 1) != 1) {
+						return false;
+					}
+					len--;
+					utils::format("V2.2: '%s'\n") % tag_.get_apic().ext_;
+				}
+				auto ret = skip_text_(code, fin, len);
+				tag_.at_apic().ofs_ = fin.tell();
+				tag_.at_apic().len_ = len;
+				fin.seek(utils::file_io::SEEK::CUR, len);
+				return ret;
+			}
 
 			if(code == 0x00) {  // ISO-8859-1
 				char tmp[len + 1];
@@ -139,7 +220,6 @@ namespace sound {
 				fin.seek(utils::file_io::SEEK::CUR, len);
 				return false;
 			}
-
 			return true;
 		}
 
@@ -225,7 +305,7 @@ namespace sound {
 //			utils::format("Flag: %04X, ") % get16_(&tmp[8]);
 //			utils::format("%d bytes\n") % size;
 
-			set_info_(id, fin, size);
+			set_info_(id, fin, size, true);
 
 			return true;
 		}
@@ -250,7 +330,7 @@ namespace sound {
 //			utils::format("ID: %c%c%c, ") % tmp[0] % tmp[1] % tmp[2];
 //			utils::format("%d bytes\n") % size;
 
-			set_info_(id, fin, size);
+			set_info_(id, fin, size, false);
 
 			return true;
 		}
@@ -261,19 +341,18 @@ namespace sound {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		id3_mgr() noexcept : org_pos_(0),
-			ver_(0), flag_(0), size_(0), tag_()
+		id3_mgr() noexcept : org_pos_(0), ver_(0), flag_(0), size_(0), tag_()
 		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	解析
+			@brief	パース
 			@param[in]	fin		「file_io」
 			@return	成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool analize(utils::file_io& fin) noexcept
+		bool parse(utils::file_io& fin) noexcept
 		{
 			if(!fin.is_open()) {
 				return false;

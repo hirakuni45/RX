@@ -10,6 +10,7 @@
 //=====================================================================//
 #include <cstdint>
 #include <functional>
+#include "common/file_io.hpp"
 
 namespace sound {
 
@@ -47,7 +48,7 @@ namespace sound {
 			@brief	情報タスク型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef std::function<void (const tag_t&)> TAG_TASK;
+		typedef std::function<void (utils::file_io& fin, const tag_t&)> TAG_TASK;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

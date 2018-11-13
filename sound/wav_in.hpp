@@ -143,20 +143,20 @@ namespace sound {
 							char* dst = nullptr;
 							uint32_t dstlen = 0;
 							if(std::strncmp(rch.szChunkName, "IART", 4) == 0) {
-								dst = tag.album_.begin();
-								dstlen = tag.album_.capacity();
+								dst    = tag.at_album().begin();
+								dstlen = tag.at_album().capacity();
 							} else if(std::strncmp(rch.szChunkName, "INAM", 4) == 0) {
-								dst = tag.title_.begin();
-								dstlen = tag.title_.capacity();
+								dst    = tag.at_title().begin();
+								dstlen = tag.at_title().capacity();
 							} else if(std::strncmp(rch.szChunkName, "IPRD", 4) == 0) {
-								dst = tag.artist_.begin();
-								dstlen = tag.artist_.capacity();
+								dst    = tag.at_artist().begin();
+								dstlen = tag.at_artist().capacity();
 							} else if(std::strncmp(rch.szChunkName, "ICRD", 4) == 0) {
-								dst = tag.year_.begin();
-								dstlen = tag.year_.capacity();
+								dst    = tag.at_year().begin();
+								dstlen = tag.at_year().capacity();
 							} else if(std::strncmp(rch.szChunkName, "IPRT", 4) == 0) {
-								dst = tag.track_.begin();
-								dstlen = tag.track_.capacity();
+								dst    = tag.at_track().begin();
+								dstlen = tag.at_track().capacity();
 							} else {
 //								utils::format("TAG: %c%c%c%c\n")
 //									% rch.szChunkName[0] % rch.szChunkName[1]
@@ -205,7 +205,7 @@ namespace sound {
 				return false;
 			}
 			if(tag_task_) {
-				tag_task_(tag);
+				tag_task_(fin, tag);
 			}
 
 			bool status = true;

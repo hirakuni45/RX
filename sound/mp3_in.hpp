@@ -203,10 +203,10 @@ namespace sound {
 		bool decode(utils::file_io& fin, AUDIO_OUT& out)
 		{
 			id3_mgr id3;
-			id3.analize(fin);
+			id3.parse(fin);
 			if(tag_task_) {
 				const auto& tag = id3.get_tag();
-				tag_task_(tag);
+				tag_task_(fin, tag);
 //				utils::format("Album:  '%s'\n") % tag.album_;
 //				utils::format("Title:  '%s'\n") % tag.title_;
 //				utils::format("Artist: '%s'\n") % tag.artist_;
