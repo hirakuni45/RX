@@ -25,6 +25,7 @@ Envision Kit RX65N で実現する簡易オーディオプレイヤー
  - SD カードのルートに [kfont16.bin](../graphics/kfont16.bin)ファイルを書き込む。（漢字表示用）   
  ※現在は、「kfont16.cpp」として、ソースコードに埋め込んでいる。
  - SD カードに、「mp3、wav」形式のファイルを書き込む。
+ - SD カード、ルートに、「NoImage.jpg」ファイルをコピーしておく。
    
 ## ビルド方法
  - make する。
