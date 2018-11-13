@@ -68,6 +68,7 @@ namespace sound {
 			year_.clear();
 			disc_.clear();
 			track_.clear();
+			apic_ = apic_t();
 		}
 
 
