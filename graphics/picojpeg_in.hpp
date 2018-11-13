@@ -74,8 +74,8 @@ namespace img {
 				if(reduce_) {
 					auto row_blocks = image_info_.m_MCUWidth  >> 3;
 					auto col_blocks = image_info_.m_MCUHeight >> 3;
-					int16_t xx = xt * row_blocks + ofs_x_;
-					int16_t yy = yt * col_blocks + ofs_y_;
+					int16_t xx = xt * row_blocks;
+					int16_t yy = yt * col_blocks;
 					if(image_info_.m_scanType == PJPG_GRAYSCALE) {
 						auto gs = image_info_.m_pMCUBufR[0];
 						render_rgb_(xx, yy, gs, gs, gs);
@@ -92,8 +92,8 @@ namespace img {
 						}
 					}
 				} else {
-					auto xx = xt * image_info_.m_MCUWidth  + ofs_x_;
-					auto yy = yt * image_info_.m_MCUHeight + ofs_y_;
+					auto xx = xt * image_info_.m_MCUWidth;
+					auto yy = yt * image_info_.m_MCUHeight;
 					for(int16_t y = 0; y < image_info_.m_MCUHeight; y += 8) {
 						auto by_limit = std::min(8,
 							image_info_.m_height - (yt * image_info_.m_MCUHeight + y));
@@ -130,11 +130,11 @@ namespace img {
 					}
 				}
 				++xt;
-				if(xt == image_info_.m_MCUSPerRow) {
+				if(xt >= image_info_.m_MCUSPerRow) {
 					xt = 0;
 					++yt;
 					if(yt >= image_info_.m_MCUSPerCol) {
-						return false;
+						break;
 					}
 				}
 			}
@@ -199,7 +199,8 @@ namespace img {
 					return true;
 				}
 			}
-//			utils::format("Not JPEG file\n");
+			utils::format("JPEG SOI Marker fail: %02X, %02X\n")
+				% static_cast<uint16_t>(sig[0]) % static_cast<uint16_t>(sig[1]);
 			return false;
 		}
 
