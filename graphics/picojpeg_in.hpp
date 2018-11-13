@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	PicoJPEG 画像クラス
+	@brief	PicoJPEG クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -19,7 +19,7 @@ namespace img {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	PicoJPEG 形式ファイルクラス
+		@brief	PicoJPEG デコード・クラス
 		@param[in]	RENDER	描画ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
