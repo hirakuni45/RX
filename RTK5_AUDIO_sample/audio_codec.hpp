@@ -92,9 +92,12 @@ namespace audio {
 			if(tag.get_apic().len_ > 0) {
 				auto pos = fin.tell();
 				fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
+				jpeg_.set_draw_offset(0, 0);
 				if(!jpeg_.load(fin)) {
-					utils::format("APIC: load error (%d, %d)\n")
-						% tag.get_apic().ofs_ % tag.get_apic().len_;
+					jpeg_.set_draw_offset(480 - 272, 0);
+					jpeg_.load("/NoImage.jpg");
+//					utils::format("APIC: load error (%d, %d)\n")
+//						% tag.get_apic().ofs_ % tag.get_apic().len_;
 				}
 				fin.seek(utils::file_io::SEEK::SET, pos);
 			}
