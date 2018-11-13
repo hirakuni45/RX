@@ -294,7 +294,7 @@ namespace img {
 			status_ = pjpeg_decode_init(&image_info_, pjpeg_callback_, &t, reduce_);
 			if(status_) {
 				if(status_ == PJPG_UNSUPPORTED_MODE) {
-//					utils::format("Progressive JPEG files are not supported.\n");
+					utils::format("Progressive JPEG files are not supported.\n");
 				} else {
 //					utils::format("pjpeg_decode_init() failed with status: %d\n") % status_;
 				}
