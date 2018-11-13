@@ -147,6 +147,7 @@ namespace audio {
 			const char*	start;
 			bool	enable;
 		};
+		loop_t	loop_t_;
 
 
 		void play_loop_func_(const char* name, const FILINFO* fi, bool dir, void* option)
@@ -169,18 +170,17 @@ namespace audio {
 
 		void play_loop_(const char* root, const char* start)
 		{
-			static loop_t t;
-			t.start = start;
+			loop_t_.start = start;
 			if(strlen(start) != 0) {
-				t.enable = true;
+				loop_t_.enable = true;
 			} else {
-				t.enable = false;
+				loop_t_.enable = false;
 			}
 			sdc_.set_dir_list_limit(1);
 			sdc_.start_dir_list(root,
 				[&](const char* name, const FILINFO* fi, bool dir, void* option) {
 					play_loop_func_(name, fi, dir, option);
-				}, true, &t);
+				}, true, &loop_t_);
 		}
 
 	public:
