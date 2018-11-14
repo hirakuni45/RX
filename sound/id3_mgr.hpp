@@ -86,7 +86,7 @@ namespace sound {
 						if(ch == 0) return true;
 					}
 					break;
-				case 1:  // UTF-16 ( BOM つき )
+				case 1:  // UTF-16 ( With BOM )
 				case 2:  // UTF-16
 					{
 						uint16_t ch;
@@ -176,6 +176,24 @@ namespace sound {
 					utils::format("V2.2: '%s'\n") % tag_.get_apic().ext_;
 				}
 				auto ret = skip_text_(code, fin, len);
+				if(!ret) {
+					utils::format("ID3 APIC skip text error\n");
+				}
+#if 0
+				// この実装は、不正なタグを回避する為に行う。
+				if(strcmp(tag_.at_apic().ext_, "jpg") == 0) {
+					auto org = fin.tell();
+					uint8_t tmp[2] = { 0 };
+					for(int i = 0; i < 64; ++i) {
+						tmp[0] = tmp[1];
+						fin.read(&tmp[1], 1);
+						if(tmp[0] == 0xff && tmp[1] == 0xd8) break;
+					}
+					auto pos = fin.tell();
+					pos -= 2;
+					fin.seek(utils::file_io::SEEK::SET, pos);
+				}
+#endif
 				tag_.at_apic().ofs_ = fin.tell();
 				tag_.at_apic().len_ = len;
 				fin.seek(utils::file_io::SEEK::CUR, len);
