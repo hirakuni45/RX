@@ -204,6 +204,15 @@ namespace device {
 				BUS::BEREN.TOEN = 1;
 				break;
 
+			case peripheral::USB:
+				SYSTEM::MSTPCRB.MSTPB19 = f;	// USB のストップ状態解除
+				break;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			case peripheral::USBA:
+				SYSTEM::MSTPCRB.MSTPB12 = f;	// USBA のストップ状態解除
+				break;
+#endif
+
 			case peripheral::ECCRAM:
 				SYSTEM::MSTPCRC.MSTPC6 = f;		// ECC RAM のストップ状態解除
 				break;

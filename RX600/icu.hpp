@@ -43,8 +43,10 @@ namespace device {
 			CMWI0        = 30,  // CMTW0
 			CMWI1        = 31,  // CMTW1
 
+#if defined(SIG_RX65N) || defined(SIG_RX71M)
 			D0FIFO2      = 32,  // USBA
 			D1FIFO2      = 33,  // USBA
+#endif
 			D0FIFO0      = 34,  // USB0
 			D1FIFO0      = 35,  // USB0
 
