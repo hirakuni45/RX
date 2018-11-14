@@ -9,7 +9,7 @@
 // Set to 1 if right shifts on signed ints are always unsigned (logical) shifts
 // When 1, arithmetic right shifts will be emulated by using a logical shift
 // with special case code to ensure the sign bit is replicated.
-#define PJPG_RIGHT_SHIFT_IS_ALWAYS_UNSIGNED 1
+/// #define PJPG_RIGHT_SHIFT_IS_ALWAYS_UNSIGNED 1
 
 // Define PJPG_INLINE to "inline" if your C compiler supports explicit inlining
 #define PJPG_INLINE inline
@@ -19,7 +19,7 @@ typedef unsigned short  uint16;
 typedef signed char     int8;
 typedef signed short    int16;
 //------------------------------------------------------------------------------
-#if PJPG_RIGHT_SHIFT_IS_ALWAYS_UNSIGNED
+#ifdef PJPG_RIGHT_SHIFT_IS_ALWAYS_UNSIGNED
 static int16 replicateSignBit16(int8 n)
 {
    switch (n)

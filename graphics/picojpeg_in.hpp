@@ -1,7 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	PicoJPEG クラス
+	@brief	PicoJPEG クラス @n
+			picojpeg.[hc] の C++ ラッパー @n
+			https://github.com/richgel999/picojpeg を参照
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -68,7 +70,6 @@ namespace img {
 		{
 			int16_t xt = 0;
 			int16_t yt = 0;
-// utils::format("MCU: %d, %d\n") % image_info_.m_MCUWidth % image_info_.m_MCUHeight;
 			while((status_ = pjpeg_decode_mcu()) == 0) {
 
 				if(reduce_) {
