@@ -24,6 +24,7 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c \
+				graphics/picojpeg.c \
 				RX65x/drw_2d_ver1.02/src/rx/dave_base_rx.c \
 				RX65x/drw_2d_ver1.02/src/rx/dave_irq_rx.c \
 				RX65x/drw_2d_ver1.02/src/rx/dave_memory_rx.c \
@@ -85,6 +86,7 @@ CP_OPT		=	-Wall -Werror \
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-unused-but-set-variable \
 				-fno-exceptions
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
