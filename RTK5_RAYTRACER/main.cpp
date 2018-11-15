@@ -18,6 +18,7 @@
 #include "graphics/graphics.hpp"
 #define CASH_KFONT
 #include "graphics/kfont.hpp"
+#include "common/cmt_io.hpp"
 
 #include "raytracer.hpp"
 
@@ -79,6 +80,9 @@ namespace {
 	SDC		sdc_;
 
 	utils::command<256> cmd_;
+
+	typedef device::cmt_io<device::CMT0> CMT;
+	CMT		cmt_;
 
 	bool	run_ = false;
 
@@ -185,7 +189,8 @@ extern "C" {
 	uint32_t millis(void)
 	{
 		// x 16.6667
-		return (glcdc_io_.get_vpos_count() * 4267) >> 8; 
+//		return (glcdc_io_.get_vpos_count() * 4267) >> 8;
+		return cmt_.get_counter();
 	}
 
 
@@ -275,6 +280,11 @@ int main(int argc, char** argv)
 	{  // SD カード・クラスの初期化
 		sdh_.start();
 		sdc_.start();
+	}
+
+	{
+		uint8_t il = 2;
+		cmt_.start(1000, il);  // 
 	}
 
 	utils::format("\rRTK5RX65N Start for Ray Trace\n");
