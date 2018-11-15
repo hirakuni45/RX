@@ -360,4 +360,8 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
 ///    display.println(buf);
 	draw_text(8, 0, buf);
   }
+  {
+	auto tm = (millis() - t) / 100;
+	utils::format("Render time: %3d.%ds\n") % (tm / 10) % (t % 10);
+  }
 }
