@@ -24,6 +24,9 @@
 #include "graphics/bmp_in.hpp"
 #include "chip/FT5206.hpp"
 
+#include "graphics/picojpeg_in.hpp"
+#include "graphics/scaling.hpp"
+
 // #define SOFT_I2C
 
 #ifdef SOFT_I2C
@@ -33,7 +36,7 @@
 #endif
 
 // SDHI インターフェースを使う場合
-#define SDHI_IF
+// #define SDHI_IF
 
 namespace {
 
@@ -113,6 +116,11 @@ namespace {
 	typedef chip::FT5206<FT5206_I2C> FT5206;
 	FT5206		ft5206_(ft5206_i2c_);
 
+	typedef img::scaling<RENDER> PLOT;
+	PLOT		plot_(render_);
+	typedef img::picojpeg_in<PLOT> JPEG_IN;
+	JPEG_IN		jpeg_(plot_);
+
 	utils::command<256> cmd_;
 
 
@@ -159,10 +167,18 @@ namespace {
 			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
 				utils::format("%s\n") % sdc_.get_current();
 				f = true;
+			} else if(cmd_.cmp_word(0, "jpeg")) { // jpeg load, draw
+				if(cmdn >= 2) {
+					char tmp[128];
+					cmd_.get_word(1, tmp, sizeof(tmp));
+					jpeg_.load(tmp);
+				}
+				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    dir [path]\n");
 				utils::format("    cd [path]\n");
 				utils::format("    pwd\n");
+				utils::format("    jpeg [filename]\n");
 				f = true;
 			}
 			if(!f) {
