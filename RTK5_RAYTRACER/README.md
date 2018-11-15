@@ -22,9 +22,8 @@ Envision Kit RX65N を使ったレイ・トレーサー
 ## 備考
  - 元となるソースコードは、Arduino 環境でベンチマークを行う事が主眼なので、オリジナルの実装をなるべく変更しないようにしています。
 ※sqrt() 関数は、sqrtf に変更しています。
-
-## 謝辞
- - macsbug さん<https://macsbug.wordpress.com/2016/12/27/raytracing-with-esp32/>のコードを流用させて頂きました。
+(https://japan.renesasrulz.com/cafe_rene/f/forum5/5169/rx65n-envision-kit)
+※上記、フォーラムで実験されていた「RXv2、FSQRT 命令」を実行するアセンブラマクロに変更   
    
 -----
    
