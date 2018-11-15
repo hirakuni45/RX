@@ -1,0 +1,297 @@
+#pragma once
+//=====================================================================//
+/*!	@file
+	@brief	スケーリング（拡大、縮小）
+    @author 平松邦仁 (hira@rvf-rc45.net)
+	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+				Released under the MIT license @n
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
+*/
+//=====================================================================//
+#include <cstdint>
+#include <cmath>
+#include "common/vtx.hpp"
+
+namespace img {
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	スケーリング・クラス
+		@param[in]	RENDER	レンダー・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class RENDER>
+	class scaling {
+
+		RENDER&		render_;
+
+
+
+#if 0
+		static float sinc_(float l)
+		{
+			return std::sin(vtx::get_pi<float>() * l) / (vtx::get_pi<float>() * l);
+		}
+
+
+		static float lanczos_(float d, float n)
+		{
+			if(d == 0.0f) {
+				return 1.0f;
+			} else if(std::abs(d) >= n) {
+				return 0.0f;
+			} else {
+				return sinc_(d) * sinc_(d / n);
+			}
+		}
+
+
+		float lanczos_tbl_[(12 + 1) * (12 + 1)];
+		float lanczos_n_;
+		// -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0
+		void init_lanczos_(float n)
+		{
+			if(lanczos_n_ == n) return;
+
+			float y = -3.0f;
+			for(int i = 0; i < (12 + 1); ++i) {
+				float yl = lanczos_(y, n);
+				float x = -3.0f;
+				for(int j = 0; j < (12 + 1); ++j) {
+					float xl = lanczos_(x, n);
+					lanczos_tbl_[i * (12 + 1) + j] = xl * yl;
+					x += 0.5f;
+				}
+				y += 0.5f;
+			}
+			lanczos_n_ = n;
+		}
+
+
+		float lanczos_t_(float x, float y, float n)
+		{
+			int i = static_cast<int>(y * 2.0f);
+			i += 6;
+			int j = static_cast<int>(x * 2.0f);
+			j += 6;
+			if(i >= 0 && i < (12 + 1) && j >= 0 && j < (12 + 1)) {
+				return lanczos_tbl_[i * (12 + 1) + j];
+			} else {
+				return lanczos_(x, n) * lanczos_(y, n);
+			}
+		}
+#endif
+
+#if 0
+	static void color_div_(const rgbaf& col, float total, rgba8& c)
+	{
+		rgbaf cc;
+		if(total != 0.0f) {
+			float sf = 1.0f / total;
+			cc.r = col.r * sf;
+			cc.g = col.g * sf;
+			cc.b = col.b * sf;
+			cc.a = col.a * sf;
+		} else {
+			cc = col;
+		}
+
+		if(cc.r < 0.0f) {
+			c.r = 0;
+		} else if(cc.r > 255.0f) {
+			c.r = 255;
+		} else {
+			c.r = static_cast<unsigned char>(cc.r);
+		}
+
+		if(cc.g < 0.0f) {
+			c.g = 0;
+		} else if(cc.g > 255.0f) {
+			c.g = 255;
+		} else {
+			c.g = static_cast<unsigned char>(cc.g);
+		}
+
+		if(cc.b < 0.0f) {
+			c.b = 0;
+		} else if(cc.b > 255.0f) {
+			c.b = 255;
+		} else {
+			c.b = static_cast<unsigned char>(cc.b);
+		}
+
+		if(cc.a < 0.0f) {
+			c.a = 0;
+		} else if(cc.a > 255.0f) {
+			c.a = 255;
+		} else {
+			c.a = static_cast<unsigned char>(cc.a);
+		}
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief	画像をリサイズする（lanczos-3 アルゴリズム）
+		@param[in]	src	ソースのイメージ
+		@param[out]	dst	リサイズイメージ
+		@param[in]	scale	スケール・ファクター
+	*/
+	//-----------------------------------------------------------------//
+	void resize_image(const i_img* src, img_rgba8& dst, float scale)
+	{
+		if(scale <= 0.0f) return;
+
+		int sw = src->get_size().x;
+		int sh = src->get_size().y;
+		int dw = static_cast<int>(static_cast<float>(sw) * scale);
+		int dh = static_cast<int>(static_cast<float>(sh) * scale);
+		dst.create(vtx::spos(dw, dh), src->test_alpha());
+
+		float n = 3.0f;
+		init_lanczos_(n);
+
+		float scn = 1.0f / scale;
+		if(scale > 1.0f) {
+			vtx::spos out;
+			for(out.y = 0; out.y < dh; ++out.y) {
+				float yy = (static_cast<float>(out.y) + 0.5f) * scn;
+				int ys = static_cast<int>(yy - n);
+				if(ys < 0) ys = 0;
+				int ye = static_cast<int>(yy + n);
+				if(ye > (sh - 1)) ye = sh - 1;
+				for(out.x = 0; out.x < dw; ++out.x) {
+					float xx = (static_cast<float>(out.x) + 0.5f) * scn;
+					int xs = static_cast<int>(xx - n);
+					if(xs < 0) xs = 0;
+					int xe = static_cast<int>(xx + n);
+					if(xe > (sw - 1)) xe = sw - 1;
+
+					rgbaf col(0.0f);
+					float weight_total = 0.0f;
+					vtx::spos pos;
+					for(pos.y = ys; pos.y <= ye; ++pos.y) {
+						float yl = fabs((pos.y + 0.5f) - yy);
+						for(pos.x = xs; pos.x <= xe; ++pos.x) {
+							float xl = std::abs((static_cast<float>(pos.x) + 0.5f) - xx);
+							float weight = lanczos_t_(xl, yl, n);
+							rgba8 c;
+							src->get_pixel(pos, c);
+							col.r += c.r * weight;
+							col.g += c.g * weight;
+							col.b += c.b * weight;
+							col.a += c.a * weight;
+							weight_total += weight;
+						}
+					}
+					rgba8 c;
+					color_div_(col, weight_total, c);
+					dst.put_pixel(out, c);
+				}
+			}
+		} else {
+			vtx::spos out;
+			for(out.y = 0; out.y < dh; ++out.y) {
+				float yy = static_cast<float>(out.y) + 0.5f;
+				int ys = static_cast<int>((yy - n) * scn);
+				if(ys < 0) ys = 0;
+				int ye = static_cast<int>((yy + n) * scn);
+				if(ye > (sh - 1)) ye = sh - 1;
+				for(out.x = 0; out.x < dw; ++out.x) {
+					float xx = static_cast<float>(out.x) + 0.5f;
+					int xs = static_cast<int>((xx - n) * scn);
+					if(xs < 0) xs = 0;
+					int xe = static_cast<int>((xx + n) * scn);
+					if(xe > (sw - 1)) xe = sw - 1;
+
+					rgbaf col(0.0f);
+					float weight_total = 0.0f;
+					vtx::spos pos;
+					for(pos.y = ys; pos.y <= ye; ++pos.y) {
+						float yl = std::abs(((static_cast<float>(pos.y) + 0.5f) * scale) - yy);
+						for(pos.x = xs; pos.x <= xe; ++pos.x) {
+							float xl = std::abs(((static_cast<float>(pos.x) + 0.5f) * scale) - xx);
+							float weight = lanczos_t_(xl, yl, n);
+							rgba8 c;
+							src->get_pixel(pos, c);
+							col.r += static_cast<float>(c.r) * weight;
+							col.g += static_cast<float>(c.g) * weight;
+							col.b += static_cast<float>(c.b) * weight;
+							col.a += static_cast<float>(c.a) * weight;
+							weight_total += weight;
+						}
+					}
+					rgba8 c;
+					color_div_(col, weight_total, c);
+					dst.put_pixel(out, c);
+				}
+			}
+		}
+	}
+#endif
+
+		vtx::spos	ofs_;
+		float		scale_;
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンストラクタ
+			@param[in]	render	レンダークラス（参照）
+		*/
+		//-----------------------------------------------------------------//
+		scaling(RENDER& render) noexcept : render_(render),
+//			lanczos_n_(0.0f),
+			ofs_(0), scale_(1.0f)
+		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	オフセットを設定
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		void set_offset(const vtx::spos& ofs = vtx::spos(0)) noexcept
+		{
+			ofs_ = ofs;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	スケールを設定
+			@param[in]	s	スケール
+		*/
+		//-----------------------------------------------------------------//
+		void set_scale(float s = 1.0f) noexcept
+		{
+			scale_ = s;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	描画ファンクタ
+			@param[in]	x	X 座標
+			@param[in]	y	Y 座標
+			@param[in]	r	R カラー
+			@param[in]	g	G カラー
+			@param[in]	b	B カラー
+		*/
+		//-----------------------------------------------------------------//
+		void operator() (int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b) noexcept
+		{
+			int16_t xx = x;
+			int16_t yy = y;
+			if(scale_ < 1.0f) {
+				xx = static_cast<float>(x) * scale_;
+				yy = static_cast<float>(y) * scale_;
+			} else if(scale_ > 1.0f) {
+
+			}
+			auto c = RENDER::COLOR::rgb(r, g, b);
+			render_.plot(xx + ofs_.x, yy + ofs_.y, c);
+		}
+	};
+}

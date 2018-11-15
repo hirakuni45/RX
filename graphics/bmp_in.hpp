@@ -18,13 +18,13 @@ namespace image {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	BMP 形式ファイルクラス
-		@param[in]	RENDER	描画ファンクタ
+		@param[in]	PLOT	描画ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class RENDER>
+	template <class PLOT>
 	class bmp_in {
 
-		RENDER&		render_;
+		PLOT&		plot_;
 
 		static const uint16_t BMP_SIGNATURE		 = 0x4D42;
 		static const uint16_t BMP_SIG_BYTES		 = 2;
@@ -128,15 +128,6 @@ namespace image {
 
 		uint8_t		rgbq_[RGBQUAD_SIZE];
 
-		int16_t		ofs_x_;
-		int16_t		ofs_y_;
-
-		void render_rgb_(int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b)
-		{
-			auto c = RENDER::COLOR::rgb(r, g, b);
-			render_.plot(ofs_x_ + x, ofs_y_ + y, c);
-		}
-
 
 		void render_idx_(int16_t x, int16_t y, uint8_t idx)
 		{
@@ -144,8 +135,7 @@ namespace image {
 			uint8_t r = rgbq_[i + RGBT_RED];
 			uint8_t g = rgbq_[i + RGBT_GREEN];
 			uint8_t b = rgbq_[i + RGBT_BLUE];
-			auto c = RENDER::COLOR::rgb(r, g, b);
-			render_.plot(ofs_x_ + x, ofs_y_ + y, c);
+			plot_(x, y, r, g, b);
 		}
 
 
@@ -375,7 +365,7 @@ namespace image {
 					auto r = src[2];
 					auto g = src[1];
 					auto b = src[0];
-					render_rgb_(pos.x, pos.y, r, g, b);
+					plot_(pos.x, pos.y, r, g, b);
 					src += pads;
 				}
 				pos.y += d;
@@ -467,7 +457,7 @@ namespace image {
 						r = (r << (8 - bits_cnt.r)) | (r >> (8 - bits_cnt.r));
 						g = (g << (8 - bits_cnt.g)) | (g >> (8 - bits_cnt.g));
 						b = (b << (8 - bits_cnt.b)) | (b >> (8 - bits_cnt.b));
-						render_rgb_(pos.x, pos.y, r, g, b);
+						plot_(pos.x, pos.y, r, g, b);
 					}
 					break;
 
@@ -478,7 +468,7 @@ namespace image {
 						auto b = src[0];
 						auto a = src[3];
 						src += 4;
-						render_rgb_(pos.x, pos.y, r, g, b);
+						plot_(pos.x, pos.y, r, g, b);
 					}
 					break;
 				}
@@ -610,24 +600,11 @@ namespace image {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	plot	描画ファンクタ
 		*/
 		//-----------------------------------------------------------------//
-		bmp_in(RENDER& render) noexcept : render_(render), prgl_ref_(0), prgl_pos_(0),
-			rgbq_{ 0 }, ofs_x_(0), ofs_y_(0) { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	描画オフセットの設定
-			@param[in]	x	X 軸オフセット
-			@param[in]	y	Y 軸オフセット
-		*/
-		//-----------------------------------------------------------------//
-		void set_draw_offset(int16_t x = 0, int16_t y = 0) noexcept
-		{
-			ofs_x_ = x;
-			ofs_y_ = y;
-		}
+		bmp_in(PLOT& plot) noexcept : plot_(plot), prgl_ref_(0), prgl_pos_(0),
+			rgbq_{ 0 } { }
 
 
 		//-----------------------------------------------------------------//

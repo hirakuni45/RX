@@ -22,13 +22,13 @@ namespace img {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	PicoJPEG デコード・クラス
-		@param[in]	RENDER	描画ファンクタ
+		@param[in]	PLOT	描画ファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class RENDER>
+	template <class PLOT>
 	class picojpeg_in {
 
-		RENDER&		render_;
+		PLOT&		plot_;
 
 		pjpeg_image_info_t	image_info_;
 
@@ -37,8 +37,6 @@ namespace img {
 
 		int16_t		width_;
 		int16_t		height_;
-		int16_t		ofs_x_;
-		int16_t		ofs_y_;
 
 		struct data_t {
 			utils::file_io&	fin_;
@@ -46,12 +44,6 @@ namespace img {
 			uint32_t		file_size_;
 			data_t(utils::file_io& fin) : fin_(fin), file_ofs_(0), file_size_(0) { }
 		};
-
-		void render_rgb_(int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b)
-		{
-			auto c = RENDER::COLOR::rgb(r, g, b);
-			render_.plot(ofs_x_ + x, ofs_y_ + y, c);
-		}
 
 
 		static uint8_t pjpeg_callback_(uint8_t* dst, uint8_t size, uint8_t* acr, void *pdata)
@@ -79,7 +71,7 @@ namespace img {
 					int16_t yy = yt * col_blocks;
 					if(image_info_.m_scanType == PJPG_GRAYSCALE) {
 						auto gs = image_info_.m_pMCUBufR[0];
-						render_rgb_(xx, yy, gs, gs, gs);
+						plot_(xx, yy, gs, gs, gs);
 					} else {
 						for(int16_t y = 0; y < col_blocks; ++y) {
 							auto ofs = y * 128;
@@ -88,7 +80,7 @@ namespace img {
 								auto g = image_info_.m_pMCUBufG[ofs];
 								auto b = image_info_.m_pMCUBufB[ofs];
 								ofs += 64;
-								render_rgb_(xx + x, yy + y, r, g, b);
+								plot_(xx + x, yy + y, r, g, b);
 							}
 						}
 					}
@@ -107,7 +99,7 @@ namespace img {
 								for(int16_t by = 0; by < by_limit; ++by) {
 									for(int16_t bx = 0; bx < bx_limit; ++bx) {
 										auto gs = *pGS++;
-										render_rgb_(x + xx + bx, y + yy + by, gs, gs, gs);
+										plot_(x + xx + bx, y + yy + by, gs, gs, gs);
 									}
 									pGS += (8 - bx_limit);
 								}
@@ -120,7 +112,7 @@ namespace img {
 										auto r = *pR++; 
 										auto g = *pG++; 
 										auto b = *pB++;
-										render_rgb_(x + xx + bx, y + yy + by, r, g, b);
+										plot_(x + xx + bx, y + yy + by, r, g, b);
 									}
 									pR += (8 - bx_limit);
 									pG += (8 - bx_limit);
@@ -150,12 +142,13 @@ namespace img {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	plot	描画ファンクタ
 		*/
 		//-----------------------------------------------------------------//
-		picojpeg_in(RENDER& render) noexcept : render_(render),
+		picojpeg_in(PLOT& plot) noexcept : plot_(plot),
 			image_info_(),
 			status_(0), reduce_(false),
-			width_(0), height_(0), ofs_x_(0), ofs_y_(0)
+			width_(0), height_(0)
 		{ }
 
 
@@ -166,20 +159,6 @@ namespace img {
 		*/
 		//-----------------------------------------------------------------//
 		uint8_t get_status() const noexcept { return status_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	描画オフセットの設定
-			@param[in]	x	X 軸オフセット
-			@param[in]	y	Y 軸オフセット
-		*/
-		//-----------------------------------------------------------------//
-		void set_draw_offset(int16_t x = 0, int16_t y = 0) noexcept
-		{
-			ofs_x_ = x;
-			ofs_y_ = y;
-		}
 
 
 		//-----------------------------------------------------------------//
@@ -222,12 +201,12 @@ namespace img {
 			t.file_ofs_  = 0;
 			t.file_size_ = fin.get_file_size();
 			status_ = pjpeg_decode_init(&image_info_, pjpeg_callback_, &t, false);
-			if(status_) {
-				fin.close();
-				return false;
-			}
 
 			fin.seek(utils::file_io::SEEK::SET, pos);
+
+			if(status_ != 0) {
+				return false;
+			}
 
 			fo.width  = image_info_.m_width;
 			fo.height = image_info_.m_height;
