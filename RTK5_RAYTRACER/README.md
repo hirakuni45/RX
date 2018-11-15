@@ -20,9 +20,9 @@ Envision Kit RX65N を使ったレイ・トレーサー
  - レンダリングを行う度に、フルスクリーン（480x272）と（320x240）を切り替える。
 
 ## 備考
- - 元となるソースコードは、Arduino 環境でベンチマークを行う事が主眼なので、オリジナルの実装をなるべく変更しないようにしています。
-※sqrt() 関数は、sqrtf に変更しています。
-(https://japan.renesasrulz.com/cafe_rene/f/forum5/5169/rx65n-envision-kit)
+ - 元となるソースコードは、Arduino 環境でベンチマークを行う事が主眼なので、オリジナルの実装をなるべく変更しないようにしています。   
+※sqrt() 関数は、sqrtf に変更しています。   
+https://japan.renesasrulz.com/cafe_rene/f/forum5/5169/rx65n-envision-kit   
 ※上記、フォーラムで実験されていた「RXv2、FSQRT 命令」を実行するアセンブラマクロに変更   
    
 -----
