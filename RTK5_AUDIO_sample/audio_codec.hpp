@@ -14,6 +14,7 @@
 #include "sound/sound_out.hpp"
 #include "sound/mp3_in.hpp"
 #include "sound/wav_in.hpp"
+#include "graphics/scaling.hpp"
 #include "graphics/picojpeg_in.hpp"
 
 namespace audio {
@@ -31,11 +32,13 @@ namespace audio {
 	class codec {
 	public:
 		typedef std::function<sound::af_play::CTRL ()> CTRL_TASK;
-		typedef img::picojpeg_in<RENDER> JPEG_IN;
+		typedef img::scaling<RENDER> SCALING;
+		typedef img::picojpeg_in<SCALING> JPEG_IN;
 
 	private:
 		SDC&		sdc_;
 		RENDER&		render_;
+		SCALING		scaling_;
 
 		static volatile uint32_t	wpos_;
 
@@ -89,20 +92,27 @@ namespace audio {
 		{
 			render_.clear(RENDER::COLOR::Black);
 
+			scaling_.set_offset(vtx::spos(480 - 272, 0));
 			if(tag.get_apic().len_ > 0) {
 				auto pos = fin.tell();
 				fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
-				jpeg_.set_draw_offset(0, 0);
-				if(!jpeg_.load(fin)) {
-					jpeg_.set_draw_offset(480 - 272, 0);
+				img::img_info ifo;
+				if(!jpeg_.info(fin, ifo)) {
+					scaling_.set_scale();
 					jpeg_.load("/NoImage.jpg");
 					render_.swap_color();
 					render_.draw_text(480 - 272, 0, "JPEG decode error.");
 					render_.swap_color();
+				} else {
+					if(ifo.width > 272 || ifo.height > 272) {
+						float sc = 272.0f / static_cast<float>(std::max(ifo.width, ifo.height));
+						scaling_.set_scale(sc);
+					}
+					jpeg_.load(fin);
 				}
 				fin.seek(utils::file_io::SEEK::SET, pos);
 			} else {
-				jpeg_.set_draw_offset(480 - 272, 0);
+				scaling_.set_scale();
 				jpeg_.load("/NoImage.jpg");
 			}
 
@@ -214,8 +224,8 @@ namespace audio {
 		*/
 		//-----------------------------------------------------------------//
 		codec(SDC& sdc, RENDER& render) noexcept :
-			sdc_(sdc), render_(render),
-			jpeg_(render_)
+			sdc_(sdc), render_(render), scaling_(render_),
+			jpeg_(scaling_)
 		{ }
 
 
@@ -241,6 +251,15 @@ namespace audio {
 				utils::format("TPU0 start error...\n");
 			}
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	描画スケーリングの参照
+			@return 描画スケーリング
+		*/
+		//-----------------------------------------------------------------//
+		SCALING& at_scaling() noexcept { return scaling_; }
 
 
 #if 0

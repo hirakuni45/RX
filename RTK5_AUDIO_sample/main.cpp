@@ -256,6 +256,8 @@ namespace {
 				if(cmdn >= 2) {
 					char tmp[128];
 					cmd_.get_word(1, tmp, sizeof(tmp));
+					audio_.at_scaling().set_offset();
+					audio_.at_scaling().set_scale();
 					if(!audio_.at_jpeg_in().load(tmp)) {
 						utils::format("Can't load JPEG file: '%s'\n") % tmp;
 					}
