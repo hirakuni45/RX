@@ -347,21 +347,14 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
 ///      if(q==1) display.drawPixel(x, y, RGBTO565(r,g,b));
 ///      else display.fillRect(x, y, q, q, RGBTO565(r,g,b));
     }
-// workaround for ESP8266 which reboots after staying too long in the loops (WTF-watchdog?)
-#ifdef ESP8266
-    delay(1);
-#endif
 
     char buf[50];
-	auto tm = (millis() - t) / 100;
-///    snprintf(buf,100,"%3d%% %3ds", (y+q)*100/dh, (millis()-t)/1000);
-	utils::sformat("%3d%% %3d.%ds", buf, sizeof(buf)) % ((y+q)*100/dh) % (tm / 10) % (t % 10);
-///    display.setCursor(8,0);
-///    display.println(buf);
+	auto tm = millis() - t;
+	utils::sformat("%3d%% %dms (%d)", buf, sizeof(buf)) % ((y+q)*100/dh) % tm % raysPerPixel;
 	draw_text(8, 0, buf);
   }
   {
-	auto tm = (millis() - t) / 100;
-	utils::format("Render time: %3d.%ds\n") % (tm / 10) % (t % 10);
+	auto tm = millis() - t;
+	utils::format("Render time: %dms (%d)\n") % tm % raysPerPixel;
   }
 }

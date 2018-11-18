@@ -313,6 +313,7 @@ int main(int argc, char** argv)
 
 	uint8_t n = 0;
 	bool sw = false;
+	uint8_t asq = 1;
 	while(1) {
 		glcdc_io_.sync_vpos();
 		bool v = !SW2::P();
@@ -324,6 +325,8 @@ int main(int argc, char** argv)
 			} else {
 				render_width_ = 320;
 				render_height_ = 240;
+				++asq;
+				if(asq > 4) asq = 1;
 			}
 			run_ = false;
 		}
@@ -334,7 +337,7 @@ int main(int argc, char** argv)
 		command_();
 		if(!run_) {
 //			uint32_t org = glcdc_io_.get_vpos();
-			doRaytrace(4, render_width_, render_height_);
+			doRaytrace(asq, render_width_, render_height_);
 //			uint32_t t = glcdc_io_.get_vpos() - org;
 //			char tmp[32];
 //			utils::sformat("%d.%d [sec]", tmp, sizeof(tmp)) % (t / 60) % ((t / 6) % 10);
