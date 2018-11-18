@@ -13,7 +13,7 @@
 #include "common/vtx.hpp"
 #include "graphics/img.hpp"
 
-namespace image {
+namespace img {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!

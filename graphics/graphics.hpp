@@ -178,6 +178,32 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	カラーの合成
+			@param[in]	c0	カラーＡ
+			@param[in]	c1	カラーＢ
+			@return 合成されたカラー
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t color_sum(T c0, T c1) noexcept
+		{
+			uint16_t r = c0 & 0b1111100000000000;
+			uint16_t g = c0 & 0b0000011111100000;
+			uint16_t b = c0 & 0b0000000000011111;
+			r >>= 1;
+			r += (c1 & 0b1111100000000000) >> 1;
+			r &= 0b1111100000000000;
+			g += c1 & 0b0000011111100000;
+			g >>= 1;
+			g &= 0b0000011111100000;
+			b += c1 & 0b0000000000011111;
+			b >>= 1;
+			b &= 0b0000000000011111;
+			return r | g | b;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	破線パターンの設定
 			@param[in]	stipple	破線パターン
 		*/
@@ -208,6 +234,22 @@ namespace graphics {
 			if(static_cast<uint16_t>(x) >= WIDTH) return;
 			if(static_cast<uint16_t>(y) >= HEIGHT) return;
 			fb_[y * line_offset + x] = c;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	点を取得する
+			@param[in]	x	開始点Ｘ軸を指定
+			@param[in]	y	開始点Ｙ軸を指定
+			@return	カラー
+		*/
+		//-----------------------------------------------------------------//
+		T get_plot(int16_t x, int16_t y) const noexcept
+		{
+			if(static_cast<uint16_t>(x) >= WIDTH) return 0;
+			if(static_cast<uint16_t>(y) >= HEIGHT) return 0;
+			return fb_[y * line_offset + x];
 		}
 
 

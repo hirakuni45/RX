@@ -33,7 +33,6 @@ namespace img {
 		pjpeg_image_info_t	image_info_;
 
 		uint8_t		status_;
-		bool		reduce_;
 
 		int16_t		width_;
 		int16_t		height_;
@@ -64,6 +63,7 @@ namespace img {
 			int16_t yt = 0;
 			while((status_ = pjpeg_decode_mcu()) == 0) {
 
+#if 0
 				if(reduce_) {
 					auto row_blocks = image_info_.m_MCUWidth  >> 3;
 					auto col_blocks = image_info_.m_MCUHeight >> 3;
@@ -85,6 +85,7 @@ namespace img {
 						}
 					}
 				} else {
+#endif
 					auto xx = xt * image_info_.m_MCUWidth;
 					auto yy = yt * image_info_.m_MCUHeight;
 					for(int16_t y = 0; y < image_info_.m_MCUHeight; y += 8) {
@@ -121,7 +122,7 @@ namespace img {
 							}
 						}
 					}
-				}
+//				}  // reduce_
 				++xt;
 				if(xt >= image_info_.m_MCUSPerRow) {
 					xt = 0;
@@ -147,7 +148,7 @@ namespace img {
 		//-----------------------------------------------------------------//
 		picojpeg_in(PLOT& plot) noexcept : plot_(plot),
 			image_info_(),
-			status_(0), reduce_(false),
+			status_(0),
 			width_(0), height_(0)
 		{ }
 
@@ -267,12 +268,11 @@ namespace img {
 				return false;
 			}
 
-			reduce_ = false;
-
 			data_t t(fin);
 			t.file_ofs_  = 0;
 			t.file_size_ = fin.get_file_size();
-			status_ = pjpeg_decode_init(&image_info_, pjpeg_callback_, &t, reduce_);
+			uint8_t reduce = 0;
+			status_ = pjpeg_decode_init(&image_info_, pjpeg_callback_, &t, reduce);
 			if(status_) {
 				if(status_ == PJPG_UNSUPPORTED_MODE) {
 					utils::format("Progressive JPEG files are not supported.\n");
@@ -282,12 +282,13 @@ namespace img {
 				return false;
 			}
 
+#if 0
 			// In reduce mode output 1 pixel per 8x8 block.
 			width_  = reduce_ ?
 				(image_info_.m_MCUSPerRow * image_info_.m_MCUWidth)  / 8 : image_info_.m_width;
 			height_ = reduce_ ?
 				(image_info_.m_MCUSPerCol * image_info_.m_MCUHeight) / 8 : image_info_.m_height;
-
+#endif
 			return pixel_(fin);
 		}
 

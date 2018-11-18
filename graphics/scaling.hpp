@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <cmath>
 #include "common/vtx.hpp"
+#include <unordered_map>
 
 namespace img {
 
@@ -25,7 +26,15 @@ namespace img {
 
 		RENDER&		render_;
 
+		struct xy_pad {
+			uint32_t	r;
+			uint32_t	g;
+			uint32_t	b;
+			uint32_t	cnt;
+		};
 
+		typedef std::unordered_map<uint32_t, xy_pad> MAP;
+		MAP			map_;
 
 #if 0
 		static float sinc_(float l)
@@ -231,7 +240,12 @@ namespace img {
 #endif
 
 		vtx::spos	ofs_;
-		float		scale_;
+		struct step_t {
+			int32_t	up;
+			int32_t	dn;
+			step_t(uint32_t u = 0, uint32_t d = 1) noexcept : up(u), dn(d) { }
+		};
+		step_t		scale_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -242,7 +256,7 @@ namespace img {
 		//-----------------------------------------------------------------//
 		scaling(RENDER& render) noexcept : render_(render),
 //			lanczos_n_(0.0f),
-			ofs_(0), scale_(1.0f)
+			ofs_(0), scale_()
 		{ }
 
 
@@ -252,21 +266,21 @@ namespace img {
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
-		void set_offset(const vtx::spos& ofs = vtx::spos(0)) noexcept
-		{
-			ofs_ = ofs;
-		}
+		void set_offset(const vtx::spos& ofs = vtx::spos(0)) noexcept { ofs_ = ofs; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	スケールを設定
-			@param[in]	s	スケール
+			@param[in]	up		分子
+			@param[in]	dn		分母
 		*/
 		//-----------------------------------------------------------------//
-		void set_scale(float s = 1.0f) noexcept
+		void set_scale(uint32_t up = 1, uint32_t dn = 1) noexcept { scale_ = step_t(up, dn); }
+
+
+		void cleanup()
 		{
-			scale_ = s;
 		}
 
 
@@ -282,16 +296,43 @@ namespace img {
 		//-----------------------------------------------------------------//
 		void operator() (int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b) noexcept
 		{
-			int16_t xx = x;
-			int16_t yy = y;
-			if(scale_ < 1.0f) {
-				xx = static_cast<float>(x) * scale_;
-				yy = static_cast<float>(y) * scale_;
-			} else if(scale_ > 1.0f) {
-
-			}
 			auto c = RENDER::COLOR::rgb(r, g, b);
-			render_.plot(xx + ofs_.x, yy + ofs_.y, c);
+			if(scale_.up < scale_.dn) {
+				if(c == 0) c = 1;
+				auto xx = x * scale_.up / scale_.dn;
+				auto yy = y * scale_.up / scale_.dn;
+				auto rc = render_.get_plot(xx + ofs_.x, yy + ofs_.y);
+				if(rc == 0) {
+					render_.plot(xx + ofs_.x, yy + ofs_.y, c);
+				} else {
+					auto nc = render_.color_sum(c, rc);
+					render_.plot(xx + ofs_.x, yy + ofs_.y, nc);
+				}
+			} else if(scale_.up > scale_.dn) {
+				auto d  = scale_.up * 2 / scale_.dn;
+				if(d & 1) { d >>= 1; ++d; } else { d >>= 1; }
+				auto xx = x * scale_.up / scale_.dn;
+				auto yy = y * scale_.up / scale_.dn;
+				render_.fill_box(xx + ofs_.x, yy + ofs_.y, d, d, c); 				
+			} else {
+				render_.plot(x + ofs_.x, y + ofs_.y, c);
+			}
+#if 0
+			uint32_t key = static_cast<uint16_t>(xx) | (static_cast<uint16_t>(yy) << 16);
+			auto it = map_.find(key);
+			if(it != map_.end()) {
+//				it->first.r += r;
+//				it->first.g += g;
+//				it->first.b += b;
+//				++it->first.cnt;
+//				if(it->first.cnt >= 4) {
+//					auto c = RENDER::COLOR::rgb(r, g, b);
+//					render_.plot(xx + ofs_.x, yy + ofs_.y, c);					
+//				}
+			} else {
+				map_.emplace(r, g, b, 1);
+			}
+#endif
 		}
 	};
 }
