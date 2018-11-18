@@ -174,8 +174,8 @@ namespace chip {
 
 		void convert_touch_() noexcept
 		{
-			touch_id_  = touch_tmp_[0];
-			touch_num_ = touch_tmp_[1] & 0x0f;
+			touch_id_  = touch_tmp_[0];  // GEST_ID
+			touch_num_ = touch_tmp_[1] & 0x0f;  // TD_STATUS
 
 			xy_[0].before = xy_[0].event;
 			xy_[0].event = static_cast<EVENT>(touch_tmp_[2] >> 6);
@@ -193,12 +193,18 @@ namespace chip {
 			xy_[1].y = (static_cast<int16_t>(touch_tmp_[10] & 0x0F) << 8)
 				| static_cast<int16_t>(touch_tmp_[11]);
 
+			// イベントが不正なら、無効にする。
+//			if(xy_[0].event == EVENT::NONE || xy_[1].event == EVENT::NONE) {
+//				touch_num_ = 0;
+//			}
+#if 1
 			if(xy_[0].event == EVENT::DOWN || xy_[1].event == EVENT::DOWN) {
 				startup_ = true;
 			}
 			if(!startup_) {
 				touch_num_ = 0;
 			}
+#endif
 		}
 
 
