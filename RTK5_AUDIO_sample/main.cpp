@@ -450,7 +450,7 @@ int main(int argc, char** argv)
 		audio_.start();
 	}
 
-#if 0
+#if 1
 	// タッチパネルの安定待ち
 	{
 		render_.draw_text(0, 0, "Touch panel wait...");
