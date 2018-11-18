@@ -41,7 +41,7 @@ namespace device {
 			@brief  システム・クロックの設定
 		*/
 		//-------------------------------------------------------------//
-		static void setup_system_clock()
+		static void setup_system_clock() noexcept
 		{
 			device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
 
