@@ -45,6 +45,7 @@ INC_SYS		=	/mingw64/include
 
 INC_APP		=	. ../
 
+# OPTIMIZE	=	-m64bit-doubles -O3
 OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
