@@ -1,9 +1,11 @@
-Renesas Envision Kit RX65N ガジェット
+Renesas Envision Kit RX65N ガジェット（オーディオ・プレイヤー）
 =========
 ![R5F564ML](IMG_1239s.jpg)
 
 ## 概要
-Envision Kit RX65N で実現する簡易オーディオプレイヤー
+ - Envision Kit RX65N で実現する簡易オーディオプレイヤー
+ - WAV、MP3 形式のオーディオファイルの再生（最大：48KHz、16ビット）
+ - ID3 タグ情報の表示
    
 ## プロジェクト・リスト
  - main.cpp

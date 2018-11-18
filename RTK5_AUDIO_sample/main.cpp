@@ -116,6 +116,8 @@ namespace {
 	FT5206_I2C	ft5206_i2c_;
 	typedef chip::FT5206<FT5206_I2C> FT5206;
 	FT5206		ft5206_(ft5206_i2c_);
+	// INT to P02(IRQ10)
+
 
 	typedef audio::codec<SDC, RENDER> AUDIO;
 	AUDIO		audio_(sdc_, render_);
@@ -448,20 +450,25 @@ int main(int argc, char** argv)
 		audio_.start();
 	}
 
+#if 0
 	// タッチパネルの安定待ち
 	{
+		render_.draw_text(0, 0, "Touch panel wait...");
 		uint8_t nnn = 0;
 		while(1) {
 			glcdc_io_.sync_vpos();
 			ft5206_.update();
-			if(ft5206_.get_touch_num() == 0) {
+			auto num = ft5206_.get_touch_num();
+			if(num == 0) {
 				++nnn;
 				if(nnn >= 60) break;
 			} else {
+// utils::format("%d\n") % static_cast<uint16_t>(num);
 				nnn = 0;
 			}
 		}
 	}
+#endif
 
 	while(1) {
 		glcdc_io_.sync_vpos();

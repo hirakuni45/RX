@@ -105,8 +105,8 @@ namespace audio {
 					render_.swap_color();
 				} else {
 					if(ifo.width > 272 || ifo.height > 272) {
-						float sc = 272.0f / static_cast<float>(std::max(ifo.width, ifo.height));
-						scaling_.set_scale(sc);
+						auto n = static_cast<float>(std::max(ifo.width, ifo.height));
+						scaling_.set_scale(272, n);
 					}
 					jpeg_.load(fin);
 				}
