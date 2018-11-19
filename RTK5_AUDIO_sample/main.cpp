@@ -453,7 +453,7 @@ int main(int argc, char** argv)
 #if 1
 	// タッチパネルの安定待ち
 	{
-		render_.draw_text(0, 0, "Touch panel wait...");
+		render_.draw_text(0, 0, "Touch panel device wait...\nPlease touch it with some screen.");
 		uint8_t nnn = 0;
 		while(1) {
 			glcdc_io_.sync_vpos();
@@ -463,9 +463,9 @@ int main(int argc, char** argv)
 				++nnn;
 				if(nnn >= 60) break;
 			} else {
-// utils::format("%d\n") % static_cast<uint16_t>(num);
 				nnn = 0;
 			}
+			update_led_();
 		}
 	}
 #endif
