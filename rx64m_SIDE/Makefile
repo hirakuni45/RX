@@ -26,7 +26,7 @@ PSOURCES	=	main.cpp \
 				side/i8080opc.cpp \
 				side/i8080sub.cpp
 
-USER_LIBS	=	stdc++
+USER_LIBS	=	supc++
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
@@ -38,7 +38,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX64M
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
@@ -166,6 +166,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -P COM11 -d RX64M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)
