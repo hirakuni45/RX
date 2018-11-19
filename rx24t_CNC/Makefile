@@ -31,7 +31,7 @@ INC_SYS		=	/mingw64/include
 
 INC_APP		=	. ../
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
