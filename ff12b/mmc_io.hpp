@@ -540,6 +540,7 @@ namespace fatfs {
 							SEL::P = 1;
 						}
 						mount_ = false;
+						init_port_ = false;  // 再マウント
 					} else {
 						mount_ = true;
 					}
