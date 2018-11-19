@@ -23,3 +23,4 @@ libmad/
 !jpeg-6b/jmorecfg.h
 !jpeg-6b/libjpeg.a
 jpeg-6b/
+!zlib/libz.a
