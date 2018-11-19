@@ -88,6 +88,15 @@ namespace audio {
 
 		JPEG_IN		jpeg_;
 
+		int16_t render_text_(int16_t x, int16_t y, const char* text)
+		{
+			render_.swap_color();
+			auto xx = render_.draw_text(x, y, text);
+			render_.swap_color();
+			render_.draw_text(x+1, y+1, text);
+			return xx;
+		}
+
 		void sound_tag_task_(utils::file_io& fin, const sound::tag_t& tag)
 		{
 			render_.clear(RENDER::COLOR::Black);
@@ -117,18 +126,18 @@ namespace audio {
 			}
 
 			utils::format("Album:  '%s'\n") % tag.get_album().c_str();
-			render_.draw_text(0, 0 * 20, tag.get_album().c_str());
+			render_text_(0, 0 * 20, tag.get_album().c_str());
 			utils::format("Title:  '%s'\n") % tag.get_title().c_str();
-			render_.draw_text(0, 1 * 20, tag.get_title().c_str());
+			render_text_(0, 1 * 20, tag.get_title().c_str());
 			utils::format("Artist: '%s'\n") % tag.get_artist().c_str();
-			render_.draw_text(0, 2 * 20, tag.get_artist().c_str());
+			render_text_(0, 2 * 20, tag.get_artist().c_str());
 			utils::format("Year:    %s\n") % tag.get_year().c_str();
-			render_.draw_text(0, 3 * 20, tag.get_year().c_str());
+			render_text_(0, 3 * 20, tag.get_year().c_str());
 			utils::format("Disc:    %s\n") % tag.get_disc().c_str();
-			auto x = render_.draw_text(0, 4 * 20, tag.get_disc().c_str());
+			auto x = render_text_(0, 4 * 20, tag.get_disc().c_str());
 			if(x > 0) x += 8;
 			utils::format("Track:   %s\n") % tag.get_track().c_str();
-			render_.draw_text(x, 4 * 20, tag.get_track().c_str());
+			render_text_(x, 4 * 20, tag.get_track().c_str());
 		}
 
 
