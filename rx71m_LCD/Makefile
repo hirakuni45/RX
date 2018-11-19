@@ -35,16 +35,19 @@ INC_SYS		=
 
 INC_APP		=	. ../
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-O3
 
 AS_OPT		=	-mcpu=rx600 --defsym MEMWAIT=1
 
-CP_OPT		=	-Wall -Werror \
+# 	-m64bit-doubles
+CP_OPT		=	-mcpu=rx600 \
+				-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
 				-fno-exceptions
 
-CC_OPT		=	-Wall -Werror \
+CC_OPT		=	-mcpu=rx600 \
+				-Wall -Werror \
 				-Wno-unused-variable \
 				-fno-exceptions
 

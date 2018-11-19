@@ -17,7 +17,7 @@
 
 #include "chip/R61505.hpp"
 
-#include "raytracer.hpp"
+#include "../RTK5_RAYTRACER/raytracer.hpp"
 
 namespace {
 
@@ -37,6 +37,7 @@ namespace {
 
 	struct tft_rw {
 
+		typedef device::PORT<device::PORT0, device::bitpos::B2> RES;
 		typedef device::PORT<device::PORTA, device::bitpos::B1> RS;
 		typedef device::PORT<device::PORT5, device::bitpos::B2> RD;
 		typedef device::PORT<device::PORT5, device::bitpos::B0> WR;
@@ -46,14 +47,21 @@ namespace {
 
 		static void start() noexcept
 		{
+			RES::DIR = 1;
 			RS::DIR = 1;
 			RD::DIR = 1;
 			WR::DIR = 1;
 			CS::DIR = 1;
-			RS::P = 0;
+
 			CS::P = 1;
+			RES::P = 0;
+			RS::P = 0;
 			RD::P = 1;
 			WR::P = 1;
+
+			utils::delay::milli_second(10);
+			RES::P = 1;
+			utils::delay::milli_second(10);
 		}
 
 		static void write16(uint16_t val) noexcept {
@@ -76,7 +84,7 @@ namespace {
 			write16(val);
 			CS::P = 0;
 			WR::P = 0;
-			utils::delay::micro_second(1);
+			utils::delay::micro_second(2);
 			WR::P = 1;
 			CS::P = 1;
 		}
@@ -87,7 +95,7 @@ namespace {
 			DH::DIR = 0x00;
 			CS::P = 0;
 			RD::P = 0;
-			utils::delay::micro_second(1);
+			utils::delay::micro_second(2);
 			auto dat = read16();
 			RD::P = 1;
 			CS::P = 1;
@@ -99,17 +107,39 @@ namespace {
 
 	typedef chip::R61505<tft_rw> TFT;
 	TFT		tft_(tft_rw_);
+
+	volatile uint16_t fb_[320 * 240];
 }
 
 
 extern "C" {
 
+	inline void dummy_plot(int x, int y, uint16_t c)
+	{
+		if(x < 0 || x >= 320) return;
+		if(y < 0 || y >= 320) return;
+		fb_[y * 320 + x] = c;
+	}
+
 	void draw_pixel(int x, int y, int r, int g, int b)
 	{
-		uint16_t c = (static_cast<uint16_t>(r & 0xf8) << 8)
+		volatile uint16_t c = (static_cast<uint16_t>(r & 0xf8) << 8)
 				   | (static_cast<uint16_t>(g & 0xfc) << 3)
 				   | (static_cast<uint16_t>(b & 0xf8) >> 3);
-		tft_.plot(x, y, c);
+		
+//		tft_.plot(x, y, c);
+	}
+
+	void draw_text(int x, int y, const char* t)
+	{
+//		tft_.fill_box(x, y, strlen(t) * 8, 16, render_.get_back_color());
+//		tft_.draw_text(x, y, t);
+	}
+
+
+	uint32_t millis(void)
+	{
+		return cmt_.get_counter() * 10;
 	}
 
 	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
@@ -158,19 +188,18 @@ int main(int argc, char** argv)
 	tft_rw_.start();
 	if(tft_.start()) {
 		utils::format("Probe TFT OK to start...\n");
-
+#if 0
 		for(int y = 0; y < 32; ++y) {
 			for(int x = 0; x < 32; ++x) {
 				tft_.plot(x, y, 0xf00f);
 			}
 		}
-
-//		doRaytrace(4, 320, 240);
+#endif
+		doRaytrace(1, 320, 240);
 
 	} else {
 		utils::format("Probe TFT NG not start...\n");
 	}
-
 
 	LED::DIR = 1;
 	uint8_t cnt = 0;
