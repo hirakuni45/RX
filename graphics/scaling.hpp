@@ -11,7 +11,7 @@
 #include <cstdint>
 #include <cmath>
 #include "common/vtx.hpp"
-#include <unordered_map>
+// #include <unordered_map>
 
 namespace img {
 
@@ -33,8 +33,8 @@ namespace img {
 			uint32_t	cnt;
 		};
 
-		typedef std::unordered_map<uint32_t, xy_pad> MAP;
-		MAP			map_;
+//		typedef std::unordered_map<uint32_t, xy_pad> MAP;
+//		MAP			map_;
 
 #if 0
 		static float sinc_(float l)
