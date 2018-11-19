@@ -670,10 +670,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos>
 	struct bit_rw_t {
-		bool get() {
+		static bool get() {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & 1;
 		}
-		void set(bool v) {
+		static void set(bool v) {
 			if(v) {
 				T::write(T::read() | (1 << static_cast<typename T::value_type>(pos)));
 			} else {
@@ -681,7 +681,7 @@ namespace device {
 			}
 		}
 
-	    typename T::value_type b(bool v = true) {
+	    static typename T::value_type b(bool v = true) {
 			return static_cast<typename T::value_type>(v) << static_cast<typename T::value_type>(pos);
 		}
 
@@ -700,15 +700,15 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos, uint8_t len>
 	struct bits_rw_t {
-		typename T::value_type get() {
+		static typename T::value_type get() {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & ((1 << len) - 1);
 		}
-		void set(typename T::value_type v) {
+		static void set(typename T::value_type v) {
 			auto m = static_cast<typename T::value_type>(((1 << len) - 1) << static_cast<typename T::value_type>(pos));
 			T::write((T::read() & ~m) | (static_cast<typename T::value_type>(v) << static_cast<typename T::value_type>(pos)));
 		}
 
-	    typename T::value_type b(typename T::value_type v) {
+	    static typename T::value_type b(typename T::value_type v) {
 			return (((1 << len) - 1) & v) << static_cast<typename T::value_type>(pos);
 		}
 
@@ -727,11 +727,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos>
 	struct bit_ro_t {
-		bool get() {
+		static bool get() {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & 1;
 		}
 
-	    typename T::value_type b() {
+	    static typename T::value_type b() {
 			return 1 << static_cast<typename T::value_type>(pos);
 		}
 
@@ -749,11 +749,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class T, bitpos pos, uint8_t len>
 	struct bits_ro_t {
-		typename T::value_type get() {
+		static typename T::value_type get() {
 			return (T::read() >> static_cast<typename T::value_type>(pos)) & ((1 << len) - 1);
 		}
 
-	    typename T::value_type b(typename T::value_type v) {
+	    static typename T::value_type b(typename T::value_type v) {
 			return (((1 << len) - 1) & v) << static_cast<typename T::value_type>(pos);
 		}
 
@@ -775,14 +775,14 @@ namespace device {
 		using T::operator |=;
 		using T::operator &=;
 
-		bit_rw_t<T, bitpos::B7> B7;	///< B7 アクセス
-		bit_rw_t<T, bitpos::B6> B6;	///< B6 アクセス
-		bit_rw_t<T, bitpos::B5> B5;	///< B5 アクセス
-		bit_rw_t<T, bitpos::B4> B4;	///< B4 アクセス
-		bit_rw_t<T, bitpos::B3> B3;	///< B3 アクセス
-		bit_rw_t<T, bitpos::B2> B2;	///< B2 アクセス
-		bit_rw_t<T, bitpos::B1> B1;	///< B1 アクセス
-		bit_rw_t<T, bitpos::B0> B0;	///< B0 アクセス
+		static bit_rw_t<T, bitpos::B7> B7;	///< B7 アクセス
+		static bit_rw_t<T, bitpos::B6> B6;	///< B6 アクセス
+		static bit_rw_t<T, bitpos::B5> B5;	///< B5 アクセス
+		static bit_rw_t<T, bitpos::B4> B4;	///< B4 アクセス
+		static bit_rw_t<T, bitpos::B3> B3;	///< B3 アクセス
+		static bit_rw_t<T, bitpos::B2> B2;	///< B2 アクセス
+		static bit_rw_t<T, bitpos::B1> B1;	///< B1 アクセス
+		static bit_rw_t<T, bitpos::B0> B0;	///< B0 アクセス
 	};
 
 
@@ -797,13 +797,13 @@ namespace device {
 
 		using T::operator ();
 
-		bit_ro_t<T, bitpos::B7> B7;	///< B7 アクセス
-		bit_ro_t<T, bitpos::B6> B6;	///< B6 アクセス
-		bit_ro_t<T, bitpos::B5> B5;	///< B5 アクセス
-		bit_ro_t<T, bitpos::B4> B4;	///< B4 アクセス
-		bit_ro_t<T, bitpos::B3> B3;	///< B3 アクセス
-		bit_ro_t<T, bitpos::B2> B2;	///< B2 アクセス
-		bit_ro_t<T, bitpos::B1> B1;	///< B1 アクセス
-		bit_ro_t<T, bitpos::B0> B0;	///< B0 アクセス
+		static bit_ro_t<T, bitpos::B7> B7;	///< B7 アクセス
+		static bit_ro_t<T, bitpos::B6> B6;	///< B6 アクセス
+		static bit_ro_t<T, bitpos::B5> B5;	///< B5 アクセス
+		static bit_ro_t<T, bitpos::B4> B4;	///< B4 アクセス
+		static bit_ro_t<T, bitpos::B3> B3;	///< B3 アクセス
+		static bit_ro_t<T, bitpos::B2> B2;	///< B2 アクセス
+		static bit_ro_t<T, bitpos::B1> B1;	///< B1 アクセス
+		static bit_ro_t<T, bitpos::B0> B0;	///< B0 アクセス
 	};
 }
