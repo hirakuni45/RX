@@ -171,7 +171,7 @@ extern "C" {
 
 	void draw_pixel(int x, int y, int r, int g, int b)
 	{
-		uint16_t c = (static_cast<uint16_t>(r & 0xf8) << 8)
+		volatile uint16_t c = (static_cast<uint16_t>(r & 0xf8) << 8)
 				   | (static_cast<uint16_t>(g & 0xfc) << 3)
 				   | (static_cast<uint16_t>(b & 0xf8) >> 3);
 		render_.plot(x, y, c);
@@ -188,8 +188,6 @@ extern "C" {
 
 	uint32_t millis(void)
 	{
-		// x 16.6667
-//		return (glcdc_io_.get_vpos_count() * 4267) >> 8;
 		return cmt_.get_counter();
 	}
 

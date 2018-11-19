@@ -149,7 +149,7 @@ uint8_t trace(const ray& r, float& distance, vec3& normal)
     result = true;
     distance = d;
     result = FLOOR;
-    normal = vec3(0,0,1);
+    normal = vec3(0.0f,0.0f,1.0f);
   }
 
   // Test the objects in the scene to see if there's anything in the way
@@ -244,7 +244,7 @@ float sample(ray& r, vec3& color)
   const vec3 half = !(r.d+n*((n%r.d)*-2));
 
 // Vector that points towards the light
-  r.d = vec3(9+SH, 6+SH,16); // Where the light is
+  r.d = vec3(9.0f + SH, 6.0f + SH, 16.0f); // Where the light is
   r.d = !(r.d-r.o);          // Normalized light vector
 
   // Lambertian factor
@@ -316,7 +316,7 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
 
         // Calculate a ray through this pixel
         temp = !(target-camera);
-        vec3& right = r.o;   right = !(temp^vec3(0,0,1));
+        vec3& right = r.o;   right = !(temp^vec3(0.0f, 0.0f, 1.0f));
         vec3& up = r.d;      up = !(right^temp);
         r.d = !(temp + ((right*xpos)+(up*ypos))*pixel);  // Ray direction
         r.o = camera;                                    // Ray starts at the camera
