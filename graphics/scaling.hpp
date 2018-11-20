@@ -309,8 +309,7 @@ namespace img {
 					render_.plot(xx + ofs_.x, yy + ofs_.y, nc);
 				}
 			} else if(scale_.up > scale_.dn) {
-				auto d  = scale_.up * 2 / scale_.dn;
-				if(d & 1) { d >>= 1; ++d; } else { d >>= 1; }
+				auto d  = (scale_.up + (scale_.dn - 1)) / scale_.dn;
 				auto xx = x * scale_.up / scale_.dn;
 				auto yy = y * scale_.up / scale_.dn;
 				render_.fill_box(xx + ofs_.x, yy + ofs_.y, d, d, c); 				
