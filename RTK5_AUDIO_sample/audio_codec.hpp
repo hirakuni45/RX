@@ -113,10 +113,8 @@ namespace audio {
 					render_.draw_text(480 - 272, 0, "JPEG decode error.");
 					render_.swap_color();
 				} else {
-					if(ifo.width > 272 || ifo.height > 272) {
-						auto n = static_cast<float>(std::max(ifo.width, ifo.height));
-						scaling_.set_scale(272, n);
-					}
+					auto n = std::max(ifo.width, ifo.height);
+					scaling_.set_scale(272, n);
 					jpeg_.load(fin);
 				}
 				fin.seek(utils::file_io::SEEK::SET, pos);
