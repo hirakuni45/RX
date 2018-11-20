@@ -85,6 +85,8 @@ namespace graphics {
 		uint32_t	stipple_;
 		uint32_t	stipple_mask_;
 
+		vtx::spos	ofs_;
+
 		// 1/8 円を拡張して、全周に点を打つ
 		void circle_pset_(int16_t xc, int16_t yc, int16_t x, int16_t y, T c) noexcept
 		{
@@ -119,7 +121,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		render(T* org, KFONT& kf) noexcept : fb_(org), kfont_(kf),
 			fc_(COLOR::White), bc_(COLOR::Black),
-			code_(0), cnt_(0), stipple_(-1), stipple_mask_(1)
+			code_(0), cnt_(0), stipple_(-1), stipple_mask_(1), ofs_(0)
 		{ }
 
 
@@ -939,6 +941,31 @@ namespace graphics {
 			x += (w - len) / 2;
 			y += (h - font_height) / 2;
 			draw_text(x, y, text);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	オフセットを設定
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		void set_offset(const vtx::spos& ofs = vtx::spos(0)) noexcept { ofs_ = ofs; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	描画ファンクタ
+			@param[in]	x	X 座標
+			@param[in]	y	Y 座標
+			@param[in]	r	R カラー
+			@param[in]	g	G カラー
+			@param[in]	b	B カラー
+		*/
+		//-----------------------------------------------------------------//
+		void operator() (int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b) noexcept {
+			auto c = COLOR::rgb(r, g, b);
+			plot(x + ofs_.x, y + ofs_.y, c);			
 		}
 	};
 }
