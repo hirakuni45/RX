@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ルネサス RX 選択
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -57,7 +57,7 @@
 #include "RX63T/port_map.hpp"
 #include "RX63T/power_cfg.hpp"
 
-#elif defined(SIG_RX64M)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M)
 #include "RX600/peripheral.hpp"
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
@@ -146,51 +146,6 @@
 #include "RX65x/glcdc_io.hpp"
 #include "RX65x/drw2d.hpp"
 #include "RX65x/drw2d_mgr.hpp"
-#include "RX600/dmac_mgr.hpp"
-
-#elif defined(SIG_RX71M)
-#include "RX600/peripheral.hpp"
-#include "RX600/system.hpp"
-#include "RX600/system_io.hpp"
-#include "RX600/dmac.hpp"
-#include "RX600/exdmac.hpp"
-#include "RX600/port.hpp"
-#include "RX600/bus.hpp"
-#include "RX600/mpc.hpp"
-#include "RX600/icu.hpp"
-#include "RX600/icu_mgr.hpp"
-#include "RX600/tpu.hpp"
-#include "RX600/cmt.hpp"
-#include "RX600/cmtw.hpp"
-#include "RX600/mtu3.hpp"
-#include "RX600/sci.hpp"
-#include "RX600/scif.hpp"
-#include "RX600/riic.hpp"
-#include "RX600/can.hpp"
-#include "RX600/rspi.hpp"
-#include "RX600/qspi.hpp"
-#include "RX600/port_map.hpp"
-#include "RX600/power_cfg.hpp"
-#include "RX600/s12adc.hpp"
-#include "RX600/adc_io.hpp"
-#include "RX600/r12da.hpp"
-#include "RX600/dac_out.hpp"
-#include "RX600/sdram.hpp"
-#include "RX600/etherc.hpp"
-#include "RX600/edmac.hpp"
-#include "RX600/usb.hpp"
-#include "RX600/rtc.hpp"
-#include "RX600/rtc_io.hpp"
-#include "RX600/wdta.hpp"
-#include "RX600/flash.hpp"
-#include "RX600/flash_io.hpp"
-#include "RX600/ether_io.hpp"
-#include "RX600/ssi.hpp"
-#include "RX600/src.hpp"
-#include "RX600/sdhi.hpp"
-#include "RX600/sdhi_io.hpp"
-#include "RX600/standby_ram.hpp"
-#include "RX600/ssi_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 
 #else
