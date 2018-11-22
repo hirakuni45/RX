@@ -27,12 +27,6 @@
 
 namespace {
 
-	class null_task {
-	public:
-		void operator() () {
-		}
-	};
-
 	uint32_t adc_cnt_;
 
 	class adc_task {
@@ -42,7 +36,7 @@ namespace {
 		}
 	};
 
-	device::cmt_io<device::CMT0, null_task>  cmt_;
+	device::cmt_io<device::CMT0>  cmt_;
 
 	typedef utils::fixed_fifo<char, 128> buffer;
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
