@@ -612,15 +612,20 @@ namespace utils {
 
 			auto src = strrchr(filename, '.');
 			if(src == nullptr) return false;
+			++src;
 
 			auto ext = strchr(exts, ',');
 			if(ext == nullptr) {
 				return strcmp_no_caps(src, exts) == 0;
 			} else {
+				auto org = exts;
 				while(ext != nullptr) {
-					if(strcmp_no_caps(src, ext) == 0) return true;
-					ext = strchr(exts, ',');
+					if(strcmp_no_caps(src, org, ext - org) == 0) return true;
+					++ext;
+					org = ext;
+					ext = strchr(org, ',');
 				}
+				return strcmp_no_caps(src, org) == 0;
 			}
 			return false;
 		}
