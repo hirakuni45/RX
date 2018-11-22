@@ -88,6 +88,30 @@ namespace img {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	画像ファイルか確認する
+			@param[in]	fname	ファイル名
+			@return エラーなら「false」を返す
+		*/
+		//-----------------------------------------------------------------//
+		bool probe(const char* fname) noexcept {
+			if(fname == nullptr) return false;
+
+			if(!img_switch_(fname)) {
+				return false;
+			}
+
+			utils::file_io fin;
+			if(!fin.open(fname, "rb")) {
+				return false;
+			}
+			auto ret = probe(fin);
+			fin.close();
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	画像ファイルの情報を取得する
 			@param[in]	fin	file_io クラス
 			@param[in]	fo	情報を受け取る構造体
@@ -97,13 +121,38 @@ namespace img {
 		bool info(utils::file_io& fin, img::img_info& fo) noexcept {
 			switch(type_) {
 			case TYPE::BMP:
-				return bmp_.info(fin);
+				return bmp_.info(fin, fo);
 			case TYPE::JPEG:
-				return jpeg_.info(fin);
+				return jpeg_.info(fin, fo);
 			default:
 				break;
 			}
 			return false;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	画像ファイルの情報を取得する
+			@param[in]	fname	ファイル名
+			@param[in]	fo	情報を受け取る構造体
+			@return エラーなら「false」を返す
+		*/
+		//-----------------------------------------------------------------//
+		bool info(const char* fname, img::img_info& fo) noexcept {
+			if(fname == nullptr) return false;
+
+			if(!img_switch_(fname)) {
+				return false;
+			}
+
+			utils::file_io fin;
+			if(!fin.open(fname, "rb")) {
+				return false;
+			}
+			auto ret = info(fin, fo);
+			fin.close();
+			return ret;
 		}
 
 
@@ -130,9 +179,9 @@ namespace img {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	BMP ファイルをロードする
-			@param[in]	fin	ファイル I/O クラス
-			@param[in]	opt	フォーマット固有の設定文字列
+			@brief	画像ファイルをロードする
+			@param[in]	fname	ファイル名
+			@param[in]	opt		フォーマット固有の設定文字列
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
