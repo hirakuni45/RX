@@ -23,7 +23,8 @@ CSOURCES	=	common/init.c \
 				common/syscalls.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
-				common/time.c
+				common/time.c \
+				graphics/picojpeg.c
 
 PSOURCES	=	main.cpp \
 				RX600/icu_mgr.cpp \
@@ -53,6 +54,8 @@ CP_OPT		=	-Wall -Werror \
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
+				-Wno-unused-function \
+				-Wno-unused-but-set-variable \
 				-fno-exceptions
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
