@@ -243,7 +243,7 @@ namespace img {
 		struct step_t {
 			int32_t	up;
 			int32_t	dn;
-			step_t(uint32_t u = 0, uint32_t d = 1) noexcept : up(u), dn(d) { }
+			step_t(uint32_t u = 1, uint32_t d = 1) noexcept : up(u), dn(d) { }
 		};
 		step_t		scale_;
 
@@ -277,11 +277,6 @@ namespace img {
 		*/
 		//-----------------------------------------------------------------//
 		void set_scale(uint32_t up = 1, uint32_t dn = 1) noexcept { scale_ = step_t(up, dn); }
-
-
-		void cleanup()
-		{
-		}
 
 
 		//-----------------------------------------------------------------//
