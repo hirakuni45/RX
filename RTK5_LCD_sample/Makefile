@@ -60,7 +60,7 @@ PSOURCES	=	main.cpp \
 				graphics/font8x16.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	jpeg m supc++
+USER_LIBS	=	m supc++ z
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
@@ -71,9 +71,9 @@ MCU_TARGET	=
 # for boost
 INC_SYS		=	/mingw64/include
 
-INC_APP		=	. ../ ../jpeg-6b ../RX65x/drw_2d_ver1.02/inc/tes
+INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
 
-LIB_ROOT	=	../jpeg-6b
+LIB_ROOT	=	../zlib
 
 OPTIMIZE	=	-Os
 
