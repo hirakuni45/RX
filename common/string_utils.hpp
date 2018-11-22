@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	文字列操作ユーティリティー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -37,7 +37,7 @@ namespace utils {
 			@param[in]	lin	１行辺りの表示数
 		*/
 		//-----------------------------------------------------------------//
-		static void hex_dump(char* src, uint16_t num, uint8_t lin)
+		static void hex_dump(char* src, uint16_t num, uint8_t lin) noexcept
 		{
 			uint8_t l = 0;
 			for(uint16_t i = 0; i < num; ++i) {
@@ -63,7 +63,7 @@ namespace utils {
 			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool utf8_to_utf16(const char* src, WCHAR* dst, uint32_t dsz)
+		static bool utf8_to_utf16(const char* src, WCHAR* dst, uint32_t dsz) noexcept
 		{
 			uint32_t len = dsz / 2;
 			if(len <= 1) return false;
@@ -107,7 +107,7 @@ namespace utils {
 			@return 格納サイズ（０の場合エラー）
 		*/
 		//-----------------------------------------------------------------//
-		static uint32_t utf16_to_utf8(uint16_t code, char* dst, uint32_t dsz)
+		static uint32_t utf16_to_utf8(uint16_t code, char* dst, uint32_t dsz) noexcept
 		{
 			uint32_t len = 0;
 			if(code < 0x0080) {
@@ -142,7 +142,7 @@ namespace utils {
 			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool utf16_to_utf8(const WCHAR* src, char* dst, uint32_t dsz) 
+		static bool utf16_to_utf8(const WCHAR* src, char* dst, uint32_t dsz) noexcept
 		{
 			if(dsz <= 1) return false;
 
@@ -170,7 +170,7 @@ namespace utils {
 			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool sjis_to_utf8(const char* src, char* dst, uint32_t dsz)
+		static bool sjis_to_utf8(const char* src, char* dst, uint32_t dsz) noexcept
 		{
 			if(src == nullptr) return false;
 
@@ -220,7 +220,7 @@ namespace utils {
 			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool utf8_to_sjis(const char* src, char* dst, uint32_t dsz)
+		static bool utf8_to_sjis(const char* src, char* dst, uint32_t dsz) noexcept
 		{
 			int8_t cnt = 0;
 			uint16_t code = 0;
@@ -278,7 +278,7 @@ namespace utils {
 					bit4:0 ---> 秒/2が 0..29 の値で入ります。
 		*/
 		//-----------------------------------------------------------------//
-		static DWORD get_fattime(time_t t)
+		static DWORD get_fattime(time_t t) noexcept
 		{
 			struct tm *tp = localtime(&t);
 
@@ -311,7 +311,7 @@ namespace utils {
 			@return GMT 標準時間値
 		*/
 		//-----------------------------------------------------------------//
-		static time_t fatfs_time_to(WORD date, WORD time)
+		static time_t fatfs_time_to(WORD date, WORD time) noexcept
 		{
 			struct tm ttm;
 			// ftime
@@ -343,7 +343,7 @@ namespace utils {
 			@return ワード数を返す
         */
         //-----------------------------------------------------------------//
-		static uint16_t get_words(const char* src)
+		static uint16_t get_words(const char* src) noexcept
 		{
 			if(src == nullptr) return 0;
 
@@ -381,7 +381,7 @@ namespace utils {
 			@return 取得できたら「true」を返す
         */
         //-----------------------------------------------------------------//
-		static bool get_word(const char* src, uint16_t argc, char* dst, uint16_t size) 
+		static bool get_word(const char* src, uint16_t argc, char* dst, uint16_t size) noexcept 
 		{
 			if(src == nullptr || dst == nullptr) return false;
 
@@ -423,7 +423,7 @@ namespace utils {
 			@return 
         */
         //-----------------------------------------------------------------//
-		static bool cmp_word(const char* src, uint16_t argc, const char* key)
+		static bool cmp_word(const char* src, uint16_t argc, const char* key) noexcept
 		{
 			if(src == nullptr) return false;
 			if(key == nullptr) return false;
@@ -461,7 +461,7 @@ namespace utils {
 			@return 出力数
 		*/
 		//-----------------------------------------------------------------//
-		static uint32_t url_encode_to_str(const char* src, char* dst, uint32_t len = 0)
+		static uint32_t url_encode_to_str(const char* src, char* dst, uint32_t len = 0) noexcept
 		{
 			char ch;
 			uint8_t hex = 0;
@@ -501,7 +501,7 @@ namespace utils {
 			@return 出力数
 		*/
 		//-----------------------------------------------------------------//
-		static uint32_t url_decode_to_str(const char* src, char* dst, uint32_t len = 0)
+		static uint32_t url_decode_to_str(const char* src, char* dst, uint32_t len = 0) noexcept
 		{
 			char ch;
 			uint32_t l = 0;
@@ -541,7 +541,7 @@ namespace utils {
 			@return 出力数
 		*/
 		//-----------------------------------------------------------------//
-		static uint32_t conv_pass_cha(char cha, const char* src, char* dst, uint32_t len = 0)
+		static uint32_t conv_pass_cha(char cha, const char* src, char* dst, uint32_t len = 0) noexcept
 		{
 			char ch;
 			uint32_t l = 0;
@@ -552,6 +552,77 @@ namespace utils {
 			}
 			*dst = 0;
 			return l + 1;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  大文字、小文字を区別しない文字列の比較 @n
+					※安全性を確保する貯め、NULL チェックを入れてある。 @n
+					※最新のコンパイラでは、NULL チェックが二重になっても最適化で無くなる。
+			@param[in]	src		文字列
+			@param[in]	cmp		比較文字列
+			@param[in]	len		比較文字数を指定する場合（０の場合必ず成功「０」する）
+			@return 「strcmp」と同等の結果
+		*/
+		//-----------------------------------------------------------------//
+		static int strcmp_no_caps(const char* src, const char* cmp, int len = -1) noexcept
+		{
+			if(src == nullptr || cmp == nullptr) return -1;
+
+			char c1 = 0;
+			char c2 = 0;
+			if(len < 0) {
+				do {
+					c1 = *src++;
+					if(c1 >= 'a' && c1 <= 'z') c1 -= 0x20; 
+					c2 = *cmp++;
+					if(c2 >= 'a' && c2 <= 'z') c2 -= 0x20; 
+					if(c1 == '\0') {
+						break;
+					}
+				} while(c1 == c2) ;
+			} else {
+				while(len > 0) {
+					c1 = *src++;
+					if(c1 >= 'a' && c1 <= 'z') c1 -= 0x20; 
+					c2 = *cmp++;
+					if(c2 >= 'a' && c2 <= 'z') c2 -= 0x20; 
+					if(c1 == '\0' || c1 != c2) {
+						break;
+					}
+					--len;
+				}
+			}
+			return static_cast<uint8_t>(c1) - static_cast<uint8_t>(c2);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  拡張子を識別
+			@param[in]	filename	ファイル名（フルパス）
+			@param[in]	exts		拡張子テーブル（「,」で区切られた文字列）
+			@return 有効な拡張子なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static bool scan_ext(const char* filename, const char* exts) noexcept
+		{
+			if(filename == nullptr || exts == nullptr) return false;
+
+			auto src = strrchr(filename, '.');
+			if(src == nullptr) return false;
+
+			auto ext = strchr(exts, ',');
+			if(ext == nullptr) {
+				return strcmp_no_caps(src, exts) == 0;
+			} else {
+				while(ext != nullptr) {
+					if(strcmp_no_caps(src, ext) == 0) return true;
+					ext = strchr(exts, ',');
+				}
+			}
+			return false;
 		}
 	};
 
