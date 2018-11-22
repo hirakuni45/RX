@@ -25,6 +25,7 @@
 #include "chip/FT5206.hpp"
 
 #include "graphics/picojpeg_in.hpp"
+#include "graphics/img_in.hpp"
 #include "graphics/scaling.hpp"
 
 // #define SOFT_I2C
@@ -118,8 +119,8 @@ namespace {
 
 	typedef img::scaling<RENDER> PLOT;
 	PLOT		plot_(render_);
-	typedef img::picojpeg_in<PLOT> JPEG_IN;
-	JPEG_IN		jpeg_(plot_);
+	typedef img::img_in<PLOT> IMG_IN;
+	IMG_IN		imgs_(plot_);
 
 	utils::command<256> cmd_;
 
@@ -167,18 +168,18 @@ namespace {
 			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
 				utils::format("%s\n") % sdc_.get_current();
 				f = true;
-			} else if(cmd_.cmp_word(0, "jpeg")) { // jpeg load, draw
+			} else if(cmd_.cmp_word(0, "image")) { // image load, draw
 				if(cmdn >= 2) {
 					char tmp[128];
 					cmd_.get_word(1, tmp, sizeof(tmp));
-					jpeg_.load(tmp);
+					imgs_.load(tmp);
 				}
 				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    dir [path]\n");
 				utils::format("    cd [path]\n");
 				utils::format("    pwd\n");
-				utils::format("    jpeg [filename]\n");
+				utils::format("    image [filename]\n");
 				f = true;
 			}
 			if(!f) {
