@@ -60,19 +60,15 @@ namespace app {
 			if(count_ > 0) {
 				--count_;
 				if(!logo_ && fatfs_get_mount() != 0) {
-					auto& bmp = at_scenes_base().at_bmp();
-					utils::file_io fin;
-//					if(fin.open("wim02.bmp", "rb")) {
-					if(fin.open("HRC_logo_s.bmp", "rb")) {
-						img::img_info ifo;
-						if(bmp.info(fin, ifo)) {
-							int16_t xo = (RENDER::width  - ifo.width) / 2;
-							int16_t yo = (RENDER::height - ifo.height) / 2;
-							bmp.set_draw_offset(xo, yo);
-							logo_ = bmp.load(fin);
-							if(logo_) count_ = 90;
-						}
-						fin.close();
+					auto& im = at_scenes_base().at_img();
+					static const char* fname = { "HRC_logo_s.bmp" };
+					img::img_info ifo;
+					if(im.info(fname, ifo)) {
+						int16_t xo = (RENDER::width  - ifo.width) / 2;
+						int16_t yo = (RENDER::height - ifo.height) / 2;
+						at_scenes_base().at_plot().set_offset(vtx::spos(xo, yo));
+						logo_ = im.load(fname);
+						if(logo_) count_ = 90;
 					}
 				}
 			} else {

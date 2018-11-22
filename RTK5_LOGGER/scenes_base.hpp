@@ -14,8 +14,9 @@
 #define CASH_KFONT
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
-#include "graphics/jpeg_in.hpp"
-#include "graphics/bmp_in.hpp"
+#include "graphics/picojpeg_in.hpp"
+#include "graphics/scaling.hpp"
+#include "graphics/img_in.hpp"
 #include "graphics/menu.hpp"
 #include "chip/FT5206.hpp"
 
@@ -110,9 +111,8 @@ namespace app {
 		};
 		typedef graphics::menu<RENDER, BACK, 8> MENU;
 
-
-		typedef image::bmp_in<RENDER> BMP_IN;
-
+		typedef img::scaling<RENDER> PLOT;
+		typedef img::img_in<PLOT> IMG_IN;
 
 		// CMT 1/100 秒計測
 		class watch_task {
@@ -181,7 +181,8 @@ namespace app {
 
 		RESOURCE	resource_;
 
-		BMP_IN		bmp_in_;
+		PLOT		plot_;
+		IMG_IN		img_in_;
 
 	public:
 		//-------------------------------------------------------------//
@@ -191,7 +192,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		scenes_base() noexcept : render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_),
 			ft5206_(ft5206_i2c_), menu_(render_, back_), back_(render_), resource_(render_),
-			bmp_in_(render_) { }
+			plot_(render_), img_in_(plot_) { }
 
 
 		//-------------------------------------------------------------//
@@ -317,11 +318,20 @@ namespace app {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	BMP_IN の参照
-			@return BMP_IN
+			@brief	PLOT の参照
+			@return PLOT
 		*/
 		//-------------------------------------------------------------//
-		BMP_IN& at_bmp() noexcept { return bmp_in_; }
+		PLOT& at_plot() noexcept { return plot_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	IMG_IN の参照
+			@return IMG_IN
+		*/
+		//-------------------------------------------------------------//
+		IMG_IN& at_img() noexcept { return img_in_; }
 	};
 }
 
