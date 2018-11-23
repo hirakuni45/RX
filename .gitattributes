@@ -1,3 +1,6 @@
-*/*.c linguist-vendored
-*/*/*.c linguist-vendored
-*/*/*/*.c linguist-vendored
+RTK5_NESEMU/emu linguist-vendored
+ff12b/src linguist-vendored
+zlib linguist-vendored
+libmad linguist-vendored
+jpeg-6b linguist-vendored
+RX65x/drw_2d_ver1.02 linguist-vendored
