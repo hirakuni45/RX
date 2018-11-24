@@ -35,7 +35,7 @@ namespace graphics {
 			return
 				(static_cast<uint16_t>(r & 0xf8) << 8)
 			  | (static_cast<uint16_t>(g & 0xfc) << 3)
-			  | (static_cast<uint16_t>(b & 0xf8) >> 3);
+			  | (static_cast<uint16_t>(b) >> 3);
 		}
 
 
