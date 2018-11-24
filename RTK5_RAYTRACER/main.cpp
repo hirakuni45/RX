@@ -171,9 +171,7 @@ extern "C" {
 
 	void draw_pixel(int x, int y, int r, int g, int b)
 	{
-		volatile uint16_t c = (static_cast<uint16_t>(r & 0xf8) << 8)
-				   | (static_cast<uint16_t>(g & 0xfc) << 3)
-				   | (static_cast<uint16_t>(b & 0xf8) >> 3);
+		auto c = RENDER::COLOR::rgb(r, g, b);
 		render_.plot(x, y, c);
 	}
 
