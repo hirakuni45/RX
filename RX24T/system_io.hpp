@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include "RX24T/system.hpp"
+#include "RX24T/flash.hpp"
 
 #ifndef F_ICLK
 #  error "system_io.hpp requires F_ICLK to be defined"
@@ -33,7 +34,7 @@ namespace device {
 		//-------------------------------------------------------------//
 		static bool setup_system_clock()
 		{
-			device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
+			device::SYSTEM::PRCR = 0xA500 | 0b0111;	// クロック、低消費電力、関係書き込み許可
 
 			// メモリーの WAIT 設定
 			if(F_ICLK > 64000000) {
@@ -86,6 +87,12 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKD.b(pckd);	 // Max: 40MHz
 
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	// PLL 選択
+
+			// クロック関係書き込み不許可
+			device::SYSTEM::PRCR = 0xA500;
+
+			// ROM キャッシュを有効（標準）
+			device::FLASH::ROMCE = 1;
 
 			return true;
 		}
