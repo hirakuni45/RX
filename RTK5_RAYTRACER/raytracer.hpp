@@ -21,6 +21,9 @@ extern "C" {
 	uint32_t millis(void);
 };
 
+// https://en.wikipedia.org/wiki/Fast_inverse_square_root
+#define FAST_INV_SQRT
+
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX24T)
 static inline float sqrtf_(float x)
 {
@@ -99,6 +102,25 @@ static const float spheres[] = {
    0, 9,5,   1,     2
 };
 
+#ifdef FAST_INV_SQRT
+static inline float Q_rsqrt( float number )
+{
+	union {
+		float f;
+		uint32_t i;
+	} conv;
+	
+	float x2;
+	const float threehalfs = 1.5F;
+
+	x2 = number * 0.5F;
+	conv.f  = number;
+	conv.i  = 0x5f3759df - ( conv.i >> 1 );
+	conv.f  = conv.f * ( threehalfs - ( x2 * conv.f * conv.f ) );
+	return conv.f;
+}
+#endif
+
 /*------------------------------------------------------------------------
   A 3D vector class
 ------------------------------------------------------------------------*/
@@ -111,7 +133,12 @@ struct vec3 {
   vec3 operator*(float s)       const { return vec3(x*s,y*s,z*s);        }    // Vector scale
   float operator%(const vec3& v)const { return x*v.x+y*v.y+z*v.z;        }    // Scalar product
   vec3 operator^(const vec3& v) const { return vec3(y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x);  } // Vector product
-  vec3 operator!()              const { return *this*(1.0f/sqrtf_(*this%*this));  }  // Normalized vector
+
+#ifdef FAST_INV_SQRT
+  vec3 operator!()              const { return *this*(Q_rsqrt(*this%*this)); }  // Normalized
+#else
+  vec3 operator!()              const { return *this*(1.0f/sqrtf_(*this%*this)); }  // Normalized vector
+#endif
   void operator+=(const vec3& v)      { x+=v.x;  y+=v.y;  z+=v.z;        }
   void operator*=(float s)            { x*=s;    y*=s;    z*=s;          }
 };
