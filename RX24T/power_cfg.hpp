@@ -29,6 +29,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void turn(peripheral t, bool ena = true)
 		{
+			device::SYSTEM::PRCR = 0xA500 | 0b0010;	// 低消費電力機能
+
 			bool f = !ena;
 			switch(t) {
 			case peripheral::DTC:
@@ -125,6 +127,7 @@ namespace device {
 			default:
 				break;
 			}
+			device::SYSTEM::PRCR = 0xA500;
 		}
 	};
 }
