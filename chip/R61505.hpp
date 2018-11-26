@@ -32,6 +32,7 @@ namespace chip {
 
 		void write_list_(const uint16_t* list, uint16_t size)
 		{
+			rw_.enable();
 			for(uint16_t i = 0; i < size; ++i) {
 				auto cmd = *list++;
 				auto dat = *list++;
@@ -42,6 +43,7 @@ namespace chip {
 					rw_.write(dat, 1);
 				}
 			}
+			rw_.enable(false);
 		}
 
 	public:
@@ -62,8 +64,10 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		bool start()
 		{
+			rw_.enable();
 			rw_.write(0x00, 0);  // command register index
 			auto id = rw_.read();
+			rw_.enable(false);
 			utils::format("ID: %04X\n") % id;
 
 			switch(id) {
@@ -74,6 +78,57 @@ namespace chip {
 				return false;
 			}
 
+
+			static const uint16_t R61505_init_list_[] = {
+				//R61505W (TFT1N3204-E)
+				0x0000, 0x0001,
+				0x0007, 0x0000,
+				0x0010, 0x0410,
+				0x0011, 0x0237,
+				0x0012, 0x0199,
+				0x0013, 0x1100,
+				DELAY,  150,
+				0x0012, 0x01b9,
+				0x0002, 0x0200,
+// #if LCD_ALIGNMENT == VERTICAL
+//				0x0001, 0x0100,
+//				0x0003, 0x1030,
+// #elif LCD_ALIGNMENT == HORIZONTAL
+				0x0001, 0x0000,
+				0x0003, 0x1028,
+//#endif
+				0x0008, 0x0808,
+				0x0009, 0x0001,
+				0x000a, 0x0000,
+				0x000c, 0x0000,    // interface?
+				0x000d, 0x0000,
+				0x000e, 0x0030,
+				0x0030, 0x0214,
+				0x0031, 0x3715,
+				0x0032, 0x0604,
+				0x0033, 0x0e16,
+				0x0034, 0x2211,
+				0x0035, 0x1500,
+				0x0036, 0x8507,
+				0x0037, 0x1407,
+				0x0038, 0x1403,
+				0x0039, 0x0020,
+				0x0050, 0x0000,
+				0x0051, 0x00ef,
+				0x0052, 0x0000,
+				0x0053, 0x013f,
+				0x0060, 0x2700,
+				0x0061, 0x0003,
+				0x006a, 0x0000,
+				0x0090, 0x0015,
+				0x0092, 0x0100,
+				0x0093, 0x0701,
+				0x0020, 0x0000,
+				0x0021, 0x0000,
+				DELAY,  80,
+				0x0007, 0x0100,
+			};
+#if 0
 			static const uint16_t R61505_init_list_[] = {
 				0x0000, 0x0000,
 				0x0000, 0x0000,
@@ -121,12 +176,14 @@ namespace chip {
 				0x0082, 0x005F,
 				0x0092, 0x0100,
 				0x0093, 0x0701,
-
 				DELAY,  80,
-				0x0007, 0x0100,     //BASEE=1--Display On
+				0x0007, 0x0100,     //BASEE=1--Display O
 	        };
 //				0x000C, 0x0001,     // 16bits interface
+#endif
 			write_list_(R61505_init_list_, sizeof(R61505_init_list_) / sizeof(uint16_t) / 2);
+
+			utils::delay::milli_second(30);
 
 			return true;
 		}
