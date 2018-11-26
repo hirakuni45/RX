@@ -22,15 +22,6 @@ namespace imath {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class circle {
 
-		static inline float sqrtf_(float x)
-		{
-			__asm __volatile(
-				"fsqrt %0, %0\n" \
-				: "+r"(x) \
-			);
-			return x;
-		}
-
 		vtx::ipos	start_;
 		vtx::ipos	center_;
 		vtx::ipos	term_;
@@ -173,25 +164,25 @@ namespace imath {
 			case 7:
 				if(cw_) pos_.x += 2;
 				else pos_.x -= 2;
-				pos_.y = sqrtf_(rad_sqr_ - pos_.x * pos_.x);
+				pos_.y = vtx::fsqrt(rad_sqr_ - pos_.x * pos_.x);
 				break;
 			case 1:
 			case 2:
 				if(cw_) pos_.y -= 2;
 				else pos_.y += 2;
-				pos_.x = sqrtf_(rad_sqr_ - pos_.y * pos_.y);
+				pos_.x = vtx::fsqrt(rad_sqr_ - pos_.y * pos_.y);
 				break;
 			case 3:
 			case 4:
 				if(cw_) pos_.x -= 2;
 				else pos_.x += 2;
-				pos_.y = -sqrtf_(rad_sqr_ - pos_.x * pos_.x);
+				pos_.y = -vtx::fsqrt(rad_sqr_ - pos_.x * pos_.x);
 				break;
 			case 5:
 			case 6:
 				if(cw_) pos_.y += 2;
 				else pos_.y -= 2;
-				pos_.x = -sqrtf_(rad_sqr_ - pos_.y * pos_.y);
+				pos_.x = -vtx::fsqrt(rad_sqr_ - pos_.y * pos_.y);
 				break;
 			}
 			if(oct != oct_) return false;
