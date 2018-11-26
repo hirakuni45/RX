@@ -506,7 +506,7 @@ extern "C" {
 }
 
 //-----
-{  // メイン、出力
+{  // メイン、SCI 出力
     utils::format("Start SCI\n");
 }
 ```
