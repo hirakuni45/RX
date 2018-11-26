@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	各種頂点の定義 @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/glfw_app/blob/master/LICENSE
 */
@@ -16,6 +16,23 @@
 #include <cstdint>
 
 namespace vtx {
+
+// note: 通常のマシンでは、float 型より double 型の方が高速だが、リソースが限られた
+//       マシンでは、その傾向は逆転する。
+//       RXv2 コアでは、float 型は高速だが double 型は遅い。
+//       RXv2 コアには、「fsqrt」（float 型専用の平方根命令がある）
+#if defined(SIG_RX24T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+	inline float fsqrt(float x)
+	{
+		__asm __volatile(
+			"fsqrt %0, %0\n" \
+			: "+r"(x) \
+		);
+		return x;
+	}
+#else
+	inline float fsqrt(float x) { return std::sqrtf(x); }
+#endif
 
 	template <typename T>
 	T get_pi() { return static_cast<T>(3.1415926535897932384626433832795); }
@@ -214,7 +231,7 @@ namespace vtx {
 		inline T sqrX() const { return x * x; }
 		inline T sqrY() const { return y * y; }
 		inline T sqr() const { return sqrX() + sqrY(); }
-		inline T len() const { return std::sqrt(sqr()); }
+		inline T len() const { return fsqrt(sqr()); }
 
 		inline T min() const { return x < y ? x : y; }
 		inline T max() const { return x > y ? x : y; }
@@ -364,7 +381,7 @@ namespace vtx {
 		inline T sqrY() const { return y * y; }
 		inline T sqrZ() const { return z * z; }
 		inline T sqr() const { return sqrX() + sqrY() + sqrZ(); }
-		inline T len() const { return std::sqrt(sqr()); }
+		inline T len() const { return fsqrt(sqr()); }
 
 		inline T min() const {
 			if(x < y) {
@@ -539,7 +556,7 @@ namespace vtx {
 		inline T sqrZ() const { return z * z; }
 		inline T sqrW() const { return w * w; }
 		inline T sqr() const { return (sqrX() + sqrY() + sqrZ() + sqrW()); }
-		inline T len() const { return std::sqrt(sqrX() + sqrY() + sqrZ() + sqrW()); }
+		inline T len() const { return fsqrt(sqrX() + sqrY() + sqrZ() + sqrW()); }
 
 		inline T min() const {
 			if(x < y) {
