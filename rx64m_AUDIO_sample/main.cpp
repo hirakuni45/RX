@@ -82,7 +82,7 @@ namespace {
 
 	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   ///< ハードウェアー定義
 
-	MMC		sdh_(spi_, 20000000);
+	MMC		sdh_(spi_, 25000000);
 
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
@@ -177,14 +177,14 @@ namespace {
 	}
 
 
-	void sound_tag_task_(const sound::tag_t& tag)
+	void sound_tag_task_(utils::file_io& fin, const sound::tag_t& tag)
 	{
-		utils::format("Album:  '%s'\n") % tag.album_.c_str();
-		utils::format("Title:  '%s'\n") % tag.title_.c_str();
-		utils::format("Artist: '%s'\n") % tag.artist_.c_str();
-		utils::format("Year:    %s\n") % tag.year_.c_str();
-		utils::format("Disc:    %s\n") % tag.disc_.c_str();
-		utils::format("Track:   %s\n") % tag.track_.c_str();
+		utils::format("Album:  '%s'\n") % tag.get_album().c_str();
+		utils::format("Title:  '%s'\n") % tag.get_title().c_str();
+		utils::format("Artist: '%s'\n") % tag.get_artist().c_str();
+		utils::format("Year:    %s\n") % tag.get_year().c_str();
+		utils::format("Disc:    %s\n") % tag.get_disc().c_str();
+		utils::format("Track:   %s\n") % tag.get_track().c_str();
 	}
 
 
