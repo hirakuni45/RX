@@ -128,22 +128,21 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t speed, PHASE ctype, DLEN dlen, uint8_t level = 0) noexcept
 		{
-			level_ = level;
+			uint8_t brdv;
+			uint8_t spbr;
+			if(!clock_div_(speed, brdv, spbr)) {
+				return false;
+			}
 
-			// デバイスを不許可
-			QSPI::SPCR = 0x00;
+			power_cfg::turn(QSPI::get_peripheral());
 
 			// ポートを有効にする
 			port_map::turn(QSPI::get_peripheral(), true, PSEL);
 
-			bool f = true;
-			uint8_t brdv;
-			uint8_t spbr;
-			if(!clock_div_(speed, brdv, spbr)) {
-				f = false;
-			}
+			level_ = level;
 
-			power_cfg::turn(QSPI::get_peripheral());
+			// デバイスを不許可
+//			QSPI::SPCR = 0x00;
 
 			// 設定
 		    QSPI::SPBR = spbr;
@@ -177,7 +176,7 @@ namespace device {
 
 			QSPI::SPCR.SPE = 1;
 
-			return f;
+			return true;
 		}
 
 
