@@ -456,6 +456,61 @@ int main(int argc, char** argv)
 }
 ```
    
+---
+   
+☆以下は C++ 的 SCI で通信するプログラム例です。   
+(1) SCI の設定に関する部分のみで、他は LED 点滅プログラムと共通です。   
+(2) SCI の標準ポートは、port_map.hpp により定義されており、選択するポートが複数ある場合
+「第二候補」や「第三候補」を設定すればよく、面倒な設定を行う必要はありません。
+(3) ボーレートは整数で設定すれば良く、内部で、設定周波数から自動的に計算されます。   
+(4) 割り込みを使う場合でも、使わない場合（ポーリング）でも使う事が出来ます。   
+(5) 送信、受信は、固定長 FIFO クラスを通して行われ、サイズは、自由に定義する事が出来ます。   
+```
+#include "common/fixed_fifo.hpp"
+#include "common/sci_io.hpp"
+#include "common/format.hpp"
+
+namespace {
+
+//  SCI9 を使用
+    typedef device::SCI9 SCI_CH;
+
+    typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
+    typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
+
+    typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
+// SCI ポートの第二候補を選択する場合
+//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
+    SCI     sci_;
+}
+
+extern "C" {
+
+    // syscalls.c から呼ばれる、標準出力（stdout, stderr）
+    void sci_putch(char ch) { sci_.putch(ch); }
+
+    void sci_puts(const char* str) { sci_.puts(str); }
+
+    // syscalls.c から呼ばれる、標準入力（stdin）
+    char sci_getch(void) { return sci_.getch(); }
+
+    uint16_t sci_length() { return sci_.recv_length(); }
+}
+
+//-----
+
+{  // メイン、SCI 開始
+    uint8_t intr = 2;        // 割り込みレベル
+    uint32_t baud = 115200;  // ボーレート
+    sci_.start(baud, intr);
+}
+
+//-----
+{  // メイン、出力
+    utils::format("Start SCI\n");
+}
+```
+   
 -----
    
 License
