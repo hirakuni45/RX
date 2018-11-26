@@ -277,229 +277,255 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  システムクロックコントロールレジスタ 3（SCKCR3）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw16_t<0x00080026> sckcr3_io;
-		struct sckcr3_t : public sckcr3_io {
-			using sckcr3_io::operator =;
-			using sckcr3_io::operator ();
-			using sckcr3_io::operator |=;
-			using sckcr3_io::operator &=;
+		template <uint32_t base>
+		struct sckcr3_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<sckcr3_io, bitpos::B8, 3> CKSEL;
+			bits_rw_t<io_, bitpos::B8, 3> CKSEL;
 		};
-		static sckcr3_t SCKCR3;
+		static sckcr3_t<0x00080026> SCKCR3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  PLL コントロールレジスタ（PLLCR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw16_t<0x00080028> pllcr_io;
-		struct pllcr_t : public pllcr_io {
-			using pllcr_io::operator =;
-			using pllcr_io::operator ();
-			using pllcr_io::operator |=;
-			using pllcr_io::operator &=;
+		template <uint32_t base>
+		struct pllcr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<pllcr_io, bitpos::B0, 2> PLIDIV;
-			bit_rw_t <pllcr_io, bitpos::B4>    PLLSRCSEL;
-			bits_rw_t<pllcr_io, bitpos::B8, 6> STC;
+			bits_rw_t<io_, bitpos::B0, 2> PLIDIV;
+			bit_rw_t <io_, bitpos::B4>    PLLSRCSEL;
+			bits_rw_t<io_, bitpos::B8, 6> STC;
 		};
-		static pllcr_t PLLCR;
+		static pllcr_t<0x00080028> PLLCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  PLL コントロールレジスタ 2（PLLCR2）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x0008002A> pllcr2_io;
-		struct pllcr2_t : public pllcr2_io {
-			using pllcr2_io::operator =;
-			using pllcr2_io::operator ();
-			using pllcr2_io::operator |=;
-			using pllcr2_io::operator &=;
+		template <uint32_t base>
+		struct pllcr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<pllcr2_io, bitpos::B0> PLLEN;
+			bit_rw_t<io_, bitpos::B0> PLLEN;
 		};
-		static pllcr2_t PLLCR2;
+		static pllcr2_t<0x0008002A> PLLCR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  外部バスクロックコントロールレジスタ（BCKCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x00080030> bckcr_io;
-		struct bckcr_t : public bckcr_io {
-			using bckcr_io::operator =;
-			using bckcr_io::operator ();
-			using bckcr_io::operator |=;
-			using bckcr_io::operator &=;
+		template <uint32_t base>
+		struct bckcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<bckcr_io, bitpos::B0> BCLKDIV;
+			bit_rw_t<io_, bitpos::B0> BCLKDIV;
 		};
-		static bckcr_t BCKCR;
+		static bckcr_t<0x00080030> BCKCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  メインクロック発振器コントロールレジスタ（MOSCCR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x00080032> mosccr_io;
-		struct mosccr_t : public mosccr_io {
-			using mosccr_io::operator =;
-			using mosccr_io::operator ();
-			using mosccr_io::operator |=;
-			using mosccr_io::operator &=;
+		template <uint32_t base>
+		struct mosccr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<mosccr_io, bitpos::B0> MOSTP;
+			bit_rw_t<io_, bitpos::B0> MOSTP;
 		};
-		static mosccr_t MOSCCR;
+		static mosccr_t<0x00080032> MOSCCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x00080033> sosccr_io;
-		struct sosccr_t : public sosccr_io {
-			using sosccr_io::operator =;
-			using sosccr_io::operator ();
-			using sosccr_io::operator |=;
-			using sosccr_io::operator &=;
+		template <uint32_t base>
+		struct sosccr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<sosccr_io, bitpos::B0> SOSTP;
+			bit_rw_t<io_, bitpos::B0> SOSTP;
 		};
-		static sosccr_t SOSCCR;
+		static sosccr_t<0x00080033> SOSCCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  低速オンチップオシレータコントロールレジスタ（LOCOCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x00080034> lococr_io;
-		struct lococr_t : public lococr_io {
-			using lococr_io::operator =;
-			using lococr_io::operator ();
-			using lococr_io::operator |=;
-			using lococr_io::operator &=;
+		template <uint32_t base>
+		struct lococr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<lococr_io, bitpos::B0> LCSTP;
+			bit_rw_t<io_, bitpos::B0> LCSTP;
 		};
-		static lococr_t LOCOCR;
+		static lococr_t<0x00080034> LOCOCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  IWDT 専用オンチップオシレータコントロールレジスタ（ILOCOCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x00080035> ilococr_io;
-		struct ilococr_t : public ilococr_io {
-			using ilococr_io::operator =;
-			using ilococr_io::operator ();
-			using ilococr_io::operator |=;
-			using ilococr_io::operator &=;
+		template <uint32_t base>
+		struct ilococr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<ilococr_io, bitpos::B0> ILCSTP;
+			bit_rw_t<io_, bitpos::B0> ILCSTP;
 		};
-		static ilococr_t ILOCOCR;
+		static ilococr_t<0x00080035> ILOCOCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  高速オンチップオシレータコントロールレジスタ（HOCOCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x00080036> hococr_io;
-		struct hococr_t : public hococr_io {
-			using hococr_io::operator =;
-			using hococr_io::operator ();
-			using hococr_io::operator |=;
-			using hococr_io::operator &=;
+		template <uint32_t base>
+		struct hococr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<hococr_io, bitpos::B0> HCSTP;
+			bit_rw_t<io_, bitpos::B0> HCSTP;
 		};
-		static hococr_t HOCOCR;
+		static hococr_t<0x00080036> HOCOCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	高速オンチップオシレータコントロールレジスタ 2（HOCOCR2）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x00080037> hococr2_io;
-		struct hococr2_t : public hococr2_io {
-			using hococr2_io::operator =;
-			using hococr2_io::operator ();
-			using hococr2_io::operator |=;
-			using hococr2_io::operator &=;
+		template <uint32_t base>
+		struct hococr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<hococr2_io, bitpos::B0, 2> HCFRQ;
+			bits_rw_t<io_, bitpos::B0, 2> HCFRQ;
 		};
-		static hococr2_t HOCOCR2;
+		static hococr2_t<0x00080037> HOCOCR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  発振安定フラグレジスタ（OSCOVFSR）
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x0008003C> oscovfsr_io;
-		struct oscovfsr_t : public oscovfsr_io {
-			using oscovfsr_io::operator =;
-			using oscovfsr_io::operator ();
-			using oscovfsr_io::operator |=;
-			using oscovfsr_io::operator &=;
+		template <uint32_t base>
+		struct oscovfsr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<oscovfsr_io, bitpos::B0> MOOVF;
-			bit_rw_t<oscovfsr_io, bitpos::B1> SOOVF;
-			bit_rw_t<oscovfsr_io, bitpos::B2> PLOVF;
-			bit_rw_t<oscovfsr_io, bitpos::B3> HCOVF;
-			bit_rw_t<oscovfsr_io, bitpos::B4> ILCOVF;
+			bit_rw_t<io_, bitpos::B0> MOOVF;
+			bit_rw_t<io_, bitpos::B1> SOOVF;
+			bit_rw_t<io_, bitpos::B2> PLOVF;
+			bit_rw_t<io_, bitpos::B3> HCOVF;
+			bit_rw_t<io_, bitpos::B4> ILCOVF;
 		};
-		static oscovfsr_t OSCOVFSR;
+		static oscovfsr_t<0x0008003C> OSCOVFSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  発振停止検出コントロールレジスタ（OSTDCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x00080040> ostdcr_io;
-		struct ostdcr_t : public ostdcr_io {
-			using ostdcr_io::operator =;
-			using ostdcr_io::operator ();
-			using ostdcr_io::operator |=;
-			using ostdcr_io::operator &=;
+		template <uint32_t base>
+		struct ostdcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<ostdcr_io, bitpos::B0> OSTDIE;
-			bit_rw_t<ostdcr_io, bitpos::B7> OSTDE;
+			bit_rw_t<io_, bitpos::B0> OSTDIE;
+			bit_rw_t<io_, bitpos::B7> OSTDE;
 		};
-		static ostdcr_t OSTDCR;
+		static ostdcr_t<0x00080040> OSTDCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  発振停止検出ステータスレジスタ（OSTDSR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x00080041> ostdsr_io;
-		struct ostdsr_t : public ostdsr_io {
-			using ostdsr_io::operator =;
-			using ostdsr_io::operator ();
-			using ostdsr_io::operator |=;
-			using ostdsr_io::operator &=;
+		template <uint32_t base>
+		struct ostdsr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<ostdsr_io, bitpos::B0> OSTDF;
+			bit_rw_t<io_, bitpos::B0> OSTDF;
 		};
-		static ostdsr_t OSTDSR;
+		static ostdsr_t<0x00080041> OSTDSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -532,9 +558,9 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>      MOFXIN;
+			bit_rw_t <io_, bitpos::B0>     MOFXIN;
 			bits_rw_t<io_, bitpos::B4, 2>  MODRV2;
-			bit_rw_t<io_, bitpos::B6>      MOSEL;
+			bit_rw_t <io_, bitpos::B6>     MOSEL;
 		};
 		static mofcr_t<0x0008C293> MOFCR;
 
@@ -542,232 +568,248 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  高速オンチップオシレータ電源コントロールレジスタ（HOCOPCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x0008C294> hocopcr_io;
-		struct hocopcr_t : public hocopcr_io {
-			using hocopcr_io::operator =;
-			using hocopcr_io::operator ();
-			using hocopcr_io::operator |=;
-			using hocopcr_io::operator &=;
+		template <uint32_t base>
+		struct hocopcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<hocopcr_io, bitpos::B0>	HOCOPCNT;
+			bit_rw_t<io_, bitpos::B0>	HOCOPCNT;
 		};
-		static hocopcr_t HOCOPCR;
+		static hocopcr_t<0x0008C294> HOCOPCR;
 
 //-----------------------------------------------------------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  スタンバイコントロールレジスタ（SBYCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw16_t<0x0008000C> sbycr_io;
-		struct sbycr_t : public sbycr_io {
-			using sbycr_io::operator =;
-			using sbycr_io::operator ();
-			using sbycr_io::operator |=;
-			using sbycr_io::operator &=;
+		template <uint32_t base>
+		struct sbycr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<sbycr_io, bitpos::B14>	OPE;
-			bit_rw_t<sbycr_io, bitpos::B15>	SSBY;
+			bit_rw_t<io_, bitpos::B14>	OPE;
+			bit_rw_t<io_, bitpos::B15>	SSBY;
 		};
-		static sbycr_t SBYCR;
+		static sbycr_t<0x0008000C> SBYCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  モジュールストップコントロールレジスタ A（MSTPCRA）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<0x00080010> mstpcra_io;
-		struct mstpcra_t : public mstpcra_io {
-			using mstpcra_io::operator =;
-			using mstpcra_io::operator ();
-			using mstpcra_io::operator |=;
-			using mstpcra_io::operator &=;
+		template <uint32_t base>
+		struct mstpcra_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<mstpcra_io, bitpos::B0>	MSTPA0;
-			bit_rw_t<mstpcra_io, bitpos::B1>	MSTPA1;
+			bit_rw_t<io_, bitpos::B0>	MSTPA0;
+			bit_rw_t<io_, bitpos::B1>	MSTPA1;
 
-			bit_rw_t<mstpcra_io, bitpos::B4>	MSTPA4;
-			bit_rw_t<mstpcra_io, bitpos::B5>	MSTPA5;
+			bit_rw_t<io_, bitpos::B4>	MSTPA4;
+			bit_rw_t<io_, bitpos::B5>	MSTPA5;
 
-			bit_rw_t<mstpcra_io, bitpos::B7>	MSTPA7;
+			bit_rw_t<io_, bitpos::B7>	MSTPA7;
 
-			bit_rw_t<mstpcra_io, bitpos::B9>	MSTPA9;
-			bit_rw_t<mstpcra_io, bitpos::B10>	MSTPA10;
-			bit_rw_t<mstpcra_io, bitpos::B11>	MSTPA11;
+			bit_rw_t<io_, bitpos::B9>	MSTPA9;
+			bit_rw_t<io_, bitpos::B10>	MSTPA10;
+			bit_rw_t<io_, bitpos::B11>	MSTPA11;
 
-			bit_rw_t<mstpcra_io, bitpos::B13>	MSTPA13;
-			bit_rw_t<mstpcra_io, bitpos::B14>	MSTPA14;
-			bit_rw_t<mstpcra_io, bitpos::B15>	MSTPA15;
-			bit_rw_t<mstpcra_io, bitpos::B16>	MSTPA16;
-			bit_rw_t<mstpcra_io, bitpos::B17>	MSTPA17;
+			bit_rw_t<io_, bitpos::B13>	MSTPA13;
+			bit_rw_t<io_, bitpos::B14>	MSTPA14;
+			bit_rw_t<io_, bitpos::B15>	MSTPA15;
+			bit_rw_t<io_, bitpos::B16>	MSTPA16;
+			bit_rw_t<io_, bitpos::B17>	MSTPA17;
 
-			bit_rw_t<mstpcra_io, bitpos::B19>	MSTPA19;
+			bit_rw_t<io_, bitpos::B19>	MSTPA19;
 
-			bit_rw_t<mstpcra_io, bitpos::B24>	MSTPA24;
+			bit_rw_t<io_, bitpos::B24>	MSTPA24;
 
-			bit_rw_t<mstpcra_io, bitpos::B27>	MSTPA27;
-			bit_rw_t<mstpcra_io, bitpos::B28>	MSTPA28;
-			bit_rw_t<mstpcra_io, bitpos::B29>	MSTPA29;
+			bit_rw_t<io_, bitpos::B27>	MSTPA27;
+			bit_rw_t<io_, bitpos::B28>	MSTPA28;
+			bit_rw_t<io_, bitpos::B29>	MSTPA29;
 
-			bit_rw_t<mstpcra_io, bitpos::B31>	ACSE;
+			bit_rw_t<io_, bitpos::B31>	ACSE;
 		};
-		static mstpcra_t MSTPCRA;
+		static mstpcra_t<0x00080010> MSTPCRA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  モジュールストップコントロールレジスタ B（MSTPCRB）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<0x00080014> mstpcrb_io;
-		struct mstpcrb_t : public mstpcrb_io {
-			using mstpcrb_io::operator =;
-			using mstpcrb_io::operator ();
-			using mstpcrb_io::operator |=;
-			using mstpcrb_io::operator &=;
+		template <uint32_t base>
+		struct mstpcrb_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<mstpcrb_io, bitpos::B0>	MSTPB0;
-			bit_rw_t<mstpcrb_io, bitpos::B1>	MSTPB1;
-			bit_rw_t<mstpcrb_io, bitpos::B2>	MSTPB2;
+			bit_rw_t<io_, bitpos::B0>	MSTPB0;
+			bit_rw_t<io_, bitpos::B1>	MSTPB1;
+			bit_rw_t<io_, bitpos::B2>	MSTPB2;
 
-			bit_rw_t<mstpcrb_io, bitpos::B4>	MSTPB4;
+			bit_rw_t<io_, bitpos::B4>	MSTPB4;
 
-			bit_rw_t<mstpcrb_io, bitpos::B6>	MSTPB6;
+			bit_rw_t<io_, bitpos::B6>	MSTPB6;
 
-			bit_rw_t<mstpcrb_io, bitpos::B8>	MSTPB8;
-			bit_rw_t<mstpcrb_io, bitpos::B9>	MSTPB9;
+			bit_rw_t<io_, bitpos::B8>	MSTPB8;
+			bit_rw_t<io_, bitpos::B9>	MSTPB9;
 
-			bit_rw_t<mstpcrb_io, bitpos::B12>	MSTPB12;
+			bit_rw_t<io_, bitpos::B12>	MSTPB12;
 
-			bit_rw_t<mstpcrb_io, bitpos::B14>	MSTPB14;
-			bit_rw_t<mstpcrb_io, bitpos::B15>	MSTPB15;
-			bit_rw_t<mstpcrb_io, bitpos::B16>	MSTPB16;
-			bit_rw_t<mstpcrb_io, bitpos::B17>	MSTPB17;
+			bit_rw_t<io_, bitpos::B14>	MSTPB14;
+			bit_rw_t<io_, bitpos::B15>	MSTPB15;
+			bit_rw_t<io_, bitpos::B16>	MSTPB16;
+			bit_rw_t<io_, bitpos::B17>	MSTPB17;
 
-			bit_rw_t<mstpcrb_io, bitpos::B19>	MSTPB19;
+			bit_rw_t<io_, bitpos::B19>	MSTPB19;
 #if defined(SIG_RX65N)
-			bit_rw_t<mstpcrb_io, bitpos::B20>	MSTPB20;
+			bit_rw_t<io_, bitpos::B20>	MSTPB20;
 #endif
-			bit_rw_t<mstpcrb_io, bitpos::B21>	MSTPB21;
-			bit_rw_t<mstpcrb_io, bitpos::B22>	MSTPB22;
-			bit_rw_t<mstpcrb_io, bitpos::B23>	MSTPB23;
-			bit_rw_t<mstpcrb_io, bitpos::B24>	MSTPB24;
-			bit_rw_t<mstpcrb_io, bitpos::B25>	MSTPB25;
-			bit_rw_t<mstpcrb_io, bitpos::B26>	MSTPB26;
-			bit_rw_t<mstpcrb_io, bitpos::B27>	MSTPB27;
-			bit_rw_t<mstpcrb_io, bitpos::B28>	MSTPB28;
-			bit_rw_t<mstpcrb_io, bitpos::B29>	MSTPB29;
-			bit_rw_t<mstpcrb_io, bitpos::B30>	MSTPB30;
-			bit_rw_t<mstpcrb_io, bitpos::B31>	MSTPB31;
+			bit_rw_t<io_, bitpos::B21>	MSTPB21;
+			bit_rw_t<io_, bitpos::B22>	MSTPB22;
+			bit_rw_t<io_, bitpos::B23>	MSTPB23;
+			bit_rw_t<io_, bitpos::B24>	MSTPB24;
+			bit_rw_t<io_, bitpos::B25>	MSTPB25;
+			bit_rw_t<io_, bitpos::B26>	MSTPB26;
+			bit_rw_t<io_, bitpos::B27>	MSTPB27;
+			bit_rw_t<io_, bitpos::B28>	MSTPB28;
+			bit_rw_t<io_, bitpos::B29>	MSTPB29;
+			bit_rw_t<io_, bitpos::B30>	MSTPB30;
+			bit_rw_t<io_, bitpos::B31>	MSTPB31;
 		};
-		static mstpcrb_t MSTPCRB;
+		static mstpcrb_t<0x00080014> MSTPCRB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  モジュールストップコントロールレジスタ C（MSTPCRC）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<0x00080018> mstpcrc_io;
-		struct mstpcrc_t : public mstpcrc_io {
-			using mstpcrc_io::operator =;
-			using mstpcrc_io::operator ();
-			using mstpcrc_io::operator |=;
-			using mstpcrc_io::operator &=;
+		template<uint32_t base>
+		struct mstpcrc_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<mstpcrc_io, bitpos::B0>	MSTPC0;
+			bit_rw_t<io_, bitpos::B0>	MSTPC0;
 
-			bit_rw_t<mstpcrc_io, bitpos::B6>	MSTPC6;
-			bit_rw_t<mstpcrc_io, bitpos::B7>	MSTPC7;
+			bit_rw_t<io_, bitpos::B6>	MSTPC6;
+			bit_rw_t<io_, bitpos::B7>	MSTPC7;
 
-			bit_rw_t<mstpcrc_io, bitpos::B17>	MSTPC17;
+			bit_rw_t<io_, bitpos::B17>	MSTPC17;
 
-			bit_rw_t<mstpcrc_io, bitpos::B19>	MSTPC19;
+			bit_rw_t<io_, bitpos::B19>	MSTPC19;
 
-			bit_rw_t<mstpcrc_io, bitpos::B23>	MSTPC23;
-			bit_rw_t<mstpcrc_io, bitpos::B24>	MSTPC24;
-			bit_rw_t<mstpcrc_io, bitpos::B25>	MSTPC25;
-			bit_rw_t<mstpcrc_io, bitpos::B26>	MSTPC26;
-			bit_rw_t<mstpcrc_io, bitpos::B27>	MSTPC27;
+			bit_rw_t<io_, bitpos::B23>	MSTPC23;
+			bit_rw_t<io_, bitpos::B24>	MSTPC24;
+			bit_rw_t<io_, bitpos::B25>	MSTPC25;
+			bit_rw_t<io_, bitpos::B26>	MSTPC26;
+			bit_rw_t<io_, bitpos::B27>	MSTPC27;
 #if defined(SIG_RX65N)
-			bit_rw_t<mstpcrc_io, bitpos::B28>	MSTPC28;
-			bit_rw_t<mstpcrc_io, bitpos::B29>	MSTPC29;
+			bit_rw_t<io_, bitpos::B28>	MSTPC28;
+			bit_rw_t<io_, bitpos::B29>	MSTPC29;
 #endif
 		};
-		static mstpcrc_t MSTPCRC;
+		static mstpcrc_t<0x00080018> MSTPCRC;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  モジュールストップコントロールレジスタ D（MSTPCRD）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw32_t<0x0008001C> mstpcrd_io;
-		struct mstpcrd_t : public mstpcrd_io {
-			using mstpcrd_io::operator =;
-			using mstpcrd_io::operator ();
-			using mstpcrd_io::operator |=;
-			using mstpcrd_io::operator &=;
+		template <uint32_t base>
+		struct mstpcrd_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<mstpcrd_io, bitpos::B0>	MSTPD0;
-			bit_rw_t<mstpcrd_io, bitpos::B1>	MSTPD1;
-			bit_rw_t<mstpcrd_io, bitpos::B2>	MSTPD2;
-			bit_rw_t<mstpcrd_io, bitpos::B3>	MSTPD3;
-			bit_rw_t<mstpcrd_io, bitpos::B4>	MSTPD4;
-			bit_rw_t<mstpcrd_io, bitpos::B5>	MSTPD5;
-			bit_rw_t<mstpcrd_io, bitpos::B6>	MSTPD6;
-			bit_rw_t<mstpcrd_io, bitpos::B7>	MSTPD7;
+			bit_rw_t<io_, bitpos::B0>	MSTPD0;
+			bit_rw_t<io_, bitpos::B1>	MSTPD1;
+			bit_rw_t<io_, bitpos::B2>	MSTPD2;
+			bit_rw_t<io_, bitpos::B3>	MSTPD3;
+			bit_rw_t<io_, bitpos::B4>	MSTPD4;
+			bit_rw_t<io_, bitpos::B5>	MSTPD5;
+			bit_rw_t<io_, bitpos::B6>	MSTPD6;
+			bit_rw_t<io_, bitpos::B7>	MSTPD7;
 
-			bit_rw_t<mstpcrd_io, bitpos::B14>	MSTPD14;
-			bit_rw_t<mstpcrd_io, bitpos::B15>	MSTPD15;
+			bit_rw_t<io_, bitpos::B14>	MSTPD14;
+			bit_rw_t<io_, bitpos::B15>	MSTPD15;
 
-			bit_rw_t<mstpcrd_io, bitpos::B19>	MSTPD19;
+			bit_rw_t<io_, bitpos::B19>	MSTPD19;
 
-			bit_rw_t<mstpcrd_io, bitpos::B21>	MSTPD21;
+			bit_rw_t<io_, bitpos::B21>	MSTPD21;
 
-			bit_rw_t<mstpcrd_io, bitpos::B23>	MSTPD23;
+			bit_rw_t<io_, bitpos::B23>	MSTPD23;
 		};
-		static mstpcrd_t MSTPCRD;
+		static mstpcrd_t<0x0008001C> MSTPCRD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  動作電力コントロールレジスタ（OPCCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x000800A0> opccr_io;
-		struct opccr_t : public opccr_io {
-			using opccr_io::operator =;
-			using opccr_io::operator ();
-			using opccr_io::operator |=;
-			using opccr_io::operator &=;
+		template<uint32_t base>
+		struct opccr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<opccr_io, bitpos::B0, 3>	OPCM;
-			bit_rw_t <opccr_io, bitpos::B4>		OPCMTSF;
+			bits_rw_t<io_, bitpos::B0, 3>	OPCM;
+			bit_rw_t <io_, bitpos::B4>		OPCMTSF;
 		};
-		static opccr_t OPCCR;
+		static opccr_t<0x000800A0> OPCCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  スリープモード復帰クロックソース切り替えレジスタ（RSTCKCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x000800A1> rstckcr_io;
-		struct rstckcr_t : public rstckcr_io {
-			using rstckcr_io::operator =;
-			using rstckcr_io::operator ();
-			using rstckcr_io::operator |=;
-			using rstckcr_io::operator &=;
+		template<uint32_t base>
+		struct rstckcr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bits_rw_t<rstckcr_io, bitpos::B0, 3>	RSTCKSEL;
-			bit_rw_t <rstckcr_io, bitpos::B4>		RSTCKEN;
+			bits_rw_t<io_, bitpos::B0, 3>	RSTCKSEL;
+			bit_rw_t <io_, bitpos::B4>		RSTCKEN;
 		};
-		static rstckcr_t RSTCKCR;
+		static rstckcr_t<0x000800A1> RSTCKCR;
 
 
 //-----------------------------------------------------------------------------//
@@ -807,9 +849,9 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>	   PRC0;
-			bit_rw_t<io_, bitpos::B1>	   PRC1;
-			bit_rw_t<io_, bitpos::B3>      PRC3;
+			bit_rw_t <io_, bitpos::B0>	   PRC0;
+			bit_rw_t <io_, bitpos::B1>	   PRC1;
+			bit_rw_t <io_, bitpos::B3>     PRC3;
 			bits_rw_t<io_, bitpos::B8, 8>  PRKEY;
 		};
 		static prcr_t<0x000803FE> PRCR;
@@ -818,6 +860,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  温度センサコントロールレジスタ（TSCR）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -837,6 +880,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  リセットステータスレジスタ 0（RSTSR0）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -860,6 +904,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  リセットステータスレジスタ 1（RSTSR1）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -878,6 +923,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  リセットステータスレジスタ 2（RSTSR2）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -908,6 +954,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ROM キャッシュ許可レジスタ（ ROMCE ）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -926,6 +973,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ROM キャッシュ無効化レジスタ（ ROMCIV ）
+			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
@@ -943,8 +991,14 @@ namespace device {
 	};
 	typedef system_t SYSTEM;
 
-	rw8_t<0x000800A2>   		  system_t::MOSCWTCR;
-	system_t::mofcr_t<0x0008C293> system_t::MOFCR;
-	system_t::sckcr_t<0x00080020> system_t::SCKCR;
-	system_t::prcr_t<0x000803FE>  system_t::PRCR;
+	SYSTEM::sckcr_t   <0x00080020>  SYSTEM::SCKCR;
+	SYSTEM::sckcr2_t  <0x00080024>  SYSTEM::SCKCR2;
+	SYSTEM::sckcr3_t  <0x00080026>  SYSTEM::SCKCR3;
+	SYSTEM::pllcr_t   <0x00080028>  SYSTEM::PLLCR;
+	SYSTEM::pllcr2_t  <0x0008002A>  SYSTEM::PLLCR2;
+	SYSTEM::mosccr_t  <0x00080032>  SYSTEM::MOSCCR;
+	SYSTEM::oscovfsr_t<0x0008003C>  SYSTEM::OSCOVFSR;
+	rw8_t             <0x000800A2>  SYSTEM::MOSCWTCR;
+	SYSTEM::prcr_t    <0x000803FE>  SYSTEM::PRCR;
+	SYSTEM::mofcr_t   <0x0008C293>  SYSTEM::MOFCR;
 }
