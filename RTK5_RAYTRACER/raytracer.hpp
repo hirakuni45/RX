@@ -22,7 +22,7 @@ extern "C" {
 };
 
 // https://en.wikipedia.org/wiki/Fast_inverse_square_root
-#define FAST_INV_SQRT
+// #define FAST_INV_SQRT
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX24T)
 static inline float sqrtf_(float x)
