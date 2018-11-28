@@ -12,37 +12,67 @@ PINK=`tput setaf 5`
 LIGHTBLUE=`tput setaf 6`
 NOCOLOR=`tput sgr0`
 
+# make clean func
+make_clean()
+{
+	cd "$2"
+	echo "${GREEN}Clean project: " $1 $2 "${NOCOLOR}"
+	make clean >& /dev/null
+	if [ $? -ne 0 ]; then
+		echo "${RED}Clean Error: " $1 $2 "${NOCOLOR}"
+		echo ""
+		exit 1
+	fi
+	cd ..
+}
+
 # make clean
 if [[ $1 = "clean" ]]; then
-  for file in `ls -d *`
-  do
-    if [ -e "${file}/Makefile" ]; then
-      cd "${file}"
-      echo "${GREEN}Clean project: " ${file} "${NOCOLOR}"
-      make clean >& /dev/null
-      if [ $? -ne 0 ]; then
-          echo "${RED}Error: " ${file} "${NOCOLOR}"
-          echo ""
-          break;
-      fi
-	  cd ..
-    fi
-  done
+	for file in `ls -d *`;
+	do
+		if [ -e "${file}/Makefile" ]; then
+			make_clean "" "${file}"
+		elif [ -d "${file}" ]; then
+			cd "${file}"
+			for proj in `ls -d *`;
+			do
+				if [ -e "${proj}/Makefile" ]; then
+					make_clean "${file}" "${proj}"
+				fi
+			done
+			cd ..
+		fi
+	done
 fi
 
-# make
-for file in `ls -d *`
-do
-  if [ -e "${file}/Makefile" ]; then
-	echo "${PINK}Start project: " ${file} "${NOCOLOR}"
-    cd "${file}"
+# make_main func
+make_main()
+{
+	echo "${PINK}Start project: " $1 $2 "${NOCOLOR}"
+	cd $2
     make > /dev/null
     if [ $? -ne 0 ]; then
-        echo "${RED}Compile error: " ${file} "${NOCOLOR}"
+        echo "${RED}Compile error: " $1 $2 "${NOCOLOR}"
 		echo ""
-        break;
+		exit 1
     fi
     cd ..
-	echo "${LIGHTBLUE}Build project: " ${file} "${NOCOLOR}"
-  fi
+	echo "${LIGHTBLUE}Build project: " $1 $2 "${NOCOLOR}"	
+}
+
+# make
+for file in `ls -d *`;
+do
+	if [ -e "${file}/Makefile" ]; then
+		make_main "" ${file}
+	elif [ -d "${file}" ]; then
+		cd "${file}"
+		for proj in `ls -d *`;
+		do
+			if [ -e "${proj}/Makefile" ]; then
+				make_main "${file}" "${proj}"
+			fi
+		done
+		cd ..
+	fi
 done
