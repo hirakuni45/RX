@@ -9,9 +9,9 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "RX600/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
-#include "RX600/peripheral.hpp"
 
 namespace device {
 
@@ -39,6 +39,29 @@ namespace device {
 			SECOND_SPI,	///< SCI ポートを簡易 SPI として使う場合、第２候補
 		};
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  MTUx（マルチ・ファンクション・タイマ） チャネル型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class channel : uint8_t {
+			A,		///< MTUx A (MTIOCxA)
+			B,		///< MTUx B (MTIOCxB)
+			C,		///< MTUx C (MTIOCxC)
+			D,		///< MTUx D (MTIOCxD)
+
+			U,		///< MTU5 U (MTIC5U) P24
+			V,		///< MTU5 V (MTIC5V) P23
+			W,		///< MTU5 W (MTIC5W) P22
+			U2,		///< MTU5 U (MTIC5U) P82
+			V2,		///< MTU5 V (MTIC5V) P81
+			W2,		///< MTU5 W (MTIC5W) P80
+
+			CLK_AB,	///< MTCLKA, MTCLKB 1ST: P33/P32, 2ND: P21/P20 
+			CLK_CD,	///< MTCLKC, MTCLKD 1ST: P31/P30, 2ND: P11/P10, 3RD: PE4/PE3
+		};
+
 	private:
 
 		static bool sub_1st_(peripheral t, bool enable, option opt)
@@ -51,7 +74,7 @@ namespace device {
 			else if(opt == option::FIRST_SPI || opt == option::SECOND_SPI) spi = true;
 
 			switch(t) {
-			case peripheral::USB:
+			case peripheral::USB0:
 				{
 					uint8_t sel = enable ? 0b010011 : 0;
 					MPC::P24PFS.PSEL = sel;  // USB0_VBUSEN (P24 LQFP176: 40)
@@ -775,7 +798,7 @@ namespace device {
 			@param[in]	t	周辺機器タイプ
 			@param[in]	ena	無効にする場合「false」
 			@param[in]	opt	ポート・マップ・オプション
-			@return 成功なら「true」
+			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
 		static bool turn(peripheral t, bool ena = true, option opt = option::FIRST) noexcept
@@ -803,7 +826,301 @@ namespace device {
 				break;
 			}
 
-			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+			MPC::PWPR = MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  MTU3 関係、チャネル別ポート切り替え
+			@param[in]	per	周辺機器タイプ
+			@param[in]	ch	チャネル
+			@param[in]	ena	無効にする場合場合「false」
+			@param[in]	opt	候補を選択する場合
+			@return 無効な周辺機器の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool turn(peripheral per, channel ch, bool ena = true, option opt = option::FIRST)
+			noexcept
+		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = true;
+			uint8_t sel = 0;
+			switch(per) {
+			case peripheral::MTU0:
+				sel = ena ? 0b00001 : 0;
+				switch(ch) {
+				case channel::A:
+					MPC::PB3PFS.PSEL = sel;  // MTIOC0A (32/100)
+					PORTB::PMR.B3 = ena;
+					break;
+				case channel::B:
+					MPC::PB2PFS.PSEL = sel;  // MTIOC0B (33/100)
+					PORTB::PMR.B2 = ena;
+					break;
+				case channel::C:
+					MPC::PB1PFS.PSEL = sel;  // MTIOC0C (34/100)
+					PORTB::PMR.B1 = ena;
+					break;
+				case channel::D:
+					MPC::PB0PFS.PSEL = sel;  // MTIOC0D (35/100)
+					PORTB::PMR.B0 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+
+			case peripheral::MTU1:
+				switch(ch) {
+				case channel::A:
+					sel = ena ? 0b00001 : 0;
+					MPC::PA5PFS.PSEL = sel;  // MTIOC1A (36/100)
+					PORTA::PMR.B5 = ena;
+					break;
+				case channel::B:
+					sel = ena ? 0b00001 : 0;
+					MPC::PA4PFS.PSEL = sel;  // MTIOC1B (37/100)
+					PORTA::PMR.B4 = ena;
+					break;
+				case channel::CLK_AB:
+					sel = ena ? 0b00010 : 0;
+					if(opt == option::FIRST) {
+						MPC::P33PFS.PSEL = sel;
+						PORT3::PMR.B3 = ena;
+						MPC::P32PFS.PSEL = sel;
+						PORT3::PMR.B2 = ena;
+					} else if(opt == option::SECOND) {
+						MPC::P21PFS.PSEL = sel;
+						PORT2::PMR.B1 = ena;
+						MPC::P20PFS.PSEL = sel;
+						PORT2::PMR.B0 = ena;
+					} else {
+						ret = false;
+					}
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+
+			case peripheral::MTU2:
+				switch(ch) {
+				case channel::A:					
+					MPC::PA3PFS.PSEL = sel;  // MTIOC2A (38/100)
+					PORTA::PMR.B3 = ena;
+					break;
+				case channel::B:
+					MPC::PA2PFS.PSEL = sel;  // MTIOC2B (39/100)
+					PORTA::PMR.B2 = ena;
+					break;
+				case channel::CLK_AB:
+					sel = ena ? 0b00010 : 0;
+					if(opt == option::FIRST) {
+						MPC::P33PFS.PSEL = sel;  // 
+						PORT3::PMR.B3 = ena;
+						MPC::P32PFS.PSEL = sel;
+						PORT3::PMR.B2 = ena;
+					} else if(opt == option::SECOND) {
+						MPC::P21PFS.PSEL = sel;
+						PORT2::PMR.B1 = ena;
+						MPC::P20PFS.PSEL = sel;
+						PORT2::PMR.B0 = ena;
+					} else {
+						ret = false;
+					}
+					break;
+				case channel::CLK_CD:
+					sel = ena ? 0b00010 : 0;
+					if(opt == option::FIRST) {
+						MPC::P31PFS.PSEL = sel;
+						PORT3::PMR.B1 = ena;
+						MPC::P30PFS.PSEL = sel;
+						PORT3::PMR.B0 = ena;
+					} else if(opt == option::SECOND) {
+						MPC::P11PFS.PSEL = sel;
+						PORT1::PMR.B1 = ena;
+						MPC::P10PFS.PSEL = sel;
+						PORT1::PMR.B0 = ena;
+					} else if(opt == option::THIRD) {
+						MPC::PE4PFS.PSEL = sel;
+						PORTE::PMR.B4 = ena;
+						MPC::PE3PFS.PSEL = sel;
+						PORTE::PMR.B3 = ena;
+					} else {
+						ret = false;
+					}
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+
+			case peripheral::MTU3:
+				switch(ch) {
+				case channel::A:					
+					MPC::P33PFS.PSEL = sel;  // MTIOC3A (58/100)
+					PORT3::PMR.B3 = ena;
+					break;
+				case channel::B:
+					MPC::P71PFS.PSEL = sel;  // MTIOC3B (56/100)
+					PORT7::PMR.B1 = ena;
+					break;
+				case channel::C:
+					MPC::P32PFS.PSEL = sel;  // MTIOC3C (59/100)
+					PORT3::PMR.B2 = ena;
+					break;
+				case channel::D:
+					MPC::P74PFS.PSEL = sel;  // MTIOC3D (53/100)
+					PORT7::PMR.B4 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+
+			case peripheral::MTU4:
+				switch(ch) {
+				case channel::A:					
+					MPC::P72PFS.PSEL = sel;  // MTIOC4A (55/100)
+					PORT7::PMR.B2 = ena;
+					break;
+				case channel::B:
+					MPC::P73PFS.PSEL = sel;  // MTIOC4B (54/100)
+					PORT7::PMR.B3 = ena;
+					break;
+				case channel::C:
+					MPC::P75PFS.PSEL = sel;  // MTIOC4C (52/100)
+					PORT7::PMR.B5 = ena;
+					break;
+				case channel::D:
+					MPC::P76PFS.PSEL = sel;  // MTIOC4D (51/100)
+					PORT7::PMR.B6 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+
+			case peripheral::MTU5:
+				switch(ch) {
+				case channel::U:
+					MPC::P24PFS.PSEL = sel;  // MTIOC5U (64/100)
+					PORT2::PMR.B4 = ena;
+					break;
+				case channel::V:
+					MPC::P23PFS.PSEL = sel;  // MTIOC5V (65/100)
+					PORT2::PMR.B3 = ena;
+					break;
+				case channel::W:
+					MPC::P22PFS.PSEL = sel;  // MTIOC5W (66/100)
+					PORT2::PMR.B2 = ena;
+					break;
+				case channel::U2:
+					MPC::P82PFS.PSEL = sel;  // MTIOC5U (96/100)
+					PORT8::PMR.B2 = ena;
+					break;
+				case channel::V2:
+					MPC::P81PFS.PSEL = sel;  // MTIOC5V (97/100)
+					PORT8::PMR.B1 = ena;
+					break;
+				case channel::W2:
+					MPC::P80PFS.PSEL = sel;  // MTIOC5W (98/100)
+					PORT8::PMR.B0 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+
+			case peripheral::MTU6:
+				switch(ch) {
+				case channel::A:
+					MPC::PA1PFS.PSEL = sel;  // MTIOC6A (40/100)
+					PORTA::PMR.B1 = ena;
+					break;
+				case channel::B:
+					MPC::P95PFS.PSEL = sel;  // MTIOC6B (45/100)
+					PORT9::PMR.B5 = ena;
+					break;
+				case channel::C:
+					MPC::PA0PFS.PSEL = sel;  // MTIOC6C (41/100)
+					PORTA::PMR.B0 = ena;
+					break;
+				case channel::D:
+					MPC::P92PFS.PSEL = sel;  // MTIOC6D (48/100)
+					PORT9::PMR.B2 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+
+			case peripheral::MTU7:
+				switch(ch) {
+				case channel::A:
+					MPC::P94PFS.PSEL = sel;  // MTIOC7A (46/100)
+					PORT9::PMR.B4 = ena;
+					break;
+				case channel::B:
+					MPC::P93PFS.PSEL = sel;  // MTIOC7B (47/100)
+					PORT9::PMR.B3 = ena;
+					break;
+				case channel::C:
+					MPC::P91PFS.PSEL = sel;  // MTIOC7C (49/100)
+					PORT9::PMR.B1 = ena;
+					break;
+				case channel::D:
+					MPC::P90PFS.PSEL = sel;  // MTIOC7D (50/100)
+					PORT9::PMR.B0 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+#if 0
+			case peripheral::MTU9:
+				switch(ch) {
+				case channel::A:
+					MPC::PD7PFS.PSEL = sel;  // MTIOC9A (18/100)
+					PORTD::PMR.B7 = ena;
+					break;
+				case channel::B:
+					MPC::PE0PFS.PSEL = sel;  // MTIOC9B (17/100)
+					PORTE::PMR.B0 = ena;
+					break;
+				case channel::C:
+					MPC::PD6PFS.PSEL = sel;  // MTIOC9C (19/100)
+					PORTD::PMR.B6 = ena;
+					break;
+				case channel::D:
+					MPC::PE1PFS.PSEL = sel;  // MTIOC9D (16/100)
+					PORTE::PMR.B1 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+#endif
+			default:
+				ret = false;
+				break;
+			}
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return ret;
 		}
@@ -877,7 +1194,7 @@ namespace device {
 				}
 			}
 
-			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return ret;
 		}
@@ -898,7 +1215,7 @@ namespace device {
 
 
 
-			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return ret;
 		}

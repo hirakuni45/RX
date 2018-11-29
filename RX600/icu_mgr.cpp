@@ -7,7 +7,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/icu_mgr.hpp"
+#include "common/device.hpp"
 
 namespace device {
 

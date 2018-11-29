@@ -8,9 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/port_map.hpp"
-#include "RX600/power_cfg.hpp"
-#include "RX600/icu_mgr.hpp"
+#include "common/renesas.hpp"
 #include "common/intr_utils.hpp"
 #include "common/vect.h"
 

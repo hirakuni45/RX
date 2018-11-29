@@ -8,9 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/peripheral.hpp"
-#include "RX600/icu.hpp"
-#include "RX600/dmac.hpp"
+#include "common/device.hpp"
 #include "common/vect.h"
 #include "common/dispatch.hpp"
 

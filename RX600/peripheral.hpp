@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・ペリフェラル
+	@brief	RX64M/RX71M グループ・ペリフェラル
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -72,7 +72,7 @@ namespace device {
 		EDMAC1,		///< Ethernet DMA 1
 		PTPEDMAC,	///< PTP Ethernet DMA
 
-		USB,		///< USB2.0FSホスト/ファンクションモジュール（USBb）
+		USB0,		///< USB2.0FSホスト/ファンクションモジュール（USBb）
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 		USBA,		///< USB 2.0 Full-Speed ホスト / ファンクションモジュール（USBA）
 #endif

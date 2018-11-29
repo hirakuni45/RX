@@ -8,19 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
-#if defined(SIG_RX63T)
-#include "RX63T/peripheral.hpp"
-#include "RX63T/icu.hpp"
-#elif defined(SIG_RX24T)
-#include "RX24T/peripheral.hpp"
-#include "RX24T/icu.hpp"
-#elif defined(SIG_RX64M) | defined(SIG_RX65N) | defined(SIG_RX71M)
-#include "RX600/peripheral.hpp"
-#include "RX600/icu.hpp"
-#else
-#  error "cmt.hpp requires SIG_XXXX to be defined"
-#endif
+#include "common/device.hpp"
 
 namespace device {
 

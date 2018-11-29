@@ -8,10 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/power_cfg.hpp"
-#include "RX600/icu_mgr.hpp"
-#include "RX600/r12da.hpp"
-#include "common/delay.hpp"
+#include "common/device.hpp"
 
 namespace device {
 

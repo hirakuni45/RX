@@ -8,25 +8,18 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
-#include "RX600/peripheral.hpp"
-#include "RX600/icu.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	CAN モジュール（CAN）
+		@brief	CAN ベース・モジュール（CAN）
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	rxf		受信 FIFO 割り込み
-		@param[in]	txf		送信 FIFO 割り込み
-		@param[in]	rxm		メールボックス受信割り込み
-		@param[in]	txm		メールボックス送信割り込み
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB rxf, ICU::VECTOR_SELB txf, ICU::VECTOR_SELB rxm, ICU::VECTOR_SELB txm>
+	template <uint32_t base, peripheral per>
 	struct can_t {
 
 		//-----------------------------------------------------------------//
@@ -330,6 +323,89 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ペリフェラル型を返す
+			@return ペリフェラル型
+		*/
+		//-----------------------------------------------------------------//
+		static peripheral get_peripheral() { return per; }
+	};
+
+
+#if defined(SIG_RX66T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	CAN モジュール（CAN 通常割り込み型）
+		@param[in]	base	ベースアドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	rxf		受信 FIFO 割り込み
+		@param[in]	txf		送信 FIFO 割り込み
+		@param[in]	rxm		メールボックス受信割り込み
+		@param[in]	txm		メールボックス送信割り込み
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm>
+	struct can_norm_t : can_t<base, per> {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  RXF 割り込みベクターを返す
+			@return 割り込みベクター
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_rxf_vec() { return rxf; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  TXF 割り込みベクターを返す
+			@return 割り込みベクター
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_txf_vec() { return txf; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  RXM 割り込みベクターを返す
+			@return 割り込みベクター
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_rxm_vec() { return rxm; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  TXM 割り込みベクターを返す
+			@return 割り込みベクター
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_txm_vec() { return txm; }
+	};
+	typedef can_norm_t<0x00090200, peripheral::CAN0,
+		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
+		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0> CAN0;
+#endif
+
+
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	CAN モジュール（CAN 選択割り込み型）
+		@param[in]	base	ベースアドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	rxf		受信 FIFO 割り込み
+		@param[in]	txf		送信 FIFO 割り込み
+		@param[in]	rxm		メールボックス受信割り込み
+		@param[in]	txm		メールボックス送信割り込み
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR_SELB rxf, ICU::VECTOR_SELB txf, ICU::VECTOR_SELB rxm, ICU::VECTOR_SELB txm>
+	struct can_seli_t : can_t<base, per> {
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  RXF 割り込みベクターを返す
 			@return 割り込みベクター
 		*/
@@ -362,28 +438,18 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR_SELB get_txm_vec() { return txm; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
-
 	};
-
-	typedef can_t<0x00090200, peripheral::CAN0,
+	typedef can_seli_t<0x00090200, peripheral::CAN0,
 		ICU::VECTOR_SELB::RXF0, ICU::VECTOR_SELB::TXF0,
 		ICU::VECTOR_SELB::RXM0, ICU::VECTOR_SELB::TXM0> CAN0;
-	typedef can_t<0x00091200, peripheral::CAN1,
+	typedef can_seli_t<0x00091200, peripheral::CAN1,
 		ICU::VECTOR_SELB::RXF1, ICU::VECTOR_SELB::TXF1,
 		ICU::VECTOR_SELB::RXM1, ICU::VECTOR_SELB::TXM1> CAN1;
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef can_t<0x00092200, peripheral::CAN2,
+	typedef can_seli_t<0x00092200, peripheral::CAN2,
 		ICU::VECTOR_SELB::RXF2, ICU::VECTOR_SELB::TXF2,
 		ICU::VECTOR_SELB::RXM2, ICU::VECTOR_SELB::TXM2> CAN2;
+#endif
 #endif
 // note: RX65x CAN0, CAN1
 }

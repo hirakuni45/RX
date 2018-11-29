@@ -22,19 +22,21 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  書き込みプロテクトレジスタ (PWPR)
+			@param[in]	base	アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef rw8_t<0x0008C11F> pwpr_io;
-		struct pwpr_t : public pwpr_io {
-			using pwpr_io::operator =;
-			using pwpr_io::operator ();
-			using pwpr_io::operator |=;
-			using pwpr_io::operator &=;
+		template <uint32_t base>
+		struct pwpr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
-			bit_rw_t<pwpr_io, bitpos::B6> PFSWE;
-			bit_rw_t<pwpr_io, bitpos::B7> B0WI;
+			bit_rw_t<io_, bitpos::B6> PFSWE;
+			bit_rw_t<io_, bitpos::B7> B0WI;
 		};
-		static pwpr_t PWPR;
+		static pwpr_t<0x0008C11F> PWPR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

@@ -142,7 +142,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> B0;
 			bit_rw_t<io_, bitpos::B2> B2;
 			bit_rw_t<io_, bitpos::B4> B4;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
 			bit_rw_t<io_, bitpos::B6> B6;
 #endif
 		};
@@ -238,6 +238,24 @@ namespace device {
 	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
 	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
 	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
+#elif defined(SIG_RX66T)
+	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
+	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
+	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
+	typedef port_t<0x0008C003, odr_oo_t<0x0008C086> > PORT3;
+	typedef port_t<0x0008C004, odr_oo_t<0x0008C088> > PORT4;
+	typedef port_t<0x0008C005, odr_oo_t<0x0008C08A> > PORT5;
+	typedef port_t<0x0008C006, odr_oo_t<0x0008C08C> > PORT6;
+	typedef port_t<0x0008C007, odr_oo_t<0x0008C08E> > PORT7;
+	typedef port_t<0x0008C008, odr_oo_t<0x0008C090> > PORT8;
+	typedef port_t<0x0008C009, odr_oo_t<0x0008C092> > PORT9;
+	typedef port_t<0x0008C00A, odr_oo_t<0x0008C094> > PORTA;
+	typedef port_t<0x0008C00B, odr_oo_t<0x0008C096> > PORTB;
+	typedef port_t<0x0008C00C, odr_oo_t<0x0008C098> > PORTC;
+	typedef port_t<0x0008C00D, odr_oo_t<0x0008C09A> > PORTD;
+	typedef port_t<0x0008C00E, odr_oo_t<0x0008C09C> > PORTE;
+	typedef port_t<0x0008C00F, odr_oo_t<0x0008C09E> > PORTF;
+	typedef port_t<0x0008C010, odr_oo_t<0x0008C0A0> > PORTG;
 #else
 #  error "port.hpp requires SIG_XXX to be defined"
 #endif
@@ -289,6 +307,10 @@ namespace device {
 		PORTB::PCR = dir;	// (8) PB0,PB1,PB2,PB3,PB4,PB5,PB6,PB7
 		PORTD::PCR = dir;	// (8) PD0,PD1,PD2,PD3,PD4,PD5,PD6,PD7
 		PORTE::PCR = dir;	// (5) PE0,PE1,PE3,PE4,PE5
+#elif defined(SIG_RX66T)
+
+// UC
+
 #else
 #  error "port.hpp requires SIG_XXX to be defined"
 #endif
