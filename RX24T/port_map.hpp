@@ -33,7 +33,10 @@ namespace device {
 			SECOND,		///< 第２候補 (XXX-B グループ)
 			THIRD,		///< 第３候補
 			FORCE,		///< 第４候補
-			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合
+			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合、第１候補
+			SECOND_I2C,	///< SCI ポートを簡易 I2C として使う場合、第２候補
+			FIRST_SPI,	///< SCI ポートを簡易 SPI として使う場合、第１候補
+			SECOND_SPI,	///< SCI ポートを簡易 SPI として使う場合、第２候補
 		};
 
 
@@ -43,17 +46,20 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class channel : uint8_t {
-			A,	///< MTUx A (MTIOCxA)
-			B,	///< MTUx B (MTIOCxB)
-			C,	///< MTUx C (MTIOCxC)
-			D,	///< MTUx D (MTIOCxD)
+			A,		///< MTUx A (MTIOCxA)
+			B,		///< MTUx B (MTIOCxB)
+			C,		///< MTUx C (MTIOCxC)
+			D,		///< MTUx D (MTIOCxD)
 
-			U,	///< MTU5 U (MTIC5U) P24
-			V,	///< MTU5 V (MTIC5V) P23
-			W,	///< MTU5 W (MTIC5W) P22
-			U2,	///< MTU5 U (MTIC5U) P82
-			V2,	///< MTU5 V (MTIC5V) P81
-			W2,	///< MTU5 W (MTIC5W) P80
+			U,		///< MTU5 U (MTIC5U) P24
+			V,		///< MTU5 V (MTIC5V) P23
+			W,		///< MTU5 W (MTIC5W) P22
+			U2,		///< MTU5 U (MTIC5U) P82
+			V2,		///< MTU5 V (MTIC5V) P81
+			W2,		///< MTU5 W (MTIC5W) P80
+
+			CLK_AB,	///< MTCLKA, MTCLKB 1ST: P33/P32, 2ND: P21/P20 
+			CLK_CD,	///< MTCLKC, MTCLKD 1ST: P31/P30, 2ND: P11/P10, 3RD: PE4/PE3
 		};
 
 	private:
@@ -212,23 +218,27 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  タイマー関係、チャネル別ポート切り替え
+			@brief  MTU3 関係、チャネル別ポート切り替え
 			@param[in]	t	周辺機器タイプ
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合場合「false」
+			@param[in]	opt	候補を選択する場合
+			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, channel ch, bool ena = true) noexcept
+		static bool turn(peripheral t, channel ch, bool ena = true, option opt = option::FIRST)
+			noexcept
 		{
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = true;
-			uint8_t sel = ena ? 0b00001 : 0;
+			uint8_t sel = 0;
 			switch(t) {
 			case peripheral::MTU0:
+				sel = ena ? 0b00001 : 0;
 				switch(ch) {
-				case channel::A:					
+				case channel::A:
 					MPC::PB3PFS.PSEL = sel;  // MTIOC0A (32/100)
 					PORTB::PMR.B3 = ena;
 					break;
@@ -252,13 +262,31 @@ namespace device {
 
 			case peripheral::MTU1:
 				switch(ch) {
-				case channel::A:					
+				case channel::A:
+					sel = ena ? 0b00001 : 0;
 					MPC::PA5PFS.PSEL = sel;  // MTIOC1A (36/100)
 					PORTA::PMR.B5 = ena;
 					break;
 				case channel::B:
+					sel = ena ? 0b00001 : 0;
 					MPC::PA4PFS.PSEL = sel;  // MTIOC1B (37/100)
 					PORTA::PMR.B4 = ena;
+					break;
+				case channel::CLK_AB:
+					sel = ena ? 0b00010 : 0;
+					if(opt == option::FIRST) {
+						MPC::P33PFS.PSEL = sel;
+						PORT3::PMR.B3 = ena;
+						MPC::P32PFS.PSEL = sel;
+						PORT3::PMR.B2 = ena;
+					} else if(opt == option::SECOND) {
+						MPC::P21PFS.PSEL = sel;
+						PORT2::PMR.B1 = ena;
+						MPC::P20PFS.PSEL = sel;
+						PORT2::PMR.B0 = ena;
+					} else {
+						ret = false;
+					}
 					break;
 				default:
 					ret = false;
@@ -275,6 +303,43 @@ namespace device {
 				case channel::B:
 					MPC::PA2PFS.PSEL = sel;  // MTIOC2B (39/100)
 					PORTA::PMR.B2 = ena;
+					break;
+				case channel::CLK_AB:
+					sel = ena ? 0b00010 : 0;
+					if(opt == option::FIRST) {
+						MPC::P33PFS.PSEL = sel;  // 
+						PORT3::PMR.B3 = ena;
+						MPC::P32PFS.PSEL = sel;
+						PORT3::PMR.B2 = ena;
+					} else if(opt == option::SECOND) {
+						MPC::P21PFS.PSEL = sel;
+						PORT2::PMR.B1 = ena;
+						MPC::P20PFS.PSEL = sel;
+						PORT2::PMR.B0 = ena;
+					} else {
+						ret = false;
+					}
+					break;
+				case channel::CLK_CD:
+					sel = ena ? 0b00010 : 0;
+					if(opt == option::FIRST) {
+						MPC::P31PFS.PSEL = sel;
+						PORT3::PMR.B1 = ena;
+						MPC::P30PFS.PSEL = sel;
+						PORT3::PMR.B0 = ena;
+					} else if(opt == option::SECOND) {
+						MPC::P11PFS.PSEL = sel;
+						PORT1::PMR.B1 = ena;
+						MPC::P10PFS.PSEL = sel;
+						PORT1::PMR.B0 = ena;
+					} else if(opt == option::THIRD) {
+						MPC::PE4PFS.PSEL = sel;
+						PORTE::PMR.B4 = ena;
+						MPC::PE3PFS.PSEL = sel;
+						PORTE::PMR.B3 = ena;
+					} else {
+						ret = false;
+					}
 					break;
 				default:
 					ret = false;
