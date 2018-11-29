@@ -136,8 +136,13 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB9 = f;		// ELC のストップ状態解除
 				break;
 
-			case peripheral::CMPC:
-				SYSTEM::MSTPCRB.MSTPB10 = f;	// CMPC のストップ状態解除
+			case peripheral::CMPC0:
+			case peripheral::CMPC1:
+			case peripheral::CMPC2:
+			case peripheral::CMPC3:
+			case peripheral::CMPC4:
+			case peripheral::CMPC5:
+				SYSTEM::MSTPCRB.MSTPB10 = f;	// CMPCx のストップ状態解除
 				break;
 
 			case peripheral::RSPI0:

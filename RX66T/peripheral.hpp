@@ -84,7 +84,14 @@ namespace device {
 
 		DOC,
 		ELC,
-		CMPC,
+
+		CMPC0,		///< コンパレーター０
+		CMPC1,		///< コンパレーター１
+		CMPC2,		///< コンパレーター２
+		CMPC3,		///< コンパレーター３
+		CMPC4,		///< コンパレーター４
+		CMPC5,		///< コンパレーター５
+
 		CRC,
 
 		// 仮の仕様
