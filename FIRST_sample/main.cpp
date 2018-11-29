@@ -12,6 +12,9 @@
 					PB7 に接続された LED を利用する @n
 			RX24T: @n
 					10MHz のベースクロックを使用する @n
+			　　　　P00 ピンにLEDを接続する @n
+			RX66T: @n
+					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
@@ -40,8 +43,10 @@ namespace {
 #elif defined(SIG_RX24T)
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+#elif defined(SIG_RX66T)
+	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #endif
-
 }
 
 int main(int argc, char** argv);
