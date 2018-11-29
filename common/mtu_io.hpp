@@ -402,7 +402,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool set_duty(typename MTUX::channel ch, uint16_t duty) noexcept
 		{
-
 			return true;
 		}
 
@@ -461,6 +460,44 @@ namespace device {
 			tt_.tgr_adr_ = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
 			wr16_(tt_.tgr_adr_, 0x0000);
 
+			MTUX::TCNT = 0;
+			MTUX::enable();
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  位相係数モード開始（モード１）@n
+					・MTCLKA, MTCLKB に入力された位相の異なる信号でカウンター更新
+			@param[in]	ch		出力チャネル
+			@param[in]	level	割り込みレベル
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool start_count_phase(typename MTUX::channel ch, uint8_t level = 0) noexcept
+		{
+			auto ph = MTUX::get_peripheral();
+			if(peripheral::MTU1 == ph || peripheral::MTU2 == ph) {
+			} else {
+				return false;
+			}
+
+			power_cfg::turn(MTUX::get_peripheral());
+#if 0
+			bool pena = (ot != OUTPUT_TYPE::NONE);
+			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch), pena);
+
+			set_output_type_(ch, ot, match);
+
+			set_TCR_(ch, dv);
+			MTUX::TMDR1.MD = 0b0100;  // 位相係数 mode 1
+
+			// 各チャネルに相当するジャネラルレジスタ
+			tt_.tgr_adr_ = MTUX::TGRA.address() + static_cast<uint32_t>(ch) * 2;
+			wr16_(tt_.tgr_adr_, match - 1);
+#endif
 			MTUX::TCNT = 0;
 			MTUX::enable();
 

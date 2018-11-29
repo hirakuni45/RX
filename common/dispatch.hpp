@@ -9,7 +9,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/peripheral.hpp"
+#include "common/device.hpp"
 
 namespace utils {
 
