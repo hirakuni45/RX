@@ -88,7 +88,7 @@ namespace device {
 			// クロック関係書き込み不許可
 			device::SYSTEM::PRCR = 0xA500;
 
-#if defined(SIG_RX65N)
+#if defined(SIG_RX65N) || defined(SIG_RX66T)
 			// ROM キャッシュを有効（標準）
 			device::SYSTEM::ROMCE = 1;
 #endif

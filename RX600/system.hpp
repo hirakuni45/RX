@@ -207,7 +207,9 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4> PCKB;
 			bits_rw_t<io_, bitpos::B12, 4> PCKA;
 			bits_rw_t<io_, bitpos::B16, 4> BCK;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			bit_rw_t <io_, bitpos::B22>    PSTOP0;
+#endif
 			bit_rw_t <io_, bitpos::B23>    PSTOP1;
 			bits_rw_t<io_, bitpos::B24, 4> ICK;
 			bits_rw_t<io_, bitpos::B28, 4> FCK;
@@ -215,6 +217,7 @@ namespace device {
 		static sckcr_t<0x00080020> SCKCR;
 
 
+#if defined(SIG_RX71M) || defined(SIG_RX66T)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
@@ -231,8 +234,13 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> MEMWAIT;
 		};
+#endif
+#if defined(SIG_RX71M)
 		static memwait_t<0x00086610> MEMWAIT;
-
+#endif
+#if defined(SIG_RX66T)
+		static memwait_t<0x0008101C> MEMWAIT;
+#endif
 
 #if defined(SIG_RX65N)
   		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -371,6 +379,7 @@ namespace device {
 		static mosccr_t<0x00080032> MOSCCR;
 
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
@@ -388,6 +397,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> SOSTP;
 		};
 		static sosccr_t<0x00080033> SOSCCR;
+#endif
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -481,7 +491,9 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> MOOVF;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			bit_rw_t<io_, bitpos::B1> SOOVF;
+#endif
 			bit_rw_t<io_, bitpos::B2> PLOVF;
 			bit_rw_t<io_, bitpos::B3> HCOVF;
 			bit_rw_t<io_, bitpos::B4> ILCOVF;
@@ -536,12 +548,14 @@ namespace device {
 		static rw8_t<0x000800A2> MOSCWTCR;
 
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static rw8_t<0x000800A3> SOSCWTCR;
+#endif
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -558,7 +572,9 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			bit_rw_t <io_, bitpos::B0>     MOFXIN;
+#endif
 			bits_rw_t<io_, bitpos::B4, 2>  MODRV2;
 			bit_rw_t <io_, bitpos::B6>     MOSEL;
 		};
@@ -621,7 +637,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>	MSTPA0;
 			bit_rw_t<io_, bitpos::B1>	MSTPA1;
-
+			bit_rw_t<io_, bitpos::B2>	MSTPA2;
+			bit_rw_t<io_, bitpos::B3>	MSTPA3;
 			bit_rw_t<io_, bitpos::B4>	MSTPA4;
 			bit_rw_t<io_, bitpos::B5>	MSTPA5;
 
@@ -639,6 +656,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B19>	MSTPA19;
 
+			bit_rw_t<io_, bitpos::B23>	MSTPA23;
 			bit_rw_t<io_, bitpos::B24>	MSTPA24;
 
 			bit_rw_t<io_, bitpos::B27>	MSTPA27;
@@ -674,6 +692,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B8>	MSTPB8;
 			bit_rw_t<io_, bitpos::B9>	MSTPB9;
+			bit_rw_t<io_, bitpos::B10>	MSTPB10;
 
 			bit_rw_t<io_, bitpos::B12>	MSTPB12;
 
@@ -950,7 +969,7 @@ namespace device {
 		static rw16_t<0x000800C2> SWRR;
 
 
-#if defined(SIG_RX65N)
+#if defined(SIG_RX65N) || defined(SIG_RX66T)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ROM キャッシュ許可レジスタ（ ROMCE ）
@@ -991,6 +1010,7 @@ namespace device {
 	};
 	typedef system_t SYSTEM;
 
+#if 0
 	SYSTEM::sckcr_t   <0x00080020>  SYSTEM::SCKCR;
 	SYSTEM::sckcr2_t  <0x00080024>  SYSTEM::SCKCR2;
 	SYSTEM::sckcr3_t  <0x00080026>  SYSTEM::SCKCR3;
@@ -1001,4 +1021,5 @@ namespace device {
 	rw8_t             <0x000800A2>  SYSTEM::MOSCWTCR;
 	SYSTEM::prcr_t    <0x000803FE>  SYSTEM::PRCR;
 	SYSTEM::mofcr_t   <0x0008C293>  SYSTEM::MOFCR;
+#endif
 }

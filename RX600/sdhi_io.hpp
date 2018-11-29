@@ -8,12 +8,10 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "common/renesas.hpp"
 #include "ff12b/src/diskio.h"
 #include "ff12b/src/ff.h"
-#include "RX600/sdhi.hpp"
-#include "RX600/icu_mgr.hpp"
-#include "RX600/port_map.hpp"
-#include "common/delay.hpp"
+
 #include "common/format.hpp"
 
 /// F_PCLKB はクロック速度計算などで必要で、設定が無いとエラーにします。

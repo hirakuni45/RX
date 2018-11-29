@@ -9,8 +9,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
-#include "RX600/icu.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -988,5 +987,5 @@ namespace device {
 		//-----------------------------------------------------------------//
 		ICU::VECTOR get_d1_vec() { return d1vec; }
 	};
-	typedef usb_t<0x000A0000, peripheral::USB, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB;
+	typedef usb_t<0x000A0000, peripheral::USB0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 }

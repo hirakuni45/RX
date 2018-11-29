@@ -8,9 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
-#include "RX600/peripheral.hpp"
-#include "RX600/icu.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -398,6 +396,8 @@ namespace device {
 	typedef i2c_t<0x00088320, peripheral::RIIC1, ICU::VECTOR::RIIC_TXI1, ICU::VECTOR::RIIC_RXI1>
 		RIIC1;
 #endif
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	typedef i2c_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::RIIC_TXI2, ICU::VECTOR::RIIC_RXI2>
 		RIIC2;
+#endif
 }

@@ -8,9 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <cstring>
-#include "RX600/power_cfg.hpp"
-#include "common/io_utils.hpp"
+#include "common/device.hpp"
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
