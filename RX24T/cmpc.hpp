@@ -1,16 +1,14 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T グループ・CMPC 定義
+	@brief	RX24T/RX66T グループ・CMPC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
-#include "RX24T/peripheral.hpp"
-#include "RX24T/icu.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -18,11 +16,11 @@ namespace device {
 	/*!
 		@brief  コンパレータ C（CMPC）
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 		@param[in]	vec		割り込みベクタ型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t, ICU::VECTOR vec>
+	template <uint32_t base, peripheral per, ICU::VECTOR vec>
 	struct cmpc_t {
 
 		//-----------------------------------------------------------------//
@@ -130,7 +128,7 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 
 		//-----------------------------------------------------------------//
@@ -142,9 +140,17 @@ namespace device {
 		static ICU::VECTOR get_vec() { return vec; }
 
 	};
+#if defined(SIG_RX24T)
 	typedef cmpc_t<0x000A0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
 	typedef cmpc_t<0x000A0CA0, peripheral::CMPC1, ICU::VECTOR::CMPC1> CMPC1;
 	typedef cmpc_t<0x000A0CC0, peripheral::CMPC2, ICU::VECTOR::CMPC2> CMPC2;
 	typedef cmpc_t<0x000A0CE0, peripheral::CMPC3, ICU::VECTOR::CMPC3> CMPC3;
-
+#elif defined(SIG_RX66T)
+	typedef cmpc_t<0x000A0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
+	typedef cmpc_t<0x000A0CA0, peripheral::CMPC1, ICU::VECTOR::CMPC1> CMPC1;
+	typedef cmpc_t<0x000A0CC0, peripheral::CMPC2, ICU::VECTOR::CMPC2> CMPC2;
+	typedef cmpc_t<0x000A0C80, peripheral::CMPC3, ICU::VECTOR::CMPC3> CMPC3;
+	typedef cmpc_t<0x000A0CA0, peripheral::CMPC4, ICU::VECTOR::CMPC4> CMPC4;
+	typedef cmpc_t<0x000A0CC0, peripheral::CMPC5, ICU::VECTOR::CMPC5> CMPC5;
+#endif
 }
