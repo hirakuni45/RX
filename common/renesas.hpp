@@ -133,11 +133,12 @@
 #include "RX600/rspi.hpp"
 // #include "RX65x/s12adf.hpp"
 // #include "RX600/adc_io.hpp"
-// #include "RX600/r12da.hpp"
+#include "RX600/r12da.hpp"
 #include "RX600/usb.hpp"
 #include "RX600/wdta.hpp"
 #include "RX600/flash.hpp"
 #include "RX600/flash_io.hpp"
+#include "RX24T/cmpc.hpp"
 
 #else
 #  error "renesas.hpp: Requires SIG_XXX to be defined"
