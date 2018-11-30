@@ -238,6 +238,12 @@ namespace device {
 
 			TEI12 = 16,	///< SCI12 送信終了割り込み 
 			ERI12 = 17,	///< SCI12 受信エラー割り込み
+
+			FERRI = 26,	///< CAC 周波数エラー
+			MENDI = 27,	///< CAC 測定終了
+			OVFI  = 28,	///< CAC オーバフロー割り込み
+
+			DOPCI = 29,	///< DOC データ演算回路割り込み
 		};
 
 
