@@ -34,16 +34,18 @@ Renesas RX マイコン
  - /RX64M　　　　　　　---> RX64M 専用のデバイス定義クラス、リンカースクリプト
  - /RX71M　　　　　　　---> RX71M 専用のデバイス定義クラス、リンカースクリプト
  - /RX65x　　　　　　　---> RX651, RX65N 専用デバイス定義クラス、リンカースクリプト
+ - /RX66T　　　　　　　---> RX66T 専用デバイス定義クラス、リンカースクリプト
  - /ff12b　　　　　　　---> ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ
  - [common](./common)　　　　　　 ---> 共有クラス、ヘッダーなど
  - [chip](./chip)　　　　　　　 ---> I2C、SPI、など各種デバイス固有制御ライブラリ
  - [graphics](./graphics)　　　　　 ---> グラフィックス関係操作クラス
  - [sound](./sound)　　　　　　　---> サウンド関係操作クラス
- - /r_net　　　　　　　---> ルネサス T4 ライブラリと、C++ ハンドラ、各種ネットワークライブラリ
+ - /r_net　　　　　　　---> ルネサス T4(TCP/UDP) ライブラリと、C++ ハンドラ、ラッパー
  - /libmad　　　　　　 ---> MP3 デコード、mad ライブラリ
  - /jpeg-6b　　　　　　---> JPEG ライブラリ
  - [rxprog](./rxprog)　　　　　　 ---> RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
  - [FIRST_sample](./FIRST_sample)　　　　---> 各プラットホーム対応 LED 点滅プログラム
+ - [RAYTRACER_sample](./RAYTRACER_sample)　　　---> 各プラットホーム対応 レイトレーシング・ベンチマーク
  - [SCI_sample](./SCI_sample)　　　　　---> 各プラットホーム対応 SCI サンプルプログラム
  - /rx24t_SDC_sample　 ---> RX24T を使った SD カードの動作サンプル
  - /rx24t_GPS_sample　 ---> RX24T を使った GPS の動作サンプル
@@ -60,7 +62,7 @@ Renesas RX マイコン
  - /RTK5_AUDIO_sample　---> ルネサス製 RTK5RX65N マイコンボード オーディオプレイヤー
  - /RTK5_SIDE　　　　　---> ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター
  - /RTK5_NESEMU　　　　---> ルネサス製 RTK5RX65N マイコンボード NES エミュレーター
- - /LICENSE　　　　　　---> ライセンス表記ファイル
+ - [/LICENSE](./LICENSE)　---> ライセンス表記ファイル
    
 ## RX 開発環境準備（Windows、MSYS2）
    
@@ -266,9 +268,15 @@ http://www.rvf-rc45.net/Renesas_GNU_Tools/
 ---
    
 ## RX プロジェクトのソースコードを取得
-
+   
 ```
-   git clone git://github.com/hirakuni45/RX.git
+    git clone git://github.com/hirakuni45/RX.git
+```
+   
+## RX 全プロジェクトのビルド
+   
+```
+    sh all_project_build.sh [clean]
 ```
    
 --- 
@@ -283,6 +291,7 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
    
 また、全ての RX マイコンが USB インターフェースを内臓しているわけでは無い為、もっとも一般的な、   
 シリアルインターフェースを使って書き込む方法を紹介します。   
+シリアルインターフェースでの書き込みは、速度はそれなりですが、簡単確実で、接続も簡単。   
    
 ※シリアルポートとの接続、ブートモードへの切り替えについては、ハードウェアマニュアルに書かれていま   
 すので参考にして下さい。   
