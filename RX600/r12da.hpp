@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・R12DA 定義
+	@brief	RX64M/RX71M/RX65x/RX66T グループ・R12DA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,10 +15,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	12 ビット D/A コンバータ（R12DA）
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral t>
+	template <peripheral per>
 	struct r12da_t {
 
 		//-----------------------------------------------------------------//
@@ -98,6 +98,26 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ペリフェラル型を返す
+			@return ペリフェラル型
+		*/
+		//-----------------------------------------------------------------//
+		static peripheral get_peripheral() { return per; }
+	};
+
+
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	12 ビット D/A コンバータ（R12DA）
+		@param[in]	per		ペリフェラル型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <peripheral per>
+	struct r12da_a_t : public r12da_t<per> {
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  D/A 出力アンプ制御レジスタ（DAAMPCR）
 			@param[in]	ofs	オフセット
 		*/
@@ -134,16 +154,40 @@ namespace device {
 		};
 		static daadusr_t<0x0008C5C0> DAADUSR;
 
+	};
+	typedef r12da_a_t<peripheral::R12DA> R12DA;
+#elif defined(SIG_RX66T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	12 ビット D/A コンバータ（R12DA）
+		@param[in]	per		ペリフェラル型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <peripheral per>
+	struct r12da_b_t : public r12da_t<per> {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
+			@brief  D/A 出力先選択レジスタ（ DADSELR ）
+			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		template <uint32_t ofs>
+		struct dadselr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  OUTDA0;
+			bit_rw_t<io_, bitpos::B1>  OUTDA1;
+			bit_rw_t<io_, bitpos::B2>  OUTREF0;
+			bit_rw_t<io_, bitpos::B3>  OUTREF1;
+		};
+		static dadselr_t<0x00088049> DADSELR;
 
 	};
-	typedef r12da_t<peripheral::R12DA> R12DA;
-
+	typedef r12da_b_t<peripheral::R12DA> R12DA;
+#endif
 }
