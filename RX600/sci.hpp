@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・SCI 定義
+	@brief	RX600 グループ・SCI 定義 SCI[jgh]
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2015, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -23,6 +23,24 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv>
 	struct sci_t {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  レシーブデータレジスタ (RDR)
+		*/
+		//-----------------------------------------------------------------//
+		static ro8_t<base + 0x05> RDR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  レシーブデータレジスタ H 、 L 、 HL (RDRH 、 RDRL 、 RDRHL)
+		*/
+		//-----------------------------------------------------------------//
+		static ro8_t<base + 0x10> RDRH;
+		static ro8_t<base + 0x11> RDRL;
+		static ro16_t<base + 0x10> RDRHL;
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -120,14 +138,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7> TDRE;
 		};
 		static ssr_t SSR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  レシーブデータレジスタ (RDR)
-		*/
-		//-----------------------------------------------------------------//
-		static ro8_t<base + 0x05> RDR;
 
 
  		//-----------------------------------------------------------------//
@@ -327,6 +337,73 @@ namespace device {
 	};
 
 
+#if defined(SIG_RX66T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  SCIj 定義クラス (tev_BL0)
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	txv		送信ベクター
+		@param[in]	rxv		受信ベクター
+		@param[in]	tev		送信終了ベクター
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 tev>
+	struct scij_bl0_t : public sci_t<base, per, txv, rxv> {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  グループ・ベクターを返す
+			@return グループ・ベクター
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_group_vec() { return ICU::VECTOR::GROUPBL0; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信終了割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR_BL0 get_te_vec() { return tev; }
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  SCIj 定義クラス (tev_BL1)
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	txv		送信ベクター
+		@param[in]	rxv		受信ベクター
+		@param[in]	tev		送信終了ベクター
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL1 tev>
+	struct scij_bl1_t : public sci_t<base, per, txv, rxv> {
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  グループ・ベクターを返す
+			@return グループ・ベクター
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_group_vec() { return ICU::VECTOR::GROUPBL1; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信終了割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR_BL1 get_te_vec() { return tev; }
+	};
+#endif
+
+
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SCIg, SCIi 定義基底クラス
@@ -338,7 +415,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 tev>
-	struct scig_t : sci_t<base, t, txv, rxv> {
+	struct scig_t : public sci_t<base, t, txv, rxv> {
 
 
 		//-----------------------------------------------------------------//
@@ -371,7 +448,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL1 tev>
-	struct scig2_t : sci_t<base, t, txv, rxv> {
+	struct scig2_t : public sci_t<base, t, txv, rxv> {
 
 
 		//-----------------------------------------------------------------//
@@ -404,7 +481,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_AL0 tev>
-	struct scii_t : sci_t<base, t, txv, rxv> {
+	struct scii_t : public sci_t<base, t, txv, rxv> {
 
 
 		//-----------------------------------------------------------------//
@@ -437,7 +514,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 tev>
-	struct scih_t : sci_t<base, per, txv, rxv> {
+	struct scih_t : public sci_t<base, per, txv, rxv> {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -494,8 +571,18 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR_BL0 get_te_vec() { return tev; }
 	};
+#endif
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX24T)
+	typedef sci_t<0x0008A020, peripheral::SCI1,  ICU::VECTOR::RXI1, ICU::VECTOR::TXI1> SCI1;
+	typedef sci_t<0x0008A020, peripheral::SCI1C, ICU::VECTOR::RXI1, ICU::VECTOR::TXI1> SCI1C;
+
+	typedef sci_t<0x0008A0A0, peripheral::SCI5,  ICU::VECTOR::RXI5, ICU::VECTOR::TXI5> SCI5;
+	typedef sci_t<0x0008A0A0, peripheral::SCI5C, ICU::VECTOR::RXI5, ICU::VECTOR::TXI5> SCI5C;
+	typedef sci_t<0x0008A0C0, peripheral::SCI6,  ICU::VECTOR::RXI6, ICU::VECTOR::TXI6> SCI6;
+	typedef sci_t<0x0008A0C0, peripheral::SCI6C, ICU::VECTOR::RXI6, ICU::VECTOR::TXI6> SCI6C;
+
+#elif defined(SIG_RX64M) || defined(SIG_RX71M)
 	typedef scig_t<0x0008A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
 		ICU::VECTOR_BL0::TEI0> SCI0;
 	typedef scig_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
@@ -515,9 +602,27 @@ namespace device {
 
 	typedef scih_t<0x0008B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
 		ICU::VECTOR_BL0::TEI12> SCI12;
-#endif
 
-#if defined(SIG_RX65N)
+#elif defined(SIG_RX65N)
+	typedef scig_t<0x0008A000, peripheral::SCI0, ICU::VECTOR::TXI0, ICU::VECTOR::RXI0,
+		ICU::VECTOR_BL0::TEI0> SCI0;
+	typedef scig_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+		ICU::VECTOR_BL0::TEI1> SCI1;
+	typedef scig_t<0x0008A040, peripheral::SCI2, ICU::VECTOR::TXI2, ICU::VECTOR::RXI2,
+		ICU::VECTOR_BL0::TEI2> SCI2;
+	typedef scig_t<0x0008A060, peripheral::SCI3, ICU::VECTOR::TXI3, ICU::VECTOR::RXI3,
+		ICU::VECTOR_BL0::TEI3> SCI3;
+	typedef scig_t<0x0008A080, peripheral::SCI4, ICU::VECTOR::TXI4, ICU::VECTOR::RXI4,
+		ICU::VECTOR_BL0::TEI4> SCI4;
+	typedef scig_t<0x0008A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
+		ICU::VECTOR_BL0::TEI5> SCI5;
+	typedef scig_t<0x0008A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
+		ICU::VECTOR_BL0::TEI6> SCI6;
+	typedef scig_t<0x0008A0E0, peripheral::SCI7, ICU::VECTOR::TXI7, ICU::VECTOR::RXI7,
+		ICU::VECTOR_BL0::TEI7> SCI7;
+
+	typedef scih_t<0x0008B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
+		ICU::VECTOR_BL0::TEI12> SCI12;
 	typedef scig2_t<0x0008A100, peripheral::SCI8, ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,
 		ICU::VECTOR_BL1::TEI8> SCI8;
 	typedef scig2_t<0x0008A120, peripheral::SCI9, ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
@@ -526,5 +631,21 @@ namespace device {
 		ICU::VECTOR_AL0::TEI10> SCI10;
 	typedef scii_t<0x000D0060, peripheral::SCI11, ICU::VECTOR::TXI11, ICU::VECTOR::RXI11,
 		ICU::VECTOR_AL0::TEI11> SCI11;
+
+#elif defined(SIG_RX66T)
+
+	typedef scij_bl0_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
+		ICU::VECTOR_BL0::TEI1> SCI1;
+
+	typedef scij_bl0_t<0x0008A0A0, peripheral::SCI5, ICU::VECTOR::TXI5, ICU::VECTOR::RXI5,
+		ICU::VECTOR_BL0::TEI5> SCI5;
+	typedef scij_bl0_t<0x0008A0C0, peripheral::SCI6, ICU::VECTOR::TXI6, ICU::VECTOR::RXI6,
+		ICU::VECTOR_BL0::TEI6> SCI6;
+
+	typedef scij_bl1_t<0x0008A100, peripheral::SCI8, ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,
+		ICU::VECTOR_BL1::TEI8> SCI8;
+	typedef scij_bl1_t<0x0008A120, peripheral::SCI9, ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,
+		ICU::VECTOR_BL1::TEI9> SCI9;
+
 #endif
 }
