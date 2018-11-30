@@ -38,8 +38,7 @@
 #include "RX24T/s12ad.hpp"
 #include "RX24T/adc_io.hpp"
 #include "RX24T/da.hpp"
-#include "RX24T/cmpc.hpp"
-#include "RX24T/doc.hpp"
+#include "RX600/cmpc.hpp"
 #include "RX24T/flash.hpp"
 #include "RX24T/flash_io.hpp"
 
@@ -138,8 +137,10 @@
 #include "RX600/wdta.hpp"
 #include "RX600/flash.hpp"
 #include "RX600/flash_io.hpp"
-#include "RX24T/cmpc.hpp"
+#include "RX600/cmpc.hpp"
 
 #else
 #  error "renesas.hpp: Requires SIG_XXX to be defined"
 #endif
+
+#include "RX600/doc.hpp"
