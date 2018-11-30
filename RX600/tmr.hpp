@@ -3,13 +3,12 @@
 /*!	@file
 	@brief	RX600 グループ・8 ビットタイマ（TMR）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
-#include "common/peripheral.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -177,9 +176,14 @@ namespace device {
 
 	};
 
-
 	typedef tmr0246_t<0x00088200> TMR0;
 	typedef tmr1357_t<0x00088201> TMR1;
 	typedef tmr0246_t<0x00088210> TMR2;
 	typedef tmr1357_t<0x00088211> TMR3;
+#if defined(SIG_RX24T) || defined(SIG_RX66T)
+	typedef tmr0246_t<0x00088220> TMR4;
+	typedef tmr1357_t<0x00088221> TMR5;
+	typedef tmr0246_t<0x00088230> TMR6;
+	typedef tmr1357_t<0x00088231> TMR7;
+#endif
 }
