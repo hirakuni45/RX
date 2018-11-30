@@ -25,16 +25,12 @@
 #elif defined(SIG_RX24T)
 #include "RX24T/system.hpp"
 #include "RX24T/system_io.hpp"
-#include "RX24T/dtc.hpp"
 #include "RX24T/mtu3.hpp"
 #include "RX24T/poe3.hpp"
-#include "RX24T/gpt.hpp"
-#include "RX24T/tmr.hpp"
 #include "RX600/cmt.hpp"
 #include "RX24T/sci.hpp"
 #include "RX24T/riic.hpp"
 #include "RX24T/rspi.hpp"
-#include "RX24T/crc.hpp"
 #include "RX24T/s12ad.hpp"
 #include "RX24T/adc_io.hpp"
 #include "RX24T/da.hpp"
@@ -143,5 +139,9 @@
 #  error "renesas.hpp: Requires SIG_XXX to be defined"
 #endif
 
+#include "RX600/dtc.hpp"
+#include "RX600/gpt.hpp"
+#include "RX600/tmr.hpp"
+#include "RX600/crc.hpp"
 #include "RX600/mpu.hpp"
 #include "RX600/doc.hpp"
