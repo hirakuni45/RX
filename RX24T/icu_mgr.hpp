@@ -290,14 +290,14 @@ namespace device {
 				break;
 
 			case peripheral::RIIC0:
-				ICU::IPR.EEI0 = lvl;
-				ICU::IPR.RXI0 = lvl;
-				ICU::IPR.TXI0 = lvl;
-				ICU::IPR.TEI0 = lvl;
-				ICU::IER.EEI0 = ena;
-				ICU::IER.RXI0 = ena;
-				ICU::IER.TXI0 = ena;
-				ICU::IER.TEI0 = ena;
+				ICU::IPR.RIIC_EEI0 = lvl;
+				ICU::IPR.RIIC_RXI0 = lvl;
+				ICU::IPR.RIIC_TXI0 = lvl;
+				ICU::IPR.RIIC_TEI0 = lvl;
+				ICU::IER.RIIC_EEI0 = ena;
+				ICU::IER.RIIC_RXI0 = ena;
+				ICU::IER.RIIC_TXI0 = ena;
+				ICU::IER.RIIC_TEI0 = ena;
 				break;
 
 			case peripheral::S12AD:
