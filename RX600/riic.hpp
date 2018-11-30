@@ -14,7 +14,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  I2C 定義
+		@brief  I 2 C バスインタフェース 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	t		ペリフェラル型
 		@param[in]	txv		送信ベクター
@@ -22,7 +22,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv>
-	struct i2c_t {
+	struct riic_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -390,14 +390,23 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR get_rx_vec() { return rxv; }
 	};
-	typedef i2c_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR::RIIC_RXI0>
+#if defined(SIG_RX24T)
+	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR::RIIC_RXI0>
 		RIIC0;
-#if defined(SIG_RX65N)
-	typedef i2c_t<0x00088320, peripheral::RIIC1, ICU::VECTOR::RIIC_TXI1, ICU::VECTOR::RIIC_RXI1>
-		RIIC1;
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-	typedef i2c_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::RIIC_TXI2, ICU::VECTOR::RIIC_RXI2>
+#elif defined(SIG_RX64M) || defined(SIG_RX71M)
+	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR::RIIC_RXI0>
+		RIIC0;
+	typedef riic_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::RIIC_TXI2, ICU::VECTOR::RIIC_RXI2>
 		RIIC2;
+#elif defined(SIG_RX65N)
+	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR::RIIC_RXI0>
+		RIIC0;
+	typedef riic_t<0x00088320, peripheral::RIIC1, ICU::VECTOR::RIIC_TXI1, ICU::VECTOR::RIIC_RXI1>
+		RIIC1;
+	typedef riic_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::RIIC_TXI2, ICU::VECTOR::RIIC_RXI2>
+		RIIC2;
+#elif defined(SIG_RX66T)
+	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR::RIIC_RXI0>
+		RIIC0;
 #endif
 }

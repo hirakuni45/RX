@@ -10,6 +10,11 @@
 //=====================================================================//
 #include "common/device.hpp"
 
+/// R12DA モジュールが無いデバイスでエラーとする
+#if defined(SIG_RX24T)
+#  error "r12da.hpp: This module does not exist"
+#endif
+
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

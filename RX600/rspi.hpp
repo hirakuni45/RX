@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・RSPIa 制御
+	@brief	RX600 グループ・RSPI[abc] 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,13 +14,14 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  RSPI 定義基底クラス
-		@param[in]	t		ペリフェラル型
+		@brief  シリアルペリフェラルインタフェースクラス
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
 		@param[in]	rxv		受信ベクター
 		@param[in]	txv		送信ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t, ICU::VECTOR rxv, ICU::VECTOR txv>
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv>
 	struct rspi_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -326,7 +327,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		int get_chanel() const {
-			return (base >> 5) & 1;
+			return (base >> 5) & 3;
 		}
 
 
@@ -336,7 +337,7 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 
 		//-----------------------------------------------------------------//
@@ -357,17 +358,49 @@ namespace device {
 		static ICU::VECTOR get_tx_vec() { return txv; }
 	};
 
-#if defined(SIG_RX65N)
+#if defined(SIG_RX24T)
+	typedef rspi_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI0;
+#elif defined(SIG_RX64M)
+	typedef rspi_t<0x000D0100, peripheral::RSPI,  ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI;
+#elif defined(SIG_RX71M)
+	typedef rspi_t<0x000D0100, peripheral::RSPI,  ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI;
+	typedef rspi_t<0x000D0120, peripheral::RSPI2, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI2;
+#elif defined(SIG_RX65N)
 	typedef rspi_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI0;
 	typedef rspi_t<0x000D0140, peripheral::RSPI1, ICU::VECTOR::SPRI1, ICU::VECTOR::SPTI1>  RSPI1;
 	typedef rspi_t<0x000D0300, peripheral::RSPI1, ICU::VECTOR::SPRI2, ICU::VECTOR::SPTI2>  RSPI2;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef rspi_t<0x000D0100, peripheral::RSPI, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>   RSPI;
 #elif defined(SIG_RX66T)
-	typedef rspi_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI0;
-#endif
 
-#if defined(SIG_RX71M)
-	typedef rspi_t<0x000D0120, peripheral::RSPI2, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI2;
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  シリアルペリフェラルインタフェースクラス (c)
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
+		@param[in]	rxv		受信ベクター
+		@param[in]	txv		送信ベクター
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv>
+	struct rspi_c_t : public rspi_t<base, per, rxv, txv> {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  RSPI データコントロールレジスタ 2 (SPDCR2)
+			@param[in]	ofs	オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct spdcr2_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  BYSW;
+		};
+		static spdcr2_t<base + 0x20> SPDCR2;
+	};
+	typedef rspi_c_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI0;
 #endif
 }
