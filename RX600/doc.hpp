@@ -8,7 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -80,9 +80,8 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR get_ivec() { return vec; }
-
 	};
-	typedef doc_t<0x0008B080, ICU::VECTOR::DOPCF> DOC;
+	typedef doc_norm_t<0x0008B080, ICU::VECTOR::DOPCF> DOC;
 #endif
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
@@ -94,7 +93,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, ICU::VECTOR_BL0 vec>
-	struct doc_norm_t : public doc_t<base> {
+	struct doc_gbl0_t : public doc_t<base> {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -103,8 +102,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR_BL0 get_ivec() { return vec; }
-
 	};
-	typedef doc_t<0x0008B080, ICU::VECTOR_BL0::DOPCI> DOC;
+	typedef doc_gbl0_t<0x0008B080, ICU::VECTOR_BL0::DOPCI> DOC;
 #endif
 }
