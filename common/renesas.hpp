@@ -143,4 +143,5 @@
 #  error "renesas.hpp: Requires SIG_XXX to be defined"
 #endif
 
+#include "RX600/mpu.hpp"
 #include "RX600/doc.hpp"
