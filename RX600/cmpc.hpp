@@ -10,6 +10,11 @@
 //=====================================================================//
 #include "common/device.hpp"
 
+/// CMPC モジュールが無いデバイスでエラーとする
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#  error "cmpc.hpp: This module does not exist"
+#endif
+
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -138,8 +143,8 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR get_vec() { return vec; }
-
 	};
+
 #if defined(SIG_RX24T)
 	typedef cmpc_t<0x000A0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
 	typedef cmpc_t<0x000A0CA0, peripheral::CMPC1, ICU::VECTOR::CMPC1> CMPC1;
@@ -149,8 +154,8 @@ namespace device {
 	typedef cmpc_t<0x000A0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
 	typedef cmpc_t<0x000A0CA0, peripheral::CMPC1, ICU::VECTOR::CMPC1> CMPC1;
 	typedef cmpc_t<0x000A0CC0, peripheral::CMPC2, ICU::VECTOR::CMPC2> CMPC2;
-	typedef cmpc_t<0x000A0C80, peripheral::CMPC3, ICU::VECTOR::CMPC3> CMPC3;
-	typedef cmpc_t<0x000A0CA0, peripheral::CMPC4, ICU::VECTOR::CMPC4> CMPC4;
-	typedef cmpc_t<0x000A0CC0, peripheral::CMPC5, ICU::VECTOR::CMPC5> CMPC5;
+	typedef cmpc_t<0x000A0CE0, peripheral::CMPC3, ICU::VECTOR::CMPC3> CMPC3;
+	typedef cmpc_t<0x000A0D00, peripheral::CMPC4, ICU::VECTOR::CMPC4> CMPC4;
+	typedef cmpc_t<0x000A0D20, peripheral::CMPC5, ICU::VECTOR::CMPC5> CMPC5;
 #endif
 }
