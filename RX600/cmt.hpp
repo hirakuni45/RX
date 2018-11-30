@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T, RX64M, RX65x, RX71M グループ・CMT 定義
+	@brief	RX600 グループ・CMT 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -130,14 +130,14 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  CMT01 定義クラス
+		@brief  CMT ノーマル・定義クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル
 		@param[in]	ivec	割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
-	struct cmt01_t : cmt_t<base, per> {
+	struct cmt_norm_t : public cmt_t<base, per> {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -152,14 +152,14 @@ namespace device {
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  CMT01 定義クラス
+		@brief  CMT 選択ベクター・定義クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル
 		@param[in]	ivec	割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per, ICU::VECTOR_SELB ivec>
-	struct cmt23_t : cmt_t<base, per> {
+	struct cmt_selb_t : public cmt_t<base, per> {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -171,14 +171,15 @@ namespace device {
 	};
 #endif
 
-	typedef cmt01_t<0x00088002, peripheral::CMT0, ICU::VECTOR::CMI0> CMT0;
-	typedef cmt01_t<0x00088008, peripheral::CMT1, ICU::VECTOR::CMI1> CMT1;
-#if defined(SIG_RX24T) || defined(SIG_RX63T)
-	typedef cmt01_t<0x00088012, peripheral::CMT2, ICU::VECTOR::CMI2> CMT2;
-	typedef cmt01_t<0x00088018, peripheral::CMT3, ICU::VECTOR::CMI3> CMT3;
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-	typedef cmt23_t<0x00088012, peripheral::CMT2, ICU::VECTOR_SELB::CMI2> CMT2;
-	typedef cmt23_t<0x00088018, peripheral::CMT3, ICU::VECTOR_SELB::CMI3> CMT3;
+#if defined(SIG_RX24T) || defined(SIG_RX66T)
+	typedef cmt_norm_t<0x00088002, peripheral::CMT0, ICU::VECTOR::CMI0> CMT0;
+	typedef cmt_norm_t<0x00088008, peripheral::CMT1, ICU::VECTOR::CMI1> CMT1;
+	typedef cmt_norm_t<0x00088012, peripheral::CMT2, ICU::VECTOR::CMI2> CMT2;
+	typedef cmt_norm_t<0x00088018, peripheral::CMT3, ICU::VECTOR::CMI3> CMT3;
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+	typedef cmt_norm_t<0x00088002, peripheral::CMT0, ICU::VECTOR::CMI0> CMT0;
+	typedef cmt_norm_t<0x00088008, peripheral::CMT1, ICU::VECTOR::CMI1> CMT1;
+	typedef cmt_selb_t<0x00088012, peripheral::CMT2, ICU::VECTOR_SELB::CMI2> CMT2;
+	typedef cmt_selb_t<0x00088018, peripheral::CMT3, ICU::VECTOR_SELB::CMI3> CMT3;
 #endif
 }

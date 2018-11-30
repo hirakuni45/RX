@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・RTC 定義 @n
+	@brief	RX64M/RX71M/RX65x グループ・RTC 定義 @n
 			※バイナリー・モードのみ定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
@@ -10,6 +10,11 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
+
+/// CMPC モジュールが無いデバイスでエラーとする
+#if defined(SIG_RX24T) || defined(SIG_RX66T)
+#  error "rtc.hpp: This module does not exist"
+#endif
 
 namespace device {
 

@@ -10,11 +10,16 @@
 //=====================================================================//
 #include "common/device.hpp"
 
+/// cmtw モジュールが無いデバイスでエラーとする
+#if defined(SIG_RX24T) || defined(SIG_RX66T)
+#  error "cmtw.hpp: This module does not exist"
+#endif
+
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  CMTW 定義基底クラス
+		@brief  コンペアマッチタイマ W クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル
 		@param[in]	ivec	割り込みベクター
