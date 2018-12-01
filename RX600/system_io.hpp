@@ -20,16 +20,18 @@ namespace device {
 	/*!
 		@brief  systen_io クラス
 		@param[in]	BASE_CLOCK	ベース・クロック周波数（１２ＭＨｚ）
+		@param[in]	INTR_CLOCK	内臓クロック周波数（２４０ＭＨｚ）
 		@param[in]	EXT_CLOCK	外部クロックに入力を行う場合「true」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t BASE_CLOCK = 12000000, bool EXT_CLOCK = false>
+	template <uint32_t BASE_CLOCK = 12000000, uint32_t INTR_CLOCK = 240000000,
+		bool EXT_CLOCK = false>
 	struct system_io {
 
 		static uint8_t clock_div_(uint32_t clk) noexcept
 		{
 			uint8_t div = 0;
-			while(clk < 240000000) {
+			while(clk < INTR_CLOCK) {
 				++div;
 				clk <<= 1;
 			}
@@ -61,13 +63,22 @@ namespace device {
 			// device::SYSTEM::MEMWAIT = 1; は、start.s で設定される。
 
 #if defined(SIG_RX65N)
-			// RX65N の場合、120MHz 動作が標準
-			device::SYSTEM::ROMWT = 0b10;
+			if(F_ICLK >= 120000000) {  // 120MHz 以上の場合設定
+				device::SYSTEM::ROMWT = 0b10;
+			} else if(F_ICLK >= 100000000) {
+				device::SYSTEM::ROMWT = 0b01;
+			} else if(F_ICLK >= 50000000) {
+				device::SYSTEM::ROMWT = 0b00;
+			}
+#endif
+#if defined(SIG_RX66T)
+			if(F_ICLK > 120000000) {  // 120MHz 以上の場合設定
+				device::SYSTEM::MEMWAIT = 1;
+			}
 #endif
 			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
 			// ... MAX x30.0
-			// 内部クロックは 240MHz にする。
-			uint32_t n = 240000000 * 2 / BASE_CLOCK;
+			uint32_t n = INTR_CLOCK * 2 / BASE_CLOCK;
 			if(n < 20) n = 20;
 			else if(n > 60) n = 60;
 			n -= 20;
@@ -77,10 +88,10 @@ namespace device {
 
 			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(F_FCLK))
 								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(F_ICLK))
-								  | device::SYSTEM::SCKCR.BCK.b(clock_div_(120000000))
+								  | device::SYSTEM::SCKCR.BCK.b(clock_div_(F_BCLK))
 								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(F_PCLKA))
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(F_PCLKB))
-								  | device::SYSTEM::SCKCR.PCKC.b(clock_div_(60000000))
+								  | device::SYSTEM::SCKCR.PCKC.b(clock_div_(F_PCLKC))
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(F_PCLKD));
 			device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
