@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ルネサス RX 選択
+	@brief	ルネサス RX デバイス選択
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -13,13 +13,11 @@
 #include "common/delay.hpp"
 #include "common/device.hpp"
 
-#include "RX600/port.hpp"
 #include "RX600/bus.hpp"
 
 #if defined(SIG_RX24T)
 #include "RX24T/system.hpp"
 #include "RX24T/system_io.hpp"
-#include "RX24T/mtu3.hpp"
 #include "RX24T/poe3.hpp"
 #include "RX24T/s12ad.hpp"
 #include "RX24T/adc_io.hpp"
@@ -36,7 +34,6 @@
 #include "RX600/mpc.hpp"
 #include "RX600/tpu.hpp"
 #include "RX600/cmtw.hpp"
-#include "RX600/mtu3.hpp"
 #include "RX600/can.hpp"
 #include "RX600/qspi.hpp"
 #include "RX600/s12adc.hpp"
@@ -70,7 +67,6 @@
 #include "RX600/mpc.hpp"
 #include "RX600/tpu.hpp"
 #include "RX600/cmtw.hpp"
-#include "RX600/mtu3.hpp"
 #include "RX600/can.hpp"
 #include "RX600/qspi.hpp"
 #include "RX65x/s12adf.hpp"
@@ -101,7 +97,6 @@
 #include "RX600/system_io.hpp"
 #include "RX600/dmac.hpp"
 #include "RX600/mpc.hpp"
-#include "RX600/mtu3.hpp"
 #include "RX600/can.hpp"
 #include "RX600/r12da.hpp"
 #include "RX600/usb.hpp"
@@ -114,7 +109,11 @@
 #  error "renesas.hpp: Requires SIG_XXX to be defined"
 #endif
 
+// RX マイコン共通ペリフェラル
+#include "RX600/cac.hpp"
 #include "RX600/dtc.hpp"
+#include "RX600/port.hpp"
+#include "RX600/mtu3.hpp"
 #include "RX600/gpt.hpp"
 #include "RX600/tmr.hpp"
 #include "RX600/cmt.hpp"
