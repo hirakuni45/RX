@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・MTU3a 定義
+	@brief	RX600 グループ・MTU3d 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -171,12 +171,12 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 			@param[in]	base	ベースアドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tior_t : public rw8_t<base> {
+		struct tiorh_t : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -402,6 +402,27 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7> CST7;
 		};
 		static tstrb_t<0x000C1A80> TSTRB;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タイマスタートレジスタ（TSTR）
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct tstr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0> CSW5;
+			bit_rw_t<io_, bitpos::B1> CSV5;
+			bit_rw_t<io_, bitpos::B2> CSU5;
+		};
+		static tstr_t<0x000C1CB4> TSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -898,12 +919,12 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>      NFAEN;
-			bit_rw_t <io_, bitpos::B1>      NFBEN;
-			bit_rw_t <io_, bitpos::B2>      NFCEN;
-			bit_rw_t <io_, bitpos::B3>      NFDEN;
+			bit_rw_t <io_, bitpos::B0>     NFAEN;
+			bit_rw_t <io_, bitpos::B1>     NFBEN;
+			bit_rw_t <io_, bitpos::B2>     NFCEN;
+			bit_rw_t <io_, bitpos::B3>     NFDEN;
 
-			bits_rw_t <io_, bitpos::B4, 2>  NFCS;
+			bits_rw_t<io_, bitpos::B4, 2>  NFCS;
 		};
 
 
@@ -1139,15 +1160,17 @@ namespace device {
 		static tadstrgr1_t<0x000C1D32> TADSTRGR1;
 
 	};
+	typedef mtu_t MTU;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU0 定義基底クラス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
+		@param[in]	INT		割り込み型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral t>
+	template <peripheral per, typename INT>
 	struct mtu0_t : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1204,32 +1227,13 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU0)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
+			@brief  有効にする(MTU0)
+			@param[in]	ena	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable(bool ena = true)
 		{
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:					
-					MPC::PB3PFS.PSEL = sel;  // MTIOC0A
-					PORTB::PMR.B3 = enable;
-				break;
-			case channel::B:
-					MPC::PB2PFS.PSEL = sel;  // MTIOC0B
-					PORTB::PMR.B2 = enable;
-				break;
-			case channel::C:
-					MPC::PB1PFS.PSEL = sel;  // MTIOC0C
-					PORTB::PMR.B1 = enable;
-				break;
-			case channel::D:
-					MPC::PB0PFS.PSEL = sel;  // MTIOC0D
-					PORTB::PMR.B0 = enable;
-				break;
-			}
+			MTU::TSTRA.CST0 = 1;
 		}
 
 
@@ -1259,10 +1263,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1302> TIOR;
+		static tiorh_t<0x000C1302> TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -1271,6 +1275,71 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static tiorl_t<0x000C1303> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -1363,13 +1432,21 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ノイズフィルタコントロールレジスタクロック（NFCRC）
+		*/
+		//-----------------------------------------------------------------//
+		static nfcr_t<0x000C1299> NFCRC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ペリフェラル型を返す
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
-#if 0
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みベクターを返す
@@ -1377,29 +1454,29 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec(interrupt intr) {
+		static INT get_vec(interrupt intr) {
 			switch(intr) {
-			case interrupt::A:   return ICU::VECTOR::TGIA0;
-			case interrupt::B:   return ICU::VECTOR::TGIB0;
-			case interrupt::C:   return ICU::VECTOR::TGIC0;
-			case interrupt::D:   return ICU::VECTOR::TGID0;
-			case interrupt::OVF: return ICU::VECTOR::TCIV0;
-			case interrupt::E:   return ICU::VECTOR::TGIE0;
-			case interrupt::F:   return ICU::VECTOR::TGIF0;
+			case interrupt::A:   return INT::TGIA0;
+			case interrupt::B:   return INT::TGIB0;
+			case interrupt::C:   return INT::TGIC0;
+			case interrupt::D:   return INT::TGID0;
+			case interrupt::OVF: return INT::TCIV0;
+			case interrupt::E:   return INT::TGIE0;
+			case interrupt::F:   return INT::TGIF0;
 			}
-			return ICU::VECTOR::NONE;
+			return INT::NONE;
 		}
-#endif
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU1 定義基底クラス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
+		@param[in]	INT		割り込み型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral t>
+	template <peripheral per, typename INT>
 	struct mtu1_t : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1442,31 +1519,20 @@ namespace device {
 		enum class interrupt : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 			UDF,	///< TCIU アンダーフロー
 		};
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU1)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
+			@brief  有効にする(MTU1)
+			@param[in]	ena	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable(bool ena = true)
 		{
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:					
-					MPC::PA5PFS.PSEL = sel;  // MTIOC1A
-					PORTA::PMR.B5 = enable;
-				break;
-			case channel::B:
-					MPC::PA4PFS.PSEL = sel;  // MTIOC1B
-					PORTA::PMR.B4 = enable;
-				break;
-			}
+			MTU::TSTRA.CST1 = 1;
 		}
 
 
@@ -1516,10 +1582,63 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1382> TIOR;
+		static tiorh_t<0x000C1382> TIORH;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				default:
+					return 0x00;
+				}
+			}
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -1622,10 +1741,9 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みベクターを返す
@@ -1633,26 +1751,26 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec(interrupt intr) {
+		static INT get_vec(interrupt intr) {
 			switch(intr) {
-			case interrupt::A:   return ICU::VECTOR::TGIA1;
-			case interrupt::B:   return ICU::VECTOR::TGIB1;
-			case interrupt::OVF: return ICU::VECTOR::TCIV1;
-			case interrupt::UDF: return ICU::VECTOR::TCIU1;
+			case interrupt::A:   return INT::TGIA1;
+			case interrupt::B:   return INT::TGIB1;
+			case interrupt::OVF: return INT::TCIV1;
+			case interrupt::UDF: return INT::TCIU1;
 			}
-			return ICU::VECTOR::NONE;
+			return INT::NONE;
 		}
-#endif
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU2 定義基底クラス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
+		@param[in]	INT		割り込み型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral t>
+	template <peripheral per, typename INT>
 	struct mtu2_t : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1695,31 +1813,20 @@ namespace device {
 		enum class interrupt : uint8_t {
 			A,		///< TGIA
 			B,		///< TGIB
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 			UDF,	///< TCIU アンダーフロー
 		};
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU2)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
+			@brief  有効にする(MTU2)
+			@param[in]	ena	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable(bool ena = true)
 		{
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:					
-					MPC::PA3PFS.PSEL = sel;  // MTIOC2A
-					PORTA::PMR.B3 = enable;
-				break;
-			case channel::B:
-					MPC::PA2PFS.PSEL = sel;  // MTIOC2B
-					PORTA::PMR.B2 = enable;
-				break;
-			}
+			MTU::TSTRA.CST2 = 1;
 		}
 
 
@@ -1749,10 +1856,63 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1402> TIOR;
+		static tiorh_t<0x000C1402> TIORH;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				default:
+					return 0x00;
+				}
+			}
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -1809,10 +1969,9 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みベクターを返す
@@ -1820,26 +1979,26 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec(interrupt intr) {
+		static INT get_vec(interrupt intr) {
 			switch(intr) {
-			case interrupt::A:   return ICU::VECTOR::TGIA2;
-			case interrupt::B:   return ICU::VECTOR::TGIB2;
-			case interrupt::OVF: return ICU::VECTOR::TCIV2;
-			case interrupt::UDF: return ICU::VECTOR::TCIU2;
+			case interrupt::A:   return INT::TGIA2;
+			case interrupt::B:   return INT::TGIB2;
+			case interrupt::OVF: return INT::TCIV2;
+			case interrupt::UDF: return INT::TCIU2;
 			}
-			return ICU::VECTOR::NONE;
+			return INT::NONE;
 		}
-#endif
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU3 定義基底クラス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
+		@param[in]	INT		割り込み型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral t>
+	template <peripheral per, typename INT>
 	struct mtu3_t : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1891,32 +2050,13 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU3)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
+			@brief  有効にする(MTU3)
+			@param[in]	ena	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable(bool ena = true)
 		{
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:					
-					MPC::P33PFS.PSEL = sel;  // MTIOC3A
-					PORT3::PMR.B3 = enable;
-				break;
-			case channel::B:
-					MPC::P71PFS.PSEL = sel;  // MTIOC3B
-					PORT7::PMR.B1 = enable;
-				break;
-			case channel::C:
-					MPC::P32PFS.PSEL = sel;  // MTIOC3C
-					PORT3::PMR.B2 = enable;
-				break;
-			case channel::D:
-					MPC::P74PFS.PSEL = sel;  // MTIOC3D
-					PORT7::PMR.B4 = enable;
-				break;
-			}
+			MTU::TSTRA.CST3 = 1;
 		}
 
 
@@ -1946,10 +2086,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1204> TIOR;
+		static tiorh_t<0x000C1204> TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -1958,6 +2098,71 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static tiorl_t<0x000C1205> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -2046,10 +2251,9 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みベクターを返す
@@ -2057,27 +2261,27 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec(interrupt intr) {
+		static INT get_vec(interrupt intr) {
 			switch(intr) {
-			case interrupt::A:   return ICU::VECTOR::TGIA3;
-			case interrupt::B:   return ICU::VECTOR::TGIB3;
-			case interrupt::C:   return ICU::VECTOR::TGIC3;
-			case interrupt::D:   return ICU::VECTOR::TGID3;
-			case interrupt::OVF: return ICU::VECTOR::TCIV3;
+			case interrupt::A:   return INT::TGIA3;
+			case interrupt::B:   return INT::TGIB3;
+			case interrupt::C:   return INT::TGIC3;
+			case interrupt::D:   return INT::TGID3;
+			case interrupt::OVF: return INT::TCIV3;
 			}
-			return ICU::VECTOR::NONE;
+			return INT::NONE;
 		}
-#endif
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU4 定義基底クラス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
+		@param[in]	INT		割り込み型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral t>
+	template <peripheral per, typename INT>
 	struct mtu4_t : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2129,32 +2333,13 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU4)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
+			@brief  有効にする(MTU4)
+			@param[in]	ena	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable(bool ena = true)
 		{
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:					
-					MPC::P72PFS.PSEL = sel;  // MTIOC4A
-					PORT7::PMR.B2 = enable;
-				break;
-			case channel::B:
-					MPC::P73PFS.PSEL = sel;  // MTIOC4B
-					PORT7::PMR.B3 = enable;
-				break;
-			case channel::C:
-					MPC::P75PFS.PSEL = sel;  // MTIOC4C
-					PORT7::PMR.B5 = enable;
-				break;
-			case channel::D:
-					MPC::P76PFS.PSEL = sel;  // MTIOC4D
-					PORT7::PMR.B6 = enable;
-				break;
-			}
+			MTU::TSTRA.CST4 = 1;
 		}
 
 
@@ -2184,10 +2369,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1206> TIOR;
+		static tiorh_t<0x000C1206> TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -2196,6 +2381,71 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static tiorl_t<0x000C1207> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -2352,10 +2602,9 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みベクターを返す
@@ -2363,27 +2612,27 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec(interrupt intr) {
+		static INT get_vec(interrupt intr) {
 			switch(intr) {
-			case interrupt::A:   return ICU::VECTOR::TGIA4;
-			case interrupt::B:   return ICU::VECTOR::TGIB4;
-			case interrupt::C:   return ICU::VECTOR::TGIC4;
-			case interrupt::D:   return ICU::VECTOR::TGID4;
-			case interrupt::OVF: return ICU::VECTOR::TCIV4;
+			case interrupt::A:   return INT::TGIA4;
+			case interrupt::B:   return INT::TGIB4;
+			case interrupt::C:   return INT::TGIC4;
+			case interrupt::D:   return INT::TGID4;
+			case interrupt::OVF: return INT::TCIV4;
 			}
-			return ICU::VECTOR::NONE;
+			return INT::NONE;
 		}
-#endif
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU5 定義基底クラス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
+		@param[in]	INT		割り込み型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral t>
+	template <peripheral per, typename INT>
 	struct mtu5_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2432,43 +2681,18 @@ namespace device {
 		};
 
 
+#if 0
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU5)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
+			@brief  有効にする(MTU5)
+			@param[in]	ena	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable(bool ena = true)
 		{
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::U:
-					MPC::P24PFS.PSEL = sel;  // MTIOC5U
-					PORT2::PMR.B4 = enable;
-				break;
-			case channel::V:
-					MPC::P23PFS.PSEL = sel;  // MTIOC5V
-					PORT2::PMR.B3 = enable;
-				break;
-			case channel::W:
-					MPC::P22PFS.PSEL = sel;  // MTIOC5W
-					PORT2::PMR.B2 = enable;
-				break;
-			case channel::U2:
-					MPC::P82PFS.PSEL = sel;  // MTIOC5U
-					PORT8::PMR.B2 = enable;
-				break;
-			case channel::V2:
-					MPC::P81PFS.PSEL = sel;  // MTIOC5V
-					PORT8::PMR.B1 = enable;
-				break;
-			case channel::W2:
-					MPC::P80PFS.PSEL = sel;  // MTIOC5W
-					PORT8::PMR.B0 = enable;
-				break;
-			}
+			MTU::TSTRA.CST5 = 1;
 		}
+#endif
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2536,7 +2760,7 @@ namespace device {
 			@brief  タイマ I/O コントロールレジスタ（TIORU）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1C86> TIORU;
+		static tior_t<0x000C1C86> TIORU;
 
 
 		//-----------------------------------------------------------------//
@@ -2544,7 +2768,7 @@ namespace device {
 			@brief  タイマ I/O コントロールレジスタ（TIORV）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1C96> TIORV;
+		static tior_t<0x000C1C96> TIORV;
 
 
 		//-----------------------------------------------------------------//
@@ -2552,7 +2776,7 @@ namespace device {
 			@brief  タイマ I/O コントロールレジスタ（TIORW）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1CA6> TIORW;
+		static tior_t<0x000C1CA6> TIORW;
 
 
 		//-----------------------------------------------------------------//
@@ -2695,10 +2919,9 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みベクターを返す
@@ -2706,25 +2929,25 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec(interrupt intr) {
+		static INT get_vec(interrupt intr) {
 			switch(intr) {
-			case interrupt::U:   return ICU::VECTOR::TGIU5;
-			case interrupt::V:   return ICU::VECTOR::TGIV5;
-			case interrupt::W:   return ICU::VECTOR::TGIW5;
+			case interrupt::U:   return INT::TGIU5;
+			case interrupt::V:   return INT::TGIV5;
+			case interrupt::W:   return INT::TGIW5;
 			}
-			return ICU::VECTOR::NONE;
+			return INT::NONE;
 		}
-#endif
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU6 定義基底クラス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
+		@param[in]	INT		割り込み型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral t>
+	template <peripheral per, typename INT>
 	struct mtu6_t : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2776,32 +2999,13 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU6)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
+			@brief  有効にする(MTU6)
+			@param[in]	ena	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable(bool ena = true)
 		{
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:
-					MPC::PA1PFS.PSEL = sel;  // MTIOC6A
-					PORTA::PMR.B1 = enable;
-				break;
-			case channel::B:
-					MPC::P95PFS.PSEL = sel;  // MTIOC6B
-					PORT9::PMR.B5 = enable;
-				break;
-			case channel::C:
-					MPC::PA0PFS.PSEL = sel;  // MTIOC6C
-					PORTA::PMR.B0 = enable;
-				break;
-			case channel::D:
-					MPC::P92PFS.PSEL = sel;  // MTIOC6D
-					PORT9::PMR.B2 = enable;
-				break;
-			}
+			MTU::TSTRB.CST6 = 1;
 		}
 
 
@@ -2831,10 +3035,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1A04> TIOR;
+		static tiorh_t<0x000C1A04> TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -2843,6 +3047,71 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static tiorl_t<0x000C1A05> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -2957,10 +3226,9 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みベクターを返す
@@ -2968,27 +3236,27 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec(interrupt intr) {
+		static INT get_vec(interrupt intr) {
 			switch(intr) {
-			case interrupt::A:   return ICU::VECTOR::TGIA6;
-			case interrupt::B:   return ICU::VECTOR::TGIB6;
-			case interrupt::C:   return ICU::VECTOR::TGIC6;
-			case interrupt::D:   return ICU::VECTOR::TGID6;
-			case interrupt::OVF: return ICU::VECTOR::TCIV6;
+			case interrupt::A:   return INT::TGIA6;
+			case interrupt::B:   return INT::TGIB6;
+			case interrupt::C:   return INT::TGIC6;
+			case interrupt::D:   return INT::TGID6;
+			case interrupt::OVF: return INT::TCIV6;
 			}
-			return ICU::VECTOR::NONE;
+			return INT::NONE;
 		}
-#endif
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MTU7 定義基底クラス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
+		@param[in]	INT		割り込み型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral t>
+	template <peripheral per, typename INT>
 	struct mtu7_t : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3040,32 +3308,13 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  ポートを有効にする(MTU7)
-			@param[in]	channel	チャネル
-			@param[in]	enable	無効にする場合「false」
+			@brief  有効にする(MTU7)
+			@param[in]	ena	無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void enable(channel ch, bool enable = true)
+		static void enable(bool ena = true)
 		{
-			uint8_t sel = enable ? 0b00001 : 0;
-			switch(ch) {
-			case channel::A:
-					MPC::P94PFS.PSEL = sel;  // MTIOC7A
-					PORT9::PMR.B4 = enable;
-				break;
-			case channel::B:
-					MPC::P93PFS.PSEL = sel;  // MTIOC7B
-					PORT9::PMR.B3 = enable;
-				break;
-			case channel::C:
-					MPC::P91PFS.PSEL = sel;  // MTIOC7C
-					PORT9::PMR.B1 = enable;
-				break;
-			case channel::D:
-					MPC::P90PFS.PSEL = sel;  // MTIOC7D
-					PORT9::PMR.B0 = enable;
-				break;
-			}
+			MTU::TSTRB.CST7 = 1;
 		}
 
 
@@ -3095,10 +3344,10 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1A06> TIOR;
+		static tiorh_t<0x000C1A06> TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -3107,6 +3356,71 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static tiorl_t<0x000C1A07> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
+		};
+		static tior_t TIOR;
 
 
 		//-----------------------------------------------------------------//
@@ -3263,9 +3577,9 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 
-#if 0
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みベクターを返す
@@ -3273,26 +3587,345 @@ namespace device {
 			@return 割り込みベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec(interrupt intr) {
+		static INT get_vec(interrupt intr) {
 			switch(intr) {
-			case interrupt::A:   return ICU::VECTOR::TGIA7;
-			case interrupt::B:   return ICU::VECTOR::TGIB7;
-			case interrupt::C:   return ICU::VECTOR::TGIC7;
-			case interrupt::D:   return ICU::VECTOR::TGID7;
-			case interrupt::OVF: return ICU::VECTOR::TCIV7;
+			case interrupt::A:   return INT::TGIA7;
+			case interrupt::B:   return INT::TGIB7;
+			case interrupt::C:   return INT::TGIC7;
+			case interrupt::D:   return INT::TGID7;
+			case interrupt::OVF: return INT::TCIV7;
 			}
-			return ICU::VECTOR::NONE;
+			return INT::NONE;
 		}
-#endif
 	};
 
-	typedef mtu_t MTU;
-	typedef mtu0_t<peripheral::MTU0> MTU0;
-	typedef mtu1_t<peripheral::MTU1> MTU1;
-	typedef mtu2_t<peripheral::MTU2> MTU2;
-	typedef mtu3_t<peripheral::MTU3> MTU3;
-	typedef mtu4_t<peripheral::MTU4> MTU4;
-	typedef mtu5_t<peripheral::MTU5> MTU5;
-	typedef mtu6_t<peripheral::MTU6> MTU6;
-	typedef mtu7_t<peripheral::MTU7> MTU7;
+#if defined(SIG_RX24T) || defined(SIG_RX66T)
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  MTU9 定義基底クラス
+		@param[in]	per		ペリフェラル型
+		@param[in]	INT		割り込み型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <peripheral per, typename INT>
+	struct mtu9_t : public mtu_t {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  クロックソース(MTU9)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class clock_source : uint8_t {
+			PCLKA      = 0b000000,	///< PCLKA / 1
+			PCLKA_4    = 0b000001,	///< PCLKA / 4
+			PCLKA_16   = 0b000010,	///< PCLKA / 16
+			PCLKA_64   = 0b000011,	///< PCLKA / 64
+			MTCLKA     = 0b000100,	///< MTCLKA
+			MTCLKB     = 0b000101,	///< MTCLKB
+			MTCLKC     = 0b000110,	///< MTCLKC
+			MTCLKD     = 0b000111,	///< MTCLKD
+			PCLKA_2    = 0b001000,	///< PCLKA / 2
+			PCLKA_8    = 0b010000,	///< PCLKA / 8
+			PCLKA_32   = 0b011000,	///< PCLKA / 32
+			PCLKA_256  = 0b100000,	///< PCLKA / 256
+			PCLKA_1024 = 0b101000,	///< PCLKA / 1024
+			MTIOC1A    = 0b111000,	///< MTIOC1A
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  入出力チャネル(MTU9)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class channel : uint8_t {
+			A,  ///< PD7 / MTIOC9A (LFQFP100:18)
+			B,  ///< PE0 / MTIOC9B (LFQFP100:17)
+			C,  ///< PD6 / MTIOC9C (LFQFP100:19)
+			D,  ///< PE1 / MTIOC9D (LFQFP100:16)
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  割り込み要因(MTU9)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class interrupt : uint8_t {
+			A,		///< TGIA
+			B,		///< TGIB
+			C,		///< TGIC
+			D,		///< TGID
+			OVR,	///< TCIV オーバーフロー
+			E,		///< TGIE
+			F,		///< TGIF
+		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  有効にする(MTU9)
+			@param[in]	ena	無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		static void enable(bool ena = true)
+		{
+			MTU::TSTRA.CST9 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマコントロールレジスタ（TCR）
+		*/
+		//-----------------------------------------------------------------//
+		static tcr_t<0x000C1580> TCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマコントロールレジスタ 2（TCR2）
+		*/
+		//-----------------------------------------------------------------//
+		static tcr2_t<0x000C15A8> TCR2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマモードレジスタ 1（TMDR1）
+		*/
+		//-----------------------------------------------------------------//
+		static tmdr1x_t<0x000C1581> TMDR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIORH）
+		*/
+		//-----------------------------------------------------------------//
+		static tiorh_t<0x000C1582> TIORH;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIORL）
+		*/
+		//-----------------------------------------------------------------//
+		static tiorl_t<0x000C1583> TIORL;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タイマ I/O コントロールレジスタ（TIOR）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct tior_t {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の設定
+				@param[in]	ch	チャネル
+				@param[in]	val	設定値
+			*/
+			//-------------------------------------------------------------//
+			bool set(channel ch, uint8_t val)
+			{
+				switch(ch) {
+				case channel::A:
+					TIORH.IOA = val;
+					break;
+				case channel::B:
+					TIORH.IOB = val;
+					break;
+				case channel::C:
+					TIORL.IOC = val;
+					break;
+				case channel::D:
+					TIORL.IOD = val;
+					break;
+				default:
+					return false;
+				}
+				return true;
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  TIOR の取得
+				@param[in]	ch	チャネル
+			*/
+			//-------------------------------------------------------------//
+			uint8_t get(channel ch)
+			{
+				switch(ch) {
+				case channel::A:
+					return TIORH.IOA();
+					break;
+				case channel::B:
+					return TIORH.IOB();
+					break;
+				case channel::C:
+					return TIORL.IOC();
+					break;
+				case channel::D:
+					return TIORL.IOD();
+					break;
+				default:
+					return 0x00;
+				}
+			}
+		};
+		static tior_t TIOR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマインタラプトイネーブルレジスタ（TIER）
+		*/
+		//-----------------------------------------------------------------//
+		static tiery_t<0x000C1584> TIER;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマインタラプトイネーブルレジスタ（TIER2）
+		*/
+		//-----------------------------------------------------------------//
+		static tier2_t<0x000C15A4> TIER2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマバッファ動作転送モードレジスタ（TBTM）
+		*/
+		//-----------------------------------------------------------------//
+		static tbtmx_t<0x000C15A6> TBTM;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマカウンタ（TCNT）
+		*/
+		//-----------------------------------------------------------------//
+		static rw16_t<0x000C1586> TCNT;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ（TGRA）
+		*/
+		//-----------------------------------------------------------------//
+		static rw16_t<0x000C1588> TGRA;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ（TGRB）
+		*/
+		//-----------------------------------------------------------------//
+		static rw16_t<0x000C158A> TGRB;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ（TGRC）
+		*/
+		//-----------------------------------------------------------------//
+		static rw16_t<0x000C158C> TGRC;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ（TGRD）
+		*/
+		//-----------------------------------------------------------------//
+		static rw16_t<0x000C158E> TGRD;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ（TGRE）
+		*/
+		//-----------------------------------------------------------------//
+		static rw16_t<0x000C15A0> TGRE;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイマジェネラルレジスタ（TGRF）
+		*/
+		//-----------------------------------------------------------------//
+		static rw16_t<0x000C15A2> TGRF;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ノイズフィルタコントロールレジスタ（NFCR）
+		*/
+		//-----------------------------------------------------------------//
+		static nfcr_t<0x000C1296> NFCR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ペリフェラル型を返す
+			@return ペリフェラル型
+		*/
+		//-----------------------------------------------------------------//
+		static peripheral get_peripheral() { return per; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みベクターを返す
+			@param[in]	intr	割り込み要因
+			@return 割り込みベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static INT get_vec(interrupt intr) {
+			switch(intr) {
+			case interrupt::A:   return INT::TGIA9;
+			case interrupt::B:   return INT::TGIB9;
+			case interrupt::C:   return INT::TGIC9;
+			case interrupt::D:   return INT::TGID9;
+			case interrupt::OVF: return INT::TCIV9;
+			case interrupt::E:   return INT::TGIE9;
+			case interrupt::F:   return INT::TGIF9;
+			}
+			return INT::NONE;
+		}
+	};
+#endif
+
+#if defined(SIG_RX24T)
+	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR> MTU0;
+	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR> MTU1;
+	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR> MTU2;
+	typedef mtu3_t<peripheral::MTU3, ICU::VECTOR> MTU3;
+	typedef mtu4_t<peripheral::MTU4, ICU::VECTOR> MTU4;
+	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR> MTU5;
+	typedef mtu6_t<peripheral::MTU6, ICU::VECTOR> MTU6;
+	typedef mtu7_t<peripheral::MTU7, ICU::VECTOR> MTU7;
+	typedef mtu9_t<peripheral::MTU9, ICU::VECTOR> MTU9;
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR_SELA> MTU0;
+	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR_SELA> MTU1;
+	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR_SELA> MTU2;
+	typedef mtu3_t<peripheral::MTU3, ICU::VECTOR_SELA> MTU3;
+	typedef mtu4_t<peripheral::MTU4, ICU::VECTOR_SELA> MTU4;
+	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR_SELA> MTU5;
+	typedef mtu6_t<peripheral::MTU6, ICU::VECTOR_SELA> MTU6;
+	typedef mtu7_t<peripheral::MTU7, ICU::VECTOR_SELA> MTU7;
+#elif defined(SIG_RX66T)
+	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR_SELA> MTU0;
+	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR_SELA> MTU1;
+	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR_SELA> MTU2;
+	typedef mtu3_t<peripheral::MTU3, ICU::VECTOR_SELA> MTU3;
+	typedef mtu4_t<peripheral::MTU4, ICU::VECTOR_SELA> MTU4;
+	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR_SELA> MTU5;
+	typedef mtu6_t<peripheral::MTU6, ICU::VECTOR_SELA> MTU6;
+	typedef mtu7_t<peripheral::MTU7, ICU::VECTOR_SELA> MTU7;
+	typedef mtu9_t<peripheral::MTU9, ICU::VECTOR_SELA> MTU9;
+#endif
 }

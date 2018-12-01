@@ -21,14 +21,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class icu_mgr {
 
-		static utils::dispatch<icu_t::VECTOR::GROUPBE0, 2>  GROUPBE0_dispatch_;
-#if defined(SIG_RX65N)
-		static utils::dispatch<icu_t::VECTOR::GROUPBL2, 1>  GROUPBL2_dispatch_;
-#endif
-		static utils::dispatch<icu_t::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_;
-		static utils::dispatch<icu_t::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_;
-		static utils::dispatch<icu_t::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_;
-		static utils::dispatch<icu_t::VECTOR::GROUPAL1, 12> GROUPAL1_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPBE0, 2>  GROUPBE0_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPAL1, 12> GROUPAL1_dispatch_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -39,11 +36,10 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool set_level(icu_t::VECTOR vec, uint8_t lvl) noexcept
+		static bool set_level(ICU::VECTOR vec, uint8_t lvl) noexcept
 		{
 			bool ena = lvl != 0 ? true : false;
 			switch(vec) {
-
 			case ICU::VECTOR::CMI0:
 				ICU::IER.CMI0 = 0;
 				ICU::IPR.CMI0 = lvl;
@@ -66,37 +62,56 @@ namespace device {
 				ICU::IER.CMWI1 = ena;
 				break;
 
-			case icu_t::VECTOR::GROUPBE0:
+			case ICU::VECTOR::GROUPBE0:
 				ICU::IER.GROUPBE0 = 0;
 				ICU::IPR.GROUPBE0 = lvl;
 				ICU::IER.GROUPBE0 = ena;
 				break;
-#if defined(SIG_RX65N)
-			case icu_t::VECTOR::GROUPBL2:
-				ICU::IER.GROUPBL2 = 0;
-				ICU::IPR.GROUPBL2 = lvl;
-				ICU::IER.GROUPBL2 = ena;
-				break;
-#endif
-			case icu_t::VECTOR::GROUPBL0:
+			case ICU::VECTOR::GROUPBL0:
 				ICU::IER.GROUPBL0 = 0;
 				ICU::IPR.GROUPBL0 = lvl;
 				ICU::IER.GROUPBL0 = ena;
 				break;
-			case icu_t::VECTOR::GROUPBL1:
+			case ICU::VECTOR::GROUPBL1:
 				ICU::IER.GROUPBL1 = 0;
 				ICU::IPR.GROUPBL1 = lvl;
 				ICU::IER.GROUPBL1 = ena;
 				break;
-			case icu_t::VECTOR::GROUPAL0:
+			case ICU::VECTOR::GROUPAL0:
 				ICU::IER.GROUPAL0 = 0;
 				ICU::IPR.GROUPAL0 = lvl;
 				ICU::IER.GROUPAL0 = ena;
 				break;
-			case icu_t::VECTOR::GROUPAL1:
+			case ICU::VECTOR::GROUPAL1:
 				ICU::IER.GROUPAL1 = 0;
 				ICU::IPR.GROUPAL1 = lvl;
 				ICU::IER.GROUPAL1 = ena;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込みレベルを設定する（選択型Ｂ）
+			@param[in]	icu	割り込み要因
+			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static bool set_level(ICU::VECTOR_SELB vec, uint8_t lvl) noexcept
+		{
+			bool ena = lvl != 0 ? true : false;
+			switch(vec) {
+			case ICU::VECTOR_SELB::CMI2:
+//				ICU::IER.CMI0 = 0;
+//				ICU::IPR.CMI0 = lvl;
+//				ICU::IER.CMI0 = ena;
+				break;
+			case ICU::VECTOR_SELB::CMI3:
 				break;
 			default:
 				return false;
@@ -207,7 +222,6 @@ namespace device {
 				ICU::IPR.TXI7 = lvl;
 				ICU::IER.TXI7 = ena;
 				break;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			case peripheral::SCIF8:
 				ICU::IPR.RXIF8 = lvl;
 				ICU::IER.RXIF8 = ena;
@@ -232,32 +246,6 @@ namespace device {
 				ICU::IPR.TXIF11 = lvl;
 				ICU::IER.TXIF11 = ena;
 				break;
-#elif defined(SIG_RX65N)
-			case peripheral::SCI8:
-				ICU::IPR.RXI8 = lvl;
-				ICU::IER.RXI8 = ena;
-				ICU::IPR.TXI8 = lvl;
-				ICU::IER.TXI8 = ena;
-				break;
-			case peripheral::SCI9:
-				ICU::IPR.RXI9 = lvl;
-				ICU::IER.RXI9 = ena;
-				ICU::IPR.TXI9 = lvl;
-				ICU::IER.TXI9 = ena;
-				break;
-			case peripheral::SCI10:
-				ICU::IPR.RXI10 = lvl;
-				ICU::IER.RXI10 = ena;
-				ICU::IPR.TXI10 = lvl;
-				ICU::IER.TXI10 = ena;
-				break;
-			case peripheral::SCI11:
-				ICU::IPR.RXI11 = lvl;
-				ICU::IER.RXI11 = ena;
-				ICU::IPR.TXI11 = lvl;
-				ICU::IER.TXI11 = ena;
-				break;
-#endif
 			case peripheral::SCI12:
 				ICU::IPR.RXI12 = lvl;
 				ICU::IER.RXI12 = ena;

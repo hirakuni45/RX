@@ -19,6 +19,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class peripheral : uint16_t {
 
+		CAC,		///< クロック周波数精度測定回路
+
+		DTC,		///< データトランスファコントローラ
+
 		DMAC0,		///< DMA コントローラ・チャネル０
 		DMAC1,		///< DMA コントローラ・チャネル１
 		DMAC2,		///< DMA コントローラ・チャネル２
@@ -65,8 +69,6 @@ namespace device {
 		TPU4,		///< 16 ビットタイマパルスユニット４
 		TPU5,		///< 16 ビットタイマパルスユニット５
 
-		DTC,		///< データトランスファコントローラ
-
 		ETHERC0,	///< Ethernet 0 (PHY RMII)
 		ETHERC1,	///< Ethernet 1 (PHY RMII)
 		PTPETHERC,	///< PTP Ethernet
@@ -78,9 +80,7 @@ namespace device {
 		PTPEDMAC,	///< PTP Ethernet DMA
 
 		USB0,		///< USB2.0FSホスト/ファンクションモジュール（USBb）
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 		USBA,		///< USB 2.0 Full-Speed ホスト / ファンクションモジュール（USBA）
-#endif
 
 		SCI0,		///< シリアルコミュニケーションインタフェース (P20:TXD0, P21:RXD0)
 		SCI1,		///< シリアルコミュニケーションインタフェース (PF0:TXD1, PF2:RXD1)
@@ -90,46 +90,28 @@ namespace device {
 		SCI5,		///< シリアルコミュニケーションインタフェース (PA4:TXD5, PA2:RXD5)
 		SCI6,		///< シリアルコミュニケーションインタフェース (P00:TXD6, P01:RXD6)
 		SCI7,		///< シリアルコミュニケーションインタフェース (P90:TXD7, P92:RXD7)
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 		SCIF8,		///< FIFO 内臓シリアルコミュニケーションインターフェース
 		SCIF9,		///< FIFO 内臓シリアルコミュニケーションインターフェース
 		SCIF10,		///< FIFO 内臓シリアルコミュニケーションインターフェース
 		SCIF11,		///< FIFO 内臓シリアルコミュニケーションインターフェース
-#elif defined(SIG_RX65N)
-		SCI8,		///< シリアルコミュニケーションインターフェース
-		SCI9,		///< シリアルコミュニケーションインターフェース
-		SCI10,		///< シリアルコミュニケーションインターフェース
-		SCI11,		///< シリアルコミュニケーションインターフェース
-#endif
 		SCI12,		///< シリアルコミュニケーションインタフェース
 
 		RIIC0,		///< I 2 C バスインタフェース０（RIICa）
-#if defined(SIG_RX65N)
-		RIIC1,		///< I 2 C バスインタフェース１（RIICa）
-#endif
 		RIIC2,		///< I 2 C バスインタフェース２（RIICa）
 
 		CAN0,		///< CAN インタフェース（CAN0）
 		CAN1,		///< CAN インタフェース（CAN1）
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 		CAN2,		///< CAN インタフェース（CAN2）
-#endif
-#if defined(SIG_RX65N)
-		RSPI0,		///< シリアルペリフェラルインタフェース（RSPI0）
-		RSPI1,		///< シリアルペリフェラルインタフェース（RSPI1）
-#else
+
 		RSPI,		///< シリアルペリフェラルインタフェース（RSPIa）
-#endif
-#ifdef SIG_RX71M
 		RSPI2,		///< シリアルペリフェラルインタフェース（RSPIb）
-#endif
+
 		QSPI,		///< クワッドシリアルペリフェラルインタフェース（QSPI）
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 		SSI0,		///< シリアルサウンドインタフェース（SSI）
 		SSI1,		///< シリアルサウンドインタフェース（SSI）
 		SRC,		///< サンプリングレートコンバータ（SRC）
-#endif
+
 		SDHI,		///< SD ホストインタフェース（SDHI）
 
 		S12AD,		///< 12 ビット A/D コンバータ（S12ADC）
@@ -149,11 +131,6 @@ namespace device {
 		IRQ5,
 		IRQ6,
 		IRQ7,
-
-#ifdef SIG_RX65N
-		GLCDC,		///< グラフィック LCD コントローラ (GLCDC)
-		DRW2D,		///< 2D 描画エンジン (DRW2D)
-#endif
 
 		ICU,		///< グループ割り込みペリフェラル
 	};

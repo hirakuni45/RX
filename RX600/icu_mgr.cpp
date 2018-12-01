@@ -7,14 +7,11 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/device.hpp"
+#include "RX600/icu_mgr.hpp"
 
 namespace device {
 
 	utils::dispatch<icu_t::VECTOR::GROUPBE0, 2>  icu_mgr::GROUPBE0_dispatch_;
-#if defined(SIG_RX65N)
-	utils::dispatch<icu_t::VECTOR::GROUPBL2, 1>  icu_mgr::GROUPBL2_dispatch_;
-#endif
 	utils::dispatch<icu_t::VECTOR::GROUPBL0, 32> icu_mgr::GROUPBL0_dispatch_;
 	utils::dispatch<icu_t::VECTOR::GROUPBL1, 32> icu_mgr::GROUPBL1_dispatch_;
 	utils::dispatch<icu_t::VECTOR::GROUPAL0, 22> icu_mgr::GROUPAL0_dispatch_;
