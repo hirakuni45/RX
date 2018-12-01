@@ -20,11 +20,25 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  systen_io クラス
-		@param[in]	base_clock	ベース・クロック周波数（標準：１０ＭＨｚ）
+		@param[in]	BASE_CLOCK	ベース・クロック周波数（１０ＭＨｚ）
+		@param[in]	INTR_CLOCK	内臓クロック周波数（８０ＭＨｚ）
+		@param[in]	EXT_CLOCK	外部クロックに入力を行う場合「true」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base_clock = 10000000>
+	template <uint32_t BASE_CLOCK = 10000000, uint32_t INTR_CLOCK = 80000000,
+		bool EXT_CLOCK = false>
 	struct system_io {
+
+		static uint8_t clock_div_(uint32_t clk) noexcept
+		{
+			uint8_t div = 0;
+			while(clk < INTR_CLOCK) {
+				++div;
+				clk <<= 1;
+			}
+			return div;
+		}
+
 
 		//-------------------------------------------------------------//
 		/*!
@@ -51,40 +65,28 @@ namespace device {
 
 			device::SYSTEM::MOSCWTCR = 9;	// 4ms wait
 			// メインクロック・ドライブ能力設定、内部発信
-			device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV21.b(1);
+			bool xtal = BASE_CLOCK >= 10000000;
+			device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV21.b(xtal)
+				| device::SYSTEM::MOFCR.MOSEL.b(EXT_CLOCK);
 			device::SYSTEM::MOSCCR.MOSTP = 0;  // メインクロック発振器動作
 			while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
 
-			// ベースクロックからマルチプライヤを計算
-			uint8_t x = F_ICLK * 2 / base_clock;
-			if(x < (4 * 2) || x >= (16 * 2)) return false;
-			x -= 1;
-			device::SYSTEM::PLLCR.STC = x;
-
-			uint32_t sysclk = ((static_cast<uint32_t>(x) + 1) * base_clock) / 2;
-
-			// Max: 32MHz
-			uint8_t fck = (sysclk / F_FCLK) - 1;
-			if(fck > 6) return false;
-
-			uint8_t ick = (sysclk / F_ICLK) - 1;
-			if(ick > 6) return false;
-
-			uint8_t pcka = (sysclk / F_PCLKA) - 1;
-			if(pcka > 6) return false;
-			uint8_t pckb = (sysclk / F_PCLKB) - 1;
-			if(pckb > 6) return false;
-			uint8_t pckd = (sysclk / F_PCLKD) - 1;
-			if(pckd > 6) return false;
+			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
+			// ... MAX x30.0
+			uint32_t n = INTR_CLOCK * 2 / BASE_CLOCK;
+			if(n < 20) n = 20;
+			else if(n > 60) n = 60;
+			n -= 20;
+			device::SYSTEM::PLLCR.STC = n + 0b010011;
 
 			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
 
-			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(fck)
-								  | device::SYSTEM::SCKCR.ICK.b(ick)     // Max: 80MHz
-								  | device::SYSTEM::SCKCR.PCKA.b(pcka)	 // Max: 80MHz
-								  | device::SYSTEM::SCKCR.PCKB.b(pckb)	 // Max: 40MHz
-								  | device::SYSTEM::SCKCR.PCKD.b(pckd);	 // Max: 40MHz
+			device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(clock_div_(F_FCLK))
+								  | device::SYSTEM::SCKCR.ICK.b(clock_div_(F_ICLK))
+								  | device::SYSTEM::SCKCR.PCKA.b(clock_div_(F_PCLKA))
+								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(F_PCLKB))
+								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(F_PCLKD));
 
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	// PLL 選択
 
