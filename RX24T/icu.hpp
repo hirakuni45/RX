@@ -37,7 +37,7 @@ namespace device {
 			CMI2    = 30,   ///< CMT2
 			CMI3    = 31,   ///< CMT3
 
-			FEPRF   = 32,  // CAC
+			FERRF   = 32,  // CAC
 			MENDF   = 33,  // CAC
 			OVFF    = 34,  // CAC
 
