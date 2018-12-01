@@ -19,6 +19,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class peripheral : uint16_t {
 
+		CAC,		///< クロック周波数精度測定回路
+
+		DTC,		///< データトランスファコントローラ
+
 		DMAC0,		///< DMA コントローラ・チャネル０
 		DMAC1,		///< DMA コントローラ・チャネル１
 		DMAC2,		///< DMA コントローラ・チャネル２
@@ -64,8 +68,6 @@ namespace device {
 		TPU3,		///< 16 ビットタイマパルスユニット３
 		TPU4,		///< 16 ビットタイマパルスユニット４
 		TPU5,		///< 16 ビットタイマパルスユニット５
-
-		DTC,		///< データトランスファコントローラ
 
 		ETHERC0,	///< Ethernet 0 (PHY RMII)
 		ETHERC1,	///< Ethernet 1 (PHY RMII)

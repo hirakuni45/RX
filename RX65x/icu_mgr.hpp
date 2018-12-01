@@ -22,9 +22,7 @@ namespace device {
 	class icu_mgr {
 
 		static utils::dispatch<icu_t::VECTOR::GROUPBE0, 2>  GROUPBE0_dispatch_;
-#if defined(SIG_RX65N)
 		static utils::dispatch<icu_t::VECTOR::GROUPBL2, 1>  GROUPBL2_dispatch_;
-#endif
 		static utils::dispatch<icu_t::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_;
 		static utils::dispatch<icu_t::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_;
 		static utils::dispatch<icu_t::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_;
@@ -71,13 +69,11 @@ namespace device {
 				ICU::IPR.GROUPBE0 = lvl;
 				ICU::IER.GROUPBE0 = ena;
 				break;
-#if defined(SIG_RX65N)
 			case icu_t::VECTOR::GROUPBL2:
 				ICU::IER.GROUPBL2 = 0;
 				ICU::IPR.GROUPBL2 = lvl;
 				ICU::IER.GROUPBL2 = ena;
 				break;
-#endif
 			case icu_t::VECTOR::GROUPBL0:
 				ICU::IER.GROUPBL0 = 0;
 				ICU::IPR.GROUPBL0 = lvl;
@@ -207,32 +203,6 @@ namespace device {
 				ICU::IPR.TXI7 = lvl;
 				ICU::IER.TXI7 = ena;
 				break;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			case peripheral::SCIF8:
-				ICU::IPR.RXIF8 = lvl;
-				ICU::IER.RXIF8 = ena;
-				ICU::IPR.TXIF8 = lvl;
-				ICU::IER.TXIF8 = ena;
-				break;
-			case peripheral::SCIF9:
-				ICU::IPR.RXIF9 = lvl;
-				ICU::IER.RXIF9 = ena;
-				ICU::IPR.TXIF9 = lvl;
-				ICU::IER.TXIF9 = ena;
-				break;
-			case peripheral::SCIF10:
-				ICU::IPR.RXIF10 = lvl;
-				ICU::IER.RXIF10 = ena;
-				ICU::IPR.TXIF10 = lvl;
-				ICU::IER.TXIF10 = ena;
-				break;
-			case peripheral::SCIF11:
-				ICU::IPR.RXIF11 = lvl;
-				ICU::IER.RXIF11 = ena;
-				ICU::IPR.TXIF11 = lvl;
-				ICU::IER.TXIF11 = ena;
-				break;
-#elif defined(SIG_RX65N)
 			case peripheral::SCI8:
 				ICU::IPR.RXI8 = lvl;
 				ICU::IER.RXI8 = ena;
@@ -257,7 +227,6 @@ namespace device {
 				ICU::IPR.TXI11 = lvl;
 				ICU::IER.TXI11 = ena;
 				break;
-#endif
 			case peripheral::SCI12:
 				ICU::IPR.RXI12 = lvl;
 				ICU::IER.RXI12 = ena;
@@ -454,7 +423,7 @@ namespace device {
 			}
 		}
 
-#if defined(SIG_RX65N)
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  グループ割り込み・ハンドラ GROUPBL2（レベル割り込み）
@@ -471,7 +440,7 @@ namespace device {
 				sign <<= 1;
 			}
 		}
-#endif
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -528,7 +497,7 @@ namespace device {
 			return ret;
 		}
 
-#if defined(SIG_RX65N)
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  GROUPBL2 割り込みタスクを登録する @n
@@ -547,7 +516,6 @@ namespace device {
 			if(ret && ena) ICU::GENBL2 |= 1 << i;
 			return ret;
 		}
-#endif
 
 
 		//-----------------------------------------------------------------//
