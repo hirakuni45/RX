@@ -71,13 +71,11 @@ namespace device {
 			device::SYSTEM::MOSCCR.MOSTP = 0;  // メインクロック発振器動作
 			while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
 
-			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
-			// ... MAX x30.0
+			// Min: (x4.0) 0b000111, Max: (x15.5) 0b111110
 			uint32_t n = INTR_CLOCK * 2 / BASE_CLOCK;
-			if(n < 20) n = 20;
-			else if(n > 60) n = 60;
-			n -= 20;
-			device::SYSTEM::PLLCR.STC = n + 0b010011;
+			if(n < 8) n = 8;
+			else if(n > 31) n = 31;
+			device::SYSTEM::PLLCR.STC = n - 1;
 
 			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
