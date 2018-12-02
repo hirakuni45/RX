@@ -43,7 +43,7 @@ namespace device {
 			CMWI0        = 30,  // CMTW0
 			CMWI1        = 31,  // CMTW1
 
-#if defined(SIG_RX65N) || defined(SIG_RX71M)
+#if defined(SIG_RX71M)
 			D0FIFO2      = 32,  // USBA
 			D1FIFO2      = 33,  // USBA
 #endif
@@ -52,7 +52,7 @@ namespace device {
 
 			SPRI0        = 38,  // RSPI0
 			SPTI0        = 39,  // RSPI0
-#if defined(SIG_RX65N) || defined(SIG_RX71M)
+#if defined(SIG_RX71M)
 			SPRI1        = 40,  // RSPI1
 			SPTI1        = 41,  // RSPI1
 #endif
@@ -62,18 +62,12 @@ namespace device {
 			SBFAI        = 44,  // SDHI
 
 			MBFAI        = 45,  // MMCIF
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			SSITXI0      = 46,  // SSI0 シリアルサウンドインタフェース
 			SSIRXI0      = 47,  // SSI0 シリアルサウンドインタフェース
 			SSIRTI1      = 48,  // SSI1 シリアルサウンドインタフェース
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+
 			IDEI         = 50,  // SRC
 			ODFI         = 51,  // SRC
-#elif defined(SIG_RX65N)
-			RIIC_RXI1    = 50,	// RIIC1 RXI
-			RIIC_TXI1    = 51,	// RIIC1 TXI
-#endif
 			RIIC_RXI0    = 52,  // RIIC0 RXI
 			RIIC_TXI0    = 53,	// RIIC0 TXI
 			RIIC_RXI2    = 54,  // RIIC2 RXI
@@ -119,9 +113,8 @@ namespace device {
 
 			ALM          = 92,  // RTC
 			PRD          = 93,
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			USBAR        = 94,  // USBA
-#endif
+
 			IWUNI        = 95,  // IWDT
 
 			WUNI         = 96,  // WDT
@@ -130,39 +123,21 @@ namespace device {
 
 			RXI7         = 98,  // SCI7
 			TXI7         = 99,
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			RXIF8        = 100, // SCIFA8
 			TXIF8        = 101,
 			RXIF9        = 102, // SCIFA9
 			TXIF9        = 103,
 			RXIF10       = 104, // SCIFA10
 			TXIF10       = 105,
-#elif defined(SIG_RX65N)
-			RXI8         = 100, // SCI8
-			TXI8         = 101,
-			RXI9         = 102, // SCI9
-			TXI9         = 103,
-			RXI10        = 104, // SCI10
-			TXI10        = 105,
-#endif
-			GROUPBE0     = 106,  // ICU
-#if defined(SIG_RX65N)
-			GROUPBL2     = 107,
 
-			SPRI2        = 108,
-			SPTI2        = 109,
-#endif
+			GROUPBE0     = 106,  // ICU
+
 			GROUPBL0	 = 110,  // ICU
 			GROUPBL1	 = 111,  // ICU
 			GROUPAL0	 = 112,  // ICU
 			GROUPAL1	 = 113,  // ICU
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			RXIF11  	 = 114,  // SCIFA11
 			TXIF11   	 = 115,
-#elif defined(SIG_RX65N)
-			RXI11   	 = 114,  // SCI11
-			TXI11   	 = 115,
-#endif
 			RXI12   	 = 116,  // SCI12
 			TXI12   	 = 117,
 
@@ -405,9 +380,7 @@ namespace device {
 		enum class VECTOR_BE0 {
 			ERS0,	///< CAN0 / ERS0
 			ERS1,	///< CAN1 / ERS1
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			ERS2	///< CAN2 / ERS2
-#endif
 		};
 
 
@@ -457,11 +430,9 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL1 {
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			OVFI = 0,		///< SRC / OVFI
 			UDFI,			///< SRC / UDFI
 			CEFI,			///< SRC / CEFI
-#endif
 			CDETI = 3,		///< SDHI / CDETI
 			CACI,			///< SDHI / CACI
 			SDACI,			///< SDHI / SDACI
@@ -476,37 +447,12 @@ namespace device {
 			EEI0,			///< RIIC0 / EEI0
 			TEI2,			///< RIIC2 / TEI2
 			EEI2,			///< RIIC2 / EEI2
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			SSIF0,			///< SSI0 / SSIF0
 			SSIF1,			///< SSI1 / SSIF1
-#endif
+
 			S12CMPAI = 20,	///< S12AD / S12CMPAI
-#if defined(SIG_RX65N)
-			S12CMPBI,		///< S12AD / S12CMPBI
-#endif
 			S12CMPAI1 = 22,	///< S12AD1 / S12CMPAI1
-#if defined(SIG_RX65N)
-			S12CMPBI1,		///< S12AD1 / S12CMPBI1
-			TEI8,			///< SCI8 / TEI8
-			ERI8,			///< SCI8 / ERI8
-			TEI9,			///< SCI9 / TEI9
-			ERI9,			///< SCI9 / ERI9
-			TEI1,			///< RIIC1 / TEI1
-			EEI1,			///< RIIC1 / EEI1
-#endif
 		};
-
-
-#if defined(SIG_RX65N)
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  GROUPBL2・ベクター・インデックス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BL2 {
-			SDIOI,			///< SDSI / SDIOI
-		};
-#endif
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -515,7 +461,6 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_AL0 {
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			TEIF8 = 0,		///< SCIFA8 / TEIF8
 			ERIF8,			///< SCIFA8 / ERIF8
 			BRIF8,			///< SCIFA8 / BRIF8
@@ -524,8 +469,7 @@ namespace device {
 			ERIF9,			///< SCIFA9 / ERIF9
 			BRIF9,			///< SCIFA9 / BRIF9
 			DRIF9,			///< SCIFA9 / DRIF9
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+
 			TEIF10 = 8,		///< SCIFA10 / TEIF10
 			ERIF10,			///< SCIFA10 / ERIF10
 			BRIF10,			///< SCIFA10 / BRIF10
@@ -534,23 +478,11 @@ namespace device {
 			ERIF11,			///< SCIFA11 / ERIF11
 			BRIF11,			///< SCIFA11 / BRIF11
 			DRIF11,			///< SCIFA11 / DRIF11
-#elif defined(SIG_RX65N)
-			TEI10 = 8,		///< SCI10 / TEI10
-			ERI10,			///< SCI10 / ERI10
 
-			TEI11 = 12,		///< SCI11 / TEI11
-			ERI11,			///< SCI11 / ERI11
-#endif
 			SPII0 = 16,		///< RSPI0 / SPII0
 			SPEI0,			///< RSPI0 / SPEI0
-#if defined(SIG_RX71M) || defined(SIG_RX65N)
 			SPII1,			///< RSPI1 / SPII1
 			SPEI1,			///< RSPI1 / SPEI1
-#endif
-#if defined(SIG_RX65N)
-			SPII2,			///< RSPI2 / SPII2
-			SPEI2,			///< RSPI2 / SPEI2
-#endif
 		};
 
 
@@ -560,20 +492,11 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_AL1 {
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			MINT = 0,		///< EPTPC / MINT
 			PINT,			///< PTPEDMAC / PINT
-#endif
+
 			EINT0 = 4,		///< EDMAC0/EINT0
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			EINT1 = 5,		///< EDMAC1/EINT1
-#endif
-#if defined(SIG_RX65N)
-			VPOS = 8,		///< GLCDC/VPOS
-			GR1UF,			///< GLCDC/GR1UF
-			GR2UF,			///< GLCDC/GR2UF
-			DRW_IRQ			///< DRW2D/DRW_IRQ
-#endif
 		};
 
 
