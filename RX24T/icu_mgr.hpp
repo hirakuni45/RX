@@ -251,16 +251,16 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みを設定する
-			@param[in]	t	周辺機器タイプ
+			@param[in]	per	周辺機器タイプ
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
 			@return 正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool set_level(peripheral t, uint8_t lvl)
+		static bool set_level(peripheral per, uint8_t lvl)
 		{
 			bool ret = true;
 			bool ena = lvl != 0 ? true : false;
-			switch(t) {
+			switch(per) {
 
 			case peripheral::RSPI0:
 				ICU::IPR.RSPI0 = lvl;

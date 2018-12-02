@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,14 +14,14 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  ICUA 定義基底クラス
+		@brief  ICU 定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct icu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  ベクター・インデックス
+			@brief  通常ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR {
@@ -30,25 +30,26 @@ namespace device {
 
 			FRDYI   = 23,   ///< FCU
 
-			SWINT   = 27,   ///< SWINT
-
+			SWINT   = 27,   ///< ICU
 			CMI0    = 28,   ///< CMT0
 			CMI1    = 29,   ///< CMT1
 			CMI2    = 30,   ///< CMT2
 			CMI3    = 31,   ///< CMT3
+			FERRF   = 32,	///< CAC
+			MENDF   = 33,	///< CAC
+			OVFF    = 34,	///< CAC
 
-			FERRF   = 32,  // CAC
-			MENDF   = 33,  // CAC
-			OVFF    = 34,  // CAC
+			ETGIN   = 40,	///< GPT
+			ETGIP   = 41,	///< GPT
 
-			SPEI0   = 44,  // RSPI0
-			SPRI0   = 45,  // RSPI0
-			SPTI0   = 46,  // RSPI0
-			SPII0   = 47,  // RSPI0
+			SPEI0   = 44,	///< RSPI0
+			SPRI0   = 45,	///< RSPI0
+			SPTI0   = 46,	///< RSPI0
+			SPII0   = 47,	///< RSPI0
 
-			DOPCF   = 57,  // DOC
+			DOPCF   = 57,	///< DOC
 
-			IRQ0    = 64,  // ICU
+			IRQ0    = 64,	///< ICU
 			IRQ1    = 65,
 			IRQ2    = 66,
 			IRQ3    = 67,
@@ -57,8 +58,8 @@ namespace device {
 			IRQ6    = 70,
 			IRQ7    = 71,
 
-			LVD1    = 88,   // LVD
-			LVD2    = 89,   // LVD
+			LVD1    = 88,   ///< LVD
+			LVD2    = 89,   ///< LVD
 
 			S12ADI  = 102,  ///< S12ADI
 			GBADI   = 103,  ///< S12AD
@@ -528,9 +529,9 @@ namespace device {
 			rw8_t<base + 192> TMR6;		///< TMR6
 			rw8_t<base + 195> TMR7;		///< TMR7
 
-			rw8_t<base + 218> SCI1;
-			rw8_t<base + 222> SCI5;
-			rw8_t<base + 226> SCI6;
+			rw8_t<base + 218> SCI1;		///< SCI1
+			rw8_t<base + 222> SCI5;		///< SCI5
+			rw8_t<base + 226> SCI6;		///< SCI6
 
 			rw8_t<base + 246> RIIC_EEI0;  	///< RIIC0
 			rw8_t<base + 247> RIIC_RXI0;
