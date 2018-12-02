@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include "common/device.hpp"
+#include <typeinfo>
 
 namespace device {
 
@@ -353,7 +354,18 @@ namespace device {
 			@return グループ・ベクター
 		*/
 		//-----------------------------------------------------------------//
-//		static ICU::VECTOR get_group_vec() { return ICU::VECTOR::GROUPBL0; }
+		static ICU::VECTOR get_group_vec() {
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
+			if(typeid(INT) == typeid(ICU::VECTOR_BL0)) {
+				return ICU::VECTOR::GROUPBL0;
+			} else if(typeid(INT) == typeid(ICU::VECTOR_BL1)) {
+				return ICU::VECTOR::GROUPBL1;
+			} else if(typeid(INT) == typeid(ICU::VECTOR_AL0)) {
+				return ICU::VECTOR::GROUPAL0;
+			}
+#endif
+			return ICU::VECTOR::NONE;
+		}
 	};
 
 
@@ -411,17 +423,17 @@ namespace device {
 
 #if defined(SIG_RX24T)
 	typedef sci_t<0x0008A020, peripheral::SCI1,
-		ICU::VECTOR::RXI1, ICU::VECTOR::TXI1, ICU::VECTOR, ICU::VECTOR::TEI1> SCI1;
+		ICU::VECTOR::TXI1, ICU::VECTOR::RXI1, ICU::VECTOR, ICU::VECTOR::TEI1> SCI1;
 	typedef sci_t<0x0008A020, peripheral::SCI1C,
-		ICU::VECTOR::RXI1, ICU::VECTOR::TXI1, ICU::VECTOR, ICU::VECTOR::TEI1> SCI1C;
+		ICU::VECTOR::TXI1, ICU::VECTOR::RXI1, ICU::VECTOR, ICU::VECTOR::TEI1> SCI1C;
 	typedef sci_t<0x0008A0A0, peripheral::SCI5,
-		ICU::VECTOR::RXI5, ICU::VECTOR::TXI5, ICU::VECTOR, ICU::VECTOR::TEI5> SCI5;
+		ICU::VECTOR::TXI5, ICU::VECTOR::RXI5, ICU::VECTOR, ICU::VECTOR::TEI5> SCI5;
 	typedef sci_t<0x0008A0A0, peripheral::SCI5C,
-		ICU::VECTOR::RXI5, ICU::VECTOR::TXI5, ICU::VECTOR, ICU::VECTOR::TEI5> SCI5C;
+		ICU::VECTOR::TXI5, ICU::VECTOR::RXI5, ICU::VECTOR, ICU::VECTOR::TEI5> SCI5C;
 	typedef sci_t<0x0008A0C0, peripheral::SCI6,
-		ICU::VECTOR::RXI6, ICU::VECTOR::TXI6, ICU::VECTOR, ICU::VECTOR::TEI6> SCI6;
+		ICU::VECTOR::TXI6, ICU::VECTOR::RXI6, ICU::VECTOR, ICU::VECTOR::TEI6> SCI6;
 	typedef sci_t<0x0008A0C0, peripheral::SCI6C,
-		ICU::VECTOR::RXI6, ICU::VECTOR::TXI6, ICU::VECTOR, ICU::VECTOR::TEI6> SCI6C;
+		ICU::VECTOR::TXI6, ICU::VECTOR::RXI6, ICU::VECTOR, ICU::VECTOR::TEI6> SCI6C;
 
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
 	typedef sci_t<0x0008A000, peripheral::SCI0,
