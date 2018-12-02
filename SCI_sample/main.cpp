@@ -9,6 +9,9 @@
 			　　　　P70 に接続された LED を利用する @n
 			RX24T: @n
 					10MHz のベースクロックを使用する @n
+			　　　　P00 ピンにLEDを接続する @n
+			RX66T: @n
+					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
@@ -24,6 +27,7 @@
 
 #include "common/cmt_io.hpp"
 
+// CMT タイマーを利用する場合有効にする。
 #define USE_CMT
 
 namespace {
@@ -48,6 +52,11 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX24T" };
+#elif defined(SIG_RX66T)
+	typedef device::system_io<10000000, 16000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX66T" };
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
