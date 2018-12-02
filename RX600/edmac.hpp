@@ -1,7 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ　EDMACa 定義
+	@brief	イーサネットコントローラ用 DMA コントローラ (EDMACa) @n
+			RX64M/RX71M/RX65N
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -9,6 +10,11 @@
 */
 //=====================================================================//
 #include "common/device.hpp"
+
+/// CMPC モジュールが無いデバイスでエラーとする
+#if defined(SIG_RX24T) || defined(SIG_RX66T)
+#  error "edmac.hpp: This module does not exist"
+#endif
 
 namespace device {
 
@@ -314,10 +320,10 @@ namespace device {
 	/*!
 		@brief  edmac 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
+	template <uint32_t base, peripheral per>
 	struct edmac_t : public edmac_core_t<base> {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -452,7 +458,7 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 	};
 
 
@@ -460,10 +466,10 @@ namespace device {
 	/*!
 		@brief  ptpedmac 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
+	template <uint32_t base, peripheral per>
 	struct ptpedmac_t : public edmac_core_t<base> {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -545,7 +551,7 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
+		static peripheral get_peripheral() { return per; }
 	};
 
 	typedef edmac_t<0x000C0000, peripheral::EDMAC0>      EDMAC0;

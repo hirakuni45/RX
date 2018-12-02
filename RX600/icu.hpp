@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・ICUb 定義
+	@brief	RX64M/RX71M グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -25,7 +25,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR {
-			VEC0         = 0,   ///< ベクター０
+			NONE         = 0,   ///< ベクター０
 
 			BUSERR       = 16,  ///< BSC
 
