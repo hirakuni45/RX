@@ -62,7 +62,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		tpu_io() noexcept : level_(0), intr_vec_(ICU::VECTOR::VEC0) { }
+		tpu_io() noexcept : level_(0), intr_vec_(ICU::VECTOR::NONE) { }
 
 
 		//-----------------------------------------------------------------//
