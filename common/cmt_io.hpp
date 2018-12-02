@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600, RX200 グループ・CMT I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -65,8 +65,12 @@ namespace device {
 			if(freq == 0) return false;
 
 			uint32_t cmcor = F_PCLKB / freq / 4;
-			if(cmcor & 1) { cmcor >>= 1; ++cmcor; }
-			else { cmcor >>= 1; }
+			if(cmcor & 1) {
+				cmcor >>= 1;
+				++cmcor;
+			} else {
+				cmcor >>= 1;
+			}
 
 			uint8_t cks = 0;
 			while(cmcor > 65536) {
