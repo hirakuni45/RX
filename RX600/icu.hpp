@@ -557,33 +557,21 @@ namespace device {
 
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			rw8_t<base + 100> RXIF8;
 			rw8_t<base + 101> TXIF8;
 			rw8_t<base + 102> RXIF9;
 			rw8_t<base + 103> TXIF9;
 			rw8_t<base + 104> RXIF10;
 			rw8_t<base + 105> TXIF10;
-#elif defined(SIG_RX65N)
-			rw8_t<base + 100> RXI8;
-			rw8_t<base + 101> TXI8;
-			rw8_t<base + 102> RXI9;
-			rw8_t<base + 103> TXI9;
-			rw8_t<base + 104> RXI10;
-			rw8_t<base + 105> TXI10;
-#endif
+
 			rw8_t<base + 106> GROUPBE0;
 			rw8_t<base + 110> GROUPBL0;
 			rw8_t<base + 111> GROUPBL1;
 			rw8_t<base + 112> GROUPAL0;
 			rw8_t<base + 113> GROUPAL1;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			rw8_t<base + 114> RXIF11;
 			rw8_t<base + 115> TXIF11;
-#elif defined(SIG_RX65N)
-			rw8_t<base + 114> RXI11;
-			rw8_t<base + 115> TXI11;
-#endif
+
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
 
@@ -738,7 +726,6 @@ namespace device {
 			typedef rw8_t<base + 0x0C> ier0C;
 			bit_rw_t<ier0C, bitpos::B2>	RXI7;
 			bit_rw_t<ier0C, bitpos::B3>	TXI7;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			bit_rw_t<ier0C, bitpos::B4>	RXIF8;
 			bit_rw_t<ier0C, bitpos::B5>	TXIF8;
 			bit_rw_t<ier0C, bitpos::B6>	RXIF9;
@@ -747,33 +734,17 @@ namespace device {
 			typedef rw8_t<base + 0x0D> ier0D;
 			bit_rw_t<ier0D, bitpos::B0>	RXIF10;
 			bit_rw_t<ier0D, bitpos::B1>	TXIF10;
-#elif defined(SIG_RX65N)
-			bit_rw_t<ier0C, bitpos::B4>	RXI8;
-			bit_rw_t<ier0C, bitpos::B5>	TXI8;
-			bit_rw_t<ier0C, bitpos::B6>	RXI9;
-			bit_rw_t<ier0C, bitpos::B7>	TXI9;
-
-			typedef rw8_t<base + 0x0D> ier0D;
-			bit_rw_t<ier0D, bitpos::B0>	RXI10;
-			bit_rw_t<ier0D, bitpos::B1>	TXI10;
-#endif
 			bit_rw_t<ier0D, bitpos::B2>	GROUPBE0;
-#if defined(SIG_RX65N)
-			bit_rw_t<ier0D, bitpos::B3>	GROUPBL2;
-#endif
+
 			bit_rw_t<ier0D, bitpos::B6>	GROUPBL0;
 			bit_rw_t<ier0D, bitpos::B7>	GROUPBL1;
 
 			typedef rw8_t<base + 0x0E> ier0E;
 			bit_rw_t<ier0E, bitpos::B0>	GROUPAL0;
 			bit_rw_t<ier0E, bitpos::B1> GROUPAL1;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			bit_rw_t<ier0E, bitpos::B2>	RXIF11;
 			bit_rw_t<ier0E, bitpos::B3>	TXIF11;
-#elif defined(SIG_RX65N)
-			bit_rw_t<ier0E, bitpos::B2>	RXI11;
-			bit_rw_t<ier0E, bitpos::B3>	TXI11;
-#endif
+
 			bit_rw_t<ier0E, bitpos::B4> RXI12;
 			bit_rw_t<ier0E, bitpos::B5> TXI12;
 
@@ -912,36 +883,20 @@ namespace device {
 
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			rw8_t<base + 100> RXIF8;
 			rw8_t<base + 101> TXIF8;
 			rw8_t<base + 102> RXIF9;
 			rw8_t<base + 103> TXIF9;
 			rw8_t<base + 104> RXIF10;
 			rw8_t<base + 105> TXIF10;
-#elif defined(SIG_RX65N)
-			rw8_t<base + 100> RXI8;
-			rw8_t<base + 101> TXI8;
-			rw8_t<base + 102> RXI9;
-			rw8_t<base + 103> TXI9;
-			rw8_t<base + 104> RXI10;
-			rw8_t<base + 105> TXI10;
-#endif
 			rw8_t<base + 106> GROUPBE0;
-#if defined(SIG_RX65N)
-			rw8_t<base + 107> GROUPBL2;
-#endif
+
 			rw8_t<base + 110> GROUPBL0;
 			rw8_t<base + 111> GROUPBL1;
 			rw8_t<base + 112> GROUPAL0;
 			rw8_t<base + 113> GROUPAL1;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			rw8_t<base + 114> RXIF11;
 			rw8_t<base + 115> TXIF11;
-#elif defined(SIG_RX65N)
-			rw8_t<base + 114> RXI11;
-			rw8_t<base + 115> TXI11;
-#endif
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
 
@@ -1239,9 +1194,6 @@ namespace device {
 		static grp_t<0x00087600> GRPBE0;
 		static grp_t<0x00087630> GRPBL0;
 		static grp_t<0x00087634> GRPBL1;
-#if defined(SIG_RX65N)
-		static grp_t<0x00087638> GRPBL2;
-#endif
 		static grp_t<0x00087830> GRPAL0;
 		static grp_t<0x00087834> GRPAL1;
 
@@ -1308,9 +1260,6 @@ namespace device {
 		static gen_t<0x00087640> GENBE0;
 		static gen_t<0x00087670> GENBL0;
 		static gen_t<0x00087674> GENBL1;
-#if defined(SIG_RX65N)
-		static gen_t<0x00087678> GENBL2;
-#endif
 		static gen_t<0x00087870> GENAL0;
 		static gen_t<0x00087874> GENAL1;
 
