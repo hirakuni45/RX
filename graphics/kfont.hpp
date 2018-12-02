@@ -14,11 +14,11 @@
 // 漢字フォントデータをＳＤカード上に置いて、キャッシュアクセスする場合有効にする
 // #define CASH_KFONT
 
-extern "C" {
 #ifdef CASH_KFONT
+extern "C" {
 	int fatfs_get_mount();
-#endif
 };
+#endif
 
 namespace graphics {
 
