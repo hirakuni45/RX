@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・ICUb 定義
+	@brief	RX651/RX65N グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -25,7 +25,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR {
-			VEC0         = 0,   ///< ベクター０
+			NONE         = 0,   ///< ベクター０
 
 			BUSERR       = 16,  ///< BSC
 
@@ -43,37 +43,26 @@ namespace device {
 			CMWI0        = 30,  // CMTW0
 			CMWI1        = 31,  // CMTW1
 
-#if defined(SIG_RX65N) || defined(SIG_RX71M)
 			D0FIFO2      = 32,  // USBA
 			D1FIFO2      = 33,  // USBA
-#endif
+
 			D0FIFO0      = 34,  // USB0
 			D1FIFO0      = 35,  // USB0
 
 			SPRI0        = 38,  // RSPI0
 			SPTI0        = 39,  // RSPI0
-#if defined(SIG_RX65N) || defined(SIG_RX71M)
 			SPRI1        = 40,  // RSPI1
 			SPTI1        = 41,  // RSPI1
-#endif
+
 			SPRI         = 42,  // QSPI
 			SPTI         = 43,  // QSPI
 
 			SBFAI        = 44,  // SDHI
 
 			MBFAI        = 45,  // MMCIF
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			SSITXI0      = 46,  // SSI0 シリアルサウンドインタフェース
-			SSIRXI0      = 47,  // SSI0 シリアルサウンドインタフェース
-			SSIRTI1      = 48,  // SSI1 シリアルサウンドインタフェース
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			IDEI         = 50,  // SRC
-			ODFI         = 51,  // SRC
-#elif defined(SIG_RX65N)
+
 			RIIC_RXI1    = 50,	// RIIC1 RXI
 			RIIC_TXI1    = 51,	// RIIC1 TXI
-#endif
 			RIIC_RXI0    = 52,  // RIIC0 RXI
 			RIIC_TXI0    = 53,	// RIIC0 TXI
 			RIIC_RXI2    = 54,  // RIIC2 RXI
@@ -119,9 +108,7 @@ namespace device {
 
 			ALM          = 92,  // RTC
 			PRD          = 93,
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			USBAR        = 94,  // USBA
-#endif
+
 			IWUNI        = 95,  // IWDT
 
 			WUNI         = 96,  // WDT
@@ -130,39 +117,26 @@ namespace device {
 
 			RXI7         = 98,  // SCI7
 			TXI7         = 99,
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			RXIF8        = 100, // SCIFA8
-			TXIF8        = 101,
-			RXIF9        = 102, // SCIFA9
-			TXIF9        = 103,
-			RXIF10       = 104, // SCIFA10
-			TXIF10       = 105,
-#elif defined(SIG_RX65N)
 			RXI8         = 100, // SCI8
 			TXI8         = 101,
 			RXI9         = 102, // SCI9
 			TXI9         = 103,
 			RXI10        = 104, // SCI10
 			TXI10        = 105,
-#endif
+
 			GROUPBE0     = 106,  // ICU
-#if defined(SIG_RX65N)
 			GROUPBL2     = 107,
 
 			SPRI2        = 108,
 			SPTI2        = 109,
-#endif
+
 			GROUPBL0	 = 110,  // ICU
 			GROUPBL1	 = 111,  // ICU
 			GROUPAL0	 = 112,  // ICU
 			GROUPAL1	 = 113,  // ICU
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			RXIF11  	 = 114,  // SCIFA11
-			TXIF11   	 = 115,
-#elif defined(SIG_RX65N)
 			RXI11   	 = 114,  // SCI11
 			TXI11   	 = 115,
-#endif
+
 			RXI12   	 = 116,  // SCI12
 			TXI12   	 = 117,
 
@@ -403,9 +377,6 @@ namespace device {
 		enum class VECTOR_BE0 {
 			ERS0,	///< CAN0 / ERS0
 			ERS1,	///< CAN1 / ERS1
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			ERS2	///< CAN2 / ERS2
-#endif
 		};
 
 
@@ -455,11 +426,6 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL1 {
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			OVFI = 0,		///< SRC / OVFI
-			UDFI,			///< SRC / UDFI
-			CEFI,			///< SRC / CEFI
-#endif
 			CDETI = 3,		///< SDHI / CDETI
 			CACI,			///< SDHI / CACI
 			SDACI,			///< SDHI / SDACI
@@ -474,16 +440,10 @@ namespace device {
 			EEI0,			///< RIIC0 / EEI0
 			TEI2,			///< RIIC2 / TEI2
 			EEI2,			///< RIIC2 / EEI2
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			SSIF0,			///< SSI0 / SSIF0
-			SSIF1,			///< SSI1 / SSIF1
-#endif
+
 			S12CMPAI = 20,	///< S12AD / S12CMPAI
-#if defined(SIG_RX65N)
 			S12CMPBI,		///< S12AD / S12CMPBI
-#endif
 			S12CMPAI1 = 22,	///< S12AD1 / S12CMPAI1
-#if defined(SIG_RX65N)
 			S12CMPBI1,		///< S12AD1 / S12CMPBI1
 			TEI8,			///< SCI8 / TEI8
 			ERI8,			///< SCI8 / ERI8
@@ -491,11 +451,9 @@ namespace device {
 			ERI9,			///< SCI9 / ERI9
 			TEI1,			///< RIIC1 / TEI1
 			EEI1,			///< RIIC1 / EEI1
-#endif
 		};
 
 
-#if defined(SIG_RX65N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  GROUPBL2・ベクター・インデックス
@@ -504,7 +462,6 @@ namespace device {
 		enum class VECTOR_BL2 {
 			SDIOI,			///< SDSI / SDIOI
 		};
-#endif
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -513,42 +470,16 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_AL0 {
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			TEIF8 = 0,		///< SCIFA8 / TEIF8
-			ERIF8,			///< SCIFA8 / ERIF8
-			BRIF8,			///< SCIFA8 / BRIF8
-			DRIF8,			///< SCIFA8 / DRIF8
-			TEIF9,			///< SCIFA9 / TEIF9
-			ERIF9,			///< SCIFA9 / ERIF9
-			BRIF9,			///< SCIFA9 / BRIF9
-			DRIF9,			///< SCIFA9 / DRIF9
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			TEIF10 = 8,		///< SCIFA10 / TEIF10
-			ERIF10,			///< SCIFA10 / ERIF10
-			BRIF10,			///< SCIFA10 / BRIF10
-			DRIF10,			///< SCIFA10 / DRIF10
-			TEIF11,			///< SCIFA11 / TEIF11
-			ERIF11,			///< SCIFA11 / ERIF11
-			BRIF11,			///< SCIFA11 / BRIF11
-			DRIF11,			///< SCIFA11 / DRIF11
-#elif defined(SIG_RX65N)
 			TEI10 = 8,		///< SCI10 / TEI10
 			ERI10,			///< SCI10 / ERI10
 
 			TEI11 = 12,		///< SCI11 / TEI11
 			ERI11,			///< SCI11 / ERI11
-#endif
+
 			SPII0 = 16,		///< RSPI0 / SPII0
 			SPEI0,			///< RSPI0 / SPEI0
-#if defined(SIG_RX71M) || defined(SIG_RX65N)
-			SPII1,			///< RSPI1 / SPII1
-			SPEI1,			///< RSPI1 / SPEI1
-#endif
-#if defined(SIG_RX65N)
 			SPII2,			///< RSPI2 / SPII2
 			SPEI2,			///< RSPI2 / SPEI2
-#endif
 		};
 
 
@@ -558,20 +489,12 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_AL1 {
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			MINT = 0,		///< EPTPC / MINT
-			PINT,			///< PTPEDMAC / PINT
-#endif
 			EINT0 = 4,		///< EDMAC0/EINT0
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			EINT1 = 5,		///< EDMAC1/EINT1
-#endif
-#if defined(SIG_RX65N)
-			VPOS = 8,		///< GLCDC/VPOS
+			VPOS  = 8,		///< GLCDC/VPOS
 			GR1UF,			///< GLCDC/GR1UF
 			GR2UF,			///< GLCDC/GR2UF
 			DRW_IRQ			///< DRW2D/DRW_IRQ
-#endif
 		};
 
 
@@ -632,33 +555,21 @@ namespace device {
 
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			rw8_t<base + 100> RXIF8;
-			rw8_t<base + 101> TXIF8;
-			rw8_t<base + 102> RXIF9;
-			rw8_t<base + 103> TXIF9;
-			rw8_t<base + 104> RXIF10;
-			rw8_t<base + 105> TXIF10;
-#elif defined(SIG_RX65N)
 			rw8_t<base + 100> RXI8;
 			rw8_t<base + 101> TXI8;
 			rw8_t<base + 102> RXI9;
 			rw8_t<base + 103> TXI9;
 			rw8_t<base + 104> RXI10;
 			rw8_t<base + 105> TXI10;
-#endif
+
 			rw8_t<base + 106> GROUPBE0;
 			rw8_t<base + 110> GROUPBL0;
 			rw8_t<base + 111> GROUPBL1;
 			rw8_t<base + 112> GROUPAL0;
 			rw8_t<base + 113> GROUPAL1;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			rw8_t<base + 114> RXIF11;
-			rw8_t<base + 115> TXIF11;
-#elif defined(SIG_RX65N)
 			rw8_t<base + 114> RXI11;
 			rw8_t<base + 115> TXI11;
-#endif
+
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
 
@@ -813,16 +724,6 @@ namespace device {
 			typedef rw8_t<base + 0x0C> ier0C;
 			bit_rw_t<ier0C, bitpos::B2>	RXI7;
 			bit_rw_t<ier0C, bitpos::B3>	TXI7;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			bit_rw_t<ier0C, bitpos::B4>	RXIF8;
-			bit_rw_t<ier0C, bitpos::B5>	TXIF8;
-			bit_rw_t<ier0C, bitpos::B6>	RXIF9;
-			bit_rw_t<ier0C, bitpos::B7>	TXIF9;
-
-			typedef rw8_t<base + 0x0D> ier0D;
-			bit_rw_t<ier0D, bitpos::B0>	RXIF10;
-			bit_rw_t<ier0D, bitpos::B1>	TXIF10;
-#elif defined(SIG_RX65N)
 			bit_rw_t<ier0C, bitpos::B4>	RXI8;
 			bit_rw_t<ier0C, bitpos::B5>	TXI8;
 			bit_rw_t<ier0C, bitpos::B6>	RXI9;
@@ -831,24 +732,18 @@ namespace device {
 			typedef rw8_t<base + 0x0D> ier0D;
 			bit_rw_t<ier0D, bitpos::B0>	RXI10;
 			bit_rw_t<ier0D, bitpos::B1>	TXI10;
-#endif
+
 			bit_rw_t<ier0D, bitpos::B2>	GROUPBE0;
-#if defined(SIG_RX65N)
 			bit_rw_t<ier0D, bitpos::B3>	GROUPBL2;
-#endif
 			bit_rw_t<ier0D, bitpos::B6>	GROUPBL0;
 			bit_rw_t<ier0D, bitpos::B7>	GROUPBL1;
 
 			typedef rw8_t<base + 0x0E> ier0E;
 			bit_rw_t<ier0E, bitpos::B0>	GROUPAL0;
 			bit_rw_t<ier0E, bitpos::B1> GROUPAL1;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			bit_rw_t<ier0E, bitpos::B2>	RXIF11;
-			bit_rw_t<ier0E, bitpos::B3>	TXIF11;
-#elif defined(SIG_RX65N)
 			bit_rw_t<ier0E, bitpos::B2>	RXI11;
 			bit_rw_t<ier0E, bitpos::B3>	TXI11;
-#endif
+
 			bit_rw_t<ier0E, bitpos::B4> RXI12;
 			bit_rw_t<ier0E, bitpos::B5> TXI12;
 
@@ -987,36 +882,22 @@ namespace device {
 
 			rw8_t<base + 98> RXI7;
 			rw8_t<base + 99> TXI7;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			rw8_t<base + 100> RXIF8;
-			rw8_t<base + 101> TXIF8;
-			rw8_t<base + 102> RXIF9;
-			rw8_t<base + 103> TXIF9;
-			rw8_t<base + 104> RXIF10;
-			rw8_t<base + 105> TXIF10;
-#elif defined(SIG_RX65N)
 			rw8_t<base + 100> RXI8;
 			rw8_t<base + 101> TXI8;
 			rw8_t<base + 102> RXI9;
 			rw8_t<base + 103> TXI9;
 			rw8_t<base + 104> RXI10;
 			rw8_t<base + 105> TXI10;
-#endif
+
 			rw8_t<base + 106> GROUPBE0;
-#if defined(SIG_RX65N)
 			rw8_t<base + 107> GROUPBL2;
-#endif
+
 			rw8_t<base + 110> GROUPBL0;
 			rw8_t<base + 111> GROUPBL1;
 			rw8_t<base + 112> GROUPAL0;
 			rw8_t<base + 113> GROUPAL1;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			rw8_t<base + 114> RXIF11;
-			rw8_t<base + 115> TXIF11;
-#elif defined(SIG_RX65N)
 			rw8_t<base + 114> RXI11;
 			rw8_t<base + 115> TXI11;
-#endif
 			rw8_t<base + 116> RXI12;
 			rw8_t<base + 117> TXI12;
 
@@ -1314,9 +1195,7 @@ namespace device {
 		static grp_t<0x00087600> GRPBE0;
 		static grp_t<0x00087630> GRPBL0;
 		static grp_t<0x00087634> GRPBL1;
-#if defined(SIG_RX65N)
 		static grp_t<0x00087638> GRPBL2;
-#endif
 		static grp_t<0x00087830> GRPAL0;
 		static grp_t<0x00087834> GRPAL1;
 
@@ -1383,9 +1262,7 @@ namespace device {
 		static gen_t<0x00087640> GENBE0;
 		static gen_t<0x00087670> GENBL0;
 		static gen_t<0x00087674> GENBL1;
-#if defined(SIG_RX65N)
 		static gen_t<0x00087678> GENBL2;
-#endif
 		static gen_t<0x00087870> GENAL0;
 		static gen_t<0x00087874> GENAL1;
 

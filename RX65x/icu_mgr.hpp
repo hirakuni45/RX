@@ -301,7 +301,7 @@ namespace device {
 			@brief  割り込みベクターの取得
 			@param[in]	per	周辺機器タイプ
 			@param[in]	id	割り込み要因
-			@return 割り込みベクター（マッチするベクターが無ければ「VEC0」を返す）
+			@return 割り込みベクター（マッチするベクターが無ければ「NONE」を返す）
 		*/
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR get_vector(peripheral per, uint8_t id) noexcept
@@ -319,7 +319,7 @@ namespace device {
 				}
 				break;
 			default:
-				return ICU::VECTOR::VEC0;
+				return ICU::VECTOR::NONE;
 			}
 
 			return ICU::VECTOR::INTB128;
