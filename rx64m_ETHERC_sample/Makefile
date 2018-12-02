@@ -21,13 +21,17 @@ CSOURCES	=	common/init.c \
 				common/syscalls.c \
 				common/time.c
 
-PSOURCES	=	main.cpp
+PSOURCES	=	main.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=	stdc++
+USER_LIBS	=	supc++
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX64M F_ICLK=96000000 F_FCLK=48000000 F_PCLKA=96000000 F_PCLKB=48000000 F_PCLKD=48000000
+USER_DEFS	=	SIG_RX64M \
+				F_ICLK=96000000 \
+				F_PCLKA=96000000 F_PCLKB=48000000 F_PCLKC=48000000 F_PCLKD=48000000 \
+				F_FCLK=48000000 F_BCLK=96000000
 
 MCU_TARGET	=	
 
@@ -35,7 +39,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX64M
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
