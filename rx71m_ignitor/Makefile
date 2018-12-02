@@ -40,14 +40,17 @@ CSOURCES	=	common/init.c \
                 r_net/T4_src/r_dhcp_client.c
 
 PSOURCES	=	main.cpp \
-				r_net/ethernet.cpp
+				r_net/ethernet.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=	stdc++ m
+USER_LIBS	=	supc++ m
 
 LDSCRIPT	=	../RX71M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX71M F_ICLK=120000000 \
-				F_FCLK=60000000 F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKD=60000000 \
+USER_DEFS	=	SIG_RX71M \
+				F_ICLK=120000000 \
+				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
+				F_FCLK=60000000 F_BCLK=120000000 \
 				B_ID=$(BUILD_ID)
 
 MCU_TARGET	=	
