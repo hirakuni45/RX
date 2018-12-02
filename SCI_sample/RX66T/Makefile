@@ -1,6 +1,6 @@
 #=======================================================================
 #   @file
-#   @brief  RX65N Makefile
+#   @brief  RX66T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
@@ -8,9 +8,7 @@
 #=======================================================================
 TARGET		=	sci_sample
 
-DEVICE		=	R5F565NE
-
-FATFS_VER	=	ff12b
+DEVICE		=	R5F566TA
 
 BUILD		=	release
 
@@ -19,19 +17,18 @@ VPATH		=	../../
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c \
-				common/syscalls.c
+				common/vect.c
 
-PSOURCES	=	SCI_sample/main.cpp
+PSOURCES	=	FIRST_sample/main.cpp
 
 USER_LIBS	=
 
-LDSCRIPT	=	../../RX65x/$(DEVICE).ld
+LDSCRIPT	=	../../RX66T/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX65N \
-				F_ICLK=120000000 \
-				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
-				F_FCLK=60000000 F_BCLK=120000000
+USER_DEFS	=	SIG_RX66T \
+				F_ICLK=160000000 \
+				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKC=160000000 F_PCLKD=40000000 \
+				F_FCLK=40000000 F_BCLK=40000000
 
 MCU_TARGET	=	
 
@@ -40,6 +37,8 @@ INC_SYS		=
 INC_APP		=	. ../ ../../
 
 OPTIMIZE	=	-O3
+
+AS_OPT		=	-mcpu=rx600
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
@@ -71,6 +70,7 @@ SIZE		=	rx-elf-size
 
 # AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
 # AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
+AFLAGS		=	$(AS_OPT)
 # ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
 ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
 
