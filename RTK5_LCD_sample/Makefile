@@ -56,7 +56,7 @@ CSOURCES	=	common/init.c \
 				RX65x/drw_2d_ver1.02/src/tes/dave_wedge.c
 
 PSOURCES	=	main.cpp \
-				RX600/icu_mgr.cpp \
+				RX65x/icu_mgr.cpp \
 				graphics/font8x16.cpp \
 				common/stdapi.cpp
 
@@ -64,7 +64,11 @@ USER_LIBS	=	m supc++ z
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX65N F_ICLK=120000000 F_FCLK=60000000 F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKD=60000000 FAT_FS
+USER_DEFS	=	SIG_RX65N \
+				F_ICLK=120000000 \
+				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
+				F_FCLK=60000000 F_BCLK=120000000 \
+				FAT_FS
 
 MCU_TARGET	=	
 
