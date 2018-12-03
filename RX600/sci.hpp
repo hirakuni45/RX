@@ -9,7 +9,6 @@
 */
 //=====================================================================//
 #include "common/device.hpp"
-#include <typeinfo>
 
 namespace device {
 
@@ -346,26 +345,6 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static INT get_te_vec() { return tev; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  グループ・ベクターを返す
-			@return グループ・ベクター
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_group_vec() {
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
-			if(typeid(INT) == typeid(ICU::VECTOR_BL0)) {
-				return ICU::VECTOR::GROUPBL0;
-			} else if(typeid(INT) == typeid(ICU::VECTOR_BL1)) {
-				return ICU::VECTOR::GROUPBL1;
-			} else if(typeid(INT) == typeid(ICU::VECTOR_AL0)) {
-				return ICU::VECTOR::GROUPAL0;
-			}
-#endif
-			return ICU::VECTOR::NONE;
-		}
 	};
 
 
