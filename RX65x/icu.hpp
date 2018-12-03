@@ -8,6 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include <typeinfo>
 #include "common/io_utils.hpp"
 
 namespace device {
@@ -496,6 +497,78 @@ namespace device {
 			GR2UF,			///< GLCDC/GR2UF
 			DRW_IRQ			///< DRW2D/DRW_IRQ
 		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループベクターの取得
+			@param[in]	VEC		グループベクター型
+			@return グループベクター
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static VECTOR get_group_vector(VECTOR_BL0 ivec) noexcept {
+			return VECTOR::GROUPBL0;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループベクターの取得
+			@param[in]	VEC		グループベクター型
+			@return グループベクター
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static VECTOR get_group_vector(VECTOR_BL1 ivec) noexcept {
+			return VECTOR::GROUPBL1;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループベクターの取得
+			@param[in]	VEC		グループベクター型
+			@return グループベクター
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static VECTOR get_group_vector(VECTOR_BL2 ivec) noexcept {
+			return VECTOR::GROUPBL2;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループベクターの取得
+			@param[in]	VEC		グループベクター型
+			@return グループベクター
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static VECTOR get_group_vector(VECTOR_BE0 ivec) noexcept {
+			return VECTOR::GROUPBE0;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループベクターの取得
+			@param[in]	VEC		グループベクター型
+			@return グループベクター
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static VECTOR get_group_vector(VECTOR_AL0 ivec) noexcept {
+			return VECTOR::GROUPAL0;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループベクターの取得
+			@param[in]	VEC		グループベクター型
+			@return グループベクター
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static VECTOR get_group_vector(VECTOR_AL1 ivec) noexcept {
+			return VECTOR::GROUPAL1;
+		}
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
