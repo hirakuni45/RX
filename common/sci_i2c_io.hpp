@@ -232,7 +232,7 @@ namespace device {
 		}
 
 
-		static void i2c_condition_task_()
+		static INTERRUPT_FUNC void i2c_condition_task_()
 		{
 			i2c_service_();
 		}
@@ -244,16 +244,6 @@ namespace device {
 				set_interrupt_task(recv_task_, static_cast<uint32_t>(rx_vec));
 				set_interrupt_task(send_task_, static_cast<uint32_t>(tx_vec));
 			}
-		}
-
-
-		void set_intr_() noexcept
-		{
-			set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
-			icu_mgr::set_level(SCI::get_peripheral(), level_);
-#if defined(SIG_RX24T)
-			set_interrupt_task(i2c_condition_task_, static_cast<uint32_t>(SCI::get_te_vec()));
-#endif
 		}
 
 
@@ -368,12 +358,20 @@ namespace device {
 
 			if(level_ > 0) {
 				task_ = sci_i2c_t::task::idle;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+
+				// RXI, TXI の設定
+				set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
+				icu_mgr::set_level(SCI::get_peripheral(), level_);
+
 				// TEIx (STI interrupt)
-				icu_mgr::set_level(SCI::get_group_vec(), level_);
-				icu_mgr::install_group_task(SCI::get_te_vec(), i2c_condition_task_);
-#endif
-				set_intr_();
+				auto tev = SCI::get_te_vec();
+				auto grp = ICU::get_group_vector(tev);
+				if(grp == ICU::VECTOR::NONE) {
+					set_interrupt_task(i2c_condition_task_, static_cast<uint32_t>(tev));
+				} else {
+					icu_mgr::set_level(grp, level_);
+					icu_mgr::install_group_task(tev, i2c_service_);
+				}
 			}
 
 			error_ = ERROR::NONE;

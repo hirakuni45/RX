@@ -93,11 +93,12 @@ namespace device {
 			counter_ = 0;
 
 			auto vec = CMT::get_ivec();
-
 			if(level_ > 0) {
+				
 				set_interrupt_task(i_task_, static_cast<uint32_t>(vec));
 			    CMT::CMCR = CMT::CMCR.CKS.b(cks) | CMT::CMCR.CMIE.b();
 			} else {
+
 				set_interrupt_task(nullptr, static_cast<uint32_t>(vec));
 			    CMT::CMCR = CMT::CMCR.CKS.b(cks);
 			}
