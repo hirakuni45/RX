@@ -8,8 +8,9 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX24T/peripheral.hpp"
-#include "RX24T/icu.hpp"
+#include "common/device.hpp"
+#include "common/vect.h"
+#include "common/dispatch.hpp"
 
 namespace device {
 
@@ -332,6 +333,20 @@ namespace device {
 				break;
 			}
 			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  グループ割り込み設定のダミー
+			@param[in]	idx		インデックス
+			@param[in]	task	割り込みタスク（※nullptr なら無効）
+			@return グループ割り込み以外なら「false」
+		*/
+		//-----------------------------------------------------------------//
+		static bool install_group_task(ICU::VECTOR idx, utils::TASK task) noexcept
+		{
+			return false;
 		}
 	};
 }
