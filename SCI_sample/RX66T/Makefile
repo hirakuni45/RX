@@ -17,9 +17,10 @@ VPATH		=	../../
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c
+				common/vect.c \
+				common/syscalls.c
 
-PSOURCES	=	FIRST_sample/main.cpp
+PSOURCES	=	SCI_sample/main.cpp
 
 USER_LIBS	=
 
