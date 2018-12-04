@@ -13,6 +13,7 @@
 #include "common/delay.hpp"
 #include "common/device.hpp"
 
+#include "RX600/lvda.hpp"
 #include "RX600/bus.hpp"
 
 #if defined(SIG_RX24T)
