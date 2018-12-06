@@ -140,7 +140,7 @@ namespace device {
 			if(level_ > 0) {  // 割り込み設定
 #if (defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N))
 				intr_vec_ = ICU::VECTOR::INTB128;
-				set_interrupt_task(tpu_task_, static_cast<uint32_t>(intr_vec_));
+				icu_mgr::set_task(intr_vec_, tpu_task_);
 				ICU::SLIBXR128 = TPU::get_TGIA();
 				ICU::IPR.INTB128 = level_;
 				ICU::IER.INTB128 = true;

@@ -136,7 +136,7 @@ namespace device {
 
 			uint32_t vec = static_cast<uint32_t>(ICU::VECTOR::IRQ0);
 			vec += static_cast<uint32_t>(PER) - static_cast<uint32_t>(peripheral::IRQ0);
-			set_interrupt_task(irq_task_, vec);
+			icu_mgr::set_task(static_cast<ICU::VECTOR>(vec), irq_task_);
 
 			level_ = lvl;
 

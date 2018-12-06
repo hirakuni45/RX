@@ -254,15 +254,15 @@ namespace device {
 ///			IICA::ICFER.TMOE = 1;  // TimeOut Enable
 
 			if(level_ > 0) {
-				set_interrupt_task(event_task_, static_cast<uint32_t>(IICA::get_ee_vec()));
-				set_interrupt_task(recv_task_,  static_cast<uint32_t>(IICA::get_rx_vec()));
-				set_interrupt_task(send_task_,  static_cast<uint32_t>(IICA::get_tx_vec()));
-				set_interrupt_task(tend_task_,  static_cast<uint32_t>(IICA::get_te_vec()));
+				icu_mgr::set_task(IICA::get_ee_vec(), event_task_);
+				icu_mgr::set_task(IICA::get_rx_vec(), recv_task_);
+				icu_mgr::set_task(IICA::get_tx_vec(), send_task_);
+				icu_mgr::set_task(IICA::get_te_vec(), tend_task_);
 			} else {
-				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_ee_vec()));
-				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_rx_vec()));
-				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_tx_vec()));
-				set_interrupt_task(nullptr, static_cast<uint32_t>(IICA::get_te_vec()));
+				icu_mgr::set_task(IICA::get_ee_vec(), nullptr);
+				icu_mgr::set_task(IICA::get_rx_vec(), nullptr);
+				icu_mgr::set_task(IICA::get_tx_vec(), nullptr);
+				icu_mgr::set_task(IICA::get_te_vec(), nullptr);
 			}
 			IICA::ICIER = 0x00;
 			icu_mgr::set_level(IICA::get_peripheral(), level_);

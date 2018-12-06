@@ -241,8 +241,8 @@ namespace device {
 		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) noexcept
 		{
 			if(level_) {
-				set_interrupt_task(recv_task_, static_cast<uint32_t>(rx_vec));
-				set_interrupt_task(send_task_, static_cast<uint32_t>(tx_vec));
+				icu_mgr::set_task(rx_vec, recv_task_);
+				icu_mgr::set_task(tx_vec, send_task_);
 			}
 		}
 
@@ -367,7 +367,9 @@ namespace device {
 				auto tev = SCI::get_te_vec();
 				auto grp = ICU::get_group_vector(tev);
 				if(grp == ICU::VECTOR::NONE) {
-					set_interrupt_task(i2c_condition_task_, static_cast<uint32_t>(tev));
+//					icu_mgr::set_task(tev, i2c_condition_task_);
+					// tev がグループベクターの場合にコンパイルエラーになるので回避
+					icu_mgr::set_task(static_cast<ICU::VECTOR>(tev), i2c_condition_task_);
 				} else {
 					icu_mgr::set_level(grp, level_);
 					icu_mgr::install_group_task(tev, i2c_service_);

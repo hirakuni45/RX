@@ -237,7 +237,7 @@ namespace device {
 
 			if(lvl > 0) {
 				ICU::VECTOR cvec = MTUX::get_vec(static_cast<typename MTUX::interrupt>(ch));
-				set_interrupt_task(out_task_, static_cast<uint32_t>(cvec));
+				icu_mgr::set_task(cvec, out_task_);
 				icu_mgr::set_level(MTUX::get_vec(static_cast<typename MTUX::interrupt>(ch)), lvl);
 				MTUX::TIER = (1 << static_cast<uint8_t>(ch)) | MTUX::TIER.TCIEV.b();
 			}
@@ -446,10 +446,10 @@ namespace device {
 			MTUX::TMDR1 = 0x00;  // 通常動作
 
 			if(level > 0) {
-				set_interrupt_task(ovf_task_, static_cast<uint32_t>(MTUX::get_vec(MTUX::interrupt::OVF)));
+				icu_mgr::set_task(MTUX::get_vec(MTUX::interrupt::OVF), ovf_task_);
 				icu_mgr::set_level(MTUX::get_vec(MTUX::interrupt::OVF), level);
 				ICU::VECTOR cvec = MTUX::get_vec(static_cast<typename MTUX::interrupt>(ch));
-				set_interrupt_task(cap_task_, static_cast<uint32_t>(cvec));
+				icu_mgr::set_task(cvec, cap_task_);
 				icu_mgr::set_level(MTUX::get_vec(static_cast<typename MTUX::interrupt>(ch)), level);
 				MTUX::TIER = (1 << static_cast<uint8_t>(ch)) | MTUX::TIER.TCIEV.b();
 			}

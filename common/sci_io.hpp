@@ -117,13 +117,14 @@ namespace device {
 		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) noexcept
 		{
 			if(level_) {
-				set_interrupt_task(recv_task_, static_cast<uint32_t>(rx_vec));
-				set_interrupt_task(send_task_, static_cast<uint32_t>(tx_vec));
+				icu_mgr::set_task(rx_vec, recv_task_);
+				icu_mgr::set_task(tx_vec, send_task_);
 			} else {
-				set_interrupt_task(nullptr, static_cast<uint32_t>(rx_vec));
-				set_interrupt_task(nullptr, static_cast<uint32_t>(tx_vec));
+				icu_mgr::set_task(rx_vec, nullptr);
+				icu_mgr::set_task(tx_vec, nullptr);
 			}
 		}
+
 
 		void set_intr_() noexcept
 		{
