@@ -10,14 +10,13 @@
 			%f ---> 浮動小数点数（float、double） @n
 			%c ---> １文字のキャラクター @n
 			%% ---> '%' のキャラクター
+			Copyright 2017, 2018 Kunihito Hiramatsu
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
-				Released under the MIT license @n
-				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <type_traits>
 #include <unistd.h>
+#include <cmath>
 
 namespace utils {
 
@@ -101,7 +100,6 @@ namespace utils {
 			not_integer,	///< 整数の不一致
 			not_float,		///< 浮動小数点の不一致
 			terminate,		///< 終端文字の不一致
-			null_form,		///< 無効なフォーム
 		};
 
 	private:
@@ -121,13 +119,24 @@ namespace utils {
 		mode	mode_;
 		error	error_;
 		int		num_;
+		uint8_t	nbc_;
 
 		uint32_t bin_() {
 			uint32_t a = 0;
 			char ch;
-			while((ch = inp_()) != 0 && ch >= '0' && ch <= '1') {
-				a <<= 1;
-				a += ch - '0';
+			while((ch = inp_()) != 0) {
+				if(ch >= '0' && ch <= '1') {
+					a <<= 1;
+					a += ch - '0';
+				} else if(nbc_ != 0 && ch == ' ') {
+					// 文字数指定がある場合「スペース」は '0' と同等に扱う
+				} else {
+					break;
+				}
+				if(nbc_ > 0) {
+					nbc_--;
+					if(nbc_ == 0) break;
+				}
 			}
 			return a;
 		}
@@ -135,9 +144,19 @@ namespace utils {
 		uint32_t oct_() {
 			uint32_t a = 0;
 			char ch;
-			while((ch = inp_()) != 0 && ch >= '0' && ch <= '7') {
-				a <<= 3;
-				a += ch - '0';
+			while((ch = inp_()) != 0) {
+				if(ch >= '0' && ch <= '7') {
+					a <<= 3;
+					a += ch - '0';
+				} else if(nbc_ != 0 && ch == ' ') {
+					// 文字数指定がある場合「スペース」は '0' と同等に扱う
+				} else {
+					break;
+				}
+				if(nbc_ > 0) {
+					nbc_--;
+					if(nbc_ == 0) break;
+				}
 			}
 			return a;
 		}
@@ -145,9 +164,19 @@ namespace utils {
 		uint32_t dec_() {
 			uint32_t a = 0;
 			char ch;
-			while((ch = inp_()) != 0 && ch >= '0' && ch <= '9') {
-				a *= 10;
-				a += ch - '0';
+			while((ch = inp_()) != 0) {
+				if(ch >= '0' && ch <= '9') {
+					a *= 10;
+					a += ch - '0';
+				} else if(nbc_ != 0 && ch == ' ') {
+					// 文字数指定がある場合「スペース」は '0' と同等に扱う
+				} else {
+					break;
+				}
+				if(nbc_ > 0) {
+					nbc_--;
+					if(nbc_ == 0) break;
+				}
 			}
 			return a;
 		}
@@ -165,8 +194,14 @@ namespace utils {
 				} else if(ch >= 'a' && ch <= 'f') {
 					a <<= 4;
 					a += ch - 'a' + 10;
+				} else if(nbc_ != 0 && ch == ' ') {
+					// 文字数指定がある場合「スペース」は '0' と同等に扱う
 				} else {
 					break;
+				}
+				if(nbc_ > 0) {
+					nbc_--;
+					if(nbc_ == 0) break;
 				}
 			}
 			return a;
@@ -175,40 +210,74 @@ namespace utils {
 
 		template<typename T>
 		T real_() {
-			uint32_t a = 0;
-			uint32_t b = 0;
-			uint32_t c = 1;
-			char ch;
-			bool p = false;
-			while((ch = inp_()) != 0) {
-				if(ch >= '0' && ch <= '9') {
+
+			struct real_t {
+				uint32_t	a;
+				uint32_t	b;
+				uint32_t	c;
+				bool		p;
+
+				real_t() : a(0), b(0), c(1), p(false) { }
+
+				void add(uint32_t v) {
 					a *= 10;
-					a += ch - '0';
+					a += v;
 					c *= 10;
-				} else if(!p && ch == '.') {
+				}
+
+				void point() {
 					b = a;
 					a = 0;
 					c = 1;
 					p = true;
+				}
+
+				T get() const {
+					if(p) {
+						return static_cast<T>(b) + static_cast<T>(a) / static_cast<T>(c);
+					} else {
+						return static_cast<T>(a); 
+					}				
+				}
+			};
+
+			real_t	base;
+			real_t	exp;
+			char ch;
+			bool expf = false;
+			while((ch = inp_()) != 0) {
+				if(ch >= '0' && ch <= '9') {
+					if(expf) {
+						exp.add(ch - '0');
+					} else { 
+						base.add(ch - '0');
+					}
+				} else if(ch == '.') {
+					if(expf) {
+						if(exp.p) break;
+						exp.point();
+					} else {
+						if(base.p) break;
+						base.point();
+					}
+				} else if(ch == 'e' || ch == 'E') {
+					if(expf) break;
+					expf = true;
 				} else {
 					break;
 				}
 			}
-			if(p) {
-				return static_cast<T>(b) + (static_cast<T>(a) / static_cast<T>(c));
+			
+			if(expf) {
+				return base.get() * pow(static_cast<T>(10), exp.get());
 			} else {
-				return static_cast<T>(a); 
+				return base.get();
 			}
 		}
 
 
 		void next_()
 		{
-			if(form_ == nullptr) {
-				error_ = error::null_form;
-				return;				
-			}
-
 			enum class fmm : uint8_t {
 				none,
 				type,
@@ -233,6 +302,7 @@ namespace utils {
 						}
 					} else if(ch == '%' && *form_ != '%') {
 						cm = fmm::type;
+						nbc_ = 0;
 					} else if(ch != inp_()) {
 						error_ = error::partition;
 						return;
@@ -240,30 +310,32 @@ namespace utils {
 					break;
 
 				case fmm::type:
-					switch(ch) {
-					case 'b':
+					if(ch >= 'a') ch -= 0x20;
+					if(ch >= '0' && ch <= '9') {
+						nbc_ *= 10;
+						nbc_ += ch - '0';
+					} else if(ch == 'B') {
 						mode_ = mode::BIN;
-						break;
-					case 'o':
+						return;
+					} else if(ch == 'O') {
 						mode_ = mode::OCT;
-						break;
-					case 'd':
+						return;
+					} else if(ch == 'D') {
 						mode_ = mode::DEC;
-						break;
-					case 'x':
+						return;
+					} else if(ch == 'X') {
 						mode_ = mode::HEX;
-						break;
-					case 'f':
+						return;
+					} else if(ch == 'F') {
 						mode_ = mode::REAL;
-						break;
-					case 'c':
+						return;
+					} else if(ch == 'C') {
 						mode_ = mode::CHA;
-						break;
-					default:
+						return;
+					} else {
 						error_ = error::input_type;
-						break;
+						return;
 					}
-					return;
 				}
 			}
 			if(ch == 0 && inp_() == 0) ;
@@ -276,28 +348,27 @@ namespace utils {
 		bool neg_() {
 			bool neg = false;
 			auto s = inp_();
-			if(s == '-') { neg = true; }
-			else if(s == '+') { neg = false; }
-			else inp_.unget();
-			return neg;
-		}
-
-
-		void skip_space_() {
-			while(1) {
-				char ch = inp_();
-				if(ch != ' ') {
-					inp_.unget();
-					return;
-				}
+			if(s == '-') {
+				neg = true;
+				if(nbc_ > 0) nbc_--;
+			} else if(s == '+') {
+				neg = false;
+				if(nbc_ > 0) nbc_--;
+			} else {
+				inp_.unget();
 			}
+			return neg;
 		}
 
 
 		int32_t nb_int_(bool sign = true)
 		{
-			skip_space_();
+			auto nbc = nbc_;
 			auto neg = neg_();
+			if(nbc > 0 && nbc_ == 0) {
+				error_ = error::not_integer;
+				return 0;
+			}
 
 			uint32_t v = 0;
 			switch(mode_) {
@@ -318,7 +389,9 @@ namespace utils {
 				break;
 			}
 			if(error_ == error::none) {
-				inp_.unget();
+				if(nbc == 0) {
+					inp_.unget();
+				}
 				next_();
 				if(error_ == error::none) ++num_;
 			}
@@ -330,7 +403,6 @@ namespace utils {
 		template <typename T>
 		T nb_real_()
 		{
-			skip_space_();
 			bool neg = neg_();
 
 			T v = 0.0f;
@@ -355,12 +427,12 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
-			@param[in]	form	入力形式
+			@param[in]	form	フォーマット式
 			@param[in]	inp		変換文字列（nullptrの場合、sci_getch で取得）
 		*/
 		//-----------------------------------------------------------------//
-		basic_input(const char* form, const char* inp = nullptr) : form_(form), inp_(inp),
-			mode_(mode::NONE), error_(error::none), num_(0)
+		basic_input(const char* form, const char* inp = nullptr) noexcept : form_(form), inp_(inp),
+			mode_(mode::NONE), error_(error::none), num_(0), nbc_(0)
 		{
 			next_();
 		}
@@ -372,7 +444,7 @@ namespace utils {
 			@return エラー
 		*/
 		//-----------------------------------------------------------------//
-		error get_error() const { return error_; }
+		error get_error() const noexcept { return error_; }
 
 
 		//-----------------------------------------------------------------//
@@ -381,7 +453,7 @@ namespace utils {
 			@return 変換が全て正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool status() const { return error_ == error::none; }
+		bool status() const noexcept { return error_ == error::none; }
 
 
 		//-----------------------------------------------------------------//
@@ -390,7 +462,7 @@ namespace utils {
 			@return 正常変換数
 		*/
 		//-----------------------------------------------------------------//
-		int num() const { return num_; }
+		int num() const noexcept { return num_; }
 
 
 		//-----------------------------------------------------------------//
@@ -401,7 +473,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		template <typename T>
-		basic_input& operator % (T& val)
+		basic_input& operator % (T& val) noexcept
 		{
 			if(error_ != error::none) return *this;
 
