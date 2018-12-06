@@ -45,6 +45,11 @@ namespace {
 		typedef device::PORT_BYTE<device::PORTD> DL;
 		typedef device::PORT_BYTE<device::PORTE> DH;
 
+		static void enable(bool ena = true) noexcept
+		{
+			CS::P = !ena;
+		}
+
 		static void start() noexcept
 		{
 			RES::DIR = 1;
