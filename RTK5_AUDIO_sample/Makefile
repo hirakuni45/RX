@@ -32,6 +32,7 @@ PSOURCES	=	main.cpp \
 				graphics/kfont16.cpp \
 				common/stdapi.cpp
 
+#				RX65x/icu_mgr.cpp
 #				Cartridge.cpp
 #				bgm_data.cpp
 
