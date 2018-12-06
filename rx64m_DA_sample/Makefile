@@ -23,7 +23,7 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	main.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++
+USER_LIBS	=	supc++ m
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
