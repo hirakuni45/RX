@@ -31,6 +31,18 @@ namespace device {
 	public:
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  割り込みタスクを設定
+			@param[in]	vec		割り込み要因
+			@param[in]	task	割り込みタスク
+		*/
+		//-----------------------------------------------------------------//
+		static void set_task(ICU::VECTOR vec, utils::TASK task) noexcept {
+			set_interrupt_task(task, static_cast<uint32_t>(vec));
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  割り込みレベルを設定する
 			@param[in]	icu	割り込み要因
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）

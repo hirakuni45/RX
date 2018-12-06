@@ -23,13 +23,25 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  割り込みタスクを設定
+			@param[in]	vec		割り込み要因
+			@param[in]	task	割り込みタスク
+		*/
+		//-----------------------------------------------------------------//
+		static void set_task(ICU::VECTOR vec, utils::TASK task) noexcept {
+			set_interrupt_task(task, static_cast<uint32_t>(vec));
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  割り込みを設定する（ベクター別）
 			@param[in]	vec	割り込みベクター
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
 			@return 正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool set_level(ICU::VECTOR vec, uint8_t lvl)
+		static bool set_level(ICU::VECTOR vec, uint8_t lvl) noexcept
 		{
 			bool ret = true;
 			bool ena = lvl != 0 ? true : false;
@@ -257,7 +269,7 @@ namespace device {
 			@return 正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool set_level(peripheral per, uint8_t lvl)
+		static bool set_level(peripheral per, uint8_t lvl) noexcept
 		{
 			bool ret = true;
 			bool ena = lvl != 0 ? true : false;
