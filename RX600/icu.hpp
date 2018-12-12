@@ -43,10 +43,8 @@ namespace device {
 			CMWI0        = 30,  // CMTW0
 			CMWI1        = 31,  // CMTW1
 
-#if defined(SIG_RX71M)
 			D0FIFO2      = 32,  // USBA
 			D1FIFO2      = 33,  // USBA
-#endif
 			D0FIFO0      = 34,  // USB0
 			D1FIFO0      = 35,  // USB0
 
@@ -664,6 +662,63 @@ namespace device {
 			rw8_t<base + 148> INTB148;
 			rw8_t<base + 149> INTB149;
 			rw8_t<base + 150> INTB150;
+			rw8_t<base + 151> INTB151;
+			rw8_t<base + 152> INTB152;
+			rw8_t<base + 153> INTB153;
+			rw8_t<base + 154> INTB154;
+			rw8_t<base + 155> INTB155;
+			rw8_t<base + 156> INTB156;
+			rw8_t<base + 157> INTB157;
+			rw8_t<base + 158> INTB158;
+			rw8_t<base + 159> INTB159;
+			rw8_t<base + 160> INTB160;
+			rw8_t<base + 161> INTB161;
+			rw8_t<base + 162> INTB162;
+			rw8_t<base + 163> INTB163;
+			rw8_t<base + 164> INTB164;
+			rw8_t<base + 165> INTB165;
+			rw8_t<base + 166> INTB166;
+			rw8_t<base + 167> INTB167;
+			rw8_t<base + 168> INTB168;
+			rw8_t<base + 169> INTB169;
+			rw8_t<base + 170> INTB170;
+			rw8_t<base + 171> INTB171;
+			rw8_t<base + 172> INTB172;
+			rw8_t<base + 173> INTB173;
+			rw8_t<base + 174> INTB174;
+			rw8_t<base + 175> INTB175;
+			rw8_t<base + 176> INTB176;
+			rw8_t<base + 177> INTB177;
+			rw8_t<base + 178> INTB178;
+			rw8_t<base + 179> INTB179;
+			rw8_t<base + 180> INTB180;
+			rw8_t<base + 181> INTB181;
+			rw8_t<base + 182> INTB182;
+			rw8_t<base + 183> INTB183;
+			rw8_t<base + 184> INTB184;
+			rw8_t<base + 185> INTB185;
+			rw8_t<base + 186> INTB186;
+			rw8_t<base + 187> INTB187;
+			rw8_t<base + 188> INTB188;
+			rw8_t<base + 189> INTB189;
+			rw8_t<base + 190> INTB190;
+			rw8_t<base + 191> INTB191;
+			rw8_t<base + 192> INTB192;
+			rw8_t<base + 193> INTB193;
+			rw8_t<base + 194> INTB194;
+			rw8_t<base + 195> INTB195;
+			rw8_t<base + 196> INTB196;
+			rw8_t<base + 197> INTB197;
+			rw8_t<base + 198> INTB198;
+			rw8_t<base + 199> INTB199;
+			rw8_t<base + 200> INTB200;
+			rw8_t<base + 201> INTB201;
+			rw8_t<base + 202> INTB202;
+			rw8_t<base + 203> INTB203;
+			rw8_t<base + 204> INTB204;
+			rw8_t<base + 205> INTB205;
+			rw8_t<base + 206> INTB206;
+			rw8_t<base + 207> INTB207;
 
 			rw8_t<base + 208> INTA208;
 			rw8_t<base + 209> INTA209;
@@ -713,6 +768,18 @@ namespace device {
 			rw8_t<base + 253> INTA253;
 			rw8_t<base + 254> INTA254;
 			rw8_t<base + 255> INTA255;
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  []オペレータ
+				@param[in]	idx		インデックス（０～２５５）
+				@return IR レジスターの参照
+			*/
+			//-------------------------------------------------------------//
+			volatile uint8_t& operator [] (uint8_t idx) {
+				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			}
 		};
 		static ir_t<0x00087010> IR;
 
