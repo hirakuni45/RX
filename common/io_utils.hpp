@@ -160,7 +160,7 @@ namespace device {
 			@param[in]	data	論理積値
 		*/
 		//-----------------------------------------------------------------//
-		void operator &= (value_type data) noexcept { write(read() & data); }		
+		void operator &= (value_type data) noexcept { write(read() & data); }
 	};
 
 
