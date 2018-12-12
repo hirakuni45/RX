@@ -100,7 +100,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static rw16_t<base + 0x14> CFIFO;
-		static rw8_t<base + 0x14> CFIFOL;
+		static rw8_t <base + 0x14> CFIFOL;
 
 
 		//-----------------------------------------------------------------//
@@ -109,7 +109,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static rw16_t<base + 0x18> D0FIFO;
-		static rw8_t<base + 0x18> D0FIFOL;
+		static rw8_t <base + 0x18> D0FIFOL;
 
 
 		//-----------------------------------------------------------------//
@@ -118,7 +118,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static rw16_t<base + 0x1C> D1FIFO;
-		static rw8_t<base + 0x1C> D1FIFOL;
+		static rw8_t <base + 0x1C> D1FIFOL;
 
 
 		//-----------------------------------------------------------------//
@@ -212,14 +212,14 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B8>	    BRDYE;
-			bit_rw_t <io_, bitpos::B9>	    NRDYE;
-			bit_rw_t <io_, bitpos::B10>	    BEMPE;
-			bit_rw_t <io_, bitpos::B11>	    CTRE;
-			bit_rw_t <io_, bitpos::B12>	    DVSE;
-			bit_rw_t <io_, bitpos::B13>	    SOFE;
-			bit_rw_t <io_, bitpos::B14>	    RSME;
-			bit_rw_t <io_, bitpos::B15>	    VBSE;
+			bit_rw_t<io_, bitpos::B8>	  BRDYE;
+			bit_rw_t<io_, bitpos::B9>	  NRDYE;
+			bit_rw_t<io_, bitpos::B10>	  BEMPE;
+			bit_rw_t<io_, bitpos::B11>	  CTRE;
+			bit_rw_t<io_, bitpos::B12>	  DVSE;
+			bit_rw_t<io_, bitpos::B13>	  SOFE;
+			bit_rw_t<io_, bitpos::B14>	  RSME;
+			bit_rw_t<io_, bitpos::B15>	  VBSE;
 		};
 		static intenb0_t INTENB0;
 
@@ -236,15 +236,15 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B4>	    SACKE;
-			bit_rw_t <io_, bitpos::B5>	    SIGNE;
-			bit_rw_t <io_, bitpos::B6>	    EOFERRE;
+			bit_rw_t<io_, bitpos::B4>	  SACKE;
+			bit_rw_t<io_, bitpos::B5>	  SIGNE;
+			bit_rw_t<io_, bitpos::B6>	  EOFERRE;
 
-			bit_rw_t <io_, bitpos::B11>	    ATTCHE;
-			bit_rw_t <io_, bitpos::B12>	    DTCHE;
+			bit_rw_t<io_, bitpos::B11>	  ATTCHE;
+			bit_rw_t<io_, bitpos::B12>	  DTCHE;
 
-			bit_rw_t <io_, bitpos::B14>	    BCHGE;
-			bit_rw_t <io_, bitpos::B15>	    OVRCRE;
+			bit_rw_t<io_, bitpos::B14>	  BCHGE;
+			bit_rw_t<io_, bitpos::B15>	  OVRCRE;
 		};
 		static intenb1_t INTENB1;
 
@@ -261,16 +261,18 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>	    PIPE0BRDYE;
-			bit_rw_t <io_, bitpos::B1>	    PIPE1BRDYE;
-			bit_rw_t <io_, bitpos::B2>	    PIPE2BRDYE;
-			bit_rw_t <io_, bitpos::B3>	    PIPE3BRDYE;
-			bit_rw_t <io_, bitpos::B4>	    PIPE4BRDYE;
-			bit_rw_t <io_, bitpos::B5>	    PIPE5BRDYE;
-			bit_rw_t <io_, bitpos::B6>	    PIPE6BRDYE;
-			bit_rw_t <io_, bitpos::B7>	    PIPE7BRDYE;
-			bit_rw_t <io_, bitpos::B8>	    PIPE8BRDYE;
-			bit_rw_t <io_, bitpos::B9>	    PIPE9BRDYE;
+			bit_rw_t<io_, bitpos::B0>	  PIPE0BRDYE;
+			bit_rw_t<io_, bitpos::B1>	  PIPE1BRDYE;
+			bit_rw_t<io_, bitpos::B2>	  PIPE2BRDYE;
+			bit_rw_t<io_, bitpos::B3>	  PIPE3BRDYE;
+			bit_rw_t<io_, bitpos::B4>	  PIPE4BRDYE;
+			bit_rw_t<io_, bitpos::B5>	  PIPE5BRDYE;
+			bit_rw_t<io_, bitpos::B6>	  PIPE6BRDYE;
+			bit_rw_t<io_, bitpos::B7>	  PIPE7BRDYE;
+			bit_rw_t<io_, bitpos::B8>	  PIPE8BRDYE;
+			bit_rw_t<io_, bitpos::B9>	  PIPE9BRDYE;
+
+			bits_rw_t<io_, bitpos::B0, 10>	PIPEBRDYE;
 		};
 		static brdyenb_t BRDYENB;
 
@@ -287,16 +289,18 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>	    PIPE0BNRDYE;
-			bit_rw_t <io_, bitpos::B1>	    PIPE1BNRDYE;
-			bit_rw_t <io_, bitpos::B2>	    PIPE2BNRDYE;
-			bit_rw_t <io_, bitpos::B3>	    PIPE3BNRDYE;
-			bit_rw_t <io_, bitpos::B4>	    PIPE4BNRDYE;
-			bit_rw_t <io_, bitpos::B5>	    PIPE5BNRDYE;
-			bit_rw_t <io_, bitpos::B6>	    PIPE6BNRDYE;
-			bit_rw_t <io_, bitpos::B7>	    PIPE7BNRDYE;
-			bit_rw_t <io_, bitpos::B8>	    PIPE8BNRDYE;
-			bit_rw_t <io_, bitpos::B9>	    PIPE9BNRDYE;
+			bit_rw_t<io_, bitpos::B0>	  PIPE0BNRDYE;
+			bit_rw_t<io_, bitpos::B1>	  PIPE1BNRDYE;
+			bit_rw_t<io_, bitpos::B2>	  PIPE2BNRDYE;
+			bit_rw_t<io_, bitpos::B3>	  PIPE3BNRDYE;
+			bit_rw_t<io_, bitpos::B4>	  PIPE4BNRDYE;
+			bit_rw_t<io_, bitpos::B5>	  PIPE5BNRDYE;
+			bit_rw_t<io_, bitpos::B6>	  PIPE6BNRDYE;
+			bit_rw_t<io_, bitpos::B7>	  PIPE7BNRDYE;
+			bit_rw_t<io_, bitpos::B8>	  PIPE8BNRDYE;
+			bit_rw_t<io_, bitpos::B9>	  PIPE9BNRDYE;
+
+			bits_rw_t<io_, bitpos::B0, 10>	PIPEBNRDYE;
 		};
 		static nrdyenb_t NRDYENB;
 
@@ -313,16 +317,18 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>	    PIPE0BEMPE;
-			bit_rw_t <io_, bitpos::B1>	    PIPE1BEMPE;
-			bit_rw_t <io_, bitpos::B2>	    PIPE2BEMPE;
-			bit_rw_t <io_, bitpos::B3>	    PIPE3BEMPE;
-			bit_rw_t <io_, bitpos::B4>	    PIPE4BEMPE;
-			bit_rw_t <io_, bitpos::B5>	    PIPE5BEMPE;
-			bit_rw_t <io_, bitpos::B6>	    PIPE6BEMPE;
-			bit_rw_t <io_, bitpos::B7>	    PIPE7BEMPE;
-			bit_rw_t <io_, bitpos::B8>	    PIPE8BEMPE;
-			bit_rw_t <io_, bitpos::B9>	    PIPE9BEMPE;
+			bit_rw_t<io_, bitpos::B0>	  PIPE0BEMPE;
+			bit_rw_t<io_, bitpos::B1>	  PIPE1BEMPE;
+			bit_rw_t<io_, bitpos::B2>	  PIPE2BEMPE;
+			bit_rw_t<io_, bitpos::B3>	  PIPE3BEMPE;
+			bit_rw_t<io_, bitpos::B4>	  PIPE4BEMPE;
+			bit_rw_t<io_, bitpos::B5>	  PIPE5BEMPE;
+			bit_rw_t<io_, bitpos::B6>	  PIPE6BEMPE;
+			bit_rw_t<io_, bitpos::B7>	  PIPE7BEMPE;
+			bit_rw_t<io_, bitpos::B8>	  PIPE8BEMPE;
+			bit_rw_t<io_, bitpos::B9>	  PIPE9BEMPE;
+
+			bits_rw_t<io_, bitpos::B0, 10>	PIPEBEMPE;
 		};
 		static bempenb_t BEMPENB;
 
@@ -339,11 +345,11 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B4>	    EDGESTS;
+			bit_rw_t<io_, bitpos::B4>    EDGESTS;
 
-			bit_rw_t <io_, bitpos::B6>	    BRDYM;
+			bit_rw_t<io_, bitpos::B6>    BRDYM;
 
-			bit_rw_t <io_, bitpos::B8>	    TRNENSEL;
+			bit_rw_t<io_, bitpos::B8>    TRNENSEL;
 		};
 		static sofcfg_t SOFCFG;
 
@@ -413,16 +419,18 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>   PIPE0BRDY;
-			bit_rw_t <io_, bitpos::B1>   PIPE1BRDY;
-			bit_rw_t <io_, bitpos::B2>   PIPE2BRDY;
-			bit_rw_t <io_, bitpos::B3>   PIPE3BRDY;
-			bit_rw_t <io_, bitpos::B4>   PIPE4BRDY;
-			bit_rw_t <io_, bitpos::B5>   PIPE5BRDY;
-			bit_rw_t <io_, bitpos::B6>   PIPE6BRDY;
-			bit_rw_t <io_, bitpos::B7>   PIPE7BRDY;
-			bit_rw_t <io_, bitpos::B8>   PIPE8BRDY;
-			bit_rw_t <io_, bitpos::B9>   PIPE9BRDY;
+			bit_rw_t<io_, bitpos::B0>   PIPE0BRDY;
+			bit_rw_t<io_, bitpos::B1>   PIPE1BRDY;
+			bit_rw_t<io_, bitpos::B2>   PIPE2BRDY;
+			bit_rw_t<io_, bitpos::B3>   PIPE3BRDY;
+			bit_rw_t<io_, bitpos::B4>   PIPE4BRDY;
+			bit_rw_t<io_, bitpos::B5>   PIPE5BRDY;
+			bit_rw_t<io_, bitpos::B6>   PIPE6BRDY;
+			bit_rw_t<io_, bitpos::B7>   PIPE7BRDY;
+			bit_rw_t<io_, bitpos::B8>   PIPE8BRDY;
+			bit_rw_t<io_, bitpos::B9>   PIPE9BRDY;
+
+			bits_rw_t<io_, bitpos::B0, 10>   PIPEBRDY;
 		};
 		static brdysts_t BRDYSTS;
 
@@ -439,16 +447,18 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>   PIPE0NRDY;
-			bit_rw_t <io_, bitpos::B1>   PIPE1NRDY;
-			bit_rw_t <io_, bitpos::B2>   PIPE2NRDY;
-			bit_rw_t <io_, bitpos::B3>   PIPE3NRDY;
-			bit_rw_t <io_, bitpos::B4>   PIPE4NRDY;
-			bit_rw_t <io_, bitpos::B5>   PIPE5NRDY;
-			bit_rw_t <io_, bitpos::B6>   PIPE6NRDY;
-			bit_rw_t <io_, bitpos::B7>   PIPE7NRDY;
-			bit_rw_t <io_, bitpos::B8>   PIPE8NRDY;
-			bit_rw_t <io_, bitpos::B9>   PIPE9NRDY;
+			bit_rw_t<io_, bitpos::B0>   PIPE0NRDY;
+			bit_rw_t<io_, bitpos::B1>   PIPE1NRDY;
+			bit_rw_t<io_, bitpos::B2>   PIPE2NRDY;
+			bit_rw_t<io_, bitpos::B3>   PIPE3NRDY;
+			bit_rw_t<io_, bitpos::B4>   PIPE4NRDY;
+			bit_rw_t<io_, bitpos::B5>   PIPE5NRDY;
+			bit_rw_t<io_, bitpos::B6>   PIPE6NRDY;
+			bit_rw_t<io_, bitpos::B7>   PIPE7NRDY;
+			bit_rw_t<io_, bitpos::B8>   PIPE8NRDY;
+			bit_rw_t<io_, bitpos::B9>   PIPE9NRDY;
+
+			bits_rw_t<io_, bitpos::B0, 10>   PIPENRDY;
 		};
 		static nrdysts_t NRDYSTS;
 
@@ -465,16 +475,18 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>   PIPE0BEMP;
-			bit_rw_t <io_, bitpos::B1>   PIPE1BEMP;
-			bit_rw_t <io_, bitpos::B2>   PIPE2BEMP;
-			bit_rw_t <io_, bitpos::B3>   PIPE3BEMP;
-			bit_rw_t <io_, bitpos::B4>   PIPE4BEMP;
-			bit_rw_t <io_, bitpos::B5>   PIPE5BEMP;
-			bit_rw_t <io_, bitpos::B6>   PIPE6BEMP;
-			bit_rw_t <io_, bitpos::B7>   PIPE7BEMP;
-			bit_rw_t <io_, bitpos::B8>   PIPE8BEMP;
-			bit_rw_t <io_, bitpos::B9>   PIPE9BEMP;
+			bit_rw_t<io_, bitpos::B0>   PIPE0BEMP;
+			bit_rw_t<io_, bitpos::B1>   PIPE1BEMP;
+			bit_rw_t<io_, bitpos::B2>   PIPE2BEMP;
+			bit_rw_t<io_, bitpos::B3>   PIPE3BEMP;
+			bit_rw_t<io_, bitpos::B4>   PIPE4BEMP;
+			bit_rw_t<io_, bitpos::B5>   PIPE5BEMP;
+			bit_rw_t<io_, bitpos::B6>   PIPE6BEMP;
+			bit_rw_t<io_, bitpos::B7>   PIPE7BEMP;
+			bit_rw_t<io_, bitpos::B8>   PIPE8BEMP;
+			bit_rw_t<io_, bitpos::B9>   PIPE9BEMP;
+
+			bits_rw_t<io_, bitpos::B0, 10>   PIPEBEMP;
 		};
 		static bempsts_t BEMPSTS;
 
@@ -491,10 +503,10 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t <io_, bitpos::B0, 11>   FRNM;
+			bits_rw_t<io_, bitpos::B0, 11>   FRNM;
 
-			bit_rw_t <io_, bitpos::B14>       CRCE;
-			bit_rw_t <io_, bitpos::B15>       OVRN;
+			bit_rw_t <io_, bitpos::B14>      CRCE;
+			bit_rw_t <io_, bitpos::B15>      OVRN;
 		};
 		static frmnum_t FRMNUM;
 
@@ -511,7 +523,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B15>   DVCHG;
+			bit_rw_t<io_, bitpos::B15>   DVCHG;
 		};
 		static dvchgr_t DVCHGR;
 
@@ -528,8 +540,8 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t <io_, bitpos::B0, 7>   USBADDR;
-			bits_rw_t <io_, bitpos::B8, 4>   STSRECOV;
+			bits_rw_t<io_, bitpos::B0, 7>   USBADDR;
+			bits_rw_t<io_, bitpos::B8, 4>   STSRECOV;
 		};
 		static usbaddr_t USBADDR;
 
@@ -546,8 +558,8 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t <io_, bitpos::B0, 8>   BMREQUESTTYPE;
-			bits_rw_t <io_, bitpos::B8, 8>   BREQUEST;
+			bits_rw_t<io_, bitpos::B0, 8>   BMREQUESTTYPE;
+			bits_rw_t<io_, bitpos::B8, 8>   BREQUEST;
 		};
 		static usbreq_t USBREQ;
 
@@ -564,7 +576,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t <io_, bitpos::B0, 16>   WVALUE;
+			bits_rw_t<io_, bitpos::B0, 16>   WVALUE;
 		};
 		static usbval_t USBVAL;
 
@@ -581,7 +593,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t <io_, bitpos::B0, 16>   WINDEX;
+			bits_rw_t<io_, bitpos::B0, 16>   WINDEX;
 		};
 		static usbindx_t USBINDX;
 
@@ -598,7 +610,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t <io_, bitpos::B0, 16>   WLENGTH;
+			bits_rw_t<io_, bitpos::B0, 16>   WLENGTH;
 		};
 		static usbleng_t USBLENG;
 
@@ -733,8 +745,8 @@ namespace device {
 			@brief  パイプ周期制御レジスタ（PIPEPERI）
 		*/
 		//-----------------------------------------------------------------//
-		struct pipeperi_t : public rw16_t<base + 0x6C> {
-			typedef rw16_t<base + 0x6C> io_;
+		struct pipeperi_t : public rw16_t<base + 0x6E> {
+			typedef rw16_t<base + 0x6E> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
