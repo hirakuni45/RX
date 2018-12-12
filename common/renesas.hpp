@@ -46,6 +46,7 @@
 #include "RX600/etherc.hpp"
 #include "RX600/edmac.hpp"
 #include "RX600/usb.hpp"
+#include "RX600/usba.hpp"
 #include "RX600/scif.hpp"
 #include "RX600/rtc.hpp"
 #include "RX600/rtc_io.hpp"
