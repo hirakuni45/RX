@@ -11,6 +11,19 @@ DEVICE		=	R5F524TA
 
 BUILD		=	release
 
+ifeq ($(OS),Windows_NT)
+SYSTEM := WIN
+else
+  UNAME := $(shell uname -s)
+  ifeq ($(UNAME),Linux)
+    SYSTEM := LINUX
+  endif
+  ifeq ($(UNAME),Darwin)
+    SYSTEM := OSX
+	OSX_VER := $(shell sw_vers -productVersion | sed 's/^\([0-9]*.[0-9]*\).[0-9]*/\1/')
+  endif
+endif
+
 VPATH		=	../
 
 ASOURCES	=	common/start.s
@@ -27,7 +40,12 @@ LDSCRIPT	=	../RX24T/$(DEVICE).ld
 
 USER_DEFS	=	SIG_RX24T F_ICLK=80000000 F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKD=40000000 F_FCLK=20000000
 
+# for boost path
+ifeq ($(SYSTEM),WIN)
 INC_SYS		=	/mingw64/include
+else
+INC_SYS		=	/usr/local/include
+endif
 
 INC_APP		=	. ../
 
