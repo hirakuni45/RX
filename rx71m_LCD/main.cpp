@@ -45,11 +45,6 @@ namespace {
 		typedef device::PORT_BYTE<device::PORTD> DL;
 		typedef device::PORT_BYTE<device::PORTE> DH;
 
-		static void enable(bool ena = true) noexcept
-		{
-			CS::P = !ena;
-		}
-
 		static void start() noexcept
 		{
 			RES::DIR = 1;
@@ -64,46 +59,48 @@ namespace {
 			RD::P = 1;
 			WR::P = 1;
 
+			DL::DIR = 0xff;
+			DH::DIR = 0xff;
+
 			utils::delay::milli_second(10);
 			RES::P = 1;
 			utils::delay::milli_second(10);
 		}
 
 		static void write16(uint16_t val) noexcept {
-			DL::P = val & 0xff;
 			DH::P = val >> 8;
+			DL::P = val & 0xff;
+			WR::P = 0;
+			CS::P = 0;
+			utils::delay::loop(10);
+			WR::P = 1;
+			CS::P = 1;
 		}
 
 		static uint16_t read16() noexcept {
-
-			uint16_t val = DH::P();
+			RD::P = 0;
+			CS::P = 0;
+			utils::delay::micro_second(1);
+			uint16_t val = static_cast<uint16_t>(DH::P());
 			val <<= 8;
-			val |= DL::P();
+			val |= static_cast<uint16_t>(DL::P());
+			CS::P = 1;
+			RD::P = 1;
 			return val;
 		}
 
 		static void write(uint16_t val, bool rs) noexcept {
 			RS::P = rs;
-			DL::DIR = 0xff;
-			DH::DIR = 0xff;
 			write16(val);
-			CS::P = 0;
-			WR::P = 0;
-			utils::delay::micro_second(2);
-			WR::P = 1;
-			CS::P = 1;
 		}
 
 		static uint16_t read() noexcept {
 			RS::P = 1;
 			DL::DIR = 0x00;
 			DH::DIR = 0x00;
-			CS::P = 0;
-			RD::P = 0;
-			utils::delay::micro_second(2);
 			auto dat = read16();
-			RD::P = 1;
-			CS::P = 1;
+			DL::DIR = 0xff;
+			DH::DIR = 0xff;
 			return dat;
 		}
 	};
@@ -112,27 +109,17 @@ namespace {
 
 	typedef chip::R61505<tft_rw> TFT;
 	TFT		tft_(tft_rw_);
-
-	volatile uint16_t fb_[320 * 240];
 }
 
 
 extern "C" {
 
-	inline void dummy_plot(int x, int y, uint16_t c)
-	{
-		if(x < 0 || x >= 320) return;
-		if(y < 0 || y >= 320) return;
-		fb_[y * 320 + x] = c;
-	}
-
 	void draw_pixel(int x, int y, int r, int g, int b)
 	{
 		volatile uint16_t c = (static_cast<uint16_t>(r & 0xf8) << 8)
 				   | (static_cast<uint16_t>(g & 0xfc) << 3)
-				   | (static_cast<uint16_t>(b & 0xf8) >> 3);
-		
-//		tft_.plot(x, y, c);
+				   | (static_cast<uint16_t>(b & 0xf8) >> 3);		
+		tft_.plot(x, y, c);
 	}
 
 	void draw_text(int x, int y, const char* t)
@@ -193,13 +180,12 @@ int main(int argc, char** argv)
 	tft_rw_.start();
 	if(tft_.start()) {
 		utils::format("Probe TFT OK to start...\n");
-#if 0
-		for(int y = 0; y < 32; ++y) {
-			for(int x = 0; x < 32; ++x) {
-				tft_.plot(x, y, 0xf00f);
+		for(int y = 0; y < 240; ++y) {
+			for(int x = 0; x < 320; ++x) {
+				tft_.plot(x, y, 0x0);
 			}
 		}
-#endif
+
 		doRaytrace(1, 320, 240);
 
 	} else {
