@@ -32,7 +32,6 @@ namespace chip {
 
 		void write_list_(const uint16_t* list, uint16_t size)
 		{
-			rw_.enable();
 			for(uint16_t i = 0; i < size; ++i) {
 				auto cmd = *list++;
 				auto dat = *list++;
@@ -43,7 +42,6 @@ namespace chip {
 					rw_.write(dat, 1);
 				}
 			}
-			rw_.enable(false);
 		}
 
 	public:
@@ -64,10 +62,8 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		bool start()
 		{
-			rw_.enable();
 			rw_.write(0x00, 0);  // command register index
 			auto id = rw_.read();
-			rw_.enable(false);
 			utils::format("ID: %04X\n") % id;
 
 			switch(id) {
@@ -99,10 +95,10 @@ namespace chip {
 //#endif
 				0x0008, 0x0808,
 				0x0009, 0x0001,
-				0x000a, 0x0000,
-				0x000c, 0x0000,    // interface?
-				0x000d, 0x0000,
-				0x000e, 0x0030,
+				0x000A, 0x0000,
+				0x000C, 0x0000,    // interface?
+				0x000D, 0x0000,
+				0x000E, 0x0030,
 				0x0030, 0x0214,
 				0x0031, 0x3715,
 				0x0032, 0x0604,
@@ -209,7 +205,7 @@ namespace chip {
 //			rw_.write(0x52, 0);
 //			rw_.write(x, 1);
 
-			rw_.write(0x22, 0);  // Frame Memory Data Write (18bits)
+			rw_.write(0x22, 0);  // Frame Memory Data Write (16bits)
 			rw_.write(c, 1);
 		}
 	};
