@@ -50,8 +50,8 @@ namespace device {
 		@param[in]	SCI		SCI 型
 		@param[in]	RBF		受信バッファクラス
 		@param[in]	SBF		送信バッファクラス
-		@param[in]	PSEL	ポート選択
-		@param[in]	HCTL	半二重通信制御ポート（RS-485）
+		@param[in]	PSEL	シリアルポート選択
+		@param[in]	HCTL	半二重通信制御ポート（for RS-485）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SCI, class RBF, class SBF, port_map::option PSEL = port_map::option::FIRST, class HCTL = NULL_PORT>
@@ -72,11 +72,17 @@ namespace device {
 		};
 
 	private:
+
+		static const char XON  = 0x11;
+		static const char XOFF = 0x13;
+
 		static RBF	recv_;
 		static SBF	send_;
 
 		uint8_t		level_;
 		bool		auto_crlf_;
+		static bool		soft_flow_;
+		static volatile bool	stop_;
 
 		// ※マルチタスクの場合適切な実装をする
 		void sleep_() noexcept { asm("nop"); }
@@ -98,6 +104,11 @@ namespace device {
 			}
 			volatile uint8_t data = SCI::RDR();
 			if(!err) {
+				if(soft_flow_) {
+					if(recv_.length() >= (recv_.size() - recv_.size() / 8)) {
+						stop_ = true;
+					}
+				}
 				recv_.put(data);
 			}
 		}
@@ -106,7 +117,12 @@ namespace device {
 		static INTERRUPT_FUNC void send_task_()
 		{
 			if(send_.length() > 0) {
-				SCI::TDR = send_.get();
+//				if(stop_) {
+//					SCI::TDR = XON;
+//					stop_ = false;
+//				} else {
+					SCI::TDR = send_.get();
+//				}
 			} else {
 				SCI::SCR.TIE = 0;
 				HCTL::P = 0;
@@ -137,9 +153,32 @@ namespace device {
 		/*!
 			@brief  コンストラクター
 			@param[in]	autocrlf	LF 時、自動で CR の送出をしない場合「false」
+			@param[in]	softflow	ソフトフロー制御を無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		sci_io(bool autocrlf = true) noexcept : level_(0), auto_crlf_(autocrlf) { }
+		sci_io(bool autocrlf = true, bool softflow = true) noexcept : level_(0),
+			auto_crlf_(autocrlf) {
+			soft_flow_ = softflow;
+			stop_ = false;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	LF 時、CR 自動送出
+			@param[in]	f	「false」なら無効
+		 */
+		//-----------------------------------------------------------------//
+		void auto_crlf(bool f = true) noexcept { auto_crlf_ = f; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ソフト・フロー制御設定
+			@param[in]	f	「false」なら無効
+		 */
+		//-----------------------------------------------------------------//
+		void soft_flow(bool f = true) noexcept { soft_flow_ = f; }
 
 
 		//-----------------------------------------------------------------//
@@ -241,11 +280,20 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	LF 時、CR 自動送出
-			@param[in]	f	「false」なら無効
+			@brief	BRR レジスタ値を取得
+			@return BRR レジスタ値
 		 */
 		//-----------------------------------------------------------------//
-		void auto_crlf(bool f = true) noexcept { auto_crlf_ = f; }
+		uint8_t get_brr() const noexcept { return SCI::BRR(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	MDDR レジスタ値を取得（ボーレート周期補正）
+			@return MDRR レジスタ値
+		 */
+		//-----------------------------------------------------------------//
+		uint8_t get_mdrr() const noexcept { return SCI::MDDR(); }
 
 
 		//-----------------------------------------------------------------//
@@ -291,7 +339,12 @@ namespace device {
 ///					while(SCI::SSR.TEND() == 0) sleep_();
 					HCTL::P = 1;
 					SCI::SCR.TIE = 1;
-					SCI::TDR = send_.get();
+//					if(stop_) {
+//						SCI::TDR = XON;
+//						stop_ = false;
+//					} else {
+						SCI::TDR = send_.get();
+//					}
 				}
 			} else {
 				while(SCI::SSR.TEND() == 0) sleep_();
@@ -359,4 +412,8 @@ namespace device {
 		RBF sci_io<SCI, RBF, SBF, PSEL, HCTL>::recv_;
 	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
 		SBF sci_io<SCI, RBF, SBF, PSEL, HCTL>::send_;
+	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
+		bool sci_io<SCI, RBF, SBF, PSEL, HCTL>::soft_flow_;
+	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
+		volatile bool sci_io<SCI, RBF, SBF, PSEL, HCTL>::stop_;
 }

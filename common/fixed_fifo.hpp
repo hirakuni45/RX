@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Fixed FIFO (first in first out) テンプレート
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,16 +14,16 @@ namespace utils {
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     /*!
-        @brief  fifo クラス
+        @brief  固定サイズ FIFO クラス
 		@param[in]	UNIT	基本形
-		@param[in]	SIZE	バッファサイズ（最大６５５３６）
+		@param[in]	SIZE	バッファサイズ
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class UNIT, uint32_t SIZE>
 	class fixed_fifo {
 
-		volatile uint16_t	get_;
-		volatile uint16_t	put_;
+		volatile uint32_t	get_;
+		volatile uint32_t	put_;
 
 		UNIT	buff_[SIZE];
 
@@ -42,7 +42,7 @@ namespace utils {
 			@return	バッファのサイズ
         */
         //-----------------------------------------------------------------//
-		uint32_t size() const noexcept { return SIZE; }
+		inline uint32_t size() const noexcept { return SIZE; }
 
 
         //-----------------------------------------------------------------//
@@ -62,16 +62,19 @@ namespace utils {
             @brief  クリア
         */
         //-----------------------------------------------------------------//
-		void clear() noexcept { get_ = put_ = 0; }
+		inline void clear() noexcept { get_ = put_ = 0; }
 
 
         //-----------------------------------------------------------------//
         /*!
             @brief  値の格納参照を得る
+			@param[in]	ofs	オフセット（格納領域を超えたオフセットは未定義）
 			@return 値の格納参照
         */
         //-----------------------------------------------------------------//
-		inline UNIT& put_at() noexcept { return buff_[put_]; }
+		inline UNIT& put_at(uint32_t ofs = 0) noexcept {
+			return buff_[(put_ + ofs) % SIZE];
+		}
 
 
         //-----------------------------------------------------------------//
@@ -104,10 +107,13 @@ namespace utils {
         //-----------------------------------------------------------------//
         /*!
             @brief  値の取得参照を得る
+			@param[in]	ofs	オフセット（格納領域を超えたオフセットは未定義）
 			@return	値の取得参照
         */
         //-----------------------------------------------------------------//
-		const UNIT& get_at() const noexcept { return buff_[get_]; }
+		inline const UNIT& get_at(uint32_t ofs = 0) const noexcept {
+			return buff_[(get_ + ofs) % SIZE];
+		}
 
 
         //-----------------------------------------------------------------//
@@ -144,7 +150,7 @@ namespace utils {
 			@return	位置
         */
         //-----------------------------------------------------------------//
-		uint16_t pos_get() const noexcept { return get_; }
+		inline uint16_t pos_get() const noexcept { return get_; }
 
 
         //-----------------------------------------------------------------//
@@ -153,6 +159,6 @@ namespace utils {
 			@return	位置
         */
         //-----------------------------------------------------------------//
-		uint16_t pos_put() const noexcept { return put_; }
+		inline uint16_t pos_put() const noexcept { return put_; }
 	};
 }
