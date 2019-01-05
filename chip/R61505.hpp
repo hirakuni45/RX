@@ -11,9 +11,7 @@
 */
 //=========================================================================//
 #include <cstdint>
-#include "common/delay.hpp"
-
-#include "common/format.hpp"
+// #include "common/format.hpp"
 
 namespace chip {
 
@@ -81,7 +79,6 @@ namespace chip {
 			default:
 				return false;
 			}
-
 
 			static const uint16_t R61505_init_list_[] = {
 				//R61505W (TFT1N3204-E)
@@ -183,11 +180,8 @@ namespace chip {
 				DELAY,  80,
 				0x0007, 0x0100,     //BASEE=1--Display O
 	        };
-//				0x000C, 0x0001,     // 16bits interface
 #endif
 			write_list_(R61505_init_list_, sizeof(R61505_init_list_) / sizeof(uint16_t) / 2);
-
-			utils::delay::milli_second(30);
 
 			return true;
 		}

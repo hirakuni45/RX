@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include <cstdint>
+#include "common/delay.hpp"
 
 namespace device {
 
