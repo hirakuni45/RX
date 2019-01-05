@@ -1,7 +1,7 @@
 #pragma once
 //=========================================================================//
 /*!	@file
-	@brief	R61505V, R61505W class @n
+	@brief	R61505V, R61505V/W class @n
 			Renesas SP @n
 			TFT Display Controller Driver
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -21,9 +21,10 @@ namespace chip {
 	/*!
 		@brief  R61505V/W テンプレートクラス
 		@param[in]	RW	Read/Write クラス
+		@param[in]	RES	リセット信号生成定義
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class RW>
+	template <class RW, class RES>
 	class R61505 {
 
 		RW&		rw_;
@@ -38,8 +39,8 @@ namespace chip {
 				if(cmd == DELAY) {
 					utils::delay::milli_second(dat);
 				} else {
-					rw_.write(cmd, 0);
-					rw_.write(dat, 1);
+					rw_.write(0, cmd);
+					rw_.write(1, dat);
 				}
 			}
 		}
@@ -62,9 +63,16 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		bool start()
 		{
-			rw_.write(0x00, 0);  // command register index
-			auto id = rw_.read();
-			utils::format("ID: %04X\n") % id;
+			RES::DIR = 1;
+            RES::P = 0;
+			rw_.start();
+            utils::delay::milli_second(10);
+            RES::P = 1;
+            utils::delay::milli_second(10);
+
+			rw_.write(0, 0x00);  // get ID
+			auto id = rw_.read(1);
+//			utils::format("ID: %04X\n") % id;
 
 			switch(id) {
 			case 0xB505:  // R61505V
@@ -195,18 +203,18 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		void plot(int16_t x, int16_t y, uint16_t c) noexcept
 		{
-			rw_.write(0x20, 0);  // Horizontal Address (8 bits)
-			rw_.write(y, 1);
-			rw_.write(0x21, 0);  // Vertical Address (9 bits)
-			rw_.write(x, 1);
+			rw_.write(0, 0x20);  // Horizontal Address (8 bits)
+			rw_.write(1, y);
+			rw_.write(0, 0x21);  // Vertical Address (9 bits)
+			rw_.write(1, x);
 
-//			rw_.write(0x50, 0);
-//			rw_.write(y, 1);
-//			rw_.write(0x52, 0);
-//			rw_.write(x, 1);
+//			rw_.write(0, 0x50);
+//			rw_.write(1, y);
+//			rw_.write(0, 0x52);
+//			rw_.write(1, x);
 
-			rw_.write(0x22, 0);  // Frame Memory Data Write (16bits)
-			rw_.write(c, 1);
+			rw_.write(0, 0x22);  // Frame Memory Data Write (16bits)
+			rw_.write(1, c);
 		}
 	};
 }
