@@ -15,6 +15,7 @@
 
 #include "common/cmt_io.hpp"
 
+#include "chip/bus_rw.hpp"
 #include "chip/R61505.hpp"
 
 #include "../RTK5_RAYTRACER/raytracer.hpp"
@@ -35,80 +36,18 @@ namespace {
 
 	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
 
-	struct tft_rw {
+	typedef device::PORT<device::PORTA, device::bitpos::B1> RS;
+	typedef device::PORT<device::PORT5, device::bitpos::B2> RD;
+	typedef device::PORT<device::PORT5, device::bitpos::B0> WR;
+	typedef device::PORT<device::PORT2, device::bitpos::B4> CS;
+	typedef device::PORT_BYTE<device::PORTD> DL;
+	typedef device::PORT_BYTE<device::PORTE> DH;
+	typedef device::bus_rw<CS, RS, RD, WR, DL, DH> BUS;
+	BUS		bus_;
 
-		typedef device::PORT<device::PORT0, device::bitpos::B2> RES;
-		typedef device::PORT<device::PORTA, device::bitpos::B1> RS;
-		typedef device::PORT<device::PORT5, device::bitpos::B2> RD;
-		typedef device::PORT<device::PORT5, device::bitpos::B0> WR;
-		typedef device::PORT<device::PORT2, device::bitpos::B4> CS;
-		typedef device::PORT_BYTE<device::PORTD> DL;
-		typedef device::PORT_BYTE<device::PORTE> DH;
-
-		static void start() noexcept
-		{
-			RES::DIR = 1;
-			RS::DIR = 1;
-			RD::DIR = 1;
-			WR::DIR = 1;
-			CS::DIR = 1;
-
-			CS::P = 1;
-			RES::P = 0;
-			RS::P = 0;
-			RD::P = 1;
-			WR::P = 1;
-
-			DL::DIR = 0xff;
-			DH::DIR = 0xff;
-
-			utils::delay::milli_second(10);
-			RES::P = 1;
-			utils::delay::milli_second(10);
-		}
-
-		static void write16(uint16_t val) noexcept {
-			DH::P = val >> 8;
-			DL::P = val & 0xff;
-			WR::P = 0;
-			CS::P = 0;
-			utils::delay::loop(10);
-			WR::P = 1;
-			CS::P = 1;
-		}
-
-		static uint16_t read16() noexcept {
-			RD::P = 0;
-			CS::P = 0;
-			utils::delay::micro_second(1);
-			uint16_t val = static_cast<uint16_t>(DH::P());
-			val <<= 8;
-			val |= static_cast<uint16_t>(DL::P());
-			CS::P = 1;
-			RD::P = 1;
-			return val;
-		}
-
-		static void write(uint16_t val, bool rs) noexcept {
-			RS::P = rs;
-			write16(val);
-		}
-
-		static uint16_t read() noexcept {
-			RS::P = 1;
-			DL::DIR = 0x00;
-			DH::DIR = 0x00;
-			auto dat = read16();
-			DL::DIR = 0xff;
-			DH::DIR = 0xff;
-			return dat;
-		}
-	};
-
-	tft_rw	tft_rw_;
-
-	typedef chip::R61505<tft_rw> TFT;
-	TFT		tft_(tft_rw_);
+	typedef device::PORT<device::PORT0, device::bitpos::B2> RES;
+	typedef chip::R61505<BUS, RES> TFT;
+	TFT		tft_(bus_);
 }
 
 
@@ -177,7 +116,6 @@ int main(int argc, char** argv)
 
 	utils::format("Start TFT sample\n");
 
-	tft_rw_.start();
 	if(tft_.start()) {
 		utils::format("Probe TFT OK to start...\n");
 		for(int y = 0; y < 240; ++y) {
