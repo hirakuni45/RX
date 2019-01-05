@@ -2,7 +2,7 @@
 =========
 
 ## 概要
-I2C、SPI、等のインターフェースで通信を行うデバイス制御クラス
+I2C、SPI、BUS、等のインターフェースで通信を行うデバイス制御クラス
    
 ## デバイス・リスト
  - BMP180   
@@ -125,6 +125,12 @@ Interface: I2C
 Variable Frequency Drive
 ?
 Interface: RS-485 (8 Bits 1 Stop No-Parity, 9600 Baud)
+   
+ - R61505V/W
+Renesas SP
+TFT Display Controller Driver (262,144-color, 240RGB x 320-dot)
+<https://datasheetspdf.com/pdf-down/R/6/1/R61505-Renesas.pdf>
+Interface: BUS-8(/CS,/RD,/WR), BUS-16(/CS,/RD,/WR),SPI(/CS,MOSI,MISO,CLK)
    
 -----
    
