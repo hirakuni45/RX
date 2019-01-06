@@ -18,7 +18,7 @@
 #include "chip/bus_rw.hpp"
 #include "chip/R61505.hpp"
 
-#include "../RTK5_RAYTRACER/raytracer.hpp"
+#include "../RAYTRACER_sample/raytracer.hpp"
 
 namespace {
 
@@ -57,7 +57,7 @@ extern "C" {
 	{
 		volatile uint16_t c = (static_cast<uint16_t>(r & 0xf8) << 8)
 				   | (static_cast<uint16_t>(g & 0xfc) << 3)
-				   | (static_cast<uint16_t>(b & 0xf8) >> 3);		
+				   | (static_cast<uint16_t>(b) >> 3);		
 		tft_.plot(x, y, c);
 	}
 
@@ -114,13 +114,12 @@ int main(int argc, char** argv)
 		sci_.start(baud, intr);
 	}
 
-	utils::format("Start TFT sample\n");
+	utils::format("Start TFT-LCD sample\n");
 
 	if(tft_.start()) {
-		utils::format("Probe TFT OK to start...\n");
 		tft_.fill_box(0, 0, 320, 240, 0x0000);
 	} else {
-		utils::format("Probe TFT NG not start...\n");
+		utils::format("TFT-LCD not start...\n");
 	}
 
 	LED::DIR = 1;
