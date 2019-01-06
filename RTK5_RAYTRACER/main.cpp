@@ -20,7 +20,7 @@
 #include "graphics/kfont.hpp"
 #include "common/cmt_io.hpp"
 
-#include "raytracer.hpp"
+#include "../RAYTRACER_sample/raytracer.hpp"
 
 namespace {
 
