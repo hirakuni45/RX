@@ -11,6 +11,7 @@
 */
 //=========================================================================//
 #include <cstdint>
+#include "common/delay.hpp"
 // #include "common/format.hpp"
 
 namespace chip {
@@ -50,7 +51,7 @@ namespace chip {
 			@param[in]	rw	RW 制御クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		R61505(RW& rw) : rw_(rw) { }
+		R61505(RW& rw) noexcept : rw_(rw) { }
 
 
 		//-----------------------------------------------------------------//
@@ -59,7 +60,7 @@ namespace chip {
 			@return デバイスを認識出来ない場合「false」
 		 */
 		//-----------------------------------------------------------------//
-		bool start()
+		bool start() noexcept
 		{
 			RES::DIR = 1;
             RES::P = 0;
@@ -81,7 +82,7 @@ namespace chip {
 			}
 
 			static const uint16_t R61505_init_list_[] = {
-				//R61505W (TFT1N3204-E)
+				// R61505W (TFT1N3204-E)
 				0x0000, 0x0001,
 				0x0007, 0x0000,
 				0x0010, 0x0410,
@@ -107,7 +108,7 @@ namespace chip {
 				0x0030, 0x0214,
 				0x0031, 0x3715,
 				0x0032, 0x0604,
-				0x0033, 0x0e16,
+				0x0033, 0x0E16,
 				0x0034, 0x2211,
 				0x0035, 0x1500,
 				0x0036, 0x8507,
@@ -115,9 +116,9 @@ namespace chip {
 				0x0038, 0x1403,
 				0x0039, 0x0020,
 				0x0050, 0x0000,
-				0x0051, 0x00ef,
+				0x0051, 0x00EF,
 				0x0052, 0x0000,
-				0x0053, 0x013f,
+				0x0053, 0x013F,
 				0x0060, 0x2700,
 				0x0061, 0x0003,
 				0x006a, 0x0000,
@@ -201,14 +202,56 @@ namespace chip {
 			rw_.write(1, y);
 			rw_.write(0, 0x21);  // Vertical Address (9 bits)
 			rw_.write(1, x);
-
-//			rw_.write(0, 0x50);
-//			rw_.write(1, y);
-//			rw_.write(0, 0x52);
-//			rw_.write(1, x);
-
 			rw_.write(0, 0x22);  // Frame Memory Data Write (16bits)
 			rw_.write(1, c);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	箱を描画
+			@param[in] x	X 位置
+			@param[in] y	Y 位置
+			@param[in] w	横幅
+			@param[in] h	高さ
+			@param[in] c	カラー（RGB565）
+		 */
+		//-----------------------------------------------------------------//
+		void fill_box(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t c) noexcept
+		{
+			for(int16_t yy = y; yy < (y + h); ++yy) {
+				rw_.write(0, 0x20);
+				rw_.write(1, yy);
+
+				rw_.write(0, 0x21);  // Vertical Address (9 bits)
+				rw_.write(1, x);
+				rw_.write(0, 0x22);  // Frame Memory Data Write (16bits)
+				for(int16_t xx = x; xx < (x + w); ++xx) {
+					rw_.write(1, c);
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	画素をコピー
+			@param[in] x	X 位置
+			@param[in] y	Y 位置
+			@param[in] src	コピー元
+			@param[in] len	コピー長
+		 */
+		//-----------------------------------------------------------------//
+		void copy(int16_t x, int16_t y, const uint16_t* src, uint16_t len) noexcept
+		{
+			rw_.write(0, 0x20);
+			rw_.write(1, y);
+			rw_.write(0, 0x21);  // Vertical Address (9 bits)
+			rw_.write(1, x);
+			rw_.write(0, 0x22);  // Frame Memory Data Write (16bits)
+			for(uint16_t n = 0; n < len; ++n) {
+				rw_.write(1, *src++);
+			}
 		}
 	};
 }
