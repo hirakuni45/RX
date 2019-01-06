@@ -32,7 +32,7 @@ namespace device {
 			DL::P = val & 0xff;
 			WR::P = 0;
 			CS::P = 0;
-			utils::delay::loop(10);
+			utils::delay::loop(5);
 			WR::P = 1;
 			CS::P = 1;
 		}
