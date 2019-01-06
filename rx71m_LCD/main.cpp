@@ -118,22 +118,29 @@ int main(int argc, char** argv)
 
 	if(tft_.start()) {
 		utils::format("Probe TFT OK to start...\n");
-		for(int y = 0; y < 240; ++y) {
-			for(int x = 0; x < 320; ++x) {
-				tft_.plot(x, y, 0x0);
-			}
-		}
-
-		doRaytrace(1, 320, 240);
-
+		tft_.fill_box(0, 0, 320, 240, 0x0000);
 	} else {
 		utils::format("Probe TFT NG not start...\n");
 	}
 
 	LED::DIR = 1;
 	uint8_t cnt = 0;
+	uint8_t delay = 60;
 	while(1) {
 		cmt_.sync();
+
+		if(delay > 0) {
+			delay--;
+			if(delay == 0) {
+				doRaytrace(1, 320, 240);
+			}
+		}
+
+		// エコーバック処理
+		while(sci_length() > 0) {
+			auto ch = sci_getch();
+			sci_putch(ch);
+		}
 
 		++cnt;
 		if(cnt >= 50) {
@@ -143,12 +150,6 @@ int main(int argc, char** argv)
 			LED::P = 0;
 		} else {
 			LED::P = 1;
-		}
-
-		// エコーバック処理
-		while(sci_length() > 0) {
-			auto ch = sci_getch();
-			sci_putch(ch);
 		}
 	}
 }
