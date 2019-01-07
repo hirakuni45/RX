@@ -347,6 +347,12 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL1 {
 
+			OEI5 = 8,	///< POE3
+			OEI1 = 9,	///< POE3
+			OEI2 = 10,	///< POE3
+			OEI3 = 11,	///< POE3
+			OEI4 = 12,	///< POE3
+
 			TEI0 = 13,	///< RIIC0 / TEI0
 			EEI0,		///< RIIC0 / EEI0
 
