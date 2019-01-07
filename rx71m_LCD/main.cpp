@@ -20,6 +20,9 @@
 
 #include "../RAYTRACER_sample/raytracer.hpp"
 
+#include "graphics/font8x16.hpp"
+#include "graphics/graphics.hpp"
+
 namespace {
 
 	typedef device::system_io<12000000> SYSTEM_IO;
@@ -48,6 +51,28 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B2> RES;
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT		tft_(bus_);
+
+	static const uint32_t TFT_W = 320;
+	static const uint32_t TFT_H = 240;
+
+	uint16_t	fb_[TFT_W * TFT_H];
+
+	typedef graphics::font8x16 AFONT;
+	typedef graphics::kfont_null KFONT;
+	KFONT	kfont_;
+
+	typedef graphics::render<uint16_t, TFT_W, TFT_H, AFONT, KFONT> RENDER;
+	RENDER	render_(fb_, kfont_);
+
+
+	void copy_fb_()
+	{
+		const uint16_t* src = fb_;
+		for(uint16_t y = 0; y < TFT_H; ++y) {
+			tft_.copy(0, y, src, TFT_W);
+			src += TFT_W;
+		}
+	}
 }
 
 
@@ -58,13 +83,15 @@ extern "C" {
 		volatile uint16_t c = (static_cast<uint16_t>(r & 0xf8) << 8)
 				   | (static_cast<uint16_t>(g & 0xfc) << 3)
 				   | (static_cast<uint16_t>(b) >> 3);		
-		tft_.plot(x, y, c);
+//		tft_.plot(x, y, c);
+		render_.plot(x, y, c);
 	}
+
 
 	void draw_text(int x, int y, const char* t)
 	{
-//		tft_.fill_box(x, y, strlen(t) * 8, 16, render_.get_back_color());
-//		tft_.draw_text(x, y, t);
+		render_.fill_box(x, y, strlen(t) * 8, 16, render_.get_back_color());
+		render_.draw_text(x, y, t);
 	}
 
 
@@ -127,6 +154,8 @@ int main(int argc, char** argv)
 	uint8_t delay = 60;
 	while(1) {
 		cmt_.sync();
+
+		copy_fb_();
 
 		if(delay > 0) {
 			delay--;
