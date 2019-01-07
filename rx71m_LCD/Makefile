@@ -20,7 +20,8 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	main.cpp
+PSOURCES	=	main.cpp \
+				graphics/font8x16.cpp
 
 USER_LIBS	=	m
 
@@ -33,7 +34,8 @@ USER_DEFS	=	SIG_RX71M \
 
 MCU_TARGET	=	
 
-INC_SYS		=
+# for boost path
+INC_SYS		=	/mingw64/include
 
 INC_APP		=	. ../
 
