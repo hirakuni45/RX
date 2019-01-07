@@ -163,7 +163,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> NACKE;
 			bit_rw_t<io_, bitpos::B5> NFE;
 			bit_rw_t<io_, bitpos::B6> SCLE;
-			// bit_rw_t<io_, bitpos::B7> FMPE;
+			bit_rw_t<io_, bitpos::B7> FMPE;
 		};
 		static icfer_t<base + 0x05> ICFER;
 
