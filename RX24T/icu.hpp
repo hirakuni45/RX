@@ -128,6 +128,12 @@ namespace device {
 			TGIE9   = 164,  ///< MTU9
 			TGIF9   = 165,  ///< MTU9
 
+			OEI1	= 168,	///< POE
+			OEI2	= 169,	///< POE
+			OEI3	= 170,	///< POE
+			OEI4	= 171,	///< POE
+			OEI5	= 172,	///< POE
+
 			CMPC3   = 173,  ///< CMPC3
 
 			CMIA0   = 174,	///< TMR0: CMIA0
@@ -271,6 +277,12 @@ namespace device {
 			rw8_t<base + 163> TCIV9;
 			rw8_t<base + 164> TGIE9;
 			rw8_t<base + 165> TGIF9;
+
+			rw8_t<base + 168> OEI1;
+			rw8_t<base + 169> OEI2;
+			rw8_t<base + 170> OEI3;
+			rw8_t<base + 171> OEI4;
+			rw8_t<base + 172> OEI5;
 
 			rw8_t<base + 174> CMIA0;
 			rw8_t<base + 175> CMIB0;
@@ -424,6 +436,12 @@ namespace device {
 			bit_rw_t<ier14, bitpos::B5>	TGIF9;
 
 			typedef rw8_t<base + 0x15> ier15;
+			bit_rw_t<ier15, bitpos::B0>	OEI1;
+			bit_rw_t<ier15, bitpos::B1>	OEI2;
+			bit_rw_t<ier15, bitpos::B2>	OEI3;
+			bit_rw_t<ier15, bitpos::B3>	OEI4;
+			bit_rw_t<ier15, bitpos::B4>	OEI5;
+
 			bit_rw_t<ier15, bitpos::B6>	CMIA0;
 			bit_rw_t<ier15, bitpos::B7>	CMIB0;
 			typedef rw8_t<base + 0x16> ier16;
@@ -532,6 +550,12 @@ namespace device {
 
 			rw8_t<base + 159> MTU9_ABCD;	///< MTU9
 			rw8_t<base + 163> MTU9_VEF;		///< MTU9
+
+			rw8_t<base + 168> OEI1;		///< POE
+			rw8_t<base + 169> OEI2;		///< POE
+			rw8_t<base + 170> OEI3;		///< POE
+			rw8_t<base + 171> OEI4;		///< POE
+			rw8_t<base + 172> OEI5;		///< POE
 
 			rw8_t<base + 174> TMR0;		///< TMR0
 			rw8_t<base + 177> TMR1;		///< TMR1
