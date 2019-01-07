@@ -22,7 +22,8 @@ namespace device {
 		@brief  systen_io クラス
 		@param[in]	BASE_CLOCK	ベース・クロック周波数（１０ＭＨｚ）
 		@param[in]	INTR_CLOCK	内臓クロック周波数（８０ＭＨｚ）
-		@param[in]	EXT_CLOCK	外部クロックに入力を行う場合「true」
+		@param[in]	EXT_CLOCK	外部クロック入力を使う場合「true」@n
+								※クリスタル利用は「false」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t BASE_CLOCK = 10000000, uint32_t INTR_CLOCK = 80000000,
