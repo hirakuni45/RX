@@ -19,7 +19,6 @@
 #if defined(SIG_RX24T)
 #include "RX24T/system.hpp"
 #include "RX24T/system_io.hpp"
-#include "RX24T/poe3.hpp"
 #include "RX24T/s12ad.hpp"
 #include "RX24T/adc_io.hpp"
 #include "RX24T/da.hpp"
@@ -119,6 +118,7 @@
 #include "RX600/dtc.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mtu3.hpp"
+#include "RX600/poe3.hpp"
 #include "RX600/gpt.hpp"
 #include "RX600/tmr.hpp"
 #include "RX600/cmt.hpp"
