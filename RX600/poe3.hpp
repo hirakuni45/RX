@@ -9,7 +9,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -1593,12 +1593,388 @@ namespace device {
 		static m6selr_t<org + 0x65> M6SELR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	MTU7 端子選択レジスタ 1 (M7SELR1)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct m7selr1_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
+			bits_rw_t<io_, bitpos::B0, 4>  M7ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  M7CSEL;
+		};
+		static m7selr1_t<org + 0x66> M7SELR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	MTU7 端子選択レジスタ 2 (M7SELR2)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct m7selr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  M7BSEL;
+			bits_rw_t<io_, bitpos::B4, 4>  M7DSEL;
+		};
+		static m7selr2_t<org + 0x67> M7SELR2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	MTU9 端子選択レジスタ 1 (M9SELR1)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct m9selr1_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  M9ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  M9BSEL;
+		};
+		static m9selr1_t<org + 0x68> M9SELR1;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	MTU9 端子選択レジスタ 2 (M9SELR2)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct m9selr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  M9CSEL;
+			bits_rw_t<io_, bitpos::B4, 4>  M9DSEL;
+		};
+		static m9selr2_t<org + 0x69> M9SELR2;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW0 端子選択レジスタ (G0SELR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct g0selr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  G0ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  G0BSEL;
+		};
+		static g0selr_t<org + 0x6A> G0SELR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW1 端子選択レジスタ (G1SELR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct g1selr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  G1ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  G1BSEL;
+		};
+		static g1selr_t<org + 0x6B> G1SELR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW2 端子選択レジスタ (G2SELR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct g2selr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  G2ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  G2BSEL;
+		};
+		static g2selr_t<org + 0x6C> G2SELR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW3 端子選択レジスタ (G3SELR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct g3selr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  G3ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  G3BSEL;
+		};
+		static g3selr_t<org + 0x6D> G3SELR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW4 端子選択レジスタ (G4SELR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct g4selr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  G4ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  G4BSEL;
+		};
+		static g4selr_t<org + 0x6E> G4SELR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW5 端子選択レジスタ (G5SELR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct g5selr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  G5ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  G5BSEL;
+		};
+		static g5selr_t<org + 0x6F> G5SELR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW6 端子選択レジスタ (G6SELR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct g6selr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  G6ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  G6BSEL;
+		};
+		static g6selr_t<org + 0x70> G6SELR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW7 端子選択レジスタ (G7SELR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct g7selr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  G7ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  G7BSEL;
+		};
+		static g7selr_t<org + 0x71> G7SELR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW8 端子選択レジスタ (G8SELR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct g8selr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  G8ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  G8BSEL;
+		};
+		static g8selr_t<org + 0x72> G8SELR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	GPTW9 端子選択レジスタ (G9SELR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct g9selr_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  G9ASEL;
+			bits_rw_t<io_, bitpos::B4, 4>  G9BSEL;
+		};
+		static g9selr_t<org + 0x73> G9SELR;
 #endif
 
 
+#if defined(SIG_RX24T)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アウトプットイネーブル割り込み 1 @n
+					POE0F, OSF1
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_oei1_vec() { return ICU::VECTOR::OEI1; }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アウトプットイネーブル割り込み 2 @n
+					POE4F, OSF2
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_oei2_vec() { return ICU::VECTOR::OEI2; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アウトプットイネーブル割り込み 3 @n
+					RX24T: POE8F, RX66T: POE8F, POE9F
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_oei3_vec() { return ICU::VECTOR::OEI3; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アウトプットイネーブル割り込み 4 @n
+					POE10F, OSF11F
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_oei4_vec() { return ICU::VECTOR::OEI4; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アウトプットイネーブル割り込み 5 @n
+					RX24T: POE4F, OSF12F
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR get_oei5_vec() { return ICU::VECTOR::OEI5; }
+
+
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アウトプットイネーブル割り込み 1 @n
+					POE0F, OSF1
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR_BL1 get_oei1_vec() { return ICU::VECTOR_BL1::OEI1; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アウトプットイネーブル割り込み 2 @n
+					POE4F, OSF2
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR_BL1 get_oei2_vec() { return ICU::VECTOR_BL1::OEI2; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アウトプットイネーブル割り込み 3 @n
+					POE8F
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR_BL1 get_oei3_vec() { return ICU::VECTOR_BL1::OEI3; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アウトプットイネーブル割り込み 4 @n
+					POE10F, OSF11F
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR_BL1 get_oei4_vec() { return ICU::VECTOR_BL1::OEI4; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アウトプットイネーブル割り込み 5 @n
+					RX66T: POE12F, OSF13F, POE14F, OSF3, OSF4, OSF5
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR_BL1 get_oei5_vec() { return ICU::VECTOR_BL1::OEI5; }
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
