@@ -45,12 +45,12 @@ namespace {
 	typedef device::PORT<device::PORT2, device::bitpos::B4> CS;
 	typedef device::PORT_BYTE<device::PORTD> DL;
 	typedef device::PORT_BYTE<device::PORTE> DH;
-	typedef device::bus_rw<CS, RS, RD, WR, DL, DH> BUS;
+	typedef device::bus_rw16<CS, RS, RD, WR, DL, DH> BUS;
 	BUS		bus_;
 
 	typedef device::PORT<device::PORT0, device::bitpos::B2> RES;
 	typedef chip::R61505<BUS, RES> TFT;
-	TFT		tft_(bus_);
+	TFT		tft_;
 
 	static const uint32_t TFT_W = 320;
 	static const uint32_t TFT_H = 240;
