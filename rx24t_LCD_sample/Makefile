@@ -21,7 +21,7 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	main.cpp
 
-USER_LIBS	=	stdc++
+USER_LIBS	=	supc++
 
 LDSCRIPT	=	../RX24T/$(DEVICE).ld
 
@@ -31,7 +31,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX24T
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
