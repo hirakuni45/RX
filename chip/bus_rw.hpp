@@ -25,7 +25,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class CS, class RS, class RD, class WR, class DL, class DH> 
-	class bus_rw {
+	class bus_rw16 {
 
 		static void write16_(uint16_t val) noexcept {
 			DH::P = val >> 8;
@@ -100,6 +100,102 @@ namespace device {
 			auto dat = read16_();
 			DL::DIR = 0xff;
 			DH::DIR = 0xff;
+			return dat;
+		}
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  BUS R/W テンプレート・クラス
+		@param[in]	CS	チップ選択
+		@param[in]	RS	レジスタ選択
+		@param[in]	RD	リード
+		@param[in]	WR	ライト
+		@param[in]	DA	データパス（DB0 - DB7）
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class CS, class RS, class RD, class WR, class DA> 
+	class bus_rw8 {
+
+		static void write16_(uint16_t val) noexcept {
+			DA::P = val >> 8;
+			CS::P = 0;
+			WR::P = 0;
+			utils::delay::loop(3);
+			WR::P = 1;
+			utils::delay::loop(3);
+			DA::P = val & 0xff;
+			WR::P = 0;
+			utils::delay::loop(3);
+			CS::P = 1;
+			WR::P = 1;
+		}
+
+		static uint16_t read16_() noexcept {
+			RD::P = 0;
+			CS::P = 0;
+			utils::delay::micro_second(1);
+			uint16_t val = static_cast<uint16_t>(DA::P());
+			val <<= 8;
+			CS::P = 1;
+			utils::delay::micro_second(1);
+			CS::P = 0;
+			utils::delay::micro_second(1);
+			val |= static_cast<uint16_t>(DA::P());
+			CS::P = 1;
+			RD::P = 1;
+			return val;
+		}
+
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	開始
+		 */
+		//-----------------------------------------------------------------//
+		static void start() noexcept
+		{
+			RS::DIR = 1;
+			RD::DIR = 1;
+			WR::DIR = 1;
+			CS::DIR = 1;
+
+			CS::P = 1;
+			RS::P = 0;
+			RD::P = 1;
+			WR::P = 1;
+
+			DA::DIR = 0xff;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	書き込み
+			@param[in]	rs		レジスタ選択
+			@param[in]	val		書き込みデータ
+		 */
+		//-----------------------------------------------------------------//
+		static void write(bool rs, uint16_t val) noexcept {
+			RS::P = rs;
+			write16_(val);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	読み込み @n
+					※あらかじめ、リードアドレスを設定しておく
+			@param[in]	rs		レジスタ選択
+			@return	読み出しデータ
+		 */
+		//-----------------------------------------------------------------//
+		static uint16_t read(bool rs) noexcept {
+			RS::P = rs;
+			DA::DIR = 0x00;
+			auto dat = read16_();
+			DA::DIR = 0xff;
 			return dat;
 		}
 	};
