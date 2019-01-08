@@ -19,14 +19,12 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  R61505V/W テンプレートクラス
-		@param[in]	RW	Read/Write クラス
+		@param[in]	BUS	Read/Write バス・クラス
 		@param[in]	RES	リセット信号生成定義
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class RW, class RES>
+	template <class BUS, class RES>
 	class R61505 {
-
-		RW&		rw_;
 
 		static const uint16_t DELAY = 0xffff;
 
@@ -38,8 +36,8 @@ namespace chip {
 				if(cmd == DELAY) {
 					utils::delay::milli_second(dat);
 				} else {
-					rw_.write(0, cmd);
-					rw_.write(1, dat);
+					BUS::write(0, cmd);
+					BUS::write(1, dat);
 				}
 			}
 		}
@@ -51,7 +49,7 @@ namespace chip {
 			@param[in]	rw	RW 制御クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		R61505(RW& rw) noexcept : rw_(rw) { }
+		R61505() noexcept { }
 
 
 		//-----------------------------------------------------------------//
@@ -64,13 +62,13 @@ namespace chip {
 		{
 			RES::DIR = 1;
             RES::P = 0;
-			rw_.start();
+			BUS::start();
             utils::delay::milli_second(10);
             RES::P = 1;
             utils::delay::milli_second(10);
 
-			rw_.write(0, 0x00);  // get ID
-			auto id = rw_.read(1);
+			BUS::write(0, 0x00);  // get ID
+			auto id = BUS::read(1);
 //			utils::format("ID: %04X\n") % id;
 
 			switch(id) {
@@ -198,12 +196,12 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		void plot(int16_t x, int16_t y, uint16_t c) noexcept
 		{
-			rw_.write(0, 0x20);  // Horizontal Address (8 bits)
-			rw_.write(1, y);
-			rw_.write(0, 0x21);  // Vertical Address (9 bits)
-			rw_.write(1, x);
-			rw_.write(0, 0x22);  // Frame Memory Data Write (16bits)
-			rw_.write(1, c);
+			BUS::write(0, 0x20);  // Horizontal Address (8 bits)
+			BUS::write(1, y);
+			BUS::write(0, 0x21);  // Vertical Address (9 bits)
+			BUS::write(1, x);
+			BUS::write(0, 0x22);  // Frame Memory Data Write (16bits)
+			BUS::write(1, c);
 		}
 
 
@@ -220,14 +218,14 @@ namespace chip {
 		void fill_box(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t c) noexcept
 		{
 			for(int16_t yy = y; yy < (y + h); ++yy) {
-				rw_.write(0, 0x20);
-				rw_.write(1, yy);
+				BUS::write(0, 0x20);
+				BUS::write(1, yy);
 
-				rw_.write(0, 0x21);  // Vertical Address (9 bits)
-				rw_.write(1, x);
-				rw_.write(0, 0x22);  // Frame Memory Data Write (16bits)
+				BUS::write(0, 0x21);  // Vertical Address (9 bits)
+				BUS::write(1, x);
+				BUS::write(0, 0x22);  // Frame Memory Data Write (16bits)
 				for(int16_t xx = x; xx < (x + w); ++xx) {
-					rw_.write(1, c);
+					BUS::write(1, c);
 				}
 			}
 		}
@@ -244,13 +242,13 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		void copy(int16_t x, int16_t y, const uint16_t* src, uint16_t len) noexcept
 		{
-			rw_.write(0, 0x20);
-			rw_.write(1, y);
-			rw_.write(0, 0x21);  // Vertical Address (9 bits)
-			rw_.write(1, x);
-			rw_.write(0, 0x22);  // Frame Memory Data Write (16bits)
+			BUS::write(0, 0x20);
+			BUS::write(1, y);
+			BUS::write(0, 0x21);  // Vertical Address (9 bits)
+			BUS::write(1, x);
+			BUS::write(0, 0x22);  // Frame Memory Data Write (16bits)
 			for(uint16_t n = 0; n < len; ++n) {
-				rw_.write(1, *src++);
+				BUS::write(1, *src++);
 			}
 		}
 	};
