@@ -134,7 +134,7 @@ namespace device {
 				return false;
 			}
 
-			power_cfg::turn(QSPI::get_peripheral());
+			power_mgr::turn(QSPI::get_peripheral());
 
 			// ポートを有効にする
 			port_map::turn(QSPI::get_peripheral(), true, PSEL);
@@ -254,7 +254,7 @@ namespace device {
 		{
 			QSPI::SPCR = 0x00;
 			port_map::turn(QSPI::get_peripheral(), false);
-			if(power) power_cfg::turn(QSPI::get_peripheral(), false);
+			if(power) power_mgr::turn(QSPI::get_peripheral(), false);
 		}
 	};
 }

@@ -40,7 +40,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start() noexcept
 		{
-			power_cfg::turn(USB::get_peripheral());
+			power_mgr::turn(USB::get_peripheral());
 
 
 

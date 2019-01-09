@@ -131,7 +131,7 @@ namespace device {
 				return false;
 			}
 
-			power_cfg::turn(per);
+			power_mgr::turn(per);
 
 			TPU::TCR = TPU::TCR.CCLR.b(1) | TPU::TCR.TPSC.b(tpsc);  // TGRA のコンペアマッチ
 			TPU::TGRA = cmt - 1;
@@ -165,7 +165,7 @@ namespace device {
 		{
 			TPU::TIER = 0;
 			TPU::enable(false);
-			power_cfg::turn(TPU::get_peripheral(), false);
+			power_mgr::turn(TPU::get_peripheral(), false);
 		}
 
 

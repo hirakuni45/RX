@@ -127,7 +127,7 @@ namespace device {
 			bool abcs0 = 0;
 			if(brr > 256) { brr /= 2; abcs0 = 1; }
 
-			power_cfg::turn(SCIF::get_peripheral());
+			power_mgr::turn(SCIF::get_peripheral());
 
 			set_intr_();
 

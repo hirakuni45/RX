@@ -44,6 +44,7 @@
 #include "RX600/dac_out.hpp"
 #include "RX600/sdram.hpp"
 #include "RX600/etherc.hpp"
+#include "RX600/eptpc.hpp"
 #include "RX600/edmac.hpp"
 #include "RX600/usb.hpp"
 #include "RX600/usba.hpp"

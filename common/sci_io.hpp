@@ -198,7 +198,7 @@ namespace device {
 #endif
 			level_ = level;
 
-			power_cfg::turn(SCI::get_peripheral());
+			power_mgr::turn(SCI::get_peripheral());
 
 			SCI::SCR = 0x00;			// TE, RE disable.
 

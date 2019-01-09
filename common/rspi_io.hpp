@@ -156,7 +156,7 @@ namespace device {
 		{
 			level_ = level;
 
-			power_cfg::turn(RSPI::get_peripheral());
+			power_mgr::turn(RSPI::get_peripheral());
 
 			// デバイスを不許可
 			RSPI::SPCR = 0x00;
@@ -220,7 +220,7 @@ namespace device {
 		{
 			level_ = 0;
 
-			power_cfg::turn(RSPI::get_peripheral());
+			power_mgr::turn(RSPI::get_peripheral());
 
 			RSPI::SPCR = 0x00;			
 
@@ -347,7 +347,7 @@ namespace device {
 		{
 			RSPI::SPCR = 0x00;
 			port_map::turn(RSPI::get_peripheral(), false);
-			if(power) power_cfg::turn(RSPI::get_peripheral(), false);
+			if(power) power_mgr::turn(RSPI::get_peripheral(), false);
 		}
 
 	};

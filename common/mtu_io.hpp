@@ -217,7 +217,7 @@ namespace device {
 				return false;
 			}
 
-			power_cfg::turn(MTUX::get_peripheral());
+			power_mgr::turn(MTUX::get_peripheral());
 
 			channel_ = ch;
 
@@ -340,7 +340,7 @@ namespace device {
 				return false;
 			}
 
-			power_cfg::turn(MTUX::get_peripheral());
+			power_mgr::turn(MTUX::get_peripheral());
 
 			bool pena = (ot != OUTPUT_TYPE::NONE);
 			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch), pena);
@@ -425,7 +425,7 @@ namespace device {
 				return false;
 			}
 
-			power_cfg::turn(MTUX::get_peripheral());
+			power_mgr::turn(MTUX::get_peripheral());
 
 			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch));
 
@@ -484,7 +484,7 @@ namespace device {
 				return false;
 			}
 
-			power_cfg::turn(MTUX::get_peripheral());
+			power_mgr::turn(MTUX::get_peripheral());
 #if 0
 			bool pena = (ot != OUTPUT_TYPE::NONE);
 			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch), pena);
@@ -518,7 +518,7 @@ namespace device {
 //			icu_mgr::set_level(MTUX::get_vec(MTUX::interrupt::OVF), 0);
 //			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch), false);
 			if(MTU::TSTRA() == 0 && MTU::TSTRB() == 0 && MTU::TSTR() == 0) {			
-				power_cfg::turn(MTUX::get_peripheral(), false);
+				power_mgr::turn(MTUX::get_peripheral(), false);
 			}
 		}
 
