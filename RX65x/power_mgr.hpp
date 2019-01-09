@@ -20,7 +20,7 @@ namespace device {
 		@brief  省電力制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class power_cfg {
+	class power_mgr {
 
 		struct pad_t {
 

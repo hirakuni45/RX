@@ -74,7 +74,7 @@ namespace device {
 		bool start(uint32_t fba) noexcept
 		{
 			// DRW2D power management
-			power_cfg::turn(DRW::get_peripheral());
+			power_mgr::turn(DRW::get_peripheral());
 
 			DRW::SIZE.X = XSIZE;
 			DRW::SIZE.Y = YSIZE;
