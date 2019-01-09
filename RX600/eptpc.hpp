@@ -735,8 +735,44 @@ namespace device {
 		static trncttdr_t<0x000C4434>  TRNCTTDR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP リセットレジスタ (PTRSTR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct ptrstr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   RESET;
+		};
+		static ptrstr_t<0x000C0500>  PTRSTR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	STCA クロック選択レジスタ (STCSELR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct stcselr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 3>   SCLKDIV;
+
+			bits_rw_t<io_, bitpos::B8, 3>   SCLKSEL;
+		};
+		static stcselr_t<0x000C0504>  STCSELR;
 
 
 		//-----------------------------------------------------------------//
@@ -1038,7 +1074,592 @@ namespace device {
 		static syrvldr_t<0x000C4880 + ofs>  SYRVLDR;
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	SYNFP 受信フィルタレジスタ 1 (SYRFL1R)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct syrfl1r_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
 
+			bits_rw_t<io_, bitpos::B0,  2>  ANCE;
+			bits_rw_t<io_, bitpos::B4,  3>  SYNC;
+			bits_rw_t<io_, bitpos::B8,  3>  FUP;
+			bits_rw_t<io_, bitpos::B12, 3>  DRQ;
+			bits_rw_t<io_, bitpos::B16, 3>  DRP;
+			bits_rw_t<io_, bitpos::B20, 3>  PDRQ;
+			bits_rw_t<io_, bitpos::B24, 3>  PDRP;
+			bits_rw_t<io_, bitpos::B28, 3>  PDFUP;
+		};
+		static syrfl1r_t<0x000C4890 + ofs>  SYRFL1R;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	SYNFP 受信フィルタレジスタ 2 (SYRFL2R)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct syrfl2r_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  2>  MAN;
+			bits_rw_t<io_, bitpos::B4,  2>  SIG;
+			bits_rw_t<io_, bitpos::B28, 2>  ILL;
+		};
+		static syrfl2r_t<0x000C4894 + ofs>  SYRFL2R;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	SYNFP 送信許可レジスタ (SYTRENR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct sytrenr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   ANCE;
+			bit_rw_t<io_, bitpos::B4>   SYNC;
+			bit_rw_t<io_, bitpos::B8>   DRQ;
+			bit_rw_t<io_, bitpos::B12>  PDRQ;
+		};
+		static sytrenr_t<0x000C4894 + ofs>  SYTRENR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	マスタクロック ID レジスタ U (MTCIDU)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C48A0 + ofs> MTCIDU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	マスタクロック ID レジスタ L (MTCIDL)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C48A4 + ofs> MTCIDL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	マスタクロックポート番号レジスタ (MTPID)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct mtpid_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16>  PNUM;
+		};
+		static mtpid_t<0x000C48A8 + ofs>  MTPID;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	SYNFP 送信間隔設定レジスタ (SYTLIR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct sytlir_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  8>  ANCE;
+			bits_rw_t<io_, bitpos::B8,  8>  SYNC;
+			bits_rw_t<io_, bitpos::B16, 8>  DREQ;
+		};
+		static sytlir_t<0x000C48C0 + ofs>  SYTLIR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	SYNFP 受信 logMessageIntervel 値表示レジスタ (SYRLIR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct syrlir_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  8>  ANCE;
+			bits_rw_t<io_, bitpos::B8,  8>  SYNC;
+			bits_rw_t<io_, bitpos::B16, 8>  DRESP;
+		};
+		static syrlir_t<0x000C48C4 + ofs>  SYRLIR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	offsetFromMaster 値レジスタ U (OFMRU)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C48C8 + ofs> OFMRU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	offsetFromMaster 値レジスタ L (OFMRL)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C48CC + ofs> OFMRL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	meanPathDelay 値レジスタ U (MPDRU)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C48D0 + ofs> MPDRU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	meanPathDelay 値レジスタ L (MPDRL)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C48D4 + ofs> MPDRL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	grandmasterPriority フィールド設定レジスタ (GMPR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct gmpr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  8>  GMPR2;
+
+			bits_rw_t<io_, bitpos::B16, 8>  GMPR1;
+		};
+		static gmpr_t<0x000C48E0 + ofs>  GMPR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	grandmasterClockQuality フィールド設定レジスタ (GMCQR)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C48E4 + ofs> GMCQR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	grandmasterIdentity フィールド設定レジスタ U (GMIDRU)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C48E8 + ofs> GMIDRU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	grandmasterIdentity フィールド設定レジスタ L (GMIDRL)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C48EC + ofs> GMIDRL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	currentUtcOffset/timeSource フィールド設定レジスタ (CUOTSR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct cuotsr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  8>   TSRC;
+
+			bits_rw_t<io_, bitpos::B16, 16>  CUTO;
+		};
+		static cuotsr_t<0x000C48F0 + ofs>  CUOTSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	stepsRemoved フィールド設定レジスタ (SRR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct srr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16>   SRMV;
+		};
+		static srr_t<0x000C48F4 + ofs>  SRR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP-primary メッセージ用宛先 MAC アドレス設定レジスタ U (PPMACRU)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C4900 + ofs> PPMACRU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP-primary メッセージ用宛先 MAC アドレス設定レジスタ L (PPMACRL)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C4904 + ofs> PPMACRL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP-pdelay メッセージ用 MAC アドレス設定レジスタ U (PDMACRU)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C4908 + ofs> PDMACRU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP-pdelay メッセージ用 MAC アドレス設定レジスタ L (PDMACRL)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C490C + ofs> PDMACRL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP メッセージ EtherType 設定レジスタ (PETYPER)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct petyper_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16>   TYPE;
+		};
+		static petyper_t<0x000C4910 + ofs>  PETYPER;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP-primary メッセージ用宛先 IP アドレス設定レジスタ (PPIPR)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C4920 + ofs> PPIPR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP-pdelay メッセージ用宛先 IP アドレス設定レジスタ (PDIPR)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C4924 + ofs> PDIPR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP event メッセージ用 TOS 設定レジスタ (PETOSR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct petosr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>   EVTO;
+		};
+		static petosr_t<0x000C4928 + ofs>  PETOSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP general メッセージ用 TOS 設定レジスタ (PGTOSR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct pgtosr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>   GETO;
+		};
+		static pgtosr_t<0x000C492C + ofs>  PGTOSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP-primary メッセージ用 TTL 設定レジスタ (PPTTLR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct ppttlr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>   PRTL;
+		};
+		static ppttlr_t<0x000C4930 + ofs>  PPTTLR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP-pdelay メッセージ用 TTL 設定レジスタ (PDTTLR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct pdttlr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 8>   PDTL;
+		};
+		static pdttlr_t<0x000C4934 + ofs>  PDTTLR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP event メッセージ用 UDP 宛先ポート番号設定レジスタ (PEUDPR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct peudpr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16>   EVUPT;
+		};
+		static peudpr_t<0x000C4938 + ofs>  PEUDPR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	PTP general メッセージ用 UDP 宛先ポート番号設定レジスタ (PGUDPR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct pgudpr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 16>   GEUPT;
+		};
+		static pgudpr_t<0x000C493C + ofs>  PGUDPR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フレーム受信フィルタ設定レジスタ (FFLTR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct ffltr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>   SEL;
+			bit_rw_t<io_, bitpos::B1>   PRT;
+			bit_rw_t<io_, bitpos::B2>   ENB;
+
+			bit_rw_t<io_, bitpos::B16>  EXTPRM;
+		};
+		static ffltr_t<0x000C4940 + ofs>  FFLTR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フレーム受信フィルタ用 MAC アドレス 0 設定レジスタ U (FMAC0RU)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C4960 + ofs> FMAC0RU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フレーム受信フィルタ用 MAC アドレス 0 設定レジスタ L (FMAC0RL)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C4964 + ofs> FMAC0RL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フレーム受信フィルタ用 MAC アドレス 1 設定レジスタ U (FMAC1RU)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C4968 + ofs> FMAC1RU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フレーム受信フィルタ用 MAC アドレス 1 設定レジスタ L (FMAC1RL)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C496C + ofs> FMAC1RL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	非対称遅延値設定レジスタ U (DASYMRU)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C49C0 + ofs> DASYMRU;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	非対称遅延値設定レジスタ L (DASYMRL)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C49C4 + ofs> DASYMRL;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タイムスタンプ遅延値設定レジスタ (TSLATR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct tslatr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  16>  EGP;
+			bits_rw_t<io_, bitpos::B16, 16>  INGP;
+		};
+		static tslatr_t<0x000C49C8 + ofs>  TSLATR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	SYNFP 動作設定レジスタ (SYCONFR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct syconfr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  16>  TCYC;
+
+			bit_rw_t <io_, bitpos::B12>      SBDIS;
+
+			bit_rw_t <io_, bitpos::B16>      FILDIS;
+
+			bit_rw_t <io_, bitpos::B20>      TCMOD;
+		};
+		static syconfr_t<0x000C49CC + ofs>  SYCONFR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	SYNFP フレームフォーマット設定レジスタ (SYFORMR)
+			@param[in]	base	ベースアドレス
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct syformr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>   FORM0;
+			bit_rw_t <io_, bitpos::B1>   FORM1;
+		};
+		static syformr_t<0x000C49D0 + ofs>  SYFORMR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	レスポンスメッセージ受信タイムアウトレジスタ (RSTOUTR)
+		*/
+		//-----------------------------------------------------------------//
+		static rw32_t<0x000C49D4 + ofs> RSTOUTR;
 
 
 		//-----------------------------------------------------------------//
