@@ -83,7 +83,7 @@ namespace device {
 
 			level_ = level;
 
-			power_cfg::turn(CMT::get_peripheral());
+			power_mgr::turn(CMT::get_peripheral());
 
 			CMT::enable(false);
 
