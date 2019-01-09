@@ -215,7 +215,7 @@ namespace device {
 		{
 			level_ = level;
 
-			power_cfg::turn(IICA::get_peripheral());
+			power_mgr::turn(IICA::get_peripheral());
 
 			port_map::turn(IICA::get_peripheral());
 
