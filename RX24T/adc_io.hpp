@@ -3,14 +3,12 @@
 /*!	@file
 	@brief	RX24T グループ A/D 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016,2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX24T/icu_mgr.hpp"
-#include "RX24T/port_map.hpp"
-#include "RX24T/power_cfg.hpp"
+#include "common/device.hpp"
 #include "common/vect.h"
 
 /// F_PCLKD は変換パラメーター計算で必要で、設定が無いとエラーにします。
@@ -80,7 +78,7 @@ namespace device {
 			uint32_t n = F_PCLKD / 1000000 + 10;
 			if(n > 255) return false;
 
-			power_cfg::turn(ADCU::get_peripheral());
+			power_mgr::turn(ADCU::get_peripheral());
 			ADCU::enable(ana);
 			ADCU::ADANSA.set(ana);
 			ADCU::ADSSTR.set(ana, n);
