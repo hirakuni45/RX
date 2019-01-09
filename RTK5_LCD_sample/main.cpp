@@ -39,6 +39,9 @@
 // SDHI インターフェースを使う場合
 // #define SDHI_IF
 
+#include "usb/usb_io.hpp"
+#include "usb/usb_hmsc.hpp"
+
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -83,8 +86,8 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y,
-		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
-//		device::glcdc_def::PIX_TYPE::CLUT8> GLCDC_IO;
+//		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
+		device::glcdc_def::PIX_TYPE::CLUT8> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
 
 	// QSPI B グループ
@@ -98,8 +101,8 @@ namespace {
 	typedef graphics::kfont<16, 16, 64> KFONT;
 	KFONT		kfont_;
 
-	typedef graphics::render<uint16_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
-	RENDER		render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
+	typedef graphics::render<uint8_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
+	RENDER		render_(reinterpret_cast<uint8_t*>(0x00000000), kfont_);
 
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
