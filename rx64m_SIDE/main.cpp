@@ -15,7 +15,7 @@
 
 #include "side/arcade.h"
 
-#include "../RTK5_RAYTRACER/raytracer.hpp"
+#include "../RAYTRACER_sample/raytracer.hpp"
 
 namespace {
 

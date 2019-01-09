@@ -494,7 +494,7 @@ int main(int argc, char** argv)
 	// SD カード・クラスの初期化
 //	sdc_.start();
 
-	device::power_cfg::turn(device::peripheral::ETHERC0);
+	device::power_mgr::turn(device::peripheral::ETHERC0);
 	device::port_map::turn(device::peripheral::ETHERC0);
 
 	set_interrupt_task(INT_Excep_ICU_GROUPAL1,

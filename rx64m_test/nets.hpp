@@ -866,7 +866,7 @@ namespace seeda {
 			utils::delay::milli_second(200); /// reset rise time
 			LAN_RESN::P = 1;
 
-			device::power_cfg::turn(device::peripheral::ETHERCA);
+			device::power_mgr::turn(device::peripheral::ETHERCA);
 			device::port_map::turn(device::peripheral::ETHERCA);
 #else
 			device::power_cfg::turn(device::peripheral::ETHERC0);
