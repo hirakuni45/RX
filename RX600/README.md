@@ -69,6 +69,7 @@ C++ テンプレートを活用したハードウェアー定義は、C++11 準�
  - [ウォッチドッグタイマ（WDTA）](wdta.hpp?ts=4)
  - [独立ウォッチドッグタイマ（IWDT）](iwdt.hpp?ts=4)
  - [イーサネットコントローラ (ETHERC)](etherc.hpp?ts=4)
+ - [イーサネットコントローラ用 PTP コントローラ (EPTPC)](eptpc.hpp?ts=4)
  - [イーサネットコントローラ用 DMA コントローラ (EDMAC)](edmac.hpp?ts=4)
  - [USB2.0FS ホスト / ファンクションモジュール（USB）](usb.hpp?ts=4)
  - [USB 2.0 High-Speed ホスト / ファンクションモジュール (USBAa)](usba.hpp?ts=4)

@@ -77,6 +77,8 @@ namespace device {
 		ETHERC0,	///< イーサネットコントローラ 0
 		ETHERC1,	///< イーサネットコントローラ 1
 		EPTPC,		///< イーサネットコントローラ用 PTP コントローラ
+		EPTPC0,		///< イーサネットコントローラ用 PTP コントローラ 0
+		EPTPC1,		///< イーサネットコントローラ用 PTP コントローラ 1
 
 		ETHERCA,	///< Ethernet 0 (PHY RMII)カスタムポート接続
 
