@@ -74,9 +74,9 @@ namespace device {
 		CMTW0,		///< コンペアマッチタイマＷ０（CMTW）
 		CMTW1,		///< コンペアマッチタイマＷ１（CMTW）
 
-		ETHERC0,	///< Ethernet 0 (PHY RMII)
-		ETHERC1,	///< Ethernet 1 (PHY RMII)
-		PTPETHERC,	///< PTP Ethernet
+		ETHERC0,	///< イーサネットコントローラ 0
+		ETHERC1,	///< イーサネットコントローラ 1
+		EPTPC,		///< イーサネットコントローラ用 PTP コントローラ
 
 		ETHERCA,	///< Ethernet 0 (PHY RMII)カスタムポート接続
 
