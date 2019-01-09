@@ -21,7 +21,7 @@ namespace vtx {
 //       マシンでは、その傾向は逆転する。
 //       RXv2 コアでは、float 型は高速だが double 型は遅い。
 //       RXv2 コアには、「fsqrt」（float 型専用の平方根命令がある）
-#if defined(SIG_RX24T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX24T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
 	inline float fsqrt(float x)
 	{
 		__asm __volatile(
