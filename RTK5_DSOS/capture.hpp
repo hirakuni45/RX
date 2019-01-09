@@ -117,7 +117,7 @@ namespace utils {
 			set_samplerate(freq);
 
 			{  // A/D 設定
-				device::power_cfg::turn(ADC0::get_peripheral());
+				device::power_mgr::turn(ADC0::get_peripheral());
 				ADC0::enable(ADC0::analog::AIN000);
 				ADC0::ADANSA.set(ADC0::analog::AIN000);
 				ADC0::ADSSTR.set(ADC0::analog::AIN000, 11);
@@ -125,7 +125,7 @@ namespace utils {
 				ADC0::ADSAM.SAM = 0;
 				ADC0::ADCSR.ADCS = 0b01;
 
-				device::power_cfg::turn(ADC1::get_peripheral());
+				device::power_mgr::turn(ADC1::get_peripheral());
 				ADC1::enable(ADC1::analog::AIN114);
 				ADC1::ADANSA.set(ADC1::analog::AIN114);
 				ADC1::ADSSTR.set(ADC1::analog::AIN114, 11);

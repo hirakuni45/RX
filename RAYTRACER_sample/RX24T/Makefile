@@ -19,7 +19,8 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	RAYTRACER_sample/main.cpp
+PSOURCES	=	RAYTRACER_sample/main.cpp \
+				graphics/font8x16.cpp
 
 USER_LIBS	=
 
@@ -28,7 +29,8 @@ LDSCRIPT	=	../../RX24T/$(DEVICE).ld
 USER_DEFS   =   SIG_RX24T F_ICLK=80000000 F_PCLKA=80000000 \
 				F_PCLKB=40000000 F_PCLKD=40000000 F_FCLK=20000000
 
-INC_SYS		=
+# for boost path
+INC_SYS		=	/mingw64/include
 
 INC_APP		=	. ../ ../../
 

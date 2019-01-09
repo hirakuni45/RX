@@ -33,7 +33,8 @@ USER_DEFS	=	SIG_RX64M \
 
 MCU_TARGET	=	
 
-INC_SYS		=
+# for boost path
+INC_SYS		=	/mingw64/include
 
 INC_APP		=	. ../ ../../
 

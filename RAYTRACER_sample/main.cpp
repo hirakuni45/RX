@@ -14,47 +14,64 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 
-#if defined(SIG_RX65N)
 #include "graphics/font8x16.hpp"
 #include "graphics/graphics.hpp"
-#endif
 
 #include "raytracer.hpp"
 
 namespace {
+
+	typedef device::cmt_io<device::CMT0> CMT;
+	CMT		cmt_;
 
 #if defined(SIG_RX71M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX71M" };
+	static const uint16_t lcd_w_ = 320;
+	static const uint16_t lcd_h_ = 240;
+	uint16_t	fb_[lcd_w_ * lcd_h_];
 #elif defined(SIG_RX64M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX64M" };
+	static const uint16_t lcd_w_ = 320;
+	static const uint16_t lcd_h_ = 240;
+	uint16_t	fb_[lcd_w_ * lcd_h_];
 #elif defined(SIG_RX65N)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 	typedef device::SCI9 SCI_CH;
 	static const char* system_str_ = { "RX65N" };
+	static const uint16_t lcd_w_ = 480;
+	static const uint16_t lcd_h_ = 272;
+	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x00000000);
 #elif defined(SIG_RX24T)
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX24T" };
+	static const uint16_t lcd_w_ = 320;
+	static const uint16_t lcd_h_ = 240;
+	uint16_t*	fb_ = nullptr;
 #elif defined(SIG_RX66T)
 	typedef device::system_io<10000000, 16000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX66T" };
+	static const uint16_t lcd_w_ = 320;
+	static const uint16_t lcd_h_ = 240;
+	uint16_t*	fb_ = nullptr;
 #endif
 
-	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
-	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
-	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
-	SCI			sci_;
+	typedef graphics::font8x16 AFONT;
+	typedef graphics::kfont_null KFONT;
+	KFONT	kfont_;
+	typedef graphics::render<uint16_t, lcd_w_, lcd_h_, AFONT> RENDER;
+	RENDER	render_(fb_, kfont_);	
 
 #if defined(RX65_LCD)
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
@@ -62,18 +79,15 @@ namespace {
 	typedef device::glcdc_io<device::GLCDC, 480, 272,
 		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
-
-	typedef graphics::font8x16 AFONT;
-
-	typedef graphics::render<uint16_t, 480, 272, AFONT> RENDER;
-	RENDER		render_(reinterpret_cast<uint16_t*>(0x00000000));
 #endif
+
+	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
+	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
+	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
+	SCI			sci_;
 
 	typedef utils::command<256> CMD;
 	CMD 	cmd_;
-
-	typedef device::cmt_io<device::CMT0> CMT;
-	CMT		cmt_;
 
 	bool	run_ = false;
 	int		sampling_ = 1;
