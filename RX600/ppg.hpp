@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ・PPG 定義
+	@brief	RX64M/RX71M/RX65N グループ・PPG 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -378,12 +378,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7>  POD23;
 		};
 		static podrl_t<0x000881FB> PODRL;
-
-
-
-
-
-
 	};
 
 
