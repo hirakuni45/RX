@@ -40,7 +40,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void start() noexcept
 		{
-			device::power_cfg::turn(peripheral::STBRAM);
+			device::power_mgr::turn(peripheral::STBRAM);
 		}
 
 

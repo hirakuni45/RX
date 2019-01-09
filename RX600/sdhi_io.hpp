@@ -190,7 +190,7 @@ namespace fatfs {
 			POW::PU  = 0;
 			POW::OD  = 1;  // Open Drain
 
-			device::power_cfg::turn(SDHI::get_peripheral());
+			device::power_mgr::turn(SDHI::get_peripheral());
 			device::port_map::turn(SDHI::get_peripheral(), true, PSEL);
 
 			while(SDHI::SDSTS2.CBSY() != 0) ;

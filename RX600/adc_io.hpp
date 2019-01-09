@@ -69,7 +69,7 @@ namespace device {
 			uint32_t n = F_PCLKD / 1000000 + 10;
 			if(n > 255) return false;
 
-			power_cfg::turn(ADCU::get_peripheral());
+			power_mgr::turn(ADCU::get_peripheral());
 			ADCU::enable(ana);
 			ADCU::ADANSA.set(ana);
 			ADCU::ADSSTR.set(ana, n);

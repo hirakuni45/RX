@@ -134,7 +134,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void start(uint32_t lvl = 0) noexcept
 		{
-			power_cfg::turn(DMAC::get_peripheral());
+			power_mgr::turn(DMAC::get_peripheral());
 
 			level_ = lvl;
 			set_vector_(DMAC::get_vec());
@@ -161,7 +161,7 @@ namespace device {
 		{
 			if(lim > 1024) return false;
 
-			power_cfg::turn(DMAC::get_peripheral());
+			power_mgr::turn(DMAC::get_peripheral());
 
 			DMAC::DMCNT.DTE = 0;  // 念のため停止させる。
 
@@ -255,7 +255,7 @@ namespace device {
 			DMAC::DMCNT.DTE = 0;
 
 			if(power) {
-				power_cfg::turn(DMAC::get_peripheral(), false);
+				power_mgr::turn(DMAC::get_peripheral(), false);
 			}
 		}
 
