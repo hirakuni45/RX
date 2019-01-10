@@ -72,6 +72,9 @@ namespace {
 #elif defined(LCD_R61505)
 
 	static const char* LCD_NAME = { "R61505" };
+	// LCD connection connector
+	// DB0, DB1, DB2, DB3, GND, DB4, DB5, DB6, DB7
+	// RST, /CS, RS , /WR, /RD, GND, GND, 3.3, 3.3
 	typedef device::PORT<device::PORT5, device::bitpos::B2> RS;
 	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
 	typedef device::PORT<device::PORT5, device::bitpos::B3> WR;
