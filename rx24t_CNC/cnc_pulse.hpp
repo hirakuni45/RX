@@ -130,6 +130,24 @@ namespace cnc {
 		typedef device::mtu_io<device::MTU0, mtu_task> MTU;
 		MTU			mtu_;
 
+		enum class OP_CODE : uint8_t {
+			NONE,
+			POS_X,
+			POS_Y,
+			POS_Z,
+			CEN_X,
+			CEN_Y,
+			CEN_Z,
+			CW_X,
+			CW_Y,
+			CW_Z,
+			CCW_X,
+			CCW_Y,
+			CCW_Z,
+		};
+		typedef utils::fixed_fifo<uint32_t, 1024> OP_BUF;
+		OP_BUF		op_buf_;
+
 		int32_t		speed_limit_;    // 最大速度 [Hz]
 		int32_t		speed_current_;  // 現在速度 [Hz]
 		int32_t		accel_;
@@ -151,6 +169,8 @@ namespace cnc {
 		FRACTION	frac_y_;
 		FRACTION	frac_z_;
 		FRACTION	frac_w_;
+		typedef imath::circle CIRCLE;
+		CIRCLE		circle_;
 
 		uint8_t		dir_;
 
@@ -158,17 +178,29 @@ namespace cnc {
 		uint8_t		limit_pos_;
 		uint8_t		limit_neg_;
 
-		imath::circle	cir_;
+		enum class move_type {
+			straight,
+			circle_xy,
+			circle_yz,
+			circle_zx,
+		};
+		move_type	move_type_;
 
 		enum class CMD {
 			ERR,	///< error
 
 			HELP,	///< command help
 
-			MOVE,	///< move
-			CURVE,	///< curve(circle)
-			CENTER,	///< setup curve(circle) center position
 			POS,	///< position
+			CW,		///< circle CW
+			CCW,	///< circle CCW
+
+			LIST,	///< list op-code
+			FREE,	///< op-code buffer free size
+			CLEAR,	///< clear op-code 
+
+			MOVE,	///< move
+
 			SPEED,	///< setup speed limit
 			ACCEL,	///< acceleration/deceleration
 			LEAD,	///< lead per rad
@@ -182,15 +214,14 @@ namespace cnc {
 		{
 			n = cmdl_.get_words();
 			if(n >= 1) {
-				if(cmdl_.cmp_word(0, "m")) return CMD::MOVE;
-				else if(cmdl_.cmp_word(0, "c")) return CMD::CURVE;
-				else if(cmdl_.cmp_word(0, "p")) return CMD::POS;
+				if(cmdl_.cmp_word(0, "pos")) return CMD::POS;
+				else if(cmdl_.cmp_word(0, "cw")) return CMD::CW;
+				else if(cmdl_.cmp_word(0, "ccw")) return CMD::CCW;
 				else if(cmdl_.cmp_word(0, "move")) return CMD::MOVE;
-				else if(cmdl_.cmp_word(0, "curve")) return CMD::CURVE;
-				else if(cmdl_.cmp_word(0, "center")) return CMD::CENTER;
-				else if(cmdl_.cmp_word(0, "pos")) return CMD::POS;
+				else if(cmdl_.cmp_word(0, "free")) return CMD::FREE;
+				else if(cmdl_.cmp_word(0, "list")) return CMD::LIST;
+				else if(cmdl_.cmp_word(0, "clear")) return CMD::CLEAR;
 				else if(cmdl_.cmp_word(0, "speed")) return CMD::SPEED;
-				else if(cmdl_.cmp_word(0, "position")) return CMD::POS;
 				else if(cmdl_.cmp_word(0, "accel")) return CMD::ACCEL;
 				else if(cmdl_.cmp_word(0, "lead")) return CMD::LEAD;
 				else if(cmdl_.cmp_word(0, "pulse")) return CMD::PULSE;
@@ -202,16 +233,31 @@ namespace cnc {
 			return CMD::ERR;
 		}
 
+
 		void help_cmd_() noexcept
 		{
-			utils::format("m[ove] [new position]    Straight line movement\n");
-			utils::format("c[urve] [new position]   Curve movement\n");
-			utils::format("center [new position]    Setup curve center\n");
-			utils::format("p[os]                    Indication of the position\n");
-			utils::format("speed [new speed]        Setup speed limit (Hz)\n");
-			utils::format("accel [freq]             Acceleration and deceleration (Hz)\n");
-			utils::format("lead [x y z w]           Quantity of movement per turn of the ball screw (um/rad)\n");
-			utils::format("pulse [x y z w]          The number of the pulses per turn (pulse/rad)\n");
+			utils::format(
+				"list                     List operation code\n");
+			utils::format(
+				"free                     Free space for operations buffer\n");
+			utils::format(
+				"clear                    Clear operations buffer\n");
+			utils::format(
+				"pos [position]           Indication of the position\n");
+			utils::format(
+				"cw [center] [position]   CW-Circle movement\n");
+			utils::format(
+				"ccw [center] [position]  CCW-Circle movement\n");
+			utils::format(
+				"move                     To movement\n");
+			utils::format(
+				"speed [new speed]        Setup speed limit (Hz)\n");
+			utils::format(
+				"accel [freq]             Acceleration and deceleration (Hz)\n");
+			utils::format(
+				"lead [x,y,z,w]           Quantity of movement per turn of the ball screw (um/rad)\n");
+			utils::format(
+				"pulse [x,y,z,w]          The number of the pulses per turn (pulse/rad)\n");
 //			utils::format("stop\n");
 //			utils::format("pause\n");
 //			utils::format("start\n");
@@ -245,6 +291,123 @@ namespace cnc {
 			return true;
 		}
 
+
+		bool get_xyz_(uint32_t n, vtx::ivtx& val) noexcept
+		{
+			char tmp[32];
+			if(cmdl_.get_word(n, tmp, sizeof(tmp))) {
+				return (utils::input("%d,%d,%d", tmp) % val.x % val.y % val.z).status();
+			} else {
+				utils::format("Illegual position: '%s'\n") % tmp;
+				return false;
+			}
+		}
+
+
+		uint8_t setup_bits_(const vtx::ivtx4& np) noexcept
+		{
+			auto bits = dir_;
+			auto step = dir_;
+			if(pos_.x != np.x) {
+				if(pos_.x > np.x) {
+					bits &= ~DIR_X_BIT;
+				} else {
+					bits |=  DIR_X_BIT;
+				}
+				step |= STEP_X_BIT;
+			}
+			if(pos_.y != np.y) {
+				if(pos_.y > np.y) {
+					bits &= ~DIR_Y_BIT;
+				} else {
+					bits |=  DIR_Y_BIT;
+				}
+				step |= STEP_Y_BIT;
+			}
+			if(pos_.z != np.z) {
+				if(pos_.z > np.z) {
+					bits &= ~DIR_Z_BIT;
+				} else {
+					bits |=  DIR_Z_BIT;
+				}
+				step |= STEP_Z_BIT;
+			}
+			dir_ = bits;
+			return bits | step;
+		}
+
+
+		int32_t cnv_op_(OP_CODE opc, int32_t n) noexcept {
+			n &= 0xffffff;
+			n |= static_cast<int32_t>(opc) << 24;
+			return n;
+		}
+
+
+		void op_pos_(const vtx::ivtx& pos) noexcept {
+			op_buf_.put(cnv_op_(OP_CODE::POS_X, pos.x));
+			op_buf_.put(cnv_op_(OP_CODE::POS_Y, pos.y));
+			op_buf_.put(cnv_op_(OP_CODE::POS_Z, pos.z));
+		}
+
+
+		void op_center_(const vtx::ivtx& pos) noexcept {
+			op_buf_.put(cnv_op_(OP_CODE::CEN_X, pos.x));
+			op_buf_.put(cnv_op_(OP_CODE::CEN_Y, pos.y));
+			op_buf_.put(cnv_op_(OP_CODE::CEN_Z, pos.z));
+		}
+
+
+		void op_circle_(const vtx::ivtx& pos, bool cw) noexcept {
+			if(cw) {
+				op_buf_.put(cnv_op_(OP_CODE::CW_X, pos.x));
+				op_buf_.put(cnv_op_(OP_CODE::CW_Y, pos.y));
+				op_buf_.put(cnv_op_(OP_CODE::CW_Z, pos.z));
+			} else {
+				op_buf_.put(cnv_op_(OP_CODE::CCW_X, pos.x));
+				op_buf_.put(cnv_op_(OP_CODE::CCW_Y, pos.y));
+				op_buf_.put(cnv_op_(OP_CODE::CCW_Z, pos.z));
+			}
+		}
+
+
+		void list_() noexcept {
+			for(uint32_t i = 0; i < op_buf_.length(); ++i) {
+				auto v = op_buf_.get_at(i);
+				OP_CODE opc = static_cast<OP_CODE>(v >> 24);
+				int32_t val = v & 0xffffff;
+				if(val & 0x800000) val |= 0xff000000;
+				switch(opc) {
+				case OP_CODE::POS_X:
+					utils::format("POS:    %d") % val;
+					break;
+				case OP_CODE::CEN_X:
+					utils::format("CENTER: %d") % val;
+					break;
+				case OP_CODE::CW_X:
+					utils::format("CW:     %d") % val;
+					break;
+				case OP_CODE::CCW_X:
+					utils::format("CCW:    %d") % val;
+					break;
+				case OP_CODE::POS_Y:
+				case OP_CODE::CEN_Y:
+				case OP_CODE::CW_Y:
+				case OP_CODE::CCW_Y:
+					utils::format(", %d") % val;
+					break;
+				case OP_CODE::POS_Z:
+				case OP_CODE::CEN_Z:
+				case OP_CODE::CW_Z:
+				case OP_CODE::CCW_Z:
+					utils::format(", %d\n") % val;
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
  	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -256,7 +419,8 @@ namespace cnc {
 			speed_limit_(50000), speed_current_(0), accel_(100), frq_(0),
 			min_(0), max_(0), org_(0), pos_(0), fin_(0),
 			pulse_(6400), lead_(5000), sqr_len_(0), length_(0),
-			dir_(0), limit_lvl_(0), limit_pos_(0), limit_neg_(0)
+			dir_(0), limit_lvl_(0), limit_pos_(0), limit_neg_(0),
+			move_type_(move_type::straight)
 		{ }
 
 
@@ -311,7 +475,7 @@ namespace cnc {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  直線移動
-			@param[in]	target
+			@param[in]	target	ターゲット座標
 		*/
 		//-----------------------------------------------------------------//
 		void move(const vtx::ivtx4& target) noexcept
@@ -349,22 +513,30 @@ namespace cnc {
 			speed_current_ = 100;
 			mtu_.at_main_task().set_frq(speed_current_, accel_);
 			mtu_.set_frq(speed_current_);  // 初期周期
+
+			move_type_ = move_type::straight;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  曲線移動 @n
-					※中心座標をあらかじめ設定しておく。@n
-					※ターゲット
-			@param[in]	target
+			@brief  曲線移動
+			@param[in]	center	中心座標
+			@param[in]	target	ターゲット座標
+			@param[in]	cw		回転方向
 			@return 不正な終端なら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool curve(const vtx::ivtx4& target) noexcept
+		bool curve(const vtx::ivtx4& center, const vtx::ivtx4& target, bool cw) noexcept
 		{
+			vtx::ipos org(pos_.x, pos_.y);
+			vtx::ipos cen(center.x, center.y);
+			vtx::ipos tgt(target.x, target.y);
+			move_type_ = move_type::circle_xy;
 
-
+			if(!circle_.start(org, cen, tgt, cw)) {
+				return false;
+			}
 
 			return true;
 		}
@@ -414,33 +586,60 @@ namespace cnc {
 
 			//　速度の計算（１／１００秒毎の更新）
 
-
 			// パルス生成
 			auto& step = mtu_.at_main_task().at_step();
 			while((step.size() - step.length()) >= (step.size() / 32)) {
 				if(fin_ == pos_) break;
 
 				auto bits = dir_;
-				if(frac_x_.add()) {
-					bits |= STEP_X_BIT;
-					if(dir_ & DIR_X_BIT) pos_.x--;
-					else ++pos_.x;
+				switch(move_type_) {
+				case move_type::straight:
+					if(frac_x_.add()) {
+						bits |= STEP_X_BIT;
+						if(dir_ & DIR_X_BIT) pos_.x--;
+						else ++pos_.x;
+					}
+					if(frac_y_.add()) {
+						bits |= STEP_Y_BIT;
+						if(dir_ & DIR_Y_BIT) pos_.y--;
+						else ++pos_.y;
+					}
+					if(frac_z_.add()) {
+						bits |= STEP_Z_BIT;
+						if(dir_ & DIR_Z_BIT) pos_.z--;
+						else ++pos_.z;
+					}
+					if(frac_w_.add()) {
+						bits |= STEP_W_BIT;
+						if(dir_ & DIR_W_BIT) pos_.w--;
+						else ++pos_.w;
+						}
+					break;
+				case move_type::circle_xy:
+					{
+						circle_.step();
+						auto np = circle_.get_position();
+						bits = setup_bits_(vtx::ivtx4(np.x, np.y, pos_.z, pos_.w));
+					}
+					break;
+				case move_type::circle_yz:
+					{
+						circle_.step();
+						auto np = circle_.get_position();
+						bits = setup_bits_(vtx::ivtx4(pos_.x, np.x, np.y, pos_.w));
+					}
+					break;
+				case move_type::circle_zx:
+					{
+						circle_.step();
+						auto np = circle_.get_position();
+						bits = setup_bits_(vtx::ivtx4(np.y, pos_.y, np.x, pos_.w));
+					}
+					break;
+				default:
+					break;					
 				}
-				if(frac_y_.add()) {
-					bits |= STEP_Y_BIT;
-					if(dir_ & DIR_Y_BIT) pos_.y--;
-					else ++pos_.y;
-				}
-				if(frac_z_.add()) {
-					bits |= STEP_Z_BIT;
-					if(dir_ & DIR_Z_BIT) pos_.z--;
-					else ++pos_.z;
-				}
-				if(frac_w_.add()) {
-					bits |= STEP_W_BIT;
-					if(dir_ & DIR_W_BIT) pos_.w--;
-					else ++pos_.w;
-				}
+
 				if(bits != dir_) {
 					step.put(bits);
 				}
@@ -464,6 +663,43 @@ namespace cnc {
 			case CMD::HELP:
 				help_cmd_();
 				break;
+			case CMD::FREE:
+				{
+					auto sz = op_buf_.size() - op_buf_.length();
+					utils::format("OP-Code free space: %d [bytes]\n") % sz; 
+				}
+				break;
+			case CMD::LIST:
+				list_();
+				break;
+			case CMD::CLEAR:
+				op_buf_.clear();
+				break;
+			case CMD::POS:
+				if(n >= 2) {
+					vtx::ivtx pos;
+					if(get_xyz_(1, pos)) {
+						op_pos_(pos);
+					}
+				} else {
+					utils::format("Param error: '%s'\n") % cmdl_.get_command();
+				}
+				break;
+			case CMD::CW:
+			case CMD::CCW:
+				if(n >= 3) {
+					vtx::ivtx cen;
+					vtx::ivtx pos;
+					if(get_xyz_(1, cen) && get_xyz_(2, pos)) {
+						bool cw = true;
+						if(cmd == CMD::CCW) cw = false;
+						op_center_(cen);
+						op_circle_(pos, cw);
+					}
+				} else {
+					utils::format("Param error: '%s'\n") % cmdl_.get_command();
+				}
+				break;
 			case CMD::SPEED:
 				if(n > 1) {
 					int32_t a = speed_limit_;
@@ -476,53 +712,10 @@ namespace cnc {
 					utils::format("Speed limit: %d [Hz]\n") % speed_limit_;
 				}
 				break;
-			case CMD::POS:
-				if(n == 1) {
-					auto p = pos_ - org_;
-					utils::format("Pos: %d, %d, %d, %d\n") % p.x % p.y % p.z % p.w;
-				}
-				break;
 			case CMD::MOVE:
-				if(n == 1) {
-					utils::format("Param error: '%s'\n") % cmdl_.get_command();
-					return false;
-				} else {
-					vtx::ivtx4 target = pos_;
-					if(n >= 2) {  // X
-						if(!cmdl_.get_integer(1, target.x)) {
-							char tmp[16];
-							cmdl_.get_word(1, tmp, sizeof(tmp));
-							utils::format("Illegual position X: %s\n") % tmp;
-							return false;
-						}
-					}
-					if(n >= 3) {  // Y
-						if(!cmdl_.get_integer(2, target.y)) {
-							char tmp[16];
-							cmdl_.get_word(2, tmp, sizeof(tmp));
-							utils::format("Illegual position Y: %s\n") % tmp;
-							return false;
-						}
-					}
-					if(n >= 4) {  // Z
-						if(!cmdl_.get_integer(3, target.z)) {
-							char tmp[16];
-							cmdl_.get_word(3, tmp, sizeof(tmp));
-							utils::format("Illegual position Z: %s\n") % tmp;
-							return false;
-						}
-					}
-					if(n >= 5) {  // W
-						if(!cmdl_.get_integer(4, target.w)) {
-							char tmp[16];
-							cmdl_.get_word(4, tmp, sizeof(tmp));
-							utils::format("Illegual position W: %s\n") % tmp;
-							return false;
-						}
-					}
-					move(target);
-				}
+//				move(target);
 				break;
+
 			case CMD::ACCEL:
 				if(n == 1) {
 					utils::format("Acceleration/Deceleration: %u[Hz]\n") % accel_;

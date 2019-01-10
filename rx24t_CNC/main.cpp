@@ -21,6 +21,8 @@
 
 #include "cnc_pulse.hpp"
 
+#include "common/sci_i2c_io.hpp"
+
 namespace {
 
 	static const uint16_t VERSION = 40;
@@ -84,7 +86,7 @@ int main(int argc, char** argv)
 
 	// タイマー設定（１００Ｈｚ）
 	{
-		uint8_t intr = 0;
+		uint8_t intr = 1;
 		cmt_.start(100, intr);
 	}
 
