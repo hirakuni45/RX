@@ -23,10 +23,10 @@ namespace utils {
 
 		static uint32_t get_() {
 			uint32_t t;
-			t  = static_cast<uint32_t>(device::RTC.BCNT0());
-			t |= static_cast<uint32_t>(device::RTC.BCNT1()) << 8;
-			t |= static_cast<uint32_t>(device::RTC.BCNT2()) << 16;
-			t |= static_cast<uint32_t>(device::RTC.BCNT3()) << 24;
+			t  = static_cast<uint32_t>(device::RTC::BCNT0());
+			t |= static_cast<uint32_t>(device::RTC::BCNT1()) << 8;
+			t |= static_cast<uint32_t>(device::RTC::BCNT2()) << 16;
+			t |= static_cast<uint32_t>(device::RTC::BCNT3()) << 24;
 			return t;
 		}
 
@@ -48,12 +48,12 @@ namespace utils {
 		bool start() {
 			device::SYSTEM::SOSCCR.SOSTP = 0;
 
-			device::RTC.RCR3 = device::RTC.RCR3.RTCEN.b(1) | device::RTC.RCR3.RTCDV.b(0b110);
-			device::RTC.RCR4 = 0x00;
-			device::RTC.RCR2 = device::RTC.RCR2.START.b(1)
-							| device::RTC.RCR2.RESET.b(1)
-							| device::RTC.RCR2.CNTMD.b(1);  // binary counter
-			device::RTC.RCR1 = 0x00;
+			device::RTC::RCR3 = device::RTC::RCR3.RTCEN.b(1) | device::RTC::RCR3.RTCDV.b(0b110);
+			device::RTC::RCR4 = 0x00;
+			device::RTC::RCR2 = device::RTC::RCR2.START.b(1)
+							  | device::RTC::RCR2.RESET.b(1)
+							  | device::RTC::RCR2.CNTMD.b(1);  // binary counter
+			device::RTC::RCR1 = 0x00;
 
 			return true;
 		}
@@ -67,12 +67,12 @@ namespace utils {
 		 */
 		//-----------------------------------------------------------------//
 		bool set_time(time_t t) const {
-			device::RTC.RCR2.START = 0;
-			device::RTC.BCNT0 = t & 0xff;
-			device::RTC.BCNT1 = (t >> 8)  & 0xff;
-			device::RTC.BCNT2 = (t >> 16) & 0xff;
-			device::RTC.BCNT3 = (t >> 24) & 0xff;
-			device::RTC.RCR2.START = 1;
+			device::RTC::RCR2.START = 0;
+			device::RTC::BCNT0 = t & 0xff;
+			device::RTC::BCNT1 = (t >> 8)  & 0xff;
+			device::RTC::BCNT2 = (t >> 16) & 0xff;
+			device::RTC::BCNT3 = (t >> 24) & 0xff;
+			device::RTC::RCR2.START = 1;
 			return true;
 		}
 
