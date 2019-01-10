@@ -43,7 +43,7 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	main.cpp \
 				r_net/ethernet.cpp
 
-USER_LIBS	=	stdc++ m
+USER_LIBS	=	supc++ m
 
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
