@@ -131,8 +131,8 @@ namespace seeda {
 		SCI			sci_;
 
 		typedef device::S12AD ADC;
-		typedef device::adc_io<ADC, utils::null_task> ADC_IO;
-		ADC_IO		adc_io_;
+		typedef device::adc_in<ADC, utils::null_task> ADC_IN;
+		ADC_IN		adc_in_;
 
 		uint32_t	list_cnt_;
 
@@ -182,9 +182,9 @@ namespace seeda {
 
 			{  // 内臓 A/D 変換設定
 				uint8_t intr_level = 0;
-				adc_io_.start(ADC::analog::AIN005, intr_level);
-				adc_io_.start(ADC::analog::AIN006, intr_level);
-				adc_io_.start(ADC::analog::AIN007, intr_level);
+				adc_in_.start(ADC::analog::AIN005, intr_level);
+				adc_in_.start(ADC::analog::AIN006, intr_level);
+				adc_in_.start(ADC::analog::AIN007, intr_level);
 			}
 		}
 
@@ -239,12 +239,12 @@ namespace seeda {
 #if 0
 			++list_cnt_;
 			if(list_cnt_ >= 100) {
-				auto val = adc_io_.get(ADC::analog::AIN005);
+				auto val = adc_in_.get(ADC::analog::AIN005);
 				utils::format("AIN005: %d\n") % static_cast<int>(val);
 				list_cnt_ = 0;
 			}
 #endif
-			adc_io_.scan();
+			adc_in_.scan();
 		}
 
 
@@ -256,7 +256,7 @@ namespace seeda {
 		*/
 		//-----------------------------------------------------------------//
 		uint16_t get_adc(uint32_t ch) const {
-			return adc_io_.get(static_cast<ADC::analog>(ch));
+			return adc_in_.get(static_cast<ADC::analog>(ch));
 		}
 
 
