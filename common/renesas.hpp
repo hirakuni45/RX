@@ -77,7 +77,7 @@
 #include "RX600/can.hpp"
 #include "RX600/qspi.hpp"
 #include "RX65x/s12adf.hpp"
-#include "RX600/adc_io.hpp"
+#include "RX600/adc_in.hpp"
 #include "RX600/r12da.hpp"
 #include "RX600/dac_out.hpp"
 #include "RX600/sdram.hpp"
