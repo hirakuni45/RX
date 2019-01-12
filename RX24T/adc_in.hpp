@@ -13,7 +13,7 @@
 
 /// F_PCLKD は変換パラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCLKD
-#  error "adc_io.hpp requires F_PCLKD to be defined"
+#  error "adc_in.hpp requires F_PCLKD to be defined"
 #endif
 
 namespace device {
@@ -26,7 +26,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ADCU, class TASK>
-	class adc_io {
+	class adc_in {
 	public:
 
 		typedef ADCU value_type;
@@ -59,7 +59,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		adc_io() : level_(0) { }
+		adc_in() : level_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -136,6 +136,5 @@ namespace device {
 		}
 	};
 
-	template <class ADCU, class TASK>
-	TASK adc_io<ADCU, TASK>::task_;
+	template <class ADCU, class TASK> TASK adc_in<ADCU, TASK>::task_;
 }
