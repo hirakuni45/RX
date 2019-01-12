@@ -49,6 +49,7 @@ C++ テンプレートを活用したハードウェアー定義は、C++11 準�
  - [電圧検出回路（LVDA）](lvda.hpp?ts=4)
  - [クロック周波数精度測定回路（CAC）](cac.hpp?ts=4)
  - [割り込みコントローラ（ICUA）](icu.hpp?ts=4)
+ - [割り込みマネージャー](icu_mgr.hpp?ts=4)
  - [メモリプロテクションユニット（MPU）](mpu.hpp?ts=4)
  - [DMAコントローラ（DMACA）](dmac.hpp?ts=4)
  - [EXDMAコントローラ（EXDMACA）](exdmac.hpp?ts=4)
@@ -91,6 +92,8 @@ C++ テンプレートを活用したハードウェアー定義は、C++11 準�
  - [A/D 変換クラス](adc_in.hpp?ts=4)
  - [12 ビット D/A コンバータ（R12DA）](r12da.hpp?ts=4)
  - [D/A 変換クラス](dac_out.hpp?ts=4)
+ - [データーフラッシュメモリ](flash.hpp?ts=4)
+ - [データーフラッシュメモリ入出力](flash_io.hpp?ts=4)
    
 -----
    
