@@ -17,11 +17,11 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
 #include "common/sci_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
-#include "common/adc_io.hpp"
 #include "common/bitset.hpp"
 #include "common/switch_man.hpp"
 
@@ -42,8 +42,8 @@ namespace {
 	device::sci_io<device::SCI1, buffer, buffer> sci_;
 
 	typedef device::S12AD adc;
-	typedef device::adc_io<adc, adc_task> adc_io;
-	adc_io adc_io_;
+	typedef device::adc_in<adc, adc_task> ADC_IN;
+	ADC_IN adc_in_;
 
 	enum class SWITCH : uint8_t {
 		RIGHT,
@@ -115,10 +115,10 @@ int main(int argc, char** argv)
 	// A/D 設定
 	{
 		uint8_t intr_level = 1;
-		if(!adc_io_.start(adc::analog::AIN000, intr_level)) {
+		if(!adc_in_.start(adc::analog::AIN000, intr_level)) {
 			utils::format("A/D start fail AIN000\n");
 		}
-		if(!adc_io_.start(adc::analog::AIN001, intr_level)) {
+		if(!adc_in_.start(adc::analog::AIN001, intr_level)) {
 			utils::format("A/D start fail AIN001\n");
 		}
 	}
@@ -127,11 +127,11 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
-		adc_io_.scan();
-		adc_io_.sync();
+		adc_in_.scan();
+		adc_in_.sync();
 
 		// ４つのスイッチ判定（排他的）
-		auto val = adc_io_.get(adc::analog::AIN000);
+		auto val = adc_in_.get(adc::analog::AIN000);
 		val += 512;  // 閾値のオフセット（4096 / 4(SWITCH) / 2）
 		val /= 1024;  // デコード（4096 / 4(SWITCH）
 
@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 		}
 
 		if(f) {
-			auto a1 = adc_io_.get(adc::analog::AIN001);
+			auto a1 = adc_in_.get(adc::analog::AIN001);
 			utils::format("Analog AIN001: %d (%d)\n") % a1 % adc_cnt_;
 		}
 
