@@ -177,7 +177,7 @@ namespace {
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 								utils::format("Write error: %04X: %08X\n")
-#elif
+#elif defined(SIG_RX24T) || defined(SIG_RX66T)
 								utils::format("Write error: %04X: %02X\n")
 #endif
 									% static_cast<uint32_t>(org) % data;
