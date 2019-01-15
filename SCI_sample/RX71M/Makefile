@@ -37,7 +37,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../../
 
-OPTIMIZE	=	-O3
+OPTIMIZE	=	-Os
 
 AS_OPT		=	-mcpu=rx600 --defsym MEMWAIT=1
 
