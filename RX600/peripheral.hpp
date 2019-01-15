@@ -123,6 +123,8 @@ namespace device {
 
 		SDHI,		///< SD ホストインタフェース（SDHI）
 
+		MMCIF,		///< マルチメディアカードインタフェース（MMCIF）
+
 		PDC,		///< パラレルデータキャプチャユニット
 
 		S12AD,		///< 12 ビット A/D コンバータ（S12ADC）
