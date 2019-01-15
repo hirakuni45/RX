@@ -220,7 +220,7 @@ namespace device {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool write(uint32_t org, const uint8_t* src, uint32_t len) const
+		bool write(uint32_t org, const void* src, uint32_t len) const
 		{
 			if(org >= data_flash_size) return false;
 
@@ -232,7 +232,7 @@ namespace device {
 
 			device::FLASH::FASR.EXS = 0;
 
-			const uint8_t*p = src;
+			const uint8_t*p = static_cast<const uint8_t*>(src);
 
 			bool ret = true;
 			uint16_t page = data_flash_size;
@@ -260,21 +260,5 @@ namespace device {
 			}
 			return ret;
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  書き込み
-			@param[in]	org	開始オフセット
-			@param[in]	data	書き込みデータ
-			@return エラーがあれば「false」
-		*/
-		//-----------------------------------------------------------------//
-		bool write(uint16_t org, uint8_t data) const
-		{
-			uint8_t d = data;
-			return write(&d, org, 1);
-		}
-
 	};
 }

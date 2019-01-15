@@ -533,22 +533,5 @@ namespace device {
 
 			return f;
 		}
-
-
-#if 0
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  書き込み
-			@param[in]	org	開始オフセット
-			@param[in]	data	書き込みデータ
-			@return エラーがあれば「false」
-		*/
-		//-----------------------------------------------------------------//
-		bool write(uint32_t org, uint32_t data) noexcept
-		{
-			uint32_t d = data;
-			return write(org, &d, 1);
-		}
-#endif
 	};
 }
