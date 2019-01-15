@@ -51,8 +51,9 @@ namespace device {
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			bit_rw_t<io_, bitpos::B0>  ECRCT;
+#endif
 			bit_rw_t<io_, bitpos::B3>  DFAE;
 			bit_rw_t<io_, bitpos::B4>  CMDLK;
 			bit_rw_t<io_, bitpos::B7>  CFAE;
@@ -75,7 +76,9 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			bit_rw_t<io_, bitpos::B0>  ECRCTIE;
+#endif
 			bit_rw_t<io_, bitpos::B3>  DFAEIE;
 			bit_rw_t<io_, bitpos::B4>  CMDLKIE;
 			bit_rw_t<io_, bitpos::B7>  CFAEIE;
@@ -118,7 +121,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static rw32_t<0x007FE034> FEADDR;
 
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  FCURAM イネーブルレジスタ（FCURAME）
@@ -138,7 +141,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
 		static fcurame_t<0x007FE054> FCURAME;
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -150,12 +153,14 @@ namespace device {
 		struct fstatr_t : public ro32_t<base> {
 			typedef ro32_t<base> io_;
 			using io_::operator ();
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			bit_ro_t <io_, bitpos::B0>   FRCRCT;
 			bit_ro_t <io_, bitpos::B1>   FRDTCT;
-
+#endif
 			bit_ro_t <io_, bitpos::B6>   FLWEERR;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			bit_ro_t <io_, bitpos::B7>   FCUERR;
+#endif
 			bit_ro_t <io_, bitpos::B8>   PRGSPD;
 			bit_ro_t <io_, bitpos::B9>   ERSSPD;
 			bit_ro_t <io_, bitpos::B10>  DBFULL;
@@ -164,6 +169,9 @@ namespace device {
 			bit_ro_t <io_, bitpos::B13>  ERSERR;
 			bit_ro_t <io_, bitpos::B14>  ILGERR;
 			bit_ro_t <io_, bitpos::B15>  FRDY;
+#if defined(SIG_RX65N)
+
+#endif
 		};
 		static fstatr_t<0x007FE080> FSTATR;
 
