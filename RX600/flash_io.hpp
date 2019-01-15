@@ -5,7 +5,7 @@
 			・データフラッシュ消去サイズ（６４バイト単位）
 			・データフラッシュ書き込みサイズ（４バイト単位）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -21,7 +21,7 @@ namespace device {
 #  error "flash_io.hpp requires F_FCLK to be defined"
 #endif
 
-#define FIO_DEBUG
+// #define FIO_DEBUG
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -40,12 +40,20 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  データ・フラッシュ構成 @n
-					（全体６４Ｋバイト、ブロック６４個、バンク１０２４個）
+					RX64M/RX71M: ６４Ｋバイト、６４バイト、１０２４ブロック @n
+					RX651/RX65N: ３２Ｋバイト、６４バイト、５１２ブロック
+					RX66T:       ３２Ｋバイト、６４バイト、５１２ブロック
 		*/
 		//-----------------------------------------------------------------//
-		static const uint32_t data_flash_block = 64;     ///< データ・フラッシュのブロックサイズ
-		static const uint32_t data_flash_size  = 65536;  ///< データ・フラッシュの容量
-		static const uint32_t data_flash_bank  = 1024;   ///< データ・フラッシュのバンク数
+		static const uint32_t data_flash_block = 64;	///< データ・フラッシュのブロックサイズ
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+		static const uint32_t data_flash_size  = 65536;	///< データ・フラッシュの容量
+		static const uint32_t data_flash_bank  = 1024;	///< データ・フラッシュのバンク数
+#elif defined(SIG_RX65N) || defined(SIG_RX66T)
+		static const uint32_t data_flash_size  = 32768;	///< データ・フラッシュの容量
+		static const uint32_t data_flash_bank  = 512;	///< データ・フラッシュのバンク数
+#endif
+		static const uint32_t data_flash_word  = 4;		///< データ・フラッシュ書き込みワードサイズ
 
 
 		//-----------------------------------------------------------------//
@@ -479,7 +487,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool write(uint32_t org, const void* src, uint32_t len) noexcept
 		{
-			if(org >= data_flash_size) {
+			if(org >= data_flash_size || (org & 0x03) != 0) {
 				error_ = error::ADDRESS;
 				return false;
 			}
@@ -527,6 +535,7 @@ namespace device {
 		}
 
 
+#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  書き込み
@@ -535,10 +544,11 @@ namespace device {
 			@return エラーがあれば「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool write(uint32_t org, uint8_t data) noexcept
+		bool write(uint32_t org, uint32_t data) noexcept
 		{
-			uint8_t d = data;
+			uint32_t d = data;
 			return write(org, &d, 1);
 		}
+#endif
 	};
 }
