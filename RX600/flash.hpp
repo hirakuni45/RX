@@ -121,7 +121,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static rw32_t<0x007FE034> FEADDR;
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  FCURAM イネーブルレジスタ（FCURAME）
