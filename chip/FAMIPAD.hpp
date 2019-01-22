@@ -3,10 +3,12 @@
 /*!	@file
 	@brief	ファミリーコンピューター JOY PAD 読み込み @n
 			CMOS 4021B Shift Register @n
-			ファミコン互換パッドの配線と信号：@n
+			ファミコン互換パッド：@n
 				赤：Vcc、黄：Vss、青：P/S、茶：CLK、白：OUT @n
-			NES パッドの配線と信号：@n
-				白：Vcc、茶：GND、橙：P/S、赤：CLK、黄：OUT
+			※互換パッドは高速なので遅延は少なくても OK (10)
+			NES パッド：@n
+				白：Vcc、茶：GND、橙：P/S、赤：CLK、黄：OUT @n
+			※ NES パッドの場合 3.3V で動かす為、クロックの遅延が重要 (20)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -89,11 +91,11 @@ namespace chip {
 		/*!
 			@brief	最新の状態に更新
 			@param[in]	cnt		パルス幅遅延数 @n
-								※６で「250ns」くらいと思う
+								※20で「1200us」くらいと思う
 			@return 状態データ
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t update(uint32_t cnt = 6) noexcept
+		uint8_t update(uint32_t cnt = 20) noexcept
 		{
 			P_S::P = 0; // seirial
 			uint8_t d = 0;
