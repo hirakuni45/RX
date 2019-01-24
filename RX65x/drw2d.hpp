@@ -8,7 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -584,6 +584,15 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() { return t; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  DRW2D 割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR_AL1 get_irq_vec() { return ICU::VECTOR_AL1::DRW_IRQ; }
 	};
 
 	typedef drw2d_t<0x000E3000, peripheral::DRW2D> DRW2D;
