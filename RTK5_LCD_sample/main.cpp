@@ -85,17 +85,17 @@ namespace {
 	static const int16_t LCD_Y = 272;
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y,
-//		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
-		device::glcdc_def::PIX_TYPE::CLUT8> GLCDC_IO;
+	static const auto PIXT = device::glcdc_def::PIX_TYPE::RGB565;
+//		device::glcdc_def::PIX_TYPE::CLUT8
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
 	GLCDC_IO	glcdc_io_;
 
 	// QSPI B グループ
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
 
-	typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_;
+	typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y, PIXT> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_(reinterpret_cast<void*>(0x00000000));
 
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont<16, 16, 64> KFONT;
@@ -322,8 +322,16 @@ int main(int argc, char** argv)
 
 	{  // DRW2D 初期化
 //		drw2d_mgr_.list_info();
-		if(drw2d_mgr_.start(0x00000000)) {
+		if(drw2d_mgr_.start()) {
 			utils:: format("Start DRW2D\n");
+			drw2d_mgr_.set_color(0xffffffff);
+			drw2d_mgr_.line(vtx::spos(0, 0), vtx::spos(480, 272));
+
+			drw2d_mgr_.set_color(0xffff00ff);
+			drw2d_mgr_.circle(vtx::spos(480/2, 272/2), 120, 10);
+
+			drw2d_mgr_.set_color(0xffffff00);
+			drw2d_mgr_.box(vtx::spos(100, 50), vtx::spos(90, 45));
 		} else {
 			utils:: format("DRW2D Fail\n");
 		}
@@ -356,11 +364,10 @@ int main(int argc, char** argv)
 
 		sdc_.service(sdh_.service());
 
+#if 0
 		if(task > 0) {
 			--task;
 			if(task == 0) {
-
-#if 0
 				img::jpeg_in jpeg;
 				utils::file_io fin;
 				if(fin.open("aaaaa.jpg", "rb")) {
@@ -369,9 +376,6 @@ int main(int argc, char** argv)
 					}
 					fin.close();
 				}
-#endif
-
-#if 0
 				char tmp[32];
 				for(int i = 0; i < 26; ++i) tmp[i] = 'A' + i;
 				tmp[26] = 0;
@@ -382,11 +386,8 @@ int main(int argc, char** argv)
 				render_.draw_text(0, 32, "金の貸し借りをしてはならない。\n金を貸せば金も友も失う。\n金を借りれば倹約が馬鹿らしくなる。");
 				render_.draw_text(0, 16*5, "Graphics Image Light Bilk IgIiIrliiljkffkL\n", true);
 				render_.draw_text(0, 16*6, "012:;,.(i),[i],{i},{|}.(`)\n", true);
-#endif
 			}
 		}
-
-		command_();
 
 		auto tnum = ft5206_.get_touch_num();
 		if(tnum == 3) {
@@ -431,6 +432,10 @@ int main(int argc, char** argv)
 #endif
 			render = false;
 		}
+#endif
+
+
+		command_();
 
 		{  // SW2 の検出
 			auto f = SW2::P();
