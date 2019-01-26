@@ -413,6 +413,8 @@ namespace device {
 
 
 		static glcdc_def::ctrl_t	ctrl_blk_;
+		void*				layer1_org_;
+		void*				layer2_org_;
 		uint8_t				intr_lvl_;
 		ERROR				last_error_;
 
@@ -1617,10 +1619,13 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクタ
+			@param[in]	ly1		レイヤー１アドレス
+			@param[in]	ly2		レイヤー２アドレス
+			@param[in]	ilv		割り込みレベル
 		*/
 		//-----------------------------------------------------------------//
-		glcdc_io(uint8_t intr_lvl = 5) noexcept :
-			intr_lvl_(intr_lvl), last_error_(ERROR::SUCCESS)
+		glcdc_io(void* ly1, void* ly2, uint8_t ilv = 5) noexcept :
+			layer1_org_(ly1), layer2_org_(ly2), intr_lvl_(ilv), last_error_(ERROR::SUCCESS)
 		{ }
 
 
@@ -1664,13 +1669,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  開始
-			@param[in]	ly1		レイヤー１アドレス
-			@param[in]	ly2		レイヤー２アドレス
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(void* ly1 = reinterpret_cast<void*>(0x0),
-			void* ly2 = reinterpret_cast<void*>(0x0)) noexcept
+		bool start() noexcept
 		{
 			cfg_t cfg;
 			cfg.output.clksrc = glcdc_def::CLK_SRC::INTERNAL;   			  // Select PLL clock
@@ -1700,18 +1702,24 @@ namespace device {
 			//
 			// Graphic 1 configuration
 			//
-			cfg.input[FRAME_LAYER_1].base = ly1;
-			cfg.input[FRAME_LAYER_1].offset = 0;	  // Disable Graphics 1
+			if(layer1_org_ != nullptr) {
+				cfg.input[FRAME_LAYER_1].base = layer1_org_;
+				cfg.input[FRAME_LAYER_1].offset = LINE_OFFSET;
+			} else {
+				cfg.input[FRAME_LAYER_1].offset = 0;	  // Disable Graphics 1
+			}
 
 			//
 			// Graphic 2 configuration
 			//
   			// Enable reading of the frame buffer
 			// Specify the start address of the frame buffer
-			cfg.input[FRAME_LAYER_2].base = ly2;
-			// Offset value from the end address of the line to the start address of the next line
-			cfg.input[FRAME_LAYER_2].offset = LINE_OFFSET;
-
+			if(layer2_org_ != nullptr) {
+				cfg.input[FRAME_LAYER_2].base = layer2_org_;
+				cfg.input[FRAME_LAYER_2].offset = LINE_OFFSET;
+			} else {
+				cfg.input[FRAME_LAYER_2].offset = 0;
+			}
 			// Single Line Data Transfer Count
 			// Single Frame Line Count
 

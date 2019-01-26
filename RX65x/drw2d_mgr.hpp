@@ -18,7 +18,7 @@
 #include "common/vtx.hpp"
 
 extern "C" {
-	extern void drw_int_isr(void);
+	extern void drw_int_isr(void);	// drw2d library interrupt handler
 };
 
 namespace device {
@@ -26,7 +26,7 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  DRW2D 制御／マネージャー
-		@param[in]	DRW		DRW2D クラス
+		@param[in]	DRW		DRW2D 制御クラス
 		@param[in]	XSIZE	X 方向ピクセルサイズ
 		@param[in]	YSIZE	Y 方向ピクセルサイズ
 		@param[in]	PXT		ピクセル・タイプ
@@ -47,6 +47,8 @@ namespace device {
 		bool		set_clip_;
 
 		int32_t		last_error_;
+
+		d2_color	clut_[256];
 
 		static uint32_t get_mode_()
 		{
@@ -146,6 +148,9 @@ namespace device {
 			d2_inithw(d2_, 0);
 			rb_ = d2_newrenderbuffer(d2_, dlis, stsz);
 
+			clut_[0] = 0xff000000;
+			clut_[1] = 0xffffffff;
+
 			return true;
 		}
 
@@ -204,6 +209,18 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		uint16_t get_pen_size() const noexcept { return pen_size_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	DRW2D フレーム・セットアップ
+		*/
+		//-----------------------------------------------------------------//
+		void setup_frame()
+		{
+			set_clip_ = false;
+			setup_();
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -284,18 +301,31 @@ namespace device {
 
 
 
-		void draw_bitmap(int x, int y, const void* src, int xSize, int ySize, int BytesPerLine)
+
+		void copy_bitmap(const vtx::spos& pos)
 		{
-				auto pitch = BytesPerLine / 4;
-				auto mode = get_mode_();
-				//
-				// Generate render operations
-				//
-				d2_framebuffer(d2_, fb_, XSIZE, XSIZE, YSIZE, mode);
-				d2_selectrenderbuffer(d2_, rb_);
-				d2_setblitsrc(d2_, src, pitch, xSize, ySize, d2_mode_argb8888);
-				d2_blitcopy(d2_, xSize, ySize,
-					0, 0, xSize * 16, ySize * 16, x * 16, y * 16, d2_bf_usealpha);
+			d2_settexclut(d2_, clut_);
+
+			static const uint8_t src[8] = {
+				0b11111111,
+				0b11111101,
+				0b11111001,
+				0b11110001,
+				0b11100001,
+				0b11000001,
+				0b10000001,
+				0b11111111
+			};
+
+			auto mode = get_mode_();
+			d2_framebuffer(d2_, fb_, XSIZE, XSIZE, YSIZE, mode);
+			d2_selectrenderbuffer(d2_, rb_);
+			d2_setblitsrc(d2_, (void*)src, 8, 8, 8, d2_mode_i1);
+			d2_blitcopy(d2_, 8, 8,
+				0, 0, 8 * 16, 8 * 16, pos.x * 16, pos.y * 16, d2_bf_usealpha);
+
+			d2_executerenderbuffer(d2_, rb_, 0);
+			d2_flushframe(d2_);
 		}
 
 
