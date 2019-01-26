@@ -62,11 +62,10 @@ namespace app {
 		/// GLCDC
 		static const int16_t LCD_X = 480;
 		static const int16_t LCD_Y = 272;
-		typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y,
-			device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
-
-		/// DRW2D
-		typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y> DRW2D_MGR;
+//		static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
+		static const auto PIXT = device::glcdc_def::PIX_TYPE::RGB565;
+		typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
+		typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y, PIXT> DRW2D_MGR;
 
 		typedef graphics::font8x16 AFONT;
 		typedef graphics::kfont<16, 16, 64> KFONT;
@@ -188,9 +187,11 @@ namespace app {
 		//-------------------------------------------------------------//
 		/*!
 			@brief	コンストラクタ
+			@param[in]	lcdorg	LCD フレームバッファの先頭アドレス
 		*/
 		//-------------------------------------------------------------//
-		scenes_base() noexcept : render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_),
+		scenes_base(void* lcdorg = reinterpret_cast<void*>(0x00000100)) noexcept :
+			glcdc_io_(nullptr, lcdorg), drw2d_mgr_(lcdorg), render_(lcdorg, kfont_),
 			ft5206_(ft5206_i2c_), menu_(render_, back_), back_(render_), resource_(render_),
 			plot_(render_), img_in_(plot_) { }
 
