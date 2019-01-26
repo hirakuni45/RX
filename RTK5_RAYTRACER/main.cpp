@@ -36,9 +36,13 @@ namespace {
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, 480, 272,
-		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
-	GLCDC_IO	glcdc_io_;
+
+	static const int16_t LCD_X = 480;
+	static const int16_t LCD_Y = 272;
+	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
+	static const auto PIXT = device::glcdc_def::PIX_TYPE::RGB565;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
+	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
 	typedef graphics::font8x16 AFONT;
 #ifdef CASH_KFONT
@@ -48,8 +52,8 @@ namespace {
 #endif
 	KFONT		kfont_;
 
-	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
-	RENDER		render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
+	typedef graphics::render<uint16_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
+	RENDER		render_(LCD_ORG, kfont_);
 
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;

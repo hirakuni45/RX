@@ -47,7 +47,7 @@ MCU_TARGET	=
 # for boost
 INC_SYS		=	/mingw64/include
 
-INC_APP		=	. ../
+INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
 
 # OPTIMIZE	=	-m64bit-doubles -O3
 OPTIMIZE	=	-O3
