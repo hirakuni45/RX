@@ -104,10 +104,9 @@ MCU_TARGET	=
 # for boost
 INC_SYS		=	/mingw64/include
 
-INC_APP		=	. ../ ../RX600 ../RX56x \
+INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes \
 				./emu ./emu/cpu ./emu/nes ./emu/mappers ./emu/sndhrdw ./emu/libsnss
 
-# OPTIMIZE	=	-Os
 OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
