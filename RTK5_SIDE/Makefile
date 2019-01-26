@@ -47,11 +47,13 @@ USER_DEFS	=	SIG_RX65N \
 
 MCU_TARGET	=	
 
-INC_SYS		=
+# for boost
+INC_SYS		=	/mingw64/include
 
-INC_APP		=	. ../ ../RX600 ../RX56x
+INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
 
-# OPTIMIZE	=	-Os
+LIB_ROOT	=	../zlib ../RX65x/drw_2d_ver1.02
+
 OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \

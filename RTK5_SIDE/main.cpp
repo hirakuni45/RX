@@ -46,9 +46,12 @@ namespace {
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, 480, 272,
-		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
-	GLCDC_IO	glcdc_io_;
+	static const int16_t LCD_X = 480;
+	static const int16_t LCD_Y = 272;
+	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
+	static const auto PIXT = device::glcdc_def::PIX_TYPE::RGB565;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
+	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
@@ -360,7 +363,7 @@ int main(int argc, char** argv)
 				}
 			}
 		} else {
-			spinv_.service((void*)0x00000000, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
+			spinv_.service(LCD_ORG, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
 
 			SPINV::SND_MGR& snd = spinv_.at_sound();
 			uint32_t len = snd.get_length();
