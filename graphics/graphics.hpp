@@ -44,7 +44,7 @@ namespace graphics {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	レンダリング
-		@param[in]	T		ピクセル型（８、１６、３２）
+		@param[in]	T		ピクセル型：uint8_t(8)、uint16_t(16)、uint32_t(32)
 		@param[in]	WIDTH	横幅
 		@param[in]	HEIGHT	高さ
 		@param[in]	AFONT	ASCII フォント・クラス
@@ -121,7 +121,7 @@ namespace graphics {
 			@param[in]	kf		漢字フォントクラス
 		*/
 		//-----------------------------------------------------------------//
-		render(T* org, KFONT& kf) noexcept : fb_(org), kfont_(kf),
+		render(void* org, KFONT& kf) noexcept : fb_(static_cast<T*>(org)), kfont_(kf),
 			fc_(COLOR::White), bc_(COLOR::Black),
 			code_(0), cnt_(0), stipple_(-1), stipple_mask_(1), ofs_(0)
 		{ }
