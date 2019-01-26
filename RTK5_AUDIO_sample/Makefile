@@ -36,7 +36,7 @@ PSOURCES	=	main.cpp \
 #				Cartridge.cpp
 #				bgm_data.cpp
 
-USER_LIBS	=	supc++ mad
+USER_LIBS	=	supc++ mad drw2d
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
@@ -50,9 +50,9 @@ MCU_TARGET	=
 
 INC_SYS		=	/mingw64/include
 
-INC_APP		=	. ../ ../libmad
+INC_APP		=	. ../ ../libmad ../RX65x/drw_2d_ver1.02/inc/tes
 
-LIB_ROOT	=	../libmad/.libs ../jpeg-6b
+LIB_ROOT	=	../libmad/.libs ../RX65x/drw_2d_ver1.02
 
 OPTIMIZE	=	-O3
 
