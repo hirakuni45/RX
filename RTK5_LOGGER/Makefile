@@ -32,7 +32,7 @@ PSOURCES	=	main.cpp \
 				resource.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++
+USER_LIBS	=	supc++ drw2d
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
@@ -46,7 +46,9 @@ MCU_TARGET	=
 
 INC_SYS		=	/mingw64/include
 
-INC_APP		=	. ../
+INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
+
+LIB_ROOT	=	../RX65x/drw_2d_ver1.02
 
 OPTIMIZE	=	-O3
 
