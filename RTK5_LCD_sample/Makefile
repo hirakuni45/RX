@@ -24,43 +24,14 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/src/ff.c \
 				$(FATFS_VER)/src/option/unicode.c \
 				common/time.c \
-				graphics/picojpeg.c \
-				RX65x/drw_2d_ver1.02/src/rx/dave_base_rx.c \
-				RX65x/drw_2d_ver1.02/src/rx/dave_irq_rx.c \
-				RX65x/drw_2d_ver1.02/src/rx/dave_memory_rx.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_base.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_blit.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_box.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_circle.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_context.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_curve.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_dlist.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_driver.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_edge.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_errorcodes.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_gradient.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_hardware.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_line.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_math.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_memory.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_pattern.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_perfcount.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_polyline.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_quad.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_rbuffer.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_render.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_texture.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_triangle.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_utility.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_viewport.c \
-				RX65x/drw_2d_ver1.02/src/tes/dave_wedge.c
+				graphics/picojpeg.c
 
 PSOURCES	=	main.cpp \
 				RX65x/icu_mgr.cpp \
 				graphics/font8x16.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	m supc++ z
+USER_LIBS	=	m supc++ z drw2d
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
@@ -77,7 +48,7 @@ INC_SYS		=	/mingw64/include
 
 INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
 
-LIB_ROOT	=	../zlib
+LIB_ROOT	=	../zlib ../RX65x/drw_2d_ver1.02
 
 OPTIMIZE	=	-Os
 

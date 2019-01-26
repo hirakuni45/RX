@@ -81,28 +81,29 @@ namespace {
 	typedef utils::sdc_man SDC;
 	SDC		sdc_;
 
-	static const int16_t LCD_X = 480;
-	static const int16_t LCD_Y = 272;
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
+	static const int16_t LCD_X = 480;
+	static const int16_t LCD_Y = 272;
+	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
 	static const auto PIXT = device::glcdc_def::PIX_TYPE::RGB565;
 //		device::glcdc_def::PIX_TYPE::CLUT8
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
-	GLCDC_IO	glcdc_io_;
+	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
 	// QSPI B グループ
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
 
 	typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y, PIXT> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_(reinterpret_cast<void*>(0x00000000));
+	DRW2D_MGR	drw2d_mgr_(LCD_ORG);
 
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont<16, 16, 64> KFONT;
 	KFONT		kfont_;
 
 	typedef graphics::render<uint8_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
-	RENDER		render_(reinterpret_cast<uint8_t*>(0x00000000), kfont_);
+	RENDER		render_(LCD_ORG, kfont_);
 
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
@@ -324,14 +325,6 @@ int main(int argc, char** argv)
 //		drw2d_mgr_.list_info();
 		if(drw2d_mgr_.start()) {
 			utils:: format("Start DRW2D\n");
-			drw2d_mgr_.set_color(0xffffffff);
-			drw2d_mgr_.line(vtx::spos(0, 0), vtx::spos(480, 272));
-
-			drw2d_mgr_.set_color(0xffff00ff);
-			drw2d_mgr_.circle(vtx::spos(480/2, 272/2), 120, 10);
-
-			drw2d_mgr_.set_color(0xffffff00);
-			drw2d_mgr_.box(vtx::spos(100, 50), vtx::spos(90, 45));
 		} else {
 			utils:: format("DRW2D Fail\n");
 		}
@@ -357,8 +350,12 @@ int main(int argc, char** argv)
 	uint8_t n = 0;
 	bool render = true;
 	bool sw2 = SW2::P();
+	uint16_t rad = 10;
+	uint16_t render_task = 0;
 	while(1) {
 		glcdc_io_.sync_vpos();
+
+		drw2d_mgr_.setup_frame();
 
 		ft5206_.update();
 
@@ -387,21 +384,6 @@ int main(int argc, char** argv)
 				render_.draw_text(0, 16*5, "Graphics Image Light Bilk IgIiIrliiljkffkL\n", true);
 				render_.draw_text(0, 16*6, "012:;,.(i),[i],{i},{|}.(`)\n", true);
 			}
-		}
-
-		auto tnum = ft5206_.get_touch_num();
-		if(tnum == 3) {
-			render_.clear(RENDER::COLOR::Black);
-		}
-		if(tnum > 0) {
-			const auto& npos = ft5206_.get_touch_pos(0);
-			if(npos.event != FT5206::EVENT::CONTACT) {
-				pos.event = FT5206::EVENT::NONE;
-			}
-			if(pos.event == FT5206::EVENT::CONTACT) {
-				render_.line(pos.x, pos.y, npos.x, npos.y, RENDER::COLOR::White);
-			}
-			pos = npos;
 		}
 
 		if(render) {
@@ -434,6 +416,58 @@ int main(int argc, char** argv)
 		}
 #endif
 
+		auto tnum = ft5206_.get_touch_num();
+		if(tnum == 3) {
+//			render_.clear(RENDER::COLOR::Black);
+		}
+		if(tnum > 0) {
+			const auto& npos = ft5206_.get_touch_pos(0);
+//			if(npos.event != FT5206::EVENT::CONTACT) {
+//				pos.event = FT5206::EVENT::NONE;
+//			}
+//			if(pos.event == FT5206::EVENT::CONTACT) {
+//				render_.line(pos.x, pos.y, npos.x, npos.y, RENDER::COLOR::White);
+//			}
+//			pos = npos;
+		}
+
+		if(render) {
+			render = false;
+
+			render_task &= 3;
+			switch(render_task) {
+			case 0:
+				drw2d_mgr_.set_color(0x000000);
+				drw2d_mgr_.box(vtx::spos(0, 0), vtx::spos(480, 272));
+				break;
+			case 1:
+				drw2d_mgr_.set_color(0xffffff);
+				drw2d_mgr_.line(vtx::spos(0, 0), vtx::spos(480, 272));
+
+				drw2d_mgr_.set_color(0xff00ff);
+				drw2d_mgr_.circle(vtx::spos(480/2, 272/2), 120, 10);
+
+				drw2d_mgr_.set_color(0xffff00);
+				drw2d_mgr_.box(vtx::spos(100, 50), vtx::spos(90, 45));
+				break;
+			case 2:
+				drw2d_mgr_.set_color(0x000000);
+				drw2d_mgr_.circle(vtx::spos(480/2, 272/2), 256);
+
+				drw2d_mgr_.set_color(0xff00ff);
+				drw2d_mgr_.circle(vtx::spos(480/2, 272/2), rad, 0);
+
+				render = true;
+				break;
+			default:
+				break;
+			}
+
+//			drw2d_mgr_.copy_bitmap(vtx::spos(10, 10));
+
+			++rad;
+			if(rad >= 256) rad = 10;
+		}
 
 		command_();
 
@@ -442,6 +476,7 @@ int main(int argc, char** argv)
 			if(sw2 && !f) {
 				utils::format("SW2: Positive\n");
 				render = true;
+				++render_task;
 			}
 			if(!sw2 && f) {
 				utils::format("SW2: Negative\n");
