@@ -74,13 +74,15 @@ namespace {
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, 480, 272,
-		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
-///		device::glcdc_def::PIX_TYPE::CLUT8> GLCDC_IO;
-	GLCDC_IO	glcdc_io_;
+	static const int16_t LCD_X = 480;
+	static const int16_t LCD_Y = 272;
+	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
+	static const auto PIXT = device::glcdc_def::PIX_TYPE::RGB565;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
+	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
-	typedef device::drw2d_mgr<device::DRW2D, 480, 272> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_;
+	typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y, PIXT> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_(LCD_ORG);
 
 	typedef graphics::font8x16 AFONT;
 #ifdef CASH_KFONT
@@ -90,8 +92,8 @@ namespace {
 #endif
 	KFONT		kfont_;
 
-	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
-	RENDER		render_(reinterpret_cast<uint16_t*>(0x00000000), kfont_);
+	typedef graphics::render<uint16_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
+	RENDER		render_(LCD_ORG, kfont_);
 
 	typedef utils::capture<2048> CAPTURE;
 	CAPTURE		capture_;
