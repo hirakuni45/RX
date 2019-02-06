@@ -17,14 +17,15 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "dave_base.h"
 #include "dave_base_rx.h"
 
 #define DAVE_STAT        (0x0)  /* STATUS register offset              */
 #define DAVE_IRQ_CTRL    (0x30) /* IRQCTL register offset              */
-#define DAVE_IRQ_IPR     (7)    /* Interrupt priority of DRW2D         */
-#define DAVE_IRQ_GRP_NUM (11)   /* Interrupt request bit of DRW2D      */
-#define ICU_GROUPAL1     (113)  /* Interrupt vector number of GROUPAL1 */
+/// #define DAVE_IRQ_IPR     (7)    /* Interrupt priority of DRW2D         */
+/// #define DAVE_IRQ_GRP_NUM (11)   /* Interrupt request bit of DRW2D      */
+/// #define ICU_GROUPAL1     (113)  /* Interrupt vector number of GROUPAL1 */
 
 //--------------------------------------------------------------------------
 
@@ -42,7 +43,9 @@ static d1_interrupt g_irq_handler[d1_irqcount];
 static void *g_irq_data[d1_irqcount];
 static volatile int g_irq_triggered[d1_irqcount];
 static d1_device_rx *context;
+// static volatile uint32_t render_end_sync_;
 
+#if 0
 static void d1_ir_set(bool enable, int vector);
 static void d1_ipr_set(unsigned char priority, int vector);
 static void d1_ien_set(bool enable, int vector);
@@ -51,8 +54,9 @@ static void d1_genal1_set(bool enable, int grp_num);
 static unsigned char d1_ipr_get(int vector);
 static unsigned long d1_genal1_get();
 static unsigned long d1_grpal1_get();
+#endif
 
-static void excep_icu_groupal1_isr(void);
+/// static void excep_icu_groupal1_isr(void);
 
 static int d1_mapirq_intern(int irqtype)
 {
@@ -85,28 +89,29 @@ static int d1_mapirq_intern(int irqtype)
 // initializaton + deinitialization
 int d1_initirq_intern(d1_device_rx *handle)
 {
-    unsigned char tmp_ipr;
+///    unsigned char tmp_ipr;
 
     context = handle;
 
     /* clear DAVE irq's, enable dlist irq */
     WRITE_REG(DAVE2D_0_BASE, DAVE_IRQ_CTRL, 0xe);
+//    WRITE_REG(DAVE2D_0_BASE, DAVE_IRQ_CTRL, 0xf);
 
     /* enable DAVE irq */
-    d1_genal1_set(true, DAVE_IRQ_GRP_NUM);
+///    d1_genal1_set(true, DAVE_IRQ_GRP_NUM);
 
     /* group interrupt request is disabled */
-    d1_ien_set(false, ICU_GROUPAL1);
+///    d1_ien_set(false, ICU_GROUPAL1);
 
     /* interrupt request is cleared */
-    d1_ir_set(false, ICU_GROUPAL1);
+///    d1_ir_set(false, ICU_GROUPAL1);
 
     /* group interrupt request priority level is set */
-    tmp_ipr = (unsigned char)((DAVE_IRQ_IPR > d1_ipr_get(ICU_GROUPAL1)) ? DAVE_IRQ_IPR : d1_ipr_get(ICU_GROUPAL1));
-    d1_ipr_set(tmp_ipr, ICU_GROUPAL1);
+///    tmp_ipr = (unsigned char)((DAVE_IRQ_IPR > d1_ipr_get(ICU_GROUPAL1)) ? DAVE_IRQ_IPR : d1_ipr_get(ICU_GROUPAL1));
+///    d1_ipr_set(tmp_ipr, ICU_GROUPAL1);
 
     /* group interrupt request is enabled */
-    d1_ien_set(true, ICU_GROUPAL1);
+///    d1_ien_set(true, ICU_GROUPAL1);
 
     return 1;
 }
@@ -178,11 +183,12 @@ int d1_shutdownirq_intern(d1_device_rx *handle)
     INTERNAL_NOT_USED(handle);
 
     /* disable DAVE irq */
-    d1_genal1_set(false, DAVE_IRQ_GRP_NUM);
+///    d1_genal1_set(false, DAVE_IRQ_GRP_NUM);
 
     /* clear DAVE irq's, disable dlist irq */
     WRITE_REG(DAVE2D_0_BASE, DAVE_IRQ_CTRL, 0xc);
 
+#if 0
     tmp_gen = d1_genal1_get();
     if (0 == tmp_gen)
     {
@@ -192,7 +198,7 @@ int d1_shutdownirq_intern(d1_device_rx *handle)
         /* group interrupt request priority level is cleared */
         d1_ipr_set(0, ICU_GROUPAL1);
     }
-
+#endif
     return 1;
 }
 
@@ -259,14 +265,23 @@ int d1_callirqhandler(d1_device *handle, int irqtype, void *irqdata)
 void drw_int_isr(void)
 {
     unsigned long intReg;
-
     intReg = READ_REG(DAVE2D_0_BASE, DAVE_STAT);
+
+	uint32_t ena = 0;
+	if(intReg & 0x10) {  // renderring fin
+		ena |= 0b0101;
+//		render_end_sync_++;
+	}
+	if(intReg & 0x20) {  // display list fin
+		ena |= 0b1010;
+	}
+	WRITE_REG(DAVE2D_0_BASE, DAVE_IRQ_CTRL, ena);
 
     /* any DAVE interrupt? */
     if (intReg & 0x30)
     {
         /* clear/enable all DAVE interrupts */
-        WRITE_REG(DAVE2D_0_BASE, DAVE_IRQ_CTRL, 0xe);
+//        WRITE_REG(DAVE2D_0_BASE, DAVE_IRQ_CTRL, 0xe);
 
         /* display list interrupt? */
         if (intReg & 0x20)
@@ -295,7 +310,12 @@ void drw_int_isr(void)
     }
 }
 
-/// #pragma interrupt excep_icu_groupal1_isr(vect=113)
+
+///////////////////////////////////////////////////////////////////////
+
+
+#if 0
+#pragma interrupt excep_icu_groupal1_isr(vect=113)
 /***********************************************************************
  * Function Name: excep_icu_groupal1_isr
  * Description  : GRPAL1 interrupt routine for DRW2D.
@@ -463,4 +483,4 @@ static unsigned long d1_grpal1_get()
 
 	return (*p_grpal1_addr);
 } /* End of function d1_grpal1_get() */
-
+#endif

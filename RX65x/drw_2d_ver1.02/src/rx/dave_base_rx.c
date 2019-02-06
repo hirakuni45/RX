@@ -21,9 +21,9 @@
 #include "dave_base.h"
 #include "dave_base_rx.h"
 
-static void d1_registerprotectenable();
-static void d1_registerprotectdisable();
-static void d1_mstp_set(bool enable, int mstp_char, int mstp_num);
+// static void d1_registerprotectenable();
+// static void d1_registerprotectdisable();
+// static void d1_mstp_set(bool enable, int mstp_char, int mstp_num);
 
 //--------------------------------------------------------------------------
 //
@@ -44,10 +44,12 @@ d1_device * d1_opendevice(long flags)
     /* init device data */
     handle->dlist_indirect = 0;
 
+#if 0
     /* apply power to peripheral */
     d1_registerprotectdisable();
     d1_mstp_set (true, MSTP_C, DAVE2D_MSTP_NUM);
     d1_registerprotectenable();
+#endif
 
     /* reset irq handlers */
     d1_initirq_intern(handle);
@@ -69,10 +71,12 @@ int d1_closedevice(d1_device *handle)
     /* close irq handlers */
     ret = d1_shutdownirq_intern((d1_device_rx *) handle);
 
+#if 0
     /* power down peripheral */
     d1_registerprotectdisable();
     d1_mstp_set (false, MSTP_C, DAVE2D_MSTP_NUM);
     d1_registerprotectenable();
+#endif
 
     free (handle);
     return ret;
@@ -157,6 +161,7 @@ int d1_devicesupported(d1_device *handle, int deviceid)
     }
 }
 
+#if 0
 /***********************************************************************
  * Function Name: d1_mstp_set
  * Description  : Write the MSTP register.
@@ -214,3 +219,4 @@ static void d1_registerprotectdisable()
     p_prcr_addr = (unsigned short *)PRCR_0_BASE;
     *p_prcr_addr = (((*p_prcr_addr) | PRCR_KEY) | PRCR_PRC1);
 } /* End of function d1_registerprotectdisable() */
+#endif

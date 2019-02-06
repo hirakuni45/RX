@@ -15,19 +15,19 @@
 #ifndef __1_dave_base_rx_h_H
 #define __1_dave_base_rx_h_H
 
-#define PRCR_KEY                (0xA500)       /* PRC Key Code            */
-#define PRCR_PRC1               (0x0002)       /* PRCR bit 1 position     */
-#define MSTP_C                  (2)            /* MSTPC offset position   */
-#define DAVE2D_MSTP_NUM         (28)           /* DRW2D bit in MSTPC      */
+// #define PRCR_KEY                (0xA500)       /* PRC Key Code            */
+// #define PRCR_PRC1               (0x0002)       /* PRCR bit 1 position     */
+// #define MSTP_C                  (2)            /* MSTPC offset position   */
+// #define DAVE2D_MSTP_NUM         (28)           /* DRW2D bit in MSTPC      */
 
-#define PRCR_0_BASE             (0x000803FEUL) /* PRCR base address       */
-#define MSTP_0_BASE             (0x00080010UL) /* MSTP base address       */
+// #define PRCR_0_BASE             (0x000803FEUL) /* PRCR base address       */
+// #define MSTP_0_BASE             (0x00080010UL) /* MSTP base address       */
 #define DAVE2D_0_BASE           (0x000E3000UL) /* DAVE2D base address     */
-#define IR_0_BASE               (0x00087000UL) /* IR base address         */
-#define IEN_0_BASE              (0x00087200UL) /* IER base address        */
-#define IPR_0_BASE              (0x00087300UL) /* IPR base address        */
-#define GRPAL1_0_BASE           (0x00087834UL) /* GRPAL1 base address     */
-#define GENAL1_0_BASE           (0x00087874UL) /* GENAL1 base address     */
+// #define IR_0_BASE               (0x00087000UL) /* IR base address         */
+// #define IEN_0_BASE              (0x00087200UL) /* IER base address        */
+// #define IPR_0_BASE              (0x00087300UL) /* IPR base address        */
+// #define GRPAL1_0_BASE           (0x00087834UL) /* GRPAL1 base address     */
+// #define GENAL1_0_BASE           (0x00087874UL) /* GENAL1 base address     */
 
 #define RX_USE_DLIST_INDIRECT   (1)
 
