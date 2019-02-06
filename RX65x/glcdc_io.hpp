@@ -413,6 +413,7 @@ namespace device {
 
 
 		static glcdc_def::ctrl_t	ctrl_blk_;
+
 		void*				layer1_org_;
 		void*				layer2_org_;
 		uint8_t				intr_lvl_;
@@ -1621,11 +1622,11 @@ namespace device {
 			@brief	コンストラクタ
 			@param[in]	ly1		レイヤー１アドレス
 			@param[in]	ly2		レイヤー２アドレス
-			@param[in]	ilv		割り込みレベル
 		*/
 		//-----------------------------------------------------------------//
-		glcdc_io(void* ly1, void* ly2, uint8_t ilv = 5) noexcept :
-			layer1_org_(ly1), layer2_org_(ly2), intr_lvl_(ilv), last_error_(ERROR::SUCCESS)
+		glcdc_io(void* ly1, void* ly2) noexcept :
+			layer1_org_(ly1), layer2_org_(ly2),
+			intr_lvl_(0), last_error_(ERROR::SUCCESS)
 		{ }
 
 
@@ -1635,7 +1636,7 @@ namespace device {
 			@return X 軸幅
 		*/
 		//-----------------------------------------------------------------//
-		int32_t get_xsize() const noexcept { return XSIZE; }
+		static int32_t get_xsize() noexcept { return XSIZE; }
 
 
 		//-----------------------------------------------------------------//
@@ -1644,7 +1645,34 @@ namespace device {
 			@return Y 軸幅
 		*/
 		//-----------------------------------------------------------------//
-		int32_t get_ysize() const noexcept { return YSIZE; }
+		static int32_t get_ysize() noexcept { return YSIZE; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ピクセルタイプを取得
+			@return ピクセルタイプ
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_pxt() noexcept { return PXT; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	レイヤー１のアドレス取得
+			@return レイヤー１のアドレス
+		*/
+		//-----------------------------------------------------------------//
+		void* get_layer1() const noexcept { return layer1_org_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	レイヤー２のアドレス取得
+			@return レイヤー２のアドレス
+		*/
+		//-----------------------------------------------------------------//
+		void* get_layer2() const noexcept { return layer2_org_; }
 
 
 		//-----------------------------------------------------------------//
@@ -1669,11 +1697,21 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  開始
+			@param[in]	ilvl	割り込みレベル（０なら割り込み無し）
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start() noexcept
+		bool start(uint8_t ilvl = 2) noexcept
 		{
+			intr_lvl_ = ilvl;
+
+			// メインバス２優先順位設定（GLCDC、DRW2D）
+			device::BUS::EBMAPCR.PR1SEL = 0;
+			device::BUS::EBMAPCR.PR2SEL = 3;
+			device::BUS::EBMAPCR.PR3SEL = 1;
+			device::BUS::EBMAPCR.PR4SEL = 2;
+			device::BUS::EBMAPCR.PR5SEL = 4;
+
 			cfg_t cfg;
 			cfg.output.clksrc = glcdc_def::CLK_SRC::INTERNAL;   			  // Select PLL clock
 			cfg.output.clock_div_ratio = glcdc_def::PANEL_CLK_DIVISOR::_24;  // 240 / 24 = 10 MHz
@@ -1855,29 +1893,12 @@ namespace device {
 			runtime_cfg.chromakey = cfg.chromakey[FRAME_LAYER_2];
 #endif
 			//
-			// Register Dave2D interrupt
-			//
-///			R_BSP_InterruptWrite(BSP_INT_SRC_AL1_DRW2D_DRW_IRQ, (bsp_int_cb_t)drw_int_isr);
-
-			//
 			// Register Reflection
 			//
 			auto ret = open_(cfg);
 			if(!ret) {
 				return false;
 			}
-
-#if 0
-			R_DMACA_Init();
-			//
-			// Extended Bus Master Priority Control Register
-			//
-			BSC.EBMAPCR.BIT.PR1SEL = 0;
-			BSC.EBMAPCR.BIT.PR2SEL = 3;
-			BSC.EBMAPCR.BIT.PR3SEL = 1;
-			BSC.EBMAPCR.BIT.PR4SEL = 2;
-			BSC.EBMAPCR.BIT.PR5SEL = 4;
-#endif
 
 			if(cfg.input[FRAME_LAYER_1].offset != 0) {
 				memset(cfg.input[FRAME_LAYER_1].base, 0x00, BYTES_PER_BUFFER);
