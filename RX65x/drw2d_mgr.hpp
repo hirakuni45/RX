@@ -26,23 +26,22 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  DRW2D 制御／マネージャー
+		@param[in]	GLC		グラフィックス・コントローラー・クラス
 		@param[in]	DRW		DRW2D 制御クラス
-		@param[in]	XSIZE	X 方向ピクセルサイズ
-		@param[in]	YSIZE	Y 方向ピクセルサイズ
-		@param[in]	PXT		ピクセル・タイプ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class DRW, int16_t XSIZE, int16_t YSIZE, glcdc_def::PIX_TYPE PXT>
+	template <class GLC, class DRW>
 	class drw2d_mgr {
 
-		void*	fb_;
+		GLC&		glc_;
 
 		d2_device*	d2_;
 		d2_renderbuffer*	rb_;
 
 		d2_color	color_;
 		vtx::srect	clip_;
-		uint16_t	pen_size_;
+		int16_t		pen_size_;
+		int16_t		scale_;
 		bool		set_color_;
 		bool		set_clip_;
 
@@ -52,7 +51,7 @@ namespace device {
 
 		static uint32_t get_mode_()
 		{
-			switch(PXT) {
+			switch(GLC::get_pxt()) {
 			case glcdc_def::PIX_TYPE::RGB888:
 				return d2_mode_argb8888;
 			case glcdc_def::PIX_TYPE::RGB565:
@@ -72,8 +71,8 @@ namespace device {
 		void setup_()
 		{
 			auto mode = get_mode_();
-			d2_framebuffer(d2_, fb_, XSIZE, XSIZE, YSIZE, mode);
-			d2_selectrenderbuffer(d2_, rb_);
+			d2_framebuffer(d2_, glc_.get_layer2(), GLC::get_xsize(), GLC::get_xsize(), GLC::get_ysize(), mode);
+//			d2_selectrenderbuffer(d2_, rb_);
 			if(!set_color_) {
 				d2_setcolor(d2_, 0, color_);
 				set_color_ = true;
@@ -87,11 +86,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクタ
-			@param[in]	fb	フレームバッファポインター
+			@param[in]	glc	GLC クラスの参照
 		*/
 		//-----------------------------------------------------------------//
-		drw2d_mgr(void* fb) noexcept : fb_(fb), d2_(nullptr), rb_(nullptr),
-			color_(0xffffffff), clip_(0, 0, XSIZE, YSIZE), pen_size_(4),
+		drw2d_mgr(GLC& glc) noexcept : glc_(glc), d2_(nullptr), rb_(nullptr),
+			color_(0xffffffff), clip_(0, 0, GLC::get_xsize(), GLC::get_ysize()),
+			pen_size_(16), scale_(16),
 			set_color_(false), set_clip_(false), last_error_(D2_OK)
 		{ }
 
@@ -138,14 +138,14 @@ namespace device {
 			// DRW2D power management
 			power_mgr::turn(DRW::get_peripheral());
 
-			DRW::SIZE.X = XSIZE;
-			DRW::SIZE.Y = YSIZE;
-
-			icu_mgr::install_group_task(DRW::get_irq_vec(), drw_int_isr);
-
 			// initialization Dave2D
 			d2_ = d2_opendevice(0);
-			d2_inithw(d2_, 0);
+			uint32_t init_flag = 0;
+			d2_inithw(d2_, init_flag);
+
+			icu_mgr::install_group_task(DRW::get_irq_vec(), drw_int_isr);
+			icu_mgr::set_level(ICU::VECTOR::GROUPAL1, 2);
+
 			rb_ = d2_newrenderbuffer(d2_, dlis, stsz);
 
 			clut_[0] = 0xff000000;
@@ -196,19 +196,37 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	ペンサイズの設定
-			@param[in]	size	ペンサイズ（ピクセル）
+			@param[in]	size	ペンサイズ（1/16 pixel）
 		*/
 		//-----------------------------------------------------------------//
-		void set_pen_size(uint16_t size) noexcept { pen_size_ = size; }
+		void set_pen_size(int16_t size) noexcept { pen_size_ = size; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	ペンサイズの取得
-			@return ペンサイズ（ピクセル）
+			@return ペンサイズ（1/16 pixel）
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_pen_size() const noexcept { return pen_size_; }
+		auto get_pen_size() const noexcept { return pen_size_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	スケールの設定
+			@param[in]	scale	スケール（等倍１６）
+		*/
+		//-----------------------------------------------------------------//
+		void set_scale(int16_t scale = 16) noexcept { scale_ = scale; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	スケールの取得
+			@return スケール（1/16 pixel）
+		*/
+		//-----------------------------------------------------------------//
+		auto get_scale() const noexcept { return scale_; }
 
 
 		//-----------------------------------------------------------------//
@@ -251,8 +269,8 @@ namespace device {
 		bool line(const vtx::spos& org, const vtx::spos& end) noexcept
 		{
 			setup_();
-			last_error_ = d2_renderline(d2_, org.x * 16, org.y * 16, end.x * 16, end.y * 16,
-				pen_size_ * 16, d2_le_exclude_none);
+			last_error_ = d2_renderline(d2_, org.x * scale_, org.y * scale_,
+				end.x * scale_, end.y * scale_, pen_size_, d2_le_exclude_none);
 
 			d2_executerenderbuffer(d2_, rb_, 0);
 			d2_flushframe(d2_);
@@ -272,7 +290,8 @@ namespace device {
 		bool circle(const vtx::spos& org, int16_t r, int16_t w = 0)
 		{
 			setup_();
-			last_error_ = d2_rendercircle(d2_, org.x * 16, org.y * 16, r * 16, w * 16);
+			last_error_ = d2_rendercircle(d2_, org.x * scale_, org.y * scale_,
+				r * scale_, w * scale_);
 
 			d2_executerenderbuffer(d2_, rb_, 0);
 			d2_flushframe(d2_);
@@ -291,7 +310,8 @@ namespace device {
 		bool box(const vtx::spos& org, const vtx::spos& size)
 		{
 			setup_();
-			last_error_ = d2_renderbox(d2_, org.x * 16, org.y * 16, size.x * 16, size.y * 16);
+			last_error_ = d2_renderbox(d2_, org.x * scale_, org.y * scale_,
+				size.x * scale_, size.y * scale_);
 
 			d2_executerenderbuffer(d2_, rb_, 0);
 			d2_flushframe(d2_);
@@ -318,7 +338,7 @@ namespace device {
 			};
 
 			auto mode = get_mode_();
-			d2_framebuffer(d2_, fb_, XSIZE, XSIZE, YSIZE, mode);
+			d2_framebuffer(d2_, glc_.get_layer2(), GLC::get_xsize(), GLC::get_xsize(), GLC::get_ysize(), mode);
 			d2_selectrenderbuffer(d2_, rb_);
 			d2_setblitsrc(d2_, (void*)src, 8, 8, 8, d2_mode_i1);
 			d2_blitcopy(d2_, 8, 8,
@@ -326,6 +346,21 @@ namespace device {
 
 			d2_executerenderbuffer(d2_, rb_, 0);
 			d2_flushframe(d2_);
+		}
+
+
+		void test_frame(d2_color col, int16_t rad)
+		{
+			d2_startframe(d2_);
+			auto xs = GLC::get_xsize();
+			auto ys = GLC::get_ysize();
+			d2_framebuffer(d2_, glc_.get_layer2(), xs, xs, ys, d2_mode_rgb565);
+			d2_cliprect(d2_, 0, 0, xs * 16, ys * 16);
+			d2_clear(d2_, 0x000000);
+			d2_setcolor(d2_, 0, col);
+//			d2_renderbox(d2_, 480/2*16, 272/2*16, rad*16, rad*16);
+			d2_rendercircle(d2_, 480/2*16, 272/2*16, rad*16, 0);
+			d2_endframe(d2_);
 		}
 
 
