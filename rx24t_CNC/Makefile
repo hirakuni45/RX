@@ -178,6 +178,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX24T --progress --write --verify $(TARGET).mot
+	rx_prog -P COM34 -d RX24T --progress --write --verify $(TARGET).mot
 
 -include $(DEPENDS)
