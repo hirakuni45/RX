@@ -91,12 +91,8 @@ namespace {
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
-	// QSPI B グループ
-	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
-	QSPI		qspi_;
-
-	typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y, PIXT> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_(LCD_ORG);
+	typedef device::drw2d_mgr<GLCDC_IO, device::DRW2D> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_(glcdc_io_);
 
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont<16, 16, 64> KFONT;
@@ -125,6 +121,10 @@ namespace {
 	PLOT		plot_(render_);
 	typedef img::img_in<PLOT> IMG_IN;
 	IMG_IN		imgs_(plot_);
+
+	// QSPI B グループ
+	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
+	QSPI		qspi_;
 
 	utils::command<256> cmd_;
 
@@ -352,13 +352,10 @@ int main(int argc, char** argv)
 	bool sw2 = SW2::P();
 	uint16_t rad = 10;
 	uint16_t render_task = 0;
+	uint16_t ttt = 0;
 	while(1) {
 		glcdc_io_.sync_vpos();
-
-		drw2d_mgr_.setup_frame();
-
 		ft5206_.update();
-
 		sdc_.service(sdh_.service());
 
 #if 0
@@ -432,13 +429,12 @@ int main(int argc, char** argv)
 		}
 
 		if(render) {
-			render = false;
-
 			render_task &= 3;
 			switch(render_task) {
 			case 0:
 				drw2d_mgr_.set_color(0x000000);
 				drw2d_mgr_.box(vtx::spos(0, 0), vtx::spos(480, 272));
+				render = false;
 				break;
 			case 1:
 				drw2d_mgr_.set_color(0xffffff);
@@ -449,21 +445,21 @@ int main(int argc, char** argv)
 
 				drw2d_mgr_.set_color(0xffff00);
 				drw2d_mgr_.box(vtx::spos(100, 50), vtx::spos(90, 45));
+				render = false;
 				break;
 			case 2:
-				drw2d_mgr_.set_color(0x000000);
-				drw2d_mgr_.circle(vtx::spos(480/2, 272/2), 256);
-
-				drw2d_mgr_.set_color(0xff00ff);
-				drw2d_mgr_.circle(vtx::spos(480/2, 272/2), rad, 0);
-
+//				drw2d_mgr_.test_frame(0xff00ff, rad);
 				render = true;
 				break;
 			default:
 				break;
 			}
 
-//			drw2d_mgr_.copy_bitmap(vtx::spos(10, 10));
+			if(render_task == 2) {
+//				if(rad & 1) {
+					drw2d_mgr_.test_frame(0xff00ff, rad);
+//				}
+			}
 
 			++rad;
 			if(rad >= 256) rad = 10;
