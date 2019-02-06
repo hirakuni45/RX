@@ -542,6 +542,33 @@ namespace device {
 		};
 		static buspri_t<0x00081310> BUSPRI;
 
+
+#if defined(SIG_RX65N)
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  拡張バスマスタ優先度制御レジスタ (EBMAPCR)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template<uint32_t base>
+		struct ebmapcr_t : public rw32_t<base> {
+			typedef rw32_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0,  3>  PR1SEL;
+			bits_rw_t<io_, bitpos::B4,  3>  PR2SEL;
+			bits_rw_t<io_, bitpos::B8,  3>  PR3SEL;
+			bits_rw_t<io_, bitpos::B12, 3>  PR4SEL;
+			bits_rw_t<io_, bitpos::B16, 3>  PR5SEL;
+
+			bit_rw_t <io_, bitpos::B29>     RPSTOP;
+
+			bit_rw_t <io_, bitpos::B31>     PRERR;
+		};
+		static ebmapcr_t<0x000C5800> EBMAPCR;
+#endif
 	};
 	
 	typedef bus_t BUS;
