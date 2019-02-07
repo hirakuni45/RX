@@ -338,7 +338,7 @@ namespace device {
 			};
 
 			auto mode = get_mode_();
-			d2_framebuffer(d2_, glc_.get_layer2(), GLC::get_xsize(), GLC::get_xsize(), GLC::get_ysize(), mode);
+			d2_framebuffer(d2_, glc_.get_fbp(), GLC::get_xsize(), GLC::get_xsize(), GLC::get_ysize(), mode);
 			d2_selectrenderbuffer(d2_, rb_);
 			d2_setblitsrc(d2_, (void*)src, 8, 8, 8, d2_mode_i1);
 			d2_blitcopy(d2_, 8, 8,
@@ -354,7 +354,7 @@ namespace device {
 			d2_startframe(d2_);
 			auto xs = GLC::get_xsize();
 			auto ys = GLC::get_ysize();
-			d2_framebuffer(d2_, glc_.get_layer2(), xs, xs, ys, d2_mode_rgb565);
+			d2_framebuffer(d2_, glc_.get_fbp(), xs, xs, ys, d2_mode_rgb565);
 			d2_cliprect(d2_, 0, 0, xs * 16, ys * 16);
 			d2_clear(d2_, 0x000000);
 			d2_setcolor(d2_, 0, col);
