@@ -11,8 +11,13 @@ K RX
 $ENDCMP
 #
 $CMP RX64M
-D Renesas RX64M 176 pin LQFP 
+D Renesas RX64M 176 pin LQFP
 K RX64M
+$ENDCMP
+#
+$CMP RX65N_176
+D Renesas RX651/RX65N Micro Controller
+K RENESAS RX RX65 MCU
 $ENDCMP
 #
 #End Doc Library
