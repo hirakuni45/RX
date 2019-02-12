@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP IS42S16160G-xT
+D 256Mb Synchronous DRAM, 16Meg x 16, TSOP-II-54
+K SDRAM DRAM
+F http://www.issi.com/WW/pdf/42-45S83200G-16160G.pdf
+$ENDCMP
+#
+#End Doc Library
