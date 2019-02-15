@@ -8,8 +8,18 @@ $CMP 6P-SW
 D 6P Switch
 $ENDCMP
 #
+$CMP CAT4238
+D High Efficiency 10 LED Boost Converter
+K LED Boost Driver
+F https://www.onsemi.jp/pub/Collateral/CAT4238-D.PDF
+$ENDCMP
+#
 $CMP DMG3415U
 D Pch MOSFET
+$ENDCMP
+#
+$CMP LCD_480_272
+D MDK43WQV118-WCT
 $ENDCMP
 #
 $CMP NON-POL
