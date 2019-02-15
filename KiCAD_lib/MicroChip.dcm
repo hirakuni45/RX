@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP ATWINC1500-MR210PB
+D Microchip IEEE® 802.11 b/g/n SmartConnect IoT Module
+K WiFi 802.11 Microchip
+F http://ww1.microchip.com/downloads/en/DeviceDoc/ATWINC15x0-MR210xB-IEEE-802.11-b-g-n-SmartConnect-IoT-Module-Data-Sheet-DS70005304C.pdf
+$ENDCMP
+#
+#End Doc Library
