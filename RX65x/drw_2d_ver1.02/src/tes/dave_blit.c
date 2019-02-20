@@ -127,7 +127,7 @@
  *   To avoid problems you can use the d1 driver memory management functions 'd1_copytovidmem' or 'd1_copyfromvidmem',
  *   which implicitly do a cache flush.
  * */
-d2_s32 d2_setblitsrc( d2_device *handle, void *ptr, d2_s32 pitch, d2_s32 width, d2_s32 height, d2_u32 format )
+d2_s32 d2_setblitsrc( d2_device *handle, const void *ptr, d2_s32 pitch, d2_s32 width, d2_s32 height, d2_u32 format )
 {
    d2_contextdata *ctx;
    d2_u32 format_noflags = format & ~d2_mode_rle & ~d2_mode_clut;
@@ -252,7 +252,7 @@ d2_s32 d2_blitcopy( d2_device *handle, d2_s32 srcwidth, d2_s32 srcheight, d2_bli
    d2_s32 texWidth, texHeight;
    d2_contextdata *ctx;
    d2_color texmodecl1, texmodecl2;
-   void *src = 0;
+   const void *src = NULL;
    d2_u32 format_noflags;
    d2_u32 isRLE = 0;
    d2_contextdata *blitcontext;

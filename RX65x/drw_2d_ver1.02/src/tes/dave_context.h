@@ -81,7 +81,7 @@ typedef struct _d2_contextdata
    d2_s32           texpitch;
    d2_s32           texwidth;
    d2_s32           texheight;
-   void *           texbase;
+   const void *     texbase;
    d2_s32           texcenterx;
    d2_s32           texcentery;
    d2_color *       texclut;
@@ -114,7 +114,7 @@ typedef struct _d2_contextdata
    d2_color        texmodecl[2];
    d2_color        texcolreg[2];
 
-   void *          blit_src;
+   const void *    blit_src;
    d2_s32          blit_pitch;
    d2_s32          blit_width;
    d2_s32          blit_height;
@@ -139,7 +139,7 @@ typedef struct _d2_contextdata_backup
     d2_s32             texpitch;
     d2_s32             texwidth;
     d2_s32             texheight;
-    void *             texbase;
+    const void *       texbase;
     d2_u8              texmode;
     d2_u8              texbpp;
     d2_u8              texsubppb;

@@ -551,7 +551,7 @@ D2_EXTERN d2_s32 d2_setlinecap( d2_device *handle, d2_u32 mode );
 D2_EXTERN d2_s32 d2_setlinejoin( d2_device *handle, d2_u32 mode );
 D2_EXTERN d2_s32 d2_setlinepattern( d2_device *handle, d2_width scale, d2_s32 offset );
 D2_EXTERN d2_s32 d2_setmiterlimit( d2_device *handle, d2_width miter );
-D2_EXTERN d2_s32 d2_settexture( d2_device *handle, void *ptr, d2_s32 pitch, d2_s32 width, d2_s32 height, d2_u32 format );
+D2_EXTERN d2_s32 d2_settexture( d2_device *handle, const void *ptr, d2_s32 pitch, d2_s32 width, d2_s32 height, d2_u32 format );
 D2_EXTERN d2_s32 d2_settexturemode( d2_device *handle, d2_u32 mode );
 D2_EXTERN d2_s32 d2_settextureoperation( d2_device *handle, d2_u8 amode, d2_u8 rmode, d2_u8 gmode, d2_u8 bmode );
 D2_EXTERN d2_s32 d2_settexopparam( d2_device *handle, d2_u32 index, d2_u32 p1, d2_u32 p2 );
@@ -614,7 +614,7 @@ D2_EXTERN d2_s32 d2_renderpolygon( d2_device *handle, const d2_point *data, d2_u
 /*---------------------------------------------------------------------------
  * blit attributes write */
 
-D2_EXTERN d2_s32 d2_setblitsrc( d2_device *handle, void *ptr, d2_s32 pitch, d2_s32 width, d2_s32 height, d2_u32 format );
+D2_EXTERN d2_s32 d2_setblitsrc( d2_device *handle, const void *ptr, d2_s32 pitch, d2_s32 width, d2_s32 height, d2_u32 format );
 
 /*---------------------------------------------------------------------------
  * blit rendering functions */

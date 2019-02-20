@@ -100,7 +100,7 @@ static D2_INLINE void d2_setupuvlimiter_invert_intern( d2_devicedata *handle, co
  *   To avoid problems you can use the d1 driver memory management functions 'd1_copytovidmem' or 'd1_copyfromvidmem',
  *   which implicitly do a cache flush.
  * */
-d2_s32 d2_settexture( d2_device *handle, void *ptr, d2_s32 pitch, d2_s32 width, d2_s32 height, d2_u32 format )
+d2_s32 d2_settexture( d2_device *handle, const void *ptr, d2_s32 pitch, d2_s32 width, d2_s32 height, d2_u32 format )
 {
    d2_u32 format_noflags = ((format & ~d2_mode_rle) & ~d2_mode_clut);
    d2_contextdata *ctx;

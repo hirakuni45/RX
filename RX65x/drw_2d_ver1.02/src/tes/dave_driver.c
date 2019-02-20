@@ -228,16 +228,11 @@ static d2_contextdata_backup * d2_newbackupcontext_intern( d2_device *handle, d2
  * returns:
  *  device pointer or NULL if not enough memory was available
  * */
-d2_device * d2_opendevice( d2_u32 flags )
+void d2_opendevice_( d2_devicedata* handle, d2_u32 flags )
 {
 #ifdef D2_USEREGCACHE
    d2_s32 i;
 #endif
-
-   d2_devicedata *handle = (d2_devicedata *) d2_getmem_p( sizeof(d2_devicedata) );
-
-   if(NULL != handle)
-   {
       /* initialize device context */
       handle->flags             = flags;
       handle->errorcode         = D2_OK;
@@ -314,9 +309,15 @@ d2_device * d2_opendevice( d2_u32 flags )
       /* attach to chain */
       handle->next = g_devicechain;
       g_devicechain = handle;
-   }
+}
 
-   return handle;
+d2_device *d2_opendevice( d2_u32 flags )
+{
+	d2_devicedata *handle = (d2_devicedata *) d2_getmem_p( sizeof(d2_devicedata) );
+	if(NULL != handle) {
+		d2_opendevice_( handle, flags );
+	}
+	return handle;
 }
 
 /*--------------------------------------------------------------------------
