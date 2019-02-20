@@ -22,6 +22,10 @@ $CMP LCD_480_272
 D MDK43WQV118-WCT
 $ENDCMP
 #
+$CMP MR
+D Flat Chip Resistors
+$ENDCMP
+#
 $CMP NON-POL
 D Non polarity capacitor
 $ENDCMP
