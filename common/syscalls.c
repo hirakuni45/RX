@@ -187,6 +187,8 @@ int open(const char *path, int flags, ...)
 //-----------------------------------------------------------------//
 int read(int file, void *ptr, int len)
 {
+	if(ptr == NULL) return 0;
+
 	int l = 0;
 	if(file >= 0 && file <= 2) {
 		// stdin
@@ -252,6 +254,8 @@ int read(int file, void *ptr, int len)
 //-----------------------------------------------------------------//
 int write(int file, const void *ptr, int len)
 {
+	if(ptr == NULL) return 0;
+
 	int l = -1;
 	if(file >= 0 && file <= 2) {
 		if(file == 1 || file == 2) {
