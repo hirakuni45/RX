@@ -44,19 +44,18 @@ namespace graphics {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	レンダリング
-		@param[in]	T		ピクセル型：uint8_t(8)、uint16_t(16)、uint32_t(32)
-		@param[in]	WIDTH	横幅
-		@param[in]	HEIGHT	高さ
+		@param[in]	GLC		グラフィックス・コントローラー・クラス
 		@param[in]	AFONT	ASCII フォント・クラス
 		@param[in]	KFONT	漢字フォントクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <typename T, uint16_t WIDTH, uint16_t HEIGHT, class AFONT = afont_null, class KFONT = kfont_null>
+	template <class GLC, class AFONT = afont_null, class KFONT = kfont_null>
 	class render {
-	public:
-		typedef T value_type;
 
-		typedef base_color<T> COLOR;
+		GLC&		glc_;
+
+	public:
+		typedef base_color<uint16_t> COLOR;
 
 		static const int16_t width  = static_cast<int16_t>(WIDTH);
 		static const int16_t height = static_cast<int16_t>(HEIGHT);
