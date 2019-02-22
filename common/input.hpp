@@ -61,7 +61,7 @@ namespace utils {
 			} else {
 				if(str_ == nullptr) {
 					char ch;
-					if(read(0, &ch, 1) == 1) {
+					if(read(STDIN_FILENO, &ch, 1) == 1) {
 						if(ch == '\n') ch = 0;
 						last_ = ch;
 					} else {

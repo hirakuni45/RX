@@ -138,7 +138,7 @@ namespace utils {
 	class stdout_term {
 	public:
 		void operator() (const char* s, uint16_t l) {
-			write(1, s, l);  // FD by stdout
+			write(STDOUT_FILENO, s, l);  // FD by stdout
 		}
 	};
 
