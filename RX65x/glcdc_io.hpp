@@ -8,7 +8,6 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/dmac_mgr.hpp"
 #include "RX65x/glcdc.hpp"
 #include "glcdc_def.hpp"
 #include "common/delay.hpp"
@@ -21,11 +20,17 @@ namespace device {
 		@param[in]	GLC		glcdc クラス
 		@param[in]	XSIZE	X 方向ピクセルサイズ
 		@param[in]	YSIZE	Y 方向ピクセルサイズ
-		@param[in]	PXT		ピクセル・タイプ
+		@param[in]	PXT_	ピクセル・タイプ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GLC, int32_t XSIZE, int32_t YSIZE, device::glcdc_def::PIX_TYPE PXT>
+	template <class GLC, int16_t XSIZE, int16_t YSIZE, device::glcdc_def::PIX_TYPE PXT_>
 	class glcdc_io {
+	public:
+		static const int16_t width  = XSIZE;
+		static const int16_t height = YSIZE;
+		static const device::glcdc_def::PIX_TYPE PXT = PXT_;
+
+	private:
 
 		static const uint32_t FRAME_LAYER_NUM  = 2;		///< Number of graphics layers
 		static const uint32_t CLUT_PLANE_NUM   = 2;		///< Number of color palletes
@@ -304,7 +309,7 @@ namespace device {
 
 		private:
 
-		static const uint32_t PIX_WIDTH        = static_cast<uint32_t>(PXT);
+		static const uint32_t PIX_WIDTH        = static_cast<uint32_t>(PXT_);
 		static const uint32_t BYTES_PER_LINE   = ((PIX_WIDTH * XSIZE) / 8);
 		static const uint32_t LINE_OFFSET      = (((BYTES_PER_LINE + 63) / 64) * 64);
 		static const uint32_t VXSIZE_PHYS      = ((LINE_OFFSET * 8) / PIX_WIDTH);
@@ -1632,33 +1637,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	X 軸幅を取得
-			@return X 軸幅
-		*/
-		//-----------------------------------------------------------------//
-		static int32_t get_xsize() noexcept { return XSIZE; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	Y 軸幅を取得
-			@return Y 軸幅
-		*/
-		//-----------------------------------------------------------------//
-		static int32_t get_ysize() noexcept { return YSIZE; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ピクセルタイプを取得
-			@return ピクセルタイプ
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_pxt() noexcept { return PXT; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	フレームバッファポインター取得
 			@return フレームバッファポインター
 		*/
@@ -1773,7 +1751,7 @@ namespace device {
 			// Single Line Data Transfer Count
 			// Single Frame Line Count
 
-			switch(PXT) {
+			switch(PXT_) {
 			case glcdc_def::PIX_TYPE::CLUT1:
 				cfg.input[FRAME_LAYER_2].format = glcdc_def::IN_FORMAT::CLUT1;
 				break;
@@ -2100,6 +2078,6 @@ namespace device {
 		}
 	};
 
-	template <class GLC, int32_t XSIZE, int32_t YSIZE, glcdc_def::PIX_TYPE PXT>
-		glcdc_def::ctrl_t glcdc_io<GLC, XSIZE, YSIZE, PXT>::ctrl_blk_;
+	template <class GLC, int16_t XSIZE, int16_t YSIZE, glcdc_def::PIX_TYPE PXT_>
+		glcdc_def::ctrl_t glcdc_io<GLC, XSIZE, YSIZE, PXT_>::ctrl_blk_;
 }

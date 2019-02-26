@@ -8,8 +8,8 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX65x/drw2d.hpp"
 #include "RX65x/glcdc_def.hpp"
+#include "RX65x/drw2d.hpp"
 
 #include "dave_base.h"
 #include "dave_videomodes.h"
@@ -27,16 +27,20 @@ namespace device {
 	/*!
 		@brief  DRW2D 制御／マネージャー
 		@param[in]	GLC		グラフィックス・コントローラー・クラス
-		@param[in]	DRW		DRW2D 制御クラス
+		@param[in]	AFONT	ASCII フォント
+		@param[in]	KFONT	漢字フォント
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GLC, class DRW>
+	template <class GLC, class AFONT, class KFONT>
 	class drw2d_mgr {
 
 		GLC&		glc_;
 
+		typedef device::DRW2D DRW;
+
+		KFONT&		kfont_;
+
 		d2_device*	d2_;
-		d2_renderbuffer*	rb_;
 
 		d2_color	color_;
 		vtx::srect	clip_;
@@ -49,9 +53,10 @@ namespace device {
 
 		d2_color	clut_[256];
 
+
 		static uint32_t get_mode_()
 		{
-			switch(GLC::get_pxt()) {
+			switch(GLC::PXT) {
 			case glcdc_def::PIX_TYPE::RGB888:
 				return d2_mode_argb8888;
 			case glcdc_def::PIX_TYPE::RGB565:
@@ -70,9 +75,6 @@ namespace device {
 
 		void setup_()
 		{
-			auto mode = get_mode_();
-			d2_framebuffer(d2_, glc_.get_layer2(), GLC::get_xsize(), GLC::get_xsize(), GLC::get_ysize(), mode);
-//			d2_selectrenderbuffer(d2_, rb_);
 			if(!set_color_) {
 				d2_setcolor(d2_, 0, color_);
 				set_color_ = true;
@@ -89,8 +91,8 @@ namespace device {
 			@param[in]	glc	GLC クラスの参照
 		*/
 		//-----------------------------------------------------------------//
-		drw2d_mgr(GLC& glc) noexcept : glc_(glc), d2_(nullptr), rb_(nullptr),
-			color_(0xffffffff), clip_(0, 0, GLC::get_xsize(), GLC::get_ysize()),
+		drw2d_mgr(GLC& glc, KFONT& kfont) noexcept : glc_(glc), kfont_(kfont), d2_(nullptr),
+			color_(0xffffffff), clip_(0, 0, GLC::width, GLC::height),
 			pen_size_(16), scale_(16),
 			set_color_(false), set_clip_(false), last_error_(D2_OK)
 		{ }
@@ -145,8 +147,6 @@ namespace device {
 
 			icu_mgr::install_group_task(DRW::get_irq_vec(), drw_int_isr);
 			icu_mgr::set_level(ICU::VECTOR::GROUPAL1, 2);
-
-			rb_ = d2_newrenderbuffer(d2_, dlis, stsz);
 
 			clut_[0] = 0xff000000;
 			clut_[1] = 0xffffffff;
@@ -231,29 +231,42 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	DRW2D フレーム・セットアップ
+			@brief	フレームを開始する
 		*/
 		//-----------------------------------------------------------------//
-		void setup_frame()
+		void start_frame() noexcept
 		{
-			set_clip_ = false;
-			setup_();
+			d2_startframe(d2_);
+
+			auto xs = GLC::width;
+			auto ys = GLC::height;
+			d2_framebuffer(d2_, glc_.get_fbp(), xs, xs, ys, get_mode_());
+			d2_cliprect(d2_, 0, 0, xs * 16, ys * 16);
+			d2_settexclut(d2_, clut_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フレームを終了する
+		*/
+		//-----------------------------------------------------------------//
+		void end_frame() noexcept
+		{
+			d2_endframe(d2_);
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	全クリア
+			@param[in]	col	クリアカラー
 			@return エラー無い場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool clear() noexcept
+		bool clear(d2_color col) noexcept
 		{
-			setup_();
-			last_error_ = d2_clear(d2_, color_);
-
-			d2_executerenderbuffer(d2_, rb_, 0);
-			d2_flushframe(d2_);
+			last_error_ = d2_clear(d2_, col);
 			return last_error_ == D2_OK;
 		}
 
@@ -271,9 +284,6 @@ namespace device {
 			setup_();
 			last_error_ = d2_renderline(d2_, org.x * scale_, org.y * scale_,
 				end.x * scale_, end.y * scale_, pen_size_, d2_le_exclude_none);
-
-			d2_executerenderbuffer(d2_, rb_, 0);
-			d2_flushframe(d2_);
 			return last_error_ == D2_OK;
 		}
 
@@ -287,14 +297,11 @@ namespace device {
 			@return エラー無い場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool circle(const vtx::spos& org, int16_t r, int16_t w = 0)
+		bool circle(const vtx::spos& org, int16_t r, int16_t w = 0) noexcept
 		{
 			setup_();
 			last_error_ = d2_rendercircle(d2_, org.x * scale_, org.y * scale_,
 				r * scale_, w * scale_);
-
-			d2_executerenderbuffer(d2_, rb_, 0);
-			d2_flushframe(d2_);
 			return last_error_ == D2_OK;
 		}
 
@@ -307,60 +314,83 @@ namespace device {
 			@return エラー無い場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool box(const vtx::spos& org, const vtx::spos& size)
+		bool box(const vtx::spos& org, const vtx::spos& size) noexcept
 		{
 			setup_();
 			last_error_ = d2_renderbox(d2_, org.x * scale_, org.y * scale_,
 				size.x * scale_, size.y * scale_);
-
-			d2_executerenderbuffer(d2_, rb_, 0);
-			d2_flushframe(d2_);
 			return last_error_ == D2_OK;
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	UTF-16 フォントの描画
+			@param[in]	pos		描画位置
+			@param[in]	cha		キャラクターコード
+		*/
+		//-----------------------------------------------------------------//
+		void draw_font_utf16(const vtx::spos& pos, uint16_t cha) noexcept
+		{
 
+
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フォントの描画
+			@param[in]	pos		描画位置
+			@param[in]	cha		キャラクターコード
+		*/
+		//-----------------------------------------------------------------//
+		void draw_font(const vtx::spos& pos, char cha) noexcept
+		{
+			const uint8_t* src = AFONT::get(cha);
+			d2_setblitsrc(d2_, src, 8, 8, 16, d2_mode_i1 | d2_mode_clut);
+			d2_blitcopy(d2_, 8, 16,
+				0, 0, 8 * 16, 16 * 16, pos.x * 16, pos.y * 16, d2_bf_filter);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	文字列の描画
+			@param[in]	pos		描画位置
+			@param[in]	str		文字列
+		*/
+		//-----------------------------------------------------------------//
+		void draw_text(const vtx::spos& pos, const char* str) noexcept
+		{
+			if(str == nullptr) return;
+
+			auto p = pos;
+			char ch;
+			while((ch = *str++) != 0) {
+				if(0x20 <= ch && ch <= 0x7f) {
+					draw_font(p, ch);
+					p.x += AFONT::width;
+				}
+			}
+		}
 
 
 		void copy_bitmap(const vtx::spos& pos)
 		{
-			d2_settexclut(d2_, clut_);
-
-			static const uint8_t src[8] = {
-				0b11111111,
-				0b11111101,
-				0b11111001,
-				0b11110001,
-				0b11100001,
-				0b11000001,
-				0b10000001,
-				0b11111111
+			static const uint8_t src[16] = {
+				0b11111111,0b11111111,
+				0b11111101,0b00111111,
+				0b11111001,0b00111111,
+				0b11110001,0b00111111,
+				0b11100001,0b00111111,
+				0b11000001,0b00111111,
+				0b10000001,0b00111111,
+				0b11111111,0b00111111
 			};
 
-			auto mode = get_mode_();
-			d2_framebuffer(d2_, glc_.get_fbp(), GLC::get_xsize(), GLC::get_xsize(), GLC::get_ysize(), mode);
-			d2_selectrenderbuffer(d2_, rb_);
-			d2_setblitsrc(d2_, (void*)src, 8, 8, 8, d2_mode_i1);
-			d2_blitcopy(d2_, 8, 8,
-				0, 0, 8 * 16, 8 * 16, pos.x * 16, pos.y * 16, d2_bf_usealpha);
-
-			d2_executerenderbuffer(d2_, rb_, 0);
-			d2_flushframe(d2_);
-		}
-
-
-		void test_frame(d2_color col, int16_t rad)
-		{
-			d2_startframe(d2_);
-			auto xs = GLC::get_xsize();
-			auto ys = GLC::get_ysize();
-			d2_framebuffer(d2_, glc_.get_fbp(), xs, xs, ys, d2_mode_rgb565);
-			d2_cliprect(d2_, 0, 0, xs * 16, ys * 16);
-			d2_clear(d2_, 0x000000);
-			d2_setcolor(d2_, 0, col);
-//			d2_renderbox(d2_, 480/2*16, 272/2*16, rad*16, rad*16);
-			d2_rendercircle(d2_, 480/2*16, 272/2*16, rad*16, 0);
-			d2_endframe(d2_);
+			d2_setblitsrc(d2_, (void*)src, 16, 16, 8, d2_mode_i1 | d2_mode_clut);
+			d2_blitcopy(d2_, 16, 8,
+				0, 0, 16 * 16, 8 * 16, pos.x * 16, pos.y * 16, d2_bf_filter | d2_bf_mirroru);
 		}
 
 
