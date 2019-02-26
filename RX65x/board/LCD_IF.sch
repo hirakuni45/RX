@@ -287,148 +287,294 @@ F 3 "http://www.ti.com/lit/gpn/sn74HCT574" H 6150 3950 50  0001 C CNN
 	1    6150 3950
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	8800 2250 8050 2250
-Wire Wire Line
-	8800 2350 8050 2350
-Wire Wire Line
-	8800 2450 8050 2450
-Wire Wire Line
-	8800 2550 8050 2550
-Wire Wire Line
-	8800 2650 8050 2650
-Wire Wire Line
-	8800 2750 8050 2750
-Wire Wire Line
-	8800 2850 8050 2850
-Wire Wire Line
-	8800 2950 8050 2950
-Wire Wire Line
-	8800 3050 8050 3050
-Wire Wire Line
-	8800 3150 8050 3150
-Wire Wire Line
-	8800 3250 8050 3250
-Wire Wire Line
-	8800 3350 8050 3350
-Wire Wire Line
-	8800 3450 8050 3450
-Wire Wire Line
-	8800 3550 8050 3550
-Wire Wire Line
-	8800 3650 8050 3650
-Wire Wire Line
-	8800 3750 8050 3750
-Wire Wire Line
-	8800 3850 8050 3850
-Wire Wire Line
-	8800 3950 8050 3950
-Wire Wire Line
-	8800 4050 8050 4050
-Wire Wire Line
-	8800 4150 8050 4150
-Wire Wire Line
-	8800 4250 8050 4250
-Wire Wire Line
-	8800 4350 8050 4350
-Wire Wire Line
-	8800 4450 8050 4450
-Wire Wire Line
-	8800 4550 8050 4550
 Entry Wire Line
-	7950 2350 8050 2250
+	7500 2350 7600 2250
 Entry Wire Line
-	7950 2450 8050 2350
+	7500 2450 7600 2350
 Entry Wire Line
-	7950 2550 8050 2450
+	7500 2550 7600 2450
 Entry Wire Line
-	7950 2650 8050 2550
+	7500 2650 7600 2550
 Entry Wire Line
-	7950 2750 8050 2650
+	7500 2750 7600 2650
 Entry Wire Line
-	7950 2850 8050 2750
+	7500 2850 7600 2750
 Entry Wire Line
-	7950 2950 8050 2850
+	7500 2950 7600 2850
 Entry Wire Line
-	7950 3050 8050 2950
+	7500 3050 7600 2950
 Entry Wire Line
-	7950 3150 8050 3050
+	7500 3150 7600 3050
 Entry Wire Line
-	7950 3250 8050 3150
+	7500 3250 7600 3150
 Entry Wire Line
-	7950 3350 8050 3250
+	7500 3350 7600 3250
 Entry Wire Line
-	7950 3450 8050 3350
+	7500 3450 7600 3350
 Entry Wire Line
-	7950 3550 8050 3450
+	7500 3550 7600 3450
 Entry Wire Line
-	7950 3650 8050 3550
+	7500 3650 7600 3550
 Entry Wire Line
-	7950 3750 8050 3650
+	7500 3750 7600 3650
 Entry Wire Line
-	7950 3850 8050 3750
+	7500 3850 7600 3750
 Entry Wire Line
-	7950 3950 8050 3850
+	7500 3950 7600 3850
 Entry Wire Line
-	7950 4050 8050 3950
+	7500 4050 7600 3950
 Entry Wire Line
-	7950 4150 8050 4050
+	7500 4150 7600 4050
 Entry Wire Line
-	7950 4250 8050 4150
+	7500 4250 7600 4150
 Entry Wire Line
-	7950 4350 8050 4250
+	7500 4350 7600 4250
 Entry Wire Line
-	7950 4450 8050 4350
+	7500 4450 7600 4350
 Entry Wire Line
-	7950 4550 8050 4450
+	7500 4550 7600 4450
 Entry Wire Line
-	7950 4650 8050 4550
-Text Label 8050 2250 0    50   ~ 0
+	7500 4650 7600 4550
+Text Label 7600 2250 0    50   ~ 0
 R0
-Text Label 8050 2350 0    50   ~ 0
+Text Label 7600 2350 0    50   ~ 0
 R1
-Text Label 8050 2450 0    50   ~ 0
+Text Label 7600 2450 0    50   ~ 0
 R2
-Text Label 8050 2550 0    50   ~ 0
+Text Label 7600 2550 0    50   ~ 0
 R3
-Text Label 8050 2650 0    50   ~ 0
+Text Label 7600 2650 0    50   ~ 0
 R4
-Text Label 8050 2750 0    50   ~ 0
+Text Label 7600 2750 0    50   ~ 0
 R5
-Text Label 8050 2850 0    50   ~ 0
+Text Label 7600 2850 0    50   ~ 0
 R6
-Text Label 8050 2950 0    50   ~ 0
+Text Label 7600 2950 0    50   ~ 0
 R7
-Text Label 8050 3050 0    50   ~ 0
+Text Label 7600 3050 0    50   ~ 0
 G0
-Text Label 8050 3150 0    50   ~ 0
+Text Label 7600 3150 0    50   ~ 0
 G1
-Text Label 8050 3250 0    50   ~ 0
+Text Label 7600 3250 0    50   ~ 0
 G2
-Text Label 8050 3350 0    50   ~ 0
+Text Label 7600 3350 0    50   ~ 0
 G3
-Text Label 8050 3450 0    50   ~ 0
+Text Label 7600 3450 0    50   ~ 0
 G4
-Text Label 8050 3550 0    50   ~ 0
+Text Label 7600 3550 0    50   ~ 0
 G5
-Text Label 8050 3650 0    50   ~ 0
+Text Label 7600 3650 0    50   ~ 0
 G6
-Text Label 8050 3750 0    50   ~ 0
+Text Label 7600 3750 0    50   ~ 0
 G7
-Text Label 8050 3850 0    50   ~ 0
+Text Label 7600 3850 0    50   ~ 0
 B0
-Text Label 8050 3950 0    50   ~ 0
+Text Label 7600 3950 0    50   ~ 0
 B1
-Text Label 8050 4050 0    50   ~ 0
+Text Label 7600 4050 0    50   ~ 0
 B2
-Text Label 8050 4150 0    50   ~ 0
+Text Label 7600 4150 0    50   ~ 0
 B3
-Text Label 8050 4250 0    50   ~ 0
+Text Label 7600 4250 0    50   ~ 0
 B4
-Text Label 8050 4350 0    50   ~ 0
+Text Label 7600 4350 0    50   ~ 0
 B5
-Text Label 8050 4450 0    50   ~ 0
+Text Label 7600 4450 0    50   ~ 0
 B6
-Text Label 8050 4550 0    50   ~ 0
+Text Label 7600 4550 0    50   ~ 0
 B7
+$Comp
+L akizuki:MR MR?
+U 1 1 5C6B7A71
+P 8300 2400
+F 0 "MR?" H 8000 2500 50  0000 C CNN
+F 1 "22" H 8550 2300 50  0000 C CNN
+F 2 "" H 8300 2400 50  0001 C CNN
+F 3 "" H 8300 2400 50  0001 C CNN
+	1    8300 2400
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:MR MR?
+U 1 1 5C6B7ACF
+P 8300 2800
+F 0 "MR?" H 8000 2900 50  0000 C CNN
+F 1 "22" H 8550 2700 50  0000 C CNN
+F 2 "" H 8300 2800 50  0001 C CNN
+F 3 "" H 8300 2800 50  0001 C CNN
+	1    8300 2800
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:MR MR?
+U 1 1 5C6B7B51
+P 8300 3200
+F 0 "MR?" H 8000 3300 50  0000 C CNN
+F 1 "22" H 8550 3100 50  0000 C CNN
+F 2 "" H 8300 3200 50  0001 C CNN
+F 3 "" H 8300 3200 50  0001 C CNN
+	1    8300 3200
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:MR MR?
+U 1 1 5C6B7BD1
+P 8300 3600
+F 0 "MR?" H 8000 3700 50  0000 C CNN
+F 1 "22" H 8550 3500 50  0000 C CNN
+F 2 "" H 8300 3600 50  0001 C CNN
+F 3 "" H 8300 3600 50  0001 C CNN
+	1    8300 3600
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:MR MR?
+U 1 1 5C6B7C1D
+P 8300 4000
+F 0 "MR?" H 8000 4100 50  0000 C CNN
+F 1 "22" H 8550 3900 50  0000 C CNN
+F 2 "" H 8300 4000 50  0001 C CNN
+F 3 "" H 8300 4000 50  0001 C CNN
+	1    8300 4000
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:MR MR?
+U 1 1 5C6B7C95
+P 8300 4400
+F 0 "MR?" H 8000 4500 50  0000 C CNN
+F 1 "22" H 8550 4300 50  0000 C CNN
+F 2 "" H 8300 4400 50  0001 C CNN
+F 3 "" H 8300 4400 50  0001 C CNN
+	1    8300 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:MR MR?
+U 1 1 5C6B7CE1
+P 8300 4900
+F 0 "MR?" H 8000 5000 50  0000 C CNN
+F 1 "22" H 8550 4800 50  0000 C CNN
+F 2 "" H 8300 4900 50  0001 C CNN
+F 3 "" H 8300 4900 50  0001 C CNN
+	1    8300 4900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8450 2250 8800 2250
+Wire Wire Line
+	8800 2350 8450 2350
+Wire Wire Line
+	8450 2450 8800 2450
+Wire Wire Line
+	8800 2550 8450 2550
+Wire Wire Line
+	8450 2650 8800 2650
+Wire Wire Line
+	8800 2750 8450 2750
+Wire Wire Line
+	8450 2850 8800 2850
+Wire Wire Line
+	8800 2950 8450 2950
+Wire Wire Line
+	8450 3050 8800 3050
+Wire Wire Line
+	8800 3150 8450 3150
+Wire Wire Line
+	8450 3250 8800 3250
+Wire Wire Line
+	8800 3350 8450 3350
+Wire Wire Line
+	8450 3450 8800 3450
+Wire Wire Line
+	8800 3550 8450 3550
+Wire Wire Line
+	8450 3650 8800 3650
+Wire Wire Line
+	8800 3750 8450 3750
+Wire Wire Line
+	8450 3850 8800 3850
+Wire Wire Line
+	8800 3950 8450 3950
+Wire Wire Line
+	8450 4050 8800 4050
+Wire Wire Line
+	8800 4150 8450 4150
+Wire Wire Line
+	8450 4250 8800 4250
+Wire Wire Line
+	8800 4350 8450 4350
+Wire Wire Line
+	8450 4450 8800 4450
+Wire Wire Line
+	8800 4550 8450 4550
+Wire Wire Line
+	8450 4750 8800 4750
+Wire Wire Line
+	8800 4850 8450 4850
+Wire Wire Line
+	8450 4950 8800 4950
+Wire Wire Line
+	8800 5050 8450 5050
+Wire Wire Line
+	8150 2250 7600 2250
+Wire Wire Line
+	7600 2350 8150 2350
+Wire Wire Line
+	8150 2450 7600 2450
+Wire Wire Line
+	7600 2550 8150 2550
+Wire Wire Line
+	7600 2650 8150 2650
+Wire Wire Line
+	7600 2750 8150 2750
+Wire Wire Line
+	8150 2850 7600 2850
+Wire Wire Line
+	7600 2950 8150 2950
+Wire Wire Line
+	8150 3050 7600 3050
+Wire Wire Line
+	7600 3150 8150 3150
+Wire Wire Line
+	8150 3250 7600 3250
+Wire Wire Line
+	7600 3350 8150 3350
+Wire Wire Line
+	8150 3450 7600 3450
+Wire Wire Line
+	7600 3550 8150 3550
+Wire Wire Line
+	8150 3650 7600 3650
+Wire Wire Line
+	7600 3750 8150 3750
+Wire Wire Line
+	8150 3850 7600 3850
+Wire Wire Line
+	7600 3950 8150 3950
+Wire Wire Line
+	8150 4050 7600 4050
+Wire Wire Line
+	7600 4150 8150 4150
+Wire Wire Line
+	8150 4250 7600 4250
+Wire Wire Line
+	7600 4350 8150 4350
+Wire Wire Line
+	8150 4450 7600 4450
+Wire Wire Line
+	7600 4550 8150 4550
+$Comp
+L akizuki:R R?
+U 1 1 5C709A63
+P 8300 5150
+F 0 "R?" H 8000 5100 50  0000 C CNN
+F 1 "22" H 8300 5150 50  0000 C CNN
+F 2 "" H 8300 5080 50  0000 C CNN
+F 3 "" V 8300 5150 50  0000 C CNN
+	1    8300 5150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8800 5150 8450 5150
 $EndSCHEMATC
