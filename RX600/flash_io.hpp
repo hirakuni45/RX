@@ -168,7 +168,7 @@ namespace device {
 					}
 				}
 			}
-
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 			device::FLASH::FCURAME = 0xC403;  // Write only
 
 			const uint32_t* src = reinterpret_cast<const uint32_t*>(0xFEFFF000);  // Farm master
@@ -178,7 +178,7 @@ namespace device {
 			}
 
 			device::FLASH::FCURAME = 0xC400;
-
+#endif
 			turn_pe_();
 
 			auto f = turn_break_();			
