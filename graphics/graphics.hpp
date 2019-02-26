@@ -55,10 +55,12 @@ namespace graphics {
 		GLC&		glc_;
 
 	public:
-		typedef base_color<uint16_t> COLOR;
+		typedef uint16_t T;
+		typedef T value_type;
+		typedef base_color<T> COLOR;
 
-		static const int16_t width  = static_cast<int16_t>(WIDTH);
-		static const int16_t height = static_cast<int16_t>(HEIGHT);
+		static const int16_t width  = GLC::width;
+		static const int16_t height = GLC::height;
 		static const int16_t afont_width  = AFONT::width;
 		static const int16_t afont_height = AFONT::height;
 		static const int16_t kfont_width  = KFONT::width;
@@ -116,14 +118,14 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
-			@param[in]	org		フレーム・バッファ先頭アドレス
+			@param[in]	glc		グラフィックス制御クラス
 			@param[in]	kf		漢字フォントクラス
 		*/
 		//-----------------------------------------------------------------//
-		render(void* org, KFONT& kf) noexcept : fb_(static_cast<T*>(org)), kfont_(kf),
+		render(GLC& glc, KFONT& kf) noexcept : glc_(glc), kfont_(kf),
 			fc_(COLOR::White), bc_(COLOR::Black),
 			code_(0), cnt_(0), stipple_(-1), stipple_mask_(1), ofs_(0)
-		{ }
+		{ fb_ = static_cast<T*>(glc_.get_fbp()); }
 
 
 		//-----------------------------------------------------------------//
@@ -234,8 +236,8 @@ namespace graphics {
 			if((stipple_ & m) == 0) {
 				return;
 			}
-			if(static_cast<uint16_t>(x) >= WIDTH) return;
-			if(static_cast<uint16_t>(y) >= HEIGHT) return;
+			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(width)) return;
+			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(height)) return;
 			fb_[y * line_offset + x] = c;
 		}
 
@@ -250,8 +252,8 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		T get_plot(int16_t x, int16_t y) const noexcept
 		{
-			if(static_cast<uint16_t>(x) >= WIDTH) return 0;
-			if(static_cast<uint16_t>(y) >= HEIGHT) return 0;
+			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(width)) return -1;
+			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(height)) return -1;
 			return fb_[y * line_offset + x];
 		}
 
@@ -268,15 +270,15 @@ namespace graphics {
 		void line_h(int16_t y, int16_t x, int16_t w, T c) noexcept
 		{
 			if(w <= 0) return;
-			if(static_cast<uint16_t>(y) >= HEIGHT) return;
+			if(y >= height) return;
 			if(x < 0) {
 				w += x;
 				x = 0;
-			} else if(x >= static_cast<int16_t>(WIDTH)) {
+			} else if(x >= width) {
 				return;
 			}
-			if((x + w) >= static_cast<int16_t>(WIDTH)) {
-				w = static_cast<int16_t>(WIDTH) - x;
+			if((x + w) >= width) {
+				w = width - x;
 			}
 			T* out = &fb_[y * line_offset + x];
 			for(int16_t i = 0; i < w; ++i) {
@@ -297,15 +299,15 @@ namespace graphics {
 		void line_v(int16_t x, int16_t y, int16_t h, T c) noexcept
 		{
 			if(h <= 0) return;
-			if(static_cast<uint16_t>(x) >= WIDTH) return;
+			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(width)) return;
 			if(y < 0) {
 				h += y;
 				y = 0;
-			} else if(y >= static_cast<int16_t>(HEIGHT)) {
+			} else if(y >= height) {
 				return;
 			}
-			if((y + h) >= static_cast<int16_t>(HEIGHT)) {
-				h = static_cast<int16_t>(HEIGHT) - y;
+			if((y + h) >= height) {
+				h = height - y;
 			}
 			T* out = &fb_[y * line_offset + x];
 			for(int16_t i = 0; i < h; ++i) {
@@ -346,7 +348,7 @@ namespace graphics {
 			if(sizeof(T) == 2) {  // 16 bits pixel
 				uint32_t c32 = (static_cast<uint32_t>(c) << 16) | c;
 				uint32_t* out = reinterpret_cast<uint32_t*>(fb_);
-				for(uint32_t i = 0; i < (WIDTH * HEIGHT) / 32; ++i) {
+				for(uint32_t i = 0; i < (width * height) / 32; ++i) {
 					*out++ = c32;
 					*out++ = c32;
 					*out++ = c32;
@@ -365,9 +367,9 @@ namespace graphics {
 					*out++ = c32;
 				}
 			} else {
-				for(uint32_t y = 0; y < HEIGHT; ++y) {
+				for(uint32_t y = 0; y < height; ++y) {
 					T* p = &fb_[line_offset * y];
-					for(uint32_t x = 0; x < WIDTH; ++x) {
+					for(uint32_t x = 0; x < width; ++x) {
 						*p++ = c;
 					}
 				}
@@ -625,12 +627,12 @@ namespace graphics {
 		void scroll(int16_t h) noexcept
 		{
 			if(h > 0) {
-				for(int32_t i = 0; i < (line_offset * (HEIGHT - h)); ++i) {
+				for(int32_t i = 0; i < (line_offset * (height - h)); ++i) {
 					fb_[i] = fb_[i + (line_offset * h)];
 				}
 			} else if(h < 0) {
 				h = -h;
-				for(int32_t i = (line_offset * (HEIGHT - h)) - 1; i >= 0; --i) {
+				for(int32_t i = (line_offset * (height - h)) - 1; i >= 0; --i) {
 					fb_[i + (line_offset * h)] = fb_[i];
 				}
 			}			
@@ -722,16 +724,16 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		void draw_font_utf16(int16_t x, int16_t y, uint16_t code) noexcept
 		{
-			if(y <= -AFONT::height || y >= static_cast<int16_t>(HEIGHT)) {
+			if(y <= -AFONT::height || y >= height) {
 				return;
 			}
 			if(code < 0x80) {
-				if(x <= -AFONT::width || x >= static_cast<int16_t>(WIDTH)) {
+				if(x <= -AFONT::width || x >= width) {
 					return;
 				}
 				draw_bitmap(x, y, AFONT::get(code), AFONT::width, AFONT::height);
 			} else {
-				if(x <= -KFONT::width || x >= static_cast<int16_t>(WIDTH)) {
+				if(x <= -KFONT::width || x >= width) {
 					return;
 				}
 				auto p = kfont_.get(code);
