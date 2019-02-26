@@ -62,15 +62,14 @@ namespace app {
 		/// GLCDC
 		static const int16_t LCD_X = 480;
 		static const int16_t LCD_Y = 272;
-//		static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
 		static const auto PIXT = device::glcdc_def::PIX_TYPE::RGB565;
 		typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
-		typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y, PIXT> DRW2D_MGR;
 
 		typedef graphics::font8x16 AFONT;
 		typedef graphics::kfont<16, 16, 64> KFONT;
 
-		typedef graphics::render<uint16_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
+		typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> DRW2D_MGR;
+		typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
 
 		// FT5206, SCI6 簡易 I2C 定義
 		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
@@ -91,8 +90,8 @@ namespace app {
 
 	private:
 		GLCDC_IO	glcdc_io_;
-		DRW2D_MGR	drw2d_mgr_;
 		KFONT		kfont_;
+		DRW2D_MGR	drw2d_mgr_;
 		RENDER		render_;
 
 	public:
@@ -191,7 +190,10 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		scenes_base(void* lcdorg = reinterpret_cast<void*>(0x00000100)) noexcept :
-			glcdc_io_(nullptr, lcdorg), drw2d_mgr_(lcdorg), render_(lcdorg, kfont_),
+			glcdc_io_(nullptr, lcdorg),
+			kfont_(),
+			drw2d_mgr_(glcdc_io_, kfont_),
+			render_(glcdc_io_, kfont_),
 			ft5206_(ft5206_i2c_), menu_(render_, back_), back_(render_), resource_(render_),
 			plot_(render_), img_in_(plot_) { }
 

@@ -52,8 +52,8 @@ namespace {
 #endif
 	KFONT		kfont_;
 
-	typedef graphics::render<uint16_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
-	RENDER		render_(LCD_ORG, kfont_);
+	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
+	RENDER		render_(glcdc_io_, kfont_);
 
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;

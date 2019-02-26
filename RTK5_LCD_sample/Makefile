@@ -31,7 +31,7 @@ PSOURCES	=	main.cpp \
 				graphics/font8x16.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	m supc++ z drw2d
+USER_LIBS	=	m supc++ drw2d
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
@@ -48,9 +48,9 @@ INC_SYS		=	/mingw64/include
 
 INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
 
-LIB_ROOT	=	../zlib ../RX65x/drw_2d_ver1.02
+LIB_ROOT	=	../RX65x/drw_2d_ver1.02
 
-OPTIMIZE	=	-Os
+OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

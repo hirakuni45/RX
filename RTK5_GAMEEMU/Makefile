@@ -33,7 +33,7 @@ PSOURCES	=	main.cpp \
 
 # BINARIES	=	graphics/kfont16.bin
 
-USER_LIBS	=	m supc++
+USER_LIBS	=	m supc++ drw2d
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
@@ -48,10 +48,10 @@ MCU_TARGET	=
 # for boost
 INC_SYS		=	/mingw64/include
 
-INC_APP		=	. ../ ../RX600 ../RX56x \
-				./emu ./emu/cpu ./emu/nes ./emu/mappers ./emu/sndhrdw ./emu/libsnss
+INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
 
-# OPTIMIZE	=	-Os
+LIB_ROOT	=	../RX65x/drw_2d_ver1.02
+
 OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \

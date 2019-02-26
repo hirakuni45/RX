@@ -84,24 +84,24 @@ namespace {
 	static const int16_t LCD_X = 480;
 	static const int16_t LCD_Y = 272;
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
-	static const auto PIXT = device::glcdc_def::PIX_TYPE::RGB565;
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
+	static const auto PIX = device::glcdc_def::PIX_TYPE::RGB565;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
-
-	typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y, PIXT> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_(LCD_ORG);
-
-	// QSPI B グループ
-	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
-	QSPI		qspi_;
 
 	typedef graphics::font8x16 AFONT;
 //	typedef graphics::kfont<16, 16, 64> KFONT;
 	typedef graphics::kfont<16, 16> KFONT;
 	KFONT		kfont_;
 
-	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
-	RENDER		render_(LCD_ORG, kfont_);
+	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_(glcdc_io_, kfont_);
+
+	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
+	RENDER		render_(glcdc_io_, kfont_);
+
+	// QSPI B グループ
+	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
+	QSPI		qspi_;
 
 	typedef graphics::filer<SDC, RENDER> FILER;
 	FILER		filer_(sdc_, render_);

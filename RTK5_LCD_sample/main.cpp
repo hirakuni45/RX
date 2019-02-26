@@ -19,9 +19,9 @@
 
 #define CASH_KFONT
 #include "graphics/kfont.hpp"
-#include "graphics/graphics.hpp"
-#include "graphics/jpeg_in.hpp"
-#include "graphics/bmp_in.hpp"
+//#include "graphics/graphics.hpp"
+//#include "graphics/jpeg_in.hpp"
+//#include "graphics/bmp_in.hpp"
 #include "chip/FT5206.hpp"
 
 #include "graphics/picojpeg_in.hpp"
@@ -41,6 +41,8 @@
 
 #include "usb/usb_io.hpp"
 #include "usb/usb_hmsc.hpp"
+
+#include "graphics/tgl.hpp"
 
 namespace {
 
@@ -91,15 +93,15 @@ namespace {
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
-	typedef device::drw2d_mgr<GLCDC_IO, device::DRW2D> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_(glcdc_io_);
-
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont<16, 16, 64> KFONT;
 	KFONT		kfont_;
 
-	typedef graphics::render<uint8_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
-	RENDER		render_(LCD_ORG, kfont_);
+	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_(glcdc_io_, kfont_);
+
+//	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
+//	RENDER		render_(glcdc_io_, kfont_);
 
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
@@ -117,10 +119,12 @@ namespace {
 	typedef chip::FT5206<FT5206_I2C> FT5206;
 	FT5206		ft5206_(ft5206_i2c_);
 
+#if 0
 	typedef img::scaling<RENDER> PLOT;
 	PLOT		plot_(render_);
 	typedef img::img_in<PLOT> IMG_IN;
 	IMG_IN		imgs_(plot_);
+#endif
 
 	// QSPI B グループ
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
@@ -176,7 +180,7 @@ namespace {
 				if(cmdn >= 2) {
 					char tmp[128];
 					cmd_.get_word(1, tmp, sizeof(tmp));
-					imgs_.load(tmp);
+///					imgs_.load(tmp);
 				}
 				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
@@ -269,6 +273,7 @@ extern "C" {
 		return sdc_.make_full_path(src, dst, len);
 	}
 
+#if 0
 	void gr_plot(int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b)
 	{
 		uint16_t c =   (static_cast<uint16_t>(r & 0xf8) << 8)
@@ -276,6 +281,7 @@ extern "C" {
               | (static_cast<uint16_t>(b & 0xf8) >> 3);
 		render_.plot(x, y, c);
 	}
+#endif
 }
 
 int main(int argc, char** argv);
@@ -347,12 +353,11 @@ int main(int argc, char** argv)
 	uint8_t task = 100;
 	FT5206::xy	pos;
 
-	uint8_t n = 0;
-	bool render = true;
 	bool sw2 = SW2::P();
+	uint8_t n = 0;
+
 	uint16_t rad = 10;
 	uint16_t render_task = 0;
-	uint16_t ttt = 0;
 	while(1) {
 		glcdc_io_.sync_vpos();
 		ft5206_.update();
@@ -428,42 +433,47 @@ int main(int argc, char** argv)
 //			pos = npos;
 		}
 
-		if(render) {
-			render_task &= 3;
-			switch(render_task) {
-			case 0:
-				drw2d_mgr_.set_color(0x000000);
-				drw2d_mgr_.box(vtx::spos(0, 0), vtx::spos(480, 272));
-				render = false;
-				break;
-			case 1:
-				drw2d_mgr_.set_color(0xffffff);
-				drw2d_mgr_.line(vtx::spos(0, 0), vtx::spos(480, 272));
+		render_task &= 3;
+		switch(render_task) {
+		case 0:
+			drw2d_mgr_.start_frame();
+			drw2d_mgr_.clear(0x000000);
+			drw2d_mgr_.end_frame();
+			break;
+		case 1:
+			drw2d_mgr_.start_frame();
+			drw2d_mgr_.clear(0x000000);
+			drw2d_mgr_.set_color(0xffffff);
+			drw2d_mgr_.line(vtx::spos(0, 0), vtx::spos(480, 272));
+			drw2d_mgr_.set_color(0xff00ff);
+			drw2d_mgr_.circle(vtx::spos(480/2, 272/2), 120, 10);
 
-				drw2d_mgr_.set_color(0xff00ff);
-				drw2d_mgr_.circle(vtx::spos(480/2, 272/2), 120, 10);
+			drw2d_mgr_.set_color(0xffff00);
+			drw2d_mgr_.box(vtx::spos(100, 50), vtx::spos(90, 45));
+			drw2d_mgr_.end_frame();
+			break;
+       		case 2:
+			drw2d_mgr_.start_frame();
+			drw2d_mgr_.clear(0x000000);
+			drw2d_mgr_.set_color(0x0000ff);
+			drw2d_mgr_.circle(vtx::spos(480/2, 272/2), rad, 0);
+			drw2d_mgr_.end_frame();
+			break;
+		case 3:
+			drw2d_mgr_.start_frame();
+			drw2d_mgr_.clear(0x000000);
+			drw2d_mgr_.set_color(0xffffff);
+			drw2d_mgr_.draw_text(vtx::spos(50, 100), "Asdfghjkl");
+			drw2d_mgr_.draw_text(vtx::spos(50, 116), "美しい漢字");
+			drw2d_mgr_.end_frame();
+			break;
 
-				drw2d_mgr_.set_color(0xffff00);
-				drw2d_mgr_.box(vtx::spos(100, 50), vtx::spos(90, 45));
-				render = false;
-				break;
-			case 2:
-//				drw2d_mgr_.test_frame(0xff00ff, rad);
-				render = true;
-				break;
-			default:
-				break;
-			}
-
-			if(render_task == 2) {
-//				if(rad & 1) {
-					drw2d_mgr_.test_frame(0xff00ff, rad);
-//				}
-			}
-
-			++rad;
-			if(rad >= 256) rad = 10;
+		default:
+			break;
 		}
+
+		++rad;
+		if(rad >= 256) rad = 10;
 
 		command_();
 
@@ -471,7 +481,6 @@ int main(int argc, char** argv)
 			auto f = SW2::P();
 			if(sw2 && !f) {
 				utils::format("SW2: Positive\n");
-				render = true;
 				++render_task;
 			}
 			if(!sw2 && f) {

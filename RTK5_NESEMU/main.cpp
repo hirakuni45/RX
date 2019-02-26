@@ -53,11 +53,11 @@ namespace {
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	static const uint16_t LCD_W = 480;
-	static const uint16_t LCD_H = 272;
+	static const uint16_t LCD_X = 480;
+	static const uint16_t LCD_Y = 272;
+	static const device::glcdc_def::PIX_TYPE PIX = device::glcdc_def::PIX_TYPE::RGB565;
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
-	typedef device::glcdc_io<device::GLCDC, LCD_W, LCD_H,
-		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
@@ -129,8 +129,8 @@ namespace {
 	typedef graphics::kfont<16, 16> KFONT;
 	KFONT		kfont_;
 
-	typedef graphics::render<uint16_t, 480, 272, AFONT, KFONT> RENDER;
-	RENDER		render_(LCD_ORG, kfont_);
+	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
+	RENDER		render_(glcdc_io_, kfont_);
 
 	typedef graphics::filer<SDC, RENDER> FILER;
 	FILER		filer_(sdc_, render_);
@@ -208,7 +208,7 @@ namespace {
 
 	void update_nesemu_()
 	{
-		nesemu_.service(LCD_ORG, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
+		nesemu_.service(LCD_ORG, GLCDC_IO::width, GLCDC_IO::height);
 
 		uint32_t len = nesemu_.get_audio_len();
 		const uint16_t* wav = nesemu_.get_audio_buf();
