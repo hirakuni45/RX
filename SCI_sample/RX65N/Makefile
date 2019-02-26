@@ -35,9 +35,9 @@ USER_DEFS	=	SIG_RX65N \
 
 MCU_TARGET	=	
 
-INC_SYS		=
+INC_SYS		=	/mingw64/include
 
-INC_APP		=	. ../ ../../
+INC_APP		=	. ../../ ../../RX65x/drw_2d_ver1.02/inc/tes
 
 OPTIMIZE	=	-O3
 
