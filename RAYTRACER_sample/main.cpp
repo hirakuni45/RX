@@ -48,7 +48,7 @@ namespace {
 	static const char* system_str_ = { "RX65N" };
 	static const uint16_t lcd_w_ = 480;
 	static const uint16_t lcd_h_ = 272;
-	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x00000000);
+	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x00000100);
 #elif defined(SIG_RX24T)
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
@@ -70,15 +70,15 @@ namespace {
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont_null KFONT;
 	KFONT	kfont_;
-	typedef graphics::render<uint16_t, lcd_w_, lcd_h_, AFONT> RENDER;
-	RENDER	render_(fb_, kfont_);	
+//	typedef graphics::render<uint16_t, lcd_w_, lcd_h_, AFONT> RENDER;
+//	RENDER	render_(fb_, kfont_);	
 
 #if defined(RX65_LCD)
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	typedef device::glcdc_io<device::GLCDC, 480, 272,
 		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
-	GLCDC_IO	glcdc_io_;
+	GLCDC_IO	glcdc_io_(fb_);
 #endif
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
@@ -142,7 +142,7 @@ extern "C" {
 	{
 #if defined(RX65_LCD)
 		auto c = RENDER::COLOR::rgb(r, g, b);
-		render_.plot(x, y, c);
+//		render_.plot(x, y, c);
 #else
 		volatile uint16_t c = (static_cast<uint16_t>(r & 0xf8) << 8)
 				   | (static_cast<uint16_t>(g & 0xfc) << 3)
@@ -155,8 +155,8 @@ extern "C" {
 	void draw_text(int x, int y, const char* t)
 	{
 #if defined(RX65_LCD)
-		render_.fill_box(x, y, strlen(t) * 8, 16, render_.get_back_color());
-		render_.draw_text(x, y, t);
+//		render_.fill_box(x, y, strlen(t) * 8, 16, render_.get_back_color());
+//		render_.draw_text(x, y, t);
 #endif
 	}
 
