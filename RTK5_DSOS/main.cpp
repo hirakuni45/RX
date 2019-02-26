@@ -81,9 +81,6 @@ namespace {
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
-	typedef device::drw2d_mgr<device::DRW2D, LCD_X, LCD_Y, PIXT> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_(LCD_ORG);
-
 	typedef graphics::font8x16 AFONT;
 #ifdef CASH_KFONT
 	typedef graphics::kfont<16, 16, 64> KFONT;
@@ -92,8 +89,11 @@ namespace {
 #endif
 	KFONT		kfont_;
 
-	typedef graphics::render<uint16_t, LCD_X, LCD_Y, AFONT, KFONT> RENDER;
-	RENDER		render_(LCD_ORG, kfont_);
+	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_(glcdc_io_, kfont_);
+
+	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
+	RENDER		render_(glcdc_io_, kfont_);
 
 	typedef utils::capture<2048> CAPTURE;
 	CAPTURE		capture_;
