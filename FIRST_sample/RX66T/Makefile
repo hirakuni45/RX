@@ -32,7 +32,7 @@ USER_DEFS	=	SIG_RX66T \
 
 MCU_TARGET	=	
 
-INC_SYS		=
+INC_SYS		=	/mingw64/include
 
 INC_APP		=	. ../ ../../
 
