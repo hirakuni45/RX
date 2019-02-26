@@ -363,7 +363,7 @@ int main(int argc, char** argv)
 				}
 			}
 		} else {
-			spinv_.service(LCD_ORG, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
+			spinv_.service(LCD_ORG, GLCDC_IO::width, GLCDC_IO::height);
 
 			SPINV::SND_MGR& snd = spinv_.at_sound();
 			uint32_t len = snd.get_length();
