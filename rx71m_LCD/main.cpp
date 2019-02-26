@@ -52,25 +52,34 @@ namespace {
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT		tft_;
 
-	static const uint32_t TFT_W = 320;
-	static const uint32_t TFT_H = 240;
+	class GLC {
+	public:
+		static const int16_t width  = 320;
+		static const int16_t height = 240;
 
-	uint16_t	fb_[TFT_W * TFT_H];
+	private:
+		uint16_t	fb_[width * height];
+	public:
+		void* get_fbp() noexcept {
+			return reinterpret_cast<void*>(fb_);
+		}
+	};
+	GLC		glc_;
 
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont_null KFONT;
 	KFONT	kfont_;
 
-	typedef graphics::render<uint16_t, TFT_W, TFT_H, AFONT, KFONT> RENDER;
-	RENDER	render_(fb_, kfont_);
+	typedef graphics::render<GLC, AFONT, KFONT> RENDER;
+	RENDER	render_(glc_, kfont_);
 
 
 	void copy_fb_()
 	{
-		const uint16_t* src = fb_;
-		for(uint16_t y = 0; y < TFT_H; ++y) {
-			tft_.copy(0, y, src, TFT_W);
-			src += TFT_W;
+		const uint16_t* src = static_cast<const uint16_t*>(glc_.get_fbp());
+		for(uint16_t y = 0; y < GLC::height; ++y) {
+			tft_.copy(0, y, src, GLC::width);
+			src += GLC::width;
 		}
 	}
 }
