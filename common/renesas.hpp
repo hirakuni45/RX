@@ -26,6 +26,9 @@
 #include "RX24T/flash.hpp"
 #include "RX24T/flash_io.hpp"
 
+#elif defined(SIG_RX621) || defined(SIG_RX62N)
+#include "RX62x/system.hpp"
+
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"

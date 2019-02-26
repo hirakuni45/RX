@@ -120,7 +120,7 @@ namespace utils {
 
 		void operator() (char ch) {
 			char tmp = ch;
-			write(1, &tmp, 1);  // FD by stdout
+			write(STDOUT_FILENO, &tmp, 1);
 			++size_;
 		}
 
@@ -138,7 +138,7 @@ namespace utils {
 	class stdout_term {
 	public:
 		void operator() (const char* s, uint16_t l) {
-			write(STDOUT_FILENO, s, l);  // FD by stdout
+			write(STDOUT_FILENO, s, l);
 		}
 	};
 

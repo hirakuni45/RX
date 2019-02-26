@@ -15,6 +15,7 @@
 #include <sys/time.h>
 #include <sys/times.h>
 #include <sys/errno.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -185,14 +186,14 @@ int open(const char *path, int flags, ...)
 	@return		読み込みバイト数
 */
 //-----------------------------------------------------------------//
-int read(int file, void *ptr, int len)
+_READ_WRITE_RETURN_TYPE read(int file, void *ptr, size_t len)
 {
 	if(ptr == NULL) return 0;
 
-	int l = 0;
+	_READ_WRITE_RETURN_TYPE l = 0;
 	if(file >= 0 && file <= 2) {
 		// stdin
-		if(file == 0) {
+		if(file == STDIN_FILENO) {
 			char *p = ptr;
 			for(int i = 0; i < len; ++i) {
 				char ch = sci_getch();
@@ -252,11 +253,11 @@ int read(int file, void *ptr, int len)
 	@return		書き込みバイト数
 */
 //-----------------------------------------------------------------//
-int write(int file, const void *ptr, int len)
+_READ_WRITE_RETURN_TYPE write(int file, const void *ptr, size_t len)
 {
 	if(ptr == NULL) return 0;
 
-	int l = -1;
+	_READ_WRITE_RETURN_TYPE l = -1;
 	if(file >= 0 && file <= 2) {
 		if(file == 1 || file == 2) {
 			const char *p = ptr;
@@ -306,7 +307,7 @@ int write(int file, const void *ptr, int len)
 	@return		成功した場合、先頭からの位置で返す、失敗したら「-1」
 */
 //-----------------------------------------------------------------//
-int lseek(int file, int offset, int dir)
+off_t lseek(int file, off_t offset, int dir)
 {
 	int pos = -1;
 	if(file >= 0 && file <= 2) {
@@ -352,7 +353,7 @@ int lseek(int file, int offset, int dir)
 		errno = EBADF;
 	}
 #endif
-	return pos;
+	return (off_t)pos;
 }
 
 
@@ -604,7 +605,7 @@ void kill(int n, int m)
 }
 
 
-int getpid(int n)
+pid_t getpid()
 {
-	return 1;
+	return (pid_t)1;
 }
