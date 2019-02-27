@@ -55,7 +55,7 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
-	static const device::glcdc_def::PIX_TYPE PIX = device::glcdc_def::PIX_TYPE::RGB565;
+	static const graphics::pixel::TYPE PIX = graphics::pixel::TYPE::RGB565;
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);

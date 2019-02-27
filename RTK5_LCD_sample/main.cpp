@@ -19,7 +19,7 @@
 
 #define CASH_KFONT
 #include "graphics/kfont.hpp"
-//#include "graphics/graphics.hpp"
+#include "graphics/graphics.hpp"
 //#include "graphics/jpeg_in.hpp"
 //#include "graphics/bmp_in.hpp"
 #include "chip/FT5206.hpp"
@@ -88,9 +88,8 @@ namespace {
 	static const int16_t LCD_X = 480;
 	static const int16_t LCD_Y = 272;
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
-	static const auto PIXT = device::glcdc_def::PIX_TYPE::RGB565;
-//		device::glcdc_def::PIX_TYPE::CLUT8
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
+	static const auto PXT = graphics::pixel::TYPE::RGB565;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PXT> GLCDC_IO;
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
 	typedef graphics::font8x16 AFONT;
@@ -100,8 +99,8 @@ namespace {
 	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> DRW2D_MGR;
 	DRW2D_MGR	drw2d_mgr_(glcdc_io_, kfont_);
 
-//	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
-//	RENDER		render_(glcdc_io_, kfont_);
+	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
+	RENDER		render_(glcdc_io_, kfont_);
 
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;

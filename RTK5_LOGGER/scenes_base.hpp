@@ -62,8 +62,8 @@ namespace app {
 		/// GLCDC
 		static const int16_t LCD_X = 480;
 		static const int16_t LCD_Y = 272;
-		static const auto PIXT = device::glcdc_def::PIX_TYPE::RGB565;
-		typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
+		static const auto PIX = graphics::pixel::TYPE::RGB565;
+		typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
 
 		typedef graphics::font8x16 AFONT;
 		typedef graphics::kfont<16, 16, 64> KFONT;

@@ -84,7 +84,7 @@ namespace {
 	static const int16_t LCD_X = 480;
 	static const int16_t LCD_Y = 272;
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
-	static const auto PIX = device::glcdc_def::PIX_TYPE::RGB565;
+	static const auto PIX = graphics::pixel::TYPE::RGB565;
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
