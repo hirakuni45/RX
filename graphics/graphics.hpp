@@ -55,6 +55,7 @@ namespace graphics {
 		GLC&		glc_;
 
 	public:
+//		typedef typename device::glcdc_def::pix<GLC::PXT>::type T;
 		typedef uint16_t T;
 		typedef T value_type;
 		typedef base_color<T> COLOR;
