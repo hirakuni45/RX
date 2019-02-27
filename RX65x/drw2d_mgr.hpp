@@ -57,15 +57,15 @@ namespace device {
 		static uint32_t get_mode_()
 		{
 			switch(GLC::PXT) {
-			case glcdc_def::PIX_TYPE::RGB888:
+			case graphics::pixel::TYPE::RGB888:
 				return d2_mode_argb8888;
-			case glcdc_def::PIX_TYPE::RGB565:
+			case graphics::pixel::TYPE::RGB565:
 				return d2_mode_rgb565;
-			case glcdc_def::PIX_TYPE::CLUT8:
+			case graphics::pixel::TYPE::CLUT8:
 				return d2_mode_i8;
-			case glcdc_def::PIX_TYPE::CLUT4:
+			case graphics::pixel::TYPE::CLUT4:
 				return d2_mode_i4;
-			case glcdc_def::PIX_TYPE::CLUT1:
+			case graphics::pixel::TYPE::CLUT1:
 				return d2_mode_i1;
 			default:
 				return d2_mode_rgb565;

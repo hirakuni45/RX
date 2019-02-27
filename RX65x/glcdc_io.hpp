@@ -8,6 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "graphics/pixel.hpp"
 #include "RX65x/glcdc.hpp"
 #include "glcdc_def.hpp"
 #include "common/delay.hpp"
@@ -23,12 +24,12 @@ namespace device {
 		@param[in]	PXT_	ピクセル・タイプ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GLC, int16_t XSIZE, int16_t YSIZE, device::glcdc_def::PIX_TYPE PXT_>
+	template <class GLC, int16_t XSIZE, int16_t YSIZE, graphics::pixel::TYPE PXT_>
 	class glcdc_io {
 	public:
 		static const int16_t width  = XSIZE;
 		static const int16_t height = YSIZE;
-		static const device::glcdc_def::PIX_TYPE PXT = PXT_;
+		static const graphics::pixel::TYPE PXT = PXT_;
 
 	private:
 
@@ -1752,21 +1753,21 @@ namespace device {
 			// Single Frame Line Count
 
 			switch(PXT_) {
-			case glcdc_def::PIX_TYPE::CLUT1:
+			case graphics::pixel::TYPE::CLUT1:
 				cfg.input[FRAME_LAYER_2].format = glcdc_def::IN_FORMAT::CLUT1;
 				break;
-			case glcdc_def::PIX_TYPE::CLUT4:
+			case graphics::pixel::TYPE::CLUT4:
 				cfg.input[FRAME_LAYER_2].format = glcdc_def::IN_FORMAT::CLUT4;
 				break;
-			case glcdc_def::PIX_TYPE::CLUT8:
+			case graphics::pixel::TYPE::CLUT8:
 				cfg.input[FRAME_LAYER_2].format = glcdc_def::IN_FORMAT::CLUT8;
 				break;
-			case glcdc_def::PIX_TYPE::RGB565:
+			case graphics::pixel::TYPE::RGB565:
 				cfg.input[FRAME_LAYER_2].format = glcdc_def::IN_FORMAT::RGB565;
 				break;
 //  (GLCDC_IN_FORMAT_16BITS_ARGB1555)
 //  (GLCDC_IN_FORMAT_16BITS_ARGB4444)
-			case glcdc_def::PIX_TYPE::RGB888:
+			case graphics::pixel::TYPE::RGB888:
 				cfg.input[FRAME_LAYER_2].format = glcdc_def::IN_FORMAT::RGB888;
 				break;
 //  (GLCDC_IN_FORMAT_32BITS_ARGB8888)
@@ -2078,6 +2079,6 @@ namespace device {
 		}
 	};
 
-	template <class GLC, int16_t XSIZE, int16_t YSIZE, glcdc_def::PIX_TYPE PXT_>
+	template <class GLC, int16_t XSIZE, int16_t YSIZE, graphics::pixel::TYPE PXT_>
 		glcdc_def::ctrl_t glcdc_io<GLC, XSIZE, YSIZE, PXT_>::ctrl_blk_;
 }
