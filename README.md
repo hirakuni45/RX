@@ -36,7 +36,7 @@ Renesas RX マイコン
  - [/RX66T](./RX66T)        ---> RX66T 専用デバイス定義クラス、リンカースクリプト
  - /ff12b                   ---> ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ
  - [/common](./common)      ---> 共有クラス、ヘッダーなど
- - [/chip](./chip)          ---> I2C、SPI、など各種デバイス固有制御ライブラリ
+ - [/chip](./chip)          ---> I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ
  - [/graphics](./graphics)  ---> グラフィックス関係操作クラス
  - [/sound](./sound)        ---> サウンド関係操作クラス
  - /r_net                   ---> ルネサス T4(TCP/UDP) ライブラリと、C++ ハンドラ、ラッパー
@@ -44,8 +44,8 @@ Renesas RX マイコン
  - /jpeg-6b                 ---> JPEG ライブラリ
  - [rxprog](./rxprog)       ---> RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
  - [FIRST_sample](./FIRST_sample)　　　　---> 各プラットホーム対応 LED 点滅プログラム
- - [RAYTRACER_sample](./RAYTRACER_sample)　　　---> 各プラットホーム対応 レイトレーシング・ベンチマーク
  - [SCI_sample](./SCI_sample)　　　　　---> 各プラットホーム対応 SCI サンプルプログラム
+ - [RAYTRACER_sample](./RAYTRACER_sample)　　　---> 各プラットホーム対応 レイトレーシング・ベンチマーク
  - /rx24t_SDC_sample　 ---> RX24T を使った SD カードの動作サンプル
  - /rx24t_GPS_sample　 ---> RX24T を使った GPS の動作サンプル
  - /rx24t_DATA_FLASH_sample ---> RX24T を使った内臓データ・フラッシュ操作サンプル
@@ -518,17 +518,25 @@ extern "C" {
     uint16_t sci_length() { return sci_.recv_length(); }
 }
 
-//-----
+int main(int argc, char** argv);
 
-{  // メイン、SCI 開始
-    uint8_t intr = 2;        // 割り込みレベル
-    uint32_t baud = 115200;  // ボーレート
-    sci_.start(baud, intr);
-}
+int main(int argc, char** argv)
+{
+    SYSTEM_IO::setup_system_clock();
 
-//-----
-{  // メイン、SCI 出力
-    utils::format("Start SCI\n");
+	{  // メイン、SCI 開始
+       uint8_t intr = 2;        // 割り込みレベル
+       uint32_t baud = 115200;  // ボーレート
+       sci_.start(baud, intr);
+	}
+
+	//-----
+	{  // メイン、SCI 出力
+       utils::format("Start SCI\n");
+	}
+
+	// 永久ループ
+	while(1) ;
 }
 ```
    
