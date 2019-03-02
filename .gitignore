@@ -25,4 +25,4 @@ libmad/
 jpeg-6b/
 !zlib/libz.a
 !RTK5_RAYTRACER/raytracer.mot
-.vscode/
+
