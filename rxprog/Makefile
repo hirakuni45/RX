@@ -152,6 +152,7 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll
 
 install:
+	mkdir -p /usr/local/bin
 	cp $(TARGET).exe /usr/local/bin/.
 	cp $(TARGET).conf /usr/local/bin/.
 
