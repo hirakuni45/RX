@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T グループ・ICUb 定義
+	@brief	RX621/RX62N グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -35,19 +35,33 @@ namespace device {
 			CMI1    = 29,   ///< CMT1
 			CMI2    = 30,   ///< CMT2
 			CMI3    = 31,   ///< CMT3
-			FERRF   = 32,	///< CAC
-			MENDF   = 33,	///< CAC
-			OVFF    = 34,	///< CAC
+			EINT    = 32,	///< Ethernet
 
-			ETGIN   = 40,	///< GPT
-			ETGIP   = 41,	///< GPT
+			D0FIFO0	= 36,	///< USB0
+			D1FIFO0	= 37,	///< USB0
+			USBI0   = 38,	///< USB0
+
+			D0FIFO1	= 40,	///< USB1
+			D1FIFO1	= 41,	///< USB1
+			USBI1   = 42,	///< USB1
 
 			SPEI0   = 44,	///< RSPI0
 			SPRI0   = 45,	///< RSPI0
 			SPTI0   = 46,	///< RSPI0
 			SPII0   = 47,	///< RSPI0
+			SPEI1   = 48,	///< RSPI1
+			SPRI1   = 49,	///< RSPI1
+			SPTI1   = 50,	///< RSPI1
+			SPII1   = 51,	///< RSPI1
 
-			DOPCF   = 57,	///< DOC
+			ERS0	= 56,	///< CAN0
+			RXF0	= 57,	///< CAN0
+			TXF0	= 58,	///< CAN0
+			RXM0	= 59,	///< CAN0
+			TXM0	= 60,	///< CAN0			
+
+			PRD		= 62,	///< RTC
+			CUP		= 63,	///< RTC
 
 			IRQ0    = 64,	///< ICU
 			IRQ1    = 65,
@@ -57,22 +71,25 @@ namespace device {
 			IRQ5    = 69,
 			IRQ6    = 70,
 			IRQ7    = 71,
+			IRQ8    = 72,
+			IRQ9    = 73,
+			IRQ10   = 74,
+			IRQ11   = 75,
+			IRQ12   = 76,
+			IRQ13   = 77,
+			IRQ14   = 78,
+			IRQ15   = 79,
 
-			LVD1    = 88,   ///< LVD
-			LVD2    = 89,   ///< LVD
+			USBR0	= 90,	///< USB
+			USBR1	= 91,	///< USB
+			ALM		= 92,	///< RTC
 
-			S12ADI  = 102,  ///< S12ADI
-			GBADI   = 103,  ///< S12AD
-			GCADI   = 104,  ///< S12AD
-			S12ADI1 = 105,  ///< S12ADI1
-			GBADI1  = 106,  ///< S12AD1
-			GCADI1  = 107,  ///< S12AD1
-			CMPC0   = 108,  ///< CMPC0
-			CMPC1   = 109,  ///< CMPC1
-			CMPC2   = 110,  ///< CMPC2
-			S12ADI2 = 111,  ///< S12AD2
-			GBADI2  = 112,  ///< S12AD2
-			GCADI2  = 113,  ///< S12AD2
+			WOVI	= 96,	///< WDT
+
+			ADI0	= 98,	///< AD0
+			ADI1	= 99,	///< AD1
+
+			S12ADI0	= 102,	///< S12AD
 
 			TGIA0   = 114,  ///< MTU0
 			TGIB0   = 115,  ///< MTU0
@@ -127,6 +144,19 @@ namespace device {
 			TCIV9   = 163,  ///< MTU9
 			TGIE9   = 164,  ///< MTU9
 			TGIF9   = 165,  ///< MTU9
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			OEI1	= 168,	///< POE
 			OEI2	= 169,	///< POE

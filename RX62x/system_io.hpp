@@ -1,15 +1,15 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX24T システム制御
+	@brief	RX621/RX62N システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX24T/system.hpp"
-#include "RX24T/flash.hpp"
+#include "RX62x/system.hpp"
+#include "RX62x/flash.hpp"
 
 #ifndef F_ICLK
 #  error "system_io.hpp requires F_ICLK to be defined"
@@ -20,13 +20,15 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  systen_io クラス
-		@param[in]	BASE_CLOCK	ベース・クロック周波数（１０ＭＨｚ）
-		@param[in]	INTR_CLOCK	内臓クロック周波数（８０ＭＨｚ）
+		@param[in]	BASE_CLOCK	ベース・クロック周波数（１２ＭＨｚ）
+		@param[in]	INTR_CLOCK	内臓クロック周波数（９６ＭＨｚ）@n
+								※最大速度は 100MHz だが、USB 使う前程だと @n
+								12MHz の整数倍にする必要がある。
 		@param[in]	EXT_CLOCK	外部クロック入力を使う場合「true」@n
 								※クリスタル利用は「false」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t BASE_CLOCK = 10000000, uint32_t INTR_CLOCK = 80000000,
+	template <uint32_t BASE_CLOCK = 12000000, uint32_t INTR_CLOCK = 96000000,
 		bool EXT_CLOCK = false>
 	struct system_io {
 
