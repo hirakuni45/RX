@@ -22,6 +22,18 @@ extern "C" {
 
 namespace graphics {
 
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	漢字 無効フォント定義
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	class kfont_null {
+	public:
+		static const int8_t width = 0;
+		static const int8_t height = 0;
+		const uint8_t* get(uint16_t code) { return nullptr; }
+	};
+
 #ifndef CASH_KFONT
 	struct kfont_bitmap {
 		static const uint8_t kfont_start[];
@@ -44,6 +56,9 @@ namespace graphics {
 	class kfont {
 
 		static const uint32_t FONTS = ((WIDTH * HEIGHT) + 7) / 8;
+
+		uint16_t	code_;
+		int8_t		cnt_;
 
 #ifdef CASH_KFONT
 		struct kanji_cash {
@@ -87,9 +102,9 @@ namespace graphics {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		kfont() noexcept 
+		kfont() noexcept : code_(0), cnt_(0) 
 #ifdef CASH_KFONT
-			: cash_(), cash_idx_(0)
+			, cash_(), cash_idx_(0)
 #endif
 			{ }
 
@@ -174,5 +189,49 @@ namespace graphics {
 			return &kfont_bitmap::kfont_start[lin * FONTS];
 #endif
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	UTF-8 コードを押し込む
+			@return UTF-16 コードが完了した場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool injection_utf8(uint8_t ch) noexcept
+		{
+			if(ch < 0x80) {
+				code_ = ch;
+				return true;
+			} else if((ch & 0xf0) == 0xe0) {
+				code_ = (ch & 0x0f);
+				cnt_ = 2;
+				return false;
+			} else if((ch & 0xe0) == 0xc0) {
+				code_ = (ch & 0x1f);
+				cnt_ = 1;
+				return false;
+			} else if((ch & 0xc0) == 0x80) {
+				code_ <<= 6;
+				code_ |= ch & 0x3f;
+				cnt_--;
+				if(cnt_ <= 0 && code_ < 0x80) {
+					code_ = 0;	// 不正なコードとして無視
+					return true;
+				}
+			}
+			if(cnt_ == 0 && code_ != 0) {
+				return true;
+			}
+			return false;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	UTF-16 コードを取得
+			@return UTF-16 コード
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_utf16() const noexcept { return code_; }
 	};
 }

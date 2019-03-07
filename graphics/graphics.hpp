@@ -9,37 +9,12 @@
 */
 //=====================================================================//
 #include "graphics/color.hpp"
+#include "graphics/afont.hpp"
+#include "graphics/kfont.hpp"
 #include "common/intmath.hpp"
 #include "common/circle.hpp"
 
 namespace graphics {
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief	ASCII 無効フォント定義
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class afont_null {
-	public:
-		static const int8_t width  = 0;
-		static const int8_t height = 0;
-		static const uint8_t* get(uint8_t code) { return nullptr; }
-		static const int8_t get_width(uint8_t code) { return 0; }
-	};
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief	漢字 無効フォント定義
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class kfont_null {
-	public:
-		static const int8_t width = 0;
-		static const int8_t height = 0;
-		const uint8_t* get(uint16_t code) { return nullptr; }
-	};
-
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -55,21 +30,21 @@ namespace graphics {
 		GLC&		glc_;
 
 	public:
+		static const uint16_t VERSION = 100;
+
 //		typedef typename device::glcdc_def::pix<GLC::PXT>::type T;
 		typedef uint16_t T;
 		typedef T value_type;
 		typedef base_color<T> COLOR;
 
-		static const int16_t width  = GLC::width;
-		static const int16_t height = GLC::height;
-		static const int16_t afont_width  = AFONT::width;
-		static const int16_t afont_height = AFONT::height;
-		static const int16_t kfont_width  = KFONT::width;
-		static const int16_t kfont_height = KFONT::height;
+		typedef GLC glc_type;
+		typedef AFONT afont_type;
+		typedef KFONT kfont_type;
+
 		static const int16_t font_height  = KFONT::height < AFONT::height
 			? AFONT::height : KFONT::height;
 
-		static const int16_t line_offset = (((width * sizeof(T)) + 63) & 0x7fc0) / sizeof(T);
+		static const int16_t line_offset = (((GLC::width * sizeof(T)) + 63) & 0x7fc0) / sizeof(T);
 
 		static const int16_t round_radius = 8;
 
@@ -80,9 +55,6 @@ namespace graphics {
 
 		T			fc_;
 		T			bc_;
-
-		uint16_t	code_;
-		uint8_t		cnt_;
 
 		uint32_t	stipple_;
 		uint32_t	stipple_mask_;
@@ -125,8 +97,34 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		render(GLC& glc, KFONT& kf) noexcept : glc_(glc), kfont_(kf),
 			fc_(COLOR::White), bc_(COLOR::Black),
-			code_(0), cnt_(0), stipple_(-1), stipple_mask_(1), ofs_(0)
+			stipple_(-1), stipple_mask_(1), ofs_(0)
 		{ fb_ = static_cast<T*>(glc_.get_fbp()); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ハードウェアーバージョンを取得
+			@return ハードウェアーバージョン
+		*/
+		//-----------------------------------------------------------------//
+		uint16_t get_version() const noexcept { return VERSION; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	開始 @n
+					※互換性の為に用意
+			@return エラーなら「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool start() noexcept
+		{
+			return true;
+		}
+
+
+		void start_frame() noexcept { }
+		void end_frame() noexcept { }
 
 
 		//-----------------------------------------------------------------//
@@ -237,8 +235,8 @@ namespace graphics {
 			if((stipple_ & m) == 0) {
 				return;
 			}
-			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(width)) return;
-			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(height)) return;
+			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(GLC::width)) return;
+			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(GLC::height)) return;
 			fb_[y * line_offset + x] = c;
 		}
 
@@ -253,8 +251,8 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		T get_plot(int16_t x, int16_t y) const noexcept
 		{
-			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(width)) return -1;
-			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(height)) return -1;
+			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(GLC::width)) return -1;
+			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(GLC::height)) return -1;
 			return fb_[y * line_offset + x];
 		}
 
@@ -271,15 +269,15 @@ namespace graphics {
 		void line_h(int16_t y, int16_t x, int16_t w, T c) noexcept
 		{
 			if(w <= 0) return;
-			if(y >= height) return;
+			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(GLC::height)) return;
 			if(x < 0) {
 				w += x;
 				x = 0;
-			} else if(x >= width) {
+			} else if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(GLC::width)) {
 				return;
 			}
-			if((x + w) >= width) {
-				w = width - x;
+			if(static_cast<uint16_t>(x + w) >= static_cast<uint16_t>(GLC::width)) {
+				w = GLC::width - x;
 			}
 			T* out = &fb_[y * line_offset + x];
 			for(int16_t i = 0; i < w; ++i) {
@@ -300,15 +298,15 @@ namespace graphics {
 		void line_v(int16_t x, int16_t y, int16_t h, T c) noexcept
 		{
 			if(h <= 0) return;
-			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(width)) return;
+			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(GLC::width)) return;
 			if(y < 0) {
 				h += y;
 				y = 0;
-			} else if(y >= height) {
+			} else if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(GLC::height)) {
 				return;
 			}
-			if((y + h) >= height) {
-				h = height - y;
+			if(static_cast<uint16_t>(y + h) >= static_cast<uint16_t>(GLC::height)) {
+				h = GLC::height - y;
 			}
 			T* out = &fb_[y * line_offset + x];
 			for(int16_t i = 0; i < h; ++i) {
@@ -349,7 +347,7 @@ namespace graphics {
 			if(sizeof(T) == 2) {  // 16 bits pixel
 				uint32_t c32 = (static_cast<uint32_t>(c) << 16) | c;
 				uint32_t* out = reinterpret_cast<uint32_t*>(fb_);
-				for(uint32_t i = 0; i < (width * height) / 32; ++i) {
+				for(uint32_t i = 0; i < (GLC::width * GLC::height) / 32; ++i) {
 					*out++ = c32;
 					*out++ = c32;
 					*out++ = c32;
@@ -368,9 +366,9 @@ namespace graphics {
 					*out++ = c32;
 				}
 			} else {
-				for(uint32_t y = 0; y < height; ++y) {
+				for(auto y = 0; y < GLC::height; ++y) {
 					T* p = &fb_[line_offset * y];
-					for(uint32_t x = 0; x < width; ++x) {
+					for(auto x = 0; x < GLC::width; ++x) {
 						*p++ = c;
 					}
 				}
@@ -628,12 +626,12 @@ namespace graphics {
 		void scroll(int16_t h) noexcept
 		{
 			if(h > 0) {
-				for(int32_t i = 0; i < (line_offset * (height - h)); ++i) {
+				for(int32_t i = 0; i < (line_offset * (GLC::height - h)); ++i) {
 					fb_[i] = fb_[i + (line_offset * h)];
 				}
 			} else if(h < 0) {
 				h = -h;
-				for(int32_t i = (line_offset * (height - h)) - 1; i >= 0; --i) {
+				for(int32_t i = (line_offset * (GLC::height - h)) - 1; i >= 0; --i) {
 					fb_[i + (line_offset * h)] = fb_[i];
 				}
 			}			
@@ -717,33 +715,32 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	フォントを描画する（UTF-16）
-			@param[in]	x	開始点Ｘ軸を指定
-			@param[in]	y	開始点Ｙ軸を指定
-			@param[in]	code	キャラクター・コード
+			@brief	UTF-16 フォントの描画
+			@param[in]	pos		描画位置
+			@param[in]	code	UTF-16 コード
 		*/
 		//-----------------------------------------------------------------//
-		void draw_font_utf16(int16_t x, int16_t y, uint16_t code) noexcept
+		void draw_font_utf16(const vtx::spos& pos, uint16_t code) noexcept
 		{
-			if(y <= -AFONT::height || y >= height) {
+			if(pos.y <= -AFONT::height || pos.y >= GLC::height) {
 				return;
 			}
 			if(code < 0x80) {
-				if(x <= -AFONT::width || x >= width) {
+				if(pos.x <= -AFONT::width || pos.x >= GLC::width) {
 					return;
 				}
-				draw_bitmap(x, y, AFONT::get(code), AFONT::width, AFONT::height);
+				draw_bitmap(pos.x, pos.y, AFONT::get(code), AFONT::width, AFONT::height);
 			} else {
-				if(x <= -KFONT::width || x >= width) {
+				if(pos.x <= -KFONT::width || pos.x >= GLC::width) {
 					return;
 				}
 				auto p = kfont_.get(code);
 				if(p != nullptr) {
-					draw_bitmap(x, y, p, KFONT::width, KFONT::height);
+					draw_bitmap(pos.x, pos.y, p, KFONT::width, KFONT::height);
 				} else {
-					draw_bitmap(x, y, AFONT::get('['), AFONT::width, AFONT::height);
-					x += AFONT::width;
-					draw_bitmap(x, y, AFONT::get(']'), AFONT::width, AFONT::height);
+					draw_bitmap(pos.x, pos.y, AFONT::get('['), AFONT::width, AFONT::height);
+					auto x = pos.x + AFONT::width;
+					draw_bitmap(x, pos.y, AFONT::get(']'), AFONT::width, AFONT::height);
 				}
 			}
 		}
@@ -751,80 +748,62 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	フォントを描画する（UTF-8）
-			@param[in]	x	開始点Ｘ軸を指定
-			@param[in]	y	開始点Ｙ軸を指定
-			@param[in]	ch	キャラクター・コード
+			@brief	フォントの描画 (UTF-8)
+			@param[in]	pos		描画位置
+			@param[in]	cha		文字コード
 			@param[in]	prop	プロポーショナルの場合「true」
-			@return 文字の終端座標（Ｘ）
+			@return 文字の終端座標 (X)
 		*/
 		//-----------------------------------------------------------------//
-		int16_t draw_font(int16_t x, int16_t y, char ch, bool prop = false) noexcept
+		int16_t draw_font(const vtx::spos& pos, char cha, bool prop = false) noexcept
 		{
-			uint8_t c = static_cast<uint8_t>(ch);
-			if(c < 0x80) {
-				int16_t o = 0;
-				if(prop) {
-					o = AFONT::get_kern(c);
-				}
-				draw_font_utf16(x + o, y, c);
-				if(prop) {
-					x += AFONT::get_width(c);
+			int16_t w = 0;
+			if(kfont_.injection_utf8(static_cast<uint8_t>(cha))) {
+				auto code = kfont_.get_utf16();
+				if(code >= 0x80) {
+					draw_font_utf16(pos, code);
+					w = KFONT::width;
 				} else {
-					x += AFONT::width;
-				}
-				code_ = 0;
-				return x;
-			} else if((c & 0xf0) == 0xe0) {
-				code_ = (c & 0x0f);
-				cnt_ = 2;
-				return x;
-			} else if((c & 0xe0) == 0xc0) {
-				code_ = (c & 0x1f);
-				cnt_ = 1;
-				return x;
-			} else if((c & 0xc0) == 0x80) {
-				code_ <<= 6;
-				code_ |= c & 0x3f;
-				cnt_--;
-				if(cnt_ == 0 && code_ < 0x80) {
-					code_ = 0;	// 不正なコードとして無視
-					return x;
-				} else if(cnt_ < 0) {
-					code_ = 0;
+					int16_t o = 0;
+					if(prop) {
+						o = AFONT::get_kern(code);
+					}
+					draw_font_utf16(vtx::spos(pos.x + o, pos.y), code);
+					if(prop) {
+						w = AFONT::get_width(code);
+					} else {
+						w = AFONT::width;
+					}
 				}
 			}
-			if(cnt_ == 0 && code_ != 0) {
-				draw_font_utf16(x, y, code_);
-				x += KFONT::width;
-				code_ = 0;
-			}
-			return x;
+			return w;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	テキストを描画する。
-			@param[in]	x	開始点Ｘ軸を指定
-			@param[in]	y	開始点Ｙ軸を指定
-			@param[in]	text	テキスト（UTF-8）
+			@brief	文字列の描画
+			@param[in]	pos		描画位置
+			@param[in]	str		文字列　(UTF-8)
 			@param[in]	prop	プロポーショナルの場合「true」
-			@return 文字の終端座標（Ｘ）
+			@return 文字の最終座標 (X)
 		*/
 		//-----------------------------------------------------------------//
-		int16_t draw_text(int16_t x, int16_t y, const char* text, bool prop = false) noexcept
+		int16_t draw_text(const vtx::spos& pos, const char* str, bool prop = false) noexcept
 		{
+			if(str == nullptr) return 0;
+
+			auto p = pos;
 			char ch;
-			while((ch = *text++) != 0) {
+			while((ch = *str++) != 0) {
 				if(ch == '\n') {
-					x = 0;
-					y += KFONT::height;
+					p.x = 0;
+					p.y += AFONT::height;
 				} else {
-					x = draw_font(x, y, ch, prop);
+					p.x = draw_font(p, ch, prop);
 				}
 			}
-			return x;
+			return p.x;
 		}
 
 
@@ -842,7 +821,7 @@ namespace graphics {
 			int16_t x = 0;
 			while((ch = *text++) != 0) {
 				// 画面外描画
-				x = draw_font(x, height, ch, prop);
+				x = draw_font(vtx::spos(x, GLC::height), ch, prop);
 			}
 			return x;
 		}
@@ -893,7 +872,7 @@ namespace graphics {
 					cnt--;
 					if(cnt == 0 && code != 0) {
 						xx += KFONT::width;
-					} else if(cnt_ < 0) {
+					} else if(cnt < 0) {
 						code = 0;
 					}
 				}
@@ -915,14 +894,14 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		void draw_dialog(uint16_t w, uint16_t h, const char* text) noexcept
 		{
-			int16_t x = (width  - w) / 2;
-			int16_t y = (height - h) / 2;
+			auto x = (GLC::width  - w) / 2;
+			auto y = (GLC::height - h) / 2;
 			frame(x, y, w, h, COLOR::White);
 			fill_box(x + 1, y + 1, w - 2, h - 2, COLOR::Black);
 			auto l = get_text_length(text);
 			x += (w - l) / 2;
 			y += (h - font_height) / 2;
-			draw_text(x, y, text);
+			draw_text(vtx::spos(x, y), text);
 		}
 
 

@@ -52,7 +52,7 @@ namespace graphics {
 
 		static const int16_t SPC = 2;                           ///< 文字間隙間
 		static const int16_t FLN = RDR::font_height + SPC;      ///< 行幅
-		static const int16_t SCN = (RDR::height - SPC) / FLN;   ///< 行数
+		static const int16_t SCN = (RDR::glc_type::height - SPC) / FLN;   ///< 行数
 
 		SDC&	sdc_;
 		RDR&	rdr_;
@@ -111,16 +111,16 @@ namespace graphics {
 			} else if(t.num_ == static_cast<uint16_t>(t.match_)) {
 				draw = true;
 			}
-			if(draw && t.vpos_ >= 0 && t.vpos_ < RDR::height) {
+			if(draw && t.vpos_ >= 0 && t.vpos_ < RDR::glc_type::height) {
 				rdr_.set_fore_color(RDR::COLOR::White);
-				rdr_.fill_box(SPC, t.vpos_, RDR::width - SPC * 2, RDR::font_height, 0x0000);
-				if(dir) rdr_.draw_font(SPC, t.vpos_, '/');
+				rdr_.fill_box(SPC, t.vpos_, RDR::glc_type::width - SPC * 2, RDR::font_height, 0x0000);
+				if(dir) rdr_.draw_font(vtx::spos(SPC, t.vpos_), '/');
 				if(dir) {
 					rdr_.set_fore_color(RDR::COLOR::Blue);
 				} else {
 					rdr_.set_fore_color(RDR::COLOR::White);
 				}
-				auto w = rdr_.draw_text(SPC + 8, t.vpos_, name);
+				auto w = rdr_.draw_text(vtx::spos(SPC + 8, t.vpos_), name);
 				if(t.hmax_ < w) t.hmax_ = w;
 			}
 			t.vpos_ += FLN;
@@ -309,7 +309,7 @@ namespace graphics {
 				int16_t match = -1;
 				if(vofs < rdr_st_.vofs_) {  // down
 					rdr_.scroll(FLN);
-					match = -vofs / FLN + (RDR::height / FLN) - 1;
+					match = -vofs / FLN + (RDR::glc_type::height / FLN) - 1;
 				} else if(vofs > rdr_st_.vofs_) {  // up
 					rdr_.scroll(-FLN);
 					match = -vofs / FLN;
