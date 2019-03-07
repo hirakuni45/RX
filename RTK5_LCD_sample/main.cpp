@@ -1,12 +1,15 @@
 //=====================================================================//
 /*! @file
-    @brief  RX65N ＬＣＤサンプル
+    @brief  RX65N ＬＣＤ描画実験用コード
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+// 漢字フォントをＳＤカードから読んでキャッシュする場合
+#define CASH_KFONT
+
 #include "common/renesas.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
@@ -17,11 +20,10 @@
 #include "common/qspi_io.hpp"
 #include "graphics/font8x16.hpp"
 
-#define CASH_KFONT
-#include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
-//#include "graphics/jpeg_in.hpp"
-//#include "graphics/bmp_in.hpp"
+// #include "graphics/jpeg_in.hpp"
+#include "graphics/bmp_in.hpp"
+#include "graphics/filer.hpp"
 #include "chip/FT5206.hpp"
 
 #include "graphics/picojpeg_in.hpp"
@@ -29,7 +31,6 @@
 #include "graphics/scaling.hpp"
 
 // #define SOFT_I2C
-
 #ifdef SOFT_I2C
 #include "common/si2c_io.hpp"
 #else
@@ -39,10 +40,16 @@
 // SDHI インターフェースを使う場合
 // #define SDHI_IF
 
+// DRW2D エンジンを使う場合
+#define USE_DRW2D
+
+
 #include "usb/usb_io.hpp"
 #include "usb/usb_hmsc.hpp"
 
 #include "graphics/tgl.hpp"
+
+
 
 namespace {
 
@@ -51,10 +58,10 @@ namespace {
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
-	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
+	typedef utils::fixed_fifo<char,  512> RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
 	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
-	SCI		sci_;
+	SCI			sci_;
 
 	// ＳＤカード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
@@ -62,7 +69,7 @@ namespace {
 
 #ifdef SDHI_IF
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
-	SDHI	sdh_;
+	SDHI		sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
@@ -71,17 +78,17 @@ namespace {
 
 	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;  ///< Soft SPI 定義
 
-	SPI		spi_;
+	SPI			spi_;
 
 	typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
 	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD   カード検出
 
 	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
 
-	MMC		sdh_(spi_, 35000000);
+	MMC			sdh_(spi_, 35000000);
 #endif
 	typedef utils::sdc_man SDC;
-	SDC		sdc_;
+	SDC			sdc_;
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
@@ -96,11 +103,15 @@ namespace {
 	typedef graphics::kfont<16, 16, 64> KFONT;
 	KFONT		kfont_;
 
-	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_(glcdc_io_, kfont_);
-
+#ifdef USE_DRW2D
+	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> RENDER;
+#else
 	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
+#endif
 	RENDER		render_(glcdc_io_, kfont_);
+
+//	typedef graphics::filer<SDC, RENDER> FILER;
+//	FILER		filer_(sdc_, render_);
 
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
@@ -327,8 +338,8 @@ int main(int argc, char** argv)
 	}
 
 	{  // DRW2D 初期化
-//		drw2d_mgr_.list_info();
-		if(drw2d_mgr_.start()) {
+//		render_.list_info();
+		if(render_.start()) {
 			utils:: format("Start DRW2D\n");
 		} else {
 			utils:: format("DRW2D Fail\n");
@@ -361,6 +372,20 @@ int main(int argc, char** argv)
 		glcdc_io_.sync_vpos();
 		ft5206_.update();
 		sdc_.service(sdh_.service());
+
+#if 0
+		{
+			uint8_t ctrl = 0;
+
+			auto tnum = ft5206_.get_touch_num();
+			const auto& xy = ft5206_.get_touch_pos(0);
+			filer_.set_touch(tnum, xy.x, xy.y); 
+			char path[256];
+			if(filer_.update(ctrl, path, sizeof(path))) {
+
+			}
+		}
+#endif
 
 #if 0
 		if(task > 0) {
@@ -435,36 +460,36 @@ int main(int argc, char** argv)
 		render_task &= 3;
 		switch(render_task) {
 		case 0:
-			drw2d_mgr_.start_frame();
-			drw2d_mgr_.clear(0x000000);
-			drw2d_mgr_.end_frame();
+			render_.start_frame();
+			render_.clear(0x000000);
+			render_.end_frame();
 			break;
 		case 1:
-			drw2d_mgr_.start_frame();
-			drw2d_mgr_.clear(0x000000);
-			drw2d_mgr_.set_color(0xffffff);
-			drw2d_mgr_.line(vtx::spos(0, 0), vtx::spos(480, 272));
-			drw2d_mgr_.set_color(0xff00ff);
-			drw2d_mgr_.circle(vtx::spos(480/2, 272/2), 120, 10);
+			render_.start_frame();
+			render_.clear(0x000000);
+			render_.set_fore_color(0xffffff);
+			render_.line(vtx::spos(0, 0), vtx::spos(480, 272));
+			render_.set_fore_color(0xff00ff);
+			render_.circle(vtx::spos(480/2, 272/2), 120, 10);
 
-			drw2d_mgr_.set_color(0xffff00);
-			drw2d_mgr_.box(vtx::spos(100, 50), vtx::spos(90, 45));
-			drw2d_mgr_.end_frame();
+			render_.set_fore_color(0xffff00);
+			render_.box(vtx::spos(100, 50), vtx::spos(90, 45));
+			render_.end_frame();
 			break;
        		case 2:
-			drw2d_mgr_.start_frame();
-			drw2d_mgr_.clear(0x000000);
-			drw2d_mgr_.set_color(0x0000ff);
-			drw2d_mgr_.circle(vtx::spos(480/2, 272/2), rad, 0);
-			drw2d_mgr_.end_frame();
+			render_.start_frame();
+			render_.clear(0x000000);
+			render_.set_fore_color(0x0000ff);
+			render_.circle(vtx::spos(480/2, 272/2), rad, 0);
+			render_.end_frame();
 			break;
 		case 3:
-			drw2d_mgr_.start_frame();
-			drw2d_mgr_.clear(0x000000);
-			drw2d_mgr_.set_color(0xffffff);
-			drw2d_mgr_.draw_text(vtx::spos(50, 100), "Asdfghjkl");
-			drw2d_mgr_.draw_text(vtx::spos(50, 116), "美しい漢字");
-			drw2d_mgr_.end_frame();
+			render_.start_frame();
+			render_.clear(0x008000);
+			render_.set_fore_color(0xffffff);
+			render_.draw_text(vtx::spos(50, 100), "Asdfghjkl");
+			render_.draw_text(vtx::spos(50, 116), "美しい漢字");
+			render_.end_frame();
 			break;
 
 		default:
