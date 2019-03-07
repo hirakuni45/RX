@@ -91,9 +91,9 @@ namespace audio {
 		int16_t render_text_(int16_t x, int16_t y, const char* text)
 		{
 			render_.swap_color();
-			auto xx = render_.draw_text(x, y, text);
+			auto xx = render_.draw_text(vtx::spos(x, y), text);
 			render_.swap_color();
-			render_.draw_text(x+1, y+1, text);
+			render_.draw_text(vtx::spos(x + 1, y + 1), text);
 			return xx;
 		}
 
@@ -110,7 +110,7 @@ namespace audio {
 					scaling_.set_scale();
 					jpeg_.load("/NoImage.jpg");
 					render_.swap_color();
-					render_.draw_text(480 - 272, 0, "JPEG decode error.");
+					render_.draw_text(vtx::spos(480 - 272, 0), "JPEG decode error.");
 					render_.swap_color();
 				} else {
 					auto n = std::max(ifo.width, ifo.height);
@@ -147,7 +147,7 @@ namespace audio {
 			char tmp[16];
 			utils::sformat("%02d:%02d:%02d", tmp, sizeof(tmp)) % hor % min % sec;
 			render_.fill_box(0, 5 * 20, 8 * 8, 16, RENDER::COLOR::Black);
-			render_.draw_text(0, 5 * 20, tmp);
+			render_.draw_text(vtx::spos(0, 5 * 20), tmp);
 		}
 
 

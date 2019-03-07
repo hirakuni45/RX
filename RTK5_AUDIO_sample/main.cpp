@@ -89,13 +89,12 @@ namespace {
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
 	typedef graphics::font8x16 AFONT;
+//  for cash into SD card /kfont16.bin
 //	typedef graphics::kfont<16, 16, 64> KFONT;
 	typedef graphics::kfont<16, 16> KFONT;
 	KFONT		kfont_;
 
-	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_(glcdc_io_, kfont_);
-
+//	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> RENDER;
 	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
 	RENDER		render_(glcdc_io_, kfont_);
 
@@ -413,10 +412,9 @@ int main(int argc, char** argv)
 	}
 
 	{  // DRW2D 初期化
-		auto ver = drw2d_mgr_.get_version();
+		auto ver = render_.get_version();
 		utils::format("DRW2D Version: %04X\n") % ver;
-
-		if(drw2d_mgr_.start(0x00000000)) {
+		if(render_.start()) {
 			utils:: format("Start DRW2D\n");
 		} else {
 			utils:: format("DRW2D Fail\n");
@@ -453,7 +451,8 @@ int main(int argc, char** argv)
 #if 1
 	// タッチパネルの安定待ち
 	{
-		render_.draw_text(0, 0, "Touch panel device wait...\nPlease touch it with some screen.");
+		render_.draw_text(vtx::spos(0),
+			"Touch panel device wait...\nPlease touch it with some screen.");
 		uint8_t nnn = 0;
 		while(1) {
 			glcdc_io_.sync_vpos();
