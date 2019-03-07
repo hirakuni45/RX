@@ -18,6 +18,11 @@
 #include "RX24T/icu_mgr.hpp"
 #include "RX24T/port_map.hpp"
 
+#elif defined(SIG_RX62N)
+#include "RX62x/system.hpp"
+#include "RX62x/icu.hpp"
+#include "RX62x/icu_mgr.hpp"
+
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
 #include "RX600/peripheral.hpp"
 #include "RX600/system.hpp"
