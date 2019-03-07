@@ -8,7 +8,10 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX65x/glcdc_def.hpp"
+#include "graphics/afont.hpp"
+#include "graphics/kfont.hpp"
+#include "graphics/color.hpp"
+
 #include "RX65x/drw2d.hpp"
 
 #include "dave_base.h"
@@ -25,18 +28,28 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  DRW2D 制御／マネージャー
+		@brief  DRW2D 制御／マネージャー・クラス
 		@param[in]	GLC		グラフィックス・コントローラー・クラス
 		@param[in]	AFONT	ASCII フォント
 		@param[in]	KFONT	漢字フォント
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GLC, class AFONT, class KFONT>
+	template <class GLC, class AFONT = graphics::afont_null, class KFONT = graphics::kfont_null>
 	class drw2d_mgr {
+	public:
+		typedef uint16_t value_type;
+		typedef graphics::base_color<value_type> COLOR;
+
+		typedef GLC glc_type;
+		typedef AFONT afont_type;
+		typedef KFONT kfont_type;
+		static const int16_t font_height  = KFONT::height < AFONT::height
+			? AFONT::height : KFONT::height;
+
+	private:
+		typedef device::DRW2D DRW;
 
 		GLC&		glc_;
-
-		typedef device::DRW2D DRW;
 
 		KFONT&		kfont_;
 
@@ -84,6 +97,7 @@ namespace device {
 				set_clip_ = true;
 			}
 		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -130,12 +144,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
-			@param[in]	dlis	ディスプレイリストエントリー初期化サイズ
-			@param[in]	stsz	ディスプレイリストエントリーステップサイズ
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t dlis = 20, uint32_t stsz = 20) noexcept
+		bool start() noexcept
 		{
 			// DRW2D power management
 			power_mgr::turn(DRW::get_peripheral());
@@ -173,7 +185,7 @@ namespace device {
 			@param[in]	color	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void set_color(d2_color color) noexcept
+		void set_fore_color(d2_color color) noexcept
 		{
 			color_ = color;
 			set_color_ = false;
@@ -327,29 +339,63 @@ namespace device {
 		/*!
 			@brief	UTF-16 フォントの描画
 			@param[in]	pos		描画位置
-			@param[in]	cha		キャラクターコード
+			@param[in]	cha		UTF-16 コード
 		*/
 		//-----------------------------------------------------------------//
 		void draw_font_utf16(const vtx::spos& pos, uint16_t cha) noexcept
 		{
-
-
+			const uint8_t* src = nullptr;
+			int16_t w;
+			int16_t h;
+			if(cha < 0x80) {
+				src = AFONT::get(cha);
+				w = AFONT::width;
+				h = AFONT::height;
+			} else {
+				src = kfont_.get(cha);
+				if(src == nullptr) {
+					return;
+				}
+				w = KFONT::width;
+				h = KFONT::height;
+			}
+			d2_setblitsrc(d2_, src, w, w, h, d2_mode_i1 | d2_mode_clut);
+			d2_blitcopy(d2_, w, h,
+				0, 0, w * 16, h * 16, pos.x * 16, pos.y * 16, d2_bf_filter);
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	フォントの描画
+			@brief	フォントの描画 (UTF-8)
 			@param[in]	pos		描画位置
-			@param[in]	cha		キャラクターコード
+			@param[in]	cha		文字コード
+			@param[in]	prop	プロポーショナルの場合「true」
+			@return 文字の終端座標 (X)
 		*/
 		//-----------------------------------------------------------------//
-		void draw_font(const vtx::spos& pos, char cha) noexcept
+		int16_t draw_font(const vtx::spos& pos, char cha, bool prop = false) noexcept
 		{
-			const uint8_t* src = AFONT::get(cha);
-			d2_setblitsrc(d2_, src, 8, 8, 16, d2_mode_i1 | d2_mode_clut);
-			d2_blitcopy(d2_, 8, 16,
-				0, 0, 8 * 16, 16 * 16, pos.x * 16, pos.y * 16, d2_bf_filter);
+			int16_t w = 0;
+			if(kfont_.injection_utf8(static_cast<uint8_t>(cha))) {
+				auto code = kfont_.get_utf16();
+				if(code >= 0x80) {
+					draw_font_utf16(pos, code);
+					w = KFONT::width;
+				} else {
+					int16_t o = 0;
+					if(prop) {
+						o = AFONT::get_kern(code);
+					}
+					draw_font_utf16(vtx::spos(pos.x + o, pos.y), code);
+					if(prop) {
+						w = AFONT::get_width(code);
+					} else {
+						w = AFONT::width;
+					}
+				}
+			}
+			return w;
 		}
 
 
@@ -357,21 +403,26 @@ namespace device {
 		/*!
 			@brief	文字列の描画
 			@param[in]	pos		描画位置
-			@param[in]	str		文字列
+			@param[in]	str		文字列 (UTF-8)
+			@param[in]	prop	プロポーショナルの場合「true」
+			@return 文字の最終座標 (X)
 		*/
 		//-----------------------------------------------------------------//
-		void draw_text(const vtx::spos& pos, const char* str) noexcept
+		int16_t draw_text(const vtx::spos& pos, const char* str, bool prop = false) noexcept
 		{
-			if(str == nullptr) return;
+			if(str == nullptr) return 0;
 
 			auto p = pos;
 			char ch;
 			while((ch = *str++) != 0) {
-				if(0x20 <= ch && ch <= 0x7f) {
-					draw_font(p, ch);
-					p.x += AFONT::width;
+				if(ch == '\n') {
+					p.x = 0;
+					p.y += AFONT::height;
+				} else {
+					p.x += draw_font(p, ch, prop);
 				}
 			}
+			return p.x;
 		}
 
 
