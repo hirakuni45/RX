@@ -3,10 +3,22 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
-				"c:/msys64/usr/local/rx-elf/rx-elf/include"
+                "d:/Git/RX/RX65x/drw_2d_ver1.02/inc/tes",
+                "c:/msys64/usr/local/rx-elf/rx-elf/include/c++/6.4.0",
+                "c:/msys64/usr/local/rx-elf/rx-elf/include/c++/6.4.0/rx-elf",
+                "c:/msys64/usr/local/rx-elf/rx-elf/include/c++/6.4.0/backward",
+                "c:/msys64/usr/local/rx-elf/lib/gcc/rx-elf/6.4.0/include",
+                "c:/msys64/usr/local/rx-elf/lib/gcc/rx-elf/6.4.0/include-fixed",
+                "c:/msys64/usr/local/rx-elf/rx-elf/include",
+                "d:/Git/RX",
+                "${workspaceFolder}"
             ],
             "defines": [
+                "__GNUC__", "__BYTE_ORDER__=__ORDER_LITTLE_ENDIAN__",
+                "SIG_RX65N",
+                "F_ICLK=120000000",
+                "F_PCLKA=120000000", "F_PCLKB=60000000", "F_PCLKC=60000000", "F_PCLKD=60000000",
+				"F_FCLK=60000000", "F_BCLK=120000000",
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"

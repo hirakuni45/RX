@@ -69,9 +69,9 @@ Renesas RX マイコン
  - Windows では、事前に MSYS2 環境をインストールしておきます。
  - MSYS2 には、msys2、mingw32、mingw64 と３つの異なった環境がありますが、RX マイコン用 gcc    
    の構築を行う必要があるので、msys2 で行います。      
-MSYS2 は UNIX 系アプリの開発環境。
-MINGW32 は gcc の例外モデルが Borland 特許の関係で SEH ではなく dwarf な i686 向け環境。
-MINGW64 は Windows 系アプリケーション開発の環境。   
+※MSYS2 は UNIX 系アプリの開発環境。
+※MINGW32 は gcc の例外モデルが Borland 特許の関係で SEH ではなく dwarf な i686 向け環境。
+※MINGW64 は Windows 系アプリケーション開発の環境。   
    
  - msys2 のアップグレード
 
@@ -274,6 +274,12 @@ http://www.rvf-rc45.net/Renesas_GNU_Tools/
    
 ```
     git clone git://github.com/hirakuni45/RX.git
+```
+   
+### ＲＸフレームワークが利用している boost のインストール
+   
+```
+    pacman -S mingw-w64-x86_64-boost
 ```
    
 ## RX 全プロジェクトのビルド

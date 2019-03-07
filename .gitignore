@@ -23,6 +23,10 @@ libmad/
 !jpeg-6b/jmorecfg.h
 !jpeg-6b/libjpeg.a
 jpeg-6b/
+libpng/
+libusb/
+r_usb/
+tmp/
 !zlib/libz.a
 !RTK5_RAYTRACER/raytracer.mot
 
