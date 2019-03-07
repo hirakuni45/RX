@@ -423,7 +423,7 @@ int main(int argc, char** argv)
 				render_.fill_box(480-24, 0, 24, 16, 0x0000);
 			}
 			if(mount && !m) {
-				render_.draw_text(480-24, 0, "?SD");
+				render_.draw_text(vtx::spos(480-24, 0), "?SD");
 				filer = false;
 			}
 			mount = m;
