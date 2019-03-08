@@ -7,6 +7,8 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#define CASH_KFONT
+
 #include "common/renesas.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
@@ -16,7 +18,6 @@
 #include "common/sdc_man.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/graphics.hpp"
-#define CASH_KFONT
 #include "graphics/kfont.hpp"
 #include "common/cmt_io.hpp"
 
@@ -184,7 +185,7 @@ extern "C" {
 	{
 //		render_.draw_text_back(x, y, t);
 		render_.fill_box(x, y, strlen(t) * 8, 16, render_.get_back_color());
-		render_.draw_text(x, y, t);
+		render_.draw_text(vtx::spos(x, y), t);
 	}
 
 
