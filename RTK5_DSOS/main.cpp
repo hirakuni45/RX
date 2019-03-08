@@ -8,6 +8,8 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#define CASH_KFONT
+
 #include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
 #include "common/fixed_fifo.hpp"
@@ -22,8 +24,6 @@
 #include "graphics/font8x16.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
-
-#define CASH_KFONT
 #include "graphics/kfont.hpp"
 
 #include "chip/FT5206.hpp"
@@ -316,7 +316,7 @@ int main(int argc, char** argv)
 		auto ver = drw2d_mgr_.get_version();
 		utils::format("DRW2D Version: %04X\n") % ver;
 
-		if(drw2d_mgr_.start(0x00000000)) {
+		if(drw2d_mgr_.start()) {
 			utils:: format("Start DRW2D\n");
 		} else {
 			utils:: format("DRW2D Fail\n");

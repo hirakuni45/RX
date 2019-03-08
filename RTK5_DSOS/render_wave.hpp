@@ -28,13 +28,13 @@ namespace utils {
 		static const int16_t GRID             = 40;
 		static constexpr float   GRID_SCALE   = 1.0f / static_cast<float>(GRID);
 		static const int16_t MENU_SIZE        = 40;
-		static const int16_t TIME_SCROLL_AREA = RENDER::afont_height + GRID;
-		static const int16_t CH0_MOVE_AREA    = (RENDER::width - MENU_SIZE) / 2;
-		static const int16_t CH1_MOVE_AREA    = RENDER::width - MENU_SIZE;
-		static const int16_t TIME_BEGIN_POS   = RENDER::afont_height;
-		static const int16_t TIME_LIMIT_POS   = RENDER::height - RENDER::afont_height - 1;
+		static const int16_t TIME_SCROLL_AREA = RENDER::font_height + GRID;
+		static const int16_t CH0_MOVE_AREA    = (RENDER::glc_type::width - MENU_SIZE) / 2;
+		static const int16_t CH1_MOVE_AREA    = RENDER::glc_type::width - MENU_SIZE;
+		static const int16_t TIME_BEGIN_POS   = RENDER::font_height;
+		static const int16_t TIME_LIMIT_POS   = RENDER::glc_type::height - RENDER::font_height - 1;
 		static const int16_t VOLT_BEGIN_POS   = 0;
-		static const int16_t VOLT_LIMIT_POS   = RENDER::width - MENU_SIZE;
+		static const int16_t VOLT_LIMIT_POS   = RENDER::glc_type::width - MENU_SIZE;
 
 		RENDER&		render_;
 		CAPTURE&	capture_;
@@ -232,15 +232,15 @@ namespace utils {
 			char tmp[64];
 			utils::sformat("%s (%s)", tmp, sizeof(tmp)) % freq[rate_div_] % rate[rate_div_];
 			render_.fill_box(0, 0, 480, 16, RENDER::COLOR::Black);
-			auto x = render_.draw_text(0, 0, tmp);
+			auto x = render_.draw_text(vtx::spos(0, 0), tmp);
 
 			// 計測モード時結果
 			if(measere_ == MEASERE::TIME) {
 				float a = static_cast<float>(mes_time_size_) * GRID_SCALE * rate_f[rate_div_];
 				auto_scale_(a, 'S', tmp, sizeof(tmp));
-				x = render_.draw_text(x + 8, 0, tmp);
+				x = render_.draw_text(vtx::spos(x + 8, 0), tmp);
 				freq_scale_(1.0f / a, tmp, sizeof(tmp));
-				render_.draw_text(x + 8, 0, tmp);
+				render_.draw_text(vtx::spos(x + 8, 0), tmp);
 			} else if(measere_ == MEASERE::VOLT) {
 //				float a = static_cast<float>(mes_time_size_) * GRID_SCALE * rate_f[rate_div_];
 //				utils::sformat("%4.3f", tmp, sizeof(tmp)) % a;
@@ -266,12 +266,12 @@ namespace utils {
 				render_.fill_box(  0, 272 - 16 + 1, 15, 15, RENDER::COLOR::Lime);
 				render_.fill_box( 16, 272 - 16 + 1, 240 - 16, 15, RENDER::COLOR::Black);
 				utils::sformat("CH0: %s [V]", tmp, sizeof(tmp)) % divs[ch0_div_];
-				render_.draw_text(  16, 272 - 16 + 1, tmp);
+				render_.draw_text(vtx::spos(  16, 272 - 16 + 1), tmp);
 			} else {
 				render_.fill_box(240, 272 - 16 + 1, 15, 15, RENDER::COLOR::Fuchsi);
 				utils::sformat("CH1: %s [V]", tmp, sizeof(tmp)) % divs[ch1_div_];
 				render_.fill_box(240 + 16, 272 - 16 + 1, 240 - 16, 15, RENDER::COLOR::Black);
-				render_.draw_text(240 + 16, 272 - 16 + 1, tmp);
+				render_.draw_text(vtx::spos(240 + 16, 272 - 16 + 1), tmp);
 			}
 		}
 
@@ -316,7 +316,7 @@ namespace utils {
 				} else if(p.event == TOUCH::EVENT::CONTACT) {
 					int16_t dx = p.x - p.org_x;
 					int16_t dy = p.y - p.org_y;
-					if(CH1_MOVE_AREA <= p.x && p.x < RENDER::width) {
+					if(CH1_MOVE_AREA <= p.x && p.x < RENDER::glc_type::width) {
 						menu_ = static_cast<MENU>((p.y - 16) / MENU_SIZE + 1);
 					} else if(measere_ == MEASERE::TIME) {
 						if(TIME_BEGIN_POS <= p.y && p.y < TIME_LIMIT_POS
