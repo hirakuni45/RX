@@ -31,7 +31,9 @@ namespace graphics {
 	public:
 		static const int8_t width = 0;
 		static const int8_t height = 0;
-		const uint8_t* get(uint16_t code) { return nullptr; }
+		const uint8_t* get(uint16_t code) noexcept { return nullptr; }
+		bool injection_utf8(uint8_t ch) noexcept { return true; }
+		uint16_t get_utf16() const noexcept { return 0x0000; } 
 	};
 
 #ifndef CASH_KFONT
