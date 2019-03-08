@@ -9,9 +9,6 @@
 */
 //=====================================================================//
 #include "graphics/font8x16.hpp"
-
-// 漢字フォントをキャッシュする場合
-#define CASH_KFONT
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/picojpeg_in.hpp"
@@ -226,7 +223,7 @@ namespace app {
 				auto ver = drw2d_mgr_.get_version();
 				utils::format("DRW2D Version: %04X\n") % ver;
 
-				if(drw2d_mgr_.start(0x00000000)) {
+				if(drw2d_mgr_.start()) {
 					utils:: format("Start DRW2D\n");
 				} else {
 					utils:: format("DRW2D Fail\n");

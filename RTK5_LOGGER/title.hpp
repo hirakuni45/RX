@@ -64,8 +64,8 @@ namespace app {
 					static const char* fname = { "HRC_logo_s.bmp" };
 					img::img_info ifo;
 					if(im.info(fname, ifo)) {
-						int16_t xo = (RENDER::width  - ifo.width) / 2;
-						int16_t yo = (RENDER::height - ifo.height) / 2;
+						int16_t xo = (RENDER::glc_type::width  - ifo.width) / 2;
+						int16_t yo = (RENDER::glc_type::height - ifo.height) / 2;
 						at_scenes_base().at_plot().set_offset(vtx::spos(xo, yo));
 						logo_ = im.load(fname);
 						if(logo_) count_ = 90;

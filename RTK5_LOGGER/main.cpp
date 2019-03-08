@@ -7,6 +7,9 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+// 漢字フォントをキャッシュする場合
+#define CASH_KFONT
+
 #include "common/renesas.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"

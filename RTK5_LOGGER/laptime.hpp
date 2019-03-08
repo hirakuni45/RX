@@ -76,7 +76,7 @@ namespace app {
 
 
 			// プログレスバー表示
-			render.frame(0, RENDER::height - 10, RENDER::width, 10, RENDER::COLOR::White);
+			render.frame(0, RENDER::glc_type::height - 10, RENDER::glc_type::width, 10, RENDER::COLOR::White);
 			uint32_t bt = 0;
 			if(pos > 0) {
 				bt = watch.get_lap(pos - 1);
@@ -89,7 +89,7 @@ namespace app {
 				}
 			}
 			if(bt > 0) {
-				uint32_t ref = RENDER::width - 2;
+				uint32_t ref = RENDER::glc_type::width - 2;
 				uint32_t per = ref * dt / bt;
 				auto fc = RENDER::COLOR::Lime;
 				if(per > ref) {
@@ -97,8 +97,8 @@ namespace app {
 					fc = RENDER::COLOR::Red;
 				}
 				auto bc = RENDER::COLOR::Black;
-				render.fill_box(1, RENDER::height - 10 + 1, ref - per, 10 - 2, bc);
-				render.fill_box(1, RENDER::height - 10 + 1, per, 10 - 2, fc);
+				render.fill_box(1, RENDER::glc_type::height - 10 + 1, ref - per, 10 - 2, bc);
+				render.fill_box(1, RENDER::glc_type::height - 10 + 1, per, 10 - 2, fc);
 			}
 
 			for(uint32_t i = 0; i < 4; ++i) {
