@@ -100,7 +100,7 @@ extern "C" {
 	void draw_text(int x, int y, const char* t)
 	{
 		render_.fill_box(x, y, strlen(t) * 8, 16, render_.get_back_color());
-		render_.draw_text(x, y, t);
+		render_.draw_text(vtx::spos(x, y), t);
 	}
 
 
