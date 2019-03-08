@@ -923,7 +923,7 @@ namespace graphics {
 			fill_box(x, y, w, h, bc_);
 			x += (w - len) / 2;
 			y += (h - font_height) / 2;
-			draw_text(x, y, text);
+			draw_text(vtx::spos(x, y), text);
 		}
 
 

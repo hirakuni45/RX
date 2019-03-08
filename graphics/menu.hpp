@@ -221,8 +221,8 @@ namespace graphics {
 		{
 			if(size_ == 0) return false;
 
-			int16_t x = (REND::width  - ox_ - mx_) / 2;
-			int16_t y = (REND::height - oy_ - my_) / 2;
+			int16_t x = (REND::glc_type::width  - ox_ - mx_) / 2;
+			int16_t y = (REND::glc_type::height - oy_ - my_) / 2;
 			x += ox_;
 			y += oy_;
 			auto tmp_fc = rend_.get_fore_color();
@@ -241,7 +241,7 @@ namespace graphics {
 				back_(x, y, mx_, obj.h_ + space_h_ * 2, c);
 				y += space_h_;
 				auto t = static_cast<const char*>(obj_[i].src_);
-				rend_.draw_text(x + space_w_, y, t);
+				rend_.draw_text(vtx::spos(x + space_w_, y), t);
 				y += obj.h_;
 				y += space_h_;
 				y += gap_ - (gap_ / 2);
