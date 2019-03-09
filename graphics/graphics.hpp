@@ -752,7 +752,7 @@ namespace graphics {
 			@param[in]	pos		描画位置
 			@param[in]	cha		文字コード
 			@param[in]	prop	プロポーショナルの場合「true」
-			@return 文字の終端座標 (X)
+			@return 文字の幅 (X)
 		*/
 		//-----------------------------------------------------------------//
 		int16_t draw_font(const vtx::spos& pos, char cha, bool prop = false) noexcept
@@ -797,10 +797,10 @@ namespace graphics {
 			char ch;
 			while((ch = *str++) != 0) {
 				if(ch == '\n') {
-					p.x = 0;
-					p.y += AFONT::height;
+					p.x = pos.x;
+					p.y += font_height;
 				} else {
-					p.x = draw_font(p, ch, prop);
+					p.x += draw_font(p, ch, prop);
 				}
 			}
 			return p.x;
@@ -821,7 +821,7 @@ namespace graphics {
 			int16_t x = 0;
 			while((ch = *text++) != 0) {
 				// 画面外描画
-				x = draw_font(vtx::spos(x, GLC::height), ch, prop);
+				x += draw_font(vtx::spos(x, GLC::height), ch, prop);
 			}
 			return x;
 		}
