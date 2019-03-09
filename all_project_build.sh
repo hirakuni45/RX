@@ -61,6 +61,13 @@ make_main()
 }
 
 # make
+for file in `ls -d RX65x/drw_*`;
+do
+    if [ -e "${file}/Makefile" ]; then
+		make_main "" ${file}
+		cd ..
+    fi
+done
 for file in `ls -d *`;
 do
 	if [ -e "${file}/Makefile" ]; then
