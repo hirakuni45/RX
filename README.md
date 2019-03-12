@@ -1,6 +1,6 @@
 Renesas RX マイコン
 =========
-![R5F564ML](RXchipS.jpg)
+![R5F564ML](docs/RX600_group.jpg)
 
 ## RX 各ディレクトリー、及び概要など
 
@@ -28,40 +28,43 @@ Renesas RX マイコン
  ※一部、ルネサス製のライブラリを利用しています。   
    
 ## RX プロジェクト・リスト
- - [/RX600](./RX600)　　　　 ---> RX マイコン共通デバイス定義クラス
- - [/RX24T](./RX24T)　　　　 ---> RX24T 専用のデバイス定義クラス、リンカースクリプト
- - [/RX64M](./RX64M)　　　　---> RX64M 専用のデバイス定義クラス、リンカースクリプト
- - [/RX71M](./RX71M)　　　　---> RX71M 専用のデバイス定義クラス、リンカースクリプト
- - [/RX65x](./RX65x)　　　　 ---> RX651, RX65N 専用デバイス定義クラス、リンカースクリプト
- - [/RX66T](./RX66T)　　　　 ---> RX66T 専用デバイス定義クラス、リンカースクリプト
- - /ff12b　　　　　---> ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ
- - [/common](./common)      ---> 共有クラス、ヘッダーなど
- - [/chip](./chip)          ---> I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ
- - [/graphics](./graphics)  ---> グラフィックス関係操作クラス
- - [/sound](./sound)        ---> サウンド関係操作クラス
- - /r_net                   ---> ルネサス T4(TCP/UDP) ライブラリと、C++ ハンドラ、ラッパー
- - /libmad                  ---> MP3 デコード、mad ライブラリ
- - /jpeg-6b                 ---> JPEG ライブラリ
- - [rxprog](./rxprog)       ---> RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）
- - [FIRST_sample](./FIRST_sample)　　　　---> 各プラットホーム対応 LED 点滅プログラム
- - [SCI_sample](./SCI_sample)　　　　　---> 各プラットホーム対応 SCI サンプルプログラム
- - [RAYTRACER_sample](./RAYTRACER_sample)　　　---> 各プラットホーム対応 レイトレーシング・ベンチマーク
- - /rx24t_SDC_sample　 ---> RX24T を使った SD カードの動作サンプル
- - /rx24t_GPS_sample　 ---> RX24T を使った GPS の動作サンプル
- - /rx24t_DATA_FLASH_sample ---> RX24T を使った内臓データ・フラッシュ操作サンプル
- - /rx24t_LOGGER　　　 ---> RX24T を使ったデータロガー・プロジェクト
- - /rx64m_SDRAM_sample ---> RX64M を使った SDRAM の制御サンプル（128Mビット×2、32ビットバス）
- - /rx64m_RTC_sample　 ---> RX64M を使った 内臓 RTC の動作サンプル
- - /rx64m_TPU_sample　 ---> RX64M を使った TPU の制御サンプル（タイマー割り込み）
- - /rx64m_DMAC_sample　---> RX64M を使った DMAC 制御のサンプル（メモリー操作）
- - /rx64m_DA_sample　　---> RX64M を使った 内臓 D/A 変換、TPU、DMAC のサンプル
- - /rx64m_AUDIO_sample ---> RX64M を使った SD カード上のオーディオファイルを内臓 D/A で再生する 
- - /GR-KAEDE_ftps　　　---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（FTP サーバー）
- - /GR-KAEDE_http　　　---> ルネサス製の RX64M 搭載マイコンボード向けサンプル（http サーバー）
- - /RTK5_AUDIO_sample　---> ルネサス製 RTK5RX65N マイコンボード オーディオプレイヤー
- - /RTK5_SIDE　　　　　---> ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター
- - /RTK5_NESEMU　　　　---> ルネサス製 RTK5RX65N マイコンボード NES エミュレーター
- - [/LICENSE](./LICENSE)　---> ライセンス表記ファイル
+
+|ディレクトリ・ファイル|説明|
+|-----------------------|----------------------------------------------|
+|[/RX600](./RX600)      |RX マイコン共通デバイス定義クラス|
+|[/RX24T](./RX24T)      |RX24T 専用のデバイス定義クラス、リンカースクリプト|
+|[/RX64M](./RX64M)      |RX64M 専用のデバイス定義クラス、リンカースクリプト|
+|[/RX71M](./RX71M)      |RX71M 専用のデバイス定義クラス、リンカースクリプト|
+|[/RX65x](./RX65x)      |RX651, RX65N 専用デバイス定義クラス、リンカースクリプト|
+|[/RX66T](./RX66T)      |RX66T 専用デバイス定義クラス、リンカースクリプト|
+|/ff12b                 |ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
+|[/common](./common)    |共有クラス、ヘッダーなど|
+|[/chip](./chip)        |I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
+|[/graphics](./graphics)|グラフィックス関係操作クラス|
+|[/sound](./sound)      |サウンド関係操作クラス|
+|/r_net                 |ルネサス T4(TCP/UDP) ライブラリと、C++ ハンドラ、ラッパー|
+|/libmad                |MP3 デコード、mad ライブラリ|
+|/jpeg-6b               |JPEG ライブラリ|
+|[rxprog](./rxprog)     |RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）|
+|[FIRST_sample](./FIRST_sample)|各プラットホーム対応 LED 点滅プログラム|
+|[SCI_sample](./SCI_sample)|各プラットホーム対応 SCI サンプルプログラム|
+|[RAYTRACER_sample](./RAYTRACER_sample)|各プラットホーム対応 レイトレーシング・ベンチマーク|
+|/rx24t_SDC_sample      |RX24T を使った SD カードの動作サンプル|
+|/rx24t_GPS_sample      |RX24T を使った GPS の動作サンプル|
+|/rx24t_DATA_FLASH_sample|RX24T を使った内臓データ・フラッシュ操作サンプル|
+|/rx24t_LOGGER          |RX24T を使ったデータロガー・プロジェクト|
+|/rx64m_SDRAM_sample    |RX64M を使った SDRAM の制御サンプル（128Mビット×2、32ビットバス）|
+|/rx64m_RTC_sample      |RX64M を使った 内臓 RTC の動作サンプル|
+|/rx64m_TPU_sample      |RX64M を使った TPU の制御サンプル（タイマー割り込み）|
+|/rx64m_DMAC_sample     |RX64M を使った DMAC 制御のサンプル（メモリー操作）|
+|/rx64m_DA_sample       |RX64M を使った 内臓 D/A 変換、TPU、DMAC のサンプル|
+|/rx64m_AUDIO_sample    |RX64M を使った SD カード上のオーディオファイルを内臓 D/A で再生する|
+|/GR-KAEDE_ftps         |ルネサス製の RX64M 搭載マイコンボード向けサンプル（FTP サーバー）|
+|/GR-KAEDE_http         |ルネサス製の RX64M 搭載マイコンボード向けサンプル（http サーバー）|
+|/RTK5_AUDIO_sample     |ルネサス製 RTK5RX65N マイコンボード オーディオプレイヤー|
+|/RTK5_SIDE             |ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター|
+|/RTK5_NESEMU           |ルネサス製 RTK5RX65N マイコンボード NES エミュレーター|
+|[/LICENSE](./LICENSE)  |ライセンス表記ファイル|
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
    
 ## RX 開発環境準備（Windows、MSYS2）
