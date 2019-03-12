@@ -65,6 +65,7 @@ Renesas RX マイコン
 |/RTK5_SIDE             |ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター|
 |/RTK5_NESEMU           |ルネサス製 RTK5RX65N マイコンボード NES エミュレーター|
 |[/LICENSE](./LICENSE)  |ライセンス表記ファイル|
+...
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
    
 ## RX 開発環境準備（Windows、MSYS2）
