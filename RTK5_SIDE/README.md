@@ -1,6 +1,6 @@
 Renesas Envision Kit RX65N ガジェット
 =========
-![R5F564ML](../RTK5_side.jpg)
+![R5F564ML](../docs/RTK5_side.jpg)
 
 ## 概要
 Envision Kit RX65N で実現する Space Invaders エミュレーター
