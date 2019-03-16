@@ -28,5 +28,3 @@ libusb/
 r_usb/
 tmp/
 !zlib/libz.a
-!RTK5_RAYTRACER/raytracer.mot
-
