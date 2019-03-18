@@ -8,6 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "graphics/pixel.hpp"
 #include "graphics/color.hpp"
 #include "graphics/afont.hpp"
 #include "graphics/kfont.hpp"
@@ -758,21 +759,23 @@ namespace graphics {
 		int16_t draw_font(const vtx::spos& pos, char cha, bool prop = false) noexcept
 		{
 			int16_t w = 0;
-			if(kfont_.injection_utf8(static_cast<uint8_t>(cha))) {
-				auto code = kfont_.get_utf16();
-				if(code >= 0x80) {
-					draw_font_utf16(pos, code);
-					w = KFONT::width;
+			if(static_cast<uint8_t>(cha) < 0x80) {
+				uint8_t code = static_cast<uint8_t>(cha);
+				if(prop) {
+					w = AFONT::get_kern(code);
+				}
+				draw_font_utf16(vtx::spos(pos.x + w, pos.y), code);
+				if(prop) {
+					w += AFONT::get_width(code);
 				} else {
-					int16_t o = 0;
-					if(prop) {
-						o = AFONT::get_kern(code);
-					}
-					draw_font_utf16(vtx::spos(pos.x + o, pos.y), code);
-					if(prop) {
-						w = AFONT::get_width(code);
-					} else {
-						w = AFONT::width;
+					w = AFONT::width;
+				}
+			} else {
+				if(kfont_.injection_utf8(static_cast<uint8_t>(cha))) {
+					auto code = kfont_.get_utf16();
+					if(code >= 0x80) {
+						draw_font_utf16(pos, code);
+						w = KFONT::width;
 					}
 				}
 			}
