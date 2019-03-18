@@ -49,9 +49,18 @@ namespace device {
 	private:
 		typedef device::DRW2D DRW;
 
+		static const int16_t line_offset = (((GLC::width * sizeof(value_type)) + 63) & 0x7fc0) / sizeof(value_type);
+
 		GLC&		glc_;
 
 		KFONT&		kfont_;
+
+		value_type*	fb_;
+		value_type	fc_;
+		value_type	bc_;
+
+		uint32_t	stipple_;
+		uint32_t	stipple_mask_;
 
 		d2_device*	d2_;
 
@@ -105,7 +114,10 @@ namespace device {
 			@param[in]	glc	GLC クラスの参照
 		*/
 		//-----------------------------------------------------------------//
-		drw2d_mgr(GLC& glc, KFONT& kfont) noexcept : glc_(glc), kfont_(kfont), d2_(nullptr),
+		drw2d_mgr(GLC& glc, KFONT& kfont) noexcept : glc_(glc), kfont_(kfont),
+			fb_(static_cast<value_type*>(glc.get_fbp())), fc_(COLOR::White), bc_(COLOR::Black),
+			stipple_(-1), stipple_mask_(1),
+			d2_(nullptr),
 			color_(0xffffffff), clip_(0, 0, GLC::width, GLC::height),
 			pen_size_(16), scale_(16),
 			set_color_(false), set_clip_(false), last_error_(D2_OK)
@@ -194,6 +206,28 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	点を描画する
+			@param[in]	pos	開始点
+			@param[in]	c	カラー
+		*/
+		//-----------------------------------------------------------------//
+		void plot(const vtx::spos& pos, value_type c) noexcept
+		{
+			auto m = stipple_mask_;
+			stipple_mask_ <<= 1;
+			if(stipple_mask_ == 0) stipple_mask_ = 1;
+
+			if((stipple_ & m) == 0) {
+				return;
+			}
+			if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(GLC::width)) return;
+			if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(GLC::height)) return;
+			fb_[pos.y * line_offset + pos.x] = c;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	クリッピング領域の設定
 			@param[in]	clip	クリッピング領域
 		*/
@@ -252,7 +286,7 @@ namespace device {
 
 			auto xs = GLC::width;
 			auto ys = GLC::height;
-			d2_framebuffer(d2_, glc_.get_fbp(), xs, xs, ys, get_mode_());
+			d2_framebuffer(d2_, fb_, xs, xs, ys, get_mode_());
 			d2_cliprect(d2_, 0, 0, xs * 16, ys * 16);
 			d2_settexclut(d2_, clut_);
 		}
@@ -377,21 +411,23 @@ namespace device {
 		int16_t draw_font(const vtx::spos& pos, char cha, bool prop = false) noexcept
 		{
 			int16_t w = 0;
-			if(kfont_.injection_utf8(static_cast<uint8_t>(cha))) {
-				auto code = kfont_.get_utf16();
-				if(code >= 0x80) {
-					draw_font_utf16(pos, code);
-					w = KFONT::width;
+			if(static_cast<uint8_t>(cha) < 0x80) {
+				uint8_t code = static_cast<uint8_t>(cha);
+				if(prop) {
+					w = AFONT::get_kern(code);
+				}
+				draw_font_utf16(vtx::spos(pos.x + w, pos.y), code);
+				if(prop) {
+					w += AFONT::get_width(code);
 				} else {
-					int16_t o = 0;
-					if(prop) {
-						o = AFONT::get_kern(code);
-					}
-					draw_font_utf16(vtx::spos(pos.x + o, pos.y), code);
-					if(prop) {
-						w = AFONT::get_width(code);
-					} else {
-						w = AFONT::width;
+					w = AFONT::width;
+				}
+			} else {
+				if(kfont_.injection_utf8(static_cast<uint8_t>(cha))) {
+					auto code = kfont_.get_utf16();
+					if(code >= 0x80) {
+						draw_font_utf16(pos, code);
+						w = KFONT::width;
 					}
 				}
 			}
