@@ -22,9 +22,12 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	RAYTRACER_sample/main.cpp
+PSOURCES	=	RAYTRACER_sample/main.cpp \
+				RX65x/icu_mgr.cpp \
+				graphics/font8x16.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=
+USER_LIBS	=	m supc++ drw2d
 
 LDSCRIPT	=	../../RX65x/$(DEVICE).ld
 
