@@ -15,6 +15,7 @@
 #include "common/command.hpp"
 
 #include "graphics/font8x16.hpp"
+#include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 
 #include "raytracer.hpp"
@@ -29,25 +30,25 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX71M" };
-	static const uint16_t lcd_w_ = 320;
-	static const uint16_t lcd_h_ = 240;
-	uint16_t	fb_[lcd_w_ * lcd_h_];
+	static const uint16_t LCD_X = 320;
+	static const uint16_t LCD_Y = 240;
+	uint16_t	fb_[LCD_X * LCD_Y];
 #elif defined(SIG_RX64M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX64M" };
-	static const uint16_t lcd_w_ = 320;
-	static const uint16_t lcd_h_ = 240;
-	uint16_t	fb_[lcd_w_ * lcd_h_];
+	static const uint16_t LCD_X = 320;
+	static const uint16_t LCD_Y = 240;
+	uint16_t	fb_[LCD_X * LCD_Y];
 #elif defined(SIG_RX65N)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 	typedef device::SCI9 SCI_CH;
 	static const char* system_str_ = { "RX65N" };
-	static const uint16_t lcd_w_ = 480;
-	static const uint16_t lcd_h_ = 272;
+	static const uint16_t LCD_X = 480;
+	static const uint16_t LCD_Y = 272;
 	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x00000100);
 #elif defined(SIG_RX24T)
 	typedef device::system_io<10000000> SYSTEM_IO;
@@ -62,44 +63,56 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX66T" };
-	static const uint16_t lcd_w_ = 320;
-	static const uint16_t lcd_h_ = 240;
-	uint16_t*	fb_ = nullptr;
+	static const uint16_t LCD_X = 320;
+	static const uint16_t LCD_Y = 240;
+	uint16_t	fb_[LCD_X * LCD_Y];
 #endif
 
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont_null KFONT;
-	KFONT	kfont_;
-//	typedef graphics::render<uint16_t, lcd_w_, lcd_h_, AFONT> RENDER;
-//	RENDER	render_(fb_, kfont_);	
+	KFONT		kfont_;
 
-#if defined(RX65_LCD)
+// GLCDC for RX65
+#if defined(SIG_RX65N)
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, 480, 272,
-		device::glcdc_def::PIX_TYPE::RGB565> GLCDC_IO;
-	GLCDC_IO	glcdc_io_(fb_);
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_IO;
+	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> RENDER;
+#else
+	class GLCDC_IO {
+		void*	fb_;
+	public:
+		static const int16_t width = LCD_X;
+		static const int16_t height = LCD_Y;
+		static const graphics::pixel::TYPE PXT = graphics::pixel::TYPE::RGB565;
+		GLCDC_IO(void* fb1, void* fb2) : fb_(fb2) { }
+        void* get_fbp() const noexcept {
+            return fb_;
+        }
+	};
+	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
 #endif
+	GLCDC_IO	glcdc_io_(nullptr, fb_);
+	RENDER		render_(glcdc_io_, kfont_);
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
 	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
 	SCI			sci_;
 
-	typedef utils::command<256> CMD;
-	CMD 	cmd_;
+	bool		run_ = false;
+	int			sampling_ = 1;
+	int			render_width_  = 320;
+	int			render_height_ = 240;
 
-	bool	run_ = false;
-	int		sampling_ = 1;
-	int		render_width_  = 320;
-	int		render_height_ = 240;
+	typedef utils::command<256> CMD;
+	CMD 		cmd_;
 
 	void command_()
 	{
 		if(!cmd_.service()) {
 			return;
 		}
-#if 0
 		uint8_t cmdn = cmd_.get_words();
 		if(cmdn >= 1) {
 			bool f = false;
@@ -131,7 +144,6 @@ namespace {
 				}
 			}
 		}
-#endif
 	}
 }
 
@@ -140,24 +152,17 @@ extern "C" {
 
 	void draw_pixel(int x, int y, int r, int g, int b)
 	{
-#if defined(RX65_LCD)
 		auto c = RENDER::COLOR::rgb(r, g, b);
-//		render_.plot(x, y, c);
-#else
-		volatile uint16_t c = (static_cast<uint16_t>(r & 0xf8) << 8)
-				   | (static_cast<uint16_t>(g & 0xfc) << 3)
-				   | (static_cast<uint16_t>(b) >> 3);
-		utils::delay::micro_second(5);  // dummy draw pixel
-#endif
+		render_.plot(vtx::spos(x, y), c);
 	}
 
 
 	void draw_text(int x, int y, const char* t)
 	{
-#if defined(RX65_LCD)
-//		render_.fill_box(x, y, strlen(t) * 8, 16, render_.get_back_color());
-//		render_.draw_text(x, y, t);
-#endif
+		render_.start_frame();
+//		render_.fill_box(x, y, strlen(t) * AFONT::width, AFONT::height, render_.get_back_color());
+		render_.draw_text(vtx::spos(x, y), t);
+		render_.end_frame();
 	}
 
 
@@ -211,7 +216,7 @@ int main(int argc, char** argv)
 
 	cmd_.set_prompt("# ");
 
-#if defined(RX65_LCD)
+#if defined(SIG_RX65N)
 	{  // GLCDC 初期化
 		LCD_DISP::DIR  = 1;
 		LCD_LIGHT::DIR = 1;
@@ -229,31 +234,32 @@ int main(int argc, char** argv)
 		}
 	}
 	SW2::DIR = 0;
+
+	// DRW2D Engine start...
+	render_.start();
 #endif
 
 	LED::DIR = 1;
 
-	doRaytrace(sampling_, render_width_, render_height_);
+	run_ = false;
 
 	uint8_t n = 0;
 	bool sw = false;
 	while(1) {
-#if defined(RX65_LCD)
+#if defined(SIG_RX65N)
 		glcdc_io_.sync_vpos();
-#endif
 
-#if 0
 		bool v = !SW2::P();
 		if(!sw && v) {
 			render_.clear(0x0);
 			if(render_width_ == 320) {
-				render_width_ = 480;
-				render_height_ = 272;
+				render_width_  = LCD_X;
+				render_height_ = LCD_Y;
 			} else {
 				render_width_ = 320;
 				render_height_ = 240;
-				++asq;
-				if(asq > 4) asq = 1;
+				++sampling_;
+				if(sampling_ > 4) sampling_ = 1;
 			}
 			run_ = false;
 		}
@@ -262,10 +268,12 @@ int main(int argc, char** argv)
 
 		command_();
 
-//		if(!run_) {
-//			doRaytrace(sampling_, render_width_, render_height_);
-//			run_ = true;
-//		}
+#if defined(SIG_RX65N)
+		if(!run_) {
+			doRaytrace(sampling_, render_width_, render_height_);
+			run_ = true;
+		}
+#endif
 
 		++n;
 		if(n >= 30) {
