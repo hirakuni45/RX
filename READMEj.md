@@ -67,11 +67,10 @@ int main(int argc, char** argv)
 |/ff12b                 |ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
 |[/common](./common)    |共有クラス、ヘッダーなど|
 |[/chip](./chip)        |I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
-|[/graphics](./graphics)|グラフィックス関係操作クラス|
-|[/sound](./sound)      |サウンド関係操作クラス|
+|[/graphics](./graphics)|グラフィックス描画関係クラス|
+|[/sound](./sound)      |サウンド、オーディオ関係クラス|
 |/r_net                 |ルネサス T4(TCP/UDP) ライブラリと、C++ ハンドラ、ラッパー|
 |/libmad                |MP3 デコード、mad ライブラリ|
-|/jpeg-6b               |JPEG ライブラリ|
 |[rxprog](./rxprog)     |RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）|
 |[FIRST_sample](./FIRST_sample)|各プラットホーム対応 LED 点滅プログラム|
 |[SCI_sample](./SCI_sample)|各プラットホーム対応 SCI サンプルプログラム|

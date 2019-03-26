@@ -70,59 +70,58 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/RX66T](./RX66T)      |Device definition class dedicated to RX66T, linker script icon common device definition class|
 |[/ff12b](./ff12b)      |ChaN's fatfs source code and handler for RX microcontroller|
 |[/common](./common)    |Shared classes, utilities, etc.|
-|[/chip](./chip)        |I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
-|[/graphics](./graphics)|グラフィックス描画関係クラス|
-|[/sound](./sound)      |サウンド、オーディオ関係クラス|
-|/r_net                 |ルネサス T4(TCP/UDP) ライブラリと、C++ ハンドラ、ラッパー|
-|/libmad                |MP3 デコード、mad ライブラリ|
-|[rxprog](./rxprog)     |RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）|
-|[FIRST_sample](./FIRST_sample)|各プラットホーム対応 LED 点滅プログラム|
-|[SCI_sample](./SCI_sample)|各プラットホーム対応 SCI サンプルプログラム|
-|[RAYTRACER_sample](./RAYTRACER_sample)|各プラットホーム対応 レイトレーシング・ベンチマーク|
-|/rx24t_SDC_sample      |RX24T を使った SD カードの動作サンプル|
-|/rx24t_GPS_sample      |RX24T を使った GPS の動作サンプル|
-|/rx24t_DATA_FLASH_sample|RX24T を使った内臓データ・フラッシュ操作サンプル|
-|/rx24t_LOGGER          |RX24T を使ったデータロガー・プロジェクト|
-|/rx64m_SDRAM_sample    |RX64M を使った SDRAM の制御サンプル（128Mビット×2、32ビットバス）|
-|/rx64m_RTC_sample      |RX64M を使った 内臓 RTC の動作サンプル|
-|/rx64m_TPU_sample      |RX64M を使った TPU の制御サンプル（タイマー割り込み）|
-|/rx64m_DMAC_sample     |RX64M を使った DMAC 制御のサンプル（メモリー操作）|
-|/rx64m_DA_sample       |RX64M を使った 内臓 D/A 変換、TPU、DMAC のサンプル|
-|/rx64m_AUDIO_sample    |RX64M を使った SD カード上のオーディオファイルを内臓 D/A で再生する|
-|/GR-KAEDE_ftps         |ルネサス製の RX64M 搭載マイコンボード向けサンプル（FTP サーバー）|
-|/GR-KAEDE_http         |ルネサス製の RX64M 搭載マイコンボード向けサンプル（http サーバー）|
-|/RTK5_AUDIO_sample     |ルネサス製 RTK5RX65N マイコンボード オーディオプレイヤー|
-|/RTK5_SIDE             |ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター|
-|/RTK5_NESEMU           |ルネサス製 RTK5RX65N マイコンボード NES エミュレーター|
-|[/LICENSE](./LICENSE)  |ライセンス表記ファイル|
+|[/chip](./chip)        |Device-specific control driver library for I2C, SPI, etc.|
+|[/graphics](./graphics)|Graphics drawing relation class|
+|[/sound](./sound)      |Sound, audio relationship class|
+|/r_net                 |Renesas T4 (TCP / UDP) library, C ++ handler, wrapper|
+|/libmad                |MP3 decoding, mad library|
+|[rxprog](./rxprog)     |Program writing tool to RX microcontroller flash (Windows, OS-X, Linux compatible)|
+|[FIRST_sample](./FIRST_sample)|LED flashing program for each platform|
+|[SCI_sample](./SCI_sample)|Each platform, corresponding SCI sample program|
+|[RAYTRACER_sample](./RAYTRACER_sample)|For each platform, Ray tracing benchmark|
+|/rx24t_SDC_sample      |SD card operation sample using RX24T|
+|/rx24t_GPS_sample      |GPS operation sample using RX24T|
+|/rx24t_DATA_FLASH_sample|Internal data flash operation sample using RX24T|
+|/rx64m_SDRAM_sample    |Control sample of SDRAM using RX64M (128 Mbit × 2, 32-bit bus)|
+|/rx64m_RTC_sample      |Operation sample of built-in RTC using RX64M|
+|/rx64m_TPU_sample      |Control sample of TPU using RX64M (timer interrupt)|
+|/rx64m_DMAC_sample     |DMAC control sample using RX64M (memory operation)|
+|/rx64m_DA_sample       |Built-in D / A conversion using RX64M, sample of TPU, DMAC|
+|/rx64m_AUDIO_sample    |Sample for Renesas RX64M microcontroller board (audio player)|
+|/GR-KAEDE_ftps         |Sample for Renesas RX64M microcontroller board (FTP server)|
+|/GR-KAEDE_http         |Sample for Renesas RX64M microcontroller board (http server)|
+|/RTK5_AUDIO_sample     |Renesas RTK5RX65N microcontroller board audio player|
+|/RTK5_SIDE             |Renesas RTK5RX65N microcontroller board Space Invaders emulator|
+|/RTK5_NESEMU           |Renesas RTK5RX65N microcontroller board NES emulator|
+|[/LICENSE](./LICENSE)  |License notation file|
    
-※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
+- Although not in the above list, please think that directories and files that exist when you check out are working.   
    
-## RX 開発環境準備（Windows、MSYS2）
+---
+## RX Development environment preparation (Windows、MSYS2)
    
- - Windows では、事前に MSYS2 環境をインストールしておきます。
- - MSYS2 には、msys2、mingw32、mingw64 と３つの異なった環境がありますが、RX マイコン用 gcc    
-   の構築を行う必要があるので、msys2 で行います。      
-※MSYS2 は UNIX 系アプリの開発環境。
-※MINGW32 は gcc の例外モデルが Borland 特許の関係で SEH ではなく dwarf な i686 向け環境。
-※MINGW64 は Windows 系アプリケーション開発の環境。   
+ - On Windows, install the MSYS2 environment in advance.   
+ - MSYS2 has msys2, mingw32, mingw64 and 3 different environments, but gcc for RX microcontroller
+   Because it is necessary to build of, do with msys2.   
+1. MSYS2 is a UNIX-based application development environment.
+2. MINGW32 is an environment for i686 that the exception model of gcc is not war related to SEH because of Borland patent.
+3. MINGW64 is an environment for developing Windows-based applications.   
    
- - msys2 のアップグレード
-
+ - MSYS2 upgrade
 ```
    pacman -Sy pacman
    pacman -Syu
 ```
-
- - コンソールを開きなおす。（コンソールを開きなおすように、メッセージが表示されるはずです）
-
+   
+- Open the console again. (You should see a message as you reopen the console)   
+   
 ```
    pacman -Su
 ```
- - アップデートは、複数回行われ、その際、コンソールの指示に従う事。
- - ※複数回、コンソールを開きなおす必要がある。
+- The update is done multiple times, then follow the instructions on the console.
+- You need to reopen the console several times.
 
- - gcc、texinfo、gmp、mpfr、mpc、diffutils、automake、zlib、tar、make、unzip、git コマンドなどをインストール
+- Install gcc, texinfo, gmp, mpfr, mpc, diffutils, automake, zlib, tar, make, unzip, git commands etc
 ```
    pacman -S gcc
    pacman -S texinfo
@@ -138,28 +137,26 @@ In device I / O operation, a dedicated header is prepared using template class l
 ```
    
 ---
-## RX 開発環境準備（OS-X）
-
- - OS-X では、事前に macports をインストールしておきます。（brew は柔軟性が低いのでお勧めしません）
- - OS−X のバージョンによっては、事前に X−Code、Command Line Tools などのインストールが必要になるかもしれません）
-
- - macports のアップグレード
-
+## RX Development environment preparation (OS-X)
+   
+- In OS-X, install macports in advance.   
+  brew is not recommended because it has less flexibility   
+- Depending on the version of OS-X, you may need to install X-Code, Command Line Tools, etc. in advance   
+ - macports upgrade   
 ```
    sudo port -d self update
 ```
-
- - ご存知とは思いますが、OS−X では初期段階では、gcc の呼び出しで llvm が起動するようになっています。
- - しかしながら、現状では llvm では、gcc のクロスコンパイラをビルドする事は出来ません。
- - そこで、macports で gcc をインストールします、バージョンは５系を使う事とします。
+- As you probably know, in the early stage of OS-X, llvm starts by calling gcc.
+- However, llvm can not currently build gcc cross compilers.
+- So, I will install gcc on macports, I will use the 5 series version.
 ```
    sudo port install gcc5
    sudo ln -sf /opt/local/bin/gcc-mp-5  /usr/local/bin/gcc
    sudo ln -sf /opt/local/bin/g++-mp-5  /usr/local/bin/g++
    sudo ln -sf /opt/local/bin/g++-mp-5  /usr/local/bin/c++
 ```
- - 再起動が必要かもしれません。
- - 一応、確認してみて下さい。
+- You may need to reboot.
+- For now, please check.
 ```
    gcc --version
 ```
@@ -171,7 +168,7 @@ In device I / O operation, a dedicated header is prepared using template class l
    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
    
- - texinfo、gmp、mpfr、mpc、diffutils、automake コマンドなどをインストール
+ - Install texinfo, gmp, mpfr, mpc, diffutils, automake command etc
 ```
    sudo port install texinfo
    sudo port install gmp
@@ -180,13 +177,13 @@ In device I / O operation, a dedicated header is prepared using template class l
    sudo port install diffutils
    sudo port install automake
 ```
-
+   
 ---
-## RX 開発環境準備（Ubuntu）
+## RX Development environment preparation (Ubuntu)
 
-Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境の場合を書いておきます。
-
- - texinfo、gmp、mpfr、mpc、diffutils、automake コマンドなどをインストール
+- There are multiple Linux environments, so here we will write the case for the "Ubuntu 16.04 LTS" environment.
+   
+- Install texinfo, gmp, mpfr, mpc, diffutils, automake command etc
 ```
    sudo apt-get install texinfo
    sudo apt-get install libgmp-dev
@@ -196,19 +193,19 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
    sudo apt-get install automake
    sudo apt-get install zlib1g-dev
 ```
-
+   
 ---
-## RX 開発環境構築
-
- - RX 用コンパイラ（rx-elf-gcc,g++）は gcc-6.4.0 を使います。   
- - binutils-2.30.tar.gz をダウンロードしておく。   
- - gcc-6.4.0.tar.gz をダウンロードしておく。   
- - newlib-2.4.0.tar.gz をダウンロードしておく。   
- - binutils, gcc, newlib には複数のバージョンがありますが、組み合わせによっては   
-   不適格なバイナリー（微妙に動作に問題がある）がビルドされる事が判っています。   
- - この不具合は、ルネサスのネットワークスタック（net_T4）を使った場合に起こります。
- - 何故そのような動作不良を起こすのかは、原因を特定出来ていません。
- - 現状で調査した組み合わせを列挙しておきます。
+## RX Development environment construction
+   
+- The RX compiler (rx-elf-gcc, g ++) uses "gcc-6.4.0".   
+- Download "binutils-2.30.tar.gz".   
+- Download "gcc-6.4.0.tar.gz".   
+- Download "newlib-2.4.0.tar.gz".   
+- There are multiple versions of binutils, gcc and newlib, but some combinations   
+  It has been found that ineligible binaries (which have subtle problems with operation) will be built.
+- This bug occurs when using Renesas network stack (net_T4).
+- It is not possible to identify the cause why such malfunction occurs.
+- Here is a list of combinations that we have investigated.
 ```
    binutils-2.27, gcc-4.9.4, newlib-2.2.0 ---> OK
    binutils-2.27, gcc-5.5.0, newlib-2.2.0 ---> OK
@@ -218,11 +215,10 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
    binutils-2.30, gcc-6.4.0, newlib-2.4.0 ---> OK (current)
    binutils-2.30, gcc-6.4.0, newlib-3.0.0 ---> NG 
 ```
- - 最新の gcc を使った方がより高速なコードになるようで、C++ の場合に特に効果が大きいです。
+- Using the latest gcc seems to be faster code, especially for C++.
    
 ---
-   
-#### binutils-2.30 をビルド
+#### build binutils-2.30
 ```
    cd
    tar xfvz binutils-2.30.tar.gz
@@ -234,21 +230,21 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
    make install     OS-X,Linux: (sudo make install)
 ```
 
- -  /usr/local/rx-elf/bin へパスを通す（.bash_profile を編集して、パスを追加）
+-  Pass PATH to /usr/local/rx-elf/bin (edit .bash_profile and add path)
 
 ```
    PATH=$PATH:/usr/local/rx-elf/bin
 ```
 
- -  コンソールを開きなおす。
+- Open the console again.
 
 ```
    rx-elf-as --version
 ```
 
- -  アセンブラコマンドを実行してみて、パスが有効か確かめる。
+- Execute the assembler command and check if the path is valid.
   
-#### C コンパイラをビルド
+#### Build C compiler
 ```
     cd
     tar xfvz gcc-6.4.0.tar.gz
@@ -260,7 +256,7 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
     make install     OS-X,Linux: (sudo make install)
 ```
   
-#### newlib をビルド
+#### Build newlib
 ```
     cd
     tar xfvz newlib-2.4.0.tar.gz
@@ -271,8 +267,8 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 	make
     make install     OS-X: (sudo make install)
 ```
- - Linux 環境では、sudo コマンドで、ローカルで設定した binutils のパスを認識しないので、
-「make install」が失敗します、その為、以下のようなスクリプトを書いて実行します。
+- In Linux environment, sudo command does not recognize the path of binutils set up locally.
+"Make install" will fail, so write the following script and execute it.
 ```
 #!/bin/sh
 # file: rx_install.sh
@@ -285,9 +281,7 @@ make install
     sudo rx_install.sh
 ```
    
----
-     
-#### C++ コンパイラをビルド
+#### Build C++ compiler
 ```
     cd
     cd gcc-6.4.0
@@ -296,34 +290,31 @@ make install
     make
     make install     OS-X,Linux: (sudo make install)
 ```
-
 ---
    
- - ビルドしたコンパイラーコレクションを以下のリンクに上げてある。（MSYS2のみ）   
+ - The built compiler collection is listed in the link below. (MSYS2 only)   
 http://www.rvf-rc45.net/Renesas_GNU_Tools/ 
 
 ---
-   
-## RX フレームワークのソースコードを取得
-   
+## Get RX Framework Source Code
 ```
     git clone git://github.com/hirakuni45/RX.git
 ```
    
-### ＲＸフレームワークが利用している boost のインストール
-   
+---
+### Boost installation used by RX framework
 ```
-    pacman -S mingw-w64-x86_64-boost
+    pacman -S mingw-w64-x86_64-boost   (for MSYS2)
+    sudo port install boost   (for OS-X)
+    sudo apt-get install boost    (for Linux)
 ```
    
-## RX 全プロジェクトのビルド
-   
+---
+## RX Build all projects
 ```
     sh all_project_build.sh [clean]
 ```
-   
 --- 
-   
 ## RX デバイスへのプログラム書き込み方法
 
 幾つかの方法がありますが、最も簡単で、コストがかからない方法は、シリアルインターフェースを使って   
@@ -384,9 +375,8 @@ USB インターフェース内臓の RX マイコンの場合は、USB でブ�
  - 各プロジェクトの「Makefile」には、「make run」で書き込めるスクリプトが設定されています。
    
 ---
-   
 ## Renesus ENVISION KIT-RX65N を使った開発
-![R5F564ML](docs/RTK5RX65N.jpg)
+<img src="docs/RTK5RX65N.jpg" width="50%">
 
  - ルネサスが販売する「RTK5RX65N」は、LCD 付きでありながら低価格で高機能なボードです。   
  - もちろんラズベリーPiなどとは比較はできませんが、スタンドアロンで動かす事の出来る手頃なマイコンボードだと思えます。
