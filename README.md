@@ -1,50 +1,80 @@
-Renesas RX マイコン
+Renesas RX Microcontroller
 =========
 ![R5F564ML](docs/RX600_group.jpg)
+   
+[Japanese](READMEj.md)
+   
+## Overview
+   
+This is a program by Renesas RX microcontroller and its compiler rx-elf-gcc, g ++.   
+   
+Currently, a dedicated writing program has been implemented that has been tested on Windows, OS-X, and Linux.   
+Development is now possible in multiple environments.   
+   
+- Currently supported and tested devices are RX24T, RX64M, RX65N, RX71M.   
+I extend the device class daily.   
+- I update it daily including directory configuration.   
+   
+Project consists of Makefile, related header, source code, dedicated startup It consists of routines and linker scripts.   
+   
+<img src="docs/RTK5_side.jpg" width="40%"> <img src="docs/NES_001.jpg" width="40%">   
+Space Invaders Emulator, NES Emulator, for RX65N Envision kit   
+<img src="docs/AudioPlayer001.jpg" width="40%"> <img src="docs/Filer.jpg" width="40%">   
+WAV/MP3 Audio Player, File selector, for RX65N Envision kit   
+   
+Device control classes with template design patterns provide flexible and concise functionality.   
+Due to its functionality, it does not require difficult or complicated settings or code generation by separate programs.   
+   
+```
+// LED flashing program
+#include "common/renesas.hpp"
 
-## RX 各ディレクトリー、及び概要など
+namespace {
+    typedef device::system_io<12000000> SYSTEM_IO;  // External connection crystal is 12MHz
+    typedef device::PORT<device::PORT0, device::bitpos::B7> LED;  // LED connection port
+}
 
- これはルネサス RX マイコンと、そのコンパイラである rx-elf-gcc,g++ によるプログラムです。   
-   
- 現在は、Windows、OS-X、Linux で動作確認が済んだ、専用書き込みプログラムも実装してあり、   
- 複数の環境で、開発が出来るようになっています。   
- ※現在サポートされ、動作確認済みデバイスは RX24T、RX64M、RX65N、RX71M となっており、   
- デバイスクラスを日々拡張しています。（RX63T、RX621、RX62N は保留状態です）   
- ※ディレクトリー構成など日々アップデートしており、乖離も発生するので注意下さい。   
- ※不明な点などあったら気軽にメールか、BBS にて質問を下さい。
-   
- プロジェクトは、Makefile、及び、関連ヘッダー、ソースコードからなり、専用のスタートアップ   
- ルーチン、リンカースクリプトで構成されています。   
- テンプレートデザインパターンによるデバイス制御クラスは、柔軟で、簡潔、自在な機能を提供します。   
- その機能性により、難解で複雑な設定や、別プログラムによるコード生成を必要としません。   
-   
- 通常「make」コマンド一発で、従属規則生成から、コンパイル、リンクまで完了する為、IDE を   
- 必要としません。  
- その為、専用のブートプログラムやローダーは必要なく、作成したバイナリーをそのまま ROM へ   
- 書いて実行できます。   
-   
- デバイスＩ／Ｏ操作では、C++ で実装されたテンプレート・クラス・ライブラリーを活用して専用の   
- ヘッダーを用意してあり、ユーティリティー的クラス・ライブラリーの充実も行っています。   
- ※一部、ルネサス製のライブラリを利用しています。   
-   
-## RX プロジェクト・リスト
+int main(int argc, char** argv);
 
-|ディレクトリ・ファイル|説明|
+int main(int argc, char** argv)
+{
+    SYSTEM_IO::setup_system_clock();
+
+    LED::OUTPUT();
+    while(1) {
+        utils::delay::milli_second(250);
+        LED::P = 0;
+        utils::delay::milli_second(250);
+        LED::P = 1;
+    }
+}
+```
+   
+In order to complete the process from dependency rule generation to compilation and linking, usually with a single "make" command,
+ I do not need it.   
+No need for a dedicated boot program or loader I can write and execute.
+   
+---
+## Description
+   
+In device I / O operation, a dedicated header is prepared using template class library implemented in C ++, and utility and class library are also enhanced.   
+- Some of them use a library made by Renesas.   
+   
+|Directory/file|Contents|
 |-----------------------|----------------------------------------------|
-|[/RX600](./RX600)      |RX マイコン共通デバイス定義クラス|
-|[/RX24T](./RX24T)      |RX24T 専用のデバイス定義クラス、リンカースクリプト|
-|[/RX64M](./RX64M)      |RX64M 専用のデバイス定義クラス、リンカースクリプト|
-|[/RX71M](./RX71M)      |RX71M 専用のデバイス定義クラス、リンカースクリプト|
-|[/RX65x](./RX65x)      |RX651, RX65N 専用デバイス定義クラス、リンカースクリプト|
-|[/RX66T](./RX66T)      |RX66T 専用デバイス定義クラス、リンカースクリプト|
-|/ff12b                 |ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
-|[/common](./common)    |共有クラス、ヘッダーなど|
+|[/RX600](./RX600)      |RX microcontroller common device definition class|
+|[/RX24T](./RX24T)      |Device definition class dedicated to RX24T, linker script icon common device definition class|
+|[/RX64M](./RX64M)      |Device definition class dedicated to RX64M, linker script icon common device definition class|
+|[/RX71M](./RX71M)      |Device definition class dedicated to RX71M, linker script icon common device definition class|
+|[/RX65x](./RX65x)      |Device definition class dedicated to RX65(1N), linker script icon common device definition class|
+|[/RX66T](./RX66T)      |Device definition class dedicated to RX66T, linker script icon common device definition class|
+|[/ff12b](./ff12b)      |ChaN's fatfs source code and handler for RX microcontroller|
+|[/common](./common)    |Shared classes, utilities, etc.|
 |[/chip](./chip)        |I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
-|[/graphics](./graphics)|グラフィックス関係操作クラス|
-|[/sound](./sound)      |サウンド関係操作クラス|
+|[/graphics](./graphics)|グラフィックス描画関係クラス|
+|[/sound](./sound)      |サウンド、オーディオ関係クラス|
 |/r_net                 |ルネサス T4(TCP/UDP) ライブラリと、C++ ハンドラ、ラッパー|
 |/libmad                |MP3 デコード、mad ライブラリ|
-|/jpeg-6b               |JPEG ライブラリ|
 |[rxprog](./rxprog)     |RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）|
 |[FIRST_sample](./FIRST_sample)|各プラットホーム対応 LED 点滅プログラム|
 |[SCI_sample](./SCI_sample)|各プラットホーム対応 SCI サンプルプログラム|
@@ -464,7 +494,7 @@ C++ での実装は、それら対する一つの回答です、また、コン�
 (3) 点滅間隔は 0.25 秒   
 ※マイコンの動作速度は、Makefile で設定   
 ※他、シリアル通信、ＳＤカードアクセスなど豊富なサンプルがあります。   
-```C++
+```
 #include "common/renesas.hpp"
 
 namespace {
