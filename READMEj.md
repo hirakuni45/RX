@@ -19,6 +19,8 @@ Renesas RX Microcontroller
 Space Invaders Emulator, NES Emulator, for RX65N Envision kit   
 <img src="docs/AudioPlayer001.jpg" width="40%"> <img src="docs/Filer.jpg" width="40%">   
 WAV/MP3 Audio Player, File selector, for RX65N Envision kit   
+<a href="http://www.youtube.com/watch?v=frRI-cbzGus" target="_blank"><img src="http://img.youtube.com/vi/frRI-cbzGus/0.jpg" width="40%" alt="YouTube Link for 'frRI-cbzGus'"></a>   
+YouTube: NES Emulator for RX65N Envision kit   
    
  テンプレートデザインパターンによるデバイス制御クラスは、柔軟で、簡潔、自在な機能を提供します。   
  その機能性により、難解で複雑な設定や、別プログラムによるコード生成を必要としません。   
