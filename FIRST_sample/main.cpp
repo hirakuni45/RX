@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::setup_system_clock();
 
-	LED::DIR = 1;  // LED ポートを出力に設定
+	LED::OUTPUT();  // LED ポートを出力に設定
 	while(1) {
 		utils::delay::milli_second(250);
 		LED::P = 0;
