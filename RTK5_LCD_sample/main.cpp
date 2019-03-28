@@ -103,6 +103,8 @@ namespace {
 	typedef graphics::kfont<16, 16, 64> KFONT;
 	KFONT		kfont_;
 
+	typedef graphics::def_color DEF_COLOR;
+
 #ifdef USE_DRW2D
 	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> RENDER;
 #else
@@ -369,7 +371,7 @@ int main(int argc, char** argv)
 	uint16_t rad = 10;
 	uint16_t render_task = 0;
 	while(1) {
-		glcdc_io_.sync_vpos();
+		render_.sync_frame();
 		ft5206_.update();
 		sdc_.service(sdh_.service());
 
@@ -460,36 +462,28 @@ int main(int argc, char** argv)
 		render_task &= 3;
 		switch(render_task) {
 		case 0:
-			render_.start_frame();
-			render_.clear(0x000000);
-			render_.end_frame();
+			render_.clear(DEF_COLOR::Black);
 			break;
 		case 1:
-			render_.start_frame();
-			render_.clear(0x000000);
-			render_.set_fore_color(0xffffff);
+			render_.clear(DEF_COLOR::Black);
+			render_.set_fore_color(DEF_COLOR::White);
 			render_.line(vtx::spos(0, 0), vtx::spos(480, 272));
-			render_.set_fore_color(0xff00ff);
+			render_.set_fore_color(DEF_COLOR::Green);
 			render_.circle(vtx::spos(480/2, 272/2), 120, 10);
 
-			render_.set_fore_color(0xffff00);
+			render_.set_fore_color(DEF_COLOR::Purple);
 			render_.box(vtx::spos(100, 50), vtx::spos(90, 45));
-			render_.end_frame();
 			break;
        		case 2:
-			render_.start_frame();
-			render_.clear(0x000000);
-			render_.set_fore_color(0x0000ff);
+			render_.clear(DEF_COLOR::Black);
+			render_.set_fore_color(DEF_COLOR::Blue);
 			render_.circle(vtx::spos(480/2, 272/2), rad, 0);
-			render_.end_frame();
 			break;
 		case 3:
-			render_.start_frame();
-			render_.clear(0x008000);
-			render_.set_fore_color(0xffffff);
+			render_.clear(DEF_COLOR::Gray);
+			render_.set_fore_color(DEF_COLOR::White);
 			render_.draw_text(vtx::spos(50, 100), "Asdfghjkl");
 			render_.draw_text(vtx::spos(50, 116), "美しい漢字");
-			render_.end_frame();
 			break;
 
 		default:
