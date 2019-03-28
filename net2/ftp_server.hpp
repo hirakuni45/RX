@@ -22,7 +22,6 @@
 #include <functional>
 #include "common/sdc_io.hpp"
 #include "common/fixed_string.hpp"
-#include "common/color.hpp"
 #include "common/format.hpp"
 #include "common/time.h"
 #include "common/string_utils.hpp"

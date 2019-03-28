@@ -16,7 +16,7 @@
 
 #include "common/sdc_io.hpp"
 #include "common/fixed_string.hpp"
-#include "common/color.hpp"
+#include "graphics/color.hpp"
 
 // #define HTTP_DEBUG
 
@@ -25,6 +25,8 @@ extern "C" {
 };
 
 namespace net {
+
+	typedef graphics::color_t color;
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -105,8 +107,8 @@ namespace net {
 		};
 		task		task_;
 
-		utils::color	back_color_;
-		utils::color	fore_color_;
+		color			back_color_;
+		color			fore_color_;
 
 		static void get_path_(const char* src, char* dst) {
 			int n = 0;
@@ -637,9 +639,9 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void set_back_color(uint8_t r, uint8_t g, uint8_t b)
 		{
-			back_color_.r = r;
-			back_color_.g = g;
-			back_color_.b = b;
+			back_color_.unit.r = r;
+			back_color_.unit.g = g;
+			back_color_.unit.b = b;
 		}
 
 
@@ -649,7 +651,7 @@ namespace net {
 			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void set_back_color(const utils::color& c)
+		void set_back_color(const color& c)
 		{
 			back_color_ = c;
 		}
@@ -661,10 +663,10 @@ namespace net {
 			@param[in]	t	カラー属性
 		*/
 		//-----------------------------------------------------------------//
-		void set_back_color(utils::color::type t)
-		{
-			back_color_.set(t);
-		}
+//		void set_back_color(color::type t)
+//		{
+//			back_color_.set(t);
+//		}
 
 
 		//-----------------------------------------------------------------//
@@ -677,9 +679,9 @@ namespace net {
 		//-----------------------------------------------------------------//
 		void set_fore_color(uint8_t r, uint8_t g, uint8_t b)
 		{
-			fore_color_.r = r;
-			fore_color_.g = g;
-			fore_color_.b = b;
+			fore_color_.unit.r = r;
+			fore_color_.unit.g = g;
+			fore_color_.unit.b = b;
 		}
 
 
@@ -689,7 +691,7 @@ namespace net {
 			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void set_fore_color(const utils::color& c)
+		void set_fore_color(const color& c)
 		{
 			fore_color_ = c;
 		}
@@ -701,10 +703,10 @@ namespace net {
 			@param[in]	t	カラー属性
 		*/
 		//-----------------------------------------------------------------//
-		void set_fore_color(utils::color::type t)
-		{
-			fore_color_.set(t);
-		}
+//		void set_fore_color(color::type t)
+//		{
+//			fore_color_.set(t);
+//		}
 
 
 		//-----------------------------------------------------------------//
@@ -724,12 +726,12 @@ namespace net {
 			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		static void insert_color_str(const utils::color& c)
+		static void insert_color_str(const color& c)
 		{
 			http_format("color=\"#%02X%02X%02X\"")
-				% static_cast<uint32_t>(c.r)
-				% static_cast<uint32_t>(c.g)
-				% static_cast<uint32_t>(c.b);
+				% static_cast<uint32_t>(c.unit.r)
+				% static_cast<uint32_t>(c.unit.g)
+				% static_cast<uint32_t>(c.unit.b);
 		}
 
 
