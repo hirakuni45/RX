@@ -11,6 +11,7 @@
 #include <cstdint>
 #include "common/enum_utils.hpp"
 #include "common/intmath.hpp"
+#include "graphics/color.hpp"
 
 namespace utils {
 
@@ -88,22 +89,24 @@ namespace utils {
 		bool		touch_down_;
 		uint8_t		touch_num_;
 
+		typedef graphics::def_color DEF_COLOR;
+
 
 		void update_measere_() noexcept
 		{
 			if(measere_ == MEASERE::TIME) {
 				auto org = mes_time_begin_;
-				render_.line(org, TIME_BEGIN_POS, org, TIME_LIMIT_POS, RENDER::COLOR::White);
+				render_.line(org, TIME_BEGIN_POS, org, TIME_LIMIT_POS, DEF_COLOR::White.rgb565);
 				auto end = mes_time_begin_ + mes_time_size_;
 				if(0 < end && end < VOLT_LIMIT_POS) {
-					render_.line(end, TIME_BEGIN_POS, end, TIME_LIMIT_POS, RENDER::COLOR::White);
+					render_.line(end, TIME_BEGIN_POS, end, TIME_LIMIT_POS, DEF_COLOR::White.rgb565);
 				}
 			} else if(measere_ == MEASERE::VOLT) {
 				auto org = mes_volt_begin_;
-				render_.line(VOLT_BEGIN_POS, org, VOLT_LIMIT_POS, org, RENDER::COLOR::White);
+				render_.line(VOLT_BEGIN_POS, org, VOLT_LIMIT_POS, org, DEF_COLOR::White.rgb565);
 				auto end = mes_volt_begin_ + mes_volt_size_;
 				if(0 < end && end < VOLT_LIMIT_POS) {
-					render_.line(VOLT_BEGIN_POS, end, VOLT_LIMIT_POS, end, RENDER::COLOR::White);
+					render_.line(VOLT_BEGIN_POS, end, VOLT_LIMIT_POS, end, DEF_COLOR::White.rgb565);
 				}
 			}
 		}
@@ -189,7 +192,7 @@ namespace utils {
 					mask = 0b11000000110000001100000011000000;
 				}
 				render_.set_stipple(mask);
-				render_.line(i, y, i, y + h, RENDER::COLOR::Aqua);
+				render_.line(i, y, i, y + h, DEF_COLOR::Aqua.rgb565);
 			}
 			for(int16_t i = y; i <= (y + h); i += unit) {
 				uint32_t mask;
@@ -199,7 +202,7 @@ namespace utils {
 					mask = 0b11000000110000001100000011000000;
 				}
 				render_.set_stipple(mask);
-				render_.line(x, i, x + w, i, RENDER::COLOR::Aqua);
+				render_.line(x, i, x + w, i, DEF_COLOR::Aqua.rgb565);
 			}
 			render_.set_stipple();
 		}
@@ -231,7 +234,7 @@ namespace utils {
 
 			char tmp[64];
 			utils::sformat("%s (%s)", tmp, sizeof(tmp)) % freq[rate_div_] % rate[rate_div_];
-			render_.fill_box(0, 0, 480, 16, RENDER::COLOR::Black);
+			render_.fill_box(0, 0, 480, 16, DEF_COLOR::Black.rgb565);
 			auto x = render_.draw_text(vtx::spos(0, 0), tmp);
 
 			// 計測モード時結果
@@ -263,14 +266,14 @@ namespace utils {
 
 			char tmp[32];
 			if(ch == 0) {
-				render_.fill_box(  0, 272 - 16 + 1, 15, 15, RENDER::COLOR::Lime);
-				render_.fill_box( 16, 272 - 16 + 1, 240 - 16, 15, RENDER::COLOR::Black);
+				render_.fill_box(  0, 272 - 16 + 1, 15, 15, DEF_COLOR::Lime.rgb565);
+				render_.fill_box( 16, 272 - 16 + 1, 240 - 16, 15, DEF_COLOR::Black.rgb565);
 				utils::sformat("CH0: %s [V]", tmp, sizeof(tmp)) % divs[ch0_div_];
 				render_.draw_text(vtx::spos(  16, 272 - 16 + 1), tmp);
 			} else {
-				render_.fill_box(240, 272 - 16 + 1, 15, 15, RENDER::COLOR::Fuchsi);
+				render_.fill_box(240, 272 - 16 + 1, 15, 15, DEF_COLOR::Fuchsi.rgb565);
 				utils::sformat("CH1: %s [V]", tmp, sizeof(tmp)) % divs[ch1_div_];
-				render_.fill_box(240 + 16, 272 - 16 + 1, 240 - 16, 15, RENDER::COLOR::Black);
+				render_.fill_box(240 + 16, 272 - 16 + 1, 240 - 16, 15, DEF_COLOR::Black.rgb565);
 				render_.draw_text(vtx::spos(240 + 16, 272 - 16 + 1), tmp);
 			}
 		}
@@ -391,18 +394,18 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void update() noexcept
 		{
-			render_.fill_box(0, 16, 440, 240, RENDER::COLOR::Black);
+			render_.fill_box(0, 16, 440, 240, DEF_COLOR::Black.rgb565);
 			draw_grid(0, 16, 440, 240, GRID);
 
 			if(measere_ != MEASERE::NONE) {
 				update_measere_();
 			} else if(touch_down_) {
 				render_.line(0, TIME_SCROLL_AREA, CH1_MOVE_AREA, TIME_SCROLL_AREA,
-					 RENDER::COLOR::Red);
+					 DEF_COLOR::Red.rgb565);
 				render_.line(CH0_MOVE_AREA, TIME_SCROLL_AREA, CH0_MOVE_AREA, 272 - 16,
-					 RENDER::COLOR::Red);
+					 DEF_COLOR::Red.rgb565);
 				render_.line(CH1_MOVE_AREA, TIME_SCROLL_AREA, CH1_MOVE_AREA, 272 - 16,
-					 RENDER::COLOR::Red);
+					 DEF_COLOR::Red.rgb565);
 			}
 
 			// メニュー・ボタンの描画
@@ -410,8 +413,8 @@ namespace utils {
 				static const char* menu[] = {
 					"CH0", "CH1", "Trg", "Smp", "Mes", "Opt" };
 				for(int16_t i = 0; i < 6; ++i) {
-					uint16_t c = RENDER::COLOR::Olive;
-					if(static_cast<MENU>(i + 1) == menu_) c = RENDER::COLOR::Yellow;
+					auto c = DEF_COLOR::Olive;
+					if(static_cast<MENU>(i + 1) == menu_) c = DEF_COLOR::Yellow;
 					render_.set_back_color(c);
 					render_.draw_button(441, 16 + GRID * i + 1, GRID - 1, GRID - 1, menu[i]);
 				}
@@ -433,7 +436,7 @@ namespace utils {
 					int16_t y1 = d1.ch0_;
 					y1 -= 2048;
 					y1 /= -17;
-					render_.line(x, ofs + y0, x + 1, ofs + y1, RENDER::COLOR::Lime);
+					render_.line(x, ofs + y0, x + 1, ofs + y1, DEF_COLOR::Lime.rgb565);
 				}
 				{
 					int16_t ofs = ch1_vpos_ + 272 / 2;
@@ -443,7 +446,7 @@ namespace utils {
 					int16_t y1 = d1.ch1_;
 					y1 -= 2048;
 					y1 /= -17;
-					render_.line(x, ofs + y0, x + 1, ofs + y1, RENDER::COLOR::Fuchsi);
+					render_.line(x, ofs + y0, x + 1, ofs + y1, DEF_COLOR::Fuchsi.rgb565);
 				}
 			}
 
