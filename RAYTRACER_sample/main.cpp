@@ -55,8 +55,8 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX24T" };
-	static const uint16_t lcd_w_ = 320;
-	static const uint16_t lcd_h_ = 240;
+	static const uint16_t LCD_X = 320;
+	static const uint16_t LCD_Y = 240;
 	uint16_t*	fb_ = nullptr;
 #elif defined(SIG_RX66T)
 	typedef device::system_io<10000000, 16000000> SYSTEM_IO;
@@ -65,7 +65,7 @@ namespace {
 	static const char* system_str_ = { "RX66T" };
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
-	uint16_t	fb_[LCD_X * LCD_Y];
+	uint16_t*	fb_ = nullptr;
 #endif
 
 	typedef graphics::font8x16 AFONT;
@@ -77,12 +77,13 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_IO;
-	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> RENDER;
+//	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> RENDER;
+	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
 #else
 	class GLCDC_IO {
 		void*	fb_;
 	public:
-		static const int16_t width = LCD_X;
+		static const int16_t width  = LCD_X;
 		static const int16_t height = LCD_Y;
 		static const graphics::pixel::TYPE PXT = graphics::pixel::TYPE::RGB565;
 		GLCDC_IO(void* fb1, void* fb2) : fb_(fb2) { }
@@ -117,16 +118,16 @@ namespace {
 		if(cmdn >= 1) {
 			bool f = false;
 			if(cmd_.cmp_word(0, "clear")) {
-				render_.clear(0x0000);
+				render_.clear(graphics::def_color::Black);
 				f = true;
 			} else if(cmd_.cmp_word(0, "render")) {
-				render_.clear(0x0000);
+				render_.clear(graphics::def_color::Black);
 				render_width_  = 320;
 				render_height_ = 240;
 				run_ = false;
 				f = true;
 			} else if(cmd_.cmp_word(0, "full")) {
-				render_.clear(0x0000);
+				render_.clear(graphics::def_color::Black);
 				render_width_  = 480;
 				render_height_ = 272;
 				run_ = false;
@@ -152,17 +153,17 @@ extern "C" {
 
 	void draw_pixel(int x, int y, int r, int g, int b)
 	{
-		auto c = RENDER::COLOR::rgb(r, g, b);
+		auto c = graphics::share_color::to_565(r, g, b);
 		render_.plot(vtx::spos(x, y), c);
 	}
 
 
 	void draw_text(int x, int y, const char* t)
 	{
-		render_.start_frame();
-//		render_.fill_box(x, y, strlen(t) * AFONT::width, AFONT::height, render_.get_back_color());
+//		render_.start_frame();
+		render_.fill_box(x, y, strlen(t) * AFONT::width, AFONT::height, 0);
 		render_.draw_text(vtx::spos(x, y), t);
-		render_.end_frame();
+//		render_.end_frame();
 	}
 
 
@@ -251,7 +252,7 @@ int main(int argc, char** argv)
 
 		bool v = !SW2::P();
 		if(!sw && v) {
-			render_.clear(0x0);
+			render_.clear(graphics::def_color::Black);
 			if(render_width_ == 320) {
 				render_width_  = LCD_X;
 				render_height_ = LCD_Y;

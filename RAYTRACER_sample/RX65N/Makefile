@@ -25,6 +25,7 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	RAYTRACER_sample/main.cpp \
 				RX65x/icu_mgr.cpp \
 				graphics/font8x16.cpp \
+				graphics/color.cpp \
 				common/stdapi.cpp
 
 USER_LIBS	=	m supc++ drw2d

@@ -23,6 +23,7 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	RAYTRACER_sample/main.cpp \
 				RX600/icu_mgr.cpp \
 				graphics/font8x16.cpp \
+				graphics/color.cpp \
 				common/stdapi.cpp
 USER_LIBS	=
 

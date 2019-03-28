@@ -20,8 +20,8 @@ CSOURCES	=	common/init.c \
 				common/syscalls.c
 
 PSOURCES	=	RAYTRACER_sample/main.cpp \
-				graphics/font8x16.cpp
-
+				graphics/font8x16.cpp \
+				graphics/color.cpp
 USER_LIBS	=
 
 LDSCRIPT	=	../../RX24T/$(DEVICE).ld
