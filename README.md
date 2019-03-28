@@ -6,7 +6,7 @@ Renesas RX Microcontroller
    
 ## Overview
    
-This is a program by Renesas RX microcontroller and its compiler rx-elf-gcc, g ++.   
+This is a program by Renesas RX microcontroller and its compiler rx-elf-gcc, g++.   
    
 Currently, a dedicated writing program has been implemented that has been tested on Windows, OS-X, and Linux.   
 Development is now possible in multiple environments.   
@@ -60,7 +60,7 @@ No need for a dedicated boot program or loader I can write and execute.
 ---
 ## Description
    
-In device I / O operation, a dedicated header is prepared using template class library implemented in C ++, and utility and class library are also enhanced.   
+In device I / O operation, a dedicated header is prepared using template class library implemented in C++, and utility and class library are also enhanced.   
 - Some of them use a library made by Renesas.   
    
 |Directory/file|Contents|
@@ -200,7 +200,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 ---
 ## RX Development environment construction
    
-- The RX compiler (rx-elf-gcc, g ++) uses "gcc-6.4.0".   
+- The RX compiler (rx-elf-gcc, g++) uses "gcc-6.4.0".   
 - Download "binutils-2.30.tar.gz".   
 - Download "gcc-6.4.0.tar.gz".   
 - Download "newlib-2.4.0.tar.gz".   
@@ -318,237 +318,137 @@ http://www.rvf-rc45.net/Renesas_GNU_Tools/
     sh all_project_build.sh [clean]
 ```
 --- 
-## RX デバイスへのプログラム書き込み方法
+## How to write program to RX microcontroller
 
-幾つかの方法がありますが、最も簡単で、コストがかからない方法は、シリアルインターフェースを使って   
-書き込む方法です。   
-※但し、書き込み速度は、あまり上がりません。   
-USB インターフェース内臓の RX マイコンの場合は、USB でブートして接続する事もできますが、ドライバー   
-は、Windows 版しか対応しないようです。（この辺りの事情は詳しく調査していない為間違っているかもしれません）   
+There are several ways, but the easiest and least expensive way is to use the serial interface
+It is a method of writing.   
+- However, the writing speed is not very fast.   
    
-また、全ての RX マイコンが USB インターフェースを内臓しているわけでは無い為、もっとも一般的な、   
-シリアルインターフェースを使って書き込む方法を紹介します。   
-シリアルインターフェースでの書き込みは、速度はそれなりですが、簡単確実で、接続も簡単。   
+In case of RX microcontroller with built-in USB interface, you can boot and connect with USB, but the driver Seems to only support the Windows version.
+- The circumstances around here may be wrong as we have not investigated in detail.   
    
-※シリアルポートとの接続、ブートモードへの切り替えについては、ハードウェアマニュアルに書かれていま   
-すので参考にして下さい。   
-通常、ＭＤ端子を、Ｌ又はＨにする事で、プログラムと内臓ＲＯＭの実行を切り替えできます。   
+The most common, because not all RX microcontrollers have built-in USB interface We will show you how to write using serial interface.
    
-※USB シリアル変換モジュールなどを使うと、電源も取れて簡単です。   
-※（秋月電子、シリアル変換モジュール）http://akizukidenshi.com/catalog/g/gK-06894/   
-※（CP2102 シリアル変換モジュール）https://www.amazon.co.jp/%E3%80%90%E3%83%8E%E3%83%BC%E3%83%96%E3%83%A9%E3%83%B3%E3%83%89%E5%93%81%E3%80%91USB%E2%86%92TTL-%E3%82%B3%E3%83%B3%E3%83%90%E3%83%BC%E3%82%BF%E3%83%BC%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB-%E3%82%A2%E3%83%80%E3%83%97%E3%82%BF%E3%83%BC-CP2102-%E3%82%B7%E3%83%AA%E3%82%A2%E3%83%AB%E5%A4%89%E6%8F%9B/dp/B008RF73CS/ref=sr_1_1?ie=UTF8&qid=1477589109&sr=8-1&keywords=%EF%BD%83%EF%BD%90%EF%BC%92%EF%BC%91%EF%BC%90%EF%BC%92
-(1) RXD シリアル受信   
-(2) TXD シリアル送信   
-(3) VCC 電源（５Ｖ又は３．３Ｖ）   
-(4) GND 電源 ０Ｖ   
-※３．３Ｖは限られた電流しか取り出せない為、必ずレギュレーターが必要です。   
-※中国製の格安なモジュールは、品質が安定していない為、お勧めしません、それらの事   
-項を理解していて対処出来る人だけ利用すると良いと思います。   
+- Writing at the serial interface is reasonably fast but easy and secure, and easy to connect.   
    
- - 接続方法、ブートモードの設定などは、各デバイスのハードウェアー・マニュアルに詳細があります。   
-   
-## RX フラッシュプログラマーの構築
+- The hardware manual describes the connection with the serial port and switching to boot mode.
+  Please refer to it.   
+- Normally, setting MD terminal to L or H allows switching between program and internal ROM execution.   
+- It is also necessary to control the state of the UB terminal.   
+- If you use a USB serial conversion module etc., it is easy to get power.   
 
- - 現在、RX63T、RX24T、RX64M、RX71M へのフラッシュ書き込みを確認しています。
- - リセットは、制御していないので、書き込み時にリセット信号をアサートする必要があります。
- - 現在のバージョンでは、消去、書き込み、比較 の動作のみ実装されています。
- - コードプロテクトの ID 設定や比較などは未実装です。
- - RX24T、RX63T では、接続が確立した時に、消去が自動で行われる為、消去動作は無視されます。
- - rx_prog のビルドには「boost」が必要です。（通常最新バージョンを使う）
- - boost はヘッダーのみ利用なので、ビルドの必要はありません。
- - mingw64 環境などに pacman を使い boost をインストールして使っています。
-
-``` 
-    pacman -S mingw-w64-x86_64-boost   
-```
-
- - rxprog のビルド（MSYS2）
- - ビルドした実行ファイルは、/usr/local/bin に配置します。
-
+1. RXD serial reception   
+2. TXD serial transmission   
+3. VCC power (5V or 3.3V)   
+4. GND power 0V   
+- As 3.3V can only extract a limited current, a regulator is always required.   
+- Details on the connection method, boot mode settings, etc. can be found in the hardware manual for each device.   
+   
+## Construction of flash programmer for RX microcontroller
+- Currently, flash writing to RX63T, RX24T, RX64M, and RX71M is confirmed.
+- Since the reset is not controlled, it is necessary to assert the reset signal at the time of writing.
+- In the current version, only erase, write and compare operations are implemented.
+- Code protection ID settings and operations are not implemented yet.
+- In the RX24T and RX63T, the erase operation is ignored because the erase is performed automatically when the connection is established.
+   
+- Build rxprog in MSYS2 environment.
+- Copy the built executable file to "/usr/local/bin".
+- Pass the PATH to /usr/local/bin.
 ```
     cd rxprog
     make
     make install
-　　※/usr/local/bin にパスを通しておく。
 ```
- - rx_prog.conf を編集して、接続する COM ポート、ボーレートの設定をする。
- - /dev/ttyS10 -> COM11 に相当します。（数字に＋１する）
- - 「rx_prog.conf」には、標準のシリアルポートを記述できます、自分の環境に合わせて設定しておくと良いでしょう。
- - ポートの設定は、開発環境の違いに対応できるように、Windows、OS-X、Linux と環境別のポートを設定できます。
- - 各プロジェクトの「Makefile」には、「make run」で書き込めるスクリプトが設定されています。
-   
----
-## Renesus ENVISION KIT-RX65N を使った開発
-<img src="docs/RTK5RX65N.jpg" width="50%">
+```
+Renesas RX Series Programmer Version 0.90b
+Copyright (C) 2016,2018 Hiramatsu Kunihito (hira@rvf-rc45.net)
+usage:
+rx_prog [options] [mot file] ...
 
- - ルネサスが販売する「RTK5RX65N」は、LCD 付きでありながら低価格で高機能なボードです。   
- - もちろんラズベリーPiなどとは比較はできませんが、スタンドアロンで動かす事の出来る手頃なマイコンボードだと思えます。
- - また、このボードには、「E1 Lite エミュレーター」が内臓されており、USB 接続で、簡単にプログラムを書き込む事が出来ます。（Windows 環境で、Renesus Flash Programmer を使って書き込める）
- - DIP SW 1, 1 を「ON」にする事で、内臓エミュレーターが有効になり、「Renesas Flash Programmer」
-   実行バイナリーを書き込めます。
- - DIP SW 1, 1 を「OFF」にする事で、書き込んだプログラムが単独で実行します。
- - 初期状態では、SD カード、イーサーネット関係の部品などが抜けていますが、後から自分で取り付ける事が出来ると思います。
- - このボード標準の SD カードソケットは、製造が終了しており、日本では入手性が悪く、価格も高い為、別の方法を推奨します。
- - 秋月電子製のマイクロ SD ソケットアダプタを介して接続するのが簡単です。   
-![R5F564ML](docs/RTK5_MSD.jpg)
-![R5F564ML](docs/RTK5_side.jpg)
-
+Options :
+    -P PORT,   --port=PORT     Specify serial port
+    -s SPEED,  --speed=SPEED   Specify serial speed
+    -d DEVICE, --device=DEVICE Specify device name
+    -e, --erase                Perform a device erase to a minimum
+    -v, --verify               Perform data verify
+    -w, --write                Perform data write
+    --progress                 display Progress output
+    --device-list              Display device list
+    --verbose                  Verbose output
+    -h, --help                 Display this
+```
+- Edit rx_prog.conf and set the COM port to connect and the baud rate.
+- Ports and baud rates can be set for each of Windows, OS-X and Linux environments.
+- You can write a standard serial port in "rx_prog.conf", and you should set it according to your environment.
+- Each project's "Makefile" contains a script that can be written using "make run".
+   
+rx_prog.conf:
+```
+port_win   = COM12
+port_osx   = /dev/tty.usbserial-DA00X2QP
+port_linux = /dev/ttyUSB0
+speed_win = 230400
+speed_osx = 230400
+speed_linux = 230400
+```
 ---
-## 何故、独自の開発環境（フレームワーク）を使うのか？
-
-現在、ルネサス社が提供する gcc ベースの IDE 環境を使う事が出来ますが、私は、IDE が嫌いです。   
-マウスでメニューを操作する必要があり、操作の方法を新たに覚える必要があるのには、抵抗があり   
-ます。   
-それと、gcc と言っても、独自の改造がしてあり、完全に「素」の gcc とは言えないのが問題と   
-思います。   
-※ルネサス社には独自の「開発環境」に対する考え方がありますが、必ずしも、それが、自分のス   
-タイルに合うとは限りません。   
+## Development using Renesus ENVISION KIT-RX65N
+<img src="docs/RTK5RX65N.jpg" width="50%">   
    
-自分は、昔ながらの CUI 環境の方が手っ取り早く、操作性や見通しが良く扱いやすいです。   
-emacs、gcc、make、があれば十分なのです。   
-また、歴史的に、開発ツールは「有償であるべきである」との考えがあります。（サポートも含む）   
-しかしながら、現代においては、数十万円のコンパイラに投資して製品を開発する事が出来るのは   
-大量生産が可能な機器に絞られると思います、それゆえ、gcc で開発をするのは、当然の結果と言   
-えるのだと思えます。   
-※公開してある「Makefile」には独自の工夫がしてあり、最小限の編集で、プロジェクトをビルド   
-出来るように自動化の為のスクリプトが入れてあります。   
-※通常の「Makefile」は、従属規則を書くのは「自動」ではありません、新規にファイルを追加し   
-たら、それに伴って、従属規則を更新しなければなりません。   
-また、ソースファイルにインクルードしているローカルなファイルを変更した場合にもこれを怠る   
-と、関係するソースファイルが適切にコンパイルされず、古いオブジェクトをリンクしてしまう事   
-があります。   
-この「Makefile」では、「従属規則」の生成は、ほぼ自動化してあり、そのようなトラブルが起こ   
-る事を最小限にする事が出来ます。   
-※事前に、何かファイルを生成したりする必要が全く無いように工夫してあります。   
-ユーザーは、ターゲット名、リンクするソースを適宜編集するだけです。   
-後は「make」と打てば、従属規則（どのソースがどのヘッダーをインクルードしているか？）は自動   
-で生成します。   
-また C++ では、ヘッダーと実装を分ける必要がほぼ無くなる為、Makefile を編集してソースを追加
-する事がほぼ無くなります。   
+- The "RTK5RX65N" sold by Renesas is a low-cost, high-performance board with an LCD.   
+- Of course it can not be compared with Raspberry Pi etc. but it seems to be an affordable   microcomputer board that can be operated stand-alone.
+- In addition, this board is equipped with an "E1 Lite Emulator", which allows you to easily write programs via USB connection.
+- In Windows, you can write using Renesus Flash Programmer V3.
+- By setting DIP SW 1-1 to "ON", the built-in emulator is enabled and the execution binary can be written.
+- By setting DIP SW 1-1 to "OFF", the written program runs independently.
+- By default, SD cards and Ethernet components are not installed, but you can attach them later.
+- This board's standard SD card socket has been discontinued, is not available in Japan, and is expensive, so we recommend another method.
+- It is easy to connect via Akizuki Electronics micro SD socket adapter.   
+- It bypasses the power control of the SD card.   
    
----
+<img src="docs/RTK5_MSD.jpg" width="50%">   
    
-次の問題は、ルネサス社が提供する、ハードウェアー定義、デバイスドライバーです。   
-これらは、多くの場合、ルネサス社の標準コンパイラ向けのコードで、gcc ではコンパイルできな   
-い場合があり、また、Ｃ言語をベースにした物であり、不満があります。   
-また、公開されているデバイスドライバーも、ファイル名、構成、見通し、など、かなり不満があ   
-ります。   
-※C++ から、C 言語の関数を呼ぶ事は可能なのだから、自分でわざわざデバイスドライバーを作る   
-のは、無意味だと言った人もいますが、その人の考え方と、私は根本的に異なります。   
-「より良い」と思う物を作りたいだけです。   
-Arduino は C++ がベースとは言え、C++ の優れた機能をあまり活用していません C++ を前面にし   
-た、新しい試みを開拓したいと思っていました。   
-   
-最初にルネサス社のマイコンを始めた段階で、まず gcc の構築から初めて、十分実用になる事を確   
-認しました。   
-次に、C++ の理解を深める学習の一環で、デバイス定義をクラス化して、C++ ぽく、デバイスにアク   
-セスするクラスを実装しました。   
-デバイスドライバも、より簡単に、少ない手順で、使いたいので、多くを独自に実装しています。   
-※ルネサス社が提供する、ハードウェアー定義の「iodefine.h」は、独自の環境でしかコンパイルす   
-る事ができず、また、可読性が非常に悪いです、本来モジュール定義コードに詳細なハードウェアー   
-マニュアルを添付すべきと思っているくらいです。   
-※ビットフィールドを定義する方法は、標準化委員会では、「バイト」単位では認めていても、それ   
-以外は規約違反（バイトオーダーで表現が異なる為）です。   
-私が提供する C++ ベースのデバイス定義クラスは、C++14以降なら、どの環境でも、特殊な定義無し   
-で完全にコンパイルする事が可能です。   
-※現在、最適化無しでコンパイルした場合、リンクに失敗します、修正中です。   
-   
-※ルネサス社純正コンパイラは、独自の拡張がされており、それらは標準化委員会が定めた規約から   
-逸脱する場合もあるように思います、そのような独自拡張されたコンパイラ向けに書かれたソースは   
-他のコンパイラではそのままコンパイル出来ない場合もあり、あまりメリットを感じません。   
-   
-「gcc 環境ではまともなデバッグが出来ない」
-と言う人がいますが、本当にそうでしょうか？   
-確かに IDE には、見た目と操作性が良い GUI があり、そのような場合は時間の短縮になる場合もあ   
-りますが、自分の経験では、そのような環境がどうしても必要と感じた事はほぼ無く、シュミレータ   
-ーを使ったり、PC 上でエミュレーションするなど、工夫次第でどうにでもなります。   
+- If you can get the standard SD card slot "101-00565-64 (made by AMPHENOL COMMERCIAL PRODUCTS)", it will not take much time.
    
 ---
-## 何故、C++ なのか？
+## Programming environment using C++ framework
    
-コンピューター言語は、マシンの為にあるのでは無く、人間の可読性の為に存在すると思っています。   
-それなら、マシンに媚びた構成では無く、より人間が理解しやすく間違いが少ない方が良いと思いま   
-す。   
-C++ は、C 言語に文法が似ていますが全く異なったコンピュータ言語です。   
-※多くの C 言語プログラマーがこの事実を受け入れないでいます、C++ を習得するには、全く新しい   
-言語を習得する覚悟と時間（コスト）が必要だと思います。（それに見合う価値があると思います）   
-   
-RX71M は 240MHz で動作し、512KB のメモリを内蔵しています、この「進化」はこれからも加速して   
-いく事と思います、そんな状況なのに、何故、開発者がマシンに寄った環境に甘んじて開発を行わな   
-ければいけないのでしょうか？   
-C++ での実装は、それら対する一つの回答です、また、コンパイラの進化により、ますます最適化が   
-加速する事と思います。   
-   
----
-   
-☆以下は C++ 的 LED を点滅するプログラム例です。   
-(1) マイコン接続のクリスタルは 12MHz   
-(2) LED の接続ポートは、PORT0、B7   
-(3) 点滅間隔は 0.25 秒   
-※マイコンの動作速度は、Makefile で設定   
-※他、シリアル通信、ＳＤカードアクセスなど豊富なサンプルがあります。   
+- The following is an example program to communicate with SCI in C++.   
+1. The port of SCI is defined by "port_map.hpp", and there is more than one port to select
+There is no need to make complicated settings if you set "second candidate" or "third candidate".   
+2. The baud rate can be set as an integer, and is automatically calculated internally from the set frequency.   
+3. Even if you use interrupts, you can use them without polling (polling).   
+4. Transmission and reception are performed through a fixed length FIFO class, and the size can be freely defined.   
+5. The sci_putch and sci_getch functions are called from POSIX file functions, so they can be linked externally.   
+6. The above functions are accessed from stdout, stdin, stderr descriptors, so you can also use the printf function, but for various reasons we do not recommend using "utils :: format", which is the size It is smaller, more flexible, convenient and safe.   
 ```
 #include "common/renesas.hpp"
-
-namespace {
-    typedef device::system_io<12000000> SYSTEM_IO;
-    typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-}
-
-int main(int argc, char** argv);
-
-int main(int argc, char** argv)
-{
-    SYSTEM_IO::setup_system_clock();
-
-    LED::DIR = 1;
-    while(1) {
-        utils::delay::milli_second(250);
-        LED::P = 0;
-        utils::delay::milli_second(250);
-        LED::P = 1;
-    }
-}
-```
-   
----
-   
-☆以下は C++ 的 SCI で通信するプログラム例です。   
-(1) SCI の設定に関する部分のみで、他は LED 点滅プログラムと共通です。   
-(2) SCI の標準ポートは、port_map.hpp により定義されており、選択するポートが複数ある場合   
-「第二候補」や「第三候補」を設定すればよく、面倒な設定を行う必要はありません。   
-(3) ボーレートは整数で設定すれば良く、内部で、設定周波数から自動的に計算されます。   
-(4) 割り込みを使う場合でも、使わない場合（ポーリング）でも使う事が出来ます。   
-(5) 送信、受信は、固定長 FIFO クラスを通して行われ、サイズは、自由に定義する事が出来ます。   
-(6) sci_putch、sci_getch 関数は、POSIX のファイル関数から呼ばれるので、外部からリンクできるようにしておきます。   
-(7) 上記関数は、stdout、stdin、stderr ディスクリプタからアクセスされます、従って、printf 関数も使う事が出来ますが、色々な理由で推奨しません「utils::format」を使って下さい、その方がサイズが小さくなり、自由度が大きく便利で安全です。   
-```
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 
 namespace {
+    typedef device::system_io<12000000> SYSTEM_IO;  // External connection crystal is 12MHz
 
-//  SCI9 を使用
+//  Use SCI9
     typedef device::SCI9 SCI_CH;
 
-    typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
-    typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
+    typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) buffer definition at 512 bytes
+    typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) buffer definition at 256 buyes
 
     typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
-// SCI ポートの第二候補を選択する場合
-//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
+//    When selecting a second candidate for the SCI port
+//    typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
     SCI     sci_;
 }
 
 extern "C" {
-
-    // syscalls.c から呼ばれる、標準出力（stdout, stderr）
+    // standard output, called from "syscalls.c"（stdout, stderr）
     void sci_putch(char ch) { sci_.putch(ch); }
 
     void sci_puts(const char* str) { sci_.puts(str); }
 
-    // syscalls.c から呼ばれる、標準入力（stdin）
+    // standard input, called from "syscalls.c"（stdin）
     char sci_getch(void) { return sci_.getch(); }
 
     uint16_t sci_length() { return sci_.recv_length(); }
@@ -560,25 +460,49 @@ int main(int argc, char** argv)
 {
     SYSTEM_IO::setup_system_clock();
 
-	{  // メイン、SCI 開始
-       uint8_t intr = 2;        // 割り込みレベル
-       uint32_t baud = 115200;  // ボーレート
+    {  // Start SCI
+       uint8_t intr = 2;        // Interrupt level
+       uint32_t baud = 115200;  // baudrate
        sci_.start(baud, intr);
-	}
+    }
 
-	//-----
-	{  // メイン、SCI 出力
+    //-----
+    {  // main、SCI output
        utils::format("Start SCI\n");
-	}
+    }
 
-	// 永久ループ
-	while(1) ;
+    // to loop
+    while(1) ;
 }
 ```
-   
------
-   
-License
-----
+---
+## License
 
 MIT
+
+```
+Copyright (c) 2017 2019, Hiramatsu Kunihito
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+* Redistributions of source code must retain the above copyright notice, 
+  this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice, 
+  this list of conditions and the following disclaimer in the documentation 
+  and/or other materials provided with the distribution.
+* Neither the name of the <organization> nor the　names of its contributors 
+  may be used to endorse or promote products derived from this software 
+  without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
