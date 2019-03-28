@@ -29,6 +29,7 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	main.cpp \
 				RX65x/icu_mgr.cpp \
 				graphics/font8x16.cpp \
+				graphics/color.cpp \
 				resource.cpp \
 				common/stdapi.cpp
 

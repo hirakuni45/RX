@@ -21,6 +21,7 @@ namespace app {
 	class setup {
 
 		typedef scenes_base::RENDER RENDER;
+		typedef graphics::def_color DEF_COLOR;
 
 	public:
 		//-------------------------------------------------------------//
@@ -38,7 +39,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init() noexcept
 		{
-			at_scenes_base().at_render().clear(RENDER::COLOR::Black);
+			at_scenes_base().at_render().clear(DEF_COLOR::Black);
 		}
 
 

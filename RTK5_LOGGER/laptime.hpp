@@ -23,6 +23,9 @@ namespace app {
 		uint32_t	lap_best_t_;
 		uint32_t	lap_best_n_;
 
+		typedef scenes_base::RENDER RENDER;
+		typedef graphics::def_color DEF_COLOR;
+
 	public:
 		//-------------------------------------------------------------//
 		/*!
@@ -43,10 +46,8 @@ namespace app {
 			lap_best_t_ = 0;
 			lap_best_n_ = 0;
 
-			typedef scenes_base::RENDER RENDER;
-
 			auto& render = at_scenes_base().at_render();
-			render.clear(RENDER::COLOR::Black);
+			render.clear(DEF_COLOR::Black);
 		}
 
 
@@ -57,7 +58,6 @@ namespace app {
 		//-------------------------------------------------------------//
 		void service()
 		{
-			typedef scenes_base::RENDER RENDER;
 			auto& render = at_scenes_base().at_render();
 			auto& res = at_scenes_base().at_resource();
 			auto& watch = at_scenes_base().at_cmt().at_task();
@@ -76,7 +76,8 @@ namespace app {
 
 
 			// プログレスバー表示
-			render.frame(0, RENDER::glc_type::height - 10, RENDER::glc_type::width, 10, RENDER::COLOR::White);
+			render.frame(0, RENDER::glc_type::height - 10, RENDER::glc_type::width, 10,
+				DEF_COLOR::White.rgb565);
 			uint32_t bt = 0;
 			if(pos > 0) {
 				bt = watch.get_lap(pos - 1);
@@ -91,14 +92,14 @@ namespace app {
 			if(bt > 0) {
 				uint32_t ref = RENDER::glc_type::width - 2;
 				uint32_t per = ref * dt / bt;
-				auto fc = RENDER::COLOR::Lime;
+				auto fc = DEF_COLOR::Lime;
 				if(per > ref) {
 					per = ref;
-					fc = RENDER::COLOR::Red;
+					fc = DEF_COLOR::Red;
 				}
-				auto bc = RENDER::COLOR::Black;
-				render.fill_box(1, RENDER::glc_type::height - 10 + 1, ref - per, 10 - 2, bc);
-				render.fill_box(1, RENDER::glc_type::height - 10 + 1, per, 10 - 2, fc);
+				auto bc = DEF_COLOR::Black;
+				render.fill_box(1, RENDER::glc_type::height - 10 + 1, ref - per, 10 - 2, bc.rgb565);
+				render.fill_box(1, RENDER::glc_type::height - 10 + 1, per, 10 - 2, fc.rgb565);
 			}
 
 			for(uint32_t i = 0; i < 4; ++i) {

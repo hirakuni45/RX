@@ -21,6 +21,7 @@ namespace app {
 	class title {
 
 		typedef scenes_base::RENDER RENDER;
+		typedef graphics::def_color DEF_COLOR;
 
 		uint8_t		count_;
 		bool		logo_;
@@ -46,7 +47,7 @@ namespace app {
 			count_ = 90;  // 1.5sec
 			logo_ = false;
 
-			render.clear(RENDER::COLOR::White);
+			render.clear(DEF_COLOR::White);
 		}
 
 

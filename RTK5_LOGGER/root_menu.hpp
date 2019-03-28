@@ -52,7 +52,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void service()
 		{
-			at_scenes_base().at_render().clear(0);
+			at_scenes_base().at_render().clear(graphics::def_color::Black);
 
 			const auto& touch = at_scenes_base().at_touch();
 			bool t = touch.get_touch_num() == 1 ? true : false;
