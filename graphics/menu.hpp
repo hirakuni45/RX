@@ -48,9 +48,9 @@ namespace graphics {
 
 		uint16_t	pos_;
 
-		typename REND::value_type	fc_;
-		typename REND::value_type	hc_;
-		typename REND::value_type	bc_;
+		share_color	fc_;
+		share_color	hc_;
+		share_color	bc_;
 
 		bool		focus_;
 
@@ -64,7 +64,7 @@ namespace graphics {
 		menu(REND& rend, BACK& back) noexcept : rend_(rend), back_(back),
 			size_(0), mx_(0), my_(0), ox_(0), oy_(0),
 			gap_(0), space_w_(0), space_h_(0), pos_(0),
-			fc_(REND::COLOR::Black), hc_(REND::COLOR::White), bc_(REND::COLOR::Gray),
+			fc_(def_color::Black), hc_(def_color::White), bc_(def_color::Gray),
 			focus_(true)
 		{ }
 
@@ -238,7 +238,7 @@ namespace graphics {
 						c = hc_;
 					}
 				}
-				back_(x, y, mx_, obj.h_ + space_h_ * 2, c);
+				back_(x, y, mx_, obj.h_ + space_h_ * 2, c.rgb565);
 				y += space_h_;
 				auto t = static_cast<const char*>(obj_[i].src_);
 				rend_.draw_text(vtx::spos(x + space_w_, y), t);

@@ -36,8 +36,8 @@ namespace graphics {
 //		typedef typename device::glcdc_def::pix<GLC::PXT>::type T;
 		typedef uint16_t T;
 		typedef T value_type;
-		typedef base_color<T> COLOR;
-
+		typedef def_color DEF_COLOR;
+		typedef share_color SHARE_COLOR;
 		typedef GLC glc_type;
 		typedef AFONT afont_type;
 		typedef KFONT kfont_type;
@@ -54,8 +54,8 @@ namespace graphics {
 
 		KFONT& 		kfont_;
 
-		T			fc_;
-		T			bc_;
+		share_color	fore_color_;
+		share_color	back_color_;
 
 		uint32_t	stipple_;
 		uint32_t	stipple_mask_;
@@ -97,7 +97,7 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		render(GLC& glc, KFONT& kf) noexcept : glc_(glc), kfont_(kf),
-			fc_(COLOR::White), bc_(COLOR::Black),
+			fore_color_(255, 255, 255), back_color_(0, 0, 0),
 			stipple_(-1), stipple_mask_(1), ofs_(0)
 		{ fb_ = static_cast<T*>(glc_.get_fbp()); }
 
@@ -124,8 +124,28 @@ namespace graphics {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フレームの同期
+		*/
+		//-----------------------------------------------------------------//
+		void sync_frame() noexcept
+		{
+			glc_.sync_vpos();
+		}
+
+
 		void start_frame() noexcept { }
 		void end_frame() noexcept { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	停止 @n
+					※互換性の為に用意
+		*/
+		//-----------------------------------------------------------------//
+		void stop() noexcept { }
 
 
 		//-----------------------------------------------------------------//
@@ -134,7 +154,7 @@ namespace graphics {
 			@return フレームバッファ・アドレス
 		*/
 		//-----------------------------------------------------------------//
-		const T* fb() const noexcept { return fb_; }
+		const value_type* fb() const noexcept { return fb_; }
 
 
 		//-----------------------------------------------------------------//
@@ -143,7 +163,7 @@ namespace graphics {
 			@return フォア・カラー
 		*/
 		//-----------------------------------------------------------------//
-		T get_fore_color() const noexcept { return fc_; }
+		const share_color& get_fore_color() const noexcept { return fore_color_; }
 
 
 		//-----------------------------------------------------------------//
@@ -152,7 +172,7 @@ namespace graphics {
 			@param[in]	c	フォア・カラー
 		*/
 		//-----------------------------------------------------------------//
-		void set_fore_color(T c) noexcept { fc_ = c; }
+		void set_fore_color(const share_color& c) noexcept { fore_color_ = c; }
 
 
 		//-----------------------------------------------------------------//
@@ -161,7 +181,7 @@ namespace graphics {
 			@return バック・カラー
 		*/
 		//-----------------------------------------------------------------//
-		T get_back_color() const noexcept { return bc_; }
+		const share_color& get_back_color() const noexcept { return back_color_; }
 
 
 		//-----------------------------------------------------------------//
@@ -170,7 +190,7 @@ namespace graphics {
 			@param[in]	c	バック・カラー
 		*/
 		//-----------------------------------------------------------------//
-		void set_back_color(T c) noexcept { bc_ = c; }
+		void set_back_color(const share_color& c) noexcept { back_color_ = c; }
 
 
 		//-----------------------------------------------------------------//
@@ -178,7 +198,7 @@ namespace graphics {
 			@brief	カラーの交換
 		*/
 		//-----------------------------------------------------------------//
-		void swap_color() noexcept { std::swap(fc_, bc_); }
+		void swap_color() noexcept { std::swap(fore_color_, back_color_); }
 
 
 		//-----------------------------------------------------------------//
@@ -222,39 +242,39 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	点を描画する
-			@param[in]	x	開始点Ｘ軸を指定
-			@param[in]	y	開始点Ｙ軸を指定
+			@param[in]	pos	開始点を指定
 			@param[in]	c	カラー
+            @return 範囲内なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		void plot(int16_t x, int16_t y, T c) noexcept
+		bool plot(const vtx::spos& pos, T c) noexcept
 		{
 			auto m = stipple_mask_;
 			stipple_mask_ <<= 1;
 			if(stipple_mask_ == 0) stipple_mask_ = 1;
 
 			if((stipple_ & m) == 0) {
-				return;
+				return false;
 			}
-			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(GLC::width)) return;
-			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(GLC::height)) return;
-			fb_[y * line_offset + x] = c;
+			if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(GLC::width)) return false;
+			if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(GLC::height)) return false;
+			fb_[pos.y * line_offset + pos.x] = c;
+			return true;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	点を取得する
-			@param[in]	x	開始点Ｘ軸を指定
-			@param[in]	y	開始点Ｙ軸を指定
+			@param[in]	pos	開始点を指定
 			@return	カラー
 		*/
 		//-----------------------------------------------------------------//
-		T get_plot(int16_t x, int16_t y) const noexcept
+		value_type get_plot(const vtx::spos& pos) const noexcept
 		{
-			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(GLC::width)) return -1;
-			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(GLC::height)) return -1;
-			return fb_[y * line_offset + x];
+			if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(GLC::width)) return -1;
+			if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(GLC::height)) return -1;
+			return fb_[pos.y * line_offset + pos.x];
 		}
 
 
@@ -343,37 +363,36 @@ namespace graphics {
 			@param[in]	c	クリアカラー
 		*/
 		//-----------------------------------------------------------------//
-		void clear(T c) noexcept
+		void clear(const share_color& c) noexcept
 		{
-			if(sizeof(T) == 2) {  // 16 bits pixel
-				uint32_t c32 = (static_cast<uint32_t>(c) << 16) | c;
-				uint32_t* out = reinterpret_cast<uint32_t*>(fb_);
-				for(uint32_t i = 0; i < (GLC::width * GLC::height) / 32; ++i) {
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-					*out++ = c32;
-				}
-			} else {
-				for(auto y = 0; y < GLC::height; ++y) {
-					T* p = &fb_[line_offset * y];
-					for(auto x = 0; x < GLC::width; ++x) {
-						*p++ = c;
-					}
+			uint32_t c32 = (static_cast<uint32_t>(c.rgb565) << 16) | c.rgb565;
+			uint32_t* out = reinterpret_cast<uint32_t*>(fb_);
+			for(uint32_t i = 0; i < (GLC::width * GLC::height) / 32; ++i) {
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+				*out++ = c32;
+			}
+#if 0
+			for(auto y = 0; y < GLC::height; ++y) {
+				T* p = &fb_[line_offset * y];
+				for(auto x = 0; x < GLC::width; ++x) {
+					*p++ = c;
 				}
 			}
+#endif
 		}
 
 
@@ -387,7 +406,8 @@ namespace graphics {
 			@param[in]	c	描画色
 		*/
 		//-----------------------------------------------------------------//
-		void line(int16_t x1, int16_t y1, int16_t x2, int16_t y2, T c) noexcept {
+		void line(int16_t x1, int16_t y1, int16_t x2, int16_t y2, T c) noexcept
+		{
 			int16_t dx;
 			int16_t dy;
 			int16_t sx;
@@ -400,7 +420,7 @@ namespace graphics {
 			int16_t y = y1;
 			if(dx > dy) {
 				for(int16_t i = 0; i <= dx; i++) {
-					plot(x, y, c);
+					plot(vtx::spos(x, y), c);
 					m += dy;
 					if(m >= dx) {
 						m -= dx;
@@ -410,7 +430,7 @@ namespace graphics {
 				}
 			} else {
 				for(int16_t i = 0; i <= dy; i++) {
-					plot(x, y, c);
+					plot(vtx::spos(x, y), c);
 					m += dx;
 					if(m >= dy) {
 						m -= dy;
@@ -660,8 +680,8 @@ namespace graphics {
 			for(uint8_t i = 0; i < h; ++i) {
 				int16_t xx = x;
 				for(uint8_t j = 0; j < w; ++j) {
-					if(c & k) plot(xx, y, fc_);
-					else if(b) plot(xx, y, bc_);
+					if(c & k) plot(vtx::spos(xx, y), fore_color_.rgb565);
+					else if(b) plot(vtx::spos(xx, y), back_color_.rgb565);
 					k <<= 1;
 					if(k == 0) {
 						k = 1;
@@ -851,7 +871,7 @@ namespace graphics {
 				auto c = static_cast<uint8_t>(ch);
 				if(c < 0x80) {
 					if(ch == 0x20) {
-						fill_box(x, y, xx - x, AFONT::height, bc_);
+						fill_box(x, y, xx - x, AFONT::height, back_color_.rgb565);
 						x = xx;
 						fill = true;
 					} else {
@@ -881,7 +901,7 @@ namespace graphics {
 				}
 			}
 			if(!fill) {
-				fill_box(x, y, xx - x, AFONT::height, bc_);
+				fill_box(x, y, xx - x, AFONT::height, back_color_.rgb565);
 			}
 			return xx;
 		}
@@ -899,8 +919,8 @@ namespace graphics {
 		{
 			auto x = (GLC::width  - w) / 2;
 			auto y = (GLC::height - h) / 2;
-			frame(x, y, w, h, COLOR::White);
-			fill_box(x + 1, y + 1, w - 2, h - 2, COLOR::Black);
+			frame(x, y, w, h, DEF_COLOR::White.rgb565);
+			fill_box(x + 1, y + 1, w - 2, h - 2, DEF_COLOR::Black.rgb565);
 			auto l = get_text_length(text);
 			x += (w - l) / 2;
 			y += (h - font_height) / 2;
@@ -923,7 +943,7 @@ namespace graphics {
 		void draw_button(int16_t x, int16_t y, int16_t w, int16_t h, const char* text) noexcept
 		{
 			auto len = get_text_length(text);
-			fill_box(x, y, w, h, bc_);
+			fill_box(x, y, w, h, back_color_.rgb565);
 			x += (w - len) / 2;
 			y += (h - font_height) / 2;
 			draw_text(vtx::spos(x, y), text);
@@ -950,7 +970,7 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		void operator() (int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b) noexcept {
-			auto c = COLOR::rgb(r, g, b);
+			auto c = SHARE_COLOR::to_565(r, g, b);
 			plot(x + ofs_.x, y + ofs_.y, c);			
 		}
 	};

@@ -112,13 +112,14 @@ namespace graphics {
 				draw = true;
 			}
 			if(draw && t.vpos_ >= 0 && t.vpos_ < RDR::glc_type::height) {
-				rdr_.set_fore_color(RDR::COLOR::White);
-				rdr_.fill_box(SPC, t.vpos_, RDR::glc_type::width - SPC * 2, RDR::font_height, 0x0000);
+				rdr_.set_fore_color(def_color::White);
+				rdr_.fill_box(SPC, t.vpos_, RDR::glc_type::width - SPC * 2, RDR::font_height,
+					def_color::Black.rgb565);
 				if(dir) rdr_.draw_font(vtx::spos(SPC, t.vpos_), '/');
 				if(dir) {
-					rdr_.set_fore_color(RDR::COLOR::Blue);
+					rdr_.set_fore_color(def_color::Blue);
 				} else {
-					rdr_.set_fore_color(RDR::COLOR::White);
+					rdr_.set_fore_color(def_color::White);
 				}
 				auto w = rdr_.draw_text(vtx::spos(SPC + 8, t.vpos_), name);
 				if(t.hmax_ < w) t.hmax_ = w;
@@ -229,13 +230,13 @@ namespace graphics {
 			if(!sdc_.get_mount()) {
 				open_ = false;
 				pos_stack_.clear();
-				rdr_.clear(RDR::COLOR::Black);
+				rdr_.clear(def_color::Black);
 				return false;
 			}
 
 			if((ptrg & ctrl_mask_(filer_ctrl::OPEN)) != 0 || (back_num_ == 3 && touch_num_ < 3)) {
 				open_ = !open_;
-				rdr_.clear(RDR::COLOR::Black);
+				rdr_.clear(def_color::Black);
 				if(open_) {
 					scan_dir_(false);
 				}
@@ -333,10 +334,10 @@ namespace graphics {
 					pos_stack_.push(pos_t(rdr_st_.vofs_, rdr_st_.sel_pos_));
 					dst[l - 1] = 0;
 					sdc_.cd(dst);
-					rdr_.clear(RDR::COLOR::Black);
+					rdr_.clear(def_color::Black);
 					scan_dir_(false);
 				} else {
-					rdr_.clear(RDR::COLOR::Black);
+					rdr_.clear(def_color::Black);
 					open_ = false;
 					return true;
 				}
@@ -345,7 +346,7 @@ namespace graphics {
 			if(ptrg & ctrl_mask_(filer_ctrl::BACK)) {
 				if(!pos_stack_.empty()) {
 					sdc_.cd("..");
-					rdr_.clear(RDR::COLOR::Black);
+					rdr_.clear(def_color::Black);
 					scan_dir_(true);
 				}
 			}

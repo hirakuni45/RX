@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <cmath>
 #include "common/vtx.hpp"
+#include "graphics/color.hpp"
 // #include <unordered_map>
 
 namespace img {
@@ -291,17 +292,17 @@ namespace img {
 		//-----------------------------------------------------------------//
 		void operator() (int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b) noexcept
 		{
-			auto c = RENDER::COLOR::rgb(r, g, b);
+			auto c = graphics::share_color::to_565(r, g, b);
 			if(scale_.up < scale_.dn) {
 				if(c == 0) c = 1;
 				auto xx = x * scale_.up / scale_.dn;
 				auto yy = y * scale_.up / scale_.dn;
-				auto rc = render_.get_plot(xx + ofs_.x, yy + ofs_.y);
+				auto rc = render_.get_plot(vtx::spos(xx + ofs_.x, yy + ofs_.y));
 				if(rc == 0) {
-					render_.plot(xx + ofs_.x, yy + ofs_.y, c);
+					render_.plot(vtx::spos(xx + ofs_.x, yy + ofs_.y), c);
 				} else {
 					auto nc = render_.color_sum(c, rc);
-					render_.plot(xx + ofs_.x, yy + ofs_.y, nc);
+					render_.plot(vtx::spos(xx + ofs_.x, yy + ofs_.y), nc);
 				}
 			} else if(scale_.up > scale_.dn) {
 				auto d  = (scale_.up + (scale_.dn - 1)) / scale_.dn;
@@ -309,7 +310,7 @@ namespace img {
 				auto yy = y * scale_.up / scale_.dn;
 				render_.fill_box(xx + ofs_.x, yy + ofs_.y, d, d, c); 				
 			} else {
-				render_.plot(x + ofs_.x, y + ofs_.y, c);
+				render_.plot(vtx::spos(x + ofs_.x, y + ofs_.y), c);
 			}
 #if 0
 			uint32_t key = static_cast<uint16_t>(xx) | (static_cast<uint16_t>(yy) << 16);
