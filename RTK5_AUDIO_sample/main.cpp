@@ -98,6 +98,8 @@ namespace {
 	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
 	RENDER		render_(glcdc_io_, kfont_);
 
+	typedef graphics::def_color DEF_COLOR;
+
 	// QSPI B グループ
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
@@ -173,7 +175,7 @@ namespace {
 		if(chip::on(ptrg, chip::FAMIPAD_ST::START)) { // Cancel Play
 			ctrl = sound::af_play::CTRL::STOP;
 			sdc_.stall_dir_list();
-			render_.clear(RENDER::COLOR::Black);
+			render_.clear(DEF_COLOR::Black);
 		}
 
 		update_led_();
@@ -186,7 +188,7 @@ namespace {
 		} else if(touch_num_ == 3 && tnum < 3) {  // Cancel Play（３点タッチが離れた瞬間）
 			ctrl = sound::af_play::CTRL::STOP;
 			sdc_.stall_dir_list();
-			render_.clear(RENDER::COLOR::Black);
+			render_.clear(DEF_COLOR::Black);
 			touch_org_ = xy.x;
 		} else if(touch_num_ == 0 && tnum == 1) {
 			touch_org_ = xy.x;
