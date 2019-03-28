@@ -38,8 +38,7 @@ namespace device {
 	class drw2d_mgr {
 	public:
 		typedef uint16_t value_type;
-		typedef graphics::base_color<value_type> COLOR;
-
+		typedef graphics::def_color DEF_COLOR;
 		typedef GLC glc_type;
 		typedef AFONT afont_type;
 		typedef KFONT kfont_type;
@@ -56,20 +55,21 @@ namespace device {
 		KFONT&		kfont_;
 
 		value_type*	fb_;
-		value_type	fc_;
-		value_type	bc_;
 
 		uint32_t	stipple_;
 		uint32_t	stipple_mask_;
 
 		d2_device*	d2_;
 
-		d2_color	color_;
+		graphics::share_color	fore_color_;
+		graphics::share_color	back_color_;
 		vtx::srect	clip_;
 		int16_t		pen_size_;
 		int16_t		scale_;
-		bool		set_color_;
+		bool		set_fore_color_;
+		bool		set_back_color_;
 		bool		set_clip_;
+		bool		start_frame_enable_;
 
 		int32_t		last_error_;
 
@@ -97,9 +97,13 @@ namespace device {
 
 		void setup_()
 		{
-			if(!set_color_) {
-				d2_setcolor(d2_, 0, color_);
-				set_color_ = true;
+			if(!set_fore_color_) {
+				d2_setcolor(d2_, 0, fore_color_.rgba8.rgba);
+				set_fore_color_ = true;
+			}
+			if(!set_back_color_) {
+				d2_setcolor(d2_, 1, back_color_.rgba8.rgba);
+				set_back_color_ = true;
 			}
 			if(!set_clip_) {
 				d2_cliprect(d2_, clip_.org.x, clip_.org.y, clip_.size.x, clip_.size.y);
@@ -115,12 +119,15 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		drw2d_mgr(GLC& glc, KFONT& kfont) noexcept : glc_(glc), kfont_(kfont),
-			fb_(static_cast<value_type*>(glc.get_fbp())), fc_(COLOR::White), bc_(COLOR::Black),
+			fb_(static_cast<value_type*>(glc.get_fbp())),
 			stipple_(-1), stipple_mask_(1),
 			d2_(nullptr),
-			color_(0xffffffff), clip_(0, 0, GLC::width, GLC::height),
+			fore_color_(DEF_COLOR::White), back_color_(DEF_COLOR::Black),
+			clip_(0, 0, GLC::width, GLC::height),
 			pen_size_(16), scale_(16),
-			set_color_(false), set_clip_(false), last_error_(D2_OK)
+			set_fore_color_(false), set_back_color_(false),
+			set_clip_(false), start_frame_enable_(false),
+			last_error_(D2_OK)
 		{ }
 
 
@@ -179,6 +186,44 @@ namespace device {
 		}
 
 
+		void start_frame() noexcept
+		{
+			start_frame_enable_ = true;
+			d2_startframe(d2_);
+
+			auto xs = GLC::width;
+			auto ys = GLC::height;
+			d2_framebuffer(d2_, fb_, xs, xs, ys, get_mode_());
+			d2_cliprect(d2_, 0, 0, xs * 16, ys * 16);
+			d2_settexclut(d2_, clut_);
+		}
+
+
+		void end_frame() noexcept
+		{
+			if(start_frame_enable_) {
+				d2_endframe(d2_);
+				start_frame_enable_ = false;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フレームの同期
+		*/
+		//-----------------------------------------------------------------//
+		void sync_frame() noexcept
+		{
+			if(d2_ == nullptr) {
+				start();
+			}
+			end_frame();
+			glc_.sync_vpos();
+			start_frame();
+		}
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	停止
@@ -188,20 +233,58 @@ namespace device {
 		{
 			d2_closedevice(d2_);
 			d2_ = nullptr;
+
+			icu_mgr::install_group_task(DRW::get_irq_vec(), nullptr);
+
+			power_mgr::turn(DRW::get_peripheral(), false);
+		}
+
+
+		//-----------------------------------------------------------------//
+        /*!
+            @brief  フレームバッファのアドレスを返す
+            @return フレームバッファ・アドレス
+        */
+        //-----------------------------------------------------------------//
+        const value_type* fb() const noexcept { return fb_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	前面カラーの設定
+			@param[in]	color	カラー
+		*/
+		//-----------------------------------------------------------------//
+		void set_fore_color(const graphics::share_color& color) noexcept
+		{
+			fore_color_ = color;
+			set_fore_color_ = false;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	カラーの設定
+			@brief	背面カラーの設定
 			@param[in]	color	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void set_fore_color(d2_color color) noexcept
+		void set_back_color(const graphics::share_color& color) noexcept
 		{
-			color_ = color;
-			set_color_ = false;
+			back_color_ = color;
+			set_back_color_ = false;
 		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  破線パターンの設定
+            @param[in]  stipple 破線パターン
+        */
+        //-----------------------------------------------------------------//
+        void set_stipple(uint32_t stipple = -1) noexcept {
+            stipple_ = stipple;
+            stipple_mask_ = 1;
+        }
 
 
 		//-----------------------------------------------------------------//
@@ -209,21 +292,38 @@ namespace device {
 			@brief	点を描画する
 			@param[in]	pos	開始点
 			@param[in]	c	カラー
+			@return 範囲内なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		void plot(const vtx::spos& pos, value_type c) noexcept
+		bool plot(const vtx::spos& pos, value_type c) noexcept
 		{
 			auto m = stipple_mask_;
 			stipple_mask_ <<= 1;
 			if(stipple_mask_ == 0) stipple_mask_ = 1;
 
 			if((stipple_ & m) == 0) {
-				return;
+				return false;
 			}
-			if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(GLC::width)) return;
-			if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(GLC::height)) return;
+			if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(GLC::width)) return false;
+			if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(GLC::height)) return false;
 			fb_[pos.y * line_offset + pos.x] = c;
+			return true;
 		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  点のカラーを取得する
+            @param[in]  pos 開始点を指定
+            @return カラー
+        */
+        //-----------------------------------------------------------------//
+        value_type get_plot(const vtx::spos& pos) const noexcept
+        {
+            if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(GLC::width)) return -1;
+            if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(GLC::height)) return -1;
+            return fb_[pos.y * line_offset + pos.x];
+        }
 
 
 		//-----------------------------------------------------------------//
@@ -277,42 +377,14 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	フレームを開始する
-		*/
-		//-----------------------------------------------------------------//
-		void start_frame() noexcept
-		{
-			d2_startframe(d2_);
-
-			auto xs = GLC::width;
-			auto ys = GLC::height;
-			d2_framebuffer(d2_, fb_, xs, xs, ys, get_mode_());
-			d2_cliprect(d2_, 0, 0, xs * 16, ys * 16);
-			d2_settexclut(d2_, clut_);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	フレームを終了する
-		*/
-		//-----------------------------------------------------------------//
-		void end_frame() noexcept
-		{
-			d2_endframe(d2_);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	全クリア
 			@param[in]	col	クリアカラー
 			@return エラー無い場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool clear(d2_color col) noexcept
+		bool clear(const graphics::share_color& col) noexcept
 		{
-			last_error_ = d2_clear(d2_, col);
+			last_error_ = d2_clear(d2_, col.rgba8.rgba);
 			return last_error_ == D2_OK;
 		}
 
@@ -459,25 +531,6 @@ namespace device {
 				}
 			}
 			return p.x;
-		}
-
-
-		void copy_bitmap(const vtx::spos& pos)
-		{
-			static const uint8_t src[16] = {
-				0b11111111,0b11111111,
-				0b11111101,0b00111111,
-				0b11111001,0b00111111,
-				0b11110001,0b00111111,
-				0b11100001,0b00111111,
-				0b11000001,0b00111111,
-				0b10000001,0b00111111,
-				0b11111111,0b00111111
-			};
-
-			d2_setblitsrc(d2_, (void*)src, 16, 16, 8, d2_mode_i1 | d2_mode_clut);
-			d2_blitcopy(d2_, 16, 8,
-				0, 0, 16 * 16, 8 * 16, pos.x * 16, pos.y * 16, d2_bf_filter | d2_bf_mirroru);
 		}
 
 

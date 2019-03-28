@@ -93,13 +93,13 @@ extern "C" {
 				   | (static_cast<uint16_t>(g & 0xfc) << 3)
 				   | (static_cast<uint16_t>(b) >> 3);		
 //		tft_.plot(x, y, c);
-		render_.plot(x, y, c);
+		render_.plot(vtx::spos(x, y), c);
 	}
 
 
 	void draw_text(int x, int y, const char* t)
 	{
-		render_.fill_box(x, y, strlen(t) * 8, 16, render_.get_back_color());
+		render_.fill_box(x, y, strlen(t) * 8, 16, render_.get_back_color().rgb565);
 		render_.draw_text(vtx::spos(x, y), t);
 	}
 

@@ -399,7 +399,7 @@ int main(int argc, char** argv)
 	bool filer = false;
 	bool mount = check_mount_();
 	while(1) {
-		glcdc_io_.sync_vpos();
+		render_.sync_frame();
 		fami_pad_data_ = famipad_.update();
 
 		uint8_t data = fami_pad_data_;
