@@ -112,9 +112,9 @@ namespace graphics {
 				draw = true;
 			}
 			if(draw && t.vpos_ >= 0 && t.vpos_ < RDR::glc_type::height) {
+				rdr_.set_fore_color(def_color::Black);
+				rdr_.fill_box(vtx::spos(SPC, t.vpos_), vtx::spos(RDR::glc_type::width - SPC * 2, RDR::font_height));
 				rdr_.set_fore_color(def_color::White);
-				rdr_.fill_box(SPC, t.vpos_, RDR::glc_type::width - SPC * 2, RDR::font_height,
-					def_color::Black.rgb565);
 				if(dir) rdr_.draw_font(vtx::spos(SPC, t.vpos_), '/');
 				if(dir) {
 					rdr_.set_fore_color(def_color::Blue);
@@ -140,11 +140,11 @@ namespace graphics {
 		}
 
 
-		void draw_sel_frame_(int16_t pos, uint16_t c)
+		void draw_sel_frame_(int16_t pos)
 		{
 			int16_t h = RDR::font_height + 2;
 			int16_t y = pos * h;
-			rdr_.frame(0, y, rdr_st_.hmax_ + 3, h + 1, c);
+			rdr_.frame(vtx::spos(0, y), vtx::spos(rdr_st_.hmax_ + 3, h + 1));
 		}
 
 
@@ -278,7 +278,8 @@ namespace graphics {
 			}
 
 			// 選択フレームの描画
-			draw_sel_frame_(rdr_st_.sel_pos_, 0xffff);
+			rdr_.set_fore_color(def_color::White);
+			draw_sel_frame_(rdr_st_.sel_pos_);
 			int16_t pos = rdr_st_.sel_pos_;
 			if(ptrg & ctrl_mask_(filer_ctrl::UP)) {
 				pos--;
@@ -306,7 +307,8 @@ namespace graphics {
 				vofs = lim;
 			}
 			if(vofs != rdr_st_.vofs_) {
-				draw_sel_frame_(rdr_st_.sel_pos_, 0x0000);  // delete frame
+				rdr_.set_fore_color(def_color::Black);
+				draw_sel_frame_(rdr_st_.sel_pos_);  // delete frame
 				int16_t match = -1;
 				if(vofs < rdr_st_.vofs_) {  // down
 					rdr_.scroll(FLN);
@@ -320,7 +322,8 @@ namespace graphics {
 			}
 			
 			if(pos != rdr_st_.sel_pos_) {
-				draw_sel_frame_(rdr_st_.sel_pos_, 0x0000);
+				rdr_.set_fore_color(def_color::Black);
+				draw_sel_frame_(rdr_st_.sel_pos_);
 				rdr_st_.sel_pos_ = pos;
 			}
 

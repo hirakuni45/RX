@@ -182,11 +182,9 @@ namespace graphics {
 			if(size_ >= MAX) return;
 
 			if(bitmap) {
-				uint8_t w;
-				uint8_t h;
-				rend_.get_mobj_size(src, w, h);
-				obj_[size_].w_ = w;
-				obj_[size_].h_ = h;
+				auto sz = rend_.get_mobj_size(src);
+				obj_[size_].w_ = sz.x;
+				obj_[size_].h_ = sz.y;
 			} else {
 				obj_[size_].w_ = rend_.get_text_length(static_cast<const char*>(src), false);
 				obj_[size_].h_ = REND::font_height;
@@ -238,9 +236,11 @@ namespace graphics {
 						c = hc_;
 					}
 				}
-				back_(x, y, mx_, obj.h_ + space_h_ * 2, c.rgb565);
+				rend_.set_fore_color(c);
+				back_(vtx::spos(x, y), vtx::spos(mx_, obj.h_ + space_h_ * 2));
 				y += space_h_;
 				auto t = static_cast<const char*>(obj_[i].src_);
+				rend_.set_fore_color(graphics::def_color::Black);
 				rend_.draw_text(vtx::spos(x + space_w_, y), t);
 				y += obj.h_;
 				y += space_h_;

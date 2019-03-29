@@ -284,10 +284,9 @@ namespace graphics {
 			@param[in]	y	開始位置 Y
 			@param[in]	x	水平開始位置
 			@param[in]	w	水平幅
-			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void line_h(int16_t y, int16_t x, int16_t w, T c) noexcept
+		void line_h(int16_t y, int16_t x, int16_t w) noexcept
 		{
 			if(w <= 0) return;
 			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(GLC::height)) return;
@@ -300,9 +299,9 @@ namespace graphics {
 			if(static_cast<uint16_t>(x + w) >= static_cast<uint16_t>(GLC::width)) {
 				w = GLC::width - x;
 			}
-			T* out = &fb_[y * line_offset + x];
+			uint16_t* out = &fb_[y * line_offset + x];
 			for(int16_t i = 0; i < w; ++i) {
-				*out++ = c;
+				*out++ = fore_color_.rgb565;
 			}
 		}
 
@@ -313,10 +312,9 @@ namespace graphics {
 			@param[in]	x	開始位置 x
 			@param[in]	y	垂直開始位置
 			@param[in]	h	垂直幅
-			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void line_v(int16_t x, int16_t y, int16_t h, T c) noexcept
+		void line_v(int16_t x, int16_t y, int16_t h) noexcept
 		{
 			if(h <= 0) return;
 			if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(GLC::width)) return;
@@ -329,9 +327,9 @@ namespace graphics {
 			if(static_cast<uint16_t>(y + h) >= static_cast<uint16_t>(GLC::height)) {
 				h = GLC::height - y;
 			}
-			T* out = &fb_[y * line_offset + x];
+			uint16_t* out = &fb_[y * line_offset + x];
 			for(int16_t i = 0; i < h; ++i) {
-				*out = c;
+				*out = fore_color_.rgb565;
 				out += line_offset;
 			}
 		}
@@ -340,19 +338,16 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	四角を塗りつぶす
-			@param[in]	x	開始位置 X
-			@param[in]	y	開始位置 Y
-			@param[in]	w	横幅 
-			@param[in]	h	高さ
-			@param[in]	c	カラー
+			@param[in]	org		開始位置
+			@param[in]	size	サイズ
 		*/
 		//-----------------------------------------------------------------//
-		void fill_box(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept
+		void fill_box(const vtx::spos& org, const vtx::spos& size) noexcept
 		{
-			if(w <= 0 || h <= 0) return;
+			if(size.x <= 0 || size.y <= 0) return;
 
-			for(int16_t yy = y; yy < (y + h); ++yy) {
-				line_h(yy, x, w, c);
+			for(int16_t yy = org.y; yy < (org.y + size.y); ++yy) {
+				line_h(yy, org.x, size.x);
 			}
 		}
 
@@ -399,44 +394,48 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	線を描画する
-			@param[in]	x1	開始点Ｘ軸を指定
-			@param[in]	y1	開始点Ｙ軸を指定
-			@param[in]	x2	終了点Ｘ軸を指定
-			@param[in]	y2	終了点Ｙ軸を指定
-			@param[in]	c	描画色
+			@param[in]	org	開始点Ｘ軸を指定
+			@param[in]	end	終了点Ｘ軸を指定
 		*/
 		//-----------------------------------------------------------------//
-		void line(int16_t x1, int16_t y1, int16_t x2, int16_t y2, T c) noexcept
+		void line(const vtx::spos& org, const vtx::spos& end) noexcept
 		{
 			int16_t dx;
 			int16_t dy;
 			int16_t sx;
 			int16_t sy;
-			if(x2 >= x1) { dx = x2 - x1; sx = 1; } else { dx = x1 - x2; sx = -1; }
-			if(y2 >= y1) { dy = y2 - y1; sy = 1; } else { dy = y1 - y2; sy = -1; }
+			if(end.x >= org.x) {
+				dx = end.x - org.x; sx = 1;
+			} else {
+				dx = org.x - end.x; sx = -1;
+			}
+			if(end.y >= org.y) {
+				dy = end.y - org.y; sy = 1;
+			} else {
+				dy = org.y - end.y; sy = -1;
+			}
 
 			int16_t m = 0;
-			int16_t x = x1;
-			int16_t y = y1;
+			vtx::spos pos = org;
 			if(dx > dy) {
 				for(int16_t i = 0; i <= dx; i++) {
-					plot(vtx::spos(x, y), c);
+					plot(pos, fore_color_.rgb565);
 					m += dy;
 					if(m >= dx) {
 						m -= dx;
-						y += sy;
+						pos.y += sy;
 					}
-					x += sx;
+					pos.x += sx;
 				}
 			} else {
 				for(int16_t i = 0; i <= dy; i++) {
-					plot(vtx::spos(x, y), c);
+					plot(pos, fore_color_.rgb565);
 					m += dx;
 					if(m >= dy) {
 						m -= dy;
-						x += sx;
+						pos.x += sx;
 					}
-					y += sy;
+					pos.y += sy;
 				}
 			}
 		}
@@ -445,19 +444,16 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	フレーム（線の箱）を描画する
-			@param[in]	x	開始点Ｘ軸を指定
-			@param[in]	y	開始点Ｙ軸を指定
-			@param[in]	w	横幅
-			@param[in]	h	高さ
-			@param[in]	c	描画色
+			@param[in]	org		開始点を指定
+			@param[in]	size	サイズを指定
 		*/
 		//-----------------------------------------------------------------//
-		void frame(int16_t x, int16_t y, int16_t w, int16_t h, T c) noexcept
+		void frame(const vtx::spos& org, const vtx::spos& size) noexcept
 		{
-			line_h(y, x, w, c);
-			line_h(y + h - 1, x, w, c);
-			line_v(x, y + 1, h - 2, c);
-			line_v(x + w - 1, y + 1, h - 2, c);
+			line_h(org.y, org.x, size.x);
+			line_h(org.y + size.y - 1, org.x, size.x);
+			line_v(org.x, org.y + 1, size.y - 2);
+			line_v(org.x + size.x - 1, org.y + 1, size.y - 2);
 		}
 
 
@@ -469,10 +465,9 @@ namespace graphics {
 			@param[in]	w	横幅
 			@param[in]	h	高さ
 			@param[in]	rad	ラウンドの半径
-			@param[in]	col	描画色
 		*/
 		//-----------------------------------------------------------------//
-		void round_frame(int16_t x, int16_t y, int16_t w, int16_t h, int16_t rad, T col) noexcept
+		void round_frame(int16_t x, int16_t y, int16_t w, int16_t h, int16_t rad) noexcept
 		{
 			if(w < (rad + rad) || h < (rad + rad)) {
 				if(w < h) rad = w / 2;
@@ -482,14 +477,14 @@ namespace graphics {
 			int16_t yc = y + rad;
 			int16_t xo = w - rad * 2 - 2;
 			int16_t yo = h - rad * 2 - 2;
-			line_h(y, xc, xo, col);
-			line_h(y + h - 1, xc, xo, col);
-			line_v(x, yc, yo, col);
-			line_v(x + w - 1, yc, yo, col);
+			line_h(y, xc, xo);
+			line_h(y + h - 1, xc, xo);
+			line_v(x, yc, yo);
+			line_v(x + w - 1, yc, yo);
 			int16_t xx = 0;
 			int16_t yy = rad;
 			int16_t p = (5 - rad * 4) / 4;
-			circle_offset_(xc, yc, xx, yy, xo, yo, col);
+			circle_offset_(xc, yc, xx, yy, xo, yo, fore_color_.rgb565);
 			while(xx < yy) {
 				xx++;
 				if(p < 0) {
@@ -498,7 +493,7 @@ namespace graphics {
 					yy--;
 					p += 2 * (xx - yy) + 1;
 				}
-				circle_offset_(xc, yc, xx, yy, xo, yo, col);
+				circle_offset_(xc, yc, xx, yy, xo, yo, fore_color_.rgb565);
 			}
 		}
 
@@ -506,43 +501,40 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	角がラウンドした塗りつぶされた箱を描画する
-			@param[in]	x	開始点Ｘ軸を指定
-			@param[in]	y	開始点Ｙ軸を指定
-			@param[in]	w	横幅
-			@param[in]	h	高さ
+			@param[in]	org		開始点
+			@param[in]	size	大きさ
 			@param[in]	rad	ラウンドの半径
-			@param[in]	col	描画色
 		*/
 		//-----------------------------------------------------------------//
-		void round_box(int16_t x, int16_t y, int16_t w, int16_t h, int16_t rad, T col) noexcept
+		void round_box(const vtx::spos& org, const vtx::spos& size, int16_t rad) noexcept
 		{
-			if(w < (rad + rad) || h < (rad + rad)) {
-				if(w < h) rad = w / 2;
-				else rad = h / 2;
+			if(size.x < (rad + rad) || size.y < (rad + rad)) {
+				if(size.x < size.y) rad = size.x / 2;
+				else rad = size.y / 2;
 			}
-			int16_t xc = x + rad;
-			int16_t yc = y + rad;
-			int16_t xo = w - rad * 2 - 2;
-			int16_t yo = h - rad * 2 - 2;
-			fill_box(x, yc, w, yo, col);
+			int16_t xc = org.x + rad;
+			int16_t yc = org.y + rad;
+			int16_t xo = size.x - rad * 2 - 2;
+			int16_t yo = size.y - rad * 2 - 2;
+			fill_box(vtx::spos(org.x, yc), vtx::spos(size.x, yo));
 			int16_t xx = 0;
 			int16_t yy = rad;
 			int16_t p = (5 - rad * 4) / 4;
-			line_h(yc + yo, xc - yy, yy + yy + 1 + xo, col);
-			line_h(yc + yy + yo + 1, xc - xx, xx + xx + xo, col);
+			line_h(yc + yo, xc - yy, yy + yy + 1 + xo);
+			line_h(yc + yy + yo + 1, xc - xx, xx + xx + xo);
 			while(xx < yy) {
 				xx++;
 				if(p < 0) {
 					p += 2 * xx + 1;
 				} else {
 					// x` = x - 1
-					line_h(yc - yy,      xc - xx + 1, xx + xx + xo - 1, col);
-					line_h(yc + yy + yo, xc - xx + 1, xx + xx + xo - 1, col);
+					line_h(yc - yy,      xc - xx + 1, xx + xx + xo - 1);
+					line_h(yc + yy + yo, xc - xx + 1, xx + xx + xo - 1);
 					yy--;
 					p += 2 * (xx - yy) + 1;
 				}
-				line_h(yc - xx,      xc - yy, yy + yy + xo + 1, col);
-				line_h(yc + xx + yo, xc - yy, yy + yy + xo + 1, col);
+				line_h(yc - xx,      xc - yy, yy + yy + xo + 1);
+				line_h(yc + xx + yo, xc - yy, yy + yy + xo + 1);
 			}
 		}
 
@@ -662,34 +654,33 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	ビットマップイメージを描画する
-			@param[in]	x	開始点Ｘ軸を指定
-			@param[in]	y	開始点Ｙ軸を指定
-			@param[in]	img	描画ソースのポインター
-			@param[in]	w	描画ソースの幅
-			@param[in]	h	描画ソースの高さ
-			@param[in]	b	背景を描画する場合「true」
+			@param[in]	pos		開始点を指定
+			@param[in]	img		描画ソースのポインター
+			@param[in]	ssz		描画ソースのサイズ
+			@param[in]	back	背景を描画する場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void draw_bitmap(int16_t x, int16_t y, const void* img, uint8_t w, uint8_t h, bool b = false)
+		void draw_bitmap(const vtx::spos& pos, const void* img, const vtx::spos& ssz, bool back = false)
 		noexcept {
 			if(img == nullptr) return;
 
 			const uint8_t* p = static_cast<const uint8_t*>(img);
 			uint8_t k = 1;
 			uint8_t c = *p++;
-			for(uint8_t i = 0; i < h; ++i) {
-				int16_t xx = x;
-				for(uint8_t j = 0; j < w; ++j) {
-					if(c & k) plot(vtx::spos(xx, y), fore_color_.rgb565);
-					else if(b) plot(vtx::spos(xx, y), back_color_.rgb565);
+			vtx::spos loc = pos;
+			for(uint8_t i = 0; i < ssz.y; ++i) {
+				loc.x = pos.x;
+				for(uint8_t j = 0; j < ssz.x; ++j) {
+					if(c & k) plot(loc, fore_color_.rgb565);
+					else if(back) plot(loc, back_color_.rgb565);
 					k <<= 1;
 					if(k == 0) {
 						k = 1;
 						c = *p++;
 					}
-					++xx;
+					++loc.x;
 				}
-				++y;
+				++loc.y;
 			}
 		}
 
@@ -698,39 +689,37 @@ namespace graphics {
 		/*!
 			@brief	モーションオブジェクトのサイズを取得
 			@param[in]	src	描画オブジェクト
-			@param[in]	w	横幅
-			@param[in]	h	高さ
+			@return サイズwを返す
 		*/
 		//-----------------------------------------------------------------//
-		void get_mobj_size(const void* src, uint8_t& w, uint8_t& h) const noexcept {
-			if(src == nullptr) {
-				w = 0;
-				h = 0;
-				return;
+		vtx::spos get_mobj_size(const void* src) const noexcept
+		{
+			vtx::spos sz(0);
+			if(src != nullptr) {
+				const uint8_t* p = static_cast<const uint8_t*>(src);
+				sz.x = *p++;
+				sz.y = *p;
 			}
-			const uint8_t* p = static_cast<const uint8_t*>(src);
-			w = *p++;
-			h = *p;
+			return sz;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	モーションオブジェクトを描画する
-			@param[in]	x	開始点Ｘ軸を指定
-			@param[in]	y	開始点Ｙ軸を指定
-			@param[in]	src	描画オブジェクト
-			@param[in]	b	背景を描画する場合「true」
+			@param[in]	pos		開始点を指定
+			@param[in]	src		描画オブジェクト
+			@param[in]	back	背景を描画する場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void draw_mobj(int16_t x, int16_t y, const void* src, bool b) noexcept
+		void draw_mobj(const vtx::spos& pos, const void* src, bool back) noexcept
 		{
 			if(src == nullptr) return;
 
 			const uint8_t* p = static_cast<const uint8_t*>(src);
-			uint8_t w = *p++;
-			uint8_t h = *p++;
-			draw_bitmap(x, y, p, w, h, b);
+			vtx::spos ssz(p[0], p[1]);
+			p += 2;
+			draw_bitmap(pos, p, ssz, back);
 		}
 
 
@@ -739,9 +728,10 @@ namespace graphics {
 			@brief	UTF-16 フォントの描画
 			@param[in]	pos		描画位置
 			@param[in]	code	UTF-16 コード
+			@param[in]	back	背景を描画する場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void draw_font_utf16(const vtx::spos& pos, uint16_t code) noexcept
+		void draw_font_utf16(const vtx::spos& pos, uint16_t code, bool back) noexcept
 		{
 			if(pos.y <= -AFONT::height || pos.y >= GLC::height) {
 				return;
@@ -750,18 +740,21 @@ namespace graphics {
 				if(pos.x <= -AFONT::width || pos.x >= GLC::width) {
 					return;
 				}
-				draw_bitmap(pos.x, pos.y, AFONT::get(code), AFONT::width, AFONT::height);
+				vtx::spos ssz(AFONT::width, AFONT::height);
+				draw_bitmap(pos, AFONT::get(code), ssz, back);
 			} else {
 				if(pos.x <= -KFONT::width || pos.x >= GLC::width) {
 					return;
 				}
 				auto p = kfont_.get(code);
 				if(p != nullptr) {
-					draw_bitmap(pos.x, pos.y, p, KFONT::width, KFONT::height);
+					vtx::spos ssz(KFONT::width, KFONT::height);
+					draw_bitmap(pos, p, ssz, back);
 				} else {
-					draw_bitmap(pos.x, pos.y, AFONT::get('['), AFONT::width, AFONT::height);
-					auto x = pos.x + AFONT::width;
-					draw_bitmap(x, pos.y, AFONT::get(']'), AFONT::width, AFONT::height);
+					vtx::spos ssz(AFONT::width, AFONT::height);
+					draw_bitmap(pos, AFONT::get('['), ssz, back);
+					vtx::spos loc(pos.x + AFONT::width, pos.y);
+					draw_bitmap(loc, AFONT::get(']'), ssz, back);
 				}
 			}
 		}
@@ -773,10 +766,12 @@ namespace graphics {
 			@param[in]	pos		描画位置
 			@param[in]	cha		文字コード
 			@param[in]	prop	プロポーショナルの場合「true」
+			@param[in]	back	背景を描画する場合「true」
 			@return 文字の幅 (X)
 		*/
 		//-----------------------------------------------------------------//
-		int16_t draw_font(const vtx::spos& pos, char cha, bool prop = false) noexcept
+		int16_t draw_font(const vtx::spos& pos, char cha, bool prop = false,
+			bool back = false) noexcept
 		{
 			int16_t w = 0;
 			if(static_cast<uint8_t>(cha) < 0x80) {
@@ -784,7 +779,7 @@ namespace graphics {
 				if(prop) {
 					w = AFONT::get_kern(code);
 				}
-				draw_font_utf16(vtx::spos(pos.x + w, pos.y), code);
+				draw_font_utf16(vtx::spos(pos.x + w, pos.y), code, back);
 				if(prop) {
 					w += AFONT::get_width(code);
 				} else {
@@ -794,7 +789,7 @@ namespace graphics {
 				if(kfont_.injection_utf8(static_cast<uint8_t>(cha))) {
 					auto code = kfont_.get_utf16();
 					if(code >= 0x80) {
-						draw_font_utf16(pos, code);
+						draw_font_utf16(pos, code, back);
 						w = KFONT::width;
 					}
 				}
@@ -809,10 +804,12 @@ namespace graphics {
 			@param[in]	pos		描画位置
 			@param[in]	str		文字列　(UTF-8)
 			@param[in]	prop	プロポーショナルの場合「true」
+			@param[in]	back	背景を描画する場合「true」
 			@return 文字の最終座標 (X)
 		*/
 		//-----------------------------------------------------------------//
-		int16_t draw_text(const vtx::spos& pos, const char* str, bool prop = false) noexcept
+		int16_t draw_text(const vtx::spos& pos, const char* str, bool prop = false,
+			bool back = false) noexcept
 		{
 			if(str == nullptr) return 0;
 
@@ -823,7 +820,7 @@ namespace graphics {
 					p.x = pos.x;
 					p.y += font_height;
 				} else {
-					p.x += draw_font(p, ch, prop);
+					p.x += draw_font(p, ch, prop, back);
 				}
 			}
 			return p.x;
@@ -871,7 +868,9 @@ namespace graphics {
 				auto c = static_cast<uint8_t>(ch);
 				if(c < 0x80) {
 					if(ch == 0x20) {
-						fill_box(x, y, xx - x, AFONT::height, back_color_.rgb565);
+						swap_color();
+						fill_box(x, y, xx - x, AFONT::height);
+						swap_color();
 						x = xx;
 						fill = true;
 					} else {
@@ -901,7 +900,9 @@ namespace graphics {
 				}
 			}
 			if(!fill) {
-				fill_box(x, y, xx - x, AFONT::height, back_color_.rgb565);
+				swap_color();
+				fill_box(x, y, xx - x, AFONT::height);
+				swap_color();
 			}
 			return xx;
 		}
@@ -910,21 +911,22 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	ダイアログ表示（画面の中心に表示される）
-			@param[in]	w		横幅
-			@param[in]	h		高さ
+			@param[in]	size	大きさ
 			@param[in]	text	テキスト
 		*/
 		//-----------------------------------------------------------------//
-		void draw_dialog(uint16_t w, uint16_t h, const char* text) noexcept
+		void draw_dialog(const vtx::spos& size, const char* text) noexcept
 		{
-			auto x = (GLC::width  - w) / 2;
-			auto y = (GLC::height - h) / 2;
-			frame(x, y, w, h, DEF_COLOR::White.rgb565);
-			fill_box(x + 1, y + 1, w - 2, h - 2, DEF_COLOR::Black.rgb565);
+			vtx::spos pos((GLC::width  - size.x) / 2, (GLC::height - size.y) / 2);
+			set_fore_color(DEF_COLOR::White);
+			frame(pos, size);
+ 			set_fore_color(DEF_COLOR::Black);
+			fill_box(pos + 1, size - 2);
 			auto l = get_text_length(text);
-			x += (w - l) / 2;
-			y += (h - font_height) / 2;
-			draw_text(vtx::spos(x, y), text);
+			pos.x += (size.x - l) / 2;
+			pos.y += (size.y - font_height) / 2;
+			set_fore_color(DEF_COLOR::White);
+			draw_text(pos, text);
 		}
 
 
@@ -933,20 +935,18 @@ namespace graphics {
 			@brief	標準ボタンの描画 @n
 					・背景色は「back_color」が使われる。@n
 					・フォントの描画色は「fore_color」が利用
-			@param[in]	x		X 位置
-			@param[in]	y		Y 位置
-			@param[in]	w		横幅
-			@param[in]	h		高さ
+			@param[in]	org		位置
+			@param[in]	size	サイズ
 			@param[in]	text	テキスト
 		*/
 		//-----------------------------------------------------------------//
-		void draw_button(int16_t x, int16_t y, int16_t w, int16_t h, const char* text) noexcept
+		void draw_button(const vtx::spos& org, const vtx::spos& size, const char* text) noexcept
 		{
 			auto len = get_text_length(text);
-			fill_box(x, y, w, h, back_color_.rgb565);
-			x += (w - len) / 2;
-			y += (h - font_height) / 2;
-			draw_text(vtx::spos(x, y), text);
+			swap_color();
+			fill_box(org, size);
+			swap_color();
+			draw_text(org + vtx::spos((size.x - len) / 2, (size.y - font_height) / 2), text);
 		}
 
 
