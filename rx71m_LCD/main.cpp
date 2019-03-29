@@ -99,7 +99,9 @@ extern "C" {
 
 	void draw_text(int x, int y, const char* t)
 	{
-		render_.fill_box(x, y, strlen(t) * 8, 16, render_.get_back_color().rgb565);
+		render_.swap_color();
+		render_.fill_box(vtx::spos(x, y), vtx::spos(strlen(t) * 8, 16));
+		render_.swap_color();
 		render_.draw_text(vtx::spos(x, y), t);
 	}
 
