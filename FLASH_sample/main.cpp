@@ -161,7 +161,7 @@ namespace {
 							if(!(utils::input("%x", buff) % data).status()) {
 								break;
 							}
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 							uint32_t inc = 4;
 							uint8_t tmp[4];
 							tmp[3] = data;
@@ -175,7 +175,7 @@ namespace {
 							tmp[0] = data;
 							if(!flash_.write(org, tmp, 1)) {
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 								utils::format("Write error: %04X: %08X\n")
 #elif defined(SIG_RX24T) || defined(SIG_RX66T)
 								utils::format("Write error: %04X: %02X\n")
