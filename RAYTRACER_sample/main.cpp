@@ -128,8 +128,8 @@ namespace {
 				f = true;
 			} else if(cmd_.cmp_word(0, "full")) {
 				render_.clear(graphics::def_color::Black);
-				render_width_  = 480;
-				render_height_ = 272;
+				render_width_  = LCD_X;
+				render_height_ = LCD_Y;
 				run_ = false;
 				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
@@ -160,10 +160,10 @@ extern "C" {
 
 	void draw_text(int x, int y, const char* t)
 	{
-//		render_.start_frame();
-		render_.fill_box(x, y, strlen(t) * AFONT::width, AFONT::height, 0);
+		render_.set_fore_color(graphics::def_color::Black);
+		render_.fill_box(vtx::spos(x, y), vtx::spos(strlen(t) * AFONT::width, AFONT::height));
+		render_.set_fore_color(graphics::def_color::White);
 		render_.draw_text(vtx::spos(x, y), t);
-//		render_.end_frame();
 	}
 
 
