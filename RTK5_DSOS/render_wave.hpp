@@ -94,19 +94,21 @@ namespace utils {
 
 		void update_measere_() noexcept
 		{
+			render_.set_fore_color(DEF_COLOR::White);
 			if(measere_ == MEASERE::TIME) {
 				auto org = mes_time_begin_;
-				render_.line(org, TIME_BEGIN_POS, org, TIME_LIMIT_POS, DEF_COLOR::White.rgb565);
+				render_.line(vtx::spos(org, TIME_BEGIN_POS), vtx::spos(org, TIME_LIMIT_POS));
 				auto end = mes_time_begin_ + mes_time_size_;
 				if(0 < end && end < VOLT_LIMIT_POS) {
-					render_.line(end, TIME_BEGIN_POS, end, TIME_LIMIT_POS, DEF_COLOR::White.rgb565);
+					render_.line(vtx::spos(end, TIME_BEGIN_POS), vtx::spos(end, TIME_LIMIT_POS));
 				}
 			} else if(measere_ == MEASERE::VOLT) {
 				auto org = mes_volt_begin_;
-				render_.line(VOLT_BEGIN_POS, org, VOLT_LIMIT_POS, org, DEF_COLOR::White.rgb565);
+				render_.line(vtx::spos(VOLT_BEGIN_POS, org), vtx::spos(VOLT_LIMIT_POS, org));
 				auto end = mes_volt_begin_ + mes_volt_size_;
 				if(0 < end && end < VOLT_LIMIT_POS) {
-					render_.line(VOLT_BEGIN_POS, end, VOLT_LIMIT_POS, end, DEF_COLOR::White.rgb565);
+					
+					render_.line(vtx::spos(VOLT_BEGIN_POS, end), vtx::spos(VOLT_LIMIT_POS, end)); 
 				}
 			}
 		}
@@ -184,6 +186,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void draw_grid(int16_t x, int16_t y, int16_t w, int16_t h, int16_t unit) noexcept
 		{
+			render_.set_fore_color(DEF_COLOR::Aqua);
 			for(int16_t i = x; i <= (x + w); i += unit) {
 				uint32_t mask;
 				if(i == x || i == (x + w)) {
@@ -192,7 +195,7 @@ namespace utils {
 					mask = 0b11000000110000001100000011000000;
 				}
 				render_.set_stipple(mask);
-				render_.line(i, y, i, y + h, DEF_COLOR::Aqua.rgb565);
+				render_.line(vtx::spos(i, y), vtx::spos(i, y + h));
 			}
 			for(int16_t i = y; i <= (y + h); i += unit) {
 				uint32_t mask;
@@ -202,7 +205,7 @@ namespace utils {
 					mask = 0b11000000110000001100000011000000;
 				}
 				render_.set_stipple(mask);
-				render_.line(x, i, x + w, i, DEF_COLOR::Aqua.rgb565);
+				render_.line(vtx::spos(x, i), vtx::spos(x + w, i));
 			}
 			render_.set_stipple();
 		}
@@ -234,7 +237,9 @@ namespace utils {
 
 			char tmp[64];
 			utils::sformat("%s (%s)", tmp, sizeof(tmp)) % freq[rate_div_] % rate[rate_div_];
-			render_.fill_box(0, 0, 480, 16, DEF_COLOR::Black.rgb565);
+			render_.set_fore_color(DEF_COLOR::Black);
+			render_.fill_box(vtx::spos(0, 0), vtx::spos(480, 16));
+			render_.set_fore_color(DEF_COLOR::White);
 			auto x = render_.draw_text(vtx::spos(0, 0), tmp);
 
 			// 計測モード時結果
@@ -266,14 +271,20 @@ namespace utils {
 
 			char tmp[32];
 			if(ch == 0) {
-				render_.fill_box(  0, 272 - 16 + 1, 15, 15, DEF_COLOR::Lime.rgb565);
-				render_.fill_box( 16, 272 - 16 + 1, 240 - 16, 15, DEF_COLOR::Black.rgb565);
+				render_.set_fore_color(DEF_COLOR::Lime);
+				render_.fill_box(vtx::spos(  0, 272 - 16 + 1), vtx::spos(15, 15));
+				render_.set_fore_color(DEF_COLOR::Black);
+				render_.fill_box(vtx::spos( 16, 272 - 16 + 1), vtx::spos(240 - 16, 15));
+				render_.set_fore_color(DEF_COLOR::White);
 				utils::sformat("CH0: %s [V]", tmp, sizeof(tmp)) % divs[ch0_div_];
 				render_.draw_text(vtx::spos(  16, 272 - 16 + 1), tmp);
 			} else {
-				render_.fill_box(240, 272 - 16 + 1, 15, 15, DEF_COLOR::Fuchsi.rgb565);
+				render_.set_fore_color(DEF_COLOR::Fuchsi);
+				render_.fill_box(vtx::spos(240, 272 - 16 + 1), vtx::spos(15, 15));
 				utils::sformat("CH1: %s [V]", tmp, sizeof(tmp)) % divs[ch1_div_];
-				render_.fill_box(240 + 16, 272 - 16 + 1, 240 - 16, 15, DEF_COLOR::Black.rgb565);
+				render_.set_fore_color(DEF_COLOR::Black);
+				render_.fill_box(vtx::spos(240 + 16, 272 - 16 + 1), vtx::spos(240 - 16, 15));
+				render_.set_fore_color(DEF_COLOR::White);
 				render_.draw_text(vtx::spos(240 + 16, 272 - 16 + 1), tmp);
 			}
 		}
@@ -394,18 +405,20 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void update() noexcept
 		{
-			render_.fill_box(0, 16, 440, 240, DEF_COLOR::Black.rgb565);
+			render_.set_fore_color(DEF_COLOR::Black);
+			render_.fill_box(vtx::spos(0, 16), vtx::spos(440, 240));
 			draw_grid(0, 16, 440, 240, GRID);
 
 			if(measere_ != MEASERE::NONE) {
 				update_measere_();
 			} else if(touch_down_) {
-				render_.line(0, TIME_SCROLL_AREA, CH1_MOVE_AREA, TIME_SCROLL_AREA,
-					 DEF_COLOR::Red.rgb565);
-				render_.line(CH0_MOVE_AREA, TIME_SCROLL_AREA, CH0_MOVE_AREA, 272 - 16,
-					 DEF_COLOR::Red.rgb565);
-				render_.line(CH1_MOVE_AREA, TIME_SCROLL_AREA, CH1_MOVE_AREA, 272 - 16,
-					 DEF_COLOR::Red.rgb565);
+				render_.set_fore_color(DEF_COLOR::Red);
+				render_.line(vtx::spos(0, TIME_SCROLL_AREA),
+							 vtx::spos(CH1_MOVE_AREA, TIME_SCROLL_AREA));				 
+				render_.line(vtx::spos(CH0_MOVE_AREA, TIME_SCROLL_AREA),
+							 vtx::spos(CH0_MOVE_AREA, 272 - 16));
+				render_.line(vtx::spos(CH1_MOVE_AREA, TIME_SCROLL_AREA),
+							 vtx::spos(CH1_MOVE_AREA, 272 - 16));
 			}
 
 			// メニュー・ボタンの描画
@@ -416,7 +429,7 @@ namespace utils {
 					auto c = DEF_COLOR::Olive;
 					if(static_cast<MENU>(i + 1) == menu_) c = DEF_COLOR::Yellow;
 					render_.set_back_color(c);
-					render_.draw_button(441, 16 + GRID * i + 1, GRID - 1, GRID - 1, menu[i]);
+					render_.draw_button(vtx::spos(441, 16 + GRID * i + 1), vtx::spos(GRID - 1, GRID - 1), menu[i]);
 				}
 			}
 
@@ -436,7 +449,8 @@ namespace utils {
 					int16_t y1 = d1.ch0_;
 					y1 -= 2048;
 					y1 /= -17;
-					render_.line(x, ofs + y0, x + 1, ofs + y1, DEF_COLOR::Lime.rgb565);
+					render_.set_fore_color(DEF_COLOR::Lime);
+					render_.line(vtx::spos(x, ofs + y0), vtx::spos(x + 1, ofs + y1));
 				}
 				{
 					int16_t ofs = ch1_vpos_ + 272 / 2;
@@ -446,7 +460,8 @@ namespace utils {
 					int16_t y1 = d1.ch1_;
 					y1 -= 2048;
 					y1 /= -17;
-					render_.line(x, ofs + y0, x + 1, ofs + y1, DEF_COLOR::Fuchsi.rgb565);
+					render_.set_fore_color(DEF_COLOR::Fuchsi);
+					render_.line(vtx::spos(x, ofs + y0), vtx::spos(x + 1, ofs + y1));
 				}
 			}
 

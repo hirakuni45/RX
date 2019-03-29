@@ -420,9 +420,11 @@ int main(int argc, char** argv)
 		{
 			bool m = check_mount_();
 			if(!mount && m) {
-				render_.fill_box(480-24, 0, 24, 16, 0x0000);
+				render_.set_fore_color(graphics::def_color::Black);
+				render_.fill_box(vtx::spos(480-24, 0), vtx::spos(24, 16));
 			}
 			if(mount && !m) {
+				render_.set_fore_color(graphics::def_color::White);
 				render_.draw_text(vtx::spos(480-24, 0), "?SD");
 				filer = false;
 			}
@@ -453,7 +455,7 @@ int main(int argc, char** argv)
 				if(nesemu_.open(tmp)) {
 					filer = false;
 				} else {
-					render_.draw_dialog(400, 80, "Not NES file");
+					render_.draw_dialog(vtx::spos(400, 80), "Not NES file");
 				}
 			}
 		} else {

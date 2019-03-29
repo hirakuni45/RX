@@ -146,7 +146,9 @@ namespace audio {
 			uint16_t hor = (t / 3600) % 24;
 			char tmp[16];
 			utils::sformat("%02d:%02d:%02d", tmp, sizeof(tmp)) % hor % min % sec;
-			render_.fill_box(0, 5 * 20, 8 * 8, 16, graphics::def_color::Black.rgb565);
+			render_.set_fore_color(graphics::def_color::Black);
+			render_.fill_box(vtx::spos(0, 5 * 20), vtx::spos(8 * 8, 16));
+			render_.set_fore_color(graphics::def_color::White);
 			render_.draw_text(vtx::spos(0, 5 * 20), tmp);
 		}
 
