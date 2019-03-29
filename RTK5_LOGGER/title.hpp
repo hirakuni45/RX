@@ -70,6 +70,12 @@ namespace app {
 						at_scenes_base().at_plot().set_offset(vtx::spos(xo, yo));
 						logo_ = im.load(fname);
 						if(logo_) count_ = 90;
+					} else {
+						auto& render = at_scenes_base().at_render();
+						render.swap_color();
+						char tmp[64];
+						utils::sformat("Can't open '%s'", tmp, sizeof(tmp)) % fname;
+						render.draw_text(vtx::spos(0), tmp);
 					}
 				}
 			} else {

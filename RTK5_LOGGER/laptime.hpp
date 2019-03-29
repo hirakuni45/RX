@@ -69,15 +69,15 @@ namespace app {
 				dt -= watch.get_lap(pos - 1);
 			}
 
-			int16_t x = 0;
-			int16_t y = 0;
-			res.draw_lap_state(x, y, pos, t, dt);
+			vtx::spos loc(0);
+			res.draw_lap_state(loc, pos, t, dt);
 //			res.draw_lap_24(x + 16, y, lap_best_n_, lap_best_t_);
 
 
+
 			// プログレスバー表示
-			render.frame(0, RENDER::glc_type::height - 10, RENDER::glc_type::width, 10,
-				DEF_COLOR::White.rgb565);
+			render.set_fore_color(DEF_COLOR::White);
+			render.frame(vtx::spos(0, RENDER::glc_type::height - 10), vtx::spos(RENDER::glc_type::width, 10));
 			uint32_t bt = 0;
 			if(pos > 0) {
 				bt = watch.get_lap(pos - 1);
@@ -98,8 +98,11 @@ namespace app {
 					fc = DEF_COLOR::Red;
 				}
 				auto bc = DEF_COLOR::Black;
-				render.fill_box(1, RENDER::glc_type::height - 10 + 1, ref - per, 10 - 2, bc.rgb565);
-				render.fill_box(1, RENDER::glc_type::height - 10 + 1, per, 10 - 2, fc.rgb565);
+				render.set_fore_color(bc);
+				render.set_back_color(fc);
+				render.fill_box(vtx::spos(1, RENDER::glc_type::height - 10 + 1), vtx::spos(ref - per, 10 - 2));
+				render.swap_color();
+				render.fill_box(vtx::spos(1, RENDER::glc_type::height - 10 + 1), vtx::spos(per, 10 - 2));
 			}
 
 			for(uint32_t i = 0; i < 4; ++i) {
@@ -110,7 +113,7 @@ namespace app {
 				if(pos > 1) {
 					t -= watch.get_lap(pos - i - 2);
 				}
-				res.draw_short_lap(0, 48 + 28 * 4 - i * 28, pos - i, t);
+				res.draw_short_lap(vtx::spos(0, 48 + 28 * 4 - i * 28), pos - i, t);
 			}
 		}
 	};

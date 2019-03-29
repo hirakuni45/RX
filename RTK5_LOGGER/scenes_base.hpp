@@ -98,9 +98,9 @@ namespace app {
 		public:
 			BACK(RENDER& render) : render_(render) { }
 
-			void operator () (int16_t x, int16_t y, int16_t w, int16_t h, RENDER::value_type c)
+			void operator () (const vtx::spos& org, const vtx::spos& size)
 			{
-				render_.round_box(x, y, w, h, 8, c);
+				render_.round_box(org, size, 8);
 //				render_.fill_box_r(x + 3, y + 3, w - 6, h - 6, c);
 			}
 		};
