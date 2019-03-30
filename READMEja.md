@@ -92,7 +92,7 @@ int main(int argc, char** argv)
 |/RTK5_AUDIO_sample     |ルネサス製 RTK5RX65N マイコンボード オーディオプレイヤー|
 |/RTK5_SIDE             |ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター|
 |/RTK5_NESEMU           |ルネサス製 RTK5RX65N マイコンボード NES エミュレーター|
-|[/LICENSE](./LICENSE)  |ライセンス表記ファイル|
+|[LICENSE](./LICENSE)   |ライセンス表記ファイル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
    
@@ -586,4 +586,4 @@ int main(int argc, char** argv)
 License
 ----
 
-MIT
+[MIT](../LICENSE)
