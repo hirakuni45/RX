@@ -275,16 +275,38 @@ namespace device {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	クリッピング領域の設定
+			@param[in]	clip	クリッピング領域
+		*/
+		//-----------------------------------------------------------------//
+		void set_clip(const vtx::srect& clip) noexcept
+		{
+			clip_ = clip;
+			set_clip_ = false;
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  クリッピング領域の取得
+            @return クリップ領域
+        */
+        //-----------------------------------------------------------------//
+		const auto& get_clip() const noexcept { return clip_; }
+
+
         //-----------------------------------------------------------------//
         /*!
             @brief  破線パターンの設定
             @param[in]  stipple 破線パターン
         */
         //-----------------------------------------------------------------//
-        void set_stipple(uint32_t stipple = -1) noexcept {
-            stipple_ = stipple;
-            stipple_mask_ = 1;
-        }
+		void set_stipple(uint32_t stipple = -1) noexcept {
+			stipple_ = stipple;
+			stipple_mask_ = 1;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -328,19 +350,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	クリッピング領域の設定
-			@param[in]	clip	クリッピング領域
-		*/
-		//-----------------------------------------------------------------//
-		void set_clip(const vtx::srect& clip) noexcept
-		{
-			clip_ = clip;
-			set_clip_ = false;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	ペンサイズの設定
 			@param[in]	size	ペンサイズ（1/16 pixel）
 		*/
@@ -375,6 +384,59 @@ namespace device {
 		auto get_scale() const noexcept { return scale_; }
 
 
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  水平ラインを描画
+            @param[in]  y   開始位置 Y
+            @param[in]  x   水平開始位置
+            @param[in]  w   水平幅
+			@return エラー無い場合「true」
+        */
+        //-----------------------------------------------------------------//
+        bool line_h(int16_t y, int16_t x, int16_t w) noexcept
+		{
+			setup_();
+			last_error_ = d2_renderline(d2_, x * scale_, y * scale_,
+				(x + w) * scale_, y * scale_, pen_size_, d2_le_exclude_none);
+			return last_error_ == D2_OK;
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  垂直ラインを描画
+            @param[in]  x   開始位置 x
+            @param[in]  y   垂直開始位置
+            @param[in]  h   垂直幅
+			@return エラー無い場合「true」
+        */
+        //-----------------------------------------------------------------//
+        bool line_v(int16_t x, int16_t y, int16_t h) noexcept
+		{
+			setup_();
+			last_error_ = d2_renderline(d2_, x * scale_, y * scale_,
+				x * scale_, (y + h) * scale_, pen_size_, d2_le_exclude_none);
+			return last_error_ == D2_OK;
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  四角を塗りつぶす
+            @param[in]  org     開始位置
+            @param[in]  size    サイズ
+			@return エラー無い場合「true」
+        */
+        //-----------------------------------------------------------------//
+        bool fill_box(const vtx::spos& org, const vtx::spos& size) noexcept
+		{
+			setup_();
+			last_error_ = d2_renderbox(d2_, org.x * scale_, org.y * scale_,
+				size.x * scale_, size.y * scale_);
+			return last_error_ == D2_OK;
+		}
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	全クリア
@@ -391,7 +453,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ライン描画
+			@brief	ライン描画（アンチエリアスされたライン）
 			@param[in]	org		開始位置
 			@param[in]	end		終端位置
 			@return エラー無い場合「true」
@@ -404,6 +466,26 @@ namespace device {
 				end.x * scale_, end.y * scale_, pen_size_, d2_le_exclude_none);
 			return last_error_ == D2_OK;
 		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  フレーム（線の箱）を描画する
+            @param[in]  rect    短径を指定
+			@return エラー無い場合「true」
+        */
+        //-----------------------------------------------------------------//
+        bool frame(const vtx::srect& rect) noexcept
+        {
+            line_h(rect.org.y,  rect.org.x, rect.size.x);
+            line_h(rect.org.y + rect.size.y - 1, rect.org.x, rect.size.x);
+            line_v(rect.org.x,  rect.org.y  + 1, rect.size.y - 2);
+            line_v(rect.org.x + rect.size.x - 1, rect.org.y + 1, rect.size.y - 2);
+			return last_error_ == D2_OK;
+        }
+
+
+
 
 
 		//-----------------------------------------------------------------//
@@ -420,23 +502,6 @@ namespace device {
 			setup_();
 			last_error_ = d2_rendercircle(d2_, org.x * scale_, org.y * scale_,
 				r * scale_, w * scale_);
-			return last_error_ == D2_OK;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ボックス描画
-			@param[in]	org		基点
-			@param[in]	size	サイズ
-			@return エラー無い場合「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool box(const vtx::spos& org, const vtx::spos& size) noexcept
-		{
-			setup_();
-			last_error_ = d2_renderbox(d2_, org.x * scale_, org.y * scale_,
-				size.x * scale_, size.y * scale_);
 			return last_error_ == D2_OK;
 		}
 
