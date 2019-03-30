@@ -237,7 +237,7 @@ namespace graphics {
 					}
 				}
 				rend_.set_fore_color(c);
-				back_(vtx::spos(x, y), vtx::spos(mx_, obj.h_ + space_h_ * 2));
+				back_(vtx::srect(x, y, mx_, obj.h_ + space_h_ * 2));
 				y += space_h_;
 				auto t = static_cast<const char*>(obj_[i].src_);
 				rend_.set_fore_color(graphics::def_color::Black);

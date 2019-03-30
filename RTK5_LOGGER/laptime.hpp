@@ -24,6 +24,7 @@ namespace app {
 		uint32_t	lap_best_n_;
 
 		typedef scenes_base::RENDER RENDER;
+		typedef RENDER::glc_type GLC;
 		typedef graphics::def_color DEF_COLOR;
 
 	public:
@@ -77,7 +78,7 @@ namespace app {
 
 			// プログレスバー表示
 			render.set_fore_color(DEF_COLOR::White);
-			render.frame(vtx::spos(0, RENDER::glc_type::height - 10), vtx::spos(RENDER::glc_type::width, 10));
+			render.frame(vtx::srect(0, GLC::height - 10, GLC::width, 10));
 			uint32_t bt = 0;
 			if(pos > 0) {
 				bt = watch.get_lap(pos - 1);

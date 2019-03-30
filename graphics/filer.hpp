@@ -144,7 +144,7 @@ namespace graphics {
 		{
 			int16_t h = RDR::font_height + 2;
 			int16_t y = pos * h;
-			rdr_.frame(vtx::spos(0, y), vtx::spos(rdr_st_.hmax_ + 3, h + 1));
+			rdr_.frame(vtx::srect(0, y, rdr_st_.hmax_ + 3, h + 1));
 		}
 
 

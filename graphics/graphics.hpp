@@ -56,6 +56,7 @@ namespace graphics {
 
 		share_color	fore_color_;
 		share_color	back_color_;
+		vtx::srect	clip_;
 
 		uint32_t	stipple_;
 		uint32_t	stipple_mask_;
@@ -63,29 +64,29 @@ namespace graphics {
 		vtx::spos	ofs_;
 
 		// 1/8 円を拡張して、全周に点を打つ
-		void circle_pset_(int16_t xc, int16_t yc, int16_t x, int16_t y, T c) noexcept
+		void circle_pset_(const vtx::spos& cen, const vtx::spos& pos) noexcept
 		{
-			plot(xc + x, yc + y, c);
-			plot(xc + y, yc + x, c);
-			plot(xc - y, yc + x, c);
-			plot(xc - x, yc + y, c);
-			plot(xc - x, yc - y, c);
-			plot(xc - y, yc - x, c);
-			plot(xc + y, yc - x, c);
-			plot(xc + x, yc - y, c);
+			plot(vtx::spos(cen.x + pos.x, cen.y + pos.y), fore_color_.rgb565);
+			plot(vtx::spos(cen.x + pos.y, cen.y + pos.x), fore_color_.rgb565);
+			plot(vtx::spos(cen.x - pos.y, cen.y + pos.x), fore_color_.rgb565);
+			plot(vtx::spos(cen.x - pos.x, cen.y + pos.y), fore_color_.rgb565);
+			plot(vtx::spos(cen.x - pos.x, cen.y - pos.y), fore_color_.rgb565);
+			plot(vtx::spos(cen.x - pos.y, cen.y - pos.x), fore_color_.rgb565);
+			plot(vtx::spos(cen.x + pos.y, cen.y - pos.x), fore_color_.rgb565);
+			plot(vtx::spos(cen.x + pos.x, cen.y - pos.y), fore_color_.rgb565);
 		}
 
 
-		void circle_offset_(int16_t xc, int16_t yc, int16_t x, int16_t y, int16_t ox, int16_t oy, T c) noexcept
+		void circle_offset_(const vtx::spos& cen, const vtx::spos& org, const vtx::spos& ofs) noexcept
 		{
-			plot(xc + ox + x, yc + oy + y, c);
-			plot(xc + ox + y, yc + oy + x, c);
-			plot(xc - y,      yc + oy + x, c);
-			plot(xc - x,      yc + oy + y, c);
-			plot(xc - x,      yc - y,      c);
-			plot(xc - y,      yc - x,      c);
-			plot(xc + ox + y, yc - x,      c);
-			plot(xc + ox + x, yc - y,      c);
+			plot(vtx::spos(cen.x + org.x + ofs.x, cen.y + org.y + ofs.y), fore_color_.rgb565);
+			plot(vtx::spos(cen.x + org.y + ofs.x, cen.y + org.x + ofs.y), fore_color_.rgb565);
+			plot(vtx::spos(cen.x - org.y        , cen.y + org.x + ofs.y), fore_color_.rgb565);
+			plot(vtx::spos(cen.x - org.x        , cen.y + org.y + ofs.y), fore_color_.rgb565);
+			plot(vtx::spos(cen.x - org.x        , cen.y - org.y        ), fore_color_.rgb565);
+			plot(vtx::spos(cen.x - org.y        , cen.y - org.x        ), fore_color_.rgb565);
+			plot(vtx::spos(cen.x + org.y + ofs.x, cen.y - org.x        ), fore_color_.rgb565);
+			plot(vtx::spos(cen.x + org.x + ofs.x, cen.y - org.y        ), fore_color_.rgb565);
 		}
 
 	public:
@@ -98,6 +99,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		render(GLC& glc, KFONT& kf) noexcept : glc_(glc), kfont_(kf),
 			fore_color_(255, 255, 255), back_color_(0, 0, 0),
+			clip_(0, 0, GLC::width, GLC::height),
 			stipple_(-1), stipple_mask_(1), ofs_(0)
 		{ fb_ = static_cast<T*>(glc_.get_fbp()); }
 
@@ -227,6 +229,27 @@ namespace graphics {
 		}
 
 
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  クリッピング領域の設定
+            @param[in]  clip    クリッピング領域
+        */
+        //-----------------------------------------------------------------//
+        void set_clip(const vtx::srect& clip) noexcept
+        {
+            clip_ = clip;
+        }
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  クリッピング領域の取得
+			@return クリッピング領域
+        */
+        //-----------------------------------------------------------------//
+        const auto& get_clip() const noexcept { return clip_; }
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	破線パターンの設定
@@ -256,8 +279,8 @@ namespace graphics {
 			if((stipple_ & m) == 0) {
 				return false;
 			}
-			if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(GLC::width)) return false;
-			if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(GLC::height)) return false;
+			if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(clip_.size.x)) return false;
+			if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(clip_.size.y)) return false;
 			fb_[pos.y * line_offset + pos.x] = c;
 			return true;
 		}
@@ -444,56 +467,49 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	フレーム（線の箱）を描画する
-			@param[in]	org		開始点を指定
-			@param[in]	size	サイズを指定
+			@param[in]	rect	短形を指定
 		*/
 		//-----------------------------------------------------------------//
-		void frame(const vtx::spos& org, const vtx::spos& size) noexcept
+		void frame(const vtx::srect& rect) noexcept
 		{
-			line_h(org.y, org.x, size.x);
-			line_h(org.y + size.y - 1, org.x, size.x);
-			line_v(org.x, org.y + 1, size.y - 2);
-			line_v(org.x + size.x - 1, org.y + 1, size.y - 2);
+			line_h(rect.org.y,  rect.org.x, rect.size.x);
+			line_h(rect.org.y + rect.size.y - 1, rect.org.x, rect.size.x);
+			line_v(rect.org.x,  rect.org.y  + 1, rect.size.y - 2);
+			line_v(rect.org.x + rect.size.x - 1, rect.org.y + 1, rect.size.y - 2);
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	角がラウンドしたフレーム（線）を描画する
-			@param[in]	x	開始点Ｘ軸を指定
-			@param[in]	y	開始点Ｙ軸を指定
-			@param[in]	w	横幅
-			@param[in]	h	高さ
-			@param[in]	rad	ラウンドの半径
+			@param[in]	rect	短形を指定
+			@param[in]	rad		ラウンドの半径
 		*/
 		//-----------------------------------------------------------------//
-		void round_frame(int16_t x, int16_t y, int16_t w, int16_t h, int16_t rad) noexcept
+		void round_frame(const vtx::srect& rect, int16_t rad) noexcept
 		{
-			if(w < (rad + rad) || h < (rad + rad)) {
-				if(w < h) rad = w / 2;
-				else rad = h / 2;
+			if(rect.size.x < (rad + rad) || rect.size.y < (rad + rad)) {
+				if(rect.size.x < rect.size.y) rad = rect.size.x / 2;
+				else rad = rect.size.y / 2;
 			} 
-			int16_t xc = x + rad;
-			int16_t yc = y + rad;
-			int16_t xo = w - rad * 2 - 2;
-			int16_t yo = h - rad * 2 - 2;
-			line_h(y, xc, xo);
-			line_h(y + h - 1, xc, xo);
-			line_v(x, yc, yo);
-			line_v(x + w - 1, yc, yo);
-			int16_t xx = 0;
-			int16_t yy = rad;
+			auto cen = rect.org + rad;
+			auto ofs = rect.size - (rad * 2 - 2);
+			line_h(rect.org.y, cen.x, ofs.x);
+			line_h(rect.org.y + rect.size.y - 1, cen.x, ofs.x);
+			line_v(rect.org.x, cen.y, ofs.y);
+			line_v(rect.org.x + rect.size.x - 1, cen.y, ofs.y);
+			vtx::spos pos(0, rad);
 			int16_t p = (5 - rad * 4) / 4;
-			circle_offset_(xc, yc, xx, yy, xo, yo, fore_color_.rgb565);
-			while(xx < yy) {
-				xx++;
+			circle_offset_(cen, pos, ofs);
+			while(pos.x < pos.y) {
+				pos.x++;
 				if(p < 0) {
-					p += 2 * xx + 1;
+					p += 2 * pos.x + 1;
 				} else {
-					yy--;
-					p += 2 * (xx - yy) + 1;
+					pos.y--;
+					p += 2 * (pos.x - pos.y) + 1;
 				}
-				circle_offset_(xc, yc, xx, yy, xo, yo, fore_color_.rgb565);
+				circle_offset_(cen, pos, ofs);
 			}
 		}
 
@@ -501,40 +517,37 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	角がラウンドした塗りつぶされた箱を描画する
-			@param[in]	org		開始点
-			@param[in]	size	大きさ
-			@param[in]	rad	ラウンドの半径
+			@param[in]	rect	短形を指定
+			@param[in]	rad		ラウンドの半径
 		*/
 		//-----------------------------------------------------------------//
-		void round_box(const vtx::spos& org, const vtx::spos& size, int16_t rad) noexcept
+		void round_box(const vtx::srect& rect, int16_t rad) noexcept
 		{
-			if(size.x < (rad + rad) || size.y < (rad + rad)) {
-				if(size.x < size.y) rad = size.x / 2;
-				else rad = size.y / 2;
+			if(rect.size.x < (rad + rad) || rect.size.y < (rad + rad)) {
+				if(rect.size.x < rect.size.y) rad = rect.size.x / 2;
+				else rad = rect.size.y / 2;
 			}
-			int16_t xc = org.x + rad;
-			int16_t yc = org.y + rad;
-			int16_t xo = size.x - rad * 2 - 2;
-			int16_t yo = size.y - rad * 2 - 2;
-			fill_box(vtx::spos(org.x, yc), vtx::spos(size.x, yo));
-			int16_t xx = 0;
-			int16_t yy = rad;
+			auto cen = rect.org + rad;
+			auto ofs = rect.size - (rad * 2 - 2);
+			int16_t yo = rect.size.y - rad * 2 - 2;
+			fill_box(vtx::spos(rect.org.x, cen.y), vtx::spos(rect.size.x, yo));
+			vtx::spos pos(0, rad);
 			int16_t p = (5 - rad * 4) / 4;
-			line_h(yc + yo, xc - yy, yy + yy + 1 + xo);
-			line_h(yc + yy + yo + 1, xc - xx, xx + xx + xo);
-			while(xx < yy) {
-				xx++;
+			line_h(cen.y + ofs.y, cen.x - pos.y, pos.y + pos.y + 1 + ofs.x);
+			line_h(cen.y + pos.y + yo + 1, cen.x - pos.x, pos.x + pos.x + ofs.x);
+			while(pos.x < pos.y) {
+				pos.x++;
 				if(p < 0) {
-					p += 2 * xx + 1;
+					p += 2 * pos.x + 1;
 				} else {
 					// x` = x - 1
-					line_h(yc - yy,      xc - xx + 1, xx + xx + xo - 1);
-					line_h(yc + yy + yo, xc - xx + 1, xx + xx + xo - 1);
-					yy--;
-					p += 2 * (xx - yy) + 1;
+					line_h(cen.y - pos.y,         cen.x - pos.x + 1, pos.x + pos.x + ofs.x - 1);
+					line_h(cen.y + pos.y + ofs.y, cen.x - pos.x + 1, pos.x + pos.x + ofs.x - 1);
+					pos.y--;
+					p += 2 * (pos.x - pos.y) + 1;
 				}
-				line_h(yc - xx,      xc - yy, yy + yy + xo + 1);
-				line_h(yc + xx + yo, xc - yy, yy + yy + xo + 1);
+				line_h(cen.y - pos.x,         cen.x - pos.y, pos.y + pos.y + ofs.x + 1);
+				line_h(cen.y + pos.x + ofs.y, cen.x - pos.y, pos.y + pos.y + ofs.x + 1);
 			}
 		}
 
@@ -548,11 +561,10 @@ namespace graphics {
 			@param[in]	yc	中心点Ｙ軸
 			@param[in]	x1	終了点Ｘ軸
 			@param[in]	y1	終了点Ｙ軸
-			@param[in]	col	描画色
 			@return 座標指定が不整合な場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool arc(int16_t x0, int16_t y0, int16_t xc, int16_t yc, int16_t x1, int16_t y1, T col)
+		bool arc(int16_t x0, int16_t y0, int16_t xc, int16_t yc, int16_t x1, int16_t y1)
 			noexcept
 		{
 			imath::circle cir;
@@ -563,7 +575,7 @@ namespace graphics {
 			}
 			do {
 				vtx::ipos pos = cir.get_position();
-				plot(pos.x, pos.y, col);
+				plot(pos.x, pos.y, fore_color_.rgb565);
 			} while(!cir.step()) ;
 
 			return true;
@@ -573,27 +585,24 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	円（線）を描画する
-			@param[in]	xc	中心点Ｘ軸
-			@param[in]	yc	中心点Ｙ軸
+			@param[in]	cen	中心点
 			@param[in]	rad	半径を指定
-			@param[in]	col	描画色
 		*/
 		//-----------------------------------------------------------------//
-		void circle(int16_t xc, int16_t yc, int16_t rad, T col) noexcept
+		void circle(const vtx::spos& cen, int16_t rad) noexcept
 		{
-			int16_t x = 0;
-			int16_t y = rad;
+			vtx::spos pos(0, rad);
 			int16_t p = (5 - rad * 4) / 4;
-			circle_pset_(xc, yc, x, y, col);
-			while(x < y) {
-				x++;
+			circle_pset_(cen, pos);
+			while(pos.x < pos.y) {
+				pos.x++;
 				if(p < 0) {
-					p += 2 * x + 1;
+					p += 2 * pos.x + 1;
 				} else {
-					y--;
-					p += 2 * (x - y) + 1;
+					pos.y--;
+					p += 2 * (pos.x - pos.y) + 1;
 				}
-				circle_pset_(xc, yc, x, y, col);
+				circle_pset_(cen, pos);
 			}
 		}
 
@@ -601,31 +610,29 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	円を描画する
-			@param[in]	xc	中心点Ｘ軸
-			@param[in]	yc	中心点Ｙ軸
+			@param[in]	cen	中心点
 			@param[in]	rad	半径を指定
-			@param[in]	col	描画色
 		*/
 		//-----------------------------------------------------------------//
-		void fill_circle(int16_t xc, int16_t yc, int16_t rad, T col) noexcept
+		void fill_circle(const vtx::spos& cen, int16_t rad) noexcept
 		{
 			int16_t x = 0;
 			int16_t y = rad;
 			int16_t p = (5 - rad * 4) / 4;
-			line_h(yc, xc - y, y + y + 1, col);
+			line_h(cen.y, cen.x - y, y + y + 1);
 			while(x < y) {
 				x++;
 				if(p < 0) {
 					p += 2 * x + 1;
 				} else {
 					// x` = x - 1
-					line_h(yc - y, xc - x + 1, x + x - 1, col);
-					line_h(yc + y, xc - x + 1, x + x - 1, col);
+					line_h(cen.y - y, cen.x - x + 1, x + x - 1);
+					line_h(cen.y + y, cen.x - x + 1, x + x - 1);
 					y--;
 					p += 2 * (x - y) + 1;
 				}
-				line_h(yc - x, xc - y, y + y + 1, col);
-				line_h(yc + x, xc - y, y + y + 1, col);
+				line_h(cen.y - x, cen.x - y, y + y + 1);
+				line_h(cen.y + x, cen.x - y, y + y + 1);
 			}
 		}
 
@@ -919,7 +926,7 @@ namespace graphics {
 		{
 			vtx::spos pos((GLC::width  - size.x) / 2, (GLC::height - size.y) / 2);
 			set_fore_color(DEF_COLOR::White);
-			frame(pos, size);
+			frame(vtx::srect(pos, size));
  			set_fore_color(DEF_COLOR::Black);
 			fill_box(pos + 1, size - 2);
 			auto l = get_text_length(text);
