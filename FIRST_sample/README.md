@@ -1,26 +1,31 @@
-Renesas RX71M, RX64M, RX65N, RX24T, RX66T LED 点滅サンプル
+Renesas RX24T, RX71M, RX64M, RX65N, RX66T LED flashing sample
 =========
 
-## 概要
-RX マイコンを使った LED 点滅のサンプルプログラム
+[Japanese](READMEja.md)
    
-## プロジェクト・リスト
- - main.cpp
- - RX24T/Makefile
- - RX64M/Makefile
- - RX71M/Makefile
- - RX65N/Makefile
- - RX66T/Makefile
+## Overview
+Sample program of LED blinking using RX microcontroller
    
-## ハードウェアーの準備
- - ベースクリスタルが異なる場合は、typedef のパラメーターを変更する。
- - Makefile で、各モジュール別の設定周波数を宣言している。
- - RX24T:  80MHz (10MHz)
- - RX64M: 120MHz (12MHz)
- - RX71M: 240MHz (12MHz)
- - RX65N: 120MHz (12MHz)
- - RX66T: 160MHz (10MHz)
- - LED を指定のポートに接続する。
+---
+## Description
+- main.cpp
+- RX24T/Makefile
+- RX64M/Makefile
+- RX71M/Makefile
+- RX65N/Makefile
+- RX66T/Makefile
+   
+---
+## Hardware preparation
+- If the base crystal is different, change the typedef parameters.
+- The Makefile declares a set frequency for each module.
+- RX24T:  80MHz (10MHz)
+- RX64M: 120MHz (12MHz)
+- RX71M: 240MHz (12MHz)
+- RX65N: 120MHz (12MHz)
+- RX66T: 160MHz (10MHz)
+- Connect the LED to the specified port.
+   
 ```
 #if defined(SIG_RX71M)
 	typedef device::system_io<12000000> SYSTEM_IO;
@@ -39,25 +44,24 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #endif
 ```
- - Envision kit RX65N の場合は、ボード上の青色 LED を利用する。
+- For RX65N Envision kit, use the blue LED on the board.
    
-## リソースの準備
- - 特に無し
+## Resource preparation
+- None
    
-## ビルド方法
- - 各プラットホームディレクトリーに移動、make する。
- - led_sample.mot ファイルを書き込む。
+## How to build
+- Move to each platform directory and make it.
+- Write the led_sample.mot file.
    
-## 動作
- - LED が 0.25 秒間隔で点滅する。
+## Operation
+- The LED flashes every 0.25 seconds.
     
-## 備考
-このプロジェクトが基本で最低限の設定などが含まれます、新しいプロジェクトを   
-始める場合の参考にして下さい。   
+## Remarks
+- This project is basic and includes minimum settings etc. Please refer to it when starting a new project.   
    
 -----
    
 License
 ----
 
-MIT
+[MIT](../LICENSE)
