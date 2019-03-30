@@ -2,7 +2,7 @@ Renesas RX Microcontroller
 =========
 ![R5F564ML](docs/RX600_group.jpg)
    
-[Japanese](READMEj.md)
+[Japanese](READMEja.md)
    
 ## Overview
    
@@ -96,7 +96,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |/RTK5_AUDIO_sample     |Renesas RTK5RX65N microcontroller board audio player|
 |/RTK5_SIDE             |Renesas RTK5RX65N microcontroller board Space Invaders emulator|
 |/RTK5_NESEMU           |Renesas RTK5RX65N microcontroller board NES emulator|
-|[/LICENSE](./LICENSE)  |License notation file|
+|[LICENSE](./LICENSE)  |License notation file|
    
 - Although not in the above list, please think that directories and files that exist when you check out are working.   
    
@@ -478,7 +478,7 @@ int main(int argc, char** argv)
 ---
 ## License
 
-MIT
+[MIT](../LICENSE)
 
 ```
 Copyright (c) 2017 2019, Hiramatsu Kunihito
