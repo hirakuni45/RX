@@ -472,7 +472,7 @@ int main(int argc, char** argv)
 			render_.circle(vtx::spos(480/2, 272/2), 120, 10);
 
 			render_.set_fore_color(DEF_COLOR::Purple);
-			render_.box(vtx::spos(100, 50), vtx::spos(90, 45));
+			render_.fill_box(vtx::spos(100, 50), vtx::spos(90, 45));
 			break;
        		case 2:
 			render_.clear(DEF_COLOR::Black);
