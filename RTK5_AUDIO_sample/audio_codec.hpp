@@ -225,7 +225,9 @@ namespace audio {
 			sdc_.start_dir_list(root,
 				[&](const char* name, const FILINFO* fi, bool dir, void* option) {
 					play_loop_func_(name, fi, dir, option);
-				}, true, &loop_t_);
+				},
+			true, &loop_t_);
+			sdc_.set_dir_list_limit();
 		}
 
 	public:
