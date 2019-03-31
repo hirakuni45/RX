@@ -100,6 +100,7 @@ namespace audio {
 		void sound_tag_task_(utils::file_io& fin, const sound::tag_t& tag)
 		{
 			render_.clear(graphics::def_color::Black);
+			render_.sync_frame(false);
 
 			scaling_.set_offset(vtx::spos(480 - 272, 0));
 			if(tag.get_apic().len_ > 0) {
@@ -136,6 +137,7 @@ namespace audio {
 			if(x > 0) x += 8;
 			utils::format("Track:   %s\n") % tag.get_track().c_str();
 			render_text_(x, 4 * 20, tag.get_track().c_str());
+			render_.sync_frame(false);
 		}
 
 
@@ -147,9 +149,10 @@ namespace audio {
 			char tmp[16];
 			utils::sformat("%02d:%02d:%02d", tmp, sizeof(tmp)) % hor % min % sec;
 			render_.set_fore_color(graphics::def_color::Black);
-			render_.fill_box(vtx::spos(0, 5 * 20), vtx::spos(8 * 8, 16));
+			render_.fill_box(vtx::srect(0, 5 * 20, 8 * 8, 16));
 			render_.set_fore_color(graphics::def_color::White);
 			render_.draw_text(vtx::spos(0, 5 * 20), tmp);
+			render_.sync_frame(false);
 		}
 
 

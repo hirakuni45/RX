@@ -161,7 +161,7 @@ extern "C" {
 	void draw_text(int x, int y, const char* t)
 	{
 		render_.set_fore_color(graphics::def_color::Black);
-		render_.fill_box(vtx::spos(x, y), vtx::spos(strlen(t) * AFONT::width, AFONT::height));
+		render_.fill_box(vtx::srect(x, y, strlen(t) * AFONT::width, AFONT::height));
 		render_.set_fore_color(graphics::def_color::White);
 		render_.draw_text(vtx::spos(x, y), t);
 	}

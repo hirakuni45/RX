@@ -2,7 +2,7 @@
 /*! @file
     @brief  RX65N オーディオファイル再生サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -19,6 +19,7 @@
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
+#include "graphics/dialog.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
 
@@ -100,13 +101,6 @@ namespace {
 
 	typedef graphics::def_color DEF_COLOR;
 
-	// QSPI B グループ
-	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
-	QSPI		qspi_;
-
-	typedef graphics::filer<SDC, RENDER> FILER;
-	FILER		filer_(sdc_, render_);
-
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 	typedef utils::fixed_fifo<uint8_t, 64> RB6;
@@ -119,6 +113,15 @@ namespace {
 	FT5206		ft5206_(ft5206_i2c_);
 	// INT to P02(IRQ10)
 
+	typedef gui::dialog<RENDER, FT5206> DIALOG;
+	DIALOG		dialog_(render_, ft5206_); 
+
+	// QSPI B グループ
+	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
+	QSPI		qspi_;
+
+	typedef graphics::filer<SDC, RENDER> FILER;
+	FILER		filer_(sdc_, render_);
 
 	typedef audio::codec<SDC, RENDER> AUDIO;
 	AUDIO		audio_(sdc_, render_);
@@ -453,11 +456,12 @@ int main(int argc, char** argv)
 #if 1
 	// タッチパネルの安定待ち
 	{
-		render_.draw_text(vtx::spos(0),
+		render_.sync_frame();
+		dialog_.modal(vtx::spos(400, 60),
 			"Touch panel device wait...\nPlease touch it with some screen.");
 		uint8_t nnn = 0;
 		while(1) {
-			glcdc_io_.sync_vpos();
+			render_.sync_frame();
 			ft5206_.update();
 			auto num = ft5206_.get_touch_num();
 			if(num == 0) {
@@ -472,7 +476,7 @@ int main(int argc, char** argv)
 #endif
 
 	while(1) {
-		glcdc_io_.sync_vpos();
+		render_.sync_frame();
 
 		ft5206_.update();
 		command_();
@@ -501,7 +505,7 @@ int main(int argc, char** argv)
 			filer_.set_touch(tnum, xy.x, xy.y); 
 			char path[256];
 			if(filer_.update(ctrl, path, sizeof(path))) {
-				glcdc_io_.sync_vpos();
+				render_.sync_frame();
 				audio_.play_loop("", path);
 			}
 		}
