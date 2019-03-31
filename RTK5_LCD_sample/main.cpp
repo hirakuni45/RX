@@ -472,7 +472,7 @@ int main(int argc, char** argv)
 			render_.circle(vtx::spos(480/2, 272/2), 120, 10);
 
 			render_.set_fore_color(DEF_COLOR::Purple);
-			render_.fill_box(vtx::spos(100, 50), vtx::spos(90, 45));
+			render_.fill_box(vtx::srect(100, 50, 90, 45));
 			break;
        		case 2:
 			render_.clear(DEF_COLOR::Black);
@@ -480,10 +480,14 @@ int main(int argc, char** argv)
 			render_.circle(vtx::spos(480/2, 272/2), rad, 0);
 			break;
 		case 3:
-			render_.clear(DEF_COLOR::Gray);
+			render_.clear(DEF_COLOR::Darkgray);
 			render_.set_fore_color(DEF_COLOR::White);
-			render_.draw_text(vtx::spos(50, 100), "Asdfghjkl");
-			render_.draw_text(vtx::spos(50, 116), "美しい漢字");
+			render_.draw_text(vtx::spos(50, 120), "Asdfghjkl");
+			render_.draw_text(vtx::spos(50, 136), "美しい漢字");
+			render_.set_fore_color(DEF_COLOR::Fuchsi);
+			render_.round_frame(vtx::srect(10, 10, 100, 50), 15);
+			render_.set_fore_color(DEF_COLOR::Aqua);
+			render_.round_box(vtx::srect(10, 10, 100, 50), 15);
 			break;
 
 		default:

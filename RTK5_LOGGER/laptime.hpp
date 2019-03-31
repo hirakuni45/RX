@@ -101,9 +101,9 @@ namespace app {
 				auto bc = DEF_COLOR::Black;
 				render.set_fore_color(bc);
 				render.set_back_color(fc);
-				render.fill_box(vtx::spos(1, RENDER::glc_type::height - 10 + 1), vtx::spos(ref - per, 10 - 2));
+				render.fill_box(vtx::srect(1, RENDER::glc_type::height - 10 + 1, ref - per, 10 - 2));
 				render.swap_color();
-				render.fill_box(vtx::spos(1, RENDER::glc_type::height - 10 + 1), vtx::spos(per, 10 - 2));
+				render.fill_box(vtx::srect(1, RENDER::glc_type::height - 10 + 1, per, 10 - 2));
 			}
 
 			for(uint32_t i = 0; i < 4; ++i) {

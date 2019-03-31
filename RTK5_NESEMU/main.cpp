@@ -23,6 +23,7 @@
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
+#include "graphics/dialog.hpp"
 
 #include "chip/FAMIPAD.hpp"
 
@@ -131,6 +132,9 @@ namespace {
 
 	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
 	RENDER		render_(glcdc_io_, kfont_);
+
+	typedef gui::dialog<RENDER, FAMIPAD> DIALOG;
+	DIALOG		dialog_(render_, famipad_);
 
 	typedef graphics::filer<SDC, RENDER> FILER;
 	FILER		filer_(sdc_, render_);
@@ -421,7 +425,7 @@ int main(int argc, char** argv)
 			bool m = check_mount_();
 			if(!mount && m) {
 				render_.set_fore_color(graphics::def_color::Black);
-				render_.fill_box(vtx::spos(480-24, 0), vtx::spos(24, 16));
+				render_.fill_box(vtx::srect(480-24, 0, 24, 16));
 			}
 			if(mount && !m) {
 				render_.set_fore_color(graphics::def_color::White);
@@ -455,7 +459,7 @@ int main(int argc, char** argv)
 				if(nesemu_.open(tmp)) {
 					filer = false;
 				} else {
-					render_.draw_dialog(vtx::spos(400, 80), "Not NES file");
+					dialog_.modal(vtx::spos(400, 80), "Not NES file");
 				}
 			}
 		} else {

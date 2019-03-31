@@ -12,6 +12,7 @@
 #include "common/enum_utils.hpp"
 #include "common/intmath.hpp"
 #include "graphics/color.hpp"
+#include "graphics/dialog.hpp"
 
 namespace utils {
 
@@ -37,9 +38,12 @@ namespace utils {
 		static const int16_t VOLT_BEGIN_POS   = 0;
 		static const int16_t VOLT_LIMIT_POS   = RENDER::glc_type::width - MENU_SIZE;
 
+		typedef gui::dialog<RENDER, TOUCH> DIALOG;
+
 		RENDER&		render_;
 		CAPTURE&	capture_;
 		TOUCH&		touch_;
+		DIALOG		dialog_;
 
 		int16_t		time_pos_;
 		int16_t		time_org_;
@@ -161,7 +165,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		render_wave(RENDER& render, CAPTURE& capture, TOUCH& touch) noexcept :
-			render_(render), capture_(capture), touch_(touch),
+			render_(render), capture_(capture), touch_(touch), dialog_(render, touch),
 			time_pos_(0), time_org_(0),
 			ch0_vpos_(0), ch0_vorg_(0), ch1_vpos_(0), ch1_vorg_(0),
 			rate_div_(11), ch0_div_(3), ch1_div_(3),
@@ -238,7 +242,7 @@ namespace utils {
 			char tmp[64];
 			utils::sformat("%s (%s)", tmp, sizeof(tmp)) % freq[rate_div_] % rate[rate_div_];
 			render_.set_fore_color(DEF_COLOR::Black);
-			render_.fill_box(vtx::spos(0, 0), vtx::spos(480, 16));
+			render_.fill_box(vtx::srect(0, 0, 480, 16));
 			render_.set_fore_color(DEF_COLOR::White);
 			auto x = render_.draw_text(vtx::spos(0, 0), tmp);
 
@@ -272,18 +276,18 @@ namespace utils {
 			char tmp[32];
 			if(ch == 0) {
 				render_.set_fore_color(DEF_COLOR::Lime);
-				render_.fill_box(vtx::spos(  0, 272 - 16 + 1), vtx::spos(15, 15));
+				render_.fill_box(vtx::srect(  0, 272 - 16 + 1, 15, 15));
 				render_.set_fore_color(DEF_COLOR::Black);
-				render_.fill_box(vtx::spos( 16, 272 - 16 + 1), vtx::spos(240 - 16, 15));
+				render_.fill_box(vtx::srect( 16, 272 - 16 + 1, 240 - 16, 15));
 				render_.set_fore_color(DEF_COLOR::White);
 				utils::sformat("CH0: %s [V]", tmp, sizeof(tmp)) % divs[ch0_div_];
 				render_.draw_text(vtx::spos(  16, 272 - 16 + 1), tmp);
 			} else {
 				render_.set_fore_color(DEF_COLOR::Fuchsi);
-				render_.fill_box(vtx::spos(240, 272 - 16 + 1), vtx::spos(15, 15));
+				render_.fill_box(vtx::srect(240, 272 - 16 + 1, 15, 15));
 				utils::sformat("CH1: %s [V]", tmp, sizeof(tmp)) % divs[ch1_div_];
 				render_.set_fore_color(DEF_COLOR::Black);
-				render_.fill_box(vtx::spos(240 + 16, 272 - 16 + 1), vtx::spos(240 - 16, 15));
+				render_.fill_box(vtx::srect(240 + 16, 272 - 16 + 1, 240 - 16, 15));
 				render_.set_fore_color(DEF_COLOR::White);
 				render_.draw_text(vtx::spos(240 + 16, 272 - 16 + 1), tmp);
 			}
@@ -406,7 +410,7 @@ namespace utils {
 		void update() noexcept
 		{
 			render_.set_fore_color(DEF_COLOR::Black);
-			render_.fill_box(vtx::spos(0, 16), vtx::spos(440, 240));
+			render_.fill_box(vtx::srect(0, 16, 440, 240));
 			draw_grid(0, 16, 440, 240, GRID);
 
 			if(measere_ != MEASERE::NONE) {
@@ -429,7 +433,7 @@ namespace utils {
 					auto c = DEF_COLOR::Olive;
 					if(static_cast<MENU>(i + 1) == menu_) c = DEF_COLOR::Yellow;
 					render_.set_back_color(c);
-					render_.draw_button(vtx::spos(441, 16 + GRID * i + 1), vtx::spos(GRID - 1, GRID - 1), menu[i]);
+					dialog_.draw_button(vtx::srect(441, 16 + GRID * i + 1, GRID - 1, GRID - 1), menu[i]);
 				}
 			}
 

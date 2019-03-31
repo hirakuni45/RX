@@ -423,7 +423,7 @@ int main(int argc, char** argv)
 			bool m = check_mount_();
 			if(!mount && m) {
 				render_.set_fore_color(graphics::def_color::Black);
-				render_.fill_box(vtx::spos(480-24, 0), vtx::spos(24, 16));
+				render_.fill_box(vtx::srect(480-24, 0, 24, 16));
 			}
 			if(mount && !m) {
 				render_.set_fore_color(graphics::def_color::White);
