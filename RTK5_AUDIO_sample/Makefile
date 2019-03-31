@@ -33,10 +33,6 @@ PSOURCES	=	main.cpp \
 				graphics/color.cpp \
 				common/stdapi.cpp
 
-#				RX65x/icu_mgr.cpp
-#				Cartridge.cpp
-#				bgm_data.cpp
-
 USER_LIBS	=	supc++ mad drw2d
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
