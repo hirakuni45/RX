@@ -25,6 +25,9 @@ namespace utils {
 	class sdc_man {
 	public:
 
+		/// 標準的な、フレーム辺りのディレクトリー取得数
+		static const uint32_t def_dir_list_num = 10;
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  DIR リスト関数型
@@ -54,7 +57,8 @@ namespace utils {
 				@brief	コンストラクター
 			 */
 			//-----------------------------------------------------------------//
-			dir_list() noexcept : total_(0), limit_(10), ptr_(nullptr), init_(false) { }
+			dir_list() noexcept : total_(0), limit_(def_dir_list_num),
+				ptr_(nullptr), init_(false) { }
 
 
 			//-----------------------------------------------------------------//
@@ -325,7 +329,7 @@ namespace utils {
 		 */
 		//-----------------------------------------------------------------//
 		sdc_man() noexcept : current_{ 0 }, cdet_(false), mount_(false), mount_delay_(0),
-			dir_list_(), dir_list_limit_(10),
+			dir_list_(), dir_list_limit_(def_dir_list_num),
 			dir_func_(), dir_todir_(false), dir_option_(nullptr) { }
 
 
@@ -602,7 +606,7 @@ namespace utils {
 			@param[in]	limit	フレーム毎の最大数
 		 */
 		//-----------------------------------------------------------------//
-		void set_dir_list_limit(uint32_t limit) { dir_list_limit_ = limit; }
+		void set_dir_list_limit(uint32_t limit = def_dir_list_num) { dir_list_limit_ = limit; }
 
 
 		//-----------------------------------------------------------------//
