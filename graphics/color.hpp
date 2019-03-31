@@ -94,6 +94,32 @@ namespace graphics {
 			rgba8 = t.rgba8;
 			return *this;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	カラーの合成
+			@param[in]	c0	カラーＡ
+			@param[in]	c1	カラーＢ
+			@return 合成されたカラー
+		*/
+		//-----------------------------------------------------------------//
+		static uint16_t color_sum(uint16_t c0, uint16_t c1) noexcept
+		{
+			uint16_t r = c0 & 0b1111100000000000;
+			uint16_t g = c0 & 0b0000011111100000;
+			uint16_t b = c0 & 0b0000000000011111;
+			r >>= 1;
+			r += (c1 & 0b1111100000000000) >> 1;
+			r &= 0b1111100000000000;
+			g += c1 & 0b0000011111100000;
+			g >>= 1;
+			g &= 0b0000011111100000;
+			b += c1 & 0b0000000000011111;
+			b >>= 1;
+			b &= 0b0000000000011111;
+			return r | g | b;
+		}
 	};
 
 
@@ -113,6 +139,7 @@ namespace graphics {
 		static const share_color Silver;
 		static const share_color Gray;
 		static const share_color Grey;
+		static const share_color Darkgray;
 		static const share_color Red;
 		static const share_color Lime;
 		static const share_color Yellow;

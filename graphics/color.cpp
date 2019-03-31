@@ -20,11 +20,12 @@ namespace graphics {
 	share_color const def_color::Silver  = { 192, 192, 192 };
 	share_color const def_color::Gray    = { 128, 128, 128 };  // 米国
 	share_color const def_color::Grey    = { 128, 128, 128 };  // 英国
+	share_color const def_color::Darkgray= {  64,  64,  64 };
 	share_color const def_color::Red     = { 255,   0,   0 };
 	share_color const def_color::Lime    = {   0, 255,   0 };
 	share_color const def_color::Yellow  = { 255, 255,   0 };
 	share_color const def_color::Blue    = {   0,   0, 255 };
-	share_color const def_color::Fuchsi  = { 255,   0, 255 };
+	share_color const def_color::Fuchsi  = { 255,   0, 255 };  // 赤紫色
 	share_color const def_color::Aqua    = {   0, 255, 255 };
 	share_color const def_color::White   = { 255, 255, 255 };
 }
