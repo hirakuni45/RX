@@ -65,7 +65,6 @@ namespace device {
 		graphics::share_color	back_color_;
 		vtx::srect	clip_;
 		int16_t		pen_size_;
-		int16_t		scale_;
 		bool		set_fore_color_;
 		bool		set_back_color_;
 		bool		set_clip_;
@@ -111,6 +110,34 @@ namespace device {
 			}
 		}
 
+
+		void arc_(const vtx::spos& cen, int16_t rad, int16_t w, const vtx::spos& n1, const vtx::spos& n2, uint32_t f = 0)
+		{
+			d2_renderwedge(d2_, cen.x << 4, cen.y << 4, rad << 4, w,
+				n1.x << 16, n1.y << 16, n2.x << 16, n2.y << 16, f);
+		}
+
+		void start_frame_() noexcept
+		{
+			start_frame_enable_ = true;
+			d2_startframe(d2_);
+
+			auto xs = GLC::width;
+			auto ys = GLC::height;
+			d2_framebuffer(d2_, fb_, xs, xs, ys, get_mode_());
+			d2_cliprect(d2_, 0, 0, xs * 16, ys * 16);
+			d2_settexclut(d2_, clut_);
+		}
+
+
+		void end_frame_() noexcept
+		{
+			if(start_frame_enable_) {
+				d2_endframe(d2_);
+				start_frame_enable_ = false;
+			}
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -124,7 +151,7 @@ namespace device {
 			d2_(nullptr),
 			fore_color_(DEF_COLOR::White), back_color_(DEF_COLOR::Black),
 			clip_(0, 0, GLC::width, GLC::height),
-			pen_size_(16), scale_(16),
+			pen_size_(16),
 			set_fore_color_(false), set_back_color_(false),
 			set_clip_(false), start_frame_enable_(false),
 			last_error_(D2_OK)
@@ -186,41 +213,20 @@ namespace device {
 		}
 
 
-		void start_frame() noexcept
-		{
-			start_frame_enable_ = true;
-			d2_startframe(d2_);
-
-			auto xs = GLC::width;
-			auto ys = GLC::height;
-			d2_framebuffer(d2_, fb_, xs, xs, ys, get_mode_());
-			d2_cliprect(d2_, 0, 0, xs * 16, ys * 16);
-			d2_settexclut(d2_, clut_);
-		}
-
-
-		void end_frame() noexcept
-		{
-			if(start_frame_enable_) {
-				d2_endframe(d2_);
-				start_frame_enable_ = false;
-			}
-		}
-
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	フレームの同期
+			@param[in]	vsync	垂直同期を行わない場合「false」	
 		*/
 		//-----------------------------------------------------------------//
-		void sync_frame() noexcept
+		void sync_frame(bool vsync = true) noexcept
 		{
 			if(d2_ == nullptr) {
 				start();
 			}
-			end_frame();
-			glc_.sync_vpos();
-			start_frame();
+			end_frame_();
+			if(vsync) glc_.sync_vpos();
+			start_frame_();
 		}
 
 
@@ -271,6 +277,19 @@ namespace device {
 		void set_back_color(const graphics::share_color& color) noexcept
 		{
 			back_color_ = color;
+			set_back_color_ = false;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  カラーの交換
+		*/
+		//-----------------------------------------------------------------//
+		void swap_color() noexcept
+		{
+			std::swap(fore_color_, back_color_);
+			set_fore_color_ = false;
 			set_back_color_ = false;
 		}
 
@@ -366,24 +385,6 @@ namespace device {
 		auto get_pen_size() const noexcept { return pen_size_; }
 
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	スケールの設定
-			@param[in]	scale	スケール（等倍１６）
-		*/
-		//-----------------------------------------------------------------//
-		void set_scale(int16_t scale = 16) noexcept { scale_ = scale; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	スケールの取得
-			@return スケール（1/16 pixel）
-		*/
-		//-----------------------------------------------------------------//
-		auto get_scale() const noexcept { return scale_; }
-
-
         //-----------------------------------------------------------------//
         /*!
             @brief  水平ラインを描画
@@ -396,8 +397,8 @@ namespace device {
         bool line_h(int16_t y, int16_t x, int16_t w) noexcept
 		{
 			setup_();
-			last_error_ = d2_renderline(d2_, x * scale_, y * scale_,
-				(x + w) * scale_, y * scale_, pen_size_, d2_le_exclude_none);
+			last_error_ = d2_renderline(d2_, x << 4, y << 4, (x + w) << 4, y << 4,
+				pen_size_, d2_le_exclude_none);
 			return last_error_ == D2_OK;
 		}
 
@@ -414,25 +415,24 @@ namespace device {
         bool line_v(int16_t x, int16_t y, int16_t h) noexcept
 		{
 			setup_();
-			last_error_ = d2_renderline(d2_, x * scale_, y * scale_,
-				x * scale_, (y + h) * scale_, pen_size_, d2_le_exclude_none);
+			last_error_ = d2_renderline(d2_, x << 4, y << 4, x << 4, (y + h) << 4,
+				pen_size_, d2_le_exclude_none);
 			return last_error_ == D2_OK;
 		}
 
 
-        //-----------------------------------------------------------------//
-        /*!
-            @brief  四角を塗りつぶす
-            @param[in]  org     開始位置
-            @param[in]  size    サイズ
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  四角を塗りつぶす
+			@param[in]	rect	配置
 			@return エラー無い場合「true」
-        */
-        //-----------------------------------------------------------------//
-        bool fill_box(const vtx::spos& org, const vtx::spos& size) noexcept
+		*/
+		//-----------------------------------------------------------------//
+		bool fill_box(const vtx::srect& rect) noexcept
 		{
 			setup_();
-			last_error_ = d2_renderbox(d2_, org.x * scale_, org.y * scale_,
-				size.x * scale_, size.y * scale_);
+			last_error_ = d2_renderbox(d2_, rect.org.x << 4, rect.org.y << 4,
+				rect.size.x << 4, rect.size.y << 4);
 			return last_error_ == D2_OK;
 		}
 
@@ -462,8 +462,8 @@ namespace device {
 		bool line(const vtx::spos& org, const vtx::spos& end) noexcept
 		{
 			setup_();
-			last_error_ = d2_renderline(d2_, org.x * scale_, org.y * scale_,
-				end.x * scale_, end.y * scale_, pen_size_, d2_le_exclude_none);
+			last_error_ = d2_renderline(d2_, org.x << 4, org.y << 4, end.x << 4, end.y << 4,
+				pen_size_, d2_le_exclude_none);
 			return last_error_ == D2_OK;
 		}
 
@@ -485,24 +485,121 @@ namespace device {
         }
 
 
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  角がラウンドしたフレーム（線）を描画する
+            @param[in]  rect    短形を指定
+            @param[in]  rad     ラウンドの半径
+			@return エラー無い場合「true」
+        */
+        //-----------------------------------------------------------------//
+        bool round_frame(const vtx::srect& rect, int16_t rad) noexcept
+		{
+            if(rect.size.x < (rad * 2) || rect.size.y < (rad * 2)) {
+                if(rect.size.x < rect.size.y) rad = rect.size.x / 2;
+                else rad = rect.size.y / 2;
+            }
+            auto cen = rect.org + rad;
+            auto ofs = rect.size - (rad * 2 - 2);
+            line_h(rect.org.y, cen.x, ofs.x);
+            line_h(rect.org.y + rect.size.y - 1, cen.x, ofs.x);
+            line_v(rect.org.x, cen.y, ofs.y);
+            line_v(rect.org.x + rect.size.x - 1, cen.y, ofs.y);
 
+			auto end = rect.end() - rad - 1;
+			arc_(cen, rad, 32, vtx::spos(-1, 0), vtx::spos(0, -1));
+			arc_(vtx::spos(end.x, cen.y), rad, 32, vtx::spos(0, -1), vtx::spos(1, 0));
+			arc_(end, rad, 32, vtx::spos(1, 0), vtx::spos(0, 1));
+			arc_(vtx::spos(cen.x, end.y), rad, 32, vtx::spos(0, 1), vtx::spos(-1, 0));
+
+			return last_error_ == D2_OK;
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  角がラウンドした塗りつぶされた箱を描画する
+            @param[in]  rect    短形を指定
+            @param[in]  rad     ラウンドの半径
+			@return エラー無い場合「true」
+        */
+        //-----------------------------------------------------------------//
+        bool round_box(const vtx::srect& rect, int16_t rad) noexcept
+		{
+            if(rect.size.x < (rad * 2) || rect.size.y < (rad * 2)) {
+                if(rect.size.x < rect.size.y) rad = rect.size.x / 2;
+                else rad = rect.size.y / 2;
+            }
+            auto cen = rect.org + rad;
+			auto len = rect.size - (rad * 2);
+			setup_();
+			d2_renderbox(d2_, cen.x << 4, rect.org.y << 4, len.x << 4, rect.size.y << 4);
+			d2_renderbox(d2_, rect.org.x << 4, cen.y << 4, rad << 4, len.y << 4);
+			auto end = rect.end() - rad - 1;
+			d2_renderbox(d2_, (end.x + 1) << 4, cen.y << 4, rad << 4, len.y << 4);
+
+//			uint32_t f = d2_edge0_shared | d2_edge1_shared;
+			++rad;
+			arc_(cen, rad, 0, vtx::spos(-1, 0), vtx::spos(0, -1));
+			arc_(vtx::spos(end.x, cen.y), rad, 0, vtx::spos(0, -1), vtx::spos(1, 0));
+			arc_(end, rad, 0, vtx::spos(1, 0), vtx::spos(0, 1));
+			arc_(vtx::spos(cen.x, end.y), rad, 0, vtx::spos(0, 1), vtx::spos(-1, 0));
+
+			return last_error_ == D2_OK;
+		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	サークル描画
-			@param[in]	org		中心位置
-			@param[in]	r		半径
-			@param[in]	w		幅（０の場合 fill）
+			@brief	円（線）を描画する
+			@param[in]	cen	中心位置
+			@param[in]	rad	半径
+			@param[in]	w	線幅（０の場合 fill）
 			@return エラー無い場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool circle(const vtx::spos& org, int16_t r, int16_t w = 0) noexcept
+		bool circle(const vtx::spos& cen, int16_t rad, int16_t w = 1) noexcept
 		{
 			setup_();
-			last_error_ = d2_rendercircle(d2_, org.x * scale_, org.y * scale_,
-				r * scale_, w * scale_);
+			last_error_ = d2_rendercircle(d2_, cen.x << 4, cen.y << 4, rad << 4, w << 4);
 			return last_error_ == D2_OK;
+		}
+
+
+        //-----------------------------------------------------------------//
+        /*!
+            @brief  円を描画する
+            @param[in]  cen 中心点
+            @param[in]  rad 半径を指定
+			@return エラー無い場合「true」
+        */
+        //-----------------------------------------------------------------//
+        bool fill_circle(const vtx::spos& cen, int16_t rad) noexcept
+		{
+			setup_();
+			last_error_ = d2_rendercircle(d2_, cen.x << 4, cen.y << 4, rad << 4, 0);
+			return last_error_ == D2_OK;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  スクロール
+			@param[in]  h       スクロール高さ（+up、-down）
+		*/
+		//-----------------------------------------------------------------//
+		void scroll(int16_t h) noexcept
+		{
+			if(h > 0) {
+				for(int32_t i = 0; i < (line_offset * (GLC::height - h)); ++i) {
+					fb_[i] = fb_[i + (line_offset * h)];
+				}
+			} else if(h < 0) {
+				h = -h;
+				for(int32_t i = (line_offset * (GLC::height - h)) - 1; i >= 0; --i) {
+					fb_[i + (line_offset * h)] = fb_[i];
+				}
+			}
 		}
 
 
