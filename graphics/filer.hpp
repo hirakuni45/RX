@@ -113,7 +113,7 @@ namespace graphics {
 			}
 			if(draw && t.vpos_ >= 0 && t.vpos_ < RDR::glc_type::height) {
 				rdr_.set_fore_color(def_color::Black);
-				rdr_.fill_box(vtx::spos(SPC, t.vpos_), vtx::spos(RDR::glc_type::width - SPC * 2, RDR::font_height));
+				rdr_.fill_box(vtx::srect(SPC, t.vpos_, RDR::glc_type::width - SPC * 2, RDR::font_height));
 				rdr_.set_fore_color(def_color::White);
 				if(dir) rdr_.draw_font(vtx::spos(SPC, t.vpos_), '/');
 				if(dir) {
@@ -238,6 +238,7 @@ namespace graphics {
 				open_ = !open_;
 				rdr_.clear(def_color::Black);
 				if(open_) {
+					rdr_.at_kfont().flush_cash();
 					scan_dir_(false);
 				}
 			}

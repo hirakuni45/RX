@@ -104,6 +104,9 @@ namespace graphics {
 		{ fb_ = static_cast<T*>(glc_.get_fbp()); }
 
 
+		KFONT& at_kfont() { return kfont_; }
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	ハードウェアーバージョンを取得
@@ -116,7 +119,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始 @n
-					※互換性の為に用意
+					※DRW2D エンジン互換性の為に用意
 			@return エラーなら「false」
 		*/
 		//-----------------------------------------------------------------//
@@ -129,16 +132,13 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	フレームの同期
+			@param[in]	vsync	垂直同期を行わない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void sync_frame() noexcept
+		void sync_frame(bool vsync = true) noexcept
 		{
-			glc_.sync_vpos();
+			if(vsync) glc_.sync_vpos();
 		}
-
-
-		void start_frame() noexcept { }
-		void end_frame() noexcept { }
 
 
 		//-----------------------------------------------------------------//
@@ -201,32 +201,6 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		void swap_color() noexcept { std::swap(fore_color_, back_color_); }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	カラーの合成
-			@param[in]	c0	カラーＡ
-			@param[in]	c1	カラーＢ
-			@return 合成されたカラー
-		*/
-		//-----------------------------------------------------------------//
-		uint16_t color_sum(T c0, T c1) noexcept
-		{
-			uint16_t r = c0 & 0b1111100000000000;
-			uint16_t g = c0 & 0b0000011111100000;
-			uint16_t b = c0 & 0b0000000000011111;
-			r >>= 1;
-			r += (c1 & 0b1111100000000000) >> 1;
-			r &= 0b1111100000000000;
-			g += c1 & 0b0000011111100000;
-			g >>= 1;
-			g &= 0b0000011111100000;
-			b += c1 & 0b0000000000011111;
-			b >>= 1;
-			b &= 0b0000000000011111;
-			return r | g | b;
-		}
 
 
         //-----------------------------------------------------------------//
@@ -304,8 +278,8 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	水平ラインを描画
-			@param[in]	y	開始位置 Y
-			@param[in]	x	水平開始位置
+			@param[in]	y	開始位置Ｘ
+			@param[in]	x	開始位置Ｙ
 			@param[in]	w	水平幅
 		*/
 		//-----------------------------------------------------------------//
@@ -332,8 +306,8 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	垂直ラインを描画
-			@param[in]	x	開始位置 x
-			@param[in]	y	垂直開始位置
+			@param[in]	x	開始位置Ｘ
+			@param[in]	y	開始位置Ｙ
 			@param[in]	h	垂直幅
 		*/
 		//-----------------------------------------------------------------//
@@ -361,16 +335,15 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	四角を塗りつぶす
-			@param[in]	org		開始位置
-			@param[in]	size	サイズ
+			@param[in]	rect	配置
 		*/
 		//-----------------------------------------------------------------//
-		void fill_box(const vtx::spos& org, const vtx::spos& size) noexcept
+		void fill_box(const vtx::srect& rect) noexcept
 		{
-			if(size.x <= 0 || size.y <= 0) return;
+			if(rect.size.x <= 0 || rect.size.y <= 0) return;
 
-			for(int16_t yy = org.y; yy < (org.y + size.y); ++yy) {
-				line_h(yy, org.x, size.x);
+			for(int16_t yy = rect.org.y; yy < (rect.org.y + rect.size.y); ++yy) {
+				line_h(yy, rect.org.x, rect.size.x);
 			}
 		}
 
@@ -488,7 +461,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		void round_frame(const vtx::srect& rect, int16_t rad) noexcept
 		{
-			if(rect.size.x < (rad + rad) || rect.size.y < (rad + rad)) {
+			if(rect.size.x < (rad * 2) || rect.size.y < (rad * 2)) {
 				if(rect.size.x < rect.size.y) rad = rect.size.x / 2;
 				else rad = rect.size.y / 2;
 			} 
@@ -528,13 +501,12 @@ namespace graphics {
 				else rad = rect.size.y / 2;
 			}
 			auto cen = rect.org + rad;
-			auto ofs = rect.size - (rad * 2 - 2);
-			int16_t yo = rect.size.y - rad * 2 - 2;
-			fill_box(vtx::spos(rect.org.x, cen.y), vtx::spos(rect.size.x, yo));
+			auto ofs = rect.size - (rad * 2);
+			fill_box(vtx::srect(rect.org.x, cen.y, rect.size.x, ofs.y));
 			vtx::spos pos(0, rad);
 			int16_t p = (5 - rad * 4) / 4;
-			line_h(cen.y + ofs.y, cen.x - pos.y, pos.y + pos.y + 1 + ofs.x);
-			line_h(cen.y + pos.y + yo + 1, cen.x - pos.x, pos.x + pos.x + ofs.x);
+			ofs -= 1;
+///			line_h(cen.y, cen.x - pos.y, pos.y + pos.y + ofs.x + 1);
 			while(pos.x < pos.y) {
 				pos.x++;
 				if(p < 0) {
@@ -585,8 +557,8 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	円（線）を描画する
-			@param[in]	cen	中心点
-			@param[in]	rad	半径を指定
+			@param[in]	cen	中心位置
+			@param[in]	rad	半径
 		*/
 		//-----------------------------------------------------------------//
 		void circle(const vtx::spos& cen, int16_t rad) noexcept
@@ -842,15 +814,25 @@ namespace graphics {
 			@return 描画サイズ
 		*/
 		//-----------------------------------------------------------------//
-		int16_t get_text_length(const char* text, bool prop = false) noexcept
+		vtx::spos get_text_size(const char* text, bool prop = false) noexcept
 		{
 			char ch;
+			vtx::spos sz(0);
 			int16_t x = 0;
 			while((ch = *text++) != 0) {
-				// 画面外描画
-				x += draw_font(vtx::spos(x, GLC::height), ch, prop);
+				if(ch == '\n') {
+					if(sz.x < x) sz.x = x;
+					x = 0;
+					sz.y += font_height;
+				} else {
+					// 画面外を指定してサイズだけ取得
+					x += draw_font(vtx::spos(x, GLC::height), ch, prop);
+				}
 			}
-			return x;
+			if(sz.x < x) sz.x = x;
+			if(sz.y == 0) sz.y = font_height;
+			if(x > 0) sz.y += font_height;
+			return sz;
 		}
 
 
@@ -912,48 +894,6 @@ namespace graphics {
 				swap_color();
 			}
 			return xx;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ダイアログ表示（画面の中心に表示される）
-			@param[in]	size	大きさ
-			@param[in]	text	テキスト
-		*/
-		//-----------------------------------------------------------------//
-		void draw_dialog(const vtx::spos& size, const char* text) noexcept
-		{
-			vtx::spos pos((GLC::width  - size.x) / 2, (GLC::height - size.y) / 2);
-			set_fore_color(DEF_COLOR::White);
-			frame(vtx::srect(pos, size));
- 			set_fore_color(DEF_COLOR::Black);
-			fill_box(pos + 1, size - 2);
-			auto l = get_text_length(text);
-			pos.x += (size.x - l) / 2;
-			pos.y += (size.y - font_height) / 2;
-			set_fore_color(DEF_COLOR::White);
-			draw_text(pos, text);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	標準ボタンの描画 @n
-					・背景色は「back_color」が使われる。@n
-					・フォントの描画色は「fore_color」が利用
-			@param[in]	org		位置
-			@param[in]	size	サイズ
-			@param[in]	text	テキスト
-		*/
-		//-----------------------------------------------------------------//
-		void draw_button(const vtx::spos& org, const vtx::spos& size, const char* text) noexcept
-		{
-			auto len = get_text_length(text);
-			swap_color();
-			fill_box(org, size);
-			swap_color();
-			draw_text(org + vtx::spos((size.x - len) / 2, (size.y - font_height) / 2), text);
 		}
 
 

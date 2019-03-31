@@ -301,7 +301,7 @@ namespace img {
 				if(rc == 0) {
 					render_.plot(vtx::spos(xx + ofs_.x, yy + ofs_.y), sc.rgb565);
 				} else {
-					auto nc = render_.color_sum(sc.rgb565, rc);
+					auto nc = graphics::share_color::color_sum(sc.rgb565, rc);
 					render_.plot(vtx::spos(xx + ofs_.x, yy + ofs_.y), nc);
 				}
 			} else if(scale_.up > scale_.dn) {
@@ -309,7 +309,7 @@ namespace img {
 				auto xx = x * scale_.up / scale_.dn;
 				auto yy = y * scale_.up / scale_.dn;
 				render_.set_fore_color(sc);
-				render_.fill_box(vtx::spos(xx + ofs_.x, yy + ofs_.y), vtx::spos(d, d));
+				render_.fill_box(vtx::srect(xx + ofs_.x, yy + ofs_.y, d, d));
 			} else {
 				render_.plot(vtx::spos(x + ofs_.x, y + ofs_.y), sc.rgb565);
 			}

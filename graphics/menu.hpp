@@ -186,8 +186,9 @@ namespace graphics {
 				obj_[size_].w_ = sz.x;
 				obj_[size_].h_ = sz.y;
 			} else {
-				obj_[size_].w_ = rend_.get_text_length(static_cast<const char*>(src), false);
-				obj_[size_].h_ = REND::font_height;
+				auto sz = rend_.get_text_size(static_cast<const char*>(src), false);
+				obj_[size_].w_ = sz.x;
+				obj_[size_].h_ = sz.y;
 			}
 			obj_[size_].src_ = src;
 			++size_;
