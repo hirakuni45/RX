@@ -8,10 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "graphics/afont.hpp"
-#include "graphics/kfont.hpp"
 #include "graphics/color.hpp"
-
 #include "RX65x/drw2d.hpp"
 
 #include "dave_base.h"
@@ -30,20 +27,16 @@ namespace device {
 	/*!
 		@brief  DRW2D 制御／マネージャー・クラス
 		@param[in]	GLC		グラフィックス・コントローラー・クラス
-		@param[in]	AFONT	ASCII フォント
-		@param[in]	KFONT	漢字フォント
+		@param[in]	FONT	フォント・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GLC, class AFONT = graphics::afont_null, class KFONT = graphics::kfont_null>
+	template <class GLC, class FONT>
 	class drw2d_mgr {
 	public:
 		typedef uint16_t value_type;
 		typedef graphics::def_color DEF_COLOR;
 		typedef GLC glc_type;
-		typedef AFONT afont_type;
-		typedef KFONT kfont_type;
-		static const int16_t font_height  = KFONT::height < AFONT::height
-			? AFONT::height : KFONT::height;
+		typedef FONT font_type;
 
 	private:
 		typedef device::DRW2D DRW;
@@ -52,7 +45,7 @@ namespace device {
 
 		GLC&		glc_;
 
-		KFONT&		kfont_;
+		FONT&		font_;
 
 		value_type*	fb_;
 
@@ -126,7 +119,7 @@ namespace device {
 			auto ys = GLC::height;
 			d2_framebuffer(d2_, fb_, xs, xs, ys, get_mode_());
 			d2_cliprect(d2_, 0, 0, xs * 16, ys * 16);
-			d2_settexclut(d2_, clut_);
+//			d2_settexclut(d2_, clut_);
 		}
 
 
@@ -142,10 +135,11 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクタ
-			@param[in]	glc	GLC クラスの参照
+			@param[in]	glc		GLC クラスの参照
+			@param[in]	font	フォントクラス参照
 		*/
 		//-----------------------------------------------------------------//
-		drw2d_mgr(GLC& glc, KFONT& kfont) noexcept : glc_(glc), kfont_(kfont),
+		drw2d_mgr(GLC& glc, FONT& font) noexcept : glc_(glc), font_(font),
 			fb_(static_cast<value_type*>(glc.get_fbp())),
 			stipple_(-1), stipple_mask_(1),
 			d2_(nullptr),
@@ -156,6 +150,15 @@ namespace device {
 			set_clip_(false), start_frame_enable_(false),
 			last_error_(D2_OK)
 		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	漢字フォントの参照を返す
+			@return 漢字フォントの参照
+		*/
+		//-----------------------------------------------------------------//
+		FONT& at_font() { return font_; }
 
 
 		//-----------------------------------------------------------------//
@@ -208,6 +211,10 @@ namespace device {
 
 			clut_[0] = 0xff000000;
 			clut_[1] = 0xffffffff;
+
+			start_frame_();
+			d2_settexclut(d2_, clut_);
+			end_frame_();
 
 			return true;
 		}
@@ -264,6 +271,7 @@ namespace device {
 		void set_fore_color(const graphics::share_color& color) noexcept
 		{
 			fore_color_ = color;
+			clut_[1] = color.rgba8.rgba;
 			set_fore_color_ = false;
 		}
 
@@ -277,6 +285,7 @@ namespace device {
 		void set_back_color(const graphics::share_color& color) noexcept
 		{
 			back_color_ = color;
+			clut_[0] = color.rgba8.rgba;
 			set_back_color_ = false;
 		}
 
@@ -289,6 +298,7 @@ namespace device {
 		void swap_color() noexcept
 		{
 			std::swap(fore_color_, back_color_);
+			std::swap(clut_[0], clut_[1]);
 			set_fore_color_ = false;
 			set_back_color_ = false;
 		}
@@ -616,20 +626,22 @@ namespace device {
 			int16_t w;
 			int16_t h;
 			if(cha < 0x80) {
-				src = AFONT::get(cha);
-				w = AFONT::width;
-				h = AFONT::height;
+				src = FONT::a_type::get(cha);
+				w = FONT::a_type::width;
+				h = FONT::a_type::height;
 			} else {
-				src = kfont_.get(cha);
+				src = font_.at_kfont().get(cha);
 				if(src == nullptr) {
 					return;
 				}
-				w = KFONT::width;
-				h = KFONT::height;
+				w = FONT::k_type::width;
+				h = FONT::k_type::height;
 			}
+			setup_();
 			d2_setblitsrc(d2_, src, w, w, h, d2_mode_i1 | d2_mode_clut);
 			d2_blitcopy(d2_, w, h,
 				0, 0, w * 16, h * 16, pos.x * 16, pos.y * 16, d2_bf_filter);
+//  | d2_bf_colorize);
 		}
 
 
@@ -648,20 +660,20 @@ namespace device {
 			if(static_cast<uint8_t>(cha) < 0x80) {
 				uint8_t code = static_cast<uint8_t>(cha);
 				if(prop) {
-					w = AFONT::get_kern(code);
+					w = FONT::a_type::get_kern(code);
 				}
 				draw_font_utf16(vtx::spos(pos.x + w, pos.y), code);
 				if(prop) {
-					w += AFONT::get_width(code);
+					w += FONT::a_type::get_width(code);
 				} else {
-					w = AFONT::width;
+					w = FONT::a_type::width;
 				}
 			} else {
-				if(kfont_.injection_utf8(static_cast<uint8_t>(cha))) {
-					auto code = kfont_.get_utf16();
+				if(font_.at_kfont().injection_utf8(static_cast<uint8_t>(cha))) {
+					auto code = font_.at_kfont().get_utf16();
 					if(code >= 0x80) {
 						draw_font_utf16(pos, code);
-						w = KFONT::width;
+						w = FONT::k_type::width;
 					}
 				}
 			}
@@ -687,7 +699,7 @@ namespace device {
 			while((ch = *str++) != 0) {
 				if(ch == '\n') {
 					p.x = 0;
-					p.y += AFONT::height;
+					p.y += FONT::a_type::height;
 				} else {
 					p.x += draw_font(p, ch, prop);
 				}
