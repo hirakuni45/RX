@@ -19,11 +19,13 @@
 #include "common/sdc_man.hpp"
 #include "common/qspi_io.hpp"
 #include "graphics/font8x16.hpp"
-
+#include "graphics/font.hpp"
 #include "graphics/graphics.hpp"
+
 // #include "graphics/jpeg_in.hpp"
 #include "graphics/bmp_in.hpp"
 #include "graphics/filer.hpp"
+#include "graphics/dialog.hpp"
 #include "chip/FT5206.hpp"
 
 #include "graphics/picojpeg_in.hpp"
@@ -100,17 +102,20 @@ namespace {
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
 	typedef graphics::font8x16 AFONT;
+	AFONT		afont_;
 	typedef graphics::kfont<16, 16, 64> KFONT;
 	KFONT		kfont_;
+	typedef graphics::font<AFONT, KFONT> FONT;
+	FONT		font_(afont_, kfont_);
 
 	typedef graphics::def_color DEF_COLOR;
 
 #ifdef USE_DRW2D
-	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> RENDER;
+	typedef device::drw2d_mgr<GLCDC_IO, FONT> RENDER;
 #else
-	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
+	typedef graphics::render<GLCDC_IO, FONT> RENDER;
 #endif
-	RENDER		render_(glcdc_io_, kfont_);
+	RENDER		render_(glcdc_io_, font_);
 
 //	typedef graphics::filer<SDC, RENDER> FILER;
 //	FILER		filer_(sdc_, render_);
@@ -130,6 +135,9 @@ namespace {
 	FT5206_I2C	ft5206_i2c_;
 	typedef chip::FT5206<FT5206_I2C> FT5206;
 	FT5206		ft5206_(ft5206_i2c_);
+
+	typedef gui::dialog<RENDER, FT5206> DIALOG;
+	DIALOG		dialog_(render_, ft5206_);
 
 #if 0
 	typedef img::scaling<RENDER> PLOT;
@@ -480,14 +488,16 @@ int main(int argc, char** argv)
 			render_.circle(vtx::spos(480/2, 272/2), rad, 0);
 			break;
 		case 3:
-			render_.clear(DEF_COLOR::Darkgray);
-			render_.set_fore_color(DEF_COLOR::White);
-			render_.draw_text(vtx::spos(50, 120), "Asdfghjkl");
-			render_.draw_text(vtx::spos(50, 136), "美しい漢字");
+			render_.clear(DEF_COLOR::Black);
+			render_.set_fore_color(DEF_COLOR::Blue);
+			render_.set_back_color(DEF_COLOR::White);
+			render_.draw_text(vtx::spos(10, 120), "Asdfghjkl");
+			render_.draw_text(vtx::spos(10, 136), "美しい漢字");
 			render_.set_fore_color(DEF_COLOR::Fuchsi);
 			render_.round_frame(vtx::srect(10, 10, 100, 50), 15);
 			render_.set_fore_color(DEF_COLOR::Aqua);
 			render_.round_box(vtx::srect(10, 10, 100, 50), 15);
+			dialog_.modal(vtx::spos(200, 60), "モーダル・ダイアログ");
 			break;
 
 		default:

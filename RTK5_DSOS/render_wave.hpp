@@ -30,11 +30,11 @@ namespace utils {
 		static const int16_t GRID             = 40;
 		static constexpr float   GRID_SCALE   = 1.0f / static_cast<float>(GRID);
 		static const int16_t MENU_SIZE        = 40;
-		static const int16_t TIME_SCROLL_AREA = RENDER::font_height + GRID;
+		static const int16_t TIME_SCROLL_AREA = RENDER::font_type::height + GRID;
 		static const int16_t CH0_MOVE_AREA    = (RENDER::glc_type::width - MENU_SIZE) / 2;
 		static const int16_t CH1_MOVE_AREA    = RENDER::glc_type::width - MENU_SIZE;
-		static const int16_t TIME_BEGIN_POS   = RENDER::font_height;
-		static const int16_t TIME_LIMIT_POS   = RENDER::glc_type::height - RENDER::font_height - 1;
+		static const int16_t TIME_BEGIN_POS   = RENDER::font_type::height;
+		static const int16_t TIME_LIMIT_POS   = RENDER::glc_type::height - RENDER::font_type::height - 1;
 		static const int16_t VOLT_BEGIN_POS   = 0;
 		static const int16_t VOLT_LIMIT_POS   = RENDER::glc_type::width - MENU_SIZE;
 

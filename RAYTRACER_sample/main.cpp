@@ -16,6 +16,7 @@
 
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
+#include "graphics/font.hpp"
 #include "graphics/graphics.hpp"
 
 #include "raytracer.hpp"
@@ -70,15 +71,18 @@ namespace {
 
 	typedef graphics::font8x16 AFONT;
 	typedef graphics::kfont_null KFONT;
+	typedef graphics::font<AFONT, KFONT> FONT;
+	AFONT		afont_;
 	KFONT		kfont_;
+	FONT		font_(afont_, kfont_);
 
 // GLCDC for RX65
 #if defined(SIG_RX65N)
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_IO;
-//	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> RENDER;
-	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
+//	typedef device::drw2d_mgr<GLCDC_IO, FONT> RENDER;
+	typedef graphics::render<GLCDC_IO, FONT> RENDER;
 #else
 	class GLCDC_IO {
 		void*	fb_;
@@ -91,10 +95,10 @@ namespace {
             return fb_;
         }
 	};
-	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
+	typedef graphics::render<GLCDC_IO, FONT> RENDER;
 #endif
 	GLCDC_IO	glcdc_io_(nullptr, fb_);
-	RENDER		render_(glcdc_io_, kfont_);
+	RENDER		render_(glcdc_io_, font_);
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;

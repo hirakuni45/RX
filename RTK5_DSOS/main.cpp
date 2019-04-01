@@ -25,6 +25,7 @@
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
 #include "graphics/kfont.hpp"
+#include "graphics/font.hpp"
 
 #include "chip/FT5206.hpp"
 
@@ -37,12 +38,13 @@ namespace {
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
-	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
+	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
+	CMT			cmt_;
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
 	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
-	SCI		sci_;
+	SCI			sci_;
 
 	// カード電源制御は使わないので、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
@@ -51,7 +53,7 @@ namespace {
 #ifdef SDHI_IF
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
-	SDHI	sdh_;
+	SDHI		sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
@@ -60,17 +62,17 @@ namespace {
 
 	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;  ///< Soft SPI 定義
 
-	SPI		spi_;
+	SPI			spi_;
 
 	typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
 	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD   カード検出
 
 	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
 
-	MMC		sdh_(spi_, 20000000);
+	MMC			sdh_(spi_, 20000000);
 #endif
 	typedef utils::sdc_man SDC;
-	SDC		sdc_;
+	SDC			sdc_;
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
@@ -82,18 +84,21 @@ namespace {
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
 	typedef graphics::font8x16 AFONT;
+	AFONT		afont_;
 #ifdef CASH_KFONT
 	typedef graphics::kfont<16, 16, 64> KFONT;
 #else
 	typedef graphics::kfont<16, 16> KFONT;
 #endif
 	KFONT		kfont_;
+	typedef graphics::font<AFONT, KFONT> FONT;
+	FONT		font_(afont_, kfont_);
 
-	typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_(glcdc_io_, kfont_);
+	typedef device::drw2d_mgr<GLCDC_IO, FONT> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_(glcdc_io_, font_);
 
-	typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
-	RENDER		render_(glcdc_io_, kfont_);
+	typedef graphics::render<GLCDC_IO, FONT> RENDER;
+	RENDER		render_(glcdc_io_, font_);
 
 	typedef utils::capture<2048> CAPTURE;
 	CAPTURE		capture_;
