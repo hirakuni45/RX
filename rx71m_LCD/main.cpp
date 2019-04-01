@@ -8,11 +8,9 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
-
 #include "common/cmt_io.hpp"
 
 #include "chip/bus_rw.hpp"
@@ -21,6 +19,7 @@
 #include "../RAYTRACER_sample/raytracer.hpp"
 
 #include "graphics/font8x16.hpp"
+#include "graphics/font.hpp"
 #include "graphics/graphics.hpp"
 
 namespace {
@@ -35,9 +34,10 @@ namespace {
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 // SCI ポートの第二候補を選択する場合
 //	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
-	SCI		sci_;
+	SCI			sci_;
 
-	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
+	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
+	CMT			cmt_;
 
 	typedef device::PORT<device::PORTA, device::bitpos::B1> RS;
 	typedef device::PORT<device::PORT5, device::bitpos::B2> RD;
@@ -46,11 +46,11 @@ namespace {
 	typedef device::PORT_BYTE<device::PORTD> DL;
 	typedef device::PORT_BYTE<device::PORTE> DH;
 	typedef device::bus_rw16<CS, RS, RD, WR, DL, DH> BUS;
-	BUS		bus_;
+	BUS			bus_;
 
 	typedef device::PORT<device::PORT0, device::bitpos::B2> RES;
 	typedef chip::R61505<BUS, RES> TFT;
-	TFT		tft_;
+	TFT			tft_;
 
 	class GLC {
 	public:
@@ -64,14 +64,17 @@ namespace {
 			return reinterpret_cast<void*>(fb_);
 		}
 	};
-	GLC		glc_;
+	GLC			glc_;
 
 	typedef graphics::font8x16 AFONT;
+	AFONT		afont_;
 	typedef graphics::kfont_null KFONT;
-	KFONT	kfont_;
+	KFONT		kfont_;
+	typedef graphics::font<AFONT, KFONT> FONT;
+	FONT		font_(afont_, kfont_);
 
-	typedef graphics::render<GLC, AFONT, KFONT> RENDER;
-	RENDER	render_(glc_, kfont_);
+	typedef graphics::render<GLC, FONT> RENDER;
+	RENDER	render_(glc_, font_);
 
 
 	void copy_fb_()
