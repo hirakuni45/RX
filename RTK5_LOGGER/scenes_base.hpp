@@ -10,6 +10,7 @@
 //=====================================================================//
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
+#include "graphics/font.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/picojpeg_in.hpp"
 #include "graphics/scaling.hpp"
@@ -64,9 +65,10 @@ namespace app {
 
 		typedef graphics::font8x16 AFONT;
 		typedef graphics::kfont<16, 16, 64> KFONT;
+		typedef graphics::font<AFONT, KFONT> FONT;
 
-		typedef device::drw2d_mgr<GLCDC_IO, AFONT, KFONT> DRW2D_MGR;
-		typedef graphics::render<GLCDC_IO, AFONT, KFONT> RENDER;
+		typedef device::drw2d_mgr<GLCDC_IO, FONT> DRW2D_MGR;
+		typedef graphics::render<GLCDC_IO, FONT> RENDER;
 
 		// FT5206, SCI6 簡易 I2C 定義
 		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
@@ -87,7 +89,9 @@ namespace app {
 
 	private:
 		GLCDC_IO	glcdc_io_;
+		AFONT		afont_;
 		KFONT		kfont_;
+		FONT		font_;
 		DRW2D_MGR	drw2d_mgr_;
 		RENDER		render_;
 
@@ -188,9 +192,9 @@ namespace app {
 		//-------------------------------------------------------------//
 		scenes_base(void* lcdorg = reinterpret_cast<void*>(0x00000100)) noexcept :
 			glcdc_io_(nullptr, lcdorg),
-			kfont_(),
-			drw2d_mgr_(glcdc_io_, kfont_),
-			render_(glcdc_io_, kfont_),
+			afont_(), kfont_(), font_(afont_, kfont_),
+			drw2d_mgr_(glcdc_io_, font_),
+			render_(glcdc_io_, font_),
 			ft5206_(ft5206_i2c_), menu_(render_, back_), back_(render_), resource_(render_),
 			plot_(render_), img_in_(plot_) { }
 
