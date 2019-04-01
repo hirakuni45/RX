@@ -42,7 +42,7 @@ namespace {
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
 	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
-	SCI		sci_;
+	SCI			sci_;
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
@@ -60,7 +60,7 @@ namespace {
 #ifdef SDHI_IF
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
-	SDHI	sdh_;
+	SDHI		sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
@@ -69,17 +69,17 @@ namespace {
 
 	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;  ///< Soft SPI 定義
 
-	SPI		spi_;
+	SPI			spi_;
 
 	typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
 	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD   カード検出
 
 	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
 
-	MMC		sdh_(spi_, 35000000);
+	MMC			sdh_(spi_, 35000000);
 #endif
 	typedef utils::sdc_man SDC;
-	SDC		sdc_;
+	SDC			sdc_;
 
 	volatile uint32_t	wpos_;
 
