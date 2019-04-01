@@ -24,22 +24,23 @@ namespace graphics {
 
 		typedef T value_type;
 
+		/// BGRA for DRW2D d2_color type
 #if defined(LITTLE_ENDIAN)
-		T		r;
-		T		g;
 		T		b;
+		T		g;
+		T		r;
 		T		a;
 		constexpr rgba_base_t(T rr = 0, T gg = 0, T bb = 0, T aa = 255) :
-			r(rr), g(gg), b(bb), a(aa) { }
-		constexpr rgba_base_t(const rgba_base_t<T>& t) : r(t.r), g(t.g), b(t.b), a(t.a) { }
+			b(bb), g(gg), r(rr), a(aa) { }
+		constexpr rgba_base_t(const rgba_base_t<T>& t) : b(t.b), g(t.g), r(t.r), a(t.a) { }
 #elif defined(BIG_ENDIAN)
 		T		a;
-		T		b;
-		T		g;
 		T		r;
+		T		g;
+		T		b;
 		constexpr rgba_base_t(T rr = 0, T gg = 0, T bb = 0, T aa = 255) :
-			a(aa), b(bb), g(gg), r(rr) { }
-		constexpr rgba_base_t(const rgba_base_t<T>& t) : a(t.a), b(t.b), g(t.g), r(t.r) { }
+			a(aa), r(rr), g(gg), b(bb) { }
+		constexpr rgba_base_t(const rgba_base_t<T>& t) : a(t.a), r(t.r), g(t.g), b(t.b) { }
 #endif
 	};
 	typedef rgba_base_t<uint8_t> rgba8_t;
