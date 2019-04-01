@@ -10,6 +10,7 @@
 //=====================================================================//
 #include <cstdint>
 #include "ff12b/src/ff.h"
+#include "common/vtx.hpp"
 
 // 漢字フォントデータをＳＤカード上に置いて、キャッシュアクセスする場合有効にする
 // #define CASH_KFONT
@@ -31,6 +32,7 @@ namespace graphics {
 	public:
 		static const int8_t width = 0;
 		static const int8_t height = 0;
+		void flush_cash() noexcept { }
 		const uint8_t* get(uint16_t code) noexcept { return nullptr; }
 		bool injection_utf8(uint8_t ch) noexcept { return true; }
 		uint16_t get_utf16() const noexcept { return 0x0000; } 
@@ -132,7 +134,7 @@ namespace graphics {
 			@brief	キャッシュのフラッシュ
 		*/
 		//-----------------------------------------------------------------//
-		void flush_cash()
+		void flush_cash() noexcept
 		{
 #ifdef CASH_KFONT
 			for(uint8_t i = 0; i < CASHN; ++i) {

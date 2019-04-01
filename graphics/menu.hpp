@@ -15,15 +15,15 @@ namespace graphics {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	メニュー・クラス
-		@param[in]	REND	描画クラス
+		@param[in]	RDR		描画クラス
 		@param[in]	BACK	背面の描画クラス	
 		@param[in]	MAX		最大メニュー数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class REND, class BACK, uint16_t MAX>
+	template <class RDR, class BACK, uint16_t MAX>
 	class menu {
 
-		REND&		rend_;
+		RDR&		rdr_;
 		BACK&		back_;
 
 		uint16_t	size_;
@@ -58,10 +58,11 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
-			@param[in]	rend	描画クラス
+			@param[in]	rdr		描画クラス
+			@param[in]	back	背面描画クラス
 		*/
 		//-----------------------------------------------------------------//
-		menu(REND& rend, BACK& back) noexcept : rend_(rend), back_(back),
+		menu(RDR& rdr, BACK& back) noexcept : rdr_(rdr), back_(back),
 			size_(0), mx_(0), my_(0), ox_(0), oy_(0),
 			gap_(0), space_w_(0), space_h_(0), pos_(0),
 			fc_(def_color::Black), hc_(def_color::White), bc_(def_color::Gray),
@@ -182,11 +183,11 @@ namespace graphics {
 			if(size_ >= MAX) return;
 
 			if(bitmap) {
-				auto sz = rend_.get_mobj_size(src);
+				auto sz = rdr_.get_mobj_size(src);
 				obj_[size_].w_ = sz.x;
 				obj_[size_].h_ = sz.y;
 			} else {
-				auto sz = rend_.get_text_size(static_cast<const char*>(src), false);
+				auto sz = rdr_.at_font().get_text_size(static_cast<const char*>(src), false);
 				obj_[size_].w_ = sz.x;
 				obj_[size_].h_ = sz.y;
 			}
@@ -220,12 +221,12 @@ namespace graphics {
 		{
 			if(size_ == 0) return false;
 
-			int16_t x = (REND::glc_type::width  - ox_ - mx_) / 2;
-			int16_t y = (REND::glc_type::height - oy_ - my_) / 2;
+			int16_t x = (RDR::glc_type::width  - ox_ - mx_) / 2;
+			int16_t y = (RDR::glc_type::height - oy_ - my_) / 2;
 			x += ox_;
 			y += oy_;
-			auto tmp_fc = rend_.get_fore_color();
-			rend_.set_fore_color(fc_);
+			auto tmp_fc = rdr_.get_fore_color();
+			rdr_.set_fore_color(fc_);
 			int16_t idx = -1;
 			for(auto i = 0; i < size_; ++i) {
 				const auto& obj = obj_[i];
@@ -237,17 +238,17 @@ namespace graphics {
 						c = hc_;
 					}
 				}
-				rend_.set_fore_color(c);
+				rdr_.set_fore_color(c);
 				back_(vtx::srect(x, y, mx_, obj.h_ + space_h_ * 2));
 				y += space_h_;
 				auto t = static_cast<const char*>(obj_[i].src_);
-				rend_.set_fore_color(graphics::def_color::Black);
-				rend_.draw_text(vtx::spos(x + space_w_, y), t);
+				rdr_.set_fore_color(graphics::def_color::Black);
+				rdr_.draw_text(vtx::spos(x + space_w_, y), t);
 				y += obj.h_;
 				y += space_h_;
 				y += gap_ - (gap_ / 2);
 			}
-			rend_.set_fore_color(tmp_fc);
+			rdr_.set_fore_color(tmp_fc);
 
 			bool focus = focus_;
 			focus_ = touch;
@@ -263,11 +264,11 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	REND クラスの参照
-			@return REND クラス
+			@brief	RDR クラスの参照
+			@return RDR クラス
 		*/
 		//-----------------------------------------------------------------//
-		REND& at_render() noexcept { return rend_; }
+		RDR& at_render() noexcept { return rdr_; }
 
 
 		//-----------------------------------------------------------------//

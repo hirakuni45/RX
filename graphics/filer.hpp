@@ -51,7 +51,7 @@ namespace graphics {
 	class filer {
 
 		static const int16_t SPC = 2;                           ///< 文字間隙間
-		static const int16_t FLN = RDR::font_height + SPC;      ///< 行幅
+		static const int16_t FLN = RDR::font_type::height + SPC;      ///< 行幅
 		static const int16_t SCN = (RDR::glc_type::height - SPC) / FLN;   ///< 行数
 
 		SDC&	sdc_;
@@ -113,7 +113,8 @@ namespace graphics {
 			}
 			if(draw && t.vpos_ >= 0 && t.vpos_ < RDR::glc_type::height) {
 				rdr_.set_fore_color(def_color::Black);
-				rdr_.fill_box(vtx::srect(SPC, t.vpos_, RDR::glc_type::width - SPC * 2, RDR::font_height));
+				rdr_.fill_box(vtx::srect(SPC, t.vpos_,
+					RDR::glc_type::width - SPC * 2, RDR::font_type::height));
 				rdr_.set_fore_color(def_color::White);
 				if(dir) rdr_.draw_font(vtx::spos(SPC, t.vpos_), '/');
 				if(dir) {
@@ -142,7 +143,7 @@ namespace graphics {
 
 		void draw_sel_frame_(int16_t pos)
 		{
-			int16_t h = RDR::font_height + 2;
+			int16_t h = RDR::font_type::height + 2;
 			int16_t y = pos * h;
 			rdr_.frame(vtx::srect(0, y, rdr_st_.hmax_ + 3, h + 1));
 		}
@@ -238,7 +239,7 @@ namespace graphics {
 				open_ = !open_;
 				rdr_.clear(def_color::Black);
 				if(open_) {
-					rdr_.at_kfont().flush_cash();
+					rdr_.at_font().at_kfont().flush_cash();
 					scan_dir_(false);
 				}
 			}

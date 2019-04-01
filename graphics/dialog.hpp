@@ -20,9 +20,11 @@ namespace gui {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class RDR, class TOUCH>
 	class dialog {
-
+	public:
 		typedef graphics::def_color DEF_COLOR;
+		static const int16_t modal_radius = 10;  // modal round radius
 
+	private:
 		RDR&	rdr_;
 		TOUCH&	touch_;
 
@@ -47,21 +49,20 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void modal(const vtx::spos& size, const char* text) noexcept
 		{
-			static const int16_t radius = 10;  // dialog round radius
-
 			vtx::spos pos((RDR::glc_type::width  - size.x) / 2, (RDR::glc_type::height - size.y) / 2);
 			rdr_.set_fore_color(DEF_COLOR::White);
+			rdr_.set_back_color(DEF_COLOR::Darkgray);
 			vtx::srect r(pos, size);
-			rdr_.round_box(r, radius);
- 			rdr_.set_fore_color(DEF_COLOR::Darkgray);
+			rdr_.round_box(r, modal_radius);
 			r.org += 2;
 			r.size -= 2 * 2;
-			rdr_.round_box(r, radius - 2);
+			rdr_.swap_color();
+			rdr_.round_box(r, modal_radius - 2);
 
-			auto sz = rdr_.get_text_size(text);
+			auto sz = rdr_.at_font().get_text_size(text);
 			pos.x += (size.x - sz.x) / 2;
 			pos.y += (size.y - sz.y) / 2;
-			rdr_.set_fore_color(DEF_COLOR::White);
+			rdr_.swap_color();
 			rdr_.draw_text(pos, text);
 		}
 
@@ -77,7 +78,7 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void draw_button(const vtx::srect& rect, const char* text) noexcept
 		{
-			auto sz = rdr_.get_text_size(text);
+			auto sz = rdr_.at_font().get_text_size(text);
 			rdr_.swap_color();
 			rdr_.fill_box(rect);
 			rdr_.swap_color();

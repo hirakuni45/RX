@@ -3,15 +3,14 @@
 /*!	@file
 	@brief	グラフィックス・ユーティリティー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "graphics/pixel.hpp"
 #include "graphics/color.hpp"
-#include "graphics/afont.hpp"
-#include "graphics/kfont.hpp"
+#include "graphics/font.hpp"
 #include "common/intmath.hpp"
 #include "common/circle.hpp"
 
@@ -25,7 +24,7 @@ namespace graphics {
 		@param[in]	KFONT	漢字フォントクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class GLC, class AFONT = afont_null, class KFONT = kfont_null>
+	template <class GLC, class FONT = font_null>
 	class render {
 
 		GLC&		glc_;
@@ -39,20 +38,14 @@ namespace graphics {
 		typedef def_color DEF_COLOR;
 		typedef share_color SHARE_COLOR;
 		typedef GLC glc_type;
-		typedef AFONT afont_type;
-		typedef KFONT kfont_type;
-
-		static const int16_t font_height  = KFONT::height < AFONT::height
-			? AFONT::height : KFONT::height;
+		typedef FONT font_type;
 
 		static const int16_t line_offset = (((GLC::width * sizeof(T)) + 63) & 0x7fc0) / sizeof(T);
-
-		static const int16_t round_radius = 8;
 
 	private:
 		T*			fb_;
 
-		KFONT& 		kfont_;
+		FONT& 		font_;
 
 		share_color	fore_color_;
 		share_color	back_color_;
@@ -97,14 +90,20 @@ namespace graphics {
 			@param[in]	kf		漢字フォントクラス
 		*/
 		//-----------------------------------------------------------------//
-		render(GLC& glc, KFONT& kf) noexcept : glc_(glc), kfont_(kf),
+		render(GLC& glc, FONT& font) noexcept : glc_(glc), font_(font),
 			fore_color_(255, 255, 255), back_color_(0, 0, 0),
 			clip_(0, 0, GLC::width, GLC::height),
 			stipple_(-1), stipple_mask_(1), ofs_(0)
 		{ fb_ = static_cast<T*>(glc_.get_fbp()); }
 
 
-		KFONT& at_kfont() { return kfont_; }
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フォントの参照を返す
+			@return フォントの参照
+		*/
+		//-----------------------------------------------------------------//
+		FONT& at_font() { return font_; }
 
 
 		//-----------------------------------------------------------------//
@@ -712,28 +711,28 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		void draw_font_utf16(const vtx::spos& pos, uint16_t code, bool back) noexcept
 		{
-			if(pos.y <= -AFONT::height || pos.y >= GLC::height) {
+			if(pos.y <= -FONT::height || pos.y >= GLC::height) {
 				return;
 			}
 			if(code < 0x80) {
-				if(pos.x <= -AFONT::width || pos.x >= GLC::width) {
+				if(pos.x <= -FONT::a_type::width || pos.x >= GLC::width) {
 					return;
 				}
-				vtx::spos ssz(AFONT::width, AFONT::height);
-				draw_bitmap(pos, AFONT::get(code), ssz, back);
+				vtx::spos ssz(FONT::a_type::width, FONT::a_type::height);
+				draw_bitmap(pos, FONT::a_type::get(code), ssz, back);
 			} else {
-				if(pos.x <= -KFONT::width || pos.x >= GLC::width) {
+				if(pos.x <= -FONT::k_type::width || pos.x >= GLC::width) {
 					return;
 				}
-				auto p = kfont_.get(code);
+				auto p = font_.at_kfont().get(code);
 				if(p != nullptr) {
-					vtx::spos ssz(KFONT::width, KFONT::height);
+					vtx::spos ssz(FONT::k_type::width, FONT::k_type::height);
 					draw_bitmap(pos, p, ssz, back);
 				} else {
-					vtx::spos ssz(AFONT::width, AFONT::height);
-					draw_bitmap(pos, AFONT::get('['), ssz, back);
-					vtx::spos loc(pos.x + AFONT::width, pos.y);
-					draw_bitmap(loc, AFONT::get(']'), ssz, back);
+					vtx::spos ssz(FONT::a_type::width, FONT::a_type::height);
+					draw_bitmap(pos, FONT::a_type::get('['), ssz, back);
+					vtx::spos loc(pos.x + FONT::a_type::width, pos.y);
+					draw_bitmap(loc, FONT::a_type::get(']'), ssz, back);
 				}
 			}
 		}
@@ -756,20 +755,20 @@ namespace graphics {
 			if(static_cast<uint8_t>(cha) < 0x80) {
 				uint8_t code = static_cast<uint8_t>(cha);
 				if(prop) {
-					w = AFONT::get_kern(code);
+					w = FONT::a_type::get_kern(code);
 				}
 				draw_font_utf16(vtx::spos(pos.x + w, pos.y), code, back);
 				if(prop) {
-					w += AFONT::get_width(code);
+					w += FONT::a_type::get_width(code);
 				} else {
-					w = AFONT::width;
+					w = FONT::a_type::width;
 				}
 			} else {
-				if(kfont_.injection_utf8(static_cast<uint8_t>(cha))) {
-					auto code = kfont_.get_utf16();
+				if(font_.at_kfont().injection_utf8(static_cast<uint8_t>(cha))) {
+					auto code = font_.at_kfont().get_utf16();
 					if(code >= 0x80) {
 						draw_font_utf16(pos, code, back);
-						w = KFONT::width;
+						w = FONT::k_type::width;
 					}
 				}
 			}
@@ -797,42 +796,12 @@ namespace graphics {
 			while((ch = *str++) != 0) {
 				if(ch == '\n') {
 					p.x = pos.x;
-					p.y += font_height;
+					p.y += FONT::height;
 				} else {
 					p.x += draw_font(p, ch, prop, back);
 				}
 			}
 			return p.x;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	テキストの描画サイズを得る
-			@param[in]	text	テキスト（UTF-8）
-			@param[in]	prop	プロポーショナルの場合「true」
-			@return 描画サイズ
-		*/
-		//-----------------------------------------------------------------//
-		vtx::spos get_text_size(const char* text, bool prop = false) noexcept
-		{
-			char ch;
-			vtx::spos sz(0);
-			int16_t x = 0;
-			while((ch = *text++) != 0) {
-				if(ch == '\n') {
-					if(sz.x < x) sz.x = x;
-					x = 0;
-					sz.y += font_height;
-				} else {
-					// 画面外を指定してサイズだけ取得
-					x += draw_font(vtx::spos(x, GLC::height), ch, prop);
-				}
-			}
-			if(sz.x < x) sz.x = x;
-			if(sz.y == 0) sz.y = font_height;
-			if(x > 0) sz.y += font_height;
-			return sz;
 		}
 
 
@@ -858,7 +827,7 @@ namespace graphics {
 				if(c < 0x80) {
 					if(ch == 0x20) {
 						swap_color();
-						fill_box(x, y, xx - x, AFONT::height);
+						fill_box(x, y, xx - x, FONT::a_type::height);
 						swap_color();
 						x = xx;
 						fill = true;
@@ -866,10 +835,10 @@ namespace graphics {
 						fill = false;
 					}
 					if(prop) {
-						xx += AFONT::get_kern(ch);
-						xx += AFONT::get_width(ch);
+						xx += FONT::a_type::get_kern(ch);
+						xx += FONT::a_type::get_width(ch);
 					} else {
-						xx += AFONT::width;
+						xx += FONT::a_type::width;
 					}
 				} else if((c & 0xf0) == 0xe0) {
 					code = (c & 0x0f);
@@ -882,7 +851,7 @@ namespace graphics {
 					code |= c & 0x3f;
 					cnt--;
 					if(cnt == 0 && code != 0) {
-						xx += KFONT::width;
+						xx += FONT::k_type::width;
 					} else if(cnt < 0) {
 						code = 0;
 					}
@@ -890,7 +859,7 @@ namespace graphics {
 			}
 			if(!fill) {
 				swap_color();
-				fill_box(x, y, xx - x, AFONT::height);
+				fill_box(x, y, xx - x, FONT::a_type::height);
 				swap_color();
 			}
 			return xx;

@@ -24,5 +24,4 @@ namespace graphics {
 		static const uint8_t* get(uint8_t code) { return nullptr; }
 		static const int8_t get_width(uint8_t code) { return 0; }
 	};
-
 }
