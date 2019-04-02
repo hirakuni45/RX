@@ -23,8 +23,11 @@ namespace gui {
 	public:
 		typedef graphics::def_color DEF_COLOR;
 		static const int16_t modal_radius = 10;  // modal round radius
+		static const int16_t button_radius = 6;  // button round radius
 
 	private:
+		using GLC = typename RDR::glc_type;
+
 		RDR&	rdr_;
 		TOUCH&	touch_;
 
@@ -49,7 +52,7 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void modal(const vtx::spos& size, const char* text) noexcept
 		{
-			vtx::spos pos((RDR::glc_type::width  - size.x) / 2, (RDR::glc_type::height - size.y) / 2);
+			vtx::spos pos((GLC::width  - size.x) / 2, (GLC::height - size.y) / 2);
 			rdr_.set_fore_color(DEF_COLOR::White);
 			rdr_.set_back_color(DEF_COLOR::Darkgray);
 			vtx::srect r(pos, size);
@@ -60,29 +63,46 @@ namespace gui {
 			rdr_.round_box(r, modal_radius - 2);
 
 			auto sz = rdr_.at_font().get_text_size(text);
-			pos.x += (size.x - sz.x) / 2;
-			pos.y += (size.y - sz.y) / 2;
 			rdr_.swap_color();
-			rdr_.draw_text(pos, text);
+			rdr_.draw_text(pos + (size - sz) / 2, text);
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	標準ボタンの描画 @n
+			@brief	四角ボタンの描画 @n
 					・背景色は「back_color」が使われる。@n
 					・フォントの描画色は「fore_color」が利用
 			@param[in]	rect	配置
 			@param[in]	text	テキスト
 		*/
 		//-----------------------------------------------------------------//
-		void draw_button(const vtx::srect& rect, const char* text) noexcept
+		void square_button(const vtx::srect& rect, const char* text) noexcept
 		{
 			auto sz = rdr_.at_font().get_text_size(text);
 			rdr_.swap_color();
 			rdr_.fill_box(rect);
 			rdr_.swap_color();
-			rdr_.draw_text(rect.org + vtx::spos((rect.size.x - sz.x) / 2, (rect.size.y - sz.y) / 2), text);
+			rdr_.draw_text(rect.org + (rect.size - sz) / 2, text);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ラウンドボタンの描画 @n
+					・背景色は「back_color」が使われる。@n
+					・フォントの描画色は「fore_color」が利用
+			@param[in]	rect	配置
+			@param[in]	text	テキスト
+		*/
+		//-----------------------------------------------------------------//
+		void round_button(const vtx::srect& rect, const char* text) noexcept
+		{
+			rdr_.swap_color();
+			rdr_.round_box(rect, button_radius);
+			rdr_.swap_color();
+			auto sz = rdr_.at_font().get_text_size(text);
+			rdr_.draw_text(rect.org + (rect.size - sz) / 2, text);
 		}
 
 
