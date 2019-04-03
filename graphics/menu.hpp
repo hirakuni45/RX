@@ -15,8 +15,8 @@ namespace graphics {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	メニュー・クラス
-		@param[in]	RDR		描画クラス
-		@param[in]	BACK	背面の描画クラス	
+		@param[in]	RDR		基本描画クラス
+		@param[in]	BACK	ボタン背面の描画クラス	
 		@param[in]	MAX		最大メニュー数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -48,10 +48,6 @@ namespace graphics {
 
 		uint16_t	pos_;
 
-		share_color	fc_;
-		share_color	hc_;
-		share_color	bc_;
-
 		bool		focus_;
 
 	public:
@@ -65,7 +61,6 @@ namespace graphics {
 		menu(RDR& rdr, BACK& back) noexcept : rdr_(rdr), back_(back),
 			size_(0), mx_(0), my_(0), ox_(0), oy_(0),
 			gap_(0), space_w_(0), space_h_(0), pos_(0),
-			fc_(def_color::Black), hc_(def_color::White), bc_(def_color::Gray),
 			focus_(true)
 		{ }
 
@@ -225,30 +220,29 @@ namespace graphics {
 			int16_t y = (RDR::glc_type::height - oy_ - my_) / 2;
 			x += ox_;
 			y += oy_;
-			auto tmp_fc = rdr_.get_fore_color();
-			rdr_.set_fore_color(fc_);
 			int16_t idx = -1;
 			for(auto i = 0; i < size_; ++i) {
 				const auto& obj = obj_[i];
 				y += gap_ / 2;
-				auto c = bc_;
+				auto fc = graphics::def_color::White;
+				auto bc = graphics::def_color::Darkgray;
 				if(x <= px && px < (x + mx_) && y <= py && py < (y + obj.h_ + space_h_ * 2)) {
 					idx = i;
 					if(touch) {
-						c = hc_;
+						bc = graphics::def_color::Silver;
 					}
 				}
-				rdr_.set_fore_color(c);
+				rdr_.set_fore_color(fc);
+				rdr_.set_back_color(bc);
 				back_(vtx::srect(x, y, mx_, obj.h_ + space_h_ * 2));
 				y += space_h_;
 				auto t = static_cast<const char*>(obj_[i].src_);
-				rdr_.set_fore_color(graphics::def_color::Black);
+				rdr_.set_fore_color(graphics::def_color::White);
 				rdr_.draw_text(vtx::spos(x + space_w_, y), t);
 				y += obj.h_;
 				y += space_h_;
 				y += gap_ - (gap_ / 2);
 			}
-			rdr_.set_fore_color(tmp_fc);
 
 			bool focus = focus_;
 			focus_ = touch;

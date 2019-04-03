@@ -114,5 +114,30 @@ namespace gui {
 		void update() noexcept
 		{
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タッチパネルの安定待ち
+		*/
+		//-----------------------------------------------------------------//
+		void ready_to_touch()
+		{
+			rdr_.sync_frame();
+			modal(vtx::spos(400, 60),
+				"Touch panel device wait...\nPlease touch it with some screen.");
+			uint8_t nnn = 0;
+			while(1) {
+				rdr_.sync_frame();
+				touch_.update();
+				auto num = touch_.get_touch_num();
+				if(num == 0) {
+					++nnn;
+					if(nnn >= 60) break;
+				} else {
+					nnn = 0;
+				}
+			}
+		}
 	};
 }
