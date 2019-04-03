@@ -10,6 +10,7 @@
 //=====================================================================//
 #include "scenes_base.hpp"
 #include "common/format.hpp"
+#include "common/time.h"
 
 namespace app {
 
@@ -54,11 +55,34 @@ namespace app {
 		{
 			at_scenes_base().at_render().clear(graphics::def_color::Black);
 
+			{
+				static const int16_t LOC_Y = scenes_base::RENDER::glc_type::height - 16;
+				auto& nmea = at_scenes_base().at_nmea();
+				char tmp[32];
+				auto stn = nmea.get_satellite();
+				utils::sformat("%d", tmp, sizeof(tmp)) % stn;
+				at_scenes_base().at_render().draw_text(vtx::spos(0, LOC_Y), tmp);
+				if(stn > 0) {
+					auto t = nmea.get_gmtime();
+					struct tm *m = localtime(&t);
+					utils::sformat("%s %s %d %02d:%02d:%02d  %4d\n", tmp, sizeof(tmp))
+						% get_wday(m->tm_wday)
+						% get_mon(m->tm_mon)
+						% static_cast<uint32_t>(m->tm_mday)
+						% static_cast<uint32_t>(m->tm_hour)
+						% static_cast<uint32_t>(m->tm_min)
+						% static_cast<uint32_t>(m->tm_sec)
+						% static_cast<uint32_t>(m->tm_year + 1900);
+				} else {
+					strcpy(tmp, "---");
+				}
+				at_scenes_base().at_render().draw_text(vtx::spos(16, LOC_Y), tmp);
+			}
+
 			const auto& touch = at_scenes_base().at_touch();
 			bool t = touch.get_touch_num() == 1 ? true : false;
-			int16_t x = touch.get_touch_pos(0).x;
-			int16_t y = touch.get_touch_pos(0).y;
-			bool trg = at_scenes_base().at_menu().render(x, y, t);
+			const auto& p = touch.get_touch_pos(0);
+			bool trg = at_scenes_base().at_menu().render(p.x, p.y, t);
 			if(trg) {
 				auto pos = at_scenes_base().at_menu().get_pos();
 //				utils::format("Menu: %d\n") % static_cast<int>(pos);

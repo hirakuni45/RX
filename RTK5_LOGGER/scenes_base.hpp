@@ -16,6 +16,7 @@
 #include "graphics/scaling.hpp"
 #include "graphics/img_in.hpp"
 #include "graphics/menu.hpp"
+#include "graphics/dialog.hpp"
 #include "chip/FT5206.hpp"
 
 // #define SOFT_I2C
@@ -27,6 +28,7 @@
 #endif
 
 #include "common/cmt_io.hpp"
+#include "common/nmea_dec.hpp"
 
 #include "resource.hpp"
 
@@ -56,18 +58,20 @@ namespace app {
 
 		typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 
-	public:
 		/// GLCDC
 		static const int16_t LCD_X = 480;
 		static const int16_t LCD_Y = 272;
+		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
+		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 		static const auto PIX = graphics::pixel::TYPE::RGB565;
 		typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
 
+	public:
 		typedef graphics::font8x16 AFONT;
 		typedef graphics::kfont<16, 16, 64> KFONT;
 		typedef graphics::font<AFONT, KFONT> FONT;
 
-		typedef device::drw2d_mgr<GLCDC_IO, FONT> DRW2D_MGR;
+//		typedef device::drw2d_mgr<GLCDC_IO, FONT> RENDER;
 		typedef graphics::render<GLCDC_IO, FONT> RENDER;
 
 		// FT5206, SCI6 簡易 I2C 定義
@@ -87,16 +91,17 @@ namespace app {
 
 		typedef resource<RENDER> RESOURCE;
 
+		typedef gui::dialog<RENDER, FT5206> DIALOG;
+
 	private:
 		GLCDC_IO	glcdc_io_;
 		AFONT		afont_;
 		KFONT		kfont_;
 		FONT		font_;
-		DRW2D_MGR	drw2d_mgr_;
 		RENDER		render_;
 
 	public:
-		// 最大８個のメニュー
+		// メニューボタンの描画
 		class BACK {
 			RENDER&	render_;
 		public:
@@ -105,7 +110,11 @@ namespace app {
 			void operator () (const vtx::srect& rect)
 			{
 				render_.round_box(rect, 8);
-//				render_.fill_box_r(x + 3, y + 3, w - 6, h - 6, c);
+				render_.swap_color();
+				auto r = rect;
+				r.org += 2;
+				r.size -= 2 * 2;
+				render_.round_box(r, 8 - 2);
 			}
 		};
 		typedef graphics::menu<RENDER, BACK, 8> MENU;
@@ -166,15 +175,20 @@ namespace app {
 		};
 		typedef device::cmt_io<device::CMT0, watch_task> CMT;
 
-	private:
-		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
-		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
+		// GPS 専用シリアル定義
+		typedef utils::fixed_fifo<char, 512>  G_REB;
+		typedef utils::fixed_fifo<char, 2048> G_SEB;
+		typedef device::sci_io<device::SCI2, G_REB, G_SEB, device::port_map::option::SECOND> GPS;
 
+		typedef utils::nmea_dec<GPS> NMEA;
+
+	private:
 		FT5206_I2C	ft5206_i2c_;
 		FT5206		ft5206_;
 
 		MENU		menu_;
 		BACK		back_;
+		DIALOG		dialog_;
 
 		CMT			cmt_;
 
@@ -182,6 +196,9 @@ namespace app {
 
 		PLOT		plot_;
 		IMG_IN		img_in_;
+
+		GPS			gps_;
+		NMEA		nmea_;
 
 	public:
 		//-------------------------------------------------------------//
@@ -193,10 +210,13 @@ namespace app {
 		scenes_base(void* lcdorg = reinterpret_cast<void*>(0x00000100)) noexcept :
 			glcdc_io_(nullptr, lcdorg),
 			afont_(), kfont_(), font_(afont_, kfont_),
-			drw2d_mgr_(glcdc_io_, font_),
 			render_(glcdc_io_, font_),
-			ft5206_(ft5206_i2c_), menu_(render_, back_), back_(render_), resource_(render_),
-			plot_(render_), img_in_(plot_) { }
+			ft5206_(ft5206_i2c_),
+			menu_(render_, back_), back_(render_), dialog_(render_, ft5206_),
+			resource_(render_),
+			plot_(render_), img_in_(plot_),
+			gps_(), nmea_(gps_)
+			{ }
 
 
 		//-------------------------------------------------------------//
@@ -206,6 +226,14 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init() noexcept
 		{
+			{  // SCI GPS
+				uint8_t intr = 1;
+				gps_.start(9600, intr);
+			}
+			{
+				nmea_.start();
+			}
+
 			{  // GLCDC の初期化
 				LCD_DISP::DIR  = 1;
 				LCD_LIGHT::DIR = 1;
@@ -223,16 +251,6 @@ namespace app {
 				}
 			}
 
-			{  // DRW2D 初期化
-				auto ver = drw2d_mgr_.get_version();
-				utils::format("DRW2D Version: %04X\n") % ver;
-
-				if(drw2d_mgr_.start()) {
-					utils:: format("Start DRW2D\n");
-				} else {
-					utils:: format("DRW2D Fail\n");
-				}
-			}
 			{  // FT5206 touch screen controller
 				FT5206::reset<FT5206_RESET>();
 				uint8_t intr_lvl = 1;
@@ -251,6 +269,9 @@ namespace app {
 
 			// スイッチ入力
 			SW2::DIR = 0;
+
+			// タッチパネルの初期化準備
+			dialog_.ready_to_touch();
 		}
 
 
@@ -261,8 +282,11 @@ namespace app {
 		//-------------------------------------------------------------//
 		void sync() noexcept
 		{
-			glcdc_io_.sync_vpos();
+			render_.sync_frame();
 			ft5206_.update();
+			nmea_.service();
+
+//			nmea_.list_all();
 		}
 
 
@@ -304,6 +328,15 @@ namespace app {
 
 		//-------------------------------------------------------------//
 		/*!
+			@brief	DIALOG の参照
+			@return DIALOG
+		*/
+		//-------------------------------------------------------------//
+		DIALOG& at_dialog() noexcept { return dialog_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
 			@brief	CMT の参照
 			@return CMT
 		*/
@@ -336,6 +369,15 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		IMG_IN& at_img() noexcept { return img_in_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	NMEA の参照
+			@return NMEA
+		*/
+		//-------------------------------------------------------------//
+		NMEA& at_nmea() noexcept { return nmea_; }
 	};
 }
 

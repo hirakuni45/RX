@@ -49,6 +49,8 @@ namespace app {
 
 			auto& render = at_scenes_base().at_render();
 			render.clear(DEF_COLOR::Black);
+			render.set_fore_color(DEF_COLOR::White);
+			render.set_back_color(DEF_COLOR::Black);
 		}
 
 
@@ -73,7 +75,6 @@ namespace app {
 			vtx::spos loc(0);
 			res.draw_lap_state(loc, pos, t, dt);
 //			res.draw_lap_24(x + 16, y, lap_best_n_, lap_best_t_);
-
 
 
 			// プログレスバー表示

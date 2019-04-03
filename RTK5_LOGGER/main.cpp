@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  RX65N ＬＣＤサンプル
+    @brief  RX65N ロガーメイン
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -18,7 +18,6 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 #include "common/qspi_io.hpp"
-#include "common/nmea_dec.hpp"
 
 #include "scenes.hpp"
 
@@ -34,17 +33,7 @@ namespace {
 	typedef utils::fixed_fifo<char, 512>  REB;
 	typedef utils::fixed_fifo<char, 1024> SEB;
 	typedef device::sci_io<device::SCI9, REB, SEB> SCI;
-	SCI		sci_;
-
-	// GPS 専用シリアル定義
-	typedef utils::fixed_fifo<char, 512>  G_REB;
-	typedef utils::fixed_fifo<char, 2048> G_SEB;
-	typedef device::sci_io<device::SCI2, G_REB, G_SEB, device::port_map::option::SECOND> GPS;
-	GPS		gps_;
-
-	// GPS の測位位置のデコード
-	typedef utils::nmea_dec<GPS> NMEA;
-	NMEA	nmea_(gps_);
+	SCI			sci_;
 
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
@@ -53,7 +42,7 @@ namespace {
 #ifdef SDHI_IF
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
-	SDHI	sdh_;
+	SDHI		sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
@@ -62,26 +51,27 @@ namespace {
 
 	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;  ///< Soft SPI 定義
 
-	SPI		spi_;
+	SPI			spi_;
 
 	typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
 	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD   カード検出
 
 	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
 
-	MMC		sdh_(spi_, 20000000);
+	MMC			sdh_(spi_, 20000000);
 #endif
 	typedef utils::sdc_man SDC;
-	SDC		sdc_;
+	SDC			sdc_;
 
 	// QSPI B グループ
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
 
-	utils::command<256> cmd_;
+	typedef utils::command<256> CMD;
+	CMD			cmd_;
 
-
-	app::scenes	scenes_;
+	typedef app::scenes	SCENES;
+	SCENES		scenes_;
 
 
 	bool check_mount_() {
@@ -236,13 +226,6 @@ int main(int argc, char** argv)
 		uint8_t intr = 2;
 		sci_.start(115200, intr);
 	}
-	{  // SCI GPS
-		uint8_t intr = 1;
-		gps_.start(9600, intr);
-	}
-	{
-		nmea_.start();
-	}
 
 	{  // SD カード・クラスの初期化
 		sdh_.start();
@@ -262,14 +245,11 @@ int main(int argc, char** argv)
 	// シーン初期化
 	scenes_.at_base().init();
 
-
 	LED::DIR = 1;
 
 	uint8_t n = 0;
 	while(1) {
 		scenes_.at_base().sync();
-
-		nmea_.service();
 
 		sdc_.service(sdh_.service());
 
@@ -277,6 +257,7 @@ int main(int argc, char** argv)
 
 		command_();
 
+		// auto n = gps_.get_satelite();
 		// GPS のステータス表示
 //		while(gps_.recv_length() > 0) {
 //			auto ch = gps_.getch();
@@ -284,12 +265,6 @@ int main(int argc, char** argv)
 //		}
 
 		++n;
-		if(n >= 30) {
-
-			nmea_.list_all();
-
-			n = 0;
-		}
 		if(n < 10) {
 			LED::P = 0;
 		} else {
