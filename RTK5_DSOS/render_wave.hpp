@@ -433,7 +433,7 @@ namespace utils {
 					auto c = DEF_COLOR::Olive;
 					if(static_cast<MENU>(i + 1) == menu_) c = DEF_COLOR::Yellow;
 					render_.set_back_color(c);
-					dialog_.draw_button(vtx::srect(441, 16 + GRID * i + 1, GRID - 1, GRID - 1), menu[i]);
+					dialog_.square_button(vtx::srect(441, 16 + GRID * i + 1, GRID - 1, GRID - 1), menu[i]);
 				}
 			}
 
