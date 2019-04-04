@@ -116,7 +116,7 @@ int main(int argc, char** argv)
 
 		auto f = nmea_.service();
 		if(f) {
-			utils::format("%s: ") % nmea_.get_satellite();
+			utils::format("%s: ") % nmea_.get_satellite_num();
 			utils::format("D/T: %s %s, ") % nmea_.get_date() % nmea_.get_time();
 			utils::format("Lat: %s, ") % nmea_.get_lat();
 			utils::format("Lon: %s, ") % nmea_.get_lon();
