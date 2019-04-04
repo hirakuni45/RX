@@ -197,10 +197,20 @@ namespace device {
 			if(level == 0) return false;
 #endif
 			level_ = level;
+			stop_ = false;
+			recv_.clear();
+			send_.clear();
 
 			power_mgr::turn(SCI::get_peripheral());
 
+			icu_mgr::set_level(SCI::get_peripheral(), 0);
 			SCI::SCR = 0x00;			// TE, RE disable.
+			{
+				auto tmp = SCI::SSR();
+				if(tmp & (SCI::SSR.ORER.b() | SCI::SSR.FER.b() | SCI::SSR.PER.b())) {
+					SCI::SSR = 0x00;
+				}
+			}
 
 			port_map::turn(SCI::get_peripheral(), true, PSEL);
 
