@@ -89,7 +89,9 @@ namespace utils {
 		uint32_t	iid_;
 
 		uint8_t		intr_;
-		BAUDRATE	baud_rate_;
+		BAUDRATE	real_baud_;
+		BAUDRATE	fast_baud_;
+		uint8_t		update_rate_;
 		uint16_t	no_recv_cnt_;
 
 		static uint16_t word_(const char* src)
@@ -215,9 +217,10 @@ namespace utils {
 			time_{ 0 }, lat_{ 0 }, ns_{ 0 }, lon_{ 0 },
 			ew_{ 0 }, q_{ 0 }, satellite_{ 0 }, hq_{ 0 },
 			alt_{ 0 }, alt_unit_{ 0 }, date_{ 0 },
-			sidx_(0), id_(0), iid_(0), intr_(0),
-			baud_rate_(BAUDRATE::NONE), no_recv_cnt_(0) {
-		}
+			sidx_(0), id_(0), iid_(0),
+			intr_(0), real_baud_(BAUDRATE::NONE), fast_baud_(BAUDRATE::NONE), update_rate_(1),
+			no_recv_cnt_(0)
+		{ }
 
 
         //-----------------------------------------------------------------//
@@ -444,15 +447,19 @@ namespace utils {
         //-----------------------------------------------------------------//
         /*!
             @brief  スタート
-			@param[in]	intr	割り込みレベル
+			@param[in]	intr	シリアルの割り込みレベル
+			@param[in]	fast	高速ボーレート
+			@param[in]	rate	更新レート（最大１０Ｈｚ）
         */
         //-----------------------------------------------------------------//
-		void start(uint8_t intr = 1) noexcept
+		void start(uint8_t intr = 1, BAUDRATE fast = BAUDRATE::B57600, uint8_t rate = 10) noexcept
 		{
 			intr_ = intr;
 			sci_.start(9600, intr);
 			init_();
-			baud_rate_ = BAUDRATE::B9600;
+			real_baud_ = BAUDRATE::B9600;
+			fast_baud_ = fast;
+			update_rate_ = rate;
 		}
 
 
@@ -470,7 +477,7 @@ namespace utils {
 			if(len == 0) {
 				++no_recv_cnt_;
 				if(no_recv_cnt_ >= (60 * 5)) {  // ５秒間受信が無い場合、ボーレートを変更
-					if(baud_rate_ == BAUDRATE::B9600) {
+					if(real_baud_ == BAUDRATE::B9600) {
 						set_baudrate(BAUDRATE::B57600);
 					} else {
 						set_baudrate(BAUDRATE::B9600);
@@ -519,6 +526,8 @@ namespace utils {
 				"PMTK251,115200",
 			};
 
+			if(real_baud_ == bpsno) return;
+
 			uint32_t idx = 0;
 			uint32_t brate = 0;
 			switch(bpsno) {
@@ -549,7 +558,6 @@ namespace utils {
 				return;
 				break;
 			}
-			if(baud_rate_ == bpsno) return;
 
 			char tmp[24];
 			uint32_t sum = sum_(p[idx]);
@@ -557,7 +565,7 @@ namespace utils {
 			sci_.puts(tmp);
 			sci_.start(brate, intr_);
 			init_();
-			baud_rate_ = bpsno;
+			real_baud_ = bpsno;
 		}
 
 
