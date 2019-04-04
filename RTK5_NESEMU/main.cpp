@@ -140,8 +140,8 @@ namespace {
 	typedef gui::dialog<RENDER, FAMIPAD> DIALOG;
 	DIALOG		dialog_(render_, famipad_);
 
-	typedef graphics::filer<SDC, RENDER> FILER;
-	FILER		filer_(sdc_, render_);
+	typedef gui::filer<RENDER, SDC> FILER;
+	FILER		filer_(render_, sdc_);
 
 	emu::nesemu		nesemu_;
 
@@ -420,7 +420,7 @@ int main(int argc, char** argv)
 		uint32_t ctrl = 0;
 		if(flt >= 120) {
 			sound_out_.mute();
-			graphics::set(graphics::filer_ctrl::OPEN, ctrl);
+			gui::set(gui::filer_ctrl::OPEN, ctrl);
 			filer = true;
 			flt = 0;
 		}
@@ -444,16 +444,16 @@ int main(int argc, char** argv)
 //				graphics::set(graphics::filer_ctrl::OPEN, ctrl);
 //			}
 			if(chip::on(data, chip::FAMIPAD_ST::UP)) {
-				graphics::set(graphics::filer_ctrl::UP, ctrl);
+				gui::set(gui::filer_ctrl::UP, ctrl);
 			}
 			if(chip::on(data, chip::FAMIPAD_ST::DOWN)) {
-				graphics::set(graphics::filer_ctrl::DOWN, ctrl);
+				gui::set(gui::filer_ctrl::DOWN, ctrl);
 			}
 			if(chip::on(data, chip::FAMIPAD_ST::LEFT)) {
-				graphics::set(graphics::filer_ctrl::BACK, ctrl);
+				gui::set(gui::filer_ctrl::BACK, ctrl);
 			}
 			if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
-				graphics::set(graphics::filer_ctrl::SELECT, ctrl);
+				gui::set(gui::filer_ctrl::SELECT, ctrl);
 			}
 			char path[256];
 			if(filer_.update(ctrl, path, sizeof(path))) {
