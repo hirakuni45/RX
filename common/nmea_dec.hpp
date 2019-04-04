@@ -5,7 +5,7 @@
 			for GTPA013 @n
 			初期ボーレートは９６００で行う。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,12 +26,15 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SCI_IO>
 	class nmea_dec {
-
 	public:
-
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  ボーレート
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class BAUDRATE : uint8_t {
-			B4800,
-			B9600,
+			NONE,
+			B9600,		///< default
 			B14400,
 			B19200,
 			B38400,
@@ -39,7 +42,7 @@ namespace utils {
 			B115200,
 		};
 
-		static const uint32_t sinfo_num_ = 12;		///< 衛星情報の最大数
+		static const uint32_t SINFO_MAX = 12;		///< 衛星情報の最大数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -80,10 +83,14 @@ namespace utils {
 		char		date_[8];   // 日付
 
 		uint16_t	sidx_;
-		sat_info	sinfo_[sinfo_num_];	// 衛星情報
+		sat_info	sinfo_[SINFO_MAX];	// 衛星情報
 
 		uint32_t	id_;
 		uint32_t	iid_;
+
+		uint8_t		intr_;
+		BAUDRATE	baud_rate_;
+		uint16_t	no_recv_cnt_;
 
 		static uint16_t word_(const char* src)
 		{
@@ -175,6 +182,29 @@ namespace utils {
 			return false;
 		}
 
+
+		uint8_t sum_(const char* str)
+		{
+			if(*str == '$') ++str;
+			char ch;
+			uint8_t sum = 0;
+			while((ch = *str) != 0) {
+				if(ch == '*') break;
+				sum ^= static_cast<uint8_t>(ch);
+				++str;
+			}
+			return sum;
+		}
+
+
+		void init_()
+		{
+			no_recv_cnt_ = 0;
+			sci_.auto_crlf(false);
+			line_[0] = 0;
+			pos_ = 0;
+		}
+
 	public:
         //-----------------------------------------------------------------//
         /*!
@@ -185,7 +215,8 @@ namespace utils {
 			time_{ 0 }, lat_{ 0 }, ns_{ 0 }, lon_{ 0 },
 			ew_{ 0 }, q_{ 0 }, satellite_{ 0 }, hq_{ 0 },
 			alt_{ 0 }, alt_unit_{ 0 }, date_{ 0 },
-			sidx_(0), id_(0), iid_(0) {
+			sidx_(0), id_(0), iid_(0), intr_(0),
+			baud_rate_(BAUDRATE::NONE), no_recv_cnt_(0) {
 		}
 
 
@@ -335,7 +366,7 @@ namespace utils {
 			@return 衛星数
         */
         //-----------------------------------------------------------------//
-		int get_satellite() const noexcept
+		int get_satellite_num() const noexcept
 		{
 			int n = 0;
 			utils::input("%d", satellite_) % n;
@@ -379,7 +410,7 @@ namespace utils {
         //-----------------------------------------------------------------//
 		const sat_info& get_satellite_info(uint16_t idx) const noexcept
 		{
-			if(idx < sinfo_num_) {
+			if(idx < SINFO_MAX) {
 				return sinfo_[idx];
 			} else {
 				static sat_info si;
@@ -406,20 +437,22 @@ namespace utils {
 				return;
 			}
 			utils::format("(%d)LatLon: %s,%s (%s m)\n")
-				% get_satellite() % lat % lon % get_altitude();
+				% get_satellite_num() % lat % lon % get_altitude();
 		}
 
 
         //-----------------------------------------------------------------//
         /*!
             @brief  スタート
+			@param[in]	intr	割り込みレベル
         */
         //-----------------------------------------------------------------//
-		void start() noexcept
+		void start(uint8_t intr = 1) noexcept
 		{
-			sci_.auto_crlf(false);
-			line_[0] = 0;
-			pos_ = 0;
+			intr_ = intr;
+			sci_.start(9600, intr);
+			init_();
+			baud_rate_ = BAUDRATE::B9600;
 		}
 
 
@@ -434,6 +467,19 @@ namespace utils {
 		{
 			bool ret = false;
 			auto len = sci_.recv_length();
+			if(len == 0) {
+				++no_recv_cnt_;
+				if(no_recv_cnt_ >= (60 * 5)) {  // ５秒間受信が無い場合、ボーレートを変更
+					if(baud_rate_ == BAUDRATE::B9600) {
+						set_baudrate(BAUDRATE::B57600);
+					} else {
+						set_baudrate(BAUDRATE::B9600);
+					}
+					no_recv_cnt_ = 0;
+				}
+				return false;
+			}
+			no_recv_cnt_ = 0;
 			while(len > 0) {
 				auto ch = sci_.getch();
 				if(ch == 0x0d) {
@@ -464,9 +510,54 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void set_baudrate(BAUDRATE bpsno) noexcept
 		{
-//			"$PMTK251,38400*27\r\n"
-#define PMTK_SET_BAUD_57600 "$PMTK251,57600*2C"
-#define PMTK_SET_BAUD_9600 "$PMTK251,9600*17"
+			static const char* p[] = {
+				"PMTK251,9600",
+				"PMTK251,14400",
+				"PMTK251,19200",
+				"PMTK251,38400",
+				"PMTK251,57600",
+				"PMTK251,115200",
+			};
+
+			uint32_t idx = 0;
+			uint32_t brate = 0;
+			switch(bpsno) {
+			case BAUDRATE::B9600:
+				brate = 9600;
+				break;
+			case BAUDRATE::B14400:
+				brate = 14400;
+				idx = 1;
+				break;
+			case BAUDRATE::B19200:
+				brate = 19200;
+				idx = 2;
+				break;
+			case BAUDRATE::B38400:
+				brate = 38400;
+				idx = 3;
+				break;
+			case BAUDRATE::B57600:
+				brate = 57600;
+				idx = 4;
+				break;
+			case BAUDRATE::B115200:
+				brate = 115200;
+				idx = 5;
+				break;
+			default:
+				return;
+				break;
+			}
+			if(baud_rate_ == bpsno) return;
+
+			char tmp[24];
+			uint32_t sum = sum_(p[idx]);
+			utils::sformat("$%s*%02X\r\n", tmp, sizeof(tmp)) % p[idx] % sum;
+			sci_.puts(tmp);
+			sci_.start(brate, intr_);
+			init_();
+			baud_rate_ = bpsno;
 		}
 
 
@@ -474,22 +565,28 @@ namespace utils {
 		/*!
 			@breif	位置更新レートの設定 @n
 					※高いレートを使う場合、事前にボーレートを高く設定する必要がある。
-			@param[in]	rate	更新レート（１～１０）
+			@param[in]	rate	更新レート
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
 		bool set_update_rate(uint32_t rate)
 		{
+			if(rate < 1 || rate > 10) return false;
+
+			// "$PMTK220,1000*1F"	// 1Hz [ms]
+			// "$PMTK220,500*2B"	// 2Hz [ms]
+			// "$PMTK220,200*2C"	// 5Hz [ms]
+			// "$PMTK220,100*2F"	// 10Hz [ms]
+			char tmp[24];
+			uint32_t r = 1000 / rate;
+			utils::sformat("$PMTK220,%u", tmp, sizeof(tmp)) % r;
+			uint32_t sum = sum_(&tmp[1]);
+			
+
+			return true;
+		}
+
 #if 0
-// different commands to set the update rate from once a second (1 Hz) to 10 times a second (10Hz)
-// Note that these only control the rate at which the position is echoed, to actually speed up the
-// position fix you must also send one of the position fix rate commands below too.
-#define PMTK_SET_NMEA_UPDATE_100_MILLIHERTZ  "$PMTK220,10000*2F" // Once every 10 seconds, 100 millihertz.
-#define PMTK_SET_NMEA_UPDATE_200_MILLIHERTZ  "$PMTK220,5000*1B"  // Once every 5 seconds, 200 millihertz.
-#define PMTK_SET_NMEA_UPDATE_1HZ  "$PMTK220,1000*1F"
-#define PMTK_SET_NMEA_UPDATE_2HZ  "$PMTK220,500*2B"
-#define PMTK_SET_NMEA_UPDATE_5HZ  "$PMTK220,200*2C"
-#define PMTK_SET_NMEA_UPDATE_10HZ "$PMTK220,100*2F"
 // Position fix update rate commands.
 #define PMTK_API_SET_FIX_CTL_100_MILLIHERTZ  "$PMTK300,10000,0,0,0,0*2C" // Once every 10 seconds, 100 millihertz.
 #define PMTK_API_SET_FIX_CTL_200_MILLIHERTZ  "$PMTK300,5000,0,0,0,0*18"  // Once every 5 seconds, 200 millihertz.
@@ -497,12 +594,6 @@ namespace utils {
 #define PMTK_API_SET_FIX_CTL_5HZ  "$PMTK300,200,0,0,0,0*2F"
 // Can't fix position faster than 5 times a second!
 #endif
-
-// $PMTK220,1000*1F<CR><LF> 1Hz
-// $PMTK220,200*2C<CR><LF> 5Hz
-// $PMTK220,100*2F<CR><LF> 10Hz
-			return true;
-		}
 
 
 #if 0
