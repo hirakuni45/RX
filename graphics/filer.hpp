@@ -11,7 +11,7 @@
 #include "common/sdc_man.hpp"
 #include "common/fixed_stack.hpp"
 
-namespace graphics {
+namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -43,19 +43,21 @@ namespace graphics {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	ファイラー・クラス
-		@param[in]	SDC	sdc_man クラス型（SD カード操作）
 		@param[in]	RDR	render クラス型（描画）
+		@param[in]	SDC	sdc_man クラス型（SD カード操作）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SDC, class RDR>
+	template <class RDR, class SDC>
 	class filer {
 
 		static const int16_t SPC = 2;                           ///< 文字間隙間
 		static const int16_t FLN = RDR::font_type::height + SPC;      ///< 行幅
 		static const int16_t SCN = (RDR::glc_type::height - SPC) / FLN;   ///< 行数
 
-		SDC&	sdc_;
+		typedef graphics::def_color DEF_COLOR;
+
 		RDR&	rdr_;
+		SDC&	sdc_;
 
 		uint32_t	ctrl_;
 		bool		open_;
@@ -112,15 +114,15 @@ namespace graphics {
 				draw = true;
 			}
 			if(draw && t.vpos_ >= 0 && t.vpos_ < RDR::glc_type::height) {
-				rdr_.set_fore_color(def_color::Black);
+				rdr_.set_fore_color(DEF_COLOR::Black);
 				rdr_.fill_box(vtx::srect(SPC, t.vpos_,
 					RDR::glc_type::width - SPC * 2, RDR::font_type::height));
-				rdr_.set_fore_color(def_color::White);
+				rdr_.set_fore_color(DEF_COLOR::White);
 				if(dir) rdr_.draw_font(vtx::spos(SPC, t.vpos_), '/');
 				if(dir) {
-					rdr_.set_fore_color(def_color::Blue);
+					rdr_.set_fore_color(DEF_COLOR::Blue);
 				} else {
-					rdr_.set_fore_color(def_color::White);
+					rdr_.set_fore_color(DEF_COLOR::White);
 				}
 				auto w = rdr_.draw_text(vtx::spos(SPC + 8, t.vpos_), name);
 				if(t.hmax_ < w) t.hmax_ = w;
@@ -171,11 +173,11 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
-			@param[in]	sdc		ファイルシステム・インスタンス
 			@param[in]	rdr		レンダリング・インスタンス
+			@param[in]	sdc		ファイルシステム・インスタンス
 		*/
 		//-----------------------------------------------------------------//
-		filer(SDC& sdc, RDR& rdr) noexcept : sdc_(sdc), rdr_(rdr),
+		filer(RDR& rdr, SDC& sdc) noexcept : rdr_(rdr), sdc_(sdc),
 			ctrl_(0), open_(false), rdr_st_(),
 			touch_lvl_(false), touch_pos_(false), touch_neg_(false), touch_num_(0),
 			touch_x_(0), touch_y_(0),
@@ -231,13 +233,13 @@ namespace graphics {
 			if(!sdc_.get_mount()) {
 				open_ = false;
 				pos_stack_.clear();
-				rdr_.clear(def_color::Black);
+				rdr_.clear(DEF_COLOR::Black);
 				return false;
 			}
 
 			if((ptrg & ctrl_mask_(filer_ctrl::OPEN)) != 0 || (back_num_ == 3 && touch_num_ < 3)) {
 				open_ = !open_;
-				rdr_.clear(def_color::Black);
+				rdr_.clear(DEF_COLOR::Black);
 				if(open_) {
 					rdr_.at_font().at_kfont().flush_cash();
 					scan_dir_(false);
@@ -280,7 +282,7 @@ namespace graphics {
 			}
 
 			// 選択フレームの描画
-			rdr_.set_fore_color(def_color::White);
+			rdr_.set_fore_color(DEF_COLOR::White);
 			draw_sel_frame_(rdr_st_.sel_pos_);
 			int16_t pos = rdr_st_.sel_pos_;
 			if(ptrg & ctrl_mask_(filer_ctrl::UP)) {
@@ -309,7 +311,7 @@ namespace graphics {
 				vofs = lim;
 			}
 			if(vofs != rdr_st_.vofs_) {
-				rdr_.set_fore_color(def_color::Black);
+				rdr_.set_fore_color(DEF_COLOR::Black);
 				draw_sel_frame_(rdr_st_.sel_pos_);  // delete frame
 				int16_t match = -1;
 				if(vofs < rdr_st_.vofs_) {  // down
@@ -324,7 +326,7 @@ namespace graphics {
 			}
 			
 			if(pos != rdr_st_.sel_pos_) {
-				rdr_.set_fore_color(def_color::Black);
+				rdr_.set_fore_color(DEF_COLOR::Black);
 				draw_sel_frame_(rdr_st_.sel_pos_);
 				rdr_st_.sel_pos_ = pos;
 			}
@@ -339,10 +341,10 @@ namespace graphics {
 					pos_stack_.push(pos_t(rdr_st_.vofs_, rdr_st_.sel_pos_));
 					dst[l - 1] = 0;
 					sdc_.cd(dst);
-					rdr_.clear(def_color::Black);
+					rdr_.clear(DEF_COLOR::Black);
 					scan_dir_(false);
 				} else {
-					rdr_.clear(def_color::Black);
+					rdr_.clear(DEF_COLOR::Black);
 					open_ = false;
 					return true;
 				}
@@ -351,7 +353,7 @@ namespace graphics {
 			if(ptrg & ctrl_mask_(filer_ctrl::BACK)) {
 				if(!pos_stack_.empty()) {
 					sdc_.cd("..");
-					rdr_.clear(def_color::Black);
+					rdr_.clear(DEF_COLOR::Black);
 					scan_dir_(true);
 				}
 			}

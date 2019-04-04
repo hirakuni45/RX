@@ -9,8 +9,9 @@
 */
 //=====================================================================//
 #include <cstdint>
+#include "common/vtx.hpp"
 
-namespace graphics {
+namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -37,17 +38,13 @@ namespace graphics {
 		};
 		obj_t	obj_[MAX];
 
-		int16_t		mx_;
-		int16_t		my_;
-		int16_t		ox_;
-		int16_t		oy_;
-
-		int8_t		gap_;
-		int8_t		space_w_;
-		int8_t		space_h_;
+		vtx::spos	m_;
+		vtx::spos	ofs_;
+		vtx::spos	space_;
 
 		uint16_t	pos_;
 
+		int8_t		gap_;
 		bool		focus_;
 
 	public:
@@ -59,8 +56,8 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		menu(RDR& rdr, BACK& back) noexcept : rdr_(rdr), back_(back),
-			size_(0), mx_(0), my_(0), ox_(0), oy_(0),
-			gap_(0), space_w_(0), space_h_(0), pos_(0),
+			size_(0), m_(0), ofs_(0), space_(0),
+			pos_(0), gap_(0),
 			focus_(true)
 		{ }
 
@@ -68,28 +65,24 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	描画オフセットの設定
-			@param[in]	ox	X オフセット
-			@param[in]	oy	Y オフセット
+			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
-		void set_offset(int16_t ox, int16_t oy) noexcept
+		void set_offset(const vtx::spos& ofs) noexcept
 		{
-			ox_ = ox;
-			oy_ = oy;
+			ofs_ = ofs;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	描画スペースの設定
-			@param[in]	w	横幅
-			@param[in]	h	高さ
+			@param[in]	spc	スペース
 		*/
 		//-----------------------------------------------------------------//
-		void set_space(int16_t w, int16_t h) noexcept
+		void set_space(const vtx::spos& spc) noexcept
 		{
-			space_w_ = w;
-			space_h_ = h;
+			space_ = spc;
 		}
 
 
@@ -159,8 +152,7 @@ namespace graphics {
 		void clear() noexcept
 		{
 			size_ = 0;
-			mx_ = 0;
-			my_ = 0;
+			m_.set(0);
 			pos_ = 0;
 			focus_ = false;
 		}
@@ -189,17 +181,15 @@ namespace graphics {
 			obj_[size_].src_ = src;
 			++size_;
 
-			int16_t x = 0;
-			int16_t y = 0;
+			vtx::spos tt(0);
 			for(auto i = 0; i < size_; ++i) {
-				auto xx = obj_[i].w_ + space_w_ * 2;
-				if(x < xx) x = xx;
-				y += obj_[i].h_;
-				y += gap_;
-				y += space_h_ * 2;
+				auto xx = obj_[i].w_ + space_.x * 2;
+				if(tt.x < xx) tt.x = xx;
+				tt.y += obj_[i].h_;
+				tt.y += gap_;
+				tt.y += space_.y * 2;
 			}
-			mx_ = x;
-			my_ = y;
+			m_ = tt;
 		}
 
 
@@ -216,17 +206,17 @@ namespace graphics {
 		{
 			if(size_ == 0) return false;
 
-			int16_t x = (RDR::glc_type::width  - ox_ - mx_) / 2;
-			int16_t y = (RDR::glc_type::height - oy_ - my_) / 2;
-			x += ox_;
-			y += oy_;
+			vtx::spos n((RDR::glc_type::width  - ofs_.x - m_.x) / 2,
+				(RDR::glc_type::height - ofs_.y - m_.y) / 2);
+			n += ofs_;
 			int16_t idx = -1;
 			for(auto i = 0; i < size_; ++i) {
 				const auto& obj = obj_[i];
-				y += gap_ / 2;
+				n.y += gap_ / 2;
 				auto fc = graphics::def_color::White;
 				auto bc = graphics::def_color::Darkgray;
-				if(x <= px && px < (x + mx_) && y <= py && py < (y + obj.h_ + space_h_ * 2)) {
+				if(n.x <= px && px < (n.x + m_.x) &&
+					n.y <= py && py < (n.y + obj.h_ + space_.y * 2)) {
 					idx = i;
 					if(touch) {
 						bc = graphics::def_color::Silver;
@@ -234,14 +224,14 @@ namespace graphics {
 				}
 				rdr_.set_fore_color(fc);
 				rdr_.set_back_color(bc);
-				back_(vtx::srect(x, y, mx_, obj.h_ + space_h_ * 2));
-				y += space_h_;
+				back_(vtx::srect(n.x, n.y, m_.x, obj.h_ + space_.y * 2));
+				n.y += space_.y;
 				auto t = static_cast<const char*>(obj_[i].src_);
 				rdr_.set_fore_color(graphics::def_color::White);
-				rdr_.draw_text(vtx::spos(x + space_w_, y), t);
-				y += obj.h_;
-				y += space_h_;
-				y += gap_ - (gap_ / 2);
+				rdr_.draw_text(vtx::spos(n.x + space_.x, n.y), t);
+				n.y += obj.h_;
+				n.y += space_.y;
+				n.y += gap_ - (gap_ / 2);
 			}
 
 			bool focus = focus_;
