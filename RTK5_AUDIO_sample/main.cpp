@@ -123,11 +123,11 @@ namespace {
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
 
-	typedef graphics::filer<SDC, RENDER> FILER;
-	FILER		filer_(sdc_, render_);
+	typedef gui::filer<RENDER, SDC> FILER;
+	FILER		filer_(render_, sdc_);
 
-	typedef audio::codec<SDC, RENDER> AUDIO;
-	AUDIO		audio_(sdc_, render_);
+	typedef audio::codec<RENDER, SDC> AUDIO;
+	AUDIO		audio_(render_, sdc_);
 
 	uint8_t		pad_level_ = 0;
 	uint8_t		touch_num_ = 0;
@@ -488,19 +488,19 @@ int main(int argc, char** argv)
 			auto data = get_fami_pad();
 			uint32_t ctrl = 0;
 			if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
-				graphics::set(graphics::filer_ctrl::OPEN, ctrl);
+				gui::set(gui::filer_ctrl::OPEN, ctrl);
 			}
 			if(chip::on(data, chip::FAMIPAD_ST::UP)) {
-				graphics::set(graphics::filer_ctrl::UP, ctrl);
+				gui::set(gui::filer_ctrl::UP, ctrl);
 			}
 			if(chip::on(data, chip::FAMIPAD_ST::DOWN)) {
-				graphics::set(graphics::filer_ctrl::DOWN, ctrl);
+				gui::set(gui::filer_ctrl::DOWN, ctrl);
 			}
 			if(chip::on(data, chip::FAMIPAD_ST::LEFT)) {
-				graphics::set(graphics::filer_ctrl::BACK, ctrl);
+				gui::set(gui::filer_ctrl::BACK, ctrl);
 			}
 			if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
-				graphics::set(graphics::filer_ctrl::SELECT, ctrl);
+				gui::set(gui::filer_ctrl::SELECT, ctrl);
 			}
 
 			auto tnum = ft5206_.get_touch_num();

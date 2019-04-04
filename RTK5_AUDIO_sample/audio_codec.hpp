@@ -24,20 +24,20 @@ namespace audio {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  オーディオ・コーデック・クラス
+		@param[in]	RDR	グラフィックス描画クラス
 		@param[in]	SDC		SD カード・マネージャー・クラス
-		@param[in]	RENDER	グラフィックス描画クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class SDC, class RENDER>
+	template<class RDR, class SDC>
 	class codec {
 	public:
 		typedef std::function<sound::af_play::CTRL ()> CTRL_TASK;
-		typedef img::scaling<RENDER> SCALING;
+		typedef img::scaling<RDR> SCALING;
 		typedef img::picojpeg_in<SCALING> JPEG_IN;
 
 	private:
+		RDR&		rdr_;
 		SDC&		sdc_;
-		RENDER&		render_;
 		SCALING		scaling_;
 
 		static volatile uint32_t	wpos_;
@@ -90,17 +90,17 @@ namespace audio {
 
 		int16_t render_text_(int16_t x, int16_t y, const char* text)
 		{
-			render_.swap_color();
-			auto xx = render_.draw_text(vtx::spos(x, y), text);
-			render_.swap_color();
-			render_.draw_text(vtx::spos(x + 1, y + 1), text);
+			rdr_.swap_color();
+			auto xx = rdr_.draw_text(vtx::spos(x, y), text);
+			rdr_.swap_color();
+			rdr_.draw_text(vtx::spos(x + 1, y + 1), text);
 			return xx;
 		}
 
 		void sound_tag_task_(utils::file_io& fin, const sound::tag_t& tag)
 		{
-			render_.clear(graphics::def_color::Black);
-			render_.sync_frame(false);
+			rdr_.clear(graphics::def_color::Black);
+			rdr_.sync_frame(false);
 
 			scaling_.set_offset(vtx::spos(480 - 272, 0));
 			if(tag.get_apic().len_ > 0) {
@@ -110,9 +110,9 @@ namespace audio {
 				if(!jpeg_.info(fin, ifo)) {
 					scaling_.set_scale();
 					jpeg_.load("/NoImage.jpg");
-					render_.swap_color();
-					render_.draw_text(vtx::spos(480 - 272, 0), "JPEG decode error.");
-					render_.swap_color();
+					rdr_.swap_color();
+					rdr_.draw_text(vtx::spos(480 - 272, 0), "JPEG decode error.");
+					rdr_.swap_color();
 				} else {
 					auto n = std::max(ifo.width, ifo.height);
 					scaling_.set_scale(272, n);
@@ -137,7 +137,7 @@ namespace audio {
 			if(x > 0) x += 8;
 			utils::format("Track:   %s\n") % tag.get_track().c_str();
 			render_text_(x, 4 * 20, tag.get_track().c_str());
-			render_.sync_frame(false);
+			rdr_.sync_frame(false);
 		}
 
 
@@ -148,11 +148,11 @@ namespace audio {
 			uint16_t hor = (t / 3600) % 24;
 			char tmp[16];
 			utils::sformat("%02d:%02d:%02d", tmp, sizeof(tmp)) % hor % min % sec;
-			render_.set_fore_color(graphics::def_color::Black);
-			render_.fill_box(vtx::srect(0, 5 * 20, 8 * 8, 16));
-			render_.set_fore_color(graphics::def_color::White);
-			render_.draw_text(vtx::spos(0, 5 * 20), tmp);
-			render_.sync_frame(false);
+			rdr_.set_fore_color(graphics::def_color::Black);
+			rdr_.fill_box(vtx::srect(0, 5 * 20, 8 * 8, 16));
+			rdr_.set_fore_color(graphics::def_color::White);
+			rdr_.draw_text(vtx::spos(0, 5 * 20), tmp);
+			rdr_.sync_frame(false);
 		}
 
 
@@ -237,8 +237,8 @@ namespace audio {
 			@param[in]	sdc		SD カードマネージャー
 		*/
 		//-----------------------------------------------------------------//
-		codec(SDC& sdc, RENDER& render) noexcept :
-			sdc_(sdc), render_(render), scaling_(render_),
+		codec(RDR& rdr, SDC& sdc) noexcept :
+			rdr_(rdr), sdc_(sdc), scaling_(rdr),
 			jpeg_(scaling_)
 		{ }
 
