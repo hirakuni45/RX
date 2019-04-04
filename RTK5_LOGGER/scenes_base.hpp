@@ -45,7 +45,8 @@ namespace app {
 
 		laptime,
 		recall,
-		setup
+		setup,
+		gps
 	};
 
 
@@ -117,7 +118,7 @@ namespace app {
 				render_.round_box(r, 8 - 2);
 			}
 		};
-		typedef graphics::menu<RENDER, BACK, 8> MENU;
+		typedef gui::menu<RENDER, BACK, 8> MENU;
 
 		typedef img::scaling<RENDER> PLOT;
 		typedef img::img_in<PLOT> IMG_IN;
@@ -173,8 +174,8 @@ namespace app {
 				return lap_pad_[pos];
 			}
 		};
-		typedef device::cmt_io<device::CMT0, watch_task> CMT;
 
+		typedef device::cmt_io<device::CMT0, watch_task> CMT;
 		// GPS 専用シリアル定義
 		typedef utils::fixed_fifo<char, 512>  G_REB;
 		typedef utils::fixed_fifo<char, 2048> G_SEB;
@@ -226,12 +227,9 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init() noexcept
 		{
-			{  // SCI GPS
-				uint8_t intr = 1;
-				gps_.start(9600, intr);
-			}
 			{
-				nmea_.start();
+				uint8_t intr = 1;
+				nmea_.start(intr);
 			}
 
 			{  // GLCDC の初期化

@@ -257,14 +257,8 @@ int main(int argc, char** argv)
 
 		command_();
 
-		// auto n = gps_.get_satelite();
-		// GPS のステータス表示
-//		while(gps_.recv_length() > 0) {
-//			auto ch = gps_.getch();
-//			sci_.putch(ch);
-//		}
-
 		++n;
+		if(n >= 30) n = 0;
 		if(n < 10) {
 			LED::P = 0;
 		} else {
