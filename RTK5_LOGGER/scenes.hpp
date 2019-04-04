@@ -16,6 +16,7 @@
 #include "laptime.hpp"
 #include "recall.hpp"
 #include "setup.hpp"
+#include "gps.hpp"
 
 namespace app {
 
@@ -26,7 +27,7 @@ namespace app {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class scenes {
 
-		typedef utils::scene<title, root_menu, laptime, recall, setup> SCENE;
+		typedef utils::scene<title, root_menu, laptime, recall, setup, gps> SCENE;
 
 		SCENE		scene_;
 
@@ -36,6 +37,7 @@ namespace app {
 		laptime		laptime_;
 		recall		recall_;
 		setup		setup_;
+		gps			gps_;
 
 		scenes_base	scenes_base_;
 
@@ -81,6 +83,9 @@ namespace app {
 				break;
 			case scenes_id::setup:
 				scene_.change(setup_);
+				break;
+			case scenes_id::gps:
+				scene_.change(gps_);
 				break;
 
 			default:

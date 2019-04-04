@@ -50,6 +50,12 @@ namespace app {
 		//-------------------------------------------------------------//
 		void service() noexcept
 		{
+			const auto& touch = at_scenes_base().at_touch();
+			bool t = touch.get_touch_num() == 1 ? true : false;
+//			const auto& p = touch.get_touch_pos(0);
+			if(t) {
+				change_scene(scenes_id::root_menu);
+			}
 		}
 	};
 }

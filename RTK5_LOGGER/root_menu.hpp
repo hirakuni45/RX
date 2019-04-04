@@ -39,10 +39,11 @@ namespace app {
 		{
 			at_scenes_base().at_menu().clear();
 			at_scenes_base().at_menu().set_gap(20);
-			at_scenes_base().at_menu().set_space(12, 8);
+			at_scenes_base().at_menu().set_space(vtx::spos(12, 8));
 			at_scenes_base().at_menu().add("Lap Time");
 			at_scenes_base().at_menu().add("Recall");
 			at_scenes_base().at_menu().add("Setup");
+			at_scenes_base().at_menu().add("G.P.S.");
 		}
 
 
@@ -59,7 +60,7 @@ namespace app {
 				static const int16_t LOC_Y = scenes_base::RENDER::glc_type::height - 16;
 				auto& nmea = at_scenes_base().at_nmea();
 				char tmp[32];
-				auto stn = nmea.get_satellite();
+				auto stn = nmea.get_satellite_num();
 				utils::sformat("%d", tmp, sizeof(tmp)) % stn;
 				at_scenes_base().at_render().draw_text(vtx::spos(0, LOC_Y), tmp);
 				if(stn > 0) {
@@ -74,9 +75,9 @@ namespace app {
 						% static_cast<uint32_t>(m->tm_sec)
 						% static_cast<uint32_t>(m->tm_year + 1900);
 				} else {
-					strcpy(tmp, "---");
+					strcpy(tmp, "--- --- - --:--:--  ----");
 				}
-				at_scenes_base().at_render().draw_text(vtx::spos(16, LOC_Y), tmp);
+				at_scenes_base().at_render().draw_text(vtx::spos(24, LOC_Y), tmp);
 			}
 
 			const auto& touch = at_scenes_base().at_touch();
@@ -95,6 +96,9 @@ namespace app {
 					break;
 				case 2:
 					change_scene(scenes_id::setup);
+					break;
+				case 3:
+					change_scene(scenes_id::gps);
 					break;
 				}
 			}
