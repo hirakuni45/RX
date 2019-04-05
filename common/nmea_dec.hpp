@@ -26,23 +26,12 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SCI_IO>
 	class nmea_dec {
-	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  ボーレート
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class BAUDRATE : uint8_t {
-			NONE,
-			B9600,		///< default
-			B14400,
-			B19200,
-			B38400,
-			B57600,
-			B115200,
-		};
 
-		static const uint32_t SINFO_MAX = 12;		///< 衛星情報の最大数
+		static const uint32_t FAST_BAUDRATE = 57600;
+		static const uint32_t UPDATE_FAST_RATE = 10;	///< 10Hz
+
+	public:
+		static const uint32_t SINFO_MAX = 14;		///< 衛星情報の最大数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -50,7 +39,7 @@ namespace utils {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct sat_info {
-			char	no_[4];  	///< 衛星番号
+			char	no_[4] ;  		///< 衛星番号
 			char	elv_[4];	///< 衛星仰角(Elevation)、０～９０度
 			char	azi_[4];	///< 衛星方位角(Azimuth)、０～３５９度
 			char	cn_[4];		///< キャリア／ノイズ比、０～９９dB
@@ -65,6 +54,8 @@ namespace utils {
 
 	private:
 		SCI_IO&		sci_;
+
+		uint16_t	sci_errc_;
 
 		uint16_t	pos_;
 		char		line_[256];
@@ -88,10 +79,10 @@ namespace utils {
 		uint32_t	id_;
 		uint32_t	iid_;
 
-		uint8_t		intr_;
-		BAUDRATE	real_baud_;
-		BAUDRATE	fast_baud_;
-		uint8_t		update_rate_;
+		uint16_t	intr_;
+		uint16_t	update_rate_;
+		uint32_t	real_baud_;
+		uint32_t	fast_baud_;
 		uint16_t	no_recv_cnt_;
 
 		static uint16_t word_(const char* src)
@@ -109,6 +100,7 @@ namespace utils {
 			std::strncpy(dst, src, len);
 			dst[len] = 0;
 		}
+
 
 		static int32_t get_dec_(const char* t, uint16_t n = 0)
 		{
@@ -128,6 +120,7 @@ namespace utils {
 			}
 			return val;
 		}
+
 
 		bool decode_()
 		{
@@ -163,14 +156,28 @@ namespace utils {
 					p += l;
 					++n;
 				}
-			} else if(std::strncmp(&line_[1], "GPGSV,", 6) == 0) {
+			} else if(std::strncmp(&line_[1], "GPGSV,", 6) == 0) {  // 衛星情報
 				const char* p = &line_[7];
 				uint16_t n = 0;
+				uint16_t sidx = 0;
 				uint16_t l;
 				while((l = word_(p)) != 0) {
-					if(n == 0) ;
-					else if(n == 1) ;
-// std::strncpy(date_, p, l - 1);
+					if(n == 1) {
+						char tmp[4];
+						copy_word_(tmp, p, l - 1);
+						sidx = get_dec_(tmp);
+						sidx *= 4;
+					} else if(n >= 3) {
+						auto& t = sinfo_[sidx % SINFO_MAX];
+						auto mod = (n - 3) % 4;
+						if(mod == 0) copy_word_(t.no_, p, l - 1);
+						else if(mod == 1) copy_word_(t.elv_, p, l - 1);
+						else if(mod == 2) copy_word_(t.azi_, p, l - 1);
+						else if(mod == 3) {
+							copy_word_(t.cn_, p, l - 1);
+							++sidx;
+						}
+					}
 					p += l;
 					++n;
 				}
@@ -185,7 +192,7 @@ namespace utils {
 		}
 
 
-		uint8_t sum_(const char* str)
+		static uint8_t sum_(const char* str)
 		{
 			if(*str == '$') ++str;
 			char ch;
@@ -213,12 +220,12 @@ namespace utils {
             @brief  コンストラクター
         */
         //-----------------------------------------------------------------//
-		nmea_dec(SCI_IO& sci) noexcept : sci_(sci), pos_(0), line_{ 0 },
+		nmea_dec(SCI_IO& sci) noexcept : sci_(sci), sci_errc_(0), pos_(0), line_{ 0 },
 			time_{ 0 }, lat_{ 0 }, ns_{ 0 }, lon_{ 0 },
 			ew_{ 0 }, q_{ 0 }, satellite_{ 0 }, hq_{ 0 },
 			alt_{ 0 }, alt_unit_{ 0 }, date_{ 0 },
 			sidx_(0), id_(0), iid_(0),
-			intr_(0), real_baud_(BAUDRATE::NONE), fast_baud_(BAUDRATE::NONE), update_rate_(1),
+			intr_(0), update_rate_(1), real_baud_(0), fast_baud_(0),
 			no_recv_cnt_(0)
 		{ }
 
@@ -452,14 +459,14 @@ namespace utils {
 			@param[in]	rate	更新レート（最大１０Ｈｚ）
         */
         //-----------------------------------------------------------------//
-		void start(uint8_t intr = 1, BAUDRATE fast = BAUDRATE::B57600, uint8_t rate = 10) noexcept
+		void start(uint16_t intr = 1, uint32_t fast = FAST_BAUDRATE, uint16_t rate = 10) noexcept
 		{
 			intr_ = intr;
-			sci_.start(9600, intr);
-			init_();
-			real_baud_ = BAUDRATE::B9600;
+			real_baud_ = 9600;
 			fast_baud_ = fast;
 			update_rate_ = rate;
+			init_();
+			sci_.start(real_baud_, intr);
 		}
 
 
@@ -472,19 +479,28 @@ namespace utils {
         //-----------------------------------------------------------------//
 		bool service() noexcept
 		{
-			bool ret = false;
 			auto len = sci_.recv_length();
-			if(len == 0) {
+			auto errc = sci_.get_error_count();
+			if(len == 0 || errc != sci_errc_) {
+				sci_errc_ = errc;
+				sci_.flush_recv();
 				++no_recv_cnt_;
 				if(no_recv_cnt_ >= (60 * 5)) {  // ５秒間受信が無い場合、ボーレートを変更
-					if(real_baud_ == BAUDRATE::B9600) {
-						set_baudrate(BAUDRATE::B57600);
-					} else {
-						set_baudrate(BAUDRATE::B9600);
+					if(real_baud_ == 9600) {  // 9600 で通信出来てないので、高速になってるかも
+						sci_.start(fast_baud_, intr_);
+						init_();
+						real_baud_ = fast_baud_;
 					}
 					no_recv_cnt_ = 0;
 				}
 				return false;
+			}
+
+			bool ret = false;
+			if(len > 0) {
+				if(real_baud_ == 9600) {  // 9600 で通信出来てる場合、高速にキック
+					set_baudrate(fast_baud_);
+				}
 			}
 			no_recv_cnt_ = 0;
 			while(len > 0) {
@@ -505,6 +521,11 @@ namespace utils {
 				}
 				--len;
 			}
+			if(ret && real_baud_ == fast_baud_) {
+				if(update_rate_ == 1) {
+					set_update_rate(UPDATE_FAST_RATE);
+				}
+			}
 			return ret;
 		}
 
@@ -512,61 +533,39 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@breif	G.P.S. のボーレートを設定
-			@param[in]	bpsno	ボーレート番号
+			@param[in]	baud	ボーレート
 		 */
 		//-----------------------------------------------------------------//
-		void set_baudrate(BAUDRATE bpsno) noexcept
+		void set_baudrate(uint32_t baud) noexcept
 		{
-			static const char* p[] = {
-				"PMTK251,9600",
-				"PMTK251,14400",
-				"PMTK251,19200",
-				"PMTK251,38400",
-				"PMTK251,57600",
-				"PMTK251,115200",
-			};
+//			"PMTK251,9600",
+//			"PMTK251,14400",
+//			"PMTK251,19200",
+//			"PMTK251,38400",
+//			"PMTK251,57600",
+//			"PMTK251,115200",
 
-			if(real_baud_ == bpsno) return;
-
-			uint32_t idx = 0;
-			uint32_t brate = 0;
-			switch(bpsno) {
-			case BAUDRATE::B9600:
-				brate = 9600;
-				break;
-			case BAUDRATE::B14400:
-				brate = 14400;
-				idx = 1;
-				break;
-			case BAUDRATE::B19200:
-				brate = 19200;
-				idx = 2;
-				break;
-			case BAUDRATE::B38400:
-				brate = 38400;
-				idx = 3;
-				break;
-			case BAUDRATE::B57600:
-				brate = 57600;
-				idx = 4;
-				break;
-			case BAUDRATE::B115200:
-				brate = 115200;
-				idx = 5;
-				break;
-			default:
-				return;
-				break;
-			}
+			if(real_baud_ == baud) return;
+			real_baud_ = baud;
 
 			char tmp[24];
-			uint32_t sum = sum_(p[idx]);
-			utils::sformat("$%s*%02X\r\n", tmp, sizeof(tmp)) % p[idx] % sum;
-			sci_.puts(tmp);
-			sci_.start(brate, intr_);
+			utils::sformat("PMTK251,%u", tmp, sizeof(tmp)) % real_baud_;
+			uint32_t sum = sum_(tmp);
+			char tmp2[24];
+			utils::sformat("$%s*%02X\r\n", tmp2, sizeof(tmp2)) % tmp % sum;
+			sci_.puts(tmp2);
+			sci_.start(real_baud_, intr_);
 			init_();
-			real_baud_ = bpsno;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@breif	通信中のボーレートを取得
+			@return	通信中のボーレート
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_baudrate() const noexcept { return real_baud_; }
 
 
 		//-----------------------------------------------------------------//
@@ -577,7 +576,7 @@ namespace utils {
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool set_update_rate(uint32_t rate)
+		bool set_update_rate(uint32_t rate) noexcept
 		{
 			if(rate < 1 || rate > 10) return false;
 
@@ -585,14 +584,26 @@ namespace utils {
 			// "$PMTK220,500*2B"	// 2Hz [ms]
 			// "$PMTK220,200*2C"	// 5Hz [ms]
 			// "$PMTK220,100*2F"	// 10Hz [ms]
-			char tmp[24];
+			char tmp[16];
 			uint32_t r = 1000 / rate;
-			utils::sformat("$PMTK220,%u", tmp, sizeof(tmp)) % r;
-			uint32_t sum = sum_(&tmp[1]);
-			
-
+			utils::sformat("PMTK220,%u", tmp, sizeof(tmp)) % r;
+			uint32_t sum = sum_(tmp);
+			char tmp2[24];
+			utils::sformat("$%s*%02X\r\n", tmp2, sizeof(tmp2)) % tmp % sum;
+			sci_.puts(tmp2);
+			update_rate_ = rate;
 			return true;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@breif	位置更新レートの取得
+			@return 位置更新レート
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_update_rate() const noexcept { return update_rate_; }
+
 
 #if 0
 // Position fix update rate commands.
@@ -630,7 +641,8 @@ namespace utils {
 
 // standby command & boot successful message
 #define PMTK_STANDBY "$PMTK161,0*28"
-#define PMTK_STANDBY_SUCCESS "$PMTK001,161,3*36"  // Not needed currently
+// Not needed currently
+#define PMTK_STANDBY_SUCCESS "$PMTK001,161,3*36"
 #define PMTK_AWAKE "$PMTK010,002*2D"
 
 // ask for the release and version
@@ -639,6 +651,30 @@ namespace utils {
 // request for updates on antenna status 
 #define PGCMD_ANTENNA "$PGCMD,33,1*6C" 
 #define PGCMD_NOANTENNA "$PGCMD,33,0*6D" 
+
+// センテンス例：
+$GPGSV,3,1,12,26,72,352,28,05,65,066,37,15,50,268,35,27,33,189,37*7F
+ 単語例 	説明 	意味
+3 	総GSVセンテンス数 	総GSVセンテンス数：3個
+1 	このセンテンスの番号 	3個中の１個目のセンテンス
+12 	ビュー内の総衛星数 	ビュー内の総衛星数：12個
+26 	衛星番号 	衛星番号：26
+72 	衛星仰角。00～90度 	衛星仰角：72度
+352 	衛星方位角。000～359度 	衛星方位角：352度
+28 	C/No（キャリア／ノイズ比）。00～99dB 	C/No：28dB
+05 	衛星番号 	衛星番号：05
+65 	衛星仰角。00～90度 	衛星仰角：65度
+066 	衛星方位角。000～359度 	衛星方位角：66度
+37 	C/No（キャリア／ノイズ比）。00～99dB 	C/No：37dB
+15 	衛星番号 	衛星番号：15
+50 	衛星仰角。00～90度 	衛星仰角：50度
+268 	衛星方位角。000～359度 	衛星方位角：268度
+35 	C/No（キャリア／ノイズ比）。00～99dB 	C/No：35dB
+27 	衛星番号 	衛星番号：27
+33 	衛星仰角。00～90度 	衛星仰角：33度
+189 	衛星方位角。000～359度 	衛星方位角：189度
+37 	C/No（キャリア／ノイズ比）。00～99dB 	C/No：37dB
+*7F 	チェックサム 	チェックサム値：7F
 #endif
 	};
 }
