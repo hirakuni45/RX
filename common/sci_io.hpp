@@ -82,7 +82,8 @@ namespace device {
 		uint8_t		level_;
 		bool		auto_crlf_;
 		static bool		soft_flow_;
-		static volatile bool	stop_;
+		static volatile bool		stop_;
+		static volatile uint16_t	errc_;
 
 		// ※マルチタスクの場合適切な実装をする
 		void sleep_() noexcept { asm("nop"); }
@@ -103,7 +104,9 @@ namespace device {
 				err = true;
 			}
 			volatile uint8_t data = SCI::RDR();
-			if(!err) {
+			if(err) {
+				++errc_;
+			} else {
 				if(soft_flow_) {
 					if(recv_.length() >= (recv_.size() - recv_.size() / 8)) {
 						stop_ = true;
@@ -160,7 +163,17 @@ namespace device {
 			auto_crlf_(autocrlf) {
 			soft_flow_ = softflow;
 			stop_ = false;
+			errc_ = 0;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	エラー数の取得
+			@return エラー数
+		 */
+		//-----------------------------------------------------------------//
+		static uint16_t get_error_count() noexcept { return errc_; }
 
 
 		//-----------------------------------------------------------------//
@@ -178,7 +191,7 @@ namespace device {
 			@param[in]	f	「false」なら無効
 		 */
 		//-----------------------------------------------------------------//
-		void soft_flow(bool f = true) noexcept { soft_flow_ = f; }
+		static void soft_flow(bool f = true) noexcept { soft_flow_ = f; }
 
 
 		//-----------------------------------------------------------------//
@@ -366,7 +379,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	SCI 入力文字数を取得
+			@brief	入力文字数を取得
 			@return	入力文字数
 		 */
 		//-----------------------------------------------------------------//
@@ -385,7 +398,20 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	SCI 文字入力（ブロック関数）
+			@brief	入力文字を捨てる
+		 */
+		//-----------------------------------------------------------------//
+		void flush_recv() noexcept
+		{
+			if(recv_length() > 0) {
+				recv_.clear();
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	文字入力（ブロック関数）
 			@return 文字コード
 		 */
 		//-----------------------------------------------------------------//
@@ -426,4 +452,6 @@ namespace device {
 		bool sci_io<SCI, RBF, SBF, PSEL, HCTL>::soft_flow_;
 	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
 		volatile bool sci_io<SCI, RBF, SBF, PSEL, HCTL>::stop_;
+	template<class SCI, class RBF, class SBF, port_map::option PSEL, class HCTL>
+		volatile uint16_t sci_io<SCI, RBF, SBF, PSEL, HCTL>::errc_;
 }
