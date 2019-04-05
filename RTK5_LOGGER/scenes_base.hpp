@@ -17,7 +17,11 @@
 #include "graphics/img_in.hpp"
 #include "graphics/menu.hpp"
 #include "graphics/dialog.hpp"
+#include "graphics/filer.hpp"
 #include "chip/FT5206.hpp"
+
+#include "common/spi_io2.hpp"
+#include "common/sdc_man.hpp"
 
 // #define SOFT_I2C
 
@@ -93,6 +97,25 @@ namespace app {
 		typedef resource<RENDER> RESOURCE;
 
 		typedef gui::dialog<RENDER, FT5206> DIALOG;
+
+#ifdef SDHI_IF
+		// RX65N Envision Kit の SDHI ポートは、候補３になっている
+		typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
+#else
+		// Soft SDC 用　SPI 定義（SPI）
+		typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
+		typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  // CMD
+		typedef device::PORT<device::PORT2, device::bitpos::B1> SPCK;  // CLK
+		typedef device::spi_io2<MISO, MOSI, SPCK> SPI;  ///< Soft SPI 定義
+		typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
+		typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD   カード検出
+		// カード電源制御は使わないので、「device::NULL_PORT」を指定する。
+//		typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
+		typedef device::NULL_PORT SDC_POWER;
+		typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
+#endif
+		typedef utils::sdc_man SDC;
+		typedef gui::filer<RENDER, SDC> FILER;
 
 	private:
 		GLCDC_IO	glcdc_io_;
@@ -183,6 +206,7 @@ namespace app {
 
 		typedef utils::nmea_dec<GPS> NMEA;
 
+
 	private:
 		FT5206_I2C	ft5206_i2c_;
 		FT5206		ft5206_;
@@ -190,6 +214,15 @@ namespace app {
 		MENU		menu_;
 		BACK		back_;
 		DIALOG		dialog_;
+
+#ifdef SDHI_IF
+		SDHI		sdh_;
+#else
+		SPI			spi_;
+		MMC			sdh_;
+#endif
+		SDC			sdc_;
+		FILER		filer_;
 
 		CMT			cmt_;
 
@@ -214,6 +247,7 @@ namespace app {
 			render_(glcdc_io_, font_),
 			ft5206_(ft5206_i2c_),
 			menu_(render_, back_), back_(render_), dialog_(render_, ft5206_),
+			spi_(), sdh_(spi_, 35000000), sdc_(), filer_(render_, sdc_),
 			resource_(render_),
 			plot_(render_), img_in_(plot_),
 			gps_(), nmea_(gps_)
