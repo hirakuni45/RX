@@ -15,6 +15,22 @@ FATFS_VER	=	ff12b
 
 BUILD		=	release
 
+ifeq ($(OS),Windows_NT)
+SYSTEM := WIN
+LOCAL_PATH	=	/mingw64
+else
+  UNAME := $(shell uname -s)
+  ifeq ($(UNAME),Linux)
+    SYSTEM := LINUX
+	LOCAL_PATH = /usr/local
+  endif
+  ifeq ($(UNAME),Darwin)
+    SYSTEM := OSX
+	OSX_VER := $(shell sw_vers -productVersion | sed 's/^\([0-9]*.[0-9]*\).[0-9]*/\1/')
+	LOCAL_PATH = /opt/local
+  endif
+endif
+
 VPATH		=	../
 
 ASOURCES	=	common/start.s
@@ -46,7 +62,7 @@ USER_DEFS	=	SIG_RX65N \
 
 MCU_TARGET	=	
 
-INC_SYS		=	/mingw64/include
+INC_SYS		=	$(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
 
