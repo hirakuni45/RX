@@ -1,9 +1,12 @@
-#-----------------------------------------------------------------------
-#    @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+# -*- tab-width : 4 -*-
+#=======================================================================
+#   @file
+#   @brief  RX prog Makefile
+#   @author 平松邦仁 (hira@rvf-rc45.net)
+#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
-#-----------------------------------------------------------------------
+#=======================================================================
 TARGET		=	rx_prog
 
 #ICON_RC		=	icon.rc
@@ -19,14 +22,26 @@ PSOURCES	=	main.cpp \
 				string_utils.cpp \
 				sjis_utf16.cpp
 
-STDLIBS		=
-OPTLIBS		=
+# Include path for each environment
 ifeq ($(OS),Windows_NT)
-INC_SYS		=	/mingw64/include
+SYSTEM := WIN
+LOCAL_PATH  =   /mingw64
 else
-INC_SYS		=	/usr/local/include
+  UNAME := $(shell uname -s)
+  ifeq ($(UNAME),Linux)
+    SYSTEM := LINUX
+    LOCAL_PATH = /usr/local
+  endif
+  ifeq ($(UNAME),Darwin)
+    SYSTEM := OSX
+    OSX_VER := $(shell sw_vers -productVersion | sed 's/^\([0-9]*.[0-9]*\).[0-9]*/\1/')
+    LOCAL_PATH = /opt/local
+  endif
 endif
 
+STDLIBS		=
+OPTLIBS		=
+INC_SYS     =   $(LOCAL_PATH)/include
 INC_LIB		=
 
 PINC_APP	=
