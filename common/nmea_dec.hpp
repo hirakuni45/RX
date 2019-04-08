@@ -80,10 +80,11 @@ namespace utils {
 		uint32_t	iid_;
 
 		uint16_t	intr_;
-		uint16_t	update_rate_;
-		uint32_t	real_baud_;
-		uint32_t	fast_baud_;
+		uint16_t	update_real_rate_;
+		uint16_t	update_fast_rate_;
 		uint16_t	no_recv_cnt_;
+		uint32_t	baud_real_rate_;
+		uint32_t	baud_fast_rate_;
 
 		static uint16_t word_(const char* src)
 		{
@@ -122,7 +123,7 @@ namespace utils {
 		}
 
 
-		bool decode_()
+		bool parse_()
 		{
 			if(line_[0] != '$') return false;
 
@@ -158,8 +159,8 @@ namespace utils {
 				}
 			} else if(std::strncmp(&line_[1], "GPGSV,", 6) == 0) {  // 衛星情報
 				const char* p = &line_[7];
-				uint16_t n = 0;
 				uint16_t sidx = 0;
+				uint16_t n = 0;
 				uint16_t l;
 				while((l = word_(p)) != 0) {
 					if(n == 1) {
@@ -168,10 +169,12 @@ namespace utils {
 						sidx = get_dec_(tmp);
 						sidx *= 4;
 					} else if(n >= 3) {
+						if(*(p - 1) == '*') break;
 						auto& t = sinfo_[sidx % SINFO_MAX];
 						auto mod = (n - 3) % 4;
-						if(mod == 0) copy_word_(t.no_, p, l - 1);
-						else if(mod == 1) copy_word_(t.elv_, p, l - 1);
+						if(mod == 0) {
+							copy_word_(t.no_, p, l - 1);
+						} else if(mod == 1) copy_word_(t.elv_, p, l - 1);
 						else if(mod == 2) copy_word_(t.azi_, p, l - 1);
 						else if(mod == 3) {
 							copy_word_(t.cn_, p, l - 1);
@@ -224,9 +227,10 @@ namespace utils {
 			time_{ 0 }, lat_{ 0 }, ns_{ 0 }, lon_{ 0 },
 			ew_{ 0 }, q_{ 0 }, satellite_{ 0 }, hq_{ 0 },
 			alt_{ 0 }, alt_unit_{ 0 }, date_{ 0 },
-			sidx_(0), id_(0), iid_(0),
-			intr_(0), update_rate_(1), real_baud_(0), fast_baud_(0),
-			no_recv_cnt_(0)
+			sidx_(0), id_(0), iid_(0), intr_(0),
+			update_real_rate_(0), update_fast_rate_(0),
+			no_recv_cnt_(0),
+			baud_real_rate_(0), baud_fast_rate_(0)
 		{ }
 
 
@@ -462,11 +466,12 @@ namespace utils {
 		void start(uint16_t intr = 1, uint32_t fast = FAST_BAUDRATE, uint16_t rate = 10) noexcept
 		{
 			intr_ = intr;
-			real_baud_ = 9600;
-			fast_baud_ = fast;
-			update_rate_ = rate;
+			baud_real_rate_ = 9600;  // 電源が入った時は９６００
+			baud_fast_rate_ = fast;
+			update_real_rate_ = 1;
+			update_fast_rate_ = rate;
 			init_();
-			sci_.start(real_baud_, intr);
+			sci_.start(baud_real_rate_, intr);
 		}
 
 
@@ -486,10 +491,10 @@ namespace utils {
 				sci_.flush_recv();
 				++no_recv_cnt_;
 				if(no_recv_cnt_ >= (60 * 5)) {  // ５秒間受信が無い場合、ボーレートを変更
-					if(real_baud_ == 9600) {  // 9600 で通信出来てないので、高速になってるかも
-						sci_.start(fast_baud_, intr_);
-						init_();
-						real_baud_ = fast_baud_;
+					if(baud_real_rate_ == 9600) {  // 9600 で通信出来てないので、高速になってるかも
+///						sci_.start(fast_baud_, intr_);
+///						init_();
+///						baud_real_rate_ = baud_fast_rate_;
 					}
 					no_recv_cnt_ = 0;
 				}
@@ -498,8 +503,8 @@ namespace utils {
 
 			bool ret = false;
 			if(len > 0) {
-				if(real_baud_ == 9600) {  // 9600 で通信出来てる場合、高速にキック
-					set_baudrate(fast_baud_);
+				if(baud_real_rate_ == 9600) {  // 9600 で通信出来てる場合、高速にキック
+///					set_baudrate(fast_baud_);
 				}
 			}
 			no_recv_cnt_ = 0;
@@ -507,7 +512,7 @@ namespace utils {
 				auto ch = sci_.getch();
 				if(ch == 0x0d) {
 					line_[pos_] = 0;
-					ret = decode_();
+					ret = parse_();
 					pos_ = 0;
 				} else {
 					if(ch >= ' ' && ch <= 0x7f) {  // CTRL コードは無視する。
@@ -521,9 +526,9 @@ namespace utils {
 				}
 				--len;
 			}
-			if(ret && real_baud_ == fast_baud_) {
-				if(update_rate_ == 1) {
-					set_update_rate(UPDATE_FAST_RATE);
+			if(ret && baud_real_rate_ == baud_fast_rate_) {  // fast rate なら、10Hz にする。
+				if(update_real_rate_ == 1) {
+///					set_update_rate(UPDATE_FAST_RATE);
 				}
 			}
 			return ret;
@@ -545,16 +550,16 @@ namespace utils {
 //			"PMTK251,57600",
 //			"PMTK251,115200",
 
-			if(real_baud_ == baud) return;
-			real_baud_ = baud;
+			if(baud_real_rate_ == baud) return;
+			baud_real_rate_ = baud;
 
 			char tmp[24];
-			utils::sformat("PMTK251,%u", tmp, sizeof(tmp)) % real_baud_;
+			utils::sformat("PMTK251,%u", tmp, sizeof(tmp)) % baud_real_rate_;
 			uint32_t sum = sum_(tmp);
 			char tmp2[24];
 			utils::sformat("$%s*%02X\r\n", tmp2, sizeof(tmp2)) % tmp % sum;
 			sci_.puts(tmp2);
-			sci_.start(real_baud_, intr_);
+			sci_.start(baud_real_rate_, intr_);
 			init_();
 		}
 
@@ -565,7 +570,7 @@ namespace utils {
 			@return	通信中のボーレート
 		 */
 		//-----------------------------------------------------------------//
-		uint32_t get_baudrate() const noexcept { return real_baud_; }
+		uint32_t get_baudrate() const noexcept { return baud_real_rate_; }
 
 
 		//-----------------------------------------------------------------//
@@ -591,7 +596,7 @@ namespace utils {
 			char tmp2[24];
 			utils::sformat("$%s*%02X\r\n", tmp2, sizeof(tmp2)) % tmp % sum;
 			sci_.puts(tmp2);
-			update_rate_ = rate;
+			update_real_rate_ = rate;
 			return true;
 		}
 
@@ -602,7 +607,7 @@ namespace utils {
 			@return 位置更新レート
 		 */
 		//-----------------------------------------------------------------//
-		uint32_t get_update_rate() const noexcept { return update_rate_; }
+		uint32_t get_update_rate() const noexcept { return update_real_rate_; }
 
 
 #if 0
