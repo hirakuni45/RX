@@ -1,3 +1,4 @@
+# -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
 #   @brief  RX66T Makefile
@@ -32,6 +33,23 @@ USER_DEFS	=	SIG_RX66T \
 				F_FCLK=40000000 F_BCLK=40000000
 
 MCU_TARGET	=	
+
+# Include path for each environment
+ifeq ($(OS),Windows_NT)
+SYSTEM := WIN
+LOCAL_PATH  =   /mingw64
+else
+  UNAME := $(shell uname -s)
+  ifeq ($(UNAME),Linux)
+    SYSTEM := LINUX
+    LOCAL_PATH = /usr/local
+  endif
+  ifeq ($(UNAME),Darwin)
+    SYSTEM := OSX
+    OSX_VER := $(shell sw_vers -productVersion | sed 's/^\([0-9]*.[0-9]*\).[0-9]*/\1/')
+    LOCAL_PATH = /opt/local
+  endif
+endif
 
 INC_SYS		=
 
@@ -78,7 +96,7 @@ ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
 # Override is only needed by avr-lib build system.
 
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++14 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
+PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
 
