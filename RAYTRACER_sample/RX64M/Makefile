@@ -1,3 +1,4 @@
+# -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
 #   @brief  RX64M Makefile
@@ -36,8 +37,24 @@ USER_DEFS	=	SIG_RX64M \
 
 MCU_TARGET	=	
 
-# for boost path
-INC_SYS		=	/mingw64/include
+# Include path for each environment
+ifeq ($(OS),Windows_NT)
+SYSTEM := WIN
+LOCAL_PATH  =   /mingw64
+else
+  UNAME := $(shell uname -s)
+  ifeq ($(UNAME),Linux)
+    SYSTEM := LINUX
+    LOCAL_PATH = /usr/local
+  endif
+  ifeq ($(UNAME),Darwin)
+    SYSTEM := OSX
+    OSX_VER := $(shell sw_vers -productVersion | sed 's/^\([0-9]*.[0-9]*\).[0-9]*/\1/')
+    LOCAL_PATH = /opt/local
+  endif
+endif
+
+INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../
 
