@@ -363,7 +363,7 @@ static void dhcp_to_selecting(dhcp_inf_t* pt_dhcpinf)
 ***********************************************************************************************************************/
 static void dhcp_apipa(dhcp_inf_t* pt_dhcpinf)
 {
-    in_addr_t   ipaddr, mskaddr;
+    in_addr_t_  ipaddr, mskaddr;
     uint8_t     uc_rnd;
 
     dhcp_memset_local(&(pt_dhcpinf->t_dhcp_param_get_inf), 0, sizeof(DHCP));

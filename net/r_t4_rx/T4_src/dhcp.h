@@ -169,7 +169,7 @@ typedef struct _in_addr
         } S_un_w;
         uint32_t        S_addr;
     }S_un;
-} in_addr_t;
+} in_addr_t_;
 
 typedef struct
 {
