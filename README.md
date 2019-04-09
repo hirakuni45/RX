@@ -66,11 +66,11 @@ In device I / O operation, a dedicated header is prepared using template class l
 |Directory/file|Contents|
 |-----------------------|----------------------------------------------|
 |[/RX600](./RX600)      |RX microcontroller common device definition class|
-|[/RX24T](./RX24T)      |Device definition class dedicated to RX24T, linker script icon common device definition class|
-|[/RX64M](./RX64M)      |Device definition class dedicated to RX64M, linker script icon common device definition class|
-|[/RX71M](./RX71M)      |Device definition class dedicated to RX71M, linker script icon common device definition class|
-|[/RX65x](./RX65x)      |Device definition class dedicated to RX65(1N), linker script icon common device definition class|
-|[/RX66T](./RX66T)      |Device definition class dedicated to RX66T, linker script icon common device definition class|
+|[/RX24T](./RX24T)      |Device definition class dedicated to RX24T, linker script|
+|[/RX64M](./RX64M)      |Device definition class dedicated to RX64M, linker script|
+|[/RX71M](./RX71M)      |Device definition class dedicated to RX71M, linker script|
+|[/RX65x](./RX65x)      |Device definition class dedicated to RX65(1N), linker script|
+|[/RX66T](./RX66T)      |Device definition class dedicated to RX66T, linker script|
 |[/ff12b](./ff12b)      |ChaN's fatfs source code and handler for RX microcontroller|
 |[/common](./common)    |Shared classes, utilities, etc.|
 |[/chip](./chip)        |Device-specific control driver library for I2C, SPI, etc.|
