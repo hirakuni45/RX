@@ -9,7 +9,7 @@
 #=======================================================================
 TARGET		=	raytracer_sample
 
-DEVICE		=	R5F566TA
+DEVICE		=	R5F566TE
 
 BUILD		=	release
 
