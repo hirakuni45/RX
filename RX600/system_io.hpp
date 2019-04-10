@@ -24,8 +24,7 @@ namespace device {
 		@param[in]	EXT_CLOCK	外部クロックに入力を行う場合「true」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t BASE_CLOCK = 12000000, uint32_t INTR_CLOCK = 240000000,
-		bool EXT_CLOCK = false>
+	template <uint32_t BASE_CLOCK = 12000000, uint32_t INTR_CLOCK = 240000000, bool EXT_CLOCK = false>
 	struct system_io {
 
 		static uint8_t clock_div_(uint32_t clk) noexcept
@@ -82,7 +81,7 @@ namespace device {
 			if(n < 20) n = 20;
 			else if(n > 60) n = 60;
 			n -= 20;
-			device::SYSTEM::PLLCR.STC = n + 0b010011;  // base 240MHz(12MHz)
+			device::SYSTEM::PLLCR.STC = n + 0b010011;  // base x10
 			device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
 			while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) { asm("nop"); }
 
