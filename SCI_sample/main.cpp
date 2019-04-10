@@ -53,7 +53,7 @@ namespace {
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX24T" };
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10000000, 16000000> SYSTEM_IO;
+	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX66T" };
