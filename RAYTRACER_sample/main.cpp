@@ -60,7 +60,7 @@ namespace {
 	static const uint16_t LCD_Y = 240;
 	uint16_t*	fb_ = nullptr;
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10000000, 16000000> SYSTEM_IO;
+	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX66T" };
@@ -97,6 +97,7 @@ namespace {
 	};
 	typedef graphics::render<GLCDC_IO, FONT> RENDER;
 #endif
+
 	GLCDC_IO	glcdc_io_(nullptr, fb_);
 	RENDER		render_(glcdc_io_, font_);
 
