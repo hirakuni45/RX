@@ -19,12 +19,22 @@
 #include "graphics/font.hpp"
 #include "graphics/graphics.hpp"
 
+#include "chip/bus_rw.hpp"
+#include "chip/R61505.hpp"
+
 #include "raytracer.hpp"
 
 namespace {
 
 	typedef device::cmt_io<device::CMT0> CMT;
-	CMT		cmt_;
+	CMT			cmt_;
+
+	typedef graphics::font8x16 AFONT;
+	typedef graphics::kfont_null KFONT;
+	typedef graphics::font<AFONT, KFONT> FONT;
+	AFONT		afont_;
+	KFONT		kfont_;
+	FONT		font_(afont_, kfont_);
 
 #if defined(SIG_RX71M)
 	typedef device::system_io<12000000> SYSTEM_IO;
@@ -34,6 +44,20 @@ namespace {
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	uint16_t	fb_[LCD_X * LCD_Y];
+
+	typedef device::PORT<device::PORTA, device::bitpos::B1> RS;
+	typedef device::PORT<device::PORT5, device::bitpos::B2> RD;
+	typedef device::PORT<device::PORT5, device::bitpos::B0> WR;
+	typedef device::PORT<device::PORT2, device::bitpos::B4> CS;
+	typedef device::PORT_BYTE<device::PORTD> DL;
+	typedef device::PORT_BYTE<device::PORTE> DH;
+	typedef device::bus_rw16<CS, RS, RD, WR, DL, DH> BUS;
+	BUS         bus_;
+
+	typedef device::PORT<device::PORT0, device::bitpos::B2> RES;
+	typedef chip::R61505<BUS, RES> TFT;
+	TFT         tft_;
+
 #elif defined(SIG_RX64M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
@@ -42,6 +66,7 @@ namespace {
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	uint16_t	fb_[LCD_X * LCD_Y];
+
 #elif defined(SIG_RX65N)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -51,6 +76,13 @@ namespace {
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
 	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x00000100);
+	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
+	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
+	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_IO;
+	typedef graphics::render<GLCDC_IO, FONT> RENDER;
+	GLCDC_IO	glcdc_io_(nullptr, fb_);
+	RENDER		render_(glcdc_io_, font_);
+
 #elif defined(SIG_RX24T)
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
@@ -58,7 +90,16 @@ namespace {
 	static const char* system_str_ = { "RX24T" };
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
-	uint16_t*	fb_ = nullptr;
+	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
+	typedef device::PORT<device::PORT5, device::bitpos::B3> WR;
+	typedef device::PORT<device::PORT5, device::bitpos::B2> RS;
+	typedef device::PORT<device::PORT5, device::bitpos::B1> CS;
+	typedef device::PORT_BYTE<device::PORT4> DA;
+	typedef device::bus_rw8<CS, RS, RD, WR, DA> BUS;
+	typedef device::PORT<device::PORT5, device::bitpos::B0> RES;
+	typedef chip::R61505<BUS, RES> TFT;
+	TFT         tft_;
+
 #elif defined(SIG_RX66T)
 	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
@@ -66,40 +107,17 @@ namespace {
 	static const char* system_str_ = { "RX66T" };
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
-	uint16_t*	fb_ = nullptr;
+	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
+	typedef device::PORT<device::PORT5, device::bitpos::B3> WR;
+	typedef device::PORT<device::PORT5, device::bitpos::B2> RS;
+	typedef device::PORT<device::PORT5, device::bitpos::B1> CS;
+	typedef device::PORT_BYTE<device::PORT4> DA;
+	typedef device::bus_rw8<CS, RS, RD, WR, DA> BUS;
+	typedef device::PORT<device::PORT5, device::bitpos::B0> RES;
+	typedef chip::R61505<BUS, RES> TFT;
+	TFT         tft_;
+
 #endif
-
-	typedef graphics::font8x16 AFONT;
-	typedef graphics::kfont_null KFONT;
-	typedef graphics::font<AFONT, KFONT> FONT;
-	AFONT		afont_;
-	KFONT		kfont_;
-	FONT		font_(afont_, kfont_);
-
-// GLCDC for RX65
-#if defined(SIG_RX65N)
-	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
-	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_IO;
-//	typedef device::drw2d_mgr<GLCDC_IO, FONT> RENDER;
-	typedef graphics::render<GLCDC_IO, FONT> RENDER;
-#else
-	class GLCDC_IO {
-		void*	fb_;
-	public:
-		static const int16_t width  = LCD_X;
-		static const int16_t height = LCD_Y;
-		static const graphics::pixel::TYPE PXT = graphics::pixel::TYPE::RGB565;
-		GLCDC_IO(void* fb1, void* fb2) : fb_(fb2) { }
-        void* get_fbp() const noexcept {
-            return fb_;
-        }
-	};
-	typedef graphics::render<GLCDC_IO, FONT> RENDER;
-#endif
-
-	GLCDC_IO	glcdc_io_(nullptr, fb_);
-	RENDER		render_(glcdc_io_, font_);
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
@@ -114,6 +132,17 @@ namespace {
 	typedef utils::command<256> CMD;
 	CMD 		cmd_;
 
+
+	void clear_screen_()
+	{
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+		render_.clear(graphics::def_color::Black);
+#else
+		tft_.fill_box(0, 0, LCD_X, LCD_Y, 0x0000);
+#endif
+	}
+
+
 	void command_()
 	{
 		if(!cmd_.service()) {
@@ -123,16 +152,16 @@ namespace {
 		if(cmdn >= 1) {
 			bool f = false;
 			if(cmd_.cmp_word(0, "clear")) {
-				render_.clear(graphics::def_color::Black);
+///				render_.clear(graphics::def_color::Black);
 				f = true;
 			} else if(cmd_.cmp_word(0, "render")) {
-				render_.clear(graphics::def_color::Black);
+///				render_.clear(graphics::def_color::Black);
 				render_width_  = 320;
 				render_height_ = 240;
 				run_ = false;
 				f = true;
 			} else if(cmd_.cmp_word(0, "full")) {
-				render_.clear(graphics::def_color::Black);
+///				render_.clear(graphics::def_color::Black);
 				render_width_  = LCD_X;
 				render_height_ = LCD_Y;
 				run_ = false;
@@ -159,16 +188,24 @@ extern "C" {
 	void draw_pixel(int x, int y, int r, int g, int b)
 	{
 		auto c = graphics::share_color::to_565(r, g, b);
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 		render_.plot(vtx::spos(x, y), c);
+#else
+		tft_.plot(x, y, c);
+#endif
 	}
 
 
 	void draw_text(int x, int y, const char* t)
 	{
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 		render_.set_fore_color(graphics::def_color::Black);
 		render_.fill_box(vtx::srect(x, y, strlen(t) * AFONT::width, AFONT::height));
 		render_.set_fore_color(graphics::def_color::White);
 		render_.draw_text(vtx::spos(x, y), t);
+#else
+
+#endif
 	}
 
 
@@ -218,7 +255,7 @@ int main(int argc, char** argv)
 		cmt_.start(1000, intr_lvl);
 	}
 
-	utils::format("\r%s Start for Ray Trace\n") % system_str_;
+	utils::format("\r%s Start for Ray Trace: %u, %u\n") % system_str_ % LCD_X % LCD_Y;
 
 	cmd_.set_prompt("# ");
 
@@ -240,12 +277,13 @@ int main(int argc, char** argv)
 		}
 	}
 	SW2::DIR = 0;
-
-	// DRW2D Engine start...
-	render_.start();
+#elif defined(SIG_RX24T) || defined(SIG_RX66T)
+	tft_.start();
 #endif
 
 	LED::DIR = 1;
+
+	clear_screen_();
 
 	run_ = false;
 
@@ -270,16 +308,16 @@ int main(int argc, char** argv)
 			run_ = false;
 		}
 		sw = v;
+#elif defined(SIG_RX71M) || defined(SIG_RX24T) || defined(SIG_RX66T)
+ 		utils::delay::milli_second(17);
 #endif
 
 		command_();
 
-#if defined(SIG_RX65N)
 		if(!run_) {
 			doRaytrace(sampling_, render_width_, render_height_);
 			run_ = true;
 		}
-#endif
 
 		++n;
 		if(n >= 30) {
