@@ -261,6 +261,23 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	点を描画する
+			@param[in]	pos	開始点を指定
+			@param[in]	c	カラー
+            @return 範囲内なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool fast_plot(const vtx::spos& pos, T c) noexcept
+		{
+			if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(clip_.size.x)) return false;
+			if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(clip_.size.y)) return false;
+			fb_[pos.y * line_offset + pos.x] = c;
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	点を取得する
 			@param[in]	pos	開始点を指定
 			@return	カラー
@@ -649,8 +666,8 @@ namespace graphics {
 			for(uint8_t i = 0; i < ssz.y; ++i) {
 				loc.x = pos.x;
 				for(uint8_t j = 0; j < ssz.x; ++j) {
-					if(c & k) plot(loc, fore_color_.rgb565);
-					else if(back) plot(loc, back_color_.rgb565);
+					if(c & k) fast_plot(loc, fore_color_.rgb565);
+					else if(back) fast_plot(loc, back_color_.rgb565);
 					k <<= 1;
 					if(k == 0) {
 						k = 1;
