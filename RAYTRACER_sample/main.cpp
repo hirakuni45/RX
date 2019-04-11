@@ -2,7 +2,7 @@
 /*! @file
     @brief  RX24T/RX64M/RX71M/RX65N/RX66T RayTracer
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -43,7 +43,6 @@ namespace {
 	static const char* system_str_ = { "RX71M" };
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
-	uint16_t	fb_[LCD_X * LCD_Y];
 
 	typedef device::PORT<device::PORTA, device::bitpos::B1> RS;
 	typedef device::PORT<device::PORT5, device::bitpos::B2> RD;
@@ -52,8 +51,6 @@ namespace {
 	typedef device::PORT_BYTE<device::PORTD> DL;
 	typedef device::PORT_BYTE<device::PORTE> DH;
 	typedef device::bus_rw16<CS, RS, RD, WR, DL, DH> BUS;
-	BUS         bus_;
-
 	typedef device::PORT<device::PORT0, device::bitpos::B2> RES;
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
@@ -65,7 +62,17 @@ namespace {
 	static const char* system_str_ = { "RX64M" };
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
-	uint16_t	fb_[LCD_X * LCD_Y];
+
+	typedef device::PORT<device::PORTA, device::bitpos::B1> RS;
+	typedef device::PORT<device::PORT5, device::bitpos::B2> RD;
+	typedef device::PORT<device::PORT5, device::bitpos::B0> WR;
+	typedef device::PORT<device::PORT2, device::bitpos::B4> CS;
+	typedef device::PORT_BYTE<device::PORTD> DL;
+	typedef device::PORT_BYTE<device::PORTE> DH;
+	typedef device::bus_rw16<CS, RS, RD, WR, DL, DH> BUS;
+	typedef device::PORT<device::PORT0, device::bitpos::B2> RES;
+	typedef chip::R61505<BUS, RES> TFT;
+	TFT         tft_;
 
 #elif defined(SIG_RX65N)
 	typedef device::system_io<12000000> SYSTEM_IO;
@@ -119,6 +126,27 @@ namespace {
 
 #endif
 
+#if defined(SIG_RX65N)
+#else
+	template <uint32_t X, uint32_t Y>
+	class glc {
+
+		uint16_t	fb_[X * Y];
+
+	public:
+		static const uint16_t width  = X;
+		static const uint16_t height = Y;
+
+		glc() { }
+
+		void* get_fbp() { return fb_; }
+	};
+	typedef glc<8 * 16, 16> GLC;
+	GLC			glc_;
+	typedef graphics::render<GLC, FONT> RENDER;
+	RENDER		render_(glc_, font_);
+#endif
+
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
 	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
@@ -135,10 +163,10 @@ namespace {
 
 	void clear_screen_()
 	{
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX65N)
 		render_.clear(graphics::def_color::Black);
 #else
-		tft_.fill_box(0, 0, LCD_X, LCD_Y, 0x0000);
+		tft_.fill_box(vtx::srect(0, 0, LCD_X, LCD_Y), 0x0000);
 #endif
 	}
 
@@ -152,16 +180,16 @@ namespace {
 		if(cmdn >= 1) {
 			bool f = false;
 			if(cmd_.cmp_word(0, "clear")) {
-///				render_.clear(graphics::def_color::Black);
+				clear_screen_();
 				f = true;
 			} else if(cmd_.cmp_word(0, "render")) {
-///				render_.clear(graphics::def_color::Black);
+				clear_screen_();
 				render_width_  = 320;
 				render_height_ = 240;
 				run_ = false;
 				f = true;
 			} else if(cmd_.cmp_word(0, "full")) {
-///				render_.clear(graphics::def_color::Black);
+				clear_screen_();
 				render_width_  = LCD_X;
 				render_height_ = LCD_Y;
 				run_ = false;
@@ -169,7 +197,7 @@ namespace {
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    clear     clear screen\n");
 				utils::format("    render    renderring 320x240\n");
-				utils::format("    full      renderring 480x272\n");
+				utils::format("    full      renderring %ux%u\n") % LCD_X % LCD_Y;
 				f = true;
 			}
 			if(!f) {
@@ -188,23 +216,36 @@ extern "C" {
 	void draw_pixel(int x, int y, int r, int g, int b)
 	{
 		auto c = graphics::share_color::to_565(r, g, b);
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX65N)
 		render_.plot(vtx::spos(x, y), c);
 #else
-		tft_.plot(x, y, c);
+		static uint16_t line[LCD_X];
+		line[x] = c;
+		if(x == (render_width_ - 1)) {
+			tft_.copy(vtx::spos(0, y), line, LCD_X);
+		}
 #endif
 	}
 
 
 	void draw_text(int x, int y, const char* t)
 	{
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX65N)
 		render_.set_fore_color(graphics::def_color::Black);
 		render_.fill_box(vtx::srect(x, y, strlen(t) * AFONT::width, AFONT::height));
 		render_.set_fore_color(graphics::def_color::White);
 		render_.draw_text(vtx::spos(x, y), t);
 #else
-
+		render_.set_fore_color(graphics::def_color::Black);
+		auto len = strlen(t) * AFONT::width;
+		render_.fill_box(vtx::srect(0, 0, len, AFONT::height));
+		render_.set_fore_color(graphics::def_color::White);
+		render_.draw_text(vtx::spos(0, 0), t);
+		const uint16_t* src = static_cast<const uint16_t*>(glc_.get_fbp());
+		for(uint16_t i = 0; i < AFONT::height; ++i) {
+			tft_.copy(vtx::spos(x, y + i), src, len);
+			src += GLC::width;
+		}
 #endif
 	}
 
@@ -277,7 +318,7 @@ int main(int argc, char** argv)
 		}
 	}
 	SW2::DIR = 0;
-#elif defined(SIG_RX24T) || defined(SIG_RX66T)
+#else
 	tft_.start();
 #endif
 
@@ -308,7 +349,7 @@ int main(int argc, char** argv)
 			run_ = false;
 		}
 		sw = v;
-#elif defined(SIG_RX71M) || defined(SIG_RX24T) || defined(SIG_RX66T)
+#else
  		utils::delay::milli_second(17);
 #endif
 
