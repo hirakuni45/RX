@@ -81,8 +81,6 @@ namespace {
 	typedef device::PORT<device::PORT5, device::bitpos::B1> CS;
 	typedef device::PORT_BYTE<device::PORT4> DATA;
 	typedef device::bus_rw8<CS, RS, RD, WR, DATA> BUS;
-	BUS		bus_;
-
 	typedef device::PORT<device::PORT5, device::bitpos::B0> RES;
 	typedef chip::R61505<BUS, RES> LCD;
 	LCD		lcd_;
@@ -118,7 +116,7 @@ extern "C" {
 		volatile uint16_t c = (static_cast<uint16_t>(r & 0xf8) << 8)
 				   | (static_cast<uint16_t>(g & 0xfc) << 3)
 				   | (static_cast<uint16_t>(b) >> 3);		
-		lcd_.plot(x, y, c);
+		lcd_.plot(vtx::spos(x, y), c);
 	}
 
 
@@ -198,7 +196,7 @@ int main(int argc, char** argv)
 		if(!lcd_.start()) {
 			utils::format("R61505 not start\n");
 		} else {
-			lcd_.fill_box(0, 0, 320, 240, 0x0000);
+			lcd_.fill_box(vtx::srect(0, 0, 320, 240), 0x0000);
 			doRaytrace(1, 320, 240);
 		}
 	}
