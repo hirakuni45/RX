@@ -11,7 +11,7 @@ This is a program by Renesas RX microcontroller and its compiler rx-elf-gcc, g++
 Currently, a dedicated writing program has been implemented that has been tested on Windows, OS-X, and Linux.   
 Development is now possible in multiple environments.   
    
-- Currently supported and tested devices are RX24T, RX64M, RX65N, RX71M.   
+- Currently supported and tested devices are RX24T, RX66T, RX64M, RX65N, RX71M.   
 I extend the device class daily.   
 - I update it daily including directory configuration.   
    
