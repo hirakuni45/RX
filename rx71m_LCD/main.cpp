@@ -81,7 +81,7 @@ namespace {
 	{
 		const uint16_t* src = static_cast<const uint16_t*>(glc_.get_fbp());
 		for(uint16_t y = 0; y < GLC::height; ++y) {
-			tft_.copy(0, y, src, GLC::width);
+			tft_.copy(vtx::spos(0, y), src, GLC::width);
 			src += GLC::width;
 		}
 	}
@@ -158,7 +158,7 @@ int main(int argc, char** argv)
 	utils::format("Start TFT-LCD sample\n");
 
 	if(tft_.start()) {
-		tft_.fill_box(0, 0, 320, 240, 0x0000);
+		tft_.fill_box(vtx::srect(0, 0, 320, 240), 0x0000);
 	} else {
 		utils::format("TFT-LCD not start...\n");
 	}
