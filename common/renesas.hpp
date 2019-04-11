@@ -111,6 +111,7 @@
 #include "RX600/dmac.hpp"
 #include "RX600/elc.hpp"
 #include "RX600/mpc.hpp"
+#include "RX66T/hrpwm.hpp"
 #include "RX600/can.hpp"
 #include "RX600/r12da.hpp"
 #include "RX600/usb.hpp"
