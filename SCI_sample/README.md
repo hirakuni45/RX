@@ -22,7 +22,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
  - RX66T: 160MHz (10MHz)
  - インジケーター LED を指定のポートに接続する。
  - USB シリアルの信号と設定の SCI ポートを接続する。
- - RX6x, RX71M, SCI の標準ポートは、「RX600/port_map.hpp」参照。
+ - RX65N, RX71M, SCI の標準ポートは、「RX600/port_map.hpp」参照。
  - RX24T, SCI の標準ポートは、「RX24T/port_map.hpp」参照。
 ```
 #if defined(SIG_RX64M)
