@@ -122,12 +122,12 @@ namespace device {
 			DA::P = val >> 8;
 			CS::P = 0;
 			WR::P = 0;
-			utils::delay::loop(3);
+			utils::delay::loop(2);
 			WR::P = 1;
-			utils::delay::loop(3);
+			utils::delay::loop(2);
 			DA::P = val & 0xff;
 			WR::P = 0;
-			utils::delay::loop(3);
+			utils::delay::loop(2);
 			CS::P = 1;
 			WR::P = 1;
 		}
