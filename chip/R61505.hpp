@@ -12,6 +12,7 @@
 //=========================================================================//
 #include <cstdint>
 #include "common/delay.hpp"
+#include "common/vtx.hpp"
 // #include "common/format.hpp"
 
 namespace chip {
@@ -189,17 +190,16 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	点を描画
-			@param[in] x	X 位置
-			@param[in] y	Y 位置
+			@param[in] pos	位置
 			@param[in] c	カラー（RGB565）
 		 */
 		//-----------------------------------------------------------------//
-		void plot(int16_t x, int16_t y, uint16_t c) noexcept
+		void plot(const vtx::spos& pos, uint16_t c) noexcept
 		{
 			BUS::write(0, 0x20);  // Horizontal Address (8 bits)
-			BUS::write(1, y);
+			BUS::write(1, pos.y);
 			BUS::write(0, 0x21);  // Vertical Address (9 bits)
-			BUS::write(1, x);
+			BUS::write(1, pos.x);
 			BUS::write(0, 0x22);  // Frame Memory Data Write (16bits)
 			BUS::write(1, c);
 		}
@@ -208,23 +208,20 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	箱を描画
-			@param[in] x	X 位置
-			@param[in] y	Y 位置
-			@param[in] w	横幅
-			@param[in] h	高さ
+			@param[in] rect	範囲	
 			@param[in] c	カラー（RGB565）
 		 */
 		//-----------------------------------------------------------------//
-		void fill_box(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t c) noexcept
+		void fill_box(const vtx::srect& rect, uint16_t c) noexcept
 		{
-			for(int16_t yy = y; yy < (y + h); ++yy) {
+			for(int16_t yy = rect.org.y; yy < rect.end_y(); ++yy) {
 				BUS::write(0, 0x20);
 				BUS::write(1, yy);
 
 				BUS::write(0, 0x21);  // Vertical Address (9 bits)
-				BUS::write(1, x);
+				BUS::write(1, rect.org.x);
 				BUS::write(0, 0x22);  // Frame Memory Data Write (16bits)
-				for(int16_t xx = x; xx < (x + w); ++xx) {
+				for(int16_t xx = rect.org.x; xx < rect.end_x(); ++xx) {
 					BUS::write(1, c);
 				}
 			}
@@ -234,18 +231,17 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	画素をコピー
-			@param[in] x	X 位置
-			@param[in] y	Y 位置
+			@param[in] org	開始位置
 			@param[in] src	コピー元
 			@param[in] len	コピー長
 		 */
 		//-----------------------------------------------------------------//
-		void copy(int16_t x, int16_t y, const uint16_t* src, uint16_t len) noexcept
+		void copy(const vtx::spos& org, const uint16_t* src, uint16_t len) noexcept
 		{
 			BUS::write(0, 0x20);
-			BUS::write(1, y);
+			BUS::write(1, org.y);
 			BUS::write(0, 0x21);  // Vertical Address (9 bits)
-			BUS::write(1, x);
+			BUS::write(1, org.x);
 			BUS::write(0, 0x22);  // Frame Memory Data Write (16bits)
 			for(uint16_t n = 0; n < len; ++n) {
 				BUS::write(1, *src++);
