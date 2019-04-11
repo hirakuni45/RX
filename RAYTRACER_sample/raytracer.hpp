@@ -374,13 +374,19 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
 	  draw_pixel(x, y, r, g, b);
     }
 
-    char buf[50];
-	auto tm = millis() - t;
-	utils::sformat("%3d%% %dms (%d)", buf, sizeof(buf)) % ((y+q)*100/dh) % tm % raysPerPixel;
-	draw_text(8, 0, buf);
+//	char buf[50];
+//	auto tm = millis() - t;
+//	utils::sformat("%3d%% %dms (%d)", buf, sizeof(buf)) % ((y+q)*100/dh) % tm % raysPerPixel;
+//	draw_text(8, 0, buf);
   }
   {
 	auto tm = millis() - t;
+	{
+		char buf[50];
+		auto tm = millis() - t;
+		utils::sformat("%dms (%d)", buf, sizeof(buf)) % tm % raysPerPixel;
+		draw_text(8, 0, buf);
+	}
 	utils::format("Render time: %dms (%d)\n") % tm % raysPerPixel;
   }
 }
