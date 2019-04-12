@@ -42,7 +42,7 @@ namespace device {
 	public:
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  周辺機器に切り替える
+			@brief  周辺機器の電力制御を切り替える
 			@param[in]	t	周辺機器タイプ
 			@param[in]	ena	オフにする場合「false」
 		*/
@@ -68,6 +68,10 @@ namespace device {
 			case peripheral::TMR1:
 			case peripheral::TMR0:
 				SYSTEM::MSTPCRA.MSTPA5 = f;
+				break;
+
+			case peripheral::HRPWM:
+				SYSTEM::MSTPCRA.MSTPA7 = f;
 				break;
 
 			case peripheral::MTU0:
