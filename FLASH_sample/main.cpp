@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  SCI (UART) サンプル @n
+    @brief  Data Flash 操作サンプル @n
 			RX64M, RX71M: @n
 					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
@@ -14,7 +14,7 @@
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -51,7 +51,7 @@ namespace {
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX24T" };
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10000000, 16000000> SYSTEM_IO;
+	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX66T" };
@@ -63,14 +63,16 @@ namespace {
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 // SCI ポートの第二候補を選択する場合
 //	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
-	SCI		sci_;
+	SCI			sci_;
 
-	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
+	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
+	CMT			cmt_;
 
-	utils::command<256> command_;
+	typedef utils::command<256> COMMAND;
+	COMMAND		command_;
 
-	typedef device::flash_io FLASH;
-	FLASH	flash_;
+	typedef device::flash_io FLASH_IO;
+	FLASH_IO	flash_io_;
 
 	void dump_(uint16_t org, uint16_t len)
 	{
@@ -80,7 +82,7 @@ namespace {
 				utils::format("0x%04X:") % static_cast<uint32_t>(org);
 				adr = false;
 			}
-			uint8_t dat = flash_.read(org);
+			uint8_t dat = flash_io_.read(org);
 			utils::format(" %02X%") % static_cast<uint32_t>(dat);
 			uint16_t a = org;
 			++org;
@@ -109,13 +111,13 @@ namespace {
 			if(command_.get_word(1, buff, sizeof(buff))) {
 				int bank = 0;
 				if((utils::input("%d", buff) % bank).status()) {
-					if(static_cast<uint32_t>(bank) < FLASH::data_flash_bank) {
-						f = flash_.erase(bank);
+					if(static_cast<uint32_t>(bank) < FLASH_IO::data_flash_bank) {
+						f = flash_io_.erase(bank);
 						if(!f) {
 							utils::format("Erase error: bank %d\n") % bank;
 							f = true;
 						} else {
-							f = flash_.erase_check(bank);
+							f = flash_io_.erase_check(bank);
 							if(!f) {
 								utils::format("Erase Check error: bank %d\n") % bank;
 								f = true;
@@ -161,23 +163,23 @@ namespace {
 							if(!(utils::input("%x", buff) % data).status()) {
 								break;
 							}
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
 							uint32_t inc = 4;
 							uint8_t tmp[4];
 							tmp[3] = data;
 							tmp[2] = data >> 8;
 							tmp[1] = data >> 16;
 							tmp[0] = data >> 24;
-							if(!flash_.write(org, tmp, 4)) {
-#elif defined(SIG_RX24T) || defined(SIG_RX66T)
+							if(!flash_io_.write(org, tmp, 4)) {
+#elif defined(SIG_RX24T)
 							uint32_t inc = 1;
 							uint8_t tmp[1];
 							tmp[0] = data;
-							if(!flash_.write(org, tmp, 1)) {
+							if(!flash_io_.write(org, tmp, 1)) {
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
 								utils::format("Write error: %04X: %08X\n")
-#elif defined(SIG_RX24T) || defined(SIG_RX66T)
+#elif defined(SIG_RX24T)
 								utils::format("Write error: %04X: %02X\n")
 #endif
 									% static_cast<uint32_t>(org) % data;
@@ -191,10 +193,22 @@ namespace {
 					utils::format("Write param error: %s\n") % command_.get_command();
 				}
 			}
+		} else if(command_.cmp_word(0, "uid")) {
+#if defined(SIG_RX24T) || defined(SIG_RX65N) || defined(SIG_RX66T)
+			utils::format("Unique ID0: %08X\n") % device::FLASH::UIDR0();
+			utils::format("Unique ID1: %08X\n") % device::FLASH::UIDR1();
+			utils::format("Unique ID2: %08X\n") % device::FLASH::UIDR2();
+#if defined(SIG_RX24T) || defined(SIG_RX65N)
+			utils::format("Unique ID3: %08X\n") % device::FLASH::UIDR3();
+#endif
+#else
+			utils::format("Unique ID not define.\n");
+#endif
 		} else if(command_.cmp_word(0, "?") || command_.cmp_word(0, "help")) {
-			utils::format("erase [bank] (erase 0 to %d)\n") % FLASH::data_flash_bank;
+			utils::format("erase [bank] (erase 0 to %d)\n") % FLASH_IO::data_flash_bank;
 			utils::format("r[ead] org [end] (read)\n");
 			utils::format("write org data... (write)\n");
+			utils::format("uid (unique ID list)\n");
 		} else {
 			const char* p = command_.get_command();
 			if(p[0]) {
@@ -249,15 +263,17 @@ int main(int argc, char** argv)
 	}
 
 	{  // DataFlash 開始
-		flash_.start();
+		flash_io_.start();
 	}
 
 	command_.set_prompt("# ");
 
 	{
 		auto clk = F_ICLK / 1000000;
-		utils::format("Start Data Flash sample for '%s' %d[MHz]\n") % system_str_ % clk;
-		utils::format("Data Flash size: %08X\n") % FLASH::data_flash_size;
+		utils::format("Start Data Flash sample for '%s' %u [MHz]\n") % system_str_ % clk;
+		auto fclk = F_FCLK / 1000000;
+		utils::format("Flash drive clock: %u [MHz]\n") % fclk;
+		utils::format("Data Flash size: %08X\n") % FLASH_IO::data_flash_size;
 	}
 
 	LED::DIR = 1;
