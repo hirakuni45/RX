@@ -98,4 +98,17 @@ namespace device {
 			return true;
 		}
 	};
+
+
+	//-------------------------------------------------------------//
+	/*!
+		@brief  SCI マスタークロック取得
+		@param[in]	per		ペリフェラル型
+		@return SCI マスタークロック
+	*/
+	//-------------------------------------------------------------//
+	inline uint32_t get_sci_master_clock(peripheral per) noexcept
+	{
+		return F_PCLKB;
+	}
 }
