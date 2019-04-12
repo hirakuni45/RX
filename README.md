@@ -56,6 +56,7 @@ int main(int argc, char** argv)
 In order to complete the process from dependency rule generation to compilation and linking, usually with a single "make" command,
  I do not need it.   
 No need for a dedicated boot program or loader I can write and execute.
+For development, we recommend using "Visual Studio Code" that can be used on multiple platforms.   
    
 ---
 ## Description
