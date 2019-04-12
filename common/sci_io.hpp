@@ -243,7 +243,7 @@ namespace device {
 			HCTL::DIR = 1;
 			HCTL::P = 0;  // disable send driver
 
-			uint32_t brr = get_master_clock(SCI::get_peripheral()) / baud * 16;
+			uint32_t brr = get_sci_master_clock(SCI::get_peripheral()) / baud * 16;
 			uint8_t cks = 0;
 			while(brr > (512 << 8)) {
 				brr >>= 2;

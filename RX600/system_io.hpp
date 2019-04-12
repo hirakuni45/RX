@@ -127,7 +127,7 @@ namespace device {
 		@return SCI マスタークロック
 	*/
 	//-------------------------------------------------------------//
-	inline uint32_t get_master_clock(peripheral per) noexcept
+	inline uint32_t get_sci_master_clock(peripheral per) noexcept
 	{
 #if defined(SIG_RX66T)
 		if(per == peripheral::SCI11 || per == peripheral::SCI11C) {
