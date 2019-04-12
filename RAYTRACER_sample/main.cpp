@@ -128,6 +128,8 @@ namespace {
 
 #if defined(SIG_RX65N)
 #else
+	uint16_t line_[LCD_X];
+
 	template <uint32_t X, uint32_t Y>
 	class glc {
 
@@ -219,10 +221,9 @@ extern "C" {
 #if defined(SIG_RX65N)
 		render_.plot(vtx::spos(x, y), c);
 #else
-		static uint16_t line[LCD_X];
-		line[x] = c;
+		line_[x] = c;
 		if(x == (render_width_ - 1)) {
-			tft_.copy(vtx::spos(0, y), line, LCD_X);
+			tft_.copy(vtx::spos(0, y), line_, LCD_X);
 		}
 #endif
 	}
