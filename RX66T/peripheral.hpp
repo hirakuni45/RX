@@ -49,6 +49,8 @@ namespace device {
 		GPT2,		///< 汎用 PWM タイマ２
 		GPT3,		///< 汎用 PWM タイマ３
 
+		HRPWM,		///< 高分解能 PWM 波形生成回路
+
 		TMR0,		///< 8 ビットタイマ０
 		TMR1,		///< 8 ビットタイマ１
 		TMR2,		///< 8 ビットタイマ２
