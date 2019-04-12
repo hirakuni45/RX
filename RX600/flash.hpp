@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ・フラッシュ 定義
+	@brief	RX64M/RX71M/RX65N/RX66T グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -56,6 +56,7 @@ namespace device {
 #endif
 			bit_rw_t<io_, bitpos::B3>  DFAE;
 			bit_rw_t<io_, bitpos::B4>  CMDLK;
+
 			bit_rw_t<io_, bitpos::B7>  CFAE;
 
 		};
@@ -81,6 +82,7 @@ namespace device {
 #endif
 			bit_rw_t<io_, bitpos::B3>  DFAEIE;
 			bit_rw_t<io_, bitpos::B4>  CMDLKIE;
+
 			bit_rw_t<io_, bitpos::B7>  CFAEIE;
 
 		};
@@ -169,9 +171,6 @@ namespace device {
 			bit_ro_t <io_, bitpos::B13>  ERSERR;
 			bit_ro_t <io_, bitpos::B14>  ILGERR;
 			bit_ro_t <io_, bitpos::B15>  FRDY;
-#if defined(SIG_RX65N)
-
-#endif
 		};
 		static fstatr_t<0x007FE080> FSTATR;
 
@@ -380,6 +379,29 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
 		static fpckar_t<0x007FE0E4> FPCKAR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) @n
+					※RX64M、RX71M には無い
+		*/
+		//-----------------------------------------------------------------//
+#if defined(SIG_RX24T)
+		static ro32_t<0x007FC350> UIDR0;
+		static ro32_t<0x007FC354> UIDR1;
+		static ro32_t<0x007FC358> UIDR2;
+		static ro32_t<0x007FC35C> UIDR3;
+#elif defined(SIG_RX65N)
+		static ro32_t<0xFE7F7D90> UIDR0;
+		static ro32_t<0xFE7F7D94> UIDR1;
+		static ro32_t<0xFE7F7D98> UIDR2;
+		static ro32_t<0xFE7F7D9C> UIDR3;
+#elif defined(SIG_RX66T)
+		static ro32_t<0x007FB174> UIDR0;
+		static ro32_t<0x007FB1E4> UIDR1;
+		static ro32_t<0x007FB1E8> UIDR2;
+#endif
 	};
 	typedef flash_t FLASH;
 }
