@@ -38,8 +38,16 @@
 #include "common/vect.h"
 
 /// F_PCLKB はボーレートパラメーター計算に必要で、設定が無いとエラーにします。
+/// F_PCLKA は、RX66T における SCI11 チャネルのマスタークロックとなっている。
+#if defined(SIG_RX66T)
+#if defined(F_PCLKA) && defined(F_PCLKB)
+#else
+#  error "sci_io.hpp requires F_PCLKA and F_PCLKB to be defined for RX66T"
+#endif
+#else
 #ifndef F_PCLKB
 #  error "sci_io.hpp requires F_PCLKB to be defined"
+#endif
 #endif
 
 namespace device {
@@ -57,6 +65,10 @@ namespace device {
 	template <class SCI, class RBF, class SBF, port_map::option PSEL = port_map::option::FIRST, class HCTL = NULL_PORT>
 	class sci_io {
 	public:
+		typedef SCI sci_type;
+		typedef RBF rbf_type;
+		typedef SBF sbf_type;
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	SCI 通信プロトコル型
@@ -231,7 +243,7 @@ namespace device {
 			HCTL::DIR = 1;
 			HCTL::P = 0;  // disable send driver
 
-			uint32_t brr = F_PCLKB / baud * 16;
+			uint32_t brr = get_master_clock(SCI::get_peripheral()) / baud * 16;
 			uint8_t cks = 0;
 			while(brr > (512 << 8)) {
 				brr >>= 2;

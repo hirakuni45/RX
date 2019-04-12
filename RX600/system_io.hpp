@@ -3,15 +3,16 @@
 /*!	@file
 	@brief	RX64M/RX71M/RX651/RX65N/RX66T グループ・システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "RX600/system.hpp"
 
-#ifndef F_ICLK
-#  error "system_io.hpp requires F_ICLK to be defined"
+#if defined(F_ICLK) && defined(F_PCLKA) && defined(F_PCLKB) && defined(F_PCLKC) && defined(F_PCLKD) && defined(F_FCLK) && defined(F_BCLK) 
+#else  
+#  error "system_io.hpp requires F_[IFB]CLK and F_PCLK[ABCD] to be defined"
 #endif
 
 namespace device {
@@ -116,5 +117,23 @@ namespace device {
 		device::SYSTEM::PRCR = 0xA502;
 		device::SYSTEM::SWRR = 0xA501;
 		device::SYSTEM::PRCR = 0xA500;
+	}
+
+
+	//-------------------------------------------------------------//
+	/*!
+		@brief  SCI マスタークロック取得
+		@param[in]	per		ペリフェラル型
+		@return SCI マスタークロック
+	*/
+	//-------------------------------------------------------------//
+	inline uint32_t get_master_clock(peripheral per) noexcept
+	{
+#if defined(SIG_RX66T)
+		if(per == peripheral::SCI11 || per == peripheral::SCI11C) {
+			return F_PCLKA;
+		}
+#endif
+		return F_PCLKB;
 	}
 }
