@@ -75,8 +75,9 @@ int main(int argc, char** argv)
 |/r_net                 |ルネサス T4(TCP/UDP) ライブラリと、C++ ハンドラ、ラッパー|
 |/libmad                |MP3 デコード、mad ライブラリ|
 |[rxprog](./rxprog)     |RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）|
-|[FIRST_sample](./FIRST_sample)|各プラットホーム対応 LED 点滅プログラム|
-|[SCI_sample](./SCI_sample)|各プラットホーム対応 SCI サンプルプログラム|
+|[FIRST_sample](./FIRST_sample)|各プラットホーム対応、LED 点滅プログラム|
+|[SCI_sample](./SCI_sample)|各プラットホーム対応、SCI サンプルプログラム|
+|[FLASH_sample](./FLASH_sample)|各プラットホーム対応、内臓データフラッシュ操作サンプル|
 |[RAYTRACER_sample](./RAYTRACER_sample)|各プラットホーム対応 レイトレーシング・ベンチマーク|
 |/rx24t_SDC_sample      |RX24T を使った SD カードの動作サンプル|
 |/rx24t_GPS_sample      |RX24T を使った GPS の動作サンプル|
