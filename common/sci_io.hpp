@@ -37,19 +37,6 @@
 #include "common/renesas.hpp"
 #include "common/vect.h"
 
-/// F_PCLKB はボーレートパラメーター計算に必要で、設定が無いとエラーにします。
-/// F_PCLKA は、RX66T における SCI11 チャネルのマスタークロックとなっている。
-#if defined(SIG_RX66T)
-#if defined(F_PCLKA) && defined(F_PCLKB)
-#else
-#  error "sci_io.hpp requires F_PCLKA and F_PCLKB to be defined for RX66T"
-#endif
-#else
-#ifndef F_PCLKB
-#  error "sci_io.hpp requires F_PCLKB to be defined"
-#endif
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
