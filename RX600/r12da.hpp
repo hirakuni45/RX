@@ -121,6 +121,19 @@ namespace device {
 	template <peripheral per>
 	struct r12da_a_t : public r12da_t<per> {
 
+		typedef r12da_t<per> base_type;
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ入出力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class analog : uint8_t {
+			DA0,
+			DA1,
+		};
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  D/A 出力アンプ制御レジスタ（DAAMPCR）
@@ -159,8 +172,35 @@ namespace device {
 		};
 		static daadusr_t<0x0008C5C0> DAADUSR;
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ入力型
+			@param[in]	f	ポート無効の場合「false」
+		*/
+		//-----------------------------------------------------------------//		
+		static void enable(analog an, bool f = true)
+		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+			switch(an) {
+			case analog::DA0:
+				MPC::P03PFS.ASEL = 1;
+				PORT0::PMR.B3 = 1;
+				break;
+			case analog::DA1:
+				MPC::P05PFS.ASEL = 1;
+				PORT0::PMR.B5 = 1;
+				break;
+			default:
+				break;
+			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
 	};
 	typedef r12da_a_t<peripheral::R12DA> R12DA;
+
 #elif defined(SIG_RX66T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -170,6 +210,20 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per>
 	struct r12da_b_t : public r12da_t<per> {
+
+		typedef r12da_t<per> base_type;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  アナログ入出力型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class analog : uint8_t {
+			DA0,
+			DA1,
+		};
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -192,6 +246,32 @@ namespace device {
 		};
 		static dadselr_t<0x00088049> DADSELR;
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ポート設定と解除
+			@param[in]	an	アナログ入力型
+			@param[in]	f	ポート無効の場合「false」
+		*/
+		//-----------------------------------------------------------------//		
+		static void enable(analog an, bool f = true)
+		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+			switch(an) {
+			case analog::DA0:
+				MPC::P64PFS.ASEL = 1;
+				PORT6::PMR.B4 = 1;
+				break;
+			case analog::DA1:
+				MPC::P65PFS.ASEL = 1;
+				PORT6::PMR.B5 = 1;
+				break;
+			default:
+				break;
+			}
+			MPC::PWPR = device::MPC::PWPR.B0WI.b();
+		}
 	};
 	typedef r12da_b_t<peripheral::R12DA> R12DA;
 #endif

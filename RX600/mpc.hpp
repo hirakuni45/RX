@@ -216,13 +216,21 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  P6n 端子機能制御レジスタ（P6nPFS）（n = 0, 6, 7）
+			@brief  P6n 端子機能制御レジスタ（P6nPFS）（n = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 		static pfsy_t<0x0008C170> P60PFS;
 		static pfsy_t<0x0008C176> P66PFS;
 		static pfsy_t<0x0008C177> P67PFS;
-
+#elif defined(SIG_RX66T)
+		static pfsz_t<0x0008C170> P60PFS;
+		static pfsz_t<0x0008C171> P61PFS;
+		static pfsz_t<0x0008C172> P62PFS;
+		static pfsz_t<0x0008C173> P63PFS;
+		static pfsz_t<0x0008C174> P64PFS;
+		static pfsz_t<0x0008C175> P65PFS;
+#endif
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
