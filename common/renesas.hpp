@@ -115,11 +115,13 @@
 #include "RX66T/poeg.hpp"
 #include "RX600/can.hpp"
 #include "RX600/r12da.hpp"
+#include "RX600/dac_out.hpp"
 #include "RX600/usb.hpp"
 #include "RX600/wdta.hpp"
 #include "RX600/flash.hpp"
 #include "RX600/flash_io.hpp"
 #include "RX600/cmpc.hpp"
+#include "RX600/dmac_mgr.hpp"
 
 #else
 #  error "renesas.hpp: Requires SIG_XXX to be defined"
