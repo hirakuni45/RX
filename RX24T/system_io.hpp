@@ -111,4 +111,16 @@ namespace device {
 	{
 		return F_PCLKB;
 	}
+
+
+	//-------------------------------------------------------------//
+	/*!
+		@brief  MTU マスタークロック取得
+		@return MTU マスタークロック
+	*/
+	//-------------------------------------------------------------//
+	inline uint32_t get_mtu_master_clock() noexcept
+	{
+		return F_PCLKA;
+	}
 }
