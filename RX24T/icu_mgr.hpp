@@ -263,6 +263,22 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  割り込み設定（通常ベクター）
+			@param[in]	vec		割り込み要因
+			@param[in]	task	割り込みタスク
+			@param[in]	lvl		割り込みレベル（０の場合、割り込み禁止）
+			@return ベクター番号
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR vec, utils::TASK task, uint8_t lvl) noexcept {
+			set_task(vec, task);
+			set_level(vec, lvl);
+			return vec;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  割り込みを設定する
 			@param[in]	per	周辺機器タイプ
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
