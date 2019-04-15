@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	DMAC マネージャー @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,11 +18,14 @@ namespace device {
 	/*!
 		@brief  DMAC マネージャー・クラス
 		@param[in]	DMAC	DMA コントローラー
+		@param[in]	TASK	DMA 終了割り込みファンクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class DMAC, class TASK = utils::null_task>
 	class dmac_mgr {
 	public:
+
+		static const uint32_t BLOCK_SIZE_MAX = 1024;	///< データ転送最大ブロック数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -38,18 +41,15 @@ namespace device {
 			SP_DN_32,		///< ソース＋、ディストネーション固定（32 bits）
 		};
 
-
 	private:
 		static TASK	task_;
 		uint8_t		level_;
-
 
 		static INTERRUPT_FUNC void dmac_task_() noexcept
 		{
 			task_();
 			DMAC::DMSTS.DTIF = 0;
 		}
-
 
 		void set_vector_(ICU::VECTOR vec) const noexcept
 		{
@@ -153,11 +153,12 @@ namespace device {
 			@param[in]	lim		転送リミット（※カウント数なので注意）
 			@param[in]	ilvl	転送完了割り込みレベル（０以上）@n
 								※無指定（０）なら割り込みを起動しない。
+			@param[in]	isel	CPU にも割り込みをかける場合は「true」にする。
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
 		bool start(ICU::VECTOR trg, trans_type tft, uint32_t src, uint32_t dst, uint32_t lim,
-			uint32_t ilvl = 0) noexcept
+			uint32_t ilvl = 0, bool isel = false) noexcept
 		{
 			if(lim > 1024) return false;
 
@@ -218,10 +219,10 @@ namespace device {
 			if(level_ > 0) {
 				icu_mgr::set_dmac(DMAC::get_peripheral(), trg);
 				DMAC::DMINT = DMAC::DMINT.DTIE.b();
-				DMAC::DMCSL.DISEL = 1;
+				DMAC::DMCSL.DISEL = isel;
 			} else {
 				DMAC::DMINT = 0x00;
-				DMAC::DMCSL.DISEL = 0;
+				DMAC::DMCSL.DISEL = isel;
 			}
 
 			DMAC::DMCNT.DTE = 1;
