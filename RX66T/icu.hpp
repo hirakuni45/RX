@@ -217,32 +217,6 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  選択型割り込みＢ要因・ベクター・インデックス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_SELB {
-			NONE = 0,	///< なし
-
-			CMI2 = 1,	///< CMT2
-			CMI3 = 2,	///< CMT3
-
-			RXF0 = 50,	///< CAN0（受信 FIFO 割り込み）
-			TXF0 = 51,	///< CAN0（送信 FIFO 割り込み）
-			RXM0 = 52,	///< CAN0（メールボックス０～３１メッセージ受信完了）
-			TXM0 = 53,	///< CAN0（メールボックス０～３１メッセージ送信完了）
-			RXF1 = 54,	///< CAN1（受信 FIFO 割り込み）
-			TXF1 = 55,	///< CAN1（送信 FIFO 割り込み）
-			RXM1 = 56,	///< CAN1（メールボックス０～３１メッセージ受信完了）
-			TXM1 = 57,	///< CAN1（メールボックス０～３１メッセージ送信完了）
-			RXF2 = 58,	///< CAN2（受信 FIFO 割り込み）
-			TXF2 = 59,	///< CAN2（送信 FIFO 割り込み）
-			RXM2 = 60,	///< CAN2（メールボックス０～３１メッセージ受信完了）
-			TXM2 = 61,	///< CAN2（メールボックス０～３１メッセージ送信完了）
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
 			@brief  選択型割り込みＡ要因・ベクター・インデックス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -425,6 +399,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  IR レジスタ
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -615,6 +590,10 @@ namespace device {
 			rw8_t<base + 253> INTA253;
 			rw8_t<base + 254> INTA254;
 			rw8_t<base + 255> INTA255;
+
+			volatile uint8_t& operator[] (uint8_t idx) {
+				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			}
 		};
 		static ir_t<0x00087010> IR;
 
@@ -622,6 +601,7 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  IER レジスタ
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -832,6 +812,25 @@ namespace device {
 			bit_rw_t<ier1F, bitpos::B5>	INTA253;
 			bit_rw_t<ier1F, bitpos::B6>	INTA254;
 			bit_rw_t<ier1F, bitpos::B7>	INTA255;
+
+
+			void enable(uint8_t idx, bool ena) noexcept
+			{
+				auto tmp = rd8_(base + (idx >> 3));
+				if(ena) {
+					tmp |=   1 << (idx & 7);
+				} else {
+					tmp &= ~(1 << (idx & 7));
+				}
+				wr8_(base + (idx >> 3), tmp);
+			}
+
+
+			bool get(uint8_t idx) const noexcept
+			{
+				auto tmp = rd8_(base + (idx >> 3));
+				return tmp & (1 << (idx & 7));
+			}
 		};
 		static ier_t<0x00087200> IER;
 
@@ -840,6 +839,7 @@ namespace device {
 		/*!
 			@brief  IPR レジスタ @n
 					全て、下位４ビットが有効
+			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
@@ -1030,6 +1030,10 @@ namespace device {
 			rw8_t<base + 253> INTA253;
 			rw8_t<base + 254> INTA254;
 			rw8_t<base + 255> INTA255;
+
+			volatile uint8_t& operator[] (uint8_t idx) {
+				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			}
 		};
 		static ipr_t<0x00087300> IPR;
 
@@ -1394,24 +1398,6 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  選択型割り込み B 要求レジスタ k（PIBRk）（k = 0h ～ Ah）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x00087700> PIBR0;
-		static pixr_t<0x00087701> PIBR1;
-		static pixr_t<0x00087702> PIBR2;
-		static pixr_t<0x00087703> PIBR3;
-		static pixr_t<0x00087704> PIBR4;
-		static pixr_t<0x00087705> PIBR5;
-		static pixr_t<0x00087706> PIBR6;
-		static pixr_t<0x00087707> PIBR7;
-		static pixr_t<0x00087708> PIBR8;
-		static pixr_t<0x00087709> PIBR9;
-		static pixr_t<0x0008770A> PIBRA;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
 			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ Bh）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1427,103 +1413,6 @@ namespace device {
 		static pixr_t<0x00087909> PIAR9;
 		static pixr_t<0x0008790A> PIARA;
 		static pixr_t<0x0008790B> PIARB;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み B 要因選択レジスタ Xn（SLIBXRn）（n = 128 ～ 143）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<0x00087780> SLIBXR128;
-		static rw8_t<0x00087781> SLIBXR129;
-		static rw8_t<0x00087782> SLIBXR130;
-		static rw8_t<0x00087783> SLIBXR131;
-		static rw8_t<0x00087784> SLIBXR132;
-		static rw8_t<0x00087785> SLIBXR133;
-		static rw8_t<0x00087786> SLIBXR134;
-		static rw8_t<0x00087787> SLIBXR135;
-		static rw8_t<0x00087788> SLIBXR136;
-		static rw8_t<0x00087789> SLIBXR137;
-		static rw8_t<0x0008778A> SLIBXR138;
-		static rw8_t<0x0008778B> SLIBXR139;
-		static rw8_t<0x0008778C> SLIBXR140;
-		static rw8_t<0x0008778D> SLIBXR141;
-		static rw8_t<0x0008778E> SLIBXR142;
-		static rw8_t<0x0008778F> SLIBXR143;
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み B 要因選択レジスタ n（SLIBRn）（n = 144 ～ 207）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<0x00087790> SLIBR144;
-		static rw8_t<0x00087791> SLIBR145;
-		static rw8_t<0x00087792> SLIBR146;
-		static rw8_t<0x00087793> SLIBR147;
-		static rw8_t<0x00087794> SLIBR148;
-		static rw8_t<0x00087795> SLIBR149;
-		static rw8_t<0x00087796> SLIBR150;
-		static rw8_t<0x00087797> SLIBR151;
-		static rw8_t<0x00087798> SLIBR152;
-		static rw8_t<0x00087799> SLIBR153;
-		static rw8_t<0x0008779A> SLIBR154;
-		static rw8_t<0x0008779B> SLIBR155;
-		static rw8_t<0x0008779C> SLIBR156;
-		static rw8_t<0x0008779D> SLIBR157;
-		static rw8_t<0x0008779E> SLIBR158;
-		static rw8_t<0x0008779F> SLIBR159;
-
-		static rw8_t<0x000877A0> SLIBR160;
-		static rw8_t<0x000877A1> SLIBR161;
-		static rw8_t<0x000877A2> SLIBR162;
-		static rw8_t<0x000877A3> SLIBR163;
-		static rw8_t<0x000877A4> SLIBR164;
-		static rw8_t<0x000877A5> SLIBR165;
-		static rw8_t<0x000877A6> SLIBR166;
-		static rw8_t<0x000877A7> SLIBR167;
-		static rw8_t<0x000877A8> SLIBR168;
-		static rw8_t<0x000877A9> SLIBR169;
-		static rw8_t<0x000877AA> SLIBR170;
-		static rw8_t<0x000877AB> SLIBR171;
-		static rw8_t<0x000877AC> SLIBR172;
-		static rw8_t<0x000877AD> SLIBR173;
-		static rw8_t<0x000877AE> SLIBR174;
-		static rw8_t<0x000877AF> SLIBR175;
-
-		static rw8_t<0x000877B0> SLIBR176;
-		static rw8_t<0x000877B1> SLIBR177;
-		static rw8_t<0x000877B2> SLIBR178;
-		static rw8_t<0x000877B3> SLIBR179;
-		static rw8_t<0x000877B4> SLIBR180;
-		static rw8_t<0x000877B5> SLIBR181;
-		static rw8_t<0x000877B6> SLIBR182;
-		static rw8_t<0x000877B7> SLIBR183;
-		static rw8_t<0x000877B8> SLIBR184;
-		static rw8_t<0x000877B9> SLIBR185;
-		static rw8_t<0x000877BA> SLIBR186;
-		static rw8_t<0x000877BB> SLIBR187;
-		static rw8_t<0x000877BC> SLIBR188;
-		static rw8_t<0x000877BD> SLIBR189;
-		static rw8_t<0x000877BE> SLIBR190;
-		static rw8_t<0x000877BF> SLIBR191;
-
-		static rw8_t<0x000877C0> SLIBR192;
-		static rw8_t<0x000877C1> SLIBR193;
-		static rw8_t<0x000877C2> SLIBR194;
-		static rw8_t<0x000877C3> SLIBR195;
-		static rw8_t<0x000877C4> SLIBR196;
-		static rw8_t<0x000877C5> SLIBR197;
-		static rw8_t<0x000877C6> SLIBR198;
-		static rw8_t<0x000877C7> SLIBR199;
-		static rw8_t<0x000877C8> SLIBR200;
-		static rw8_t<0x000877C9> SLIBR201;
-		static rw8_t<0x000877CA> SLIBR202;
-		static rw8_t<0x000877CB> SLIBR203;
-		static rw8_t<0x000877CC> SLIBR204;
-		static rw8_t<0x000877CD> SLIBR205;
-		static rw8_t<0x000877CE> SLIBR206;
-		static rw8_t<0x000877CF> SLIBR207;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1581,6 +1470,32 @@ namespace device {
 		static rw8_t<0x000879FD> SLIAR253;
 		static rw8_t<0x000879FE> SLIAR254;
 		static rw8_t<0x000879FF> SLIAR255;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  選択型割り込み要因選択レジスタ・テンプレート
+			@param[in]	base	ベース・アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct slixr_t {
+
+			void set(uint16_t idx, uint8_t val) noexcept {
+				if(idx < 244 || idx > 255) return;
+				wr8_(base + idx, val);
+			}
+
+			uint8_t get(uint16_t idx) noexcept {
+				if(idx < 244 || idx > 255) return 0;
+				return rd8_(base + idx);
+			}
+
+			volatile uint8_t& operator[] (uint8_t idx) {
+				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			}
+		};
+		static slixr_t<0x00087900> SLIAR;
 	};
 	typedef icu_t ICU;
 }
