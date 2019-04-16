@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・割り込みマネージャー
+	@brief	RX651/RX65N グループ・割り込みマネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -110,6 +110,90 @@ namespace device {
 				return false;
 			}
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定（通常ベクター）
+			@param[in]	vec		割り込み要因
+			@param[in]	task	割り込みタスク
+			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
+			@return ベクター番号
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR vec, utils::TASK task, uint8_t lvl) noexcept {
+			set_task(vec, task);
+			set_level(vec, lvl);
+			return vec;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定（選択Ａベクター）
+			@param[in]	vec		割り込み要因
+			@param[in]	task	割り込みタスク
+			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELA vec, utils::TASK task, uint8_t lvl) noexcept
+		{
+			for(uint16_t i = 208; i <= 255; ++i) {
+				if(lvl > 0) {
+					if(ICU::SLIXR[i] == 0) {
+						ICU::IER.enable(i, 0);
+						set_task(static_cast<ICU::VECTOR>(i), task);
+						ICU::IPR[i] = lvl;
+						ICU::SLIXR[i] = static_cast<uint8_t>(vec);
+						ICU::IR[i] = 0;
+						ICU::IER.enable(i, 1);
+						return static_cast<ICU::VECTOR>(i);
+					}
+				} else if(ICU::SLIXR[i] == static_cast<uint8_t>(vec)) {
+					ICU::IER.enable(i, 0);
+					set_task(static_cast<ICU::VECTOR>(i), nullptr);
+					ICU::SLIXR[i] = 0;
+					ICU::IR[i] = 0;
+					return static_cast<ICU::VECTOR>(i);
+				}
+			}
+			return ICU::VECTOR::NONE;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定（選択Ｂベクター）
+			@param[in]	vec		割り込み要因
+			@param[in]	task	割り込みタスク
+			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELB vec, utils::TASK task, uint8_t lvl) noexcept
+		{
+			for(uint16_t i = 128; i <= 207; ++i) {
+				if(lvl > 0) {
+					if(ICU::SLIXR[i] == 0) {
+						ICU::IER.enable(i, 0);
+						set_task(static_cast<ICU::VECTOR>(i), task);
+						ICU::IPR[i] = lvl;
+						ICU::SLIXR[i] = static_cast<uint8_t>(vec);
+						ICU::IR[i] = 0;
+						ICU::IER.enable(i, 1);
+						return static_cast<ICU::VECTOR>(i);
+					}
+				} else if(ICU::SLIXR[i] == static_cast<uint8_t>(vec)) {
+					ICU::IER.enable(i, 0);
+					set_task(static_cast<ICU::VECTOR>(i), nullptr);
+					ICU::SLIXR[i] = 0;
+					ICU::IR[i] = 0;
+					return static_cast<ICU::VECTOR>(i);
+				}
+			}
+			return ICU::VECTOR::NONE;
 		}
 
 

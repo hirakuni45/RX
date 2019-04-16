@@ -3,13 +3,13 @@
 /*!	@file
 	@brief	RX651/RX65N グループ・ICUb 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <typeinfo>
-#include "common/io_utils.hpp"
+#include "RX600/icu_utils.hpp"
 
 namespace device {
 
@@ -724,6 +724,18 @@ namespace device {
 			rw8_t<base + 253> INTA253;
 			rw8_t<base + 254> INTA254;
 			rw8_t<base + 255> INTA255;
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  []オペレータ
+				@param[in]	idx		インデックス（０～２５５）
+				@return IR レジスターの参照
+			*/
+			//-------------------------------------------------------------//
+			volatile uint8_t& operator [] (uint8_t idx) {
+				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			}
 		};
 		static ir_t<0x00087010> IR;
 
@@ -892,6 +904,39 @@ namespace device {
 			bit_rw_t<ier1F, bitpos::B5> INTA253;
 			bit_rw_t<ier1F, bitpos::B6> INTA254;
 			bit_rw_t<ier1F, bitpos::B7> INTA255;
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  許可、不許可
+				@param[in]	idx		インデックス（０～２５５）
+				@param[in]	ena		許可／不許可
+			*/
+			//-------------------------------------------------------------//
+			void enable(uint8_t idx, bool ena) noexcept
+			{
+				auto tmp = rd8_(base + (idx >> 3));
+				if(ena) {
+					tmp |=   1 << (idx & 7);
+				} else {
+					tmp &= ~(1 << (idx & 7));
+				}
+				wr8_(base + (idx >> 3), tmp);
+			}
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  許可状態を取得
+				@param[in]	idx		インデックス（０～２５５）
+				@return 許可状態（許可の場合「true」）
+			*/
+			//-------------------------------------------------------------//
+			bool get(uint8_t idx) const noexcept
+			{
+				auto tmp = rd8_(base + (idx >> 3));
+				return tmp & (1 << (idx & 7));
+			}
 		};
 		static ier_t<0x00087200> IER;
 
@@ -1052,6 +1097,18 @@ namespace device {
 			rw8_t<base + 253> INTA253;
 			rw8_t<base + 254> INTA254;
 			rw8_t<base + 255> INTA255;
+
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  []オペレータ
+				@param[in]	idx		インデックス（０～２５５）
+				@return IR レジスターの参照
+			*/
+			//-------------------------------------------------------------//
+			volatile uint8_t& operator [] (uint8_t idx) {
+				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			}
 		};
 		static ipr_t<0x00087300> IPR;
 
@@ -1607,6 +1664,9 @@ namespace device {
 		static rw8_t<0x000879FD> SLIAR253;
 		static rw8_t<0x000879FE> SLIAR254;
 		static rw8_t<0x000879FF> SLIAR255;
+
+
+		static icu_utils::slixr_t<0x00087900> SLIXR;
 	};
 	typedef icu_t ICU;
 }
