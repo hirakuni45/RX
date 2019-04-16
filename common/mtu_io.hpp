@@ -257,7 +257,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool set_frq(typename MTUX::channel ch, uint32_t frq) noexcept
+		static bool set_freq(typename MTUX::channel ch, uint32_t frq) noexcept
 		{
 			uint8_t dv;
 			uint32_t match;
