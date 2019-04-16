@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・割り込みマネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -11,6 +11,7 @@
 #include "common/device.hpp"
 #include "common/vect.h"
 #include "common/dispatch.hpp"
+#include "RX600/icu_utils.hpp"
 
 namespace device {
 
@@ -108,27 +109,85 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みレベルを設定する（選択型Ｂ）
-			@param[in]	icu	割り込み要因
+			@brief  割り込み設定（通常ベクター）
+			@param[in]	vec		割り込み要因
+			@param[in]	task	割り込みタスク
+			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
+			@return ベクター番号
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR vec, utils::TASK task, uint8_t lvl) noexcept {
+			set_task(vec, task);
+			set_level(vec, lvl);
+			return vec;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定（選択Ａベクター）
+			@param[in]	vec		割り込み要因
+			@param[in]	task	割り込みタスク
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool set_level(ICU::VECTOR_SELB vec, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELA vec, utils::TASK task, uint8_t lvl) noexcept
 		{
-			bool ena = lvl != 0 ? true : false;
-			switch(vec) {
-			case ICU::VECTOR_SELB::CMI2:
-//				ICU::IER.CMI0 = 0;
-//				ICU::IPR.CMI0 = lvl;
-//				ICU::IER.CMI0 = ena;
-				break;
-			case ICU::VECTOR_SELB::CMI3:
-				break;
-			default:
-				return false;
+			for(uint16_t i = 208; i <= 255; ++i) {
+				if(lvl > 0) {
+					if(ICU::SLIXR[i] == 0) {
+						ICU::IER.enable(i, 0);
+						set_task(static_cast<ICU::VECTOR>(i), task);
+						ICU::IPR[i] = lvl;
+						ICU::SLIXR[i] = static_cast<uint8_t>(vec);
+						ICU::IR[i] = 0;
+						ICU::IER.enable(i, 1);
+						return static_cast<ICU::VECTOR>(i);
+					}
+				} else if(ICU::SLIXR[i] == static_cast<uint8_t>(vec)) {
+					ICU::IER.enable(i, 0);
+					set_task(static_cast<ICU::VECTOR>(i), nullptr);
+					ICU::SLIXR[i] = 0;
+					ICU::IR[i] = 0;
+					return static_cast<ICU::VECTOR>(i);
+				}
 			}
-			return true;
+			return ICU::VECTOR::NONE;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定（選択Ｂベクター）
+			@param[in]	vec		割り込み要因
+			@param[in]	task	割り込みタスク
+			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELB vec, utils::TASK task, uint8_t lvl) noexcept
+		{
+			for(uint16_t i = 144; i <= 207; ++i) {
+				if(lvl > 0) {
+					if(ICU::SLIXR[i] == 0) {
+						ICU::IER.enable(i, 0);
+						set_task(static_cast<ICU::VECTOR>(i), task);
+						ICU::IPR[i] = lvl;
+						ICU::SLIXR[i] = static_cast<uint8_t>(vec);
+						ICU::IR[i] = 0;
+						ICU::IER.enable(i, 1);
+						return static_cast<ICU::VECTOR>(i);
+					}
+				} else if(ICU::SLIXR[i] == static_cast<uint8_t>(vec)) {
+					ICU::IER.enable(i, 0);
+					set_task(static_cast<ICU::VECTOR>(i), nullptr);
+					ICU::SLIXR[i] = 0;
+					ICU::IR[i] = 0;
+					return static_cast<ICU::VECTOR>(i);
+				}
+			}
+			return ICU::VECTOR::NONE;
 		}
 
 
@@ -329,36 +388,6 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターの取得
-			@param[in]	per	周辺機器タイプ
-			@param[in]	id	割り込み要因
-			@return 割り込みベクター（マッチするベクターが無ければ「NONE」を返す）
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vector(peripheral per, uint8_t id) noexcept
-		{
-			switch(per) {
-			case peripheral::TPU0:
-			case peripheral::TPU1:
-			case peripheral::TPU2:
-			case peripheral::TPU3:
-			case peripheral::TPU4:
-			case peripheral::TPU5:
-				// INTB128 to INTB207
-				for(uint8_t i = 128; i <= 207; ++i) {
-					
-				}
-				break;
-			default:
-				return ICU::VECTOR::NONE;
-			}
-
-			return ICU::VECTOR::INTB128;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  DMAC 要因の設定
 			@param[in]	dma_per	DMAC ペリフェラル
 			@param[in]	target	DMA 要因のベクター番号
@@ -454,24 +483,6 @@ namespace device {
 			}
 		}
 
-#if defined(SIG_RX65N)
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  グループ割り込み・ハンドラ GROUPBL2（レベル割り込み）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group_bl2_handler_() noexcept
-		{
-			uint32_t bits = ICU::GRPBL2() & GROUPBL2_dispatch_.get_mask();
-			uint32_t sign = 1;
-			for(uint32_t idx = 0; idx < GROUPBL2_dispatch_.size(); ++idx) {
-				if(bits & sign) {
-					GROUPBL2_dispatch_.run_task(idx);
-				}
-				sign <<= 1;
-			}
-		}
-#endif
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -527,27 +538,6 @@ namespace device {
 			if(ret && ena) ICU::GENBE0 |= 1 << i;
 			return ret;
 		}
-
-#if defined(SIG_RX65N)
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GROUPBL2 割り込みタスクを登録する @n
-					※ここで登録するタスクは「割り込みアトリビュート」無しの関数を登録する事
-			@param[in]	idx		グループ内インデックス
-			@param[in]	task	割り込みタスク（※nullptr なら無効）
-			@return グループ割り込み以外なら「false」
-		*/
-		//-----------------------------------------------------------------//
-		static bool install_group_task(ICU::VECTOR_BL2 idx, utils::TASK task) noexcept
-		{
-			bool ena = task != nullptr ? true : false;
-			set_interrupt_task(group_bl2_handler_, static_cast<uint32_t>(ICU::VECTOR::GROUPBL2));
-			auto i = static_cast<uint32_t>(idx);
-			bool ret = GROUPBL2_dispatch_.set_task(i, task);
-			if(ret && ena) ICU::GENBL2 |= 1 << i;
-			return ret;
-		}
-#endif
 
 
 		//-----------------------------------------------------------------//
