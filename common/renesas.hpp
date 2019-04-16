@@ -25,6 +25,7 @@
 #include "RX600/cmpc.hpp"
 #include "RX24T/flash.hpp"
 #include "RX24T/flash_io.hpp"
+#include "RX24T/dac_out.hpp"
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 #include "RX62x/system.hpp"
