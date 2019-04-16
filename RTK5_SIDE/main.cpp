@@ -304,9 +304,10 @@ int main(int argc, char** argv)
 
 	{  // DMAC マネージャー開始
 		uint8_t intr_level = 4;
+		bool cpu_intr = true;
 		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
 			reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
-			sound_out_.size(), intr_level);
+			sound_out_.size(), intr_level, cpu_intr);
 		if(!ret) {
 			utils::format("DMAC Not start...\n");
 		}

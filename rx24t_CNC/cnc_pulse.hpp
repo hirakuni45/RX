@@ -94,7 +94,7 @@ namespace cnc {
 					if(acc_step_ > 0) {
 						frq_ += acc_;
 						--acc_step_;
-						MTU::set_frq(device::MTU0::channel::A, frq_);
+						MTU::set_freq(device::MTU0::channel::A, frq_);
 					} else if(lin_step_ > 0) {
 						--lin_step_;
 					} else {
@@ -102,7 +102,7 @@ namespace cnc {
 						if(frq_ < 100) {
 							frq_ = 100;
 						}
-						MTU::set_frq(device::MTU0::channel::A, frq_);
+						MTU::set_freq(device::MTU0::channel::A, frq_);
 					}
 				}
 				++count_;
