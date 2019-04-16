@@ -110,7 +110,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込み設定（選択ベクター）
+			@brief  割り込み設定（選択Ａベクター）
 			@param[in]	vec		割り込み要因
 			@param[in]	task	割り込みタスク
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
@@ -121,19 +121,19 @@ namespace device {
 		{
 			for(uint16_t i = 208; i <= 255; ++i) {
 				if(lvl > 0) {
-					if(ICU::SLIAR[i] == 0) {
+					if(ICU::SLIXR[i] == 0) {
 						ICU::IER.enable(i, 0);
-						set_task(ICU::VECTOR::INTA208, task);
+						set_task(static_cast<ICU::VECTOR>(i), task);
 						ICU::IPR[i] = lvl;
-						ICU::SLIAR[i] = static_cast<uint8_t>(vec);
+						ICU::SLIXR[i] = static_cast<uint8_t>(vec);
 						ICU::IR[i] = 0;
 						ICU::IER.enable(i, 1);
 						return static_cast<ICU::VECTOR>(i);
 					}
-				} else if(ICU::SLIAR[i] == static_cast<uint8_t>(vec)) {
+				} else if(ICU::SLIXR[i] == static_cast<uint8_t>(vec)) {
 					ICU::IER.enable(i, 0);
 					set_task(static_cast<ICU::VECTOR>(i), nullptr);
-					ICU::SLIAR[i] = 0;
+					ICU::SLIXR[i] = 0;
 					ICU::IR[i] = 0;
 					return static_cast<ICU::VECTOR>(i);
 				}

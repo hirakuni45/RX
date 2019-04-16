@@ -3,12 +3,12 @@
 /*!	@file
 	@brief	RX66T グループ・ICUc 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
+#include "RX600/icu_utils.hpp"
 
 namespace device {
 
@@ -591,7 +591,15 @@ namespace device {
 			rw8_t<base + 254> INTA254;
 			rw8_t<base + 255> INTA255;
 
-			volatile uint8_t& operator[] (uint8_t idx) {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  []オペレータ
+				@param[in]	idx		インデックス（０～２５５）
+				@return IR レジスターの参照
+			*/
+			//-------------------------------------------------------------//
+			volatile uint8_t& operator [] (uint8_t idx) {
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
@@ -814,6 +822,13 @@ namespace device {
 			bit_rw_t<ier1F, bitpos::B7>	INTA255;
 
 
+			//-------------------------------------------------------------//
+			/*!
+				@brief  許可、不許可
+				@param[in]	idx		インデックス（０～２５５）
+				@param[in]	ena		許可／不許可
+			*/
+			//-------------------------------------------------------------//
 			void enable(uint8_t idx, bool ena) noexcept
 			{
 				auto tmp = rd8_(base + (idx >> 3));
@@ -826,6 +841,13 @@ namespace device {
 			}
 
 
+			//-------------------------------------------------------------//
+			/*!
+				@brief  許可状態を取得
+				@param[in]	idx		インデックス（０～２５５）
+				@return 許可状態（許可の場合「true」）
+			*/
+			//-------------------------------------------------------------//
 			bool get(uint8_t idx) const noexcept
 			{
 				auto tmp = rd8_(base + (idx >> 3));
@@ -1031,7 +1053,15 @@ namespace device {
 			rw8_t<base + 254> INTA254;
 			rw8_t<base + 255> INTA255;
 
-			volatile uint8_t& operator[] (uint8_t idx) {
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  []オペレータ
+				@param[in]	idx		インデックス（０～２５５）
+				@return IR レジスターの参照
+			*/
+			//-------------------------------------------------------------//
+			volatile uint8_t& operator [] (uint8_t idx) {
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
@@ -1472,30 +1502,7 @@ namespace device {
 		static rw8_t<0x000879FF> SLIAR255;
 
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み要因選択レジスタ・テンプレート
-			@param[in]	base	ベース・アドレス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
-		struct slixr_t {
-
-			void set(uint16_t idx, uint8_t val) noexcept {
-				if(idx < 244 || idx > 255) return;
-				wr8_(base + idx, val);
-			}
-
-			uint8_t get(uint16_t idx) noexcept {
-				if(idx < 244 || idx > 255) return 0;
-				return rd8_(base + idx);
-			}
-
-			volatile uint8_t& operator[] (uint8_t idx) {
-				return *reinterpret_cast<volatile uint8_t*>(base + idx);
-			}
-		};
-		static slixr_t<0x00087900> SLIAR;
+		static icu_utils::slixr_t<0x00087900> SLIXR;
 	};
 	typedef icu_t ICU;
 }
