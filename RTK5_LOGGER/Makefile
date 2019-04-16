@@ -3,7 +3,7 @@
 #   @file
 #   @brief  RX65N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -200,6 +200,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX65N --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)
