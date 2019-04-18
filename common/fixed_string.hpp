@@ -23,7 +23,7 @@ namespace utils {
 	template <uint32_t SIZE>
 	class fixed_string {
 		uint32_t	pos_;
-		char		text_[SIZE + 1];
+		char		str_[SIZE + 1];
 
 	public:
 		//-----------------------------------------------------------------//
@@ -34,11 +34,11 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		fixed_string(const char* str = nullptr) noexcept : pos_(0) {
 			if(str != nullptr) {
-				std::strncpy(text_, str, SIZE);
-				pos_ = std::strlen(text_);
+				std::strncpy(str_, str, SIZE);
+				pos_ = std::strlen(str_);
 			}
-			text_[pos_] = 0;
-			text_[SIZE] = 0;
+			str_[pos_] = 0;
+			str_[SIZE] = 0;
 		}
 
 
@@ -67,7 +67,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void clear() noexcept {
 			pos_ = 0;
-			text_[pos_] = 0;
+			str_[pos_] = 0;
 		}
 
 
@@ -77,7 +77,7 @@ namespace utils {
 			@return 配列の先頭
 		*/
 		//-----------------------------------------------------------------//
-		const char* begin() const noexcept { return &text_[0]; }
+		const char* begin() const noexcept { return &str_[0]; }
 
 
 		//-----------------------------------------------------------------//
@@ -86,7 +86,7 @@ namespace utils {
 			@return 配列の先頭
 		*/
 		//-----------------------------------------------------------------//
-		char* begin() noexcept { return &text_[0]; }
+		char* begin() noexcept { return &str_[0]; }
 
 
 		//-----------------------------------------------------------------//
@@ -95,7 +95,7 @@ namespace utils {
 			@return 配列の終端
 		*/
 		//-----------------------------------------------------------------//
-		const char* end() const noexcept { return &text_[pos_]; }
+		const char* end() const noexcept { return &str_[pos_]; }
 
 
 		//-----------------------------------------------------------------//
@@ -104,7 +104,7 @@ namespace utils {
 			@return 配列の終端
 		*/
 		//-----------------------------------------------------------------//
-		char* end() noexcept { return &text_[pos_]; }
+		char* end() noexcept { return &str_[pos_]; }
 
 
 		//-----------------------------------------------------------------//
@@ -113,7 +113,7 @@ namespace utils {
 			@return 文字列
 		*/
 		//-----------------------------------------------------------------//
-		const char* c_str() const noexcept { return text_; }
+		const char* c_str() const noexcept { return str_; }
 
 
 		//-----------------------------------------------------------------//
@@ -124,7 +124,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		void swap(fixed_string& src) noexcept {
-			std::swap(src.text_, text_);
+			std::swap(src.str_, str_);
 			std::swap(src.pos_, pos_);
 		}
 
@@ -137,8 +137,8 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		fixed_string& operator = (const char* src) noexcept {
-			std::strncpy(text_, src, SIZE);
-			pos_ = std::strlen(text_);
+			std::strncpy(str_, src, SIZE);
+			pos_ = std::strlen(str_);
 			return *this;
 		}
 
@@ -151,7 +151,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		fixed_string& operator = (const fixed_string& src) noexcept {
-			std::strncpy(text_, src.c_str(), SIZE);
+			std::strncpy(str_, src.c_str(), SIZE);
 			pos_ = src.pos_;
 			return *this;
 		}
@@ -166,9 +166,9 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		fixed_string& operator += (char ch) noexcept {
 			if(pos_ < SIZE) {
-				text_[pos_] = ch;
+				str_[pos_] = ch;
 				++pos_;
-				text_[pos_] = 0;
+				str_[pos_] = 0;
 			}
 			return *this;
 		}
@@ -188,21 +188,22 @@ namespace utils {
 
 			uint32_t l = std::strlen(str);
 			if((pos_ + l) < SIZE) {
-				std::strcpy(&text_[pos_], str);
+				std::strcpy(&str_[pos_], str);
 				pos_ += l;
 			} else {  // バッファが許す範囲でコピー
 				l = SIZE - pos_;
-				std::strncpy(&text_[pos_], str, l);
+				std::strncpy(&str_[pos_], str, l);
 				pos_ = SIZE;
 			}
-			text_[pos_] = 0; 
+			str_[pos_] = 0; 
 			return *this;
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  文字参照
+			@brief  文字参照 @n
+					※範囲外では、「０」を返す（例外を投げない）
 			@param[in]	pos	配列位置
 			@return 文字
 		*/
@@ -212,49 +213,26 @@ namespace utils {
 				static char tmp = 0;
 				return tmp;
 			}
-			return text_[pos];
+			return str_[pos];
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  一致比較
-			@param[in]	text	文字列
+			@brief  クラス一致比較
+			@param[in]	th		文字列クラス
 			@return 同じなら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool cmp(const char* text) const noexcept {
-			if(text == nullptr) {
-				return pos_ == 0;
-			}
-			return std::strcmp(c_str(), text) == 0;
+		int cmp(const fixed_string& th) const noexcept {
+			return std::strcmp(c_str(), th.c_str());
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  一致比較（オペレーター）
-			@param[in]	text	文字列
-			@return 同じなら「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool operator == (const char* text) const noexcept { return cmp(text); }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  不一致比較（オペレーター）
-			@param[in]	text	文字列
-			@return 同じなら「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool operator != (const char* text) const noexcept { return !cmp(text); }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  クラス、一致比較（オペレーター）
-			@param[in]	th	比較対象
+			@brief  クラス一致比較（オペレーター）
+			@param[in]	th	文字列クラス
 			@return 同じなら「true」
 		*/
 		//-----------------------------------------------------------------//
@@ -266,12 +244,66 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  クラス、不一致比較（オペレーター）
-			@param[in]	th	比較対象
+			@param[in]	th	文字列クラス
 			@return 同じなら「true」
 		*/
 		//-----------------------------------------------------------------//
 		bool operator != (const fixed_string& th) const noexcept {
 			return std::strcmp(c_str(), th.c_str()) != 0;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クラス大小比較（オペレーター）
+			@param[in]	th		文字列クラス
+			@return 大小なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool operator > (const fixed_string& th) const noexcept {
+			return std::strcmp(c_str(), th.c_str()) > 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クラス小大比較（オペレーター）
+			@param[in]	th		文字列クラス
+			@return 小大なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool operator < (const fixed_string& th) const noexcept {
+			return std::strcmp(c_str(), th.c_str()) < 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クラス大小一致比較（オペレーター）
+			@param[in]	th		文字列
+			@return 大小一致なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool operator >= (const fixed_string& th) const noexcept {
+			return std::strcmp(c_str(), th.c_str()) >= 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  クラス小大一致比較（オペレーター）
+			@param[in]	th		文字列クラス
+			@return 小大一致なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool operator <= (const fixed_string& th) const noexcept {
+			return std::strcmp(c_str(), th.c_str()) <= 0;
+		}
 	};
+
+	typedef fixed_string<16> STR16;
+	typedef fixed_string<32> STR32;
+	typedef fixed_string<64> STR64;
+	typedef fixed_string<128> STR128;
+	typedef fixed_string<256> STR256;
 }
