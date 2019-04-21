@@ -24,7 +24,6 @@ void init(void)
 	init_interrupt();
 
 	// C++ constractor
-	rx_run_fini_array();
 	rx_run_preinit_array();
 	rx_run_init_array();
 
@@ -34,6 +33,8 @@ void init(void)
 	static int argc = 0;
 	static char **argv = 0;
 	int ret = main(argc, argv);
+
+	rx_run_fini_array();
 
 	// メイン関数の「return」
 	while(1) ;
