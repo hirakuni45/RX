@@ -8,6 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "common/scene.hpp"
 #include "scenes_base.hpp"
 #include "common/format.hpp"
 #include "common/time.h"
@@ -19,7 +20,7 @@ namespace app {
 		@brief	ルート・メニュー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class root_menu {
+	class root_menu : public utils::scene {
 
 	public:
 		//-------------------------------------------------------------//
@@ -35,7 +36,7 @@ namespace app {
 			@brief	初期化
 		*/
 		//-------------------------------------------------------------//
-		void init()
+		void init() override
 		{
 			at_scenes_base().at_menu().clear();
 			at_scenes_base().at_menu().set_gap(20);
@@ -52,7 +53,7 @@ namespace app {
 			@brief	サービス
 		*/
 		//-------------------------------------------------------------//
-		void service()
+		void service() override
 		{
 			at_scenes_base().at_render().clear(graphics::def_color::Black);
 
@@ -103,5 +104,13 @@ namespace app {
 				}
 			}
 		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	シーンの終了
+		*/
+		//-------------------------------------------------------------//
+		void exit() override { }
 	};
 }

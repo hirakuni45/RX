@@ -27,9 +27,10 @@ namespace app {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class scenes {
 
-		typedef utils::scene<title, root_menu, laptime, recall, setup, gps> SCENE;
+		typedef utils::scene_director SCDR;
+		SCDR		scdr_;
 
-		SCENE		scene_;
+		scenes_base	scenes_base_;
 
 		title		title_;
 		root_menu	root_menu_;
@@ -39,15 +40,22 @@ namespace app {
 		setup		setup_;
 		gps			gps_;
 
-		scenes_base	scenes_base_;
-
 	public:
 		//-------------------------------------------------------------//
 		/*!
 			@brief	コンストラクタ
 		*/
 		//-------------------------------------------------------------//
-		scenes() noexcept { scene_.change(title_); }
+		scenes() noexcept : scdr_(), scenes_base_(),
+			title_(),
+			root_menu_(),
+			laptime_(),
+			recall_(),
+			setup_(),
+			gps_()
+		{
+			scdr_.change(title_);
+		}
 
 
 		//-------------------------------------------------------------//
@@ -69,23 +77,23 @@ namespace app {
 		{
 			switch(id) {
 			case scenes_id::title:
-				scene_.change(title_);
+				scdr_.change(title_);
 				break;
 			case scenes_id::root_menu:
-				scene_.change(root_menu_);
+				scdr_.change(root_menu_);
 				break;
 
 			case scenes_id::laptime:
-				scene_.change(laptime_);
+				scdr_.change(laptime_);
 				break;
 			case scenes_id::recall:
-				scene_.change(recall_);
+				scdr_.change(recall_);
 				break;
 			case scenes_id::setup:
-				scene_.change(setup_);
+				scdr_.change(setup_);
 				break;
 			case scenes_id::gps:
-				scene_.change(gps_);
+				scdr_.change(gps_);
 				break;
 
 			default:
@@ -101,7 +109,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void service() noexcept
 		{
-			scene_.service();
+			scdr_.service();
 		}
 	};
 }

@@ -23,6 +23,10 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 
+#include "graphics/widget_director.hpp"
+
+// #define SDHI_IF
+
 // #define SOFT_I2C
 
 #ifdef SOFT_I2C
@@ -92,11 +96,11 @@ namespace app {
 				device::port_map::option::FIRST_I2C> FT5206_I2C;
 #endif
 		// FT5206 touch device
-		typedef chip::FT5206<FT5206_I2C> FT5206;
+		typedef chip::FT5206<FT5206_I2C> TOUCH;
 
 		typedef resource<RENDER> RESOURCE;
 
-		typedef gui::dialog<RENDER, FT5206> DIALOG;
+		typedef gui::dialog<RENDER, TOUCH> DIALOG;
 
 #ifdef SDHI_IF
 		// RX65N Envision Kit の SDHI ポートは、候補３になっている
@@ -116,6 +120,8 @@ namespace app {
 #endif
 		typedef utils::sdc_man SDC;
 		typedef gui::filer<RENDER, SDC> FILER;
+
+		typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
 
 	private:
 		GLCDC_IO	glcdc_io_;
@@ -209,8 +215,9 @@ namespace app {
 
 	private:
 		FT5206_I2C	ft5206_i2c_;
-		FT5206		ft5206_;
+		TOUCH		touch_;
 
+		WIDD		widd_;
 		MENU		menu_;
 		BACK		back_;
 		DIALOG		dialog_;
@@ -234,6 +241,8 @@ namespace app {
 		GPS			gps_;
 		NMEA		nmea_;
 
+		bool		enable_filer_;
+
 	public:
 		//-------------------------------------------------------------//
 		/*!
@@ -245,12 +254,14 @@ namespace app {
 			glcdc_io_(nullptr, lcdorg),
 			afont_(), kfont_(), font_(afont_, kfont_),
 			render_(glcdc_io_, font_),
-			ft5206_(ft5206_i2c_),
-			menu_(render_, back_), back_(render_), dialog_(render_, ft5206_),
+			touch_(ft5206_i2c_),
+			widd_(render_, touch_),
+			menu_(render_, back_), back_(render_), dialog_(render_, touch_),
 			spi_(), sdh_(spi_, 35000000), sdc_(), filer_(render_, sdc_),
 			resource_(render_),
 			plot_(render_), img_in_(plot_),
-			gps_(), nmea_(gps_)
+			gps_(), nmea_(gps_),
+			enable_filer_(false)
 			{ }
 
 
@@ -261,6 +272,11 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init() noexcept
 		{
+			{  // SDC 開始
+				sdh_.start();
+				sdc_.start();
+			}
+
 			{
 				uint8_t intr = 1;
 				nmea_.start(intr);
@@ -284,12 +300,12 @@ namespace app {
 			}
 
 			{  // FT5206 touch screen controller
-				FT5206::reset<FT5206_RESET>();
+				TOUCH::reset<FT5206_RESET>();
 				uint8_t intr_lvl = 1;
 				if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
 					utils::format("FT5206 I2C Start Fail...\n");
 				}
-				if(!ft5206_.start()) {
+				if(!touch_.start()) {
 					utils::format("FT5206 Start Fail...\n");
 				}
 			}
@@ -315,10 +331,58 @@ namespace app {
 		void sync() noexcept
 		{
 			render_.sync_frame();
-			ft5206_.update();
-			nmea_.service();
+			touch_.update();
+		}
 
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	アップデート（毎フレーム呼び出し）
+		*/
+		//-------------------------------------------------------------//
+		void update() noexcept
+		{
+			sdc_.service(sdh_.service());
+
+			nmea_.service();
 //			nmea_.list_all();
+
+			// ファイラー機能更新
+			if(enable_filer_) {
+				uint32_t ctrl = 0;
+#if 0
+				auto data = get_fami_pad();
+				if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
+					gui::set(gui::filer_ctrl::OPEN, ctrl);
+				}
+				if(chip::on(data, chip::FAMIPAD_ST::UP)) {
+					gui::set(gui::filer_ctrl::UP, ctrl);
+				}
+				if(chip::on(data, chip::FAMIPAD_ST::DOWN)) {
+					gui::set(gui::filer_ctrl::DOWN, ctrl);
+				}
+				if(chip::on(data, chip::FAMIPAD_ST::LEFT)) {
+					gui::set(gui::filer_ctrl::BACK, ctrl);
+				}
+				if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
+					gui::set(gui::filer_ctrl::SELECT, ctrl);
+				}
+#endif
+				auto tnum = touch_.get_touch_num();
+				const auto& xy = touch_.get_touch_pos(0);
+				filer_.set_touch(tnum, xy.x, xy.y);
+				char path[256];
+				if(filer_.update(ctrl, path, sizeof(path))) {
+					render_.sync_frame();
+
+					utils::format("%s\n") % path;
+
+					enable_filer_ = false;
+				}
+			}
+
+			// widget 関係
+			widd_.update();
 		}
 
 
@@ -337,7 +401,7 @@ namespace app {
 			@return タッチデバイス
 		*/
 		//-------------------------------------------------------------//
-		FT5206& at_touch() noexcept { return ft5206_; }
+		TOUCH& at_touch() noexcept { return touch_; }
 
 
 		//-------------------------------------------------------------//
@@ -347,6 +411,15 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		RENDER& at_render() noexcept { return render_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	widget_director の参照
+			@return widget_director
+		*/
+		//-------------------------------------------------------------//
+		auto& at_widget_director() noexcept { return widd_; }
 
 
 		//-------------------------------------------------------------//
@@ -410,6 +483,42 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		NMEA& at_nmea() noexcept { return nmea_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	SDH の参照
+			@return SDH
+		*/
+		//-------------------------------------------------------------//
+		auto& at_sdh() noexcept { return sdh_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	SDC の参照
+			@return SDC
+		*/
+		//-------------------------------------------------------------//
+		auto& at_sdc() noexcept { return sdc_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	ファイラーの許可
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-------------------------------------------------------------//
+		void enable_filer(bool ena = true) noexcept { enable_filer_ = ena; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	ファイラーの状態を取得
+			@return ファイラーの状態
+		*/
+		//-------------------------------------------------------------//
+		bool get_filer_state() const noexcept { return enable_filer_; }
 	};
 }
 

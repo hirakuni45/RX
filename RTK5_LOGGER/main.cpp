@@ -21,8 +21,6 @@
 
 #include "scenes.hpp"
 
-// #define SDHI_IF
-
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -30,42 +28,15 @@ namespace {
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
+	// debug serial port
 	typedef utils::fixed_fifo<char, 512>  REB;
 	typedef utils::fixed_fifo<char, 1024> SEB;
 	typedef device::sci_io<device::SCI9, REB, SEB> SCI;
 	SCI			sci_;
 
-	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
-//	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
-	typedef device::NULL_PORT SDC_POWER;
-
-#ifdef SDHI_IF
-	// RX65N Envision Kit の SDHI ポートは、候補３になっている
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
-	SDHI		sdh_;
-#else
-	// Soft SDC 用　SPI 定義（SPI）
-	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
-	typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  // CMD
-	typedef device::PORT<device::PORT2, device::bitpos::B1> SPCK;  // CLK
-
-	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;  ///< Soft SPI 定義
-
-	SPI			spi_;
-
-	typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
-	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD   カード検出
-
-	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
-
-	MMC			sdh_(spi_, 20000000);
-#endif
-	typedef utils::sdc_man SDC;
-	SDC			sdc_;
-
 	// QSPI B グループ
-	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
-	QSPI		qspi_;
+//	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
+//	QSPI		qspi_;
 
 	typedef utils::command<256> CMD;
 	CMD			cmd_;
@@ -75,7 +46,7 @@ namespace {
 
 
 	bool check_mount_() {
-		return sdc_.get_mount();
+		return scenes_.at_base().at_sdc().get_mount();
 	}
 
 
@@ -93,9 +64,9 @@ namespace {
 					if(cmdn >= 2) {
 						char tmp[128];
 						cmd_.get_word(1, tmp, sizeof(tmp));
-						sdc_.dir(tmp);
+						scenes_.at_base().at_sdc().dir(tmp);
 					} else {
-						sdc_.dir("");
+						scenes_.at_base().at_sdc().dir("");
 					}
 				}
 				f = true;
@@ -104,14 +75,17 @@ namespace {
 					if(cmdn >= 2) {
 						char tmp[128];
 						cmd_.get_word(1, tmp, sizeof(tmp));
-						sdc_.cd(tmp);						
+						scenes_.at_base().at_sdc().cd(tmp);						
 					} else {
-						sdc_.cd("/");
+						scenes_.at_base().at_sdc().cd("/");
 					}
 				}
 				f = true;
 			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-				utils::format("%s\n") % sdc_.get_current();
+				utils::format("%s\n") % scenes_.at_base().at_sdc().get_current();
+				f = true;
+			} else if(cmd_.cmp_word(0, "gui")) {
+				at_scenes_base().at_widget_director().list_all();
 				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    dir [path]\n");
@@ -139,6 +113,18 @@ void change_scene(app::scenes_id id)
 app::scenes_base& at_scenes_base()
 {
 	return scenes_.at_base();
+}
+
+/// widget の登録
+bool insert_widget(gui::widget* w)
+{
+	return at_scenes_base().at_widget_director().insert(w);
+}
+
+/// widget の解除
+void remove_widget(gui::widget* w)
+{
+	at_scenes_base().at_widget_director().remove(w);
 }
 
 
@@ -169,33 +155,35 @@ extern "C" {
 
 
 	DSTATUS disk_initialize(BYTE drv) {
-		return sdh_.disk_initialize(drv);
+		return scenes_.at_base().at_sdh().disk_initialize(drv);
 	}
 
 
 	DSTATUS disk_status(BYTE drv) {
-		return sdh_.disk_status(drv);
+		return scenes_.at_base().at_sdh().disk_status(drv);
 	}
 
 
 	DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
-		return sdh_.disk_read(drv, buff, sector, count);
+		return scenes_.at_base().at_sdh().disk_read(drv, buff, sector, count);
 	}
 
 
 	DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
-		return sdh_.disk_write(drv, buff, sector, count);
+		return scenes_.at_base().at_sdh().disk_write(drv, buff, sector, count);
 	}
 
 
 	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
-		return sdh_.disk_ioctl(drv, ctrl, buff);
+		return scenes_.at_base().at_sdh().disk_ioctl(drv, ctrl, buff);
 	}
 
 
 	DWORD get_fattime(void) {
-		time_t t = 0;
+///		time_t t = 0;
 ///		rtc_.get_time(t);
+		// GPS モジュールから GMT 時間を取得
+		auto t = scenes_.at_base().at_nmea().get_gmtime();		
 		return utils::str::get_fattime(t);
 	}
 
@@ -212,7 +200,7 @@ extern "C" {
 
 	int make_full_path(const char* src, char* dst, uint16_t len)
 	{
-		return sdc_.make_full_path(src, dst, len);
+		return scenes_.at_base().at_sdc().make_full_path(src, dst, len);
 	}
 }
 
@@ -227,31 +215,30 @@ int main(int argc, char** argv)
 		sci_.start(115200, intr);
 	}
 
-	{  // SD カード・クラスの初期化
-		sdh_.start();
-		sdc_.start();
-	}
-
 	utils::format("\rRTK5RX65N Start for Data Logger\n");
 
 	cmd_.set_prompt("# ");
 
-	{  // QSPI の初期化（Flash Memory Read/Write Interface)
-		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
-			utils::format("QSPI not start.\n");
-		}
-	}
+//	{  // QSPI の初期化（Flash Memory Read/Write Interface)
+//		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
+//			utils::format("QSPI not start.\n");
+//		}
+//	}
 
 	// シーン初期化
 	scenes_.at_base().init();
 
 	LED::DIR = 1;
 
+
+	
+
+
 	uint8_t n = 0;
 	while(1) {
 		scenes_.at_base().sync();
 
-		sdc_.service(sdh_.service());
+		scenes_.at_base().update();
 
 		scenes_.service();
 

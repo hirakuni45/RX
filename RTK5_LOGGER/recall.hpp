@@ -18,7 +18,7 @@ namespace app {
 		@brief	リコール・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class recall {
+	class recall : public utils::scene {
 
 		typedef scenes_base::RENDER RENDER;
 		typedef graphics::def_color DEF_COLOR;
@@ -37,9 +37,11 @@ namespace app {
 			@brief	初期化
 		*/
 		//-------------------------------------------------------------//
-		void init()
+		void init() override
 		{
 			at_scenes_base().at_render().clear(DEF_COLOR::Black);
+			at_scenes_base().enable_filer();
+			at_scenes_base().get_filer_state();
 		}
 
 
@@ -48,7 +50,21 @@ namespace app {
 			@brief	サービス
 		*/
 		//-------------------------------------------------------------//
-		void service()
+		void service() override
+		{
+			auto f = at_scenes_base().get_filer_state();
+			if(!f) {
+				change_scene(scenes_id::root_menu);
+			}
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	シーンの終了
+		*/
+		//-------------------------------------------------------------//
+		void exit() override
 		{
 		}
 	};

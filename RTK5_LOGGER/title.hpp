@@ -8,6 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "common/scene.hpp"
 #include "common/format.hpp"
 #include "scenes_base.hpp"
 
@@ -18,7 +19,7 @@ namespace app {
 		@brief	タイトル・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class title {
+	class title : public utils::scene {
 
 		typedef scenes_base::RENDER RENDER;
 		typedef graphics::def_color DEF_COLOR;
@@ -41,7 +42,7 @@ namespace app {
 			@brief	初期化
 		*/
 		//-------------------------------------------------------------//
-		void init()
+		void init() override
 		{
 			auto& render = at_scenes_base().at_render();
 
@@ -58,7 +59,7 @@ namespace app {
 			@brief	サービス
 		*/
 		//-------------------------------------------------------------//
-		void service()
+		void service() override
 		{
 			if(wait_ > 0) {
 				--wait_;
@@ -96,5 +97,13 @@ namespace app {
 				change_scene(scenes_id::root_menu);
 			}
 		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	シーンの終了
+		*/
+		//-------------------------------------------------------------//
+		void exit() override { }
 	};
 }

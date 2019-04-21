@@ -18,7 +18,7 @@ namespace app {
 		@brief	ラップタイム・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class laptime {
+	class laptime : public utils::scene {
 
 		uint32_t	lap_best_t_;
 		uint32_t	lap_best_n_;
@@ -41,7 +41,7 @@ namespace app {
 			@brief	初期化
 		*/
 		//-------------------------------------------------------------//
-		void init()
+		void init() override
 		{
 			at_scenes_base().at_cmt().at_task().enable();
 			lap_best_t_ = 0;
@@ -59,7 +59,7 @@ namespace app {
 			@brief	サービス
 		*/
 		//-------------------------------------------------------------//
-		void service()
+		void service() override
 		{
 			auto& render = at_scenes_base().at_render();
 			auto& res = at_scenes_base().at_resource();
@@ -118,5 +118,13 @@ namespace app {
 				res.draw_short_lap(vtx::spos(0, 48 + 28 * 4 - i * 28), pos - i, t);
 			}
 		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	シーンの終了
+		*/
+		//-------------------------------------------------------------//
+		void exit() override { }
 	};
 }

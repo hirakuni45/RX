@@ -18,7 +18,7 @@ namespace app {
 		@brief	ＧＰＳ表示・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class gps {
+	class gps : public utils::scene {
 
 		typedef scenes_base::RENDER RENDER;
 		typedef graphics::def_color DEF_COLOR;
@@ -39,7 +39,7 @@ namespace app {
 			@brief	初期化
 		*/
 		//-------------------------------------------------------------//
-		void init() noexcept
+		void init() noexcept override
 		{
 			at_scenes_base().at_render().clear(DEF_COLOR::Black);
 //			auto& nmea = at_scenes_base().at_nmea();
@@ -54,7 +54,7 @@ namespace app {
 			@brief	サービス
 		*/
 		//-------------------------------------------------------------//
-		void service() noexcept
+		void service() noexcept override
 		{
 			auto& rdr = at_scenes_base().at_render();
 			rdr.clear(DEF_COLOR::Black);
@@ -92,5 +92,13 @@ namespace app {
 			}
 			trg_ = t;
 		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	シーンの終了
+		*/
+		//-------------------------------------------------------------//
+		void exit() override { }
 	};
 }
