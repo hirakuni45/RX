@@ -63,6 +63,32 @@ rx_prog -d RX71M --verbose
 ```
 rx_prog -d RX71M --progress --write --verify test_sample.mot
 ```
+
+### FT231XS と CP2102 の違い
+FT231XS:
+```
+Neptune./d/Git/RX/RAYTRACER_sample/RX66T % time rx_prog -d RX66T --progress --erase --write --verify raytracer_sample.mot
+Erase:  #################################################
+Write:  #################################################
+Verify: #################################################
+
+real    0m16.617s
+user    0m0.202s
+sys     0m0.421s
+```
+   
+CP2102:
+```
+Neptune./d/Git/RX/RAYTRACER_sample/RX66T % time rx_prog -P COM12 -d RX66T --progress --erase --write --verify raytracer_sample.mot
+Erase:  #################################################
+Write:  #################################################
+Verify: #################################################
+
+real    0m6.616s
+user    0m0.078s
+sys     0m0.187s
+```
+同じボーレート、同じサイズの書き込みで、まるで違う速度です、これは、廉価な「FT231XS」は、上位でコストの高い「FT232RL」などと差別化する為、スピードを遅くしているものと思えます。   
    
 -----
    
