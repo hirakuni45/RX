@@ -945,6 +945,9 @@ namespace vtx {
 		rectangle(const vertex2<T>& org_, const vertex2<T>& size_) : org(org_), size(size_) { }
 		rectangle(const rectangle<T>& r) : org(r.org), size(r.size) { }
 
+		void set(T x, T y, T w, T h) { org.set(x, y); size.set(w, h); }
+		void set(const vertex2<T>& org_, const vertex2<T>& size_) { org = org_; size = size_; }
+
 		bool is_focus(const vertex2<T>& p) const {
 			if(size.x <= 0 || size.y <= 0) return false;
 			if(org.x <= p.x && p.x < (org.x + size.x) && org.y <= p.y && p.y < (org.y + size.y)) {
