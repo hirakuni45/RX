@@ -3,57 +3,37 @@
 /*!	@file
 	@brief	シーン・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <boost/variant.hpp>
+#include <cstdint>
 
 namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	シーン・クラス
+		@brief	シーン・インターフェース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class... Args>
-	class scene {
+	struct scene {
+		virtual ~scene() { }
+		virtual void init() = 0;
+		virtual void service() = 0;
+		virtual void exit() = 0;
+	};
 
-		static const int argc_ = sizeof...(Args);
 
-		using scene_type = boost::variant<Args...>;
-		scene_type cur_scene_;
-		scene_type new_scene_;
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	シーン・ディレクター・クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	class scene_director {
 
-		struct init_visitor {
-			using result_type = void;
-
-    		template <class T>
-    		void operator()(T& x) {
-				return x.init();
-			}
-		};
-
-		struct service_visitor {
-			using result_type = void;
-
-    		template <class T>
-    		void operator()(T& x) {
-				return x.service();
-			}
-		};
-
-		bool	change_;
-		bool	current_;
-
-		void init_()
-		{
-			init_visitor vis;
-           	boost::apply_visitor(vis, new_scene_);
-			cur_scene_ = new_scene_;
-			current_ = true;
-		}
+		scene*	cur_scene_;
+		scene*	new_scene_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -61,21 +41,19 @@ namespace utils {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		scene() : change_(false), current_(false) { }
+		scene_director() : cur_scene_(nullptr), new_scene_(nullptr) { }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	チェンジ・シーン
-			@param[in]	T	型
-			@param[in]	new_scene	新規シーンのインスタンス
+			@brief	シーンの切り替え
+			@param[in]	news   シーン
 		*/
 		//-----------------------------------------------------------------//
 		template <class T>
-		void change(T scene)
+		void change(T& news)
 		{
-			new_scene_ = scene;
-			change_ = true;
+			new_scene_ = &news;
 		}
 
 
@@ -86,14 +64,15 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void service()
 		{
-			if(change_) {
-				init_();
-				change_ = false;
+			if(new_scene_ != nullptr) {
+				if(cur_scene_ != nullptr) cur_scene_->exit();
+				new_scene_->init();
+				cur_scene_ = new_scene_;
+				new_scene_ = nullptr;
 			}
 
-			if(current_) {
-				service_visitor vis;
-    	       	boost::apply_visitor(vis, cur_scene_);
+			if(cur_scene_ != nullptr) {
+				cur_scene_->service();
 			}
 		}
 	};
