@@ -272,11 +272,14 @@ namespace utils {
 
         //-----------------------------------------------------------------//
         /*!
-            @brief  時間「time_t」を取得（グリニッチ時間）
+            @brief  GMT 時間「time_t」を取得（グリニッチ標準時間）
 			@return 時間「time_t」
         */
         //-----------------------------------------------------------------//
 		time_t get_gmtime() const noexcept {
+			if(time_[0] == 0) {
+				return 0;
+			}
 			tm ts;
 			ts.tm_sec  = get_dec_(&time_[4], 2);
 			ts.tm_min  = get_dec_(&time_[2], 2);
@@ -457,7 +460,10 @@ namespace utils {
 
         //-----------------------------------------------------------------//
         /*!
-            @brief  スタート
+            @brief  スタート @n
+					・開始時はボーレートは「９６００ＢＰＳ」になっている。@n
+					・GPS モジュールがバッテリーバックアップされている場合、@n
+					最後に設定したボーレートになっている可能性がある。
 			@param[in]	intr	シリアルの割り込みレベル
 			@param[in]	fast	高速ボーレート
 			@param[in]	rate	更新レート（最大１０Ｈｚ）
@@ -466,7 +472,7 @@ namespace utils {
 		void start(uint16_t intr = 1, uint32_t fast = FAST_BAUDRATE, uint16_t rate = 10) noexcept
 		{
 			intr_ = intr;
-			baud_real_rate_ = 9600;  // 電源が入った時は９６００
+			baud_real_rate_ = 9600;
 			baud_fast_rate_ = fast;
 			update_real_rate_ = 1;
 			update_fast_rate_ = rate;
