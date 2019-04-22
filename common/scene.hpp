@@ -3,12 +3,13 @@
 /*!	@file
 	@brief	シーン・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdint>
+#include <tuple>
 
 namespace utils {
 
@@ -18,10 +19,10 @@ namespace utils {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct scene {
-		virtual ~scene() { }
-		virtual void init() = 0;
-		virtual void service() = 0;
-		virtual void exit() = 0;
+		virtual ~scene() { }		///< デストラクタ
+		virtual void init() = 0;	///< シーン開始前処理
+		virtual void service() = 0;	///< シーン・サービス
+		virtual void exit() = 0;	///< シーン終了処理
 	};
 
 
@@ -30,7 +31,11 @@ namespace utils {
 		@brief	シーン・ディレクター・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template<class... Args>
 	class scene_director {
+
+		typedef std::tuple<Args...> SCENES;
+		SCENES	scenes_;
 
 		scene*	cur_scene_;
 		scene*	new_scene_;
@@ -41,7 +46,20 @@ namespace utils {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		scene_director() : cur_scene_(nullptr), new_scene_(nullptr) { }
+		scene_director() noexcept : scenes_(), cur_scene_(nullptr), new_scene_(nullptr)
+		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	開始（最初の型シーン）
+		*/
+		//-----------------------------------------------------------------//
+		void start_first() noexcept
+		{
+			auto& t = std::get<0>(scenes_);
+			new_scene_ = &t;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -51,8 +69,10 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		template <class T>
-		void change(T& news)
+		void change() noexcept
+//		void change(T& news)
 		{
+			auto& news = std::get<T>(scenes_);
 			new_scene_ = &news;
 		}
 
@@ -62,7 +82,7 @@ namespace utils {
 			@brief	サービス
 		*/
 		//-----------------------------------------------------------------//
-		void service()
+		void service() noexcept
 		{
 			if(new_scene_ != nullptr) {
 				if(cur_scene_ != nullptr) cur_scene_->exit();
