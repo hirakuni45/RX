@@ -29,6 +29,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	シーン・ディレクター・クラス
+		@param[in]	Args	管理するシーンの全て
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class... Args>
@@ -70,7 +71,6 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		template <class T>
 		void change() noexcept
-//		void change(T& news)
 		{
 			auto& news = std::get<T>(scenes_);
 			new_scene_ = &news;

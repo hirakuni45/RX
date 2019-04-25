@@ -19,15 +19,21 @@ namespace utils {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ITEM, uint32_t SIZE>
-	class fixed_list {
+	struct fixed_list {
+
+		typedef ITEM value_type;
+
+	private:
 
 		struct list_t {
+			list_t*	back_;
 			ITEM	item_;
 			list_t*	next_;
+			list_t() : back_(nullptr), item_(), next_(nullptr) { }
 		};
 
 		list_t		list_[SIZE];
-		uint32_t	top_;
+		uint32_t	count_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -35,7 +41,7 @@ namespace utils {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		fixed_list() noexcept : top_(0) { }
+		fixed_list() noexcept : list_{ }, count_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -63,6 +69,13 @@ namespace utils {
 		//-----------------------------------------------------------------//
 ///		void clear() noexcept { pos_ = 0; }
 
+
+		bool insert(const ITEM& item)
+		{
+			list_[count_].item_ = item;
+			++count_;
+
+		}
 
 
 	};
