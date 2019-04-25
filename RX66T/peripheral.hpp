@@ -44,10 +44,16 @@ namespace device {
 
 		POE,		///< ポートアウトプットイネーブル
 
-		GPT0,		///< 汎用 PWM タイマ０
-		GPT1,		///< 汎用 PWM タイマ１
-		GPT2,		///< 汎用 PWM タイマ２
-		GPT3,		///< 汎用 PWM タイマ３
+		GPTW0,		///< GPTW0  汎用 PWM タイマ
+		GPTW1,		///< GPTW1  汎用 PWM タイマ
+		GPTW2,		///< GPTW2  汎用 PWM タイマ
+		GPTW3,		///< GPTW3  汎用 PWM タイマ
+		GPTW4,		///< GPTW4  汎用 PWM タイマ
+		GPTW5,		///< GPTW5  汎用 PWM タイマ
+		GPTW6,		///< GPTW6  汎用 PWM タイマ
+		GPTW7,		///< GPTW7  汎用 PWM タイマ
+		GPTW8,		///< GPTW8  汎用 PWM タイマ
+		GPTW9,		///< GPTW9  汎用 PWM タイマ
 
 		HRPWM,		///< 高分解能 PWM 波形生成回路
 
