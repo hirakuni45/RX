@@ -88,7 +88,7 @@ namespace app {
 			const auto& touch = at_scenes_base().at_touch();
 			bool t = touch.get_touch_num() == 1 ? true : false;
 			if(trg_ && !t) {
-				change_scene(scenes_id::root_menu);
+				change_scene(scene_id::root_menu);
 			}
 			trg_ = t;
 		}

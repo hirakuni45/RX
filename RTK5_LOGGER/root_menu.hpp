@@ -90,16 +90,16 @@ namespace app {
 //				utils::format("Menu: %d\n") % static_cast<int>(pos);
 				switch(pos) {
 				case 0:
-					change_scene(scenes_id::laptime);
+					change_scene(scene_id::laptime);
 					break;
 				case 1:
-					change_scene(scenes_id::recall);
+					change_scene(scene_id::recall);
 					break;
 				case 2:
-					change_scene(scenes_id::setup);
+					change_scene(scene_id::setup);
 					break;
 				case 3:
-					change_scene(scenes_id::gps);
+					change_scene(scene_id::gps);
 					break;
 				}
 			}

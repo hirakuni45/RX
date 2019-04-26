@@ -51,8 +51,10 @@ namespace app {
 //			insert_widget(&btn_);
 
 			btn_.set_state(gui::widget::STATE::ENABLE);
-utils::format("Setup: init...\n");
-			at_scenes_base().at_widget_director().list_all();
+			btn_.at_select_func() = [this](uint32_t id) {
+				change_scene(scene_id::root_menu);
+			};
+//			at_scenes_base().at_widget_director().list_all();
 		}
 
 
@@ -84,7 +86,6 @@ utils::format("Setup: init...\n");
 		//-------------------------------------------------------------//
 		void exit() noexcept override
 		{
-utils::format("Setup: exit...\n");
 			btn_.set_state(gui::widget::STATE::DISABLE);
 		}
 	};

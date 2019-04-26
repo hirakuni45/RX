@@ -8,8 +8,6 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/scene.hpp"
-
 #include "scenes_base.hpp"
 #include "title.hpp"
 #include "root_menu.hpp"
@@ -17,6 +15,7 @@
 #include "recall.hpp"
 #include "setup.hpp"
 #include "gps.hpp"
+#include "common/scene.hpp"
 
 namespace app {
 
@@ -27,18 +26,10 @@ namespace app {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class scenes {
 
-		typedef utils::scene_director SCDR;
-		SCDR		scdr_;
-
 		scenes_base	scenes_base_;
 
-		title		title_;
-		root_menu	root_menu_;
-
-		laptime		laptime_;
-		recall		recall_;
-		setup		setup_;
-		gps			gps_;
+		typedef utils::scene_director<title, root_menu, laptime, recall, setup, gps> SCDR;
+		SCDR		scdr_;
 
 	public:
 		//-------------------------------------------------------------//
@@ -46,15 +37,9 @@ namespace app {
 			@brief	コンストラクタ
 		*/
 		//-------------------------------------------------------------//
-		scenes() noexcept : scdr_(), scenes_base_(),
-			title_(),
-			root_menu_(),
-			laptime_(),
-			recall_(),
-			setup_(),
-			gps_()
+		scenes() noexcept : scenes_base_(), scdr_()
 		{
-			scdr_.change(title_);
+			scdr_.change<title>();
 		}
 
 
@@ -73,27 +58,27 @@ namespace app {
 			@param[in]	id	新規シーン番号
 		*/
 		//-------------------------------------------------------------//
-		void change(scenes_id id) noexcept
+		void change(scene_id id) noexcept
 		{
 			switch(id) {
-			case scenes_id::title:
-				scdr_.change(title_);
+			case scene_id::title:
+				scdr_.change<title>();
 				break;
-			case scenes_id::root_menu:
-				scdr_.change(root_menu_);
+			case scene_id::root_menu:
+				scdr_.change<root_menu>();
 				break;
 
-			case scenes_id::laptime:
-				scdr_.change(laptime_);
+			case scene_id::laptime:
+				scdr_.change<laptime>();
 				break;
-			case scenes_id::recall:
-				scdr_.change(recall_);
+			case scene_id::recall:
+				scdr_.change<recall>();
 				break;
-			case scenes_id::setup:
-				scdr_.change(setup_);
+			case scene_id::setup:
+				scdr_.change<setup>();
 				break;
-			case scenes_id::gps:
-				scdr_.change(gps_);
+			case scene_id::gps:
+				scdr_.change<gps>();
 				break;
 
 			default:

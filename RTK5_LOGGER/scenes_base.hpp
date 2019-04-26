@@ -47,7 +47,7 @@ namespace app {
 		@brief	シーン ID
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class scenes_id {
+	enum class scene_id {
 		title,
 		root_menu,
 
@@ -320,6 +320,8 @@ namespace app {
 
 			// タッチパネルの初期化準備
 			dialog_.ready_to_touch();
+
+			
 		}
 
 
@@ -522,5 +524,5 @@ namespace app {
 	};
 }
 
-extern void change_scene(app::scenes_id id);
+extern void change_scene(app::scene_id id);
 extern app::scenes_base& at_scenes_base();

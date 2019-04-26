@@ -94,7 +94,7 @@ namespace app {
 					}
 				}
 			} else {
-				change_scene(scenes_id::root_menu);
+				change_scene(scene_id::root_menu);
 			}
 		}
 

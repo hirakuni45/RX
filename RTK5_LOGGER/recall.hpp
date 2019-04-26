@@ -54,7 +54,7 @@ namespace app {
 		{
 			auto f = at_scenes_base().get_filer_state();
 			if(!f) {
-				change_scene(scenes_id::root_menu);
+				change_scene(scene_id::root_menu);
 			}
 		}
 
