@@ -8,9 +8,11 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "graphics/widget.hpp"
 #include <array>
+#include "graphics/widget.hpp"
+#include "graphics/frame.hpp"
 #include "graphics/button.hpp"
+#include "graphics/check.hpp"
 
 namespace gui {
 
@@ -35,10 +37,10 @@ namespace gui {
 	private:
 		using GLC = typename RDR::glc_type;
 
-		RDR&	rdr_;
-		TOUCH&	touch_;
+		RDR&		rdr_;
+		TOUCH&		touch_;
 
-		WIDGETS	widgets_;
+		WIDGETS		widgets_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -60,7 +62,7 @@ namespace gui {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool insert(widget* w)
+		bool insert(widget* w) noexcept
 		{
 			for(auto& t : widgets_) {
 				if(t.w_ == nullptr) {
@@ -79,7 +81,7 @@ namespace gui {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool remove(widget* w)
+		bool remove(widget* w) noexcept
 		{
 			for(auto& t : widgets_) {
 				if(t.w_ == w) {
@@ -91,6 +93,11 @@ namespace gui {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	四角を描画
+		*/
+		//-----------------------------------------------------------------//
 		void draw_square(const vtx::srect& rect, const char* text) noexcept
 		{
 			auto sz = rdr_.at_font().get_text_size(text);
@@ -101,6 +108,11 @@ namespace gui {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ラウンドした四角を描画
+		*/
+		//-----------------------------------------------------------------//
 		void draw_round(const vtx::srect& rect, const char* text, int16_t radius) noexcept
 		{
 			rdr_.swap_color();
@@ -125,7 +137,7 @@ namespace gui {
 				for(auto& t : widgets_) {
 					if(t.w_ == nullptr) continue;
 					if(t.w_->get_state() == widget::STATE::DISABLE) continue;
-					t.w_->check_area(vtx::spos(tp.x, tp.y), num);
+					t.w_->update_touch(vtx::spos(tp.x, tp.y), num);
 				}
 			}
 
@@ -134,10 +146,32 @@ namespace gui {
 				if(t.w_->get_state() == widget::STATE::DISABLE) continue;
 
 				switch(t.w_->get_id()) {
+				case widget_set::ID::FRAME:
+					{
+						auto* w = dynamic_cast<frame*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
 				case widget_set::ID::BUTTON:
-					auto* btn = dynamic_cast<button*>(t.w_);
-					if(btn == nullptr) break;
-					btn->draw(rdr_);
+					{
+						auto* w = dynamic_cast<button*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+
+						if(w->get_touch_state().neg_) {
+							w->exec_select();
+						}
+						if(w->get_touch_state().pos_) {
+						}
+						if(w->get_touch_state().lvl_) {
+						}
+					}
+					break;
+				case widget_set::ID::CHECK:
+					{
+
+					}
 					break;
 				}
 			}

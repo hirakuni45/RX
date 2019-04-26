@@ -1,54 +1,45 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ボタン表示と制御
+	@brief	フレーム表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <functional>
 #include "graphics/widget.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	ボタン・クラス
+		@brief	フレーム・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct button : public widget {
+	struct frame : public widget {
 
-		typedef button value_type;
+		typedef frame value_type;
 
-		typedef std::function<void(uint32_t)> SELECT_FUNC_TYPE;
-
-		static const int16_t round_radius = 6;
-		static const int16_t frame_width  = 3;
+		static const int16_t round_radius = 6;  // round radius
 
 	private:
 
-		SELECT_FUNC_TYPE	select_func_;
-		uint32_t			select_id_;
+		int16_t		caption_height_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	str		ボタン文字列
+			@param[in]	str		フレーム・タイトル
 		*/
 		//-----------------------------------------------------------------//
-		button(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), select_func_(), select_id_(0)
+		frame(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
+			widget(loc, str), caption_height_(0)
 		{
 			insert_widget(this);
 		}
-
-
-		button(const button& th) = delete;
-		button& operator = (const button& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -56,7 +47,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~button() { remove_widget(this); }
+		virtual ~frame() { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -65,7 +56,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const override { return "Button"; }
+		const char* get_name() const override { return "Frame"; }
 
 
 		//-----------------------------------------------------------------//
@@ -74,45 +65,12 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		widget_set::ID get_id() const override { return widget_set::ID::BUTTON; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	セレクト ID の取得
-			@return	セレクト ID
-		*/
-		//-----------------------------------------------------------------//
-		uint32_t get_select_id() const noexcept { return select_id_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	セレクト関数への参照
-			@return	セレクト関数
-		*/
-		//-----------------------------------------------------------------//
-		SELECT_FUNC_TYPE& at_select_func() noexcept { return select_func_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	選択推移
-		*/
-		//-----------------------------------------------------------------//
-		void exec_select() noexcept
-		{
-			++select_id_;
-			if(select_func_) {
-				select_func_(select_id_);
-			}
-		}
+		widget_set::ID get_id() const override { return widget_set::ID::FRAME; }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	描画
-			@param[in]	rdr		描画インスタンス
 		*/
 		//-----------------------------------------------------------------//
 		template<class RDR>
@@ -126,9 +84,9 @@ namespace gui {
 			} else {
 				rdr.set_fore_color(graphics::def_color::Darkgray);
 			}
-			r.org += frame_width;
-			r.size -= frame_width * 2;
-			rdr.round_box(r, round_radius - frame_width);
+			r.org += 2;
+			r.size -= 4;
+			rdr.round_box(r, round_radius - 2);
 
 			rdr.set_fore_color(graphics::def_color::White);
 			auto sz = rdr.at_font().get_text_size(get_title());

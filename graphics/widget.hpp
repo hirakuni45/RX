@@ -28,13 +28,26 @@ namespace gui {
 			@brief	ステート
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class STATE {
+		enum class STATE : uint8_t {
 			DISABLE,	///< 無効状態（表示されない）
 			ENABLE,		///< 有効
 			STALL,		///< 表示されているが、ストール状態
 		};
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	タッチ・ステート
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct touch_state {
+			bool	pos_;
+			bool	lvl_;
+			bool	neg_;
+			touch_state() : pos_(false), lvl_(false), neg_(false) { }
+		};
+
 	private:
+
 		widget*		parents_;	///< 親
 
 		vtx::srect	location_;	///< 位置とサイズ
@@ -44,6 +57,8 @@ namespace gui {
 		STATE		state_;		///< 状態
 		bool		focus_;		///< フォーカスされている場合「true」
 		bool		touch_;		///< タッチされている場合「true」
+
+		touch_state	touch_state_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -57,7 +72,7 @@ namespace gui {
 			parents_(nullptr),
 			location_(loc),
 			title_(title),
-			state_(STATE::DISABLE), focus_(false), touch_(false)
+			state_(STATE::DISABLE), focus_(false), touch_(false), touch_state_()
 		{ } 
 
 
@@ -142,7 +157,6 @@ namespace gui {
 		void set_state(STATE state) noexcept
 		{
 			state_ = state;
-///			utils::format("set_state: %d\n") % static_cast<int>(state_);
 		}
 
 
@@ -157,16 +171,25 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	エリア判定を行い、内部状態へ反映する
+			@brief	タッチ判定を更新
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
 		*/
 		//-----------------------------------------------------------------//
-		void check_area(const vtx::spos& pos, uint16_t num) noexcept
+		void update_touch(const vtx::spos& pos, uint16_t num) noexcept
 		{
 			focus_ = location_.is_focus(pos);
-			if(focus_ && num > 0) touch_ = true;
-			else touch_ = false;
+			if(focus_) {
+				if(num > 0) touch_ = true;
+				else touch_ = false;
+				touch_state_.pos_ = ( touch_ && !touch_state_.lvl_);
+				touch_state_.neg_ = (!touch_ &&  touch_state_.lvl_);
+				touch_state_.lvl_ =   touch_;
+			} else {
+				touch_state_.pos_ = false;
+				touch_state_.neg_ = false;
+				touch_state_.lvl_ = false;
+			}
 		}
 
 
@@ -181,11 +204,11 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タッチを取得
-			@return タッチ
+			@brief	タッチ・ステートを取得
+			@return タッチ・ステート
 		*/
 		//-----------------------------------------------------------------//
-		bool get_touch() const noexcept { return touch_; }
+		const auto& get_touch_state() const noexcept { return touch_state_; }
 	};
 }
 

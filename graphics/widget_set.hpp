@@ -20,7 +20,9 @@ namespace gui {
 	struct widget_set {
 
 		enum class ID {
-			BUTTON,
+			FRAME,		///< フレーム
+			BUTTON,		///< ボタン
+			CHECK,		///< チェック・ボタン
 		};
 
 	};

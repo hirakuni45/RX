@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ボタン表示と制御
+	@brief	チェック・ボタン表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,14 +15,14 @@ namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	ボタン・クラス
+		@brief	チェック・ボタン・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct button : public widget {
+	struct check : public widget {
 
-		typedef button value_type;
+		typedef check value_type;
 
-		typedef std::function<void(uint32_t)> SELECT_FUNC_TYPE;
+		typedef std::function<void(bool)> SELECT_FUNC_TYPE;
 
 		static const int16_t round_radius = 6;
 		static const int16_t frame_width  = 3;
@@ -30,7 +30,7 @@ namespace gui {
 	private:
 
 		SELECT_FUNC_TYPE	select_func_;
-		uint32_t			select_id_;
+		bool				enable_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -40,15 +40,14 @@ namespace gui {
 			@param[in]	str		ボタン文字列
 		*/
 		//-----------------------------------------------------------------//
-		button(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), select_func_(), select_id_(0)
+		check(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
+			widget(loc, str), select_func_(), enable_(false)
 		{
 			insert_widget(this);
 		}
 
-
-		button(const button& th) = delete;
-		button& operator = (const button& th) = delete;
+		check(const check& th) = delete;
+		check& operator = (const check& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -56,7 +55,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~button() { remove_widget(this); }
+		virtual ~check() { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -65,7 +64,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const override { return "Button"; }
+		const char* get_name() const override { return "Check"; }
 
 
 		//-----------------------------------------------------------------//
@@ -74,7 +73,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		widget_set::ID get_id() const override { return widget_set::ID::BUTTON; }
+		widget_set::ID get_id() const override { return widget_set::ID::CHECK; }
 
 
 		//-----------------------------------------------------------------//
@@ -83,7 +82,7 @@ namespace gui {
 			@return	セレクト ID
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_select_id() const noexcept { return select_id_; }
+		bool get_enable() const noexcept { return enable_; }
 
 
 		//-----------------------------------------------------------------//
@@ -102,9 +101,9 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void exec_select() noexcept
 		{
-			++select_id_;
+			enable_ = !enable_;
 			if(select_func_) {
-				select_func_(select_id_);
+				select_func_(enable_);
 			}
 		}
 
