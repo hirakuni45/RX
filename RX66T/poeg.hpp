@@ -1,33 +1,36 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX66T グループ・POEG 定義
+	@brief	GPTW 用ポートアウトプットイネーブル (POEG)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief   GPTW 用ポートアウトプットイネーブル (POEG)
+		@brief  GPTW 用ポートアウトプットイネーブル (POEG)
+		@param[in]	base	モジュール先頭アドレス
+		@param[in]	peri	ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral peri>
 	struct poeg_t {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  POEG グループ n 設定レジスタ (POEGGn) (n = A ～ D)
-			@param[in]	base	ベースアドレス
+			@brief	POEG グループ n 設定レジスタ (POEGGn) (n = A ～ D)
+			@param[in]	addr	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct poeggn_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
+		template <uint32_t addr>
+		struct poegg_t : public rw32_t<addr> {
+			typedef rw32_t<addr> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -48,25 +51,27 @@ namespace device {
 			bit_rw_t <io_, bitpos::B12>     CDRE4;
 			bit_rw_t <io_, bitpos::B13>     CDRE5;
 
+			bit_rw_t <io_, bitpos::B16>     ST;
+
 			bit_rw_t <io_, bitpos::B28>     INV;
 			bit_rw_t <io_, bitpos::B29>     NFEN;
 			bits_rw_t<io_, bitpos::B30, 2>  NFCS;
 		};
-		static poeggn_t<0x0009E000> POEGGA;
-		static poeggn_t<0x0009E100> POEGGB;
-		static poeggn_t<0x0009E200> POEGGC;
-		static poeggn_t<0x0009E300> POEGGD;
+		static poegg_t<base + 0x0000> POEGGA;
+		static poegg_t<base + 0x0100> POEGGB;
+		static poegg_t<base + 0x0200> POEGGC;
+		static poegg_t<base + 0x0300> POEGGD;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  GPTW 出力停止制御グループ n 書き込み保護レジスタ (GTONCWPn)(n = A~D)
-			@param[in]	base	ベースアドレス
+			@brief	GPTW 出力停止制御グループ n 書き込み保護レジスタ (GTONCWPn)(n = A~D)
+			@param[in]	addr	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct gtoncwpn_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template <uint32_t addr>
+		struct gtoncwpn_t : public rw16_t<addr> {
+			typedef rw16_t<addr> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -74,38 +79,46 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>      WP;
 
-			bits_rw_t<io_, bitpos::B8, 8>   PRKEY;
+			bits_rw_t<io_, bitpos::B8, 8>   KEY;
 		};
-		static gtoncwpn_t<0x0009E040> GTONCWPA;
-		static gtoncwpn_t<0x0009E140> GTONCWPB;
-		static gtoncwpn_t<0x0009E240> GTONCWPC;
-		static gtoncwpn_t<0x0009E340> GTONCWPD;
+		static gtoncwpn_t<base + 0x0040> GTONCWPA;
+		static gtoncwpn_t<base + 0x0140> GTONCWPB;
+		static gtoncwpn_t<base + 0x0240> GTONCWPC;
+		static gtoncwpn_t<base + 0x0340> GTONCWPD;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  GPTW 出力停止制御グループ n コントロールレジスタ (GTONCCRn)(n = A~D)
-			@param[in]	base	ベースアドレス
+			@brief	GPTW 出力停止制御グループ n コントロールレジスタ (GTONCCRn)(n = A~D)
+			@param[in]	addr	アドレス
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t base>
-		struct gtonccrn_t : public rw16_t<base> {
-			typedef rw16_t<base> io_;
+		template <uint32_t addr>
+		struct gtonccrn_t : public rw16_t<addr> {
+			typedef rw16_t<addr> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>     NE;
+			bit_rw_t <io_, bitpos::B0>      NE;
 
-			bits_rw_t<io_, bitpos::B4, 4>  NFS;
-			bit_rw_t <io_, bitpos::B8>     NFV;
+			bits_rw_t<io_, bitpos::B4, 4>   NFS;
+			bit_rw_t <io_, bitpos::B8>      NFV;
 		};
-		static gtonccrn_t<0x0009E044> GTONCCRA;
-		static gtonccrn_t<0x0009E144> GTONCCRB;
-		static gtonccrn_t<0x0009E244> GTONCCRC;
-		static gtonccrn_t<0x0009E344> GTONCCRD;
-	};
+		static gtonccrn_t<base + 0x0044> GTONCCRA;
+		static gtonccrn_t<base + 0x0144> GTONCCRB;
+		static gtonccrn_t<base + 0x0244> GTONCCRC;
+		static gtonccrn_t<base + 0x0344> GTONCCRD;
 
-	typedef poeg_t POEG;
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ペリフェラル型を返す
+			@return ペリフェラル型
+		*/
+		//-----------------------------------------------------------------//
+		static peripheral get_peripheral() { return peri; }
+	};
+	typedef poeg_t<0x0009E000, peripheral::POEG> POEG;
 }
