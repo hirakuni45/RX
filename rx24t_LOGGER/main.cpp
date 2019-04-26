@@ -21,20 +21,11 @@
 
 namespace {
 
-	core_t core_;
+	core_t	core_;
 
-	typedef utils::scene<app::title, app::root_menu,
-		app::logging, app::recall, app::setup, app::laptimer> SCENE;
-	SCENE scene_;
+	typedef utils::scene_director<title, root_menu, logging, recall, setup, laptime> SCENES;
+	SCENES	scenes_;
 
-	app::title		title_;
-
-	app::root_menu	root_menu_;
-
-	app::logging	logging_;
-	app::recall		recall_;
-	app::setup		setup_;
-	app::laptimer	laptimer_;
 }
 
 
@@ -48,22 +39,22 @@ void select_scene(app::scene_id id)
 {
 	switch(id) {
 	case app::scene_id::title:
-		scene_.change(title_);
+		scenes_.change<title>();
 		break;
 	case app::scene_id::root_menu:
-		scene_.change(root_menu_);
+		scenes_.change<root_menu>();
 		break;
 	case app::scene_id::logging:
-		scene_.change(logging_);
+		scenes_.change<logging>();
 		break;
 	case app::scene_id::recall:
-		scene_.change(recall_);
+		scenes_.change<recall>();
 		break;
 	case app::scene_id::setup:
-		scene_.change(setup_);
+		scenes_.change<setup>();
 		break;
 	case app::scene_id::laptimer:
-		scene_.change(laptimer_);
+		scenes_.change<laptimer>();
 		break;
 	default:
 		break;
