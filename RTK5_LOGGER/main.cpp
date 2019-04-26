@@ -104,7 +104,7 @@ namespace {
 }
 
 
-void change_scene(app::scenes_id id)
+void change_scene(app::scene_id id)
 {
 	scenes_.change(id);
 }
