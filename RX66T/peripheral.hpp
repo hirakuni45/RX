@@ -57,6 +57,8 @@ namespace device {
 
 		HRPWM,		///< 高分解能 PWM 波形生成回路
 
+		POEG,		///< GPTW 用ポートアウトプットイネーブル (POEG)
+
 		TMR0,		///< 8 ビットタイマ０
 		TMR1,		///< 8 ビットタイマ１
 		TMR2,		///< 8 ビットタイマ２
