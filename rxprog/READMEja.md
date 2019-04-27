@@ -64,8 +64,23 @@ rx_prog -d RX71M --verbose
 rx_prog -d RX71M --progress --write --verify test_sample.mot
 ```
 
-### FT231XS と CP2102 の違い
-FT231XS:
+### 不必要なシリアルポートの削除
+```
+set devmgr_show_nonpresent_devices=1
+start devmgmt.msc
+```
+
+- 全ての USB シリアルデバイスをコンピューターから取り外す。
+- 上記で BAT ファイルを作成して、右クリックにて、「管理者権限」で実行する。
+- 「表示」-「非表示のデバイスの表示」にチェックを入れる。
+- 使っていない COM ポートを削除する。
+- 改めて、USB シリアルデバイスを順番にコンピューターに接続していく。
+   
+※同メーカーデバイスの場合、二個目以降、COM ポート番号の移り変わりなどが発生するので状況に応じてメーカー専用ツールなどで内部シリアルID番号を変更するなどの対処を行う必要がある。
+※専用ツールの利用に関して、デバイスメーカーのＨＰで確認下さい。
+   
+### FT232RL, FT231XS と CP2102 の違い
+FT231XS, FT232RL:
 ```
 Neptune./d/Git/RX/RAYTRACER_sample/RX66T % time rx_prog -d RX66T --progress --erase --write --verify raytracer_sample.mot
 Erase:  #################################################
@@ -88,7 +103,9 @@ real    0m6.616s
 user    0m0.078s
 sys     0m0.187s
 ```
-同じボーレート、同じサイズの書き込みで、まるで違う速度です、これは、廉価な「FT231XS」は、上位でコストの高い「FT232RL」などと差別化する為、スピードを遅くしているものと思えます。   
+   
+※FTDI のデバイスはシリコンラボ製デバイスに比べて低速なようです。
+   
    
 -----
    
