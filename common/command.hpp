@@ -23,20 +23,22 @@ namespace utils {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     /*!
         @brief  command class
-		@param[in]	buffsize	バッファサイズ（最小でも９）
+		@param[in]	BUFN	バッファサイズ（最小でも９）
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <int16_t buffsize>
+	template <uint16_t BUFN>
 	class command {
-		char	buff_[buffsize];
-		int16_t	bpos_;
-		int16_t	pos_;
-		int16_t	len_;
-		int16_t tab_top_;
+		char		buff_[BUFN];
+		uint16_t	bpos_;
+		uint16_t	pos_;
+		uint16_t	len_;
+		int16_t		tab_top_;
 
 		const char*	prompt_;
 
 		bool	tab_;
+		bool	esc_;
+		uint8_t	esc_step_;
 
 		// VT-100 ESC シーケンス 
 		static void clear_line_() {
@@ -67,7 +69,8 @@ namespace utils {
         */
         //-----------------------------------------------------------------//
 		command() : bpos_(-1), pos_(0), len_(0), tab_top_(-1),
-			prompt_(nullptr), tab_(false) { buff_[0] = 0; }
+			prompt_(nullptr), tab_(false), esc_(false), esc_step_(false)
+		{ buff_[0] = 0; }
 
 
         //-----------------------------------------------------------------//
@@ -86,21 +89,22 @@ namespace utils {
 			@return 「Enter」キーが押されたら「true」
         */
         //-----------------------------------------------------------------//
-		bool service() {
+		bool service()
+		{
 			if(bpos_ < 0 && pos_ == 0) {
 				if(prompt_ != nullptr) sci_puts(prompt_);
 			}
 			bpos_ = pos_;
 			tab_ = false;
 			while(sci_length()) {
-				if(pos_ >= (buffsize - 1)) {	///< バッファが溢れた・・
+				if(pos_ >= (BUFN - 1)) {	///< バッファが溢れた・・
 					sci_putch('\\');		///< バックスラッシュ
-					buff_[buffsize - 1] = 0;
+					buff_[BUFN - 1] = 0;
 					pos_ = 0;
 					bpos_ = -1;
 					crlf_();
 					return false;
-				} else if(pos_ >= (buffsize - 8)) {	///< バッファが溢れそうな警告
+				} else if(pos_ >= (BUFN - 8)) {	///< バッファが溢れそうな警告
 					sci_putch('G' - 0x40);	///< Ctrl-G
 				}
 
@@ -138,18 +142,39 @@ namespace utils {
 					tab_ = true;
 					break;
 
+				case 0x1B:  // ESC キー
+					esc_ = true;
+					esc_step_ = 0;
+					break;
+
 				default:
-					if(ch < 0x20) {	///< 他の ctrl コード
-						buff_[pos_] = ch;
-						++pos_;
-						sci_putch('^');
-						sci_putch(ch + 0x40);
+					if(esc_) {
+						if(esc_step_ == 0) {
+							if(ch == '[') {
+								++esc_step_;
+							} else {
+								esc_ = false;
+							}
+						} else if(esc_step_ == 1) {
+							if(ch == 'A') ;  // Up
+							else if(ch == 'B') ;  // Down
+							else if(ch == 'C') ;  // Right
+							else if(ch == 'D') ;  // Left
+							esc_ = false;
+						}
 					} else {
-						buff_[pos_] = ch;
-						++pos_;
-						sci_putch(ch);
+						if(ch < 0x20) {	///< 他の ctrl コード
+							buff_[pos_] = ch;
+							++pos_;
+							sci_putch('^');
+							sci_putch(ch + 0x40);
+						} else {
+							buff_[pos_] = ch;
+							++pos_;
+							sci_putch(ch);
+						}
+						buff_[pos_] = 0;
 					}
-					buff_[pos_] = 0;
 					break;
 				}
 			}
