@@ -24,7 +24,14 @@ namespace app {
 		typedef scenes_base::RENDER RENDER;
 		typedef graphics::def_color DEF_COLOR;
 
-		gui::button		btn_;
+		gui::button		button_;
+		gui::check		check_;
+		gui::group		group_;
+		gui::radio		radio1_;
+		gui::radio		radio2_;
+		gui::radio		radio3_;
+		gui::slider		slider_;
+		
 
 	public:
 		//-------------------------------------------------------------//
@@ -32,7 +39,14 @@ namespace app {
 			@brief	コンストラクター
 		*/
 		//-------------------------------------------------------------//
-		setup() noexcept : btn_(vtx::srect(100, 50, 80, 30), "OK")
+		setup() noexcept :
+			button_(vtx::srect( 30, 20, 80, 30), "OK"),
+			check_(vtx::srect(  30, 70 + 40*0, 0, 0), "Check"),
+			group_(vtx::srect(  30, 70 + 40*1, 0, 0)),
+			radio1_(vtx::srect( 30, 70 + 40*1, 0, 0), "Red"),
+			radio2_(vtx::srect( 30, 70 + 40*2, 0, 0), "Green"),
+			radio3_(vtx::srect( 30, 70 + 40*3, 0, 0), "Blue"),
+			slider_(vtx::srect(150,20, 120, 0))
 		{ }
 
 
@@ -45,16 +59,19 @@ namespace app {
 		{
 			at_scenes_base().at_render().clear(DEF_COLOR::Black);
 
-//			btn_.at_location().org.set(100, 50);
-//			btn_.at_location().size.set(80, 30);
-//			btn_.set_title("OK");
-//			insert_widget(&btn_);
-
-			btn_.set_state(gui::widget::STATE::ENABLE);
-			btn_.at_select_func() = [this](uint32_t id) {
+			button_.enable();
+			button_.at_select_func() = [this](uint32_t id) {
 				change_scene(scene_id::root_menu);
 			};
-//			at_scenes_base().at_widget_director().list_all();
+			check_.enable();
+			check_.at_select_func() = [this](bool ena) {
+				utils::format("Check: %d\n") % static_cast<int>(ena);
+			};
+			group_ + radio1_ + radio2_ + radio3_;
+			radio1_.enable();
+			radio2_.enable();
+			radio3_.enable();
+			slider_.enable();
 		}
 
 
@@ -65,9 +82,6 @@ namespace app {
 		//-------------------------------------------------------------//
 		void service() noexcept override
 		{
-			btn_.set_state(gui::widget::STATE::ENABLE);
-
-
 #if 0
 			const auto& touch = at_scenes_base().at_touch();
 			bool t = touch.get_touch_num() == 1 ? true : false;
@@ -86,7 +100,12 @@ namespace app {
 		//-------------------------------------------------------------//
 		void exit() noexcept override
 		{
-			btn_.set_state(gui::widget::STATE::DISABLE);
+			button_.enable(false);
+			check_.enable(false);
+			radio1_.enable(false);
+			radio2_.enable(false);
+			radio3_.enable(false);
+			slider_.enable(false);
 		}
 	};
 }
