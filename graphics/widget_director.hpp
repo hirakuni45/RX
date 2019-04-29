@@ -10,9 +10,12 @@
 //=====================================================================//
 #include <array>
 #include "graphics/widget.hpp"
+#include "graphics/group.hpp"
 #include "graphics/frame.hpp"
 #include "graphics/button.hpp"
 #include "graphics/check.hpp"
+#include "graphics/radio.hpp"
+#include "graphics/slider.hpp"
 
 namespace gui {
 
@@ -29,7 +32,8 @@ namespace gui {
 
 		struct widget_t {
 			widget*		w_;
-			widget_t() : w_(nullptr) { }
+			bool		init_;
+			widget_t() : w_(nullptr), init_(false) { }
 		};
 
 		typedef std::array<widget_t, WNUM> WIDGETS; 
@@ -67,6 +71,7 @@ namespace gui {
 			for(auto& t : widgets_) {
 				if(t.w_ == nullptr) {
 					t.w_ = w;
+					t.init_ = false;
 					return true;
 				}
 			}
@@ -136,8 +141,30 @@ namespace gui {
 				const auto& tp = touch_.get_touch_pos(0);
 				for(auto& t : widgets_) {
 					if(t.w_ == nullptr) continue;
-					if(t.w_->get_state() == widget::STATE::DISABLE) continue;
-					t.w_->update_touch(vtx::spos(tp.x, tp.y), num);
+					if(!t.init_) {  // 初期化プロセス
+						t.w_->init();
+						t.init_ = true;
+					}					
+					if(t.w_->get_state() == widget::STATE::ENABLE) {
+						t.w_->update_touch(vtx::spos(tp.x, tp.y), num);
+					}
+				}
+			}
+
+			for(auto& t : widgets_) {
+				if(t.w_ == nullptr) continue;
+				if(t.w_->get_state() == widget::STATE::ENABLE) {
+					const auto& ts = t.w_->get_touch_state();
+					if(ts.negative_) {
+						t.w_->exec_select();
+					}
+					if(ts.positive_) {
+					}
+					if(ts.level_) {
+						if(t.w_->get_id() == widget::ID::SLIDER) {
+							t.w_->exec_select();
+						}
+					}
 				}
 			}
 
@@ -146,31 +173,41 @@ namespace gui {
 				if(t.w_->get_state() == widget::STATE::DISABLE) continue;
 
 				switch(t.w_->get_id()) {
-				case widget_set::ID::FRAME:
+				case widget::ID::GROUP:
+					break;
+				case widget::ID::FRAME:
 					{
 						auto* w = dynamic_cast<frame*>(t.w_);
 						if(w == nullptr) break;
 						w->draw(rdr_);
 					}
 					break;
-				case widget_set::ID::BUTTON:
+				case widget::ID::BUTTON:
 					{
 						auto* w = dynamic_cast<button*>(t.w_);
 						if(w == nullptr) break;
 						w->draw(rdr_);
-
-						if(w->get_touch_state().neg_) {
-							w->exec_select();
-						}
-						if(w->get_touch_state().pos_) {
-						}
-						if(w->get_touch_state().lvl_) {
-						}
 					}
 					break;
-				case widget_set::ID::CHECK:
+				case widget::ID::CHECK:
 					{
-
+						auto* w = dynamic_cast<check*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::RADIO:
+					{
+						auto* w = dynamic_cast<radio*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::SLIDER:
+					{
+						auto* w = dynamic_cast<slider*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
 					}
 					break;
 				}

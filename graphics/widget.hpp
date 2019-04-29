@@ -10,7 +10,6 @@
 //=====================================================================//
 #include "common/vtx.hpp"
 #include "graphics/color.hpp"
-#include "graphics/widget_set.hpp"
 
 namespace gui {
 
@@ -21,7 +20,22 @@ namespace gui {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct widget {
 
-		typedef graphics::def_color DEF_COLOR;
+		typedef graphics::def_color DEF_COLOR;	///< 標準カラー
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	widget ID
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ID {
+			GROUP,		///< グループ
+			FRAME,		///< フレーム
+			BUTTON,		///< ボタン
+			CHECK,		///< チェック・ボタン
+			RADIO,		///< ラジオ・ボタン
+			SLIDER,		///< スライダー
+		};
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -34,29 +48,35 @@ namespace gui {
 			STALL,		///< 表示されているが、ストール状態
 		};
 
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	タッチ・ステート
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct touch_state {
-			bool	pos_;
-			bool	lvl_;
-			bool	neg_;
-			touch_state() : pos_(false), lvl_(false), neg_(false) { }
+			vtx::spos	position_;	///< タッチしている絶対位置
+			vtx::spos	expand_;	///< フォーカス拡張領域
+			bool		positive_;	///< タッチした瞬間
+			bool		level_;		///< タッチしている状態
+			bool		negative_;	///< 離した瞬間
+			touch_state(const vtx::spos& fexp = vtx::spos(4)) noexcept :
+				position_(-1), expand_(fexp),
+				positive_(false), level_(false), negative_(false) { }
 		};
 
 	private:
 
-		widget*		parents_;	///< 親
+		widget*		parents_;		///< 親
+		widget*		next_;			///< リンク
 
-		vtx::srect	location_;	///< 位置とサイズ
+		vtx::srect	location_;		///< 位置とサイズ
 
-		const char*	title_;		///< タイトル
+		const char*	title_;			///< タイトル
 
-		STATE		state_;		///< 状態
-		bool		focus_;		///< フォーカスされている場合「true」
-		bool		touch_;		///< タッチされている場合「true」
+		STATE		state_;
+		bool		focus_;
+		bool		touch_;
 
 		touch_state	touch_state_;
 
@@ -66,13 +86,14 @@ namespace gui {
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
 			@param[in]	title	タイトル
+			@param[in]	fexp	フォーカス拡張領域
 		*/
 		//-----------------------------------------------------------------//
-		widget(const vtx::srect& loc = vtx::srect(0), const char* title = nullptr) noexcept :
-			parents_(nullptr),
-			location_(loc),
-			title_(title),
-			state_(STATE::DISABLE), focus_(false), touch_(false), touch_state_()
+		widget(const vtx::srect& loc = vtx::srect(0), const char* title = nullptr, const vtx::spos& fexp = vtx::spos(0))
+			noexcept :
+			parents_(nullptr), next_(nullptr),
+			location_(loc), title_(title),
+			state_(STATE::DISABLE), focus_(false), touch_(false), touch_state_(fexp)
 		{ } 
 
 
@@ -91,7 +112,23 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		virtual widget_set::ID get_id() const = 0; 
+		virtual ID get_id() const = 0; 
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	初期化
+		*/
+		//-----------------------------------------------------------------//
+		virtual void init()  = 0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	選択推移
+		*/
+		//-----------------------------------------------------------------//
+		virtual void exec_select()  = 0;
 
 
 		//-----------------------------------------------------------------//
@@ -100,7 +137,7 @@ namespace gui {
 			@param[in]	w	親 widget
 		*/
 		//-----------------------------------------------------------------//
-		void set_parents(widget* w) { parents_ = w; }
+		void set_parents(widget* w) noexcept { parents_ = w; }
 
 
 		//-----------------------------------------------------------------//
@@ -110,6 +147,24 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		widget* get_parents() const noexcept { return parents_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	次接続設定
+			@param[in]	w	親 widget
+		*/
+		//-----------------------------------------------------------------//
+		void set_next(widget* w) noexcept { next_ = w; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	次接続 widget を返す
+			@return	次接続 widget
+		*/
+		//-----------------------------------------------------------------//
+		widget* get_next() const noexcept { return next_; }
 
 
 		//-----------------------------------------------------------------//
@@ -171,6 +226,19 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	許可・不許可
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(bool ena = true) noexcept
+		{
+			if(ena) set_state(STATE::ENABLE);
+			else set_state(STATE::DISABLE);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	タッチ判定を更新
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
@@ -178,17 +246,25 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void update_touch(const vtx::spos& pos, uint16_t num) noexcept
 		{
-			focus_ = location_.is_focus(pos);
+			auto loc = location_;
+			loc.org  -= touch_state_.expand_;
+			loc.size += touch_state_.expand_;
+			focus_ = loc.is_focus(pos);
 			if(focus_) {
-				if(num > 0) touch_ = true;
-				else touch_ = false;
-				touch_state_.pos_ = ( touch_ && !touch_state_.lvl_);
-				touch_state_.neg_ = (!touch_ &&  touch_state_.lvl_);
-				touch_state_.lvl_ =   touch_;
+				if(num > 0) {
+					touch_ = true;
+					touch_state_.position_ = pos;
+				} else {
+					touch_ = false;
+					touch_state_.position_.set(-1);
+				}
+				touch_state_.positive_ = ( touch_ && !touch_state_.level_);
+				touch_state_.negative_ = (!touch_ &&  touch_state_.level_);
+				touch_state_.level_    =   touch_;
 			} else {
-				touch_state_.pos_ = false;
-				touch_state_.neg_ = false;
-				touch_state_.lvl_ = false;
+				touch_state_.positive_ = false;
+				touch_state_.negative_ = false;
+				touch_state_.level_    = false;
 			}
 		}
 
@@ -209,6 +285,24 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		const auto& get_touch_state() const noexcept { return touch_state_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	最終位置を取得
+			@return 最終位置
+		*/
+		//-----------------------------------------------------------------//
+		vtx::spos get_final_position() const noexcept
+		{
+			vtx::spos pos = location_.org;
+			widget* w = parents_;
+			while(w != nullptr) {
+				pos += w->get_location().org;
+				w = w->get_parents();
+			}
+			return pos;
+		}
 	};
 }
 

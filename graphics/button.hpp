@@ -1,7 +1,10 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ボタン表示と制御
+	@brief	ボタン表示と制御 @n
+			・領域内で、「押した」、「離した」がある場合に「選択」と認識する。@n
+			・選択時関数を使わない場合、select_id を監視する事で、状態の変化を認識できる。@n
+			・選択時関数にはラムダ式を使える。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -26,6 +29,8 @@ namespace gui {
 
 		static const int16_t round_radius = 6;
 		static const int16_t frame_width  = 3;
+		static const int16_t box_size     = 30;		///< サイズが省略された場合の標準的なサイズ
+		static const int16_t edge_to_title = 4;
 
 	private:
 
@@ -43,6 +48,16 @@ namespace gui {
 		button(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
 			widget(loc, str), select_func_(), select_id_(0)
 		{
+			if(get_location().size.x <= 0) {
+				auto tlen = 0;
+				if(str != nullptr) {
+					tlen = strlen(str) * 8;
+				}
+				at_location().size.x = (frame_width + edge_to_title) * 2 + tlen;
+			}
+			if(get_location().size.y <= 0) {
+				at_location().size.y = box_size;
+			}
 			insert_widget(this);
 		}
 
@@ -74,7 +89,29 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		widget_set::ID get_id() const override { return widget_set::ID::BUTTON; }
+		ID get_id() const override { return ID::BUTTON; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	初期化
+		*/
+		//-----------------------------------------------------------------//
+		void init() override { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	選択推移
+		*/
+		//-----------------------------------------------------------------//
+		void exec_select() override
+		{
+			++select_id_;
+			if(select_func_) {
+				select_func_(select_id_);
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -97,20 +134,6 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	選択推移
-		*/
-		//-----------------------------------------------------------------//
-		void exec_select() noexcept
-		{
-			++select_id_;
-			if(select_func_) {
-				select_func_(select_id_);
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	描画
 			@param[in]	rdr		描画インスタンス
 		*/
@@ -121,12 +144,12 @@ namespace gui {
 			auto r = get_location();
 			rdr.set_fore_color(graphics::def_color::White);
 			rdr.round_box(r, round_radius);
-			if(get_touch_state().lvl_) {
+			if(get_touch_state().level_) {
 				rdr.set_fore_color(graphics::def_color::Silver);
 			} else {
 				rdr.set_fore_color(graphics::def_color::Darkgray);
 			}
-			r.org += frame_width;
+			r.org  += frame_width;
 			r.size -= frame_width * 2;
 			rdr.round_box(r, round_radius - frame_width);
 
