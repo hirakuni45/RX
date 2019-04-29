@@ -100,11 +100,16 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	選択推移
+			@param[in]	inva	無効状態にする場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select() override
+		void exec_select(bool inva) override
 		{
-			enable_ = !enable_;
+			if(inva) {
+				enable_ = false;
+			} else {
+				enable_ = !enable_;
+			}
 			if(select_func_) {
 				select_func_(enable_);
 			}

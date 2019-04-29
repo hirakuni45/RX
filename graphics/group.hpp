@@ -81,9 +81,10 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	選択推移
+			@param[in]	inva	無効状態にする場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select() noexcept override { }
+		void exec_select(bool inva) noexcept override { }
 
 
 		template <class T>

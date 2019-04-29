@@ -31,9 +31,13 @@ namespace gui {
 	struct widget_director {
 
 		struct widget_t {
-			widget*		w_;
-			bool		init_;
-			widget_t() : w_(nullptr), init_(false) { }
+			widget*			w_;
+			widget::STATE	state_;
+			bool			init_;
+			bool			focus_;
+			bool			draw_;
+			widget_t() : w_(nullptr), state_(widget::STATE::DISABLE),
+				init_(false), focus_(false), draw_(false) { }
 		};
 
 		typedef std::array<widget_t, WNUM> WIDGETS; 
@@ -45,6 +49,26 @@ namespace gui {
 		TOUCH&		touch_;
 
 		WIDGETS		widgets_;
+
+		// ipass 自分を含めない場合「false」
+		uint32_t create_childs_(widget* w, widget_t** list, uint32_t max, bool ipass)
+		{
+			uint16_t idx = 0;
+			for(auto& t : widgets_) {
+				if(t.w_ == nullptr) continue;
+				if(t.w_->get_state() == widget::STATE::STALL) continue;
+				if(ipass && t.w_ == w) continue;
+				if(t.w_->get_parents() == w->get_parents()) {
+					if(max > idx) {
+						list[idx] = &t;
+						++idx;
+					} else {
+						break;
+					}
+				}
+			}
+			return idx;
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -72,6 +96,7 @@ namespace gui {
 				if(t.w_ == nullptr) {
 					t.w_ = w;
 					t.init_ = false;
+					t.draw_ = true;
 					return true;
 				}
 			}
@@ -144,9 +169,18 @@ namespace gui {
 					if(!t.init_) {  // 初期化プロセス
 						t.w_->init();
 						t.init_ = true;
-					}					
+						t.draw_ = true;
+					}
+					if(t.state_ != t.w_->get_state()) {
+						t.state_ = t.w_->get_state();
+						t.draw_ = true;
+					}
 					if(t.w_->get_state() == widget::STATE::ENABLE) {
 						t.w_->update_touch(vtx::spos(tp.x, tp.y), num);
+					}
+					if(t.focus_ != t.w_->get_focus()) {
+						t.focus_ = t.w_->get_focus();
+						t.draw_ = true;
 					}
 				}
 			}
@@ -157,12 +191,23 @@ namespace gui {
 					const auto& ts = t.w_->get_touch_state();
 					if(ts.negative_) {
 						t.w_->exec_select();
+						t.draw_ = true;
+						if(t.w_->get_id() == widget::ID::RADIO) {
+							widget_t* list[8];
+							auto n = create_childs_(t.w_, list, 8, true);
+							for(uint16_t i = 0; i < n; ++i) {
+								list[i]->w_->exec_select(true);
+								list[i]->draw_ = true;
+							}
+						}
 					}
 					if(ts.positive_) {
+						t.draw_ = true;
 					}
 					if(ts.level_) {
 						if(t.w_->get_id() == widget::ID::SLIDER) {
 							t.w_->exec_select();
+							t.draw_ = true;
 						}
 					}
 				}
@@ -171,6 +216,8 @@ namespace gui {
 			for(auto& t : widgets_) {
 				if(t.w_ == nullptr) continue;
 				if(t.w_->get_state() == widget::STATE::DISABLE) continue;
+				if(!t.draw_) continue; 
+				t.draw_ = false;
 
 				switch(t.w_->get_id()) {
 				case widget::ID::GROUP:
