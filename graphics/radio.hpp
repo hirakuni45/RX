@@ -97,6 +97,20 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	タッチ判定を更新
+			@param[in]	pos		判定位置
+			@param[in]	num		タッチ数
+			@param[in]	slt		スライド・タイプの場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
+		{
+			update_touch_def(pos, num);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	選択推移
 			@param[in]	inva	無効状態にする場合「true」
 		*/
@@ -106,7 +120,7 @@ namespace gui {
 			if(inva) {
 				enable_ = false;
 			} else {
-				enable_ = !enable_;
+				enable_ = true;
 			}
 			if(select_func_) {
 				select_func_(enable_);

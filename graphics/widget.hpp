@@ -125,6 +125,16 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	タッチ判定を更新
+			@param[in]	pos		判定位置
+			@param[in]	num		タッチ数
+		*/
+		//-----------------------------------------------------------------//
+		virtual void update_touch(const vtx::spos& pos, uint16_t num) = 0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	選択推移
 			@param[in]	inva	無効状態にする場合「true」
 		*/
@@ -240,38 +250,6 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タッチ判定を更新
-			@param[in]	pos		判定位置
-			@param[in]	num		タッチ数
-		*/
-		//-----------------------------------------------------------------//
-		void update_touch(const vtx::spos& pos, uint16_t num) noexcept
-		{
-			auto loc = location_;
-			loc.org  -= touch_state_.expand_;
-			loc.size += touch_state_.expand_;
-			focus_ = loc.is_focus(pos);
-			if(focus_) {
-				if(num > 0) {
-					touch_ = true;
-					touch_state_.position_ = pos;
-				} else {
-					touch_ = false;
-					touch_state_.position_.set(-1);
-				}
-				touch_state_.positive_ = ( touch_ && !touch_state_.level_);
-				touch_state_.negative_ = (!touch_ &&  touch_state_.level_);
-				touch_state_.level_    =   touch_;
-			} else {
-				touch_state_.positive_ = false;
-				touch_state_.negative_ = false;
-				touch_state_.level_    = false;
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	フォーカスを取得
 			@return フォーカス
 		*/
@@ -286,6 +264,78 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		const auto& get_touch_state() const noexcept { return touch_state_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	標準的なタッチ判定更新
+			@param[in]	pos		判定位置
+			@param[in]	num		タッチ数
+		*/
+		//-----------------------------------------------------------------//
+		void update_touch_def(const vtx::spos& pos, uint16_t num) noexcept
+		{
+			auto loc = location_;
+			loc.org  -= touch_state_.expand_;
+			loc.size += touch_state_.expand_;
+			focus_ = loc.is_focus(pos);
+			if(focus_) {
+				if(num > 0) {
+					touch_ = true;
+					touch_state_.position_ = pos;
+				} else {
+					touch_ = false;
+					touch_state_.position_.set(-1);
+				}
+				auto level = touch_;
+				touch_state_.positive_ = ( level && !touch_state_.level_);
+				touch_state_.negative_ = (!level &&  touch_state_.level_);
+				touch_state_.level_    =   level;
+			} else {
+				touch_state_.positive_ = false;
+				touch_state_.negative_ = false;
+				touch_state_.level_    = false;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タッチ判定を更新（スライダー用）@n
+					・スライダーの操作性を良くする為の工夫をする。@n
+					・タッチしたまま、左右、上下にドラッグして、スライダー @n
+					のフォーカスを外れた場合、操作が中断してしまうのを改善する。
+			@param[in]	pos		判定位置
+			@param[in]	num		タッチ数
+		*/
+		//-----------------------------------------------------------------//
+		void update_touch_slider(const vtx::spos& pos, uint16_t num) noexcept
+		{
+			if(num == 0) {
+				focus_ = false;
+				touch_ = false;
+				touch_state_.position_.set(-1);
+				touch_state_.positive_ = false;
+				touch_state_.negative_ = touch_state_.level_;
+				touch_state_.level_    = false;
+				return;
+			}
+
+			auto loc = location_;
+			loc.org  -= touch_state_.expand_;
+			loc.size += touch_state_.expand_;
+			bool focus = loc.is_focus(pos);
+			if(!focus_ && focus) {
+				touch_ = true;
+			}
+			focus_ = focus;
+			touch_state_.position_ = pos;
+
+			auto level = touch_;
+			touch_state_.positive_ = ( level && !touch_state_.level_);
+			touch_state_.negative_ = (!level &&  touch_state_.level_);
+			touch_state_.level_    =   level;
+		}
 
 
 		//-----------------------------------------------------------------//

@@ -80,7 +80,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const override { return "Button"; }
+		const char* get_name() const noexcept override { return "Button"; }
 
 
 		//-----------------------------------------------------------------//
@@ -89,7 +89,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const override { return ID::BUTTON; }
+		ID get_id() const noexcept override { return ID::BUTTON; }
 
 
 		//-----------------------------------------------------------------//
@@ -97,7 +97,21 @@ namespace gui {
 			@brief	初期化
 		*/
 		//-----------------------------------------------------------------//
-		void init() override { }
+		void init() noexcept override { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タッチ判定を更新
+			@param[in]	pos		判定位置
+			@param[in]	num		タッチ数
+			@param[in]	slt		スライド・タイプの場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
+		{
+			update_touch_def(pos, num);
+		}
 
 
 		//-----------------------------------------------------------------//

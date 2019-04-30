@@ -96,6 +96,19 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	タッチ判定を更新
+			@param[in]	pos		判定位置
+			@param[in]	num		タッチ数
+		*/
+		//-----------------------------------------------------------------//
+		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
+		{
+			update_touch_slider(pos, num);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	選択推移
 			@param[in]	inva	無効状態にする場合「true」
 		*/
