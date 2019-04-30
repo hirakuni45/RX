@@ -110,10 +110,10 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	選択推移
-			@param[in]	inva	無効状態にする場合「true」
+			@param[in]	ena		無効状態にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select(bool inva) override
+		void exec_select(bool ena = true) override
 		{
 			if(get_touch_state().positive_) {
 				touch_org_ = get_touch_state().position_;

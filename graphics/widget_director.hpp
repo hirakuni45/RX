@@ -196,7 +196,7 @@ namespace gui {
 							widget_t* list[8];
 							auto n = create_childs_(t.w_, list, 8, true);
 							for(uint16_t i = 0; i < n; ++i) {
-								list[i]->w_->exec_select(true);
+								list[i]->w_->exec_select(false);
 								list[i]->draw_ = true;
 							}
 						}
