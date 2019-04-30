@@ -64,7 +64,7 @@ rx_prog -d RX71M --verbose
 rx_prog -d RX71M --progress --write --verify test_sample.mot
 ```
 
-### 不必要なシリアルポートの削除
+### 不必要なシリアルポートの削除（Windows）
 ```
 set devmgr_show_nonpresent_devices=1
 start devmgmt.msc
