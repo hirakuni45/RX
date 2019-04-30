@@ -49,6 +49,7 @@ namespace app {
 			slider_(vtx::srect(150,20, 120, 0))
 		{
 			group_ + radio1_ + radio2_ + radio3_;
+			radio2_.exec_select();  // 初期 radio2_ を有効にする
 		}
 
 
