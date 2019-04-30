@@ -47,7 +47,9 @@ namespace app {
 			radio2_(vtx::srect( 30, 70 + 40*2, 0, 0), "Green"),
 			radio3_(vtx::srect( 30, 70 + 40*3, 0, 0), "Blue"),
 			slider_(vtx::srect(150,20, 120, 0))
-		{ }
+		{
+			group_ + radio1_ + radio2_ + radio3_;
+		}
 
 
 		//-------------------------------------------------------------//
@@ -67,7 +69,6 @@ namespace app {
 			check_.at_select_func() = [this](bool ena) {
 				utils::format("Check: %d\n") % static_cast<int>(ena);
 			};
-			group_ + radio1_ + radio2_ + radio3_;
 			radio1_.enable();
 			radio2_.enable();
 			radio3_.enable();
