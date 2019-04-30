@@ -53,6 +53,7 @@ See development environment preparation of 'RX/README.md'
 - Pull down if the device has a UB terminal. (4.7K)
 - Pull down if there is an EMLE terminal. (4.7K)
 - Set the MD terminal to "Low" and input the "Reset" signal.
+- When executing an internal program, set the MD pin to "High level" and input reset signal.
    
 ---
 ## Connection terminal list
