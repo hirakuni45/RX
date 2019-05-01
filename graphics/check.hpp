@@ -154,7 +154,7 @@ namespace gui {
 		void draw(RDR& rdr) noexcept
 		{
 			auto font_height = RDR::font_type::height;
-			auto loc = get_location();
+			auto loc = vtx::srect(get_final_position(), get_location().size);
 			loc.size.x = loc.size.y;
 			auto r = loc;
 

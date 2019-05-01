@@ -156,7 +156,7 @@ namespace gui {
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
-			auto r = get_location();
+			auto r = vtx::srect(get_final_position(), get_location().size);
 			rdr.set_fore_color(graphics::def_color::White);
 			rdr.round_box(r, round_radius);
 			if(get_touch_state().level_) {

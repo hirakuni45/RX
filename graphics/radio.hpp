@@ -153,7 +153,8 @@ namespace gui {
 		{
 			auto font_height = RDR::font_type::height;
 			auto rad = get_location().size.y / 2;
-			auto cen = get_location().org + rad;
+			const auto& org = get_final_position();
+			auto cen = org + rad;
 
 			rdr.set_fore_color(graphics::def_color::White);
 			rdr.fill_circle(cen, rad);
@@ -167,7 +168,7 @@ namespace gui {
 				rdr.fill_circle(cen, rad);
 			}
 
-			auto pos = get_location().org;
+			auto pos = org;
 			pos.x +=  get_location().size.y + box_to_title;
 			pos.y += (get_location().size.y - RDR::font_type::height) / 2;
 			rdr.set_fore_color(graphics::def_color::White);

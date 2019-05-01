@@ -169,7 +169,8 @@ namespace gui {
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
-			auto r = get_location();
+			auto org = get_final_position();
+			auto r = vtx::srect(org, get_location().size);
 			rdr.set_fore_color(graphics::def_color::White);
 			rdr.round_box(r, round_radius);
 			if(get_touch_state().level_) {
@@ -182,7 +183,7 @@ namespace gui {
 			rdr.round_box(r, round_radius - frame_width);
 
 			const auto& size = get_location().size;
-			auto cen = get_location().org;
+			auto cen = org;
 			int16_t rad = 0;
 			if(size.x > size.y) {
 				rad = size.y / 2;

@@ -277,7 +277,7 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void update_touch_def(const vtx::spos& pos, uint16_t num) noexcept
 		{
-			auto loc = location_;
+			auto loc = vtx::srect(get_final_position(), location_.size);
 			loc.org  -= touch_state_.expand_;
 			loc.size += touch_state_.expand_;
 			focus_ = loc.is_focus(pos);
@@ -323,7 +323,7 @@ namespace gui {
 				return;
 			}
 
-			auto loc = location_;
+			auto loc = vtx::srect(get_final_position(), location_.size);
 			loc.org  -= touch_state_.expand_;
 			loc.size += touch_state_.expand_;
 			bool focus = loc.is_focus(pos);
@@ -348,7 +348,7 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		vtx::spos get_final_position() const noexcept
 		{
-			vtx::spos pos = location_.org;
+			auto pos = location_.org;
 			widget* w = parents_;
 			while(w != nullptr) {
 				pos += w->get_location().org;
