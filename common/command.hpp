@@ -29,8 +29,8 @@ namespace utils {
 	template <uint16_t BUFN>
 	class command {
 		char		buff_[BUFN];
-		uint16_t	bpos_;
-		uint16_t	pos_;
+		int16_t		bpos_;
+		int16_t		pos_;
 		uint16_t	len_;
 		int16_t		tab_top_;
 
