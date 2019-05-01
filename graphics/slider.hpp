@@ -40,14 +40,15 @@ namespace gui {
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	str		ボタン文字列
+			@param[in]	inr		初期レシオ
 		*/
 		//-----------------------------------------------------------------//
-		slider(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), select_func_(),
-			touch_org_(0), ratio_org_(0.0f), ratio_(0.0f)
+		slider(const vtx::srect& loc = vtx::srect(0), float inr = 0.0f) noexcept :
+			widget(loc, nullptr), select_func_(),
+			touch_org_(0), ratio_org_(inr), ratio_(inr)
 		{
 			if(loc.size.x <= 0) {
+				at_location().size.x = handle_size;
 			}
 			if(loc.size.y <= 0) {
 				at_location().size.y = handle_size;
@@ -133,9 +134,10 @@ namespace gui {
 				ratio_ = ratio_org_ + (val / ref);
 				if(ratio_ < 0.0f) ratio_ = 0.0f;
 				else if(ratio_ > 1.0f) ratio_ = 1.0f;
-			}
-			if(select_func_) {
-				select_func_(ratio_);
+			} else if(get_touch_state().negative_) {
+				if(select_func_) {
+					select_func_(ratio_);
+				}
 			}
 		}
 
