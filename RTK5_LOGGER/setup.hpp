@@ -30,7 +30,8 @@ namespace app {
 		gui::radio		radio1_;
 		gui::radio		radio2_;
 		gui::radio		radio3_;
-		gui::slider		slider_;
+		gui::slider		sliderh_;
+		gui::slider		sliderv_;
 		
 
 	public:
@@ -46,7 +47,8 @@ namespace app {
 			radio1_(vtx::srect( 30, 70 + 40*1, 0, 0), "Red"),
 			radio2_(vtx::srect( 30, 70 + 40*2, 0, 0), "Green"),
 			radio3_(vtx::srect( 30, 70 + 40*3, 0, 0), "Blue"),
-			slider_(vtx::srect(150,20, 120, 0))
+			sliderh_(vtx::srect(150,20, 150, 0), 0.5f),
+			sliderv_(vtx::srect(450,20, 0, 200), 1.0f)
 		{
 			group_ + radio1_ + radio2_ + radio3_;
 			radio2_.exec_select();  // 初期 radio2_ を有効にする
@@ -73,7 +75,14 @@ namespace app {
 			radio1_.enable();
 			radio2_.enable();
 			radio3_.enable();
-			slider_.enable();
+			sliderh_.enable();
+			sliderh_.at_select_func() = [this](float val) {
+				utils::format("SliderH: %4.3f\n") % val;
+			};
+			sliderv_.enable();
+			sliderv_.at_select_func() = [this](float val) {
+				utils::format("SliderV: %4.3f\n") % val;
+			};
 		}
 
 
@@ -107,7 +116,8 @@ namespace app {
 			radio1_.enable(false);
 			radio2_.enable(false);
 			radio3_.enable(false);
-			slider_.enable(false);
+			sliderh_.enable(false);
+			sliderv_.enable(false);
 		}
 	};
 }
