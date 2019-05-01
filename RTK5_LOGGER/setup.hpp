@@ -44,9 +44,9 @@ namespace app {
 			button_(vtx::srect( 30, 20, 80, 30), "OK"),
 			check_(vtx::srect(  30, 70 + 40*0, 0, 0), "Check"),
 			group_(vtx::srect(  30, 70 + 40*1, 0, 0)),
-			radio1_(vtx::srect( 30, 70 + 40*1, 0, 0), "Red"),
-			radio2_(vtx::srect( 30, 70 + 40*2, 0, 0), "Green"),
-			radio3_(vtx::srect( 30, 70 + 40*3, 0, 0), "Blue"),
+			radio1_(vtx::srect(  0, 40*0, 0, 0), "Red"),
+			radio2_(vtx::srect(  0, 40*1, 0, 0), "Green"),
+			radio3_(vtx::srect(  0, 40*2, 0, 0), "Blue"),
 			sliderh_(vtx::srect(150,20, 150, 0), 0.5f),
 			sliderv_(vtx::srect(450,20, 0, 200), 1.0f)
 		{
