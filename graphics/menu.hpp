@@ -3,264 +3,152 @@
 /*!	@file
 	@brief	メニュー・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <cstdint>
-#include "common/vtx.hpp"
+#include "graphics/widget.hpp"
+#include "common/string_utils.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	メニュー・クラス
-		@param[in]	RDR		基本描画クラス
-		@param[in]	BACK	ボタン背面の描画クラス	
-		@param[in]	MAX		最大メニュー数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class RDR, class BACK, uint16_t MAX>
-	class menu {
+	struct menu : public widget {
 
-		RDR&		rdr_;
-		BACK&		back_;
+		typedef menu value_type;
 
-		uint16_t	size_;
+		static const int16_t round_radius = 6;  // round radius
+		static const int16_t item_height  = 28;	// ITEM height
 
-		struct obj_t {
-			uint8_t		w_;
-			uint8_t		h_;
-			const void* src_;
+	private:
 
-			obj_t() : w_(0), h_(0), src_(nullptr) { }
-		};
-		obj_t	obj_[MAX];
-
-		vtx::spos	m_;
-		vtx::spos	ofs_;
-		vtx::spos	space_;
-
-		uint16_t	pos_;
-
-		int8_t		gap_;
-		bool		focus_;
+		uint32_t	num_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
-			@param[in]	rdr		描画クラス
-			@param[in]	back	背面描画クラス
+			@param[in]	loc		ロケーション
+			@param[in]	str		ボタン文字列
 		*/
 		//-----------------------------------------------------------------//
-		menu(RDR& rdr, BACK& back) noexcept : rdr_(rdr), back_(back),
-			size_(0), m_(0), ofs_(0), space_(0),
-			pos_(0), gap_(0),
-			focus_(true)
-		{ }
+		menu(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
+			widget(loc, str)
+		{
+			num_ = utils::str::get_words(str, ',');
+			at_location().size.y = num_ * item_height;
+			insert_widget(this);
+		}
+
+
+		menu(const menu& th) = delete;
+		menu& operator = (const menu& th) = delete;
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	描画オフセットの設定
-			@param[in]	ofs	オフセット
+			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		void set_offset(const vtx::spos& ofs) noexcept
+		virtual ~menu() noexcept { remove_widget(this); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	型整数を取得
+			@return 型整数
+		*/
+		//-----------------------------------------------------------------//
+		const char* get_name() const noexcept override { return "Menu"; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ID を取得
+			@return ID
+		*/
+		//-----------------------------------------------------------------//
+		ID get_id() const noexcept override { return ID::MENU; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	初期化
+		*/
+		//-----------------------------------------------------------------//
+		void init() noexcept override { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	タッチ判定を更新
+			@param[in]	pos		判定位置
+			@param[in]	num		タッチ数
+			@param[in]	slt		スライド・タイプの場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	選択推移
+			@param[in]	inva	無効状態にする場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		void exec_select(bool inva) noexcept override { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	許可・不許可
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(bool ena = true) noexcept override
 		{
-			ofs_ = ofs;
+			if(ena) set_state(STATE::ENABLE);
+			else set_state(STATE::DISABLE);
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	描画スペースの設定
-			@param[in]	spc	スペース
+			@brief	描画
 		*/
 		//-----------------------------------------------------------------//
-		void set_space(const vtx::spos& spc) noexcept
+		template<class RDR>
+		void draw(RDR& rdr) noexcept
 		{
-			space_ = spc;
-		}
+			auto r = vtx::srect(get_final_position(), get_location().size);
 
+			for(uint32_t i = 0; i < num_; ++i) {
+				if(i & 1) rdr.set_fore_color(graphics::def_color::Darkgray);
+				else rdr.set_fore_color(graphics::def_color::Gray);
+				rdr.round_box(r, round_radius);
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	ギャップの設定（縦）
-			@param[in]	gap	ギャップ
-		*/
-		//-----------------------------------------------------------------//
-		void set_gap(int16_t gap) noexcept { gap_ = gap; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	メニュー・サイズを返す（登録されているメニュー数）
-			@return メニュー・サイズ
-		*/
-		//-----------------------------------------------------------------//
-		uint16_t size() const noexcept { return size_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	フォーカスを戻す
-		*/
-		//-----------------------------------------------------------------//
-		void prev_focus() noexcept
-		{
-			if(size_ == 0) return;
-
-			if(pos_ > 0) {
-				pos_--;
+				rdr.set_fore_color(graphics::def_color::White);
+				auto sz = rdr.at_font().get_text_size(get_title());
+				rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
 			}
-		}
 
+#if 0
+			rdr.set_fore_color(graphics::def_color::White);
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	フォーカスを進める
-		*/
-		//-----------------------------------------------------------------//
-		void next_focus() noexcept
-		{
-			if(size_ == 0) return;
-
-			++pos_;
-			if(pos_ >= size_) {
-				pos_ = size_ - 1;
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	メニュー位置を取得
-			@return メニュー位置
-		*/
-		//-----------------------------------------------------------------//
-		uint16_t get_pos() const noexcept { return pos_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	登録メニューを全てクリア
-		*/
-		//-----------------------------------------------------------------//
-		void clear() noexcept
-		{
-			size_ = 0;
-			m_.set(0);
-			pos_ = 0;
-			focus_ = false;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	オブジェクトを追加
-			@param[in]	src		オブジェクト・ソース
-			@param[in]	bitmap	ビットマップの場合「true」
-		*/
-		//-----------------------------------------------------------------//
-		void add(const void* src, bool bitmap = false) noexcept
-		{
-			if(size_ >= MAX) return;
-
-			if(bitmap) {
-				auto sz = rdr_.get_mobj_size(src);
-				obj_[size_].w_ = sz.x;
-				obj_[size_].h_ = sz.y;
+			if(get_touch_state().level_) {
+				rdr.set_fore_color(graphics::def_color::Silver);
 			} else {
-				auto sz = rdr_.at_font().get_text_size(static_cast<const char*>(src), false);
-				obj_[size_].w_ = sz.x;
-				obj_[size_].h_ = sz.y;
+				rdr.set_fore_color(graphics::def_color::Darkgray);
 			}
-			obj_[size_].src_ = src;
-			++size_;
-
-			vtx::spos tt(0);
-			for(auto i = 0; i < size_; ++i) {
-				auto xx = obj_[i].w_ + space_.x * 2;
-				if(tt.x < xx) tt.x = xx;
-				tt.y += obj_[i].h_;
-				tt.y += gap_;
-				tt.y += space_.y * 2;
-			}
-			m_ = tt;
+			r.org += 2;
+			r.size -= 4;
+			rdr.round_box(r, round_radius - 2);
+#endif
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	レンダリング
-			@param[in]	px	X 位置
-			@param[in]	py	Y 位置
-			@param[in]	touch	タッチ状態
-			@return メニューが選択された場合「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool render(int16_t px = -1, int16_t py = -1, bool touch = false) noexcept
-		{
-			if(size_ == 0) return false;
-
-			vtx::spos n((RDR::glc_type::width  - ofs_.x - m_.x) / 2,
-				(RDR::glc_type::height - ofs_.y - m_.y) / 2);
-			n += ofs_;
-			int16_t idx = -1;
-			for(auto i = 0; i < size_; ++i) {
-				const auto& obj = obj_[i];
-				n.y += gap_ / 2;
-				auto fc = graphics::def_color::White;
-				auto bc = graphics::def_color::Darkgray;
-				if(n.x <= px && px < (n.x + m_.x) &&
-					n.y <= py && py < (n.y + obj.h_ + space_.y * 2)) {
-					idx = i;
-					if(touch) {
-						bc = graphics::def_color::Silver;
-					}
-				}
-				rdr_.set_fore_color(fc);
-				rdr_.set_back_color(bc);
-				back_(vtx::srect(n.x, n.y, m_.x, obj.h_ + space_.y * 2));
-				n.y += space_.y;
-				auto t = static_cast<const char*>(obj_[i].src_);
-				rdr_.set_fore_color(graphics::def_color::White);
-				rdr_.draw_text(vtx::spos(n.x + space_.x, n.y), t);
-				n.y += obj.h_;
-				n.y += space_.y;
-				n.y += gap_ - (gap_ / 2);
-			}
-
-			bool focus = focus_;
-			focus_ = touch;
-			if(idx >= 0) {
-				pos_ = idx;
-				if(focus && !focus_) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	RDR クラスの参照
-			@return RDR クラス
-		*/
-		//-----------------------------------------------------------------//
-		RDR& at_render() noexcept { return rdr_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	BACK クラスの参照
-			@return BACK クラス
-		*/
-		//-----------------------------------------------------------------//
-		BACK& at_back() noexcept { return back_; }
 	};
 }
