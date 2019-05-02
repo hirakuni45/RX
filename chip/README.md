@@ -1,10 +1,10 @@
-各種デバイスドライバー
+Various device drivers
 =========
 
-## 概要
-I2C、SPI、BUS、等のインターフェースで通信を行うデバイス制御クラス
+## Overview
+Device control class that communicates with interfaces such as I2C, SPI, BUS, etc.
    
-## デバイス・リスト
+## Device list
  - BMP180   
 BOSCH   
 digital barometric pressure sensor   
@@ -19,19 +19,19 @@ Interface: I2C
    
  - DS1371   
 Maxim Integrated   
-内部バイナリー、I²Cリアルタイムクロック(RTC)    
+32-Bit Binary Counter    
 <https://www.maximintegrated.com/jp/products/digital/real-time-clocks/DS1371.html>   
 Interface: I2C   
    
  - DS3231   
 Maxim Integrated   
-超高精度I²Cリアルタイムクロック(RTC)    
-超高精度I²C内蔵RTC/TCXO/水晶    
+Ultra High Accuracy I2C Real Time Clock (RTC)    
+Super high precision I2C built-in RTC / TCXO / Crystal    
 <https://www.maximintegrated.com/jp/products/digital/real-time-clocks/DS3231.html>   
 Interface: I2C   
    
  - EEPROM   
-各社   
+Each company   
 I2C EEPROM   
 I2C EEPROM（１byte、２byte address）   
 Interface: I2C   
@@ -60,7 +60,7 @@ Interface: I2C
    
  - NTCTH   
 muRata   
-NTC サーミスタ   
+NTC thermistor   
 Interface: Analog   
    
  - SH1106   
