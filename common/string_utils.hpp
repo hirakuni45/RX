@@ -339,16 +339,17 @@ namespace utils {
         //-----------------------------------------------------------------//
         /*!
             @brief  ワード数を取得
-			@param[in]	src	ソース
+			@param[in]	src		ソース
+			@param[in]	sch		分離キャラクタ
 			@return ワード数を返す
         */
         //-----------------------------------------------------------------//
-		static uint16_t get_words(const char* src) noexcept
+		static uint16_t get_words(const char* src, char sch = ' ') noexcept
 		{
 			if(src == nullptr) return 0;
 
 			const char* p = src;
-			char bc = ' ';
+			char bc = sch;
 			uint16_t n = 0;
 			bool esc = false;
 			while(1) {
@@ -362,7 +363,7 @@ namespace utils {
 					esc = true;
 					continue;
 				} 
-				if(bc == ' ' && ch != ' ') {
+				if(bc == sch && ch != sch) {
 					++n;
 				}
 				bc = ch;
@@ -378,22 +379,24 @@ namespace utils {
 			@param[in]	argc	ワード位置
 			@param[out]	dst		ワード文字列格納ポインター
 			@param[in]	size	ワード文字列サイズ
+			@param[in]	sch		分離キャラクタ
 			@return 取得できたら「true」を返す
         */
         //-----------------------------------------------------------------//
-		static bool get_word(const char* src, uint16_t argc, char* dst, uint16_t size) noexcept 
+		static bool get_word(const char* src, uint16_t argc, char* dst, uint16_t size,
+			char sch = ' ') noexcept 
 		{
 			if(src == nullptr || dst == nullptr) return false;
 
 			const char* p = src;
-			char bc = ' ';
+			char bc = sch;
 			const char* wd = p;
 			while(1) {
 				char ch = *p;
-				if(bc == ' ' && ch != ' ') {
+				if(bc == sch && ch != sch) {
 					wd = p;
 				}
-				if(bc != ' ' && (ch == ' ' || ch == 0)) {
+				if(bc != sch && (ch == sch || ch == 0)) {
 					if(argc == 0) {
 						uint8_t i;
 						for(i = 0; i < (p - wd); ++i) {
@@ -420,24 +423,25 @@ namespace utils {
 			@param[in]	src	ソース
 			@param[in]	argc	ワード位置
 			@param[in]	key		比較文字列
-			@return 
+			@param[in]	sch		分離キャラクタ
+			@return マッチした場合「true」
         */
         //-----------------------------------------------------------------//
-		static bool cmp_word(const char* src, uint16_t argc, const char* key) noexcept
+		static bool cmp_word(const char* src, uint16_t argc, const char* key, char sch = ' ') noexcept
 		{
 			if(src == nullptr) return false;
 			if(key == nullptr) return false;
 
 			const char* p = src;
-			char bc = ' ';
+			char bc = sch;
 			int keylen = std::strlen(key);
 			const char* top = p;
 			while(1) {
 				char ch = *p;
-				if(bc == ' ' && ch != ' ') {
+				if(bc == sch && ch != sch) {
 					top = p;
 				}
-				if(bc != ' ' && (ch == ' ' || ch == 0)) {
+				if(bc != sch && (ch == sch || ch == 0)) {
 					int len = p - top;					
 					if(argc == 0 && len == keylen) {
 						return std::strncmp(key, top, keylen) == 0;
