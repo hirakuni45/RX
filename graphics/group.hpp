@@ -21,9 +21,18 @@ namespace gui {
 
 		typedef group value_type;
 
+		static const uint32_t CNUM = 16;
+
 	private:
+		widget*		child_[CNUM];
+		uint32_t	count_;
 
-
+		void insert_(widget* w) {
+			if(count_ < CNUM) {
+				child_[count_] = w;
+				++count_;
+			}
+		} 
 
 	public:
 		//-----------------------------------------------------------------//
@@ -34,7 +43,7 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		group(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str)
+			widget(loc, str), child_{ nullptr }, count_(0)
 		{
 			insert_widget(this);
 		}
@@ -97,18 +106,69 @@ namespace gui {
 		void exec_select(bool inva) noexcept override { }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	許可・不許可
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(bool ena = true) override
+		{
+			auto st = STATE::DISABLE;
+			if(ena) {
+				st = STATE::ENABLE;
+			}
+			set_state(st);
+			for(uint32_t i = 0; i < count_; ++i) {
+				child_[i]->set_state(st);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	子供のリスト数取得
+			@return 子供のリスト数
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_child_num() const noexcept { return count_; }
+ 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	子供のリスト取得
+			@return 子供のリスト
+		*/
+		//-----------------------------------------------------------------//
+		widget** get_child() noexcept { return child_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	親の設定
+			@param[in]	th	子のインスタンス	
+		*/
+		//-----------------------------------------------------------------//
 		template <class T>
 		group& operator + (T& th)
 		{
 			th.set_parents(this);
+			insert_(&th);
 			return *this;
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	親の設定
+			@param[in]	th	子のインスタンス	
+		*/
+		//-----------------------------------------------------------------//
 		template <class T>
 		group& operator += (T& th)
 		{
 			th.set_parents(this);
+			insert_(&th);
 			return *this;
 		}
 	};

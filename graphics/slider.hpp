@@ -105,17 +105,7 @@ namespace gui {
 		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
 		{
 			update_touch_slider(pos, num);
-		}
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	選択推移
-			@param[in]	ena		無効状態にする場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		void exec_select(bool ena = true) override
-		{
 			if(get_touch_state().positive_) {
 				touch_org_ = get_touch_state().position_;
 				ratio_org_ = ratio_;
@@ -134,11 +124,36 @@ namespace gui {
 				ratio_ = ratio_org_ + (val / ref);
 				if(ratio_ < 0.0f) ratio_ = 0.0f;
 				else if(ratio_ > 1.0f) ratio_ = 1.0f;
-			} else if(get_touch_state().negative_) {
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	選択推移
+			@param[in]	ena		無効状態にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void exec_select(bool ena = true) noexcept override
+		{
+ 			if(get_touch_state().negative_) {
 				if(select_func_) {
 					select_func_(ratio_);
 				}
 			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	許可・不許可
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(bool ena = true) noexcept override
+		{
+			if(ena) set_state(STATE::ENABLE);
+			else set_state(STATE::DISABLE);
 		}
 
 
