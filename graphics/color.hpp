@@ -140,6 +140,7 @@ namespace graphics {
 		static const share_color Silver;
 		static const share_color Gray;
 		static const share_color Grey;
+		static const share_color Midgray;
 		static const share_color Darkgray;
 		static const share_color Red;
 		static const share_color Lime;
