@@ -508,34 +508,42 @@ namespace graphics {
 			@brief	角がラウンドした塗りつぶされた箱を描画する
 			@param[in]	rect	短形を指定
 			@param[in]	rad		ラウンドの半径
+			@param[in]	up		上部をラウンドする
+			@param[in]	dn		下部をラウンドする
 		*/
 		//-----------------------------------------------------------------//
-		void round_box(const vtx::srect& rect, int16_t rad) noexcept
+		void round_box(const vtx::srect& rect, int16_t rad, bool up = true, bool dn = true) noexcept
 		{
 			if(rect.size.x < (rad + rad) || rect.size.y < (rad + rad)) {
 				if(rect.size.x < rect.size.y) rad = rect.size.x / 2;
 				else rad = rect.size.y / 2;
 			}
-			auto cen = rect.org + rad;
-			auto ofs = rect.size - (rad * 2);
-			fill_box(vtx::srect(rect.org.x, cen.y, rect.size.x, ofs.y));
-			vtx::spos pos(0, rad);
+			auto cn = rect.org + rad;
+			auto of = rect.size - (rad * 2);
+			{
+				auto yy = rect.org.y;
+				auto sz = rect.size.y;
+				if(up) { sz -= rad; yy += rad; }
+				if(dn) sz -= rad;
+				fill_box(vtx::srect(rect.org.x, yy, rect.size.x, sz));
+			}
+			vtx::spos po(0, rad);
 			int16_t p = (5 - rad * 4) / 4;
-			ofs -= 1;
+			of -= 1;
 ///			line_h(cen.y, cen.x - pos.y, pos.y + pos.y + ofs.x + 1);
-			while(pos.x < pos.y) {
-				pos.x++;
+			while(po.x < po.y) {
+				po.x++;
 				if(p < 0) {
-					p += 2 * pos.x + 1;
+					p += 2 * po.x + 1;
 				} else {
 					// x` = x - 1
-					line_h(cen.y - pos.y,         cen.x - pos.x + 1, pos.x + pos.x + ofs.x - 1);
-					line_h(cen.y + pos.y + ofs.y, cen.x - pos.x + 1, pos.x + pos.x + ofs.x - 1);
-					pos.y--;
-					p += 2 * (pos.x - pos.y) + 1;
+					if(up) line_h(cn.y - po.y,        cn.x - po.x + 1, po.x + po.x + of.x - 1);
+					if(dn) line_h(cn.y + po.y + of.y, cn.x - po.x + 1, po.x + po.x + of.x - 1);
+					po.y--;
+					p += 2 * (po.x - po.y) + 1;
 				}
-				line_h(cen.y - pos.x,         cen.x - pos.y, pos.y + pos.y + ofs.x + 1);
-				line_h(cen.y + pos.x + ofs.y, cen.x - pos.y, pos.y + pos.y + ofs.x + 1);
+				if(up) line_h(cn.y - po.x,        cn.x - po.y, po.y + po.y + of.x + 1);
+				if(dn) line_h(cn.y + po.x + of.y, cn.x - po.y, po.y + po.y + of.x + 1);
 			}
 		}
 
