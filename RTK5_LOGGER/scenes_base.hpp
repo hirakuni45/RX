@@ -15,7 +15,7 @@
 #include "graphics/picojpeg_in.hpp"
 #include "graphics/scaling.hpp"
 #include "graphics/img_in.hpp"
-#include "graphics/menu.hpp"
+#include "graphics/root_menu.hpp"
 #include "graphics/dialog.hpp"
 #include "graphics/filer.hpp"
 #include "chip/FT5206.hpp"
@@ -147,7 +147,7 @@ namespace app {
 				render_.round_box(r, 8 - 2);
 			}
 		};
-		typedef gui::menu<RENDER, BACK, 8> MENU;
+		typedef gui::root_menu<RENDER, BACK, 8> MENU;
 
 		typedef img::scaling<RENDER> PLOT;
 		typedef img::img_in<PLOT> IMG_IN;

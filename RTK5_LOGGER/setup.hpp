@@ -32,7 +32,7 @@ namespace app {
 		gui::radio		radio3_;
 		gui::slider		sliderh_;
 		gui::slider		sliderv_;
-		
+		gui::menu		menu_;
 
 	public:
 		//-------------------------------------------------------------//
@@ -48,7 +48,8 @@ namespace app {
 			radio2_(vtx::srect(  0, 40*1, 0, 0), "Green"),
 			radio3_(vtx::srect(  0, 40*2, 0, 0), "Blue"),
 			sliderh_(vtx::srect(150,20, 150, 0), 0.5f),
-			sliderv_(vtx::srect(450,20, 0, 200), 1.0f)
+			sliderv_(vtx::srect(450,20, 0, 200), 1.0f),
+			menu_(vtx::srect(150, 70, 100, 0), "Red,Green,Blue,White")
 		{
 			group_ + radio1_ + radio2_ + radio3_;
 			radio2_.exec_select();  // 初期 radio2_ を有効にする
@@ -72,9 +73,9 @@ namespace app {
 			check_.at_select_func() = [this](bool ena) {
 				utils::format("Check: %d\n") % static_cast<int>(ena);
 			};
-			radio1_.enable();
-			radio2_.enable();
-			radio3_.enable();
+
+			group_.enable();  // ラジオボタングループ
+
 			sliderh_.enable();
 			sliderh_.at_select_func() = [this](float val) {
 				utils::format("SliderH: %4.3f\n") % val;
@@ -82,6 +83,11 @@ namespace app {
 			sliderv_.enable();
 			sliderv_.at_select_func() = [this](float val) {
 				utils::format("SliderV: %4.3f\n") % val;
+			};
+
+			menu_.enable();
+			menu_.at_select_func() = [this](uint32_t pos, uint32_t num) {
+				utils::format("Menu: %u/%u\n") % pos % num;
 			};
 		}
 
@@ -113,11 +119,10 @@ namespace app {
 		{
 			button_.enable(false);
 			check_.enable(false);
-			radio1_.enable(false);
-			radio2_.enable(false);
-			radio3_.enable(false);
+			group_.enable(false);
 			sliderh_.enable(false);
 			sliderv_.enable(false);
+			menu_.enable(false);
 		}
 	};
 }
