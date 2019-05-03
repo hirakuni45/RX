@@ -1,21 +1,23 @@
 #pragma once
 //=====================================================================//
 /*! @file
-    @brief  format クラス @n
+    @brief  utils::format クラス @n
 			・安全性を考慮した、[s]printf 表示に準じたクラス @n
 			・二進表記として、「%b」をサポート @n
 			・固定小数点表示「%N.M:Ly」形式をサポート @n
 			※ N：全桁数、M：小数部桁数、L：小数部のビット数 @n
 			※ N には、小数点、符号が含まれる @n
-			Ex: %1.2:8y ---> 256 で 1.00、128 で 0.50、384 で 1.50 @n
+			Ex: %3.2:8y ---> 256 で 1.00、128 で 0.50、384 で 1.50 @n
 			と表示される。@n
+            ・NO_FLOAT_FORM を有効にすると、float 関係の機能を無効にでき @n
+            メモリを節約出来る。@n
 			+ 2017/06/11 20:00- 標準文字出力クラスの再定義、実装 @n 
 			+ 2017/06/11 21:00- 固定文字列クラス向け chaout、実装 @n
 			+ 2017/06/12 14:50- memory_chaoutと、専用コンストラクター実装 @n
 			+ 2017/06/14 05:34- memory_chaout size() のバグ修正 @n
 			+ 2018/11/20 05:10- float を無効にするオプションを復活
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
