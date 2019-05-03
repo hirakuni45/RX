@@ -8,6 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include <functional>
 #include "graphics/widget.hpp"
 #include "common/string_utils.hpp"
 
@@ -25,9 +26,14 @@ namespace gui {
 		static const int16_t round_radius = 6;  // round radius
 		static const int16_t item_height  = 28;	// ITEM height
 
+		typedef std::function<void(uint32_t pos, uint32_t num)> SELECT_FUNC_TYPE;
+
 	private:
 
-		uint32_t	num_;
+		SELECT_FUNC_TYPE	select_func_;
+		vtx::spos			item_size_;
+		uint32_t			num_;
+		uint32_t			select_pos_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -38,10 +44,16 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		menu(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str)
+			widget(loc, str),
+			select_func_(), item_size_(0),
+			num_(utils::str::get_words(str, ',')), select_pos_(num_)
 		{
-			num_ = utils::str::get_words(str, ',');
-			at_location().size.y = num_ * item_height;
+			if(loc.size.y <= 0) {
+				at_location().size.y = num_ * item_height;
+				item_size_.y = item_height;
+			} else {
+				item_size_.y = loc.size.y / num_;
+			}
 			insert_widget(this);
 		}
 
@@ -92,7 +104,19 @@ namespace gui {
 			@param[in]	slt		スライド・タイプの場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override { }
+		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
+		{
+			update_touch_def(pos, num, false);
+			const auto& st = get_touch_state();
+			if(st.level_) {
+				select_pos_ = st.relative_.y / item_size_.y;
+			}
+			if(st.negative_) {
+				if(!get_focus()) {
+					select_pos_ = num_;
+				}
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -101,7 +125,12 @@ namespace gui {
 			@param[in]	inva	無効状態にする場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select(bool inva) noexcept override { }
+		void exec_select(bool inva) noexcept override
+		{
+			if(select_func_) {
+				select_func_(select_pos_, num_);
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -119,6 +148,24 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	セレクト位置の取得
+			@return	セレクト位置
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_select_pos() const noexcept { return select_pos_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	セレクト関数への参照
+			@return	セレクト関数
+		*/
+		//-----------------------------------------------------------------//
+		SELECT_FUNC_TYPE& at_select_func() noexcept { return select_func_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	描画
 		*/
 		//-----------------------------------------------------------------//
@@ -126,29 +173,28 @@ namespace gui {
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
-
+			r.size.y /= num_;
 			for(uint32_t i = 0; i < num_; ++i) {
-				if(i & 1) rdr.set_fore_color(graphics::def_color::Darkgray);
-				else rdr.set_fore_color(graphics::def_color::Gray);
-				rdr.round_box(r, round_radius);
+				if(get_touch_state().level_ && select_pos_ == i) {
+					rdr.set_fore_color(graphics::def_color::Silver);
+				} else {
+					if(i & 1) rdr.set_fore_color(graphics::def_color::Midgray);
+					else rdr.set_fore_color(graphics::def_color::Gray);
+				}
+				bool up = false;
+				bool dn = false;
+				if(i == 0) up = true;
+				if(i == (num_ - 1)) dn = true;
+				rdr.round_box(r, round_radius, up, dn);
 
-				rdr.set_fore_color(graphics::def_color::White);
-				auto sz = rdr.at_font().get_text_size(get_title());
-				rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
+				char tmp[16];
+				if(utils::str::get_word(get_title(), i, tmp, sizeof(tmp), ',')) {
+					auto sz = rdr.at_font().get_text_size(tmp);
+					rdr.set_fore_color(graphics::def_color::White);
+					rdr.draw_text(r.org + (r.size - sz) / 2, tmp);
+				}
+				r.org.y += r.size.y;
 			}
-
-#if 0
-			rdr.set_fore_color(graphics::def_color::White);
-
-			if(get_touch_state().level_) {
-				rdr.set_fore_color(graphics::def_color::Silver);
-			} else {
-				rdr.set_fore_color(graphics::def_color::Darkgray);
-			}
-			r.org += 2;
-			r.size -= 4;
-			rdr.round_box(r, round_radius - 2);
-#endif
 		}
 	};
 }

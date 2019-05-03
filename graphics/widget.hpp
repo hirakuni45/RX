@@ -34,6 +34,8 @@ namespace gui {
 			CHECK,		///< チェック・ボタン
 			RADIO,		///< ラジオ・ボタン
 			SLIDER,		///< スライダー
+			MENU,		///< メニュー
+			SPINBOX,	///< スピンボックス
 		};
 
 
@@ -56,6 +58,7 @@ namespace gui {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct touch_state {
 			vtx::spos	position_;	///< タッチしている絶対位置
+			vtx::spos	relative_;	///< タッチしている相対位置
 			vtx::spos	expand_;	///< フォーカス拡張領域
 			bool		positive_;	///< タッチした瞬間
 			bool		level_;		///< タッチしている状態
@@ -141,7 +144,16 @@ namespace gui {
 			@param[in]	ena		無効状態にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		virtual void exec_select(bool ena = true)  = 0;
+		virtual void exec_select(bool ena = true) = 0;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	許可・不許可
+			@param[in]	ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		virtual void enable(bool ena = true) = 0;
 
 
 		//-----------------------------------------------------------------//
@@ -239,19 +251,6 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	許可・不許可
-			@param[in]	ena		不許可の場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		void enable(bool ena = true) noexcept
-		{
-			if(ena) set_state(STATE::ENABLE);
-			else set_state(STATE::DISABLE);
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief	フォーカスを取得
 			@return フォーカス
 		*/
@@ -273,18 +272,22 @@ namespace gui {
 			@brief	標準的なタッチ判定更新
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
+			@param[in]	exp		タッチ領域拡張を行わない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void update_touch_def(const vtx::spos& pos, uint16_t num) noexcept
+		void update_touch_def(const vtx::spos& pos, uint16_t num, bool exp = true) noexcept
 		{
 			auto loc = vtx::srect(get_final_position(), location_.size);
-			loc.org  -= touch_state_.expand_;
-			loc.size += touch_state_.expand_;
+			if(exp) {
+				loc.org  -= touch_state_.expand_;
+				loc.size += touch_state_.expand_;
+			}
 			focus_ = loc.is_focus(pos);
 			if(focus_) {
 				if(num > 0) {
 					touch_ = true;
 					touch_state_.position_ = pos;
+					touch_state_.relative_ = pos - loc.org;
 				} else {
 					touch_ = false;
 					touch_state_.position_.set(-1);

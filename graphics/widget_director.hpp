@@ -16,6 +16,8 @@
 #include "graphics/check.hpp"
 #include "graphics/radio.hpp"
 #include "graphics/slider.hpp"
+#include "graphics/menu.hpp"
+#include "graphics/spinbox.hpp"
 
 namespace gui {
 
@@ -190,7 +192,14 @@ namespace gui {
 				if(t.w_->get_state() == widget::STATE::ENABLE) {
 					const auto& ts = t.w_->get_touch_state();
 					if(ts.negative_) {
-						t.w_->exec_select();
+						bool ena = true;
+						if(t.w_->get_id() == widget::ID::CHECK) {
+							auto* w = dynamic_cast<check*>(t.w_);
+							if(w != nullptr) {
+								ena = !w->get_enable();
+							}
+						}
+						t.w_->exec_select(ena);
 						t.draw_ = true;
 						if(t.w_->get_id() == widget::ID::RADIO) {
 							widget_t* list[8];
@@ -198,7 +207,7 @@ namespace gui {
 							for(uint16_t i = 0; i < n; ++i) {
 								list[i]->w_->exec_select(false);
 								list[i]->draw_ = true;
-							}
+							}							
 						}
 					}
 					if(ts.positive_) {
@@ -206,7 +215,8 @@ namespace gui {
 					}
 					if(ts.level_) {
 						if(t.w_->get_id() == widget::ID::SLIDER) {
-							t.w_->exec_select();
+							t.draw_ = true;
+						} else if(t.w_->get_id() == widget::ID::MENU) {
 							t.draw_ = true;
 						}
 					}
@@ -253,6 +263,20 @@ namespace gui {
 				case widget::ID::SLIDER:
 					{
 						auto* w = dynamic_cast<slider*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::MENU:
+					{
+						auto* w = dynamic_cast<menu*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::SPINBOX:
+					{
+						auto* w = dynamic_cast<spinbox*>(t.w_);
 						if(w == nullptr) break;
 						w->draw(rdr_);
 					}
