@@ -122,7 +122,8 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		stdout_chaout() : size_(0) { } 
 
-		void operator() (char ch) {
+		void operator() (char ch)
+		{
 			char tmp = ch;
 			write(STDOUT_FILENO, &tmp, 1);
 			++size_;
@@ -830,6 +831,8 @@ namespace utils {
 					} else {  // over range
 						error_ = error::over;
 					}
+				} else {
+					decimal_(static_cast<int32_t>(val), std::is_signed<T>::value);
 				}
 #ifndef NO_FLOAT_FORM
 			} else if(std::is_floating_point<T>::value) {
