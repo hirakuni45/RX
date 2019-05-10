@@ -320,22 +320,29 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  単ポート定義テンプレート
-		@param[in]	PORTx	ポート・クラス
-		@param[in]	bpos	ビット位置	
+		@param[in]	PORT	ポート・クラス
+		@param[in]	BPOS	ビット位置	
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class PORTx, bitpos bpos>
+	template <class PORTX, bitpos BPOS>
 	struct PORT {
 
-		static const uint8_t PNO     = static_cast<uint8_t>(PORTx::base_address_ & 0x1f);
-		static const uint8_t BIT_POS = static_cast<uint8_t>(bpos);
+		static const uint8_t PNO     = static_cast<uint8_t>(PORTX::base_address_ & 0x1f);
+		static const uint8_t BIT_POS = static_cast<uint8_t>(BPOS);
+
+		/// オープンドレインタイプ
+		enum class OD_TYPE : uint8_t {
+			NONE,	///< 無し
+			N_CH,	///< N-Channel
+			P_CH,	///< P-Channel
+		};
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ポート方向レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		static bit_rw_t<rw8_t<PORTx::base_address_ + 0x00>, bpos> DIR;
+		static bit_rw_t<rw8_t<PORTX::base_address_ + 0x00>, BPOS> DIR;
 
 
 		//-----------------------------------------------------------------//
@@ -359,7 +366,7 @@ namespace device {
 			@brief  プルアップ制御・レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		static bit_rw_t<rw8_t<PORTx::base_address_ + 0xC0>, bpos> PU;
+		static bit_rw_t<rw8_t<PORTX::base_address_ + 0xC0>, BPOS> PU;
 
 
 		//-----------------------------------------------------------------//
@@ -368,27 +375,27 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct od_t {
-			static rw8_t<PORTx::base_address_ + 0x80> ODR0;
-			static rw8_t<PORTx::base_address_ + 0x81> ODR1;
+			static rw8_t<PORTX::base_address_ + 0x80> ODR0;
+			static rw8_t<PORTX::base_address_ + 0x81> ODR1;
 
-			void operator = (bool val) {
-				uint8_t pos = static_cast<uint8_t>(bpos);
-				if(pos < 4) { 
-					if(val) ODR0 |= 1 << (pos * 2);
-					else ODR0 &= ~(1 << (pos * 2));
+			void operator = (OD_TYPE val) {
+				uint8_t pos = static_cast<uint8_t>(BPOS);
+				if(pos < 4) {
+					ODR0 = (ODR0() & ~(3 << (pos * 2))) | (static_cast<uint8_t>(val) << (pos * 2));
 				} else {
 					pos -= 4;
 					if(val) ODR1 |= 1 << (pos * 2);
 					else ODR1 &= ~(1 << (pos * 2));
 				}
 			}
-			bool operator () () {
-				uint8_t pos = static_cast<uint8_t>(bpos);
+
+			OD_TYPE operator () () {
+				uint8_t pos = static_cast<uint8_t>(BPOS);
 				if(pos < 4) {
-					return ODR0() & (1 << (pos * 2));
+					return static_cast<OD_TYPE>(ODR0() & (3 << (pos * 2)));
 				} else {
 					pos -= 4;
-					return ODR1() & (1 << (pos * 2));
+					return static_cast<OD_TYPE>(ODR1() & (3 << (pos * 2)));
 				}
 			}
 		};
@@ -402,8 +409,8 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct port_t {
-			static bit_rw_t<rw8_t<PORTx::base_address_ + 0x20>, bpos> PO;  // ポート出力用
-			static bit_ro_t<ro8_t<PORTx::base_address_ + 0x40>, bpos> PI;  // ポート入力用
+			static bit_rw_t<rw8_t<PORTX::base_address_ + 0x20>, BPOS> PO;  // ポート出力用
+			static bit_ro_t<ro8_t<PORTX::base_address_ + 0x40>, BPOS> PI;  // ポート入力用
 
 			void operator = (bool val) { PO = val; }
 			bool operator () () { return PI(); }
