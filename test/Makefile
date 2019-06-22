@@ -25,7 +25,7 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	main.cpp
 
-USER_LIBS	=
+USER_LIBS	=	stdc++
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
@@ -118,7 +118,8 @@ DEPENDS =   $(patsubst %.o,%.d, $(DOBJECTS))
 .SUFFIXES :
 .SUFFIXES : .rc .hpp .s .h .c .cpp .d .o
 
-all: $(BUILD) $(TARGET).elf text
+# all: $(BUILD) $(TARGET).elf text
+all: $(BUILD) $(TARGET).elf
 
 $(TARGET).elf: $(OBJECTS) $(LDSCRIPT) Makefile
 	$(CC) $(LDFLAGS) $(LIBINCS) -o $@ $(OBJECTS) $(LIBS)

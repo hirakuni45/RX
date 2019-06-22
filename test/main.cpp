@@ -30,6 +30,8 @@
 
 #include "common/fixed_string.hpp"
 
+// #include <iostream>
+
 namespace {
 
 #if defined(SIG_RX71M)
@@ -113,10 +115,11 @@ int main(int argc, char** argv)
 	}
 
 	auto iclk = F_ICLK / 1000000;
-	utils::format("Start test for '%s' %d[MHz]\n") % system_str_ % iclk;
+///	utils::format("Start test for '%s' %d[MHz]\n") % system_str_ % iclk;
 
 ///
 
+#if 0
 	utils::STR16 str;
 
 	str = "asdfg";
@@ -147,11 +150,12 @@ int main(int argc, char** argv)
 	int a_gt_b = a > b;
 	utils::format("a.GT.b: %d\n") % a_gt_b;
 
-
 //	if(a > b) utils::format("a < b: %d\n") % (a > b);
 
+#endif
 
-
+//	std::cout << "Hello!" << std::endl;
+	utils::format("Hello!\n");
 
 	LED::OUTPUT();  // LED ポートを出力に設定
 	uint8_t cnt = 0;
