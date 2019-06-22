@@ -1,7 +1,7 @@
 //=====================================================================//
 /*! @file
     @brief  ファースト・サンプル（LED 点滅） @n
-			RX64M, RX71M: @n
+			RX64M, RX71M, RX72M: @n
 					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
 			RX65N (Renesas Envision kit RX65N): @n
@@ -29,6 +29,9 @@ namespace {
 /// ベースクリスタルの定義
 /// LED 接続ポートの定義
 #if defined(SIG_RX71M)
+	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+#elif defined(SIG_RX72M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX64M)
