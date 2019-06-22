@@ -20,4 +20,9 @@ D Renesas RX651/RX65N Micro Controller
 K RENESAS RX RX65 MCU
 $ENDCMP
 #
+$CMP RX72M_176
+D Renesas RX72M Micro Controller
+K RENESAS RX RX72M MCU
+$ENDCMP
+#
 #End Doc Library
