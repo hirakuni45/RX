@@ -1,6 +1,6 @@
 EESchema Schematic File Version 4
 LIBS:board-cache
-EELAYER 26 0
+EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -248,7 +248,7 @@ F 3 "" H 4600 2100 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C?
+L board-rescue:C-akizuki C?
 U 1 1 5C687E6E
 P 7450 3150
 F 0 "C?" H 7533 3203 60  0000 L CNN
@@ -259,7 +259,7 @@ F 3 "" V 7450 3150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C?
+L board-rescue:C-akizuki C?
 U 1 1 5C687EF4
 P 7850 3150
 F 0 "C?" H 7933 3203 60  0000 L CNN
@@ -270,7 +270,7 @@ F 3 "" V 7850 3150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C?
+L board-rescue:C-akizuki C?
 U 1 1 5C687F22
 P 8250 3150
 F 0 "C?" H 8333 3203 60  0000 L CNN
@@ -281,7 +281,7 @@ F 3 "" V 8250 3150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C?
+L board-rescue:C-akizuki C?
 U 1 1 5C687F6C
 P 8650 3150
 F 0 "C?" H 8733 3203 60  0000 L CNN
@@ -292,7 +292,7 @@ F 3 "" V 8650 3150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C?
+L board-rescue:C-akizuki C?
 U 1 1 5C687FA2
 P 9050 3150
 F 0 "C?" H 9133 3203 60  0000 L CNN
@@ -303,7 +303,7 @@ F 3 "" V 9050 3150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C?
+L board-rescue:C-akizuki C?
 U 1 1 5C687FDE
 P 9450 3150
 F 0 "C?" H 9533 3203 60  0000 L CNN
@@ -314,7 +314,7 @@ F 3 "" V 9450 3150 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C?
+L board-rescue:C-akizuki C?
 U 1 1 5C688016
 P 9850 3150
 F 0 "C?" H 9933 3203 60  0000 L CNN
@@ -437,7 +437,7 @@ Wire Wire Line
 Text HLabel 2250 4400 0    50   UnSpc ~ 0
 SDCLK
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C7216D1
 P 3150 4400
 F 0 "R?" H 3150 4150 50  0000 C CNN
@@ -452,7 +452,7 @@ Wire Wire Line
 Wire Wire Line
 	3000 4400 2250 4400
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C7265C5
 P 2350 3850
 F 0 "R?" V 2350 3700 50  0000 L CNN
@@ -463,7 +463,7 @@ F 3 "" H 2350 3850 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C726615
 P 2350 5250
 F 0 "R?" V 2300 5300 50  0000 L CNN
@@ -474,7 +474,7 @@ F 3 "" H 2350 5250 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C726653
 P 2650 5250
 F 0 "R?" V 2600 5300 50  0000 L CNN
@@ -485,7 +485,7 @@ F 3 "" H 2650 5250 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C726693
 P 2950 5250
 F 0 "R?" V 2900 5300 50  0000 L CNN
@@ -496,7 +496,7 @@ F 3 "" H 2950 5250 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C72DECE
 P 3550 5250
 F 0 "R?" V 3500 5300 50  0000 L CNN

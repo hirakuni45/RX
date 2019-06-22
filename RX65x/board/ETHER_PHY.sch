@@ -1,6 +1,6 @@
 EESchema Schematic File Version 4
 LIBS:board-cache
-EELAYER 26 0
+EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -26,7 +26,7 @@ F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/8720a.pdf" H 5800 2850 50  
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:J0011D21BNL J?
+L board-rescue:J0011D21BNL-akizuki J?
 U 1 1 5C74EDFE
 P 8750 3700
 F 0 "J?" H 9328 3746 50  0000 L CNN
@@ -104,7 +104,7 @@ F 3 "" H 7900 2400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C74F5AA
 P 7650 4000
 F 0 "R?" H 7650 3900 50  0000 C CNN
@@ -115,7 +115,7 @@ F 3 "" H 7650 4000 50  0000 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C74F61C
 P 7650 4200
 F 0 "R?" H 7650 4100 50  0000 C CNN

@@ -1,6 +1,6 @@
 EESchema Schematic File Version 4
 LIBS:board-cache
-EELAYER 26 0
+EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -142,7 +142,7 @@ F 3 "" H 4300 5050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C66B596
 P 6150 2400
 F 0 "R?" V 6104 2470 50  0000 L CNN
@@ -162,7 +162,7 @@ Wire Wire Line
 Wire Wire Line
 	6150 3000 6150 2550
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C66BF5E
 P 3600 3350
 F 0 "R?" V 3554 3420 50  0000 L CNN
@@ -177,7 +177,7 @@ Wire Wire Line
 Wire Wire Line
 	3600 3500 3600 4100
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C66C9B0
 P 2850 1800
 F 0 "R?" V 2804 1870 50  0000 L CNN
@@ -188,7 +188,7 @@ F 3 "" V 2850 1800 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C66C9F0
 P 3150 1800
 F 0 "R?" V 3196 1730 50  0000 R CNN
@@ -199,7 +199,7 @@ F 3 "" V 3150 1800 50  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C66CA53
 P 3450 1800
 F 0 "R?" V 3404 1870 50  0000 L CNN
@@ -210,7 +210,7 @@ F 3 "" V 3450 1800 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C66CABD
 P 3750 1800
 F 0 "R?" V 3704 1870 50  0000 L CNN
@@ -221,7 +221,7 @@ F 3 "" V 3750 1800 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C66CB0A
 P 4050 1800
 F 0 "R?" V 4004 1870 50  0000 L CNN
@@ -232,7 +232,7 @@ F 3 "" V 4050 1800 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C66CB6A
 P 4350 1800
 F 0 "R?" V 4304 1870 50  0000 L CNN
@@ -320,7 +320,7 @@ F 3 "" H 4350 1250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:Shotkey D?
+L board-rescue:Shotkey-akizuki D?
 U 1 1 5C67A1CB
 P 4300 3750
 F 0 "D?" V 4200 3750 60  0000 C CNN
@@ -335,7 +335,7 @@ Wire Wire Line
 Wire Wire Line
 	4150 3750 2950 3750
 $Comp
-L akizuki:2P-SW SW?
+L board-rescue:2P-SW-akizuki SW?
 U 1 1 5C67C4B4
 P 3600 4600
 F 0 "SW?" H 3600 4800 60  0000 C CNN
@@ -389,7 +389,7 @@ F 3 "" H 6150 4650 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:3P-SW SW?
+L board-rescue:3P-SW-akizuki SW?
 U 1 1 5C65C94A
 P 3050 5200
 F 0 "SW?" H 3177 5258 60  0000 L CNN
@@ -424,7 +424,7 @@ $EndComp
 Text HLabel 2200 3600 0    50   Input ~ 0
 UB
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C6F121E
 P 5750 4100
 F 0 "R?" V 5704 4170 50  0000 L CNN
@@ -435,7 +435,7 @@ F 3 "" V 5750 4100 50  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:R R?
+L board-rescue:R-akizuki R?
 U 1 1 5C6F12B6
 P 5200 3600
 F 0 "R?" H 5200 3807 50  0000 C CNN

@@ -1,6 +1,6 @@
 EESchema Schematic File Version 4
 LIBS:board-cache
-EELAYER 26 0
+EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L renesas:RX65N_176 U1
+L board-rescue:RX65N_176-renesas U1
 U 3 1 5C66C468
 P 3200 3900
 F 0 "U1" H 4141 3946 50  0000 L CNN
@@ -26,7 +26,7 @@ F 3 "" H 3200 3900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C11
+L board-rescue:C-akizuki C11
 U 1 1 5C66D811
 P 4200 4650
 F 0 "C11" H 4282 4703 60  0000 L CNN
@@ -37,7 +37,7 @@ F 3 "" V 4200 4650 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C3
+L board-rescue:C-akizuki C3
 U 1 1 5C66D8E5
 P 1450 1800
 F 0 "C3" H 1533 1853 60  0000 L CNN
@@ -48,7 +48,7 @@ F 3 "" V 1450 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C5
+L board-rescue:C-akizuki C5
 U 1 1 5C66DB05
 P 1850 1800
 F 0 "C5" H 1933 1853 60  0000 L CNN
@@ -59,7 +59,7 @@ F 3 "" V 1850 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C6
+L board-rescue:C-akizuki C6
 U 1 1 5C66DB51
 P 2250 1800
 F 0 "C6" H 2333 1853 60  0000 L CNN
@@ -70,7 +70,7 @@ F 3 "" V 2250 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C7
+L board-rescue:C-akizuki C7
 U 1 1 5C66DB85
 P 2650 1800
 F 0 "C7" H 2733 1853 60  0000 L CNN
@@ -81,7 +81,7 @@ F 3 "" V 2650 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C8
+L board-rescue:C-akizuki C8
 U 1 1 5C66DBBF
 P 3050 1800
 F 0 "C8" H 3133 1853 60  0000 L CNN
@@ -92,7 +92,7 @@ F 3 "" V 3050 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C9
+L board-rescue:C-akizuki C9
 U 1 1 5C66DBF7
 P 3450 1800
 F 0 "C9" H 3533 1853 60  0000 L CNN
@@ -103,7 +103,7 @@ F 3 "" V 3450 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C10
+L board-rescue:C-akizuki C10
 U 1 1 5C66DC2F
 P 3850 1800
 F 0 "C10" H 3933 1853 60  0000 L CNN
@@ -114,7 +114,7 @@ F 3 "" V 3850 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C12
+L board-rescue:C-akizuki C12
 U 1 1 5C66DC69
 P 4250 1800
 F 0 "C12" H 4333 1853 60  0000 L CNN
@@ -125,7 +125,7 @@ F 3 "" V 4250 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C13
+L board-rescue:C-akizuki C13
 U 1 1 5C66DCA5
 P 4650 1800
 F 0 "C13" H 4733 1853 60  0000 L CNN
@@ -136,7 +136,7 @@ F 3 "" V 4650 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C15
+L board-rescue:C-akizuki C15
 U 1 1 5C66DCE3
 P 5050 1800
 F 0 "C15" H 5133 1853 60  0000 L CNN
@@ -147,7 +147,7 @@ F 3 "" V 5050 1800 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C2
+L board-rescue:C-akizuki C2
 U 1 1 5C66DD23
 P 1300 3500
 F 0 "C2" H 1383 3553 60  0000 L CNN
@@ -158,7 +158,7 @@ F 3 "" V 1300 3500 60  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C C4
+L board-rescue:C-akizuki C4
 U 1 1 5C66DD65
 P 1700 3500
 F 0 "C4" H 1783 3553 60  0000 L CNN
@@ -491,7 +491,7 @@ F 3 "" H 1300 3200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:BATTERY BT1
+L board-rescue:BATTERY-akizuki BT1
 U 1 1 5C6C5236
 P 5050 4350
 F 0 "BT1" H 5138 4403 60  0000 L CNN
@@ -506,7 +506,7 @@ Wire Wire Line
 Wire Wire Line
 	5050 4100 5050 4200
 $Comp
-L akizuki:C C14
+L board-rescue:C-akizuki C14
 U 1 1 5C6CD9E9
 P 4650 4350
 F 0 "C14" H 4733 4403 60  0000 L CNN
@@ -542,7 +542,7 @@ F 3 "" H 4650 4900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L akizuki:C-POL C1
+L board-rescue:C-POL-akizuki C1
 U 1 1 5C6D9F88
 P 900 3500
 F 0 "C1" H 983 3553 60  0000 L CNN
@@ -561,7 +561,7 @@ Wire Wire Line
 Wire Wire Line
 	900  3700 900  3650
 $Comp
-L akizuki:Shotkey D1
+L board-rescue:Shotkey-akizuki D1
 U 1 1 5C6E3F1C
 P 5800 4100
 F 0 "D1" V 6027 4100 60  0000 C CNN
@@ -572,7 +572,7 @@ F 3 "" V 5795 4065 60  0000 C CNN
 	0    -1   -1   0   
 $EndComp
 $Comp
-L akizuki:C-POL C16
+L board-rescue:C-POL-akizuki C16
 U 1 1 5C6E7861
 P 5450 4350
 F 0 "C16" H 5533 4403 60  0000 L CNN
@@ -596,7 +596,7 @@ Wire Wire Line
 	5650 4100 5450 4100
 Connection ~ 5450 4100
 $Comp
-L akizuki:R R1
+L board-rescue:R-akizuki R1
 U 1 1 5C71306E
 P 6300 4100
 F 0 "R1" H 6300 4000 50  0000 C CNN
@@ -622,7 +622,7 @@ F 3 "" H 6650 4100 50  0001 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:C-POL C?
+L board-rescue:C-POL-akizuki C?
 U 1 1 5C7051FE
 P 5650 1800
 F 0 "C?" H 5733 1853 60  0000 L CNN

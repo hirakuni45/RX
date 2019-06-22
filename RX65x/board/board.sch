@@ -1,6 +1,6 @@
 EESchema Schematic File Version 4
 LIBS:board-cache
-EELAYER 26 0
+EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L renesas:RX65N_176 U1
+L board-rescue:RX65N_176-renesas U1
 U 1 1 5C66B59D
 P 4100 3250
 F 0 "U1" H 4100 5515 50  0000 C CNN
@@ -26,7 +26,7 @@ F 3 "" H 4100 3250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L renesas:RX65N_176 U1
+L board-rescue:RX65N_176-renesas U1
 U 2 1 5C66B614
 P 7050 3200
 F 0 "U1" H 7050 5415 50  0000 C CNN
@@ -1007,7 +1007,7 @@ Wire Wire Line
 Wire Wire Line
 	5700 2000 5700 5700
 $Comp
-L akizuki:CRYSTAL X?
+L board-rescue:CRYSTAL-akizuki X?
 U 1 1 5C8A37E5
 P 2850 1800
 F 0 "X?" V 2750 1700 60  0000 C CNN
@@ -1018,7 +1018,7 @@ F 3 "" V 2850 1800 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:CRYSTAL X?
+L board-rescue:CRYSTAL-akizuki X?
 U 1 1 5C8A384B
 P 2850 2400
 F 0 "X?" V 2750 2300 60  0000 C CNN
@@ -1037,7 +1037,7 @@ Wire Wire Line
 Wire Wire Line
 	2600 1800 2700 1800
 $Comp
-L akizuki:C C?
+L board-rescue:C-akizuki C?
 U 1 1 5C8E5EA4
 P 2300 2000
 F 0 "C?" V 2200 1850 60  0000 C CNN
@@ -1048,7 +1048,7 @@ F 3 "" V 2300 2000 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:C C?
+L board-rescue:C-akizuki C?
 U 1 1 5C8E5EFC
 P 2300 2200
 F 0 "C?" V 2200 2050 60  0000 C CNN
@@ -1059,7 +1059,7 @@ F 3 "" V 2300 2200 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:C C?
+L board-rescue:C-akizuki C?
 U 1 1 5C8E5F61
 P 2300 1650
 F 0 "C?" V 2200 1500 60  0000 C CNN
@@ -1070,7 +1070,7 @@ F 3 "" V 2300 1650 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L akizuki:C C?
+L board-rescue:C-akizuki C?
 U 1 1 5C8E5FDF
 P 2300 2550
 F 0 "C?" V 2200 2400 60  0000 C CNN

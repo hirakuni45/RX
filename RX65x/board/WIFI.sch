@@ -1,6 +1,6 @@
 EESchema Schematic File Version 4
 LIBS:board-cache
-EELAYER 26 0
+EELAYER 29 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
@@ -34,7 +34,7 @@ MOSI
 Text HLabel 2350 3850 0    50   Input ~ 0
 MISO
 $Comp
-L akizuki:MR MR?
+L board-rescue:MR-akizuki MR?
 U 1 1 5C733C72
 P 2750 3800
 F 0 "MR?" H 2750 4175 50  0000 C CNN
