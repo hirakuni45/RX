@@ -912,7 +912,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		void operator() (int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b) noexcept {
 			auto c = SHARE_COLOR::to_565(r, g, b);
-			plot(x + ofs_.x, y + ofs_.y, c);			
+			plot(vtx::spos(x + ofs_.x, y + ofs_.y), c);			
 		}
 	};
 }
