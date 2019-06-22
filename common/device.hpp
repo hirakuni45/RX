@@ -23,7 +23,7 @@
 #include "RX62x/icu.hpp"
 #include "RX62x/icu_mgr.hpp"
 
-#elif defined(SIG_RX64M) || defined(SIG_RX71M)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M)
 #include "RX600/peripheral.hpp"
 #include "RX600/system.hpp"
 #include "RX600/power_mgr.hpp"

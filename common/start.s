@@ -43,7 +43,7 @@ _start:
 	mov	#__romdatacopysize, r3
 	smovf
 
-# MEMWAIT を設定 (for RX71M by 240MHz)
+# MEMWAIT を設定 (for RX71M/RX72M by 240MHz)
 .ifdef MEMWAIT
 	mov #0x86610,r1
 	mov # 0x00000001,r2

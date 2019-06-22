@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ルネサス RX デバイス選択
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -31,7 +31,7 @@
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 #include "RX62x/system.hpp"
 
-#elif defined(SIG_RX64M) || defined(SIG_RX71M)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M)
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
 #include "RX600/dmac.hpp"
