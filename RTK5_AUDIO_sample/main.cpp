@@ -14,12 +14,12 @@
 #include "common/spi_io2.hpp"
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
-#include "common/qspi_io.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
 #include "graphics/dialog.hpp"
+#include "graphics/img_in.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
 
@@ -27,6 +27,8 @@
 #include "chip/FT5206.hpp"
 
 #include "audio_codec.hpp"
+
+#include "graphics/bmp_in.hpp"
 
 namespace {
 
@@ -102,6 +104,12 @@ namespace {
 	typedef graphics::render<GLCDC_IO, FONT> RENDER;
 	RENDER		render_(glcdc_io_, font_);
 
+
+	typedef img::bmp_in<RENDER> BMP_IN;
+	BMP_IN		bmp_in_(render_);
+
+
+
 	typedef graphics::def_color DEF_COLOR;
 
 	// FT5206, SCI6 簡易 I2C 定義
@@ -118,10 +126,6 @@ namespace {
 
 	typedef gui::dialog<RENDER, FT5206> DIALOG;
 	DIALOG		dialog_(render_, ft5206_); 
-
-	// QSPI B グループ
-	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
-	QSPI		qspi_;
 
 	typedef gui::filer<RENDER, SDC> FILER;
 	FILER		filer_(render_, sdc_);
@@ -272,6 +276,15 @@ namespace {
 					}
 				}
 				f = true;
+			} else if(cmd_.cmp_word(0, "bmp")) {
+				if(cmdn >= 2) {
+					char tmp[128];
+					cmd_.get_word(1, tmp, sizeof(tmp));
+					if(!bmp_in_.load(tmp)) {
+						utils::format("Can't load BMP file: '%s'\n") % tmp;
+					}
+				}
+				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    dir [path]\n");
 				utils::format("    cd [path]\n");
@@ -395,12 +408,6 @@ int main(int argc, char** argv)
 
 	utils::format("RTK5RX65N Start for AUDIO sample\n");
 	cmd_.set_prompt("# ");
-
-	{  // QSPI の初期化（Flash Memory Read/Write Interface)
-		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
-			utils::format("QSPI not start.\n");
-		}
-	}
 
 	{  // GLCDC の初期化
 		LCD_DISP::DIR  = 1;
