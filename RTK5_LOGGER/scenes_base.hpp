@@ -206,11 +206,11 @@ namespace app {
 
 		typedef device::cmt_io<device::CMT0, watch_task> CMT;
 		// GPS 専用シリアル定義
-		typedef utils::fixed_fifo<char, 512>  G_REB;
-		typedef utils::fixed_fifo<char, 2048> G_SEB;
-		typedef device::sci_io<device::SCI2, G_REB, G_SEB, device::port_map::option::SECOND> GPS;
+		typedef utils::fixed_fifo<char, 2048>  G_REB;
+		typedef utils::fixed_fifo<char, 512> G_SEB;
+		typedef device::sci_io<device::SCI2, G_REB, G_SEB, device::port_map::option::SECOND> GPS_S;
 
-		typedef utils::nmea_dec<GPS> NMEA;
+		typedef utils::nmea_dec<GPS_S> NMEA;
 
 
 	private:
@@ -238,7 +238,7 @@ namespace app {
 		PLOT		plot_;
 		IMG_IN		img_in_;
 
-		GPS			gps_;
+		GPS_S		gps_s_;
 		NMEA		nmea_;
 
 		bool		enable_filer_;
@@ -260,7 +260,7 @@ namespace app {
 			spi_(), sdh_(spi_, 35000000), sdc_(), filer_(render_, sdc_),
 			resource_(render_),
 			plot_(render_), img_in_(plot_),
-			gps_(), nmea_(gps_),
+			gps_s_(), nmea_(gps_s_),
 			enable_filer_(false)
 			{ }
 

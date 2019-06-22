@@ -10,6 +10,8 @@
 //=====================================================================//
 #include "common/format.hpp"
 #include "scenes_base.hpp"
+#include "common/fixed_fifo.hpp"
+#include "common/file_io.hpp"
 
 namespace app {
 
@@ -27,13 +29,27 @@ namespace app {
 		typedef RENDER::glc_type GLC;
 		typedef graphics::def_color DEF_COLOR;
 
+		void make_file_name_(time_t t, char* out, uint32_t len)
+		{
+			struct tm *m = localtime(&t);
+			utils::sformat("%04d%s%02d%02d%02d", out, len)
+				% static_cast<uint32_t>(m->tm_year + 1900)
+				% get_mon(m->tm_mon)
+				% static_cast<uint32_t>(m->tm_mday)
+				% static_cast<uint32_t>(m->tm_hour)
+				% static_cast<uint32_t>(m->tm_min)
+			;
+		}
+
 	public:
 		//-------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 		*/
 		//-------------------------------------------------------------//
-		laptime() : lap_best_t_(0), lap_best_n_(0) { }
+		laptime() :
+			lap_best_t_(0), lap_best_n_(0)
+		{ }
 
 
 		//-------------------------------------------------------------//
@@ -51,6 +67,7 @@ namespace app {
 			render.clear(DEF_COLOR::Black);
 			render.set_fore_color(DEF_COLOR::White);
 			render.set_back_color(DEF_COLOR::Black);
+
 		}
 
 
@@ -75,7 +92,6 @@ namespace app {
 			vtx::spos loc(0);
 			res.draw_lap_state(loc, pos, t, dt);
 //			res.draw_lap_24(x + 16, y, lap_best_n_, lap_best_t_);
-
 
 			// プログレスバー表示
 			render.set_fore_color(DEF_COLOR::White);
@@ -117,6 +133,10 @@ namespace app {
 				}
 				res.draw_short_lap(vtx::spos(0, 48 + 28 * 4 - i * 28), pos - i, t);
 			}
+
+			// GPS 書き込みサービス
+//			auto& nmea = at_scenes_base().at_nmea();
+//			auto n = nmea.get_satellite_num();
 		}
 
 

@@ -230,10 +230,6 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
-
-	
-
-
 	uint8_t n = 0;
 	while(1) {
 		scenes_.at_base().sync();
