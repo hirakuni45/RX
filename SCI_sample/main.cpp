@@ -23,12 +23,11 @@
 
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
-#include "common/format.hpp"
-
 #include "common/cmt_io.hpp"
 
-// CMT タイマーを利用する場合有効にする。
-#define USE_CMT
+#include "common/format.hpp"
+#include "common/input.hpp"
+
 
 namespace {
 
@@ -67,9 +66,8 @@ namespace {
 //	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
 	SCI		sci_;
 
-#ifdef USE_CMT
-	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
-#endif
+	typedef device::cmt_io<device::CMT0> CMT;
+	CMT			cmt_;
 }
 
 
@@ -105,12 +103,10 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::setup_system_clock();
 
-#ifdef USE_CMT
 	{  // タイマー設定（100Hz）
 		uint8_t intr = 4;
 		cmt_.start(100, intr);
 	}
-#endif
 
 	{  // SCI の開始
 		uint8_t intr = 2;        // 割り込みレベル
@@ -122,14 +118,16 @@ int main(int argc, char** argv)
 	utils::format("Start SCI (UART) sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
 	LED::DIR = 1;
+	LED::P = 0;
+	{  // utils::format 
+		utils::format("");
+	}
+	LED::P = 1;
+
 	uint8_t cnt = 0;
-//	char cha = 0x20;
 	while(1) {
-#ifdef USE_CMT
 		cmt_.sync();
-#else
-		utils::delay::milli_second(10);  // 100Hz
-#endif
+
 		++cnt;
 		if(cnt >= 50) {
 			cnt = 0;
@@ -145,9 +143,5 @@ int main(int argc, char** argv)
 			auto ch = sci_getch();
 			sci_putch(ch);
 		}
-
-//		sci_putch(cha);
-//		++cha;
-//		if(cha >= 0x7f) cha = 0x20;
 	}
 }
