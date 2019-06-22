@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65N/RX66T グループ・フラッシュ 定義
+	@brief	RX64M/RX71M/RX72M/RX65N/RX66T グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -123,6 +123,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static rw32_t<0x007FE034> FEADDR;
 
+
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 		//-----------------------------------------------------------------//
 		/*!
@@ -144,6 +145,7 @@ namespace device {
 		};
 		static fcurame_t<0x007FE054> FCURAME;
 #endif
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -171,6 +173,12 @@ namespace device {
 			bit_ro_t <io_, bitpos::B13>  ERSERR;
 			bit_ro_t <io_, bitpos::B14>  ILGERR;
 			bit_ro_t <io_, bitpos::B15>  FRDY;
+#if defined(SIG_RX72M)
+			bit_ro_t <io_, bitpos::B20>  OTERR;
+			bit_ro_t <io_, bitpos::B21>  SECERR;
+			bit_ro_t <io_, bitpos::B22>  FESETERR;
+			bit_ro_t <io_, bitpos::B23>  ILGCOMERR;
+#endif
 		};
 		static fstatr_t<0x007FE080> FSTATR;
 
@@ -196,6 +204,7 @@ namespace device {
 		static fentryr_t<0x007FE084> FENTRYR;
 
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュプロテクトレジスタ（FPROTR）
@@ -214,6 +223,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
 		static fprotr_t<0x007FE088> FPROTR;
+#endif
 
 
 		//-----------------------------------------------------------------//
@@ -236,6 +246,7 @@ namespace device {
 		static fsuinitr_t<0x007FE08C> FSUINITR;
 
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ロックビットステータスレジスタ（FLKSTAT）
@@ -253,6 +264,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>  FLOCKST;
 		};
 		static flkstat_t<0x007FE090> FLKSTAT;
+#endif
 
 
 		//-----------------------------------------------------------------//
@@ -272,6 +284,7 @@ namespace device {
 		static fcmdr_t<0x007FE0A0> FCMDR;
 
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M) 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュ P/E ステータスレジスタ（FPESTAT）
@@ -286,6 +299,7 @@ namespace device {
 			bits_ro_t<io_, bitpos::B0, 8>  PEERRST;
 		};
 		static fpestat_t<0x007FE0C0> FPESTAT;
+#endif
 
 
 		//-----------------------------------------------------------------//
@@ -381,6 +395,55 @@ namespace device {
 		static fpckar_t<0x007FE0E4> FPCKAR;
 
 
+#if defined(SIG_RX72M)
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  フラッシュアクセスウィンドウモニタレジスタ (FAWMON)
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct fawmon_t : public ro32_t<base> {
+			typedef ro32_t<base> io_;
+			using io_::operator ();
+
+			bits_ro_t<io_, bitpos::B0,  12>  FAWS;
+			bit_ro_t <io_, bitpos::B15>      FSPR;
+			bits_ro_t<io_, bitpos::B16, 12>  FAWE;
+			bit_ro_t <io_, bitpos::B31>      BTFLG;
+		};
+		static fawmon_t<0x007FE0DC> FAWMON;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  スタートアップ領域コントロールレジスタ (FSUACR)
+			@param[in]	base	ベース
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t base>
+		struct fsuacr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2>  SAS;
+			bits_rw_t<io_, bitpos::B8, 8>  KEY;
+		};
+		static fsuacr_t<0x007FE0E8> FSUACR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  データフラッシュメモリアクセス周波数設定レジスタ (EEPFCLK)
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<0x007FC040> EEPFCLK;
+#endif
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3) @n
@@ -392,7 +455,7 @@ namespace device {
 		static ro32_t<0x007FC354> UIDR1;
 		static ro32_t<0x007FC358> UIDR2;
 		static ro32_t<0x007FC35C> UIDR3;
-#elif defined(SIG_RX65N)
+#elif defined(SIG_RX65N) || defined(SIG_RX72M)
 		static ro32_t<0xFE7F7D90> UIDR0;
 		static ro32_t<0xFE7F7D94> UIDR1;
 		static ro32_t<0xFE7F7D98> UIDR2;

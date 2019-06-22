@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX651/RX65N/RX66T グループ・システム制御
+	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T グループ・システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -99,7 +99,7 @@ namespace device {
 			// クロック関係書き込み不許可
 			device::SYSTEM::PRCR = 0xA500;
 
-#if defined(SIG_RX65N) || defined(SIG_RX66T)
+#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
 			// ROM キャッシュを有効（標準）
 			device::SYSTEM::ROMCE = 1;
 #endif

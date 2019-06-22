@@ -116,7 +116,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> B0;
 			bit_rw_t<io_, bitpos::B2> B2;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N)
 			bit_rw_t<io_, bitpos::B3> B3;
 #endif
 			bit_rw_t<io_, bitpos::B4> B4;
@@ -142,7 +142,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> B0;
 			bit_rw_t<io_, bitpos::B2> B2;
 			bit_rw_t<io_, bitpos::B4> B4;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
 			bit_rw_t<io_, bitpos::B6> B6;
 #endif
 		};
@@ -184,7 +184,7 @@ namespace device {
 	};
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
 	typedef port_t<0x0008C000, odr_oo_t<0x0008C080> > PORT0;
 	typedef port_t<0x0008C001, odr_oo_t<0x0008C082> > PORT1;
 	typedef port_t<0x0008C002, odr_oo_t<0x0008C084> > PORT2;
@@ -269,7 +269,7 @@ namespace device {
 	//-------------------------------------------------------------//
 	static void init_port(uint8_t dir)
 	{
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
 		// RX64M/LQFP:176(177)
 		PORT0::PCR = dir;	// (6) P00,P01,P02,P05,P07
 		PORT1::PCR = dir;	// (8) P10 to P17

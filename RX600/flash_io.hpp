@@ -49,7 +49,7 @@ namespace device {
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 		static const uint32_t data_flash_size  = 65536;	///< データ・フラッシュの容量
 		static const uint32_t data_flash_bank  = 1024;	///< データ・フラッシュのバンク数
-#elif defined(SIG_RX65N) || defined(SIG_RX66T)
+#elif defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
 		static const uint32_t data_flash_size  = 32768;	///< データ・フラッシュの容量
 		static const uint32_t data_flash_bank  = 512;	///< データ・フラッシュのバンク数
 #endif
@@ -148,6 +148,7 @@ namespace device {
 		}
 
 
+		/// RX64M, RX71M, RX65x
 		/// FCUファームウェア格納領域 FEFF F000h～FEFF FFFFh 4Kバイト
 		/// FCURAM領域 007F 8000h～007F 8FFFh 4Kバイト
 		/// コンフィギュレーション設定領域 0012 0040h～0012 007Fh 64バイト
@@ -178,7 +179,10 @@ namespace device {
 			}
 
 			device::FLASH::FCURAME = 0xC400;
+#elif defined(SIG_RX72M)
+			device::FLASH::FSUINITR = 0x2D01;
 #endif
+
 			turn_pe_();
 
 			auto f = turn_break_();			
@@ -197,7 +201,9 @@ namespace device {
 		// org: align 4 bytes
 		bool write32_(const void* src, uint32_t org)
 		{
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			device::FLASH::FPROTR = 0x5501;
+#endif
 			device::FLASH::FSADDR = org;
 
 			FACI_CMD_AREA = 0xE8;
@@ -418,7 +424,9 @@ namespace device {
 				turn_pe_();
 			}
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 			device::FLASH::FPROTR = 0x5501;  // ロックビットプロテクト無効
+#endif
 			device::FLASH::FCPSR  = 0x0000;  // サスペンド優先
 			device::FLASH::FSADDR = org;
 
