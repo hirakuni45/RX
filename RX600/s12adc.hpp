@@ -9,10 +9,9 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
-#include "RX600/peripheral.hpp"
+#include "common/device.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
-#include "RX600/icu.hpp"
 
 namespace device {
 

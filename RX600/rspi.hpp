@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・RSPI[abc] 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -369,7 +369,7 @@ namespace device {
 	typedef rspi_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI0;
 	typedef rspi_t<0x000D0140, peripheral::RSPI1, ICU::VECTOR::SPRI1, ICU::VECTOR::SPTI1>  RSPI1;
 	typedef rspi_t<0x000D0300, peripheral::RSPI1, ICU::VECTOR::SPRI2, ICU::VECTOR::SPTI2>  RSPI2;
-#elif defined(SIG_RX66T)
+#elif defined(SIG_RX66T) || defined(SIG_RX72M)
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -401,6 +401,12 @@ namespace device {
 		};
 		static spdcr2_t<base + 0x20> SPDCR2;
 	};
+#if defined(SIG_RX66T)
 	typedef rspi_c_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI0;
+#elif defined(SIG_RX72M)
+	typedef rspi_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI0;
+	typedef rspi_t<0x000D0140, peripheral::RSPI1, ICU::VECTOR::SPRI1, ICU::VECTOR::SPTI1>  RSPI1;
+	typedef rspi_t<0x000D0300, peripheral::RSPI1, ICU::VECTOR::SPRI2, ICU::VECTOR::SPTI2>  RSPI2;
+#endif
 #endif
 }

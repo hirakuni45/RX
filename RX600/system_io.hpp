@@ -71,7 +71,7 @@ namespace device {
 				device::SYSTEM::ROMWT = 0b00;
 			}
 #endif
-#if defined(SIG_RX66T)
+#if defined(SIG_RX66T) || defined(SIG_RX72M)
 			if(F_ICLK > 120000000) {  // 120MHz 以上の場合設定
 				device::SYSTEM::MEMWAIT = 1;
 			}

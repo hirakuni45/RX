@@ -217,13 +217,13 @@ namespace device {
 		static sckcr_t<0x00080020> SCKCR;
 
 
+#if defined(SIG_RX71M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
 			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-#if defined(SIG_RX71M)
 		template<uint32_t base>
 		struct memwait_t : public rw32_t<base> {
 			typedef rw32_t<base> io_;
@@ -234,6 +234,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> MEMWAIT;
 		};
+		static memwait_t<0x00086610> MEMWAIT;
 #elif defined(SIG_RX72M) || defined(SIG_RX66T)
 		template<uint32_t base>
 		struct memwait_t : public rw8_t<base> {
@@ -245,14 +246,9 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> MEMWAIT;
 		};
-#endif
-
-#if defined(SIG_RX71M)
-		static memwait_t<0x00086610> MEMWAIT;
-#endif
-#if defined(SIG_RX66T) || defined(SIG_RX72M)
 		static memwait_t<0x0008101C> MEMWAIT;
 #endif
+
 
 #if defined(SIG_RX65N)
   		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -705,7 +701,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>	MSTPB8;
 			bit_rw_t<io_, bitpos::B9>	MSTPB9;
 			bit_rw_t<io_, bitpos::B10>	MSTPB10;
-
+#if defined(SIG_RX72M)
+			bit_rw_t<io_, bitpos::B11>	MSTPB11;
+#endif
 			bit_rw_t<io_, bitpos::B12>	MSTPB12;
 
 			bit_rw_t<io_, bitpos::B14>	MSTPB14;
@@ -714,7 +712,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B17>	MSTPB17;
 
 			bit_rw_t<io_, bitpos::B19>	MSTPB19;
-#if defined(SIG_RX65N)
+#if defined(SIG_RX65N) || defined(SIG_RX72M)
 			bit_rw_t<io_, bitpos::B20>	MSTPB20;
 #endif
 			bit_rw_t<io_, bitpos::B21>	MSTPB21;
@@ -747,20 +745,24 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>	MSTPC0;
-
+#if defined(SIG_RX72M)
+			bit_rw_t<io_, bitpos::B2>	MSTPC2;
+#endif
 			bit_rw_t<io_, bitpos::B6>	MSTPC6;
 			bit_rw_t<io_, bitpos::B7>	MSTPC7;
 
 			bit_rw_t<io_, bitpos::B17>	MSTPC17;
 
 			bit_rw_t<io_, bitpos::B19>	MSTPC19;
-
+#if defined(SIG_RX72M)
+			bit_rw_t<io_, bitpos::B22>	MSTPC22;
+#endif
 			bit_rw_t<io_, bitpos::B23>	MSTPC23;
 			bit_rw_t<io_, bitpos::B24>	MSTPC24;
 			bit_rw_t<io_, bitpos::B25>	MSTPC25;
 			bit_rw_t<io_, bitpos::B26>	MSTPC26;
 			bit_rw_t<io_, bitpos::B27>	MSTPC27;
-#if defined(SIG_RX65N)
+#if defined(SIG_RX65N) || defined(SIG_RX72M)
 			bit_rw_t<io_, bitpos::B28>	MSTPC28;
 			bit_rw_t<io_, bitpos::B29>	MSTPC29;
 #endif
@@ -791,6 +793,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>	MSTPD6;
 			bit_rw_t<io_, bitpos::B7>	MSTPD7;
 
+#if defined(SIG_RX72M)
+			bit_rw_t<io_, bitpos::B11>	MSTPD11;
+#endif
 			bit_rw_t<io_, bitpos::B14>	MSTPD14;
 			bit_rw_t<io_, bitpos::B15>	MSTPD15;
 
