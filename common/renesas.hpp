@@ -31,7 +31,7 @@
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 #include "RX62x/system.hpp"
 
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M)
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
 #include "RX600/dmac.hpp"
@@ -69,6 +69,45 @@
 #include "RX600/pdc.hpp"
 #include "RX600/standby_ram.hpp"
 #include "RX600/ssi_io.hpp"
+#include "RX600/dmac_mgr.hpp"
+
+#elif defined(SIG_RX72M)
+
+#include "RX600/system.hpp"
+#include "RX600/system_io.hpp"
+#include "RX600/dmac.hpp"
+#include "RX600/elc.hpp"
+#include "RX600/exdmac.hpp"
+#include "RX600/mpc.hpp"
+#include "RX600/tpu.hpp"
+#include "RX600/ppg.hpp"
+#include "RX600/gpt.hpp"
+#include "RX600/ppg.hpp"
+#include "RX600/cmtw.hpp"
+#include "RX600/can.hpp"
+#include "RX600/qspi.hpp"
+#include "RX600/s12adc.hpp"
+#include "RX600/adc_in.hpp"
+#include "RX600/r12da.hpp"
+#include "RX600/dac_out.hpp"
+#include "RX600/sdram.hpp"
+#include "RX600/etherc.hpp"
+#include "RX600/eptpc.hpp"
+#include "RX600/edmac.hpp"
+#include "RX600/usb.hpp"
+#include "RX600/scif.hpp"
+#include "RX600/rtc.hpp"
+#include "RX600/rtc_io.hpp"
+#include "RX600/wdta.hpp"
+#include "RX600/flash.hpp"
+#include "RX600/flash_io.hpp"
+#include "RX600/ether_io.hpp"
+// #include "RX600/ssi.hpp"
+#include "RX600/sdhi.hpp"
+#include "RX600/sdhi_io.hpp"
+#include "RX600/mmcif.hpp"
+#include "RX600/pdc.hpp"
+#include "RX600/standby_ram.hpp"
 #include "RX600/dmac_mgr.hpp"
 
 #elif defined(SIG_RX65N)
