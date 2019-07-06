@@ -140,7 +140,7 @@ namespace rx {
 				protocol_ = rx63t::protocol();
 			} else if(rx.cpu_type_ == "RX24T") {
 				protocol_ = rx24t::protocol();
-			} else if(rx.cpu_type_ == "RX64M" || rx.cpu_type_ == "RX71M") {
+			} else if(rx.cpu_type_ == "RX64M" || rx.cpu_type_ == "RX71M" || rx.cpu_type_ == "RX72M") {
 				protocol_ = rx64m::protocol();
 			} else if(rx.cpu_type_ == "RX651" || rx.cpu_type_ == "RX65N") {
 				protocol_ = rx65x::protocol();
