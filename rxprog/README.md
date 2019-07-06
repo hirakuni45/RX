@@ -57,7 +57,7 @@ See development environment preparation of 'RX/README.md'
    
 ---
 ## Connection terminal list
-|端子|RX24T (100 Pin)|RX66T (100 Pin)|RX64M (176 Pin)|RX71M (176 Pin)|RX65N (176 Pin)|
+|Terminal|RX24T (100 Pin)|RX66T (100 Pin)|RX64M (176 Pin)|RX71M (176 Pin)|RX65N (176 Pin)|
 |---|---|---|---|---|---|
 |UB|X|UB/P00 (4)|PC7/UB (76)|PC7/UB (76)|PC7/UB (76)|
 |MD|MD (6)|MD/FINED (6)|MD/FINED (18)|MD/FINED (18)|MD/FINED (18)|
