@@ -30,7 +30,8 @@
 /***********************************************************************************************************************
 Configuration Options
 ***********************************************************************************************************************/
-#define DHCP_TIMEOUT		300		// DHCP timeout : 300*10ms : 3sec
+// #define DHCP_TIMEOUT		300		// DHCP timeout : 300*10ms : 3sec
+#define DHCP_TIMEOUT		500		// DHCP timeout : 500*10ms : 5sec
 
 #endif /* R_T4_DHCP_CLIENT_RX_CONFIG_H */
 
