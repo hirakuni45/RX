@@ -25,6 +25,8 @@ extern "C" {
 
 namespace {
 
+	typedef device::system_io<12000000> SYSTEM_IO;
+
 	class cmt_task {
 		void (*task_10ms_)();
 
@@ -329,31 +331,8 @@ int main(int argc, char** argv)
 	device::PORTC::PDR.B3 = 1; // output
 	device::PORTC::PODR.B3 = 1;
 
-	device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
+	SYSTEM_IO::setup_system_clock();
 
-	device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
-	// メインクロック強制発振とドライブ能力設定
-	device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(0b10)
-						  | device::SYSTEM::MOFCR.MOFXIN.b(1);
-	device::SYSTEM::MOSCCR.MOSTP = 0;		// メインクロック発振器動作
-	while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
-
-	// Base Clock 12MHz
-	// PLLDIV: 1/1, STC: 16 倍(198MHz)
-	device::SYSTEM::PLLCR = device::SYSTEM::PLLCR.PLIDIV.b(0) |
-							device::SYSTEM::PLLCR.STC.b(0b011111);
-	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
-	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
-
-	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)		// 1/2 (198/4=48)
-						  | device::SYSTEM::SCKCR.ICK.b(1)		// 1/2 (198/2=96)
-						  | device::SYSTEM::SCKCR.BCK.b(2)		// 1/2 (198/4=48)
-						  | device::SYSTEM::SCKCR.PCKA.b(1)		// 1/2 (198/2=96)
-						  | device::SYSTEM::SCKCR.PCKB.b(2)		// 1/4 (198/4=48)
-						  | device::SYSTEM::SCKCR.PCKC.b(2)		// 1/4 (198/4=48)
-						  | device::SYSTEM::SCKCR.PCKD.b(2);	// 1/4 (198/4=48)
-	device::SYSTEM::SCKCR2 = device::SYSTEM::SCKCR2.UCK.b(0b0011) | 1;  // USB Clock: 1/4 (198/4=48)
-	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 	{  // タイマー設定、１０００Ｈｚ（１ｍｓ）
 		uint8_t int_level = 1;
@@ -384,7 +363,7 @@ int main(int argc, char** argv)
 	ethernet_.start();
 	{
 		static const uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-		net::ip_address ipa(192, 168, 3, 20);  // 固定アドレス
+		net::ip_address ipa(192, 168, 0, 33);  // 固定アドレス
 		bool dhcp = true;
 		if(dhcp) {
 			if(ethernet_.begin(mac) == 0) {

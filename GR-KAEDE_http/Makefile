@@ -1,3 +1,4 @@
+# -*- tab-width : 4 -*-
 #=======================================================#
 #														#
 #	RX64M Makefile 				        				#
@@ -45,9 +46,9 @@ USER_LIBS	=	supc++ m
 LDSCRIPT	=	../RX64M/$(DEVICE).ld
 
 USER_DEFS	=	SIG_RX64M \
-				F_ICLK=96000000 \
-				F_PCLKA=96000000 F_PCLKB=48000000 F_PCLKC=48000000 F_PCLKD=48000000 \
-				F_FCLK=48000000 F_BCLK=96000000 \
+				F_ICLK=120000000 \
+				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
+				F_FCLK=60000000 F_BCLK=120000000 \
 				B_ID=$(BUILD_ID) \
 				FAT_FS FAT_FS_NUM=3
 
