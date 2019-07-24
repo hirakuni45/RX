@@ -3,14 +3,14 @@
         {
             "name": "Win32",
             "includePath": [
-                "d:/Git/RX/RX65x/drw_2d_ver1.02/inc/tes",
                 "c:/msys64/usr/local/rx-elf/rx-elf/include/c++/6.4.0",
                 "c:/msys64/usr/local/rx-elf/rx-elf/include/c++/6.4.0/rx-elf",
                 "c:/msys64/usr/local/rx-elf/rx-elf/include/c++/6.4.0/backward",
                 "c:/msys64/usr/local/rx-elf/lib/gcc/rx-elf/6.4.0/include",
                 "c:/msys64/usr/local/rx-elf/lib/gcc/rx-elf/6.4.0/include-fixed",
                 "c:/msys64/usr/local/rx-elf/rx-elf/include",
-                "d:/Git/RX",
+				"d:/Git/RX",
+				"d:/Git/RX/RX65x/drw_2d_ver1.02/inc/tes",
                 "${workspaceFolder}"
             ],
             "defines": [
