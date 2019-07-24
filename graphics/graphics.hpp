@@ -13,6 +13,7 @@
 #include "graphics/font.hpp"
 #include "common/intmath.hpp"
 #include "common/circle.hpp"
+#include "common/vtx.hpp"
 
 namespace graphics {
 
