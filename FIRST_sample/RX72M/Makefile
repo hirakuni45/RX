@@ -56,7 +56,7 @@ INC_APP		=	. ../ ../../
 
 OPTIMIZE	=	-O3
 
-AS_OPT		=	-mcpu=rx600 --defsym MEMWAIT=1
+AS_OPT		=	-mcpu=rx600
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

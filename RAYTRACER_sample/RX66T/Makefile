@@ -188,6 +188,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX66T --progress --erase --write --verify $(TARGET).mot
+	time rx_prog -d RX66T -P COM6 --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)
