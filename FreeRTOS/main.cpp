@@ -153,7 +153,9 @@ namespace {
 	void vTask1(void *pvParameters)
 	{
 		while(1) {
+			vTaskEnterCritical();
 			LED::P = !LED::P();
+			vTaskExitCritical();
 			vTaskDelay(500 / portTICK_PERIOD_MS);
 		}
 	}
@@ -162,7 +164,9 @@ namespace {
 	void vTask2(void *pvParameters)
 	{
 		while(1) {
+			vTaskEnterCritical();
 			LED::P = !LED::P();
+			vTaskExitCritical();
 			vTaskDelay(100 / portTICK_PERIOD_MS);
 		}
 	}

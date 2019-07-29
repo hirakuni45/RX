@@ -70,8 +70,7 @@ static void prvStartFirstTask( void ) __attribute__((naked));
  * restoring of registers).  Written in asm code as direct register access is
  * required.
  */
-/// void vSoftwareInterruptISR( void ) __attribute__((naked));
-void vSoftwareInterruptISR( void ) __attribute__((interrupt));
+void vSoftwareInterruptISR( void ) __attribute__((naked));
 
 /*
  * The tick interrupt handler.
