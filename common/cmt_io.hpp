@@ -60,7 +60,7 @@ namespace device {
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level = 0) noexcept
+		bool start(uint32_t freq, uint8_t level = 0, void (*task)() = nullptr) noexcept
 		{
 			if(freq == 0) return false;
 
@@ -94,8 +94,11 @@ namespace device {
 
 			auto vec = CMT::get_ivec();
 			if(level_ > 0) {
-				
-				icu_mgr::set_task(vec, i_task_);
+				if(task != nullptr) {
+					icu_mgr::set_task(vec, task);
+				} else {
+					icu_mgr::set_task(vec, i_task_);
+				}
 			    CMT::CMCR = CMT::CMCR.CKS.b(cks) | CMT::CMCR.CMIE.b();
 			} else {
 

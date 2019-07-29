@@ -15,29 +15,22 @@ extern void rx_run_init_array(void);
 
 extern void init_interrupt(void);
 
-extern void set_intr_level(int);
-
-extern void null_task_(void);
-
 void init(void)
 {
+	// setup interrupt vector
 	init_interrupt();
 
-	// C++ constractor
+	// C++ static constractor
 	rx_run_preinit_array();
 	rx_run_init_array();
-
-	set_intr_level(15);
+	rx_run_fini_array();
 
 	// main の起動
 	static int argc = 0;
 	static char **argv = 0;
 	int ret = main(argc, argv);
 
-	rx_run_fini_array();
-
 	// メイン関数の「return」
 	while(1) ;
 }
 
-// EOF

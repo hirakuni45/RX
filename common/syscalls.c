@@ -609,3 +609,4 @@ pid_t getpid()
 {
 	return (pid_t)1;
 }
+
