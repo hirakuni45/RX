@@ -797,6 +797,7 @@ namespace device {
 			bit_rw_t<ier02, bitpos::B7>	FRDYI;
 
 			typedef rw8_t<base + 0x03> ier03;
+			bit_rw_t<ier03, bitpos::B2>	SWINT2;
 			bit_rw_t<ier03, bitpos::B3>	SWINT;
 			bit_rw_t<ier03, bitpos::B4>	CMI0;
 			bit_rw_t<ier03, bitpos::B5>	CMI1;
@@ -993,6 +994,9 @@ namespace device {
 		template <uint32_t base>
 		struct ipr_t {
 			rw8_t<base + 0> BUSERR;
+
+			rw8_t<base + 3> SWINT2;
+			rw8_t<base + 3> SWINT;
 
 			rw8_t<base + 4> CMI0;
 			rw8_t<base + 5> CMI1;
