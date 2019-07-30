@@ -34,6 +34,9 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+// RX64Mで、GR-KAEDE の場合有効にする
+#define GR_KAEDE
+
 extern "C" {
 	void vTickISR(void);
 	void vSoftwareInterruptISR(void);
@@ -51,7 +54,12 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX64M)
 	typedef device::system_io<12000000> SYSTEM_IO;
+#ifdef GR_KAEDE
+	typedef device::PORT<device::PORTC, device::bitpos::B1> LED;
+	typedef device::PORT<device::PORTC, device::bitpos::B0> LED2;
+#else
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+#endif
 #elif defined(SIG_RX65N)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -165,7 +173,11 @@ namespace {
 	{
 		while(1) {
 			vTaskEnterCritical();
+#ifdef GR_KAEDE
+			LED2::P = !LED2::P();
+#else
 			LED::P = !LED::P();
+#endif
 			vTaskExitCritical();
 			vTaskDelay(100 / portTICK_PERIOD_MS);
 		}
@@ -181,6 +193,10 @@ int main(int argc, char** argv)
 
 	LED::OUTPUT();  // LED ポートを出力に設定
 	LED::P = 1;		// Off
+#ifdef GR_KAEDE
+	LED2::OUTPUT();
+	LED2::P = 1;
+#endif
 
 	{
 		uint32_t stack_size = 512;
