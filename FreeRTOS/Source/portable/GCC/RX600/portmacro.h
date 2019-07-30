@@ -80,14 +80,14 @@ typedef unsigned long UBaseType_t;
 where portITU_SWINTR is the location of the software interrupt register
 (0x000872E0).  Don't rely on the assembler to select a register, so instead
 save and restore clobbered registers manually. */
-#if 0
+#if 1
 #define portYIELD()							\
 	__asm volatile 							\
 	(										\
 		"PUSH.L	R10					\n"		\
 		"MOV.L	#0x872E0, R10		\n"		\
 		"MOV.B	#0x1, [R10]			\n"		\
-		"MOV.L	[R10], R10			\n"		\
+		"CMP	[R10].UB, R10		\n"		\
 		"POP	R10					\n"		\
 	)
 #else
