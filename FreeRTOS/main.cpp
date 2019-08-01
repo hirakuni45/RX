@@ -34,8 +34,10 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#ifdef SIG_RX64M
 // RX64Mで、GR-KAEDE の場合有効にする
 #define GR_KAEDE
+#endif
 
 extern "C" {
 	void vTickISR(void);
