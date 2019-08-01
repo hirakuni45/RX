@@ -51,36 +51,94 @@ namespace {
 #if defined(SIG_RX71M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX71M" };
 #elif defined(SIG_RX72M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX72M" };
 #elif defined(SIG_RX64M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 #ifdef GR_KAEDE
 	typedef device::PORT<device::PORTC, device::bitpos::B1> LED;
 	typedef device::PORT<device::PORTC, device::bitpos::B0> LED2;
+	typedef device::SCI7 SCI_CH;
+	static const char* system_str_ = { "GR-KAEDE" };
 #else
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX64M" };
 #endif
 #elif defined(SIG_RX65N)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+	typedef device::SCI9 SCI_CH;
+	static const char* system_str_ = { "RX65N" };
 #elif defined(SIG_RX63T)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORTB, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX63T" };
 #elif defined(SIG_RX24T)
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX24T" };
 #elif defined(SIG_RX66T)
 	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX66T" };
 #endif
 
 	typedef device::cmt_io<device::CMT0> CMT;
 	CMT			cmt_;
+
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
+
+	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
+	SCI			sci_;
+
+	volatile bool sci_putch_lock_ = false;
+	volatile bool sci_puts_lock_ = false;
+	volatile bool sci_getch_lock_ = false;
 }
 
 extern "C" {
+
+	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
+	void sci_putch(char ch)
+	{
+		while(sci_putch_lock_) ;
+		sci_putch_lock_ = true;
+		sci_.putch(ch);
+		sci_putch_lock_ = false;
+	}
+
+	void sci_puts(const char* str)
+	{
+		while(sci_puts_lock_) ;
+		sci_puts_lock_ = true;
+		sci_.puts(str);
+		sci_puts_lock_ = false;
+	}
+
+	// syscalls.c から呼ばれる、標準入力（stdin）
+	char sci_getch(void)
+	{
+		while(sci_getch_lock_) ;
+		sci_getch_lock_ = true;
+		auto ch = sci_.getch();
+		sci_getch_lock_ = false;
+		return ch;
+	}
+
+	uint16_t sci_length()
+	{
+		return sci_.recv_length();
+	}
 
 	void vApplicationMallocFailedHook( void )
 	{
@@ -109,7 +167,7 @@ extern "C" {
 
 	void vApplicationIdleHook( void )
 	{
-		/// volatile size_t xFreeHeapSpace;
+///		volatile size_t xFreeHeapSpace;
 
 		/* This is just a trivial example of an idle hook.  It is called on each
 		cycle of the idle task.  It must *NOT* attempt to block.  In this case the
@@ -162,17 +220,27 @@ namespace {
 
 	void vTask1(void *pvParameters)
 	{
+		uint32_t loop = 0;
+		uint32_t cnt = 0;
 		while(1) {
 			vTaskEnterCritical();
 			LED::P = !LED::P();
 			vTaskExitCritical();
 			vTaskDelay(500 / portTICK_PERIOD_MS);
+			++loop;
+			if(loop >= 10) {
+				loop = 0;
+				utils::format("Task1: %u\n") % cnt;
+				++cnt;
+			}
 		}
 	}
 
 
 	void vTask2(void *pvParameters)
 	{
+		uint32_t loop = 0;
+		uint32_t cnt = 0;
 		while(1) {
 			vTaskEnterCritical();
 #ifdef GR_KAEDE
@@ -182,6 +250,23 @@ namespace {
 #endif
 			vTaskExitCritical();
 			vTaskDelay(100 / portTICK_PERIOD_MS);
+			++loop;
+			if(loop >= 12) {
+				loop = 0;
+				utils::format("Task2: %u\n") % cnt;
+				++cnt;
+			}
+		}
+	}
+
+
+	void vTask3(void *pvParameters)
+	{
+		uint32_t cnt = 0;
+		while(1) {
+			utils::format("Task3: %u\n") % cnt;
+			++cnt;
+			vTaskDelay(1000 / portTICK_PERIOD_MS);
 		}
 	}
 }
@@ -200,12 +285,22 @@ int main(int argc, char** argv)
 	LED2::P = 1;
 #endif
 
+	{  // SCI の開始
+		uint8_t intr = 2;        // 割り込みレベル
+		uint32_t baud = 115200;  // ボーレート
+		sci_.start(baud, intr);
+	}
+
+	auto clk = F_ICLK / 1000000;
+	utils::format("Start FreeRTOS sample for '%s' %d[MHz]\n") % system_str_ % clk;
+
 	{
 		uint32_t stack_size = 512;
 		void* param = nullptr;
 		uint32_t prio = 1;
 		xTaskCreate(vTask1, "Task1", stack_size, param, prio, nullptr);
 		xTaskCreate(vTask2, "Task2", stack_size, param, prio, nullptr);
+		xTaskCreate(vTask3, "Task3", stack_size, param, prio, nullptr);
 	}
 
 	vTaskStartScheduler();
