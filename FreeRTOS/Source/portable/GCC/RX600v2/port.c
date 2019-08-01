@@ -60,16 +60,14 @@ which would require the old IPL to be read first and stored in a local variable.
  * Function to start the first task executing - written in asm code as direct
  * access to registers is required.
  */
-/// static void prvStartFirstTask( void ) __attribute__((naked));
-extern void prvStartFirstTask( void );
+static void prvStartFirstTask( void ) __attribute__((naked));
 
 /*
  * Software interrupt handler.  Performs the actual context switch (saving and
  * restoring of registers).  Written in asm code as direct register access is
  * required.
  */
-/// void vSoftwareInterruptISR( void ) __attribute__((naked));
-extern void vSoftwareInterruptISR( void );
+void vSoftwareInterruptISR( void ) __attribute__((naked));
 
 /*
  * The tick interrupt handler.
@@ -194,7 +192,6 @@ void vPortEndScheduler( void )
 }
 /*-----------------------------------------------------------*/
 
-#if 0
 static void prvStartFirstTask( void )
 {
 	__asm volatile
@@ -361,7 +358,6 @@ void vSoftwareInterruptISR( void )
 	);
 }
 /*-----------------------------------------------------------*/
-#endif
 
 void vTickISR( void )
 {
