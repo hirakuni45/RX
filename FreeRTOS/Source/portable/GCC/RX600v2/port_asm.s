@@ -140,7 +140,7 @@ _vSoftwareInterruptISR:
 		/* Ensure the interrupt mask is set to the syscall priority while the kernel
 		structures are being accessed. */
 #		MVTIPL		%0
-		MVTIPL		#1
+		MVTIPL		#4
 
 		/* Select the next task to run. */
 		BSR.A		_vTaskSwitchContext
