@@ -67,6 +67,7 @@ int main(int argc, char** argv)
 |[/RX71M](./RX71M)      |RX71M 専用のデバイス定義クラス、リンカースクリプト|
 |[/RX65x](./RX65x)      |RX651, RX65N 専用デバイス定義クラス、リンカースクリプト|
 |[/RX66T](./RX66T)      |RX66T 専用デバイス定義クラス、リンカースクリプト|
+|[FreeRTOS](./FreeRTOS) |FreeRTOS の RX マイコン各種対応版と簡単なサンプル|
 |/ff12b                 |ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
 |[/common](./common)    |共有クラス、ヘッダーなど|
 |[/chip](./chip)        |I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|

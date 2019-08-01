@@ -72,6 +72,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/RX71M](./RX71M)      |Device definition class dedicated to RX71M, linker script|
 |[/RX65x](./RX65x)      |Device definition class dedicated to RX65(1N), linker script|
 |[/RX66T](./RX66T)      |Device definition class dedicated to RX66T, linker script|
+|[FreeRTOS](./FreeRTOS) |FreeRTOS RX microcontroller compatible version and a simple sample|
 |[/ff12b](./ff12b)      |ChaN's fatfs source code and handler for RX microcontroller|
 |[/common](./common)    |Shared classes, utilities, etc.|
 |[/chip](./chip)        |Device-specific control driver library for I2C, SPI, etc.|
