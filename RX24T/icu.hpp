@@ -31,6 +31,7 @@ namespace device {
 			FRDYI   = 23,   ///< FCU
 
 			SWINT   = 27,   ///< ICU
+
 			CMI0    = 28,   ///< CMT0
 			CMI1    = 29,   ///< CMT1
 			CMI2    = 30,   ///< CMT2
@@ -201,6 +202,8 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
 		struct ir_t {
+			rw8_t<base + 27> SWINT;
+
 			rw8_t<base + 28> CMI0;
 			rw8_t<base + 29> CMI1;
 			rw8_t<base + 30> CMI2;
@@ -503,6 +506,8 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
 		struct ipr_t {
+
+			rw8_t<base + 3  > SWINT;
 
 			rw8_t<base + 4  > CMI0;
 			rw8_t<base + 5  > CMI1;
