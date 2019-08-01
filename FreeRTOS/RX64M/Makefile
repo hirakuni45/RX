@@ -15,8 +15,7 @@ BUILD		=	release
 
 VPATH		=	../../
 
-ASOURCES	=	common/start.s \
-				FreeRTOS/Source/portable/GCC/RX600v2/port_asm.s
+ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
@@ -42,8 +41,8 @@ USER_DEFS	=	SIG_RX64M \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000
 
-MCU_TARGET_AS	=	-mcpu=rxv2 --defsym NOT_USER=1
-MCU_TARGET_CX	=	-mcpu=rx600
+MCU_TARGET_AS	=	--defsym NOT_USER=1
+MCU_TARGET_CX	=	-mcpu=rx600 -Wa,-mcpu=rxv2
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
