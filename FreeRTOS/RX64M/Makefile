@@ -15,12 +15,13 @@ BUILD		=	release
 
 VPATH		=	../../
 
-ASOURCES	=	common/start.s
+ASOURCES	=	common/start.s \
+				FreeRTOS/Source/portable/GCC/RX600v2/port_asm.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-				FreeRTOS/Source/portable/GCC/RX600/port.c \
+				FreeRTOS/Source/portable/GCC/RX600v2/port.c \
 				FreeRTOS/Source/portable/MemMang/heap_3.c \
 				FreeRTOS/Source/croutine.c \
 				FreeRTOS/Source/event_groups.c \
@@ -41,7 +42,7 @@ USER_DEFS	=	SIG_RX64M \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000
 
-MCU_TARGET_AS	=	-mcpu=rx600 --defsym NOT_USER=1
+MCU_TARGET_AS	=	-mcpu=rxv2 --defsym NOT_USER=1
 MCU_TARGET_CX	=	-mcpu=rx600
 
 # Include path for each environment
@@ -65,7 +66,7 @@ INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \
-				../../FreeRTOS/Source/portable/GCC/RX600
+				../../FreeRTOS/Source/portable/GCC/RX600v2
 
 OPTIMIZE	=	-O3
 
