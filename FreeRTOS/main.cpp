@@ -39,11 +39,6 @@
 #define GR_KAEDE
 #endif
 
-extern "C" {
-	void vTickISR(void);
-	void vSoftwareInterruptISR(void);
-};
-
 namespace {
 
 /// ベースクリスタルの定義
@@ -100,10 +95,6 @@ namespace {
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 	SCI			sci_;
-
-	volatile bool sci_putch_lock_ = false;
-	volatile bool sci_puts_lock_ = false;
-	volatile bool sci_getch_lock_ = false;
 }
 
 extern "C" {
@@ -111,36 +102,43 @@ extern "C" {
 	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
 	void sci_putch(char ch)
 	{
-		while(sci_putch_lock_) ;
-		sci_putch_lock_ = true;
+	   	volatile static bool lock_ = false;
+		while(lock_) ;
+		lock_ = true;
 		sci_.putch(ch);
-		sci_putch_lock_ = false;
+		lock_ = false;
 	}
+
 
 	void sci_puts(const char* str)
 	{
-		while(sci_puts_lock_) ;
-		sci_puts_lock_ = true;
+		volatile static bool lock_ = false;
+		while(lock_) ;
+		lock_ = true;
 		sci_.puts(str);
-		sci_puts_lock_ = false;
+		lock_ = false;
 	}
+
 
 	// syscalls.c から呼ばれる、標準入力（stdin）
 	char sci_getch(void)
 	{
-		while(sci_getch_lock_) ;
-		sci_getch_lock_ = true;
+		volatile static bool lock_ = false;
+		while(lock_) ;
+		lock_ = true;
 		auto ch = sci_.getch();
-		sci_getch_lock_ = false;
+		lock_ = false;
 		return ch;
 	}
+
 
 	uint16_t sci_length()
 	{
 		return sci_.recv_length();
 	}
 
-	void vApplicationMallocFailedHook( void )
+
+	void vApplicationMallocFailedHook(void)
 	{
 		/* Called if a call to pvPortMalloc() fails because there is insufficient
 		free memory available in the FreeRTOS heap.  pvPortMalloc() is called
@@ -152,7 +150,7 @@ extern "C" {
 	}
 
 
-	void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
+	void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
 	{
 		( void ) pcTaskName;
 		( void ) pxTask;
@@ -165,7 +163,7 @@ extern "C" {
 	}
 
 
-	void vApplicationIdleHook( void )
+	void vApplicationIdleHook(void)
 	{
 ///		volatile size_t xFreeHeapSpace;
 
@@ -183,12 +181,12 @@ extern "C" {
 	}
 
 
-	void vApplicationTickHook( void )
+	void vApplicationTickHook(void)
 	{
 	}
 
 
-	void vAssertCalled( void )
+	void vAssertCalled(void)
 	{
 		volatile unsigned long ul = 0;
 
@@ -204,8 +202,10 @@ extern "C" {
 		taskEXIT_CRITICAL();
 	}
 
+	extern void vTickISR(void);
+	extern void vSoftwareInterruptISR(void);
 
-	void vApplicationSetupTimerInterrupt( void )
+	void vApplicationSetupTimerInterrupt(void)
 	{
 		uint8_t intr = configKERNEL_INTERRUPT_PRIORITY;
 		cmt_.start(configTICK_RATE_HZ, intr, vTickISR);
