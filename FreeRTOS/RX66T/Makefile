@@ -11,6 +11,10 @@ TARGET		=	rtos_sample
 
 DEVICE		=	R5F566TE
 
+ROOT_DEV	=	RX66T
+
+OPTIMIZE	=	-O3
+
 BUILD		=	release
 
 VPATH		=	../../
@@ -34,15 +38,16 @@ PSOURCES	=	FreeRTOS/main.cpp
 
 USER_LIBS	=
 
-LDSCRIPT	=	../../RX66T/$(DEVICE).ld
+LDSCRIPT	=	../../$(ROOT_DEV)/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX66T \
+USER_DEFS	=	SIG_$(ROOT_DEV) \
 				F_ICLK=160000000 \
 				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKC=160000000 F_PCLKD=40000000 \
 				F_FCLK=40000000 F_BCLK=40000000
 
-MCU_TARGET_AS	=	--defsym NOT_USER=1
-MCU_TARGET_CX	=	-mcpu=rx600 -Wa,-mcpu=rxv2
+AS_DEFS		=	--defsym NOT_USER=1
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
@@ -66,8 +71,6 @@ INC_SYS     =   $(LOCAL_PATH)/include
 INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \
 				../../FreeRTOS/Source/portable/GCC/RX600v2
-
-OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
@@ -99,17 +102,11 @@ OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
 
-# AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
-# AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
-# ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
-AFLAGS		= $(MCU_TARGET_AS)
-
 # Override is only needed by avr-lib build system.
 
-CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET_CX) $(DEFS)
-PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET_CX) $(DEFS)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
+AFLAGS		=	$(AS_OPT) $(AS_DEFS)
+CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
+PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(CP_DEFS) $(DEFS)
 
 override LDFLAGS = $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
 
@@ -197,6 +194,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX66T --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d $(ROOT_DEV) --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)
