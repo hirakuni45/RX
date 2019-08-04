@@ -27,7 +27,7 @@ void sci_putch(char ch) { }
 char sci_getch(void) __attribute__((weak));
 char sci_getch(void) { return 0; }
 
-void utf8_to_sjis(const char* src, char* dst, uint32_t dsz);
+void utf8_to_oemc(const char* src, char* dst, uint32_t dsz);
 
 // FatFS を使う場合有効にする（通常 Makefile で定義）
 // #define FAT_FS
@@ -41,8 +41,8 @@ unsigned long millis(void) { return 0; }
 #endif
 
 #ifdef FAT_FS
-#include "ff12b/src/diskio.h"
-#include "ff12b/src/ff.h"
+#include "ff13c/source/ff.h"
+#include "ff13c/source/diskio.h"
 
 int fatfs_get_mount(void) __attribute__((weak));
 int fatfs_get_mount(void) { return 1; }
@@ -138,13 +138,7 @@ int open(const char *path, int flags, ...)
 	if(flags & O_TRUNC) mode |= FA_CREATE_ALWAYS;
 	else if(flags & O_CREAT) mode |= FA_CREATE_NEW;
 
-#if _USE_LFN != 0
-	char tmp[_MAX_LFN + 1];
-	utf8_to_sjis(path, tmp, sizeof(tmp));
-	FRESULT res = f_open(&file_obj_[file - STD_OFS_], tmp, mode);
-#else
 	FRESULT res = f_open(&file_obj_[file - STD_OFS_], path, mode);
-#endif
 	if(res == FR_OK) {
 		fd_pads_[file] = 1;
 		errno = 0;
@@ -373,15 +367,7 @@ int link(const char *oldpath, const char *newpath)
 		errno = EIO;
 		return -1;
 	}
-#if _USE_LFN != 0
-	char oldtmp[_MAX_LFN + 1];
-	utf8_to_sjis(oldpath, oldtmp, sizeof(oldtmp));
-	char newtmp[_MAX_LFN + 1];
-	utf8_to_sjis(newpath, newtmp, sizeof(newtmp));
-	FRESULT res = f_rename(oldtmp, newtmp);
-#else
 	FRESULT res = f_rename(oldpath, newpath);
-#endif
 	if(res == FR_OK) {
 
 		errno = 0;
@@ -415,13 +401,7 @@ int unlink(const char *path)
 		errno = EIO;
 		return -1;
 	}
-#if _USE_LFN != 0
-	char tmp[_MAX_LFN + 1];
-	utf8_to_sjis(path, tmp, sizeof(tmp));
-	FRESULT res = f_unlink(tmp);
-#else
 	FRESULT res = f_unlink(path);
-#endif
 	if(res == FR_OK) {
 		errno = 0;
 		return 0;

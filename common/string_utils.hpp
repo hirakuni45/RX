@@ -9,7 +9,7 @@
 */
 //=====================================================================//
 #include <cstring>
-#include "ff12b/src/ff.h"
+#include "ff13c/source/ff.h"
 #include "common/time.h"
 #include "common/format.hpp"
 
@@ -160,17 +160,17 @@ namespace utils {
 			return dsz >= 1;
 		}
 
-#if _USE_LFN != 0
+#if FF_USE_LFN != 0
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  sjis から UTF-8 への変換
+			@brief  OEM code から UTF-8 への変換
 			@param[in]	src	ソース
 			@param[in]	dst	変換先
 			@param[in]	dsz	変換先のサイズ
 			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool sjis_to_utf8(const char* src, char* dst, uint32_t dsz) noexcept
+		static bool oemc_to_utf8(const char* src, char* dst, uint32_t dsz) noexcept
 		{
 			if(src == nullptr) return false;
 
@@ -182,14 +182,16 @@ namespace utils {
 					if(0x40 <= c && c <= 0x7e) {
 						wc <<= 8;
 						wc |= c;
-						auto len = utf16_to_utf8(ff_convert(wc, 1), dst, dsz);
+						uint16_t tmp = ff_oem2uni(wc, FF_CODE_PAGE);
+						auto len = utf16_to_utf8(tmp, dst, dsz);
 						if(len == 0) break;
 						dst += len;
 						dsz -= len;
 					} else if(0x80 <= c && c <= 0xfc) {
 						wc <<= 8;
 						wc |= c;
-						auto len = utf16_to_utf8(ff_convert(wc, 1), dst, dsz);
+						uint16_t tmp = ff_oem2uni(wc, FF_CODE_PAGE);
+						auto len = utf16_to_utf8(tmp, dst, dsz);
 						if(len == 0) break;
 						dst += len;
 						dsz -= len;
@@ -199,10 +201,8 @@ namespace utils {
 					if(0x81 <= c && c <= 0x9f) wc = c;
 					else if(0xe0 <= c && c <= 0xfc) wc = c;
 					else {
-						auto len = utf16_to_utf8(ff_convert(c, 1), dst, dsz);
-						if(len == 0) break;
-						dst += len;
-						dsz -= len;
+						*dst++ = c;
+						dsz -= 1;
 					}
 				}
 			}
@@ -213,14 +213,14 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  UTF-8 から sjis への変換
+			@brief  UTF-8 から OEM code への変換
 			@param[in]	src	ソース
 			@param[out]	dst	変換先
 			@param[in]	dsz	変換先のサイズ
 			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool utf8_to_sjis(const char* src, char* dst, uint32_t dsz) noexcept
+		static bool utf8_to_oemc(const char* src, char* dst, uint32_t dsz) noexcept
 		{
 			int8_t cnt = 0;
 			uint16_t code = 0;
@@ -251,7 +251,7 @@ namespace utils {
 				}
 				if(cnt == 0 && code != 0) {
 					if(dsz <= 3) break;
-					auto wc = ff_convert(code, 0);
+					auto wc = ff_uni2oem(code, FF_CODE_PAGE);
 					*dst++ = static_cast<char>(wc >> 8);
 					*dst++ = static_cast<char>(wc & 0xff);
 					dsz -= 2;
