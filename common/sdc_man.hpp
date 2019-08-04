@@ -13,7 +13,7 @@
 #include "common/format.hpp"
 #include "common/string_utils.hpp"
 #include "common/fixed_stack.hpp"
-#include "ff12b/mmc_io.hpp"
+#include "ff13c/mmc_io.hpp"
 
 namespace utils {
 
@@ -49,7 +49,7 @@ namespace utils {
 
 			bool		init_;
 
-			char full_[_MAX_LFN + 1];
+			char full_[FF_MAX_LFN + 1];
 
 		public:
 			//-----------------------------------------------------------------//
@@ -151,11 +151,7 @@ namespace utils {
 
 //					if(func != nullptr) {
 					if(func) {
-#if _USE_LFN != 0
-						str::sjis_to_utf8(fi.fname, ptr_, sizeof(full_));
-#else
 						std::strcpy(ptr_, fi.fname);
-#endif
 						if(fi.fattrib & AM_DIR) {
 							if(todir) {
 								func(ptr_, &fi, true, option);
@@ -170,7 +166,7 @@ namespace utils {
 			}
 		};
 
-		char			current_[_MAX_LFN + 1];
+		char			current_[FF_MAX_LFN + 1];
 		bool			cdet_;
 		bool			mount_;
 		uint16_t		mount_delay_;
@@ -282,20 +278,14 @@ namespace utils {
 
 		// FATFS で認識できるパス（文字コード）へ変換
 		void create_fatfs_path_(const char* path, char* full, uint32_t len) const noexcept {
-#if _USE_LFN != 0
-			char tmp[_MAX_LFN + 1];
-			create_full_path_(path, tmp, sizeof(tmp));
-			str::utf8_to_sjis(tmp, full, len);
-#else
 			create_full_path_(path, full, len);
-#endif
 		}
 
 
 		// パス中のディレクトリーが無かったら生成
 		bool build_dir_path_(const char* path) const noexcept
 		{
-			char tmp[_MAX_LFN + 1];
+			char tmp[FF_MAX_LFN + 1];
 			std::strcpy(tmp, path);
 			char* p = tmp;
 			if(p[0] == '/') ++p;
@@ -303,13 +293,7 @@ namespace utils {
 				p = std::strchr(p, '/');
 				if(p == nullptr) break;
 				p[0] = 0;
-#if _USE_LFN != 0
-				char sjis[_MAX_LFN + 1];
-				str::utf8_to_sjis(tmp, sjis, sizeof(sjis));
-				auto ret = f_mkdir(sjis);
-#else
 				auto ret = f_mkdir(tmp);
-#endif
 				if(ret == FR_OK) ;
 				else if(ret == FR_EXIST) ;
 				else {
@@ -379,7 +363,7 @@ namespace utils {
 			if(!mount_) return false;
 			if(path == nullptr) return false;
 
-			char full[_MAX_LFN + 1];
+			char full[FF_MAX_LFN + 1];
 			create_full_path_(path, full, sizeof(full));
 
 			if(!build_dir_path_(full)) {
@@ -403,7 +387,7 @@ namespace utils {
 			if(!mount_) return false;
 			if(fp == nullptr || path == nullptr) return false;
 
-			char full[_MAX_LFN + 1];
+			char full[FF_MAX_LFN + 1];
 			create_fatfs_path_(path, full, sizeof(full));
 
 			if(f_open(fp, full, mode) != FR_OK) {
@@ -442,7 +426,7 @@ namespace utils {
 			if(!mount_) return false;
 			if(path == nullptr) return false;
 
-			char full[_MAX_LFN + 1];
+			char full[FF_MAX_LFN + 1];
 			create_fatfs_path_(path, full, sizeof(full));
 
 			FILINFO fno;
@@ -466,7 +450,7 @@ namespace utils {
 			if(!mount_) return 0;
 			if(path == nullptr) return 0;
 
-			char full[_MAX_LFN + 1];
+			char full[FF_MAX_LFN + 1];
 			create_fatfs_path_(path, full, sizeof(full));
 
 			FILINFO fno;
@@ -490,7 +474,7 @@ namespace utils {
 			if(!mount_) return false;
 			if(path == nullptr) return false;
 
-			char full[_MAX_LFN + 1];
+			char full[FF_MAX_LFN + 1];
 			create_fatfs_path_(path, full, sizeof(full));
 
 			return f_unlink(full) == FR_OK;
@@ -510,9 +494,9 @@ namespace utils {
 			if(!mount_) return false;
 			if(org_path == nullptr || new_path == nullptr) return false;
 
-			char org_full[_MAX_LFN + 1];
+			char org_full[FF_MAX_LFN + 1];
 			create_fatfs_path_(org_path, org_full, sizeof(org_full));
-			char new_full[_MAX_LFN + 1];
+			char new_full[FF_MAX_LFN + 1];
 			create_fatfs_path_(new_path, new_full, sizeof(new_full));
 
 			return f_rename(org_full, new_full) == FR_OK;
@@ -531,7 +515,7 @@ namespace utils {
 			if(!mount_) return false;
 			if(path == nullptr) return false;
 
-			char full[_MAX_LFN + 1];
+			char full[FF_MAX_LFN + 1];
 			create_fatfs_path_(path, full, sizeof(full));
 
 			return f_mkdir(full) == FR_OK;
@@ -577,18 +561,12 @@ namespace utils {
 
 			if(path == nullptr) return false;
 
-			char full[_MAX_LFN + 1];
+			char full[FF_MAX_LFN + 1];
 			create_full_path_(path, full, sizeof(full));
 
-#if _USE_LFN != 0
-			char oem[_MAX_LFN + 1];
-			str::utf8_to_sjis(full, oem, sizeof(oem));
-			DIR dir;
-			auto st = f_opendir(&dir, oem);
-#else
 			DIR dir;
 			auto st = f_opendir(&dir, full);
-#endif
+
 			if(st != FR_OK) {
 				format("Can't open dir(%d): '%s'\n") % static_cast<uint32_t>(st) % full;
 				return false;
@@ -642,9 +620,6 @@ namespace utils {
 
 			char full[256];
 			create_full_path_(root, full, sizeof(full));
-#if _USE_LFN != 0
-			str::utf8_to_sjis(full, full, sizeof(full));
-#endif
 			return dir_list_.start(full);
 		}
 
@@ -674,9 +649,6 @@ namespace utils {
 		{
 			char current[256];
 			create_full_path_(current_, current, sizeof(current));
-#if _USE_LFN != 0
-			str::utf8_to_sjis(current, current, sizeof(current));
-#endif
 			dir_list dl;
 			if(!dl.start(current)) return false;
 
@@ -705,9 +677,6 @@ namespace utils {
 			dir_list dl;
 			char full[256];
 			create_full_path_(root, full, sizeof(full));
-#if _USE_LFN != 0
-			str::utf8_to_sjis(full, full, sizeof(full));
-#endif
 			if(!dl.start(full)) return 0;
 
 			do {
