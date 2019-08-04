@@ -1,8 +1,9 @@
+# -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
 #   @brief  RX64M Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -11,7 +12,7 @@ TARGET		=	seeda_sample
 # MCU (R5F564MLHDFB 144pin QFP)
 DEVICE		=	R5F564ML
 
-FATFS_VER	=	ff12b
+FATFS_VER	=	ff13c/source
 
 # BUILD		=	release
 BUILD		=	debug
@@ -28,8 +29,9 @@ CSOURCES	=	common/ofs.c \
 				common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-				$(FATFS_VER)/src/ff.c \
-				$(FATFS_VER)/src/option/unicode.c \
+				$(FATFS_VER)/ff.c \
+				$(FATFS_VER)/ffsystem.c \
+				$(FATFS_VER)/ffunicode.c \
 				common/time.c \
 				r_net/r_byteq_v1.30/r_byteq.c \
 				r_net/driver/phy.c \
