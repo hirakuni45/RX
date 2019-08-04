@@ -1,3 +1,4 @@
+# -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
 #   @brief  RX71M Makefile
@@ -11,7 +12,7 @@ TARGET		=	seeda03_rx71m
 # MCU (R5F564MLHDFB 144pin QFP)
 DEVICE		=	R5F571ML
 
-FATFS_VER	=	ff12b
+FATFS_VER	=	ff13c/source
 
 # BUILD		=	release
 BUILD		=	debug
@@ -27,8 +28,9 @@ CSOURCES	=	common/ofs.c \
 				common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-				$(FATFS_VER)/src/ff.c \
-				$(FATFS_VER)/src/option/unicode.c \
+				$(FATFS_VER)/ff.c \
+				$(FATFS_VER)/ffsystem.c \
+				$(FATFS_VER)/ffunicode.c \
 				common/time.c \
 				r_net/r_byteq_v1.30/r_byteq.c \
 				r_net/driver/phy.c \
