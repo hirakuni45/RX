@@ -282,19 +282,6 @@ extern "C" {
 	}
 
 
-	//-----------------------------------------------------------------//
-	/*!
-		@brief	UTF-8 から ShiftJIS への変換
-		@param[in]	src	UTF-8 文字列ソース
-		@param[out]	dst	ShiftJIS 文字列出力
-		@param[in]	dsz	文字列出力サイズ
-	 */
-	//-----------------------------------------------------------------//
-	void utf8_to_sjis(const char* src, char* dst, uint16_t dsz) {
-		utils::str::utf8_to_sjis(src, dst, dsz);
-	}
-
-
 	unsigned long millis(void)
 	{
 		return cmt0_.at_task().get_millis();

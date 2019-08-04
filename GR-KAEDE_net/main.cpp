@@ -255,19 +255,6 @@ extern "C" {
 	}
 
 
-	//-----------------------------------------------------------------//
-	/*!
-		@brief	UTF-8 から ShiftJIS への変換
-		@param[in]	src	UTF-8 文字列ソース
-		@param[out]	dst	ShiftJIS 文字列出力
-		@param[in]	dsz	出力サイズ
-	 */
-	//-----------------------------------------------------------------//
-	void utf8_to_sjis(const char* src, char* dst, uint16_t dsz) {
-		utils::str::utf8_to_sjis(src, dst, dsz);
-	}
-
-
 	uint16_t get_tcpudp_time(void)
 	{
 		return cmt_.at_task().get_tcpudp_time();

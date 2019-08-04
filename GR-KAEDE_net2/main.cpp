@@ -263,18 +263,6 @@ extern "C" {
 		auto t = get_time();
 		return utils::str::get_fattime(t);
 	}
-
-
-	//-----------------------------------------------------------------//
-	/*!
-		@brief	UTF-8 から ShiftJIS への変換
-		@param[in]	src	UTF-8 文字列ソース
-		@param[out]	dst	ShiftJIS 文字列出力
-	 */
-	//-----------------------------------------------------------------//
-	void utf8_to_sjis(const char* src, char* dst, uint32_t len) {
-		utils::str::utf8_to_sjis(src, dst, len);
-	}
 }
 
 

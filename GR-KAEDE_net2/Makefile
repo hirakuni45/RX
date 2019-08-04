@@ -1,3 +1,4 @@
+# -*- tab-width : 4 -*-
 #=======================================================================
 #	@file
 #   @brief  RX64M Makefile
@@ -11,7 +12,7 @@ TARGET		=	kaede_net2_sample
 # GR-KAEDE MCU (R5F564MLCDFB 144pin QFP)
 DEVICE		=	R5F564ML
 
-FATFS_VER	=	ff12b
+FATFS_VER	=	ff13c/source
 
 # BUILD		=	release
 BUILD		=	debug
@@ -25,8 +26,9 @@ ASOURCES	=	common/start.s
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-				$(FATFS_VER)/src/ff.c \
-				$(FATFS_VER)/src/option/unicode.c \
+				$(FATFS_VER)/ff.c \
+				$(FATFS_VER)/ffsystem.c \
+				$(FATFS_VER)/ffunicode.c \
 				common/time.c
 
 PSOURCES	=	main.cpp
