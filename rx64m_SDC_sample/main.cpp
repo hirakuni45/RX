@@ -192,11 +192,6 @@ extern "C" {
 	}
 
 
-	void utf8_to_sjis(const char* src, char* dst, uint32_t len) {
-		utils::str::utf8_to_sjis(src, dst, len);
-	}
-
-
 	time_t get_time_()
 	{
 		time_t t = 0;
