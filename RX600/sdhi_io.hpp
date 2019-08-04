@@ -9,8 +9,8 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "ff12b/src/diskio.h"
-#include "ff12b/src/ff.h"
+#include "ff13c/source/ff.h"
+#include "ff13c/source/diskio.h"
 
 #include "common/format.hpp"
 
