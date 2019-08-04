@@ -351,11 +351,6 @@ extern "C" {
 	}
 
 
-	void utf8_to_sjis(const char* src, char* dst, uint32_t len) {
-		utils::str::utf8_to_sjis(src, dst, len);
-	}
-
-
 	bool check_mount_() {
 		return sdc_.get_mount();
 	}
