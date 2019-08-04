@@ -1,9 +1,9 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX65N Makefile
+#   @brief  RX64M Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -11,7 +11,12 @@ TARGET		=	nesemu
 
 DEVICE		=	R5F565NE
 
-FATFS_VER	=	ff12b
+ROOT_DEV	=	RX65N
+ROOT_DEV_	=	RX65x
+
+FATFS_VER	=	ff13c/source
+
+OPTIMIZE	=	-O3
 
 BUILD		=	release
 
@@ -22,8 +27,9 @@ ASOURCES	=	common/start.s
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-				$(FATFS_VER)/src/ff.c \
-				$(FATFS_VER)/src/option/unicode.c \
+				$(FATFS_VER)/ff.c \
+				$(FATFS_VER)/ffsystem.c \
+				$(FATFS_VER)/ffunicode.c \
 				common/time.c \
 				./emu/log.c \
 				./emu/bitmap.c \
@@ -91,15 +97,17 @@ PSOURCES	=	main.cpp \
 
 USER_LIBS	=	m supc++
 
-LDSCRIPT	=	../RX65x/$(DEVICE).ld
+LDSCRIPT	=	../$(ROOT_DEV_)/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX65N \
+USER_DEFS	=	SIG_$(ROOT_DEV) \
 				F_ICLK=120000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000 \
-				FAT_FS
+				FAT_FS FAT_FS_NUM=16
 
-MCU_TARGET	=	
+AS_DEFS		=
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
@@ -123,13 +131,9 @@ INC_SYS     =   $(LOCAL_PATH)/include
 INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes \
 				./emu ./emu/cpu ./emu/nes ./emu/mappers ./emu/sndhrdw ./emu/libsnss
 
-OPTIMIZE	=	-O3
-
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
-				-Wno-unused-but-set-variable \
-				-Wno-maybe-uninitialized \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
@@ -159,17 +163,11 @@ OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
 
-# AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
-# AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
-# ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
-ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
-
 # Override is only needed by avr-lib build system.
 
-CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
+AFLAGS		=	$(AS_OPT) $(AS_DEFS)
+CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
+PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(CP_DEFS) $(DEFS)
 
 override LDFLAGS = $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
 
@@ -177,8 +175,7 @@ OBJCOPY_OPT	=	--srec-forceS3 --srec-len 32
 
 OBJECTS	=	$(addprefix $(BUILD)/,$(patsubst %.s,%.o,$(ASOURCES))) \
 			$(addprefix $(BUILD)/,$(patsubst %.c,%.o,$(CSOURCES))) \
-			$(addprefix $(BUILD)/,$(patsubst %.cpp,%.o,$(PSOURCES))) \
-			$(addprefix $(BUILD)/,$(patsubst %.bin,%.o,$(BINARIES)))
+			$(addprefix $(BUILD)/,$(patsubst %.cpp,%.o,$(PSOURCES)))
 
 DOBJECTS =	$(addprefix $(BUILD)/,$(patsubst %.c,%.o,$(CSOURCES))) \
 			$(addprefix $(BUILD)/,$(patsubst %.cpp,%.o,$(PSOURCES)))
@@ -187,7 +184,7 @@ DEPENDS =   $(patsubst %.o,%.d, $(DOBJECTS))
 
 .PHONY: all clean
 .SUFFIXES :
-.SUFFIXES : .rc .hpp .s .h .c .cpp .bin .d .o
+.SUFFIXES : .rc .hpp .s .h .c .cpp .d .o
 
 all: $(BUILD) $(TARGET).elf text
 
@@ -206,10 +203,6 @@ $(BUILD)/%.o : %.c
 $(BUILD)/%.o : %.cpp
 	mkdir -p $(dir $@); \
 	$(CP) -c $(POPT) $(PFLAGS) $(PINCS) $(CPWARN) -o $@ $<
-
-$(BUILD)/%.o: %.bin
-	mkdir -p $(dir $@); \
-	$(OBJCOPY) --readonly-text -I binary -O elf32-rx-le -B rx $< $@ 
 
 $(BUILD)/%.d: %.c
 	mkdir -p $(dir $@); \
@@ -231,23 +224,26 @@ clean_depend:
 
 lst:  $(TARGET).lst
 
+%.lst: %.elf
+	$(OBJDUMP) -h -S $< > $@
+
 # Rules for building the .text rom images
 
-# text: mot lst
-text: mot
+text: mot lst
 
 bin: $(TARGET).bin
 mot: $(TARGET).mot
 lst: $(TARGET).lst
 
 %.lst: %.elf
-	$(OBJDUMP) -h -d $< > $@
+	$(OBJDUMP) -h -S $< > $@
 
 %.mot: %.elf
 	$(OBJCOPY) $(OBJCOPY_OPT) -O srec $< $@
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
+#	$(OBJCOPY) -j .vects -j .text -j .data -O binary $< $@
 
 tarball:
 	tar cfvz $(subst .elf,,$(TARGET))_$(shell date +%Y%m%d%H).tgz \
@@ -259,6 +255,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d $(ROOT_DEV) --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

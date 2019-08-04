@@ -310,11 +310,6 @@ extern "C" {
 	}
 
 
-	void utf8_to_sjis(const char* src, char* dst, uint32_t len) {
-		utils::str::utf8_to_sjis(src, dst, len);
-	}
-
-
 	int fatfs_get_mount() {
 		return sdc_.get_mount();
 	}

@@ -284,21 +284,17 @@ extern "C" {
 		return sdh_.disk_initialize(drv);
 	}
 
-
 	DSTATUS disk_status(BYTE drv) {
 		return sdh_.disk_status(drv);
 	}
-
 
 	DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
 		return sdh_.disk_read(drv, buff, sector, count);
 	}
 
-
 	DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
 		return sdh_.disk_write(drv, buff, sector, count);
 	}
-
 
 	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
 		return sdh_.disk_ioctl(drv, ctrl, buff);
@@ -312,8 +308,8 @@ extern "C" {
 	}
 
 
-	void utf8_to_sjis(const char* src, char* dst, uint32_t len) {
-		utils::str::utf8_to_sjis(src, dst, len);
+	void utf8_to_oemc(const char* src, char* dst, uint32_t len) {
+		utils::str::utf8_to_oemc(src, dst, len);
 	}
 
 
