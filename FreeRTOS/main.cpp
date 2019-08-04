@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  ファースト・サンプル（LED 点滅） @n
+    @brief  FreeRTOS Simple Sample（Flash LED, Output SCI） @n
 			RX64M, RX71M, RX72M: @n
 					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
@@ -36,7 +36,7 @@
 
 #ifdef SIG_RX64M
 // RX64Mで、GR-KAEDE の場合有効にする
-#define GR_KAEDE
+// #define GR_KAEDE
 #endif
 
 namespace {
@@ -102,7 +102,7 @@ extern "C" {
 	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
 	void sci_putch(char ch)
 	{
-	   	volatile static bool lock_ = false;
+		static volatile bool lock_ = false;
 		while(lock_) ;
 		lock_ = true;
 		sci_.putch(ch);
@@ -112,7 +112,7 @@ extern "C" {
 
 	void sci_puts(const char* str)
 	{
-		volatile static bool lock_ = false;
+		static volatile bool lock_ = false;
 		while(lock_) ;
 		lock_ = true;
 		sci_.puts(str);
@@ -123,7 +123,7 @@ extern "C" {
 	// syscalls.c から呼ばれる、標準入力（stdin）
 	char sci_getch(void)
 	{
-		volatile static bool lock_ = false;
+		static volatile bool lock_ = false;
 		while(lock_) ;
 		lock_ = true;
 		auto ch = sci_.getch();
