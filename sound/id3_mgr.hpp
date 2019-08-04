@@ -206,7 +206,7 @@ namespace sound {
 					return false;
 				}
 				tmp[len] = 0;
-				utils::str::sjis_to_utf8(tmp, dst, dstlen); 
+				utils::str::oemc_to_utf8(tmp, dst, dstlen); 
 			} else if(code == 0x01) {  // UTF-16 (with BOM)
 				WCHAR tmp[len / 2 + 1];
 				if(fin.read(tmp, len) != len) {
