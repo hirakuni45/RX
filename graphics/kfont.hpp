@@ -9,7 +9,7 @@
 */
 //=====================================================================//
 #include <cstdint>
-#include "ff12b/src/ff.h"
+#include "ff13c/source/ff.h"
 #include "common/vtx.hpp"
 
 // 漢字フォントデータをＳＤカード上に置いて、キャッシュアクセスする場合有効にする
@@ -179,7 +179,7 @@ namespace graphics {
 
 			if(fatfs_get_mount() == 0) return nullptr;
 #endif
-			uint32_t lin = sjis_to_liner_(ff_convert(code, 0));
+			uint32_t lin = sjis_to_liner_(ff_uni2oem(code, FF_CODE_PAGE));
 
 			if(lin == 0xffff) {
 				return nullptr;
