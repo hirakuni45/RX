@@ -1,3 +1,4 @@
+# -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
 #   @brief  RX71M Makefile
@@ -10,7 +11,7 @@ TARGET		=	ignitor_cnt
 
 DEVICE		=	R5F571MF
 
-FATFS_VER   =   ff12b
+FATFS_VER   =   ff13c/source
 
 BUILD		=	release
 
@@ -24,8 +25,9 @@ ASOURCES	=	common/start.s \
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-				$(FATFS_VER)/src/ff.c \
-				$(FATFS_VER)/src/option/unicode.c \
+				$(FATFS_VER)/ff.c \
+				$(FATFS_VER)/ffsystem.c \
+				$(FATFS_VER)/ffunicode.c \
 				common/time.c \
                 r_net/driver/phy.c \
                 r_net/driver/r_ether.c \
