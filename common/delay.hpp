@@ -9,6 +9,10 @@
 */
 //=====================================================================//
 #include <cstdint>
+#ifdef RTOS
+#include "FreeRTOS.h"
+#include "task.h"
+#endif
 
 #ifndef F_ICLK
 #  error "delay.hpp requires F_ICLK to be defined"
@@ -80,9 +84,13 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		static void milli_second(uint32_t ms)
 		{
+#ifdef RTOS
+			vTaskDelay(ms / portTICK_PERIOD_MS);
+#else
 			for(uint32_t i = 0; i < ms; ++i) {
 				micro_second(1000);
 			}
+#endif
 		}
 	};
 }
