@@ -12,6 +12,7 @@
 #include "common/sci_io.hpp"
 #include "common/sci_i2c_io.hpp"
 #include "common/spi_io2.hpp"
+#include "ff13c/mmc_io.hpp"
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
 #include "graphics/font8x16.hpp"
