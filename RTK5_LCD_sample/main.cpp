@@ -16,6 +16,7 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/spi_io2.hpp"
+#include "ff13c/mmc_io.hpp"
 #include "common/sdc_man.hpp"
 #include "common/qspi_io.hpp"
 #include "graphics/font8x16.hpp"
