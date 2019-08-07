@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ・RSPI I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -277,29 +277,42 @@ namespace device {
 
 		//----------------------------------------------------------------//
 		/*!
-			@brief	リード・ライト
+			@brief	通信レジスタへ書き込み @n
+					※通信幅は最大３２ビット（通信モード設定による）
 			@param[in]	data	書き込みデータ
-			@return 読み出しデータ
 		*/
 		//----------------------------------------------------------------//
-		uint32_t xchg32(uint32_t data = 0) noexcept
-		{
-			RSPI::SPDR = static_cast<uint32_t>(data);
-			while(RSPI::SPSR.SPRF() == 0) sleep_();
-		    return RSPI::SPDR();
-		}
-
-
 		inline void xchg32_start(uint32_t data = 0) noexcept
 		{
 			RSPI::SPDR = static_cast<uint32_t>(data);
 		}
 
 
+		//----------------------------------------------------------------//
+		/*!
+			@brief	通信の同期とレジスタからの読み出し @n
+					※通信幅は最大３２ビット（通信モード設定による）
+			@return	読み出しデータ
+		*/
+		//----------------------------------------------------------------//
 		inline uint32_t xchg32_sync() noexcept
 		{
 			while(RSPI::SPSR.SPRF() == 0) sleep_();
 		    return RSPI::SPDR();
+		}
+
+
+		//----------------------------------------------------------------//
+		/*!
+			@brief	リード・ライト
+			@param[in]	data	書き込みデータ
+			@return 読み出しデータ
+		*/
+		//----------------------------------------------------------------//
+		inline uint32_t xchg32(uint32_t data = 0) noexcept
+		{
+			xchg32_start(data);
+			return xchg32_sync();
 		}
 
 
@@ -310,12 +323,13 @@ namespace device {
 			@param[in]	cnt	送信サイズ
 		*/
 		//-----------------------------------------------------------------//
-		void send(const uint8_t* src, uint16_t size) noexcept
+		void send(const void* src, uint32_t size) noexcept
 		{
-			auto end = src + size;
-			while(src < end) {
-				xchg(*src);
-				++src;
+			auto ptr = static_cast<const uint8_t*>(src);
+			while(size > 0) {
+				xchg(*ptr);
+				++ptr;
+				size--;
 			}
 		}
 
@@ -327,12 +341,13 @@ namespace device {
 			@param[in]	cnt	受信サイズ
 		*/
 		//-----------------------------------------------------------------//
-		void recv(uint8_t* dst, uint16_t size) noexcept
+		void recv(void* dst, uint32_t size) noexcept
 		{
-			auto end = dst + size;
-			while(dst < end) {
-				*dst = xchg();
-				++dst;
+			auto ptr = static_cast<uint8_t*>(dst);
+			while(size > 0) {
+				*ptr = xchg();
+				++ptr;
+				size--;
 			}
 		}
 
@@ -349,6 +364,5 @@ namespace device {
 			port_map::turn(RSPI::get_peripheral(), false);
 			if(power) power_mgr::turn(RSPI::get_peripheral(), false);
 		}
-
 	};
 }
