@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	MMC（SD カード）FatFS ドライバー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -76,6 +76,21 @@ namespace fatfs {
 			CMD58 = 58,			/* READ_OCR */
 		};
 
+
+		inline void lock_() {
+#ifdef RTOS
+			vTaskEnterCritical();
+#endif
+		}
+
+
+		inline void unlock_() {
+#ifdef RTOS
+			vTaskExitCritical();
+#endif
+		}
+
+
 		/* 1:OK, 0:Timeout */
 		int wait_ready_() {
 			UINT tmr;
@@ -89,14 +104,18 @@ namespace fatfs {
 
 
 		void deselect_() {
+			lock_();
 			SEL::P = 1;
+			unlock_();
 			volatile BYTE d = spi_.xchg();	/* Dummy clock (force DO hi-z for multiple slave SPI) */
 		}
 
 
 		/* 1:OK, 0:Timeout */
 		int select_() {
+			lock_();
 			SEL::P = 0;
+			unlock_();
 #ifdef DEBUG_MMC
 			utils::format("Select port: %d\n") % static_cast<uint32_t>(SEL::P());
 #endif
@@ -244,6 +263,8 @@ namespace fatfs {
 		{
 			if(init_port_) return;
 
+			lock_();
+
 			if(POW::BIT_POS < 32) {
 				POW::DIR = 1;
 				POW::P = 1;  // power off
@@ -261,6 +282,8 @@ namespace fatfs {
 
 			CDT::DIR = 0;
 			CDT::PU  = 1;  // 内部プルアップは標準では有効にしておく
+
+			unlock_();
 
 			init_port_ = true;
 		}
@@ -318,7 +341,7 @@ namespace fatfs {
 						uint16_t tmr;
 						for (tmr = 1000; tmr; tmr--) {	/* Wait for leaving idle state (ACMD41 with HCS bit) */
 							if (send_cmd_(command::ACMD41, 1UL << 30) == 0) break;
-							utils::delay::micro_second(1000);
+							utils::delay::milli_second(1);
 						}
 						if (tmr && send_cmd_(command::CMD58, 0) == 0) {	/* Check CCS bit in the OCR */
 							spi_.recv(buf, 4);
@@ -335,7 +358,7 @@ namespace fatfs {
 					uint16_t tmr;
 					for (tmr = 1000; tmr; tmr--) {			/* Wait for leaving idle state */
 						if (send_cmd_(cmd, 0) == 0) break;
-						utils::delay::micro_second(1000);
+						utils::delay::milli_second(1);
 					}
 					/* Set R/W block length to 512 */
 					if (!tmr || send_cmd_(command::CMD16, 512) != 0) {
@@ -505,20 +528,28 @@ namespace fatfs {
 			if(!cd_ && select_wait_ >= 10) {
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
 				if(POW::BIT_POS < 32) {
+					lock_();
 					POW::P = 0;
 					SEL::P = 1;
+					unlock_();
 				} else {
+					lock_();
 					SEL::P = 1;
+					unlock_();
 				}
 //				utils::format("Card ditect\n");
 			} else if(cd_ && select_wait_ == 0) {
 				f_mount(&fatfs_, "", 0);
 				spi_.destroy();
 				if(POW::BIT_POS < 32) {
+					lock_();
 					POW::P = 1;
 					SEL::P = 0;
+					unlock_();
 				} else {
+					lock_();
 					SEL::P = 1;
+					unlock_();
 				}
 				mount_ = false;
 //				utils::format("Card unditect\n");
@@ -534,10 +565,14 @@ namespace fatfs {
 						utils::format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
 						spi_.destroy();
 						if(POW::BIT_POS < 32) {
+							lock_();
 							POW::P = 1;
 							SEL::P = 0;
+							unlock_();
 						} else {
+							lock_();
 							SEL::P = 1;
+							unlock_();
 						}
 						mount_ = false;
 						init_port_ = false;  // 再マウント
