@@ -18,6 +18,7 @@
 #include "common/rspi_io.hpp"
 #include "common/spi_io.hpp"
 #include "common/spi_io2.hpp"
+#include "ff13c/mmc_io.hpp"
 #include "common/sdc_man.hpp"
 #include "common/string_utils.hpp"
 
