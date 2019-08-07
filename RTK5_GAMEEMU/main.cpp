@@ -16,6 +16,7 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/spi_io2.hpp"
+#include "ff13c/mmc_io.hpp"
 #include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
 #include "sound/sound_out.hpp"
