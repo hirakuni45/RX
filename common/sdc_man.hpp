@@ -13,7 +13,6 @@
 #include "common/format.hpp"
 #include "common/string_utils.hpp"
 #include "common/fixed_stack.hpp"
-#include "ff13c/mmc_io.hpp"
 
 namespace utils {
 
