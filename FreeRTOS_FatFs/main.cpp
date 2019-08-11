@@ -53,12 +53,15 @@ namespace {
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+
+	static const uint32_t sdc_spi_speed_ = 30000000;
 	static const char* system_str_ = { "RX71M" };
 
 #elif defined(SIG_RX72M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+	static const uint32_t sdc_spi_speed_ = 30000000;
 	static const char* system_str_ = { "RX72M" };
 
 #elif defined(SIG_RX64M)
@@ -71,7 +74,7 @@ namespace {
 	typedef device::PORT<device::PORTC, device::bitpos::B1> LED2;
 	typedef device::SCI7 SCI_CH;
 
-#if 0
+#if SOFT_SPI
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORTC, device::bitpos::B7> MISO;
 	typedef device::PORT<device::PORTC, device::bitpos::B6> MOSI;
@@ -87,6 +90,7 @@ namespace {
 	typedef device::NULL_PORT  SDC_POWER;	///< SD カード電源制御（制御なし、常にＯＮ）
 	typedef device::PORT<device::PORTB, device::bitpos::B7> SDC_DETECT;	///< SD カード検出
 
+	static const uint32_t sdc_spi_speed_ = 30000000;
 	static const char* system_str_ = { "GR-KAEDE" };
 #else
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
@@ -102,6 +106,7 @@ namespace {
 	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;  ///< カード選択信号
 	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;  ///< カード検出
 
+	static const uint32_t sdc_spi_speed_ = 30000000;
 	static const char* system_str_ = { "RX64M" };
 #endif
 
@@ -120,6 +125,7 @@ namespace {
 	typedef device::NULL_PORT  SDC_POWER;	///< SD カード電源制御（制御なし、常にＯＮ）
 	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD カード検出
 
+	static const uint32_t sdc_spi_speed_ = 30000000;
 	static const char* system_str_ = { "RX65N" };
 
 #elif defined(SIG_RX63T)
@@ -148,12 +154,15 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
 
+	static const uint32_t sdc_spi_speed_ = 20000000;
 	static const char* system_str_ = { "RX24T" };
 
 #elif defined(SIG_RX66T)
 	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
+
+	static const uint32_t sdc_spi_speed_ = 30000000;
 	static const char* system_str_ = { "RX66T" };
 #endif
 
@@ -175,7 +184,7 @@ namespace {
 
 	///< FatFs MMC ドライバ（ハードウェアインスタンス、ハードウェア最大速度）
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC_DEV;
-	SDC_DEV		sdc_dev_(sdc_spi_, 35000000);
+	SDC_DEV		sdc_dev_(sdc_spi_, sdc_spi_speed_);
 
 	typedef utils::command<256> CMD_LINE;
 	CMD_LINE	cmd_;
@@ -390,7 +399,7 @@ namespace {
 					utils::format("    pwd           list current path\n");
 					utils::format("    cd [path]     change current directory\n");
 					utils::format("    dir [path]    list current directory\n");
-					utils::format("    scan [file]   scan file (read 1024 bytes after wait 100ms)\n");
+					utils::format("    scan [file]   scan file (read 1024 bytes after wait 25ms)\n");
 				} else {
 					char tmp[256];
 					cmd_.get_word(0, tmp, sizeof(tmp));
@@ -490,7 +499,7 @@ int main(int argc, char** argv)
 	utils::format("\nStart FreeRTOS FatFs sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
 	{
-		uint32_t stack_size = 2048;
+		uint32_t stack_size = 1024;
 		void* param = nullptr;
 		uint32_t prio = 1;
 		xTaskCreate(sdc_task_, "SD_MAN", stack_size, param, prio, nullptr);
