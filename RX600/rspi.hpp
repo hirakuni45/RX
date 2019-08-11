@@ -359,7 +359,7 @@ namespace device {
 	};
 
 #if defined(SIG_RX24T)
-	typedef rspi_t<0x000D0100, peripheral::RSPI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI0;
+	typedef rspi_t<0x00088380, peripheral::RSPI0, ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI0;
 #elif defined(SIG_RX64M)
 	typedef rspi_t<0x000D0100, peripheral::RSPI,  ICU::VECTOR::SPRI0, ICU::VECTOR::SPTI0>  RSPI;
 #elif defined(SIG_RX71M)
