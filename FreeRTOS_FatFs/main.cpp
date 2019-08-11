@@ -494,7 +494,7 @@ int main(int argc, char** argv)
 		uint32_t stack_size = 2048;
 		void* param = nullptr;
 		uint32_t prio = 1;
-//		xTaskCreate(scan_task_, "SCAN", stack_size, param, prio, nullptr);
+		xTaskCreate(scan_task_, "SCAN", stack_size, param, prio, nullptr);
 	}
 
 	vTaskStartScheduler();
