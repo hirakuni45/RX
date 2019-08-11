@@ -5,7 +5,7 @@
 			※ fopen 系の機能を提供するクラス。@n
 			※ FATFS が必要
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,28 +14,25 @@
 #  error "file_io.hpp requires FAT_FS to be defined and include FATFS module"
 #endif
 
-#include "ff13c/source/ff.h"
-#include "ff13c/source/diskio.h"
-
-extern "C" {
-	int make_full_path(const char* src, char* dst, uint16_t dsz);
-};
+#include "common/format.hpp"
+#include "common/string_utils.hpp"
+#include "common/dir_list.hpp"
 
 namespace utils {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	ファイル入出力クラス
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class file_io {
 	public:
 
-        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
         /*!
             @brief  SEEK タイプ
         */
-        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
         enum class SEEK {
 			SET,	///< 先頭からのオフセット
 			CUR,	///< 現在位置からのオフセット
@@ -46,34 +43,128 @@ namespace utils {
 		FIL			fp_;
 		bool		open_;
 
+		//< 標準的、ディレクトリーリスト
+		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+		{
+			if(fi == nullptr) return;
+
+			time_t t = str::fatfs_time_to(fi->fdate, fi->ftime);
+			struct tm *m = localtime(&t);
+			if(dir) {
+				format("           ");
+			} else {
+				format("%10d ") % fi->fsize;
+			}
+			format("%s %2d %4d %02d:%02d ") 
+				% get_mon(m->tm_mon)
+				% static_cast<int>(m->tm_mday)
+				% static_cast<int>(m->tm_year + 1900)
+				% static_cast<int>(m->tm_hour)
+				% static_cast<int>(m->tm_min);
+			if(dir) {
+				format("/");
+			} else {
+				format(" ");
+			}
+			format("%s\n") % name;
+		}
+
 	public:
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		file_io() noexcept :
 			fp_(),
 			open_(false)
 		{ }
 
 
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	デストラクター
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		~file_io() { close(); }
 
 
-		//-------------------------------------------------------------//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ディレクトリーの作成
+			@param[in]	path	相対パス、又は、絶対パス
+			@return 成功なら「true」
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool mkdir(const char* path) noexcept
+		{
+			return f_mkdir(path) == FR_OK;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ファイルの削除
+			@param[in]	path	相対パス、又は、絶対パス
+			@return 削除成功なら「true」
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool remove(const char* path) noexcept
+		{
+			return f_unlink(path) == FR_OK;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ファイル名の変更
+			@param[in]	org_path	元名
+			@param[in]	new_path	新名
+			@return 成功なら「true」
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool rename(const char* org_path, const char* new_path) noexcept
+		{
+			return f_rename(org_path, new_path) == FR_OK;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	カレント・パスの移動
+			@param[in]	path	相対パス、又は、絶対パス
+			@return 移動成功なら「true」
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool cd(const char* path) noexcept {
+			if(path == nullptr) return false;
+
+			auto ret = f_chdir(path);
+			return ret == FR_OK;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	カレント・パスを取得
+			@return カレント。パス
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static const char* pwd() noexcept {
+			static char current[FF_MAX_LFN + 1];
+			auto ret = f_getcwd(current, sizeof(current));
+			return ret == FR_OK ? current : nullptr;
+		}
+
+
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	ファイルを開く
 			@param[in]	filename	ファイル名
 			@param[in]	mode		オープン・モード
 			@return 成功なら「true」
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		bool open(const char* filename, const char* mode) noexcept
 		{
 			if(filename == nullptr || mode == nullptr) return false;
@@ -92,12 +183,7 @@ namespace utils {
 				mdf |= FA_OPEN_APPEND;
 			}
 
-			char tmp[FF_MAX_LFN + 1];
-			if(!make_full_path(filename, tmp, sizeof(tmp))) {
-				return false;
-			}
-
-			FRESULT res = f_open(&fp_, tmp, mdf);
+			FRESULT res = f_open(&fp_, filename, mdf);
 			if(res != FR_OK) {
 				return false;
 			}
@@ -106,30 +192,44 @@ namespace utils {
 		}
 
 
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	ファイル・ディスクリプタへの参照
 			@return ファイル・ディスクリプタ
 		*/
-		//-------------------------------------------------------------//
-		FIL& at_fd() noexcept { return fp_; }
+		//-----------------------------------------------------------------//
+		FIL& at() noexcept { return fp_; }
 
 
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	オープンの確認
 			@return オープンなら「true」
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		bool is_open() const noexcept { return open_; }
 
 
-		//-------------------------------------------------------------//
+#if 0
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ディレクトリかどうか
+			@return ディレクトリなら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool is_directory() const noexcept {
+			if(!open_) return false;
+			return 
+		}
+#endif
+
+
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	ファイルをクローズする
 			@return 成功なら「true」
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		bool close() noexcept
 		{
 			if(!open_) {
@@ -140,14 +240,14 @@ namespace utils {
 		}
 
 
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	リード
 			@param[out]	dst		読込先
 			@param[in]	num		読み込みサイズ
 			@return 読み込みサイズ
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		uint32_t read(void* dst, uint32_t len) noexcept
 		{
 			if(!open_) return 0; 
@@ -161,7 +261,7 @@ namespace utils {
 		}
 
 
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	リード
 			@param[out]	dst		読込先
@@ -169,20 +269,20 @@ namespace utils {
 			@param[in]	num		個数
 			@return 読み込みサイズ
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		uint32_t read(void* dst, uint32_t block, uint32_t num) noexcept
 		{
 			return read(dst, block * num) / block;
 		}
 
 
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	１文字取得
 			@param[out]	ch	文字（参照）
 			@return 正常なら「true」
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		bool get_char(char& ch) noexcept
 		{
 			char tmp[1];
@@ -194,14 +294,14 @@ namespace utils {
 		}
 
 
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	ライト
 			@param[in]	src		ソース
 			@param[in]	num		書き込みサイズ
 			@return 書き込みサイズ
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		uint32_t write(const void* src, uint32_t len) noexcept
 		{
 			if(!open_) return 0; 
@@ -215,14 +315,14 @@ namespace utils {
 		}
 
 
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	シーク（fseek 準拠）
 			@param[in]	seek	シーク形式
 			@param[in]	ofs		オフセット
 			@return 成功なら「true」
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		bool seek(SEEK seek, int32_t ofs) noexcept
 		{
 			if(!open_) return false;
@@ -253,12 +353,12 @@ namespace utils {
 		}
 
 
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	ファイル位置を返す
 			@return ファイル位置
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		uint32_t tell() const noexcept
 		{
 			if(!open_) return false;
@@ -266,12 +366,12 @@ namespace utils {
 		}
 
 
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	ファイルの終端か検査
 			@return ファイルの終端なら「true」
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		bool eof() const noexcept
 		{
 			if(!open_) return false;
@@ -279,16 +379,142 @@ namespace utils {
 		}
 
 
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		/*!
 			@brief	ファイルサイズを返す
 			@return ファイルサイズ
 		*/
-		//-------------------------------------------------------------//
+		//-----------------------------------------------------------------//
 		uint32_t get_file_size() const noexcept
 		{
 			if(!open_) return 0;
 			return f_size(&fp_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ファイル・フラッシュ
+			@return 正常なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool flush() noexcept
+		{
+			if(!open_) return false;
+
+			return f_sync(&fp_) == FR_OK;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ファイルの存在を検査
+			@param[in]	filename	ファイル名
+			@return ファイルがある場合「true」
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool probe(const char* filename) noexcept
+		{
+			if(filename == nullptr) return false;
+
+			BYTE mdf = FA_READ | FA_OPEN_EXISTING;
+
+			FIL fil;
+			FRESULT res = f_open(&fil, filename, mdf);
+			if(res != FR_OK) {
+				return false;
+			}
+
+			f_close(&fil);
+
+			return true;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ファイルサイズを返す
+			@param[in]	filename	ファイル名
+			@return ファイルサイズ
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static uint32_t get_file_size(const char* filename) noexcept
+		{
+			if(filename == nullptr) return 0;
+
+			BYTE mdf = FA_READ | FA_OPEN_EXISTING;
+
+			FIL fil;
+			FRESULT res = f_open(&fil, filename, mdf);
+			if(res != FR_OK) {
+				return 0;
+			}
+
+			auto sz = f_size(&fil);
+
+			f_close(&fil);
+
+			return sz;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ファイルの更新時間を取得
+			@param[in]	filename	ファイル名
+			@return ファイルの更新時間（０の場合エラー）
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static time_t get_time(const char* filename) noexcept
+		{
+			if(filename == nullptr) return 0;
+
+			FILINFO fno;
+			if(f_stat(filename, &fno) != FR_OK) {
+				return 0;
+			}
+
+			return str::fatfs_time_to(fno.fdate, fno.ftime);
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ディレクトリかどうか
+			@param[in]	filename	ファイル名
+			@return ディレクトリなら「true」
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool is_directory(const char* filename) noexcept
+		{
+			if(filename == nullptr) return false;
+
+			FILINFO fno;
+			if(f_stat(filename, &fno) != FR_OK) {
+				return false;
+			}
+			return (fno.fattrib & AM_DIR) != 0;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	SD カードのディレクトリーをリストする
+			@param[in]	root	ルート・パス
+			@return ファイル数
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static uint32_t dir(const char* root) noexcept
+		{
+			dir_list dl;
+			if(!dl.start(root)) return 0;
+
+			do {
+				dl.service(10, dir_list_func_, true);
+			} while(dl.probe()) ;
+			auto n = dl.get_total();
+			utils::format("Total %d file%s\n") % n % (n > 1 ? "s" : "");
+			return n;
 		}
 	};
 }
