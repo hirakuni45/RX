@@ -35,13 +35,14 @@
 #include "ff13c/mmc_io.hpp"
 #include "common/sdc_man.hpp"
 #include "common/command.hpp"
+#include "common/file_io.hpp"
 
 #include "FreeRTOS.h"
 #include "task.h"
 
 #ifdef SIG_RX64M
 // RX64Mで、GR-KAEDE の場合有効にする
-#define GR_KAEDE
+// #define GR_KAEDE
 #endif
 
 namespace {
@@ -66,8 +67,8 @@ namespace {
 	typedef utils::rtc_io RTC;
 
 #ifdef GR_KAEDE
-	typedef device::PORT<device::PORTC, device::bitpos::B1> LED;
-	typedef device::PORT<device::PORTC, device::bitpos::B0> LED2;
+	typedef device::PORT<device::PORTC, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORTC, device::bitpos::B1> LED2;
 	typedef device::SCI7 SCI_CH;
 
 #if 0
@@ -91,6 +92,16 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 
+	///< Soft SDC 用　SPI 定義（SPI）
+	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
+	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
+	typedef device::PORT<device::PORT7, device::bitpos::B7> SPCK;
+	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;
+
+	typedef device::PORT<device::PORT8, device::bitpos::B2> SDC_POWER;	///< カード電源制御
+	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;  ///< カード選択信号
+	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;  ///< カード検出
+
 	static const char* system_str_ = { "RX64M" };
 #endif
 
@@ -110,6 +121,22 @@ namespace {
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
+
+#ifdef SOFT_SPI
+	// Soft SDC 用　SPI 定義（SPI）
+	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;
+	typedef device::PORT<device::PORT2, device::bitpos::B3> MOSI;
+	typedef device::PORT<device::PORT2, device::bitpos::B4> SPCK;
+	typedef device::spi_io<MISO, MOSI, SPCK> SPI;
+#else
+	// RSPI SDC 用　SPI 定義（RSPI0）
+	typedef device::rspi_io<device::RSPI0> SDC_SPI;
+#endif
+
+	typedef device::PORT<device::PORT6, device::bitpos::B5> SDC_SELECT;	///< カード選択信号
+	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;	///< カード電源制御
+	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
+
 	static const char* system_str_ = { "RX24T" };
 
 #elif defined(SIG_RX66T)
@@ -128,7 +155,9 @@ namespace {
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 	SCI			sci_;
 
+#if defined(SIG_RX64M)
 	RTC			rtc_;
+#endif
 
 	// SDC ハードウェア
 	SDC_SPI		sdc_spi_;
@@ -209,7 +238,9 @@ extern "C" {
 
 	DWORD get_fattime(void) {
 		time_t t = 0;
+#if defined(SIG_RX64M)
 		rtc_.get_time(t);
+#endif
 		return utils::str::get_fattime(t);
 	}
 
@@ -294,13 +325,65 @@ extern "C" {
 
 namespace {
 
+	struct scan_t {
+		char filename_[64];
+		volatile uint32_t put_;
+		volatile uint32_t get_;
+		scan_t() : filename_{ 0 }, put_(0), get_(0) { }
+	};
+
+	scan_t		scan_t_;
+
 	void shell_()
 	{
         if(cmd_.service()) {
             uint8_t cmdn = cmd_.get_words();
             if(cmdn >= 1) {
-                bool f = false;
                 if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
+					char tmp[FF_MAX_LFN + 1];
+					if(cmdn == 1) {
+						strcpy(tmp, utils::file_io::pwd());
+					} else {
+						cmd_.get_word(1, tmp, sizeof(tmp));
+					}
+					if(!utils::file_io::dir(tmp)) {
+						utils::format("Directory path fail: '%s'\n") % tmp;
+					}
+				} else if(cmd_.cmp_word(0, "pwd")) {  // pwd
+					const char* path = utils::file_io::pwd();
+					if(path == nullptr) {
+						utils::format("pwd fail\n");
+					} else {
+						utils::format("%s\n") % path;
+					}
+				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
+					char tmp[FF_MAX_LFN + 1];
+					if(cmdn == 1) {
+						strcpy(tmp, "/");
+					} else {
+						cmd_.get_word(1, tmp, sizeof(tmp));
+					}
+					if(!utils::file_io::cd(tmp)) {
+						utils::format("Change directory fail: '%s'\n") % tmp;
+					}
+				} else if(cmd_.cmp_word(0, "scan")) {  // scan
+					if(cmdn >= 1) {
+						if(scan_t_.get_ != scan_t_.put_) {
+							utils::format("Scan task is busy !\n");
+						} else {
+							cmd_.get_word(1, scan_t_.filename_, sizeof(scan_t_.filename_));
+							scan_t_.put_++;
+						}
+					}
+				} else if(cmd_.cmp_word(0, "help")) {  // help
+					utils::format("    pwd           list current path\n");
+					utils::format("    cd [path]     change current directory\n");
+					utils::format("    dir [path]    list current directory\n");
+					utils::format("    scan [file]   scan file (read 1024 bytes after wait 100ms)\n");
+				} else {
+					char tmp[256];
+					cmd_.get_word(0, tmp, sizeof(tmp));
+					utils::format("Fail: '%s'\n") % tmp; 
 				}
 			}
 		}
@@ -323,13 +406,38 @@ namespace {
 	}
 
 
-	void vTask2(void *pvParameters)
+	void led_task_(void *pvParameters)
 	{
 		while(1) {
 			vTaskEnterCritical();
 			LED::P = !LED::P();
 			vTaskExitCritical();
 			vTaskDelay(100 / portTICK_PERIOD_MS);
+		}
+	}
+
+
+	void scan_task_(void *pvParameters)
+	{
+		while(1) {
+			while(scan_t_.get_ == scan_t_.put_) {
+				vTaskDelay(100 / portTICK_PERIOD_MS);
+			}
+			utils::file_io fio;
+			if(!fio.open(scan_t_.filename_, "rb")) {
+				utils::format("Can't open: '%s'\n") % scan_t_.filename_;
+				scan_t_.get_++;
+			} else {
+				uint32_t pos = 0;
+				uint8_t tmp[1024];
+				while(pos < fio.get_file_size()) {
+					pos += fio.read(tmp, 1024);
+					vTaskDelay(25 / portTICK_PERIOD_MS);
+				}
+				utils::format("Scan Task: %u bytes\n") % pos;
+				scan_t_.get_++;
+				fio.close();
+			}
 		}
 	}
 }
@@ -361,19 +469,32 @@ int main(int argc, char** argv)
 		sci_.start(baud, intr);
 	}
 
+#if defined(SIG_RX64M)
 	{  // RTC 開始
 		rtc_.start();
 	}
+#endif
 
 	auto clk = F_ICLK / 1000000;
-	utils::format("Start FreeRTOS FatFs sample for '%s' %d[MHz]\n") % system_str_ % clk;
+	utils::format("\nStart FreeRTOS FatFs sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
 	{
-		uint32_t stack_size = 512;
+		uint32_t stack_size = 2048;
 		void* param = nullptr;
 		uint32_t prio = 1;
 		xTaskCreate(sdc_task_, "SD_MAN", stack_size, param, prio, nullptr);
-		xTaskCreate(vTask2, "Task2", stack_size, param, prio, nullptr);
+	}
+	{
+		uint32_t stack_size = 256;
+		void* param = nullptr;
+		uint32_t prio = 1;
+		xTaskCreate(led_task_, "LED", stack_size, param, prio, nullptr);
+	}
+	{
+		uint32_t stack_size = 2048;
+		void* param = nullptr;
+		uint32_t prio = 1;
+//		xTaskCreate(scan_task_, "SCAN", stack_size, param, prio, nullptr);
 	}
 
 	vTaskStartScheduler();
