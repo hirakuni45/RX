@@ -2,6 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	SD カード・マネージャー @n
+			ファイル操作やカレントパス管理など
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
