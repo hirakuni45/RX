@@ -263,9 +263,13 @@
 
 
 /* #include <somertos.h>	// O/S definitions */
+#ifdef RTOS
 #include "FreeRTOS.h"
 #include "semphr.h"
 #define FF_FS_REENTRANT	1
+#else
+#define FF_FS_REENTRANT	0
+#endif
 #define FF_FS_TIMEOUT	1000
 // #define FF_SYNC_t		HANDLE
 #define FF_SYNC_t		SemaphoreHandle_t
