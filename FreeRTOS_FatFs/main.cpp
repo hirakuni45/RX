@@ -109,6 +109,17 @@ namespace {
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
+
+	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
+	typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  // CMD
+	typedef device::PORT<device::PORT2, device::bitpos::B1> SPCK;  // CLK
+
+	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;
+
+	typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
+	typedef device::NULL_PORT  SDC_POWER;	///< SD カード電源制御（制御なし、常にＯＮ）
+	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD カード検出
+
 	static const char* system_str_ = { "RX65N" };
 
 #elif defined(SIG_RX63T)
