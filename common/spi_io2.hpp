@@ -1,7 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ソフトウェア SPI I/O 制御
+	@brief	ソフトウェア SPI I/O 制御２@n
+			SD カードに特化したソフト SPI 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -20,10 +21,9 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  ソフト SPI 制御クラス
-		@param[in]	MISO	Master In Slave Out
-		@param[in]	MOSI	Master Out Slave In
-		@param[in]	SPCK	Clock
-		@param[in]	MODE	soft_spi_mode
+		@param[in]	MISO	Master In Slave Out ポート
+		@param[in]	MOSI	Master Out Slave In ポート
+		@param[in]	SPCK	Clock ポート
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class MISO, class MOSI, class SPCK>
@@ -35,6 +35,7 @@ namespace device {
 #endif
 		}
 
+
 		inline void unlock_() {
 #ifdef RTOS
 			vTaskExitCritical();
@@ -45,23 +46,17 @@ namespace device {
 
 		inline void clock_fast_() noexcept
 		{
-			lock_();
 			SPCK::P = 1;
 			SPCK::P = 0;
-			unlock_();
 		}
 
 
-		void clock_() noexcept
+		inline void clock_() noexcept
 		{
-			lock_();
 			SPCK::P = 1;
-			unlock_();
 			auto n = delay_;
 			while(n > 0) { n--; asm("nop"); }
-			lock_();
 			SPCK::P = 0;
-			unlock_();
 		}
 
 
@@ -147,61 +142,48 @@ namespace device {
 		{
 			uint8_t r = 0;
 ///			if(delay_ < 2) {
-				r = 0;
 				lock_();
+				r = 0;
 				if(MISO::P()) ++r;  // bit7
 				if(data & 0x80) MOSI::P = 1; else MOSI::P = 0;	// bit7
-				unlock_();
 				clock_fast_();
 
 				r <<= 1;
-				lock_();
 				if(MISO::P()) ++r;  // bit6
 				if(data & 0x40) MOSI::P = 1; else MOSI::P = 0;	// bit6
-				unlock_();
 				clock_fast_();
 
 				r <<= 1;
-				lock_();
 				if(MISO::P()) ++r;  // bit5
 				if(data & 0x20) MOSI::P = 1; else MOSI::P = 0;	// bit5
-				unlock_();
 				clock_fast_();
 
 				r <<= 1;
-				lock_();
 				if(MISO::P()) ++r;  // bit4
 				if(data & 0x10) MOSI::P = 1; else MOSI::P = 0;	// bit4
-				unlock_();
 				clock_fast_();
 
 				r <<= 1;
-				lock_();
 				if(MISO::P()) ++r;  // bit3
 				if(data & 0x08) MOSI::P = 1; else MOSI::P = 0;	// bit3
-				unlock_();
 				clock_fast_();
 
 				r <<= 1;
-				lock_();
 				if(MISO::P()) ++r;  // bit2
 				if(data & 0x04) MOSI::P = 1; else MOSI::P = 0;	// bit2
-				unlock_();
 				clock_fast_();
 
 				r <<= 1;
-				lock_();
 				if(MISO::P()) ++r;  // bit1
 				if(data & 0x02) MOSI::P = 1; else MOSI::P = 0;	// bit1
-				unlock_();
 				clock_fast_();
 
 				r <<= 1;
-				lock_();
 				if(MISO::P()) ++r;  // bit0
 				if(data & 0x01) MOSI::P = 1; else MOSI::P = 0;	// bit0
-				unlock_();
 				clock_fast_();
+
+				unlock_();
 #if 0
 			} else {
 				r = 0;

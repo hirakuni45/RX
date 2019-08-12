@@ -43,7 +43,7 @@ namespace utils {
 		FIL			fp_;
 		bool		open_;
 
-		//< 標準的、ディレクトリーリスト
+		///< 標準的、ディレクトリーリスト
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option)
 		{
 			if(fi == nullptr) return;
@@ -147,13 +147,53 @@ namespace utils {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	カレント・パスを取得
-			@return カレント。パス
+			@param[in]	dst		パス格納
+			@param[in]	len		格納サイズ
+			@return 取得出来たら「true」
 		 */
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static const char* pwd() noexcept {
-			static char current[FF_MAX_LFN + 1];
-			auto ret = f_getcwd(current, sizeof(current));
-			return ret == FR_OK ? current : nullptr;
+		static bool pwd(char* dst, uint32_t len) noexcept {
+			if(dst == nullptr) {
+				return false;
+			}
+			auto ret = f_getcwd(dst, len);
+			if(ret == FR_OK) {
+				return true;
+			} else {
+				dst[0] = 0;
+				return false;
+			}
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	フル・パスを取作成
+			@param[in]	dst		格納先
+			@param[in]	base	ベース名
+			@param[in]	len		格納先サイズ
+			@return 取得出来たら「true」
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool make_full_path(char* dst, const char* base, uint32_t len) noexcept {
+			if(base == nullptr || dst == nullptr) return false;
+
+			if(base[0] == '/') {
+				strncpy(dst, base, len);
+			} else {
+				if(!pwd(dst, len)) {
+					return false;
+				}
+				auto l = strlen(dst);
+				if(l > 1) {
+					if(strlen(base) > 0) {
+						dst[l] = '/';
+						++l;
+					}
+				}
+				strncpy(&dst[l], base, len);
+			}
+			return true;
 		}
 
 
@@ -506,8 +546,10 @@ namespace utils {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static uint32_t dir(const char* root) noexcept
 		{
+			char tmp[FF_MAX_LFN + 1];
+			make_full_path(tmp, root, sizeof(tmp));
 			dir_list dl;
-			if(!dl.start(root)) return 0;
+			if(!dl.start(tmp)) return 0;
 
 			do {
 				dl.service(10, dir_list_func_, true);

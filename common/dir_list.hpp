@@ -27,28 +27,23 @@ namespace utils {
 			@brief  DIR リスト関数型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef std::function<void (const char* name, const FILINFO* fi, bool dir, void* option)> dir_loop_func;
+		typedef std::function<void (const char* name, const FILINFO* fi, bool dir, void* option)> loop_func;
 
 
 	private:
 		DIR			dir_;
 		uint32_t	total_;
-		uint32_t	limit_;
-		char*		ptr_;
+		char		nmb_[256];
 
 		bool		init_;
-
-		char full_[FF_MAX_LFN + 1];
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
-			@param[in]	dirnum	フレーム辺りの標準的なリスト数
 		 */
 		//-----------------------------------------------------------------//
-		dir_list(uint32_t defnum = 10) noexcept : total_(0), limit_(defnum),
-			ptr_(nullptr), init_(false) { }
+		dir_list() noexcept : dir_(), total_(0), nmb_{ 0 }, init_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -81,15 +76,11 @@ namespace utils {
 		{
 			total_ = 0;
 
-			std::strcpy(full_, root);
-
-			auto st = f_opendir(&dir_, full_);
+			auto st = f_opendir(&dir_, root);
 			if(st != FR_OK) {
 				return false;
 			}
 
-			std::strcat(full_, "/");
-			ptr_ = &full_[std::strlen(full_)];
 			init_ = true;
 
 			return true;
@@ -122,8 +113,7 @@ namespace utils {
 			@return エラー無ければ「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool service(uint32_t num, dir_loop_func func, bool todir = false,
-					 void* option = nullptr) noexcept
+		bool service(uint32_t num, loop_func func, bool todir = false, void* option = nullptr) noexcept
 		{
 			if(!init_) return false;
 
@@ -139,15 +129,14 @@ namespace utils {
 					break;
 				}
 
-//				if(func != nullptr) {
 				if(func) {
-					std::strcpy(ptr_, fi.fname);
+					std::strcpy(nmb_, fi.fname);
 					if(fi.fattrib & AM_DIR) {
 						if(todir) {
-							func(ptr_, &fi, true, option);
+							func(nmb_, &fi, true, option);
 						}
 					} else {
-						func(ptr_, &fi, false, option);
+						func(nmb_, &fi, false, option);
 					}
 				}
 				++total_;
