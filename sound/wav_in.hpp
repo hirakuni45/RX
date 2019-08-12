@@ -241,9 +241,9 @@ namespace sound {
 				uint32_t unit = (bits_ / 8) * channel_;
 				uint8_t tmp[1024];
 				if(fin.read(tmp, unit * 256) != (unit * 256)) {
-					utils::format("Read fail abort...\n");
+//					utils::format("Read fail abort...\n");
 					out.mute();
-					status = false;
+//					status = false;
 					break;
 				}
 				if(bits_ == 16) {
