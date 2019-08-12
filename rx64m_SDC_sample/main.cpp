@@ -374,7 +374,12 @@ int main(int argc, char** argv)
 					}
 					f = true;
 				} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-					utils::format("%s\n") % utils::file_io::pwd();
+					char tmp[256];
+					if(utils::file_io::pwd(tmp, sizeof(tmp))) {
+						utils::format("%s\n") % tmp;
+					} else {
+						utils::format("pwd: Filesystem fail.\n");
+					}
 					f = true;
 				} else if(cmd_.cmp_word(0, "date")) {
 					if(cmdn == 1) {

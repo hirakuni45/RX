@@ -14,7 +14,7 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/rspi_io.hpp"
-#include "common/spi_io.hpp"
+#include "common/spi_io2.hpp"
 #include "ff13c/mmc_io.hpp"
 #include "common/sdc_man.hpp"
 
@@ -47,19 +47,19 @@ namespace {
 	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;
 	typedef device::PORT<device::PORT2, device::bitpos::B3> MOSI;
 	typedef device::PORT<device::PORT2, device::bitpos::B4> SPCK;
-	typedef device::spi_io<MISO, MOSI, SPCK> SPI;
+	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;
 #else
 	// RSPI SDC 用　SPI 定義（RSPI0）
-	typedef device::rspi_io<device::RSPI0> SPI;
+	typedef device::rspi_io<device::RSPI0> SDC_SPI;
 #endif
-	SPI 	spi_;
+	SDC_SPI		sdc_spi_;
 
 	typedef device::PORT<device::PORT6, device::bitpos::B5> SDC_SELECT;	///< カード選択信号
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
 
-	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;
-	MMC		mmc_(spi_, 20000000);
+	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;
+	MMC		mmc_(sdc_spi_, 20000000);
 
 	utils::sdc_man	sdc_;
 
