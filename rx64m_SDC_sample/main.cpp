@@ -19,7 +19,7 @@
 #include "common/spi_io.hpp"
 #include "common/spi_io2.hpp"
 #include "ff13c/mmc_io.hpp"
-#include "common/sdc_man.hpp"
+#include "common/file_io.hpp"
 #include "common/string_utils.hpp"
 
 // #define SDHI_IF
@@ -59,8 +59,6 @@ namespace {
 
 	MMC		sdh_(spi_, 20000000);
 #endif
-	typedef utils::sdc_man SDC;
-	SDC		sdc_;
 
 	utils::command<256> cmd_;
 
@@ -92,14 +90,14 @@ namespace {
 	bool create_test_file_(const char* fname, uint32_t size)
 	{
 		uint8_t buff[512];
-		FIL fp;
+		utils::file_io fio;
 
 		for(uint16_t i = 0; i < sizeof(buff); ++i) {
 			buff[i] = rand_();
 		}
 
 		auto st = cmt_.get_counter();
-		if(!sdc_.open(&fp, fname, FA_WRITE | FA_CREATE_ALWAYS)) {
+		if(!fio.open(fname, "wb")) {
 			utils::format("Can't create file: '%s'\n") % fname;
 			return false;
 		}
@@ -112,15 +110,14 @@ namespace {
 		while(rs > 0) {
 			UINT sz = sizeof(buff);
 			if(sz > rs) sz = rs;
-			UINT bw;
-			f_write(&fp, buff, sz, &bw);
+			auto bw = fio.write(buff, sz);
 			rs -= bw;
 		}
 		ed = cmt_.get_counter();
 		uint32_t twrite = ed - st;
 		st = ed;
 
-		f_close(&fp);
+		fio.close();
 		ed = cmt_.get_counter();
 		uint32_t tclose = ed - st;
 
@@ -295,15 +292,6 @@ extern "C" {
 			sci_puts("Stall RTC write...\n");
 		}
 	}
-
-
-	bool check_mount_() {
-		auto f = sdc_.get_mount();
-		if(!f) {
-			utils::format("SD card not mount.\n");
-		}
-		return f;
-	}
 }
 
 int main(int argc, char** argv);
@@ -340,7 +328,6 @@ int main(int argc, char** argv)
 #endif
 	{  // SD カード・クラスの初期化
 		sdh_.start();
-		sdc_.start();
 	}
 
 	// 電圧検出の表示
@@ -357,7 +344,7 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
-		sdc_.service(sdh_.service());
+		auto mount = sdh_.service();
 
 		// コマンド入力と、コマンド解析
 		if(cmd_.service()) {
@@ -365,29 +352,29 @@ int main(int argc, char** argv)
 			if(cmdn >= 1) {
 				bool f = false;
 				if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-					if(check_mount_()) {
+					if(!mount) {
+						utils::format("No mount SD-card.\n");
+					} else {
 						if(cmdn >= 2) {
 							char tmp[128];
 							cmd_.get_word(1, tmp, sizeof(tmp));
-							sdc_.dir(tmp);
+							utils::file_io::dir(tmp);
 						} else {
-							sdc_.dir("");
+							utils::file_io::dir("");
 						}
 					}
 					f = true;
 				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-					if(check_mount_()) {
-						if(cmdn >= 2) {
-							char tmp[128];
-							cmd_.get_word(1, tmp, sizeof(tmp));
-							sdc_.cd(tmp);						
-						} else {
-							sdc_.cd("/");
-						}
+					if(cmdn >= 2) {
+						char tmp[128];
+						cmd_.get_word(1, tmp, sizeof(tmp));
+						utils::file_io::cd(tmp);						
+					} else {
+						utils::file_io::cd("/");
 					}
 					f = true;
 				} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-					utils::format("%s\n") % sdc_.get_current();
+					utils::format("%s\n") % utils::file_io::pwd();
 					f = true;
 				} else if(cmd_.cmp_word(0, "date")) {
 					if(cmdn == 1) {
@@ -403,7 +390,11 @@ int main(int argc, char** argv)
 ///					SDC_POWER::P = 0;
 ///					f = true;
 				} else if(cmd_.cmp_word(0, "test")) {
-					create_test_file_("write_test.bin", 1024 * 1024);
+					if(!mount) {
+						utils::format("No mount SD-card.\n");
+					} else {
+						create_test_file_("write_test.bin", 1024 * 1024);
+					}
 					f = true;
 				} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
 					utils::format("date\n");
