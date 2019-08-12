@@ -452,6 +452,7 @@ namespace {
 				uint8_t tmp[1024];
 				while(pos < fio.get_file_size()) {
 					pos += fio.read(tmp, 1024);
+					utils::format("=@=");
 					vTaskDelay(25 / portTICK_PERIOD_MS);
 				}
 				utils::format("Scan Task: %u bytes\n") % pos;
