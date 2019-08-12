@@ -25,7 +25,7 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
 				FreeRTOS/Source/portable/GCC/RX600v2/port.c \
-				FreeRTOS/Source/portable/MemMang/heap_3.c \
+				FreeRTOS/Source/portable/MemMang/heap_1.c \
 				FreeRTOS/Source/croutine.c \
 				FreeRTOS/Source/event_groups.c \
 				FreeRTOS/Source/list.c \
@@ -43,7 +43,8 @@ LDSCRIPT	=	../../$(ROOT_DEV)/$(DEVICE).ld
 USER_DEFS	=	SIG_$(ROOT_DEV) \
 				F_ICLK=80000000 \
 				F_FCLK=20000000 \
-				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKD=40000000
+				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKD=40000000 \
+				RTOS
 
 AS_DEFS		=	--defsym NOT_USER=1
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
