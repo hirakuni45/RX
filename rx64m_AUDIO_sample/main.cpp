@@ -28,10 +28,9 @@
 #include "common/input.hpp"
 #include "common/command.hpp"
 #include "common/rspi_io.hpp"
-#include "common/spi_io.hpp"
 #include "common/spi_io2.hpp"
 #include "ff13c/mmc_io.hpp"
-#include "common/sdc_man.hpp"
+#include "common/dir_list.hpp"
 #include "common/string_utils.hpp"
 #include "common/tpu_io.hpp"
 #include "sound/sound_out.hpp"
@@ -79,14 +78,13 @@ namespace {
 	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;  ///< カード選択信号
 	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;  ///< カード検出
 #endif
-	SPI		spi_;
+	SPI					spi_;
 
 	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   ///< ハードウェアー定義
 
-	MMC		sdh_(spi_, 25000000);
-
-	typedef utils::sdc_man SDC;
-	SDC		sdc_;
+	MMC					sdh_(spi_, 35000000);
+	typedef utils::dir_list DLIST;
+	DLIST				dlist_;
 
 	utils::command<256> cmd_;
 
@@ -151,27 +149,19 @@ namespace {
 	{
 		auto ctrl = sound::af_play::CTRL::NONE;
 
-#if 0
-		uint8_t level = famipad_.update();
-		uint8_t ptrg = ~pad_level_ &  level;
-		uint8_t ntrg =  pad_level_ & ~level;
-		pad_level_ = level;
-
-		if(chip::on(ptrg, chip::FAMIPAD_ST::SELECT)) {
-			ctrl = sound::af_play::CTRL::PAUSE;
+		if(sci_.recv_length() > 0) {
+			auto ch = sci_.getch();
+			if(ch == ' ') {			
+				ctrl = sound::af_play::CTRL::PAUSE;
+			} else if(ch == 0x08) {  // BS
+				ctrl = sound::af_play::CTRL::REPLAY;
+			} else if(ch == 0x0D) {  // RETURN
+				ctrl = sound::af_play::CTRL::STOP;
+			} else if(ch == 0x1b) {  // ESC
+				ctrl = sound::af_play::CTRL::STOP;
+				dlist_.stop();
+			}
 		}
-		if(chip::on(ptrg, chip::FAMIPAD_ST::RIGHT)) {
-			ctrl = sound::af_play::CTRL::STOP;
-		}
-		if(chip::on(ptrg, chip::FAMIPAD_ST::LEFT)) {
-			ctrl = sound::af_play::CTRL::REPLAY;
-		}
-		if(chip::on(ptrg, chip::FAMIPAD_ST::START)) {
-			ctrl = sound::af_play::CTRL::STOP;
-			sdc_.stall_dir_list();
-			render_.clear(RENDER::COLOR::Black);
-		}
-#endif
 		update_led_();
 
 		return ctrl;
@@ -230,12 +220,11 @@ namespace {
 
 	void play_loop_(const char*, const char*);
 
-
 	struct loop_t {
 		const char*	start;
 		bool	enable;
 	};
-
+	loop_t		loop_t_;
 
 	void play_loop_func_(const char* name, const FILINFO* fi, bool dir, void* option)
 	{
@@ -252,10 +241,14 @@ namespace {
 		} else {
 			const char* ext = strrchr(name, '.');
 			if(ext != nullptr) {
-				if(strcmp(ext, ".mp3") == 0) {
-					play_mp3_(name);
-				} else if(strcmp(ext, ".wav") == 0) {
-					play_wav_(name);
+				bool ret = true; 
+				if(utils::str::strcmp_no_caps(ext, ".mp3") == 0) {
+					ret = play_mp3_(name);
+				} else if(utils::str::strcmp_no_caps(ext, ".wav") == 0) {
+					ret = play_wav_(name);
+				}
+				if(!ret) {
+					utils::format("Can't open audio file: '%s'\n") % name;
 				}
 			}
 		}
@@ -264,15 +257,14 @@ namespace {
 
 	void play_loop_(const char* root, const char* start)
 	{
-		loop_t t;
-		t.start = start;
+
+		loop_t_.start = start;
 		if(strlen(start) != 0) {
-			t.enable = true;
+			loop_t_.enable = true;
 		} else {
-			t.enable = false;
+			loop_t_.enable = false;
 		}
-		sdc_.set_dir_list_limit(1);
-		sdc_.start_dir_list(root, play_loop_func_, true, &t);
+		dlist_.start(root);
 	}
 }
 
@@ -353,13 +345,7 @@ extern "C" {
 
 
 	bool check_mount_() {
-		return sdc_.get_mount();
-	}
-
-
-	int make_full_path(const char* src, char* dst, uint16_t len)
-	{
-		return sdc_.make_full_path(src, dst, len);
+		return sdh_.get_mount();
 	}
 }
 
@@ -402,7 +388,6 @@ int main(int argc, char** argv)
 
 	{  // SD カード・クラスの初期化
 		sdh_.start();
-		sdc_.start();
 	}
 
 	// 波形メモリーの無音状態初期化
@@ -432,7 +417,8 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
-		sdc_.service(sdh_.service());
+		sdh_.service();
+		dlist_.service(1, play_loop_func_, true, &loop_t_);
 
 		// コマンド入力と、コマンド解析
 		if(cmd_.service()) {
@@ -445,9 +431,9 @@ int main(int argc, char** argv)
 						if(cmdn >= 2) {
 							char tmp[128];
 							cmd_.get_word(1, tmp, sizeof(tmp));
-							sdc_.dir(tmp);
+							utils::file_io::dir(tmp);
 						} else {
-							sdc_.dir("");
+							utils::file_io::dir("");
 						}
 					}
 					f = true;
@@ -456,14 +442,17 @@ int main(int argc, char** argv)
 						if(cmdn >= 2) {
 							char tmp[128];
 							cmd_.get_word(1, tmp, sizeof(tmp));
-							sdc_.cd(tmp);
+							utils::file_io::cd(tmp);
 						} else {
-							sdc_.cd("/");
+							utils::file_io::cd("/");
 						}
 					}
 					f = true;
 				} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-					utils::format("%s\n") % sdc_.get_current();
+					char tmp[256];
+					tmp[0] = 0;
+					utils::file_io::pwd(tmp, sizeof(tmp));
+					utils::format("%s\n") % tmp;
 					f = true;
 				} else if(cmd_.cmp_word(0, "play")) {  // play [xxx]
 					if(cmdn >= 2) {
