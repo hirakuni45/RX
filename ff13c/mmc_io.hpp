@@ -107,7 +107,8 @@ namespace fatfs {
 			lock_();
 			SEL::P = 1;
 			unlock_();
-			volatile BYTE d = spi_.xchg();	/* Dummy clock (force DO hi-z for multiple slave SPI) */
+			/* Dummy clock (force DO hi-z for multiple slave SPI) */
+			volatile BYTE d = spi_.xchg();
 		}
 
 
@@ -149,7 +150,6 @@ namespace fatfs {
 #endif
 			spi_.recv(buff, btr);			/* Receive the data block into buffer */
 			spi_.recv(d, 2);				/* Discard CRC */
-
 			return 1;						/* Return with success */
 		}
 
@@ -263,9 +263,8 @@ namespace fatfs {
 		{
 			if(init_port_) return;
 
-			lock_();
-
 			if(POW::BIT_POS < 32) {
+				lock_();
 				POW::DIR = 1;
 				POW::P = 1;  // power off
 				POW::PU = 0;
@@ -274,15 +273,18 @@ namespace fatfs {
 				SEL::PU = 0;
 			  // ※電源 OFF 時は、SEL を「１」にすると、SEL から電流が流れるので、「０」にする
 				SEL::P = 0;
+				unlock_();
 			} else {
+				lock_();
 				SEL::DIR = 1;
 				SEL::PU = 0;
 				SEL::P = 1;
+				unlock_();
 			}
 
+			lock_();
 			CDT::DIR = 0;
 			CDT::PU  = 1;  // 内部プルアップは標準では有効にしておく
-
 			unlock_();
 
 			init_port_ = true;
@@ -322,8 +324,10 @@ namespace fatfs {
 		{
 			if (drv) return RES_NOTRDY;
 
+			lock_();
 			SEL::P = 1;
 			SEL::PU = 0;
+			unlock_();
 
 			utils::delay::milli_second(100);  // 100ms
 
