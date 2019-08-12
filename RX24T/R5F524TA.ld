@@ -15,9 +15,9 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX24TA chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00003F00 /* 16K - stack_size (0x100) */
-	USTACK (w) : ORIGIN = 0x00003FC0, LENGTH = 4 /* ustack 192 bytes */
-	ISTACK (w) : ORIGIN = 0x00004000, LENGTH = 4 /* istack 64 bytes  */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x00003C00 /* 16K - stack_size (0x400) */
+	USTACK (w) : ORIGIN = 0x00003F00, LENGTH = 4 /* ustack 768 bytes */
+	ISTACK (w) : ORIGIN = 0x00004000, LENGTH = 4 /* istack 256 bytes  */
 	ROM (w)    : ORIGIN = 0xFFFC0000, LENGTH = 0x0003FFD0 /* 256K */
 }
 
