@@ -33,7 +33,6 @@
 #include "common/spi_io2.hpp"
 #include "common/rspi_io.hpp"
 #include "ff13c/mmc_io.hpp"
-#include "common/sdc_man.hpp"
 #include "common/command.hpp"
 #include "common/file_io.hpp"
 
