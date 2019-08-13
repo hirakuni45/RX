@@ -1,7 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	MMC（SD カード）FatFS ドライバー
+	@brief	MMC/FatFS ドライバー @n
+			SD カード、SPI/MMC モードでアクセス @n
+			FreeRTOS 対応（「RTOS」を define）
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -20,14 +22,26 @@ namespace fatfs {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MMC テンプレートクラス
-		@param[in]	SPI	SPI クラス
-		@param[in]	SEL	デバイス選択クラス
-		@param[in]	POW	電源操作クラス
-		@param[in]	CDT	カード検出クラス
+		@param[in]	SPI	SPI-IF クラス
+		@param[in]	SEL	デバイス選択ポート・クラス
+		@param[in]	POW	電源制御ポート・クラス（制御を行わない場合は「NULL_PORT」とする）
+		@param[in]	CDT	カード検出ポート・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SPI, class SEL, class POW, class CDT>
 	class mmc_io {
+
+		inline void lock_() {
+#ifdef RTOS
+			vTaskEnterCritical();
+#endif
+		}
+
+		inline void unlock_() {
+#ifdef RTOS
+			vTaskExitCritical();
+#endif
+		}
 
 		// MMC card type flags (MMC_GET_TYPE)
 		static const BYTE CT_MMC   = 0x01;	///< MMC ver 3
@@ -75,21 +89,6 @@ namespace fatfs {
 			CMD55 = 55,			/* APP_CMD */
 			CMD58 = 58,			/* READ_OCR */
 		};
-
-
-		inline void lock_() {
-#ifdef RTOS
-			vTaskEnterCritical();
-#endif
-		}
-
-
-		inline void unlock_() {
-#ifdef RTOS
-			vTaskExitCritical();
-#endif
-		}
-
 
 		/* 1:OK, 0:Timeout */
 		int wait_ready_() {

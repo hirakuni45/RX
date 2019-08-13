@@ -2,8 +2,8 @@
 //=====================================================================//
 /*!	@file
 	@brief	ファイル・入出力クラス @n
-			※ fopen 系の機能を提供するクラス。@n
-			※ FATFS が必要
+			※ FatFs のラッパー（ff13c 以降が必要） @n
+			※ fopen ぽい機能を提供する。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -14,8 +14,8 @@
 #  error "file_io.hpp requires FAT_FS to be defined and include FATFS module"
 #endif
 
-#include "common/format.hpp"
 #include "common/string_utils.hpp"
+#include "common/format.hpp"
 #include "common/dir_list.hpp"
 
 namespace utils {
