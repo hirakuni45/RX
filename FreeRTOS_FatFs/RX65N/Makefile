@@ -44,7 +44,7 @@ CSOURCES	=	common/init.c \
 PSOURCES	=	FreeRTOS_FatFs/main.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++
+USER_LIBS	=	supc++ mad
 
 LDSCRIPT	=	../../$(ROOT_DEV_)/$(DEVICE).ld
 
@@ -82,7 +82,8 @@ INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/portable/GCC/RX600v2 \
 				../../RX65x/drw_2d_ver1.02/inc/tes
 
-LIB_ROOT	=	../../RX65x/drw_2d_ver1.02
+LIB_ROOT	=	../../RX65x/drw_2d_ver1.02 \
+				../../libmad/.libs
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

@@ -7,9 +7,6 @@
 			RX65N (Renesas Envision kit RX65N): @n
 					12MHz のベースクロックを使用する @n
 			　　　　P70 に接続された LED を利用する @n
-			RX63T @n
-					12MHz のベースクロックを使用する @n
-					PB7 に接続された LED を利用する @n
 			RX24T: @n
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する @n
@@ -36,8 +33,16 @@
 #include "common/command.hpp"
 #include "common/file_io.hpp"
 
+#include "common/tpu_io.hpp"
+#include "sound/sound_out.hpp"
+#include "sound/wav_in.hpp"
+#include "sound/mp3_in.hpp"
+
 #include "FreeRTOS.h"
 #include "task.h"
+
+// オーディオ再生を行う場合有効にする
+#define PLAY_AUDIO
 
 #ifdef SIG_RX64M
 // RX64Mで、GR-KAEDE の場合有効にする
@@ -127,12 +132,6 @@ namespace {
 	static const uint32_t sdc_spi_speed_ = 30000000;
 	static const char* system_str_ = { "RX65N" };
 
-#elif defined(SIG_RX63T)
-	typedef device::system_io<12000000> SYSTEM_IO;
-	typedef device::PORT<device::PORTB, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX63T" };
-
 #elif defined(SIG_RX24T)
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
@@ -187,9 +186,206 @@ namespace {
 
 	typedef utils::command<256> CMD_LINE;
 	CMD_LINE	cmd_;
+
+#ifdef PLAY_AUDIO
+	volatile uint32_t	wpos_;
+
+	/// DMAC 終了割り込み
+	class dmac_term_task {
+	public:
+		void operator() () {
+			device::DMAC0::DMCNT.DTE = 1;  // DMA を再スタート
+			wpos_ = 0;
+		}
+	};
+
+	typedef device::dmac_mgr<device::DMAC0, dmac_term_task> DMAC_MGR;
+	DMAC_MGR	dmac_mgr_;
+
+	uint32_t get_wave_pos_() { return (dmac_mgr_.get_count() & 0x3ff) ^ 0x3ff; }
+
+	typedef device::R12DA DAC;
+	typedef device::dac_out<DAC> DAC_OUT;
+	DAC_OUT		dac_out_;
+
+	typedef utils::sound_out<8192, 1024> SOUND_OUT;
+	SOUND_OUT	sound_out_;
+
+	class tpu_task {
+	public:
+		void operator() () {
+			uint32_t tmp = wpos_;
+			++wpos_;
+			if((tmp ^ wpos_) & 64) {
+				sound_out_.service(64);
+			}
+		}
+	};
+
+	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
+	TPU0		tpu0_;	
+
+	typedef sound::mp3_in MP3_IN;
+	MP3_IN		mp3_in_;
+	typedef sound::wav_in WAV_IN;
+	WAV_IN		wav_in_;
+
+	typedef utils::dir_list DLIST;
+	DLIST		dlist_;
+
+
+	void update_led_()
+	{
+		static uint8_t n = 0;
+		++n;
+		if(n >= 30) {
+			n = 0;
+		}
+		vTaskEnterCritical();
+		if(n < 10) {
+			LED::P = 0;
+		} else {
+			LED::P = 1;
+		}
+		vTaskExitCritical();
+	}
+
+
+	sound::af_play::CTRL sound_ctrl_task_()
+	{
+		auto ctrl = sound::af_play::CTRL::NONE;
+#if 0
+		if(sci_.recv_length() > 0) {
+			auto ch = sci_.getch();
+			if(ch == ' ') {			
+				ctrl = sound::af_play::CTRL::PAUSE;
+			} else if(ch == 0x08) {  // BS
+				ctrl = sound::af_play::CTRL::REPLAY;
+			} else if(ch == 0x0D) {  // RETURN
+				ctrl = sound::af_play::CTRL::STOP;
+			} else if(ch == 0x1b) {  // ESC
+				ctrl = sound::af_play::CTRL::STOP;
+				dlist_.stop();
+			}
+		}
+#endif
+		update_led_();
+
+		return ctrl;
+	}
+
+
+	void sound_tag_task_(utils::file_io& fin, const sound::tag_t& tag)
+	{
+		utils::format("Album:  '%s'\n") % tag.get_album().c_str();
+		utils::format("Title:  '%s'\n") % tag.get_title().c_str();
+		utils::format("Artist: '%s'\n") % tag.get_artist().c_str();
+		utils::format("Year:    %s\n") % tag.get_year().c_str();
+		utils::format("Disc:    %s\n") % tag.get_disc().c_str();
+		utils::format("Track:   %s\n") % tag.get_track().c_str();
+	}
+
+
+	void sound_update_task_(uint32_t t)
+	{
+		uint16_t sec = t % 60;
+		uint16_t min = (t / 60) % 60;
+		uint16_t hor = (t / 3600) % 24;
+		utils::format("\r%02d:%02d:%02d") % hor % min % sec;
+	}
+
+
+	bool play_mp3_(const char* fname)
+	{
+		utils::file_io fin;
+		if(!fin.open(fname, "rb")) {
+			return false;
+		}
+		mp3_in_.set_ctrl_task(sound_ctrl_task_);
+		mp3_in_.set_tag_task(sound_tag_task_);
+		mp3_in_.set_update_task(sound_update_task_);
+		bool ret = mp3_in_.decode(fin, sound_out_);
+		fin.close();
+		return ret;
+	}
+
+
+	bool play_wav_(const char* fname)
+	{
+		utils::file_io fin;
+		if(!fin.open(fname, "rb")) {
+			return false;
+		}
+		wav_in_.set_ctrl_task(sound_ctrl_task_);
+		wav_in_.set_tag_task(sound_tag_task_);
+		wav_in_.set_update_task(sound_update_task_);
+		bool ret = wav_in_.decode(fin, sound_out_);
+		fin.close();
+		return ret;
+	}
+
+
+	void play_loop_(const char*, const char*);
+
+	struct loop_t {
+		const char*	start;
+		bool	enable;
+	};
+	loop_t		loop_t_;
+
+	void play_loop_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+	{
+		loop_t* t = static_cast<loop_t*>(option);
+		if(t->enable) {
+			if(strcmp(name, t->start) != 0) {
+				return;
+			} else {
+				t->enable = false;
+			}
+		}
+		if(dir) {
+			play_loop_(name, "");
+		} else {
+			const char* ext = strrchr(name, '.');
+			if(ext != nullptr) {
+				bool ret = true; 
+				if(utils::str::strcmp_no_caps(ext, ".mp3") == 0) {
+					ret = play_mp3_(name);
+				} else if(utils::str::strcmp_no_caps(ext, ".wav") == 0) {
+					ret = play_wav_(name);
+				}
+				if(!ret) {
+					utils::format("Can't open audio file: '%s'\n") % name;
+				}
+			}
+		}
+	}
+
+
+	void play_loop_(const char* root, const char* start)
+	{
+		loop_t_.start = start;
+		if(strlen(start) != 0) {
+			loop_t_.enable = true;
+		} else {
+			loop_t_.enable = false;
+		}
+		dlist_.start(root);
+	}
+#endif
 }
 
 extern "C" {
+
+#ifdef PLAY_AUDIO
+	void set_sample_rate(uint32_t freq)
+	{
+		uint8_t intr_level = 5;
+		if(!tpu0_.start(freq, intr_level)) {
+			utils::format("TPU0 start error...\n");
+		}
+	}
+#endif
 
 	// syscalls.c から呼ばれる、標準出力（stdout, stderr）
 	void sci_putch(char ch)
@@ -344,14 +540,14 @@ extern "C" {
 
 namespace {
 
-	struct scan_t {
+	struct name_t {
 		char filename_[64];
 		volatile uint32_t put_;
 		volatile uint32_t get_;
-		scan_t() : filename_{ 0 }, put_(0), get_(0) { }
+		name_t() : filename_{ 0 }, put_(0), get_(0) { }
 	};
 
-	scan_t		scan_t_;
+	name_t		name_t_;
 
 	void shell_()
 	{
@@ -359,21 +555,25 @@ namespace {
             uint8_t cmdn = cmd_.get_words();
             if(cmdn >= 1) {
                 if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
+					bool f = true;
 					char tmp[FF_MAX_LFN + 1];
 					if(cmdn == 1) {
-						strcpy(tmp, utils::file_io::pwd());
+						if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
+							utils::format("Fail: 'pwd'\n");
+							f = false;
+						}
 					} else {
 						cmd_.get_word(1, tmp, sizeof(tmp));
 					}
-					if(!utils::file_io::dir(tmp)) {
-						utils::format("Directory path fail: '%s'\n") % tmp;
+					if(f) {
+						utils::file_io::dir(tmp);
 					}
 				} else if(cmd_.cmp_word(0, "pwd")) {  // pwd
-					const char* path = utils::file_io::pwd();
-					if(path == nullptr) {
+					char tmp[FF_MAX_LFN + 1];
+					if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
 						utils::format("pwd fail\n");
 					} else {
-						utils::format("%s\n") % path;
+						utils::format("%s\n") % tmp;
 					}
 				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
 					char tmp[FF_MAX_LFN + 1];
@@ -385,20 +585,36 @@ namespace {
 					if(!utils::file_io::cd(tmp)) {
 						utils::format("Change directory fail: '%s'\n") % tmp;
 					}
-				} else if(cmd_.cmp_word(0, "scan")) {  // scan
-					if(cmdn >= 1) {
-						if(scan_t_.get_ != scan_t_.put_) {
-							utils::format("Scan task is busy !\n");
+#ifdef PLAY_AUDIO
+				} else if(cmd_.cmp_word(0, "play")) {  // play [xxx]
+					if(cmdn >= 2) {
+						if(name_t_.get_ != name_t_.put_) {
+							utils::format("Audio task is busy !\n");
 						} else {
-							cmd_.get_word(1, scan_t_.filename_, sizeof(scan_t_.filename_));
-							scan_t_.put_++;
+							cmd_.get_word(1, name_t_.filename_, sizeof(name_t_.filename_));
+							name_t_.put_++;
 						}
 					}
+#else
+				} else if(cmd_.cmp_word(0, "scan")) {  // scan
+					if(cmdn >= 2) {
+						if(name_t_.get_ != name_t_.put_) {
+							utils::format("Scan task is busy !\n");
+						} else {
+							cmd_.get_word(1, name_t_.filename_, sizeof(name_t_.filename_));
+							name_t_.put_++;
+						}
+					}
+#endif
 				} else if(cmd_.cmp_word(0, "help")) {  // help
 					utils::format("    pwd           list current path\n");
 					utils::format("    cd [path]     change current directory\n");
 					utils::format("    dir [path]    list current directory\n");
+#ifdef PLAY_AUDIO
+					utils::format("    play file     play audio file (wav, mp3)\n");
+#else
 					utils::format("    scan [file]   scan file (read 1024 bytes after wait 25ms)\n");
+#endif
 				} else {
 					char tmp[256];
 					cmd_.get_word(0, tmp, sizeof(tmp));
@@ -439,13 +655,30 @@ namespace {
 	void scan_task_(void *pvParameters)
 	{
 		while(1) {
-			while(scan_t_.get_ == scan_t_.put_) {
+#ifdef PLAY_AUDIO
+			while(name_t_.get_ == name_t_.put_) {
+				vTaskDelay(100 / portTICK_PERIOD_MS);
+				dlist_.service(1, play_loop_func_, true, &loop_t_);
+			}
+
+			if(strlen(name_t_.filename_) == 0) {
+				play_loop_("", "");
+			} else {
+				if(std::strcmp(name_t_.filename_, "*") == 0) {
+					play_loop_("", "");
+				} else {
+					play_loop_("", name_t_.filename_);
+				}
+			}
+			name_t_.get_++;
+#else
+			while(name_t_.get_ == name_t_.put_) {
 				vTaskDelay(100 / portTICK_PERIOD_MS);
 			}
 			utils::file_io fio;
-			if(!fio.open(scan_t_.filename_, "rb")) {
-				utils::format("Can't open: '%s'\n") % scan_t_.filename_;
-				scan_t_.get_++;
+			if(!fio.open(name_t_.filename_, "rb")) {
+				utils::format("Can't open: '%s'\n") % name_t_.filename_;
+				name_t_.get_++;
 			} else {
 				uint32_t pos = 0;
 				uint8_t tmp[1024];
@@ -455,9 +688,10 @@ namespace {
 					vTaskDelay(25 / portTICK_PERIOD_MS);
 				}
 				utils::format("Scan Task: %u bytes\n") % pos;
-				scan_t_.get_++;
+				name_t_.get_++;
 				fio.close();
 			}
+#endif
 		}
 	}
 }
@@ -495,6 +729,34 @@ int main(int argc, char** argv)
 	}
 #endif
 
+#ifdef PLAY_AUDIO
+	{  // 内臓１２ビット D/A の設定
+		bool amp_ena = true;
+		dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
+		dac_out_.out0(0x8000);
+		dac_out_.out1(0x8000);
+	}
+
+	{  // 波形メモリーの無音状態初期化
+		sound_out_.mute();
+	}
+
+	{  // サンプリング・タイマー設定
+		set_sample_rate(44100);
+	}
+
+	{  // DMAC マネージャー開始
+		uint8_t intr_level = 4;
+		bool cpu_intr = true;
+		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
+			reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
+			sound_out_.size(), intr_level, cpu_intr);
+		if(!ret) {
+			utils::format("DMAC Not start...\n");
+		}
+	}
+#endif
+
 	auto clk = F_ICLK / 1000000;
 	utils::format("\nStart FreeRTOS FatFs sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
@@ -511,7 +773,7 @@ int main(int argc, char** argv)
 		xTaskCreate(led_task_, "LED", stack_size, param, prio, nullptr);
 	}
 	{
-		uint32_t stack_size = 2048;
+		uint32_t stack_size = 8192;
 		void* param = nullptr;
 		uint32_t prio = 1;
 		xTaskCreate(scan_task_, "SCAN", stack_size, param, prio, nullptr);
