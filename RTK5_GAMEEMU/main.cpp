@@ -16,8 +16,6 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/spi_io2.hpp"
-#include "ff13c/mmc_io.hpp"
-#include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
 #include "sound/sound_out.hpp"
 #include "graphics/font8x16.hpp"
@@ -87,8 +85,6 @@ namespace {
 
 	MMC			sdh_(spi_, 20000000);
 #endif
-	typedef utils::sdc_man SDC;
-	SDC			sdc_;
 
 	volatile uint32_t	wpos_;
 
@@ -137,8 +133,8 @@ namespace {
 	typedef graphics::render<GLCDC_IO, FONT> RENDER;
 	RENDER		render_(glcdc_io_, font_);
 
-	typedef gui::filer<RENDER, SDC> FILER;
-	FILER		filer_(render_, sdc_);
+	typedef gui::filer<RENDER> FILER;
+	FILER		filer_(render_);
 
 //	emu::nesemu		nesemu_;
 
@@ -146,67 +142,11 @@ namespace {
 
 	uint8_t			fami_pad_data_;
 
-	bool check_mount_() {
-		auto f = sdc_.get_mount();
-		return f;
-	}
-
 #if 0
 	void command_()
 	{
 		if(!cmd_.service()) {
 			return;
-		}
-
-		uint8_t cmdn = cmd_.get_words();
-		if(cmdn >= 1) {
-			bool f = false;
-			if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, sizeof(tmp), tmp);
-						sdc_.dir(tmp);
-					} else {
-						sdc_.dir("");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, sizeof(tmp), tmp);
-						sdc_.cd(tmp);						
-					} else {
-						sdc_.cd("/");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-				utils::format("%s\n") % sdc_.get_current();
-				f = true;
-			} else if(cmd_.cmp_word(0, "nes")) {
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, sizeof(tmp), tmp);
-///						f = nesemu_.open(tmp);						
-					}
-				}
-			} else if(cmd_.cmp_word(0, "help")) {
-				utils::format("    dir [path]\n");
-				utils::format("    cd [path]\n");
-				utils::format("    pwd\n");
-				utils::format("    nes path\n");
-				f = true;
-			}
-			if(!f) {
-				char tmp[128];
-				if(cmd_.get_word(0, sizeof(tmp), tmp)) {
-					utils::format("Command error: '%s'\n") % tmp;
-				}
-			}
 		}
 	}
 #endif
@@ -309,17 +249,6 @@ extern "C" {
 ///		rtc_.get_time(t);
 		return utils::str::get_fattime(t);
 	}
-
-
-	int fatfs_get_mount() {
-		return sdc_.get_mount();
-	}
-
-
-	int make_full_path(const char* src, char* dst, uint16_t len)
-	{
-		return sdc_.make_full_path(src, dst, len);
-	}
 }
 
 int main(int argc, char** argv);
@@ -342,7 +271,6 @@ int main(int argc, char** argv)
 
 	{  // SD カード・クラスの初期化
 		sdh_.start();
-		sdc_.start();
 	}
 
 	// 波形メモリーの無音状態初期化
@@ -400,7 +328,7 @@ int main(int argc, char** argv)
 	uint8_t n = 0;
 	uint8_t flt = 0;
 	bool filer = false;
-	bool mount = check_mount_();
+	bool mount = sdh_.get_mount();
 	while(1) {
 		glcdc_io_.sync_vpos();
 		fami_pad_data_ = famipad_.update();
@@ -421,7 +349,7 @@ int main(int argc, char** argv)
 		}
 
 		{
-			bool m = check_mount_();
+			bool m = sdh_.get_mount();
 			if(!mount && m) {
 				render_.set_fore_color(graphics::def_color::Black);
 				render_.fill_box(vtx::srect(480-24, 0, 24, 16));
@@ -453,7 +381,7 @@ int main(int argc, char** argv)
 			char path[256];
 			if(filer_.update(ctrl, path, sizeof(path))) {
 				char tmp[256];
-				sdc_.make_full_path(path, tmp, sizeof(tmp));
+				utils::file_io::make_full_path(path, tmp, sizeof(tmp));
 ///				nesemu_.close();
 ///				if(nesemu_.open(tmp)) {
 ///					filer = false;
@@ -465,7 +393,7 @@ int main(int argc, char** argv)
 ///			update_nesemu_();
 		}
 
-		sdc_.service(sdh_.service());
+		sdh_.service();
 
 //		command_();
 
