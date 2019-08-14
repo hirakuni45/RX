@@ -12,9 +12,8 @@
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/shell.hpp"
 #include "common/spi_io2.hpp"
-#include "ff13c/mmc_io.hpp"
-#include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
 #include "sound/sound_out.hpp"
 
@@ -79,8 +78,6 @@ namespace {
 
 	MMC			sdh_(spi_, 35000000);
 #endif
-	typedef utils::sdc_man SDC;
-	SDC			sdc_;
 
 	volatile uint32_t	wpos_;
 
@@ -122,16 +119,10 @@ namespace {
 	typedef emu::spinv SPINV;
 	SPINV		spinv_;
 
-	utils::command<256> cmd_;
-
-	bool check_mount_() {
-		auto f = sdc_.get_mount();
-		if(!f) {
-			utils::format("SD card not mount.\n");
-		}
-		return f;
-	}
-
+	typedef utils::command<256> CMD;
+	CMD			cmd_;
+	typedef utils::shell<CMD> SHELL;
+	SHELL		shell_(cmd_);
 
 	void command_()
 	{
@@ -139,46 +130,14 @@ namespace {
 			return;
 		}
 
-		uint8_t cmdn = cmd_.get_words();
-		if(cmdn >= 1) {
-			bool f = false;
-			if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						sdc_.dir(tmp);
-					} else {
-						sdc_.dir("");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						sdc_.cd(tmp);						
-					} else {
-						sdc_.cd("/");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-				utils::format("%s\n") % sdc_.get_current();
-				f = true;
-			} else if(cmd_.cmp_word(0, "help")) {
-				utils::format("    dir [path]\n");
-				utils::format("    cd [path]\n");
-				utils::format("    pwd\n");
-				f = true;
-			}
-			if(!f) {
-				char tmp[128];
-				if(cmd_.get_word(0, tmp, sizeof(tmp))) {
-					utils::format("Command error: '%s'\n") % tmp;
-				}
-			}
+		if(shell_.analize()) {
+			return;
+		}
+
+		if(cmd_.cmp_word(0, "help")) {
+			shell_.help();
+		} else {
+			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
 	}
 }
@@ -255,17 +214,6 @@ extern "C" {
 ///		rtc_.get_time(t);
 		return utils::str::get_fattime(t);
 	}
-
-
-	int fatfs_get_mount() {
-		return sdc_.get_mount();
-	}
-
-
-	int make_full_path(const char* src, char* dst, uint16_t len)
-	{
-		return sdc_.make_full_path(src, dst, len);
-	}
 }
 
 int main(int argc, char** argv);
@@ -288,7 +236,6 @@ int main(int argc, char** argv)
 
 	{  // SD カード・クラスの初期化
 		sdh_.start();
-		sdc_.start();
 	}
 
 	// 波形メモリーの無音状態初期化
@@ -348,7 +295,7 @@ int main(int argc, char** argv)
 		if(delay_inv > 0) {
 			--delay_inv;
 			if(delay_inv == 0) {
-				if(sdc_.get_mount()) {
+				if(sdh_.get_mount()) {
 					if(spinv_.start("/inv_roms", "/inv_wavs")) {
 						utils::format("Space Invaders start...\n");
 					} else {
@@ -374,7 +321,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-		sdc_.service(sdh_.service());
+		sdh_.service();
 
 		command_();
 
