@@ -12,7 +12,6 @@
 #include "common/sci_io.hpp"
 #include "common/sci_i2c_io.hpp"
 #include "common/spi_io2.hpp"
-#include "ff13c/mmc_io.hpp"
 #include "common/file_io.hpp"
 #include "common/tpu_io.hpp"
 #include "graphics/font8x16.hpp"
@@ -23,6 +22,7 @@
 #include "graphics/img_in.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/shell.hpp"
 
 #include "chip/FAMIPAD.hpp"
 #include "chip/FT5206.hpp"
@@ -78,7 +78,11 @@ namespace {
 	MMC			sdh_(spi_, 35000000);
 #endif
 
-	utils::command<256> cmd_;
+	typedef utils::command<256> CMD;
+	CMD			cmd_;
+
+	typedef utils::shell<CMD> SHELL;
+	SHELL		shell_(cmd_);
 
 	// GLCDC
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
@@ -221,85 +225,48 @@ namespace {
 			return;
 		}
 
-		uint8_t cmdn = cmd_.get_words();
-		if(cmdn >= 1) {
-			bool f = false;
-			if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[256];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						utils::file_io::dir(tmp);
-					} else {
-						utils::file_io::dir("");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[256];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						utils::file_io::cd(tmp);						
-					} else {
-						utils::file_io::cd("/");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-				char tmp[256];
-				if(utils::file_io::pwd(tmp, sizeof(tmp))) {
-					utils::format("%s\n") % tmp;
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "play")) {
-				if(cmdn >= 2) {
-					char tmp[128];
-					cmd_.get_word(1, tmp, sizeof(tmp));
-					if(std::strcmp(tmp, "*") == 0) {
-						audio_.play_loop("", "");
-					} else {
-						audio_.play_file(tmp);
-					}
-				} else {
+		if(shell_.analize()) {
+			return;
+		}
+
+		auto cmdn = cmd_.get_words();
+		if(cmd_.cmp_word(0, "play")) {
+			if(cmdn >= 2) {
+				char tmp[128];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				if(std::strcmp(tmp, "*") == 0) {
 					audio_.play_loop("", "");
+				} else {
+					audio_.play_file(tmp);
 				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "jpeg")) {
-				if(cmdn >= 2) {
-					char tmp[256];
-					cmd_.get_word(1, tmp, sizeof(tmp));
-					audio_.at_scaling().set_offset();
-					audio_.at_scaling().set_scale();
-					if(!audio_.at_jpeg_in().load(tmp)) {
-						utils::format("Can't load JPEG file: '%s'\n") % tmp;
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "bmp")) {
-				if(cmdn >= 2) {
-					char tmp[256];
-					cmd_.get_word(1, tmp, sizeof(tmp));
-					if(!bmp_in_.load(tmp)) {
-						utils::format("Can't load BMP file: '%s'\n") % tmp;
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "help")) {
-				utils::format("    dir [path]\n");
-				utils::format("    cd [path]\n");
-				utils::format("    pwd\n");
-				utils::format("    play [filename, *]\n");
-				utils::format("    jpeg [filename]\n");
-				utils::format("    bmp [filename]\n");
-				f = true;
+			} else {
+				audio_.play_loop("", "");
 			}
-			if(!f) {
+		} else if(cmd_.cmp_word(0, "jpeg")) {
+			if(cmdn >= 2) {
 				char tmp[256];
-				if(cmd_.get_word(0, tmp, sizeof(tmp))) {
-					utils::format("Command error: '%s'\n") % tmp;
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				audio_.at_scaling().set_offset();
+				audio_.at_scaling().set_scale();
+				if(!audio_.at_jpeg_in().load(tmp)) {
+					utils::format("Can't load JPEG file: '%s'\n") % tmp;
 				}
 			}
+		} else if(cmd_.cmp_word(0, "bmp")) {
+			if(cmdn >= 2) {
+				char tmp[256];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				if(!bmp_in_.load(tmp)) {
+					utils::format("Can't load BMP file: '%s'\n") % tmp;
+				}
+			}
+		} else if(cmd_.cmp_word(0, "help")) {
+			shell_.help();
+			utils::format("    play [filename, *]\n");
+			utils::format("    jpeg [filename]\n");
+			utils::format("    bmp [filename]\n");
+		} else {
+			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
 	}
 }
