@@ -29,9 +29,9 @@
 #include "common/string_utils.hpp"
 #include "common/spi_io2.hpp"
 #include "common/rspi_io.hpp"
-#include "ff13c/mmc_io.hpp"
 #include "common/command.hpp"
 #include "common/file_io.hpp"
+#include "common/shell.hpp"
 
 #include "common/tpu_io.hpp"
 #include "sound/sound_out.hpp"
@@ -184,8 +184,11 @@ namespace {
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC_DEV;
 	SDC_DEV		sdc_dev_(sdc_spi_, sdc_spi_speed_);
 
-	typedef utils::command<256> CMD_LINE;
-	CMD_LINE	cmd_;
+	typedef utils::command<256> CMD;
+	CMD			cmd_;
+
+	typedef utils::shell<CMD> SHELL;
+	SHELL		shell_(cmd_);
 
 #ifdef PLAY_AUDIO
 	volatile uint32_t	wpos_;
@@ -549,78 +552,47 @@ namespace {
 
 	name_t		name_t_;
 
-	void shell_()
+	void cmds_()
 	{
-        if(cmd_.service()) {
-            uint8_t cmdn = cmd_.get_words();
-            if(cmdn >= 1) {
-                if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-					bool f = true;
-					char tmp[FF_MAX_LFN + 1];
-					if(cmdn == 1) {
-						if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
-							utils::format("Fail: 'pwd'\n");
-							f = false;
-						}
-					} else {
-						cmd_.get_word(1, tmp, sizeof(tmp));
-					}
-					if(f) {
-						utils::file_io::dir(tmp);
-					}
-				} else if(cmd_.cmp_word(0, "pwd")) {  // pwd
-					char tmp[FF_MAX_LFN + 1];
-					if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
-						utils::format("pwd fail\n");
-					} else {
-						utils::format("%s\n") % tmp;
-					}
-				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-					char tmp[FF_MAX_LFN + 1];
-					if(cmdn == 1) {
-						strcpy(tmp, "/");
-					} else {
-						cmd_.get_word(1, tmp, sizeof(tmp));
-					}
-					if(!utils::file_io::cd(tmp)) {
-						utils::format("Change directory fail: '%s'\n") % tmp;
-					}
+        if(!cmd_.service()) {
+			return;
+		}
+
+		if(shell_.analize()) {
+			return;
+		}
+
+		auto cmdn = cmd_.get_words();
 #ifdef PLAY_AUDIO
-				} else if(cmd_.cmp_word(0, "play")) {  // play [xxx]
-					if(cmdn >= 2) {
-						if(name_t_.get_ != name_t_.put_) {
-							utils::format("Audio task is busy !\n");
-						} else {
-							cmd_.get_word(1, name_t_.filename_, sizeof(name_t_.filename_));
-							name_t_.put_++;
-						}
-					}
-#else
-				} else if(cmd_.cmp_word(0, "scan")) {  // scan
-					if(cmdn >= 2) {
-						if(name_t_.get_ != name_t_.put_) {
-							utils::format("Scan task is busy !\n");
-						} else {
-							cmd_.get_word(1, name_t_.filename_, sizeof(name_t_.filename_));
-							name_t_.put_++;
-						}
-					}
-#endif
-				} else if(cmd_.cmp_word(0, "help")) {  // help
-					utils::format("    pwd           list current path\n");
-					utils::format("    cd [path]     change current directory\n");
-					utils::format("    dir [path]    list current directory\n");
-#ifdef PLAY_AUDIO
-					utils::format("    play file     play audio file (wav, mp3)\n");
-#else
-					utils::format("    scan [file]   scan file (read 1024 bytes after wait 25ms)\n");
-#endif
+		if(cmd_.cmp_word(0, "play")) {  // play [xxx]
+			if(cmdn >= 2) {
+				if(name_t_.get_ != name_t_.put_) {
+					utils::format("Audio task is busy !\n");
 				} else {
-					char tmp[256];
-					cmd_.get_word(0, tmp, sizeof(tmp));
-					utils::format("Fail: '%s'\n") % tmp; 
+					cmd_.get_word(1, name_t_.filename_, sizeof(name_t_.filename_));
+					name_t_.put_++;
 				}
 			}
+#else
+		} else if(cmd_.cmp_word(0, "scan")) {  // scan
+			if(cmdn >= 2) {
+				if(name_t_.get_ != name_t_.put_) {
+					utils::format("Scan task is busy !\n");
+				} else {
+					cmd_.get_word(1, name_t_.filename_, sizeof(name_t_.filename_));
+					name_t_.put_++;
+				}
+			}
+#endif
+		} else if(cmd_.cmp_word(0, "help")) {  // help
+			shell_.help();
+#ifdef PLAY_AUDIO
+			utils::format("    play file       play audio file (wav, mp3)\n");
+#else
+			utils::format("    scan [file]     scan file (read 1024 bytes after wait 25ms)\n");
+#endif
+		} else {
+			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
 	}
 
@@ -634,7 +606,7 @@ namespace {
 		while(1) {
 			sdc_dev_.service();
 
-			shell_();
+			cmds_();
 
 			vTaskDelay(16 / portTICK_PERIOD_MS);
 		}
