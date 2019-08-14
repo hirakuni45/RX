@@ -193,13 +193,13 @@ namespace utils {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	フル・パスを取作成
-			@param[in]	dst		格納先
 			@param[in]	base	ベース名
+			@param[in]	dst		格納先
 			@param[in]	len		格納先サイズ
 			@return 取得出来たら「true」
 		 */
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool make_full_path(char* dst, const char* base, uint32_t len) noexcept {
+		static bool make_full_path(const char* base, char* dst, uint32_t len) noexcept {
 			if(base == nullptr || dst == nullptr) return false;
 
 			if(base[0] == '/') {
@@ -571,7 +571,7 @@ namespace utils {
 		static uint32_t dir(const char* root) noexcept
 		{
 			char tmp[FF_MAX_LFN + 1];
-			make_full_path(tmp, root, sizeof(tmp));
+			make_full_path(root, tmp, sizeof(tmp));
 			dir_list dl;
 			if(!dl.start(tmp)) return 0;
 
