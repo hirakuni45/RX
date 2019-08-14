@@ -19,7 +19,6 @@
 #include "common/command.hpp"
 #include "common/spi_io2.hpp"
 #include "ff13c/mmc_io.hpp"
-#include "common/sdc_man.hpp"
 #include "common/tpu_io.hpp"
 #include "common/qspi_io.hpp"
 #include "graphics/font8x16.hpp"
@@ -69,8 +68,6 @@ namespace {
 
 	MMC			sdh_(spi_, 20000000);
 #endif
-	typedef utils::sdc_man SDC;
-	SDC			sdc_;
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
@@ -109,13 +106,6 @@ namespace {
 
 	utils::command<256> cmd_;
 
-
-
-	bool check_mount_() {
-		return sdc_.get_mount();
-	}
-
-
 	void update_led_()
 	{
 		static uint8_t n = 0;
@@ -141,29 +131,32 @@ namespace {
 		if(cmdn >= 1) {
 			bool f = false;
 			if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-				if(check_mount_()) {
+				if(sdh_.get_mount()) {
 					if(cmdn >= 2) {
 						char tmp[128];
 						cmd_.get_word(1, tmp, sizeof(tmp));
-						sdc_.dir(tmp);
+						utils::file_io::dir(tmp);
 					} else {
-						sdc_.dir("");
+						utils::file_io::dir("");
 					}
 				}
 				f = true;
 			} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-				if(check_mount_()) {
+				if(sdh_.get_mount()) {
 					if(cmdn >= 2) {
 						char tmp[128];
 						cmd_.get_word(1, tmp, sizeof(tmp));
-						sdc_.cd(tmp);						
+						utils::file_io::cd(tmp);						
 					} else {
-						sdc_.cd("/");
+						utils::file_io::cd("/");
 					}
 				}
 				f = true;
 			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-				utils::format("%s\n") % sdc_.get_current();
+				char tmp[FF_MAX_LFN + 1];
+				if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
+					utils::format("%s\n") % tmp;
+				}
 				f = true;
 			} else if(cmd_.cmp_word(0, "help")) {
 				utils::format("    dir [path]\n");
@@ -238,17 +231,6 @@ extern "C" {
 ///		rtc_.get_time(t);
 		return utils::str::get_fattime(t);
 	}
-
-
-	int fatfs_get_mount() {
-		return check_mount_();
-	}
-
-
-	int make_full_path(const char* src, char* dst, uint16_t len)
-	{
-		return sdc_.make_full_path(src, dst, len);
-	}
 }
 
 int main(int argc, char** argv);
@@ -264,7 +246,6 @@ int main(int argc, char** argv)
 
 	{  // SD カード・クラスの初期化
 		sdh_.start();
-		sdc_.start();
 	}
 
 	utils::format("RTK5RX65N Start for Direct Digital Synthsyzer\n");
@@ -309,7 +290,7 @@ int main(int argc, char** argv)
 
 		ft5206_.update();
 
-		sdc_.service(sdh_.service());
+		sdh_.service();
 
 		command_();
 
