@@ -69,6 +69,29 @@ namespace utils {
 			format("%s\n") % name;
 		}
 
+
+		struct copy_t {
+			uint32_t	count_;
+			uint32_t	match_;
+			char*		dst_;
+			uint32_t	dstlen_;
+		};
+
+		static void path_copy_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+			noexcept
+		{
+			copy_t* t = static_cast<copy_t*>(option);
+			if(t->count_ == t->match_) {
+				if(t->dst_ != nullptr && t->dstlen_ > 0) {
+					std::strncpy(t->dst_, name, t->dstlen_);
+					if(dir) {
+						std::strncat(t->dst_, "/", t->dstlen_);
+					}
+				}
+			}
+			++t->count_;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -557,6 +580,34 @@ namespace utils {
 			auto n = dl.get_total();
 			utils::format("Total %d file%s\n") % n % (n > 1 ? "s" : "");
 			return n;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ディレクトリから、ファイル名の取得
+			@param[in]	root	ルート・ディレクトリ
+			@param[in]	idx		リストのインデックス
+			@param[out]	dst		パスのコピー先
+			@param[in]	dstlen	コピー先サイズ
+			@return 成功なら「true」
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool get_dir_path(const char* root, uint32_t idx, char* dst, uint32_t dstlen)
+		{
+			dir_list dl;
+			if(!dl.start(root)) return false;
+
+			copy_t t;
+			t.count_ = 0;
+			t.match_ = idx;
+			t.dst_ = dst;
+			t.dstlen_ = dstlen;
+			do {
+				dl.service(10, path_copy_func_, true, &t);
+			} while(dl.probe()) ;
+
+			return true;
 		}
 	};
 }
