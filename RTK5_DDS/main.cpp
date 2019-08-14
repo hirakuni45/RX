@@ -17,8 +17,8 @@
 #include "common/sci_i2c_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/shell.hpp"
 #include "common/spi_io2.hpp"
-#include "ff13c/mmc_io.hpp"
 #include "common/tpu_io.hpp"
 #include "common/qspi_io.hpp"
 #include "graphics/font8x16.hpp"
@@ -104,7 +104,10 @@ namespace {
 	typedef chip::FT5206<FT5206_I2C> FT5206;
 	FT5206		ft5206_(ft5206_i2c_);
 
-	utils::command<256> cmd_;
+	typedef utils::command<256> CMD;
+	CMD			cmd_;
+	typedef utils::shell<CMD> SHELL;
+	SHELL		shell_(cmd_);
 
 	void update_led_()
 	{
@@ -126,50 +129,13 @@ namespace {
 		if(!cmd_.service()) {
 			return;
 		}
-
-		uint8_t cmdn = cmd_.get_words();
-		if(cmdn >= 1) {
-			bool f = false;
-			if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-				if(sdh_.get_mount()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						utils::file_io::dir(tmp);
-					} else {
-						utils::file_io::dir("");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-				if(sdh_.get_mount()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						utils::file_io::cd(tmp);						
-					} else {
-						utils::file_io::cd("/");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-				char tmp[FF_MAX_LFN + 1];
-				if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
-					utils::format("%s\n") % tmp;
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "help")) {
-				utils::format("    dir [path]\n");
-				utils::format("    cd [path]\n");
-				utils::format("    pwd\n");
-				f = true;
-			}
-			if(!f) {
-				char tmp[128];
-				if(cmd_.get_word(0, tmp, sizeof(tmp))) {
-					utils::format("Command error: '%s'\n") % tmp;
-				}
-			}
+		if(shell_.analize()) {
+			return;
+		}
+		if(cmd_.cmp_word(0, "help")) {
+			shell_.help();
+		} else {
+			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
 	}
 }
