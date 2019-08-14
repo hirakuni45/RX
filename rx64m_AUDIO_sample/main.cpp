@@ -27,9 +27,9 @@
 #include "common/format.hpp"
 #include "common/input.hpp"
 #include "common/command.hpp"
+#include "common/shell.hpp"
 #include "common/rspi_io.hpp"
 #include "common/spi_io2.hpp"
-#include "ff13c/mmc_io.hpp"
 #include "common/dir_list.hpp"
 #include "common/string_utils.hpp"
 #include "common/tpu_io.hpp"
@@ -49,7 +49,7 @@ namespace {
 #endif
 
 	typedef device::cmt_io<device::CMT0> CMT;
-	CMT		cmt_;
+	CMT			cmt_;
 
 	typedef utils::fixed_fifo<char, 256> BUFFER;
 #ifdef GR_KAEDE
@@ -57,7 +57,7 @@ namespace {
 #else
 	typedef device::sci_io<device::SCI1, BUFFER, BUFFER> SCI;
 #endif
-	SCI		sci_;
+	SCI			sci_;
 
 #ifdef GR_KAEDE
 	// SDC 用　SPI 定義（RSPI）
@@ -78,17 +78,21 @@ namespace {
 	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;  ///< カード選択信号
 	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;  ///< カード検出
 #endif
-	SPI					spi_;
+	SPI			spi_;
 
 	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   ///< ハードウェアー定義
 
-	MMC					sdh_(spi_, 35000000);
+	MMC			sdh_(spi_, 35000000);
 	typedef utils::dir_list DLIST;
-	DLIST				dlist_;
+	DLIST		dlist_;
 
-	utils::command<256> cmd_;
+	typedef utils::command<256> CMD;
+	CMD			cmd_;
 
-	volatile uint32_t	wpos_;
+	typedef utils::shell<CMD> SHELL;
+	SHELL		shell_(cmd_);
+
+	volatile uint32_t wpos_;
 
 	/// DMAC 終了割り込み
 	class dmac_term_task {
@@ -344,8 +348,35 @@ extern "C" {
 	}
 
 
-	bool check_mount_() {
-		return sdh_.get_mount();
+	void cmds_()
+	{
+		// コマンド入力と、コマンド解析
+		if(!cmd_.service()) {
+			return;
+		}
+		if(shell_.analize()) {
+			return;
+		}
+
+		auto cmdn = cmd_.get_words();
+		if(cmd_.cmp_word(0, "play")) {  // play [xxx]
+			if(cmdn >= 2) {
+				char tmp[FF_MAX_LFN + 1];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				if(std::strcmp(tmp, "*") == 0) {
+					play_loop_("", "");
+				} else {
+					play_loop_("", tmp);
+				}
+			} else {
+				play_loop_("", "");
+			}
+		} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
+			shell_.help();
+			utils::format("    play file-name\n");
+		} else {
+			utils::format("Command error: '%s'\n") % cmd_.get_command();
+		}
 	}
 }
 
@@ -420,67 +451,7 @@ int main(int argc, char** argv)
 		sdh_.service();
 		dlist_.service(1, play_loop_func_, true, &loop_t_);
 
-		// コマンド入力と、コマンド解析
-		if(cmd_.service()) {
-			uint8_t cmdn = cmd_.get_words();
-			if(cmdn >= 1) {
-				char tmp[256];
-				bool f = false;
-				if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-					if(check_mount_()) {
-						if(cmdn >= 2) {
-							char tmp[128];
-							cmd_.get_word(1, tmp, sizeof(tmp));
-							utils::file_io::dir(tmp);
-						} else {
-							utils::file_io::dir("");
-						}
-					}
-					f = true;
-				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-					if(check_mount_()) {
-						if(cmdn >= 2) {
-							char tmp[128];
-							cmd_.get_word(1, tmp, sizeof(tmp));
-							utils::file_io::cd(tmp);
-						} else {
-							utils::file_io::cd("/");
-						}
-					}
-					f = true;
-				} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-					char tmp[256];
-					tmp[0] = 0;
-					utils::file_io::pwd(tmp, sizeof(tmp));
-					utils::format("%s\n") % tmp;
-					f = true;
-				} else if(cmd_.cmp_word(0, "play")) {  // play [xxx]
-					if(cmdn >= 2) {
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						if(std::strcmp(tmp, "*") == 0) {
-							play_loop_("", "");
-						} else {
-							play_loop_("", tmp);
-						}
-					} else {
-						play_loop_("", "");
-					}
-					f = true;
-				} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
-					utils::format("dir [name]\n");
-					utils::format("cd [directory-name]\n");
-					utils::format("pwd\n");
-					utils::format("play file-name\n");
-					f = true;
-				}
-				if(!f) {
-					char tmp[128];
-					if(cmd_.get_word(0, tmp, sizeof(tmp))) {
-						utils::format("Command error: '%s'\n") % tmp;
-					}
-				}
-			}
-		}
+		cmds_();
 
 		++cnt;
 		if(cnt >= 50) {
