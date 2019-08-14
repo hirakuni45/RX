@@ -3,12 +3,12 @@
 /*!	@file
 	@brief	ファイル選択ユーティリティー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/sdc_man.hpp"
+#include "common/file_io.hpp"
 #include "common/fixed_stack.hpp"
 
 namespace gui {
@@ -19,6 +19,7 @@ namespace gui {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	enum class filer_ctrl {
+		MOUNT,		///< ＳＤカードのマウント状態
 		OPEN,		///< ファイラーを起動
 		UP,			///< スクロール上
 		DOWN,		///< スクロール下
@@ -44,20 +45,21 @@ namespace gui {
 	/*!
 		@brief	ファイラー・クラス
 		@param[in]	RDR	render クラス型（描画）
-		@param[in]	SDC	sdc_man クラス型（SD カード操作）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class RDR, class SDC>
+	template <class RDR>
 	class filer {
 
-		static const int16_t SPC = 2;                           ///< 文字間隙間
-		static const int16_t FLN = RDR::font_type::height + SPC;      ///< 行幅
-		static const int16_t SCN = (RDR::glc_type::height - SPC) / FLN;   ///< 行数
+		static const int16_t SPC = 2;									///< 文字間隙間
+		static const int16_t FLN = RDR::font_type::height + SPC;		///< 行幅
+		static const int16_t SCN = (RDR::glc_type::height - SPC) / FLN;	///< 行数
 
 		typedef graphics::def_color DEF_COLOR;
 
-		RDR&	rdr_;
-		SDC&	sdc_;
+		RDR&		rdr_;
+
+		typedef utils::dir_list DLIST;
+		DLIST		dlist_;
 
 		uint32_t	ctrl_;
 		bool		open_;
@@ -137,9 +139,10 @@ namespace gui {
 			rdr_st_.vpos_ = rdr_st_.vofs_ + 2;
 			rdr_st_.num_ = 0;
 			rdr_st_.match_ = match;
-			sdc_.start_dir_list("",
-				[&](const char* name, const FILINFO* fi, bool dir, void* opt) {
-					dir_draw_func_(name, fi, dir, opt); }, true, &rdr_st_);
+			char tmp[FF_MAX_LFN + 1];
+			if(utils::file_io::pwd(tmp, sizeof(tmp))) {
+				dlist_.start(tmp);
+			}
 		}
 
 
@@ -174,10 +177,9 @@ namespace gui {
 		/*!
 			@brief	コンストラクター
 			@param[in]	rdr		レンダリング・インスタンス
-			@param[in]	sdc		ファイルシステム・インスタンス
 		*/
 		//-----------------------------------------------------------------//
-		filer(RDR& rdr, SDC& sdc) noexcept : rdr_(rdr), sdc_(sdc),
+		filer(RDR& rdr) noexcept : rdr_(rdr), dlist_(),
 			ctrl_(0), open_(false), rdr_st_(),
 			touch_lvl_(false), touch_pos_(false), touch_neg_(false), touch_num_(0),
 			touch_x_(0), touch_y_(0),
@@ -230,10 +232,16 @@ namespace gui {
 			uint32_t ntrg =  ctrl_ & ~ctrl;
 			ctrl_ = ctrl;
 
-			if(!sdc_.get_mount()) {
+			dlist_.service(10,
+				[&](const char* name, const FILINFO* fi, bool dir, void* opt) {
+				dir_draw_func_(name, fi, dir, opt); }, true, &rdr_st_);
+
+			if((ntrg & ctrl_mask_(filer_ctrl::MOUNT))) {  // SD カードのマウント状態
 				open_ = false;
 				pos_stack_.clear();
 				rdr_.clear(DEF_COLOR::Black);
+			}
+			if((ctrl & ctrl_mask_(filer_ctrl::MOUNT)) == 0) {
 				return false;
 			}
 
@@ -275,10 +283,10 @@ namespace gui {
 			}
 
 			{
-				uint32_t n;
-				bool f = sdc_.probe_dir_list(n);
-				if(f) return false;
-				if(rdr_st_.num_ < static_cast<int16_t>(n)) return false;
+				if(dlist_.probe()) return false;
+				if(rdr_st_.num_ < static_cast<int16_t>(dlist_.get_total())) {
+					return false;
+				}
 			}
 
 			// 選択フレームの描画
@@ -332,15 +340,19 @@ namespace gui {
 			}
 
 			if(ptrg & ctrl_mask_(filer_ctrl::SELECT)) {
-				uint32_t n = rdr_st_.sel_pos_ - rdr_st_.vofs_ / FLN;
-				if(!sdc_.get_dir_path(n, dst, dstlen)) {
+				uint32_t idx = rdr_st_.sel_pos_ - rdr_st_.vofs_ / FLN;
+				char root[FF_MAX_LFN + 1];
+				if(!utils::file_io::pwd(root, sizeof(root))) {
+					return false;
+				}
+				if(!utils::file_io::get_dir_path(root, idx, dst, dstlen)) {
 					return false;
 				}
 				uint32_t l = strlen(dst);
-				if(dst[l - 1] == '/') {
+				if(dst[l - 1] == '/') {  // directory ?
 					pos_stack_.push(pos_t(rdr_st_.vofs_, rdr_st_.sel_pos_));
 					dst[l - 1] = 0;
-					sdc_.cd(dst);
+					utils::file_io::cd(dst);
 					rdr_.clear(DEF_COLOR::Black);
 					scan_dir_(false);
 				} else {
@@ -352,7 +364,7 @@ namespace gui {
 
 			if(ptrg & ctrl_mask_(filer_ctrl::BACK)) {
 				if(!pos_stack_.empty()) {
-					sdc_.cd("..");
+					utils::file_io::cd("..");
 					rdr_.clear(DEF_COLOR::Black);
 					scan_dir_(true);
 				}
