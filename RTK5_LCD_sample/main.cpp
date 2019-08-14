@@ -15,9 +15,8 @@
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/shell.hpp"
 #include "common/spi_io2.hpp"
-#include "ff13c/mmc_io.hpp"
-#include "common/sdc_man.hpp"
 #include "common/qspi_io.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/font.hpp"
@@ -51,8 +50,6 @@
 #include "usb/usb_hmsc.hpp"
 
 #include "graphics/tgl.hpp"
-
-
 
 namespace {
 
@@ -90,8 +87,6 @@ namespace {
 
 	MMC			sdh_(spi_, 35000000);
 #endif
-	typedef utils::sdc_man SDC;
-	SDC			sdc_;
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
@@ -119,7 +114,7 @@ namespace {
 	RENDER		render_(glcdc_io_, font_);
 
 //	typedef graphics::filer<SDC, RENDER> FILER;
-//	FILER		filer_(sdc_, render_);
+//	FILER		filer_(render_);
 
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
@@ -151,16 +146,10 @@ namespace {
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
 	QSPI		qspi_;
 
-	utils::command<256> cmd_;
-
-
-	bool check_mount_() {
-		auto f = sdc_.get_mount();
-		if(!f) {
-			utils::format("SD card not mount.\n");
-		}
-		return f;
-	}
+	typedef utils::command<256> CMD;
+	CMD			cmd_;
+	typedef utils::shell<CMD> SHELL;
+	SHELL		shell_(cmd_);
 
 
 	void command_()
@@ -168,55 +157,22 @@ namespace {
 		if(!cmd_.service()) {
 			return;
 		}
+		if(shell_.analize()) {
+			return;
+		}
 
-		uint8_t cmdn = cmd_.get_words();
-		if(cmdn >= 1) {
-			bool f = false;
-			if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						sdc_.dir(tmp);
-					} else {
-						sdc_.dir("");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						sdc_.cd(tmp);						
-					} else {
-						sdc_.cd("/");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-				utils::format("%s\n") % sdc_.get_current();
-				f = true;
-			} else if(cmd_.cmp_word(0, "image")) { // image load, draw
-				if(cmdn >= 2) {
-					char tmp[128];
-					cmd_.get_word(1, tmp, sizeof(tmp));
-///					imgs_.load(tmp);
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "help")) {
-				utils::format("    dir [path]\n");
-				utils::format("    cd [path]\n");
-				utils::format("    pwd\n");
-				utils::format("    image [filename]\n");
-				f = true;
-			}
-			if(!f) {
+		auto cmdn = cmd_.get_words();
+		if(cmd_.cmp_word(0, "image")) { // image load, draw
+			if(cmdn >= 2) {
 				char tmp[128];
-				if(cmd_.get_word(0, tmp, sizeof(tmp))) {
-					utils::format("Command error: '%s'\n") % tmp;
-				}
+				cmd_.get_word(1, tmp, sizeof(tmp));
+///				imgs_.load(tmp);
 			}
+		} else if(cmd_.cmp_word(0, "help")) {
+			shell_.help();
+			utils::format("    image [filename]\n");
+		} else {
+			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
 	}
 }
@@ -279,16 +235,6 @@ extern "C" {
 	}
 
 
-	int fatfs_get_mount() {
-		return sdc_.get_mount();
-	}
-
-
-	int make_full_path(const char* src, char* dst, uint16_t len)
-	{
-		return sdc_.make_full_path(src, dst, len);
-	}
-
 #if 0
 	void gr_plot(int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b)
 	{
@@ -313,7 +259,6 @@ int main(int argc, char** argv)
 
 	{  // SD カード・クラスの初期化
 		sdh_.start();
-		sdc_.start();
 	}
 
 	utils::format("\rRTK5RX65N Start for LCD sample\n");
@@ -377,7 +322,7 @@ int main(int argc, char** argv)
 	while(1) {
 		render_.sync_frame();
 		ft5206_.update();
-		sdc_.service(sdh_.service());
+		sdh_.service();
 
 #if 0
 		{
