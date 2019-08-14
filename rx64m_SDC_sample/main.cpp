@@ -15,10 +15,10 @@
 #include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/shell.hpp"
 #include "common/rspi_io.hpp"
 #include "common/spi_io.hpp"
 #include "common/spi_io2.hpp"
-#include "ff13c/mmc_io.hpp"
 #include "common/file_io.hpp"
 #include "common/string_utils.hpp"
 
@@ -60,7 +60,10 @@ namespace {
 	MMC		sdh_(spi_, 20000000);
 #endif
 
-	utils::command<256> cmd_;
+	typedef utils::command<256> CMD;
+	CMD		cmd_;
+	typedef utils::shell<CMD> SHELL;
+	SHELL	shell_(cmd_);
 
 //	utils::SDRAM_128M_32W	sdram_;
 
@@ -292,6 +295,41 @@ extern "C" {
 			sci_puts("Stall RTC write...\n");
 		}
 	}
+
+
+	void cmds_()
+	{
+		// コマンド入力と、コマンド解析
+		if(!cmd_.service()) {
+			return;
+		}
+		if(shell_.analize()) {
+			return;
+		}
+		auto cmdn = cmd_.get_words();
+		if(cmd_.cmp_word(0, "date")) {
+			if(cmdn == 1) {
+				time_t t = get_time_();
+				if(t != 0) {
+					disp_time_(t);
+				}
+			} else {
+				set_time_date_();
+			}
+///			} else if(cmd_.cmp_word(0, "power")) {
+///				SDC_POWER::P = 0;
+///				f = true;
+		} else if(cmd_.cmp_word(0, "test")) {
+			create_test_file_("write_test.bin", 1024 * 1024);
+		} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
+			shell_.help();
+			utils::format("    date\n");
+			utils::format("    date yyyy/mm/dd hh:mm[:ss]\n");
+			utils::format("    test          test speed for write file\n");
+		} else {
+			utils::format("Command error: '%s'\n") % cmd_.get_command();
+		}
+	}
 }
 
 int main(int argc, char** argv);
@@ -346,78 +384,7 @@ int main(int argc, char** argv)
 
 		auto mount = sdh_.service();
 
-		// コマンド入力と、コマンド解析
-		if(cmd_.service()) {
-			uint8_t cmdn = cmd_.get_words();
-			if(cmdn >= 1) {
-				bool f = false;
-				if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-					if(!mount) {
-						utils::format("No mount SD-card.\n");
-					} else {
-						if(cmdn >= 2) {
-							char tmp[128];
-							cmd_.get_word(1, tmp, sizeof(tmp));
-							utils::file_io::dir(tmp);
-						} else {
-							utils::file_io::dir("");
-						}
-					}
-					f = true;
-				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						utils::file_io::cd(tmp);						
-					} else {
-						utils::file_io::cd("/");
-					}
-					f = true;
-				} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-					char tmp[256];
-					if(utils::file_io::pwd(tmp, sizeof(tmp))) {
-						utils::format("%s\n") % tmp;
-					} else {
-						utils::format("pwd: Filesystem fail.\n");
-					}
-					f = true;
-				} else if(cmd_.cmp_word(0, "date")) {
-					if(cmdn == 1) {
-						time_t t = get_time_();
-						if(t != 0) {
-							disp_time_(t);
-						}
-					} else {
-						set_time_date_();
-					}
-					f = true;
-///				} else if(cmd_.cmp_word(0, "power")) {
-///					SDC_POWER::P = 0;
-///					f = true;
-				} else if(cmd_.cmp_word(0, "test")) {
-					if(!mount) {
-						utils::format("No mount SD-card.\n");
-					} else {
-						create_test_file_("write_test.bin", 1024 * 1024);
-					}
-					f = true;
-				} else if(cmd_.cmp_word(0, "help") || cmd_.cmp_word(0, "?")) {
-					utils::format("date\n");
-					utils::format("date yyyy/mm/dd hh:mm[:ss]\n");
-					utils::format("dir [name]\n");
-					utils::format("cd [directory-name]\n");
-					utils::format("pwd\n");
-					utils::format("test    test speed for write file\n");
-					f = true;
-				}
-				if(!f) {
-					char tmp[128];
-					if(cmd_.get_word(0, tmp, sizeof(tmp))) {
-						utils::format("Command error: '%s'\n") % tmp;
-					}
-				}
-			}
-		}
+		cmds_();
 
 		++cnt;
 		if(cnt >= 50) {
