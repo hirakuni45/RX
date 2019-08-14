@@ -17,8 +17,8 @@
 #include "common/sci_i2c_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/shell.hpp"
 #include "common/spi_io2.hpp"
-#include "ff13c/mmc_io.hpp"
 #include "common/tpu_io.hpp"
 #include "common/qspi_io.hpp"
 #include "graphics/font8x16.hpp"
@@ -115,7 +115,10 @@ namespace {
 	typedef utils::render_wave<RENDER, CAPTURE, FT5206> RENDER_WAVE;
 	RENDER_WAVE	render_wave_(render_, capture_, ft5206_);
 
-	utils::command<256> cmd_;
+	typedef utils::command<256> CMD;
+	CMD			cmd_;
+	typedef utils::shell<CMD> SHELL;
+	SHELL		shell_(cmd_);
 
 	utils::capture_trigger	trigger_ = utils::capture_trigger::NONE;
 
@@ -140,55 +143,17 @@ namespace {
 		if(!cmd_.service()) {
 			return;
 		}
-
-		uint8_t cmdn = cmd_.get_words();
-		if(cmdn >= 1) {
-			bool f = false;
-			if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-				if(sdh_.get_mount()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						utils::file_io::dir(tmp);
-					} else {
-						utils::file_io::dir("");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-				if(sdh_.get_mount()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						utils::file_io::cd(tmp);						
-					} else {
-						utils::file_io::cd("/");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-				char tmp[FF_MAX_LFN + 1];
-				if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
-					utils::format("%s\n") % tmp;
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "cap")) { // capture
-				trigger_ = utils::capture_trigger::SINGLE;
-				capture_.set_trigger(trigger_);			
-				f = true;
-			} else if(cmd_.cmp_word(0, "help")) {
-				utils::format("    dir [path]\n");
-				utils::format("    cd [path]\n");
-				utils::format("    pwd\n");
-				utils::format("    cap   single trigger\n");
-				f = true;
-			}
-			if(!f) {
-				char tmp[128];
-				if(cmd_.get_word(0, tmp, sizeof(tmp))) {
-					utils::format("Command error: '%s'\n") % tmp;
-				}
-			}
+		if(shell_.analize()) {
+			return;
+		}
+		if(cmd_.cmp_word(0, "cap")) { // capture
+			trigger_ = utils::capture_trigger::SINGLE;
+			capture_.set_trigger(trigger_);			
+		} else if(cmd_.cmp_word(0, "help")) {
+			shell_.help();
+			utils::format("    cap        single trigger\n");
+		} else {
+			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
 	}
 }
