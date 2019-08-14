@@ -15,9 +15,8 @@
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/shell.hpp"
 #include "common/spi_io2.hpp"
-#include "ff13c/mmc_io.hpp"
-#include "common/sdc_man.hpp"
 #include "common/qspi_io.hpp"
 
 #include "scenes.hpp"
@@ -41,14 +40,11 @@ namespace {
 
 	typedef utils::command<256> CMD;
 	CMD			cmd_;
+	typedef utils::shell<CMD> SHELL;
+	SHELL		shell_(cmd_);
 
 	typedef app::scenes	SCENES;
 	SCENES		scenes_;
-
-
-	bool check_mount_() {
-		return scenes_.at_base().at_sdc().get_mount();
-	}
 
 
 	void command_()
@@ -56,50 +52,18 @@ namespace {
 		if(!cmd_.service()) {
 			return;
 		}
+		if(shell_.analize()) {
+			return;
+		}
 
-		uint8_t cmdn = cmd_.get_words();
-		if(cmdn >= 1) {
-			bool f = false;
-			if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						scenes_.at_base().at_sdc().dir(tmp);
-					} else {
-						scenes_.at_base().at_sdc().dir("");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, tmp, sizeof(tmp));
-						scenes_.at_base().at_sdc().cd(tmp);						
-					} else {
-						scenes_.at_base().at_sdc().cd("/");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-				utils::format("%s\n") % scenes_.at_base().at_sdc().get_current();
-				f = true;
-			} else if(cmd_.cmp_word(0, "gui")) {
-				at_scenes_base().at_widget_director().list_all();
-				f = true;
-			} else if(cmd_.cmp_word(0, "help")) {
-				utils::format("    dir [path]\n");
-				utils::format("    cd [path]\n");
-				utils::format("    pwd\n");
-				f = true;
-			}
-			if(!f) {
-				char tmp[128];
-				if(cmd_.get_word(0, tmp, sizeof(tmp))) {
-					utils::format("Command error: '%s'\n") % tmp;
-				}
-			}
+		auto cmdn = cmd_.get_words();
+		if(cmd_.cmp_word(0, "gui")) {
+			at_scenes_base().at_widget_director().list_all();
+		} else if(cmd_.cmp_word(0, "help")) {
+			shell_.help();
+			utils::format("    gui\n");
+		} else {
+			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
 	}
 }
@@ -186,17 +150,6 @@ extern "C" {
 		// GPS モジュールから GMT 時間を取得
 		auto t = scenes_.at_base().at_nmea().get_gmtime();		
 		return utils::str::get_fattime(t);
-	}
-
-
-	int fatfs_get_mount() {
-		return check_mount_();
-	}
-
-
-	int make_full_path(const char* src, char* dst, uint16_t len)
-	{
-		return scenes_.at_base().at_sdc().make_full_path(src, dst, len);
 	}
 }
 
