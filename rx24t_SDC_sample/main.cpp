@@ -15,8 +15,7 @@
 #include "common/command.hpp"
 #include "common/rspi_io.hpp"
 #include "common/spi_io2.hpp"
-#include "ff13c/mmc_io.hpp"
-#include "common/sdc_man.hpp"
+#include "common/shell.hpp"
 
 #ifdef RTC
 #include "common/iica_io.hpp"
@@ -61,9 +60,11 @@ namespace {
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;
 	MMC		mmc_(sdc_spi_, 20000000);
 
-	utils::sdc_man	sdc_;
+	typedef utils::command<128> CMD;
+	CMD		cmd_;
 
-	utils::command<128> command_;
+	typedef utils::shell<CMD> SHELL;
+	SHELL	shell_(cmd_);
 
 #ifdef RTC
 	time_t get_time_()
@@ -172,6 +173,7 @@ namespace {
 }
 
 extern "C" {
+
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
@@ -224,7 +226,6 @@ extern "C" {
 #endif
 	}
 
-
 	uint8_t v_ = 91;
 	uint8_t m_ = 123;
 	uint8_t rand_()
@@ -242,7 +243,6 @@ extern "C" {
 	bool create_test_file_(const char* fname, uint32_t size)
 	{
 		uint8_t buff[512];
-		FIL fp;
 
 		utils::format("SD Write test...\n");
 
@@ -251,19 +251,18 @@ extern "C" {
 		}
 
 		auto st = cmt_.get_counter();
-		if(!sdc_.open(&fp, fname, FA_WRITE | FA_CREATE_ALWAYS)) {
+		utils::file_io fo;
+		if(!fo.open(fname, "wb")) {
 			utils::format("Can't create file: '%s'\n") % fname;
 			return false;
 		}
 		auto rs = size;
 		while(rs > 0) {
-			UINT sz = sizeof(buff);
+			uint32_t sz = sizeof(buff);
 			if(sz > rs) sz = rs;
-			UINT bw;
-			f_write(&fp, buff, sz, &bw);
-			rs -= bw;
+			rs -= fo.write(buff, sz);
 		}
-		f_close(&fp);
+		fo.close();
 
 		auto ed = cmt_.get_counter();
 		uint32_t len;
@@ -276,6 +275,7 @@ extern "C" {
 
 		return true;
 	}
+
 
 	void test_all_()
 	{
@@ -290,20 +290,19 @@ extern "C" {
 		auto st = cmt_.get_counter();
 
 		utils::format("SD Read test...\n");
-		FIL fp;
-		if(!sdc_.open(&fp, test_file, FA_READ)) {
+		utils::file_io fin;
+		if(!fin.open(test_file, "rb")) {
 			utils::format("Can't read file: '%s'\n") % test_file;
 		}
 		auto rs = size;
 		while(rs > 0) {
 			uint8_t buff[512];
-			UINT rb;
-			UINT sz = sizeof(buff);
+			uint32_t sz = sizeof(buff);
 			if(sz > rs) sz = rs;
-			f_read(&fp, buff, sz, &rb);
-			rs -= rb;
+			rs -= fin.read(buff, sz);
+			
 		}
-		f_close(&fp);
+		fin.close();
 
 		auto ed = cmt_.get_counter();
 		uint32_t len;
@@ -313,14 +312,6 @@ extern "C" {
 		auto pbyte = size * 60 / len;
 		utils::format("Read: %d Bytes/Sec\n") % pbyte;
 		utils::format("Read: %d KBytes/Sec\n") % (pbyte / 1024);
-	}
-
-	bool check_mount_() {
-		auto f = sdc_.get_mount();
-		if(!f) {
-			utils::format("SD card not mount.\n");
-		}
-		return f;
 	}
 }
 
@@ -377,7 +368,6 @@ int main(int argc, char** argv)
 
 	// SDC 開始
 	mmc_.start();
-	sdc_.start();
 
 #ifdef RTC
 	// DS3231(RTC) の開始
@@ -386,7 +376,7 @@ int main(int argc, char** argv)
 	}
 #endif
 
-	command_.set_prompt("# ");
+	cmd_.set_prompt("# ");
 
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 
@@ -397,64 +387,31 @@ int main(int argc, char** argv)
 		cmt_.sync();
 
 		// SD カード・サービス
-		sdc_.service(mmc_.service());
+		mmc_.service();
 
-		// コマンド入力と、コマンド解析
-		if(command_.service()) {
-			auto cmdn = command_.get_words();
-			if(cmdn >= 1) {
-				bool f = false;
-				if(command_.cmp_word(0, "dir")) {  // dir [xxx]
-					if(check_mount_()) {
-						if(cmdn >= 2) {
-							char tmp[128];
-							command_.get_word(1, tmp, sizeof(tmp));
-							sdc_.dir(tmp);
-						} else {
-							sdc_.dir("");
+		// コマンド入力
+		if(cmd_.service()) {
+			if(!shell_.analize()) {
+				// 他のコマンド解析
+				auto cmdn = cmd_.get_words();
+				if(cmdn >= 1) {
+					if(cmd_.cmp_word(0, "speed")) { // speed
+						if(mmc_.get_mount()) {
+							test_all_();
 						}
-					}
-					f = true;
-				} else if(command_.cmp_word(0, "cd")) {  // cd [xxx]
-					if(check_mount_()) {
-						if(cmdn >= 2) {
-							char tmp[128];
-							command_.get_word(1, tmp, sizeof(tmp));
-							sdc_.cd(tmp);						
-						} else {
-							sdc_.cd("/");
-						}
-					}
-					f = true;
-				} else if(command_.cmp_word(0, "pwd")) { // pwd
-					utils::format("%s\n") % sdc_.get_current();
-					f = true;
-				} else if(command_.cmp_word(0, "speed")) { // speed
-					if(check_mount_()) {
-						test_all_();
-					}
-					f = true;
-				} else if(command_.cmp_word(0, "help")) { // help
-					utils::format("dir [name]\n");
-					utils::format("cd [directory-name]\n");
-					utils::format("pwd\n");
-					utils::format("speed\n");
+					} else if(cmd_.cmp_word(0, "help")) { // help
+						shell_.help();
+						utils::format("    speed           Read/Write speed test for SD-Card\n");
 #ifdef RTC
-					utils::format("date\n");
+						utils::format("    date [mm/dd/ss] set/get date/time for RTC\n");
+					} else if(cmd_.cmp_word(0, "date")) { // date
+						date_();
 #endif
-					f = true;
-#ifdef RTC
-				} else if(command_.cmp_word(0, "date")) { // date
-					date_();
-					f = true;
-				}
-#else
-				}
-#endif
-				if(!f) {
-					char tmp[128];
-					command_.get_word(0, tmp, sizeof(tmp));
-					utils::format("Command error: '%s'\n") % tmp;
+					} else {
+						char tmp[128];
+						cmd_.get_word(0, tmp, sizeof(tmp));
+						utils::format("Command error: '%s'\n") % tmp;
+					}
 				}
 			}
 		}
