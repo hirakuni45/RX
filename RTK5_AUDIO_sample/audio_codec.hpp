@@ -11,6 +11,7 @@
 #include "common/renesas.hpp"
 #include "common/tpu_io.hpp"
 #include "common/fixed_fifo.hpp"
+#include "common/dir_list.hpp"
 #include "sound/sound_out.hpp"
 #include "sound/mp3_in.hpp"
 #include "sound/wav_in.hpp"
@@ -25,10 +26,9 @@ namespace audio {
 	/*!
 		@brief  オーディオ・コーデック・クラス
 		@param[in]	RDR	グラフィックス描画クラス
-		@param[in]	SDC		SD カード・マネージャー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class RDR, class SDC>
+	template<class RDR>
 	class codec {
 	public:
 		typedef std::function<sound::af_play::CTRL ()> CTRL_TASK;
@@ -37,7 +37,9 @@ namespace audio {
 
 	private:
 		RDR&		rdr_;
-		SDC&		sdc_;
+		typedef utils::dir_list DLIST;
+		DLIST		dlist_;
+
 		SCALING		scaling_;
 
 		static volatile uint32_t	wpos_;
@@ -62,7 +64,7 @@ namespace audio {
 
 		static SOUND_OUT	sound_out_;
 
-		static volatile uint32_t cycle_count_;
+//		static volatile uint32_t cycle_count_;
 
 		class tpu_task {
 		public:
@@ -72,7 +74,7 @@ namespace audio {
 				if((tmp ^ wpos_) & 64) {
 					sound_out_.service(64);
 				}
-				cycle_count_ += 1361;
+//				cycle_count_ += 1361;
 			}
 		};
 
@@ -221,24 +223,18 @@ namespace audio {
 			} else {
 				loop_t_.enable = false;
 			}
-			sdc_.set_dir_list_limit(1);
-			sdc_.start_dir_list(root,
-				[&](const char* name, const FILINFO* fi, bool dir, void* option) {
-					play_loop_func_(name, fi, dir, option);
-				},
-			true, &loop_t_);
-			sdc_.set_dir_list_limit();
+			dlist_.start(root);
 		}
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクタ
-			@param[in]	sdc		SD カードマネージャー
+			@param[in]	rdr		描画コンテキスト
 		*/
 		//-----------------------------------------------------------------//
-		codec(RDR& rdr, SDC& sdc) noexcept :
-			rdr_(rdr), sdc_(sdc), scaling_(rdr),
+		codec(RDR& rdr) noexcept :
+			rdr_(rdr), dlist_(), scaling_(rdr),
 			jpeg_(scaling_)
 		{ }
 
@@ -323,16 +319,34 @@ namespace audio {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  制御タスクの設定
+			@param[in]	task	制御タスク
+		*/
+		//-----------------------------------------------------------------//
 		void set_ctrl_task(CTRL_TASK task) noexcept
 		{
 			ctrl_task_ = task;
 		}
 
 
-//		static uint32_t getCycleCount()
-//		{
-//			return cycle_count_;
-//		}
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  サービス @n
+					周期的に呼び出す。@n
+					※ワイルドカード指定で、開始した場合に、ディレクトリー @n
+					を巡る処理を行う。
+		*/
+		//-----------------------------------------------------------------//
+		void service() noexcept
+		{
+			dlist_.service(1,
+				[&](const char* name, const FILINFO* fi, bool dir, void* option) {
+					play_loop_func_(name, fi, dir, option);
+				},
+			true, &loop_t_);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -368,15 +382,25 @@ namespace audio {
 			}
 			return ret;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  再生を停止
+		*/
+		//-----------------------------------------------------------------//
+		void stop() noexcept {
+			dlist_.stop();
+		}
 	};
 
-	template<class SDC, class RENDER>
-	volatile uint32_t codec<SDC, RENDER>::wpos_;
+	template<class RENDER>
+	volatile uint32_t codec<RENDER>::wpos_;
 
-	template<class SDC, class RENDER>
-	SOUND_OUT codec<SDC, RENDER>::sound_out_;
+	template<class RENDER>
+	SOUND_OUT codec<RENDER>::sound_out_;
 
-	template<class SDC, class RENDER>
-	volatile uint32_t codec<SDC, RENDER>::cycle_count_;
+//	template<class RENDER>
+//	volatile uint32_t codec<RENDER>::cycle_count_;
 }
 

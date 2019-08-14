@@ -13,7 +13,7 @@
 #include "common/sci_i2c_io.hpp"
 #include "common/spi_io2.hpp"
 #include "ff13c/mmc_io.hpp"
-#include "common/sdc_man.hpp"
+#include "common/file_io.hpp"
 #include "common/tpu_io.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
@@ -77,8 +77,6 @@ namespace {
 
 	MMC			sdh_(spi_, 35000000);
 #endif
-	typedef utils::sdc_man SDC;
-	SDC			sdc_;
 
 	utils::command<256> cmd_;
 
@@ -109,8 +107,6 @@ namespace {
 	typedef img::bmp_in<RENDER> BMP_IN;
 	BMP_IN		bmp_in_(render_);
 
-
-
 	typedef graphics::def_color DEF_COLOR;
 
 	// FT5206, SCI6 簡易 I2C 定義
@@ -128,11 +124,11 @@ namespace {
 	typedef gui::dialog<RENDER, FT5206> DIALOG;
 	DIALOG		dialog_(render_, ft5206_); 
 
-	typedef gui::filer<RENDER, SDC> FILER;
-	FILER		filer_(render_, sdc_);
+	typedef gui::filer<RENDER> FILER;
+	FILER		filer_(render_);
 
-	typedef audio::codec<RENDER, SDC> AUDIO;
-	AUDIO		audio_(render_, sdc_);
+	typedef audio::codec<RENDER> AUDIO;
+	AUDIO		audio_(render_);
 
 	uint8_t		pad_level_ = 0;
 	uint8_t		touch_num_ = 0;
@@ -140,7 +136,7 @@ namespace {
 
 
 	bool check_mount_() {
-		auto f = sdc_.get_mount();
+		auto f = sdh_.get_mount();
 		if(!f) {
 			utils::format("SD card not mount.\n");
 		}
@@ -185,7 +181,7 @@ namespace {
 		}
 		if(chip::on(ptrg, chip::FAMIPAD_ST::START)) { // Cancel Play
 			ctrl = sound::af_play::CTRL::STOP;
-			sdc_.stall_dir_list();
+			audio_.stop();
 			render_.clear(DEF_COLOR::Black);
 		}
 
@@ -198,7 +194,7 @@ namespace {
 			touch_org_ = xy.x;
 		} else if(touch_num_ == 3 && tnum < 3) {  // Cancel Play（３点タッチが離れた瞬間）
 			ctrl = sound::af_play::CTRL::STOP;
-			sdc_.stall_dir_list();
+			audio_.stop();
 			render_.clear(DEF_COLOR::Black);
 			touch_org_ = xy.x;
 		} else if(touch_num_ == 0 && tnum == 1) {
@@ -231,27 +227,30 @@ namespace {
 			if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
 				if(check_mount_()) {
 					if(cmdn >= 2) {
-						char tmp[128];
+						char tmp[256];
 						cmd_.get_word(1, tmp, sizeof(tmp));
-						sdc_.dir(tmp);
+						utils::file_io::dir(tmp);
 					} else {
-						sdc_.dir("");
+						utils::file_io::dir("");
 					}
 				}
 				f = true;
 			} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
 				if(check_mount_()) {
 					if(cmdn >= 2) {
-						char tmp[128];
+						char tmp[256];
 						cmd_.get_word(1, tmp, sizeof(tmp));
-						sdc_.cd(tmp);						
+						utils::file_io::cd(tmp);						
 					} else {
-						sdc_.cd("/");
+						utils::file_io::cd("/");
 					}
 				}
 				f = true;
 			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-				utils::format("%s\n") % sdc_.get_current();
+				char tmp[256];
+				if(utils::file_io::pwd(tmp, sizeof(tmp))) {
+					utils::format("%s\n") % tmp;
+				}
 				f = true;
 			} else if(cmd_.cmp_word(0, "play")) {
 				if(cmdn >= 2) {
@@ -268,7 +267,7 @@ namespace {
 				f = true;
 			} else if(cmd_.cmp_word(0, "jpeg")) {
 				if(cmdn >= 2) {
-					char tmp[128];
+					char tmp[256];
 					cmd_.get_word(1, tmp, sizeof(tmp));
 					audio_.at_scaling().set_offset();
 					audio_.at_scaling().set_scale();
@@ -279,7 +278,7 @@ namespace {
 				f = true;
 			} else if(cmd_.cmp_word(0, "bmp")) {
 				if(cmdn >= 2) {
-					char tmp[128];
+					char tmp[256];
 					cmd_.get_word(1, tmp, sizeof(tmp));
 					if(!bmp_in_.load(tmp)) {
 						utils::format("Can't load BMP file: '%s'\n") % tmp;
@@ -292,10 +291,11 @@ namespace {
 				utils::format("    pwd\n");
 				utils::format("    play [filename, *]\n");
 				utils::format("    jpeg [filename]\n");
+				utils::format("    bmp [filename]\n");
 				f = true;
 			}
 			if(!f) {
-				char tmp[128];
+				char tmp[256];
 				if(cmd_.get_word(0, tmp, sizeof(tmp))) {
 					utils::format("Command error: '%s'\n") % tmp;
 				}
@@ -372,17 +372,6 @@ extern "C" {
 		time_t t = 0;
 		return utils::str::get_fattime(t);
 	}
-
-
-	int fatfs_get_mount() {
-		return check_mount_();
-	}
-
-
-	int make_full_path(const char* src, char* dst, uint16_t len)
-	{
-		return sdc_.make_full_path(src, dst, len);
-	}
 }
 
 int main(int argc, char** argv);
@@ -398,7 +387,6 @@ int main(int argc, char** argv)
 
 	{  // SD カード・クラスの初期化
 		sdh_.start();
-		sdc_.start();
 	}
 
 	utils::format("RTK5RX65N Start for AUDIO sample\n");
@@ -477,6 +465,7 @@ int main(int argc, char** argv)
 			}
 			update_led_();
 		}
+		render_.clear(DEF_COLOR::Black);
 	}
 #endif
 
@@ -484,11 +473,17 @@ int main(int argc, char** argv)
 		render_.sync_frame();
 
 		ft5206_.update();
+
 		command_();
 
 		{
 			auto data = get_fami_pad();
 			uint32_t ctrl = 0;
+
+			if(sdh_.get_mount()) {
+				gui::set(gui::filer_ctrl::MOUNT, ctrl);
+			}
+
 			if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
 				gui::set(gui::filer_ctrl::OPEN, ctrl);
 			}
@@ -515,7 +510,8 @@ int main(int argc, char** argv)
 			}
 		}
 
-		sdc_.service(sdh_.service());
+		sdh_.service();
+		audio_.service();
 
 		update_led_();
 	}
