@@ -21,7 +21,6 @@
 #include "chip/FT5206.hpp"
 
 #include "common/spi_io2.hpp"
-#include "common/sdc_man.hpp"
 
 #include "graphics/widget_director.hpp"
 
@@ -118,8 +117,7 @@ namespace app {
 		typedef device::NULL_PORT SDC_POWER;
 		typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
 #endif
-		typedef utils::sdc_man SDC;
-		typedef gui::filer<RENDER, SDC> FILER;
+		typedef gui::filer<RENDER> FILER;
 
 		typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
 
@@ -228,7 +226,6 @@ namespace app {
 		SPI			spi_;
 		MMC			sdh_;
 #endif
-		SDC			sdc_;
 		FILER		filer_;
 
 		CMT			cmt_;
@@ -257,7 +254,7 @@ namespace app {
 			touch_(ft5206_i2c_),
 			widd_(render_, touch_),
 			menu_(render_, back_), back_(render_), dialog_(render_, touch_),
-			spi_(), sdh_(spi_, 35000000), sdc_(), filer_(render_, sdc_),
+			spi_(), sdh_(spi_, 35000000), filer_(render_),
 			resource_(render_),
 			plot_(render_), img_in_(plot_),
 			gps_s_(), nmea_(gps_s_),
@@ -272,9 +269,8 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init() noexcept
 		{
-			{  // SDC 開始
+			{
 				sdh_.start();
-				sdc_.start();
 			}
 
 			{
@@ -344,7 +340,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void update() noexcept
 		{
-			sdc_.service(sdh_.service());
+			sdh_.service();
 
 			nmea_.service();
 //			nmea_.list_all();
@@ -494,15 +490,6 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		auto& at_sdh() noexcept { return sdh_; }
-
-
-		//-------------------------------------------------------------//
-		/*!
-			@brief	SDC の参照
-			@return SDC
-		*/
-		//-------------------------------------------------------------//
-		auto& at_sdc() noexcept { return sdc_; }
 
 
 		//-------------------------------------------------------------//
