@@ -15,6 +15,7 @@
 #endif
 
 #include "common/string_utils.hpp"
+#include "ff13c/mmc_io.hpp"
 #include "common/format.hpp"
 #include "common/dir_list.hpp"
 
