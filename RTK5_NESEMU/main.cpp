@@ -394,7 +394,11 @@ int main(int argc, char** argv)
 			flt = 0;
 		}
 
+		bool m = sdh_.get_mount();
 		uint32_t ctrl = 0;
+		if(m) {
+			gui::set(gui::filer_ctrl::MOUNT, ctrl);
+		}
 		if(flt >= 120) {
 			sound_out_.mute();
 			gui::set(gui::filer_ctrl::OPEN, ctrl);
@@ -402,8 +406,7 @@ int main(int argc, char** argv)
 			flt = 0;
 		}
 
-		{
-			bool m = sdh_.get_mount();
+		{	
 			if(!mount && m) {
 				render_.set_fore_color(graphics::def_color::Black);
 				render_.fill_box(vtx::srect(480-24, 0, 24, 16));
