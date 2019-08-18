@@ -9,7 +9,9 @@
 */
 //=====================================================================//
 #include <cstring>
+#ifdef FATFS
 #include "ff13c/source/ff.h"
+#endif
 #include "common/time.h"
 #include "common/format.hpp"
 
@@ -336,37 +338,57 @@ namespace utils {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	標準的なフォーマットで日付、時間、年表示
+			@param[in]	gt	GMT 時間
+			@return GMT 標準時間値
+		*/
+		//-----------------------------------------------------------------//
+		static void print_date_time(time_t gt) noexcept
+		{
+                struct tm *m = localtime(&gt);
+                utils::format("%s %s %d %02d:%02d:%02d  %4d\n")
+                    % get_wday(m->tm_wday)
+                    % get_mon(m->tm_mon)
+                    % static_cast<uint32_t>(m->tm_mday)
+                    % static_cast<uint32_t>(m->tm_hour)
+                    % static_cast<uint32_t>(m->tm_min)
+                    % static_cast<uint32_t>(m->tm_sec)
+                    % static_cast<uint32_t>(m->tm_year + 1900);
+		}
+
+
         //-----------------------------------------------------------------//
         /*!
-            @brief  ワード数を取得
+            @brief  文字列中の「単語」数を取得 @n
+					※バックスラッシュによる除外を行う
 			@param[in]	src		ソース
-			@param[in]	sch		分離キャラクタ
+			@param[in]	sch		単語分離キャラクタ
 			@return ワード数を返す
         */
         //-----------------------------------------------------------------//
-		static uint16_t get_words(const char* src, char sch = ' ') noexcept
+		static uint32_t get_words(const char* src, char sch = ' ') noexcept
 		{
 			if(src == nullptr) return 0;
 
-			const char* p = src;
+			uint32_t n = 0;
 			char bc = sch;
-			uint16_t n = 0;
-			bool esc = false;
+			bool bsc = false;
 			while(1) {
-				char ch = *p++;
-				if(ch == 0) break;
-				if(esc) {
-					esc = false;
-					continue;
-				}
+				char ch = *src++;
 				if(ch == '\\') {
-					esc = true;
+					bsc = true;
 					continue;
-				} 
-				if(bc == sch && ch != sch) {
-					++n;
+				} else if(bsc) {
+					bsc = false;
+				} else {
+					if(ch == 0) break;
+					if(bc == sch && ch != sch) { 
+						++n;
+					}
+					bc = ch;
 				}
-				bc = ch;
 			}
 			return n;
 		}
@@ -374,7 +396,8 @@ namespace utils {
 
         //-----------------------------------------------------------------//
         /*!
-            @brief  ワードを取得
+            @brief  ワードを取得 @n
+					※バックスラッシュによる除外を行う
 			@param[in]	src	ソース
 			@param[in]	argc	ワード位置
 			@param[out]	dst		ワード文字列格納ポインター
@@ -383,37 +406,43 @@ namespace utils {
 			@return 取得できたら「true」を返す
         */
         //-----------------------------------------------------------------//
-		static bool get_word(const char* src, uint16_t argc, char* dst, uint16_t size,
+		static bool get_word(const char* src, uint32_t argc, char* dst, uint32_t dstlen,
 			char sch = ' ') noexcept 
 		{
-			if(src == nullptr || dst == nullptr) return false;
+			if(src == nullptr || dst == nullptr || dstlen == 0) return false;
 
-			const char* p = src;
+			uint32_t n = 0;
 			char bc = sch;
-			const char* wd = p;
+			bool bsc = false;
+			bool out = false;
 			while(1) {
-				char ch = *p;
-				if(bc == sch && ch != sch) {
-					wd = p;
-				}
-				if(bc != sch && (ch == sch || ch == 0)) {
-					if(argc == 0) {
-						uint8_t i;
-						for(i = 0; i < (p - wd); ++i) {
-							--size;
-							if(size == 0) break;
-							dst[i] = wd[i];
+				char ch = *src++;
+				if(ch == '\\') {
+					bsc = true;
+					continue;
+				} else if(bsc) {
+					bsc = false;
+				} else {
+					if(bc == sch && ch != sch) {
+						if(n == argc) {
+							out = true;
 						}
-						dst[i] = 0;
-						return true;
+						++n;
+					} else if(bc != sch && ch == sch) {
+						if(out) {
+							break;
+						}
 					}
-					--argc;
+					if(ch == 0) break;
+					bc = ch;
 				}
-				if(ch == 0) break;
-				bc = ch;
-				++p;
+				if(out && dstlen > 1) {
+					*dst++ = ch;
+					dstlen--;
+				}
 			}
-			return false;
+			*dst = 0;
+			return out;
 		}
 
 
@@ -427,32 +456,42 @@ namespace utils {
 			@return マッチした場合「true」
         */
         //-----------------------------------------------------------------//
-		static bool cmp_word(const char* src, uint16_t argc, const char* key, char sch = ' ') noexcept
+		static bool cmp_word(const char* src, uint32_t argc, const char* key, char sch = ' ') noexcept
 		{
-			if(src == nullptr) return false;
-			if(key == nullptr) return false;
+			if(src == nullptr || key == nullptr) return false;
 
-			const char* p = src;
+			uint32_t n = 0;
 			char bc = sch;
-			int keylen = std::strlen(key);
-			const char* top = p;
+			bool bsc = false;
+			bool out = false;
 			while(1) {
-				char ch = *p;
-				if(bc == sch && ch != sch) {
-					top = p;
-				}
-				if(bc != sch && (ch == sch || ch == 0)) {
-					int len = p - top;					
-					if(argc == 0 && len == keylen) {
-						return std::strncmp(key, top, keylen) == 0;
+				char ch = *src++;
+				if(ch == '\\') {
+					bsc = true;
+					continue;
+				} else if(bsc) {
+					bsc = false;
+				} else {
+					if(bc == sch && ch != sch) {
+						if(n == argc) {
+							out = true;
+						}
+						++n;
+					} else if(bc != sch && ch == sch) {
+						if(out) {
+							break;
+						}
 					}
-					--argc;
+					if(ch == 0) break;
+					bc = ch;
 				}
-				if(ch == 0) break;
-				bc = ch;
-				++p;
+				if(out) {
+					if(ch != *key) return false;
+					++key; 
+				}
 			}
-			return false;
+			if(*key == 0) return true;
+			else return false;
 		}
 
 

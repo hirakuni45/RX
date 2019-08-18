@@ -8,7 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <cstring>
+#include "common/string_utils.hpp"
 #include "common/input.hpp"
 
 extern "C" {
@@ -85,7 +85,7 @@ namespace utils {
         //-----------------------------------------------------------------//
         /*!
             @brief  サービス @n
-					定期的に呼び出す
+					※文字取得バッファが溢れない程度に呼び出す。
 			@return 「Enter」キーが押されたら「true」
         */
         //-----------------------------------------------------------------//
@@ -194,31 +194,12 @@ namespace utils {
         //-----------------------------------------------------------------//
         /*!
             @brief  ワード数を取得
+			@param[in]	sch		単語分離キャラクタ
 			@return ワード数を返す
         */
         //-----------------------------------------------------------------//
-		uint8_t get_words() const {
-			const char* p = buff_;
-			char bc = ' ';
-			uint8_t n = 0;
-			bool esc = false;
-			while(1) {
-				char ch = *p++;
-				if(ch == 0) break;
-				if(esc) {
-					esc = false;
-					continue;
-				}
-				if(ch == '\\') {
-					esc = true;
-					continue;
-				} 
-				if(bc == ' ' && ch != ' ') {
-					++n;
-				}
-				bc = ch;
-			}
-			return n;
+		uint32_t get_words(char sch = ' ') const {
+			return str::get_words(buff_, sch);
 		}
 
 
@@ -226,38 +207,14 @@ namespace utils {
         /*!
             @brief  ワードを取得
 			@param[in]	argc	ワード位置
-			@param[out]	word	ワード文字列格納ポインター
-			@param[in]	limit	ワード文字列リミット数
+			@param[out]	dst		ワード文字列格納ポインター
+			@param[in]	dstlen	ワード文字列リミット数
+			@param[in]	sch		単語分離キャラクタ
 			@return 取得できたら「true」を返す
         */
         //-----------------------------------------------------------------//
-		bool get_word(uint8_t argc, char* word, uint16_t limit) const {
-			const char* p = buff_;
-			char bc = ' ';
-			const char* wd = p;
-			while(1) {
-				char ch = *p;
-				if(bc == ' ' && ch != ' ') {
-					wd = p;
-				}
-				if(bc != ' ' && (ch == ' ' || ch == 0)) {
-					if(argc == 0) {
-						uint8_t i;
-						for(i = 0; i < (p - wd); ++i) {
-							--limit;
-							if(limit == 0) break;
-							word[i] = wd[i];
-						}
-						word[i] = 0;
-						return true;
-					}
-					--argc;
-				}
-				if(ch == 0) break;
-				bc = ch;
-				++p;
-			}
-			return false;
+		bool get_word(uint32_t argc, char* dst, uint32_t dstlen, char sch = ' ') const {
+			return str::get_word(buff_, argc, dst, dstlen);
 		}
 
 
@@ -266,32 +223,12 @@ namespace utils {
             @brief  ワードを比較
 			@param[in]	argc	ワード位置
 			@param[in]	key		比較文字列
-			@return 
+			@param[in]	sch		単語分離キャラクタ
+			@return 同じ場合「true」
         */
         //-----------------------------------------------------------------//
-		bool cmp_word(uint8_t argc, const char* key) const {
-			if(key == nullptr) return false;
-			const char* p = buff_;
-			char bc = ' ';
-			int keylen = std::strlen(key);
-			const char* top = p;
-			while(1) {
-				char ch = *p;
-				if(bc == ' ' && ch != ' ') {
-					top = p;
-				}
-				if(bc != ' ' && (ch == ' ' || ch == 0)) {
-					int len = p - top;					
-					if(argc == 0 && len == keylen) {
-						return std::strncmp(key, top, keylen) == 0;
-					}
-					--argc;
-				}
-				if(ch == 0) break;
-				bc = ch;
-				++p;
-			}
-			return false;
+		bool cmp_word(uint32_t argc, const char* key, char sch = ' ') const {
+			return str::cmp_word(buff_, argc, key, sch);
 		}
 
 
