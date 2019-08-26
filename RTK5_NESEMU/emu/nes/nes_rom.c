@@ -141,12 +141,10 @@ static int rom_allocsram(rominfo_t *rominfo)
 /* If there's a trainer, load it in at $7000 */
 static int rom_loadtrainer(FILE *fp, rominfo_t *rominfo)
 {
-//	ASSERT(rom);
 	ASSERT(rominfo);
 
 	if(rominfo->flags & ROM_FLAG_TRAINER) {
 		fread(rominfo->sram + TRAINER_OFFSET, TRAINER_LENGTH, 1, fp);
-//		rom += TRAINER_LENGTH;
 		log_printf("Read in trainer at $7000\n");
 	}
 	return 0;
@@ -424,19 +422,6 @@ rominfo_t *rom_load(const char *filename)
 		return NULL;
 	}
 
-//	fseek(fp, 0, SEEK_END);
-//	long sz = ftell( fp );
-//	uint8_t *rom = (uint8_t *)malloc(sz);
-//	fseek(fp, 0, SEEK_SET);
-//	if(fread(rom, 1, sz, fp) != sz) {
-//		free(rom);
-//		fclose(fp);
-//		log_printf("Read error ROM file: %s (%ld)\n", filename, sz);
-//		return NULL;
-//	}
-//	fclose(fp);
-//	printf("LOAD ROM: %s (%d)\n", filename, sz);
-
 	rominfo_t *rominfo;
 	rominfo = malloc(sizeof(rominfo_t));
 	if(NULL == rominfo) {
@@ -469,6 +454,7 @@ rominfo_t *rom_load(const char *filename)
     		goto _fail;
 		}
 	}
+	fclose(fp);
 
 	rom_loadsram(rominfo);
 
@@ -479,6 +465,7 @@ rominfo_t *rom_load(const char *filename)
 	return rominfo;
 
 _fail:
+	fclose(fp);
 	rom_free(rominfo);
 	return NULL;
 }
