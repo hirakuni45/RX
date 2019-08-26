@@ -16,8 +16,6 @@
 
 #include "chip/FAMIPAD.hpp"
 
-// #include "emu/nsf/nsfplay.hpp"
-
 extern "C" {
 
 	uint8_t get_fami_pad();
@@ -44,11 +42,7 @@ namespace emu {
 
 		uint16_t		audio_buf_[audio_len_];
 
-//		emu::nsfplay	nsfplay_;
-
 		bool			nesrom_;
-
-		uint32_t		delay_;
 
 		nesinput_t		inp_[2];
 
@@ -58,7 +52,7 @@ namespace emu {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		nesemu() noexcept : nesrom_(false), delay_(120) { }
+		nesemu() noexcept : audio_buf_{ 0 }, nesrom_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -124,24 +118,6 @@ namespace emu {
 		//-----------------------------------------------------------------//
 		void service(void* org, uint32_t xs, uint32_t ys)
 		{
-			if(delay_ > 0) {
-				--delay_;
-				if(delay_ == 0) {
-//					open("GALAXIAN.NES");
-//					open("Galaga_j.NES");
-//					open("Pac-Man.NES");
-//					open("GRADIUS.nes");
-//					open("DragonQuest_J_fix.nes");
-//					open("Dragon_Quest2_fix.nes");
-//					open("Solstice_J.nes");
-
-// メモリー不足で動作しない・・
-//					open("Zombie.nes");
-// メモリーマッパーが未対応
-//					open("High_Speed_E.nes");
-				}
-			}
-
 			auto nes = nes_getcontext();
 			bitmap_t* v = nes->vidbuf;
 			const rgb_t* lut = get_palette();
@@ -233,4 +209,3 @@ namespace emu {
 		const uint16_t* get_audio_buf() const noexcept { return audio_buf_; }
 	};
 }
-
