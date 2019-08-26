@@ -97,7 +97,7 @@ namespace rx64m {
 
 		bool read_(void* buff, uint32_t len) {
 			timeval tv;
-			tv.tv_sec  = 5;
+			tv.tv_sec  = 10;
 			tv.tv_usec = 0;
 			return rs232c_.recv(buff, len, tv) == len;
 		}
