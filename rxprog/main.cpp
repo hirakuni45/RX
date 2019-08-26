@@ -2,7 +2,7 @@
 /*!	@file
 	@brief	Renesas RX Series Programmer (Flash Writer)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,7 +16,7 @@
 
 namespace {
 
-	const std::string version_ = "1.10b";
+	const std::string version_ = "1.12b";
 	const std::string conf_file_ = "rx_prog.conf";
 	const uint32_t progress_num_ = 50;
 	const char progress_cha_ = '#';
