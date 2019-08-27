@@ -54,6 +54,9 @@ namespace gui {
 		static const int16_t FLN = RDR::font_type::height + SPC;		///< 行幅
 		static const int16_t SCN = (RDR::glc_type::height - SPC) / FLN;	///< 行数
 
+		static const uint16_t REPEAT_DELAY = 40;	///< リピートまでの時間（フレーム数）
+		static const uint16_t REPEAT_CYCLE = 8;		///< リピート間隔（フレーム数）
+
 		typedef graphics::def_color DEF_COLOR;
 
 		RDR&		rdr_;
@@ -76,7 +79,7 @@ namespace gui {
 				sel_pos_(0), num_(0), match_(-1)
 			{ }
 		};
-		rdr_st	rdr_st_;
+		rdr_st		rdr_st_;
 
 		struct pos_t {
 			int16_t		vofs_;
@@ -85,20 +88,23 @@ namespace gui {
 				vofs_(vofs), sel_pos_(sel_pos) { }
 		};
 		typedef utils::fixed_stack<pos_t, 16> POS_STACK;
-		POS_STACK		pos_stack_;
+		POS_STACK	pos_stack_;
 
-		bool			touch_lvl_;
-		bool			touch_pos_;
-		bool			touch_neg_;
-		uint8_t			touch_num_;
-		int16_t			touch_x_;
-		int16_t			touch_y_;
-		int16_t			touch_org_x_;
-		int16_t			touch_org_y_;
-		int16_t			touch_end_x_;
-		int16_t			touch_end_y_;
+		bool		touch_lvl_;
+		bool		touch_pos_;
+		bool		touch_neg_;
+		uint8_t		touch_num_;
+		int16_t		touch_x_;
+		int16_t		touch_y_;
+		int16_t		touch_org_x_;
+		int16_t		touch_org_y_;
+		int16_t		touch_end_x_;
+		int16_t		touch_end_y_;
 
-		uint8_t			back_num_;
+		uint8_t		back_num_;
+
+		uint16_t	repeat_;
+
 
 		static uint32_t ctrl_mask_(filer_ctrl ctrl) noexcept
 		{
@@ -184,7 +190,7 @@ namespace gui {
 			touch_lvl_(false), touch_pos_(false), touch_neg_(false), touch_num_(0),
 			touch_x_(0), touch_y_(0),
 			touch_org_x_(0), touch_org_y_(0), touch_end_x_(0), touch_end_y_(0),
-			back_num_(0)
+			back_num_(0), repeat_(0)
 		{ }
 
 
@@ -279,6 +285,19 @@ namespace gui {
 						ptrg |= ctrl_mask_(filer_ctrl::UP);
 						touch_org_y_ = touch_y_;
 					}
+				}
+			}
+
+			{
+				auto t = ctrl_ & (ctrl_mask_(filer_ctrl::DOWN) | ctrl_mask_(filer_ctrl::UP));
+				if(t != 0) {
+					++repeat_;
+					if(repeat_ >= REPEAT_DELAY) {
+						ptrg |= t; 
+						repeat_ -= REPEAT_CYCLE;
+					}
+				} else {
+					repeat_ = 0;
 				}
 			}
 
