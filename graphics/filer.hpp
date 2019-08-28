@@ -25,6 +25,8 @@ namespace gui {
 		DOWN,		///< スクロール下
 		BACK,		///< ディレクトリーを戻る
 		SELECT,		///< 選択
+		INFO,		///< ファイルの情報を表示
+		CLOSE,		///< ファイラーを閉じる
 	};
 
 
@@ -50,6 +52,10 @@ namespace gui {
 	template <class RDR>
 	class filer {
 
+		using GLC = typename RDR::glc_type;
+
+		static const int16_t modal_radius = 10;  // modal round radius
+
 		static const int16_t SPC = 2;									///< 文字間隙間
 		static const int16_t FLN = RDR::font_type::height + SPC;		///< 行幅
 		static const int16_t SCN = (RDR::glc_type::height - SPC) / FLN;	///< 行数
@@ -65,7 +71,6 @@ namespace gui {
 		DLIST		dlist_;
 
 		uint32_t	ctrl_;
-		bool		open_;
 
 		struct rdr_st {
 			int16_t		vofs_;
@@ -80,6 +85,9 @@ namespace gui {
 			{ }
 		};
 		rdr_st		rdr_st_;
+
+		bool		open_;
+		bool		info_;
 
 		struct pos_t {
 			int16_t		vofs_;
@@ -186,12 +194,37 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		filer(RDR& rdr) noexcept : rdr_(rdr), dlist_(),
-			ctrl_(0), open_(false), rdr_st_(),
+			ctrl_(0), rdr_st_(), open_(false), info_(false), 
 			touch_lvl_(false), touch_pos_(false), touch_neg_(false), touch_num_(0),
 			touch_x_(0), touch_y_(0),
 			touch_org_x_(0), touch_org_y_(0), touch_end_x_(0), touch_end_y_(0),
 			back_num_(0), repeat_(0)
 		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	モーダルウィンドウ描画（画面の中心に表示される）
+			@param[in]	size	大きさ
+			@param[in]	text	テキスト
+		*/
+		//-----------------------------------------------------------------//
+		void modal(const vtx::spos& size, const char* text) noexcept
+		{
+			vtx::spos pos((GLC::width  - size.x) / 2, (GLC::height - size.y) / 2);
+			rdr_.set_fore_color(DEF_COLOR::White);
+			rdr_.set_back_color(DEF_COLOR::Darkgray);
+			vtx::srect r(pos, size);
+			rdr_.round_box(r, modal_radius);
+			r.org += 2;
+			r.size -= 2 * 2;
+			rdr_.swap_color();
+			rdr_.round_box(r, modal_radius - 2);
+
+			auto sz = rdr_.at_font().get_text_size(text);
+			rdr_.swap_color();
+			rdr_.draw_text(pos + (size - sz) / 2, text);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -259,6 +292,10 @@ namespace gui {
 					scan_dir_(false);
 				}
 			}
+			if((ptrg & ctrl_mask_(filer_ctrl::CLOSE)) != 0) {
+				rdr_.clear(DEF_COLOR::Black);
+				open_ = false;
+			}
 			back_num_ = touch_num_;
 
 			if(!open_) {
@@ -306,6 +343,49 @@ namespace gui {
 				if(rdr_st_.num_ < static_cast<int16_t>(dlist_.get_total())) {
 					return false;
 				}
+			}
+
+			if(ptrg & ctrl_mask_(filer_ctrl::INFO)) {
+				if(info_) {
+					pos_stack_.push(pos_t(rdr_st_.vofs_, rdr_st_.sel_pos_));
+					info_ = false;
+					rdr_.clear(DEF_COLOR::Black);
+					scan_dir_(true);
+					return false;
+				} else {
+					info_ = true;
+					uint32_t idx = rdr_st_.sel_pos_ - rdr_st_.vofs_ / FLN;
+					char tmp[FF_MAX_LFN + 1];
+					if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
+						return false;
+					}
+					if(!utils::file_io::get_dir_path(tmp, idx, dst, dstlen)) {
+						return false;
+					}
+					bool dir = false;
+					uint32_t l = strlen(dst);
+					if(dst[l - 1] == '/') {
+						dir = true;
+						dst[l - 1] = 0;
+					}
+					auto t = utils::file_io::get_time(dst);
+					struct tm *m = localtime(&t);
+					utils::sformat("%s %2d %4d %02d:%02d\n", tmp, sizeof(tmp))
+						% get_mon(m->tm_mon)
+						% static_cast<int>(m->tm_mday)
+						% static_cast<int>(m->tm_year + 1900)
+						% static_cast<int>(m->tm_hour)
+						% static_cast<int>(m->tm_min);
+					if(!dir) {
+						auto n = utils::file_io::get_file_size(dst);
+						l = strlen(tmp);
+						utils::sformat("%u bytes", &tmp[l], sizeof(tmp) - l) % n;
+					}
+					modal(vtx::spos(300, 80), tmp);
+				}
+			}
+			if(info_) {
+				return false;
 			}
 
 			// 選択フレームの描画
