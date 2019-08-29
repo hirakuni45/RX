@@ -643,6 +643,46 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  小文字を大文字に変換
+			@param[in]	src		元
+			@param[out]	dst		先
+			@param[in]	len		先の大きさ	
+		*/
+		//-----------------------------------------------------------------//
+		static void to_caps(const char* src, char* dst, uint32_t len) {
+			char ch;
+			while((ch = *src++) != 0) {
+				if(len <= 1) break;
+				if(ch >= 'a' && ch <= 'z') ch -= 0x20;
+				*dst++ = ch;
+				--len;
+			}
+			if(len > 0) *dst = 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  大文字を小文字に変換
+			@param[in]	src		元
+			@param[out]	dst		先
+			@param[in]	len		先の大きさ	
+		*/
+		//-----------------------------------------------------------------//
+		static void no_caps(const char* src, char* dst, uint32_t len) {
+			char ch;
+			while((ch = *src++) != 0) {
+				if(len <= 1) break;
+				if(ch >= 'A' && ch <= 'Z') ch += 0x20;
+				*dst++ = ch;
+				--len;
+			}
+			if(len > 0) *dst = 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  拡張子を識別
 			@param[in]	filename	ファイル名（フルパス）
 			@param[in]	exts		拡張子テーブル（「,」で区切られた文字列）
