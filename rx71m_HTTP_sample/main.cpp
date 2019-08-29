@@ -67,7 +67,7 @@ namespace {
 
 	net::ethernet   ethernet_;
 	HTTP_SERVER     https_(ethernet_);
-	TELNETS			telnets_(ethernet_, false);
+//	TELNETS			telnets_(ethernet_, false);
 
 	http<HTTP_SERVER>	http_(https_);
 
@@ -94,6 +94,7 @@ extern "C" {
 		@brief  時間の作成
 		@param[in]	date	日付
 		@param[in]	time	時間
+		@return GMT 時間
 	*/
 	//-----------------------------------------------------------------//
 	size_t make_time(const char* date, const char* time)
@@ -101,7 +102,11 @@ extern "C" {
 		time_t t = get_time();
 		struct tm *m = localtime(&t);
 		int vs[3];
-		if((utils::input("%d/%d/%d", date) % vs[0] % vs[1] % vs[2]).status()) {
+		if(date == nullptr) {
+			m->tm_year = 0;  // 1900
+			m->tm_mon = 0;  // Jan
+			m->tm_mday = 1; // day of 1
+		} else if((utils::input("%d/%d/%d", date) % vs[0] % vs[1] % vs[2]).status()) {
 			if(vs[0] >= 1900 && vs[0] < 2100) m->tm_year = vs[0] - 1900;
 			if(vs[1] >= 1 && vs[1] <= 12) m->tm_mon = vs[1] - 1;
 			if(vs[2] >= 1 && vs[2] <= 31) m->tm_mday = vs[2];		
@@ -109,7 +114,11 @@ extern "C" {
 			return 0;
 		}
 
-		if((utils::input("%d:%d:%d", time) % vs[0] % vs[1] % vs[2]).status()) {
+		if(time == nullptr) {
+			m->tm_hour = 0;
+			m->tm_min = 0;
+			m->tm_sec = 0;
+		} else if((utils::input("%d:%d:%d", time) % vs[0] % vs[1] % vs[2]).status()) {
 			if(vs[0] >= 0 && vs[0] < 24) m->tm_hour = vs[0];
 			if(vs[1] >= 0 && vs[1] < 60) m->tm_min = vs[1];
 			if(vs[2] >= 0 && vs[2] < 60) m->tm_sec = vs[2];
@@ -399,8 +408,8 @@ int main(int argc, char** argv)
 	}
 
 	{  // SCI 設定
-		uint8_t int_level = 2;
-		sci_.start(115200, int_level);
+		uint8_t intr_level = 2;
+		sci_.start(115200, intr_level);
 	}
 
 	auto clk = F_ICLK / 1000000;
@@ -444,7 +453,7 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
-//		service_putch_tmp_();
+		service_putch_tmp_();
 
 		ethernet_.service();
 
@@ -453,94 +462,24 @@ int main(int argc, char** argv)
 //		telnets_.service(100);
 //		ftps_.service(100);
 
-
 		if(cmd_.service()) {
-		}
+			auto n = cmd_.get_words();
+			if(n == 0) ;
+			else if(cmd_.cmp_word(0, "date")) {
+				if(n <= 1) {
+					auto gt = get_time();
+					utils::str::print_date_time(gt);
+				} else if(n <= 2) {
 
-#if 0
-		if(send_all_) {
-			if(send_idx_ < 2048) {
-				wdm_send_(512);
-			} else {
-				send_all_ = false;
-			}
-		}
-
-		if(cmd_.service()) {
-			uint8_t cmdn = cmd_.get_words();
-			if(cmdn >= 1) {
-				char tmp[128];
-				tmp[0] = 0;
-				if(cmdn >= 2) {
-					cmd_.get_word(1, tmp, sizeof(tmp));
-				}
-				if(cmd_.cmp_word(0, "st")) {  // get status
-					auto st = wdmc_.get_status();
-					utils::format("WDM st: %04X\n") % st;
-				} else if(cmd_.cmp_word(0, "get")) {
-					int num = 0;
-					if(cmdn >= 2 && (utils::input("%d", tmp) % num).status()) {
-						for(int i = 0; i < num; ++i) {
-							auto w = wdmc_.get_wave(0);
-							utils::format("%d\n") % w;
-						}
-					}
-				} else if(cmd_.cmp_word(0, "ttt")) {
-					wdmc_.set_wave_pos(1 + 1, 0);
-					auto w = wdmc_.get_wave(1 + 1);
-					utils::format("%d\n") % w;
-
-				} else if(cmd_.cmp_word(0, "cap")) {
-					wdmc_.set_wave_pos(0, 0);
-					for(int i = 0; i < 2048; ++i) {
-						wave_buff_[i] = wdmc_.get_wave(1);
-					}
-					send_idx_ = 0;
-				} else if(cmd_.cmp_word(0, "pgw")) {
-					int num = 0;
-					if(cmdn >= 2 && (utils::input("%d", tmp) % num).status()) {
-						wdm_send_(num);
-					}					
-				} else if(cmd_.cmp_word(0, "mtw")) {
-					int num = 0;
-					uint16_t d = 0;
-					if(cmdn >= 2 && (utils::input("%d", tmp) % num).status()) {
-						for(int i = 0; i < 2048; ++i) {
-							wave_buff_[i] = d;
-							d += num;
-						}
-						send_idx_ = 0;
-					}					
-				} else if(cmd_.cmp_word(0, "all")) {
-					send_idx_ = 0;
-					send_all_ = true;
-				} else if(cmd_.cmp_word(0, "crr")) {
-					crm_.puts("CRR?1    \n");
-				} else if(cmd_.cmp_word(0, "thr")) {
-					wdmc_.output(0x080000);
-					utils::delay::micro_second(100);
-					wdmc_.output(0x08F000);
-					wdmc_.output(0x104300);
-					wdmc_.output(0x204280);
-					ign_cmd_.start_treg();
-					utils::format("WDM THR First Trigger Request\n");
-				} else if(cmd_.cmp_word(0, "help")) {
-					utils::format("WDM command help\n");
-					utils::format("  st           read status\n");
-					utils::format("  get [num]    get wave data\n");
-					utils::format("  cap          capture\n");
-					utils::format("  pgw [num]    put wave data\n");
-					utils::format("  mtw [dlt]    make test wave data\n");
-					utils::format("  all          all capture and send\n");
-					utils::format("  crr          CRR\n");
-					utils::format("  thr          thrmal registance request\n");
 				} else {
-					cmd_.get_word(0, tmp, sizeof(tmp));
-					utils::format("command error: '%s'\n") % tmp;
+
 				}
+			} else if(cmd_.cmp_word(0, "help")) {
+				utils::format("    date [yyyy/mm/dd]\n");
+			} else {
+				utils::format("command error: '%s'\n") % cmd_.get_command();
 			}
 		}
-#endif
 
 		++cnt;
 		if(cnt >= 32) {

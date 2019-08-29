@@ -43,7 +43,7 @@ CSOURCES	=	common/init.c \
                 r_net/T4_src/tcp_api.c \
                 r_net/T4_src/r_dhcp_client.c \
 				FreeRTOS/Source/portable/GCC/RX600v2/port.c \
-				FreeRTOS/Source/portable/MemMang/heap_3.c \
+				FreeRTOS/Source/portable/MemMang/heap_4.c \
 				FreeRTOS/Source/croutine.c \
 				FreeRTOS/Source/event_groups.c \
 				FreeRTOS/Source/list.c \
@@ -51,6 +51,16 @@ CSOURCES	=	common/init.c \
 				FreeRTOS/Source/stream_buffer.c \
 				FreeRTOS/Source/tasks.c \
 				FreeRTOS/Source/timers.c
+
+#				FreeRTOS_TCP/source/FreeRTOS_ARP.c \
+				FreeRTOS_TCP/source/FreeRTOS_DHCP.c \
+				FreeRTOS_TCP/source/FreeRTOS_DNS.c \
+				FreeRTOS_TCP/source/FreeRTOS_IP.c \
+				FreeRTOS_TCP/source/FreeRTOS_Sockets.c \
+				FreeRTOS_TCP/source/FreeRTOS_Stream_Buffer.c \
+				FreeRTOS_TCP/source/FreeRTOS_TCP_IP.c \
+				FreeRTOS_TCP/source/FreeRTOS_TCP_WIN.c \
+				FreeRTOS_TCP/source/FreeRTOS_UDP_IP.c
 
 PSOURCES	=	main.cpp \
 				r_net/ethernet.cpp \
@@ -92,6 +102,8 @@ INC_SYS     =   $(LOCAL_PATH)/include
 INC_APP		=	. ../ \
 				../FreeRTOS/Source/include \
 				../FreeRTOS/Source/portable/GCC/RX600v2 \
+				../FreeRTOS_TCP \
+				../FreeRTOS_TCP/include \
 				../r_net
 
 LIB_ROOT	=

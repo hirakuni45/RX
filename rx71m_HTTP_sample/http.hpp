@@ -27,7 +27,7 @@ extern "C" {
 namespace {
 
     typedef net::http_server<16, 8192> HTTP_SERVER;
-    typedef net::telnet_server<4096, 4096> TELNETS;
+///    typedef net::telnet_server<4096, 4096> TELNETS;
 
 	static const int HTTP_VERSION = 50;
 
