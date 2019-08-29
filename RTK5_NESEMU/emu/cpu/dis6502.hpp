@@ -1,9 +1,11 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	6502 dis assembler クラス @n
-			Copyright 2017 Kunihito Hiramatsu
-	@author	平松邦仁 (hira@rvf-rc45.net)
+	@brief	6502 dis assembler クラス
+    @author 平松邦仁 (hira@rvf-rc45.net)
+    @copyright  Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
+                Released under the MIT license @n
+                https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdint>
@@ -79,43 +81,43 @@ namespace cpu {
 		}
 
 		int dis_show_ind_(char* buf) const {
-			return sprintf(buf, "(%04X)  ", dis_op16_());
+			return sprintf(buf, "($%04X)  ", dis_op16_());
 		}
 
 		int dis_show_ind_x_(char* buf) const {
-			return sprintf(buf, "(%02X,x)  ", dis_op8_());
+			return sprintf(buf, "($%02X,x)  ", dis_op8_());
 		}
 
 		int dis_show_ind_y_(char* buf) const {
-			return sprintf(buf, "(%02X),y  ", dis_op8_());
+			return sprintf(buf, "($%02X),y  ", dis_op8_());
 		}
 
 		int dis_show_zero_x_(char* buf) const {
-			return sprintf(buf, " %02X,x   ", dis_op8_());
+			return sprintf(buf, " $%02X,x   ", dis_op8_());
 		}
 
 		int dis_show_zero_y_(char* buf) const {
-			return sprintf(buf, " %02X,y   ", dis_op8_());
+			return sprintf(buf, " $%02X,y   ", dis_op8_());
 		}
 
 		int dis_show_abs_y_(char* buf) const {
-			return sprintf(buf, " %04X,y ", dis_op16_());
+			return sprintf(buf, " $%04X,y ", dis_op16_());
 		}
 
 		int dis_show_abs_x_(char* buf) const {
-			return sprintf(buf, " %04X,x ", dis_op16_());
+			return sprintf(buf, " $%04X,x ", dis_op16_());
 		}
 
 		int dis_show_zero_(char* buf) const {
-			return sprintf(buf, " %02X     ", dis_op8_());
+			return sprintf(buf, " $%02X     ", dis_op8_());
 		}
 
 		int dis_show_abs_(char* buf) const {
-			return sprintf(buf, " %04X   ", dis_op16_());
+			return sprintf(buf, " $%04X   ", dis_op16_());
 		}
 
 		int dis_show_immediate_(char* buf) const {
-			return sprintf(buf, "#%02X     ", dis_op8_());
+			return sprintf(buf, " #$%02X     ", dis_op8_());
 		}
 
 		int dis_show_acc_(char* buf) const {
@@ -126,7 +128,7 @@ namespace cpu {
 			int target;
 			target = (int8_t) dis_op8_();
 			target += (pc_reg_ + 2);
-			return sprintf(buf, " %04X   ", target);
+			return sprintf(buf, " $%04X   ", target);
 		}
 
 		int dis_show_code_(char* buf, adrmode optype) const {
@@ -186,9 +188,12 @@ namespace cpu {
 		//-------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	gb	get byte func
+			@param[in]	pb	put byte func
 		*/
 		//-------------------------------------------------------------//
-		dis6502() : pc_reg_(0) { }
+		dis6502(getbyte_type gb, putbyte_type pb) : pc_reg_(0),
+			getbyte_(gb), putbyte_(pb) { }
 
 
 		//-------------------------------------------------------------//
@@ -223,7 +228,7 @@ namespace cpu {
 
 			pc_reg_ = PC;
 
-			buf += sprintf(buf, "%04X- ", pc_reg_);
+			buf += sprintf(buf, "%04X- ", (unsigned int)pc_reg_);
 
 			switch (getbyte_(pc_reg_)) {
 			case 0x00: op = "brk"; type = adrmode::imp;    break;
