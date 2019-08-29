@@ -373,7 +373,7 @@ static int rom_getheader(FILE *fp, rominfo_t *rominfo)
 }
 
 /* Build the info string for ROM display */
-char *rom_getinfo(rominfo_t *rominfo)
+const char *rom_getinfo(rominfo_t *rominfo)
 {
    static char info[PATH_MAX + 1];
    char romname[PATH_MAX + 1], temp[PATH_MAX + 1];

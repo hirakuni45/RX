@@ -381,11 +381,11 @@ int state_save(void)
    if (SNSS_OK != status)
       goto _error;
 
-	log_printf("State %d saved", state_slot);
+	log_printf("State %d saved\n", state_slot);
 	return 0;
 
 _error:
-	log_printf("error: %s", SNSS_GetErrorString(status));
+	log_printf("error: %s\n", SNSS_GetErrorString(status));
 	SNSS_CloseFile(&snssFile);
 	return -1;
 }
@@ -464,11 +464,11 @@ int state_load(void)
    if (SNSS_OK != status)
       goto _error;
 
-	log_printf("State %d restored", state_slot);
+	log_printf("State %d restored\n", state_slot);
 	return 0;
 
 _error:
-	log_printf("error: %s", SNSS_GetErrorString(status));
+	log_printf("error: %s\n", SNSS_GetErrorString(status));
 	SNSS_CloseFile(&snssFile);
 	return -1;
 }
