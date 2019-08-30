@@ -3,25 +3,23 @@
 /*!	@file
 	@brief	NES Emulator ハンドラー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "common/string_utils.hpp"
 #include "emu/log.h"
 #include "emu/nes/nes.h"
 #include "emu/nes/nesinput.h"
 #include "emu/nes/nesstate.h"
 #include "emu/nes/nes_pal.h"
+#include "emu/cpu/dis6502.hpp"
 
 #include "chip/FAMIPAD.hpp"
 
 extern "C" {
-
 	uint8_t get_fami_pad();
-	uint16_t sci_length(void);
-	char sci_getch(void);
-
 }
 
 
@@ -44,6 +42,10 @@ namespace emu {
 
 		bool			nesrom_;
 
+		cpu::dis6502	disa_;
+
+		uint16_t		mon_val_[3];
+
 		nesinput_t		inp_[2];
 
 	public:
@@ -52,7 +54,10 @@ namespace emu {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		nesemu() noexcept : audio_buf_{ 0 }, nesrom_(false) { }
+		nesemu() noexcept : audio_buf_{ 0 }, nesrom_(false),
+			disa_(nes6502_getbyte, nes6502_putbyte),
+			mon_val_{ 0 }
+		{ }
 
 
 		//-----------------------------------------------------------------//
@@ -96,10 +101,57 @@ namespace emu {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  カートリッジが有効か？
+			@return 有効なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool probe() const { return nesrom_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  一時停止の取得
+			@return 一時停止
+		*/
+		//-----------------------------------------------------------------//
+		bool get_pause() const noexcept {
+			const nes_t* t = nes_getcontext();
+			return t->pause;			
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  一時停止
+		*/
+		//-----------------------------------------------------------------//
+		void enable_pause(bool ena = true) noexcept {
+			if(!nesrom_) return;
+
+			nes_pause(ena);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  情報取得
+			@return 情報テキスト
+		*/
+		//-----------------------------------------------------------------//
+		const char* get_info() noexcept {
+			nes_t* t = nes_getcontext();
+	   		if(t == nullptr) return nullptr;
+			if(t->rominfo == nullptr) return nullptr;
+			return rom_getinfo(t->rominfo);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  エミュレーターを終了
 		*/
 		//-----------------------------------------------------------------//
-		void close()
+		void close() noexcept
 		{
 			if(nesrom_) {
 				nes_eject_cart();
@@ -207,5 +259,139 @@ namespace emu {
 		*/
 		//-----------------------------------------------------------------//
 		const uint16_t* get_audio_buf() const noexcept { return audio_buf_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ステートのセーブ
+			@param[in]	no	スロット番号（０～９）
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool save_state(int no) noexcept {
+			if(!nesrom_) return false;
+			state_setslot(no);
+			return state_save() == 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ステートのロード
+			@param[in]	no	スロット番号（０～９）
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool load_state(int no) noexcept {
+			if(!nesrom_) return false;
+			state_setslot(no);
+			return state_load() == 0;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ハード・リセット
+		*/
+		//-----------------------------------------------------------------//
+		void reset() noexcept {
+			nes_reset(HARD_RESET);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  モニター機能
+			@param[in]	cmd		コマンド
+		*/
+		//-----------------------------------------------------------------//
+		void monitor(const char* cmd) noexcept {
+			char ch;
+			uint16_t hexadec = 0;
+			bool write = false;
+			bool area = false;
+			while(1) {
+				ch = *cmd++;
+				if(ch >= 'a' && ch <= 'z') ch -= 0x20;
+				if(ch >= '0' && ch <= '9') {
+					mon_val_[0] <<= 4;
+					mon_val_[0] |= static_cast<uint16_t>(ch - '0');
+					++hexadec;
+				} else if(ch >= 'A' && ch <= 'F') {
+					mon_val_[0] <<= 4;
+					mon_val_[0] |= static_cast<uint16_t>(ch - 'A' + 10);
+					++hexadec;
+				} else if(ch == 'L') {
+					if(hexadec > 0) {
+						mon_val_[2] = mon_val_[0];
+					}
+					for(int i = 0; i < 20; ++i) {
+						char tmp[64];
+						disa_.disasm(mon_val_[2], tmp, sizeof(tmp));
+						utils::str::to_caps(tmp, tmp, sizeof(tmp));
+						utils::format("%s\n") % tmp;
+						mon_val_[2] = disa_.get_pc();
+					}
+					hexadec = 0;
+					write = false;
+					area = false;
+				} else if(ch == '.') {
+					mon_val_[1] = mon_val_[0];
+					write = false;
+					area = true;
+					hexadec = 0;
+				} else if(ch == ':') {
+					mon_val_[1] = mon_val_[0];
+					write = true;
+					area = false;
+					hexadec = 0;
+				} else if(ch == ' ' || ch == 0) {
+					if(write) {
+						if(hexadec > 0) {
+							nes6502_putbyte(mon_val_[1], mon_val_[0]);
+							mon_val_[1]++;						
+						}
+					} else if(ch == 0) {
+						uint32_t org = 0; 
+						uint32_t end = 0;
+						if(area) {
+							org = mon_val_[1];
+							if(hexadec > 0) {
+								end = mon_val_[0] + 1;
+								if(org > end) end = org;
+							} else {
+								end = org + 16;
+							}
+							area = false; 
+						} else {
+							if(hexadec > 0) {
+								org = mon_val_[1] = mon_val_[0];
+								end = org + 1;
+							} else {
+								org = end = mon_val_[1];
+							}
+						}
+						while(org < end) {
+							char tmp[96];
+							auto l = end - org;
+							if(l == 0) l = 1;
+							else if(l > 16) l = 16;
+							org = disa_.dump(org, l, tmp, sizeof(tmp));
+							utils::format("%s\n") % tmp;
+						 }
+						mon_val_[1] = org;
+					}
+					mon_val_[0] = 0;
+					hexadec = 0;
+				} else {
+					utils::format("%c?\n") % ch;
+					hexadec = 0;
+					write = false;
+					area = false;
+				}
+
+				if(ch == 0) break;
+			}
+		}
 	};
 }

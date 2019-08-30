@@ -15,6 +15,7 @@
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/shell.hpp"
 #include "common/spi_io2.hpp"
 #include "common/tpu_io.hpp"
 #include "sound/sound_out.hpp"
@@ -140,71 +141,98 @@ namespace {
 	typedef gui::filer<RENDER> FILER;
 	FILER		filer_(render_);
 
-	emu::nesemu		nesemu_;
+	time_t		rtc_time_ = 0;
 
-//	utils::command<256> cmd_;
+	emu::nesemu	nesemu_;
 
-	uint8_t			fami_pad_data_;
+	typedef utils::command<256> CMD;
+	CMD			cmd_;
+	typedef utils::shell<CMD> SHELL;
+	SHELL		shell_(cmd_);
 
-#if 0
+	uint8_t		fami_pad_data_;
+	bool		monitor_ = false;
+
 	void command_()
 	{
 		if(!cmd_.service()) {
 			return;
 		}
 
-		uint8_t cmdn = cmd_.get_words();
-		if(cmdn >= 1) {
-			bool f = false;
-			if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, sizeof(tmp), tmp);
-						sdc_.dir(tmp);
-					} else {
-						sdc_.dir("");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, sizeof(tmp), tmp);
-						sdc_.cd(tmp);						
-					} else {
-						sdc_.cd("/");
-					}
-				}
-				f = true;
-			} else if(cmd_.cmp_word(0, "pwd")) { // pwd
-				utils::format("%s\n") % sdc_.get_current();
-				f = true;
-			} else if(cmd_.cmp_word(0, "nes")) {
-				if(check_mount_()) {
-					if(cmdn >= 2) {
-						char tmp[128];
-						cmd_.get_word(1, sizeof(tmp), tmp);
-						f = nesemu_.open(tmp);						
-					}
-				}
-			} else if(cmd_.cmp_word(0, "help")) {
-				utils::format("    dir [path]\n");
-				utils::format("    cd [path]\n");
-				utils::format("    pwd\n");
-				utils::format("    nes path\n");
-				f = true;
+		if(shell_.analize()) {
+			return;
+		}
+
+		if(monitor_) {
+			auto n = cmd_.get_words();
+			if(n == 0) return;
+			if(cmd_.cmp_word(0, "exit")) {
+				cmd_.set_prompt("# ");
+				monitor_ = false;
+			} else {
+				nesemu_.monitor(cmd_.get_command());
 			}
-			if(!f) {
-				char tmp[128];
-				if(cmd_.get_word(0, sizeof(tmp), tmp)) {
-					utils::format("Command error: '%s'\n") % tmp;
+			return;
+		}
+
+		auto cmdn = cmd_.get_words();
+		if(cmdn == 0) return;
+
+		if(cmd_.cmp_word(0, "nes")) {
+			if(cmdn >= 2) {
+				char tmp[FF_MAX_LFN + 1];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				if(!nesemu_.open(tmp)) {
+					utils::format("Open error: '%s'\n") % tmp;
 				}
 			}
+		} else if(cmd_.cmp_word(0, "reset")) {
+			nesemu_.reset();
+		} else if(cmd_.cmp_word(0, "pause")) {
+			nesemu_.enable_pause(!nesemu_.get_pause());
+		} else if(cmd_.cmp_word(0, "save")) {
+			int slot = 0;
+			if(cmdn >= 2) {
+				char tmp[32];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				utils::input("%d", tmp) % slot;
+			}
+			if(!nesemu_.save_state(slot)) {
+				utils::format("Save state error: slot = %d\n") % slot;
+			}
+		} else if(cmd_.cmp_word(0, "load")) {
+			int slot = 0;
+			if(cmdn >= 2) {
+				char tmp[32];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				utils::input("%d", tmp) % slot;
+			}
+			if(!nesemu_.load_state(slot)) {
+				utils::format("Load state error: slot = %d\n") % slot;
+			}
+		} else if(cmd_.cmp_word(0, "info")) {
+			const char* str = nesemu_.get_info();
+			utils::format("%s\n") % str;
+		} else if(cmd_.cmp_word(0, "call-151")) {
+			if(nesemu_.probe()) {
+				cmd_.set_prompt("$");
+				monitor_ = true;
+			} else {
+				utils::format("Not Ready To Cartridge (NESEMU)\n");
+			}
+		} else if(cmd_.cmp_word(0, "help")) {
+			shell_.help();
+			utils::format("    nes filename\n");
+			utils::format("    pause\n");
+			utils::format("    reset\n");
+			utils::format("    save [slot-no]\n");
+			utils::format("    load [slot-no]\n");
+			utils::format("    info\n");
+			utils::format("    call-151\n");
+		} else {
+			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
 	}
-#endif
 
 	void update_nesemu_()
 	{
@@ -242,7 +270,6 @@ extern "C" {
 
     int emu_log(const char* text)
     {
-//        emu::tools::put(text);
 		sci_puts(text);
         return 0;
     }
@@ -294,14 +321,9 @@ extern "C" {
 
 
 	DWORD get_fattime(void) {
-		time_t t = 0;
-///		rtc_.get_time(t);
-		return utils::str::get_fattime(t);
-	}
-
-
-	void utf8_to_oemc(const char* src, char* dst, uint32_t len) {
-		utils::str::utf8_to_oemc(src, dst, len);
+//		time_t t = 0;
+//		rtc_.get_time(t);
+		return utils::str::get_fattime(rtc_time_);
 	}
 }
 
@@ -323,6 +345,17 @@ int main(int argc, char** argv)
 		sci_.start(115200, sci_level);
 	}
 
+	{  // 時計の初期時刻(2019/9/1 12:00:00)
+		struct tm m;
+		m.tm_year = 2019 - 1900;
+		m.tm_mon  = 9 - 1;
+		m.tm_mday = 1;
+		m.tm_hour = 12;
+		m.tm_min  = 0;
+		m.tm_sec  = 0;
+		rtc_time_ = mktime(&m);
+	}
+
 	{  // SD カード・クラスの初期化
 		sdh_.start();
 	}
@@ -330,12 +363,11 @@ int main(int argc, char** argv)
 	// 波形メモリーの無音状態初期化
 	sound_out_.mute();
 
-	{  // サンプリング・タイマー設定（初期 44.1KHz ）
-//		set_sample_rate(44100);
+	{  // サンプリング・タイマー設定（初期 22.05KHz ）
 		set_sample_rate(22050);
 	}
 
-	{  // DMAC マネージャー開始
+	{  // サウンドストリーム DMAC マネージャー開始
 		uint8_t intr_level = 4;
 		bool cpu_intr = true;
 		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
@@ -346,8 +378,8 @@ int main(int argc, char** argv)
 		}
 	}
 
-	utils::format("\rRTK5RX65N Start for NES Emulator sample\n");
-//	cmd_.set_prompt("# ");
+	utils::format("\rRTK5RX65N Start for NES Emulator\n");
+	cmd_.set_prompt("# ");
 
 	{  // GLCDC 初期化
 		LCD_DISP::DIR  = 1;
@@ -381,6 +413,7 @@ int main(int argc, char** argv)
 
 	uint8_t n = 0;
 	uint8_t flt = 0;
+	uint8_t	sec = 0;
 	bool filer = false;
 	bool mount = sdh_.get_mount();
 	while(1) {
@@ -406,7 +439,7 @@ int main(int argc, char** argv)
 			flt = 0;
 		}
 
-		{	
+		{
 			if(!mount && m) {
 				render_.set_fore_color(graphics::def_color::Black);
 				render_.fill_box(vtx::srect(480-24, 0, 24, 16));
@@ -420,9 +453,13 @@ int main(int argc, char** argv)
 		}
 
 		if(filer) {
-//			if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
-//				graphics::set(graphics::filer_ctrl::OPEN, ctrl);
-//			}
+			if(chip::on(data, chip::FAMIPAD_ST::B)) {
+				gui::set(gui::filer_ctrl::CLOSE, ctrl);
+				filer = false;
+			}
+			if(chip::on(data, chip::FAMIPAD_ST::A)) {
+				gui::set(gui::filer_ctrl::INFO, ctrl);
+			}
 			if(chip::on(data, chip::FAMIPAD_ST::UP)) {
 				gui::set(gui::filer_ctrl::UP, ctrl);
 			}
@@ -452,7 +489,7 @@ int main(int argc, char** argv)
 
 		sdh_.service();
 
-//		command_();
+		command_();
 
 		++n;
 		if(n >= 30) {
@@ -462,6 +499,11 @@ int main(int argc, char** argv)
 			LED::P = 0;
 		} else {
 			LED::P = 1;
+		}
+		++sec;
+		if(sec >= 60) {
+			sec = 0;
+			++rtc_time_;
 		}
 	}
 }
