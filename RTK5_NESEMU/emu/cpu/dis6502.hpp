@@ -9,8 +9,8 @@
 */
 //=====================================================================//
 #include <cstdint>
-#include <cstdio>
 #include <functional>
+#include "common/format.hpp"
 
 namespace cpu {
 
@@ -65,12 +65,10 @@ namespace cpu {
 			static const uint8_t C = 0x01;
 		};
 
-		uint32_t	pc_reg_;
+		uint32_t		pc_reg_;
 
 		getbyte_type	getbyte_;
 		putbyte_type	putbyte_;
-
-		char		text_[256];
 
 		uint8_t dis_op8_() const {
 			return (getbyte_(pc_reg_ + 1));
@@ -80,64 +78,64 @@ namespace cpu {
 			return (getbyte_(pc_reg_ + 1) + (getbyte_(pc_reg_ + 2) << 8));
 		}
 
-		int dis_show_ind_(char* buf) const {
-			return sprintf(buf, "($%04X)  ", dis_op16_());
+		void dis_show_ind_(char* out, uint32_t len) const {
+			utils::sformat("($%04X)  ", out, len, true) % dis_op16_();
 		}
 
-		int dis_show_ind_x_(char* buf) const {
-			return sprintf(buf, "($%02X,x)  ", dis_op8_());
+		void dis_show_ind_x_(char* out, uint32_t len) const {
+			utils::sformat("($%02X,x)  ", out, len, true) % dis_op8_();
 		}
 
-		int dis_show_ind_y_(char* buf) const {
-			return sprintf(buf, "($%02X),y  ", dis_op8_());
+		void dis_show_ind_y_(char* out, uint32_t len) const {
+			utils::sformat("($%02X),y  ", out, len, true) % dis_op8_();
 		}
 
-		int dis_show_zero_x_(char* buf) const {
-			return sprintf(buf, " $%02X,x   ", dis_op8_());
+		void dis_show_zero_x_(char* out, uint32_t len) const {
+			utils::sformat(" $%02X,x   ", out, len, true) % dis_op8_();
 		}
 
-		int dis_show_zero_y_(char* buf) const {
-			return sprintf(buf, " $%02X,y   ", dis_op8_());
+		void dis_show_zero_y_(char* out, uint32_t len) const {
+			utils::sformat(" $%02X,y   ", out, len, true) % dis_op8_();
 		}
 
-		int dis_show_abs_y_(char* buf) const {
-			return sprintf(buf, " $%04X,y ", dis_op16_());
+		void dis_show_abs_y_(char* out, uint32_t len) const {
+			utils::sformat(" $%04X,y ", out, len, true) % dis_op16_();
 		}
 
-		int dis_show_abs_x_(char* buf) const {
-			return sprintf(buf, " $%04X,x ", dis_op16_());
+		void dis_show_abs_x_(char* out, uint32_t len) const {
+			utils::sformat(" $%04X,x ", out, len, true) % dis_op16_();
 		}
 
-		int dis_show_zero_(char* buf) const {
-			return sprintf(buf, " $%02X     ", dis_op8_());
+		void dis_show_zero_(char* out, uint32_t len) const {
+			utils::sformat(" $%02X     ", out, len, true) % dis_op8_();
 		}
 
-		int dis_show_abs_(char* buf) const {
-			return sprintf(buf, " $%04X   ", dis_op16_());
+		void dis_show_abs_(char* out, uint32_t len) const {
+			utils::sformat(" $%04X   ", out, len, true) % dis_op16_();
 		}
 
-		int dis_show_immediate_(char* buf) const {
-			return sprintf(buf, " #$%02X     ", dis_op8_());
+		void dis_show_immediate_(char* out, uint32_t len) const {
+			utils::sformat(" #$%02X     ", out, len, true) % dis_op8_();
 		}
 
-		int dis_show_acc_(char* buf) const {
-			return sprintf(buf, " a      ");
+		void dis_show_acc_(char* out, uint32_t len) const {
+			utils::sformat(" a      ", out, len, true);
 		}
 
-		int dis_show_relative_(char* buf) const {
+		void dis_show_relative_(char* out, uint32_t len) const {
 			int target;
-			target = (int8_t) dis_op8_();
+			target = static_cast<int8_t>(dis_op8_());
 			target += (pc_reg_ + 2);
-			return sprintf(buf, " $%04X   ", target);
+			utils::sformat(" $%04X   ", out, len, true) % target;
 		}
 
-		int dis_show_code_(char* buf, adrmode optype) const {
-			char *dest = buf + sprintf(buf, "%02X ", getbyte_(pc_reg_));
+		void dis_show_code_(char* out, uint32_t len, adrmode optype) const {
+			utils::sformat("%02X ", out, len, true) % static_cast<uint16_t>(getbyte_(pc_reg_));
 
 			switch(optype) {
 			case adrmode::imp:
 			case adrmode::acc:
-				dest += sprintf(dest, "      ");
+				utils::sformat("      ", out, len, true);
 				break;
 
 			case adrmode::rel:
@@ -147,41 +145,42 @@ namespace cpu {
 			case adrmode::zero_y:
 			case adrmode::ind_y:
 			case adrmode::ind_x:
-				dest += sprintf(dest, "%02X    ", getbyte_(pc_reg_ + 1));
+				utils::sformat("%02X    ", out, len, true)
+					% static_cast<uint16_t>(getbyte_(pc_reg_ + 1));
 				break;
 
 			case adrmode::abs:
 			case adrmode::abs_x:
 			case adrmode::abs_y:
 			case adrmode::ind:
-				dest += sprintf(dest, "%02X %02X ", getbyte_(pc_reg_ + 1), getbyte_(pc_reg_ + 2));
+				utils::sformat("%02X %02X ", out, len, true)
+					% static_cast<uint16_t>(getbyte_(pc_reg_ + 1))
+					% static_cast<uint16_t>(getbyte_(pc_reg_ + 2));
 				break;
 			}
-			return dest - buf;
 		}
 
-		int dis_show_op_(char* buf, const char* opstr, adrmode optype) const {
-			char *dest = buf;
+		void dis_show_op_(char* out, uint32_t len, const char* opstr, adrmode optype) const {
    
-			dest += dis_show_code_(dest, optype);
-			dest += sprintf(dest, "%s ", opstr);
+			dis_show_code_(out, len, optype);
+
+			utils::sformat("%s ", out, len, true) % opstr;
 
 			switch(optype) {
-			case adrmode::imp:     dest += sprintf(dest, "        ");   break;
-			case adrmode::acc:     dest += dis_show_acc_(dest);         break;
-			case adrmode::rel:     dest += dis_show_relative_(dest);    break;
-			case adrmode::imm:     dest += dis_show_immediate_(dest);   break;
-			case adrmode::abs:     dest += dis_show_abs_(dest);         break;
-			case adrmode::abs_x:   dest += dis_show_abs_x_(dest);       break;
-			case adrmode::abs_y:   dest += dis_show_abs_y_(dest);       break;
-			case adrmode::zero:    dest += dis_show_zero_(dest);        break;
-			case adrmode::zero_x:  dest += dis_show_zero_x_(dest);      break;
-			case adrmode::zero_y:  dest += dis_show_zero_y_(dest);      break;
-			case adrmode::ind:     dest += dis_show_ind_(dest);         break;
-			case adrmode::ind_x:   dest += dis_show_ind_x_(dest);       break;
-			case adrmode::ind_y:   dest += dis_show_ind_y_(dest);       break;
+			case adrmode::imp:     utils::sformat("        ", out, len, true);   break;
+			case adrmode::acc:     dis_show_acc_(out, len);        break;
+			case adrmode::rel:     dis_show_relative_(out, len);   break;
+			case adrmode::imm:     dis_show_immediate_(out, len);  break;
+			case adrmode::abs:     dis_show_abs_(out, len);        break;
+			case adrmode::abs_x:   dis_show_abs_x_(out, len);      break;
+			case adrmode::abs_y:   dis_show_abs_y_(out, len);      break;
+			case adrmode::zero:    dis_show_zero_(out, len);       break;
+			case adrmode::zero_x:  dis_show_zero_x_(out, len);     break;
+			case adrmode::zero_y:  dis_show_zero_y_(out, len);     break;
+			case adrmode::ind:     dis_show_ind_(out, len);        break;
+			case adrmode::ind_x:   dis_show_ind_x_(out, len);      break;
+			case adrmode::ind_y:   dis_show_ind_y_(out, len);      break;
 			}
-			return dest - buf;
 		}
 
 	public:
@@ -217,18 +216,19 @@ namespace cpu {
 		//-------------------------------------------------------------//
 		/*!
 			@brief	逆アセンブル
-			@param[in]	PC	開始アドレス
+			@param[in]	org	開始アドレス
+			@param[out]	out	文字列
+			@param[in]	len	文字列長さ
 		*/
 		//-------------------------------------------------------------//
-		const char* disasm(uint32_t PC)
+		void disasm(uint32_t org, char* out, uint32_t len)
 		{
-			char* buf = text_;
 			const char* op;
 			adrmode type;
 
-			pc_reg_ = PC;
+			pc_reg_ = org;
 
-			buf += sprintf(buf, "%04X- ", (unsigned int)pc_reg_);
+			utils::sformat("%04X- ", out, len) % pc_reg_;
 
 			switch (getbyte_(pc_reg_)) {
 			case 0x00: op = "brk"; type = adrmode::imp;    break;
@@ -504,19 +504,7 @@ namespace cpu {
 			case 0xff: op = "isb"; type = adrmode::abs_x;  break;
 			}
 
-			buf += dis_show_op_(buf, op, type);
-
-#if 0
-			buf += sprintf(buf, "%c%c1%c%c%c%c%c %02X %02X %02X %02X\n",
-				(P & flags::N) ? 'N' : '.',
-				(P & flags::V) ? 'V' : '.',
-				(P & flags::B) ? 'B' : '.',
-				(P & flags::D) ? 'D' : '.',
-				(P & flags::I) ? 'I' : '.',
-				(P & flags::Z) ? 'Z' : '.',
-				(P & flags::C) ? 'C' : '.',
-				A, X, Y, S);
-#endif
+			dis_show_op_(out, len, op, type);
 
 			uint32_t step = 0;
 			switch(type) {
@@ -535,8 +523,58 @@ namespace cpu {
 			case adrmode::ind_y:  step = 2; break;
 			}
 			pc_reg_ += step;
+		}
 
-			return text_;
+#if 0
+		//-------------------------------------------------------------//
+		/*!
+			@brief	レジスタ表示
+			@param[out]	out		文字列
+			@param[in]	olen	文字列長さ
+		*/
+		//-------------------------------------------------------------//
+		void disp_register(char* out, uint32_t olen) 
+		{
+			utils::sformat("%c%c1%c%c%c%c%c %02X %02X %02X %02X", out, olen)
+				% (P & flags::N) ? 'N' : '-'
+				% (P & flags::V) ? 'V' : '-'
+				% (P & flags::B) ? 'B' : '-'
+				% (P & flags::D) ? 'D' : '-'
+				% (P & flags::I) ? 'I' : '-'
+				% (P & flags::Z) ? 'Z' : '-'
+				% (P & flags::C) ? 'C' : '-'
+				% static_cast<uint16_t>(A)
+				% static_cast<uint16_t>(X)
+				% static_cast<uint16_t>(Y)
+				% static_cast<uint16_t>(S);
+		}
+#endif
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	ダンプ・メモリ（ライン）
+			@param[in]	org		開始アドレス
+			@param[in]	dlen	ダンプ長さ
+			@param[out]	out		文字列
+			@param[in]	olen	文字列長さ
+		*/
+		//-------------------------------------------------------------//
+		uint32_t dump(uint32_t org, uint32_t dlen, char* out, uint32_t olen)
+		{
+			utils::sformat("%04X-", out, olen) % org;
+			while(1) {
+				utils::sformat(" %02X", out, olen, true) % static_cast<uint16_t>(getbyte_(org));
+				++org;
+				dlen--;
+				if(dlen == 0 || (org & 0xf) == 0) {
+					break;
+				}
+				if((org & 0xf) == 8) {
+					utils::sformat(" ", out, olen, true);
+				}
+			}
+			return org;
 		}
 
 
@@ -571,14 +609,5 @@ namespace cpu {
 		*/
 		//-------------------------------------------------------------//
 		uint32_t get_pc() const { return pc_reg_ & 0xffff; }
-
-
-		//-------------------------------------------------------------//
-		/*!
-			@brief	アセンブルリスト取得
-			@return アセンブルリスト
-		*/
-		//-------------------------------------------------------------//
-		const char* get_list() const { return text_; }
 	};
 }
