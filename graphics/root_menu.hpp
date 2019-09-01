@@ -15,6 +15,30 @@ namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
+		@brief	標準的ボタン・クラス
+		@param[in]	RDR		基本描画クラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class RDR>
+	class back_btn {
+		RDR&	rdr_;
+	public:
+		back_btn(RDR& rdr) : rdr_(rdr) { }
+
+		void operator () (const vtx::srect& rect)
+		{
+			rdr_.round_box(rect, 8);
+			rdr_.swap_color();
+			auto r = rect;
+			r.org += 2;
+			r.size -= 2 * 2;
+			rdr_.round_box(r, 8 - 2);
+		}
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
 		@brief	ルート・メニュー・クラス
 		@param[in]	RDR		基本描画クラス
 		@param[in]	BACK	ボタン背面の描画クラス	
@@ -195,14 +219,53 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	メニュー先頭位置を取得
+			@param[in]	idx		インデックス
+			@return メニュー先頭位置
+		*/
+		//-----------------------------------------------------------------//
+		vtx::spos get_org(uint16_t idx) const noexcept
+		{
+			vtx::spos n((RDR::glc_type::width  - ofs_.x - m_.x) / 2,
+				(RDR::glc_type::height - ofs_.y - m_.y) / 2);
+			n += ofs_;
+
+			for(auto i = 0; i < size_; ++i) {
+				const auto& obj = obj_[i];
+				n.y += gap_ / 2;
+				if(idx == i) return n;
+				n.y += space_.y;
+				n.y += obj.h_;
+				n.y += space_.y;
+				n.y += gap_ - (gap_ / 2);
+			}
+			return n;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	オブジェクトを再設定
+			@param[in]	idx		インデックス
+			@param[in]	src		オブジェクト・ソース
+		*/
+		//-----------------------------------------------------------------//
+		void set(uint32_t idx, const void* src) noexcept {
+			if(idx >= size_) return;
+
+			obj_[idx].src_ = src;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	レンダリング
-			@param[in]	px	X 位置
-			@param[in]	py	Y 位置
+			@param[in]	point	タッチ位置
 			@param[in]	touch	タッチ状態
 			@return メニューが選択された場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool render(int16_t px = -1, int16_t py = -1, bool touch = false) noexcept
+		bool render(const vtx::spos& point, bool touch = false) noexcept
 		{
 			if(size_ == 0) return false;
 
@@ -215,8 +278,8 @@ namespace gui {
 				n.y += gap_ / 2;
 				auto fc = graphics::def_color::White;
 				auto bc = graphics::def_color::Darkgray;
-				if(n.x <= px && px < (n.x + m_.x) &&
-					n.y <= py && py < (n.y + obj.h_ + space_.y * 2)) {
+				if(n.x <= point.x && point.x < (n.x + m_.x) &&
+					n.y <= point.y && point.y < (n.y + obj.h_ + space_.y * 2)) {
 					idx = i;
 					if(touch) {
 						bc = graphics::def_color::Silver;
