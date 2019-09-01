@@ -145,7 +145,7 @@ namespace {
 	FILER		filer_(render_);
 
 	typedef gui::back_btn<RENDER> BACK_BTN;
-	typedef gui::root_menu<RENDER, BACK_BTN, 4> ROOTM;
+	typedef gui::root_menu<RENDER, BACK_BTN, 5> ROOTM;
 
 	BACK_BTN	back_btn_(render_);
 	ROOTM		rootm_(render_, back_btn_);
@@ -438,6 +438,7 @@ int main(int argc, char** argv)
 	rootm_.add("Select NES File");
 	rootm_.add("Load State 0");
 	rootm_.add("Save State 0");
+	rootm_.add("Reset");
 	rootm_.add("Close Menu");
 
 	uint8_t n = 0;
@@ -515,7 +516,6 @@ int main(int argc, char** argv)
 			if(chip::on(trg, chip::FAMIPAD_ST::A)) {
 				switch(idx) {
 				case 0:
-					menu = false;
 					gui::set(gui::filer_ctrl::OPEN, ctrl);
 					filer = true;
 					break;
@@ -524,19 +524,22 @@ int main(int argc, char** argv)
 						dialog_.modal(vtx::spos(400, 80), "Load state error");
 						error = true;
 					}
-					menu = false;
 					break;
 				case 2:
 					if(!nesemu_.save_state(slot)) {
 						dialog_.modal(vtx::spos(400, 80), "Save state error");
 						error = true;
 					}
-					menu = false;
 					break;
 				case 3:
-					menu = false;
+					nesemu_.reset();
+					break;
+				case 4:
 					break;
 				}
+				fami_pad_data_ = 0;
+				render_.clear(graphics::def_color::Black);
+				menu = false;
 			}
 		}
 
@@ -578,6 +581,7 @@ int main(int argc, char** argv)
 			if(chip::on(trg, chip::FAMIPAD_ST::A) || chip::on(trg, chip::FAMIPAD_ST::B)) {
 				render_.clear(graphics::def_color::Black);
 				error = false;
+				fami_pad_data_ = 0;
 			}
 		}
 
