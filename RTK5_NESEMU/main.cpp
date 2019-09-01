@@ -3,9 +3,10 @@
     @brief  RX65N NESEMU @n
 			・NES Emulator（NES Emulator のソースは GPL）@n
 			・SD カードを使えるようにする必要がある。@n
-			・オーディオとして、DA0、DA1 出力を繋ぐ必要がある。
+			・オーディオとして、DA0、DA1 出力を繋ぐ必要がある。@n
+			・ファミコン互換パッドを繋ぐ必要がある。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -25,6 +26,7 @@
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
 #include "graphics/dialog.hpp"
+#include "graphics/root_menu.hpp"
 
 #include "chip/FAMIPAD.hpp"
 
@@ -37,7 +39,7 @@ namespace {
 //	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 
 	// Famicon PAD (CMOS 4021B Shift Register)
-	// 電源は、微小なので、接続を簡単に行う為、ポートを使う
+	// 電源は、微小なので、接続を簡単に行う為、ポート出力を使う
 	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_VCC;
 	typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_GND;
 	typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_P_S;
@@ -58,11 +60,13 @@ namespace {
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
 	static const graphics::pixel::TYPE PIX = graphics::pixel::TYPE::RGB565;
+	// フレームバッファ開始アドレスは、100 番地から開始とする。
+	// ※０～ＦＦは未使用領域
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
-	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
+	// カード電源制御を使わない場合、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 	typedef device::NULL_PORT SDC_POWER;
 
@@ -72,11 +76,10 @@ namespace {
 	SDHI		sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
-	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
-	typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  // CMD
-	typedef device::PORT<device::PORT2, device::bitpos::B1> SPCK;  // CLK
-
-	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;  ///< Soft SPI 定義
+	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  ///< DAT0
+	typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  ///< CMD
+	typedef device::PORT<device::PORT2, device::bitpos::B1> SPCK;  ///< CLK
+	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;				   ///< Soft SPI 定義
 
 	SPI			spi_;
 
@@ -141,6 +144,13 @@ namespace {
 	typedef gui::filer<RENDER> FILER;
 	FILER		filer_(render_);
 
+	typedef gui::back_btn<RENDER> BACK_BTN;
+	typedef gui::root_menu<RENDER, BACK_BTN, 4> ROOTM;
+
+	BACK_BTN	back_btn_(render_);
+	ROOTM		rootm_(render_, back_btn_);
+
+	// RTK5 では、内臓 RTC は利用出来ない為、簡易的な時計を用意する。
 	time_t		rtc_time_ = 0;
 
 	emu::nesemu	nesemu_;
@@ -222,17 +232,18 @@ namespace {
 			}
 		} else if(cmd_.cmp_word(0, "help")) {
 			shell_.help();
-			utils::format("    nes filename\n");
-			utils::format("    pause\n");
-			utils::format("    reset\n");
-			utils::format("    save [slot-no]\n");
-			utils::format("    load [slot-no]\n");
-			utils::format("    info\n");
-			utils::format("    call-151\n");
+			utils::format("    nes filename    Emulations for NES\n");
+			utils::format("    pause           Pause Emulation (toggle)\n");
+			utils::format("    reset           Reset NES Machine\n");
+			utils::format("    save [slot-no]  Save NES State (slot-no:0 to 9)\n");
+			utils::format("    load [slot-no]  Load NES State (slot-no:0 to 9)\n");
+			utils::format("    info            Cartrige Infomations\n");
+			utils::format("    call-151        Goto Monitor\n");
 		} else {
 			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
 	}
+
 
 	void update_nesemu_()
 	{
@@ -247,6 +258,16 @@ namespace {
 			t.l_ch = t.r_ch = *wav++;
 			sound_out_.at_fifo().put(t);
 		}
+	}
+
+
+	void make_state_str_(int slot) {
+		static char tmp1[16];
+		utils::sformat("Load State %d", tmp1, sizeof(tmp1)) % slot;
+		rootm_.set(1, tmp1);
+		static char tmp2[16];
+		utils::sformat("Save State %d", tmp2, sizeof(tmp2)) % slot;
+		rootm_.set(2, tmp2);
 	}
 }
 
@@ -411,17 +432,32 @@ int main(int argc, char** argv)
 
 	nesemu_.start();
 
+	rootm_.clear();
+	rootm_.set_gap(20);
+	rootm_.set_space(vtx::spos(12, 8));
+	rootm_.add("Select NES File");
+	rootm_.add("Load State 0");
+	rootm_.add("Save State 0");
+	rootm_.add("Close Menu");
+
 	uint8_t n = 0;
 	uint8_t flt = 0;
 	uint8_t	sec = 0;
+	uint8_t lvl = 0;
+	uint8_t trg = 0;
+	uint8_t slot = 0;
+	bool menu = false;
 	bool filer = false;
 	bool mount = sdh_.get_mount();
+	bool error = false;
 	while(1) {
 		render_.sync_frame();
 		fami_pad_data_ = famipad_.update();
 
-		uint8_t data = fami_pad_data_;
-		if(chip::on(data, chip::FAMIPAD_ST::SELECT) && chip::on(data, chip::FAMIPAD_ST::START)) {
+		trg = fami_pad_data_ & ~lvl;
+		lvl = fami_pad_data_;
+
+		if(chip::on(lvl, chip::FAMIPAD_ST::SELECT) && chip::on(lvl, chip::FAMIPAD_ST::START)) {
 			++flt;
 		} else {
 			flt = 0;
@@ -432,11 +468,10 @@ int main(int argc, char** argv)
 		if(m) {
 			gui::set(gui::filer_ctrl::MOUNT, ctrl);
 		}
-		if(flt >= 120) {
-			sound_out_.mute();
-			gui::set(gui::filer_ctrl::OPEN, ctrl);
-			filer = true;
+		if(!menu && flt >= 120) {
 			flt = 0;
+			sound_out_.mute();
+			menu = true;
 		}
 
 		{
@@ -452,24 +487,77 @@ int main(int argc, char** argv)
 			mount = m;
 		}
 
+		if(menu) {
+			render_.clear(graphics::def_color::Black);
+
+			if(chip::on(trg, chip::FAMIPAD_ST::UP)) {
+				rootm_.prev_focus();
+			}
+			if(chip::on(trg, chip::FAMIPAD_ST::DOWN)) {
+				rootm_.next_focus();
+			}
+
+			auto idx = rootm_.get_pos();
+			if(idx == 1 || idx == 2) {
+				if(chip::on(trg, chip::FAMIPAD_ST::LEFT)) {
+					if(slot > 0) slot--;
+				}
+				if(chip::on(trg, chip::FAMIPAD_ST::RIGHT)) {
+					if(slot < 9) ++slot;
+				}
+			}
+
+			make_state_str_(slot);
+
+			auto pos = rootm_.get_org(idx);
+			rootm_.render(pos, true);
+
+			if(chip::on(trg, chip::FAMIPAD_ST::A)) {
+				switch(idx) {
+				case 0:
+					menu = false;
+					gui::set(gui::filer_ctrl::OPEN, ctrl);
+					filer = true;
+					break;
+				case 1:
+					if(!nesemu_.load_state(slot)) {
+						dialog_.modal(vtx::spos(400, 80), "Load state error");
+						error = true;
+					}
+					menu = false;
+					break;
+				case 2:
+					if(!nesemu_.save_state(slot)) {
+						dialog_.modal(vtx::spos(400, 80), "Save state error");
+						error = true;
+					}
+					menu = false;
+					break;
+				case 3:
+					menu = false;
+					break;
+				}
+			}
+		}
+
 		if(filer) {
-			if(chip::on(data, chip::FAMIPAD_ST::B)) {
+			if(chip::on(lvl, chip::FAMIPAD_ST::B)) {
 				gui::set(gui::filer_ctrl::CLOSE, ctrl);
 				filer = false;
 			}
-			if(chip::on(data, chip::FAMIPAD_ST::A)) {
+			if(chip::on(lvl, chip::FAMIPAD_ST::A)) {
 				gui::set(gui::filer_ctrl::INFO, ctrl);
 			}
-			if(chip::on(data, chip::FAMIPAD_ST::UP)) {
+			if(chip::on(lvl, chip::FAMIPAD_ST::UP)) {
 				gui::set(gui::filer_ctrl::UP, ctrl);
 			}
-			if(chip::on(data, chip::FAMIPAD_ST::DOWN)) {
+			if(chip::on(lvl, chip::FAMIPAD_ST::DOWN)) {
 				gui::set(gui::filer_ctrl::DOWN, ctrl);
 			}
-			if(chip::on(data, chip::FAMIPAD_ST::LEFT)) {
+			if(chip::on(lvl, chip::FAMIPAD_ST::LEFT)) {
 				gui::set(gui::filer_ctrl::BACK, ctrl);
 			}
-			if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
+			if(chip::on(lvl, chip::FAMIPAD_ST::RIGHT)) {
 				gui::set(gui::filer_ctrl::SELECT, ctrl);
 			}
 			char path[256];
@@ -481,9 +569,19 @@ int main(int argc, char** argv)
 					filer = false;
 				} else {
 					dialog_.modal(vtx::spos(400, 80), "Not NES file");
+					error = true;
 				}
 			}
-		} else {
+		}
+
+		if(error) {
+			if(chip::on(trg, chip::FAMIPAD_ST::A) || chip::on(trg, chip::FAMIPAD_ST::B)) {
+				render_.clear(graphics::def_color::Black);
+				error = false;
+			}
+		}
+
+		if(!menu && !filer && !error) {
 			update_nesemu_();
 		}
 

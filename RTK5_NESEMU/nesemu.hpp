@@ -178,8 +178,8 @@ namespace emu {
 			}
 
 			{
-				inp_[0].data = 0;
-				inp_[1].data = 0;
+				inp_[0].data = 0;  // Player 1
+				inp_[1].data = 0;  // Player 2
 				uint8_t pad = get_fami_pad();
 				if(chip::on(pad, chip::FAMIPAD_ST::A)) {
 					inp_[0].data |= INP_PAD_A;
