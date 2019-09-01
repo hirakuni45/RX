@@ -33,7 +33,7 @@ Envision Kit RX65N で実現する NES(ファミコン) エミュレーター
    
 ## リソースの準備
  - SD カードのルートに「kfont16.bin」ファイルを書き込む。（ファイラーでの漢字表示）
- RX/graphics/kfont16.bin
+ RX/graphics/kfont16.bin   
  ※現在は、「kfont16.cpp」として、ソースコードに埋め込んでいる。
  - SD カードに、「xxx.nes」形式のファイルを書き込む。
    
