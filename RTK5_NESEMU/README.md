@@ -1,26 +1,30 @@
-Renesas Envision Kit RX65N ガジェット
+Renesas Envision Kit RX65N NES Emulator
 =========
-<img src="../docs/NES_001.jpg" width="50%"><img src="../docs/NES_002.jpg" width="50%">
-
-## 概要
-Envision Kit RX65N で実現する NES(ファミコン) エミュレーター
    
-## プロジェクト・リスト
+[Japanese](READMEja.md)
+   
+## Overview
+   
+<img src="../docs/NES_001.jpg" width="50%"><img src="../docs/NES_002.jpg" width="50%">
+   
+NES (NES) emulator realized with 'Envision Kit RX65N'
+   
+## Project list
  - main.cpp
  - nesemu.hpp
  - emu/* [NES Emulator ソースコード]
  - Makefile
    
-## ハードウェアーの準備
- - SD カードインターフェースの準備
+## Preparing the hardware
+ - Preparing the SD card interface
 
  <img src="../docs/SD_MOUNT.jpg" width="50%">
  
- - ファミコン（互換）パッドの接続
+ - NES (compatible) pad connection
 
 <img src="../docs/JoyPad.jpg" width="50%"><img src="../docs/JoyPadCon.jpg" width="50%">
 
- - オーディオの接続（DA0、DA1 から出力、GND レベルは、1.65V）
+ - Audio connection (output from DA0 and DA1, GND level is 1.65V)
 
 <img src="../docs/AudioLead.jpg" width="50%">
 
@@ -31,35 +35,33 @@ Envision Kit RX65N で実現する NES(ファミコン) エミュレーター
  - Pmod ( 9) PB7_TXD9_PMOD_9  ---> TXD として使用
  - RXD/TXD は 115200 Baud, 8-bits, 1-Stop, No-Parity 内部動作表示等
    
-## リソースの準備
- - SD カードのルートに「kfont16.bin」ファイルを書き込む。（ファイラーでの漢字表示）
- RX/graphics/kfont16.bin   
- ※現在は、「kfont16.cpp」として、ソースコードに埋め込んでいる。
- - SD カードに、「xxx.nes」形式のファイルを書き込む。
+## Prepare resources
+ - Write a file in “xxx.nes” format to the SD card.
    
-## ビルド方法
- - make する。
- - nesemu.mot ファイルを書き込む。
+## Build method
+ - Make.
+ - Write the nesemu.mot file.
    
-## 操作方法
- - 「SELECT」、「START」ボタンを２秒程度同時押しする。
- - メニューが表示され、上下ボタンで選択し、Ａボタンで決定。
- - 「Select NES File」、ファイラーが開く。
- - 「Load State x」NES ステートをロード（左右ボタンでスロットを変更 0 ～ 9）
- - 「Save State x」NES ステートをセーブ（左右ボタンでスロットを変更 0 ～ 9）
- - 「Close Menu」メニューを終了
+## Method of operation
+ - Press the “SELECT” and “START” buttons simultaneously for about 2 seconds.
+ - A menu is displayed. Select with the up and down buttons and confirm with the A button.
+ - “Select NES File”, filer opens.
+ - "Load State x" Load NES state (change the slot with left / right buttons 0-9)
+ - "Save State x" Save NES state (change the slot with left / right buttons 0-9)
+ - Reset “Reset” NES
+ - Exit the "Close Menu" menu
    
-### ファイラーの操作
- - 上下ボタンで、ファイル名フォーカスを移動。
- - 「xxx.nes」ファイルで、右方向ボタンを押して選択（ゲームが起動する）。   
- - ディレクトリーの場合は、そのディレクトリーへ移動する。
- - ディレクトリーを戻る場合は、左方向ボタンを押す。
- - Ａボタンを押すとファイル情報の表示。（もう一度押すと戻る）
- - Ｂボタンを押すとファイラーを閉じる。
+### Filer operations
+ - Move the file name focus with the up and down buttons.
+ - In the "xxx.nes" file, press the right button to select (game starts).
+ - If it is a directory, change to that directory.
+ - To go back to the directory, press the left button.
+ - Press A to display file information. (Press again to return)
+ - Press B to close the filer.
    
-## シリアルターミナル接続によるモニター機能
-SCI9 に USB シリアルなどを接続して、ターミナルソフトにより、簡単な操作が出来る。
-対応しているコマンドは以下
+## Monitor function via serial terminal connection
+By connecting a USB serial device to SCI9, you can use the terminal software for easy operation.
+The following commands are supported
 
 ```
 # help
@@ -75,7 +77,7 @@ SCI9 に USB シリアルなどを接続して、ターミナルソフトによ�
     call-151        Goto Monitor
 ```
    
-call-151 でモニター機能に移り、ファミコン内部のメモリダンプなど行える。
+With call-151, you can move to the monitor function and perform a memory dump inside the NES.
 
 ```
 #call-151
@@ -111,12 +113,12 @@ $exit
 #
 ```
 
-## 制限
- - エミュレーションは、プログラム、ビットマップの合計が、2MBits(256Kバイト)の場合まで可能。
- - 同じような構成でも、マッパー（バンク切り替えデバイス）など、起動出来ない場合があります。
- - NES ステートによる機能は、マッパーによっては（マッパーの状態がセーブ出来ない）正しく機能しないようです。
+## Restriction
+ - Emulation is possible up to a total of programs and bitmaps of 2MBits (256K bytes).
+ - Even with the same configuration, you may not be able to start up a mapper (bank switching device).
+ - The function by the NES state does not seem to work correctly depending on the mapper (the mapper state cannot be saved).
    
-## 参考動画
+## Reference video
 <https://www.youtube.com/watch?v=frRI-cbzGus>
    
 -----
