@@ -65,7 +65,7 @@ namespace utils {
 			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool utf8_to_utf16(const char* src, WCHAR* dst, uint32_t dsz) noexcept
+		static bool utf8_to_utf16(const char* src, uint16_t* dst, uint32_t dsz) noexcept
 		{
 			uint32_t len = dsz / 2;
 			if(len <= 1) return false;
@@ -144,12 +144,12 @@ namespace utils {
 			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool utf16_to_utf8(const WCHAR* src, char* dst, uint32_t dsz) noexcept
+		static bool utf16_to_utf8(const uint16_t* src, char* dst, uint32_t dsz) noexcept
 		{
 			if(dsz <= 1) return false;
 
 			uint16_t code;
-			while((code = static_cast<uint16_t>(*src++)) != 0) {
+			while((code = *src++) != 0) {
 				auto len = utf16_to_utf8(code, dst, dsz);
 				if(dsz > len) {
 					dsz -= len;
@@ -265,6 +265,7 @@ namespace utils {
 		}
 #endif
 
+#ifdef FAT_FS
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	FatFS が使う時間取得関数
@@ -336,7 +337,7 @@ namespace utils {
 
 			return mktime(&ttm);
 		}
-
+#endif
 
 		//-----------------------------------------------------------------//
 		/*!
