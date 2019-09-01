@@ -9,7 +9,7 @@
 */
 //=====================================================================//
 #include <cstring>
-#ifdef FATFS
+#ifdef FAT_FS
 #include "ff13c/source/ff.h"
 #endif
 #include "common/time.h"
