@@ -1,6 +1,6 @@
 Renesas Envision Kit RX65N ガジェット
 =========
-![R5F564ML](../RTK5RX65N.jpg)
+<img src="../docs/NES_001.jpg" width="50%"><img src="../docs/NES_002.jpg" width="50%">
 
 ## 概要
 Envision Kit RX65N で実現する NES(ファミコン) エミュレーター
@@ -13,10 +13,17 @@ Envision Kit RX65N で実現する NES(ファミコン) エミュレーター
    
 ## ハードウェアーの準備
  - SD カードインターフェースの準備
+
+ <img src="../docs/SD_MOUNT.jpg" width="50%">
  
  - ファミコン（互換）パッドの接続
 
+<img src="../docs/JoyPad.jpg" width="50%"><img src="../docs/JoyPadCon.jpg" width="50%">
+
  - オーディオの接続（DA0、DA1 から出力、GND レベルは、1.65V）
+
+<img src="../docs/AudioLead.jpg" width="50%">
+
  - P03_JOY_RIGHT_IRQ11 (DA0) Left 出力
  - P05_IRQ13_SW (DA1) Right 出力
  ※ ファミコンの仕様でモノラル
@@ -37,14 +44,14 @@ Envision Kit RX65N で実現する NES(ファミコン) エミュレーター
 ## 操作方法
  - 「SELECT」、「START」ボタンを２秒程度同時押しする。
  - メニューが表示され、上下ボタンで選択し、Ａボタンで決定。
- -「Select NES File」、ファイラーが開く。
- -「Load State x」ステートをロード（左右ボタンでスロットを変更）
- -「Save State x」ステートをセーブ（左右ボタンでスロットを変更）
- -「Close Menu」メニューを終了
+ - 「Select NES File」、ファイラーが開く。
+ - 「Load State x」NES ステートをロード（左右ボタンでスロットを変更 0 ～ 9）
+ - 「Save State x」NES ステートをセーブ（左右ボタンでスロットを変更 0 ～ 9）
+ - 「Close Menu」メニューを終了
    
 ### ファイラーの操作
  - 上下ボタンで、ファイル名フォーカスを移動。
- -「xxx.nes」ファイルで、右方向ボタンを押して選択（ゲームが起動する）。
+ - 「xxx.nes」ファイルで、右方向ボタンを押して選択（ゲームが起動する）。   
  - ディレクトリーの場合は、そのディレクトリーへ移動する。
  - ディレクトリーを戻る場合は、左方向ボタンを押す。
  - Ａボタンを押すとファイル情報の表示。（もう一度押すと戻る）
@@ -59,18 +66,19 @@ SCI9 に USB シリアルなどを接続して、ターミナルソフトによ�
     dir [xxx]       list current directory
     pwd             current directory path
     cd [xxx]        change current directory
-    nes filename
-    pause
-    reset
-    save [slot-no]
-    load [slot-no]
-    info
-    call-151
+    nes filename    Emulations for NES
+    pause           Pause Emulation (toggle)
+    reset           Reset NES Machine
+    save [slot-no]  Save NES State (slot-no:0 to 9)
+    load [slot-no]  Load NES State (slot-no:0 to 9)
+    info            Cartrige Infomations
+    call-151        Goto Monitor
 ```
    
 call-151 でモニター機能に移り、ファミコン内部のメモリダンプなど行える。
 
 ```
+#call-151
 $fff8.ffff
 FFF8- FF FF 0C E2 20 E0 20 E0
 $e020l
@@ -99,11 +107,14 @@ $0.
 $0:1 2 3 4
 $0.
 0000- 01 02 03 04 00 00 00 00  00 00 00 00 00 00 00 00
+$exit
+#
 ```
 
 ## 制限
  - エミュレーションは、プログラム、ビットマップの合計が、2MBits(256Kバイト)の場合まで可能。
  - 同じような構成でも、マッパー（バンク切り替えデバイス）など、起動出来ない場合があります。
+ - NES ステートによる機能は、マッパーによっては（マッパーの状態がセーブ出来ない）正しく機能しないようです。
    
 ## 参考動画
 <https://www.youtube.com/watch?v=frRI-cbzGus>
