@@ -73,7 +73,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/RX65x](./RX65x)      |Device definition class dedicated to RX65(1N), linker script|
 |[/RX66T](./RX66T)      |Device definition class dedicated to RX66T, linker script|
 |[FreeRTOS](./FreeRTOS) |FreeRTOS RX microcontroller compatible version and a simple sample|
-|[/ff12b](./ff12b)      |ChaN's fatfs source code and handler for RX microcontroller|
+|[/ff13c](./ff13c)      |ChaN's fatfs source code and handler for RX microcontroller|
 |[/common](./common)    |Shared classes, utilities, etc.|
 |[/chip](./chip)        |Device-specific control driver library for I2C, SPI, etc.|
 |[/graphics](./graphics)|Graphics drawing relation class|
@@ -98,7 +98,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |/GR-KAEDE_http         |Sample for Renesas RX64M microcontroller board (http server)|
 |/RTK5_AUDIO_sample     |Renesas RTK5RX65N microcontroller board audio player|
 |/RTK5_SIDE             |Renesas RTK5RX65N microcontroller board Space Invaders emulator|
-|/RTK5_NESEMU           |Renesas RTK5RX65N microcontroller board NES emulator|
+|[/RTK5_NESEMU](./RTK5_NESEMU)  |Renesas RTK5RX65N microcontroller board NES emulator|
 |[LICENSE](./LICENSE)  |License notation file|
    
 - Although not in the above list, please think that directories and files that exist when you check out are working.   

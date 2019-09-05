@@ -68,7 +68,7 @@ int main(int argc, char** argv)
 |[/RX65x](./RX65x)      |RX651, RX65N 専用デバイス定義クラス、リンカースクリプト|
 |[/RX66T](./RX66T)      |RX66T 専用デバイス定義クラス、リンカースクリプト|
 |[FreeRTOS](./FreeRTOS) |FreeRTOS の RX マイコン各種対応版と簡単なサンプル|
-|/ff12b                 |ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
+|/ff13c                 |ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
 |[/common](./common)    |共有クラス、ヘッダーなど|
 |[/chip](./chip)        |I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
 |[/graphics](./graphics)|グラフィックス描画関係クラス|
@@ -94,7 +94,7 @@ int main(int argc, char** argv)
 |/GR-KAEDE_http         |ルネサス製の RX64M 搭載マイコンボード向けサンプル（http サーバー）|
 |/RTK5_AUDIO_sample     |ルネサス製 RTK5RX65N マイコンボード オーディオプレイヤー|
 |/RTK5_SIDE             |ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター|
-|/RTK5_NESEMU           |ルネサス製 RTK5RX65N マイコンボード NES エミュレーター|
+|[/RTK5_NESEMU](./RTK5_NESEMU)   |ルネサス製 RTK5RX65N マイコンボード NES エミュレーター|
 |[LICENSE](./LICENSE)   |ライセンス表記ファイル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
