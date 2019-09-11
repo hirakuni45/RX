@@ -1,6 +1,8 @@
 各種デバイスドライバー
 =========
 
+[English](README.md)
+
 ## 概要
 I2C、SPI、BUS、等のインターフェースで通信を行うデバイス制御クラス
    
@@ -113,6 +115,12 @@ ANALOG DEVICES
 Programmable Waveform Generator   
 <http://www.analog.com/media/jp/technical-documentation/data-sheets/AD9833_JP.pdf>   
 Interface: SPI   
+
+ - AD985X (AD9850, AD9851)   
+ANALOG DEVICES   
+Programmable Waveform Generator   
+<http://www.analog.com/media/jp/technical-documentation/data-sheets/AD9851_JP.pdf>   
+Interface: 3 Wire Serial (W_CLK, D7, UD)   
    
  - FT5206
 FocalTech   
