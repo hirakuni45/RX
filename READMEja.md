@@ -2,6 +2,8 @@ Renesas RX Microcontroller
 =========
 ![R5F564ML](docs/RX600_group.jpg)
 
+[English](README.md)
+
 ## 概要
 
  これはルネサス RX マイコンと、そのコンパイラである rx-elf-gcc,g++ によるプログラムです。   
