@@ -1,10 +1,18 @@
-Renesas RX24T, RX64M, RX71M, RX65N, RX66T レイトレーサーサンプル
+Renesas RX24T, RX64M, RX71M, RX65N, RX66T Ray tracer sample
 =========
-
-## 概要
-RX マイコンを使ったレイトレーシングのレンダリングプログラム
    
-## プロジェクト・リスト
+[Japanese](READMEja.md)
+   
+<img src="../docs/RX65N_raytrace1.jpg" width="40%"> <img src="../docs/RX65N_raytrace2.jpg" width="40%">   
+Raytracer 320x240/480x272, for RX65N Envision kit   
+※Rendering from a previous version (slightly faster due to optimization in the latest code)
+   
+---
+   
+## Overview
+Ray tracing rendering program using RX microcontroller
+   
+## Project list
 - main.cpp
 - raytracer.hpp
 - RX24T/Makefile
@@ -13,46 +21,47 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 - RX65N/Makefile
 - RX66T/Makefile
    
-## ハードウェアーの準備（全般）
-- ベースクリスタルが異なる場合は、typedef のパラメーターを変更する。
-- Makefile で、各モジュール別の設定周波数を宣言している。
+## Hardware preparation (general)
+- If the base crystal is different, change the typedef parameter.
+- Makefile declares the set frequency for each module.
 - RX24T:  80MHz (10MHz)
 - RX64M: 120MHz (12MHz)
 - RX71M: 240MHz (12MHz)
 - RX65N: 120MHz (12MHz)
 - RX66T: 160MHz (10MHz)
-- インジケーター LED を指定のポートに接続する。
-- USB シリアルの信号と設定の SCI1(RX24T, RX66T, RX64M, RX71M) ポートを接続する。
-- RX65N Envision kit は付属の LCD (480x272) を使う。
-- RX24T, RX66T は８ビット接続 (R61505W LCD Controller)
-- RX64M, RX71M は１６ビット接続 (R61505W LCD Controller)
-- R61505W LCD との接続ポートは、「main.cpp」を参照
+- Connect the indicator LED to the specified port.
+- Connect the USB serial signal and the SCI1 (RX24T, RX66T, RX64M, RX71M) port of the setting.
+- RX65N Envision kit uses the attached LCD (480x272).
+- RX24T, RX66T are 8-bit connection (R61505W LCD Controller)
+- RX64M, RX71M are 16-bit connection (R61505W LCD Controller)
+- Refer to "main.cpp" for the connection port with the R61505W LCD.
    
-## ハードウェアーリソースの準備
-- SCI に指定されたポートに USB シリアルなどの変換器を接続する。
-- マイコン側の RXD 端子と、USB シリアルの TXD を接続。
-- マイコン側の TXD 端子と、USB シリアルの RXD を接続。
+## Prepare hardware resources (optional)
+- Connect a USB serial converter to the port specified in SCI.
+- Connect the RXD terminal on the microcontroller side and the TXD of USB serial.
+- Connect the TXD terminal on the microcontroller side and the RXD of USB serial.
    
-## ビルド方法
-- 各プラットホームディレクトリーに移動、make する。
-- raytracer_sample.mot ファイルを書き込む。
+## Build method
+- Move to each platform directory and make.
+- Write the raytracer_sample.mot file to the microcontroller.
    
-## 動作
-- 320x240 の解像度でレイトレーシングを行い描画する（描画ハードウェアーがあれば）。
-- レンダリング時間を、液晶とコンソールに表示（ミリ秒）
-- LED が 0.25 秒間隔で点滅する。
-- SCI に指定されたポートで、TX（送信）、RX（受信）を行う。
-- TeraTerm などで確認。
-- TeraTerm のシリアル設定：１１５２００ボー、８ビットデータ、１ストップ、パリティ無し。
+## Action
+- Draw with raytracing at 320x240 resolution (if you have drawing hardware).
+- Render time displayed on LCD and console (milliseconds)
+- LED flashes at 0.25 second intervals.
+- TX (send) and RX (receive) are performed on the port specified in SCI.
+- Check with TeraTerm.
+- TeraTerm serial settings: 115200 baud, 8-bit data, 1 stop, no parity.
+- In RX65N Envision kit, press SW2 on the back side to change the number of samplings and resolution.
    
-## 備考
+## Remarks
    
-- ポートバスによる、フォントの描画を液晶に送る処理は、かなり大きい。
-- 通常、ライン毎にレンダリング時間を液晶に表示しているが、コメントアウトしてある。
+- The process of sending font drawing to the LCD by the port bus is quite large.
+- In the original code, the rendering time is displayed on the LCD for each line, but it is commented out.
    
-## レンダリング時間３２０ｘ２４０、サンプリング１
+## Rendering time 320x240, sampling number: 1
    
-|マイコン  |周波数 [MHz]|描画方式         |時間 [ms]   |
+|Microcontroller  |Frequency [MHz]|Drawing method         |Time [ms]   |
 |----------|------------|-----------------|------------|
 |RX24T     |80          |8 bits, port-bus |1224        |
 |RX65N     |120         |Frame Memory     |784         |
@@ -65,4 +74,6 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 License
 ---
 
-MIT
+Reference (Ray Tracer): http://www.cs.cmu.edu/~ph/
+
+Other: MIT
