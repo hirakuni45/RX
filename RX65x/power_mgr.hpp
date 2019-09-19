@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・省電力制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -137,20 +137,6 @@ namespace device {
 			case peripheral::SCI12:
 				SYSTEM::MSTPCRB.MSTPB4 = f;		// B-B4 (SCI12)のストップ状態解除
 				break;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			case peripheral::SCIF8:
-				SYSTEM::MSTPCRC.MSTPC27 = f;	// C-B27 (SCIF8)のストップ状態解除
-				break;
-			case peripheral::SCIF9:
-				SYSTEM::MSTPCRC.MSTPC26 = f;	// C-B26 (SCIF9)のストップ状態解除
-				break;
-			case peripheral::SCIF10:
-				SYSTEM::MSTPCRC.MSTPC25 = f;	// C-B25 (SCIF10のストップ状態解除
-				break;
-			case peripheral::SCIF11:
-				SYSTEM::MSTPCRC.MSTPC24 = f;	// C-B24 (SCIF11のストップ状態解除
-				break;
-#elif defined(SIG_RX65N)
 			case peripheral::SCI8:
 				SYSTEM::MSTPCRC.MSTPC27 = f;	// C-B27 (SCI8)のストップ状態解除
 				break;
@@ -163,31 +149,23 @@ namespace device {
 			case peripheral::SCI11:
 				SYSTEM::MSTPCRC.MSTPC24 = f;	// C-B24 (SCI11のストップ状態解除
 				break;
-#endif
+
 			case peripheral::RIIC0:
 				SYSTEM::MSTPCRB.MSTPB21 = f;	// RIIC0 のストップ状態解除
 				break;
-#if defined(SIG_RX65N)
 			case peripheral::RIIC1:
 				SYSTEM::MSTPCRB.MSTPB20 = f;	// RIIC1 のストップ状態解除
 				break;
-#endif
 			case peripheral::RIIC2:
 				SYSTEM::MSTPCRC.MSTPC17 = f;	// RIIC2 のストップ状態解除
 				break;
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			case peripheral::RSPI:
-				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI のストップ状態解除
-				break;
-#elif defined(SIG_RX65N)
 			case peripheral::RSPI0:
-				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI のストップ状態解除
+				SYSTEM::MSTPCRB.MSTPB17 = f;	// RSPI0 のストップ状態解除
 				break;
 			case peripheral::RSPI1:
-				SYSTEM::MSTPCRB.MSTPB16 = f;	// RSPI のストップ状態解除
+				SYSTEM::MSTPCRB.MSTPB16 = f;	// RSPI1 のストップ状態解除
 				break;
-#endif
 
 			case peripheral::SDHI:
 				SYSTEM::MSTPCRD.MSTPD19 = f;	// SDHI のストップ状態解除
@@ -208,11 +186,6 @@ namespace device {
 			case peripheral::USB0:
 				SYSTEM::MSTPCRB.MSTPB19 = f;	// USB のストップ状態解除
 				break;
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-			case peripheral::USBA:
-				SYSTEM::MSTPCRB.MSTPB12 = f;	// USBA のストップ状態解除
-				break;
-#endif
 
 			case peripheral::ECCRAM:
 				SYSTEM::MSTPCRC.MSTPC6 = f;		// ECC RAM のストップ状態解除
@@ -222,14 +195,13 @@ namespace device {
 				SYSTEM::MSTPCRC.MSTPC7 = f;		// STANDBY RAM のストップ状態解除
 				break;
 
-#if defined(SIG_RX65N)
 			case peripheral::DRW2D:
 				SYSTEM::MSTPCRC.MSTPC28 = f;	// DRW2D のストップ状態解除
 				break;
 			case peripheral::GLCDC:
 				SYSTEM::MSTPCRC.MSTPC29 = f;	// GLCDC のストップ状態解除
 				break;
-#endif
+
 			default:
 				break;
 			}
