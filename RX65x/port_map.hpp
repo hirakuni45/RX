@@ -742,22 +742,22 @@ namespace device {
 			case peripheral::SDHI:
 				{
 					uint8_t sel = enable ? 0b011010 : 0;
-					MPC::P25PFS.PSEL = sel;  // SDHI_CD P25(32)
-					PORT2::PMR.B5 = enable;
 					MPC::P24PFS.PSEL = sel;  // SDHI_WP P24(33)
 					PORT2::PMR.B4 = enable;
-					MPC::P23PFS.PSEL = sel;  // SDHI_D1-C  P23(34)
-					PORT2::PMR.B3 = enable;
-					MPC::P22PFS.PSEL = sel;  // SDHI_D0-C  P22(35)
-					PORT2::PMR.B2 = enable;
-					MPC::P21PFS.PSEL = sel;  // SDHI_CLK-C P21(36)
-					PORT2::PMR.B1 = enable;
+					MPC::P25PFS.PSEL = sel;  // SDHI_CD P25(32)
+					PORT2::PMR.B5 = enable;
 					MPC::P20PFS.PSEL = sel;  // SDHI_CMD-C P20(37)
 					PORT2::PMR.B0 = enable;
-					MPC::P17PFS.PSEL = sel;  // SDHI_D3-C  P17(38)
-					PORT1::PMR.B7 = enable;
+					MPC::P21PFS.PSEL = sel;  // SDHI_CLK-C P21(36)
+					PORT2::PMR.B1 = enable;
+					MPC::P22PFS.PSEL = sel;  // SDHI_D0-C  P22(35)
+					PORT2::PMR.B2 = enable;
+					MPC::P23PFS.PSEL = sel;  // SDHI_D1-C  P23(34)
+					PORT2::PMR.B3 = enable;
    					MPC::P87PFS.PSEL = sel;  // SDHI_D2-C  P87(39)
 					PORT8::PMR.B7 = enable;
+					MPC::P17PFS.PSEL = sel;  // SDHI_D3-C  P17(38)
+					PORT1::PMR.B7 = enable;
 				}
 				break;
 			default:
