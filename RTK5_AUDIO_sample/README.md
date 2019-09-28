@@ -1,7 +1,9 @@
 Renesas Envision Kit RX65N ガジェット（オーディオ・プレイヤー）
 =========
 ![R5F564ML](IMG_1239s.jpg)
-
+   
+[Japanese](READMEja.md)
+   
 ## 概要
  - Envision Kit RX65N で実現する簡易オーディオプレイヤー
  - WAV、MP3 形式のオーディオファイルの再生（最大：48KHz、16ビット）
@@ -24,14 +26,12 @@ Renesas Envision Kit RX65N ガジェット（オーディオ・プレイヤー�
 ![Audio PreAmp](RTK5_audio_amp.png)
    
 ## リソースの準備
- - SD カードのルートに [kfont16.bin](../graphics/kfont16.bin)ファイルを書き込む。（漢字表示用）   
- ※現在は、「kfont16.cpp」として、ソースコードに埋め込んでいる。
- - SD カードに、「mp3、wav」形式のファイルを書き込む。
  - SD カード、ルートに、「NoImage.jpg」ファイルをコピーしておく。
+ - SD カードに、「mp3、wav」形式のファイルを書き込む。
    
 ## ビルド方法
  - make する。
- - audio_sample.mot ファイルを書き込む。
+ - audio_sample.mot ファイルをマイコンに書き込む。
    
 ## タッチパネルでの操作方法
  - ３点タッチ（離れた時）で、ファイラーが有効になる。
