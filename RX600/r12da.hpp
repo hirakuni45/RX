@@ -176,7 +176,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	ポート設定と解除
-			@param[in]	an	アナログ入力型
+			@param[in]	an	アナログ型
 			@param[in]	f	ポート無効の場合「false」
 		*/
 		//-----------------------------------------------------------------//		
@@ -186,11 +186,11 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 			switch(an) {
 			case analog::DA0:
-				MPC::P03PFS.ASEL = 1;
+				MPC::P03PFS.ASEL = f;
 				PORT0::PMR.B3 = 1;
 				break;
 			case analog::DA1:
-				MPC::P05PFS.ASEL = 1;
+				MPC::P05PFS.ASEL = f;
 				PORT0::PMR.B5 = 1;
 				break;
 			default:
