@@ -21,7 +21,12 @@ NES (NES) emulator realized with 'Envision Kit RX65N'
  <img src="../docs/SD_MOUNT.jpg" width="50%">
  
  - NES (compatible) pad connection
-
+For NES Pads:   
+CN2( 2) P60 - White: Vcc (Power、Usually +5V, but use at +3.3V)   
+CN2( 4) P61 - Brown: GND (Power、0V)   
+CN2( 6) P62 - Orange: P/S (Parallel, shift switching)   
+CN2( 8) P65 - Red: CLK (Clock)   
+CN2(10) P73 - Yellow: OUT (Serial output)   
 <img src="../docs/JoyPad.jpg" width="50%"><img src="../docs/JoyPadCon.jpg" width="50%">
 
  - Audio connection (output from DA0 and DA1, GND level is 1.65V)
