@@ -11,6 +11,7 @@
 #include "common/vtx.hpp"
 #include "common/mtx.hpp"
 #include "common/fixed_stack.hpp"
+#include "common/format.hpp"
 
 namespace gl {
 
@@ -433,7 +434,6 @@ namespace gl {
 		}
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	カレント・マトリックスの表示
@@ -441,7 +441,7 @@ namespace gl {
 		//-----------------------------------------------------------------//
 		void print_matrix() {
 			for(int i = 0; i < 4; ++i) {
-				std::cout << utils::format("(%d) %-1.5f, %-1.5f, %-1.5f, %-1.5f\n")
+				utils::format("(%d) %-1.5f, %-1.5f, %-1.5f, %-1.5f\n")
 					% i
 					% acc_[mode_].m[0 * 4 + i]
 					% acc_[mode_].m[1 * 4 + i]
@@ -449,7 +449,6 @@ namespace gl {
 					% acc_[mode_].m[3 * 4 + i];
 			}
 		}
-#endif
 	};
 
 	typedef matrix<float>	matrixf;
