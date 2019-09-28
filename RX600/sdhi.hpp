@@ -17,10 +17,13 @@ namespace device {
 		@brief  SDHI 定義基底クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	ivec	割り込みベクター
+		@param[in]	cdeti	カード検出割り込み・ベクタ
+		@param[in]	caci	カードアクセス割り込み・ベクタ
+		@param[in]	sdaci	SDIO アクセス割り込み・ベクタ
+		@param[in]	sbfai	バッファアクセス割り込み・ベクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
 	struct sdhi_t {
 
 		//-----------------------------------------------------------------//
@@ -474,13 +477,41 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  SDHI 割り込みベクターを返す
+			@brief  カード検出割り込み・ベクタ
 			@return ベクター型
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_ivec() { return ivec; }
+		static auto get_cdeti() { return cdeti; }
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  カードアクセス割り込み・ベクタ
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_caci() { return caci; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SDIO アクセス割り込み・ベクタ
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_sdaci() { return sdaci; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バッファアクセス割り込み・ベクタ
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_sbfai() { return sbfai; }
 	};
 
-	typedef sdhi_t<0x0008AC00, peripheral::SDHI, ICU::VECTOR::SBFAI> SDHI;
+	typedef sdhi_t<0x0008AC00, peripheral::SDHI,
+		ICU::VECTOR_BL1::CDETI, ICU::VECTOR_BL1::CACI, ICU::VECTOR_BL1::SDACI,
+		ICU::VECTOR::SBFAI> SDHI;
 }
