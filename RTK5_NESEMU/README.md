@@ -12,7 +12,7 @@ NES (NES) emulator realized with 'Envision Kit RX65N'
 ## Project list
  - main.cpp
  - nesemu.hpp
- - emu/* [NES Emulator ソースコード]
+ - emu/* [NES Emulator source code]
  - Makefile
    
 ## Preparing the hardware
@@ -33,12 +33,12 @@ CN2(10) P73 - Yellow: OUT (Serial output)
 
 <img src="../docs/AudioLead.jpg" width="50%">
 
- - P03_JOY_RIGHT_IRQ11 (DA0) Left 出力
- - P05_IRQ13_SW (DA1) Right 出力
- ※ ファミコンの仕様でモノラル
- - Pmod (10) PB6_RXD9_PMOD_10 ---> RXD として使用
- - Pmod ( 9) PB7_TXD9_PMOD_9  ---> TXD として使用
- - RXD/TXD は 115200 Baud, 8-bits, 1-Stop, No-Parity 内部動作表示等
+ - P03_JOY_RIGHT_IRQ11 (DA0) Left output
+ - P05_IRQ13_SW (DA1) Right output   
+   Mono with NES specifications
+ - Pmod (10) PB6_RXD9_PMOD_10 ---> Use RXD signal
+ - Pmod ( 9) PB7_TXD9_PMOD_9  ---> Use TXD signal
+ - RXD/TXD: 115200 Baud, 8-bits, 1-Stop, No-Parity (Internal operation display etc.)
    
 ## Prepare resources
  - Write a file in “xxx.nes” format to the SD card.
