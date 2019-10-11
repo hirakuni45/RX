@@ -108,7 +108,7 @@ namespace device {
 			using io::operator &=;
 
 			bits_rw_t<io, bitpos::B0, 6>  PSEL;
-			bit_rw_t<io, bitpos::B6>      ISEL;
+			bit_rw_t <io, bitpos::B6>     ISEL;
 		};
 
 
