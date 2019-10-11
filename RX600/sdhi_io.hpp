@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ、SDHI（SD ホストインターフェース）FatFS ドライバー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,7 +26,7 @@ namespace fatfs {
 		@brief  SDHI テンプレートクラス
 		@param[in]	SDHI	SDHI クラス
 		@param[in]	POW		電源制御ポート・クラス
-		@param[in]	PSEL	ポート候補
+		@param[in]	PSEL	ポート候補（port_map.hpp 参照）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SDHI, class POW,
@@ -34,20 +34,27 @@ namespace fatfs {
 	class sdhi_io {
 
 		// 通常 PCLKB は 60MHz
-		static const uint8_t CARD_DETECT_DIVIDE_ = 11;			///< CD 信号サンプリング周期
-		// SD カード初期化時100～400KBPS(224KBPS）
+		static const uint8_t CARD_DETECT_DIVIDE_ = 12;		///< CD 信号サンプリング周期
+		static const uint8_t TIME_OUT_DIVIDE_    = 14;		///< タイムアウトカウント（０～１４）
+		// SD カード初期化時100～400KBPS(1/256: 224KBPS）
 		static const uint8_t CLOCK_SLOW_DIVIDE_  = 0b01000000;	///< 初期化時のクロック周期 (1/256)
-		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000100;	///< 通常クロック周期 (1/16)
+//		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000000;	///< 通常クロック周期 (1/2)
+		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000001;	///< 通常クロック周期 (1/4)
+//		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000010;	///< 通常クロック周期 (1/8)
+//		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000100;	///< 通常クロック周期 (1/16)
 
 		// MMC card type flags (MMC_GET_TYPE)
-		static const BYTE CT_MMC   = 0x01;	///< MMC ver 3
-		static const BYTE CT_SD1   = 0x02;	///< SD ver 1
-		static const BYTE CT_SD2   = 0x04;	///< SD ver 2
-		static const BYTE CT_SDC   = CT_SD1 | CT_SD2;   ///< SD
-		static const BYTE CT_BLOCK = 0x08;	///< Block addressing
+		static const BYTE CT_MMC   = 0b00000001;		///< MMC ver 3
+		static const BYTE CT_SD1   = 0b00000010;		///< SD ver 1
+		static const BYTE CT_SD2   = 0b00000100;		///< SD ver 2
+//		static const BYTE CT_SDC   = CT_SD1 | CT_SD2;   ///< SD
+		static const BYTE CT_BLOCK = 0b00001000;		///< Block addressing
+
+		static const int CMD0_LOOP_MAX = 3;
+		static const int ACMD41_LOOP_MAX = 400;
+		static const int CMD3_LOOP_MAX = 3;
 
 		FATFS		fatfs_;
-
 		DSTATUS		stat_;			// Disk status
 		BYTE		card_type_;		// b0:MMC, b1:SDv1, b2:SDv2, b3:Block addressing
 
@@ -59,26 +66,35 @@ namespace fatfs {
 		bool		fast_;
 		bool		onew_;
 
-		// MMC/SD command (SPI mode)
+		uint32_t	rca_id_;
+		uint32_t	cid_[4];
+
+		// SD command
 		enum class command : uint32_t {
-                                  // 引数　       応答　データ転送　説明
-            CMD0   = 0x00000000,  // -            R1    -           ソフトウェア・リセット
-			CMD1   = 0x00000001,  // -            R1    -           初期化開始
-			CMD6   = 0x00000006,  // 
-			CMD8   = 0x00000408,  // *3           R7    -           SDC V2 専用、動作電圧確認
-			CMD9   = 0x00000009,  // -            R1    あり        CSD 読み出し
-			CMD10  = 0x0000000A,  // -            R1    あり        CID 読み出し
-			CMD12  = 0x0000000C,  // -            R1b   -           リード動作停止
-			CMD16  = 0x00000010,  // BlockLen(32) R1    -           R/W ブロック長変更
-			CMD17  = 0x00000011,  // Address(32)  R1    あり        シングル・ブロック・リード
-			CMD18  = 0x00000012,  // Address(32)  R1    あり        マルチ・ブロック・リード
-			CMD23  = 0x00000017,  // Block(16)    R1    -           MMC 専用次のマルチブロックブロック数設定
-			CMD24  = 0x00000018,  // Address(32)  R1    あり        シングル・ブロック・ライト
-			CMD25  = 0x00000019,  // Address(32)  R1    あり        マルチ・ブロック・ライト
-			CMD55  = 0x00000037,  // -            R1    -           アプリケーション特化コマンド
-			CMD58  = 0x0000003A,  // -            R3    -           OCR レジスタ取得    
-			ACMD23 = 0x00000057,  // Block(23)    R1    -           SDC 専用次のマルチブロックブロック数設定
-			ACMD41 = 0x00000069,  // *2           R1    -           SDC 専用、初期化開始
+                              // 引数　       応答　データ転送　説明
+            CMD0   = 0,       // -            R1    -           ソフトウェア・リセット
+			CMD2   = 2,       // -            R2    -	        CID の読み出し
+			CMD3   = 3,       // -            R3    -	        RCA の読み出し
+			CMD4   = 4,       // -            R3    -	        DSR
+
+			CMD6   = 6,       // 
+			ACMD6  = 0x40+6,  //                    -           Set Bus Width
+			CMD7   = 7,       // RCA-ID       R1b               SD カードセレクト 
+			CMD8   = 0x408,   // *3           R7    -           SDC V2 専用、動作電圧確認
+			CMD9   = 9,       // -            R1    あり        CSD 読み出し
+			CMD10  = 10,      // -            R1    あり        CID 読み出し
+			CMD12  = 12,      // -            R1b   -           リード動作停止
+			CMD16  = 16,      // BlockLen(32) R1    -           R/W ブロック長変更
+			CMD17  = 17,      // Address(32)  R1    あり        シングル・ブロック・リード
+			CMD18  = 18,      // Address(32)  R1    あり        マルチ・ブロック・リード
+			CMD23  = 23,      // Block(16)    R1    -           MMC 専用次のマルチブロックブロック数設定
+			CMD24  = 24,      // Address(32)  R1    あり        シングル・ブロック・ライト
+			CMD25  = 25,      // Address(32)  R1    あり        マルチ・ブロック・ライト
+			CMD41  = 41,
+			CMD55  = 55,      // -            R1    -           アプリケーション特化コマンド
+			CMD58  = 58,      // -            R3    -           OCR レジスタ取得    
+			ACMD23 = 0x40+23, // Block(23)    R1    -           SDC 専用次のマルチブロックブロック数設定
+			ACMD41 = 0x40+41, // *2           R3    -           SDC 専用、初期化開始
 		};
 
 
@@ -87,6 +103,16 @@ namespace fatfs {
 			cmd_error,
 			timeout,
 		};
+
+		void set_bus_(bool single) noexcept
+		{
+			// バス幅は１ビットで始める
+			while(SDHI::SDSTS2.CBSY() != 0) ;
+			SDHI::SDOPT =
+				  SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_)
+				| SDHI::SDOPT.TOP.b(TIME_OUT_DIVIDE_)
+				| SDHI::SDOPT.WIDTH.b(single);
+		}
 
 
 		void set_clk_() noexcept
@@ -97,10 +123,6 @@ namespace fatfs {
 			while(SDHI::SDSTS2.SDCLKCREN() == 0) ;
 
 			if(fast_) {
-///				SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.WIDTH.b(1)
-///					| SDHI::SDOPT.TOP.b(12);
-//				SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.WIDTH.b(onew_)
-//					| SDHI::SDOPT.TOP.b(12);
 				// F_PCLKB / 4 (15MHz)
 				SDHI::SDCLKCR.CLKEN = 0;
 				SDHI::SDCLKCR.CLKSEL = CLOCK_FAST_DIVIDE_;
@@ -109,8 +131,6 @@ namespace fatfs {
 				// Card detect 50Hz(20ms) とする
 				// ONEW: 1 bit: 1, 4 bits: 0
 				// 開始時は、1 bit にしておく
-///				SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.WIDTH.b(1)
-///					| SDHI::SDOPT.TOP.b(12);
 				// F_PCLKB / 256
 				SDHI::SDCLKCR.CLKEN = 0;
 				SDHI::SDCLKCR.CLKSEL = CLOCK_SLOW_DIVIDE_;
@@ -147,13 +167,20 @@ namespace fatfs {
 			return st;
 		}
 
-		static uint32_t i_count_;
-
-		static INTERRUPT_FUNC void i_task_()
-		{
-			++i_count_;
+		static void cdeti_task_() noexcept {
 		}
 
+		static void caci_task_() noexcept {
+		}
+
+		static void sdaci_task_() noexcept {
+		}
+
+		static volatile uint32_t i_count_;
+
+		static INTERRUPT_FUNC void sbfai_task_() noexcept {
+			++i_count_;
+		}
 
 		static void sync_data_end_() noexcept
 		{
@@ -169,14 +196,14 @@ namespace fatfs {
 		sdhi_io(bool onew = false) noexcept : stat_(STA_NOINIT), card_type_(0),
 			mount_delay_(0), intr_lvl_(0),
 			cd_(false), mount_(false), start_(false), fast_(false),
-			onew_(onew)
+			onew_(onew), rca_id_(0)
 		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
-			@param[in]	lvl		割り込みレベル
+			@param[in]	lvl		割り込みレベル（０の場合、ポーリング）
 		 */
 		//-----------------------------------------------------------------//
 		void start(uint8_t lvl = 0)
@@ -193,23 +220,14 @@ namespace fatfs {
 			device::power_mgr::turn(SDHI::get_peripheral());
 			device::port_map::turn(SDHI::get_peripheral(), true, PSEL);
 
-			while(SDHI::SDSTS2.CBSY() != 0) ;
-			SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.TOP.b(1)
-				| SDHI::SDOPT.WIDTH.b();
-//			SDHI::SDOPT = SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_) | SDHI::SDOPT.TOP.b(1);
-
-			// データ読み出し、書き込み時のエンディアン変換を有効にする
-#ifdef LITTLE_ENDIAN
-//			SDHI::SDSWAP = SDHI::SDSWAP.BWSWP.b(1) | SDHI::SDSWAP.BRSWP.b(1);
-#else
-
-#endif
-
 			intr_lvl_ = lvl;
 			if(intr_lvl_) {
-				set_interrupt_task(i_task_, static_cast<uint32_t>(SDHI::get_ivec()));
+//				cdeti_task_
+//				caci_task_
+//				sdaci_task_
+				set_interrupt_task(sbfai_task_, static_cast<uint32_t>(SDHI::get_sbfai()));
 			} else {
-				set_interrupt_task(nullptr, static_cast<uint32_t>(SDHI::get_ivec()));
+				set_interrupt_task(nullptr, static_cast<uint32_t>(SDHI::get_sbfai()));
 			}
 			device::icu_mgr::set_level(SDHI::get_peripheral(), intr_lvl_);
 
@@ -283,16 +301,18 @@ namespace fatfs {
 		{
 			if(drv) return RES_NOTRDY;
 
-			utils::format("Start: disk_initialize\n");
-#if 0
+			utils::format("Start SDHI: disk_initialize\n");
 			utils::format("  Version IP1: 0x%02X, IP2: 0x%1X, CLKRAT: %d, CPRM: %d\n")
 				% static_cast<uint16_t>(SDHI::SDVER.IP1())
 				% static_cast<uint16_t>(SDHI::SDVER.IP2())
 				% static_cast<uint16_t>(SDHI::SDVER.CLKRAT())
 				% static_cast<uint16_t>(SDHI::SDVER.CPRM());
 			utils::format("  SDSIZE: %d\n") % SDHI::SDSIZE();
-#endif
-			// ダミークロックを７４個以上入った事を確認する。
+
+
+			set_bus_(true);
+
+			// ダミークロックをが７４個以上入った事を確認する。
 			// ※CS(D3) = 1, DI = 1 が「１」の状態である事。
 			SDHI::SDCLKCR.CLKCTRLEN = 1;
 			set_clk_();
@@ -302,98 +322,170 @@ namespace fatfs {
 				while(device::port_map::probe_sdhi_clock(PSEL) == 1) ;
 			}
 			SDHI::SDCLKCR.CLKCTRLEN = 1;
+			utils::format("74 Dummy clock OK.\n");
 
-			if(send_cmd_(command::CMD0, 0) != state::no_error) {  // soft reset
-				utils::format("CMD0: Error\n");
-				stat_ = STA_NOINIT;
-				return stat_;
+			{
+				// CMD0 soft reset
+				int loop;
+				for(loop = 0; loop < CMD0_LOOP_MAX; ++loop) {
+					if(send_cmd_(command::CMD0, 0) == state::no_error) {
+						break;
+					} 
+				}
+				if(loop >= CMD0_LOOP_MAX) {
+					utils::format("CMD0: Error\n");
+					stat_ = STA_NOINIT;
+					return stat_;
+				}
+				utils::format("CMD0: OK (%d)\n") % loop;
 			}
-			utils::format("CMD0: OK!\n");
 
 			BYTE ty = 0;
+			// 0x100: 2.7V to 3.6V condition
+			// 0x200: Low range
+			// 0x0AA: Check Pattern
 			if(send_cmd_(command::CMD8, 0x01AA) == state::no_error) {
 				uint32_t res = SDHI::SDRSP10() & 0xFFF;
+				rca_id_ = res & 0xffff0000;
 				if(res != 0x1AA) {  // No Match for SD-V1
 					utils::format("CMD8: State Miss Match (%03X)\n") % res;
 					stat_ = STA_NOINIT;
 					return stat_;
 				} else {
-					utils::format("CMD8: OK! for 'SD-V2'\n");
+					utils::format("CMD8: OK 'SD-V2' RCA: 0x%08X\n") % rca_id_;
 					ty = CT_SD2;  // for SD Ver 2.x
 				}
 			} else {  // Error, No Response for SD-V1, MMC-V3, Error
+				// Clear the illegal command error for CMD8
+				for(int loop = 0; loop < CMD0_LOOP_MAX; ++loop) {
+					if(send_cmd_(command::CMD0, 0) == state::no_error) {
+						break;
+					} 
+				}
 				ty = CT_SD1;
-				utils::format("CMD8: NG! for 'SD-V1, MMC-V3 or Fail'\n");
+				utils::format("CMD8: NG 'SD-V1, MMC-V3 or Fail'\n");
 			}
 
-
-			// 初期化コマンド(CMD55/ACMD41)
-			// retray loop count: 1 turn 640 clock for 234KHz(60MHz / 256) 2.735ms
-			// 750 ms: 
-			static const uint32_t init_limit = 500;
-			uint32_t init_loop = 0;
-			while(init_loop < init_limit) {
-				{
-					auto st = send_cmd_(command::CMD55, 0);
-					if(st != state::no_error) {
+			{  // ACMD41
+				int loop;
+				for(loop = 0; loop < ACMD41_LOOP_MAX; ++loop) {
+					if(send_cmd_(command::CMD55, rca_id_) != state::no_error) {
 						utils::format("CMD55: Error\n");
 						stat_ = STA_NOINIT;
 						return stat_;
 					}
-				}
-
-				{
+					// HCS: 0x40000000
 					uint32_t send = (ty == CT_SD2) ? 0x40000000 : 0x00000000;
-					auto st = send_cmd_(command::ACMD41, send);
-					auto res = SDHI::SDRSP10();
-					if(st == state::no_error && ((res & 0xff) == 0x00)) {
-						break;
+///					send |= 0x01000000;  // S18R(B24) 電圧切り替え
+					if(send_cmd_(command::ACMD41, send) != state::no_error) {
+						utils::format("ACMD41: Error\n");
+						stat_ = STA_NOINIT;
+						return stat_;
 					} else {
-						++init_loop;
+						auto res = SDHI::SDRSP10();
+// utils::format("(%d) ACMD41 %08X: %08X\n") % loop % send % res;
+						if((res & 0x80000000) != 0) {
+							break;
+						} else {
+							utils::delay::milli_second(4);
+						}
 					}
 				}
-			}
-			if(init_loop >= init_limit) {  // timeout
-				utils::format("ACMD41: Time Out\n");
-				stat_ = STA_NOINIT;
-				return stat_;
-			}
-
-			if(ty == CT_SD2) {
-				utils::format("ACMD41: OK! (SD-V2), %d loops\n") % init_loop;
-#if 0
-				// Block for 512 bytes
-				if(send_cmd_(command::CMD16, 512) == state::no_error) {
-					utils::format("CMD16: OK!\n");
+				if(loop < ACMD41_LOOP_MAX) {
+					utils::format("ACMD41: OK for %d [ms]\n") % static_cast<int>(loop * 4);
 				} else {
-					utils::format("CMD16: NG!\n");
+					utils::format("ACMD41: Error\n");
 					stat_ = STA_NOINIT;
 					return stat_;
 				}
-#endif
-			} else { // SD-V1
-				utils::format("ACMD41: OK! (SD-V1), %d loops\n") % init_loop;
+			}
+			// S18A が有効なら、電圧切り替えコマンド（CMD11）を送る必要がある。
+
+
+			// CMD2 (CID) カード識別レジスタ (R2)
+			if(send_cmd_(command::CMD2, 0x0) != state::no_error) {
+				utils::format("CMD2: Error\n");
+				stat_ = STA_NOINIT;
+				return stat_;
+			} else {
+				uint32_t st[4];
+				st[3] = SDHI::SDRSP76();
+				st[2] = SDHI::SDRSP54();
+				st[1] = SDHI::SDRSP32();
+				st[0] = SDHI::SDRSP10();
+
+				cid_[0] = (st[3] << 8) | (st[2] >> 24);
+				cid_[1] = (st[2] << 8) | (st[1] >> 24);
+				cid_[2] = (st[1] << 8) | (st[0] >> 24);
+				cid_[3] =  st[0] << 8;
+				utils::format("CMD2: OK (%08X, %08X, %08X, %08X)\n")
+					% cid_[0] % cid_[1] % cid_[2] % cid_[3];
 			}
 
-			// CMD58 (read OCR)
-			if(send_cmd_(command::CMD58, 0) == state::no_error) {
-				auto res = SDHI::SDRSP10();
-				utils::format("CMD58: OK! %02X\n") % res;
-			} else {
-				utils::format("CMD58: NG!\n");
+			{  // CMD3 RCA 読み出し
+				int loop;
+				for(loop = 0; loop < CMD3_LOOP_MAX; ++loop) {
+					if(send_cmd_(command::CMD3, 0) == state::no_error) {
+						rca_id_ = SDHI::SDRSP10() & 0xffff0000;
+						if(rca_id_ != 0) {
+							break;
+						}
+					}
+				}
+				if(loop >= CMD3_LOOP_MAX) {
+					utils::format("CMD3: Error\n");
+					stat_ = STA_NOINIT;
+					return stat_;
+				}
+				utils::format("CMD3: OK (RCA: %08X)\n") % rca_id_;
+			}
+
+			bool lock = false;
+			{  // CMD7 RCA を使ってカード選択
+				if(send_cmd_(command::CMD7, rca_id_) != state::no_error) {
+					utils::format("CMD7: Error\n");
+					stat_ = STA_NOINIT;
+					return stat_;
+				} else {
+					if((SDHI::SDRSP10() & 0xfdffe008) != 0) {
+						lock = true;
+					}
+					utils::format("CMD7: OK\n");
+				}
+			}
+
+			if(lock) {
+				// カードのロックを外すには、CMD42 が必要
+				// その後で ACMD6 を使いバス幅を４ビットと同時にロック解除する。
+				// とりあえず、エラーで終了
+				utils::format("Card Locked...\n");
 				stat_ = STA_NOINIT;
 				return stat_;
 			}
 
-			// CMD9 (CSD)
-
-			// CMD10 (CID)
-
-///////////////////////////////////////////////////////////////
-//	ty |= CT_BLOCK;
+			{  // 4 bit bus mode
+				if(send_cmd_(command::CMD55, rca_id_) != state::no_error) {
+					utils::format("CMD55(ACMD6): Error\n");
+					stat_ = STA_NOINIT;
+					return stat_;
+				}
+				uint32_t busarg = 0x00000002;
+				if(send_cmd_(command::ACMD6, busarg) != state::no_error) {
+					utils::format("ACMD6: Error\n");
+					stat_ = STA_NOINIT;
+					return stat_;
+				} else {
+					if(busarg) {
+						set_bus_(false);
+					}
+					utils::format("ACMD6: OK bus = %d\n") % static_cast<int>(busarg != 0 ? 4 : 1);
+				}
+			}
 
 			card_type_ = ty;
 			stat_ = ty ? 0 : STA_NOINIT;
+
+//			card_type_ |= CT_BLOCK;
 
 			// boost for CLK
 			fast_ = true;
@@ -401,6 +493,13 @@ namespace fatfs {
 			if(card_type_ & CT_BLOCK) {
 				utils::format("SD: Block mode\n"); 
 			}
+
+			// データ読み出し、書き込み時のエンディアン変換を有効にする
+#ifndef LITTLE_ENDIAN
+			utils::format("Turn SWAP mode for Big Endian\n");
+			SDHI::SDSWAP = SDHI::SDSWAP.BWSWP.b(1) | SDHI::SDSWAP.BRSWP.b(1);
+#endif
+			utils::format("SD Initialize final.\n");
 
 			return stat_;
 		}
@@ -422,9 +521,10 @@ namespace fatfs {
 			// Convert LBA to byte address if needed
 			if(!(card_type_ & CT_BLOCK)) sector *= 512;
 
-			utils::format("disk_read: sector: %d, count: %d\n") % sector % count;
+///			utils::format("disk_read: sector: %d, count: %d\n") % sector % count;
 
 			set_clk_();
+
 			SDHI::SDSIZE   = 512;
 //			SDHI::SDIMSK1  = 0x0000FFFE;
 //			SDHI::SDIMSK2  = 0x00007F80;
@@ -450,10 +550,10 @@ namespace fatfs {
 			}
 			SDHI::SDSTS1 = 0x0000FFFE;
 			auto sp10 = SDHI::SDRSP10();
-			utils::format("%s: Response: %08X\n") % cmdstr % sp10;
+///			utils::format("%s: Response: %08X\n") % cmdstr % sp10;
 			uint32_t loop = 0;
 			while(SDHI::SDSTS2.BRE() == 0) {
-				if(loop >= 1000000) {
+				if(loop >= 1000) {
 					utils::format("%s time out\n") % cmdstr;
 					return RES_ERROR;
 				}
@@ -471,7 +571,7 @@ namespace fatfs {
 			}
 
 			SDHI::SDSTS2 = 0x0000FEFF;
-			utils::format("%s BRE: OK\n") % cmdstr;
+///			utils::format("%s BRE: OK\n") % cmdstr;
 
 			if((reinterpret_cast<uint32_t>(buff) & 0x3) == 0) {
 				uint32_t* p = static_cast<uint32_t*>(buff);
@@ -480,24 +580,38 @@ namespace fatfs {
 				}
 			} else {
 				uint8_t* p = static_cast<uint8_t*>(buff);
-				for(uint32_t n = 0; n < 128; ++n) {
+				for(uint32_t n = 0; n < (512 / 4); ++n) {
 					uint32_t tmp = SDHI::SDBUFR();
 					std::memcpy(p, &tmp, 4);
 					p += 4;
 				}
 			}
 
-			utils::format("Data trans: OK\n");
+///			utils::format("Data trans: OK\n");
+
+			if(0) {
+				const uint8_t* p = static_cast<const uint8_t*>(buff);
+				for(int j = 0; j < 32; ++j) {
+					for(int i = 0; i < 16; ++i) {
+						utils::format(" %02X") % static_cast<uint16_t>(p[i]);
+						++p;
+					}
+					utils::format("\n");
+				}
+			}
+
 
 			while(SDHI::SDSTS1.ACEND() == 0) {
-
 			}
+
 			SDHI::SDSTS1 = 0x0000FFFB;
 			{
-				auto sp10 = SDHI::SDRSP10();
-				utils::format("Data end: 0x%08X\n") % sp10;
+///				auto sp10 = SDHI::SDRSP10();
+///				utils::format("Data end: 0x%08X\n") % sp10;
 			}
-			return count ? RES_ERROR : RES_OK;
+
+///			return count ? RES_ERROR : RES_OK;
+			return RES_OK;
 		}
 
 
@@ -667,5 +781,5 @@ namespace fatfs {
 
 	// テンプレート関数、実態の定義
 	template <class SDHI, class POW, device::port_map::option PSEL>
-		uint32_t sdhi_io<SDHI, POW, PSEL>::i_count_ = 0;
+		volatile uint32_t sdhi_io<SDHI, POW, PSEL>::i_count_ = 0;
 }
