@@ -11,6 +11,7 @@
 			と表示される。@n
             ・NO_FLOAT_FORM を有効にすると、float 関係の機能を無効にでき @n
             メモリを節約出来る。@n
+			・現在の実装では、IEEE-754 32 ビットフォーマットのみサポート @n 
 			+ 2017/06/11 20:00- 標準文字出力クラスの再定義、実装 @n 
 			+ 2017/06/11 21:00- 固定文字列クラス向け chaout、実装 @n
 			+ 2017/06/12 14:50- memory_chaoutと、専用コンストラクター実装 @n
@@ -599,7 +600,7 @@ namespace utils {
 				while (*(out - 1) == '0') {
 					out--;
 				}
-				if(*(out - 1) == '.') out--;		
+				if(*(out - 1) == '.') out--;
 			}
 			*out++ = 0;
 			str_(buff_);			
@@ -870,8 +871,8 @@ namespace utils {
 
 	template <class CHAOUT> CHAOUT basic_format<CHAOUT>::chaout_;
 
-	typedef basic_format<stdout_chaout> format;
-	typedef basic_format<memory_chaout> sformat;
-	typedef basic_format<null_chaout> null_format;
-	typedef basic_format<size_chaout> size_format;
+	typedef basic_format<stdout_chaout> format;		///< stdout に出力する
+	typedef basic_format<memory_chaout> sformat;	///< メモリー先に出力する
+	typedef basic_format<null_chaout> null_format;	///< 文字列の生成を捨てる
+	typedef basic_format<size_chaout> size_format;	///< 文字列サイズのみを求める
 }
