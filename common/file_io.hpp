@@ -239,8 +239,8 @@ namespace utils {
 			}
 			if(strchr(mode, 'w') != nullptr) {
 				mdf = FA_WRITE;
-				mdf |= FA_CREATE_NEW;
-//				if(flags & O_TRUNC) mode |= FA_CREATE_ALWAYS;
+//				mdf |= FA_CREATE_NEW;  // 上書き禁止
+				mdf |= FA_CREATE_ALWAYS;
 			}
 //			else if(rwm == O_RDWR) mode = FA_READ | FA_WRITE;
 			if(strchr(mode, 'a') != nullptr) {
