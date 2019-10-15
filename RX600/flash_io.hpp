@@ -541,5 +541,40 @@ namespace device {
 
 			return f;
 		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  プロセッサIDの取得
+			@param[in]	idx		プロセッサIDインデックス
+			@param[out]	id		固有のID
+			@return 取得が成功しない場合「false」
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool get_processor_id(uint32_t idx, uint32_t& id) noexcept
+		{
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+			return false;
+#elif defined(SIG_RX24T) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX66T)
+			switch(idx) {
+			case 0:
+				id = FLASH::UIDR0();
+				return true;
+			case 1:
+				id = FLASH::UIDR1();
+				return true;
+			case 2:
+				id = FLASH::UIDR2();
+				return true;
+#if !defined(SIG_RX66T)
+			case 3:
+				id = FLASH::UIDR3();
+				return true;
+#endif
+			default:
+				return false;
+			}
+#endif
+		}
 	};
 }
