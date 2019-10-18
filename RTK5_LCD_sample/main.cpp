@@ -289,21 +289,11 @@ namespace {
 				cmd_.get_word(1, tmp, sizeof(tmp));
 				speed_test_file_(tmp, 1024 * 1024);
 			}
-		} else if(cmd_.cmp_word(0, "free")) { // SD free space
-			uint32_t fspc = 0;
-			uint32_t capa = 0;
-			if(utils::file_io::get_free_space(fspc, capa)) {
-				utils::format("Free space: %u KBytes\n") % fspc;
-				utils::format("Capacity:   %u KBytes\n") % capa;
-			} else {
-				utils::format("get_free_space: error\n");
-			}
 		} else if(cmd_.cmp_word(0, "help")) {
 			shell_.help();
 //			utils::format("    image [filename]\n");
 			utils::format("    write filename      test for write\n");
 			utils::format("    read filename       test for read\n");
-			utils::format("    free                get SD space\n");
 		} else {
 			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
