@@ -320,7 +320,7 @@ namespace fatfs {
 
 			device::power_mgr::turn(SDHI::get_peripheral());
 			using port_map = device::port_map;
-			port_map::turn_sdhi(port_map::sdhi_situation::start, PSEL);
+			port_map::turn_sdhi(port_map::sdhi_situation::START, PSEL);
 
 			intr_lvl_ = lvl;
 			if(intr_lvl_) {
@@ -416,7 +416,7 @@ namespace fatfs {
 #endif
 			SDHI::SDRST.SDRST = 0;
 			using port_map = device::port_map;
-			port_map::turn_sdhi(port_map::sdhi_situation::insert, PSEL);
+			port_map::turn_sdhi(port_map::sdhi_situation::INSERT, PSEL);
 			SDHI::SDRST.SDRST = 1;
 
 			set_bus_(true);
@@ -430,17 +430,13 @@ namespace fatfs {
 				while(device::port_map::probe_sdhi_clock(PSEL) == 0) ;
 				while(device::port_map::probe_sdhi_clock(PSEL) == 1) ;
 			}
-			debug_format("Assert 74 dummy clocks OK.\n");
+			debug_format("Assert 74 dummy clocks.\n");
 			SDHI::SDCLKCR.CLKCTRLEN = 1;
 
 			{
 				// CMD0 soft reset
 				int loop;
 				for(loop = 0; loop < CMD0_LOOP_MAX; ++loop) {
-					int f = SDHI::SDSTS1.SDCDMON();
-					debug_format("CD: %d\n") % f;
-					f = SDHI::SDSTS1.SDD3MON();
-					debug_format("D3: %d\n") % f;
 					if(send_cmd_(command::CMD0, 0) == state::no_error) {
 						break;
 					} 
@@ -604,7 +600,7 @@ namespace fatfs {
 				}
 			}
 
-			port_map::turn_sdhi(port_map::sdhi_situation::bus, PSEL);
+			port_map::turn_sdhi(port_map::sdhi_situation::BUS, PSEL);
 
 			card_type_ = ty;
 			stat_ = ty ? 0 : STA_NOINIT;
@@ -884,7 +880,7 @@ namespace fatfs {
 			} else if(!cd && cd_) {
 ///				utils::format("Card Eject\n");
 				f_mount(&fatfs_, "", 0);
-				device::port_map::turn_sdhi(device::port_map::sdhi_situation::eject, PSEL);
+				device::port_map::turn_sdhi(device::port_map::sdhi_situation::EJECT, PSEL);
 				POW::P = 1;
 
 				stat_ = STA_NOINIT;

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・CAN 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -42,7 +42,7 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>      TPM;
 			bit_rw_t <io_, bitpos::B5>      TSRC;
 			bits_rw_t<io_, bitpos::B6, 2>   TSPS;
-			bits_rw_t<io_, bitpos::B9, 2>   CANM;
+			bits_rw_t<io_, bitpos::B8, 2>   CANM;
 			bit_rw_t <io_, bitpos::B10>     SLPM;
 			bits_rw_t<io_, bitpos::B11, 2>  BOM;
 			bit_rw_t <io_, bitpos::B13>     RBOC;
@@ -243,12 +243,12 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>       RFE;
-			bits_ro_t<io_, bitpos::B0,  3>   RFUST;
-			bit_rw_t <io_, bitpos::B4>       RFMLF;
-			bit_ro_t <io_, bitpos::B5>       RFFST;
-			bit_ro_t <io_, bitpos::B6>       RFWST;
-			bit_ro_t <io_, bitpos::B7>       RFEST;
+			bit_rw_t <io_, bitpos::B0>      RFE;
+			bits_ro_t<io_, bitpos::B1, 3>   RFUST;
+			bit_rw_t <io_, bitpos::B4>      RFMLF;
+			bit_ro_t <io_, bitpos::B5>      RFFST;
+			bit_ro_t <io_, bitpos::B6>      RFWST;
+			bit_ro_t <io_, bitpos::B7>      RFEST;
 		};
 		static rfcr_t<base + 0x0648> RFCR;
 
@@ -275,10 +275,10 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bit_rw_t <io_, bitpos::B0>       TFE;
-			bits_rw_t<io_, bitpos::B0,  3>   TFUST;
-			bit_ro_t <io_, bitpos::B6>       TFFST;
-			bit_ro_t <io_, bitpos::B7>       TFEST;
+			bit_rw_t <io_, bitpos::B0>      TFE;
+			bits_rw_t<io_, bitpos::B1, 3>   TFUST;
+			bit_ro_t <io_, bitpos::B6>      TFFST;
+			bit_ro_t <io_, bitpos::B7>      TFEST;
 		};
 		static tfcr_t<base + 0x064A> TFCR;
 
@@ -319,6 +319,183 @@ namespace device {
 			bit_ro_t <in_, bitpos::B14>  RECST;
 		};
 		static str_t<base + 0x0642> STR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  メールボックスサーチモードレジスタ（ MSMR ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct msmr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2>  MBSM;
+		};
+		static msmr_t<base + 0x0654> MSMR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  メールボックスサーチステータスレジスタ（ MSSR ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct mssr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 5>  MBNST;
+			bit_rw_t <io_, bitpos::B7>     SEST;
+		};
+		static mssr_t<base + 0x0652> MSSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  チャネルサーチサポートレジスタ（ CSSR ）
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<base + 0x0651>  CSSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  アクセプタンスフィルタサポートレジスタ（ AFSR ）
+		*/
+		//-----------------------------------------------------------------//
+		static rw16_t<base + 0x0656>  AFSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  エラー割り込み許可レジスタ（ EIER ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct eier_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  BEIE;
+			bit_rw_t<io_, bitpos::B1>  EWIE;
+			bit_rw_t<io_, bitpos::B2>  EPIE;
+			bit_rw_t<io_, bitpos::B3>  BOEIE;
+			bit_rw_t<io_, bitpos::B4>  BORIE;
+			bit_rw_t<io_, bitpos::B5>  ORIE;
+			bit_rw_t<io_, bitpos::B6>  OLIE;
+			bit_rw_t<io_, bitpos::B7>  BLIE;
+		};
+		static eier_t<base + 0x064C> EIER;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  エラー割り込み要因判定レジスタ（ EIFR ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct eifr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  BEIF;
+			bit_rw_t<io_, bitpos::B1>  EWIF;
+			bit_rw_t<io_, bitpos::B2>  EPIF;
+			bit_rw_t<io_, bitpos::B3>  BOEIF;
+			bit_rw_t<io_, bitpos::B4>  BORIF;
+			bit_rw_t<io_, bitpos::B5>  ORIF;
+			bit_rw_t<io_, bitpos::B6>  OLIF;
+			bit_rw_t<io_, bitpos::B7>  BLIF;
+		};
+		static eifr_t<base + 0x064D> EIFR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  受信エラーカウントレジスタ（ RECR ）
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<base + 0x064E>  RECR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  送信エラーカウントレジスタ（ TECR ）
+		*/
+		//-----------------------------------------------------------------//
+		static rw8_t<base + 0x064F>  TECR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	エラーコード格納レジスタ（ ECSR ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct ecsr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  SEF;
+			bit_rw_t<io_, bitpos::B1>  FEF;
+			bit_rw_t<io_, bitpos::B2>  AEF;
+			bit_rw_t<io_, bitpos::B3>  CEF;
+			bit_rw_t<io_, bitpos::B4>  BE1F;
+			bit_rw_t<io_, bitpos::B5>  BE0F;
+			bit_rw_t<io_, bitpos::B6>  ADEF;
+			bit_rw_t<io_, bitpos::B7>  EDPM;
+		};
+		static ecsr_t<base + 0x0650> ECSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  タイムスタンプレジスタ（ TSR ）
+		*/
+		//-----------------------------------------------------------------//
+		static rw16_t<base + 0x0654>  TSR;
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	テスト制御レジスタ（ TCR ）
+			@param[in]	ofs	オフセット
+		*/
+		//-----------------------------------------------------------------//
+		template <uint32_t ofs>
+		struct tcr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t <io_, bitpos::B0>     TSTE;
+			bits_rw_t<io_, bitpos::B1, 2>  TSTM;
+		};
+		static tcr_t<base + 0x0658> TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -398,10 +575,12 @@ namespace device {
 		@param[in]	txf		送信 FIFO 割り込み
 		@param[in]	rxm		メールボックス受信割り込み
 		@param[in]	txm		メールボックス送信割り込み
+		@param[in]	ers		エラー割り込み
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB rxf, ICU::VECTOR_SELB txf, ICU::VECTOR_SELB rxm, ICU::VECTOR_SELB txm>
+		ICU::VECTOR_SELB rxf, ICU::VECTOR_SELB txf, ICU::VECTOR_SELB rxm, ICU::VECTOR_SELB txm,
+		ICU::VECTOR_BE0 ers>
 	struct can_seli_t : can_t<base, per> {
 
 		//-----------------------------------------------------------------//
@@ -438,17 +617,29 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR_SELB get_txm_vec() { return txm; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ERS 割り込みベクターを返す
+			@return 割り込みベクター
+		*/
+		//-----------------------------------------------------------------//
+		static ICU::VECTOR_BE0 get_ers_vec() { return ers; }
 	};
+
 	typedef can_seli_t<0x00090200, peripheral::CAN0,
 		ICU::VECTOR_SELB::RXF0, ICU::VECTOR_SELB::TXF0,
-		ICU::VECTOR_SELB::RXM0, ICU::VECTOR_SELB::TXM0> CAN0;
+		ICU::VECTOR_SELB::RXM0, ICU::VECTOR_SELB::TXM0, ICU::VECTOR_BE0::ERS0> CAN0;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	typedef can_seli_t<0x00091200, peripheral::CAN1,
 		ICU::VECTOR_SELB::RXF1, ICU::VECTOR_SELB::TXF1,
-		ICU::VECTOR_SELB::RXM1, ICU::VECTOR_SELB::TXM1> CAN1;
+		ICU::VECTOR_SELB::RXM1, ICU::VECTOR_SELB::TXM1, ICU::VECTOR_BE0::ERS1> CAN1;
+#endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 	typedef can_seli_t<0x00092200, peripheral::CAN2,
 		ICU::VECTOR_SELB::RXF2, ICU::VECTOR_SELB::TXF2,
-		ICU::VECTOR_SELB::RXM2, ICU::VECTOR_SELB::TXM2> CAN2;
+		ICU::VECTOR_SELB::RXM2, ICU::VECTOR_SELB::TXM2, ICU::VECTOR_BE0::ERS2> CAN2;
 #endif
 #endif
 // note: RX65x CAN0, CAN1

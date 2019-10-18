@@ -64,6 +64,21 @@ namespace device {
 			CLK_CD,	///< MTCLKC, MTCLKD 1ST: P31/P30, 2ND: P11/P10, 3RD: PE4/PE3
 		};
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  SDHI シチュエーション型 @n
+					SDHI ポートの状態に応じたマッピング
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class sdhi_situation : uint8_t {
+			START,		///< 開始時（カード挿入を待っている状態）
+ 			INSERT,		///< カード挿入時（カードが挿入された時）
+			BUS,		///< カードのバスを有効にする
+			EJECT,		///< カード排出時（カードが排出された時）
+			DESTROY,	///< カード廃止
+		};
+
 	private:
 		static bool sub_1st_(peripheral t, bool enable, option opt)
 		{
@@ -496,30 +511,6 @@ namespace device {
 				}
 				break;
 
-#if 0
-			case peripheral::SDHI:
-				{
-					uint8_t sel = enable ? 0b011010 : 0;
-					MPC::P80PFS.PSEL = sel;  // SDHI_WP (81)
-					PORT8::PMR.B0 = enable;
-					MPC::P81PFS.PSEL = sel;  // SDHI_CD (80)
-					PORT8::PMR.B1 = enable;
-					MPC::PC2PFS.PSEL = sel;  // SDHI_D3 (86)
-					PORTC::PMR.B2 = enable;
-					MPC::PC3PFS.PSEL = sel;  // SDHI_D0 (83)
-					PORTC::PMR.B3 = enable;
-					MPC::PC4PFS.PSEL = sel;  // SDHI_D1 (82)
-					PORTC::PMR.B4 = enable;
-   					MPC::P75PFS.PSEL = sel;  // SDHI_D2 (87)
-					PORT7::PMR.B5 = enable;
-					MPC::P76PFS.PSEL = sel;  // SDHI_CMD (85)
-					PORT7::PMR.B6 = enable;
-					MPC::P77PFS.PSEL = sel;  // SDHI_CLK (84)
-					PORT7::PMR.B7 = enable;
-				}
-				break;
-#endif
-
 			case peripheral::ETHERC0:  // only RMII mode, not use link status interrupt
 				{
 					uint8_t  mii = enable ? 0b010001 : 0;
@@ -863,7 +854,99 @@ namespace device {
 		}
 
 
+		static bool sdhi_1st_(sdhi_situation sit) noexcept
+		{
+			bool ret = true;
+			bool enable = true;
+			uint8_t sel = enable ? 0b011010 : 0;
+			switch(sit) {
+			case sdhi_situation::START:
+				PORT8::PMR.B0 = 0;
+				MPC::P80PFS.PSEL = sel;  // SDHI_WP (81)
+				PORT8::PMR.B0 = enable;
+				PORT8::PMR.B1 = 0;
+				MPC::P81PFS.PSEL = sel;  // SDHI_CD (80)
+				PORT8::PMR.B1 = enable;
+				break;
+
+			case sdhi_situation::EJECT:
+				enable = 0;
+				sel = 0;
+			case sdhi_situation::INSERT:
+				PORTC::PMR.B2 = 0;
+				MPC::PC2PFS.PSEL = sel;  // SDHI_D3 (86)
+				PORTC::PMR.B2 = enable;
+				PORTC::PMR.B3 = 0;
+				MPC::PC3PFS.PSEL = sel;  // SDHI_D0 (83)
+				PORTC::PMR.B3 = enable;
+				PORTC::PMR.B4 = 0;
+				MPC::PC4PFS.PSEL = sel;  // SDHI_D1 (82)
+				PORTC::PMR.B4 = enable;
+				PORT7::PMR.B5 = 0;
+				MPC::P75PFS.PSEL = sel;  // SDHI_D2 (87)
+				PORT7::PMR.B5 = enable;
+				PORT7::PMR.B6 = 0;
+				MPC::P76PFS.PSEL = sel;  // SDHI_CMD (85)
+				PORT7::PMR.B6 = enable;
+				PORT7::PMR.B7 = 0;
+				MPC::P77PFS.PSEL = sel;  // SDHI_CLK (84)
+				PORT7::PMR.B7 = enable;
+				break;
+
+			case sdhi_situation::DESTROY:
+				sel = 0;
+				PORT8::PMR.B0 = 0;
+				MPC::P80PFS.PSEL = sel;  // SDHI_WP (81)
+				PORT8::PMR.B1 = 0;
+				MPC::P81PFS.PSEL = sel;  // SDHI_CD (80)
+				PORTC::PMR.B2 = 0;
+				MPC::PC2PFS.PSEL = sel;  // SDHI_D3 (86)
+				PORTC::PMR.B3 = 0;
+				MPC::PC3PFS.PSEL = sel;  // SDHI_D0 (83)
+				PORTC::PMR.B4 = 0;
+				MPC::PC4PFS.PSEL = sel;  // SDHI_D1 (82)
+				PORT7::PMR.B5 = 0;
+				MPC::P75PFS.PSEL = sel;  // SDHI_D2 (87)
+				PORT7::PMR.B6 = 0;
+				MPC::P76PFS.PSEL = sel;  // SDHI_CMD (85)
+				PORT7::PMR.B7 = 0;
+				MPC::P77PFS.PSEL = sel;  // SDHI_CLK (84)
+				break;
+
+			default:
+				ret = false;
+			}
+			return ret;
+		}
+
 	public:
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  SDHI ポート専用切り替え
+			@param[in]	sit		SHDI シチュエーション
+			@param[in]	opt		ポート・マップ・オプション（ポート候補）
+			@return 無効な周辺機器の場合「false」
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool turn_sdhi(sdhi_situation sit, option opt = option::FIRST) noexcept
+		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = 0;
+			switch(opt) {
+			case option::FIRST:
+				ret = sdhi_1st_(sit);
+				break;
+			default:
+				break;
+			}
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
+			return ret;
+		}
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  周辺機器に切り替える
