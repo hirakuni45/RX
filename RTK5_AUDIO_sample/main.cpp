@@ -31,14 +31,15 @@
 
 #include "graphics/bmp_in.hpp"
 
-#define SDHI_IF
+// SDHI インターフェースを利用する場合（現状では SDHC タイプに比非対応）
+// #define SDHI_IF
 
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 
 	// Famicon PAD (CMOS 4021B Shift Register)
-	// 電源は、微小なので、接続を簡単に行う為、ポートを使う
+	// 電源は、微小なので、接続を簡単に行う為、ポート出力を使う
 	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_VCC;
 	typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_GND;
 	typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_P_S;
@@ -438,6 +439,7 @@ int main(int argc, char** argv)
 	}
 #endif
 
+	char path[256];
 	while(1) {
 		render_.sync_frame();
 
@@ -472,7 +474,6 @@ int main(int argc, char** argv)
 			auto tnum = ft5206_.get_touch_num();
 			const auto& xy = ft5206_.get_touch_pos(0);
 			filer_.set_touch(tnum, xy.x, xy.y); 
-			char path[256];
 			if(filer_.update(ctrl, path, sizeof(path))) {
 				render_.sync_frame();
 				audio_.play_loop("", path);

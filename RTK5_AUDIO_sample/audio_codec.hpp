@@ -201,7 +201,10 @@ namespace audio {
 		{
 			loop_t* t = static_cast<loop_t*>(option);
 			if(t->enable) {
-				if(strcmp(name, t->start) != 0) {
+				const char* p = strrchr(t->start, '/');
+				if(p != nullptr) ++p;
+				else p = t->start;
+				if(strcmp(name, p) != 0) {
 					return;
 				} else {
 					t->enable = false;
