@@ -3,7 +3,8 @@
 /*!	@file
 	@brief	ファイル・入出力クラス @n
 			※ FatFs のラッパー（ff13c 以降が必要） @n
-			※ fopen ぽい機能を提供する。
+			※ FatFs のファイル操作系をラップして fopen ぽい機能を提供する。@n
+			※ fopen と違って、バッファリング（キャッシュ）されない。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -609,6 +610,29 @@ namespace utils {
 			} while(dl.probe()) ;
 
 			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	空き容量の取得
+			@param[out]	fspc	フリー・スペース（単位Ｋバイト)
+			@param[out]	capa	最大容量（単位Ｋバイト）
+			@return 成功なら「true」
+		 */
+		//-----------------------------------------------------------------//
+		static bool get_free_space(uint32_t& fspc, uint32_t& capa) noexcept
+		{
+			FATFS* fs;
+			DWORD nclst = 0;
+			if(f_getfree("", &nclst, &fs) == FR_OK) {
+				// 全セクタ数と空きセクタ数を計算（５１２バイトセクタ）
+				capa = (fs->n_fatent - 2) * fs->csize / 2;
+				fspc = nclst * fs->csize / 2;
+				return true;
+			} else {
+				return false;
+			}
 		}
 	};
 }
