@@ -67,6 +67,18 @@ namespace device {
 		{
 			switch(t) {
 
+			case peripheral::CAN0:
+				{
+					uint8_t sel = enable ? 0b10000 : 0;
+					PORTA::PMR.B0 = 0;
+					PORTA::PMR.B1 = 0;
+					MPC::PA0PFS.PSEL = sel;  // PA0/CTX0 (59/144)
+					MPC::PA1PFS.PSEL = sel;  // PA1/CRX0 (58/144)
+					PORTA::PMR.B0 = enable;
+					PORTA::PMR.B1 = enable;
+				}
+				break;
+
 			case peripheral::RIIC0:
 				{
 					uint8_t sel = enable ? 0b01111 : 0;
@@ -148,6 +160,19 @@ namespace device {
 		static bool sub_2nd_(peripheral t, bool enable) noexcept
 		{
 			switch(t) {
+
+			case peripheral::CAN0:
+				{
+					uint8_t sel = enable ? 0b10000 : 0;
+					PORTA::PMR.B6 = 0;
+					PORTA::PMR.B7 = 0;
+					MPC::PA6PFS.PSEL = sel;  // PA6/CTX0 (53/144)
+					MPC::PA7PFS.PSEL = sel;  // PA7/CRX0 (42/144)
+					PORTA::PMR.B6 = enable;
+					PORTA::PMR.B7 = enable;
+				}
+				break;
+
 //			case peripheral::SCI5C:
 //				{
 //					uint8_t sel = enable ? 0b01010 : 0;
