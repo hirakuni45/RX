@@ -167,6 +167,13 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB16 = f;	// RSPI1 のストップ状態解除
 				break;
 
+			case peripheral::CAN0:
+				SYSTEM::MSTPCRB.MSTPB0 = f;		// CAN0 のストップ状態解除
+				break;
+			case peripheral::CAN1:
+				SYSTEM::MSTPCRB.MSTPB1 = f;		// CAN1 のストップ状態解除
+				break;
+
 			case peripheral::SDHI:
 				SYSTEM::MSTPCRD.MSTPD19 = f;	// SDHI のストップ状態解除
 				break;
