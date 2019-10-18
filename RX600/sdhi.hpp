@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・SDHI 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -40,7 +40,6 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 6>  CMDIDX;
 			bits_rw_t<io_, bitpos::B6, 2>  ACMD;
-			bits_rw_t<io_, bitpos::B0, 8>  CMD;
 			bits_rw_t<io_, bitpos::B8, 3>  RSPTP;
 			bit_rw_t <io_, bitpos::B11>    CMDTP;
 			bit_rw_t <io_, bitpos::B12>    CMDRW;
@@ -89,7 +88,7 @@ namespace device {
 			@brief  レスポンスレジスタ 10 （ SDRSP10 ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<base + 0x18> SDRSP10;
+		static ro32_t<base + 0x18> SDRSP10;
 
 
 		//-----------------------------------------------------------------//
@@ -97,7 +96,7 @@ namespace device {
 			@brief  レスポンスレジスタ 32 （ SDRSP32 ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<base + 0x20> SDRSP32;
+		static ro32_t<base + 0x20> SDRSP32;
 
 
 		//-----------------------------------------------------------------//
@@ -105,7 +104,7 @@ namespace device {
 			@brief  レスポンスレジスタ 54 （ SDRSP54 ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<base + 0x28> SDRSP54;
+		static ro32_t<base + 0x28> SDRSP54;
 
 
 		//-----------------------------------------------------------------//
@@ -113,7 +112,7 @@ namespace device {
 			@brief  レスポンスレジスタ 76 （ SDRSP76 ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<base + 0x30> SDRSP76;
+		static ro32_t<base + 0x30> SDRSP76;
 
 
 		//-----------------------------------------------------------------//
