@@ -85,6 +85,17 @@ namespace utils {
 						cmd_.get_word(1, tmp, sizeof(tmp));
 					}
 					sdc_state_ = utils::file_io::cd(tmp);
+				} else if(cmd_.cmp_word(0, "free")) {  // free
+					uint32_t fre;
+					uint32_t max;
+					if(utils::file_io::get_free_space(fre, max)) {
+						uint32_t rate = fre * 1000 / max;
+						utils::format("%u/%u [KB] (%u.%u%%)\n")
+							% fre % max % (rate / 10) % (rate % 10);
+						sdc_state_ = true;
+					} else {
+						sdc_state_ = false;
+					}
 				} else {
 					return false;
 				}
@@ -102,6 +113,7 @@ namespace utils {
 			utils::format("    dir [xxx]       list current directory\n");
 			utils::format("    pwd             current directory path\n");
 			utils::format("    cd [xxx]        change current directory\n");
+			utils::format("    free            list disk space\n");
 ///						   ---+---+---+---+---+
 		}
 	};
