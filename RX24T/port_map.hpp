@@ -68,6 +68,18 @@ namespace device {
 		{
 			switch(t) {
 
+			case peripheral::CAN0:  // Only Version B
+				{
+					uint8_t sel = enable ? 0b10000 : 0;
+					PORTA::PMR.B0 = 0;
+					PORTA::PMR.B1 = 0;
+					MPC::PA0PFS.PSEL = sel;  // PA0/CTXD0 (41/100)
+					MPC::PA1PFS.PSEL = sel;  // PA1/CRXD0 (40/100)
+					PORTA::PMR.B0 = enable;
+					PORTA::PMR.B1 = enable;
+				}
+				break;
+
 			case peripheral::RIIC0:
 				{
 					uint8_t sel = enable ? 0b01111 : 0;
