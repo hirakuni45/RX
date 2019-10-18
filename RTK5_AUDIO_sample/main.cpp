@@ -31,6 +31,8 @@
 
 #include "graphics/bmp_in.hpp"
 
+#define SDHI_IF
+
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -52,9 +54,9 @@ namespace {
 	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
 	SCI			sci_;
 
-	// カード電源制御は使わないので、「device::NULL_PORT」を指定する。
-//	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
-	typedef device::NULL_PORT SDC_POWER;
+	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
+//	typedef device::NULL_PORT SDC_POWER;
+	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 
 #ifdef SDHI_IF
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている

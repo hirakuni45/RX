@@ -11,6 +11,7 @@
 #define CASH_KFONT
 
 #include "common/renesas.hpp"
+#include "common/cmt_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
@@ -40,7 +41,7 @@
 #endif
 
 // SDHI インターフェースを使う場合
-// #define SDHI_IF
+#define SDHI_IF
 
 // DRW2D エンジンを使う場合
 #define USE_DRW2D
@@ -58,19 +59,25 @@ namespace {
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
+	static const uint32_t CMT_FREQ = 1000;  ///< 計測用タイマー分解能
+	typedef device::cmt_io<device::CMT0> CMT;
+	CMT		cmt_;
+
 	typedef utils::fixed_fifo<char,  512> RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
 	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
 	SCI			sci_;
 
-	// ＳＤカード電源制御は使わない場合、「device::NULL_PORT」を指定する。
-//	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
-	typedef device::NULL_PORT SDC_POWER;
-
 #ifdef SDHI_IF
+	// SDHI を使う場合は、必ず電源制御が必要
+	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
+
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
 	SDHI		sdh_;
 #else
+	// ＳＤカード電源制御は使わない場合、「device::NULL_PORT」を指定する。
+	typedef device::NULL_PORT SDC_POWER;
+
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
 	typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  // CMD
@@ -152,6 +159,111 @@ namespace {
 	SHELL		shell_(cmd_);
 
 
+	uint8_t v_ = 91;
+	uint8_t m_ = 123;
+	uint8_t rand_()
+	{
+		v_ += v_ << 2;
+		++v_;
+		uint8_t n = 0;
+		if(m_ & 0x02) n = 1;
+		if(m_ & 0x40) n ^= 1;
+		m_ += m_;
+		if(n == 0) ++m_;
+		return v_ ^ m_;
+	}
+
+
+	//-----------------------------------------------------------------//
+	/*!
+		@brief  ファイル作成テスト
+		@param[in]	fname	ファイル名
+		@param[in]	size	作成サイズ
+		@return 成功なら「true」
+	*/
+	//-----------------------------------------------------------------//
+	bool create_test_file_(const char* fname, uint32_t size)
+	{
+		uint8_t buff[512];
+		utils::file_io fio;
+
+		for(uint16_t i = 0; i < sizeof(buff); ++i) {
+			buff[i] = rand_();
+		}
+
+		auto st = cmt_.get_counter();
+		if(!fio.open(fname, "wb")) {
+			utils::format("Can't create file: '%s'\n") % fname;
+			return false;
+		}
+		auto ed = cmt_.get_counter();
+		uint32_t topen = ed - st;
+		st = ed;
+
+		auto rs = size;
+		while(rs > 0) {
+			UINT sz = sizeof(buff);
+			if(sz > rs) sz = rs;
+			auto bw = fio.write(buff, sz);
+			rs -= bw;
+		}
+		ed = cmt_.get_counter();
+		uint32_t twrite = ed - st;
+		st = ed;
+
+		fio.close();
+		ed = cmt_.get_counter();
+		uint32_t tclose = ed - st;
+
+		utils::format("Open:  %d [ms]\n") % (topen * 1000 / CMT_FREQ);
+		auto pbyte = size * CMT_FREQ / twrite;
+		utils::format("Write: %d Bytes/Sec\n") % pbyte;
+		utils::format("Write: %d KBytes/Sec\n") % (pbyte / 1024);
+		utils::format("Close: %d [ms]\n") % (tclose * 1000 / CMT_FREQ);
+
+		return true;
+	}
+
+
+	void speed_test_file_(const char* fname, uint32_t size)
+	{
+		utils::format("SD Read test...\n");
+
+		auto st = cmt_.get_counter();
+		utils::file_io fin;
+		if(!fin.open(fname, "rb")) {
+			utils::format("Can't read file: '%s'\n") % fname;
+			return;
+		}
+		auto ed = cmt_.get_counter();
+		uint32_t topen = ed - st;
+		st = ed;
+
+		auto rs = size;
+		while(rs > 0) {
+			uint8_t buff[512];
+			uint32_t sz = sizeof(buff);
+			if(sz > rs) sz = rs;
+			auto s = fin.read(buff, sz);
+			if(s == 0) break;
+			rs -= s;
+		}
+		ed = cmt_.get_counter();
+		uint32_t tread = ed - st;
+		st = ed;
+
+		fin.close();
+		ed = cmt_.get_counter();
+		uint32_t tclose = ed - st;
+
+		utils::format("Open:  %d [ms]\n") % (topen * 1000 / CMT_FREQ);
+		auto pbyte = size * CMT_FREQ / tread;
+		utils::format("Read: %d Bytes/Sec\n") % pbyte;
+		utils::format("Read: %d KBytes/Sec\n") % (pbyte / 1024);
+		utils::format("Close: %d [ms]\n") % (tclose * 1000 / CMT_FREQ);
+	}
+
+
 	void command_()
 	{
 		if(!cmd_.service()) {
@@ -162,15 +274,36 @@ namespace {
 		}
 
 		auto cmdn = cmd_.get_words();
-		if(cmd_.cmp_word(0, "image")) { // image load, draw
+//		if(cmd_.cmp_word(0, "image")) { // image load, draw
+
+		if(cmd_.cmp_word(0, "write")) { // test file (read/write)
 			if(cmdn >= 2) {
 				char tmp[128];
 				cmd_.get_word(1, tmp, sizeof(tmp));
 ///				imgs_.load(tmp);
+				create_test_file_(tmp, 1024 * 1024);
+			}
+		} else if(cmd_.cmp_word(0, "read")) { // speed test
+			if(cmdn >= 2) {
+				char tmp[128];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				speed_test_file_(tmp, 1024 * 1024);
+			}
+		} else if(cmd_.cmp_word(0, "free")) { // SD free space
+			uint32_t fspc = 0;
+			uint32_t capa = 0;
+			if(utils::file_io::get_free_space(fspc, capa)) {
+				utils::format("Free space: %u KBytes\n") % fspc;
+				utils::format("Capacity:   %u KBytes\n") % capa;
+			} else {
+				utils::format("get_free_space: error\n");
 			}
 		} else if(cmd_.cmp_word(0, "help")) {
 			shell_.help();
-			utils::format("    image [filename]\n");
+//			utils::format("    image [filename]\n");
+			utils::format("    write filename      test for write\n");
+			utils::format("    read filename       test for read\n");
+			utils::format("    free                get SD space\n");
 		} else {
 			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
@@ -251,6 +384,11 @@ int main(int argc, char** argv);
 int main(int argc, char** argv)
 {
 	SYSTEM_IO::setup_system_clock();
+
+	{  // 計測タイマー設定 (1000Hz)
+		uint8_t cmt_irq_level = 4;
+		cmt_.start(CMT_FREQ, cmt_irq_level);
+	}
 
 	{  // SCI 設定
 		static const uint8_t sci_level = 2;
