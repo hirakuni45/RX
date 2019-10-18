@@ -3,7 +3,7 @@
     @brief  RX64M CAN サンプル @n
 			・P07(176) ピンに赤色LED（VF:1.9V）を吸い込みで接続する @n
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
