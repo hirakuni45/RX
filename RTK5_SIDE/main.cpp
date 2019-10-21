@@ -1,8 +1,8 @@
 //=====================================================================//
 /*! @file
-    @brief  RX65N SIDE
+    @brief  RX65N Space InvaDers Emulator
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,7 +15,14 @@
 #include "common/shell.hpp"
 #include "common/spi_io2.hpp"
 #include "common/tpu_io.hpp"
+
 #include "sound/sound_out.hpp"
+
+#include "graphics/font8x16.hpp"
+#include "graphics/kfont.hpp"
+#include "graphics/font.hpp"
+#include "graphics/graphics.hpp"
+#include "graphics/dialog.hpp"
 
 #include "chip/FAMIPAD.hpp"
 
@@ -24,6 +31,7 @@
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+
 // オーディオの D/A として使用
 //	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 
@@ -48,14 +56,29 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	static const int16_t LCD_X = 480;
 	static const int16_t LCD_Y = 272;
+	// LCD のフレームメモリーの開始アドレスは、nullptr と区別する為 0x00000000 から始められない
+	// 0x000100 から 255K バイト (480x272x2)
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
 	static const auto PIX = graphics::pixel::TYPE::RGB565;
 	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
+	typedef graphics::font8x16 AFONT;
+	AFONT		afont_;
+	typedef graphics::kfont_null KFONT;
+	KFONT		kfont_;
+	typedef graphics::font<AFONT, KFONT> FONT;
+	FONT		font_(afont_, kfont_);
+
+	typedef graphics::render<GLCDC_IO, FONT> RENDER;
+	RENDER		render_(glcdc_io_, font_);
+
+	typedef gui::dialog<RENDER, FAMIPAD> DIALOG;
+	DIALOG		dialog_(render_, famipad_);
+
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
-//	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
-	typedef device::NULL_PORT SDC_POWER;
+	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
+//	typedef device::NULL_PORT SDC_POWER;
 
 #ifdef SDHI_IF
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている
@@ -121,6 +144,7 @@ namespace {
 
 	typedef utils::command<256> CMD;
 	CMD			cmd_;
+
 	typedef utils::shell<CMD> SHELL;
 	SHELL		shell_(cmd_);
 
@@ -256,7 +280,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	utils::format("\rRTK5RX65N Start for Space Invaders\n");
+	utils::format("\rRTK5RX65N Start for Space Invaders Emulator\n");
 
 	cmd_.set_prompt("# ");
 
@@ -289,6 +313,7 @@ int main(int argc, char** argv)
 
 	uint32_t delay_inv = 120;
 	uint8_t n = 0;
+	bool inv_ok_ = false;
 	while(1) {
 		glcdc_io_.sync_vpos();
 
@@ -298,15 +323,23 @@ int main(int argc, char** argv)
 				if(sdh_.get_mount()) {
 					if(spinv_.start("/inv_roms", "/inv_wavs")) {
 						utils::format("Space Invaders start...\n");
+						inv_ok_ = true;
+						render_.clear(graphics::def_color::Black);
 					} else {
+						delay_inv = 30;
 						utils::format("Space Invaders not start...(fail)\n");
+						dialog_.modal(vtx::spos(400, 60),
+							"Invaders ROM Can't find...\n/inv_roms/*, /inv_wavs/*");
 					}
 				} else {
 					delay_inv = 60;
 					utils::format("SD card not mount\n");
+					dialog_.modal(vtx::spos(400, 60), "SD Card not mount...");
 				}
 			}
-		} else {
+		}
+
+		if(inv_ok_) {
 			spinv_.service(LCD_ORG, GLCDC_IO::width, GLCDC_IO::height);
 
 			SPINV::SND_MGR& snd = spinv_.at_sound();

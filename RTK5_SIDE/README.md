@@ -25,7 +25,7 @@ Envision Kit RX65N で実現する Space Invaders エミュレーター
 ## リソースの準備
  - ROM の準備（invaders.h、invaders.g、invaders.f、invaders.e）invaders.zip
  - サウンドデータの準備（BaseHit.wav, InvHit.Wav, Shot.wav, Ufo.wav, UfoHit.wav, Walk1.wav, Walk2.wav, Walk3.wav, Walk4.wav）
- - SD カードに上記ファイルを、それぞれディレクトリを作成して配置（/inv_roms, /inv_wavs）
+ - SD カードに上記ファイルを、それぞれディレクトリを作成して配置しておく（/inv_roms, /inv_wavs）
 
 ## ビルド方法
  - make する。
@@ -40,3 +40,4 @@ License
 ----
 
 MIT
+SIDE for GPLv2
