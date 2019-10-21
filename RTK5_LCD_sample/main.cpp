@@ -43,7 +43,7 @@
 #endif
 
 // SDHI インターフェースを使う場合
-#define SDHI_IF
+// #define SDHI_IF
 
 // DRW2D エンジンを使う場合
 #define USE_DRW2D
@@ -70,16 +70,13 @@ namespace {
 	typedef device::sci_io<device::SCI9, RECV_BUFF, SEND_BUFF> SCI;
 	SCI			sci_;
 
-#ifdef SDHI_IF
-	// SDHI を使う場合は、必ず電源制御が必要
+	// ＳＤカード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 
+#ifdef SDHI_IF
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
 	SDHI		sdh_;
 #else
-	// ＳＤカード電源制御は使わない場合、「device::NULL_PORT」を指定する。
-	typedef device::NULL_PORT SDC_POWER;
-
 	// Soft SDC 用　SPI 定義（SPI）
 	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
 	typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  // CMD
