@@ -2,7 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX600 グループ、SDHI（SD ホストインターフェース）FatFS ドライバー @n
-			・ピンアサイン（）内は SPI 接続
+			・ピンアサイン（）内は SPI 接続の場合 @n
 			1.D3  (CS) @n
 			2.CMD (DI) @n
 			3.Vss (Vss) @n
@@ -50,8 +50,8 @@ namespace fatfs {
 		device::port_map::option PSEL = device::port_map::option::FIRST>
 	class sdhi_io {
 
-		typedef utils::format debug_format;
-//		typedef utils::null_format debug_format;
+//		typedef utils::format debug_format;
+		typedef utils::null_format debug_format;
 
 		static const uint32_t MOUNT_DELAY_FRAME = 60;		///< 60 frame (1.0 sec)
 
@@ -59,8 +59,7 @@ namespace fatfs {
 		static const uint8_t CARD_DETECT_DIVIDE_ = 12;		///< CD 信号サンプリング周期
 		static const uint8_t TIME_OUT_DIVIDE_    = 14;		///< タイムアウトカウント（０～１４）
 		// SD カード初期化時100～400KBPS(60MHz / 256: 224KBPS）
-//		static const uint8_t CLOCK_SLOW_DIVIDE_  = 0b01000000;	///< 初期化時の分周比 (1/256)
-		static const uint8_t CLOCK_SLOW_DIVIDE_  = 0b10000000;	///< 初期化時の分周比 (1/512)
+		static const uint8_t CLOCK_SLOW_DIVIDE_  = 0b01000000;	///< 初期化時の分周比 (1/256)
 //		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b11111111;	///< ブースト時 (60MHz:1/1)
 		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000000;	///< ブースト時 (30MHz:1/2)
 //		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000001;	///< ブースト時 (15MHz:1/4)
@@ -74,8 +73,9 @@ namespace fatfs {
 //		static const uint8_t CT_SD3   = 0b00001000;	///< SDXC   ,exFAT (32G を超えるカード）
 		static const uint8_t CT_BLOCK = 0b00010000;	///< Block addressing
 
+		static const int WAIT_BUSY_LOOP_COUNT = 10000;
 		static const int CMD0_LOOP_MAX   = 3;
-		static const int ACMD41_LOOP_MAX = 300;
+		static const int ACMD41_LOOP_MAX = 1000;
 		static const int CMD3_LOOP_MAX   = 3;
 
 		FATFS		fatfs_;
@@ -126,22 +126,32 @@ namespace fatfs {
 			no_error,
 			cmd_error,
 			timeout,
+			busy,
 		};
 
 
-		void wait_busy_() noexcept {
-			while(SDHI::SDSTS2.CBSY() != 0) ;
-///			while(SDHI::SDSTS2.SDCLKCREN() == 0) ;
+		bool wait_busy_() noexcept {
+			int loop = 0;
+///			while(SDHI::SDSTS2.CBSY() != 0) ;
+			while(SDHI::SDSTS2.SDCLKCREN() == 0) ;
+			++loop;
+			if(loop >= WAIT_BUSY_LOOP_COUNT) {
+				return false;
+			}
+			return true;
 		}
 
 
-		void set_bus_(bool single) noexcept {
-			wait_busy_();
+		bool set_bus_(bool single) noexcept {
+			if(!wait_busy_()) {
+				return false;
+			}
 
 			SDHI::SDOPT =
 				  SDHI::SDOPT.CTOP.b(CARD_DETECT_DIVIDE_)
 				| SDHI::SDOPT.TOP.b(TIME_OUT_DIVIDE_)
 				| SDHI::SDOPT.WIDTH.b(single);
+			return true;
 		}
 
 
@@ -176,7 +186,9 @@ namespace fatfs {
 		{
 			SDHI::SDARG = arg;
 
-			wait_busy_();
+			if(!wait_busy_()) {
+				return state::busy;
+			}
 
 			SDHI::SDCMD = static_cast<uint32_t>(cmd);
 			state st = state::no_error;
@@ -402,9 +414,13 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		DSTATUS disk_initialize(BYTE drv) noexcept
 		{
-			if(drv) return RES_NOTRDY;
+			if(drv) {
+				return RES_NOTRDY;
+			}
 
-			if(!SDHI::SDSTS1.SDCDMON()) return RES_NOTRDY;
+			if(!SDHI::SDSTS1.SDCDMON()) {
+				return RES_NOTRDY;
+			}
 #if 0
 			debug_format("Start SDHI: disk_initialize\n");
 			debug_format("  Version IP1: 0x%02X, IP2: 0x%1X, CLKRAT: %d, CPRM: %d\n")
@@ -419,7 +435,9 @@ namespace fatfs {
 			port_map::turn_sdhi(port_map::sdhi_situation::INSERT, PSEL);
 			SDHI::SDRST.SDRST = 1;
 
-			set_bus_(true);
+			if(!set_bus_(true)) {
+				return RES_NOTRDY;
+			}
 
 			// ダミークロックをが７４個以上入った事を確認する。
 			// ※CS(D3) = 1, DI = 1 が「１」の状態である事。
@@ -436,12 +454,15 @@ namespace fatfs {
 			{
 				// CMD0 soft reset
 				int loop;
+				state ret;
 				for(loop = 0; loop < CMD0_LOOP_MAX; ++loop) {
-					if(send_cmd_(command::CMD0, 0) == state::no_error) {
+					ret = send_cmd_(command::CMD0, 0);
+					if(ret == state::no_error && loop > 0) {
 						break;
-					} 
+					}
+					utils::delay::milli_second(1);
 				}
-				if(loop >= CMD0_LOOP_MAX) {
+				if(ret != state::no_error) {
 					debug_format("CMD0: Error\n");
 					stat_ = STA_NOINIT;
 					return stat_;
@@ -479,10 +500,13 @@ namespace fatfs {
 				int loop;
 				uint32_t st = 0;
 				uint32_t res = 0;
+				uint32_t msd = 1;  // delay for command
 				for(loop = 0; loop < ACMD41_LOOP_MAX; ++loop) {
 					// HCS: 0x40000000
-					uint32_t arg = (ty & CT_SD2) != 0 ? 0x40000000 : 0x00000000;
-					// send |= 0x01000000;  // S18R(B24) 電圧切り替え
+					uint32_t arg = 0;
+					arg |= 0xFF8000;  // 電圧範囲の指定: 2.7～3.6V
+					if((ty & CT_SD2) != 0) arg |= 0x40000000;
+					// arg |= 0x01000000;  // S18R(B24) 電圧切り替え要求
 					// SDHI は 3.3V のみサポート
 					if(send_cmd_(command::ACMD41, arg) != state::no_error) {
 						debug_format("ACMD41: State Error\n");
@@ -493,21 +517,21 @@ namespace fatfs {
 						if(st != res) {
 							st = res;
 							debug_format("ACMD41(%d ms): State(0x%08X)\n")
-								% static_cast<int>(loop * 5) % res;
+								% static_cast<int>(loop * msd) % res;
 						}
 						if((res & 0x80000000) != 0) {
 							break;
 						} else {
-							utils::delay::milli_second(5);
+							utils::delay::milli_second(msd);
 						}
 					}
 				}
 				if(loop < ACMD41_LOOP_MAX) {
 					debug_format("ACMD41: OK for %d [ms]\n")
-						% static_cast<int>(loop * 5);
+						% static_cast<int>(loop * msd);
 				} else {
 					debug_format("ACMD41(%d ms): Busy Error: State(0x%08X)\n")
-						% static_cast<int>(loop * 5) % res;
+						% static_cast<int>(loop * msd) % res;
 					stat_ = STA_NOINIT;
 					return stat_;
 				}
@@ -516,7 +540,7 @@ namespace fatfs {
 				}
 			}
 
-			// S18A が有効なら、電圧切り替えコマンド（CMD11）を送る必要がある。
+			// 電圧切り替え可能なインターフェースなら、（CMD11）を送って電圧を切り替える。
 
 			// CMD2 (CID) カード識別レジスタ (R2)
 			if(send_cmd_(command::CMD2, 0x0) != state::no_error) {
@@ -593,7 +617,10 @@ namespace fatfs {
 					return stat_;
 				} else {
 					if(busarg) {
-						set_bus_(false);
+						if(!set_bus_(false)) {
+							stat_ = STA_NOINIT;
+							return stat_;
+						}
 					}
 					debug_format("ACMD6: OK bus = %d bit\n") %
 						static_cast<int>(busarg != 0 ? 4 : 1);
@@ -671,7 +698,7 @@ namespace fatfs {
 
 				uint32_t loop = 0;
 				while(SDHI::SDSTS2.BRE() == 0) {
-					if(loop >= 1000) {
+					if(loop >= 10000) {
 						debug_format("%s time out\n") % cmdstr;
 						return RES_ERROR;
 					}
@@ -706,7 +733,7 @@ namespace fatfs {
 					}
 					buff = static_cast<void*>(p);
 				}
-				count--;
+				--count;
 			}
 
 ///			utils::format("Data trans: OK\n");
@@ -746,7 +773,7 @@ namespace fatfs {
 			SDHI::SDBLKCNT = count;  // for multi block read
 			SDHI::SDARG    = sector;
 			command cmd = count > 1 ? command::CMD25 : command::CMD24;
-			const char* cmdstr = cmd == command::CMD17 ? "CMD17" : "CMD18";
+			const char* cmdstr = cmd == command::CMD25 ? "CMD25" : "CMD24";
 			SDHI::SDCMD = static_cast<uint32_t>(cmd);
 
 			while(SDHI::SDSTS1.RSPEND() == 0) {
@@ -761,7 +788,7 @@ namespace fatfs {
 
 				uint32_t loop = 0;
 				while(SDHI::SDSTS2.BWE() == 0) {
-					if(loop >= 1000) {
+					if(loop >= 10000) {
 						debug_format("%s time out\n") % cmdstr;
 						return RES_ERROR;
 					}
@@ -796,6 +823,7 @@ namespace fatfs {
 					}
 					buff = static_cast<const void*>(p);
 				}
+				--count;
 			}
 
 			while(SDHI::SDSTS1.ACEND() == 0) {
