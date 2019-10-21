@@ -31,8 +31,8 @@
 
 #include "graphics/bmp_in.hpp"
 
-// SDHI インターフェースを利用する場合（現状では SDHC タイプに比非対応）
-// #define SDHI_IF
+// SDHI インターフェースを利用する場合
+#define SDHI_IF
 
 namespace {
 
