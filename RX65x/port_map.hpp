@@ -968,6 +968,20 @@ namespace device {
 				PORT2::PMR.B5 = 0;
 				MPC::P25PFS.PSEL = sel;  // SDHI_CD P25(32)
 				PORT2::PMR.B5 = enable;
+#if 0
+				PORT2::PMR.B2 = 0;
+				PORT2::PDR.B2 = 1;
+				PORT2::PODR.B2 = 0;
+				PORT2::PMR.B3 = 0;
+				PORT2::PDR.B3 = 1;
+				PORT2::PODR.B3 = 0;
+				PORT8::PMR.B7 = 0;
+				PORT8::PDR.B7 = 1;
+				PORT8::PODR.B7 = 0;
+				PORT1::PMR.B7 = 0;
+				PORT1::PDR.B7 = 1;
+				PORT1::PODR.B7 = 1;
+#endif
 				break;
 
 			case sdhi_situation::INSERT:
@@ -980,6 +994,20 @@ namespace device {
 				break;
 
 			case sdhi_situation::BUS:
+#if 0
+				PORT2::PMR.B2 = 0;
+				PORT2::PDR.B2 = 0;
+				PORT2::PODR.B2 = 0;
+				PORT2::PMR.B3 = 0;
+				PORT2::PDR.B3 = 0;
+				PORT2::PODR.B3 = 0;
+				PORT8::PMR.B7 = 0;
+				PORT8::PDR.B7 = 0;
+				PORT8::PODR.B7 = 0;
+				PORT1::PMR.B7 = 0;
+				PORT1::PDR.B7 = 0;
+				PORT1::PODR.B7 = 0;
+#endif
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = sel;  // SDHI_D0-C  P22(35)
 				PORT2::PMR.B2 = enable;
