@@ -23,9 +23,6 @@ namespace gl {
 	template <typename T>
 	struct matrix {
 
-		typedef T	value_type;
-		typedef mtx::matrix4<T> matrix_type;
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	マトリックス・モード
@@ -37,12 +34,15 @@ namespace gl {
 			num_
 		};
 
+		typedef T	value_type;
+		typedef mtx::matrix4<T> matrix_type;
+
 	private:
 		static const uint32_t STACK_SIZE = 4;
 
 		mode		mode_;
 
-		matrix_type	acc_[mode::num_];
+		matrix_type	acc_[static_cast<int>(mode::num_)];
 		typedef utils::fixed_stack<matrix_type, STACK_SIZE>	STACK;
 		STACK		stack_;
 
@@ -123,7 +123,7 @@ namespace gl {
 			@brief	OpenGL カレント・マトリックスに単位行列をセット
 		 */
 		//-----------------------------------------------------------------//
-		void identity() { acc_[mode_].identity(); }
+		void identity() noexcept { acc_[static_cast<int>(mode_)].identity(); }
 
 
 		//-----------------------------------------------------------------//
@@ -132,7 +132,7 @@ namespace gl {
 			@param[in]	m	マトリックスのポインター先頭（fmat4）
 		 */
 		//-----------------------------------------------------------------//
-		void load(const value_type& m) { acc_[mode_] = m; }
+		void load(const value_type& m) { acc_[static_cast<int>(mode_)] = m; }
 
 
 		//-----------------------------------------------------------------//
@@ -141,7 +141,7 @@ namespace gl {
 			@param[in]	m	マトリックスのポインター先頭（float）
 		 */
 		//-----------------------------------------------------------------//
-		void load(const T* m) { acc_[mode_] = m; }
+		void load(const T* m) { acc_[static_cast<int>(mode_)] = m; }
 
 
 		//-----------------------------------------------------------------//
@@ -150,7 +150,7 @@ namespace gl {
 			@param[in]	m	マトリックスのポインター先頭（double）
 		 */
 		//-----------------------------------------------------------------//
-		void load(const double* m) { acc_[mode_] = m; }
+		void load(const double* m) { acc_[static_cast<int>(mode_)] = m; }
 
 
 		//-----------------------------------------------------------------//
@@ -160,7 +160,7 @@ namespace gl {
 		 */
 		//-----------------------------------------------------------------//
 		void mult(const mtx::matrix4<T>& m) {
-			mtx::matmul4<T>(acc_[mode_].m, acc_[mode_].m, m.m);
+			mtx::matmul4<T>(acc_[static_cast<int>(mode_)].m, acc_[static_cast<int>(mode_)].m, m.m);
 		}
 
 
@@ -172,7 +172,7 @@ namespace gl {
 		//-----------------------------------------------------------------//
 		void mult(const float* m) {
 			mtx::matrix4<T> tm = m;
-			mtx::matmul4<T>(acc_[mode_].m, acc_[mode_].m, tm.m);
+			mtx::matmul4<T>(acc_[static_cast<int>(mode_)].m, acc_[static_cast<int>(mode_)].m, tm.m);
 		}
 
 
@@ -184,7 +184,7 @@ namespace gl {
 		//-----------------------------------------------------------------//
 		void mult(const double* m) {
 			mtx::matrix4<T> tm = m;
-			mtx::matmul4<T>(acc_[mode_].m, acc_[mode_].m, tm.m);
+			mtx::matmul4<T>(acc_[static_cast<int>(mode_)].m, acc_[static_cast<int>(mode_)].m, tm.m);
 		}
 
 		//-----------------------------------------------------------------//
@@ -192,7 +192,7 @@ namespace gl {
 			@brief	OpenGL カレント・マトリックスをスタックに退避
 		 */
 		//-----------------------------------------------------------------//
-		void push() { stack_[mode_].push(acc_[mode_]); }
+		void push() { stack_[static_cast<int>(mode_)].push(acc_[static_cast<int>(mode_)]); }
 
 
 		//-----------------------------------------------------------------//
@@ -200,7 +200,7 @@ namespace gl {
 			@brief	OpenGL カレント・マトリックスをスタックから復帰
 		 */
 		//-----------------------------------------------------------------//
-		void pop() { stack_[mode_].pop(); acc_[mode_] = stack_[mode_].top(); }
+		void pop() { stack_[static_cast<int>(mode_)].pop(); acc_[static_cast<int>(mode_)] = stack_[static_cast<int>(mode_)].top(); }
 
 
 		//-----------------------------------------------------------------//
@@ -217,7 +217,7 @@ namespace gl {
 		void frustum(T left, T right, T bottom, T top, T nearval, T farval) {
 			near_ = nearval;
 			far_ = farval;
-			acc_[mode_].frustum(left, right, bottom, top, nearval, farval);
+			acc_[static_cast<int>(mode_)].frustum(left, right, bottom, top, nearval, farval);
 		}
 
 
@@ -235,7 +235,7 @@ namespace gl {
 		void ortho(T left, T right, T bottom, T top, T nearval, T farval) {
 			near_ = nearval;
 			far_  = farval;
-			acc_[mode_].ortho(left, right, bottom, top, nearval, farval);
+			acc_[static_cast<int>(mode_)].ortho(left, right, bottom, top, nearval, farval);
 		}
 
 
@@ -251,7 +251,7 @@ namespace gl {
 		void perspective(T fovy, T aspect, T nearval, T farval) {
 			near_ = nearval;
 			far_  = farval;
-			acc_[mode_].perspective(fovy, aspect, nearval, farval);
+			acc_[static_cast<int>(mode_)].perspective(fovy, aspect, nearval, farval);
 		}
 
 
@@ -264,7 +264,7 @@ namespace gl {
 		 */
 		//-----------------------------------------------------------------//
 		void look_at(const vtx::vertex3<T>& eye, const vtx::vertex3<T>& center, const vtx::vertex3<T>& up) {
-			acc_[mode_].look_at(eye, center, up);
+			acc_[static_cast<int>(mode_)].look_at(eye, center, up);
 		}
 
 
@@ -274,7 +274,7 @@ namespace gl {
 			@param[in]	v	スケール
 		 */
 		//-----------------------------------------------------------------//
-		void scale(const vtx::vertex3<T>& v) { acc_[mode_].scale(v); }
+		void scale(const vtx::vertex3<T>& v) { acc_[static_cast<int>(mode_)].scale(v); }
 
 
 		//-----------------------------------------------------------------//
@@ -285,7 +285,7 @@ namespace gl {
 			@param[in]	z	Z スケール
 		 */
 		//-----------------------------------------------------------------//
-		void scale(T x, T y, T z) { acc_[mode_].scale(vtx::vertex3<T>(x, y, z)); }
+		void scale(T x, T y, T z) { acc_[static_cast<int>(mode_)].scale(vtx::vertex3<T>(x, y, z)); }
  
 
 		//-----------------------------------------------------------------//
@@ -297,7 +297,7 @@ namespace gl {
 		 */
 		//-----------------------------------------------------------------//
 		void translate(T x, T y, T z) {
-			acc_[mode_].translate(vtx::vertex3<T>(x, y, z));
+			acc_[static_cast<int>(mode_)].translate(vtx::vertex3<T>(x, y, z));
 		}
 
 
@@ -311,7 +311,7 @@ namespace gl {
 		 */
 		//-----------------------------------------------------------------//
 		void rotate(T angle, T x, T y, T z) {
-			acc_[mode_].rotate(angle, vtx::vertex3<T>(x, y, z));
+			acc_[static_cast<int>(mode_)].rotate(angle, vtx::vertex3<T>(x, y, z));
 		};
 
 
@@ -321,7 +321,7 @@ namespace gl {
 			@return	OpenGL 並びの、ベースマトリックス
 		 */
 		//-----------------------------------------------------------------//
-		matrix_type& at_current_matrix() { return acc_[mode_]; };
+		matrix_type& at_current_matrix() { return acc_[static_cast<int>(mode_)]; };
 
 
 		//-----------------------------------------------------------------//
@@ -330,7 +330,7 @@ namespace gl {
 			@return	OpenGL 並びの、ベースマトリックス
 		 */
 		//-----------------------------------------------------------------//
-		const matrix_type& get_current_matrix() const { return acc_[mode_]; };
+		const matrix_type& get_current_matrix() const { return acc_[static_cast<int>(mode_)]; };
 
 
 		//-----------------------------------------------------------------//
@@ -443,10 +443,10 @@ namespace gl {
 			for(int i = 0; i < 4; ++i) {
 				utils::format("(%d) %-1.5f, %-1.5f, %-1.5f, %-1.5f\n")
 					% i
-					% acc_[mode_].m[0 * 4 + i]
-					% acc_[mode_].m[1 * 4 + i]
-					% acc_[mode_].m[2 * 4 + i]
-					% acc_[mode_].m[3 * 4 + i];
+					% acc_[static_cast<int>(mode_)].m[0 * 4 + i]
+					% acc_[static_cast<int>(mode_)].m[1 * 4 + i]
+					% acc_[static_cast<int>(mode_)].m[2 * 4 + i]
+					% acc_[static_cast<int>(mode_)].m[3 * 4 + i];
 			}
 		}
 	};

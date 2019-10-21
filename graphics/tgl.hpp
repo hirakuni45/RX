@@ -34,6 +34,8 @@ namespace graphics {
 			LINE_LOOP,
 		};
 
+		typedef gl::matrixf	MATRIX;
+
 	private:
 		RDR&		rdr_;
 
@@ -52,6 +54,8 @@ namespace graphics {
 
 		share_color	color_;
 
+		MATRIX		matrix_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -59,9 +63,10 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		tgl(RDR& rdr) : rdr_(rdr),
-			vtx_idx_(0), vtxs_{ 0.0f },
+			vtx_idx_(0), vtxs_{},
 			dt_idx_(0), dts_{},
-			color_()
+			color_(0, 0, 0),
+			matrix_()
 		{ }
 
 
@@ -91,7 +96,7 @@ namespace graphics {
 			if(dts_[dt_idx_].org_ == vtx_idx_) {
 				return;
 			}
-			dts_[dt_idx_].len = vtx_idx_ - dts_[dt_idx_].org_;
+			dts_[dt_idx_].len_ = vtx_idx_ - dts_[dt_idx_].org_;
 		}
 
 
@@ -211,10 +216,19 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	マトリックスへの参照
+			@return マトリックス
+		*/
+		//-----------------------------------------------------------------//
+		MATRIX& at_matrix() noexcept { return matrix_; }		
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	レンダリング
 		*/
 		//-----------------------------------------------------------------//
-		void renderring()
+		void renderring() noexcept
 		{
 			for(uint32_t i = 0; i < dt_idx_; ++i) {
 				const auto& t = dts_[i];
