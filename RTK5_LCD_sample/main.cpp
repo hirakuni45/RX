@@ -33,6 +33,8 @@
 #include "graphics/img_in.hpp"
 #include "graphics/scaling.hpp"
 
+#include "graphics/tgl.hpp"
+
 // #define SOFT_I2C
 #ifdef SOFT_I2C
 #include "common/si2c_io.hpp"
@@ -148,6 +150,10 @@ namespace {
 	typedef img::img_in<PLOT> IMG_IN;
 	IMG_IN		imgs_(plot_);
 #endif
+
+	// test for Tiny-GL
+	typedef graphics::tgl<RENDER, 200, 10> TGL;
+	TGL			tgl_(render_);
 
 	// QSPI B グループ
 	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
@@ -447,6 +453,7 @@ int main(int argc, char** argv)
 
 	uint16_t rad = 10;
 	uint16_t render_task = 0;
+	float angle = 0.0f;
 	while(1) {
 		render_.sync_frame();
 		ft5206_.update();
@@ -536,11 +543,11 @@ int main(int argc, char** argv)
 //			pos = npos;
 		}
 
-		render_task &= 3;
 		switch(render_task) {
 		case 0:
 			render_.clear(DEF_COLOR::Black);
 			break;
+
 		case 1:
 			render_.clear(DEF_COLOR::Black);
 			render_.set_fore_color(DEF_COLOR::White);
@@ -551,11 +558,13 @@ int main(int argc, char** argv)
 			render_.set_fore_color(DEF_COLOR::Purple);
 			render_.fill_box(vtx::srect(100, 50, 90, 45));
 			break;
-       		case 2:
+
+		case 2:
 			render_.clear(DEF_COLOR::Black);
 			render_.set_fore_color(DEF_COLOR::Blue);
 			render_.circle(vtx::spos(480/2, 272/2), rad, 0);
 			break;
+
 		case 3:
 			render_.clear(DEF_COLOR::Black);
 			render_.set_fore_color(DEF_COLOR::Blue);
@@ -569,7 +578,28 @@ int main(int argc, char** argv)
 			dialog_.modal(vtx::spos(200, 60), "モーダル・ダイアログ");
 			break;
 
+		case 4:
+			render_.clear(DEF_COLOR::Black);
+
+			tgl_.at_matrix().set_viewport(0, 0, LCD_X, LCD_Y);
+
+			tgl_.at_matrix().identity();
+			tgl_.at_matrix().scale(1.0f, 1.0f, 1.0f);
+			tgl_.at_matrix().rotate(angle, 0.0f, 0.0f, 1.0f);
+			angle += 1.5f;
+
+			tgl_.begin(TGL::PTYPE::LINES);
+			tgl_.vertex(vtx::fvtx(-1.0f,  1.0f, 0.0f));
+			tgl_.vertex(vtx::fvtx( 1.0f, -1.0f, 0.0f));
+			tgl_.vertex(vtx::fvtx( 1.0f, -1.0f, 0.0f));
+			tgl_.vertex(vtx::fvtx(-1.0f,  1.0f, 0.0f));
+			tgl_.end();
+
+			tgl_.renderring();
+			break;
+
 		default:
+			render_task = 0;
 			break;
 		}
 
