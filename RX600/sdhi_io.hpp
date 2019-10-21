@@ -73,10 +73,13 @@ namespace fatfs {
 //		static const uint8_t CT_SD3   = 0b00001000;	///< SDXC   ,exFAT (32G を超えるカード）
 		static const uint8_t CT_BLOCK = 0b00010000;	///< Block addressing
 
-		static const int WAIT_BUSY_LOOP_COUNT = 10000;
+		static const int BUSY_LOOP_LIMIT  = 1000;
+		static const int ACEND_LOOP_LIMIT = 10000;
 		static const int CMD0_LOOP_MAX   = 3;
 		static const int ACMD41_LOOP_MAX = 1000;
 		static const int CMD3_LOOP_MAX   = 3;
+		static const int BRE_LOOP_LIMIT  = 1000;
+		static const int BWE_LOOP_LIMIT  = 1000;
 
 		FATFS		fatfs_;
 		DSTATUS		stat_;			// Disk status
@@ -132,11 +135,26 @@ namespace fatfs {
 
 		bool wait_busy_() noexcept {
 			int loop = 0;
-///			while(SDHI::SDSTS2.CBSY() != 0) ;
-			while(SDHI::SDSTS2.SDCLKCREN() == 0) ;
-			++loop;
-			if(loop >= WAIT_BUSY_LOOP_COUNT) {
-				return false;
+///			while(SDHI::SDSTS2.CBSY() != 0) {
+			while(SDHI::SDSTS2.SDCLKCREN() == 0) {
+				++loop;
+				if(loop >= BUSY_LOOP_LIMIT) {
+					return false;
+				}
+				utils::delay::micro_second(10);
+			}
+			return true;
+		}
+
+
+		bool wait_acend_() noexcept {
+			int loop = 0;
+			while(SDHI::SDSTS1.ACEND() == 0) {
+				++loop;
+				if(loop >= ACEND_LOOP_LIMIT) {
+					return false;
+				}
+				utils::delay::micro_second(10);
 			}
 			return true;
 		}
@@ -259,9 +277,9 @@ namespace fatfs {
 			SDHI::SDSTS1 = 0x0000FFFE;
 			auto sp10 = SDHI::SDRSP10();
 ///			utils::format("%s: Response: %08X\n") % cmdstr % sp10;
-			uint32_t loop = 0;
+			int loop = 0;
 			while(SDHI::SDSTS2.BRE() == 0) {
-				if(loop >= 1000) {
+				if(loop >= BRE_LOOP_LIMIT) {
 					debug_format("Data Time out\n");
 					return false;
 				}
@@ -738,7 +756,9 @@ namespace fatfs {
 
 ///			utils::format("Data trans: OK\n");
 
-			while(SDHI::SDSTS1.ACEND() == 0) {
+			if(!wait_acend_()) {
+				debug_format("Read: ACEND time out\n");
+				return RES_ERROR;				
 			}
 
 			SDHI::SDSTS1 = 0x0000FFFB;
@@ -788,7 +808,7 @@ namespace fatfs {
 
 				uint32_t loop = 0;
 				while(SDHI::SDSTS2.BWE() == 0) {
-					if(loop >= 10000) {
+					if(loop >= BWE_LOOP_LIMIT) {
 						debug_format("%s time out\n") % cmdstr;
 						return RES_ERROR;
 					}
@@ -826,8 +846,11 @@ namespace fatfs {
 				--count;
 			}
 
-			while(SDHI::SDSTS1.ACEND() == 0) {
+			if(!wait_acend_()) {
+				debug_format("Write: ACEND time out\n");
+				return RES_ERROR;				
 			}
+
 			SDHI::SDSTS1 = 0x0000FFFB;
 
 			return count != 0 ? RES_ERROR : RES_OK;
