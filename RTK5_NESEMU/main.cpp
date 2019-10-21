@@ -32,6 +32,8 @@
 
 #include "nesemu.hpp"
 
+#define SDHI_IF
+
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -67,8 +69,8 @@ namespace {
 	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
 
 	// カード電源制御を使わない場合、「device::NULL_PORT」を指定する。
-//	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
-	typedef device::NULL_PORT SDC_POWER;
+	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
+//	typedef device::NULL_PORT SDC_POWER;
 
 #ifdef SDHI_IF
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている
