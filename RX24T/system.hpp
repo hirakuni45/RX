@@ -318,6 +318,8 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
+			bit_rw_t<io_, bitpos::B0>  MSTPB0;
+
 			bit_rw_t<io_, bitpos::B6>  MSTPB6;
 
 			bit_rw_t<io_, bitpos::B10> MSTPB10;
