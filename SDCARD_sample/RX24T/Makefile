@@ -10,6 +10,8 @@ TARGET		=	sdc_sample
 
 DEVICE		=	R5F524TA
 
+FATFS_VER	=	ff13c/source
+
 BUILD		=	release
 
 VPATH		=	../../
@@ -18,16 +20,22 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c
+				common/syscalls.c \
+				$(FATFS_VER)/ff.c \
+				$(FATFS_VER)/ffsystem.c \
+				$(FATFS_VER)/ffunicode.c \
+				common/time.c
 
-PSOURCES	=	SDCARD_sample/main.cpp
+PSOURCES	=	SDCARD_sample/main.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=
+USER_LIBS	=	supc++
 
 LDSCRIPT	=	../../RX24T/$(DEVICE).ld
 
 USER_DEFS   =   SIG_RX24T F_ICLK=80000000 F_PCLKA=80000000 \
-				F_PCLKB=40000000 F_PCLKD=40000000 F_FCLK=20000000
+				F_PCLKB=40000000 F_PCLKD=40000000 F_FCLK=20000000 \
+				FAT_FS FAT_FS_NUM=2
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
