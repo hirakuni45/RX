@@ -360,6 +360,46 @@ namespace utils {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  時間の作成
+			@param[in]	date	日付 xx/xx/xx 形式
+			@param[in]	time	時間 xx:xx[:xx] 形式
+			@return GMT 時間
+		*/
+		//-----------------------------------------------------------------//
+		static time_t make_time(const char* date, const char* time) noexcept
+		{
+			time_t t;
+			struct tm *m = localtime(&t);
+			m->tm_year = 2019 - 1900;
+			m->tm_mon  = 10 - 1;  // Oct
+			m->tm_mday = 1;       // day of 1
+			int vs[3];
+			if(date == nullptr) {
+			} else if((utils::input("%d/%d/%d", date) % vs[0] % vs[1] % vs[2]).status()) {
+				if(vs[0] >= 1900 && vs[0] < 2100) m->tm_year = vs[0] - 1900;
+				if(vs[1] >= 1 && vs[1] <= 12) m->tm_mon = vs[1] - 1;
+				if(vs[2] >= 1 && vs[2] <= 31) m->tm_mday = vs[2];
+			}
+
+			m->tm_hour = 0;
+			m->tm_min  = 0;
+			m->tm_sec  = 0;
+			if(time == nullptr) {
+			} else if((utils::input("%d:%d:%d", time) % vs[0] % vs[1] % vs[2]).status()) {
+				if(vs[0] >= 0 && vs[0] < 24) m->tm_hour = vs[0];
+				if(vs[1] >= 0 && vs[1] < 60) m->tm_min = vs[1];
+				if(vs[2] >= 0 && vs[2] < 60) m->tm_sec = vs[2];
+			} else if((utils::input("%d:%d", time) % vs[0] % vs[1]).status()) {
+				if(vs[0] >= 0 && vs[0] < 24) m->tm_hour = vs[0];
+				if(vs[1] >= 0 && vs[1] < 60) m->tm_min = vs[1];
+				m->tm_sec = 0;
+			}
+			return mktime(m);
+		}
+
+
         //-----------------------------------------------------------------//
         /*!
             @brief  文字列中の「単語」数を取得 @n
