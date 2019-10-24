@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 |[SCI_sample](./SCI_sample)|各プラットホーム対応、SCI サンプルプログラム|
 |[FLASH_sample](./FLASH_sample)|各プラットホーム対応、内臓データフラッシュ操作サンプル|
 |[RAYTRACER_sample](./RAYTRACER_sample)|各プラットホーム対応 レイトレーシング・ベンチマーク|
-|/rx24t_SDC_sample      |RX24T を使った SD カードの動作サンプル|
+|[SDCARD_sample](./SDCARD_sample)|SD カードの動作サンプル|
 |/rx24t_GPS_sample      |RX24T を使った GPS の動作サンプル|
 |/rx24t_DATA_FLASH_sample|RX24T を使った内臓データ・フラッシュ操作サンプル|
 |/rx24t_LOGGER          |RX24T を使ったデータロガー・プロジェクト|

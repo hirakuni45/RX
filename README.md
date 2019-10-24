@@ -85,7 +85,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[SCI_sample](./SCI_sample)|Each platform, corresponding SCI sample program|
 |[FLASH_sample](./FLASH_sample)|Built-in data flash operation sample for each platform|
 |[RAYTRACER_sample](./RAYTRACER_sample)|For each platform, Ray tracing benchmark|
-|/rx24t_SDC_sample      |SD card operation sample using RX24T|
+|[SDCARD_sample](./SDCARD_sample)|For each platform, SD card operation sample|
 |/rx24t_GPS_sample      |GPS operation sample using RX24T|
 |/rx24t_DATA_FLASH_sample|Internal data flash operation sample using RX24T|
 |/rx64m_SDRAM_sample    |Control sample of SDRAM using RX64M (128 Mbit × 2, 32-bit bus)|
