@@ -11,6 +11,8 @@ TARGET		=	sdc_sample
 
 DEVICE		=	R5F564MF
 
+FATFS_VER	=	ff13c/source
+
 BUILD		=	release
 
 VPATH		=	../../
@@ -19,18 +21,24 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c
+				common/syscalls.c \
+				$(FATFS_VER)/ff.c \
+				$(FATFS_VER)/ffsystem.c \
+				$(FATFS_VER)/ffunicode.c \
+				common/time.c
 
-PSOURCES	=	SDCARD_sample/main.cpp
+PSOURCES	=	SDCARD_sample/main.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=
+USER_LIBS	=	supc++
 
 LDSCRIPT	=	../../RX64M/$(DEVICE).ld
 
 USER_DEFS	=	SIG_RX64M \
 				F_ICLK=120000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
-				F_FCLK=60000000 F_BCLK=120000000
+				F_FCLK=60000000 F_BCLK=120000000 \
+				FAT_FS FAT_FS_NUM=2
 
 MCU_TARGET	=	
 
