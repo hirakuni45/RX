@@ -55,6 +55,8 @@ namespace fatfs {
 
 		static const uint32_t MOUNT_DELAY_FRAME = 60;		///< 60 frame (1.0 sec)
 
+		static const int DUMMY_LOOP_LIMIT = 1000;
+
 		// 通常 PCLKB は 60MHz
 		static const uint8_t CARD_DETECT_DIVIDE_ = 12;		///< CD 信号サンプリング周期
 		static const uint8_t TIME_OUT_DIVIDE_    = 14;		///< タイムアウトカウント（０～１４）
@@ -463,8 +465,20 @@ namespace fatfs {
 
 			SDHI::SDCLKCR.CLKCTRLEN = 0;
 			for(uint32_t i = 0; i < 75; ++i) {
-				while(device::port_map::probe_sdhi_clock(PSEL) == 0) ;
-				while(device::port_map::probe_sdhi_clock(PSEL) == 1) ;
+				int loop = 0;
+				while(device::port_map::probe_sdhi_clock(PSEL) == 0) {
+					++loop;
+					if(loop >= DUMMY_LOOP_LIMIT) {
+						return RES_NOTRDY;
+					}
+				}
+				loop = 0;
+				while(device::port_map::probe_sdhi_clock(PSEL) == 1) {
+					++loop;
+					if(loop >= DUMMY_LOOP_LIMIT) {
+						return RES_NOTRDY;
+					}
+				}
 			}
 			debug_format("Assert 74 dummy clocks.\n");
 			SDHI::SDCLKCR.CLKCTRLEN = 1;
