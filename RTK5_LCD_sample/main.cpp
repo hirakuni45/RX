@@ -43,7 +43,7 @@
 #endif
 
 // SDHI インターフェースを使う場合
-// #define SDHI_IF
+#define SDHI_IF
 
 // DRW2D エンジンを使う場合
 #define USE_DRW2D
