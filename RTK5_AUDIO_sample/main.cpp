@@ -32,7 +32,7 @@
 #include "graphics/bmp_in.hpp"
 
 // SDHI インターフェースを利用する場合
-#define SDHI_IF
+#define USE_SDHI
 
 namespace {
 
@@ -59,7 +59,7 @@ namespace {
 //	typedef device::NULL_PORT SDC_POWER;
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 
-#ifdef SDHI_IF
+#ifdef USE_SDHI
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
 	SDHI		sdh_;

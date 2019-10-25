@@ -28,6 +28,8 @@
 
 // #include "nesemu.hpp"
 
+#define USE_SDHI
+
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -64,7 +66,7 @@ namespace {
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 	typedef device::NULL_PORT SDC_POWER;
 
-#ifdef SDHI_IF
+#ifdef USE_SDHI
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
 	SDHI		sdh_;
