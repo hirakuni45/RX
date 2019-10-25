@@ -107,9 +107,9 @@ For power supply control ICs, general-purpose MOS-FETs were used because of avai
 - “ISL61861BIBZ” has a power supply voltage check function, but it is omitted.
 
 <a href="http://akizukidenshi.com/catalog/g/gK-05488/" target="_blank">Akizuki Electronics, Micro SD slot board</A>   
-<img src="../docs/SD_CARD.jpg" width="40%">   
+<img src="../docs/SD_CARD.jpg" width="30%">   
 <a href="http://akizukidenshi.com/catalog/g/gI-03942/" target="_blank">Akizuki Electronics, Pch chip MOSFET DMG3415U (20V4A)</A>   
-<img src="../docs/I-03942.jpg" width="40%">
+<img src="../docs/I-03942.jpg" width="30%">
 
 ![RTK5_MicroSD_PSW.jpg](../docs/RTK5_MicroSD_PSW.jpg)
 
@@ -277,7 +277,7 @@ In addition, the built-in buffer arrangement is assumed to be little-endian, so 
 
 ## Speed ​​comparison
 
-<img src="../docs/MicroSD.jpg" width="60%">
+<img src="../docs/MicroSD.JPG" width="60%">
 
 ### SPI Mode RX24T (RSPI)
 ```

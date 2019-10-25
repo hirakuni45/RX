@@ -109,9 +109,9 @@ SD カードソケットは、入手が困難で、購入出来てもコスト�
 - 「ISL61861BIBZ」には電源電圧の確認機能がありますが、省略しています。
 
 <a href="http://akizukidenshi.com/catalog/g/gK-05488/" target="_blank">秋月電子、マイクロ SD スロット基板</A>   
-<img src="../docs/SD_CARD.jpg" width="40%">   
-<a href="http://akizukidenshi.com/catalog/g/gI-03942/" target="_blank">秋月電子、ＰｃｈチップＭＯＳＦＥＴ　ＤＭＧ３４１５Ｕ（２０Ｖ４Ａ）:</A>   
-<img src="../docs/I-03942.jpg" width="40%">
+<img src="../docs/SD_CARD.jpg" width="30%">   
+<a href="http://akizukidenshi.com/catalog/g/gI-03942/" target="_blank">秋月電子、ＰｃｈチップＭＯＳＦＥＴ　ＤＭＧ３４１５Ｕ（２０Ｖ４Ａ）</A>   
+<img src="../docs/I-03942.jpg" width="30%">
 
 ![RTK5_MicroSD_PSW.jpg](../docs/RTK5_MicroSD_PSW.jpg)
 
@@ -279,7 +279,7 @@ SDHI では、内臓バッファは５１２バイトで、３２ビット単位
 
 ## 速度比較
 
-<img src="../docs/MicroSD.jpg" width="60%">
+<img src="../docs/MicroSD.JPG" width="60%">
 
 ### SPI モード RX24T (RSPI)
 ```
