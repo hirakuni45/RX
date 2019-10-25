@@ -24,7 +24,7 @@
 
 #include "graphics/widget_director.hpp"
 
-// #define SDHI_IF
+#define USE_SDHI
 
 // #define SOFT_I2C
 
@@ -101,7 +101,10 @@ namespace app {
 
 		typedef gui::dialog<RENDER, TOUCH> DIALOG;
 
-#ifdef SDHI_IF
+		// カード電源制御は使わないので、「device::NULL_PORT」を指定する。
+		typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
+//		typedef device::NULL_PORT SDC_POWER;
+#ifdef USE_SDHI
 		// RX65N Envision Kit の SDHI ポートは、候補３になっている
 		typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
 #else
@@ -112,9 +115,7 @@ namespace app {
 		typedef device::spi_io2<MISO, MOSI, SPCK> SPI;  ///< Soft SPI 定義
 		typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
 		typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD   カード検出
-		// カード電源制御は使わないので、「device::NULL_PORT」を指定する。
-//		typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
-		typedef device::NULL_PORT SDC_POWER;
+
 		typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
 #endif
 		typedef gui::filer<RENDER> FILER;
@@ -220,7 +221,7 @@ namespace app {
 		BACK		back_;
 		DIALOG		dialog_;
 
-#ifdef SDHI_IF
+#ifdef USE_SDHI
 		SDHI		sdh_;
 #else
 		SPI			spi_;
@@ -254,7 +255,12 @@ namespace app {
 			touch_(ft5206_i2c_),
 			widd_(render_, touch_),
 			menu_(render_, back_), back_(render_), dialog_(render_, touch_),
-			spi_(), sdh_(spi_, 35000000), filer_(render_),
+#ifdef USE_SDHI
+			sdh_(),
+#else
+			spi_(), sdh_(spi_, 35000000),
+#endif
+			filer_(render_),
 			resource_(render_),
 			plot_(render_), img_in_(plot_),
 			gps_s_(), nmea_(gps_s_),
