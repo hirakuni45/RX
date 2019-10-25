@@ -14,6 +14,7 @@
 #endif
 #include "common/time.h"
 #include "common/format.hpp"
+#include "common/input.hpp"
 
 /// string, vector が使える環境
 // #define STRING_VECTOR
