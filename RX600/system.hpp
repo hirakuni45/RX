@@ -796,6 +796,9 @@ namespace device {
 #if defined(SIG_RX72M)
 			bit_rw_t<io_, bitpos::B11>	MSTPD11;
 #endif
+#if defined(SIG_RX65N)
+			bit_rw_t<io_, bitpos::B11>	MSTPD13;
+#endif
 			bit_rw_t<io_, bitpos::B14>	MSTPD14;
 			bit_rw_t<io_, bitpos::B15>	MSTPD15;
 

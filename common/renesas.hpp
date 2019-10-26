@@ -138,6 +138,7 @@
 #include "RX600/ether_io.hpp"
 #include "RX600/sdhi.hpp"
 #include "RX600/sdhi_io.hpp"
+#include "RX600/sdsi.hpp"
 #include "RX600/mmcif.hpp"
 #include "RX600/pdc.hpp"
 #include "RX600/standby_ram.hpp"

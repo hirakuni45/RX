@@ -177,6 +177,9 @@ namespace device {
 			case peripheral::SDHI:
 				SYSTEM::MSTPCRD.MSTPD19 = f;	// SDHI のストップ状態解除
 				break;
+			case peripheral::SDSI:
+				SYSTEM::MSTPCRD.MSTPD13 = f;	// SDSI のストップ状態解除
+				break;
 
 			case peripheral::ETHERC0:
 			case peripheral::ETHERCA:

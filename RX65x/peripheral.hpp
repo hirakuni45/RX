@@ -115,6 +115,7 @@ namespace device {
 		QSPI,		///< クワッドシリアルペリフェラルインタフェース（QSPI）
 
 		SDHI,		///< SD ホストインタフェース（SDHI）
+		SDSI,		///< SD スレーブインタフェース（SDSI）
 
 		MMCIF,		///< マルチメディアカードインタフェース（MMCIF）
 
