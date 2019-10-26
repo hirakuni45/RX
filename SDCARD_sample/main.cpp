@@ -30,10 +30,13 @@
 #include "common/string_utils.hpp"
 
 #include "common/rspi_io.hpp"
+#include "common/iica_io.hpp"
 #include "common/spi_io2.hpp"
 #include "common/shell.hpp"
 
 #include "common/command.hpp"
+
+#include "chip/DS3231.hpp"
 
 namespace {
 
@@ -82,6 +85,9 @@ namespace {
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC;
 	SDC_SPI	sdc_spi_;
 	SDC		sdc_(sdc_spi_, 20000000);
+	typedef device::iica_io<device::RIIC0> I2C;
+	typedef chip::DS3231<I2C> RTC;
+	#define ENABLE_I2C_RTC
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
 	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
@@ -129,6 +135,11 @@ namespace {
 
 #ifdef ENABLE_RTC
 	RTC		rtc_;
+#endif
+
+#ifdef ENABLE_I2C_RTC
+	I2C		i2c_;
+	RTC		rtc_(i2c_);
 #endif
 
 	bool write_test_(const char* fname, uint32_t size)
@@ -239,7 +250,7 @@ namespace {
 				read_test_(tmp, 1024 * 1024);
 			}
 		} else if(cmd_.cmp_word(0, "time")) { // 日付・時間設定
-#ifdef ENABLE_RTC
+#if defined( ENABLE_RTC) || defined(ENABLE_I2C_RTC)
 			if(cmdn >= 3) {
 				char date[64];
 				cmd_.get_word(1, date, sizeof(date));
@@ -314,7 +325,7 @@ extern "C" {
 
 	DWORD get_fattime(void) {
 		time_t t = 0;
-#ifdef ENABLE_RTC
+#if defined( ENABLE_RTC) || defined(ENABLE_I2C_RTC)
 		rtc_.get_time(t);
 #else
 		t = utils::str::make_time(nullptr, nullptr);
@@ -344,6 +355,19 @@ int main(int argc, char** argv)
 #ifdef ENABLE_RTC
 	{  // RTC の開始
 		rtc_.start();
+	}
+#endif
+
+#ifdef ENABLE_I2C_RTC
+	{  // I2C-RTC の開始
+		uint8_t intr_level = 0;
+		if(!i2c_.start(I2C::speed::fast, intr_level)) {
+			utils::format("IICA start error (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
+		}
+		// DS3231(RTC) の開始
+		if(!rtc_.start()) {
+			utils::format("Stall RTC start (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
+		}
 	}
 #endif
 
