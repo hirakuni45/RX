@@ -12,6 +12,7 @@
 #include "common/vect.h"
 #include "common/renesas.hpp"
 #include "common/format.hpp"
+#include "common/delay.hpp"
 
 namespace device {
 
@@ -174,7 +175,8 @@ namespace device {
 		}
 
 
-		void setup_start_() {
+		bool setup_start_() {
+			int loop = 0;
 			while(IICA::ICCR2.BBSY() != 0) {
 #if 0
 				if(IICA::ICSR2.TMOF()) {
@@ -183,7 +185,13 @@ namespace device {
 					return false;
 				}
 #endif
+				utils::delay::micro_second(1);
+				++loop;
+				if(loop >= 1000) {
+					return false;
+				}
 			}
+			return true;
 		}
 
 
@@ -316,7 +324,10 @@ namespace device {
 
 			error_ = error::none;
 
-			setup_start_();
+			if(!setup_start_()) {
+				error_ = error::start;
+				return false;
+			}
 
 			bool ret = true;
 			if(level_) {
@@ -357,13 +368,15 @@ namespace device {
 						--len;
 					}
 				}
-
-				while(IICA::ICSR2.TEND() == 0) ;
+				if(ret) {
+					while(IICA::ICSR2.TEND() == 0) ;
+				}
 
 				IICA::ICSR2.STOP = 0;
 				IICA::ICCR2.SP = 1;
 
-				while(IICA::ICSR2.STOP() == 0) ;
+				while(IICA::ICSR2.STOP() == 0) {
+				}
 
 				IICA::ICSR2.NACKF = 0;
 				IICA::ICSR2.STOP = 0;
@@ -407,7 +420,10 @@ namespace device {
 
 			error_ = error::none;
 
-			setup_start_();
+			if(!setup_start_()) {
+				error_ = error::start;
+				return false;
+			}
 
 			if(level_) {
 				volatile auto id = intr_.recv_id_;
@@ -421,7 +437,9 @@ namespace device {
 			} else {
 
 				IICA::ICCR2.ST = 1;
-				while(IICA::ICSR2.TDRE() == 0) ;
+				while(IICA::ICSR2.TDRE() == 0) {
+				}
+
 				IICA::ICDRT = (adr << 1) | 0x01;
 				while(IICA::ICSR2.RDRF() == 0) ;
 
