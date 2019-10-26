@@ -115,6 +115,7 @@ For power supply control ICs, general-purpose MOS-FETs were used because of avai
 
 <img src="../docs/RTK5_SD_Circuit.png" width="75%">
 
+- Attach the pull-up chip resistor “R35 10K” for the gate.(It is on the silkscreen written CN1)
 - Write protect is not used.
 - The SD card control signals and bus are pulled up, and the pull-up voltage is supplied from the power supply control.
 - This is a pretty “important” part.
