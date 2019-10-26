@@ -18,19 +18,30 @@
 
 namespace {
 
+	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX24T" };
+
 	class cmt_task {
 	public:
 		void operator() () {
 		}
 	};
 
-	device::cmt_io<device::CMT0, cmt_task>  cmt_;
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
 
-	typedef utils::fixed_fifo<char, 128> buffer;
-	device::sci_io<device::SCI1, buffer, buffer> sci_;
+	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
+// SCI ポートの第二候補を選択する場合
+//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
+	SCI		sci_;
+
+	typedef device::cmt_io<device::CMT0> CMT;
+	CMT		cmt_;
 
 	typedef device::iica_io<device::RIIC0> I2C;
-	I2C i2c_;
+	I2C		i2c_;
 
 	chip::DS3231<I2C> rtc_(i2c_);
 
@@ -141,6 +152,7 @@ namespace {
 }
 
 extern "C" {
+
 	void sci_putch(char ch)
 	{
 		sci_.putch(ch);
@@ -166,69 +178,52 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-	device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
+	SYSTEM_IO::setup_system_clock();
 
-	device::SYSTEM::MEMWAIT = 0b10; // 80MHz 動作 wait 設定
+	LED::DIR = 1;
+	LED::P = 0;
 
-	while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
-	device::SYSTEM::OPCCR = 0;  // 高速モード選択
-	while(device::SYSTEM::OPCCR.OPCMTSF() != 0) asm("nop");
-
-	// clock osc 10MHz
-	device::SYSTEM::MOSCWTCR = 9;	// 4ms wait
-	// メインクロック・ドライブ能力設定、内部発信
-	device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV21.b(1);
-	device::SYSTEM::MOSCCR.MOSTP = 0;  // メインクロック発振器動作
-	while(device::SYSTEM::OSCOVFSR.MOOVF() == 0) asm("nop");
-
-	device::SYSTEM::PLLCR.STC = 0b001111;		// PLL input: 1, PLL 8 倍(80MHz)
-	device::SYSTEM::PLLCR2.PLLEN = 0;			// PLL 動作
-	while(device::SYSTEM::OSCOVFSR.PLOVF() == 0) asm("nop");
-
-	device::SYSTEM::SCKCR = device::SYSTEM::SCKCR.FCK.b(2)		// 1/4 (80/4=20)
-						  | device::SYSTEM::SCKCR.ICK.b(0)		// 1/1 (80/1=80)
-						  | device::SYSTEM::SCKCR.PCKA.b(0)		// 1/1 (80/1=80)
-						  | device::SYSTEM::SCKCR.PCKB.b(1)		// 1/2 (80/2=40)
-						  | device::SYSTEM::SCKCR.PCKD.b(1);	// 1/2 (120/2=60)
-	device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
-
-	{  // タイマー設定（６０Ｈｚ）
-		uint8_t intr_level = 4;
-		cmt_.start(60, intr_level);
+	{  // タイマー設定（100Hz）
+		uint8_t intr = 4;
+		cmt_.start(100, intr);
 	}
 
-	{  // SCI 設定
-		uint8_t intr_level = 2;
-		sci_.start(115200, intr_level);
+	{  // SCI の開始
+		uint8_t intr = 2;        // 割り込みレベル
+		uint32_t baud = 115200;  // ボーレート
+		sci_.start(baud, intr);
 	}
+
+	auto clk = F_ICLK / 1000000;
+	utils::format("Start DS3231 (I2C) sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
 	{  // IICA(I2C) の開始
 		uint8_t intr_level = 0;
 		if(!i2c_.start(I2C::speed::fast, intr_level)) {
-			utils::format("IICA start error (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
+			utils::format("IICA start error (%d)\n") % static_cast<int>(i2c_.get_last_error());
 		}
 	}
 
-	utils::format("RX24T DS3231 sample\n");
-
 	// DS3231(RTC) の開始
 	if(!rtc_.start()) {
-		utils::format("Stall RTC start (%d)\n") % static_cast<uint32_t>(i2c_.get_last_error());
+		utils::format("Stall DS3231: (%d)\n") % static_cast<int>(i2c_.get_last_error());
 	}
 
 	command_.set_prompt("# ");
-
-	device::PORT0::PDR.B0 = 1; // output
 
 	uint32_t cnt = 0;
 	while(1) {
 		cmt_.sync();
 
 		++cnt;
-		if(cnt >= 30) {
+		if(cnt >= 50) {
 			cnt = 0;
 		}
-		device::PORT0::PODR.B0 = (cnt < 10) ? 0 : 1;
+		if(cnt < 25) {
+			LED::P = 0;
+		} else {
+			LED::P = 1;
+		}
 
 		// コマンド入力と、コマンド解析
 		if(command_.service()) {
