@@ -58,7 +58,7 @@ namespace device {
 		uint8_t		speed_;
 		error		error_;
 
-		enum class event {
+		enum class event : uint8_t {
 			NONE,
 			AL,
 			NACKF,
@@ -68,17 +68,19 @@ namespace device {
 		};
 
 		struct intr_t {
-			volatile event     event_;
-			volatile uint8_t   firstb_;
-			volatile bool	   dummy_recv_;
-			const uint8_t*     src_;
-			uint8_t*           dst_;
-			volatile uint16_t  len_;
-			volatile uint16_t  send_id_;
-			volatile uint16_t  recv_id_;
+			volatile event		event_;
+			volatile uint8_t	firstb_;
+			volatile bool		dummy_recv_;
+			const uint8_t*		src_;
+			uint8_t*			dst_;
+			volatile uint16_t	len_;
+			volatile uint16_t	send_id_;
+			volatile uint16_t	send_id_back_;
+			volatile uint16_t	recv_id_;
+			volatile uint16_t	recv_id_back_;
 			intr_t() : event_(event::NONE), firstb_(0), dummy_recv_(false),
 				src_(nullptr), dst_(nullptr), len_(0),
-				send_id_(0), recv_id_(0) { }
+				send_id_(0), send_id_back_(0), recv_id_(0), recv_id_back_(0) { }
 		};
 		static intr_t	intr_;
 
@@ -292,11 +294,11 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	送信割り込みIDを取得
-			@return 送信割り込みID
+			@brief	送信状態の検査
+			@return 送信が完了なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		uint16_t get_send_id() const { return intr_.send_id_; }
+		static bool get_send_state() { return intr_.send_id_ != intr_.send_id_back_; }
 
 
 		//-----------------------------------------------------------------//
@@ -305,7 +307,7 @@ namespace device {
 			@return 受信割り込みID
 		 */
 		//-----------------------------------------------------------------//
-		uint16_t get_recv_id() const { return intr_.recv_id_; }
+		static bool get_recv_state() { return intr_.recv_id_ != intr_.recv_id_back_; }
 
 
 		//-----------------------------------------------------------------//
@@ -331,7 +333,7 @@ namespace device {
 
 			bool ret = true;
 			if(level_) {
-				volatile auto id = intr_.send_id_;
+				intr_.send_id_back_ = intr_.send_id_;
 				intr_.firstb_ = adr << 1;
 				intr_.src_ = src;
 				intr_.len_ = len;
@@ -339,7 +341,7 @@ namespace device {
 				IICA::ICIER = IICA::ICIER() | IICA::ICIER.NAKIE.b() | IICA::ICIER.TIE.b();
 				IICA::ICCR2.ST = 1;
 				if(sync) {
-					while(id == intr_.send_id_) sleep_();
+					while(intr_.send_id_back_ == intr_.send_id_) sleep_();
 					if(intr_.event_ != event::NONE) {
 						error_ = error::send_data;
 						ret = false;
@@ -426,7 +428,7 @@ namespace device {
 			}
 
 			if(level_) {
-				volatile auto id = intr_.recv_id_;
+				intr_.recv_id_back_ = intr_.recv_id_;
 				intr_.firstb_ = (adr << 1) | 0x01;
 				intr_.dst_ = dst;
 				intr_.len_ = len;

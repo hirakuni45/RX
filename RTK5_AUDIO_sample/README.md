@@ -19,9 +19,9 @@ Renesas Envision Kit RX65N ガジェット（オーディオ・プレイヤー�
  - オーディオの接続（DA0、DA1 から出力、GND レベルは、1.65V）3.3V p-p
  - P03_JOY_RIGHT_IRQ11 (DA0) Left 出力
  - P05_IRQ13_SW (DA1) Right 出力
- - ファミコン（互換）パッドの接続（main.cpp を参照）
- - Pmod (10) PB6_RXD9_PMOD_10 ---> RXD として使用
- - Pmod ( 9) PB7_TXD9_PMOD_9  ---> TXD として使用
+ - ファミコン（互換）パッドの接続（利用する場合、main.cpp で ENABLE_FAMIPAD を有効にする）
+ - Pmod (10) PB6_RXD9_PMOD_10 ---> RXD として使用 (コマンドラインインターフェースを利用する場合)
+ - Pmod ( 9) PB7_TXD9_PMOD_9  ---> TXD として使用 (コマンドラインインターフェースを利用する場合)
  - RXD/TXD は 115200 Baud, 8-bits, 1-Stop, No-Parity 内部動作表示等
 ![Audio PreAmp](RTK5_audio_amp.png)
    

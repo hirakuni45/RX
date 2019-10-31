@@ -162,21 +162,6 @@ namespace {
 	SHELL		shell_(cmd_);
 
 
-	uint8_t v_ = 91;
-	uint8_t m_ = 123;
-	uint8_t rand_()
-	{
-		v_ += v_ << 2;
-		++v_;
-		uint8_t n = 0;
-		if(m_ & 0x02) n = 1;
-		if(m_ & 0x40) n ^= 1;
-		m_ += m_;
-		if(n == 0) ++m_;
-		return v_ ^ m_;
-	}
-
-
 	//-----------------------------------------------------------------//
 	/*!
 		@brief  ファイル作成テスト
@@ -191,7 +176,7 @@ namespace {
 		utils::file_io fio;
 
 		for(uint16_t i = 0; i < sizeof(buff); ++i) {
-			buff[i] = rand_();
+			buff[i] = rand();
 		}
 
 		auto st = cmt_.get_counter();

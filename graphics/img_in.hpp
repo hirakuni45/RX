@@ -11,6 +11,10 @@
 #include <cstdint>
 #include "graphics/bmp_in.hpp"
 #include "graphics/picojpeg_in.hpp"
+#include "graphics/png_in.hpp"
+
+// PNG のロードを有効にする場合
+#define ENABLE_PNG
 
 namespace img {
 
@@ -29,10 +33,16 @@ namespace img {
 		BMP			bmp_;
 		JPEG		jpeg_;
 
+#ifdef ENABLE_PNG
+		typedef png_in<PLOT> PNG;
+		PNG			png_;
+#endif
+
 		enum class TYPE : uint8_t {
 			NONE,
 			BMP,
 			JPEG,
+			PNG,
 		};
 		TYPE		type_;
 
@@ -48,6 +58,11 @@ namespace img {
 				} else if(utils::str::scan_ext(ext, jpeg_.get_file_ext())) {
 					type_ = TYPE::JPEG;
 					ret = true;
+#ifdef ENABLE_PNG
+				} else if(utils::str::scan_ext(ext, png_.get_file_ext())) {
+					type_ = TYPE::JPEG;
+					ret = true;
+#endif
 				}
 			} else {
 				// 拡張子が無い・・
@@ -63,6 +78,9 @@ namespace img {
 		*/
 		//-----------------------------------------------------------------//
 		img_in(PLOT& plot) noexcept : bmp_(plot), jpeg_(plot),
+#ifdef ENABLE_PNG
+			png_(plot),
+#endif
 			type_(TYPE::NONE) { }
 
 
@@ -79,6 +97,10 @@ namespace img {
 				return bmp_.probe(fin);
 			case TYPE::JPEG:
 				return jpeg_.probe(fin);
+#ifdef ENABLE_PNG
+			case TYPE::PNG:
+				return png_.probe(fin);
+#endif
 			default:
 				break;
 			}
@@ -124,6 +146,10 @@ namespace img {
 				return bmp_.info(fin, fo);
 			case TYPE::JPEG:
 				return jpeg_.info(fin, fo);
+#ifdef ENABLE_PNG
+			case TYPE::PNG:
+				return png_.info(fin, fo);
+#endif
 			default:
 				break;
 			}
@@ -170,6 +196,10 @@ namespace img {
 				return bmp_.load(fin, opt);
 			case TYPE::JPEG:
 				return jpeg_.load(fin, opt);
+#ifdef ENABLE_PNG
+			case TYPE::PNG:
+				return png_.load(fin, opt);
+#endif
 			default:
 				break;
 			}

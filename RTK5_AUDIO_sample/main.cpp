@@ -14,30 +14,35 @@
 #include "common/spi_io2.hpp"
 #include "common/file_io.hpp"
 #include "common/tpu_io.hpp"
+#include "common/format.hpp"
+#include "common/command.hpp"
+#include "common/shell.hpp"
+
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
 #include "graphics/dialog.hpp"
 #include "graphics/img_in.hpp"
-#include "common/format.hpp"
-#include "common/command.hpp"
-#include "common/shell.hpp"
+#include "graphics/widget_director.hpp"
 
 #include "chip/FAMIPAD.hpp"
 #include "chip/FT5206.hpp"
 
 #include "audio_codec.hpp"
-
-#include "graphics/bmp_in.hpp"
+#include "audio_gui.hpp"
 
 // SDHI インターフェースを利用する場合
 #define USE_SDHI
+
+// ファミコン PAD での操作を有効にする場合
+// #define ENABLE_FAMIPAD
 
 namespace {
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 
+#ifdef ENABLE_FAMIPAD
 	// Famicon PAD (CMOS 4021B Shift Register)
 	// 電源は、微小なので、接続を簡単に行う為、ポート出力を使う
 	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_VCC;
@@ -47,6 +52,9 @@ namespace {
 	typedef device::PORT<device::PORT7, device::bitpos::B3> PAD_OUT;
 	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT> FAMIPAD;
 	FAMIPAD		famipad_;
+
+	uint8_t		pad_level_ = 0;
+#endif
 
 	typedef device::system_io<12000000> SYSTEM_IO;
 
@@ -110,7 +118,6 @@ namespace {
 	typedef graphics::render<GLCDC_IO, FONT> RENDER;
 	RENDER		render_(glcdc_io_, font_);
 
-
 	typedef img::bmp_in<RENDER> BMP_IN;
 	BMP_IN		bmp_in_(render_);
 
@@ -124,12 +131,12 @@ namespace {
 		device::port_map::option::FIRST_I2C> FT5206_I2C;
 
 	FT5206_I2C	ft5206_i2c_;
-	typedef chip::FT5206<FT5206_I2C> FT5206;
-	FT5206		ft5206_(ft5206_i2c_);
+	typedef chip::FT5206<FT5206_I2C> TOUCH;
+	TOUCH		touch_(ft5206_i2c_);
 	// INT to P02(IRQ10)
 
-	typedef gui::dialog<RENDER, FT5206> DIALOG;
-	DIALOG		dialog_(render_, ft5206_); 
+	typedef gui::dialog<RENDER, TOUCH> DIALOG;
+	DIALOG		dialog_(render_, touch_); 
 
 	typedef gui::filer<RENDER> FILER;
 	FILER		filer_(render_);
@@ -137,9 +144,11 @@ namespace {
 	typedef audio::codec<RENDER> AUDIO;
 	AUDIO		audio_(render_);
 
-	uint8_t		pad_level_ = 0;
-	uint8_t		touch_num_ = 0;
+	typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
+	WIDD		widd_(render_, touch_);
+
 	int16_t		touch_org_ = 0;
+	uint8_t		touch_num_ = 0;
 
 
 	bool check_mount_() {
@@ -168,10 +177,10 @@ namespace {
 
 	sound::af_play::CTRL sound_ctrl_task_()
 	{
-		ft5206_.update();
+		touch_.update();
 
 		auto ctrl = sound::af_play::CTRL::NONE;
-
+#ifdef ENABLE_FAMIPAD
 		uint8_t level = famipad_.update();
 		uint8_t ptrg = ~pad_level_ &  level;
 		uint8_t ntrg =  pad_level_ & ~level;
@@ -191,11 +200,11 @@ namespace {
 			audio_.stop();
 			render_.clear(DEF_COLOR::Black);
 		}
-
+#endif
 		update_led_();
 
-		auto tnum = ft5206_.get_touch_num();
-		const auto& xy = ft5206_.get_touch_pos(0);
+		auto tnum = touch_.get_touch_num();
+		const auto& xy = touch_.get_touch_pos(0);
 		if(touch_num_ == 2 && tnum < 2) {  // pause（２点タッチが離された瞬間）
 			ctrl = sound::af_play::CTRL::PAUSE;
 			touch_org_ = xy.x;
@@ -274,6 +283,18 @@ namespace {
 	}
 }
 
+/// widget の登録
+bool insert_widget(gui::widget* w)
+{
+    return widd_.insert(w);
+}
+
+/// widget の解除
+void remove_widget(gui::widget* w)
+{
+    widd_.remove(w);
+}
+
 
 extern "C" {
 
@@ -282,12 +303,12 @@ extern "C" {
 		audio_.set_sample_rate(freq);
 	}
 
-
+#ifdef ENABLE_FAMIPAD
 	uint8_t get_fami_pad()
 	{
 		return famipad_.update();
 	}
-
+#endif
 
 	void sci_putch(char ch)
 	{
@@ -389,6 +410,7 @@ int main(int argc, char** argv)
 		}
 	}
 
+#ifdef ENABLE_FAMIPAD
 	{  // ファミコンパッド初期化
 		PAD_VCC::DIR = 1;
 		PAD_VCC::P = 1;
@@ -396,14 +418,15 @@ int main(int argc, char** argv)
 		PAD_GND::P = 0;
 		famipad_.start();
 	}
+#endif
 
 	{  // FT5206 touch screen controller
-		FT5206::reset<FT5206_RESET>();
+		TOUCH::reset<FT5206_RESET>();
 		uint8_t intr_lvl = 1;
 		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
 			utils::format("FT5206 I2C Start Fail...\n");
 		}
-		if(!ft5206_.start()) {
+		if(!touch_.start()) {
 			utils::format("FT5206 Start Fail...\n");
 		}
 	}
@@ -425,8 +448,8 @@ int main(int argc, char** argv)
 		uint8_t nnn = 0;
 		while(1) {
 			render_.sync_frame();
-			ft5206_.update();
-			auto num = ft5206_.get_touch_num();
+			touch_.update();
+			auto num = touch_.get_touch_num();
 			if(num == 0) {
 				++nnn;
 				if(nnn >= 60) break;
@@ -443,18 +466,17 @@ int main(int argc, char** argv)
 	while(1) {
 		render_.sync_frame();
 
-		ft5206_.update();
+		touch_.update();
 
 		command_();
 
 		{
-			auto data = get_fami_pad();
 			uint32_t ctrl = 0;
-
 			if(sdh_.get_mount()) {
 				gui::set(gui::filer_ctrl::MOUNT, ctrl);
 			}
-
+#ifdef ENABLE_FAMIPAD
+			auto data = get_fami_pad();
 			if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
 				gui::set(gui::filer_ctrl::OPEN, ctrl);
 			}
@@ -470,9 +492,9 @@ int main(int argc, char** argv)
 			if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
 				gui::set(gui::filer_ctrl::SELECT, ctrl);
 			}
-
-			auto tnum = ft5206_.get_touch_num();
-			const auto& xy = ft5206_.get_touch_pos(0);
+#endif
+			auto tnum = touch_.get_touch_num();
+			const auto& xy = touch_.get_touch_pos(0);
 			filer_.set_touch(tnum, xy.x, xy.y); 
 			if(filer_.update(ctrl, path, sizeof(path))) {
 				render_.sync_frame();

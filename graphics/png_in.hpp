@@ -15,6 +15,8 @@
 #include "common/file_io.hpp"
 #include "common/format.hpp"
 
+// #include "libpng/lpng1635/png.h"
+
 namespace img {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -41,11 +43,11 @@ namespace img {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ステータスの取得（Error code）
-			@return ステータス
+			@brief	ファイル拡張子を返す
+			@return ファイル拡張子の文字列
 		*/
 		//-----------------------------------------------------------------//
-//		uint8_t get_status() const noexcept { return status_; }
+		const char* get_file_ext() const noexcept { return "png"; }
 
 
 		//-----------------------------------------------------------------//
@@ -57,6 +59,18 @@ namespace img {
 		//-----------------------------------------------------------------//
 		bool probe(utils::file_io& fin) noexcept
 		{
+			static const int PNG_BYTES_TO_CHECK = 4;
+			uint8_t sig[PNG_BYTES_TO_CHECK];
+
+			auto ofs = fin.tell();
+			auto len = fin.read(sig, PNG_BYTES_TO_CHECK);
+			fin.seek(utils::file_io::SEEK::SET, ofs);
+			if(len == PNG_BYTES_TO_CHECK) {
+//				if(png_check_sig(sig, PNG_BYTES_TO_CHECK)) {
+//					return true;
+//				}
+			}
+			return false;
 		}
 
 
@@ -70,6 +84,7 @@ namespace img {
 		//-----------------------------------------------------------------//
 		bool info(utils::file_io& fin, img::img_info& fo) noexcept
 		{
+			return false;
 		}
 
 
@@ -83,6 +98,7 @@ namespace img {
 		//-----------------------------------------------------------------//
 		bool load(utils::file_io& fin, const char* opt = nullptr)
 		{
+			return false;
 		}
 
 
