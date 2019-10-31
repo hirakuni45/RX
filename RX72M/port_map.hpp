@@ -1463,29 +1463,29 @@ namespace device {
  176 pin device mapping:
      TGT, SDRAM, SDHI-C, ETHERC-1, GLCDC, SSIE0, SSIE1, RSPKB-A, CAN0, RTC
   1  AVSS0
-  2  P05      SSILRCK1/DA1
+  2  P05       SSILRCK1/DA1
   3  AVCC1
-  4  P03      SSIDATA1/DA0
+  4  P03       SSIDATA1/DA0
   5  AVSS1
-  6  P02      SSIBCK1
-  7  P01      SSIBCK0
-  8  P00      AUDIO_CLK
-  9  PF5      SSILRCK0
- 10  EMLE     TGT_EMLE
- 11  PJ5      SSIRXD0
+  6  P02       SSIBCK1
+  7  P01       SSIBCK0
+  8  P00       AUDIO_CLK
+  9  PF5       SSILRCK0
+ 10  EMLE      TGT_EMLE
+ 11  PJ5       SSIRXD0
  12  VSS
- 13  PJ3      SSITXD0
+ 13  PJ3       SSITXD0
  14  VCL
- 15  VBATT    RTC_BACKUP
+ 15  VBATT     RTC_BACKUP
  16  NC
- 17  PF4      TGT_TRST
- 18  MD/FINED TGT_MD
- 19  XCIN     RTC_XTAL0
- 20  XCOUT    RTC_XTAL1
- 21  RES      RESET
- 22  XTAL     SYS_XTAL0
+ 17  PF4       TGT_TRST
+ 18  MD/FINED  TGT_MD
+ 19  XCIN      RTC_XTAL0
+ 20  XCOUT     RTC_XTAL1
+ 21  RES       RESET
+ 22  XTAL      SYS_XTAL0
  23  VSS
- 24  EXTAL    SYS_XTAL1
+ 24  EXTAL     SYS_XTAL1
  25  VCC
  26  P35       UPSEL/NMI
  27  P34
@@ -1493,12 +1493,12 @@ namespace device {
  29  P32                    CTX0
  30  PF3       TGT_TMS
  31  PF2       TGT_TDI
- 32  P31       ET1_MDC      SSLB0-A
- 33  P30       ET1_MDIO     MISOB-A
+ 32  P31                        ET1_MDC
+ 33  P30                        ET1_MDIO     MISOB-A
  34  PF1       TGT_TCK      SCK1
  35  PF0       TGT_TDO
- 36  P27                    RSPCKB-A
- 37  P26                    MOSIB-A
+ 36  P27                                     RSPCKB-A
+ 37  P26                                     MOSIB-A
  38  P25       SDHI_CD-C
  39  VCC
  40  P24       SDHI_WP-C
@@ -1510,7 +1510,7 @@ namespace device {
  46  P17       SDHI_D3-C
  47  P87       SDHI_D2-C
  48  P16                    TXD1
- 49  P86
+ 49  P86       SDHI_PE
  50  P15                    RXD1
  51  P14       LCD_CLK-A
  52  P13       LCD_TCON0-A
