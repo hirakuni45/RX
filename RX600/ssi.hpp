@@ -18,19 +18,21 @@ namespace device {
 		@brief	シリアルサウンドインタフェース（SSI）
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
+		@param[in]	ssif	ステータス割り込み
 		@param[in]	rxi		受信データフル割り込みベクタ
 		@param[in]	txi		送信データエンプティ割り込みベクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR rxi, ICU::VECTOR txi>
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR_BL1 ssif, ICU::VECTOR rxi, ICU::VECTOR txi>
 	struct ssi_t {
 
-		//-----------------------------------------------------------------//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  制御レジスタ（ SSICR ）
 			@param[in]	ofs	オフセット
 		*/
-		//-----------------------------------------------------------------//
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
 		struct ssicr_t : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
@@ -160,7 +162,7 @@ namespace device {
 			@brief  受信 FIFO データレジスタ（ SSIFRDR ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<base + 0x1C> SSIFRDR;
+		static ro32_t<base + 0x1C> SSIFRDR;
 
 
 		//-----------------------------------------------------------------//
@@ -197,7 +199,7 @@ namespace device {
 			@return 受信データフル割り込みベクタ
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_rx_vec() { return rxi; }
+		static ICU::VECTOR get_rxi_vec() { return rxi; }
 
 
 		//-----------------------------------------------------------------//
@@ -206,11 +208,13 @@ namespace device {
 			@return 送信データエンプティ割り込みベクタ
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_tx_vec() { return txi; }
+		static ICU::VECTOR get_txi_vec() { return txi; }
 	};
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef ssi_t<0x0008A500, peripheral::SSI0, ICU::VECTOR::SSIRXI0, ICU::VECTOR::SSITXI0> SSI0;
-	typedef ssi_t<0x0008A540, peripheral::SSI1, ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1> SSI1;
+	typedef ssi_t<0x0008A500, peripheral::SSI0,
+		ICU::VECTOR_BL1::SSIF0, ICU::VECTOR::SSIRXI0, ICU::VECTOR::SSITXI0> SSI0;
+	typedef ssi_t<0x0008A540, peripheral::SSI1,
+		ICU::VECTOR_BL1::SSIF0, ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1> SSI1;
 #endif
 }
