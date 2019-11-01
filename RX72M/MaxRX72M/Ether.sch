@@ -29,7 +29,7 @@ Wire Wire Line
 	5400 3900 4000 3900
 Text HLabel 4000 3900 0    50   Input ~ 10
 ET_MDC
-Text HLabel 4000 3800 0    50   Input ~ 10
+Text HLabel 4000 3800 0    50   BiDi ~ 10
 ET_MDIO
 Text HLabel 4000 3700 0    50   Input ~ 10
 ET_CRS
@@ -61,7 +61,7 @@ Wire Wire Line
 	5400 3500 4000 3500
 Wire Wire Line
 	4000 3600 5400 3600
-Text HLabel 4000 4200 0    50   Input ~ 10
+Text HLabel 4000 4200 0    50   Output ~ 10
 ET_REFCK
 Wire Wire Line
 	5400 4200 4000 4200
@@ -73,4 +73,31 @@ Wire Wire Line
 	4100 4400 4100 4100
 Wire Wire Line
 	4100 4100 5400 4100
+$Comp
+L akizuki:J0011D21BNL J?
+U 1 1 5DBF1A1C
+P 9050 3700
+F 0 "J?" H 9628 3746 50  0000 L CNN
+F 1 "J0011D21BNL" H 9628 3655 50  0000 L CNN
+F 2 "" H 9065 3695 50  0001 C CNN
+F 3 "" H 9065 3695 50  0001 C CNN
+	1    9050 3700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6900 3300 8300 3300
+Wire Wire Line
+	6900 3400 8300 3400
+Wire Wire Line
+	8300 3600 7000 3600
+Wire Wire Line
+	7000 3600 7000 3500
+Wire Wire Line
+	7000 3500 6900 3500
+Wire Wire Line
+	6900 3200 7000 3200
+Wire Wire Line
+	7000 3200 7000 3100
+Wire Wire Line
+	7000 3100 8300 3100
 $EndSCHEMATC

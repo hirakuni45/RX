@@ -396,4 +396,46 @@ Wire Wire Line
 Wire Wire Line
 	8450 3250 8450 3150
 Connection ~ 8000 3250
+$Comp
+L Device:C C?
+U 1 1 5DBA7B66
+P 8900 3000
+F 0 "C?" H 9015 3046 50  0000 L CNN
+F 1 "0.1uF" H 9015 2955 50  0000 L CNN
+F 2 "" H 8938 2850 50  0001 C CNN
+F 3 "~" H 8900 3000 50  0001 C CNN
+	1    8900 3000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C?
+U 1 1 5DBA831C
+P 9350 3000
+F 0 "C?" H 9465 3046 50  0000 L CNN
+F 1 "0.1uF" H 9465 2955 50  0000 L CNN
+F 2 "" H 9388 2850 50  0001 C CNN
+F 3 "~" H 9350 3000 50  0001 C CNN
+	1    9350 3000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8900 2850 8900 2750
+Wire Wire Line
+	8900 2750 8450 2750
+Connection ~ 8450 2750
+Wire Wire Line
+	8900 3150 8900 3250
+Wire Wire Line
+	8900 3250 8450 3250
+Connection ~ 8450 3250
+Wire Wire Line
+	9350 3150 9350 3250
+Wire Wire Line
+	9350 3250 8900 3250
+Connection ~ 8900 3250
+Wire Wire Line
+	9350 2850 9350 2750
+Wire Wire Line
+	9350 2750 8900 2750
+Connection ~ 8900 2750
 $EndSCHEMATC

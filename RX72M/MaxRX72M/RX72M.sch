@@ -232,4 +232,44 @@ Wire Wire Line
 	3050 3900 2850 3900
 Wire Wire Line
 	2850 4000 3050 4000
+Text HLabel 2800 4600 0    50   Output ~ 10
+ET_MDC
+Text HLabel 2800 4500 0    50   BiDi ~ 10
+ET_MDIO
+Wire Wire Line
+	3050 4500 2800 4500
+Wire Wire Line
+	3050 4600 2800 4600
+Text HLabel 8350 2500 2    50   Output ~ 10
+ET_RXER
+Text HLabel 8350 2800 2    50   Input ~ 10
+ET_TXD1
+Text HLabel 8350 2700 2    50   Input ~ 10
+ET_TXD0
+Text HLabel 4650 2500 2    50   Input ~ 10
+ET_TXEN
+Wire Wire Line
+	4650 2500 4450 2500
+Text HLabel 8350 2400 2    50   Input ~ 10
+ET_REFCK
+Wire Wire Line
+	8350 2400 8150 2400
+Wire Wire Line
+	8350 2700 8150 2700
+Wire Wire Line
+	8350 2800 8150 2800
+Text HLabel 6550 2800 0    50   Output ~ 10
+ET_RXD0
+Text HLabel 6550 2900 0    50   Output ~ 10
+ET_RXD1
+Wire Wire Line
+	6750 2800 6550 2800
+Wire Wire Line
+	6750 2900 6550 2900
+Text HLabel 6550 2600 0    50   Output ~ 10
+ET_CRS
+Wire Wire Line
+	6750 2600 6550 2600
+Wire Wire Line
+	8350 2500 8150 2500
 $EndSCHEMATC

@@ -165,4 +165,8 @@ F 3 "" H 5650 3500 50  0001 C CNN
 	1    5700 3800
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	5050 3300 4050 3300
+Text GLabel 4050 3300 0    50   Output ~ 10
+~RESET~
 $EndSCHEMATC
