@@ -209,6 +209,8 @@ namespace device {
 		static ICU::VECTOR get_tx_vec() { return txi; }
 	};
 
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
 	typedef ssi_t<0x0008A500, peripheral::SSI0, ICU::VECTOR::SSIRXI0, ICU::VECTOR::SSITXI0> SSI0;
 	typedef ssi_t<0x0008A540, peripheral::SSI1, ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1> SSI1;
+#endif
 }

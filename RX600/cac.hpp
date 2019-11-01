@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・CAC 定義
+	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX24T/RX66T CAC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -193,7 +193,7 @@ namespace device {
 #if defined(SIG_RX24T)
 	typedef cac_t<peripheral::CAC,
 		ICU::VECTOR, ICU::VECTOR::FERRF, ICU::VECTOR::MENDF, ICU::VECTOR::OVFF> CAC;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX66T)
 	typedef cac_t<peripheral::CAC,
 		ICU::VECTOR_BL0,
 		ICU::VECTOR_BL0::FERRI, ICU::VECTOR_BL0::MENDI, ICU::VECTOR_BL0::OVFI> CAC;

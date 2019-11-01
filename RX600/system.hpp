@@ -207,7 +207,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4> PCKB;
 			bits_rw_t<io_, bitpos::B12, 4> PCKA;
 			bits_rw_t<io_, bitpos::B16, 4> BCK;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
 			bit_rw_t <io_, bitpos::B22>    PSTOP0;
 #endif
 			bit_rw_t <io_, bitpos::B23>    PSTOP1;
@@ -235,6 +235,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> MEMWAIT;
 		};
 		static memwait_t<0x00086610> MEMWAIT;
+
 #elif defined(SIG_RX72M) || defined(SIG_RX66T)
 		template<uint32_t base>
 		struct memwait_t : public rw8_t<base> {
@@ -505,6 +506,9 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2> PLOVF;
 			bit_rw_t<io_, bitpos::B3> HCOVF;
 			bit_rw_t<io_, bitpos::B4> ILCOVF;
+#if defined(SIG_RX72M)
+			bit_rw_t<io_, bitpos::B5> PPLOVF;
+#endif
 		};
 		static oscovfsr_t<0x0008003C> OSCOVFSR;
 
@@ -606,6 +610,112 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>	HOCOPCNT;
 		};
 		static hocopcr_t<0x0008C294> HOCOPCR;
+
+
+#if defined(SIG_RX72M)
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CLKOUT 出力コントロールレジスタ (CKOCR)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct ckocr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B8,  3>  CKOSEL;
+
+			bits_rw_t<io_, bitpos::B12, 3>  CKODIV;
+			bit_rw_t <io_, bitpos::B15>     CKOSTP;
+		};
+		static ckocr_t<0x0008003E> CKOCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  特定用途向けクロック制御レジスタ (PACKCR)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct packcr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B4>   OUTCKSEL;
+
+			bit_rw_t<io_, bitpos::B8>   EPLLSEL;
+
+			bit_rw_t<io_, bitpos::B12>  UPLLSEL;
+		};
+		static packcr_t<0x00080044> PACKCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  PPLL コントロールレジスタ (PPLLCR)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct ppllcr_t : public rw16_t<base> {
+			typedef rw16_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 2>  PPLIDIV;
+
+			bits_rw_t<io_, bitpos::B8, 6>  PPLSTC;
+		};
+		static ppllcr_t<0x00080048> PPLLCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  PPLL コントロールレジスタ 2 (PPLLCR2)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct ppllcr2_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bit_rw_t<io_, bitpos::B0>  PPLLEN;
+		};
+		static ppllcr2_t<0x0008004A> PPLLCR2;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  PPLL コントロールレジスタ 3 (PPLLCR3)
+			@param[in]	base	ベースアドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base>
+		struct ppllcr3_t : public rw8_t<base> {
+			typedef rw8_t<base> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 4>  PPLCK;
+		};
+		static ppllcr3_t<0x0008004B> PPLLCR3;
+#endif
 
 //-----------------------------------------------------------------------------//
 
