@@ -78,6 +78,6 @@ namespace device {
 		static peripheral get_peripheral() { return per; }
 	};
 
-	typedef etherc_t<0x000C5880, peripheral::PMGI0> PMGI0;
-	typedef etherc_t<0x000C5890, peripheral::PMGI1> PMGI1;
+	typedef pmgi_t<0x000C5880, peripheral::PMGI0> PMGI0;
+	typedef pmgi_t<0x000C5890, peripheral::PMGI1> PMGI1;
 }
