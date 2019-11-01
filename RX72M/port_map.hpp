@@ -1462,170 +1462,170 @@ namespace device {
 /*
  176 pin device mapping:
      TGT, SDRAM, SDHI-C, ETHERC-1, GLCDC, SSIE0, SSIE1, RSPKB-A, CAN0, RTC
-  1  AVSS0
-  2  P05       SSILRCK1/DA1
-  3  AVCC1
-  4  P03       SSIDATA1/DA0
-  5  AVSS1
-  6  P02       SSIBCK1
-  7  P01       SSIBCK0
-  8  P00       AUDIO_CLK
-  9  PF5       SSILRCK0
- 10  EMLE      TGT_EMLE
- 11  PJ5       SSIRXD0
- 12  VSS
- 13  PJ3       SSITXD0
- 14  VCL
- 15  VBATT     RTC_BACKUP
+  1  AVSS0       --
+  2  P05         SSILRCK1/DA1
+  3  AVCC1       ++
+  4  P03         SSIDATA1/DA0
+  5  AVSS1       --
+  6  P02         SSIBCK1
+  7  P01         SSIBCK0
+  8  P00         AUDIO_CLK
+  9  PF5         SSILRCK0
+ 10  EMLE        TGT_EMLE
+ 11  PJ5         SSIRXD0
+ 12  VSS         -
+ 13  PJ3         SSITXD0
+ 14  VCL         *
+ 15  VBATT       RTC_BACKUP
  16  NC
- 17  PF4       TGT_TRST
- 18  MD/FINED  TGT_MD
- 19  XCIN      RTC_XTAL0
- 20  XCOUT     RTC_XTAL1
- 21  RES       RESET
- 22  XTAL      SYS_XTAL0
- 23  VSS
- 24  EXTAL     SYS_XTAL1
- 25  VCC
- 26  P35       UPSEL/NMI
+ 17  PF4         TGT_TRST
+ 18  MD/FINED    TGT_MD
+ 19  XCIN        RTC_XTAL0
+ 20  XCOUT       RTC_XTAL1
+ 21  RES         RESET
+ 22  XTAL        SYS_XTAL0
+ 23  VSS         -
+ 24  EXTAL       SYS_XTAL1
+ 25  VCC         +
+ 26  P35         UPSEL/NMI
  27  P34
  28  P33                    CRX0
  29  P32                    CTX0
- 30  PF3       TGT_TMS
- 31  PF2       TGT_TDI
+ 30  PF3         TGT_TMS
+ 31  PF2         TGT_TDI
  32  P31                        ET1_MDC
  33  P30                        ET1_MDIO     MISOB-A
- 34  PF1       TGT_TCK      SCK1
- 35  PF0       TGT_TDO
+ 34  PF1         TGT_TCK      SCK1
+ 35  PF0         TGT_TDO
  36  P27                                     RSPCKB-A
  37  P26                                     MOSIB-A
- 38  P25       SDHI_CD-C
- 39  VCC
- 40  P24       SDHI_WP-C
- 41  VSS
- 42  P23       SDHI_D1-C
- 43  P22       SDHI_D0-C
- 44  P21       SDHI_CLK-C
- 45  P20       SDHI_CMD-C
- 46  P17       SDHI_D3-C
- 47  P87       SDHI_D2-C
+ 38  P25         SDHI_CD-C
+ 39  VCC         +
+ 40  P24         SDHI_WP-C
+ 41  VSS         -
+ 42  P23         SDHI_D1-C
+ 43  P22         SDHI_D0-C
+ 44  P21         SDHI_CLK-C
+ 45  P20         SDHI_CMD-C
+ 46  P17         SDHI_D3-C
+ 47  P87         SDHI_D2-C
  48  P16                    TXD1
- 49  P86       SDHI_PE
+ 49  P86         SDHI_PE
  50  P15                    RXD1
- 51  P14       LCD_CLK-A
- 52  P13       LCD_TCON0-A
- 53  P12       LCD_TCON1-A
+ 51  P14         LCD_CLK-A
+ 52  P13         LCD_TCON0-A
+ 53  P12         LCD_TCON1-A
  54  VCC_USB
  55  USB_DM
  56  USB_DP
  57  VSS_USB
- 58  PJ2       LCD_TCON2-A
- 59  PJ1       LCD_TCON3-A
- 60  PJ0       LCD_DATA0-A
- 61  P85       LCD_DATA1-A
- 62  P84       LCD_DATA2-A
- 63  P57       LCD_DATA3-A
- 64  P56       LCD_DATA4-A
- 65  P55       LCD_DATA5-A
- 66  P54       LCD_DATA6-A
- 67  P11       LCD_DATA7-A
+ 58  PJ2         LCD_TCON2-A
+ 59  PJ1         LCD_TCON3-A
+ 60  PJ0         LCD_DATA0-A
+ 61  P85         LCD_DATA1-A
+ 62  P84         LCD_DATA2-A
+ 63  P57         LCD_DATA3-A
+ 64  P56         LCD_DATA4-A
+ 65  P55         LCD_DATA5-A
+ 66  P54         LCD_DATA6-A
+ 67  P11         LCD_DATA7-A
  68  P10
- 69  P53       BCLK
+ 69  P53         BCLK
  70  P52                    RXD2
  71  P51                    SCK2
  72  P50                    TXD2
- 73  VSS
- 74  P83       LCD_DATA8-A
- 75  VCC
- 76  PC7       LCD_DATA9-A/TGT_UB
- 77  PC6       LCD_DATA10-A
- 78  PC5       LCD_DATA11-A
- 79  P82       LCD_DATA12-A
- 80  P81       LCD_DATA13-A
- 81  P80       LCD_DATA14-A
- 82  PC4       LCD_DATA15-A
- 83  PC3       LCD_DATA16-A
- 84  P77       LCD_DATA17-A
- 85  P76       LCD_DATA18-A
- 86  PC2       LCD_DATA19-A
- 87  P75       LCD_DATA20-A
- 88  P74       LCD_DATA21-A
- 89  PC1       LCD_DATA22-A
- 90  VCC
+ 73  VSS         -
+ 74  P83         LCD_DATA8-A
+ 75  VCC         +
+ 76  PC7         LCD_DATA9-A/TGT_UB
+ 77  PC6         LCD_DATA10-A
+ 78  PC5         LCD_DATA11-A
+ 79  P82         LCD_DATA12-A
+ 80  P81         LCD_DATA13-A
+ 81  P80         LCD_DATA14-A
+ 82  PC4         LCD_DATA15-A
+ 83  PC3         LCD_DATA16-A
+ 84  P77         LCD_DATA17-A
+ 85  P76         LCD_DATA18-A
+ 86  PC2         LCD_DATA19-A
+ 87  P75         LCD_DATA20-A
+ 88  P74         LCD_DATA21-A
+ 89  PC1         LCD_DATA22-A
+ 90  VCC         +
  91  PC0
- 92  VSS
- 93  P73       LCD_EXTCLK-A
- 94  PB7       SDRAM_A15
- 95  PB6       SDRAM_A14
- 96  PB5       SDRAM_A13
- 97  PB4       SDRAM_A12
- 98  PB3       SDRAM_A11
- 99  PB2       SDRAM_A10
-100  PB1       SDRAM_A9
-101  P72       LCD_DATA23-A
+ 92  VSS         -
+ 93  P73         LCD_EXTCLK-A
+ 94  PB7         SDRAM_A15
+ 95  PB6         SDRAM_A14
+ 96  PB5         SDRAM_A13
+ 97  PB4         SDRAM_A12
+ 98  PB3         SDRAM_A11
+ 99  PB2         SDRAM_A10
+100  PB1         SDRAM_A9
+101  P72         LCD_DATA23-A
 102  P71
-103  VCC
-104  PB0       SDRAM_A8
-105  VSS
-106  PA7       SDRAM_A7
-107  PA6       SDRAM_A6
-108  PA5       SDRAM_A5
-109  PA4       SDRAM_A4
-110  PA3       SDRAM_A3
+103  VCC         +
+104  PB0         SDRAM_A8
+105  VSS         -
+106  PA7         SDRAM_A7
+107  PA6         SDRAM_A6
+108  PA5         SDRAM_A5
+109  PA4         SDRAM_A4
+110  PA3         SDRAM_A3
 111  PG7                       ET1_TX_ER
-112  PA2       SDRAM_A2
+112  PA2         SDRAM_A2
 113  PG6
-114  PA1       SDRAM_A1
-115  VCC
+114  PA1         SDRAM_A1
+115  VCC         +
 116  PG5
-117  VSS
+117  VSS         -
 118  PA0
 119  PG4                       ET1_ETXD1
-120  P67       SDRAM_DQM1
+120  P67         SDRAM_DQM1
 121  PG3                       ET1_ETXD0
-122  P66       SDRAM_DQM0
+122  P66         SDRAM_DQM0
 123  PG2           
-124  P65       SDRAM_CKE
-125  PE7       SDRAM_D15
-126  PE6       SDRAM_D14
-127  VCC
-128  P70       SDRAM_SDCLK
-129  VSS
-130  PE5       SDRAM_D13
-131  PE4       SDRAM_D12
-132  PE3       SDRAM_D11
-133  PE2       SDRAM_D10
-134  PE1       SDRAM_D9
-135  PE0       SDRAM_D8
-136  P64       SDRAM_WE
-137  P63       SDRAM_CAS
-138  P62       SDRAM_RAS
-139  P61       SDRAM_SDCS
-140  VSS
+124  P65         SDRAM_CKE
+125  PE7         SDRAM_D15
+126  PE6         SDRAM_D14
+127  VCC         +
+128  P70         SDRAM_SDCLK
+129  VSS         -
+130  PE5         SDRAM_D13
+131  PE4         SDRAM_D12
+132  PE3         SDRAM_D11
+133  PE2         SDRAM_D10
+134  PE1         SDRAM_D9
+135  PE0         SDRAM_D8
+136  P64         SDRAM_WE
+137  P63         SDRAM_CAS
+138  P62         SDRAM_RAS
+139  P61         SDRAM_SDCS
+140  VSS         -
 141  P60                        ET1_TX_EN
-142  VCC
-143  PD7       SDRAM_D7
+142  VCC         +
+143  PD7         SDRAM_D7
 144  PG1                        ET1_RX_ER
-145  PD6       SDRAM_D6
+145  PD6         SDRAM_D6
 146  PG0                        ET1_RX_CLK/REF50CK1
-147  PD5       SDRAM_D5
-148  PD4       SDRAM_D4
+147  PD5         SDRAM_D5
+148  PD4         SDRAM_D4
 149  P97
-150  PD3       SDRAM_D3
-151  VSS
+150  PD3         SDRAM_D3
+151  VSS         -
 152  P96
-153  VCC
-154  PD2       SDRAM_D2
+153  VCC         +
+154  PD2         SDRAM_D2
 155  P95                        ET1_ERXD1
-156  PD1       SDRAM_D1
+156  PD1         SDRAM_D1
 157  P94                        ET1_ERXD0
-158  PD0       SDRAM_D0
+158  PD0         SDRAM_D0
 159  P93
 160  P92                        ET1_CRS
 161  P91         AN115
-162  VSS
+162  VSS         -
 163  P90         AN114
-164  VCC
+164  VCC         +
 165  P47         AN007
 166  P46         AN006
 167  P45         AN005
@@ -1633,9 +1633,9 @@ namespace device {
 169  P43         AN003
 170  P42         AN002
 171  P41         AN001
-172  VREFL0
+172  VREFL0      *
 173  P40         AN000
-174  VREFH0
-175  AVCC0
+174  VREFH0      *
+175  AVCC0       ++
 176  P07         IRQ15
 */

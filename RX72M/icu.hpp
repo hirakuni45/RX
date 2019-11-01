@@ -58,7 +58,7 @@ namespace device {
 			MBFAI        = 45,  // MMCIF
 			SSITXI0      = 46,  // SSIE0 シリアルサウンドインタフェース
 			SSIRXI0      = 47,  // SSIE0 シリアルサウンドインタフェース
-			SSIRTI1      = 48,  // SSI1 シリアルサウンドインタフェース
+			SSIRTI1      = 48,  // SSIE1 シリアルサウンドインタフェース
 
 			RIIC_RXI1    = 50,  // RIIC1 RXI
 			RIIC_TXI1    = 51,	// RIIC1 TXI

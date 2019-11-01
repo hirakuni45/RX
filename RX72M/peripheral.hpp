@@ -90,6 +90,9 @@ namespace device {
 		EDMAC1,		///< Ethernet DMA 1
 		PTPEDMAC,	///< PTP Ethernet DMA
 
+		PMGI0,		///< PHY マネジメントインタフェース 0
+		PMGI1,		///< PHY マネジメントインタフェース 1
+
 		ESC,		///< EtherCAT スレーブコントローラ
 
 		USB0,		///< USB2.0FSホスト/ファンクションモジュール（USBb）
@@ -136,7 +139,8 @@ namespace device {
 		GLCDC,		///< グラフィックスＬＣＤコントローラ
 		DRW2D,		///< ２Ｄ描画エンジン
 
-		DSMIF,		///< ΔΣモジュレータインターフェース
+		DSMIF0,		///< ΔΣモジュレータインターフェース 0
+		DSMIF1,		///< ΔΣモジュレータインターフェース 1
 
 		S12AD,		///< 12 ビット A/D コンバータ（S12ADC）
 		S12AD1,		///< 12 ビット A/D コンバータ（S12ADC）

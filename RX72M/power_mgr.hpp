@@ -178,20 +178,21 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB9 = f;
 				break;
 
-			case peripheral::DSMIF:				// ΔΣインターフェース
+			case peripheral::DSMIF0:			// ΔΣインターフェース 0
+			case peripheral::DSMIF1:			// ΔΣインターフェース 1
 				SYSTEM::MSTPCRB.MSTPB11 = f;
 				break;
 
-
-
 			case peripheral::ETHERC1:
 			case peripheral::EDMAC1:
+			case peripheral::PMGI1:
 				SYSTEM::MSTPCRB.MSTPB14 = f;	// ETHER1, EDMAC1 のストップ状態解除
 				BUS::BEREN.TOEN = 1;
 				break;
 			case peripheral::ETHERC0:
 			case peripheral::ETHERCA:
 			case peripheral::EDMAC0:
+			case peripheral::PMGI0:
 				SYSTEM::MSTPCRB.MSTPB15 = f;	// ETHER0, EDMAC0 のストップ状態解除
 				BUS::BEREN.TOEN = 1;
 				break;
