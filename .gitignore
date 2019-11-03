@@ -24,8 +24,9 @@ libmad/
 !jpeg-6b/jmorecfg.h
 !jpeg-6b/libjpeg.a
 jpeg-6b/
-libpng/
+libpng_/
 libusb/
 r_usb/
 tmp/
 !zlib/libz.a
+!libpng/libpng.a
