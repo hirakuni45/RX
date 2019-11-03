@@ -906,12 +906,13 @@ namespace graphics {
 			@brief	描画ファンクタ
 			@param[in]	x	X 座標
 			@param[in]	y	Y 座標
-			@param[in]	r	R カラー
-			@param[in]	g	G カラー
-			@param[in]	b	B カラー
+			@param[in]	r	Red
+			@param[in]	g	Green
+			@param[in]	b	Blue
+			@param[in]	a	Alpha
 		*/
 		//-----------------------------------------------------------------//
-		void operator() (int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b) noexcept {
+		void operator() (int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) noexcept {
 			auto c = SHARE_COLOR::to_565(r, g, b);
 			plot(vtx::spos(x + ofs_.x, y + ofs_.y), c);			
 		}
