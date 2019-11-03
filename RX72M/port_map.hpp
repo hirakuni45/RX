@@ -1434,28 +1434,6 @@ namespace device {
 
 			return ret;
 		}
-
-
-#if 0
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  アナログ入出力に切り替える
-			@param[in]	t	周辺機器タイプ
-			@param[in]	ena	無効にする場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		static bool turn_analog(bool ena = true) noexcept
-		{
-			MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
-			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
-
-
-
-			MPC::PWPR = MPC::PWPR.B0WI.b();
-
-			return ret;
-		}
-#endif
 	};
 }
 
