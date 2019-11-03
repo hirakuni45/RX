@@ -23,13 +23,10 @@
 #include "graphics/font.hpp"
 #include "graphics/graphics.hpp"
 
-// #include "graphics/jpeg_in.hpp"
-#include "graphics/bmp_in.hpp"
 #include "graphics/filer.hpp"
 #include "graphics/dialog.hpp"
 #include "chip/FT5206.hpp"
 
-#include "graphics/picojpeg_in.hpp"
 #include "graphics/img_in.hpp"
 #include "graphics/scaling.hpp"
 
@@ -141,12 +138,10 @@ namespace {
 	typedef gui::dialog<RENDER, FT5206> DIALOG;
 	DIALOG		dialog_(render_, ft5206_);
 
-#if 0
 	typedef img::scaling<RENDER> PLOT;
 	PLOT		plot_(render_);
 	typedef img::img_in<PLOT> IMG_IN;
 	IMG_IN		imgs_(plot_);
-#endif
 
 	// test for Tiny-GL
 	typedef graphics::tgl<RENDER, 200, 10> TGL;
@@ -262,13 +257,16 @@ namespace {
 		}
 
 		auto cmdn = cmd_.get_words();
-//		if(cmd_.cmp_word(0, "image")) { // image load, draw
-
-		if(cmd_.cmp_word(0, "write")) { // test file (read/write)
+		if(cmd_.cmp_word(0, "image")) { // image load, draw
 			if(cmdn >= 2) {
 				char tmp[128];
 				cmd_.get_word(1, tmp, sizeof(tmp));
-///				imgs_.load(tmp);
+				imgs_.load(tmp);
+			}
+		} else if(cmd_.cmp_word(0, "write")) { // test file (read/write)
+			if(cmdn >= 2) {
+				char tmp[128];
+				cmd_.get_word(1, tmp, sizeof(tmp));
 				create_test_file_(tmp, 1024 * 1024);
 			}
 		} else if(cmd_.cmp_word(0, "read")) { // speed test
@@ -279,7 +277,7 @@ namespace {
 			}
 		} else if(cmd_.cmp_word(0, "help")) {
 			shell_.help();
-//			utils::format("    image [filename]\n");
+			utils::format("    image [filename]\n");
 			utils::format("    write filename      test for write\n");
 			utils::format("    read filename       test for read\n");
 		} else {
@@ -527,7 +525,7 @@ int main(int argc, char** argv)
 
 		switch(render_task) {
 		case 0:
-			render_.clear(DEF_COLOR::Black);
+//			render_.clear(DEF_COLOR::Black);
 			break;
 
 		case 1:
