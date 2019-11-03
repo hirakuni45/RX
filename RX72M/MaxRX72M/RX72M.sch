@@ -4,7 +4,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 3 8
+Sheet 3 9
 Title ""
 Date ""
 Rev ""
@@ -86,7 +86,7 @@ Text HLabel 4650 2700 2    50   Output ~ 10
 ~RAS~
 Text HLabel 4650 2600 2    50   Output ~ 10
 ~SDCS~
-Text HLabel 4650 2200 2    50   Output ~ 10
+Text HLabel 4650 1500 2    50   Output ~ 10
 SDCLK
 Text HLabel 4650 3100 2    50   Output ~ 10
 DQM0
@@ -169,7 +169,7 @@ Wire Wire Line
 Wire Wire Line
 	4450 3200 4650 3200
 Wire Wire Line
-	4450 2200 4650 2200
+	4450 1500 4650 1500
 Text HLabel 2850 4000 0    50   Input ~ 10
 SDHI_CD
 Text HLabel 2850 3900 0    50   Input ~ 10
@@ -272,4 +272,100 @@ Wire Wire Line
 	6750 2600 6550 2600
 Wire Wire Line
 	8350 2500 8150 2500
+Text HLabel 8350 1450 2    50   Output ~ 10
+LCD_D0
+Wire Wire Line
+	8350 1450 8150 1450
+Text HLabel 6550 1950 0    50   Output ~ 10
+LCD_D1
+Text HLabel 6550 1850 0    50   Output ~ 10
+LCD_D2
+Text HLabel 4650 4200 2    50   Output ~ 10
+LCD_D3
+Text HLabel 4650 4100 2    50   Output ~ 10
+LCD_D4
+Text HLabel 4650 4000 2    50   Output ~ 10
+LCD_D5
+Text HLabel 4650 3900 2    50   Output ~ 10
+LCD_D6
+Text HLabel 2850 2600 0    50   Output ~ 10
+LCD_D7
+Text HLabel 6550 1750 0    50   Output ~ 10
+LCD_D8
+Text HLabel 6550 5950 0    50   Output ~ 10
+LCD_D9
+Text HLabel 6550 5850 0    50   Output ~ 10
+LCD_D10
+Text HLabel 6550 5750 0    50   Output ~ 10
+LCD_D11
+Text HLabel 6550 1650 0    50   Output ~ 10
+LCD_D12
+Text HLabel 6550 1550 0    50   Output ~ 10
+LCD_D13
+Text HLabel 6550 1450 0    50   Output ~ 10
+LCD_D14
+Text HLabel 6550 5650 0    50   Output ~ 10
+LCD_D15
+Text HLabel 6550 5550 0    50   Output ~ 10
+LCD_D16
+Text HLabel 4650 2200 2    50   Output ~ 10
+LCD_D17
+Text HLabel 4650 2100 2    50   Output ~ 10
+LCD_D18
+Text HLabel 6550 5450 0    50   Output ~ 10
+LCD_D19
+Text HLabel 4650 2000 2    50   Output ~ 10
+LCD_D20
+Text HLabel 4650 1900 2    50   Output ~ 10
+LCD_D21
+Text HLabel 6550 5350 0    50   Output ~ 10
+LCD_D22
+Text HLabel 4650 1700 2    50   Output ~ 10
+LCD_D23
+Wire Wire Line
+	4650 1700 4450 1700
+Wire Wire Line
+	4450 1900 4650 1900
+Wire Wire Line
+	4650 2000 4450 2000
+Wire Wire Line
+	4450 2100 4650 2100
+Wire Wire Line
+	4650 2200 4450 2200
+Wire Wire Line
+	6750 5350 6550 5350
+Wire Wire Line
+	6550 5450 6750 5450
+Wire Wire Line
+	6750 5550 6550 5550
+Wire Wire Line
+	6550 5650 6750 5650
+Wire Wire Line
+	6750 5750 6550 5750
+Wire Wire Line
+	6550 5850 6750 5850
+Wire Wire Line
+	6750 5950 6550 5950
+Wire Wire Line
+	4650 3900 4450 3900
+Wire Wire Line
+	4450 4000 4650 4000
+Wire Wire Line
+	4650 4100 4450 4100
+Wire Wire Line
+	4450 4200 4650 4200
+Wire Wire Line
+	3050 2600 2850 2600
+Wire Wire Line
+	6750 1450 6550 1450
+Wire Wire Line
+	6550 1550 6750 1550
+Wire Wire Line
+	6750 1650 6550 1650
+Wire Wire Line
+	6550 1750 6750 1750
+Wire Wire Line
+	6750 1850 6550 1850
+Wire Wire Line
+	6550 1950 6750 1950
 $EndSCHEMATC
