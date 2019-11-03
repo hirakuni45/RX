@@ -1,5 +1,5 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef _TIME_H_
+#define _TIME_H_
 //=====================================================================//
 /*!	@file
 	@brief	時間関数（ヘッダー）
@@ -175,4 +175,4 @@ const char* get_mon(uint8_t idx);
 }
 #endif
 
-#endif	// TIME_H
+#endif	// _TIME_H_
