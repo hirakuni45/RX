@@ -34,7 +34,7 @@ PSOURCES	=	main.cpp \
 				graphics/color.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	m supc++ drw2d
+USER_LIBS	=	supc++ drw2d png m z
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
@@ -67,7 +67,7 @@ INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
 
-LIB_ROOT	=	../RX65x/drw_2d_ver1.02
+LIB_ROOT	=	../RX65x/drw_2d_ver1.02 ../libpng ../zlib
 
 OPTIMIZE	=	-O3
 
