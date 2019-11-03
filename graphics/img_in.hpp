@@ -60,7 +60,7 @@ namespace img {
 					ret = true;
 #ifdef ENABLE_PNG
 				} else if(utils::str::scan_ext(ext, png_.get_file_ext())) {
-					type_ = TYPE::JPEG;
+					type_ = TYPE::PNG;
 					ret = true;
 #endif
 				}
