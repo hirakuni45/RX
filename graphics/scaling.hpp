@@ -292,6 +292,8 @@ namespace img {
 		//-----------------------------------------------------------------//
 		void operator() (int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) noexcept
 		{
+			if(a == 0) return;
+
 			auto sc = graphics::share_color(r, g, b);
 			if(scale_.up < scale_.dn) {
 				if(sc.rgb565 == 0) sc = graphics::share_color(0, 0, 1);
@@ -311,8 +313,7 @@ namespace img {
 				render_.set_fore_color(sc);
 				render_.fill_box(vtx::srect(xx + ofs_.x, yy + ofs_.y, d, d));
 			} else {
-				if(a == 0) ;
-				else if(a == 255) {
+				if(a == 255) {
 					render_.plot(vtx::spos(x + ofs_.x, y + ofs_.y), sc.rgb565);
 				} else {
 // utils::format("Alpha: %d\n") % static_cast<int>(a);
