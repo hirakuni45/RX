@@ -257,7 +257,9 @@ namespace {
 		}
 
 		auto cmdn = cmd_.get_words();
-		if(cmd_.cmp_word(0, "image")) { // image load, draw
+		if(cmd_.cmp_word(0, "clear")) {
+			render_.clear(DEF_COLOR::Black);
+		} else if(cmd_.cmp_word(0, "image")) { // image load, draw
 			if(cmdn >= 2) {
 				char tmp[128];
 				cmd_.get_word(1, tmp, sizeof(tmp));
@@ -277,7 +279,8 @@ namespace {
 			}
 		} else if(cmd_.cmp_word(0, "help")) {
 			shell_.help();
-			utils::format("    image [filename]\n");
+			utils::format("    clear               clear screen\n");
+			utils::format("    image [filename]    load image file\n");
 			utils::format("    write filename      test for write\n");
 			utils::format("    read filename       test for read\n");
 		} else {
