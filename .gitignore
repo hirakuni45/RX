@@ -7,9 +7,10 @@
 *.exe
 *.bak
 *.bck
+*.lib
+*.dcm
 *.kicad_pcb-bak
 *.kicad_mod
-*-cache.lib
 *.sch-bak
 release/
 debug/
