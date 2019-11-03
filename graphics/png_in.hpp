@@ -213,7 +213,7 @@ namespace img {
 			bool alpha;
 			bool gray = false;
 			bool indexed = false;
-   			png_bytep ta = 0;
+   			png_bytep ta = nullptr;
 		   	int nt = 0;
 		   	png_color_16p tc = 0;
 			if(color_type == PNG_COLOR_TYPE_GRAY) {
@@ -279,9 +279,11 @@ namespace img {
 						p += skip;
 						if(i < clut_num) {
 							const png_color* clut = &clut_ptr[i];
-///							img_->put_pixel(pos, i);
-							if(ta != nullptr && ta[i] == 0) continue;
-							plot_(pos.x, pos.y, clut->red, clut->green, clut->blue);
+							uint8_t a = 255;
+							if(alpha) {
+								a = ta[i];
+							}
+							plot_(pos.x, pos.y, clut->red, clut->green, clut->blue, a);
 						}
 					} else {
 						if(gray) {
@@ -310,9 +312,7 @@ namespace img {
 								c.a = 0;
 							}
 						}
-						if(c.a != 0) {
-							plot_(pos.x, pos.y, c.r, c.g, c.b);
-						}
+						plot_(pos.x, pos.y, c.r, c.g, c.b, c.a);
 					}
 				}
 				prgl_pos_ = pos.y;

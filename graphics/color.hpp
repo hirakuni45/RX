@@ -99,7 +99,7 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	カラーの合成
+			@brief	RGB565 カラーの合成
 			@param[in]	c0	カラーＡ
 			@param[in]	c1	カラーＢ
 			@return 合成されたカラー
@@ -120,6 +120,44 @@ namespace graphics {
 			b >>= 1;
 			b &= 0b0000000000011111;
 			return r | g | b;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	RGB565 カラーから RGBA888 への変換
+			@param[in]	src		ソースカラー
+			@return 変換されたカラー
+		*/
+		//-----------------------------------------------------------------//
+		static rgba8_t conv_rgba8(uint16_t src) noexcept {
+			uint8_t r = (src & 0b1111100000000000) >> 8;
+			r |= r >> 5;
+			uint8_t g = (src & 0b0000011111100000) >> 3;
+			g |= g >> 6;
+			uint8_t b = (src & 0b0000000000011111) << 3;
+			b |= b >> 5;
+			rgba8_t t(r, g, b);
+			return t;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	アルファ・ブレンド
+			@param[in]	dst		元カラー
+			@param[in]	src		合成カラー
+			@return ブレンドされたカラー
+		*/
+		//-----------------------------------------------------------------//
+		static rgba8_t blend(const rgba8_t& dst, const rgba8_t& src) noexcept {
+			uint16_t aa = 256 - (src.a + 1);
+			uint16_t ba = src.a + 1;
+			uint16_t r = (dst.r * aa) + (src.r * ba);
+			uint16_t g = (dst.g * aa) + (src.g * ba);
+			uint16_t b = (dst.b * aa) + (src.b * ba);
+			rgba8_t t(r >> 8, g >> 8, b >> 8);
+			return t;
 		}
 	};
 
