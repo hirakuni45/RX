@@ -64,8 +64,6 @@ namespace audio {
 
 		static SOUND_OUT	sound_out_;
 
-//		static volatile uint32_t cycle_count_;
-
 		class tpu_task {
 		public:
 			void operator() () {
@@ -74,7 +72,6 @@ namespace audio {
 				if((tmp ^ wpos_) & 64) {
 					sound_out_.service(64);
 				}
-//				cycle_count_ += 1361;
 			}
 		};
 
@@ -237,8 +234,7 @@ namespace audio {
 		*/
 		//-----------------------------------------------------------------//
 		codec(RDR& rdr) noexcept :
-			rdr_(rdr), dlist_(), scaling_(rdr),
-			jpeg_(scaling_)
+			rdr_(rdr), dlist_(), scaling_(rdr), jpeg_(scaling_)
 		{ }
 
 

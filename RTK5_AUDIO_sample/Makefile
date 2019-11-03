@@ -40,7 +40,7 @@ PSOURCES	=	main.cpp \
 				graphics/color.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++ mad drw2d
+USER_LIBS	=	supc++ drw2d mad png m z
 
 LDSCRIPT	=	../$(ROOT_DEV_)/$(DEVICE).ld
 
@@ -73,10 +73,9 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes \
-				./emu ./emu/cpu ./emu/nes ./emu/mappers ./emu/sndhrdw ./emu/libsnss
+INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
 
-LIB_ROOT	=	../libmad/.libs ../RX65x/drw_2d_ver1.02
+LIB_ROOT	=	../RX65x/drw_2d_ver1.02 ../libmad/.libs ../zlib ../libpng
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

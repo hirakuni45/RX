@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  RX65N オーディオファイル再生サンプル
+    @brief  RX65N Envision Kit オーディオ再生サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -44,7 +44,7 @@ namespace {
 
 #ifdef ENABLE_FAMIPAD
 	// Famicon PAD (CMOS 4021B Shift Register)
-	// 電源は、微小なので、接続を簡単に行う為、ポート出力を使う
+	// 電源は、微小なので、接続を簡単に行う為、ポート出力を電源として利用
 	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_VCC;
 	typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_GND;
 	typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_P_S;
@@ -68,7 +68,7 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 
 #ifdef USE_SDHI
-	// RX65N Envision Kit の SDHI ポートは、候補３になっている
+	// RX65N Envision Kit の SDHI ポートは、候補３で指定できる
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
 	SDHI		sdh_;
 #else
@@ -84,7 +84,7 @@ namespace {
 	typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
 	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD   カード検出
 
-	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
+	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // SPI ハードウェアー定義
 
 	MMC			sdh_(spi_, 35000000);
 #endif
@@ -115,11 +115,12 @@ namespace {
 	FONT		font_(afont_, kfont_);
 
 //	typedef device::drw2d_mgr<GLCDC_IO, FONT> RENDER;
+	// ソフトウェアーレンダラー
 	typedef graphics::render<GLCDC_IO, FONT> RENDER;
 	RENDER		render_(glcdc_io_, font_);
 
-	typedef img::bmp_in<RENDER> BMP_IN;
-	BMP_IN		bmp_in_(render_);
+	typedef img::img_in<RENDER> IMG_IN;
+	IMG_IN		img_in_(render_);
 
 	typedef graphics::def_color DEF_COLOR;
 
@@ -254,29 +255,18 @@ namespace {
 			} else {
 				audio_.play_loop("", "");
 			}
-		} else if(cmd_.cmp_word(0, "jpeg")) {
+		} else if(cmd_.cmp_word(0, "img")) {
 			if(cmdn >= 2) {
 				char tmp[256];
 				cmd_.get_word(1, tmp, sizeof(tmp));
-				audio_.at_scaling().set_offset();
-				audio_.at_scaling().set_scale();
-				if(!audio_.at_jpeg_in().load(tmp)) {
-					utils::format("Can't load JPEG file: '%s'\n") % tmp;
-				}
-			}
-		} else if(cmd_.cmp_word(0, "bmp")) {
-			if(cmdn >= 2) {
-				char tmp[256];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				if(!bmp_in_.load(tmp)) {
-					utils::format("Can't load BMP file: '%s'\n") % tmp;
+				if(!img_in_.load(tmp)) {
+					utils::format("Can't load image file: '%s'\n") % tmp;
 				}
 			}
 		} else if(cmd_.cmp_word(0, "help")) {
 			shell_.help();
 			utils::format("    play [filename, *]\n");
-			utils::format("    jpeg [filename]\n");
-			utils::format("    bmp [filename]\n");
+			utils::format("    img [filename]\n");
 		} else {
 			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
