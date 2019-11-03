@@ -321,7 +321,7 @@ namespace img {
 
 			png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
 
-			return false;
+			return true;
 		}
 
 
