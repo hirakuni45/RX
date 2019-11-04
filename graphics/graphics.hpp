@@ -913,8 +913,17 @@ namespace graphics {
 		*/
 		//-----------------------------------------------------------------//
 		void operator() (int16_t x, int16_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) noexcept {
-			auto c = SHARE_COLOR::to_565(r, g, b);
-			plot(vtx::spos(x + ofs_.x, y + ofs_.y), c);			
+			if(a == 0) return;
+			else if(a == 255) {
+				auto c = SHARE_COLOR::to_565(r, g, b);
+				plot(vtx::spos(x + ofs_.x, y + ofs_.y), c);
+			} else {
+				auto rc = get_plot(vtx::spos(x + ofs_.x, y + ofs_.y));
+				auto ac = share_color::conv_rgba8(rc);
+				auto t = share_color::blend(ac, rgba8_t(r, g, b, a));
+				auto dc = share_color(t.r, t.g, t.b);
+				plot(vtx::spos(x + ofs_.x, y + ofs_.y), dc.rgb565);
+			}
 		}
 	};
 }
