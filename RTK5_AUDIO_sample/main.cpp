@@ -255,6 +255,8 @@ namespace {
 			} else {
 				audio_.play_loop("", "");
 			}
+		} else if(cmd_.cmp_word(0, "clear")) {
+			render_.clear(DEF_COLOR::Black);
 		} else if(cmd_.cmp_word(0, "img")) {
 			if(cmdn >= 2) {
 				char tmp[256];
@@ -266,6 +268,7 @@ namespace {
 		} else if(cmd_.cmp_word(0, "help")) {
 			shell_.help();
 			utils::format("    play [filename, *]\n");
+			utils::format("    clear\n");
 			utils::format("    img [filename]\n");
 		} else {
 			utils::format("Command error: '%s'\n") % cmd_.get_command();
