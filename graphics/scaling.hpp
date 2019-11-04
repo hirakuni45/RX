@@ -303,8 +303,15 @@ namespace img {
 				if(rc == 0) {
 					render_.plot(vtx::spos(xx + ofs_.x, yy + ofs_.y), sc.rgb565);
 				} else {
-					auto nc = graphics::share_color::color_sum(sc.rgb565, rc);
-					render_.plot(vtx::spos(xx + ofs_.x, yy + ofs_.y), nc);
+					if(a == 255) {
+						auto nc = graphics::share_color::color_sum(sc.rgb565, rc);
+						render_.plot(vtx::spos(xx + ofs_.x, yy + ofs_.y), nc);
+					} else {
+						auto ac = graphics::share_color::conv_rgba8(rc);
+						auto t = graphics::share_color::blend(ac, graphics::rgba8_t(r, g, b, a));
+						auto dc = graphics::share_color(t.r, t.g, t.b);
+						render_.plot(vtx::spos(x + ofs_.x, y + ofs_.y), dc.rgb565);
+					}
 				}
 			} else if(scale_.up > scale_.dn) {
 				auto d  = (scale_.up + (scale_.dn - 1)) / scale_.dn;
@@ -316,7 +323,6 @@ namespace img {
 				if(a == 255) {
 					render_.plot(vtx::spos(x + ofs_.x, y + ofs_.y), sc.rgb565);
 				} else {
-// utils::format("Alpha: %d\n") % static_cast<int>(a);
 					auto rc = render_.get_plot(vtx::spos(x + ofs_.x, y + ofs_.y));
 					auto ac = graphics::share_color::conv_rgba8(rc);
 					auto t = graphics::share_color::blend(ac, graphics::rgba8_t(r, g, b, a));
