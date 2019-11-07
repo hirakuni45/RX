@@ -7,13 +7,14 @@
 			・I2C 割り込み対応 @n
 			・２点同時までのタッチ位置を補足
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
 #include <cstdint>
 #include "common/delay.hpp"
+#include "common/vtx.hpp"
 
 namespace chip {
 
@@ -43,24 +44,21 @@ namespace chip {
 			@brief  Touch Struct
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct xy {
+		struct touch_t {
 			EVENT		before;	///< Touch Event (before)
 			EVENT		event;	///< Touch Event
 			uint8_t		id;		///< Touch ID
-			int16_t		x;		///< Touch Position X
-			int16_t		y;		///< Touch Position Y
-			int16_t		org_x;	///< Touch Down Position X
-			int16_t		org_y;	///< Touch Down Position Y
-			int16_t		end_x;	///< Touch Up Position X
-			int16_t		end_y;	///< Touch Up Position Y
+			vtx::spos	pos;	///< Touch Position
+			vtx::spos	org;	///< Touch Down Position
+			vtx::spos	end;	///< Touch Up Position
 
 			//-------------------------------------------------------------//
 			/*!
 				@brief	コンストラクター
 			 */
 			//-------------------------------------------------------------//
-			xy() noexcept : before(EVENT::NONE), event(EVENT::NONE), id(0), x(0), y(0),
-				   org_x(0), org_y(0), end_x(0), end_y(0) { }
+			touch_t() noexcept : before(EVENT::NONE), event(EVENT::NONE), id(0),
+				pos(0), org(0), end(0) { }
 
 
 			//-------------------------------------------------------------//
@@ -71,9 +69,8 @@ namespace chip {
 			//-------------------------------------------------------------//
 			uint32_t length_sqr() const noexcept
 			{
-				auto dx = end_x - org_x;
-				auto dy = end_y - org_y;
-				return dx * dx + dy * dy;
+				auto d = end - org;
+				return d.x * d.x + d.y * d.y;
 			} 
 		};
 
@@ -148,7 +145,7 @@ namespace chip {
 		uint16_t	version_;
 		uint8_t		chip_;
 		uint8_t		touch_tmp_[12];
-		xy			xy_[2];
+		touch_t		t_[2];
 
 
 		void write_(REG reg, uint8_t data) noexcept
@@ -177,28 +174,28 @@ namespace chip {
 			touch_id_  = touch_tmp_[0];  // GEST_ID
 			touch_num_ = touch_tmp_[1] & 0x0f;  // TD_STATUS
 
-			xy_[0].before = xy_[0].event;
-			xy_[0].event = static_cast<EVENT>(touch_tmp_[2] >> 6);
-			xy_[0].id = touch_tmp_[4] >> 4;
-			xy_[0].x = (static_cast<int16_t>(touch_tmp_[2] & 0x0F) << 8)
+			t_[0].before = t_[0].event;
+			t_[0].event = static_cast<EVENT>(touch_tmp_[2] >> 6);
+			t_[0].id = touch_tmp_[4] >> 4;
+			t_[0].pos.x = (static_cast<int16_t>(touch_tmp_[2] & 0x0F) << 8)
 				| static_cast<int16_t>(touch_tmp_[3]);
-			xy_[0].y = (static_cast<int16_t>(touch_tmp_[4] & 0x0F) << 8)
+			t_[0].pos.y = (static_cast<int16_t>(touch_tmp_[4] & 0x0F) << 8)
 				| static_cast<int16_t>(touch_tmp_[5]);
 
-			xy_[1].before = xy_[1].event;
-			xy_[1].event = static_cast<EVENT>(touch_tmp_[8] >> 6);
-			xy_[1].id = touch_tmp_[10] >> 4;
-			xy_[1].x = (static_cast<int16_t>(touch_tmp_[8] & 0x0F) << 8)
+			t_[1].before = t_[1].event;
+			t_[1].event = static_cast<EVENT>(touch_tmp_[8] >> 6);
+			t_[1].id = touch_tmp_[10] >> 4;
+			t_[1].pos.x = (static_cast<int16_t>(touch_tmp_[8] & 0x0F) << 8)
 				| static_cast<int16_t>(touch_tmp_[9]);
-			xy_[1].y = (static_cast<int16_t>(touch_tmp_[10] & 0x0F) << 8)
+			t_[1].pos.y = (static_cast<int16_t>(touch_tmp_[10] & 0x0F) << 8)
 				| static_cast<int16_t>(touch_tmp_[11]);
 
 			// イベントが不正なら、無効にする。
-//			if(xy_[0].event == EVENT::NONE || xy_[1].event == EVENT::NONE) {
+//			if(t_[0].event == EVENT::NONE || t_[1].event == EVENT::NONE) {
 //				touch_num_ = 0;
 //			}
 #if 1
-			if(xy_[0].event == EVENT::DOWN || xy_[1].event == EVENT::DOWN) {
+			if(t_[0].event == EVENT::DOWN || t_[1].event == EVENT::DOWN) {
 				startup_ = true;
 			}
 			if(!startup_) {
@@ -224,7 +221,7 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		FT5206(I2C& i2c) noexcept : i2c_(i2c), touch_id_(0), touch_num_(0),
 			start_(false), startup_(false),
-			version_(0), chip_(0), touch_tmp_{ 0 }, xy_{ } { }
+			version_(0), chip_(0), touch_tmp_{ 0 }, t_{ } { }
 
 
 		//-----------------------------------------------------------------//
@@ -314,12 +311,10 @@ namespace chip {
 			request_touch_();
 
 			for(uint8_t i = 0; i < 2; ++i) {
-				if(xy_[i].event == EVENT::DOWN) {
-					xy_[i].org_x = xy_[i].x;
-					xy_[i].org_y = xy_[i].y;
-				} else if(xy_[i].event == EVENT::UP) {
-					xy_[i].end_x = xy_[i].x;
-					xy_[i].end_y = xy_[i].y;
+				if(t_[i].event == EVENT::DOWN) {
+					t_[i].org = t_[i].pos;
+				} else if(t_[i].event == EVENT::UP) {
+					t_[i].end = t_[i].pos;
 				}
 			}
 		}
@@ -341,6 +336,6 @@ namespace chip {
 			@return タッチ位置
 		 */
 		//-----------------------------------------------------------------//
-		const xy& get_touch_pos(uint8_t idx) const noexcept { return xy_[idx & 1]; }
+		const touch_t& get_touch_pos(uint8_t idx) const noexcept { return t_[idx & 1]; }
 	};
 }
