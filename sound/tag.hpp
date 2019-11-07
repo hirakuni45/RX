@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Audio タグ・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -42,6 +42,13 @@ namespace sound {
 			uint32_t	ofs_;
 			uint32_t	len_;
 			apic_t() : typ_(0), ext_{ 0 }, ofs_(0), len_(0) { }
+			apic_t& operator = (const apic_t& t) noexcept {
+				typ_ = t.typ_;
+				std::memcpy(ext_, t.ext_, sizeof(ext_));
+				ofs_ = t.ofs_;
+				len_ = t.len_;
+				return *this;
+			}
 		};
 	private:
 		apic_t	apic_;
@@ -196,5 +203,22 @@ namespace sound {
 		*/
 		//-------------------------------------------------------------//
 		const apic_t& get_apic() const noexcept { return apic_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	コピー・オペレーター
+		*/
+		//-------------------------------------------------------------//
+		tag_t& operator = (const tag_t& ths) noexcept {
+			album_  = ths.album_;
+			title_  = ths.title_;
+			artist_ = ths.artist_;
+			year_   = ths.year_;
+			disc_   = ths.disc_;
+			track_  = ths.track_;
+			apic_   = ths.apic_;
+			return *this;
+		}
 	};
 }

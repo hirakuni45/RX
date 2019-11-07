@@ -60,7 +60,7 @@ namespace sound {
 		}
 
 
-		static bool get_text_(utils::file_io& fin, char* dst, uint32_t& len) noexcept
+		static bool get_text64_(utils::file_io& fin, char* dst, uint32_t& len) noexcept
 		{
 			for(int i = 0; i < 64; ++i) {
 				char ch;
@@ -153,11 +153,15 @@ namespace sound {
 			if(apic) {
 				if(v2_3) {
 					char tmp[64];
-					if(!get_text_(fin, tmp, len)) {
+					if(!get_text64_(fin, tmp, len)) {
 						return false;
 					}
 					if(strcmp(tmp, "image/jpeg") == 0) {
 						strcpy(tag_.at_apic().ext_, "jpg");
+					} else if(strcmp(tmp, "image/png") == 0) {
+						strcpy(tag_.at_apic().ext_, "png");
+					} else if(strcmp(tmp, "image/bmp") == 0) {
+						strcpy(tag_.at_apic().ext_, "bmp");
 					}
 					if(fin.read(&tag_.at_apic().typ_, 1) != 1) {
 						return false;
