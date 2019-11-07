@@ -18,7 +18,7 @@ namespace gui {
 		@brief	ファイラー制御型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class filer_ctrl {
+	enum class filer_ctrl : uint8_t {
 		MOUNT,		///< ＳＤカードのマウント状態
 		OPEN,		///< ファイラーを起動
 		UP,			///< スクロール上
@@ -102,15 +102,12 @@ namespace gui {
 		bool		touch_pos_;
 		bool		touch_neg_;
 		uint8_t		touch_num_;
-		int16_t		touch_x_;
-		int16_t		touch_y_;
-		int16_t		touch_org_x_;
-		int16_t		touch_org_y_;
-		int16_t		touch_end_x_;
-		int16_t		touch_end_y_;
+		vtx::spos	touch_;
+		vtx::spos	touch_org_;
+		vtx::spos	touch_end_;
 
 		uint8_t		back_num_;
-
+		bool		tto_;
 		uint16_t	repeat_;
 
 
@@ -191,14 +188,14 @@ namespace gui {
 		/*!
 			@brief	コンストラクター
 			@param[in]	rdr		レンダリング・インスタンス
+			@param[in]	tto		３本指タッチオープンを無効にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		filer(RDR& rdr) noexcept : rdr_(rdr), dlist_(),
+		filer(RDR& rdr, bool tto = true) noexcept : rdr_(rdr), dlist_(),
 			ctrl_(0), rdr_st_(), open_(false), info_(false), 
 			touch_lvl_(false), touch_pos_(false), touch_neg_(false), touch_num_(0),
-			touch_x_(0), touch_y_(0),
-			touch_org_x_(0), touch_org_y_(0), touch_end_x_(0), touch_end_y_(0),
-			back_num_(0), repeat_(0)
+			touch_(0), touch_org_(0), touch_end_(0),
+			back_num_(0), tto_(tto), repeat_(0)
 		{ }
 
 
@@ -229,29 +226,34 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	ファイラーの状態を返す。
+			@return ファイラーの状態、「true」ならファイラーが有効
+		*/
+		//-----------------------------------------------------------------//
+		bool get_state() const noexcept { return open_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	スクリーン・タッチ位置設定 @n
 					※タッチ情報は毎フレーム設定する事。
 			@param[in]	num		タッチ数
-			@param[in]	x		タッチＸ
-			@param[in]	y		タッチＹ
+			@param[in]	pos		タッチ位置
 		*/
 		//-----------------------------------------------------------------//
-		void set_touch(uint8_t num, int16_t x, int16_t y) noexcept
+		void set_touch(uint8_t num, const vtx::spos& pos) noexcept
 		{
 			touch_num_ = num;
 			bool lvl = num > 0;
 			touch_pos_ = !touch_lvl_ &  lvl;
 			touch_neg_ =  touch_lvl_ & !lvl;
 			touch_lvl_ = lvl;
-			touch_x_ = x;
-			touch_y_ = y;
+			touch_ = pos;
 			if(touch_pos_) {
-				touch_org_x_ = touch_x_;
-				touch_org_y_ = touch_y_;
+				touch_org_ = touch_;
 			}
 			if(touch_neg_) {
-				touch_end_x_ = touch_x_;
-				touch_end_y_ = touch_y_;
+				touch_end_ = touch_;
 			}
 		}
 
@@ -284,7 +286,14 @@ namespace gui {
 				return false;
 			}
 
-			if((ptrg & ctrl_mask_(filer_ctrl::OPEN)) != 0 || (back_num_ == 3 && touch_num_ < 3)) {
+			bool opt = false;
+			if(back_num_ == 3 && touch_num_ < 3) {
+				if(!tto_ && !open_) ;  // 3 touch open が無効な場合 
+				else {
+					opt = true;
+				}
+			}
+			if((ptrg & ctrl_mask_(filer_ctrl::OPEN)) != 0 || opt) {
 				open_ = !open_;
 				rdr_.clear(DEF_COLOR::Black);
 				if(open_) {
@@ -304,23 +313,23 @@ namespace gui {
 
 			{  // ドラッグでフォーカス移動
 				if(touch_neg_) {
-					auto dx = touch_x_ - touch_org_x_;
+					auto dx = touch_.x - touch_org_.x;
 					if(dx >= FLN * 2) {
 						ptrg |= ctrl_mask_(filer_ctrl::SELECT);
-						touch_org_x_ = touch_x_;
+						touch_org_.x = touch_.x;
 					} else if(dx <= -FLN * 2) {
 						ptrg |= ctrl_mask_(filer_ctrl::BACK);
-						touch_org_x_ = touch_x_;
+						touch_org_.x = touch_.x;
 					}
 				}
 				if(touch_lvl_) {
-					auto dy = touch_y_ - touch_org_y_;
+					auto dy = touch_.y - touch_org_.y;
 					if(dy >= FLN) {
 						ptrg |= ctrl_mask_(filer_ctrl::DOWN);
-						touch_org_y_ = touch_y_;
+						touch_org_.y = touch_.y;
 					} else if(dy <= -FLN) {
 						ptrg |= ctrl_mask_(filer_ctrl::UP);
-						touch_org_y_ = touch_y_;
+						touch_org_.y = touch_.y;
 					}
 				}
 			}

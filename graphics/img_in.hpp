@@ -86,6 +86,23 @@ namespace img {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	画像ファイルローダーの選択
+			@param[in]	ext		画像ファイルの拡張子
+			@return エラーなら「false」を返す
+		*/
+		//-----------------------------------------------------------------//
+		bool select_decoder(const char* ext) noexcept {
+			if(ext == nullptr) return false;
+
+			char tmp[8];
+			tmp[0] = '.';
+			strcpy(&tmp[1], ext); 
+			return img_switch_(tmp);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	画像ファイルか確認する
 			@param[in]	fin	file_io クラス
 			@return エラーなら「false」を返す
@@ -128,6 +145,7 @@ namespace img {
 			}
 			auto ret = probe(fin);
 			fin.close();
+			type_ = TYPE::NONE;
 			return ret;
 		}
 
@@ -178,6 +196,7 @@ namespace img {
 			}
 			auto ret = info(fin, fo);
 			fin.close();
+			type_ = TYPE::NONE;
 			return ret;
 		}
 
@@ -229,6 +248,7 @@ namespace img {
 			}
 			auto ret = load(fin, opt);
 			fin.close();
+			type_ = TYPE::NONE;
 			return ret;
 		}
 	};
