@@ -8,6 +8,7 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
+#include "common/cmt_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/sci_i2c_io.hpp"
@@ -18,27 +19,16 @@
 #include "common/command.hpp"
 #include "common/shell.hpp"
 
-#include "graphics/font8x16.hpp"
-#include "graphics/kfont.hpp"
-#include "graphics/graphics.hpp"
-#include "graphics/filer.hpp"
-#include "graphics/dialog.hpp"
-#include "graphics/img_in.hpp"
-#include "graphics/widget_director.hpp"
-
-#include "chip/FAMIPAD.hpp"
-#include "chip/FT5206.hpp"
-
 #include "audio_codec.hpp"
 #include "audio_gui.hpp"
-
-// SDHI インターフェースを利用する場合
-#define USE_SDHI
 
 // ファミコン PAD での操作を有効にする場合
 // #define ENABLE_FAMIPAD
 
 namespace {
+
+    typedef device::cmt_io<device::CMT0> CMT;
+    CMT         cmt_;
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 
@@ -67,27 +57,9 @@ namespace {
 //	typedef device::NULL_PORT SDC_POWER;
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 
-#ifdef USE_SDHI
 	// RX65N Envision Kit の SDHI ポートは、候補３で指定できる
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
 	SDHI		sdh_;
-#else
-	// Soft SDC 用　SPI 定義（SPI）
-	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
-	typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  // CMD
-	typedef device::PORT<device::PORT2, device::bitpos::B1> SPCK;  // CLK
-
-	typedef device::spi_io2<MISO, MOSI, SPCK> SPI;  ///< Soft SPI 定義
-
-	SPI			spi_;
-
-	typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
-	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD   カード検出
-
-	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // SPI ハードウェアー定義
-
-	MMC			sdh_(spi_, 35000000);
-#endif
 
 	typedef utils::command<256> CMD;
 	CMD			cmd_;
@@ -95,71 +67,23 @@ namespace {
 	typedef utils::shell<CMD> SHELL;
 	SHELL		shell_(cmd_);
 
-	// GLCDC
-	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
-	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	static const int16_t LCD_X = 480;
-	static const int16_t LCD_Y = 272;
-	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
-	static const auto PIX = graphics::pixel::TYPE::RGB565;
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
-	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
+	typedef app::audio_gui GUI;
+	GUI			gui_;
 
-	typedef graphics::font8x16 AFONT;
-	AFONT		afont_;
-//  for cash into SD card /kfont16.bin
-//	typedef graphics::kfont<16, 16, 64> KFONT;
-	typedef graphics::kfont<16, 16> KFONT;
-	KFONT		kfont_;
-	typedef graphics::font<AFONT, KFONT> FONT;
-	FONT		font_(afont_, kfont_);
+	typedef audio::codec<GUI::RENDER> AUDIO;
+	AUDIO		audio_(gui_.at_render());
 
-//	typedef device::drw2d_mgr<GLCDC_IO, FONT> RENDER;
-	// ソフトウェアーレンダラー
-	typedef graphics::render<GLCDC_IO, FONT> RENDER;
-	RENDER		render_(glcdc_io_, font_);
+//	int16_t		touch_org_ = 0;
+//	uint8_t		touch_num_ = 0;
 
-	typedef img::img_in<RENDER> IMG_IN;
-	IMG_IN		img_in_(render_);
+    struct name_t {
+        char filename_[256];
+        volatile uint32_t put_;
+        volatile uint32_t get_;
+        name_t() : filename_{ 0 }, put_(0), get_(0) { }
+    };
 
-	typedef graphics::def_color DEF_COLOR;
-
-	// FT5206, SCI6 簡易 I2C 定義
-	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
-	typedef utils::fixed_fifo<uint8_t, 64> RB6;
-	typedef utils::fixed_fifo<uint8_t, 64> SB6;
-	typedef device::sci_i2c_io<device::SCI6, RB6, SB6,
-		device::port_map::option::FIRST_I2C> FT5206_I2C;
-
-	FT5206_I2C	ft5206_i2c_;
-	typedef chip::FT5206<FT5206_I2C> TOUCH;
-	TOUCH		touch_(ft5206_i2c_);
-	// INT to P02(IRQ10)
-
-	typedef gui::dialog<RENDER, TOUCH> DIALOG;
-	DIALOG		dialog_(render_, touch_); 
-
-	typedef gui::filer<RENDER> FILER;
-	FILER		filer_(render_);
-
-	typedef audio::codec<RENDER> AUDIO;
-	AUDIO		audio_(render_);
-
-	typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
-	WIDD		widd_(render_, touch_);
-
-	int16_t		touch_org_ = 0;
-	uint8_t		touch_num_ = 0;
-
-
-	bool check_mount_() {
-		auto f = sdh_.get_mount();
-		if(!f) {
-			utils::format("SD card not mount.\n");
-		}
-		return f;
-	}
-
+    name_t      name_t_;
 
 	void update_led_()
 	{
@@ -178,8 +102,6 @@ namespace {
 
 	sound::af_play::CTRL sound_ctrl_task_()
 	{
-		touch_.update();
-
 		auto ctrl = sound::af_play::CTRL::NONE;
 #ifdef ENABLE_FAMIPAD
 		uint8_t level = famipad_.update();
@@ -202,8 +124,8 @@ namespace {
 			render_.clear(DEF_COLOR::Black);
 		}
 #endif
-		update_led_();
 
+#if 0
 		auto tnum = touch_.get_touch_num();
 		const auto& xy = touch_.get_touch_pos(0);
 		if(touch_num_ == 2 && tnum < 2) {  // pause（２点タッチが離された瞬間）
@@ -227,7 +149,7 @@ namespace {
 			}
 		}
 		touch_num_ = tnum;
-
+#endif
 		return ctrl;
 	}
 
@@ -248,20 +170,20 @@ namespace {
 				char tmp[128];
 				cmd_.get_word(1, tmp, sizeof(tmp));
 				if(std::strcmp(tmp, "*") == 0) {
-					audio_.play_loop("", "");
+///					audio_.play_loop("", "");
 				} else {
-					audio_.play_file(tmp);
+///					audio_.play_file(tmp);
 				}
 			} else {
-				audio_.play_loop("", "");
+///				audio_.play_loop("", "");
 			}
 		} else if(cmd_.cmp_word(0, "clear")) {
-			render_.clear(DEF_COLOR::Black);
+			gui_.at_render().clear(GUI::DEF_COLOR::Black);
 		} else if(cmd_.cmp_word(0, "img")) {
 			if(cmdn >= 2) {
 				char tmp[256];
 				cmd_.get_word(1, tmp, sizeof(tmp));
-				if(!img_in_.load(tmp)) {
+				if(!audio_.at_img_in().load(tmp)) {
 					utils::format("Can't load image file: '%s'\n") % tmp;
 				}
 			}
@@ -276,16 +198,16 @@ namespace {
 	}
 }
 
-/// widget の登録
+/// widget の登録・グローバル関数
 bool insert_widget(gui::widget* w)
 {
-    return widd_.insert(w);
+    return gui_.insert_widget(w);
 }
 
-/// widget の解除
+/// widget の解除・グローバル関数
 void remove_widget(gui::widget* w)
 {
-    widd_.remove(w);
+    gui_.remove_widget(w);
 }
 
 
@@ -303,22 +225,36 @@ extern "C" {
 	}
 #endif
 
-	void sci_putch(char ch)
-	{
-		sci_.putch(ch);
-	}
+    void sci_putch(char ch)
+    {
+        static volatile bool lock_ = false;
+        while(lock_) ;
+        lock_ = true;
+        sci_.putch(ch);
+        lock_ = false;
+    }
 
 
-	void sci_puts(const char* str)
-	{
-		sci_.puts(str);
-	}
+    void sci_puts(const char* str)
+    {
+        static volatile bool lock_ = false;
+        while(lock_) ;
+        lock_ = true;
+        sci_.puts(str);
+        lock_ = false;
+    }
 
 
-	char sci_getch(void)
-	{
-		return sci_.getch();
-	}
+    // syscalls.c から呼ばれる、標準入力（stdin）
+    char sci_getch(void)
+    {
+        static volatile bool lock_ = false;
+        while(lock_) ;
+        lock_ = true;
+        auto ch = sci_.getch();
+        lock_ = false;
+        return ch;
+    }
 
 
 	uint16_t sci_length()
@@ -356,6 +292,111 @@ extern "C" {
 		time_t t = 0;
 		return utils::str::get_fattime(t);
 	}
+
+
+    void vApplicationMallocFailedHook(void)
+    {
+        taskDISABLE_INTERRUPTS();
+        for( ;; );
+    }
+
+
+    void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
+    {
+        ( void ) pcTaskName;
+        ( void ) pxTask;
+
+        taskDISABLE_INTERRUPTS();
+        for( ;; );
+    }
+
+
+    void vApplicationIdleHook(void) { }
+
+
+    void vApplicationTickHook(void) { }
+
+
+    void vAssertCalled(void)
+    {
+        volatile unsigned long ul = 0;
+
+        taskENTER_CRITICAL();
+        {
+            /* Use the debugger to set ul to a non-zero value in order to step out
+            of this function to determine why it was called. */
+            while( ul == 0 )
+            {
+                portNOP();
+            }
+        }
+        taskEXIT_CRITICAL();
+    }
+
+    extern void vTickISR(void);
+    extern void vSoftwareInterruptISR(void);
+
+    void vApplicationSetupTimerInterrupt(void)
+    {
+        uint8_t intr = configKERNEL_INTERRUPT_PRIORITY;
+        cmt_.start(configTICK_RATE_HZ, intr, vTickISR);
+
+        device::icu_mgr::set_task(device::ICU::VECTOR::SWINT, vSoftwareInterruptISR);
+        device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, configKERNEL_INTERRUPT_PRIORITY);
+    }
+}
+
+
+namespace {
+
+	void codec_task_(void *pvParameters)
+	{
+		// オーディオの開始
+///		audio_.set_ctrl_task(sound_ctrl_task_);
+		audio_.start();
+
+		while(1) {
+			if(name_t_.get_ != name_t_.put_) {
+				if(strlen(name_t_.filename_) == 0) {
+					audio_.play_loop("", "");
+				} else {
+					if(std::strcmp(name_t_.filename_, "*") == 0) {
+						audio_.play_loop("", "");
+					} else {
+						audio_.play_loop("", name_t_.filename_);
+					}
+				}
+				++name_t_.get_;
+			}
+			audio_.service();
+
+			vTaskDelay(10 / portTICK_PERIOD_MS);
+		}
+	}
+
+
+	void main_task_(void *pvParameters)
+	{
+		cmd_.set_prompt("# ");
+
+		LED::DIR = 1;
+
+		gui_.start();
+		gui_.setup_touch_panel();
+
+		gui_.open();  // 標準 GUI
+
+		while(1) {
+			if(gui_.update(sdh_.get_mount())) {
+				strncpy(name_t_.filename_, gui_.get_filename(), sizeof(name_t_.filename_));
+				name_t_.put_++;
+			}
+
+			command_();
+			sdh_.service();
+			update_led_();
+		}
+	}
 }
 
 int main(int argc, char** argv);
@@ -374,130 +415,20 @@ int main(int argc, char** argv)
 	}
 
 	utils::format("RTK5RX65N Start for AUDIO sample\n");
-	cmd_.set_prompt("# ");
 
-	{  // GLCDC の初期化
-		LCD_DISP::DIR  = 1;
-		LCD_LIGHT::DIR = 1;
-		LCD_DISP::P  = 0;  // DISP Disable
-		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-		if(glcdc_io_.start()) {
-			utils::format("Start GLCDC\n");
-			LCD_DISP::P  = 1;  // DISP Enable
-			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-			if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
-				utils::format("GLCDC ctrl fail...\n");
-			}
-		} else {
-			utils::format("GLCDC Fail\n");
-		}
-	}
+    {
+        uint32_t stack_size = 4096;
+        void* param = nullptr;
+        uint32_t prio = 2;
+        xTaskCreate(codec_task_, "Codec", stack_size, param, prio, nullptr);
+    }
 
-	{  // DRW2D 初期化
-		auto ver = render_.get_version();
-		utils::format("DRW2D Version: %04X\n") % ver;
-		if(render_.start()) {
-			utils:: format("Start DRW2D\n");
-		} else {
-			utils:: format("DRW2D Fail\n");
-		}
-	}
+    {
+        uint32_t stack_size = 8192;
+        void* param = nullptr;
+        uint32_t prio = 1;
+        xTaskCreate(main_task_, "Main", stack_size, param, prio, nullptr);
+    }
 
-#ifdef ENABLE_FAMIPAD
-	{  // ファミコンパッド初期化
-		PAD_VCC::DIR = 1;
-		PAD_VCC::P = 1;
-		PAD_GND::DIR = 1;
-		PAD_GND::P = 0;
-		famipad_.start();
-	}
-#endif
-
-	{  // FT5206 touch screen controller
-		TOUCH::reset<FT5206_RESET>();
-		uint8_t intr_lvl = 1;
-		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
-			utils::format("FT5206 I2C Start Fail...\n");
-		}
-		if(!touch_.start()) {
-			utils::format("FT5206 Start Fail...\n");
-		}
-	}
-
-	LED::DIR = 1;
-
-	// オーディオの開始
-	{
-		audio_.set_ctrl_task(sound_ctrl_task_);
-		audio_.start();
-	}
-
-#if 1
-	// タッチパネルの安定待ち
-	{
-		render_.sync_frame();
-		dialog_.modal(vtx::spos(400, 60),
-			"Touch panel device wait...\nPlease touch it with some screen.");
-		uint8_t nnn = 0;
-		while(1) {
-			render_.sync_frame();
-			touch_.update();
-			auto num = touch_.get_touch_num();
-			if(num == 0) {
-				++nnn;
-				if(nnn >= 60) break;
-			} else {
-				nnn = 0;
-			}
-			update_led_();
-		}
-		render_.clear(DEF_COLOR::Black);
-	}
-#endif
-
-	char path[256];
-	while(1) {
-		render_.sync_frame();
-
-		touch_.update();
-
-		command_();
-
-		{
-			uint32_t ctrl = 0;
-			if(sdh_.get_mount()) {
-				gui::set(gui::filer_ctrl::MOUNT, ctrl);
-			}
-#ifdef ENABLE_FAMIPAD
-			auto data = get_fami_pad();
-			if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
-				gui::set(gui::filer_ctrl::OPEN, ctrl);
-			}
-			if(chip::on(data, chip::FAMIPAD_ST::UP)) {
-				gui::set(gui::filer_ctrl::UP, ctrl);
-			}
-			if(chip::on(data, chip::FAMIPAD_ST::DOWN)) {
-				gui::set(gui::filer_ctrl::DOWN, ctrl);
-			}
-			if(chip::on(data, chip::FAMIPAD_ST::LEFT)) {
-				gui::set(gui::filer_ctrl::BACK, ctrl);
-			}
-			if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
-				gui::set(gui::filer_ctrl::SELECT, ctrl);
-			}
-#endif
-			auto tnum = touch_.get_touch_num();
-			const auto& xy = touch_.get_touch_pos(0);
-			filer_.set_touch(tnum, xy.x, xy.y); 
-			if(filer_.update(ctrl, path, sizeof(path))) {
-				render_.sync_frame();
-				audio_.play_loop("", path);
-			}
-		}
-
-		sdh_.service();
-		audio_.service();
-
-		update_led_();
-	}
+	vTaskStartScheduler();
 }

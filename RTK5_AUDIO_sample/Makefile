@@ -31,7 +31,16 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/ffsystem.c \
 				$(FATFS_VER)/ffunicode.c \
 				common/time.c \
-				graphics/picojpeg.c
+				graphics/picojpeg.c \
+                FreeRTOS/Source/portable/GCC/RX600v2/port.c \
+                FreeRTOS/Source/portable/MemMang/heap_3.c \
+                FreeRTOS/Source/croutine.c \
+                FreeRTOS/Source/event_groups.c \
+                FreeRTOS/Source/list.c \
+                FreeRTOS/Source/queue.c \
+                FreeRTOS/Source/stream_buffer.c \
+                FreeRTOS/Source/tasks.c \
+                FreeRTOS/Source/timers.c
 
 PSOURCES	=	main.cpp \
 				RX65x/icu_mgr.cpp \
@@ -48,9 +57,9 @@ USER_DEFS	=	SIG_$(ROOT_DEV) \
 				F_ICLK=120000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000 \
-				FAT_FS FAT_FS_NUM=16
+				FAT_FS FAT_FS_NUM=16 RTOS
 
-AS_DEFS		=
+AS_DEFS		=	--defsym NOT_USER=1
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 
@@ -73,7 +82,10 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
+INC_APP		=	. ../ \
+                ../FreeRTOS/Source/include \
+                ../FreeRTOS/Source/portable/GCC/RX600v2 \
+				../RX65x/drw_2d_ver1.02/inc/tes
 
 LIB_ROOT	=	../RX65x/drw_2d_ver1.02 ../libmad/.libs ../zlib ../libpng
 
