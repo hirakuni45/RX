@@ -11,6 +11,7 @@
 #define CASH_KFONT
 
 #include "common/renesas.hpp"
+#include "common/cmt_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
@@ -22,6 +23,9 @@
 #include "scenes.hpp"
 
 namespace {
+
+    typedef device::cmt_io<device::CMT0> CMT;
+    CMT         cmt_;
 
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
@@ -95,22 +99,36 @@ void remove_widget(gui::widget* w)
 
 extern "C" {
 
-	void sci_putch(char ch)
-	{
-		sci_.putch(ch);
-	}
+    void sci_putch(char ch)
+    {
+        static volatile bool lock_ = false;
+        while(lock_) ;
+        lock_ = true;
+        sci_.putch(ch);
+        lock_ = false;
+    }
 
 
-	void sci_puts(const char* str)
-	{
-		sci_.puts(str);
-	}
+    void sci_puts(const char* str)
+    {
+        static volatile bool lock_ = false;
+        while(lock_) ;
+        lock_ = true;
+        sci_.puts(str);
+        lock_ = false;
+    }
 
 
-	char sci_getch(void)
-	{
-		return sci_.getch();
-	}
+    // syscalls.c から呼ばれる、標準入力（stdin）
+    char sci_getch(void)
+    {
+        static volatile bool lock_ = false;
+        while(lock_) ;
+        lock_ = true;
+        auto ch = sci_.getch();
+        lock_ = false;
+        return ch;
+    }
 
 
 	uint16_t sci_length()
@@ -151,6 +169,57 @@ extern "C" {
 		auto t = scenes_.at_base().at_nmea().get_gmtime();		
 		return utils::str::get_fattime(t);
 	}
+
+    void vApplicationMallocFailedHook(void)
+    {
+        taskDISABLE_INTERRUPTS();
+        for( ;; );
+    }
+
+
+    void vApplicationStackOverflowHook(TaskHandle_t pxTask, char *pcTaskName)
+    {
+        ( void ) pcTaskName;
+        ( void ) pxTask;
+
+        taskDISABLE_INTERRUPTS();
+        for( ;; );
+    }
+
+
+    void vApplicationIdleHook(void) { }
+
+
+    void vApplicationTickHook(void) { }
+
+
+    void vAssertCalled(void)
+    {
+        volatile unsigned long ul = 0;
+
+        taskENTER_CRITICAL();
+        {
+            /* Use the debugger to set ul to a non-zero value in order to step out
+            of this function to determine why it was called. */
+            while( ul == 0 )
+            {
+                portNOP();
+            }
+        }
+        taskEXIT_CRITICAL();
+    }
+
+    extern void vTickISR(void);
+    extern void vSoftwareInterruptISR(void);
+
+    void vApplicationSetupTimerInterrupt(void)
+    {
+        uint8_t intr = configKERNEL_INTERRUPT_PRIORITY;
+        cmt_.start(configTICK_RATE_HZ, intr, vTickISR);
+
+        device::icu_mgr::set_task(device::ICU::VECTOR::SWINT, vSoftwareInterruptISR);
+        device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, configKERNEL_INTERRUPT_PRIORITY);
+    }
 }
 
 int main(int argc, char** argv);
