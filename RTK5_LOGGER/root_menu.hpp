@@ -84,7 +84,7 @@ namespace app {
 			const auto& touch = at_scenes_base().at_touch();
 			bool t = touch.get_touch_num() == 1 ? true : false;
 			const auto& p = touch.get_touch_pos(0);
-			bool trg = at_scenes_base().at_menu().render(vtx::spos(p.x, p.y), t);
+			bool trg = at_scenes_base().at_menu().render(p.pos, t);
 			if(trg) {
 				auto pos = at_scenes_base().at_menu().get_pos();
 //				utils::format("Menu: %d\n") % static_cast<int>(pos);

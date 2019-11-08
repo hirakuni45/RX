@@ -374,7 +374,7 @@ namespace app {
 #endif
 				auto tnum = touch_.get_touch_num();
 				const auto& xy = touch_.get_touch_pos(0);
-				filer_.set_touch(tnum, xy.x, xy.y);
+				filer_.set_touch(tnum, xy.pos);
 				char path[256];
 				if(filer_.update(ctrl, path, sizeof(path))) {
 					render_.sync_frame();
