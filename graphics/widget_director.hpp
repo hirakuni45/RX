@@ -157,6 +157,22 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	再描画設定
+		*/
+		//-----------------------------------------------------------------//
+		void redraw_all() noexcept
+		{
+			for(auto& t : widgets_) {
+				if(t.w_ == nullptr) continue;
+				if(t.w_->get_state() == widget::STATE::ENABLE) {
+					t.draw_ = true;
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	アップデート（管理と描画）
 		*/
 		//-----------------------------------------------------------------//
@@ -178,7 +194,7 @@ namespace gui {
 						t.draw_ = true;
 					}
 					if(t.w_->get_state() == widget::STATE::ENABLE) {
-						t.w_->update_touch(vtx::spos(tp.x, tp.y), num);
+						t.w_->update_touch(tp.pos, num);
 					}
 					if(t.focus_ != t.w_->get_focus()) {
 						t.focus_ = t.w_->get_focus();

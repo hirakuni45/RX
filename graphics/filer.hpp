@@ -1,7 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ファイル選択ユーティリティー
+	@brief	ファイル選択ユーティリティー @n
+			ファイルを選択を行う GUI を提供する。@n
+			スイッチによる操作と、タッチパネルによる操作をサポートする。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -46,7 +48,7 @@ namespace gui {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	ファイラー・クラス
-		@param[in]	RDR	render クラス型（描画）
+		@param[in]	RDR	描画クラス型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class RDR>
@@ -54,7 +56,8 @@ namespace gui {
 
 		using GLC = typename RDR::glc_type;
 
-		static const int16_t modal_radius = 10;  // modal round radius
+		static const int32_t FRAME_PER_FILES = 10;  ///< ディレクトリー取得で処理するフレーム辺りのファイル数
+		static const int16_t MODAL_RADIUS = 10;  ///< modal round radius
 
 		static const int16_t SPC = 2;									///< 文字間隙間
 		static const int16_t FLN = RDR::font_type::height + SPC;		///< 行幅
@@ -212,11 +215,11 @@ namespace gui {
 			rdr_.set_fore_color(DEF_COLOR::White);
 			rdr_.set_back_color(DEF_COLOR::Darkgray);
 			vtx::srect r(pos, size);
-			rdr_.round_box(r, modal_radius);
+			rdr_.round_box(r, MODAL_RADIUS);
 			r.org += 2;
 			r.size -= 2 * 2;
 			rdr_.swap_color();
-			rdr_.round_box(r, modal_radius - 2);
+			rdr_.round_box(r, MODAL_RADIUS - 2);
 
 			auto sz = rdr_.at_font().get_text_size(text);
 			rdr_.swap_color();
@@ -273,7 +276,7 @@ namespace gui {
 			uint32_t ntrg =  ctrl_ & ~ctrl;
 			ctrl_ = ctrl;
 
-			dlist_.service(10,
+			dlist_.service(FRAME_PER_FILES,
 				[&](const char* name, const FILINFO* fi, bool dir, void* opt) {
 				dir_draw_func_(name, fi, dir, opt); }, true, &rdr_st_);
 
