@@ -14,6 +14,7 @@ NES (NES) emulator realized with 'Envision Kit RX65N'
  - nesemu.hpp
  - emu/* [NES Emulator source code]
  - Makefile
+ - nesemu_stable.mot (Compiled Motorola format file)
    
 ## Preparing the hardware
  - Preparing the SD card interface

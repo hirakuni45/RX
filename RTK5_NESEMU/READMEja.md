@@ -1,7 +1,7 @@
 Renesas Envision Kit RX65N NES Emulator
 =========
 
-[Japanese](READMEja.md)
+[English](README.md)
 
 ## 概要
 
@@ -14,6 +14,7 @@ Envision Kit RX65N で実現する NES(ファミコン) エミュレーター
  - nesemu.hpp
  - emu/* [NES Emulator ソースコード]
  - Makefile
+ - nesemu_stable.mot（コンパイル済みモトローラー形式ファイル）
    
 ## ハードウェアーの準備
  - SD カードインターフェースの準備
