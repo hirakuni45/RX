@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	オーディオ・コーデック・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,7 +16,7 @@
 #include "sound/mp3_in.hpp"
 #include "sound/wav_in.hpp"
 #include "graphics/scaling.hpp"
-#include "graphics/picojpeg_in.hpp"
+#include "graphics/img_in.hpp"
 
 namespace audio {
 
@@ -31,9 +31,10 @@ namespace audio {
 	template<class RDR>
 	class codec {
 	public:
-		typedef std::function<sound::af_play::CTRL ()> CTRL_TASK;
+		typedef sound::af_play::UPDATE_TASK UPDATE_TASK;
+		typedef sound::af_play::CTRL CTRL_TASK;
 		typedef img::scaling<RDR> SCALING;
-		typedef img::picojpeg_in<SCALING> JPEG_IN;
+		typedef img::img_in<SCALING> IMG_IN;
 
 	private:
 		RDR&		rdr_;
@@ -83,9 +84,10 @@ namespace audio {
 		typedef sound::wav_in WAV_IN;
 		WAV_IN		wav_in_;
 
+		UPDATE_TASK	update_task_;
 		CTRL_TASK	ctrl_task_;
 
-		JPEG_IN		jpeg_;
+		IMG_IN		img_in_;
 
 		int16_t render_text_(int16_t x, int16_t y, const char* text)
 		{
@@ -103,24 +105,29 @@ namespace audio {
 
 			scaling_.set_offset(vtx::spos(480 - 272, 0));
 			if(tag.get_apic().len_ > 0) {
-				auto pos = fin.tell();
-				fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
-				img::img_info ifo;
-				if(!jpeg_.info(fin, ifo)) {
+				if(!img_in_.select_decoder(tag.get_apic().ext_)) {
 					scaling_.set_scale();
-					jpeg_.load("/NoImage.jpg");
-					rdr_.swap_color();
-					rdr_.draw_text(vtx::spos(480 - 272, 0), "JPEG decode error.");
-					rdr_.swap_color();
+					img_in_.load("/NoImage.jpg");
 				} else {
-					auto n = std::max(ifo.width, ifo.height);
-					scaling_.set_scale(272, n);
-					jpeg_.load(fin);
+					auto pos = fin.tell();
+					fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
+					img::img_info ifo;
+					if(!img_in_.info(fin, ifo)) {
+						scaling_.set_scale();
+						img_in_.load("/NoImage.jpg");
+						rdr_.swap_color();
+						rdr_.draw_text(vtx::spos(480 - 272, 0), "image decode error.");
+						rdr_.swap_color();
+					} else {
+						auto n = std::max(ifo.width, ifo.height);
+						scaling_.set_scale(272, n);
+						img_in_.load(fin);
+					}
+					fin.seek(utils::file_io::SEEK::SET, pos);
 				}
-				fin.seek(utils::file_io::SEEK::SET, pos);
 			} else {
 				scaling_.set_scale();
-				jpeg_.load("/NoImage.jpg");
+				img_in_.load("/NoImage.jpg");
 			}
 
 			utils::format("Album:  '%s'\n") % tag.get_album().c_str();
@@ -161,7 +168,8 @@ namespace audio {
 			if(!fin.open(fname, "rb")) {
 				return false;
 			}
-			mp3_in_.set_ctrl_task([&]() { return ctrl_task_(); } );
+///			mp3_in_.set_ctrl_task([&]() { return ctrl_task_(); } );
+//			mp3_in_.set_ctrl_task(ctrl_task_);
 			mp3_in_.set_tag_task([&](utils::file_io& fin, const sound::tag_t& tag) {
 				sound_tag_task_(fin, tag); } );
 			mp3_in_.set_update_task([&](uint32_t t) { sound_update_task_(t); } );
@@ -177,7 +185,8 @@ namespace audio {
 			if(!fin.open(fname, "rb")) {
 				return false;
 			}
-			wav_in_.set_ctrl_task([&]() { return ctrl_task_(); } );
+///			wav_in_.set_ctrl_task([&]() { return ctrl_task_(); } );
+//			wav_in_.set_ctrl_task(ctrl_task_);
 			wav_in_.set_tag_task([&](utils::file_io& fin, const sound::tag_t& tag) {
 				sound_tag_task_(fin, tag); } );
 			wav_in_.set_update_task([&](uint32_t t) { sound_update_task_(t); } );
@@ -234,17 +243,48 @@ namespace audio {
 		*/
 		//-----------------------------------------------------------------//
 		codec(RDR& rdr) noexcept :
-			rdr_(rdr), dlist_(), scaling_(rdr), jpeg_(scaling_)
+			rdr_(rdr), dlist_(), scaling_(rdr), img_in_(scaling_)
 		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	JPEG デコーダーの参照
-			@return JPEG デコーダー
+			@brief	描画スケーリングの参照
+			@return 描画スケーリング
 		*/
 		//-----------------------------------------------------------------//
-		JPEG_IN& at_jpeg_in() noexcept { return jpeg_; }
+		SCALING& at_scaling() noexcept { return scaling_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	画像デコーダーの参照
+			@return 画像デコーダー
+		*/
+		//-----------------------------------------------------------------//
+		IMG_IN& at_img_in() noexcept { return img_in_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	演奏アップデートの設定
+			@param[in]	task	演奏アップデート
+		*/
+		//-----------------------------------------------------------------//
+		void set_update_task(UPDATE_TASK task) noexcept {
+			update_task_ = task;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  制御タスクの設定
+			@param[in]	task	制御タスク
+		*/
+		//-----------------------------------------------------------------//
+		void set_ctrl_task(CTRL_TASK task) noexcept {
+			ctrl_task_ = task;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -262,13 +302,7 @@ namespace audio {
 		}
 
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	描画スケーリングの参照
-			@return 描画スケーリング
-		*/
-		//-----------------------------------------------------------------//
-		SCALING& at_scaling() noexcept { return scaling_; }
+
 
 
 #if 0
@@ -315,18 +349,6 @@ namespace audio {
 					utils::format("DMAC Not start...\n");
 				}
 			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  制御タスクの設定
-			@param[in]	task	制御タスク
-		*/
-		//-----------------------------------------------------------------//
-		void set_ctrl_task(CTRL_TASK task) noexcept
-		{
-			ctrl_task_ = task;
 		}
 
 
