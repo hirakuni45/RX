@@ -31,3 +31,4 @@ r_usb/
 tmp/
 !zlib/libz.a
 !libpng/libpng.a
+!RTK5_NESEMU/nesemu_stable.mot
