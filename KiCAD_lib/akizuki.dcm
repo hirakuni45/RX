@@ -26,6 +26,11 @@ $CMP MR
 D Flat Chip Resistors
 $ENDCMP
 #
+$CMP NJU7223DL1-33
+D JRC 3.3V/500mA Regulator
+F http://akizukidenshi.com/download/ds/njr/NJU7223_j.pdf
+$ENDCMP
+#
 $CMP NON-POL
 D Non polarity capacitor
 $ENDCMP
