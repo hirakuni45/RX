@@ -1,0 +1,8 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP CP2102N-QFN20
+D Silicon Labs Single-Chip USB-to-UART Data Transfer
+F https://www.silabs.com/documents/public/data-sheets/cp2102n-datasheet.pdf
+$ENDCMP
+#
+#End Doc Library
