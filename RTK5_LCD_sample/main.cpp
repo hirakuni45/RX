@@ -116,9 +116,6 @@ namespace {
 #endif
 	RENDER		render_(glcdc_io_, font_);
 
-//	typedef graphics::filer<SDC, RENDER> FILER;
-//	FILER		filer_(render_);
-
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 #ifdef SOFT_I2C
@@ -143,6 +140,9 @@ namespace {
 	typedef img::img_in<PLOT> IMG_IN;
 	IMG_IN		imgs_(plot_);
 
+//	typedef graphics::filer<SDC, RENDER> FILER;
+//	FILER		filer_(render_);
+
 	// test for Tiny-GL
 	typedef graphics::tgl<RENDER, 200, 10> TGL;
 	TGL			tgl_(render_);
@@ -157,14 +157,6 @@ namespace {
 	SHELL		shell_(cmd_);
 
 
-	//-----------------------------------------------------------------//
-	/*!
-		@brief  ファイル作成テスト
-		@param[in]	fname	ファイル名
-		@param[in]	size	作成サイズ
-		@return 成功なら「true」
-	*/
-	//-----------------------------------------------------------------//
 	bool create_test_file_(const char* fname, uint32_t size)
 	{
 		uint8_t buff[512];
@@ -429,7 +421,6 @@ int main(int argc, char** argv)
 	SW2::DIR = 0;
 
 	uint8_t task = 100;
-	FT5206::xy	pos;
 
 	bool sw2 = SW2::P();
 	uint8_t n = 0;
@@ -441,90 +432,6 @@ int main(int argc, char** argv)
 		render_.sync_frame();
 		ft5206_.update();
 		sdh_.service();
-
-#if 0
-		{
-			uint8_t ctrl = 0;
-
-			auto tnum = ft5206_.get_touch_num();
-			const auto& xy = ft5206_.get_touch_pos(0);
-			filer_.set_touch(tnum, xy.x, xy.y); 
-			char path[256];
-			if(filer_.update(ctrl, path, sizeof(path))) {
-
-			}
-		}
-#endif
-
-#if 0
-		if(task > 0) {
-			--task;
-			if(task == 0) {
-				img::jpeg_in jpeg;
-				utils::file_io fin;
-				if(fin.open("aaaaa.jpg", "rb")) {
-					if(!jpeg.load(fin)) {
-						utils::format("JPEG load fail...\n");
-					}
-					fin.close();
-				}
-				char tmp[32];
-				for(int i = 0; i < 26; ++i) tmp[i] = 'A' + i;
-				tmp[26] = 0;
-				render_.draw_text(0, 0, tmp);
-				for(int i = 0; i < 26; ++i) tmp[i] = 'a' + i;
-				tmp[26] = 0;
-				render_.draw_text(0, 16, tmp);
-				render_.draw_text(0, 32, "金の貸し借りをしてはならない。\n金を貸せば金も友も失う。\n金を借りれば倹約が馬鹿らしくなる。");
-				render_.draw_text(0, 16*5, "Graphics Image Light Bilk IgIiIrliiljkffkL\n", true);
-				render_.draw_text(0, 16*6, "012:;,.(i),[i],{i},{|}.(`)\n", true);
-			}
-		}
-
-		if(render) {
-			int16_t xc = 470 / 2;
-			int16_t yc = 272 / 2;
-			render_.arc(xc + 0, yc + 100, xc, yc, xc + 0, yc - 100, RENDER::COLOR::White);
-			render_.arc(xc + 0, yc - 100, xc, yc, xc + 0, yc + 100, RENDER::COLOR::Green);
-
-			auto p0 = imath::circle::angle_to_position( 0.25f - 1.0f / 16.0f, 50);
-			auto p1 = imath::circle::angle_to_position(-0.25f + 1.0f / 16.0f, 50);
-			render_.arc(xc + p0.x, yc + p0.y, xc, yc, xc + p1.x, yc + p1.y, RENDER::COLOR::Red);
-
-//			imath::circle cir;
-//			cir.func_test();
-
-#if 0
-			render_.round_frame(20, 20, 400, 200, 16, RENDER::COLOR::Red);
-//			render_.round_frame(20 + 5, 20 + 5, 400 - 10, 200 - 10, 16 - 5, RENDER::COLOR::Green);
-
-			render_.round_frame(20 + 5, 20 + 5, 400 - 10, 200 - 10, 16 - 5, RENDER::COLOR::Red);
-			render_.round_box(20 + 5, 20 + 5, 400 - 10, 200 - 10, 16 - 5, RENDER::COLOR::Green);
-
-			render_.circle(480/2, 272/2, 100, RENDER::COLOR::Blue);
-			render_.fill_circle(480/2, 272/2, 100, RENDER::COLOR::Aqua);
-
-			render_.fill_box(5, 5, 4, 4, RENDER::COLOR::White);
-			render_.frame(4, 4, 6, 6, RENDER::COLOR::Gray);
-#endif
-			render = false;
-		}
-#endif
-
-		auto tnum = ft5206_.get_touch_num();
-		if(tnum == 3) {
-//			render_.clear(RENDER::COLOR::Black);
-		}
-		if(tnum > 0) {
-			const auto& npos = ft5206_.get_touch_pos(0);
-//			if(npos.event != FT5206::EVENT::CONTACT) {
-//				pos.event = FT5206::EVENT::NONE;
-//			}
-//			if(pos.event == FT5206::EVENT::CONTACT) {
-//				render_.line(pos.x, pos.y, npos.x, npos.y, RENDER::COLOR::White);
-//			}
-//			pos = npos;
-		}
 
 		switch(render_task) {
 		case 0:
@@ -554,6 +461,9 @@ int main(int argc, char** argv)
 			render_.set_back_color(DEF_COLOR::White);
 			render_.draw_text(vtx::spos(10, 120), "Asdfghjkl");
 			render_.draw_text(vtx::spos(10, 136), "美しい漢字");
+///			render_.draw_text(0, 32,
+///				"金の貸し借りをしてはならない。\n金を貸せば金も友も失う。\n"
+///				"金を借りれば倹約が馬鹿らしくなる。");
 			render_.set_fore_color(DEF_COLOR::Fuchsi);
 			render_.round_frame(vtx::srect(10, 10, 100, 50), 15);
 			render_.set_fore_color(DEF_COLOR::Aqua);
