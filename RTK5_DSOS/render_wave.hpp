@@ -332,33 +332,32 @@ namespace utils {
 					mes_time_org_ = mes_time_begin_;
 					mes_volt_org_ = mes_volt_begin_;
 				} else if(p.event == TOUCH::EVENT::CONTACT) {
-					int16_t dx = p.x - p.org_x;
-					int16_t dy = p.y - p.org_y;
-					if(CH1_MOVE_AREA <= p.x && p.x < RENDER::glc_type::width) {
-						menu_ = static_cast<MENU>((p.y - 16) / MENU_SIZE + 1);
+					auto d = p.pos - p.org;
+					if(CH1_MOVE_AREA <= p.pos.x && p.pos.x < RENDER::glc_type::width) {
+						menu_ = static_cast<MENU>((p.pos.y - 16) / MENU_SIZE + 1);
 					} else if(measere_ == MEASERE::TIME) {
-						if(TIME_BEGIN_POS <= p.y && p.y < TIME_LIMIT_POS
-							&& VOLT_BEGIN_POS <= p.x && p.x < VOLT_LIMIT_POS) {
-							mes_time_begin_ = mes_time_org_ + dx;
+						if(TIME_BEGIN_POS <= p.pos.y && p.pos.y < TIME_LIMIT_POS
+							&& VOLT_BEGIN_POS <= p.pos.x && p.pos.x < VOLT_LIMIT_POS) {
+							mes_time_begin_ = mes_time_org_ + d.x;
 							if(mes_time_begin_ < 0) mes_time_begin_ = 0;
 							else if(mes_time_begin_ >= 440) mes_time_begin_ = 440;
 						}
 					} else if(measere_ == MEASERE::VOLT) {
-						if(TIME_BEGIN_POS <= p.y && p.y < TIME_LIMIT_POS
-							&& VOLT_BEGIN_POS <= p.x && p.x < VOLT_LIMIT_POS) {
-							mes_volt_begin_ = mes_volt_org_ + dy;
+						if(TIME_BEGIN_POS <= p.pos.y && p.pos.y < TIME_LIMIT_POS
+							&& VOLT_BEGIN_POS <= p.pos.x && p.pos.x < VOLT_LIMIT_POS) {
+							mes_volt_begin_ = mes_volt_org_ + d.y;
 							if(mes_volt_begin_ < 16) mes_volt_begin_ = 16;
 							else if(mes_volt_begin_ >= (272 - 16)) mes_volt_begin_ = 272 - 16 - 1;
 						}
 					} else {
-						if(0 <= p.y && p.y < TIME_SCROLL_AREA) {
-							time_pos_ = time_org_ + dx;
+						if(0 <= p.pos.y && p.pos.y < TIME_SCROLL_AREA) {
+							time_pos_ = time_org_ + d.x;
 							touch_down_ = true;
-						} else if(0 <= p.x && p.x < CH0_MOVE_AREA) {
-							ch0_vpos_ = ch0_vorg_ + dy;
+						} else if(0 <= p.pos.x && p.pos.x < CH0_MOVE_AREA) {
+							ch0_vpos_ = ch0_vorg_ + d.y;
 							touch_down_ = true;
-						} else if(CH0_MOVE_AREA <= p.x && p.x < CH1_MOVE_AREA) {
-							ch1_vpos_ = ch1_vorg_ + dy;
+						} else if(CH0_MOVE_AREA <= p.pos.x && p.pos.x < CH1_MOVE_AREA) {
+							ch1_vpos_ = ch1_vorg_ + d.y;
 							touch_down_ = true;
 						}
 					}
@@ -366,9 +365,8 @@ namespace utils {
 			} else if(num == 2) {
 				const auto& p2 = touch_.get_touch_pos(1);
 				if(measere_ == MEASERE::TIME) {
-					auto dx = p.x - p2.x;
-					auto dy = p.y - p2.y;
-					auto len = intmath::sqrt16(dx * dx + dy * dy);
+					auto d = p.pos - p2.pos;
+					auto len = intmath::sqrt16(d.x * d.x + d.y * d.y);
 					if(p2.event == TOUCH::EVENT::DOWN) {
 						mes_ref_size_ = mes_time_size_;
 						mes_ref_len_  = len.val;
@@ -378,9 +376,8 @@ namespace utils {
 						if(mes_time_size_ < 0) mes_time_size_ = 0;
 					}
 				} else if(measere_ == MEASERE::VOLT) {
-					auto dx = p.x - p2.x;
-					auto dy = p.y - p2.y;
-					auto len = intmath::sqrt16(dx * dx + dy * dy);
+					auto d = p.pos - p2.pos;
+					auto len = intmath::sqrt16(d.x * d.x + d.y * d.y);
 					if(p2.event == TOUCH::EVENT::DOWN) {
 						mes_ref_size_ = mes_volt_size_;
 						mes_ref_len_  = len.val;
