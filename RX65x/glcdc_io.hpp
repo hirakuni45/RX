@@ -133,14 +133,14 @@ namespace device {
 		/** Graphics plane input configuration */
 		struct input_cfg_t
 		{
-			void*					base;		// Base address to the frame buffer.
-			uint16_t				hsize;		// Horizontal pixel size in a line.
-			uint16_t				vsize;		// Vertical pixel size in a frame.
-			int32_t 				offset;		// offset value to next line.
-			glcdc_def::IN_FORMAT	format;		// Input format setting.
-			bool 				frame_edge;	// Show/hide setting of the frame of the graphics area.
-			glcdc_def::coordinate_t	coordinate;	// Starting point of image.
-			glcdc_def::color_t		bg_color;	// Color outside region.
+			void*					base;		///< Base address to the frame buffer.(can not set null)
+			uint16_t				hsize;		///< Horizontal pixel size in a line.
+			uint16_t				vsize;		///< Vertical pixel size in a frame.
+			int32_t 				offset;		///< offset value to next line.
+			glcdc_def::IN_FORMAT	format;		///< Input format setting.
+			bool 					frame_edge;	///< Show/hide setting of the frame of the graphics area.
+			glcdc_def::coordinate_t	coordinate;	///< Starting point of image.
+			glcdc_def::color_t		bg_color;	///< Color outside region.
 
 			input_cfg_t() : base(nullptr), hsize(0), vsize(0), offset(0),
 				format(glcdc_def::IN_FORMAT::RGB565), frame_edge(false), coordinate(), bg_color()
@@ -151,33 +151,33 @@ namespace device {
 		/** Display output configuration */
 		struct output_cfg_t
 		{
-			glcdc_def::timing_t         htiming;             // Horizontal display cycle setting.
-			glcdc_def::timing_t         vtiming;             // Vertical display cycle setting.
-			glcdc_def::OUT_FORMAT       format;              // Output format setting.
-			glcdc_def::ENDIAN           endian;              // Bit order of output data.
-			glcdc_def::COLOR_ORDER      color_order;         // Color order in pixel.
-			glcdc_def::SIGNAL_SYNC_EDGE sync_edge;           // Signal sync edge selection.
+			glcdc_def::timing_t         htiming;			// Horizontal display cycle setting.
+			glcdc_def::timing_t         vtiming;			// Vertical display cycle setting.
+			glcdc_def::OUT_FORMAT       format;				// Output format setting.
+			glcdc_def::ENDIAN           endian;				// Bit order of output data.
+			glcdc_def::COLOR_ORDER      color_order;		// Color order in pixel.
+			glcdc_def::SIGNAL_SYNC_EDGE sync_edge;			// Signal sync edge selection.
 
-			glcdc_def::color_t          bg_color;               // Background color.
+			glcdc_def::color_t          bg_color;			// Background color.
 
-			brightness_t             brightness;             // Brightness setting.
-			contrast_t               contrast;               // Contrast setting.
-			gamma_correction_t       gamma;                  // Gamma correction setting.
+			brightness_t				brightness;			// Brightness setting.
+			contrast_t					contrast;			// Contrast setting.
+			gamma_correction_t			gamma;				// Gamma correction setting.
 			glcdc_def::CORRECTION_PROC_ORDER  correction_proc_order;  // Correction control route select.
-			dithering_t              dithering;              // Dithering setting.
+			dithering_t					dithering;			// Dithering setting.
 
-			glcdc_def::TCON_PIN           tcon_hsync;             // GLCD TCON output pin select.
-			glcdc_def::TCON_PIN           tcon_vsync;             // GLCD TCON output pin select.
-			glcdc_def::TCON_PIN           tcon_de;                // GLCD TCON output pin select.
-			glcdc_def::SIGNAL_POLARITY    data_enable_polarity;   // Data Enable signal polarity.
-			glcdc_def::SIGNAL_POLARITY    hsync_polarity;    // Horizontal sync signal polarity.
-			glcdc_def::SIGNAL_POLARITY    vsync_polarity;    // Vertical sync signal polarity.
+			glcdc_def::TCON_PIN			tcon_hsync;			// GLCD TCON output pin select.
+			glcdc_def::TCON_PIN			tcon_vsync;			// GLCD TCON output pin select.
+			glcdc_def::TCON_PIN			tcon_de;			// GLCD TCON output pin select.
+			glcdc_def::SIGNAL_POLARITY	data_enable_polarity;	// Data Enable signal polarity.
+			glcdc_def::SIGNAL_POLARITY	hsync_polarity;		// Horizontal sync signal polarity.
+			glcdc_def::SIGNAL_POLARITY	vsync_polarity;		// Vertical sync signal polarity.
 
-			glcdc_def::CLK_SRC            clksrc;                 // Clock Source selection.
-			glcdc_def::PANEL_CLK_DIVISOR  clock_div_ratio;        // Clock divide ratio for dot clock.
+			glcdc_def::CLK_SRC			clksrc;				// Clock Source selection.
+			glcdc_def::PANEL_CLK_DIVISOR clock_div_ratio;	// Clock divide ratio for dot clock.
 
-			SERIAL_OUTPUT_DELAY		 serial_output_delay;    // Serial RGB Data output delay cycle select (this function is not supported).
-			SERIAL_SCAN_DIRECTION	serial_scan_direction;   // Serial RGB Scan direction select (this function is not supported).
+			SERIAL_OUTPUT_DELAY		 serial_output_delay;	// Serial RGB Data output delay cycle select (this function is not supported).
+			SERIAL_SCAN_DIRECTION	serial_scan_direction;	// Serial RGB Scan direction select (this function is not supported).
 		};
 
 
@@ -281,10 +281,10 @@ namespace device {
 
 		    /** Interrupt setting*/
 		    detect_cfg_t	detection;					// Detection enable/disable setting.
-		    glcdc_def::interrupt_cfg_t	interrupt;           // Interrupt enable/disable setting.
+		    glcdc_def::interrupt_cfg_t	interrupt;		// Interrupt enable/disable setting.
 
 		    /** Configuration for display event processing */
-		    void (*callback)(void *);                 // Pointer to callback function.
+		    void (*callback)(void *);					// Pointer to callback function.
 		};
 
 
@@ -1704,10 +1704,13 @@ namespace device {
 			device::BUS::EBMAPCR.PR5SEL = 4;
 
 			cfg_t cfg;
-			cfg.output.clksrc = glcdc_def::CLK_SRC::INTERNAL;   			  // Select PLL clock
-			cfg.output.clock_div_ratio = glcdc_def::PANEL_CLK_DIVISOR::_24;  // 240 / 24 = 10 MHz
-  																      // No frequency division
-  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	  	      // Enable LCD_CLK output
+			cfg.output.clksrc = glcdc_def::CLK_SRC::INTERNAL;		// Select PLL clock
+
+			// 240 / 24 = 10 MHz
+			// No frequency division
+			// Enable LCD_CLK output
+			cfg.output.clock_div_ratio = glcdc_def::PANEL_CLK_DIVISOR::_24;
+
 			//
 			// Definition of LCD for 480x272 LCD by 60Hz
 			//
