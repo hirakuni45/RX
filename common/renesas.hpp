@@ -144,10 +144,10 @@
 #include "RX600/mmcif.hpp"
 #include "RX600/pdc.hpp"
 #include "RX600/standby_ram.hpp"
-#include "RX65x/glcdc.hpp"
-#include "RX65x/glcdc_io.hpp"
-#include "RX65x/drw2d.hpp"
-#include "RX65x/drw2d_mgr.hpp"
+#include "RX600/glcdc.hpp"
+#include "RX600/glcdc_mgr.hpp"
+#include "RX600/drw2d.hpp"
+#include "RX600/drw2d_mgr.hpp"
 #include "RX600/dmac_mgr.hpp"
 
 #elif defined(SIG_RX66T)
