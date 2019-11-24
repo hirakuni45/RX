@@ -59,8 +59,8 @@ namespace {
 	static const int16_t LCD_Y = 272;
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
 	static const auto PIX = graphics::pixel::TYPE::RGB565;
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
-	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
+	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
+	GLCDC_MGR	glcdc_mgr_(nullptr, LCD_ORG);
 
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 //	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
@@ -132,8 +132,8 @@ namespace {
 	typedef graphics::font<AFONT, KFONT> FONT;
 	FONT		font_(afont_, kfont_);
 
-	typedef graphics::render<GLCDC_IO, FONT> RENDER;
-	RENDER		render_(glcdc_io_, font_);
+	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
+	RENDER		render_(glcdc_mgr_, font_);
 
 	typedef gui::filer<RENDER> FILER;
 	FILER		filer_(render_);
@@ -157,7 +157,7 @@ namespace {
 	void update_nesemu_()
 	{
 		void* org = reinterpret_cast<void*>(0x00000000);
-		nesemu_.service(org, glcdc_io_.get_xsize(), glcdc_io_.get_ysize());
+		nesemu_.service(org, glcdc_mgr_.get_xsize(), glcdc_mgr_.get_ysize());
 
 		uint32_t len = nesemu_.get_audio_len();
 		const uint16_t* wav = nesemu_.get_audio_buf();
@@ -302,11 +302,11 @@ int main(int argc, char** argv)
 		LCD_LIGHT::DIR = 1;
 		LCD_DISP::P  = 0;  // DISP Disable
 		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-		if(glcdc_io_.start()) {
+		if(glcdc_mgr_.start()) {
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-			if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
+			if(!glcdc_mgr_.control(GLCDC_MGR::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC Ctrl Fail\n");
 			}
 		} else {
@@ -332,7 +332,7 @@ int main(int argc, char** argv)
 	bool filer = false;
 	bool mount = sdh_.get_mount();
 	while(1) {
-		glcdc_io_.sync_vpos();
+		glcdc_mgr_.sync_vpos();
 		fami_pad_data_ = famipad_.update();
 
 		uint8_t data = fami_pad_data_;
