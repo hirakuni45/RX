@@ -80,8 +80,8 @@ namespace {
 	static const int16_t LCD_Y = 272;
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
 	static const auto PIXT = graphics::pixel::TYPE::RGB565;
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_IO;
-	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
+	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIXT> GLCDC_MGR;
+	GLCDC_MGR	glcdc_mgr_(nullptr, LCD_ORG);
 
 	typedef graphics::font8x16 AFONT;
 	AFONT		afont_;
@@ -94,11 +94,11 @@ namespace {
 	typedef graphics::font<AFONT, KFONT> FONT;
 	FONT		font_(afont_, kfont_);
 
-	typedef device::drw2d_mgr<GLCDC_IO, FONT> DRW2D_MGR;
-	DRW2D_MGR	drw2d_mgr_(glcdc_io_, font_);
+	typedef device::drw2d_mgr<GLCDC_MGR, FONT> DRW2D_MGR;
+	DRW2D_MGR	drw2d_mgr_(glcdc_mgr_, font_);
 
-	typedef graphics::render<GLCDC_IO, FONT> RENDER;
-	RENDER		render_(glcdc_io_, font_);
+	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
+	RENDER		render_(glcdc_mgr_, font_);
 
 	typedef utils::capture<2048> CAPTURE;
 	CAPTURE		capture_;
@@ -250,11 +250,11 @@ int main(int argc, char** argv)
 		LCD_LIGHT::DIR = 1;
 		LCD_DISP::P  = 0;  // DISP Disable
 		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-		if(glcdc_io_.start()) {
+		if(glcdc_mgr_.start()) {
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-			if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
+			if(!glcdc_mgr_.control(GLCDC_MGR::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC ctrl fail...\n");
 			}
 		} else {
@@ -310,7 +310,7 @@ int main(int argc, char** argv)
 #endif
 
 	while(1) {
-		glcdc_io_.sync_vpos();
+		glcdc_mgr_.sync_vpos();
 
 		ft5206_.update();
 
