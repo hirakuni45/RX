@@ -43,13 +43,15 @@
 #define USE_SDHI
 
 // DRW2D エンジンを使う場合
-#define USE_DRW2D
+// #define USE_DRW2D
 
 
 #include "usb/usb_io.hpp"
 #include "usb/usb_hmsc.hpp"
 
 #include "graphics/tgl.hpp"
+
+#include "RX600/drw2d_mgr.hpp"
 
 namespace {
 
@@ -97,8 +99,8 @@ namespace {
 	static const int16_t LCD_Y = 272;
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
 	static const auto PXT = graphics::pixel::TYPE::RGB565;
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PXT> GLCDC_IO;
-	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
+	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PXT> GLCDC_MGR;
+	GLCDC_MGR	glcdc_mgr_(nullptr, LCD_ORG);
 
 	typedef graphics::font8x16 AFONT;
 	AFONT		afont_;
@@ -110,11 +112,11 @@ namespace {
 	typedef graphics::def_color DEF_COLOR;
 
 #ifdef USE_DRW2D
-	typedef device::drw2d_mgr<GLCDC_IO, FONT> RENDER;
+	typedef device::drw2d_mgr<GLCDC_MGR, FONT> RENDER;
 #else
-	typedef graphics::render<GLCDC_IO, FONT> RENDER;
+	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
 #endif
-	RENDER		render_(glcdc_io_, font_);
+	RENDER		render_(glcdc_mgr_, font_);
 
 	// FT5206, SCI6 簡易 I2C 定義
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
@@ -385,11 +387,11 @@ int main(int argc, char** argv)
 		LCD_LIGHT::DIR = 1;
 		LCD_DISP::P  = 0;  // DISP Disable
 		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-		if(glcdc_io_.start()) {
+		if(glcdc_mgr_.start()) {
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-			if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
+			if(!glcdc_mgr_.control(GLCDC_MGR::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC ctrl fail...\n");
 			}
 		} else {
@@ -443,7 +445,7 @@ int main(int argc, char** argv)
 			render_.set_fore_color(DEF_COLOR::White);
 			render_.line(vtx::spos(0, 0), vtx::spos(480, 272));
 			render_.set_fore_color(DEF_COLOR::Green);
-			render_.circle(vtx::spos(480/2, 272/2), 120, 10);
+///			render_.circle(vtx::spos(480/2, 272/2), 120, 10);
 
 			render_.set_fore_color(DEF_COLOR::Purple);
 			render_.fill_box(vtx::srect(100, 50, 90, 45));
@@ -452,7 +454,7 @@ int main(int argc, char** argv)
 		case 2:
 			render_.clear(DEF_COLOR::Black);
 			render_.set_fore_color(DEF_COLOR::Blue);
-			render_.circle(vtx::spos(480/2, 272/2), rad, 0);
+///			render_.circle(vtx::spos(480/2, 272/2), rad, 0);
 			break;
 
 		case 3:
