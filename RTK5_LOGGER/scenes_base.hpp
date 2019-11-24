@@ -72,15 +72,15 @@ namespace app {
 		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 		static const auto PIX = graphics::pixel::TYPE::RGB565;
-		typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
+		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
 
 	public:
 		typedef graphics::font8x16 AFONT;
 		typedef graphics::kfont<16, 16, 64> KFONT;
 		typedef graphics::font<AFONT, KFONT> FONT;
 
-//		typedef device::drw2d_mgr<GLCDC_IO, FONT> RENDER;
-		typedef graphics::render<GLCDC_IO, FONT> RENDER;
+//		typedef device::drw2d_mgr<GLCDC_MGR, FONT> RENDER;
+		typedef graphics::render<GLCDC_MGR, FONT> RENDER;
 
 		// FT5206, SCI6 簡易 I2C 定義
 		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
@@ -123,7 +123,7 @@ namespace app {
 		typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
 
 	private:
-		GLCDC_IO	glcdc_io_;
+		GLCDC_MGR	glcdc_mgr_;
 		AFONT		afont_;
 		KFONT		kfont_;
 		FONT		font_;
@@ -249,9 +249,9 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		scenes_base(void* lcdorg = reinterpret_cast<void*>(0x00000100)) noexcept :
-			glcdc_io_(nullptr, lcdorg),
+			glcdc_mgr_(nullptr, lcdorg),
 			afont_(), kfont_(), font_(afont_, kfont_),
-			render_(glcdc_io_, font_),
+			render_(glcdc_mgr_, font_),
 			touch_(ft5206_i2c_),
 			widd_(render_, touch_),
 			menu_(render_, back_), back_(render_), dialog_(render_, touch_),
@@ -289,11 +289,11 @@ namespace app {
 				LCD_LIGHT::DIR = 1;
 				LCD_DISP::P  = 0;  // DISP Disable
 				LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-				if(glcdc_io_.start()) {
+				if(glcdc_mgr_.start()) {
 					utils::format("Start GLCDC\n");
 					LCD_DISP::P  = 1;  // DISP Enable
 					LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-					if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
+					if(!glcdc_mgr_.control(GLCDC_MGR::CONTROL_CMD::START_DISPLAY)) {
 						utils::format("GLCDC ctrl fail...\n");
 					}
 				} else {
@@ -392,11 +392,11 @@ namespace app {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	GLCDC_IO の参照
-			@return GLCDC_IO
+			@brief	GLCDC_MGR の参照
+			@return GLCDC_MGR
 		*/
 		//-------------------------------------------------------------//
-		GLCDC_IO& at_glcdc_io() noexcept { return glcdc_io_; }
+		GLCDC_MGR& at_glcdc_mgr() noexcept { return glcdc_mgr_; }
 
 
 		//-------------------------------------------------------------//
