@@ -82,9 +82,9 @@ INC_SYS		=	$(LOCAL_PATH)/include
 INC_APP		=	. ../ \
                 ../FreeRTOS/Source/include \
                 ../FreeRTOS/Source/portable/GCC/RX600v2 \
-				../RX65x/drw_2d_ver1.02/inc/tes
+				../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../RX65x/drw_2d_ver1.02 ../libmad/.libs ../zlib ../libpng
+LIB_ROOT	=	../RX600/drw2d ../libmad ../zlib ../libpng
 
 OPTIMIZE	=	-O3
 
