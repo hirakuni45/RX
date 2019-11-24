@@ -17,7 +17,7 @@
 
 #include "common/vtx.hpp"
 
-#include "drw2d/box.hpp"
+///#include "drw2d/box.hpp"
 
 extern "C" {
 	extern void drw_int_isr(void);	// drw2d library interrupt handler
