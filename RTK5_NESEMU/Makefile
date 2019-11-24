@@ -128,7 +128,7 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes \
+INC_APP		=	. ../ ../RX600/drw2d/inc/tes \
 				./emu ./emu/cpu ./emu/nes ./emu/mappers ./emu/sndhrdw ./emu/libsnss
 
 CP_OPT		=	-Wall -Werror \
