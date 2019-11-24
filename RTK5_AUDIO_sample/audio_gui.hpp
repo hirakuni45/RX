@@ -34,7 +34,7 @@ namespace app {
 
 		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-		typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
+		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
 
 		typedef graphics::font8x16 AFONT;
 //  	for cash into SD card /kfont16.bin
