@@ -65,8 +65,8 @@ namespace {
 	// フレームバッファ開始アドレスは、100 番地から開始とする。
 	// ※０～ＦＦは未使用領域
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_IO;
-	GLCDC_IO	glcdc_io_(nullptr, LCD_ORG);
+	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
+	GLCDC_MGR	glcdc_mgr_(nullptr, LCD_ORG);
 
 	// カード電源制御を使わない場合、「device::NULL_PORT」を指定する。
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
@@ -137,8 +137,8 @@ namespace {
 	typedef graphics::font<AFONT, KFONT> FONT;
 	FONT		font_(afont_, kfont_);
 
-	typedef graphics::render<GLCDC_IO, FONT> RENDER;
-	RENDER		render_(glcdc_io_, font_);
+	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
+	RENDER		render_(glcdc_mgr_, font_);
 
 	typedef gui::dialog<RENDER, FAMIPAD> DIALOG;
 	DIALOG		dialog_(render_, famipad_);
@@ -249,7 +249,7 @@ namespace {
 
 	void update_nesemu_()
 	{
-		nesemu_.service(LCD_ORG, GLCDC_IO::width, GLCDC_IO::height);
+		nesemu_.service(LCD_ORG, GLCDC_MGR::width, GLCDC_MGR::height);
 
 		uint32_t len = nesemu_.get_audio_len();
 		const uint16_t* wav = nesemu_.get_audio_buf();
@@ -409,11 +409,11 @@ int main(int argc, char** argv)
 		LCD_LIGHT::DIR = 1;
 		LCD_DISP::P  = 0;  // DISP Disable
 		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-		if(glcdc_io_.start()) {
+		if(glcdc_mgr_.start()) {
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-			if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
+			if(!glcdc_mgr_.control(GLCDC_MGR::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC Ctrl Fail\n");
 			}
 		} else {
