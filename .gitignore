@@ -25,3 +25,4 @@ tmp/
 libmad/libmad
 libpng/libpng
 !RTK5_NESEMU/nesemu_stable.mot
+!RX600/drw2d/libdrw2d.a
