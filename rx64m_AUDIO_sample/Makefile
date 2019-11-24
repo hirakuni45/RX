@@ -45,7 +45,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX64M ../libmad
 
-LIB_ROOT	=	../libmad/.libs
+LIB_ROOT	=	../libmad
 
 OPTIMIZE	=	-Os
 
