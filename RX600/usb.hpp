@@ -18,11 +18,14 @@ namespace device {
 		@brief  USB 定義基底クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
+		@param[in]	ivec	USBI 割り込み Vector
+		@param[in]	rvec	USBR 割り込み Vector
 		@param[in]	d0vec	D0 割り込み Vector
 		@param[in]	d1vec	D1 割り込み Vector
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+	template <uint32_t base, peripheral per,
+		ICU::VECTOR_SELB ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
 	struct usb_t {
 
 		//-----------------------------------------------------------------//
@@ -979,7 +982,25 @@ namespace device {
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
+		static auto get_peripheral() { return per; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  USBI0 割り込みベクタを返す
+			@return USBI0 割り込みベクタ
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_i_vec() { return ivec; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  USBR0 割り込みベクタを返す
+			@return USBR0 割り込みベクタ
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_r_vec() { return rvec; }
 
 
 		//-----------------------------------------------------------------//
@@ -988,7 +1009,7 @@ namespace device {
 			@return D0FIFO 割り込みベクタ
 		*/
 		//-----------------------------------------------------------------//
-		ICU::VECTOR get_d0_vec() { return d0vec; }
+		static auto get_d0_vec() { return d0vec; }
 
 
 		//-----------------------------------------------------------------//
@@ -997,7 +1018,8 @@ namespace device {
 			@return D1FIFO 割り込みベクタ
 		*/
 		//-----------------------------------------------------------------//
-		ICU::VECTOR get_d1_vec() { return d1vec; }
+		static auto get_d1_vec() { return d1vec; }
 	};
-	typedef usb_t<0x000A0000, peripheral::USB0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
+	typedef usb_t<0x000A0000, peripheral::USB0,
+		ICU::VECTOR_SELB::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
 }
