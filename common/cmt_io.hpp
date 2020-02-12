@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600, RX200 グループ・CMT I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -95,17 +95,15 @@ namespace device {
 			auto vec = CMT::get_ivec();
 			if(level_ > 0) {
 				if(task != nullptr) {
-					icu_mgr::set_task(vec, task);
+					icu_mgr::set_interrupt(vec, task, level_);
 				} else {
-					icu_mgr::set_task(vec, i_task_);
+					icu_mgr::set_interrupt(vec, i_task_, level_);
 				}
 			    CMT::CMCR = CMT::CMCR.CKS.b(cks) | CMT::CMCR.CMIE.b();
 			} else {
-
-				icu_mgr::set_task(vec, nullptr);
+				icu_mgr::set_interrupt(vec, nullptr, 0);
 			    CMT::CMCR = CMT::CMCR.CKS.b(cks);
 			}
-			icu_mgr::set_level(vec, level_);
 			CMT::enable();
 
 			return true;
