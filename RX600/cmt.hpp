@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・CMT 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,20 +17,12 @@ namespace device {
 		@brief  CMT 定義基底クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル
-		@param[in]	INT		割り込みベクター型
+		@param[in]	VEC		ベクター型
 		@param[in]	ivec	割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, typename INT, INT ivec>
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec>
 	struct cmt_t {
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  割り込みベクターの型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef INT vector_type;
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -105,7 +97,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  許可
+			@brief  許可・不許可
 			@param[in]	ena		不許可の場合「false」
 		*/
 		//-----------------------------------------------------------------//
@@ -130,28 +122,29 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_ivec() noexcept { return ivec; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  ペリフェラル型を返す
 			@return ペリフェラル型
 		*/
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() noexcept { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static INT get_ivec() noexcept { return ivec; }
 	};
 
-#if defined(SIG_RX24T) || defined(SIG_RX66T)
+
+#if defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef cmt_t<0x00088002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0> CMT0;
 	typedef cmt_t<0x00088008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1> CMT1;
 	typedef cmt_t<0x00088012, peripheral::CMT2, ICU::VECTOR, ICU::VECTOR::CMI2> CMT2;
 	typedef cmt_t<0x00088018, peripheral::CMT3, ICU::VECTOR, ICU::VECTOR::CMI3> CMT3;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
 	typedef cmt_t<0x00088002, peripheral::CMT0, ICU::VECTOR, ICU::VECTOR::CMI0> CMT0;
 	typedef cmt_t<0x00088008, peripheral::CMT1, ICU::VECTOR, ICU::VECTOR::CMI1> CMT1;
 	typedef cmt_t<0x00088012, peripheral::CMT2, ICU::VECTOR_SELB, ICU::VECTOR_SELB::CMI2> CMT2;

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T グループ・システム制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -93,7 +93,7 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(F_PCLKB))
 								  | device::SYSTEM::SCKCR.PCKC.b(clock_div_(F_PCLKC))
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(F_PCLKD));
-			device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (120/5=24)
+			device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (240/5=48)
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 			// クロック関係書き込み不許可

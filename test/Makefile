@@ -3,15 +3,15 @@
 #   @file
 #   @brief  RX65N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	test_test
+TARGET		=	test
 
 DEVICE		=	R5F565NE
 
-FATFS_VER	=	ff12b
+FATFS_VER	=	ff13c/source
 
 BUILD		=	release
 
@@ -21,11 +21,15 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c
+				common/syscalls.c \
+				common/time.c
+
+# r_lcd/r_glcdc_rx_pinset.c
 
 PSOURCES	=	main.cpp
 
-USER_LIBS	=	stdc++
+USER_LIBS	=	supc++
+#USER_LIBS	=	stdc++
 
 LDSCRIPT	=	../RX65x/$(DEVICE).ld
 
@@ -55,15 +59,16 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../RX65x/drw_2d_ver1.02/inc/tes
+INC_APP		=	. ../ ../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../RX65x/drw_2d_ver1.02
+LIB_ROOT	=	../RX600/drw2d ../zlib
 
 OPTIMIZE	=	-O3
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-unused-but-set-variable \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
@@ -118,8 +123,7 @@ DEPENDS =   $(patsubst %.o,%.d, $(DOBJECTS))
 .SUFFIXES :
 .SUFFIXES : .rc .hpp .s .h .c .cpp .d .o
 
-# all: $(BUILD) $(TARGET).elf text
-all: $(BUILD) $(TARGET).elf
+all: $(BUILD) $(TARGET).elf text
 
 $(TARGET).elf: $(OBJECTS) $(LDSCRIPT) Makefile
 	$(CC) $(LDFLAGS) $(LIBINCS) -o $@ $(OBJECTS) $(LIBS)

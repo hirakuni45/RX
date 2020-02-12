@@ -93,13 +93,13 @@ namespace device {
 			switch(t) {
 			case peripheral::USB0:
 				{
-					uint8_t sel = enable ? 0b010011 : 0;
-					PORT2::PMR.B4 = 0;
-					MPC::P24PFS.PSEL = sel;  // USB0_VBUSEN (P24 LQFP176: 40)
-					PORT2::PMR.B4 = enable;
-					PORT2::PMR.B2 = 0;
-					MPC::P22PFS.PSEL = sel;  // USB0_OVRCURB (P22 LQFP176: 43)
-					PORT2::PMR.B2 = enable;
+					uint8_t sel = enable ? 0b010010 : 0;
+					PORT1::PMR.B4 = 0;
+					MPC::P14PFS.PSEL = sel;  // USB0_VBUSEN  (P14 LQFP176: 51)
+					PORT1::PMR.B4 = enable;
+					PORT1::PMR.B6 = 0;
+					MPC::P16PFS.PSEL = sel;  // USB0_OVRCURB (P16 LQFP176: 48)
+					PORT1::PMR.B6 = enable;
 				}
 				break;
 			// ※シリアルポートの MPC 設定では、PDR を制御する必要は無いが、

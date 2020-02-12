@@ -305,6 +305,8 @@ namespace device {
 			TXF2 = 59,	///< CAN2（送信 FIFO 割り込み）
 			RXM2 = 60,	///< CAN2（メールボックス０～３１メッセージ受信完了）
 			TXM2 = 61,	///< CAN2（メールボックス０～３１メッセージ送信完了）
+
+			USBI0 = 62,	///< USB0（１５要因のステータス割り込み） 
 		};
 
 
@@ -1711,7 +1713,7 @@ namespace device {
 		static rw8_t<0x000879FE> SLIAR254;
 		static rw8_t<0x000879FF> SLIAR255;
 
-		static icu_utils::slixr_t<0x00087900> SLIXR;
+		static icu_utils::slixr_t<0x00087700> SLIXR;
 	};
 	typedef icu_t ICU;
 }

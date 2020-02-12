@@ -2,7 +2,7 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX600 グループ・USBA 定義 @n
-			RX64M/RX71M/RX65x
+			RX64M/RX71M
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -18,11 +18,12 @@ namespace device {
 		@brief  USB 2.0 High-Speed ホスト / ファンクションモジュール (USBAa)
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
+		@param[in]	rvec	R 割り込み Vector
 		@param[in]	d0vec	D0 割り込み Vector
 		@param[in]	d1vec	D1 割り込み Vector
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
 	struct usba_t {
 
 		//-----------------------------------------------------------------//
@@ -1112,6 +1113,25 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  I 割り込みベクタを返す @n
+					USBA モジュールには、I ベクターはサポートしていない。
+			@return I 割り込みベクタ
+		*/
+		//-----------------------------------------------------------------//
+		ICU::VECTOR get_i_vec() { return ICU::VECTOR::NONE; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  R 割り込みベクタを返す
+			@return R 割り込みベクタ
+		*/
+		//-----------------------------------------------------------------//
+		ICU::VECTOR get_r_vec() { return rvec; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  D0FIFO 割り込みベクタを返す
 			@return D0FIFO 割り込みベクタ
 		*/
@@ -1127,5 +1147,6 @@ namespace device {
 		//-----------------------------------------------------------------//
 		ICU::VECTOR get_d1_vec() { return d1vec; }
 	};
-	typedef usba_t<0x000D0400, peripheral::USBA, ICU::VECTOR::D0FIFO2, ICU::VECTOR::D1FIFO2> USBA;
+	typedef usba_t<0x000D0400, peripheral::USBA, ICU::VECTOR::USBAR,
+		ICU::VECTOR::D0FIFO2, ICU::VECTOR::D1FIFO2> USBA;
 }
