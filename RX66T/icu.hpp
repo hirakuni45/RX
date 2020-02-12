@@ -1602,7 +1602,7 @@ namespace device {
 		static rw8_t<0x000879FF> SLIAR255;
 
 
-		static icu_utils::slixr_t<0x00087900> SLIXR;
+		static icu_utils::slixr_t<0x00087700> SLIXR;
 	};
 	typedef icu_t ICU;
 }
