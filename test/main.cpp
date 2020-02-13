@@ -70,6 +70,7 @@ namespace {
 	SCI		sci_;
 
 	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
+
 }
 
 extern "C" {
