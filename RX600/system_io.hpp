@@ -1,7 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T グループ・システム制御
+	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T/RX72T グループ・システム制御 @n
+			※ USB を使う場合：96MHz, 144MHz, 192MHz, 240MHz のいづれか
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -21,7 +22,8 @@ namespace device {
 	/*!
 		@brief  systen_io クラス
 		@param[in]	BASE_CLOCK	ベース・クロック周波数（１２ＭＨｚ）
-		@param[in]	INTR_CLOCK	内臓クロック周波数（２４０ＭＨｚ）
+		@param[in]	INTR_CLOCK	内臓クロック周波数（２４０ＭＨｚ）@n
+								※USB を使う場合、「INTR_CLOCK」は48の倍数である事
 		@param[in]	EXT_CLOCK	外部クロックに入力を行う場合「true」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -71,7 +73,7 @@ namespace device {
 				device::SYSTEM::ROMWT = 0b00;
 			}
 #endif
-#if defined(SIG_RX66T) || defined(SIG_RX72M)
+#if defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T)
 			if(F_ICLK > 120000000) {  // 120MHz 以上の場合設定
 				device::SYSTEM::MEMWAIT = 1;
 			}
@@ -93,13 +95,20 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKB.b(clock_div_(F_PCLKB))
 								  | device::SYSTEM::SCKCR.PCKC.b(clock_div_(F_PCLKC))
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(F_PCLKD));
-			device::SYSTEM::SCKCR2.UCK = 0b0100;  // USB Clock: 1/5 (240/5=48)
+			{  // USB Master Clock の設定
+				auto usb_div = INTR_CLOCK / 48;
+				if(usb_div >= 2 && usb_div <= 5) {
+					// 1/2, 1/3, 1/4, 1/5
+					static const uint8_t divs[] = { 0b0001, 0b0010, 0b0011, 0b0100 };
+					device::SYSTEM::SCKCR2.UCK = divs[usb_div - 2];
+				}
+			}
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
 
 			// クロック関係書き込み不許可
 			device::SYSTEM::PRCR = 0xA500;
 
-#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
+#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T)
 			// ROM キャッシュを有効（標準）
 			device::SYSTEM::ROMCE = 1;
 #endif
