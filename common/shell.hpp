@@ -1,12 +1,13 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	シェル、ＳＤコマンド解析、実行 @n
+	@brief	シェル、FS コマンド解析、実行 @n
 			・dir [xxx] @n
 			・pwd @n
-			・cd [xxx]
+			・cd [xxx] @n
+			・free
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -50,8 +51,8 @@ namespace utils {
 
         //-----------------------------------------------------------------//
         /*!
-            @brief  基本ＳＤ操作コマンド解析
-			@return ＳＤ操作にマッチしたら「true」
+            @brief  基本ＦＳ操作コマンド解析
+			@return ＦＳ操作にマッチしたら「true」
         */
         //-----------------------------------------------------------------//
 		bool analize() noexcept
