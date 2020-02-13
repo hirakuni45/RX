@@ -96,11 +96,10 @@ namespace device {
 								  | device::SYSTEM::SCKCR.PCKC.b(clock_div_(F_PCLKC))
 								  | device::SYSTEM::SCKCR.PCKD.b(clock_div_(F_PCLKD));
 			{  // USB Master Clock の設定
-				auto usb_div = INTR_CLOCK / 48;
+				auto usb_div = INTR_CLOCK / 48000000;
 				if(usb_div >= 2 && usb_div <= 5) {
 					// 1/2, 1/3, 1/4, 1/5
-					static const uint8_t divs[] = { 0b0001, 0b0010, 0b0011, 0b0100 };
-					device::SYSTEM::SCKCR2.UCK = divs[usb_div - 2];
+					device::SYSTEM::SCKCR2.UCK = usb_div - 1;
 				}
 			}
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
