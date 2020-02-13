@@ -117,7 +117,7 @@ INC_APP		=	. ../ \
                 ../FreeRTOS/Source/include \
                 ../FreeRTOS/Source/portable/GCC/RX600v2 \
 				../RX600/drw2d/inc/tes \
-				../r_usb/basic ../r_usb/basic/ref ../r_usb/hmsc \
+				../r_usb/basic ../r_usb/hmsc \
 				../r_usb/basic/src/driver/inc ../r_usb/basic/src/hw/inc ../r_usb/hmsc/src/inc
 
 LIB_ROOT	=	../RX600/drw2d ../libmad ../zlib ../libpng
