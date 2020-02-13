@@ -19,7 +19,6 @@ html/
 !jpeg-6b/jmorecfg.h
 !jpeg-6b/libjpeg.a
 jpeg-6b/
-r_usb/
 libusb/
 tmp/
 libmad/libmad
