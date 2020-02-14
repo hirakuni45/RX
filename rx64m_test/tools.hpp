@@ -383,7 +383,7 @@ namespace seeda {
 				wm = true;
 			}
 			if(wm || wrn > 0) {
-				uint32_t d;
+				uint32_t d = 0;
 				if(!(utils::input("%x", p) % d).status()) {
 					utils::format("Flash data fail (%d): '%s'\n") % (n - 1) % tmp;
 					return;
@@ -391,7 +391,7 @@ namespace seeda {
 				wrd[wrn] = d;
 				++wrn;
 			} else {
-				uint32_t d;
+				uint32_t d = 0;
 				if(!(utils::input("%x", p) % d).status()) {
 					utils::format("Flash address fail: %s\n") % tmp;
 					return;
