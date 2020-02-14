@@ -80,7 +80,7 @@ INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \
 				../../FreeRTOS/Source/portable/GCC/RX600v2
 
-LIB_ROOT	=	../../libmad/.libs
+LIB_ROOT	=	../../libmad
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
