@@ -542,7 +542,7 @@ namespace fatfs {
 				}
 //				utils::format("Card ditect\n");
 			} else if(cd_ && select_wait_ == 0) {
-				f_mount(&fatfs_, "", 0);
+				f_mount(nullptr, "", 0);
 				spi_.destroy();
 				if(POW::BIT_POS < 32) {
 					lock_();
@@ -563,7 +563,7 @@ namespace fatfs {
 			if(mount_delay_) {
 				--mount_delay_;
 				if(mount_delay_ == 0) {
-					auto st = f_mount(&fatfs_, "", 1);
+					auto st = f_mount(&fatfs_, "", 0);
 					if(st != FR_OK) {
 						utils::format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
 						spi_.destroy();

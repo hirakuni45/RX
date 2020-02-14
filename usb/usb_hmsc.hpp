@@ -227,17 +227,20 @@ namespace fatfs {
 			auto event = R_USB_GetEvent(&usb_.at_ctrl()); /* Get event code */
 			switch (event) {
 			case USB_STS_CONFIGURED:
-				format("USB: CONFIGURED\n");
+///				format("USB: CONFIGURED\n");
 				{
-					auto st = f_mount(&fatfs_, "", 1);
+					uint8_t drvno;
+					R_USB_HmscGetDriveNo(&usb_.at_ctrl(), &drvno);
+
+					auto st = f_mount(&fatfs_, "", 0);
 					if(st == FR_OK) mount_ = true;
 					else mount_ = false;
 				}
 				break;
 
 			case USB_STS_DETACH:
-				format("USB: DETACH\n");
-				f_mount(&fatfs_, "", 0);
+///				format("USB: DETACH\n");
+				f_mount(nullptr, "", 0);
 				mount_ = false;
 				break;
 
