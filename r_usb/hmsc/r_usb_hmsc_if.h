@@ -68,10 +68,18 @@ typedef enum
     USB_CSW_PHASE   = 0x02u,
 }usb_csw_result_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /******************************************************************************
  Exported global functions (to be accessed by other files)
  ******************************************************************************/
 usb_err_t       R_USB_HmscStrgCmd (usb_ctrl_t *p_ctrl, uint8_t *p_buf, uint16_t command);
 usb_err_t       R_USB_HmscGetDriveNo (usb_ctrl_t *p_ctrl, uint8_t *p_drive);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif /* USB_HMSC_IF_H */

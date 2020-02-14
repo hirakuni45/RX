@@ -944,7 +944,7 @@ namespace fatfs {
 				mount_delay_ = MOUNT_DELAY_FRAME;  // n フレーム後にマウントする
 			} else if(!cd && cd_) {
 ///				utils::format("Card Eject\n");
-				f_mount(&fatfs_, "", 0);
+				f_mount(nullptr, "", 0);
 				device::port_map::turn_sdhi(device::port_map::sdhi_situation::EJECT, PSEL);
 				POW::P = 1;
 
@@ -956,7 +956,7 @@ namespace fatfs {
 			if(mount_delay_) {
 				--mount_delay_;
 				if(mount_delay_ == 0) {
-					auto st = f_mount(&fatfs_, "", 1);
+					auto st = f_mount(&fatfs_, "", 0);
 					if(st != FR_OK) {
 						debug_format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
 						POW::P = 1;

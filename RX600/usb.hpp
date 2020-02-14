@@ -18,14 +18,15 @@ namespace device {
 		@brief  USB 定義基底クラス
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
+		@param[in]	IVT		ivec タイプ
 		@param[in]	ivec	USBI 割り込み Vector
 		@param[in]	rvec	USBR 割り込み Vector
 		@param[in]	d0vec	D0 割り込み Vector
 		@param[in]	d1vec	D1 割り込み Vector
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per,
-		ICU::VECTOR_SELB ivec, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
+	template <uint32_t base, peripheral per, class IVT, IVT ivec, 
+		ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
 	struct usb_t {
 
 		//-----------------------------------------------------------------//
@@ -1020,6 +1021,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static auto get_d1_vec() { return d1vec; }
 	};
-	typedef usb_t<0x000A0000, peripheral::USB0,
+
+#if defined(SIG_RX66T) || defined(SIG_RX72T)
+	typedef usb_t<0x000A0000, peripheral::USB0, ICU::VECTOR,
+		ICU::VECTOR::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
+#else
+	typedef usb_t<0x000A0000, peripheral::USB0, ICU::VECTOR_SELB,
 		ICU::VECTOR_SELB::USBI0, ICU::VECTOR::USBR0, ICU::VECTOR::D0FIFO0, ICU::VECTOR::D1FIFO0> USB0;
+#endif
 }

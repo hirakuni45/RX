@@ -85,10 +85,10 @@ namespace {
 	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x00000100);
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-	typedef device::glcdc_io<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_IO;
-	typedef graphics::render<GLCDC_IO, FONT> RENDER;
-	GLCDC_IO	glcdc_io_(nullptr, fb_);
-	RENDER		render_(glcdc_io_, font_);
+	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_MGR;
+	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
+	GLCDC_MGR	glcdc_mgr_(nullptr, fb_);
+	RENDER		render_(glcdc_mgr_, font_);
 
 #elif defined(SIG_RX24T)
 	typedef device::system_io<10000000> SYSTEM_IO;
@@ -307,11 +307,11 @@ int main(int argc, char** argv)
 		LCD_LIGHT::DIR = 1;
 		LCD_DISP::P  = 0;  // DISP Disable
 		LCD_LIGHT::P = 0;  // BackLight Disable (No PWM)
-		if(glcdc_io_.start()) {
+		if(glcdc_mgr_.start()) {
 			utils::format("Start GLCDC\n");
 			LCD_DISP::P  = 1;  // DISP Enable
 			LCD_LIGHT::P = 1;  // BackLight Enable (No PWM)
-			if(!glcdc_io_.control(GLCDC_IO::CONTROL_CMD::START_DISPLAY)) {
+			if(!glcdc_mgr_.control(GLCDC_MGR::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC ctrl fail...\n");
 			}
 		} else {
@@ -333,7 +333,7 @@ int main(int argc, char** argv)
 	bool sw = false;
 	while(1) {
 #if defined(SIG_RX65N)
-		glcdc_io_.sync_vpos();
+		glcdc_mgr_.sync_vpos();
 
 		bool v = !SW2::P();
 		if(!sw && v) {

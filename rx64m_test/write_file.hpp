@@ -122,7 +122,7 @@ namespace seeda {
 			if(std::strlen(name) != 3) {
 				return;
 			}
-			uint16_t v;
+			uint16_t v = 0;
 			if((utils::input("%d", name) % v).status()) {
 				if(v > 0 && v < 1000) {  // 1 to 999
 					dir_info_t* t = static_cast<dir_info_t*>(opt);
