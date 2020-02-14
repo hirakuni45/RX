@@ -61,6 +61,7 @@ make_main()
 }
 
 # make
+# first build drw2d library
 for file in `ls -d RX600/drw2d`;
 do
     if [ -e "${file}/Makefile" ]; then
