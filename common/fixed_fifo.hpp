@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Fixed FIFO (first in first out) テンプレート
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,7 +16,7 @@ namespace utils {
     /*!
         @brief  固定サイズ FIFO クラス
 		@param[in]	UNIT	基本形
-		@param[in]	SIZE	バッファサイズ
+		@param[in]	SIZE	バッファサイズ（最低２）
     */
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class UNIT, uint32_t SIZE>
@@ -83,7 +83,7 @@ namespace utils {
         */
         //-----------------------------------------------------------------//
 		inline void put_go() noexcept {
-			volatile uint16_t put = put_;
+			volatile auto put = put_;
 			++put;
 			if(put >= SIZE) {
 				put = 0;
@@ -122,7 +122,7 @@ namespace utils {
         */
         //-----------------------------------------------------------------//
 		inline void get_go() noexcept {
-			volatile uint16_t get = get_;
+			volatile auto get = get_;
 			++get;
 			if(get >= SIZE) {
 				get = 0;
