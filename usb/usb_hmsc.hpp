@@ -168,7 +168,8 @@ namespace fatfs {
 				return RES_ERROR;
 			}
 
-			auto err = R_USB_HmscStrgWriteSector(&t, drv, static_cast<const uint8_t*>(buff), sector, count, len);
+///			auto err = R_USB_HmscStrgWriteSector(&t, drv, static_cast<const uint8_t*>(buff), sector, count, len);
+			auto err = R_USB_HmscStrgWriteSector(&t, drv, (uint8_t*)(buff), sector, count, len);
 			if(USB_OK != err) {
 				return RES_ERROR;
 			}

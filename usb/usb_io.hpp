@@ -31,22 +31,11 @@ namespace device {
 
 		typedef utils::format format;
 
-		enum class STATE : uint16_t {
-			ATTACH,
-			DATA_READY,
-			DATA_WRITE,
-			FILE_READ,
-			DETACH,
-			ERROR,
-		};
-
 		uint8_t			ilvl_;
 
 		ICU::VECTOR		ivec_;
 
 		usb_ctrl_t		ctrl_;
-
-		STATE			state_;
 
 		int32_t			event_;
 
@@ -75,7 +64,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		usb_io() : ilvl_(0), ivec_(ICU::VECTOR::NONE),
-			ctrl_(), state_(STATE::DETACH),
+			ctrl_(),
 			event_(-1)
 		{ }
 
@@ -107,7 +96,7 @@ namespace device {
 			cfg.usb_speed   = USB_FS;
 			cfg.usb_mode    = USB_HOST;
 			auto ret = R_USB_Open(&ctrl_, &cfg);
-			format("R_USB_Open: (%d)\n") % static_cast<int>(ret);
+//			format("R_USB_Open: (%d)\n") % static_cast<int>(ret);
 
 			return true;
 		}
