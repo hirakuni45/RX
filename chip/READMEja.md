@@ -145,6 +145,12 @@ Nintendo
 Family Computer Joy-Pad P/S Conversion
 Interface: 8 bits serial(P/S, CLK, OUT)
 
+ - MAX6675
+Maxim Integrated   
+冷接点補償K熱電対デジタルコンバータ(0℃～+1024℃)   
+https://www.maximintegrated.com/jp/products/sensors/MAX6675.html   
+Interface: SPI (/CS, SCK, SO)   
+
 -----
    
 License

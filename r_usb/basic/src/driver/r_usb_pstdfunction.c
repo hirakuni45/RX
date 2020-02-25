@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2016) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_pstdfunction.c
@@ -26,19 +26,25 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 
 /******************************************************************************
  Includes   <System Includes> , "Project Includes"
  ******************************************************************************/
-
+#include <string.h>
 #include "r_usb_basic_if.h"
 #include "r_usb_typedef.h"
 #include "r_usb_extern.h"
 #include "r_usb_bitdefine.h"
 #include "r_usb_reg_access.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
+
+
+/******************************************************************************
+ Exported global variables (to be accessed by other files)
+ ******************************************************************************/
 
 /******************************************************************************
  Renesas Abstracted Peripheral standard function functions
@@ -73,6 +79,7 @@ uint16_t usb_pstd_chk_vbsts (void)
     uint16_t connect_info;
 
     /* VBUS chattering cut */
+    /* WAIT_LOOP */
     do
     {
         buf1 = hw_usb_read_intsts();
@@ -83,7 +90,7 @@ uint16_t usb_pstd_chk_vbsts (void)
     } while (((buf1 & USB_VBSTS) != (buf2 & USB_VBSTS)) || ((buf2 & USB_VBSTS) != (buf3 & USB_VBSTS)));
 
     /* VBUS status judge */
-    if ((buf1 & USB_VBSTS) != (uint16_t) 0)
+    if ((uint16_t) 0 != (buf1 & USB_VBSTS))
     {
         /* Attach */
         connect_info = USB_ATTACH;
@@ -137,11 +144,49 @@ void usb_pdriver_init (usb_ctrl_t *ctrl, usb_cfg_t *cfg)
 {
     uint16_t i;
 
-    for (i = 0; i < USB_EVENT_MAX; i++)
+    /* WAIT_LOOP */
+    for (i = 0; i < (USB_MAX_EP_NO + 1); i++)
     {
-        g_usb_cstd_event.code[i] = USB_STS_NONE;
+        g_usb_pstd_eptbl_index[0][i] = 0;
+        g_usb_pstd_eptbl_index[1][i] = 0;
     }
 
+    /* WAIT_LOOP */
+    for (i = 0; i < USB_ALT_NO; i++)
+    {
+        g_usb_pstd_alt_num[i] = 0;
+    }
+
+    g_usb_pstd_test_mode_select = USB_NULL;
+    g_usb_pstd_req_type = USB_NULL;
+    g_usb_pstd_req_value = USB_NULL;
+    g_usb_pstd_req_index = USB_NULL;
+    g_usb_pstd_req_length = USB_NULL;
+    g_usb_pstd_pipe0_request = USB_OFF;
+    g_usb_pstd_std_request = USB_NO;
+    g_usb_peri_connected = USB_FALSE;
+    memset((void *)&g_usb_pstd_req_reg, 0, sizeof(usb_setup_t));
+    g_usb_pstd_stall_cb = USB_NULL;
+    memset((void *)&g_usb_pstd_driver, 0, sizeof(usb_pcdreg_t));
+
+    /* WAIT_LOOP */
+    for (i = 0; i < (USB_MAX_PIPE_NO + 1); i++)
+    {
+        gp_usb_pstd_data[i] = USB_NULL;
+        g_usb_pstd_data_cnt[i] = 0;
+    }
+
+    /* WAIT_LOOP */
+    for (i = 0; i < USB_EVENT_MAX; i++)
+    {
+#if (BSP_CFG_RTOS_USED == 0)
+        g_usb_cstd_event.code[i] = USB_STS_NONE;
+#else /*(BSP_CFG_RTOS_USED == 0)*/
+        g_usb_cstd_event[i].event = USB_STS_NONE;
+#endif /*(BSP_CFG_RTOS_USED == 0)*/
+    }
+
+    /* WAIT_LOOP */
     for (i = USB_PIPE0; i <= USB_MAX_PIPE_NO; i++)
     {
         g_usb_pstd_stall_pipe[i] = USB_FALSE;
@@ -149,7 +194,7 @@ void usb_pdriver_init (usb_ctrl_t *ctrl, usb_cfg_t *cfg)
     }
 
     g_usb_pstd_config_num = 0; /* Configuration number */
-    g_usb_pstd_remote_wakeup = USB_FALSE; /* Remote wakeup enable flag */
+    g_usb_pstd_remote_wakeup = USB_FALSE; /* Remote wake up enable flag */
 
     usb_peri_registration(ctrl, cfg);
 

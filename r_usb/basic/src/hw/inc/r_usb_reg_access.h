@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_reg_access.h
@@ -27,6 +27,9 @@
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
  *         : 26.01.2017 1.21 Support DMAC Technical Update for RX71M/RX64M USBA.
+ *         : 30.09.2017 1.22 RX65N-2MB is added.
+ *         : 20.12.2017 1.23 Delete support for Host 2port.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 #ifndef HW_USB_REG_ACCESS_H
 #define HW_USB_REG_ACCESS_H
@@ -93,17 +96,17 @@ void         hw_usb_pmodule_init( void );
 /************/
 /*  SYSCFG  */
 /************/
-uint16_t hw_usb_read_syscfg (usb_utr_t *ptr, uint16_t port);
-void hw_usb_write_syscfg (usb_utr_t *ptr, uint16_t port, uint16_t data);
+uint16_t hw_usb_read_syscfg (usb_utr_t *ptr);
+void hw_usb_write_syscfg (usb_utr_t *ptr, uint16_t data);
 void hw_usb_clear_cnen (usb_utr_t *ptr);
-void hw_usb_set_hse (usb_utr_t *ptr, uint16_t port);
-void hw_usb_clear_hse (usb_utr_t *ptr, uint16_t port);
+void hw_usb_set_hse (usb_utr_t *ptr);
+void hw_usb_clear_hse (usb_utr_t *ptr);
 void hw_usb_set_dcfm (void);
 void hw_usb_clear_dcfm (usb_utr_t *ptr);
-void hw_usb_clear_drpd (usb_utr_t *ptr, uint16_t port);
+void hw_usb_clear_drpd (usb_utr_t *ptr);
 void hw_usb_set_usbe (usb_utr_t *ptr);
 void hw_usb_clear_usbe (usb_utr_t *ptr);
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 void hw_usb_set_cnen (void);
 void hw_usb_pset_dprpu (void);
 void hw_usb_pclear_dprpu (void);
@@ -118,27 +121,27 @@ void hw_usb_set_buswait (usb_utr_t *ptr);
 /************/
 /*  SYSSTS0 */
 /************/
-uint16_t hw_usb_read_syssts (usb_utr_t *ptr, uint16_t port);
+uint16_t hw_usb_read_syssts (usb_utr_t *ptr);
 
 /**************/
 /*  DVSTCTR0  */
 /**************/
-uint16_t hw_usb_read_dvstctr (usb_utr_t *ptr, uint16_t port);
-void hw_usb_write_dvstctr (usb_utr_t *ptr, uint16_t port, uint16_t data);
-void hw_usb_rmw_dvstctr (usb_utr_t *ptr, uint16_t port, uint16_t data, uint16_t width);
-void hw_usb_clear_dvstctr (usb_utr_t *ptr, uint16_t port, uint16_t data);
-void hw_usb_set_vbout (usb_utr_t *ptr, uint16_t port);
-void hw_usb_clear_vbout (usb_utr_t *ptr, uint16_t port);
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
-void hw_usb_hset_rwupe (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hclear_rwupe (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hset_resume (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hclear_resume (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hset_uact (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hclear_uact (usb_utr_t *ptr, uint16_t port);
+uint16_t hw_usb_read_dvstctr (usb_utr_t *ptr);
+void hw_usb_write_dvstctr (usb_utr_t *ptr, uint16_t data);
+void hw_usb_rmw_dvstctr (usb_utr_t *ptr, uint16_t data, uint16_t width);
+void hw_usb_clear_dvstctr (usb_utr_t *ptr, uint16_t data);
+void hw_usb_set_vbout (usb_utr_t *ptr);
+void hw_usb_clear_vbout (usb_utr_t *ptr);
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+void hw_usb_hset_rwupe (usb_utr_t *ptr);
+void hw_usb_hclear_rwupe (usb_utr_t *ptr);
+void hw_usb_hset_resume (usb_utr_t *ptr);
+void hw_usb_hclear_resume (usb_utr_t *ptr);
+void hw_usb_hset_uact (usb_utr_t *ptr);
+void hw_usb_hclear_uact (usb_utr_t *ptr);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 void hw_usb_pset_wkup (void);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_REPI */
@@ -184,7 +187,7 @@ void hw_usb_write_intenb (usb_utr_t *ptr, uint16_t data);
 void hw_usb_set_intenb (usb_utr_t *ptr, uint16_t data);
 void hw_usb_clear_enb_vbse (usb_utr_t *ptr);
 void hw_usb_clear_enb_sofe (usb_utr_t *ptr);
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 void hw_usb_pset_enb_rsme (void);
 void hw_usb_pclear_enb_rsme (void);
 
@@ -215,7 +218,7 @@ void hw_usb_clear_bempenb (usb_utr_t *ptr, uint16_t pipeno);
 /*  SOFCFG   */
 /*************/
 void hw_usb_set_sofcfg (usb_utr_t *ptr, uint16_t data);
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 void hw_usb_hset_trnensel (usb_utr_t *ptr);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -225,7 +228,7 @@ void hw_usb_hset_trnensel (usb_utr_t *ptr);
 /*************/
 void hw_usb_write_intsts (usb_utr_t *ptr, uint16_t data);
 void hw_usb_clear_sts_sofr (usb_utr_t *ptr);
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 uint16_t hw_usb_read_intsts (void);
 void hw_usb_pclear_sts_resm (void);
 void hw_usb_pclear_sts_valid (void);
@@ -256,7 +259,7 @@ void hw_usb_clear_status_bemp (usb_utr_t *ptr, uint16_t pipeno);
 /************/
 uint16_t hw_usb_read_frmnum (usb_utr_t *ptr);
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /************/
 /* USBREQ   */
 /************/
@@ -279,7 +282,7 @@ void hw_usb_hset_usbleng (usb_utr_t *ptr, uint16_t data);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 /************/
 /* USBREQ   */
 /************/
@@ -317,12 +320,12 @@ void hw_usb_write_dcpmxps (usb_utr_t *ptr, uint16_t data);
 /************/
 /* DCPCTR   */
 /************/
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 void hw_usb_hwrite_dcpctr (usb_utr_t *ptr, uint16_t data);
 void hw_usb_hset_sureq (usb_utr_t *ptr);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 uint16_t hw_usb_read_dcpctr (void);
 void hw_usb_pset_ccpl (void);
 
@@ -393,7 +396,7 @@ void hw_usb_set_idpsinke (usb_utr_t *ptr);
 void hw_usb_set_suspendm(void);
 void hw_usb_clear_suspm(void);
 void hw_usb_clear_idpsinke (usb_utr_t *ptr);
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 void hw_usb_hset_dcpmode (usb_utr_t *ptr);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -403,19 +406,19 @@ void hw_usb_hset_dcpmode (usb_utr_t *ptr);
 /**********************************/
 void hw_usb_write_dmacfg (usb_utr_t *ptr, uint16_t pipemode, uint16_t data);
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /*************/
 /*  INTENB1  */
 /*************/
-void hw_usb_hwrite_intenb (usb_utr_t *ptr, uint16_t port, uint16_t data);
-void hw_usb_hset_enb_ovrcre (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hclear_enb_ovrcre (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hset_enb_bchge (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hclear_enb_bchge (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hset_enb_dtche (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hclear_enb_dtche (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hset_enb_attche (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hclear_enb_attche (usb_utr_t *ptr, uint16_t port);
+void hw_usb_hwrite_intenb (usb_utr_t *ptr, uint16_t data);
+void hw_usb_hset_enb_ovrcre (usb_utr_t *ptr);
+void hw_usb_hclear_enb_ovrcre (usb_utr_t *ptr);
+void hw_usb_hset_enb_bchge (usb_utr_t *ptr);
+void hw_usb_hclear_enb_bchge (usb_utr_t *ptr);
+void hw_usb_hset_enb_dtche (usb_utr_t *ptr);
+void hw_usb_hclear_enb_dtche (usb_utr_t *ptr);
+void hw_usb_hset_enb_attche (usb_utr_t *ptr);
+void hw_usb_hclear_enb_attche (usb_utr_t *ptr);
 void hw_usb_hset_enb_signe (usb_utr_t *ptr);
 void hw_usb_hset_enb_sacke (usb_utr_t *ptr);
 void hw_usb_hset_enb_pddetinte (usb_utr_t *ptr);
@@ -423,11 +426,11 @@ void hw_usb_hset_enb_pddetinte (usb_utr_t *ptr);
 /*************/
 /*  INTSTS1  */
 /*************/
-void hw_usb_hwrite_intsts (usb_utr_t *ptr, uint16_t port, uint16_t data);
-void hw_usb_hclear_sts_ovrcr (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hclear_sts_bchg (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hclear_sts_dtch (usb_utr_t *ptr, uint16_t port);
-void hw_usb_hclear_sts_attch (usb_utr_t *ptr, uint16_t port);
+void hw_usb_hwrite_intsts (usb_utr_t *ptr, uint16_t data);
+void hw_usb_hclear_sts_ovrcr (usb_utr_t *ptr);
+void hw_usb_hclear_sts_bchg (usb_utr_t *ptr);
+void hw_usb_hclear_sts_dtch (usb_utr_t *ptr);
+void hw_usb_hclear_sts_attch (usb_utr_t *ptr);
 void hw_usb_hclear_sts_sign (usb_utr_t *ptr);
 void hw_usb_hclear_sts_sack (usb_utr_t *ptr);
 void hw_usb_hclear_sts_pddetint (usb_utr_t *ptr);

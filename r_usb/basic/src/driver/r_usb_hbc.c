@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2016) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_hbc.c
@@ -26,6 +26,7 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Delete support for Host 2port. Supporting Smart Configurator.
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -38,7 +39,7 @@
 #include "r_usb_bitdefine.h"
 #include "r_usb_reg_access.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 #if USB_CFG_BC == USB_CFG_ENABLE
 /******************************************************************************
  Macro definitions
@@ -62,10 +63,10 @@
 usb_bc_status_t g_usb_hstd_bc[2u];
 
 /* functions */
-void usb_hstd_pddetint_process(usb_utr_t *ptr, uint16_t port);
+void usb_hstd_pddetint_process(usb_utr_t *ptr);
 
 /* BC State change function table */
-void (*usb_hstd_bc_func[USB_BC_STATE_MAX][USB_BC_EVENT_MAX])(usb_utr_t *ptr, uint16_t port) =
+void (*usb_hstd_bc_func[USB_BC_STATE_MAX][USB_BC_EVENT_MAX])(usb_utr_t *ptr) =
 {
     /* VBUS_ON              ATTACH               DETACH */
     {   usb_hstd_bc_init_vb , usb_hstd_bc_err , usb_hstd_bc_err},   /* USB_BC_STATE_INIT */
@@ -84,14 +85,14 @@ void (*usb_hstd_bc_func[USB_BC_STATE_MAX][USB_BC_EVENT_MAX])(usb_utr_t *ptr, uin
  Function Name   : usb_hstd_pddetint_process
  Description     : PDDETINT process
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_pddetint_process(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_pddetint_process(usb_utr_t *ptr)
 {
     uint16_t buf[3];
 
     /* PDDETSTS chattering cut */
+    /* WAIT_LOOP */
     do
     {
         buf[0] = hw_usb_read_bcctrl(ptr);
@@ -125,10 +126,9 @@ void usb_hstd_pddetint_process(usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_bc_err
  Description     : BC State change function [ERROR]
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_err(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_err(usb_utr_t *ptr)
 {
     /* Nothing */
 } /* End of function usb_hstd_bc_err() */
@@ -137,17 +137,16 @@ void usb_hstd_bc_err(usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_bc_init_vb
  Description     : BC State change function [INIT] [VbusOn]
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_init_vb(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_init_vb(usb_utr_t *ptr)
 {
 #if USB_CFG_DCP == USB_CFG_ENABLE
         g_usb_hstd_bc[ptr->ip].state = USB_BC_STATE_DCP;
-        usb_hstd_bc_dcp_entry(ptr,port);
+        usb_hstd_bc_dcp_entry(ptr);
 #else   /* USB_CFG_DCP == USB_CFG_ENABLE */
         g_usb_hstd_bc[ptr->ip].state = USB_BC_STATE_DET;
-        usb_hstd_bc_det_entry(ptr,port);
+        usb_hstd_bc_det_entry(ptr);
 
 #endif  /* USB_CFG_DCP == USB_CFG_ENABLE */
 
@@ -157,22 +156,21 @@ void usb_hstd_bc_init_vb(usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_bc_det_at
  Description     : BC State change function [DET] [Attach]
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_det_at(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_det_at(usb_utr_t *ptr)
 {
-    usb_hstd_bc_det_exit(ptr,port);
+    usb_hstd_bc_det_exit(ptr);
 
     if (g_usb_hstd_bc[ptr->ip].pd_detect)
     {
         g_usb_hstd_bc[ptr->ip].state = USB_BC_STATE_CDP;
-        usb_hstd_bc_cdp_entry(ptr, port);
+        usb_hstd_bc_cdp_entry(ptr);
     }
     else
     {
         g_usb_hstd_bc[ptr->ip].state = USB_BC_STATE_SDP;
-        usb_hstd_bc_sdp_entry(ptr,port);
+        usb_hstd_bc_sdp_entry(ptr);
     }
 } /* End of function usb_hstd_bc_det_at() */
 
@@ -180,38 +178,35 @@ void usb_hstd_bc_det_at(usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_bc_cdp_dt
  Description     : BC State change function [CDP] [Detach]
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_cdp_dt(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_cdp_dt(usb_utr_t *ptr)
 {
-    usb_hstd_bc_cdp_exit(ptr, port);
+    usb_hstd_bc_cdp_exit(ptr);
     g_usb_hstd_bc[ptr->ip].state = USB_BC_STATE_DET;
-    usb_hstd_bc_det_entry(ptr, port);
+    usb_hstd_bc_det_entry(ptr);
 } /* End of function usb_hstd_bc_cdp_dt() */
 
 /******************************************************************************
  Function Name   : usb_hstd_bc_sdp_dt
  Description     : BC State change function [SDP] [Detach]
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_sdp_dt(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_sdp_dt(usb_utr_t *ptr)
 {
-    usb_hstd_bc_sdp_exit(ptr, port);
+    usb_hstd_bc_sdp_exit(ptr);
     g_usb_hstd_bc[ptr->ip].state = USB_BC_STATE_DET;
-    usb_hstd_bc_det_entry(ptr, port);
+    usb_hstd_bc_det_entry(ptr);
 } /* End of function usb_hstd_bc_sdp_dt() */
 
 /******************************************************************************
  Function Name   : usb_hstd_bc_det_entry
  Description     : BC State entry function [DET]
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_det_entry(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_det_entry(usb_utr_t *ptr)
 {
     hw_usb_set_idpsinke(ptr);
     hw_usb_hclear_sts_pddetint(ptr);
@@ -222,10 +217,9 @@ void usb_hstd_bc_det_entry(usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_bc_det_exit
  Description     : BC State exit function [DET]
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_det_exit(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_det_exit(usb_utr_t *ptr)
 {
     hw_usb_hset_enb_pddetinte(ptr);
     hw_usb_hclear_sts_pddetint(ptr);
@@ -239,7 +233,7 @@ void usb_hstd_bc_det_exit(usb_utr_t *ptr, uint16_t port)
                  : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_cdp_entry(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_cdp_entry(usb_utr_t *ptr)
 {
     /* Nothing */
 } /* End of function usb_hstd_bc_cdp_entry() */
@@ -248,10 +242,9 @@ void usb_hstd_bc_cdp_entry(usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_bc_cdp_exit
  Description     : BC State exit function [CDP]
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_cdp_exit(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_cdp_exit(usb_utr_t *ptr)
 {
     g_usb_hstd_bc[ptr->ip].pd_detect = USB_BC_NODET;
 } /* End of function usb_hstd_bc_cdp_exit() */
@@ -260,10 +253,9 @@ void usb_hstd_bc_cdp_exit(usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_bc_sdp_entry
  Description     : BC State entry function [SDP]
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_sdp_entry(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_sdp_entry(usb_utr_t *ptr)
 {
     /* Nothing */
 } /* End of function usb_hstd_bc_sdp_entry() */
@@ -272,10 +264,9 @@ void usb_hstd_bc_sdp_entry(usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_bc_sdp_exit
  Description     : BC State exit function [SDP]
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_sdp_exit(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_sdp_exit(usb_utr_t *ptr)
 {
     /* Nothing */
 } /* End of function usb_hstd_bc_sdp_exit() */
@@ -284,12 +275,11 @@ void usb_hstd_bc_sdp_exit(usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_bc_dcp_entry
  Description     : BC State entry function [DCP]
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bc_dcp_entry(usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bc_dcp_entry(usb_utr_t *ptr)
 {
-    hw_usb_clear_drpd(ptr, port);
+    hw_usb_clear_drpd(ptr);
     hw_usb_hset_dcpmode(ptr);
 } /* End of function usb_hstd_bc_dcp_entry() */
 

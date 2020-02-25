@@ -33,6 +33,8 @@
 #include "usb/usb_io.hpp"
 #include "usb/usb_hmsc.hpp"
 
+#include "usb/usb_host.hpp"
+
 namespace {
 
 	typedef device::system_io<12000000> SYSTEM_IO;
@@ -264,12 +266,12 @@ extern "C" {
 		usb_io_.init_intr();
 	}
 
-	void usb_cpu_int_enable (usb_utr_t *ptr)
+	void usb_cpu_int_enable (void)
 	{
 		usb_io_.enable_intr();
 	}
 
-	void usb_cpu_int_disable (usb_utr_t *ptr)
+	void usb_cpu_int_disable (void)
 	{
 		usb_io_.enable_intr(false);
 	}

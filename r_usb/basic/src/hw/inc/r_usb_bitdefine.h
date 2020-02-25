@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2016) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_bitdefine.h
@@ -26,6 +26,7 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 #ifndef R_USB_BITDEFINE_H
 #define R_USB_BITDEFINE_H
@@ -43,7 +44,7 @@
 #define USB_DCFM                (0x0040u)   /* b6: Function select */
 #define USB_DRPD                (0x0020u)   /* b5: D+/D- pull down control */
 #define USB_DPRPU               (0x0010u)   /* b4: D+ pull up control */
-#define USB_DMRPU               (0x0010u)   /* b4: D- pull up control *//* For low speed */
+#define USB_DMRPU               (0x0008u)   /* b3: D- pull up control *//* For low speed */
 #define USB_USBE                (0x0001u)   /* b0: USB module enable */
 
 /* CPU Bus Wait Register */
@@ -266,10 +267,10 @@
 #define USB_CRCE                (0x4000u)   /* b14: Received data error */
 #define USB_FRNM                (0x07FFu)   /* b10-0: Frame number */
 
-/* Device State Change Register *//* For USB0 */
+/* Device State Change Register */ /* For USB0 */
 #define USB_DVCHG               (0x8000u)   /* b15: Device state change */
 
-/* Micro Frame Number Register *//* For USBHS */
+/* Micro Frame Number Register */ /* For USBHS */
 #define USB_UFRNM               (0x0007u)   /* b2-0: Micro frame number */
 
 /* USB Address / Low Power Status Recovery Register */
@@ -350,7 +351,6 @@
 #define USB_UPPHUB              (0x7800u)   /* b14-11: HUB register */
 #define USB_HUBPORT             (0x0700u)   /* b10-8: HUB port */
 #define USB_USBSPD              (0x00C0u)   /* b7-6: Device speed */
-#define USB_RTPORT              (0x0001u)
 
 /********* USB0 Only ******************************************************************************/
 

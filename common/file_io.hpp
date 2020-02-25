@@ -28,6 +28,9 @@ namespace utils {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class file_io {
+
+		static const uint32_t COPY_TMP_SIZE = 512;	///< コピーを行う場合のテンポラリサイズ
+
 	public:
 
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -69,6 +72,13 @@ namespace utils {
 				format(" ");
 			}
 			format("%s\n") % name;
+		}
+
+
+		///< 標準的、コピー用
+		static void dir_copy_func_(const char* name, const FILINFO* fi, bool dir, void* option)
+		{
+			if(fi == nullptr) return;
 		}
 
 
@@ -632,6 +642,62 @@ namespace utils {
 				return true;
 			} else {
 				return false;
+			}
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ファイルの複製
+			@param[in]	org_path	元名
+			@param[in]	new_path	新名
+			@param[in]	dir			ディレクトリをコピーする場合「true」
+			@return 成功なら「true」
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool copy(const char* org_path, const char* new_path, bool dir = false) noexcept
+		{
+			if(org_path == nullptr || new_path == nullptr) return false;
+
+			if(dir) {
+				if(!is_directory(org_path)) {
+					return false;
+				}
+
+				char tmp[FF_MAX_LFN + 1];
+				make_full_path(org_path, tmp, sizeof(tmp));
+				dir_list dl;
+				if(!dl.start(tmp)) return false;
+
+				do {
+//					dl.service(10, dir_copy_func_, true, org_path);
+				} while(dl.probe()) ;
+
+				return true;
+			} else {
+				file_io forg;
+				if(!forg.open(org_path, "rb")) {
+					return false;
+				}
+
+				file_io fnew;
+				if(!fnew.open(new_path, "wb")) {
+					return false;
+				}
+
+				uint8_t tmp[COPY_TMP_SIZE];
+				auto len = forg.get_file_size();
+				uint32_t pos = 0;
+				do {
+					auto r = forg.read(tmp, sizeof(tmp));
+					if(r == 0) break;
+					pos += r;
+					auto w = fnew.write(tmp, r);
+					if(w == 0) break;
+				} while(pos < len) ;
+				forg.close();
+				fnew.close();
+				return pos == len;
 			}
 		}
 	};

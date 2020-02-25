@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_reg_access.c
@@ -29,6 +29,7 @@
  *         : 26.01.2017 1.20 hw_usb_write_fifo16(),hw_usb_write_fifo8(),hw_usb_get_fifosel_adr(),hw_usb_set_dreqe(),
  *         :                 hw_usb_set_curpipe() is fixed.
  *         : 30.09.2017 1.22 RX62N/RX630/RX63T-H is added. and Add "__evenaccess" for I/O reg access local variable.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -54,14 +55,13 @@ static void *hw_usb_get_fifoctr_adr (usb_utr_t *ptr, uint16_t pipemode);
  Function Name   : hw_usb_read_syscfg
  Description     : Returns the specified port's SYSCFG register value.
  Arguments       : usb_utr_t    *ptr   : Pointer to usb_utr_t structure.
-                 : uint16_t     port   : Port number (not used $REA)
  Return value    : SYSCFG content.
  ******************************************************************************/
-uint16_t hw_usb_read_syscfg (usb_utr_t *ptr, uint16_t port)
+uint16_t hw_usb_read_syscfg (usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         return USB_M0.SYSCFG.WORD;
 #else
@@ -71,7 +71,7 @@ uint16_t hw_usb_read_syscfg (usb_utr_t *ptr, uint16_t port)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         return ptr->ipp->SYSCFG.WORD;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -82,21 +82,17 @@ uint16_t hw_usb_read_syscfg (usb_utr_t *ptr, uint16_t port)
  End of function hw_usb_read_syscfg
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : hw_usb_write_syscfg
  Description     : Write specified value to the SYSCFG register of the given port.
  Arguments       : usb_utr_t    *ptr   : Pointer to usb_utr_t structure.
-                 : uint16_t     port   : Port number (only port 0 used $REA)
                  : uint16_t     data   : Value to write.
  Return value    : none
  ******************************************************************************/
-void hw_usb_write_syscfg (usb_utr_t *ptr, uint16_t port, uint16_t data)
+void hw_usb_write_syscfg (usb_utr_t *ptr, uint16_t data)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->SYSCFG.WORD = data;
-    }
+    ptr->ipp->SYSCFG.WORD = data;
 }
 /******************************************************************************
  End of function hw_usb_write_syscfg
@@ -105,7 +101,7 @@ void hw_usb_write_syscfg (usb_utr_t *ptr, uint16_t port, uint16_t data)
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
 
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 /******************************************************************************
  Function Name   : hw_usb_set_cnen
  Description     : Enable single end receiver.
@@ -134,7 +130,7 @@ void hw_usb_clear_cnen(usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
 #else
         USB_M1.SYSCFG.WORD &= (~USB_CNEN);
@@ -143,7 +139,7 @@ void hw_usb_clear_cnen(usb_utr_t *ptr)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp1->SYSCFG.WORD &= (~USB_CNEN);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -158,14 +154,13 @@ void hw_usb_clear_cnen(usb_utr_t *ptr)
  Function Name   : hw_usb_set_hse
  Description     : Not processed as the functionality is provided by R8A66597(ASSP).
  Arguments       : usb_utr_t    *ptr  : Pointer to usb_utr_t structure.
-                 : uint16_t     port  : Not used.
- Return value    : none
+  Return value    : none
  ******************************************************************************/
-void hw_usb_set_hse(usb_utr_t *ptr, uint16_t port)
+void hw_usb_set_hse(usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
 #else
         USB_M1.SYSCFG.WORD |= USB_HSE;
@@ -174,8 +169,8 @@ void hw_usb_set_hse(usb_utr_t *ptr, uint16_t port)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
-        if (ptr->ip == USB_USBIP_1)
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+        if (USB_IP1 == ptr->ip)
         {
             ptr->ipp1->SYSCFG.WORD |= USB_HSE;
         }
@@ -192,14 +187,13 @@ void hw_usb_set_hse(usb_utr_t *ptr, uint16_t port)
  Function Name   : hw_usb_clear_hse
  Description     : Clears HSE bit of the specified port's SYSCFG register
  Arguments       : usb_utr_t    *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t     port : Port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_clear_hse(usb_utr_t *ptr, uint16_t port)
+void hw_usb_clear_hse(usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
 #else
         USB_M1.SYSCFG.WORD &= (~USB_HSE);
@@ -208,8 +202,8 @@ void hw_usb_clear_hse(usb_utr_t *ptr, uint16_t port)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
-        if (ptr->ip == USB_USBIP_1)
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+        if (USB_IP1 == ptr->ip)
         {
             ptr->ipp->SYSCFG.WORD &= (~USB_HSE);
         }
@@ -223,7 +217,7 @@ void hw_usb_clear_hse(usb_utr_t *ptr, uint16_t port)
  ******************************************************************************/
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 /******************************************************************************
  Function Name   : hw_usb_set_dcfm
  Description     : DCFM-bit set of register SYSCFG
@@ -255,7 +249,7 @@ void hw_usb_clear_dcfm (usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.SYSCFG.WORD &= (~USB_DCFM);
 #else
@@ -265,7 +259,7 @@ void hw_usb_clear_dcfm (usb_utr_t *ptr)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->SYSCFG.WORD &= (~USB_DCFM);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -275,21 +269,17 @@ void hw_usb_clear_dcfm (usb_utr_t *ptr)
  End of function hw_usb_clear_dcfm
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : hw_usb_clear_drpd
  Description     : Clear bit of the specified port's SYSCFG DRPD register.
                  : (for USB Host mode; Enable D + / D-line PullDown.)
  Arguments       : usb_utr_t    *ptr  : Pointer to usb_utr_t structure.
-                 : uint16_t     port  : Port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_clear_drpd (usb_utr_t *ptr, uint16_t port)
+void hw_usb_clear_drpd (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->SYSCFG.WORD &= (~USB_DRPD);
-    }
+    ptr->ipp->SYSCFG.WORD &= (~USB_DRPD);
 }
 /******************************************************************************
  End of function hw_usb_clear_drpd
@@ -306,7 +296,7 @@ void hw_usb_set_usbe (usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.SYSCFG.WORD |= USB_USBE;
 #else
@@ -316,7 +306,7 @@ void hw_usb_set_usbe (usb_utr_t *ptr)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->SYSCFG.WORD |= USB_USBE;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -336,7 +326,7 @@ void hw_usb_clear_usbe (usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.SYSCFG.WORD &= (~USB_USBE);
 #else
@@ -346,7 +336,7 @@ void hw_usb_clear_usbe (usb_utr_t *ptr)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->SYSCFG.WORD &= (~USB_USBE);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -357,7 +347,7 @@ void hw_usb_clear_usbe (usb_utr_t *ptr)
  ******************************************************************************/
 
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : hw_usb_set_buswait
  Description     : Set BUSWAIT register.
@@ -384,7 +374,7 @@ void    hw_usb_set_bcctrl (usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP1
         USB_M1.BCCTRL.WORD |= data;
 #endif
@@ -392,8 +382,8 @@ void    hw_usb_set_bcctrl (usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
-        if(ptr->ip == USB_USBIP_1)
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+        if(USB_IP1 == ptr->ip)
         {
             ptr->ipp1->BCCTRL.WORD |= data;
         }
@@ -416,7 +406,7 @@ void    hw_usb_clear_bcctrl (usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP1
         USB_M1.BCCTRL.WORD &= ~data;
 #endif
@@ -424,8 +414,8 @@ void    hw_usb_clear_bcctrl (usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
-        if(ptr->ip == USB_USBIP_1)
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+        if(USB_IP1 == ptr->ip)
         {
             ptr->ipp1->BCCTRL.WORD &= ~data;
         }
@@ -442,14 +432,13 @@ void    hw_usb_clear_bcctrl (usb_utr_t *ptr, uint16_t data)
  Function Name   : hw_usb_read_syssts
  Description     : Returns the value of the specified port's SYSSTS register.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure.
-                 : uint16_t  port   : USB port number. ($REA not used.)
  Return value    : SYSSTS0 content
  ******************************************************************************/
-uint16_t hw_usb_read_syssts (usb_utr_t *ptr, uint16_t port)
+uint16_t hw_usb_read_syssts (usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         return (uint16_t)(USB_M0.SYSSTS0.WORD);
 #else
@@ -459,7 +448,7 @@ uint16_t hw_usb_read_syssts (usb_utr_t *ptr, uint16_t port)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         return (uint16_t) (ptr->ipp->SYSSTS0.WORD);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -474,14 +463,13 @@ uint16_t hw_usb_read_syssts (usb_utr_t *ptr, uint16_t port)
  Function Name   : hw_usb_read_dvstctr
  Description     : Returns the specified port's DVSTCTR register content.
  Arguments       : usb_utr_t *ptr  : Pointer to usb_utr_t structure.
-                 : uint16_t  port  : USB port number. ($REA not used.)
  Return value    : DVSTCTR0 content
  ******************************************************************************/
-uint16_t hw_usb_read_dvstctr (usb_utr_t *ptr, uint16_t port)
+uint16_t hw_usb_read_dvstctr (usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         return (uint16_t)(USB_M0.DVSTCTR0.WORD);
 #else
@@ -491,7 +479,7 @@ uint16_t hw_usb_read_dvstctr (usb_utr_t *ptr, uint16_t port)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         return (uint16_t) (ptr->ipp->DVSTCTR0.WORD);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -502,21 +490,17 @@ uint16_t hw_usb_read_dvstctr (usb_utr_t *ptr, uint16_t port)
  End of function hw_usb_read_dvstctr
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : hw_usb_write_dvstctr
  Description     : Write data to the specified port's DVSTCTR register.
  Arguments       : usb_utr_t *ptr  : Pointer to usb_utr_t structure.
-                 : uint16_t  port  : USB port number.
                  : uint16_t  data  : Setting value
  Return value    : none
  ******************************************************************************/
-void hw_usb_write_dvstctr (usb_utr_t *ptr, uint16_t port, uint16_t data)
+void hw_usb_write_dvstctr (usb_utr_t *ptr, uint16_t data)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->DVSTCTR0.WORD = data;
-    }
+    ptr->ipp->DVSTCTR0.WORD = data;
 }
 /******************************************************************************
  End of function hw_usb_write_dvstctr
@@ -526,22 +510,18 @@ void hw_usb_write_dvstctr (usb_utr_t *ptr, uint16_t port, uint16_t data)
  Function Name   : hw_usb_rmw_dvstctr
  Description     : Read-modify-write the specified port's DVSTCTR.
  Arguments       : usb_utr_t *ptr  : Pointer to usb_utr_t structure.
-                 : uint16_t  port  : Port number
                  : uint16_t  data  : The value to write.
                  : uint16_t  bitptn: Bit pattern to read-modify-write.
  Return value    : none
  ******************************************************************************/
-void hw_usb_rmw_dvstctr (usb_utr_t *ptr, uint16_t port, uint16_t data, uint16_t bitptn)
+void hw_usb_rmw_dvstctr (usb_utr_t *ptr, uint16_t data, uint16_t bitptn)
 {
     uint16_t buf;
 
-    if (USB_PORT0 == port)
-    {
-        buf = ptr->ipp->DVSTCTR0.WORD;
-        buf &= (~bitptn);
-        buf |= (data & bitptn);
-        ptr->ipp->DVSTCTR0.WORD = buf;
-    }
+    buf = ptr->ipp->DVSTCTR0.WORD;
+    buf &= (~bitptn);
+    buf |= (data & bitptn);
+    ptr->ipp->DVSTCTR0.WORD = buf;
 }
 /******************************************************************************
  End of function hw_usb_rmw_dvstctr
@@ -552,16 +532,12 @@ void hw_usb_rmw_dvstctr (usb_utr_t *ptr, uint16_t port, uint16_t data, uint16_t 
  Description     : Clear the bit pattern specified in argument, of the specified 
                  : port's DVSTCTR register.
  Arguments       : usb_utr_t *ptr  : Pointer to usb_utr_t structure.
-                 : uint16_t  port  : Port number
                  : uint16_t  bitptn: Bit pattern to read-modify-write.
  Return value    : none
  ******************************************************************************/
-void hw_usb_clear_dvstctr (usb_utr_t *ptr, uint16_t port, uint16_t bitptn)
+void hw_usb_clear_dvstctr (usb_utr_t *ptr, uint16_t bitptn)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->DVSTCTR0.WORD &= (~bitptn);
-    }
+    ptr->ipp->DVSTCTR0.WORD &= (~bitptn);
 }
 /******************************************************************************
  End of function hw_usb_clear_dvstctr
@@ -572,21 +548,17 @@ void hw_usb_clear_dvstctr (usb_utr_t *ptr, uint16_t port, uint16_t bitptn)
  Description     : Set specified port's VBOUT-bit in the DVSTCTR register.
                  : (To output a "High" to pin VBOUT.) 
  Arguments       : usb_utr_t *ptr  : Pointer to usb_utr_t structure.
-                 : uint16_t  port  : Port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_set_vbout (usb_utr_t *ptr, uint16_t port)
+void hw_usb_set_vbout (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
 #if USB_CFG_VBUS == USB_CFG_HIGH
-        ptr->ipp->DVSTCTR0.WORD |= USB_VBUSEN;
+    ptr->ipp->DVSTCTR0.WORD |= USB_VBUSEN;
 
 #else  /* USB_CFG_VBUS == USB_CFG_HIGH */
-        ptr->ipp->DVSTCTR0.WORD &= (~USB_VBUSEN);
+    ptr->ipp->DVSTCTR0.WORD &= (~USB_VBUSEN);
 
 #endif /* USB_CFG_VBUS == USB_CFG_HIGH */
-    }
 }
 /******************************************************************************
  End of function hw_usb_set_vbout
@@ -597,21 +569,17 @@ void hw_usb_set_vbout (usb_utr_t *ptr, uint16_t port)
  Description     : Clear specified port's VBOUT-bit in the DVSTCTR register.
                  : (To output a "Low" to pin VBOUT.)
  Arguments       : usb_utr_t *ptr  : Pointer to usb_utr_t structure.
-                 : uint16_t  port  : Port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_clear_vbout (usb_utr_t *ptr, uint16_t port)
+void hw_usb_clear_vbout (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
 #if USB_CFG_VBUS == USB_CFG_HIGH
-        ptr->ipp->DVSTCTR0.WORD &= (~USB_VBUSEN);
+    ptr->ipp->DVSTCTR0.WORD &= (~USB_VBUSEN);
 
 #else  /* USB_CFG_VBUS == USB_CFG_HIGH */
-        ptr->ipp->DVSTCTR0.WORD |= USB_VBUSEN;
+    ptr->ipp->DVSTCTR0.WORD |= USB_VBUSEN;
 
 #endif /* USB_CFG_VBUS == USB_CFG_HIGH */
-    }
 }
 /******************************************************************************
  End of function hw_usb_clear_vbout
@@ -631,7 +599,7 @@ void hw_usb_set_utst(usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
 #else
         USB_M1.TESTMODE.WORD = data;
@@ -640,7 +608,7 @@ void hw_usb_set_utst(usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp1->TESTMODE.WORD = data;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -666,7 +634,7 @@ uint32_t hw_usb_read_fifo32(usb_utr_t *ptr, uint16_t pipemode)
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
         switch (pipemode)
         {
             case USB_CUSE:
@@ -687,7 +655,7 @@ uint32_t hw_usb_read_fifo32(usb_utr_t *ptr, uint16_t pipemode)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         switch (pipemode)
         {
             case USB_CUSE:
@@ -725,7 +693,7 @@ void hw_usb_write_fifo32(usb_utr_t *ptr, uint16_t pipemode, uint32_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
         switch (pipemode)
         {
             case USB_CUSE:
@@ -745,7 +713,7 @@ void hw_usb_write_fifo32(usb_utr_t *ptr, uint16_t pipemode, uint32_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         switch (pipemode)
         {
             case USB_CUSE:
@@ -785,7 +753,7 @@ uint16_t hw_usb_read_fifo16 (usb_utr_t *ptr, uint16_t pipemode)
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
         switch (pipemode)
         {
 
@@ -813,8 +781,8 @@ uint16_t hw_usb_read_fifo16 (usb_utr_t *ptr, uint16_t pipemode)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
-        if (USB_USBIP_0 == ptr->ip)
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+        if (USB_IP0 == ptr->ip)
         {
             switch (pipemode)
             {
@@ -833,7 +801,7 @@ uint16_t hw_usb_read_fifo16 (usb_utr_t *ptr, uint16_t pipemode)
             }
         }
 #if USB_NUM_USBIP == 2
-        else if (USB_USBIP_1 == ptr->ip)
+        else if (USB_IP1 == ptr->ip)
         {
             switch (pipemode)
             {
@@ -920,7 +888,7 @@ void hw_usb_write_fifo16 (usb_utr_t *ptr, uint16_t pipemode, uint16_t data)
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
   #if USB_CFG_USE_USBIP == USB_CFG_IP1
         ip = USB_IP1;
   #else   /* USB_CFG_USE_USBIP == USB_CFG_IP1 */
@@ -932,7 +900,7 @@ void hw_usb_write_fifo16 (usb_utr_t *ptr, uint16_t pipemode, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ip = ptr->ip;
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
     }
@@ -999,7 +967,7 @@ void hw_usb_write_fifo8 (usb_utr_t *ptr, uint16_t pipemode, uint8_t data)
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
   #if USB_CFG_USE_USBIP == USB_CFG_IP1
         ip = USB_IP1;
   #else   /* USB_CFG_USE_USBIP == USB_CFG_IP1 */
@@ -1011,7 +979,7 @@ void hw_usb_write_fifo8 (usb_utr_t *ptr, uint16_t pipemode, uint8_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ip = ptr->ip;
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
     }
@@ -1077,7 +1045,7 @@ static void *hw_usb_get_fifosel_adr (usb_utr_t *ptr, uint16_t pipemode)
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
         switch (pipemode)
         {
             case USB_CUSE:
@@ -1091,7 +1059,6 @@ static void *hw_usb_get_fifosel_adr (usb_utr_t *ptr, uint16_t pipemode)
             break;
 
             case    USB_D0USE:
-            case    USB_D0DMA:
 #if USB_CFG_USE_USBIP == USB_CFG_IP1
                 p_reg = (void *)&(USB_M1.D0FIFOSEL);
 
@@ -1101,7 +1068,6 @@ static void *hw_usb_get_fifosel_adr (usb_utr_t *ptr, uint16_t pipemode)
 #endif  /* USB_CFG_USE_USBIP == USB_CFG_IP1 */
                 break;
             case    USB_D1USE:
-            case    USB_D1DMA:
 #if USB_CFG_USE_USBIP == USB_CFG_IP1
                 p_reg = (void *)&(USB_M1.D1FIFOSEL);
 
@@ -1119,18 +1085,16 @@ static void *hw_usb_get_fifosel_adr (usb_utr_t *ptr, uint16_t pipemode)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         switch (pipemode)
         {
             case USB_CUSE :
                 p_reg = (void *) &(ptr->ipp->CFIFOSEL);
             break;
             case USB_D0USE :
-            case    USB_D0DMA:
                 p_reg = (void *) &(ptr->ipp->D0FIFOSEL);
             break;
             case USB_D1USE :
-            case    USB_D1DMA:
                 p_reg = (void *) &(ptr->ipp->D1FIFOSEL);
             break;
             default :
@@ -1155,7 +1119,7 @@ static void *hw_usb_get_fifosel_adr (usb_utr_t *ptr, uint16_t pipemode)
  ******************************************************************************/
 uint16_t hw_usb_read_fifosel (usb_utr_t *ptr, uint16_t pipemode)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     p_reg = (uint16_t *) hw_usb_get_fifosel_adr(ptr, pipemode);
 
@@ -1179,7 +1143,7 @@ uint16_t hw_usb_read_fifosel (usb_utr_t *ptr, uint16_t pipemode)
 void hw_usb_rmw_fifosel (usb_utr_t *ptr, uint16_t pipemode, uint16_t data, uint16_t bitptn)
 {
     uint16_t buf;
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     p_reg = (uint16_t *) hw_usb_get_fifosel_adr(ptr, pipemode);
 
@@ -1202,7 +1166,7 @@ void hw_usb_rmw_fifosel (usb_utr_t *ptr, uint16_t pipemode, uint16_t data, uint1
  ******************************************************************************/
 void hw_usb_set_dclrm (usb_utr_t *ptr, uint16_t pipemode)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     p_reg = (uint16_t *) hw_usb_get_fifosel_adr(ptr, pipemode);
 
@@ -1222,7 +1186,7 @@ void hw_usb_set_dclrm (usb_utr_t *ptr, uint16_t pipemode)
  ******************************************************************************/
 void hw_usb_clear_dclrm (usb_utr_t *ptr, uint16_t pipemode)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     p_reg = hw_usb_get_fifosel_adr(ptr, pipemode);
 
@@ -1242,19 +1206,17 @@ void hw_usb_clear_dclrm (usb_utr_t *ptr, uint16_t pipemode)
  ******************************************************************************/
 void hw_usb_set_dreqe (usb_utr_t *ptr, uint16_t pipemode)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     p_reg = hw_usb_get_fifosel_adr(ptr, pipemode);
 
     if (true == usb_check_use_usba_module(ptr))
     {
         (*p_reg) &= (~(USB_DREQE | USB_CURPIPE));
-        while(1)
+        /* WAIT_LOOP */
+        while(0 != ((*p_reg) & USB_CURPIPE))
         {
-            if (0 == ((*p_reg) & USB_CURPIPE))
-            {
-                break;
-            }
+            /* Wait Clear CURPIPE */
         }
     }
     else
@@ -1278,7 +1240,7 @@ void hw_usb_set_dreqe (usb_utr_t *ptr, uint16_t pipemode)
  ******************************************************************************/
 void hw_usb_clear_dreqe (usb_utr_t *ptr, uint16_t pipemode)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     p_reg = hw_usb_get_fifosel_adr(ptr, pipemode);
 
@@ -1301,13 +1263,13 @@ void hw_usb_clear_dreqe (usb_utr_t *ptr, uint16_t pipemode)
  ******************************************************************************/
 void hw_usb_set_mbw (usb_utr_t *ptr, uint16_t pipemode, uint16_t data)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     p_reg = hw_usb_get_fifosel_adr(ptr, pipemode);
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
         (*p_reg) &= (~USB_MBW);
         if (0 != data)
         {
@@ -1318,8 +1280,8 @@ void hw_usb_set_mbw (usb_utr_t *ptr, uint16_t pipemode, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
-        if (USB_USBIP_0 == ptr->ip)
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+        if (USB_IP0 == ptr->ip)
         {
             if (0 != data)
             {
@@ -1330,7 +1292,7 @@ void hw_usb_set_mbw (usb_utr_t *ptr, uint16_t pipemode, uint16_t data)
                 (*p_reg) &= (~USB_MBW_16);
             }
         }
-        else if (USB_USBIP_1 == ptr->ip)
+        else if (USB_IP1 == ptr->ip)
         {
             (*p_reg) &= (~USB_MBW);
 
@@ -1362,13 +1324,13 @@ void hw_usb_set_mbw (usb_utr_t *ptr, uint16_t pipemode, uint16_t data)
  ******************************************************************************/
 void hw_usb_set_curpipe (usb_utr_t *ptr, uint16_t pipemode, uint16_t pipeno)
 {
-    volatile __evenaccess uint16_t *p_reg;
-    volatile __evenaccess uint16_t reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t reg;
 
     p_reg = hw_usb_get_fifosel_adr(ptr, pipemode);
     reg = *p_reg;
 
-    if ((USB_D0DMA == pipemode) || (USB_D1DMA == pipemode))
+    if ((USB_D0USE == pipemode) || (USB_D1USE == pipemode))
     {
         if (false == usb_check_use_usba_module(ptr))
         {
@@ -1378,12 +1340,10 @@ void hw_usb_set_curpipe (usb_utr_t *ptr, uint16_t pipemode, uint16_t pipeno)
 
     reg &= (~USB_CURPIPE);
     *p_reg = reg;
-    while(1)
+    /* WAIT_LOOP */
+    while (0 != ((*p_reg) & USB_CURPIPE))
     {
-        if (0 == ((*p_reg) & USB_CURPIPE))
-        {
-            break;
-        }
+        /* Wait Clear CURPIPE */
     }
 
     reg |= pipeno;
@@ -1409,7 +1369,7 @@ static void *hw_usb_get_fifoctr_adr (usb_utr_t *ptr, uint16_t pipemode)
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
         switch (pipemode)
         {
             case USB_CUSE:
@@ -1423,7 +1383,6 @@ static void *hw_usb_get_fifoctr_adr (usb_utr_t *ptr, uint16_t pipemode)
             break;
 
             case    USB_D0USE:
-            case    USB_D0DMA:
 #if USB_CFG_USE_USBIP == USB_CFG_IP1
                 p_reg = (void *)&(USB_M1.D0FIFOCTR);
 
@@ -1433,7 +1392,6 @@ static void *hw_usb_get_fifoctr_adr (usb_utr_t *ptr, uint16_t pipemode)
 #endif  /* USB_CFG_USE_USBIP == USB_CFG_IP1 */
                 break;
             case    USB_D1USE:
-            case    USB_D1DMA:
 #if USB_CFG_USE_USBIP == USB_CFG_IP1
                 p_reg = (void *)&(USB_M1.D1FIFOCTR);
 
@@ -1451,18 +1409,16 @@ static void *hw_usb_get_fifoctr_adr (usb_utr_t *ptr, uint16_t pipemode)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         switch (pipemode)
         {
             case USB_CUSE :
                 p_reg = (void *) &(ptr->ipp->CFIFOCTR);
             break;
             case USB_D0USE :
-            case USB_D0DMA:
                 p_reg = (void *) &(ptr->ipp->D0FIFOCTR);
             break;
             case USB_D1USE :
-            case USB_D1DMA:
                 p_reg = (void *) &(ptr->ipp->D1FIFOCTR);
             break;
             default :
@@ -1488,7 +1444,7 @@ static void *hw_usb_get_fifoctr_adr (usb_utr_t *ptr, uint16_t pipemode)
  ******************************************************************************/
 uint16_t hw_usb_read_fifoctr (usb_utr_t *ptr, uint16_t pipemode)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     p_reg = (uint16_t *) hw_usb_get_fifoctr_adr(ptr, pipemode);
 
@@ -1508,7 +1464,7 @@ uint16_t hw_usb_read_fifoctr (usb_utr_t *ptr, uint16_t pipemode)
  ******************************************************************************/
 void hw_usb_set_bval (usb_utr_t *ptr, uint16_t pipemode)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     p_reg = (uint16_t *) hw_usb_get_fifoctr_adr(ptr, pipemode);
 
@@ -1528,7 +1484,7 @@ void hw_usb_set_bval (usb_utr_t *ptr, uint16_t pipemode)
  ******************************************************************************/
 void hw_usb_set_bclr (usb_utr_t *ptr, uint16_t pipemode)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     p_reg = (uint16_t *) hw_usb_get_fifoctr_adr(ptr, pipemode);
 
@@ -1550,7 +1506,7 @@ void hw_usb_write_intenb (usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.INTENB0.WORD = data;
 #else
@@ -1560,7 +1516,7 @@ void hw_usb_write_intenb (usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->INTENB0.WORD = data;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -1583,7 +1539,7 @@ void hw_usb_set_intenb (usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.INTENB0.WORD |= data;
 #else
@@ -1593,7 +1549,7 @@ void hw_usb_set_intenb (usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->INTENB0.WORD |= data;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -1603,7 +1559,7 @@ void hw_usb_set_intenb (usb_utr_t *ptr, uint16_t data)
  End of function hw_usb_set_intenb
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : hw_usb_clear_enb_vbse
  Description     : Clear the VBE-bit of INTENB register,
@@ -1668,7 +1624,7 @@ void hw_usb_set_brdyenb (usb_utr_t *ptr, uint16_t pipeno)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.BRDYENB.WORD |= (1 << pipeno);
 #else
@@ -1678,7 +1634,7 @@ void hw_usb_set_brdyenb (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->BRDYENB.WORD |= (1 << pipeno);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -1700,7 +1656,7 @@ void hw_usb_clear_brdyenb (usb_utr_t *ptr, uint16_t pipeno)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.BRDYENB.WORD &= (~(1 << pipeno));
 #else
@@ -1710,7 +1666,7 @@ void hw_usb_clear_brdyenb (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->BRDYENB.WORD &= (~(1 << pipeno));
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -1720,7 +1676,7 @@ void hw_usb_clear_brdyenb (usb_utr_t *ptr, uint16_t pipeno)
  End of function hw_usb_clear_brdyenb
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : hw_usb_write_nrdyenb
  Description     : Data is written to NRDYENB register, 
@@ -1751,7 +1707,7 @@ void hw_usb_set_nrdyenb (usb_utr_t *ptr, uint16_t pipeno)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.NRDYENB.WORD |= (1 << pipeno);
 #else
@@ -1761,7 +1717,7 @@ void hw_usb_set_nrdyenb (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->NRDYENB.WORD |= (1 << pipeno);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -1783,17 +1739,17 @@ void hw_usb_clear_nrdyenb (usb_utr_t *ptr, uint16_t pipeno)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
-        USB_M0.NRDYENB.WORD &= (1 << pipeno);
+        USB_M0.NRDYENB.WORD &= (~(1 << pipeno));
 #else
-        USB_M1.NRDYENB.WORD &= (1 << pipeno);
+        USB_M1.NRDYENB.WORD &= (~(1 << pipeno));
 #endif
 #endif  /* (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_REPI */
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->NRDYENB.WORD &= (~(1 << pipeno));
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -1803,7 +1759,7 @@ void hw_usb_clear_nrdyenb (usb_utr_t *ptr, uint16_t pipeno)
  End of function hw_usb_clear_nrdyenb
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : hw_usb_write_bempenb
  Description     : Data is written to BEMPENB register, 
@@ -1836,17 +1792,20 @@ void hw_usb_set_bempenb (usb_utr_t *ptr, uint16_t pipeno)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
+        g_usb_cstd_bemp_skip[USB_IP0][pipeno] = USB_OFF;
         USB_M0.BEMPENB.WORD |= (1 << pipeno);
 #else
+        g_usb_cstd_bemp_skip[USB_IP1][pipeno] = USB_OFF;
         USB_M1.BEMPENB.WORD |= (1 << pipeno);
 #endif
 #endif  /* (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_REPI */
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+        g_usb_cstd_bemp_skip[ptr->ip][pipeno] = USB_OFF;
         ptr->ipp->BEMPENB.WORD |= (1 << pipeno);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -1868,7 +1827,7 @@ void hw_usb_clear_bempenb (usb_utr_t *ptr, uint16_t pipeno)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.BEMPENB.WORD &= (~(1 << pipeno));
 #else
@@ -1878,7 +1837,7 @@ void hw_usb_clear_bempenb (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->BEMPENB.WORD &= (~(1 << pipeno));
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -1899,15 +1858,15 @@ void hw_usb_set_sofcfg (usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 
 #endif  /* (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_REPI */
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 #if USB_NUM_USBIP == 2
-        if (USB_USBIP_1 == ptr->ip)
+        if (USB_IP1 == ptr->ip)
         {
             ptr->ipp1->SOFCFG.WORD |= data;
         }
@@ -1920,7 +1879,7 @@ void hw_usb_set_sofcfg (usb_utr_t *ptr, uint16_t data)
  End of function hw_usb_set_sofcfg
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 /******************************************************************************
  Function Name   : hw_usb_read_intsts
  Description     : Returns INTSTS0 register content.
@@ -1952,7 +1911,7 @@ void hw_usb_write_intsts (usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.INTSTS0.WORD = data;
 #else
@@ -1962,7 +1921,7 @@ void hw_usb_write_intsts (usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->INTSTS0.WORD = data;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -1972,7 +1931,7 @@ void hw_usb_write_intsts (usb_utr_t *ptr, uint16_t data)
  End of function hw_usb_write_intsts
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : hw_usb_clear_sts_sofr
  Description     : Clear the SOFR-bit (Frame Number Refresh Interrupt Status) of 
@@ -2032,7 +1991,7 @@ void hw_usb_clear_sts_brdy (usb_utr_t *ptr, uint16_t pipeno)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.BRDYSTS.WORD = (uint16_t) (~(1 << pipeno)) & BRDYSTS_MASK;
 #else
@@ -2042,7 +2001,7 @@ void hw_usb_clear_sts_brdy (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->BRDYSTS.WORD = (uint16_t) (~(1 << pipeno)) & BRDYSTS_MASK;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2052,7 +2011,7 @@ void hw_usb_clear_sts_brdy (usb_utr_t *ptr, uint16_t pipeno)
  End of function hw_usb_clear_sts_brdy
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : hw_usb_write_nrdy_sts
  Description     : Data is written to NRDYSTS register, to
@@ -2083,7 +2042,7 @@ void hw_usb_clear_status_nrdy (usb_utr_t *ptr, uint16_t pipeno)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.NRDYSTS.WORD = (uint16_t) ((~(1 << pipeno)) & NRDYSTS_MASK);
 #else
@@ -2093,7 +2052,7 @@ void hw_usb_clear_status_nrdy (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->NRDYSTS.WORD = (uint16_t) (~(1 << pipeno)) & NRDYSTS_MASK;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2103,7 +2062,7 @@ void hw_usb_clear_status_nrdy (usb_utr_t *ptr, uint16_t pipeno)
  End of function hw_usb_clear_status_nrdy
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : hw_usb_write_bempsts
  Description     : Data is written to BEMPSTS register, to set the BEMP interrupt status.
@@ -2133,7 +2092,7 @@ void hw_usb_clear_status_bemp (usb_utr_t *ptr, uint16_t pipeno)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.BEMPSTS.WORD = (uint16_t) ((~(1 << pipeno)) & BEMPSTS_MASK);
 #else
@@ -2143,7 +2102,7 @@ void hw_usb_clear_status_bemp (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->BEMPSTS.WORD = (uint16_t) (~(1 << pipeno)) & BEMPSTS_MASK;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2163,7 +2122,7 @@ uint16_t hw_usb_read_frmnum (usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         return (uint16_t)USB_M0.FRMNUM.WORD;
 #else
@@ -2173,7 +2132,7 @@ uint16_t hw_usb_read_frmnum (usb_utr_t *ptr)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         return (uint16_t) ptr->ipp->FRMNUM.WORD;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2184,7 +2143,7 @@ uint16_t hw_usb_read_frmnum (usb_utr_t *ptr)
  End of function hw_usb_read_frmnum
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 /******************************************************************************
  Function Name   : hw_usb_read_usbreq
  Description     : Returns USBREQ register content.
@@ -2269,7 +2228,7 @@ uint16_t hw_usb_read_dcpcfg (usb_utr_t *ptr)
 #if !defined(BSP_MCU_RX630)
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         return (uint16_t)USB_M0.DCPCFG.WORD;
 #else
@@ -2279,7 +2238,7 @@ uint16_t hw_usb_read_dcpcfg (usb_utr_t *ptr)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         return (uint16_t) ptr->ipp->DCPCFG.WORD;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2303,7 +2262,7 @@ void hw_usb_write_dcpcfg (usb_utr_t *ptr, uint16_t data)
 #if !defined(BSP_MCU_RX630)
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.DCPCFG.WORD = data;
 #else
@@ -2314,7 +2273,7 @@ void hw_usb_write_dcpcfg (usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->DCPCFG.WORD = data;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2335,7 +2294,7 @@ uint16_t hw_usb_read_dcpmaxp (usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         return (uint16_t)USB_M0.DCPMAXP.WORD;
 #else
@@ -2345,7 +2304,7 @@ uint16_t hw_usb_read_dcpmaxp (usb_utr_t *ptr)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         return (uint16_t) ptr->ipp->DCPMAXP.WORD;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2367,7 +2326,7 @@ void hw_usb_write_dcpmxps (usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.DCPMAXP.WORD = data;
 #else
@@ -2377,7 +2336,7 @@ void hw_usb_write_dcpmxps (usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->DCPMAXP.WORD = data;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2387,7 +2346,7 @@ void hw_usb_write_dcpmxps (usb_utr_t *ptr, uint16_t data)
  End of function hw_usb_write_dcpmxps
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 /******************************************************************************
  Function Name   : hw_usb_read_dcpctr
  Description     : Returns DCPCTR register content.
@@ -2419,7 +2378,7 @@ void hw_usb_write_pipesel (usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.PIPESEL.WORD = data;
 #else
@@ -2429,7 +2388,7 @@ void hw_usb_write_pipesel (usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->PIPESEL.WORD = data;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2449,7 +2408,7 @@ uint16_t hw_usb_read_pipecfg (usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         return (uint16_t)USB_M0.PIPECFG.WORD;
 #else
@@ -2459,7 +2418,7 @@ uint16_t hw_usb_read_pipecfg (usb_utr_t *ptr)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         return (uint16_t) ptr->ipp->PIPECFG.WORD;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2481,7 +2440,7 @@ void hw_usb_write_pipecfg (usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.PIPECFG.WORD = data;
 #else
@@ -2491,7 +2450,7 @@ void hw_usb_write_pipecfg (usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->PIPECFG.WORD = data;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2513,7 +2472,7 @@ void hw_usb_write_pipebuf(usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
 
 #else
@@ -2523,8 +2482,8 @@ void hw_usb_write_pipebuf(usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
-        if (USB_USBIP_1 == ptr->ip)
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+        if (USB_IP1 == ptr->ip)
         {
             ptr->ipp1->PIPEBUF.WORD = data;
         }
@@ -2546,7 +2505,7 @@ uint16_t hw_usb_read_pipebuf(usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         return 0;
 #else
@@ -2557,8 +2516,8 @@ uint16_t hw_usb_read_pipebuf(usb_utr_t *ptr)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
-        if (USB_USBIP_1 == ptr->ip)
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+        if (USB_IP1 == ptr->ip)
         {
             return (uint16_t)ptr->ipp1->PIPEBUF.WORD;
         }
@@ -2587,7 +2546,7 @@ uint16_t hw_usb_read_pipemaxp (usb_utr_t *ptr)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         return (uint16_t)USB_M0.PIPEMAXP.WORD;
 #else
@@ -2597,7 +2556,7 @@ uint16_t hw_usb_read_pipemaxp (usb_utr_t *ptr)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         return (uint16_t) ptr->ipp->PIPEMAXP.WORD;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2619,7 +2578,7 @@ void hw_usb_write_pipemaxp (usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.PIPEMAXP.WORD = data;
 #else
@@ -2629,7 +2588,7 @@ void hw_usb_write_pipemaxp (usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->PIPEMAXP.WORD = data;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2651,7 +2610,7 @@ void hw_usb_write_pipeperi (usb_utr_t *ptr, uint16_t data)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         USB_M0.PIPEPERI.WORD = data;
 #else
@@ -2661,7 +2620,7 @@ void hw_usb_write_pipeperi (usb_utr_t *ptr, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         ptr->ipp->PIPEPERI.WORD = data;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2683,11 +2642,11 @@ void hw_usb_write_pipeperi (usb_utr_t *ptr, uint16_t data)
  ******************************************************************************/
 uint16_t hw_usb_read_pipectr (usb_utr_t *ptr, uint16_t pipeno)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         if (USB_PIPE0 == pipeno)
         {
@@ -2711,7 +2670,7 @@ uint16_t hw_usb_read_pipectr (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         if (USB_PIPE0 == pipeno)
         {
             p_reg = (uint16_t *) &(ptr->ipp->DCPCTR);
@@ -2730,7 +2689,7 @@ uint16_t hw_usb_read_pipectr (usb_utr_t *ptr, uint16_t pipeno)
  End of function hw_usb_read_pipectr
  ******************************************************************************/
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : hw_usb_write_pipectr
  Description     : Specified data is written to the specified pipe's PIPEPERI register.
@@ -2741,7 +2700,7 @@ uint16_t hw_usb_read_pipectr (usb_utr_t *ptr, uint16_t pipeno)
  ******************************************************************************/
 void hw_usb_write_pipectr (usb_utr_t *ptr, uint16_t pipeno, uint16_t data)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_PIPE0 == pipeno)
     {
@@ -2769,11 +2728,11 @@ void hw_usb_write_pipectr (usb_utr_t *ptr, uint16_t pipeno, uint16_t data)
  ******************************************************************************/
 void hw_usb_set_csclr (usb_utr_t *ptr, uint16_t pipeno)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         p_reg = (uint16_t *)&(USB_M0.PIPE1CTR) + (pipeno - 1);
 #else
@@ -2783,7 +2742,7 @@ void hw_usb_set_csclr (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         p_reg = (uint16_t *) &(ptr->ipp->PIPE1CTR) + (pipeno - 1);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2805,11 +2764,11 @@ void hw_usb_set_csclr (usb_utr_t *ptr, uint16_t pipeno)
  ******************************************************************************/
 void hw_usb_set_aclrm (usb_utr_t *ptr, uint16_t pipeno)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         p_reg = (uint16_t *)&(USB_M0.PIPE1CTR) + (pipeno - 1);
 #else
@@ -2819,7 +2778,7 @@ void hw_usb_set_aclrm (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         p_reg = (uint16_t *) &(ptr->ipp->PIPE1CTR) + (pipeno - 1);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2842,11 +2801,11 @@ void hw_usb_set_aclrm (usb_utr_t *ptr, uint16_t pipeno)
  ******************************************************************************/
 void hw_usb_clear_aclrm (usb_utr_t *ptr, uint16_t pipeno)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         p_reg = (uint16_t *)&(USB_M0.PIPE1CTR) + (pipeno - 1);
 #else
@@ -2856,7 +2815,7 @@ void hw_usb_clear_aclrm (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         p_reg = (uint16_t *) &(ptr->ipp->PIPE1CTR) + (pipeno - 1);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -2879,11 +2838,11 @@ void hw_usb_clear_aclrm (usb_utr_t *ptr, uint16_t pipeno)
  ******************************************************************************/
 void hw_usb_set_sqclr (usb_utr_t *ptr, uint16_t pipeno)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         if (USB_PIPE0 == pipeno)
         {
@@ -2909,7 +2868,7 @@ void hw_usb_set_sqclr (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         if (USB_PIPE0 == pipeno)
         {
             ptr->ipp->DCPCTR.WORD |= USB_SQCLR;
@@ -2939,11 +2898,11 @@ void hw_usb_set_sqclr (usb_utr_t *ptr, uint16_t pipeno)
  ******************************************************************************/
 void hw_usb_set_sqset (usb_utr_t *ptr, uint16_t pipeno)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         if (USB_PIPE0 == pipeno)
         {
@@ -2969,7 +2928,7 @@ void hw_usb_set_sqset (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         if (USB_PIPE0 == pipeno)
         {
             ptr->ipp->DCPCTR.WORD |= USB_SQSET;
@@ -2999,11 +2958,11 @@ void hw_usb_set_sqset (usb_utr_t *ptr, uint16_t pipeno)
  ******************************************************************************/
 void hw_usb_set_pid (usb_utr_t *ptr, uint16_t pipeno, uint16_t data)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         if (USB_PIPE0 == pipeno)
         {
@@ -3027,7 +2986,7 @@ void hw_usb_set_pid (usb_utr_t *ptr, uint16_t pipeno, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         if (USB_PIPE0 == pipeno)
         {
             p_reg = ((uint16_t *) &(ptr->ipp->DCPCTR));
@@ -3057,11 +3016,11 @@ void hw_usb_set_pid (usb_utr_t *ptr, uint16_t pipeno, uint16_t data)
  ******************************************************************************/
 void hw_usb_clear_pid (usb_utr_t *ptr, uint16_t pipeno, uint16_t data)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         if (USB_PIPE0 == pipeno)
         {
@@ -3085,7 +3044,7 @@ void hw_usb_clear_pid (usb_utr_t *ptr, uint16_t pipeno, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         if (USB_PIPE0 == pipeno)
         {
             p_reg = ((uint16_t *) &(ptr->ipp->DCPCTR));
@@ -3113,11 +3072,11 @@ void hw_usb_clear_pid (usb_utr_t *ptr, uint16_t pipeno, uint16_t data)
  ******************************************************************************/
 void hw_usb_set_trenb (usb_utr_t *ptr, uint16_t pipeno)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         p_reg = (uint16_t *)&(USB_M0.PIPE1TRE) + ((pipeno - 1) * 2);
 #else
@@ -3127,7 +3086,7 @@ void hw_usb_set_trenb (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         p_reg = (uint16_t *) &(ptr->ipp->PIPE1TRE) + ((pipeno - 1) * 2);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -3149,11 +3108,11 @@ void hw_usb_set_trenb (usb_utr_t *ptr, uint16_t pipeno)
  ******************************************************************************/
 void hw_usb_clear_trenb (usb_utr_t *ptr, uint16_t pipeno)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         p_reg = (uint16_t *)&(USB_M0.PIPE1TRE) + ((pipeno - 1) * 2);
 #else
@@ -3163,7 +3122,7 @@ void hw_usb_clear_trenb (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         p_reg = (uint16_t *) &(ptr->ipp->PIPE1TRE) + ((pipeno - 1) * 2);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -3186,11 +3145,11 @@ void hw_usb_clear_trenb (usb_utr_t *ptr, uint16_t pipeno)
  ******************************************************************************/
 void hw_usb_set_trclr (usb_utr_t *ptr, uint16_t pipeno)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         p_reg = (uint16_t *)&(USB_M0.PIPE1TRE) + ((pipeno - 1) * 2);
 #else
@@ -3200,7 +3159,7 @@ void hw_usb_set_trclr (usb_utr_t *ptr, uint16_t pipeno)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         p_reg = (uint16_t *) &(ptr->ipp->PIPE1TRE) + ((pipeno - 1) * 2);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -3223,11 +3182,11 @@ void hw_usb_set_trclr (usb_utr_t *ptr, uint16_t pipeno)
  ******************************************************************************/
 void hw_usb_write_pipetrn (usb_utr_t *ptr, uint16_t pipeno, uint16_t data)
 {
-    volatile __evenaccess uint16_t *p_reg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *p_reg;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
         p_reg = (uint16_t *)&(USB_M0.PIPE1TRN) + ((pipeno - 1) * 2);
 #else
@@ -3237,7 +3196,7 @@ void hw_usb_write_pipetrn (usb_utr_t *ptr, uint16_t pipeno, uint16_t data)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         p_reg = (uint16_t *) &(ptr->ipp->PIPE1TRN) + ((pipeno - 1) * 2);
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -3262,7 +3221,7 @@ uint16_t hw_usb_read_bcctrl(usb_utr_t *ptr)
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 #if USB_CFG_USE_USBIP == USB_CFG_IP1
         return USB_M1.BCCTRL.WORD;
 
@@ -3271,8 +3230,8 @@ uint16_t hw_usb_read_bcctrl(usb_utr_t *ptr)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
-        if (USB_USBIP_1 == ptr->ip)
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+        if (USB_IP1 == ptr->ip)
         {
             return (uint16_t)ptr->ipp1->BCCTRL.WORD;
 
@@ -3291,7 +3250,7 @@ uint16_t hw_usb_read_bcctrl(usb_utr_t *ptr)
 #endif  /* USB_CFG_BC == USB_CFG_ENABLE */
 
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 #if USB_CFG_BC == USB_CFG_ENABLE
 /******************************************************************************
  Function Name   : hw_usb_set_vdmsrce
@@ -3301,7 +3260,7 @@ uint16_t hw_usb_read_bcctrl(usb_utr_t *ptr)
  ******************************************************************************/
 void hw_usb_set_vdmsrce(usb_utr_t *ptr)
 {
-    if (USB_USBIP_1 == ptr->ip)
+    if (USB_IP1 == ptr->ip)
     {
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
         ptr->ipp1->BCCTRL.WORD |= USB_VDMSRCE;
@@ -3322,7 +3281,7 @@ void hw_usb_set_vdmsrce(usb_utr_t *ptr)
  ******************************************************************************/
 void hw_usb_clear_vdmsrce(usb_utr_t *ptr)
 {
-    if (USB_USBIP_1 == ptr->ip)
+    if (USB_IP1 == ptr->ip)
     {
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
         ptr->ipp1->BCCTRL.WORD &= (~USB_VDMSRCE);
@@ -3343,7 +3302,7 @@ void hw_usb_clear_vdmsrce(usb_utr_t *ptr)
  ******************************************************************************/
 void hw_usb_set_idpsinke(usb_utr_t *ptr)
 {
-    if (USB_USBIP_1 == ptr->ip)
+    if (USB_IP1 == ptr->ip)
     {
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
         ptr->ipp1->BCCTRL.WORD |= USB_IDPSINKE;
@@ -3364,7 +3323,7 @@ void hw_usb_set_idpsinke(usb_utr_t *ptr)
  ******************************************************************************/
 void hw_usb_clear_idpsinke(usb_utr_t *ptr)
 {
-    if (USB_USBIP_1 == ptr->ip)
+    if (USB_IP1 == ptr->ip)
     {
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
         ptr->ipp1->BCCTRL.WORD &= (~USB_IDPSINKE);
@@ -3380,7 +3339,7 @@ void hw_usb_clear_idpsinke(usb_utr_t *ptr)
 #endif  /* USB_CFG_BC == USB_CFG_ENABLE */
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 /******************************************************************************
  Function Name   : hw_usb_set_suspendm
  Description     : Set SUSPM bit.

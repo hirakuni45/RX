@@ -150,7 +150,7 @@
 #include "RX600/drw2d_mgr.hpp"
 #include "RX600/dmac_mgr.hpp"
 
-#elif defined(SIG_RX66T)
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
 #include "RX600/dmac.hpp"

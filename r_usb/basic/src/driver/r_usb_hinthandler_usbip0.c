@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2016) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_hinthandler_usbip0.c
@@ -26,6 +26,7 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -36,13 +37,13 @@
 #include "r_usb_typedef.h"
 #include "r_usb_extern.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Exported global variables (to be accessed by other files)
  ******************************************************************************/
-usb_utr_t g_usb_cstd_int_msg_t[USB_NUM_USBIP][USB_INTMSGMAX]; /* Interrupt message */
-uint16_t g_usb_cstd_int_msg_t_cnt[USB_NUM_USBIP]; /* Interrupt message count */
-usb_utr_t g_usb_cstd_int_msg_t_d0fifo;
+usb_utr_t g_usb_cstd_int_msg[USB_NUM_USBIP][USB_INTMSGMAX]; /* Interrupt message */
+uint16_t g_usb_cstd_int_msg_cnt[USB_NUM_USBIP]; /* Interrupt message count */
+
 
 /******************************************************************************
  Renesas Abstracted common Interrupt handler functions
@@ -61,8 +62,8 @@ void usb_hstd_usb_handler (void)
     usb_er_t err;
 
     /* Initial pointer */
-    ptr = &g_usb_cstd_int_msg_t[0][g_usb_cstd_int_msg_t_cnt[0]];
-    ptr->ip = USB_USBIP_0;
+    ptr = &g_usb_cstd_int_msg[0][g_usb_cstd_int_msg_cnt[0]];
+    ptr->ip = USB_IP0;
     ptr->ipp = usb_hstd_get_usb_ip_adr(ptr->ip);
 
     /* Host Function */
@@ -78,10 +79,10 @@ void usb_hstd_usb_handler (void)
     }
 
     /* Renewal Message count  */
-    g_usb_cstd_int_msg_t_cnt[0]++;
-    if (USB_INTMSGMAX == g_usb_cstd_int_msg_t_cnt[0])
+    g_usb_cstd_int_msg_cnt[0]++;
+    if (USB_INTMSGMAX == g_usb_cstd_int_msg_cnt[0])
     {
-        g_usb_cstd_int_msg_t_cnt[0] = 0;
+        g_usb_cstd_int_msg_cnt[0] = 0;
     }
 }
 /******************************************************************************
@@ -117,12 +118,13 @@ void usb_hstd_init_usb_message (usb_utr_t *ptr)
     /* Host Function */
     msg_info = USB_MSG_HCD_INT;
 
+    /* WAIT_LOOP */
     for (i = 0; i < USB_INTMSGMAX; i++)
     {
-        g_usb_cstd_int_msg_t[ptr->ip][i].msginfo = msg_info;
+        g_usb_cstd_int_msg[ptr->ip][i].msginfo = msg_info;
     }
 
-    g_usb_cstd_int_msg_t_cnt[ptr->ip] = 0;
+    g_usb_cstd_int_msg_cnt[ptr->ip] = 0;
 }
 /******************************************************************************
  End of function usb_hstd_init_usb_message

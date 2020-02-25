@@ -35,6 +35,7 @@ CSOURCES	=	common/init.c \
 				common/time.c \
 				r_usb/basic/src/driver/r_usb_cdataio.c \
 				r_usb/basic/src/driver/r_usb_clibusbip.c \
+				r_usb/basic/src/driver/r_usb_cstd_rtos.c \
 				r_usb/basic/src/driver/r_usb_hbc.c \
 				r_usb/basic/src/driver/r_usb_hcontrolrw.c \
 				r_usb/basic/src/driver/r_usb_hdriver.c \
@@ -68,8 +69,10 @@ CSOURCES	=	common/init.c \
 				r_usb/basic/src/hw/r_usb_preg_access.c \
 				r_usb/hmsc/src/r_usb_hmsc_api.c \
 				r_usb/hmsc/src/r_usb_hmsc_driver.c \
-				r_usb/hmsc/src/r_usb_hstorage_driver_api.c \
 				r_usb/hmsc/src/r_usb_hstorage_driver.c
+
+#				r_usb/hhid/src/r_usb_hhid_driver.c
+#				r_usb/hhid/src/r_usb_hhid_api.c
 
 PSOURCES	=	main.cpp \
 				RX65x/icu_mgr.cpp \
@@ -117,8 +120,9 @@ INC_APP		=	. ../ \
                 ../FreeRTOS/Source/include \
                 ../FreeRTOS/Source/portable/GCC/RX600v2 \
 				../RX600/drw2d/inc/tes \
-				../r_usb/basic ../r_usb/hmsc \
-				../r_usb/basic/src/driver/inc ../r_usb/basic/src/hw/inc ../r_usb/hmsc/src/inc
+				../r_usb/basic ../r_usb/basic/src/hw/inc ../r_usb/basic/src/driver/inc \
+				../r_usb/hmsc ../r_usb/hmsc/src/inc \
+				../r_usb/hhid ../r_usb/hhid/src/inc
 
 LIB_ROOT	=	../RX600/drw2d ../libmad ../zlib ../libpng
 

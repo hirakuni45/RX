@@ -18,9 +18,8 @@
 #define true 1
 #endif
 
-#define __evenaccess
+#include "r_usb/r_rx_compiler.h"
 
 #include "r_usb/iodefine.h"
-
 
 

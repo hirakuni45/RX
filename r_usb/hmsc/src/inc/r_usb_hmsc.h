@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2019) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_hmsc.h
@@ -28,6 +28,8 @@
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
  *         : 26.01.2017 1.21 USB_HMSC_STRG_SECTSIZE is added.
  *         : 30.09.2017 1.22 Add HMSC driver use API functions.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator 
+ *         : 31.05.2019 1.26 Added support for GNUC and ICCRX.
  ***********************************************************************************************************************/
 
 #ifndef R_USB_HMSC_LOCAL_H
@@ -42,6 +44,7 @@
  Macro definitions
  ******************************************************************************/
 /* Host Sample Task */
+#if (BSP_CFG_RTOS_USED == 0)
 #define USB_HMSC_TSK        (USB_TID_4)           /* Task ID */
 #define USB_HMSC_MBX        (USB_HMSC_TSK)        /* Mailbox ID */
 #define USB_HMSC_MPL        (USB_HMSC_TSK)        /* Memorypool ID */
@@ -50,6 +53,20 @@
 #define USB_HSTRG_TSK       (USB_TID_5)           /* Task ID */
 #define USB_HSTRG_MBX       (USB_HSTRG_TSK)       /* Mailbox ID */
 #define USB_HSTRG_MPL       (USB_HSTRG_TSK)       /* Memorypool ID */
+#else
+#define USB_HMSC_TSK        (USB_TID_6)           /* Task ID */
+#define USB_HMSC_MBX        (USB_HMSC_TSK)        /* Mailbox ID */
+#define USB_HMSC_MPL        (USB_HMSC_TSK)        /* Memorypool ID */
+
+/* Host Sample Task */
+#define USB_HSTRG_TSK       (USB_TID_7)           /* Task ID */
+#define USB_HSTRG_MBX       (USB_HSTRG_TSK)       /* Mailbox ID */
+#define USB_HSTRG_MPL       (USB_HSTRG_TSK)       /* Memorypool ID */
+
+#define USB_HMSC_REQ_MBX    (USB_TID_7)
+#endif /* (BSP_CFG_RTOS_USED == 0) */
+
+
 
 #define USB_MAXSTRAGE       (4)
 
@@ -97,29 +114,54 @@
 #define USB_HMSC_CLSDATASIZE                (256)
 #define USB_HMSC_STRG_SECTSIZE              (512) /* 512 bytes per sector */
 
-#define R_usb_hmsc_ref_drv_no  R_USB_HmscRefDrvno
+#define R_usb_hmsc_ref_drv_no  usb_hmsc_ref_drvno
+#define R_USB_HmscGetDevSts    usb_hmsc_get_dev_sts
 
 /*****************************************************************************
  Typedef definitions
  ******************************************************************************/
 
+R_BSP_PRAGMA_UNPACK
 typedef struct
 {
-    uint8_t reserved7 :7;
-    uint8_t cbw_dir :1;
+    union {
+        uint8_t    BYTE;
+        /* CPU bit order rigth */
+        R_BSP_ATTRIB_STRUCT_BIT_ORDER_RIGHT_2(
+            uint8_t reserved7 :7,
+            uint8_t cbw_dir :1
+        )BIT;
+    };
 } usb_msc_bm_cbw_flags_t;
+R_BSP_PRAGMA_PACKOPTION
 
+R_BSP_PRAGMA_UNPACK
 typedef struct
 {
-    uint8_t bcbw_lun :4;
-    uint8_t reserved4 :4;
+    union {
+        uint8_t    BYTE;
+        /* CPU bit order rigth */
+        R_BSP_ATTRIB_STRUCT_BIT_ORDER_RIGHT_2(
+            uint8_t bcbw_lun :4,
+            uint8_t reserved4 :4
+        )BIT;
+    };
 } usb_msc_bcbw_lun_t;
+R_BSP_PRAGMA_PACKOPTION
 
+R_BSP_PRAGMA_UNPACK
 typedef struct
 {
-    uint8_t bcbwcb_length :5;
-    uint8_t reserved3 :3;
+    union {
+        uint8_t    BYTE;
+        /* CPU bit order rigth */
+        R_BSP_ATTRIB_STRUCT_BIT_ORDER_RIGHT_2(
+            uint8_t bcbwcb_length :5,
+            uint8_t reserved3 :3
+        )BIT;
+    };
 } usb_msc_bcbwcb_length_t;
+R_BSP_PRAGMA_PACKOPTION
 
 /* CBW Structure define.    */
 typedef struct
@@ -168,12 +210,14 @@ typedef struct
 /* ERROR CODE */
 typedef enum
 {
-    USB_HMSC_OK = (uint16_t) 0, USB_HMSC_STALL = (uint16_t) -1, USB_HMSC_CBW_ERR = (uint16_t) -2, /* CBW error */
-    USB_HMSC_DAT_RD_ERR = (uint16_t) -3, /* Data IN error */
-    USB_HMSC_DAT_WR_ERR = (uint16_t) -4, /* Data OUT error */
-    USB_HMSC_CSW_ERR = (uint16_t) -5, /* CSW error */
+    USB_HMSC_OK            = (uint16_t) 0,
+    USB_HMSC_STALL         = (uint16_t) -1,
+    USB_HMSC_CBW_ERR       = (uint16_t) -2, /* CBW error */
+    USB_HMSC_DAT_RD_ERR    = (uint16_t) -3, /* Data IN error */
+    USB_HMSC_DAT_WR_ERR    = (uint16_t) -4, /* Data OUT error */
+    USB_HMSC_CSW_ERR       = (uint16_t) -5, /* CSW error */
     USB_HMSC_CSW_PHASE_ERR = (uint16_t) -6, /* Phase error */
-    USB_HMSC_SUBMIT_ERR = (uint16_t) -7, /* Submit error */
+    USB_HMSC_SUBMIT_ERR    = (uint16_t) -7, /* Submit error */
 }g_usb_hmsc_error_t;
 
 /* CSW STATUS */
@@ -182,33 +226,6 @@ typedef enum
     USB_MSC_CSW_OK = (uint16_t) 0x00, USB_MSC_CSW_NG = (uint16_t) 0x01, USB_MSC_CSW_PHASE_ERR = (uint16_t) 0x02
 }usb_gcmsc_cswsts_t;
 
-typedef enum
-{
-    USB_ATAPI_SUCCESS = 0x11,
-
-    /* Command receive events */
-    USB_ATAPI_NO_DATA = 0x21,
-    USB_ATAPI_A_SND_DATA = 0x22,
-    USB_ATAPI_A_RCV_DATA = 0x23,
-    USB_ATAPI_SND_DATAS = 0x24,
-    USB_ATAPI_RCV_DATAS = 0x25,
-    USB_ATAPI_NOT_SUPPORT = 0x26,
-
-    /* Complete events */
-    USB_ATAPI_CMD_CONTINUE = 0x31,
-    USB_ATAPI_CMD_COMPLETE = 0x32,
-    USB_ATAPI_CMD_FAILED = 0x33,
-
-    /* ATAPI Start events */
-    USB_ATAPI_READY = 0x41,
-
-    /* respond error */
-    USB_ATAPI_ERROR = 0x51,
-
-    /*** ERR CODE ***/
-    USB_ATAPI_ERR_CODE_SEPARATER = 0x100,
-    USB_ATAPI_ERR_INVAL = 0x61
-}usb_atapi_event_t;
 
 /*****************************************************************************
  Private global variables and functions
@@ -230,9 +247,7 @@ extern uint8_t *g_p_usb_hmsc_interface_table[USB_NUM_USBIP];
 extern uint16_t g_usb_hmsc_devaddr[USB_NUM_USBIP];
 extern uint16_t g_usb_hmsc_init_seq[USB_NUM_USBIP];
 
-extern uint16_t g_usb_hmsc_def_ep_tbl[USB_NUM_USBIP][USB_EPL + 1];
 extern uint16_t g_usb_hmsc_speed[USB_NUM_USBIP];
-extern uint16_t g_usb_hmsc_tmp_ep_tbl[USB_NUM_USBIP][USB_MAXSTRAGE][2][USB_EPL];
 extern uint16_t g_usb_hmsc_in_pipectr[USB_NUM_USBIP][USB_MAXSTRAGE];
 extern uint16_t g_usb_hmsc_out_pipectr[USB_NUM_USBIP][USB_MAXSTRAGE];
 
@@ -240,14 +255,15 @@ extern uint16_t g_usb_hmsc_out_pipectr[USB_NUM_USBIP][USB_MAXSTRAGE];
 extern uint16_t g_usb_hmsc_strg_process[USB_NUM_USBIP];
 extern uint16_t g_usb_hmsc_drive_search_seq[USB_NUM_USBIP];
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 /*****************************************************************************
  Exported global variables (to be accessed by other files)
  ******************************************************************************/
 
-uint16_t usb_hmsc_smp_pipe_info (usb_utr_t *ptr, uint8_t *table, uint16_t msgnum, uint16_t speed, uint16_t length);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+uint16_t usb_hmsc_pipe_info (usb_utr_t *ptr, uint8_t *table, uint16_t msgnum, uint16_t speed, uint16_t length);
 
 /* HMSC driver */
 void usb_hmsc_task (void);
@@ -257,7 +273,7 @@ void usb_hmsc_set_rw_cbw (usb_utr_t *ptr, uint16_t command, uint32_t secno, uint
 void usb_hmsc_clr_data (uint16_t len, uint8_t *buf);
 uint16_t usb_hmsc_no_data (usb_utr_t *ptr, uint16_t side);
 uint16_t usb_hmsc_data_in (usb_utr_t *ptr, uint16_t side, uint8_t *buff, uint32_t size);
-uint16_t usb_hmsc_data_out (usb_utr_t *ptr, uint16_t side, const uint8_t *buff, uint32_t size);
+uint16_t usb_hmsc_data_out (usb_utr_t *ptr, uint16_t side, uint8_t *buff, uint32_t size);
 
 void usb_hmsc_smp_drive2_addr (uint16_t side, usb_utr_t *devadr);
 void usb_hmsc_message_retry (uint16_t id, usb_utr_t *mess);
@@ -267,33 +283,41 @@ void usb_hmsc_strg_drive_search_act (usb_utr_t *mess);
 void usb_hmsc_strg_specified_path (usb_utr_t *mess);
 void usb_hmsc_strg_check_result (usb_utr_t *mess, uint16_t data1, uint16_t data2);
 
-uint16_t R_USB_HmscStrgReadSector (usb_utr_t *ptr, uint16_t side, uint8_t *buff, uint32_t secno,
+#if (BSP_CFG_RTOS_USED)
+uint16_t usb_hmsc_get_string_info(usb_utr_t *mess, uint16_t addr, uint16_t string);
+uint16_t usb_hmsc_trans_wait_tmo(uint16_t tmo);
+void usb_hmsc_trans_result(usb_utr_t *mess, uint16_t data1, uint16_t data2);
+uint16_t usb_hmsc_req_trans_wait_tmo(uint16_t tmo);
+void usb_hmsc_req_trans_result(usb_utr_t *mess, uint16_t data1, uint16_t data2);
+#endif /* (BSP_CFG_RTOS_USED) */
+
+uint16_t usb_hmsc_strg_read_sector (usb_utr_t *ptr, uint16_t side, uint8_t *buff, uint32_t secno,
                                    uint16_t seccnt, uint32_t trans_byte);
-uint16_t R_USB_HmscStrgWriteSector (usb_utr_t *ptr, uint16_t side, const uint8_t *buff, uint32_t secno,
+uint16_t usb_hmsc_strg_write_sector (usb_utr_t *ptr, uint16_t side, uint8_t *buff, uint32_t secno,
                                    uint16_t seccnt, uint32_t trans_byte);
-uint16_t R_USB_HmscGetDevSts (uint16_t side);
-uint16_t R_USB_HmscStrgUserCommand (usb_utr_t *ptr, uint16_t side, uint16_t command, uint8_t *buff,
+uint16_t usb_hmsc_get_dev_sts (uint16_t side);
+uint16_t usb_hmsc_strg_user_command (usb_utr_t *ptr, uint16_t side, uint16_t command, uint8_t *buff,
                                     usb_cb_t complete);
-uint16_t R_USB_HmscRequestSense (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
-usb_er_t R_USB_HmscMassStorageReset (usb_utr_t *ptr, uint16_t addr, usb_cb_t complete);
-uint16_t R_USB_HmscStrgDriveOpen (usb_utr_t *ptr, uint16_t addr, uint16_t *side);
-uint16_t R_USB_HmscStrgDriveClose (usb_utr_t *ptr, uint16_t side);
-uint16_t R_USB_HmscRefDrvno (uint16_t devadr);
-usb_er_t R_USB_HmscGetMaxUnit (usb_utr_t *ptr, uint16_t addr, uint8_t *buff, usb_cb_t complete);
-uint16_t R_USB_HmscInquiry (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
-uint16_t R_USB_HmscReadFormatCapacity (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
-uint16_t R_USB_HmscReadCapacity (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
-uint16_t R_USB_HmscTestUnit (usb_utr_t *ptr, uint16_t side);
-uint16_t R_USB_HmscRead10 (usb_utr_t *ptr, uint16_t side, uint8_t *buff, uint32_t secno, uint16_t seccnt,
+uint16_t usb_hmsc_request_sense (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
+usb_er_t usb_hmsc_mass_storage_reset (usb_utr_t *ptr, uint16_t addr, usb_cb_t complete);
+uint16_t usb_hmsc_strg_drive_open (usb_utr_t *ptr, uint16_t addr, uint16_t *side);
+uint16_t usb_hmsc_strg_drive_close (usb_utr_t *ptr, uint16_t side);
+uint16_t usb_hmsc_ref_drvno (uint16_t devadr);
+usb_er_t usb_hmsc_get_max_unit (usb_utr_t *ptr, uint16_t addr, uint8_t *buff, usb_cb_t complete);
+uint16_t usb_hmsc_inquiry (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
+uint16_t usb_hmsc_read_format_capacity (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
+uint16_t usb_hmsc_read_capacity (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
+uint16_t usb_hmsc_test_unit (usb_utr_t *ptr, uint16_t side);
+uint16_t usb_hmsc_read10 (usb_utr_t *ptr, uint16_t side, uint8_t *buff, uint32_t secno, uint16_t seccnt,
                            uint32_t trans_byte);
-void R_USB_HmscClassCheck (usb_utr_t *ptr, uint16_t **table);
-uint16_t R_USB_HmscAllocDrvno (uint16_t devadr);
-uint16_t R_USB_HmscFreeDrvno (uint16_t side);
-uint16_t R_USB_HmscWrite10 (usb_utr_t *ptr, uint16_t side, const uint8_t *buff, uint32_t secno, uint16_t seccnt,
+void usb_hmsc_class_check (usb_utr_t *ptr, uint16_t **table);
+uint16_t usb_hmsc_alloc_drvno (uint16_t devadr);
+uint16_t usb_hmsc_free_drvno (uint16_t side);
+uint16_t usb_hmsc_write10 (usb_utr_t *ptr, uint16_t side, uint8_t *buff, uint32_t secno, uint16_t seccnt,
                             uint32_t trans_byte);
-uint16_t R_USB_HmscPreventAllow (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
-uint16_t R_USB_HmscModeSelect10 (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
-uint16_t R_USB_HmscModeSense10 (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
+uint16_t usb_hmsc_prevent_allow (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
+uint16_t usb_hmsc_mode_select10 (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
+uint16_t usb_hmsc_mode_sense10 (usb_utr_t *ptr, uint16_t side, uint8_t *buff);
 
 #ifdef __cplusplus
 };

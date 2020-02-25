@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2016) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_pintfifo.c
@@ -26,6 +26,7 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -38,7 +39,7 @@
 #include "r_usb_bitdefine.h"
 #include "r_usb_reg_access.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 /******************************************************************************
  Renesas Abstracted Peripheral FIFO access functions
  ******************************************************************************/
@@ -54,7 +55,7 @@ void usb_pstd_brdy_pipe (uint16_t bitsts)
 {
     /* When operating by the peripheral function, usb_pstd_brdy_pipe() is executed with PIPEx request because */
     /* two BRDY messages are issued even when the demand of PIPE0 and PIPEx has been generated at the same time. */
-    if ((bitsts & USB_BRDY0) == USB_BRDY0)
+    if (USB_BRDY0 == (bitsts & USB_BRDY0))
     {
         switch (usb_pstd_read_data(USB_PIPE0, USB_CUSE))
         {
@@ -116,7 +117,7 @@ void usb_pstd_brdy_pipe (uint16_t bitsts)
 void usb_pstd_nrdy_pipe (uint16_t bitsts)
 {
     /* The function for peripheral driver is created here. */
-    if ((bitsts & USB_NRDY0) == USB_NRDY0)
+    if (USB_NRDY0 == (bitsts & USB_NRDY0))
     {
         /* Non processing. */
     }
@@ -141,7 +142,7 @@ void usb_pstd_bemp_pipe (uint16_t bitsts)
 {
     /* When operating by the peripheral function, usb_pstd_bemp_pipe() is executed with PIPEx request because */
     /* two BEMP messages are issued even when the demand of PIPE0 and PIPEx has been generated at the same time. */
-    if ((bitsts & USB_BEMP0) == USB_BEMP0)
+    if (USB_BEMP0 == (bitsts & USB_BEMP0))
     {
         switch (usb_pstd_write_data(USB_PIPE0, USB_CUSE))
         {

@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2016) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_psignal.c
@@ -26,6 +26,7 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -38,11 +39,10 @@
 #include "r_usb_bitdefine.h"
 #include "r_usb_reg_access.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 /******************************************************************************
  Exported global variables (to be accessed by other files)
  ******************************************************************************/
-/*extern  uint16_t    g_usb_pstd_intsts0;*/
 #if USB_CFG_BC == USB_CFG_ENABLE
 extern uint16_t        g_usb_bc_detect;
 
@@ -68,7 +68,7 @@ void usb_pstd_bus_reset (void)
 
     /* Memory clear */
     usb_pstd_clr_mem();
-    connect_info = usb_cstd_port_speed(USB_NULL, USB_NULL);
+    connect_info = usb_cstd_port_speed(USB_NULL);
 
     /* Callback */
     if (USB_NULL != g_usb_pstd_driver.devdefault)
@@ -120,17 +120,12 @@ void usb_pstd_attach_process (void)
 void usb_pstd_detach_process (void)
 {
     uint16_t i;
-    uint16_t *p_tbl;
 
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
     hw_usb_clear_cnen(USB_NULL);
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
     /* Pull-up disable */
     hw_usb_pclear_dprpu();
-    usb_cpu_delay_1us((uint16_t) 2);
-    hw_usb_set_dcfm();
-    usb_cpu_delay_1us((uint16_t) 1);
-    hw_usb_clear_dcfm(USB_NULL);
 
     /* Configuration number */
     g_usb_pstd_config_num = 0;
@@ -138,14 +133,14 @@ void usb_pstd_detach_process (void)
     /* Remote wakeup enable flag */
     g_usb_pstd_remote_wakeup = USB_FALSE;
 
-    /* INTSTS0 clear */
-    /*g_usb_pstd_intsts0 = 0;*/
-
-    p_tbl = g_usb_pstd_driver.p_pipetbl;
-    for (i = 0; USB_PDTBLEND != p_tbl[i]; i += USB_EPL)
+    /* WAIT_LOOP */
+    for (i = USB_MIN_PIPE_NO; i < (USB_MAXPIPE_NUM +1); i++)
     {
-        usb_pstd_forced_termination(p_tbl[i], (uint16_t) USB_DATA_STOP);
-        usb_cstd_clr_pipe_cnfg(USB_NULL, p_tbl[i]);
+        if (USB_TRUE == g_usb_pipe_table[USB_CFG_USE_USBIP][i].use_flag)
+        {
+            usb_pstd_forced_termination(i, (uint16_t) USB_DATA_STOP);
+            usb_cstd_clr_pipe_cnfg(USB_NULL, i);
+        }
     }
 
     /* Callback */
@@ -174,8 +169,8 @@ void usb_pstd_suspend_process (void)
     hw_usb_pset_enb_rsme();
 
     intsts0 = hw_usb_read_intsts();
-    buf = hw_usb_read_syssts(USB_NULL, USB_NULL);
-    if (((intsts0 & USB_DS_SUSP) != (uint16_t) 0) && ((buf & USB_LNST) == USB_FS_JSTS))
+    buf = hw_usb_read_syssts(USB_NULL);
+    if (((uint16_t) 0 != (intsts0 & USB_DS_SUSP)) && (USB_FS_JSTS == (buf & USB_LNST)))
     {
         /* Suspend */
         usb_pstd_stop_clock();

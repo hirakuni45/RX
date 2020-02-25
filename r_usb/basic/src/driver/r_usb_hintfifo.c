@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2016) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_hintfifo.c
@@ -26,6 +26,7 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -38,7 +39,7 @@
 #include "r_usb_bitdefine.h"
 #include "r_usb_reg_access.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Renesas Abstracted Host FIFO Interrupt functions
  ******************************************************************************/
@@ -58,7 +59,7 @@ void usb_hstd_brdy_pipe (usb_utr_t *ptr)
 
     /* When operating by the host function, usb_hstd_brdy_pipe() is executed without fail because */
     /* only one BRDY message is issued even when the demand of PIPE0 and PIPEx has been generated at the same time. */
-    if ((bitsts & USB_BRDY0) == USB_BRDY0)
+    if (USB_BRDY0 == (bitsts & USB_BRDY0))
     {
         /* Branch  by the Control transfer stage management */
         switch (g_usb_hstd_ctsq[ptr->ip])
@@ -149,13 +150,13 @@ void usb_hstd_nrdy_pipe (usb_utr_t *ptr)
 
     /* When operating by the host function, usb_hstd_nrdy_pipe() is executed without fail because */
     /* only one NRDY message is issued even when the demand of PIPE0 and PIPEx has been generated at the same time. */
-    if ((bitsts & USB_NRDY0) == USB_NRDY0)
+    if (USB_NRDY0 == (bitsts & USB_NRDY0))
     {
         /* Get Pipe PID from pipe number */
         buffer = usb_cstd_get_pid(ptr, (uint16_t) USB_PIPE0);
 
         /* STALL ? */
-        if ((buffer & USB_PID_STALL) == USB_PID_STALL)
+        if (USB_PID_STALL == (buffer & USB_PID_STALL))
         {
             USB_PRINTF0("### STALL Pipe 0\n");
 
@@ -209,10 +210,10 @@ void usb_hstd_bemp_pipe (usb_utr_t *ptr)
 
     /* When operating by the host function, usb_hstd_bemp_pipe() is executed without fail because */
     /* only one BEMP message is issued even when the demand of PIPE0 and PIPEx has been generated at the same time. */
-    if ((bitsts & USB_BEMP0) == USB_BEMP0)
+    if (USB_BEMP0 == (bitsts & USB_BEMP0))
     {
         buffer = usb_cstd_get_pid(ptr, (uint16_t) USB_PIPE0); /* Get Pipe PID from pipe number */
-        if ((buffer & USB_PID_STALL) == USB_PID_STALL) /* MAX packet size error ? */
+        if (USB_PID_STALL == (buffer & USB_PID_STALL)) /* MAX packet size error ? */
         {
             USB_PRINTF0("### STALL Pipe 0\n");
             usb_hstd_ctrl_end(ptr, (uint16_t) USB_DATA_STALL); /* PIPE0 STALL call back */

@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2019) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_rx_mcu.c
@@ -28,6 +28,9 @@
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
  *         : 26.01.2017 1.21 Support DMAC Technical Update for RX71M/RX64M USBA.
  *         : 30.09.2017 1.22 RX62N/RX630/RX63T-H is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
+ *         : 31.05.2019 1.26 Added support for GNUC and ICCRX.
+ *         : 30.07.2019 1.27 RX72M is added.
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -160,59 +163,56 @@
 /******************************************************************************
  Exported global variables (to be accessed by other files)
  ******************************************************************************/
-extern uint16_t g_usb_usbmode;
 
 #if 0
 /******************************************************************************
  Private global variables and functions
  ******************************************************************************/
-#pragma interrupt usbfs_usbi_isr(vect = VECT(USB0, USBI0))
+R_BSP_PRAGMA_STATIC_INTERRUPT(usbfs_usbi_isr, VECT(USB0, USBI0))
+
+#endif
 
 #if defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-    #pragma interrupt usbhs_usbir_isr(vect = VECT(USBA, USBAR))
+    R_BSP_PRAGMA_STATIC_INTERRUPT(usbhs_usbir_isr, VECT(USBA, USBAR))
 
 #endif  /* defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 
 #if defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N) || defined (BSP_MCU_RX630) || defined (BSP_MCU_RX63T)
-        #pragma interrupt usb_cpu_usb_int_hand_isr(vect = VECT(USB, USBR0))
+    R_BSP_PRAGMA_STATIC_INTERRUPT(usb_cpu_usb_int_hand_isr, VECT(USB, USBR0))
 #endif /* defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N) || defined (BSP_MCU_RX630) || defined (BSP_MCU_RX63T) */
 
 #if defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N)
-        #pragma interrupt usbhs_usbir_isr(vect = VECT(USB1, USBI1))
-    #if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
-        #pragma interrupt usb2_cpu_usb_int_hand_isr(vect = VECT(USB, USBR1))
+        R_BSP_PRAGMA_STATIC_INTERRUPT(usbhs_usbir_isr, VECT(USB1, USBI1))
+    #if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
+        R_BSP_PRAGMA_INTERRUPT(usb2_cpu_usb_int_hand_isr, VECT(USB, USBR1))
     #endif /* ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI ) */
 #endif  /* defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N) */
 
-#if defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N)
-    #if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
-        #pragma interrupt usb_cpu_usb_int_hand_isr(vect = VECT(USB0, USBR0))
+#if defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M)
+    #if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
+        R_BSP_PRAGMA_STATIC_INTERRUPT(usb_cpu_usb_int_hand_isr, VECT(USB0, USBR0))
     #endif /* ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI ) */
-#endif /* defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) */
+#endif /* defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M) */
 
 #if USB_CFG_DTC == USB_CFG_ENABLE
-#pragma interrupt usb_cpu_d0fifo_int_hand(vect = VECT(USB0, D0FIFO0))
-#pragma interrupt usb_cpu_d1fifo_int_hand(vect = VECT(USB0, D1FIFO0))
+R_BSP_PRAGMA_STATIC_INTERRUPT(usb_cpu_d0fifo_int_hand, VECT(USB0, D0FIFO0))
+R_BSP_PRAGMA_STATIC_INTERRUPT(usb_cpu_d1fifo_int_hand, VECT(USB0, D1FIFO0))
 
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-#pragma interrupt usb2_cpu_d0fifo_int_hand(vect = VECT(USBA, D0FIFO2))
-#pragma interrupt usb2_cpu_d1fifo_int_hand(vect = VECT(USBA, D1FIFO2))
+R_BSP_PRAGMA_STATIC_INTERRUPT(usb2_cpu_d0fifo_int_hand, VECT(USBA, D0FIFO2))
+R_BSP_PRAGMA_STATIC_INTERRUPT(usb2_cpu_d1fifo_int_hand, VECT(USBA, D1FIFO2))
 
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 
 #if defined(BSP_MCU_RX63N) || defined (BSP_MCU_RX62N)
-#pragma interrupt usb2_cpu_d0fifo_int_hand(vect = VECT(USB1, D0FIFO1))
-#pragma interrupt usb2_cpu_d1fifo_int_hand(vect = VECT(USB1, D1FIFO1))
+R_BSP_PRAGMA_INTERRUPT(usb2_cpu_d0fifo_int_hand, VECT(USB1, D0FIFO1))
+R_BSP_PRAGMA_INTERRUPT(usb2_cpu_d1fifo_int_hand, VECT(USB1, D1FIFO1))
 
 #endif  /* defined(BSP_MCU_RX63N) || defined (BSP_MCU_RX62N) */
 
 #endif  /* USB_CFG_DTC == USB_CFG_ENABLE */
-
-
-
-#endif
-
-
 
 /******************************************************************************
  Renesas Abstracted RSK functions
@@ -234,6 +234,10 @@ usb_err_t usb_module_start (uint8_t ip_type)
         {
             return USB_ERR_BUSY;
         }
+
+#if defined (BSP_MCU_RX72T)
+        R_BSP_VoltageLevelSetting (BSP_VOL_USB_POWERON);
+#endif  /* defined (BSP_MCU_RX72T) */
 
         /* Enable writing to MSTP registers */
         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
@@ -281,7 +285,6 @@ usb_err_t usb_module_start (uint8_t ip_type)
     }
     return USB_SUCCESS;
 }
-#endif
 /******************************************************************************
 End of function usb_module_start
 ******************************************************************************/
@@ -292,7 +295,6 @@ End of function usb_module_start
  Arguments       : uint8_t ip_type  : USB_IP0/USB_IP1
  Return value    : none
  ******************************************************************************/
-#if 0
 usb_err_t usb_module_stop (uint8_t ip_type)
 {
     if (USB_IP0 == ip_type)
@@ -301,6 +303,34 @@ usb_err_t usb_module_stop (uint8_t ip_type)
         {
             return USB_ERR_NOT_OPEN;
         }
+
+        USB0.DVSTCTR0.WORD = 0;
+        USB0.DCPCTR.WORD = USB_SQSET;
+        USB0.PIPE1CTR.WORD = 0;
+        USB0.PIPE2CTR.WORD = 0;
+        USB0.PIPE3CTR.WORD = 0;
+        USB0.PIPE4CTR.WORD = 0;
+        USB0.PIPE5CTR.WORD = 0;
+        USB0.PIPE6CTR.WORD = 0;
+        USB0.PIPE7CTR.WORD = 0;
+        USB0.PIPE8CTR.WORD = 0;
+        USB0.PIPE9CTR.WORD = 0;
+        USB0.BRDYENB.WORD = 0;
+        USB0.NRDYENB.WORD = 0;
+        USB0.BEMPENB.WORD = 0;
+        USB0.INTENB0.WORD = 0;
+        USB0.INTENB1.WORD = 0;
+        USB0.SYSCFG.WORD &= (~USB_DPRPU);
+        USB0.SYSCFG.WORD &= (~USB_DRPD);
+        USB0.SYSCFG.WORD &= (~USB_USBE);
+        USB0.SYSCFG.WORD &= (~USB_DCFM);
+        USB0.BRDYSTS.WORD = 0;
+        USB0.NRDYSTS.WORD = 0;
+        USB0.BEMPSTS.WORD = 0;
+
+#if defined (BSP_MCU_RX72T)
+        R_BSP_VoltageLevelSetting (BSP_VOL_USB_POWEROFF);
+#endif  /* defined (BSP_MCU_RX72T) */
 
         /* Enable writing to MSTP registers */
         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
@@ -319,6 +349,30 @@ usb_err_t usb_module_stop (uint8_t ip_type)
             return USB_ERR_NOT_OPEN;
         }
 
+        USBA.DVSTCTR0.WORD = 0;
+        USBA.DCPCTR.WORD = USB_SQSET;
+        USBA.PIPE1CTR.WORD = 0;
+        USBA.PIPE2CTR.WORD = 0;
+        USBA.PIPE3CTR.WORD = 0;
+        USBA.PIPE4CTR.WORD = 0;
+        USBA.PIPE5CTR.WORD = 0;
+        USBA.PIPE6CTR.WORD = 0;
+        USBA.PIPE7CTR.WORD = 0;
+        USBA.PIPE8CTR.WORD = 0;
+        USBA.PIPE9CTR.WORD = 0;
+        USBA.BRDYENB.WORD = 0;
+        USBA.NRDYENB.WORD = 0;
+        USBA.BEMPENB.WORD = 0;
+        USBA.INTENB0.WORD = 0;
+        USBA.INTENB1.WORD = 0;
+        USBA.SYSCFG.WORD &= (~USB_DPRPU);
+        USBA.SYSCFG.WORD &= (~USB_DRPD);
+        USBA.SYSCFG.WORD &= (~USB_USBE);
+        USBA.SYSCFG.WORD &= (~USB_DCFM);
+        USBA.BRDYSTS.WORD = 0;
+        USBA.NRDYSTS.WORD = 0;
+        USBA.BEMPSTS.WORD = 0;
+
         /* Enable writing to MSTP registers */
         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
 
@@ -335,6 +389,33 @@ usb_err_t usb_module_stop (uint8_t ip_type)
         {
             return USB_ERR_NOT_OPEN;
         }
+
+        USB1.DVSTCTR0.WORD = 0;
+        USB1.DCPCTR.WORD = USB_SQSET;
+        USB1.PIPE1CTR.WORD = 0;
+        USB1.PIPE2CTR.WORD = 0;
+        USB1.PIPE3CTR.WORD = 0;
+        USB1.PIPE4CTR.WORD = 0;
+        USB1.PIPE5CTR.WORD = 0;
+        USB1.PIPE6CTR.WORD = 0;
+        USB1.PIPE7CTR.WORD = 0;
+        USB1.PIPE8CTR.WORD = 0;
+        USB1.PIPE9CTR.WORD = 0;
+        USB1.BRDYENB.WORD = 0;
+        USB1.NRDYENB.WORD = 0;
+        USB1.BEMPENB.WORD = 0;
+        USB1.INTENB0.WORD = 0;
+#if defined (BSP_MCU_RX62N)
+        USB1.INTENB1.WORD = 0;
+#endif /* defined (BSP_MCU_RX62N) */
+        USB1.SYSCFG.WORD &= (~USB_DPRPU);
+        USB1.SYSCFG.WORD &= (~USB_DRPD);
+        USB1.SYSCFG.WORD &= (~USB_USBE);
+        USB1.SYSCFG.WORD &= (~USB_DCFM);
+        USB1.BRDYSTS.WORD = 0;
+        USB1.NRDYSTS.WORD = 0;
+        USB1.BEMPSTS.WORD = 0;
+
         /* Enable writing to MSTP registers */
         R_BSP_RegisterProtectDisable(BSP_REG_PROTECT_LPC_CGC_SWR);
 
@@ -352,7 +433,6 @@ usb_err_t usb_module_stop (uint8_t ip_type)
     }
     return USB_SUCCESS;
 }
-#endif
 /******************************************************************************
 End of function usb_module_stop
 ******************************************************************************/
@@ -363,12 +443,11 @@ End of function usb_module_stop
  Arguments       : uint8_t ip_type  : USB_IP0/USB_IP1
  Return value    : void
  ******************************************************************************/
-#if 0
 void usb_cpu_usbint_init (uint8_t ip_type)
 {
     if ( USB_IP0 == ip_type)
     {
-#ifndef BSP_MCU_RX63T
+#if (!defined (BSP_MCU_RX63T)) && (!defined (BSP_MCU_RX72T))
         /* Deep standby USB monitor register
          b0      SRPC0    USB0 single end control
          b3-b1   Reserved 0
@@ -394,7 +473,7 @@ void usb_cpu_usbint_init (uint8_t ip_type)
          b31     DVBSTS1  USB1 VBUS input
          */
         USB.DPUSR0R.BIT.FIXPHY0 = 0u; /* USB0 Transceiver Output fixed */
-#endif /* defined BSP_MCU_RX63T */
+#endif /* (!defined (BSP_MCU_RX63T)) && (!defined (BSP_MCU_RX72T)) */
 
         /* Interrupt enable register
          b0 IEN0 Interrupt enable bit
@@ -407,18 +486,20 @@ void usb_cpu_usbint_init (uint8_t ip_type)
          b7 IEN7 Interrupt enable bit
          */
 #if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
-        IEN( USB0, D0FIFO0 ) = 1u;    /* D0FIFO0 Enable */
-        IEN( USB0, D1FIFO0 ) = 1u;    /* D1FIFO0 Enable */
+        R_BSP_InterruptRequestEnable(VECT(USB0, D0FIFO0));    /* D0FIFO0 Enable */
+        R_BSP_InterruptRequestEnable(VECT(USB0, D1FIFO0));    /* D1FIFO0 Enable */
 
 #endif  /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
 
-#if defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N)
-        IEN( USB0, USBR0 )= 1u; /* USBR0 enable */
+#if defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M)
+        R_BSP_InterruptRequestEnable(VECT(USB0, USBR0)); /* USBR0 enable */
 
-#endif  /* defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) */
+#endif  /* defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M) */
 
 #if defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N)
-        IEN( USB, USBR0 ) = 1u; /* USBR0 enable */
+        R_BSP_InterruptRequestEnable(VECT(USB, USBR0)); /* USBR0 enable */
 
 #endif  /* defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N) */
 
@@ -426,18 +507,20 @@ void usb_cpu_usbint_init (uint8_t ip_type)
          b3-b0 IPR      Interrupt priority
          b7-b4 Reserved 0
          */
-#if defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N)
-        IPR( USB0, USBR0 )= 0x00; /* USBR0 */
+#if defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M)
+        IPR (USB0, USBR0)= 0x00; /* USBR0 */
 
-#endif  /* defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) */
+#endif  /* defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M) */
 
 #if defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N)
-        IPR( USB, USBR0 ) = 0x00; /* USBR0 */
+        IPR (USB, USBR0) = 0x00; /* USBR0 */
 
 #endif  /* defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N) */
 
-        IPR( USB0, USBI0 )= USB_CFG_INTERRUPT_PRIORITY; /* USBI0 in vector 128 */
-        IEN( USB0, USBI0 )= 1u; /* USBI0 enable in vector 128 */
+        IPR (USB0, USBI0) = USB_CFG_INTERRUPT_PRIORITY; /* USBI0 in vector 128 */
+        R_BSP_InterruptRequestEnable(VECT(USB0, USBI0)); /* USBI0 enable in vector 128 */
     }
 
     if (USB_IP1 == ip_type)
@@ -454,18 +537,18 @@ void usb_cpu_usbint_init (uint8_t ip_type)
          b7 IEN7 Interrupt enable bit
          */
 #if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
-        IEN( USBA, D0FIFO2 ) = 1u;   /* Enable D0FIF2 interrupt */
-        IEN( USBA, D1FIFO2 ) = 1u;   /* Enable D1FIF2 interrupt */
+        R_BSP_InterruptRequestEnable(VECT(USBA, D0FIFO2));   /* Enable D0FIF2 interrupt */
+        R_BSP_InterruptRequestEnable(VECT(USBA, D1FIFO2));   /* Enable D1FIF2 interrupt */
 
 #endif  /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
 
-        IEN( USBA, USBAR ) = 1u; /* Enable  USBA  interrupt */
+        R_BSP_InterruptRequestEnable(VECT(USBA, USBAR)); /* Enable  USBA  interrupt */
 
         /* Priority D0FIFO0=0(Disable)
          b3-b0 IPR      Interrupt priority
          b7-b4 Reserved 0
          */
-        IPR( USBA, USBAR ) = USB_CFG_INTERRUPT_PRIORITY; /* USBA */
+        IPR (USBA, USBAR) = USB_CFG_INTERRUPT_PRIORITY; /* USBA */
 
 #endif  /* defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 
@@ -510,26 +593,25 @@ void usb_cpu_usbint_init (uint8_t ip_type)
          b7 IEN7 Interrupt enable bit
          */
 #if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
-        IEN( USB1, D0FIFO1 ) = 1u;   /* Enable D0FIF1 interrupt */
-        IEN( USB1, D1FIFO1 ) = 1u;   /* Enable D1FIF1 interrupt */
+        R_BSP_InterruptRequestEnable(VECT(USB1, D0FIFO1));   /* Enable D0FIF1 interrupt */
+        R_BSP_InterruptRequestEnable(VECT(USB1, D1FIFO1));   /* Enable D1FIF1 interrupt */
 
 #endif  /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
 
-        IEN( USB1, USBI1 ) = 1u; /* Enable  USB1  interrupt */
-        IEN( USB, USBR1 ) = 1u; /* Enable  USB1  interrupt */
+        R_BSP_InterruptRequestEnable(VECT(USB1, USBI1)); /* Enable  USB1  interrupt */
+        R_BSP_InterruptRequestEnable(VECT(USB, USBR1)); /* Enable  USB1  interrupt */
 
         /* Priority D0FIFO0=0(Disable)
          b3-b0 IPR      Interrupt priority
          b7-b4 Reserved 0
          */
-        IPR( USB1, USBI1 ) = USB_CFG_INTERRUPT_PRIORITY; /* USB1 */
-        IPR( USB, USBR1 ) = USB_CFG_INTERRUPT_PRIORITY; /* USB1 */
+        IPR (USB1, USBI1) = USB_CFG_INTERRUPT_PRIORITY; /* USB1 */
+        IPR (USB, USBR1) = USB_CFG_INTERRUPT_PRIORITY; /* USB1 */
 
 #endif  /* defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N) */
 
     }
 }
-#endif
 /******************************************************************************
  End of function usb_cpu_usbint_init
  ******************************************************************************/
@@ -544,12 +626,10 @@ void usb_cpu_usbint_init (uint8_t ip_type)
  Return value    : none
  Note            : Please change for your MCU
  ******************************************************************************/
-#if 0
 void usb_cpu_delay_1us (uint16_t time)
 {
     R_BSP_SoftwareDelay((uint32_t)time, BSP_DELAY_MICROSECS);
 }
-#endif
 /******************************************************************************
  End of function usb_cpu_delay_1us
  ******************************************************************************/
@@ -561,75 +641,73 @@ void usb_cpu_delay_1us (uint16_t time)
  Return value    : void
  Note            : Please change for your MCU
  ******************************************************************************/
-#if 0
 void usb_cpu_delay_xms (uint16_t time)
 {
+#if (BSP_CFG_RTOS_USED == 0)
     R_BSP_SoftwareDelay((uint32_t)time, BSP_DELAY_MILLISECS);
-}
+#endif /* (BSP_CFG_RTOS_USED == 0) */
 
+#if (BSP_CFG_RTOS_USED == 1)
+    vTaskDelay((TickType_t)(time/portTICK_PERIOD_MS));
+#endif /* (BSP_CFG_RTOS_USED == 1) */
+}
 /******************************************************************************
  End of function usb_cpu_delay_xms
  ******************************************************************************/
 #endif
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
-#if 0
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : usb_cpu_int_enable
  Description     : USB Interrupt Enable
- Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
- Return value    : void
+ Arguments       : none
+ Return value    : none
  ******************************************************************************/
-void usb_cpu_int_enable (usb_utr_t *ptr)
+#if 0
+void usb_cpu_int_enable (void)
 {
-    if (USB_USBIP_0 == ptr->ip)
-    {
-        /* Interrupt enable register (USB0 USBIO enable)
-         b0 IEN0 Interrupt enable bit
-         b1 IEN1 Interrupt enable bit
-         b2 IEN2 Interrupt enable bit
-         b3 IEN3 Interrupt enable bit
-         b4 IEN4 Interrupt enable bit
-         b5 IEN5 Interrupt enable bit
-         b6 IEN6 Interrupt enable bit
-         b7 IEN7 Interrupt enable bit
-         */
-///        IEN( USB0, USBI0 )= 1; /* Enable USB0 interrupt */
-    }
+    /* Interrupt enable register (USB0 USBIO enable)
+     b0 IEN0 Interrupt enable bit
+     b1 IEN1 Interrupt enable bit
+     b2 IEN2 Interrupt enable bit
+     b3 IEN3 Interrupt enable bit
+     b4 IEN4 Interrupt enable bit
+     b5 IEN5 Interrupt enable bit
+     b6 IEN6 Interrupt enable bit
+     b7 IEN7 Interrupt enable bit
+     */
+    R_BSP_InterruptRequestEnable(VECT(USB0, USBI0)); /* Enable USB0 interrupt */
 
-    if (ptr->ip == USB_USBIP_1)
-    {
 #if defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-        /* Interrupt enable register (USB1 USBIO enable)
-         b0 IEN0 Interrupt enable bit
-         b1 IEN1 Interrupt enable bit
-         b2 IEN2 Interrupt enable bit
-         b3 IEN3 Interrupt enable bit
-         b4 IEN4 Interrupt enable bit
-         b5 IEN5 Interrupt enable bit
-         b6 IEN6 Interrupt enable bit
-         b7 IEN7 Interrupt enable bit
-         */
-        IEN( USBA, USBAR ) = 1u; /* Enable USBA interrupt */
+    /* Interrupt enable register (USB1 USBIO enable)
+     b0 IEN0 Interrupt enable bit
+     b1 IEN1 Interrupt enable bit
+     b2 IEN2 Interrupt enable bit
+     b3 IEN3 Interrupt enable bit
+     b4 IEN4 Interrupt enable bit
+     b5 IEN5 Interrupt enable bit
+     b6 IEN6 Interrupt enable bit
+     b7 IEN7 Interrupt enable bit
+     */
+    R_BSP_InterruptRequestEnable(VECT(USBA, USBAR)); /* Enable USBA interrupt */
 
 #endif  /* defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 
 #if defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N)
-        /* Interrupt enable register (USB1 USBIO enable)
-         b0 IEN0 Interrupt enable bit
-         b1 IEN1 Interrupt enable bit
-         b2 IEN2 Interrupt enable bit
-         b3 IEN3 Interrupt enable bit
-         b4 IEN4 Interrupt enable bit
-         b5 IEN5 Interrupt enable bit
-         b6 IEN6 Interrupt enable bit
-         b7 IEN7 Interrupt enable bit
-         */
-        IEN( USB, USBR1 ) = 1u; /* Enable USB1 interrupt */
+    /* Interrupt enable register (USB1 USBIO enable)
+     b0 IEN0 Interrupt enable bit
+     b1 IEN1 Interrupt enable bit
+     b2 IEN2 Interrupt enable bit
+     b3 IEN3 Interrupt enable bit
+     b4 IEN4 Interrupt enable bit
+     b5 IEN5 Interrupt enable bit
+     b6 IEN6 Interrupt enable bit
+     b7 IEN7 Interrupt enable bit
+     */
+    R_BSP_InterruptRequestEnable(VECT(USB, USBR1)); /* Enable USB1 interrupt */
 
 #endif  /* defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N) */
 
-    }
 }
 /******************************************************************************
  End of function usb_cpu_int_enable
@@ -638,61 +716,54 @@ void usb_cpu_int_enable (usb_utr_t *ptr)
 /******************************************************************************
  Function Name   : usb_cpu_int_disable
  Description     : USB Interrupt disable
- Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
- Return value    : void
+ Arguments       : none
+ Return value    : none
  ******************************************************************************/
-void usb_cpu_int_disable (usb_utr_t *ptr)
+void usb_cpu_int_disable (void)
 {
-    if (USB_USBIP_0 == ptr->ip)
-    {
-        /* Interrupt enable register (USB0 USBIO disable)
-         b0 IEN0 Interrupt enable bit
-         b1 IEN1 Interrupt enable bit
-         b2 IEN2 Interrupt enable bit
-         b3 IEN3 Interrupt enable bit
-         b4 IEN4 Interrupt enable bit
-         b5 IEN5 Interrupt enable bit
-         b6 IEN6 Interrupt enable bit
-         b7 IEN7 Interrupt enable bit
-         */
-        IEN( USB0, USBI0 )= 0; /* Disnable USB0 interrupt */
-    }
+    /* Interrupt enable register (USB0 USBIO disable)
+     b0 IEN0 Interrupt enable bit
+     b1 IEN1 Interrupt enable bit
+     b2 IEN2 Interrupt enable bit
+     b3 IEN3 Interrupt enable bit
+     b4 IEN4 Interrupt enable bit
+     b5 IEN5 Interrupt enable bit
+     b6 IEN6 Interrupt enable bit
+     b7 IEN7 Interrupt enable bit
+     */
+    R_BSP_InterruptRequestDisable(VECT(USB0, USBI0)); /* Disable USB0 interrupt */
 
-    if (USB_USBIP_1 == ptr->ip)
-    {
 #if defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-        /* Interrupt enable register (USB1 USBIO disable)
-         b0 IEN0 Interrupt enable bit
-         b1 IEN1 Interrupt enable bit
-         b2 IEN2 Interrupt enable bit
-         b3 IEN3 Interrupt enable bit
-         b4 IEN4 Interrupt enable bit
-         b5 IEN5 Interrupt enable bit
-         b6 IEN6 Interrupt enable bit
-         b7 IEN7 Interrupt enable bit
-         */
-        IEN( USBA, USBAR ) = 0u; /* Disnable USBA interrupt */
+    /* Interrupt enable register (USB1 USBIO disable)
+     b0 IEN0 Interrupt enable bit
+     b1 IEN1 Interrupt enable bit
+     b2 IEN2 Interrupt enable bit
+     b3 IEN3 Interrupt enable bit
+     b4 IEN4 Interrupt enable bit
+     b5 IEN5 Interrupt enable bit
+     b6 IEN6 Interrupt enable bit
+     b7 IEN7 Interrupt enable bit
+     */
+    R_BSP_InterruptRequestDisable(VECT(USBA, USBAR)); /* Disnable USBA interrupt */
 
 #endif  /* defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 
 #if defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N)
-        /* Interrupt enable register (USB1 USBIO disable)
-         b0 IEN0 Interrupt enable bit
-         b1 IEN1 Interrupt enable bit
-         b2 IEN2 Interrupt enable bit
-         b3 IEN3 Interrupt enable bit
-         b4 IEN4 Interrupt enable bit
-         b5 IEN5 Interrupt enable bit
-         b6 IEN6 Interrupt enable bit
-         b7 IEN7 Interrupt enable bit
-         */
-        IEN( USB, USBR1 ) = 0u; /* Disnable USB1 interrupt */
+    /* Interrupt enable register (USB1 USBIO disable)
+     b0 IEN0 Interrupt enable bit
+     b1 IEN1 Interrupt enable bit
+     b2 IEN2 Interrupt enable bit
+     b3 IEN3 Interrupt enable bit
+     b4 IEN4 Interrupt enable bit
+     b5 IEN5 Interrupt enable bit
+     b6 IEN6 Interrupt enable bit
+     b7 IEN7 Interrupt enable bit
+     */
+    R_BSP_InterruptRequestDisable(VECT(USB, USBR1)); /* Disable USB1 interrupt */
 
 #endif  /* defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N) */
 
-    }
 }
-
 /******************************************************************************
  End of function usb_cpu_int_disable
  ******************************************************************************/
@@ -708,6 +779,7 @@ uint16_t usb_chattaring (uint16_t *syssts)
 {
     uint16_t lnst[4];
 
+    /* WAIT_LOOP */
     while (1)
     {
         lnst[0] = (*syssts) & USB_LNST;
@@ -735,19 +807,19 @@ End of function usb_chattaring
  * Arguments    : none
  * Return Value : none
  *******************************************************************************/
-static void usbfs_usbi_isr (void)
+R_BSP_ATTRIB_STATIC_INTERRUPT void usbfs_usbi_isr (void)
 {
     /* Call USB interrupt routine */
     if (USB_HOST == g_usb_usbmode)
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
         usb_hstd_usb_handler(); /* Call interrupt routine */
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
         usb_pstd_usb_handler(); /* Call interrupt routine */
 
 #endif  /* (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_REPI */
@@ -769,12 +841,12 @@ static void usbfs_usbi_isr (void)
  * Arguments    : none
  * Return Value : none
  *******************************************************************************/
-static void usbhs_usbir_isr (void)
+R_BSP_ATTRIB_STATIC_INTERRUPT void usbhs_usbir_isr (void)
 {
     /* Condition compilation by the difference of USB function */
     if (USB_HOST == g_usb_usbmode)
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 #if USB_NUM_USBIP == 2
         usb2_hstd_usb_handler(); /* Call interrupt routine */
 
@@ -783,7 +855,7 @@ static void usbhs_usbir_isr (void)
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
         usb_pstd_usb_handler();
 
 #endif  /* (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_REPI */
@@ -794,37 +866,40 @@ static void usbhs_usbir_isr (void)
  ******************************************************************************/
 #endif /* defined (BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX63N) || defined (BSP_MCU_RX62N) */
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 
-#if defined (BSP_MCU_RX64M) || defined (BSP_MCU_RX71M) || defined (BSP_MCU_RX65N)
+#if defined (BSP_MCU_RX64M) || defined (BSP_MCU_RX71M) || defined (BSP_MCU_RX65N) || defined (BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M)
 /******************************************************************************
  Function Name   : usb_cpu_usb_int_hand_isr
  Description     :
  Arguments       : none
  Return value    : none
  ******************************************************************************/
-static void usb_cpu_usb_int_hand_isr (void)
+R_BSP_ATTRIB_STATIC_INTERRUPT void usb_cpu_usb_int_hand_isr (void)
 {
     hw_usb_pclear_sts_resm();
-    ICU.IPR[IPR_USB0_USBR0].BYTE = 0x00; /* Priority Resume1=0 */
-    ICU.IR[IR_USB0_USBR0].BIT.IR = 0; /* Interrupt Request USB_resume USBR1 Clear */
+    IPR (USB0, USBR0) = 0x00; /* Priority Resume1=0 */
+    IR (USB0, USBR0) = 0; /* Interrupt Request USB_resume USBR1 Clear */
 } /* End of function usb_cpu_usb_int_hand_isr */
 
-#else  /* defined (BSP_MCU_RX64M) || defined (BSP_MCU_RX71M) || defined (BSP_MCU_RX65N) */
+#else  /* defined (BSP_MCU_RX64M) || defined (BSP_MCU_RX71M) || defined (BSP_MCU_RX65N) || defined (BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M) */
 /******************************************************************************
  Function Name   : usb_cpu_usb_int_hand_isr
  Description     :
  Arguments       : none
  Return value    : none
  ******************************************************************************/
-static void usb_cpu_usb_int_hand_isr (void)
+R_BSP_ATTRIB_STATIC_INTERRUPT void usb_cpu_usb_int_hand_isr (void)
 {
     hw_usb_pclear_sts_resm();
-    ICU.IPR[IPR_USB_USBR0].BYTE = 0x00; /* Priority Resume1=0 */
-    ICU.IR[IR_USB_USBR0].BIT.IR = 0; /* Interrupt Request USB_resume USBR1 Clear */
+    IPR (USB, USBR0) = 0x00; /* Priority Resume1=0 */
+    IR (USB, USBR0) = 0; /* Interrupt Request USB_resume USBR1 Clear */
 } /* End of function usb_cpu_usb_int_hand_isr */
 
-#endif /* defined (BSP_MCU_RX64M) || defined (BSP_MCU_RX71M) || defined (BSP_MCU_RX65N) */
+#endif /* defined (BSP_MCU_RX64M) || defined (BSP_MCU_RX71M) || defined (BSP_MCU_RX65N) || defined (BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M) */
 
 #if defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N)
 /******************************************************************************
@@ -836,8 +911,8 @@ Return value    : none
 void usb2_cpu_usb_int_hand_isr(void)
 {
     hw_usb_pclear_sts_resm();
-    ICU.IPR[IPR_USB_USBR1].BYTE = 0x00;   /* Priority Resume1=0 */
-    ICU.IR[IR_USB_USBR1].BIT.IR = 0;      /* Interrupt Request USB_resume USBR1 Clear */
+    IPR (USB, USBR1) = 0x00;   /* Priority Resume1=0 */
+    IR (USB, USBR1) = 0;      /* Interrupt Request USB_resume USBR1 Clear */
 }   /* eof usb2_cpu_usb_int_hand_isr() */
 #endif  /* defined (BSP_MCU_RX63N) || defined (BSP_MCU_RX62N) */
 
@@ -851,10 +926,10 @@ Description     : D0FIFO interrupt Handler
 Arguments       : none
 Return value    : none
 ******************************************************************************/
-static void usb_cpu_d0fifo_int_hand(void)
+R_BSP_ATTRIB_STATIC_INTERRUPT void usb_cpu_d0fifo_int_hand(void)
 {
-    IPR(USB0,D0FIFO0) = 0;
-    usb_dma_buf2dxfifo_complete_event_set(USB_IP0, USB_D0DMA);
+    IPR (USB0,D0FIFO0) = 0;
+    usb_cstd_dma_send_complete(USB_IP0, USB_D0USE);
 }
 /******************************************************************************
 End of function usb_cpu_d0fifo_int_hand
@@ -866,10 +941,10 @@ Description     : D0FIFO interrupt Handler
 Arguments       : none
 Return value    : none
 ******************************************************************************/
-static void usb_cpu_d1fifo_int_hand(void)
+R_BSP_ATTRIB_STATIC_INTERRUPT void usb_cpu_d1fifo_int_hand(void)
 {
-    IPR(USB0,D1FIFO0) = 0;
-    usb_dma_buf2dxfifo_complete_event_set(USB_IP0, USB_D1DMA);
+    IPR (USB0,D1FIFO0) = 0;
+    usb_cstd_dma_send_complete(USB_IP0, USB_D1USE);
 }
 /******************************************************************************
 End of function usb_cpu_d1fifo_int_hand
@@ -882,17 +957,17 @@ Description     : D0FIFO interrupt Handler
 Arguments       : none
 Return value    : none
 ******************************************************************************/
-static void usb2_cpu_d0fifo_int_hand(void)
+R_BSP_ATTRIB_STATIC_INTERRUPT void usb2_cpu_d0fifo_int_hand(void)
 {
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-    IPR(USBA,D0FIFO2) = 0;
+    IPR (USBA,D0FIFO2) = 0;
 
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 #if defined(BSP_MCU_RX63N)
-    IPR(USB1,D0FIFO1) = 0;
+    IPR (USB1,D0FIFO1) = 0;
 
 #endif  /* defined(BSP_MCU_RX63N) */
-    usb_dma_buf2dxfifo_complete_event_set(USB_IP1, USB_D0DMA);
+    usb_cstd_dma_send_complete(USB_IP1, USB_D0USE);
 }
 /******************************************************************************
 End of function usb2_cpu_d0fifo_int_hand
@@ -904,17 +979,17 @@ Description     : D0FIFO interrupt Handler
 Arguments       : none
 Return value    : none
 ******************************************************************************/
-static void usb2_cpu_d1fifo_int_hand(void)
+R_BSP_ATTRIB_STATIC_INTERRUPT void usb2_cpu_d1fifo_int_hand(void)
 {
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-    IPR(USBA,D1FIFO2) = 0;
+    IPR (USBA,D1FIFO2) = 0;
 
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 #if defined(BSP_MCU_RX63N)
-    IPR(USB1,D1FIFO1) = 0;
+    IPR (USB1,D1FIFO1) = 0;
 
 #endif  /* defined(BSP_MCU_RX63N) */
-    usb_dma_buf2dxfifo_complete_event_set(USB_IP1, USB_D1DMA);
+    usb_cstd_dma_send_complete(USB_IP1, USB_D1USE);
 }
 /******************************************************************************
 End of function usb2_cpu_d1fifo_int_hand
@@ -937,7 +1012,7 @@ bool usb_check_use_usba_module(usb_utr_t *ptr)
 #if defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX64M)
     if (USB_NULL == ptr)
     {
-    #if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+    #if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
         #if USB_CFG_USE_USBIP == USB_CFG_IP1
         ret_code = true;
         #endif  

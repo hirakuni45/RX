@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T グループ・システム定義
+	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T/RX72T システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -55,7 +55,9 @@ namespace device {
 			bits_ro_t<io_, bitpos::B8,  2>  IWDTRPES;
 			bits_ro_t<io_, bitpos::B10, 2>  IWDTRPSS;
 			bit_ro_t <io_, bitpos::B12>     IWDTRSTIRQS;
+
 			bit_ro_t <io_, bitpos::B14>     IWDTSLCSTP;
+
 			bit_ro_t <io_, bitpos::B17>     WDTSTRT;
 			bits_ro_t<io_, bitpos::B18, 2>  WDTTOPS;
 			bits_ro_t<io_, bitpos::B20, 4>  WDTCKS;
@@ -183,7 +185,10 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  RAME;
 			bit_rw_t<io_, bitpos::B6>  ECCRAME;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
 			bit_rw_t<io_, bitpos::B7>  SBYRAME;
+#endif
+
 		};
 		static syscr1_t<0x00080008> SYSCR1;
 
@@ -528,6 +533,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> OSTDIE;
+
 			bit_rw_t<io_, bitpos::B7> OSTDE;
 		};
 		static ostdcr_t<0x00080040> OSTDCR;

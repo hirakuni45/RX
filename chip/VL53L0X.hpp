@@ -57,7 +57,7 @@ namespace chip {
 		};
 
 	private:
-		// R/W ビットを含まない７ビット値
+		// I2C アドレス：（R/W ビットを含まない７ビット値）
 		static const uint8_t ADR_ = 0b0101001;
 
 	    enum class reg_addr : uint8_t {

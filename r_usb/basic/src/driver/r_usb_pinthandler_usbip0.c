@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2016) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_pinthandler_usbip0.c
@@ -26,6 +26,7 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -36,7 +37,7 @@
 #include "r_usb_typedef.h"
 #include "r_usb_extern.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 /******************************************************************************
  Exported global variables (to be accessed by other files)
  ******************************************************************************/
@@ -55,14 +56,29 @@ usb_int_t g_usb_pstd_usb_int;
  ******************************************************************************/
 void usb_pstd_usb_handler (void)
 {
+#if (BSP_CFG_RTOS_USED == 1)
+    usb_utr_t       *p;
+    
+    p = get_usb_int_buf();
+#endif /*(BSP_CFG_RTOS_USED == 1)*/
+
     usb_pstd_interrupt_clock();
 
     /* Push Interrupt info */
+#if (BSP_CFG_RTOS_USED == 1)
+    usb_pstd_interrupt_handler(&p->keyword, &p->status);
+    p->msginfo = USB_MSG_PCD_INT;
+
+    USB_ISND_MSG(USB_PCD_MBX, (usb_msg_t *)p);
+#endif /*(BSP_CFG_RTOS_USED == 1)*/
+
+#if (BSP_CFG_RTOS_USED == 0)
     usb_pstd_interrupt_handler(&g_usb_pstd_usb_int.buf[g_usb_pstd_usb_int.wp].type,
             &g_usb_pstd_usb_int.buf[g_usb_pstd_usb_int.wp].status);
 
-    /* Write countup */
+    /* Write count up */
     g_usb_pstd_usb_int.wp = ((g_usb_pstd_usb_int.wp + 1) % USB_INT_BUFSIZE);
+#endif /*(BSP_CFG_RTOS_USED == 0)*/
 }
 /******************************************************************************
  End of function usb_pstd_usb_handler
