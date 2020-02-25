@@ -90,7 +90,7 @@ namespace device {
 			else if(opt == option::FIRST_SPI || opt == option::SECOND_SPI) spi = true;
 
 			switch(t) {
-			case peripheral::USB0:
+			case peripheral::USB0:  // USB0 Host: VBUSEN, OVRCURB
 				{
 					uint8_t sel = enable ? 0b010011 : 0;
 					PORT2::PMR.B4 = 0;
