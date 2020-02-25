@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2016) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2019) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_preg_access.c
@@ -26,6 +26,9 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
+ *         : 31.05.2019 1.26 Added support for GNUC and ICCRX.
+ *         : 30.07.2019 1.27 RX72M is added.
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -39,7 +42,7 @@
 #include "r_usb_extern.h"
 
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 /******************************************************************************
  Function Name   : hw_usb_pset_dprpu
  Description     : Set DPRPU-bit SYSCFG0 register.
@@ -199,10 +202,20 @@ void hw_usb_pmodule_init( void )
 
 #if USB_CFG_USE_USBIP == USB_CFG_IP0
     USB_M0.SYSCFG.WORD |= USB_SCKE;
+    /* WAIT_LOOP */
     while (USB_SCKE != (USB_M0.SYSCFG.WORD & USB_SCKE))
     {
         /* Wait for Set of SCKE */
     }
+
+#if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M)
+    USB_M0.PHYSLEW.LONG = 0x5;
+
+#endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M) */
+
+    USB_M0.SYSCFG.WORD &= (~USB_DRPD);
 
     USB_M0.SYSCFG.WORD |= USB_USBE;
     USB_M0.CFIFOSEL.WORD  = USB0_CFIFO_MBW;
@@ -237,12 +250,14 @@ void hw_usb_pmodule_init( void )
     USB_M1.PHYSET.WORD &= (~USB_PLLRESET);
 
 #endif  /* (USB_CFG_CLKSEL == USB_CFG_20MHZ) || (USB_CFG_CLKSEL == USB_CFG_24MHZ) */
+    USB_M1.SYSCFG.WORD &= (~USB_DRPD);
 
     USB_M1.SYSCFG.WORD |= USB_USBE;
 
     USB_M1.LPSTS.WORD |= USB_SUSPENDM;
 
 #if ((USB_CFG_CLKSEL == USB_CFG_20MHZ) || (USB_CFG_CLKSEL == USB_CFG_24MHZ))
+    /* WAIT_LOOP */
     while (USB_PLLLOCK != (USB_M1.PLLSTA.WORD & USB_PLLLOCK ))
     {
         /* Wait for PLL Lock */
@@ -270,10 +285,12 @@ void hw_usb_pmodule_init( void )
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 #if defined(BSP_MCU_RX63N)
     USB_M1.SYSCFG.WORD |= USB_SCKE;
+    /* WAIT_LOOP */
     while (USB_SCKE != (USB_M1.SYSCFG.WORD & USB_SCKE))
     {
         /* Wait for Set of SCKE */
     }
+    USB_M1.SYSCFG.WORD &= (~USB_DRPD);
 
     USB_M1.SYSCFG.WORD |= USB_USBE;
 

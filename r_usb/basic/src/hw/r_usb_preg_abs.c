@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2019) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_preg_abs.c
@@ -27,6 +27,9 @@
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
  *         : 30.09.2017 1.22 RX62N/RX630/RX63T-H is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
+ *         : 31.05.2019 1.26 Added support for GNUC and ICCRX.
+ *         : 30.07.2019 1.27 RX72M is added.
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -39,7 +42,7 @@
 #include "r_usb_reg_access.h"
 #include "r_usb_bitdefine.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 
 /******************************************************************************
  Exported global variables (to be accessed by other files)
@@ -103,15 +106,15 @@ void usb_pstd_interrupt_handler(uint16_t * type, uint16_t * status)
     nsts = (uint16_t)(nrdysts & nrdyenb);
     ests = (uint16_t)(bempsts & bempenb);
 
-    if ((intsts0 & (USB_VBINT | USB_RESM | USB_SOFR | USB_DVST |
-                            USB_CTRT | USB_BEMP | USB_NRDY | USB_BRDY)) == 0u)
+    if (0u == ((USB_VBINT | USB_RESM | USB_SOFR | USB_DVST |
+                            USB_CTRT | USB_BEMP | USB_NRDY | USB_BRDY) & intsts0))
     {
         return;
     }
 
     /***** Processing USB bus signal *****/
     /***** Resume signal *****/
-    if ((ists0 & USB_RESM) == USB_RESM)
+    if (USB_RESM == (ists0 & USB_RESM))
     {
 #if USB_CFG_USE_USBIP == USB_CFG_IP1
         USB_M1.INTSTS0.WORD = (uint16_t)~USB_RESM;
@@ -124,7 +127,7 @@ void usb_pstd_interrupt_handler(uint16_t * type, uint16_t * status)
     }
 
     /***** Vbus change *****/
-    else if ((ists0 & USB_VBINT) == USB_VBINT)
+    else if (USB_VBINT == (ists0 & USB_VBINT))
     {
         /* Status clear */
 #if USB_CFG_USE_USBIP == USB_CFG_IP1
@@ -138,7 +141,7 @@ void usb_pstd_interrupt_handler(uint16_t * type, uint16_t * status)
     }
 
     /***** SOFR change *****/
-    else if ((ists0 & USB_SOFR) == USB_SOFR)
+    else if (USB_SOFR == (ists0 & USB_SOFR))
     {
         /* SOFR Clear */
 #if USB_CFG_USE_USBIP == USB_CFG_IP1
@@ -153,7 +156,7 @@ void usb_pstd_interrupt_handler(uint16_t * type, uint16_t * status)
 
     /***** Processing device state *****/
     /***** DVST change *****/
-    else if ((ists0 & USB_DVST) == USB_DVST)
+    else if (USB_DVST == (ists0 & USB_DVST))
     {
         /* DVST clear */
 #if USB_CFG_USE_USBIP == USB_CFG_IP1
@@ -310,7 +313,7 @@ uint16_t usb_pstd_chk_configured(void)
     buf = hw_usb_read_intsts();
 
     /* Device Status - Configured check */
-    if ((buf & USB_DVSQ) == USB_DS_CNFG)
+    if (USB_DS_CNFG == (buf & USB_DVSQ))
     {
         /* Configured */
         return USB_TRUE;
@@ -335,6 +338,8 @@ void usb_pstd_remote_wakeup(void)
 {
     uint16_t buf;
 
+    g_usb_pstd_remote_wakeup_state = USB_ERROR;
+
     /* Support remote wakeup ? */
     if (USB_TRUE == g_usb_pstd_remote_wakeup)
     {
@@ -345,6 +350,7 @@ void usb_pstd_remote_wakeup(void)
         buf = hw_usb_read_intsts();
         if ((buf & USB_RESM) != (uint16_t)0)
         {
+            g_usb_pstd_remote_wakeup_state = USB_QOVR;
             /* RESM status clear */
             hw_usb_pclear_sts_resm();
         }
@@ -354,6 +360,7 @@ void usb_pstd_remote_wakeup(void)
             {
                 /* Remote wakeup set */
                 hw_usb_pset_wkup();
+                g_usb_pstd_remote_wakeup_state = USB_OK;
             }
         }
     }
@@ -463,6 +470,7 @@ uint8_t *usb_pstd_write_fifo(uint16_t count, uint16_t pipemode, uint8_t *write_p
 #endif  /* USB_CFG_USE_USBIP == USB_CFG_IP1 */
 
 #if (USB_CFG_USE_USBIP == USB_CFG_IP0) || defined(BSP_MCU_RX63N) || defined(BSP_MCU_RX62N)
+    /* WAIT_LOOP */
     for (even = (uint16_t)(count >> 1); (0 != even); --even)
     {
         /* 16bit access */
@@ -489,6 +497,7 @@ uint8_t *usb_pstd_write_fifo(uint16_t count, uint16_t pipemode, uint8_t *write_p
         write_p++;
     }
 #else
+    /* WAIT_LOOP */
     for (even = (uint16_t)(count >> 2); (even != 0); --even)
     {
         /* 32bit access */
@@ -555,6 +564,7 @@ uint8_t *usb_pstd_read_fifo(uint16_t count, uint16_t pipemode, uint8_t *read_p)
 #endif /* !((USB_CFG_USE_USBIP == USB_CFG_IP0) || defined(BSP_MCU_RX63N)) */
 
 #if (USB_CFG_USE_USBIP == USB_CFG_IP0) || defined(BSP_MCU_RX63N) || defined(BSP_MCU_RX62N)
+    /* WAIT_LOOP */
     for (even = (uint16_t)(count >> 1); (0 != even); --even)
     {
         /* 16bit FIFO access */
@@ -579,6 +589,7 @@ uint8_t *usb_pstd_read_fifo(uint16_t count, uint16_t pipemode, uint8_t *read_p)
         read_p += sizeof(uint8_t);
     }
 #else
+    /* WAIT_LOOP */
     for (even = (uint16_t)(count >> 2); (even != 0); --even)
     {
         /* 32bit FIFO access */
@@ -598,6 +609,7 @@ uint8_t *usb_pstd_read_fifo(uint16_t count, uint16_t pipemode, uint8_t *read_p)
         odd_byte_data_temp = hw_usb_read_fifo32(USB_NULL, pipemode);
         /* Condition compilation by the difference of the endian */
 #if USB_CFG_ENDIAN == USB_CFG_LITTLE
+        /* WAIT_LOOP */
         do
         {
             *read_p = (uint8_t)(odd_byte_data_temp & 0x000000ff);
@@ -607,6 +619,7 @@ uint8_t *usb_pstd_read_fifo(uint16_t count, uint16_t pipemode, uint8_t *read_p)
             odd--;
         }while(odd != 0);
 #else   /* USB_CFG_ENDIAN == USB_CFG_LITTLE */
+        /* WAIT_LOOP */
         for (i = 0; i < odd; i++)
         {
             *read_p = (uint8_t)( ( odd_byte_data_temp >> (24 -(i*8))) & 0x000000ff );
@@ -633,7 +646,7 @@ uint8_t *usb_pstd_read_fifo(uint16_t count, uint16_t pipemode, uint8_t *read_p)
  ******************************************************************************/
 void usb_pstd_forced_termination(uint16_t pipe, uint16_t status)
 {
-    uint16_t useport;
+    uint16_t buffer;
 
     /* PID = NAK */
     /* Set NAK */
@@ -651,32 +664,37 @@ void usb_pstd_forced_termination(uint16_t pipe, uint16_t status)
 
     usb_cstd_clr_transaction_counter(USB_NULL, pipe);
 
-    /* Pipe number to FIFO port select */
-    useport = usb_pstd_pipe2fport(pipe);
-
-    /* Check use FIFO access */
-    switch(useport)
+    /* Clear CFIFO-port */
+    buffer = hw_usb_read_fifosel(USB_NULL, USB_CUSE);
+    if ((buffer & USB_CURPIPE) == pipe)
     {
-        /* CFIFO use */
-        case USB_CUSE:
-#if USB_CFG_USE_USBIP == USB_CFG_IP1
-        hw_usb_set_mbw(USB_NULL, USB_CUSE, USB1_CFIFO_MBW);
-#else  /* USB_CFG_USE_USBIP == USB_CFG_IP0 */
-        hw_usb_set_mbw(USB_NULL, USB_CUSE, USB0_CFIFO_MBW);
-
-#endif /* USB_CFG_USE_USBIP == USB_CFG_IP0 */
         /* Changes the FIFO port by the pipe. */
-        usb_cstd_chg_curpipe(USB_NULL, (uint16_t)USB_PIPE0, (uint16_t)USB_CUSE, USB_FALSE);
-        break;
-        default:
-        break;
+        usb_cstd_chg_curpipe(USB_NULL, (uint16_t) USB_PIPE0, (uint16_t) USB_CUSE, USB_FALSE);
     }
+
+#if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
+    /* Clear D0FIFO-port */
+    buffer = hw_usb_read_fifosel(USB_NULL, USB_D0USE);
+    if ((buffer & USB_CURPIPE) == pipe)
+    {
+        /* Changes the FIFO port by the pipe. */
+        usb_cstd_chg_curpipe(USB_NULL, (uint16_t) USB_PIPE0, (uint16_t) USB_D0USE, USB_FALSE);
+    }
+
+    /* Clear D1FIFO-port */
+    buffer = hw_usb_read_fifosel(USB_NULL, USB_D1USE);
+    if ((buffer & USB_CURPIPE) == pipe)
+    {
+        /* Changes the FIFO port by the pipe. */
+        usb_cstd_chg_curpipe(USB_NULL, (uint16_t) USB_PIPE0, (uint16_t) USB_D1USE, USB_FALSE);
+    }
+
+#endif /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
 
     /* Do Aclr */
     usb_cstd_do_aclrm(USB_NULL, pipe);
 
     /* FIFO buffer SPLIT transaction initialized */
-    usb_cstd_chg_curpipe(USB_NULL, (uint16_t)USB_PIPE0, (uint16_t)USB_CUSE, USB_NOUSE);
     hw_usb_set_csclr(USB_NULL,pipe);
 
     /* Call Back */
@@ -692,7 +710,15 @@ void usb_pstd_forced_termination(uint16_t pipe, uint16_t status)
             (g_p_usb_pstd_pipe[pipe]->complete)(g_p_usb_pstd_pipe[pipe], USB_NULL, USB_NULL);
         }
 
-        g_p_usb_pstd_pipe[pipe] = (usb_utr_t *)USB_NULL;
+#if BSP_CFG_RTOS_USED == 1
+        vPortFree (g_p_usb_pstd_pipe[pipe]);
+        g_p_usb_pstd_pipe[pipe] = (usb_utr_t*)USB_NULL;
+        usb_cstd_pipe_msg_re_forward (USB_IP0, pipe);
+
+#else   /* BSP_CFG_RTOS_USED == 1 */
+        g_p_usb_pstd_pipe[pipe] = (usb_utr_t*)USB_NULL;
+
+#endif  /* BSP_CFG_RTOS_USED == 1 */
     }
 }
 /******************************************************************************

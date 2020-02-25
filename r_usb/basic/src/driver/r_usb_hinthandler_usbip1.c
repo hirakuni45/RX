@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2016) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_hinthandler_usbip1.c
@@ -26,23 +26,21 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 
 /******************************************************************************
  Includes   <System Includes> , "Project Includes"
  ******************************************************************************/
-
 #include "r_usb_basic_if.h"
 #include "r_usb_typedef.h"
 #include "r_usb_extern.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 #if USB_NUM_USBIP == 2
 /******************************************************************************
  Exported global variables (to be accessed by other files)
  ******************************************************************************/
-extern usb_utr_t g_usb_cstd_int_msg_t[][USB_INTMSGMAX]; /* Interrupt message */
-extern uint16_t g_usb_cstd_int_msg_t_cnt[]; /* Interrupt message count */
 
 
 /******************************************************************************
@@ -62,8 +60,8 @@ void usb2_hstd_usb_handler(void)
     usb_er_t err;
 
     /* Initial pointer */
-    ptr = &g_usb_cstd_int_msg_t[1][g_usb_cstd_int_msg_t_cnt[1]];
-    ptr->ip = USB_USBIP_1;
+    ptr = &g_usb_cstd_int_msg[1][g_usb_cstd_int_msg_cnt[1]];
+    ptr->ip = USB_IP1;
     ptr->ipp = usb_hstd_get_usb_ip_adr(ptr->ip);
 
     /* Host Function */
@@ -78,10 +76,10 @@ void usb2_hstd_usb_handler(void)
     }
 
     /* Renewal Message count  */
-    g_usb_cstd_int_msg_t_cnt[1]++;
-    if (g_usb_cstd_int_msg_t_cnt[1] == USB_INTMSGMAX)
+    g_usb_cstd_int_msg_cnt[1]++;
+    if (USB_INTMSGMAX == g_usb_cstd_int_msg_cnt[1])
     {
-        g_usb_cstd_int_msg_t_cnt[1] = 0;
+        g_usb_cstd_int_msg_cnt[1] = 0;
     }
 }
 

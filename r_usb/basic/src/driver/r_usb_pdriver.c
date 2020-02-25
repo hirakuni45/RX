@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_pdriver.c
@@ -27,6 +27,7 @@
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
  *         : 30.09.2017 1.22 Rename "usb_pstd_buf2fifo"->"usb_pstd_buf_to_fifo" and Function move from"r_usb_plibusbip.c"
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -38,12 +39,21 @@
 #include "r_usb_extern.h"
 #include "r_usb_bitdefine.h"
 #include "r_usb_reg_access.h"
+#include "r_usb_basic_define.h"
 
 #if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
 #include "r_usb_dmac.h"
 #endif  /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
+/******************************************************************************
+Private global variables and functions
+******************************************************************************/
+#if (BSP_CFG_RTOS_USED == 1)
+static void usb_pstd_interrupt(usb_utr_t *);
+#else /*(BSP_CFG_RTOS_USED == 1)*/
+static void usb_pstd_interrupt (uint16_t type, uint16_t status);
+#endif /*(BSP_CFG_RTOS_USED == 1)*/
 
 /******************************************************************************
  Exported global variables (to be accessed by other files)
@@ -52,7 +62,8 @@ uint16_t g_usb_pstd_stall_pipe[USB_MAX_PIPE_NO + 1u];   /* Stall Pipe info */
 usb_cb_t g_usb_pstd_stall_cb;                           /* Stall Callback function */
 uint16_t g_usb_pstd_config_num = 0;                     /* Current configuration number */
 uint16_t g_usb_pstd_alt_num[USB_ALT_NO];                /* Alternate number */
-uint16_t g_usb_pstd_remote_wakeup = USB_FALSE;          /* Remote wakeup enable flag */
+uint16_t g_usb_pstd_remote_wakeup = USB_FALSE;          /* Remote wake up enable flag */
+uint16_t g_usb_pstd_remote_wakeup_state;                /* Result for Remote wake up */
 
 uint16_t g_usb_pstd_test_mode_select;                   /* Test mode selectors */
 uint16_t g_usb_pstd_test_mode_flag = USB_FALSE;         /* Test mode flag */
@@ -64,7 +75,7 @@ uint16_t g_usb_pstd_req_index;                          /* Index */
 uint16_t g_usb_pstd_req_length;                         /* Length */
 
 uint16_t g_usb_pstd_pipe0_request;
-
+uint16_t g_usb_pstd_std_request;
 uint16_t g_usb_peri_connected;                          /* Status for USB connect. */
 
 /* Driver registration */
@@ -72,14 +83,14 @@ usb_pcdreg_t g_usb_pstd_driver;
 usb_setup_t g_usb_pstd_req_reg;                         /* Device Request - Request structure */
 
 /******************************************************************************
-Private global variables and functions
+Exported global variables
 ******************************************************************************/
-static void usb_pstd_interrupt (uint16_t type, uint16_t status);
+
 
 /******************************************************************************
  Renesas Abstracted Peripheral Driver functions
  ******************************************************************************/
-
+#if (BSP_CFG_RTOS_USED == 0)
 /******************************************************************************
  Function Name   : usb_pstd_interrupt
  Description     : Analyze the USB Peripheral interrupt event and execute the
@@ -123,7 +134,7 @@ static void usb_pstd_interrupt (uint16_t type, uint16_t status)
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
             hw_usb_set_cnen();
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
-            if (usb_pstd_chk_vbsts() == USB_ATTACH)
+            if (USB_ATTACH == usb_pstd_chk_vbsts())
             {
                 USB_PRINTF0("VBUS int attach\n");
                 usb_pstd_attach_process();    /* USB attach */
@@ -209,7 +220,7 @@ static void usb_pstd_interrupt (uint16_t type, uint16_t status)
                 }
             }
 
-            if ((g_usb_pstd_req_type & USB_BMREQUESTTYPETYPE) == USB_STANDARD)
+            if (USB_STANDARD == (g_usb_pstd_req_type & USB_BMREQUESTTYPETYPE))
             {
                 /* Switch on the control transfer stage (CTSQ). */
                 switch (stginfo)
@@ -217,6 +228,7 @@ static void usb_pstd_interrupt (uint16_t type, uint16_t status)
                     /* Idle or setup stage */
                     case USB_CS_IDST :
                         g_usb_pstd_pipe0_request = USB_OFF;
+                        g_usb_pstd_std_request = USB_NO;
                         usb_pstd_stand_req0();
                     break;
 
@@ -283,6 +295,228 @@ static void usb_pstd_interrupt (uint16_t type, uint16_t status)
 /******************************************************************************
  End of function usb_pstd_interrupt
  ******************************************************************************/
+#endif /*(BSP_CFG_RTOS_USED == 0)*/
+
+#if (BSP_CFG_RTOS_USED == 1)
+/******************************************************************************
+ Function Name   : usb_pstd_interrupt
+ Description     : Analyze the USB Peripheral interrupt event and execute the
+ : appropriate process.
+ Arguments       : uint16_t type      : Interrupt type.
+                 : uint16_t status    : BRDYSTS register & BRDYENB register.
+ Return value    : none
+ ******************************************************************************/
+static void usb_pstd_interrupt (usb_utr_t *p_mess)
+{
+    uint16_t    stginfo;
+    uint16_t    type;
+    uint16_t    status;
+#if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
+    uint16_t    fifo_type;
+
+    fifo_type   = p_mess->status;
+#endif
+    type        = p_mess->keyword;
+    status      = p_mess->status;
+
+    /* check interrupt status */
+    switch (type)
+    {
+        /* BRDY, BEMP, NRDY */
+        case USB_INT_BRDY :
+            usb_pstd_brdy_pipe(status);
+        break;
+        case USB_INT_BEMP :
+            usb_pstd_bemp_pipe(status);
+        break;
+        case USB_INT_NRDY :
+            usb_pstd_nrdy_pipe(status);
+        break;
+
+            /* Resume */
+        case USB_INT_RESM :
+            USB_PRINTF0("RESUME int peri\n");
+
+            /* Callback */
+            if (USB_NULL != g_usb_pstd_driver.devresume)
+            {
+                (*g_usb_pstd_driver.devresume)(USB_NULL, USB_NO_ARG, USB_NULL);
+            }
+            usb_pstd_resume_process();
+        break;
+
+            /* VBUS */
+        case USB_INT_VBINT :
+#if defined(BSP_MCU_RX64M) || (BSP_MCU_RX71M)
+            hw_usb_set_cnen();
+#endif  /* defined(BSP_MCU_RX64M) || (BSP_MCU_RX71M) */
+            if (USB_ATTACH == usb_pstd_chk_vbsts())
+            {
+                USB_PRINTF0("VBUS int attach\n");
+                usb_pstd_attach_process();    /* USB attach */
+            }
+            else
+            {
+                USB_PRINTF0("VBUS int detach\n");
+                usb_pstd_detach_process();    /* USB detach */
+            }
+        break;
+
+            /* SOF */
+        case USB_INT_SOFR :
+
+            /* User program */
+        break;
+
+            /* DVST */
+        case USB_INT_DVST :
+            switch ((uint16_t) (status & USB_DVSQ))
+            {
+                /* Power state  */
+                case USB_DS_POWR :
+                break;
+
+                    /* Default state  */
+                case USB_DS_DFLT :
+                    USB_PRINTF0("USB-reset int peri\n");
+                    usb_pstd_bus_reset();
+                break;
+
+                    /* Address state  */
+                case USB_DS_ADDS :
+                break;
+
+                    /* Configured state  */
+                case USB_DS_CNFG :
+                    USB_PRINTF0("Device configuration int peri\n");
+                break;
+
+                    /* Power suspend state */
+                case USB_DS_SPD_POWR :
+
+                    /* Continue */
+                    /* Default suspend state */
+                case USB_DS_SPD_DFLT :
+
+                    /* Continue */
+                    /* Address suspend state */
+                case USB_DS_SPD_ADDR :
+
+                    /* Continue */
+                    /* Configured Suspend state */
+                case USB_DS_SPD_CNFG :
+                    USB_PRINTF0("SUSPEND int peri\n");
+                    usb_pstd_suspend_process();
+                break;
+
+                    /* Error */
+                default :
+                break;
+            }
+        break;
+
+            /* CTRT */
+        case USB_INT_CTRT :
+            stginfo = (uint16_t) (status & USB_CTSQ);
+            if (USB_CS_IDST == stginfo)
+            {
+                /* check Test mode */
+                if (USB_TRUE == g_usb_pstd_test_mode_flag)
+                {
+                    /* Test mode */
+                    usb_pstd_test_mode();
+                }
+            }
+            else
+            {
+                if (((USB_CS_RDDS == stginfo) || (USB_CS_WRDS == stginfo)) || (USB_CS_WRND == stginfo))
+                {
+                    /* Save request register */
+                    usb_pstd_save_request();
+                }
+            }
+
+            if (USB_STANDARD == (g_usb_pstd_req_type & USB_BMREQUESTTYPETYPE))
+            {
+                /* Switch on the control transfer stage (CTSQ). */
+                switch (stginfo)
+                {
+                    /* Idle or setup stage */
+                    case USB_CS_IDST :
+                        usb_pstd_stand_req0();
+                    break;
+
+                    /* Control read data stage */
+                    case USB_CS_RDDS :
+                        usb_pstd_stand_req1();
+                    break;
+
+                    /* Control write data stage */
+                    case USB_CS_WRDS :
+                        usb_pstd_stand_req2();
+                    break;
+
+                    /* Status stage of a control write where there is no data stage. */
+                    case USB_CS_WRND :
+                        usb_pstd_stand_req3();
+                    break;
+
+                    /* Control read status stage */
+                    case USB_CS_RDSS :
+                        usb_pstd_stand_req4();
+                    break;
+
+                    /* Control write status stage */
+                    case USB_CS_WRSS :
+                        usb_pstd_stand_req5();
+                    break;
+
+                    /* Control sequence error */
+                    case USB_CS_SQER :
+                        usb_pstd_ctrl_end((uint16_t) USB_DATA_ERR);
+                    break;
+
+                    /* Illegal */
+                    default :
+                        usb_pstd_ctrl_end((uint16_t) USB_DATA_ERR);
+                    break;
+                }
+            }
+            else
+            {
+                /* Vender Specific */
+                g_usb_pstd_req_reg.type = g_usb_pstd_req_type;
+                g_usb_pstd_req_reg.value = g_usb_pstd_req_value;
+                g_usb_pstd_req_reg.index = g_usb_pstd_req_index;
+                g_usb_pstd_req_reg.length = g_usb_pstd_req_length;
+
+                /* Callback */
+                if (USB_NULL != g_usb_pstd_driver.ctrltrans)
+                {
+                    (*g_usb_pstd_driver.ctrltrans)((usb_setup_t *) &g_usb_pstd_req_reg, stginfo);
+                }
+            }
+        break;
+
+#if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
+        case USB_INT_DXFIFO:
+            usb_cstd_dma_stop(USB_CFG_USE_USBIP, fifo_type);  /* Stop DMA,FIFO access */
+            usb_cstd_dma_send_continue(USB_NULL, fifo_type);
+        break;
+#endif  /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
+
+            /* Error */
+        case USB_INT_UNKNOWN :
+            USB_PRINTF0("pINT_UNKNOWN\n");
+        break;
+        default :
+        break;
+    }
+}
+/******************************************************************************
+ End of function usb_pstd_interrupt
+ ******************************************************************************/
+#endif /*(BSP_CFG_RTOS_USED == 1)*/
 
 /******************************************************************************
  Function Name   : usb_pstd_pcd_task
@@ -292,6 +526,7 @@ static void usb_pstd_interrupt (uint16_t type, uint16_t status)
  ******************************************************************************/
 void usb_pstd_pcd_task (void)
 {
+#if (BSP_CFG_RTOS_USED == 0)
     if (g_usb_pstd_usb_int.wp != g_usb_pstd_usb_int.rp)
     {
         /* Pop Interrupt info */
@@ -302,8 +537,45 @@ void usb_pstd_pcd_task (void)
         g_usb_pstd_usb_int.rp = ((g_usb_pstd_usb_int.rp + 1) % USB_INT_BUFSIZE);
     }
 #if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
-    usb_dma_driver();           /* USB DMA driver */
+    usb_cstd_dma_driver();           /* USB DMA driver */
 #endif  /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
+#endif /*(BSP_CFG_RTOS_USED == 0)*/
+
+#if (BSP_CFG_RTOS_USED == 1)
+    usb_er_t    err;
+    usb_utr_t   *p_mess;
+
+    /* WAIT_LOOP */
+    while(1)
+    {
+        err = USB_TRCV_MSG(USB_PCD_MBX, (usb_msg_t **)&p_mess, (usb_tm_t)1000);
+        if (USB_OK == err)
+        {
+            switch (p_mess->msginfo)
+            {
+                case USB_MSG_PCD_INT:
+                    usb_pstd_interrupt(p_mess);
+                break;
+
+                case USB_MSG_PCD_SUBMITUTR:
+                    usb_pstd_set_submitutr(p_mess);
+                break;
+
+                case USB_MSG_PCD_TRANSEND1:
+                    usb_pstd_forced_termination(p_mess->keyword, (uint16_t)USB_DATA_STOP);
+                break;
+
+                case USB_MSG_PCD_REMOTEWAKEUP:
+                    usb_pstd_self_clock();
+                    usb_pstd_remote_wakeup();
+                break;
+
+                default:
+                break;
+            }
+        }
+    }
+#endif /*(BSP_CFG_RTOS_USED == 1)*/
 }
 /******************************************************************************
  End of function usb_pstd_pcd_task
@@ -320,13 +592,28 @@ usb_er_t usb_pstd_set_submitutr (usb_utr_t * utrmsg)
     uint16_t pipenum;
 
     pipenum = utrmsg->keyword;
+
+#if (BSP_CFG_RTOS_USED == 0)
     g_p_usb_pstd_pipe[pipenum] = utrmsg;
+#endif /* (BSP_CFG_RTOS_USED == 0) */
 
     /* Check state (Configured) */
-    if (usb_pstd_chk_configured() == USB_TRUE)
+    if (USB_TRUE == usb_pstd_chk_configured())
     {
+#if (BSP_CFG_RTOS_USED == 1)
+        if (USB_NULL != g_p_usb_pstd_pipe[pipenum])
+        {
+            usb_cstd_pipe_msg_forward (utrmsg, pipenum);
+            return USB_OK;
+        }
+#endif /* BSP_CFG_RTOS_USED == 1 */
+
+#if (BSP_CFG_RTOS_USED == 1)
+        g_p_usb_pstd_pipe[pipenum] = utrmsg;
+#endif /* (BSP_CFG_RTOS_USED == 1) */
+
         /* Data transfer */
-        if (usb_cstd_get_pipe_dir(USB_NULL, pipenum) == USB_DIR_P_OUT)
+        if (USB_DIR_P_OUT == usb_cstd_get_pipe_dir(USB_NULL, pipenum))
         {
             usb_pstd_receive_start(pipenum);    /* Out transfer */
         }
@@ -338,8 +625,19 @@ usb_er_t usb_pstd_set_submitutr (usb_utr_t * utrmsg)
     }
     else
     {
+#if (BSP_CFG_RTOS_USED == 1)
+        if (USB_PIPE0 == pipenum)
+        {
+            usb_cstd_pipe0_msg_clear (utrmsg, 0);
+        }
+        else
+        {
+            usb_cstd_pipe_msg_clear (utrmsg, pipenum);
+        }
+#else /* BSP_CFG_RTOS_USED == 1 */
         /* Transfer stop */
         usb_pstd_forced_termination(pipenum, (uint16_t) USB_DATA_ERR);
+#endif /* (BSP_CFG_RTOS_USED == 1) */
     }
     return USB_OK;
 }
@@ -357,6 +655,7 @@ void usb_pstd_clr_alt (void)
 {
     uint16_t i;
 
+    /* WAIT_LOOP */
     for (i = 0; i < USB_ALT_NO; ++i)
     {
         /* Alternate table clear */
@@ -376,7 +675,7 @@ void usb_pstd_clr_alt (void)
 void usb_pstd_clr_mem (void)
 {
     g_usb_pstd_config_num = 0;               /* Configuration number */
-    g_usb_pstd_remote_wakeup = USB_FALSE;    /* Remote wakeup enable flag */
+    g_usb_pstd_remote_wakeup = USB_FALSE;    /* Remote wake up enable flag */
     usb_pstd_clr_alt();                      /* Alternate setting clear */
 }
 /******************************************************************************
@@ -408,6 +707,7 @@ void usb_pstd_clr_eptbl_index (void)
 {
     uint16_t i;
 
+    /* WAIT_LOOP */
     for (i = 0; i <= USB_MAX_EP_NO; ++i)
     {
         /* EndPoint index table clear */
@@ -422,10 +722,10 @@ void usb_pstd_clr_eptbl_index (void)
 /******************************************************************************
  Function Name   : usb_pstd_get_interface_num
  Description     : Get interface number
- Arguments       : uint16_t con_num : Configuration Number
+ Arguments       : void
  Return value    : uint16_t         : Number of this interface(bNumInterfaces)
  ******************************************************************************/
-uint16_t usb_pstd_get_interface_num (uint16_t con_num)
+uint16_t usb_pstd_get_interface_num (void)
 {
     uint16_t num_if = 0;
 
@@ -445,7 +745,7 @@ uint16_t usb_pstd_get_interface_num (uint16_t con_num)
                  : uint16_t int_num : Interface Number
  Return value    : uint16_t         : Value used to select this alternate (bAlternateSetting)
  ******************************************************************************/
-uint16_t usb_pstd_get_alternate_num (uint16_t con_num, uint16_t int_num)
+uint16_t usb_pstd_get_alternate_num (uint16_t int_num)
 {
     uint16_t i;
     uint16_t alt_num = 0;
@@ -461,6 +761,7 @@ uint16_t usb_pstd_get_alternate_num (uint16_t con_num, uint16_t int_num)
     length |= (uint16_t) ((uint16_t) (*(uint8_t *) ((uint32_t) g_usb_pstd_driver.p_configtbl + (uint16_t) 3u)) << 8u);
 
     /* Search descriptor table size */
+    /* WAIT_LOOP */
     for (; i < length;)
     {
         /* Descriptor type ? */
@@ -520,7 +821,7 @@ uint16_t usb_pstd_get_alternate_num (uint16_t con_num, uint16_t int_num)
                  : uint16_t alt_num : Alternate Setting.
  Return value    : none
  ******************************************************************************/
-void usb_pstd_set_eptbl_index (uint16_t con_num, uint16_t int_num, uint16_t alt_num)
+void usb_pstd_set_eptbl_index (uint16_t int_num, uint16_t alt_num)
 {
     uint8_t * ptr;
     uint16_t i;
@@ -542,6 +843,7 @@ void usb_pstd_set_eptbl_index (uint16_t con_num, uint16_t int_num, uint16_t alt_
     numbers = 0;
     j = 0;
 
+    /* WAIT_LOOP */
     for (; i < length;)
     {
         /* Descriptor type ? */
@@ -626,7 +928,7 @@ uint16_t usb_pstd_chk_remote (void)
     atr = *(uint8_t *) ((uint32_t) g_usb_pstd_driver.p_configtbl + (uint32_t) 7u);
 
     /* Remote WakeUp check(= D5) */
-    if ((atr & USB_CF_RWUPON) == USB_CF_RWUPON)
+    if (USB_CF_RWUPON == (atr & USB_CF_RWUPON))
     {
         return USB_TRUE;
     }
@@ -655,7 +957,7 @@ uint8_t usb_pstd_get_current_power (void)
 
     /* Standard configuration descriptor */
     tmp = *(uint8_t *) ((uint32_t) g_usb_pstd_driver.p_configtbl + (uint32_t) 7u);
-    if ((tmp & USB_CF_SELFP) == USB_CF_SELFP)
+    if (USB_CF_SELFP == (tmp & USB_CF_SELFP))
     {
         /* Self Powered */
         currentpower = USB_GS_SELFPOWERD;
@@ -675,270 +977,6 @@ uint8_t usb_pstd_get_current_power (void)
  ******************************************************************************/
 
 /******************************************************************************
- Function Name   : usb_pstd_set_pipe_register
- Description     : Configure specified pipe.
- Arguments       : uint16_t pipe_number  : Pipe number.
-                 : uint16_t *tbl         : DEF_EP table pointer.
- Return value    : none
- ******************************************************************************/
-void usb_pstd_set_pipe_register (uint16_t pipe_number, uint16_t * tbl)
-{
-    uint16_t i;
-    uint16_t pipe;
-    uint16_t ep;
-    uint16_t dir;
-
-    switch (pipe_number)
-    {
-        /* All pipe initialized */
-        case USB_USEPIPE :
-
-            /* Current FIFO port Clear */
-            usb_cstd_chg_curpipe(USB_NULL, (uint16_t) USB_PIPE0, (uint16_t) USB_CUSE, USB_FALSE);
-            for (i = 0; USB_PDTBLEND != tbl[i]; i += USB_EPL)
-            {
-                /* Pipe number */
-                pipe = (uint16_t) (tbl[i + 0] & USB_CURPIPE);
-                usb_cstd_pipe_init(USB_NULL, pipe, tbl, i);
-            }
-        break;
-
-            /* Peripheral pipe initialized */
-        case USB_PERIPIPE :
-
-            /* Current FIFO port Clear */
-            usb_cstd_chg_curpipe(USB_NULL, (uint16_t) USB_PIPE0, (uint16_t) USB_CUSE, USB_FALSE);
-            for (ep = USB_EP1; ep <= USB_MAX_EP_NO; ++ep)
-            {
-                for (dir = 0; dir < 2; dir++)
-                {
-                    if (USB_ERROR != g_usb_pstd_eptbl_index[dir][ep])
-                    {
-                        i = (uint16_t) (USB_EPL * g_usb_pstd_eptbl_index[dir][ep]);
-
-                        /* Pipe number */
-                        pipe = (uint16_t) (tbl[i + 0] & USB_CURPIPE);
-                        usb_cstd_pipe_init(USB_NULL, pipe, tbl, i);
-                    }
-                }
-            }
-        break;
-
-            /* Clear Peripheral pipe register */
-        case USB_CLRPIPE :
-
-            /* Current FIFO port Clear */
-            usb_cstd_chg_curpipe(USB_NULL, (uint16_t) USB_PIPE0, (uint16_t) USB_CUSE, USB_FALSE);
-            for (ep = USB_EP1; ep <= USB_MAX_EP_NO; ++ep)
-            {
-                for (dir = 0; dir < 2; dir++)
-                {
-                    if (USB_ERROR != g_usb_pstd_eptbl_index[dir][ep])
-                    {
-                        i = (uint16_t) (USB_EPL * g_usb_pstd_eptbl_index[dir][ep]);
-
-                        /* Pipe number */
-                        pipe = (uint16_t) (tbl[i + 0] & USB_CURPIPE);
-                        usb_cstd_clr_pipe_cnfg(USB_NULL, pipe);
-                    }
-                }
-            }
-        break;
-
-            /* Pipe initialized */
-        default :
-
-            /* Current FIFO port clear */
-            usb_cstd_chg_curpipe(USB_NULL, (uint16_t) USB_PIPE0, (uint16_t) USB_CUSE, USB_FALSE);
-            for (i = 0; USB_PDTBLEND != tbl[i] ; i += USB_EPL)
-            {
-                /* Pipe number */
-                pipe = (uint16_t) (tbl[i + 0] & USB_CURPIPE);
-                if (pipe == pipe_number)
-                {
-                    usb_cstd_pipe_init(USB_NULL, pipe, tbl, i);
-                }
-            }
-        break;
-    }
-}
-/******************************************************************************
- End of function usb_pstd_set_pipe_register
- ******************************************************************************/
-
-/******************************************************************************
- Function Name   : usb_pstd_chk_pipe_info
- Description     : Analyze descriptor information of the connected USB Device, 
-                 : and reflect it in the pipe information table.
- Argument        : uint16_t speed            : device speed
-                 : uint16_t *ep_tbl          : DEF_EP table pointer
-                 : uint8_t  *descriptor      : Endpoint Descriptor table
- Return          : uint16_t                  : DIR_P_IN / DIR_P_OUT / USB_ERROR
- ******************************************************************************/
-uint16_t usb_pstd_chk_pipe_info (uint16_t speed, uint16_t *ep_tbl, uint8_t *descriptor)
-{
-    uint16_t pipe_cfg;
-    uint16_t pipe_maxp;
-    uint16_t pipe_peri;
-    uint16_t retval;
-    uint16_t work1;
-    uint16_t work2;
-    uint16_t useport = USB_CUSE;
-
-    /* Check Endpoint descriptor */
-    /* Descriptor Type */
-    if (USB_DT_ENDPOINT == descriptor[1])
-    {
-        switch ((uint16_t) (descriptor[3] & USB_EP_TRNSMASK))
-        {
-            /* Control Endpoint */
-            case USB_EP_CNTRL :
-                USB_PRINTF0("###Control pipe is not support.\n");
-                return USB_ERROR;
-            break;
-
-                /* Isochronous Endpoint */
-            case USB_EP_ISO :
-                if ((USB_PIPE1 != ep_tbl[0]) && (USB_PIPE2 != ep_tbl[0]))
-                {
-                    USB_PRINTF0("###Iso pipe is 1 or 2.\n");
-                    return USB_ERROR;
-                }
-                USB_PRINTF0(" ISOCH ");
-                pipe_cfg = USB_TYPFIELD_ISO;
-            break;
-
-                /* Bulk Endpoint */
-            case USB_EP_BULK :
-                if ((ep_tbl[0] < USB_PIPE1) || (ep_tbl[0] > USB_PIPE5))
-                {
-                    USB_PRINTF0("###Bulk pipe is 1 to 5.\n");
-                    return USB_ERROR;
-                }
-
-                /* USB_PRINTF0(" BULK "); */
-                pipe_cfg = USB_TYPFIELD_BULK;
-            break;
-
-                /* Interrupt Endpoint */
-            case USB_EP_INT :
-                if ((ep_tbl[0] < USB_PIPE6) || (ep_tbl[0] > USB_MAX_PIPE_NO))
-                {
-                    USB_PRINTF0("###Int pipe is 6 to 9.\n");
-                    return USB_ERROR;
-                }
-
-                /* USB_PRINTF0(" INT "); */
-                pipe_cfg = USB_TYPFIELD_INT;
-            break;
-            default :
-                USB_PRINTF0("###Endpoint Descriptor error.\n");
-                return USB_ERROR;
-            break;
-        }
-
-        /* Set pipe configuration table */
-        if ((descriptor[2] & USB_EP_DIRMASK) == USB_EP_OUT)
-        {
-            /* OUT(receive) */
-
-            if ((descriptor[3] & USB_EP_TRNSMASK) != USB_EP_ISO)
-            {
-                /* Compulsory SHTNAK */
-                pipe_cfg |= (USB_CFG_SHTNAK | USB_DIR_P_OUT);
-            }
-            else
-            {
-                pipe_cfg |= USB_DIR_P_OUT;
-            }
-
-            useport = usb_pstd_pipe2fport(ep_tbl[0]);
-            switch(useport)
-            {
-                case USB_CUSE :
-
-                    /* continue */
-                case USB_D0USE :
-
-                    /* continue */
-                case USB_D1USE :
-                    pipe_cfg |= (uint16_t) (ep_tbl[1] & (USB_DBLBFIELD | USB_CNTMDFIELD));
-                break;
-#if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
-                    case USB_D0DMA:
-                    /* continue */
-                    case USB_D1DMA:
-                    pipe_cfg |= (uint16_t)((uint16_t)(ep_tbl[1] & (USB_DBLBFIELD|USB_CNTMDFIELD)) );
-                    break;
-#endif    /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
-                default :
-                    USB_PRINTF0("###EndPoint Descriptor error.\n");
-                    return USB_ERROR;
-                break;
-            }
-            retval = USB_DIR_P_OUT;
-        }
-        else
-        {
-            /* IN(send) */
-            pipe_cfg |= (uint16_t) ((uint16_t) (ep_tbl[1] & (USB_DBLBFIELD | USB_CNTMDFIELD)) | USB_DIR_P_IN);
-            retval = USB_DIR_P_IN;
-        }
-
-        /* EndPoint number set */
-        pipe_cfg |= (uint16_t) (descriptor[2] & USB_EP_NUMMASK);
-
-        /* Max packet size set */
-        pipe_maxp = (uint16_t) (descriptor[4] | (uint16_t) ((uint16_t) descriptor[5] << 8u));
-
-        /* Buffer flash */
-        pipe_peri = (uint16_t) (ep_tbl[4] & (~USB_IITVFIELD));
-        if (0 != descriptor[6])
-        {
-            /* FS/LS interrupt */
-            if (((uint16_t) (pipe_cfg & USB_TYPFIELD) == USB_INT) && (USB_HSCONNECT != speed))
-            {
-                work1 = descriptor[6];
-                work2 = 0;
-                for (; 0 != work1; work2++)
-                {
-                    work1 = (uint16_t) (work1 >> 1);
-                }
-                if (0 != work2)
-                {
-                    /* Interval time */
-                    pipe_peri |= (uint16_t) (work2 - 1);
-                }
-            }
-            else
-            {
-                if (descriptor[6] <= 8)
-                {
-                    /* Interval time */
-                    pipe_peri |= (uint16_t) ((descriptor[6] - 1u) & (USB_IITVFIELD));
-                }
-                else
-                {
-                    /* Interval time */
-                    pipe_peri |= (uint16_t) ((0x00FFu) & (USB_IITVFIELD));
-                }
-            }
-        }
-        ep_tbl[1] = pipe_cfg;
-        ep_tbl[3] = pipe_maxp;
-        ep_tbl[4] = pipe_peri;
-
-        /* USB_PRINTF4(" pipe%d configuration %04X %04X %04X\n", ep_tbl[0], ep_tbl[1], ep_tbl[3], ep_tbl[4]); */
-    }
-    else
-    {
-        USB_PRINTF0("###Endpoint Descriptor error.\n");
-        return USB_ERROR;
-    }
-    return (retval);
-}/* End of function usb_pstd_chk_pipe_info */
-
-/******************************************************************************
  Function Name   : usb_pstd_fifo_to_buf
  Description     : Request readout from USB FIFO to buffer and process depending
                  : on status; read complete or reading.
@@ -951,6 +989,11 @@ void usb_pstd_fifo_to_buf(uint16_t pipe, uint16_t useport)
     uint16_t end_flag;
 
     end_flag = USB_ERROR;
+
+    if (USB_MAX_PIPE_NO < pipe)
+    {
+        return; /* Error */
+    }
 
     end_flag = usb_pstd_read_data(pipe, useport);
 
@@ -1009,6 +1052,11 @@ void usb_pstd_buf_to_fifo(uint16_t pipe, uint16_t useport)
 {
     uint16_t end_flag;
 
+    if (USB_MAX_PIPE_NO < pipe)
+    {
+        return; /* Error */
+    }
+
     /* Disable Ready Interrupt */
     hw_usb_clear_brdyenb(USB_NULL,pipe);
 
@@ -1065,12 +1113,22 @@ usb_er_t usb_pstd_transfer_start(usb_utr_t * ptr)
 {
     usb_er_t err;
     uint16_t pipenum;
+#if (BSP_CFG_RTOS_USED == 1)
+    usb_utr_t   *p_tran_data;
+#endif /* BSP_CFG_RTOS_USED == 1 */
 
     pipenum = ptr->keyword;
+    if (USB_PIPE0 == pipenum)
+    {
+        USB_PRINTF0("### usb_pstd_transfer_start PIPE0 is not support\n");
+        return USB_ERROR;
+    }
+
+#if (BSP_CFG_RTOS_USED == 0)
     if (USB_NULL != g_p_usb_pstd_pipe[pipenum])
     {
         /* Get PIPE TYPE */
-        if (usb_cstd_get_pipe_type(USB_NULL, pipenum) != USB_ISO)
+        if (USB_TYPFIELD_ISO != usb_cstd_get_pipe_type(USB_NULL, pipenum))
         {
             USB_PRINTF1("### usb_pstd_transfer_start overlaps %d\n", pipenum);
             return USB_QOVR;
@@ -1078,19 +1136,33 @@ usb_er_t usb_pstd_transfer_start(usb_utr_t * ptr)
     }
 
     /* Check state (Configured) */
-    if (usb_pstd_chk_configured() != USB_TRUE)
+    if (USB_TRUE != usb_pstd_chk_configured())
     {
         USB_PRINTF0("### usb_pstd_transfer_start not configured\n");
         return USB_ERROR;
     }
+    err = usb_pstd_set_submitutr(ptr);
+#else /* BSP_CFG_RTOS_USED == 0 */
+    ptr->msghead = (usb_mh_t) USB_NULL;
+    ptr->msginfo = USB_MSG_PCD_SUBMITUTR;
+    ptr->ip = USB_IP0;
 
-    if (USB_PIPE0 == pipenum)
+    p_tran_data = (usb_utr_t *)pvPortMalloc(sizeof(usb_utr_t));
+    if (NULL == p_tran_data)
     {
-        USB_PRINTF0("### usb_pstd_transfer_start PIPE0 is not support\n");
         return USB_ERROR;
     }
+    *p_tran_data = *ptr;
+    p_tran_data->cur_task_hdl  = xTaskGetCurrentTaskHandle();
 
-    err = usb_pstd_set_submitutr(ptr);
+    /* Send message */
+    err = USB_SND_MSG(USB_PCD_MBX, (usb_msg_t* )p_tran_data);
+    if (USB_OK != err)
+    {
+        vPortFree (p_tran_data);
+    }
+#endif /* (BSP_CFG_RTOS_USED == 0) */
+
     return err;
 }
 /******************************************************************************
@@ -1107,6 +1179,15 @@ usb_er_t usb_pstd_transfer_start(usb_utr_t * ptr)
  ******************************************************************************/
 usb_er_t usb_pstd_transfer_end(uint16_t pipe)
 {
+#if (BSP_CFG_RTOS_USED == 1)
+    usb_utr_t   utr;
+#endif /* (BSP_CFG_RTOS_USED == 1) */
+
+    if (USB_MAX_PIPE_NO < pipe)
+    {
+        return USB_ERROR; /* Error */
+    }
+
     if (USB_NULL == g_p_usb_pstd_pipe[pipe])
     {
         USB_PRINTF0("### usb_pstd_transfer_end overlaps\n");
@@ -1114,7 +1195,16 @@ usb_er_t usb_pstd_transfer_end(uint16_t pipe)
     }
     else
     {
+#if (BSP_CFG_RTOS_USED == 0)
         usb_pstd_forced_termination(pipe, (uint16_t)USB_DATA_STOP);
+#else /* BSP_CFG_RTOS_USED == 0 */
+        utr.msghead = (usb_mh_t) USB_NULL;
+        utr.msginfo = USB_MSG_PCD_TRANSEND1;
+        utr.keyword = pipe;
+
+        /* Send message */
+        return USB_SND_MSG(USB_PCD_MBX, (usb_msg_t* )&utr);
+#endif /* (BSP_CFG_RTOS_USED == 0) */
     }
 
     return USB_OK;
@@ -1134,6 +1224,10 @@ usb_er_t usb_pstd_transfer_end(uint16_t pipe)
 void usb_pstd_change_device_state(uint16_t state, uint16_t keyword, usb_cb_t complete)
 {
     uint16_t pipenum;
+#if (BSP_CFG_RTOS_USED == 1)
+    static usb_utr_t   utr;
+    uint16_t    err;
+#endif /* (BSP_CFG_RTOS_USED == 1) */
 
     pipenum = keyword;
     switch(state)
@@ -1145,8 +1239,21 @@ void usb_pstd_change_device_state(uint16_t state, uint16_t keyword, usb_cb_t com
         break;
 
         case USB_DO_REMOTEWAKEUP:
+#if (BSP_CFG_RTOS_USED == 0)
             usb_pstd_self_clock();
             usb_pstd_remote_wakeup();
+#else   /* BSP_CFG_RTOS_USED == 0 */
+            utr.msghead = (usb_mh_t) USB_NULL;
+            utr.msginfo = USB_MSG_PCD_REMOTEWAKEUP;
+
+            /* Send message */
+            err = USB_SND_MSG(USB_PCD_MBX, (usb_msg_t* )&utr);
+            if (USB_OK != err)
+            {
+                g_usb_pstd_remote_wakeup_state = USB_ERROR;
+            }
+
+#endif  /* BSP_CFG_RTOS_USED == 0 */
         break;
 
         case USB_MSG_PCD_DP_ENABLE:
@@ -1179,19 +1286,19 @@ void usb_pstd_driver_registration(usb_pcdreg_t * registinfo)
 
     driver = &g_usb_pstd_driver;
 
-    driver->p_pipetbl = registinfo->p_pipetbl;       /* Pipe define table address */
     driver->p_devicetbl = registinfo->p_devicetbl;   /* Device descriptor table address */
-    driver->p_qualitbl = registinfo->p_qualitbl;     /* Qualifier descriptor table address */
+    driver->p_qualitbl  = registinfo->p_qualitbl;    /* Qualifier descriptor table address */
     driver->p_configtbl = registinfo->p_configtbl;   /* Configuration descriptor table address */
-    driver->p_othertbl = registinfo->p_othertbl;     /* Other configuration descriptor table address */
+    driver->p_othertbl  = registinfo->p_othertbl;    /* Other configuration descriptor table address */
     driver->p_stringtbl = registinfo->p_stringtbl;   /* String descriptor table address */
-    driver->devdefault = registinfo->devdefault; /* Device default */
-    driver->devconfig = registinfo->devconfig;   /* Device configured */
-    driver->devdetach = registinfo->devdetach;   /* Device detach */
-    driver->devsuspend = registinfo->devsuspend; /* Device suspend */
-    driver->devresume = registinfo->devresume;   /* Device resume */
-    driver->interface = registinfo->interface;   /* Interfaced change */
-    driver->ctrltrans = registinfo->ctrltrans;   /* Control transfer */
+    driver->devdefault  = registinfo->devdefault;    /* Device default */
+    driver->devconfig   = registinfo->devconfig;     /* Device configured */
+    driver->devdetach   = registinfo->devdetach;     /* Device detach */
+    driver->devsuspend  = registinfo->devsuspend;    /* Device suspend */
+    driver->devresume   = registinfo->devresume;     /* Device resume */
+    driver->interface   = registinfo->interface;     /* Interfaced change */
+    driver->ctrltrans   = registinfo->ctrltrans;     /* Control transfer */
+    driver->num_string  = registinfo->num_string;    /* String descriptor number */
 }
 /******************************************************************************
  End of function  usb_pstd_driver_registration
@@ -1208,7 +1315,6 @@ void usb_pstd_driver_release(void)
     usb_pcdreg_t *driver;
 
     driver = &g_usb_pstd_driver;
-    driver->p_pipetbl = (uint16_t*)0u;               /* Pipe define table address */
     driver->p_devicetbl = (uint8_t*)0u;              /* Device descriptor table address */
     driver->p_qualitbl = (uint8_t*)0u;               /* Qualifier descriptor table address */
     driver->p_configtbl = (uint8_t*)0u;              /* Configuration descriptor table address */
@@ -1269,13 +1375,13 @@ void usb_pstd_device_information (usb_utr_t *ptr, uint16_t *tbl)
     tbl[0] = hw_usb_read_intsts() & (uint16_t)(USB_VBSTS|USB_DVSQ);
 
     /* Speed */
-    tbl[1] = usb_cstd_port_speed (ptr, (uint16_t)USB_PORT0);
+    tbl[1] = usb_cstd_port_speed (ptr);
 
     /* Configuration number */
     tbl[2] = g_usb_pstd_config_num;
 
     /* Interface number */
-    tbl[3] = usb_pstd_get_interface_num (g_usb_pstd_config_num);
+    tbl[3] = usb_pstd_get_interface_num ();
 
     /* Remote Wakeup Flag */
     tbl[4] = g_usb_pstd_remote_wakeup;
@@ -1291,6 +1397,11 @@ Return value    : usb_er_t              : Error Info
 ******************************************************************************/
 usb_er_t usb_pstd_set_stall_clr_feature (usb_utr_t *ptr, usb_cb_t complete, uint16_t pipe)
 {
+    if (USB_MAX_PIPE_NO < pipe)
+    {
+        return USB_ERROR; /* Error */
+    }
+
     usb_pstd_change_device_state(USB_DO_STALL, pipe, complete);
 
     return USB_OK;
@@ -1310,12 +1421,12 @@ void usb_peri_registration(usb_ctrl_t *ctrl, usb_cfg_t *cfg)
     usb_pcdreg_t pdriver;
 
     /* pdriver registration */
-    pdriver.p_pipetbl     = (uint16_t*) &g_usb_pstd_eptbl;      /* Pipe Define Table address */
     pdriver.p_devicetbl   = cfg->p_usb_reg->p_device;           /* Device descriptor Table address */
     pdriver.p_qualitbl    = cfg->p_usb_reg->p_qualifier;        /* Qualifier descriptor Table address */
     pdriver.p_configtbl   = cfg->p_usb_reg->p_config_f;         /* Configuration descriptor Table address */
     pdriver.p_othertbl    = cfg->p_usb_reg->p_config_h;         /* Other configuration descriptor Table address */
     pdriver.p_stringtbl   = cfg->p_usb_reg->p_string;           /* String descriptor Table address */
+    pdriver.num_string    = cfg->p_usb_reg->num_string;         /* Num entry String descriptor */
 
     pdriver.devdefault  = &usb_peri_devdefault;                 /* Device default */
     pdriver.devconfig   = &usb_peri_configured;                 /* Device configuered */
@@ -1353,8 +1464,14 @@ void usb_peri_devdefault (usb_utr_t *ptr, uint16_t mode, uint16_t data2)
 
         /* Set Descriptor type.  */
         /* Hi-Speed Mode */
-        g_usb_pstd_driver.p_configtbl[1] = USB_DT_OTHER_SPEED_CONF;
-        g_usb_pstd_driver.p_othertbl[1] = USB_DT_CONFIGURATION;
+        if (USB_NULL != g_usb_pstd_driver.p_configtbl)
+        {
+            g_usb_pstd_driver.p_configtbl[1] = USB_DT_OTHER_SPEED_CONF;
+        }
+        if (USB_NULL != g_usb_pstd_driver.p_othertbl)
+        {
+            g_usb_pstd_driver.p_othertbl[1] = USB_DT_CONFIGURATION;
+        }
     }
     else
     {
@@ -1362,15 +1479,21 @@ void usb_peri_devdefault (usb_utr_t *ptr, uint16_t mode, uint16_t data2)
 
         /* Set Descriptor type. */
         /* Full-Speed Mode */
-        g_usb_pstd_driver.p_configtbl[1] = USB_DT_CONFIGURATION;
-        g_usb_pstd_driver.p_othertbl[1] = USB_DT_OTHER_SPEED_CONF;
+        if (USB_NULL != g_usb_pstd_driver.p_configtbl)
+        {
+            g_usb_pstd_driver.p_configtbl[1] = USB_DT_CONFIGURATION;
+        }
+        if (USB_NULL != g_usb_pstd_driver.p_othertbl)
+        {
+            g_usb_pstd_driver.p_othertbl[1] = USB_DT_OTHER_SPEED_CONF;
+        }
     }
-
 
     len = (uint16_t) (*(uint8_t*) ((uint32_t) ptable + (uint32_t) 3));
     len = (uint16_t) (len << 8);
     len += (uint16_t) (*(uint8_t*) ((uint32_t) ptable + (uint32_t) 2));
 
+    usb_pstd_clr_pipe_table ();
     usb_peri_pipe_info(ptable, mode, len);
 
 #if (defined(USB_CFG_PCDC_USE) | defined(USB_CFG_PHID_USE))
@@ -1391,29 +1514,28 @@ void usb_peri_devdefault (usb_utr_t *ptr, uint16_t mode, uint16_t data2)
 uint16_t usb_peri_pipe_info (uint8_t *table, uint16_t speed, uint16_t length)
 {
     uint16_t ofdsc;
-    uint16_t *pipe_offset;
-    uint16_t retval;
+    uint16_t retval = USB_ERROR;
+    uint8_t         pipe_no;
 
     /* Check Endpoint Descriptor */
     ofdsc = table[0];
-    pipe_offset = g_usb_pstd_driver.p_pipetbl;
 
+    /* WAIT_LOOP */
     while (ofdsc < length)
     {
         /* Endpoint Descriptor */
         if ( USB_DT_ENDPOINT == table[ofdsc + USB_EP_B_DESCRIPTORTYPE])
         {
             /* EP Table pipe Information set */
-            retval = usb_pstd_chk_pipe_info(speed, pipe_offset, &table[ofdsc]);
-            if ( USB_ERROR == retval)
+            pipe_no = usb_pstd_set_pipe_table (&table[ofdsc]);
+            if (USB_NULL != pipe_no)
             {
-                return USB_ERROR;
+                retval = USB_OK;
             }
-            pipe_offset += USB_EPL;
         }
         ofdsc += table[ofdsc];
     }
-    return USB_OK;
+    return retval;
 } /* End of function usb_peri_pipe_info() */
 
 /******************************************************************************
@@ -1450,10 +1572,13 @@ void usb_peri_detach (usb_utr_t *ptr, uint16_t data1, uint16_t data2)
 {
     usb_ctrl_t ctrl;
 
-    g_usb_peri_connected = USB_FALSE;
+    if(USB_TRUE == g_usb_peri_connected)
+    {
+        g_usb_peri_connected = USB_FALSE;
 
-    ctrl.module = USB_CFG_USE_USBIP;
-    usb_set_event(USB_STS_DETACH, &ctrl);
+        ctrl.module = USB_CFG_USE_USBIP;
+        usb_set_event(USB_STS_DETACH, &ctrl);
+    }
 } /* End of function usb_peri_detach() */
 
 /******************************************************************************
@@ -1485,6 +1610,10 @@ void usb_peri_resume(usb_utr_t *ptr, uint16_t data1, uint16_t data2)
     usb_ctrl_t ctrl;
 
     ctrl.module = USB_CFG_USE_USBIP;
+#if (BSP_CFG_RTOS_USED == 1)
+    ctrl.p_data = (void *)ptr->cur_task_hdl;
+#endif /* (BSP_CFG_RTOS_USED == 1) */
+
     usb_set_event(USB_STS_RESUME, &ctrl);
 } /* End of function usb_peri_resume() */
 
@@ -1504,6 +1633,72 @@ void usb_peri_interface(usb_utr_t *ptr, uint16_t data1, uint16_t data2)
     /* Non processing */
 #endif  /* defined(USB_CFG_PMSC_USE) */
 } /* End of function usb_peri_interface() */
+
+#if defined(USB_CFG_PVND_USE)
+/******************************************************************************
+ Function Name   : usb_pvnd_read_complete
+ Description     : CallBack Function
+ Argument        : usb_utr_t *mess           : Transfer result message
+ Return          : none
+ ******************************************************************************/
+void usb_pvnd_read_complete (usb_utr_t *mess, uint16_t data1, uint16_t data2)
+{
+    usb_ctrl_t ctrl;
+
+    /* Set Receive data length */
+    ctrl.size = mess->read_req_len - mess->tranlen;
+    ctrl.pipe = mess->keyword; /* Pipe number setting */
+    ctrl.type = USB_PVND; /* Device class setting  */
+#if (BSP_CFG_RTOS_USED == 1)
+    ctrl.p_data = (void *)mess->cur_task_hdl;
+#endif /* (BSP_CFG_RTOS_USED == 1) */
+    switch (mess->status)
+    {
+        case USB_DATA_OK :
+            ctrl.status = USB_SUCCESS;
+        break;
+        case USB_DATA_SHT :
+            ctrl.status = USB_ERR_SHORT;
+        break;
+        case USB_DATA_OVR :
+            ctrl.status = USB_ERR_OVER;
+        break;
+        case USB_DATA_ERR :
+        default :
+            ctrl.status = USB_ERR_NG;
+        break;
+    }
+    ctrl.module = USB_CFG_USE_USBIP;
+    usb_set_event(USB_STS_READ_COMPLETE, &ctrl);
+} /* End of function usb_pvnd_read_complete() */
+
+/******************************************************************************
+ Function Name   : usb_pvnd_write_complete
+ Description     : CallBack Function
+ Argument        : usb_utr_t *mess           : Transfer result message
+ Return          : none
+ ******************************************************************************/
+void usb_pvnd_write_complete (usb_utr_t *mess, uint16_t data1, uint16_t data2)
+{
+    usb_ctrl_t ctrl;
+
+    ctrl.pipe = mess->keyword; /* Pipe number setting */
+    ctrl.type = USB_PVND; /* CDC Control class  */
+    if (USB_DATA_NONE == mess->status)
+    {
+        ctrl.status = USB_SUCCESS;
+    }
+    else
+    {
+        ctrl.status = USB_ERR_NG;
+    }
+    ctrl.module = USB_CFG_USE_USBIP;
+#if (BSP_CFG_RTOS_USED == 1)
+    ctrl.p_data = (void *)mess->cur_task_hdl;
+#endif /* (BSP_CFG_RTOS_USED == 1) */
+    usb_set_event(USB_STS_WRITE_COMPLETE, &ctrl);
+} /* End of function usb_pvnd_write_complete() */
+#endif /* defined(USB_CFG_PVND_USE) */
 
 #endif  /* (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_REPI */
 

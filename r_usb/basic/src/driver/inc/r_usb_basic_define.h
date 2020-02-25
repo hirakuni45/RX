@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2019) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_basic_define.h
@@ -28,10 +28,43 @@
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
  *         : 26.01.2017 1.21 USB_VERSION_MINOR is updated.
  *         : 30.09.2017 1.22 RX62N/RX630/RX63T-H is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
+ *         : 16.11.2018 1.24 Supporting RTOS Thread safe
+ *         : 31.05.2019 1.26 Added support for GNUC and ICCRX.
+ *         : 30.07.2019 1.27 RX72M is added.
  ***********************************************************************************************************************/
 
 #ifndef R_USB_BASIC_DEFINE_H
 #define R_USB_BASIC_DEFINE_H
+
+#define USB_CFG_LITTLE          (0u)
+#define USB_CFG_BIG             (1u)
+
+#if defined(__CCRX__)
+
+  #ifdef __BIG
+    #define    USB_CFG_ENDIAN           (USB_CFG_BIG)
+  #else   /* __BIG */
+    #define    USB_CFG_ENDIAN           (USB_CFG_LITTLE)
+  #endif  /* __BIG */
+
+#elif defined(__GNUC__)
+
+  #ifdef __RX_BIG_ENDIAN__
+    #define    USB_CFG_ENDIAN           (USB_CFG_BIG)
+  #else   /* __RX_BIG_ENDIAN__ */
+    #define    USB_CFG_ENDIAN           (USB_CFG_LITTLE)
+  #endif  /* __RX_BIG_ENDIAN__ */
+
+#elif defined(__ICCRX__)
+
+  #if __BIG_ENDIAN__
+    #define    USB_CFG_ENDIAN           (USB_CFG_BIG)
+  #else   /* __BIG_ENDIAN__ */
+    #define    USB_CFG_ENDIAN           (USB_CFG_LITTLE)
+  #endif  /* __BIG_ENDIAN__ */
+
+#endif /* defined(__CCRX__), defined(__GNUC__), defined(__ICCRX__) */
 
 #if defined(USB_DEBUG_ON)
     #include    <stdlib.h>          /* @@@MISRA del */
@@ -46,16 +79,29 @@
     #define BSP_MCU_RX62N BSP_MCU_RX621
 #endif /* #if defined(BSP_MCU_RX631) */
 
+#if defined(BSP_MCU_RX66T)
+    #define BSP_MCU_RX72T BSP_MCU_RX66T
+#endif /* #if defined(BSP_MCU_RX72T) */
+
+
+#define R_USB_HmscTask              usb_hmsc_task
+#define R_USB_HmscStrgReadSector    usb_hmsc_strg_read_sector
+#define R_USB_HmscStrgWriteSector   usb_hmsc_strg_write_sector
+
 /**********************************************************************************************************************
  * Macro definitions
  **********************************************************************************************************************/
 /* Version Number of API. */
 #define USB_VERSION_MAJOR   (1)
-#define USB_VERSION_MINOR   (22)
+#define USB_VERSION_MINOR   (27)
 
-
-#define CLSDATASIZE         (32u)               /* Transfer data size for Standard Request */
-#define USB_INT_BUFSIZE     (10u)               /* Size of Interrupt info buffer */
+#define CLSDATASIZE         (512u)              /* Transfer data size for Standard Request */
+#if (BSP_CFG_RTOS_USED == 1)
+    /* The buffer size of interrupt info is increased to avoid overlapping interrupt events. */
+    #define USB_INT_BUFSIZE     (64u)           /* Size of Interrupt info buffer */
+#else /* (BSP_CFG_RTOS_USED == 1) */
+    #define USB_INT_BUFSIZE     (10u)           /* Size of Interrupt info buffer */
+#endif /* (BSP_CFG_RTOS_USED == 1) */
 #define USB_EVENT_MAX       (10)
 
 /* Scheduler use define */
@@ -90,17 +136,28 @@
 /* Host Control Driver Task */
 #define USB_HCD_TSK         (USB_TID_1)          /* Task ID */
 #define USB_HCD_MBX         (USB_HCD_TSK)        /* Mailbox ID */
-#define USB_HCD_MPL         (USB_HCD_TSK)        /* Memorypool ID */
+#define USB_HCD_MPL         (USB_HCD_TSK)        /* Memory pool ID */
 
 /* Host Manager Task */
 #define USB_MGR_TSK         (USB_TID_2)          /* Task ID */
 #define USB_MGR_MBX         (USB_MGR_TSK)        /* Mailbox ID */
-#define USB_MGR_MPL         (USB_MGR_TSK)        /* Memorypool ID */
+#define USB_MGR_MPL         (USB_MGR_TSK)        /* Memory pool ID */
 
 /* Hub Task */
 #define USB_HUB_TSK         (USB_TID_3)          /* Task ID */
 #define USB_HUB_MBX         (USB_HUB_TSK)        /* Mailbox ID */
-#define USB_HUB_MPL         (USB_HUB_TSK)        /* Memorypool ID */
+#define USB_HUB_MPL         (USB_HUB_TSK)        /* Memory pool ID */
+
+#if (BSP_CFG_RTOS_USED == 1)
+/* Class Request for Internal Communication  */
+#define USB_CLS_TSK         (USB_TID_4)          /* Task ID */
+#define USB_CLS_MBX         (USB_CLS_TSK)        /* Mailbox ID */
+#define USB_CLS_MPL         (USB_CLS_TSK)        /* Memory pool ID */
+
+/* Peripheral Control Driver Task */
+#define USB_PCD_TSK         (USB_TID_5)          /* Task ID */
+#define USB_PCD_MBX         (USB_PCD_TSK)        /* Mailbox ID */
+#endif /* (BSP_CFG_RTOS_USED == 1) */
 
 /* Error discrimination */
 #define USB_DEBUG_HOOK_HWR      (0x0100)
@@ -132,7 +189,6 @@
 #else
     #define USB_DEBUG_HOOK(x)
 #endif
-
 
 /* H/W function type */
 #define USB_HOST                ((uint16_t)1u)     /* Host mode */
@@ -170,18 +226,18 @@
 #define USB_SEQ_9               ((uint16_t)0x0009)
 #define USB_SEQ_10              ((uint16_t)0x000a)
 
+/* USB HUB PIPE No. */
+#define USB_HUB_PIPE            (9u)
+
 #define USB_HUB_P1              ((uint16_t)0x0001)
 #define USB_HUB_P2              ((uint16_t)0x0002)
 #define USB_HUB_P3              ((uint16_t)0x0003)
 #define USB_HUB_P4              ((uint16_t)0x0004)
 
+#define USB_HUB                 (USB_REQUEST +1)
+
 /* Interrupt message num */
 #define USB_INTMSGMAX           ((uint16_t)15u)
-
-/* USB IP Number */
-#define USB_USBIP_0             (0u)
-#define USB_USBIP_1             (1u)
-#define USB_NOTUSE              (2u)
 
 /* USB Device Connect */
 #define USB_DEV_NO_CONNECT      ((uint16_t)0u)
@@ -195,6 +251,9 @@
 #define USB_TRUE            (1u)
 #define USB_FALSE           (0u)
 
+#define USB_YES             (1u)
+#define USB_NO              (0u)
+
 #define USB_CFG_HIGH        (0u)
 #define USB_CFG_LOW         (1u)
 
@@ -204,17 +263,17 @@
 /* The number of USBIP */
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX63N) || defined(BSP_MCU_RX62N)
     #define USB_NUM_USBIP           (2u)
-#endif /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX63N) || defined(BSP_MCU_RX62N) */
 
-#if defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX630) || defined(BSP_MCU_RX63T)
+#else   /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX63N) || defined(BSP_MCU_RX62N) */
     #define USB_NUM_USBIP           (1u)
-#endif /* defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX630) || defined(BSP_MCU_RX63T) */
+
+#endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX63N) || defined(BSP_MCU_RX62N) */
 
 /* USB module definition */
 #define USB_M0  (USB0_)
 #if defined(BSP_MCU_RX63N) || defined(BSP_MCU_RX62N)
 /*    #define USB_M1  (USB1) */
-#define USB_M1  (*(volatile struct st_usb0    __evenaccess *)0xA0200)
+#define USB_M1  (*(struct st_usb0    R_BSP_VOLATILE_EVENACCESS *)0xA0200)
 
 #endif  /* defined(BSP_MCU_RX63N) || defined(BSP_MCU_RX62N) */
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
@@ -237,7 +296,20 @@
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 
 /* Start Pipe No */
-#define USB_MIN_PIPE_NO         (USB_PIPE1)
+#define USB_MIN_PIPE_NO         (1u)
+
+/* Max device */
+#define USB_MAXPIPE_BULK        (5u)
+#define USB_MAXPIPE_ISO         (2u)
+#define USB_MAXPIPE_NUM         (9u)
+
+#define USB_BULK_PIPE_START     (1u)
+#define USB_BULK_PIPE_END       (5u)
+#define USB_INT_PIPE_START      (6u)
+#define USB_INT_PIPE_END        (9u)
+#define USB_ISO_PIPE_START      (1u)
+#define USB_ISO_PIPE_END        (2u)
+
 
 /* SPEED mode */
 #define USB_HS_DISABLE          ((uint16_t)0u)
@@ -253,22 +325,26 @@
 /* HUB Address */
 #define USB_HUBDPADDR           ((uint16_t)(USB_DEVICEADDR + 1u))
 
-#define USB_CFG_ENABLE      (1u)
-#define USB_CFG_DISABLE     (0u)
+#define USB_PIPE_DIR_IN         (0u)
+#define USB_PIPE_DIR_OUT        (1u)
+#define USB_PIPE_DIR_MAX        (2u)
 
-#define USB_CFG_IP0         (0)
-#define USB_CFG_IP1         (1)
-#define USB_CFG_MULTI       (2)
+#define USB_CFG_ENABLE          (1u)
+#define USB_CFG_DISABLE         (0u)
 
-#define USB_CFG_HOST        (1)
-#define USB_CFG_PERI        (2)
+#define USB_CFG_IP0             (0)
+#define USB_CFG_IP1             (1)
+#define USB_CFG_MULTI           (2)
 
-#define USB_CFG_CDC         (0)
-#define USB_CFG_VEN         (1)
+#define USB_CFG_HOST            (1)
+#define USB_CFG_PERI            (2)
 
-#define USB_CFG_24MHZ       (0)
-#define USB_CFG_20MHZ       (1)
-#define USB_CFG_OTHER       (2)
+#define USB_CFG_CDC             (0)
+#define USB_CFG_VEN             (1)
+
+#define USB_CFG_24MHZ           (0)
+#define USB_CFG_20MHZ           (1)
+#define USB_CFG_OTHER           (2)
 
 /* Channel Number */
 #define USB_CFG_CH0             (0u)
@@ -282,9 +358,6 @@
 
 #define USB_CFG_USE             (0u)
 #define USB_CFG_NOUSE           (0xFFFFu)
-
-#define USB_CFG_LITTLE          (0u)
-#define USB_CFG_BIG             (1u)
 
 #define USB_CFG_ON              (1u)
 #define USB_CFG_OFF             (0u)
@@ -309,8 +382,8 @@
 #define USB_DEV_ID_VENDOR_H                 (9u)        /* Vendor ID */
 #define USB_DEV_ID_PRODUCT_L                (10u)       /* Product ID */
 #define USB_DEV_ID_PRODUCT_H                (11u)       /* Product ID */
-#define USB_DEV_BCD_DEVICE_L                (12u)       /* Device relese number */
-#define USB_DEV_BCD_DEVICE_H                (13u)       /* Device relese number */
+#define USB_DEV_BCD_DEVICE_L                (12u)       /* Device release number */
+#define USB_DEV_BCD_DEVICE_H                (13u)       /* Device release number */
 #define USB_DEV_I_MANUFACTURER              (14u)       /* Index of string descriptor describing manufacturer */
 #define USB_DEV_I_PRODUCT                   (15u)       /* Index of string descriptor describing product */
 #define USB_DEV_I_SERIAL_NUMBER             (16u)       /* Device serial number */
@@ -338,7 +411,7 @@
 #define USB_EP_B_ENDPOINTADDRESS            (2u)      /* Endpoint No. , Dir */
 #define USB_EP_B_ATTRIBUTES                 (3u)      /* Transfer Type */
 #define USB_EP_B_MAXPACKETSIZE_L            (4u)      /* Max packet size */
-#define USB_EP_B_MAXPACKETSIZE_h            (5u)      /* Max packet size */
+#define USB_EP_B_MAXPACKETSIZE_H            (5u)      /* Max packet size */
 #define USB_EP_B_INTERVAL                   (6u)      /* Interval */
 
 /* Standard Interface Descriptor Offset Define */
@@ -423,10 +496,6 @@
 #define USB_HUB_CHG_PORT_OVRCURRNET         (0x0008u)
 #define USB_HUB_CHG_PORT_RESET              (0x0010u)
 
-/* Root port */
-#define USB_PORT0                           (0u)
-#define USB_PORT1                           (1u)
-
 /* Device connect information */
 #define USB_ATTACH                          (0x0040u)
 #define USB_ATTACHL                         (0x0041u)
@@ -463,8 +532,6 @@
 #define USB_CFG_CNTMDON                     (0x0100u)
 #define USB_CFG_CNTMDOFF                    (0x0000u)
 #define USB_SHTNAKFIELD                     (0x0080u)   /* Transfer end NAK */
-#define USB_CFG_SHTNAKON                    (0x0080u)
-#define USB_CFG_SHTNAKOFF                   (0x0000u)
 #define USB_DIRFIELD                        (0x0010u)   /* Transfer direction select */
 #define USB_DIR_H_OUT                       (0x0010u)   /* HOST OUT */
 #define USB_DIR_P_IN                        (0x0010u)   /* PERI IN */
@@ -485,13 +552,10 @@
 #define USB_IITV_TIME(x)                    (x)
 
 /* FIFO port & access define */
-#define USB_CUSE                            (0u)  /* CFIFO CPU trans */
-#define USB_D0USE                           (1u)  /* D0FIFO CPU trans */
-#define USB_D0DMA                           (2u)  /* D0FIFO DMA trans */
-#define USB_D1USE                           (3u)  /* D1FIFO CPU trans */
-#define USB_D1DMA                           (4u)  /* D1FIFO DMA trans */
-#define USB_CUSE2                           (5u)  /* CFIFO CPU trans (not trans count) */
-#define USB_FIFO_ACCESS_NUM_MAX             (6u)  /* MAX number for FIFO port & access define */
+#define USB_CUSE                            (0u)  /* CFIFO  trans */
+#define USB_D0USE                           (1u)  /* D0FIFO trans */
+#define USB_D1USE                           (2u)  /* D1FIFO trans */
+#define USB_FIFO_ACCESS_NUM_MAX             (3u)  /* MAX number for FIFO port define */
 
 /******************************************************************************
  Another define
@@ -537,6 +601,7 @@
 #define USB_INT_BRDY                        (0x0001u)
 #define USB_INT_BEMP                        (0x0002u)
 #define USB_INT_NRDY                        (0x0003u)
+#define USB_INT_DXFIFO                      (0x0004u)   /* BSP_CFG_RTOS_USED == 1 */
 
 /* USB interrupt type (PERI)*/
 #define USB_INT_VBINT                       (0x0011u)
@@ -567,18 +632,13 @@
 #define USB_VBON                            (1u)
 #define USB_VBOFF                           (0u)
 
-#define USB_NOVENDOR                        (0xFFFFu) /* Vendor ID nocheck */
-#define USB_NOPRODUCT                       (0xFFFFu) /* Product ID nocheck */
+#define USB_NOVENDOR                        (0xFFFFu) /* Vendor ID no check */
+#define USB_NOPRODUCT                       (0xFFFFu) /* Product ID no check */
 
 #define USB_INTFCLSHET                      (0xAAu)   /* Host electrical test class */
 
 /* Root port */
 #define USB_NOPORT                          (0xFFFFu) /* Not connect */
-
-/* Max device */
-#define USB_MAXPIPE_BULK                    (5u)
-#define USB_MAXPIPE_ISO                     (2u)
-#define USB_MAXPIPE_NUM                     (9u)
 
 /* Condition compilation by the difference of IP */
 #define USB_MAXDEVADDR                      (5u)
@@ -597,8 +657,8 @@
 #define USB_NODEVICE                        (0xF000u) /* No device */
 #define USB_DEVADDRBIT                      (12u)
 
-/* DCP Max packetsize */
-#define USB_MAXPFIELD                       (0x007Fu) /* Maxpacket size of DCP */
+/* DCP Max packet size */
+#define USB_MAXPFIELD                       (0x007Fu) /* Max packet size of DCP */
 
 /******************************************************************************
  Another define
@@ -609,13 +669,8 @@
 /* Device state define */
 #define USB_NONDEVICE                       (0u)
 #define USB_NOTTPL                          (1u)
-#define USB_ATTACHDEVICE                    (2u)
 #define USB_DEVICEENUMERATION               (3u)
-#define USB_DEVICEADDRESSED                 (4u)
-#define USB_DEVICECONFIGURED                (5u)
 #define USB_COMPLETEPIPESET                 (10u)
-#define USB_DEVICESUSPENDED                 (20u)
-#define USB_ELECTRICALTEST                  (30u)
 
 /* Control Transfer Stage */
 #define USB_IDLEST                          (0u)  /* Idle */
@@ -683,7 +738,6 @@
 #define USB_MSG_HCD_CLRSEQBIT               (0x0115u)
 #define USB_MSG_HCD_SETSEQBIT               (0x0116u)
 #define USB_MSG_HCD_INT                     (0x0117u)
-#define USB_MSG_HCD_PCUTINT                 (0x0118u)
 #define USB_MSG_HCD_DMAINT                  (0x0119u)
 
 #define USB_MSG_HCD_D0FIFO_INT              (0x0141u)

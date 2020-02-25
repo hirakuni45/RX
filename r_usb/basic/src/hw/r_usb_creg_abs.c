@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_creg_abs.c
@@ -26,7 +26,8 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
- *         : 26.01.2017 1.2 usb_cstd_chg_curpipe is fixed.(Add process for USB_D0USE/USB_D1USE.)
+ *         : 26.01.2017 1.22 usb_cstd_chg_curpipe is fixed.(Add process for USB_D0USE/USB_D1USE.)
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -42,7 +43,7 @@
 /******************************************************************************
  Exported global variables (to be accessed by other files)
  ******************************************************************************/
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 uint16_t g_usb_hstd_use_pipe[USB_NUM_USBIP];
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -62,7 +63,7 @@ uint16_t usb_cstd_get_buf_size (usb_utr_t *ptr, uint16_t pipe)
     if (USB_PIPE0 == pipe)
     {
         buffer = hw_usb_read_dcpcfg(ptr);
-        if ((buffer & USB_CNTMDFIELD) == USB_CFG_CNTMDON)
+        if (USB_CFG_CNTMDON == (buffer & USB_CNTMDFIELD))
         {
             /* Continuation transmit */
             /* Buffer Size */
@@ -85,7 +86,7 @@ uint16_t usb_cstd_get_buf_size (usb_utr_t *ptr, uint16_t pipe)
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
         /* Read CNTMD */
         buffer = hw_usb_read_pipecfg(ptr);
-        if ((buffer & USB_CNTMDFIELD) == USB_CFG_CNTMDON)
+        if (USB_CFG_CNTMDON == (buffer & USB_CNTMDFIELD))
         {
             buffer = hw_usb_read_pipebuf(ptr);
 
@@ -114,28 +115,47 @@ uint16_t usb_cstd_get_buf_size (usb_utr_t *ptr, uint16_t pipe)
  Description     : Initialization of registers associated with specified pipe.
  Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
                  : uint16_t pipe     : Pipe Number
-                 : uint16_t *tbl     : Pointer to the endpoint table
-                 : uint16_t ofs      : Endpoint table offset
  Return value    : none
  ******************************************************************************/
-void usb_cstd_pipe_init (usb_utr_t *ptr, uint16_t pipe, uint16_t *tbl, uint16_t ofs)
+void usb_cstd_pipe_init (usb_utr_t *ptr, uint16_t pipe)
 {
     uint16_t    useport = USB_CUSE;
+    uint16_t    ip_no;
 
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
+
+#if BSP_CFG_RTOS_USED == 1
+        if (USB_NULL != g_p_usb_pstd_pipe[pipe])
+        {
+            vPortFree (g_p_usb_pstd_pipe[pipe]);
+        }
+
+#endif  /* BSP_CFG_RTOS_USED == 1 */
+
+
         g_p_usb_pstd_pipe[pipe] = (usb_utr_t *)USB_NULL;
         useport = usb_pstd_pipe2fport(pipe);
-
+        ip_no = USB_CFG_USE_USBIP;
 #endif  /* (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI */
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+
+#if BSP_CFG_RTOS_USED == 1
+        if (USB_NULL != g_p_usb_hstd_pipe[ptr->ip][pipe])
+        {
+            vPortFree (g_p_usb_hstd_pipe[ptr->ip][pipe]);
+        }
+
+#endif  /* BSP_CFG_RTOS_USED == 1 */
+
+
         g_p_usb_hstd_pipe[ptr->ip][pipe] = (usb_utr_t*) USB_NULL;
         useport = usb_hstd_pipe2fport(ptr, pipe);
-
+        ip_no = ptr->ip;
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
     }
 
@@ -155,9 +175,9 @@ void usb_cstd_pipe_init (usb_utr_t *ptr, uint16_t pipe, uint16_t *tbl, uint16_t 
     /* PIPE Configuration */
     hw_usb_write_pipesel(ptr, pipe);
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
     /* Update use pipe no info */
-    if (USB_NULL != tbl[ofs + 1])
+    if (USB_NULL != g_usb_pipe_table[ip_no][pipe].pipe_cfg)
     {
         g_usb_hstd_use_pipe[ptr->ip] |= ((uint16_t) 1 << pipe);
     }
@@ -168,19 +188,21 @@ void usb_cstd_pipe_init (usb_utr_t *ptr, uint16_t pipe, uint16_t *tbl, uint16_t 
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
 
-    if ((USB_D0DMA == useport) || (USB_D1DMA == useport))
+    if ((USB_D0USE == useport) || (USB_D1USE == useport))
     {
-        tbl[ofs + 1] |= USB_BFREON;
+        g_usb_pipe_table[ip_no][pipe].pipe_cfg |= USB_BFREON;
     }
 
-    hw_usb_write_pipecfg(ptr, tbl[ofs + 1]);
+    hw_usb_write_pipecfg(ptr, g_usb_pipe_table[ip_no][pipe].pipe_cfg);
 
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-    hw_usb_write_pipebuf(ptr, tbl[ofs + 2]);
-
+    if (USB_IP1 == ip_no)
+    {
+        hw_usb_write_pipebuf(ptr, g_usb_pipe_table[ip_no][pipe].pipe_buf);
+    }
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
-    hw_usb_write_pipemaxp(ptr, tbl[ofs + 3]);
-    hw_usb_write_pipeperi(ptr, tbl[ofs + 4]);
+    hw_usb_write_pipemaxp(ptr, g_usb_pipe_table[ip_no][pipe].pipe_maxp);
+    hw_usb_write_pipeperi(ptr, g_usb_pipe_table[ip_no][pipe].pipe_peri);
 
     /* FIFO buffer DATA-PID initialized */
     hw_usb_write_pipesel(ptr, USB_PIPE0);
@@ -219,14 +241,32 @@ void usb_cstd_clr_pipe_cnfg (usb_utr_t *ptr, uint16_t pipe_no)
 {
     if (USB_NULL == ptr)
     {
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
+
+#if BSP_CFG_RTOS_USED == 1
+        if (USB_NULL != g_p_usb_pstd_pipe[pipe_no])
+        {
+            vPortFree (g_p_usb_pstd_pipe[pipe_no]);
+        }
+
+#endif  /* BSP_CFG_RTOS_USED == 1 */
+
         g_p_usb_pstd_pipe[pipe_no] = (usb_utr_t *)USB_NULL;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI */
     }
     else
     {
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
+
+#if BSP_CFG_RTOS_USED == 1
+        if (USB_NULL != g_p_usb_hstd_pipe[ptr->ip][pipe_no])
+        {
+            vPortFree (g_p_usb_hstd_pipe[ptr->ip][pipe_no]);
+        }
+
+#endif  /* BSP_CFG_RTOS_USED == 1 */
+
         g_p_usb_hstd_pipe[ptr->ip][pipe_no] = (usb_utr_t*) USB_NULL;
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
@@ -301,11 +341,12 @@ void usb_cstd_set_nak (usb_utr_t *ptr, uint16_t pipe)
     /* The state of PBUSY continues while transmitting the packet when it is a detach. */
     /* 1ms comes off when leaving because the packet duration might not exceed 1ms.  */
     /* Whether it is PBUSY release or 1ms passage can be judged. */
+    /* WAIT_LOOP */
     for (n = 0; n < 0xFFFFu; ++n)
     {
         /* PIPE control reg read */
         buf = hw_usb_read_pipectr(ptr, pipe);
-        if ((uint16_t) (buf & USB_PBUSY) == 0)
+        if (0 == (uint16_t) (buf & USB_PBUSY))
         {
             n = 0xFFFEu;
         }
@@ -332,11 +373,12 @@ uint16_t usb_cstd_is_set_frdy (usb_utr_t *ptr, uint16_t pipe, uint16_t fifosel, 
     /* Changes the FIFO port by the pipe. */
     usb_cstd_chg_curpipe(ptr, pipe, fifosel, isel);
 
+    /* WAIT_LOOP */
     for (i = 0; i < 4; i++)
     {
         buffer = hw_usb_read_fifoctr(ptr, fifosel);
 
-        if ((uint16_t) (buffer & USB_FRDY) == USB_FRDY)
+        if (USB_FRDY == (uint16_t) (buffer & USB_FRDY))
         {
             return (buffer);
         } USB_PRINTF1("*** FRDY wait pipe = %d\n", pipe);
@@ -346,8 +388,8 @@ uint16_t usb_cstd_is_set_frdy (usb_utr_t *ptr, uint16_t pipe, uint16_t fifosel, 
          * for 100ns here.
          * For details, please look at the data sheet.   */
         /***** The example of reference. *****/
-        buffer = hw_usb_read_syscfg(ptr, USB_PORT0);
-        buffer = hw_usb_read_syssts(ptr, USB_PORT0);
+        buffer = hw_usb_read_syscfg(ptr);
+        buffer = hw_usb_read_syssts(ptr);
 
         /*************************************/
     }
@@ -378,6 +420,7 @@ void usb_cstd_chg_curpipe (usb_utr_t *ptr, uint16_t pipe, uint16_t fifosel, uint
 
             /* ISEL=1, CURPIPE=0 */
             hw_usb_rmw_fifosel(ptr, USB_CUSE, ((USB_RCNT | isel) | pipe), ((USB_RCNT | USB_ISEL) | USB_CURPIPE));
+            /* WAIT_LOOP */
             do
             {
                 buffer = hw_usb_read_fifosel(ptr, USB_CUSE);
@@ -387,29 +430,17 @@ void usb_cstd_chg_curpipe (usb_utr_t *ptr, uint16_t pipe, uint16_t fifosel, uint
 #if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
         /* D0FIFO use */
         case USB_D0USE :
-        /* D0FIFO DMA */
-        case USB_D0DMA:
-            /* D0FIFO pipe select */
-            hw_usb_set_curpipe( ptr, USB_D0DMA, pipe );
-            do
-            {
-                buffer = hw_usb_read_fifosel( ptr, USB_D0DMA );
-            }
-            while( (uint16_t)(buffer & USB_CURPIPE) != pipe );
-        break;
-
         /* D1FIFO use */
         case USB_D1USE :
-        /* D1FIFO DMA */
-        case USB_D1DMA:
-            /* D1FIFO pipe select */
-            hw_usb_set_curpipe( ptr, USB_D1DMA, pipe );
+            /* DxFIFO pipe select */
+            hw_usb_set_curpipe (ptr, fifosel, pipe);
 
+            /* WAIT_LOOP */
             do
             {
-                buffer = hw_usb_read_fifosel( ptr, USB_D1DMA );
+                buffer = hw_usb_read_fifosel (ptr, fifosel);
             }
-            while( (uint16_t)(buffer & USB_CURPIPE) != pipe );
+            while ((uint16_t)(buffer & USB_CURPIPE) != pipe);
         break;
 #endif    /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
 

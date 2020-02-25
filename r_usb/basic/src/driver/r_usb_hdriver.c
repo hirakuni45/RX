@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_hdriver.c
@@ -28,11 +28,14 @@
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
  *         : 26.01.2017 1.21 Support DMAC Technical Update for RX71M/RX64M USBA.
  *         : 30.09.2017 1.22 Rename "usb_hstd_buf2fifo"->"usb_hstd_buf_to_fifo" and Function move from"r_usb_hlibusbip.c"
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
+ *         : 16.11.2018 1.24 Supporting RTOS Thread safe
  ***********************************************************************************************************************/
 
 /******************************************************************************
  Includes   <System Includes> , "Project Includes"
  ******************************************************************************/
+#include <string.h>
 
 #include "r_usb_basic_if.h"
 #include "r_usb_typedef.h"
@@ -69,14 +72,42 @@
 #include "r_usb_dmac.h"
 #endif  /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /**********************************************************************************************************************
  * Macro definitions
  **********************************************************************************************************************/
 #if USB_CFG_COMPLIANCE == USB_CFG_ENABLE
 #define USB_RESPONCE_COUNTER_VALUE     (6000u)
-
 #endif /* USB_CFG_COMPLIANCE == USB_CFG_ENABLE */
+
+#if defined(USB_CFG_HVND_USE)
+#define USB_EP_PIPE_NUM     (9)
+#define USB_EP_TBL_WSIZE    ((USB_EPL * USB_EP_PIPE_NUM) + 1)
+#endif /* defined(USB_CFG_HVND_USE) */
+
+/******************************************************************************
+ Private global variables and functions
+ ******************************************************************************/
+static uint16_t usb_shstd_clr_stall_pipe[USB_NUM_USBIP];
+static uint16_t usb_shstd_clr_stall_request[USB_NUM_USBIP][5];  
+static usb_utr_t usb_shstd_clr_stall_ctrl[USB_NUM_USBIP];
+
+#if defined(USB_CFG_HVND_USE)
+static void     usb_hvnd_configured (usb_utr_t *ptr, uint16_t dev_addr, uint16_t data2);
+static void     usb_hvnd_detach (usb_utr_t *ptr, uint16_t dev_addr, uint16_t data2);
+static void     usb_hvnd_enumeration (usb_clsinfo_t *mess, uint16_t **table);
+static void     usb_hvnd_pipe_info (uint8_t *table, uint16_t speed, uint16_t length);
+#endif /* defined(USB_CFG_HVND_USE) */
+
+#if (BSP_CFG_RTOS_USED == 0)
+static usb_cb_t usb_shstd_clr_stall_call;
+#endif /* (BSP_CFG_RTOS_USED == 0) */
+
+static void usb_hstd_set_submitutr (usb_utr_t *ptr);
+static void usb_hstd_set_retransfer (usb_utr_t *ptr, uint16_t pipe);
+#if (BSP_CFG_RTOS_USED == 0)
+static void usb_hstd_clr_stall_result (usb_utr_t *ptr, uint16_t data1, uint16_t data2);
+#endif /* (BSP_CFG_RTOS_USED == 0) */
 
 /******************************************************************************
  Exported global variables (to be accessed by other files)
@@ -86,13 +117,13 @@ usb_hcdreg_t g_usb_hstd_device_drv[USB_NUM_USBIP][USB_MAXDEVADDR + 1u];
 
 /* Root port, status, config num, interface class, speed, */
 uint16_t g_usb_hstd_device_info[USB_NUM_USBIP][USB_MAXDEVADDR + 1u][8u];
-uint16_t g_usb_hstd_remort_port[2u];
+uint16_t g_usb_hstd_remort_port[USB_NUM_USBIP];
 
 /* Control transfer stage management */
 uint16_t g_usb_hstd_ctsq[USB_NUM_USBIP];
 
 /* Manager mode */
-uint16_t g_usb_hstd_mgr_mode[USB_NUM_USBIP][2u];
+uint16_t g_usb_hstd_mgr_mode[USB_NUM_USBIP];
 
 /* DEVSEL & DCPMAXP (Multiple device) */
 uint16_t g_usb_hstd_dcp_register[USB_NUM_USBIP][USB_MAXDEVADDR + 1u];
@@ -109,14 +140,13 @@ uint16_t g_usb_hstd_device_num[USB_NUM_USBIP];
 /* Ignore count */
 uint16_t g_usb_hstd_ignore_cnt[USB_NUM_USBIP][USB_MAX_PIPE_NO + 1u];
 
-usb_ctrl_t g_ctrl;
-
 /* USB data transfer */
 /* PIPEn Buffer counter */
 uint32_t g_usb_hstd_data_cnt[USB_NUM_USBIP][USB_MAX_PIPE_NO + 1u];
+uint32_t g_usb_hstd_data_cnt_pipe0[USB_NUM_USBIP];
 
 /* PIPEn Buffer pointer(8bit) */
-uint8_t *g_p_usb_hstd_data[USB_NUM_USBIP][USB_MAX_PIPE_NO + 1u];
+uint8_t *gp_usb_hstd_data_ptr[USB_NUM_USBIP][USB_MAX_PIPE_NO + 1u];
 
 /* Message pipe */
 usb_utr_t *g_p_usb_hstd_pipe[USB_NUM_USBIP][USB_MAX_PIPE_NO + 1u];
@@ -125,68 +155,21 @@ usb_utr_t *g_p_usb_hstd_pipe[USB_NUM_USBIP][USB_MAX_PIPE_NO + 1u];
 uint16_t g_usb_hstd_hs_enable[USB_NUM_USBIP];
 usb_ctrl_trans_t g_usb_ctrl_request[USB_NUM_USBIP][USB_MAXDEVADDR + 1];
 
+#if BSP_CFG_RTOS_USED == 0
 uint16_t g_usb_hstd_pipe_request[USB_NUM_USBIP][USB_MAX_PIPE_NO + 1u];
+#endif  /* BSP_CFG_RTOS_USED == 0 */
 
-/* Pipe number of USB Host transfer.(Read pipe/Write pipe) */
-const uint8_t g_usb_pipe_host[] =
+
+#if defined(USB_CFG_HVND_USE)
+/* Target Peripheral List */
+const uint16_t g_usb_apl_devicetpl[] =
 {
-/* READ pipe *//* WRITE pipe */
-/* IN pipe *//* OUT pipe */
-#if defined(USB_CFG_HCDC_USE)
-        USB_CFG_HCDC_BULK_IN, USB_CFG_HCDC_BULK_OUT,    /* HCDC: Address 1 */
-        USB_CFG_HCDC_BULK_IN, USB_CFG_HCDC_BULK_OUT,    /* HCDC: Address 2 using Hub */
-        USB_CFG_HCDC_BULK_IN2, USB_CFG_HCDC_BULK_OUT2,  /* HCDC: Address 3 using Hub */
-        USB_NULL, USB_NULL,
-#else
-        USB_NULL, USB_NULL,
-        USB_NULL, USB_NULL,
-        USB_NULL, USB_NULL,
-        USB_NULL, USB_NULL,
-#endif
-
-#if defined(USB_CFG_HCDC_USE)
-        USB_CFG_HCDC_INT_IN, USB_NULL,                  /* HCDCC: Address 1 */
-        USB_CFG_HCDC_INT_IN, USB_NULL,                  /* HCDCC: Address 2 using Hub */
-        USB_CFG_HCDC_INT_IN2, USB_NULL,                 /* HCDCC: Address 3 using Hub */
-        USB_NULL, USB_NULL,
-#else
-        USB_NULL, USB_NULL,
-        USB_NULL, USB_NULL,
-        USB_NULL, USB_NULL,
-        USB_NULL, USB_NULL,
-#endif
-
-#if defined(USB_CFG_HHID_USE)
-        USB_CFG_HHID_INT_IN, USB_CFG_HHID_INT_OUT,      /* HCDC: Address 1 */
-        USB_CFG_HHID_INT_IN, USB_CFG_HHID_INT_OUT,      /* HCDC: Address 2 using Hub */
-        USB_CFG_HHID_INT_IN2, USB_NULL,                 /* HCDC: Address 3 using Hub */
-        USB_CFG_HHID_INT_IN3, USB_NULL,                 /* HCDC: Address 4 using Hub */
-#else
-        USB_NULL, USB_NULL,
-        USB_NULL, USB_NULL,
-        USB_NULL, USB_NULL,
-        USB_NULL, USB_NULL,
-#endif
-
+    USB_CFG_TPLCNT, /* Number of list */
+    0,              /* Reserved */
+    USB_CFG_TPL     /* Vendor ID, Product ID */
 };
+#endif /* defined(USB_CFG_HVND_USE) */
 
-#if USB_CFG_COMPLIANCE == USB_CFG_ENABLE
-extern uint16_t g_usb_hstd_responce_counter;
-#endif /* USB_CFG_COMPLIANCE == USB_CFG_ENABLE */
-
-/******************************************************************************
- Private global variables and functions
- ******************************************************************************/
-static usb_hcdinfo_t *p_usb_shstd_hcd_msg;
-static uint16_t usb_shstd_clr_stall_pipe;
-static uint16_t usb_shstd_clr_stall_request[5];
-static uint8_t usb_shstd_clr_stall_data[10];
-static usb_utr_t usb_shstd_clr_stall_ctrl;
-static usb_cb_t usb_shstd_clr_stall_call;
-
-static usb_er_t usb_hstd_set_submitutr (usb_utr_t *ptr);
-static void usb_hstd_set_retransfer (usb_utr_t *ptr, uint16_t pipe);
-static void usb_hstd_clr_stall_result (usb_utr_t *ptr, uint16_t data1, uint16_t data2);
 
 /******************************************************************************
  Renesas USB Host Driver functions
@@ -222,36 +205,24 @@ uint8_t *usb_hstd_con_descriptor (usb_utr_t *ptr)
  ******************************************************************************/
 
 /******************************************************************************
- Function Name   : usb_hstd_transfer_start
+ Function Name   : usb_hstd_transfer_start_req
  Description     : Send a request for data transfer to HCD (Host Control Driver) 
                  : using the specified pipe.
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
  Return          : usb_er_t       : USB_OK/USB_QOVR/USB_ERROR
  ******************************************************************************/
-usb_er_t usb_hstd_transfer_start (usb_utr_t *ptr)
+usb_er_t usb_hstd_transfer_start_req (usb_utr_t *ptr)
 {
     usb_er_t err;
     uint16_t pipenum;
     uint16_t devsel;
-    uint16_t connect_inf;
+#if (BSP_CFG_RTOS_USED == 0)
+    uint16_t    connect_inf;
+#else   /* (BSP_CFG_RTOS_USED == 0) */
+    usb_utr_t   *p_tran_data;
+#endif  /* BSP_CFG_RTOS_USED == 0 */
 
     pipenum = ptr->keyword;
-
-    if (USB_ON == g_usb_hstd_pipe_request[ptr->ip][pipenum])
-    {
-        return USB_QOVR;
-    }
-
-    /* Pipe Transfer Process check */
-    if (USB_NULL != g_p_usb_hstd_pipe[ptr->ip][pipenum])
-    {
-        /* Check PIPE TYPE */
-        if (usb_cstd_get_pipe_type(ptr, pipenum) != USB_TYPFIELD_ISO)
-        {
-            USB_PRINTF1("### usb_hstd_transfer_start overlaps %d\n", pipenum);
-            return USB_QOVR;
-        }
-    }
 
     if (USB_PIPE0 == pipenum)
     {
@@ -264,21 +235,42 @@ usb_er_t usb_hstd_transfer_start (usb_utr_t *ptr)
     }
     if ((USB_DEVICE_0 == devsel) && (USB_PIPE0 != pipenum))
     {
-        USB_PRINTF1("### usb_hstd_transfer_start not configured %x\n", devsel);
-        return USB_ERROR;
-    }
-
-    /* Get device speed from device address */
-    connect_inf = usb_hstd_get_dev_speed(ptr, devsel);
-    if (USB_NOCONNECT == connect_inf)
-    {
-        USB_PRINTF1("### usb_hstd_transfer_start not connect %x\n", devsel);
+        USB_PRINTF1("### usb_hstd_transfer_start_req not configured %x\n", devsel);
         return USB_ERROR;
     }
 
     ptr->msghead = (usb_mh_t) USB_NULL;
     ptr->msginfo = USB_MSG_HCD_SUBMITUTR;
 
+    if (USB_MAX_PIPE_NO < pipenum)
+    {
+        return USB_ERROR;
+    }
+
+#if (BSP_CFG_RTOS_USED == 0)
+    if (USB_ON == g_usb_hstd_pipe_request[ptr->ip][pipenum])
+    {
+        return USB_QOVR;
+    }
+
+    /* Pipe Transfer Process check */
+    if (USB_NULL != g_p_usb_hstd_pipe[ptr->ip][pipenum])
+    {
+        /* Check PIPE TYPE */
+        if (usb_cstd_get_pipe_type(ptr, pipenum) != USB_TYPFIELD_ISO)
+        {
+            USB_PRINTF1("### usb_hstd_transfer_start_req overlaps %d\n", pipenum);
+            return USB_QOVR;
+        }
+    }
+
+    /* Get device speed from device address */
+    connect_inf = usb_hstd_get_dev_speed(ptr, devsel);
+    if (USB_NOCONNECT == connect_inf)
+    {
+        USB_PRINTF1("### usb_hstd_transfer_start_req not connect %x\n", devsel);
+        return USB_ERROR;
+    }
     /* Send message */
     err = USB_SND_MSG(USB_HCD_MBX, (usb_msg_t* )ptr);
     if (USB_OK == err)
@@ -287,12 +279,40 @@ usb_er_t usb_hstd_transfer_start (usb_utr_t *ptr)
     }
     else
     {
-        USB_PRINTF1("### usb_hstd_transfer_start snd_msg error (%ld)\n", err);
+        USB_PRINTF1("### usb_hstd_transfer_start_req snd_msg error (%ld)\n", err);
     }
+
+#else   /* (BSP_CFG_RTOS_USED == 0) */
+    p_tran_data = (usb_utr_t *)pvPortMalloc(sizeof(usb_utr_t));
+    if (NULL == p_tran_data)
+    {
+        return USB_ERROR;
+    }
+    *p_tran_data = *ptr;
+    if (0 != ptr->p_setup)
+    {
+        p_tran_data->setup_data[0] = ptr->p_setup[0];
+        p_tran_data->setup_data[1] = ptr->p_setup[1];
+        p_tran_data->setup_data[2] = ptr->p_setup[2];
+        p_tran_data->setup_data[3] = ptr->p_setup[3];
+        p_tran_data->setup_data[4] = ptr->p_setup[4];
+        p_tran_data->p_setup = (uint16_t *)&p_tran_data->setup_data;
+    }
+    p_tran_data->cur_task_hdl  = xTaskGetCurrentTaskHandle();
+
+    /* Send message */
+    err = USB_SND_MSG(USB_HCD_MBX, (usb_msg_t* )p_tran_data);
+    if (USB_OK != err)
+    {
+        vPortFree (p_tran_data);
+    }
+
+#endif  /* (BSP_CFG_RTOS_USED == 0) */
+
     return err;
 }
 /******************************************************************************
- End of function usb_hstd_transfer_start
+ End of function usb_hstd_transfer_start_req
  ******************************************************************************/
 
 /******************************************************************************
@@ -327,7 +347,7 @@ usb_er_t usb_hstd_hcd_snd_mbx (usb_utr_t *ptr, uint16_t msginfo, uint16_t dat, u
     usb_er_t err2;
     usb_hcdinfo_t *hp;
 
-    /* Get mem pool blk */
+    /* Get memory pool blk */
     err = USB_PGET_BLK(USB_HCD_MPL, &p_blf);
     if (USB_OK == err)
     {
@@ -339,6 +359,9 @@ usb_er_t usb_hstd_hcd_snd_mbx (usb_utr_t *ptr, uint16_t msginfo, uint16_t dat, u
         hp->complete = callback;
         hp->ipp = ptr->ipp;
         hp->ip = ptr->ip;
+#if (BSP_CFG_RTOS_USED == 1)
+        hp->cur_task_hdl = ptr->cur_task_hdl;
+#endif /* BSP_CFG_RTOS_USED == 1 */
 
         /* Send message */
         err = USB_SND_MSG(USB_HCD_MBX, (usb_msg_t* )p_blf);
@@ -354,7 +377,12 @@ usb_er_t usb_hstd_hcd_snd_mbx (usb_utr_t *ptr, uint16_t msginfo, uint16_t dat, u
     }
     else
     {
-        USB_PRINTF1("### hHcdSndMbx pget_blk error (%ld)\n", err);
+        /* Error */
+        /* WAIT_LOOP */
+        while (1)
+        {
+            /* error */
+        }
     }
     return err;
 }
@@ -378,7 +406,7 @@ void usb_hstd_mgr_snd_mbx (usb_utr_t *ptr, uint16_t msginfo, uint16_t dat, uint1
     usb_er_t err2;
     usb_mgrinfo_t *mp;
 
-    /* Get mem pool blk */
+    /* Get memory pool blk */
     err = USB_PGET_BLK(USB_MGR_MPL, &p_blf);
     if (USB_OK == err)
     {
@@ -389,6 +417,9 @@ void usb_hstd_mgr_snd_mbx (usb_utr_t *ptr, uint16_t msginfo, uint16_t dat, uint1
         mp->result = res;
         mp->ipp = ptr->ipp;
         mp->ip = ptr->ip;
+#if (BSP_CFG_RTOS_USED == 1)
+        mp->cur_task_hdl = ptr->cur_task_hdl;
+#endif /* BSP_CFG_RTOS_USED == 1 */
 
         /* Send message */
         err = USB_SND_MSG(USB_MGR_MBX, (usb_msg_t * )p_blf);
@@ -404,7 +435,12 @@ void usb_hstd_mgr_snd_mbx (usb_utr_t *ptr, uint16_t msginfo, uint16_t dat, uint1
     }
     else
     {
-        USB_PRINTF1("### hMgrSndMbx pget_blk error (%ld)\n", err);
+        /* Error */
+        /* WAIT_LOOP */
+        while (1)
+        {
+            /* error */
+        }
     }
 }
 /******************************************************************************
@@ -437,10 +473,9 @@ void usb_hstd_hcd_rel_mpl (usb_utr_t *ptr, uint16_t n)
  Function Name   : usb_hstd_suspend
  Description     : Request suspend for USB device.
  Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
-                 : uint16_t port     : Port no.
  Return          : none
  ******************************************************************************/
-void usb_hstd_suspend (usb_utr_t *ptr, uint16_t port)
+void usb_hstd_suspend (usb_utr_t *ptr)
 {
     usb_hcdinfo_t* hp;
 
@@ -448,25 +483,17 @@ void usb_hstd_suspend (usb_utr_t *ptr, uint16_t port)
     if (USB_IDLEST == g_usb_hstd_ctsq[ptr->ip])
     {
         /* USB suspend process */
-        usb_hstd_suspend_process(ptr, port);
-        usb_hstd_chk_clk(ptr, port, (uint16_t) USB_SUSPENDED); /* Check clock */
+        usb_hstd_suspend_process(ptr);
+        usb_hstd_chk_clk(ptr, (uint16_t) USB_SUSPENDED); /* Check clock */
         hp = (usb_hcdinfo_t*) ptr; /* Callback */
-        if (USB_NULL == hp->complete)   /* Chack Callback function */
-        {
-            while(1)
-            {
-                /* Error Stop */
-            }
-        }
-        (hp->complete)(ptr, port, ptr->msginfo);
+        (hp->complete)(ptr, USB_NULL, ptr->msginfo);
     }
     else
     {
         /* 1ms wait */
         usb_cpu_delay_xms((uint16_t) 1);
-
         /* Change device state request */
-        usb_hstd_hcd_snd_mbx(ptr, ptr->msginfo, port, (uint16_t*) 0, &usb_hstd_status_result);
+        usb_hstd_hcd_snd_mbx(ptr, ptr->msginfo, USB_NULL, (uint16_t*) 0, &usb_hstd_status_result);
     }
 }
 /******************************************************************************
@@ -478,9 +505,9 @@ void usb_hstd_suspend (usb_utr_t *ptr, uint16_t port)
  Description     : Submit utr: Get the device address via the specified pipe num-
                  : ber and do a USB transfer.
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
- Return          : usb_er_t       : USB_OK
+ Return          : none
  ******************************************************************************/
-static usb_er_t usb_hstd_set_submitutr (usb_utr_t *ptr)
+static void usb_hstd_set_submitutr (usb_utr_t *ptr)
 {
     uint16_t pipenum;
     uint16_t devsel;
@@ -489,9 +516,10 @@ static usb_er_t usb_hstd_set_submitutr (usb_utr_t *ptr)
     usb_utr_t *pp;
 
     pipenum = ptr->keyword;
+#if BSP_CFG_RTOS_USED == 0
     g_p_usb_hstd_pipe[ptr->ip][pipenum] = ptr;
-
     g_usb_hstd_pipe_request[ptr->ip][pipenum] = USB_OFF;
+#endif /* BSP_CFG_RTOS_USED == 0 */
 
     /* Get device address from pipe number */
     if (USB_PIPE0 == pipenum)
@@ -503,17 +531,21 @@ static usb_er_t usb_hstd_set_submitutr (usb_utr_t *ptr)
         /* Get device address from pipe number */
         devsel = usb_hstd_get_devsel(ptr, pipenum);
     }
-    if ((USB_DEVICE_0 == devsel) && (USB_PIPE0 != pipenum))
-    {
-        /* End of data transfer (IN/OUT) */
-        usb_hstd_forced_termination(ptr, pipenum, (uint16_t) USB_DATA_ERR);
-        return USB_OK;
-    }
 
     /* Get device speed from device address */
     connect_inf = usb_hstd_get_dev_speed(ptr, devsel);
     if (USB_NOCONNECT == connect_inf)
     {
+#if BSP_CFG_RTOS_USED == 1
+        if (USB_PIPE0 == pipenum)
+        {
+            usb_cstd_pipe0_msg_clear (ptr, ptr->p_setup[4]);
+        }
+        else
+        {
+            usb_cstd_pipe_msg_clear (ptr, pipenum);
+        }
+#else /* BSP_CFG_RTOS_USED == 1 */
         if (USB_PIPE0 == pipenum)
         {
             /* Control Read/Write End */
@@ -524,7 +556,35 @@ static usb_er_t usb_hstd_set_submitutr (usb_utr_t *ptr)
             /* End of data transfer (IN/OUT) */
             usb_hstd_forced_termination(ptr, pipenum, (uint16_t) USB_DATA_ERR);
         }
-        return USB_OK;
+#endif /* BSP_CFG_RTOS_USED == 1 */
+        return;
+    }
+
+#if BSP_CFG_RTOS_USED == 1
+    /* Pipe Transfer Process check */
+    if (USB_NULL != g_p_usb_hstd_pipe[ptr->ip][pipenum])
+    {
+        if (USB_PIPE0 == pipenum)
+        {
+            usb_cstd_pipe0_msg_forward (ptr, ptr->p_setup[4]);
+        }
+        else
+        {
+            usb_cstd_pipe_msg_forward (ptr, pipenum);
+        }
+        return;
+    }
+#endif /* BSP_CFG_RTOS_USED == 1 */
+
+#if (BSP_CFG_RTOS_USED == 1)
+    g_p_usb_hstd_pipe[ptr->ip][pipenum] = ptr;
+
+#endif /* BSP_CFG_RTOS_USED == 1 */
+
+    if ((USB_DEVICE_0 == devsel) && (USB_PIPE0 != pipenum))
+    {
+        usb_hstd_forced_termination(ptr, pipenum, (uint16_t) USB_DATA_ERR);
+        return;
     }
 
     /* Control Transfer */
@@ -558,7 +618,7 @@ static usb_er_t usb_hstd_set_submitutr (usb_utr_t *ptr)
         }
         else
         {
-            USB_PRINTF0("### Control transfer seaquence error \n");
+            USB_PRINTF0("### Control transfer sequence error \n");
 
             /* Control Read/Write End */
             usb_hstd_ctrl_end(ptr, (uint16_t) USB_DATA_ERR);
@@ -566,10 +626,8 @@ static usb_er_t usb_hstd_set_submitutr (usb_utr_t *ptr)
     }
     else
     {
-        g_ctrl.pipe = pipenum;
         usb_hstd_set_retransfer(ptr, pipenum); /* Data Transfer */
     }
-    return USB_OK;
 }
 /******************************************************************************
  End of function usb_hstd_set_submitutr
@@ -584,6 +642,11 @@ static usb_er_t usb_hstd_set_submitutr (usb_utr_t *ptr)
  ******************************************************************************/
 static void usb_hstd_set_retransfer (usb_utr_t *ptr, uint16_t pipe)
 {
+    if (USB_MAX_PIPE_NO < pipe)
+    {
+        return; /* Error */
+    }
+
     /* Data Transfer */
     if (usb_cstd_get_pipe_dir(ptr, pipe) == USB_DIR_H_IN)
     {
@@ -604,24 +667,22 @@ static void usb_hstd_set_retransfer (usb_utr_t *ptr, uint16_t pipe)
  Function Name   : usb_hstd_bus_int_disable
  Description     : Disable USB Bus Interrupts OVRCR, ATTCH, DTCH, and BCHG.
  Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t  port : Port number.
  Return          : none
  ******************************************************************************/
-void usb_hstd_bus_int_disable (usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bus_int_disable (usb_utr_t *ptr)
 {
     /* ATTCH interrupt disable */
-    usb_hstd_attch_disable(ptr, port);
+    usb_hstd_attch_disable(ptr);
 
     /* DTCH     interrupt disable */
-    usb_hstd_dtch_disable(ptr, port);
+    usb_hstd_dtch_disable(ptr);
 
     /* BCHG     interrupt disable */
-    usb_hstd_bchg_disable(ptr, port);
+    usb_hstd_bchg_disable(ptr);
 }
 /******************************************************************************
  End of function usb_hstd_bus_int_disable
  ******************************************************************************/
-
 
 /******************************************************************************
  Function Name   : usb_hstd_interrupt
@@ -749,7 +810,7 @@ static void usb_hstd_interrupt (usb_utr_t *ptr)
         case USB_INT_ATTCH0 :
 
             /* Port0 ATCH interrupt function */
-            usb_hstd_attach_process(ptr, (uint16_t) USB_PORT0);
+            usb_hstd_attach_process(ptr);
         break;
         case USB_INT_BCHG0 :
             USB_PRINTF0("BCHG int port0\n");
@@ -761,7 +822,7 @@ static void usb_hstd_interrupt (usb_utr_t *ptr)
             USB_PRINTF0("DTCH int port0\n");
 
             /* USB detach process */
-            usb_hstd_detach_process(ptr, (uint16_t) USB_PORT0);
+            usb_hstd_detach_process(ptr);
         break;
 
 #if USB_CFG_BC == USB_CFG_ENABLE
@@ -770,7 +831,7 @@ static void usb_hstd_interrupt (usb_utr_t *ptr)
             /* Port0 PDDETINT interrupt function */
             if (USB_IP1 == ptr->ip)
             {
-                usb_hstd_pddetint_process(ptr, (uint16_t)USB_PORT0);
+                usb_hstd_pddetint_process(ptr);
             }
 
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
@@ -784,8 +845,8 @@ static void usb_hstd_interrupt (usb_utr_t *ptr)
         break;
         case USB_INT_SOFR :
 #if USB_CFG_COMPLIANCE == USB_CFG_ENABLE
-            g_usb_hstd_responce_counter++;
-            if (USB_RESPONCE_COUNTER_VALUE == g_usb_hstd_responce_counter)
+            g_usb_hstd_response_counter[ptr->ip]++;
+            if (USB_RESPONCE_COUNTER_VALUE == g_usb_hstd_response_counter[ptr->ip])
             {
                 hw_usb_clear_enb_sofe( ptr );
                 disp_param.status = USB_CT_NORES;
@@ -800,6 +861,13 @@ static void usb_hstd_interrupt (usb_utr_t *ptr)
 
 #endif /* USB_CFG_COMPLIANCE == USB_CFG_ENABLE */
         break;
+
+#if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
+        case USB_INT_DXFIFO:
+            usb_cstd_dma_stop(ptr->ip, ptr->status);  /* Stop DMA,FIFO access */
+            usb_cstd_dma_send_continue(ptr, ptr->status);
+        break;
+#endif  /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
 
             /*** ERROR ***/
         case USB_INT_UNKNOWN :
@@ -830,32 +898,51 @@ usb_er_t usb_hstd_clr_feature (usb_utr_t *ptr, uint16_t addr, uint16_t epnum, us
     if (0xFF == epnum)
     {
         /* ClearFeature(Device) */
-        usb_shstd_clr_stall_request[0] = USB_CLEAR_FEATURE | USB_HOST_TO_DEV | USB_STANDARD | USB_DEVICE;
-        usb_shstd_clr_stall_request[1] = USB_DEV_REMOTE_WAKEUP;
-        usb_shstd_clr_stall_request[2] = (uint16_t) 0x0000;
+        usb_shstd_clr_stall_request[ptr->ip][0] = USB_CLEAR_FEATURE | USB_HOST_TO_DEV | USB_STANDARD | USB_DEVICE;
+        usb_shstd_clr_stall_request[ptr->ip][1] = USB_DEV_REMOTE_WAKEUP;
+        usb_shstd_clr_stall_request[ptr->ip][2] = (uint16_t) 0x0000;
     }
     else
     {
         /* ClearFeature(endpoint) */
-        usb_shstd_clr_stall_request[0] = USB_CLEAR_FEATURE | USB_HOST_TO_DEV | USB_STANDARD | USB_ENDPOINT;
-        usb_shstd_clr_stall_request[1] = USB_ENDPOINT_HALT;
-        usb_shstd_clr_stall_request[2] = epnum;
+        usb_shstd_clr_stall_request[ptr->ip][0] = USB_CLEAR_FEATURE | USB_HOST_TO_DEV | USB_STANDARD | USB_ENDPOINT;
+        usb_shstd_clr_stall_request[ptr->ip][1] = USB_ENDPOINT_HALT;
+        usb_shstd_clr_stall_request[ptr->ip][2] = epnum;
     }
-    usb_shstd_clr_stall_request[3] = (uint16_t) 0x0000;
-    usb_shstd_clr_stall_request[4] = addr;
+    usb_shstd_clr_stall_request[ptr->ip][3] = (uint16_t) 0x0000;
+    usb_shstd_clr_stall_request[ptr->ip][4] = addr;
 
-    usb_shstd_clr_stall_ctrl.p_tranadr = (void*) usb_shstd_clr_stall_data;
-    usb_shstd_clr_stall_ctrl.complete = complete;
-    usb_shstd_clr_stall_ctrl.tranlen = (uint32_t) usb_shstd_clr_stall_request[3];
-    usb_shstd_clr_stall_ctrl.keyword = USB_PIPE0;
-    usb_shstd_clr_stall_ctrl.p_setup = usb_shstd_clr_stall_request;
-    usb_shstd_clr_stall_ctrl.segment = USB_TRAN_END;
+    usb_shstd_clr_stall_ctrl[ptr->ip].p_tranadr = USB_NULL;
+    usb_shstd_clr_stall_ctrl[ptr->ip].complete = complete;
+    usb_shstd_clr_stall_ctrl[ptr->ip].tranlen = 0;
+    usb_shstd_clr_stall_ctrl[ptr->ip].keyword = USB_PIPE0;
+    usb_shstd_clr_stall_ctrl[ptr->ip].p_setup = usb_shstd_clr_stall_request[ptr->ip];
+    usb_shstd_clr_stall_ctrl[ptr->ip].segment = USB_TRAN_END;
 
-    usb_shstd_clr_stall_ctrl.ip = ptr->ip;
-    usb_shstd_clr_stall_ctrl.ipp = ptr->ipp;
+    usb_shstd_clr_stall_ctrl[ptr->ip].ip = ptr->ip;
+    usb_shstd_clr_stall_ctrl[ptr->ip].ipp = ptr->ipp;
 
-    ret_code = usb_hstd_transfer_start(&usb_shstd_clr_stall_ctrl);
+    ret_code = usb_hstd_transfer_start_req(&usb_shstd_clr_stall_ctrl[ptr->ip]);
 
+
+#if (BSP_CFG_RTOS_USED == 1)
+    if (USB_QOVR == ret_code)
+    {
+        /** Submit overlap error **/
+        /** Retry **/
+        /* WAIT_LOOP */
+        do
+        {
+            usb_cpu_delay_xms((uint16_t)2);
+            ret_code = usb_hstd_transfer_start(&usb_shstd_clr_stall_ctrl[ptr->ip]);
+        } while (USB_QOVR == ret_code);
+    }
+
+    if (USB_OK == ret_code)
+    {
+        ret_code = class_trans_wait_tmo(ptr, (uint16_t)3000);
+    }
+#endif /* (BSP_CFG_RTOS_USED == 1) */
     return ret_code;
 }
 /******************************************************************************
@@ -876,16 +963,29 @@ usb_er_t usb_hstd_clr_stall (usb_utr_t *ptr, uint16_t pipe, usb_cb_t complete)
     uint8_t dir_ep;
     uint16_t devsel;
 
+    if (USB_MAX_PIPE_NO < pipe)
+    {
+        return USB_ERROR; /* Error */
+    }
+
     dir_ep = usb_hstd_pipe_to_epadr(ptr, pipe);
     devsel = usb_hstd_get_device_address(ptr, pipe);
 
     err = usb_hstd_clr_feature(ptr, (uint16_t) (devsel >> USB_DEVADDRBIT), (uint16_t) dir_ep, complete);
+#if (BSP_CFG_RTOS_USED == 1)
+    if (USB_OK == err)
+    {
+        usb_cstd_clr_stall(ptr, usb_shstd_clr_stall_pipe[ptr->ip]);
+        hw_usb_set_sqclr(ptr, usb_shstd_clr_stall_pipe[ptr->ip]); /* SQCLR */
+    }
+#endif /* (BSP_CFG_RTOS_USED == 1) */
     return err;
 }/* End of function usb_hstd_clr_stall() */
 /******************************************************************************
  End of function usb_hstd_clr_stall
  ******************************************************************************/
 
+#if (BSP_CFG_RTOS_USED == 0)
 /******************************************************************************
  Function Name   : usb_hstd_clr_stall_result
  Description     : Callback function to notify HCD task that usb_hstd_clr_stall function is completed
@@ -901,7 +1001,7 @@ static void usb_hstd_clr_stall_result (usb_utr_t *ptr, uint16_t data1, uint16_t 
     usb_er_t err2;
     usb_utr_t *up;
 
-    /* Get mem pool blk */
+    /* Get memory pool blk */
     err = USB_PGET_BLK(USB_HCD_MPL, &p_blf);
     if (USB_OK == err)
     {
@@ -927,12 +1027,18 @@ static void usb_hstd_clr_stall_result (usb_utr_t *ptr, uint16_t data1, uint16_t 
     }
     else
     {
-        USB_PRINTF1("### hHcdSndMbx pget_blk error (%ld)\n", err);
+        /* Error */
+        /* WAIT_LOOP */
+        while (1)
+        {
+            /* error */
+        }
     }
 }
 /******************************************************************************
  End of function usb_hstd_clr_stall_result
  ******************************************************************************/
+#endif /* (BSP_CFG_RTOS_USED == 0) */
 
 /******************************************************************************
  Function Name   : usb_hstd_hcd_task
@@ -949,14 +1055,25 @@ void usb_hstd_hcd_task (usb_vp_int_t stacd)
     uint16_t pipenum;
     uint16_t msginfo;
     uint16_t connect_inf;
+#if (BSP_CFG_RTOS_USED == 0)
     uint16_t retval;
+#endif /* (BSP_CFG_RTOS_USED == 0) */
     usb_hcdinfo_t* hp;
 
+#if (BSP_CFG_RTOS_USED == 1)
+    /* WAIT_LOOP */
+    while (1)
+    {
+#endif /* (BSP_CFG_RTOS_USED == 1) */
     /* Receive message */
     err = USB_TRCV_MSG(USB_HCD_MBX, (usb_msg_t** )&p_mess, (usb_tm_t )10000);
     if (USB_OK != err)
     {
+#if (BSP_CFG_RTOS_USED == 1)
+        continue;
+#else /* (BSP_CFG_RTOS_USED == 1) */
         return;
+#endif /* (BSP_CFG_RTOS_USED == 1 */
     }
     else
     {
@@ -970,221 +1087,110 @@ void usb_hstd_hcd_task (usb_vp_int_t stacd)
         switch (msginfo)
         {
             case USB_MSG_HCD_INT :
-
                 /* USB INT */
                 usb_hstd_interrupt(ptr);
-            break;
-
-            case USB_MSG_HCD_PCUTINT :
-                ptr = (usb_utr_t*) p_usb_shstd_hcd_msg;
-
-                /* USB interrupt Handler */
-                usb_hstd_interrupt_handler(ptr);
-
-                /* USB INT */
-                usb_hstd_interrupt(ptr);
-                ptr->msginfo = USB_MSG_HCD_INT;
             break;
 
             case USB_MSG_HCD_SUBMITUTR :
-
                 /* USB Submit utr */
                 usb_hstd_set_submitutr(ptr);
             break;
 
             case USB_MSG_HCD_ATTACH :
-
                 /* USB attach / detach */
-                usb_hstd_attach_process(ptr, rootport);
-
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
+                usb_hstd_attach_process(ptr);
                 /* Callback */
                 (hp->complete)(ptr, rootport, USB_MSG_HCD_ATTACH);
-
                 /* Release Memory Block */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo);
             break;
 
             case USB_MSG_HCD_ATTACH_MGR :
-
                 /* USB attach / detach */
-                usb_hstd_attach_process(ptr, rootport);
-                connect_inf = usb_cstd_port_speed(ptr, rootport);
-
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
+                usb_hstd_attach_process(ptr);
+                connect_inf = usb_cstd_port_speed(ptr);
                 /* Callback */
                 (hp->complete)(ptr, rootport, connect_inf);
-
                 /* Release Memory Block */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo);
             break;
 
             case USB_MSG_HCD_DETACH :
-
                 /* USB detach process */
-                usb_hstd_detach_process(ptr, rootport);
-
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
+                usb_hstd_detach_process(ptr);
                 /* Callback */
                 (hp->complete)(ptr, rootport, USB_MSG_HCD_DETACH);
-
                 /* Release Memory Block */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo);
             break;
 
             case USB_MSG_HCD_DETACH_MGR :
-                hw_usb_clear_dvstctr(ptr, USB_PORT0, (USB_RWUPE | USB_USBRST | USB_RESUME | USB_UACT));
-
+                hw_usb_clear_dvstctr(ptr, (USB_RWUPE | USB_USBRST | USB_RESUME | USB_UACT));
                 usb_cpu_delay_xms(1);
-
                 /* interrupt disable */
-                usb_hstd_attch_disable(ptr, rootport);
-                usb_hstd_dtch_disable(ptr, rootport);
-                usb_hstd_bchg_disable(ptr, rootport);
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
-                (hp->complete)(ptr, rootport, USB_MSG_HCD_DETACH_MGR);
+                usb_hstd_attch_disable(ptr);
+                usb_hstd_dtch_disable(ptr);
+                usb_hstd_bchg_disable(ptr);
+                (hp->complete)(ptr, USB_NULL, USB_MSG_HCD_DETACH_MGR);
                 usb_hstd_hcd_rel_mpl(ptr, msginfo);
             break;
 
             case USB_MSG_HCD_USBRESET :
-
                 /* USB bus reset */
-                usb_hstd_bus_reset(ptr, rootport);
-
+                usb_hstd_bus_reset(ptr);
                 /* Check current port speed */
-                connect_inf = usb_cstd_port_speed(ptr, rootport);
-
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
+                connect_inf = usb_cstd_port_speed(ptr);
                 /* Callback */
-                (hp->complete)(ptr, rootport, connect_inf);
-
+                (hp->complete)(ptr, USB_NULL, connect_inf);
                 /* Release Memory Block */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo);
             break;
 
             case USB_MSG_HCD_REMOTE :
-
                 /* Suspend device */
-                g_usb_hstd_remort_port[rootport] = USB_SUSPENDED;
-                usb_hstd_suspend(ptr, rootport);
-
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
+                g_usb_hstd_remort_port[ptr->ip] = USB_SUSPENDED;
+                usb_hstd_suspend(ptr);
                 /* CallBack */
-                (hp->complete)(ptr, rootport, USB_MSG_HCD_REMOTE);
+                (hp->complete)(ptr, USB_NULL, USB_MSG_HCD_REMOTE);
 
                 /* Release Memory Block */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo);
             break;
 
             case USB_MSG_HCD_SUSPEND :
-                usb_hstd_suspend(ptr, rootport); /* Suspend device */
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
+                usb_hstd_suspend(ptr); /* Suspend device */
                 (hp->complete)(ptr, rootport, USB_MSG_HCD_SUSPEND);
                 usb_hstd_hcd_rel_mpl(ptr, msginfo); /* Release Memory Block */
             break;
 
             case USB_MSG_HCD_RESUME :
-                usb_hstd_resume_process(ptr, rootport); /* USB resume */
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
+                usb_hstd_resume_process(ptr); /* USB resume */
                 (hp->complete)(ptr, rootport, USB_MSG_HCD_RESUME); /* Callback */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo); /* Release Memory Block */
             break;
 
             case USB_MSG_HCD_VBON :
-
-                usb_hstd_ovrcr_enable(ptr, rootport); /* Interrupt Enable */
-
-                usb_hstd_vbus_control(ptr, rootport, (uint16_t) USB_VBON); /* USB VBUS control ON */
+                usb_hstd_ovrcr_enable(ptr); /* Interrupt Enable */
+                usb_hstd_vbus_control(ptr, (uint16_t) USB_VBON); /* USB VBUS control ON */
 #if USB_CFG_BC == USB_CFG_DISABLE
                 /* 100ms wait */
                 usb_cpu_delay_xms((uint16_t) 100u);
 
 #endif /* USB_CFG_BC == USB_CFG_DISABLE */
-
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
                 (hp->complete)(ptr, rootport, USB_MSG_HCD_VBON); /* Callback */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo); /* Release Memory Block */
             break;
 
             case USB_MSG_HCD_VBOFF :
-                usb_hstd_vbus_control(ptr, rootport, (uint16_t) USB_VBOFF); /* USB VBUS control OFF */
-                usb_hstd_ovrcr_disable(ptr, rootport);
-
+                usb_hstd_vbus_control(ptr, (uint16_t) USB_VBOFF); /* USB VBUS control OFF */
+                usb_hstd_ovrcr_disable(ptr);
                 usb_cpu_delay_xms((uint16_t) 100u); /* 100ms wait */
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
                 (hp->complete)(ptr, rootport, USB_MSG_HCD_VBOFF); /* Callback */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo); /* Release Memory Block */
             break;
 
             case USB_MSG_HCD_CLR_STALLBIT :
                 usb_cstd_clr_stall(ptr, pipenum); /* STALL */
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
                 (hp->complete)(ptr, (uint16_t) USB_NO_ARG, (uint16_t) USB_MSG_HCD_CLR_STALLBIT); /* Callback */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo); /* Release Memory Block */
             break;
@@ -1192,20 +1198,20 @@ void usb_hstd_hcd_task (usb_vp_int_t stacd)
             case USB_MSG_HCD_SQTGLBIT :
                 pipenum = ptr->keyword & USB_PIPENM;
                 usb_hstd_do_sqtgl(ptr, pipenum, ptr->keyword); /* SQ toggle */
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
                 (hp->complete)(ptr, (uint16_t) USB_NO_ARG, (uint16_t) USB_MSG_HCD_SQTGLBIT); /* Callback */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo); /* Release Memory Block */
             break;
 
             case USB_MSG_HCD_CLR_STALL :
+#if (BSP_CFG_RTOS_USED == 1)
+                usb_shstd_clr_stall_pipe[ptr->ip] = pipenum;
+                err = usb_hstd_clr_stall(ptr, pipenum, (usb_cb_t) &class_trans_result);
+                (hp->complete)(ptr, (uint16_t)err, USB_MSG_HCD_CLR_STALL);
+                /* Release Memory Block */
+                usb_hstd_hcd_rel_mpl(ptr, msginfo);
+#else /* (BSP_CFG_RTOS_USED == 1) */
                 usb_shstd_clr_stall_call = hp->complete;
-                usb_shstd_clr_stall_pipe = pipenum;
+                usb_shstd_clr_stall_pipe[ptr->ip] = pipenum;
                 err = usb_hstd_clr_stall(ptr, pipenum, (usb_cb_t) &usb_hstd_clr_stall_result);
                 if ( USB_QOVR == err)
                 {
@@ -1216,8 +1222,13 @@ void usb_hstd_hcd_task (usb_vp_int_t stacd)
                     /* Release Memory Block */
                     usb_hstd_hcd_rel_mpl(ptr, msginfo);
                 }
+#endif /* (BSP_CFG_RTOS_USED == 1) */
             break;
             case USB_MSG_HCD_CLR_STALL_RESULT :
+#if (BSP_CFG_RTOS_USED == 1)
+                /** Do nothing when running in RTOS
+                 * The result will be checked immediately after issuing a "USB_MSG_HCD_CLR_STALL" request. **/
+#else /* (BSP_CFG_RTOS_USED == 1) */
                 ptr = (usb_utr_t*) p_mess;
                 retval = ptr->status;
 
@@ -1235,44 +1246,24 @@ void usb_hstd_hcd_task (usb_vp_int_t stacd)
                 }
                 else
                 {
-                    usb_cstd_clr_stall(ptr, usb_shstd_clr_stall_pipe);
-                    hw_usb_set_sqclr(ptr, usb_shstd_clr_stall_pipe); /* SQCLR */
-                }
-                if (USB_NULL == usb_shstd_clr_stall_call)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
+                    usb_cstd_clr_stall(ptr, usb_shstd_clr_stall_pipe[ptr->ip]);
+                    hw_usb_set_sqclr(ptr, usb_shstd_clr_stall_pipe[ptr->ip]); /* SQCLR */
                 }
                 (*usb_shstd_clr_stall_call)(ptr, retval, USB_MSG_HCD_CLR_STALL);
 
                 /* Release Memory Block */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo);
+#endif /* (BSP_CFG_RTOS_USED == 1) */
             break;
 
             case USB_MSG_HCD_CLRSEQBIT :
                 hw_usb_set_sqclr(ptr, pipenum); /* SQCLR */
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
                 (hp->complete)(ptr, (uint16_t) USB_NO_ARG, (uint16_t) USB_MSG_HCD_CLRSEQBIT); /* Callback */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo);
             break;
 
             case USB_MSG_HCD_SETSEQBIT :
                 hw_usb_set_sqset(ptr, pipenum); /* SQSET */
-                if (USB_NULL == hp->complete)   /* Chack Callback function */
-                {
-                    while(1)
-                    {
-                        /* Error Stop */
-                    }
-                }
                 (hp->complete)(ptr, (uint16_t) USB_NO_ARG, (uint16_t) USB_MSG_HCD_SETSEQBIT); /* Callback */
                 usb_hstd_hcd_rel_mpl(ptr, msginfo); /* Release Memory Block */
             break;
@@ -1296,7 +1287,7 @@ void usb_hstd_hcd_task (usb_vp_int_t stacd)
                 }
                 else
                 {
-                    USB_PRINTF1("### Host not transferd %d\n",pipenum);
+                    USB_PRINTF1("### Host not transfer %d\n",pipenum);
                 }
 
                 /* Release Memory Block */
@@ -1322,7 +1313,7 @@ void usb_hstd_hcd_task (usb_vp_int_t stacd)
                 }
                 else
                 {
-                    USB_PRINTF1("### Host not transferd %d\n",pipenum);
+                    USB_PRINTF1("### Host not transfer %d\n",pipenum);
                 }
 
                 /* Release Memory Block */
@@ -1339,6 +1330,9 @@ void usb_hstd_hcd_task (usb_vp_int_t stacd)
             break;
         }
     }
+#if (BSP_CFG_RTOS_USED == 1)
+    } /* End of while(1) */
+#endif /* (BSP_CFG_RTOS_USED == 1) */
 }
 /******************************************************************************
  End of function usb_hstd_hcd_task
@@ -1361,6 +1355,11 @@ void usb_hstd_send_start (usb_utr_t *ptr, uint16_t pipe)
     uint16_t dma_ch;
 #endif  /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
 
+    if (USB_MAX_PIPE_NO < pipe)
+    {
+        return; /* Error */
+    }
+
     /* Evacuation pointer */
     pp = g_p_usb_hstd_pipe[ptr->ip][pipe];
     length = pp->tranlen;
@@ -1372,10 +1371,10 @@ void usb_hstd_send_start (usb_utr_t *ptr, uint16_t pipe)
         usb_hstd_do_sqtgl(ptr, pipe, pp->pipectr);
     }
 
-    usb_cstd_select_nak(ptr, pipe); /* Select NAK */
-    g_usb_hstd_data_cnt[ptr->ip][pipe] = length; /* Set data count */
-    g_p_usb_hstd_data[ptr->ip][pipe] = (uint8_t*) pp->p_tranadr; /* Set data pointer */
-    g_usb_hstd_ignore_cnt[ptr->ip][pipe] = (uint16_t) 0; /* Ignore count clear */
+    usb_cstd_set_nak(ptr, pipe);                                    /* Select NAK */
+    g_usb_hstd_data_cnt[ptr->ip][pipe] = length;                    /* Set data count */
+    gp_usb_hstd_data_ptr[ptr->ip][pipe] = (uint8_t*) pp->p_tranadr; /* Set data pointer */
+    g_usb_hstd_ignore_cnt[ptr->ip][pipe] = (uint16_t) 0;            /* Ignore count clear */
 
     hw_usb_clear_status_bemp(ptr, pipe); /* BEMP Status Clear */
     hw_usb_clear_sts_brdy(ptr, pipe); /* BRDY Status Clear */
@@ -1394,28 +1393,11 @@ void usb_hstd_send_start (usb_utr_t *ptr, uint16_t pipe)
 
         break;
 
-        case USB_D0USE : /* D0FIFO use */
-
-            /* D0 FIFO access is NG */
-            USB_PRINTF1("### USB-ITRON is not support(SND-D0USE:pipe%d)\n", pipe);
-            usb_hstd_forced_termination(ptr, pipe, (uint16_t) USB_DATA_ERR);
-
-        break;
-
-            /* D1FIFO use */
-        case USB_D1USE :
-
-            /* Buffer to FIFO data write */
-            usb_hstd_buf_to_fifo(ptr, pipe, useport);
-            usb_cstd_set_buf(ptr, pipe); /* Set BUF */
-
-        break;
-
 #if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
         /* D0FIFO DMA */
-        case USB_D0DMA:
+        case USB_D0USE:
         /* D1FIFO DMA */
-        case USB_D1DMA:
+        case USB_D1USE:
             if (USB_IP0 == ptr->ip)
             {
                 dma_ch = USB_CFG_USB0_DMA_TX;
@@ -1424,7 +1406,7 @@ void usb_hstd_send_start (usb_utr_t *ptr, uint16_t pipe)
             {
                 dma_ch = USB_CFG_USB1_DMA_TX;
             }
-            usb_dma_set_ch_no(ptr->ip, useport, dma_ch);
+            usb_cstd_dma_set_ch_no(ptr->ip, useport, dma_ch);
             /* Setting for use PIPE number */
             g_usb_cstd_dma_pipe[ptr->ip][dma_ch] = pipe;
             /* Buffer size */
@@ -1444,7 +1426,7 @@ void usb_hstd_send_start (usb_utr_t *ptr, uint16_t pipe)
                         - (g_usb_hstd_data_cnt[ptr->ip][pipe] % g_usb_cstd_dma_fifo[ptr->ip][dma_ch]));
             }
 
-            usb_cstd_buf2dxfifo_start_dma( ptr, pipe, useport );
+            usb_cstd_dma_send_start( ptr, pipe, useport );
 
             /* Set BUF */
             usb_cstd_set_buf(ptr, pipe);
@@ -1475,6 +1457,11 @@ void usb_hstd_send_start (usb_utr_t *ptr, uint16_t pipe)
 void usb_hstd_fifo_to_buf (usb_utr_t *ptr, uint16_t pipe, uint16_t useport)
 {
     uint16_t end_flag;
+
+    if (USB_MAX_PIPE_NO < pipe)
+    {
+        return; /* Error */
+    }
 
     /* Ignore count clear */
     g_usb_hstd_ignore_cnt[ptr->ip][pipe] = (uint16_t) 0;
@@ -1542,6 +1529,11 @@ void usb_hstd_fifo_to_buf (usb_utr_t *ptr, uint16_t pipe, uint16_t useport)
 void usb_hstd_buf_to_fifo (usb_utr_t *ptr, uint16_t pipe, uint16_t useport)
 {
     uint16_t end_flag;
+
+    if (USB_MAX_PIPE_NO < pipe)
+    {
+        return; /* Error */
+    }
 
     /* Disable Ready Interrupt */
     hw_usb_clear_brdyenb(ptr, pipe);
@@ -1628,30 +1620,15 @@ void usb_class_request_complete (usb_utr_t *mess, uint16_t data1, uint16_t data2
     ctrl.setup.index = mess->p_setup[2];
     ctrl.setup.length = mess->p_setup[3];
     ctrl.address = mess->p_setup[4];
-    ctrl.size = ctrl.setup.length - g_usb_hstd_data_cnt[mess->ip][USB_PIPE0];
+    ctrl.size = ctrl.setup.length - g_usb_hstd_data_cnt_pipe0[mess->ip];
+#if (BSP_CFG_RTOS_USED == 1)
+    ctrl.p_data = (void *)mess->cur_task_hdl;
+#endif /* (BSP_CFG_RTOS_USED == 1) */
+
     usb_set_event(USB_STS_REQUEST_COMPLETE, &ctrl); /* Set Event()  */
 }
 /******************************************************************************
  End of function usb_class_request_complete
- ******************************************************************************/
-
-/******************************************************************************
- Function Name   : usb_hstd_set_pipe_registration
- Description     : Set pipe configuration of USB H/W. Set the content of the
-                 : specified pipe information table (2nd argument).
- Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
-                 : uint16_t *table       : DEF_EP table pointer.
-                 : uint16_t pipe         : Pipe number.
- Return          : usb_err_t error code  : USB_OK etc.
- ******************************************************************************/
-usb_er_t usb_hstd_set_pipe_registration (usb_utr_t *ptr, uint16_t *table, uint16_t pipe)
-{
-    usb_hstd_set_pipe_register(ptr, pipe, table);
-
-    return USB_SUCCESS;
-}
-/******************************************************************************
- End of function usb_hstd_set_pipe_registration
  ******************************************************************************/
 
 /******************************************************************************
@@ -1667,10 +1644,17 @@ usb_er_t usb_hstd_transfer_end (usb_utr_t *ptr, uint16_t pipe, uint16_t status)
     uint16_t msg;
     usb_er_t err;
 
+#if (BSP_CFG_RTOS_USED == 0)
+    if (USB_MAX_PIPE_NO < pipe)
+    {
+        return USB_ERROR; /* Error */
+    }
+
     if (USB_ON == g_usb_hstd_pipe_request[ptr->ip][pipe])
     {
         return USB_ERROR;
     }
+#endif /* (BSP_CFG_RTOS_USED == 0) */
 
     if (USB_NULL == g_p_usb_hstd_pipe[ptr->ip][pipe])
     {
@@ -1695,59 +1679,6 @@ usb_er_t usb_hstd_transfer_end (usb_utr_t *ptr, uint16_t pipe, uint16_t status)
  ******************************************************************************/
 
 /******************************************************************************
- Function Name   : usb_hstd_mgr_open
- Description     : Initialize global variable that contains registration status
-                 : of HDCD.
- Arguments       : usb_utr_t *ptr       : Pointer to usb_utr_t structure.
- Return          : none
- ******************************************************************************/
-usb_er_t usb_hstd_mgr_open (usb_utr_t *ptr)
-{
-    usb_er_t err = USB_OK;
-    usb_hcdreg_t *driver;
-    uint16_t i;
-
-    /* Manager Mode */
-    g_usb_hstd_mgr_mode[ptr->ip][0] = USB_DETACHED;
-    g_usb_hstd_mgr_mode[ptr->ip][1] = USB_DETACHED;
-    g_usb_hstd_device_speed[ptr->ip] = USB_NOCONNECT;
-
-    /* Device address */
-    g_usb_hstd_device_addr[ptr->ip] = USB_DEVICE_0;
-
-    /* Device driver number */
-    g_usb_hstd_device_num[ptr->ip] = 0;
-    for (i = USB_PIPE0; i <= USB_MAX_PIPE_NO; i++)
-    {
-        g_usb_hstd_suspend_pipe[ptr->ip][i] = USB_OK;
-    }
-
-    for (i = 0; i < (USB_MAXDEVADDR + 1u); i++)
-    {
-        driver = &g_usb_hstd_device_drv[ptr->ip][i];
-
-        driver->rootport = USB_NOPORT; /* Root port */
-        driver->devaddr = USB_NODEVICE; /* Device address */
-        driver->devstate = USB_DETACHED; /* Device state */
-        driver->ifclass = (uint16_t) USB_IFCLS_NOT; /* Interface Class : NO class */
-        g_usb_hstd_device_info[ptr->ip][i][0] = USB_NOPORT; /* Root port */
-        g_usb_hstd_device_info[ptr->ip][i][1] = USB_DETACHED; /* Device state */
-        g_usb_hstd_device_info[ptr->ip][i][2] = (uint16_t) 0; /* Not configured */
-        g_usb_hstd_device_info[ptr->ip][i][3] = (uint16_t) USB_IFCLS_NOT; /* Interface Class : NO class */
-        g_usb_hstd_device_info[ptr->ip][i][4] = (uint16_t) USB_NOCONNECT; /* No connect */
-    }
-
-    USB_PRINTF0("*** Install USB-MGR ***\n");
-
-    usb_cstd_set_task_pri(USB_MGR_TSK, USB_PRI_2);
-
-    return err;
-}
-/******************************************************************************
- End of function usb_hstd_mgr_open
- ******************************************************************************/
-
-/******************************************************************************
  Function Name   : usb_hstd_driver_registration
  Description     : The HDCD information registered in the class driver structure
                  : is registered in HCD.
@@ -1768,30 +1699,16 @@ void usb_hstd_driver_registration (usb_utr_t *ptr, usb_hcdreg_t *callback)
         driver->devstate = USB_DETACHED; /* Device state */
         driver->ifclass = callback->ifclass; /* Interface Class */
         driver->p_tpl = callback->p_tpl; /* Target peripheral list */
-        driver->p_pipetbl = callback->p_pipetbl; /* Pipe Define Table address */
         driver->classinit = callback->classinit; /* Driver init */
         driver->classcheck = callback->classcheck; /* Driver check */
         driver->devconfig = callback->devconfig; /* Device configured */
         driver->devdetach = callback->devdetach; /* Device detach */
         driver->devsuspend = callback->devsuspend; /* Device suspend */
         driver->devresume = callback->devresume; /* Device resume */
-
-        if (USB_NULL == driver->classinit)   /* Chack Callback function */
-        {
-            while(1)
-            {
-                /* Error Stop */
-            }
-        }
         /* Initialized device driver */
         (*driver->classinit)(ptr, driver->devaddr, (uint16_t) USB_NO_ARG);
-
         g_usb_hstd_device_num[ptr->ip]++;
         USB_PRINTF1("*** Registration driver 0x%02x\n",driver->ifclass);
-    }
-    else
-    {
-        USB_PRINTF0("### Registration device driver over\n");
     }
 }
 /******************************************************************************
@@ -1818,6 +1735,7 @@ void usb_hstd_driver_release (usb_utr_t *ptr, uint8_t devclass)
     }
     else
     {
+        /* WAIT_LOOP */
         for (flg = 0u, i = 0u
         ; (i < (USB_MAXDEVADDR + 1u)) && (0u == flg); i++)
         {
@@ -1843,177 +1761,33 @@ void usb_hstd_driver_release (usb_utr_t *ptr, uint8_t devclass)
  End of function usb_hstd_driver_release
  ******************************************************************************/
 
-
-/******************************************************************************
- Function Name   : usb_hstd_chk_pipe_info
- Description     : Analyze descriptor information of the connected USB Device,
-                   and reflect it in the pipe information table.
- Argument        : uint16_t speed            : USB Device speed
-                 : uint16_t *ep_tbl          : DEF_EP table pointer
-                 : uint8_t  *descriptor      : Endpoint Descriptor table
- Return          : uint16_t                  : DIR_H_IN / DIR_H_OUT / USB_ERROR
- ******************************************************************************/
-uint16_t usb_hstd_chk_pipe_info (uint16_t speed, uint16_t *ep_tbl, uint8_t *descriptor)
-{
-    uint16_t pipe_cfg;
-    uint16_t pipe_maxp;
-    uint16_t pipe_peri;
-    uint16_t retval;
-    uint16_t work1;
-    uint16_t work2;
-
-    /* Check Endpoint descriptor */
-    /* Descriptor Type */
-    if (USB_DT_ENDPOINT == descriptor[1])
-    {
-        switch ((uint16_t) (descriptor[3] & USB_EP_TRNSMASK))
-        {
-            /* Control Endpoint */
-            case USB_EP_CNTRL :
-                USB_PRINTF0("###Control pipe is not support.\n");
-                return USB_ERROR;
-            break;
-
-                /* Isochronous Endpoint */
-            case USB_EP_ISO :
-                if ((USB_PIPE1 != ep_tbl[0]) && (USB_PIPE2 != ep_tbl[0]))
-                {
-                    USB_PRINTF0("###Iso pipe is 1 or 2.\n");
-                    return USB_ERROR;
-                }
-                USB_PRINTF0(" ISOCH ");
-                pipe_cfg = USB_TYPFIELD_ISO;
-            break;
-
-                /* Bulk Endpoint */
-            case USB_EP_BULK :
-                if ((ep_tbl[0] < USB_PIPE1) || (ep_tbl[0] > USB_PIPE5))
-                {
-                    USB_PRINTF0("###Bulk pipe is 1 to 5.\n");
-                    return USB_ERROR;
-                }
-                pipe_cfg = USB_TYPFIELD_BULK; /* USB_PRINTF0(" BULK "); */
-            break;
-
-                /* Interrupt Endpoint */
-            case USB_EP_INT :
-                if ((ep_tbl[0] < USB_PIPE6) || (ep_tbl[0] > USB_MAX_PIPE_NO))
-                {
-                    USB_PRINTF0("###Int pipe is 6 to 9.\n");
-                    return USB_ERROR;
-                }
-                pipe_cfg = USB_TYPFIELD_INT; /* USB_PRINTF0(" INT "); */
-            break;
-            default :
-                USB_PRINTF0("###Endpoint Descriptor error.\n");
-                return USB_ERROR;
-            break;
-        }
-
-        /* Set pipe configuration table */
-        if ((descriptor[2] & USB_EP_DIRMASK) == USB_EP_IN)
-        {
-            /* IN(receive) */
-
-            if ((descriptor[3] & USB_EP_TRNSMASK) != USB_EP_ISO)
-            {
-                /* Compulsory SHTNAK */
-                pipe_cfg |= (USB_CFG_SHTNAKON | USB_DIR_H_IN);
-            }
-            else
-            {
-                pipe_cfg |= USB_DIR_H_IN;
-            }
-            pipe_cfg |= (uint16_t) (ep_tbl[1] & (USB_DBLBFIELD | USB_CNTMDFIELD));
-            retval = USB_DIR_H_IN;
-        }
-        else
-        {
-            /* OUT(send) */
-            pipe_cfg |= (uint16_t) ((uint16_t) (ep_tbl[1] & (USB_DBLBFIELD | USB_CNTMDFIELD)) | USB_DIR_H_OUT);
-            retval = USB_DIR_H_OUT;
-        }
-
-        /* Endpoint number set */
-        pipe_cfg |= (uint16_t) (descriptor[2] & USB_EP_NUMMASK);
-
-        /* Max packet size set */
-        pipe_maxp = (uint16_t) (descriptor[4] | (uint16_t) ((uint16_t) descriptor[5] << 8u));
-
-        /* Buffer flash */
-        pipe_peri = (uint16_t) (ep_tbl[4] & (~USB_IITVFIELD));
-        if (0 != descriptor[6])
-        {
-            /* FS/LS interrupt */
-            if (((uint16_t) (pipe_cfg & USB_TYPFIELD) == USB_TYPFIELD_INT) && (USB_HSCONNECT != speed))
-            {
-                work1 = descriptor[6];
-                work2 = 0;
-                for (; 0 != work1; work2++)
-                {
-                    work1 = (uint16_t) (work1 >> 1);
-                }
-                if (0 != work2)
-                {
-                    /* Interval time */
-                    pipe_peri |= (uint16_t) (work2 - 1);
-                }
-            }
-            else
-            {
-                if (descriptor[6] <= 8)
-                {
-                    /* Interval time */
-                    pipe_peri |= (uint16_t) ((descriptor[6] - 1u) & (USB_IITVFIELD));
-                }
-                else
-                {
-                    /* Interval time */
-                    pipe_peri |= ((uint16_t) (0x00FFu) & (USB_IITVFIELD));
-                }
-            }
-        }
-        ep_tbl[1] = pipe_cfg;
-        ep_tbl[3] = pipe_maxp;
-        ep_tbl[4] = pipe_peri;
-
-        /* USB_PRINTF4(" pipe%d configuration %04X %04X %04X\n", ep_tbl[0], ep_tbl[1], ep_tbl[3], ep_tbl[4]); */
-    }
-    else
-    {
-        USB_PRINTF0("###Endpoint Descriptor error.\n");
-        return USB_ERROR;
-    }
-    return (retval);
-}
-/******************************************************************************
- End of function usb_hstd_chk_pipe_info
- ******************************************************************************/
-
 /******************************************************************************
  Function Name   : usb_hstd_set_pipe_info
  Description     : Copy information of pipe information table from source
                  :  (2nd argument) to destination (1st argument)
- Argument        : uint16_t *dst_ep_tbl      : DEF_EP table pointer(destination)
-                 : uint16_t *src_ep_tbl      : DEF_EP table pointer(source)
-                 : uint16_t length           : Table length
+ Argument        : usb_pipe_table_t *dst_ep_tbl      : DEF_EP table pointer(destination)
+                 : usb_pipe_table_t *src_ep_tbl      : DEF_EP table pointer(source)
  Return          : none
  ******************************************************************************/
-void usb_hstd_set_pipe_info (uint16_t *dst_ep_tbl, uint16_t *src_ep_tbl, uint16_t length)
+void usb_hstd_set_pipe_info (uint16_t ip_no, uint16_t pipe_no, usb_pipe_table_reg_t *src_ep_tbl)
 {
-    uint16_t i;
-
-    /*USB_PRINTF3("!!! %lx %lx %d\n", dst_ep_tbl, src_ep_tbl, length);*/
-
-    for (i = 0; i < length; i++)
+    g_usb_pipe_table[ip_no][pipe_no].use_flag  = USB_TRUE;
+    g_usb_pipe_table[ip_no][pipe_no].pipe_cfg  = src_ep_tbl->pipe_cfg;
+#if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
+    if (USB_IP1 == ip_no)
     {
-        dst_ep_tbl[i] = src_ep_tbl[i];
+        g_usb_pipe_table[ip_no][pipe_no].pipe_buf  = src_ep_tbl->pipe_buf;
     }
+#endif /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
+    g_usb_pipe_table[ip_no][pipe_no].pipe_maxp = src_ep_tbl->pipe_maxp;
+    g_usb_pipe_table[ip_no][pipe_no].pipe_peri = src_ep_tbl->pipe_peri;
 }
 /******************************************************************************
  End of function usb_hstd_set_pipe_info
  ******************************************************************************/
 
+
+#if (BSP_CFG_RTOS_USED == 0)
 /******************************************************************************
  Function Name   : usb_hstd_return_enu_mgr
  Description     : Continuous enumeration is requested to MGR task (API for nonOS)
@@ -2030,21 +1804,7 @@ void usb_hstd_return_enu_mgr (usb_utr_t *ptr, uint16_t cls_result)
  End of function usb_hstd_return_enu_mgr
  ******************************************************************************/
 
-/******************************************************************************
- Function Name   : usb_hstd_enu_wait
- Description     : Request to change enumeration priority(API for nonOS)
- Arguments       : usb_utr_t *ptr       : Pointer to usb_utr_t structure.
-                 : uint16_t taskID      : Enumeration wait Task ID
- Return          : none
- ******************************************************************************/
-void usb_hstd_enu_wait (usb_utr_t *ptr, uint8_t task_id)
-{
-    g_usb_hstd_enu_wait[ptr->ip] = task_id;
-
-}
-/******************************************************************************
- End of function usb_hstd_enu_wait
- ******************************************************************************/
+#endif  /* (BSP_CFG_RTOS_USED == 0) */
 
 /******************************************************************************
  Function Name   : usb_hstd_change_device_state
@@ -2081,9 +1841,9 @@ usb_er_t usb_hstd_change_device_state (usb_utr_t *ptr, usb_cb_t complete, uint16
 
         default :
 
-            /* Get mem pool blk */
+            /* Get memory pool blk */
             err = USB_PGET_BLK(USB_MGR_MPL, &p_blf);
-            if (err == USB_SUCCESS)
+            if (USB_SUCCESS == err)
             {
                 USB_PRINTF2("*** member%d : msginfo=%d ***\n", member, msginfo);
                 hp = (usb_hcdinfo_t*) p_blf;
@@ -2094,14 +1854,17 @@ usb_er_t usb_hstd_change_device_state (usb_utr_t *ptr, usb_cb_t complete, uint16
 
                 hp->ipp = ptr->ipp;
                 hp->ip = ptr->ip;
+#if (BSP_CFG_RTOS_USED == 1)
+                hp->cur_task_hdl = xTaskGetCurrentTaskHandle();
+#endif /* BSP_CFG_RTOS_USED == 1 */
 
                 /* Send message */
                 err = USB_SND_MSG(USB_MGR_MBX, (usb_msg_t* )p_blf);
-                if (err != USB_SUCCESS)
+                if (USB_SUCCESS != err)
                 {
                     USB_PRINTF1("### hMgrChangeDeviceState snd_msg error (%ld)\n", err);
                     err2 = USB_REL_BLK(USB_MGR_MPL, (usb_mh_t )p_blf);
-                    if (err2 != USB_SUCCESS)
+                    if (USB_SUCCESS != err2)
                     {
                         USB_PRINTF1("### hMgrChangeDeviceState rel_blk error (%ld)\n", err2);
                     }
@@ -2109,8 +1872,12 @@ usb_er_t usb_hstd_change_device_state (usb_utr_t *ptr, usb_cb_t complete, uint16
             }
             else
             {
-                USB_PRINTF1("### hMgrChangeDeviceState pget_blk error (%ld)\n", err);
-                err = USB_ERROR;
+                /* Error */
+                /* WAIT_LOOP */
+                while (1)
+                {
+                    /* error */
+                }
             }
         break;
     }
@@ -2128,6 +1895,7 @@ usb_er_t usb_hstd_change_device_state (usb_utr_t *ptr, usb_cb_t complete, uint16
  ******************************************************************************/
 usb_err_t usb_hstd_hcd_open (usb_utr_t *ptr)
 {
+    static uint8_t is_init = USB_NO;
     uint16_t i;
     uint16_t j;
     usb_err_t err = USB_SUCCESS;
@@ -2141,18 +1909,56 @@ usb_err_t usb_hstd_hcd_open (usb_utr_t *ptr)
     }
 
     /* Global Init */
+    if (USB_NO == is_init)
+    {
+#if (BSP_CFG_RTOS_USED == 0)
+        usb_shstd_clr_stall_call = 0;
+#endif /* (BSP_CFG_RTOS_USED == 0) */
+
+        usb_shstd_clr_stall_pipe[0] = 0;
+        memset((void *)&usb_shstd_clr_stall_ctrl[0], 0, sizeof(usb_utr_t));
+        memset((void *)&usb_shstd_clr_stall_request[0], 0, (5*2));
+#if (USB_NUM_USBIP == 2)
+        usb_shstd_clr_stall_pipe[1] = 0;
+        memset((void *)&usb_shstd_clr_stall_ctrl[1], 0, sizeof(usb_utr_t));
+        memset((void *)&usb_shstd_clr_stall_request[1], 0, (5*2));
+#endif
+        is_init = USB_YES;
+    }
+
+    /* WAIT_LOOP */
+    for (i =0; i< (USB_MAXDEVADDR + 1); i++)
+    {
+        memset((void *)&g_usb_hstd_device_drv[ptr->ip][i], 0, sizeof(usb_hcdreg_t));
+        memset((void *)&g_usb_hstd_device_info[ptr->ip][i], 0, (8 * 2));
+        g_usb_hstd_dcp_register[ptr->ip][i] = 0;
+        memset((void *)&g_usb_ctrl_request[ptr->ip][i], 0, sizeof(usb_ctrl_trans_t));
+    }
+
+    /* WAIT_LOOP */
+    for (i =0; i< (USB_MAX_PIPE_NO + 1); i++)
+    {
+        g_usb_hstd_data_cnt[ptr->ip][i] = 0;
+        gp_usb_hstd_data_ptr[ptr->ip][i] = 0;
+        g_usb_hstd_ignore_cnt[ptr->ip][i] = 0;
+#if (BSP_CFG_RTOS_USED == 0)
+        g_usb_hstd_pipe_request[ptr->ip][i] = 0;
+#endif /* (BSP_CFG_RTOS_USED == 0) */
+    }
+
+    g_usb_hstd_device_addr[ptr->ip] = 0;
+    g_usb_hstd_device_speed[ptr->ip] = 0;
+    g_usb_hstd_device_num[ptr->ip] = 0;
+
     /* Control transfer stage management */
     g_usb_hstd_ctsq[ptr->ip] = USB_IDLEST;
 
-    g_usb_hstd_remort_port[0] = USB_DEFAULT;
-    g_usb_hstd_remort_port[1] = USB_DEFAULT;
+    g_usb_hstd_remort_port[ptr->ip] = USB_DEFAULT;
 
-    for (j = 0; j < USB_NUM_USBIP; ++j)
+    /* WAIT_LOOP */
+    for (i = USB_PIPE0; i <= USB_MAX_PIPE_NO; i++)
     {
-        for (i = USB_PIPE0; i <= USB_MAX_PIPE_NO; i++)
-        {
-            g_p_usb_hstd_pipe[j][i] = (usb_utr_t*) USB_NULL;
-        }
+        g_p_usb_hstd_pipe[j][i] = (usb_utr_t*) USB_NULL;
     }
 
 #if USB_CFG_BC == USB_CFG_ENABLE
@@ -2191,7 +1997,6 @@ void usb_hstd_dummy_function (usb_utr_t *ptr, uint16_t data1, uint16_t data2)
  End of function usb_hstd_dummy_function
  ******************************************************************************/
 
-#if defined(USB_CFG_HHID_USE)
 /******************************************************************************
  Function Name   : usb_hstd_suspend_complete
  Description     : usb_hstd_change_device_state callback (Suspend)
@@ -2202,7 +2007,19 @@ void usb_hstd_dummy_function (usb_utr_t *ptr, uint16_t data1, uint16_t data2)
  ******************************************************************************/
 void usb_hstd_suspend_complete (usb_utr_t *ptr, uint16_t data1, uint16_t data2)
 {
+    usb_ctrl_t ctrl;
+    
+#if (BSP_CFG_RTOS_USED == 0)
     g_usb_change_device_state[ptr->ip] &= (~(1 << USB_STS_SUSPEND));
+#endif /* BSP_CFG_RTOS_USED == 0 */
+
+    ctrl.module     = ptr->ip;      /* USB Module Number */
+    ctrl.address    = 1;            /* Device Address Number */
+#if (BSP_CFG_RTOS_USED == 1)
+    ctrl.p_data = (void *)ptr->cur_task_hdl;
+#endif /* (BSP_CFG_RTOS_USED == 1) */
+
+    usb_set_event(USB_STS_SUSPEND, &ctrl);
 }
 /******************************************************************************
  End of function usb_hstd_suspend_complete
@@ -2218,9 +2035,20 @@ void usb_hstd_suspend_complete (usb_utr_t *ptr, uint16_t data1, uint16_t data2)
  ******************************************************************************/
 void usb_hstd_resume_complete (usb_utr_t *ptr, uint16_t data1, uint16_t data2)
 {
+    usb_ctrl_t ctrl;
+
+#if (BSP_CFG_RTOS_USED == 0)
     g_usb_change_device_state[ptr->ip] &= (~(1 << USB_STS_RESUME));
+#endif /* BSP_CFG_RTOS_USED == 0 */
+
+    ctrl.module     = ptr->ip;
+    ctrl.address    = 1;
+#if (BSP_CFG_RTOS_USED == 1)
+    ctrl.p_data = (void *)ptr->cur_task_hdl;
+#endif /* (BSP_CFG_RTOS_USED == 1) */
+
+    usb_set_event(USB_STS_RESUME, &ctrl);
 }/* End of function usb_hstd_resume_complete */
-#endif  /* defined(USB_CFG_HHID_USE) */
 
 
 /******************************************************************************
@@ -2235,7 +2063,7 @@ void usb_hstd_device_information (usb_utr_t *ptr, uint16_t devaddr, uint16_t *tb
 {
     uint16_t    i, port, *p;
 
-    if( devaddr == 0 )
+    if (0 == devaddr)
     {
         for( p = tbl, i = 0; i < 8; ++i )
         {
@@ -2243,18 +2071,10 @@ void usb_hstd_device_information (usb_utr_t *ptr, uint16_t devaddr, uint16_t *tb
         }
 
         port = g_usb_hstd_device_info[ptr->ip][devaddr][0];
-        if( port != USB_NOPORT )
-        {
-            tbl[0] = port;
-            tbl[1] = g_usb_hstd_mgr_mode[ptr->ip][port];
-            tbl[4] = g_usb_hstd_device_info[ptr->ip][devaddr][4];
-        }
-        else
-        {
-            tbl[0] = port;
-            tbl[1] = g_usb_hstd_mgr_mode[ptr->ip][0];
-            tbl[4] = g_usb_hstd_device_info[ptr->ip][devaddr][4];
-        }
+        tbl[0] = port;
+        tbl[1] = g_usb_hstd_mgr_mode[ptr->ip];
+        tbl[4] = g_usb_hstd_device_info[ptr->ip][devaddr][4];
+
     }
     else
     {
@@ -2263,8 +2083,7 @@ void usb_hstd_device_information (usb_utr_t *ptr, uint16_t devaddr, uint16_t *tb
             tbl[i] = g_usb_hstd_device_info[ptr->ip][devaddr][i];
         }
     }
-    tbl[8] = g_usb_hstd_mgr_mode[ptr->ip][0];
-    tbl[9] = g_usb_hstd_mgr_mode[ptr->ip][1];
+    tbl[8] = g_usb_hstd_mgr_mode[ptr->ip];
 }
 /******************************************************************************
  End of function usb_hstd_device_information
@@ -2295,13 +2114,357 @@ void usb_host_registration (usb_utr_t *ptr)
 #endif /* defined(USB_CFG_HMSC_USE) */
 
 #if defined(USB_CFG_HVND_USE)
-    usb_hvendor_registration(ptr);
+    usb_hvnd_registration(ptr);
 
 #endif /* defined(USB_CFG_HVND_USE) */
 }
 /******************************************************************************
  End of function usb_host_registration
  ******************************************************************************/
+
+/******************************************************************************
+ Function Name   : usb_hstd_transfer_start
+ Description     : Send a request for data transfer to HCD (Host Control Driver) 
+                 : using the specified pipe.
+ Arguments       : usb_utr_t *ptr : Pointer to usb_utr_t structure.
+ Return          : usb_er_t       : USB_OK/USB_QOVR/USB_ERROR
+ ******************************************************************************/
+usb_er_t usb_hstd_transfer_start (usb_utr_t *ptr)
+{
+    usb_er_t        err;
+
+    /* Check enumeration  */
+    if (USB_PIPE0 == ptr->keyword)
+    {
+        if (USB_DEFAULT == g_usb_hstd_mgr_mode[ptr->ip])
+        {
+            return USB_QOVR;
+        }
+    }
+
+    err = usb_hstd_transfer_start_req( ptr );
+
+    return err;
+}
+/******************************************************************************
+ End of function usb_hstd_transfer_start
+ ******************************************************************************/
+
+/******************************************************************************
+ Function Name   : usb_hstd_connect_err_event_set
+ Description     : Set event for "USB_STS_NOT_SUPPORT"
+ Arguments       : uint16_t ip_no  : IP no.(USB_IP0/USB_IP1)
+ Return          : none
+ ******************************************************************************/
+void usb_hstd_connect_err_event_set(uint16_t ip_no)
+{
+    usb_ctrl_t ctrl;
+
+    ctrl.address = g_usb_hstd_device_addr[ip_no];       /* usb device address */
+    ctrl.module = ip_no;                                /* module number setting */
+    usb_set_event(USB_STS_NOT_SUPPORT, &ctrl);          /* set event()  */
+}
+/******************************************************************************
+ End of function usb_hstd_connect_err_event_set
+ ******************************************************************************/
+
+#if defined(USB_CFG_HVND_USE)
+/******************************************************************************
+ Function Name   : usb_hvnd_set_pipe_registration
+ Description     : Host CDC pipe registration.
+ Arguments       : usb_utr_t *ptr       : Pointer to usb_utr_t structure.
+                 : uint16_t  devadr     : Device address
+ Return          : usb_er_t             : Error info
+ ******************************************************************************/
+usb_er_t usb_hvnd_set_pipe_registration (usb_utr_t *ptr, uint16_t dev_addr)
+{
+    usb_er_t    err; /* Error code */
+    uint8_t     pipe_no;
+
+    err = USB_ERROR;
+
+    /* Device address check */
+    if (0 != dev_addr)
+    {
+        /* Search use pipe block */
+        /* WAIT_LOOP */
+        for (pipe_no = USB_MIN_PIPE_NO; pipe_no < (USB_MAX_PIPE_NO +1); pipe_no++)
+        {   /* Check use block */
+            if (USB_TRUE == g_usb_pipe_table[ptr->ip][pipe_no].use_flag)
+            {   /* Check USB Device address */
+                if ((dev_addr << USB_DEVADDRBIT) == (g_usb_pipe_table[ptr->ip][pipe_no].pipe_maxp & USB_DEVSEL))
+                {
+                    usb_hstd_set_pipe_reg (ptr, pipe_no);
+                    err = USB_OK;
+                }
+            }
+        }
+    }
+    else
+    {
+        /* Error */
+        USB_PRINTF1("SmplOpen adr error %x\n", dev_addr);
+    }
+    return err;
+}
+/******************************************************************************
+ End of function usb_hvnd_set_pipe_registration()
+ ******************************************************************************/
+
+
+/******************************************************************************
+ Function Name   : usb_hvnd_configured
+ Description     : Host vendor application initialization.
+ Argument        : usb_utr_t *ptr    : IP info (mode, IP no, reg. address).
+ : uint16_t dev_addr : Device address.
+ : uint16_t data2    : Not used.
+ Return          : none
+ ******************************************************************************/
+void usb_hvnd_configured (usb_utr_t *ptr, uint16_t dev_addr, uint16_t data2)
+{
+    usb_ctrl_t ctrl;
+
+    ctrl.module = ptr->ip; /* Module number setting */
+    ctrl.address = dev_addr;
+    if (0 != dev_addr)
+    {
+
+        /* Registration */
+        usb_hvnd_set_pipe_registration(ptr, dev_addr); /* Host CDC Pipe registration */
+    }
+
+    usb_set_event(USB_STS_CONFIGURED, &ctrl);
+}
+/******************************************************************************
+ End of function usb_hvnd_configured
+ ******************************************************************************/
+
+/******************************************************************************
+ Function Name   : usb_hvnd_detach
+ Description     : Close host vendor application.
+ Argument        : usb_utr_t *ptr    : IP info (mode, IP no, reg. address).
+ : uint16_t data1            : Not Use
+ : uint16_t data2            : Not Use
+ Return          : none
+ ******************************************************************************/
+void usb_hvnd_detach (usb_utr_t *ptr, uint16_t dev_addr, uint16_t data2)
+{
+    usb_ctrl_t ctrl;
+
+    usb_hstd_clr_pipe_table (ptr->ip, dev_addr);
+
+    ctrl.module = ptr->ip; /* Module number setting */
+    ctrl.address = dev_addr;
+    usb_set_event(USB_STS_DETACH, &ctrl);
+}
+/******************************************************************************
+ End of function usb_hvnd_detach
+ ******************************************************************************/
+
+/******************************************************************************
+ Function Name   : usb_hvnd_enumeration
+ Description     : Vendor class example enumeration execution by host.
+ Argument        : usb_clsinfo_t *mess   : Class info data pointer.
+ Return          : none
+ ******************************************************************************/
+void usb_hvnd_enumeration (usb_clsinfo_t *mess, uint16_t **table)
+{
+    uint8_t *pdesc;
+    uint16_t total_len;
+    uint16_t speed;
+
+    *table[3] = USB_OK;
+
+    /* Pipe Information table set */
+    speed = *table[6];
+    pdesc = (uint8_t *) g_usb_hstd_config_descriptor[mess->ip];
+
+    total_len = ((uint16_t) *(pdesc + 3)) << 8;
+    total_len |= (uint16_t) *(pdesc + 2);
+
+    /* Pipe Information table set */
+    usb_hvnd_pipe_info(pdesc, speed, total_len);
+
+#if (BSP_CFG_RTOS_USED == 0)
+    usb_hstd_return_enu_mgr(mess, USB_OK); /* Return to MGR */
+#endif  /* BSP_CFG_RTOS_USED == 0 */
+}
+/******************************************************************************
+ End of function usb_hvnd_enumeration
+ ******************************************************************************/
+
+/******************************************************************************
+ Function Name   : usb_hvnd_pipe_info
+ Description     : Host pipe information check. Set EP table.
+ Arguments       : uint8_t *table        : Descriptor start address.
+ : uint16_t speed        : Device connected speed
+ : uint16_t length       : Configuration Descriptor Length
+ Return value    : none
+ ******************************************************************************/
+void usb_hvnd_pipe_info (uint8_t *table, uint16_t speed, uint16_t length)
+{
+    uint16_t ofdsc;
+    uint16_t pipe_no;
+    usb_pipe_table_reg_t    ep_tbl;
+
+    /* Check Endpoint Descriptor */
+    ofdsc = table[0];
+
+    /* WAIT_LOOP */
+    while (ofdsc < length)
+    {
+        /* Search within Interface */
+        if (USB_DT_ENDPOINT == table[ofdsc + 1])
+        {
+            pipe_no = usb_hstd_make_pipe_reg_info (USB_IP0, 1, USB_HVND, speed, &table[ofdsc], &ep_tbl);
+            if ( USB_NULL == pipe_no)
+            {
+                return;
+            }
+            else
+            {
+                usb_hstd_set_pipe_info (USB_IP0, pipe_no, &ep_tbl);
+            }
+
+            ofdsc += table[ofdsc];
+        }
+        else
+        {
+            ofdsc += table[ofdsc];
+        }
+    }
+}
+/******************************************************************************
+ End of function usb_hvnd_pipe_info
+ ******************************************************************************/
+
+/******************************************************************************
+ Function Name   : usb_hvnd_read_complete
+ Description     : Notify application task of data reception completion.
+ : (Callback function at completion of INT data reception.)
+ Arguments       :
+ Return value    : none
+ ******************************************************************************/
+void usb_hvnd_read_complete (usb_utr_t *ptr, uint16_t data1, uint16_t data2)
+{
+    usb_ctrl_t ctrl;
+
+    ctrl.module = ptr->ip; /* Module number setting */
+    ctrl.pipe = ptr->keyword; /* Pipe number setting */
+    ctrl.type = USB_HVND; /* Vendor class  */
+
+    ctrl.size = ptr->read_req_len - ptr->tranlen;
+    ctrl.address = usb_hstd_get_devsel(ptr, ctrl.pipe) >> 12;
+#if (BSP_CFG_RTOS_USED == 1)
+    ctrl.p_data = (void *)ptr->cur_task_hdl;
+#endif /* (BSP_CFG_RTOS_USED == 1) */
+
+    switch (ptr->status)
+    {
+        case USB_DATA_OK :
+            ctrl.status = USB_SUCCESS;
+        break;
+        case USB_DATA_SHT :
+            ctrl.status = USB_ERR_SHORT;
+        break;
+        case USB_DATA_OVR :
+            ctrl.status = USB_ERR_OVER;
+        break;
+        case USB_DATA_ERR :
+        default :
+            ctrl.status = USB_ERR_NG;
+        break;
+    }
+
+    usb_set_event(USB_STS_READ_COMPLETE, &ctrl); /* Set Event()  */
+}
+/******************************************************************************
+ End of function usb_hvnd_read_complete()
+ ******************************************************************************/
+
+/******************************************************************************
+ Function Name   : usb_hvnd_write_complete
+ Description     : Notify application task of data transmission completion.
+ : (Callback function at completion of INT data reception.)
+ Arguments       :
+ Return value    : none
+ ******************************************************************************/
+void usb_hvnd_write_complete (usb_utr_t *ptr, uint16_t data1, uint16_t data2)
+{
+    usb_ctrl_t ctrl;
+
+    ctrl.module = ptr->ip; /* Module number setting */
+    ctrl.pipe = ptr->keyword; /* Pipe number setting */
+    ctrl.type = USB_HVND; /* Vendor class  */
+    ctrl.address = usb_hstd_get_devsel(ptr, ctrl.pipe) >> 12;
+#if (BSP_CFG_RTOS_USED == 1)
+    ctrl.p_data = (void *)ptr->cur_task_hdl;
+#endif /* (BSP_CFG_RTOS_USED == 1) */
+
+    if (USB_DATA_NONE == ptr->status)
+    {
+        ctrl.status = USB_SUCCESS;
+    }
+    else
+    {
+        ctrl.status = USB_ERR_NG;
+    }
+
+    usb_set_event(USB_STS_WRITE_COMPLETE, &ctrl); /* Set Event()  */
+}
+/******************************************************************************
+ End of function usb_hvnd_write_complete()
+ ******************************************************************************/
+
+/******************************************************************************
+ Function Name   : usb_hvnd_registration
+ Description     : Host vendor class registration.
+ Argument        : usb_utr_t *ptr    : IP info (mode, IP no, reg. address).
+ Return          : none
+ ******************************************************************************/
+void usb_hvnd_registration (usb_utr_t *ptr)
+{
+    usb_hcdreg_t driver;
+
+    /* Driver registration */
+
+    /* Interface Class */
+    driver.ifclass = (uint16_t) USB_IFCLS_VEN;
+
+    /* Target peripheral list */
+    driver.p_tpl = (uint16_t*) &g_usb_apl_devicetpl;
+
+    /* Driver init */
+    driver.classinit = &usb_hstd_dummy_function;
+
+    /* Driver check */
+    driver.classcheck = &usb_hvnd_enumeration;
+
+    /* Device configured */
+    driver.devconfig = &usb_hvnd_configured;
+
+    /* Device detach */
+    driver.devdetach = &usb_hvnd_detach;
+
+    /* Device suspend */
+    driver.devsuspend = &usb_hstd_dummy_function;
+
+    /* Device resume */
+    driver.devresume = &usb_hstd_dummy_function;
+
+    usb_hstd_driver_registration(ptr, &driver);
+
+#if USB_CFG_HUB == USB_CFG_ENABLE
+#if (BSP_CFG_RTOS_USED == 0)
+    usb_cstd_set_task_pri(USB_HUB_TSK, USB_PRI_3);
+#endif  /* BSP_CFG_RTOS_USED == 0 */
+    usb_hhub_registration(ptr, USB_NULL);
+#endif  /* USB_CFG_HUB == USB_CFG_ENABLE */
+}
+/******************************************************************************
+ End of function usb_hvnd_registration
+ ******************************************************************************/
+#endif /* defined(USB_CFG_HVND_USE) */
 
 #endif  /* (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST */
 

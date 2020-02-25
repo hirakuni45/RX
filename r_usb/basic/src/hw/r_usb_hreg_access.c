@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2015(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2015(2019) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_hreg_access.c
@@ -27,6 +27,10 @@
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
  *         : 30.09.2017 1.22 RX62N/RX630/RX63T-H is added. and Add "__evenaccess" for I/O reg access local variable.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
+ *         : 16.11.2018 1.24 Added '~' before USB_OVRCRE in hw_usb_hclear_enb_ovrcre()
+ *         : 31.05.2019 1.26 Added support for GNUC and ICCRX.
+ *         : 30.07.2019 1.27 RX72M is added.
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -39,7 +43,7 @@
 #include "r_usb_reg_access.h"
 #include "r_usb_extern.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 
 /******************************************************************************
  Function Name   : hw_usb_hset_rwupe
@@ -47,15 +51,11 @@
                  : ister. When host. To allow detection of remote wake-up from 
                  : a USB Function.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hset_rwupe (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hset_rwupe (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->DVSTCTR0.WORD |= USB_RWUPE;
-    }
+    ptr->ipp->DVSTCTR0.WORD |= USB_RWUPE;
 }
 /******************************************************************************
  End of function hw_usb_hset_rwupe
@@ -67,15 +67,11 @@ void hw_usb_hset_rwupe (usb_utr_t *ptr, uint16_t port)
                  : ister. When host. To prohibit detection of remote wake-up from 
                  : a USB Function.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hclear_rwupe (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hclear_rwupe (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->DVSTCTR0.WORD &= (~USB_RWUPE);
-    }
+    ptr->ipp->DVSTCTR0.WORD &= (~USB_RWUPE);
 }
 /******************************************************************************
  End of function hw_usb_hclear_rwupe
@@ -86,15 +82,11 @@ void hw_usb_hclear_rwupe (usb_utr_t *ptr, uint16_t port)
  Description     : Set the RESUME-bit specified port's DVSTCTR0 register 
                  : When host. To allow output of resume signal to a USB Function.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hset_resume (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hset_resume (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->DVSTCTR0.WORD |= USB_RESUME;
-    }
+    ptr->ipp->DVSTCTR0.WORD |= USB_RESUME;
 }
 /******************************************************************************
  End of function hw_usb_hset_resume
@@ -106,15 +98,11 @@ void hw_usb_hset_resume (usb_utr_t *ptr, uint16_t port)
                  : When host. To prohibit output of resume signal to a USB Func-
                  : tion.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hclear_resume (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hclear_resume (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->DVSTCTR0.WORD &= (~USB_RESUME);
-    }
+    ptr->ipp->DVSTCTR0.WORD &= (~USB_RESUME);
 }
 /******************************************************************************
  End of function hw_usb_hset_uact
@@ -125,15 +113,11 @@ void hw_usb_hclear_resume (usb_utr_t *ptr, uint16_t port)
  Description     : Set UACT-bit (USB Bus Enable) specified port's DVSTCTR0 
                  : register. When Host, to output SOF.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hset_uact (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hset_uact (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->DVSTCTR0.WORD |= USB_UACT;
-    }
+    ptr->ipp->DVSTCTR0.WORD |= USB_UACT;
 }
 /******************************************************************************
  End of function hw_usb_hset_uact
@@ -144,15 +128,11 @@ void hw_usb_hset_uact (usb_utr_t *ptr, uint16_t port)
  Description     : Clear UACT-bit (USB Bus Enable) specified port's DVSTCTR0 
                  : register. When Host, to prohibit output SOF.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hclear_uact (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hclear_uact (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->DVSTCTR0.WORD &= (~USB_UACT);
-    }
+    ptr->ipp->DVSTCTR0.WORD &= (~USB_UACT);
 }
 /******************************************************************************
  End of function hw_usb_hclear_uact
@@ -162,16 +142,12 @@ void hw_usb_hclear_uact (usb_utr_t *ptr, uint16_t port)
  Function Name   : hw_usb_hwrite_intenb
  Description     : Write the specified data to the specified port's INTENB register.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
                  : uint16_t  data   : Setting value
  Return value    : none
  ******************************************************************************/
-void hw_usb_hwrite_intenb (usb_utr_t *ptr, uint16_t port, uint16_t data)
+void hw_usb_hwrite_intenb (usb_utr_t *ptr, uint16_t data)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTENB1.WORD = data;
-    }
+    ptr->ipp->INTENB1.WORD = data;
 }
 /******************************************************************************
  End of function hw_usb_hwrite_intenb
@@ -182,15 +158,11 @@ void hw_usb_hwrite_intenb (usb_utr_t *ptr, uint16_t port, uint16_t data)
  Description     : Set specified port's OVRCRE-bit (Overcurrent Input Change Int-
                  : errupt Status Enable) in the INTENB1 register.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hset_enb_ovrcre (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hset_enb_ovrcre (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTENB1.WORD |= USB_OVRCRE;
-    }
+    ptr->ipp->INTENB1.WORD |= USB_OVRCRE;
 }
 /******************************************************************************
  End of function hw_usb_hset_enb_ovrcre
@@ -201,15 +173,11 @@ void hw_usb_hset_enb_ovrcre (usb_utr_t *ptr, uint16_t port)
  Description     : Clear the OVRCRE-bit of the specified port's INTENB1 register,
                  : to prohibit VBUS interrupts.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hclear_enb_ovrcre (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hclear_enb_ovrcre (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTENB1.WORD &= (USB_OVRCRE);
-    }
+    ptr->ipp->INTENB1.WORD &= (~USB_OVRCRE);
 }
 /******************************************************************************
  End of function hw_usb_hclear_enb_ovrcre
@@ -221,15 +189,11 @@ void hw_usb_hclear_enb_ovrcre (usb_utr_t *ptr, uint16_t port)
                  : specified port's INTENB1 register. This will cause a BCHG 
                  : interrupt when a change of USB bus state has been detected.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hset_enb_bchge (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hset_enb_bchge (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTENB1.WORD |= USB_BCHGE;
-    }
+    ptr->ipp->INTENB1.WORD |= USB_BCHGE;
 }
 /******************************************************************************
  End of function hw_usb_hset_enb_bchge
@@ -240,15 +204,11 @@ void hw_usb_hset_enb_bchge (usb_utr_t *ptr, uint16_t port)
  Description     : The BCHGE-bit (USB Bus Change Interrupt Enable) is cleared in 
                  : the specified port's INTENB1 register.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hclear_enb_bchge (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hclear_enb_bchge (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTENB1.WORD &= (~USB_BCHGE);
-    }
+    ptr->ipp->INTENB1.WORD &= (~USB_BCHGE);
 }
 /******************************************************************************
  End of function hw_usb_hclear_enb_bchge
@@ -259,15 +219,11 @@ void hw_usb_hclear_enb_bchge (usb_utr_t *ptr, uint16_t port)
  Description     : Enable the specified port's DTCHE-interrupt "Disconnection 
                  : Detection" by setting the DTCHE-bit.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hset_enb_dtche (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hset_enb_dtche (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTENB1.WORD |= USB_DTCHE;
-    }
+    ptr->ipp->INTENB1.WORD |= USB_DTCHE;
 }
 /******************************************************************************
  End of function hw_usb_hset_enb_dtche
@@ -278,15 +234,11 @@ void hw_usb_hset_enb_dtche (usb_utr_t *ptr, uint16_t port)
  Description     : Disable the specified port's DTCHE-interrupt "Disconnection 
                  : Detection" by clearing the DTCHE-bit.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hclear_enb_dtche (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hclear_enb_dtche (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTENB1.WORD &= (~USB_DTCHE);
-    }
+    ptr->ipp->INTENB1.WORD &= (~USB_DTCHE);
 }
 /******************************************************************************
  End of function hw_usb_hclear_enb_dtche
@@ -297,15 +249,11 @@ void hw_usb_hclear_enb_dtche (usb_utr_t *ptr, uint16_t port)
  Description     : Enable the specified port's ATTCHE-interrupt "Connection 
                  : Detection" by setting the ATTCHE-bit.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hset_enb_attche (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hset_enb_attche (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTENB1.WORD |= USB_ATTCHE;
-    }
+    ptr->ipp->INTENB1.WORD |= USB_ATTCHE;
 }
 /******************************************************************************
  End of function hw_usb_hset_enb_attche
@@ -316,15 +264,11 @@ void hw_usb_hset_enb_attche (usb_utr_t *ptr, uint16_t port)
  Description     : Disable the specified port's ATTCHE-interrupt "Disconnection 
                  : Detection" by clearing the ATTCHE-bit.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hclear_enb_attche (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hclear_enb_attche (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTENB1.WORD &= (~USB_ATTCHE);
-    }
+    ptr->ipp->INTENB1.WORD &= (~USB_ATTCHE);
 }
 /******************************************************************************
  End of function hw_usb_hclear_enb_attche
@@ -371,7 +315,7 @@ void hw_usb_hset_enb_sacke (usb_utr_t *ptr)
 void hw_usb_hset_enb_pddetinte (usb_utr_t *ptr)
 {
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-    if (ptr->ip == USB_USBIP_1)
+    if (USB_IP1 == ptr->ip)
     {
         ptr->ipp1->INTENB1.WORD |= USB_PDDETINTE;
 
@@ -388,16 +332,12 @@ void hw_usb_hset_enb_pddetinte (usb_utr_t *ptr)
  Description     : Write the specified data to the specified port's INTSTS1 reg-
                  : ister.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
                  : uint16_t  data   : Setting value
  Return value    : none
  ******************************************************************************/
-void hw_usb_hwrite_intsts (usb_utr_t *ptr, uint16_t port, uint16_t data)
+void hw_usb_hwrite_intsts (usb_utr_t *ptr, uint16_t data)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTSTS1.WORD = data;
-    }
+    ptr->ipp->INTSTS1.WORD = data;
 }
 /******************************************************************************
  End of function hw_usb_hwrite_intsts
@@ -408,15 +348,11 @@ void hw_usb_hwrite_intsts (usb_utr_t *ptr, uint16_t port, uint16_t data)
  Description     : Clear the specified port's OVRCR-bit; "Overcurrent 
                  : Input Change Interrupt Status".
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hclear_sts_ovrcr (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hclear_sts_ovrcr (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTSTS1.WORD = (uint16_t) ((~USB_OVRCR) & INTSTS1_MASK);
-    }
+    ptr->ipp->INTSTS1.WORD = (uint16_t) ((~USB_OVRCR) & INTSTS1_MASK);
 }
 /******************************************************************************
  End of function hw_usb_hclear_sts_ovrcr
@@ -427,15 +363,11 @@ void hw_usb_hclear_sts_ovrcr (usb_utr_t *ptr, uint16_t port)
  Description     : Clear the specified port's BCHG-bit; "USB Bus Change Interrupt 
                  : Status".
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hclear_sts_bchg (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hclear_sts_bchg (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTSTS1.WORD = (uint16_t) ((~USB_BCHG) & INTSTS1_MASK);
-    }
+    ptr->ipp->INTSTS1.WORD = (uint16_t) ((~USB_BCHG) & INTSTS1_MASK);
 } /* End of function hw_usb_hclear_sts_bchg() */
 /******************************************************************************
  End of function hw_usb_hclear_sts_bchg
@@ -446,15 +378,11 @@ void hw_usb_hclear_sts_bchg (usb_utr_t *ptr, uint16_t port)
  Description     : Clear the specified port's DTCH-bit; "USB Disconnection Detec-
                  : tion Interrupt Status".
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hclear_sts_dtch (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hclear_sts_dtch (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTSTS1.WORD = (uint16_t) ((~USB_DTCH) & INTSTS1_MASK);
-    }
+    ptr->ipp->INTSTS1.WORD = (uint16_t) ((~USB_DTCH) & INTSTS1_MASK);
 }
 /******************************************************************************
  End of function hw_usb_hclear_sts_dtch
@@ -464,15 +392,11 @@ void hw_usb_hclear_sts_dtch (usb_utr_t *ptr, uint16_t port)
  Function Name   : hw_usb_hclear_sts_attch
  Description     : Clear the specified port's ATTCH-bit; "ATTCH Interrupt Status".
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure
-                 : uint16_t  port   : USB port number
  Return value    : none
  ******************************************************************************/
-void hw_usb_hclear_sts_attch (usb_utr_t *ptr, uint16_t port)
+void hw_usb_hclear_sts_attch (usb_utr_t *ptr)
 {
-    if (USB_PORT0 == port)
-    {
-        ptr->ipp->INTSTS1.WORD = (uint16_t) ((~USB_ATTCH) & INTSTS1_MASK);
-    }
+    ptr->ipp->INTSTS1.WORD = (uint16_t) ((~USB_ATTCH) & INTSTS1_MASK);
 }
 /******************************************************************************
  End of function hw_usb_hclear_sts_attch
@@ -520,7 +444,7 @@ void hw_usb_hclear_sts_sack (usb_utr_t *ptr)
 void hw_usb_hclear_sts_pddetint (usb_utr_t *ptr)
 {
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-    if (ptr->ip == USB_USBIP_1)
+    if (USB_IP1 == ptr->ip)
     {
         ptr->ipp1->INTSTS1.WORD = (uint16_t) ((~USB_PDDETINT) & INTSTS1_MASK);
 
@@ -641,7 +565,7 @@ void hw_usb_hset_sureq (usb_utr_t *ptr)
  ******************************************************************************/
 uint16_t hw_usb_hread_devadd (usb_utr_t *ptr, uint16_t devsel)
 {
-    volatile __evenaccess uint16_t *preg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *preg;
     uint16_t devadr;
     uint16_t return_value;
 
@@ -673,7 +597,7 @@ uint16_t hw_usb_hread_devadd (usb_utr_t *ptr, uint16_t devsel)
  ******************************************************************************/
 void hw_usb_hrmw_devadd (usb_utr_t *ptr, uint16_t devsel, uint16_t data, uint16_t width)
 {
-    volatile __evenaccess uint16_t *preg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *preg;
     uint16_t buf;
     uint16_t devadr;
 
@@ -701,7 +625,7 @@ void hw_usb_hrmw_devadd (usb_utr_t *ptr, uint16_t devsel, uint16_t data, uint16_
  ******************************************************************************/
 void hw_usb_hset_usbspd (usb_utr_t *ptr, uint16_t devsel, uint8_t data)
 {
-    volatile __evenaccess uint16_t *preg;
+    R_BSP_VOLATILE_EVENACCESS uint16_t *preg;
     uint16_t devadr;
 
     devadr = devsel >> USB_DEVADDRBIT;
@@ -724,7 +648,7 @@ void hw_usb_hset_usbspd (usb_utr_t *ptr, uint16_t devsel, uint8_t data)
 void hw_usb_hset_dcpmode (usb_utr_t *ptr)
 {
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-    if (ptr->ip == USB_USBIP_1)
+    if (USB_IP1 == ptr->ip)
     {
         ptr->ipp1->BCCTRL.WORD |= USB_DCPMODE;
 
@@ -748,15 +672,21 @@ void hw_usb_hmodule_init (usb_ctrl_t *p_ctrl)
     if ( USB_IP0 == p_ctrl->module)
     {
         USB_M0.SYSCFG.WORD |= USB_SCKE;
+        /* WAIT_LOOP */
         while ( USB_SCKE != (USB_M0.SYSCFG.WORD & USB_SCKE))
         {
             /* none */
         }
 
-#if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
+#if defined(BSP_MCU_RX64M)
+        USB_M0.PHYSLEW.LONG = 0xE;
+
+#endif  /* defined(BSP_MCU_RX64M) */
+
+#if defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX72T) || defined (BSP_MCU_RX72M)
         USB_M0.PHYSLEW.LONG = 0x5;
 
-#endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
+#endif  /* defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX72T) || defined (BSP_MCU_RX72M) */
 
         USB_M0.SYSCFG.WORD |= USB_DCFM;
 
@@ -784,6 +714,7 @@ void hw_usb_hmodule_init (usb_ctrl_t *p_ctrl)
                 USB_M0.DVSTCTR0.WORD |= USB_USBRST;
                 usb_cpu_delay_xms((uint16_t) 50); /* Need to wait greater equal 10ms in USB spec */
                 USB_M0.DVSTCTR0.WORD &= (~USB_USBRST);
+                /* WAIT_LOOP */
                 while ( USB_HSPROC == (USB_M0.DVSTCTR0.WORD & USB_HSPROC))
                 {
                     /* HSPROC = 0100b */
@@ -813,6 +744,7 @@ void hw_usb_hmodule_init (usb_ctrl_t *p_ctrl)
     {
 #if defined(BSP_MCU_RX62N)
         USB_M1.SYSCFG.WORD |= USB_SCKE;
+        /* WAIT_LOOP */
         while ( USB_SCKE != (USB_M1.SYSCFG.WORD & USB_SCKE))
         {
             /* none */
@@ -847,6 +779,7 @@ void hw_usb_hmodule_init (usb_ctrl_t *p_ctrl)
         USB_M1.LPSTS.WORD |= USB_SUSPENDM;
 
 #if ((USB_CFG_CLKSEL == USB_CFG_20MHZ) || (USB_CFG_CLKSEL == USB_CFG_24MHZ))
+        /* WAIT_LOOP */
         while( USB_PLLLOCK != (USB_M1.PLLSTA.WORD & USB_PLLLOCK ) )
         {
             /* Wait for PLL Lock */
@@ -898,6 +831,7 @@ void hw_usb_hmodule_init (usb_ctrl_t *p_ctrl)
                 usb_cpu_delay_xms((uint16_t)50); /* Need to wait greater equal 10ms in USB spec */
 
                 USB_M1.DVSTCTR0.WORD &= (~USB_USBRST);
+                /* WAIT_LOOP */
                 while (USB_HSPROC == (USB_M1.DVSTCTR0.WORD & USB_HSPROC))
                 {
                     /* Wait for USB reset handshake in progress */

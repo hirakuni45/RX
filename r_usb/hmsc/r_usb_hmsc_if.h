@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_hmsc_if.h
@@ -27,6 +27,7 @@
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
  *         : 30.09.2017 1.22 Add typedef "usb_csw_result_t", Delete not use API functions.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator 
  ***********************************************************************************************************************/
 
 #ifndef USB_HMSC_IF_H
@@ -77,6 +78,8 @@ extern "C" {
  ******************************************************************************/
 usb_err_t       R_USB_HmscStrgCmd (usb_ctrl_t *p_ctrl, uint8_t *p_buf, uint16_t command);
 usb_err_t       R_USB_HmscGetDriveNo (usb_ctrl_t *p_ctrl, uint8_t *p_drive);
+void            R_USB_HmscGetSem (void);
+void            R_USB_HmscRelSem (void);
 
 #ifdef __cplusplus
 };

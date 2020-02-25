@@ -14,7 +14,7 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2014(2016) Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2014(2018) Renesas Electronics Corporation. All rights reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : r_usb_pbc.c
@@ -26,6 +26,7 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -37,7 +38,7 @@ Includes <System Includes> , "Project Includes"
 #include "r_usb_reg_access.h"
 #include "r_usb_bitdefine.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI )
+#if ((USB_CFG_MODE & USB_CFG_PERI) == USB_CFG_PERI)
 
 #if USB_CFG_BC == USB_CFG_ENABLE
 /******************************************************************************
@@ -71,8 +72,6 @@ void usb_pstd_bc_detect_process(void);
 /******************************************************************************
 Private global variables and functions
 ******************************************************************************/
-/* variables */
-
 /* functions */
 uint8_t usb_pstd_bc_data_contact_detect(void);
 uint8_t usb_pstd_bc_primary_detection(void);
@@ -82,12 +81,6 @@ uint8_t usb_pstd_bc_secondary_detection(void);
 /******************************************************************************
 Imported global variables and functions (from other files)
 ******************************************************************************/
-/* variables */
-
-/* functions */
-extern void usb_cpu_delay_1us(uint16_t time);
-extern void usb_cpu_delay_xms(uint16_t time);
-
 
 
 /******************************************************************************
@@ -145,15 +138,16 @@ uint8_t usb_pstd_bc_data_contact_detect (void)
     hw_usb_set_bcctrl( USB_NULL, USB_IDPSRCE);
     usb_cpu_delay_xms((uint16_t)5);                                 /* wait stabilization */
 
+    /* WAIT_LOOP */
     while (timer < USB_BC_DCD_TIME)                               /* [BC1.2 Spec] DCD_TIMEOUT (300-900ms) */
     {
-        buf = hw_usb_read_syssts (USB_NULL, USB_PORT0);
-        if ((buf & USB_LNST) == USB_SE0)
+        buf = hw_usb_read_syssts (USB_NULL);
+        if (USB_SE0 == (buf & USB_LNST))
         {
             usb_cpu_delay_xms ((uint16_t)USB_BC_DCD_DBNC);           /* [BC1.2 Spec] DCD_DBNC (min:10ms) */
             timer += USB_BC_DCD_DBNC;
-            buf = hw_usb_read_syssts (USB_NULL, USB_PORT0);
-            if ((buf & USB_LNST) == USB_SE0)
+            buf = hw_usb_read_syssts (USB_NULL);
+            if (USB_SE0 == (buf & USB_LNST))
             {
                 hw_usb_clear_bcctrl (USB_NULL, USB_IDPSRCE);
                 return USB_BC_DCD_COMP_SE0;                         /* Connected Data Line */

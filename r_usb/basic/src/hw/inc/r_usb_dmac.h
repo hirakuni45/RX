@@ -14,7 +14,7 @@
 * following link:
 * http://www.renesas.com/disclaimer
 *
-* Copyright (C) 2016(2017) Renesas Electronics Corporation. All rights reserved.
+* Copyright (C) 2016(2018) Renesas Electronics Corporation. All rights reserved.
 ***********************************************************************************************************************/
 /***********************************************************************************************************************
 * File Name    : r_usb_dmac.h
@@ -24,7 +24,8 @@
 * History : DD.MM.YYYY Version Description
 *         : 30.09.2016 1.00    First Release
 *         : 26.01.2017 1.21 Support DMAC Technical Update for RX71M/RX64M USBA.
-*         : 30.09.2017 1.22    Change functions name "usb_dma_buf2fifo_restart"->"usb_dma_buf_to_fifo_restart"
+*         : 30.09.2017 1.22    Change functions name "usb_dma_buf2fifo_restart"->"usb_cstd_dma_send_restart"
+*         : 31.03.2018 1.23 Supporting Smart Configurator
 ***********************************************************************************************************************/
 
 #ifndef R_USB_DMAC_H
@@ -38,10 +39,6 @@ Macro definitions
 #define USB_DMA_USE_CH_MAX          (4)     /* MAX USE DMAC CH for USB */
 #define USB_DMA_CH_PRI              (3)     /* DMACmI interrupt priority level for USB Pipe : DxFIFO->buff */
 #define USB_DMA_CH2_PRI             (3)     /* DMACmI interrupt priority level for USB Pipe : buff->DxFIFO */
-
-#define USB_FIFO_TYPE_D0DMA         (0)                             /* D0FIFO Select */
-#define USB_FIFO_TYPE_D1DMA         (1)                             /* D1FIFO Select */
-#define USB_DMA_FIFO_TYPE_NUM       (USB_FIFO_TYPE_D1DMA + 1)       /*  */
 
 #define USB_FIFO_ACCESS_TYPE_32BIT  (0)                             /* FIFO port 32bit access */
 #define USB_FIFO_ACCESS_TYPE_16BIT  (1)                             /* FIFO port 16bit access */
@@ -59,27 +56,27 @@ extern uint32_t g_usb_cstd_dma_size[USB_NUM_USBIP][USB_DMA_USE_CH_MAX]; /* DMA0 
 extern uint16_t g_usb_cstd_dma_fifo[USB_NUM_USBIP][USB_DMA_USE_CH_MAX]; /* DMA0 and DMA1 FIFO buffer size */
 extern uint16_t g_usb_cstd_dma_pipe[USB_NUM_USBIP][USB_DMA_USE_CH_MAX]; /* DMA0 and DMA1 pipe number */
 
-void        usb_dma_driver(void);
-uint16_t    usb_dma_get_crtb(uint16_t use_port);
-uint16_t    usb_dma_get_dxfifo_ir_vect(usb_utr_t *ptr, uint16_t useport);
-void        usb_dma_clear_dxfifo_ir(usb_utr_t *ptr, uint16_t useport);
-void        usb_dma_dxfifo2buf_setting(usb_utr_t *ptr, uint32_t src_adr, uint16_t useport, uint32_t transfer_size);
-void        usb_dma_buf2dxfifo_setting(usb_utr_t *ptr, uint32_t src_adr, uint16_t useport, uint32_t transfer_size);
-void        usb_dma_stop_dxfifo(uint8_t ip_type, uint16_t fifo_mode);
-void        usb_cstd_dxfifo_stop(usb_utr_t *ptr, uint16_t useport);
+void        usb_cstd_dma_driver(void);
+uint16_t    usb_cstd_dma_get_crtb(uint16_t use_port);
+uint16_t    usb_cstd_dma_get_ir_vect(usb_utr_t *ptr, uint16_t useport);
+void        usb_cstd_dma_clear_ir(usb_utr_t *ptr, uint16_t useport);
+void        usb_cstd_dma_rcv_setting(usb_utr_t *ptr, uint32_t src_adr, uint16_t useport, uint32_t transfer_size);
+void        usb_cstd_dma_send_setting(usb_utr_t *ptr, uint32_t src_adr, uint16_t useport, uint32_t transfer_size);
+void        usb_cstd_dma_stop(uint8_t ip_type, uint16_t fifo_mode);
+void        usb_cstd_dfifo_end(usb_utr_t *ptr, uint16_t useport);
 uint32_t    hw_usb_get_dxfifo_adr(usb_utr_t *ptr, uint16_t fifo_mode, uint16_t bit_width);
 
-uint8_t     usb_dma_ref_ch_no(uint16_t ip_no, uint16_t use_port);
-void        usb_dma_set_ch_no(uint16_t ip_no, uint16_t use_port, uint8_t dma_ch_no);
-void        usb_dma_buf2dxfifo_complete(usb_utr_t *ptr, uint16_t useport);
+uint8_t     usb_cstd_dma_ref_ch_no(uint16_t ip_no, uint16_t use_port);
+void        usb_cstd_dma_set_ch_no(uint16_t ip_no, uint16_t use_port, uint8_t dma_ch_no);
+void        usb_cstd_dma_send_continue(usb_utr_t *ptr, uint16_t useport);
 
-void        usb_cstd_dxfifo2buf_start_dma(usb_utr_t *ptr, uint16_t pipe, uint16_t useport, uint32_t length);
-void        usb_cstd_buf2dxfifo_start_dma(usb_utr_t *ptr, uint16_t pipe, uint16_t useport);
-void        usb_dma_buf_to_fifo_restart(usb_utr_t *ptr, uint32_t src, uint32_t data_size, uint8_t pipe);
-void        usb_dma_buf2dxfifo_complete_event_set(uint16_t ip_no, uint16_t use_port);
+void        usb_cstd_dma_rcv_start(usb_utr_t *ptr, uint16_t pipe, uint16_t useport);
+void        usb_cstd_dma_send_start(usb_utr_t *ptr, uint16_t pipe, uint16_t useport);
+void        usb_cstd_dma_send_restart(usb_utr_t *ptr, uint32_t src, uint32_t data_size, uint8_t pipe);
+void        usb_cstd_dma_send_complete(uint16_t ip_no, uint16_t use_port);
 
-void        usb_ip0_d0fifo_callback (void);
-void        usb_ip0_d1fifo_callback (void);
+void        usb_cstd_d0fifo_cb (void);
+void        usb_cstd_d1fifo_cb (void);
 void        usb_ip1_d0fifo_callback (void);
 void        usb_ip1_d1fifo_callback (void);
 

@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2016) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_hcontrolrw.c
@@ -26,6 +26,8 @@
  *         : 26.12.2014 1.10 RX71M is added
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
+ *         : 16.11.2018 1.24 Supporting RTOS Thread safe
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -38,13 +40,13 @@
 #include "r_usb_bitdefine.h"
 #include "r_usb_reg_access.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Renesas USB FIFO Read/Write Host Driver API functions
  ******************************************************************************/
 
 #if USB_CFG_COMPLIANCE == USB_CFG_ENABLE
-uint16_t g_usb_hstd_responce_counter;
+uint16_t g_usb_hstd_response_counter[USB_NUM_USBIP];
 #endif /* USB_CFG_COMPLIANCE == USB_CFG_ENABLE */
 
 /******************************************************************************
@@ -64,7 +66,7 @@ uint16_t usb_hstd_ctrl_write_start (usb_utr_t *ptr, uint32_t Bsize, uint8_t *Tab
     /* PID=NAK & clear STALL */
     usb_cstd_clr_stall(ptr, (uint16_t) USB_PIPE0);
     g_usb_hstd_data_cnt[ptr->ip][USB_PIPE0] = Bsize; /* Transfer size set */
-    g_p_usb_hstd_data[ptr->ip][USB_PIPE0] = Table; /* Transfer address set */
+    gp_usb_hstd_data_ptr[ptr->ip][USB_PIPE0] = Table; /* Transfer address set */
 
     /* DCP Configuration Register  (0x5C) */
     hw_usb_write_dcpcfg(ptr, (USB_CNTMDFIELD | USB_DIRFIELD));
@@ -157,7 +159,7 @@ void usb_hstd_ctrl_read_start (usb_utr_t *ptr, uint32_t Bsize, uint8_t *Table)
     uint16_t toggle;
 
 #if USB_CFG_COMPLIANCE == USB_CFG_ENABLE
-    g_usb_hstd_responce_counter = 0;
+    g_usb_hstd_response_counter[ptr->ip] = 0;
 
     hw_usb_clear_sts_sofr( ptr );
     hw_usb_set_intenb( ptr, USB_SOFE );
@@ -170,7 +172,7 @@ void usb_hstd_ctrl_read_start (usb_utr_t *ptr, uint32_t Bsize, uint8_t *Table)
     g_usb_hstd_data_cnt[ptr->ip][USB_PIPE0] = Bsize;
 
     /* Transfer address set */
-    g_p_usb_hstd_data[ptr->ip][USB_PIPE0] = Table;
+    gp_usb_hstd_data_ptr[ptr->ip][USB_PIPE0] = Table;
 
     /* DCP Configuration Register  (0x5C) */
     hw_usb_write_dcpcfg(ptr, USB_SHTNAKFIELD);
@@ -227,6 +229,9 @@ void usb_hstd_status_start (usb_utr_t *ptr)
 
     /* Transfer size set */
     g_p_usb_hstd_pipe[ptr->ip][USB_PIPE0]->tranlen = g_usb_hstd_data_cnt[ptr->ip][USB_PIPE0];
+
+    /* Save Data stage transfer size */
+    g_usb_hstd_data_cnt_pipe0[ptr->ip] = g_usb_hstd_data_cnt[ptr->ip][USB_PIPE0];
 
     /* Branch  by the Control transfer stage management */
     switch (g_usb_hstd_ctsq[ptr->ip])
@@ -290,27 +295,34 @@ void usb_hstd_status_start (usb_utr_t *ptr)
 void usb_hstd_ctrl_end (usb_utr_t *ptr, uint16_t status)
 {
     /* Interrupt Disable */
-
     hw_usb_clear_bempenb(ptr, (uint16_t) USB_PIPE0); /* BEMP0 Disable */
     hw_usb_clear_brdyenb(ptr, (uint16_t) USB_PIPE0); /* BRDY0 Disable */
     hw_usb_clear_nrdyenb(ptr, (uint16_t) USB_PIPE0); /* NRDY0 Disable */
 
     usb_cstd_clr_stall(ptr, (uint16_t) USB_PIPE0); /* PID=NAK & clear STALL */
-    if (USB_USBIP_0 == ptr->ip)
+    if (USB_IP0 == ptr->ip)
     {
         hw_usb_set_mbw(ptr, USB_CUSE, USB0_CFIFO_MBW);
+
+        /* SUREQ=1, SQCLR=1, PID=NAK */
+        hw_usb_hwrite_dcpctr(ptr, (uint16_t) (USB_SUREQCLR | USB_SQCLR));
     }
-    else if (USB_USBIP_1 == ptr->ip)
+    else if (USB_IP1 == ptr->ip)
     {
         hw_usb_set_mbw(ptr, USB_CUSE, USB1_CFIFO_MBW);
+
+#if defined(BSP_MCU_RX71M)
+        /* CSCLR=1, SUREQ=1, SQCLR=1, PID=NAK */
+        hw_usb_hwrite_dcpctr(ptr, (uint16_t) ((USB_CSCLR | USB_SUREQCLR) | USB_SQCLR));
+#else   /* defined(BSP_MCU_RX71M) */
+        /* SUREQ=1, SQCLR=1, PID=NAK */
+        hw_usb_hwrite_dcpctr(ptr, (uint16_t) (USB_SUREQCLR | USB_SQCLR));
+#endif  /* defined(BSP_MCU_RX71M) */
     }
     else
     {
         /* Non */
     }
-
-    /* CSCLR=1, SUREQ=1, SQCLR=1, PID=NAK */
-    hw_usb_hwrite_dcpctr(ptr, (uint16_t) ((USB_CSCLR | USB_SUREQCLR) | USB_SQCLR));
 
     /* CFIFO buffer clear */
     usb_cstd_chg_curpipe(ptr, (uint16_t) USB_PIPE0, (uint16_t) USB_CUSE, USB_FALSE);
@@ -338,10 +350,18 @@ void usb_hstd_ctrl_end (usb_utr_t *ptr, uint16_t status)
         if ( USB_NULL != (g_p_usb_hstd_pipe[ptr->ip][USB_PIPE0]->complete))
         {
             /* Process Done Callback */
-            (g_p_usb_hstd_pipe[ptr->ip][USB_PIPE0]->complete)(g_p_usb_hstd_pipe[ptr->ip][USB_PIPE0], 0, 0);
+            (g_p_usb_hstd_pipe[ptr->ip][USB_PIPE0]->complete)(g_p_usb_hstd_pipe[ptr->ip][USB_PIPE0], USB_NULL, USB_NULL);
         }
     }
+#if BSP_CFG_RTOS_USED == 1
+    vPortFree (g_p_usb_hstd_pipe[ptr->ip][USB_PIPE0]);
     g_p_usb_hstd_pipe[ptr->ip][USB_PIPE0] = (usb_utr_t*) USB_NULL;
+    usb_cstd_pipe0_msg_re_forward (ptr->ip);   /* Get PIPE0 Transfer wait que and Message send to HCD */
+
+#else   /* BSP_CFG_RTOS_USED == 1 */
+    g_p_usb_hstd_pipe[ptr->ip][USB_PIPE0] = (usb_utr_t*) USB_NULL;
+
+#endif /* BSP_CFG_RTOS_USED == 1 */
 
 #if USB_CFG_COMPLIANCE == USB_CFG_ENABLE
     hw_usb_clear_enb_sofe( ptr );

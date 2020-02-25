@@ -14,12 +14,12 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2018) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_basic_if.h
  * Description  : User macro define file
- *                This file is the macrodefinition header file which a user can operate.
+ *                This file is the macro definition header file which a user can operate.
  ***********************************************************************************************************************/
 /**********************************************************************************************************************
  * History : DD.MM.YYYY Version Description
@@ -28,10 +28,12 @@
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
  *         : 30.09.2017 1.22 USB Standard request Macro added. and Move Typedef definitions for "r_usb_typedef.h"
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
+ *         : 16.11.2018 1.24 Supporting RTOS Thread safe
  ***********************************************************************************************************************/
 #ifndef R_USB_BASIC_IF_H
 #define R_USB_BASIC_IF_H
-    
+
 /******************************************************************************
 Includes   <System Includes> , "Project Includes"
 ******************************************************************************/
@@ -152,8 +154,8 @@ Includes   <System Includes> , "Project Includes"
 #define USB_CF_RESERVED                         (0x80u)   /* Reserved(set to 1) */
 #define USB_CF_SELFP                            (0x40u)   /* Self Powered */
 #define USB_CF_BUSP                             (0x00u)   /* Bus Powered */
-#define USB_CF_RWUPON                           (0x20u)   /* Remote Wakeup ON */
-#define USB_CF_RWUPOFF                          (0x00u)   /* Remote Wakeup OFF */
+#define USB_CF_RWUPON                           (0x20u)   /* Remote Wake up ON */
+#define USB_CF_RWUPOFF                          (0x00u)   /* Remote Wake up OFF */
 
  /* Descriptor length Define */
 #define USB_DD_BLENGTH                          (18u)     /* Device Descriptor Length */
@@ -174,6 +176,7 @@ typedef enum usb_err
     USB_ERR_OVER,               /* Received data size over */
     USB_ERR_SHORT,              /* Received data size short */
     USB_ERR_NG,                 /* Operation failed */
+    USB_ERR_TMOUT,              /* Timeout */
 } usb_err_t;
 
 typedef struct usb_descriptor
@@ -183,6 +186,7 @@ typedef struct usb_descriptor
     uint8_t *p_config_h;          /* Pointer to the configuration descriptor for Hi-speed */
     uint8_t *p_qualifier;         /* Pointer to the qualifier descriptor */
     uint8_t **p_string;           /* Pointer to the string descriptor table */
+    uint8_t num_string;           /* Num entry String Descriptor */
 } usb_descriptor_t;
 
 typedef struct usb_cfg
@@ -202,13 +206,19 @@ typedef struct usb_setup
 
 typedef struct usb_ctrl
 {
-    uint8_t         module;     /* USB moudle number (USB_IP0/USB_IP1) */
+    uint8_t         module;     /* USB module number (USB_IP0/USB_IP1) */
     uint8_t         address;    /* USB device address */
     uint8_t         pipe;       /* USB pipe number */
     uint8_t         type;       /* USB device class etc */
     uint8_t         status;     /* USB device state etc */
+#if (BSP_CFG_RTOS_USED == 1)
+    uint8_t         event;      /* USB event */
+#endif /*(BSP_CFG_RTOS_USED == 1)*/
     uint32_t        size;       /* Read data size */
     usb_setup_t     setup;      /* usb_setup_t structure area */
+#if (BSP_CFG_RTOS_USED == 1)
+    void            *p_data;    /* Other information */
+#endif /*(BSP_CFG_RTOS_USED == 1)*/
 } usb_ctrl_t;
 
 typedef struct usb_pipe
@@ -234,7 +244,7 @@ typedef enum usb_ct_status
     USB_CT_NOTTPL,            /* Not TPL device connect */
     USB_CT_HUB,               /* USB Hub connect */
     USB_CT_OVRC,              /* Over current */
-    USB_CT_NORES,             /* Responce Time out for Control Read Transfer */
+    USB_CT_NORES,             /* Response Time out for Control Read Transfer */
     USB_CT_SETUP_ERR,         /* Setup Transaction Error */
 } usb_ct_status_t;
 
@@ -286,7 +296,7 @@ typedef enum usb_class
 
     USB_HCDC, USB_HCDCC, USB_HHID, USB_HVND,
 
-    USB_HMSC, USB_PMSC, USB_REQUEST,
+    USB_HMSC, USB_PMSC, USB_REQUEST
 } usb_class_t;
 
 /* USB battery charging type */
@@ -312,6 +322,10 @@ typedef enum usb_transfer
 {
     USB_BULK = 0, USB_INT, USB_ISO,
 } usb_transfer_t;
+#if (BSP_CFG_RTOS_USED == 1)
+typedef TaskHandle_t    usb_hdl_t;
+typedef void (usb_callback_t)(usb_ctrl_t *, usb_hdl_t, uint8_t);
+#endif /*(BSP_CFG_RTOS_USED == 1)*/
 
 #ifdef __cplusplus
 extern "C" {
@@ -333,8 +347,15 @@ usb_err_t       R_USB_PipeWrite (usb_ctrl_t *p_ctrl, uint8_t *p_buf, uint32_t si
 usb_err_t       R_USB_PipeStop (usb_ctrl_t *p_ctrl);
 usb_err_t       R_USB_GetUsePipe (usb_ctrl_t *p_ctrl, uint16_t *p_pipe);
 usb_err_t       R_USB_GetPipeInfo (usb_ctrl_t *p_ctrl, usb_pipe_t *p_info);
-uint16_t        R_USB_GetEvent (usb_ctrl_t *p_ctrl);
+#if (BSP_CFG_RTOS_USED == 0)
+usb_status_t    R_USB_GetEvent (usb_ctrl_t *p_ctrl);
+#endif /*(BSP_CFG_RTOS_USED == 0)*/
 uint32_t        R_USB_GetVersion (void);
+#if (BSP_CFG_RTOS_USED == 1)
+void            R_USB_Callback (usb_callback_t *);
+#endif /*(BSP_CFG_RTOS_USED == 1)*/
+usb_err_t       R_USB_PullUp(uint8_t state);
+
 #ifdef __cplusplus
 };
 #endif

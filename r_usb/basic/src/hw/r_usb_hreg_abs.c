@@ -14,7 +14,7 @@
  * following link:
  * http://www.renesas.com/disclaimer
  *
- * Copyright (C) 2014(2017) Renesas Electronics Corporation. All rights reserved.
+ * Copyright (C) 2014(2019) Renesas Electronics Corporation. All rights reserved.
  ***********************************************************************************************************************/
 /***********************************************************************************************************************
  * File Name    : r_usb_hreg_abs.c
@@ -27,6 +27,9 @@
  *         : 30.09.2015 1.11 RX63N/RX631 is added.
  *         : 30.09.2016 1.20 RX65N/RX651 is added.
  *         : 30.09.2017 1.22 RX62N/RX630/RX63T-H is added.
+ *         : 31.03.2018 1.23 Supporting Smart Configurator
+ *         : 31.05.2019 1.26 Added support for GNUC and ICCRX.
+ *         : 30.07.2019 1.27 RX72M is added.
  ***********************************************************************************************************************/
 
 /******************************************************************************
@@ -39,7 +42,7 @@
 #include "r_usb_bitdefine.h"
 #include "r_usb_reg_access.h"
 
-#if ( (USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST )
+#if ((USB_CFG_MODE & USB_CFG_HOST) == USB_CFG_HOST)
 /******************************************************************************
  Function Name   : usb_hstd_set_hub_port
  Description     : Set up-port hub
@@ -52,7 +55,7 @@
 void usb_hstd_set_hub_port (usb_utr_t *ptr, uint16_t addr, uint16_t upphub, uint16_t hubport)
 {
 #if defined(BSP_MCU_RX71M)
-    if (ptr->ip == USB_USBIP_1)
+    if (USB_IP1 == ptr->ip)
     {
         hw_usb_hrmw_devadd(ptr, addr, (upphub|hubport), (uint16_t)(USB_UPPHUB | USB_HUBPORT));
     }
@@ -114,7 +117,7 @@ void usb_hstd_interrupt_handler (usb_utr_t *ptr)
     ests = (uint16_t) (bempsts & bempenb);
 
     /***** Processing Setup transaction *****/
-    if ((ists1 & USB_SACK) == USB_SACK)
+    if (USB_SACK == (ists1 & USB_SACK))
     {
         /***** Setup ACK *****/
         /* SACK Clear */
@@ -124,7 +127,7 @@ void usb_hstd_interrupt_handler (usb_utr_t *ptr)
         ptr->ipp->INTENB1.WORD &= (uint16_t) ~(USB_SIGNE | USB_SACKE);
         ptr->keyword = USB_INT_SACK;
     }
-    else if ((ists1 & USB_SIGN) == USB_SIGN)
+    else if (USB_SIGN == (ists1 & USB_SIGN))
     {
         /***** Setup Ignore *****/
         /* SIGN Clear */
@@ -136,19 +139,19 @@ void usb_hstd_interrupt_handler (usb_utr_t *ptr)
     }
 
     /***** Processing PIPE0-MAX_PIPE_NO data *****/
-    else if ((ists0 & USB_BRDY) == USB_BRDY) /***** EP0-7 BRDY *****/
+    else if (USB_BRDY == (ists0 & USB_BRDY)) /***** EP0-7 BRDY *****/
     {
         ptr->ipp->BRDYSTS.WORD = (uint16_t) ((~bsts) & BRDYSTS_MASK);
         ptr->keyword = USB_INT_BRDY;
         ptr->status = bsts;
     }
-    else if ((ists0 & USB_BEMP) == USB_BEMP) /***** EP0-7 BEMP *****/
+    else if (USB_BEMP == (ists0 & USB_BEMP)) /***** EP0-7 BEMP *****/
     {
         ptr->ipp->BEMPSTS.WORD = (uint16_t) ((~ests) & BEMPSTS_MASK);
         ptr->keyword = USB_INT_BEMP;
         ptr->status = ests;
     }
-    else if ((ists0 & USB_NRDY) == USB_NRDY) /***** EP0-7 NRDY *****/
+    else if (USB_NRDY == (ists0 & USB_NRDY)) /***** EP0-7 NRDY *****/
     {
         ptr->ipp->NRDYSTS.WORD = (uint16_t) ((~nsts) & NRDYSTS_MASK);
         ptr->keyword = USB_INT_NRDY;
@@ -156,40 +159,40 @@ void usb_hstd_interrupt_handler (usb_utr_t *ptr)
     }
 
     /***** Processing rootport0 *****/
-    else if ((ists1 & USB_OVRCR) == USB_OVRCR) /***** OVER CURRENT *****/
+    else if (USB_OVRCR == (ists1 & USB_OVRCR)) /***** OVER CURRENT *****/
     {
         /* OVRCR Clear */
         ptr->ipp->INTSTS1.WORD = (uint16_t) ((~USB_OVRCR) & INTSTS1_MASK);
         ptr->keyword = USB_INT_OVRCR0;
     }
-    else if ((ists1 & USB_ATTCH) == USB_ATTCH) /***** ATTCH INT *****/
+    else if (USB_ATTCH == (ists1 & USB_ATTCH)) /***** ATTCH INT *****/
     {
         /* DTCH  interrupt disable */
-        usb_hstd_bus_int_disable(ptr, (uint16_t) USB_PORT0);
+        usb_hstd_bus_int_disable(ptr);
         ptr->keyword = USB_INT_ATTCH0;
     }
-    else if ((ists1 & USB_EOFERR) == USB_EOFERR) /***** EOFERR INT *****/
+    else if (USB_EOFERR == (ists1 & USB_EOFERR)) /***** EOFERR INT *****/
     {
         /* EOFERR Clear */
         ptr->ipp->INTSTS1.WORD = (uint16_t) ((~USB_EOFERR) & INTSTS1_MASK);
         ptr->keyword = USB_INT_EOFERR0;
     }
-    else if ((ists1 & USB_BCHG) == USB_BCHG) /***** BCHG INT *****/
+    else if (USB_BCHG == (ists1 & USB_BCHG)) /***** BCHG INT *****/
     {
         /* BCHG  interrupt disable */
-        usb_hstd_bchg_disable(ptr, (uint16_t) USB_PORT0);
+        usb_hstd_bchg_disable(ptr);
         ptr->keyword = USB_INT_BCHG0;
     }
-    else if ((ists1 & USB_DTCH) == USB_DTCH) /***** DETACH *****/
+    else if (USB_DTCH == (ists1 & USB_DTCH)) /***** DETACH *****/
     {
         /* DTCH  interrupt disable */
-        usb_hstd_bus_int_disable(ptr, (uint16_t) USB_PORT0);
+        usb_hstd_bus_int_disable(ptr);
         ptr->keyword = USB_INT_DTCH0;
     }
 #if USB_CFG_BC == USB_CFG_ENABLE
-    else if ((ists1 & USB_PDDETINT) == USB_PDDETINT) /***** PDDETINT INT *****/
+    else if (USB_PDDETINT == (ists1 & USB_PDDETINT)) /***** PDDETINT INT *****/
     {
-        if (USB_USBIP_1 == ptr -> ip)
+        if (USB_IP1 == ptr -> ip)
         {
             /* PDDETINT  interrupt disable */
             ptr->ipp1->INTSTS1.WORD = (uint16_t) ((~USB_PDDETINT) & INTSTS1_MASK);
@@ -198,13 +201,13 @@ void usb_hstd_interrupt_handler (usb_utr_t *ptr)
     }
 #endif  /* USB_CFG_BC == USB_CFG_ENABLE */
     /***** Processing VBUS/SOF *****/
-    else if ((ists0 & USB_VBINT) == USB_VBINT) /***** VBUS change *****/
+    else if (USB_VBINT == (ists0 & USB_VBINT)) /***** VBUS change *****/
     {
         /* Status Clear */
         ptr->ipp->INTSTS0.WORD = (uint16_t) ~USB_VBINT;
         ptr->keyword = USB_INT_VBINT;
     }
-    else if ((ists0 & USB_SOFR) == USB_SOFR) /***** SOFR change *****/
+    else if (USB_SOFR == (ists0 & USB_SOFR)) /***** SOFR change *****/
     {
         /* SOFR Clear */
         ptr->ipp->INTSTS0.WORD = (uint16_t) ~USB_SOFR;
@@ -225,38 +228,37 @@ void usb_hstd_interrupt_handler (usb_utr_t *ptr)
  Description     : Checks whether USB Device is attached or not and return USB speed
                  : of USB Device
  Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
-                 : uint16_t port     : port number
  Return value    : uint16_t          : connection status
                  :                   : (USB_ATTACHF/USB_ATTACHL/USB_DETACH/USB_OK)
  Note            : Please change for your SYSTEM
  ******************************************************************************/
-uint16_t usb_hstd_chk_attach (usb_utr_t *ptr, uint16_t port)
+uint16_t usb_hstd_chk_attach (usb_utr_t *ptr)
 {
     uint16_t buf[3];
 
-    usb_hstd_read_lnst(ptr, port, buf);
+    usb_hstd_read_lnst(ptr, buf);
 
-    if ((uint16_t) (buf[1] & USB_RHST) == USB_UNDECID)
+    if (USB_UNDECID == (uint16_t) (buf[1] & USB_RHST))
     {
-        if ((buf[0] & USB_LNST) == USB_FS_JSTS)
+        if (USB_FS_JSTS == (buf[0] & USB_LNST))
         {
             /* High/Full speed device */
             USB_PRINTF0(" Detect FS-J\n");
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-            usb_hstd_set_hse(ptr, port, g_usb_hstd_hs_enable[ptr->ip]);
+            usb_hstd_set_hse(ptr, g_usb_hstd_hs_enable[ptr->ip]);
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
             return USB_ATTACHF;
         }
-        else if ((buf[0] & USB_LNST) == USB_LS_JSTS)
+        else if (USB_LS_JSTS == (buf[0] & USB_LNST))
         {
             /* Low speed device */
             USB_PRINTF0(" Attach LS device\n");
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-            usb_hstd_set_hse(ptr, port, USB_HS_DISABLE);
+            usb_hstd_set_hse(ptr, USB_HS_DISABLE);
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
             return USB_ATTACHL;
         }
-        else if ((buf[0] & USB_LNST) == USB_SE0)
+        else if (USB_SE0 == (buf[0] & USB_LNST))
         {
             USB_PRINTF0(" Detach device\n");
         }
@@ -281,20 +283,18 @@ uint16_t usb_hstd_chk_attach (usb_utr_t *ptr, uint16_t port)
  Description     : Checks SOF sending setting when USB Device is detached or suspended
                  : , BCHG interrupt enable setting and clock stop processing
  Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
-                 : uint16_t port     : port number
                  : uint16_t event    : device state
  Return value    : none
  ******************************************************************************/
-void usb_hstd_chk_clk (usb_utr_t *ptr, uint16_t port, uint16_t event)
+void usb_hstd_chk_clk (usb_utr_t *ptr, uint16_t event)
 {
 
-    if ((USB_DETACHED == g_usb_hstd_mgr_mode[ptr->ip][USB_PORT0])
-            || (USB_SUSPENDED == g_usb_hstd_mgr_mode[ptr->ip][USB_PORT0]))
+    if ((USB_DETACHED == g_usb_hstd_mgr_mode[ptr->ip]) || (USB_SUSPENDED == g_usb_hstd_mgr_mode[ptr->ip]))
     {
-        usb_hstd_chk_sof(ptr, (uint16_t) USB_PORT0);
+        usb_hstd_chk_sof(ptr);
 
         /* Enable port BCHG interrupt */
-        usb_hstd_bchg_enable(ptr, (uint16_t) USB_PORT0);
+        usb_hstd_bchg_enable(ptr);
     }
 
 } /* End of function usb_hstd_chk_clk */
@@ -308,10 +308,9 @@ void usb_hstd_chk_clk (usb_utr_t *ptr, uint16_t port, uint16_t event)
                  : (Data transfer forcibly termination processing to the connected USB Device,
                  : the clock supply stop setting and the USB interrupt dissable setteing etc)
  Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
-                 : uint16_t port     : port number
  Return value    : none
  ******************************************************************************/
-void usb_hstd_detach_process (usb_utr_t *ptr, uint16_t port)
+void usb_hstd_detach_process (usb_utr_t *ptr)
 {
     uint16_t connect_inf;
     uint16_t md;
@@ -319,22 +318,24 @@ void usb_hstd_detach_process (usb_utr_t *ptr, uint16_t port)
     uint16_t addr;
 
     /* ATTCH interrupt disable */
-    usb_hstd_attch_disable(ptr, port);
+    usb_hstd_attch_disable(ptr);
 
     /* DTCH  interrupt disable */
-    usb_hstd_dtch_disable(ptr, port);
-    usb_hstd_bchg_disable(ptr, (uint16_t) USB_PORT0);
+    usb_hstd_dtch_disable(ptr);
+    usb_hstd_bchg_disable(ptr);
 
+    /* WAIT_LOOP */
     for (md = 1u; md < (USB_MAXDEVADDR + 1u); md++)
     {
         addr = (uint16_t) (md << USB_DEVADDRBIT);
-        if (usb_hstd_chk_dev_addr(ptr, addr, port) != USB_NOCONNECT)
+        if (usb_hstd_chk_dev_addr(ptr, addr) != USB_NOCONNECT)
         {
             if (USB_IDLEST != g_usb_hstd_ctsq[ptr->ip])
             {
                 /* Control Read/Write End */
                 usb_hstd_ctrl_end(ptr, (uint16_t) USB_DATA_ERR);
             }
+            /* WAIT_LOOP */
             for (i = USB_MIN_PIPE_NO; i <= USB_MAX_PIPE_NO; i++)
             {
                 /* Not control transfer */
@@ -342,7 +343,7 @@ void usb_hstd_detach_process (usb_utr_t *ptr, uint16_t port)
                 if (usb_hstd_get_devsel(ptr, i) == addr)
                 {
                     /* PID=BUF ? */
-                    if (usb_cstd_get_pid(ptr, i) == USB_PID_BUF)
+                    if (USB_PID_BUF == usb_cstd_get_pid(ptr, i))
                     {
                         /* End of data transfer (IN/OUT) */
                         usb_hstd_forced_termination(ptr, i, (uint16_t) USB_DATA_STOP);
@@ -350,37 +351,37 @@ void usb_hstd_detach_process (usb_utr_t *ptr, uint16_t port)
                     usb_cstd_clr_pipe_cnfg(ptr, i);
                 }
             }
-            usb_hstd_set_dev_addr(ptr, addr, USB_OK, USB_OK);
-            usb_hstd_set_hub_port(ptr, addr, USB_OK, USB_OK);
+            usb_hstd_set_dev_addr(ptr, addr, USB_NOCONNECT);
+            usb_hstd_set_hub_port(ptr, addr, USB_NULL, USB_NULL);
             USB_PRINTF1("*** Device address %d clear.\n",md);
         }
     }
 
     /* Decide USB Line state (ATTACH) */
-    connect_inf = usb_hstd_chk_attach(ptr, port);
+    connect_inf = usb_hstd_chk_attach(ptr);
     switch (connect_inf)
     {
         case USB_ATTACHL :
-            usb_hstd_attach(ptr, connect_inf, port);
+            usb_hstd_attach(ptr, connect_inf);
         break;
         case USB_ATTACHF :
-            usb_hstd_attach(ptr, connect_inf, port);
+            usb_hstd_attach(ptr, connect_inf);
         break;
         case USB_DETACH :
 
             /* USB detach */
-            usb_hstd_detach(ptr, port);
+            usb_hstd_detach(ptr);
 
             /* Check clock */
-            usb_hstd_chk_clk(ptr, port, (uint16_t) USB_DETACHED);
+            usb_hstd_chk_clk(ptr, (uint16_t) USB_DETACHED);
         break;
         default :
 
             /* USB detach */
-            usb_hstd_detach(ptr, port);
+            usb_hstd_detach(ptr);
 
             /* Check clock */
-            usb_hstd_chk_clk(ptr, port, (uint16_t) USB_DETACHED);
+            usb_hstd_chk_clk(ptr, (uint16_t) USB_DETACHED);
         break;
     }
 }
@@ -394,28 +395,28 @@ void usb_hstd_detach_process (usb_utr_t *ptr, uint16_t port)
                  : are equal and returns the value of DVSTCTR register that correspond to
                  : the port specified by 2nd argument.
  Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
-                 : uint16_t port     : port number
                  : uint16_t *buf     : Pointer to the buffer to store DVSTCTR register
  Return value    : none
  Note            : Please change for your SYSTEM
  ******************************************************************************/
-void usb_hstd_read_lnst (usb_utr_t *ptr, uint16_t port, uint16_t *buf)
+void usb_hstd_read_lnst (usb_utr_t *ptr, uint16_t *buf)
 {
+    /* WAIT_LOOP */
     do
     {
-        buf[0] = hw_usb_read_syssts(ptr, port);
+        buf[0] = hw_usb_read_syssts(ptr);
 
         /* 30ms wait */
         usb_cpu_delay_xms((uint16_t) 30);
-        buf[1] = hw_usb_read_syssts(ptr, port);
+        buf[1] = hw_usb_read_syssts(ptr);
         if ((buf[0] & USB_LNST) == (buf[1] & USB_LNST))
         {
             /* 20ms wait */
             usb_cpu_delay_xms((uint16_t) 20);
-            buf[1] = hw_usb_read_syssts(ptr, port);
+            buf[1] = hw_usb_read_syssts(ptr);
         }
     } while ((buf[0] & USB_LNST) != (buf[1] & USB_LNST));
-    buf[1] = hw_usb_read_dvstctr(ptr, port);
+    buf[1] = hw_usb_read_dvstctr(ptr);
 }
 /******************************************************************************
  End of function usb_hstd_read_lnst
@@ -427,41 +428,40 @@ void usb_hstd_read_lnst (usb_utr_t *ptr, uint16_t port, uint16_t *buf)
                  : handles the required interrupt disable setting etc when USB device
                  : is attached.
  Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
-                 : uint16_t port     : port number
  Return value    : none
  Note            : Please change for your SYSTEM
  ******************************************************************************/
-void usb_hstd_attach_process (usb_utr_t *ptr, uint16_t port)
+void usb_hstd_attach_process (usb_utr_t *ptr)
 {
     uint16_t connect_inf;
 
     /* ATTCH interrupt disable */
-    usb_hstd_attch_disable(ptr, port);
+    usb_hstd_attch_disable(ptr);
 
     /* DTCH  interrupt disable */
-    usb_hstd_dtch_disable(ptr, port);
-    usb_hstd_bchg_disable(ptr, (uint16_t) USB_PORT0);
+    usb_hstd_dtch_disable(ptr);
+    usb_hstd_bchg_disable(ptr);
 
     /* Decide USB Line state (ATTACH) */
-    connect_inf = usb_hstd_chk_attach(ptr, port);
+    connect_inf = usb_hstd_chk_attach(ptr);
     switch (connect_inf)
     {
         case USB_ATTACHL :
-            usb_hstd_attach(ptr, connect_inf, port);
+            usb_hstd_attach(ptr, connect_inf);
         break;
         case USB_ATTACHF :
-            usb_hstd_attach(ptr, connect_inf, port);
+            usb_hstd_attach(ptr, connect_inf);
         break;
         case USB_DETACH :
 
             /* USB detach */
-            usb_hstd_detach(ptr, port);
+            usb_hstd_detach(ptr);
 
             /* Check clock */
-            usb_hstd_chk_clk(ptr, port, (uint16_t) USB_DETACHED);
+            usb_hstd_chk_clk(ptr, (uint16_t) USB_DETACHED);
         break;
         default :
-            usb_hstd_attach(ptr, (uint16_t) USB_ATTACHF, port);
+            usb_hstd_attach(ptr, (uint16_t) USB_ATTACHF);
         break;
     }
 }
@@ -473,10 +473,9 @@ void usb_hstd_attach_process (usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_chk_sof
  Description     : Checks whether SOF is sended or not
  Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
-                 : uint16_t port     : port number
  Return value    : none
  ******************************************************************************/
-void usb_hstd_chk_sof (usb_utr_t *ptr, uint16_t port)
+void usb_hstd_chk_sof (usb_utr_t *ptr)
 {
     usb_cpu_delay_1us((uint16_t) 1); /* Wait 640ns */
 }
@@ -488,35 +487,35 @@ void usb_hstd_chk_sof (usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_bus_reset
  Description     : Setting USB register when BUS Reset
  Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
-                 : uint16_t port     : port number
  Return value    : none
  ******************************************************************************/
-void usb_hstd_bus_reset (usb_utr_t *ptr, uint16_t port)
+void usb_hstd_bus_reset (usb_utr_t *ptr)
 {
     uint16_t buf;
     uint16_t i;
 
     /* USBRST=1, UACT=0 */
-    hw_usb_rmw_dvstctr(ptr, port, USB_USBRST, (USB_USBRST | USB_UACT));
+    hw_usb_rmw_dvstctr(ptr, USB_USBRST, (USB_USBRST | USB_UACT));
 
     /* Wait 50ms */
     usb_cpu_delay_xms((uint16_t) 50);
-    if (USB_USBIP_1 == ptr->ip)
+    if (USB_IP1 == ptr->ip)
     {
         /* USBRST=0 */
-        hw_usb_clear_dvstctr(ptr, USB_PORT0, USB_USBRST); /* for UTMI */
+        hw_usb_clear_dvstctr(ptr, USB_USBRST); /* for UTMI */
         usb_cpu_delay_1us(300);                            /* for UTMI */
     }
 
     /* USBRST=0, RESUME=0, UACT=1 */
-    usb_hstd_set_uact(ptr, port);
+    usb_hstd_set_uact(ptr);
 
     /* Wait 10ms or more (USB reset recovery) */
     usb_cpu_delay_xms((uint16_t) 20);
+    /* WAIT_LOOP */
     for (i = 0, buf = USB_HSPROC; (i < 3) && (USB_HSPROC == buf); ++i)
     {
         /* DeviceStateControlRegister - ResetHandshakeStatusCheck */
-        buf = hw_usb_read_dvstctr(ptr, port);
+        buf = hw_usb_read_dvstctr(ptr);
         buf = (uint16_t) (buf & USB_RHST);
         if (USB_HSPROC == buf)
         {
@@ -536,21 +535,20 @@ void usb_hstd_bus_reset (usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_resume_process
  Description     : Setting USB register when RESUME signal is detected
  Arguments       : usb_utr_t *ptr    : Pointer to usb_utr_t structure.
-                 : uint16_t port     : port number
  Return value    : none
  ******************************************************************************/
-void usb_hstd_resume_process (usb_utr_t *ptr, uint16_t port)
+void usb_hstd_resume_process (usb_utr_t *ptr)
 {
-    usb_hstd_bchg_disable(ptr, port);
+    usb_hstd_bchg_disable(ptr);
 
     /* RESUME=1, RWUPE=0 */
-    hw_usb_rmw_dvstctr(ptr, port, USB_RESUME, (USB_RESUME | USB_RWUPE));
+    hw_usb_rmw_dvstctr(ptr, USB_RESUME, (USB_RESUME | USB_RWUPE));
 
     /* Wait */
     usb_cpu_delay_xms((uint16_t) 20);
 
     /* USBRST=0, RESUME=0, UACT=1 */
-    usb_hstd_set_uact(ptr, port);
+    usb_hstd_set_uact(ptr);
 
     /* Wait */
     usb_cpu_delay_xms((uint16_t) 5);
@@ -563,18 +561,17 @@ void usb_hstd_resume_process (usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_support_speed_check
  Description     : Get USB-speed of the specified port.
  Arguments       : usb_utr_t *ptr   : Pointer to usb_utr_t structure.
-                 : uint16_t port    : port number
  Return value    : uint16_t         : HSCONNECT : Hi-Speed
                  :                  : FSCONNECT : Full-Speed
                  :                  : LSCONNECT : Low-Speed
                  :                  : NOCONNECT : not connect
  ******************************************************************************/
-uint16_t usb_hstd_support_speed_check (usb_utr_t *ptr, uint16_t port)
+uint16_t usb_hstd_support_speed_check (usb_utr_t *ptr)
 {
     uint16_t buf;
     uint16_t conn_inf;
 
-    buf = hw_usb_read_dvstctr(ptr, port);
+    buf = hw_usb_read_dvstctr(ptr);
 
     /* Reset handshake status get */
     buf = (uint16_t) (buf & USB_RHST);
@@ -589,11 +586,14 @@ uint16_t usb_hstd_support_speed_check (usb_utr_t *ptr, uint16_t port)
             conn_inf = USB_FSCONNECT;
         break;
         case USB_LSMODE :
-#if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX71M)
+#if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M)
             conn_inf = USB_LSCONNECT;
-#else   /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX71M) */
+#else   /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M) */
             conn_inf = USB_NOCONNECT;
-#endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX71M) */
+#endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX65N) || defined(BSP_MCU_RX71M) || defined(BSP_MCU_RX72T)\
+    || defined (BSP_MCU_RX72M) */
         break;
         case USB_HSPROC :
             conn_inf = USB_NOCONNECT;
@@ -613,7 +613,7 @@ uint16_t usb_hstd_support_speed_check (usb_utr_t *ptr, uint16_t port)
  Function Name   : usb_hstd_write_fifo
  Description     : Write specified amount of data to specified USB FIFO. 
  Arguments       : usb_utr_t    *ptr       : Pointer to usb_utr_t structure.
-                 : uint16_t     port       : port number
+                 : uint16_t     count      : Write size
                  : uint16_t     pipemode   : The mode of CPU/DMA(D0)/DMA(D1).
                  : uint16_t     *write_p   : Address of buffer of data to write.
  Return value    : The incremented address of last argument (write_p).
@@ -626,79 +626,81 @@ uint8_t *usb_hstd_write_fifo (usb_utr_t *ptr, uint16_t count, uint16_t pipemode,
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-    if (ptr->ip == USB_USBIP_0)
+    if (USB_IP0 == ptr->ip)
     {
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
-    for (even = (uint16_t) (count >> 1); (0 != even); --even)
-    {
-        /* 16bit access */
-        hw_usb_write_fifo16(ptr, pipemode, *((uint16_t *) write_p));
+        /* WAIT_LOOP */
+        for (even = (uint16_t) (count >> 1); (0 != even); --even)
+        {
+            /* 16bit access */
+            hw_usb_write_fifo16(ptr, pipemode, *((uint16_t *) write_p));
 
-        /* Renewal write pointer */
-        write_p += sizeof(uint16_t);
-    }
+            /* Renewal write pointer */
+            write_p += sizeof(uint16_t);
+        }
 
-    if ((count & (uint16_t) 0x0001u) != 0u)
-    {
-        /* 8bit access */
-        /* count == odd */
-        /* Change FIFO access width */
-        hw_usb_set_mbw(ptr, pipemode, USB_MBW_8);
+        if ((count & (uint16_t) 0x0001u) != 0u)
+        {
+            /* 8bit access */
+            /* count == odd */
+            /* Change FIFO access width */
+            hw_usb_set_mbw(ptr, pipemode, USB_MBW_8);
 
-        /* FIFO write */
-        hw_usb_write_fifo8(ptr, pipemode, *write_p);
+            /* FIFO write */
+            hw_usb_write_fifo8(ptr, pipemode, *write_p);
 
-        /* Return FIFO access width */
-        hw_usb_set_mbw(ptr, pipemode, USB_MBW_16);
+            /* Return FIFO access width */
+            hw_usb_set_mbw(ptr, pipemode, USB_MBW_16);
 
-        /* Renewal write pointer */
-        write_p++;
-    }
+            /* Renewal write pointer */
+            write_p++;
+        }
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-}
-else if (ptr->ip == USB_USBIP_1)
-{
-    for (even = (uint16_t)(count >> 2); (0 != even); --even)
-    {
-        /* 16bit access */
-        hw_usb_write_fifo32(ptr, pipemode, *((uint32_t *)write_p));
-
-        /* Renewal write pointer */
-        write_p += sizeof(uint32_t);
     }
-    odd = count % 4;
-    if ((odd & (uint16_t)0x0002u) != 0u)
+    else if (USB_IP1 == ptr->ip)
     {
-        /* 16bit access */
-        /* Change FIFO access width */
-        hw_usb_set_mbw(ptr, pipemode, USB_MBW_16);
+        /* WAIT_LOOP */
+        for (even = (uint16_t)(count >> 2); (0 != even); --even)
+        {
+            /* 16bit access */
+            hw_usb_write_fifo32(ptr, pipemode, *((uint32_t *)write_p));
 
-        /* FIFO write */
-        hw_usb_write_fifo16(ptr, pipemode, *((uint16_t *)write_p));
+            /* Renewal write pointer */
+            write_p += sizeof(uint32_t);
+        }
+        odd = count % 4;
+        if ((odd & (uint16_t)0x0002u) != 0u)
+        {
+            /* 16bit access */
+            /* Change FIFO access width */
+            hw_usb_set_mbw(ptr, pipemode, USB_MBW_16);
 
-        /* Renewal write pointer */
-        write_p += sizeof(uint16_t);
+            /* FIFO write */
+            hw_usb_write_fifo16(ptr, pipemode, *((uint16_t *)write_p));
+
+            /* Renewal write pointer */
+            write_p += sizeof(uint16_t);
+        }
+        if ((odd & (uint16_t)0x0001u) != 0u)
+        {
+            /* 8bit access */
+            /* count == odd */
+            /* Change FIFO access width */
+            hw_usb_set_mbw(ptr, pipemode, USB_MBW_8);
+
+            /* FIFO write */
+            hw_usb_write_fifo8(ptr, pipemode, *write_p);
+
+            /* Renewal write pointer */
+            write_p++;
+        }
+        /* Return FIFO access width */
+        hw_usb_set_mbw(ptr, pipemode, USB_MBW_32);
     }
-    if ((odd & (uint16_t)0x0001u) != 0u)
+    else
     {
-        /* 8bit access */
-        /* count == odd */
-        /* Change FIFO access width */
-        hw_usb_set_mbw(ptr, pipemode, USB_MBW_8);
-
-        /* FIFO write */
-        hw_usb_write_fifo8(ptr, pipemode, *write_p);
-
-        /* Renewal write pointer */
-        write_p++;
+        /* Non */
     }
-    /* Return FIFO access width */
-    hw_usb_set_mbw(ptr, pipemode, USB_MBW_32);
-}
-else
-{
-    /* Non */
-}
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
     return write_p;
 
@@ -711,7 +713,7 @@ else
  Function Name   : usb_hstd_read_fifo
  Description     : Read specified buffer size from the USB FIFO.
  Arguments       : usb_utr_t    *ptr        : Pointer to usb_utr_t structure.
-                 : uint16_t     port        : port number
+                 : uint16_t     count       : Read size
                  : uint16_t     pipemode    : The mode of CPU/DMA(D0)/DMA(D1).
                  : uint16_t     *read_p     : Address of buffer to store the read data
  Return value    : Pointer to a buffer that contains the data to be read next.
@@ -732,80 +734,84 @@ uint8_t *usb_hstd_read_fifo (usb_utr_t *ptr, uint16_t count, uint16_t pipemode, 
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
 
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-    if (USB_USBIP_0 == ptr->ip)
+    if (USB_IP0 == ptr->ip)
     {
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
-    for (even = (uint16_t) (count >> 1); (0 != even); --even)
-    {
-        /* 16bit FIFO access */
-        *(uint16_t *) read_p = hw_usb_read_fifo16(ptr, pipemode);
-
-        /* Renewal read pointer */
-        read_p += sizeof(uint16_t);
-    }
-    if ((count & (uint16_t) 0x0001) != 0)
-    {
-        /* 16bit FIFO access */
-        odd_byte_data_temp = hw_usb_read_fifo16(ptr, pipemode);
-
-        /* Condition compilation by the difference of the little endian */
-#if USB_CFG_ENDIAN == USB_CFG_LITTLE
-        *read_p = (uint8_t) (odd_byte_data_temp & 0x00ff);
-#else   /* USB_CFG_ENDIAN == USB_CFG_LITTLE */
-        *read_p = (uint8_t) (odd_byte_data_temp >> 8);
-#endif  /* USB_CFG_ENDIAN == USB_CFG_LITTLE */
-
-        /* Renewal read pointer */
-        read_p += sizeof(uint8_t);
-    }
-#if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
-}
-else if (ptr->ip == USB_USBIP_1)
-{
-    for (even = (uint16_t)(count >> 2); (0 != even); --even)
-    {
-        /* 32bit FIFO access */
-        *(uint32_t *)read_p= hw_usb_read_fifo32(ptr, pipemode);
-
-        /* Renewal read pointer */
-        read_p += sizeof(uint32_t);
-    }
-    odd = count % 4;
-    if (count < 4)
-    {
-        odd = count;
-    }
-    if (odd != 0)
-    {
-        /* 32bit FIFO access */
-        odd_byte_data_temp = hw_usb_read_fifo32(ptr, pipemode);
-
-        /* Condition compilation by the difference of the little endian */
-#if USB_CFG_ENDIAN == USB_CFG_LITTLE
-        do
+        /* WAIT_LOOP */
+        for (even = (uint16_t) (count >> 1); (0 != even); --even)
         {
-            *read_p = (uint8_t)(odd_byte_data_temp & 0x000000ff);
-            odd_byte_data_temp = odd_byte_data_temp >> 8;
+            /* 16bit FIFO access */
+            *(uint16_t *) read_p = hw_usb_read_fifo16(ptr, pipemode);
 
             /* Renewal read pointer */
-            read_p += sizeof(uint8_t);
-            odd--;
-        }while (odd != 0);
-#else   /* USB_CFG_ENDIAN == USB_CFG_LITTLE */
-        for (i = 0; i < odd; i++)
+            read_p += sizeof(uint16_t);
+        }
+        if ((count & (uint16_t) 0x0001) != 0)
         {
-            *read_p = (uint8_t)( ( odd_byte_data_temp >> (24 -(i*8))) & 0x000000ff );
+            /* 16bit FIFO access */
+            odd_byte_data_temp = hw_usb_read_fifo16(ptr, pipemode);
+
+            /* Condition compilation by the difference of the little endian */
+#if USB_CFG_ENDIAN == USB_CFG_LITTLE
+            *read_p = (uint8_t) (odd_byte_data_temp & 0x00ff);
+#else   /* USB_CFG_ENDIAN == USB_CFG_LITTLE */
+            *read_p = (uint8_t) (odd_byte_data_temp >> 8);
+#endif  /* USB_CFG_ENDIAN == USB_CFG_LITTLE */
 
             /* Renewal read pointer */
             read_p += sizeof(uint8_t);
         }
-#endif  /* USB_CFG_ENDIAN == USB_CFG_LITTLE */
+#if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
     }
-}
-else
-{
-    /* None */
-}
+    else if (USB_IP1 == ptr->ip)
+    {
+        /* WAIT_LOOP */
+        for (even = (uint16_t)(count >> 2); (0 != even); --even)
+        {
+            /* 32bit FIFO access */
+            *(uint32_t *)read_p= hw_usb_read_fifo32(ptr, pipemode);
+
+            /* Renewal read pointer */
+            read_p += sizeof(uint32_t);
+        }
+        odd = count % 4;
+        if (count < 4)
+        {
+            odd = count;
+        }
+        if (odd != 0)
+        {
+            /* 32bit FIFO access */
+            odd_byte_data_temp = hw_usb_read_fifo32(ptr, pipemode);
+
+            /* Condition compilation by the difference of the little endian */
+#if USB_CFG_ENDIAN == USB_CFG_LITTLE
+            /* WAIT_LOOP */
+            do
+            {
+                *read_p = (uint8_t)(odd_byte_data_temp & 0x000000ff);
+                odd_byte_data_temp = odd_byte_data_temp >> 8;
+
+                /* Renewal read pointer */
+                read_p += sizeof(uint8_t);
+                odd--;
+            }while (odd != 0);
+#else   /* USB_CFG_ENDIAN == USB_CFG_LITTLE */
+            /* WAIT_LOOP */
+            for (i = 0; i < odd; i++)
+            {
+                *read_p = (uint8_t)( ( odd_byte_data_temp >> (24 -(i*8))) & 0x000000ff );
+
+                /* Renewal read pointer */
+                read_p += sizeof(uint8_t);
+            }
+#endif  /* USB_CFG_ENDIAN == USB_CFG_LITTLE */
+        }
+    }
+    else
+    {
+        /* None */
+    }
 #endif  /* defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M) */
     return read_p;
 }
@@ -842,40 +848,37 @@ void usb_hstd_forced_termination (usb_utr_t *ptr, uint16_t pipe, uint16_t status
 
     usb_cstd_clr_transaction_counter(ptr, pipe);
 
-    /* Clear D1FIFO-port */
+    /* Clear CFIFO-port */
     buffer = hw_usb_read_fifosel(ptr, USB_CUSE);
     if ((buffer & USB_CURPIPE) == pipe)
     {
-        if (USB_USBIP_0 == ptr->ip)
-        {
-            hw_usb_set_mbw(ptr, USB_CUSE, USB0_CFIFO_MBW);
-        }
-#if USB_NUM_USBIP == 2
-        else if (ptr->ip == USB_USBIP_1)
-        {
-            hw_usb_set_mbw(ptr, USB_CUSE, USB1_CFIFO_MBW);
-        }
-#endif /* USB_NUM_USBIP == 2 */
-        else
-        {
-            /* Non */
-        }
-
         /* Changes the FIFO port by the pipe. */
         usb_cstd_chg_curpipe(ptr, (uint16_t) USB_PIPE0, (uint16_t) USB_CUSE, USB_FALSE);
     }
 
-    /* Changes the FIFO port by the pipe. */
-    usb_cstd_chg_curpipe(ptr, pipe, (uint16_t) USB_CUSE, USB_FALSE);
-    buffer = hw_usb_read_fifoctr(ptr, USB_CUSE);
-    if ((uint16_t) (buffer & USB_FRDY) == USB_FRDY)
+#if ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE))
+    /* Clear D0FIFO-port */
+    buffer = hw_usb_read_fifosel(ptr, USB_D0USE);
+    if ((buffer & USB_CURPIPE) == pipe)
     {
-        /* Clear BVAL */
-        hw_usb_set_bclr(ptr, USB_CUSE);
+        /* Changes the FIFO port by the pipe. */
+        usb_cstd_chg_curpipe(ptr, (uint16_t) USB_PIPE0, (uint16_t) USB_D0USE, USB_FALSE);
     }
 
+    /* Clear D1FIFO-port */
+    buffer = hw_usb_read_fifosel(ptr, USB_D1USE);
+    if ((buffer & USB_CURPIPE) == pipe)
+    {
+        /* Changes the FIFO port by the pipe. */
+        usb_cstd_chg_curpipe(ptr, (uint16_t) USB_PIPE0, (uint16_t) USB_D1USE, USB_FALSE);
+    }
+
+#endif /* ((USB_CFG_DTC == USB_CFG_ENABLE) || (USB_CFG_DMA == USB_CFG_ENABLE)) */
+
+    /* Do Aclr */
+    usb_cstd_do_aclrm(ptr, pipe);
+
     /* FIFO buffer SPLIT transaction initialized */
-    usb_cstd_chg_curpipe(ptr, (uint16_t) USB_PIPE0, (uint16_t) USB_CUSE, USB_FALSE);
     hw_usb_set_csclr(ptr, pipe);
 
     /* Call Back */
@@ -892,7 +895,16 @@ void usb_hstd_forced_termination (usb_utr_t *ptr, uint16_t pipe, uint16_t status
         {
             (g_p_usb_hstd_pipe[ptr->ip][pipe]->complete)(g_p_usb_hstd_pipe[ptr->ip][pipe], 0, 0);
         }
+
+#if BSP_CFG_RTOS_USED == 1
+        vPortFree (g_p_usb_hstd_pipe[ptr->ip][pipe]);
         g_p_usb_hstd_pipe[ptr->ip][pipe] = (usb_utr_t*) USB_NULL;
+        usb_cstd_pipe_msg_re_forward (ptr->ip, pipe);    /* Get PIPE Transfer wait que and Message send to HCD */
+
+#else   /* BSP_CFG_RTOS_USED == 1 */
+        g_p_usb_hstd_pipe[ptr->ip][pipe] = (usb_utr_t*) USB_NULL;
+
+#endif  /* BSP_CFG_RTOS_USED == 1 */
     }
 }
 /******************************************************************************
@@ -903,7 +915,7 @@ void usb_hstd_forced_termination (usb_utr_t *ptr, uint16_t pipe, uint16_t status
  Function Name   : usb_hstd_get_usb_ip_adr
  Description     : Get base address of the selected USB channel's peripheral 
                  : registers.
- Argument        : uint16_t ipnum  : USB_USBIP_0 (0), or USB_USBIP_1 (1).
+ Argument        : uint16_t ipnum  : USB_IP0 (0), or USB_IP1 (1).
  Return          : usb_regadr_t    : A pointer to the USB_597IP register 
                  : structure USB_REGISTER containing all USB
                  : channel's registers.
@@ -912,12 +924,12 @@ usb_regadr_t usb_hstd_get_usb_ip_adr (uint16_t ipnum)
 {
     usb_regadr_t ptr;
 
-    if (USB_USBIP_0 == ipnum)
+    if (USB_IP0 == ipnum)
     {
         ptr = (usb_regadr_t) &USB0_;
     }
 #if USB_NUM_USBIP == 2
-    else if (USB_USBIP_1 == ipnum)
+    else if (USB_IP1 == ipnum)
     {
 #if defined(BSP_MCU_RX64M) || defined(BSP_MCU_RX71M)
         ptr = (usb_regadr_t)&USBA;
@@ -959,7 +971,7 @@ void usb_hstd_nrdy_endprocess (usb_utr_t *ptr, uint16_t pipe)
     buffer = usb_cstd_get_pid(ptr, pipe);
 
     /* STALL ? */
-    if ((buffer & USB_PID_STALL) == USB_PID_STALL)
+    if (USB_PID_STALL == (buffer & USB_PID_STALL))
     {
         /*USB_PRINTF1("### STALL Pipe %d\n", pipe);*/
         /* @4 */
@@ -969,7 +981,7 @@ void usb_hstd_nrdy_endprocess (usb_utr_t *ptr, uint16_t pipe)
     else
     {
         /* Wait for About 60ns */
-        buffer = hw_usb_read_syssts(ptr, USB_PORT0);
+        buffer = hw_usb_read_syssts(ptr);
 
         /* @3 */
         g_usb_hstd_ignore_cnt[ptr->ip][pipe]++;
