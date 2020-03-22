@@ -14,8 +14,9 @@
 
 #include "r_usb_hmsc.h"
 #include "r_usb_extern.h"
+#include "r_usb_hmsc_if.h"
 
-namespace fatfs {
+namespace usb_host {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -24,13 +25,15 @@ namespace fatfs {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class USB_IO>
-	class usb_hmsc {
+	class hmsc {
 
 		static const uint32_t SECTOR_SIZE = 512;
 
 		typedef utils::format format;
 
 		USB_IO&		usb_;
+
+		usb_ctrl_t	ctrl_;
 
 		FATFS		fatfs_;
 
@@ -51,9 +54,10 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
+			@param[in]	usb	USB_IO インスタンス
 		*/
 		//-----------------------------------------------------------------//
-		usb_hmsc(USB_IO& usb) : usb_(usb), fatfs_(), mount_(false) { }
+		hmsc(USB_IO& usb) : usb_(usb), ctrl_(), fatfs_(), mount_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -64,6 +68,15 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		bool start() noexcept
 		{
+			ctrl_.module    = USB_IP0;
+			ctrl_.type      = USB_HMSC;
+
+			usb_cfg_t cfg;
+			cfg.usb_speed   = USB_FS;
+			cfg.usb_mode    = USB_HOST;
+			auto ret = R_USB_Open(&ctrl_, &cfg);
+///			format("R_USB_Open: (%d)\n") % static_cast<int>(ret);
+
 			return true;
 		}
 
@@ -125,17 +138,17 @@ namespace fatfs {
 			do {
 				res = R_USB_HmscGetDevSts(drv);
 				wait_loop_();
-				err = USB_TRCV_MSG(USB_HSTRG_MBX, (usb_msg_t** ) &mess, (uint16_t )0);
+				err = USB_TRCV_MSG(USB_HSTRG_MBX, (usb_msg_t**)&mess, 0);
 			} while((err != USB_OK) && (res != USB_FALSE)) ;
 
 			if(err == USB_OK) { // Complete R_USB_HmscStrgReadSector()
 				err = mess->result;
-				USB_REL_BLK(USB_HSTRG_MPL, (usb_mh_t )mess);
+				USB_REL_BLK(USB_HSTRG_MPL, (usb_mh_t)mess);
 			} else { // Device detach
 				wait_loop_();
-				err = USB_TRCV_MSG(USB_HSTRG_MBX, (usb_msg_t** ) & mess, (uint16_t )0);
+				err = USB_TRCV_MSG(USB_HSTRG_MBX, (usb_msg_t**)&mess, 0);
 				if(USB_OK == err) {
-					USB_REL_BLK(USB_HSTRG_MPL, (usb_mh_t )mess);
+					USB_REL_BLK(USB_HSTRG_MPL, (usb_mh_t)mess);
 				}
 				err = USB_ERROR;
 			}
@@ -181,7 +194,7 @@ namespace fatfs {
 
 				wait_loop_();
 
-				err = USB_TRCV_MSG(USB_HSTRG_MBX, (usb_msg_t**) &mess, (uint16_t )0);
+				err = USB_TRCV_MSG(USB_HSTRG_MBX, (usb_msg_t**)&mess, 0);
 			} while ((err != USB_OK) && (res != USB_FALSE));
 
 			if(USB_OK == err) {
@@ -189,7 +202,7 @@ namespace fatfs {
 				USB_REL_BLK(USB_HSTRG_MPL, (usb_mh_t)mess);
 			} else {
 				wait_loop_();
-				err = USB_TRCV_MSG(USB_HSTRG_MBX, (usb_msg_t**) &mess, (uint16_t )0);
+				err = USB_TRCV_MSG(USB_HSTRG_MBX, (usb_msg_t**)&mess, 0);
 				if(err == USB_OK) {
 					USB_REL_BLK(USB_HSTRG_MPL, (usb_mh_t)mess);
 				}
@@ -225,13 +238,13 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		void service() noexcept
 		{
-			auto event = R_USB_GetEvent(&usb_.at_ctrl()); /* Get event code */
+			auto event = R_USB_GetEvent(&ctrl_); /* Get event code */
 			switch (event) {
 			case USB_STS_CONFIGURED:
-///				format("USB: CONFIGURED\n");
+///				format("HMSC: CONFIGURED\n");
 				{
 					uint8_t drvno;
-					R_USB_HmscGetDriveNo(&usb_.at_ctrl(), &drvno);
+					R_USB_HmscGetDriveNo(&ctrl_, &drvno);
 
 					auto st = f_mount(&fatfs_, "", 0);
 					if(st == FR_OK) mount_ = true;
@@ -240,7 +253,7 @@ namespace fatfs {
 				break;
 
 			case USB_STS_DETACH:
-///				format("USB: DETACH\n");
+///				format("HMSC: DETACH\n");
 				f_mount(nullptr, "", 0);
 				mount_ = false;
 				break;
