@@ -1,9 +1,10 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	固定サイズ・リスト・クラス
+	@brief	固定サイズ・リスト・クラス @n
+			※作業中
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -11,13 +12,13 @@
 
 namespace utils {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  固定サイズ・リスト・クラス
-		@param[in]	ITEM	格納形
+		@param[in]	ITEM	格納型
 		@param[in]	SIZE	リスト・サイズ
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class ITEM, uint32_t SIZE>
 	struct fixed_list {
 
