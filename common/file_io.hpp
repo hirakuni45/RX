@@ -48,30 +48,51 @@ namespace utils {
 		FIL			fp_;
 		bool		open_;
 
+		struct dir_list_t {
+			bool	ll_;
+			uint8_t	cnt_;
+			uint8_t	lim_;
+		};
+
 		///< 標準的、ディレクトリーリスト
 		static void dir_list_func_(const char* name, const FILINFO* fi, bool dir, void* option)
 		{
 			if(fi == nullptr) return;
 
-			time_t t = str::fatfs_time_to(fi->fdate, fi->ftime);
-			struct tm *m = localtime(&t);
-			if(dir) {
-				format("           ");
+			auto p = static_cast<dir_list_t*>(option);
+
+			if(p->ll_) {
+				time_t t = str::fatfs_time_to(fi->fdate, fi->ftime);
+				struct tm *m = localtime(&t);
+				if(dir) {
+					format("           ");
+				} else {
+					format("%10d ") % fi->fsize;
+				}
+				format("%s %2d %4d %02d:%02d ") 
+					% get_mon(m->tm_mon)
+					% static_cast<int>(m->tm_mday)
+					% static_cast<int>(m->tm_year + 1900)
+					% static_cast<int>(m->tm_hour)
+					% static_cast<int>(m->tm_min);
+				if(dir) {
+					format("/");
+				} else {
+					format(" ");
+				}
+				format("%s\n") % name;
 			} else {
-				format("%10d ") % fi->fsize;
+				if(dir) {
+					format("/");
+				} else {
+					format(" ");
+				}
+				format("%15s") % name;
+				++p->cnt_;
+				if(p->cnt_ >= p->lim_) {
+					p->cnt_ = 0;
+				}
 			}
-			format("%s %2d %4d %02d:%02d ") 
-				% get_mon(m->tm_mon)
-				% static_cast<int>(m->tm_mday)
-				% static_cast<int>(m->tm_year + 1900)
-				% static_cast<int>(m->tm_hour)
-				% static_cast<int>(m->tm_min);
-			if(dir) {
-				format("/");
-			} else {
-				format(" ");
-			}
-			format("%s\n") % name;
 		}
 
 
@@ -576,21 +597,31 @@ namespace utils {
 		/*!
 			@brief	SD カードのディレクトリーをリストする
 			@param[in]	root	ルート・パス
+			@param[in]	ll		ショート表示の場合「false」
 			@return ファイル数
 		 */
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static uint32_t dir(const char* root) noexcept
+		static uint32_t dir(const char* root, bool ll = true) noexcept
 		{
 			char tmp[FF_MAX_LFN + 1];
 			make_full_path(root, tmp, sizeof(tmp));
 			dir_list dl;
 			if(!dl.start(tmp)) return 0;
 
+			dir_list_t t;
+			t.ll_ = ll;
+			t.cnt_ = 0;
+			t.lim_ = 5;
 			do {
-				dl.service(10, dir_list_func_, true);
+				dl.service(10, dir_list_func_, true, &t);
 			} while(dl.probe()) ;
 			auto n = dl.get_total();
-			utils::format("Total %d file%s\n") % n % (n > 1 ? "s" : "");
+			if(t.ll_) utils::format("Total %d file%s\n") % n % (n > 1 ? "s" : "");
+			else {
+				if(t.cnt_ != 0) {
+					utils::format("\n");
+				}
+			}
 			return n;
 		}
 
