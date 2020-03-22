@@ -57,8 +57,12 @@ namespace {
 //	typedef device::NULL_PORT SDC_POWER;
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 
+	// 書き込み禁止は使わない
+	typedef device::NULL_PORT SDC_WPRT;
+
 	// RX65N Envision Kit の SDHI ポートは、候補３で指定できる
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
+		device::port_map::option::THIRD> SDHI;
 	SDHI		sdh_;
 
 	typedef utils::command<256> CMD;

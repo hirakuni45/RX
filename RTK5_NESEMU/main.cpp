@@ -73,8 +73,10 @@ namespace {
 //	typedef device::NULL_PORT SDC_POWER;
 
 #ifdef USE_SDHI
+	// 書き込み禁止は使わない
+	typedef device::NULL_PORT SDC_WP;
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDHI;
 	SDHI		sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）
