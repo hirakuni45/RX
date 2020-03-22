@@ -25,11 +25,11 @@ namespace fatfs {
 		@param[in]	SPI		SPI-IF クラス
 		@param[in]	SEL		デバイス選択ポート・クラス
 		@param[in]	POW		電源制御ポート・クラス
-		@param[in]	WDIS	書き込み禁止ポート・クラス
 		@param[in]	CDT		カード検出ポート・クラス
+		@param[in]	WPR		書き込み禁止ポート・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SPI, class SEL, class POW, class WDIS, class CDT>
+	template <class SPI, class SEL, class POW, class CDT, class WPR>
 	class mmc_io {
 
 		inline void lock_() {

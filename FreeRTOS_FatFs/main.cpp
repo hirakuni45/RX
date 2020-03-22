@@ -179,7 +179,8 @@ namespace {
 	SDC_SPI		sdc_spi_;
 
 	///< FatFs MMC ドライバ（ハードウェアインスタンス、ハードウェア最大速度）
-	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC_DEV;
+	typedef device::NULL_PORT SDC_WPRT;
+	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC_DEV;
 	SDC_DEV		sdc_dev_(sdc_spi_, sdc_spi_speed_);
 
 	typedef utils::command<256> CMD;
