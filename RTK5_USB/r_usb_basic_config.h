@@ -54,7 +54,8 @@
  *  #define USB_CFG_PMSC_USE : Peripheral Mass Storage Class
  *  #define USB_CFG_PVND_USE : Peripheral VENDER Class
  * */
-#define USB_CFG_HMSC_USE    /* Host Mass Storage Class */
+#define USB_CFG_HMSC_USE    /// Host Mass Storage Class
+#define USB_CFG_HHID_USE	/// Host Human Interface Device Class
 
 /**  [DTC use setting]
  * USB_CFG_ENABLE       : Uses DTC
@@ -165,6 +166,18 @@
  * USB_CFG_DISABLE      : DCP disabled.
  */
 #define USB_CFG_DCP                 (USB_CFG_DISABLE)
+
+/** [Setting whteher to use USB Hub]
+ * USB_CFG_ENABLE       : Using USB Hub
+ * USB_CFG_DISABLE      : Not using USB Hub
+ */
+#define USB_CFG_HUB                 (USB_CFG_ENABLE)
+
+/** [Setting whther to use Type-C]
+ * USB_CFG_ENABLE       : Using Type-C
+ * USB_CFG_DISABLE      : Not using Type-C
+ */
+#define USB_CFG_TYPEC               (USB_CFG_DISABLE)
 
 /** [Setting Compliance Test mode]
  * USB_CFG_ENABLE       : Compliance Test supported.

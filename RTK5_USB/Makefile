@@ -69,10 +69,9 @@ CSOURCES	=	common/init.c \
 				r_usb/basic/src/hw/r_usb_preg_access.c \
 				r_usb/hmsc/src/r_usb_hmsc_api.c \
 				r_usb/hmsc/src/r_usb_hmsc_driver.c \
-				r_usb/hmsc/src/r_usb_hstorage_driver.c
-
-#				r_usb/hhid/src/r_usb_hhid_driver.c
-#				r_usb/hhid/src/r_usb_hhid_api.c
+				r_usb/hmsc/src/r_usb_hstorage_driver.c \
+				r_usb/hhid/src/r_usb_hhid_driver.c \
+				r_usb/hhid/src/r_usb_hhid_api.c
 
 PSOURCES	=	main.cpp \
 				RX65x/icu_mgr.cpp \
