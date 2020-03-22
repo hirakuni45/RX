@@ -2,18 +2,9 @@
 //=====================================================================//
 /*!	@file
 	@brief	RX600 グループ、SDHI（SD ホストインターフェース）FatFS ドライバー @n
-			・ピンアサイン（）内は SPI 接続の場合 @n
-			1.D3  (CS) @n
-			2.CMD (DI) @n
-			3.Vss (Vss) @n
-			4.Vdd (Vdd) @n
-			5.CLK (CLK) @n
-			6.Vss (Vss) @n
-			7.D0  (DO)  @n
-			8.D1  -     @n
-			9.D2  -     
+			SDHI インターフェースを使った SD カードアクセス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -23,6 +14,7 @@
 #include "ff13c/source/diskio.h"
 
 #include "common/format.hpp"
+// #include "common/memmgr.hpp"
 
 /// F_PCLKB はクロック速度計算などで必要で、設定が無いとエラーにします。
 #ifndef F_PCLKB
@@ -43,10 +35,11 @@ namespace fatfs {
 		@brief  SDHI テンプレートクラス
 		@param[in]	SDHI	SDHI クラス
 		@param[in]	POW		電源制御ポート・クラス
+		@param[in]	WPRT	書き込み禁止ポート・クラス
 		@param[in]	PSEL	ポート候補（port_map.hpp 参照）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SDHI, class POW,
+	template <class SDHI, class POW, class WPRT = device::NULL_PORT,
 		device::port_map::option PSEL = device::port_map::option::FIRST>
 	class sdhi_io {
 
@@ -93,6 +86,7 @@ namespace fatfs {
 		bool		mount_;
 		bool		start_;
 		bool		onew_;
+		bool		wp_lvl_;
 
 		uint32_t	rca_id_;
 		uint32_t	cid_[4];
@@ -325,12 +319,14 @@ namespace fatfs {
 		/*!
 			@brief	コンストラクター
 			@param[in]	onew	１ビットモードの場合「true」
+			@param[in]	wp_lvl	書き込み禁止ポートの論理
 		 */
 		//-----------------------------------------------------------------//
-		sdhi_io(bool onew = false) noexcept : stat_(STA_NOINIT), card_type_(0),
+		sdhi_io(bool onew = false, bool wp_lvl = 0) noexcept :
+			stat_(STA_NOINIT), card_type_(0),
 			mount_delay_(0), intr_lvl_(0),
 			cd_(false), mount_(false), start_(false),
-			onew_(onew), rca_id_(0)
+			onew_(onew), wp_lvl_(wp_lvl), rca_id_(0)
 		{ }
 
 
@@ -349,6 +345,8 @@ namespace fatfs {
 			POW::DIR = 1;
 			POW::P   = 1;  // offline power
 			POW::PU  = 0;
+
+			WPRT::DIR = 0;
 
 			device::power_mgr::turn(SDHI::get_peripheral());
 			using port_map = device::port_map;
@@ -797,6 +795,8 @@ namespace fatfs {
 		DRESULT disk_write(BYTE drv, const void* buff, DWORD sector, UINT count) noexcept
 		{
 			if(disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
+			if(WPRT::P() == wp_lvl_) return RES_WRPRT;
+
 			if(!(card_type_ & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
 
 			SDHI::SDSTS1 = 0;
@@ -982,6 +982,6 @@ namespace fatfs {
 	};
 
 	// テンプレート関数、実態の定義
-	template <class SDHI, class POW, device::port_map::option PSEL>
-		volatile uint32_t sdhi_io<SDHI, POW, PSEL>::i_count_ = 0;
+	template <class SDHI, class POW, class WDIS, device::port_map::option PSEL>
+		volatile uint32_t sdhi_io<SDHI, POW, WDIS, PSEL>::i_count_ = 0;
 }
