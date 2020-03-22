@@ -70,7 +70,8 @@ namespace {
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDC;
+	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
 	SDC		sdc_;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };

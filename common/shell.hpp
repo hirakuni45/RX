@@ -15,6 +15,7 @@
 //=====================================================================//
 #include "common/file_io.hpp"
 #include "common/format.hpp"
+#include "common/string_utils.hpp"
 
 namespace utils {
 
@@ -29,7 +30,7 @@ namespace utils {
 
 		CMD&	cmd_;
 
-		bool	sdc_state_;
+		bool	state_;
 
 	public:
         //-----------------------------------------------------------------//
@@ -37,7 +38,7 @@ namespace utils {
             @brief  コンストラクター
         */
         //-----------------------------------------------------------------//
-		shell(CMD& cmd) : cmd_(cmd), sdc_state_(true)
+		shell(CMD& cmd) : cmd_(cmd), state_(true)
 		{ }
 
 
@@ -47,7 +48,7 @@ namespace utils {
 			@return ＳＤ操作が正常なら「true」
         */
         //-----------------------------------------------------------------//
-		bool get_status() const { return sdc_state_; }
+		bool get_status() const { return state_; }
 
 
         //-----------------------------------------------------------------//
@@ -60,22 +61,22 @@ namespace utils {
 		{
             auto cmdn = cmd_.get_words();
             if(cmdn >= 1) {
-                if(cmd_.cmp_word(0, "dir")) {  // dir [xxx]
+                if(cmd_.cmp_word(0, "ls")) {  // ls [xxx]
 					char tmp[FF_MAX_LFN + 1];
 					if(cmdn == 1) {
 						if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
-							sdc_state_ = false;
+							state_ = false;
 						} else {
-							sdc_state_ = utils::file_io::dir(tmp);
+							state_ = utils::file_io::dir(tmp);
 						}
 					} else {
 						cmd_.get_word(1, tmp, sizeof(tmp));
-						sdc_state_ = utils::file_io::dir(tmp);
+						state_ = utils::file_io::dir(tmp);
 					}
 				} else if(cmd_.cmp_word(0, "pwd")) {  // pwd
 					char tmp[FF_MAX_LFN + 1];
 					if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
-						sdc_state_ = false;
+						state_ = false;
 					} else {
 						utils::format("%s\n") % tmp;
 					}
@@ -86,7 +87,7 @@ namespace utils {
 					} else {
 						cmd_.get_word(1, tmp, sizeof(tmp));
 					}
-					sdc_state_ = utils::file_io::cd(tmp);
+					state_ = utils::file_io::cd(tmp);
 				} else if(cmd_.cmp_word(0, "free")) {  // free
 					uint32_t fre;
 					uint32_t max;
@@ -94,9 +95,9 @@ namespace utils {
 						uint32_t rate = fre * 1000 / max;
 						utils::format("%u/%u [KB] (%u.%u%%)\n")
 							% fre % max % (rate / 10) % (rate % 10);
-						sdc_state_ = true;
+						state_ = true;
 					} else {
-						sdc_state_ = false;
+						state_ = false;
 					}
 				} else {
 					return false;
@@ -109,14 +110,26 @@ namespace utils {
         //-----------------------------------------------------------------//
         /*!
             @brief  HELP 表示
+			@param[in]	spc0	初期空白数
+			@param[in]	spc1	コマンド群文字数
         */
         //-----------------------------------------------------------------//
-		void help() const {
-			utils::format("    dir [xxx]       list current directory\n");
-			utils::format("    pwd             current directory path\n");
-			utils::format("    cd [xxx]        change current directory\n");
-			utils::format("    free            list disk space\n");
-///						   ---+---+---+---+---+
+		void help(int spc0 = 4, int spc1 = 20) const {
+			static const char* t[] = {
+				"ls [xxx]", "list current directory (-l: long)",
+				"pwd",      "current directory path",
+				"cd [xxx]", "change current directory",
+				"free",     "list disk space",
+			};
+			for(int i = 0; i < 4; ++i) {
+				for(int n = 0; n < spc0; ++n) {
+					utils::format(" ");
+				}
+				utils::format("%s") % t[i * 2];
+				int n = strlen(t[i * 2]);
+				while(n < spc1) { utils::format(" "); ++n; }
+				utils::format("%s\n") % t[i * 2 + 1];
+			}
 		}
 	};
 }

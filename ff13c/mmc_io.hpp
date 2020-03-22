@@ -22,13 +22,14 @@ namespace fatfs {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  MMC テンプレートクラス
-		@param[in]	SPI	SPI-IF クラス
-		@param[in]	SEL	デバイス選択ポート・クラス
-		@param[in]	POW	電源制御ポート・クラス（制御を行わない場合は「NULL_PORT」とする）
-		@param[in]	CDT	カード検出ポート・クラス
+		@param[in]	SPI		SPI-IF クラス
+		@param[in]	SEL		デバイス選択ポート・クラス
+		@param[in]	POW		電源制御ポート・クラス
+		@param[in]	WDIS	書き込み禁止ポート・クラス
+		@param[in]	CDT		カード検出ポート・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SPI, class SEL, class POW, class CDT>
+	template <class SPI, class SEL, class POW, class WDIS, class CDT>
 	class mmc_io {
 
 		inline void lock_() {

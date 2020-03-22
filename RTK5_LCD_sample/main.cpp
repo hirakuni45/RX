@@ -68,8 +68,11 @@ namespace {
 	// ＳＤカード電源制御は使わない場合、「device::NULL_PORT」を指定する。
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 
+	typedef device::NULL_PORT SDC_WPRT;
+
 #ifdef USE_SDHI
-	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, device::port_map::option::THIRD> SDHI;
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
+		device::port_map::option::THIRD> SDHI;
 	SDHI		sdh_;
 #else
 	// Soft SDC 用　SPI 定義（SPI）

@@ -11,7 +11,6 @@
 #include "common/renesas.hpp"
 
 #include "r_usb_basic_if.h"
-#include "r_usb_hmsc_if.h"
 
 extern "C" {
 	void usb_hstd_usb_handler(void);
@@ -35,18 +34,13 @@ namespace device {
 
 		ICU::VECTOR		ivec_;
 
-		usb_ctrl_t		ctrl_;
-
 		int32_t			event_;
 
 		uint32_t		cnt_;
 
-		static volatile uint32_t	int_cnt_;
-
 		static INTERRUPT_FUNC void i_task_()
 		{
 			usb_hstd_usb_handler(); /* Call interrupt routine */
-//			++int_cnt_;
 		}
 
 
@@ -64,13 +58,8 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		usb_io() : ilvl_(0), ivec_(ICU::VECTOR::NONE),
-			ctrl_(),
 			event_(-1)
 		{ }
-
-
-
-		usb_ctrl_t& at_ctrl() { return ctrl_; }
 
 
 		//-----------------------------------------------------------------//
@@ -88,15 +77,6 @@ namespace device {
 			if(!port_map::turn(USB_CH::get_peripheral())) {
 				return false;
 			}
-
-			ctrl_.module    = USB_IP0;
-			ctrl_.type      = USB_HMSC;
-
-			usb_cfg_t cfg;
-			cfg.usb_speed   = USB_FS;
-			cfg.usb_mode    = USB_HOST;
-			auto ret = R_USB_Open(&ctrl_, &cfg);
-//			format("R_USB_Open: (%d)\n") % static_cast<int>(ret);
 
 			return true;
 		}
@@ -125,5 +105,5 @@ namespace device {
 		}
 	};
 
-	template <class USB_CH> volatile uint32_t usb_io<USB_CH>::int_cnt_ = 0;
+//	template <class USB_CH> volatile uint32_t usb_io<USB_CH>::int_cnt_ = 0;
 }

@@ -32,8 +32,11 @@
 #include "r_usb_basic_config.h"
 #include "usb/usb_io.hpp"
 #include "usb/usb_hmsc.hpp"
+#include "usb/usb_hhid.hpp"
+#include "usb/usb_keyboard.hpp"
 
-#include "usb/usb_host.hpp"
+// SD カードを併用する場合有効にする
+// #define WITH_SDC
 
 namespace {
 
@@ -52,8 +55,25 @@ namespace {
 
 	USB_IO		usb_io_;
 
-	typedef fatfs::usb_hmsc<USB_IO> HMSC;
+	typedef usb_host::hmsc<USB_IO> HMSC;
 	HMSC		hmsc_(usb_io_);
+
+	typedef usb_host::hhid<USB_IO> HHID;
+	HHID		hhid_(usb_io_);
+
+	typedef usb::keyboard KEYBOARD;
+	KEYBOARD	kbd_;
+
+#ifdef WITH_SDC
+	// カード電源制御を使わない場合、「device::NULL_PORT」を指定する。
+	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
+	// カードの書き込み禁止検出ポート
+	typedef device::NULL_PORT SDC_WDIS;
+
+	// RX65N Envision Kit の SDHI ポートは、候補３になっている
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WDIS, device::port_map::option::THIRD> SDHI;
+ 	SDHI		sdh_;
+#endif
 
 	static const uint32_t CMT_FREQ = 1000;  ///< 計測用タイマー分解能
 
@@ -357,8 +377,15 @@ int main(int argc, char** argv)
 			utils::format("USB Host not start...\n");
 		} else {
 			utils::format("USB Host start...\n");
+///			hmsc_.start();
+			hhid_.start();
 		}
 	}
+#ifdef WITH_SDC
+	{  // SD カード開始
+		sdh_.start();
+	}
+#endif
 
 	cmd_.set_prompt("# ");
 
@@ -366,8 +393,11 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.at_task().sync_100hz();
 
-		hmsc_.service();
-
+///		hmsc_.service();
+		hhid_.service();
+#ifdef WITH_SDC
+		sdh_.service();
+#endif
 		command_();
 
 		++cnt;
