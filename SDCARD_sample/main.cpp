@@ -59,7 +59,8 @@ namespace {
 	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;	///< カード選択信号
 	typedef device::PORT<device::PORT8, device::bitpos::B2> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;	///< カード検出
-	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC;
+	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
+	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
 	SDC		sdc_(sdc_spi_, 25000000);
 	// 内臓 RTC を有効
 	#define ENABLE_RTC
@@ -83,7 +84,8 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B5> SDC_SELECT;	///< カード選択信号
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
-	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> SDC;
+	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
+	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
 	SDC_SPI	sdc_spi_;
 	SDC		sdc_(sdc_spi_, 20000000);
 	typedef device::iica_io<device::RIIC0> I2C;

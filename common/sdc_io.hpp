@@ -32,7 +32,7 @@ namespace utils {
 
 		typedef SPI spi_type;	///< ＳＰＩ型
 
-		typedef fatfs::mmc_io<SPI, SELECT, POWER, DETECT> mmc_type;	///< ＭＭＣ型
+		typedef fatfs::mmc_io<SPI, SELECT, POWER, DETECT, WP> mmc_type;	///< ＭＭＣ型
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

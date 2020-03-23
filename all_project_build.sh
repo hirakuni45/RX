@@ -30,18 +30,20 @@ make_clean()
 if [[ $1 = "clean" ]]; then
 	for file in `ls -d *`;
 	do
-		if [ -e "${file}/Makefile" ]; then
-			make_clean "" "${file}"
-		elif [ -d "${file}" ]; then
-			cd "${file}"
-			for proj in `ls -d *`;
-			do
-				if [ -e "${proj}/Makefile" ]; then
-					make_clean "${file}" "${proj}"
-				fi
-			done
+	    if [ ${file} = "legacy" ]; then
+		echo "${GREEN}Legacy project: pass..." "${NOCOLOR}"
+	    elif [ -e "${file}/Makefile" ]; then
+		make_clean "" "${file}"
+	    elif [ -d "${file}" ]; then
+		cd "${file}"
+		for proj in `ls -d *`;
+		    do
+			if [ -e "${proj}/Makefile" ]; then
+			    make_clean "${file}" "${proj}"
+			fi
+		    done
 			cd ..
-		fi
+	     fi
 	done
 fi
 
@@ -71,7 +73,9 @@ do
 done
 for file in `ls -d *`;
 do
-	if [ -e "${file}/Makefile" ]; then
+    	if [ ${file} = "legacy" ]; then
+	    echo "Legacy project: pass..."
+	elif [ -e "${file}/Makefile" ]; then
 		make_main "" ${file}
 	elif [ -d "${file}" ]; then
 		cd "${file}"

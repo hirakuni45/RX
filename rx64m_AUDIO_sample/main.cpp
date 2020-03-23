@@ -80,7 +80,10 @@ namespace {
 #endif
 	SPI			spi_;
 
-	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   ///< ハードウェアー定義
+	typedef device::NULL_PORT SDC_WPRT;
+
+	/// SD カード・ハードウェアー定義
+	typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> MMC;
 
 	MMC			sdh_(spi_, 35000000);
 	typedef utils::dir_list DLIST;
