@@ -4,7 +4,7 @@
 	@brief	RX64M, RX71M グループ・ポート・マッピング @n
 			・ペリフェラル型に従って、ポートの設定をグループ化して設定 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,6 +12,11 @@
 #include "RX600/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
+
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#else  
+#  error "port_map.hpp requires SIG_RX64M or SIG_RX71M to be defined"
+#endif
 
 namespace device {
 

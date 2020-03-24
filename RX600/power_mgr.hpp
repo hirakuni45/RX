@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・電力制御
+	@brief	RX64M/RX71M グループ・電力制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,6 +12,11 @@
 #include "RX600/system.hpp"
 #include "RX600/bus.hpp"
 #include "common/static_holder.hpp"
+
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+#else  
+#  error "power_mgr.hpp requires SIG_RX64M or SIG_RX71M to be defined"
+#endif
 
 namespace device {
 
