@@ -4,7 +4,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 7 9
+Sheet 6 9
 Title ""
 Date ""
 Rev ""
@@ -154,9 +154,13 @@ F 3 "" H 8250 5050 50  0001 C CNN
 	1    8250 5050
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	5050 3300 4050 3300
+Text GLabel 4050 3300 0    50   Output ~ 10
+~RESET~
 $Comp
 L renesas:RX72M_176 U?
-U 1 1 5DC5E0A8
+U 1 1 5E7DD9B3
 P 5700 3800
 F 0 "U?" H 5700 4755 50  0000 C CNN
 F 1 "RX72M_176" H 5700 4664 50  0000 C CNN
@@ -165,8 +169,4 @@ F 3 "" H 5650 3500 50  0001 C CNN
 	1    5700 3800
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	5050 3300 4050 3300
-Text GLabel 4050 3300 0    50   Output ~ 10
-~RESET~
 $EndSCHEMATC

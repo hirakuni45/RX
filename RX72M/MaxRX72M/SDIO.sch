@@ -4,7 +4,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 5 9
+Sheet 4 9
 Title ""
 Date ""
 Rev ""
@@ -332,74 +332,10 @@ F 3 "" H 5950 5150 50  0001 C CNN
 	1    5950 5150
 	1    0    0    -1  
 $EndComp
-$Comp
-L Transistor_FET:DMG2301L Q?
-U 1 1 5DC6DC81
-P 4300 1900
-F 0 "Q?" V 4643 1900 50  0000 C CNN
-F 1 "DMG3415U" V 4552 1900 50  0000 C CNN
-F 2 "Package_TO_SOT_SMD:SOT-23" H 4500 1825 50  0001 L CIN
-F 3 "https://www.diodes.com/assets/Datasheets/DMG2301L.pdf" H 4300 1900 50  0001 L CNN
-	1    4300 1900
-	0    1    -1   0   
-$EndComp
-Wire Wire Line
-	4100 1800 3800 1800
-Wire Wire Line
-	3800 1800 3800 1700
-$Comp
-L power:+3.3V #PWR?
-U 1 1 5DC74F4F
-P 3800 1700
-F 0 "#PWR?" H 3800 1550 50  0001 C CNN
-F 1 "+3.3V" H 3815 1873 50  0000 C CNN
-F 2 "" H 3800 1700 50  0001 C CNN
-F 3 "" H 3800 1700 50  0001 C CNN
-	1    3800 1700
-	1    0    0    -1  
-$EndComp
-$Comp
-L Device:R R?
-U 1 1 5DC759E7
-P 3800 2050
-F 0 "R?" H 3870 2096 50  0000 L CNN
-F 1 "10K" H 3870 2005 50  0000 L CNN
-F 2 "" V 3730 2050 50  0001 C CNN
-F 3 "~" H 3800 2050 50  0001 C CNN
-	1    3800 2050
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	3800 1900 3800 1800
-Connection ~ 3800 1800
-Wire Wire Line
-	3800 2200 3800 2300
-Wire Wire Line
-	3800 2300 4300 2300
-Wire Wire Line
-	4300 2300 4300 2100
-Wire Wire Line
-	4300 2300 4300 2550
 Wire Wire Line
 	4300 2550 4100 2550
-Connection ~ 4300 2300
 Text HLabel 4100 2550 0    50   Input ~ 10
 SDHI_PE
-$Comp
-L Device:R L?
-U 1 1 5DC79249
-P 5100 1800
-F 0 "L?" V 4893 1800 50  0000 C CNN
-F 1 "220/1KHz" V 4984 1800 50  0000 C CNN
-F 2 "" V 5030 1800 50  0001 C CNN
-F 3 "~" H 5100 1800 50  0001 C CNN
-	1    5100 1800
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	4500 1800 4950 1800
-Wire Wire Line
-	5250 1800 5450 1800
 Wire Wire Line
 	5450 1800 5450 2550
 $Comp

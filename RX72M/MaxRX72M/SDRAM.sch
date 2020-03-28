@@ -4,7 +4,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 4 9
+Sheet 3 9
 Title ""
 Date ""
 Rev ""
@@ -18,6 +18,8 @@ $Comp
 L SDRAM:IS42S16160G-xT U?
 U 1 1 5DBD840C
 P 4450 4200
+AR Path="/5DBD840C" Ref="U?"  Part="1" 
+AR Path="/5DBD746D/5DBD840C" Ref="U?"  Part="1" 
 F 0 "U?" H 3900 5600 50  0000 C CNN
 F 1 "IS42S16160G-xT" H 5400 3050 50  0000 C CNN
 F 2 "Package_SO:TSOP-II-54_10.16x22.22mm_P0.8mm" H 4450 4300 50  0001 C CNN

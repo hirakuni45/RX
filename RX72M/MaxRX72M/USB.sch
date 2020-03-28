@@ -4,7 +4,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 8 9
+Sheet 7 9
 Title ""
 Date ""
 Rev ""
@@ -14,19 +14,6 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-$Comp
-L MaxRX72M-rescue:RX72M_176-renesas U?
-U 5 1 5DC34870
-P 6050 3900
-AR Path="/5DC34870" Ref="U?"  Part="5" 
-AR Path="/5DC3479B/5DC34870" Ref="U?"  Part="5" 
-F 0 "U?" H 6528 3966 50  0000 L CNN
-F 1 "RX72M_176" H 6528 3875 50  0000 L CNN
-F 2 "LQFP-176_24x24mm_Pitch0.5mm" H 6528 3784 50  0000 L CNN
-F 3 "" H 6000 3600 50  0001 C CNN
-	5    6050 3900
-	1    0    0    -1  
-$EndComp
 $Comp
 L Connector:USB_A J?
 U 1 1 5DC3C34C
@@ -42,10 +29,6 @@ Wire Wire Line
 	3550 4450 4500 4450
 Wire Wire Line
 	3550 4350 4150 4350
-Wire Wire Line
-	5300 4350 5300 4150
-Wire Wire Line
-	5300 4150 5400 4150
 $Comp
 L power:GND #PWR?
 U 1 1 5DC405BA
@@ -90,9 +73,6 @@ F 3 "~" V 4500 4650 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	4150 4550 4150 4350
-Connection ~ 4150 4350
-Wire Wire Line
-	4150 4350 5300 4350
 Wire Wire Line
 	4500 4450 4500 4550
 Connection ~ 4500 4450
@@ -121,16 +101,34 @@ $EndComp
 $Comp
 L power:GND #PWR?
 U 1 1 5DC43B20
-P 5100 3850
-F 0 "#PWR?" H 5100 3600 50  0001 C CNN
-F 1 "GND" H 5105 3677 50  0000 C CNN
-F 2 "" H 5100 3850 50  0001 C CNN
-F 3 "" H 5100 3850 50  0001 C CNN
-	1    5100 3850
+P 5100 4800
+F 0 "#PWR?" H 5100 4550 50  0001 C CNN
+F 1 "GND" H 5105 4627 50  0000 C CNN
+F 2 "" H 5100 4800 50  0001 C CNN
+F 3 "" H 5100 4800 50  0001 C CNN
+	1    5100 4800
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5100 3850 5100 3700
+	5100 4800 5100 4650
 Wire Wire Line
-	5100 3700 5400 3700
+	5100 4650 5400 4650
+$Comp
+L renesas:RX72M_176 U?
+U 5 1 5E7DEA68
+P 6050 4350
+F 0 "U?" H 6528 4416 50  0000 L CNN
+F 1 "RX72M_176" H 6528 4325 50  0000 L CNN
+F 2 "LQFP-176_24x24mm_Pitch0.5mm" H 6528 4234 50  0000 L CNN
+F 3 "" H 6000 4050 50  0001 C CNN
+	5    6050 4350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4150 4350 5300 4350
+Wire Wire Line
+	5300 4350 5300 4250
+Wire Wire Line
+	5300 4250 5400 4250
+Connection ~ 4150 4350
 $EndSCHEMATC
