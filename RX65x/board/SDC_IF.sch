@@ -1,10 +1,10 @@
 EESchema Schematic File Version 4
 LIBS:board-cache
-EELAYER 29 0
+EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 3 8
+Sheet 3 9
 Title ""
 Date ""
 Rev ""
@@ -31,7 +31,7 @@ SD_WP
 Text GLabel 3050 2800 0    50   Input ~ 0
 SD_CD
 $Comp
-L board-rescue:SD-CARD-SOCKET-akizuki CN1
+L board-rescue:SD-CARD-SOCKET-akizuki-board-rescue CN1
 U 1 1 5C7298FC
 P 4300 3200
 F 0 "CN1" H 4578 3253 60  0000 L CNN
@@ -52,7 +52,7 @@ Wire Wire Line
 Wire Wire Line
 	3050 3800 3850 3800
 $Comp
-L board-rescue:R-akizuki R?
+L board-rescue:R-akizuki-board-rescue R?
 U 1 1 5C7AFF66
 P 3350 3300
 F 0 "R?" H 3350 3200 50  0000 C CNN
@@ -69,7 +69,7 @@ Wire Wire Line
 Wire Wire Line
 	3850 3700 3050 3700
 $Comp
-L board-rescue:R-akizuki R?
+L board-rescue:R-akizuki-board-rescue R?
 U 1 1 5C7B011C
 P 3350 3600
 F 0 "R?" H 3350 3500 50  0000 C CNN
@@ -124,7 +124,7 @@ F 3 "" H 3650 2350 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L board-rescue:C-akizuki C?
+L board-rescue:C-akizuki-board-rescue C?
 U 1 1 5C745830
 P 5650 3200
 F 0 "C?" H 5732 3253 60  0000 L CNN
