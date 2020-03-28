@@ -68,6 +68,10 @@ namespace utils {
 				for(uint32_t n = 0; n < (F_ICLK / 3346666); ++n) {
 					asm("nop");
 				}
+#elif defined(SIG_RX72T)
+				for(uint32_t n = 0; n < (F_ICLK / 3346666); ++n) {
+					asm("nop");
+				}
 #else
 #  error "delay.hpp requires tune dummy operations"
 #endif

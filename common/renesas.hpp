@@ -150,7 +150,7 @@
 #include "RX600/drw2d_mgr.hpp"
 #include "RX600/dmac_mgr.hpp"
 
-#elif defined(SIG_RX66T) || defined(SIG_RX72T)
+#elif defined(SIG_RX66T)
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"
 #include "RX600/dmac.hpp"
@@ -159,6 +159,25 @@
 #include "RX66T/gptw.hpp"
 #include "RX66T/hrpwm.hpp"
 #include "RX66T/poeg.hpp"
+#include "RX600/can.hpp"
+#include "RX600/r12da.hpp"
+#include "RX600/dac_out.hpp"
+#include "RX600/usb.hpp"
+#include "RX600/wdta.hpp"
+#include "RX600/flash.hpp"
+#include "RX600/flash_io.hpp"
+#include "RX600/cmpc.hpp"
+#include "RX600/dmac_mgr.hpp"
+
+#elif defined(SIG_RX72T)
+#include "RX600/system.hpp"
+#include "RX600/system_io.hpp"
+#include "RX600/dmac.hpp"
+#include "RX600/elc.hpp"
+#include "RX600/mpc.hpp"
+//#include "RX66T/gptw.hpp"
+//#include "RX66T/hrpwm.hpp"
+//#include "RX66T/poeg.hpp"
 #include "RX600/can.hpp"
 #include "RX600/r12da.hpp"
 #include "RX600/dac_out.hpp"

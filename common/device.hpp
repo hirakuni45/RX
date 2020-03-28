@@ -55,6 +55,14 @@
 #include "RX66T/icu_mgr.hpp"
 #include "RX66T/port_map.hpp"
 
+#elif defined(SIG_RX72T)
+#include "RX72T/peripheral.hpp"
+#include "RX600/system.hpp"
+#include "RX72T/power_mgr.hpp"
+#include "RX72T/icu.hpp"
+#include "RX72T/icu_mgr.hpp"
+#include "RX72T/port_map.hpp"
+
 #else
 #  error "device.hpp: Requires SIG_XXX to be defined"
 #endif
