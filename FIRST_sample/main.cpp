@@ -16,6 +16,9 @@
 			RX66T: @n
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する
+			RX72T: @n
+					8MHz のベースクロックを使用する @n
+					P01 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -49,6 +52,9 @@ namespace {
 #elif defined(SIG_RX66T)
 	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+#elif defined(SIG_RX72T)
+	typedef device::system_io<8000000, 196000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 #endif
 }
 
