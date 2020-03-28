@@ -241,7 +241,7 @@ namespace device {
 		};
 		static memwait_t<0x00086610> MEMWAIT;
 
-#elif defined(SIG_RX72M) || defined(SIG_RX66T)
+#elif defined(SIG_RX72M) || defined(SIG_RX66T) || defined(SIG_RX72T)
 		template<uint32_t base>
 		struct memwait_t : public rw8_t<base> {
 			typedef rw8_t<base> io_;
@@ -1105,7 +1105,7 @@ namespace device {
 		static rw16_t<0x000800C2> SWRR;
 
 
-#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
+#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ROM キャッシュ許可レジスタ（ ROMCE ）
