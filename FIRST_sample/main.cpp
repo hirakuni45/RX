@@ -53,7 +53,7 @@ namespace {
 	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #elif defined(SIG_RX72T)
-	typedef device::system_io<8000000, 196000000> SYSTEM_IO;
+	typedef device::system_io<8000000, 192000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 #endif
 }
