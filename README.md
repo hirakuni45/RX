@@ -12,8 +12,10 @@ Currently, a dedicated writing program has been implemented that has been tested
 Development is now possible in multiple environments.   
    
 - Currently supported and tested devices are RX24T, RX66T, RX64M, RX65N, RX71M.   
-I extend the device class daily.   
+I extend the device class daily.
+- The RX72T and RX72M are scheduled to be supported in the future.
 - I update it daily including directory configuration.   
+- The RX62N(RX621) and RX63T are not currently supported. (It's in the LEGACY folder.)
    
 Project consists of Makefile, related header, source code, dedicated startup It consists of routines and linker scripts.   
    
@@ -114,7 +116,9 @@ In device I / O operation, a dedicated header is prepared using template class l
 1. MSYS2 is a UNIX-based application development environment.
 2. MINGW32 is an environment for i686 that the exception model of gcc is not war related to SEH because of Borland patent.
 3. MINGW64 is an environment for developing Windows-based applications.   
-   
+ - If you have installed any software other than Microsoft's anti-virus software, please disable it.
+1. The GCC build may take an unusually long time or may fail to build.   
+
  - MSYS2 upgrade
 ```
    pacman -Sy pacman
