@@ -1,8 +1,9 @@
+/* -*- tab-width : 4 -*- */
 /*!	@file
 	@brief	RX72M R5F572MN リンカー・スクリプト @n
-		CodeFlash: 4M, RAM: 1M, DataFlash: 32K
+		CodeFlash: 4M, RAM: 512K+512K, DataFlash: 32K
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,9 +17,10 @@ ENTRY(_start)
 
 /* This memory layout corresponds to the smallest predicted RX72M chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x000FC000 /* 1024k - (USTACK+ISTACK)(0x2000) */
-	USTACK (w) : ORIGIN = 0x000FE000, LENGTH = 4 /* ustack 8192 */
-	ISTACK (w) : ORIGIN = 0x00100000, LENGTH = 4 /* istack 8192 */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0007C000 /* 512k - (USTACK+ISTACK)(0x2000) */
+	USTACK (w) : ORIGIN = 0x0007E000, LENGTH = 4 /* ustack 8192 */
+	ISTACK (w) : ORIGIN = 0x00080000, LENGTH = 4 /* istack 8192 */
+	EXRAM (w)  : ORIGIN = 0x00800000, LENGTH = 0x00080000 /* 512k */
 	ROM (w)    : ORIGIN = 0xFFC00000, LENGTH = 0x003FFFD0 /* 4M */
 }
 
