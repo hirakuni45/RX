@@ -71,7 +71,7 @@
 #include "RX600/ssi_io.hpp"
 #include "RX600/dmac_mgr.hpp"
 
-#elif defined(SIG_RX72M)
+#elif defined(SIG_RX72M) || defined(SIG_RX72N)
 
 #include "RX600/system.hpp"
 #include "RX600/system_io.hpp"

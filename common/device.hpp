@@ -39,6 +39,14 @@
 #include "RX72M/icu_mgr.hpp"
 #include "RX72M/port_map.hpp"
 
+#elif defined(SIG_RX72N)
+#include "RX72N/peripheral.hpp"
+#include "RX600/system.hpp"
+#include "RX72N/power_mgr.hpp"
+#include "RX72N/icu.hpp"
+#include "RX72N/icu_mgr.hpp"
+#include "RX72N/port_map.hpp"
+
 #elif defined(SIG_RX65N)
 #include "RX65x/peripheral.hpp"
 #include "RX600/system.hpp"
