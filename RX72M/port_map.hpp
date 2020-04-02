@@ -1,10 +1,10 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX651/RX65N グループ・ポート・マッピング @n
+	@brief	RX72M グループ・ポート・マッピング @n
 			・ペリフェラル型に従って、ポートの設定をグループ化して設定 
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
