@@ -1,10 +1,10 @@
 EESchema Schematic File Version 4
 LIBS:board-cache
-EELAYER 29 0
+EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 8
+Sheet 1 9
 Title "Renesas RX65N BASE"
 Date ""
 Rev ""
@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L board-rescue:RX65N_176-renesas U1
+L board-rescue:RX65N_176-renesas-board-rescue U1
 U 1 1 5C66B59D
 P 4100 3250
 F 0 "U1" H 4100 5515 50  0000 C CNN
@@ -26,7 +26,7 @@ F 3 "" H 4100 3250 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L board-rescue:RX65N_176-renesas U1
+L board-rescue:RX65N_176-renesas-board-rescue U1
 U 2 1 5C66B614
 P 7050 3200
 F 0 "U1" H 7050 5415 50  0000 C CNN
@@ -1007,7 +1007,7 @@ Wire Wire Line
 Wire Wire Line
 	5700 2000 5700 5700
 $Comp
-L board-rescue:CRYSTAL-akizuki X?
+L board-rescue:CRYSTAL-akizuki-board-rescue X?
 U 1 1 5C8A37E5
 P 2850 1800
 F 0 "X?" V 2750 1700 60  0000 C CNN
@@ -1018,7 +1018,7 @@ F 3 "" V 2850 1800 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L board-rescue:CRYSTAL-akizuki X?
+L board-rescue:CRYSTAL-akizuki-board-rescue X?
 U 1 1 5C8A384B
 P 2850 2400
 F 0 "X?" V 2750 2300 60  0000 C CNN
@@ -1037,7 +1037,7 @@ Wire Wire Line
 Wire Wire Line
 	2600 1800 2700 1800
 $Comp
-L board-rescue:C-akizuki C?
+L board-rescue:C-akizuki-board-rescue C?
 U 1 1 5C8E5EA4
 P 2300 2000
 F 0 "C?" V 2200 1850 60  0000 C CNN
@@ -1048,7 +1048,7 @@ F 3 "" V 2300 2000 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L board-rescue:C-akizuki C?
+L board-rescue:C-akizuki-board-rescue C?
 U 1 1 5C8E5EFC
 P 2300 2200
 F 0 "C?" V 2200 2050 60  0000 C CNN
@@ -1059,7 +1059,7 @@ F 3 "" V 2300 2200 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L board-rescue:C-akizuki C?
+L board-rescue:C-akizuki-board-rescue C?
 U 1 1 5C8E5F61
 P 2300 1650
 F 0 "C?" V 2200 1500 60  0000 C CNN
@@ -1070,7 +1070,7 @@ F 3 "" V 2300 1650 60  0000 C CNN
 	0    1    1    0   
 $EndComp
 $Comp
-L board-rescue:C-akizuki C?
+L board-rescue:C-akizuki-board-rescue C?
 U 1 1 5C8E5FDF
 P 2300 2550
 F 0 "C?" V 2200 2400 60  0000 C CNN
@@ -1241,6 +1241,34 @@ Wire Wire Line
 	8550 3750 8750 3750
 Wire Wire Line
 	8550 6100 6300 6100
+$Sheet
+S 650  1700 850  900 
+U 5E7FE04C
+F0 "USB_IF" 50
+F1 "USB_IF.sch" 50
+F2 "USB_DP" U R 1500 2100 50 
+F3 "USB_DM" U R 1500 2200 50 
+$EndSheet
+Wire Wire Line
+	3400 2600 2600 2600
+Wire Wire Line
+	2600 2600 2600 2900
+Wire Wire Line
+	2600 2900 1850 2900
+Wire Wire Line
+	1850 2900 1850 2100
+Wire Wire Line
+	1850 2100 1500 2100
+Wire Wire Line
+	3400 2700 2700 2700
+Wire Wire Line
+	2700 2700 2700 2950
+Wire Wire Line
+	2700 2950 1800 2950
+Wire Wire Line
+	1800 2950 1800 2200
+Wire Wire Line
+	1800 2200 1500 2200
 Wire Wire Line
 	4800 1300 5400 1300
 Wire Bus Line

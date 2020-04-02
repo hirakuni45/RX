@@ -14,6 +14,7 @@ Sample program of LED blinking using RX microcontroller
 - RX71M/Makefile
 - RX65N/Makefile
 - RX66T/Makefile
+- RX72T/Makefile
    
 ---
 ## Hardware preparation
@@ -24,6 +25,7 @@ Sample program of LED blinking using RX microcontroller
 - RX71M: 240MHz (12MHz)
 - RX65N: 120MHz (12MHz)
 - RX66T: 160MHz (10MHz)
+- RX72T: 192MHz (8MHz)
 - Connect the LED to the specified port.
    
 ```
@@ -40,8 +42,11 @@ Sample program of LED blinking using RX microcontroller
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+#elif defined(SIG_RX72T)
+	typedef device::system_io<8000000, 192000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 #endif
 ```
 - For RX65N Envision kit, use the blue LED on the board.

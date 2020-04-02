@@ -49,7 +49,7 @@ namespace device {
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 		static const uint32_t data_flash_size  = 65536;	///< データ・フラッシュの容量
 		static const uint32_t data_flash_bank  = 1024;	///< データ・フラッシュのバンク数
-#elif defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
+#elif defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static const uint32_t data_flash_size  = 32768;	///< データ・フラッシュの容量
 		static const uint32_t data_flash_bank  = 512;	///< データ・フラッシュのバンク数
 #endif
@@ -179,7 +179,7 @@ namespace device {
 			}
 
 			device::FLASH::FCURAME = 0xC400;
-#elif defined(SIG_RX72M)
+#elif defined(SIG_RX72M) || defined(SIG_RX72N)
 			device::FLASH::FSUINITR = 0x2D01;
 #endif
 
@@ -555,7 +555,7 @@ namespace device {
 		{
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 			return false;
-#elif defined(SIG_RX24T) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX66T)
+#elif defined(SIG_RX24T) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N) 
 			switch(idx) {
 			case 0:
 				id = FLASH::UIDR0();
@@ -566,7 +566,7 @@ namespace device {
 			case 2:
 				id = FLASH::UIDR2();
 				return true;
-#if !defined(SIG_RX66T)
+#if !(defined(SIG_RX66T) || defined(SIG_RX72T))
 			case 3:
 				id = FLASH::UIDR3();
 				return true;

@@ -16,6 +16,9 @@
 			RX66T: @n
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する
+			RX72T: @n
+					8MHz のベースクロックを使用する @n
+					P01 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -29,26 +32,32 @@ namespace {
 /// ベースクリスタルの定義
 /// LED 接続ポートの定義
 #if defined(SIG_RX71M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX72M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+#elif defined(SIG_RX72N)
+	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 #elif defined(SIG_RX64M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX65N)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 #elif defined(SIG_RX63T)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORTB, device::bitpos::B7> LED;
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
+#elif defined(SIG_RX72T)
+	typedef device::system_io<8'000'000, 192'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 #endif
 }
 

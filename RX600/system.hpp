@@ -185,7 +185,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  RAME;
 			bit_rw_t<io_, bitpos::B6>  ECCRAME;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B7>  SBYRAME;
 #endif
 
@@ -212,7 +212,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  4> PCKB;
 			bits_rw_t<io_, bitpos::B12, 4> PCKA;
 			bits_rw_t<io_, bitpos::B16, 4> BCK;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 			bit_rw_t <io_, bitpos::B22>    PSTOP0;
 #endif
 			bit_rw_t <io_, bitpos::B23>    PSTOP1;
@@ -241,7 +241,7 @@ namespace device {
 		};
 		static memwait_t<0x00086610> MEMWAIT;
 
-#elif defined(SIG_RX72M) || defined(SIG_RX66T)
+#elif defined(SIG_RX72M) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N)
 		template<uint32_t base>
 		struct memwait_t : public rw8_t<base> {
 			typedef rw8_t<base> io_;
@@ -393,7 +393,7 @@ namespace device {
 		static mosccr_t<0x00080032> MOSCCR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  サブクロック発振器コントロールレジスタ（SOSCCR）
@@ -505,7 +505,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0> MOOVF;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B1> SOOVF;
 #endif
 			bit_rw_t<io_, bitpos::B2> PLOVF;
@@ -566,7 +566,7 @@ namespace device {
 		static rw8_t<0x000800A2> MOSCWTCR;
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  サブクロック発振器ウェイトコントロールレジスタ（SOSCWTCR）
@@ -590,7 +590,7 @@ namespace device {
 			using io_::operator |=;
 			using io_::operator &=;
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 			bit_rw_t <io_, bitpos::B0>     MOFXIN;
 #endif
 			bits_rw_t<io_, bitpos::B4, 2>  MODRV2;
@@ -618,7 +618,7 @@ namespace device {
 		static hocopcr_t<0x0008C294> HOCOPCR;
 
 
-#if defined(SIG_RX72M)
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CLKOUT 出力コントロールレジスタ (CKOCR)
@@ -828,7 +828,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B17>	MSTPB17;
 
 			bit_rw_t<io_, bitpos::B19>	MSTPB19;
-#if defined(SIG_RX65N) || defined(SIG_RX72M)
+#if defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B20>	MSTPB20;
 #endif
 			bit_rw_t<io_, bitpos::B21>	MSTPB21;
@@ -861,8 +861,8 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B0>	MSTPC0;
-#if defined(SIG_RX72M)
-			bit_rw_t<io_, bitpos::B2>	MSTPC2;
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
+			bit_rw_t<io_, bitpos::B2>	MSTPC2;	///< 拡張 RAM
 #endif
 			bit_rw_t<io_, bitpos::B6>	MSTPC6;
 			bit_rw_t<io_, bitpos::B7>	MSTPC7;
@@ -870,17 +870,17 @@ namespace device {
 			bit_rw_t<io_, bitpos::B17>	MSTPC17;
 
 			bit_rw_t<io_, bitpos::B19>	MSTPC19;
-#if defined(SIG_RX72M)
-			bit_rw_t<io_, bitpos::B22>	MSTPC22;
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
+			bit_rw_t<io_, bitpos::B22>	MSTPC22;	///< RSPI2
 #endif
 			bit_rw_t<io_, bitpos::B23>	MSTPC23;
 			bit_rw_t<io_, bitpos::B24>	MSTPC24;
 			bit_rw_t<io_, bitpos::B25>	MSTPC25;
 			bit_rw_t<io_, bitpos::B26>	MSTPC26;
 			bit_rw_t<io_, bitpos::B27>	MSTPC27;
-#if defined(SIG_RX65N) || defined(SIG_RX72M)
-			bit_rw_t<io_, bitpos::B28>	MSTPC28;
-			bit_rw_t<io_, bitpos::B29>	MSTPC29;
+#if defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+			bit_rw_t<io_, bitpos::B28>	MSTPC28;	///< DRW2D
+			bit_rw_t<io_, bitpos::B29>	MSTPC29;	///< GLCDC
 #endif
 		};
 		static mstpcrc_t<0x00080018> MSTPCRC;
@@ -1105,7 +1105,7 @@ namespace device {
 		static rw16_t<0x000800C2> SWRR;
 
 
-#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
+#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ROM キャッシュ許可レジスタ（ ROMCE ）
@@ -1145,7 +1145,7 @@ namespace device {
 #endif
 
 
-#if defined(SIG_RX72M)
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	ノンキャッシャブル領域 n アドレスレジスタ (NCRGn) (n = 0, 1)

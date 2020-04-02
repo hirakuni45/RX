@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65N/RX651/RX66T バス定義
+	@brief	RX64M/RX71M/RX65N/RX651/RX66T/RX72T/RX72N バス定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -37,13 +37,13 @@ namespace device {
 			bit_rw_t <io_, bitpos::B8>     EMODE;
 			bit_rw_t <io_, bitpos::B12>    MPXEN;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static csncr_t<0x00083802> CS0CR;
 		static csncr_t<0x00083812> CS1CR;
 		static csncr_t<0x00083822> CS2CR;
 		static csncr_t<0x00083832> CS3CR;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static csncr_t<0x00083842> CS4CR;
 		static csncr_t<0x00083852> CS5CR;
 		static csncr_t<0x00083862> CS6CR;
@@ -67,13 +67,13 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> PRCV;
 			bits_rw_t<io_, bitpos::B8, 4> WRCV;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static csncr_t<0x0008380A> CS0REC;
 		static csncr_t<0x0008381A> CS1REC;
 		static csncr_t<0x0008382A> CS2REC;
 		static csncr_t<0x0008383A> CS3REC;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static csncr_t<0x0008384A> CS4REC;
 		static csncr_t<0x0008385A> CS5REC;
 		static csncr_t<0x0008386A> CS6REC;
@@ -134,13 +134,13 @@ namespace device {
 			bit_rw_t<io_, bitpos::B9>  PWENB;
 			bit_rw_t<io_, bitpos::B15> PRMOD;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static csnmod_t<0x00083002> CS0MOD;
 		static csnmod_t<0x00083012> CS1MOD;
 		static csnmod_t<0x00083022> CS2MOD;
 		static csnmod_t<0x00083032> CS3MOD;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static csnmod_t<0x00083042> CS4MOD;
 		static csnmod_t<0x00083052> CS5MOD;
 		static csnmod_t<0x00083062> CS6MOD;
@@ -166,13 +166,13 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 5> CSWWAIT;
 			bits_rw_t<io_, bitpos::B24, 5> CSRWWAIT;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static csnwcr1_t<0x00083004> CS0WCR1;
 		static csnwcr1_t<0x00083014> CS1WCR1;
 		static csnwcr1_t<0x00083024> CS2WCR1;
 		static csnwcr1_t<0x00083034> CS3WCR1;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static csnwcr1_t<0x00083044> CS4WCR1;
 		static csnwcr1_t<0x00083054> CS5WCR1;
 		static csnwcr1_t<0x00083064> CS6WCR1;
@@ -202,13 +202,13 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 3> WDON;
 			bits_rw_t<io_, bitpos::B28, 3> CSON;
 		};
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static csnwcr2_t<0x00083008> CS0WCR2;
 		static csnwcr2_t<0x00083018> CS1WCR2;
 		static csnwcr2_t<0x00083028> CS2WCR2;
 		static csnwcr2_t<0x00083038> CS3WCR2;
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static csnwcr2_t<0x00083048> CS4WCR2;
 		static csnwcr2_t<0x00083058> CS5WCR2;
 		static csnwcr2_t<0x00083068> CS6WCR2;
@@ -216,7 +216,7 @@ namespace device {
 #endif
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  SDC 制御レジスタ（SDCCR）

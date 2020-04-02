@@ -1,10 +1,10 @@
 EESchema Schematic File Version 4
 LIBS:board-cache
-EELAYER 29 0
+EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 4 8
+Sheet 4 9
 Title ""
 Date ""
 Rev ""
@@ -15,7 +15,7 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L board-rescue:CAT4238-akizuki U?
+L board-rescue:CAT4238-akizuki-board-rescue U?
 U 1 1 5C70ED58
 P 3200 1650
 F 0 "U?" H 3000 2000 50  0000 C CNN
@@ -26,7 +26,7 @@ F 3 "https://www.onsemi.jp/pub/Collateral/CAT4238-D.PDF" H 3200 1650 50  0001 C 
 	1    0    0    -1  
 $EndComp
 $Comp
-L board-rescue:L-akizuki L?
+L board-rescue:L-akizuki-board-rescue L?
 U 1 1 5C72292B
 P 3200 1050
 F 0 "L?" V 3050 1050 60  0000 C CNN
@@ -49,7 +49,7 @@ Wire Wire Line
 Wire Wire Line
 	3750 1450 3650 1450
 $Comp
-L board-rescue:R-akizuki R?
+L board-rescue:R-akizuki-board-rescue R?
 U 1 1 5C7229D5
 P 3750 2100
 F 0 "R?" V 3704 2170 50  0000 L CNN
@@ -72,7 +72,7 @@ Wire Wire Line
 Wire Wire Line
 	3750 1850 3750 1950
 $Comp
-L board-rescue:Shotkey-akizuki D?
+L board-rescue:Shotkey-akizuki-board-rescue D?
 U 1 1 5C722B2F
 P 4000 1050
 F 0 "D?" V 3900 1050 60  0000 C CNN
@@ -119,7 +119,7 @@ Wire Wire Line
 	3750 1850 4000 1850
 Connection ~ 3750 1850
 $Comp
-L board-rescue:R-akizuki R?
+L board-rescue:R-akizuki-board-rescue R?
 U 1 1 5C72371A
 P 4000 2100
 F 0 "R?" V 3954 2170 50  0000 L CNN
@@ -138,7 +138,7 @@ Wire Wire Line
 	4000 2350 4000 2250
 Connection ~ 3750 2350
 $Comp
-L board-rescue:C-akizuki C?
+L board-rescue:C-akizuki-board-rescue C?
 U 1 1 5C723AE3
 P 2100 2100
 F 0 "C?" H 2183 2153 60  0000 L CNN
@@ -151,7 +151,7 @@ $EndComp
 Wire Wire Line
 	2100 2350 2650 2350
 $Comp
-L board-rescue:C-akizuki C?
+L board-rescue:C-akizuki-board-rescue C?
 U 1 1 5C723EED
 P 4550 2100
 F 0 "C?" H 4632 2153 60  0000 L CNN
@@ -180,7 +180,7 @@ DISPON
 Wire Wire Line
 	2750 1650 1700 1650
 $Comp
-L board-rescue:R-akizuki R?
+L board-rescue:R-akizuki-board-rescue R?
 U 1 1 5C7256C7
 P 1700 2100
 F 0 "R?" V 1654 2170 50  0000 L CNN
@@ -201,7 +201,7 @@ Wire Wire Line
 	1700 2350 2100 2350
 Connection ~ 2100 2350
 $Comp
-L board-rescue:LCD_480_272-akizuki J?
+L board-rescue:LCD_480_272-akizuki-board-rescue J?
 U 1 1 5C74788C
 P 9150 3800
 F 0 "J?" H 9369 3851 50  0000 L CNN
@@ -384,7 +384,7 @@ B6
 Text Label 7600 4550 0    50   ~ 0
 B7
 $Comp
-L board-rescue:MR-akizuki MR?
+L board-rescue:MR-akizuki-board-rescue MR?
 U 1 1 5C6B7A71
 P 8300 2400
 F 0 "MR?" H 8000 2500 50  0000 C CNN
@@ -395,7 +395,7 @@ F 3 "" H 8300 2400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L board-rescue:MR-akizuki MR?
+L board-rescue:MR-akizuki-board-rescue MR?
 U 1 1 5C6B7ACF
 P 8300 2800
 F 0 "MR?" H 8000 2900 50  0000 C CNN
@@ -406,7 +406,7 @@ F 3 "" H 8300 2800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L board-rescue:MR-akizuki MR?
+L board-rescue:MR-akizuki-board-rescue MR?
 U 1 1 5C6B7B51
 P 8300 3200
 F 0 "MR?" H 8000 3300 50  0000 C CNN
@@ -417,7 +417,7 @@ F 3 "" H 8300 3200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L board-rescue:MR-akizuki MR?
+L board-rescue:MR-akizuki-board-rescue MR?
 U 1 1 5C6B7BD1
 P 8300 3600
 F 0 "MR?" H 8000 3700 50  0000 C CNN
@@ -428,7 +428,7 @@ F 3 "" H 8300 3600 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L board-rescue:MR-akizuki MR?
+L board-rescue:MR-akizuki-board-rescue MR?
 U 1 1 5C6B7C1D
 P 8300 4000
 F 0 "MR?" H 8000 4100 50  0000 C CNN
@@ -439,7 +439,7 @@ F 3 "" H 8300 4000 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L board-rescue:MR-akizuki MR?
+L board-rescue:MR-akizuki-board-rescue MR?
 U 1 1 5C6B7C95
 P 8300 4400
 F 0 "MR?" H 8000 4500 50  0000 C CNN
@@ -450,7 +450,7 @@ F 3 "" H 8300 4400 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L board-rescue:MR-akizuki MR?
+L board-rescue:MR-akizuki-board-rescue MR?
 U 1 1 5C6B7CE1
 P 8300 4900
 F 0 "MR?" H 8000 5000 50  0000 C CNN
@@ -565,7 +565,7 @@ Wire Wire Line
 Wire Wire Line
 	7600 4550 8150 4550
 $Comp
-L board-rescue:R-akizuki R?
+L board-rescue:R-akizuki-board-rescue R?
 U 1 1 5C709A63
 P 8300 5150
 F 0 "R?" H 8000 5100 50  0000 C CNN

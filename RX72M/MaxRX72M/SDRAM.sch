@@ -4,7 +4,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 4 9
+Sheet 3 9
 Title ""
 Date ""
 Rev ""
@@ -14,17 +14,6 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-$Comp
-L SDRAM:IS42S16160G-xT U?
-U 1 1 5DBD840C
-P 4450 4200
-F 0 "U?" H 3900 5600 50  0000 C CNN
-F 1 "IS42S16160G-xT" H 5400 3050 50  0000 C CNN
-F 2 "Package_SO:TSOP-II-54_10.16x22.22mm_P0.8mm" H 4450 4300 50  0001 C CNN
-F 3 "http://www.issi.com/WW/pdf/42-45S83200G-16160G.pdf" H 3850 5550 50  0001 C CNN
-	1    4450 4200
-	1    0    0    -1  
-$EndComp
 Text HLabel 5450 3000 2    50   BiDi ~ 10
 D0
 Text HLabel 5450 3100 2    50   BiDi ~ 10
@@ -149,9 +138,9 @@ Wire Wire Line
 	3650 4300 3450 4300
 Wire Wire Line
 	3450 4400 3650 4400
-Text HLabel 3450 4800 0    50   Input ~ 10
+Text HLabel 2150 3350 0    50   Input ~ 10
 SDCLK
-Text HLabel 3450 4600 0    50   Input ~ 10
+Text HLabel 2150 4600 0    50   Input ~ 10
 ~SDCS~
 Text HLabel 3450 4700 0    50   Input ~ 10
 CKE
@@ -159,28 +148,18 @@ Text HLabel 3450 4900 0    50   Input ~ 10
 DQM0
 Text HLabel 3450 5000 0    50   Input ~ 10
 DQM1
-Text HLabel 3450 5100 0    50   Input ~ 10
+Text HLabel 2150 5100 0    50   Input ~ 10
 ~WE~
-Text HLabel 3450 5200 0    50   Input ~ 10
+Text HLabel 2150 5200 0    50   Input ~ 10
 ~CAS~
-Text HLabel 3450 5300 0    50   Input ~ 10
+Text HLabel 2150 5300 0    50   Input ~ 10
 ~RAS~
 Wire Wire Line
-	3450 4600 3650 4600
-Wire Wire Line
-	3450 4700 3650 4700
-Wire Wire Line
-	3450 4800 3650 4800
+	3450 4700 3550 4700
 Wire Wire Line
 	3450 4900 3650 4900
 Wire Wire Line
 	3450 5000 3650 5000
-Wire Wire Line
-	3450 5100 3650 5100
-Wire Wire Line
-	3450 5200 3650 5200
-Wire Wire Line
-	3450 5300 3650 5300
 $Comp
 L Device:C C?
 U 1 1 5DBF9E02
@@ -438,4 +417,163 @@ Wire Wire Line
 Wire Wire Line
 	9350 2750 8900 2750
 Connection ~ 8900 2750
+$Comp
+L SDRAM:IS42S16160G-xT U?
+U 1 1 5E891CCB
+P 4450 4200
+F 0 "U?" H 5050 5550 50  0000 C CNN
+F 1 "IS42S16160G-6T" H 5300 2900 50  0000 C CNN
+F 2 "Package_SO:TSOP-II-54_10.16x22.22mm_P0.8mm" H 4450 4300 50  0001 C CNN
+F 3 "http://www.issi.com/WW/pdf/42-45S83200G-16160G.pdf" H 3850 5550 50  0001 C CNN
+	1    4450 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:R R?
+U 1 1 5EA85EA8
+P 2300 4850
+F 0 "R?" V 2254 4920 50  0000 L CNN
+F 1 "4.7K" V 2345 4920 50  0000 L CNN
+F 2 "" H 2300 4780 50  0000 C CNN
+F 3 "" V 2300 4850 50  0000 C CNN
+	1    2300 4850
+	0    1    1    0   
+$EndComp
+$Comp
+L akizuki:R R?
+U 1 1 5EA86ED2
+P 2600 4850
+F 0 "R?" V 2554 4920 50  0000 L CNN
+F 1 "4.7K" V 2645 4920 50  0000 L CNN
+F 2 "" H 2600 4780 50  0000 C CNN
+F 3 "" V 2600 4850 50  0000 C CNN
+	1    2600 4850
+	0    1    1    0   
+$EndComp
+$Comp
+L akizuki:R R?
+U 1 1 5EA872CD
+P 2900 4850
+F 0 "R?" V 2854 4920 50  0000 L CNN
+F 1 "4.7K" V 2945 4920 50  0000 L CNN
+F 2 "" H 2900 4780 50  0000 C CNN
+F 3 "" V 2900 4850 50  0000 C CNN
+	1    2900 4850
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	2150 5100 3650 5100
+Wire Wire Line
+	3650 5200 2600 5200
+Wire Wire Line
+	2150 5300 2900 5300
+Wire Wire Line
+	2900 5000 2900 5300
+Connection ~ 2900 5300
+Wire Wire Line
+	2900 5300 3650 5300
+Wire Wire Line
+	2600 5000 2600 5200
+Connection ~ 2600 5200
+Wire Wire Line
+	2600 5200 2300 5200
+Wire Wire Line
+	2300 5000 2300 5200
+Connection ~ 2300 5200
+Wire Wire Line
+	2300 5200 2150 5200
+Wire Wire Line
+	3650 4600 2300 4600
+Wire Wire Line
+	2900 4700 2600 4700
+Connection ~ 2300 4700
+Wire Wire Line
+	2300 4700 1750 4700
+Connection ~ 2600 4700
+Wire Wire Line
+	2600 4700 2300 4700
+$Comp
+L akizuki:R R?
+U 1 1 5EAA4F55
+P 2300 4350
+F 0 "R?" V 2254 4420 50  0000 L CNN
+F 1 "4.7K" V 2345 4420 50  0000 L CNN
+F 2 "" H 2300 4280 50  0000 C CNN
+F 3 "" V 2300 4350 50  0000 C CNN
+	1    2300 4350
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	2300 4600 2300 4500
+Connection ~ 2300 4600
+Wire Wire Line
+	2300 4600 2150 4600
+Wire Wire Line
+	1750 4100 2300 4100
+Wire Wire Line
+	2300 4100 2300 4200
+Wire Wire Line
+	1750 4100 1750 4700
+Wire Wire Line
+	2300 4100 2300 4000
+Connection ~ 2300 4100
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5EAAFF63
+P 2300 4000
+F 0 "#PWR?" H 2300 3850 50  0001 C CNN
+F 1 "+3.3V" H 2315 4173 50  0000 C CNN
+F 2 "" H 2300 4000 50  0001 C CNN
+F 3 "" H 2300 4000 50  0001 C CNN
+	1    2300 4000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3650 4800 3150 4800
+Wire Wire Line
+	3150 4800 3150 3350
+Wire Wire Line
+	3150 3350 2850 3350
+$Comp
+L akizuki:R R?
+U 1 1 5EAB4A48
+P 2700 3350
+F 0 "R?" H 2700 3557 50  0000 C CNN
+F 1 "10" H 2700 3466 50  0000 C CNN
+F 2 "" H 2700 3280 50  0000 C CNN
+F 3 "" V 2700 3350 50  0000 C CNN
+	1    2700 3350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2550 3350 2150 3350
+Wire Wire Line
+	3550 4700 3550 5550
+Connection ~ 3550 4700
+Wire Wire Line
+	3550 4700 3650 4700
+$Comp
+L akizuki:R R?
+U 1 1 5EABD069
+P 3550 5700
+F 0 "R?" V 3504 5770 50  0000 L CNN
+F 1 "4.7K" V 3595 5770 50  0000 L CNN
+F 2 "" H 3550 5630 50  0000 C CNN
+F 3 "" V 3550 5700 50  0000 C CNN
+	1    3550 5700
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	3550 5850 3550 6000
+$Comp
+L power:GND #PWR?
+U 1 1 5EAC1AF3
+P 3550 6000
+F 0 "#PWR?" H 3550 5750 50  0001 C CNN
+F 1 "GND" H 3555 5827 50  0000 C CNN
+F 2 "" H 3550 6000 50  0001 C CNN
+F 3 "" H 3550 6000 50  0001 C CNN
+	1    3550 6000
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

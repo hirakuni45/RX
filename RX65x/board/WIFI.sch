@@ -1,10 +1,10 @@
 EESchema Schematic File Version 4
 LIBS:board-cache
-EELAYER 29 0
+EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 8 8
+Sheet 8 9
 Title ""
 Date ""
 Rev ""
@@ -15,9 +15,11 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L MicroChip:ATWINC1500-MR210PB U?
+L board-rescue:ATWINC1500-MR210PB-MicroChip U?
 U 1 1 5C76D029
 P 4800 3750
+AR Path="/5C76D029" Ref="U?"  Part="1" 
+AR Path="/5C785170/5C76D029" Ref="U?"  Part="1" 
 F 0 "U?" H 4200 4900 50  0000 C CNN
 F 1 "ATWINC1500-MR210PB" H 4050 2650 50  0000 C CNN
 F 2 "" H 4150 3950 50  0001 C CNN
@@ -34,7 +36,7 @@ MOSI
 Text HLabel 2350 3850 0    50   Input ~ 0
 MISO
 $Comp
-L board-rescue:MR-akizuki MR?
+L board-rescue:MR-akizuki-board-rescue MR?
 U 1 1 5C733C72
 P 2750 3800
 F 0 "MR?" H 2750 4175 50  0000 C CNN

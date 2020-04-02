@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX65N/RX66T グループ・フラッシュ 定義
+	@brief	RX64M/RX71M/RX72M/RX65N/RX66T/RX72T グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -455,12 +455,12 @@ namespace device {
 		static ro32_t<0x007FC354> UIDR1;
 		static ro32_t<0x007FC358> UIDR2;
 		static ro32_t<0x007FC35C> UIDR3;
-#elif defined(SIG_RX65N) || defined(SIG_RX72M)
+#elif defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static ro32_t<0xFE7F7D90> UIDR0;
 		static ro32_t<0xFE7F7D94> UIDR1;
 		static ro32_t<0xFE7F7D98> UIDR2;
 		static ro32_t<0xFE7F7D9C> UIDR3;
-#elif defined(SIG_RX66T)
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
 		static ro32_t<0x007FB174> UIDR0;
 		static ro32_t<0x007FB1E4> UIDR1;
 		static ro32_t<0x007FB1E8> UIDR2;

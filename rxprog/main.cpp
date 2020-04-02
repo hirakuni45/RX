@@ -16,7 +16,7 @@
 
 namespace {
 
-	const std::string version_ = "1.12b";
+	const std::string version_ = "1.23b";
 	const std::string conf_file_ = "rx_prog.conf";
 	const uint32_t progress_num_ = 50;
 	const char progress_cha_ = '#';
@@ -182,7 +182,7 @@ namespace {
 		std::string c = utils::get_file_base(cmd);
 
 		cout << "Renesas RX Series Programmer Version " << version_ << endl;
-		cout << "Copyright (C) 2016,2019 Hiramatsu Kunihito (hira@rvf-rc45.net)" << endl;
+		cout << "Copyright (C) 2016,2020 Hiramatsu Kunihito (hira@rvf-rc45.net)" << endl;
 		cout << "usage:" << endl;
 		cout << c << " [options] [mot file] ..." << endl;
 		cout << endl;
