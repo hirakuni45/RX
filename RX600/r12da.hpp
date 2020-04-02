@@ -111,7 +111,7 @@ namespace device {
 	};
 
 
-#if defined(SIG_RX64M) || defined(SIG_RX65N) || defined(SIG_RX71M) || defined(SIG_RX72T) || defined(SIG_RX72M) 
+#if defined(SIG_RX64M) || defined(SIG_RX65N) || defined(SIG_RX71M) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N) 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	12 ビット D/A コンバータ（R12DA）

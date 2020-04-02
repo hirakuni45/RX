@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX65N/RX66T グループ D/A 制御
+	@brief	RX64M/RX71M/RX72M/RX65N/RX66T/RX72T/RX72N グループ D/A 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -82,7 +82,7 @@ namespace device {
 
 			if(ch0) {
 				DAC::DACR.DAOE0 = 1;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 				DAC::DAAMPCR.DAAMP0 = ampe;
 #elif defined(SIG_RX66T)
 				DAC::DADSELR.OUTDA0 = 1;
@@ -91,7 +91,7 @@ namespace device {
 			}
 			if(ch1) {
 				DAC::DACR.DAOE1 = 1;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 				DAC::DAAMPCR.DAAMP1 = ampe;
 #elif defined(SIG_RX66T)
 				DAC::DADSELR.OUTDA1 = 1;
@@ -205,7 +205,7 @@ namespace device {
 
 			if(otype == output::CH0) {
 				R12DA::DACR.DAOE0 = 1;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 				R12DA::DAAMPCR.DAAMP0 = ampe;
 #endif
 				MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可
@@ -214,7 +214,7 @@ namespace device {
 				MPC::PWPR = device::MPC::PWPR.B0WI.b();
 			} else if(otype == output::CH1) {
 				R12DA::DACR.DAOE1 = 1;
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX72N)
 				R12DA::DAAMPCR.DAAMP1 = ampe;
 #endif
 				MPC::PWPR.B0WI = 0;		// PWPR 書き込み許可

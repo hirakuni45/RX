@@ -455,7 +455,7 @@ namespace device {
 		static ro32_t<0x007FC354> UIDR1;
 		static ro32_t<0x007FC358> UIDR2;
 		static ro32_t<0x007FC35C> UIDR3;
-#elif defined(SIG_RX65N) || defined(SIG_RX72M)
+#elif defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static ro32_t<0xFE7F7D90> UIDR0;
 		static ro32_t<0xFE7F7D94> UIDR1;
 		static ro32_t<0xFE7F7D98> UIDR2;

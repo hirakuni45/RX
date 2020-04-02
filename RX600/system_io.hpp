@@ -73,7 +73,7 @@ namespace device {
 				device::SYSTEM::ROMWT = 0b00;
 			}
 #endif
-#if defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T)
+#if defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 			if(F_ICLK > 120000000) {  // 120MHz 以上の場合設定
 				device::SYSTEM::MEMWAIT = 1;
 			}
@@ -107,7 +107,7 @@ namespace device {
 			// クロック関係書き込み不許可
 			device::SYSTEM::PRCR = 0xA500;
 
-#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T)
+#if defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 			// ROM キャッシュを有効（標準）
 			device::SYSTEM::ROMCE = 1;
 #endif
