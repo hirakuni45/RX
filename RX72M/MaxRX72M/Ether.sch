@@ -4,7 +4,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 6 9
+Sheet 5 9
 Title ""
 Date ""
 Rev ""
@@ -18,8 +18,8 @@ $Comp
 L Interface_Ethernet:LAN8720A U?
 U 1 1 5DC93B7A
 P 6200 3700
-F 0 "U?" H 6150 2511 50  0000 C CNN
-F 1 "LAN8720A" H 6150 2420 50  0000 C CNN
+F 0 "U?" H 6750 4900 50  0000 C CNN
+F 1 "LAN8720A" H 5650 2600 50  0000 C CNN
 F 2 "Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm" H 6250 2650 50  0001 L CNN
 F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/8720a.pdf" H 6000 2750 50  0001 C CNN
 	1    6200 3700
@@ -65,14 +65,8 @@ Text HLabel 4000 4200 0    50   Output ~ 10
 ET_REFCK
 Wire Wire Line
 	5400 4200 4000 4200
-Text GLabel 4000 4400 0    50   Input ~ 10
+Text GLabel 3300 4100 0    50   Input ~ 10
 ~RESET~
-Wire Wire Line
-	4000 4400 4100 4400
-Wire Wire Line
-	4100 4400 4100 4100
-Wire Wire Line
-	4100 4100 5400 4100
 $Comp
 L akizuki:J0011D21BNL J?
 U 1 1 5DBF1A1C
@@ -100,4 +94,63 @@ Wire Wire Line
 	7000 3200 7000 3100
 Wire Wire Line
 	7000 3100 8300 3100
+Wire Wire Line
+	5400 4100 3300 4100
+$Comp
+L akizuki:C C?
+U 1 1 5E93D636
+P 7000 1500
+F 0 "C?" H 7083 1553 60  0000 L CNN
+F 1 "C" H 7083 1447 60  0000 L CNN
+F 2 "" V 7000 1500 60  0000 C CNN
+F 3 "" V 7000 1500 60  0000 C CNN
+	1    7000 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:C C?
+U 1 1 5E93E43C
+P 7500 1500
+F 0 "C?" H 7583 1553 60  0000 L CNN
+F 1 "C" H 7583 1447 60  0000 L CNN
+F 2 "" V 7500 1500 60  0000 C CNN
+F 3 "" V 7500 1500 60  0000 C CNN
+	1    7500 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:C C?
+U 1 1 5E93E635
+P 8000 1500
+F 0 "C?" H 8083 1553 60  0000 L CNN
+F 1 "C" H 8083 1447 60  0000 L CNN
+F 2 "" V 8000 1500 60  0000 C CNN
+F 3 "" V 8000 1500 60  0000 C CNN
+	1    8000 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:C C?
+U 1 1 5E93E844
+P 8500 1500
+F 0 "C?" H 8583 1553 60  0000 L CNN
+F 1 "C" H 8583 1447 60  0000 L CNN
+F 2 "" V 8500 1500 60  0000 C CNN
+F 3 "" V 8500 1500 60  0000 C CNN
+	1    8500 1500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6200 4800 6200 5000
+$Comp
+L power:GND #PWR?
+U 1 1 5E93F3E4
+P 6200 5000
+F 0 "#PWR?" H 6200 4750 50  0001 C CNN
+F 1 "GND" H 6205 4827 50  0000 C CNN
+F 2 "" H 6200 5000 50  0001 C CNN
+F 3 "" H 6200 5000 50  0001 C CNN
+	1    6200 5000
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

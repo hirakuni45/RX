@@ -333,8 +333,8 @@ F 3 "" H 5950 5150 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4300 2550 4100 2550
-Text HLabel 4100 2550 0    50   Input ~ 10
+	3000 2500 2800 2500
+Text HLabel 2800 2500 0    50   Input ~ 10
 SDHI_PE
 Wire Wire Line
 	5450 1800 5450 2550
