@@ -1,8 +1,8 @@
 //=====================================================================//
 /*! @file
-    @brief  RX24T/RX64M/RX71M/RX65N/RX66T RayTracer
+    @brief  RX24T/RX64M/RX71M/RX65N/RX66T/RX72N RayTracer サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -37,7 +37,7 @@ namespace {
 	FONT		font_(afont_, kfont_);
 
 #if defined(SIG_RX71M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX71M" };
@@ -56,7 +56,7 @@ namespace {
 	TFT         tft_;
 
 #elif defined(SIG_RX64M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX64M" };
@@ -75,13 +75,16 @@ namespace {
 	TFT         tft_;
 
 #elif defined(SIG_RX65N)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	/// for RX65N Envision Kit
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 	typedef device::SCI9 SCI_CH;
 	static const char* system_str_ = { "RX65N" };
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
+	/// フレームバッファ開始アドレスは null_ptr の関係で０から開始出来ない
+	/// RX65N では、RAM は２ブロックあり、前半の 256K 領域をフレームバッファに設定する
 	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x00000100);
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
@@ -90,8 +93,10 @@ namespace {
 	GLCDC_MGR	glcdc_mgr_(nullptr, fb_);
 	RENDER		render_(glcdc_mgr_, font_);
 
+	#define USE_GLCDC
+
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX24T" };
@@ -108,7 +113,7 @@ namespace {
 	TFT         tft_;
 
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX66T" };
@@ -124,10 +129,28 @@ namespace {
 	typedef chip::R61505<BUS, RES> TFT;
 	TFT         tft_;
 
+#elif defined(SIG_RX72N)
+	/// for RX72N Envision Kit
+	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
+	typedef device::SCI2 SCI_CH;
+	static const char* system_str_ = { "RX72N" };
+	static const uint16_t LCD_X = 480;
+	static const uint16_t LCD_Y = 272;
+	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x00800000);
+	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
+	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
+	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_MGR;
+	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
+	GLCDC_MGR	glcdc_mgr_(nullptr, fb_);
+	RENDER		render_(glcdc_mgr_, font_);
+
+	#define USE_GLCDC
+
 #endif
 
-#if defined(SIG_RX65N)
-#else
+#ifndef USE_GLCDC
 	uint16_t line_[LCD_X];
 
 	template <uint32_t X, uint32_t Y>
@@ -165,7 +188,7 @@ namespace {
 
 	void clear_screen_()
 	{
-#if defined(SIG_RX65N)
+#ifdef USE_GLCDC
 		render_.clear(graphics::def_color::Black);
 #else
 		tft_.fill_box(vtx::srect(0, 0, LCD_X, LCD_Y), 0x0000);
@@ -218,7 +241,7 @@ extern "C" {
 	void draw_pixel(int x, int y, int r, int g, int b)
 	{
 		auto c = graphics::share_color::to_565(r, g, b);
-#if defined(SIG_RX65N)
+#ifdef USE_GLCDC
 		render_.plot(vtx::spos(x, y), c);
 #else
 		line_[x] = c;
@@ -231,7 +254,7 @@ extern "C" {
 
 	void draw_text(int x, int y, const char* t)
 	{
-#if defined(SIG_RX65N)
+#ifdef USE_GLCDC
 		render_.set_fore_color(graphics::def_color::Black);
 		render_.fill_box(vtx::srect(x, y, strlen(t) * AFONT::width, AFONT::height));
 		render_.set_fore_color(graphics::def_color::White);
@@ -301,7 +324,7 @@ int main(int argc, char** argv)
 
 	cmd_.set_prompt("# ");
 
-#if defined(SIG_RX65N)
+#ifdef USE_GLCDC
 	{  // GLCDC 初期化
 		LCD_DISP::DIR  = 1;
 		LCD_LIGHT::DIR = 1;
@@ -332,7 +355,7 @@ int main(int argc, char** argv)
 	uint8_t n = 0;
 	bool sw = false;
 	while(1) {
-#if defined(SIG_RX65N)
+#ifdef USE_GLCDC
 		glcdc_mgr_.sync_vpos();
 
 		bool v = !SW2::P();

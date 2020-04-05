@@ -44,7 +44,7 @@ namespace device {
 			bit_rw_t< io_, bitpos::B0>     REN;
 			bit_rw_t< io_, bitpos::B1>     TEN;
 
-			bit_rw_t< io_, bitpos::B2>     MUEN;
+			bit_rw_t< io_, bitpos::B3>     MUEN;
 			bits_rw_t<io_, bitpos::B4, 4>  CKDV;
 			bit_rw_t< io_, bitpos::B8>     DEL;
 			bit_rw_t< io_, bitpos::B9>     PDTA;
@@ -56,7 +56,7 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 3> SWL;
 			bits_rw_t<io_, bitpos::B19, 3> DWL;
-			bits_rw_t<io_, bitpos::B22, 3> FRM;
+			bits_rw_t<io_, bitpos::B22, 2> FRM;
 
 			bit_rw_t< io_, bitpos::B25>    IIEN;
 			bit_rw_t< io_, bitpos::B26>    ROIEN;
@@ -136,11 +136,11 @@ namespace device {
 
 			bit_rw_t< io_, bitpos::B0>     RDF;
 
-			bits_ro_t<ro_, bitpos::B8, 4>  RDC;
+			bits_ro_t<ro_, bitpos::B8, 6>  RDC;
 
 			bit_rw_t< io_, bitpos::B16>    TDE;
 
-			bits_ro_t<ro_, bitpos::B24, 4> TDC;
+			bits_ro_t<ro_, bitpos::B24, 6> TDC;
 		};
 		static ssifsr_t<base + 0x14> SSIFSR;
 
@@ -244,7 +244,7 @@ namespace device {
 		static ICU::VECTOR get_txi_vec() { return txi; }
 	};
 
-#if defined(SIG_RX72M)
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef ssie_t<0x0008A500, peripheral::SSIE0, ICU::VECTOR_BL1::SSIF0, ICU::VECTOR::SSIRXI0, ICU::VECTOR::SSITXI0> SSI0;
 	typedef ssie_t<0x0008A540, peripheral::SSIE1, ICU::VECTOR_BL1::SSIF1, ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1> SSI1;
 #endif

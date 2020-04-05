@@ -27,6 +27,7 @@
 #include "RX24T/flash.hpp"
 #include "RX24T/flash_io.hpp"
 #include "RX24T/dac_out.hpp"
+#include "RX600/crc.hpp"
 
 #elif defined(SIG_RX621) || defined(SIG_RX62N)
 #include "RX62x/system.hpp"
@@ -70,6 +71,7 @@
 #include "RX600/standby_ram.hpp"
 #include "RX600/ssi_io.hpp"
 #include "RX600/dmac_mgr.hpp"
+#include "RX600/crc.hpp"
 
 #elif defined(SIG_RX72M) || defined(SIG_RX72N)
 
@@ -108,9 +110,18 @@
 #include "RX600/sdhi_io.hpp"
 #include "RX600/mmcif.hpp"
 #include "RX600/pdc.hpp"
+#if defined(SIG_RX72M)
 #include "RX600/dsmif.hpp"
+#endif
 #include "RX600/standby_ram.hpp"
+
+#include "RX600/glcdc.hpp"
+#include "RX600/glcdc_mgr.hpp"
+#include "RX600/drw2d.hpp"
+#include "RX600/drw2d_mgr.hpp"
+
 #include "RX600/dmac_mgr.hpp"
+#include "RX600/crca.hpp"
 
 #elif defined(SIG_RX65N)
 #include "RX600/system.hpp"
@@ -149,6 +160,7 @@
 #include "RX600/drw2d.hpp"
 #include "RX600/drw2d_mgr.hpp"
 #include "RX600/dmac_mgr.hpp"
+#include "RX600/crca.hpp"
 
 #elif defined(SIG_RX66T)
 #include "RX600/system.hpp"
@@ -168,6 +180,7 @@
 #include "RX600/flash_io.hpp"
 #include "RX600/cmpc.hpp"
 #include "RX600/dmac_mgr.hpp"
+#include "RX600/crca.hpp"
 
 #elif defined(SIG_RX72T)
 #include "RX600/system.hpp"
@@ -187,6 +200,7 @@
 #include "RX600/flash_io.hpp"
 #include "RX600/cmpc.hpp"
 #include "RX600/dmac_mgr.hpp"
+#include "RX600/crca.hpp"
 
 #else
 #  error "renesas.hpp: Requires SIG_XXX to be defined"
@@ -204,6 +218,5 @@
 #include "RX600/sci.hpp"
 #include "RX600/riic.hpp"
 #include "RX600/rspi.hpp"
-#include "RX600/crc.hpp"
 #include "RX600/mpu.hpp"
 #include "RX600/doc.hpp"

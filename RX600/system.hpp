@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T/RX72T システム定義
+	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T/RX72T/RX72N システム定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -97,7 +97,7 @@ namespace device {
 
 			bits_ro_t<io_, bitpos::B0, 3> MDE;
 		};
-#if defined(SIG_RX65N)
+#if defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 		static spcc_t<0xFE7F5D40> SPCC;
 		static ofs0_t<0xFE7F5D04> OFS0;
 		static ofs1_t<0xFE7F5D08> OFS1;

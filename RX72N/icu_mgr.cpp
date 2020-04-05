@@ -1,13 +1,13 @@
 //=====================================================================//
 /*!	@file
-	@brief	RX72M グループ・割り込みマネージャー定数実装
+	@brief	RX72N グループ・割り込みマネージャー定数実装
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX600/icu_mgr.hpp"
+#include "RX72N/icu_mgr.hpp"
 
 namespace device {
 

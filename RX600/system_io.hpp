@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T/RX72T グループ・システム制御 @n
+	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T/RX72T/RX72N グループ・システム制御 @n
 			※ USB を使う場合：96MHz, 144MHz, 192MHz, 240MHz のいづれか
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
@@ -52,9 +52,9 @@ namespace device {
 			device::SYSTEM::MOSCWTCR = 9;	// 1ms wait
 			// メインクロック強制発振とドライブ能力設定
 			uint8_t modrv2 = 0b11;
-			if(BASE_CLOCK > 20000000) modrv2 = 0b00;
-			else if(BASE_CLOCK > 16000000) modrv2 = 0b01;
-			else if(BASE_CLOCK > 8000000) modrv2 = 0b10;
+			if(BASE_CLOCK > 20'000'000) modrv2 = 0b00;
+			else if(BASE_CLOCK > 16'000'000) modrv2 = 0b01;
+			else if(BASE_CLOCK > 8'000'000) modrv2 = 0b10;
 			device::SYSTEM::MOFCR = device::SYSTEM::MOFCR.MODRV2.b(modrv2)
 						  | device::SYSTEM::MOFCR.MOSEL.b(EXT_CLOCK);
 ///						  device::SYSTEM::MOFCR.MOFXIN.b(1)
@@ -65,16 +65,16 @@ namespace device {
 			// device::SYSTEM::MEMWAIT = 1; は、start.s で設定される。
 
 #if defined(SIG_RX65N)
-			if(F_ICLK >= 120000000) {  // 120MHz 以上の場合設定
+			if(F_ICLK >= 120'000'000) {  // 120MHz 以上の場合設定
 				device::SYSTEM::ROMWT = 0b10;
-			} else if(F_ICLK >= 100000000) {
+			} else if(F_ICLK >= 100'000'000) {
 				device::SYSTEM::ROMWT = 0b01;
-			} else if(F_ICLK >= 50000000) {
+			} else if(F_ICLK >= 50'000'000) {
 				device::SYSTEM::ROMWT = 0b00;
 			}
 #endif
 #if defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
-			if(F_ICLK > 120000000) {  // 120MHz 以上の場合設定
+			if(F_ICLK > 120'000'000) {  // 120MHz 以上の場合設定
 				device::SYSTEM::MEMWAIT = 1;
 			}
 #endif

@@ -368,13 +368,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL2 : uint8_t {
-			OCDI0 = 1,		///< DSMIF0 過電流検出割り込み
-			SUMEI0,			///< DSMIF0 合計電流エラー割り込み
-			SCDI0,			///< DSMIF0 短絡検出割り込み
-			OCDI1,			///< DSMIF1 過電流検出割り込み
-			SUMEI1,			///< DSMIF1 合計電流エラー割り込み
-			SCDI1,			///< DSMIF1 短絡検出割り込み
-			POEGGAI,		///< POEG グループＡ
+			POEGGAI = 7,	///< POEG グループＡ
 			POEGGBI,		///< POEG グループＢ
 			POEGGCI,		///< POEG グループＣ
 			POEGGDI,		///< POEG グループＤ
@@ -426,8 +420,6 @@ namespace device {
 			GR1UF,			///< GLCDC    / GR1UF
 			GR2UF,			///< GLCDC    / GR2UF
 			DRW_IRQ,		///< DRW2D    / DRW_IRQ
-
-			ESCI  = 13,		///< ESC      / ESCI (EtherCAT)
 		};
 
 
@@ -533,13 +525,6 @@ namespace device {
 
 			IPLS = 86,	///< EPTPC (タイマ割り込み)
 
-			SYNC0 = 92,	///< ESC (ESC Sync0 割り込み)
-			SYNC1,		///< ESC (ESC Sync1 割り込み)
-			SOF,		///< ESC (ESC SOF 割り込み)
-			EOF,		///< ESC (ESC EOF 割り込み)
-			WDT,		///< ESC (ESC WDT 割り込み)
-			RESET,		///< ESC (ESC RESET 割り込み)
-
 			PMGI0I = 98,///< PMGI0 (アクセス完了割り込み)
 			PMGI1I,		///< PMGI1 (アクセス完了割り込み)
 
@@ -617,6 +602,7 @@ namespace device {
 			TXF2 = 59,	///< CAN2（送信 FIFO 割り込み）
 			RXM2 = 60,	///< CAN2（メールボックス０～３１メッセージ受信完了）
 			TXM2 = 61,	///< CAN2（メールボックス０～３１メッセージ送信完了）
+
 			USBI0 = 62,	///< USB0 (15 要因のステータス割り込み)
 
 			S12ADI = 64,///< S12AD (A/D 変換終了)

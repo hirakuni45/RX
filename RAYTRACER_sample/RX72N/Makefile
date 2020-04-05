@@ -7,9 +7,11 @@
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	led_sample
+TARGET		=	raytracer_sample
 
 DEVICE		=	R5F572NN
+
+FATFS_VER	=	ff13c/source
 
 BUILD		=	release
 
@@ -18,11 +20,16 @@ VPATH		=	../../
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c
+				common/vect.c \
+				common/syscalls.c
 
-PSOURCES	=	FIRST_sample/main.cpp
+PSOURCES	=	RAYTRACER_sample/main.cpp \
+				RX72N/icu_mgr.cpp \
+				graphics/font8x16.cpp \
+				graphics/color.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=
+USER_LIBS	=	m supc++ drw2d
 
 LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 

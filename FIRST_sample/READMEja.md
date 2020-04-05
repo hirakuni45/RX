@@ -1,4 +1,4 @@
-Renesas RX24T, RX71M, RX64M, RX65N, RX66T LED 点滅サンプル
+Renesas RX24T, RX71M, RX64M, RX65N, RX66T, RX72N LED 点滅サンプル
 =========
 
 ## 概要
@@ -11,7 +11,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 - RX71M/Makefile
 - RX65N/Makefile
 - RX66T/Makefile
-- RX72T/Makefile
+- RX72N/Makefile
    
 ## ハードウェアーの準備
 - ベースクリスタルが異なる場合は、typedef のパラメーターを変更する。
@@ -21,7 +21,7 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 - RX71M: 240MHz (12MHz)
 - RX65N: 120MHz (12MHz)
 - RX66T: 160MHz (10MHz)
-- RX72T: 192MHz (8MHz)
+- RX72N: 240MHz (12MHz)
 - LED を指定のポートに接続する。
 ```
 #if defined(SIG_RX71M)
@@ -39,12 +39,13 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 #elif defined(SIG_RX66T)
 	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-#elif defined(SIG_RX72T)
-	typedef device::system_io<8000000, 192000000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+#elif defined(SIG_RX72N)
+	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 #endif
 ```
-- Envision kit RX65N の場合は、ボード上の青色 LED を利用する。
+- RX65N Envision kit の場合は、ボード上の青色 LED を利用する。
+- RX72N Envision kit の場合は、ボード上の青色 LED を利用する。
    
 ## リソースの準備
 - 特に無し
