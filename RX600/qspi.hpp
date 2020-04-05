@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・QSPI 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,11 +16,13 @@ namespace device {
 	/*!
 		@brief  QSPI 定義基底クラス
 		@param[in]	per		ペリフェラル型
-		@param[in]	rxv		受信ベクター
-		@param[in]	txv		送信ベクター
+		@param[in]	rxv		受信バッファ・フル割り込みベクター
+		@param[in]	txv		送信バッファ・エンプティ割り込みベクター
+		@param[in]	sslv	QSSL ネゲート割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv>
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv,
+		ICU::VECTOR_BL0 sslv>
 	struct qspi_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -38,7 +40,9 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B1> SPSSLIE;
+
 			bit_rw_t<io_, bitpos::B3> MSTR;
+
 			bit_rw_t<io_, bitpos::B5> SPTIE;
 			bit_rw_t<io_, bitpos::B6> SPE;
 			bit_rw_t<io_, bitpos::B7> SPRIE;
@@ -82,6 +86,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>	SPLP;
 			bit_rw_t<io_, bitpos::B1>	IO2FV;
 			bit_rw_t<io_, bitpos::B2>	IO3FV;
+
 			bit_rw_t<io_, bitpos::B4>	MOIFV;
 			bit_rw_t<io_, bitpos::B5>	MOIFE;
 		};
@@ -116,7 +121,7 @@ namespace device {
 			@param[in]	ofs	レジスター・オフセット
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x04> SPDR;
+		static rw32_t<base + 0x04> SPDR32;
 		static rw16_t<base + 0x04> SPDR16;
 		static rw8_t<base + 0x04> SPDR8;
 
@@ -275,6 +280,61 @@ namespace device {
 		static spcmd_t<base + 0x16> SPCMD3;
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  QSPI バッファ制御レジスタ (SPBFCR)
+			@param[in]	ofs	レジスター・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct spbfcr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 3> RXTRG;
+			bit_rw_t <io_, bitpos::B3>    TXTRGEX;
+			bits_rw_t<io_, bitpos::B4, 2> TXTRG;
+			bit_rw_t <io_, bitpos::B6>    RXRST;
+			bit_rw_t <io_, bitpos::B7>    TXRST;
+		};
+		static spbfcr_t<base + 0x18> SPBFCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  QSPI バッファデータカウントセットレジスタ (SPBDCR)
+			@param[in]	ofs	レジスター・オフセット
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t ofs>
+		struct spbdcr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			bits_rw_t<io_, bitpos::B0, 6> RXBC;
+
+			bits_rw_t<io_, bitpos::B8, 6> TXBC;
+		};
+		static spbdcr_t<base + 0x1A> SPBDCR;
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  QSPI 転送データ長倍数設定レジスタ n (SPBMULn) (n = 0 ～ 3)
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static rw32_t<base + 0x1C> SPBMUL0;
+		static rw32_t<base + 0x20> SPBMUL1;
+		static rw32_t<base + 0x24> SPBMUL2;
+		static rw32_t<base + 0x28> SPBMUL3;
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ペリフェラル型を返す
@@ -286,7 +346,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  受信割り込みベクターを返す
+			@brief  受信バッファ・フル割り込みベクターを返す
 			@return ベクター型
 		*/
 		//-----------------------------------------------------------------//
@@ -295,12 +355,22 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  送信割り込みベクターを返す
+			@brief  送信バッファ・エンプティ割り込みベクターを返す
 			@return ベクター型
 		*/
 		//-----------------------------------------------------------------//
 		static ICU::VECTOR get_tx_vec() { return txv; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  QSSL ネゲート割り込みベクターを返す
+			@return ベクター型
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_ssl_vec() { return sslv; }
 	};
 
-	typedef qspi_t<0x00089E00, peripheral::QSPI, ICU::VECTOR::SPRI, ICU::VECTOR::SPTI>  QSPI;
+	typedef qspi_t<0x00089E00, peripheral::QSPI, ICU::VECTOR::SPRI, ICU::VECTOR::SPTI,
+		ICU::VECTOR_BL0::QSPSSLI>  QSPI;
 }

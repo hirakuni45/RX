@@ -467,7 +467,7 @@ namespace device {
 	typedef sci_t<0x0008A120, peripheral::SCI9,
 		ICU::VECTOR::TXI9, ICU::VECTOR::RXI9, ICU::VECTOR_BL1, ICU::VECTOR_BL1::TEI9> SCI9;
 
-#elif defined(SIG_RX72M)
+#elif defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef sci_t<0x0008A000, peripheral::SCI0,
 		ICU::VECTOR::TXI0, ICU::VECTOR::RXI0, ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI0> SCI0;
 	typedef sci_t<0x0008A020, peripheral::SCI1,
@@ -486,9 +486,9 @@ namespace device {
 		ICU::VECTOR::TXI7, ICU::VECTOR::RXI7, ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI7> SCI7;
 
 	typedef sci_t<0x000D0000, peripheral::SCI8,
-		ICU::VECTOR::TXI8, ICU::VECTOR::RXI8, ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI8> SCI8;
+		ICU::VECTOR::TXI8, ICU::VECTOR::RXI8,   ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI8>  SCI8;
 	typedef sci_t<0x000D0020, peripheral::SCI9,
-		ICU::VECTOR::TXI9, ICU::VECTOR::RXI9, ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI9> SCI9;
+		ICU::VECTOR::TXI9, ICU::VECTOR::RXI9,   ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI9>  SCI9;
 	typedef sci_t<0x000D0040, peripheral::SCI10,
 		ICU::VECTOR::TXI10, ICU::VECTOR::RXI10, ICU::VECTOR_AL0, ICU::VECTOR_AL0::TEI10> SCI10;
 	typedef sci_t<0x000D0060, peripheral::SCI11,
@@ -496,6 +496,5 @@ namespace device {
 
 	typedef scih_t<0x0008B300, peripheral::SCI12,
 		ICU::VECTOR::TXI12, ICU::VECTOR::RXI12, ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI12> SCI12;
-
 #endif
 }
