@@ -19,7 +19,7 @@
 #undef PCLK
 #define PCLK F_PCLKB
 #endif
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 #ifndef F_PCLKA
 #  error "rspi_io.hpp requires F_PCLKA to be defined"
 #else
