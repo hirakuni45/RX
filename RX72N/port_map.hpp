@@ -420,6 +420,45 @@ namespace device {
 				}
 				break;
 
+			case peripheral::SSIE0:
+				{
+					uint8_t sel = enable ? 0b010111 : 0;
+					PORT0::PMR.B0 = 0;
+					MPC::P00PFS.PSEL = sel;  // AUDIO_CLK
+					PORT0::PMR.B0 = enable;
+					PORT0::PMR.B1 = 0;
+					MPC::P01PFS.PSEL = sel;  // SSIBCK0
+					PORT0::PMR.B1 = enable;
+					PORTF::PMR.B5 = 0;
+					MPC::PF5PFS.PSEL = sel;  // SSILRCK0
+					PORTF::PMR.B5 = enable;
+					PORTJ::PMR.B5 = 0;
+					MPC::PJ5PFS.PSEL = sel;  // SSIRXD0
+					PORTJ::PMR.B5 = enable;
+					PORTJ::PMR.B3 = 0;
+					MPC::PJ3PFS.PSEL = sel;  // SSITXD0
+					PORTJ::PMR.B3 = enable;
+				}
+				break;
+			case peripheral::SSIE1:
+				{
+					uint8_t sel = enable ? 0b010111 : 0;
+					PORT0::PMR.B0 = 0;
+					MPC::P00PFS.PSEL = sel;  // AUDIO_CLK
+					PORT0::PMR.B0 = enable;
+
+					PORT0::PMR.B2 = 0;
+					MPC::P02PFS.PSEL = sel;  // SSIBCK1
+					PORT0::PMR.B2 = enable;
+					PORT0::PMR.B5 = 0;
+					MPC::P05PFS.PSEL = sel;  // SSILRCK1
+					PORT0::PMR.B5 = enable;
+					PORT0::PMR.B3 = 0;
+					MPC::P03PFS.PSEL = sel;  // SSIDATA1
+					PORT0::PMR.B3 = enable;
+				}
+				break;
+
 			case peripheral::RIIC0:
 				{
 					uint8_t sel = enable ? 0b001111 : 0;
@@ -962,26 +1001,12 @@ namespace device {
 			uint8_t sel = 0b011010;
 			switch(sit) {
 			case sdhi_situation::START:
-				PORT2::PMR.B4 = 0;
-				MPC::P24PFS.PSEL = sel;  // SDHI_WP P24(33)
-				PORT2::PMR.B4 = enable;
+///				PORT2::PMR.B4 = 0;
+///				MPC::P24PFS.PSEL = sel;  // SDHI_WP P24(33)
+///				PORT2::PMR.B4 = enable;
 				PORT2::PMR.B5 = 0;
 				MPC::P25PFS.PSEL = sel;  // SDHI_CD P25(32)
 				PORT2::PMR.B5 = enable;
-#if 0
-				PORT2::PMR.B2 = 0;
-				PORT2::PDR.B2 = 1;
-				PORT2::PODR.B2 = 0;
-				PORT2::PMR.B3 = 0;
-				PORT2::PDR.B3 = 1;
-				PORT2::PODR.B3 = 0;
-				PORT8::PMR.B7 = 0;
-				PORT8::PDR.B7 = 1;
-				PORT8::PODR.B7 = 0;
-				PORT1::PMR.B7 = 0;
-				PORT1::PDR.B7 = 1;
-				PORT1::PODR.B7 = 1;
-#endif
 				break;
 
 			case sdhi_situation::INSERT:
@@ -994,20 +1019,6 @@ namespace device {
 				break;
 
 			case sdhi_situation::BUS:
-#if 0
-				PORT2::PMR.B2 = 0;
-				PORT2::PDR.B2 = 0;
-				PORT2::PODR.B2 = 0;
-				PORT2::PMR.B3 = 0;
-				PORT2::PDR.B3 = 0;
-				PORT2::PODR.B3 = 0;
-				PORT8::PMR.B7 = 0;
-				PORT8::PDR.B7 = 0;
-				PORT8::PODR.B7 = 0;
-				PORT1::PMR.B7 = 0;
-				PORT1::PDR.B7 = 0;
-				PORT1::PODR.B7 = 0;
-#endif
 				PORT2::PMR.B2 = 0;
 				MPC::P22PFS.PSEL = sel;  // SDHI_D0-C  P22(35)
 				PORT2::PMR.B2 = enable;
@@ -1024,8 +1035,8 @@ namespace device {
 
 			case sdhi_situation::DESTROY:
 				sel = 0;
-				PORT2::PMR.B4 = 0;
-				MPC::P24PFS.PSEL = sel;  // SDHI_WP P24(33)
+///				PORT2::PMR.B4 = 0;
+///				MPC::P24PFS.PSEL = sel;  // SDHI_WP P24(33)
 				PORT2::PMR.B5 = 0;
 				MPC::P25PFS.PSEL = sel;  // SDHI_CD P25(32)
 
