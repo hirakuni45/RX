@@ -57,7 +57,9 @@ namespace device {
 			@brief  開始
 			@param[in]	freq	タイマー周波数
 			@param[in]	level	割り込みレベル（０ならポーリング）
-			@return レンジオーバーなら「false」を返す
+			@param[in]	task	割り込み時に起動する関数 @n
+								※割り込み関数は属性「INTERRUPT_FUNC」を付加する。
+			@return タイマー周波数が範囲を超えた場合「false」を返す
 		*/
 		//-----------------------------------------------------------------//
 		bool start(uint32_t freq, uint8_t level = 0, void (*task)() = nullptr) noexcept
@@ -113,12 +115,14 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  廃棄（割り込みを停止して、ユニットを停止）
+			@param[in]	power	電源を停止しない場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void destroy() noexcept
+		void destroy(bool power = false) noexcept
 		{
 		    CMT::CMCR.CMIE = 0;
 			CMT::enable(false);
+			power_mgr::turn(CMT::get_peripheral(), power);
 		}
 
 

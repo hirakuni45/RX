@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ・QSPI I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -11,16 +11,9 @@
 #include "common/renesas.hpp"
 #include "common/vect.h"
 
-/// F_PCKx は速度パラメーター計算で必要で、設定が無いとエラーにします。
-#if defined(SIG_RX24T)
-#  error "qspi_io.hpp not support for RX24T"
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
+/// F_PCLKB は速度パラメーター計算で必要で、設定が無いとエラーにします。
 #ifndef F_PCLKB
 #  error "qspi_io.hpp requires F_PCLKB to be defined"
-#else
-#undef PCLK
-#define PCLK F_PCLKB
-#endif
 #endif
 
 namespace device {
