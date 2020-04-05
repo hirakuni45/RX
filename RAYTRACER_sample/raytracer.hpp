@@ -25,7 +25,7 @@ extern "C" {
 // #define FAST_INV_SQRT
 // Because precision is not enough, I do not use it
 
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX24T) || defined(SIG_RX66T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 static inline float sqrtf_(float x)
 {
     __asm __volatile(
