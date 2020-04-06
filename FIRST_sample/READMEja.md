@@ -21,27 +21,29 @@ RX マイコンを使った LED 点滅のサンプルプログラム
 - RX71M: 240MHz (12MHz)
 - RX65N: 120MHz (12MHz)
 - RX66T: 160MHz (10MHz)
-- RX72N: 240MHz (12MHz)
+- RX72N: 240MHz (16MHz)
+   
 - LED を指定のポートに接続する。
+   
 ```
 #if defined(SIG_RX71M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX64M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX65N)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10000000, 80000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #elif defined(SIG_RX72N)
-	typedef device::system_io<12000000> SYSTEM_IO;
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 #endif
 ```
 - RX65N Envision kit の場合は、ボード上の青色 LED を利用する。

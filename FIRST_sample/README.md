@@ -1,4 +1,4 @@
-Renesas RX24T, RX71M, RX64M, RX65N, RX66T LED flashing sample
+Renesas RX24T, RX71M, RX64M, RX65N, RX66T, RX72N LED flashing sample
 =========
 
 [Japanese](READMEja.md)
@@ -14,8 +14,8 @@ Sample program of LED blinking using RX microcontroller
 - RX71M/Makefile
 - RX65N/Makefile
 - RX66T/Makefile
-- RX72T/Makefile
-   
+- RX72N/Makefile
+
 ---
 ## Hardware preparation
 - If the base crystal is different, change the typedef parameters.
@@ -25,31 +25,33 @@ Sample program of LED blinking using RX microcontroller
 - RX71M: 240MHz (12MHz)
 - RX65N: 120MHz (12MHz)
 - RX66T: 160MHz (10MHz)
-- RX72T: 192MHz (8MHz)
+- RX72N: 240MHz (16MHz)
+   
 - Connect the LED to the specified port.
    
 ```
 #if defined(SIG_RX71M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX64M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 #elif defined(SIG_RX65N)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-#elif defined(SIG_RX72T)
-	typedef device::system_io<8000000, 192000000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+#elif defined(SIG_RX72N)
+	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 #endif
 ```
 - For RX65N Envision kit, use the blue LED on the board.
+- For RX72N Envision kit, use the blue LED on the board.
    
 ## Resource preparation
 - None
