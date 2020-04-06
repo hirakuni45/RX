@@ -60,7 +60,7 @@ namespace {
 	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;  ///< Soft SPI 定義
 	SDC_SPI	sdc_spi_;
 	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;	///< カード選択信号
-	typedef device::PORT<device::PORT8, device::bitpos::B2> SDC_POWER;	///< カード電源制御
+	typedef device::PORT<device::PORT8, device::bitpos::B2, 0> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;	///< カード検出
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
@@ -73,7 +73,7 @@ namespace {
 	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
-	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
+	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< 「０」でＯＮ
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
 	SDC		sdc_;
@@ -85,7 +85,7 @@ namespace {
 	// SDCARD 制御リソース
 	typedef device::rspi_io<device::RSPI0> SDC_SPI;
 	typedef device::PORT<device::PORT6, device::bitpos::B5> SDC_SELECT;	///< カード選択信号
-	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;	///< カード電源制御
+	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;

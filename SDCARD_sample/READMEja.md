@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX65N SD-CARD アクセス・サンプル
+Renesas RX24T, RX64M, RX65N, RX72N SD-CARD アクセス・サンプル
 =========
 
 [English](README.md)
@@ -41,6 +41,7 @@ SD カード・アクセス、サンプルプログラム
 |RX24T|RSPI|△|
 |RX64M|Soft SPI|○|
 |RX65N|SDHI|△|
+|RX72N|SDHI|△|
 
 ※RTC はファイル書き込み時の時間を記録する為に利用しています。   
 ※RX24T では、I2C 接続の RTC を利用する事が出来ます。   
