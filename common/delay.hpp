@@ -74,8 +74,9 @@ namespace utils {
 					asm("nop");
 				}
 #elif defined(SIG_RX72N)
-				// 240MHz: 75
-				for(uint32_t n = 0; n < (F_ICLK / 3200000); ++n) {
+				// 240MHz: 78 : 20uS->50.763KHz
+				// 240MHz: 79 : 20uS->50.127KHz
+				for(uint32_t n = 0; n < (F_ICLK / 3037974); ++n) {
 					asm("nop");
 				}
 #else
