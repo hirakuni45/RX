@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX71M, RX65N, RX66T レイトレーサーサンプル
+Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N レイトレーサーサンプル
 =========
    
 [Japanese](READMEja.md)
@@ -20,6 +20,7 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 - RX71M/Makefile
 - RX65N/Makefile
 - RX66T/Makefile
+- RX72N/Makefile
    
 ## ハードウェアーの準備（全般）
 - ベースクリスタルが異なる場合は、typedef のパラメーターを変更する。
@@ -29,17 +30,20 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 - RX71M: 240MHz (12MHz)
 - RX65N: 120MHz (12MHz)
 - RX66T: 160MHz (10MHz)
+- RX72N: 240MHz (16MHz)
 - インジケーター LED を指定のポートに接続する。
 - USB シリアルの信号と設定の SCI1(RX24T, RX66T, RX64M, RX71M) ポートを接続する。
 - RX65N Envision kit は付属の LCD (480x272) を使う。
 - RX24T, RX66T は８ビット接続 (R61505W LCD Controller)
 - RX64M, RX71M は１６ビット接続 (R61505W LCD Controller)
 - R61505W LCD との接続ポートは、「main.cpp」を参照
+- RX72N Envision kit は付属の LCD (480x272) を使う。
    
 ## ハードウェアーリソースの準備
 - SCI に指定されたポートに USB シリアルなどの変換器を接続する。
 - マイコン側の RXD 端子と、USB シリアルの TXD を接続。
 - マイコン側の TXD 端子と、USB シリアルの RXD を接続。
+- RX72N Envision Kit では、CN8 コネクタが USB シリアル接続となっている。
    
 ## ビルド方法
 - 各プラットホームディレクトリーに移動、make する。
@@ -53,6 +57,7 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 - TeraTerm などで確認。
 - TeraTerm のシリアル設定：１１５２００ボー、８ビットデータ、１ストップ、パリティ無し。
 - RX65N Envision kit では、裏側の SW2 を押す事で、サンプリング数、解像度を変えてレンダリング
+- RX72N Envision kit では、裏側の SW2 を押す事で、サンプリング数、解像度を変えてレンダリング
    
 ## 備考
    
@@ -61,14 +66,14 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
    
 ## レンダリング時間３２０ｘ２４０、サンプリング数：１
    
-|マイコン  |周波数 [MHz]|描画方式         |時間 [ms]   |
-|----------|------------|-----------------|------------|
-|RX24T     |80          |8 bits, port-bus |1224        |
-|RX65N     |120         |Frame Memory     |784         |
-|RX64M     |120         |16 bits, port-bus|751         |
-|RX66T     |160         |8 bits, port-bus |602         |
-|RX71M     |240         |16 bits, port-bus|439         |
-   
+|マイコン  |core|周波数 [MHz]|描画方式         |時間 [ms]   |
+|----------|----|------------|-----------------|------------|
+|RX24T     |RXv2|80          |8 bits, port-bus |1224        |
+|RX65N     |RXv2|120         |Frame Memory     |784         |
+|RX64M     |RXv2|120         |16 bits, port-bus|751         |
+|RX66T     |RXv3|160         |8 bits, port-bus |602         |
+|RX71M     |RXv2|240         |16 bits, port-bus|439         |
+|RX72N     |RXv3|240         |Frame Memory     |361         |
 ---
    
 License

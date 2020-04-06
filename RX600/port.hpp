@@ -341,10 +341,11 @@ namespace device {
 	/*!
 		@brief  単ポート定義テンプレート
 		@param[in]	PORT	ポート・クラス
-		@param[in]	BPOS	ビット位置	
+		@param[in]	BPOS	ビット位置
+		@param[in]	ASSERT	アサート論理（通常「１」）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class PORTX, bitpos BPOS>
+	template <class PORTX, bitpos BPOS, bool ASSERT = 1>
 	struct PORT {
 
 		static const uint8_t PNO     = static_cast<uint8_t>(PORTX::base_address_ & 0x1f);
@@ -432,8 +433,13 @@ namespace device {
 			static bit_rw_t<rw8_t<PORTX::base_address_ + 0x20>, BPOS> PO;  // ポート出力用
 			static bit_ro_t<ro8_t<PORTX::base_address_ + 0x40>, BPOS> PI;  // ポート入力用
 
-			void operator = (bool val) { PO = val; }
-			bool operator () () { return PI(); }
+			void operator = (bool val) {
+				if(ASSERT) { PO = val; } else { PO = !val; }
+			}
+			bool operator () () {
+				if(ASSERT) { return PI(); } 
+				else { return !PI(); }
+			}
 		};
 		static port_t P;
 	};

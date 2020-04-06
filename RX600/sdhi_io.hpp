@@ -86,7 +86,6 @@ namespace fatfs {
 		bool		mount_;
 		bool		start_;
 		bool		onew_;
-		bool		wp_lvl_;
 
 		uint32_t	rca_id_;
 		uint32_t	cid_[4];
@@ -319,14 +318,13 @@ namespace fatfs {
 		/*!
 			@brief	コンストラクター
 			@param[in]	onew	１ビットモードの場合「true」
-			@param[in]	wp_lvl	書き込み禁止ポートの論理
 		 */
 		//-----------------------------------------------------------------//
-		sdhi_io(bool onew = false, bool wp_lvl = 0) noexcept :
+		sdhi_io(bool onew = false) noexcept :
 			stat_(STA_NOINIT), card_type_(0),
 			mount_delay_(0), intr_lvl_(0),
 			cd_(false), mount_(false), start_(false),
-			onew_(onew), wp_lvl_(wp_lvl), rca_id_(0)
+			onew_(onew), rca_id_(0)
 		{ }
 
 
@@ -343,7 +341,7 @@ namespace fatfs {
 			}
 
 			POW::DIR = 1;
-			POW::P   = 1;  // offline power
+			POW::P   = 0;  // offline power
 			POW::PU  = 0;
 
 			WPRT::DIR = 0;
@@ -795,7 +793,9 @@ namespace fatfs {
 		DRESULT disk_write(BYTE drv, const void* buff, DWORD sector, UINT count) noexcept
 		{
 			if(disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
-			if(WPRT::P() == wp_lvl_) return RES_WRPRT;
+			if(WPRT::BIT_POS < 8) {
+				if(WPRT::P()) return RES_WRPRT;
+			}
 
 			if(!(card_type_ & CT_BLOCK)) sector *= 512;	/* Convert LBA to byte address if needed */
 
@@ -940,13 +940,13 @@ namespace fatfs {
 			bool cd = SDHI::SDSTS1.SDCDMON();
 			if(cd && !cd_) {
 ///				utils::format("Card Detect\n");
-				POW::P = 0;  // power ON!
+				POW::P = 1;  // power ON!
 				mount_delay_ = MOUNT_DELAY_FRAME;  // n フレーム後にマウントする
 			} else if(!cd && cd_) {
 ///				utils::format("Card Eject\n");
 				f_mount(nullptr, "", 0);
 				device::port_map::turn_sdhi(device::port_map::sdhi_situation::EJECT, PSEL);
-				POW::P = 1;
+				POW::P = 0;
 
 				stat_ = STA_NOINIT;
 				mount_ = false;
@@ -959,7 +959,7 @@ namespace fatfs {
 					auto st = f_mount(&fatfs_, "", 0);
 					if(st != FR_OK) {
 						debug_format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
-						POW::P = 1;
+						POW::P = 0;
 						mount_ = false;
 					} else {
 						debug_format("f_mount OK\n");
@@ -982,6 +982,6 @@ namespace fatfs {
 	};
 
 	// テンプレート関数、実態の定義
-	template <class SDHI, class POW, class WDIS, device::port_map::option PSEL>
-		volatile uint32_t sdhi_io<SDHI, POW, WDIS, PSEL>::i_count_ = 0;
+	template <class SDHI, class POW, class WPRT, device::port_map::option PSEL>
+		volatile uint32_t sdhi_io<SDHI, POW, WPRT, PSEL>::i_count_ = 0;
 }

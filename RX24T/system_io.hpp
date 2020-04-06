@@ -26,7 +26,7 @@ namespace device {
 								※クリスタル利用は「false」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t BASE_CLOCK = 10000000, uint32_t INTR_CLOCK = 80000000,
+	template <uint32_t BASE_CLOCK = 10'000'000, uint32_t INTR_CLOCK = 80'000'000,
 		bool EXT_CLOCK = false>
 	struct system_io {
 

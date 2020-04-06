@@ -13,8 +13,11 @@
 			RX66T: @n
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する
+			RX72N (Renesas Envision kit RX72N): @n
+					16MHz のベースクロックを使用する @n
+					P40 に接続された LED を利用する
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -42,12 +45,12 @@ namespace {
 
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	// SDCARD 制御リソース
@@ -57,45 +60,54 @@ namespace {
 	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;  ///< Soft SPI 定義
 	SDC_SPI	sdc_spi_;
 	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;	///< カード選択信号
-	typedef device::PORT<device::PORT8, device::bitpos::B2> SDC_POWER;	///< カード電源制御
+	typedef device::PORT<device::PORT8, device::bitpos::B2, 0> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;	///< カード検出
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
-	SDC		sdc_(sdc_spi_, 25000000);
+	SDC		sdc_(sdc_spi_, 25'000'000);
 	// 内臓 RTC を有効
 	#define ENABLE_RTC
 	typedef utils::rtc_io RTC;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
-	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
-	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
+	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< 「０」でＯＮ
+	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
 	SDC		sdc_;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	// SDCARD 制御リソース
 	typedef device::rspi_io<device::RSPI0> SDC_SPI;
 	typedef device::PORT<device::PORT6, device::bitpos::B5> SDC_SELECT;	///< カード選択信号
-	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;	///< カード電源制御
+	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
-	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
+	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
 	SDC_SPI	sdc_spi_;
-	SDC		sdc_(sdc_spi_, 20000000);
+	SDC		sdc_(sdc_spi_, 20'000'000);
 	typedef device::iica_io<device::RIIC0> I2C;
 	typedef chip::DS3231<I2C> RTC;
 	#define ENABLE_I2C_RTC
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX72N)
+	static const char* system_str_ = { "RX72N" };
+	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::SCI2 SCI_CH;
+	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;
+	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
+	SDC		sdc_;
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
