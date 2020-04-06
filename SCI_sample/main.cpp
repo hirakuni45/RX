@@ -4,18 +4,23 @@
 			RX64M, RX71M: @n
 					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
+					SCI1 を使用する @n
 			RX65N (Renesas Envision kit RX65N): @n
 					12MHz のベースクロックを使用する @n
 			　　　　P70 に接続された LED を利用する @n
+					SCI9 を使用する @n
 			RX24T: @n
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する @n
+					SCI1 を使用する @n
 			RX66T: @n
 					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する
-			RX72N: @n
+			　　　　P00 ピンにLEDを接続する @n
+					SCI1 を使用する @n
+			RX72N: (Renesas Envision kit RX72N) @n
 					16MHz のベースクロックを使用する @n
-					P40 ピンにLEDを接続する
+					P40 ピンにLEDを接続する @n
+					SCI2 を使用する @n
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -27,10 +32,10 @@
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/cmt_io.hpp"
+#include "common/command.hpp"
 
 #include "common/format.hpp"
 #include "common/input.hpp"
-
 
 namespace {
 
@@ -76,6 +81,9 @@ namespace {
 
 	typedef device::cmt_io<device::CMT0> CMT;
 	CMT			cmt_;
+
+	typedef utils::command<256> CMD;
+	CMD 		cmd_;
 }
 
 
@@ -127,14 +135,24 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 	LED::P = 0;
-	{  // utils::format 
-		utils::format("");
-	}
-	LED::P = 1;
+
+	cmd_.set_prompt("# ");
 
 	uint8_t cnt = 0;
 	while(1) {
 		cmt_.sync();
+
+		if(cmd_.service()) {
+			uint32_t cmdn = cmd_.get_words();
+			uint32_t n = 0;
+			while(n < cmdn) {
+				char tmp[256];
+				if(cmd_.get_word(n, tmp, sizeof(tmp))) {
+					utils::format("Param%d: '%s'\n") % n % tmp;
+				}
+				++n;
+			}
+		}
 
 		++cnt;
 		if(cnt >= 50) {
@@ -144,12 +162,6 @@ int main(int argc, char** argv)
 			LED::P = 0;
 		} else {
 			LED::P = 1;
-		}
-
-		// エコーバック処理
-		while(sci_length() > 0) {
-			auto ch = sci_getch();
-			sci_putch(ch);
 		}
 	}
 }

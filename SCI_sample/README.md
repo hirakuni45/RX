@@ -1,68 +1,84 @@
-Renesas RX24T, RX64M, RX71M, RX65N, RX66T SCI (UART) サンプル
+Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N SCI (UART) sample
 =========
 
-## 概要
-RX マイコンを使った SCI (UART) のサンプルプログラム
+[Japanese](READMEja.md)
+
+## Overview
+SCI (UART) sample program using RX microcontroller
    
-## プロジェクト・リスト
+## Project list
  - main.cpp
  - RX24T/Makefile
  - RX64M/Makefile
  - RX71M/Makefile
  - RX65N/Makefile
  - RX66T/Makefile
+ - RX72N/Makefile
    
-## ハードウェアーの準備（全般）
- - ベースクリスタルが異なる場合は、typedef のパラメーターを変更する。
- - Makefile で、各モジュール別の設定周波数を宣言している。
+## Hardware preparation (general)
+ - If the base crystal is different, change the typedef parameter.
+ - Makefile declares the set frequency for each module.
  - RX24T:  80MHz (10MHz)
  - RX64M: 120MHz (12MHz)
  - RX71M: 240MHz (12MHz)
  - RX65N: 120MHz (12MHz)
  - RX66T: 160MHz (10MHz)
- - インジケーター LED を指定のポートに接続する。
- - USB シリアルの信号と設定の SCI ポートを接続する。
- - RX65N, RX71M, SCI の標準ポートは、「RX600/port_map.hpp」参照。
- - RX24T, SCI の標準ポートは、「RX24T/port_map.hpp」参照。
+ - RX72N: 240MHz (16MHz)
+ - Connect the indicator LED to the specified port.
+ - Connect the USB serial and SCI ports.
+ - Refer to RX600/port_map.hpp for the RX64M/RX71M SCI standard port.
+ - Refer to RX24T/port_map.hpp for the RX24T SCI standard port.
+ - Refer to RX65x/port_map.hpp for the RX65x SCI standard port.
+ - Refer to RX72N/port_map.hpp for the RX72N SCI standard port.
+ 
 ```
 #if defined(SIG_RX64M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX64M" };
 #elif defined(SIG_RX71M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX71M" };
 #elif defined(SIG_RX65N)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 	static const char* system_str_ = { "RX65N" };
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX24T" };
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX66T" };
+#elif defined(SIG_RX72N)
+	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::SCI2 SCI_CH;
+	static const char* system_str_ = { "RX72N" };
 #endif
 ```
- - 標準的には、RX24T, RX66T の場合「10MHz」、他 CPU は「12MHz」のクリスタル。
- - Envision kit RX65N の場合、インジケーター LED はボード上の青色を利用する。
+
+ - The standard crystal value is 10MHz for the RX24T and RX66T, and 12MHz for other CPUs.
+ - RX72N Envision kit is a "16MHz" crystal
+ - For the Envision kit RX65N, the indicator LED uses the blue color on the board.
+ - For the Envision kit RX72N, the indicator LED uses the blue color on the board.
    
-## ハードウェアーリソースの準備
- - SCI に指定されたポートに USB シリアルなどの変換器を接続する。
- - マイコン側の RXD 端子と、USB シリアルの TXD を接続。
- - マイコン側の TXD 端子と、USB シリアルの RXD を接続。
+## Prepare your hardware resources.
+ - Connect a converter, such as USB serial, to the port specified in SCI.
+ - Connect the RXD terminal on the microcontroller side to the TXD of USB serial.
+ - Connect the TXD terminal on the microcontroller side to the RXD of USB serial.
+ - The RX72N Envision kit connects a PC to the CN8 micro USB on board.
    
-## ビルド方法
- - 各プラットホームディレクトリーに移動、make する。
- - sci_sample.mot ファイルを書き込む。
+## Build method
+ - Go to each platform directory and make it.
+ - Write the sci_sample.mot file.
    
 ## 動作
  - LED が 0.25 秒間隔で点滅する。
@@ -70,7 +86,9 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
  - TeraTerm などで確認。
  - TeraTerm のシリアル設定：１１５２００ボー、８ビットデータ、１ストップ、パリティ無し。
  - main.cpp の中、SCI の初期化でボーレートは自由に設定できる。
- - 設定出来ない「値」の場合、初期化が失敗する。（極端に遅い、早い）
+ - ボーレート設定出来ない「値」の場合、初期化が失敗する。（極端に遅い、速い）
+ - utils::command クラスにより、１行入力機能をサービス。
+ - 受け取った文字をパースして表示。
     
 ## 備考
  - FIFO バッファは、受信側 256 バイト、送信側 512 バイトとなっている。
@@ -79,11 +97,11 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
  - FIFO バッファより大きい文字列を送る場合、バッファが空くまで待機する事になる。
  - 受信時、バッファからの取り出し速度が、受信速度を下回ると、オーバーフローして、文字を紛失する。
  - SCI のチャネルを変更する場合「main.cpp」で「typedef」してある定義を変更する。
- - SCIx とポート接続の関係性は、RX600/port_map.hpp を参照する。
+ - SCIx とポート接続の関係性は、RXxxx/port_map.hpp を参照する。
  - port_map クラスは、169 ピンデバイスのポートを基準にしたアサインになっている。
  - ピン番号以外は、144ピン、100ピン、デバイスでも同じように機能する。
  - 第二候補を選択する場合は、sci_io の typedef で、「device::port_map::option::SECOND」を追加する。
- - 別プログラムによって、雑多な設定を自動化してソースコードを生成する試みを行っている場合がありますが、それは、基本的に間違った方法だと思えます、設定の修正が必要な場合、必ず生成プログラムに戻って、生成からやり直す必要があります。
+ - 別プログラムによって、雑多な設定を自動化してソースコードを生成する試みを行っているアプリケーションがありますが、それは、基本的に間違った方法だと思えます、設定の修正が必要な場合、必ず生成プログラムに戻って、生成からやり直す必要があります。
  - C++ テンプレートは、チャネルの違いや、ポートの違い、デバイスの違いをうまく吸収して、柔軟で、判りやすい方法で実装できます。
    
 ## 標準出力の対応
