@@ -1,8 +1,13 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T/RX72T/RX72N グループ・システム制御 @n
-			※ USB を使う場合：96MHz, 144MHz, 192MHz, 240MHz のいづれか
+	@brief	RX64M/RX71M/RX651/RX65N/RX66T/RX72T/RX72N/RX72M グループ・システム制御 @n
+			※RX24T は構成が大きく異なるので、RX24T/system_io.hpp に分離しています。@n
+			※ USB を使う場合：96MHz, 144MHz, 192MHz, 240MHz のいづれか @n
+			※ 通常ベースクロックは、12MHz、24MHz を使います。@n
+			RX72x 系では、内部 PLL 回路が追加され、Ethernet などに必要な 25MHz を得る為 @n
+			16MHz を使います。@n
+			(16MHz x 12.5 -> 200MHz, 16MHz x 15 -> 240MHz)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -16,18 +21,24 @@
 #  error "system_io.hpp requires F_[IFB]CLK and F_PCLK[ABCD] to be defined"
 #endif
 
+#if defined(SIG_RX24T)
+#  error "system_io.hpp: Not available on RX24T"
+#endif
+
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  systen_io クラス
+		@brief  systen_io クラス @n
+				INTR_CLOCK は、内部 PLL で扱える最大速度です、@n
+				外部クリスタルを微妙な周波数にする場合、その整数倍にしなければなりません。@n
 		@param[in]	BASE_CLOCK	ベース・クロック周波数（１２ＭＨｚ）
 		@param[in]	INTR_CLOCK	内臓クロック周波数（２４０ＭＨｚ）@n
 								※USB を使う場合、「INTR_CLOCK」は48の倍数である事
 		@param[in]	EXT_CLOCK	外部クロックに入力を行う場合「true」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t BASE_CLOCK = 12000000, uint32_t INTR_CLOCK = 240000000, bool EXT_CLOCK = false>
+	template <uint32_t BASE_CLOCK = 12'000'000, uint32_t INTR_CLOCK = 240'000'000, bool EXT_CLOCK = false>
 	struct system_io {
 
 		static uint8_t clock_div_(uint32_t clk) noexcept
@@ -103,6 +114,9 @@ namespace device {
 				}
 			}
 			device::SYSTEM::SCKCR3.CKSEL = 0b100;	///< PLL 選択
+
+			device::SYSTEM::LOCOCR.LCSTP = 1;  ///< 低速オンチップオシレータ停止
+			device::SYSTEM::HOCOCR.HCSTP = 1;  ///< 高速オンチップオシレータ停止
 
 			// クロック関係書き込み不許可
 			device::SYSTEM::PRCR = 0xA500;
