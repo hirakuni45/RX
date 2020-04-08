@@ -106,6 +106,7 @@
 #include "RX600/flash_io.hpp"
 #include "RX600/ether_io.hpp"
 #include "RX600/ssie.hpp"
+#include "RX600/ssie_io.hpp"
 #include "RX600/sdhi.hpp"
 #include "RX600/sdhi_io.hpp"
 #include "RX600/mmcif.hpp"
