@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX65N/RX66T/RX72T グループ・フラッシュ 定義
+	@brief	RX64M/RX71M/RX72M/RX65N/RX66T/RX72N グループ・フラッシュ 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -173,7 +173,7 @@ namespace device {
 			bit_ro_t <io_, bitpos::B13>  ERSERR;
 			bit_ro_t <io_, bitpos::B14>  ILGERR;
 			bit_ro_t <io_, bitpos::B15>  FRDY;
-#if defined(SIG_RX72M)
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
 			bit_ro_t <io_, bitpos::B20>  OTERR;
 			bit_ro_t <io_, bitpos::B21>  SECERR;
 			bit_ro_t <io_, bitpos::B22>  FESETERR;
@@ -328,14 +328,11 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fbcstat_t : public rw8_t<base> {
-			typedef rw8_t<base> io_;
-			using io_::operator =;
+		struct fbcstat_t : public ro8_t<base> {
+			typedef ro8_t<base> io_;
 			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
 
-			bit_rw_t<io_, bitpos::B0>  BCST;
+			bit_ro_t<io_, bitpos::B0>  BCST;
 		};
 		static fbcstat_t<0x007FE0D4> FBCSTAT;
 
@@ -351,7 +348,7 @@ namespace device {
 			typedef ro32_t<base> io_;
 			using io_::operator ();
 
-			bits_ro_t<io_, bitpos::B0, 19>  PSADR;
+			bits_ro_t<io_, bitpos::B0, 17>  PSADR;
 		};
 		static fpsaddr_t<0x007FE0D8> FPSADDR;
 
@@ -395,7 +392,7 @@ namespace device {
 		static fpckar_t<0x007FE0E4> FPCKAR;
 
 
-#if defined(SIG_RX72M)
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュアクセスウィンドウモニタレジスタ (FAWMON)

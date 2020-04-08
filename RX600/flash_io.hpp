@@ -1,11 +1,11 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ FLASH 制御 @n
+	@brief	RX64M/RX71M/RX65N/RX66T/RX72M/RX72N グループ FLASH 制御 @n
 			・データフラッシュ消去サイズ（６４バイト単位）
 			・データフラッシュ書き込みサイズ（４バイト単位）
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
