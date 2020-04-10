@@ -52,7 +52,9 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../../
+INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
+
+LIB_ROOT	=	../../RX600/drw2d
 
 OPTIMIZE	=	-O3
 
