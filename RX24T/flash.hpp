@@ -17,7 +17,8 @@ namespace device {
 		@brief  フラッシュ・メモリー制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct flash_t {
+	template<class _>
+	struct flash_t_ {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -26,7 +27,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct dflctl_t : public rw8_t<base> {
+		struct dflctl_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -35,7 +36,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> DFLEN;
 		};
-		static dflctl_t<0x007FC090> DFLCTL;
+		typedef dflctl_t_<0x007FC090> dflctl_t;
+		static dflctl_t DFLCTL;
 
 
 		//-----------------------------------------------------------------//
@@ -45,7 +47,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fentryr_t : public rw16_t<base> {
+		struct fentryr_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -56,7 +58,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>     FENTRYD;
 			bits_rw_t<io_, bitpos::B8, 8>  FEKEY;
 		};
-		static fentryr_t<0x007FFFB2> FENTRYR;
+		typedef fentryr_t_<0x007FFFB2> fentryr_t;
+		static fentryr_t FENTRYR;
 
 
 		//-----------------------------------------------------------------//
@@ -64,7 +67,8 @@ namespace device {
 			@brief  プロテクト解除レジスタ (FPR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<0x007FC180> FPR;
+		typedef rw8_t<0x007FC180> fpr_t;
+		static fpr_t FPR;
 
 
 		//-----------------------------------------------------------------//
@@ -74,13 +78,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fpsr_t : public ro8_t<base> {
+		struct fpsr_t_ : public ro8_t<base> {
 			typedef ro8_t<base> io_;
 			using io_::operator ();
 
 			bit_ro_t<io_, bitpos::B0> PERR;
 		};
-		static fpsr_t<0x007FC184> FPSR;
+		typedef fpsr_t_<0x007FC184> fpsr_t;
+		static fpsr_t FPSR;
 
 
 		//-----------------------------------------------------------------//
@@ -90,7 +95,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fpmcr_t : public rw8_t<base> {
+		struct fpmcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -103,7 +108,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  LVPE;
 			bit_rw_t<io_, bitpos::B7>  FMS2;
 		};
-		static fpmcr_t<0x007FC100> FPMCR;
+		typedef fpmcr_t_<0x007FC100> fpmcr_t;
+		static fpmcr_t FPMCR;
 
 
 		//-----------------------------------------------------------------//
@@ -113,7 +119,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fisr_t : public rw8_t<base> {
+		struct fisr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -123,7 +129,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 5>  PCKA;
 			bits_rw_t<io_, bitpos::B6, 2>  SAS;
 		};
-		static fisr_t<0x007FC1D8> FISR;
+		typedef fisr_t_<0x007FC1D8> fisr_t;
+		static fisr_t FISR;
 
 
 		//-----------------------------------------------------------------//
@@ -133,7 +140,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fresetr_t : public rw8_t<base> {
+		struct fresetr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -142,7 +149,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  FRESET;
 		};
-		static fresetr_t<0x007FC124> FRESETR;
+		typedef fresetr_t_<0x007FC124> fresetr_t;
+		static fresetr_t FRESETR;
 
 
 		//-----------------------------------------------------------------//
@@ -152,7 +160,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fasr_t : public rw8_t<base> {
+		struct fasr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -161,7 +169,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  EXS;
 		};
-		static fasr_t<0x007FC104> FASR;
+		typedef fasr_t_<0x007FC104> fasr_t;
+		static fasr_t FASR;
 
 
 		//-----------------------------------------------------------------//
@@ -171,7 +180,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fcr_t : public rw8_t<base> {
+		struct fcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -182,7 +191,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>     STOP;
 			bit_rw_t <io_, bitpos::B7>     OPST;
 		};
-		static fcr_t<0x007FC114> FCR;
+		typedef fcr_t_<0x007FC114> fcr_t;
+		static fcr_t FCR;
 
 
 		//-----------------------------------------------------------------//
@@ -192,7 +202,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fexcr_t : public rw8_t<base> {
+		struct fexcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -202,7 +212,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 3>  CMD;
 			bit_rw_t <io_, bitpos::B7>     OPST;
 		};
-		static fexcr_t<0x007FC1DC> FEXCR;
+		typedef fexcr_t_<0x007FC1DC> fexcr_t;
+		static fexcr_t FEXCR;
 
 
 		//-----------------------------------------------------------------//
@@ -210,7 +221,8 @@ namespace device {
 			@brief  フラッシュ処理開始アドレスレジスタ H (FSARH)
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x007FC110> FSARH;
+		typedef rw16_t<0x007FC110> fsarh_t;
+		static fsarh_t FSARH;
 
 
 		//-----------------------------------------------------------------//
@@ -218,7 +230,8 @@ namespace device {
 			@brief  フラッシュ処理開始アドレスレジスタ L (FSARL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x007FC108> FSARL;
+		typedef rw16_t<0x007FC108> fsarl_t;
+		static fsarl_t FSARL;
 
 
 		//-----------------------------------------------------------------//
@@ -226,7 +239,8 @@ namespace device {
 			@brief  フラッシュ処理終了アドレスレジスタ H (FEARH)
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x007FC120> FEARH;
+		typedef rw16_t<0x007FC120> fearh_t;
+		static fearh_t FEARH;
 
 
 		//-----------------------------------------------------------------//
@@ -234,7 +248,8 @@ namespace device {
 			@brief  フラッシュ処理終了アドレスレジスタ L (FEARL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x007FC118> FEARL;
+		typedef rw16_t<0x007FC118> fearl_t;
+		static fearl_t FEARL;
 
 
 		//-----------------------------------------------------------------//
@@ -242,10 +257,14 @@ namespace device {
 			@brief  フラッシュライトバッファ n レジスタ (FWBn) (n = 0 ～ 3)
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x007FC130> FWB0;
-		static rw16_t<0x007FC138> FWB1;
-		static rw16_t<0x007FC140> FWB2;
-		static rw16_t<0x007FC144> FWB3;
+		typedef rw16_t<0x007FC130> fwb0_t;
+		static fwb0_t FWB0;
+		typedef rw16_t<0x007FC138> fwb1_t;
+		static fwb1_t FWB1;
+		typedef rw16_t<0x007FC140> fwb2_t;
+		static fwb2_t FWB2;
+		typedef rw16_t<0x007FC144> fwb3_t;
+		static fwb3_t FWB3;
 
 
 		//-----------------------------------------------------------------//
@@ -255,7 +274,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fstatr0_t : public ro8_t<base> {
+		struct fstatr0_t_ : public ro8_t<base> {
 			typedef ro8_t<base> io_;
 			using io_::operator ();
 
@@ -265,7 +284,8 @@ namespace device {
 			bit_ro_t<io_, bitpos::B4>  ILGLERR;
 			bit_ro_t<io_, bitpos::B5>  EILGLERR;
 		};
-		static fstatr0_t<0x007FC1F0> FSTATR0;
+		typedef fstatr0_t_<0x007FC1F0> fstatr0_t;
+		static fstatr0_t FSTATR0;
 
 
 		//-----------------------------------------------------------------//
@@ -275,14 +295,15 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fstatr1_t : public ro8_t<base> {
+		struct fstatr1_t_ : public ro8_t<base> {
 			typedef ro8_t<base> io_;
 			using io_::operator ();
 
 			bit_ro_t<io_, bitpos::B6>  FRDY;
 			bit_ro_t<io_, bitpos::B7>  EXRDY;
 		};
-		static fstatr1_t<0x007FC12C> FSTATR1;
+		typedef fstatr1_t_<0x007FC12C> fstatr1_t;
+		static fstatr1_t FSTATR1;
 
 
 		//-----------------------------------------------------------------//
@@ -290,7 +311,8 @@ namespace device {
 			@brief  フラッシュエラーアドレスモニタレジスタ H (FEAMH)
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x007FC1E8> FEAMH;
+		typedef rw16_t<0x007FC1E8> feamh_t;
+		static feamh_t FEAMH;
 
 
 		//-----------------------------------------------------------------//
@@ -298,7 +320,8 @@ namespace device {
 			@brief  フラッシュエラーアドレスモニタレジスタ L (FEAML)
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x007FC1E0> FEAML;
+		typedef rw16_t<0x007FC1E0> feaml_t;
+		static feaml_t FEAML;
 
 
 		//-----------------------------------------------------------------//
@@ -308,7 +331,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct fscmr_t : public rw16_t<base> {
+		struct fscmr_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -317,7 +340,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B8>  SASMF;
 		};
-		static fscmr_t<0x007FC1C0> FSCMR;
+		typedef fscmr_t_<0x007FC1C0> fscmr_t;
+		static fscmr_t FSCMR;
 
 
 		//-----------------------------------------------------------------//
@@ -325,7 +349,8 @@ namespace device {
 			@brief  フラッシュアクセスウィンドウ開始アドレスモニタレジスタ (FAWSMR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x007FC1C8> FAWSMR;
+		typedef rw16_t<0x007FC1C8> fawsmr_t;
+		static fawsmr_t FAWSMR;
 
 
 		//-----------------------------------------------------------------//
@@ -333,7 +358,8 @@ namespace device {
 			@brief  フラッシュアクセスウィンドウ終了アドレスモニタレジスタ (FAWEMR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x007FC1D0> FAWEMR;
+		typedef rw16_t<0x007FC1D0> fawemr_t;
+		static fawemr_t FAWEMR;
 
 
 		//-----------------------------------------------------------------//
@@ -341,10 +367,14 @@ namespace device {
 			@brief  ユニーク ID レジスタ n (UIDRn) (n = 0 ～ 3)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x007FC350> UIDR0;
-		static rw32_t<0x007FC354> UIDR1;
-		static rw32_t<0x007FC358> UIDR2;
-		static rw32_t<0x007FC35C> UIDR3;
+		typedef rw32_t<0x007FC350> uidr0_t;
+		static uidr0_t UIDR0;
+		typedef rw32_t<0x007FC354> uidr1_t;
+		static uidr1_t UIDR1;
+		typedef rw32_t<0x007FC358> uidr2_t;
+		static uidr2_t UIDR2;
+		typedef rw32_t<0x007FC35C> uidr3_t;
+		static uidr3_t UIDR3;
 
 
 		//-----------------------------------------------------------------//
@@ -354,7 +384,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct romce_t : public rw16_t<base> {
+		struct romce_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -363,7 +393,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  ROMCEN;
 		};
-		static romce_t<0x00081000> ROMCE;
+		typedef romce_t_<0x00081000> romce_t;
+		static romce_t ROMCE;
 
 
 		//-----------------------------------------------------------------//
@@ -373,7 +404,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct romciv_t : public rw16_t<base> {
+		struct romciv_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -382,9 +413,41 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  ROMCIV;
 		};
-		static romciv_t<0x00081004> ROMCIV;
+		typedef romciv_t_<0x00081004> romciv_t;
+		static romciv_t ROMCIV;
 
 
 	};
-	typedef flash_t FLASH;
+	typedef flash_t_<void> FLASH;
+	template<class _> typename flash_t_<_>::dflctl_t flash_t_<_>::DFLCTL;
+	template<class _> typename flash_t_<_>::fentryr_t flash_t_<_>::FENTRYR;
+	template<class _> typename flash_t_<_>::fpr_t flash_t_<_>::FPR;
+	template<class _> typename flash_t_<_>::fpsr_t flash_t_<_>::FPSR;
+	template<class _> typename flash_t_<_>::fpmcr_t flash_t_<_>::FPMCR;
+	template<class _> typename flash_t_<_>::fisr_t flash_t_<_>::FISR;
+	template<class _> typename flash_t_<_>::fresetr_t flash_t_<_>::FRESETR;
+	template<class _> typename flash_t_<_>::fasr_t flash_t_<_>::FASR;
+	template<class _> typename flash_t_<_>::fcr_t flash_t_<_>::FCR;
+	template<class _> typename flash_t_<_>::fexcr_t flash_t_<_>::FEXCR;
+	template<class _> typename flash_t_<_>::fsarh_t flash_t_<_>::FSARH;
+	template<class _> typename flash_t_<_>::fsarl_t flash_t_<_>::FSARL;
+	template<class _> typename flash_t_<_>::fearh_t flash_t_<_>::FEARH;
+	template<class _> typename flash_t_<_>::fearl_t flash_t_<_>::FEARL;
+	template<class _> typename flash_t_<_>::fwb0_t flash_t_<_>::FWB0;
+	template<class _> typename flash_t_<_>::fwb1_t flash_t_<_>::FWB1;
+	template<class _> typename flash_t_<_>::fwb2_t flash_t_<_>::FWB2;
+	template<class _> typename flash_t_<_>::fwb3_t flash_t_<_>::FWB3;
+	template<class _> typename flash_t_<_>::fstatr0_t flash_t_<_>::FSTATR0;
+	template<class _> typename flash_t_<_>::fstatr1_t flash_t_<_>::FSTATR1;
+	template<class _> typename flash_t_<_>::feamh_t flash_t_<_>::FEAMH;
+	template<class _> typename flash_t_<_>::feaml_t flash_t_<_>::FEAML;
+	template<class _> typename flash_t_<_>::fscmr_t flash_t_<_>::FSCMR;
+	template<class _> typename flash_t_<_>::fawsmr_t flash_t_<_>::FAWSMR;
+	template<class _> typename flash_t_<_>::fawemr_t flash_t_<_>::FAWEMR;
+	template<class _> typename flash_t_<_>::uidr0_t flash_t_<_>::UIDR0;
+	template<class _> typename flash_t_<_>::uidr1_t flash_t_<_>::UIDR1;
+	template<class _> typename flash_t_<_>::uidr2_t flash_t_<_>::UIDR2;
+	template<class _> typename flash_t_<_>::uidr3_t flash_t_<_>::UIDR3;
+	template<class _> typename flash_t_<_>::romce_t flash_t_<_>::ROMCE;
+	template<class _> typename flash_t_<_>::romciv_t flash_t_<_>::ROMCIV;
 }

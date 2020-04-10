@@ -17,7 +17,8 @@ namespace device {
 		@brief  ICU 定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct icu_t {
+	template<class _>
+	struct icu_t_ {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -201,7 +202,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct ir_t {
+		struct ir_t_ {
 			rw8_t<base + 27> SWINT;
 
 			rw8_t<base + 28> CMI0;
@@ -332,7 +333,8 @@ namespace device {
 			rw8_t<base + 248> RIIC_TXI0;
 			rw8_t<base + 249> RIIC_TEI0;
 		};
-		static ir_t<0x00087010> IR;
+		typedef ir_t_<0x00087010> ir_t;
+		static ir_t IR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -341,7 +343,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct ier_t {
+		struct ier_t_ {
 			typedef rw8_t<base + 0x02> ier02;
 			bit_rw_t<ier02, bitpos::B0>	BUSERR;
 			bit_rw_t<ier02, bitpos::B7>	FRDYI;
@@ -495,7 +497,8 @@ namespace device {
 			bit_rw_t<ier1f, bitpos::B0>	RIIC_TXI0;
 			bit_rw_t<ier1f, bitpos::B1>	RIIC_TEI0;
 		};
-		static ier_t<0x00087200> IER;
+		typedef ier_t_<0x00087200> ier_t;
+		static ier_t IER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -505,7 +508,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct ipr_t {
+		struct ipr_t_ {
 
 			rw8_t<base + 3  > SWINT;
 
@@ -580,8 +583,13 @@ namespace device {
 			rw8_t<base + 248> RIIC_TXI0;
 			rw8_t<base + 249> RIIC_TEI0;
 		};
-		static ipr_t<0x00087300> IPR;
+		typedef ipr_t_<0x00087300> ipr_t;
+		static ipr_t IPR;
 
 	};
-	typedef icu_t ICU;
+	typedef icu_t_<void> ICU;
+	typedef icu_t_<void> icu_t;
+	template<class _> typename icu_t_<_>::ir_t icu_t_<_>::IR;
+	template<class _> typename icu_t_<_>::ier_t icu_t_<_>::IER;
+	template<class _> typename icu_t_<_>::ipr_t icu_t_<_>::IPR;
 }

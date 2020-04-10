@@ -29,7 +29,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct pmgcr_t : public rw32_t<ofs> {
+		struct pmgcr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -41,7 +41,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 3>  PSMHT;
 			bits_rw_t<io_, bitpos::B20, 3>  PSMCT;
 		};
-		static pmgcr_t<base + 0x00> PMGCR;
+		typedef pmgcr_t_<base + 0x00> pmgcr_t;
+		static pmgcr_t PMGCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -51,7 +52,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct psmr_t : public rw32_t<ofs> {
+		struct psmr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -66,7 +67,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 16> PRD;
 		};
-		static psmr_t<base + 0x04> PSMR;
+		typedef psmr_t_<base + 0x04> psmr_t;
+		static psmr_t PSMR;
 
 
 		//-----------------------------------------------------------------//
@@ -80,4 +82,7 @@ namespace device {
 
 	typedef pmgi_t<0x000C5880, peripheral::PMGI0> PMGI0;
 	typedef pmgi_t<0x000C5890, peripheral::PMGI1> PMGI1;
+
+	template<uint32_t base, peripheral per> typename pmgi_t<base, per>::pmgcr_t pmgi_t<base, per>::PMGCR;
+	template<uint32_t base, peripheral per> typename pmgi_t<base, per>::psmr_t pmgi_t<base, per>::PSMR;
 }

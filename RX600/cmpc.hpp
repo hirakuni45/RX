@@ -35,7 +35,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct cmpctl_t : public rw8_t<ofs> {
+		struct cmpctl_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -48,7 +48,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B5, 2>  CDFS;
 			bit_rw_t <io_, bitpos::B7>     HCMPON;
 		};
-		static cmpctl_t<base + 0x00> CMPCTL;
+		typedef cmpctl_t_<base + 0x00> cmpctl_t;
+		static cmpctl_t CMPCTL;
 
 
 		//-----------------------------------------------------------------//
@@ -58,7 +59,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct cmpsel0_t : public rw8_t<ofs> {
+		struct cmpsel0_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -67,7 +68,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  CMPSEL;
 		};
-		static cmpsel0_t<base + 0x04> CMPSEL0;
+		typedef cmpsel0_t_<base + 0x04> cmpsel0_t;
+		static cmpsel0_t CMPSEL0;
 
 
 		//-----------------------------------------------------------------//
@@ -77,7 +79,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct cmpsel1_t : public rw8_t<ofs> {
+		struct cmpsel1_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -86,7 +88,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  CVRS;
 		};
-		static cmpsel1_t<base + 0x08> CMPSEL1;
+		typedef cmpsel1_t_<base + 0x08> cmpsel1_t;
+		static cmpsel1_t CMPSEL1;
 
 
 		//-----------------------------------------------------------------//
@@ -96,7 +99,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct cmpmon_t : public rw8_t<ofs> {
+		struct cmpmon_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -105,7 +108,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  CMPMON0;
 		};
-		static cmpmon_t<base + 0x0C> CMPMON;
+		typedef cmpmon_t_<base + 0x0C> cmpmon_t;
+		static cmpmon_t CMPMON;
 
 
 		//-----------------------------------------------------------------//
@@ -115,7 +119,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct cmpioc_t : public rw8_t<ofs> {
+		struct cmpioc_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -124,7 +128,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  CPOE;
 		};
-		static cmpioc_t<base + 0x10> CMPIOC;
+		typedef cmpioc_t_<base + 0x10> cmpioc_t;
+		static cmpioc_t CMPIOC;
 
 
 		//-----------------------------------------------------------------//
@@ -158,4 +163,10 @@ namespace device {
 	typedef cmpc_t<0x000A0D00, peripheral::CMPC4, ICU::VECTOR::CMPC4> CMPC4;
 	typedef cmpc_t<0x000A0D20, peripheral::CMPC5, ICU::VECTOR::CMPC5> CMPC5;
 #endif
+
+	template<uint32_t base, peripheral per, ICU::VECTOR vec> typename cmpc_t<base, per, vec>::cmpctl_t cmpc_t<base, per, vec>::CMPCTL;
+	template<uint32_t base, peripheral per, ICU::VECTOR vec> typename cmpc_t<base, per, vec>::cmpsel0_t cmpc_t<base, per, vec>::CMPSEL0;
+	template<uint32_t base, peripheral per, ICU::VECTOR vec> typename cmpc_t<base, per, vec>::cmpsel1_t cmpc_t<base, per, vec>::CMPSEL1;
+	template<uint32_t base, peripheral per, ICU::VECTOR vec> typename cmpc_t<base, per, vec>::cmpmon_t cmpc_t<base, per, vec>::CMPMON;
+	template<uint32_t base, peripheral per, ICU::VECTOR vec> typename cmpc_t<base, per, vec>::cmpioc_t cmpc_t<base, per, vec>::CMPIOC;
 }

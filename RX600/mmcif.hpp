@@ -17,7 +17,8 @@ namespace device {
 		@brief  マルチメディアカードインタフェースクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct mmcif_t {
+	template<class _>
+	struct mmcif_t_ {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -25,7 +26,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
-		struct cecmdset_t : public rw32_t<base> {
+		struct cecmdset_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -54,7 +55,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 6>  CMD;
 			bit_rw_t <io_, bitpos::B30>     BOOT;
 		};
-		static cecmdset_t<0x00088500> CECMDSET;
+		typedef cecmdset_t_<0x00088500> cecmdset_t;
+		static cecmdset_t CECMDSET;
 
 
 		//-----------------------------------------------------------------//
@@ -62,7 +64,8 @@ namespace device {
 			@brief  アーギュメントレジスタ（ CEARG ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x00088508>  CEARG;
+		typedef rw32_t<0x00088508> cearg_t;
+		static cearg_t CEARG;
 
 
 		//-----------------------------------------------------------------//
@@ -70,7 +73,8 @@ namespace device {
 			@brief  自動 CMD12 アーギュメントレジスタ（ CEARGCMD12 ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x0008850C>  CEARGCMD12;
+		typedef rw32_t<0x0008850C> ceargcmd12_t;
+		static ceargcmd12_t CEARGCMD12;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -79,7 +83,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
-		struct cecmdctrl_t : public rw32_t<base> {
+		struct cecmdctrl_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -88,7 +92,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B3>  BREAK;
 		};
-		static cecmdctrl_t<0x00088510> CECMDCTRL;
+		typedef cecmdctrl_t_<0x00088510> cecmdctrl_t;
+		static cecmdctrl_t CECMDCTRL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -97,7 +102,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template<uint32_t base>
-		struct ceblockset_t : public rw32_t<base> {
+		struct ceblockset_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -107,7 +112,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  16>  BLKSIZ;
 			bits_rw_t<io_, bitpos::B16, 16>  BLKCNT;
 		};
-		static ceblockset_t<0x00088514> CEBLOCKSET;
+		typedef ceblockset_t_<0x00088514> ceblockset_t;
+		static ceblockset_t CEBLOCKSET;
 
 
 
@@ -126,5 +132,11 @@ namespace device {
 		static peripheral get_peripheral() { return peripheral::MMCIF; }
 	};
 
-	typedef mmcif_t MMCIF;
+	typedef mmcif_t_<void> MMCIF;
+
+	template<class _> typename mmcif_t_<_>::cecmdset_t mmcif_t_<_>::CECMDSET;
+	template<class _> typename mmcif_t_<_>::cearg_t mmcif_t_<_>::CEARG;
+	template<class _> typename mmcif_t_<_>::ceargcmd12_t mmcif_t_<_>::CEARGCMD12;
+	template<class _> typename mmcif_t_<_>::cecmdctrl_t mmcif_t_<_>::CECMDCTRL;
+	template<class _> typename mmcif_t_<_>::ceblockset_t mmcif_t_<_>::CEBLOCKSET;
 }

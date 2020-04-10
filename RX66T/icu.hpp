@@ -17,7 +17,8 @@ namespace device {
 		@brief  ICUA 定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct icu_t {
+	template<typename _>
+	struct icu_t_ {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -503,7 +504,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct ir_t {
+		struct ir_t_ {
 
 			rw8_t<base + 16> BUSERR;
 
@@ -703,7 +704,8 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
-		static ir_t<0x00087010> IR;
+		typedef ir_t_<0x00087010> ir_t;
+		static ir_t IR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -713,7 +715,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct ier_t {
+		struct ier_t_ {
 
 			typedef rw8_t<base + 0x02> ier02;
 			bit_rw_t<ier02, bitpos::B0>	BUSERR;
@@ -954,7 +956,8 @@ namespace device {
 				return tmp & (1 << (idx & 7));
 			}
 		};
-		static ier_t<0x00087200> IER;
+		typedef ier_t_<0x00087200> ier_t;
+		static ier_t IER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -965,7 +968,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct ipr_t {
+		struct ipr_t_ {
 
 			rw8_t<base + 0  > BUSERR;
 
@@ -1165,7 +1168,8 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
-		static ipr_t<0x00087300> IPR;
+		typedef ipr_t_<0x00087300> ipr_t;
+		static ipr_t IPR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1173,14 +1177,22 @@ namespace device {
 			@brief  DMAC 起動要因選択レジスタ m（DMRSRm）（m = DMAC チャネル番号）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<0x00087400> DMRSR0;
-		static rw8_t<0x00087404> DMRSR1;
-		static rw8_t<0x00087408> DMRSR2;
-		static rw8_t<0x0008740C> DMRSR3;
-		static rw8_t<0x00087410> DMRSR4;
-		static rw8_t<0x00087414> DMRSR5;
-		static rw8_t<0x00087418> DMRSR6;
-		static rw8_t<0x0008741C> DMRSR7;
+		typedef rw8_t<0x00087400> dmrsr0_t;
+		static dmrsr0_t DMRSR0;
+		typedef rw8_t<0x00087404> dmrsr1_t;
+		static dmrsr1_t DMRSR1;
+		typedef rw8_t<0x00087408> dmrsr2_t;
+		static dmrsr2_t DMRSR2;
+		typedef rw8_t<0x0008740C> dmrsr3_t;
+		static dmrsr3_t DMRSR3;
+		typedef rw8_t<0x00087410> dmrsr4_t;
+		static dmrsr4_t DMRSR4;
+		typedef rw8_t<0x00087414> dmrsr5_t;
+		static dmrsr5_t DMRSR5;
+		typedef rw8_t<0x00087418> dmrsr6_t;
+		static dmrsr6_t DMRSR6;
+		typedef rw8_t<0x0008741C> dmrsr7_t;
+		static dmrsr7_t DMRSR7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1224,7 +1236,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct irqflte0_t : public rw8_t<base> {
+		struct irqflte0_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1240,7 +1252,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> FLTEN6;
 			bit_rw_t<io_, bitpos::B7> FLTEN7;
 		};
-		static irqflte0_t<0x00087520> IRQFLTE0;
+		typedef irqflte0_t_<0x00087520> irqflte0_t;
+		static irqflte0_t IRQFLTE0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1250,7 +1263,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct irqflte1_t : public rw8_t<base> {
+		struct irqflte1_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1266,7 +1279,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> FLTEN14;
 			bit_rw_t<io_, bitpos::B7> FLTEN15;
 		};
-		static irqflte1_t<0x00087521> IRQFLTE1;
+		typedef irqflte1_t_<0x00087521> irqflte1_t;
+		static irqflte1_t IRQFLTE1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1276,7 +1290,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct irqfltc0_t : public rw16_t<base> {
+		struct irqfltc0_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1292,7 +1306,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> FCLKSEL6;
 			bits_rw_t<io_, bitpos::B14, 2> FCLKSEL7;
 		};
-		static irqfltc0_t<0x00087528> IRQFLTC0;
+		typedef irqfltc0_t_<0x00087528> irqfltc0_t;
+		static irqfltc0_t IRQFLTC0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1302,7 +1317,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct irqfltc1_t : public rw16_t<base> {
+		struct irqfltc1_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1318,7 +1333,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> FCLKSEL14;
 			bits_rw_t<io_, bitpos::B14, 2> FCLKSEL15;
 		};
-		static irqfltc1_t<0x0008752A> IRQFLTC1;
+		typedef irqfltc1_t_<0x0008752A> irqfltc1_t;
+		static irqfltc1_t IRQFLTC1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1328,7 +1344,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct grp_t : public ro32_t<base> {
+		struct grp_t_ : public ro32_t<base> {
 			typedef ro32_t<base> io_;
 			using io_::operator ();
 
@@ -1377,10 +1393,14 @@ namespace device {
 					グループ AL0/1 割り込み要求レジスタ（GRPAL0/GRPAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static grp_t<0x00087600> GRPBE0;
-		static grp_t<0x00087630> GRPBL0;
-		static grp_t<0x00087634> GRPBL1;
-		static grp_t<0x00087830> GRPAL0;
+		typedef grp_t_<0x00087600> grpbe0_t;
+		static grpbe0_t GRPBE0;
+		typedef grp_t_<0x00087630> grpbl0_t;
+		static grpbl0_t GRPBL0;
+		typedef grp_t_<0x00087634> grpbl1_t;
+		static grpbl1_t GRPBL1;
+		typedef grp_t_<0x00087830> grpal0_t;
+		static grpal0_t GRPAL0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1390,7 +1410,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct gen_t : public rw32_t<base> {
+		struct gen_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1442,10 +1462,14 @@ namespace device {
 					グループ AL0/1 割り込み要求許可レジスタ（GENAL0/GENAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static gen_t<0x00087640> GENBE0;
-		static gen_t<0x00087670> GENBL0;
-		static gen_t<0x00087674> GENBL1;
-		static gen_t<0x00087870> GENAL0;
+		typedef gen_t_<0x00087640> genbe0_t;
+		static genbe0_t GENBE0;
+		typedef gen_t_<0x00087670> genbl0_t;
+		static genbl0_t GENBL0;
+		typedef gen_t_<0x00087674> genbl1_t;
+		static genbl1_t GENBL1;
+		typedef gen_t_<0x00087870> genal0_t;
+		static genal0_t GENAL0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1455,7 +1479,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct gcrbe0_t : public rw32_t<base> {
+		struct gcrbe0_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1498,7 +1522,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30> CLR30;
 			bit_rw_t <io_, bitpos::B31> CLR31;
 		};
-		static gcrbe0_t<0x00087680> GCRBE0;
+		typedef gcrbe0_t_<0x00087680> gcrbe0_t;
+		static gcrbe0_t GCRBE0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1508,7 +1533,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct pixr_t : public rw8_t<base> {
+		struct pixr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1531,78 +1556,224 @@ namespace device {
 			@brief  選択型割り込み A 要求レジスタ k（PIARk）（k = 0h ～ Bh）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static pixr_t<0x00087900> PIAR0;
-		static pixr_t<0x00087901> PIAR1;
-		static pixr_t<0x00087902> PIAR2;
-		static pixr_t<0x00087903> PIAR3;
-		static pixr_t<0x00087904> PIAR4;
-		static pixr_t<0x00087905> PIAR5;
-		static pixr_t<0x00087906> PIAR6;
-		static pixr_t<0x00087907> PIAR7;
-		static pixr_t<0x00087908> PIAR8;
-		static pixr_t<0x00087909> PIAR9;
-		static pixr_t<0x0008790A> PIARA;
-		static pixr_t<0x0008790B> PIARB;
+		typedef pixr_t_<0x00087900> piar0_t;
+		static piar0_t PIAR0;
+		typedef pixr_t_<0x00087901> piar1_t;
+		static piar1_t PIAR1;
+		typedef pixr_t_<0x00087902> piar2_t;
+		static piar2_t PIAR2;
+		typedef pixr_t_<0x00087903> piar3_t;
+		static piar3_t PIAR3;
+		typedef pixr_t_<0x00087904> piar4_t;
+		static piar4_t PIAR4;
+		typedef pixr_t_<0x00087905> piar5_t;
+		static piar5_t PIAR5;
+		typedef pixr_t_<0x00087906> piar6_t;
+		static piar6_t PIAR6;
+		typedef pixr_t_<0x00087907> piar7_t;
+		static piar7_t PIAR7;
+		typedef pixr_t_<0x00087908> piar8_t;
+		static piar8_t PIAR8;
+		typedef pixr_t_<0x00087909> piar9_t;
+		static piar9_t PIAR9;
+		typedef pixr_t_<0x0008790A> piara_t;
+		static piara_t PIARA;
+		typedef pixr_t_<0x0008790B> piarb_t;
+		static piarb_t PIARB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
+		  @brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<0x000879D0> SLIAR208;
-		static rw8_t<0x000879D1> SLIAR209;
-		static rw8_t<0x000879D2> SLIAR210;
-		static rw8_t<0x000879D3> SLIAR211;
-		static rw8_t<0x000879D4> SLIAR212;
-		static rw8_t<0x000879D5> SLIAR213;
-		static rw8_t<0x000879D6> SLIAR214;
-		static rw8_t<0x000879D7> SLIAR215;
-		static rw8_t<0x000879D8> SLIAR216;
-		static rw8_t<0x000879D9> SLIAR217;
-		static rw8_t<0x000879DA> SLIAR218;
-		static rw8_t<0x000879DB> SLIAR219;
-		static rw8_t<0x000879DC> SLIAR220;
-		static rw8_t<0x000879DD> SLIAR221;
-		static rw8_t<0x000879DE> SLIAR222;
-		static rw8_t<0x000879DF> SLIAR223;
+		typedef rw8_t<0x000879D0> sliar208_t;
+		static sliar208_t SLIAR208;
+		typedef rw8_t<0x000879D1> sliar209_t;
+		static sliar209_t SLIAR209;
+		typedef rw8_t<0x000879D2> sliar210_t;
+		static sliar210_t SLIAR210;
+		typedef rw8_t<0x000879D3> sliar211_t;
+		static sliar211_t SLIAR211;
+		typedef rw8_t<0x000879D4> sliar212_t;
+		static sliar212_t SLIAR212;
+		typedef rw8_t<0x000879D5> sliar213_t;
+		static sliar213_t SLIAR213;
+		typedef rw8_t<0x000879D6> sliar214_t;
+		static sliar214_t SLIAR214;
+		typedef rw8_t<0x000879D7> sliar215_t;
+		static sliar215_t SLIAR215;
+		typedef rw8_t<0x000879D8> sliar216_t;
+		static sliar216_t SLIAR216;
+		typedef rw8_t<0x000879D9> sliar217_t;
+		static sliar217_t SLIAR217;
+		typedef rw8_t<0x000879DA> sliar218_t;
+		static sliar218_t SLIAR218;
+		typedef rw8_t<0x000879DB> sliar219_t;
+		static sliar219_t SLIAR219;
+		typedef rw8_t<0x000879DC> sliar220_t;
+		static sliar220_t SLIAR220;
+		typedef rw8_t<0x000879DD> sliar221_t;
+		static sliar221_t SLIAR221;
+		typedef rw8_t<0x000879DE> sliar222_t;
+		static sliar222_t SLIAR222;
+		typedef rw8_t<0x000879DF> sliar223_t;
+		static sliar223_t SLIAR223;
 
-		static rw8_t<0x000879E0> SLIAR224;
-		static rw8_t<0x000879E1> SLIAR225;
-		static rw8_t<0x000879E2> SLIAR226;
-		static rw8_t<0x000879E3> SLIAR227;
-		static rw8_t<0x000879E4> SLIAR228;
-		static rw8_t<0x000879E5> SLIAR229;
-		static rw8_t<0x000879E6> SLIAR230;
-		static rw8_t<0x000879E7> SLIAR231;
-		static rw8_t<0x000879E8> SLIAR232;
-		static rw8_t<0x000879E9> SLIAR233;
-		static rw8_t<0x000879EA> SLIAR234;
-		static rw8_t<0x000879EB> SLIAR235;
-		static rw8_t<0x000879EC> SLIAR236;
-		static rw8_t<0x000879ED> SLIAR237;
-		static rw8_t<0x000879EE> SLIAR238;
-		static rw8_t<0x000879EF> SLIAR239;
+		typedef rw8_t<0x000879E0> sliar224_t;
+		static sliar224_t SLIAR224;
+		typedef rw8_t<0x000879E1> sliar225_t;
+		static sliar225_t SLIAR225;
+		typedef rw8_t<0x000879E2> sliar226_t;
+		static sliar226_t SLIAR226;
+		typedef rw8_t<0x000879E3> sliar227_t;
+		static sliar227_t SLIAR227;
+		typedef rw8_t<0x000879E4> sliar228_t;
+		static sliar228_t SLIAR228;
+		typedef rw8_t<0x000879E5> sliar229_t;
+		static sliar229_t SLIAR229;
+		typedef rw8_t<0x000879E6> sliar230_t;
+		static sliar230_t SLIAR230;
+		typedef rw8_t<0x000879E7> sliar231_t;
+		static sliar231_t SLIAR231;
+		typedef rw8_t<0x000879E8> sliar232_t;
+		static sliar232_t SLIAR232;
+		typedef rw8_t<0x000879E9> sliar233_t;
+		static sliar233_t SLIAR233;
+		typedef rw8_t<0x000879EA> sliar234_t;
+		static sliar234_t SLIAR234;
+		typedef rw8_t<0x000879EB> sliar235_t;
+		static sliar235_t SLIAR235;
+		typedef rw8_t<0x000879EC> sliar236_t;
+		static sliar236_t SLIAR236;
+		typedef rw8_t<0x000879ED> sliar237_t;
+		static sliar237_t SLIAR237;
+		typedef rw8_t<0x000879EE> sliar238_t;
+		static sliar238_t SLIAR238;
+		typedef rw8_t<0x000879EF> sliar239_t;
+		static sliar239_t SLIAR239;
 
-		static rw8_t<0x000879F0> SLIAR240;
-		static rw8_t<0x000879F1> SLIAR241;
-		static rw8_t<0x000879F2> SLIAR242;
-		static rw8_t<0x000879F3> SLIAR243;
-		static rw8_t<0x000879F4> SLIAR244;
-		static rw8_t<0x000879F5> SLIAR245;
-		static rw8_t<0x000879F6> SLIAR246;
-		static rw8_t<0x000879F7> SLIAR247;
-		static rw8_t<0x000879F8> SLIAR248;
-		static rw8_t<0x000879F9> SLIAR249;
-		static rw8_t<0x000879FA> SLIAR250;
-		static rw8_t<0x000879FB> SLIAR251;
-		static rw8_t<0x000879FC> SLIAR252;
-		static rw8_t<0x000879FD> SLIAR253;
-		static rw8_t<0x000879FE> SLIAR254;
-		static rw8_t<0x000879FF> SLIAR255;
+		typedef rw8_t<0x000879F0> sliar240_t;
+		static sliar240_t SLIAR240;
+		typedef rw8_t<0x000879F1> sliar241_t;
+		static sliar241_t SLIAR241;
+		typedef rw8_t<0x000879F2> sliar242_t;
+		static sliar242_t SLIAR242;
+		typedef rw8_t<0x000879F3> sliar243_t;
+		static sliar243_t SLIAR243;
+		typedef rw8_t<0x000879F4> sliar244_t;
+		static sliar244_t SLIAR244;
+		typedef rw8_t<0x000879F5> sliar245_t;
+		static sliar245_t SLIAR245;
+		typedef rw8_t<0x000879F6> sliar246_t;
+		static sliar246_t SLIAR246;
+		typedef rw8_t<0x000879F7> sliar247_t;
+		static sliar247_t SLIAR247;
+		typedef rw8_t<0x000879F8> sliar248_t;
+		static sliar248_t SLIAR248;
+		typedef rw8_t<0x000879F9> sliar249_t;
+		static sliar249_t SLIAR249;
+		typedef rw8_t<0x000879FA> sliar250_t;
+		static sliar250_t SLIAR250;
+		typedef rw8_t<0x000879FB> sliar251_t;
+		static sliar251_t SLIAR251;
+		typedef rw8_t<0x000879FC> sliar252_t;
+		static sliar252_t SLIAR252;
+		typedef rw8_t<0x000879FD> sliar253_t;
+		static sliar253_t SLIAR253;
+		typedef rw8_t<0x000879FE> sliar254_t;
+		static sliar254_t SLIAR254;
+		typedef rw8_t<0x000879FF> sliar255_t;
+		static sliar255_t SLIAR255;
 
-
-		static icu_utils::slixr_t<0x00087700> SLIXR;
+		typedef icu_utils::slixr_t<0x00087700> slixr_t;
+		static slixr_t SLIXR;
 	};
-	typedef icu_t ICU;
+	typedef icu_t_<void> ICU;
+	typedef icu_t_<void> icu_t;
+	template <typename _> typename icu_t_<_>::ir_t        icu_t_<_>::IR;
+	template <typename _> typename icu_t_<_>::ier_t       icu_t_<_>::IER;
+	template <typename _> typename icu_t_<_>::ipr_t       icu_t_<_>::IPR;
+	template <typename _> typename icu_t_<_>::dmrsr0_t    icu_t_<_>::DMRSR0;
+	template <typename _> typename icu_t_<_>::dmrsr1_t    icu_t_<_>::DMRSR1;
+	template <typename _> typename icu_t_<_>::dmrsr2_t    icu_t_<_>::DMRSR2;
+	template <typename _> typename icu_t_<_>::dmrsr3_t    icu_t_<_>::DMRSR3;
+	template <typename _> typename icu_t_<_>::dmrsr4_t    icu_t_<_>::DMRSR4;
+	template <typename _> typename icu_t_<_>::dmrsr5_t    icu_t_<_>::DMRSR5;
+	template <typename _> typename icu_t_<_>::dmrsr6_t    icu_t_<_>::DMRSR6;
+	template <typename _> typename icu_t_<_>::dmrsr7_t    icu_t_<_>::DMRSR7;
+	template <typename _> typename icu_t_<_>::irqflte0_t  icu_t_<_>::IRQFLTE0;
+	template <typename _> typename icu_t_<_>::irqflte1_t  icu_t_<_>::IRQFLTE1;
+	template <typename _> typename icu_t_<_>::irqfltc0_t  icu_t_<_>::IRQFLTC0;
+	template <typename _> typename icu_t_<_>::irqfltc1_t  icu_t_<_>::IRQFLTC1;
+	template <typename _> typename icu_t_<_>::grpbe0_t    icu_t_<_>::GRPBE0;
+	template <typename _> typename icu_t_<_>::grpbl0_t    icu_t_<_>::GRPBL0;
+	template <typename _> typename icu_t_<_>::grpbl1_t    icu_t_<_>::GRPBL1;
+	template <typename _> typename icu_t_<_>::grpal0_t    icu_t_<_>::GRPAL0;
+	template <typename _> typename icu_t_<_>::genbe0_t    icu_t_<_>::GENBE0;
+	template <typename _> typename icu_t_<_>::genbl0_t    icu_t_<_>::GENBL0;
+	template <typename _> typename icu_t_<_>::genbl1_t    icu_t_<_>::GENBL1;
+	template <typename _> typename icu_t_<_>::genal0_t    icu_t_<_>::GENAL0;
+	template <typename _> typename icu_t_<_>::gcrbe0_t    icu_t_<_>::GCRBE0;
+	template <typename _> typename icu_t_<_>::piar0_t     icu_t_<_>::PIAR0;
+	template <typename _> typename icu_t_<_>::piar1_t     icu_t_<_>::PIAR1;
+	template <typename _> typename icu_t_<_>::piar2_t     icu_t_<_>::PIAR2;
+	template <typename _> typename icu_t_<_>::piar3_t     icu_t_<_>::PIAR3;
+	template <typename _> typename icu_t_<_>::piar4_t     icu_t_<_>::PIAR4;
+	template <typename _> typename icu_t_<_>::piar5_t     icu_t_<_>::PIAR5;
+	template <typename _> typename icu_t_<_>::piar6_t     icu_t_<_>::PIAR6;
+	template <typename _> typename icu_t_<_>::piar7_t     icu_t_<_>::PIAR7;
+	template <typename _> typename icu_t_<_>::piar8_t     icu_t_<_>::PIAR8;
+	template <typename _> typename icu_t_<_>::piar9_t     icu_t_<_>::PIAR9;
+	template <typename _> typename icu_t_<_>::piara_t     icu_t_<_>::PIARA;
+	template <typename _> typename icu_t_<_>::piarb_t     icu_t_<_>::PIARB;
+	template <typename _> typename icu_t_<_>::sliar208_t  icu_t_<_>::SLIAR208;
+	template <typename _> typename icu_t_<_>::sliar209_t  icu_t_<_>::SLIAR209;
+	template <typename _> typename icu_t_<_>::sliar210_t  icu_t_<_>::SLIAR210;
+	template <typename _> typename icu_t_<_>::sliar211_t  icu_t_<_>::SLIAR211;
+	template <typename _> typename icu_t_<_>::sliar212_t  icu_t_<_>::SLIAR212;
+	template <typename _> typename icu_t_<_>::sliar213_t  icu_t_<_>::SLIAR213;
+	template <typename _> typename icu_t_<_>::sliar214_t  icu_t_<_>::SLIAR214;
+	template <typename _> typename icu_t_<_>::sliar215_t  icu_t_<_>::SLIAR215;
+	template <typename _> typename icu_t_<_>::sliar216_t  icu_t_<_>::SLIAR216;
+	template <typename _> typename icu_t_<_>::sliar217_t  icu_t_<_>::SLIAR217;
+	template <typename _> typename icu_t_<_>::sliar218_t  icu_t_<_>::SLIAR218;
+	template <typename _> typename icu_t_<_>::sliar219_t  icu_t_<_>::SLIAR219;
+	template <typename _> typename icu_t_<_>::sliar220_t  icu_t_<_>::SLIAR220;
+	template <typename _> typename icu_t_<_>::sliar221_t  icu_t_<_>::SLIAR221;
+	template <typename _> typename icu_t_<_>::sliar222_t  icu_t_<_>::SLIAR222;
+	template <typename _> typename icu_t_<_>::sliar223_t  icu_t_<_>::SLIAR223;
+	template <typename _> typename icu_t_<_>::sliar224_t  icu_t_<_>::SLIAR224;
+	template <typename _> typename icu_t_<_>::sliar225_t  icu_t_<_>::SLIAR225;
+	template <typename _> typename icu_t_<_>::sliar226_t  icu_t_<_>::SLIAR226;
+	template <typename _> typename icu_t_<_>::sliar227_t  icu_t_<_>::SLIAR227;
+	template <typename _> typename icu_t_<_>::sliar228_t  icu_t_<_>::SLIAR228;
+	template <typename _> typename icu_t_<_>::sliar229_t  icu_t_<_>::SLIAR229;
+	template <typename _> typename icu_t_<_>::sliar230_t  icu_t_<_>::SLIAR230;
+	template <typename _> typename icu_t_<_>::sliar231_t  icu_t_<_>::SLIAR231;
+	template <typename _> typename icu_t_<_>::sliar232_t  icu_t_<_>::SLIAR232;
+	template <typename _> typename icu_t_<_>::sliar233_t  icu_t_<_>::SLIAR233;
+	template <typename _> typename icu_t_<_>::sliar234_t  icu_t_<_>::SLIAR234;
+	template <typename _> typename icu_t_<_>::sliar235_t  icu_t_<_>::SLIAR235;
+	template <typename _> typename icu_t_<_>::sliar236_t  icu_t_<_>::SLIAR236;
+	template <typename _> typename icu_t_<_>::sliar237_t  icu_t_<_>::SLIAR237;
+	template <typename _> typename icu_t_<_>::sliar238_t  icu_t_<_>::SLIAR238;
+	template <typename _> typename icu_t_<_>::sliar239_t  icu_t_<_>::SLIAR239;
+	template <typename _> typename icu_t_<_>::sliar240_t  icu_t_<_>::SLIAR240;
+	template <typename _> typename icu_t_<_>::sliar241_t  icu_t_<_>::SLIAR241;
+	template <typename _> typename icu_t_<_>::sliar242_t  icu_t_<_>::SLIAR242;
+	template <typename _> typename icu_t_<_>::sliar243_t  icu_t_<_>::SLIAR243;
+	template <typename _> typename icu_t_<_>::sliar244_t  icu_t_<_>::SLIAR244;
+	template <typename _> typename icu_t_<_>::sliar245_t  icu_t_<_>::SLIAR245;
+	template <typename _> typename icu_t_<_>::sliar246_t  icu_t_<_>::SLIAR246;
+	template <typename _> typename icu_t_<_>::sliar247_t  icu_t_<_>::SLIAR247;
+	template <typename _> typename icu_t_<_>::sliar248_t  icu_t_<_>::SLIAR248;
+	template <typename _> typename icu_t_<_>::sliar249_t  icu_t_<_>::SLIAR249;
+	template <typename _> typename icu_t_<_>::sliar250_t  icu_t_<_>::SLIAR250;
+	template <typename _> typename icu_t_<_>::sliar251_t  icu_t_<_>::SLIAR251;
+	template <typename _> typename icu_t_<_>::sliar252_t  icu_t_<_>::SLIAR252;
+	template <typename _> typename icu_t_<_>::sliar253_t  icu_t_<_>::SLIAR253;
+	template <typename _> typename icu_t_<_>::sliar254_t  icu_t_<_>::SLIAR254;
+	template <typename _> typename icu_t_<_>::sliar255_t  icu_t_<_>::SLIAR255;
+	template <typename _> typename icu_t_<_>::slixr_t     icu_t_<_>::SLIXR;
 }

@@ -29,7 +29,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct control_t : public trw32_t<ofs> {
+		struct control_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -61,7 +61,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B22>  SPANABT;
 			bit_rw_t<io_, bitpos::B23>  SPANSTR;
 		};
-		static control_t<base + 0x00> CONTROL;
+		typedef control_t_<base + 0x00> control_t;
+		static control_t CONTROL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -71,7 +72,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct control2_t : public trw32_t<ofs> {
+		struct control2_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -106,7 +107,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B29>     BDIA;
 			bits_rw_t<io_, bitpos::B30, 2>  RLEPIXW;
 		};
-		static control2_t<base + 0x04> CONTROL2;
+		typedef control2_t_<base + 0x04> control2_t;
+		static control2_t CONTROL2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -116,7 +118,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct irqctl_t : public trw32_t<ofs> {
+		struct irqctl_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -128,7 +130,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>      ENUIRCLR;
 			bit_rw_t <io_, bitpos::B3>      DLIRCLR;
 		};
-		static irqctl_t<base + 0xC0> IRQCTL;
+		typedef irqctl_t_<base + 0xC0> irqctl_t;
+		static irqctl_t IRQCTL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -138,7 +141,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct cachectl_t : public trw32_t<ofs> {
+		struct cachectl_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -150,7 +153,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>      CENTX;
 			bit_rw_t <io_, bitpos::B3>      CFLUTX;
 		};
-		static cachectl_t<base + 0xC4> CACHECTL;
+		typedef cachectl_t_<base + 0xC4> cachectl_t;
+		static cachectl_t CACHECTL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -160,7 +164,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct status_t : public ro32_t<ofs> {
+		struct status_t_ : public ro32_t<ofs> {
 			typedef ro32_t<ofs> io_;
 			using io_::operator ();
 
@@ -171,7 +175,8 @@ namespace device {
 			bit_ro_t <io_, bitpos::B4>      ENUIR;
 			bit_ro_t <io_, bitpos::B5>      DLIR;
 		};
-		static status_t<base + 0x00> STATUS;
+		typedef status_t_<base + 0x00> status_t;
+		static status_t STATUS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -181,7 +186,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct hwver_t : public ro32_t<ofs> {
+		struct hwver_t_ : public ro32_t<ofs> {
 			typedef ro32_t<ofs> io_;
 			using io_::operator ();
 
@@ -198,7 +203,8 @@ namespace device {
 
 			bit_ro_t <io_, bitpos::B27>     ACBLD;
 		};
-		static hwver_t<base + 0x04> HWVER;
+		typedef hwver_t_<base + 0x04> hwver_t;
+		static hwver_t HWVER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -208,7 +214,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct color1_t : public trw32_t<ofs> {
+		struct color1_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -220,7 +226,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 8>    COL1R;
 			bits_rw_t<io_, bitpos::B24, 8>    COL1A;
 		};
-		static color1_t<base + 0x64> COLOR1;
+		typedef color1_t_<base + 0x64> color1_t;
+		static color1_t COLOR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -230,7 +237,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct color2_t : public trw32_t<ofs> {
+		struct color2_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -242,7 +249,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 8>    COL2R;
 			bits_rw_t<io_, bitpos::B24, 8>    COL2A;
 		};
-		static color2_t<base + 0x68> COLOR2;
+		typedef color2_t_<base + 0x68> color2_t;
+		static color2_t COLOR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -252,7 +260,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct pattern_t : public trw32_t<ofs> {
+		struct pattern_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -261,7 +269,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0,  8>    PATTERN;
 		};
-		static pattern_t<base + 0x74> PATTERN;
+		typedef pattern_t_<base + 0x74> pattern_t;
+		static pattern_t PATTERN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -269,12 +278,18 @@ namespace device {
 			@brief	リミッタ n 開始値レジスタ (LnSTART) (n = 1 ～ 6)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0x10> L1START;
-		static trw32_t<base + 0x14> L2START;
-		static trw32_t<base + 0x18> L3START;
-		static trw32_t<base + 0x1C> L4START;
-		static trw32_t<base + 0x20> L5START;
-		static trw32_t<base + 0x24> L6START;
+		typedef trw32_t<base + 0x10> l1start_t;
+		static l1start_t L1START;
+		typedef trw32_t<base + 0x14> l2start_t;
+		static l2start_t L2START;
+		typedef trw32_t<base + 0x18> l3start_t;
+		static l3start_t L3START;
+		typedef trw32_t<base + 0x1C> l4start_t;
+		static l4start_t L4START;
+		typedef trw32_t<base + 0x20> l5start_t;
+		static l5start_t L5START;
+		typedef trw32_t<base + 0x24> l6start_t;
+		static l6start_t L6START;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -282,12 +297,18 @@ namespace device {
 			@brief	リミッタ n X 軸インクリメントレジスタ (LnXADD) (n = 1 ～ 6)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0x28> L1XADD;
-		static trw32_t<base + 0x2C> L2XADD;
-		static trw32_t<base + 0x30> L3XADD;
-		static trw32_t<base + 0x34> L4XADD;
-		static trw32_t<base + 0x38> L5XADD;
-		static trw32_t<base + 0x3C> L6XADD;
+		typedef trw32_t<base + 0x28> l1xadd_t;
+		static l1xadd_t L1XADD;
+		typedef trw32_t<base + 0x2C> l2xadd_t;
+		static l2xadd_t L2XADD;
+		typedef trw32_t<base + 0x30> l3xadd_t;
+		static l3xadd_t L3XADD;
+		typedef trw32_t<base + 0x34> l4xadd_t;
+		static l4xadd_t L4XADD;
+		typedef trw32_t<base + 0x38> l5xadd_t;
+		static l5xadd_t L5XADD;
+		typedef trw32_t<base + 0x3C> l6xadd_t;
+		static l6xadd_t L6XADD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -295,12 +316,18 @@ namespace device {
 			@brief	リミッタ n Y 軸インクリメントレジスタ (LnYADD) (n = 1 ～ 6)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0x40> L1YADD;
-		static trw32_t<base + 0x44> L2YADD;
-		static trw32_t<base + 0x48> L3YADD;
-		static trw32_t<base + 0x4C> L4YADD;
-		static trw32_t<base + 0x50> L5YADD;
-		static trw32_t<base + 0x54> L6YADD;
+		typedef trw32_t<base + 0x40> l1yadd_t;
+		static l1yadd_t L1YADD;
+		typedef trw32_t<base + 0x44> l2yadd_t;
+		static l2yadd_t L2YADD;
+		typedef trw32_t<base + 0x48> l3yadd_t;
+		static l3yadd_t L3YADD;
+		typedef trw32_t<base + 0x4C> l4yadd_t;
+		static l4yadd_t L4YADD;
+		typedef trw32_t<base + 0x50> l5yadd_t;
+		static l5yadd_t L5YADD;
+		typedef trw32_t<base + 0x54> l6yadd_t;
+		static l6yadd_t L6YADD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -308,8 +335,10 @@ namespace device {
 			@brief	リミッタ m バンド幅パラメータレジスタ (LmBAND) (m = 1, 2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0x58> L1BAND;
-		static trw32_t<base + 0x5C> L2BAND;
+		typedef trw32_t<base + 0x58> l1band_t;
+		static l1band_t L1BAND;
+		typedef trw32_t<base + 0x5C> l2band_t;
+		static l2band_t L2BAND;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -317,7 +346,8 @@ namespace device {
 			@brief	テクスチャベースアドレスレジスタ (TEXORG)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0xBC> TEXORG;
+		typedef trw32_t<base + 0xBC> texorg_t;
+		static texorg_t TEXORG;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -325,7 +355,8 @@ namespace device {
 			@brief	テクスチャラインテクセル数レジスタ (TEXPITCH)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0xB4> TEXPITCH;
+		typedef trw32_t<base + 0xB4> texpitch_t;
+		static texpitch_t TEXPITCH;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -335,7 +366,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct texmsk_t : public trw32_t<ofs> {
+		struct texmsk_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -345,7 +376,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  11>  TEXUMASK;
 			bits_rw_t<io_, bitpos::B11, 21>  TEXVMASK;
 		};
-		static texmsk_t<base + 0xB8> TEXMSK;
+		typedef texmsk_t_<base + 0xB8> texmsk_t;
+		static texmsk_t TEXMSK;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -353,7 +385,8 @@ namespace device {
 			@brief	U リミッタ開始値レジスタ (LUST)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0x90> LUST;
+		typedef trw32_t<base + 0x90> lust_t;
+		static lust_t LUST;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -361,7 +394,8 @@ namespace device {
 			@brief	U リミッタ X 軸インクリメントレジスタ (LUXADD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0x94> LUXADD;
+		typedef trw32_t<base + 0x94> luxadd_t;
+		static luxadd_t LUXADD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -369,7 +403,8 @@ namespace device {
 			@brief	U リミッタ Y 軸インクリメントレジスタ (LUYADD)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0x98> LUYADD;
+		typedef trw32_t<base + 0x98> luyadd_t;
+		static luyadd_t LUYADD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -377,7 +412,8 @@ namespace device {
 			@brief	V リミッタ開始値整数部レジスタ (LVSTI)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0x9C> LVSTI;
+		typedef trw32_t<base + 0x9C> lvsti_t;
+		static lvsti_t LVSTI;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -386,7 +422,8 @@ namespace device {
 					※下位１６ビットのみが有効
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0xA0> LVSTF;
+		typedef trw32_t<base + 0xA0> lvstf_t;
+		static lvstf_t LVSTF;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -394,7 +431,8 @@ namespace device {
 			@brief	V リミッタ X 軸インクリメント整数部レジスタ (LVXADDI)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0xA4> LVXADDI;
+		typedef trw32_t<base + 0xA4> lvxaddi_t;
+		static lvxaddi_t LVXADDI;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -402,7 +440,8 @@ namespace device {
 			@brief	V リミッタ Y 軸インクリメント整数部レジスタ (LVYADDI)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0xA8> LVYADDI;
+		typedef trw32_t<base + 0xA8> lvyaddi_t;
+		static lvyaddi_t LVYADDI;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -412,7 +451,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct lvyxaddf_t : public trw32_t<ofs> {
+		struct lvyxaddf_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -422,7 +461,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  16>  LVYADDF;
 			bits_rw_t<io_, bitpos::B16, 16>  LVXADDF;
 		};
-		static lvyxaddf_t<base + 0xAC> LVYXADDF;
+		typedef lvyxaddf_t_<base + 0xAC> lvyxaddf_t;
+		static lvyxaddf_t LVYXADDF;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -432,7 +472,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct texcladdr_t : public trw32_t<ofs> {
+		struct texcladdr_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -441,7 +481,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0,  8>  CLADDR;
 		};
-		static texcladdr_t<base + 0xDC> TEXCLADDR;
+		typedef texcladdr_t_<base + 0xDC> texcladdr_t;
+		static texcladdr_t TEXCLADDR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -449,7 +490,8 @@ namespace device {
 			@brief	CLUT データレジスタ (TEXCLDATA)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0xE0> TEXCLDATA;
+		typedef trw32_t<base + 0xE0> texcldata_t;
+		static texcldata_t TEXCLDATA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -459,7 +501,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct texclofst_t : public trw32_t<ofs> {
+		struct texclofst_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -468,7 +510,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0,  8>  CLOFST;
 		};
-		static texclofst_t<base + 0xE4> TEXCLOFST;
+		typedef texclofst_t_<base + 0xE4> texclofst_t;
+		static texclofst_t TEXCLOFST;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -478,7 +521,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct colkey_t : public trw32_t<ofs> {
+		struct colkey_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -489,7 +532,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  G;
 			bits_rw_t<io_, bitpos::B16, 8>  R;
 		};
-		static colkey_t<base + 0xE8> COLKEY;
+		typedef colkey_t_<base + 0xE8> colkey_t;
+		static colkey_t COLKEY;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -499,7 +543,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct size_t : public trw32_t<ofs> {
+		struct size_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -509,7 +553,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  16>  X;
 			bits_rw_t<io_, bitpos::B16, 16>  Y;
 		};
-		static size_t<base + 0x78> SIZE;
+		typedef size_t_<base + 0x78> size_t;
+		static size_t SIZE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -519,7 +564,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct pitch_t : public trw32_t<ofs> {
+		struct pitch_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -529,7 +574,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  16>  PITCH;
 			bits_rw_t<io_, bitpos::B16, 16>  SSD;
 		};
-		static pitch_t<base + 0x7C> PITCH;
+		typedef pitch_t_<base + 0x7C> pitch_t;
+		static pitch_t PITCH;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -537,7 +583,8 @@ namespace device {
 			@brief	フレームバッファベースアドレスレジスタ (ORIGIN)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0x80> ORIGIN;
+		typedef trw32_t<base + 0x80> origin_t;
+		static origin_t ORIGIN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -545,7 +592,8 @@ namespace device {
 			@brief	ディスプレイリスト開始アドレスレジスタ (DLISTST)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0xC8> DLISTST;
+		typedef trw32_t<base + 0xC8> dlistst_t;
+		static dlistst_t DLISTST;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -555,7 +603,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct perftrg_t : public trw32_t<ofs> {
+		struct perftrg_t_ : public trw32_t<ofs> {
 			typedef trw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -565,7 +613,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  16>  TRG1;
 			bits_rw_t<io_, bitpos::B16, 16>  TRG2;
 		};
-		static perftrg_t<base + 0xD4> PERFTRG;
+		typedef perftrg_t_<base + 0xD4> perftrg_t;
+		static perftrg_t PERFTRG;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -573,8 +622,10 @@ namespace device {
 			@brief	パフォーマンスカウンタ k (PERFCNTk) (k = 1, 2)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static trw32_t<base + 0xCC> PERFCNT1;
-		static trw32_t<base + 0xD0> PERFCNT2;
+		typedef trw32_t<base + 0xCC> perfcnt1_t;
+		static perfcnt1_t PERFCNT1;
+		typedef trw32_t<base + 0xD0> perfcnt2_t;
+		static perfcnt2_t PERFCNT2;
 
 
 		//-----------------------------------------------------------------//
@@ -596,4 +647,56 @@ namespace device {
 	};
 
 	typedef drw2d_t<0x000E3000, peripheral::DRW2D> DRW2D;
+
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::control_t drw2d_t<base, t>::CONTROL;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::control2_t drw2d_t<base, t>::CONTROL2;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::irqctl_t drw2d_t<base, t>::IRQCTL;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::cachectl_t drw2d_t<base, t>::CACHECTL;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::status_t drw2d_t<base, t>::STATUS;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::hwver_t drw2d_t<base, t>::HWVER;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::color1_t drw2d_t<base, t>::COLOR1;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::color2_t drw2d_t<base, t>::COLOR2;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::pattern_t drw2d_t<base, t>::PATTERN;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l1start_t drw2d_t<base, t>::L1START;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l2start_t drw2d_t<base, t>::L2START;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l3start_t drw2d_t<base, t>::L3START;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l4start_t drw2d_t<base, t>::L4START;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l5start_t drw2d_t<base, t>::L5START;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l6start_t drw2d_t<base, t>::L6START;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l1xadd_t drw2d_t<base, t>::L1XADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l2xadd_t drw2d_t<base, t>::L2XADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l3xadd_t drw2d_t<base, t>::L3XADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l4xadd_t drw2d_t<base, t>::L4XADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l5xadd_t drw2d_t<base, t>::L5XADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l6xadd_t drw2d_t<base, t>::L6XADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l1yadd_t drw2d_t<base, t>::L1YADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l2yadd_t drw2d_t<base, t>::L2YADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l3yadd_t drw2d_t<base, t>::L3YADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l4yadd_t drw2d_t<base, t>::L4YADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l5yadd_t drw2d_t<base, t>::L5YADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l6yadd_t drw2d_t<base, t>::L6YADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l1band_t drw2d_t<base, t>::L1BAND;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::l2band_t drw2d_t<base, t>::L2BAND;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::texorg_t drw2d_t<base, t>::TEXORG;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::texpitch_t drw2d_t<base, t>::TEXPITCH;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::texmsk_t drw2d_t<base, t>::TEXMSK;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::lust_t drw2d_t<base, t>::LUST;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::luxadd_t drw2d_t<base, t>::LUXADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::luyadd_t drw2d_t<base, t>::LUYADD;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::lvsti_t drw2d_t<base, t>::LVSTI;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::lvstf_t drw2d_t<base, t>::LVSTF;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::lvxaddi_t drw2d_t<base, t>::LVXADDI;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::lvyaddi_t drw2d_t<base, t>::LVYADDI;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::lvyxaddf_t drw2d_t<base, t>::LVYXADDF;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::texcladdr_t drw2d_t<base, t>::TEXCLADDR;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::texcldata_t drw2d_t<base, t>::TEXCLDATA;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::texclofst_t drw2d_t<base, t>::TEXCLOFST;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::colkey_t drw2d_t<base, t>::COLKEY;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::size_t drw2d_t<base, t>::SIZE;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::pitch_t drw2d_t<base, t>::PITCH;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::origin_t drw2d_t<base, t>::ORIGIN;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::dlistst_t drw2d_t<base, t>::DLISTST;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::perftrg_t drw2d_t<base, t>::PERFTRG;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::perfcnt1_t drw2d_t<base, t>::PERFCNT1;
+	template <uint32_t base, peripheral t> typename drw2d_t<base, t>::perfcnt2_t drw2d_t<base, t>::PERFCNT2;
 }

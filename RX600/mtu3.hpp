@@ -17,7 +17,8 @@ namespace device {
 		@brief  MTU 全体定義クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct mtu_t {
+	template<class _>
+	struct mtu_t_ {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -26,7 +27,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tcr_t : public rw8_t<base> {
+		struct tcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -46,7 +47,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tcr2_t : public rw8_t<base> {
+		struct tcr2_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -64,7 +65,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tcr2x_t : public rw8_t<base> {
+		struct tcr2x_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -83,7 +84,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tmdr1x_t : public rw8_t<base> {
+		struct tmdr1x_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -104,7 +105,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tmdr1y_t : public rw8_t<base> {
+		struct tmdr1y_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -122,7 +123,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tmdr1z_t : public rw8_t<base> {
+		struct tmdr1z_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -142,7 +143,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tmdr_t : public rw8_t<base> {
+		struct tmdr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -158,7 +159,8 @@ namespace device {
 			@brief  タイマモードレジスタ 2（TMDR2A）
 		*/
 		//-----------------------------------------------------------------//
-		static tmdr_t<0x000C1270> TMDR2A;
+		typedef tmdr_t_<0x000C1270> tmdr2a_t;
+		static tmdr2a_t TMDR2A;
 
 
 		//-----------------------------------------------------------------//
@@ -166,7 +168,8 @@ namespace device {
 			@brief  タイマモードレジスタ 2（TMDR2B）
 		*/
 		//-----------------------------------------------------------------//
-		static tmdr_t<0x000C1A70> TMDR2B;
+		typedef tmdr_t_<0x000C1A70> tmdr2b_t;
+		static tmdr2b_t TMDR2B;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -176,7 +179,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tiorh_t : public rw8_t<base> {
+		struct tiorh_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -195,7 +198,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tiorl_t : public rw8_t<base> {
+		struct tiorl_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -214,7 +217,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tierx_t : public rw8_t<base> {
+		struct tierx_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -238,7 +241,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tiery_t : public rw8_t<base> {
+		struct tiery_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -262,7 +265,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tierz_t : public rw8_t<base> {
+		struct tierz_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -287,7 +290,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tier2_t : public rw8_t<base> {
+		struct tier2_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -308,7 +311,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tsr_t : public rw8_t<base> {
+		struct tsr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -326,7 +329,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tbtmx_t : public rw8_t<base> {
+		struct tbtmx_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -346,7 +349,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tbtmy_t : public rw8_t<base> {
+		struct tbtmy_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -365,7 +368,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tstra_t : public rw8_t<base> {
+		struct tstra_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -381,7 +384,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> CST3;
 			bit_rw_t<io_, bitpos::B7> CST4;
 		};
-		static tstra_t<0x000C1280> TSTRA;
+		typedef tstra_t_<0x000C1280> tstra_t;
+		static tstra_t TSTRA;
 
 
 		//-----------------------------------------------------------------//
@@ -391,7 +395,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tstrb_t : public rw8_t<base> {
+		struct tstrb_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -401,7 +405,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> CST6;
 			bit_rw_t<io_, bitpos::B7> CST7;
 		};
-		static tstrb_t<0x000C1A80> TSTRB;
+		typedef tstrb_t_<0x000C1A80> tstrb_t;
+		static tstrb_t TSTRB;
 
 
 		//-----------------------------------------------------------------//
@@ -411,7 +416,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tstr_t : public rw8_t<base> {
+		struct tstr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -422,7 +427,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1> CSV5;
 			bit_rw_t<io_, bitpos::B2> CSU5;
 		};
-		static tstr_t<0x000C1CB4> TSTR;
+		typedef tstr_t_<0x000C1CB4> tstr_t;
+		static tstr_t TSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -432,7 +438,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tsyra_t : public rw8_t<base> {
+		struct tsyra_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -447,7 +453,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> SYNC3;
 			bit_rw_t<io_, bitpos::B7> SYNC4;
 		};
-		static tsyra_t<0x000C1281> TSYRA;
+		typedef tsyra_t_<0x000C1281> tsyra_t;
+		static tsyra_t TSYRA;
 
 
 		//-----------------------------------------------------------------//
@@ -457,7 +464,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tsyrb_t : public rw8_t<base> {
+		struct tsyrb_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -467,7 +474,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> SYNC6;
 			bit_rw_t<io_, bitpos::B7> SYNC7;
 		};
-		static tsyrb_t<0x000C1A81> TSYRB;
+		typedef tsyrb_t_<0x000C1A81> tsyrb_t;
+		static tsyrb_t TSYRB;
 
 
 		//-----------------------------------------------------------------//
@@ -477,7 +485,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tcsystr_t : public rw8_t<base> {
+		struct tcsystr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -493,7 +501,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> SCH1;
 			bit_rw_t<io_, bitpos::B7> SCH0;
 		};
-		static tcsystr_t<0x000C1282> TCSYSTR;
+		typedef tcsystr_t_<0x000C1282> tcsystr_t;
+		static tcsystr_t TCSYSTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -503,7 +512,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct trwer_t : public rw8_t<base> {
+		struct trwer_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -519,7 +528,8 @@ namespace device {
 			@brief	タイマリードライトイネーブルレジスタ（TRWERA）
 		*/
 		//-----------------------------------------------------------------//
-		static trwer_t<0x000C1284> TRWERA;
+		typedef trwer_t_<0x000C1284> trwera_t;
+		static trwera_t TRWERA;
 
 
 		//-----------------------------------------------------------------//
@@ -527,7 +537,8 @@ namespace device {
 			@brief	タイマリードライトイネーブルレジスタ（TRWERB）
 		*/
 		//-----------------------------------------------------------------//
-		static trwer_t<0x000C1A84> TRWERB;
+		typedef trwer_t_<0x000C1A84> trwerb_t;
+		static trwerb_t TRWERB;
 
 
 		//-----------------------------------------------------------------//
@@ -537,7 +548,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct toera_t : public rw8_t<base> {
+		struct toera_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -551,7 +562,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> OE4C;
 			bit_rw_t<io_, bitpos::B5> OE4D;
 		};
-		static toera_t<0x000C120A> TOERA; 
+		typedef toera_t_<0x000C120A> toera_t;
+		static toera_t TOERA;
 
 
 		//-----------------------------------------------------------------//
@@ -561,7 +573,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct toerb_t : public rw8_t<base> {
+		struct toerb_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -575,7 +587,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> OE7C;
 			bit_rw_t<io_, bitpos::B5> OE7D;
 		};
-		static toerb_t<0x000C120A> TOERB; 
+		typedef toerb_t_<0x000C120A> toerb_t;
+		static toerb_t TOERB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -585,7 +598,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tocr1_t : public rw8_t<base> {
+		struct tocr1_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -606,7 +619,8 @@ namespace device {
 			@brief	タイマアウトプットコントロールレジスタ 1（TOCR1A）
 		*/
 		//-----------------------------------------------------------------//
-		static tocr1_t<0x000C120E> TOCR1A; 
+		typedef tocr1_t_<0x000C120E> tocr1a_t;
+		static tocr1a_t TOCR1A;
 
 
 		//-----------------------------------------------------------------//
@@ -614,7 +628,8 @@ namespace device {
 			@brief	タイマアウトプットコントロールレジスタ 1（TOCR1B）
 		*/
 		//-----------------------------------------------------------------//
-		static tocr1_t<0x000C1A0E> TOCR1B; 
+		typedef tocr1_t_<0x000C1A0E> tocr1b_t;
+		static tocr1b_t TOCR1B;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -624,7 +639,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tocr2_t : public rw8_t<base> {
+		struct tocr2_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -646,7 +661,8 @@ namespace device {
 			@brief	タイマアウトプットコントロールレジスタ 2（TOCR2A）
 		*/
 		//-----------------------------------------------------------------//
-		static tocr2_t<0x000C120F> TOCR2A; 
+		typedef tocr2_t_<0x000C120F> tocr2a_t;
+		static tocr2a_t TOCR2A;
 
 
 		//-----------------------------------------------------------------//
@@ -654,7 +670,8 @@ namespace device {
 			@brief	タイマアウトプットコントロールレジスタ 2（TOCR2B）
 		*/
 		//-----------------------------------------------------------------//
-		static tocr2_t<0x000C1A0F> TOCR2B; 
+		typedef tocr2_t_<0x000C1A0F> tocr2b_t;
+		static tocr2b_t TOCR2B;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -664,7 +681,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tolbr_t : public rw8_t<base> {
+		struct tolbr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -685,7 +702,8 @@ namespace device {
 			@brief	タイマアウトプットレベルバッファレジスタ（TOLBRA）
 		*/
 		//-----------------------------------------------------------------//
-		static tolbr_t<0x000C1236> TOLBRA; 
+		typedef tolbr_t_<0x000C1236> tolbra_t;
+		static tolbra_t TOLBRA;
 
 
 		//-----------------------------------------------------------------//
@@ -693,7 +711,8 @@ namespace device {
 			@brief	タイマアウトプットレベルバッファレジスタ（TOLBRB）
 		*/
 		//-----------------------------------------------------------------//
-		static tolbr_t<0x000C1A36> TOLBRB; 
+		typedef tolbr_t_<0x000C1A36> tolbrb_t;
+		static tolbrb_t TOLBRB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -703,7 +722,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tgcra_t : public rw8_t<base> {
+		struct tgcra_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -725,7 +744,8 @@ namespace device {
 			@brief	タイマゲートコントロールレジスタ（TGCRA）
 		*/
 		//-----------------------------------------------------------------//
-		static tgcra_t<0x000C120D> TGCRA; 
+		typedef tgcra_t_<0x000C120D> tgcra_t;
+		static tgcra_t TGCRA;
 
 
 		//-----------------------------------------------------------------//
@@ -733,7 +753,8 @@ namespace device {
 			@brie	タイマゲートコントロールレジスタ（TGCRB）
 		*/
 		//-----------------------------------------------------------------//
-		static tgcra_t<0x000C1A0D> TGCRB; 
+		typedef tgcra_t_<0x000C1A0D> tgcrb_t;
+		static tgcrb_t TGCRB;
 
 
 		//-----------------------------------------------------------------//
@@ -741,7 +762,8 @@ namespace device {
 			@brie	タイマサブカウンタ（TCNTSA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1220> TCNTSA;
+		typedef rw16_t<0x000C1220> tcntsa_t;
+		static tcntsa_t TCNTSA;
 
 
 		//-----------------------------------------------------------------//
@@ -749,7 +771,8 @@ namespace device {
 			@brie	タイマサブカウンタ（TCNTSB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A20> TCNTSB;
+		typedef rw16_t<0x000C1A20> tcntsb_t;
+		static tcntsb_t TCNTSB;
 
 
 		//-----------------------------------------------------------------//
@@ -757,7 +780,8 @@ namespace device {
 			@brie	タイマ周期データレジスタ（TCDRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1214> TCDRA;
+		typedef rw16_t<0x000C1214> tcdra_t;
+		static tcdra_t TCDRA;
 
 
 		//-----------------------------------------------------------------//
@@ -765,7 +789,8 @@ namespace device {
 			@brie	タイマ周期データレジスタ（TCDRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A14> TCDRB;
+		typedef rw16_t<0x000C1A14> tcdrb_t;
+		static tcdrb_t TCDRB;
 
 
 		//-----------------------------------------------------------------//
@@ -773,7 +798,8 @@ namespace device {
 			@brie	タイマ周期バッファレジスタ（TCBRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1222> TCBRA;
+		typedef rw16_t<0x000C1222> tcbra_t;
+		static tcbra_t TCBRA;
 
 
 		//-----------------------------------------------------------------//
@@ -781,7 +807,8 @@ namespace device {
 			@brie	タイマ周期バッファレジスタ（TCBRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A22> TCBRB;
+		typedef rw16_t<0x000C1A22> tcbrb_t;
+		static tcbrb_t TCBRB;
 
 
 		//-----------------------------------------------------------------//
@@ -789,7 +816,8 @@ namespace device {
 			@brie	タイマデッドタイムデータレジスタ（TDDRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1216> TDDRA;
+		typedef rw16_t<0x000C1216> tddra_t;
+		static tddra_t TDDRA;
 
 
 		//-----------------------------------------------------------------//
@@ -797,7 +825,8 @@ namespace device {
 			@brie	タイマデッドタイムデータレジスタ（TDDRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A16> TDDRB;
+		typedef rw16_t<0x000C1A16> tddrb_t;
+		static tddrb_t TDDRB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -807,7 +836,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tder_t : public rw8_t<base> {
+		struct tder_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -823,7 +852,8 @@ namespace device {
 			@brief	タイマデッドタイムイネーブルレジスタ（TDERA）
 		*/
 		//-----------------------------------------------------------------//
-		static tder_t<0x000C1234> TDERA;
+		typedef tder_t_<0x000C1234> tdera_t;
+		static tdera_t TDERA;
 
 
 		//-----------------------------------------------------------------//
@@ -831,7 +861,8 @@ namespace device {
 			@brief	タイマデッドタイムイネーブルレジスタ（TDERB）
 		*/
 		//-----------------------------------------------------------------//
-		static tder_t<0x000C1A34> TDERB;
+		typedef tder_t_<0x000C1A34> tderb_t;
+		static tderb_t TDERB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -841,7 +872,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tbter_t : public rw8_t<base> {
+		struct tbter_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -857,7 +888,8 @@ namespace device {
 			@brief	タイマバッファ転送設定レジスタ（TBTERA）
 		*/
 		//-----------------------------------------------------------------//
-		static tbter_t<0x000C1232> TBTERA;
+		typedef tbter_t_<0x000C1232> tbtera_t;
+		static tbtera_t TBTERA;
 
 
 		//-----------------------------------------------------------------//
@@ -865,7 +897,8 @@ namespace device {
 			@brief	タイマバッファ転送設定レジスタ（TBTERB）
 		*/
 		//-----------------------------------------------------------------//
-		static tbter_t<0x000C1A32> TBTERB;
+		typedef tbter_t_<0x000C1A32> tbterb_t;
+		static tbterb_t TBTERB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -875,7 +908,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct twcr_t : public rw8_t<base> {
+		struct twcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -894,7 +927,8 @@ namespace device {
 			@brief	タイマ波形コントロールレジスタ（TWCRA）
 		*/
 		//-----------------------------------------------------------------//
-		static twcr_t<0x000C1260> TWCRA;
+		typedef twcr_t_<0x000C1260> twcra_t;
+		static twcra_t TWCRA;
 
 
 		//-----------------------------------------------------------------//
@@ -902,7 +936,8 @@ namespace device {
 			@brief	タイマ波形コントロールレジスタ（TWCRB）
 		*/
 		//-----------------------------------------------------------------//
-		static twcr_t<0x000C1A60> TWCRB;
+		typedef twcr_t_<0x000C1A60> twcrb_t;
+		static twcrb_t TWCRB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -912,7 +947,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct nfcr_t : public rw8_t<base> {
+		struct nfcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -935,7 +970,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct titmr_t : public rw8_t<base> {
+		struct titmr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -951,7 +986,8 @@ namespace device {
 			@brief	タイマ割り込み間引きモードレジスタ（TITMRA）
 		*/
 		//-----------------------------------------------------------------//
-		static titmr_t<0x000C123A> TITMRA;
+		typedef titmr_t_<0x000C123A> titmra_t;
+		static titmra_t TITMRA;
 
 
 		//-----------------------------------------------------------------//
@@ -959,7 +995,8 @@ namespace device {
 			@brief	タイマ割り込み間引きモードレジスタ（TITMRB）
 		*/
 		//-----------------------------------------------------------------//
-		static titmr_t<0x000C1A3A> TITMRB;
+		typedef titmr_t_<0x000C1A3A> titmrb_t;
+		static titmrb_t TITMRB;
 
 
 		//-----------------------------------------------------------------//
@@ -969,7 +1006,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct titcr1a_t : public rw8_t<base> {
+		struct titcr1a_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -981,7 +1018,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3>  T3ACOR;
 			bit_rw_t <io_, bitpos::B7>     T3AEN;
 		};
-		static titcr1a_t<0x000C1230> TITCR1A;
+		typedef titcr1a_t_<0x000C1230> titcr1a_t;
+		static titcr1a_t TITCR1A;
 
 
 		//-----------------------------------------------------------------//
@@ -991,7 +1029,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct titcr1b_t : public rw8_t<base> {
+		struct titcr1b_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1003,7 +1041,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3>  T6ACOR;
 			bit_rw_t <io_, bitpos::B7>     T6AEN;
 		};
-		static titcr1b_t<0x000C1230> TITCR1B;
+		typedef titcr1b_t_<0x000C1230> titcr1b_t;
+		static titcr1b_t TITCR1B;
 
 
 		//-----------------------------------------------------------------//
@@ -1013,7 +1052,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct titcnt1a_t : public rw8_t<base> {
+		struct titcnt1a_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1023,7 +1062,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 3>  T4VCNT;
 			bits_rw_t<io_, bitpos::B4, 3>  T3ACNT;
 		};
-		static titcnt1a_t<0x000C1231> TITCNT1A;
+		typedef titcnt1a_t_<0x000C1231> titcnt1a_t;
+		static titcnt1a_t TITCNT1A;
 
 
 		//-----------------------------------------------------------------//
@@ -1033,7 +1073,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct titcnt1b_t : public rw8_t<base> {
+		struct titcnt1b_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1043,7 +1083,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 3>  T7VCNT;
 			bits_rw_t<io_, bitpos::B4, 3>  T6ACNT;
 		};
-		static titcnt1b_t<0x000C1A31> TITCNT1B;
+		typedef titcnt1b_t_<0x000C1A31> titcnt1b_t;
+		static titcnt1b_t TITCNT1B;
 
 
 		//-----------------------------------------------------------------//
@@ -1053,7 +1094,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct titcr2a_t : public rw8_t<base> {
+		struct titcr2a_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1062,7 +1103,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3>  TRG4COR;
 		};
-		static titcr2a_t<0x000C123B> TITCR2A;
+		typedef titcr2a_t_<0x000C123B> titcr2a_t;
+		static titcr2a_t TITCR2A;
 
 
 		//-----------------------------------------------------------------//
@@ -1072,7 +1114,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct titcr2b_t : public rw8_t<base> {
+		struct titcr2b_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1081,7 +1123,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3>  TRG7COR;
 		};
-		static titcr2b_t<0x000C1A3B> TITCR2B;
+		typedef titcr2b_t_<0x000C1A3B> titcr2b_t;
+		static titcr2b_t TITCR2B;
 
 
 		//-----------------------------------------------------------------//
@@ -1091,7 +1134,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct titcnt2a_t : public rw8_t<base> {
+		struct titcnt2a_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1100,7 +1143,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3>  TRG4CNT;
 		};
-		static titcnt2a_t<0x000C123C> TITCNT2A;
+		typedef titcnt2a_t_<0x000C123C> titcnt2a_t;
+		static titcnt2a_t TITCNT2A;
 
 
 		//-----------------------------------------------------------------//
@@ -1110,7 +1154,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct titcnt2b_t : public rw8_t<base> {
+		struct titcnt2b_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1119,7 +1163,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3>  TRG7CNT;
 		};
-		static titcnt2b_t<0x000C1A3C> TITCNT2B;
+		typedef titcnt2b_t_<0x000C1A3C> titcnt2b_t;
+		static titcnt2b_t TITCNT2B;
 
 
 		//-----------------------------------------------------------------//
@@ -1129,7 +1174,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tadstrgr0_t : public rw8_t<base> {
+		struct tadstrgr0_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1138,7 +1183,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5>  TADSTRS0;
 		};
-		static tadstrgr0_t<0x000C1D30> TADSTRGR0;
+		typedef tadstrgr0_t_<0x000C1D30> tadstrgr0_t;
+		static tadstrgr0_t TADSTRGR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1148,7 +1194,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tadstrgr1_t : public rw8_t<base> {
+		struct tadstrgr1_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1157,10 +1203,59 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5>  TADSTRS1;
 		};
-		static tadstrgr1_t<0x000C1D32> TADSTRGR1;
+		typedef tadstrgr1_t_<0x000C1D32> tadstrgr1_t;
+		static tadstrgr1_t TADSTRGR1;
 
 	};
-	typedef mtu_t MTU;
+	typedef mtu_t_<void> MTU;
+	typedef mtu_t_<void> mtu_t;
+
+	template<class _> typename mtu_t_<_>::tmdr2a_t    mtu_t_<_>::TMDR2A;
+	template<class _> typename mtu_t_<_>::tmdr2b_t    mtu_t_<_>::TMDR2B;
+	template<class _> typename mtu_t_<_>::tstra_t     mtu_t_<_>::TSTRA;
+	template<class _> typename mtu_t_<_>::tstrb_t     mtu_t_<_>::TSTRB;
+	template<class _> typename mtu_t_<_>::tstr_t      mtu_t_<_>::TSTR;
+	template<class _> typename mtu_t_<_>::tsyra_t     mtu_t_<_>::TSYRA;
+	template<class _> typename mtu_t_<_>::tsyrb_t     mtu_t_<_>::TSYRB;
+	template<class _> typename mtu_t_<_>::tcsystr_t   mtu_t_<_>::TCSYSTR;
+	template<class _> typename mtu_t_<_>::trwera_t    mtu_t_<_>::TRWERA;
+	template<class _> typename mtu_t_<_>::trwerb_t    mtu_t_<_>::TRWERB;
+	template<class _> typename mtu_t_<_>::toera_t     mtu_t_<_>::TOERA;
+	template<class _> typename mtu_t_<_>::toerb_t     mtu_t_<_>::TOERB;
+	template<class _> typename mtu_t_<_>::tocr1a_t    mtu_t_<_>::TOCR1A;
+	template<class _> typename mtu_t_<_>::tocr1b_t    mtu_t_<_>::TOCR1B;
+	template<class _> typename mtu_t_<_>::tocr2a_t    mtu_t_<_>::TOCR2A;
+	template<class _> typename mtu_t_<_>::tocr2b_t    mtu_t_<_>::TOCR2B;
+	template<class _> typename mtu_t_<_>::tolbra_t    mtu_t_<_>::TOLBRA;
+	template<class _> typename mtu_t_<_>::tolbrb_t    mtu_t_<_>::TOLBRB;
+	template<class _> typename mtu_t_<_>::tgcra_t     mtu_t_<_>::TGCRA;
+	template<class _> typename mtu_t_<_>::tgcrb_t     mtu_t_<_>::TGCRB;
+	template<class _> typename mtu_t_<_>::tcntsa_t    mtu_t_<_>::TCNTSA;
+	template<class _> typename mtu_t_<_>::tcntsb_t    mtu_t_<_>::TCNTSB;
+	template<class _> typename mtu_t_<_>::tcdra_t     mtu_t_<_>::TCDRA;
+	template<class _> typename mtu_t_<_>::tcdrb_t     mtu_t_<_>::TCDRB;
+	template<class _> typename mtu_t_<_>::tcbra_t     mtu_t_<_>::TCBRA;
+	template<class _> typename mtu_t_<_>::tcbrb_t     mtu_t_<_>::TCBRB;
+	template<class _> typename mtu_t_<_>::tddra_t     mtu_t_<_>::TDDRA;
+	template<class _> typename mtu_t_<_>::tddrb_t     mtu_t_<_>::TDDRB;
+	template<class _> typename mtu_t_<_>::tdera_t     mtu_t_<_>::TDERA;
+	template<class _> typename mtu_t_<_>::tderb_t     mtu_t_<_>::TDERB;
+	template<class _> typename mtu_t_<_>::tbtera_t    mtu_t_<_>::TBTERA;
+	template<class _> typename mtu_t_<_>::tbterb_t    mtu_t_<_>::TBTERB;
+	template<class _> typename mtu_t_<_>::twcra_t     mtu_t_<_>::TWCRA;
+	template<class _> typename mtu_t_<_>::twcrb_t     mtu_t_<_>::TWCRB;
+	template<class _> typename mtu_t_<_>::titmra_t    mtu_t_<_>::TITMRA;
+	template<class _> typename mtu_t_<_>::titmrb_t    mtu_t_<_>::TITMRB;
+	template<class _> typename mtu_t_<_>::titcr1a_t   mtu_t_<_>::TITCR1A;
+	template<class _> typename mtu_t_<_>::titcr1b_t   mtu_t_<_>::TITCR1B;
+	template<class _> typename mtu_t_<_>::titcnt1a_t  mtu_t_<_>::TITCNT1A;
+	template<class _> typename mtu_t_<_>::titcnt1b_t  mtu_t_<_>::TITCNT1B;
+	template<class _> typename mtu_t_<_>::titcr2a_t   mtu_t_<_>::TITCR2A;
+	template<class _> typename mtu_t_<_>::titcr2b_t   mtu_t_<_>::TITCR2B;
+	template<class _> typename mtu_t_<_>::titcnt2a_t  mtu_t_<_>::TITCNT2A;
+	template<class _> typename mtu_t_<_>::titcnt2b_t  mtu_t_<_>::TITCNT2B;
+	template<class _> typename mtu_t_<_>::tadstrgr0_t mtu_t_<_>::TADSTRGR0;
+	template<class _> typename mtu_t_<_>::tadstrgr1_t mtu_t_<_>::TADSTRGR1;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1171,7 +1266,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu0_t : public mtu_t {
+	struct mtu0_t_ : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1242,7 +1337,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1300> TCR;
+		typedef tcr_t_<0x000C1300> tcr_t;
+		static tcr_t TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1250,7 +1346,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ 2（TCR2）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr2_t<0x000C1328> TCR2;
+		typedef tcr2_t_<0x000C1328> tcr2_t;
+		static tcr2_t TCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -1258,7 +1355,8 @@ namespace device {
 			@brief  タイマモードレジスタ 1（TMDR1）
 		*/
 		//-----------------------------------------------------------------//
-		static tmdr1x_t<0x000C1301> TMDR1;
+		typedef tmdr1x_t_<0x000C1301> tmdr1_t;
+		static tmdr1_t TMDR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1266,7 +1364,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorh_t<0x000C1302> TIORH;
+		typedef tiorh_t_<0x000C1302> tiorh_t;
+		static tiorh_t TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -1274,7 +1373,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORL）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorl_t<0x000C1303> TIORL;
+		typedef tiorl_t_<0x000C1303> tiorl_t;
+		static tiorl_t TIORL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1347,7 +1447,8 @@ namespace device {
 			@brief  タイマインタラプトイネーブルレジスタ（TIER）
 		*/
 		//-----------------------------------------------------------------//
-		static tiery_t<0x000C1304> TIER;
+		typedef tiery_t_<0x000C1304> tier_t;
+		static tier_t TIER;
 
 
 		//-----------------------------------------------------------------//
@@ -1355,7 +1456,8 @@ namespace device {
 			@brief  タイマインタラプトイネーブルレジスタ（TIER2）
 		*/
 		//-----------------------------------------------------------------//
-		static tier2_t<0x000C1324> TIER2;
+		typedef tier2_t_<0x000C1324> tier2_t;
+		static tier2_t TIER2;
 
 
 		//-----------------------------------------------------------------//
@@ -1363,7 +1465,8 @@ namespace device {
 			@brief  タイマバッファ動作転送モードレジスタ（TBTM）
 		*/
 		//-----------------------------------------------------------------//
-		static tbtmx_t<0x000C1326> TBTM;
+		typedef tbtmx_t_<0x000C1326> tbtm_t;
+		static tbtm_t TBTM;
 
 
 		//-----------------------------------------------------------------//
@@ -1371,7 +1474,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1306> TCNT;
+		typedef rw16_t<0x000C1306> tcnt_t;
+		static tcnt_t TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -1379,7 +1483,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1308> TGRA;
+		typedef rw16_t<0x000C1308> tgra_t;
+		static tgra_t TGRA;
 
 
 		//-----------------------------------------------------------------//
@@ -1387,7 +1492,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C130A> TGRB;
+		typedef rw16_t<0x000C130A> tgrb_t;
+		static tgrb_t TGRB;
 
 
 		//-----------------------------------------------------------------//
@@ -1395,7 +1501,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRC）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C130C> TGRC;
+		typedef rw16_t<0x000C130C> tgrc_t;
+		static tgrc_t TGRC;
 
 
 		//-----------------------------------------------------------------//
@@ -1403,7 +1510,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRD）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C130E> TGRD;
+		typedef rw16_t<0x000C130E> tgrd_t;
+		static tgrd_t TGRD;
 
 
 		//-----------------------------------------------------------------//
@@ -1411,7 +1519,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRE）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1320> TGRE;
+		typedef rw16_t<0x000C1320> tgre_t;
+		static tgre_t TGRE;
 
 
 		//-----------------------------------------------------------------//
@@ -1419,7 +1528,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRF）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1322> TGRF;
+		typedef rw16_t<0x000C1322> tgrf_t;
+		static tgrf_t TGRF;
 
 
 		//-----------------------------------------------------------------//
@@ -1427,7 +1537,8 @@ namespace device {
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
-		static nfcr_t<0x000C1290> NFCR;
+		typedef nfcr_t_<0x000C1290> nfcr_t;
+		static nfcr_t NFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1435,7 +1546,8 @@ namespace device {
 			@brief  ノイズフィルタコントロールレジスタクロック（NFCRC）
 		*/
 		//-----------------------------------------------------------------//
-		static nfcr_t<0x000C1299> NFCRC;
+		typedef nfcr_t_<0x000C1299> nfcrc_t;
+		static nfcrc_t NFCRC;
 
 
 		//-----------------------------------------------------------------//
@@ -1468,6 +1580,26 @@ namespace device {
 		}
 	};
 
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tcr_t   mtu0_t_<per, INT>::TCR;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tcr2_t  mtu0_t_<per, INT>::TCR2;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tmdr1_t mtu0_t_<per, INT>::TMDR1;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tiorh_t mtu0_t_<per, INT>::TIORH;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tiorl_t mtu0_t_<per, INT>::TIORL;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tior_t  mtu0_t_<per, INT>::TIOR;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tier_t  mtu0_t_<per, INT>::TIER;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tier2_t mtu0_t_<per, INT>::TIER2;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tbtm_t  mtu0_t_<per, INT>::TBTM;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tcnt_t  mtu0_t_<per, INT>::TCNT;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tgra_t  mtu0_t_<per, INT>::TGRA;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tgrb_t  mtu0_t_<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tgrc_t  mtu0_t_<per, INT>::TGRC;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tgrd_t  mtu0_t_<per, INT>::TGRD;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tgre_t  mtu0_t_<per, INT>::TGRE;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::tgrf_t  mtu0_t_<per, INT>::TGRF;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::nfcr_t  mtu0_t_<per, INT>::NFCR;
+	template <peripheral per, typename INT> typename mtu0_t_<per, INT>::nfcrc_t mtu0_t_<per, INT>::NFCRC;
+
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -1477,7 +1609,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu1_t : public mtu_t {
+	struct mtu1_t_ : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1541,7 +1673,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1380> TCR;
+		typedef tcr_t_<0x000C1380> tcr_t;
+		static tcr_t TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1549,7 +1682,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ 2（TCR2）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr2x_t<0x000C1394> TCR2;
+		typedef tcr2x_t_<0x000C1394> tcr2_t;
+		static tcr2_t TCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -1557,7 +1691,8 @@ namespace device {
 			@brief  タイマモードレジスタ 1（TMDR1）
 		*/
 		//-----------------------------------------------------------------//
-		static tmdr1y_t<0x000C1381> TMDR1;
+		typedef tmdr1y_t_<0x000C1381> tmdr1_t;
+		static tmdr1_t TMDR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1567,7 +1702,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tmdr3_t : public rw8_t<base> {
+		struct tmdr3_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1577,7 +1712,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> LWA;
 			bit_rw_t<io_, bitpos::B1> PHCKSEL;
 		};
-		static tmdr3_t<0x000C1391> TMDR3;
+		typedef tmdr3_t_<0x000C1391> tmdr3_t;
+		static tmdr3_t TMDR3;
 
 
 		//-----------------------------------------------------------------//
@@ -1585,7 +1721,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorh_t<0x000C1382> TIORH;
+		typedef tiorh_t_<0x000C1382> tiorh_t;
+		static tiorh_t TIORH;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1646,7 +1783,8 @@ namespace device {
 			@brief  タイマインタラプトイネーブルレジスタ（TIER）
 		*/
 		//-----------------------------------------------------------------//
-		static tierx_t<0x000C1384> TIER;
+		typedef tierx_t_<0x000C1384> tier_t;
+		static tier_t TIER;
 
 
 		//-----------------------------------------------------------------//
@@ -1654,7 +1792,8 @@ namespace device {
 			@brief  タイマステータスレジスタ（TSR）
 		*/
 		//-----------------------------------------------------------------//
-		static tsr_t<0x000C1385> TSR;
+		typedef tsr_t_<0x000C1385> tsr_t;
+		static tsr_t TSR;
 
 
 		//-----------------------------------------------------------------//
@@ -1664,7 +1803,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct ticcr_t : public rw8_t<base> {
+		struct ticcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1676,7 +1815,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2> I2AE;
 			bit_rw_t<io_, bitpos::B3> I2BE;
 		};
-		static ticcr_t<0x000C1390> TICCR;
+		typedef ticcr_t_<0x000C1390> ticcr_t;
+		static ticcr_t TICCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1684,7 +1824,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1386> TCNT;
+		typedef rw16_t<0x000C1386> tcnt_t;
+		static tcnt_t TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -1692,7 +1833,8 @@ namespace device {
 			@brief  タイマロングワードカウンタ（TCNTLW）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C13A0> TCNTLW;
+		typedef rw32_t<0x000C13A0> tcntlw_t;
+		static tcntlw_t TCNTLW;
 
 
 		//-----------------------------------------------------------------//
@@ -1700,7 +1842,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1388> TGRA;
+		typedef rw16_t<0x000C1388> tgra_t;
+		static tgra_t TGRA;
 
 
 		//-----------------------------------------------------------------//
@@ -1708,7 +1851,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C138A> TGRB;
+		typedef rw16_t<0x000C138A> tgrb_t;
+		static tgrb_t TGRB;
 
 
 		//-----------------------------------------------------------------//
@@ -1716,7 +1860,8 @@ namespace device {
 			@brief	タイマロングワードジェネラルレジスタ（TGRALW）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C13A4> TGRALW;
+		typedef rw32_t<0x000C13A4> tgralw_t;
+		static tgralw_t TGRALW;
 
 
 		//-----------------------------------------------------------------//
@@ -1724,7 +1869,8 @@ namespace device {
 			@brief	タイマロングワードジェネラルレジスタ（TGRBLW）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C13A8> TGRBLW;
+		typedef rw32_t<0x000C13A8> tgrblw_t;
+		static tgrblw_t TGRBLW;
 
 
 		//-----------------------------------------------------------------//
@@ -1732,7 +1878,8 @@ namespace device {
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
-		static nfcr_t<0x000C1291> NFCR;
+		typedef nfcr_t_<0x000C1291> nfcr_t;
+		static nfcr_t NFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1762,6 +1909,24 @@ namespace device {
 		}
 	};
 
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tcr_t    mtu1_t_<per, INT>::TCR;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tcr2_t   mtu1_t_<per, INT>::TCR2;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tmdr1_t  mtu1_t_<per, INT>::TMDR1;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tmdr3_t  mtu1_t_<per, INT>::TMDR3;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tiorh_t  mtu1_t_<per, INT>::TIORH;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tior_t   mtu1_t_<per, INT>::TIOR;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tier_t   mtu1_t_<per, INT>::TIER;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tsr_t    mtu1_t_<per, INT>::TSR;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::ticcr_t  mtu1_t_<per, INT>::TICCR;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tcnt_t   mtu1_t_<per, INT>::TCNT;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tcntlw_t mtu1_t_<per, INT>::TCNTLW;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tgra_t   mtu1_t_<per, INT>::TGRA;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tgrb_t   mtu1_t_<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tgralw_t mtu1_t_<per, INT>::TGRALW;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::tgrblw_t mtu1_t_<per, INT>::TGRBLW;
+	template <peripheral per, typename INT> typename mtu1_t_<per, INT>::nfcr_t   mtu1_t_<per, INT>::NFCR;
+
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -1771,7 +1936,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu2_t : public mtu_t {
+	struct mtu2_t_ : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1835,7 +2000,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1400> TCR;
+		typedef tcr_t_<0x000C1400> tcr_t;
+		static tcr_t TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1843,7 +2009,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ 2（TCR2）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr2x_t<0x000C140C> TCR2;
+		typedef tcr2x_t_<0x000C140C> tcr2_t;
+		static tcr2_t TCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -1851,7 +2018,8 @@ namespace device {
 			@brief  タイマモードレジスタ 1（TMDR1）
 		*/
 		//-----------------------------------------------------------------//
-		static tmdr1y_t<0x000C1401> TMDR1;
+		typedef tmdr1y_t_<0x000C1401> tmdr1_t;
+		static tmdr1_t TMDR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1859,7 +2027,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorh_t<0x000C1402> TIORH;
+		typedef tiorh_t_<0x000C1402> tiorh_t;
+		static tiorh_t TIORH;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1920,7 +2089,8 @@ namespace device {
 			@brief  タイマインタラプトイネーブルレジスタ（TIER）
 		*/
 		//-----------------------------------------------------------------//
-		static tierx_t<0x000C1404> TIER;
+		typedef tierx_t_<0x000C1404> tier_t;
+		static tier_t TIER;
 
 
 		//-----------------------------------------------------------------//
@@ -1928,7 +2098,8 @@ namespace device {
 			@brief  タイマステータスレジスタ（TSR）
 		*/
 		//-----------------------------------------------------------------//
-		static tsr_t<0x000C1405> TSR;
+		typedef tsr_t_<0x000C1405> tsr_t;
+		static tsr_t TSR;
 
 
 		//-----------------------------------------------------------------//
@@ -1936,7 +2107,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1406> TCNT;
+		typedef rw16_t<0x000C1406> tcnt_t;
+		static tcnt_t TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -1944,7 +2116,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1408> TGRA;
+		typedef rw16_t<0x000C1408> tgra_t;
+		static tgra_t TGRA;
 
 
 		//-----------------------------------------------------------------//
@@ -1952,7 +2125,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C140A> TGRB;
+		typedef rw16_t<0x000C140A> tgrb_t;
+		static tgrb_t TGRB;
 
 
 		//-----------------------------------------------------------------//
@@ -1960,7 +2134,8 @@ namespace device {
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
-		static nfcr_t<0x000C1292> NFCR;
+		typedef nfcr_t_<0x000C1292> nfcr_t;
+		static nfcr_t NFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -1989,6 +2164,17 @@ namespace device {
 			return INT::NONE;
 		}
 	};
+	template <peripheral per, typename INT> typename mtu2_t_<per, INT>::tcr2_t  mtu2_t_<per, INT>::TCR2;
+	template <peripheral per, typename INT> typename mtu2_t_<per, INT>::tmdr1_t mtu2_t_<per, INT>::TMDR1;
+	template <peripheral per, typename INT> typename mtu2_t_<per, INT>::tiorh_t mtu2_t_<per, INT>::TIORH;
+	template <peripheral per, typename INT> typename mtu2_t_<per, INT>::tior_t  mtu2_t_<per, INT>::TIOR;
+	template <peripheral per, typename INT> typename mtu2_t_<per, INT>::tier_t  mtu2_t_<per, INT>::TIER;
+	template <peripheral per, typename INT> typename mtu2_t_<per, INT>::tsr_t   mtu2_t_<per, INT>::TSR;
+	template <peripheral per, typename INT> typename mtu2_t_<per, INT>::tcnt_t  mtu2_t_<per, INT>::TCNT;
+	template <peripheral per, typename INT> typename mtu2_t_<per, INT>::tgra_t  mtu2_t_<per, INT>::TGRA;
+	template <peripheral per, typename INT> typename mtu2_t_<per, INT>::tgrb_t  mtu2_t_<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu2_t_<per, INT>::nfcr_t  mtu2_t_<per, INT>::NFCR;
+
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1999,7 +2185,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu3_t : public mtu_t {
+	struct mtu3_t_ : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -2065,7 +2251,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1200> TCR;
+		typedef tcr_t_<0x000C1200> tcr_t;
+		static tcr_t TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -2073,7 +2260,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ 2（TCR2）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr2_t<0x000C124C> TCR2;
+		typedef tcr2_t_<0x000C124C> tcr2_t;
+		static tcr2_t TCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -2081,7 +2269,8 @@ namespace device {
 			@brief  タイマモードレジスタ 1（TMDR1）
 		*/
 		//-----------------------------------------------------------------//
-		static tmdr1z_t<0x000C1202> TMDR1;
+		typedef tmdr1z_t_<0x000C1202> tmdr1_t;
+		static tmdr1_t TMDR1;
 
 
 		//-----------------------------------------------------------------//
@@ -2089,7 +2278,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorh_t<0x000C1204> TIORH;
+		typedef tiorh_t_<0x000C1204> tiorh_t;
+		static tiorh_t TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -2097,7 +2287,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORL）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorl_t<0x000C1205> TIORL;
+		typedef tiorl_t_<0x000C1205> tiorl_t;
+		static tiorl_t TIORL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2170,7 +2361,8 @@ namespace device {
 			@brief  タイマインタラプトイネーブルレジスタ（TIER）
 		*/
 		//-----------------------------------------------------------------//
-		static tiery_t<0x000C1208> TIER;
+		typedef tiery_t_<0x000C1208> tier_t;
+		static tier_t TIER;
 
 
 		//-----------------------------------------------------------------//
@@ -2178,7 +2370,8 @@ namespace device {
 			@brief  タイマステータスレジスタ（TSR）
 		*/
 		//-----------------------------------------------------------------//
-		static tsr_t<0x000C122C> TSR;
+		typedef tsr_t_<0x000C122C> tsr_t;
+		static tsr_t TSR;
 
 
 		//-----------------------------------------------------------------//
@@ -2186,7 +2379,8 @@ namespace device {
 			@brief  タイマバッファ動作転送モードレジスタ（TBTM）
 		*/
 		//-----------------------------------------------------------------//
-		static tbtmy_t<0x000C1238> TBTM;
+		typedef tbtmy_t_<0x000C1238> tbtm_t;
+		static tbtm_t TBTM;
 
 
 		//-----------------------------------------------------------------//
@@ -2194,7 +2388,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1210> TCNT;
+		typedef rw16_t<0x000C1210> tcnt_t;
+		static tcnt_t TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -2202,7 +2397,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1218> TGRA;
+		typedef rw16_t<0x000C1218> tgra_t;
+		static tgra_t TGRA;
 
 
 		//-----------------------------------------------------------------//
@@ -2210,7 +2406,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C121A> TGRB;
+		typedef rw16_t<0x000C121A> tgrb_t;
+		static tgrb_t TGRB;
 
 
 		//-----------------------------------------------------------------//
@@ -2218,7 +2415,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRC）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1224> TGRC;
+		typedef rw16_t<0x000C1224> tgrc_t;
+		static tgrc_t TGRC;
 
 
 		//-----------------------------------------------------------------//
@@ -2226,7 +2424,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRD）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1226> TGRD;
+		typedef rw16_t<0x000C1226> tgrd_t;
+		static tgrd_t TGRD;
 
 
 		//-----------------------------------------------------------------//
@@ -2234,7 +2433,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRE）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1272> TGRE;
+		typedef rw16_t<0x000C1272> tgre_t;
+		static tgre_t TGRE;
 
 
 		//-----------------------------------------------------------------//
@@ -2242,7 +2442,8 @@ namespace device {
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
-		static nfcr_t<0x000C1293> NFCR;
+		typedef nfcr_t_<0x000C1293> nfcr_t;
+		static nfcr_t NFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -2272,6 +2473,16 @@ namespace device {
 			return INT::NONE;
 		}
 	};
+	template <peripheral per, typename INT> typename mtu3_t_<per, INT>::tcr2_t  mtu3_t_<per, INT>::TCR2;
+	template <peripheral per, typename INT> typename mtu3_t_<per, INT>::tmdr1_t mtu3_t_<per, INT>::TMDR1;
+	template <peripheral per, typename INT> typename mtu3_t_<per, INT>::tiorh_t mtu3_t_<per, INT>::TIORH;
+	template <peripheral per, typename INT> typename mtu3_t_<per, INT>::tior_t  mtu3_t_<per, INT>::TIOR;
+	template <peripheral per, typename INT> typename mtu3_t_<per, INT>::tier_t  mtu3_t_<per, INT>::TIER;
+	template <peripheral per, typename INT> typename mtu3_t_<per, INT>::tsr_t   mtu3_t_<per, INT>::TSR;
+	template <peripheral per, typename INT> typename mtu3_t_<per, INT>::tcnt_t  mtu3_t_<per, INT>::TCNT;
+	template <peripheral per, typename INT> typename mtu3_t_<per, INT>::tgra_t  mtu3_t_<per, INT>::TGRA;
+	template <peripheral per, typename INT> typename mtu3_t_<per, INT>::tgrb_t  mtu3_t_<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu3_t_<per, INT>::nfcr_t  mtu3_t_<per, INT>::NFCR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2282,7 +2493,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu4_t : public mtu_t {
+	struct mtu4_t_ : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -2348,7 +2559,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1201> TCR;
+		typedef tcr_t_<0x000C1201> tcr_t;
+		static tcr_t TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -2356,7 +2568,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ 2（TCR2）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr2_t<0x000C124D> TCR2;
+		typedef tcr2_t_<0x000C124D> tcr2_t;
+		static tcr2_t TCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -2364,7 +2577,8 @@ namespace device {
 			@brief  タイマモードレジスタ 1（TMDR1）
 		*/
 		//-----------------------------------------------------------------//
-		static tmdr1z_t<0x000C1203> TMDR1;
+		typedef tmdr1z_t_<0x000C1203> tmdr1_t;
+		static tmdr1_t TMDR1;
 
 
 		//-----------------------------------------------------------------//
@@ -2372,7 +2586,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorh_t<0x000C1206> TIORH;
+		typedef tiorh_t_<0x000C1206> tiorh_t;
+		static tiorh_t TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -2380,7 +2595,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORL）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorl_t<0x000C1207> TIORL;
+		typedef tiorl_t_<0x000C1207> tiorl_t;
+		static tiorl_t TIORL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2453,7 +2669,8 @@ namespace device {
 			@brief  タイマインタラプトイネーブルレジスタ（TIER）
 		*/
 		//-----------------------------------------------------------------//
-		static tierz_t<0x000C1209> TIER;
+		typedef tierz_t_<0x000C1209> tier_t;
+		static tier_t TIER;
 
 
 		//-----------------------------------------------------------------//
@@ -2461,7 +2678,8 @@ namespace device {
 			@brief  タイマステータスレジスタ（TSR）
 		*/
 		//-----------------------------------------------------------------//
-		static tsr_t<0x000C122D> TSR;
+		typedef tsr_t_<0x000C122D> tsr_t;
+		static tsr_t TSR;
 
 
 		//-----------------------------------------------------------------//
@@ -2469,7 +2687,8 @@ namespace device {
 			@brief  タイマバッファ動作転送モードレジスタ（TBTM）
 		*/
 		//-----------------------------------------------------------------//
-		static tbtmy_t<0x000C1239> TBTM;
+		typedef tbtmy_t_<0x000C1239> tbtm_t;
+		static tbtm_t TBTM;
 
 
 		//-----------------------------------------------------------------//
@@ -2477,7 +2696,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1212> TCNT;
+		typedef rw16_t<0x000C1212> tcnt_t;
+		static tcnt_t TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -2485,7 +2705,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C121C> TGRA;
+		typedef rw16_t<0x000C121C> tgra_t;
+		static tgra_t TGRA;
 
 
 		//-----------------------------------------------------------------//
@@ -2493,7 +2714,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C121E> TGRB;
+		typedef rw16_t<0x000C121E> tgrb_t;
+		static tgrb_t TGRB;
 
 
 		//-----------------------------------------------------------------//
@@ -2501,7 +2723,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRC）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1228> TGRC;
+		typedef rw16_t<0x000C1228> tgrc_t;
+		static tgrc_t TGRC;
 
 
 		//-----------------------------------------------------------------//
@@ -2509,7 +2732,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRD）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C122A> TGRD;
+		typedef rw16_t<0x000C122A> tgrd_t;
+		static tgrd_t TGRD;
 
 
 		//-----------------------------------------------------------------//
@@ -2517,7 +2741,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRE）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1274> TGRE;
+		typedef rw16_t<0x000C1274> tgre_t;
+		static tgre_t TGRE;
 
 
 		//-----------------------------------------------------------------//
@@ -2525,7 +2750,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRF）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1276> TGRF;
+		typedef rw16_t<0x000C1276> tgrf_t;
+		static tgrf_t TGRF;
 
 
 		//-----------------------------------------------------------------//
@@ -2533,7 +2759,8 @@ namespace device {
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
-		static nfcr_t<0x000C1294> NFCR;
+		typedef nfcr_t_<0x000C1294> nfcr_t;
+		static nfcr_t NFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -2543,7 +2770,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tadcr_t : public rw16_t<base> {
+		struct tadcr_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -2561,7 +2788,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B14, 2> BF;
 		};
-		static tadcr_t<0x000C1240> TADCR;
+		typedef tadcr_t_<0x000C1240> tadcr_t;
+		static tadcr_t TADCR;
 
 
 		//-----------------------------------------------------------------//
@@ -2569,7 +2797,8 @@ namespace device {
 			@brief  タイマ A/D 変換開始要求周期設定レジスタ（TADCORA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1244> TADCORA;
+		typedef rw16_t<0x000C1244> tadcora_t;
+		static tadcora_t TADCORA;
 
 
 		//-----------------------------------------------------------------//
@@ -2577,7 +2806,8 @@ namespace device {
 			@brief  タイマ A/D 変換開始要求周期設定レジスタ（TADCORB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1246> TADCORB;
+		typedef rw16_t<0x000C1246> tadcorb_t;
+		static tadcorb_t TADCORB;
 
 
 		//-----------------------------------------------------------------//
@@ -2585,7 +2815,8 @@ namespace device {
 			@brief  タイマ A/D 変換開始要求周期設定バッファレジスタ（TADCOBRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1248> TADCOBRA;
+		typedef rw16_t<0x000C1248> tadcobra_t;
+		static tadcobra_t TADCOBRA;
 
 
 		//-----------------------------------------------------------------//
@@ -2593,7 +2824,8 @@ namespace device {
 			@brief  タイマ A/D 変換開始要求周期設定バッファレジスタ（TADCOBRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C124A> TADCOBRB;
+		typedef rw16_t<0x000C124A> tadcobrb_t;
+		static tadcobrb_t TADCOBRB;
 
 
 		//-----------------------------------------------------------------//
@@ -2623,6 +2855,23 @@ namespace device {
 			return INT::NONE;
 		}
 	};
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tcr_t   mtu4_t_<per, INT>::TCR;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tcr2_t  mtu4_t_<per, INT>::TCR2;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tmdr1_t mtu4_t_<per, INT>::TMDR1;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tiorh_t mtu4_t_<per, INT>::TIORH;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tiorl_t mtu4_t_<per, INT>::TIORL;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tior_t  mtu4_t_<per, INT>::TIOR;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tier_t  mtu4_t_<per, INT>::TIER;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tsr_t   mtu4_t_<per, INT>::TSR;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tbtm_t  mtu4_t_<per, INT>::TBTM;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tcnt_t  mtu4_t_<per, INT>::TCNT;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tgra_t  mtu4_t_<per, INT>::TGRA;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tgrb_t  mtu4_t_<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tgrc_t  mtu4_t_<per, INT>::TGRC;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tgrd_t  mtu4_t_<per, INT>::TGRD;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::tgre_t  mtu4_t_<per, INT>::TGRE;
+	template <peripheral per, typename INT> typename mtu4_t_<per, INT>::nfcr_t  mtu4_t_<per, INT>::NFCR;
+
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2633,7 +2882,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu5_t {
+	struct mtu5_t_ {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -2702,7 +2951,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tcr_t : public rw8_t<base> {
+		struct tcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -2718,7 +2967,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ（TCRU）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1C84> TCRU;
+		typedef tcr_t_<0x000C1C84> tcru_t;
+		static tcru_t TCRU;
 
 
 		//-----------------------------------------------------------------//
@@ -2726,7 +2976,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ（TCRV）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1C94> TCRV;
+		typedef tcr_t_<0x000C1C94> tcrv_t;
+		static tcrv_t TCRV;
 
 
 		//-----------------------------------------------------------------//
@@ -2734,7 +2985,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ（TCRW）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1CA4> TCRW;
+		typedef tcr_t_<0x000C1CA4> tcrw_t;
+		static tcrw_t TCRW;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2744,7 +2996,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tior_t : public rw8_t<base> {
+		struct tior_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -2760,7 +3012,8 @@ namespace device {
 			@brief  タイマ I/O コントロールレジスタ（TIORU）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1C86> TIORU;
+		typedef tior_t_<0x000C1C86> tioru_t;
+		static tioru_t TIORU;
 
 
 		//-----------------------------------------------------------------//
@@ -2768,7 +3021,8 @@ namespace device {
 			@brief  タイマ I/O コントロールレジスタ（TIORV）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1C96> TIORV;
+		typedef tior_t_<0x000C1C96> tiorv_t;
+		static tiorv_t TIORV;
 
 
 		//-----------------------------------------------------------------//
@@ -2776,7 +3030,8 @@ namespace device {
 			@brief  タイマ I/O コントロールレジスタ（TIORW）
 		*/
 		//-----------------------------------------------------------------//
-		static tior_t<0x000C1CA6> TIORW;
+		typedef tior_t_<0x000C1CA6> tiorw_t;
+		static tiorw_t TIORW;
 
 
 		//-----------------------------------------------------------------//
@@ -2786,7 +3041,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tcntcmpclr_t : public rw8_t<base> {
+		struct tcntcmpclr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -2797,7 +3052,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1> CMPCLR5V;
 			bit_rw_t<io_, bitpos::B2> CMPCLR5U;
 		};
-		static tcntcmpclr_t<0x000C1CB6> TCNTCMPCLR;
+		typedef tcntcmpclr_t_<0x000C1CB6> tcntcmpclr_t;
+		static tcntcmpclr_t TCNTCMPCLR;
 
 
 		//-----------------------------------------------------------------//
@@ -2807,7 +3063,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tier_t : public rw8_t<base> {
+		struct tier_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -2818,7 +3074,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1> TGIE5V;
 			bit_rw_t<io_, bitpos::B2> TGIE5U;
 		};
-		static tier_t<0x000C1CB2> TIER;
+		typedef tier_t_<0x000C1CB2> tier_t;
+		static tier_t TIER;
 
 
 		//-----------------------------------------------------------------//
@@ -2826,7 +3083,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNTU）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1C80> TCNTU;
+		typedef rw16_t<0x000C1C80> tcntu_t;
+		static tcntu_t TCNTU;
 
 
 		//-----------------------------------------------------------------//
@@ -2834,7 +3092,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNTV）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1C90> TCNTV;
+		typedef rw16_t<0x000C1C90> tcntv_t;
+		static tcntv_t TCNTV;
 
 
 		//-----------------------------------------------------------------//
@@ -2842,7 +3101,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNTW）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1CA0> TCNTW;
+		typedef rw16_t<0x000C1CA0> tcntw_t;
+		static tcntw_t TCNTW;
 
 
 		//-----------------------------------------------------------------//
@@ -2850,7 +3110,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRU）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1C82> TGRU;
+		typedef rw16_t<0x000C1C82> tgru_t;
+		static tgru_t TGRU;
 
 
 		//-----------------------------------------------------------------//
@@ -2858,7 +3119,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRV）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1C92> TGRV;
+		typedef rw16_t<0x000C1C92> tgrv_t;
+		static tgrv_t TGRV;
 
 
 		//-----------------------------------------------------------------//
@@ -2866,7 +3128,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRW）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1CA2> TGRW;
+		typedef rw16_t<0x000C1CA2> tgrw_t;
+		static tgrw_t TGRW;
 
 
 		//-----------------------------------------------------------------//
@@ -2876,7 +3139,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tstr_t : public rw8_t<base> {
+		struct tstr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -2887,7 +3150,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1> CSTV5;
 			bit_rw_t<io_, bitpos::B2> CSTU5;
 		};
-		static tstr_t<0x000C1CB4> TSTR;
+		typedef tstr_t_<0x000C1CB4> tstr_t;
+		static tstr_t TSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -2897,7 +3161,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct nfcr_t : public rw8_t<base> {
+		struct nfcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -2910,7 +3174,8 @@ namespace device {
 
 			bits_rw_t <io_, bitpos::B4, 2>  NFCS;
 		};
-		static nfcr_t<0x000C1A95> NFCR;
+		typedef nfcr_t_<0x000C1A95> nfcr_t;
+		static nfcr_t NFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -2938,6 +3203,22 @@ namespace device {
 			return INT::NONE;
 		}
 	};
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tcru_t       mtu5_t_<per, INT>::TCRU;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tcrv_t       mtu5_t_<per, INT>::TCRV;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tcrw_t       mtu5_t_<per, INT>::TCRW;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tioru_t      mtu5_t_<per, INT>::TIORU;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tiorv_t      mtu5_t_<per, INT>::TIORV;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tiorw_t      mtu5_t_<per, INT>::TIORW;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tcntcmpclr_t mtu5_t_<per, INT>::TCNTCMPCLR;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tier_t       mtu5_t_<per, INT>::TIER;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tcntu_t      mtu5_t_<per, INT>::TCNTU;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tcntv_t      mtu5_t_<per, INT>::TCNTV;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tcntw_t      mtu5_t_<per, INT>::TCNTW;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tgru_t       mtu5_t_<per, INT>::TGRU;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tgrv_t       mtu5_t_<per, INT>::TGRV;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tgrw_t       mtu5_t_<per, INT>::TGRW;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::tstr_t       mtu5_t_<per, INT>::TSTR;
+	template <peripheral per, typename INT> typename mtu5_t_<per, INT>::nfcr_t       mtu5_t_<per, INT>::NFCR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2948,7 +3229,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu6_t : public mtu_t {
+	struct mtu6_t_ : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -3014,7 +3295,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1A00> TCR;
+		typedef tcr_t_<0x000C1A00> tcr_t;
+		static tcr_t TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -3022,7 +3304,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ 2（TCR2）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr2_t<0x000C1A4C> TCR2;
+		typedef tcr2_t_<0x000C1A4C> tcr2_t;
+		static tcr2_t TCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -3030,7 +3313,8 @@ namespace device {
 			@brief  タイマモードレジスタ 1（TMDR1）
 		*/
 		//-----------------------------------------------------------------//
-		static tmdr1z_t<0x000C1A02> TMDR1;
+		typedef tmdr1z_t_<0x000C1A02> tmdr1_t;
+		static tmdr1_t TMDR1;
 
 
 		//-----------------------------------------------------------------//
@@ -3038,7 +3322,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorh_t<0x000C1A04> TIORH;
+		typedef tiorh_t_<0x000C1A04> tiorh_t;
+		static tiorh_t TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -3046,7 +3331,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORL）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorl_t<0x000C1A05> TIORL;
+		typedef tiorl_t_<0x000C1A05> tiorl_t;
+		static tiorl_t TIORL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3119,7 +3405,8 @@ namespace device {
 			@brief  タイマインタラプトイネーブルレジスタ（TIER）
 		*/
 		//-----------------------------------------------------------------//
-		static tiery_t<0x000C1A08> TIER;
+		typedef tiery_t_<0x000C1A08> tier_t;
+		static tier_t TIER;
 
 
 		//-----------------------------------------------------------------//
@@ -3127,7 +3414,8 @@ namespace device {
 			@brief  タイマステータスレジスタ（TSR）
 		*/
 		//-----------------------------------------------------------------//
-		static tsr_t<0x000C1A2C> TSR;
+		typedef tsr_t_<0x000C1A2C> tsr_t;
+		static tsr_t TSR;
 
 
 		//-----------------------------------------------------------------//
@@ -3135,7 +3423,8 @@ namespace device {
 			@brief  タイマバッファ動作転送モードレジスタ（TBTM）
 		*/
 		//-----------------------------------------------------------------//
-		static tbtmy_t<0x000C1A38> TBTM;
+		typedef tbtmy_t_<0x000C1A38> tbtm_t;
+		static tbtm_t TBTM;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3145,7 +3434,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct tsycr_t : public rw8_t<base> {
+		struct tsycr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -3161,7 +3450,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> CE0B;
 			bit_rw_t<io_, bitpos::B7> CE0A;
 		};
-		static tsycr_t<0x000C1A50> TSYCR;
+		typedef tsycr_t_<0x000C1A50> tsycr_t;
+		static tsycr_t TSYCR;
 
 
 		//-----------------------------------------------------------------//
@@ -3169,7 +3459,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A10> TCNT;
+		typedef rw16_t<0x000C1A10> tcnt_t;
+		static tcnt_t TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -3177,7 +3468,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A18> TGRA;
+		typedef rw16_t<0x000C1A18> tgra_t;
+		static tgra_t TGRA;
 
 
 		//-----------------------------------------------------------------//
@@ -3185,7 +3477,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A1A> TGRB;
+		typedef rw16_t<0x000C1A1A> tgrb_t;
+		static tgrb_t TGRB;
 
 
 		//-----------------------------------------------------------------//
@@ -3193,7 +3486,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRC）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A24> TGRC;
+		typedef rw16_t<0x000C1A24> tgrc_t;
+		static tgrc_t TGRC;
 
 
 		//-----------------------------------------------------------------//
@@ -3201,7 +3495,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRD）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A26> TGRD;
+		typedef rw16_t<0x000C1A26> tgrd_t;
+		static tgrd_t TGRD;
 
 
 		//-----------------------------------------------------------------//
@@ -3209,7 +3504,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRE）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A72> TGRE;
+		typedef rw16_t<0x000C1A72> tgre_t;
+		static tgre_t TGRE;
 
 
 		//-----------------------------------------------------------------//
@@ -3217,7 +3513,8 @@ namespace device {
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
-		static nfcr_t<0x000C1A93> NFCR;
+		typedef nfcr_t_<0x000C1A93> nfcr_t;
+		static nfcr_t NFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -3247,6 +3544,25 @@ namespace device {
 			return INT::NONE;
 		}
 	};
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tcr_t   mtu6_t_<per, INT>::TCR;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tcr2_t  mtu6_t_<per, INT>::TCR2;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tmdr1_t mtu6_t_<per, INT>::TMDR1;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tiorh_t mtu6_t_<per, INT>::TIORH;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tiorl_t mtu6_t_<per, INT>::TIORL;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tior_t  mtu6_t_<per, INT>::TIOR;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tier_t  mtu6_t_<per, INT>::TIER;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tsr_t   mtu6_t_<per, INT>::TSR;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tbtm_t  mtu6_t_<per, INT>::TBTM;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tsycr_t mtu6_t_<per, INT>::TSYCR;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tcnt_t  mtu6_t_<per, INT>::TCNT;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tgra_t  mtu6_t_<per, INT>::TGRA;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tgrb_t  mtu6_t_<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tgrc_t  mtu6_t_<per, INT>::TGRC;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tgrd_t  mtu6_t_<per, INT>::TGRD;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::tgre_t  mtu6_t_<per, INT>::TGRE;
+	template <peripheral per, typename INT> typename mtu6_t_<per, INT>::nfcr_t  mtu6_t_<per, INT>::NFCR;
+
+
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3257,7 +3573,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu7_t : public mtu_t {
+	struct mtu7_t_ : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -3323,7 +3639,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1A01> TCR;
+		typedef tcr_t_<0x000C1A01> tcr_t;
+		static tcr_t TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -3331,7 +3648,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ 2（TCR2）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr2_t<0x000C1A4D> TCR2;
+		typedef tcr2_t_<0x000C1A4D> tcr2_t;
+		static tcr2_t TCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -3339,7 +3657,8 @@ namespace device {
 			@brief  タイマモードレジスタ 1（TMDR1）
 		*/
 		//-----------------------------------------------------------------//
-		static tmdr1z_t<0x000C1A03> TMDR1;
+		typedef tmdr1z_t_<0x000C1A03> tmdr1_t;
+		static tmdr1_t TMDR1;
 
 
 		//-----------------------------------------------------------------//
@@ -3347,7 +3666,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorh_t<0x000C1A06> TIORH;
+		typedef tiorh_t_<0x000C1A06> tiorh_t;
+		static tiorh_t TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -3355,7 +3675,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORL）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorl_t<0x000C1A07> TIORL;
+		typedef tiorl_t_<0x000C1A07> tiorl_t;
+		static tiorl_t TIORL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3428,7 +3749,8 @@ namespace device {
 			@brief  タイマインタラプトイネーブルレジスタ（TIER）
 		*/
 		//-----------------------------------------------------------------//
-		static tierz_t<0x000C1A09> TIER;
+		typedef tierz_t_<0x000C1A09> tier_t;
+		static tier_t TIER;
 
 
 		//-----------------------------------------------------------------//
@@ -3436,7 +3758,8 @@ namespace device {
 			@brief  タイマステータスレジスタ（TSR）
 		*/
 		//-----------------------------------------------------------------//
-		static tsr_t<0x000C1A2D> TSR;
+		typedef tsr_t_<0x000C1A2D> tsr_t;
+		static tsr_t TSR;
 
 
 		//-----------------------------------------------------------------//
@@ -3444,7 +3767,8 @@ namespace device {
 			@brief  タイマバッファ動作転送モードレジスタ（TBTM）
 		*/
 		//-----------------------------------------------------------------//
-		static tbtmy_t<0x000C1A39> TBTM;
+		typedef tbtmy_t_<0x000C1A39> tbtm_t;
+		static tbtm_t TBTM;
 
 
 		//-----------------------------------------------------------------//
@@ -3452,7 +3776,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A12> TCNT;
+		typedef rw16_t<0x000C1A12> tcnt_t;
+		static tcnt_t TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -3460,7 +3785,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A1C> TGRA;
+		typedef rw16_t<0x000C1A1C> tgra_t;
+		static tgra_t TGRA;
 
 
 		//-----------------------------------------------------------------//
@@ -3468,7 +3794,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A1E> TGRB;
+		typedef rw16_t<0x000C1A1E> tgrb_t;
+		static tgrb_t TGRB;
 
 
 		//-----------------------------------------------------------------//
@@ -3476,7 +3803,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRC）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A28> TGRC;
+		typedef rw16_t<0x000C1A28> tgrc_t;
+		static tgrc_t TGRC;
 
 
 		//-----------------------------------------------------------------//
@@ -3484,7 +3812,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRD）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A2A> TGRD;
+		typedef rw16_t<0x000C1A2A> tgrd_t;
+		static tgrd_t TGRD;
 
 
 		//-----------------------------------------------------------------//
@@ -3492,7 +3821,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRE）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A74> TGRE;
+		typedef rw16_t<0x000C1A74> tgre_t;
+		static tgre_t TGRE;
 
 
 		//-----------------------------------------------------------------//
@@ -3500,7 +3830,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRF）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A76> TGRF;
+		typedef rw16_t<0x000C1A76> tgrf_t;
+		static tgrf_t TGRF;
 
 
 		//-----------------------------------------------------------------//
@@ -3508,7 +3839,8 @@ namespace device {
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
-		static nfcr_t<0x000C1A94> NFCR;
+		typedef nfcr_t_<0x000C1A94> nfcr_t;
+		static nfcr_t NFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -3518,7 +3850,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct tadcr_t : public rw16_t<base> {
+		struct tadcr_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -3536,7 +3868,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B14, 2> BF;
 		};
-		static tadcr_t<0x000C1A40> TADCR;
+		typedef tadcr_t_<0x000C1A40> tadcr_t;
+		static tadcr_t TADCR;
 
 
 		//-----------------------------------------------------------------//
@@ -3544,7 +3877,8 @@ namespace device {
 			@brief  タイマ A/D 変換開始要求周期設定レジスタ（TADCORA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A44> TADCORA;
+		typedef rw16_t<0x000C1A44> tadcora_t;
+		static tadcora_t TADCORA;
 
 
 		//-----------------------------------------------------------------//
@@ -3552,7 +3886,8 @@ namespace device {
 			@brief  タイマ A/D 変換開始要求周期設定レジスタ（TADCORB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A46> TADCORB;
+		typedef rw16_t<0x000C1A46> tadcorb_t;
+		static tadcorb_t TADCORB;
 
 
 		//-----------------------------------------------------------------//
@@ -3560,7 +3895,8 @@ namespace device {
 			@brief  タイマ A/D 変換開始要求周期設定バッファレジスタ（TADCOBRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A48> TADCOBRA;
+		typedef rw16_t<0x000C1A48> tadcobra_t;
+		static tadcobra_t TADCOBRA;
 
 
 		//-----------------------------------------------------------------//
@@ -3568,7 +3904,8 @@ namespace device {
 			@brief  タイマ A/D 変換開始要求周期設定バッファレジスタ（TADCOBRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1A4A> TADCOBRB;
+		typedef rw16_t<0x000C1A4A> tadcobrb_t;
+		static tadcobrb_t TADCOBRB;
 
 
 		//-----------------------------------------------------------------//
@@ -3598,6 +3935,29 @@ namespace device {
 			return INT::NONE;
 		}
 	};
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tcr_t      mtu7_t_<per, INT>::TCR;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tcr2_t     mtu7_t_<per, INT>::TCR2;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tmdr1_t    mtu7_t_<per, INT>::TMDR1;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tiorh_t    mtu7_t_<per, INT>::TIORH;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tiorl_t    mtu7_t_<per, INT>::TIORL;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tior_t     mtu7_t_<per, INT>::TIOR;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tier_t     mtu7_t_<per, INT>::TIER;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tsr_t      mtu7_t_<per, INT>::TSR;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tbtm_t     mtu7_t_<per, INT>::TBTM;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tcnt_t     mtu7_t_<per, INT>::TCNT;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tgra_t     mtu7_t_<per, INT>::TGRA;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tgrb_t     mtu7_t_<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tgrc_t     mtu7_t_<per, INT>::TGRC;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tgrd_t     mtu7_t_<per, INT>::TGRD;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tgre_t     mtu7_t_<per, INT>::TGRE;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tgrf_t     mtu7_t_<per, INT>::TGRF;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::nfcr_t     mtu7_t_<per, INT>::NFCR;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tadcr_t    mtu7_t_<per, INT>::TADCR;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tadcora_t  mtu7_t_<per, INT>::TADCORA;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tadcorb_t  mtu7_t_<per, INT>::TADCORB;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tadcobra_t mtu7_t_<per, INT>::TADCOBRA;
+	template <peripheral per, typename INT> typename mtu7_t_<per, INT>::tadcobrb_t mtu7_t_<per, INT>::TADCOBRB;
+
 
 #if defined(SIG_RX24T) || defined(SIG_RX66T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3608,7 +3968,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <peripheral per, typename INT>
-	struct mtu9_t : public mtu_t {
+	struct mtu9_t_ : public mtu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -3679,7 +4039,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr_t<0x000C1580> TCR;
+		typedef tcr_t_<0x000C1580> tcr_t;
+		static tcr_t TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -3687,7 +4048,8 @@ namespace device {
 			@brief  タイマコントロールレジスタ 2（TCR2）
 		*/
 		//-----------------------------------------------------------------//
-		static tcr2_t<0x000C15A8> TCR2;
+		typedef tcr2_t_<0x000C15A8> tcr2_t;
+		static tcr2_t TCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -3695,7 +4057,8 @@ namespace device {
 			@brief  タイマモードレジスタ 1（TMDR1）
 		*/
 		//-----------------------------------------------------------------//
-		static tmdr1x_t<0x000C1581> TMDR1;
+		typedef tmdr1x_t_<0x000C1581> tmdr1_t;
+		static tmdr1_t TMDR1;
 
 
 		//-----------------------------------------------------------------//
@@ -3703,7 +4066,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORH）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorh_t<0x000C1582> TIORH;
+		typedef tiorh_t_<0x000C1582> tiorh_t;
+		static tiorh_t TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -3711,7 +4075,8 @@ namespace device {
 			@brief	タイマ I/O コントロールレジスタ（TIORL）
 		*/
 		//-----------------------------------------------------------------//
-		static tiorl_t<0x000C1583> TIORL;
+		typedef tiorl_t_<0x000C1583> tiorl_t;
+		static tiorl_t TIORL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3784,7 +4149,8 @@ namespace device {
 			@brief  タイマインタラプトイネーブルレジスタ（TIER）
 		*/
 		//-----------------------------------------------------------------//
-		static tiery_t<0x000C1584> TIER;
+		typedef tiery_t_<0x000C1584> tier_t;
+		static tier_t TIER;
 
 
 		//-----------------------------------------------------------------//
@@ -3792,7 +4158,8 @@ namespace device {
 			@brief  タイマインタラプトイネーブルレジスタ（TIER2）
 		*/
 		//-----------------------------------------------------------------//
-		static tier2_t<0x000C15A4> TIER2;
+		typedef tier2_t_<0x000C15A4> tier2_t;
+		static tier2_t TIER2;
 
 
 		//-----------------------------------------------------------------//
@@ -3800,7 +4167,8 @@ namespace device {
 			@brief  タイマバッファ動作転送モードレジスタ（TBTM）
 		*/
 		//-----------------------------------------------------------------//
-		static tbtmx_t<0x000C15A6> TBTM;
+		typedef tbtmx_t_<0x000C15A6> tbtm_t;
+		static tbtm_t TBTM;
 
 
 		//-----------------------------------------------------------------//
@@ -3808,7 +4176,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1586> TCNT;
+		typedef rw16_t<0x000C1586> tcnt_t;
+		static tcnt_t TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -3816,7 +4185,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C1588> TGRA;
+		typedef rw16_t<0x000C1588> tgra_t;
+		static tgra_t TGRA;
 
 
 		//-----------------------------------------------------------------//
@@ -3824,7 +4194,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C158A> TGRB;
+		typedef rw16_t<0x000C158A> tgrb_t;
+		static tgrb_t TGRB;
 
 
 		//-----------------------------------------------------------------//
@@ -3832,7 +4203,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRC）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C158C> TGRC;
+		typedef rw16_t<0x000C158C> tgrc_t;
+		static tgrc_t TGRC;
 
 
 		//-----------------------------------------------------------------//
@@ -3840,7 +4212,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRD）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C158E> TGRD;
+		typedef rw16_t<0x000C158E> tgrd_t;
+		static tgrd_t TGRD;
 
 
 		//-----------------------------------------------------------------//
@@ -3848,7 +4221,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRE）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C15A0> TGRE;
+		typedef rw16_t<0x000C15A0> tgre_t;
+		static tgre_t TGRE;
 
 
 		//-----------------------------------------------------------------//
@@ -3856,7 +4230,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ（TGRF）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x000C15A2> TGRF;
+		typedef rw16_t<0x000C15A2> tgrf_t;
+		static tgrf_t TGRF;
 
 
 		//-----------------------------------------------------------------//
@@ -3864,7 +4239,8 @@ namespace device {
 			@brief  ノイズフィルタコントロールレジスタ（NFCR）
 		*/
 		//-----------------------------------------------------------------//
-		static nfcr_t<0x000C1296> NFCR;
+		typedef nfcr_t_<0x000C1296> nfcr_t;
+		static nfcr_t NFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -3896,36 +4272,54 @@ namespace device {
 			return INT::NONE;
 		}
 	};
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tcr_t   mtu9_t_<per, INT>::TCR;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tcr2_t  mtu9_t_<per, INT>::TCR2;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tmdr1_t mtu9_t_<per, INT>::TMDR1;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tiorh_t mtu9_t_<per, INT>::TIORH;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tiorl_t mtu9_t_<per, INT>::TIORL;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tior_t  mtu9_t_<per, INT>::TIOR;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tier_t  mtu9_t_<per, INT>::TIER;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tier2_t mtu9_t_<per, INT>::TIER2;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tbtm_t  mtu9_t_<per, INT>::TBTM;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tcnt_t  mtu9_t_<per, INT>::TCNT;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tgra_t  mtu9_t_<per, INT>::TGRA;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tgrb_t  mtu9_t_<per, INT>::TGRB;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tgrc_t  mtu9_t_<per, INT>::TGRC;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tgrd_t  mtu9_t_<per, INT>::TGRD;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tgre_t  mtu9_t_<per, INT>::TGRE;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::tgrf_t  mtu9_t_<per, INT>::TGRF;
+	template <peripheral per, typename INT> typename mtu9_t_<per, INT>::nfcr_t  mtu9_t_<per, INT>::NFCR;
 #endif
 
+
 #if defined(SIG_RX24T)
-	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR> MTU0;
-	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR> MTU1;
-	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR> MTU2;
-	typedef mtu3_t<peripheral::MTU3, ICU::VECTOR> MTU3;
-	typedef mtu4_t<peripheral::MTU4, ICU::VECTOR> MTU4;
-	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR> MTU5;
-	typedef mtu6_t<peripheral::MTU6, ICU::VECTOR> MTU6;
-	typedef mtu7_t<peripheral::MTU7, ICU::VECTOR> MTU7;
-	typedef mtu9_t<peripheral::MTU9, ICU::VECTOR> MTU9;
+	typedef mtu0_t_<peripheral::MTU0, ICU::VECTOR> MTU0;
+	typedef mtu1_t_<peripheral::MTU1, ICU::VECTOR> MTU1;
+	typedef mtu2_t_<peripheral::MTU2, ICU::VECTOR> MTU2;
+	typedef mtu3_t_<peripheral::MTU3, ICU::VECTOR> MTU3;
+	typedef mtu4_t_<peripheral::MTU4, ICU::VECTOR> MTU4;
+	typedef mtu5_t_<peripheral::MTU5, ICU::VECTOR> MTU5;
+	typedef mtu6_t_<peripheral::MTU6, ICU::VECTOR> MTU6;
+	typedef mtu7_t_<peripheral::MTU7, ICU::VECTOR> MTU7;
+	typedef mtu9_t_<peripheral::MTU9, ICU::VECTOR> MTU9;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR_SELA> MTU0;
-	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR_SELA> MTU1;
-	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR_SELA> MTU2;
-	typedef mtu3_t<peripheral::MTU3, ICU::VECTOR_SELA> MTU3;
-	typedef mtu4_t<peripheral::MTU4, ICU::VECTOR_SELA> MTU4;
-	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR_SELA> MTU5;
-	typedef mtu6_t<peripheral::MTU6, ICU::VECTOR_SELA> MTU6;
-	typedef mtu7_t<peripheral::MTU7, ICU::VECTOR_SELA> MTU7;
+	typedef mtu0_t_<peripheral::MTU0, ICU::VECTOR_SELA> MTU0;
+	typedef mtu1_t_<peripheral::MTU1, ICU::VECTOR_SELA> MTU1;
+	typedef mtu2_t_<peripheral::MTU2, ICU::VECTOR_SELA> MTU2;
+	typedef mtu3_t_<peripheral::MTU3, ICU::VECTOR_SELA> MTU3;
+	typedef mtu4_t_<peripheral::MTU4, ICU::VECTOR_SELA> MTU4;
+	typedef mtu5_t_<peripheral::MTU5, ICU::VECTOR_SELA> MTU5;
+	typedef mtu6_t_<peripheral::MTU6, ICU::VECTOR_SELA> MTU6;
+	typedef mtu7_t_<peripheral::MTU7, ICU::VECTOR_SELA> MTU7;
 #elif defined(SIG_RX66T)
-	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR_SELA> MTU0;
-	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR_SELA> MTU1;
-	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR_SELA> MTU2;
-	typedef mtu3_t<peripheral::MTU3, ICU::VECTOR_SELA> MTU3;
-	typedef mtu4_t<peripheral::MTU4, ICU::VECTOR_SELA> MTU4;
-	typedef mtu5_t<peripheral::MTU5, ICU::VECTOR_SELA> MTU5;
-	typedef mtu6_t<peripheral::MTU6, ICU::VECTOR_SELA> MTU6;
-	typedef mtu7_t<peripheral::MTU7, ICU::VECTOR_SELA> MTU7;
-	typedef mtu9_t<peripheral::MTU9, ICU::VECTOR_SELA> MTU9;
+	typedef mtu0_t_<peripheral::MTU0, ICU::VECTOR_SELA> MTU0;
+	typedef mtu1_t_<peripheral::MTU1, ICU::VECTOR_SELA> MTU1;
+	typedef mtu2_t_<peripheral::MTU2, ICU::VECTOR_SELA> MTU2;
+	typedef mtu3_t_<peripheral::MTU3, ICU::VECTOR_SELA> MTU3;
+	typedef mtu4_t_<peripheral::MTU4, ICU::VECTOR_SELA> MTU4;
+	typedef mtu5_t_<peripheral::MTU5, ICU::VECTOR_SELA> MTU5;
+	typedef mtu6_t_<peripheral::MTU6, ICU::VECTOR_SELA> MTU6;
+	typedef mtu7_t_<peripheral::MTU7, ICU::VECTOR_SELA> MTU7;
+	typedef mtu9_t_<peripheral::MTU9, ICU::VECTOR_SELA> MTU9;
 #endif
 }

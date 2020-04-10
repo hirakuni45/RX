@@ -29,7 +29,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct ptrslr_t : public rw8_t<base> {
+		struct ptrslr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -38,7 +38,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  PTRSL;
 		};
-		static ptrslr_t<0x000881F0> PTRSLR;
+		typedef ptrslr_t_<0x000881F0> ptrslr_t;
+		static ptrslr_t PTRSLR;
 
 
 		//-----------------------------------------------------------------//
@@ -48,7 +49,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct ndrh_t : public rw8_t<base> {
+		struct ndrh_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -64,7 +65,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDR14;
 			bit_rw_t<io_, bitpos::B7>  NDR15;
 		};
-		static ndrh_t<0x000881EC + ch * 2> NDRH;
+		typedef ndrh_t_<0x000881EC + ch * 2> ndrh_t;
+		static ndrh_t NDRH;
 
 
 		//-----------------------------------------------------------------//
@@ -74,7 +76,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct ndrl_t : public rw8_t<base> {
+		struct ndrl_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -90,7 +92,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDR6;
 			bit_rw_t<io_, bitpos::B7>  NDR7;
 		};
-		static ndrl_t<0x000881ED + ch * 2> NDRL;
+		typedef ndrl_t_<0x000881ED + ch * 2> ndrl_t;
+		static ndrl_t NDRL;
 
 
 		//-----------------------------------------------------------------//
@@ -100,7 +103,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct pcr_t : public rw8_t<base> {
+		struct pcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -112,7 +115,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  G2CMS;
 			bits_rw_t<io_, bitpos::B6, 2>  G3CMS;
 		};
-		static pcr_t<0x000881E6 + ch * 0x10> PCR;
+		typedef pcr_t_<0x000881E6 + ch * 0x10> pcr_t;
+		static pcr_t PCR;
 
 
 		//-----------------------------------------------------------------//
@@ -122,7 +126,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct pmr_t : public rw8_t<base> {
+		struct pmr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -138,7 +142,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  G2INV;
 			bit_rw_t<io_, bitpos::B7>  G3INV;
 		};
-		static pmr_t<0x000881E7 + ch * 0x10> PMR;
+		typedef pmr_t_<0x000881E7 + ch * 0x10> pmr_t;
+		static pmr_t PMR;
 
 
 		//-----------------------------------------------------------------//
@@ -168,7 +173,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct nderh_t : public rw8_t<base> {
+		struct nderh_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -184,7 +189,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDER14;
 			bit_rw_t<io_, bitpos::B7>  NDER15;
 		};
-		static nderh_t<0x000881E8> NDERH;
+		typedef nderh_t_<0x000881E8> nderh_t;
+		static nderh_t NDERH;
 
 
 		//-----------------------------------------------------------------//
@@ -194,7 +200,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct nderl_t : public rw8_t<base> {
+		struct nderl_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -210,7 +216,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDER6;
 			bit_rw_t<io_, bitpos::B7>  NDER7;
 		};
-		static nderl_t<0x000881E9> NDERL;
+		typedef nderl_t_<0x000881E9> nderl_t;
+		static nderl_t NDERL;
 
 
 		//-----------------------------------------------------------------//
@@ -220,7 +227,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct podrh_t : public rw8_t<base> {
+		struct podrh_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -236,7 +243,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  POD14;
 			bit_rw_t<io_, bitpos::B7>  POD15;
 		};
-		static podrh_t<0x000881EA> PODRH;
+		typedef podrh_t_<0x000881EA> podrh_t;
+		static podrh_t PODRH;
 
 
 		//-----------------------------------------------------------------//
@@ -246,7 +254,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct podrl_t : public rw8_t<base> {
+		struct podrl_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -262,7 +270,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  POD6;
 			bit_rw_t<io_, bitpos::B7>  POD7;
 		};
-		static podrl_t<0x000881EB> PODRL;
+		typedef podrl_t_<0x000881EB> podrl_t;
+		static podrl_t PODRL;
 	};
 
 
@@ -283,7 +292,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct nderh_t : public rw8_t<base> {
+		struct nderh_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -299,7 +308,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDER30;
 			bit_rw_t<io_, bitpos::B7>  NDER31;
 		};
-		static nderh_t<0x000881F8> NDERH;
+		typedef nderh_t_<0x000881F8> nderh_t;
+		static nderh_t NDERH;
 
 
 		//-----------------------------------------------------------------//
@@ -309,7 +319,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct nderl_t : public rw8_t<base> {
+		struct nderl_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -325,7 +335,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  NDER22;
 			bit_rw_t<io_, bitpos::B7>  NDER23;
 		};
-		static nderl_t<0x000881F9> NDERL;
+		typedef nderl_t_<0x000881F9> nderl_t;
+		static nderl_t NDERL;
 
 
 		//-----------------------------------------------------------------//
@@ -335,7 +346,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct podrh_t : public rw8_t<base> {
+		struct podrh_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -351,7 +362,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  POD30;
 			bit_rw_t<io_, bitpos::B7>  POD31;
 		};
-		static podrh_t<0x000881FA> PODRH;
+		typedef podrh_t_<0x000881FA> podrh_t;
+		static podrh_t PODRH;
 
 
 		//-----------------------------------------------------------------//
@@ -361,7 +373,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct podrl_t : public rw8_t<base> {
+		struct podrl_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -377,10 +389,27 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  POD22;
 			bit_rw_t<io_, bitpos::B7>  POD23;
 		};
-		static podrl_t<0x000881FB> PODRL;
+		typedef podrl_t_<0x000881FB> podrl_t;
+		static podrl_t PODRL;
 	};
 
 
 	typedef ppg0_t<0, peripheral::PPG0> PPG0;
 	typedef ppg1_t<1, peripheral::PPG1> PPG1;
+
+	template <uint32_t ch, peripheral per> typename ppg_t<ch, per>::ptrslr_t ppg_t<ch, per>::PTRSLR;
+	template <uint32_t ch, peripheral per> typename ppg_t<ch, per>::ndrh_t ppg_t<ch, per>::NDRH;
+	template <uint32_t ch, peripheral per> typename ppg_t<ch, per>::ndrl_t ppg_t<ch, per>::NDRL;
+	template <uint32_t ch, peripheral per> typename ppg_t<ch, per>::pcr_t ppg_t<ch, per>::PCR;
+	template <uint32_t ch, peripheral per> typename ppg_t<ch, per>::pmr_t ppg_t<ch, per>::PMR;
+
+	template <uint32_t ch, peripheral per> typename ppg0_t<ch, per>::nderh_t ppg0_t<ch, per>::NDERH;
+	template <uint32_t ch, peripheral per> typename ppg0_t<ch, per>::nderl_t ppg0_t<ch, per>::NDERL;
+	template <uint32_t ch, peripheral per> typename ppg0_t<ch, per>::podrh_t ppg0_t<ch, per>::PODRH;
+	template <uint32_t ch, peripheral per> typename ppg0_t<ch, per>::podrl_t ppg0_t<ch, per>::PODRL;
+
+	template <uint32_t ch, peripheral per> typename ppg1_t<ch, per>::nderh_t ppg1_t<ch, per>::NDERH;
+	template <uint32_t ch, peripheral per> typename ppg1_t<ch, per>::nderl_t ppg1_t<ch, per>::NDERL;
+	template <uint32_t ch, peripheral per> typename ppg1_t<ch, per>::podrh_t ppg1_t<ch, per>::PODRH;
+	template <uint32_t ch, peripheral per> typename ppg1_t<ch, per>::podrl_t ppg1_t<ch, per>::PODRL;
 }

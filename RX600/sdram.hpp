@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include "RX600/system.hpp"
+#include "common/renesas.hpp"
 
 namespace utils {
 

@@ -17,7 +17,8 @@ namespace device {
 		@brief  システム定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct system_t {
+	template<class _>
+	struct system_t_ {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -25,7 +26,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct sckcr_t : public rw32_t<base> {
+		struct sckcr_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -38,7 +39,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 4> ICK;
 			bits_rw_t<io_, bitpos::B28, 4> FCK;
 		};
-		static sckcr_t<0x00080020> SCKCR;
+		typedef sckcr_t_<0x00080020> sckcr_t;
+		static sckcr_t SCKCR;
 
 
 		//-----------------------------------------------------------------//
@@ -47,7 +49,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct sckcr3_t : public rw16_t<base> {
+		struct sckcr3_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -56,7 +58,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 3> CKSEL;
 		};
-		static sckcr3_t<0x00080026> SCKCR3;
+		typedef sckcr3_t_<0x00080026> sckcr3_t;
+		static sckcr3_t SCKCR3;
 
 
 		//-----------------------------------------------------------------//
@@ -65,7 +68,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct pllcr_t : public rw16_t<base> {
+		struct pllcr_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -75,7 +78,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 2> PLIDIV;
 			bits_rw_t<io_, bitpos::B8, 6> STC;
 		};
-		static pllcr_t<0x00080028> PLLCR;
+		typedef pllcr_t_<0x00080028> pllcr_t;
+		static pllcr_t PLLCR;
 
 
 		//-----------------------------------------------------------------//
@@ -84,7 +88,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct pllcr2_t : public rw8_t<base> {
+		struct pllcr2_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -93,7 +97,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> PLLEN;
 		};
-		static pllcr2_t<0x0008002A> PLLCR2;
+		typedef pllcr2_t_<0x0008002A> pllcr2_t;
+		static pllcr2_t PLLCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -102,7 +107,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct mosccr_t : public rw8_t<base> {
+		struct mosccr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -111,7 +116,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> MOSTP;
 		};
-		static mosccr_t<0x00080032> MOSCCR;
+		typedef mosccr_t_<0x00080032> mosccr_t;
+		static mosccr_t MOSCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -120,7 +126,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct lococr_t : public rw8_t<base> {
+		struct lococr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -129,7 +135,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> LCSTP;
 		};
-		static lococr_t<0x00080034> LOCOCR;
+		typedef lococr_t_<0x00080034> lococr_t;
+		static lococr_t LOCOCR;
 
 
 		//-----------------------------------------------------------------//
@@ -138,7 +145,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct ilococr_t : public rw8_t<base> {
+		struct ilococr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -147,7 +154,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> ILCSTP;
 		};
-		static ilococr_t<0x00080035> ILOCOCR;
+		typedef ilococr_t_<0x00080035> ilococr_t;
+		static ilococr_t ILOCOCR;
 
 
 		//-----------------------------------------------------------------//
@@ -156,7 +164,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct oscovfsr_t : public rw8_t<base> {
+		struct oscovfsr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -166,7 +174,8 @@ namespace device {
 			bit_ro_t<ro8_t<base>, bitpos::B0> MOOVF;
 			bit_ro_t<ro8_t<base>, bitpos::B2> PLOVF;
 		};
-		static oscovfsr_t<0x0008003C> OSCOVFSR;
+		typedef oscovfsr_t_<0x0008003C> oscovfsr_t;
+		static oscovfsr_t OSCOVFSR;
 
 
 		//-----------------------------------------------------------------//
@@ -175,7 +184,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct ostdcr_t : public rw8_t<base> {
+		struct ostdcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -185,7 +194,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> OSTDIE;
 			bit_rw_t<io_, bitpos::B7> OSTDE;
 		};
-		static ostdcr_t<0x00080040> OSTDCR;
+		typedef ostdcr_t_<0x00080040> ostdcr_t;
+		static ostdcr_t OSTDCR;
 
 
 		//-----------------------------------------------------------------//
@@ -194,7 +204,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct ostdsr_t : public rw8_t<base> {
+		struct ostdsr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -203,7 +213,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> OSTDF;
 		};
-		static ostdsr_t<0x00080041> OSTDSR;
+		typedef ostdsr_t_<0x00080041> ostdsr_t;
+		static ostdsr_t OSTDSR;
 
 
 		//-----------------------------------------------------------------//
@@ -212,7 +223,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct moscwtcr_t : public rw8_t<base> {
+		struct moscwtcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -221,7 +232,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5> MSTS;
 		};
-		static moscwtcr_t<0x000800A2> MOSCWTCR;
+		typedef moscwtcr_t_<0x000800A2> moscwtcr_t;
+		static moscwtcr_t MOSCWTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -230,7 +242,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct mofcr_t : public rw8_t<base> {
+		struct mofcr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -240,7 +252,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5> MODRV21;
 			bit_rw_t<io_, bitpos::B6> MOSEL;
 		};
-		static mofcr_t<0x0008C293> MOFCR;
+		typedef mofcr_t_<0x0008C293> mofcr_t;
+		static mofcr_t MOFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -248,7 +261,8 @@ namespace device {
 			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<0x00080031> MEMWAIT;
+		typedef rw8_t<0x00080031> memwait_t;
+		static memwait_t MEMWAIT;
 
 
 		//-----------------------------------------------------------------//
@@ -257,7 +271,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct sbycr_t : public rw32_t<base> {
+		struct sbycr_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -266,7 +280,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B15>	SSBY;
 		};
-		static sbycr_t<0x0008000C> SBYCR;
+		typedef sbycr_t_<0x0008000C> sbycr_t;
+		static sbycr_t SBYCR;
 
 
 		//-----------------------------------------------------------------//
@@ -275,7 +290,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct mstpcra_t : public rw32_t<base> {
+		struct mstpcra_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -302,7 +317,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B28> MSTPA28;
 		};
-		static mstpcra_t<0x00080010> MSTPCRA;
+		typedef mstpcra_t_<0x00080010> mstpcra_t;
+		static mstpcra_t MSTPCRA;
 
 
 		//-----------------------------------------------------------------//
@@ -311,7 +327,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct mstpcrb_t : public rw32_t<base> {
+		struct mstpcrb_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -335,7 +351,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B30> MSTPB30;
 		};
-		static mstpcrb_t<0x00080014> MSTPCRB;
+		typedef mstpcrb_t_<0x00080014> mstpcrb_t;
+		static mstpcrb_t MSTPCRB;
 
 
 		//-----------------------------------------------------------------//
@@ -344,7 +361,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct mstpcrc_t : public rw32_t<base> {
+		struct mstpcrc_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -357,7 +374,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B31> DSLPE;
 		};
-		static mstpcrb_t<0x00080018> MSTPCRC;
+		typedef mstpcrb_t_<0x00080018> mstpcrc_t;
+		static mstpcrc_t MSTPCRC;
 
 
 		//-----------------------------------------------------------------//
@@ -366,7 +384,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct opccr_t : public rw8_t<base> {
+		struct opccr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -377,7 +395,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B4>    OPCMTSF;
 		};
-		static opccr_t<0x000800A0> OPCCR;
+		typedef opccr_t_<0x000800A0> opccr_t;
+		static opccr_t OPCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -386,7 +405,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct prcr_t : public rw16_t<base> {
+		struct prcr_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -398,8 +417,29 @@ namespace device {
 			bit_rw_t <io_, bitpos::B3>    PRC3;
 			bits_rw_t<io_, bitpos::B8, 8> PRKEY;
 		};
-		static prcr_t<0x000803FE> PRCR;
+		typedef prcr_t_<0x000803FE> prcr_t;
+		static prcr_t PRCR;
 	};
 
-	typedef system_t SYSTEM;
+	typedef system_t_<void> SYSTEM;
+
+	template<class _> typename system_t_<_>::sckcr_t system_t_<_>::SCKCR;
+	template<class _> typename system_t_<_>::sckcr3_t system_t_<_>::SCKCR3;
+	template<class _> typename system_t_<_>::pllcr_t system_t_<_>::PLLCR;
+	template<class _> typename system_t_<_>::pllcr2_t system_t_<_>::PLLCR2;
+	template<class _> typename system_t_<_>::mosccr_t system_t_<_>::MOSCCR;
+	template<class _> typename system_t_<_>::lococr_t system_t_<_>::LOCOCR;
+	template<class _> typename system_t_<_>::ilococr_t system_t_<_>::ILOCOCR;
+	template<class _> typename system_t_<_>::oscovfsr_t system_t_<_>::OSCOVFSR;
+	template<class _> typename system_t_<_>::ostdcr_t system_t_<_>::OSTDCR;
+	template<class _> typename system_t_<_>::ostdsr_t system_t_<_>::OSTDSR;
+	template<class _> typename system_t_<_>::moscwtcr_t system_t_<_>::MOSCWTCR;
+	template<class _> typename system_t_<_>::mofcr_t system_t_<_>::MOFCR;
+	template<class _> typename system_t_<_>::memwait_t system_t_<_>::MEMWAIT;
+	template<class _> typename system_t_<_>::sbycr_t system_t_<_>::SBYCR;
+	template<class _> typename system_t_<_>::mstpcra_t system_t_<_>::MSTPCRA;
+	template<class _> typename system_t_<_>::mstpcrb_t system_t_<_>::MSTPCRB;
+	template<class _> typename system_t_<_>::mstpcrc_t system_t_<_>::MSTPCRC;
+	template<class _> typename system_t_<_>::opccr_t system_t_<_>::OPCCR;
+	template<class _> typename system_t_<_>::prcr_t system_t_<_>::PRCR;
 }

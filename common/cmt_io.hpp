@@ -37,7 +37,7 @@ namespace device {
 
 		static volatile uint32_t counter_;
 
-		static INTERRUPT_FUNC void i_task_()
+		INTERRUPT_FUNC static void i_task_()
 		{
 			++counter_;
 			task_();

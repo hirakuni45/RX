@@ -9,7 +9,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <mad.h>
+#include <libmad/mad.h>
 #include "common/file_io.hpp"
 #include "sound/id3_mgr.hpp"
 #include "sound/af_play.hpp"

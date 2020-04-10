@@ -450,7 +450,7 @@ namespace device {
 			@brief  グループ割り込み・ハンドラ GROUPBE0（エッジ割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group_be0_handler_() noexcept
+		INTERRUPT_FUNC static void group_be0_handler_() noexcept
 		{
 			uint32_t bits = ICU::GRPBE0() & GROUPBE0_dispatch_.get_mask();
 			uint32_t sign = 1;
@@ -469,7 +469,7 @@ namespace device {
 			@brief  グループ割り込み・ハンドラ GROUPBL0（レベル割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group_bl0_handler_() noexcept
+		INTERRUPT_FUNC static void group_bl0_handler_() noexcept
 		{
 			uint32_t bits = ICU::GRPBL0() & GROUPBL0_dispatch_.get_mask();
 			uint32_t sign = 1;
@@ -487,7 +487,7 @@ namespace device {
 			@brief  グループ割り込み・ハンドラ GROUPBL1（レベル割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group_bl1_handler_() noexcept
+		INTERRUPT_FUNC static void group_bl1_handler_() noexcept
 		{
 			uint32_t bits = ICU::GRPBL1() & GROUPBL1_dispatch_.get_mask();
 			uint32_t sign = 1;
@@ -505,7 +505,7 @@ namespace device {
 			@brief  グループ割り込み・ハンドラ GROUPAL0（レベル割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group_al0_handler_() noexcept
+		INTERRUPT_FUNC static void group_al0_handler_() noexcept
 		{
 			uint32_t bits = ICU::GRPAL0() & GROUPAL0_dispatch_.get_mask();
 			uint32_t sign = 1;
@@ -523,7 +523,7 @@ namespace device {
 			@brief  グループ割り込み・ハンドラ GROUPAL1（レベル割り込み）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static INTERRUPT_FUNC void group_al1_handler_() noexcept
+		INTERRUPT_FUNC static void group_al1_handler_() noexcept
 		{
 			uint32_t bits = ICU::GRPAL1() & GROUPAL1_dispatch_.get_mask();
 			uint32_t sign = 1;

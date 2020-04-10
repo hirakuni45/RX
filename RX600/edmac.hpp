@@ -34,7 +34,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct edmr_t : public rw32_t<ofs> {
+		struct edmr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -47,7 +47,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> DE;
 
 		};
-		static edmr_t<base + 0x00> EDMR;
+		typedef edmr_t_<base + 0x00> edmr_t;
+		static edmr_t EDMR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -57,7 +58,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct edtrr_t : public rw32_t<ofs> {
+		struct edtrr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -67,7 +68,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> TR;
 
 		};
-		static edtrr_t<base + 0x08> EDTRR;
+		typedef edtrr_t_<base + 0x08> edtrr_t;
+		static edtrr_t EDTRR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -77,7 +79,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct edrrr_t : public rw32_t<ofs> {
+		struct edrrr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -86,7 +88,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> RR;
 		};
-		static edrrr_t<base + 0x10> EDRRR;
+		typedef edrrr_t_<base + 0x10> edrrr_t;
+		static edrrr_t EDRRR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -94,7 +97,8 @@ namespace device {
 			@brief  送信ディスクリプタリスト先頭アドレスレジスタ（TDLAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x18> TDLAR;
+		typedef rw32_t<base + 0x18> tdlar_t;
+		static tdlar_t TDLAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -102,7 +106,8 @@ namespace device {
 			@brief  受信ディスクリプタリスト先頭アドレスレジスタ（RDLAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x20> RDLAR;
+		typedef rw32_t<base + 0x20> rdlar_t;
+		static rdlar_t RDLAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -112,7 +117,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct rmfcr_t : public rw32_t<ofs> {
+		struct rmfcr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -121,7 +126,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> MFC;
 		};
-		static rmfcr_t<base + 0x40> RMFCR;
+		typedef rmfcr_t_<base + 0x40> rmfcr_t;
+		static rmfcr_t RMFCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -131,7 +137,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct tftr_t : public rw32_t<ofs> {
+		struct tftr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -140,7 +146,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 11> TFT;
 		};
-		static tftr_t<base + 0x48> TFTR;
+		typedef tftr_t_<base + 0x48> tftr_t;
+		static tftr_t TFTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -150,7 +157,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct fdr_t : public rw32_t<ofs> {
+		struct fdr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -160,7 +167,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 5> RFD;
 			bits_rw_t<io_, bitpos::B8, 5> TFD;
 		};
-		static fdr_t<base + 0x50> FDR;
+		typedef fdr_t_<base + 0x50> fdr_t;
+		static fdr_t FDR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -170,7 +178,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct rmcr_t : public rw32_t<ofs> {
+		struct rmcr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -179,7 +187,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> RNR;
 		};
-		static rmcr_t<base + 0x58> RMCR;
+		typedef rmcr_t_<base + 0x58> rmcr_t;
+		static rmcr_t RMCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -189,7 +198,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct tfucr_t : public rw32_t<ofs> {
+		struct tfucr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -198,7 +207,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> UNDER;
 		};
-		static tfucr_t<base + 0x64> TFUCR;
+		typedef tfucr_t_<base + 0x64> tfucr_t;
+		static tfucr_t TFUCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -208,7 +218,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct rfocr_t : public rw32_t<ofs> {
+		struct rfocr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -217,7 +227,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> OVER;
 		};
-		static rfocr_t<base + 0x68> RFOCR;
+		typedef rfocr_t_<base + 0x68> rfocr_t;
+		static rfocr_t RFOCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -227,7 +238,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct fcftr_t : public rw32_t<ofs> {
+		struct fcftr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -238,7 +249,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 3> RFFO;
 		};
-		static fcftr_t<base + 0x70> FCFTR;
+		typedef fcftr_t_<base + 0x70> fcftr_t;
+		static fcftr_t FCFTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -248,7 +260,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct rpadir_t : public rw32_t<ofs> {
+		struct rpadir_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -259,7 +271,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 2> PADS;
 		};
-		static rpadir_t<base + 0x78> RPADIR;
+		typedef rpadir_t_<base + 0x78> rpadir_t;
+		static rpadir_t RPADIR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -269,7 +282,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct trimd_t : public rw32_t<ofs> {
+		struct trimd_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -280,7 +293,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B4> TIM;
 		};
-		static trimd_t<base + 0x7C> TRIMD;
+		typedef trimd_t_<base + 0x7C> trimd_t;
+		static trimd_t TRIMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -288,7 +302,8 @@ namespace device {
 			@brief  受信バッファライトアドレスレジスタ（RBWAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xC8> RBWAR;
+		typedef rw32_t<base + 0xC8> rbwar_t;
+		static rbwar_t RBWAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -296,7 +311,8 @@ namespace device {
 			@brief  受信ディスクリプタフェッチアドレスレジスタ（RDFAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xCC> RDFAR;
+		typedef rw32_t<base + 0xCC> rdfar_t;
+		static rdfar_t RDFAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -304,7 +320,8 @@ namespace device {
 			@brief  送信バッファリードアドレスレジスタ（TBRAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xD4> TBRAR;
+		typedef rw32_t<base + 0xD4> tbrar_t;
+		static tbrar_t TBRAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -312,7 +329,8 @@ namespace device {
 			@brief  送信ディスクリプタフェッチアドレスレジスタ（TDFAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xD8> TDFAR;
+		typedef rw32_t<base + 0xD8> tdfar_t;
+		static tdfar_t TDFAR;
 	};
 
 
@@ -333,7 +351,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct eesr_t : public rw32_t<ofs> {
+		struct eesr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -366,7 +384,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B30> TWB;
 		};
-		static eesr_t<base + 0x28> EESR;
+		typedef eesr_t_<base + 0x28> eesr_t;
+		static eesr_t EESR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -376,7 +395,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct eesipr_t : public rw32_t<ofs> {
+		struct eesipr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -409,7 +428,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B30> TWBIP;
 		};
-		static eesipr_t<base + 0x30> EESIPR;
+		typedef eesipr_t_<base + 0x30> eesipr_t;
+		static eesipr_t EESIPR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -419,7 +439,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct trscer_t : public rw32_t<ofs> {
+		struct trscer_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -430,7 +450,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  RMAFCE;
 		};
-		static trscer_t<base + 0x38> TRSCER;
+		typedef trscer_t_<base + 0x38> trscer_t;
+		static trscer_t TRSCER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -440,7 +461,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct iosr_t : public rw32_t<ofs> {
+		struct iosr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -449,7 +470,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> ELB;
 		};
-		static iosr_t<base + 0x6C> IOSR;
+		typedef iosr_t_<base + 0x6C> iosr_t;
+		static iosr_t IOSR;
 
 
 		//-----------------------------------------------------------------//
@@ -479,7 +501,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct eesr_t : public rw32_t<ofs> {
+		struct eesr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -506,7 +528,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B30>    TWB;
 		};
-		static eesr_t<base + 0x28> EESR;
+		typedef eesr_t_<base + 0x28> eesr_t;
+		static eesr_t EESR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -516,7 +539,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct eesipr_t : public rw32_t<ofs> {
+		struct eesipr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -542,7 +565,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B30>  TWBIP;
 		};
-		static eesipr_t<base + 0x30> EESIPR;
+		typedef eesipr_t_<base + 0x30> eesipr_t;
+		static eesipr_t EESIPR;
 
 
 		//-----------------------------------------------------------------//
@@ -557,4 +581,31 @@ namespace device {
 	typedef edmac_t<0x000C0000, peripheral::EDMAC0>      EDMAC0;
 	typedef edmac_t<0x000C0200, peripheral::EDMAC1>      EDMAC1;
 	typedef ptpedmac_t<0x000C0400, peripheral::PTPEDMAC> PTPEDMAC;
+
+	template<uint32_t base> typename edmac_core_t<base>::edmr_t edmac_core_t<base>::EDMR;
+	template<uint32_t base> typename edmac_core_t<base>::edtrr_t edmac_core_t<base>::EDTRR;
+	template<uint32_t base> typename edmac_core_t<base>::edrrr_t edmac_core_t<base>::EDRRR;
+	template<uint32_t base> typename edmac_core_t<base>::tdlar_t edmac_core_t<base>::TDLAR;
+	template<uint32_t base> typename edmac_core_t<base>::rdlar_t edmac_core_t<base>::RDLAR;
+	template<uint32_t base> typename edmac_core_t<base>::rmfcr_t edmac_core_t<base>::RMFCR;
+	template<uint32_t base> typename edmac_core_t<base>::tftr_t edmac_core_t<base>::TFTR;
+	template<uint32_t base> typename edmac_core_t<base>::fdr_t edmac_core_t<base>::FDR;
+	template<uint32_t base> typename edmac_core_t<base>::rmcr_t edmac_core_t<base>::RMCR;
+	template<uint32_t base> typename edmac_core_t<base>::tfucr_t edmac_core_t<base>::TFUCR;
+	template<uint32_t base> typename edmac_core_t<base>::rfocr_t edmac_core_t<base>::RFOCR;
+	template<uint32_t base> typename edmac_core_t<base>::fcftr_t edmac_core_t<base>::FCFTR;
+	template<uint32_t base> typename edmac_core_t<base>::rpadir_t edmac_core_t<base>::RPADIR;
+	template<uint32_t base> typename edmac_core_t<base>::trimd_t edmac_core_t<base>::TRIMD;
+	template<uint32_t base> typename edmac_core_t<base>::rbwar_t edmac_core_t<base>::RBWAR;
+	template<uint32_t base> typename edmac_core_t<base>::rdfar_t edmac_core_t<base>::RDFAR;
+	template<uint32_t base> typename edmac_core_t<base>::tbrar_t edmac_core_t<base>::TBRAR;
+	template<uint32_t base> typename edmac_core_t<base>::tdfar_t edmac_core_t<base>::TDFAR;
+
+	template<uint32_t base, peripheral per> typename edmac_t<base, per>::eesr_t edmac_t<base, per>::EESR;
+	template<uint32_t base, peripheral per> typename edmac_t<base, per>::eesipr_t edmac_t<base, per>::EESIPR;
+	template<uint32_t base, peripheral per> typename edmac_t<base, per>::trscer_t edmac_t<base, per>::TRSCER;
+	template<uint32_t base, peripheral per> typename edmac_t<base, per>::iosr_t edmac_t<base, per>::IOSR;
+
+	template<uint32_t base, peripheral per> typename ptpedmac_t<base, per>::eesr_t ptpedmac_t<base, per>::EESR;
+	template<uint32_t base, peripheral per> typename ptpedmac_t<base, per>::eesipr_t ptpedmac_t<base, per>::EESIPR;
 }

@@ -26,7 +26,8 @@ namespace device {
 			@brief  WDT リフレッシュレジスタ（WDTRR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x00> WDTRR;
+		typedef rw8_t<base + 0x00> wdtrr_t;
+		static wdtrr_t WDTRR;
 
 
 		//-----------------------------------------------------------------//
@@ -89,4 +90,9 @@ namespace device {
 
 	};
 	typedef wdta_t<0x00088020> WDT;
+
+	template <uint32_t base> typename wdta_t<base>::wdtrr_t wdta_t<base>::WDTRR;
+	template <uint32_t base> typename wdta_t<base>::wdtcr_t wdta_t<base>::WDTCR;
+	template <uint32_t base> typename wdta_t<base>::wdtsr_t wdta_t<base>::WDTSR;
+	template <uint32_t base> typename wdta_t<base>::wdtrcr_t wdta_t<base>::WDTRCR;
 }

@@ -106,7 +106,8 @@ namespace device {
 			@brief  タイマカウンタ（CMWCNT）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x10> CMWCNT;
+		typedef rw32_t<base + 0x10> cmwcnt_t;
+		static cmwcnt_t CMWCNT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -114,7 +115,8 @@ namespace device {
 			@brief  コンペアマッチコンスタントレジスタ（CMWCOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x14> CMWCOR;
+		typedef rw32_t<base + 0x14> cmwcor_t;
+		static cmwcor_t CMWCOR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -122,7 +124,8 @@ namespace device {
 			@brief  インプットキャプチャレジスタ 0（CMWICR0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x18> CMWICR0;
+		typedef rw32_t<base + 0x18> cmwicr0_t;
+		static cmwicr0_t CMWICR0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -130,7 +133,8 @@ namespace device {
 			@brief  インプットキャプチャレジスタ 1（CMWICR1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x1C> CMWICR1;
+		typedef rw32_t<base + 0x1C> cmwicr1_t;
+		static cmwicr1_t CMWICR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -138,7 +142,8 @@ namespace device {
 			@brief  アウトプットコンペアレジスタ 0（CMWOCR0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x20> CMWOCR0;
+		typedef rw32_t<base + 0x20> cmwocr0_t;
+		static cmwocr0_t CMWOCR0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -146,7 +151,8 @@ namespace device {
 			@brief  アウトプットコンペアレジスタ 1（CMWOCR1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x24> CMWOCR1;
+		typedef rw32_t<base + 0x24> cmwocr1_t;
+		static cmwocr1_t CMWOCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -169,4 +175,14 @@ namespace device {
 
 	typedef cmtw_t<0x00094200, peripheral::CMTW0, ICU::VECTOR::CMWI0> CMTW0;
 	typedef cmtw_t<0x00094280, peripheral::CMTW1, ICU::VECTOR::CMWI1> CMTW1;
+
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::cmwstr_t cmtw_t<base, per, ivec>::CMWSTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::cmwcr_t cmtw_t<base, per, ivec>::CMWCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::cmwior_t cmtw_t<base, per, ivec>::CMWIOR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::cmwcnt_t cmtw_t<base, per, ivec>::CMWCNT;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::cmwcor_t cmtw_t<base, per, ivec>::CMWCOR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::cmwicr0_t cmtw_t<base, per, ivec>::CMWICR0;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::cmwicr1_t cmtw_t<base, per, ivec>::CMWICR1;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::cmwocr0_t cmtw_t<base, per, ivec>::CMWOCR0;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::cmwocr1_t cmtw_t<base, per, ivec>::CMWOCR1;
 }

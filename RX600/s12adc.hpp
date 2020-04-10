@@ -29,7 +29,8 @@ namespace device {
 			@brief  A/D データレジスタ 0（ADDR0）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x20> ADDR0;
+		typedef ro16_t<base + 0x20> addr0_t;
+		static addr0_t ADDR0;
 
 
 		//-----------------------------------------------------------------//
@@ -37,7 +38,8 @@ namespace device {
 			@brief  A/D データレジスタ 1（ADDR1）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x22> ADDR1;
+		typedef ro16_t<base + 0x22> addr1_t;
+		static addr1_t ADDR1;
 
 
 		//-----------------------------------------------------------------//
@@ -45,7 +47,8 @@ namespace device {
 			@brief  A/D データレジスタ 2（ADDR2）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x24> ADDR2;
+		typedef ro16_t<base + 0x24> addr2_t;
+		static addr2_t ADDR2;
 
 
 		//-----------------------------------------------------------------//
@@ -53,7 +56,8 @@ namespace device {
 			@brief  A/D データレジスタ 3（ADDR3）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x26> ADDR3;
+		typedef ro16_t<base + 0x26> addr3_t;
+		static addr3_t ADDR3;
 
 
 		//-----------------------------------------------------------------//
@@ -61,7 +65,8 @@ namespace device {
 			@brief  A/D データレジスタ 4（ADDR4）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x28> ADDR4;
+		typedef ro16_t<base + 0x28> addr4_t;
+		static addr4_t ADDR4;
 
 
 		//-----------------------------------------------------------------//
@@ -69,7 +74,8 @@ namespace device {
 			@brief  A/D データレジスタ 5（ADDR5）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x2A> ADDR5;
+		typedef ro16_t<base + 0x2A> addr5_t;
+		static addr5_t ADDR5;
 
 
 		//-----------------------------------------------------------------//
@@ -77,7 +83,8 @@ namespace device {
 			@brief  A/D データレジスタ 6（ADDR6）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x2C> ADDR6;
+		typedef ro16_t<base + 0x2C> addr6_t;
+		static addr6_t ADDR6;
 
 
 		//-----------------------------------------------------------------//
@@ -85,7 +92,8 @@ namespace device {
 			@brief  A/D データレジスタ 7（ADDR7）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x2E> ADDR7;
+		typedef ro16_t<base + 0x2E> addr7_t;
+		static addr7_t ADDR7;
 
 
 		//-----------------------------------------------------------------//
@@ -93,7 +101,8 @@ namespace device {
 			@brief  A/D データ 2 重化レジスタ（ADDBLDR）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x18> ADDBLDR;
+		typedef ro16_t<base + 0x18> addbldr_t;
+		static addbldr_t ADDBLDR;
 
 
 		//-----------------------------------------------------------------//
@@ -101,7 +110,8 @@ namespace device {
 			@brief  A/D データ 2 重化レジスタ A（ADDBLDRA）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x84> ADDBLDRA;
+		typedef ro16_t<base + 0x84> addbldra_t;
+		static addbldra_t ADDBLDRA;
 
 
 		//-----------------------------------------------------------------//
@@ -109,7 +119,8 @@ namespace device {
 			@brief  A/D データ 2 重化レジスタ B（ADDBLDRB）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x86> ADDBLDRB;
+		typedef ro16_t<base + 0x86> addbldrb_t;
+		static addbldrb_t ADDBLDRB;
 
 
 		//-----------------------------------------------------------------//
@@ -119,7 +130,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adrd_t : public rw16_t<ofs> {
+		struct adrd_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -129,7 +140,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 12>  AD;
 			bits_rw_t<io_, bitpos::B14, 2>  DIAGST;
 		};
-		static adrd_t<base + 0x1E>  ADRD;
+		typedef adrd_t_<base + 0x1E> adrd_t;
+		static adrd_t ADRD;
 
 
 		//-----------------------------------------------------------------//
@@ -139,7 +151,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcsr_t : public rw16_t<ofs> {
+		struct adcsr_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -156,7 +168,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B13, 2> ADCS;
 			bit_rw_t <io_, bitpos::B15>    ADST;
 		};
-		static adcsr_t<base + 0x00>  ADCSR;
+		typedef adcsr_t_<base + 0x00> adcsr_t;
+		static adcsr_t ADCSR;
 
 
 		//-----------------------------------------------------------------//
@@ -166,7 +179,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adadc_t : public rw8_t<ofs> {
+		struct adadc_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -176,7 +189,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 2>  ADC;
 			bit_rw_t <io_, bitpos::B7>     AVEE;
 		};
-		static adadc_t<base + 0x0C>  ADADC;
+		typedef adadc_t_<base + 0x0C> adadc_t;
+		static adadc_t ADADC;
 
 
 		//-----------------------------------------------------------------//
@@ -186,7 +200,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcer_t : public rw16_t<ofs> {
+		struct adcer_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -200,7 +214,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B11>    DIAGM;
 			bit_rw_t <io_, bitpos::B15>    ADRFMT;
 		};
-		static adcer_t<base + 0x0E>  ADCER;
+		typedef adcer_t_<base + 0x0E> adcer_t;
+		static adcer_t ADCER;
 
 
 		//-----------------------------------------------------------------//
@@ -210,7 +225,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adstrgr_t : public rw16_t<ofs> {
+		struct adstrgr_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -220,7 +235,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 6>  TRSB;
 			bits_rw_t<io_, bitpos::B8, 6>  TRSA;
 		};
-		static adstrgr_t<base + 0x10>  ADSTRGR;
+		typedef adstrgr_t_<base + 0x10> adstrgr_t;
+		static adstrgr_t ADSTRGR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -230,7 +246,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct adsstrx_t : public rw16_t<ofs> {
+		struct adsstrx_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -246,7 +262,8 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 0（ADSSTR0）
 		*/
 		//-----------------------------------------------------------------//
-		static adsstrx_t<base + 0x60> ADSSTR0;
+		typedef adsstrx_t_<base + 0x60> adsstr0_t;
+		static adsstr0_t ADSSTR0;
 
 
 		//-----------------------------------------------------------------//
@@ -254,7 +271,8 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 1（ADSSTR1）
 		*/
 		//-----------------------------------------------------------------//
-		static adsstrx_t<base + 0x73> ADSSTR1;
+		typedef adsstrx_t_<base + 0x73> adsstr1_t;
+		static adsstr1_t ADSSTR1;
 
 
 		//-----------------------------------------------------------------//
@@ -262,7 +280,8 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 2（ADSSTR2）
 		*/
 		//-----------------------------------------------------------------//
-		static adsstrx_t<base + 0x74> ADSSTR2;
+		typedef adsstrx_t_<base + 0x74> adsstr2_t;
+		static adsstr2_t ADSSTR2;
 
 
 		//-----------------------------------------------------------------//
@@ -270,7 +289,8 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 3（ADSSTR3）
 		*/
 		//-----------------------------------------------------------------//
-		static adsstrx_t<base + 0x75> ADSSTR3;
+		typedef adsstrx_t_<base + 0x75> adsstr3_t;
+		static adsstr3_t ADSSTR3;
 
 
 		//-----------------------------------------------------------------//
@@ -278,7 +298,8 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 4（ADSSTR4）
 		*/
 		//-----------------------------------------------------------------//
-		static adsstrx_t<base + 0x76> ADSSTR4;
+		typedef adsstrx_t_<base + 0x76> adsstr4_t;
+		static adsstr4_t ADSSTR4;
 
 
 		//-----------------------------------------------------------------//
@@ -286,7 +307,8 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 5（ADSSTR5）
 		*/
 		//-----------------------------------------------------------------//
-		static adsstrx_t<base + 0x77> ADSSTR5;
+		typedef adsstrx_t_<base + 0x77> adsstr5_t;
+		static adsstr5_t ADSSTR5;
 
 
 		//-----------------------------------------------------------------//
@@ -294,7 +316,8 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 6（ADSSTR6）
 		*/
 		//-----------------------------------------------------------------//
-		static adsstrx_t<base + 0x78> ADSSTR6;
+		typedef adsstrx_t_<base + 0x78> adsstr6_t;
+		static adsstr6_t ADSSTR6;
 
 
 		//-----------------------------------------------------------------//
@@ -302,7 +325,8 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ 7（ADSSTR7）
 		*/
 		//-----------------------------------------------------------------//
-		static adsstrx_t<base + 0x79> ADSSTR7;
+		typedef adsstrx_t_<base + 0x79> adsstr7_t;
+		static adsstr7_t ADSSTR7;
 
 
 		//-----------------------------------------------------------------//
@@ -312,7 +336,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct addiscr_t : public rw8_t<ofs> {
+		struct addiscr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -321,7 +345,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5>  ADNDIS;
 		};
-		static addiscr_t<base + 0x7A>  ADDISCR;
+		typedef addiscr_t_<base + 0x7A> addiscr_t;
+		static addiscr_t ADDISCR;
 
 
 		//-----------------------------------------------------------------//
@@ -331,7 +356,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adgspcr_t : public rw16_t<ofs> {
+		struct adgspcr_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -342,7 +367,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>   GBRSCN;
 			bit_rw_t<io_, bitpos::B15>  GBRP;
 		};
-		static adgspcr_t<base + 0x80>  ADGSPCR;
+		typedef adgspcr_t_<base + 0x80> adgspcr_t;
+		static adgspcr_t ADGSPCR;
 
 
 		//-----------------------------------------------------------------//
@@ -352,7 +378,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmpcr_t : public rw8_t<ofs> {
+		struct adcmpcr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -362,7 +388,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>   WCMPE;
 			bit_rw_t <io_, bitpos::B7>   CMPIE;
 		};
-		static adcmpcr_t<base + 0x90>  ADCMPCR;
+		typedef adcmpcr_t_<base + 0x90> adcmpcr_t;
+		static adcmpcr_t ADCMPCR;
 
 
 		//-----------------------------------------------------------------//
@@ -370,7 +397,8 @@ namespace device {
 			@brief  A/D コンペアデータレジスタ 0 （ ADCMPDR0 ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x9C> ADCMPDR0;
+		typedef rw16_t<base + 0x9C> adcmpdr0_t;
+		static adcmpdr0_t ADCMPDR0;
 
 
 		//-----------------------------------------------------------------//
@@ -378,7 +406,8 @@ namespace device {
 			@brief  A/D コンペアデータレジスタ 1 （ ADCMPDR1 ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x9E> ADCMPDR1;
+		typedef rw16_t<base + 0x9E> adcmpdr1_t;
+		static adcmpdr1_t ADCMPDR1;
 	};
 
 
@@ -498,7 +527,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adansa0_t : public rw16_t<ofs> {
+		struct adansa0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -514,7 +543,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  ANSA006;
 			bit_rw_t<io_, bitpos::B7>  ANSA007;
 		};
-		static adansa0_t<base + 0x04>   ADANSA0;
+		typedef adansa0_t_<base + 0x04> adansa0_t;
+		static adansa0_t ADANSA0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -524,7 +554,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct adans_t {
+		struct adans_t_ {
 			void set(analog an, bool f = true) {
 				uint32_t n = static_cast<uint32_t>(an);
 				if(f) {
@@ -546,7 +576,8 @@ namespace device {
 			@brief  A/D チャネル選択レジスタ設定 A
 		*/
 		//-----------------------------------------------------------------//
-		static adans_t<base + 0x04>   ADANSA;
+		typedef adans_t_<base + 0x04> adansa_t;
+		static adansa_t ADANSA;
 
 
 		//-----------------------------------------------------------------//
@@ -554,7 +585,8 @@ namespace device {
 			@brief  A/D チャネル選択レジスタ設定 B
 		*/
 		//-----------------------------------------------------------------//
-		static adans_t<base + 0x14> ADANSB;
+		typedef adans_t_<base + 0x14> adansb_t;
+		static adansb_t ADANSB;
 
 
 		//-----------------------------------------------------------------//
@@ -564,7 +596,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adansb0_t : public rw16_t<ofs> {
+		struct adansb0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -580,7 +612,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  ANSB006;
 			bit_rw_t<io_, bitpos::B7>  ANSB007;
 		};
-		static adansb0_t<base + 0x14>   ADANSB0;
+		typedef adansb0_t_<base + 0x14> adansb0_t;
+		static adansb0_t ADANSB0;
 
 
 		//-----------------------------------------------------------------//
@@ -590,7 +623,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adads0_t : public rw16_t<ofs> {
+		struct adads0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -606,7 +639,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  ADS006;
 			bit_rw_t<io_, bitpos::B7>  ADS007;
 		};
-		static adads0_t<base + 0x08>   ADADS0;
+		typedef adads0_t_<base + 0x08> adads0_t;
+		static adads0_t ADADS0;
 
 
 		//-----------------------------------------------------------------//
@@ -629,7 +663,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adshcr_t : public rw16_t<ofs> {
+		struct adshcr_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -639,7 +673,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8>  SSTSH;
 			bits_rw_t<io_, bitpos::B8, 3>  SHANS;
 		};
-		static adshcr_t<base + 0x66>   ADSHCR;
+		typedef adshcr_t_<base + 0x66> adshcr_t;
+		static adshcr_t ADSHCR;
 
 
 		//-----------------------------------------------------------------//
@@ -649,7 +684,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adshmsr_t : public rw8_t<ofs> {
+		struct adshmsr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -658,7 +693,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  SHMD;
 		};
-		static adshmsr_t<base + 0x7C>  ADSHMSR;
+		typedef adshmsr_t_<base + 0x7C> adshmsr_t;
+		static adshmsr_t ADSHMSR;
 
 
 		//-----------------------------------------------------------------//
@@ -668,7 +704,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmpansr0_t : public rw16_t<ofs> {
+		struct adcmpansr0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -677,7 +713,8 @@ namespace device {
 
 			bits_rw_t <io_, bitpos::B0, 8>  CMPS0;
 		};
-		static adcmpansr0_t<base + 0x94>  ADCMPANSR0;
+		typedef adcmpansr0_t_<base + 0x94> adcmpansr0_t;
+		static adcmpansr0_t ADCMPANSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -687,7 +724,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmplr0_t : public rw16_t<ofs> {
+		struct adcmplr0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -696,7 +733,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>  CMPL0;
 		};
-		static adcmplr0_t<base + 0x98>  ADCMPLR0;
+		typedef adcmplr0_t_<base + 0x98> adcmplr0_t;
+		static adcmplr0_t ADCMPLR0;
 
 
 		//-----------------------------------------------------------------//
@@ -706,7 +744,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmpsr0_t : public rw16_t<ofs> {
+		struct adcmpsr0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -715,7 +753,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>  CMPF0;
 		};
-		static adcmpsr0_t<base + 0xA0>  ADCMPSR0;
+		typedef adcmpsr0_t_<base + 0xA0> adcmpsr0_t;
+		static adcmpsr0_t ADCMPSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -899,7 +938,8 @@ namespace device {
 			@brief  A/D データレジスタ 8（ADDR8）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x30> ADDR8;
+		typedef ro16_t<base + 0x30> addr8_t;
+		static addr8_t ADDR8;
 
 
 		//-----------------------------------------------------------------//
@@ -907,7 +947,8 @@ namespace device {
 			@brief  A/D データレジスタ 9（ADDR9）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x32> ADDR9;
+		typedef ro16_t<base + 0x32> addr9_t;
+		static addr9_t ADDR9;
 
 
 		//-----------------------------------------------------------------//
@@ -915,7 +956,8 @@ namespace device {
 			@brief  A/D データレジスタ 10（ADDR10）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x34> ADDR10;
+		typedef ro16_t<base + 0x34> addr10_t;
+		static addr10_t ADDR10;
 
 
 		//-----------------------------------------------------------------//
@@ -923,7 +965,8 @@ namespace device {
 			@brief  A/D データレジスタ 11（ADDR11）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x36> ADDR11;
+		typedef ro16_t<base + 0x36> addr11_t;
+		static addr11_t ADDR11;
 
 
 		//-----------------------------------------------------------------//
@@ -931,7 +974,8 @@ namespace device {
 			@brief  A/D データレジスタ 12（ADDR12）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x38> ADDR12;
+		typedef ro16_t<base + 0x38> addr12_t;
+		static addr12_t ADDR12;
 
 
 		//-----------------------------------------------------------------//
@@ -939,7 +983,8 @@ namespace device {
 			@brief  A/D データレジスタ 13（ADDR13）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x3A> ADDR13;
+		typedef ro16_t<base + 0x3A> addr13_t;
+		static addr13_t ADDR13;
 
 
 		//-----------------------------------------------------------------//
@@ -947,7 +992,8 @@ namespace device {
 			@brief  A/D データレジスタ 14（ADDR14）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x3C> ADDR14;
+		typedef ro16_t<base + 0x3C> addr14_t;
+		static addr14_t ADDR14;
 
 
 		//-----------------------------------------------------------------//
@@ -955,7 +1001,8 @@ namespace device {
 			@brief  A/D データレジスタ 15（ADDR15）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x3E> ADDR15;
+		typedef ro16_t<base + 0x3E> addr15_t;
+		static addr15_t ADDR15;
 
 
 		//-----------------------------------------------------------------//
@@ -963,7 +1010,8 @@ namespace device {
 			@brief  A/D データレジスタ 16（ADDR16）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x40> ADDR16;
+		typedef ro16_t<base + 0x40> addr16_t;
+		static addr16_t ADDR16;
 
 
 		//-----------------------------------------------------------------//
@@ -971,7 +1019,8 @@ namespace device {
 			@brief  A/D データレジスタ 17（ADDR17）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x42> ADDR17;
+		typedef ro16_t<base + 0x42> addr17_t;
+		static addr17_t ADDR17;
 
 
 		//-----------------------------------------------------------------//
@@ -979,7 +1028,8 @@ namespace device {
 			@brief  A/D データレジスタ 18（ADDR18）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x44> ADDR18;
+		typedef ro16_t<base + 0x44> addr18_t;
+		static addr18_t ADDR18;
 
 
 		//-----------------------------------------------------------------//
@@ -987,7 +1037,8 @@ namespace device {
 			@brief  A/D データレジスタ 19（ADDR19）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x46> ADDR19;
+		typedef ro16_t<base + 0x46> addr19_t;
+		static addr19_t ADDR19;
 
 
 		//-----------------------------------------------------------------//
@@ -995,7 +1046,8 @@ namespace device {
 			@brief  A/D データレジスタ 20（ADDR20）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x48> ADDR20;
+		typedef ro16_t<base + 0x48> addr20_t;
+		static addr20_t ADDR20;
 
 
 		//-----------------------------------------------------------------//
@@ -1003,7 +1055,8 @@ namespace device {
 			@brief  A/D 温度センサデータレジスタ（ ADTSDR ）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x1A> ADTSDR;
+		typedef ro16_t<base + 0x1A> adtsdr_t;
+		static adtsdr_t ADTSDR;
 
 
 		//-----------------------------------------------------------------//
@@ -1011,7 +1064,8 @@ namespace device {
 			@brief   A/D 内部基準電圧データレジスタ（ ADOCDR ）
 		*/
 		//-----------------------------------------------------------------//
-		static ro16_t<base + 0x01C> ADOCDR;
+		typedef ro16_t<base + 0x01C> adocdr_t;
+		static adocdr_t ADOCDR;
 
 
 		//-----------------------------------------------------------------//
@@ -1036,7 +1090,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adansa0_t : public rw16_t<ofs> {
+		struct adansa0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1060,7 +1114,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14> ANSA114;
 			bit_rw_t<io_, bitpos::B15> ANSA115;
 		};
-		static adansa0_t<base + 0x04>   ADANSA0;
+		typedef adansa0_t_<base + 0x04> adansa0_t;
+		static adansa0_t ADANSA0;
 
 
 		//-----------------------------------------------------------------//
@@ -1070,7 +1125,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adansa1_t : public rw16_t<ofs> {
+		struct adansa1_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1083,7 +1138,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3>  ANSA119;
 			bit_rw_t<io_, bitpos::B4>  ANSA120;
 		};
-		static adansa1_t<base + 0x06>   ADANSA1;
+		typedef adansa1_t_<base + 0x06> adansa1_t;
+		static adansa1_t ADANSA1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1093,7 +1149,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct adans_t {
+		struct adans_t_ {
 			void set(analog an, bool f = true) {
 				uint32_t n = static_cast<uint32_t>(an);
 				uint32_t ros = ofs;
@@ -1125,7 +1181,8 @@ namespace device {
 			@brief  A/D チャネル選択レジスタ（ADANSA）
 		*/
 		//-----------------------------------------------------------------//
-		static adans_t<base + 0x04> ADANSA;
+		typedef adans_t_<base + 0x04> adansa_t;
+		static adansa_t ADANSA;
 
 
 		//-----------------------------------------------------------------//
@@ -1135,7 +1192,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adansb0_t : public rw16_t<ofs> {
+		struct adansb0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1159,7 +1216,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14> ANSB114;
 			bit_rw_t<io_, bitpos::B15> ANSB115;
 		};
-		static adansb0_t<base + 0x14>   ADANSB0;
+		typedef adansb0_t_<base + 0x14> adansb0_t;
+		static adansb0_t ADANSB0;
 
 
 		//-----------------------------------------------------------------//
@@ -1167,7 +1225,8 @@ namespace device {
 			@brief  A/D チャネル選択レジスタ設定 B
 		*/
 		//-----------------------------------------------------------------//
-		static adans_t<base + 0x14> ADANSB;
+		typedef adans_t_<base + 0x14> adansb_t;
+		static adansb_t ADANSB;
 
 
 		//-----------------------------------------------------------------//
@@ -1177,7 +1236,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adansb1_t : public rw16_t<ofs> {
+		struct adansb1_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1190,7 +1249,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3>  ANSB119;
 			bit_rw_t<io_, bitpos::B4>  ANSB120;
 		};
-		static adansb1_t<base + 0x16>   ADANSB1;
+		typedef adansb1_t_<base + 0x16> adansb1_t;
+		static adansb1_t ADANSB1;
 
 
 		//-----------------------------------------------------------------//
@@ -1200,7 +1260,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adads0_t : public rw16_t<ofs> {
+		struct adads0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1224,7 +1284,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14>  ADS114;
 			bit_rw_t<io_, bitpos::B15>  ADS115;
 		};
-		static adads0_t<base + 0x08>   ADADS0;
+		typedef adads0_t_<base + 0x08> adads0_t;
+		static adads0_t ADADS0;
 
 
 		//-----------------------------------------------------------------//
@@ -1234,7 +1295,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adads1_t : public rw16_t<ofs> {
+		struct adads1_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1247,7 +1308,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3>   ADS119;
 			bit_rw_t<io_, bitpos::B4>   ADS120;
 		};
-		static adads1_t<base + 0x10>   ADADS1;
+		typedef adads1_t_<base + 0x10> adads1_t;
+		static adads1_t ADADS1;
 
 
 		//-----------------------------------------------------------------//
@@ -1257,7 +1319,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adexicr_t : public rw16_t<ofs> {
+		struct adexicr_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1275,7 +1337,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B13, 2> EXSEL;
 			bit_rw_t<io_, bitpos::B15>     EXOEN;
 		};
-		static adexicr_t<base + 0x12>   ADEXICR;
+		typedef adexicr_t_<base + 0x12> adexicr_t;
+		static adexicr_t ADEXICR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1301,7 +1364,8 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ L（ADSSTRL）
 		*/
 		//-----------------------------------------------------------------//
-		static adsstrx_t<base + 0x61> ADSSTRL;
+		typedef adsstrx_t<base + 0x61> adsstrl_t;
+		static adsstrl_t ADSSTRL;
 
 
 		//-----------------------------------------------------------------//
@@ -1309,7 +1373,8 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ T（ADSSTRT）
 		*/
 		//-----------------------------------------------------------------//
-		static adsstrx_t<base + 0x70> ADSSTRT;
+		typedef adsstrx_t<base + 0x70> adsstrt_t;
+		static adsstrt_t ADSSTRT;
 
 
 		//-----------------------------------------------------------------//
@@ -1317,7 +1382,8 @@ namespace device {
 			@brief  A/D サンプリングステートレジスタ O（ADSSTRO）
 		*/
 		//-----------------------------------------------------------------//
-		static adsstrx_t<base + 0x71> ADSSTRO;
+		typedef adsstrx_t<base + 0x71> adsstro_t;
+		static adsstro_t ADSSTRO;
 
 
 		//-----------------------------------------------------------------//
@@ -1340,7 +1406,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmpansr0_t : public rw16_t<ofs> {
+		struct adcmpansr0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1349,7 +1415,8 @@ namespace device {
 
 			bits_rw_t <io_, bitpos::B0, 16>  CMPS0;
 		};
-		static adcmpansr0_t<base + 0x94>  ADCMPANSR0;
+		typedef adcmpansr0_t_<base + 0x94> adcmpansr0_t;
+		static adcmpansr0_t ADCMPANSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1359,7 +1426,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmpansr1_t : public rw16_t<ofs> {
+		struct adcmpansr1_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1368,7 +1435,8 @@ namespace device {
 
 			bits_rw_t <io_, bitpos::B0, 5>  CMPS1;
 		};
-		static adcmpansr1_t<base + 0x96>  ADCMPANSR1;
+		typedef adcmpansr1_t_<base + 0x96> adcmpansr1_t;
+		static adcmpansr1_t ADCMPANSR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1378,7 +1446,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmpanser_t : public rw8_t<ofs> {
+		struct adcmpanser_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1388,7 +1456,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>  CMPSTS;
 			bit_rw_t <io_, bitpos::B1>  CMPSOC;
 		};
-		static adcmpanser_t<base + 0x92>  ADCMPANSER;
+		typedef adcmpanser_t_<base + 0x92> adcmpanser_t;
+		static adcmpanser_t ADCMPANSER;
 
 
 		//-----------------------------------------------------------------//
@@ -1398,7 +1467,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmplr0_t : public rw16_t<ofs> {
+		struct adcmplr0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1407,7 +1476,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>  CMPL0;
 		};
-		static adcmplr0_t<base + 0x98>  ADCMPLR0;
+		typedef adcmplr0_t_<base + 0x98> adcmplr0_t;
+		static adcmplr0_t ADCMPLR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1417,7 +1487,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmplr1_t : public rw16_t<ofs> {
+		struct adcmplr1_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1426,7 +1496,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5>  CMPL1;
 		};
-		static adcmplr1_t<base + 0x9A>  ADCMPLR1;
+		typedef adcmplr1_t_<base + 0x9A> adcmplr1_t;
+		static adcmplr1_t ADCMPLR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1436,7 +1507,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmpler_t : public rw8_t<ofs> {
+		struct adcmpler_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1446,7 +1517,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  CMPLTS;
 			bit_rw_t<io_, bitpos::B0>  CMPLOC;
 		};
-		static adcmpler_t<base + 0x93>  ADCMPLER;
+		typedef adcmpler_t_<base + 0x93> adcmpler_t;
+		static adcmpler_t ADCMPLER;
 
 
 		//-----------------------------------------------------------------//
@@ -1456,7 +1528,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmpsr0_t : public rw16_t<ofs> {
+		struct adcmpsr0_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1465,7 +1537,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>  CMPF0;
 		};
-		static adcmpsr0_t<base + 0xA0>  ADCMPSR0;
+		typedef adcmpsr0_t_<base + 0xA0> adcmpsr0_t;
+		static adcmpsr0_t ADCMPSR0;
 
 
 		//-----------------------------------------------------------------//
@@ -1475,7 +1548,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmpsr1_t : public rw16_t<ofs> {
+		struct adcmpsr1_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1484,7 +1557,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5>  CMPF1;
 		};
-		static adcmpsr1_t<base + 0xA2>  ADCMPSR1;
+		typedef adcmpsr1_t_<base + 0xA2> adcmpsr1_t;
+		static adcmpsr1_t ADCMPSR1;
 
 
 		//-----------------------------------------------------------------//
@@ -1494,7 +1568,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct adcmpser_t : public rw8_t<ofs> {
+		struct adcmpser_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1504,7 +1578,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  CMPFTS;
 			bit_rw_t<io_, bitpos::B1>  CMPFOC;
 		};
-		static adcmpser_t<base + 0xA4>  ADCMPSER;
+		typedef adcmpser_t_<base + 0xA4> adcmpser_t;
+		static adcmpser_t ADCMPSER;
 
 
 		//-----------------------------------------------------------------//
@@ -1527,4 +1602,87 @@ namespace device {
 
 	typedef s12ad0_t<0x00089000, peripheral::S12AD,  ICU::VECTOR_BL1::S12CMPAI>   S12AD;
 	typedef s12ad1_t<0x00089100, peripheral::S12AD1, ICU::VECTOR_BL1::S12CMPAI1>  S12AD1;
+
+	template<uint32_t base> typename s12adc_t<base>::addr0_t s12adc_t<base>::ADDR0;
+	template<uint32_t base> typename s12adc_t<base>::addr1_t s12adc_t<base>::ADDR1;
+	template<uint32_t base> typename s12adc_t<base>::addr2_t s12adc_t<base>::ADDR2;
+	template<uint32_t base> typename s12adc_t<base>::addr3_t s12adc_t<base>::ADDR3;
+	template<uint32_t base> typename s12adc_t<base>::addr4_t s12adc_t<base>::ADDR4;
+	template<uint32_t base> typename s12adc_t<base>::addr5_t s12adc_t<base>::ADDR5;
+	template<uint32_t base> typename s12adc_t<base>::addr6_t s12adc_t<base>::ADDR6;
+	template<uint32_t base> typename s12adc_t<base>::addr7_t s12adc_t<base>::ADDR7;
+	template<uint32_t base> typename s12adc_t<base>::addbldr_t s12adc_t<base>::ADDBLDR;
+	template<uint32_t base> typename s12adc_t<base>::addbldra_t s12adc_t<base>::ADDBLDRA;
+	template<uint32_t base> typename s12adc_t<base>::addbldrb_t s12adc_t<base>::ADDBLDRB;
+	template<uint32_t base> typename s12adc_t<base>::adrd_t s12adc_t<base>::ADRD;
+	template<uint32_t base> typename s12adc_t<base>::adcsr_t s12adc_t<base>::ADCSR;
+	template<uint32_t base> typename s12adc_t<base>::adadc_t s12adc_t<base>::ADADC;
+	template<uint32_t base> typename s12adc_t<base>::adcer_t s12adc_t<base>::ADCER;
+	template<uint32_t base> typename s12adc_t<base>::adstrgr_t s12adc_t<base>::ADSTRGR;
+	template<uint32_t base> typename s12adc_t<base>::adsstr0_t s12adc_t<base>::ADSSTR0;
+	template<uint32_t base> typename s12adc_t<base>::adsstr1_t s12adc_t<base>::ADSSTR1;
+	template<uint32_t base> typename s12adc_t<base>::adsstr2_t s12adc_t<base>::ADSSTR2;
+	template<uint32_t base> typename s12adc_t<base>::adsstr3_t s12adc_t<base>::ADSSTR3;
+	template<uint32_t base> typename s12adc_t<base>::adsstr4_t s12adc_t<base>::ADSSTR4;
+	template<uint32_t base> typename s12adc_t<base>::adsstr5_t s12adc_t<base>::ADSSTR5;
+	template<uint32_t base> typename s12adc_t<base>::adsstr6_t s12adc_t<base>::ADSSTR6;
+	template<uint32_t base> typename s12adc_t<base>::adsstr7_t s12adc_t<base>::ADSSTR7;
+	template<uint32_t base> typename s12adc_t<base>::addiscr_t s12adc_t<base>::ADDISCR;
+	template<uint32_t base> typename s12adc_t<base>::adgspcr_t s12adc_t<base>::ADGSPCR;
+	template<uint32_t base> typename s12adc_t<base>::adcmpcr_t s12adc_t<base>::ADCMPCR;
+	template<uint32_t base> typename s12adc_t<base>::adcmpdr0_t s12adc_t<base>::ADCMPDR0;
+	template<uint32_t base> typename s12adc_t<base>::adcmpdr1_t s12adc_t<base>::ADCMPDR1;
+
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::addr_t s12ad0_t<base, per, ivec>::ADDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::adansa0_t s12ad0_t<base, per, ivec>::ADANSA0;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::adansa_t s12ad0_t<base, per, ivec>::ADANSA;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::adansb_t s12ad0_t<base, per, ivec>::ADANSB;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::adansb0_t s12ad0_t<base, per, ivec>::ADANSB0;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::adads0_t s12ad0_t<base, per, ivec>::ADADS0;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::adsstr_t s12ad0_t<base, per, ivec>::ADSSTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::adshcr_t s12ad0_t<base, per, ivec>::ADSHCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::adshmsr_t s12ad0_t<base, per, ivec>::ADSHMSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::adcmpansr0_t s12ad0_t<base, per, ivec>::ADCMPANSR0;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::adcmplr0_t s12ad0_t<base, per, ivec>::ADCMPLR0;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad0_t<base, per, ivec>::adcmpsr0_t s12ad0_t<base, per, ivec>::ADCMPSR0;
+
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr8_t s12ad1_t<base, per, ivec>::ADDR8;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr9_t s12ad1_t<base, per, ivec>::ADDR9;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr10_t s12ad1_t<base, per, ivec>::ADDR10;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr11_t s12ad1_t<base, per, ivec>::ADDR11;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr12_t s12ad1_t<base, per, ivec>::ADDR12;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr13_t s12ad1_t<base, per, ivec>::ADDR13;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr14_t s12ad1_t<base, per, ivec>::ADDR14;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr15_t s12ad1_t<base, per, ivec>::ADDR15;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr16_t s12ad1_t<base, per, ivec>::ADDR16;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr17_t s12ad1_t<base, per, ivec>::ADDR17;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr18_t s12ad1_t<base, per, ivec>::ADDR18;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr19_t s12ad1_t<base, per, ivec>::ADDR19;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr20_t s12ad1_t<base, per, ivec>::ADDR20;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adtsdr_t s12ad1_t<base, per, ivec>::ADTSDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adocdr_t s12ad1_t<base, per, ivec>::ADOCDR;
+
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::addr_t s12ad1_t<base, per, ivec>::ADDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adansa0_t s12ad1_t<base, per, ivec>::ADANSA0;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adansa1_t s12ad1_t<base, per, ivec>::ADANSA1;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adansa_t s12ad1_t<base, per, ivec>::ADANSA;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adansb0_t s12ad1_t<base, per, ivec>::ADANSB0;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adansb_t s12ad1_t<base, per, ivec>::ADANSB;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adansb1_t s12ad1_t<base, per, ivec>::ADANSB1;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adads0_t s12ad1_t<base, per, ivec>::ADADS0;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adads1_t s12ad1_t<base, per, ivec>::ADADS1;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adexicr_t s12ad1_t<base, per, ivec>::ADEXICR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adsstrl_t s12ad1_t<base, per, ivec>::ADSSTRL;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adsstrt_t s12ad1_t<base, per, ivec>::ADSSTRT;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adsstro_t s12ad1_t<base, per, ivec>::ADSSTRO;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adsstr_t s12ad1_t<base, per, ivec>::ADSSTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adcmpansr0_t s12ad1_t<base, per, ivec>::ADCMPANSR0;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adcmpansr1_t s12ad1_t<base, per, ivec>::ADCMPANSR1;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adcmpanser_t s12ad1_t<base, per, ivec>::ADCMPANSER;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adcmplr0_t s12ad1_t<base, per, ivec>::ADCMPLR0;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adcmplr1_t s12ad1_t<base, per, ivec>::ADCMPLR1;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adcmpler_t s12ad1_t<base, per, ivec>::ADCMPLER;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adcmpsr0_t s12ad1_t<base, per, ivec>::ADCMPSR0;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adcmpsr1_t s12ad1_t<base, per, ivec>::ADCMPSR1;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec> typename s12ad1_t<base, per, ivec>::adcmpser_t s12ad1_t<base, per, ivec>::ADCMPSER;
 }

@@ -28,7 +28,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct pccr0_t : public rw32_t<base> {
+		struct pccr0_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -49,7 +49,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B11, 3>  PCKDIV;
 			bit_rw_t <io_, bitpos::B14>     EDS;
 		};
-		static pccr0_t<0x000A0500>  PCCR0;
+		typedef pccr0_t_<0x000A0500> pccr0_t;
+		static pccr0_t PCCR0;
 
 
 		//-----------------------------------------------------------------//
@@ -59,7 +60,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct pccr1_t : public rw32_t<base> {
+		struct pccr1_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -68,7 +69,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>      PCE;
 		};
-		static pccr1_t<0x000A0504>  PCCR1;
+		typedef pccr1_t_<0x000A0504> pccr1_t;
+		static pccr1_t PCCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -78,7 +80,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct pcsr_t : public rw32_t<base> {
+		struct pcsr_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -93,7 +95,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5>  VERF;
 			bit_rw_t<io_, bitpos::B6>  HERF;
 		};
-		static pcsr_t<0x000A0508>  PCSR;
+		typedef pcsr_t_<0x000A0508> pcsr_t;
+		static pcsr_t PCSR;
 
 
 		//-----------------------------------------------------------------//
@@ -103,14 +106,15 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct pcmonr_t : public ro32_t<base> {
+		struct pcmonr_t_ : public ro32_t<base> {
 			typedef ro32_t<base> io_;
 			using io_::operator ();
 
 			bit_rw_t<io_, bitpos::B0>  VSYNC;
 			bit_rw_t<io_, bitpos::B1>  HSYNC;
 		};
-		static pcmonr_t<0x000A050C>  PCMONR;
+		typedef pcmonr_t_<0x000A050C> pcmonr_t;
+		static pcmonr_t PCMONR;
 
 
 		//-----------------------------------------------------------------//
@@ -118,7 +122,8 @@ namespace device {
 			@brief  PDC 受信データレジスタ（ PCDR ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000A0510>  PCDR;
+		typedef rw32_t<0x000A0510> pcdr_t;
+		static pcdr_t PCDR;
 
 
 		//-----------------------------------------------------------------//
@@ -128,7 +133,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct vcr_t : public rw32_t<base> {
+		struct vcr_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -138,7 +143,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  12>  VST;
 			bits_rw_t<io_, bitpos::B16, 12>  VSZ;
 		};
-		static vcr_t<0x000A0514>  VCR;
+		typedef vcr_t_<0x000A0514> vcr_t;
+		static vcr_t VCR;
 
 
 		//-----------------------------------------------------------------//
@@ -148,7 +154,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct hcr_t : public rw32_t<base> {
+		struct hcr_t_ : public rw32_t<base> {
 			typedef rw32_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -158,7 +164,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  12>  HST;
 			bits_rw_t<io_, bitpos::B16, 12>  HSZ;
 		};
-		static hcr_t<0x000A0518>  HCR;
+		typedef hcr_t_<0x000A0518> hcr_t;
+		static hcr_t HCR;
 
 
 		//-----------------------------------------------------------------//
@@ -170,4 +177,12 @@ namespace device {
 		static peripheral get_peripheral() { return per; }
 	};
 	typedef pdc_t<peripheral::PDC> PDC;
+
+	template<peripheral per> typename pdc_t<per>::pccr0_t pdc_t<per>::PCCR0;
+	template<peripheral per> typename pdc_t<per>::pccr1_t pdc_t<per>::PCCR1;
+	template<peripheral per> typename pdc_t<per>::pcsr_t pdc_t<per>::PCSR;
+	template<peripheral per> typename pdc_t<per>::pcmonr_t pdc_t<per>::PCMONR;
+	template<peripheral per> typename pdc_t<per>::pcdr_t pdc_t<per>::PCDR;
+	template<peripheral per> typename pdc_t<per>::vcr_t pdc_t<per>::VCR;
+	template<peripheral per> typename pdc_t<per>::hcr_t pdc_t<per>::HCR;
 }

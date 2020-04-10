@@ -29,7 +29,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct ecmr_t : public rw32_t<ofs> {
+		struct ecmr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -54,7 +54,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B19> ZPF;
 			bit_rw_t<io_, bitpos::B20> TPC;
 		};
-		static ecmr_t<base + 0x00> ECMR;
+		typedef ecmr_t_<base + 0x00> ecmr_t;
+		static ecmr_t ECMR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -64,7 +65,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct rflr_t : public rw32_t<ofs> {
+		struct rflr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -73,7 +74,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 12> RFL;
 		};
-		static rflr_t<base + 0x08> RFLR;
+		typedef rflr_t_<base + 0x08> rflr_t;
+		static rflr_t RFLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -83,7 +85,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct ecsr_t : public rw32_t<ofs> {
+		struct ecsr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -97,7 +99,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> PSRTO;
 			bit_rw_t<io_, bitpos::B5> BFR;
 		};
-		static ecsr_t<base + 0x10> ECSR;
+		typedef ecsr_t_<base + 0x10> ecsr_t;
+		static ecsr_t ECSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -107,7 +110,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct ecsipr_t : public rw32_t<ofs> {
+		struct ecsipr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -121,7 +124,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> PSRTOIP;
 			bit_rw_t<io_, bitpos::B5> BFSIPR;
 		};
-		static ecsipr_t<base + 0x18> ECSIPR;
+		typedef ecsipr_t_<base + 0x18> ecsipr_t;
+		static ecsipr_t ECSIPR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -131,7 +135,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct pir_t : public rw32_t<ofs> {
+		struct pir_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -143,7 +147,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2> MDO;
 			bit_rw_t<io_, bitpos::B3> MDI;
 		};
-		static pir_t<base + 0x20> PIR;
+		typedef pir_t_<base + 0x20> pir_t;
+		static pir_t PIR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -153,13 +158,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct psr_t : public ro32_t<ofs> {
+		struct psr_t_ : public ro32_t<ofs> {
 			typedef ro32_t<ofs> io_;
 			using io_::operator ();
 
 			bit_ro_t<io_, bitpos::B0> LMON;
 		};
-		static psr_t<base + 0x28> PSR;
+		typedef psr_t_<base + 0x28> psr_t;
+		static psr_t PSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -169,7 +175,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct rdmlr_t : public rw32_t<ofs> {
+		struct rdmlr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -178,7 +184,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 20> RMD;
 		};
-		static rdmlr_t<base + 0x40> RDMLR;
+		typedef rdmlr_t_<base + 0x40> rdmlr_t;
+		static rdmlr_t RDMLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -188,7 +195,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct ipgr_t : public rw32_t<ofs> {
+		struct ipgr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -197,7 +204,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 5> IPG;
 		};
-		static ipgr_t<base + 0x50> IPGR;
+		typedef ipgr_t_<base + 0x50> ipgr_t;
+		static ipgr_t IPGR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -207,7 +215,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct apr_t : public rw32_t<ofs> {
+		struct apr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -216,7 +224,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> AP;
 		};
-		static apr_t<base + 0x54> APR;
+		typedef apr_t_<base + 0x54> apr_t;
+		static apr_t APR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -226,7 +235,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct mpr_t : public rw32_t<ofs> {
+		struct mpr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -235,7 +244,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> MP;
 		};
-		static mpr_t<base + 0x58> MPR;
+		typedef mpr_t_<base + 0x58> mpr_t;
+		static mpr_t MPR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -245,13 +255,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct rfcf_t : public ro32_t<ofs> {
+		struct rfcf_t_ : public ro32_t<ofs> {
 			typedef ro32_t<ofs> io_;
 			using io_::operator ();
 
 			bits_ro_t<io_, bitpos::B0, 8> RPAUSE;
 		};
-		static rfcf_t<base + 0x60> RFCF;
+		typedef rfcf_t_<base + 0x60> rfcf_t;
+		static rfcf_t RFCF;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -261,7 +272,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct tpauser_t : public rw32_t<ofs> {
+		struct tpauser_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -270,7 +281,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> TPAUSE;
 		};
-		static tpauser_t<base + 0x64> TPAUSER;
+		typedef tpauser_t_<base + 0x64> tpauser_t;
+		static tpauser_t TPAUSER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -280,13 +292,14 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct tpausecr_t : public ro32_t<ofs> {
+		struct tpausecr_t_ : public ro32_t<ofs> {
 			typedef ro32_t<ofs> io_;
 			using io_::operator ();
 
 			bits_ro_t<io_, bitpos::B0, 8> TXP;
 		};
-		static tpausecr_t<base + 0x68> TPAUSECR;
+		typedef tpausecr_t_<base + 0x68> tpausecr_t;
+		static tpausecr_t TPAUSECR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -296,7 +309,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct bcfrr_t : public rw32_t<ofs> {
+		struct bcfrr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -305,7 +318,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> BCF;
 		};
-		static bcfrr_t<base + 0x6C> BCFRR;
+		typedef bcfrr_t_<base + 0x6C> bcfrr_t;
+		static bcfrr_t BCFRR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -313,7 +327,8 @@ namespace device {
 			@brief  MAC アドレス上位設定レジスタ（MAHR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xC0> MAHR;
+		typedef rw32_t<base + 0xC0> mahr_t;
+		static mahr_t MAHR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -321,7 +336,8 @@ namespace device {
 			@brief  MAC アドレス下位設定レジスタ（MALR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xC8> MALR;
+		typedef rw32_t<base + 0xC8> malr_t;
+		static malr_t MALR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -329,7 +345,8 @@ namespace device {
 			@brief  送信リトライオーバカウンタレジスタ（TROCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xD0> TROCR;
+		typedef rw32_t<base + 0xD0> trocr_t;
+		static trocr_t TROCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -337,7 +354,8 @@ namespace device {
 			@brief  遅延衝突検出カウンタレジスタ（CDCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xD4> CDCR;
+		typedef rw32_t<base + 0xD4> cdcr_t;
+		static cdcr_t CDCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -345,7 +363,8 @@ namespace device {
 			@brief  キャリア消失カウンタレジスタ（LCCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xD8> LCCR;
+		typedef rw32_t<base + 0xD8> lccr_t;
+		static lccr_t LCCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -353,7 +372,8 @@ namespace device {
 			@brief  キャリア未検出カウンタレジスタ（CNDCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xDC> CNDCR;
+		typedef rw32_t<base + 0xDC> cndcr_t;
+		static cndcr_t CNDCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -361,7 +381,8 @@ namespace device {
 			@brief  CRC エラーフレーム受信カウンタレジスタ（CEFCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xE4> CEFCR;
+		typedef rw32_t<base + 0xE4> cefcr_t;
+		static cefcr_t CEFCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -369,7 +390,8 @@ namespace device {
 			@brief  フレーム受信エラーカウンタレジスタ（FRECR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xE8> FRECR;
+		typedef rw32_t<base + 0xE8> frecr_t;
+		static frecr_t FRECR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -377,7 +399,8 @@ namespace device {
 			@brief  ショートフレーム受信カウンタレジスタ（TSFRCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xEC> TSFRCR;
+		typedef rw32_t<base + 0xEC> tsfrcr_t;
+		static tsfrcr_t TSFRCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -385,7 +408,8 @@ namespace device {
 			@brief  ロングフレーム受信カウンタレジスタ（TLFRCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xF0> TLFRCR;
+		typedef rw32_t<base + 0xF0> tlfrcr_t;
+		static tlfrcr_t TLFRCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -393,7 +417,8 @@ namespace device {
 			@brief  端数ビットフレーム受信カウンタレジスタ（RFCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xF4> RFCR;
+		typedef rw32_t<base + 0xF4> rfcr_t;
+		static rfcr_t RFCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -401,7 +426,8 @@ namespace device {
 			@brief  マルチキャストアドレスフレーム受信カウンタレジスタ（MAFCR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xF8> MAFCR;
+		typedef rw32_t<base + 0xF8> mafcr_t;
+		static mafcr_t MAFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -415,4 +441,31 @@ namespace device {
 
 	typedef etherc_t<0x000C0100, peripheral::ETHERC0> ETHERC0;
 	typedef etherc_t<0x000C0300, peripheral::ETHERC1> ETHERC1;
+
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::ecmr_t etherc_t<base, per>::ECMR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::rflr_t etherc_t<base, per>::RFLR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::ecsr_t etherc_t<base, per>::ECSR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::ecsipr_t etherc_t<base, per>::ECSIPR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::pir_t etherc_t<base, per>::PIR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::psr_t etherc_t<base, per>::PSR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::rdmlr_t etherc_t<base, per>::RDMLR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::ipgr_t etherc_t<base, per>::IPGR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::apr_t etherc_t<base, per>::APR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::mpr_t etherc_t<base, per>::MPR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::rfcf_t etherc_t<base, per>::RFCF;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::tpauser_t etherc_t<base, per>::TPAUSER;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::tpausecr_t etherc_t<base, per>::TPAUSECR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::bcfrr_t etherc_t<base, per>::BCFRR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::mahr_t etherc_t<base, per>::MAHR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::malr_t etherc_t<base, per>::MALR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::trocr_t etherc_t<base, per>::TROCR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::cdcr_t etherc_t<base, per>::CDCR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::lccr_t etherc_t<base, per>::LCCR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::cndcr_t etherc_t<base, per>::CNDCR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::cefcr_t etherc_t<base, per>::CEFCR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::frecr_t etherc_t<base, per>::FRECR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::tsfrcr_t etherc_t<base, per>::TSFRCR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::tlfrcr_t etherc_t<base, per>::TLFRCR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::rfcr_t etherc_t<base, per>::RFCR;
+	template<uint32_t base, peripheral per> typename etherc_t<base, per>::mafcr_t etherc_t<base, per>::MAFCR;
 }

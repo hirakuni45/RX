@@ -28,7 +28,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct crccr_t : public rw8_t<ofs> {
+		struct crccr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -39,7 +39,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>     LMS;
 			bit_rw_t <io_, bitpos::B7>     DORCLR;
 		};
-		static crccr_t<base + 0x00> CRCCR;
+		typedef crccr_t_<base + 0x00> crccr_t;
+		static crccr_t CRCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -47,7 +48,8 @@ namespace device {
 			@brief  CRC データ入力レジスタ（CRCDIR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x01> CRCDIR;
+		typedef rw8_t<base + 0x01> crcdir_t;
+		static crcdir_t CRCDIR;
 
 
 		//-----------------------------------------------------------------//
@@ -55,8 +57,13 @@ namespace device {
 			@brief  CRC データ出力レジスタ（CRCDOR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x02> CRCDOR;
+		typedef rw16_t<base + 0x02> crcdor_t;
+		static crcdor_t CRCDOR;
 
 	};
 	typedef crc_t<0x00088280> CRC;
+
+	template<uint32_t base> typename crc_t<base>::crccr_t crc_t<base>::CRCCR;
+	template<uint32_t base> typename crc_t<base>::crcdir_t crc_t<base>::CRCDIR;
+	template<uint32_t base> typename crc_t<base>::crcdor_t crc_t<base>::CRCDOR;
 }

@@ -158,7 +158,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x06> TCNT;
+		typedef rw16_t<base + 0x06> tcnt_t;
+		static tcnt_t TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -166,7 +167,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ A（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x08> TGRA;
+		typedef rw16_t<base + 0x08> tgra_t;
+		static tgra_t TGRA;
 
 
 		//-----------------------------------------------------------------//
@@ -174,7 +176,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ B（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x0A> TGRB;
+		typedef rw16_t<base + 0x0A> tgrb_t;
+		static tgrb_t TGRB;
 
 
 		//-----------------------------------------------------------------//
@@ -182,7 +185,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ C（TGRC）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x0C> TGRC;
+		typedef rw16_t<base + 0x0C> tgrc_t;
+		static tgrc_t TGRC;
 
 
 		//-----------------------------------------------------------------//
@@ -190,7 +194,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ D（TGRD）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x0E> TGRD;
+		typedef rw16_t<base + 0x0E> tgrd_t;
+		static tgrd_t TGRD;
 
 
 		//-----------------------------------------------------------------//
@@ -360,4 +365,18 @@ namespace device {
 	typedef tpux_t<0x00088140, peripheral::TPU3, 28, 29, 30, 31,  0, 32> TPU3;
 	typedef tpux_t<0x00088150, peripheral::TPU4, 33, 34,  0,  0, 35, 36> TPU4;
 	typedef tpux_t<0x00088160, peripheral::TPU5, 37, 38,  0,  0, 39, 40> TPU5;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tcr_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TCR;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tmdr_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TMDR;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tiorh_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORH;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tiorl_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tier_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIER;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tsr_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSR;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tcnt_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TCNT;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tgra_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRA;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tgrb_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRB;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tgrc_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tgrd_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tstr_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSTR;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::tsyr_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSYR;
+	template <uint32_t base, peripheral per, uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv> typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::nfcr_t tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::NFCR;
 }

@@ -28,7 +28,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct docr_t : public rw8_t<ofs> {
+		struct docr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -41,7 +41,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B5>     DOPCF;
 			bit_rw_t <io_, bitpos::B6>     DOPCFCL;
 		};
-		static docr_t<base + 0x00> DOCR;
+		typedef docr_t_<base + 0x00> docr_t;
+		static docr_t DOCR;
 
 
 		//-----------------------------------------------------------------//
@@ -49,7 +50,8 @@ namespace device {
 			@brief  DOC データインプットレジスタ（DODIR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x02> DODIR;
+		typedef rw16_t<base + 0x02> dodir_t;
+		static dodir_t DODIR;
 
 
 		//-----------------------------------------------------------------//
@@ -57,7 +59,8 @@ namespace device {
 			@brief  DOC データセッティングレジスタ（DODSR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x04> DODSR;
+		typedef rw16_t<base + 0x04> dodsr_t;
+		static dodsr_t DODSR;
 
 	};
 
@@ -105,4 +108,8 @@ namespace device {
 	};
 	typedef doc_gbl0_t<0x0008B080, ICU::VECTOR_BL0::DOPCI> DOC;
 #endif
+
+	template <uint32_t base> typename doc_t<base>::docr_t doc_t<base>::DOCR;
+	template <uint32_t base> typename doc_t<base>::dodir_t doc_t<base>::DODIR;
+	template <uint32_t base> typename doc_t<base>::dodsr_t doc_t<base>::DODSR;
 }

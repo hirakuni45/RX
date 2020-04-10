@@ -775,16 +775,32 @@ namespace device {
 		using T::operator |=;
 		using T::operator &=;
 
-		static bit_rw_t<T, bitpos::B7> B7;	///< B7 アクセス
-		static bit_rw_t<T, bitpos::B6> B6;	///< B6 アクセス
-		static bit_rw_t<T, bitpos::B5> B5;	///< B5 アクセス
-		static bit_rw_t<T, bitpos::B4> B4;	///< B4 アクセス
-		static bit_rw_t<T, bitpos::B3> B3;	///< B3 アクセス
-		static bit_rw_t<T, bitpos::B2> B2;	///< B2 アクセス
-		static bit_rw_t<T, bitpos::B1> B1;	///< B1 アクセス
-		static bit_rw_t<T, bitpos::B0> B0;	///< B0 アクセス
-	};
+		typedef bit_rw_t<T, bitpos::B7> b7_t;
+		typedef bit_rw_t<T, bitpos::B6> b6_t;
+		typedef bit_rw_t<T, bitpos::B5> b5_t;
+		typedef bit_rw_t<T, bitpos::B4> b4_t;
+		typedef bit_rw_t<T, bitpos::B3> b3_t;
+		typedef bit_rw_t<T, bitpos::B2> b2_t;
+		typedef bit_rw_t<T, bitpos::B1> b1_t;
+		typedef bit_rw_t<T, bitpos::B0> b0_t;
 
+		static b7_t B7;	///< B7 アクセス
+		static b6_t B6;	///< B6 アクセス
+		static b5_t B5;	///< B5 アクセス
+		static b4_t B4;	///< B4 アクセス
+		static b3_t B3;	///< B3 アクセス
+		static b2_t B2;	///< B2 アクセス
+		static b1_t B1;	///< B1 アクセス
+		static b0_t B0;	///< B0 アクセス
+	};
+	template <class T> typename basic_rw_t<T>::b7_t basic_rw_t<T>::B7;
+	template <class T> typename basic_rw_t<T>::b6_t basic_rw_t<T>::B6;
+	template <class T> typename basic_rw_t<T>::b5_t basic_rw_t<T>::B5;
+	template <class T> typename basic_rw_t<T>::b4_t basic_rw_t<T>::B4;	
+	template <class T> typename basic_rw_t<T>::b3_t basic_rw_t<T>::B3;
+	template <class T> typename basic_rw_t<T>::b2_t basic_rw_t<T>::B2;
+	template <class T> typename basic_rw_t<T>::b1_t basic_rw_t<T>::B1;	
+	template <class T> typename basic_rw_t<T>::b0_t basic_rw_t<T>::B0;	
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -797,13 +813,30 @@ namespace device {
 
 		using T::operator ();
 
-		static bit_ro_t<T, bitpos::B7> B7;	///< B7 アクセス
-		static bit_ro_t<T, bitpos::B6> B6;	///< B6 アクセス
-		static bit_ro_t<T, bitpos::B5> B5;	///< B5 アクセス
-		static bit_ro_t<T, bitpos::B4> B4;	///< B4 アクセス
-		static bit_ro_t<T, bitpos::B3> B3;	///< B3 アクセス
-		static bit_ro_t<T, bitpos::B2> B2;	///< B2 アクセス
-		static bit_ro_t<T, bitpos::B1> B1;	///< B1 アクセス
-		static bit_ro_t<T, bitpos::B0> B0;	///< B0 アクセス
+		typedef bit_ro_t<T, bitpos::B7> b7_t;
+		typedef bit_ro_t<T, bitpos::B6> b6_t;
+		typedef bit_ro_t<T, bitpos::B5> b5_t;
+		typedef bit_ro_t<T, bitpos::B4> b4_t;
+		typedef bit_ro_t<T, bitpos::B3> b3_t;
+		typedef bit_ro_t<T, bitpos::B2> b2_t;
+		typedef bit_ro_t<T, bitpos::B1> b1_t;
+		typedef bit_ro_t<T, bitpos::B0> b0_t;
+
+		static b7_t B7;	///< B7 アクセス
+		static b6_t B6;	///< B6 アクセス
+		static b5_t B5;	///< B5 アクセス
+		static b4_t B4;	///< B4 アクセス
+		static b3_t B3;	///< B3 アクセス
+		static b2_t B2;	///< B2 アクセス
+		static b1_t B1;	///< B1 アクセス
+		static b0_t B0;	///< B0 アクセス
 	};
+	template <class T> typename basic_ro_t<T>::b7_t basic_ro_t<T>::B7;
+	template <class T> typename basic_ro_t<T>::b6_t basic_ro_t<T>::B6;
+	template <class T> typename basic_ro_t<T>::b5_t basic_ro_t<T>::B5;
+	template <class T> typename basic_ro_t<T>::b4_t basic_ro_t<T>::B4;	
+	template <class T> typename basic_ro_t<T>::b3_t basic_ro_t<T>::B3;
+	template <class T> typename basic_ro_t<T>::b2_t basic_ro_t<T>::B2;
+	template <class T> typename basic_ro_t<T>::b1_t basic_ro_t<T>::B1;	
+	template <class T> typename basic_ro_t<T>::b0_t basic_ro_t<T>::B0;	
 }

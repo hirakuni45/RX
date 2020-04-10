@@ -148,9 +148,12 @@ namespace device {
 			@brief  CFIFO ポートレジスタ（CFIFO）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<base + 0x14> CFIFO;
-		static rw16_t<base + 0x16> CFIFOH;
-		static rw8_t <base + 0x17> CFIFOHH;
+		typedef rw32_t<base + 0x14> cfifo_t;
+		static cfifo_t CFIFO;
+		typedef rw16_t<base + 0x16> cfifoh_t;
+		static cfifoh_t CFIFOH;
+		typedef rw8_t<base + 0x17> cfifohh_t;
+		static cfifohh_t CFIFOHH;
 
 
 		//-----------------------------------------------------------------//
@@ -158,9 +161,12 @@ namespace device {
 			@brief  D0FIFO ポートレジスタ（D0FIFO）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<base + 0x18> D0FIFO;
-		static rw16_t<base + 0x1A> D0FIFOH;
-		static rw8_t <base + 0x1B> D0FIFOHH;
+		typedef rw32_t<base + 0x18> d0fifo_t;
+		static d0fifo_t D0FIFO;
+		typedef rw16_t<base + 0x1A> d0fifoh_t;
+		static d0fifoh_t D0FIFOH;
+		typedef rw8_t<base + 0x1B> d0fifohh_t;
+		static d0fifohh_t D0FIFOHH;
 
 
 		//-----------------------------------------------------------------//
@@ -168,9 +174,12 @@ namespace device {
 			@brief  D1FIFO ポートレジスタ（D1FIFO）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<base + 0x1C> D1FIFO;
-		static rw16_t<base + 0x1E> D1FIFOH;
-		static rw8_t <base + 0x1F> D1FIFOHH;
+		typedef rw32_t<base + 0x1C> d1fifo_t;
+		static d1fifo_t D1FIFO;
+		typedef rw16_t<base + 0x1E> d1fifoh_t;
+		static d1fifoh_t D1FIFOH;
+		typedef rw8_t<base + 0x1F> d1fifohh_t;
+		static d1fifohh_t D1FIFOHH;
 
 
 		//-----------------------------------------------------------------//
@@ -205,7 +214,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct dxfifosel_t : public rw16_t<base + ofs> {
+		struct dxfifosel_t_ : public rw16_t<base + ofs> {
 			typedef rw16_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -223,8 +232,10 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>	    REW;
 			bit_rw_t <io_, bitpos::B15>	    RCNT;
 		};
-		static dxfifosel_t<0x28> D0FIFOSEL;
-		static dxfifosel_t<0x2C> D1FIFOSEL;
+		typedef dxfifosel_t_<0x28> d0fifosel_t;
+		static d0fifosel_t D0FIFOSEL;
+		typedef dxfifosel_t_<0x2C> d1fifosel_t;
+		static d1fifosel_t D1FIFOSEL;
 
 
 		//-----------------------------------------------------------------//
@@ -234,7 +245,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct xfifoctr_t : public rw16_t<base + ofs> {
+		struct xfifoctr_t_ : public rw16_t<base + ofs> {
 			typedef rw16_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -247,9 +258,12 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>	    BCLR;
 			bit_rw_t <io_, bitpos::B15>	    BVAL;
 		};
-		static xfifoctr_t<0x22> CFIFOCTR;
-		static xfifoctr_t<0x2A> D0FIFOCTR;
-		static xfifoctr_t<0x2E> D1FIFOCTR;
+		typedef xfifoctr_t_<0x22> cfifoctr_t;
+		static cfifoctr_t CFIFOCTR;
+		typedef xfifoctr_t_<0x2A> d0fifoctr_t;
+		static d0fifoctr_t D0FIFOCTR;
+		typedef xfifoctr_t_<0x2E> d1fifoctr_t;
+		static d1fifoctr_t D1FIFOCTR;
 
 
 		//-----------------------------------------------------------------//
@@ -808,7 +822,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct pipexctr_t : public rw16_t<base + ofs> {
+		struct pipexctr_t_ : public rw16_t<base + ofs> {
 			typedef rw16_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -829,15 +843,24 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>     INBUFM;
 			bit_rw_t <io_, bitpos::B15>     BSTS;
 		};
-		static pipexctr_t<0x70>  PIPE1CTR;
-		static pipexctr_t<0x72>  PIPE2CTR;
-		static pipexctr_t<0x74>  PIPE3CTR;
-		static pipexctr_t<0x76>  PIPE4CTR;
-		static pipexctr_t<0x78>  PIPE5CTR;
-		static pipexctr_t<0x7A>  PIPE6CTR;
-		static pipexctr_t<0x7C>  PIPE7CTR;
-		static pipexctr_t<0x7E>  PIPE8CTR;
-		static pipexctr_t<0x80>  PIPE9CTR;
+		typedef pipexctr_t_<0x70> pipe1ctr_t;
+		static pipe1ctr_t PIPE1CTR;
+		typedef pipexctr_t_<0x72> pipe2ctr_t;
+		static pipe2ctr_t PIPE2CTR;
+		typedef pipexctr_t_<0x74> pipe3ctr_t;
+		static pipe3ctr_t PIPE3CTR;
+		typedef pipexctr_t_<0x76> pipe4ctr_t;
+		static pipe4ctr_t PIPE4CTR;
+		typedef pipexctr_t_<0x78> pipe5ctr_t;
+		static pipe5ctr_t PIPE5CTR;
+		typedef pipexctr_t_<0x7A> pipe6ctr_t;
+		static pipe6ctr_t PIPE6CTR;
+		typedef pipexctr_t_<0x7C> pipe7ctr_t;
+		static pipe7ctr_t PIPE7CTR;
+		typedef pipexctr_t_<0x7E> pipe8ctr_t;
+		static pipe8ctr_t PIPE8CTR;
+		typedef pipexctr_t_<0x80> pipe9ctr_t;
+		static pipe9ctr_t PIPE9CTR;
 
 
 		//-----------------------------------------------------------------//
@@ -847,7 +870,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct pipentre_t : public rw16_t<base + ofs> {
+		struct pipentre_t_ : public rw16_t<base + ofs> {
 			typedef rw16_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -857,11 +880,16 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>   TRCLR;
 			bit_rw_t<io_, bitpos::B9>   TRENB;
 		};
-		static pipentre_t<0x90>  PIPE1TRE;
-		static pipentre_t<0x94>  PIPE2TRE;
-		static pipentre_t<0x98>  PIPE3TRE;
-		static pipentre_t<0x9C>  PIPE4TRE;
-		static pipentre_t<0xA0>  PIPE5TRE;
+		typedef pipentre_t_<0x90> pipe1tre_t;
+		static pipe1tre_t PIPE1TRE;
+		typedef pipentre_t_<0x94> pipe2tre_t;
+		static pipe2tre_t PIPE2TRE;
+		typedef pipentre_t_<0x98> pipe3tre_t;
+		static pipe3tre_t PIPE3TRE;
+		typedef pipentre_t_<0x9C> pipe4tre_t;
+		static pipe4tre_t PIPE4TRE;
+		typedef pipentre_t_<0xA0> pipe5tre_t;
+		static pipe5tre_t PIPE5TRE;
 
 
 		//-----------------------------------------------------------------//
@@ -871,7 +899,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct pipentrn_t : public rw16_t<base + ofs> {
+		struct pipentrn_t_ : public rw16_t<base + ofs> {
 			typedef rw16_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -880,11 +908,16 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>  TRNCNT;
 		};
-		static pipentrn_t<0x92>  PIPE1TRN;
-		static pipentrn_t<0x96>  PIPE2TRN;
-		static pipentrn_t<0x9A>  PIPE3TRN;
-		static pipentrn_t<0x9E>  PIPE4TRN;
-		static pipentrn_t<0xA2>  PIPE5TRN;
+		typedef pipentrn_t_<0x92> pipe1trn_t;
+		static pipe1trn_t PIPE1TRN;
+		typedef pipentrn_t_<0x96> pipe2trn_t;
+		static pipe2trn_t PIPE2TRN;
+		typedef pipentrn_t_<0x9A> pipe3trn_t;
+		static pipe3trn_t PIPE3TRN;
+		typedef pipentrn_t_<0x9E> pipe4trn_t;
+		static pipe4trn_t PIPE4TRN;
+		typedef pipentrn_t_<0xA2> pipe5trn_t;
+		static pipe5trn_t PIPE5TRN;
 
 
 		//-----------------------------------------------------------------//
@@ -894,7 +927,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct devaddm_t : public rw16_t<base + ofs> {
+		struct devaddm_t_ : public rw16_t<base + ofs> {
 			typedef rw16_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -905,17 +938,28 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  3>  HUBPORT;
 			bits_rw_t<io_, bitpos::B11, 4>  UPPHUB;
 		};
-		static devaddm_t<0xD0>  DEVADD0;
-		static devaddm_t<0xD2>  DEVADD1;
-		static devaddm_t<0xD4>  DEVADD2;
-		static devaddm_t<0xD6>  DEVADD3;
-		static devaddm_t<0xD8>  DEVADD4;
-		static devaddm_t<0xDA>  DEVADD5;
-		static devaddm_t<0xDC>  DEVADD6;
-		static devaddm_t<0xDE>  DEVADD7;
-		static devaddm_t<0xE0>  DEVADD8;
-		static devaddm_t<0xE2>  DEVADD9;
-		static devaddm_t<0xE4>  DEVADDA;
+		typedef devaddm_t_<0xD0> devadd0_t;
+		static devadd0_t DEVADD0;
+		typedef devaddm_t_<0xD2> devadd1_t;
+		static devadd1_t DEVADD1;
+		typedef devaddm_t_<0xD4> devadd2_t;
+		static devadd2_t DEVADD2;
+		typedef devaddm_t_<0xD6> devadd3_t;
+		static devadd3_t DEVADD3;
+		typedef devaddm_t_<0xD8> devadd4_t;
+		static devadd4_t DEVADD4;
+		typedef devaddm_t_<0xDA> devadd5_t;
+		static devadd5_t DEVADD5;
+		typedef devaddm_t_<0xDC> devadd6_t;
+		static devadd6_t DEVADD6;
+		typedef devaddm_t_<0xDE> devadd7_t;
+		static devadd7_t DEVADD7;
+		typedef devaddm_t_<0xE0> devadd8_t;
+		static devadd8_t DEVADD8;
+		typedef devaddm_t_<0xE2> devadd9_t;
+		static devadd9_t DEVADD9;
+		typedef devaddm_t_<0xE4> devadda_t;
+		static devadda_t DEVADDA;
 
 
 		//-----------------------------------------------------------------//
@@ -1149,4 +1193,92 @@ namespace device {
 	};
 	typedef usba_t<0x000D0400, peripheral::USBA, ICU::VECTOR::USBAR,
 		ICU::VECTOR::D0FIFO2, ICU::VECTOR::D1FIFO2> USBA;
+
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::syscfg_t usba_t<base, per, rvec, d0vec, d1vec>::SYSCFG;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::buswait_t usba_t<base, per, rvec, d0vec, d1vec>::BUSWAIT;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::syssts0_t usba_t<base, per, rvec, d0vec, d1vec>::SYSSTS0;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pllsta_t usba_t<base, per, rvec, d0vec, d1vec>::PLLSTA;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::dvstctr0_t usba_t<base, per, rvec, d0vec, d1vec>::DVSTCTR0;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::testmode_t usba_t<base, per, rvec, d0vec, d1vec>::TESTMODE;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::cfifo_t usba_t<base, per, rvec, d0vec, d1vec>::CFIFO;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::cfifoh_t usba_t<base, per, rvec, d0vec, d1vec>::CFIFOH;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::cfifohh_t usba_t<base, per, rvec, d0vec, d1vec>::CFIFOHH;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::d0fifo_t usba_t<base, per, rvec, d0vec, d1vec>::D0FIFO;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::d0fifoh_t usba_t<base, per, rvec, d0vec, d1vec>::D0FIFOH;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::d0fifohh_t usba_t<base, per, rvec, d0vec, d1vec>::D0FIFOHH;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::d1fifo_t usba_t<base, per, rvec, d0vec, d1vec>::D1FIFO;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::d1fifoh_t usba_t<base, per, rvec, d0vec, d1vec>::D1FIFOH;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::d1fifohh_t usba_t<base, per, rvec, d0vec, d1vec>::D1FIFOHH;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::cfifosel_t usba_t<base, per, rvec, d0vec, d1vec>::CFIFOSEL;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::d0fifosel_t usba_t<base, per, rvec, d0vec, d1vec>::D0FIFOSEL;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::d1fifosel_t usba_t<base, per, rvec, d0vec, d1vec>::D1FIFOSEL;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::cfifoctr_t usba_t<base, per, rvec, d0vec, d1vec>::CFIFOCTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::d0fifoctr_t usba_t<base, per, rvec, d0vec, d1vec>::D0FIFOCTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::d1fifoctr_t usba_t<base, per, rvec, d0vec, d1vec>::D1FIFOCTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::intenb0_t usba_t<base, per, rvec, d0vec, d1vec>::INTENB0;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::intenb1_t usba_t<base, per, rvec, d0vec, d1vec>::INTENB1;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::brdyenb_t usba_t<base, per, rvec, d0vec, d1vec>::BRDYENB;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::nrdyenb_t usba_t<base, per, rvec, d0vec, d1vec>::NRDYENB;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::bempenb_t usba_t<base, per, rvec, d0vec, d1vec>::BEMPENB;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::sofcfg_t usba_t<base, per, rvec, d0vec, d1vec>::SOFCFG;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::physet_t  usba_t<base, per, rvec, d0vec, d1vec>::PHYSET;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::intsts0_t usba_t<base, per, rvec, d0vec, d1vec>::INTSTS0;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::intsts1_t usba_t<base, per, rvec, d0vec, d1vec>::INTSTS1;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::brdysts_t usba_t<base, per, rvec, d0vec, d1vec>::BRDYSTS;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::nrdysts_t usba_t<base, per, rvec, d0vec, d1vec>::NRDYSTS;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::bempsts_t usba_t<base, per, rvec, d0vec, d1vec>::BEMPSTS;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::frmnum_t usba_t<base, per, rvec, d0vec, d1vec>::FRMNUM;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::ufrmnum_t usba_t<base, per, rvec, d0vec, d1vec>::UFRMNUM;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::usbaddr_t usba_t<base, per, rvec, d0vec, d1vec>::USBADDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::usbreq_t usba_t<base, per, rvec, d0vec, d1vec>::USBREQ;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::usbval_t usba_t<base, per, rvec, d0vec, d1vec>::USBVAL;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::usbindx_t usba_t<base, per, rvec, d0vec, d1vec>::USBINDX;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::usbleng_t usba_t<base, per, rvec, d0vec, d1vec>::USBLENG;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::dcpcfg_t usba_t<base, per, rvec, d0vec, d1vec>::DCPCFG;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::dcpmaxp_t usba_t<base, per, rvec, d0vec, d1vec>::DCPMAXP;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::dcpctr_t usba_t<base, per, rvec, d0vec, d1vec>::DCPCTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipesel_t usba_t<base, per, rvec, d0vec, d1vec>::PIPESEL;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipecfg_t usba_t<base, per, rvec, d0vec, d1vec>::PIPECFG;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipebuf_t usba_t<base, per, rvec, d0vec, d1vec>::PIPEBUF;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipemaxp_t usba_t<base, per, rvec, d0vec, d1vec>::PIPEMAXP;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipeperi_t usba_t<base, per, rvec, d0vec, d1vec>::PIPEPERI;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe1ctr_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE1CTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe2ctr_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE2CTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe3ctr_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE3CTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe4ctr_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE4CTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe5ctr_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE5CTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe6ctr_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE6CTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe7ctr_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE7CTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe8ctr_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE8CTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe9ctr_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE9CTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe1tre_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE1TRE;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe2tre_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE2TRE;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe3tre_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE3TRE;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe4tre_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE4TRE;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe5tre_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE5TRE;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe1trn_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE1TRN;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe2trn_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE2TRN;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe3trn_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE3TRN;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe4trn_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE4TRN;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pipe5trn_t usba_t<base, per, rvec, d0vec, d1vec>::PIPE5TRN;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::devadd0_t usba_t<base, per, rvec, d0vec, d1vec>::DEVADD0;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::devadd1_t usba_t<base, per, rvec, d0vec, d1vec>::DEVADD1;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::devadd2_t usba_t<base, per, rvec, d0vec, d1vec>::DEVADD2;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::devadd3_t usba_t<base, per, rvec, d0vec, d1vec>::DEVADD3;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::devadd4_t usba_t<base, per, rvec, d0vec, d1vec>::DEVADD4;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::devadd5_t usba_t<base, per, rvec, d0vec, d1vec>::DEVADD5;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::devadd6_t usba_t<base, per, rvec, d0vec, d1vec>::DEVADD6;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::devadd7_t usba_t<base, per, rvec, d0vec, d1vec>::DEVADD7;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::devadd8_t usba_t<base, per, rvec, d0vec, d1vec>::DEVADD8;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::devadd9_t usba_t<base, per, rvec, d0vec, d1vec>::DEVADD9;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::devadda_t usba_t<base, per, rvec, d0vec, d1vec>::DEVADDA;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::lpctrl_t usba_t<base, per, rvec, d0vec, d1vec>::LPCTRL;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::lpsts_t usba_t<base, per, rvec, d0vec, d1vec>::LPSTS;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::bcctrl_t usba_t<base, per, rvec, d0vec, d1vec>::BCCTRL;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pl1ctrl1_t usba_t<base, per, rvec, d0vec, d1vec>::PL1CTRL1;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::pl1ctrl2_t usba_t<base, per, rvec, d0vec, d1vec>::PL1CTRL2;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::hl1ctrl1_t usba_t<base, per, rvec, d0vec, d1vec>::HL1CTRL1;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::hl1ctrl2_t usba_t<base, per, rvec, d0vec, d1vec>::HL1CTRL2;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::dpusr0r_t  usba_t<base, per, rvec, d0vec, d1vec>::DPUSR0R;
+	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec> typename usba_t<base, per, rvec, d0vec, d1vec>::dpusr1r_t  usba_t<base, per, rvec, d0vec, d1vec>::DPUSR1R;
 }

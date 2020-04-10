@@ -29,7 +29,8 @@ namespace device {
 			@brief  レシーブ FIFO データレジスタ (FRDR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x0A> FRDR;
+		typedef rw8_t<base + 0x0A> frdr_t;
+		static frdr_t FRDR;
 
 
 		//-----------------------------------------------------------------//
@@ -37,7 +38,8 @@ namespace device {
 			@brief  トランスミット FIFO データレジスタ (FTDR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x06> FTDR;
+		typedef rw8_t<base + 0x06> ftdr_t;
+		static ftdr_t FTDR;
 
 
 		//-----------------------------------------------------------------//
@@ -114,7 +116,8 @@ namespace device {
 			@brief  ビットレートレジスタ (BRR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x02> BRR;
+		typedef rw8_t<base + 0x02> brr_t;
+		static brr_t BRR;
 
 
 		//-----------------------------------------------------------------//
@@ -124,7 +127,8 @@ namespace device {
 					※SEMR.MDDRS = 1 の場合に有効
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x02> MDDR;
+		typedef rw8_t<base + 0x02> mddr_t;
+		static mddr_t MDDR;
 
 
 		//-----------------------------------------------------------------//
@@ -282,4 +286,18 @@ namespace device {
 	typedef scif_t<0x000D0040, peripheral::SCIF10, ICU::VECTOR::TXIF10, ICU::VECTOR::RXIF10> SCIF10;
 	typedef scif_t<0x000D0060, peripheral::SCIF11, ICU::VECTOR::TXIF11, ICU::VECTOR::RXIF11> SCIF11;
 #endif
+
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::frdr_t scif_t<base, t, txv, rxv>::FRDR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::ftdr_t scif_t<base, t, txv, rxv>::FTDR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::smr_t scif_t<base, t, txv, rxv>::SMR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::scr_t scif_t<base, t, txv, rxv>::SCR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::fsr_t scif_t<base, t, txv, rxv>::FSR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::brr_t scif_t<base, t, txv, rxv>::BRR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::mddr_t scif_t<base, t, txv, rxv>::MDDR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::fcr_t scif_t<base, t, txv, rxv>::FCR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::fdr_t scif_t<base, t, txv, rxv>::FDR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::sptr_t scif_t<base, t, txv, rxv>::SPTR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::lsr_t scif_t<base, t, txv, rxv>::LSR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::ftcr_t scif_t<base, t, txv, rxv>::FTCR;
+	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, t, txv, rxv>::semr_t scif_t<base, t, txv, rxv>::SEMR;
 }

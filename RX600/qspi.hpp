@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -30,7 +31,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct spcr_t : public rw8_t<ofs> {
+		struct spcr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -43,7 +44,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> SPE;
 			bit_rw_t<io_, bitpos::B7> SPRIE;
 		};
-		static spcr_t<base + 0x00> SPCR;
+		typedef spcr_t_<base + 0x00> spcr_t;
+		static spcr_t SPCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -53,7 +55,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct sslp_t : public rw8_t<ofs> {
+		struct sslp_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -62,7 +64,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> SSLP;
 		};
-		static sslp_t<base + 0x01> SSLP;
+		typedef sslp_t_<base + 0x01> sslp_t;
+		static sslp_t SSLP;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -72,7 +75,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct sppcr_t : public rw8_t<ofs> {
+		struct sppcr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -85,7 +88,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>	MOIFV;
 			bit_rw_t<io_, bitpos::B5>	MOIFE;
 		};
-		static sppcr_t<base + 0x02> SPPCR;
+		typedef sppcr_t_<base + 0x02> sppcr_t;
+		static sppcr_t SPPCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -95,7 +99,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct spsr_t : public rw8_t<ofs> {
+		struct spsr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -107,7 +111,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> TREND;
 			bit_rw_t<io_, bitpos::B7> SPRFF;
 		};
-		static spsr_t<base + 0x03> SPSR;
+		typedef spsr_t_<base + 0x03> spsr_t;
+		static spsr_t SPSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -116,9 +121,12 @@ namespace device {
 			@param[in]	ofs	レジスター・オフセット
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x04> SPDR;
-		static rw16_t<base + 0x04> SPDR16;
-		static rw8_t<base + 0x04> SPDR8;
+		typedef rw32_t<base + 0x04> spdr_t;
+		static spdr_t SPDR;
+		typedef rw16_t<base + 0x04> spdr16_t;
+		static spdr16_t SPDR16;
+		typedef rw8_t<base + 0x04> spdr8_t;
+		static spdr8_t SPDR8;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -128,7 +136,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct spscr_t : public rw8_t<ofs> {
+		struct spscr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -137,7 +145,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> SPSC;
 		};
-		static spscr_t<base + 0x08> SPSCR;
+		typedef spscr_t_<base + 0x08> spscr_t;
+		static spscr_t SPSCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -147,7 +156,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct spssr_t : public rw8_t<ofs> {
+		struct spssr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -156,7 +165,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> SPSS;
 		};
-		static spssr_t<base + 0x09> SPSSR;
+		typedef spssr_t_<base + 0x09> spssr_t;
+		static spssr_t SPSSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -164,7 +174,8 @@ namespace device {
 			@brief  QSPI ビットレートレジスタ（SPBR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<base + 0x0A> SPBR;
+		typedef rw8_t<base + 0x0A> spbr_t;
+		static spbr_t SPBR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -174,7 +185,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct spdcr_t : public rw8_t<ofs> {
+		struct spdcr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -183,7 +194,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>  TXDMY;
 		};
-		static spdcr_t<base + 0x0B> SPDCR;
+		typedef spdcr_t_<base + 0x0B> spdcr_t;
+		static spdcr_t SPDCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -193,7 +205,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct spckd_t : public rw8_t<ofs> {
+		struct spckd_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -202,7 +214,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> SCKDL;
 		};
-		static spckd_t<base + 0x0C> SPCKD;
+		typedef spckd_t_<base + 0x0C> spckd_t;
+		static spckd_t SPCKD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -212,7 +225,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct sslnd_t : public rw8_t<ofs> {
+		struct sslnd_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -221,7 +234,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> SLNDL;
 		};
-		static sslnd_t<base + 0x0D> SSLND;
+		typedef sslnd_t_<base + 0x0D> sslnd_t;
+		static sslnd_t SSLND;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -231,7 +245,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct spnd_t : public rw8_t<ofs> {
+		struct spnd_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -240,7 +254,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> SPNDL;
 		};
-		static spnd_t<base + 0x0E> SPND;
+		typedef spnd_t_<base + 0x0E> spnd_t;
+		static spnd_t SPND;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -250,7 +265,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct spcmd_t : public rw16_t<ofs> {
+		struct spcmd_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -269,10 +284,14 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>   SLNDEN;
 			bit_rw_t <io_, bitpos::B15>   SCKDEN;
 		};
-		static spcmd_t<base + 0x10> SPCMD0;
-		static spcmd_t<base + 0x12> SPCMD1;
-		static spcmd_t<base + 0x14> SPCMD2;
-		static spcmd_t<base + 0x16> SPCMD3;
+		typedef spcmd_t_<base + 0x10> spcmd0_t;
+		static spcmd0_t SPCMD0;
+		typedef spcmd_t_<base + 0x12> spcmd1_t;
+		static spcmd1_t SPCMD1;
+		typedef spcmd_t_<base + 0x14> spcmd2_t;
+		static spcmd2_t SPCMD2;
+		typedef spcmd_t_<base + 0x16> spcmd3_t;
+		static spcmd3_t SPCMD3;
 
 
 		//-----------------------------------------------------------------//
@@ -303,4 +322,23 @@ namespace device {
 	};
 
 	typedef qspi_t<0x00089E00, peripheral::QSPI, ICU::VECTOR::SPRI, ICU::VECTOR::SPTI>  QSPI;
+
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spcr_t qspi_t<base, per, rxv, txv>::SPCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::sslp_t qspi_t<base, per, rxv, txv>::SSLP;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::sppcr_t qspi_t<base, per, rxv, txv>::SPPCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spsr_t qspi_t<base, per, rxv, txv>::SPSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spdr_t qspi_t<base, per, rxv, txv>::SPDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spdr16_t qspi_t<base, per, rxv, txv>::SPDR16;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spdr8_t qspi_t<base, per, rxv, txv>::SPDR8;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spscr_t qspi_t<base, per, rxv, txv>::SPSCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spssr_t qspi_t<base, per, rxv, txv>::SPSSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spbr_t qspi_t<base, per, rxv, txv>::SPBR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spdcr_t qspi_t<base, per, rxv, txv>::SPDCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spckd_t qspi_t<base, per, rxv, txv>::SPCKD;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::sslnd_t qspi_t<base, per, rxv, txv>::SSLND;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spnd_t qspi_t<base, per, rxv, txv>::SPND;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spcmd0_t qspi_t<base, per, rxv, txv>::SPCMD0;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spcmd1_t qspi_t<base, per, rxv, txv>::SPCMD1;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spcmd2_t qspi_t<base, per, rxv, txv>::SPCMD2;
+	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv> typename qspi_t<base, per, rxv, txv>::spcmd3_t qspi_t<base, per, rxv, txv>::SPCMD3;
 }

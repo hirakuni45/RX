@@ -29,7 +29,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct ctlr_t : public rw16_t<ofs> {
+		struct ctlr_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -47,7 +47,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B11, 2>  BOM;
 			bit_rw_t <io_, bitpos::B13>     RBOC;
 		};
-		static ctlr_t<base + 0x0640> CTLR;
+		typedef ctlr_t_<base + 0x0640> ctlr_t;
+		static ctlr_t CTLR;
 
 
 		//-----------------------------------------------------------------//
@@ -57,7 +58,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct bcr_t : public rw32_t<ofs> {
+		struct bcr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -70,7 +71,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 10> BRP;
 			bits_rw_t<io_, bitpos::B28, 4>  TSEG1;
 		};
-		static bcr_t<base + 0x0644> BCR;
+		typedef bcr_t_<base + 0x0644> bcr_t;
+		static bcr_t BCR;
 
 
 		//-----------------------------------------------------------------//
@@ -80,7 +82,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct mkrk_t : public rw32_t<ofs> {
+		struct mkrk_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -90,14 +92,22 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  18>  EID;
 			bits_rw_t<io_, bitpos::B18, 11>  SID;
 		};
-		static mkrk_t<base + 0x0200> MKR0;
-		static mkrk_t<base + 0x0204> MKR1;
-		static mkrk_t<base + 0x0208> MKR2;
-		static mkrk_t<base + 0x020C> MKR3;
-		static mkrk_t<base + 0x0210> MKR4;
-		static mkrk_t<base + 0x0214> MKR5;
-		static mkrk_t<base + 0x0218> MKR6;
-		static mkrk_t<base + 0x021C> MKR7;
+		typedef mkrk_t_<base + 0x0200> mkr0_t;
+		static mkr0_t MKR0;
+		typedef mkrk_t_<base + 0x0204> mkr1_t;
+		static mkr1_t MKR1;
+		typedef mkrk_t_<base + 0x0208> mkr2_t;
+		static mkr2_t MKR2;
+		typedef mkrk_t_<base + 0x020C> mkr3_t;
+		static mkr3_t MKR3;
+		typedef mkrk_t_<base + 0x0210> mkr4_t;
+		static mkr4_t MKR4;
+		typedef mkrk_t_<base + 0x0214> mkr5_t;
+		static mkr5_t MKR5;
+		typedef mkrk_t_<base + 0x0218> mkr6_t;
+		static mkr6_t MKR6;
+		typedef mkrk_t_<base + 0x021C> mkr7_t;
+		static mkr7_t MKR7;
 
 
 		//-----------------------------------------------------------------//
@@ -107,7 +117,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct fidcrx_t : public rw32_t<ofs> {
+		struct fidcrx_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -119,8 +129,10 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30>      RTR;
 			bit_rw_t <io_, bitpos::B31>      IDE;
 		};
-		static fidcrx_t<base + 0x0220> FIDCR0;
-		static fidcrx_t<base + 0x0224> FIDCR1;
+		typedef fidcrx_t_<base + 0x0220> fidcr0_t;
+		static fidcr0_t FIDCR0;
+		typedef fidcrx_t_<base + 0x0224> fidcr1_t;
+		static fidcr1_t FIDCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -130,7 +142,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct mbn_t : public rw32_t<ofs> {
+		struct mbn_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -170,7 +182,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30>  MB30;
 			bit_rw_t <io_, bitpos::B31>  MB31;
 		};
-		static mbn_t<base + 0x0228> MKIVLR;
+		typedef mbn_t_<base + 0x0228> mkivlr_t;
+		static mkivlr_t MKIVLR;
 
 /// 構成を検討中・・・
 #if 0
@@ -181,7 +194,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct mbx_t : public rw32_t<ofs> {
+		struct mbx_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -193,7 +206,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30>      RTR;
 			bit_rw_t <io_, bitpos::B31>      IDE;
 		};
-///		static mbx_t<base + 0x0000> MB0;
+///		typedef mbx_t_<base + 0x0000> mb0_t;
+		static mb0_t MB0;
 #endif
 
 
@@ -203,7 +217,8 @@ namespace device {
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
-		static mbn_t<base + 0x022C> MIER;
+		typedef mbn_t_<base + 0x022C> mier_t;
+		static mier_t MIER;
 
 #if 0
 		//-----------------------------------------------------------------//
@@ -213,7 +228,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct mctln_t : public rw8_t<ofs> {
+		struct mctln_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -225,7 +240,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30>      RTR;
 			bit_rw_t <io_, bitpos::B31>      IDE;
 		};
-		static mctln_t<base + 0x0620> MCTL0;
+		typedef mctln_t_<base + 0x0620> mctl0_t;
+		static mctl0_t MCTL0;
 #endif
 
 
@@ -236,7 +252,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct rfcr_t : public rw8_t<ofs> {
+		struct rfcr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -250,7 +266,8 @@ namespace device {
 			bit_ro_t <io_, bitpos::B6>      RFWST;
 			bit_ro_t <io_, bitpos::B7>      RFEST;
 		};
-		static rfcr_t<base + 0x0648> RFCR;
+		typedef rfcr_t_<base + 0x0648> rfcr_t;
+		static rfcr_t RFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -258,7 +275,8 @@ namespace device {
 			@brief  受信 FIFO ポインタ制御レジスタ（ RFPCR ）
 		*/
 		//-----------------------------------------------------------------//
-		static wo8_t<base + 0x0649>  RFPCR;
+		typedef wo8_t<base + 0x0649> rfpcr_t;
+		static rfpcr_t RFPCR;
 
 
 		//-----------------------------------------------------------------//
@@ -268,7 +286,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct tfcr_t : public rw8_t<ofs> {
+		struct tfcr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -280,7 +298,8 @@ namespace device {
 			bit_ro_t <io_, bitpos::B6>      TFFST;
 			bit_ro_t <io_, bitpos::B7>      TFEST;
 		};
-		static tfcr_t<base + 0x064A> TFCR;
+		typedef tfcr_t_<base + 0x064A> tfcr_t;
+		static tfcr_t TFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -288,7 +307,8 @@ namespace device {
 			@brief  送信 FIFO ポインタ制御レジスタ（ TFPCR ）
 		*/
 		//-----------------------------------------------------------------//
-		static wo8_t<base + 0x064B>  TFPCR;
+		typedef wo8_t<base + 0x064B> tfpcr_t;
+		static tfpcr_t TFPCR;
 
 
 		//-----------------------------------------------------------------//
@@ -298,7 +318,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct str_t : public ro16_t<ofs> {
+		struct str_t_ : public ro16_t<ofs> {
 			typedef ro16_t<ofs> in_;
 			using in_::operator ();
 
@@ -318,7 +338,8 @@ namespace device {
 			bit_ro_t <in_, bitpos::B13>  TRMST;
 			bit_ro_t <in_, bitpos::B14>  RECST;
 		};
-		static str_t<base + 0x0642> STR;
+		typedef str_t_<base + 0x0642> str_t;
+		static str_t STR;
 
 
 		//-----------------------------------------------------------------//
@@ -328,7 +349,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct msmr_t : public rw8_t<ofs> {
+		struct msmr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -337,7 +358,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  MBSM;
 		};
-		static msmr_t<base + 0x0654> MSMR;
+		typedef msmr_t_<base + 0x0654> msmr_t;
+		static msmr_t MSMR;
 
 
 		//-----------------------------------------------------------------//
@@ -347,7 +369,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct mssr_t : public rw8_t<ofs> {
+		struct mssr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -357,7 +379,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 5>  MBNST;
 			bit_rw_t <io_, bitpos::B7>     SEST;
 		};
-		static mssr_t<base + 0x0652> MSSR;
+		typedef mssr_t_<base + 0x0652> mssr_t;
+		static mssr_t MSSR;
 
 
 		//-----------------------------------------------------------------//
@@ -365,7 +388,8 @@ namespace device {
 			@brief  チャネルサーチサポートレジスタ（ CSSR ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x0651>  CSSR;
+		typedef rw8_t<base + 0x0651> cssr_t;
+		static cssr_t CSSR;
 
 
 		//-----------------------------------------------------------------//
@@ -373,7 +397,8 @@ namespace device {
 			@brief  アクセプタンスフィルタサポートレジスタ（ AFSR ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x0656>  AFSR;
+		typedef rw16_t<base + 0x0656> afsr_t;
+		static afsr_t AFSR;
 
 
 		//-----------------------------------------------------------------//
@@ -383,7 +408,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct eier_t : public rw8_t<ofs> {
+		struct eier_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -399,7 +424,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  OLIE;
 			bit_rw_t<io_, bitpos::B7>  BLIE;
 		};
-		static eier_t<base + 0x064C> EIER;
+		typedef eier_t_<base + 0x064C> eier_t;
+		static eier_t EIER;
 
 
 		//-----------------------------------------------------------------//
@@ -409,7 +435,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct eifr_t : public rw8_t<ofs> {
+		struct eifr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -425,7 +451,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  OLIF;
 			bit_rw_t<io_, bitpos::B7>  BLIF;
 		};
-		static eifr_t<base + 0x064D> EIFR;
+		typedef eifr_t_<base + 0x064D> eifr_t;
+		static eifr_t EIFR;
 
 
 		//-----------------------------------------------------------------//
@@ -433,7 +460,8 @@ namespace device {
 			@brief  受信エラーカウントレジスタ（ RECR ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x064E>  RECR;
+		typedef rw8_t<base + 0x064E> recr_t;
+		static recr_t RECR;
 
 
 		//-----------------------------------------------------------------//
@@ -441,7 +469,8 @@ namespace device {
 			@brief  送信エラーカウントレジスタ（ TECR ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x064F>  TECR;
+		typedef rw8_t<base + 0x064F> tecr_t;
+		static tecr_t TECR;
 
 
 		//-----------------------------------------------------------------//
@@ -451,7 +480,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct ecsr_t : public rw8_t<ofs> {
+		struct ecsr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -467,7 +496,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  ADEF;
 			bit_rw_t<io_, bitpos::B7>  EDPM;
 		};
-		static ecsr_t<base + 0x0650> ECSR;
+		typedef ecsr_t_<base + 0x0650> ecsr_t;
+		static ecsr_t ECSR;
 
 
 		//-----------------------------------------------------------------//
@@ -475,7 +505,8 @@ namespace device {
 			@brief  タイムスタンプレジスタ（ TSR ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x0654>  TSR;
+		typedef rw16_t<base + 0x0654> tsr_t;
+		static tsr_t TSR;
 
 
 		//-----------------------------------------------------------------//
@@ -485,7 +516,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct tcr_t : public rw8_t<ofs> {
+		struct tcr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -495,7 +526,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>     TSTE;
 			bits_rw_t<io_, bitpos::B1, 2>  TSTM;
 		};
-		static tcr_t<base + 0x0658> TCR;
+		typedef tcr_t_<base + 0x0658> tcr_t;
+		static tcr_t TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -581,7 +613,7 @@ namespace device {
 	template <uint32_t base, peripheral per,
 		ICU::VECTOR_SELB rxf, ICU::VECTOR_SELB txf, ICU::VECTOR_SELB rxm, ICU::VECTOR_SELB txm,
 		ICU::VECTOR_BE0 ers>
-	struct can_seli_t : can_t<base, per> {
+	struct can_seli_t_ : can_t<base, per> {
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -628,19 +660,56 @@ namespace device {
 		static ICU::VECTOR_BE0 get_ers_vec() { return ers; }
 	};
 
-	typedef can_seli_t<0x00090200, peripheral::CAN0,
+	typedef can_seli_t_<0x00090200, peripheral::CAN0,
 		ICU::VECTOR_SELB::RXF0, ICU::VECTOR_SELB::TXF0,
 		ICU::VECTOR_SELB::RXM0, ICU::VECTOR_SELB::TXM0, ICU::VECTOR_BE0::ERS0> CAN0;
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
-	typedef can_seli_t<0x00091200, peripheral::CAN1,
+	typedef can_seli_t_<0x00091200, peripheral::CAN1,
 		ICU::VECTOR_SELB::RXF1, ICU::VECTOR_SELB::TXF1,
 		ICU::VECTOR_SELB::RXM1, ICU::VECTOR_SELB::TXM1, ICU::VECTOR_BE0::ERS1> CAN1;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef can_seli_t<0x00092200, peripheral::CAN2,
+	typedef can_seli_t_<0x00092200, peripheral::CAN2,
 		ICU::VECTOR_SELB::RXF2, ICU::VECTOR_SELB::TXF2,
 		ICU::VECTOR_SELB::RXM2, ICU::VECTOR_SELB::TXM2, ICU::VECTOR_BE0::ERS2> CAN2;
 #endif
 #endif
 // note: RX65x CAN0, CAN1
+
+	template <uint32_t base, peripheral per> typename can_t<base, per>::ctlr_t can_t<base, per>::CTLR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::bcr_t can_t<base, per>::BCR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mkr0_t can_t<base, per>::MKR0;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mkr1_t can_t<base, per>::MKR1;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mkr2_t can_t<base, per>::MKR2;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mkr3_t can_t<base, per>::MKR3;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mkr4_t can_t<base, per>::MKR4;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mkr5_t can_t<base, per>::MKR5;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mkr6_t can_t<base, per>::MKR6;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mkr7_t can_t<base, per>::MKR7;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::fidcr0_t can_t<base, per>::FIDCR0;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::fidcr1_t can_t<base, per>::FIDCR1;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mkivlr_t can_t<base, per>::MKIVLR;
+#if 0
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mb0_t can_t<base, per>::MB0;
+#endif
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mier_t can_t<base, per>::MIER;
+#if 0
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mctl0_t can_t<base, per>::MCTL0;
+#endif
+	template <uint32_t base, peripheral per> typename can_t<base, per>::rfcr_t can_t<base, per>::RFCR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::rfpcr_t can_t<base, per>::RFPCR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::tfcr_t can_t<base, per>::TFCR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::tfpcr_t can_t<base, per>::TFPCR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::str_t can_t<base, per>::STR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::msmr_t can_t<base, per>::MSMR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::mssr_t can_t<base, per>::MSSR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::cssr_t can_t<base, per>::CSSR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::afsr_t can_t<base, per>::AFSR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::eier_t can_t<base, per>::EIER;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::eifr_t can_t<base, per>::EIFR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::recr_t can_t<base, per>::RECR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::tecr_t can_t<base, per>::TECR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::ecsr_t can_t<base, per>::ECSR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::tsr_t can_t<base, per>::TSR;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::tcr_t can_t<base, per>::TCR;
 }

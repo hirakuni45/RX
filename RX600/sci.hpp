@@ -31,7 +31,8 @@ namespace device {
 			@brief  レシーブデータレジスタ (RDR)
 		*/
 		//-----------------------------------------------------------------//
-		static ro8_t<base + 0x05> RDR;
+		typedef ro8_t<base + 0x05> rdr_t;
+		static rdr_t RDR;
 
 
 		//-----------------------------------------------------------------//
@@ -39,9 +40,12 @@ namespace device {
 			@brief  レシーブデータレジスタ H 、 L 、 HL (RDRH 、 RDRL 、 RDRHL)
 		*/
 		//-----------------------------------------------------------------//
-		static ro8_t<base + 0x10> RDRH;
-		static ro8_t<base + 0x11> RDRL;
-		static ro16_t<base + 0x10> RDRHL;
+		typedef ro8_t<base + 0x10> rdrh_t;
+		static rdrh_t RDRH;
+		typedef ro8_t<base + 0x11> rdrl_t;
+		static rdrl_t RDRL;
+		typedef ro16_t<base + 0x10> rdrhl_t;
+		static rdrhl_t RDRHL;
 
 
 		//-----------------------------------------------------------------//
@@ -76,7 +80,8 @@ namespace device {
 			@brief  ビットレートレジスタ (BRR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x01> BRR;
+		typedef rw8_t<base + 0x01> brr_t;
+		static brr_t BRR;
 
 
 		//-----------------------------------------------------------------//
@@ -84,7 +89,8 @@ namespace device {
 			@brief	モジュレーションデューティレジスタ（MDDR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x12> MDDR;
+		typedef rw8_t<base + 0x12> mddr_t;
+		static mddr_t MDDR;
 
 
 		//-----------------------------------------------------------------//
@@ -115,7 +121,8 @@ namespace device {
 			@brief  トランスミットデータレジスタ (TDR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x03> TDR;
+		typedef rw8_t<base + 0x03> tdr_t;
+		static tdr_t TDR;
 
 
 		//-----------------------------------------------------------------//
@@ -335,6 +342,24 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static INT get_te_vec() { return tev; }
 	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::rdr_t sci_t<base, per, txv, rxv, INT, tev>::RDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::rdrh_t  sci_t<base, per, txv, rxv, INT, tev>::RDRH;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::rdrl_t  sci_t<base, per, txv, rxv, INT, tev>::RDRL;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::rdrhl_t sci_t<base, per, txv, rxv, INT, tev>::RDRHL;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::smr_t   sci_t<base, per, txv, rxv, INT, tev>::SMR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::brr_t   sci_t<base, per, txv, rxv, INT, tev>::BRR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::mddr_t  sci_t<base, per, txv, rxv, INT, tev>::MDDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::scr_t   sci_t<base, per, txv, rxv, INT, tev>::SCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::tdr_t   sci_t<base, per, txv, rxv, INT, tev>::TDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::ssr_t   sci_t<base, per, txv, rxv, INT, tev>::SSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::scmr_t  sci_t<base, per, txv, rxv, INT, tev>::SCMR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::semr_t  sci_t<base, per, txv, rxv, INT, tev>::SEMR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::snfr_t  sci_t<base, per, txv, rxv, INT, tev>::SNFR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::simr1_t sci_t<base, per, txv, rxv, INT, tev>::SIMR1;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::simr2_t sci_t<base, per, txv, rxv, INT, tev>::SIMR2;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::simr3_t sci_t<base, per, txv, rxv, INT, tev>::SIMR3;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::sisr_t  sci_t<base, per, txv, rxv, INT, tev>::SISR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename sci_t<base, per, txv, rxv, INT, tev>::spmr_t  sci_t<base, per, txv, rxv, INT, tev>::SPMR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -387,6 +412,8 @@ namespace device {
 		};
 		static cr0_t CR0;
 	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename scih_t<base, per, txv, rxv, INT, tev>::esmer_t scih_t<base, per, txv, rxv, INT, tev>::ESMER;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev> typename scih_t<base, per, txv, rxv, INT, tev>::cr0_t scih_t<base, per, txv, rxv, INT, tev>::CR0;
 
 
 #if defined(SIG_RX24T)

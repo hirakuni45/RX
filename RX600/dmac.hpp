@@ -28,7 +28,8 @@ namespace device {
 			@brief  DMA 転送元アドレスレジスタ (DMSAR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x00> DMSAR;
+		typedef rw32_t<base + 0x00> dmsar_t;
+		static dmsar_t DMSAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -36,7 +37,8 @@ namespace device {
 			@brief  DMA 転送先アドレスレジスタ (DMDAR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x04> DMDAR;
+		typedef rw32_t<base + 0x04> dmdar_t;
+		static dmdar_t DMDAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -44,7 +46,8 @@ namespace device {
 			@brief  DMA 転送カウントレジスタ (DMCRA)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x08> DMCRA;
+		typedef rw32_t<base + 0x08> dmcra_t;
+		static dmcra_t DMCRA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -52,7 +55,8 @@ namespace device {
 			@brief  DMA ブロック転送カウントレジスタ (DMCRB)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw16_t<base + 0x0C> DMCRB;
+		typedef rw16_t<base + 0x0C> dmcrb_t;
+		static dmcrb_t DMCRB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -62,7 +66,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct dmtmd_t : public rw16_t<ofs> {
+		struct dmtmd_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -74,7 +78,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2>   DTS;
 			bits_rw_t<io_, bitpos::B14, 2>   MD;
 		};
-		static dmtmd_t<base + 0x10> DMTMD;
+		typedef dmtmd_t_<base + 0x10> dmtmd_t;
+		static dmtmd_t DMTMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -84,7 +89,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct dmint_t : public rw8_t<ofs> {
+		struct dmint_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -97,7 +102,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3>   ESIE;
 			bit_rw_t<io_, bitpos::B4>   DTIE;
 		};
-		static dmint_t<base + 0x13> DMINT;
+		typedef dmint_t_<base + 0x13> dmint_t;
+		static dmint_t DMINT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -107,7 +113,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct dmamd_t : public rw16_t<ofs> {
+		struct dmamd_t_ : public rw16_t<ofs> {
 			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -119,7 +125,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  5>   SARA;
 			bits_rw_t<io_, bitpos::B14, 2>   SM;
 		};
-		static dmamd_t<base + 0x14> DMAMD;
+		typedef dmamd_t_<base + 0x14> dmamd_t;
+		static dmamd_t DMAMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -127,7 +134,8 @@ namespace device {
 			@brief  DMA オフセットレジスタ (DMOFR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x18> DMOFR;
+		typedef rw32_t<base + 0x18> dmofr_t;
+		static dmofr_t DMOFR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -137,7 +145,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct dmcnt_t : public rw8_t<ofs> {
+		struct dmcnt_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -146,7 +154,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>   DTE;
 		};
-		static dmcnt_t<base + 0x1C> DMCNT;
+		typedef dmcnt_t_<base + 0x1C> dmcnt_t;
+		static dmcnt_t DMCNT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -156,7 +165,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct dmreq_t : public rw8_t<ofs> {
+		struct dmreq_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -166,7 +175,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>   SWREQ;
 			bit_rw_t<io_, bitpos::B4>   CLRS;
 		};
-		static dmreq_t<base + 0x1D> DMREQ;
+		typedef dmreq_t_<base + 0x1D> dmreq_t;
+		static dmreq_t DMREQ;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -176,7 +186,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct dmsts_t : public rw8_t<ofs> {
+		struct dmsts_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -187,7 +197,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>   DTIF;
 			bit_rw_t<io_, bitpos::B7>   ACT;
 		};
-		static dmsts_t<base + 0x1E> DMSTS;
+		typedef dmsts_t_<base + 0x1E> dmsts_t;
+		static dmsts_t DMSTS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -197,7 +208,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct dmcsl_t : public rw8_t<ofs> {
+		struct dmcsl_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -206,7 +217,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>   DISEL;
 		};
-		static dmcsl_t<base + 0x1F> DMCSL;
+		typedef dmcsl_t_<base + 0x1F> dmcsl_t;
+		static dmcsl_t DMCSL;
 
 
 		//-----------------------------------------------------------------//
@@ -227,6 +239,19 @@ namespace device {
 		static ICU::VECTOR get_vec() { return vec; }
 	};
 
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmsar_t dmac_t<base, t, vec>::DMSAR;
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmdar_t dmac_t<base, t, vec>::DMDAR;
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmcra_t dmac_t<base, t, vec>::DMCRA;
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmcrb_t dmac_t<base, t, vec>::DMCRB;
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmtmd_t dmac_t<base, t, vec>::DMTMD;
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmint_t dmac_t<base, t, vec>::DMINT;
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmamd_t dmac_t<base, t, vec>::DMAMD;
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmofr_t dmac_t<base, t, vec>::DMOFR;
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmcnt_t dmac_t<base, t, vec>::DMCNT;
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmreq_t dmac_t<base, t, vec>::DMREQ;
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmsts_t dmac_t<base, t, vec>::DMSTS;
+	template <uint32_t base, peripheral t, ICU::VECTOR vec> typename dmac_t<base, t, vec>::dmcsl_t dmac_t<base, t, vec>::DMCSL;
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -235,7 +260,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t ofs>
-	struct dmast_t : public rw8_t<ofs> {
+	struct dmast_t_ : public rw8_t<ofs> {
 		typedef rw8_t<ofs> io_;
 		using io_::operator =;
 		using io_::operator ();
@@ -244,7 +269,8 @@ namespace device {
 
 		bit_rw_t<io_, bitpos::B0>   DMST;
 	};
-	static dmast_t<0x00082200> DMAST;
+	typedef dmast_t_<0x00082200> dmast_t;
+	static dmast_t DMAST;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -254,7 +280,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t ofs>
-	struct dmist_t : public ro8_t<ofs> {
+	struct dmist_t_ : public ro8_t<ofs> {
 		typedef ro8_t<ofs> in_;
 		using in_::operator ();
 
@@ -263,7 +289,8 @@ namespace device {
 		bit_ro_t<in_, bitpos::B6>   DMIS6;
 		bit_ro_t<in_, bitpos::B7>   DMIS7;
 	};
-	static dmist_t<0x00082204> DMIST;
+	typedef dmist_t_<0x00082204> dmist_t;
+	static dmist_t DMIST;
 
 
 	typedef dmac_t<0x00082000, peripheral::DMAC0, ICU::VECTOR::DMAC0I>    DMAC0;

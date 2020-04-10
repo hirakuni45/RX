@@ -28,7 +28,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct dtccr_t : public rw8_t<base> {
+		struct dtccr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -37,7 +37,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B4> RRS;
 		};
-		static dtccr_t<0x00082400> DTCCR;
+		typedef dtccr_t_<0x00082400> dtccr_t;
+		static dtccr_t DTCCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -45,7 +46,8 @@ namespace device {
 			@brief  DTC ベクタベースレジスタ（DTCVBR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<0x00082404> DTCVBR;
+		typedef rw32_t<0x00082404> dtcvbr_t;
+		static dtcvbr_t DTCVBR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -55,7 +57,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct dtcadmod_t : public rw8_t<base> {
+		struct dtcadmod_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -64,7 +66,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> SHORT;
 		};
-		static dtcadmod_t<0x00082408> DTCADMOD;
+		typedef dtcadmod_t_<0x00082408> dtcadmod_t;
+		static dtcadmod_t DTCADMOD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -74,7 +77,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct dtcst_t : public rw8_t<base> {
+		struct dtcst_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -83,7 +86,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> DTCST;
 		};
-		static dtcst_t<0x0008240C> DTCST;
+		typedef dtcst_t_<0x0008240C> dtcst_t;
+		static dtcst_t DTCST;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -93,7 +97,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t base>
-		struct dtcsts_t : public rw16_t<base> {
+		struct dtcsts_t_ : public rw16_t<base> {
 			typedef rw16_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -103,7 +107,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8> VECN;
 			bit_rw_t <io_, bitpos::B15>   ACT;
 		};
-		static dtcsts_t<0x0008240E> DTCSTS;
+		typedef dtcsts_t_<0x0008240E> dtcsts_t;
+		static dtcsts_t DTCSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -116,4 +121,10 @@ namespace device {
 	};
 
 	typedef dtc_t<peripheral::DTC>  DTC;
+
+	template<peripheral per> typename dtc_t<per>::dtccr_t dtc_t<per>::DTCCR;
+	template<peripheral per> typename dtc_t<per>::dtcvbr_t dtc_t<per>::DTCVBR;
+	template<peripheral per> typename dtc_t<per>::dtcadmod_t dtc_t<per>::DTCADMOD;
+	template<peripheral per> typename dtc_t<per>::dtcst_t dtc_t<per>::DTCST;
+	template<peripheral per> typename dtc_t<per>::dtcsts_t dtc_t<per>::DTCSTS;
 }

@@ -28,7 +28,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct elcr_t : public rw8_t<ofs> {
+		struct elcr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -37,7 +37,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  ELCON;
 		};
-		static elcr_t<base + 0x00> ERCR;
+		typedef elcr_t_<base + 0x00> ercr_t;
+		static ercr_t ERCR;
 
 
 		//-----------------------------------------------------------------//
@@ -46,37 +47,68 @@ namespace device {
 					（n = 0、3、4、7、10 ～ 13、15、16、18 ～ 28、33、35 ～ 38、41 ～ 45）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x01>  ELSR0;
-		static rw8_t<base + 0x04>  ELSR3;
-		static rw8_t<base + 0x05>  ELSR4;
-		static rw8_t<base + 0x08>  ELSR7;
-		static rw8_t<base + 0x0B>  ELSR10;
-		static rw8_t<base + 0x0C>  ELSR11;
-		static rw8_t<base + 0x0D>  ELSR12;
-		static rw8_t<base + 0x0E>  ELSR13;
-		static rw8_t<base + 0x10>  ELSR15;
-		static rw8_t<base + 0x11>  ELSR16;
-		static rw8_t<base + 0x13>  ELSR18;
-		static rw8_t<base + 0x14>  ELSR19;
-		static rw8_t<base + 0x15>  ELSR20;
-		static rw8_t<base + 0x16>  ELSR21;
-		static rw8_t<base + 0x17>  ELSR22;
-		static rw8_t<base + 0x18>  ELSR23;
-		static rw8_t<base + 0x19>  ELSR24;
-		static rw8_t<base + 0x1A>  ELSR25;
-		static rw8_t<base + 0x1B>  ELSR26;
-		static rw8_t<base + 0x1C>  ELSR27;
-		static rw8_t<base + 0x1D>  ELSR28;
-		static rw8_t<base + 0x31>  ELSR33;
-		static rw8_t<base + 0x33>  ELSR35;
-		static rw8_t<base + 0x34>  ELSR36;
-		static rw8_t<base + 0x35>  ELSR37;
-		static rw8_t<base + 0x36>  ELSR38;
-		static rw8_t<base + 0x39>  ELSR41;
-		static rw8_t<base + 0x3A>  ELSR42;
-		static rw8_t<base + 0x3B>  ELSR43;
-		static rw8_t<base + 0x3C>  ELSR44;
-		static rw8_t<base + 0x3D>  ELSR45;
+		typedef rw8_t<base + 0x01> elsr0_t;
+		static elsr0_t ELSR0;
+		typedef rw8_t<base + 0x04> elsr3_t;
+		static elsr3_t ELSR3;
+		typedef rw8_t<base + 0x05> elsr4_t;
+		static elsr4_t ELSR4;
+		typedef rw8_t<base + 0x08> elsr7_t;
+		static elsr7_t ELSR7;
+		typedef rw8_t<base + 0x0B> elsr10_t;
+		static elsr10_t ELSR10;
+		typedef rw8_t<base + 0x0C> elsr11_t;
+		static elsr11_t ELSR11;
+		typedef rw8_t<base + 0x0D> elsr12_t;
+		static elsr12_t ELSR12;
+		typedef rw8_t<base + 0x0E> elsr13_t;
+		static elsr13_t ELSR13;
+		typedef rw8_t<base + 0x10> elsr15_t;
+		static elsr15_t ELSR15;
+		typedef rw8_t<base + 0x11> elsr16_t;
+		static elsr16_t ELSR16;
+		typedef rw8_t<base + 0x13> elsr18_t;
+		static elsr18_t ELSR18;
+		typedef rw8_t<base + 0x14> elsr19_t;
+		static elsr19_t ELSR19;
+		typedef rw8_t<base + 0x15> elsr20_t;
+		static elsr20_t ELSR20;
+		typedef rw8_t<base + 0x16> elsr21_t;
+		static elsr21_t ELSR21;
+		typedef rw8_t<base + 0x17> elsr22_t;
+		static elsr22_t ELSR22;
+		typedef rw8_t<base + 0x18> elsr23_t;
+		static elsr23_t ELSR23;
+		typedef rw8_t<base + 0x19> elsr24_t;
+		static elsr24_t ELSR24;
+		typedef rw8_t<base + 0x1A> elsr25_t;
+		static elsr25_t ELSR25;
+		typedef rw8_t<base + 0x1B> elsr26_t;
+		static elsr26_t ELSR26;
+		typedef rw8_t<base + 0x1C> elsr27_t;
+		static elsr27_t ELSR27;
+		typedef rw8_t<base + 0x1D> elsr28_t;
+		static elsr28_t ELSR28;
+		typedef rw8_t<base + 0x31> elsr33_t;
+		static elsr33_t ELSR33;
+		typedef rw8_t<base + 0x33> elsr35_t;
+		static elsr35_t ELSR35;
+		typedef rw8_t<base + 0x34> elsr36_t;
+		static elsr36_t ELSR36;
+		typedef rw8_t<base + 0x35> elsr37_t;
+		static elsr37_t ELSR37;
+		typedef rw8_t<base + 0x36> elsr38_t;
+		static elsr38_t ELSR38;
+		typedef rw8_t<base + 0x39> elsr41_t;
+		static elsr41_t ELSR41;
+		typedef rw8_t<base + 0x3A> elsr42_t;
+		static elsr42_t ELSR42;
+		typedef rw8_t<base + 0x3B> elsr43_t;
+		static elsr43_t ELSR43;
+		typedef rw8_t<base + 0x3C> elsr44_t;
+		static elsr44_t ELSR44;
+		typedef rw8_t<base + 0x3D> elsr45_t;
+		static elsr45_t ELSR45;
 
 
 		//-----------------------------------------------------------------//
@@ -86,7 +118,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct elopa_t : public rw8_t<ofs> {
+		struct elopa_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -96,7 +128,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 2>  MTU0MD;
 			bits_rw_t<io_, bitpos::B6, 2>  MTU3MD;
 		};
-		static elopa_t<base + 0x1F> ELOPA;
+		typedef elopa_t_<base + 0x1F> elopa_t;
+		static elopa_t ELOPA;
 
 
 		//-----------------------------------------------------------------//
@@ -106,7 +139,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct elopb_t : public rw8_t<ofs> {
+		struct elopb_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -115,7 +148,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  MTU4MD;
 		};
-		static elopb_t<base + 0x20> ELOPB;
+		typedef elopb_t_<base + 0x20> elopb_t;
+		static elopb_t ELOPB;
 
 
 		//-----------------------------------------------------------------//
@@ -125,7 +159,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct elopc_t : public rw8_t<ofs> {
+		struct elopc_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -134,7 +168,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B2, 2>  CMT1MD;
 		};
-		static elopc_t<base + 0x21> ELOPC;
+		typedef elopc_t_<base + 0x21> elopc_t;
+		static elopc_t ELOPC;
 
 
 		//-----------------------------------------------------------------//
@@ -144,7 +179,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct elopd_t : public rw8_t<ofs> {
+		struct elopd_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -156,7 +191,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  TMR2MD;
 			bits_rw_t<io_, bitpos::B6, 2>  TMR3MD;
 		};
-		static elopd_t<base + 0x22> ELOPD;
+		typedef elopd_t_<base + 0x22> elopd_t;
+		static elopd_t ELOPD;
 
 
 		//-----------------------------------------------------------------//
@@ -166,7 +202,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct elopf_t : public rw8_t<ofs> {
+		struct elopf_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -178,7 +214,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  TPU2MD;
 			bits_rw_t<io_, bitpos::B6, 2>  TPU3MD;
 		};
-		static elopf_t<base + 0x3F> ELOPF;
+		typedef elopf_t_<base + 0x3F> elopf_t;
+		static elopf_t ELOPF;
 
 
 		//-----------------------------------------------------------------//
@@ -188,7 +225,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct eloph_t : public rw8_t<ofs> {
+		struct eloph_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -197,7 +234,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  CMTW0MD;
 		};
-		static eloph_t<base + 0x41> ELOPH;
+		typedef eloph_t_<base + 0x41> eloph_t;
+		static eloph_t ELOPH;
 
 
 		//-----------------------------------------------------------------//
@@ -207,7 +245,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct elopi_t : public rw8_t<ofs> {
+		struct elopi_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -217,7 +255,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 3>  GPT0MD;
 			bits_rw_t<io_, bitpos::B4, 3>  GPT1MD;
 		};
-		static elopi_t<base + 0x42> ELOPI;
+		typedef elopi_t_<base + 0x42> elopi_t;
+		static elopi_t ELOPI;
 
 
 		//-----------------------------------------------------------------//
@@ -227,7 +266,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct elopj_t : public rw8_t<ofs> {
+		struct elopj_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -237,7 +276,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 3>  GPT2MD;
 			bits_rw_t<io_, bitpos::B4, 3>  GPT3MD;
 		};
-		static elopj_t<base + 0x43> ELOPJ;
+		typedef elopj_t_<base + 0x43> elopj_t;
+		static elopj_t ELOPJ;
 
 
 		//-----------------------------------------------------------------//
@@ -247,7 +287,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct pgrn_t : public rw8_t<ofs> {
+		struct pgrn_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -263,8 +303,10 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  PGR6;
 			bit_rw_t<io_, bitpos::B7>  PGR7;
 		};
-		static pgrn_t<base + 0x23> PGR1;
-		static pgrn_t<base + 0x24> PGR2;
+		typedef pgrn_t_<base + 0x23> pgr1_t;
+		static pgr1_t PGR1;
+		typedef pgrn_t_<base + 0x24> pgr2_t;
+		static pgr2_t PGR2;
 
 
 		//-----------------------------------------------------------------//
@@ -274,7 +316,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct pgcn_t : public rw8_t<ofs> {
+		struct pgcn_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -285,8 +327,10 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>     PGCOVE;
 			bits_rw_t<io_, bitpos::B4, 3>  PGCO;
 		};
-		static pgcn_t<base + 0x25> PGC1;
-		static pgcn_t<base + 0x26> PGC2;
+		typedef pgcn_t_<base + 0x25> pgc1_t;
+		static pgc1_t PGC1;
+		typedef pgcn_t_<base + 0x26> pgc2_t;
+		static pgc2_t PGC2;
 
 
 		//-----------------------------------------------------------------//
@@ -296,7 +340,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct pdbfn_t : public rw8_t<ofs> {
+		struct pdbfn_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -312,8 +356,10 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  PDBF6;
 			bit_rw_t<io_, bitpos::B7>  PDBF7;
 		};
-		static pdbfn_t<base + 0x27> PDBF1;
-		static pdbfn_t<base + 0x28> PDBF2;
+		typedef pdbfn_t_<base + 0x27> pdbf1_t;
+		static pdbf1_t PDBF1;
+		typedef pdbfn_t_<base + 0x28> pdbf2_t;
+		static pdbf2_t PDBF2;
 
 
 		//-----------------------------------------------------------------//
@@ -323,7 +369,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct peln_t : public rw8_t<ofs> {
+		struct peln_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -334,10 +380,14 @@ namespace device {
 			bits_rw_t<io_, bitpos::B3, 2>  PSP;
 			bits_rw_t<io_, bitpos::B5, 2>  PSM;
 		};
-		static peln_t<base + 0x29> PEL0;
-		static peln_t<base + 0x2A> PEL1;
-		static peln_t<base + 0x2B> PEL2;
-		static peln_t<base + 0x2C> PEL3;
+		typedef peln_t_<base + 0x29> pel0_t;
+		static pel0_t PEL0;
+		typedef peln_t_<base + 0x2A> pel1_t;
+		static pel1_t PEL1;
+		typedef peln_t_<base + 0x2B> pel2_t;
+		static pel2_t PEL2;
+		typedef peln_t_<base + 0x2C> pel3_t;
+		static pel3_t PEL3;
 
 
 		//-----------------------------------------------------------------//
@@ -347,7 +397,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct elsegr_t : public rw8_t<ofs> {
+		struct elsegr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -358,7 +408,60 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  WE;
 			bit_rw_t<io_, bitpos::B7>  WI;	// write-only
 		};
-		static elsegr_t<base + 0x2D> ELSEGR;
+		typedef elsegr_t_<base + 0x2D> elsegr_t;
+		static elsegr_t ELSEGR;
 	};
 	typedef elc_t<0x0008B100> ELC;
+
+	template<uint32_t base> typename elc_t<base>::ercr_t elc_t<base>::ERCR;
+	template<uint32_t base> typename elc_t<base>::elsr0_t elc_t<base>::ELSR0;
+	template<uint32_t base> typename elc_t<base>::elsr3_t elc_t<base>::ELSR3;
+	template<uint32_t base> typename elc_t<base>::elsr4_t elc_t<base>::ELSR4;
+	template<uint32_t base> typename elc_t<base>::elsr7_t elc_t<base>::ELSR7;
+	template<uint32_t base> typename elc_t<base>::elsr10_t elc_t<base>::ELSR10;
+	template<uint32_t base> typename elc_t<base>::elsr11_t elc_t<base>::ELSR11;
+	template<uint32_t base> typename elc_t<base>::elsr12_t elc_t<base>::ELSR12;
+	template<uint32_t base> typename elc_t<base>::elsr13_t elc_t<base>::ELSR13;
+	template<uint32_t base> typename elc_t<base>::elsr15_t elc_t<base>::ELSR15;
+	template<uint32_t base> typename elc_t<base>::elsr16_t elc_t<base>::ELSR16;
+	template<uint32_t base> typename elc_t<base>::elsr18_t elc_t<base>::ELSR18;
+	template<uint32_t base> typename elc_t<base>::elsr19_t elc_t<base>::ELSR19;
+	template<uint32_t base> typename elc_t<base>::elsr20_t elc_t<base>::ELSR20;
+	template<uint32_t base> typename elc_t<base>::elsr21_t elc_t<base>::ELSR21;
+	template<uint32_t base> typename elc_t<base>::elsr22_t elc_t<base>::ELSR22;
+	template<uint32_t base> typename elc_t<base>::elsr23_t elc_t<base>::ELSR23;
+	template<uint32_t base> typename elc_t<base>::elsr24_t elc_t<base>::ELSR24;
+	template<uint32_t base> typename elc_t<base>::elsr25_t elc_t<base>::ELSR25;
+	template<uint32_t base> typename elc_t<base>::elsr26_t elc_t<base>::ELSR26;
+	template<uint32_t base> typename elc_t<base>::elsr27_t elc_t<base>::ELSR27;
+	template<uint32_t base> typename elc_t<base>::elsr28_t elc_t<base>::ELSR28;
+	template<uint32_t base> typename elc_t<base>::elsr33_t elc_t<base>::ELSR33;
+	template<uint32_t base> typename elc_t<base>::elsr35_t elc_t<base>::ELSR35;
+	template<uint32_t base> typename elc_t<base>::elsr36_t elc_t<base>::ELSR36;
+	template<uint32_t base> typename elc_t<base>::elsr37_t elc_t<base>::ELSR37;
+	template<uint32_t base> typename elc_t<base>::elsr38_t elc_t<base>::ELSR38;
+	template<uint32_t base> typename elc_t<base>::elsr41_t elc_t<base>::ELSR41;
+	template<uint32_t base> typename elc_t<base>::elsr42_t elc_t<base>::ELSR42;
+	template<uint32_t base> typename elc_t<base>::elsr43_t elc_t<base>::ELSR43;
+	template<uint32_t base> typename elc_t<base>::elsr44_t elc_t<base>::ELSR44;
+	template<uint32_t base> typename elc_t<base>::elsr45_t elc_t<base>::ELSR45;
+	template<uint32_t base> typename elc_t<base>::elopa_t elc_t<base>::ELOPA;
+	template<uint32_t base> typename elc_t<base>::elopb_t elc_t<base>::ELOPB;
+	template<uint32_t base> typename elc_t<base>::elopc_t elc_t<base>::ELOPC;
+	template<uint32_t base> typename elc_t<base>::elopd_t elc_t<base>::ELOPD;
+	template<uint32_t base> typename elc_t<base>::elopf_t elc_t<base>::ELOPF;
+	template<uint32_t base> typename elc_t<base>::eloph_t elc_t<base>::ELOPH;
+	template<uint32_t base> typename elc_t<base>::elopi_t elc_t<base>::ELOPI;
+	template<uint32_t base> typename elc_t<base>::elopj_t elc_t<base>::ELOPJ;
+	template<uint32_t base> typename elc_t<base>::pgr1_t elc_t<base>::PGR1;
+	template<uint32_t base> typename elc_t<base>::pgr2_t elc_t<base>::PGR2;
+	template<uint32_t base> typename elc_t<base>::pgc1_t elc_t<base>::PGC1;
+	template<uint32_t base> typename elc_t<base>::pgc2_t elc_t<base>::PGC2;
+	template<uint32_t base> typename elc_t<base>::pdbf1_t elc_t<base>::PDBF1;
+	template<uint32_t base> typename elc_t<base>::pdbf2_t elc_t<base>::PDBF2;
+	template<uint32_t base> typename elc_t<base>::pel0_t elc_t<base>::PEL0;
+	template<uint32_t base> typename elc_t<base>::pel1_t elc_t<base>::PEL1;
+	template<uint32_t base> typename elc_t<base>::pel2_t elc_t<base>::PEL2;
+	template<uint32_t base> typename elc_t<base>::pel3_t elc_t<base>::PEL3;
+	template<uint32_t base> typename elc_t<base>::elsegr_t elc_t<base>::ELSEGR;
 }

@@ -84,7 +84,8 @@ namespace device {
 			@brief  CMCNT レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw16_t<base + 0x02> CMCNT;
+		typedef rw16_t<base + 0x02> cmcnt_t;
+		static cmcnt_t CMCNT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -92,7 +93,8 @@ namespace device {
 			@brief  CMCOR レジスタ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw16_t<base + 0x04> CMCOR;
+		typedef rw16_t<base + 0x04> cmcor_t;
+		static cmcor_t CMCOR;
 
 
 		//-----------------------------------------------------------------//
@@ -137,6 +139,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static peripheral get_peripheral() noexcept { return per; }
 	};
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec> typename cmt_t<base, per, VEC, ivec>::cmstr0_t	cmt_t<base, per, VEC, ivec>::CMSTR0;
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec> typename cmt_t<base, per, VEC, ivec>::cmstr1_t	cmt_t<base, per, VEC, ivec>::CMSTR1;
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec> typename cmt_t<base, per, VEC, ivec>::cmcr_t   cmt_t<base, per, VEC, ivec>::CMCR;
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec> typename cmt_t<base, per, VEC, ivec>::cmcnt_t  cmt_t<base, per, VEC, ivec>::CMCNT;
+	template <uint32_t base, peripheral per, typename VEC, VEC ivec> typename cmt_t<base, per, VEC, ivec>::cmcor_t  cmt_t<base, per, VEC, ivec>::CMCOR;
+
 
 
 #if defined(SIG_RX24T) || defined(SIG_RX66T) || defined(SIG_RX72T)

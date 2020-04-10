@@ -33,7 +33,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct fn1accr_t : public rw32_t<base + ofs> {
+		struct fn1accr_t_ : public rw32_t<base + ofs> {
 			typedef rw32_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -42,7 +42,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B11>  FN1ACC;
 		};
-		static fn1accr_t<0x0000> FN1ACCR;
+		typedef fn1accr_t_<0x0000> fn1accr_t;
+		static fn1accr_t FN1ACCR;
 
 
 		//-----------------------------------------------------------------//
@@ -52,7 +53,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct intencr1_t : public rw8_t<base + ofs> {
+		struct intencr1_t_ : public rw8_t<base + ofs> {
 			typedef rw8_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -63,7 +64,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  CMD53WIREN;
 			bit_rw_t<io_, bitpos::B2>  CMD53RIREN;
 		};
-		static intencr1_t<0x0004> INTENCR1;
+		typedef intencr1_t_<0x0004> intencr1_t;
+		static intencr1_t INTENCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -73,7 +75,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct intsr1_t : public rw8_t<base + ofs> {
+		struct intsr1_t_ : public rw8_t<base + ofs> {
 			typedef rw8_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -84,7 +86,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  CMD53W;
 			bit_rw_t<io_, bitpos::B2>  CMD53R;
 		};
-		static intsr1_t<0x0005> INTSR1;
+		typedef intsr1_t_<0x0005> intsr1_t;
+		static intsr1_t INTSR1;
 
 
 		//-----------------------------------------------------------------//
@@ -94,7 +97,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct sdcmdcr_t : public rw8_t<base + ofs> {
+		struct sdcmdcr_t_ : public rw8_t<base + ofs> {
 			typedef rw8_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -107,7 +110,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3>  SDBMODE;
 			bit_rw_t<io_, bitpos::B4>  SDOPCODE;
 		};
-		static sdcmdcr_t<0x0006> SDCMDCR;
+		typedef sdcmdcr_t_<0x0006> sdcmdcr_t;
+		static sdcmdcr_t SDCMDCR;
 
 
 		//-----------------------------------------------------------------//
@@ -117,13 +121,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct sdcadd0r_t : public ro8_t<base + ofs> {
+		struct sdcadd0r_t_ : public ro8_t<base + ofs> {
 			typedef ro8_t<base + ofs> io_;
 			using io_::operator ();
 
 			bits_ro_t<io_, bitpos::B0, 8>  SDCMDACCADD;
 		};
-		static sdcadd0r_t<0x0007> SDCADD0R;
+		typedef sdcadd0r_t_<0x0007> sdcadd0r_t;
+		static sdcadd0r_t SDCADD0R;
 
 
 		//-----------------------------------------------------------------//
@@ -133,13 +138,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct sdcadd1r_t : public ro8_t<base + ofs> {
+		struct sdcadd1r_t_ : public ro8_t<base + ofs> {
 			typedef ro8_t<base + ofs> io_;
 			using io_::operator ();
 
 			bits_ro_t<io_, bitpos::B0, 8>  SDCMDACCADD;
 		};
-		static sdcadd1r_t<0x0008> SDCADD1R;
+		typedef sdcadd1r_t_<0x0008> sdcadd1r_t;
+		static sdcadd1r_t SDCADD1R;
 
 
 		//-----------------------------------------------------------------//
@@ -149,13 +155,14 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct sdcadd2r_t : public ro8_t<base + ofs> {
+		struct sdcadd2r_t_ : public ro8_t<base + ofs> {
 			typedef ro8_t<base + ofs> io_;
 			using io_::operator ();
 
 			bits_ro_t<io_, bitpos::B0, 8>  SDCMDACCADD;
 		};
-		static sdcadd2r_t<0x0009> SDCADD2R;
+		typedef sdcadd2r_t_<0x0009> sdcadd2r_t;
+		static sdcadd2r_t SDCADD2R;
 
 
 		//-----------------------------------------------------------------//
@@ -165,7 +172,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct sdsicr1_t : public rw8_t<base + ofs> {
+		struct sdsicr1_t_ : public rw8_t<base + ofs> {
 			typedef rw8_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -176,7 +183,8 @@ namespace device {
 			bit_ro_t<io_, bitpos::B1>  EPS;
 			bit_ro_t<io_, bitpos::B2>  EMPC;
 		};
-		static sdsicr1_t<0x000A> SDSICR1;
+		typedef sdsicr1_t_<0x000A> sdsicr1_t;
+		static sdsicr1_t SDSICR1;
 
 
 		//-----------------------------------------------------------------//
@@ -186,7 +194,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct dmacr1_t : public rw8_t<base + ofs> {
+		struct dmacr1_t_ : public rw8_t<base + ofs> {
 			typedef rw8_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -196,7 +204,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  DMAEN;
 			bit_rw_t<io_, bitpos::B1>  DMALOCKEN;
 		};
-		static dmacr1_t<0x000B> DMACR1;
+		typedef dmacr1_t_<0x000B> dmacr1_t;
+		static dmacr1_t DMACR1;
 
 
 		//-----------------------------------------------------------------//
@@ -206,7 +215,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct blkcnt_t : public rw16_t<base + ofs> {
+		struct blkcnt_t_ : public rw16_t<base + ofs> {
 			typedef rw16_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -215,7 +224,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 9>  CMD53BLK;
 		};
-		static blkcnt_t<0x000C> BLKCNT;
+		typedef blkcnt_t_<0x000C> blkcnt_t;
+		static blkcnt_t BLKCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -225,7 +235,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct bytcnt_t : public rw16_t<base + ofs> {
+		struct bytcnt_t_ : public rw16_t<base + ofs> {
 			typedef rw16_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -234,7 +244,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 12>  CMD53BYT;
 		};
-		static bytcnt_t<0x000E> BYTCNT;
+		typedef bytcnt_t_<0x000E> bytcnt_t;
+		static bytcnt_t BYTCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -244,7 +255,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct dmatraddr_t : public rw32_t<base + ofs> {
+		struct dmatraddr_t_ : public rw32_t<base + ofs> {
 			typedef rw32_t<base + ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -253,7 +264,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 32>  DMAADD;
 		};
-		static dmatraddr_t<0x0010> DMATRADDR;
+		typedef dmatraddr_t_<0x0010> dmatraddr_t;
+		static dmatraddr_t DMATRADDR;
 
 
 
@@ -280,4 +292,17 @@ namespace device {
 	};
 
 	typedef sdsi_t<0x00095000, peripheral::SDSI, ICU::VECTOR_BL2::SDIOI> SDSI;
+
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::fn1accr_t sdsi_t<base, per, sdioi>::FN1ACCR;
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::intencr1_t sdsi_t<base, per, sdioi>::INTENCR1;
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::intsr1_t sdsi_t<base, per, sdioi>::INTSR1;
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::sdcmdcr_t sdsi_t<base, per, sdioi>::SDCMDCR;
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::sdcadd0r_t sdsi_t<base, per, sdioi>::SDCADD0R;
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::sdcadd1r_t sdsi_t<base, per, sdioi>::SDCADD1R;
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::sdcadd2r_t sdsi_t<base, per, sdioi>::SDCADD2R;
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::sdsicr1_t sdsi_t<base, per, sdioi>::SDSICR1;
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::dmacr1_t sdsi_t<base, per, sdioi>::DMACR1;
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::blkcnt_t sdsi_t<base, per, sdioi>::BLKCNT;
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::bytcnt_t sdsi_t<base, per, sdioi>::BYTCNT;
+	template<uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi> typename sdsi_t<base, per, sdioi>::dmatraddr_t sdsi_t<base, per, sdioi>::DMATRADDR;
 }

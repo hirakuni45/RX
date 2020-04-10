@@ -32,7 +32,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct cacr0_t : public rw8_t<base> {
+		struct cacr0_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -41,7 +41,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>   CFME;
 		};
-		static cacr0_t<0x0008B000> CACR0;
+		typedef cacr0_t_<0x0008B000> cacr0_t;
+		static cacr0_t CACR0;
 
 
 		//-----------------------------------------------------------------//
@@ -51,7 +52,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct cacr1_t : public rw8_t<base> {
+		struct cacr1_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -63,7 +64,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  TCSS;
 			bits_rw_t<io_, bitpos::B6, 2>  EDGES;
 		};
-		static cacr1_t<0x0008B001> CACR1;
+		typedef cacr1_t_<0x0008B001> cacr1_t;
+		static cacr1_t CACR1;
 
 
 		//-----------------------------------------------------------------//
@@ -73,7 +75,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct cacr2_t : public rw8_t<base> {
+		struct cacr2_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -85,7 +87,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2>  RCDS;
 			bits_rw_t<io_, bitpos::B6, 2>  DFS;
 		};
-		static cacr2_t<0x0008B002> CACR2;
+		typedef cacr2_t_<0x0008B002> cacr2_t;
+		static cacr2_t CACR2;
 
 
 		//-----------------------------------------------------------------//
@@ -95,7 +98,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct caicr_t : public rw8_t<base> {
+		struct caicr_t_ : public rw8_t<base> {
 			typedef rw8_t<base> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -110,7 +113,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5>   MENDFCL;
 			bit_rw_t<io_, bitpos::B6>   OVFFCL;
 		};
-		static caicr_t<0x0008B003> CAICR;
+		typedef caicr_t_<0x0008B003> caicr_t;
+		static caicr_t CAICR;
 
 
 		//-----------------------------------------------------------------//
@@ -120,7 +124,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t base>
-		struct castr_t : public ro8_t<base> {
+		struct castr_t_ : public ro8_t<base> {
 			typedef ro8_t<base> io_;
 			using io_::operator ();
 
@@ -128,7 +132,8 @@ namespace device {
 			bit_ro_t<io_, bitpos::B1>   MENDF;
 			bit_ro_t<io_, bitpos::B2>   OVFF;
 		};
-		static castr_t<0x0008B004> CASTR;
+		typedef castr_t_<0x0008B004> castr_t;
+		static castr_t CASTR;
 
 
 		//-----------------------------------------------------------------//
@@ -136,7 +141,8 @@ namespace device {
 			@brief  CAC 上限値設定レジスタ（CAULVR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x0008B006>  CAULVR;
+		typedef rw16_t<0x0008B006> caulvr_t;
+		static caulvr_t CAULVR;
 
 
 		//-----------------------------------------------------------------//
@@ -144,7 +150,8 @@ namespace device {
 			@brief  CAC 下限値設定レジスタ（CALLVR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x0008B008>  CALLVR;
+		typedef rw16_t<0x0008B008> callvr_t;
+		static callvr_t CALLVR;
 
 
 		//-----------------------------------------------------------------//
@@ -152,7 +159,8 @@ namespace device {
 			@brief  CAC カウンタバッファレジスタ（CACNTBR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x0008B00A>  CACNTBR;
+		typedef rw16_t<0x0008B00A> cacntbr_t;
+		static cacntbr_t CACNTBR;
 
 
 		//-----------------------------------------------------------------//
@@ -198,4 +206,13 @@ namespace device {
 		ICU::VECTOR_BL0,
 		ICU::VECTOR_BL0::FERRI, ICU::VECTOR_BL0::MENDI, ICU::VECTOR_BL0::OVFI> CAC;
 #endif
+
+	template<peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::cacr0_t cac_t<per, INT, ferr, mend, ovff>::CACR0;
+	template<peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::cacr1_t cac_t<per, INT, ferr, mend, ovff>::CACR1;
+	template<peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::cacr2_t cac_t<per, INT, ferr, mend, ovff>::CACR2;
+	template<peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::caicr_t cac_t<per, INT, ferr, mend, ovff>::CAICR;
+	template<peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::castr_t cac_t<per, INT, ferr, mend, ovff>::CASTR;
+	template<peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::caulvr_t cac_t<per, INT, ferr, mend, ovff>::CAULVR;
+	template<peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::callvr_t cac_t<per, INT, ferr, mend, ovff>::CALLVR;
+	template<peripheral per, typename INT, INT ferr, INT mend, INT ovff> typename cac_t<per, INT, ferr, mend, ovff>::cacntbr_t cac_t<per, INT, ferr, mend, ovff>::CACNTBR;
 }

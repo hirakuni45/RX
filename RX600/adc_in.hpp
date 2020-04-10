@@ -35,7 +35,7 @@ namespace device {
 	private:
 		static TASK task_;
 
-		static INTERRUPT_FUNC void adi_task_()
+		INTERRUPT_FUNC static void adi_task_()
 		{
 			task_();
 		}

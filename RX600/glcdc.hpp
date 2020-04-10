@@ -9,6 +9,7 @@
 */
 //=====================================================================//
 #include "common/io_utils.hpp"
+#include "common/device.hpp"
 
 namespace device {
 
@@ -44,15 +45,19 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grclut_t {
+		struct grclut_t_ {
 			volatile uint32_t& operator[] (uint32_t idx) {
 				return *reinterpret_cast<volatile uint32_t*>(ofs + (idx & 0xff));
 			}
 		};
-		static grclut_t<base + 0x0000> GR1CLUT0;
-		static grclut_t<base + 0x0400> GR1CLUT1;
-		static grclut_t<base + 0x0800> GR2CLUT0;
-		static grclut_t<base + 0x0C00> GR2CLUT1;
+		typedef grclut_t_<base + 0x0000> gr1clut0_t;
+		static gr1clut0_t GR1CLUT0;
+		typedef grclut_t_<base + 0x0400> gr1clut1_t;
+		static gr1clut1_t GR1CLUT1;
+		typedef grclut_t_<base + 0x0800> gr2clut0_t;
+		static gr2clut0_t GR2CLUT0;
+		typedef grclut_t_<base + 0x0C00> gr2clut1_t;
+		static gr2clut1_t GR2CLUT1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -62,7 +67,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct bgen_t : public rw32_t<ofs> {
+		struct bgen_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -73,7 +78,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>  VEN;
 			bit_rw_t<io_, bitpos::B0>  EN;
 		};
-		static bgen_t<base + 0x1000> BGEN;
+		typedef bgen_t_<base + 0x1000> bgen_t;
+		static bgen_t BGEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -83,7 +89,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct bgperi_t : public rw32_t<ofs> {
+		struct bgperi_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -93,7 +99,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  FV;
 			bits_rw_t<io_, bitpos::B0,  11>  FH;
 		};
-		static bgperi_t<base + 0x1004> BGPERI;
+		typedef bgperi_t_<base + 0x1004> bgperi_t;
+		static bgperi_t BGPERI;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -103,7 +110,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct bgsync_t : public rw32_t<ofs> {
+		struct bgsync_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -113,7 +120,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 4>  VP;
 			bits_rw_t<io_, bitpos::B0,  4>  HP;
 		};
-		static bgsync_t<base + 0x1008> BGSYNC;
+		typedef bgsync_t_<base + 0x1008> bgsync_t;
+		static bgsync_t BGSYNC;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -123,7 +131,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct bgvsize_t : public rw32_t<ofs> {
+		struct bgvsize_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -133,7 +141,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  VP;
 			bits_rw_t<io_, bitpos::B0,  11>  VW;
 		};
-		static bgvsize_t<base + 0x100C> BGVSIZE;
+		typedef bgvsize_t_<base + 0x100C> bgvsize_t;
+		static bgvsize_t BGVSIZE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -143,7 +152,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct bghsize_t : public rw32_t<ofs> {
+		struct bghsize_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -153,7 +162,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  HP;
 			bits_rw_t<io_, bitpos::B0,  11>  HW;
 		};
-		static bghsize_t<base + 0x1010> BGHSIZE;
+		typedef bghsize_t_<base + 0x1010> bghsize_t;
+		static bghsize_t BGHSIZE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -163,7 +173,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct bgcolor_t : public rw32_t<ofs> {
+		struct bgcolor_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -174,7 +184,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  G;
 			bits_rw_t<io_, bitpos::B0,  8>  B;
 		};
-		static bgcolor_t<base + 0x1014> BGCOLOR;
+		typedef bgcolor_t_<base + 0x1014> bgcolor_t;
+		static bgcolor_t BGCOLOR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -184,7 +195,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct bgmon_t : public rw32_t<ofs> {
+		struct bgmon_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -195,7 +206,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>  VEN;
 			bit_rw_t<io_, bitpos::B0>  EN;
 		};
-		static bgmon_t<base + 0x1018> BGMON;
+		typedef bgmon_t_<base + 0x1018> bgmon_t;
+		static bgmon_t BGMON;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -205,7 +217,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnven_t : public rw32_t<ofs> {
+		struct grnven_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -214,8 +226,10 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  VEN;
 		};
-		static grnven_t<base + 0x1100> GR1VEN;
-		static grnven_t<base + 0x1200> GR2VEN;
+		typedef grnven_t_<base + 0x1100> gr1ven_t;
+		static gr1ven_t GR1VEN;
+		typedef grnven_t_<base + 0x1200> gr2ven_t;
+		static gr2ven_t GR2VEN;
 
 
 
@@ -227,7 +241,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnflmrd_t : public rw32_t<ofs> {
+		struct grnflmrd_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -236,8 +250,10 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  RENB;
 		};
-		static grnflmrd_t<base + 0x1104> GR1FLMRD;
-		static grnflmrd_t<base + 0x1204> GR2FLMRD;
+		typedef grnflmrd_t_<base + 0x1104> gr1flmrd_t;
+		static gr1flmrd_t GR1FLMRD;
+		typedef grnflmrd_t_<base + 0x1204> gr2flmrd_t;
+		static gr2flmrd_t GR2FLMRD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -246,8 +262,10 @@ namespace device {
 			        ※下位６ビットは「０」にする事
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x110C> GR1FLM2;
-		static rw32_t<base + 0x120C> GR2FLM2;
+		typedef rw32_t<base + 0x110C> gr1flm2_t;
+		static gr1flm2_t GR1FLM2;
+		typedef rw32_t<base + 0x120C> gr2flm2_t;
+		static gr2flm2_t GR2FLM2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -257,7 +275,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnflm3_t : public rw32_t<ofs> {
+		struct grnflm3_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -266,8 +284,10 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 16>  LNOFF;
 		};
-		static grnflm3_t<base + 0x1110> GR1FLM3;
-		static grnflm3_t<base + 0x1210> GR2FLM3;
+		typedef grnflm3_t_<base + 0x1110> gr1flm3_t;
+		static gr1flm3_t GR1FLM3;
+		typedef grnflm3_t_<base + 0x1210> gr2flm3_t;
+		static gr2flm3_t GR2FLM3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -277,7 +297,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnflm5_t : public rw32_t<ofs> {
+		struct grnflm5_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -287,8 +307,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  LNNUM;
 			bits_rw_t<io_, bitpos::B0,  16>  DATANUM;
 		};
-		static grnflm5_t<base + 0x1118> GR1FLM5;
-		static grnflm5_t<base + 0x1218> GR2FLM5;
+		typedef grnflm5_t_<base + 0x1118> gr1flm5_t;
+		static gr1flm5_t GR1FLM5;
+		typedef grnflm5_t_<base + 0x1218> gr2flm5_t;
+		static gr2flm5_t GR2FLM5;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -298,7 +320,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnflm6_t : public rw32_t<ofs> {
+		struct grnflm6_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -307,8 +329,10 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B28, 3>  FORMAT;
 		};
-		static grnflm6_t<base + 0x111C> GR1FLM6;
-		static grnflm6_t<base + 0x121C> GR2FLM6;
+		typedef grnflm6_t_<base + 0x111C> gr1flm6_t;
+		static gr1flm6_t GR1FLM6;
+		typedef grnflm6_t_<base + 0x121C> gr2flm6_t;
+		static gr2flm6_t GR2FLM6;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -318,7 +342,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnab1_t : public rw32_t<ofs> {
+		struct grnab1_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -330,8 +354,10 @@ namespace device {
 			bit_rw_t<io_,  bitpos::B4>     GRCDISPON;
 			bits_rw_t<io_, bitpos::B0, 2>  DISPSEL;
 		};
-		static grnab1_t<base + 0x1120> GR1AB1;
-		static grnab1_t<base + 0x1220> GR2AB1;
+		typedef grnab1_t_<base + 0x1120> gr1ab1_t;
+		static gr1ab1_t GR1AB1;
+		typedef grnab1_t_<base + 0x1220> gr2ab1_t;
+		static gr2ab1_t GR2AB1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -341,7 +367,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnab2_t : public rw32_t<ofs> {
+		struct grnab2_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -351,8 +377,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GRCVS;
 			bits_rw_t<io_, bitpos::B0,  11>  GRCVW;
 		};
-		static grnab2_t<base + 0x1124> GR1AB2;
-		static grnab2_t<base + 0x1224> GR2AB2;
+		typedef grnab2_t_<base + 0x1124> gr1ab2_t;
+		static gr1ab2_t GR1AB2;
+		typedef grnab2_t_<base + 0x1224> gr2ab2_t;
+		static gr2ab2_t GR2AB2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -362,7 +390,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnab3_t : public rw32_t<ofs> {
+		struct grnab3_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -372,8 +400,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GRCHS;
 			bits_rw_t<io_, bitpos::B0,  11>  GRCHW;
 		};
-		static grnab3_t<base + 0x1128> GR1AB3;
-		static grnab3_t<base + 0x1228> GR2AB3;
+		typedef grnab3_t_<base + 0x1128> gr1ab3_t;
+		static gr1ab3_t GR1AB3;
+		typedef grnab3_t_<base + 0x1228> gr2ab3_t;
+		static gr2ab3_t GR2AB3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -383,7 +413,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnab4_t : public rw32_t<ofs> {
+		struct grnab4_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -393,8 +423,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  ARCVS;
 			bits_rw_t<io_, bitpos::B0,  11>  ARCVW;
 		};
-		static grnab4_t<base + 0x112C> GR1AB4;
-		static grnab4_t<base + 0x122C> GR2AB4;
+		typedef grnab4_t_<base + 0x112C> gr1ab4_t;
+		static gr1ab4_t GR1AB4;
+		typedef grnab4_t_<base + 0x122C> gr2ab4_t;
+		static gr2ab4_t GR2AB4;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -404,7 +436,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnab5_t : public rw32_t<ofs> {
+		struct grnab5_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -414,8 +446,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  ARCHS;
 			bits_rw_t<io_, bitpos::B0,  11>  ARCHW;
 		};
-		static grnab5_t<base + 0x1130> GR1AB5;
-		static grnab5_t<base + 0x1230> GR2AB5;
+		typedef grnab5_t_<base + 0x1130> gr1ab5_t;
+		static gr1ab5_t GR1AB5;
+		typedef grnab5_t_<base + 0x1230> gr2ab5_t;
+		static gr2ab5_t GR2AB5;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -425,7 +459,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnab6_t : public rw32_t<ofs> {
+		struct grnab6_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -435,8 +469,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 9>  ARCCOEF;
 			bits_rw_t<io_, bitpos::B0,  8>  ARCRATE;
 		};
-		static grnab6_t<base + 0x1134> GR1AB6;
-		static grnab6_t<base + 0x1234> GR2AB6;
+		typedef grnab6_t_<base + 0x1134> gr1ab6_t;
+		static gr1ab6_t GR1AB6;
+		typedef grnab6_t_<base + 0x1234> gr2ab6_t;
+		static gr2ab6_t GR2AB6;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -446,7 +482,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnab7_t : public rw32_t<ofs> {
+		struct grnab7_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -456,8 +492,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 8>  ARCDEF;
 			bit_rw_t <io_, bitpos::B0>      CKON;
 		};
-		static grnab7_t<base + 0x1138> GR1AB7;
-		static grnab7_t<base + 0x1238> GR2AB7;
+		typedef grnab7_t_<base + 0x1138> gr1ab7_t;
+		static gr1ab7_t GR1AB7;
+		typedef grnab7_t_<base + 0x1238> gr2ab7_t;
+		static gr2ab7_t GR2AB7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -467,7 +505,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnab8_t : public rw32_t<ofs> {
+		struct grnab8_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -478,8 +516,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  CKKB;
 			bits_rw_t<io_, bitpos::B0,  8>  CKKR;
 		};
-		static grnab8_t<base + 0x113C> GR1AB8;
-		static grnab8_t<base + 0x123C> GR2AB8;
+		typedef grnab8_t_<base + 0x113C> gr1ab8_t;
+		static gr1ab8_t GR1AB8;
+		typedef grnab8_t_<base + 0x123C> gr2ab8_t;
+		static gr2ab8_t GR2AB8;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -489,7 +529,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnab9_t : public rw32_t<ofs> {
+		struct grnab9_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -501,8 +541,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  CKB;
 			bits_rw_t<io_, bitpos::B0,  8>  CKR;
 		};
-		static grnab9_t<base + 0x1140> GR1AB9;
-		static grnab9_t<base + 0x1240> GR2AB9;
+		typedef grnab9_t_<base + 0x1140> gr1ab9_t;
+		static gr1ab9_t GR1AB9;
+		typedef grnab9_t_<base + 0x1240> gr2ab9_t;
+		static gr2ab9_t GR2AB9;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -512,7 +554,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnbase_t : public rw32_t<ofs> {
+		struct grnbase_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -523,8 +565,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  B;
 			bits_rw_t<io_, bitpos::B0,  8>  R;
 		};
-		static grnbase_t<base + 0x114C> GR1BASE;
-		static grnbase_t<base + 0x124C> GR2BASE;
+		typedef grnbase_t_<base + 0x114C> gr1base_t;
+		static gr1base_t GR1BASE;
+		typedef grnbase_t_<base + 0x124C> gr2base_t;
+		static gr2base_t GR2BASE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -534,7 +578,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnclutint_t : public rw32_t<ofs> {
+		struct grnclutint_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -544,8 +588,10 @@ namespace device {
 			bit_rw_t <io_, bitpos::B16>     SEL;
 			bits_rw_t<io_, bitpos::B0, 11>  LINE;
 		};
-		static grnclutint_t<base + 0x1150> GR1CLUTINT;
-		static grnclutint_t<base + 0x1250> GR2CLUTINT;
+		typedef grnclutint_t_<base + 0x1150> gr1clutint_t;
+		static gr1clutint_t GR1CLUTINT;
+		typedef grnclutint_t_<base + 0x1250> gr2clutint_t;
+		static gr2clutint_t GR2CLUTINT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -555,7 +601,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grnmon_t : public rw32_t<ofs> {
+		struct grnmon_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -565,8 +611,10 @@ namespace device {
 			bit_rw_t<io_, bitpos::B16> UFST;
 			bit_rw_t<io_, bitpos::B0>  ARCST;
 		};
-		static grnmon_t<base + 0x1154> GR1MON;
-		static grnmon_t<base + 0x1254> GR2MON;
+		typedef grnmon_t_<base + 0x1154> gr1mon_t;
+		static gr1mon_t GR1MON;
+		typedef grnmon_t_<base + 0x1254> gr2mon_t;
+		static gr2mon_t GR2MON;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -576,7 +624,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxven_t : public rw32_t<ofs> {
+		struct gamxven_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -585,9 +633,12 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  VEN;
 		};
-		static gamxven_t<base + 0x1300> GAMGVEN;
-		static gamxven_t<base + 0x1340> GAMBVEN;
-		static gamxven_t<base + 0x1380> GAMRVEN;
+		typedef gamxven_t_<base + 0x1300> gamgven_t;
+		static gamgven_t GAMGVEN;
+		typedef gamxven_t_<base + 0x1340> gambven_t;
+		static gambven_t GAMBVEN;
+		typedef gamxven_t_<base + 0x1380> gamrven_t;
+		static gamrven_t GAMRVEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -597,7 +648,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamsw_t : public rw32_t<ofs> {
+		struct gamsw_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -606,7 +657,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  GAMON;
 		};
-		static gamsw_t<base + 0x1304> GAMSW;
+		typedef gamsw_t_<base + 0x1304> gamsw_t;
+		static gamsw_t GAMSW;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -616,7 +668,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxlut1_t : public rw32_t<ofs> {
+		struct gamxlut1_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -626,9 +678,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN00;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN01;
 		};
-		static gamxlut1_t<base + 0x1308> GAMGLUT1;
-		static gamxlut1_t<base + 0x1348> GAMBLUT1;
-		static gamxlut1_t<base + 0x1388> GAMRLUT1;
+		typedef gamxlut1_t_<base + 0x1308> gamglut1_t;
+		static gamglut1_t GAMGLUT1;
+		typedef gamxlut1_t_<base + 0x1348> gamblut1_t;
+		static gamblut1_t GAMBLUT1;
+		typedef gamxlut1_t_<base + 0x1388> gamrlut1_t;
+		static gamrlut1_t GAMRLUT1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -638,7 +693,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxlut2_t : public rw32_t<ofs> {
+		struct gamxlut2_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -648,9 +703,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN02;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN03;
 		};
-		static gamxlut2_t<base + 0x130C> GAMGLUT2;
-		static gamxlut2_t<base + 0x134C> GAMBLUT2;
-		static gamxlut2_t<base + 0x138C> GAMRLUT2;
+		typedef gamxlut2_t_<base + 0x130C> gamglut2_t;
+		static gamglut2_t GAMGLUT2;
+		typedef gamxlut2_t_<base + 0x134C> gamblut2_t;
+		static gamblut2_t GAMBLUT2;
+		typedef gamxlut2_t_<base + 0x138C> gamrlut2_t;
+		static gamrlut2_t GAMRLUT2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -660,7 +718,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxlut3_t : public rw32_t<ofs> {
+		struct gamxlut3_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -670,9 +728,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN04;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN05;
 		};
-		static gamxlut3_t<base + 0x1310> GAMGLUT3;
-		static gamxlut3_t<base + 0x1350> GAMBLUT3;
-		static gamxlut3_t<base + 0x1390> GAMRLUT3;
+		typedef gamxlut3_t_<base + 0x1310> gamglut3_t;
+		static gamglut3_t GAMGLUT3;
+		typedef gamxlut3_t_<base + 0x1350> gamblut3_t;
+		static gamblut3_t GAMBLUT3;
+		typedef gamxlut3_t_<base + 0x1390> gamrlut3_t;
+		static gamrlut3_t GAMRLUT3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -682,7 +743,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxlut4_t : public rw32_t<ofs> {
+		struct gamxlut4_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -692,9 +753,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN06;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN07;
 		};
-		static gamxlut4_t<base + 0x1314> GAMGLUT4;
-		static gamxlut4_t<base + 0x1354> GAMBLUT4;
-		static gamxlut4_t<base + 0x1394> GAMRLUT4;
+		typedef gamxlut4_t_<base + 0x1314> gamglut4_t;
+		static gamglut4_t GAMGLUT4;
+		typedef gamxlut4_t_<base + 0x1354> gamblut4_t;
+		static gamblut4_t GAMBLUT4;
+		typedef gamxlut4_t_<base + 0x1394> gamrlut4_t;
+		static gamrlut4_t GAMRLUT4;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -704,7 +768,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxlut5_t : public rw32_t<ofs> {
+		struct gamxlut5_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -714,9 +778,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN08;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN09;
 		};
-		static gamxlut5_t<base + 0x1318> GAMGLUT5;
-		static gamxlut5_t<base + 0x1358> GAMBLUT5;
-		static gamxlut5_t<base + 0x1398> GAMRLUT5;
+		typedef gamxlut5_t_<base + 0x1318> gamglut5_t;
+		static gamglut5_t GAMGLUT5;
+		typedef gamxlut5_t_<base + 0x1358> gamblut5_t;
+		static gamblut5_t GAMBLUT5;
+		typedef gamxlut5_t_<base + 0x1398> gamrlut5_t;
+		static gamrlut5_t GAMRLUT5;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -726,7 +793,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxlut6_t : public rw32_t<ofs> {
+		struct gamxlut6_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -736,9 +803,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN10;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN11;
 		};
-		static gamxlut6_t<base + 0x131C> GAMGLUT6;
-		static gamxlut6_t<base + 0x135C> GAMBLUT6;
-		static gamxlut6_t<base + 0x139C> GAMRLUT6;
+		typedef gamxlut6_t_<base + 0x131C> gamglut6_t;
+		static gamglut6_t GAMGLUT6;
+		typedef gamxlut6_t_<base + 0x135C> gamblut6_t;
+		static gamblut6_t GAMBLUT6;
+		typedef gamxlut6_t_<base + 0x139C> gamrlut6_t;
+		static gamrlut6_t GAMRLUT6;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -748,7 +818,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxlut7_t : public rw32_t<ofs> {
+		struct gamxlut7_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -758,9 +828,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN12;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN13;
 		};
-		static gamxlut7_t<base + 0x1320> GAMGLUT7;
-		static gamxlut7_t<base + 0x1360> GAMBLUT7;
-		static gamxlut7_t<base + 0x13A0> GAMRLUT7;
+		typedef gamxlut7_t_<base + 0x1320> gamglut7_t;
+		static gamglut7_t GAMGLUT7;
+		typedef gamxlut7_t_<base + 0x1360> gamblut7_t;
+		static gamblut7_t GAMBLUT7;
+		typedef gamxlut7_t_<base + 0x13A0> gamrlut7_t;
+		static gamrlut7_t GAMRLUT7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -770,7 +843,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxlut8_t : public rw32_t<ofs> {
+		struct gamxlut8_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -780,9 +853,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN14;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN15;
 		};
-		static gamxlut8_t<base + 0x1320> GAMGLUT8;
-		static gamxlut8_t<base + 0x1360> GAMBLUT8;
-		static gamxlut8_t<base + 0x13A0> GAMRLUT8;
+		typedef gamxlut8_t_<base + 0x1320> gamglut8_t;
+		static gamglut8_t GAMGLUT8;
+		typedef gamxlut8_t_<base + 0x1360> gamblut8_t;
+		static gamblut8_t GAMBLUT8;
+		typedef gamxlut8_t_<base + 0x13A0> gamrlut8_t;
+		static gamrlut8_t GAMRLUT8;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -792,7 +868,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxarea1_t : public rw32_t<ofs> {
+		struct gamxarea1_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -803,9 +879,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 10>  TH02;
 			bits_rw_t<io_, bitpos::B0,  10>  TH03;
 		};
-		static gamxarea1_t<base + 0x1328> GAMGAREA1;
-		static gamxarea1_t<base + 0x1368> GAMBAREA1;
-		static gamxarea1_t<base + 0x13A8> GAMRAREA1;
+		typedef gamxarea1_t_<base + 0x1328> gamgarea1_t;
+		static gamgarea1_t GAMGAREA1;
+		typedef gamxarea1_t_<base + 0x1368> gambarea1_t;
+		static gambarea1_t GAMBAREA1;
+		typedef gamxarea1_t_<base + 0x13A8> gamrarea1_t;
+		static gamrarea1_t GAMRAREA1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -815,7 +894,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxarea2_t : public rw32_t<ofs> {
+		struct gamxarea2_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -826,9 +905,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 10>  TH05;
 			bits_rw_t<io_, bitpos::B0,  10>  TH06;
 		};
-		static gamxarea2_t<base + 0x132C> GAMGAREA2;
-		static gamxarea2_t<base + 0x136C> GAMBAREA2;
-		static gamxarea2_t<base + 0x13AC> GAMRAREA2;
+		typedef gamxarea2_t_<base + 0x132C> gamgarea2_t;
+		static gamgarea2_t GAMGAREA2;
+		typedef gamxarea2_t_<base + 0x136C> gambarea2_t;
+		static gambarea2_t GAMBAREA2;
+		typedef gamxarea2_t_<base + 0x13AC> gamrarea2_t;
+		static gamrarea2_t GAMRAREA2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -838,7 +920,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxarea3_t : public rw32_t<ofs> {
+		struct gamxarea3_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -849,9 +931,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 10>  TH08;
 			bits_rw_t<io_, bitpos::B0,  10>  TH09;
 		};
-		static gamxarea3_t<base + 0x1330> GAMGAREA3;
-		static gamxarea3_t<base + 0x1370> GAMBAREA3;
-		static gamxarea3_t<base + 0x13B0> GAMRAREA3;
+		typedef gamxarea3_t_<base + 0x1330> gamgarea3_t;
+		static gamgarea3_t GAMGAREA3;
+		typedef gamxarea3_t_<base + 0x1370> gambarea3_t;
+		static gambarea3_t GAMBAREA3;
+		typedef gamxarea3_t_<base + 0x13B0> gamrarea3_t;
+		static gamrarea3_t GAMRAREA3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -861,7 +946,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxarea4_t : public rw32_t<ofs> {
+		struct gamxarea4_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -872,9 +957,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 10>  TH11;
 			bits_rw_t<io_, bitpos::B0,  10>  TH12;
 		};
-		static gamxarea4_t<base + 0x1334> GAMGAREA4;
-		static gamxarea4_t<base + 0x1374> GAMBAREA4;
-		static gamxarea4_t<base + 0x13B4> GAMRAREA4;
+		typedef gamxarea4_t_<base + 0x1334> gamgarea4_t;
+		static gamgarea4_t GAMGAREA4;
+		typedef gamxarea4_t_<base + 0x1374> gambarea4_t;
+		static gambarea4_t GAMBAREA4;
+		typedef gamxarea4_t_<base + 0x13B4> gamrarea4_t;
+		static gamrarea4_t GAMRAREA4;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -884,7 +972,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct gamxarea5_t : public rw32_t<ofs> {
+		struct gamxarea5_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -895,9 +983,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 10>  TH14;
 			bits_rw_t<io_, bitpos::B0,  10>  TH15;
 		};
-		static gamxarea5_t<base + 0x1338> GAMGAREA5;
-		static gamxarea5_t<base + 0x1378> GAMBAREA5;
-		static gamxarea5_t<base + 0x13B8> GAMRAREA5;
+		typedef gamxarea5_t_<base + 0x1338> gamgarea5_t;
+		static gamgarea5_t GAMGAREA5;
+		typedef gamxarea5_t_<base + 0x1378> gambarea5_t;
+		static gambarea5_t GAMBAREA5;
+		typedef gamxarea5_t_<base + 0x13B8> gamrarea5_t;
+		static gamrarea5_t GAMRAREA5;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -907,7 +998,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct outven_t : public rw32_t<ofs> {
+		struct outven_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -916,7 +1007,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  VEN;
 		};
-		static outven_t<base + 0x13C0> OUTVEN;
+		typedef outven_t_<base + 0x13C0> outven_t;
+		static outven_t OUTVEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -926,7 +1018,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct outset_t : public rw32_t<ofs> {
+		struct outset_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -940,7 +1032,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>      DIRSEL;
 			bits_rw_t<io_, bitpos::B0,  2>  PHASE;
 		};
-		static outset_t<base + 0x13C4> OUTSET;
+		typedef outset_t_<base + 0x13C4> outset_t;
+		static outset_t OUTSET;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -950,7 +1043,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct bright1_t : public rw32_t<ofs> {
+		struct bright1_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -959,7 +1052,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 10>  BRTG;
 		};
-		static bright1_t<base + 0x13C8> BRIGHT1;
+		typedef bright1_t_<base + 0x13C8> bright1_t;
+		static bright1_t BRIGHT1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -969,7 +1063,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct bright2_t : public rw32_t<ofs> {
+		struct bright2_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -979,7 +1073,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 10>  BRTB;
 			bits_rw_t<io_, bitpos::B0,  10>  BRTR;
 		};
-		static bright2_t<base + 0x13CC> BRIGHT2;
+		typedef bright2_t_<base + 0x13CC> bright2_t;
+		static bright2_t BRIGHT2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -989,7 +1084,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct contrast_t : public rw32_t<ofs> {
+		struct contrast_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1000,7 +1095,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  CONTB;
 			bits_rw_t<io_, bitpos::B0,  8>  CONTR;
 		};
-		static contrast_t<base + 0x13D0> CONTRAST;
+		typedef contrast_t_<base + 0x13D0> contrast_t;
+		static contrast_t CONTRAST;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1010,7 +1106,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct paneldtha_t : public rw32_t<ofs> {
+		struct paneldtha_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1024,7 +1120,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4,  2>  PC;
 			bits_rw_t<io_, bitpos::B0,  2>  PD;
 		};
-		static paneldtha_t<base + 0x13D4> PANELDTHA;
+		typedef paneldtha_t_<base + 0x13D4> paneldtha_t;
+		static paneldtha_t PANELDTHA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1034,7 +1131,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct clkphase_t : public rw32_t<ofs> {
+		struct clkphase_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1048,7 +1145,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  TCON2EDG;
 			bit_rw_t<io_, bitpos::B3>  TCON3EDG;
 		};
-		static clkphase_t<base + 0x13E4> CLKPHASE;
+		typedef clkphase_t_<base + 0x13E4> clkphase_t;
+		static clkphase_t CLKPHASE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1058,7 +1156,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct tcontim_t : public rw32_t<ofs> {
+		struct tcontim_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1068,7 +1166,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  HALF;
 			bits_rw_t<io_, bitpos::B0,  11>  OFFSET;
 		};
-		static tcontim_t<base + 0x1404> TCONTIM;
+		typedef tcontim_t_<base + 0x1404> tcontim_t;
+		static tcontim_t TCONTIM;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1078,7 +1177,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct tconstvy1_t : public rw32_t<ofs> {
+		struct tconstvy1_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1088,8 +1187,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  VS;
 			bits_rw_t<io_, bitpos::B0,  11>  VW;
 		};
-		static tconstvy1_t<base + 0x1408> TCONSTVA1;
-		static tconstvy1_t<base + 0x1410> TCONSTVB1;
+		typedef tconstvy1_t_<base + 0x1408> tconstva1_t;
+		static tconstva1_t TCONSTVA1;
+		typedef tconstvy1_t_<base + 0x1410> tconstvb1_t;
+		static tconstvb1_t TCONSTVB1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1099,7 +1200,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct tconstvy2_t : public rw32_t<ofs> {
+		struct tconstvy2_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1109,8 +1210,10 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>     INV;
 			bits_rw_t<io_, bitpos::B0, 3>  SEL;
 		};
-		static tconstvy2_t<base + 0x140C> TCONSTVA2;
-		static tconstvy2_t<base + 0x1414> TCONSTVB2;
+		typedef tconstvy2_t_<base + 0x140C> tconstva2_t;
+		static tconstva2_t TCONSTVA2;
+		typedef tconstvy2_t_<base + 0x1414> tconstvb2_t;
+		static tconstvb2_t TCONSTVB2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1120,7 +1223,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct tconsthy1_t : public rw32_t<ofs> {
+		struct tconsthy1_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1130,8 +1233,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  HS;
 			bits_rw_t<io_, bitpos::B0,  11>  HW;
 		};
-		static tconsthy1_t<base + 0x1418> TCONSTHA1;
-		static tconsthy1_t<base + 0x1420> TCONSTHB1;
+		typedef tconsthy1_t_<base + 0x1418> tconstha1_t;
+		static tconstha1_t TCONSTHA1;
+		typedef tconsthy1_t_<base + 0x1420> tconsthb1_t;
+		static tconsthb1_t TCONSTHB1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1141,7 +1246,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct tconsthy2_t : public rw32_t<ofs> {
+		struct tconsthy2_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1152,8 +1257,10 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>     INV;
 			bits_rw_t<io_, bitpos::B0, 3>  SEL;
 		};
-		static tconsthy2_t<base + 0x141C> TCONSTHA2;
-		static tconsthy2_t<base + 0x1424> TCONSTHB2;
+		typedef tconsthy2_t_<base + 0x141C> tconstha2_t;
+		static tconstha2_t TCONSTHA2;
+		typedef tconsthy2_t_<base + 0x1424> tconsthb2_t;
+		static tconsthb2_t TCONSTHB2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1163,7 +1270,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct tconde_t : public rw32_t<ofs> {
+		struct tconde_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1172,7 +1279,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  INV;
 		};
-		static tconde_t<base + 0x1428>  TCONDE;
+		typedef tconde_t_<base + 0x1428> tconde_t;
+		static tconde_t TCONDE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1182,7 +1290,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct dtcten_t : public rw32_t<ofs> {
+		struct dtcten_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1193,7 +1301,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  GR1UFDTC;
 			bit_rw_t<io_, bitpos::B0>  VPOSDTC;
 		};
-		static dtcten_t<base + 0x1440>  DTCTEN;
+		typedef dtcten_t_<base + 0x1440> dtcten_t;
+		static dtcten_t DTCTEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1203,7 +1312,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct inten_t : public rw32_t<ofs> {
+		struct inten_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1214,7 +1323,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  GR1UFINTEN;
 			bit_rw_t<io_, bitpos::B0>  VPOSINTEN;
 		};
-		static inten_t<base + 0x1444>  INTEN;
+		typedef inten_t_<base + 0x1444> inten_t;
+		static inten_t INTEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1224,7 +1334,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct stclr_t : public rw32_t<ofs> {
+		struct stclr_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1235,7 +1345,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  GR1UFCLR;
 			bit_rw_t<io_, bitpos::B0>  VPOSCLR;
 		};
-		static stclr_t<base + 0x1448>  STCLR;
+		typedef stclr_t_<base + 0x1448> stclr_t;
+		static stclr_t STCLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1245,7 +1356,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct stmon_t : public ro32_t<ofs> {
+		struct stmon_t_ : public ro32_t<ofs> {
 			typedef ro32_t<ofs> io_;
 			using io_::operator ();
 
@@ -1253,7 +1364,8 @@ namespace device {
 			bit_ro_t<io_, bitpos::B1>  GR1UF;
 			bit_ro_t<io_, bitpos::B0>  VPOS;
 		};
-		static stmon_t<base + 0x144C>  STMON;
+		typedef stmon_t_<base + 0x144C> stmon_t;
+		static stmon_t STMON;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1263,7 +1375,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct panelclk_t : public rw32_t<ofs> {
+		struct panelclk_t_ : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -1275,7 +1387,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>     CLKEN;
 			bits_rw_t<io_, bitpos::B0, 6>  DCDR;
 		};
-		static panelclk_t<base + 0x1450>  PANELCLK;
+		typedef panelclk_t_<base + 0x1450> panelclk_t;
+		static panelclk_t PANELCLK;
 
 
 		//-----------------------------------------------------------------//
@@ -1288,4 +1401,116 @@ namespace device {
 	};
 
 	typedef glcdc_t<0x000E0000, peripheral::GLCDC> GLCDC;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1clut0_t glcdc_t<base, t>::GR1CLUT0;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1clut1_t glcdc_t<base, t>::GR1CLUT1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2clut0_t glcdc_t<base, t>::GR2CLUT0;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2clut1_t glcdc_t<base, t>::GR2CLUT1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::bgen_t glcdc_t<base, t>::BGEN;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::bgperi_t glcdc_t<base, t>::BGPERI;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::bgsync_t glcdc_t<base, t>::BGSYNC;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::bgvsize_t glcdc_t<base, t>::BGVSIZE;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::bghsize_t glcdc_t<base, t>::BGHSIZE;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::bgcolor_t glcdc_t<base, t>::BGCOLOR;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::bgmon_t glcdc_t<base, t>::BGMON;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1ven_t glcdc_t<base, t>::GR1VEN;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2ven_t glcdc_t<base, t>::GR2VEN;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1flmrd_t glcdc_t<base, t>::GR1FLMRD;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2flmrd_t glcdc_t<base, t>::GR2FLMRD;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1flm2_t glcdc_t<base, t>::GR1FLM2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2flm2_t glcdc_t<base, t>::GR2FLM2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1flm3_t glcdc_t<base, t>::GR1FLM3;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2flm3_t glcdc_t<base, t>::GR2FLM3;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1flm5_t glcdc_t<base, t>::GR1FLM5;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2flm5_t glcdc_t<base, t>::GR2FLM5;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1flm6_t glcdc_t<base, t>::GR1FLM6;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2flm6_t glcdc_t<base, t>::GR2FLM6;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1ab1_t glcdc_t<base, t>::GR1AB1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2ab1_t glcdc_t<base, t>::GR2AB1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1ab2_t glcdc_t<base, t>::GR1AB2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2ab2_t glcdc_t<base, t>::GR2AB2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1ab3_t glcdc_t<base, t>::GR1AB3;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2ab3_t glcdc_t<base, t>::GR2AB3;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1ab4_t glcdc_t<base, t>::GR1AB4;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2ab4_t glcdc_t<base, t>::GR2AB4;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1ab5_t glcdc_t<base, t>::GR1AB5;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2ab5_t glcdc_t<base, t>::GR2AB5;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1ab6_t glcdc_t<base, t>::GR1AB6;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2ab6_t glcdc_t<base, t>::GR2AB6;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1ab7_t glcdc_t<base, t>::GR1AB7;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2ab7_t glcdc_t<base, t>::GR2AB7;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1ab8_t glcdc_t<base, t>::GR1AB8;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2ab8_t glcdc_t<base, t>::GR2AB8;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1ab9_t glcdc_t<base, t>::GR1AB9;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2ab9_t glcdc_t<base, t>::GR2AB9;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1base_t glcdc_t<base, t>::GR1BASE;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2base_t glcdc_t<base, t>::GR2BASE;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1clutint_t glcdc_t<base, t>::GR1CLUTINT;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2clutint_t glcdc_t<base, t>::GR2CLUTINT;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr1mon_t glcdc_t<base, t>::GR1MON;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gr2mon_t glcdc_t<base, t>::GR2MON;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamgven_t glcdc_t<base, t>::GAMGVEN;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gambven_t glcdc_t<base, t>::GAMBVEN;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrven_t glcdc_t<base, t>::GAMRVEN;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamsw_t glcdc_t<base, t>::GAMSW;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamglut1_t glcdc_t<base, t>::GAMGLUT1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamblut1_t glcdc_t<base, t>::GAMBLUT1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrlut1_t glcdc_t<base, t>::GAMRLUT1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamglut2_t glcdc_t<base, t>::GAMGLUT2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamblut2_t glcdc_t<base, t>::GAMBLUT2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrlut2_t glcdc_t<base, t>::GAMRLUT2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamglut3_t glcdc_t<base, t>::GAMGLUT3;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamblut3_t glcdc_t<base, t>::GAMBLUT3;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrlut3_t glcdc_t<base, t>::GAMRLUT3;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamglut4_t glcdc_t<base, t>::GAMGLUT4;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamblut4_t glcdc_t<base, t>::GAMBLUT4;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrlut4_t glcdc_t<base, t>::GAMRLUT4;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamglut5_t glcdc_t<base, t>::GAMGLUT5;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamblut5_t glcdc_t<base, t>::GAMBLUT5;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrlut5_t glcdc_t<base, t>::GAMRLUT5;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamglut6_t glcdc_t<base, t>::GAMGLUT6;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamblut6_t glcdc_t<base, t>::GAMBLUT6;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrlut6_t glcdc_t<base, t>::GAMRLUT6;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamglut7_t glcdc_t<base, t>::GAMGLUT7;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamblut7_t glcdc_t<base, t>::GAMBLUT7;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrlut7_t glcdc_t<base, t>::GAMRLUT7;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamglut8_t glcdc_t<base, t>::GAMGLUT8;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamblut8_t glcdc_t<base, t>::GAMBLUT8;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrlut8_t glcdc_t<base, t>::GAMRLUT8;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamgarea1_t glcdc_t<base, t>::GAMGAREA1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gambarea1_t glcdc_t<base, t>::GAMBAREA1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrarea1_t glcdc_t<base, t>::GAMRAREA1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamgarea2_t glcdc_t<base, t>::GAMGAREA2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gambarea2_t glcdc_t<base, t>::GAMBAREA2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrarea2_t glcdc_t<base, t>::GAMRAREA2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamgarea3_t glcdc_t<base, t>::GAMGAREA3;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gambarea3_t glcdc_t<base, t>::GAMBAREA3;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrarea3_t glcdc_t<base, t>::GAMRAREA3;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamgarea4_t glcdc_t<base, t>::GAMGAREA4;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gambarea4_t glcdc_t<base, t>::GAMBAREA4;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrarea4_t glcdc_t<base, t>::GAMRAREA4;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamgarea5_t glcdc_t<base, t>::GAMGAREA5;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gambarea5_t glcdc_t<base, t>::GAMBAREA5;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::gamrarea5_t glcdc_t<base, t>::GAMRAREA5;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::outven_t glcdc_t<base, t>::OUTVEN;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::outset_t glcdc_t<base, t>::OUTSET;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::bright1_t glcdc_t<base, t>::BRIGHT1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::bright2_t glcdc_t<base, t>::BRIGHT2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::contrast_t glcdc_t<base, t>::CONTRAST;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::paneldtha_t glcdc_t<base, t>::PANELDTHA;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::clkphase_t glcdc_t<base, t>::CLKPHASE;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::tcontim_t glcdc_t<base, t>::TCONTIM;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::tconstva1_t glcdc_t<base, t>::TCONSTVA1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::tconstvb1_t glcdc_t<base, t>::TCONSTVB1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::tconstva2_t glcdc_t<base, t>::TCONSTVA2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::tconstvb2_t glcdc_t<base, t>::TCONSTVB2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::tconstha1_t glcdc_t<base, t>::TCONSTHA1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::tconsthb1_t glcdc_t<base, t>::TCONSTHB1;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::tconstha2_t glcdc_t<base, t>::TCONSTHA2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::tconsthb2_t glcdc_t<base, t>::TCONSTHB2;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::tconde_t glcdc_t<base, t>::TCONDE;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::dtcten_t glcdc_t<base, t>::DTCTEN;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::inten_t glcdc_t<base, t>::INTEN;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::stclr_t glcdc_t<base, t>::STCLR;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::stmon_t glcdc_t<base, t>::STMON;
+	template <uint32_t base, peripheral t> typename glcdc_t<base, t>::panelclk_t glcdc_t<base, t>::PANELCLK;
 }

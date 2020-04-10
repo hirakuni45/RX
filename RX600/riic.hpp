@@ -34,7 +34,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct iccr1_t : public rw8_t<ofs> {
+		struct iccr1_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -50,7 +50,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> IICRST;
 			bit_rw_t<io_, bitpos::B7> ICE;
 		};
-		static iccr1_t<base + 0x00> ICCR1;
+		typedef iccr1_t_<base + 0x00> iccr1_t;
+		static iccr1_t ICCR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -59,7 +60,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct iccr2_t : public rw8_t<ofs> {
+		struct iccr2_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -73,7 +74,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> MST;
 			bit_rw_t<io_, bitpos::B7> BBSY;
 		};
-		static iccr2_t<base + 0x01> ICCR2;
+		typedef iccr2_t_<base + 0x01> iccr2_t;
+		static iccr2_t ICCR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -82,7 +84,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct icmr1_t : public rw8_t<ofs> {
+		struct icmr1_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -94,7 +96,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3> CKS;
 			bit_rw_t <io_, bitpos::B7>    MTWP;
 		};
-		static icmr1_t<base + 0x02> ICMR1;
+		typedef icmr1_t_<base + 0x02> icmr1_t;
+		static icmr1_t ICMR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -103,7 +106,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct icmr2_t : public rw8_t<ofs> {
+		struct icmr2_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -116,7 +119,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 3> SDDL;
 			bit_rw_t <io_, bitpos::B7>    DLCS;
 		};
-		static icmr2_t<base + 0x03> ICMR2;
+		typedef icmr2_t_<base + 0x03> icmr2_t;
+		static icmr2_t ICMR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -125,7 +129,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct icmr3_t : public rw8_t<ofs> {
+		struct icmr3_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -140,7 +144,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>    WAIT;
 			bit_rw_t <io_, bitpos::B7>    SMBS;
 		};
-		static icmr3_t<base + 0x04> ICMR3;
+		typedef icmr3_t_<base + 0x04> icmr3_t;
+		static icmr3_t ICMR3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -149,7 +154,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct icfer_t : public rw8_t<ofs> {
+		struct icfer_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -165,7 +170,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> SCLE;
 			bit_rw_t<io_, bitpos::B7> FMPE;
 		};
-		static icfer_t<base + 0x05> ICFER;
+		typedef icfer_t_<base + 0x05> icfer_t;
+		static icfer_t ICFER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -174,7 +180,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct icser_t : public rw8_t<ofs> {
+		struct icser_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -188,7 +194,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5> DIDE;
 			bit_rw_t<io_, bitpos::B7> HOAE;
 		};
-		static icser_t<base + 0x06> ICSER;
+		typedef icser_t_<base + 0x06> icser_t;
+		static icser_t ICSER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -197,7 +204,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct icier_t : public rw8_t<ofs> {
+		struct icier_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -213,7 +220,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> TEIE;
 			bit_rw_t<io_, bitpos::B7> TIE;
 		};
-		static icier_t<base + 0x07> ICIER;
+		typedef icier_t_<base + 0x07> icier_t;
+		static icier_t ICIER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -222,7 +230,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct icsr1_t : public rw8_t<ofs> {
+		struct icsr1_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -236,7 +244,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5> DID;
 			bit_rw_t<io_, bitpos::B7> HOA;
 		};
-		static icsr1_t<base + 0x08> ICSR1;
+		typedef icsr1_t_<base + 0x08> icsr1_t;
+		static icsr1_t ICSR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -245,7 +254,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct icsr2_t : public rw8_t<ofs> {
+		struct icsr2_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -261,7 +270,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> TEND;
 			bit_rw_t<io_, bitpos::B7> TDRE;
 		};
-		static icsr2_t<base + 0x09> ICSR2;
+		typedef icsr2_t_<base + 0x09> icsr2_t;
+		static icsr2_t ICSR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -270,7 +280,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct sarly_t : public rw8_t<ofs> {
+		struct sarly_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -280,9 +290,12 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>    SVA0;
 			bits_rw_t<io_, bitpos::B1, 7> SVA;
 		};
-		static sarly_t<base + 0x0A> SARL0;
-		static sarly_t<base + 0x0C> SARL1;
-		static sarly_t<base + 0x0E> SARL2;
+		typedef sarly_t_<base + 0x0A> sarl0_t;
+		static sarl0_t SARL0;
+		typedef sarly_t_<base + 0x0C> sarl1_t;
+		static sarl1_t SARL1;
+		typedef sarly_t_<base + 0x0E> sarl2_t;
+		static sarl2_t SARL2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -291,7 +304,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct saruy_t : public rw8_t<ofs> {
+		struct saruy_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -301,9 +314,12 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>    FS;
 			bits_rw_t<io_, bitpos::B1, 2> SVA;
 		};
-		static saruy_t<base + 0x0B> SARU0;
-		static saruy_t<base + 0x0D> SARU1;
-		static saruy_t<base + 0x0F> SARU2;
+		typedef saruy_t_<base + 0x0B> saru0_t;
+		static saru0_t SARU0;
+		typedef saruy_t_<base + 0x0D> saru1_t;
+		static saru1_t SARU1;
+		typedef saruy_t_<base + 0x0F> saru2_t;
+		static saru2_t SARU2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -312,7 +328,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct icbrl_t : public rw8_t<ofs> {
+		struct icbrl_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -321,7 +337,8 @@ namespace device {
 
 			bits_rw_t <io_, bitpos::B0, 5> BRL;
 		};
-		static icbrl_t<base + 0x10> ICBRL;
+		typedef icbrl_t_<base + 0x10> icbrl_t;
+		static icbrl_t ICBRL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -330,7 +347,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct icbrh_t : public rw8_t<ofs> {
+		struct icbrh_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -339,7 +356,8 @@ namespace device {
 
 			bits_rw_t <io_, bitpos::B0, 5> BRH;
 		};
-		static icbrh_t<base + 0x11> ICBRH;
+		typedef icbrh_t_<base + 0x11> icbrh_t;
+		static icbrh_t ICBRH;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -347,7 +365,8 @@ namespace device {
 			@brief  I 2 C バス送信データレジスタ (ICDRT)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<base + 0x12> ICDRT;
+		typedef rw8_t<base + 0x12> icdrt_t;
+		static icdrt_t ICDRT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -355,7 +374,8 @@ namespace device {
 			@brief  I 2 C バス受信データレジスタ (ICDRR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<base + 0x13> ICDRR;
+		typedef rw8_t<base + 0x13> icdrr_t;
+		static icdrr_t ICDRR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -431,4 +451,25 @@ namespace device {
 	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0,
 		ICU::VECTOR::RIIC_RXI0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR_BL1::TEI0> RIIC0;
 #endif
+
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::iccr1_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICCR1;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::iccr2_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICCR2;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icmr1_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICMR1;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icmr2_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICMR2;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icmr3_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICMR3;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icfer_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICFER;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icser_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICSER;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icier_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICIER;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icsr1_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICSR1;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icsr2_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICSR2;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::sarl0_t riic_t<base, per, INT, eev, rxv, txv, tev>::SARL0;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::sarl1_t riic_t<base, per, INT, eev, rxv, txv, tev>::SARL1;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::sarl2_t riic_t<base, per, INT, eev, rxv, txv, tev>::SARL2;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::saru0_t riic_t<base, per, INT, eev, rxv, txv, tev>::SARU0;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::saru1_t riic_t<base, per, INT, eev, rxv, txv, tev>::SARU1;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::saru2_t riic_t<base, per, INT, eev, rxv, txv, tev>::SARU2;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icbrl_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICBRL;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icbrh_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICBRH;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icdrt_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICDRT;
+	template <uint32_t base, peripheral per, typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev> typename riic_t<base, per, INT, eev, rxv, txv, tev>::icdrr_t riic_t<base, per, INT, eev, rxv, txv, tev>::ICDRR;
 }

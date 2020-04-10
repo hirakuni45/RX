@@ -26,7 +26,8 @@ namespace device {
 			@brie	タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x08> TCNT;
+		typedef rw8_t<base + 0x08> tcnt_t;
+		static tcnt_t TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -34,7 +35,8 @@ namespace device {
 			@brie	タイムコンスタントレジスタ A（TCORA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x04> TCORA;
+		typedef rw8_t<base + 0x04> tcora_t;
+		static tcora_t TCORA;
 
 
 		//-----------------------------------------------------------------//
@@ -42,7 +44,8 @@ namespace device {
 			@brie	タイムコンスタントレジスタ B（TCORB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x06> TCORB;
+		typedef rw8_t<base + 0x06> tcorb_t;
+		static tcorb_t TCORB;
 
 
 		//-----------------------------------------------------------------//
@@ -52,7 +55,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct tcr_t : public rw8_t<ofs> {
+		struct tcr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -64,7 +67,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>     CMIEA;
 			bit_rw_t <io_, bitpos::B7>     CMIEB;
 		};
-		static tcr_t<base + 0x00> TCR;
+		typedef tcr_t_<base + 0x00> tcr_t;
+		static tcr_t TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -74,7 +78,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct tccr_t : public rw8_t<ofs> {
+		struct tccr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -85,7 +89,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B3, 2>  CSS;
 			bit_rw_t <io_, bitpos::B7>     TMRIS;
 		};
-		static tccr_t<base + 0x0A> TCCR;
+		typedef tccr_t_<base + 0x0A> tccr_t;
+		static tccr_t TCCR;
 
 	};
 
@@ -104,7 +109,8 @@ namespace device {
 			@brie	タイマカウンタ（TCNTW）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x08> TCNT16;
+		typedef rw16_t<base + 0x08> tcnt16_t;
+		static tcnt16_t TCNT16;
 
 
 		//-----------------------------------------------------------------//
@@ -112,7 +118,8 @@ namespace device {
 			@brie	タイムコンスタントレジスタ A（TCORA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x04> TCORA16;
+		typedef rw16_t<base + 0x04> tcora16_t;
+		static tcora16_t TCORA16;
 
 
 		//-----------------------------------------------------------------//
@@ -120,7 +127,8 @@ namespace device {
 			@brie	タイムコンスタントレジスタ B（TCORB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x06> TCORB16;
+		typedef rw16_t<base + 0x06> tcorb16_t;
+		static tcorb16_t TCORB16;
 
 
 		//-----------------------------------------------------------------//
@@ -130,7 +138,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct tcsr_t : public rw8_t<ofs> {
+		struct tcsr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -141,7 +149,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B2, 2>  OSB;
 			bit_rw_t <io_, bitpos::B4>     ADTE;
 		};
-		static tcsr_t<base + 0x02> TCSR;
+		typedef tcsr_t_<base + 0x02> tcsr_t;
+		static tcsr_t TCSR;
 
 	};
 
@@ -162,7 +171,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct tcsr_t : public rw8_t<ofs> {
+		struct tcsr_t_ : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
@@ -172,7 +181,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 2>  OSA;
 			bits_rw_t<io_, bitpos::B2, 2>  OSB;
 		};
-		static tcsr_t<base + 0x02> TCSR;
+		typedef tcsr_t_<base + 0x02> tcsr_t;
+		static tcsr_t TCSR;
 
 	};
 
@@ -186,4 +196,17 @@ namespace device {
 	typedef tmr0246_t<0x00088230> TMR6;
 	typedef tmr1357_t<0x00088231> TMR7;
 #endif
+
+	template <uint32_t base> typename tmr_t<base>::tcnt_t tmr_t<base>::TCNT;
+	template <uint32_t base> typename tmr_t<base>::tcora_t tmr_t<base>::TCORA;
+	template <uint32_t base> typename tmr_t<base>::tcorb_t tmr_t<base>::TCORB;
+	template <uint32_t base> typename tmr_t<base>::tcr_t tmr_t<base>::TCR;
+	template <uint32_t base> typename tmr_t<base>::tccr_t tmr_t<base>::TCCR;
+
+	template <uint32_t base> typename tmr0246_t<base>::tcnt16_t tmr0246_t<base>::TCNT16;
+	template <uint32_t base> typename tmr0246_t<base>::tcora16_t tmr0246_t<base>::TCORA16;
+	template <uint32_t base> typename tmr0246_t<base>::tcorb16_t tmr0246_t<base>::TCORB16;
+	template <uint32_t base> typename tmr0246_t<base>::tcsr_t tmr0246_t<base>::TCSR;
+
+	template <uint32_t base> typename tmr1357_t<base>::tcsr_t tmr1357_t<base>::TCSR;
 }
