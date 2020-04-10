@@ -142,22 +142,20 @@ namespace device {
 	}
 
 
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
 	//-------------------------------------------------------------//
 	/*!
-		@brief  SCI マスタークロック取得
-		@param[in]	per		ペリフェラル型
-		@return SCI マスタークロック
+		@brief  PPLL 制御を使って PHY 向け 25MHz を出力する。
+		@return 成功なら「true」
 	*/
 	//-------------------------------------------------------------//
-	inline uint32_t get_sci_master_clock(peripheral per) noexcept
+	bool setup_phy25()
 	{
-#if defined(SIG_RX66T)
-		if(per == peripheral::SCI11 || per == peripheral::SCI11C) {
-			return F_PCLKA;
-		}
-#endif
-		return F_PCLKB;
+
+		return true;
 	}
+
+#endif
 
 
 	//-------------------------------------------------------------//

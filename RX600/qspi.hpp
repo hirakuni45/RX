@@ -16,14 +16,20 @@ namespace device {
 	/*!
 		@brief  QSPI 定義基底クラス
 		@param[in]	per		ペリフェラル型
-		@param[in]	rxv		受信バッファ・フル割り込みベクター
 		@param[in]	txv		送信バッファ・エンプティ割り込みベクター
+		@param[in]	rxv		受信バッファ・フル割り込みベクター
 		@param[in]	sslv	QSSL ネゲート割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR rxv, ICU::VECTOR txv,
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
 		ICU::VECTOR_BL0 sslv>
 	struct qspi_t {
+
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static const auto TX_VEC = txv;			///< 受信割り込みベクター
+		static const auto RX_VEC = rxv;			///< 送信割り込みベクター
+		static const auto SSL_VEC = sslv;		///< 送信終了割り込みベクター
+		static const uint32_t PCLK = F_PCLKB;	///< PCLK 周波数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -333,44 +339,8 @@ namespace device {
 		static rw32_t<base + 0x20> SPBMUL1;
 		static rw32_t<base + 0x24> SPBMUL2;
 		static rw32_t<base + 0x28> SPBMUL3;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  受信バッファ・フル割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_rx_vec() { return rxv; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  送信バッファ・エンプティ割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_tx_vec() { return txv; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  QSSL ネゲート割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_ssl_vec() { return sslv; }
 	};
 
-	typedef qspi_t<0x00089E00, peripheral::QSPI, ICU::VECTOR::SPRI, ICU::VECTOR::SPTI,
+	typedef qspi_t<0x00089E00, peripheral::QSPI, ICU::VECTOR::SPTI, ICU::VECTOR::SPRI,
 		ICU::VECTOR_BL0::QSPSSLI>  QSPI;
 }
