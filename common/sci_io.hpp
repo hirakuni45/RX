@@ -132,22 +132,16 @@ namespace device {
 		}
 
 
-		void set_vector_(ICU::VECTOR rx_vec, ICU::VECTOR tx_vec) noexcept
-		{
-			if(level_) {
-				icu_mgr::set_task(rx_vec, recv_task_);
-				icu_mgr::set_task(tx_vec, send_task_);
-			} else {
-				icu_mgr::set_task(rx_vec, nullptr);
-				icu_mgr::set_task(tx_vec, nullptr);
-			}
-		}
-
-
 		void set_intr_() noexcept
 		{
-			set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
-			icu_mgr::set_level(SCI::get_peripheral(), level_);
+			if(level_) {
+				icu_mgr::set_task(SCI::RX_VEC, recv_task_);
+				icu_mgr::set_task(SCI::TX_VEC, send_task_);
+			} else {
+				icu_mgr::set_task(SCI::RX_VEC, nullptr);
+				icu_mgr::set_task(SCI::TX_VEC, nullptr);
+			}
+			icu_mgr::set_level(SCI::PERIPHERAL, level_);
 		}
 
 	public:
@@ -213,9 +207,9 @@ namespace device {
 			recv_.clear();
 			send_.clear();
 
-			power_mgr::turn(SCI::get_peripheral());
+			power_mgr::turn(SCI::PERIPHERAL);
 
-			icu_mgr::set_level(SCI::get_peripheral(), 0);
+			icu_mgr::set_level(SCI::PERIPHERAL, 0);
 			SCI::SCR = 0x00;			// TE, RE disable.
 			{
 				auto tmp = SCI::SSR();
@@ -224,13 +218,13 @@ namespace device {
 				}
 			}
 
-			port_map::turn(SCI::get_peripheral(), true, PSEL);
+			port_map::turn(SCI::PERIPHERAL, true, PSEL);
 
 			// RS-484 半二重制御ポート
 			HCTL::DIR = 1;
 			HCTL::P = 0;  // disable send driver
 
-			uint32_t brr = get_sci_master_clock(SCI::get_peripheral()) / baud * 16;
+			uint32_t brr = SCI::PCLK / baud * 16;
 			uint8_t cks = 0;
 			while(brr > (512 << 8)) {
 				brr >>= 2;

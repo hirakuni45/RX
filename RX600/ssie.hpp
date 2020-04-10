@@ -128,7 +128,6 @@ namespace device {
 		template <uint32_t ofs>
 		struct ssifsr_t : public rw32_t<ofs> {
 			typedef rw32_t<ofs> io_;
-			typedef ro32_t<ofs> ro_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -136,11 +135,11 @@ namespace device {
 
 			bit_rw_t< io_, bitpos::B0>     RDF;
 
-			bits_ro_t<ro_, bitpos::B8, 6>  RDC;
+			bits_rw_t<io_, bitpos::B8, 6>  RDC;
 
 			bit_rw_t< io_, bitpos::B16>    TDE;
 
-			bits_ro_t<ro_, bitpos::B24, 6> TDC;
+			bits_rw_t<io_, bitpos::B24, 6> TDC;
 		};
 		static ssifsr_t<base + 0x14> SSIFSR;
 
@@ -245,7 +244,7 @@ namespace device {
 	};
 
 #if defined(SIG_RX72M) || defined(SIG_RX72N)
-	typedef ssie_t<0x0008A500, peripheral::SSIE0, ICU::VECTOR_BL1::SSIF0, ICU::VECTOR::SSIRXI0, ICU::VECTOR::SSITXI0> SSI0;
-	typedef ssie_t<0x0008A540, peripheral::SSIE1, ICU::VECTOR_BL1::SSIF1, ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1> SSI1;
+	typedef ssie_t<0x0008A500, peripheral::SSIE0, ICU::VECTOR_BL1::SSIF0, ICU::VECTOR::SSIRXI0, ICU::VECTOR::SSITXI0> SSIE0;
+	typedef ssie_t<0x0008A540, peripheral::SSIE1, ICU::VECTOR_BL1::SSIF1, ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1> SSIE1;
 #endif
 }

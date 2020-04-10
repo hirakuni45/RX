@@ -85,7 +85,7 @@ namespace device {
 
 			level_ = level;
 
-			power_mgr::turn(CMT::get_peripheral());
+			power_mgr::turn(CMT::PERIPHERAL);
 
 			CMT::enable(false);
 
@@ -94,16 +94,15 @@ namespace device {
 
 			counter_ = 0;
 
-			auto vec = CMT::get_ivec();
 			if(level_ > 0) {
 				if(task != nullptr) {
-					icu_mgr::set_interrupt(vec, task, level_);
+					icu_mgr::set_interrupt(CMT::IVEC, task, level_);
 				} else {
-					icu_mgr::set_interrupt(vec, i_task_, level_);
+					icu_mgr::set_interrupt(CMT::IVEC, i_task_, level_);
 				}
 			    CMT::CMCR = CMT::CMCR.CKS.b(cks) | CMT::CMCR.CMIE.b();
 			} else {
-				icu_mgr::set_interrupt(vec, nullptr, 0);
+				icu_mgr::set_interrupt(CMT::IVEC, nullptr, 0);
 			    CMT::CMCR = CMT::CMCR.CKS.b(cks);
 			}
 			CMT::enable();
@@ -122,7 +121,7 @@ namespace device {
 		{
 		    CMT::CMCR.CMIE = 0;
 			CMT::enable(false);
-			power_mgr::turn(CMT::get_peripheral(), power);
+			power_mgr::turn(CMT::PERIPHERAL, power);
 		}
 
 

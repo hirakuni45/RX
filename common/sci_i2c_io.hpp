@@ -335,10 +335,10 @@ namespace device {
 
 			level_ = level;
 
-			power_mgr::turn(SCI::get_peripheral());
+			power_mgr::turn(SCI::PERIPHERAL);
 
 			SCI::SCR = 0x00;		// TE, RE disable. CKE = 0
-			port_map::turn(SCI::get_peripheral(), true, PSEL);
+			port_map::turn(SCI::PERIPHERAL, true, PSEL);
 
 			SCI::SIMR3 = SCI::SIMR3.IICSDAS.b(0b11) | SCI::SIMR3.IICSCLS.b(0b11);
 			SCI::SMR   = 0x00;
@@ -360,19 +360,20 @@ namespace device {
 				task_ = sci_i2c_t::task::idle;
 
 				// RXI, TXI の設定
-				set_vector_(SCI::get_rx_vec(), SCI::get_tx_vec());
-				icu_mgr::set_level(SCI::get_peripheral(), level_);
+				set_vector_(SCI::RX_VEC, SCI::TX_VEC);
+				icu_mgr::set_level(SCI::PERIPHERAL, level_);
 
 				// TEIx (STI interrupt)
-				auto tev = SCI::get_te_vec();
-				auto grp = ICU::get_group_vector(tev);
+				auto grp = ICU::get_group_vector(SCI::TE_VEC);
 				if(grp == ICU::VECTOR::NONE) {
-//					icu_mgr::set_task(tev, i2c_condition_task_);
+					// 通常ベクターの場合、割り込み関数を登録、
 					// tev がグループベクターの場合にコンパイルエラーになるので回避
-					icu_mgr::set_task(static_cast<ICU::VECTOR>(tev), i2c_condition_task_);
+					icu_mgr::set_level(static_cast<ICU::VECTOR>(SCI::TE_VEC), level_);
+					icu_mgr::set_task(static_cast<ICU::VECTOR>(SCI::TE_VEC), i2c_condition_task_);
 				} else {
+					// グループベクターの場合、通常関数を登録
 					icu_mgr::set_level(grp, level_);
-					icu_mgr::install_group_task(tev, i2c_service_);
+					icu_mgr::install_group_task(SCI::TE_VEC, i2c_service_);
 				}
 			}
 

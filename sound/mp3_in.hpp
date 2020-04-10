@@ -13,6 +13,7 @@
 #include "common/file_io.hpp"
 #include "sound/id3_mgr.hpp"
 #include "sound/af_play.hpp"
+#include "sound/sound_out.hpp"
 
 extern "C" {
 	void set_sample_rate(uint32_t freq);

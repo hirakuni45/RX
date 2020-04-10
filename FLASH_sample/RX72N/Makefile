@@ -1,15 +1,15 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX72M Makefile
+#   @brief  RX72N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	led_sample
+TARGET		=	flash_sample
 
-DEVICE		=	R5F572MD
+DEVICE		=	R5F572NN
 
 BUILD		=	release
 
@@ -18,15 +18,16 @@ VPATH		=	../../
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c
+				common/vect.c \
+				common/syscalls.c
 
-PSOURCES	=	FIRST_sample/main.cpp
+PSOURCES	=	FLASH_sample/main.cpp
 
 USER_LIBS	=
 
-LDSCRIPT	=	../../RX72M/$(DEVICE).ld
+LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX72M \
+USER_DEFS	=	SIG_RX72N \
 				F_ICLK=240000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000
@@ -57,8 +58,6 @@ INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
 LIB_ROOT	=	../../RX600/drw2d
 
 OPTIMIZE	=	-O3
-
-AS_OPT		=	-mcpu=rx600
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
@@ -187,6 +186,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

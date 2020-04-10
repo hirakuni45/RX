@@ -12,9 +12,12 @@
 			　　　　P00 ピンにLEDを接続する @n
 			RX66T: @n
 					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する
+			　　　　P00 ピンにLEDを接続する @n
+			RX72N (Renesas Envision kit RX72N): @n
+					16MHz のベースクロックを使用する @n
+			　　　　P40 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -31,30 +34,35 @@
 namespace {
 
 #if defined(SIG_RX71M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX71M" };
 #elif defined(SIG_RX64M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX64M" };
 #elif defined(SIG_RX65N)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 	static const char* system_str_ = { "RX65N" };
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX24T" };
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX66T" };
+#elif defined(SIG_RX72N)
+	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::SCI2 SCI_CH;
+	static const char* system_str_ = { "RX72N" };
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
@@ -163,7 +171,7 @@ namespace {
 							if(!(utils::input("%x", buff) % data).status()) {
 								break;
 							}
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72N)
 							uint32_t inc = 4;
 							uint8_t tmp[4];
 							tmp[3] = data;
@@ -177,7 +185,7 @@ namespace {
 							tmp[0] = data;
 							if(!flash_io_.write(org, tmp, 1)) {
 #endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72N)
 								utils::format("Write error: %04X: %08X\n")
 #elif defined(SIG_RX24T)
 								utils::format("Write error: %04X: %02X\n")
@@ -194,11 +202,11 @@ namespace {
 				}
 			}
 		} else if(command_.cmp_word(0, "uid")) {
-#if defined(SIG_RX24T) || defined(SIG_RX65N) || defined(SIG_RX66T)
+#if defined(SIG_RX24T) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72N)
 			utils::format("Unique ID0: %08X\n") % device::FLASH::UIDR0();
 			utils::format("Unique ID1: %08X\n") % device::FLASH::UIDR1();
 			utils::format("Unique ID2: %08X\n") % device::FLASH::UIDR2();
-#if defined(SIG_RX24T) || defined(SIG_RX65N)
+#if defined(SIG_RX24T) || defined(SIG_RX65N) || defined(SIG_RX72N)
 			utils::format("Unique ID3: %08X\n") % device::FLASH::UIDR3();
 #endif
 #else
@@ -291,12 +299,6 @@ int main(int argc, char** argv)
 			LED::P = 0;
 		} else {
 			LED::P = 1;
-		}
-
-		// エコーバック処理
-		while(sci_length() > 0) {
-			auto ch = sci_getch();
-			sci_putch(ch);
 		}
 	}
 }

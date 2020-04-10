@@ -75,6 +75,22 @@ namespace device {
 				ICU::IER.CMWI1 = ena;
 				break;
 
+			case ICU::VECTOR::SSIRXI0:
+				ICU::IER.SSIRXI0 = 0;
+				ICU::IPR.SSIRXI0 = lvl;
+				ICU::IER.SSIRXI0 = ena;
+				break;
+			case ICU::VECTOR::SSITXI0:
+				ICU::IER.SSITXI0 = 0;
+				ICU::IPR.SSITXI0 = lvl;
+				ICU::IER.SSITXI0 = ena;
+				break;
+			case ICU::VECTOR::SSIRTI1:
+				ICU::IER.SSIRTI1 = 0;
+				ICU::IPR.SSIRTI1 = lvl;
+				ICU::IER.SSIRTI1 = ena;
+				break;
+
 			case ICU::VECTOR::GROUPBE0:
 				ICU::IER.GROUPBE0 = 0;
 				ICU::IPR.GROUPBE0 = lvl;
@@ -100,6 +116,7 @@ namespace device {
 				ICU::IPR.GROUPAL1 = lvl;
 				ICU::IER.GROUPAL1 = ena;
 				break;
+
 			default:
 				return false;
 			}

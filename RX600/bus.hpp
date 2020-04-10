@@ -543,7 +543,7 @@ namespace device {
 		static buspri_t<0x00081310> BUSPRI;
 
 
-#if defined(SIG_RX65N) || defined(SIG_RX72N)
+#if defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  拡張バスマスタ優先度制御レジスタ (EBMAPCR)

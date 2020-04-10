@@ -1,15 +1,17 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX72M Makefile
+#   @brief  RX72N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	led_sample
+TARGET		=	audio_sample
 
-DEVICE		=	R5F572MD
+DEVICE		=	R5F572NN
+
+FATFS_VER	=	ff13c/source
 
 BUILD		=	release
 
@@ -18,18 +20,28 @@ VPATH		=	../../
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c
+				common/vect.c \
+				common/syscalls.c \
+				$(FATFS_VER)/ff.c \
+				$(FATFS_VER)/ffsystem.c \
+				$(FATFS_VER)/ffunicode.c \
+				common/time.c
 
-PSOURCES	=	FIRST_sample/main.cpp
+PSOURCES	=	AUDIO_sample/main.cpp \
+				RX72N/icu_mgr.cpp \
+				graphics/font8x16.cpp \
+				graphics/color.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=
+USER_LIBS	=	m supc++ drw2d
 
-LDSCRIPT	=	../../RX72M/$(DEVICE).ld
+LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX72M \
+USER_DEFS	=	SIG_RX72N \
 				F_ICLK=240000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
-				F_FCLK=60000000 F_BCLK=120000000
+				F_FCLK=60000000 F_BCLK=120000000 \
+				FAT_FS FAT_FS_NUM=16
 
 MCU_TARGET	=	
 
