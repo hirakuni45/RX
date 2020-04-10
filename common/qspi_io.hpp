@@ -77,7 +77,7 @@ namespace device {
 
 		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) {
 ///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(PCLK);
-			uint32_t br = static_cast<uint32_t>(PCLK) / speed;
+			uint32_t br = static_cast<uint32_t>(QSPI::PCLK) / speed;
 			uint8_t dv = 0;
 			while(br > 512) {
 				br >>= 1;
@@ -127,10 +127,10 @@ namespace device {
 				return false;
 			}
 
-			power_mgr::turn(QSPI::get_peripheral());
+			power_mgr::turn(QSPI::PERIPHERAL);
 
 			// ポートを有効にする
-			port_map::turn(QSPI::get_peripheral(), true, PSEL);
+			port_map::turn(QSPI::PERIPHERAL, true, PSEL);
 
 			level_ = level;
 

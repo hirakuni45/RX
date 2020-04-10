@@ -24,6 +24,9 @@ namespace device {
 	template <uint32_t base, peripheral per, typename VEC, VEC ivec>
 	struct cmt_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static const auto IVEC = ivec;		///< 割り込みベクター
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  CMSTR0 レジスタ
@@ -118,24 +121,6 @@ namespace device {
 				break;
 			} 			
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_ivec() noexcept { return ivec; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() noexcept { return per; }
 	};
 
 
