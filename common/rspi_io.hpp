@@ -16,15 +16,15 @@
 #ifndef F_PCLKB
 #  error "rspi_io.hpp requires F_PCLKB to be defined"
 #else
-#undef PCLK
-#define PCLK F_PCLKB
+#undef PCLK_
+#define PCLK_ F_PCLKB
 #endif
 #elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
 #ifndef F_PCLKA
 #  error "rspi_io.hpp requires F_PCLKA to be defined"
 #else
-#undef PCLK
-#define PCLK F_PCLKA
+#undef PCLK_
+#define PCLK_ F_PCLKA
 #endif
 #endif
 
@@ -87,8 +87,8 @@ namespace device {
 
 
 		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) {
-///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(PCLK);
-			uint32_t br = static_cast<uint32_t>(PCLK) / speed;
+///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(PCLK_);
+			uint32_t br = static_cast<uint32_t>(PCLK_) / speed;
 			uint8_t dv = 0;
 			while(br > 512) {
 				br >>= 1;
@@ -129,7 +129,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_max_speed() const noexcept {
-			uint32_t clk = PCLK;
+			uint32_t clk = PCLK_;
 #ifdef SEEDA
 			while(clk > 20000000) {  // 15MHz
 //			while(clk > 10000000) {  // 7MHz
@@ -241,7 +241,7 @@ namespace device {
 			// 実際のクロックを表示
 #if 0
 			static const uint8_t n[4] = { 1, 2, 4, 8 };
-			uint32_t z = static_cast<uint32_t>(PCLK)
+			uint32_t z = static_cast<uint32_t>(PCLK_)
 					/ (2 * static_cast<uint32_t>(spbr + 1) * static_cast<uint32_t>(n[brdv]));
 			utils::format("RSPI Real Speed: %u [Hz]\n") % z;
 #endif
