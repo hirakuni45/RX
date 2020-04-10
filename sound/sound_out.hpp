@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	オーディオ出力クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -21,11 +21,11 @@ namespace sound {
 		uint16_t	l_ch;
 		uint16_t	r_ch;
 
-		wave_t() { }
+		wave_t() noexcept { }
 		void zero() noexcept { l_ch = r_ch = 0x8000; }
 	};
-
 }
+
 
 namespace utils {
 

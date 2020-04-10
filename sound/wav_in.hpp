@@ -13,6 +13,7 @@
 #include "common/format.hpp"
 #include "sound/tag.hpp"
 #include "sound/af_play.hpp"
+#include "sound/sound_out.hpp"
 
 namespace sound {
 
