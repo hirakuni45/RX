@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M/RX71M/RX65N/RX651 マルチメディアカードインタフェース（MMCIF）定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,18 +15,23 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  マルチメディアカードインタフェースクラス
+		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t base, peripheral per>
 	struct mmcif_t {
+
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  コマンド設定レジスタ（ CECMDSET ）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct cecmdset_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
+		template<uint32_t ofs>
+		struct cecmdset_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -54,7 +59,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 6>  CMD;
 			bit_rw_t <io_, bitpos::B30>     BOOT;
 		};
-		static cecmdset_t<0x00088500> CECMDSET;
+		static cecmdset_t<base + 0x00> CECMDSET;
 
 
 		//-----------------------------------------------------------------//
@@ -62,7 +67,7 @@ namespace device {
 			@brief  アーギュメントレジスタ（ CEARG ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x00088508>  CEARG;
+		static rw32_t<base + 0x08>  CEARG;
 
 
 		//-----------------------------------------------------------------//
@@ -70,7 +75,7 @@ namespace device {
 			@brief  自動 CMD12 アーギュメントレジスタ（ CEARGCMD12 ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x0008850C>  CEARGCMD12;
+		static rw32_t<base + 0x0C>  CEARGCMD12;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -78,9 +83,9 @@ namespace device {
 			@brief  コマンド制御レジスタ（ CECMDCTRL ）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct cecmdctrl_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
+		template<uint32_t ofs>
+		struct cecmdctrl_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -88,7 +93,7 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B3>  BREAK;
 		};
-		static cecmdctrl_t<0x00088510> CECMDCTRL;
+		static cecmdctrl_t<base + 0x10> CECMDCTRL;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -96,9 +101,9 @@ namespace device {
 			@brief  転送ブロック設定レジスタ（ CEBLOCKSET ）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template<uint32_t base>
-		struct ceblockset_t : public rw32_t<base> {
-			typedef rw32_t<base> io_;
+		template<uint32_t ofs>
+		struct ceblockset_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -107,7 +112,7 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  16>  BLKSIZ;
 			bits_rw_t<io_, bitpos::B16, 16>  BLKCNT;
 		};
-		static ceblockset_t<0x00088514> CEBLOCKSET;
+		static ceblockset_t<base + 0x14> CEBLOCKSET;
 
 
 
@@ -116,15 +121,7 @@ namespace device {
 
 
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return peripheral::MMCIF; }
 	};
 
-	typedef mmcif_t MMCIF;
+	typedef mmcif_t<0x00088500, peripheral::MMCIF> MMCIF;
 }

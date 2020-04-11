@@ -16,12 +16,15 @@ namespace device {
 	/*!
 		@brief	DMA コントローラ（DMACa）
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
-		@param[in]	vec		割り込みベクター
+		@param[in]	per		ペリフェラル型
+		@param[in]	ivec	割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t, ICU::VECTOR vec>
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
 	struct dmac_t {
+
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static const auto IVEC = ivec;			///< 割り込みベクター
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -207,24 +210,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>   DISEL;
 		};
 		static dmcsl_t<base + 0x1F> DMCSL;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec() { return vec; }
 	};
 
 

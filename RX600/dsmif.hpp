@@ -26,6 +26,12 @@ namespace device {
 		ICU::VECTOR_BL2 ocdi, ICU::VECTOR_BL2 sumei, ICU::VECTOR_BL2 scdi>
 	struct dsmif_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static const auto OCD_VEC  = ocdi;	///< 過電流検出割り込み
+		static const auto SUME_VEC = sumei;	///< 合計電流エラー割り込み
+		static const auto SCD_VEC  = scdi;	///< 短絡検出割り込み
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  DSMIF 制御レジスタ (DSCR)
@@ -55,47 +61,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B28, 4>  OCSH;
 		};
 		static dscr_t<base + 0x00> DSCR;
-
-
-
-
-
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  OCDI 割り込みベクタを返す
-			@return 割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_ocdi_vec() { return ocdi; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  SUMEI 割り込みベクタを返す
-			@return 割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_sumei_vec() { return sumei; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  SCDI 割り込みベクタを返す
-			@return 割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_scdi_vec() { return scdi; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 
 	typedef dsmif_t<0x000A0700, peripheral::PMGI0,

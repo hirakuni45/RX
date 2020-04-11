@@ -26,6 +26,8 @@ namespace device {
 	template <peripheral per>
 	struct r12da_t {
 
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  D/A データレジスタ 0（DADR0）
@@ -99,15 +101,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7> DAADST;
 		};
 		static daadscr_t<0x00088046> DAADSCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 
 

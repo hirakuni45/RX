@@ -708,8 +708,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(uint8_t level)
 		{
-			power_mgr::turn(ETHRC::get_peripheral());
-			port_map::turn(ETHRC::get_peripheral());
+			power_mgr::turn(ETHRC::PERIPHERAL);
+			port_map::turn(ETHRC::PERIPHERAL);
 
 			intr_level_ = level;
 

@@ -24,8 +24,9 @@ namespace device {
 	template <uint32_t base, peripheral per, typename VEC, VEC ivec>
 	struct cmt_t {
 
-		static const auto PERIPHERAL = per;	///< ペリフェラル型
-		static const auto IVEC = ivec;		///< 割り込みベクター
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static const auto IVEC = ivec;			///< 割り込みベクター
+		static const uint32_t PCLK = F_PCLKB;	///< PCLK 周波数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

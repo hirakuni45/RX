@@ -386,6 +386,9 @@ namespace device {
 	template <uint32_t base, peripheral per, uint32_t ch>
 	struct gptn_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  汎用 PWM タイマ I/O コントロールレジスタ (GTIOR)
@@ -718,15 +721,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  SOTR;
 		};
 		static gtsos_t GTSOTR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 
 
 		//-----------------------------------------------------------------//

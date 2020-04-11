@@ -28,6 +28,10 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
 	struct cmtw_t {
 
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static const auto IVEC = ivec;			///< 割り込みベクター
+		static const uint32_t PCLK = F_PCLKB;	///< PCLK 周波数
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  タイマスタートレジスタ（CMWSTR）
@@ -147,24 +151,6 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static rw32_t<base + 0x24> CMWOCR1;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() noexcept { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_ivec() noexcept { return ivec; }
 	};
 
 	typedef cmtw_t<0x00094200, peripheral::CMTW0, ICU::VECTOR::CMWI0> CMTW0;

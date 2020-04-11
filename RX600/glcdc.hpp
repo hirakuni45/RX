@@ -16,11 +16,13 @@ namespace device {
 	/*!
 		@brief  GLCDC 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
+	template <uint32_t base, peripheral per>
 	struct glcdc_t {
+
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1276,15 +1278,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 6>  DCDR;
 		};
 		static panelclk_t<base + 0x1450>  PANELCLK;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
 	};
 
 	typedef glcdc_t<0x000E0000, peripheral::GLCDC> GLCDC;

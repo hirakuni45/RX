@@ -21,6 +21,9 @@ namespace device {
 	template <peripheral per>
 	struct dtc_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  DTC コントロールレジスタ（DTCCR）
@@ -104,15 +107,6 @@ namespace device {
 			bit_rw_t <io_, bitpos::B15>   ACT;
 		};
 		static dtcsts_t<0x0008240E> DTCSTS;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 
 	typedef dtc_t<peripheral::DTC>  DTC;

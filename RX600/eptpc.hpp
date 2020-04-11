@@ -21,6 +21,8 @@ namespace device {
 	template <peripheral per>
 	struct eptpc_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  MINT 割り込み要因ステータスレジスタ (MIESR)
@@ -773,15 +775,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 3>   SCLKSEL;
 		};
 		static stcselr_t<0x000C0504>  STCSELR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 
 
@@ -794,6 +787,9 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t ofs, peripheral per>
 	struct eptpcx_t {
+
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -1660,15 +1656,6 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static rw32_t<0x000C49D4 + ofs> RSTOUTR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 	typedef eptpc_t<peripheral::EPTPC> EPTPC;
 	typedef eptpcx_t<0x000, peripheral::EPTPC0> EPTPC0;

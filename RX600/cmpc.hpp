@@ -22,11 +22,15 @@ namespace device {
 		@brief  コンパレータ C（CMPC）
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	vec		割り込みベクタ型
+		@param[in]	ivec	割り込みベクタ型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR vec>
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
 	struct cmpc_t {
+
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static const auto IVEC = ivec;			///< 割り込みベクター
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -125,24 +129,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  CPOE;
 		};
 		static cmpioc_t<base + 0x10> CMPIOC;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vec() { return vec; }
 	};
 
 #if defined(SIG_RX24T)

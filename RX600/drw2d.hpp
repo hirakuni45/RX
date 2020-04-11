@@ -16,11 +16,15 @@ namespace device {
 	/*!
 		@brief  DRW2D 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
+	template <uint32_t base, peripheral per>
 	struct drw2d_t {
+
+		static const auto PERIPHERAL = per;					///< ペリフェラル型
+		static const auto IVEC = ICU::VECTOR_AL1::DRW_IRQ;	///< 割り込みベクター
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -575,24 +579,6 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static trw32_t<base + 0xCC> PERFCNT1;
 		static trw32_t<base + 0xD0> PERFCNT2;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  DRW2D 割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_AL1 get_irq_vec() { return ICU::VECTOR_AL1::DRW_IRQ; }
 	};
 
 	typedef drw2d_t<0x000E3000, peripheral::DRW2D> DRW2D;
