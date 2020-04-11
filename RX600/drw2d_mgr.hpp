@@ -202,14 +202,14 @@ namespace device {
 		bool start() noexcept
 		{
 			// DRW2D power management
-			power_mgr::turn(DRW::get_peripheral());
+			power_mgr::turn(DRW::PERIPHERAL);
 
 			// initialization Dave2D
 			d2_ = d2_opendevice(0);
 			uint32_t init_flag = 0;
 			d2_inithw(d2_, init_flag);
 
-			icu_mgr::install_group_task(DRW::get_irq_vec(), drw_int_isr);
+			icu_mgr::install_group_task(DRW::IVEC, drw_int_isr);
 			icu_mgr::set_level(ICU::VECTOR::GROUPAL1, 2);
 
 			clut_[0] = 0xff000000;
@@ -250,9 +250,9 @@ namespace device {
 			d2_closedevice(d2_);
 			d2_ = nullptr;
 
-			icu_mgr::install_group_task(DRW::get_irq_vec(), nullptr);
+			icu_mgr::install_group_task(DRW::IVEC, nullptr);
 
-			power_mgr::turn(DRW::get_peripheral(), false);
+			power_mgr::turn(DRW::PERIPHERAL, false);
 		}
 
 

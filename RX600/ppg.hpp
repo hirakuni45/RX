@@ -22,6 +22,9 @@ namespace device {
 	template <uint32_t ch, peripheral per>
 	struct ppg_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  PPG トリガセレクトレジスタ（PTRSLR）
@@ -139,15 +142,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7>  G3INV;
 		};
 		static pmr_t<0x000881E7 + ch * 0x10> PMR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 
 

@@ -87,7 +87,7 @@ namespace device {
 			}
 			if(cmt == 0) return false;
 
-			auto per = TPU::get_peripheral();
+			auto per = TPU::PERIPHERAL;
 
 			// プリスケーラーの算出と指定 (shift)
 			// 1: 1/2, 2: 1/4, 3: 1/8, ...
@@ -141,7 +141,7 @@ namespace device {
 #if (defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N))
 				intr_vec_ = ICU::VECTOR::INTB128;
 				icu_mgr::set_task(intr_vec_, tpu_task_);
-				ICU::SLIBXR128 = TPU::get_TGIA();
+				ICU::SLIBXR128 = TPU::RA_INN;
 				ICU::IPR.INTB128 = level_;
 				ICU::IER.INTB128 = true;
 #endif
@@ -165,7 +165,7 @@ namespace device {
 		{
 			TPU::TIER = 0;
 			TPU::enable(false);
-			power_mgr::turn(TPU::get_peripheral(), false);
+			power_mgr::turn(TPU::PERIPHERAL, false);
 		}
 
 

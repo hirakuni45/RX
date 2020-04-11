@@ -1533,10 +1533,10 @@ namespace device {
 #endif
 
 			// Supply the peripheral clock to the GLCD module
-			power_mgr::turn(GLC::get_peripheral());
+			power_mgr::turn(GLC::PERIPHERAL);
 
 			// LCD_DATA0 to LCD_DATA15, LCD_CLK, LCD_TCON0, LCD_TCON2, LCD_TCON3
-			if(!port_map::turn(GLC::get_peripheral())) {
+			if(!port_map::turn(GLC::PERIPHERAL)) {
 				utils::format("GLCDC: port map fail...\n");
 				return false;
 			}

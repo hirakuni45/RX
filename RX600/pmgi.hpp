@@ -22,6 +22,9 @@ namespace device {
 	template <uint32_t base, peripheral per>
 	struct pmgi_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  PMGI コンフィギュレーションレジスタ (PMGCR)
@@ -67,15 +70,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 16> PRD;
 		};
 		static psmr_t<base + 0x04> PSMR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 
 	typedef pmgi_t<0x000C5880, peripheral::PMGI0> PMGI0;

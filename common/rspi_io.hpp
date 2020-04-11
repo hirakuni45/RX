@@ -3,30 +3,13 @@
 /*!	@file
 	@brief	RX グループ・RSPI I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
-
-/// F_PCKx は速度パラメーター計算で必要で、設定が無いとエラーにします。
-#if defined(SIG_RX24T)
-#ifndef F_PCLKB
-#  error "rspi_io.hpp requires F_PCLKB to be defined"
-#else
-#undef PCLK_
-#define PCLK_ F_PCLKB
-#endif
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-#ifndef F_PCLKA
-#  error "rspi_io.hpp requires F_PCLKA to be defined"
-#else
-#undef PCLK_
-#define PCLK_ F_PCLKA
-#endif
-#endif
 
 namespace device {
 
@@ -88,7 +71,7 @@ namespace device {
 
 		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) {
 ///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(PCLK_);
-			uint32_t br = static_cast<uint32_t>(PCLK_) / speed;
+			uint32_t br = static_cast<uint32_t>(RSPI::PCLK) / speed;
 			uint8_t dv = 0;
 			while(br > 512) {
 				br >>= 1;
@@ -129,7 +112,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_max_speed() const noexcept {
-			uint32_t clk = PCLK_;
+			uint32_t clk = RSPI::PCLK;
 #ifdef SEEDA
 			while(clk > 20000000) {  // 15MHz
 //			while(clk > 10000000) {  // 7MHz
@@ -156,13 +139,13 @@ namespace device {
 		{
 			level_ = level;
 
-			power_mgr::turn(RSPI::get_peripheral());
+			power_mgr::turn(RSPI::PERIPHERAL);
 
 			// デバイスを不許可
 			RSPI::SPCR = 0x00;
 
 			// ポートを有効にする
-			port_map::turn(RSPI::get_peripheral(), true, PSEL);
+			port_map::turn(RSPI::PERIPHERAL, true, PSEL);
 
 			bool f = true;
 			uint8_t brdv;
@@ -220,7 +203,7 @@ namespace device {
 		{
 			level_ = 0;
 
-			power_mgr::turn(RSPI::get_peripheral());
+			power_mgr::turn(RSPI::PERIPHERAL);
 
 			RSPI::SPCR = 0x00;			
 
@@ -230,7 +213,7 @@ namespace device {
 			if(!clock_div_(speed, brdv, spbr)) {
 				f = false;
 			}
-			port_map::turn(RSPI::get_peripheral(), true, PSEL);
+			port_map::turn(RSPI::PERIPHERAL, true, PSEL);
 #if 0
 			utils::format("RSPI Request Speed: %u [Hz]\n") % speed;
 			utils::format("RSPI SPBR: %d\n") % static_cast<uint32_t>(spbr);
@@ -361,8 +344,8 @@ namespace device {
 		void destroy(bool power = true) noexcept
 		{
 			RSPI::SPCR = 0x00;
-			port_map::turn(RSPI::get_peripheral(), false);
-			if(power) power_mgr::turn(RSPI::get_peripheral(), false);
+			port_map::turn(RSPI::PERIPHERAL, false);
+			if(power) power_mgr::turn(RSPI::PERIPHERAL, false);
 		}
 	};
 }

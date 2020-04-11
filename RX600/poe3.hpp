@@ -23,6 +23,9 @@ namespace device {
 	template <uint32_t org, peripheral per>
 	struct poe3_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	入力レベルコントロール / ステータスレジスタ 1（ICSR1）
@@ -1976,14 +1979,6 @@ namespace device {
 		static ICU::VECTOR_BL1 get_oei5_vec() { return ICU::VECTOR_BL1::OEI5; }
 #endif
 #endif
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 #if defined(SIG_RX24T) || defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N)
 	typedef poe3_t<0x0008C4C0, peripheral::POE> POE3;

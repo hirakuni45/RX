@@ -123,9 +123,9 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		bool start(uint8_t adiv, FORM form, D_NUM dnum, S_NUM snum, uint8_t intl) noexcept
 		{
-			device::power_mgr::turn(SSIE::get_peripheral());
+			device::power_mgr::turn(SSIE::PERIPHERAL);
 
-			if(!device::port_map::turn(SSIE::get_peripheral(), true)) {
+			if(!device::port_map::turn(SSIE::PERIPHERAL, true)) {
 				return false;
 			}
 
@@ -178,11 +178,11 @@ namespace utils {
 
 			// 割り込み設定
 			if(intl > 0) {
-				device::icu_mgr::set_level(SSIE::get_txi_vec(), intl);
-				device::icu_mgr::set_task(SSIE::get_txi_vec(), send_task_);
+				device::icu_mgr::set_level(SSIE::TX_VEC, intl);
+				device::icu_mgr::set_task(SSIE::TX_VEC, send_task_);
 				SSIE::SSIFCR.TIE = 1;
 			} else {
-				device::icu_mgr::set_task(SSIE::get_txi_vec(), nullptr);
+				device::icu_mgr::set_task(SSIE::TX_VEC, nullptr);
 			}
 
 			uint8_t word = 0b00;

@@ -54,14 +54,14 @@ namespace device {
 		bool start(output otype, bool ampe) const noexcept
 		{
 			if(otype == output::NONE) {
-				power_mgr::turn(DAC::get_peripheral());
+				power_mgr::turn(DAC::PERIPHERAL);
 				DAC::DACR.DAE = 0;
 				DAC::DACR = DAC::DACR.DAE.b(0) | DAC::DACR.DAOE0.b(0) | DAC::DACR.DAOE1.b(0);
-				power_mgr::turn(DAC::get_peripheral(), false);
+				power_mgr::turn(DAC::PERIPHERAL, false);
 				return true;
 			}
 
-			power_mgr::turn(DAC::get_peripheral());
+			power_mgr::turn(DAC::PERIPHERAL);
 
 			DAC::DADPR.DPSEL = 1;  // 左詰め（下位４ビット無視）
 
@@ -193,11 +193,11 @@ namespace device {
 		{
 			if(otype == output::NONE) {
 				R12DA::DACR = R12DA::DACR.DAE.b(0) | R12DA::DACR.DAOE0.b(0) | R12DA::DACR.DAOE1.b(0);
-				power_mgr::turn(R12DA::get_peripheral(), false);
+				power_mgr::turn(R12DA::PERIPHERAL, false);
 				return true;
 			}
 
-			power_mgr::turn(R12DA::get_peripheral());
+			power_mgr::turn(R12DA::PERIPHERAL);
 
 			R12DA::DADPR.DPSEL = 1;  // 左詰め（上位１２ビット無視）
 

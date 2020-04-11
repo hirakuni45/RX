@@ -24,9 +24,15 @@ namespace device {
 		@param[in]	tev		「送信終了」ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per,
-		typename INT, INT eev, ICU::VECTOR rxv, ICU::VECTOR txv, INT tev>
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv,
+		typename INT, INT eev, INT tev>
 	struct riic_t {
+
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static const auto TX_VEC = txv;		///< 受信割り込みベクター
+		static const auto RX_VEC = rxv;		///< 送信割り込みベクター
+		static const auto EE_VEC = eev;		///< 通信エラー、イベント割り込みベクター
+		static const auto TE_VEC = tev;		///< 送信終了割り込みベクター
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -367,68 +373,24 @@ namespace device {
 		static uint32_t get_chanel() {
 			return (base >> 5) & 1;
 		}
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  「通信エラー、通信イベント」ベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_ee_vec() { return eev; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  「受信データフル」ベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_rx_vec() { return rxv; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  「送信データエンプティ」ベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_tx_vec() { return txv; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  「送信終了」ベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_te_vec() { return tev; }
 	};
 #if defined(SIG_RX24T)
-	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR, ICU::VECTOR::RIIC_EEI0,
-		ICU::VECTOR::RIIC_RXI0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR::RIIC_TEI0> RIIC0;
+	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR::RIIC_RXI0,
+		ICU::VECTOR, ICU::VECTOR::RIIC_EEI0, ICU::VECTOR::RIIC_TEI0> RIIC0;
 #elif defined(SIG_RX64M) || defined(SIG_RX71M)
-	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0,
-		ICU::VECTOR::RIIC_RXI0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR_BL1::TEI0> RIIC0;
-	typedef riic_t<0x00088340, peripheral::RIIC2, ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI2,
-		ICU::VECTOR::RIIC_RXI2, ICU::VECTOR::RIIC_TXI2, ICU::VECTOR_BL1::TEI2> RIIC2;
-#elif defined(SIG_RX65N)
-	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0,
-		ICU::VECTOR::RIIC_RXI0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR_BL1::TEI0> RIIC0;
-	typedef riic_t<0x00088320, peripheral::RIIC1, ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI1,
-		ICU::VECTOR::RIIC_RXI1, ICU::VECTOR::RIIC_TXI1, ICU::VECTOR_BL1::TEI1> RIIC1;
-	typedef riic_t<0x00088340, peripheral::RIIC2, ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI2,
-		ICU::VECTOR::RIIC_RXI2, ICU::VECTOR::RIIC_TXI2, ICU::VECTOR_BL1::TEI2> RIIC2;
+	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR::RIIC_RXI0,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0> RIIC0;
+	typedef riic_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::RIIC_TXI2, ICU::VECTOR::RIIC_RXI2,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI2, ICU::VECTOR_BL1::TEI2> RIIC2;
+#elif defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)
+	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR::RIIC_RXI0,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0> RIIC0;
+	typedef riic_t<0x00088320, peripheral::RIIC1, ICU::VECTOR::RIIC_TXI1, ICU::VECTOR::RIIC_RXI1,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI1, ICU::VECTOR_BL1::TEI1> RIIC1;
+	typedef riic_t<0x00088340, peripheral::RIIC2, ICU::VECTOR::RIIC_TXI2, ICU::VECTOR::RIIC_RXI2,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI2, ICU::VECTOR_BL1::TEI2> RIIC2;
 #elif defined(SIG_RX66T)
-	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0,
-		ICU::VECTOR::RIIC_RXI0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR_BL1::TEI0> RIIC0;
+	typedef riic_t<0x00088300, peripheral::RIIC0, ICU::VECTOR::RIIC_TXI0, ICU::VECTOR::RIIC_RXI0,
+		ICU::VECTOR_BL1, ICU::VECTOR_BL1::EEI0, ICU::VECTOR_BL1::TEI0> RIIC0;
 #endif
 }

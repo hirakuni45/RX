@@ -24,7 +24,7 @@ namespace device {
 			@brief  通常ベクター型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR {
+		enum class VECTOR : uint8_t {
 			NONE    = 0,	///< none 
 			BUSERR  = 16,   ///< BSC
 

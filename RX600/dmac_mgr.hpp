@@ -58,7 +58,7 @@ namespace device {
 			} else {
 				set_interrupt_task(nullptr, static_cast<uint32_t>(vec));
 			}
-			icu_mgr::set_level(DMAC::get_peripheral(), level_);
+			icu_mgr::set_level(DMAC::PERIPHERAL, level_);
 		}
 
 
@@ -134,10 +134,10 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void start(uint32_t lvl = 0) noexcept
 		{
-			power_mgr::turn(DMAC::get_peripheral());
+			power_mgr::turn(DMAC::PERIPHERAL);
 
 			level_ = lvl;
-			set_vector_(DMAC::get_vec());
+			set_vector_(DMAC::IVEC);
 
 			DMAST.DMST = 1;
 		}
@@ -162,7 +162,7 @@ namespace device {
 		{
 			if(lim > 1024) return false;
 
-			power_mgr::turn(DMAC::get_peripheral());
+			power_mgr::turn(DMAC::PERIPHERAL);
 
 			DMAC::DMCNT.DTE = 0;  // 念のため停止させる。
 
@@ -215,9 +215,9 @@ namespace device {
 			DMAC::DMCRB = 1;
 
 			level_ = ilvl;
-			set_vector_(DMAC::get_vec());
+			set_vector_(DMAC::IVEC);
 			if(level_ > 0) {
-				icu_mgr::set_dmac(DMAC::get_peripheral(), trg);
+				icu_mgr::set_dmac(DMAC::PERIPHERAL, trg);
 				DMAC::DMINT = DMAC::DMINT.DTIE.b();
 				DMAC::DMCSL.DISEL = isel;
 			} else {
@@ -256,7 +256,7 @@ namespace device {
 			DMAC::DMCNT.DTE = 0;
 
 			if(power) {
-				power_mgr::turn(DMAC::get_peripheral(), false);
+				power_mgr::turn(DMAC::PERIPHERAL, false);
 			}
 		}
 

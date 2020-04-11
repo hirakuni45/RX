@@ -22,6 +22,8 @@ namespace device {
 	template <uint32_t base, peripheral per>
 	struct etherc_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ETHERC モードレジスタ（ECMR）
@@ -402,15 +404,6 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static rw32_t<base + 0xF8> MAFCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 
 	typedef etherc_t<0x000C0100, peripheral::ETHERC0> ETHERC0;

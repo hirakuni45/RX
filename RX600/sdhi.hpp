@@ -26,6 +26,12 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
 	struct sdhi_t {
 
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static const auto CDET_VEC = cdeti;		///< CDET 割り込みベクター
+		static const auto CAC_VEC = caci;		///< CAC 割り込みベクター
+		static const auto SDAC_VEC = sdaci;		///< SDAC 割り込みベクター
+		static const auto SBFA_VEC = sbfai;		///< SBFA 割り込みベクター
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コマンドレジスタ（ SDCMD ）
@@ -463,51 +469,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B7>  BRSWP;
 		};
 		static sdswap_t SDSWAP;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  カード検出割り込み・ベクタ
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_cdeti() { return cdeti; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  カードアクセス割り込み・ベクタ
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_caci() { return caci; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  SDIO アクセス割り込み・ベクタ
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_sdaci() { return sdaci; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  バッファアクセス割り込み・ベクタ
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_sbfai() { return sbfai; }
 	};
 
 	typedef sdhi_t<0x0008AC00, peripheral::SDHI,

@@ -22,6 +22,8 @@ namespace device {
 	template <uint32_t base, peripheral per>
 	struct can_t {
 
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  制御レジスタ（ CTLR ）
@@ -496,15 +498,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B1, 2>  TSTM;
 		};
 		static tcr_t<base + 0x0658> TCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 
 

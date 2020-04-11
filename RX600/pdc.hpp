@@ -21,6 +21,9 @@ namespace device {
 	template <peripheral per>
 	struct pdc_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  PDC 制御レジスタ 0 （ PCCR0 ）
@@ -159,15 +162,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 12>  HSZ;
 		};
 		static hcr_t<0x000A0518>  HCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 	typedef pdc_t<peripheral::PDC> PDC;
 }

@@ -22,10 +22,13 @@ namespace device {
 	/*!
 		@brief  edmac core 定義
 		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
+	template <uint32_t base, peripheral per>
 	struct edmac_core_t {
+
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -324,7 +327,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per>
-	struct edmac_t : public edmac_core_t<base> {
+	struct edmac_t : public edmac_core_t<base, per> {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -450,15 +453,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> ELB;
 		};
 		static iosr_t<base + 0x6C> IOSR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 
 
@@ -470,7 +464,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per>
-	struct ptpedmac_t : public edmac_core_t<base> {
+	struct ptpedmac_t : public edmac_core_t<base, per> {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -543,15 +537,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B30>  TWBIP;
 		};
 		static eesipr_t<base + 0x30> EESIPR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 
 	typedef edmac_t<0x000C0000, peripheral::EDMAC0>      EDMAC0;

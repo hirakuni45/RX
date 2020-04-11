@@ -26,6 +26,9 @@ namespace device {
 	template <peripheral per>
 	struct rtc_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  64Hz カウンタ（R64CNT）
@@ -806,15 +809,6 @@ namespace device {
 		static rmoncpy_t<0x0008C45C> RMONCP0;
 		static rmoncpy_t<0x0008C46C> RMONCP1;
 		static rmoncpy_t<0x0008C47C> RMONCP2;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 	};
 	typedef rtc_t<peripheral::RTC> RTC;
 }

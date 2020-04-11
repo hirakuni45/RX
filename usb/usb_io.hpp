@@ -74,7 +74,7 @@ namespace device {
 			ilvl_ = ilvl;
 
 			// VBUSEN, OVERCURA ピンの設定
-			if(!port_map::turn(USB_CH::get_peripheral())) {
+			if(!port_map::turn(USB_CH::PERIPHERAL)) {
 				return false;
 			}
 
@@ -85,13 +85,13 @@ namespace device {
 		void enable_mod(bool ena = true) noexcept
 		{
 			format("USB0: enable_mod (%d)...\n") % static_cast<int>(ena);
-			power_mgr::turn(USB_CH::get_peripheral(), ena);
+			power_mgr::turn(USB_CH::PERIPHERAL, ena);
 		}
 
 
 		void init_intr() noexcept
 		{
-			auto no = USB_CH::get_i_vec();
+			auto no = USB_CH::I_VEC;
 			ivec_ = icu_mgr::set_interrupt(no, i_task_, ilvl_);
 			format("USB0: init_intr(Vec: %d, No: %d, Lvl: %d)...\n")
 				% static_cast<int>(ivec_) % static_cast<int>(no) % static_cast<int>(ilvl_);

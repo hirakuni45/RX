@@ -210,16 +210,16 @@ namespace device {
 		bool start_normal(typename MTUX::channel ch, OUTPUT_TYPE ot, uint32_t frq,
 			uint8_t lvl = 0) noexcept
 		{
-			if(MTUX::get_peripheral() == peripheral::MTU5) {  // MTU5 は通常出力として利用不可
+			if(MTUX::PERIPHERAL == peripheral::MTU5) {  // MTU5 は通常出力として利用不可
 				return false;
 			}
 
-			power_mgr::turn(MTUX::get_peripheral());
+			power_mgr::turn(MTUX::PERIPHERAL);
 
 			channel_ = ch;
 
 			bool pena = (ot != OUTPUT_TYPE::NONE);
-			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch), pena);
+			port_map::turn(MTUX::PERIPHERAL, static_cast<port_map::channel>(ch), pena);
 
 			uint8_t dv;
 			uint32_t match;
@@ -332,15 +332,14 @@ namespace device {
 		bool start_pwm2(typename MTUX::channel ch, OUTPUT_TYPE ot, uint32_t frq,
 			uint8_t level = 0) noexcept
 		{
-			auto ph = MTUX::get_peripheral();
-			if(peripheral::MTU3 <= ph && ph <= peripheral::MTU7) {
+			if(peripheral::MTU3 <= MTUX::PERIPHERAL && MTUX::PERIPHERAL <= peripheral::MTU7) {
 				return false;
 			}
 
-			power_mgr::turn(MTUX::get_peripheral());
+			power_mgr::turn(MTUX::PERIPHERAL);
 
 			bool pena = (ot != OUTPUT_TYPE::NONE);
-			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch), pena);
+			port_map::turn(MTUX::PERIPHERAL, static_cast<port_map::channel>(ch), pena);
 
 			uint8_t dv;
 			uint32_t match;
@@ -419,13 +418,14 @@ namespace device {
 		{
 			if(lvl == 0) return false;
 
-			if(MTUX::get_peripheral() == peripheral::MTU5) {  // MTU5 はインプットキャプチャとして利用不可
+			// MTU5 はインプットキャプチャとして利用不可
+			if(MTUX::PERIPHERAL == peripheral::MTU5) {
 				return false;
 			}
 
-			power_mgr::turn(MTUX::get_peripheral());
+			power_mgr::turn(MTUX::PERIPHERAL);
 
-			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch));
+			port_map::turn(MTUX::PERIPHERAL, static_cast<port_map::channel>(ch));
 
 			uint8_t ctd = 0;
 			switch(ct) {
@@ -476,13 +476,12 @@ namespace device {
 		bool start_count_phase(typename MTUX::channel ch, uint8_t level = 0) noexcept
 		{
 			// 工事中
-			auto ph = MTUX::get_peripheral();
-			if(peripheral::MTU1 == ph || peripheral::MTU2 == ph) {
+			if(peripheral::MTU1 == MTUX::PERIPHERAL || peripheral::MTU2 == MTUX::PERIPHERAL) {
 			} else {
 				return false;
 			}
 
-			power_mgr::turn(MTUX::get_peripheral());
+			power_mgr::turn(MTUX::PERIPHERAL);
 #if 0
 			bool pena = (ot != OUTPUT_TYPE::NONE);
 			port_map::turn(MTUX::get_peripheral(), static_cast<port_map::channel>(ch), pena);

@@ -18,14 +18,20 @@ namespace device {
 		@brief	シリアルサウンドインタフェース（SSIE）
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	ssie	ステータス割り込みベクタ
-		@param[in]	rxi		受信データフル割り込みベクタ
 		@param[in]	txi		送信データエンプティ割り込みベクタ
+		@param[in]	rxi		受信データフル割り込みベクタ
+		@param[in]	ssie	ステータス割り込みベクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_BL1 ssie, ICU::VECTOR rxi, ICU::VECTOR txi>
+		ICU::VECTOR txi, ICU::VECTOR rxi, ICU::VECTOR_BL1 ssie>
 	struct ssie_t {
+
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static const auto TX_VEC = txi;		///< 送信データエンプティ割り込みベクタ
+		static const auto RX_VEC = rxi;		///< 受信データフル割り込みベクタ
+		static const auto SS_VEC = ssie;	///< ステータス割り込みベクタ
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -205,46 +211,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 5>   TDES;
 		};
 		static ssiscr_t<base + 0x24> SSISCR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ステータス割り込みベクターの取得
-			@return ステータス割り込みベクター
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_BL1 get_ssie_vec() { return ssie; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  受信データフル割り込みベクタを取得
-			@return 受信データフル割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_rxi_vec() { return rxi; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  送信データエンプティ割り込みベクタを取得
-			@return 送信データエンプティ割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_txi_vec() { return txi; }
 	};
 
 #if defined(SIG_RX72M) || defined(SIG_RX72N)
-	typedef ssie_t<0x0008A500, peripheral::SSIE0, ICU::VECTOR_BL1::SSIF0, ICU::VECTOR::SSIRXI0, ICU::VECTOR::SSITXI0> SSIE0;
-	typedef ssie_t<0x0008A540, peripheral::SSIE1, ICU::VECTOR_BL1::SSIF1, ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1> SSIE1;
+	typedef ssie_t<0x0008A500, peripheral::SSIE0,
+		ICU::VECTOR::SSITXI0, ICU::VECTOR::SSIRXI0, ICU::VECTOR_BL1::SSIF0> SSIE0;
+	typedef ssie_t<0x0008A540, peripheral::SSIE1,
+		ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1, ICU::VECTOR_BL1::SSIF1> SSIE1;
 #endif
 }

@@ -16,10 +16,13 @@ namespace device {
 	/*!
 		@brief  exdmac core 定義
 		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
+	template <uint32_t base, peripheral per>
 	struct exdmac_core_t {
+
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -305,11 +308,11 @@ namespace device {
 	/*!
 		@brief  edmac 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
-	struct exdmac0_t : public exdmac_core_t<base> {
+	template <uint32_t base, peripheral per>
+	struct exdmac0_t : public exdmac_core_t<base, per> {
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -319,15 +322,6 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static rw32_t<base + 0x18> EDMOFR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
 	};
 
 
@@ -335,20 +329,12 @@ namespace device {
 	/*!
 		@brief  edmac 定義
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t>
-	struct exdmac1_t : public exdmac_core_t<base> {
+	template <uint32_t base, peripheral per>
+	struct exdmac1_t : public exdmac_core_t<base, per> {
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
 	};
 
 	typedef exdmac0_t<0x00082800, peripheral::EXDMAC0>  EXDMAC0;

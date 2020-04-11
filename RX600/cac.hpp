@@ -25,6 +25,12 @@ namespace device {
 	template<peripheral per, typename INT, INT ferr, INT mend, INT ovff>
 	struct cac_t {
 
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static const auto FERR_VEC = ferr;		///< 周波数エラー割り込みベクター
+		static const auto MEND_VEC = mend;		///< 測定終了割り込みベクター
+		static const auto OVFF_VEC = ovff;		///< オーバーフロー割り込みベクター
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  CAC コントロールレジスタ 0（CACR0）
@@ -153,47 +159,11 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static rw16_t<0x0008B00A>  CACNTBR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  周波数エラー割り込みベクタを返す
-			@return 周波数エラー割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static INT get_ferr_vec() { return ferr; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  測定終了割り込みベクタを返す
-			@return 測定終了割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static INT get_mend_vec() { return mend; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  オーバフロー割り込みベクタを返す
-			@return オーバフロー割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static INT get_ovff_vec() { return ovff; }
 	};
 #if defined(SIG_RX24T)
 	typedef cac_t<peripheral::CAC,
 		ICU::VECTOR, ICU::VECTOR::FERRF, ICU::VECTOR::MENDF, ICU::VECTOR::OVFF> CAC;
-#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX66T)
+#elif defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef cac_t<peripheral::CAC,
 		ICU::VECTOR_BL0,
 		ICU::VECTOR_BL0::FERRI, ICU::VECTOR_BL0::MENDI, ICU::VECTOR_BL0::OVFI> CAC;
