@@ -69,7 +69,7 @@ namespace device {
 			uint32_t n = F_PCLKD / 1000000 + 10;
 			if(n > 255) return false;
 
-			power_mgr::turn(ADCU::get_peripheral());
+			power_mgr::turn(ADCU::PERIPHERAL);
 			ADCU::enable(ana);
 			ADCU::ADANSA.set(ana);
 			ADCU::ADSSTR.set(ana, n);
@@ -87,7 +87,7 @@ namespace device {
 		{
 			if(level_) {
 ///				set_interrupt_task(adi_task_, static_cast<uint32_t>(ADCU::get_vec()));
-///				icu_mgr::set_level(ADCU::get_peripheral(), level_);
+///				icu_mgr::set_level(ADCU::PERIPHERAL, level_);
 				ADCU::ADCSR = ADCU::ADCSR.ADST.b() | ADCU::ADCSR.ADIE.b();
 			} else {
 				ADCU::ADCSR = ADCU::ADCSR.ADST.b();
