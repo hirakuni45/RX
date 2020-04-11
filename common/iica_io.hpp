@@ -225,9 +225,9 @@ namespace device {
 		{
 			level_ = level;
 
-			power_mgr::turn(IICA::get_peripheral());
+			power_mgr::turn(IICA::PERIPHERAL);
 
-			port_map::turn(IICA::get_peripheral());
+			port_map::turn(IICA::PERIPHERAL);
 
 			IICA::ICCR1.ICE = 0;
 			IICA::ICCR1.IICRST = 1;
@@ -264,18 +264,18 @@ namespace device {
 ///			IICA::ICFER.TMOE = 1;  // TimeOut Enable
 
 			if(level_ > 0) {
-				icu_mgr::set_task(IICA::get_ee_vec(), event_task_);
-				icu_mgr::set_task(IICA::get_rx_vec(), recv_task_);
-				icu_mgr::set_task(IICA::get_tx_vec(), send_task_);
-				icu_mgr::set_task(IICA::get_te_vec(), tend_task_);
+				icu_mgr::set_task(IICA::EE_VEC, event_task_);
+				icu_mgr::set_task(IICA::RX_VEC, recv_task_);
+				icu_mgr::set_task(IICA::TX_VEC, send_task_);
+				icu_mgr::set_task(IICA::TE_VEC, tend_task_);
 			} else {
-				icu_mgr::set_task(IICA::get_ee_vec(), nullptr);
-				icu_mgr::set_task(IICA::get_rx_vec(), nullptr);
-				icu_mgr::set_task(IICA::get_tx_vec(), nullptr);
-				icu_mgr::set_task(IICA::get_te_vec(), nullptr);
+				icu_mgr::set_task(IICA::EE_VEC, nullptr);
+				icu_mgr::set_task(IICA::RX_VEC, nullptr);
+				icu_mgr::set_task(IICA::TX_VEC, nullptr);
+				icu_mgr::set_task(IICA::TE_VEC, nullptr);
 			}
 			IICA::ICIER = 0x00;
-			icu_mgr::set_level(IICA::get_peripheral(), level_);
+			icu_mgr::set_level(IICA::PERIPHERAL, level_);
 
 			IICA::ICCR1.IICRST = 0;
 

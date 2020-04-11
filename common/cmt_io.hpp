@@ -12,11 +12,6 @@
 #include "common/intr_utils.hpp"
 #include "common/vect.h"
 
-/// F_PCLKB は周期パラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCLKB
-#  error "cmt_io.hpp requires F_PCLKB to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -66,7 +61,7 @@ namespace device {
 		{
 			if(freq == 0) return false;
 
-			uint32_t cmcor = F_PCLKB / freq / 4;
+			uint32_t cmcor = CMT::PCLK / freq / 4;
 			if(cmcor & 1) {
 				cmcor >>= 1;
 				++cmcor;
