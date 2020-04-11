@@ -16,13 +16,18 @@ namespace device {
 	/*!
 		@brief  SCIF 定義基底クラス (SCIF)
 		@param[in]	base	ベース・アドレス
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 		@param[in]	txv		送信ベクター
 		@param[in]	rxv		受信ベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral t, ICU::VECTOR txv, ICU::VECTOR rxv>
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv>
 	struct scif_t {
+
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static const auto TX_VEC = txv;		///< 受信割り込みベクター
+		static const auto RX_VEC = rxv;		///< 送信割り込みベクター
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -248,33 +253,6 @@ namespace device {
 			bit_rw_t <io_, bitpos::B7>  BGDM;
 		};
 		static semr_t SEMR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  送信割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_tx_vec() { return txv; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  受信割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_rx_vec() { return rxv; }
 	};
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 	typedef scif_t<0x000D0000, peripheral::SCIF8,  ICU::VECTOR::TXIF8,  ICU::VECTOR::RXIF8>  SCIF8;

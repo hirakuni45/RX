@@ -16,11 +16,13 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	サンプリングレートコンバータ（SRC）
-		@param[in]	t		ペリフェラル型
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <peripheral t>
+	template <peripheral per>
 	struct src_t {
+
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -155,16 +157,6 @@ namespace device {
 //			void operator[] (uint16_t idx) { put(idx, val); }
 		};
 		static srcfctr_t<0x00098000> SRCFCTR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return t; }
-
 	};
 	typedef src_t<peripheral::SRC> SRC;
 }

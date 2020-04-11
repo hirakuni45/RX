@@ -387,11 +387,15 @@ namespace device {
 		@brief  S12AD0 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	ivec	割り込みベクター
+		@param[in]	cmpi	CMP 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec>
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi>
 	struct s12ad0_t : public s12adc_t<base> {
+
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static const auto CMP_VEC = cmpi;		///< CMP 割り込みベクター
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -716,25 +720,6 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8>  CMPF0;
 		};
 		static adcmpsr0_t<base + 0xA0>  ADCMPSR0;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  スキャン終了割り込みＡベクターを返す
-			@return スキャン終了割り込みＡベクター
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_BL1 get_cmpa_vec() { return ivec; }
-
 	};
 
 
@@ -743,13 +728,17 @@ namespace device {
 		@brief  S12AD1 定義
 		@param[in]	base	ベース・アドレス
 		@param[in]	per		ペリフェラル型
-		@param[in]	ivec	割り込みベクター
+		@param[in]	cmpi	CMP 割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 ivec>
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cmpi>
 	struct s12ad1_t : public s12adc_t<base> {
 
 		typedef s12adc_t<base> base_class;
+
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
+		static const auto CMP_VEC = cmpi;		///< CMP 割り込みベクター
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -1505,24 +1494,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  CMPFOC;
 		};
 		static adcmpser_t<base + 0xA4>  ADCMPSER;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  スキャン終了割り込みＡベクターを返す
-			@return スキャン終了割り込みＡベクター
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_BL1 get_cmpa_vec() { return ivec; }
 	};
 
 	typedef s12ad0_t<0x00089000, peripheral::S12AD,  ICU::VECTOR_BL1::S12CMPAI>   S12AD;

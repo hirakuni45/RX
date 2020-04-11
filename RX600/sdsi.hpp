@@ -26,6 +26,13 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL2 sdioi>
 	struct sdsi_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+//		static const auto CDET_VEC = cdeti;	///< カード検出割り込み・ベクタ
+//		static const auto CAC_VEC  = caci;	///< カードアクセス割り込み・ベクタ
+//		static const auto SDAC_VEC = sdaci;	///< SDIO アクセス割り込み・ベクタ
+//		static const auto SBFA_VEC = sdfai;	///< バッファアクセス割り込み・ベクタ
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  FN1 アクセス制御レジスタ (FN1ACCR)
@@ -261,22 +268,7 @@ namespace device {
 
 
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
 
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  SDSI 割り込み・ベクタ
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_sdioi() { return sdioi; }
 	};
 
 	typedef sdsi_t<0x00095000, peripheral::SDSI, ICU::VECTOR_BL2::SDIOI> SDSI;

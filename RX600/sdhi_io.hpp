@@ -346,7 +346,7 @@ namespace fatfs {
 
 			WPRT::DIR = 0;
 
-			device::power_mgr::turn(SDHI::get_peripheral());
+			device::power_mgr::turn(SDHI::PERIPHERAL);
 			using port_map = device::port_map;
 			port_map::turn_sdhi(port_map::sdhi_situation::START, PSEL);
 
@@ -355,11 +355,11 @@ namespace fatfs {
 //				cdeti_task_
 //				caci_task_
 //				sdaci_task_
-				set_interrupt_task(sbfai_task_, static_cast<uint32_t>(SDHI::get_sbfai()));
+				set_interrupt_task(sbfai_task_, static_cast<uint32_t>(SDHI::SBFA_VEC));
 			} else {
-				set_interrupt_task(nullptr, static_cast<uint32_t>(SDHI::get_sbfai()));
+				set_interrupt_task(nullptr, static_cast<uint32_t>(SDHI::SBFA_VEC));
 			}
-			device::icu_mgr::set_level(SDHI::get_peripheral(), intr_lvl_);
+			device::icu_mgr::set_level(SDHI::PERIPHERAL, intr_lvl_);
 
 			start_ = true;
 		}

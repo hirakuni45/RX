@@ -18,14 +18,20 @@ namespace device {
 		@brief	シリアルサウンドインタフェース（SSI）
 		@param[in]	base	ベースアドレス
 		@param[in]	per		ペリフェラル型
+		@param[in]	txv		送信データエンプティ割り込みベクタ
+		@param[in]	rxv		受信データフル割り込みベクタ
 		@param[in]	ssif	ステータス割り込み
-		@param[in]	rxi		受信データフル割り込みベクタ
-		@param[in]	txi		送信データエンプティ割り込みベクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR_BL1 ssif, ICU::VECTOR rxi, ICU::VECTOR txi>
+		ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL1 ssif>
 	struct ssi_t {
+
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static const auto TX_VEC = txv;		///< 送信データエンプティ割り込みベクタ
+		static const auto RX_VEC = rxv;		///< 受信データフル割り込みベクタ
+		static const auto SS_VEC = ssif;	///< ステータス割り込み
+
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -182,39 +188,12 @@ namespace device {
 			bit_rw_t< io_, bitpos::B8>     CONT;
 		};
 		static ssitdmr_t<base + 0x20> SSITDMR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  受信データフル割り込みベクタを取得
-			@return 受信データフル割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_rxi_vec() { return rxi; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  送信データエンプティ割り込みベクタを取得
-			@return 送信データエンプティ割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_txi_vec() { return txi; }
 	};
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 	typedef ssi_t<0x0008A500, peripheral::SSI0,
-		ICU::VECTOR_BL1::SSIF0, ICU::VECTOR::SSIRXI0, ICU::VECTOR::SSITXI0> SSI0;
+		ICU::VECTOR::SSITXI0, ICU::VECTOR::SSIRXI0, ICU::VECTOR_BL1::SSIF0> SSI0;
 	typedef ssi_t<0x0008A540, peripheral::SSI1,
-		ICU::VECTOR_BL1::SSIF0, ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1> SSI1;
+		ICU::VECTOR::SSIRTI1, ICU::VECTOR::SSIRTI1, ICU::VECTOR_BL1::SSIF0> SSI1;
 #endif
 }
