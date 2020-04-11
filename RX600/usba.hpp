@@ -26,6 +26,12 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
 	struct usba_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static const auto R_VEC = rvec;		///< R 割り込み Vector
+		static const auto D0_VEC = d0vec;	///< D0 割り込み Vector
+		static const auto D1_VEC = d1vec;	///< D0 割り込み Vector
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  システムコンフィギュレーションコントロールレジスタ（SYSCFG）
@@ -1100,52 +1106,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B23>  DVBSTSH;
 		};
 		static dpusr1r_t  DPUSR1R;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  I 割り込みベクタを返す @n
-					USBA モジュールには、I ベクターはサポートしていない。
-			@return I 割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		ICU::VECTOR get_i_vec() { return ICU::VECTOR::NONE; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  R 割り込みベクタを返す
-			@return R 割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		ICU::VECTOR get_r_vec() { return rvec; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  D0FIFO 割り込みベクタを返す
-			@return D0FIFO 割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		ICU::VECTOR get_d0_vec() { return d0vec; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  D1FIFO 割り込みベクタを返す
-			@return D1FIFO 割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		ICU::VECTOR get_d1_vec() { return d1vec; }
 	};
 	typedef usba_t<0x000D0400, peripheral::USBA, ICU::VECTOR::USBAR,
 		ICU::VECTOR::D0FIFO2, ICU::VECTOR::D1FIFO2> USBA;

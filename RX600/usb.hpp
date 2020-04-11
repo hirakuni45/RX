@@ -29,6 +29,13 @@ namespace device {
 		ICU::VECTOR rvec, ICU::VECTOR d0vec, ICU::VECTOR d1vec>
 	struct usb_t {
 
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static const auto I_VEC = ivec;		///< USBI 割り込み Vector
+		static const auto R_VEC = rvec;		///< USBI 割り込み Vector
+		static const auto D0_VEC = d0vec;	///< D0 割り込み Vector
+		static const auto D1_VEC = d1vec;	///< D0 割り込み Vector
+
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  システムコンフィギュレーションコントロールレジスタ（SYSCFG）
@@ -975,51 +982,6 @@ namespace device {
 			bit_rw_t<io_, bitpos::B23>  DVBINT0;
 		};
 		static dpusr1r_t  DPUSR1R;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_peripheral() { return per; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  USBI0 割り込みベクタを返す
-			@return USBI0 割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_i_vec() { return ivec; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  USBR0 割り込みベクタを返す
-			@return USBR0 割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_r_vec() { return rvec; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  D0FIFO 割り込みベクタを返す
-			@return D0FIFO 割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_d0_vec() { return d0vec; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  D1FIFO 割り込みベクタを返す
-			@return D1FIFO 割り込みベクタ
-		*/
-		//-----------------------------------------------------------------//
-		static auto get_d1_vec() { return d1vec; }
 	};
 
 #if defined(SIG_RX66T) || defined(SIG_RX72T)
