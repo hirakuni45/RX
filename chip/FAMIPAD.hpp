@@ -55,9 +55,10 @@ namespace chip {
 		@param[in]	P_S		P/S ポート
 		@param[in]	CLK		CLK ポート
 		@param[in]	OUT		OUT ポート
+		@param[in]	LOOP	パルス幅を生成する無駄ループ（120MHz: 20）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class P_S, class CLK, class OUT>
+	template <class P_S, class CLK, class OUT, uint32_t LOOP = 20>
 	class FAMIPAD {
 
 		uint8_t		data_;
@@ -89,23 +90,23 @@ namespace chip {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	最新の状態に更新
-			@param[in]	cnt		パルス幅遅延数 @n
+			@brief	最新の状態に更新 @n
 								※20で「1200us」くらいと思う
 			@return 状態データ
 		 */
 		//-----------------------------------------------------------------//
-		uint8_t update(uint32_t cnt = 20) noexcept
+		uint8_t update() noexcept
 		{
 			P_S::P = 0; // seirial
+			utils::delay::loop(LOOP);
 			uint8_t d = 0;
 			for(uint8_t i = 0; i < 8; ++i) {
 				d <<= 1;
 				if(!OUT::P()) ++d;
 				CLK::P = 1;
-				utils::delay::loop(cnt);
+				utils::delay::loop(LOOP);
 				CLK::P = 0;
-				utils::delay::loop(cnt);
+				utils::delay::loop(LOOP);
 			}
 			P_S::P = 1; // parallel
 			data_ = d;
