@@ -55,7 +55,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../../
 
-OPTIMIZE	=	-O3
+OPTIMIZE	=	-O0
 
 AS_OPT		=	-mcpu=rx600
 

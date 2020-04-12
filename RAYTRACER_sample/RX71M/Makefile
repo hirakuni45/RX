@@ -58,7 +58,7 @@ INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../
 
-OPTIMIZE	=	-O3
+OPTIMIZE	=	-O0
 
 AS_OPT		=	-mcpu=rx600 --defsym MEMWAIT=1
 

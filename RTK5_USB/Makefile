@@ -18,7 +18,7 @@ ROOT_DEV_	=	RX65x
 
 FATFS_VER	=	ff13c/source
 
-OPTIMIZE	=	-O3
+OPTIMIZE	=	-O0
 
 BUILD		=	release
 

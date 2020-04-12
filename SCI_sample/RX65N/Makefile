@@ -57,7 +57,7 @@ INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
 
-OPTIMIZE	=	-O3
+OPTIMIZE	=	-O0
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

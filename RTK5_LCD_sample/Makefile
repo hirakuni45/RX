@@ -69,7 +69,7 @@ INC_APP		=	. ../ ../RX600/drw2d/inc/tes
 
 LIB_ROOT	=	../RX600/drw2d ../libpng ../zlib
 
-OPTIMIZE	=	-O3
+OPTIMIZE	=	-O0
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

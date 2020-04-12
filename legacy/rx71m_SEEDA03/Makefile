@@ -67,7 +67,7 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../RX600 ../RX71M ../r_net ../rx64m_test
 
-OPTIMIZE	=	-O3
+OPTIMIZE	=	-O0
 
 AS_OPT		=	-mcpu=rx600 --defsym MEMWAIT=1
 

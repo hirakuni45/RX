@@ -62,7 +62,7 @@ INC_APP		=	. inc/tes
 
 LIB_ROOT	=
 
-OPTIMIZE	=	-O3
+OPTIMIZE	=	-O0
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

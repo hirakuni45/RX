@@ -15,7 +15,7 @@ ROOT_DEV	=	RX64M
 
 FATFS_VER	=	ff13c/source
 
-OPTIMIZE	=	-O3
+OPTIMIZE	=	-O0
 
 BUILD		=	release
 

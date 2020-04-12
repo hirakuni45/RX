@@ -51,7 +51,7 @@ INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../
 
-OPTIMIZE	=	-O3
+OPTIMIZE	=	-O0
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
