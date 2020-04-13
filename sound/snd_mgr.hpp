@@ -116,7 +116,8 @@ namespace sound {
 				return false;
 			}
 
-			utils::format("Rate: %d, Bits: %d\n") % wav.get_rate() % wav.get_bits();
+			utils::format("Rate: %d, Bits: %d, Size: %u\n")
+				% wav.get_rate() % wav.get_bits() % wav.get_size();
 
 			if(!in.seek(utils::file_io::SEEK::SET, wav.get_top())) {
 				in.close();

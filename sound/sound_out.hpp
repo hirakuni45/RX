@@ -41,11 +41,12 @@ namespace utils {
 	class sound_out {
 	public:
 
-		typedef utils::fixed_fifo<sound::wave_t, BFS> FIFO;		
+		typedef sound::wave_t WAVE;
+		typedef utils::fixed_fifo<WAVE, BFS> FIFO;		
 
 	private:
 
-		sound::wave_t	wave_[OUTS];
+		WAVE		wave_[OUTS];
 		uint32_t	w_put_;
 
 		FIFO		fifo_;
@@ -131,5 +132,14 @@ namespace utils {
 				w_put_ &= (OUTS - 1);
 			}
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	波形メモリの位置を返す
+			@return 波形メモリの位置
+		*/
+		//-----------------------------------------------------------------//
+		auto get_wave_pos() const { return w_put_; }
 	};
 }
