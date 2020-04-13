@@ -32,21 +32,21 @@ namespace {
 
 #if defined(SIG_RX65N)
 
+	const char* sys_msg_ = { "RX65N Envision kit" };
+
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+	typedef device::SCI9 SCI_CH;
 
 	// Famicon PAD (CMOS 4021B Shift Register)
 	// 電源は、微小なので、接続を簡単に行う為、ポートを使う
-	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_VCC;
-	typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_GND;
-	typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_P_S;
-	typedef device::PORT<device::PORT6, device::bitpos::B5> PAD_CLK;
-	typedef device::PORT<device::PORT7, device::bitpos::B3> PAD_OUT;
+	typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_VCC;  // CN2(2)
+	typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_GND;  // CN2(4)
+	typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_P_S;  // CN2(6)
+	typedef device::PORT<device::PORT6, device::bitpos::B5> PAD_CLK;  // CN2(8)
+	typedef device::PORT<device::PORT7, device::bitpos::B3> PAD_OUT;  // CN2(10)
 	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT> FAMIPAD;
 	FAMIPAD		famipad_;
-
-	typedef device::system_io<12000000> SYSTEM_IO;
-
-	typedef device::SCI9 SCI_CH;
 
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
@@ -64,42 +64,47 @@ namespace {
 	// RX65N Envision Kit の SDHI ポートは、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
 		device::port_map::option::THIRD> SDHI;
+
+	#define USE_DAC
 
 #elif defined(SIG_RX72N)
 
+	const char* sys_msg_ = { "RX72N Envision kit" };
+
+	typedef device::system_io<16'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::SCI2 SCI_CH;
 
 	// Famicon PAD (CMOS 4021B Shift Register)
-	// PMOD1 を使う
-	typedef device::PORT<device::PORT5, device::bitpos::B0> PAD_P_S;
-	typedef device::PORT<device::PORT5, device::bitpos::B1> PAD_CLK;
-	typedef device::PORT<device::PORT5, device::bitpos::B2> PAD_OUT;
-	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT> FAMIPAD;
+	// PMOD1                                                PAD_3V3:     Pmod1-6
+	// PMOD1                                                PAD_GND:     Pmod1-5 
+	typedef device::PORT<device::PORT5, device::bitpos::B1> PAD_P_S;  // Pmod1-4
+	typedef device::PORT<device::PORT5, device::bitpos::B2> PAD_CLK;  // Pmod1-3
+	typedef device::PORT<device::PORT5, device::bitpos::B0> PAD_OUT;  // Pmod1-2
+	typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT, 40> FAMIPAD;
 	FAMIPAD		famipad_;
 
-	typedef device::system_io<12000000> SYSTEM_IO;
-
-	typedef device::SCI9 SCI_CH;
-
-	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
-	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
+	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
+	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
 	static const int16_t LCD_X = 480;
 	static const int16_t LCD_Y = 272;
-	// LCD のフレームメモリーの開始アドレスは、nullptr と区別する為 0x00000000 から始められない
-	// 0x000100 から 255K バイト (480x272x2)
-	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
+	static void* LCD_ORG = reinterpret_cast<void*>(0x0080'0000);
 
 	// カード電源制御は使わない場合、「device::NULL_PORT」を指定する。
-	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  // Low Active
-
+	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;
 	// 書き込み禁止は使わない
 	typedef device::NULL_PORT SDC_WPRT;
-	// RX65N Envision Kit の SDHI ポートは、候補３になっている
+	// RX72N Envision Kit の SDHI ポートは、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
 		device::port_map::option::THIRD> SDHI;
 
+	typedef utils::ssie_io<device::SSIE1, device::DMAC1, 8192, 512> SSIE_IO;
+
+	#define USE_SSIE
+
 #endif
 
+#ifdef USE_DAC
 	volatile uint32_t	wpos_;
 
 	/// DMAC 終了割り込み
@@ -136,6 +141,59 @@ namespace {
 
 	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
 	TPU0		tpu0_;
+
+	void start_audio_()
+	{
+		PAD_VCC::DIR = 1;
+		PAD_VCC::P = 1;
+		PAD_GND::DIR = 1;
+		PAD_GND::P = 0;
+
+		{  // 内臓１２ビット D/A の設定
+			bool amp_ena = true;
+			dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
+			dac_out_.out0(0x8000);
+			dac_out_.out1(0x8000);
+		}
+
+		{  // DMAC マネージャー開始
+			uint8_t intr_level = 4;
+			bool cpu_intr = true;
+			auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
+				reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
+				sound_out_.size(), intr_level, cpu_intr);
+			if(!ret) {
+				utils::format("DMAC Not start...\n");
+			}
+		}
+	}
+#endif
+
+
+#ifdef USE_SSIE
+	SSIE_IO     ssie_io_;
+	SSIE_IO::SOUND_OUT& sound_out_ = ssie_io_.at_sound_out();
+
+	void start_audio_()
+	{
+		{  // SSIE 設定 RX72N Envision kit では、I2S, 48KHz, 32/24 ビットフォーマット
+			uint8_t intr = 5;
+			uint8_t adiv = 24'576'000 / 48'000 / (32 + 32);
+			auto ret = ssie_io_.start(adiv,
+				utils::ssie_t::FORM::I2S,
+				utils::ssie_t::D_NUM::_32, utils::ssie_t::S_NUM::_32, intr);
+///				utils::ssie_core::D_NUM::_24, utils::ssie_core::S_NUM::_32, intr);
+			if(ret) {
+				ssie_io_.enable_mute(false);
+				ssie_io_.enable_send();  // 送信開始
+				uint32_t bclk = 24'576'000 / static_cast<uint32_t>(adiv);
+				utils::format("SSIE Start: BCLK: %u Hz\n") % bclk;
+			} else {
+				utils::format("SSIE No start...\n");
+			}
+		}
+	}
+#endif
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
 	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
@@ -201,10 +259,16 @@ extern "C" {
 
 	void set_sample_rate(uint32_t freq)
 	{
+#ifdef USE_DAC
 		uint8_t intr_level = 5;
 		if(!tpu0_.start(freq, intr_level)) {
 			utils::format("TPU0 start error...\n");
 		}
+#endif
+
+#ifdef USE_SSIE
+		ssie_io_.set_sampling_freq(freq);
+#endif
 	}
 
 
@@ -270,17 +334,12 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::setup_system_clock();
 
-	{  // 内臓１２ビット D/A の設定
-		bool amp_ena = true;
-		dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
-		dac_out_.out0(0x8000);
-		dac_out_.out1(0x8000);
-	}
-
 	{  // SCI 設定
 		static const uint8_t sci_level = 2;
 		sci_.start(115200, sci_level);
 	}
+
+	utils::format("\r%s Start Space Invaders Emulator\n") % sys_msg_;
 
 	{  // SD カード・クラスの初期化
 		sdh_.start();
@@ -289,22 +348,11 @@ int main(int argc, char** argv)
 	// 波形メモリーの無音状態初期化
 	sound_out_.mute();
 
+	start_audio_();
+
 	{  // サンプリング・タイマー設定
 		set_sample_rate(11127);
 	}
-
-	{  // DMAC マネージャー開始
-		uint8_t intr_level = 4;
-		bool cpu_intr = true;
-		auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-			reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
-			sound_out_.size(), intr_level, cpu_intr);
-		if(!ret) {
-			utils::format("DMAC Not start...\n");
-		}
-	}
-
-	utils::format("\rRTK5RX65N Start for Space Invaders Emulator\n");
 
 	cmd_.set_prompt("# ");
 
@@ -327,15 +375,7 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
-	{
-#if defined(SIG_RX65N)
-		PAD_VCC::DIR = 1;
-		PAD_VCC::P = 1;
-		PAD_GND::DIR = 1;
-		PAD_GND::P = 0;
-#endif
-		famipad_.start();
-	}
+	famipad_.start();
 
 	uint32_t delay_inv = 120;
 	uint8_t n = 0;
