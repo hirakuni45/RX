@@ -33,7 +33,7 @@ PSOURCES	=	AUDIO_sample/main.cpp \
 				graphics/color.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	m supc++ drw2d
+USER_LIBS	=	m supc++ drw2d mad
 
 LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 
@@ -66,7 +66,7 @@ INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../../RX600/drw2d
+LIB_ROOT	=	../../RX600/drw2d ../../libmad
 
 OPTIMIZE	=	-O3
 
