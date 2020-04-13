@@ -2,8 +2,7 @@
 //=========================================================================//
 /*!	@file
 	@brief	RX72M/RX72N/RX66N SSIE I/O 制御 @n
-			SSIE 内 FIFO では容量が足りないので、バッファリングを行う。 @n
-			※バッファのサイズは「必ず１６の倍数」にする必要がある。
+			SSIE 内 FIFO では容量が足りないので、バッファリングを行う。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -12,6 +11,7 @@
 //=========================================================================//
 #include "RX600/ssie.hpp"
 #include "common/delay.hpp"
+#include "sound/sound_out.hpp"
 
 namespace utils {
 
@@ -20,8 +20,8 @@ namespace utils {
 		@brief  SSIE（シリアルサウンドインターフェース）基本クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class ssie_t {
-	public:
+	struct ssie_t {
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ビット列フォーマット
@@ -78,35 +78,88 @@ namespace utils {
 		@brief  SSIE（シリアルサウンドインターフェース）制御クラス
 		@param[in]	SSIE	ハードウェアー・コンテキスト
 		@param[in]	DMAC	DMAC デバイス・コンテキスト(DMAC0 - DMAC7)
-		@param[in]	ABSIZE	オーディオ・バッファ・サイズ（１６の倍数）
+		@param[in]	BFS		fifo バッファのサイズ
+		@param[in]	OUTS	出力バッファのサイズ（１６の倍数で１２８以上）
 		@param[in]	MASTER	スレーブの場合「false」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SSIE, class DMAC, uint32_t ABSIZE = 1024, bool MASTER = true>
+	template <class SSIE, class DMAC, uint32_t BFS, uint32_t OUTS, bool MASTER = true>
 	class ssie_io : public ssie_t {
 	public:
 
 		typedef SSIE value_type;
 		typedef DMAC dmac_type;
+		typedef sound_out<BFS, OUTS> SOUND_OUT;
 
 	private:
 
+		SOUND_OUT	sound_out_;
 
+		struct sound_task_t {
+			SOUND_OUT&	sound_out_;
+			uint32_t	ref_freq_;
+			uint32_t	rsmp_freq_;
+			uint32_t	timebase_;
+			sound_task_t(SOUND_OUT& sound_out, uint32_t ref) : sound_out_(sound_out),
+				ref_freq_(ref), rsmp_freq_(ref), timebase_(0) { }
+		};
+		sound_task_t	sound_task_t_;
 
+		static void* sound_task_ptr_;
 
 		static INTERRUPT_FUNC void send_task_()
 		{
+			auto p = static_cast<sound_task_t*>(sound_task_ptr_);
+			uint32_t wpos = p->sound_out_.get_wave_pos();
+			wpos += 8 * 2;  // オフセット
+			wpos &= (OUTS - 1);
+			uint32_t l = 0;
+			for(uint32_t i = 0; i < 8; ++i) {
+				auto w = p->sound_out_.get_wave(wpos);
+				SSIE::SSIFTDR32 = (static_cast<int32_t>(w->l_ch) - 32767) << 16;
+				SSIE::SSIFTDR32 = (static_cast<int32_t>(w->r_ch) - 32767) << 16;
+				uint32_t base_freq = 48000;
+				p->timebase_ += p->rsmp_freq_;
+				if(p->timebase_ >= p->ref_freq_) {
+					p->timebase_ -= p->ref_freq_;
+					++wpos;
+					wpos &= (OUTS - 1);
+					++l;
+				}
+			}
+			p->sound_out_.service(l);
 
+			SSIE::SSIFSR.TDE = 0;
 		}
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
-			@param[in]	
 		*/
 		//-----------------------------------------------------------------//
-		ssie_io() noexcept  { }
+		ssie_io() noexcept : 
+			sound_out_(), sound_task_t_(sound_out_, 48'000) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  サンプリング周波数設定
+			@param[in]	freq	サンプリング周期
+			@return 不正な場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		bool set_sampling_freq(uint32_t freq) noexcept
+		{
+			if(freq > sound_task_t_.ref_freq_) {
+				return false;
+			}
+			if(freq < 11025) {
+				return false;
+			}
+			sound_task_t_.rsmp_freq_ = freq;
+			return true;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -128,6 +181,8 @@ namespace utils {
 			if(!device::port_map::turn(SSIE::PERIPHERAL, true)) {
 				return false;
 			}
+
+			sound_task_ptr_ = static_cast<void*>(&sound_task_t_);
 
 			// ソフトリセット
 			SSIE::SSIFCR.SSIRST = 1;
@@ -183,6 +238,7 @@ namespace utils {
 				SSIE::SSIFCR.TIE = 1;
 			} else {
 				device::icu_mgr::set_task(SSIE::TX_VEC, nullptr);
+				SSIE::SSIFCR.TIE = 0;
 			}
 
 			uint8_t word = 0b00;
@@ -244,9 +300,17 @@ namespace utils {
 		/*!
 			@brief  送信許可
 			@param[in]	ena		「false」なら不許可
+			@param[in]	ival	イニシャル値（通常は０）
 		*/
 		//-----------------------------------------------------------------//
-		void enable_send(bool ena = true) noexcept { SSIE::SSICR.TEN = ena; }
+		void enable_send(bool ena = true, int32_t ival = 0) noexcept {
+			if(ena && !SSIE::SSICR.TEN()) {  // 送信開始
+				for(uint32_t i = 0; i < 16; ++i) {  // ダミーデータで半分埋める
+					SSIE::SSIFTDR32 = ival;
+				}
+			}
+			SSIE::SSICR.TEN = ena;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -328,6 +392,19 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		auto recv() const noexcept { return SSIE::SSIFRDR32(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  SOUND_OUT オブジェクトの参照
+			@return	SOUND_OUT オブジェクト
+		*/
+		//-----------------------------------------------------------------//
+		auto& at_sound_out() { return sound_out_; }
 	};
+
+	// テンプレート関数内、実態の定義
+	template <class SSIE, class DMAC, uint32_t BFS, uint32_t OUTS, bool MASTER>
+		void* ssie_io<SSIE, DMAC, BFS, OUTS, MASTER>::sound_task_ptr_;
 }
 
