@@ -7,11 +7,17 @@
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	audio_sample
+TARGET		=	nesemu
+
+ROOT		=	NESEMU_sample
 
 DEVICE		=	R5F572NN
 
+ROOT_DEV	=	RX72N
+
 FATFS_VER	=	ff13c/source
+
+OPTIMIZE	=	-O3
 
 BUILD		=	release
 
@@ -25,25 +31,84 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/ff.c \
 				$(FATFS_VER)/ffsystem.c \
 				$(FATFS_VER)/ffunicode.c \
-				common/time.c
+				common/time.c \
+				$(ROOT)/emu/log.c \
+				$(ROOT)/emu/bitmap.c \
+				$(ROOT)/emu/cpu/nes6502.c \
+				$(ROOT)/emu/nes/mmclist.c \
+				$(ROOT)/emu/nes/nes.c \
+				$(ROOT)/emu/nes/nes_mmc.c \
+				$(ROOT)/emu/nes/nes_pal.c \
+				$(ROOT)/emu/nes/nes_ppu.c \
+				$(ROOT)/emu/nes/nes_rom.c \
+				$(ROOT)/emu/nes/nesinput.c \
+				$(ROOT)/emu/nes/nesstate.c \
+				$(ROOT)/emu/sndhrdw/fds_snd.c \
+				$(ROOT)/emu/sndhrdw/mmc5_snd.c \
+				$(ROOT)/emu/sndhrdw/nes_apu.c \
+				$(ROOT)/emu/sndhrdw/vrcvisnd.c \
+				$(ROOT)/emu/mappers/map000.c \
+				$(ROOT)/emu/mappers/map001.c \
+				$(ROOT)/emu/mappers/map002.c \
+				$(ROOT)/emu/mappers/map003.c \
+				$(ROOT)/emu/mappers/map004.c \
+				$(ROOT)/emu/mappers/map005.c \
+				$(ROOT)/emu/mappers/map007.c \
+				$(ROOT)/emu/mappers/map008.c \
+				$(ROOT)/emu/mappers/map009.c \
+				$(ROOT)/emu/mappers/map011.c \
+				$(ROOT)/emu/mappers/map015.c \
+				$(ROOT)/emu/mappers/map016.c \
+				$(ROOT)/emu/mappers/map018.c \
+				$(ROOT)/emu/mappers/map019.c \
+				$(ROOT)/emu/mappers/map024.c \
+				$(ROOT)/emu/mappers/map032.c \
+				$(ROOT)/emu/mappers/map033.c \
+				$(ROOT)/emu/mappers/map034.c \
+				$(ROOT)/emu/mappers/map040.c \
+				$(ROOT)/emu/mappers/map041.c \
+				$(ROOT)/emu/mappers/map042.c \
+				$(ROOT)/emu/mappers/map046.c \
+				$(ROOT)/emu/mappers/map050.c \
+				$(ROOT)/emu/mappers/map064.c \
+				$(ROOT)/emu/mappers/map065.c \
+				$(ROOT)/emu/mappers/map066.c \
+				$(ROOT)/emu/mappers/map070.c \
+				$(ROOT)/emu/mappers/map073.c \
+				$(ROOT)/emu/mappers/map075.c \
+				$(ROOT)/emu/mappers/map078.c \
+				$(ROOT)/emu/mappers/map079.c \
+				$(ROOT)/emu/mappers/map085.c \
+				$(ROOT)/emu/mappers/map087.c \
+				$(ROOT)/emu/mappers/map093.c \
+				$(ROOT)/emu/mappers/map094.c \
+				$(ROOT)/emu/mappers/map099.c \
+				$(ROOT)/emu/mappers/map160.c \
+				$(ROOT)/emu/mappers/map229.c \
+				$(ROOT)/emu/mappers/map231.c \
+				$(ROOT)/emu/mappers/mapvrc.c \
+				$(ROOT)/emu/libsnss/libsnss.c
 
-PSOURCES	=	AUDIO_sample/main.cpp \
-				RX72N/icu_mgr.cpp \
+PSOURCES	=	$(ROOT)/main.cpp \
+				$(ROOT_DEV)/icu_mgr.cpp \
 				graphics/font8x16.cpp \
+				graphics/kfont16.cpp \
 				graphics/color.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	m supc++ drw2d mad
+USER_LIBS	=	m supc++
 
-LDSCRIPT	=	../../RX72N/$(DEVICE).ld
+LDSCRIPT	=	../../$(ROOT_DEV)/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX72N \
-				F_ICLK=240000000 \
+USER_DEFS	=	SIG_$(ROOT_DEV) \
+				F_ICLK=120000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000 \
-				FAT_FS FAT_FS_NUM=16
+				FAT_FS FAT_FS_NUM=4
 
-MCU_TARGET	=	
+AS_DEFS		=
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
@@ -64,13 +129,8 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
-
-LIB_ROOT	=	../../RX600/drw2d ../../libmad
-
-OPTIMIZE	=	-O3
-
-AS_OPT		=	-mcpu=rx600
+INC_APP		=	. ../ ../../ ../../RX600/drw2d/inc/tes \
+				../emu ../emu/cpu ../emu/nes ../emu/mappers ../emu/sndhrdw ../emu/libsnss
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
@@ -79,6 +139,10 @@ CP_OPT		=	-Wall -Werror \
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
+				-Wno-unused-function \
+				-Wno-maybe-uninitialized \
+				-Wno-unused-but-set-variable \
+				-Wno-strict-aliasing \
 				-fno-exceptions
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
@@ -100,18 +164,11 @@ OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
 
-# AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
-# AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
-AFLAGS		=	$(AS_OPT)
-# ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
-ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
-
 # Override is only needed by avr-lib build system.
 
-CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
+AFLAGS		=	$(AS_OPT) $(AS_DEFS)
+CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
+PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(CP_DEFS) $(DEFS)
 
 override LDFLAGS = $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
 
@@ -199,6 +256,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d $(ROOT_DEV) --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

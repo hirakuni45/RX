@@ -85,7 +85,7 @@ namespace {
 	static const uint16_t LCD_Y = 272;
 	/// フレームバッファ開始アドレスは null_ptr の関係で０から開始出来ない
 	/// RX65N では、RAM は２ブロックあり、前半の 256K 領域をフレームバッファに設定する
-	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x00000100);
+	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x0000'0100);
 	typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
 	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_MGR;
@@ -138,7 +138,7 @@ namespace {
 	static const char* system_str_ = { "RX72N" };
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
-	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x00800000);
+	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x0080'0000);
 	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
 	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_MGR;

@@ -1,9 +1,9 @@
-Renesas Envision Kit RX65N ガジェット
+Renesas Envision Kit RX65N/RX72N ガジェット
 =========
 ![R5F564ML](../docs/RTK5_side.jpg)
 
 ## 概要
-Envision Kit RX65N で実現する Space Invaders エミュレーター
+Envision Kit RX65N/RX72N で実現する Space Invaders エミュレーター
    
 ## プロジェクト・リスト
  - main.cpp
@@ -11,7 +11,7 @@ Envision Kit RX65N で実現する Space Invaders エミュレーター
  - Makefile
  - wavs/ 効果音ファイル
    
-## ハードウェアーの準備
+## ハードウェアーの準備 RX65N
  - SD カードインターフェースの準備
  - ファミコン（互換）パッドの接続（main.cpp を参照）
  - オーディオの接続（DA0、DA1 から出力、GND レベルは、1.65V）
@@ -21,6 +21,10 @@ Envision Kit RX65N で実現する Space Invaders エミュレーター
  - Pmod (10) PB6_RXD9_PMOD_10 ---> RXD として使用
  - Pmod ( 9) PB7_TXD9_PMOD_9  ---> TXD として使用
  - RXD/TXD は 115200 Baud, 8-bits, 1-Stop, No-Parity 内部動作表示等
+
+## ハードウェアーの準備 RX72N
+ - ファミコン（互換）パッドの接続（main.cpp を参照）Pmod1 に接続する
+ - 効果音は D2 オーディオジャックから出力
    
 ## リソースの準備
  - ROM の準備（invaders.h、invaders.g、invaders.f、invaders.e）invaders.zip
