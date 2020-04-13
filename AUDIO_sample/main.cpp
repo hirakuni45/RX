@@ -26,10 +26,11 @@
 #include "common/dir_list.hpp"
 #include "common/shell.hpp"
 
-// #define USE_CODEC
-
 #include "sound/wav_in.hpp"
 #include "sound/mp3_in.hpp"
+#include "common/tpu_io.hpp"
+#include "sound/sound_out.hpp"
+
 
 namespace {
 
@@ -83,7 +84,7 @@ namespace {
     typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
 		device::port_map::option::THIRD> SDC;
 
-	typedef utils::ssie_io<device::SSIE1, device::DMAC1> SSIE_IO;
+	typedef utils::ssie_io<device::SSIE1, device::DMAC1, 8192, 512> SSIE_IO;
 
 	#define USE_SSIE
 	#define USE_GLCDC
@@ -115,62 +116,79 @@ namespace {
 	typedef sound::wav_in WAV_IN;
 	WAV_IN		wav_in_;
 
+#ifdef USE_DAC
+	typedef utils::sound_out<8192, 1024> SOUND_OUT;
+	SOUND_OUT	sound_out_;
+
+	class tpu_task {
+	public:
+		void operator() () {
+			uint32_t tmp = wpos_;
+			++wpos_;
+			if((tmp ^ wpos_) & 64) {
+				sound_out_.service(64);
+			}
+		}
+	};
+
+	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
+	TPU0		tpu0_;
+
+	void start_audio_()
+	{
+		{  // DMAC マネージャー開始
+			uint8_t intr_level = 4;
+			bool cpu_intr = true;
+			auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
+				reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
+				sound_out_.size(), intr_level, cpu_intr);
+			if(!ret) {
+				utils::format("DMAC Not start...\n");
+			}
+		}
+	}
+#endif
+
 #ifdef USE_SSIE
-	SSIE_IO		ssie_io_; 
+	SSIE_IO		ssie_io_;
+	SSIE_IO::SOUND_OUT&	sound_out_ = ssie_io_.at_sound_out();
 
 	void start_audio_()
 	{
 		{  // SSIE 設定 RX72N Envision kit では、I2S, 48KHz, 32/24 ビットフォーマット
-			uint8_t intr = 0;
+			uint8_t intr = 5;
 			uint8_t adiv = 24'576'000 / 48'000 / (32 + 32);
 			auto ret = ssie_io_.start(adiv,
 				utils::ssie_t::FORM::I2S,
 				utils::ssie_t::D_NUM::_32, utils::ssie_t::S_NUM::_32, intr);
 ///				utils::ssie_core::D_NUM::_24, utils::ssie_core::S_NUM::_32, intr);
 			if(ret) {
-				for(uint32_t i = 0; i < 8; ++i) {  // とりあえずダミーを８フレーム分書く
-					ssie_io_.send(0);
-					ssie_io_.send(0);
-				}
-				ssie_io_.enable_send();
 				ssie_io_.enable_mute(false);
-				utils::format("SSIE DIV(%d) Start...\n") % static_cast<int>(adiv);
+				ssie_io_.enable_send();  // 送信開始
+				uint32_t bclk = 24'576'000 / static_cast<uint32_t>(adiv);
+				utils::format("SSIE Start: BCLK: %u Hz\n") % bclk;
 			} else {
 				utils::format("SSIE No start...\n");
 			}
 		}
 	}
-
-
-	uint32_t value_l_ = 0x4000'0000;
-	uint32_t value_r_ = 0;
-	uint32_t count_ = 0;
-
-	void service_audio_()
-	{
-		if(ssie_io_.get_send_limit()) {
-
-			for(int i = 0; i < 8; ++i) {
-				ssie_io_.send(value_l_);
-				ssie_io_.send(value_r_);
-				value_l_ -= 64 << 16;
-				value_l_ &= 0x7fff'ff00;
-				value_r_ += 64 << 16;
-				value_r_ &= 0x7fff'ff00;
-				++count_;
-			}
-
-			ssie_io_.set_send_limit(false);
-
-//			if(count_ >= 48000) {
-//				count_ = 0;
-//				utils::format(".\n");
-//			}
-		}
-	}
 #endif
 
-#if 0
+	void update_led_()
+	{
+		static uint8_t n = 0;
+		++n;
+		if(n >= 30) {
+			n = 0;
+		}
+		if(n < 10) {
+			LED::P = 0;
+		} else {
+			LED::P = 1;
+		}
+	}
+
+
 	sound::af_play::CTRL sound_ctrl_task_()
 	{
 		auto ctrl = sound::af_play::CTRL::NONE;
@@ -242,11 +260,47 @@ namespace {
 		fin.close();
 		return ret;
 	}
-#endif
 
-	void play_loop_(const char*, const char*)
+
+	void play_loop_(const char*, const char*);
+
+	struct loop_t {
+		const char*	start;
+		bool	enable;
+	};
+	loop_t		loop_t_;
+
+	void play_loop_func_(const char* name, const FILINFO* fi, bool dir, void* option)
 	{
-#if 0
+		loop_t* t = static_cast<loop_t*>(option);
+		if(t->enable) {
+			if(strcmp(name, t->start) != 0) {
+				return;
+			} else {
+				t->enable = false;
+			}
+		}
+		if(dir) {
+			play_loop_(name, "");
+		} else {
+			const char* ext = strrchr(name, '.');
+			if(ext != nullptr) {
+				bool ret = true; 
+				if(utils::str::strcmp_no_caps(ext, ".mp3") == 0) {
+					ret = play_mp3_(name);
+				} else if(utils::str::strcmp_no_caps(ext, ".wav") == 0) {
+					ret = play_wav_(name);
+				}
+				if(!ret) {
+					utils::format("Can't open audio file: '%s'\n") % name;
+				}
+			}
+		}
+	}
+
+
+	void play_loop_(const char* root, const char* start)
+	{
 		loop_t_.start = start;
 		if(strlen(start) != 0) {
 			loop_t_.enable = true;
@@ -254,7 +308,6 @@ namespace {
 			loop_t_.enable = false;
 		}
 		dlist_.start(root);
-#endif
 	}
 
 
@@ -292,6 +345,20 @@ namespace {
 
 
 extern "C" {
+
+	void set_sample_rate(uint32_t freq)
+	{
+#ifdef USE_SSIE
+		ssie_io_.set_sampling_freq(freq);
+#endif
+#ifdef USE_DAC
+		uint8_t intr_level = 5;
+		if(!tpu0_.start(freq, intr_level)) {
+			utils::format("TPU0 start error...\n");
+		}
+#endif
+	}
+
 
 	void sci_putch(char ch)
 	{
@@ -347,6 +414,7 @@ extern "C" {
 	}
 }
 
+
 int main(int argc, char** argv);
 
 int main(int argc, char** argv)
@@ -358,9 +426,9 @@ int main(int argc, char** argv)
 		sci_.start(115200, intr_lvl);
 	}
 
-	{  // 時間計測タイマー（100Hz）
+	{  // 時間計測タイマー（60Hz）
 		uint8_t intr_lvl = 4;
-		cmt_.start(100, intr_lvl);
+		cmt_.start(60, intr_lvl);
 	}
 
 	utils::format("\r%s Start for Audio Sample\n") % system_str_;
@@ -371,26 +439,17 @@ int main(int argc, char** argv)
 
 	start_audio_();
 
-	uint8_t n = 0;
-	bool sw = false;
 	while(1) {
 		cmt_.sync();
 
-		service_audio_();
+///		service_audio_();
 
 		sdc_.service();
-///		dlist_.service(1, play_loop_func_, true, &loop_t_);
+
+		dlist_.service(1, play_loop_func_, true, &loop_t_);
 
 		cmd_service_();
 
-		++n;
-		if(n >= 30) {
-			n = 0;
-		}
-		if(n < 10) {
-			LED::P = 0;
-		} else {
-			LED::P = 1;
-		}
+		update_led_();
 	}
 }
