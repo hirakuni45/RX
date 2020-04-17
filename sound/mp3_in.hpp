@@ -200,8 +200,8 @@ namespace sound {
 			@return 正常終了なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		template <class AUDIO_OUT>
-		bool decode(utils::file_io& fin, AUDIO_OUT& out)
+		template <class SOUND_OUT>
+		bool decode(utils::file_io& fin, SOUND_OUT& out)
 		{
 			id3_mgr id3;
 			id3.parse(fin);
@@ -271,7 +271,6 @@ namespace sound {
 
 				if(!info) {
 					set_sample_rate(mad_frame_.header.samplerate);
-					utils::format("Sample Rate: %d\n") % mad_frame_.header.samplerate;
 					info = true;
 				}
 
@@ -287,7 +286,7 @@ namespace sound {
 				for(uint32_t i = 0; i < mad_synth_.pcm.length; ++i) {
 					while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
 					}
-					sound::wave_t t;
+					typename SOUND_OUT::WAVE t;
 					if(MAD_NCHANNELS(&mad_frame_.header) == 1) {
 						t.l_ch = t.r_ch = MadFixedToSshort(mad_synth_.pcm.samples[0][i]);
 					} else {
