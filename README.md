@@ -11,7 +11,7 @@ This is a program by Renesas RX microcontroller and its compiler rx-elf-gcc, g++
 Currently, a dedicated writing program has been implemented that has been tested on Windows, OS-X, and Linux.   
 Development is now possible in multiple environments.   
    
-- Currently supported and tested devices are RX24T, RX66T, RX64M, RX65N, RX71M.   
+- Currently supported and tested devices are RX24T, RX66T, RX64M, RX65N, RX71M, RX72N.   
 I extend the device class daily.
 - The RX72T and RX72M are scheduled to be supported in the future.
 - I update it daily including directory configuration.   
@@ -20,9 +20,9 @@ I extend the device class daily.
 Project consists of Makefile, related header, source code, dedicated startup It consists of routines and linker scripts.   
    
 <img src="docs/RTK5_side.jpg" width="40%"> <img src="docs/NES_001.jpg" width="40%">   
-Space Invaders Emulator, NES Emulator, for RX65N Envision kit   
+Space Invaders Emulator, NES Emulator, for RX65N/RX72N Envision kit   
 <img src="docs/AudioPlayer001.jpg" width="40%"> <img src="docs/Filer.jpg" width="40%">   
-WAV/MP3 Audio Player, File selector, for RX65N Envision kit   
+WAV/MP3 Audio Player, File selector, for RX65N/RX72N Envision kit   
    
 <a href="http://www.youtube.com/watch?v=frRI-cbzGus" target="_blank"><img src="http://img.youtube.com/vi/frRI-cbzGus/0.jpg" width="40%" alt="YouTube Link for 'frRI-cbzGus'"></a>   
 YouTube: NES Emulator for RX65N Envision kit
@@ -75,6 +75,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/RX71M](./RX71M)      |Device definition class dedicated to RX71M, linker script|
 |[/RX65x](./RX65x)      |Device definition class dedicated to RX65(1N), linker script|
 |[/RX66T](./RX66T)      |Device definition class dedicated to RX66T, linker script|
+|[/RX72N](./RX72N)      |Device definition class dedicated to RX72N, linker script|
 |[/FreeRTOS](./FreeRTOS)|FreeRTOS RX microcontroller compatible version and a simple sample|
 |[/ff13c](./ff13c)      |ChaN's fatfs source code and handler for RX microcontroller|
 |[/common](./common)    |Shared classes, utilities, etc.|
@@ -84,12 +85,15 @@ In device I / O operation, a dedicated header is prepared using template class l
 |/r_net                 |Renesas T4 (TCP / UDP) library, C ++ handler, wrapper|
 |[/libmad](./libmad)    |MP3 decoding, mad library|
 |[/libpng](./libpng)    |PNG library|
-|[rxprog](./rxprog)     |Program writing tool to RX microcontroller flash (Windows, OS-X, Linux compatible)|
-|[FIRST_sample](./FIRST_sample)|LED flashing program for each platform|
-|[SCI_sample](./SCI_sample)|Each platform, corresponding SCI sample program|
-|[FLASH_sample](./FLASH_sample)|Built-in data flash operation sample for each platform|
-|[RAYTRACER_sample](./RAYTRACER_sample)|For each platform, Ray tracing benchmark|
-|[SDCARD_sample](./SDCARD_sample)|For each platform, SD card operation sample|
+|[/rxprog](./rxprog)    |Program writing tool to RX microcontroller flash (Windows, OS-X, Linux compatible)|
+|[/FIRST_sample](./FIRST_sample)|LED flashing program for each platform|
+|[/SCI_sample](./SCI_sample)|Each platform, corresponding SCI sample program|
+|[/FLASH_sample](./FLASH_sample)|Built-in data flash operation sample for each platform|
+|[/RAYTRACER_sample](./RAYTRACER_sample)|For each platform, Ray tracing benchmark|
+|[/SDCARD_sample](./SDCARD_sample)|For each platform, SD card operation sample|
+|[/SIDE_sample](./SIDE_sample)|Renesas RX65N/RX72N Envision Kit, Space Invaders emulator|
+|[/NESEMU_sample](./NESEMU_sample)|Renesas RX65N/RX72N Envision Kit, NES emulator|
+|[/AUDIO_sample](./AUDIO_sample)|For each platform, MP3/WAV Audio player|
 |/rx24t_GPS_sample      |GPS operation sample using RX24T|
 |/rx24t_DATA_FLASH_sample|Internal data flash operation sample using RX24T|
 |/rx64m_SDRAM_sample    |Control sample of SDRAM using RX64M (128 Mbit × 2, 32-bit bus)|
@@ -97,12 +101,8 @@ In device I / O operation, a dedicated header is prepared using template class l
 |/rx64m_TPU_sample      |Control sample of TPU using RX64M (timer interrupt)|
 |/rx64m_DMAC_sample     |DMAC control sample using RX64M (memory operation)|
 |/rx64m_DA_sample       |Built-in D / A conversion using RX64M, sample of TPU, DMAC|
-|/rx64m_AUDIO_sample    |Sample for Renesas RX64M microcontroller board (audio player)|
 |/GR-KAEDE_ftps         |Sample for Renesas RX64M microcontroller board (FTP server)|
 |/GR-KAEDE_http         |Sample for Renesas RX64M microcontroller board (http server)|
-|/RTK5_AUDIO_sample     |Renesas RTK5RX65N microcontroller board audio player|
-|/RTK5_SIDE             |Renesas RTK5RX65N microcontroller board Space Invaders emulator|
-|[/RTK5_NESEMU](./RTK5_NESEMU)  |Renesas RTK5RX65N microcontroller board NES emulator|
 |[LICENSE](./LICENSE)  |License notation file|
    
 - Although not in the above list, please think that directories and files that exist when you check out are working.   
