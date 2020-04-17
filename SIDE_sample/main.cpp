@@ -8,15 +8,12 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/shell.hpp"
-#include "common/spi_io2.hpp"
-#include "common/tpu_io.hpp"
 
-#include "sound/sound_out.hpp"
+#include "sound/dac_stream.hpp"
 
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
@@ -65,6 +62,10 @@ namespace {
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
 		device::port_map::option::THIRD> SDHI;
 
+	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
+	// DMAC でループ転送できる最大数の２倍（1024）
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+
 	#define USE_DAC
 
 #elif defined(SIG_RX72N)
@@ -98,101 +99,12 @@ namespace {
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
 		device::port_map::option::THIRD> SDHI;
 
-	typedef utils::ssie_io<device::SSIE1, device::DMAC1, 8192, 512> SSIE_IO;
+	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
+	// SSIE の FIFO サイズの２倍以上（256）
+	typedef sound::sound_out<int16_t, 8192, 256> SOUND_OUT;
 
 	#define USE_SSIE
 
-#endif
-
-#ifdef USE_DAC
-	volatile uint32_t	wpos_;
-
-	/// DMAC 終了割り込み
-	class dmac_term_task {
-	public:
-		void operator() () {
-			device::DMAC0::DMCNT.DTE = 1;  // DMA を再スタート
-			wpos_ = 0;
-		}
-	};
-
-	typedef device::dmac_mgr<device::DMAC0, dmac_term_task> DMAC_MGR;
-	DMAC_MGR	dmac_mgr_;
-
-	uint32_t get_wave_pos_() { return (dmac_mgr_.get_count() & 0x3ff) ^ 0x3ff; }
-
-	typedef device::R12DA DAC;
-	typedef device::dac_out<DAC> DAC_OUT;
-	DAC_OUT		dac_out_;
-
-	typedef utils::sound_out<1024, 256> SOUND_OUT;
-	SOUND_OUT	sound_out_;
-
-	class tpu_task {
-	public:
-		void operator() () {
-			uint32_t tmp = wpos_;
-			++wpos_;
-			if((tmp ^ wpos_) & 64) {
-				sound_out_.service(64);
-			}
-		}
-	};
-
-	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
-	TPU0		tpu0_;
-
-	void start_audio_()
-	{
-		PAD_VCC::DIR = 1;
-		PAD_VCC::P = 1;
-		PAD_GND::DIR = 1;
-		PAD_GND::P = 0;
-
-		{  // 内臓１２ビット D/A の設定
-			bool amp_ena = true;
-			dac_out_.start(DAC_OUT::output::CH0_CH1, amp_ena);
-			dac_out_.out0(0x8000);
-			dac_out_.out1(0x8000);
-		}
-
-		{  // DMAC マネージャー開始
-			uint8_t intr_level = 4;
-			bool cpu_intr = true;
-			auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-				reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
-				sound_out_.size(), intr_level, cpu_intr);
-			if(!ret) {
-				utils::format("DMAC Not start...\n");
-			}
-		}
-	}
-#endif
-
-
-#ifdef USE_SSIE
-	SSIE_IO     ssie_io_;
-	SSIE_IO::SOUND_OUT& sound_out_ = ssie_io_.at_sound_out();
-
-	void start_audio_()
-	{
-		{  // SSIE 設定 RX72N Envision kit では、I2S, 48KHz, 32/24 ビットフォーマット
-			uint8_t intr = 5;
-			uint8_t adiv = 24'576'000 / 48'000 / (32 + 32);
-			auto ret = ssie_io_.start(adiv,
-				utils::ssie_t::FORM::I2S,
-				utils::ssie_t::D_NUM::_32, utils::ssie_t::S_NUM::_32, intr);
-///				utils::ssie_core::D_NUM::_24, utils::ssie_core::S_NUM::_32, intr);
-			if(ret) {
-				ssie_io_.enable_mute(false);
-				ssie_io_.enable_send();  // 送信開始
-				uint32_t bclk = 24'576'000 / static_cast<uint32_t>(adiv);
-				utils::format("SSIE Start: BCLK: %u Hz\n") % bclk;
-			} else {
-				utils::format("SSIE No start...\n");
-			}
-		}
-	}
 #endif
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
@@ -220,6 +132,9 @@ namespace {
 
 	SDHI		sdh_;
 
+	// サウンド出力コンテキスト
+	SOUND_OUT	sound_out_;
+
 	typedef emu::spinv SPINV;
 	SPINV		spinv_;
 
@@ -228,6 +143,48 @@ namespace {
 
 	typedef utils::shell<CMD> SHELL;
 	SHELL		shell_(cmd_);
+
+#ifdef USE_DAC
+
+	typedef sound::dac_stream<device::R12DA, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
+	DAC_STREAM	dac_stream_(sound_out_);
+
+	void start_audio_()
+	{
+		uint8_t dmac_intl = 4;
+		uint8_t tpu_intl  = 5;
+		if(dac_stream_.start(48'000, dmac_intl, tpu_intl)) {
+			utils::format("Start D/A Stream\n");
+		} else {
+			utils::format("D/A Stream Not start...\n");
+		}
+	}
+
+#endif
+
+
+#ifdef USE_SSIE
+
+	typedef device::ssie_io<device::SSIE1, device::DMAC1, SOUND_OUT> SSIE_IO;
+	SSIE_IO		ssie_io_(sound_out_);
+
+	void start_audio_()
+	{
+		{  // SSIE 設定 RX72N Envision kit では、I2S, 48KHz, 32/24 ビットフォーマット固定
+			uint8_t intr = 5;
+			uint32_t aclk = 24'576'000;
+			uint32_t lrclk = 48'000;
+			auto ret = ssie_io_.start(aclk, lrclk, SSIE_IO::BFORM::I2S_32, intr);
+			if(ret) {
+				ssie_io_.enable_mute(false);
+				ssie_io_.enable_send();  // 送信開始
+				utils::format("SSIE Start: AUDIO_CLK: %u Hz, LRCLK: %u\n") % aclk % lrclk;
+			} else {
+				utils::format("SSIE Not start...\n");
+			}
+		}
+	}
+#endif
 
 	void command_()
 	{
@@ -260,14 +217,10 @@ extern "C" {
 	void set_sample_rate(uint32_t freq)
 	{
 #ifdef USE_DAC
-		uint8_t intr_level = 5;
-		if(!tpu0_.start(freq, intr_level)) {
-			utils::format("TPU0 start error...\n");
-		}
+		dac_stream_.set_sample_rate(freq);
 #endif
-
 #ifdef USE_SSIE
-		ssie_io_.set_sampling_freq(freq);
+		sound_out_.set_output_rate(freq);
 #endif
 	}
 
@@ -414,7 +367,7 @@ int main(int argc, char** argv)
 			for(uint32_t i = 0; i < len; ++i) {
 				while((sound_out_.at_fifo().size() - sound_out_.at_fifo().length()) < 8) {
 				}
-				sound::wave_t t;
+				typename SOUND_OUT::WAVE t;
 				t.l_ch = t.r_ch = *wav++;
 				sound_out_.at_fifo().put(t);
 			}
