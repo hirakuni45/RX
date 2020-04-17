@@ -87,6 +87,7 @@ namespace device {
 #if defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 			if(F_ICLK > 120'000'000) {  // 120MHz 以上の場合設定
 				device::SYSTEM::MEMWAIT = 1;
+				volatile auto tmp = device::SYSTEM::MEMWAIT();  // 読み出しを行う
 			}
 #endif
 			// (x10.0) 0b010011, (x10.5) 0b010100, (x11.0) 0b010101, (x11.5) 0b010110
