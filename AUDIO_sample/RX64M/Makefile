@@ -1,21 +1,21 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX65N Makefile
+#   @brief  RX64M Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	side
+TARGET		=	audio_sample
 
-DEVICE		=	R5F565NE
+DEVICE		=	R5F564MF
 
 FATFS_VER	=	ff13c/source
 
 BUILD		=	release
 
-VPATH		=	../
+VPATH		=	../../
 
 ASOURCES	=	common/start.s
 
@@ -27,27 +27,21 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/ffunicode.c \
 				common/time.c
 
-# r_lcd/r_glcdc_rx_pinset.c
-
-PSOURCES	=	main.cpp \
-				RX65x/icu_mgr.cpp \
+PSOURCES	=	AUDIO_sample/main.cpp \
+				RX600/icu_mgr.cpp \
 				graphics/font8x16.cpp \
 				graphics/color.cpp \
-				side/arcade.cpp \
-				side/i8080.cpp \
-				side/i8080opc.cpp \
-				side/i8080sub.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++
+USER_LIBS	=	m supc++ mad
 
-LDSCRIPT	=	../RX65x/$(DEVICE).ld
+LDSCRIPT	=	../../RX64M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX65N \
+USER_DEFS	=	SIG_RX64M \
 				F_ICLK=120000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000 \
-				FAT_FS
+				FAT_FS FAT_FS_NUM=16
 
 MCU_TARGET	=	
 
@@ -70,16 +64,17 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../RX600/drw2d/inc/tes
+INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../RX600/drw2d ../zlib
+LIB_ROOT	=	../../RX600/drw2d ../../libmad
 
 OPTIMIZE	=	-O3
+
+AS_OPT		=	-mcpu=rx600
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
-				-Wno-unused-but-set-variable \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
@@ -107,6 +102,7 @@ SIZE		=	rx-elf-size
 
 # AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
 # AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
+AFLAGS		=	$(AS_OPT)
 # ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
 ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
 
@@ -203,6 +199,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

@@ -36,6 +36,7 @@
 //=========================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
+#include "common/fixed_fifo.hpp"
 
 namespace device {
 

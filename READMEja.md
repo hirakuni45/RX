@@ -81,12 +81,15 @@ int main(int argc, char** argv)
 |/r_net                 |ルネサス T4(TCP/UDP) ライブラリと、C++ ハンドラ、ラッパー|
 |[/libmad](./libmad)    |MP3 デコード、mad ライブラリ|
 |[/libpng](./libpng)    |PNG ライブラリ|
-|[rxprog](./rxprog)     |RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）|
-|[FIRST_sample](./FIRST_sample)|各プラットホーム対応、LED 点滅プログラム|
-|[SCI_sample](./SCI_sample)|各プラットホーム対応、SCI サンプルプログラム|
-|[FLASH_sample](./FLASH_sample)|各プラットホーム対応、内臓データフラッシュ操作サンプル|
-|[RAYTRACER_sample](./RAYTRACER_sample)|各プラットホーム対応 レイトレーシング・ベンチマーク|
-|[SDCARD_sample](./SDCARD_sample)|SD カードの動作サンプル|
+|[/rxprog](./rxprog)    |RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）|
+|[/FIRST_sample](./FIRST_sample)|各プラットホーム対応、LED 点滅プログラム|
+|[/SCI_sample](./SCI_sample)|各プラットホーム対応、SCI サンプルプログラム|
+|[/FLASH_sample](./FLASH_sample)|各プラットホーム対応、内臓データフラッシュ操作サンプル|
+|[/RAYTRACER_sample](./RAYTRACER_sample)|各プラットホーム対応 レイトレーシング・ベンチマーク|
+|[/SDCARD_sample](./SDCARD_sample)|SD カードの動作サンプル|
+|[/SIDE_sample](./SIDE_sample)|ルネサス製 RX65N/RX72N Envision Kit, Space Invaders エミュレーター|
+|[/NESEMU_sample](./NESEMU_sample)|ルネサス製 RX65N/RX72N Envision Kit, NES エミュレーター|
+|[/AUDIO_sample](./AUDIO_sample)|MP3/WAV オーディオプレイヤー|
 |/rx24t_GPS_sample      |RX24T を使った GPS の動作サンプル|
 |/rx24t_DATA_FLASH_sample|RX24T を使った内臓データ・フラッシュ操作サンプル|
 |/rx24t_LOGGER          |RX24T を使ったデータロガー・プロジェクト|
@@ -95,12 +98,8 @@ int main(int argc, char** argv)
 |/rx64m_TPU_sample      |RX64M を使った TPU の制御サンプル（タイマー割り込み）|
 |/rx64m_DMAC_sample     |RX64M を使った DMAC 制御のサンプル（メモリー操作）|
 |/rx64m_DA_sample       |RX64M を使った 内臓 D/A 変換、TPU、DMAC のサンプル|
-|/rx64m_AUDIO_sample    |RX64M を使った SD カード上のオーディオファイルを内臓 D/A で再生する|
 |/GR-KAEDE_ftps         |ルネサス製の RX64M 搭載マイコンボード向けサンプル（FTP サーバー）|
 |/GR-KAEDE_http         |ルネサス製の RX64M 搭載マイコンボード向けサンプル（http サーバー）|
-|/RTK5_AUDIO_sample     |ルネサス製 RTK5RX65N マイコンボード オーディオプレイヤー|
-|/RTK5_SIDE             |ルネサス製 RTK5RX65N マイコンボード Space Invaders エミュレーター|
-|[/RTK5_NESEMU](./RTK5_NESEMU)   |ルネサス製 RTK5RX65N マイコンボード NES エミュレーター|
 |[LICENSE](./LICENSE)   |ライセンス表記ファイル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。

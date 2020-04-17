@@ -1,8 +1,8 @@
 //=====================================================================//
 /*! @file
-    @brief  RX64M/RX71M/RX65N/RX72N Audio サンプル @n
-			SD-CARD にある MP3、WAV 形式のサウンドを再生する。@n
-			オーディオインターフェースとして、マイコン内蔵 D/A 又は、SSIE を選択できる。@n
+    @brief  RX64M/RX65N/RX72N Audio サンプル @n
+			SD-CARD にある MP3、WAV 形式のサファイルを再生する。@n
+			オーディオ出力として、マイコン内蔵 D/A 又は、SSIE を選択できる。@n
 			※ D/A を使う場合「#define USE_DAC」@n
 			※ SSIE を使う場合「#define USE_SSIE」
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -13,10 +13,10 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/cmt_io.hpp"
-#include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
+#include "common/spi_io2.hpp"
 
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
@@ -26,81 +26,103 @@
 #include "common/dir_list.hpp"
 #include "common/shell.hpp"
 
-#include "sound/wav_in.hpp"
-#include "sound/mp3_in.hpp"
-#include "common/tpu_io.hpp"
 #include "sound/sound_out.hpp"
-
+#include "sound/dac_stream.hpp"
+#include "sound/codec_mgr.hpp"
 
 namespace {
 
 	typedef device::cmt_io<device::CMT0> CMT;
 	CMT			cmt_;
 
-#if defined(SIG_RX71M)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX71M" };
-
-	#define USE_DAC
-
-#elif defined(SIG_RX64M)
+#if defined(SIG_RX64M)
 	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX64M" };
 
+	// SDCARD 制御リソース
+	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
+	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
+	typedef device::PORT<device::PORT7, device::bitpos::B7> SPCK;
+	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;  ///< Soft SPI 定義
+	SDC_SPI	sdc_spi_;
+	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;	///< カード選択信号
+	typedef device::PORT<device::PORT8, device::bitpos::B2, 0> SDC_POWER;	///< カード電源制御
+	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;	///< カード検出
+	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
+	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
+	SDC		sdc_(sdc_spi_, 25'000'000);
+
+	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
+	// DMAC でループ転送できる最大数の２倍（1024）
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+
+	#define USE_DAC
+
+#elif defined(SIG_RX71M)
+	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX71M" };
+
+	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
+	// DMAC でループ転送できる最大数の２倍（1024）
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+
 	#define USE_DAC
 
 #elif defined(SIG_RX65N)
-	/// for RX65N Envision Kit
+	/// RX65N Envision Kit
 	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 	typedef device::SCI9 SCI_CH;
 	static const char* system_str_ = { "RX65N" };
 
-    typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< 0 でＯＮ
-    typedef device::NULL_PORT SDC_WPRT;		///< 書き込み禁止は使わない
+    typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
+    typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない
     // RX65N Envision Kit の SDHI ポートは、候補３で指定できる
-    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
-        device::port_map::option::THIRD> SDC;
+    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
+    SDC			sdc_;
+
+	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
+	// DMAC でループ転送できる最大数の２倍（1024）
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
 
 	#define USE_DAC
 	#define USE_GLCDC
 
 #elif defined(SIG_RX72N)
-	/// for RX72N Envision Kit
+	/// RX72N Envision Kit
 	typedef device::system_io<16'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
 	typedef device::SCI2 SCI_CH;
 	static const char* system_str_ = { "RX72N" };
 
-    typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;
-    typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
+    typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
+    typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
     // RX72N Envision Kit の SDHI ポートは、候補３で指定できる
-    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
-		device::port_map::option::THIRD> SDC;
+    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
+    SDC			sdc_;
 
-	typedef utils::ssie_io<device::SSIE1, device::DMAC1, 8192, 512> SSIE_IO;
+	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
+	// SSIE の FIFO サイズの２倍以上（256）
+	typedef sound::sound_out<int16_t, 8192, 256> SOUND_OUT;
 
 	#define USE_SSIE
 	#define USE_GLCDC
 
 #endif
 
-	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
-	typedef utils::fixed_fifo<char, 1024> SEND_BUFF;
+	typedef utils::fixed_fifo<char, 1024> RECV_BUFF;
+	typedef utils::fixed_fifo<char, 2048> SEND_BUFF;
 	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
 	SCI			sci_;
 
+	// コマンドライン
 	typedef utils::command<256> CMD;
 	CMD 		cmd_;
-
-	// SD-CARD ハードウェアーコンテキスト
-    SDC			sdc_;
 
 	// ディレクトリー・リスト・コンテキスト
 	typedef utils::dir_list DLIST;
@@ -110,6 +132,9 @@ namespace {
 	typedef utils::shell<CMD> SHELL;
 	SHELL		shell_(cmd_);
 
+	// サウンド出力コンテキスト
+	SOUND_OUT	sound_out_;
+
 	// オーディオ・コーデック・コンテキスト
 	typedef sound::mp3_in MP3_IN;
 	MP3_IN		mp3_in_;
@@ -117,62 +142,47 @@ namespace {
 	WAV_IN		wav_in_;
 
 #ifdef USE_DAC
-	typedef utils::sound_out<8192, 1024> SOUND_OUT;
-	SOUND_OUT	sound_out_;
 
-	class tpu_task {
-	public:
-		void operator() () {
-			uint32_t tmp = wpos_;
-			++wpos_;
-			if((tmp ^ wpos_) & 64) {
-				sound_out_.service(64);
-			}
-		}
-	};
-
-	typedef device::tpu_io<device::TPU0, tpu_task> TPU0;
-	TPU0		tpu0_;
+	typedef sound::dac_stream<device::R12DA, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
+	DAC_STREAM	dac_stream_(sound_out_);
 
 	void start_audio_()
 	{
-		{  // DMAC マネージャー開始
-			uint8_t intr_level = 4;
-			bool cpu_intr = true;
-			auto ret = dmac_mgr_.start(tpu0_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
-				reinterpret_cast<uint32_t>(sound_out_.get_wave()), DAC::DADR0.address(),
-				sound_out_.size(), intr_level, cpu_intr);
-			if(!ret) {
-				utils::format("DMAC Not start...\n");
-			}
+		uint8_t dmac_intl = 4;
+		uint8_t tpu_intl  = 5;
+		if(dac_stream_.start(48'000, dmac_intl, tpu_intl)) {
+			utils::format("Start D/A Stream\n");
+		} else {
+			utils::format("D/A Stream Not start...\n");
 		}
 	}
+
 #endif
 
 #ifdef USE_SSIE
-	SSIE_IO		ssie_io_;
-	SSIE_IO::SOUND_OUT&	sound_out_ = ssie_io_.at_sound_out();
+
+	typedef device::ssie_io<device::SSIE1, device::DMAC1, SOUND_OUT> SSIE_IO;
+	SSIE_IO		ssie_io_(sound_out_);
 
 	void start_audio_()
 	{
-		{  // SSIE 設定 RX72N Envision kit では、I2S, 48KHz, 32/24 ビットフォーマット
+		{  // SSIE 設定 RX72N Envision kit では、I2S, 48KHz, 32/16 ビットフォーマット固定
 			uint8_t intr = 5;
-			uint8_t adiv = 24'576'000 / 48'000 / (32 + 32);
-			auto ret = ssie_io_.start(adiv,
-				utils::ssie_t::FORM::I2S,
-				utils::ssie_t::D_NUM::_32, utils::ssie_t::S_NUM::_32, intr);
-///				utils::ssie_core::D_NUM::_24, utils::ssie_core::S_NUM::_32, intr);
+			uint32_t aclk = 24'576'000;
+			uint32_t lrclk = 48'000;
+			auto ret = ssie_io_.start(aclk, lrclk, SSIE_IO::BFORM::I2S_32, intr);
 			if(ret) {
 				ssie_io_.enable_mute(false);
 				ssie_io_.enable_send();  // 送信開始
-				uint32_t bclk = 24'576'000 / static_cast<uint32_t>(adiv);
-				utils::format("SSIE Start: BCLK: %u Hz\n") % bclk;
+				utils::format("SSIE Start: AUDIO_CLK: %u Hz, LRCLK: %u\n") % aclk % lrclk;
 			} else {
-				utils::format("SSIE No start...\n");
+				utils::format("SSIE Not start...\n");
 			}
 		}
 	}
+
 #endif
+
 
 	void update_led_()
 	{
@@ -348,14 +358,12 @@ extern "C" {
 
 	void set_sample_rate(uint32_t freq)
 	{
-#ifdef USE_SSIE
-		ssie_io_.set_sampling_freq(freq);
-#endif
+		utils::format("Change Sample rate: %u Hz\n") % freq;
 #ifdef USE_DAC
-		uint8_t intr_level = 5;
-		if(!tpu0_.start(freq, intr_level)) {
-			utils::format("TPU0 start error...\n");
-		}
+		dac_stream_.set_sample_rate(freq);
+#endif
+#ifdef USE_SSIE
+		sound_out_.set_input_rate(freq);
 #endif
 	}
 
@@ -421,14 +429,14 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::setup_system_clock();
 
-	{  // SCI 設定
-		uint8_t intr_lvl = 2;
-		sci_.start(115200, intr_lvl);
-	}
-
 	{  // 時間計測タイマー（60Hz）
 		uint8_t intr_lvl = 4;
 		cmt_.start(60, intr_lvl);
+	}
+
+	{  // SCI 設定
+		uint8_t intr_lvl = 2;
+		sci_.start(115200, intr_lvl);
 	}
 
 	utils::format("\r%s Start for Audio Sample\n") % system_str_;
@@ -441,8 +449,6 @@ int main(int argc, char** argv)
 
 	while(1) {
 		cmt_.sync();
-
-///		service_audio_();
 
 		sdc_.service();
 

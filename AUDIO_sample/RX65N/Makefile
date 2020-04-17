@@ -1,20 +1,21 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
-#	RX64M Makefile
+#   @file
+#   @brief  RX65N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
 TARGET		=	audio_sample
 
-DEVICE		=	R5F564MF
+DEVICE		=	R5F565NE
 
 FATFS_VER	=	ff13c/source
 
 BUILD		=	release
 
-VPATH		=	../
+VPATH		=	../../
 
 ASOURCES	=	common/start.s
 
@@ -26,14 +27,17 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/ffunicode.c \
 				common/time.c
 
-PSOURCES	=	main.cpp \
+PSOURCES	=	AUDIO_sample/main.cpp \
+				RX65x/icu_mgr.cpp \
+				graphics/font8x16.cpp \
+				graphics/color.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	mad supc++
+USER_LIBS	=	m supc++ drw2d mad
 
-LDSCRIPT	=	../RX64M/$(DEVICE).ld
+LDSCRIPT	=	../../RX65x/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX64M \
+USER_DEFS	=	SIG_RX65N \
 				F_ICLK=120000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000 \
@@ -41,24 +45,40 @@ USER_DEFS	=	SIG_RX64M \
 
 MCU_TARGET	=	
 
-INC_SYS		=
+# Include path for each environment
+ifeq ($(OS),Windows_NT)
+SYSTEM := WIN
+LOCAL_PATH  =   /mingw64
+else
+  UNAME := $(shell uname -s)
+  ifeq ($(UNAME),Linux)
+    SYSTEM := LINUX
+    LOCAL_PATH = /usr/local
+  endif
+  ifeq ($(UNAME),Darwin)
+    SYSTEM := OSX
+    OSX_VER := $(shell sw_vers -productVersion | sed 's/^\([0-9]*.[0-9]*\).[0-9]*/\1/')
+    LOCAL_PATH = /opt/local
+  endif
+endif
 
-INC_APP		=	. ../ ../RX64M ../libmad
+INC_SYS     =   $(LOCAL_PATH)/include
 
-LIB_ROOT	=	../libmad
+INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
 
-OPTIMIZE	=	-Os
+LIB_ROOT	=	../../RX600/drw2d ../../libmad
+
+OPTIMIZE	=	-O3
+
+AS_OPT		=	-mcpu=rx600
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
-				-Wno-unused-but-set-variable \
-				-mcpu=rx600 \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
-				-mcpu=rx600 \
 				-fno-exceptions
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
@@ -82,13 +102,14 @@ SIZE		=	rx-elf-size
 
 # AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
 # AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
+AFLAGS		=	$(AS_OPT)
 # ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
 ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
 
 # Override is only needed by avr-lib build system.
 
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++14 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
+PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
 
@@ -178,6 +199,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

@@ -15,6 +15,10 @@
 #include "sound/af_play.hpp"
 #include "sound/sound_out.hpp"
 
+extern "C" {
+	void set_sample_rate(uint32_t freq);
+};
+
 namespace sound {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -205,6 +209,10 @@ namespace sound {
 			if(!load_header(fin, tag)) {
 				return false;
 			}
+
+			// サンプル・レートの設定（外部）
+			set_sample_rate(rate_);
+
 			if(tag_task_) {
 				tag_task_(fin, tag);
 			}
@@ -220,7 +228,7 @@ namespace sound {
 				}
 				if(ctrl == CTRL::STOP) {
 					out.mute();
-					status = false;
+//					status = false;
 					break;
 				} else if(ctrl == CTRL::REPLAY) {
 					out.mute();
@@ -252,7 +260,7 @@ namespace sound {
 					for(uint32_t i = 0; i < 256; ++i) {
 						while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
 						}
-						sound::wave_t t;
+						typename SOUND_OUT::WAVE t;
 						if(get_channel() == 2) {
 							t.l_ch = src[0];
 							t.r_ch = src[1];
@@ -270,7 +278,7 @@ namespace sound {
 					for(uint32_t i = 0; i < 256; ++i) {
 						while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
 						}
-						sound::wave_t t;
+						typename SOUND_OUT::WAVE t;
 						if(get_channel() == 2) {
 							t.l_ch = static_cast<uint16_t>(src[0] ^ 0x80) << 8;
 							t.l_ch |= (src[0] & 0x7f) << 1;

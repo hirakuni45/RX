@@ -210,7 +210,7 @@ namespace {
 	typedef device::dac_out<DAC> DAC_OUT;
 	DAC_OUT		dac_out_;
 
-	typedef utils::sound_out<8192, 1024> SOUND_OUT;
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
 	SOUND_OUT	sound_out_;
 
 	class tpu_task {
@@ -219,7 +219,7 @@ namespace {
 			uint32_t tmp = wpos_;
 			++wpos_;
 			if((tmp ^ wpos_) & 64) {
-				sound_out_.service(64);
+				sound_out_.service(64, 0x8000);
 			}
 		}
 	};
