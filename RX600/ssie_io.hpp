@@ -9,66 +9,36 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=========================================================================//
-#include "RX600/ssie.hpp"
-#include "common/delay.hpp"
-#include "sound/sound_out.hpp"
+#include "common/renesas.hpp"
 
-namespace utils {
+namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  SSIE（シリアルサウンドインターフェース）基本クラス
+		@brief  SSIE（シリアルサウンドインターフェース）基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct ssie_t {
+	struct ssie_io_base {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  ビット列フォーマット
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class FORM : uint8_t {
-			I2S,	///< I2S
-			LEFT,	///< 左詰め
-			RIGHT,	///< 右詰め
-			TDM2,	///< TDM 2 ワード・フォーマット
-			TDM4,	///< TDM 4 ワード・フォーマット
-			TDM6,	///< TDM 6 ワード・フォーマット
-			TDM8,	///< TDM 8 ワード・フォーマット
-			MONO,	///< モノラル・フォーマット
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  データ・ワード長数
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class D_NUM : uint8_t {
-			_8,		///< 8 ビット
-			_16,	///< 16 ビット
-			_18,	///< 18 ビット
-			_20,	///< 20 ビット
-			_22,	///< 22 ビット
-			_24,	///< 24 ビット
-			_32		///< 32 ビット
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  システム・ワード長数
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class S_NUM : uint8_t {
-			_8,		///<  8 ビット   16Fs
-			_16,	///<  16 ビット  32Fs
-			_24,	///<  24 ビット  48Fs
-			_32,	///<  32 ビット  64Fs
-			_48,	///<  48 ビット  96Fs
-			_64,	///<  64 ビット 128Fs
-			_128,	///< 128 ビット 256Fs
-			_256	///< 256 ビット 512Fs
+		enum class BFORM : uint8_t {
+			I2S_16,		///< I2S 16 ビットフォーマット
+			I2S_24,		///< I2S 24 ビットフォーマット
+			I2S_32,		///< I2S 32 ビットフォーマット
+			LEFT_16,	///< 左詰め 16 ビットフォーマット
+			LEFT_24,	///< 左詰め 24 ビットフォーマット
+			LEFT_32,	///< 左詰め 32 ビットフォーマット
+			RIGHT_16,	///< 右詰め 16 ビットフォーマット
+			RIGHT_24,	///< 右詰め 24 ビットフォーマット
+			RIGHT_32,	///< 右詰め 32 ビットフォーマット
+			TDM_2,		///< TDM 2(16x2) ワード・フォーマット
+			TDM_4,		///< TDM 4(16x4) ワード・フォーマット
+			TDM_6,		///< TDM 6(16x6) ワード・フォーマット
+			TDM_8,		///< TDM 8(16x8) ワード・フォーマット
 		};
 	};
 
@@ -76,32 +46,39 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  SSIE（シリアルサウンドインターフェース）制御クラス
-		@param[in]	SSIE	ハードウェアー・コンテキスト
-		@param[in]	DMAC	DMAC デバイス・コンテキスト(DMAC0 - DMAC7)
-		@param[in]	BFS		fifo バッファのサイズ
-		@param[in]	OUTS	出力バッファのサイズ（１６の倍数で１２８以上）
-		@param[in]	MASTER	スレーブの場合「false」
+		@param[in]	SSIE		ハードウェアー・コンテキスト
+		@param[in]	DMAC		DMAC デバイス・コンテキスト(DMAC0 - DMAC7)
+		@param[in]	SOUND_OUT	サウンド出力オブジェクト型
+		@param[in]	MASTER		スレーブの場合「false」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class SSIE, class DMAC, uint32_t BFS, uint32_t OUTS, bool MASTER = true>
-	class ssie_io : public ssie_t {
+	template <class SSIE, class DMAC, class SOUND_OUT, bool MASTER = true>
+	class ssie_io : public ssie_io_base {
 	public:
 
 		typedef SSIE value_type;
 		typedef DMAC dmac_type;
-		typedef sound_out<BFS, OUTS> SOUND_OUT;
 
 	private:
 
-		SOUND_OUT	sound_out_;
+		// SSIE の FIFO は 32 段なので、半分の 16 段で割り込み
+		static const uint32_t FIFO_TH = 16;
+
+		SOUND_OUT&	sound_out_;
+
+		enum class FORM : uint8_t {
+			I2S,
+			LEFT,
+			RIGHT,
+			TDM,
+			MONO
+		};
 
 		struct sound_task_t {
 			SOUND_OUT&	sound_out_;
 			uint32_t	ref_freq_;
-			uint32_t	rsmp_freq_;
-			uint32_t	timebase_;
 			sound_task_t(SOUND_OUT& sound_out, uint32_t ref) : sound_out_(sound_out),
-				ref_freq_(ref), rsmp_freq_(ref), timebase_(0) { }
+				ref_freq_(ref) { }
 		};
 		sound_task_t	sound_task_t_;
 
@@ -111,23 +88,17 @@ namespace utils {
 		{
 			auto p = static_cast<sound_task_t*>(sound_task_ptr_);
 			uint32_t wpos = p->sound_out_.get_wave_pos();
-			wpos += 8 * 2;  // オフセット
-			wpos &= (OUTS - 1);
-			uint32_t l = 0;
-			for(uint32_t i = 0; i < 8; ++i) {
+			wpos += FIFO_TH / 2 * 2;  // オフセット
+			wpos &= (p->sound_out_.size() - 1);
+			// FIFO の L/R 出２段消費するので８段
+			for(uint32_t i = 0; i < (FIFO_TH / 2); ++i) {
 				auto w = p->sound_out_.get_wave(wpos);
-				SSIE::SSIFTDR32 = (static_cast<int32_t>(w->l_ch) - 32767) << 16;
-				SSIE::SSIFTDR32 = (static_cast<int32_t>(w->r_ch) - 32767) << 16;
-				uint32_t base_freq = 48000;
-				p->timebase_ += p->rsmp_freq_;
-				if(p->timebase_ >= p->ref_freq_) {
-					p->timebase_ -= p->ref_freq_;
-					++wpos;
-					wpos &= (OUTS - 1);
-					++l;
-				}
+				SSIE::SSIFTDR16 = w->l_ch;
+				SSIE::SSIFTDR16 = w->r_ch;
+				++wpos;
+				wpos &= (p->sound_out_.size() - 1);
 			}
-			p->sound_out_.service(l);
+			p->sound_out_.service(FIFO_TH / 2, 0x0000);
 
 			SSIE::SSIFSR.TDE = 0;
 		}
@@ -136,29 +107,13 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コンストラクター
+			@param[in]	SOUND_OUT	サウンド出力オブジェクト
 		*/
 		//-----------------------------------------------------------------//
-		ssie_io() noexcept : 
-			sound_out_(), sound_task_t_(sound_out_, 48'000) { }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  サンプリング周波数設定
-			@param[in]	freq	サンプリング周期
-			@return 不正な場合「false」
-		*/
-		//-----------------------------------------------------------------//
-		bool set_sampling_freq(uint32_t freq) noexcept
+		ssie_io(SOUND_OUT& sound_out) noexcept : 
+			sound_out_(sound_out), sound_task_t_(sound_out_, 48'000)
 		{
-			if(freq > sound_task_t_.ref_freq_) {
-				return false;
-			}
-			if(freq < 11025) {
-				return false;
-			}
-			sound_task_t_.rsmp_freq_ = freq;
-			return true;
+			sound_task_ptr_ = static_cast<void*>(&sound_task_t_);
 		}
 
 
@@ -166,23 +121,20 @@ namespace utils {
 		/*!
 			@brief  開始 @n
 					※送信動作、受信動作、ミュート、初期状態を維持
-			@param[in]	adiv	AUDIO_CLK の分周値
-			@param[in]	form	フォーマット
-			@param[in]	dnum	データ数
-			@param[in]	snum	システム数
+			@param[in]	aclk	オーディオ入力周波数
+			@param[in]	lrclk	LR クロック周波数（サンプルレート）
+			@param[in]	bform	ビット列フォーマット
 			@param[in]	intl	割り込みレベル
 			@return 初期化出来ない場合「false」（パラメータの異常など）
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint8_t adiv, FORM form, D_NUM dnum, S_NUM snum, uint8_t intl) noexcept
+		bool start(uint32_t aclk, uint32_t lrclk, BFORM bform, uint8_t intl) noexcept
 		{
-			device::power_mgr::turn(SSIE::PERIPHERAL);
+			power_mgr::turn(SSIE::PERIPHERAL);
 
-			if(!device::port_map::turn(SSIE::PERIPHERAL, true)) {
+			if(!port_map::turn(SSIE::PERIPHERAL, true)) {
 				return false;
 			}
-
-			sound_task_ptr_ = static_cast<void*>(&sound_task_t_);
 
 			// ソフトリセット
 			SSIE::SSIFCR.SSIRST = 1;
@@ -193,6 +145,99 @@ namespace utils {
 
 			SSIE::SSICR.MST = MASTER;
 
+			uint32_t bits = 0;
+			FORM form;
+			uint8_t dwl = 0;
+			uint8_t swl = 0;
+			uint8_t word = 0;
+			switch(bform) {
+			case BFORM::I2S_16:
+				bits = 16 * 2;
+				form = FORM::I2S;
+				swl = 0b001;  // S:16
+				dwl = 0b001;  // D:16
+				break;
+			case BFORM::I2S_24:
+				bits = 32 * 2;
+				form = FORM::I2S;
+				swl = 0b011;  // S:32
+				dwl = 0b101;  // D:24
+				break;
+			case BFORM::I2S_32:
+				bits = 32 * 2;
+				form = FORM::I2S;
+				swl = 0b011;  // S:32
+				dwl = 0b110;  // D:32
+				break;
+			case BFORM::LEFT_16:
+				bits = 16 * 2;
+				form = FORM::LEFT;
+				swl = 0b001;
+				dwl = 0b001;
+				break;
+			case BFORM::LEFT_24:
+				bits = 32 * 2;
+				form = FORM::LEFT;
+				swl = 0b011;
+				dwl = 0b101;
+				break;
+			case BFORM::LEFT_32:
+				bits = 32 * 2;
+				form = FORM::LEFT;
+				swl = 0b011;
+				dwl = 0b110;
+				break;
+			case BFORM::RIGHT_16:
+				bits = 16 * 2;
+				form = FORM::RIGHT;
+				swl = 0b001;
+				dwl = 0b001;
+				break;
+			case BFORM::RIGHT_24:
+				bits = 32 * 2;
+				form = FORM::RIGHT;
+				swl = 0b011;
+				dwl = 0b101;
+				break;
+			case BFORM::RIGHT_32:
+				bits = 32 * 2;
+				form = FORM::RIGHT;
+				swl = 0b011;
+				dwl = 0b110;
+				break;
+			case BFORM::TDM_2:
+				bits = 16 * 2;
+				word = 2;
+				form = FORM::TDM;
+				swl = 0b001;
+				dwl = 0b001;
+				break;
+			case BFORM::TDM_4:
+				bits = 16 * 4;
+				word = 4;
+				form = FORM::TDM;
+				swl = 0b001;
+				dwl = 0b001;
+				break;
+			case BFORM::TDM_6:
+				bits = 16 * 6;
+				word = 6;
+				form = FORM::TDM;
+				swl = 0b001;
+				dwl = 0b001;
+				break;
+			case BFORM::TDM_8:
+				bits = 16 * 8;
+				word = 8;
+				form = FORM::TDM;
+				swl = 0b001;
+				dwl = 0b001;
+				break;
+			default:
+				return false;
+			}
+
+			auto adiv = aclk / lrclk / bits;
 			uint8_t ckdv = 0;
 			switch(adiv) {
 			case 1:   ckdv = 0b0000; break;
@@ -233,15 +278,14 @@ namespace utils {
 
 			// 割り込み設定
 			if(intl > 0) {
-				device::icu_mgr::set_level(SSIE::TX_VEC, intl);
-				device::icu_mgr::set_task(SSIE::TX_VEC, send_task_);
+				icu_mgr::set_level(SSIE::TX_VEC, intl);
+				icu_mgr::set_task(SSIE::TX_VEC, send_task_);
 				SSIE::SSIFCR.TIE = 1;
 			} else {
-				device::icu_mgr::set_task(SSIE::TX_VEC, nullptr);
+				icu_mgr::set_task(SSIE::TX_VEC, nullptr);
 				SSIE::SSIFCR.TIE = 0;
 			}
 
-			uint8_t word = 0b00;
 			switch(form) {
 			case FORM::I2S:
 				SSIE::SSIOFR.OMOD = 0b00;
@@ -261,15 +305,11 @@ namespace utils {
 				SSIE::SSICR.LRCKP = 1;
 				SSIE::SSICR.SDTA  = 1;
 				break;
-			case FORM::TDM2:
-			case FORM::TDM4:
-			case FORM::TDM6:
-			case FORM::TDM8:
+			case FORM::TDM:
 				SSIE::SSIOFR.OMOD = 0b01;
 				SSIE::SSICR.DEL   = 0;
 				SSIE::SSICR.LRCKP = 1;
 				SSIE::SSICR.SDTA  = 0;
-				word = static_cast<uint8_t>(form) - static_cast<uint8_t>(FORM::TDM2);
 				break;
 			case FORM::MONO:
 				SSIE::SSIOFR.OMOD = 0b10;
@@ -277,20 +317,24 @@ namespace utils {
 				SSIE::SSICR.LRCKP = 1;
 				SSIE::SSICR.SDTA  = 0;
 				break;
+			default:
+				return false;
 			}
+
+			sound_task_t_.ref_freq_ = lrclk;			
 
 //			SSIE::SSICR.BCKP = 1;
 
-			// フレームのワード数設定
+			// フレームのワード数設定 (TDM)
 			SSIE::SSICR.FRM = word;
 
-			SSIE::SSICR.DWL = static_cast<uint8_t>(dnum);
-			SSIE::SSICR.SWL = static_cast<uint8_t>(snum);
+			SSIE::SSICR.DWL = dwl;
+			SSIE::SSICR.SWL = swl;
 
 			SSIE::SSIOFR.LRCONT = 1;  // アイドル時にも LRCNT を出力
 
 			// 32 ワード FIFO のバッファリミット値
-			SSIE::SSISCR = SSIE::SSISCR.TDES.b(16 - 1) | SSIE::SSISCR.RDFS.b(16 - 1);
+			SSIE::SSISCR = SSIE::SSISCR.TDES.b(FIFO_TH - 1) | SSIE::SSISCR.RDFS.b(FIFO_TH - 1);
 
 			return true;
 		}
@@ -305,7 +349,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void enable_send(bool ena = true, int32_t ival = 0) noexcept {
 			if(ena && !SSIE::SSICR.TEN()) {  // 送信開始
-				for(uint32_t i = 0; i < 16; ++i) {  // ダミーデータで半分埋める
+				for(uint32_t i = 0; i < FIFO_TH; ++i) {  // ダミーデータで半分埋める
 					SSIE::SSIFTDR32 = ival;
 				}
 			}
@@ -392,19 +436,9 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		auto recv() const noexcept { return SSIE::SSIFRDR32(); }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  SOUND_OUT オブジェクトの参照
-			@return	SOUND_OUT オブジェクト
-		*/
-		//-----------------------------------------------------------------//
-		auto& at_sound_out() { return sound_out_; }
 	};
 
 	// テンプレート関数内、実態の定義
-	template <class SSIE, class DMAC, uint32_t BFS, uint32_t OUTS, bool MASTER>
-		void* ssie_io<SSIE, DMAC, BFS, OUTS, MASTER>::sound_task_ptr_;
+	template <class SSIE, class DMAC, class SOUND_OUT, bool MASTER>
+		void* ssie_io<SSIE, DMAC, SOUND_OUT, MASTER>::sound_task_ptr_;
 }
-
