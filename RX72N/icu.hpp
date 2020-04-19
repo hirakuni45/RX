@@ -17,6 +17,7 @@ namespace device {
 		@brief  割り込みコントローラ（ICUD）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template<class _>
 	struct icu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -974,7 +975,8 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
-		static ir_t<0x00087010> IR;
+		typedef ir_t<0x00087010> IR_t;
+		static IR_t IR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1213,7 +1215,8 @@ namespace device {
 				return tmp & (1 << (idx & 7));
 			}
 		};
-		static ier_t<0x00087200> IER;
+		typedef ier_t<0x00087200> IER_t;
+		static IER_t IER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1414,7 +1417,8 @@ namespace device {
 				return *reinterpret_cast<volatile uint8_t*>(base + idx);
 			}
 		};
-		static ipr_t<0x00087300> IPR;
+		typedef ipr_t<0x00087300> IPR_t;
+		static IPR_t IPR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1969,5 +1973,9 @@ namespace device {
 
 		static icu_utils::slixr_t<0x00087700> SLIXR;
 	};
-	typedef icu_t ICU;
+	typedef icu_t<void> ICU;
+
+	template<class _> typename icu_t<_>::IR_t icu_t<_>::IR;
+	template<class _> typename icu_t<_>::IER_t icu_t<_>::IER;
+	template<class _> typename icu_t<_>::IPR_t icu_t<_>::IPR;
 }
