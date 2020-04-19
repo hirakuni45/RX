@@ -31,7 +31,8 @@ namespace device {
 			@brief  ポート方向レジスタ（PDR）
 		*/
 		//-----------------------------------------------------------------//
-		static basic_rw_t<rw8_t<base + 0x00> > PDR;
+		typedef basic_rw_t<rw8_t<base + 0x00> > PDR_t;
+		static PDR_t PDR;
 
 
 		//-----------------------------------------------------------------//
@@ -39,7 +40,8 @@ namespace device {
 			@brief  ポート出力データレジスタ（PODR）
 		*/
 		//-----------------------------------------------------------------//
-		static basic_rw_t<rw8_t<base + 0x20> > PODR;
+		typedef basic_rw_t<rw8_t<base + 0x20> > PODR_t;
+		static PODR_t PODR;
 
 
 		//-----------------------------------------------------------------//
@@ -47,7 +49,8 @@ namespace device {
 			@brief  ポート入力データレジスタ（PIDR）
 		*/
 		//-----------------------------------------------------------------//
-		static basic_ro_t<ro8_t<base + 0x40> > PIDR;
+		typedef basic_ro_t<ro8_t<base + 0x40> > PIDR_t;
+		static PIDR_t PIDR;
 
 
 		//-----------------------------------------------------------------//
@@ -55,7 +58,8 @@ namespace device {
 			@brief  ポートモードレジスタ（PMR）
 		*/
 		//-----------------------------------------------------------------//
-		static basic_rw_t<rw8_t<base + 0x60> > PMR;
+		typedef basic_rw_t<rw8_t<base + 0x60> > PMR_t;
+		static PMR_t PMR;
 
 
 		//-----------------------------------------------------------------//
@@ -63,7 +67,8 @@ namespace device {
 			@brief  プルアップ制御レジスタ（PCR）
 		*/
 		//-----------------------------------------------------------------//
-		static basic_rw_t<rw8_t<base + 0xC0> > PCR;
+		typedef basic_rw_t<rw8_t<base + 0xC0> > PCR_t;
+		static PCR_t PCR;
 
 
 		//-----------------------------------------------------------------//
@@ -71,8 +76,22 @@ namespace device {
 			@brief  駆動能力制御レジスタ（DSCR）
 		*/
 		//-----------------------------------------------------------------//
-		static basic_rw_t<rw8_t<base + 0xE0> > DSCR;
+		typedef basic_rw_t<rw8_t<base + 0xE0> > DSCR_t;
+		static DSCR_t DSCR;
 	};
+	template <uint32_t base, class option> const uint32_t port_t<base, option>::base_address_;
+	template <uint32_t base, class option>
+		typename port_t<base, option>::PDR_t  port_t<base, option>::PDR;
+	template <uint32_t base, class option>
+		typename port_t<base, option>::PODR_t port_t<base, option>::PODR;
+	template <uint32_t base, class option>
+		typename port_t<base, option>::PIDR_t port_t<base, option>::PIDR;
+	template <uint32_t base, class option>
+		typename port_t<base, option>::PMR_t  port_t<base, option>::PMR;
+	template <uint32_t base, class option>
+		typename port_t<base, option>::PCR_t  port_t<base, option>::PCR;
+	template <uint32_t base, class option>
+		typename port_t<base, option>::DSCR_t port_t<base, option>::DSCR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -117,7 +136,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> B4;
 			bit_rw_t<io_, bitpos::B6> B6;
 		};
-		static odr0_t<base + 0> ODR0;
+		typedef odr0_t<base + 0> ODR0_t;
+		static ODR0_t ODR0;
 
 
 		//-----------------------------------------------------------------//
@@ -141,8 +161,11 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> B6;
 #endif
 		};
-		static odr1_t<base + 1> ODR1;
+		typedef odr1_t<base + 1> ODR1_t;
+		static ODR1_t ODR1;
 	};
+	template <uint32_t base> typename odr_oo_t<base>::ODR0_t odr_oo_t<base>::ODR0;
+	template <uint32_t base> typename odr_oo_t<base>::ODR1_t odr_oo_t<base>::ODR1;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -175,8 +198,10 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> B4;
 			bit_rw_t<io_, bitpos::B6> B6;
 		};
-		static odr0_t<base> ODR0;
+		typedef odr0_t<base> ODR0_t;
+		static ODR0_t ODR0;
 	};
+	template <uint32_t base> typename odr_ox_t<base>::ODR0_t ODR0;
 
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
