@@ -505,7 +505,8 @@ namespace device {
 			@brief  ポート方向レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<PORTx::base_address_ + 0x00> DIR;
+		typedef rw8_t<PORTx::base_address_ + 0x00> DIR_;
+		static DIR_ DIR;
 
 
 		//-----------------------------------------------------------------//
@@ -513,7 +514,8 @@ namespace device {
 			@brief  プルアップ制御・レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<PORTx::base_address_ + 0xC0> PU;
+		typedef rw8_t<PORTx::base_address_ + 0xC0> PU_;
+		static PU_ PU;
 
 
 #if 0
@@ -557,14 +559,22 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct port_t {
-			static rw8_t<PORTx::base_address_ + 0x20> PO;  // ポート出力用
-			static ro8_t<PORTx::base_address_ + 0x40> PI;  // ポート入力用
+			typedef rw8_t<PORTx::base_address_ + 0x20> PO_;
+			static PO_ PO;	// ポート出力用
+			typedef ro8_t<PORTx::base_address_ + 0x40> PI_;
+			static PI_ PI;  // ポート入力用
 
 			void operator = (uint8_t val) { PO = val; }
 			uint8_t operator () () { return PI(); }
 		};
-		static port_t P;
+		typedef port_t P_;
+		static P_ P;
 	};
+	template <class PORTx> typename PORT_BYTE<PORTx>::DIR_ PORT_BYTE<PORTx>::DIR;
+	template <class PORTx> typename PORT_BYTE<PORTx>::PU_  PORT_BYTE<PORTx>::PU;
+	template <class PORTx> typename PORT_BYTE<PORTx>::P_::PO_  PORT_BYTE<PORTx>::P_::PO;
+	template <class PORTx> typename PORT_BYTE<PORTx>::P_::PI_  PORT_BYTE<PORTx>::P_::PI;
+	template <class PORTx> typename PORT_BYTE<PORTx>::P_   PORT_BYTE<PORTx>::P;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

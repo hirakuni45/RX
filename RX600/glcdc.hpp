@@ -51,10 +51,14 @@ namespace device {
 				return *reinterpret_cast<volatile uint32_t*>(ofs + (idx & 0xff));
 			}
 		};
-		static grclut_t<base + 0x0000> GR1CLUT0;
-		static grclut_t<base + 0x0400> GR1CLUT1;
-		static grclut_t<base + 0x0800> GR2CLUT0;
-		static grclut_t<base + 0x0C00> GR2CLUT1;
+		typedef grclut_t<base + 0x0000> GR1CLUT0_;
+		static  GR1CLUT0_ GR1CLUT0;
+		typedef grclut_t<base + 0x0400> GR1CLUT1_;
+		static  GR1CLUT1_ GR1CLUT1;
+		typedef grclut_t<base + 0x0800> GR2CLUT0_;
+		static  GR2CLUT0_ GR2CLUT0;
+		typedef grclut_t<base + 0x0C00> GR2CLUT1_;
+		static  GR2CLUT1_ GR2CLUT1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -75,7 +79,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>  VEN;
 			bit_rw_t<io_, bitpos::B0>  EN;
 		};
-		static bgen_t<base + 0x1000> BGEN;
+		typedef bgen_t<base + 0x1000> BGEN_;
+		static  BGEN_ BGEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -95,7 +100,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  FV;
 			bits_rw_t<io_, bitpos::B0,  11>  FH;
 		};
-		static bgperi_t<base + 0x1004> BGPERI;
+		typedef bgperi_t<base + 0x1004> BGPERI_;
+		static  BGPERI_ BGPERI;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -115,7 +121,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 4>  VP;
 			bits_rw_t<io_, bitpos::B0,  4>  HP;
 		};
-		static bgsync_t<base + 0x1008> BGSYNC;
+		typedef bgsync_t<base + 0x1008> BGSYNC_;
+		static  BGSYNC_ BGSYNC;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -135,7 +142,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  VP;
 			bits_rw_t<io_, bitpos::B0,  11>  VW;
 		};
-		static bgvsize_t<base + 0x100C> BGVSIZE;
+		typedef bgvsize_t<base + 0x100C> BGVSIZE_;
+		static  BGVSIZE_ BGVSIZE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -155,7 +163,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  HP;
 			bits_rw_t<io_, bitpos::B0,  11>  HW;
 		};
-		static bghsize_t<base + 0x1010> BGHSIZE;
+		typedef bghsize_t<base + 0x1010> BGHSIZE_;
+		static  BGHSIZE_ BGHSIZE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -176,7 +185,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  G;
 			bits_rw_t<io_, bitpos::B0,  8>  B;
 		};
-		static bgcolor_t<base + 0x1014> BGCOLOR;
+		typedef bgcolor_t<base + 0x1014> BGCOLOR_;
+		static  BGCOLOR_ BGCOLOR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -197,7 +207,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>  VEN;
 			bit_rw_t<io_, bitpos::B0>  EN;
 		};
-		static bgmon_t<base + 0x1018> BGMON;
+		typedef bgmon_t<base + 0x1018> BGMON_;
+		static  BGMON_ BGMON;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -216,8 +227,10 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  VEN;
 		};
-		static grnven_t<base + 0x1100> GR1VEN;
-		static grnven_t<base + 0x1200> GR2VEN;
+		typedef grnven_t<base + 0x1100> GR1VEN_;
+		static  GR1VEN_ GR1VEN;
+		typedef grnven_t<base + 0x1200> GR2VEN_;
+		static  GR2VEN_ GR2VEN;
 
 
 
@@ -238,8 +251,10 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  RENB;
 		};
-		static grnflmrd_t<base + 0x1104> GR1FLMRD;
-		static grnflmrd_t<base + 0x1204> GR2FLMRD;
+		typedef grnflmrd_t<base + 0x1104> GR1FLMRD_;
+		static  GR1FLMRD_ GR1FLMRD;
+		typedef grnflmrd_t<base + 0x1204> GR2FLMRD_;
+		static  GR2FLMRD_ GR2FLMRD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -248,8 +263,10 @@ namespace device {
 			        ※下位６ビットは「０」にする事
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x110C> GR1FLM2;
-		static rw32_t<base + 0x120C> GR2FLM2;
+		typedef rw32_t<base + 0x110C> GR1FLM2_;
+		static  GR1FLM2_ GR1FLM2;
+		typedef rw32_t<base + 0x120C> GR2FLM2_;
+		static  GR2FLM2_ GR2FLM2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -268,8 +285,10 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 16>  LNOFF;
 		};
-		static grnflm3_t<base + 0x1110> GR1FLM3;
-		static grnflm3_t<base + 0x1210> GR2FLM3;
+		typedef grnflm3_t<base + 0x1110> GR1FLM3_;
+		static  GR1FLM3_ GR1FLM3;
+		typedef grnflm3_t<base + 0x1210> GR2FLM3_;
+		static  GR2FLM3_ GR2FLM3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -289,8 +308,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  LNNUM;
 			bits_rw_t<io_, bitpos::B0,  16>  DATANUM;
 		};
-		static grnflm5_t<base + 0x1118> GR1FLM5;
-		static grnflm5_t<base + 0x1218> GR2FLM5;
+		typedef grnflm5_t<base + 0x1118> GR1FLM5_;
+		static  GR1FLM5_ GR1FLM5;
+		typedef grnflm5_t<base + 0x1218> GR2FLM5_;
+		static  GR2FLM5_ GR2FLM5;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -309,8 +330,10 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B28, 3>  FORMAT;
 		};
-		static grnflm6_t<base + 0x111C> GR1FLM6;
-		static grnflm6_t<base + 0x121C> GR2FLM6;
+		typedef grnflm6_t<base + 0x111C> GR1FLM6_;
+		static  GR1FLM6_ GR1FLM6;
+		typedef grnflm6_t<base + 0x121C> GR2FLM6_;
+		static  GR2FLM6_ GR2FLM6;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -332,8 +355,10 @@ namespace device {
 			bit_rw_t<io_,  bitpos::B4>     GRCDISPON;
 			bits_rw_t<io_, bitpos::B0, 2>  DISPSEL;
 		};
-		static grnab1_t<base + 0x1120> GR1AB1;
-		static grnab1_t<base + 0x1220> GR2AB1;
+		typedef grnab1_t<base + 0x1120> GR1AB1_;
+		static  GR1AB1_ GR1AB1;
+		typedef grnab1_t<base + 0x1220> GR2AB1_;
+		static  GR2AB1_ GR2AB1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -353,8 +378,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GRCVS;
 			bits_rw_t<io_, bitpos::B0,  11>  GRCVW;
 		};
-		static grnab2_t<base + 0x1124> GR1AB2;
-		static grnab2_t<base + 0x1224> GR2AB2;
+		typedef grnab2_t<base + 0x1124> GR1AB2_;
+		static  GR1AB2_ GR1AB2;
+		typedef grnab2_t<base + 0x1224> GR2AB2_;
+		static  GR2AB2_ GR2AB2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -374,8 +401,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GRCHS;
 			bits_rw_t<io_, bitpos::B0,  11>  GRCHW;
 		};
-		static grnab3_t<base + 0x1128> GR1AB3;
-		static grnab3_t<base + 0x1228> GR2AB3;
+		typedef grnab3_t<base + 0x1128> GR1AB3_;
+		static  GR1AB3_ GR1AB3;
+		typedef grnab3_t<base + 0x1228> GR2AB3_;
+		static  GR2AB3_ GR2AB3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -395,8 +424,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  ARCVS;
 			bits_rw_t<io_, bitpos::B0,  11>  ARCVW;
 		};
-		static grnab4_t<base + 0x112C> GR1AB4;
-		static grnab4_t<base + 0x122C> GR2AB4;
+		typedef grnab4_t<base + 0x112C> GR1AB4_;
+		static  GR1AB4_ GR1AB4;
+		typedef grnab4_t<base + 0x122C> GR2AB4_;
+		static  GR2AB4_ GR2AB4;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -416,8 +447,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  ARCHS;
 			bits_rw_t<io_, bitpos::B0,  11>  ARCHW;
 		};
-		static grnab5_t<base + 0x1130> GR1AB5;
-		static grnab5_t<base + 0x1230> GR2AB5;
+		typedef grnab5_t<base + 0x1130> GR1AB5_;
+		static  GR1AB5_ GR1AB5;
+		typedef grnab5_t<base + 0x1230> GR2AB5_;
+		static  GR2AB5_ GR2AB5;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -437,8 +470,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 9>  ARCCOEF;
 			bits_rw_t<io_, bitpos::B0,  8>  ARCRATE;
 		};
-		static grnab6_t<base + 0x1134> GR1AB6;
-		static grnab6_t<base + 0x1234> GR2AB6;
+		typedef grnab6_t<base + 0x1134> GR1AB6_;
+		static  GR1AB6_ GR1AB6;
+		typedef grnab6_t<base + 0x1234> GR2AB6_;
+		static  GR2AB6_ GR2AB6;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -458,8 +493,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 8>  ARCDEF;
 			bit_rw_t <io_, bitpos::B0>      CKON;
 		};
-		static grnab7_t<base + 0x1138> GR1AB7;
-		static grnab7_t<base + 0x1238> GR2AB7;
+		typedef grnab7_t<base + 0x1138> GR1AB7_;
+		static  GR1AB7_ GR1AB7;
+		typedef grnab7_t<base + 0x1238> GR2AB7_;
+		static  GR2AB7_ GR2AB7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -480,8 +517,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  CKKB;
 			bits_rw_t<io_, bitpos::B0,  8>  CKKR;
 		};
-		static grnab8_t<base + 0x113C> GR1AB8;
-		static grnab8_t<base + 0x123C> GR2AB8;
+		typedef grnab8_t<base + 0x113C> GR1AB8_;
+		static  GR1AB8_ GR1AB8;
+		typedef grnab8_t<base + 0x123C> GR2AB8_;
+		static  GR2AB8_ GR2AB8;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -503,8 +542,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  CKB;
 			bits_rw_t<io_, bitpos::B0,  8>  CKR;
 		};
-		static grnab9_t<base + 0x1140> GR1AB9;
-		static grnab9_t<base + 0x1240> GR2AB9;
+		typedef grnab9_t<base + 0x1140> GR1AB9_;
+		static  GR1AB9_ GR1AB9;
+		typedef grnab9_t<base + 0x1240> GR2AB9_;
+		static  GR2AB9_ GR2AB9;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -525,8 +566,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  B;
 			bits_rw_t<io_, bitpos::B0,  8>  R;
 		};
-		static grnbase_t<base + 0x114C> GR1BASE;
-		static grnbase_t<base + 0x124C> GR2BASE;
+		typedef grnbase_t<base + 0x114C> GR1BASE_;
+		static  GR1BASE_ GR1BASE;
+		typedef grnbase_t<base + 0x124C> GR2BASE_;
+		static  GR2BASE_ GR2BASE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -546,8 +589,10 @@ namespace device {
 			bit_rw_t <io_, bitpos::B16>     SEL;
 			bits_rw_t<io_, bitpos::B0, 11>  LINE;
 		};
-		static grnclutint_t<base + 0x1150> GR1CLUTINT;
-		static grnclutint_t<base + 0x1250> GR2CLUTINT;
+		typedef grnclutint_t<base + 0x1150> GR1CLUTINT_;
+		static  GR1CLUTINT_ GR1CLUTINT;
+		typedef grnclutint_t<base + 0x1250> GR2CLUTINT_;
+		static  GR2CLUTINT_ GR2CLUTINT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -567,8 +612,10 @@ namespace device {
 			bit_rw_t<io_, bitpos::B16> UFST;
 			bit_rw_t<io_, bitpos::B0>  ARCST;
 		};
-		static grnmon_t<base + 0x1154> GR1MON;
-		static grnmon_t<base + 0x1254> GR2MON;
+		typedef grnmon_t<base + 0x1154> GR1MON_;
+		static  GR1MON_ GR1MON;
+		typedef grnmon_t<base + 0x1254> GR2MON_;
+		static  GR2MON_ GR2MON;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -587,9 +634,12 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  VEN;
 		};
-		static gamxven_t<base + 0x1300> GAMGVEN;
-		static gamxven_t<base + 0x1340> GAMBVEN;
-		static gamxven_t<base + 0x1380> GAMRVEN;
+		typedef gamxven_t<base + 0x1300> GAMGVEN_;
+		static  GAMGVEN_ GAMGVEN;
+		typedef gamxven_t<base + 0x1340> GAMBVEN_;
+		static  GAMBVEN_ GAMBVEN;
+		typedef gamxven_t<base + 0x1380> GAMRVEN_;
+		static  GAMRVEN_ GAMRVEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -608,7 +658,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  GAMON;
 		};
-		static gamsw_t<base + 0x1304> GAMSW;
+		typedef gamsw_t<base + 0x1304> GAMSW_;
+		static  GAMSW_ GAMSW;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -628,9 +679,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN00;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN01;
 		};
-		static gamxlut1_t<base + 0x1308> GAMGLUT1;
-		static gamxlut1_t<base + 0x1348> GAMBLUT1;
-		static gamxlut1_t<base + 0x1388> GAMRLUT1;
+		typedef gamxlut1_t<base + 0x1308> GAMGLUT1_;
+		static  GAMGLUT1_ GAMGLUT1;
+		typedef gamxlut1_t<base + 0x1348> GAMBLUT1_;
+		static  GAMBLUT1_ GAMBLUT1;
+		typedef gamxlut1_t<base + 0x1388> GAMRLUT1_;
+		static  GAMRLUT1_ GAMRLUT1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -650,9 +704,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN02;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN03;
 		};
-		static gamxlut2_t<base + 0x130C> GAMGLUT2;
-		static gamxlut2_t<base + 0x134C> GAMBLUT2;
-		static gamxlut2_t<base + 0x138C> GAMRLUT2;
+		typedef gamxlut2_t<base + 0x130C> GAMGLUT2_;
+		static  GAMGLUT2_ GAMGLUT2;
+		typedef gamxlut2_t<base + 0x134C> GAMBLUT2_;
+		static  GAMBLUT2_ GAMBLUT2;
+		typedef gamxlut2_t<base + 0x138C> GAMRLUT2_;
+		static  GAMRLUT2_ GAMRLUT2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -672,9 +729,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN04;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN05;
 		};
-		static gamxlut3_t<base + 0x1310> GAMGLUT3;
-		static gamxlut3_t<base + 0x1350> GAMBLUT3;
-		static gamxlut3_t<base + 0x1390> GAMRLUT3;
+		typedef gamxlut3_t<base + 0x1310> GAMGLUT3_;
+		static  GAMGLUT3_ GAMGLUT3;
+		typedef gamxlut3_t<base + 0x1350> GAMBLUT3_;
+		static  GAMBLUT3_ GAMBLUT3;
+		typedef gamxlut3_t<base + 0x1390> GAMRLUT3_;
+		static  GAMRLUT3_ GAMRLUT3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -694,9 +754,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN06;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN07;
 		};
-		static gamxlut4_t<base + 0x1314> GAMGLUT4;
-		static gamxlut4_t<base + 0x1354> GAMBLUT4;
-		static gamxlut4_t<base + 0x1394> GAMRLUT4;
+		typedef gamxlut4_t<base + 0x1314> GAMGLUT4_;
+		static  GAMGLUT4_ GAMGLUT4;
+		typedef gamxlut4_t<base + 0x1354> GAMBLUT4_;
+		static  GAMBLUT4_ GAMBLUT4;
+		typedef gamxlut4_t<base + 0x1394> GAMRLUT4_;
+		static  GAMRLUT4_ GAMRLUT4;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -716,9 +779,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN08;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN09;
 		};
-		static gamxlut5_t<base + 0x1318> GAMGLUT5;
-		static gamxlut5_t<base + 0x1358> GAMBLUT5;
-		static gamxlut5_t<base + 0x1398> GAMRLUT5;
+		typedef gamxlut5_t<base + 0x1318> GAMGLUT5_;
+		static  GAMGLUT5_ GAMGLUT5;
+		typedef gamxlut5_t<base + 0x1358> GAMBLUT5_;
+		static  GAMBLUT5_ GAMBLUT5;
+		typedef gamxlut5_t<base + 0x1398> GAMRLUT5_;
+		static  GAMRLUT5_ GAMRLUT5;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -738,9 +804,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN10;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN11;
 		};
-		static gamxlut6_t<base + 0x131C> GAMGLUT6;
-		static gamxlut6_t<base + 0x135C> GAMBLUT6;
-		static gamxlut6_t<base + 0x139C> GAMRLUT6;
+		typedef gamxlut6_t<base + 0x131C> GAMGLUT6_;
+		static  GAMGLUT6_ GAMGLUT6;
+		typedef gamxlut6_t<base + 0x135C> GAMBLUT6_;
+		static  GAMBLUT6_ GAMBLUT6;
+		typedef gamxlut6_t<base + 0x139C> GAMRLUT6_;
+		static  GAMRLUT6_ GAMRLUT6;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -760,9 +829,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN12;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN13;
 		};
-		static gamxlut7_t<base + 0x1320> GAMGLUT7;
-		static gamxlut7_t<base + 0x1360> GAMBLUT7;
-		static gamxlut7_t<base + 0x13A0> GAMRLUT7;
+		typedef gamxlut7_t<base + 0x1320> GAMGLUT7_;
+		static  GAMGLUT7_ GAMGLUT7;
+		typedef gamxlut7_t<base + 0x1360> GAMBLUT7_;
+		static  GAMBLUT7_ GAMBLUT7;
+		typedef gamxlut7_t<base + 0x13A0> GAMRLUT7_;
+		static  GAMRLUT7_ GAMRLUT7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -782,9 +854,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  GGAIN14;
 			bits_rw_t<io_, bitpos::B0,  11>  GGAIN15;
 		};
-		static gamxlut8_t<base + 0x1320> GAMGLUT8;
-		static gamxlut8_t<base + 0x1360> GAMBLUT8;
-		static gamxlut8_t<base + 0x13A0> GAMRLUT8;
+		typedef gamxlut8_t<base + 0x1320> GAMGLUT8_;
+		static  GAMGLUT8_ GAMGLUT8;
+		typedef gamxlut8_t<base + 0x1360> GAMBLUT8_;
+		static  GAMBLUT8_ GAMBLUT8;
+		typedef gamxlut8_t<base + 0x13A0> GAMRLUT8_;
+		static  GAMRLUT8_ GAMRLUT8;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -805,9 +880,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 10>  TH02;
 			bits_rw_t<io_, bitpos::B0,  10>  TH03;
 		};
-		static gamxarea1_t<base + 0x1328> GAMGAREA1;
-		static gamxarea1_t<base + 0x1368> GAMBAREA1;
-		static gamxarea1_t<base + 0x13A8> GAMRAREA1;
+		typedef gamxarea1_t<base + 0x1328> GAMGAREA1_;
+		static  GAMGAREA1_ GAMGAREA1;
+		typedef gamxarea1_t<base + 0x1368> GAMBAREA1_;
+		static  GAMBAREA1_ GAMBAREA1;
+		typedef gamxarea1_t<base + 0x13A8> GAMRAREA1_;
+		static  GAMRAREA1_ GAMRAREA1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -828,9 +906,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 10>  TH05;
 			bits_rw_t<io_, bitpos::B0,  10>  TH06;
 		};
-		static gamxarea2_t<base + 0x132C> GAMGAREA2;
-		static gamxarea2_t<base + 0x136C> GAMBAREA2;
-		static gamxarea2_t<base + 0x13AC> GAMRAREA2;
+		typedef gamxarea2_t<base + 0x132C> GAMGAREA2_;
+		static  GAMGAREA2_ GAMGAREA2;
+		typedef gamxarea2_t<base + 0x136C> GAMBAREA2_;
+		static  GAMBAREA2_ GAMBAREA2;
+		typedef gamxarea2_t<base + 0x13AC> GAMRAREA2_;
+		static  GAMRAREA2_ GAMRAREA2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -851,9 +932,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 10>  TH08;
 			bits_rw_t<io_, bitpos::B0,  10>  TH09;
 		};
-		static gamxarea3_t<base + 0x1330> GAMGAREA3;
-		static gamxarea3_t<base + 0x1370> GAMBAREA3;
-		static gamxarea3_t<base + 0x13B0> GAMRAREA3;
+		typedef gamxarea3_t<base + 0x1330> GAMGAREA3_;
+		static  GAMGAREA3_ GAMGAREA3;
+		typedef gamxarea3_t<base + 0x1370> GAMBAREA3_;
+		static  GAMBAREA3_ GAMBAREA3;
+		typedef gamxarea3_t<base + 0x13B0> GAMRAREA3_;
+		static  GAMRAREA3_ GAMRAREA3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -874,9 +958,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 10>  TH11;
 			bits_rw_t<io_, bitpos::B0,  10>  TH12;
 		};
-		static gamxarea4_t<base + 0x1334> GAMGAREA4;
-		static gamxarea4_t<base + 0x1374> GAMBAREA4;
-		static gamxarea4_t<base + 0x13B4> GAMRAREA4;
+		typedef gamxarea4_t<base + 0x1334> GAMGAREA4_;
+		static  GAMGAREA4_ GAMGAREA4;
+		typedef gamxarea4_t<base + 0x1374> GAMBAREA4_;
+		static  GAMBAREA4_ GAMBAREA4;
+		typedef gamxarea4_t<base + 0x13B4> GAMRAREA4_;
+		static  GAMRAREA4_ GAMRAREA4;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -897,9 +984,12 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 10>  TH14;
 			bits_rw_t<io_, bitpos::B0,  10>  TH15;
 		};
-		static gamxarea5_t<base + 0x1338> GAMGAREA5;
-		static gamxarea5_t<base + 0x1378> GAMBAREA5;
-		static gamxarea5_t<base + 0x13B8> GAMRAREA5;
+		typedef gamxarea5_t<base + 0x1338> GAMGAREA5_;
+		static  GAMGAREA5_ GAMGAREA5;
+		typedef gamxarea5_t<base + 0x1378> GAMBAREA5_;
+		static  GAMBAREA5_ GAMBAREA5;
+		typedef gamxarea5_t<base + 0x13B8> GAMRAREA5_;
+		static  GAMRAREA5_ GAMRAREA5;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -918,7 +1008,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  VEN;
 		};
-		static outven_t<base + 0x13C0> OUTVEN;
+		typedef outven_t<base + 0x13C0> OUTVEN_;
+		static  OUTVEN_ OUTVEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -942,7 +1033,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>      DIRSEL;
 			bits_rw_t<io_, bitpos::B0,  2>  PHASE;
 		};
-		static outset_t<base + 0x13C4> OUTSET;
+		typedef outset_t<base + 0x13C4> OUTSET_;
+		static  OUTSET_ OUTSET;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -961,7 +1053,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 10>  BRTG;
 		};
-		static bright1_t<base + 0x13C8> BRIGHT1;
+		typedef bright1_t<base + 0x13C8> BRIGHT1_;
+		static  BRIGHT1_ BRIGHT1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -981,7 +1074,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 10>  BRTB;
 			bits_rw_t<io_, bitpos::B0,  10>  BRTR;
 		};
-		static bright2_t<base + 0x13CC> BRIGHT2;
+		typedef bright2_t<base + 0x13CC> BRIGHT2_;
+		static  BRIGHT2_ BRIGHT2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1002,7 +1096,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  CONTB;
 			bits_rw_t<io_, bitpos::B0,  8>  CONTR;
 		};
-		static contrast_t<base + 0x13D0> CONTRAST;
+		typedef contrast_t<base + 0x13D0> CONTRAST_;
+		static  CONTRAST_ CONTRAST;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1026,7 +1121,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4,  2>  PC;
 			bits_rw_t<io_, bitpos::B0,  2>  PD;
 		};
-		static paneldtha_t<base + 0x13D4> PANELDTHA;
+		typedef paneldtha_t<base + 0x13D4> PANELDTHA_;
+		static  PANELDTHA_ PANELDTHA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1050,7 +1146,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  TCON2EDG;
 			bit_rw_t<io_, bitpos::B3>  TCON3EDG;
 		};
-		static clkphase_t<base + 0x13E4> CLKPHASE;
+		typedef clkphase_t<base + 0x13E4> CLKPHASE_;
+		static  CLKPHASE_ CLKPHASE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1070,7 +1167,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  HALF;
 			bits_rw_t<io_, bitpos::B0,  11>  OFFSET;
 		};
-		static tcontim_t<base + 0x1404> TCONTIM;
+		typedef tcontim_t<base + 0x1404> TCONTIM_;
+		static  TCONTIM_ TCONTIM;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1090,8 +1188,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  VS;
 			bits_rw_t<io_, bitpos::B0,  11>  VW;
 		};
-		static tconstvy1_t<base + 0x1408> TCONSTVA1;
-		static tconstvy1_t<base + 0x1410> TCONSTVB1;
+		typedef tconstvy1_t<base + 0x1408> TCONSTVA1_;
+		static  TCONSTVA1_ TCONSTVA1;
+		typedef tconstvy1_t<base + 0x1410> TCONSTVB1_;
+		static  TCONSTVB1_ TCONSTVB1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1111,8 +1211,10 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>     INV;
 			bits_rw_t<io_, bitpos::B0, 3>  SEL;
 		};
-		static tconstvy2_t<base + 0x140C> TCONSTVA2;
-		static tconstvy2_t<base + 0x1414> TCONSTVB2;
+		typedef tconstvy2_t<base + 0x140C> TCONSTVA2_;
+		static  TCONSTVA2_ TCONSTVA2;
+		typedef tconstvy2_t<base + 0x1414> TCONSTVB2_;
+		static  TCONSTVB2_ TCONSTVB2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1132,8 +1234,10 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 11>  HS;
 			bits_rw_t<io_, bitpos::B0,  11>  HW;
 		};
-		static tconsthy1_t<base + 0x1418> TCONSTHA1;
-		static tconsthy1_t<base + 0x1420> TCONSTHB1;
+		typedef tconsthy1_t<base + 0x1418> TCONSTHA1_;
+		static  TCONSTHA1_ TCONSTHA1;
+		typedef tconsthy1_t<base + 0x1420> TCONSTHB1_;
+		static  TCONSTHB1_ TCONSTHB1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1154,8 +1258,10 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>     INV;
 			bits_rw_t<io_, bitpos::B0, 3>  SEL;
 		};
-		static tconsthy2_t<base + 0x141C> TCONSTHA2;
-		static tconsthy2_t<base + 0x1424> TCONSTHB2;
+		typedef tconsthy2_t<base + 0x141C> TCONSTHA2_;
+		static  TCONSTHA2_ TCONSTHA2;
+		typedef tconsthy2_t<base + 0x1424> TCONSTHB2_;
+		static  TCONSTHB2_ TCONSTHB2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1174,7 +1280,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  INV;
 		};
-		static tconde_t<base + 0x1428>  TCONDE;
+		typedef tconde_t<base + 0x1428>  TCONDE_;
+		static  TCONDE_ TCONDE;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1195,7 +1302,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  GR1UFDTC;
 			bit_rw_t<io_, bitpos::B0>  VPOSDTC;
 		};
-		static dtcten_t<base + 0x1440>  DTCTEN;
+		typedef dtcten_t<base + 0x1440>  DTCTEN_;
+		static  DTCTEN_ DTCTEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1216,7 +1324,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  GR1UFINTEN;
 			bit_rw_t<io_, bitpos::B0>  VPOSINTEN;
 		};
-		static inten_t<base + 0x1444>  INTEN;
+		typedef inten_t<base + 0x1444>  INTEN_;
+		static  INTEN_ INTEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1237,7 +1346,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  GR1UFCLR;
 			bit_rw_t<io_, bitpos::B0>  VPOSCLR;
 		};
-		static stclr_t<base + 0x1448>  STCLR;
+		typedef stclr_t<base + 0x1448>  STCLR_;
+		static  STCLR_ STCLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1255,7 +1365,8 @@ namespace device {
 			bit_ro_t<io_, bitpos::B1>  GR1UF;
 			bit_ro_t<io_, bitpos::B0>  VPOS;
 		};
-		static stmon_t<base + 0x144C>  STMON;
+		typedef stmon_t<base + 0x144C>  STMON_;
+		static  STMON_ STMON;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1277,8 +1388,122 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>     CLKEN;
 			bits_rw_t<io_, bitpos::B0, 6>  DCDR;
 		};
-		static panelclk_t<base + 0x1450>  PANELCLK;
+		typedef panelclk_t<base + 0x1450>  PANELCLK_;
+		static  PANELCLK_ PANELCLK;
 	};
-
 	typedef glcdc_t<0x000E0000, peripheral::GLCDC> GLCDC;
+
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1CLUT0_ glcdc_t<base, per>::GR1CLUT0;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1CLUT1_ glcdc_t<base, per>::GR1CLUT1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2CLUT0_ glcdc_t<base, per>::GR2CLUT0;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2CLUT1_ glcdc_t<base, per>::GR2CLUT1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::BGEN_ glcdc_t<base, per>::BGEN;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::BGPERI_ glcdc_t<base, per>::BGPERI;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::BGSYNC_ glcdc_t<base, per>::BGSYNC;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::BGVSIZE_ glcdc_t<base, per>::BGVSIZE;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::BGHSIZE_ glcdc_t<base, per>::BGHSIZE;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::BGCOLOR_ glcdc_t<base, per>::BGCOLOR;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::BGMON_ glcdc_t<base, per>::BGMON;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1VEN_ glcdc_t<base, per>::GR1VEN;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2VEN_ glcdc_t<base, per>::GR2VEN;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1FLMRD_ glcdc_t<base, per>::GR1FLMRD;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2FLMRD_ glcdc_t<base, per>::GR2FLMRD;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1FLM2_ glcdc_t<base, per>::GR1FLM2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2FLM2_ glcdc_t<base, per>::GR2FLM2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1FLM3_ glcdc_t<base, per>::GR1FLM3;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2FLM3_ glcdc_t<base, per>::GR2FLM3;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1FLM5_ glcdc_t<base, per>::GR1FLM5;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2FLM5_ glcdc_t<base, per>::GR2FLM5;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1FLM6_ glcdc_t<base, per>::GR1FLM6;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2FLM6_ glcdc_t<base, per>::GR2FLM6;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1AB1_ glcdc_t<base, per>::GR1AB1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2AB1_ glcdc_t<base, per>::GR2AB1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1AB2_ glcdc_t<base, per>::GR1AB2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2AB2_ glcdc_t<base, per>::GR2AB2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1AB3_ glcdc_t<base, per>::GR1AB3;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2AB3_ glcdc_t<base, per>::GR2AB3;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1AB4_ glcdc_t<base, per>::GR1AB4;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2AB4_ glcdc_t<base, per>::GR2AB4;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1AB5_ glcdc_t<base, per>::GR1AB5;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2AB5_ glcdc_t<base, per>::GR2AB5;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1AB6_ glcdc_t<base, per>::GR1AB6;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2AB6_ glcdc_t<base, per>::GR2AB6;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1AB7_ glcdc_t<base, per>::GR1AB7;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2AB7_ glcdc_t<base, per>::GR2AB7;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1AB8_ glcdc_t<base, per>::GR1AB8;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2AB8_ glcdc_t<base, per>::GR2AB8;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1AB9_ glcdc_t<base, per>::GR1AB9;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2AB9_ glcdc_t<base, per>::GR2AB9;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1BASE_ glcdc_t<base, per>::GR1BASE;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2BASE_ glcdc_t<base, per>::GR2BASE;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1CLUTINT_ glcdc_t<base, per>::GR1CLUTINT;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2CLUTINT_ glcdc_t<base, per>::GR2CLUTINT;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR1MON_ glcdc_t<base, per>::GR1MON;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GR2MON_ glcdc_t<base, per>::GR2MON;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGVEN_ glcdc_t<base, per>::GAMGVEN;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBVEN_ glcdc_t<base, per>::GAMBVEN;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRVEN_ glcdc_t<base, per>::GAMRVEN;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMSW_ glcdc_t<base, per>::GAMSW;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGLUT1_ glcdc_t<base, per>::GAMGLUT1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBLUT1_ glcdc_t<base, per>::GAMBLUT1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRLUT1_ glcdc_t<base, per>::GAMRLUT1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGLUT2_ glcdc_t<base, per>::GAMGLUT2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBLUT2_ glcdc_t<base, per>::GAMBLUT2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRLUT2_ glcdc_t<base, per>::GAMRLUT2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGLUT3_ glcdc_t<base, per>::GAMGLUT3;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBLUT3_ glcdc_t<base, per>::GAMBLUT3;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRLUT3_ glcdc_t<base, per>::GAMRLUT3;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGLUT4_ glcdc_t<base, per>::GAMGLUT4;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBLUT4_ glcdc_t<base, per>::GAMBLUT4;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRLUT4_ glcdc_t<base, per>::GAMRLUT4;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGLUT5_ glcdc_t<base, per>::GAMGLUT5;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBLUT5_ glcdc_t<base, per>::GAMBLUT5;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRLUT5_ glcdc_t<base, per>::GAMRLUT5;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGLUT6_ glcdc_t<base, per>::GAMGLUT6;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBLUT6_ glcdc_t<base, per>::GAMBLUT6;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRLUT6_ glcdc_t<base, per>::GAMRLUT6;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGLUT7_ glcdc_t<base, per>::GAMGLUT7;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBLUT7_ glcdc_t<base, per>::GAMBLUT7;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRLUT7_ glcdc_t<base, per>::GAMRLUT7;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGLUT8_ glcdc_t<base, per>::GAMGLUT8;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBLUT8_ glcdc_t<base, per>::GAMBLUT8;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRLUT8_ glcdc_t<base, per>::GAMRLUT8;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGAREA1_ glcdc_t<base, per>::GAMGAREA1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBAREA1_ glcdc_t<base, per>::GAMBAREA1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRAREA1_ glcdc_t<base, per>::GAMRAREA1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGAREA2_ glcdc_t<base, per>::GAMGAREA2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBAREA2_ glcdc_t<base, per>::GAMBAREA2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRAREA2_ glcdc_t<base, per>::GAMRAREA2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGAREA3_ glcdc_t<base, per>::GAMGAREA3;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBAREA3_ glcdc_t<base, per>::GAMBAREA3;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRAREA3_ glcdc_t<base, per>::GAMRAREA3;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGAREA4_ glcdc_t<base, per>::GAMGAREA4;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBAREA4_ glcdc_t<base, per>::GAMBAREA4;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRAREA4_ glcdc_t<base, per>::GAMRAREA4;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMGAREA5_ glcdc_t<base, per>::GAMGAREA5;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMBAREA5_ glcdc_t<base, per>::GAMBAREA5;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::GAMRAREA5_ glcdc_t<base, per>::GAMRAREA5;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::OUTVEN_ glcdc_t<base, per>::OUTVEN;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::OUTSET_ glcdc_t<base, per>::OUTSET;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::BRIGHT1_ glcdc_t<base, per>::BRIGHT1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::BRIGHT2_ glcdc_t<base, per>::BRIGHT2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::CONTRAST_ glcdc_t<base, per>::CONTRAST;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::PANELDTHA_ glcdc_t<base, per>::PANELDTHA;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::CLKPHASE_ glcdc_t<base, per>::CLKPHASE;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::TCONTIM_ glcdc_t<base, per>::TCONTIM;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::TCONSTVA1_ glcdc_t<base, per>::TCONSTVA1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::TCONSTVB1_ glcdc_t<base, per>::TCONSTVB1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::TCONSTVA2_ glcdc_t<base, per>::TCONSTVA2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::TCONSTVB2_ glcdc_t<base, per>::TCONSTVB2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::TCONSTHA1_ glcdc_t<base, per>::TCONSTHA1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::TCONSTHB1_ glcdc_t<base, per>::TCONSTHB1;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::TCONSTHA2_ glcdc_t<base, per>::TCONSTHA2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::TCONSTHB2_ glcdc_t<base, per>::TCONSTHB2;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::TCONDE_ glcdc_t<base, per>::TCONDE;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::DTCTEN_ glcdc_t<base, per>::DTCTEN;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::INTEN_ glcdc_t<base, per>::INTEN;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::STCLR_ glcdc_t<base, per>::STCLR;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::STMON_ glcdc_t<base, per>::STMON;
+	template <uint32_t base, peripheral per> typename glcdc_t<base, per>::PANELCLK_ glcdc_t<base, per>::PANELCLK;
+
 }

@@ -3,7 +3,7 @@
 #   @file
 #   @brief  RX71M Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -12,6 +12,7 @@ TARGET		=	raytracer_sample
 DEVICE		=	R5F571ML
 
 BUILD		=	release
+# BUILD		=	debug
 
 VPATH		=	../../
 
@@ -58,8 +59,6 @@ INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../
 
-OPTIMIZE	=	-O3
-
 AS_OPT		=	-mcpu=rx600 --defsym MEMWAIT=1
 
 CP_OPT		=	-Wall -Werror \
@@ -70,6 +69,18 @@ CP_OPT		=	-Wall -Werror \
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-fno-exceptions
+
+ifeq ($(BUILD),debug)
+    CC_OPT += -g -DDEBUG
+    CP_OPT += -g -DDEBUG
+	OPTIMIZE = -O0
+endif
+
+ifeq ($(BUILD),release)
+    CC_OPT += -DNDEBUG
+    CP_OPT += -DNDEBUG
+	OPTIMIZE = -O3
+endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
 APPINCS		=	$(addprefix -I, $(INC_APP))

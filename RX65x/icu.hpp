@@ -1362,7 +1362,8 @@ namespace device {
 		static grp_t<0x00087634> GRPBL1;
 		static grp_t<0x00087638> GRPBL2;
 		static grp_t<0x00087830> GRPAL0;
-		static grp_t<0x00087834> GRPAL1;
+		typedef grp_t<0x00087834> GRPAL1_;
+		static GRPAL1_ GRPAL1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1429,7 +1430,8 @@ namespace device {
 		static gen_t<0x00087674> GENBL1;
 		static gen_t<0x00087678> GENBL2;
 		static gen_t<0x00087870> GENAL0;
-		static gen_t<0x00087874> GENAL1;
+		typedef gen_t<0x00087874> GENAL1_;
+		static GENAL1_ GENAL1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1720,6 +1722,9 @@ namespace device {
 	template<class _> typename icu_t<_>::DMRSR7_ icu_t<_>::DMRSR7;
 
 	template<class _> typename icu_t<_>::SLIBXR128_ icu_t<_>::SLIBXR128;
+
+	template<class _> typename icu_t<_>::GRPAL1_ icu_t<_>::GRPAL1;
+	template<class _> typename icu_t<_>::GENAL1_ icu_t<_>::GENAL1;
 
 	template<class _> typename icu_t<_>::SLIXR_ icu_t<_>::SLIXR;
 }

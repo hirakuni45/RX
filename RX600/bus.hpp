@@ -717,7 +717,7 @@ namespace device {
 	template <class _> typename bus_t<_>::BERSR2_  bus_t<_>::BERSR2;
 	template <class _> typename bus_t<_>::BUSPRI_  bus_t<_>::BUSPRI;
 
-#if defined(SIG_RX65N)
+#if defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)
 	template <class _> typename bus_t<_>::EBMAPCR_ bus_t<_>::EBMAPCR;
 #endif
 }
