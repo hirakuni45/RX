@@ -17,6 +17,7 @@ namespace device {
 		@brief  ICU 定義基底クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template<class _>
 	struct icu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -332,7 +333,8 @@ namespace device {
 			rw8_t<base + 248> RIIC_TXI0;
 			rw8_t<base + 249> RIIC_TEI0;
 		};
-		static ir_t<0x00087010> IR;
+		typedef ir_t<0x00087010> IR_;
+		static IR_ IR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -495,7 +497,8 @@ namespace device {
 			bit_rw_t<ier1f, bitpos::B0>	RIIC_TXI0;
 			bit_rw_t<ier1f, bitpos::B1>	RIIC_TEI0;
 		};
-		static ier_t<0x00087200> IER;
+		typedef ier_t<0x00087200> IER_;
+		static IER_ IER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -580,8 +583,13 @@ namespace device {
 			rw8_t<base + 248> RIIC_TXI0;
 			rw8_t<base + 249> RIIC_TEI0;
 		};
-		static ipr_t<0x00087300> IPR;
+		typedef ipr_t<0x00087300> IPR_;
+		static IPR_ IPR;
 
 	};
-	typedef icu_t ICU;
+	typedef icu_t<void> ICU;
+
+	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;
+	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
+	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
 }

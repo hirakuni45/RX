@@ -21,12 +21,12 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class icu_mgr {
 
-		static utils::dispatch<icu_t::VECTOR::GROUPBE0, 2>  GROUPBE0_dispatch_;
-		static utils::dispatch<icu_t::VECTOR::GROUPBL2, 1>  GROUPBL2_dispatch_;
-		static utils::dispatch<icu_t::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_;
-		static utils::dispatch<icu_t::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_;
-		static utils::dispatch<icu_t::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_;
-		static utils::dispatch<icu_t::VECTOR::GROUPAL1, 12> GROUPAL1_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPBE0, 2>  GROUPBE0_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPBL2, 1>  GROUPBL2_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPAL1, 12> GROUPAL1_dispatch_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -49,7 +49,7 @@ namespace device {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool set_level(icu_t::VECTOR vec, uint8_t lvl) noexcept
+		static bool set_level(ICU::VECTOR vec, uint8_t lvl) noexcept
 		{
 			bool ena = lvl != 0 ? true : false;
 			switch(vec) {
@@ -87,32 +87,32 @@ namespace device {
 				ICU::IER.CMWI1 = ena;
 				break;
 
-			case icu_t::VECTOR::GROUPBE0:
+			case ICU::VECTOR::GROUPBE0:
 				ICU::IER.GROUPBE0 = 0;
 				ICU::IPR.GROUPBE0 = lvl;
 				ICU::IER.GROUPBE0 = ena;
 				break;
-			case icu_t::VECTOR::GROUPBL2:
+			case ICU::VECTOR::GROUPBL2:
 				ICU::IER.GROUPBL2 = 0;
 				ICU::IPR.GROUPBL2 = lvl;
 				ICU::IER.GROUPBL2 = ena;
 				break;
-			case icu_t::VECTOR::GROUPBL0:
+			case ICU::VECTOR::GROUPBL0:
 				ICU::IER.GROUPBL0 = 0;
 				ICU::IPR.GROUPBL0 = lvl;
 				ICU::IER.GROUPBL0 = ena;
 				break;
-			case icu_t::VECTOR::GROUPBL1:
+			case ICU::VECTOR::GROUPBL1:
 				ICU::IER.GROUPBL1 = 0;
 				ICU::IPR.GROUPBL1 = lvl;
 				ICU::IER.GROUPBL1 = ena;
 				break;
-			case icu_t::VECTOR::GROUPAL0:
+			case ICU::VECTOR::GROUPAL0:
 				ICU::IER.GROUPAL0 = 0;
 				ICU::IPR.GROUPAL0 = lvl;
 				ICU::IER.GROUPAL0 = ena;
 				break;
-			case icu_t::VECTOR::GROUPAL1:
+			case ICU::VECTOR::GROUPAL1:
 				ICU::IER.GROUPAL1 = 0;
 				ICU::IPR.GROUPAL1 = lvl;
 				ICU::IER.GROUPAL1 = ena;

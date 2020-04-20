@@ -345,7 +345,7 @@ int main(int argc, char** argv)
 	device::power_mgr::turn(device::peripheral::ETHERC0);
 	device::port_map::turn(device::peripheral::ETHERC0);
 
-	set_interrupt_task(INT_Excep_ICU_GROUPAL1, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
+	set_interrupt_task(INT_Excep_ICU_GROUPAL1, static_cast<uint32_t>(device::ICU::VECTOR::GROUPAL1));
 
 	ethernet_.start();
 	{

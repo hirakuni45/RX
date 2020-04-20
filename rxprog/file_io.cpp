@@ -21,6 +21,7 @@
 #endif
 
 #include <iostream>
+#include <boost/format.hpp>
 
 namespace utils {
 

@@ -780,7 +780,7 @@ namespace device {
 				ICU::IPR.GROUPAL1 = intr_level_;
 				ICU::GENAL1.EN4   = 1;
 				ICU::IER.GROUPAL1 = 1;
-				set_interrupt_task(ether_task_, static_cast<uint32_t>(device::icu_t::VECTOR::GROUPAL1));
+				set_interrupt_task(ether_task_, static_cast<uint32_t>(device::ICU::VECTOR::GROUPAL1));
 
 				stat_.reset();
 

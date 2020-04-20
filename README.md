@@ -401,23 +401,11 @@ speed_osx = 230400
 speed_linux = 230400
 ```
 ---
-## Development using Renesus ENVISION KIT-RX65N
-<img src="docs/RTK5RX65N.jpg" width="50%">   
+## Development using Renesus RX72N Envision Kit
+<img src="docs/rx72n-envision-kit.jpg" width="50%">
+<img src="docs/rx72n-envision-kit-board.jpg" width="80%">
    
-- The "RTK5RX65N" sold by Renesas is a low-cost, high-performance board with an LCD.   
-- Of course it can not be compared with Raspberry Pi etc. but it seems to be an affordable   microcomputer board that can be operated stand-alone.
-- In addition, this board is equipped with an "E1 Lite Emulator", which allows you to easily write programs via USB connection.
-- In Windows, you can write using Renesus Flash Programmer V3.
-- By setting DIP SW 1-1 to "ON", the built-in emulator is enabled and the execution binary can be written.
-- By setting DIP SW 1-1 to "OFF", the written program runs independently.
-- By default, SD cards and Ethernet components are not installed, but you can attach them later.
-- This board's standard SD card socket has been discontinued, is not available in Japan, and is expensive, so we recommend another method.
-- It is easy to connect via Akizuki Electronics micro SD socket adapter.   
-- It bypasses the power control of the SD card.   
-   
-<img src="docs/RTK5_MSD.jpg" width="50%">   
-   
-- If you can get the standard SD card slot "101-00565-64 (made by AMPHENOL COMMERCIAL PRODUCTS)", it will not take much time.
+
    
 ---
 ## Programming environment using C++ framework

@@ -17,6 +17,7 @@ namespace device {
 		@brief  フラッシュ・メモリー制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template<class _>
 	struct flash_t {
 
 		//-----------------------------------------------------------------//
@@ -363,7 +364,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  ROMCEN;
 		};
-		static romce_t<0x00081000> ROMCE;
+		typedef romce_t<0x00081000> ROMCE_t;
+		static ROMCE_t ROMCE;
 
 
 		//-----------------------------------------------------------------//
@@ -382,9 +384,14 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  ROMCIV;
 		};
-		static romciv_t<0x00081004> ROMCIV;
-
-
+		typedef romciv_t<0x00081004> ROMCIV_t;
+		static ROMCIV_t ROMCIV;
 	};
-	typedef flash_t FLASH;
+	typedef flash_t<void> FLASH;
+
+
+
+
+	template<class _> typename flash_t<_>::ROMCE_t flash_t<_>::ROMCE;
+	template<class _> typename flash_t<_>::ROMCIV_t flash_t<_>::ROMCIV;
 }

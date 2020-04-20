@@ -39,7 +39,8 @@ namespace device {
 			@brief  レシーブデータレジスタ (RDR)
 		*/
 		//-----------------------------------------------------------------//
-		static ro8_t<base + 0x05> RDR;
+		typedef ro8_t<base + 0x05> RDR_;
+		static RDR_ RDR;
 
 
 		//-----------------------------------------------------------------//
@@ -47,18 +48,23 @@ namespace device {
 			@brief  レシーブデータレジスタ H 、 L 、 HL (RDRH 、 RDRL 、 RDRHL)
 		*/
 		//-----------------------------------------------------------------//
-		static ro8_t<base + 0x10> RDRH;
-		static ro8_t<base + 0x11> RDRL;
-		static ro16_t<base + 0x10> RDRHL;
+		typedef ro8_t<base + 0x10> RDRH_;
+		static RDRH_ RDRH;
+		typedef ro8_t<base + 0x11> RDRL_;
+		static RDRL_ RDRL;
+		typedef ro16_t<base + 0x10> RDRHL_;
+		static RDRHL_ RDRHL;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  シリアルモードレジスタ (SMR)
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct smr_t : public rw8_t<base + 0x00> {
-			typedef rw8_t<base + 0x00> io_;
+		template <uint32_t ofs>
+		struct smr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -76,7 +82,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  BLK;
 			bit_rw_t <io_, bitpos::B7>	  GM;
 		};
-		static smr_t SMR;
+		typedef smr_t<base + 0x00> SMR_;
+		static SMR_ SMR;
 
 
 		//-----------------------------------------------------------------//
@@ -84,7 +91,8 @@ namespace device {
 			@brief  ビットレートレジスタ (BRR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x01> BRR;
+		typedef rw8_t<base + 0x01> BRR_;
+		static BRR_ BRR;
 
 
 		//-----------------------------------------------------------------//
@@ -92,16 +100,19 @@ namespace device {
 			@brief	モジュレーションデューティレジスタ（MDDR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x12> MDDR;
+		typedef rw8_t<base + 0x12> MDDR_;
+		static MDDR_ MDDR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  シリアルコントロールレジスタ (SCR)
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct scr_t : public rw8_t<base + 0x02> {
-			typedef rw8_t<base + 0x02> io_;
+		template <uint32_t ofs>
+		struct scr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -115,7 +126,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  RIE;
 			bit_rw_t <io_, bitpos::B7>	  TIE;
 		};
-		static scr_t SCR;
+		typedef scr_t<base + 0x02> SCR_;
+		static SCR_ SCR;
 
 
 		//-----------------------------------------------------------------//
@@ -123,16 +135,19 @@ namespace device {
 			@brief  トランスミットデータレジスタ (TDR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x03> TDR;
+		typedef rw8_t<base + 0x03> TDR_;
+		static TDR_ TDR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  シリアルステータスレジスタ (SSR)
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct ssr_t : public rw8_t<base + 0x04> {
-			typedef rw8_t<base + 0x04> io_;
+		template <uint32_t ofs>
+		struct ssr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -147,16 +162,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> RDRF;
 			bit_rw_t<io_, bitpos::B7> TDRE;
 		};
-		static ssr_t SSR;
+		typedef ssr_t<base + 0x04> SSR_;
+		static SSR_ SSR;
 
 
  		//-----------------------------------------------------------------//
 		/*!
 			@brief  スマートカードモードレジスタ (SCMR)
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct scmr_t : public rw8_t<base + 0x06> {
-			typedef rw8_t<base + 0x06> io_;
+		template <uint32_t ofs>
+		struct scmr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -168,16 +186,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> CHR1;
 			bit_rw_t<io_, bitpos::B7> BCP2;
 		};
-		static scmr_t SCMR;
+		typedef scmr_t<base + 0x06> SCMR_;
+		static SCMR_ SCMR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  シリアル拡張レジスタ (SEMR)
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct semr_t : public rw8_t<base + 0x07> {
-			typedef rw8_t<base + 0x07> io_;
+		template <uint32_t ofs>
+		struct semr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -190,16 +211,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> BGDM;
 			bit_rw_t<io_, bitpos::B7> RXDESEL;
 		};
-		static semr_t SEMR;
+		typedef semr_t<base + 0x07> SEMR_;
+		static SEMR_ SEMR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  ノイズフィルタ設定レジスタ (SNFR)
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct snfr_t : public rw8_t<base + 0x08> {
-			typedef rw8_t<base + 0x08> io_;
+		template <uint32_t ofs>
+		struct snfr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -207,16 +231,19 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> NFCS;
 		};
-		static snfr_t SNFR;
+		typedef snfr_t<base + 0x08> SNFR_;
+		static SNFR_ SNFR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  I2C モードレジスタ１ (SIMR1)
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct simr1_t : public rw8_t<base + 0x09> {
-			typedef rw8_t<base + 0x09> io_;
+		template <uint32_t ofs>
+		struct simr1_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -225,16 +252,19 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>    IICM;
 			bits_rw_t<io_, bitpos::B3, 5> IICDL;
 		};
-		static simr1_t SIMR1;
+		typedef simr1_t<base + 0x09> SIMR1_;
+		static SIMR1_ SIMR1;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  I2C モードレジスタ２ (SIMR2)
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct simr2_t : public rw8_t<base + 0x0A> {
-			typedef rw8_t<base + 0x0A> io_;
+		template < uint32_t ofs>
+		struct simr2_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -244,16 +274,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1> IICCSC;
 			bit_rw_t<io_, bitpos::B5> IICACKT;
 		};
-		static simr2_t SIMR2;
+		typedef simr2_t<base + 0x0A> SIMR2_;
+		static SIMR2_ SIMR2;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  I2C モードレジスタ３ (SIMR3)
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct simr3_t : public rw8_t<base + 0x0B> {
-			typedef rw8_t<base + 0x0B> io_;
+		template <uint32_t ofs>
+		struct simr3_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -266,16 +299,19 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4, 2> IICSDAS;
 			bits_rw_t<io_, bitpos::B6, 2> IICSCLS;
 		};
-		static simr3_t SIMR3;
+		typedef simr3_t<base + 0x0B> SIMR3_;
+		static SIMR3_ SIMR3;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  I2C ステータスレジスタ (SISR)
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sisr_t : public rw8_t<base + 0x0C> {
-			typedef rw8_t<base + 0x0C> io_;
+		template <uint32_t ofs>
+		struct sisr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -283,16 +319,19 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> IICACKR;
 		};
-		static sisr_t SISR;
+		typedef sisr_t<base + 0x0C> SISR_;
+		static SISR_ SISR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  SPI モードレジスタ (SPMR)
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct spmr_t : public rw8_t<base + 0x0D> {
-			typedef rw8_t<base + 0x0D> io_;
+		template <uint32_t ofs>
+		struct spmr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -305,8 +344,45 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> CKPOL;
 			bit_rw_t<io_, bitpos::B7> CKPH;
 		};
-		static spmr_t SPMR;
+		typedef spmr_t<base + 0x0D> SPMR_;
+		static SPMR_ SPMR;
 	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::RDR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::RDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRH_ sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRH;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRL_ sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRL;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRHL_ sci_t<base, per, txv, rxv, INT, tev, pclk>::RDRHL;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SMR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SMR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::BRR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::BRR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::MDDR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::MDDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SCR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::TDR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::TDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SSR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SCMR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SCMR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SEMR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SEMR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SNFR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SNFR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR1_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR1;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR2_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR2;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR3_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SIMR3;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SISR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SISR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, typename INT, INT tev, uint32_t pclk>
+		typename sci_t<base, per, txv, rxv, INT, tev, pclk>::SPMR_ sci_t<base, per, txv, rxv, INT, tev, pclk>::SPMR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

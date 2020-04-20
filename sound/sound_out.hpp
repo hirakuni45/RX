@@ -1,8 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	オーディオ出力クラス @n
-			アップサンプリング変換
+	@brief	サウンド出力バッファ
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -15,8 +14,8 @@ namespace sound {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	オーディオ出力構造体
-		@param[in]	T	基本型
+		@brief	波形構造体
+		@param[in]	T	波形単位型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <typename T>
@@ -25,15 +24,17 @@ namespace sound {
 		T	r_ch;
 
 		wave_t() noexcept { }
+		wave_t(T v) noexcept : l_ch(v), r_ch(v) { }
 		wave_t(const wave_t& t) noexcept : l_ch(t.l_ch), r_ch(t.r_ch) { }
 		void zero() noexcept { l_ch = 0; r_ch = 0; }
-		wave_t linear(int32_t base, int32_t mod, const wave_t& back) const noexcept
+		static wave_t linear(int32_t base, int32_t mod, const wave_t& a, const wave_t& b) noexcept
 		{
 			wave_t tmp;
-			tmp.l_ch = back.l_ch + (static_cast<int32_t>(l_ch - back.l_ch) * mod / base);
-			tmp.r_ch = back.r_ch + (static_cast<int32_t>(r_ch - back.r_ch) * mod / base);
+			tmp.l_ch = a.l_ch + (static_cast<int32_t>(b.l_ch - a.l_ch) * mod) / base;
+			tmp.r_ch = a.r_ch + (static_cast<int32_t>(b.r_ch - a.r_ch) * mod) / base;
 			return tmp;
-		} 
+		}
+		void offset(T ofs) noexcept { l_ch += ofs; r_ch += ofs; }
 	};
 
 
@@ -121,6 +122,7 @@ namespace sound {
 			for(uint32_t i = 0; i < OUTS; ++i) {
 				wave_[i].zero();
 			}
+			wbase_.zero();
 		}
 
 
@@ -190,26 +192,25 @@ namespace sound {
 				}
 			} else {
 				uint32_t i = 0;
-				auto back = wbase_;
+				WAVE next(0);
 				while(i < num) {
 					if(timebase_ >= out_rate_) {
 						timebase_ -= out_rate_;
-						back = wbase_;
 						if(len > 0) {
 							wbase_ = fifo_.get();
+							next = fifo_.get_at();
 							--len;
 						} else {
 							wbase_.zero();
+							next.zero();
 						}
-						wbase_.l_ch += ofs;
-						wbase_.r_ch += ofs;
 					}
-					timebase_ += inp_rate_;
+//					wave_[w_put_] = WAVE::linear(out_rate_, timebase_, wbase_, next);
 					wave_[w_put_] = wbase_;
-///					wave_[w_put_] = back.linear(
-///						static_cast<int32_t>(out_rate_), static_cast<int32_t>(timebase_), wbase_);
+					wave_[w_put_].offset(ofs);
 					++w_put_;
 					w_put_ &= (OUTS - 1);
+					timebase_ += inp_rate_;
 					++i;
 				}
 			}

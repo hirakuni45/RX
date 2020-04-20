@@ -1,9 +1,19 @@
 #!/bin/bash
 CMDNAME=`basename $0`
 if [[ $1 = "help" ]]; then
-  echo "Usage: $CMDNAME [clean]"
-  echo ""
-  exit
+    echo "Usage: $CMDNAME options [clean]"
+    echo "    -debug      debug build, 'OPTIMIZE=-O0'"
+    echo ""
+    exit
+fi
+
+# analize options
+MAKE_OPTION=""
+BUILD="release"
+if [[ $1 = "-debug" ]]; then
+    MAKE_OPTION="-e"
+    export BUILD="debug"
+    shift
 fi
 
 RED=`tput setaf 1`
@@ -16,8 +26,8 @@ NOCOLOR=`tput sgr0`
 make_clean()
 {
 	cd "$2"
-	echo "${GREEN}Clean project: " $1 $2 "${NOCOLOR}"
-	make clean >& /dev/null
+	echo "${GREEN}Clean project (${BUILD}): " $1 $2 "${NOCOLOR}"
+	make ${MAKE_OPTION} clean >& /dev/null
 	if [ $? -ne 0 ]; then
 		echo "${RED}Clean Error: " $1 $2 "${NOCOLOR}"
 		echo ""
@@ -45,14 +55,15 @@ if [[ $1 = "clean" ]]; then
 			cd ..
 	     fi
 	done
+	exit
 fi
 
 # make_main func
 make_main()
 {
-	echo "${PINK}Start project: " $1 $2 "${NOCOLOR}"
+	echo "${PINK}Start project (${BUILD}): " $1 $2 "${NOCOLOR}"
 	cd $2
-    make > /dev/null
+    make ${MAKE_OPTION} > /dev/null
     if [ $? -ne 0 ]; then
         echo "${RED}Compile error: " $1 $2 "${NOCOLOR}"
 		echo ""
