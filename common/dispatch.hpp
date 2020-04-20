@@ -22,7 +22,7 @@ namespace utils {
 		@param[in]	NUM	分岐数（最大３２）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<device::icu_t::VECTOR VEC, uint32_t NUM>
+	template<device::ICU::VECTOR VEC, uint32_t NUM>
 	class dispatch {
 
 		TASK		task_[NUM];
