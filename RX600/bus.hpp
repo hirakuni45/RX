@@ -39,24 +39,24 @@ namespace device {
 			bit_rw_t <io_, bitpos::B12>    MPXEN;
 		};
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csncr_t<0x00083802> CS0CR_t;
-		static CS0CR_t CS0CR;
-		typedef csncr_t<0x00083812> CS1CR_t;
-		static CS1CR_t CS1CR;
-		typedef csncr_t<0x00083822> CS2CR_t;
-		static CS2CR_t CS2CR;
-		typedef csncr_t<0x00083832> CS3CR_t;
-		static CS3CR_t CS3CR;
+		typedef csncr_t<0x00083802> CS0CR_;
+		static CS0CR_ CS0CR;
+		typedef csncr_t<0x00083812> CS1CR_;
+		static CS1CR_ CS1CR;
+		typedef csncr_t<0x00083822> CS2CR_;
+		static CS2CR_ CS2CR;
+		typedef csncr_t<0x00083832> CS3CR_;
+		static CS3CR_ CS3CR;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csncr_t<0x00083842> CS4CR_t;
-		static CS4CR_t CS4CR;
-		typedef csncr_t<0x00083852> CS5CR_t;
-		static CS5CR_t CS5CR;
-		typedef csncr_t<0x00083862> CS6CR_t;
-		static CS6CR_t CS6CR;
-		typedef csncr_t<0x00083872> CS7CR_t;
-		static CS7CR_t CS7CR;
+		typedef csncr_t<0x00083842> CS4CR_;
+		static CS4CR_ CS4CR;
+		typedef csncr_t<0x00083852> CS5CR_;
+		static CS5CR_ CS5CR;
+		typedef csncr_t<0x00083862> CS6CR_;
+		static CS6CR_ CS6CR;
+		typedef csncr_t<0x00083872> CS7CR_;
+		static CS7CR_ CS7CR;
 #endif
 
 
@@ -77,24 +77,24 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8, 4> WRCV;
 		};
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csncr_t<0x0008380A> CS0REC_t;
-		static CS0REC_t CS0REC;
-		typedef csncr_t<0x0008381A> CS1REC_t;
-		static CS1REC_t CS1REC;
-		typedef csncr_t<0x0008382A> CS2REC_t;
-		static CS2REC_t CS2REC;
-		typedef csncr_t<0x0008383A> CS3REC_t;
-		static CS3REC_t CS3REC;
+		typedef csncr_t<0x0008380A> CS0REC_;
+		static CS0REC_ CS0REC;
+		typedef csncr_t<0x0008381A> CS1REC_;
+		static CS1REC_ CS1REC;
+		typedef csncr_t<0x0008382A> CS2REC_;
+		static CS2REC_ CS2REC;
+		typedef csncr_t<0x0008383A> CS3REC_;
+		static CS3REC_ CS3REC;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csncr_t<0x0008384A> CS4REC_t;
-		static CS4REC_t CS4REC;
-		typedef csncr_t<0x0008385A> CS5REC_t;
-		static CS5REC_t CS5REC;
-		typedef csncr_t<0x0008386A> CS6REC_t;
-		static CS6REC_t CS6REC;
-		typedef csncr_t<0x0008387A> CS7REC_t;
-		static CS7REC_t CS7REC;
+		typedef csncr_t<0x0008384A> CS4REC_;
+		static CS4REC_ CS4REC;
+		typedef csncr_t<0x0008385A> CS5REC_;
+		static CS5REC_ CS5REC;
+		typedef csncr_t<0x0008386A> CS6REC_;
+		static CS6REC_ CS6REC;
+		typedef csncr_t<0x0008387A> CS7REC_;
+		static CS7REC_ CS7REC;
 #endif
 
 
@@ -129,8 +129,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14> RCVENM6;
 			bit_rw_t<io_, bitpos::B15> RCVENM7;
 		};
-		typedef csrecen_t<0x00083880> CSRECEN_t;
-		static CSRECEN_t CSRECEN;
+		typedef csrecen_t<0x00083880> CSRECEN_;
+		static CSRECEN_ CSRECEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -153,24 +153,24 @@ namespace device {
 			bit_rw_t<io_, bitpos::B15> PRMOD;
 		};
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnmod_t<0x00083002> CS0MOD_t;
-		static CS0MOD_t CS0MOD;
-		typedef csnmod_t<0x00083012> CS1MOD_t;
-		static CS1MOD_t CS1MOD;
-		typedef csnmod_t<0x00083022> CS2MOD_t;
-		static CS2MOD_t CS2MOD;
-		typedef csnmod_t<0x00083032> CS3MOD_t;
-		static CS3MOD_t CS3MOD;
+		typedef csnmod_t<0x00083002> CS0MOD_;
+		static CS0MOD_ CS0MOD;
+		typedef csnmod_t<0x00083012> CS1MOD_;
+		static CS1MOD_ CS1MOD;
+		typedef csnmod_t<0x00083022> CS2MOD_;
+		static CS2MOD_ CS2MOD;
+		typedef csnmod_t<0x00083032> CS3MOD_;
+		static CS3MOD_ CS3MOD;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnmod_t<0x00083042> CS4MOD_t;
-		static CS4MOD_t CS4MOD;
-		typedef csnmod_t<0x00083052> CS5MOD_t;
-		static CS5MOD_t CS5MOD;
-		typedef csnmod_t<0x00083062> CS6MOD_t;
-		static CS6MOD_t CS6MOD;
-		typedef csnmod_t<0x00083072> CS7MOD_t;
-		static CS7MOD_t CS7MOD;
+		typedef csnmod_t<0x00083042> CS4MOD_;
+		static CS4MOD_ CS4MOD;
+		typedef csnmod_t<0x00083052> CS5MOD_;
+		static CS5MOD_ CS5MOD;
+		typedef csnmod_t<0x00083062> CS6MOD_;
+		static CS6MOD_ CS6MOD;
+		typedef csnmod_t<0x00083072> CS7MOD_;
+		static CS7MOD_ CS7MOD;
 #endif
 
 
@@ -193,24 +193,24 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 5> CSRWWAIT;
 		};
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnwcr1_t<0x00083004> CS0WCR1_t;
-		static CS0WCR1_t CS0WCR1;
-		typedef csnwcr1_t<0x00083014> CS1WCR1_t;
-		static CS1WCR1_t CS1WCR1;
-		typedef csnwcr1_t<0x00083024> CS2WCR1_t;
-		static CS2WCR1_t CS2WCR1;
-		typedef csnwcr1_t<0x00083034> CS3WCR1_t;
-		static CS3WCR1_t CS3WCR1;
+		typedef csnwcr1_t<0x00083004> CS0WCR1_;
+		static CS0WCR1_ CS0WCR1;
+		typedef csnwcr1_t<0x00083014> CS1WCR1_;
+		static CS1WCR1_ CS1WCR1;
+		typedef csnwcr1_t<0x00083024> CS2WCR1_;
+		static CS2WCR1_ CS2WCR1;
+		typedef csnwcr1_t<0x00083034> CS3WCR1_;
+		static CS3WCR1_ CS3WCR1;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnwcr1_t<0x00083044> CS4WCR1_t;
-		static CS4WCR1_t CS4WCR1;
-		typedef csnwcr1_t<0x00083054> CS5WCR1_t;
-		static CS5WCR1_t CS5WCR1;
-		typedef csnwcr1_t<0x00083064> CS6WCR1_t;
-		static CS6WCR1_t CS6WCR1;
-		typedef csnwcr1_t<0x00083074> CS7WCR1_t;
-		static CS7WCR1_t CS7WCR1;
+		typedef csnwcr1_t<0x00083044> CS4WCR1_;
+		static CS4WCR1_ CS4WCR1;
+		typedef csnwcr1_t<0x00083054> CS5WCR1_;
+		static CS5WCR1_ CS5WCR1;
+		typedef csnwcr1_t<0x00083064> CS6WCR1_;
+		static CS6WCR1_ CS6WCR1;
+		typedef csnwcr1_t<0x00083074> CS7WCR1_;
+		static CS7WCR1_ CS7WCR1;
 #endif
 
 
@@ -237,24 +237,24 @@ namespace device {
 			bits_rw_t<io_, bitpos::B28, 3> CSON;
 		};
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnwcr2_t<0x00083008> CS0WCR2_t;
-		static CS0WCR2_t CS0WCR2;
-		typedef csnwcr2_t<0x00083018> CS1WCR2_t;
-		static CS1WCR2_t CS1WCR2;
-		typedef csnwcr2_t<0x00083028> CS2WCR2_t;
-		static CS2WCR2_t CS2WCR2;
-		typedef csnwcr2_t<0x00083038> CS3WCR2_t;
-		static CS3WCR2_t CS3WCR2;
+		typedef csnwcr2_t<0x00083008> CS0WCR2_;
+		static CS0WCR2_ CS0WCR2;
+		typedef csnwcr2_t<0x00083018> CS1WCR2_;
+		static CS1WCR2_ CS1WCR2;
+		typedef csnwcr2_t<0x00083028> CS2WCR2_;
+		static CS2WCR2_ CS2WCR2;
+		typedef csnwcr2_t<0x00083038> CS3WCR2_;
+		static CS3WCR2_ CS3WCR2;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		typedef csnwcr2_t<0x00083048> CS4WCR2_t;
-		static CS4WCR2_t CS4WCR2;
-		typedef csnwcr2_t<0x00083058> CS5WCR2_t;
-		static CS5WCR2_t CS5WCR2;
-		typedef csnwcr2_t<0x00083068> CS6WCR2_t;
-		static CS6WCR2_t CS6WCR2;
-		typedef csnwcr2_t<0x00083078> CS7WCR2_t;
-		static CS7WCR2_t CS7WCR2;
+		typedef csnwcr2_t<0x00083048> CS4WCR2_;
+		static CS4WCR2_ CS4WCR2;
+		typedef csnwcr2_t<0x00083058> CS5WCR2_;
+		static CS5WCR2_ CS5WCR2;
+		typedef csnwcr2_t<0x00083068> CS6WCR2_;
+		static CS6WCR2_ CS6WCR2;
+		typedef csnwcr2_t<0x00083078> CS7WCR2_;
+		static CS7WCR2_ CS7WCR2;
 #endif
 
 
@@ -275,8 +275,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>    EXENB;
 			bits_rw_t<io_, bitpos::B4, 2> BSIZE;
 		};
-		typedef sdccr_t<0x00083C00> SDCCR_t;
-		static SDCCR_t SDCCR;
+		typedef sdccr_t<0x00083C00> SDCCR_;
+		static SDCCR_ SDCCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -294,8 +294,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0> EMODE;
 		};
-		typedef sdcmod_t<0x00083C01> SDCMOD_t;
-		static SDCMOD_t SDCMOD;
+		typedef sdcmod_t<0x00083C01> SDCMOD_;
+		static SDCMOD_ SDCMOD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -313,8 +313,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0> BE;
 		};
-		typedef sdamod_t<0x00083C02> SDAMOD_t;
-		static SDAMOD_t SDAMOD;
+		typedef sdamod_t<0x00083C02> SDAMOD_;
+		static SDAMOD_ SDAMOD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -332,8 +332,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0> SFEN;
 		};
-		typedef sdself_t<0x00083C10> SDSELF_t;
-		static SDSELF_t SDSELF;
+		typedef sdself_t<0x00083C10> SDSELF_;
+		static SDSELF_ SDSELF;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -352,8 +352,8 @@ namespace device {
 			bits_rw_t <io_, bitpos::B0,  12> RFC;
 			bits_rw_t <io_, bitpos::B12, 4>  REFW;
 		};
-		typedef sdrfcr_t<0x00083C14> SDRFCR_t;
-		static SDRFCR_t SDRFCR;
+		typedef sdrfcr_t<0x00083C14> SDRFCR_;
+		static SDRFCR_ SDRFCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -371,8 +371,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0> RFEN;
 		};
-		typedef sdrfen_t<0x00083C16> SDRFEN_t;
-		static SDRFEN_t SDRFEN;
+		typedef sdrfen_t<0x00083C16> SDRFEN_;
+		static SDRFEN_ SDRFEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -390,8 +390,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0> INIRQ;
 		};
-		typedef sdicr_t<0x00083C20> SDICR_t;
-		static SDICR_t SDICR;
+		typedef sdicr_t<0x00083C20> SDICR_;
+		static SDICR_ SDICR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -411,8 +411,8 @@ namespace device {
 			bits_rw_t <io_, bitpos::B4, 4> ARFC;
 			bits_rw_t <io_, bitpos::B8, 3> PRC;
 		};
-		typedef sdir_t<0x00083C24> SDIR_t;
-		static SDIR_t SDIR;
+		typedef sdir_t<0x00083C24> SDIR_;
+		static SDIR_ SDIR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -430,8 +430,8 @@ namespace device {
 
 			bits_rw_t <io_, bitpos::B0, 2> MXC;
 		};
-		typedef sdadr_t<0x00083C40> SDADR_t;
-		static SDADR_t SDADR;
+		typedef sdadr_t<0x00083C40> SDADR_;
+		static SDADR_ SDADR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -453,8 +453,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> RCD;
 			bits_rw_t<io_, bitpos::B16, 3> RAS;
 		};
-		typedef sdtr_t<0x00083C44> SDTR_t;
-		static SDTR_t SDTR;
+		typedef sdtr_t<0x00083C44> SDTR_;
+		static SDTR_ SDTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -472,8 +472,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 14> MR;
 		};
-		typedef sdmod_t<0x00083C48> SDMOD_t;
-		static SDMOD_t SDMOD;
+		typedef sdmod_t<0x00083C48> SDMOD_;
+		static SDMOD_ SDMOD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -493,8 +493,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3> INIST;
 			bit_rw_t<io_, bitpos::B4> SRFST;
 		};
-		typedef sdsr_t<0x00083C50> SDSR_t;
-		static SDSR_t SDSR;
+		typedef sdsr_t<0x00083C50> SDSR_;
+		static SDSR_ SDSR;
 #endif
 
 
@@ -513,8 +513,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> STSCLR;
 		};
-		typedef berclr_t<0x00081300> BERCLR_t;
-		static BERCLR_t BERCLR;
+		typedef berclr_t<0x00081300> BERCLR_;
+		static BERCLR_ BERCLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -533,8 +533,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> IGAEN;
 			bit_rw_t<io_, bitpos::B1> TOEN;
 		};
-		typedef beren_t<0x00081304> BEREN_t;
-		static BEREN_t BEREN;
+		typedef beren_t<0x00081304> BEREN_;
+		static BEREN_ BEREN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -554,8 +554,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B1>    TO;
 			bits_rw_t<io_, bitpos::B4, 3> MST;
 		};
-		typedef bersr1_t<0x00081308> BERSR1_t;
-		static BERSR1_t BERSR1;
+		typedef bersr1_t<0x00081308> BERSR1_;
+		static BERSR1_ BERSR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -573,8 +573,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B3, 13> ADDR;
 		};
-		typedef bersr2_t<0x0008130A> BERSR2_t;
-		static BERSR2_t BERSR2;
+		typedef bersr2_t<0x0008130A> BERSR2_;
+		static BERSR2_ BERSR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -598,8 +598,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B10, 2> BPFB;
 			bits_rw_t<io_, bitpos::B12, 2> BPEB;
 		};
-		typedef buspri_t<0x00081310> BUSPRI_t;
-		static BUSPRI_t BUSPRI;
+		typedef buspri_t<0x00081310> BUSPRI_;
+		static BUSPRI_ BUSPRI;
 
 
 #if defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX66N)
@@ -630,94 +630,94 @@ namespace device {
 #endif
 			bit_rw_t <io_, bitpos::B31>     PRERR;
 		};
-		typedef ebmapcr_t<0x000C5800> EBMAPCR_t;
-		static EBMAPCR_t EBMAPCR;
+		typedef ebmapcr_t<0x000C5800> EBMAPCR_;
+		static EBMAPCR_ EBMAPCR;
 #endif
 	};
 	typedef bus_t<void> BUS;
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename bus_t<_>::CS0CR_t   bus_t<_>::CS0CR;
-	template <class _> typename bus_t<_>::CS1CR_t   bus_t<_>::CS1CR;
-	template <class _> typename bus_t<_>::CS2CR_t   bus_t<_>::CS2CR;
-	template <class _> typename bus_t<_>::CS3CR_t   bus_t<_>::CS3CR;
+	template <class _> typename bus_t<_>::CS0CR_   bus_t<_>::CS0CR;
+	template <class _> typename bus_t<_>::CS1CR_   bus_t<_>::CS1CR;
+	template <class _> typename bus_t<_>::CS2CR_   bus_t<_>::CS2CR;
+	template <class _> typename bus_t<_>::CS3CR_   bus_t<_>::CS3CR;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename bus_t<_>::CS4CR_t   bus_t<_>::CS4CR;
-	template <class _> typename bus_t<_>::CS5CR_t   bus_t<_>::CS5CR;
-	template <class _> typename bus_t<_>::CS6CR_t   bus_t<_>::CS6CR;
-	template <class _> typename bus_t<_>::CS7CR_t   bus_t<_>::CS7CR;
+	template <class _> typename bus_t<_>::CS4CR_   bus_t<_>::CS4CR;
+	template <class _> typename bus_t<_>::CS5CR_   bus_t<_>::CS5CR;
+	template <class _> typename bus_t<_>::CS6CR_   bus_t<_>::CS6CR;
+	template <class _> typename bus_t<_>::CS7CR_   bus_t<_>::CS7CR;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename bus_t<_>::CS0REC_t  bus_t<_>::CS0REC;
-	template <class _> typename bus_t<_>::CS1REC_t  bus_t<_>::CS1REC;
-	template <class _> typename bus_t<_>::CS2REC_t  bus_t<_>::CS2REC;
-	template <class _> typename bus_t<_>::CS3REC_t  bus_t<_>::CS3REC;
+	template <class _> typename bus_t<_>::CS0REC_  bus_t<_>::CS0REC;
+	template <class _> typename bus_t<_>::CS1REC_  bus_t<_>::CS1REC;
+	template <class _> typename bus_t<_>::CS2REC_  bus_t<_>::CS2REC;
+	template <class _> typename bus_t<_>::CS3REC_  bus_t<_>::CS3REC;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename bus_t<_>::CS4REC_t  bus_t<_>::CS4REC;
-	template <class _> typename bus_t<_>::CS5REC_t  bus_t<_>::CS5REC;
-	template <class _> typename bus_t<_>::CS6REC_t  bus_t<_>::CS6REC;
-	template <class _> typename bus_t<_>::CS7REC_t  bus_t<_>::CS7REC;
+	template <class _> typename bus_t<_>::CS4REC_  bus_t<_>::CS4REC;
+	template <class _> typename bus_t<_>::CS5REC_  bus_t<_>::CS5REC;
+	template <class _> typename bus_t<_>::CS6REC_  bus_t<_>::CS6REC;
+	template <class _> typename bus_t<_>::CS7REC_  bus_t<_>::CS7REC;
 #endif
-	template <class _> typename bus_t<_>::CSRECEN_t bus_t<_>::CSRECEN;
+	template <class _> typename bus_t<_>::CSRECEN_ bus_t<_>::CSRECEN;
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename bus_t<_>::CS0MOD_t  bus_t<_>::CS0MOD;
-	template <class _> typename bus_t<_>::CS1MOD_t  bus_t<_>::CS1MOD;
-	template <class _> typename bus_t<_>::CS2MOD_t  bus_t<_>::CS2MOD;
-	template <class _> typename bus_t<_>::CS3MOD_t  bus_t<_>::CS3MOD;
+	template <class _> typename bus_t<_>::CS0MOD_  bus_t<_>::CS0MOD;
+	template <class _> typename bus_t<_>::CS1MOD_  bus_t<_>::CS1MOD;
+	template <class _> typename bus_t<_>::CS2MOD_  bus_t<_>::CS2MOD;
+	template <class _> typename bus_t<_>::CS3MOD_  bus_t<_>::CS3MOD;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename bus_t<_>::CS4MOD_t  bus_t<_>::CS4MOD;
-	template <class _> typename bus_t<_>::CS5MOD_t  bus_t<_>::CS5MOD;
-	template <class _> typename bus_t<_>::CS6MOD_t  bus_t<_>::CS6MOD;
-	template <class _> typename bus_t<_>::CS7MOD_t  bus_t<_>::CS7MOD;
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename bus_t<_>::CS0WCR1_t bus_t<_>::CS0WCR1;
-	template <class _> typename bus_t<_>::CS1WCR1_t bus_t<_>::CS1WCR1;
-	template <class _> typename bus_t<_>::CS2WCR1_t bus_t<_>::CS2WCR1;
-	template <class _> typename bus_t<_>::CS3WCR1_t bus_t<_>::CS3WCR1;
-#endif
-#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename bus_t<_>::CS4WCR1_t bus_t<_>::CS4WCR1;
-	template <class _> typename bus_t<_>::CS5WCR1_t bus_t<_>::CS5WCR1;
-	template <class _> typename bus_t<_>::CS6WCR1_t bus_t<_>::CS6WCR1;
-	template <class _> typename bus_t<_>::CS7WCR1_t bus_t<_>::CS7WCR1;
+	template <class _> typename bus_t<_>::CS4MOD_  bus_t<_>::CS4MOD;
+	template <class _> typename bus_t<_>::CS5MOD_  bus_t<_>::CS5MOD;
+	template <class _> typename bus_t<_>::CS6MOD_  bus_t<_>::CS6MOD;
+	template <class _> typename bus_t<_>::CS7MOD_  bus_t<_>::CS7MOD;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename bus_t<_>::CS0WCR2_t bus_t<_>::CS0WCR2;
-	template <class _> typename bus_t<_>::CS1WCR2_t bus_t<_>::CS1WCR2;
-	template <class _> typename bus_t<_>::CS2WCR2_t bus_t<_>::CS2WCR2;
-	template <class _> typename bus_t<_>::CS3WCR2_t bus_t<_>::CS3WCR2;
+	template <class _> typename bus_t<_>::CS0WCR1_ bus_t<_>::CS0WCR1;
+	template <class _> typename bus_t<_>::CS1WCR1_ bus_t<_>::CS1WCR1;
+	template <class _> typename bus_t<_>::CS2WCR1_ bus_t<_>::CS2WCR1;
+	template <class _> typename bus_t<_>::CS3WCR1_ bus_t<_>::CS3WCR1;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename bus_t<_>::CS4WCR2_t bus_t<_>::CS4WCR2;
-	template <class _> typename bus_t<_>::CS5WCR2_t bus_t<_>::CS5WCR2;
-	template <class _> typename bus_t<_>::CS6WCR2_t bus_t<_>::CS6WCR2;
-	template <class _> typename bus_t<_>::CS7WCR2_t bus_t<_>::CS7WCR2;
+	template <class _> typename bus_t<_>::CS4WCR1_ bus_t<_>::CS4WCR1;
+	template <class _> typename bus_t<_>::CS5WCR1_ bus_t<_>::CS5WCR1;
+	template <class _> typename bus_t<_>::CS6WCR1_ bus_t<_>::CS6WCR1;
+	template <class _> typename bus_t<_>::CS7WCR1_ bus_t<_>::CS7WCR1;
+#endif
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+	template <class _> typename bus_t<_>::CS0WCR2_ bus_t<_>::CS0WCR2;
+	template <class _> typename bus_t<_>::CS1WCR2_ bus_t<_>::CS1WCR2;
+	template <class _> typename bus_t<_>::CS2WCR2_ bus_t<_>::CS2WCR2;
+	template <class _> typename bus_t<_>::CS3WCR2_ bus_t<_>::CS3WCR2;
 #endif
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
-	template <class _> typename bus_t<_>::SDCCR_t   bus_t<_>::SDCCR;
-	template <class _> typename bus_t<_>::SDCMOD_t  bus_t<_>::SDCMOD;
-	template <class _> typename bus_t<_>::SDAMOD_t  bus_t<_>::SDAMOD;
-	template <class _> typename bus_t<_>::SDSELF_t  bus_t<_>::SDSELF;
-	template <class _> typename bus_t<_>::SDRFCR_t  bus_t<_>::SDRFCR;
-	template <class _> typename bus_t<_>::SDRFEN_t  bus_t<_>::SDRFEN;
-	template <class _> typename bus_t<_>::SDICR_t   bus_t<_>::SDICR;
-	template <class _> typename bus_t<_>::SDIR_t    bus_t<_>::SDIR;
-	template <class _> typename bus_t<_>::SDADR_t   bus_t<_>::SDADR;
-	template <class _> typename bus_t<_>::SDTR_t    bus_t<_>::SDTR;
-	template <class _> typename bus_t<_>::SDMOD_t   bus_t<_>::SDMOD;
-	template <class _> typename bus_t<_>::SDSR_t    bus_t<_>::SDSR;
+	template <class _> typename bus_t<_>::CS4WCR2_ bus_t<_>::CS4WCR2;
+	template <class _> typename bus_t<_>::CS5WCR2_ bus_t<_>::CS5WCR2;
+	template <class _> typename bus_t<_>::CS6WCR2_ bus_t<_>::CS6WCR2;
+	template <class _> typename bus_t<_>::CS7WCR2_ bus_t<_>::CS7WCR2;
 #endif
-	template <class _> typename bus_t<_>::BERCLR_t  bus_t<_>::BERCLR;
-	template <class _> typename bus_t<_>::BEREN_t   bus_t<_>::BEREN;
-	template <class _> typename bus_t<_>::BERSR1_t  bus_t<_>::BERSR1;
-	template <class _> typename bus_t<_>::BERSR2_t  bus_t<_>::BERSR2;
-	template <class _> typename bus_t<_>::BUSPRI_t  bus_t<_>::BUSPRI;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+	template <class _> typename bus_t<_>::SDCCR_   bus_t<_>::SDCCR;
+	template <class _> typename bus_t<_>::SDCMOD_  bus_t<_>::SDCMOD;
+	template <class _> typename bus_t<_>::SDAMOD_  bus_t<_>::SDAMOD;
+	template <class _> typename bus_t<_>::SDSELF_  bus_t<_>::SDSELF;
+	template <class _> typename bus_t<_>::SDRFCR_  bus_t<_>::SDRFCR;
+	template <class _> typename bus_t<_>::SDRFEN_  bus_t<_>::SDRFEN;
+	template <class _> typename bus_t<_>::SDICR_   bus_t<_>::SDICR;
+	template <class _> typename bus_t<_>::SDIR_    bus_t<_>::SDIR;
+	template <class _> typename bus_t<_>::SDADR_   bus_t<_>::SDADR;
+	template <class _> typename bus_t<_>::SDTR_    bus_t<_>::SDTR;
+	template <class _> typename bus_t<_>::SDMOD_   bus_t<_>::SDMOD;
+	template <class _> typename bus_t<_>::SDSR_    bus_t<_>::SDSR;
+#endif
+	template <class _> typename bus_t<_>::BERCLR_  bus_t<_>::BERCLR;
+	template <class _> typename bus_t<_>::BEREN_   bus_t<_>::BEREN;
+	template <class _> typename bus_t<_>::BERSR1_  bus_t<_>::BERSR1;
+	template <class _> typename bus_t<_>::BERSR2_  bus_t<_>::BERSR2;
+	template <class _> typename bus_t<_>::BUSPRI_  bus_t<_>::BUSPRI;
 
 #if defined(SIG_RX65N)
-	template <class _> typename bus_t<_>::EBMAPCR_t bus_t<_>::EBMAPCR;
+	template <class _> typename bus_t<_>::EBMAPCR_ bus_t<_>::EBMAPCR;
 #endif
 }

@@ -28,7 +28,8 @@ namespace device {
 		@brief  FLASH 制御クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class flash_io {
+	template <class _>
+	class flash_io_ {
 
 #ifdef FIO_DEBUG
 		typedef utils::format debug_format;
@@ -82,9 +83,10 @@ namespace device {
 		bool	trans_farm_;
 
 		/// FACIコマンド発行領域 007E 0000h 4バイト
-		static rw8_t<0x007E0000> FACI_CMD_AREA;		///< byte 書き込み
-
-		static rw16_t<0x007E0000> FACI_CMD_AREA16;	///< word(16) 書き込み
+		typedef rw8_t<0x007E0000> FACI_CMD_AREA_;
+		static FACI_CMD_AREA_ FACI_CMD_AREA;		///< byte 書き込み
+		typedef rw16_t<0x007E0000> FACI_CMD_AREA16_;
+		static FACI_CMD_AREA16_ FACI_CMD_AREA16;	///< word(16) 書き込み
 
 		// return 「true」正常、「false」ロック状態
 		// 強制終了コマンド
@@ -258,7 +260,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		flash_io() noexcept : error_(error::NONE), mode_(mode::NONE), trans_farm_(false) { }
+		flash_io_() noexcept : error_(error::NONE), mode_(mode::NONE), trans_farm_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -577,4 +579,8 @@ namespace device {
 #endif
 		}
 	};
+	typedef flash_io_<void> flash_io;
+
+	template <class _> typename flash_io_<_>::FACI_CMD_AREA_   flash_io_<_>::FACI_CMD_AREA;
+	template <class _> typename flash_io_<_>::FACI_CMD_AREA16_ flash_io_<_>::FACI_CMD_AREA16;
 }

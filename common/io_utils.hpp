@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	I/O ユーティリティー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -775,31 +775,31 @@ namespace device {
 		using T::operator |=;
 		using T::operator &=;
 
-		typedef bit_rw_t<T, bitpos::B7> B7_t;	///< B7 アクセス
-		typedef bit_rw_t<T, bitpos::B6> B6_t;	///< B6 アクセス
-		typedef bit_rw_t<T, bitpos::B5> B5_t;	///< B5 アクセス
-		typedef bit_rw_t<T, bitpos::B4> B4_t;	///< B4 アクセス
-		typedef bit_rw_t<T, bitpos::B3> B3_t;	///< B3 アクセス
-		typedef bit_rw_t<T, bitpos::B2> B2_t;	///< B2 アクセス
-		typedef bit_rw_t<T, bitpos::B1> B1_t;	///< B1 アクセス
-		typedef bit_rw_t<T, bitpos::B0> B0_t;	///< B0 アクセス
-		static B7_t B7;
-		static B6_t B6;
-		static B5_t B5;
-		static B4_t B4;
-		static B3_t B3;
-		static B2_t B2;
-		static B1_t B1;
-		static B0_t B0;
+		typedef bit_rw_t<T, bitpos::B7> B7_;
+		typedef bit_rw_t<T, bitpos::B6> B6_;
+		typedef bit_rw_t<T, bitpos::B5> B5_;
+		typedef bit_rw_t<T, bitpos::B4> B4_;
+		typedef bit_rw_t<T, bitpos::B3> B3_;
+		typedef bit_rw_t<T, bitpos::B2> B2_;
+		typedef bit_rw_t<T, bitpos::B1> B1_;
+		typedef bit_rw_t<T, bitpos::B0> B0_;
+		static B7_ B7;	///< B7 アクセス
+		static B6_ B6;	///< B6 アクセス
+		static B5_ B5;	///< B5 アクセス
+		static B4_ B4;	///< B4 アクセス
+		static B3_ B3;	///< B3 アクセス
+		static B2_ B2;	///< B2 アクセス
+		static B1_ B1;	///< B1 アクセス
+		static B0_ B0;	///< B0 アクセス
 	};
-	template <class T> typename basic_rw_t<T>::B7_t basic_rw_t<T>::B7;
-	template <class T> typename basic_rw_t<T>::B6_t basic_rw_t<T>::B6;
-	template <class T> typename basic_rw_t<T>::B5_t basic_rw_t<T>::B5;
-	template <class T> typename basic_rw_t<T>::B4_t basic_rw_t<T>::B4;
-	template <class T> typename basic_rw_t<T>::B3_t basic_rw_t<T>::B3;
-	template <class T> typename basic_rw_t<T>::B2_t basic_rw_t<T>::B2;
-	template <class T> typename basic_rw_t<T>::B1_t basic_rw_t<T>::B1;
-	template <class T> typename basic_rw_t<T>::B0_t basic_rw_t<T>::B0;
+	template <class T> typename basic_rw_t<T>::B7_ basic_rw_t<T>::B7;
+	template <class T> typename basic_rw_t<T>::B6_ basic_rw_t<T>::B6;
+	template <class T> typename basic_rw_t<T>::B5_ basic_rw_t<T>::B5;
+	template <class T> typename basic_rw_t<T>::B4_ basic_rw_t<T>::B4;
+	template <class T> typename basic_rw_t<T>::B3_ basic_rw_t<T>::B3;
+	template <class T> typename basic_rw_t<T>::B2_ basic_rw_t<T>::B2;
+	template <class T> typename basic_rw_t<T>::B1_ basic_rw_t<T>::B1;
+	template <class T> typename basic_rw_t<T>::B0_ basic_rw_t<T>::B0;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -813,29 +813,29 @@ namespace device {
 
 		using T::operator ();
 
-		typedef bit_ro_t<T, bitpos::B7> B7_t;	///< B7 アクセス
-		typedef bit_ro_t<T, bitpos::B6> B6_t;	///< B6 アクセス
-		typedef bit_ro_t<T, bitpos::B5> B5_t;	///< B5 アクセス
-		typedef bit_ro_t<T, bitpos::B4> B4_t;	///< B4 アクセス
-		typedef bit_ro_t<T, bitpos::B3> B3_t;	///< B3 アクセス
-		typedef bit_ro_t<T, bitpos::B2> B2_t;	///< B2 アクセス
-		typedef bit_ro_t<T, bitpos::B1> B1_t;	///< B1 アクセス
-		typedef bit_ro_t<T, bitpos::B0> B0_t;	///< B0 アクセス
-		static B7_t B7;
-		static B6_t B6;
-		static B5_t B5;
-		static B4_t B4;
-		static B3_t B3;
-		static B2_t B2;
-		static B1_t B1;
-		static B0_t B0;
+		typedef bit_ro_t<T, bitpos::B7> B7_;
+		typedef bit_ro_t<T, bitpos::B6> B6_;
+		typedef bit_ro_t<T, bitpos::B5> B5_;
+		typedef bit_ro_t<T, bitpos::B4> B4_;
+		typedef bit_ro_t<T, bitpos::B3> B3_;
+		typedef bit_ro_t<T, bitpos::B2> B2_;
+		typedef bit_ro_t<T, bitpos::B1> B1_;
+		typedef bit_ro_t<T, bitpos::B0> B0_;
+		static B7_ B7;	///< B7 アクセス
+		static B6_ B6;	///< B6 アクセス
+		static B5_ B5;	///< B5 アクセス
+		static B4_ B4;	///< B4 アクセス
+		static B3_ B3;	///< B3 アクセス
+		static B2_ B2;	///< B2 アクセス
+		static B1_ B1;	///< B1 アクセス
+		static B0_ B0;	///< B0 アクセス
 	};
-	template <class T> typename basic_ro_t<T>::B7_t basic_ro_t<T>::B7;
-	template <class T> typename basic_ro_t<T>::B6_t basic_ro_t<T>::B6;
-	template <class T> typename basic_ro_t<T>::B5_t basic_ro_t<T>::B5;
-	template <class T> typename basic_ro_t<T>::B4_t basic_ro_t<T>::B4;
-	template <class T> typename basic_ro_t<T>::B3_t basic_ro_t<T>::B3;
-	template <class T> typename basic_ro_t<T>::B2_t basic_ro_t<T>::B2;
-	template <class T> typename basic_ro_t<T>::B1_t basic_ro_t<T>::B1;
-	template <class T> typename basic_ro_t<T>::B0_t basic_ro_t<T>::B0;
+	template <class T> typename basic_ro_t<T>::B7_ basic_ro_t<T>::B7;
+	template <class T> typename basic_ro_t<T>::B6_ basic_ro_t<T>::B6;
+	template <class T> typename basic_ro_t<T>::B5_ basic_ro_t<T>::B5;
+	template <class T> typename basic_ro_t<T>::B4_ basic_ro_t<T>::B4;
+	template <class T> typename basic_ro_t<T>::B3_ basic_ro_t<T>::B3;
+	template <class T> typename basic_ro_t<T>::B2_ basic_ro_t<T>::B2;
+	template <class T> typename basic_ro_t<T>::B1_ basic_ro_t<T>::B1;
+	template <class T> typename basic_ro_t<T>::B0_ basic_ro_t<T>::B0;
 }
