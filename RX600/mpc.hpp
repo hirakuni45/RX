@@ -953,11 +953,11 @@ namespace device {
 	template<class _> typename mpc_t<_>::P67PFS_t mpc_t<_>::P67PFS;
 #elif defined(SIG_RX66T)
 	template<class _> typename mpc_t<_>::P60PFS_t mpc_t<_>::P60PFS;
-	template<class _> typename mpc_t<_>::P60PFS_t mpc_t<_>::P61PFS;
-	template<class _> typename mpc_t<_>::P60PFS_t mpc_t<_>::P62PFS;
-	template<class _> typename mpc_t<_>::P60PFS_t mpc_t<_>::P63PFS;
-	template<class _> typename mpc_t<_>::P60PFS_t mpc_t<_>::P64PFS;
-	template<class _> typename mpc_t<_>::P60PFS_t mpc_t<_>::P65PFS;
+	template<class _> typename mpc_t<_>::P61PFS_t mpc_t<_>::P61PFS;
+	template<class _> typename mpc_t<_>::P62PFS_t mpc_t<_>::P62PFS;
+	template<class _> typename mpc_t<_>::P63PFS_t mpc_t<_>::P63PFS;
+	template<class _> typename mpc_t<_>::P64PFS_t mpc_t<_>::P64PFS;
+	template<class _> typename mpc_t<_>::P65PFS_t mpc_t<_>::P65PFS;
 #endif
 	template<class _> typename mpc_t<_>::P71PFS_t mpc_t<_>::P71PFS;
 	template<class _> typename mpc_t<_>::P72PFS_t mpc_t<_>::P72PFS;
