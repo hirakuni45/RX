@@ -11,10 +11,10 @@
 
 namespace device {
 
-	utils::dispatch<icu_t::VECTOR::GROUPBE0, 2>  icu_mgr::GROUPBE0_dispatch_;
-	utils::dispatch<icu_t::VECTOR::GROUPBL0, 32> icu_mgr::GROUPBL0_dispatch_;
-	utils::dispatch<icu_t::VECTOR::GROUPBL1, 32> icu_mgr::GROUPBL1_dispatch_;
-	utils::dispatch<icu_t::VECTOR::GROUPAL0, 22> icu_mgr::GROUPAL0_dispatch_;
-	utils::dispatch<icu_t::VECTOR::GROUPAL1, 12> icu_mgr::GROUPAL1_dispatch_;
+	utils::dispatch<ICU::VECTOR::GROUPBE0, 2>  icu_mgr::GROUPBE0_dispatch_;
+	utils::dispatch<ICU::VECTOR::GROUPBL0, 32> icu_mgr::GROUPBL0_dispatch_;
+	utils::dispatch<ICU::VECTOR::GROUPBL1, 32> icu_mgr::GROUPBL1_dispatch_;
+	utils::dispatch<ICU::VECTOR::GROUPAL0, 22> icu_mgr::GROUPAL0_dispatch_;
+	utils::dispatch<ICU::VECTOR::GROUPAL1, 12> icu_mgr::GROUPAL1_dispatch_;
 
 }
