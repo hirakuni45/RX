@@ -31,8 +31,8 @@ namespace device {
 			@brief  ポート方向レジスタ（PDR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef basic_rw_t<rw8_t<base + 0x00> > PDR_t;
-		static PDR_t PDR;
+		typedef basic_rw_t<rw8_t<base + 0x00> > PDR_;
+		static PDR_ PDR;
 
 
 		//-----------------------------------------------------------------//
@@ -40,8 +40,8 @@ namespace device {
 			@brief  ポート出力データレジスタ（PODR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef basic_rw_t<rw8_t<base + 0x20> > PODR_t;
-		static PODR_t PODR;
+		typedef basic_rw_t<rw8_t<base + 0x20> > PODR_;
+		static PODR_ PODR;
 
 
 		//-----------------------------------------------------------------//
@@ -49,8 +49,8 @@ namespace device {
 			@brief  ポート入力データレジスタ（PIDR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef basic_ro_t<ro8_t<base + 0x40> > PIDR_t;
-		static PIDR_t PIDR;
+		typedef basic_ro_t<ro8_t<base + 0x40> > PIDR_;
+		static PIDR_ PIDR;
 
 
 		//-----------------------------------------------------------------//
@@ -58,8 +58,8 @@ namespace device {
 			@brief  ポートモードレジスタ（PMR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef basic_rw_t<rw8_t<base + 0x60> > PMR_t;
-		static PMR_t PMR;
+		typedef basic_rw_t<rw8_t<base + 0x60> > PMR_;
+		static PMR_ PMR;
 
 
 		//-----------------------------------------------------------------//
@@ -67,8 +67,8 @@ namespace device {
 			@brief  プルアップ制御レジスタ（PCR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef basic_rw_t<rw8_t<base + 0xC0> > PCR_t;
-		static PCR_t PCR;
+		typedef basic_rw_t<rw8_t<base + 0xC0> > PCR_;
+		static PCR_ PCR;
 
 
 		//-----------------------------------------------------------------//
@@ -76,22 +76,22 @@ namespace device {
 			@brief  駆動能力制御レジスタ（DSCR）
 		*/
 		//-----------------------------------------------------------------//
-		typedef basic_rw_t<rw8_t<base + 0xE0> > DSCR_t;
-		static DSCR_t DSCR;
+		typedef basic_rw_t<rw8_t<base + 0xE0> > DSCR_;
+		static DSCR_ DSCR;
 	};
 	template <uint32_t base, class option> const uint32_t port_t<base, option>::base_address_;
 	template <uint32_t base, class option>
-		typename port_t<base, option>::PDR_t  port_t<base, option>::PDR;
+		typename port_t<base, option>::PDR_  port_t<base, option>::PDR;
 	template <uint32_t base, class option>
-		typename port_t<base, option>::PODR_t port_t<base, option>::PODR;
+		typename port_t<base, option>::PODR_ port_t<base, option>::PODR;
 	template <uint32_t base, class option>
-		typename port_t<base, option>::PIDR_t port_t<base, option>::PIDR;
+		typename port_t<base, option>::PIDR_ port_t<base, option>::PIDR;
 	template <uint32_t base, class option>
-		typename port_t<base, option>::PMR_t  port_t<base, option>::PMR;
+		typename port_t<base, option>::PMR_  port_t<base, option>::PMR;
 	template <uint32_t base, class option>
-		typename port_t<base, option>::PCR_t  port_t<base, option>::PCR;
+		typename port_t<base, option>::PCR_  port_t<base, option>::PCR;
 	template <uint32_t base, class option>
-		typename port_t<base, option>::DSCR_t port_t<base, option>::DSCR;
+		typename port_t<base, option>::DSCR_ port_t<base, option>::DSCR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -136,8 +136,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> B4;
 			bit_rw_t<io_, bitpos::B6> B6;
 		};
-		typedef odr0_t<base + 0> ODR0_t;
-		static ODR0_t ODR0;
+		typedef odr0_t<base + 0> ODR0_;
+		static ODR0_ ODR0;
 
 
 		//-----------------------------------------------------------------//
@@ -161,11 +161,11 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> B6;
 #endif
 		};
-		typedef odr1_t<base + 1> ODR1_t;
-		static ODR1_t ODR1;
+		typedef odr1_t<base + 1> ODR1_;
+		static ODR1_ ODR1;
 	};
-	template <uint32_t base> typename odr_oo_t<base>::ODR0_t odr_oo_t<base>::ODR0;
-	template <uint32_t base> typename odr_oo_t<base>::ODR1_t odr_oo_t<base>::ODR1;
+	template <uint32_t base> typename odr_oo_t<base>::ODR0_ odr_oo_t<base>::ODR0;
+	template <uint32_t base> typename odr_oo_t<base>::ODR1_ odr_oo_t<base>::ODR1;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -198,10 +198,10 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4> B4;
 			bit_rw_t<io_, bitpos::B6> B6;
 		};
-		typedef odr0_t<base> ODR0_t;
-		static ODR0_t ODR0;
+		typedef odr0_t<base> ODR0_;
+		static ODR0_ ODR0;
 	};
-	template <uint32_t base> typename odr_ox_t<base>::ODR0_t ODR0;
+	template <uint32_t base> typename odr_ox_t<base>::ODR0_ ODR0;
 
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
@@ -388,8 +388,8 @@ namespace device {
 			@brief  ポート方向レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		typedef bit_rw_t<rw8_t<PORTX::base_address_ + 0x00>, BPOS> DIR_t;
-		static DIR_t DIR;
+		typedef bit_rw_t<rw8_t<PORTX::base_address_ + 0x00>, BPOS> DIR_;
+		static DIR_ DIR;
 
 
 		//-----------------------------------------------------------------//
@@ -413,8 +413,8 @@ namespace device {
 			@brief  プルアップ制御・レジスタ
 		*/
 		//-----------------------------------------------------------------//
-		typedef bit_rw_t<rw8_t<PORTX::base_address_ + 0xC0>, BPOS> PU_t;
-		static PU_t PU;
+		typedef bit_rw_t<rw8_t<PORTX::base_address_ + 0xC0>, BPOS> PU_;
+		static PU_ PU;
 
 
 		//-----------------------------------------------------------------//
@@ -447,7 +447,8 @@ namespace device {
 				}
 			}
 		};
-		static od_t OD;
+		typedef od_t OD_;
+		static OD_ OD;
 
 
 		//-----------------------------------------------------------------//
@@ -457,10 +458,10 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct port_t {
-			typedef bit_rw_t<rw8_t<PORTX::base_address_ + 0x20>, BPOS> PO_t;
-			static PO_t PO;  // ポート出力用
-			typedef bit_ro_t<ro8_t<PORTX::base_address_ + 0x40>, BPOS> PI_t;
-			static PI_t PI;  // ポート入力用
+			typedef bit_rw_t<rw8_t<PORTX::base_address_ + 0x20>, BPOS> PO_;
+			static PO_ PO;  // ポート出力用
+			typedef bit_ro_t<ro8_t<PORTX::base_address_ + 0x40>, BPOS> PI_;
+			static PI_ PI;  // ポート入力用
 
 			void operator = (bool val) {
 				if(ASSERT) { PO = val; } else { PO = !val; }
@@ -470,20 +471,21 @@ namespace device {
 				else { return !PI(); }
 			}
 		};
-		static port_t P;
+		typedef port_t P_;
+		static P_ P;
 	};
 	template <class PORTX, bitpos BPOS, bool ASSERT>
-		typename PORT<PORTX, BPOS, ASSERT>::DIR_t PORT<PORTX, BPOS, ASSERT>::DIR;
+		typename PORT<PORTX, BPOS, ASSERT>::DIR_ PORT<PORTX, BPOS, ASSERT>::DIR;
 	template <class PORTX, bitpos BPOS, bool ASSERT>
-		typename PORT<PORTX, BPOS, ASSERT>::PU_t PORT<PORTX, BPOS, ASSERT>::PU;
+		typename PORT<PORTX, BPOS, ASSERT>::PU_ PORT<PORTX, BPOS, ASSERT>::PU;
 	template <class PORTX, bitpos BPOS, bool ASSERT>
-		typename PORT<PORTX, BPOS, ASSERT>::od_t PORT<PORTX, BPOS, ASSERT>::OD;
+		typename PORT<PORTX, BPOS, ASSERT>::OD_ PORT<PORTX, BPOS, ASSERT>::OD;
 	template <class PORTX, bitpos BPOS, bool ASSERT>
-		typename PORT<PORTX, BPOS, ASSERT>::port_t::PO_t PORT<PORTX, BPOS, ASSERT>::port_t::PO;
+		typename PORT<PORTX, BPOS, ASSERT>::port_t::PO_ PORT<PORTX, BPOS, ASSERT>::port_t::PO;
 	template <class PORTX, bitpos BPOS, bool ASSERT>
-		typename PORT<PORTX, BPOS, ASSERT>::port_t::PI_t PORT<PORTX, BPOS, ASSERT>::port_t::PI;
+		typename PORT<PORTX, BPOS, ASSERT>::port_t::PI_ PORT<PORTX, BPOS, ASSERT>::port_t::PI;
 	template <class PORTX, bitpos BPOS, bool ASSERT>
-		typename PORT<PORTX, BPOS, ASSERT>::port_t PORT<PORTX, BPOS, ASSERT>::P;
+		typename PORT<PORTX, BPOS, ASSERT>::P_ PORT<PORTX, BPOS, ASSERT>::P;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
