@@ -1178,14 +1178,22 @@ namespace device {
 			@brief  DMAC 起動要因選択レジスタ m（DMRSRm）（m = DMAC チャネル番号）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<0x00087400> DMRSR0;
-		static rw8_t<0x00087404> DMRSR1;
-		static rw8_t<0x00087408> DMRSR2;
-		static rw8_t<0x0008740C> DMRSR3;
-		static rw8_t<0x00087410> DMRSR4;
-		static rw8_t<0x00087414> DMRSR5;
-		static rw8_t<0x00087418> DMRSR6;
-		static rw8_t<0x0008741C> DMRSR7;
+		typedef rw8_t<0x00087400> DMRSR0_;
+		static DMRSR0_ DMRSR0;
+		typedef rw8_t<0x00087404> DMRSR1_;
+		static DMRSR1_ DMRSR1;
+		typedef rw8_t<0x00087408> DMRSR2_;
+		static DMRSR2_ DMRSR2;
+		typedef rw8_t<0x0008740C> DMRSR3_;
+		static DMRSR3_ DMRSR3;
+		typedef rw8_t<0x00087410> DMRSR4_;
+		static DMRSR4_ DMRSR4;
+		typedef rw8_t<0x00087414> DMRSR5_;
+		static DMRSR5_ DMRSR5;
+		typedef rw8_t<0x00087418> DMRSR6_;
+		static DMRSR6_ DMRSR6;
+		typedef rw8_t<0x0008741C> DMRSR7_;
+		static DMRSR7_ DMRSR7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1575,7 +1583,8 @@ namespace device {
 			@brief  選択型割り込み B 要因選択レジスタ Xn（SLIBXRn）（n = 128 ～ 143）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<0x00087780> SLIBXR128;
+		typedef rw8_t<0x00087780> SLIBXR128_;
+		static SLIBXR128_ SLIBXR128;
 		static rw8_t<0x00087781> SLIBXR129;
 		static rw8_t<0x00087782> SLIBXR130;
 		static rw8_t<0x00087783> SLIBXR131;
@@ -1723,11 +1732,25 @@ namespace device {
 		static rw8_t<0x000879FE> SLIAR254;
 		static rw8_t<0x000879FF> SLIAR255;
 
-		static icu_utils::slixr_t<0x00087700> SLIXR;
+		typedef icu_utils::slixr_t<0x00087700> SLIXR_;
+		static SLIXR_ SLIXR;
 	};
 	typedef icu_t<void> ICU;
 
 	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;
 	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
 	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
+
+	template<class _> typename icu_t<_>::DMRSR0_ icu_t<_>::DMRSR0;
+	template<class _> typename icu_t<_>::DMRSR1_ icu_t<_>::DMRSR1;
+	template<class _> typename icu_t<_>::DMRSR2_ icu_t<_>::DMRSR2;
+	template<class _> typename icu_t<_>::DMRSR3_ icu_t<_>::DMRSR3;
+	template<class _> typename icu_t<_>::DMRSR4_ icu_t<_>::DMRSR4;
+	template<class _> typename icu_t<_>::DMRSR5_ icu_t<_>::DMRSR5;
+	template<class _> typename icu_t<_>::DMRSR6_ icu_t<_>::DMRSR6;
+	template<class _> typename icu_t<_>::DMRSR7_ icu_t<_>::DMRSR7;
+
+	template<class _> typename icu_t<_>::SLIBXR128_ icu_t<_>::SLIBXR128;
+
+	template<class _> typename icu_t<_>::SLIXR_ icu_t<_>::SLIXR;
 }

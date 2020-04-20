@@ -33,7 +33,8 @@ namespace device {
 			@brief  D/A データレジスタ 0（DADR0）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x00088040> DADR0;
+		typedef rw16_t<0x00088040> DADR0_;
+		static DADR0_ DADR0;
 
 
 		//-----------------------------------------------------------------//
@@ -41,7 +42,8 @@ namespace device {
 			@brief  D/A データレジスタ 1（DADR1）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<0x00088042> DADR1;
+		typedef rw16_t<0x00088042> DADR1_;
+		static DADR1_ DADR1;
 
 
 		//-----------------------------------------------------------------//
@@ -62,7 +64,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> DAOE0;
 			bit_rw_t<io_, bitpos::B7> DAOE1;
 		};
-		static dacr_t<0x00088044> DACR;
+		typedef dacr_t<0x00088044> DACR_;
+		static DACR_ DACR;
 
 
 		//-----------------------------------------------------------------//
@@ -81,7 +84,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> DPSEL;
 		};
-		static dadpr_t<0x00088045> DADPR;
+		typedef dadpr_t<0x00088045> DADPR_;
+		static DADPR_ DADPR;
 
 
 		//-----------------------------------------------------------------//
@@ -100,8 +104,14 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7> DAADST;
 		};
-		static daadscr_t<0x00088046> DAADSCR;
+		typedef daadscr_t<0x00088046> DAADSCR_;
+		static DAADSCR_ DAADSCR;
 	};
+	template <peripheral per> typename r12da_t<per>::DADR0_ r12da_t<per>::DADR0;
+	template <peripheral per> typename r12da_t<per>::DADR1_ r12da_t<per>::DADR1;
+	template <peripheral per> typename r12da_t<per>::DACR_ r12da_t<per>::DACR;
+	template <peripheral per> typename r12da_t<per>::DADPR_ r12da_t<per>::DADPR;
+	template <peripheral per> typename r12da_t<per>::DAADSCR_ r12da_t<per>::DAADSCR;
 
 
 #if defined(SIG_RX64M) || defined(SIG_RX65N) || defined(SIG_RX71M) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N) 
@@ -144,7 +154,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> DAAMP0;
 			bit_rw_t<io_, bitpos::B7> DAAMP1;
 		};
-		static daampcr_t<0x00088048> DAAMPCR;
+		typedef daampcr_t<0x00088048> DAAMPCR_;
+		static DAAMPCR_ DAAMPCR;
 
 
 		//-----------------------------------------------------------------//
@@ -163,7 +174,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B1> AMADSEL1;
 		};
-		static daadusr_t<0x0008C5C0> DAADUSR;
+		typedef daadusr_t<0x0008C5C0> DAADUSR_;
+		static DAADUSR_ DAADUSR;
 
 
 		//-----------------------------------------------------------------//
@@ -193,6 +205,10 @@ namespace device {
 		}
 	};
 	typedef r12da_a_t<peripheral::R12DA> R12DA;
+
+	template <peripheral per> typename r12da_a_t<per>::DAAMPCR_ r12da_a_t<per>::DAAMPCR;
+	template <peripheral per> typename r12da_a_t<per>::DAADUSR_ r12da_a_t<per>::DAADUSR;
+
 
 #elif defined(SIG_RX66T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

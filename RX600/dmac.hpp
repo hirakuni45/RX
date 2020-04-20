@@ -31,7 +31,8 @@ namespace device {
 			@brief  DMA 転送元アドレスレジスタ (DMSAR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x00> DMSAR;
+		typedef rw32_t<base + 0x00> DMSAR_;
+		static DMSAR_ DMSAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -39,7 +40,8 @@ namespace device {
 			@brief  DMA 転送先アドレスレジスタ (DMDAR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x04> DMDAR;
+		typedef rw32_t<base + 0x04> DMDAR_;
+		static DMDAR_ DMDAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -47,7 +49,8 @@ namespace device {
 			@brief  DMA 転送カウントレジスタ (DMCRA)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x08> DMCRA;
+		typedef rw32_t<base + 0x08> DMCRA_;
+		static DMCRA_ DMCRA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -55,7 +58,8 @@ namespace device {
 			@brief  DMA ブロック転送カウントレジスタ (DMCRB)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw16_t<base + 0x0C> DMCRB;
+		typedef rw16_t<base + 0x0C> DMCRB_;
+		static DMCRB_ DMCRB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -77,7 +81,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2>   DTS;
 			bits_rw_t<io_, bitpos::B14, 2>   MD;
 		};
-		static dmtmd_t<base + 0x10> DMTMD;
+		typedef dmtmd_t<base + 0x10> DMTMD_;
+		static DMTMD_ DMTMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -100,7 +105,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3>   ESIE;
 			bit_rw_t<io_, bitpos::B4>   DTIE;
 		};
-		static dmint_t<base + 0x13> DMINT;
+		typedef dmint_t<base + 0x13> DMINT_;
+		static DMINT_ DMINT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -122,7 +128,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  5>   SARA;
 			bits_rw_t<io_, bitpos::B14, 2>   SM;
 		};
-		static dmamd_t<base + 0x14> DMAMD;
+		typedef dmamd_t<base + 0x14> DMAMD_;
+		static DMAMD_ DMAMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -130,7 +137,8 @@ namespace device {
 			@brief  DMA オフセットレジスタ (DMOFR)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x18> DMOFR;
+		typedef rw32_t<base + 0x18> DMOFR_;
+		static DMOFR_ DMOFR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -149,7 +157,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>   DTE;
 		};
-		static dmcnt_t<base + 0x1C> DMCNT;
+		typedef dmcnt_t<base + 0x1C> DMCNT_;
+		static DMCNT_ DMCNT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -169,7 +178,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>   SWREQ;
 			bit_rw_t<io_, bitpos::B4>   CLRS;
 		};
-		static dmreq_t<base + 0x1D> DMREQ;
+		typedef dmreq_t<base + 0x1D> DMREQ_;
+		static DMREQ_ DMREQ;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -190,7 +200,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>   DTIF;
 			bit_rw_t<io_, bitpos::B7>   ACT;
 		};
-		static dmsts_t<base + 0x1E> DMSTS;
+		typedef dmsts_t<base + 0x1E> DMSTS_;
+		static DMSTS_ DMSTS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -209,8 +220,34 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>   DISEL;
 		};
-		static dmcsl_t<base + 0x1F> DMCSL;
+		typedef dmcsl_t<base + 0x1F> DMCSL_;
+		static DMCSL_ DMCSL;
 	};
+
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMSAR_ dmac_t<base, per, ivec>::DMSAR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMDAR_ dmac_t<base, per, ivec>::DMDAR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMCRA_ dmac_t<base, per, ivec>::DMCRA;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMCRB_ dmac_t<base, per, ivec>::DMCRB;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMTMD_ dmac_t<base, per, ivec>::DMTMD;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMINT_ dmac_t<base, per, ivec>::DMINT;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMAMD_ dmac_t<base, per, ivec>::DMAMD;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMOFR_ dmac_t<base, per, ivec>::DMOFR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMCNT_ dmac_t<base, per, ivec>::DMCNT;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMREQ_ dmac_t<base, per, ivec>::DMREQ;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMSTS_ dmac_t<base, per, ivec>::DMSTS;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename dmac_t<base, per, ivec>::DMCSL_ dmac_t<base, per, ivec>::DMCSL;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
