@@ -54,7 +54,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B3, 2> CKEG;
 			bits_rw_t<io_, bitpos::B5, 3> CCLR;
 		};
-		static tcr_t TCR;
+		typedef tcr_t TCR_;
+		static TCR_ TCR;
 
 
 		//-----------------------------------------------------------------//
@@ -75,7 +76,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>     ICSELB;
 			bit_rw_t <io_, bitpos::B7>     ICSELD;
 		};
-		static tmdr_t TMDR;
+		typedef tmdr_t TMDR_;
+		static TMDR_ TMDR;
 
 
 		//-----------------------------------------------------------------//
@@ -93,7 +95,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> IOA;
 			bits_rw_t<io_, bitpos::B4, 4> IOB;
 		};
-		static tiorh_t TIORH;
+		typedef tiorh_t TIORH_;
+		static TIORH_ TIORH;
 
 
 		//-----------------------------------------------------------------//
@@ -111,7 +114,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4> IOC;
 			bits_rw_t<io_, bitpos::B4, 4> IOD;
 		};
-		static tiorl_t TIORL;
+		typedef tiorl_t TIORL_;
+		static TIORL_ TIORL;
 
 
 		//-----------------------------------------------------------------//
@@ -135,7 +139,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  TTGE;
 		};
-		static tier_t TIER;
+		typedef tier_t TIER_;
+		static TIER_ TIER;
 
 
 		//-----------------------------------------------------------------//
@@ -159,7 +164,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  TCFD;
 		};
-		static tsr_t TSR;
+		typedef tsr_t TSR_;
+		static TSR_ TSR;
 
 
 		//-----------------------------------------------------------------//
@@ -167,7 +173,8 @@ namespace device {
 			@brief  タイマカウンタ（TCNT）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x06> TCNT;
+		typedef rw16_t<base + 0x06> TCNT_;
+		static TCNT_ TCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -175,7 +182,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ A（TGRA）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x08> TGRA;
+		typedef rw16_t<base + 0x08> TGRA_;
+		static TGRA_ TGRA;
 
 
 		//-----------------------------------------------------------------//
@@ -183,7 +191,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ B（TGRB）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x0A> TGRB;
+		typedef rw16_t<base + 0x0A> TGRB_;
+		static TGRB_ TGRB;
 
 
 		//-----------------------------------------------------------------//
@@ -191,7 +200,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ C（TGRC）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x0C> TGRC;
+		typedef rw16_t<base + 0x0C> TGRC_;
+		static TGRC_ TGRC;
 
 
 		//-----------------------------------------------------------------//
@@ -199,7 +209,8 @@ namespace device {
 			@brief  タイマジェネラルレジスタ D（TGRD）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x0E> TGRD;
+		typedef rw16_t<base + 0x0E> TGRD_;
+		static TGRD_ TGRD;
 
 
 		//-----------------------------------------------------------------//
@@ -221,7 +232,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>  CST4;
 			bit_rw_t <io_, bitpos::B5>  CST5;
 		};
-		static tstr_t TSTR;
+		typedef tstr_t TSTR_;
+		static TSTR_ TSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -243,7 +255,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>  SYNC4;
 			bit_rw_t <io_, bitpos::B5>  SYNC5;
 		};
-		static tsyr_t TSYR;
+		typedef tsyr_t TSYR_;
+		static TSYR_ TSYR;
 
 
 		//-----------------------------------------------------------------//
@@ -265,7 +278,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 2>  NFCS;
 		};
-		static nfcr_t NFCR;
+		typedef nfcr_t NFCR_;
+		static NFCR_ NFCR;
 
 
 		//-----------------------------------------------------------------//
@@ -299,6 +313,63 @@ namespace device {
 			}
 		}
 	};
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TCR_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TCR;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TMDR_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TMDR;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORH_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORH;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIORL;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIER_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TIER;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSR_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSR;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TCNT_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TCNT;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRA_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRA;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRB_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRB;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRC;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TGRD;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSTR_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSTR;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSYR_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::TSYR;
+	template <uint32_t base, peripheral per,
+		uint8_t intra, uint8_t intrb, uint8_t intrc, uint8_t intrd, uint8_t intru, uint8_t intrv>
+		typename tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::NFCR_
+		tpux_t<base, per, intra, intrb, intrc, intrd, intru, intrv>::NFCR;
+
 
 	typedef tpux_t<0x00088110, peripheral::TPU0, 15, 16, 17, 18,  0, 19> TPU0;
 	typedef tpux_t<0x00088120, peripheral::TPU1, 20, 21,  0,  0, 22, 23> TPU1;
