@@ -11,6 +11,7 @@ TARGET		=	flash_sample
 DEVICE		=	R5F524TA
 
 BUILD		=	release
+# BUILD		=	debug
 
 VPATH		=	../../
 
@@ -50,8 +51,6 @@ INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../
 
-OPTIMIZE	=	-Os
-
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
@@ -60,6 +59,18 @@ CP_OPT		=	-Wall -Werror \
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-fno-exceptions
+
+ifeq ($(BUILD),debug)
+    CC_OPT += -g -DDEBUG
+    CP_OPT += -g -DDEBUG
+	OPTIMIZE = -O0
+endif
+
+ifeq ($(BUILD),release)
+    CC_OPT += -DNDEBUG
+    CP_OPT += -DNDEBUG
+	OPTIMIZE = -Os
+endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
 APPINCS		=	$(addprefix -I, $(INC_APP))

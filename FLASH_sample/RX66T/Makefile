@@ -12,6 +12,7 @@ TARGET		=	flash_sample
 DEVICE		=	R5F566TE
 
 BUILD		=	release
+# BUILD		=	debug
 
 VPATH		=	../../
 
@@ -55,8 +56,6 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../../
 
-OPTIMIZE	=	-O3
-
 AS_OPT		=	-mcpu=rx600
 
 CP_OPT		=	-Wall -Werror \
@@ -67,6 +66,18 @@ CP_OPT		=	-Wall -Werror \
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-fno-exceptions
+
+ifeq ($(BUILD),debug)
+    CC_OPT += -g -DDEBUG
+    CP_OPT += -g -DDEBUG
+	OPTIMIZE = -O0
+endif
+
+ifeq ($(BUILD),release)
+    CC_OPT += -DNDEBUG
+    CP_OPT += -DNDEBUG
+	OPTIMIZE = -O2
+endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
 APPINCS		=	$(addprefix -I, $(INC_APP))
