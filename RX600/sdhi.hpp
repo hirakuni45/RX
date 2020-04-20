@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・SDHI 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -35,10 +35,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  コマンドレジスタ（ SDCMD ）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sdcmd_t : public rw32_t<base + 0x00> {
-			typedef rw32_t<base + 0x00> io_;
+		template <uint32_t ofs>
+		struct sdcmd_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -52,7 +54,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B13>    TRSTP;
 			bits_rw_t<io_, bitpos::B14, 2> CMD12AT;
 		};
-		static sdcmd_t SDCMD;
+		typedef sdcmd_t<base + 0x00> SDCMD_;
+		static SDCMD_ SDCMD;
 
 
 		//-----------------------------------------------------------------//
@@ -60,16 +63,19 @@ namespace device {
 			@brief  アーギュメントレジスタ（ SDARG ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<base + 0x08> SDARG;
+		typedef rw32_t<base + 0x08> SDARG_;
+		static SDARG_ SDARG;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  データストップレジスタ（ SDSTOP ）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sdstop_t : public rw32_t<base + 0x10> {
-			typedef rw32_t<base + 0x10> io_;
+		template <uint32_t ofs>
+		struct sdstop_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -78,7 +84,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  STP;
 			bit_rw_t<io_, bitpos::B8>  SDBLKCNTEN;
 		};
-		static sdstop_t SDSTOP;
+		typedef sdstop_t<base + 0x10> SDSTOP_;
+		static SDSTOP_ SDSTOP;
 
 
 		//-----------------------------------------------------------------//
@@ -86,7 +93,8 @@ namespace device {
 			@brief  ブロックカウントレジスタ（ SDBLKCNT ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<base + 0x14> SDBLKCNT;
+		typedef rw32_t<base + 0x14> SDBLKCNT_;
+		static SDBLKCNT_ SDBLKCNT;
 
 
 		//-----------------------------------------------------------------//
@@ -94,7 +102,8 @@ namespace device {
 			@brief  レスポンスレジスタ 10 （ SDRSP10 ）
 		*/
 		//-----------------------------------------------------------------//
-		static ro32_t<base + 0x18> SDRSP10;
+		typedef ro32_t<base + 0x18> SDRSP10_;
+		static SDRSP10_ SDRSP10;
 
 
 		//-----------------------------------------------------------------//
@@ -102,7 +111,8 @@ namespace device {
 			@brief  レスポンスレジスタ 32 （ SDRSP32 ）
 		*/
 		//-----------------------------------------------------------------//
-		static ro32_t<base + 0x20> SDRSP32;
+		typedef ro32_t<base + 0x20> SDRSP32_;
+		static SDRSP32_ SDRSP32;
 
 
 		//-----------------------------------------------------------------//
@@ -110,7 +120,8 @@ namespace device {
 			@brief  レスポンスレジスタ 54 （ SDRSP54 ）
 		*/
 		//-----------------------------------------------------------------//
-		static ro32_t<base + 0x28> SDRSP54;
+		typedef ro32_t<base + 0x28> SDRSP54_;
+		static SDRSP54_ SDRSP54;
 
 
 		//-----------------------------------------------------------------//
@@ -118,16 +129,19 @@ namespace device {
 			@brief  レスポンスレジスタ 76 （ SDRSP76 ）
 		*/
 		//-----------------------------------------------------------------//
-		static ro32_t<base + 0x30> SDRSP76;
+		typedef ro32_t<base + 0x30> SDRSP76_;
+		static SDRSP76_ SDRSP76;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  SD ステータスレジスタ 1 （ SDSTS1 ）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sdsts1_t : public rw32_t<base + 0x38> {
-			typedef rw32_t<base + 0x38> io_;
+		template <uint32_t ofs>
+		struct sdsts1_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -145,16 +159,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B9>  SDD3IN;
 			bit_ro_t<io_, bitpos::B10> SDD3MON;
 		};
-		static sdsts1_t SDSTS1;
+		typedef sdsts1_t<base + 0x38> SDSTS1_;
+		static SDSTS1_ SDSTS1;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  SD ステータスレジスタ 2 （ SDSTS2 ）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sdsts2_t : public rw32_t<base + 0x3C> {
-			typedef rw32_t<base + 0x3C> io_;
+		template <uint32_t ofs>
+		struct sdsts2_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -175,16 +192,19 @@ namespace device {
 			bit_ro_t<io_, bitpos::B14> CBSY;
 			bit_rw_t<io_, bitpos::B15> ILA;
 		};
-		static sdsts2_t SDSTS2;
+		typedef sdsts2_t<base + 0x3C> SDSTS2_;
+		static SDSTS2_ SDSTS2;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  SD 割り込みマスクレジスタ 1 （ SDIMSK1 ）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sdimsk1_t : public rw32_t<base + 0x40> {
-			typedef rw32_t<base + 0x40> io_;
+		template <uint32_t ofs>
+		struct sdimsk1_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -199,16 +219,19 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>  SDD3RMM;
 			bit_rw_t<io_, bitpos::B9>  SDD3INM;
 		};
-		static sdimsk1_t SDIMSK1;
+		typedef sdimsk1_t<base + 0x40> SDIMSK1_;
+		static SDIMSK1_ SDIMSK1;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  SD 割り込みマスクレジスタ 2 （ SDIMSK2 ）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sdimsk2_t : public rw32_t<base + 0x44> {
-			typedef rw32_t<base + 0x44> io_;
+		template <uint32_t ofs>
+		struct sdimsk2_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -227,16 +250,19 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B15> ILAM;
 		};
-		static sdimsk2_t SDIMSK2;
+		typedef sdimsk2_t<base + 0x44> SDIMSK2_;
+		static SDIMSK2_ SDIMSK2;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  SDHI クロックコントロールレジスタ（ SDCLKCR ）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sdclkcr_t : public rw32_t<base + 0x48> {
-			typedef rw32_t<base + 0x48> io_;
+		template <uint32_t ofs>
+		struct sdclkcr_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -246,16 +272,19 @@ namespace device {
 			bit_rw_t <io_, bitpos::B8>     CLKEN;
 			bit_rw_t <io_, bitpos::B9>     CLKCTRLEN;
 		};
-		static sdclkcr_t SDCLKCR;
+		typedef sdclkcr_t<base + 0x48> SDCLKCR_;
+		static SDCLKCR_ SDCLKCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  転送データサイズレジスタ（ SDSIZE ）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sdsize_t : public rw32_t<base + 0x4C> {
-			typedef rw32_t<base + 0x4C> io_;
+		template <uint32_t ofs>
+		struct sdsize_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -263,16 +292,19 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 10>  LEN;
 		};
-		static sdsize_t SDSIZE;
+		typedef sdsize_t<base + 0x4C> SDSIZE_;
+		static SDSIZE_ SDSIZE;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  カードアクセスオプションレジスタ（ SDOPT ）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sdopt_t : public rw32_t<base + 0x50> {
-			typedef rw32_t<base + 0x50> io_;
+		template <uint32_t ofs>
+		struct sdopt_t : public rw32_t<ofs> {
+			typedef rw32_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -283,16 +315,19 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>    WIDTH;
 		};
-		static sdopt_t SDOPT;
+		typedef sdopt_t<base + 0x50> SDOPT_;
+		static SDOPT_ SDOPT;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  SD エラーステータスレジスタ 1 （ SDERSTS1 ）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sdersts1_t : public ro32_t<base + 0x58> {
-			typedef ro32_t<base + 0x58> io_;
+		template <uint32_t ofs>
+		struct sdersts1_t : public ro32_t<ofs> {
+			typedef ro32_t<ofs> io_;
 			using io_::operator ();
 
 			bit_ro_t <io_, bitpos::B0>      CMDE0;
@@ -308,16 +343,19 @@ namespace device {
 			bit_ro_t <io_, bitpos::B11>     CRCTKE;
 			bits_ro_t<io_, bitpos::B12, 3>  CRCTK;
 		};
-		static sdersts1_t SDERSTS1;
+		typedef sdersts1_t<base + 0x58> SDERSTS1_;
+		static SDERSTS1_ SDERSTS1;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  SD エラーステータスレジスタ 2 （ SDERSTS2 ）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct sdersts2_t : public ro32_t<base + 0x5C> {
-			typedef ro32_t<base + 0x5C> io_;
+		template <uint32_t ofs>
+		struct sdersts2_t : public ro32_t<ofs> {
+			typedef ro32_t<ofs> io_;
 			using io_::operator ();
 
 			bit_ro_t<io_, bitpos::B0>  RSPTO0;
@@ -328,7 +366,8 @@ namespace device {
 			bit_ro_t<io_, bitpos::B5>  CRCTO;
 			bit_ro_t<io_, bitpos::B6>  CRCBSYTO;
 		};
-		static sdersts2_t SDERSTS2;
+		typedef sdersts2_t<base + 0x5C> SDERSTS2_;
+		static SDERSTS2_ SDERSTS2;
 
 
 		//-----------------------------------------------------------------//
@@ -336,7 +375,8 @@ namespace device {
 			@brief  SD バッファレジスタ（ SDBUFR ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<base + 0x60> SDBUFR;
+		typedef rw32_t<base + 0x60> SDBUFR_;
+		static SDBUFR_ SDBUFR;
 
 
 		//-----------------------------------------------------------------//
@@ -358,7 +398,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>  IOABT;
 			bit_rw_t<io_, bitpos::B9>  C52PUB;
 		};
-		static sdiomd_t SDIOMD;
+		typedef sdiomd_t SDIOMD_;
+		static SDIOMD_ SDIOMD;
 
 
 		//-----------------------------------------------------------------//
@@ -378,7 +419,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14> EXPUB52;
 			bit_rw_t<io_, bitpos::B15> EXWT;
 		};
-		static sdiosts_t SDIOSTS;
+		typedef sdiosts_t SDIOSTS_;
+		static SDIOSTS_ SDIOSTS;
 
 
 		//-----------------------------------------------------------------//
@@ -398,7 +440,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B14> EXPUB52M;
 			bit_rw_t<io_, bitpos::B15> EXWTM;
 		};
-		static sdioimsk_t SDIOIMSK;
+		typedef sdioimsk_t SDIOIMSK_;
+		static SDIOIMSK_ SDIOIMSK;
 
 
 		//-----------------------------------------------------------------//
@@ -415,7 +458,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B1>  DMAEN;
 		};
-		static sddmaen_t SDDMAEN;
+		typedef sddmaen_t SDDMAEN_;
+		static SDDMAEN_ SDDMAEN;
 
 
 		//-----------------------------------------------------------------//
@@ -432,7 +476,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  SDRST;
 		};
-		static sdrst_t SDRST;
+		typedef sdrst_t SDRST_;
+		static SDRST_ SDRST;
 
 
 		//-----------------------------------------------------------------//
@@ -450,7 +495,8 @@ namespace device {
 			bit_ro_t <io_, bitpos::B14>    CLKRAT;
 			bit_ro_t <io_, bitpos::B15>    CPRM;
 		};
-		static sdver_t SDVER;
+		typedef sdver_t SDVER_;
+		static SDVER_ SDVER;
 
 
 		//-----------------------------------------------------------------//
@@ -468,10 +514,86 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  BWSWP;
 			bit_rw_t<io_, bitpos::B7>  BRSWP;
 		};
-		static sdswap_t SDSWAP;
+		typedef sdswap_t SDSWAP_;
+		static SDSWAP_ SDSWAP;
 	};
-
 	typedef sdhi_t<0x0008AC00, peripheral::SDHI,
 		ICU::VECTOR_BL1::CDETI, ICU::VECTOR_BL1::CACI, ICU::VECTOR_BL1::SDACI,
 		ICU::VECTOR::SBFAI> SDHI;
+
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDCMD_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDCMD;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDARG_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDARG;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTOP_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTOP;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDBLKCNT_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDBLKCNT;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP10_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP10;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP32_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP32;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP54_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP54;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP76_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRSP76;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTS1_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTS1;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTS2_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSTS2;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIMSK1_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIMSK1;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIMSK2_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIMSK2;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDCLKCR_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDCLKCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSIZE_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSIZE;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDOPT_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDOPT;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDERSTS1_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDERSTS1;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDERSTS2_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDERSTS2;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDBUFR_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDBUFR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOMD_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOMD;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOSTS_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOSTS;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOIMSK_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDIOIMSK;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDDMAEN_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDDMAEN;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRST_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDRST;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDVER_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDVER;
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 cdeti, ICU::VECTOR_BL1 caci, ICU::VECTOR_BL1 sdaci, ICU::VECTOR sbfai>
+	typename sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSWAP_
+	sdhi_t<base, per, cdeti, caci, sdaci, sbfai>::SDSWAP;
 }

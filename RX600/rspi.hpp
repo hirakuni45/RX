@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・RSPI[abc] 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -54,7 +54,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> SPE;
 			bit_rw_t<io_, bitpos::B7> SPRIE;
 		};
-		static spcr_t<base + 0x00> SPCR;
+		typedef spcr_t<base + 0x00> SPCR_;
+		static SPCR_ SPCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -76,7 +77,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2> SSLP2;
 			bit_rw_t<io_, bitpos::B3> SSLP3;
 		};
-		static sslp_t<base + 0x01> SSLP;
+		typedef sslp_t<base + 0x01> SSLP_;
+		static SSLP_ SSLP;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -98,7 +100,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>	MOIFV;
 			bit_rw_t<io_, bitpos::B5>	MOIFE;
 		};
-		static sppcr_t<base + 0x02> SPPCR;
+		typedef sppcr_t<base + 0x02> SPPCR_;
+		static SPPCR_ SPPCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -122,7 +125,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5> SPTEF;
 			bit_rw_t<io_, bitpos::B7> SPRF;
 		};
-		static spsr_t<base + 0x03> SPSR;
+		typedef spsr_t<base + 0x03> SPSR_;
+		static SPSR_ SPSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -141,7 +145,8 @@ namespace device {
 
 			rw16_t<ofs> H;
 		};
-		static spdr_t<base + 0x04> SPDR;
+		typedef spdr_t<base + 0x04> SPDR_;
+		static SPDR_ SPDR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -160,7 +165,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> SPSLN;
 		};
-		static spscr_t<base + 0x08> SPSCR;
+		typedef spscr_t<base + 0x08> SPSCR_;
+		static SPSCR_ SPSCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -180,7 +186,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 3> SPCP;
 			bits_rw_t<io_, bitpos::B4, 3> SPECM;
 		};
-		static spssr_t<base + 0x09> SPSSR;
+		typedef spssr_t<base + 0x09> SPSSR_;
+		static SPSSR_ SPSSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -188,7 +195,8 @@ namespace device {
 			@brief  RSPI ビットレートレジスタ（SPBR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<base + 0x0A> SPBR;
+		typedef rw8_t<base + 0x0A> SPBR_;
+		static SPBR_ SPBR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -209,7 +217,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B4>    SPRDTD;
 			bit_rw_t <io_, bitpos::B5>    SPLW;
 		};
-		static spdcr_t<base + 0x0B> SPDCR;
+		typedef spdcr_t<base + 0x0B> SPDCR_;
+		static SPDCR_ SPDCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -228,7 +237,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> SCKDL;
 		};
-		static spckd_t<base + 0x0C> SPCKD;
+		typedef spckd_t<base + 0x0C> SPCKD_;
+		static SPCKD_ SPCKD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -247,7 +257,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> SLNDL;
 		};
-		static sslnd_t<base + 0x0D> SSLND;
+		typedef sslnd_t<base + 0x0D> SSLND_;
+		static SSLND_ SSLND;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -266,7 +277,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> SPNDL;
 		};
-		static spnd_t<base + 0x0E> SPND;
+		typedef spnd_t<base + 0x0E> SPND_;
+		static SPND_ SPND;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -289,7 +301,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3> PTE;
 			bit_rw_t<io_, bitpos::B4> SCKASE;
 		};
-		static spcr2_t<base + 0x0F> SPCR2;
+		typedef spcr2_t<base + 0x0F> SPCR2_;
+		static SPCR2_ SPCR2;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -317,14 +330,22 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>   SLNDEN;
 			bit_rw_t <io_, bitpos::B15>   SCKDEN;
 		};
-		static spcmd_t<base + 0x10> SPCMD0;
-		static spcmd_t<base + 0x12> SPCMD1;
-		static spcmd_t<base + 0x14> SPCMD2;
-		static spcmd_t<base + 0x16> SPCMD3;
-		static spcmd_t<base + 0x18> SPCMD4;
-		static spcmd_t<base + 0x1A> SPCMD5;
-		static spcmd_t<base + 0x1C> SPCMD6;
-		static spcmd_t<base + 0x1E> SPCMD7;
+		typedef spcmd_t<base + 0x10> SPCMD0_;
+		typedef spcmd_t<base + 0x12> SPCMD1_;
+		typedef spcmd_t<base + 0x14> SPCMD2_;
+		typedef spcmd_t<base + 0x16> SPCMD3_;
+		typedef spcmd_t<base + 0x18> SPCMD4_;
+		typedef spcmd_t<base + 0x1A> SPCMD5_;
+		typedef spcmd_t<base + 0x1C> SPCMD6_;
+		typedef spcmd_t<base + 0x1E> SPCMD7_;
+		static SPCMD0_ SPCMD0;
+		static SPCMD1_ SPCMD1;
+		static SPCMD2_ SPCMD2;
+		static SPCMD3_ SPCMD3;
+		static SPCMD4_ SPCMD4;
+		static SPCMD5_ SPCMD5;
+		static SPCMD6_ SPCMD6;
+		static SPCMD7_ SPCMD7;
 
 
 		//-----------------------------------------------------------------//
@@ -337,6 +358,48 @@ namespace device {
 			return (base >> 5) & 3;
 		}
 	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPCR_ rspi_t<base, per, txv, rxv, pclk>::SPCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SSLP_ rspi_t<base, per, txv, rxv, pclk>::SSLP;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPPCR_ rspi_t<base, per, txv, rxv, pclk>::SPPCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPSR_ rspi_t<base, per, txv, rxv, pclk>::SPSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPDR_ rspi_t<base, per, txv, rxv, pclk>::SPDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPSCR_ rspi_t<base, per, txv, rxv, pclk>::SPSCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPSSR_ rspi_t<base, per, txv, rxv, pclk>::SPSSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPBR_ rspi_t<base, per, txv, rxv, pclk>::SPBR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPDCR_ rspi_t<base, per, txv, rxv, pclk>::SPDCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPCKD_ rspi_t<base, per, txv, rxv, pclk>::SPCKD;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SSLND_ rspi_t<base, per, txv, rxv, pclk>::SSLND;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPND_ rspi_t<base, per, txv, rxv, pclk>::SPND;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPCR2_ rspi_t<base, per, txv, rxv, pclk>::SPCR2;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD0_ rspi_t<base, per, txv, rxv, pclk>::SPCMD0;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD1_ rspi_t<base, per, txv, rxv, pclk>::SPCMD1;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD2_ rspi_t<base, per, txv, rxv, pclk>::SPCMD2;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD3_ rspi_t<base, per, txv, rxv, pclk>::SPCMD3;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD4_ rspi_t<base, per, txv, rxv, pclk>::SPCMD4;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD5_ rspi_t<base, per, txv, rxv, pclk>::SPCMD5;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD6_ rspi_t<base, per, txv, rxv, pclk>::SPCMD6;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, uint32_t pclk>
+		typename rspi_t<base, per, txv, rxv, pclk>::SPCMD7_ rspi_t<base, per, txv, rxv, pclk>::SPCMD7;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//

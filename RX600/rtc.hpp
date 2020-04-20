@@ -28,7 +28,6 @@ namespace device {
 
 		static const auto PERIPHERAL = per;	///< ペリフェラル型
 
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  64Hz カウンタ（R64CNT）
@@ -79,7 +78,8 @@ namespace device {
 			@brief  バイナリカウンタ 0（BCNT0）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<0x0008C402> BCNT0;
+		typedef rw8_t<0x0008C402> BCNT0_;
+		static BCNT0_ BCNT0;
 
 
 		//-----------------------------------------------------------------//
@@ -107,7 +107,8 @@ namespace device {
 			@brief  バイナリカウンタ 1（BCNT1）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<0x0008C404> BCNT1;
+		typedef rw8_t<0x0008C404> BCNT1_;
+		static BCNT1_ BCNT1;
 
 
 		//-----------------------------------------------------------------//
@@ -136,7 +137,8 @@ namespace device {
 			@brief  バイナリカウンタ 2（BCNT2）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<0x0008C406> BCNT2;
+		typedef rw8_t<0x0008C406> BCNT2_;
+		static BCNT2_ BCNT2;
 
 
 		//-----------------------------------------------------------------//
@@ -163,7 +165,8 @@ namespace device {
 			@brief  バイナリカウンタ 3（BCNT3）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<0x0008C408> BCNT3;
+		typedef rw8_t<0x0008C408> BCNT3_;
+		static BCNT3_ BCNT3;
 
 
 		//-----------------------------------------------------------------//
@@ -476,7 +479,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B3>	  RTCOS;
 			bits_rw_t<io_, bitpos::B4, 4> PES;
 		};
-		static rcr1_t<0x0008C422> RCR1;
+		typedef rcr1_t<0x0008C422> RCR1_;
+		static RCR1_ RCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -502,7 +506,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  HR24;
 			bit_rw_t<io_, bitpos::B7>  CNTMD;
 		};
-		static rcr2_t<0x0008C424> RCR2;
+		typedef rcr2_t<0x0008C424> RCR2_;
+		static RCR2_ RCR2;
 
 
 		//-----------------------------------------------------------------//
@@ -522,7 +527,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>	  RTCEN;
 			bits_rw_t<io_, bitpos::B1, 3> RTCDV;
 		};
-		static rcr3_t<0x0008C426> RCR3;
+		typedef rcr3_t<0x0008C426> RCR3_;
+		static RCR3_ RCR3;
 
 
 		//-----------------------------------------------------------------//
@@ -541,7 +547,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>	  RCKSEL;
 		};
-		static rcr4_t<0x0008C428> RCR4;
+		typedef rcr4_t<0x0008C428> RCR4_;
+		static RCR4_ RCR4;
 
 
 		//-----------------------------------------------------------------//
@@ -811,4 +818,14 @@ namespace device {
 		static rmoncpy_t<0x0008C47C> RMONCP2;
 	};
 	typedef rtc_t<peripheral::RTC> RTC;
+
+	template<peripheral per> typename rtc_t<per>::RCR1_ rtc_t<per>::RCR1;
+	template<peripheral per> typename rtc_t<per>::RCR2_ rtc_t<per>::RCR2;
+	template<peripheral per> typename rtc_t<per>::RCR3_ rtc_t<per>::RCR3;
+	template<peripheral per> typename rtc_t<per>::RCR4_ rtc_t<per>::RCR4;
+
+	template<peripheral per> typename rtc_t<per>::BCNT0_ rtc_t<per>::BCNT0;
+	template<peripheral per> typename rtc_t<per>::BCNT1_ rtc_t<per>::BCNT1;
+	template<peripheral per> typename rtc_t<per>::BCNT2_ rtc_t<per>::BCNT2;
+	template<peripheral per> typename rtc_t<per>::BCNT3_ rtc_t<per>::BCNT3;
 }
