@@ -83,6 +83,9 @@ namespace device {
 
 			USBR0	= 90,	///< USB0
 
+			IWUNI   = 95,  // IWDT
+			WUNI    = 96,  // WDT
+
 			RXI8	= 100,	///< SCI8
 			TXI8	= 101,	///< SCI8
 			RXI9	= 102,	///< SCI9
