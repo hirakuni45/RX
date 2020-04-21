@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ　DTCa 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -40,7 +40,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B4> RRS;
 		};
-		static dtccr_t<0x00082400> DTCCR;
+		typedef dtccr_t<0x00082400> DTCCR_;
+		static  DTCCR_ DTCCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -48,7 +49,8 @@ namespace device {
 			@brief  DTC ベクタベースレジスタ（DTCVBR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<0x00082404> DTCVBR;
+		typedef rw32_t<0x00082404> DTCVBR_;
+		static  DTCVBR_ DTCVBR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -67,7 +69,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> SHORT;
 		};
-		static dtcadmod_t<0x00082408> DTCADMOD;
+		typedef dtcadmod_t<0x00082408> DTCADMOD_;
+		static  DTCADMOD_ DTCADMOD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -86,7 +89,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> DTCST;
 		};
-		static dtcst_t<0x0008240C> DTCST;
+		typedef dtcst_t<0x0008240C> DTCST_;
+		static  DTCST_ DTCST;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -106,8 +110,15 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 8> VECN;
 			bit_rw_t <io_, bitpos::B15>   ACT;
 		};
-		static dtcsts_t<0x0008240E> DTCSTS;
+		typedef dtcsts_t<0x0008240E> DTCSTS_;
+		static  DTCSTS_ DTCSTS;
 	};
+	template <peripheral per> typename dtc_t<per>::DTCCR_ dtc_t<per>::DTCCR;
+	template <peripheral per> typename dtc_t<per>::DTCVBR_ dtc_t<per>::DTCVBR;
+	template <peripheral per> typename dtc_t<per>::DTCADMOD_ dtc_t<per>::DTCADMOD;
+	template <peripheral per> typename dtc_t<per>::DTCST_ dtc_t<per>::DTCST;
+	template <peripheral per> typename dtc_t<per>::DTCSTS_ dtc_t<per>::DTCSTS;
+
 
 	typedef dtc_t<peripheral::DTC>  DTC;
 }
