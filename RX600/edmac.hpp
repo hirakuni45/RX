@@ -2,16 +2,16 @@
 //=====================================================================//
 /*!	@file
 	@brief	イーサネットコントローラ用 DMA コントローラ (EDMACa) @n
-			RX64M/RX71M/RX65N
+			RX64M/RX71M/RX65N/RX72M/RX72N/RX66N
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include "common/device.hpp"
 
-/// CMPC モジュールが無いデバイスでエラーとする
+/// EDMAC モジュールが無いデバイスでエラーとする
 #if defined(SIG_RX24T) || defined(SIG_RX66T)
 #  error "edmac.hpp: This module does not exist"
 #endif
@@ -50,7 +50,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> DE;
 
 		};
-		static edmr_t<base + 0x00> EDMR;
+		typedef edmr_t<base + 0x00> EDMR_;
+		static  EDMR_ EDMR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -70,7 +71,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> TR;
 
 		};
-		static edtrr_t<base + 0x08> EDTRR;
+		typedef edtrr_t<base + 0x08> EDTRR_;
+		static  EDTRR_ EDTRR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -89,7 +91,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> RR;
 		};
-		static edrrr_t<base + 0x10> EDRRR;
+		typedef edrrr_t<base + 0x10> EDRRR_;
+		static  EDRRR_ EDRRR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -97,7 +100,8 @@ namespace device {
 			@brief  送信ディスクリプタリスト先頭アドレスレジスタ（TDLAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x18> TDLAR;
+		typedef rw32_t<base + 0x18> TDLAR_;
+		static  TDLAR_ TDLAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -105,7 +109,8 @@ namespace device {
 			@brief  受信ディスクリプタリスト先頭アドレスレジスタ（RDLAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x20> RDLAR;
+		typedef rw32_t<base + 0x20> RDLAR_;
+		static  RDLAR_ RDLAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -124,7 +129,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> MFC;
 		};
-		static rmfcr_t<base + 0x40> RMFCR;
+		typedef rmfcr_t<base + 0x40> RMFCR_;
+		static  RMFCR_ RMFCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -143,7 +149,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 11> TFT;
 		};
-		static tftr_t<base + 0x48> TFTR;
+		typedef tftr_t<base + 0x48> TFTR_;
+		static  TFTR_ TFTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -163,7 +170,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 5> RFD;
 			bits_rw_t<io_, bitpos::B8, 5> TFD;
 		};
-		static fdr_t<base + 0x50> FDR;
+		typedef fdr_t<base + 0x50> FDR_;
+		static  FDR_ FDR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -182,7 +190,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> RNR;
 		};
-		static rmcr_t<base + 0x58> RMCR;
+		typedef rmcr_t<base + 0x58> RMCR_;
+		static  RMCR_ RMCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -201,7 +210,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> UNDER;
 		};
-		static tfucr_t<base + 0x64> TFUCR;
+		typedef tfucr_t<base + 0x64> TFUCR_;
+		static  TFUCR_ TFUCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -220,7 +230,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16> OVER;
 		};
-		static rfocr_t<base + 0x68> RFOCR;
+		typedef rfocr_t<base + 0x68> RFOCR_;
+		static  RFOCR_ RFOCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -241,7 +252,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 3> RFFO;
 		};
-		static fcftr_t<base + 0x70> FCFTR;
+		typedef fcftr_t<base + 0x70> FCFTR_;
+		static  FCFTR_ FCFTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -262,7 +274,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 2> PADS;
 		};
-		static rpadir_t<base + 0x78> RPADIR;
+		typedef rpadir_t<base + 0x78> RPADIR_;
+		static  RPADIR_ RPADIR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -283,7 +296,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B4> TIM;
 		};
-		static trimd_t<base + 0x7C> TRIMD;
+		typedef trimd_t<base + 0x7C> TRIMD_;
+		static  TRIMD_ TRIMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -291,7 +305,8 @@ namespace device {
 			@brief  受信バッファライトアドレスレジスタ（RBWAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xC8> RBWAR;
+		typedef rw32_t<base + 0xC8> RBWAR_;
+		static  RBWAR_ RBWAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -299,7 +314,8 @@ namespace device {
 			@brief  受信ディスクリプタフェッチアドレスレジスタ（RDFAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xCC> RDFAR;
+		typedef rw32_t<base + 0xCC> RDFAR_;
+		static  RDFAR_ RDFAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -307,7 +323,8 @@ namespace device {
 			@brief  送信バッファリードアドレスレジスタ（TBRAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xD4> TBRAR;
+		typedef rw32_t<base + 0xD4> TBRAR_;
+		static  TBRAR_ TBRAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -315,8 +332,27 @@ namespace device {
 			@brief  送信ディスクリプタフェッチアドレスレジスタ（TDFAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0xD8> TDFAR;
+		typedef rw32_t<base + 0xD8> TDFAR_;
+		static  TDFAR_ TDFAR;
 	};
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::EDMR_ edmac_core_t<base, per>::EDMR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::EDTRR_ edmac_core_t<base, per>::EDTRR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::EDRRR_ edmac_core_t<base, per>::EDRRR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::TDLAR_ edmac_core_t<base, per>::TDLAR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::RDLAR_ edmac_core_t<base, per>::RDLAR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::RMFCR_ edmac_core_t<base, per>::RMFCR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::TFTR_ edmac_core_t<base, per>::TFTR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::FDR_ edmac_core_t<base, per>::FDR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::RMCR_ edmac_core_t<base, per>::RMCR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::TFUCR_ edmac_core_t<base, per>::TFUCR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::RFOCR_ edmac_core_t<base, per>::RFOCR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::FCFTR_ edmac_core_t<base, per>::FCFTR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::RPADIR_ edmac_core_t<base, per>::RPADIR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::TRIMD_ edmac_core_t<base, per>::TRIMD;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::RBWAR_ edmac_core_t<base, per>::RBWAR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::RDFAR_ edmac_core_t<base, per>::RDFAR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::TBRAR_ edmac_core_t<base, per>::TBRAR;
+	template <uint32_t base, peripheral per> typename edmac_core_t<base, per>::TDFAR_ edmac_core_t<base, per>::TDFAR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -369,7 +405,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B30> TWB;
 		};
-		static eesr_t<base + 0x28> EESR;
+		typedef eesr_t<base + 0x28> EESR_;
+		static  EESR_ EESR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -412,7 +449,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B30> TWBIP;
 		};
-		static eesipr_t<base + 0x30> EESIPR;
+		typedef eesipr_t<base + 0x30> EESIPR_;
+		static  EESIPR_ EESIPR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -433,7 +471,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B7>  RMAFCE;
 		};
-		static trscer_t<base + 0x38> TRSCER;
+		typedef trscer_t<base + 0x38> TRSCER_;
+		static  TRSCER_ TRSCER;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -452,8 +491,13 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> ELB;
 		};
-		static iosr_t<base + 0x6C> IOSR;
+		typedef iosr_t<base + 0x6C> IOSR_;
+		static  IOSR_ IOSR;
 	};
+	template <uint32_t base, peripheral per> typename edmac_t<base, per>::EESR_ edmac_t<base, per>::EESR;
+	template <uint32_t base, peripheral per> typename edmac_t<base, per>::EESIPR_ edmac_t<base, per>::EESIPR;
+	template <uint32_t base, peripheral per> typename edmac_t<base, per>::TRSCER_ edmac_t<base, per>::TRSCER;
+	template <uint32_t base, peripheral per> typename edmac_t<base, per>::IOSR_ edmac_t<base, per>::IOSR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -500,7 +544,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B30>    TWB;
 		};
-		static eesr_t<base + 0x28> EESR;
+		typedef eesr_t<base + 0x28> EESR_;
+		static  EESR_ EESR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -536,8 +581,11 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B30>  TWBIP;
 		};
-		static eesipr_t<base + 0x30> EESIPR;
+		typedef eesipr_t<base + 0x30> EESIPR_;
+		static  EESIPR_ EESIPR;
 	};
+	template <uint32_t base, peripheral per> typename ptpedmac_t<base, per>::EESR_ ptpedmac_t<base, per>::EESR;
+	template <uint32_t base, peripheral per> typename ptpedmac_t<base, per>::EESIPR_ ptpedmac_t<base, per>::EESIPR;
 
 	typedef edmac_t<0x000C0000, peripheral::EDMAC0>      EDMAC0;
 	typedef edmac_t<0x000C0200, peripheral::EDMAC1>      EDMAC1;
