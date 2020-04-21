@@ -214,7 +214,7 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB22 = f;
 				break;
 
-			case peripheral::CRCA:
+			case peripheral::CRC:
 				SYSTEM::MSTPCRB.MSTPB23 = f;
 				break;
 
