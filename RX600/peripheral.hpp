@@ -140,6 +140,8 @@ namespace device {
 
 		R12DA,		///< 12 ビット D/A コンバータ（R12DA）
 
+		DOC,		///< データ演算回路（DOC）
+
 		ECCRAM,		///< ECC RAM (32K)
 		STBRAM,		///< Standby RAM (8K)
 
