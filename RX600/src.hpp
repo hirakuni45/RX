@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・SRC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -29,7 +29,8 @@ namespace device {
 			@brief  入力データレジスタ（ SRCID ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x0009DFF0> SRCID;
+		typedef rw32_t<0x0009DFF0> SRCID_;
+		static  SRCID_ SRCID;
 
 
 		//-----------------------------------------------------------------//
@@ -37,7 +38,8 @@ namespace device {
 			@brief  出力データレジスタ（ SRCOD ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x0009DFF4> SRCOD;
+		typedef rw32_t<0x0009DFF4> SRCOD_;
+		static  SRCOD_ SRCOD;
 
 
 		//-----------------------------------------------------------------//
@@ -58,7 +60,8 @@ namespace device {
 			bit_rw_t< io_, bitpos::B8>     IEN;
 			bit_rw_t< io_, bitpos::B9>     IED;
 		};
-		static srcidctrl_t<0x0009DFF8> SRCIDCTRL;
+		typedef srcidctrl_t<0x0009DFF8> SRCIDCTRL_;
+		static  SRCIDCTRL_ SRCIDCTRL;
 
 
 		//-----------------------------------------------------------------//
@@ -80,7 +83,8 @@ namespace device {
 			bit_rw_t< io_, bitpos::B9>     OED;
 			bit_rw_t< io_, bitpos::B10>    OCH;
 		};
-		static srcodctrl_t<0x0009DFFA> SRCODCTRL;
+		typedef srcodctrl_t<0x0009DFFA> SRCODCTRL_;
+		static  SRCODCTRL_ SRCODCTRL;
 
 
 		//-----------------------------------------------------------------//
@@ -108,7 +112,8 @@ namespace device {
 
 			bit_rw_t< io_, bitpos::B15>    FICRAE;
 		};
-		static srcctrl_t<0x0009DFFC> SRCCTRL;
+		typedef srcctrl_t<0x0009DFFC> SRCCTRL_;
+		static  SRCCTRL_ SRCCTRL;
 
 
 		//-----------------------------------------------------------------//
@@ -137,7 +142,8 @@ namespace device {
 			bits_rw_t<ro_, bitpos::B11, 5> OFDN;
 
 		};
-		static srcstat_t<0x0009DFFE> SRCSTAT;
+		typedef srcstat_t<0x0009DFFE> SRCSTAT_;
+		static  SRCSTAT_ SRCSTAT;
 
 
 		//-----------------------------------------------------------------//
@@ -156,7 +162,17 @@ namespace device {
 
 //			void operator[] (uint16_t idx) { put(idx, val); }
 		};
-		static srcfctr_t<0x00098000> SRCFCTR;
+		typedef srcfctr_t<0x00098000> SRCFCTR_;
+		static  SRCFCTR_ SRCFCTR;
 	};
+	template <peripheral per> typename src_t<per>::SRCID_ src_t<per>::SRCID;
+	template <peripheral per> typename src_t<per>::SRCOD_ src_t<per>::SRCOD;
+	template <peripheral per> typename src_t<per>::SRCIDCTRL_ src_t<per>::SRCIDCTRL;
+	template <peripheral per> typename src_t<per>::SRCODCTRL_ src_t<per>::SRCODCTRL;
+	template <peripheral per> typename src_t<per>::SRCCTRL_ src_t<per>::SRCCTRL;
+	template <peripheral per> typename src_t<per>::SRCSTAT_ src_t<per>::SRCSTAT;
+	template <peripheral per> typename src_t<per>::SRCFCTR_ src_t<per>::SRCFCTR;
+
+
 	typedef src_t<peripheral::SRC> SRC;
 }
