@@ -115,6 +115,8 @@ namespace device {
 
 		QSPI,		///< クワッドシリアルペリフェラルインタフェース（QSPI）
 
+		CRC,		///< CRC 演算器（CRCA）
+
 		SDHI,		///< SD ホストインタフェース（SDHI）
 		SDSI,		///< SD スレーブインタフェース（SDSI）
 
