@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ　EXDMAC 定義 (a)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -29,7 +29,8 @@ namespace device {
 			@brief  EXDMA 転送元アドレスレジスタ（EDMSAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x00> EDMSAR;
+		typedef rw32_t<base + 0x00> EDMSAR_;
+		static  EDMSAR_ EDMSAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -37,7 +38,8 @@ namespace device {
 			@brief  EXDMA 転送先アドレスレジスタ（EDMDAR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x04> EDMDAR;
+		typedef rw32_t<base + 0x04> EDMDAR_;
+		static  EDMDAR_ EDMDAR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -45,7 +47,8 @@ namespace device {
 			@brief  EXDMA 転送カウントレジスタ（EDMCRA）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x08> EDMCRA;
+		typedef rw32_t<base + 0x08> EDMCRA_;
+		static  EDMCRA_ EDMCRA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -53,7 +56,8 @@ namespace device {
 			@brief  EXDMA ブロック転送カウントレジスタ（EDMCRB）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw16_t<base + 0x0C> EDMCRB;
+		typedef rw16_t<base + 0x0C> EDMCRB_;
+		static  EDMCRB_ EDMCRB;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -77,7 +81,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B12, 2> DTS;
 			bits_rw_t<io_, bitpos::B14, 2> MD;
 		};
-		static edmtmd_t<base + 0x10> EDMTMD;
+		typedef edmtmd_t<base + 0x10> EDMTMD_;
+		static  EDMTMD_ EDMTMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -99,7 +104,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2> DACKE;
 			bit_rw_t<io_, bitpos::B3> DACKS;
 		};
-		static edmomd_t<base + 0x12> EDMOMD;
+		typedef edmomd_t<base + 0x12> EDMOMD_;
+		static  EDMOMD_ EDMOMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -122,7 +128,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3> ESIE;
 			bit_rw_t<io_, bitpos::B4> DTIE;
 		};
-		static edmint_t<base + 0x13> EDMINT;
+		typedef edmint_t<base + 0x13> EDMINT_;
+		static  EDMINT_ EDMINT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -148,7 +155,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B16>     DIR;
 			bit_rw_t <io_, bitpos::B17>     AMS;
 		};
-		static edmamd_t<base + 0x14> EDMAMD;
+		typedef edmamd_t<base + 0x14> EDMAMD_;
+		static  EDMAMD_ EDMAMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -167,7 +175,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> DTE;
 		};
-		static edmcnt_t<base + 0x1C> EDMCNT;
+		typedef edmcnt_t<base + 0x1C> EDMCNT_;
+		static  EDMCNT_ EDMCNT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -187,7 +196,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0> SWREQ;
 			bit_rw_t<io_, bitpos::B4> CLRS;
 		};
-		static edmreq_t<base + 0x1D> EDMREQ;
+		typedef edmreq_t<base + 0x1D> EDMREQ_;
+		static  EDMREQ_ EDMREQ;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -209,7 +219,8 @@ namespace device {
 
 			bit_ro_t<io_, bitpos::B7> ACT;
 		};
-		static edmsts_t<base + 0x1E> EDMSTS;
+		typedef edmsts_t<base + 0x1E> EDMSTS_;
+		static  EDMSTS_ EDMSTS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -228,7 +239,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> DREQS;
 		};
-		static edmrmd_t<base + 0x20> EDMRMD;
+		typedef edmrmd_t<base + 0x20> EDMRMD_;
+		static  EDMRMD_ EDMRMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -247,7 +259,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> EREQ;
 		};
-		static edmerf_t<base + 0x21> EDMERF;
+		typedef edmerf_t<base + 0x21> EDMERF_;
+		static  EDMERF_ EDMERF;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -266,7 +279,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> PREQ;
 		};
-		static edmprf_t<base + 0x22> EDMPRF;
+		typedef edmprf_t<base + 0x22> EDMPRF_;
+		static  EDMPRF_ EDMPRF;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -285,7 +299,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> DMST;
 		};
-		static edmast_t<0x00082A00> EDMAST;
+		typedef edmast_t<0x00082A00> EDMAST_;
+		static  EDMAST_ EDMAST;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -293,15 +308,46 @@ namespace device {
 			@brief  クラスタバッファレジスタ y（CLSBRy）（y = 0 ～ 7）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<0x00082BE0> CLSBR0;
-		static rw32_t<0x00082BE4> CLSBR1;
-		static rw32_t<0x00082BE8> CLSBR2;
-		static rw32_t<0x00082BEC> CLSBR3;
-		static rw32_t<0x00082BF0> CLSBR4;
-		static rw32_t<0x00082BF4> CLSBR5;
-		static rw32_t<0x00082BF8> CLSBR6;
-		static rw32_t<0x00082BFC> CLSBR7;
+		typedef rw32_t<0x00082BE0> CLSBR0_;
+		static  CLSBR0_ CLSBR0;
+		typedef rw32_t<0x00082BE4> CLSBR1_;
+		static  CLSBR1_ CLSBR1;
+		typedef rw32_t<0x00082BE8> CLSBR2_;
+		static  CLSBR2_ CLSBR2;
+		typedef rw32_t<0x00082BEC> CLSBR3_;
+		static  CLSBR3_ CLSBR3;
+		typedef rw32_t<0x00082BF0> CLSBR4_;
+		static  CLSBR4_ CLSBR4;
+		typedef rw32_t<0x00082BF4> CLSBR5_;
+		static  CLSBR5_ CLSBR5;
+		typedef rw32_t<0x00082BF8> CLSBR6_;
+		static  CLSBR6_ CLSBR6;
+		typedef rw32_t<0x00082BFC> CLSBR7_;
+		static  CLSBR7_ CLSBR7;
 	};
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMSAR_ exdmac_core_t<base, per>::EDMSAR;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMDAR_ exdmac_core_t<base, per>::EDMDAR;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMCRA_ exdmac_core_t<base, per>::EDMCRA;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMCRB_ exdmac_core_t<base, per>::EDMCRB;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMTMD_ exdmac_core_t<base, per>::EDMTMD;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMOMD_ exdmac_core_t<base, per>::EDMOMD;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMINT_ exdmac_core_t<base, per>::EDMINT;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMAMD_ exdmac_core_t<base, per>::EDMAMD;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMCNT_ exdmac_core_t<base, per>::EDMCNT;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMREQ_ exdmac_core_t<base, per>::EDMREQ;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMSTS_ exdmac_core_t<base, per>::EDMSTS;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMRMD_ exdmac_core_t<base, per>::EDMRMD;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMERF_ exdmac_core_t<base, per>::EDMERF;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMPRF_ exdmac_core_t<base, per>::EDMPRF;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::EDMAST_ exdmac_core_t<base, per>::EDMAST;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR0_ exdmac_core_t<base, per>::CLSBR0;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR1_ exdmac_core_t<base, per>::CLSBR1;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR2_ exdmac_core_t<base, per>::CLSBR2;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR3_ exdmac_core_t<base, per>::CLSBR3;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR4_ exdmac_core_t<base, per>::CLSBR4;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR5_ exdmac_core_t<base, per>::CLSBR5;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR6_ exdmac_core_t<base, per>::CLSBR6;
+	template <uint32_t base, peripheral per> typename exdmac_core_t<base, per>::CLSBR7_ exdmac_core_t<base, per>::CLSBR7;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -314,15 +360,16 @@ namespace device {
 	template <uint32_t base, peripheral per>
 	struct exdmac0_t : public exdmac_core_t<base, per> {
 
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  EXDMA オフセットレジスタ（EDMOFR）
 			@param[in]	ofs	オフセット
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x18> EDMOFR;
+		typedef rw32_t<base + 0x18> EDMOFR_;
+		static  EDMOFR_ EDMOFR;
 	};
+	template <uint32_t base, peripheral per> typename exdmac0_t<base, per>::EDMOFR_ exdmac0_t<base, per>::EDMOFR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -334,8 +381,8 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per>
 	struct exdmac1_t : public exdmac_core_t<base, per> {
-
 	};
+
 
 	typedef exdmac0_t<0x00082800, peripheral::EXDMAC0>  EXDMAC0;
 	typedef exdmac1_t<0x00082840, peripheral::EXDMAC1>  EXDMAC1;
