@@ -16,10 +16,13 @@ namespace device {
 	/*!
 		@brief  CRC 演算器クラス
 		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
+	template <uint32_t base, peripheral per>
 	struct crc_t {
+
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -60,10 +63,13 @@ namespace device {
 		typedef rw16_t<base + 0x02> CRCDOR_;
 		static CRCDOR_ CRCDOR;
 	};
-	template <uint32_t base> typename crc_t<base>::CRCCR_  crc_t<base>::CRCCR;
-	template <uint32_t base> typename crc_t<base>::CRCDIR_ crc_t<base>::CRCDIR;
-	template <uint32_t base> typename crc_t<base>::CRCDOR_ crc_t<base>::CRCDOR;
+	template <uint32_t base, peripheral per>
+		typename crc_t<base, per>::CRCCR_  crc_t<base, per>::CRCCR;
+	template <uint32_t base, peripheral per>
+		typename crc_t<base, per>::CRCDIR_ crc_t<base, per>::CRCDIR;
+	template <uint32_t base, peripheral per>
+		typename crc_t<base, per>::CRCDOR_ crc_t<base, per>::CRCDOR;
 
 
-	typedef crc_t<0x00088280> CRC;
+	typedef crc_t<0x00088280, peripheral::CRC> CRC;
 }
