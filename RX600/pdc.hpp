@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M/RX71M グループ・PDC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -22,7 +22,9 @@ namespace device {
 	struct pdc_t {
 
 		static const auto PERIPHERAL = per;	///< ペリフェラル型
-
+		static const auto VEC_DFI = ICU::VECTOR::PCDFI;		///< 受信データレディ割り込み
+		static const auto VEC_FEI = ICU::VECTOR_BL0::PCFEI;	///< フレームエンド割り込み
+		static const auto VEC_ERI = ICU::VECTOR_BL0::PCERI;	///< エラー割り込み
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -52,7 +54,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B11, 3>  PCKDIV;
 			bit_rw_t <io_, bitpos::B14>     EDS;
 		};
-		static pccr0_t<0x000A0500>  PCCR0;
+		typedef pccr0_t<0x000A0500>  PCCR0_;
+		static  PCCR0_ PCCR0;
 
 
 		//-----------------------------------------------------------------//
@@ -71,7 +74,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>      PCE;
 		};
-		static pccr1_t<0x000A0504>  PCCR1;
+		typedef pccr1_t<0x000A0504>  PCCR1_;
+		static  PCCR1_ PCCR1;
 
 
 		//-----------------------------------------------------------------//
@@ -96,7 +100,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B5>  VERF;
 			bit_rw_t<io_, bitpos::B6>  HERF;
 		};
-		static pcsr_t<0x000A0508>  PCSR;
+		typedef pcsr_t<0x000A0508>  PCSR_;
+		static  PCSR_ PCSR;
 
 
 		//-----------------------------------------------------------------//
@@ -113,7 +118,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B0>  VSYNC;
 			bit_rw_t<io_, bitpos::B1>  HSYNC;
 		};
-		static pcmonr_t<0x000A050C>  PCMONR;
+		typedef pcmonr_t<0x000A050C>  PCMONR_;
+		static  PCMONR_ PCMONR;
 
 
 		//-----------------------------------------------------------------//
@@ -121,7 +127,8 @@ namespace device {
 			@brief  PDC 受信データレジスタ（ PCDR ）
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000A0510>  PCDR;
+		typedef rw32_t<0x000A0510>  PCDR_;
+		static  PCDR_ PCDR;
 
 
 		//-----------------------------------------------------------------//
@@ -141,7 +148,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  12>  VST;
 			bits_rw_t<io_, bitpos::B16, 12>  VSZ;
 		};
-		static vcr_t<0x000A0514>  VCR;
+		typedef vcr_t<0x000A0514>  VCR_;
+		static  VCR_ VCR;
 
 
 		//-----------------------------------------------------------------//
@@ -161,7 +169,17 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  12>  HST;
 			bits_rw_t<io_, bitpos::B16, 12>  HSZ;
 		};
-		static hcr_t<0x000A0518>  HCR;
+		typedef hcr_t<0x000A0518>  HCR_;
+		static  HCR_ HCR;
 	};
+	template <peripheral per> typename pdc_t<per>::PCCR0_  pdc_t<per>::PCCR0;
+	template <peripheral per> typename pdc_t<per>::PCCR1_  pdc_t<per>::PCCR1;
+	template <peripheral per> typename pdc_t<per>::PCSR_   pdc_t<per>::PCSR;
+	template <peripheral per> typename pdc_t<per>::PCMONR_ pdc_t<per>::PCMONR;
+	template <peripheral per> typename pdc_t<per>::PCDR_   pdc_t<per>::PCDR;
+	template <peripheral per> typename pdc_t<per>::VCR_    pdc_t<per>::VCR;
+	template <peripheral per> typename pdc_t<per>::HCR_    pdc_t<per>::HCR;
+
+
 	typedef pdc_t<peripheral::PDC> PDC;
 }
