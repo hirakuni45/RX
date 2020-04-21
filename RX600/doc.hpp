@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX24T グループ・DOC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,9 +16,10 @@ namespace device {
 	/*!
 		@brief  データ演算回路（DOC）
 		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
+	template <uint32_t base, peripheral per>
 	struct doc_t {
 
 		//-----------------------------------------------------------------//
@@ -41,7 +42,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B5>     DOPCF;
 			bit_rw_t <io_, bitpos::B6>     DOPCFCL;
 		};
-		static docr_t<base + 0x00> DOCR;
+		typedef docr_t<base + 0x00> DOCR_;
+		static  DOCR_ DOCR;
 
 
 		//-----------------------------------------------------------------//
@@ -49,7 +51,8 @@ namespace device {
 			@brief  DOC データインプットレジスタ（DODIR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x02> DODIR;
+		typedef rw16_t<base + 0x02> DODIR_;
+		static  DODIR_ DODIR;
 
 
 		//-----------------------------------------------------------------//
@@ -57,9 +60,16 @@ namespace device {
 			@brief  DOC データセッティングレジスタ（DODSR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x04> DODSR;
+		typedef rw16_t<base + 0x04> DODSR_;
+		static  DODSR_ DODSR;
 
 	};
+	template <uint32_t base, peripheral per>
+		typename doc_t<base, per>::DOCR_ doc_t<base, per>::DOCR;
+	template <uint32_t base, peripheral per>
+		typename doc_t<base, per>::DODIR_ doc_t<base, per>::DODIR;
+	template <uint32_t base, peripheral per>
+		typename doc_t<base, per>::DODSR_ doc_t<base, per>::DODSR;
 
 
 #if defined(SIG_RX24T)
@@ -70,18 +80,13 @@ namespace device {
 		@param[in]	vec		割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, ICU::VECTOR vec>
-	struct doc_norm_t : public doc_t<base> {
+	template <uint32_t base, peripheral per, ICU::VECTOR vec>
+	struct doc_norm_t : public doc_t<base, per> {
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_ivec() { return vec; }
+		static const auto I_VEC = vec;	///< 割り込みベクター
+
 	};
-	typedef doc_norm_t<0x0008B080, ICU::VECTOR::DOPCF> DOC;
+	typedef doc_norm_t<0x0008B080, peripheral::DOC, ICU::VECTOR::DOPCF> DOC;
 #endif
 
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T)
@@ -92,17 +97,12 @@ namespace device {
 		@param[in]	vec		割り込みベクター
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, ICU::VECTOR_BL0 vec>
-	struct doc_gbl0_t : public doc_t<base> {
+	template <uint32_t base, peripheral per, ICU::VECTOR_BL0 vec>
+	struct doc_gbl0_t : public doc_t<base, per> {
 
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_BL0 get_ivec() { return vec; }
+		static const auto I_VEC = vec;	///< 割り込みベクター
+
 	};
-	typedef doc_gbl0_t<0x0008B080, ICU::VECTOR_BL0::DOPCI> DOC;
+	typedef doc_gbl0_t<0x0008B080, peripheral::DOC, ICU::VECTOR_BL0::DOPCI> DOC;
 #endif
 }

@@ -123,6 +123,8 @@ namespace device {
 
 		QSPI,		///< クワッドシリアルペリフェラルインタフェース（QSPI）
 
+		CRC,		///< CRC 演算器（CRCA）
+
 		SSI0,		///< シリアルサウンドインタフェース（SSI）
 		SSI1,		///< シリアルサウンドインタフェース（SSI）
 		SRC,		///< サンプリングレートコンバータ（SRC）
@@ -137,6 +139,8 @@ namespace device {
 		S12AD1,		///< 12 ビット A/D コンバータ（S12ADC）
 
 		R12DA,		///< 12 ビット D/A コンバータ（R12DA）
+
+		DOC,		///< データ演算回路（DOC）
 
 		ECCRAM,		///< ECC RAM (32K)
 		STBRAM,		///< Standby RAM (8K)

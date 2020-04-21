@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・CRC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,10 +16,13 @@ namespace device {
 	/*!
 		@brief  CRC 演算器クラス
 		@param[in]	base	ベース・アドレス
+		@param[in]	per		ペリフェラル
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
+	template <uint32_t base, peripheral per>
 	struct crc_t {
+
+		static const auto PERIPHERAL = per;		///< ペリフェラル型
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -39,7 +42,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B2>     LMS;
 			bit_rw_t <io_, bitpos::B7>     DORCLR;
 		};
-		static crccr_t<base + 0x00> CRCCR;
+		typedef crccr_t<base + 0x00> CRCCR_;
+		static CRCCR_ CRCCR;
 
 
 		//-----------------------------------------------------------------//
@@ -47,7 +51,8 @@ namespace device {
 			@brief  CRC データ入力レジスタ（CRCDIR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x01> CRCDIR;
+		typedef rw8_t<base + 0x01> CRCDIR_;
+		static CRCDIR_ CRCDIR;
 
 
 		//-----------------------------------------------------------------//
@@ -55,8 +60,16 @@ namespace device {
 			@brief  CRC データ出力レジスタ（CRCDOR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw16_t<base + 0x02> CRCDOR;
-
+		typedef rw16_t<base + 0x02> CRCDOR_;
+		static CRCDOR_ CRCDOR;
 	};
-	typedef crc_t<0x00088280> CRC;
+	template <uint32_t base, peripheral per>
+		typename crc_t<base, per>::CRCCR_  crc_t<base, per>::CRCCR;
+	template <uint32_t base, peripheral per>
+		typename crc_t<base, per>::CRCDIR_ crc_t<base, per>::CRCDIR;
+	template <uint32_t base, peripheral per>
+		typename crc_t<base, per>::CRCDOR_ crc_t<base, per>::CRCDOR;
+
+
+	typedef crc_t<0x00088280, peripheral::CRC> CRC;
 }

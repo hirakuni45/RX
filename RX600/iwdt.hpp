@@ -135,7 +135,8 @@ namespace device {
 
 
 #if defined(SIG_RX24T)
-	typedef iwdt_t<0x00088030, ICU::VECTOR::IWUNI,  15'000> IWDT;
+	// interrupt vector: for NMI vector
+	typedef iwdt_t<0x00088030, ICU::VECTOR::NONE,  15'000> IWDT;
 #else
 	typedef iwdt_t<0x00088030, ICU::VECTOR::IWUNI, 120'000> IWDT;
 #endif
