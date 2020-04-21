@@ -3,7 +3,7 @@
 #   @file
 #   @brief  RX66T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -13,9 +13,8 @@ DEVICE		=	R5F566TE
 
 ROOT_DEV	=	RX66T
 
-OPTIMIZE	=	-O3
-
 BUILD		=	release
+# BUILD		=	debug
 
 VPATH		=	../../
 
@@ -83,6 +82,18 @@ CC_OPT		=	-Wall -Werror \
 				-Wno-unused-function \
 				-Wno-unused-variable \
 				-fno-exceptions
+
+ifeq ($(BUILD),debug)
+    CC_OPT += -g -DDEBUG
+    CP_OPT += -g -DDEBUG
+	OPTIMIZE = -O0
+endif
+
+ifeq ($(BUILD),release)
+    CC_OPT += -DNDEBUG
+    CP_OPT += -DNDEBUG
+	OPTIMIZE = -O3
+endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
 APPINCS		=	$(addprefix -I, $(INC_APP))

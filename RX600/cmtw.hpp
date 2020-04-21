@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M, RX65x, RX71M, RX72M グループ・CMTW 定義
+	@brief	RX64M, RX65x, RX71M, RX72M, RX72N グループ・CMTW 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -35,10 +35,12 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  タイマスタートレジスタ（CMWSTR）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct cmwstr_t : public rw16_t<base + 0x00> {
-			typedef rw16_t<base + 0x00> io_;
+		template <uint32_t ofs>
+		struct cmwstr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -46,16 +48,19 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B0>   STR;
 		};
-		static cmwstr_t CMWSTR;
+		typedef cmwstr_t<base + 0x00> CMWSTR_;
+		static  CMWSTR_ CMWSTR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  タイマコントロールレジスタ（CMWCR）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct cmwcr_t : public rw16_t<base + 0x04> {
-			typedef rw16_t<base + 0x04> io_;
+		template <uint32_t ofs>
+		struct cmwcr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -73,16 +78,19 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B13, 3>  CCLR;
 		};
-		static cmwcr_t CMWCR;
+		typedef cmwcr_t<base + 0x04> CMWCR_;
+		static  CMWCR_ CMWCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  タイマ I/O コントロールレジスタ（CMWIOR）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct cmwior_t : public rw16_t<base + 0x08> {
-			typedef rw16_t<base + 0x08> io_;
+		template <uint32_t ofs>
+		struct cmwior_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -102,7 +110,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B15>     CMWE;
 		};
-		static cmwior_t CMWIOR;
+		typedef cmwior_t<base + 0x08> CMWIOR_;
+		static  CMWIOR_ CMWIOR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -110,7 +119,8 @@ namespace device {
 			@brief  タイマカウンタ（CMWCNT）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x10> CMWCNT;
+		typedef rw32_t<base + 0x10> CMWCNT_;
+		static  CMWCNT_ CMWCNT;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -118,7 +128,8 @@ namespace device {
 			@brief  コンペアマッチコンスタントレジスタ（CMWCOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x14> CMWCOR;
+		typedef rw32_t<base + 0x14> CMWCOR_;
+		static  CMWCOR_ CMWCOR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -126,7 +137,8 @@ namespace device {
 			@brief  インプットキャプチャレジスタ 0（CMWICR0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x18> CMWICR0;
+		typedef rw32_t<base + 0x18> CMWICR0_;
+		static  CMWICR0_ CMWICR0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -134,7 +146,8 @@ namespace device {
 			@brief  インプットキャプチャレジスタ 1（CMWICR1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x1C> CMWICR1;
+		typedef rw32_t<base + 0x1C> CMWICR1_;
+		static  CMWICR1_ CMWICR1;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -142,7 +155,8 @@ namespace device {
 			@brief  アウトプットコンペアレジスタ 0（CMWOCR0）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x20> CMWOCR0;
+		typedef rw32_t<base + 0x20> CMWOCR0_;
+		static  CMWOCR0_ CMWOCR0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -150,8 +164,19 @@ namespace device {
 			@brief  アウトプットコンペアレジスタ 1（CMWOCR1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x24> CMWOCR1;
+		typedef rw32_t<base + 0x24> CMWOCR1_;
+		static  CMWOCR1_ CMWOCR1;
 	};
+
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::  CMWSTR_ cmtw_t<base, per, ivec>::CMWSTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::  CMWCR_ cmtw_t<base, per, ivec>::CMWCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::  CMWIOR_ cmtw_t<base, per, ivec>::CMWIOR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::  CMWCNT_ cmtw_t<base, per, ivec>::CMWCNT;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::  CMWCOR_ cmtw_t<base, per, ivec>::CMWCOR;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::  CMWICR0_ cmtw_t<base, per, ivec>::CMWICR0;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::  CMWICR1_ cmtw_t<base, per, ivec>::CMWICR1;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::  CMWOCR0_ cmtw_t<base, per, ivec>::CMWOCR0;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec> typename cmtw_t<base, per, ivec>::  CMWOCR1_ cmtw_t<base, per, ivec>::CMWOCR1;
 
 	typedef cmtw_t<0x00094200, peripheral::CMTW0, ICU::VECTOR::CMWI0> CMTW0;
 	typedef cmtw_t<0x00094280, peripheral::CMTW1, ICU::VECTOR::CMWI1> CMTW1;

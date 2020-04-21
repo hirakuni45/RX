@@ -70,7 +70,6 @@ namespace {
 	SCI		sci_;
 
 	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
-
 }
 
 extern "C" {
@@ -119,6 +118,12 @@ int main(int argc, char** argv)
 ///	utils::format("Start test for '%s' %d[MHz]\n") % system_str_ % iclk;
 
 ///
+
+
+	device::CAC::CACR1 = 0;
+
+	device::CMTW0::CMWOCR0 = 0;
+
 
 #if 0
 	utils::STR16 str;

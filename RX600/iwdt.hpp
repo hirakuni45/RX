@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・WDTA 定義
+	@brief	RX600 グループ・IWDT 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,26 +16,34 @@ namespace device {
 	/*!
 		@brief  独立ウォッチドッグタイマクラス
 		@param[in]	base	ベース・アドレス
+		@param[in]	ivec	割り込み要因
+		@param[in]	pclk	マスタークロック
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base>
+	template <uint32_t base, ICU::VECTOR ivec, uint32_t pclk>
 	struct iwdt_t {
+
+		static const auto IVEC = ivec;	///< 割り込みベクター
+		static const auto PCLK = pclk;	///< マスタークロック周波数
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  IWDT リフレッシュレジスタ（IWDTRR）
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x00> IWDTRR;
+		typedef rw8_t<base + 0x00> IWDTRR_;
+		static IWDTRR_ IWDTRR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	IWDT コントロールレジスタ（IWDTCR）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct iwdtcr_t : public rw16_t<base + 0x02> {
-			typedef rw16_t<base + 0x02> io_;
+		template <uint32_t ofs>
+		struct iwdtcr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -48,16 +56,19 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B12, 2> RPSS;
 		};
-		static iwdtcr_t IWDTCR;
+		typedef iwdtcr_t<base + 0x02> IWDTCR_;
+		static IWDTCR_ IWDTCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	IWDT ステータスレジスタ（IWDTSR）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct iwdtsr_t : public rw16_t<base + 0x04> {
-			typedef rw16_t<base + 0x04> io_;
+		template <uint32_t ofs>
+		struct iwdtsr_t : public rw16_t<ofs> {
+			typedef rw16_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -68,16 +79,19 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>    UNDFF;
 			bit_rw_t <io_, bitpos::B15>    REFEF;
 		};
-		static iwdtsr_t IWDTSR;
+		typedef iwdtsr_t<base + 0x04> IWDTSR_;
+		static IWDTSR_ IWDTSR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	IWDT リセットコントロールレジスタ（IWDTRCR）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct iwdtrcr_t : public rw8_t<base + 0x06> {
-			typedef rw8_t<base + 0x06> io_;
+		template <uint32_t ofs>
+		struct iwdtrcr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -85,16 +99,19 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>  RSTIRQS;
 		};
-		static iwdtrcr_t IWDTRCR;
+		typedef iwdtrcr_t<base + 0x06> IWDTRCR_;
+		static IWDTRCR_ IWDTRCR;
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	IWDT カウント停止コントロールレジスタ（IWDTCSTPR）
+			@param[in]	ofs		レジスタ・オフセット
 		*/
 		//-----------------------------------------------------------------//
-		struct iwdtcstpr_t : public rw8_t<base + 0x08> {
-			typedef rw8_t<base + 0x08> io_;
+		template <uint32_t ofs>
+		struct iwdtcstpr_t : public rw8_t<ofs> {
+			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
@@ -102,7 +119,24 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>  SLCSTP;
 		};
-		static iwdtcstpr_t IWDTCSTPR;
+		typedef iwdtcstpr_t<base + 0x08> IWDTCSTPR_;
+		static IWDTCSTPR_ IWDTCSTPR;
 	};
-	typedef iwdt_t<0x00088030> IWDT;
+	template <uint32_t base, ICU::VECTOR ivec, uint32_t pclk>
+		typename iwdt_t<base, ivec, pclk>::IWDTRR_ iwdt_t<base, ivec, pclk>::IWDTRR;
+	template <uint32_t base, ICU::VECTOR ivec, uint32_t pclk>
+		typename iwdt_t<base, ivec, pclk>::IWDTCR_ iwdt_t<base, ivec, pclk>::IWDTCR;
+	template <uint32_t base, ICU::VECTOR ivec, uint32_t pclk>
+		typename iwdt_t<base, ivec, pclk>::IWDTSR_ iwdt_t<base, ivec, pclk>::IWDTSR;
+	template <uint32_t base, ICU::VECTOR ivec, uint32_t pclk>
+		typename iwdt_t<base, ivec, pclk>::IWDTRCR_ iwdt_t<base, ivec, pclk>::IWDTRCR;
+	template <uint32_t base, ICU::VECTOR ivec, uint32_t pclk>
+		typename iwdt_t<base, ivec, pclk>::IWDTCSTPR_ iwdt_t<base, ivec, pclk>::IWDTCSTPR;
+
+
+#if defined(SIG_RX24T)
+	typedef iwdt_t<0x00088030, ICU::VECTOR::IWUNI,  15'000> IWDT;
+#else
+	typedef iwdt_t<0x00088030, ICU::VECTOR::IWUNI, 120'000> IWDT;
+#endif
 }

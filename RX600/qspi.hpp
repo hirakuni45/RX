@@ -53,7 +53,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> SPE;
 			bit_rw_t<io_, bitpos::B7> SPRIE;
 		};
-		static spcr_t<base + 0x00> SPCR;
+		typedef spcr_t<base + 0x00> SPCR_;
+		static  SPCR_ SPCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -72,7 +73,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0> SSLP;
 		};
-		static sslp_t<base + 0x01> SSLP;
+		typedef sslp_t<base + 0x01> SSLP_;
+		static  SSLP_ SSLP;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -96,7 +98,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>	MOIFV;
 			bit_rw_t<io_, bitpos::B5>	MOIFE;
 		};
-		static sppcr_t<base + 0x02> SPPCR;
+		typedef sppcr_t<base + 0x02> SPPCR_;
+		static  SPPCR_ SPPCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -118,7 +121,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> TREND;
 			bit_rw_t<io_, bitpos::B7> SPRFF;
 		};
-		static spsr_t<base + 0x03> SPSR;
+		typedef spsr_t<base + 0x03> SPSR_;
+		static  SPSR_ SPSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -127,9 +131,12 @@ namespace device {
 			@param[in]	ofs	レジスター・オフセット
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x04> SPDR32;
-		static rw16_t<base + 0x04> SPDR16;
-		static rw8_t<base + 0x04> SPDR8;
+		typedef rw32_t<base + 0x04> SPDR32_;
+		static  SPDR32_ SPDR32;
+		typedef rw16_t<base + 0x04> SPDR16_;
+		static  SPDR16_ SPDR16;
+		typedef rw8_t<base + 0x04> SPDR8_;
+		static  SPDR8_ SPDR8;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -148,7 +155,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> SPSC;
 		};
-		static spscr_t<base + 0x08> SPSCR;
+		typedef spscr_t<base + 0x08> SPSCR_;
+		static  SPSCR_ SPSCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -167,7 +175,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2> SPSS;
 		};
-		static spssr_t<base + 0x09> SPSSR;
+		typedef spssr_t<base + 0x09> SPSSR_;
+		static  SPSSR_ SPSSR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -175,7 +184,8 @@ namespace device {
 			@brief  QSPI ビットレートレジスタ（SPBR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw8_t<base + 0x0A> SPBR;
+		typedef rw8_t<base + 0x0A> SPBR_;
+		static  SPBR_ SPBR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -194,7 +204,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B7>  TXDMY;
 		};
-		static spdcr_t<base + 0x0B> SPDCR;
+		typedef spdcr_t<base + 0x0B> SPDCR_;
+		static  SPDCR_ SPDCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -213,7 +224,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> SCKDL;
 		};
-		static spckd_t<base + 0x0C> SPCKD;
+		typedef spckd_t<base + 0x0C> SPCKD_;
+		static  SPCKD_ SPCKD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -232,7 +244,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> SLNDL;
 		};
-		static sslnd_t<base + 0x0D> SSLND;
+		typedef sslnd_t<base + 0x0D> SSLND_;
+		static  SSLND_ SSLND;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -251,7 +264,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 3> SPNDL;
 		};
-		static spnd_t<base + 0x0E> SPND;
+		typedef spnd_t<base + 0x0E> SPND_;
+		static  SPND_ SPND;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -280,10 +294,14 @@ namespace device {
 			bit_rw_t <io_, bitpos::B14>   SLNDEN;
 			bit_rw_t <io_, bitpos::B15>   SCKDEN;
 		};
-		static spcmd_t<base + 0x10> SPCMD0;
-		static spcmd_t<base + 0x12> SPCMD1;
-		static spcmd_t<base + 0x14> SPCMD2;
-		static spcmd_t<base + 0x16> SPCMD3;
+		typedef spcmd_t<base + 0x10> SPCMD0_;
+		static  SPCMD0_ SPCMD0;
+		typedef spcmd_t<base + 0x12> SPCMD1_;
+		static  SPCMD1_ SPCMD1;
+		typedef spcmd_t<base + 0x14> SPCMD2_;
+		static  SPCMD2_ SPCMD2;
+		typedef spcmd_t<base + 0x16> SPCMD3_;
+		static  SPCMD3_ SPCMD3;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -306,7 +324,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>    RXRST;
 			bit_rw_t <io_, bitpos::B7>    TXRST;
 		};
-		static spbfcr_t<base + 0x18> SPBFCR;
+		typedef spbfcr_t<base + 0x18> SPBFCR_;
+		static  SPBFCR_ SPBFCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -327,7 +346,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 6> TXBC;
 		};
-		static spbdcr_t<base + 0x1A> SPBDCR;
+		typedef spbdcr_t<base + 0x1A> SPBDCR_;
+		static  SPBDCR_ SPBDCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -335,11 +355,40 @@ namespace device {
 			@brief  QSPI 転送データ長倍数設定レジスタ n (SPBMULn) (n = 0 ～ 3)
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static rw32_t<base + 0x1C> SPBMUL0;
-		static rw32_t<base + 0x20> SPBMUL1;
-		static rw32_t<base + 0x24> SPBMUL2;
-		static rw32_t<base + 0x28> SPBMUL3;
+		typedef rw32_t<base + 0x1C> SPBMUL0_;
+		static  SPBMUL0_ SPBMUL0;
+		typedef rw32_t<base + 0x20> SPBMUL1_;
+		static  SPBMUL1_ SPBMUL1;
+		typedef rw32_t<base + 0x24> SPBMUL2_;
+		static  SPBMUL2_ SPBMUL2;
+		typedef rw32_t<base + 0x28> SPBMUL3_;
+		static  SPBMUL3_ SPBMUL3;
 	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCR_ qspi_t<base, per, txv, rxv, sslv>::SPCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SSLP_ qspi_t<base, per, txv, rxv, sslv>::SSLP;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPPCR_ qspi_t<base, per, txv, rxv, sslv>::SPPCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPSR_ qspi_t<base, per, txv, rxv, sslv>::SPSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDR32_ qspi_t<base, per, txv, rxv, sslv>::SPDR32;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDR16_ qspi_t<base, per, txv, rxv, sslv>::SPDR16;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDR8_ qspi_t<base, per, txv, rxv, sslv>::SPDR8;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPSCR_ qspi_t<base, per, txv, rxv, sslv>::SPSCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPSSR_ qspi_t<base, per, txv, rxv, sslv>::SPSSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBR_ qspi_t<base, per, txv, rxv, sslv>::SPBR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPDCR_ qspi_t<base, per, txv, rxv, sslv>::SPDCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCKD_ qspi_t<base, per, txv, rxv, sslv>::SPCKD;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SSLND_ qspi_t<base, per, txv, rxv, sslv>::SSLND;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPND_ qspi_t<base, per, txv, rxv, sslv>::SPND;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCMD0_ qspi_t<base, per, txv, rxv, sslv>::SPCMD0;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCMD1_ qspi_t<base, per, txv, rxv, sslv>::SPCMD1;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCMD2_ qspi_t<base, per, txv, rxv, sslv>::SPCMD2;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCMD3_ qspi_t<base, per, txv, rxv, sslv>::SPCMD3;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBFCR_ qspi_t<base, per, txv, rxv, sslv>::SPBFCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBDCR_ qspi_t<base, per, txv, rxv, sslv>::SPBDCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL0_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL0;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL1_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL1;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL2_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL2;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL3_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL3;
+
 
 	typedef qspi_t<0x00089E00, peripheral::QSPI, ICU::VECTOR::SPTI, ICU::VECTOR::SPRI,
 		ICU::VECTOR_BL0::QSPSSLI>  QSPI;
