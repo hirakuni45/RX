@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ・SCIF(SCIFA) 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -28,13 +28,13 @@ namespace device {
 		static const auto TX_VEC = txv;		///< 受信割り込みベクター
 		static const auto RX_VEC = rxv;		///< 送信割り込みベクター
 
-
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  レシーブ FIFO データレジスタ (FRDR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x0A> FRDR;
+		typedef rw8_t<base + 0x0A> FRDR_;
+		static  FRDR_ FRDR;
 
 
 		//-----------------------------------------------------------------//
@@ -42,7 +42,8 @@ namespace device {
 			@brief  トランスミット FIFO データレジスタ (FTDR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x06> FTDR;
+		typedef rw8_t<base + 0x06> FTDR_;
+		static  FTDR_ FTDR;
 
 
 		//-----------------------------------------------------------------//
@@ -64,7 +65,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  CHR;
 			bit_rw_t <io_, bitpos::B7>	  CM;
 		};
-		static smr_t SMR;
+		typedef smr_t SMR_;
+		static  SMR_ SMR;
 
 
 		//-----------------------------------------------------------------//
@@ -87,7 +89,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B6>	  RIE;
 			bit_rw_t <io_, bitpos::B7>	  TIE;
 		};
-		static scr_t SCR;
+		typedef scr_t SCR_;
+		static  SCR_ SCR;
 
 
 		//-----------------------------------------------------------------//
@@ -111,7 +114,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6> TEND;
 			bit_rw_t<io_, bitpos::B7> ER;
 		};
-		static fsr_t FSR;
+		typedef fsr_t FSR_;
+		static  FSR_ FSR;
 
 
 		//-----------------------------------------------------------------//
@@ -119,7 +123,8 @@ namespace device {
 			@brief  ビットレートレジスタ (BRR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x02> BRR;
+		typedef rw8_t<base + 0x02> BRR_;
+		static  BRR_ BRR;
 
 
 		//-----------------------------------------------------------------//
@@ -129,7 +134,8 @@ namespace device {
 					※SEMR.MDDRS = 1 の場合に有効
 		*/
 		//-----------------------------------------------------------------//
-		static rw8_t<base + 0x02> MDDR;
+		typedef rw8_t<base + 0x02> MDDR_;
+		static  MDDR_ MDDR;
 
 
 		//-----------------------------------------------------------------//
@@ -152,7 +158,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B6, 2>  RTRG;
 			bits_rw_t<io_, bitpos::B8, 3>  RSTRG;
 		};
-		static fcr_t FCR;
+		typedef fcr_t FCR_;
+		static  FCR_ FCR;
 
 
 		//-----------------------------------------------------------------//
@@ -167,7 +174,8 @@ namespace device {
 			bits_ro_t<io_, bitpos::B0, 5>  R;
 			bits_ro_t<io_, bitpos::B8, 5>  T;
 		};
-		static fdr_t FDR;
+		typedef fdr_t FDR_;
+		static  FDR_ FDR;
 
 
 		//-----------------------------------------------------------------//
@@ -191,7 +199,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B6>  RTS2DT;
 			bit_rw_t<io_, bitpos::B7>  RTS2IO;
 		};
-		static sptr_t SPTR;
+		typedef sptr_t SPTR_;
+		static  SPTR_ SPTR;
 
 
 		//-----------------------------------------------------------------//
@@ -210,7 +219,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B2, 4>  FER;
 			bits_rw_t<io_, bitpos::B8, 4>  PER;
 		};
-		static lsr_t LSR;
+		typedef lsr_t LSR_;
+		static  LSR_ LSR;
 
 
 		//-----------------------------------------------------------------//
@@ -230,7 +240,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  5>  RFTC;
 			bit_rw_t <io_, bitpos::B15>     RTRGS;
 		};
-		static ftcr_t FTCR;
+		typedef ftcr_t FTCR_;
+		static  FTCR_ FTCR;
 
 
 		//-----------------------------------------------------------------//
@@ -252,8 +263,24 @@ namespace device {
 			bit_rw_t <io_, bitpos::B5>  BRME;
 			bit_rw_t <io_, bitpos::B7>  BGDM;
 		};
-		static semr_t SEMR;
+		typedef semr_t SEMR_;
+		static  SEMR_ SEMR;
 	};
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FRDR_ scif_t<base, per, txv, rxv>::FRDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FTDR_ scif_t<base, per, txv, rxv>::FTDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::SMR_ scif_t<base, per, txv, rxv>::SMR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::SCR_ scif_t<base, per, txv, rxv>::SCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FSR_ scif_t<base, per, txv, rxv>::FSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::BRR_ scif_t<base, per, txv, rxv>::BRR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::MDDR_ scif_t<base, per, txv, rxv>::MDDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FCR_ scif_t<base, per, txv, rxv>::FCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FDR_ scif_t<base, per, txv, rxv>::FDR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::SPTR_ scif_t<base, per, txv, rxv>::SPTR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::LSR_ scif_t<base, per, txv, rxv>::LSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::FTCR_ scif_t<base, per, txv, rxv>::FTCR;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv> typename scif_t<base, per, txv, rxv>::SEMR_ scif_t<base, per, txv, rxv>::SEMR;
+
+
 #if defined(SIG_RX64M) || defined(SIG_RX71M)
 	typedef scif_t<0x000D0000, peripheral::SCIF8,  ICU::VECTOR::TXIF8,  ICU::VECTOR::RXIF8>  SCIF8;
 	typedef scif_t<0x000D0020, peripheral::SCIF9,  ICU::VECTOR::TXIF9,  ICU::VECTOR::RXIF9>  SCIF9;
