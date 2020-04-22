@@ -125,7 +125,7 @@ namespace device {
 
 		QSPI,		///< クワッドシリアルペリフェラルインタフェース（QSPI）
 
-		CRCA,		///< CRC 演算器
+		CRC,		///< CRC 演算器
 
 		SSIE0,		///< シリアルサウンドインタフェース（SSIE）
 		SSIE1,		///< シリアルサウンドインタフェース（SSIE）
