@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M/RX71M グループ EPTPC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -49,7 +49,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B20>  CYC4;
 			bit_rw_t<io_, bitpos::B21>  CYC5;
 		};
-		static miesr_t<0x000C4000>  MIESR;
+		typedef miesr_t<0x000C4000>  MIESR_;
+		static  MIESR_ MIESR;
 
 
 		//-----------------------------------------------------------------//
@@ -57,7 +58,8 @@ namespace device {
 			@brief  MINT 割り込み要求許可レジスタ (MIEIPR)
 		*/
 		//-----------------------------------------------------------------//
-		static miesr_t<0x000C4004>  MIEIPR;
+		typedef miesr_t<0x000C4004>  MIEIPR_;
+		static  MIEIPR_ MIEIPR;
 
 
 		//-----------------------------------------------------------------//
@@ -91,7 +93,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B16>  PLSP;
 			bit_rw_t<io_, bitpos::B24>  PLSN;
 		};
-		static elippr_t<0x000C4010>  ELIPPR;
+		typedef elippr_t<0x000C4010>  ELIPPR_;
+		static  ELIPPR_ ELIPPR;
 
 
 		//-----------------------------------------------------------------//
@@ -100,7 +103,8 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		static elippr_t<0x000C4010>  ELIPACR;
+		typedef elippr_t<0x000C4010>  ELIPACR_;
+		static  ELIPACR_ ELIPACR;
 
 
 		//-----------------------------------------------------------------//
@@ -123,7 +127,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B3>  SYNTOUT;
 			bit_rw_t<io_, bitpos::B4>  W10D;
 		};
-		static stsr_t<0x000C4040>  STSR;
+		typedef stsr_t<0x000C4040>  STSR_;
+		static  STSR_ STSR;
 
 
 		//-----------------------------------------------------------------//
@@ -132,7 +137,8 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		static stsr_t<0x000C4044>  STIPR;
+		typedef stsr_t<0x000C4044>  STIPR_;
+		static  STIPR_ STIPR;
 
 
 		//-----------------------------------------------------------------//
@@ -151,7 +157,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  STCF;
 		};
-		static stcfr_t<0x000C4050>  STCFR;
+		typedef stcfr_t<0x000C4050>  STCFR_;
+		static  STCFR_ STCFR;
 
 
 		//-----------------------------------------------------------------//
@@ -179,7 +186,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B28>     ALEN0;
 			bit_rw_t <io_, bitpos::B29>     ALEN1;
 		};
-		static stmr_t<0x000C4054>  STMR;
+		typedef stmr_t<0x000C4054>  STMR_;
+		static  STMR_ STMR;
 
 
 		//-----------------------------------------------------------------//
@@ -187,7 +195,8 @@ namespace device {
 			@brief	Sync メッセージ受信タイムアウトレジスタ (SYNTOR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4058> SYNTOR;
+		typedef rw32_t<0x000C4058> SYNTOR_;
+		static  SYNTOR_ SYNTOR;
 
 
 		//-----------------------------------------------------------------//
@@ -211,7 +220,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  IPTSEL4;
 			bit_rw_t<io_, bitpos::B5>  IPTSEL5;
 		};
-		static iptselr_t<0x000C4060>  IPTSELR;
+		typedef iptselr_t<0x000C4060>  IPTSELR_;
+		static  IPTSELR_ IPTSELR;
 
 
 		//-----------------------------------------------------------------//
@@ -235,7 +245,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  MINTEN4;
 			bit_rw_t<io_, bitpos::B5>  MINTEN5;
 		};
-		static mitselr_t<0x000C4064>  MITSELR;
+		typedef mitselr_t<0x000C4064>  MITSELR_;
+		static  MITSELR_ MITSELR;
 
 
 		//-----------------------------------------------------------------//
@@ -259,7 +270,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  ELTDIS4;
 			bit_rw_t<io_, bitpos::B5>  ELTDIS5;
 		};
-		static eltselr_t<0x000C4068>  ELTSELR;
+		typedef eltselr_t<0x000C4068>  ELTSELR_;
+		static  ELTSELR_ ELTSELR;
 
 
 		//-----------------------------------------------------------------//
@@ -278,7 +290,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  SYSEL;
 		};
-		static stchselr_t<0x000C406C>  STCHSELR;
+		typedef stchselr_t<0x000C406C>  STCHSELR_;
+		static  STCHSELR_ STCHSELR;
 
 
 		//-----------------------------------------------------------------//
@@ -297,7 +310,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  STR;
 		};
-		static synstartr_t<0x000C4080>  SYNSTARTR;
+		typedef synstartr_t<0x000C4080>  SYNSTARTR_;
+		static  SYNSTARTR_ SYNSTARTR;
 
 
 		//-----------------------------------------------------------------//
@@ -316,7 +330,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  LOAD;
 		};
-		static lcivldr_t<0x000C4084>  LCIVLDR;
+		typedef lcivldr_t<0x000C4084>  LCIVLDR_;
+		static  LCIVLDR_ LCIVLDR;
 
 
 		//-----------------------------------------------------------------//
@@ -324,7 +339,8 @@ namespace device {
 			@brief	同期外れ検出しきい値レジスタ U (SYNTDARU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4090> SYNTDARU;
+		typedef rw32_t<0x000C4090> SYNTDARU_;
+		static  SYNTDARU_ SYNTDARU;
 
 
 		//-----------------------------------------------------------------//
@@ -332,7 +348,8 @@ namespace device {
 			@brief	同期外れ検出しきい値レジスタ L (SYNTDARL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4094> SYNTDARL;
+		typedef rw32_t<0x000C4094> SYNTDARL_;
+		static  SYNTDARL_ SYNTDARL;
 
 
 		//-----------------------------------------------------------------//
@@ -340,7 +357,8 @@ namespace device {
 			@brief	同期検出しきい値レジスタ U (SYNTDBRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4098> SYNTDBRU;
+		typedef rw32_t<0x000C4098> SYNTDBRU_;
+		static  SYNTDBRU_ SYNTDBRU;
 
 
 		//-----------------------------------------------------------------//
@@ -348,7 +366,8 @@ namespace device {
 			@brief	同期検出しきい値レジスタ L (SYNTDBRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C409C> SYNTDBRL;
+		typedef rw32_t<0x000C409C> SYNTDBRL_;
+		static  SYNTDBRL_ SYNTDBRL;
 
 
 		//-----------------------------------------------------------------//
@@ -356,7 +375,8 @@ namespace device {
 			@brief	ローカルクロックカウンタ初期値レジスタ U (LCIVRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C40B0> LCIVRU;
+		typedef rw32_t<0x000C40B0> LCIVRU_;
+		static  LCIVRU_ LCIVRU;
 
 
 		//-----------------------------------------------------------------//
@@ -364,7 +384,8 @@ namespace device {
 			@brief	ローカルクロックカウンタ初期値レジスタ M (LCIVRM)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C40B4> LCIVRM;
+		typedef rw32_t<0x000C40B4> LCIVRM_;
+		static  LCIVRM_ LCIVRM;
 
 
 		//-----------------------------------------------------------------//
@@ -372,7 +393,8 @@ namespace device {
 			@brief	ローカルクロックカウンタ初期値レジスタ L (LCIVRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C40B8> LCIVRL;
+		typedef rw32_t<0x000C40B8> LCIVRL_;
+		static  LCIVRL_ LCIVRL;
 
 
 		//-----------------------------------------------------------------//
@@ -391,7 +413,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  GW10;
 		};
-		static getw10r_t<0x000C4124>  GETW10R;
+		typedef getw10r_t<0x000C4124>  GETW10R_;
+		static  GETW10R_ GETW10R;
 
 
 		//-----------------------------------------------------------------//
@@ -399,7 +422,8 @@ namespace device {
 			@brief	プラス側傾き制限値レジスタ U (PLIMITRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4128> PLIMITRU;
+		typedef rw32_t<0x000C4128> PLIMITRU_;
+		static  PLIMITRU_ PLIMITRU;
 
 
 		//-----------------------------------------------------------------//
@@ -407,7 +431,8 @@ namespace device {
 			@brief	プラス側傾き制限値レジスタ M (PLIMITRM)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C412C> PLIMITRM;
+		typedef rw32_t<0x000C412C> PLIMITRM_;
+		static  PLIMITRM_ PLIMITRM;
 
 
 		//-----------------------------------------------------------------//
@@ -415,7 +440,8 @@ namespace device {
 			@brief	プラス側傾き制限値レジスタ L (PLIMITRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4130> PLIMITRL;
+		typedef rw32_t<0x000C4130> PLIMITRL_;
+		static  PLIMITRL_ PLIMITRL;
 
 
 		//-----------------------------------------------------------------//
@@ -423,7 +449,8 @@ namespace device {
 			@brief	マイナス側傾き制限値レジスタ U (MLIMITRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4134> MLIMITRU;
+		typedef rw32_t<0x000C4134> MLIMITRU_;
+		static  MLIMITRU_ MLIMITRU;
 
 
 		//-----------------------------------------------------------------//
@@ -431,7 +458,8 @@ namespace device {
 			@brief	マイナス側傾き制限値レジスタ M (MLIMITRM)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4138> MLIMITRM;
+		typedef rw32_t<0x000C4138> MLIMITRM_;
+		static  MLIMITRM_ MLIMITRM;
 
 
 		//-----------------------------------------------------------------//
@@ -439,7 +467,8 @@ namespace device {
 			@brief	マイナス側傾き制限値レジスタ L (MLIMITRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C413C> MLIMITRL;
+		typedef rw32_t<0x000C413C> MLIMITRL_;
+		static  MLIMITRL_ MLIMITRL;
 
 
 		//-----------------------------------------------------------------//
@@ -458,7 +487,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  INFO;
 		};
-		static getinfor_t<0x000C4140>  GETINFOR;
+		typedef getinfor_t<0x000C4140>  GETINFOR_;
+		static  GETINFOR_ GETINFOR;
 
 
 		//-----------------------------------------------------------------//
@@ -466,7 +496,8 @@ namespace device {
 			@brief	ローカルクロックカウンタ U (LCCVRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4170> LCCVRU;
+		typedef rw32_t<0x000C4170> LCCVRU_;
+		static  LCCVRU_ LCCVRU;
 
 
 		//-----------------------------------------------------------------//
@@ -474,7 +505,8 @@ namespace device {
 			@brief	ローカルクロックカウンタ M (LCCVRM)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4174> LCCVRM;
+		typedef rw32_t<0x000C4174> LCCVRM_;
+		static  LCCVRM_ LCCVRM;
 
 
 		//-----------------------------------------------------------------//
@@ -482,7 +514,8 @@ namespace device {
 			@brief	ローカルクロックカウンタ L (LCCVRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4178> LCCVRL;
+		typedef rw32_t<0x000C4178> LCCVRL_;
+		static  LCCVRL_ LCCVRL;
 
 
 		//-----------------------------------------------------------------//
@@ -490,7 +523,8 @@ namespace device {
 			@brief	プラス側傾きワースト 10 値レジスタ U (PW10VRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4210> PW10VRU;
+		typedef rw32_t<0x000C4210> PW10VRU_;
+		static  PW10VRU_ PW10VRU;
 
 
 		//-----------------------------------------------------------------//
@@ -498,7 +532,8 @@ namespace device {
 			@brief	プラス側傾きワースト 10 値レジスタ M (PW10VRM)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4214> PW10VRM;
+		typedef rw32_t<0x000C4214> PW10VRM_;
+		static  PW10VRM_ PW10VRM;
 
 
 		//-----------------------------------------------------------------//
@@ -506,7 +541,8 @@ namespace device {
 			@brief	プラス側傾きワースト 10 値レジスタ L (PW10VRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4218> PW10VRL;
+		typedef rw32_t<0x000C4218> PW10VRL_;
+		static  PW10VRL_ PW10VRL;
 
 
 		//-----------------------------------------------------------------//
@@ -514,7 +550,8 @@ namespace device {
 			@brief	マイナス側傾きワースト 10 値レジスタ U (MW10RU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C42D0> MW10RU;
+		typedef rw32_t<0x000C42D0> MW10RU_;
+		static  MW10RU_ MW10RU;
 
 
 		//-----------------------------------------------------------------//
@@ -522,7 +559,8 @@ namespace device {
 			@brief	マイナス側傾きワースト 10 値レジスタ M (MW10RM)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C42D4> MW10RM;
+		typedef rw32_t<0x000C42D4> MW10RM_;
+		static  MW10RM_ MW10RM;
 
 
 		//-----------------------------------------------------------------//
@@ -530,7 +568,8 @@ namespace device {
 			@brief	マイナス側傾きワースト 10 値レジスタ L (MW10RL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C42D8> MW10RL;
+		typedef rw32_t<0x000C42D8> MW10RL_;
+		static  MW10RL_ MW10RL;
 
 
 		//-----------------------------------------------------------------//
@@ -538,12 +577,18 @@ namespace device {
 			@brief	タイマスタート時刻設定レジスタ m (TMSTTRUm) (m=0~5)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4300> TMSTTRU0;
-		static rw32_t<0x000C4310> TMSTTRU1;
-		static rw32_t<0x000C4320> TMSTTRU2;
-		static rw32_t<0x000C4330> TMSTTRU3;
-		static rw32_t<0x000C4340> TMSTTRU4;
-		static rw32_t<0x000C4350> TMSTTRU5;
+		typedef rw32_t<0x000C4300> TMSTTRU0_;
+		static  TMSTTRU0_ TMSTTRU0;
+		typedef rw32_t<0x000C4310> TMSTTRU1_;
+		static  TMSTTRU1_ TMSTTRU1;
+		typedef rw32_t<0x000C4320> TMSTTRU2_;
+		static  TMSTTRU2_ TMSTTRU2;
+		typedef rw32_t<0x000C4330> TMSTTRU3_;
+		static  TMSTTRU3_ TMSTTRU3;
+		typedef rw32_t<0x000C4340> TMSTTRU4_;
+		static  TMSTTRU4_ TMSTTRU4;
+		typedef rw32_t<0x000C4350> TMSTTRU5_;
+		static  TMSTTRU5_ TMSTTRU5;
 
 
 		//-----------------------------------------------------------------//
@@ -551,12 +596,18 @@ namespace device {
 			@brief	タイマスタート時刻設定レジスタ m (TMSTTRLm) (m=0~5)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4304> TMSTTRL0;
-		static rw32_t<0x000C4314> TMSTTRL1;
-		static rw32_t<0x000C4324> TMSTTRL2;
-		static rw32_t<0x000C4334> TMSTTRL3;
-		static rw32_t<0x000C4344> TMSTTRL4;
-		static rw32_t<0x000C4354> TMSTTRL5;
+		typedef rw32_t<0x000C4304> TMSTTRL0_;
+		static  TMSTTRL0_ TMSTTRL0;
+		typedef rw32_t<0x000C4314> TMSTTRL1_;
+		static  TMSTTRL1_ TMSTTRL1;
+		typedef rw32_t<0x000C4324> TMSTTRL2_;
+		static  TMSTTRL2_ TMSTTRL2;
+		typedef rw32_t<0x000C4334> TMSTTRL3_;
+		static  TMSTTRL3_ TMSTTRL3;
+		typedef rw32_t<0x000C4344> TMSTTRL4_;
+		static  TMSTTRL4_ TMSTTRL4;
+		typedef rw32_t<0x000C4354> TMSTTRL5_;
+		static  TMSTTRL5_ TMSTTRL5;
 
 
 		//-----------------------------------------------------------------//
@@ -564,12 +615,18 @@ namespace device {
 			@brief	タイマ周期設定レジスタ m (TMCYCRm) (m=0~5)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4308> TMCYCR0;
-		static rw32_t<0x000C4318> TMCYCR1;
-		static rw32_t<0x000C4328> TMCYCR2;
-		static rw32_t<0x000C4338> TMCYCR3;
-		static rw32_t<0x000C4348> TMCYCR4;
-		static rw32_t<0x000C4358> TMCYCR5;
+		typedef rw32_t<0x000C4308> TMCYCR0_;
+		static  TMCYCR0_ TMCYCR0;
+		typedef rw32_t<0x000C4318> TMCYCR1_;
+		static  TMCYCR1_ TMCYCR1;
+		typedef rw32_t<0x000C4328> TMCYCR2_;
+		static  TMCYCR2_ TMCYCR2;
+		typedef rw32_t<0x000C4338> TMCYCR3_;
+		static  TMCYCR3_ TMCYCR3;
+		typedef rw32_t<0x000C4348> TMCYCR4_;
+		static  TMCYCR4_ TMCYCR4;
+		typedef rw32_t<0x000C4358> TMCYCR5_;
+		static  TMCYCR5_ TMCYCR5;
 
 
 		//-----------------------------------------------------------------//
@@ -577,12 +634,18 @@ namespace device {
 			@brief	タイマパルス幅設定レジスタ m (TMPLSRm) (m=0~5)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C430C> TMPLSR0;
-		static rw32_t<0x000C431C> TMPLSR1;
-		static rw32_t<0x000C432C> TMPLSR2;
-		static rw32_t<0x000C433C> TMPLSR3;
-		static rw32_t<0x000C434C> TMPLSR4;
-		static rw32_t<0x000C435C> TMPLSR5;
+		typedef rw32_t<0x000C430C> TMPLSR0_;
+		static  TMPLSR0_ TMPLSR0;
+		typedef rw32_t<0x000C431C> TMPLSR1_;
+		static  TMPLSR1_ TMPLSR1;
+		typedef rw32_t<0x000C432C> TMPLSR2_;
+		static  TMPLSR2_ TMPLSR2;
+		typedef rw32_t<0x000C433C> TMPLSR3_;
+		static  TMPLSR3_ TMPLSR3;
+		typedef rw32_t<0x000C434C> TMPLSR4_;
+		static  TMPLSR4_ TMPLSR4;
+		typedef rw32_t<0x000C435C> TMPLSR5_;
+		static  TMPLSR5_ TMPLSR5;
 
 
 		//-----------------------------------------------------------------//
@@ -606,7 +669,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B4>  EN4;
 			bit_rw_t<io_, bitpos::B5>  EN5;
 		};
-		static tmstartr_t<0x000C437C>  TMSTARTR;
+		typedef tmstartr_t<0x000C437C>  TMSTARTR_;
+		static  TMSTARTR_ TMSTARTR;
 
 
 		//-----------------------------------------------------------------//
@@ -633,7 +697,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B28>  URE0;
 			bit_rw_t<io_, bitpos::B29>  URE1;
 		};
-		static prsr_t<0x000C4400>  PRSR;
+		typedef prsr_t<0x000C4400>  PRSR_;
+		static  PRSR_ PRSR;
 
 
 		//-----------------------------------------------------------------//
@@ -642,7 +707,8 @@ namespace device {
 			@param[in]	base	ベースアドレス
 		*/
 		//-----------------------------------------------------------------//
-		static prsr_t<0x000C4404>  PRIPR;
+		typedef prsr_t<0x000C4404>  PRIPR_;
+		static  PRIPR_ PRIPR;
 
 
 		//-----------------------------------------------------------------//
@@ -650,7 +716,8 @@ namespace device {
 			@brief	チャネル 0 自局 MAC アドレスレジスタ U (PRMACRU0)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4410> PRMACRU0;
+		typedef rw32_t<0x000C4410> PRMACRU0_;
+		static  PRMACRU0_ PRMACRU0;
 
 
 		//-----------------------------------------------------------------//
@@ -658,7 +725,8 @@ namespace device {
 			@brief	チャネル 0 自局 MAC アドレスレジスタ L (PRMACRL0)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4414> PRMACRL0;
+		typedef rw32_t<0x000C4414> PRMACRL0_;
+		static  PRMACRL0_ PRMACRL0;
 
 
 		//-----------------------------------------------------------------//
@@ -666,7 +734,8 @@ namespace device {
 			@brief	チャネル 1 自局 MAC アドレスレジスタ U (PRMACRU1)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4418> PRMACRU1;
+		typedef rw32_t<0x000C4418> PRMACRU1_;
+		static  PRMACRU1_ PRMACRU1;
 
 
 		//-----------------------------------------------------------------//
@@ -674,7 +743,8 @@ namespace device {
 			@brief	チャネル 1 自局 MAC アドレスレジスタ L (PRMACRL1)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C441C> PRMACRL1;
+		typedef rw32_t<0x000C441C> PRMACRL1_;
+		static  PRMACRL1_ PRMACRL1;
 
 
 		//-----------------------------------------------------------------//
@@ -693,7 +763,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  TDIS;
 		};
-		static trndisr_t<0x000C4420>  TRNDISR;
+		typedef trndisr_t<0x000C4420>  TRNDISR_;
+		static  TRNDISR_ TRNDISR;
 
 
 		//-----------------------------------------------------------------//
@@ -715,7 +786,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>  FWD0;
 			bit_rw_t<io_, bitpos::B9>  FWD1;
 		};
-		static trnmr_t<0x000C4430>  TRNMR;
+		typedef trnmr_t<0x000C4430>  TRNMR_;
+		static  TRNMR_ TRNMR;
 
 
 		//-----------------------------------------------------------------//
@@ -734,7 +806,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 11>  THVAL;
 		};
-		static trncttdr_t<0x000C4434>  TRNCTTDR;
+		typedef trncttdr_t<0x000C4434>  TRNCTTDR_;
+		static  TRNCTTDR_ TRNCTTDR;
 
 
 		//-----------------------------------------------------------------//
@@ -753,7 +826,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>   RESET;
 		};
-		static ptrstr_t<0x000C0500>  PTRSTR;
+		typedef ptrstr_t<0x000C0500>  PTRSTR_;
+		static  PTRSTR_ PTRSTR;
 
 
 		//-----------------------------------------------------------------//
@@ -774,8 +848,84 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B8, 3>   SCLKSEL;
 		};
-		static stcselr_t<0x000C0504>  STCSELR;
+		typedef stcselr_t<0x000C0504>  STCSELR_;
+		static  STCSELR_ STCSELR;
 	};
+	template <peripheral per> typename eptpc_t<per>::MIESR_ eptpc_t<per>::MIESR;
+	template <peripheral per> typename eptpc_t<per>::MIEIPR_ eptpc_t<per>::MIEIPR;
+	template <peripheral per> typename eptpc_t<per>::ELIPPR_ eptpc_t<per>::ELIPPR;
+	template <peripheral per> typename eptpc_t<per>::ELIPACR_ eptpc_t<per>::ELIPACR;
+	template <peripheral per> typename eptpc_t<per>::STSR_ eptpc_t<per>::STSR;
+	template <peripheral per> typename eptpc_t<per>::STIPR_ eptpc_t<per>::STIPR;
+	template <peripheral per> typename eptpc_t<per>::STCFR_ eptpc_t<per>::STCFR;
+	template <peripheral per> typename eptpc_t<per>::STMR_ eptpc_t<per>::STMR;
+	template <peripheral per> typename eptpc_t<per>::SYNTOR_ eptpc_t<per>::SYNTOR;
+	template <peripheral per> typename eptpc_t<per>::IPTSELR_ eptpc_t<per>::IPTSELR;
+	template <peripheral per> typename eptpc_t<per>::MITSELR_ eptpc_t<per>::MITSELR;
+	template <peripheral per> typename eptpc_t<per>::ELTSELR_ eptpc_t<per>::ELTSELR;
+	template <peripheral per> typename eptpc_t<per>::STCHSELR_ eptpc_t<per>::STCHSELR;
+	template <peripheral per> typename eptpc_t<per>::SYNSTARTR_ eptpc_t<per>::SYNSTARTR;
+	template <peripheral per> typename eptpc_t<per>::LCIVLDR_ eptpc_t<per>::LCIVLDR;
+	template <peripheral per> typename eptpc_t<per>::SYNTDARU_ eptpc_t<per>::SYNTDARU;
+	template <peripheral per> typename eptpc_t<per>::SYNTDARL_ eptpc_t<per>::SYNTDARL;
+	template <peripheral per> typename eptpc_t<per>::SYNTDBRU_ eptpc_t<per>::SYNTDBRU;
+	template <peripheral per> typename eptpc_t<per>::SYNTDBRL_ eptpc_t<per>::SYNTDBRL;
+	template <peripheral per> typename eptpc_t<per>::LCIVRU_ eptpc_t<per>::LCIVRU;
+	template <peripheral per> typename eptpc_t<per>::LCIVRM_ eptpc_t<per>::LCIVRM;
+	template <peripheral per> typename eptpc_t<per>::LCIVRL_ eptpc_t<per>::LCIVRL;
+	template <peripheral per> typename eptpc_t<per>::GETW10R_ eptpc_t<per>::GETW10R;
+	template <peripheral per> typename eptpc_t<per>::PLIMITRU_ eptpc_t<per>::PLIMITRU;
+	template <peripheral per> typename eptpc_t<per>::PLIMITRM_ eptpc_t<per>::PLIMITRM;
+	template <peripheral per> typename eptpc_t<per>::PLIMITRL_ eptpc_t<per>::PLIMITRL;
+	template <peripheral per> typename eptpc_t<per>::MLIMITRU_ eptpc_t<per>::MLIMITRU;
+	template <peripheral per> typename eptpc_t<per>::MLIMITRM_ eptpc_t<per>::MLIMITRM;
+	template <peripheral per> typename eptpc_t<per>::MLIMITRL_ eptpc_t<per>::MLIMITRL;
+	template <peripheral per> typename eptpc_t<per>::GETINFOR_ eptpc_t<per>::GETINFOR;
+	template <peripheral per> typename eptpc_t<per>::LCCVRU_ eptpc_t<per>::LCCVRU;
+	template <peripheral per> typename eptpc_t<per>::LCCVRM_ eptpc_t<per>::LCCVRM;
+	template <peripheral per> typename eptpc_t<per>::LCCVRL_ eptpc_t<per>::LCCVRL;
+	template <peripheral per> typename eptpc_t<per>::PW10VRU_ eptpc_t<per>::PW10VRU;
+	template <peripheral per> typename eptpc_t<per>::PW10VRM_ eptpc_t<per>::PW10VRM;
+	template <peripheral per> typename eptpc_t<per>::PW10VRL_ eptpc_t<per>::PW10VRL;
+	template <peripheral per> typename eptpc_t<per>::MW10RU_ eptpc_t<per>::MW10RU;
+	template <peripheral per> typename eptpc_t<per>::MW10RM_ eptpc_t<per>::MW10RM;
+	template <peripheral per> typename eptpc_t<per>::MW10RL_ eptpc_t<per>::MW10RL;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRU0_ eptpc_t<per>::TMSTTRU0;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRU1_ eptpc_t<per>::TMSTTRU1;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRU2_ eptpc_t<per>::TMSTTRU2;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRU3_ eptpc_t<per>::TMSTTRU3;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRU4_ eptpc_t<per>::TMSTTRU4;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRU5_ eptpc_t<per>::TMSTTRU5;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRL0_ eptpc_t<per>::TMSTTRL0;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRL1_ eptpc_t<per>::TMSTTRL1;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRL2_ eptpc_t<per>::TMSTTRL2;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRL3_ eptpc_t<per>::TMSTTRL3;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRL4_ eptpc_t<per>::TMSTTRL4;
+	template <peripheral per> typename eptpc_t<per>::TMSTTRL5_ eptpc_t<per>::TMSTTRL5;
+	template <peripheral per> typename eptpc_t<per>::TMCYCR0_ eptpc_t<per>::TMCYCR0;
+	template <peripheral per> typename eptpc_t<per>::TMCYCR1_ eptpc_t<per>::TMCYCR1;
+	template <peripheral per> typename eptpc_t<per>::TMCYCR2_ eptpc_t<per>::TMCYCR2;
+	template <peripheral per> typename eptpc_t<per>::TMCYCR3_ eptpc_t<per>::TMCYCR3;
+	template <peripheral per> typename eptpc_t<per>::TMCYCR4_ eptpc_t<per>::TMCYCR4;
+	template <peripheral per> typename eptpc_t<per>::TMCYCR5_ eptpc_t<per>::TMCYCR5;
+	template <peripheral per> typename eptpc_t<per>::TMPLSR0_ eptpc_t<per>::TMPLSR0;
+	template <peripheral per> typename eptpc_t<per>::TMPLSR1_ eptpc_t<per>::TMPLSR1;
+	template <peripheral per> typename eptpc_t<per>::TMPLSR2_ eptpc_t<per>::TMPLSR2;
+	template <peripheral per> typename eptpc_t<per>::TMPLSR3_ eptpc_t<per>::TMPLSR3;
+	template <peripheral per> typename eptpc_t<per>::TMPLSR4_ eptpc_t<per>::TMPLSR4;
+	template <peripheral per> typename eptpc_t<per>::TMPLSR5_ eptpc_t<per>::TMPLSR5;
+	template <peripheral per> typename eptpc_t<per>::TMSTARTR_ eptpc_t<per>::TMSTARTR;
+	template <peripheral per> typename eptpc_t<per>::PRSR_ eptpc_t<per>::PRSR;
+	template <peripheral per> typename eptpc_t<per>::PRIPR_ eptpc_t<per>::PRIPR;
+	template <peripheral per> typename eptpc_t<per>::PRMACRU0_ eptpc_t<per>::PRMACRU0;
+	template <peripheral per> typename eptpc_t<per>::PRMACRL0_ eptpc_t<per>::PRMACRL0;
+	template <peripheral per> typename eptpc_t<per>::PRMACRU1_ eptpc_t<per>::PRMACRU1;
+	template <peripheral per> typename eptpc_t<per>::PRMACRL1_ eptpc_t<per>::PRMACRL1;
+	template <peripheral per> typename eptpc_t<per>::TRNDISR_ eptpc_t<per>::TRNDISR;
+	template <peripheral per> typename eptpc_t<per>::TRNMR_ eptpc_t<per>::TRNMR;
+	template <peripheral per> typename eptpc_t<per>::TRNCTTDR_ eptpc_t<per>::TRNCTTDR;
+	template <peripheral per> typename eptpc_t<per>::PTRSTR_ eptpc_t<per>::PTRSTR;
+	template <peripheral per> typename eptpc_t<per>::STCSELR_ eptpc_t<per>::STCSELR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -820,7 +970,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B16>  RESDN;
 			bit_rw_t<io_, bitpos::B17>  GENDN;
 		};
-		static sysr_t<0x000C4800 + ofs>  SYSR;
+		typedef sysr_t<0x000C4800 + ofs>  SYSR_;
+		static  SYSR_ SYSR;
 
 
 		//-----------------------------------------------------------------//
@@ -828,7 +979,8 @@ namespace device {
 			@brief	SYNFP ステータス通知許可レジスタ (SYIPR)
 		*/
 		//-----------------------------------------------------------------//
-		static sysr_t<0x000C4804 + ofs>  SYIPR;
+		typedef sysr_t<0x000C4804 + ofs>  SYIPR_;
+		static  SYIPR_ SYIPR;
 
 
 		//-----------------------------------------------------------------//
@@ -836,7 +988,8 @@ namespace device {
 			@brief	SYNFP MAC アドレスレジスタ U (SYMACRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4810 + ofs> SYMACRU;
+		typedef rw32_t<0x000C4810 + ofs> SYMACRU_;
+		static  SYMACRU_ SYMACRU;
 
 
 		//-----------------------------------------------------------------//
@@ -844,7 +997,8 @@ namespace device {
 			@brief	SYNFP MAC アドレスレジスタ L (SYMACRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4814 + ofs> SYMACRL;
+		typedef rw32_t<0x000C4814 + ofs> SYMACRL_;
+		static  SYMACRL_ SYMACRL;
 
 
 		//-----------------------------------------------------------------//
@@ -863,7 +1017,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>  CTL;
 		};
-		static syllcctlr_t<0x000C4818 + ofs>  SYLLCCTLR;
+		typedef syllcctlr_t<0x000C4818 + ofs>  SYLLCCTLR_;
+		static  SYLLCCTLR_ SYLLCCTLR;
 
 
 		//-----------------------------------------------------------------//
@@ -871,7 +1026,8 @@ namespace device {
 			@brief	SYNFP 自局 IP アドレスレジスタ (SYIPADDRR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C481C + ofs> SYIPADDRR;
+		typedef rw32_t<0x000C481C + ofs> SYIPADDRR_;
+		static  SYIPADDRR_ SYIPADDRR;
 
 
 		//-----------------------------------------------------------------//
@@ -891,7 +1047,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0, 4>  VER;
 			bits_rw_t<io_, bitpos::B4, 4>  TRSP;
 		};
-		static syspvrr_t<0x000C4840 + ofs>  SYSPVRR;
+		typedef syspvrr_t<0x000C4840 + ofs>  SYSPVRR_;
+		static  SYSPVRR_ SYSPVRR;
 
 
 		//-----------------------------------------------------------------//
@@ -910,7 +1067,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>  DNUM;
 		};
-		static sydomr_t<0x000C4844 + ofs>  SYDOMR;
+		typedef sydomr_t<0x000C4844 + ofs>  SYDOMR_;
+		static  SYDOMR_ SYDOMR;
 
 
 		//-----------------------------------------------------------------//
@@ -941,7 +1099,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B13>  FLAG13;
 			bit_rw_t<io_, bitpos::B14>  FLAG14;
 		};
-		static anfr_t<0x000C4850 + ofs>  ANFR;
+		typedef anfr_t<0x000C4850 + ofs>  ANFR_;
+		static  ANFR_ ANFR;
 
 
 		//-----------------------------------------------------------------//
@@ -965,7 +1124,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B13>  FLAG13;
 			bit_rw_t<io_, bitpos::B14>  FLAG14;
 		};
-		static synfr_t<0x000C4854 + ofs>  SYNFR;
+		typedef synfr_t<0x000C4854 + ofs>  SYNFR_;
+		static  SYNFR_ SYNFR;
 
 
 		//-----------------------------------------------------------------//
@@ -987,7 +1147,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B13>  FLAG13;
 			bit_rw_t<io_, bitpos::B14>  FLAG14;
 		};
-		static dyrqfr_t<0x000C4858 + ofs>  DYRQFR;
+		typedef dyrqfr_t<0x000C4858 + ofs>  DYRQFR_;
+		static  DYRQFR_ DYRQFR;
 
 
 		//-----------------------------------------------------------------//
@@ -1011,7 +1172,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B13>  FLAG13;
 			bit_rw_t<io_, bitpos::B14>  FLAG14;
 		};
-		static dyrpfr_t<0x000C485C + ofs>  DYRPFR;
+		typedef dyrpfr_t<0x000C485C + ofs>  DYRPFR_;
+		static  DYRPFR_ DYRPFR;
 
 
 		//-----------------------------------------------------------------//
@@ -1019,7 +1181,8 @@ namespace device {
 			@brief	SYNFP 自局クロック ID レジスタ U (SYCIDRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4860 + ofs> SYCIDRU;
+		typedef rw32_t<0x000C4860 + ofs> SYCIDRU_;
+		static  SYCIDRU_ SYCIDRU;
 
 
 		//-----------------------------------------------------------------//
@@ -1027,7 +1190,8 @@ namespace device {
 			@brief	SYNFP 自局クロック ID レジスタ L (SYCIDRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4864 + ofs> SYCIDRL;
+		typedef rw32_t<0x000C4864 + ofs> SYCIDRL_;
+		static  SYCIDRL_ SYCIDRL;
 
 
 		//-----------------------------------------------------------------//
@@ -1046,7 +1210,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>   PNUM;
 		};
-		static sypnumr_t<0x000C4868 + ofs>  SYPNUMR;
+		typedef sypnumr_t<0x000C4868 + ofs>  SYPNUMR_;
+		static  SYPNUMR_ SYPNUMR;
 
 
 		//-----------------------------------------------------------------//
@@ -1067,7 +1232,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>   STUP;
 			bit_rw_t<io_, bitpos::B2>   ANUP;
 		};
-		static syrvldr_t<0x000C4880 + ofs>  SYRVLDR;
+		typedef syrvldr_t<0x000C4880 + ofs>  SYRVLDR_;
+		static  SYRVLDR_ SYRVLDR;
 
 
 		//-----------------------------------------------------------------//
@@ -1093,7 +1259,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B24, 3>  PDRP;
 			bits_rw_t<io_, bitpos::B28, 3>  PDFUP;
 		};
-		static syrfl1r_t<0x000C4890 + ofs>  SYRFL1R;
+		typedef syrfl1r_t<0x000C4890 + ofs>  SYRFL1R_;
+		static  SYRFL1R_ SYRFL1R;
 
 
 		//-----------------------------------------------------------------//
@@ -1114,7 +1281,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B4,  2>  SIG;
 			bits_rw_t<io_, bitpos::B28, 2>  ILL;
 		};
-		static syrfl2r_t<0x000C4894 + ofs>  SYRFL2R;
+		typedef syrfl2r_t<0x000C4894 + ofs>  SYRFL2R_;
+		static  SYRFL2R_ SYRFL2R;
 
 
 		//-----------------------------------------------------------------//
@@ -1136,7 +1304,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B8>   DRQ;
 			bit_rw_t<io_, bitpos::B12>  PDRQ;
 		};
-		static sytrenr_t<0x000C4894 + ofs>  SYTRENR;
+		typedef sytrenr_t<0x000C4894 + ofs>  SYTRENR_;
+		static  SYTRENR_ SYTRENR;
 
 
 		//-----------------------------------------------------------------//
@@ -1144,7 +1313,8 @@ namespace device {
 			@brief	マスタクロック ID レジスタ U (MTCIDU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C48A0 + ofs> MTCIDU;
+		typedef rw32_t<0x000C48A0 + ofs> MTCIDU_;
+		static  MTCIDU_ MTCIDU;
 
 
 		//-----------------------------------------------------------------//
@@ -1152,7 +1322,8 @@ namespace device {
 			@brief	マスタクロック ID レジスタ L (MTCIDL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C48A4 + ofs> MTCIDL;
+		typedef rw32_t<0x000C48A4 + ofs> MTCIDL_;
+		static  MTCIDL_ MTCIDL;
 
 
 		//-----------------------------------------------------------------//
@@ -1171,7 +1342,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>  PNUM;
 		};
-		static mtpid_t<0x000C48A8 + ofs>  MTPID;
+		typedef mtpid_t<0x000C48A8 + ofs>  MTPID_;
+		static  MTPID_ MTPID;
 
 
 		//-----------------------------------------------------------------//
@@ -1192,7 +1364,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  SYNC;
 			bits_rw_t<io_, bitpos::B16, 8>  DREQ;
 		};
-		static sytlir_t<0x000C48C0 + ofs>  SYTLIR;
+		typedef sytlir_t<0x000C48C0 + ofs>  SYTLIR_;
+		static  SYTLIR_ SYTLIR;
 
 
 		//-----------------------------------------------------------------//
@@ -1213,7 +1386,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B8,  8>  SYNC;
 			bits_rw_t<io_, bitpos::B16, 8>  DRESP;
 		};
-		static syrlir_t<0x000C48C4 + ofs>  SYRLIR;
+		typedef syrlir_t<0x000C48C4 + ofs>  SYRLIR_;
+		static  SYRLIR_ SYRLIR;
 
 
 		//-----------------------------------------------------------------//
@@ -1221,7 +1395,8 @@ namespace device {
 			@brief	offsetFromMaster 値レジスタ U (OFMRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C48C8 + ofs> OFMRU;
+		typedef rw32_t<0x000C48C8 + ofs> OFMRU_;
+		static  OFMRU_ OFMRU;
 
 
 		//-----------------------------------------------------------------//
@@ -1229,7 +1404,8 @@ namespace device {
 			@brief	offsetFromMaster 値レジスタ L (OFMRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C48CC + ofs> OFMRL;
+		typedef rw32_t<0x000C48CC + ofs> OFMRL_;
+		static  OFMRL_ OFMRL;
 
 
 		//-----------------------------------------------------------------//
@@ -1237,7 +1413,8 @@ namespace device {
 			@brief	meanPathDelay 値レジスタ U (MPDRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C48D0 + ofs> MPDRU;
+		typedef rw32_t<0x000C48D0 + ofs> MPDRU_;
+		static  MPDRU_ MPDRU;
 
 
 		//-----------------------------------------------------------------//
@@ -1245,7 +1422,8 @@ namespace device {
 			@brief	meanPathDelay 値レジスタ L (MPDRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C48D4 + ofs> MPDRL;
+		typedef rw32_t<0x000C48D4 + ofs> MPDRL_;
+		static  MPDRL_ MPDRL;
 
 
 		//-----------------------------------------------------------------//
@@ -1266,7 +1444,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 8>  GMPR1;
 		};
-		static gmpr_t<0x000C48E0 + ofs>  GMPR;
+		typedef gmpr_t<0x000C48E0 + ofs>  GMPR_;
+		static  GMPR_ GMPR;
 
 
 		//-----------------------------------------------------------------//
@@ -1274,7 +1453,8 @@ namespace device {
 			@brief	grandmasterClockQuality フィールド設定レジスタ (GMCQR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C48E4 + ofs> GMCQR;
+		typedef rw32_t<0x000C48E4 + ofs> GMCQR_;
+		static  GMCQR_ GMCQR;
 
 
 		//-----------------------------------------------------------------//
@@ -1282,7 +1462,8 @@ namespace device {
 			@brief	grandmasterIdentity フィールド設定レジスタ U (GMIDRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C48E8 + ofs> GMIDRU;
+		typedef rw32_t<0x000C48E8 + ofs> GMIDRU_;
+		static  GMIDRU_ GMIDRU;
 
 
 		//-----------------------------------------------------------------//
@@ -1290,7 +1471,8 @@ namespace device {
 			@brief	grandmasterIdentity フィールド設定レジスタ L (GMIDRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C48EC + ofs> GMIDRL;
+		typedef rw32_t<0x000C48EC + ofs> GMIDRL_;
+		static  GMIDRL_ GMIDRL;
 
 
 		//-----------------------------------------------------------------//
@@ -1311,7 +1493,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 16>  CUTO;
 		};
-		static cuotsr_t<0x000C48F0 + ofs>  CUOTSR;
+		typedef cuotsr_t<0x000C48F0 + ofs>  CUOTSR_;
+		static  CUOTSR_ CUOTSR;
 
 
 		//-----------------------------------------------------------------//
@@ -1330,7 +1513,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>   SRMV;
 		};
-		static srr_t<0x000C48F4 + ofs>  SRR;
+		typedef srr_t<0x000C48F4 + ofs>  SRR_;
+		static  SRR_ SRR;
 
 
 		//-----------------------------------------------------------------//
@@ -1338,7 +1522,8 @@ namespace device {
 			@brief	PTP-primary メッセージ用宛先 MAC アドレス設定レジスタ U (PPMACRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4900 + ofs> PPMACRU;
+		typedef rw32_t<0x000C4900 + ofs> PPMACRU_;
+		static  PPMACRU_ PPMACRU;
 
 
 		//-----------------------------------------------------------------//
@@ -1346,7 +1531,8 @@ namespace device {
 			@brief	PTP-primary メッセージ用宛先 MAC アドレス設定レジスタ L (PPMACRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4904 + ofs> PPMACRL;
+		typedef rw32_t<0x000C4904 + ofs> PPMACRL_;
+		static  PPMACRL_ PPMACRL;
 
 
 		//-----------------------------------------------------------------//
@@ -1354,7 +1540,8 @@ namespace device {
 			@brief	PTP-pdelay メッセージ用 MAC アドレス設定レジスタ U (PDMACRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4908 + ofs> PDMACRU;
+		typedef rw32_t<0x000C4908 + ofs> PDMACRU_;
+		static  PDMACRU_ PDMACRU;
 
 
 		//-----------------------------------------------------------------//
@@ -1362,7 +1549,8 @@ namespace device {
 			@brief	PTP-pdelay メッセージ用 MAC アドレス設定レジスタ L (PDMACRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C490C + ofs> PDMACRL;
+		typedef rw32_t<0x000C490C + ofs> PDMACRL_;
+		static  PDMACRL_ PDMACRL;
 
 
 		//-----------------------------------------------------------------//
@@ -1381,7 +1569,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>   TYPE;
 		};
-		static petyper_t<0x000C4910 + ofs>  PETYPER;
+		typedef petyper_t<0x000C4910 + ofs>  PETYPER_;
+		static  PETYPER_ PETYPER;
 
 
 		//-----------------------------------------------------------------//
@@ -1389,7 +1578,8 @@ namespace device {
 			@brief	PTP-primary メッセージ用宛先 IP アドレス設定レジスタ (PPIPR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4920 + ofs> PPIPR;
+		typedef rw32_t<0x000C4920 + ofs> PPIPR_;
+		static  PPIPR_ PPIPR;
 
 
 		//-----------------------------------------------------------------//
@@ -1397,7 +1587,8 @@ namespace device {
 			@brief	PTP-pdelay メッセージ用宛先 IP アドレス設定レジスタ (PDIPR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4924 + ofs> PDIPR;
+		typedef rw32_t<0x000C4924 + ofs> PDIPR_;
+		static  PDIPR_ PDIPR;
 
 
 		//-----------------------------------------------------------------//
@@ -1416,7 +1607,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>   EVTO;
 		};
-		static petosr_t<0x000C4928 + ofs>  PETOSR;
+		typedef petosr_t<0x000C4928 + ofs>  PETOSR_;
+		static  PETOSR_ PETOSR;
 
 
 		//-----------------------------------------------------------------//
@@ -1435,7 +1627,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>   GETO;
 		};
-		static pgtosr_t<0x000C492C + ofs>  PGTOSR;
+		typedef pgtosr_t<0x000C492C + ofs>  PGTOSR_;
+		static  PGTOSR_ PGTOSR;
 
 
 		//-----------------------------------------------------------------//
@@ -1454,7 +1647,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>   PRTL;
 		};
-		static ppttlr_t<0x000C4930 + ofs>  PPTTLR;
+		typedef ppttlr_t<0x000C4930 + ofs>  PPTTLR_;
+		static  PPTTLR_ PPTTLR;
 
 
 		//-----------------------------------------------------------------//
@@ -1473,7 +1667,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 8>   PDTL;
 		};
-		static pdttlr_t<0x000C4934 + ofs>  PDTTLR;
+		typedef pdttlr_t<0x000C4934 + ofs>  PDTTLR_;
+		static  PDTTLR_ PDTTLR;
 
 
 		//-----------------------------------------------------------------//
@@ -1492,7 +1687,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>   EVUPT;
 		};
-		static peudpr_t<0x000C4938 + ofs>  PEUDPR;
+		typedef peudpr_t<0x000C4938 + ofs>  PEUDPR_;
+		static  PEUDPR_ PEUDPR;
 
 
 		//-----------------------------------------------------------------//
@@ -1511,7 +1707,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 16>   GEUPT;
 		};
-		static pgudpr_t<0x000C493C + ofs>  PGUDPR;
+		typedef pgudpr_t<0x000C493C + ofs>  PGUDPR_;
+		static  PGUDPR_ PGUDPR;
 
 
 		//-----------------------------------------------------------------//
@@ -1534,7 +1731,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B16>  EXTPRM;
 		};
-		static ffltr_t<0x000C4940 + ofs>  FFLTR;
+		typedef ffltr_t<0x000C4940 + ofs>  FFLTR_;
+		static  FFLTR_ FFLTR;
 
 
 		//-----------------------------------------------------------------//
@@ -1542,7 +1740,8 @@ namespace device {
 			@brief	フレーム受信フィルタ用 MAC アドレス 0 設定レジスタ U (FMAC0RU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4960 + ofs> FMAC0RU;
+		typedef rw32_t<0x000C4960 + ofs> FMAC0RU_;
+		static  FMAC0RU_ FMAC0RU;
 
 
 		//-----------------------------------------------------------------//
@@ -1550,7 +1749,8 @@ namespace device {
 			@brief	フレーム受信フィルタ用 MAC アドレス 0 設定レジスタ L (FMAC0RL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4964 + ofs> FMAC0RL;
+		typedef rw32_t<0x000C4964 + ofs> FMAC0RL_;
+		static  FMAC0RL_ FMAC0RL;
 
 
 		//-----------------------------------------------------------------//
@@ -1558,7 +1758,8 @@ namespace device {
 			@brief	フレーム受信フィルタ用 MAC アドレス 1 設定レジスタ U (FMAC1RU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C4968 + ofs> FMAC1RU;
+		typedef rw32_t<0x000C4968 + ofs> FMAC1RU_;
+		static  FMAC1RU_ FMAC1RU;
 
 
 		//-----------------------------------------------------------------//
@@ -1566,7 +1767,8 @@ namespace device {
 			@brief	フレーム受信フィルタ用 MAC アドレス 1 設定レジスタ L (FMAC1RL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C496C + ofs> FMAC1RL;
+		typedef rw32_t<0x000C496C + ofs> FMAC1RL_;
+		static  FMAC1RL_ FMAC1RL;
 
 
 		//-----------------------------------------------------------------//
@@ -1574,7 +1776,8 @@ namespace device {
 			@brief	非対称遅延値設定レジスタ U (DASYMRU)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C49C0 + ofs> DASYMRU;
+		typedef rw32_t<0x000C49C0 + ofs> DASYMRU_;
+		static  DASYMRU_ DASYMRU;
 
 
 		//-----------------------------------------------------------------//
@@ -1582,7 +1785,8 @@ namespace device {
 			@brief	非対称遅延値設定レジスタ L (DASYMRL)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C49C4 + ofs> DASYMRL;
+		typedef rw32_t<0x000C49C4 + ofs> DASYMRL_;
+		static  DASYMRL_ DASYMRL;
 
 
 		//-----------------------------------------------------------------//
@@ -1602,7 +1806,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B0,  16>  EGP;
 			bits_rw_t<io_, bitpos::B16, 16>  INGP;
 		};
-		static tslatr_t<0x000C49C8 + ofs>  TSLATR;
+		typedef tslatr_t<0x000C49C8 + ofs>  TSLATR_;
+		static  TSLATR_ TSLATR;
 
 
 		//-----------------------------------------------------------------//
@@ -1627,7 +1832,8 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B20>      TCMOD;
 		};
-		static syconfr_t<0x000C49CC + ofs>  SYCONFR;
+		typedef syconfr_t<0x000C49CC + ofs>  SYCONFR_;
+		static  SYCONFR_ SYCONFR;
 
 
 		//-----------------------------------------------------------------//
@@ -1647,7 +1853,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B0>   FORM0;
 			bit_rw_t <io_, bitpos::B1>   FORM1;
 		};
-		static syformr_t<0x000C49D0 + ofs>  SYFORMR;
+		typedef syformr_t<0x000C49D0 + ofs>  SYFORMR_;
+		static  SYFORMR_ SYFORMR;
 
 
 		//-----------------------------------------------------------------//
@@ -1655,8 +1862,69 @@ namespace device {
 			@brief	レスポンスメッセージ受信タイムアウトレジスタ (RSTOUTR)
 		*/
 		//-----------------------------------------------------------------//
-		static rw32_t<0x000C49D4 + ofs> RSTOUTR;
+		typedef rw32_t<0x000C49D4 + ofs> RSTOUTR_;
+		static  RSTOUTR_ RSTOUTR;
 	};
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYSR_ eptpcx_t<base, per>::SYSR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYIPR_ eptpcx_t<base, per>::SYIPR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYMACRU_ eptpcx_t<base, per>::SYMACRU;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYMACRL_ eptpcx_t<base, per>::SYMACRL;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYLLCCTLR_ eptpcx_t<base, per>::SYLLCCTLR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYIPADDRR_ eptpcx_t<base, per>::SYIPADDRR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYSPVRR_ eptpcx_t<base, per>::SYSPVRR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYDOMR_ eptpcx_t<base, per>::SYDOMR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::ANFR_ eptpcx_t<base, per>::ANFR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYNFR_ eptpcx_t<base, per>::SYNFR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::DYRQFR_ eptpcx_t<base, per>::DYRQFR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::DYRPFR_ eptpcx_t<base, per>::DYRPFR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYCIDRU_ eptpcx_t<base, per>::SYCIDRU;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYCIDRL_ eptpcx_t<base, per>::SYCIDRL;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYPNUMR_ eptpcx_t<base, per>::SYPNUMR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYRVLDR_ eptpcx_t<base, per>::SYRVLDR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYRFL1R_ eptpcx_t<base, per>::SYRFL1R;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYRFL2R_ eptpcx_t<base, per>::SYRFL2R;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYTRENR_ eptpcx_t<base, per>::SYTRENR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::MTCIDU_ eptpcx_t<base, per>::MTCIDU;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::MTCIDL_ eptpcx_t<base, per>::MTCIDL;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::MTPID_ eptpcx_t<base, per>::MTPID;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYTLIR_ eptpcx_t<base, per>::SYTLIR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYRLIR_ eptpcx_t<base, per>::SYRLIR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::OFMRU_ eptpcx_t<base, per>::OFMRU;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::OFMRL_ eptpcx_t<base, per>::OFMRL;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::MPDRU_ eptpcx_t<base, per>::MPDRU;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::MPDRL_ eptpcx_t<base, per>::MPDRL;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::GMPR_ eptpcx_t<base, per>::GMPR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::GMCQR_ eptpcx_t<base, per>::GMCQR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::GMIDRU_ eptpcx_t<base, per>::GMIDRU;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::GMIDRL_ eptpcx_t<base, per>::GMIDRL;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::CUOTSR_ eptpcx_t<base, per>::CUOTSR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SRR_ eptpcx_t<base, per>::SRR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PPMACRU_ eptpcx_t<base, per>::PPMACRU;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PPMACRL_ eptpcx_t<base, per>::PPMACRL;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PDMACRU_ eptpcx_t<base, per>::PDMACRU;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PDMACRL_ eptpcx_t<base, per>::PDMACRL;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PETYPER_ eptpcx_t<base, per>::PETYPER;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PPIPR_ eptpcx_t<base, per>::PPIPR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PDIPR_ eptpcx_t<base, per>::PDIPR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PETOSR_ eptpcx_t<base, per>::PETOSR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PGTOSR_ eptpcx_t<base, per>::PGTOSR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PPTTLR_ eptpcx_t<base, per>::PPTTLR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PDTTLR_ eptpcx_t<base, per>::PDTTLR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PEUDPR_ eptpcx_t<base, per>::PEUDPR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::PGUDPR_ eptpcx_t<base, per>::PGUDPR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::FFLTR_ eptpcx_t<base, per>::FFLTR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::FMAC0RU_ eptpcx_t<base, per>::FMAC0RU;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::FMAC0RL_ eptpcx_t<base, per>::FMAC0RL;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::FMAC1RU_ eptpcx_t<base, per>::FMAC1RU;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::FMAC1RL_ eptpcx_t<base, per>::FMAC1RL;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::DASYMRU_ eptpcx_t<base, per>::DASYMRU;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::DASYMRL_ eptpcx_t<base, per>::DASYMRL;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::TSLATR_ eptpcx_t<base, per>::TSLATR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYCONFR_ eptpcx_t<base, per>::SYCONFR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::SYFORMR_ eptpcx_t<base, per>::SYFORMR;
+	template <uint32_t base, peripheral per> typename eptpcx_t<base, per>::RSTOUTR_ eptpcx_t<base, per>::RSTOUTR;
+
+
 	typedef eptpc_t<peripheral::EPTPC> EPTPC;
 	typedef eptpcx_t<0x000, peripheral::EPTPC0> EPTPC0;
 	typedef eptpcx_t<0x400, peripheral::EPTPC1> EPTPC1;

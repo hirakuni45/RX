@@ -140,6 +140,8 @@ namespace device {
 
 		R12DA,		///< 12 ビット D/A コンバータ（R12DA）
 
+		TEMPS,		///< 温度センサ（TEMPS）
+
 		DOC,		///< データ演算回路（DOC）
 
 		ECCRAM,		///< ECC RAM (32K)
