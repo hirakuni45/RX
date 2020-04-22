@@ -74,7 +74,6 @@ CSOURCES	=	common/init.c \
 				r_usb/hhid/src/r_usb_hhid_api.c
 
 PSOURCES	=	main.cpp \
-				RX65x/icu_mgr.cpp \
 				common/stdapi.cpp
 
 USER_LIBS	=	supc++

@@ -31,7 +31,6 @@ CSOURCES	=	common/init.c \
 				common/time.c
 
 PSOURCES	=	$(ROOT)/main.cpp \
-				RX72N/icu_mgr.cpp \
 				graphics/font8x16.cpp \
 				graphics/color.cpp \
 				$(ROOT)/side/arcade.cpp \
