@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ MPU 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,6 +17,7 @@ namespace device {
 		@brief  メモリプロテクションユニットクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class _>
 	struct mpu_t {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -35,14 +36,22 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B4, 28> RSPN;
 		};
-		static rspage_t<0x00086400> RSPAGE0;
-		static rspage_t<0x00086408> RSPAGE1;
-		static rspage_t<0x00086410> RSPAGE2;
-		static rspage_t<0x00086418> RSPAGE3;
-		static rspage_t<0x00086420> RSPAGE4;
-		static rspage_t<0x00086428> RSPAGE5;
-		static rspage_t<0x00086430> RSPAGE6;
-		static rspage_t<0x00086438> RSPAGE7;
+		typedef rspage_t<0x00086400> RSPAGE0_;
+		static  RSPAGE0_ RSPAGE0;
+		typedef rspage_t<0x00086408> RSPAGE1_;
+		static  RSPAGE1_ RSPAGE1;
+		typedef rspage_t<0x00086410> RSPAGE2_;
+		static  RSPAGE2_ RSPAGE2;
+		typedef rspage_t<0x00086418> RSPAGE3_;
+		static  RSPAGE3_ RSPAGE3;
+		typedef rspage_t<0x00086420> RSPAGE4_;
+		static  RSPAGE4_ RSPAGE4;
+		typedef rspage_t<0x00086428> RSPAGE5_;
+		static  RSPAGE5_ RSPAGE5;
+		typedef rspage_t<0x00086430> RSPAGE6_;
+		static  RSPAGE6_ RSPAGE6;
+		typedef rspage_t<0x00086438> RSPAGE7_;
+		static  RSPAGE7_ RSPAGE7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -63,14 +72,22 @@ namespace device {
 			bits_rw_t<io_, bitpos::B1, 3>   UAC;
 			bits_rw_t<io_, bitpos::B4, 28>  REPN;
 		};
-		static repage_t<0x00086404> REPAGE0;
-		static repage_t<0x0008640C> REPAGE1;
-		static repage_t<0x00086414> REPAGE2;
-		static repage_t<0x0008641C> REPAGE3;
-		static repage_t<0x00086424> REPAGE4;
-		static repage_t<0x0008642C> REPAGE5;
-		static repage_t<0x00086434> REPAGE6;
-		static repage_t<0x0008643C> REPAGE7;
+		typedef repage_t<0x00086404> REPAGE0_;
+		static  REPAGE0_ REPAGE0;
+		typedef repage_t<0x0008640C> REPAGE1_;
+		static  REPAGE1_ REPAGE1;
+		typedef repage_t<0x00086414> REPAGE2_;
+		static  REPAGE2_ REPAGE2;
+		typedef repage_t<0x0008641C> REPAGE3_;
+		static  REPAGE3_ REPAGE3;
+		typedef repage_t<0x00086424> REPAGE4_;
+		static  REPAGE4_ REPAGE4;
+		typedef repage_t<0x0008642C> REPAGE5_;
+		static  REPAGE5_ REPAGE5;
+		typedef repage_t<0x00086434> REPAGE6_;
+		static  REPAGE6_ REPAGE6;
+		typedef repage_t<0x0008643C> REPAGE7_;
+		static  REPAGE7_ REPAGE7;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -89,7 +106,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  MPEN;
 		};
-		static mpen_t<0x00086500> MPEN;
+		typedef mpen_t<0x00086500> MPEN_;
+		static  MPEN_ MPEN;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -108,7 +126,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B1, 3>  UBAC;
 		};
-		static mpbac_t<0x00086504> MPBAC;
+		typedef mpbac_t<0x00086504> MPBAC_;
+		static  MPBAC_ MPBAC;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -127,7 +146,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>   CLR;
 		};
-		static mpeclr_t<0x00086508> MPECLR;
+		typedef mpeclr_t<0x00086508> MPECLR_;
+		static  MPECLR_ MPECLR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -145,7 +165,8 @@ namespace device {
 			bit_rw_t<io_, bitpos::B1>  DMPER;
 			bit_rw_t<io_, bitpos::B2>  DRW;
 		};
-		static mpests_t<0x0008650C> MPESTS;
+		typedef mpests_t<0x0008650C> MPESTS_;
+		static  MPESTS_ MPESTS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -161,7 +182,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 32>  DEA;
 		};
-		static mpdea_t<0x00086514> MPEDEA;
+		typedef mpdea_t<0x00086514> MPEDEA_;
+		static  MPEDEA_ MPEDEA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -180,7 +202,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 32>  SA;
 		};
-		static mpsa_t<0x00086520> MPSA;
+		typedef mpsa_t<0x00086520> MPSA_;
+		static  MPSA_ MPSA;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -199,7 +222,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  S;
 		};
-		static mpops_t<0x00086524> MPOPS;
+		typedef mpops_t<0x00086524> MPOPS_;
+		static  MPOPS_ MPOPS;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -218,7 +242,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  INV;
 		};
-		static mpopi_t<0x00086526> MPOPI;
+		typedef mpopi_t<0x00086526> MPOPI_;
+		static  MPOPI_ MPOPI;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -238,7 +263,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B1,  3>  UHACI;
 			bits_rw_t<io_, bitpos::B16, 8>  HITI;
 		};
-		static mhiti_t<0x00086528> MHIHI;
+		typedef mhiti_t<0x00086528> MHIHI_;
+		static  MHIHI_ MHIHI;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -258,7 +284,36 @@ namespace device {
 			bits_rw_t<io_, bitpos::B1,  3>  UHACD;
 			bits_rw_t<io_, bitpos::B16, 8>  HITD;
 		};
-		static mhitd_t<0x00086528> MHITD;
+		typedef mhitd_t<0x00086528> MHITD_;
+		static  MHITD_ MHITD;
 	};
-	typedef mpu_t MPU;
+	template <class _> typename mpu_t<_>::RSPAGE0_ mpu_t<_>::RSPAGE0;
+	template <class _> typename mpu_t<_>::RSPAGE1_ mpu_t<_>::RSPAGE1;
+	template <class _> typename mpu_t<_>::RSPAGE2_ mpu_t<_>::RSPAGE2;
+	template <class _> typename mpu_t<_>::RSPAGE3_ mpu_t<_>::RSPAGE3;
+	template <class _> typename mpu_t<_>::RSPAGE4_ mpu_t<_>::RSPAGE4;
+	template <class _> typename mpu_t<_>::RSPAGE5_ mpu_t<_>::RSPAGE5;
+	template <class _> typename mpu_t<_>::RSPAGE6_ mpu_t<_>::RSPAGE6;
+	template <class _> typename mpu_t<_>::RSPAGE7_ mpu_t<_>::RSPAGE7;
+	template <class _> typename mpu_t<_>::REPAGE0_ mpu_t<_>::REPAGE0;
+	template <class _> typename mpu_t<_>::REPAGE1_ mpu_t<_>::REPAGE1;
+	template <class _> typename mpu_t<_>::REPAGE2_ mpu_t<_>::REPAGE2;
+	template <class _> typename mpu_t<_>::REPAGE3_ mpu_t<_>::REPAGE3;
+	template <class _> typename mpu_t<_>::REPAGE4_ mpu_t<_>::REPAGE4;
+	template <class _> typename mpu_t<_>::REPAGE5_ mpu_t<_>::REPAGE5;
+	template <class _> typename mpu_t<_>::REPAGE6_ mpu_t<_>::REPAGE6;
+	template <class _> typename mpu_t<_>::REPAGE7_ mpu_t<_>::REPAGE7;
+	template <class _> typename mpu_t<_>::MPEN_ mpu_t<_>::MPEN;
+	template <class _> typename mpu_t<_>::MPBAC_ mpu_t<_>::MPBAC;
+	template <class _> typename mpu_t<_>::MPECLR_ mpu_t<_>::MPECLR;
+	template <class _> typename mpu_t<_>::MPESTS_ mpu_t<_>::MPESTS;
+	template <class _> typename mpu_t<_>::MPEDEA_ mpu_t<_>::MPEDEA;
+	template <class _> typename mpu_t<_>::MPSA_ mpu_t<_>::MPSA;
+	template <class _> typename mpu_t<_>::MPOPS_ mpu_t<_>::MPOPS;
+	template <class _> typename mpu_t<_>::MPOPI_ mpu_t<_>::MPOPI;
+	template <class _> typename mpu_t<_>::MHIHI_ mpu_t<_>::MHIHI;
+	template <class _> typename mpu_t<_>::MHITD_ mpu_t<_>::MHITD;
+
+
+	typedef mpu_t<void> MPU;
 }
