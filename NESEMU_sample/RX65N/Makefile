@@ -90,7 +90,6 @@ CSOURCES	=	common/init.c \
 				$(ROOT)/emu/libsnss/libsnss.c
 
 PSOURCES	=	$(ROOT)/main.cpp \
-				RX65x/icu_mgr.cpp \
 				graphics/font8x16.cpp \
 				graphics/kfont16.cpp \
 				graphics/color.cpp \
