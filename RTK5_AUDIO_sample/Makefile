@@ -43,7 +43,6 @@ CSOURCES	=	common/init.c \
                 FreeRTOS/Source/timers.c
 
 PSOURCES	=	main.cpp \
-				RX65x/icu_mgr.cpp \
 				graphics/font8x16.cpp \
 				graphics/kfont16.cpp \
 				graphics/color.cpp \
