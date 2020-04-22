@@ -52,7 +52,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B5, 2>  CDFS;
 			bit_rw_t <io_, bitpos::B7>     HCMPON;
 		};
-		static cmpctl_t<base + 0x00> CMPCTL;
+		typedef cmpctl_t<base + 0x00> CMPCTL_;
+		static  CMPCTL_ CMPCTL;
 
 
 		//-----------------------------------------------------------------//
@@ -71,7 +72,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 4>  CMPSEL;
 		};
-		static cmpsel0_t<base + 0x04> CMPSEL0;
+		typedef cmpsel0_t<base + 0x04> CMPSEL0_;
+		static  CMPSEL0_ CMPSEL0;
 
 
 		//-----------------------------------------------------------------//
@@ -90,7 +92,8 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B0, 2>  CVRS;
 		};
-		static cmpsel1_t<base + 0x08> CMPSEL1;
+		typedef cmpsel1_t<base + 0x08> CMPSEL1_;
+		static  CMPSEL1_ CMPSEL1;
 
 
 		//-----------------------------------------------------------------//
@@ -109,7 +112,8 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  CMPMON0;
 		};
-		static cmpmon_t<base + 0x0C> CMPMON;
+		typedef cmpmon_t<base + 0x0C> CMPMON_;
+		static  CMPMON_ CMPMON;
 
 
 		//-----------------------------------------------------------------//
@@ -128,8 +132,20 @@ namespace device {
 
 			bit_rw_t<io_, bitpos::B0>  CPOE;
 		};
-		static cmpioc_t<base + 0x10> CMPIOC;
+		typedef cmpioc_t<base + 0x10> CMPIOC_;
+		static  CMPIOC_ CMPIOC;
 	};
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename cmpc_t<base, per, ivec>::CMPCTL_  cmpc_t<base, per, ivec>::CMPCTL;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename cmpc_t<base, per, ivec>::CMPSEL0_ cmpc_t<base, per, ivec>::CMPSEL0;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename cmpc_t<base, per, ivec>::CMPSEL1_ cmpc_t<base, per, ivec>::CMPSEL1;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename cmpc_t<base, per, ivec>::CMPMON_  cmpc_t<base, per, ivec>::CMPMON;
+	template <uint32_t base, peripheral per, ICU::VECTOR ivec>
+		typename cmpc_t<base, per, ivec>::CMPIOC_  cmpc_t<base, per, ivec>::CMPIOC;
+
 
 #if defined(SIG_RX24T)
 	typedef cmpc_t<0x000A0C80, peripheral::CMPC0, ICU::VECTOR::CMPC0> CMPC0;
