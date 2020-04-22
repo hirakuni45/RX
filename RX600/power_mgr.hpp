@@ -199,6 +199,14 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB12 = f;	// USBA のストップ状態解除
 				break;
 
+			case peripheral::TEMPS:
+				SYSTEM::MSTPCRB.MSTPB8 = f;		// TEMPS のストップ状態解除
+				break;
+
+			case peripheral::ELC:
+				SYSTEM::MSTPCRB.MSTPB9 = f;		// ELC のストップ状態解除
+				break;
+
 			case peripheral::ECCRAM:
 				SYSTEM::MSTPCRC.MSTPC6 = f;		// ECC RAM のストップ状態解除
 				break;

@@ -23,6 +23,8 @@ namespace device {
 
 		DTC,		///< データトランスファコントローラ
 
+		ELC,		///< イベントリンクコントローラ (ELC)
+
 		DMAC0,		///< DMA コントローラ・チャネル０
 		DMAC1,		///< DMA コントローラ・チャネル１
 		DMAC2,		///< DMA コントローラ・チャネル２
@@ -96,14 +98,15 @@ namespace device {
 
 		RSPI0,		///< シリアルペリフェラルインタフェース（RSPI）
 
+		CRC,		///< CRC 演算器 (CRCA)
+
 		S12AD,		///< 12 ビット A/D コンバータ（S12ADC）
 		S12AD1,		///< 12 ビット A/D コンバータ（S12ADC）
 		S12AD2,		///< 12 ビット A/D コンバータ（S12ADC）
 
 		R12DA,		///< 12 ビット D/A コンバータ（R12DA）
 
-		DOC,
-		ELC,
+		TEMPS,		///< 温度センサ（TEMPS）
 
 		CMPC0,		///< コンパレーター０
 		CMPC1,		///< コンパレーター１
@@ -112,7 +115,7 @@ namespace device {
 		CMPC4,		///< コンパレーター４
 		CMPC5,		///< コンパレーター５
 
-		CRC,
+		DOC,		///< データ演算回路 (DOC)
 
 		// 仮の仕様
 		IRQ0,
