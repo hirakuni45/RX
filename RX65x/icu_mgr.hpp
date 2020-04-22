@@ -19,14 +19,22 @@ namespace device {
 		@brief  割り込みマネージャー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class icu_mgr {
+	template <class _>
+	class icu_mgr_ {
 
-		static utils::dispatch<ICU::VECTOR::GROUPBE0, 2>  GROUPBE0_dispatch_;
-		static utils::dispatch<ICU::VECTOR::GROUPBL2, 1>  GROUPBL2_dispatch_;
-		static utils::dispatch<ICU::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_;
-		static utils::dispatch<ICU::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_;
-		static utils::dispatch<ICU::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_;
-		static utils::dispatch<ICU::VECTOR::GROUPAL1, 12> GROUPAL1_dispatch_;
+		typedef utils::dispatch<ICU::VECTOR::GROUPBE0, 2>  GROUPBE0_dispatch_t;
+		typedef utils::dispatch<ICU::VECTOR::GROUPBL2, 1>  GROUPBL2_dispatch_t;
+		typedef utils::dispatch<ICU::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_t;
+		typedef utils::dispatch<ICU::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_t;
+		typedef utils::dispatch<ICU::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_t;
+		typedef utils::dispatch<ICU::VECTOR::GROUPAL1, 12> GROUPAL1_dispatch_t;
+
+		static GROUPBE0_dispatch_t GROUPBE0_dispatch_;
+		static GROUPBL2_dispatch_t GROUPBL2_dispatch_;
+		static GROUPBL0_dispatch_t GROUPBL0_dispatch_;
+		static GROUPBL1_dispatch_t GROUPBL1_dispatch_;
+		static GROUPAL0_dispatch_t GROUPAL0_dispatch_;
+		static GROUPAL1_dispatch_t GROUPAL1_dispatch_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -704,4 +712,12 @@ namespace device {
 			return ret;
 		}
 	};
+	typedef icu_mgr_<void> icu_mgr;
+
+	template <class _> typename icu_mgr_<_>::GROUPBE0_dispatch_t icu_mgr_<_>::GROUPBE0_dispatch_;
+	template <class _> typename icu_mgr_<_>::GROUPBL2_dispatch_t icu_mgr_<_>::GROUPBL2_dispatch_;
+	template <class _> typename icu_mgr_<_>::GROUPBL0_dispatch_t icu_mgr_<_>::GROUPBL0_dispatch_;
+	template <class _> typename icu_mgr_<_>::GROUPBL1_dispatch_t icu_mgr_<_>::GROUPBL1_dispatch_;
+	template <class _> typename icu_mgr_<_>::GROUPAL0_dispatch_t icu_mgr_<_>::GROUPAL0_dispatch_;
+	template <class _> typename icu_mgr_<_>::GROUPAL1_dispatch_t icu_mgr_<_>::GROUPAL1_dispatch_;
 }
