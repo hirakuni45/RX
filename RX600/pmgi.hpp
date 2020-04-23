@@ -24,7 +24,6 @@ namespace device {
 
 		static const auto PERIPHERAL = per;	///< ペリフェラル型
 
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  PMGI コンフィギュレーションレジスタ (PMGCR)
@@ -44,7 +43,8 @@ namespace device {
 			bits_rw_t<io_, bitpos::B16, 3>  PSMHT;
 			bits_rw_t<io_, bitpos::B20, 3>  PSMCT;
 		};
-		static pmgcr_t<base + 0x00> PMGCR;
+		typedef pmgcr_t<base + 0x00> PMGCR_;
+		static  PMGCR_ PMGCR;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -69,9 +69,12 @@ namespace device {
 
 			bits_rw_t<io_, bitpos::B16, 16> PRD;
 		};
-		static psmr_t<base + 0x04> PSMR;
+		typedef psmr_t<base + 0x04> PSMR_;
+		static  PSMR_ PSMR;
 	};
-
 	typedef pmgi_t<0x000C5880, peripheral::PMGI0> PMGI0;
 	typedef pmgi_t<0x000C5890, peripheral::PMGI1> PMGI1;
+
+	template <uint32_t base, peripheral per> typename pmgi_t<base, per>::PMGCR_ pmgi_t<base, per>::PMGCR;
+	template <uint32_t base, peripheral per> typename pmgi_t<base, per>::PSMR_ pmgi_t<base, per>::PSMR;
 }
