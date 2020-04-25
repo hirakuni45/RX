@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX65N SD-CARD access sample
+Renesas RX24T, RX64M, RX65N, RX72N SD-CARD access sample
 =========
 
 [Japanese](READMEja.md)
@@ -41,11 +41,12 @@ SD card access, sample program
 |RX24T|RSPI|△|
 |RX64M|Soft SPI|○|
 |RX65N|SDHI|△|
+|RX72N|SDHI|△|
 
 ※RTC is used to record the time when writing a file.   
 ※RX24T can use RTC with I2C connection.   
 ※RX64M uses the built-in RTC.   
-※The RX65N Envision Kit disables the built-in RTC, but you can use an I2C-connected RTC.   
+※The RX65N/RX72N Envision Kit disables the built-in RTC, but you can use an I2C-connected RTC.   
 
 ## SDHI built-in device in RX microcontroller
 
@@ -68,13 +69,13 @@ The devices that incorporate SDHI in major RX microcontroller are as follows.
 |R5F571MxHxxx|RX71M|○|10M|15M|
 |R5F571MxCxxx|RX71M|×|-|-|
 |R5F571MxGxxx|RX71M|×|-|-|
+|R5F572Nxxxxx|RX72N|o|12.5M|25M|
 
-※Other RX microcontrollers have devices that incorporate SDHI peripherals.   
-※The clock frequency is twice that of BPS.   
+※Other RX microcontrollers have devices that incorporate SDHI peripherals.    
 
-### RX65N Envision Kit
+### RX65N/RX72N Envision Kit
 
-<img src="../docs/RTK5RX65N.jpg" width="30%">
+<img src="../docs/RTK5RX65N.jpg" width="40%"> > <img src="../docs/rx72n-envision-kit.jpg" width="40%">
 
 **The RX65N Envision Kit is equipped with R5F565NEDDFB and can use SDHI.**
 
@@ -83,6 +84,16 @@ The devices that incorporate SDHI in major RX microcontroller are as follows.
 ## Preparing the hardware
 
 SD card pin assignments and functions   
+
+---
+
+### RX72N (SDHI) for RX72N Envision Kit
+
+Use the micro SD socket already mounted on the board.
+
+<img src="../docs/RX72N_MicroSD.jpg" width="40%">
+
+---
 
 ### RX24T (RSPI-A)
 
@@ -94,6 +105,8 @@ SD card pin assignments and functions
 |P65|69|DAT3(1)|SELECT||
 |P64|70|-|Power CTRL|active-low|
 |P63|74|-|CardDetect|active-low|
+
+---
 
 ### RX65N (SDHI) for RX65N Envision Kit
 
@@ -124,6 +137,8 @@ For power supply control ICs, general-purpose MOS-FETs were used because of avai
 - The clock signal and command signal have resistors in series for impedance matching.
 - The pull-up resistor is omitted only for the clock signal, but there is a truck.
 - It may be possible to mount a resistor in some cases, but I don't think it is necessary.
+
+---
 
 ### RX64M (Soft SPI)
 

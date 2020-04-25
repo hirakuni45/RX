@@ -46,7 +46,7 @@ SD カード・アクセス、サンプルプログラム
 ※RTC はファイル書き込み時の時間を記録する為に利用しています。   
 ※RX24T では、I2C 接続の RTC を利用する事が出来ます。   
 ※RX64M では、内臓 RTC を利用しています。   
-※RX65N Envision Kit では、内臓 RTC は無効になっていますが I2C 接続の RTC を利用する事が出来ます。   
+※RX65N/RX72N Envision Kit では、内臓 RTC は無効になっていますが I2C 接続の RTC を利用する事が出来ます。   
 
 ## RX マイコンにおける SDHI 内臓デバイス
 
@@ -69,13 +69,13 @@ SD カード・アクセス、サンプルプログラム
 |R5F571MxHxxx|RX71M|○|10M|15M|
 |R5F571MxCxxx|RX71M|×|-|-|
 |R5F571MxGxxx|RX71M|×|-|-|
+|R5F572Nxxxxx|RX72N|o|12.5M|25M|
 
-※他の RX マイコンでも SDHI ペリフェラルを内臓するデバイスはあります。   
-※クロック周波数は、BPS の倍となります。   
+※他の RX マイコンでも SDHI ペリフェラルを内臓するデバイスはあります。      
 
-### RX65N Envision Kit
+### RX65N/RX72N Envision Kit
 
-<img src="../docs/RTK5RX65N.jpg" width="30%">
+<img src="../docs/RTK5RX65N.jpg" width="30%"> <img src="../docs/rx72n-envision-kit.jpg" width="40%">
 
 **RX65N Envision Kit には、R5F565NEDDFB が実装されており、SDHI を利用する事が出来ます。**
 
@@ -85,7 +85,15 @@ SD カード・アクセス、サンプルプログラム
 
 SD カードの各ピン配置と機能   
 
+---
 
+### RX72N (SDHI) for RX72N Envision Kit
+
+ボードに実装済のマイクロSDソケットを使います。
+
+<img src="../docs/RX72N_MicroSD.jpg" width="40%">
+
+---
 
 ### RX24T (RSPI-A)
 
@@ -97,6 +105,8 @@ SD カードの各ピン配置と機能
 |P65|69|DAT3(1)|SELECT||
 |P64|70|-|Power CTRL|active-low|
 |P63|74|-|CardDetect|active-low|
+
+---
 
 ### RX65N (SDHI) for RX65N Envision Kit
 
@@ -127,6 +137,8 @@ SD カードソケットは、入手が困難で、購入出来てもコスト�
 - クロック信号、コマンド信号には、インピーダンスのマッチング用に抵抗が直列に入っています。
 - クロック信号だけ、プルアップ抵抗が省略されていますが、パターンはあります。
 - 場合により抵抗を実装可能なようですが、必要無いと思います。
+
+---
 
 ### RX64M (Soft SPI)
 
