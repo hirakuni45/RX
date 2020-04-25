@@ -239,6 +239,7 @@ namespace {
 		uint16_t min = (t / 60) % 60;
 		uint16_t hor = (t / 3600) % 24;
 		utils::format("\r%02d:%02d:%02d") % hor % min % sec;
+		utils::format::chaout().flush();
 	}
 
 

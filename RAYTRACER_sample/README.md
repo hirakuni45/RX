@@ -2,10 +2,12 @@ Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N Ray tracer sample
 =========
    
 [Japanese](READMEja.md)
-   
-<img src="../docs/RX65N_raytrace1.jpg" width="40%"> <img src="../docs/RX65N_raytrace2.jpg" width="40%">   
-Raytracer 320x240/480x272, for RX65N Envision kit   
-※Rendering from a previous version (slightly faster due to optimization in the latest code)
+
+<img src="../docs/RX72N_raytrace1.jpg" width="40%"> <img src="../docs/RX65N_raytrace1.jpg" width="40%">
+<img src="../docs/RX65N_raytrace2.jpg" width="40%">   
+- Raytracer 320x240, for RX65N Envision kit/RX72N Envision kit
+- Raytracer 480x272 for RX65N Envision kit   
+※Rendering from a previous version (slightly faster due to optimization in the latest code) RX65N
    
 ---
    
@@ -43,6 +45,7 @@ Ray tracing rendering program using RX microcontroller
 - Connect a USB serial converter to the port specified in SCI.
 - Connect the RXD terminal on the microcontroller side and the TXD of USB serial.
 - Connect the TXD terminal on the microcontroller side and the RXD of USB serial.
+- In the RX72N Envision Kit, the CN8 connector is a USB serial connection.
    
 ## Build method
 - Move to each platform directory and make.
@@ -55,7 +58,7 @@ Ray tracing rendering program using RX microcontroller
 - TX (send) and RX (receive) are performed on the port specified in SCI.
 - Check with TeraTerm.
 - TeraTerm serial settings: 115200 baud, 8-bit data, 1 stop, no parity.
-- In RX65N Envision kit, press SW2 on the back side to change the number of samplings and resolution.
+- In RX65N/RX72N Envision kit, press SW2 on the back side to change the number of samplings and resolution.
    
 ## Remarks
    
