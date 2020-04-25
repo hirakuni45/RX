@@ -2,10 +2,11 @@ Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N レイトレーサーサンプ�
 =========
    
 [Japanese](READMEja.md)
-   
-<img src="../docs/RX65N_raytrace1.jpg" width="40%"> <img src="../docs/RX65N_raytrace2.jpg" width="40%">   
-Raytracer 320x240/480x272, for RX65N Envision kit   
-※少し前のバージョンによるレンダリング（最新のコードでは最適化により若干高速）
+
+<img src="../docs/RX72N_raytrace1.jpg" width="40%"> <img src="../docs/RX65N_raytrace1.jpg" width="40%"> <img src="../docs/RX65N_raytrace2.jpg" width="40%">   
+- Raytracer 320x240, for RX65N Envision kit/RX72N Envision kit
+- Raytracer 480x272 for RX65N Envision kit
+※少し前のバージョンによるレンダリング（最新のコードでは最適化により若干高速）RX65N
    
 ---
    
@@ -56,8 +57,7 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 - SCI に指定されたポートで、TX（送信）、RX（受信）を行う。
 - TeraTerm などで確認。
 - TeraTerm のシリアル設定：１１５２００ボー、８ビットデータ、１ストップ、パリティ無し。
-- RX65N Envision kit では、裏側の SW2 を押す事で、サンプリング数、解像度を変えてレンダリング
-- RX72N Envision kit では、裏側の SW2 を押す事で、サンプリング数、解像度を変えてレンダリング
+- RX65N/RX72N Envision kit では、裏側の SW2 を押す事で、サンプリング数、解像度を変えてレンダリング
    
 ## 備考
    
