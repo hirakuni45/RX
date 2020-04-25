@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX72N グループ・ペリフェラル
+	@brief	RX72M/RX72N/RX66N グループ・ペリフェラル
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -136,7 +136,10 @@ namespace device {
 
 		GLCDC,		///< グラフィックスＬＣＤコントローラ
 		DRW2D,		///< ２Ｄ描画エンジン
-
+#if defined(SIG_RX72M)
+		DSMIF0,		///< ΔΣモジュレータインターフェース 0
+		DSMIF1,		///< ΔΣモジュレータインターフェース 1
+#endif
 		S12AD,		///< 12 ビット A/D コンバータ（S12ADC）
 		S12AD1,		///< 12 ビット A/D コンバータ（S12ADC）
 
