@@ -28,7 +28,8 @@
 			+ 2020/01/02 11:05- ポインター表示機能「%p」追加。 @n
 			+ 2020/02/02 15:43- enum error など共有定義の継承。 @n
 			! 2019/02/02 19:42- 符号文字カウントの不具合修正。@n
-			+ 2020/02/04 05:23- std::string 型追加。
+			+ 2020/02/04 05:23- std::string 型追加。@n
+			+ 2020/04/25 07:45- stdout_buffered_chaout に、操作位置を返すメソッド pos() を追加。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -207,7 +208,9 @@ namespace utils {
 
 		void clear() noexcept { size_ = 0; };
 
-		uint32_t size() const noexcept { return size_; }
+		auto size() const noexcept { return size_; }
+
+		auto pos() const noexcept { return pos_; }
 
 		void flush() noexcept
 		{
@@ -367,7 +370,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class base_format {
 	public:
-		static const uint16_t VERSION = 89;
+		static const uint16_t VERSION = 90;		///< バージョン番号（整数）
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
