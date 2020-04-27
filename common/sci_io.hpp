@@ -235,8 +235,10 @@ namespace device {
 			}
 			uint32_t rate = SCI::PCLK / 16 / brr / (1 << (cks * 2));
 			bool abcs = false;
-			uint32_t mddr = (baud_ << 8) / rate;
-			if(mddr >= 128 && mddr < 256) abcs = true;
+			uint32_t mddr = (baud_ << 9) / rate;
+			if(mddr >= 256 && mddr < 512) abcs = true;
+			++mddr;
+			mddr >>= 1;
 
 			set_intr_();
 
