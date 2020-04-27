@@ -25,6 +25,7 @@ namespace device {
 	class cmt_io {
 
 		uint8_t		level_;
+		uint32_t	rate_;
 
 		void sleep_() const { asm("nop"); }
 
@@ -44,7 +45,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		cmt_io() : level_(0) { }
+		cmt_io() : level_(0), rate_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -62,12 +63,8 @@ namespace device {
 			if(freq == 0) return false;
 
 			uint32_t cmcor = CMT::PCLK / freq / 4;
-			if(cmcor & 1) {
-				cmcor >>= 1;
-				++cmcor;
-			} else {
-				cmcor >>= 1;
-			}
+			cmcor++;
+			cmcor >>= 1;
 
 			uint8_t cks = 0;
 			while(cmcor > 65536) {
@@ -77,6 +74,7 @@ namespace device {
 			if(cks > 3 || cmcor == 0) {
 				return false;
 			}
+			rate_ = freq;
 
 			level_ = level;
 
@@ -173,6 +171,25 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		uint16_t get_cmp_count() const noexcept { return CMT::CMCOR(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	周期を取得
+			@param[in]	real	「true」にした場合、内部で計算されたリアルな値
+			@return 周期
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_rate(bool real = false) const noexcept
+		{
+			if(real) {
+				uint32_t rate = CMT::PCLK / (static_cast<uint32_t>(CMT::CMCOR()) + 1);
+				rate /= 4 << (CMT::CMCR.CKS() * 2);
+				return rate;
+			} else {
+				return rate_;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
