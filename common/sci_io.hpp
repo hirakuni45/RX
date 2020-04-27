@@ -81,6 +81,7 @@ namespace device {
 
 		uint8_t		level_;
 		bool		auto_crlf_;
+		uint32_t	baud_;
 		static bool		soft_flow_;
 		static volatile bool		stop_;
 		static volatile uint16_t	errc_;
@@ -154,7 +155,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		sci_io(bool autocrlf = true, bool softflow = true) noexcept : level_(0),
-			auto_crlf_(autocrlf) {
+			auto_crlf_(autocrlf), baud_(0) {
 			soft_flow_ = softflow;
 			stop_ = false;
 			errc_ = 0;
@@ -225,17 +226,17 @@ namespace device {
 			HCTL::DIR = 1;
 			HCTL::P = 0;  // disable send driver
 
-			uint32_t brr = SCI::PCLK / baud * 16;
+			baud_ = baud;
+			uint32_t brr = SCI::PCLK / 16 / baud;
 			uint8_t cks = 0;
-			while(brr > (512 << 8)) {
+			while(brr > 256) {
 				brr >>= 2;
 				++cks;
 			}
-			if(cks > 3) return false;
-			bool abcs = true;
-			if(brr > (256 << 8)) { brr /= 2; abcs = false; }
-			uint32_t mddr = ((brr & 0xff00) << 8) / brr;
-			brr >>= 8;
+			uint32_t rate = SCI::PCLK / 16 / brr / (1 << (cks * 2));
+			bool abcs = false;
+			uint32_t mddr = (baud_ << 8) / rate;
+			if(mddr >= 128 && mddr < 256) abcs = true;
 
 			set_intr_();
 
@@ -302,6 +303,30 @@ namespace device {
 		 */
 		//-----------------------------------------------------------------//
 		uint8_t get_brr() const noexcept { return SCI::BRR(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ボーレートを取得
+			@param[in]	real	「true」にした場合、内部で計算されたリアルな値
+			@return ボーレート
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_baud_rate(bool real = false) const noexcept
+		{
+			if(real) {
+				uint32_t brr = SCI::BRR();
+				uint32_t cks = 1 << (SCI::SMR.CKS() * 2);
+				auto baud = SCI::PCLK / 16 / cks / (brr + 1);
+				if(SCI::SEMR.BRME()) {
+					baud *= SCI::MDDR();
+					baud /= 256;
+				}
+				return baud;
+			} else {
+				return baud_;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
