@@ -136,6 +136,13 @@ int main(int argc, char** argv)
 	LED::DIR = 1;
 	LED::P = 0;
 
+	{
+		utils::format("Baud rate (set):  %d\n") % sci_.get_baud_rate();
+		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
+		rate *= 100.0f;
+		utils::format("Baud rate (real): %d (%3.2f [%%])\n") % sci_.get_baud_rate(true) % rate;
+	}
+
 	cmd_.set_prompt("# ");
 
 	uint8_t cnt = 0;
