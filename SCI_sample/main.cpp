@@ -141,7 +141,10 @@ int main(int argc, char** argv)
 		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
 		rate *= 100.0f;
 		utils::format("SCI Baud rate (real): %d (%3.2f [%%])\n") % sci_.get_baud_rate(true) % rate;
-		utils::format("CMT rate: %d [Hz]\n") % cmt_.get_rate();
+		utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
+		rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
+		rate *= 100.0f;
+		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
 
 	cmd_.set_prompt("# ");
