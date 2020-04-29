@@ -3,11 +3,13 @@
 /*!	@file
 	@brief	オーディオ GUI クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "common/sci_i2c_io.hpp"
+
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
@@ -15,6 +17,10 @@
 #include "graphics/dialog.hpp"
 #include "graphics/img_in.hpp"
 #include "graphics/widget_director.hpp"
+#include "graphics/scaling.hpp"
+#include "graphics/img_in.hpp"
+
+#include "sound/tag.hpp"
 
 #include "chip/FAMIPAD.hpp"
 #include "chip/FT5206.hpp"
@@ -32,9 +38,22 @@ namespace app {
 		static const int16_t LCD_Y = 272;
 		static const auto PIX = graphics::pixel::TYPE::RGB565;
 
+		typedef utils::fixed_fifo<uint8_t, 64> RB64;
+		typedef utils::fixed_fifo<uint8_t, 64> SB64;
+
+#if defined(SIG_RX65N)
 		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-
+		static const uint32_t LCD_ORG = 0x0000'0100;
+		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::FIRST_I2C> FT5206_I2C;
+#elif defined(SIG_RX72N)
+		typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
+		typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
+		static const uint32_t LCD_ORG = 0x0080'0000;
+		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
+		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
+#endif
 		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
 
 		typedef graphics::font8x16 AFONT;
@@ -55,13 +74,6 @@ namespace app {
 		KFONT	kfont_;
 		FONT	font_;
 		RENDER	render_;
-
-		// FT5206, SCI6 簡易 I2C 定義
-		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
-		typedef utils::fixed_fifo<uint8_t, 64> RB6;
-		typedef utils::fixed_fifo<uint8_t, 64> SB6;
-		typedef device::sci_i2c_io<device::SCI6, RB6, SB6,
-		device::port_map::option::FIRST_I2C> FT5206_I2C;
 
 		FT5206_I2C	ft5206_i2c_;
 		typedef chip::FT5206<FT5206_I2C> TOUCH;
@@ -84,9 +96,24 @@ namespace app {
 //		BUTTON	pause_;
 		BUTTON	ff_;
 
+		typedef img::scaling<RENDER> SCALING;
+		SCALING		scaling_;
+
+		typedef img::img_in<SCALING> IMG_IN;
+		IMG_IN		img_in_;
+
 		uint32_t	ctrl_;
 
 		char		path_[256];
+
+		int16_t render_text_(int16_t x, int16_t y, const char* text)
+		{
+			render_.swap_color();
+			auto xx = render_.draw_text(vtx::spos(x, y), text);
+			render_.swap_color();
+			render_.draw_text(vtx::spos(x + 1, y + 1), text);
+			return xx;
+		}
 
 	public:
 		//-------------------------------------------------------------//
@@ -95,7 +122,7 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		audio_gui() noexcept :
-			glcdc_(nullptr, reinterpret_cast<void*>(0x00000100)),
+			glcdc_(nullptr, reinterpret_cast<void*>(LCD_ORG)),
 			afont_(), kfont_(), font_(afont_, kfont_),
 			render_(glcdc_, font_),
 			ft5206_i2c_(), touch_(ft5206_i2c_),
@@ -106,6 +133,7 @@ namespace app {
 			rew_(   vtx::srect(70*0, 272-64, 64, 64), "<<"),
 			play_(  vtx::srect(70*1, 272-64, 64, 64), "Play"),
 			ff_(    vtx::srect(70*2, 272-64, 64, 64), ">>"),
+			scaling_(render_), img_in_(scaling_),
 			ctrl_(0), path_{ 0 }
 		{ }
 
@@ -291,6 +319,54 @@ namespace app {
 				}
 			}
 			return ret;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  TAG のレンダリング
+		*/
+		//-------------------------------------------------------------//
+		void render_tag(utils::file_io& fin, const sound::tag_t& tag) noexcept
+		{
+			render_.clear(graphics::def_color::Black);
+			render_.sync_frame(false);
+
+			scaling_.set_offset(vtx::spos(480 - 272, 0));
+			if(tag.get_apic().len_ > 0) {
+				if(!img_in_.select_decoder(tag.get_apic().ext_)) {
+					scaling_.set_scale();
+					img_in_.load("/NoImage.jpg");
+				} else {
+					auto pos = fin.tell();
+					fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
+					img::img_info ifo;
+					if(!img_in_.info(fin, ifo)) {
+						scaling_.set_scale();
+						img_in_.load("/NoImage.jpg");
+						render_.swap_color();
+						render_.draw_text(vtx::spos(480 - 272, 0), "image decode error.");
+						render_.swap_color();
+					} else {
+						auto n = std::max(ifo.width, ifo.height);
+						scaling_.set_scale(272, n);
+						img_in_.load(fin);
+					}
+					fin.seek(utils::file_io::SEEK::SET, pos);
+				}
+			} else {
+				scaling_.set_scale();
+				img_in_.load("/NoImage.jpg");
+			}
+
+			render_text_(0, 0 * 20, tag.get_album().c_str());
+			render_text_(0, 1 * 20, tag.get_title().c_str());
+			render_text_(0, 2 * 20, tag.get_artist().c_str());
+			render_text_(0, 3 * 20, tag.get_year().c_str());
+			auto x = render_text_(0, 4 * 20, tag.get_disc().c_str());
+			if(x > 0) x += 8;
+			render_text_(x, 4 * 20, tag.get_track().c_str());
+			render_.sync_frame(false);
 		}
 
 
