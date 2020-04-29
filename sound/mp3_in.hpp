@@ -233,7 +233,11 @@ namespace sound {
 				if(ctrl_task_) {
 					ctrl = ctrl_task_();
 				}
-				if(ctrl == CTRL::STOP) {
+				if(ctrl == CTRL::NEXT) {
+					out.mute();
+					status = true;
+					break;
+				} else if(ctrl == CTRL::STOP) {
 					out.mute();
 					status = false;
 					break;

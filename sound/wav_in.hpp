@@ -226,9 +226,13 @@ namespace sound {
 				if(ctrl_task_) {
 					ctrl = ctrl_task_();
 				}
-				if(ctrl == CTRL::STOP) {
+				if(ctrl == CTRL::NEXT) {
 					out.mute();
-//					status = false;
+					status = true;
+					break;
+				} else if(ctrl == CTRL::STOP) {
+					out.mute();
+					status = false;
 					break;
 				} else if(ctrl == CTRL::REPLAY) {
 					out.mute();
