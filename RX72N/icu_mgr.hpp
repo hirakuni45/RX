@@ -64,6 +64,18 @@ namespace device {
 		{
 			bool ena = lvl != 0 ? true : false;
 			switch(vec) {
+
+			case ICU::VECTOR::SWINT:
+				ICU::IER.SWINT = 0;
+				ICU::IPR.SWINT = lvl;
+				ICU::IER.SWINT = ena;
+				break;
+			case ICU::VECTOR::SWINT2:
+				ICU::IER.SWINT2 = 0;
+				ICU::IPR.SWINT2 = lvl;
+				ICU::IER.SWINT2 = ena;
+				break;
+
 			case ICU::VECTOR::CMI0:
 				ICU::IER.CMI0 = 0;
 				ICU::IPR.CMI0 = lvl;
