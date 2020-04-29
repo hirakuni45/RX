@@ -37,8 +37,10 @@ namespace device {
 			LOCAL1,		///< 独自の特殊な設定１
 			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合、第１候補
 			SECOND_I2C,	///< SCI ポートを簡易 I2C として使う場合、第２候補
+			THIRD_I2C,	///< SCI ポートを簡易 I2C として使う場合、第３候補
 			FIRST_SPI,	///< SCI ポートを簡易 SPI として使う場合、第１候補
 			SECOND_SPI,	///< SCI ポートを簡易 SPI として使う場合、第２候補
+			THIRD_SPI,	///< SCI ポートを簡易 SPI として使う場合、第３候補
 		};
 
 
