@@ -66,7 +66,6 @@ namespace sound {
 					ctrl = sound::af_play::CTRL::STOP;
 				}
 			}
-//			update_led_();
 			return ctrl;
 		}
 
