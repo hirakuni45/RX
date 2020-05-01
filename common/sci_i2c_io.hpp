@@ -313,7 +313,8 @@ namespace device {
 		bool start(SPEED spd, bool master = true, uint8_t level = 0) noexcept
 		{
 			// I2C オプションが無い場合エラー
-			if(PSEL != port_map::option::FIRST_I2C) {
+			if(PSEL == port_map::option::FIRST_I2C || PSEL == port_map::option::SECOND_I2C || PSEL == port_map::option::THIRD_I2C) {
+			} else {
 				return false;
 			}
 

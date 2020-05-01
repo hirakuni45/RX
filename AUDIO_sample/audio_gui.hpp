@@ -3,11 +3,13 @@
 /*!	@file
 	@brief	オーディオ GUI クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+#include "common/sci_i2c_io.hpp"
+
 #include "graphics/font8x16.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
@@ -15,6 +17,11 @@
 #include "graphics/dialog.hpp"
 #include "graphics/img_in.hpp"
 #include "graphics/widget_director.hpp"
+#include "graphics/scaling.hpp"
+#include "graphics/img_in.hpp"
+
+#include "sound/tag.hpp"
+#include "sound/af_play.hpp"
 
 #include "chip/FAMIPAD.hpp"
 #include "chip/FT5206.hpp"
@@ -32,9 +39,22 @@ namespace app {
 		static const int16_t LCD_Y = 272;
 		static const auto PIX = graphics::pixel::TYPE::RGB565;
 
+		typedef utils::fixed_fifo<uint8_t, 64> RB64;
+		typedef utils::fixed_fifo<uint8_t, 64> SB64;
+
+#if defined(SIG_RX65N)
 		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
-
+		static const uint32_t LCD_ORG = 0x0000'0100;
+		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::FIRST_I2C> FT5206_I2C;
+#elif defined(SIG_RX72N)
+		typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
+		typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
+		static const uint32_t LCD_ORG = 0x0080'0000;
+		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
+		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
+#endif
 		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
 
 		typedef graphics::font8x16 AFONT;
@@ -46,7 +66,7 @@ namespace app {
 //	typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
 		// ソフトウェアーレンダラー
 		typedef graphics::render<GLCDC, FONT> RENDER;
-
+		// 標準カラーインスタンス
 		typedef graphics::def_color DEF_COLOR;
 
 	private:
@@ -56,17 +76,11 @@ namespace app {
 		FONT	font_;
 		RENDER	render_;
 
-		// FT5206, SCI6 簡易 I2C 定義
-		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
-		typedef utils::fixed_fifo<uint8_t, 64> RB6;
-		typedef utils::fixed_fifo<uint8_t, 64> SB6;
-		typedef device::sci_i2c_io<device::SCI6, RB6, SB6,
-		device::port_map::option::FIRST_I2C> FT5206_I2C;
-
 		FT5206_I2C	ft5206_i2c_;
 		typedef chip::FT5206<FT5206_I2C> TOUCH;
 		TOUCH	touch_;
-		// INT to P02(IRQ10)
+		// RX65N Envision Kit: INT to P02(IRQ10), not use
+		// RX72N Envision Kit: INT to P34(IRQ4), not use
 
 		typedef gui::filer<RENDER> FILER;
 		FILER	filer_;
@@ -81,12 +95,43 @@ namespace app {
 		BUTTON	select_;
 		BUTTON	rew_;
 		BUTTON	play_;
-//		BUTTON	pause_;
 		BUTTON	ff_;
+
+		typedef img::scaling<RENDER> SCALING;
+		SCALING		scaling_;
+
+		typedef img::img_in<SCALING> IMG_IN;
+		IMG_IN		img_in_;
 
 		uint32_t	ctrl_;
 
 		char		path_[256];
+
+		struct th_sync_t {
+			volatile uint8_t	put;
+			volatile uint8_t	get;
+			th_sync_t() : put(0), get(0) { }
+			void send() { ++put; }
+			bool sync() const { return put == get; }
+			void recv() { get = put; }
+		};
+
+		th_sync_t	play_stop_;
+		th_sync_t	play_rew_;
+		th_sync_t	play_pause_;
+		th_sync_t	play_ff_;
+
+		bool		mount_state_;
+		bool		filer_state_;
+
+		int16_t render_text_(int16_t x, int16_t y, const char* text)
+		{
+			render_.swap_color();
+			auto xx = render_.draw_text(vtx::spos(x, y), text);
+			render_.swap_color();
+			render_.draw_text(vtx::spos(x + 1, y + 1), text);
+			return xx;
+		}
 
 	public:
 		//-------------------------------------------------------------//
@@ -95,7 +140,7 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		audio_gui() noexcept :
-			glcdc_(nullptr, reinterpret_cast<void*>(0x00000100)),
+			glcdc_(nullptr, reinterpret_cast<void*>(LCD_ORG)),
 			afont_(), kfont_(), font_(afont_, kfont_),
 			render_(glcdc_, font_),
 			ft5206_i2c_(), touch_(ft5206_i2c_),
@@ -104,10 +149,36 @@ namespace app {
 			widd_(render_, touch_),
 			select_(vtx::srect(   0, 272-64*2-6, 64, 64), "Sel"),
 			rew_(   vtx::srect(70*0, 272-64, 64, 64), "<<"),
-			play_(  vtx::srect(70*1, 272-64, 64, 64), "Play"),
+			play_(  vtx::srect(70*1, 272-64, 64, 64), "-"),
 			ff_(    vtx::srect(70*2, 272-64, 64, 64), ">>"),
-			ctrl_(0), path_{ 0 }
+			scaling_(render_), img_in_(scaling_),
+			ctrl_(0), path_{ 0 }, play_stop_(), play_rew_(), play_pause_(), play_ff_(),
+			mount_state_(false), filer_state_(false)
 		{ }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  widget 追加
+			@param[in]	w	widget
+			@return 正常なら「true」
+		*/
+		//-------------------------------------------------------------//
+		bool insert_widget(gui::widget* w) noexcept {
+			return widd_.insert(w);
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  widget 削除
+			@param[in]	w	widget
+			@return 正常なら「true」
+		*/
+		//-------------------------------------------------------------//
+		void remove_widget(gui::widget* w) noexcept {
+			widd_.remove(w);
+		}
 
 
 		//-------------------------------------------------------------//
@@ -176,6 +247,11 @@ namespace app {
 		}
 
 
+		//-------------------------------------------------------------//
+		/*!
+			@brief  タッチ・パネルの設定
+		*/
+		//-------------------------------------------------------------//
 		void setup_touch_panel() noexcept
 		{
 			render_.sync_frame();
@@ -192,19 +268,8 @@ namespace app {
 				} else {
 					nnn = 0;
 				}
-///					update_led_();
 			}
 			render_.clear(DEF_COLOR::Black);
-		}
-
-
-		bool insert_widget(gui::widget* w) noexcept {
-			return widd_.insert(w);
-		}
-
-
-		void remove_widget(gui::widget* w) noexcept {
-			widd_.remove(w);
 		}
 
 
@@ -218,18 +283,27 @@ namespace app {
 			select_.enable();
             select_.at_select_func() = [this](uint32_t id) {
 				gui::set(gui::filer_ctrl::OPEN, ctrl_);
-				enable(false);
 			};
 
 			rew_.enable();
+			rew_.at_select_func() = [this](uint32_t id) {
+				play_rew_.send();
+			};
 			play_.enable();
+			play_.at_select_func() = [this](uint32_t id) {
+				play_pause_.send();
+			};
 			ff_.enable();
+			ff_.at_select_func() = [this](uint32_t id) {
+				play_ff_.send();
+			};
 		}
 
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief  GUI クローズ
+			@brief  GUI 有効 / 無効
+			@param[in]	ena	「false」の場合無効
 		*/
 		//-------------------------------------------------------------//
 		void enable(bool ena = true) noexcept
@@ -245,22 +319,53 @@ namespace app {
 		/*!
 			@brief  GUI 関係更新
 			@param[in]	mount	SD カードマウント状態
+			@param[in]	st		コーデックのステート
 			@return ファイルが選択されたら「true」
 		*/
 		//-------------------------------------------------------------//
-		bool update(bool mount) noexcept
+		bool update(bool mount, sound::af_play::STATE st) noexcept
 		{
 			render_.sync_frame();
-			touch_.update();
+			touch_.update();			
+
+			if(st == sound::af_play::STATE::PLAY) {
+				play_.set_title("Pause");
+			} else if(st == sound::af_play::STATE::PAUSE) {
+				play_.set_title("Play");
+			} else {
+				play_.set_title("-");
+			}
 
 			ctrl_ = 0;
 			if(mount) {
 				gui::set(gui::filer_ctrl::MOUNT, ctrl_);
+				if(!mount_state_ && mount) {  // SD がマウントされたら、画面を消して GUI 再描画
+					render_.clear(DEF_COLOR::Black);
+					widd_.redraw_all();
+				}
+			} else {
+				dialog_.modal(vtx::spos(400, 60),
+					"Insert the SD card.\n(The one with the music file.)");
+				gui::set(gui::filer_ctrl::CLOSE, ctrl_);
+				if(st == sound::af_play::STATE::PLAY) {
+					play_stop_.send();
+				}
 			}
+			mount_state_ = mount;
+
+			// ファイラーが有効なら、GUI を無効、ファイラーが無効なら GUI を有効にする。
+			auto fs = filer_.get_state();
+			enable(!fs);
+			// ファイラーが閉じた時に GUI を再描画
+			if(filer_state_ && !fs) {
+				widd_.redraw_all();
+			}
+			filer_state_ = fs;
+
 			widd_.update();
 
 			bool ret = false;
-			{
+			{  // ファイラーの操作
 #ifdef ENABLE_FAMIPAD
 				auto data = get_fami_pad();
 				if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
@@ -284,13 +389,125 @@ namespace app {
 				filer_.set_touch(tnum, t.pos); 
 				path_[0] = 0;
 				if(filer_.update(ctrl_, path_, sizeof(path_))) {
-					enable();
-					widd_.redraw_all();
 //					utils::format("Play: '%s'\n") % path_;
+					// プレイヤーが再生中なら停止を送る。
+					if(st == sound::af_play::STATE::PLAY) {
+						play_stop_.send();
+					}
 					ret = true;
 				}
 			}
 			return ret;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  コーデック制御 @n
+					※非同期、外部のタスクがこの API を呼ぶ
+			@return コーデック制御ステート
+		*/
+		//-------------------------------------------------------------//
+		sound::af_play::CTRL ctrl() noexcept
+		{
+			sound::af_play::CTRL c = sound::af_play::CTRL::NONE;
+			if(!play_stop_.sync()) {
+				play_stop_.recv();
+				return sound::af_play::CTRL::STOP;
+			}
+			if(!play_pause_.sync()) {
+				play_pause_.recv();
+				return sound::af_play::CTRL::PAUSE;
+			}
+			if(!play_rew_.sync()) {
+				play_rew_.recv();
+				return sound::af_play::CTRL::REPLAY;
+			}
+			if(!play_ff_.sync()) {
+				play_ff_.recv();
+				return sound::af_play::CTRL::NEXT;
+			}
+			return c;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  TAG のレンダリング @n
+					※非同期、外部のタスクがこの API を呼ぶ
+			@param[in]	fin		ファイル操作コンテキスト
+			@param[in]	tag		タグ
+		*/
+		//-------------------------------------------------------------//
+		void render_tag(utils::file_io& fin, const sound::tag_t& tag) noexcept
+		{
+//			render_.clear(graphics::def_color::Black);
+			render_.set_fore_color(graphics::def_color::Black);
+			render_.fill_box(vtx::srect(0, 0, LCD_X - LCD_Y, 20 * 6));
+			render_.fill_box(vtx::srect(LCD_X - LCD_Y, 0, LCD_Y, LCD_Y));
+			render_.sync_frame(false);
+
+			scaling_.set_offset(vtx::spos(LCD_X - LCD_Y, 0));
+			if(tag.get_apic().len_ > 0) {
+				if(!img_in_.select_decoder(tag.get_apic().ext_)) {
+					scaling_.set_scale();
+					img_in_.load("/NoImage.jpg");
+				} else {
+					auto pos = fin.tell();
+					fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
+					img::img_info ifo;
+					if(!img_in_.info(fin, ifo)) {
+						scaling_.set_scale();
+						img_in_.load("/NoImage.jpg");
+						render_.swap_color();
+						render_.draw_text(vtx::spos(LCD_X - LCD_Y, 0), "image decode error.");
+						render_.swap_color();
+					} else {
+						auto n = std::max(ifo.width, ifo.height);
+						scaling_.set_scale(LCD_Y, n);
+						img_in_.load(fin);
+					}
+					fin.seek(utils::file_io::SEEK::SET, pos);
+				}
+			} else {
+				scaling_.set_scale();
+				img_in_.load("/NoImage.jpg");
+			}
+
+			render_.set_fore_color(graphics::def_color::White);
+			render_.set_back_color(graphics::def_color::Gray);
+			render_text_(0, 0 * 20, tag.get_album().c_str());
+			render_text_(0, 1 * 20, tag.get_title().c_str());
+			render_text_(0, 2 * 20, tag.get_artist().c_str());
+			render_text_(0, 3 * 20, tag.get_year().c_str());
+			auto x = render_text_(0, 4 * 20, tag.get_disc().c_str());
+			if(x > 0) x += 8;
+			render_text_(x, 4 * 20, tag.get_track().c_str());
+			render_.sync_frame(false);
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  時間のレンダリング @n
+					※非同期、外部のタスクがこの API を呼ぶ
+			@param[in]	t		時間
+		*/
+		//-------------------------------------------------------------//
+		void render_time(uint32_t t) noexcept
+		{
+			if(filer_.get_state()) return;
+
+			uint16_t sec = t % 60;
+			uint16_t min = (t / 60) % 60;
+			uint16_t hor = (t / 3600) % 24;
+			char tmp[16];
+			utils::sformat("%02d:%02d:%02d", tmp, sizeof(tmp)) % hor % min % sec;
+			render_.set_fore_color(graphics::def_color::Black);
+			render_.fill_box(vtx::srect(0, 5 * 20, 8 * 8, 16));
+			render_.set_fore_color(graphics::def_color::White);
+			render_.draw_text(vtx::spos(0, 5 * 20), tmp);
+			render_.sync_frame(false);
 		}
 
 

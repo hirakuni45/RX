@@ -38,8 +38,10 @@ namespace device {
 			LOCAL1,		///< 独自の特殊な設定１
 			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合、第１候補
 			SECOND_I2C,	///< SCI ポートを簡易 I2C として使う場合、第２候補
+			THIRD_I2C,	///< SCI ポートを簡易 I2C として使う場合、第３候補
 			FIRST_SPI,	///< SCI ポートを簡易 SPI として使う場合、第１候補
 			SECOND_SPI,	///< SCI ポートを簡易 SPI として使う場合、第２候補
+			THIRD_SPI,	///< SCI ポートを簡易 SPI として使う場合、第３候補
 		};
 
 
@@ -88,8 +90,8 @@ namespace device {
 
 			bool i2c = false;
 			bool spi = false;
-			if(opt == option::FIRST_I2C || opt == option::SECOND_I2C) i2c = true;
-			else if(opt == option::FIRST_SPI || opt == option::SECOND_SPI) spi = true;
+			if(opt == option::FIRST_I2C) i2c = true;
+			else if(opt == option::FIRST_SPI) spi = true;
 
 			switch(t) {
 			case peripheral::USB0:
@@ -757,8 +759,8 @@ namespace device {
 
 			bool i2c = false;
 			bool spi = false;
-			if(opt == option::FIRST_I2C || opt == option::SECOND_I2C) i2c = true;
-			else if(opt == option::FIRST_SPI || opt == option::SECOND_SPI) spi = true;
+			if(opt == option::SECOND_I2C) i2c = true;
+			else if(opt == option::SECOND_SPI) spi = true;
 
 			switch(t) {
 			case peripheral::SCI0:
@@ -771,7 +773,7 @@ namespace device {
 						PORT3::PODR.B2 = 1;
 						PORT3::PODR.B3 = 1;
 					}
-					uint8_t sel = enable ? 0b001010 : 0;
+					uint8_t sel = enable ? 0b001011 : 0;
 					PORT3::PMR.B2 = 0;
 					PORT3::PMR.B3 = 0;
 					MPC::P32PFS.PSEL = sel;  // TXD0/SMOSI0/SSDA0 (P32 LQFP176: 29)
@@ -928,6 +930,48 @@ namespace device {
 				MPC::PF5PFS.ISEL = enable;  // PF5
 				break;
 
+			default:
+				ret = false;
+				break;
+			}
+			return ret;
+		}
+
+
+		static bool sub_3rd_(peripheral t, bool enable, option opt)
+		{
+			bool ret = true;
+
+			bool i2c = false;
+			bool spi = false;
+			if(opt == option::THIRD_I2C) i2c = true;
+			else if(opt == option::THIRD_SPI) spi = true;
+
+			switch(t) {
+			case peripheral::SCI6:
+				{
+					if(i2c) {
+						PORT3::ODR0.B4 = 1;  // P32 N-OpenDrain
+						PORT3::ODR0.B6 = 1;  // P33 N-OpenDrain
+						PORT3::PDR.B2 = 1;
+						PORT3::PDR.B3 = 1;
+						PORT3::PODR.B2 = 1;
+						PORT3::PODR.B3 = 1;
+					}
+					uint8_t sel = enable ? 0b001010 : 0;
+					PORT3::PMR.B2 = 0;
+					PORT3::PMR.B3 = 0;
+					MPC::P32PFS.PSEL = sel;  // TXD6/SMOSI6/SSDA6 (P32 LQFP176: 29)
+					MPC::P33PFS.PSEL = sel;  // RXD6/SMISO6/SSCL6 (P33 LQFP176: 28)
+					PORT3::PMR.B2 = enable;
+					PORT3::PMR.B3 = enable;
+					if(spi) {
+						PORT3::PMR.B4 = 0;
+						MPC::P34PFS.PSEL = sel;  // SCK6 (P34 LQFP176: 27)
+						PORT3::PMR.B4 = enable;
+					}
+				}
+				break;
 			default:
 				ret = false;
 				break;
@@ -1145,6 +1189,11 @@ namespace device {
 			case option::SECOND_I2C:
 			case option::SECOND_SPI:
 				ret = sub_2nd_(per, ena, opt);
+				break;
+			case option::THIRD:
+			case option::THIRD_I2C:
+			case option::THIRD_SPI:
+				ret = sub_3rd_(per, ena, opt);
 				break;
 			default:
 				break;

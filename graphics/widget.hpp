@@ -96,7 +96,8 @@ namespace gui {
 			noexcept :
 			parents_(nullptr), next_(nullptr),
 			location_(loc), title_(title),
-			state_(STATE::DISABLE), focus_(false), touch_(false), touch_state_(fexp)
+			state_(STATE::DISABLE), focus_(false), touch_(false),
+			touch_state_(fexp)
 		{ } 
 
 

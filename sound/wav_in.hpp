@@ -205,6 +205,7 @@ namespace sound {
 		template <class SOUND_OUT>
 		bool decode(utils::file_io& fin, SOUND_OUT& out) noexcept
 		{
+			set_state(STATE::TAG);
 			tag_t tag;
 			if(!load_header(fin, tag)) {
 				return false;
@@ -221,14 +222,19 @@ namespace sound {
 			bool pause = false;
 			uint32_t pos = 0;
 			time_ = 0;
+			set_state(STATE::PLAY);
 			while(data_pos_ < data_size_) {
 				CTRL ctrl = CTRL::NONE;
 				if(ctrl_task_) {
 					ctrl = ctrl_task_();
 				}
-				if(ctrl == CTRL::STOP) {
+				if(ctrl == CTRL::NEXT) {
 					out.mute();
-//					status = false;
+					status = true;
+					break;
+				} else if(ctrl == CTRL::STOP) {
+					out.mute();
+					status = false;
 					break;
 				} else if(ctrl == CTRL::REPLAY) {
 					out.mute();
@@ -243,8 +249,11 @@ namespace sound {
 					pause = !pause;
 				}
 				if(pause) {
-					utils::delay::milli_second(2);
+					set_state(STATE::PAUSE);
+					system_delay(2);
 					continue;
+				} else {
+					set_state(STATE::PLAY);
 				}
 
 				uint32_t unit = (bits_ / 8) * channel_;
@@ -258,7 +267,8 @@ namespace sound {
 				if(bits_ == 16) {
 					const uint16_t* src = reinterpret_cast<const uint16_t*>(tmp);
 					for(uint32_t i = 0; i < 256; ++i) {
-						while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
+						while((out.at_fifo().size() - out.at_fifo().length()) < 64) {
+							system_delay(1);
 						}
 						typename SOUND_OUT::WAVE t;
 						if(get_channel() == 2) {
@@ -276,7 +286,8 @@ namespace sound {
 				} else {  // 8 bits
 					const uint8_t* src = reinterpret_cast<const uint8_t*>(tmp);
 					for(uint32_t i = 0; i < 256; ++i) {
-						while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
+						while((out.at_fifo().size() - out.at_fifo().length()) < 64) {
+							system_delay(1);
 						}
 						typename SOUND_OUT::WAVE t;
 						if(get_channel() == 2) {
@@ -307,6 +318,7 @@ namespace sound {
 				}
 				data_pos_ += unit;
 			}
+			set_state(STATE::IDLE);
 			return status;
 		}
 

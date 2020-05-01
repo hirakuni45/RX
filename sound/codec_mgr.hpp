@@ -1,7 +1,10 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	オーディオ・コーデック・マネージャー
+	@brief	オーディオ・コーデック・マネージャー @n
+			複数のオーディオ・コーデックを扱う。@n
+			・mp3（mp3_in.hpp）@n
+			・wav（wav_in.hpp）
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -12,27 +15,108 @@
 #include "sound/wav_in.hpp"
 #include "sound/sound_out.hpp"
 #include "common/dir_list.hpp"
+#include "common/format.hpp"
+
+extern "C" {
+	char sci_getch();
+	uint16_t sci_get_length();
+};
 
 namespace sound {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	codec manager class
-		@param[in]	SOUND_OUT	サウンド出力クラス
+		@brief	コンソール版、LIST_CTRL クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template<class SOUND_OUT>
+	class def_list_ctrl {
+	public:
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	コンストラクター
+		*/
+		//-----------------------------------------------------------------//
+		def_list_ctrl() noexcept { }
+
+
+		void start(const char* fn) noexcept
+		{
+			utils::format("\nAudio file: '%s'\n") % fn;
+		}
+
+
+		void close() noexcept
+		{
+		}
+
+
+		af_play::CTRL ctrl() noexcept
+		{
+			auto ctrl = sound::af_play::CTRL::NONE;
+
+			if(sci_length() > 0) {
+				auto ch = sci_getch();
+				if(ch == ' ') {
+					ctrl = sound::af_play::CTRL::PAUSE;
+				} else if(ch == 0x08) {  // BS
+					ctrl = sound::af_play::CTRL::REPLAY;
+				} else if(ch == 0x0D) {  // RETURN
+					ctrl = sound::af_play::CTRL::NEXT;
+				} else if(ch == 0x1b) {  // ESC
+					ctrl = sound::af_play::CTRL::STOP;
+				}
+			}
+//			update_led_();
+			return ctrl;
+		}
+
+
+		void tag(utils::file_io& fin, const sound::tag_t& t) noexcept
+		{
+			utils::format("Album:  '%s'\n") % t.get_album().c_str();
+			utils::format("Title:  '%s'\n") % t.get_title().c_str();
+			utils::format("Artist: '%s'\n") % t.get_artist().c_str();
+			utils::format("Year:    %s\n")  % t.get_year().c_str();
+			utils::format("Disc:    %s\n")  % t.get_disc().c_str();
+			utils::format("Track:   %s\n")  % t.get_track().c_str();
+		}
+
+
+		void update(uint32_t t) noexcept
+		{
+			uint16_t sec = t % 60;
+			uint16_t min = (t / 60) % 60;
+			uint16_t hor = (t / 3600) % 24;
+			utils::format("\r%02d:%02d:%02d") % hor % min % sec;
+			utils::format::chaout().flush();
+		}
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief	codec manager class
+		@param[in]	LIST_CTRL	TAG 情報表示と制御クラス
+		@param[in]	SOUND_OUT	サウンド出力クラス(sound_out クラス)
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template<class LIST_CTRL, class SOUND_OUT>
 	class codec_mgr {
 
+		LIST_CTRL&	list_ctrl_;
 		SOUND_OUT&	sound_out_;
 
 		wav_in		wav_in_;
 		mp3_in		mp3_in_;
 
+		enum class CODEC : uint8_t {
+			NONE,
+			MP3,
+			WAV,
+		};
+
 		typedef utils::dir_list DLIST;
 		DLIST		dlist_;
-
-		char		get_ch_;
 
 		struct loop_t {
 			const char* start;
@@ -41,49 +125,9 @@ namespace sound {
 		};
 		loop_t		loop_t_;
 
+		bool		stop_;
 
-		af_play::CTRL ctrl_task_() noexcept
-		{
-			auto ctrl = sound::af_play::CTRL::NONE;
-
-			if(get_ch_ != 0) {
-				auto ch = get_ch_;
-				if(ch == ' ') {
-					ctrl = sound::af_play::CTRL::PAUSE;
-				} else if(ch == 0x08) {  // BS
-					ctrl = sound::af_play::CTRL::REPLAY;
-				} else if(ch == 0x0D) {  // RETURN
-					ctrl = sound::af_play::CTRL::STOP;
-				} else if(ch == 0x1b) {  // ESC
-					ctrl = sound::af_play::CTRL::STOP;
-					dlist_.stop();
-				}
-				get_ch_ = 0;
-			}
-//			update_led_();
-			return ctrl;
-		}
-
-
-		void tag_task_(utils::file_io& fin, const sound::tag_t& tag) noexcept
-		{
-			utils::format("Album:  '%s'\n") % tag.get_album().c_str();
-			utils::format("Title:  '%s'\n") % tag.get_title().c_str();
-			utils::format("Artist: '%s'\n") % tag.get_artist().c_str();
-			utils::format("Year:    %s\n") % tag.get_year().c_str();
-			utils::format("Disc:    %s\n") % tag.get_disc().c_str();
-			utils::format("Track:   %s\n") % tag.get_track().c_str();
-		}
-
-
-		void update_task_(uint32_t t) noexcept
-		{
-			uint16_t sec = t % 60;
-			uint16_t min = (t / 60) % 60;
-			uint16_t hor = (t / 3600) % 24;
-			utils::format("\r%02d:%02d:%02d") % hor % min % sec;
-		}
-
+		CODEC		codec_;
 
 		bool play_mp3_(const char* fname) noexcept
 		{
@@ -91,10 +135,23 @@ namespace sound {
 			if(!fin.open(fname, "rb")) {
 				return false;
 			}
-			mp3_in_.set_ctrl_task(ctrl_task_);
-			mp3_in_.set_tag_task(tag_task_);
-			mp3_in_.set_update_task(update_task_);
+			codec_ = CODEC::MP3;
+			mp3_in_.set_ctrl_task([=]() {
+					auto c = list_ctrl_.ctrl();
+					if(c == sound::af_play::CTRL::STOP) {
+						dlist_.stop();
+						stop_ = true;
+					}
+					return c;
+				} );
+			mp3_in_.set_tag_task([=](utils::file_io& fin, const sound::tag_t& tag) {
+				list_ctrl_.tag(fin, tag); }
+			);
+			mp3_in_.set_update_task([=](uint32_t t) { list_ctrl_.update(t); });
+			list_ctrl_.start(fname);
+			stop_ = false;
 			bool ret = mp3_in_.decode(fin, sound_out_);
+			list_ctrl_.close();
 			fin.close();
 			return ret;
 		}
@@ -106,10 +163,23 @@ namespace sound {
 			if(!fin.open(fname, "rb")) {
 				return false;
 			}
-			wav_in_.set_ctrl_task(ctrl_task_);
-			wav_in_.set_tag_task(tag_task_);
-			wav_in_.set_update_task(update_task_);
+			codec_ = CODEC::WAV;
+			wav_in_.set_ctrl_task([=]() {
+					auto c = list_ctrl_.ctrl();
+					if(c == sound::af_play::CTRL::STOP) {
+						dlist_.stop();
+						stop_ = true;
+					}
+					return c;
+				} );
+			wav_in_.set_tag_task([=](utils::file_io& fin, const sound::tag_t& tag) {
+				list_ctrl_.tag(fin, tag); }
+			);
+			wav_in_.set_update_task([=](uint32_t t) { list_ctrl_.update(t); });
+			list_ctrl_.start(fname);
+			stop_ = false;
 			bool ret = wav_in_.decode(fin, sound_out_);
+			list_ctrl_.close();
 			fin.close();
 			return ret;
 		}
@@ -142,13 +212,13 @@ namespace sound {
 			} else {
 				const char* ext = strrchr(name, '.');
 				if(ext != nullptr) {
-					bool ret = true;
+					bool ret = true;  // 拡張子が無い場合スルー
 					if(utils::str::strcmp_no_caps(ext, ".mp3") == 0) {
 						ret = play_mp3_(name);
 					} else if(utils::str::strcmp_no_caps(ext, ".wav") == 0) {
 						ret = play_wav_(name);
 					}
-					if(!ret) {
+					if(!ret && !stop_) {
 						utils::format("Can't open audio file: '%s'\n") % name;
 					}
 				}
@@ -160,30 +230,57 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
-			@param[in]	sound_out	サウンドバッファの参照
+			@param[in]	LIST_CTRL	TAG 情報表示と制御クラスの参照
+			@param[in]	sound_out	サウンドバッファクラスの参照
 		*/
 		//-----------------------------------------------------------------//
-		codec_mgr(SOUND_OUT& sound_out) noexcept : sound_out_(sound_out),
+		codec_mgr(LIST_CTRL& list_ctrl, SOUND_OUT& sound_out) noexcept :
+			list_ctrl_(list_ctrl), sound_out_(sound_out),
 			wav_in_(), mp3_in_(),
-			dlist_(), get_ch_(0), loop_t_()
+			dlist_(), loop_t_(), stop_(false), codec_(CODEC::NONE)
 		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	サービス
-			@param[in]	ctrl	制御キャラクタを注入
+			@brief	コーデックファイル再生
+			@param[in]	name	ファイル名
 		*/
 		//-----------------------------------------------------------------//
-		void service(char ctrl) noexcept
+		void play(const char* name) noexcept
 		{
-			if(ctrl) {
-				get_ch_ = ctrl;
-			}
-			dlist_.service(1, play_loop_func_, true, &loop_t_);
+			play_loop_("", name);
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	サービス
+		*/
+		//-----------------------------------------------------------------//
+		void service() noexcept
+		{
+			dlist_.service(1, [=](const char* name, const FILINFO* fi, bool dir, void* option) {
+				play_loop_func_(name, fi, dir, option); }, true, &loop_t_);
+		}
 
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ステートを取得
+			@return ステート
+		*/
+		//-----------------------------------------------------------------//
+		auto get_state() const noexcept
+		{
+			switch(codec_) {
+			case CODEC::MP3:
+				return mp3_in_.get_state();
+			case CODEC::WAV:
+				return wav_in_.get_state();
+			default:
+				return af_play::STATE::IDLE;
+			}
+		}
 	};
 }

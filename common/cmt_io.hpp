@@ -184,7 +184,7 @@ namespace device {
 		{
 			if(real) {
 				uint32_t rate = CMT::PCLK / (static_cast<uint32_t>(CMT::CMCOR()) + 1);
-				rate /= 4 << (CMT::CMCR.CKS() * 2);
+				rate /= 8 << (CMT::CMCR.CKS() * 2);
 				return rate;
 			} else {
 				return rate_;
