@@ -34,11 +34,12 @@ namespace gui {
 
 		struct widget_t {
 			widget*			w_;
+			const char*		title_;	// タイトルの変化を監視するパッド
 			widget::STATE	state_;
 			bool			init_;
 			bool			focus_;
 			bool			draw_;
-			widget_t() : w_(nullptr), state_(widget::STATE::DISABLE),
+			widget_t() : w_(nullptr), title_(nullptr), state_(widget::STATE::DISABLE),
 				init_(false), focus_(false), draw_(false) { }
 		};
 
@@ -97,6 +98,7 @@ namespace gui {
 			for(auto& t : widgets_) {
 				if(t.w_ == nullptr) {
 					t.w_ = w;
+					t.title_ = w->get_title();
 					t.init_ = false;
 					t.draw_ = true;
 					return true;
@@ -198,6 +200,10 @@ namespace gui {
 					}
 					if(t.focus_ != t.w_->get_focus()) {
 						t.focus_ = t.w_->get_focus();
+						t.draw_ = true;
+					}
+					if(t.w_->get_title() != t.title_) {  // タイトル変更で再描画
+						t.title_ = t.w_->get_title();
 						t.draw_ = true;
 					}
 				}
