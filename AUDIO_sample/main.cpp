@@ -4,7 +4,8 @@
 			SD-CARD にある MP3、WAV 形式のサファイルを再生する。@n
 			オーディオ出力として、マイコン内蔵 D/A 又は、SSIE を選択できる。@n
 			※ D/A を使う場合「#define USE_DAC」@n
-			※ SSIE を使う場合「#define USE_SSIE」
+			※ SSIE を使う場合「#define USE_SSIE」(RX72N) @n
+			※ GLCDC を使う場合「#define USE_GLCDC」(RX65N/RX72N)
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -111,8 +112,8 @@ namespace {
     SDC			sdc_;
 
 	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
-	// SSIE の FIFO サイズの２倍以上（256）
-	typedef sound::sound_out<int16_t, 8192, 256> SOUND_OUT;
+	// SSIE の FIFO サイズの２倍以上（1024）
+	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
 
 	#define USE_SSIE
 	#define USE_GLCDC
@@ -143,6 +144,8 @@ namespace {
     };
 
     name_t      name_t_;
+
+	volatile uint32_t	audio_t_;	
 
 	void update_led_()
 	{
@@ -185,7 +188,12 @@ namespace {
 		//------
 		sound::af_play::CTRL ctrl() noexcept
 		{
-			return def_.ctrl();
+			auto c = def_.ctrl();
+			if(sound::af_play::CTRL::NONE != c) return c;
+#ifdef USE_GLCDC
+			c = gui_.ctrl();
+#endif
+			return c; 
 		}
 
 		//------
@@ -200,7 +208,10 @@ namespace {
 		//------
 		void update(uint32_t t) noexcept
 		{
+#ifndef USE_GLCDC
 			def_.update(t);
+#endif
+			audio_t_ = t;
 		}	
 	};
 	list_ctrl	list_ctrl_;
@@ -457,14 +468,19 @@ extern "C" {
 #ifdef USE_GLCDC
 		gui_.start();
 		gui_.setup_touch_panel();
-
 		gui_.open();  // 標準 GUI
+		volatile uint32_t audio_t = audio_t_;
 #endif
 		while(1) {
 #ifdef USE_GLCDC
-			if(gui_.update(sdc_.get_mount())) {
+			if(gui_.update(sdc_.get_mount(), codec_mgr_.get_state())) {
+				// オーディオ・タスクに、ファイル名を送る。
 				strncpy(name_t_.filename_, gui_.get_filename(), sizeof(name_t_.filename_));
 				name_t_.put_++;
+			}
+			if(audio_t != audio_t_) {
+				gui_.render_time(audio_t_);
+				audio_t = audio_t_;
 			}
 #endif
 			cmd_service_();
