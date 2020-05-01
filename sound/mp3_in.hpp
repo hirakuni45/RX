@@ -203,6 +203,7 @@ namespace sound {
 		template <class SOUND_OUT>
 		bool decode(utils::file_io& fin, SOUND_OUT& out)
 		{
+			set_state(STATE::TAG);
 			id3_mgr id3;
 			id3.parse(fin);
 			if(tag_task_) {
@@ -227,6 +228,7 @@ namespace sound {
 			uint32_t frame_count = 0;
 			bool status = true;
 			bool pause = false;
+			set_state(STATE::PLAY);
 			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
 
 				CTRL ctrl = CTRL::NONE;
@@ -256,8 +258,11 @@ namespace sound {
 					pause = !pause;
 				}
 				if(pause) {
-					utils::delay::milli_second(5);
+					set_state(STATE::PAUSE);
+					system_delay(5);
 					continue;
+				} else {
+					set_state(STATE::PLAY);
 				}
 
 				if(mad_frame_decode(&mad_frame_, &mad_stream_)) {
@@ -287,8 +292,10 @@ namespace sound {
 
 				mad_synth_frame(&mad_synth_, &mad_frame_);
 
+				// 1152 sample / frame
 				for(uint32_t i = 0; i < mad_synth_.pcm.length; ++i) {
-					while((out.at_fifo().size() - out.at_fifo().length()) < 8) {
+					while((out.at_fifo().size() - out.at_fifo().length()) < 64) {
+						system_delay(1);
 					}
 					typename SOUND_OUT::WAVE t;
 					if(MAD_NCHANNELS(&mad_frame_.header) == 1) {
@@ -311,6 +318,7 @@ namespace sound {
 					}
 				}
 			}
+			set_state(STATE::IDLE);
 
 			mad_synth_finish(&mad_synth_);
 			mad_frame_finish(&mad_frame_);
