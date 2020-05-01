@@ -62,6 +62,7 @@ namespace {
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
 
@@ -74,6 +75,7 @@ namespace {
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
 
@@ -93,6 +95,7 @@ namespace {
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
 	#define USE_GLCDC
@@ -114,6 +117,7 @@ namespace {
 	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// SSIE の FIFO サイズの２倍以上（1024）
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LVL = 0x0000;
 
 	#define USE_SSIE
 	#define USE_GLCDC
@@ -134,7 +138,7 @@ namespace {
 	SHELL		shell_(cmd_);
 
 	// サウンド出力コンテキスト
-	SOUND_OUT	sound_out_;
+	SOUND_OUT	sound_out_(ZERO_LEVEL);
 
     struct name_t {
         char filename_[256];
@@ -145,7 +149,7 @@ namespace {
 
     name_t      name_t_;
 
-	volatile uint32_t	audio_t_;	
+	volatile uint32_t	audio_t_;
 
 	void update_led_()
 	{
@@ -482,13 +486,17 @@ extern "C" {
 				gui_.render_time(audio_t_);
 				audio_t = audio_t_;
 			}
+			cmd_service_();
 #else
+			// GLCDC を使わない場合（コンソールのみ）
 			auto n = cmt_.get_counter();
 			while((n + 10) <= cmt_.get_counter()) {
 				vTaskDelay(1 / portTICK_PERIOD_MS);
 			}
+			if(codec_mgr_.get_state() != sound::af_play::STATE::PLAY) {
+				cmd_service_();
+			}
 #endif
-			cmd_service_();
 			sdc_.service();
 			update_led_();
 		}
