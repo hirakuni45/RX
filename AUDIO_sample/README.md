@@ -55,6 +55,7 @@ Renesas RX65N/RX72N Envision Kit, RX64M Audio Player
 
 <img src="../docs/Filer.jpg" width="80%">
 <img src="../docs/AudioPlayer2.JPG" width="80%">
+<img src="../docs/AudioPlayer3.JPG" width="80%">
 
 ## How to operate the Famicom pad (currently unsupported)
  - 「SELECT」ボタンで、ファイラーが有効になる。（もう一度押すと無効）
