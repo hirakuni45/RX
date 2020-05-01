@@ -66,7 +66,7 @@ namespace sound {
 		public:
 			void operator() () {
 				auto p = static_cast<tpu_t*>(tpu_t_ptr_);
-				device::DMAC0::DMCNT.DTE = 1;  // DMA を再スタート
+				DMAC::DMCNT.DTE = 1;  // DMA を再スタート
 				p->wpos_ = 0;
 			}
 		};
@@ -112,6 +112,12 @@ namespace sound {
 				dac_out_.out1(0x8000);
 			}
 
+			// 波形メモリーの無音状態初期化
+			sound_out_.mute();
+
+			tpu_intl_ = tpu_intl;
+			set_sample_rate(sample_rate);
+
 			{  // DMAC マネージャー開始
 				bool cpu_intr = true;
 				auto ret = dmac_mgr_.start(tpu_io_.get_intr_vec(), DMAC_MGR::trans_type::SP_DN_32,
@@ -122,10 +128,6 @@ namespace sound {
 					return false;
 				}
 			}
-
-			tpu_intl_ = tpu_intl;
-
-			set_sample_rate(sample_rate);
 
 			return true;
 		}
@@ -139,7 +141,6 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		void set_sample_rate(uint32_t freq) noexcept
 		{
-	        uint8_t intr_level = 5;
     	    if(!tpu_io_.start(freq, tpu_intl_)) {
         	    utils::format("TPU0 start error...\n");
         	}
