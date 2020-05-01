@@ -109,6 +109,12 @@ namespace sound {
 		wav_in		wav_in_;
 		mp3_in		mp3_in_;
 
+		enum class CODEC : uint8_t {
+			NONE,
+			MP3,
+			WAV,
+		};
+
 		typedef utils::dir_list DLIST;
 		DLIST		dlist_;
 
@@ -121,12 +127,15 @@ namespace sound {
 
 		bool		stop_;
 
+		CODEC		codec_;
+
 		bool play_mp3_(const char* fname) noexcept
 		{
 			utils::file_io fin;
 			if(!fin.open(fname, "rb")) {
 				return false;
 			}
+			codec_ = CODEC::MP3;
 			mp3_in_.set_ctrl_task([=]() {
 					auto c = list_ctrl_.ctrl();
 					if(c == sound::af_play::CTRL::STOP) {
@@ -154,6 +163,7 @@ namespace sound {
 			if(!fin.open(fname, "rb")) {
 				return false;
 			}
+			codec_ = CODEC::WAV;
 			wav_in_.set_ctrl_task([=]() {
 					auto c = list_ctrl_.ctrl();
 					if(c == sound::af_play::CTRL::STOP) {
@@ -227,7 +237,7 @@ namespace sound {
 		codec_mgr(LIST_CTRL& list_ctrl, SOUND_OUT& sound_out) noexcept :
 			list_ctrl_(list_ctrl), sound_out_(sound_out),
 			wav_in_(), mp3_in_(),
-			dlist_(), loop_t_(), stop_(false)
+			dlist_(), loop_t_(), stop_(false), codec_(CODEC::NONE)
 		{ }
 
 
@@ -252,6 +262,25 @@ namespace sound {
 		{
 			dlist_.service(1, [=](const char* name, const FILINFO* fi, bool dir, void* option) {
 				play_loop_func_(name, fi, dir, option); }, true, &loop_t_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ステートを取得
+			@return ステート
+		*/
+		//-----------------------------------------------------------------//
+		auto get_state() const noexcept
+		{
+			switch(codec_) {
+			case CODEC::MP3:
+				return mp3_in_.get_state();
+			case CODEC::WAV:
+				return wav_in_.get_state();
+			default:
+				return af_play::STATE::IDLE;
+			}
 		}
 	};
 }
