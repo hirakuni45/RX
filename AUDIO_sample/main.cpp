@@ -53,7 +53,7 @@ namespace {
 	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;  ///< Soft SPI 定義
 	SDC_SPI	sdc_spi_;
 	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;	///< カード選択信号
-	typedef device::PORT<device::PORT8, device::bitpos::B2, 0> SDC_POWER;	///< カード電源制御
+	typedef device::PORT<device::PORT8, device::bitpos::B2> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;	///< カード検出
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
@@ -481,6 +481,11 @@ extern "C" {
 			if(audio_t != audio_t_) {
 				gui_.render_time(audio_t_);
 				audio_t = audio_t_;
+			}
+#else
+			auto n = cmt_.get_counter();
+			while((n + 10) <= cmt_.get_counter()) {
+				vTaskDelay(1 / portTICK_PERIOD_MS);
 			}
 #endif
 			cmd_service_();
