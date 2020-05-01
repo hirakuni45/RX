@@ -49,9 +49,9 @@ Renesas RX65N/RX72N Envision Kit, RX64M オーディオ・プレイヤー
  - 右ドラッグでファイル選択（ディレクトリーの場合、そのディレクトリーへ移動）
  - 左ドラッグで、一つ手前のディレクトリーへ移動
  - 三点タッチで、ファイラークローズ
- - 「<<」曲の先頭から再生
- - 「Play/Pause」一時停止と再開
- - 「>>」次の曲を再生
+ - 「<<」ボタンで曲の先頭から再生
+ - 「Play/Pause」ボタンで一時停止と再開
+ - 「>>」ボタンで次の曲を再生
  - ディレクトリー内では、曲の再生が終了したら、次の曲を再生
 
 <img src="../docs/Filer.jpg" width="80%">
@@ -77,10 +77,10 @@ Renesas RX65N/RX72N Envision Kit, RX64M オーディオ・プレイヤー
    
 License
 ----
-
-Audio Player: (MIT open source license) 
-
-FreeRTOS: (MIT open source license) 
-libmad: See libma/libmad/COPYRIGHT (G.P.L. v2)
-libpng: See libpng/libpng/LICENSE  (libpng license)
-zlib: (zlib License)
+   
+Audio Player: (MIT open source license)    
+   
+FreeRTOS: (MIT open source license)    
+libmad: See libma/libmad/COPYRIGHT (G.P.L. v2)   
+libpng: See libpng/libpng/LICENSE  (libpng license)   
+zlib: (zlib License)   

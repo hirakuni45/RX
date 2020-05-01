@@ -24,39 +24,38 @@ Renesas RX65N/RX72N Envision Kit, RX64M Audio Player
 
 <img src="../docs/AudioLead.jpg" width="60%">
 
- - SD カードインターフェースの準備
- - オーディオの接続（DA0、DA1 から出力、GND レベルは、1.65V）3.3V p-p
- - P03_JOY_RIGHT_IRQ11 (DA0) Left 出力
- - P05_IRQ13_SW (DA1) Right 出力
- - ファミコン（互換）パッドの接続（利用する場合、main.cpp で ENABLE_FAMIPAD を有効にする）
- - Pmod (10) PB6_RXD9_PMOD_10 ---> RXD として使用 (コマンドラインインターフェースを利用する場合)
- - Pmod ( 9) PB7_TXD9_PMOD_9  ---> TXD として使用 (コマンドラインインターフェースを利用する場合)
- - RXD/TXD は 115200 Baud, 8-bits, 1-Stop, No-Parity 内部動作表示等
+ - Preparing the SD card interface
+ - Audio connection (output from DA0 and DA1, GND level is 1.65V) 3.3V p-p
+ - P03_JOY_RIGHT_IRQ11 (DA0) Left Output
+ - P05_IRQ13_SW (DA1) Right Output
+ - Pmod (10) PB6_RXD9_PMOD_10 ---> Used as RXD (when using the command line interface)
+ - Pmod ( 9) PB7_TXD9_PMOD_9  ---> Used as TXD (when using the command line interface)
+ - RXD/TXD is 115200 Baud, 8-bits, 1-Stop, No-Parity Internal operation display, etc.
 
-## リソースの準備
- - SD カード、ルートに、「NoImage.jpg」ファイルをコピーしておく。
- - SD カードに、「mp3、wav」形式のファイルを書き込む。
+## Resource Preparation
+ - Copy the "NoImage.jpg" file to the root of the SD card.
+ - Write "mp3, wav" format files to an SD card.
    
-## ビルド方法
- - ターゲットディレクトリーに移動
+## Build method
+ - Move to target directory
  - RX64M、RX65N (Envision Kit)、RX72N (Envision Kit)
- - make する。
- - audio_sample.mot ファイルをマイコンに書き込む。
+ - To make
+ - Write the audio_sample.mot file to the microcontroller.
    
-## タッチパネルでの操作方法
- - 「Sel」ボタンを押す事でファイラーが起動
- - 上下のドラッグで、ファイルフォーカス
- - 右ドラッグでファイル選択（ディレクトリーの場合、そのディレクトリーへ移動）
- - 左ドラッグで、一つ手前のディレクトリーへ移動
- - 三点タッチで、ファイラークローズ
- - 「<<」曲の先頭から再生
- - 「Play/Pause」一時停止と再開
- - 「>>」次の曲を再生
- - ディレクトリー内では、曲の再生が終了したら、次の曲を再生
+## How to operate the touch panel
+ - The filer is started by pushing the "Sel" button.
+ - Drag up and down to focus the file.
+ - Right-drag to select a file (if it is a directory, move it to that directory)
+ - Drag to the left to move to the previous directory.
+ - Three point touch, filer close.
+ - Play from the top of the song with the "<<" button
+ - Pause and resume with the "Play/Pause" button
+ - Press the ">>" button to play the next song.
+ - In the directory, when the song is finished playing, play the next song.
 
 <img src="../docs/Filer.jpg" width="80%">
 
-## ファミコン・パッドでの操作方法（現在は未サポート）
+## How to operate the Famicom pad (currently unsupported)
  - 「SELECT」ボタンで、ファイラーが有効になる。（もう一度押すと無効）
  - 上下ボタンで、ファイルフォーカス
  - 右ボタンで選択（ディレクトリーの場合、そのディレクトリーへ移動）
@@ -67,20 +66,20 @@ Renesas RX65N/RX72N Envision Kit, RX64M Audio Player
  - 再生中「START」ボタンを押す事で、再生中断
  - 再生中は、曲の再生が終了したら、次の曲を再生
     
-## MP3、WAV ファイルの対応状況
- - WAV 形式の場合、最大 48KHz、16 ビット、ステレオのファイルフォーマットまで対応
- - MP3 形式の場合、320Kbps まで対応 (44.1KHz, 48KHz, 16 Bits)
- - WAV 内タグのパース（一部）
- - ID3V2 タグのパース（ID3V1 タグは未対応）
+## Support for MP3 and WAV files
+ - Supports up to 48 KHz, 16-bit and stereo file formats in WAV format.
+ - Up to 320Kbps in MP3 format (44.1KHz, 48KHz, 16 Bits)
+ - Parsing of the tag in WAV (part of it)
+ - ID3V2 tag parsing (ID3V1 tag is not supported)
 
 -----
    
 License
 ----
-
-Audio Player: (MIT open source license) 
-
-FreeRTOS: (MIT open source license) 
-libmad: See libma/libmad/COPYRIGHT (G.P.L. v2)
-libpng: See libpng/libpng/LICENSE  (libpng license)
-zlib: (zlib License)
+   
+Audio Player: (MIT open source license)    
+   
+FreeRTOS: (MIT open source license)    
+libmad: See libma/libmad/COPYRIGHT (G.P.L. v2)   
+libpng: See libpng/libpng/LICENSE  (libpng license)   
+zlib: (zlib License)   
