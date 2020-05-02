@@ -71,7 +71,7 @@ namespace audio {
 				uint32_t tmp = wpos_;
 				++wpos_;
 				if((tmp ^ wpos_) & 64) {
-					sound_out_.service(64, 0x8000);
+					sound_out_.service(64);
 				}
 			}
 		};
@@ -419,7 +419,7 @@ namespace audio {
 	volatile uint32_t codec<RENDER>::wpos_;
 
 	template<class RENDER>
-	SOUND_OUT codec<RENDER>::sound_out_;
+	SOUND_OUT codec<RENDER>::sound_out_(0x8000);
 
 //	template<class RENDER>
 //	volatile uint32_t codec<RENDER>::cycle_count_;

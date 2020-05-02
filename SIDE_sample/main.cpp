@@ -65,6 +65,7 @@ namespace {
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x8000;
 
 	#define USE_DAC
 
@@ -102,6 +103,7 @@ namespace {
 	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// SSIE の FIFO サイズの２倍以上（256）
 	typedef sound::sound_out<int16_t, 8192, 256> SOUND_OUT;
+	static const int16_t ZERO_LEVEL = 0x0000;
 
 	#define USE_SSIE
 
@@ -133,7 +135,7 @@ namespace {
 	SDHI		sdh_;
 
 	// サウンド出力コンテキスト
-	SOUND_OUT	sound_out_;
+	SOUND_OUT	sound_out_(ZERO_LEVEL);
 
 	typedef emu::spinv SPINV;
 	SPINV		spinv_;
