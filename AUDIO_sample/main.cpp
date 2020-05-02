@@ -117,7 +117,7 @@ namespace {
 	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// SSIE の FIFO サイズの２倍以上（1024）
 	typedef sound::sound_out<int16_t, 8192, 1024> SOUND_OUT;
-	static const int16_t ZERO_LVL = 0x0000;
+	static const int16_t ZERO_LEVEL = 0x0000;
 
 	#define USE_SSIE
 	#define USE_GLCDC

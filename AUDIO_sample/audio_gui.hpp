@@ -26,6 +26,9 @@
 #include "chip/FAMIPAD.hpp"
 #include "chip/FT5206.hpp"
 
+// ファミコン・パッドでの操作を有効にする場合
+// #define USE_FAMIPAD
+
 namespace app {
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -48,12 +51,33 @@ namespace app {
 		static const uint32_t LCD_ORG = 0x0000'0100;
 		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
 		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::FIRST_I2C> FT5206_I2C;
+#ifdef USE_FAMIPAD
+		// Famicon PAD (CMOS 4021B Shift Register)
+		// 電源は、微小なので、接続を簡単に行う為、ポート出力を電源として利用
+		typedef device::PORT<device::PORT6, device::bitpos::B0> PAD_VCC;
+		typedef device::PORT<device::PORT6, device::bitpos::B1> PAD_GND;
+		typedef device::PORT<device::PORT6, device::bitpos::B2> PAD_P_S;
+		typedef device::PORT<device::PORT6, device::bitpos::B5> PAD_CLK;
+		typedef device::PORT<device::PORT7, device::bitpos::B3> PAD_OUT;
+		typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT> FAMIPAD;
+#endif
+
 #elif defined(SIG_RX72N)
 		typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
 		typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
 		static const uint32_t LCD_ORG = 0x0080'0000;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
 		typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
+#ifdef USE_FAMIPAD
+		// Famicon PAD (CMOS 4021B Shift Register)
+		// RX72N では、Pmod1 に接続する。
+		// PMOD1                                                PAD_3V3:     Pmod1-6
+		// PMOD1                                                PAD_GND:     Pmod1-5 
+		typedef device::PORT<device::PORT5, device::bitpos::B1> PAD_P_S;  // Pmod1-4
+		typedef device::PORT<device::PORT5, device::bitpos::B2> PAD_CLK;  // Pmod1-3
+		typedef device::PORT<device::PORT5, device::bitpos::B0> PAD_OUT;  // Pmod1-2
+		typedef chip::FAMIPAD<PAD_P_S, PAD_CLK, PAD_OUT, 40> FAMIPAD;
+#endif
 #endif
 		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
 
@@ -70,6 +94,10 @@ namespace app {
 		typedef graphics::def_color DEF_COLOR;
 
 	private:
+#ifdef USE_FAMIPAD
+		FAMIPAD		famipad_;
+#endif
+
 		GLCDC	glcdc_;
 		AFONT	afont_;
 		KFONT	kfont_;
@@ -224,12 +252,14 @@ namespace app {
 				}
 			}
 
-#ifdef ENABLE_FAMIPAD
+#ifdef USE_FAMIPAD
 			{  // ファミコンパッド初期化
+#if defined(SIG_RX65N)
 				PAD_VCC::DIR = 1;
 				PAD_VCC::P = 1;
 				PAD_GND::DIR = 1;
 				PAD_GND::P = 0;
+#endif
 				famipad_.start();
 			}
 #endif
