@@ -220,6 +220,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

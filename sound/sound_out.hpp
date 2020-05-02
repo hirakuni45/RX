@@ -26,7 +26,7 @@ namespace sound {
 		wave_t() noexcept { }
 		wave_t(T v) noexcept : l_ch(v), r_ch(v) { }
 		wave_t(const wave_t& t) noexcept : l_ch(t.l_ch), r_ch(t.r_ch) { }
-		void zero() noexcept { l_ch = 0; r_ch = 0; }
+		void set(T zl) noexcept { l_ch = zl; r_ch = zl; }
 		static wave_t linear(int32_t base, int32_t mod, const wave_t& a, const wave_t& b) noexcept
 		{
 			wave_t tmp;
@@ -65,14 +65,17 @@ namespace sound {
 		uint32_t	timebase_;
 		WAVE		wbase_;
 
+		T			zero_ofs_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	zero_ofs	中心レベルのオフセット
 		*/
 		//-----------------------------------------------------------------//
-		sound_out() noexcept : w_put_(0), fifo_(),
-			out_rate_(48'000), inp_rate_(48'000), timebase_(0), wbase_()
+		sound_out(T zero_ofs) noexcept : w_put_(0), fifo_(),
+			out_rate_(48'000), inp_rate_(48'000), timebase_(0), wbase_(), zero_ofs_(zero_ofs)
 		{ }
 
 
@@ -129,9 +132,9 @@ namespace sound {
 		{
 			fifo_.clear();
 			for(uint32_t i = 0; i < OUTS; ++i) {
-				wave_[i].zero();
+				wave_[i].set(zero_ofs_);
 			}
-			wbase_.zero();
+			wbase_.set(0);
 		}
 
 
@@ -178,10 +181,9 @@ namespace sound {
 		/*!
 			@brief	サービス
 			@param[in]	num		波形メモリに移動する数（出力周期に沿った数）
-			@param[in]	ofs		波形オフセット
 		*/
 		//-----------------------------------------------------------------//
-		void service(uint32_t num, uint16_t ofs) noexcept
+		void service(uint32_t num) noexcept
 		{
 			volatile auto len = fifo_.length();
 			if(inp_rate_ == out_rate_) {
@@ -191,11 +193,10 @@ namespace sound {
 						t = fifo_.get();
 						--len;
 					} else {
-						t.zero();
+						t.set(0);
 					}
-					t.l_ch += ofs;
-					t.r_ch += ofs;
 					wave_[w_put_] = t;
+					wave_[w_put_].offset(zero_ofs_);
 					++w_put_;
 					w_put_ &= (OUTS - 1);
 				}
@@ -210,13 +211,13 @@ namespace sound {
 							next = fifo_.get_at();
 							--len;
 						} else {
-							wbase_.zero();
-							next.zero();
+							wbase_.set(0);
+							next.set(0);
 						}
 					}
 //					wave_[w_put_] = WAVE::linear(out_rate_, timebase_, wbase_, next);
 					wave_[w_put_] = wbase_;
-					wave_[w_put_].offset(ofs);
+					wave_[w_put_].offset(zero_ofs_);
 					++w_put_;
 					w_put_ &= (OUTS - 1);
 					timebase_ += inp_rate_;

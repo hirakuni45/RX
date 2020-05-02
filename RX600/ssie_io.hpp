@@ -98,7 +98,7 @@ namespace device {
 				++wpos;
 				wpos &= (p->sound_out_.size() - 1);
 			}
-			p->sound_out_.service(FIFO_TH / 2, 0x0000);
+			p->sound_out_.service(FIFO_TH / 2);
 
 			SSIE::SSIFSR.TDE = 0;
 		}

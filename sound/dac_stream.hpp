@@ -49,7 +49,7 @@ namespace sound {
 				uint32_t tmp = p->wpos_;
 				++p->wpos_;
 				if((tmp ^ p->wpos_) & 64) {
-					p->sound_out_.service(64, 0x8000);
+					p->sound_out_.service(64);
 				}
 			}
 		};
