@@ -688,6 +688,7 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		DRESULT disk_read(BYTE drv, void* buff, DWORD sector, UINT count) noexcept
 		{
+			if(!SDHI::SDSTS1.SDCDMON()) return RES_NOTRDY;
 			if(disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
 
 			// Convert LBA to byte address if needed
@@ -792,6 +793,7 @@ namespace fatfs {
 		//-----------------------------------------------------------------//
 		DRESULT disk_write(BYTE drv, const void* buff, DWORD sector, UINT count) noexcept
 		{
+			if(!SDHI::SDSTS1.SDCDMON()) return RES_NOTRDY;
 			if(disk_status(drv) & STA_NOINIT) return RES_NOTRDY;
 			if(WPRT::BIT_POS < 8) {
 				if(WPRT::P()) return RES_WRPRT;

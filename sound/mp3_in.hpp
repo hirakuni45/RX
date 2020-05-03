@@ -205,7 +205,10 @@ namespace sound {
 		{
 			set_state(STATE::TAG);
 			id3_mgr id3;
-			id3.parse(fin);
+			if(!id3.parse(fin)) {
+				set_state(STATE::IDLE);
+				return false;
+			}
 			if(tag_task_) {
 				const auto& tag = id3.get_tag();
 				tag_task_(fin, tag);
@@ -230,6 +233,10 @@ namespace sound {
 			bool pause = false;
 			set_state(STATE::PLAY);
 			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
+
+				if(fin.get_error()) {
+					break;
+				}
 
 				CTRL ctrl = CTRL::NONE;
 				if(ctrl_task_) {

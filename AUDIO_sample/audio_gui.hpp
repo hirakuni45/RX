@@ -142,6 +142,7 @@ namespace app {
 			void send() { ++put; }
 			bool sync() const { return put == get; }
 			void recv() { get = put; }
+			void clear() { get = put = 0; }
 		};
 
 		th_sync_t	play_stop_;
@@ -152,6 +153,7 @@ namespace app {
 		bool		mount_state_;
 		bool		filer_state_;
 
+
 		int16_t render_text_(int16_t x, int16_t y, const char* text)
 		{
 			render_.swap_color();
@@ -159,6 +161,53 @@ namespace app {
 			render_.swap_color();
 			render_.draw_text(vtx::spos(x + 1, y + 1), text);
 			return xx;
+		}
+
+
+		void render_tag_(utils::file_io& fin, const sound::tag_t& tag) noexcept
+		{
+			render_.set_fore_color(graphics::def_color::Black);
+			render_.fill_box(vtx::srect(0, 0, LCD_X - LCD_Y, 20 * 6));
+			render_.fill_box(vtx::srect(LCD_X - LCD_Y, 0, LCD_Y, LCD_Y));
+			render_.sync_frame(false);
+
+			scaling_.set_offset(vtx::spos(LCD_X - LCD_Y, 0));
+			if(tag.get_apic().len_ > 0) {
+				if(!img_in_.select_decoder(tag.get_apic().ext_)) {
+					scaling_.set_scale();
+					img_in_.load("/NoImage.jpg");
+				} else {
+					auto pos = fin.tell();
+					fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
+					img::img_info ifo;
+					if(!img_in_.info(fin, ifo)) {
+						scaling_.set_scale();
+						img_in_.load("/NoImage.jpg");
+						render_.swap_color();
+						render_.draw_text(vtx::spos(LCD_X - LCD_Y, 0), "image decode error.");
+						render_.swap_color();
+					} else {
+						auto n = std::max(ifo.width, ifo.height);
+						scaling_.set_scale(LCD_Y, n);
+						img_in_.load(fin);
+					}
+					fin.seek(utils::file_io::SEEK::SET, pos);
+				}
+			} else {
+				scaling_.set_scale();
+				img_in_.load("/NoImage.jpg");
+			}
+
+			render_.set_fore_color(graphics::def_color::White);
+			render_.set_back_color(graphics::def_color::Gray);
+			render_text_(0, 0 * 20, tag.get_album().c_str());
+			render_text_(0, 1 * 20, tag.get_title().c_str());
+			render_text_(0, 2 * 20, tag.get_artist().c_str());
+			render_text_(0, 3 * 20, tag.get_year().c_str());
+			auto x = render_text_(0, 4 * 20, tag.get_disc().c_str());
+			if(x > 0) x += 8;
+			render_text_(x, 4 * 20, tag.get_track().c_str());
+			render_.sync_frame(false);
 		}
 
 	public:
@@ -433,12 +482,23 @@ namespace app {
 
 		//-------------------------------------------------------------//
 		/*!
+			@brief  演奏ファイル名の登録
+			@param[in]	fn	ファイル名
+		*/
+		//-------------------------------------------------------------//
+		void set_file_name(const char* fn) noexcept
+		{
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
 			@brief  コーデック制御 @n
 					※非同期、外部のタスクがこの API を呼ぶ
 			@return コーデック制御ステート
 		*/
 		//-------------------------------------------------------------//
-		sound::af_play::CTRL ctrl() noexcept
+		sound::af_play::CTRL get_ctrl() noexcept
 		{
 			sound::af_play::CTRL c = sound::af_play::CTRL::NONE;
 			if(!play_stop_.sync()) {
@@ -471,49 +531,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void render_tag(utils::file_io& fin, const sound::tag_t& tag) noexcept
 		{
-//			render_.clear(graphics::def_color::Black);
-			render_.set_fore_color(graphics::def_color::Black);
-			render_.fill_box(vtx::srect(0, 0, LCD_X - LCD_Y, 20 * 6));
-			render_.fill_box(vtx::srect(LCD_X - LCD_Y, 0, LCD_Y, LCD_Y));
-			render_.sync_frame(false);
-
-			scaling_.set_offset(vtx::spos(LCD_X - LCD_Y, 0));
-			if(tag.get_apic().len_ > 0) {
-				if(!img_in_.select_decoder(tag.get_apic().ext_)) {
-					scaling_.set_scale();
-					img_in_.load("/NoImage.jpg");
-				} else {
-					auto pos = fin.tell();
-					fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
-					img::img_info ifo;
-					if(!img_in_.info(fin, ifo)) {
-						scaling_.set_scale();
-						img_in_.load("/NoImage.jpg");
-						render_.swap_color();
-						render_.draw_text(vtx::spos(LCD_X - LCD_Y, 0), "image decode error.");
-						render_.swap_color();
-					} else {
-						auto n = std::max(ifo.width, ifo.height);
-						scaling_.set_scale(LCD_Y, n);
-						img_in_.load(fin);
-					}
-					fin.seek(utils::file_io::SEEK::SET, pos);
-				}
-			} else {
-				scaling_.set_scale();
-				img_in_.load("/NoImage.jpg");
-			}
-
-			render_.set_fore_color(graphics::def_color::White);
-			render_.set_back_color(graphics::def_color::Gray);
-			render_text_(0, 0 * 20, tag.get_album().c_str());
-			render_text_(0, 1 * 20, tag.get_title().c_str());
-			render_text_(0, 2 * 20, tag.get_artist().c_str());
-			render_text_(0, 3 * 20, tag.get_year().c_str());
-			auto x = render_text_(0, 4 * 20, tag.get_disc().c_str());
-			if(x > 0) x += 8;
-			render_text_(x, 4 * 20, tag.get_track().c_str());
-			render_.sync_frame(false);
+			render_tag_(fin, tag);
 		}
 
 
