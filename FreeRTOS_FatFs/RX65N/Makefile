@@ -16,9 +16,8 @@ ROOT_DEV_	=	RX65x
 
 FATFS_VER	=	ff13c/source
 
-OPTIMIZE	=	-O3
-
 BUILD		=	release
+# BUILD		=	debug
 
 VPATH		=	../../
 
@@ -97,6 +96,18 @@ CC_OPT		=	-Wall -Werror \
 				-Wno-unused-but-set-variable \
 				-Wno-strict-aliasing \
 				-fno-exceptions
+
+ifeq ($(BUILD),debug)
+    CC_OPT += -g -DDEBUG
+    CP_OPT += -g -DDEBUG
+	OPTIMIZE = -O0
+endif
+
+ifeq ($(BUILD),release)
+    CC_OPT += -DNDEBUG
+    CP_OPT += -DNDEBUG
+	OPTIMIZE = -O3
+endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
 APPINCS		=	$(addprefix -I, $(INC_APP))
