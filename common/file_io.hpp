@@ -47,6 +47,7 @@ namespace utils {
 	private: 
 		FIL			fp_;
 		bool		open_;
+		bool		error_;
 
 		struct dir_list_t {
 			bool	ll_;
@@ -133,7 +134,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		file_io() noexcept :
 			fp_(),
-			open_(false)
+			open_(false), error_(false)
 		{ }
 
 
@@ -284,6 +285,7 @@ namespace utils {
 				return false;
 			}
 			open_ = true;
+			error_ = false;
 			return true;
 		}
 
@@ -351,6 +353,7 @@ namespace utils {
 			UINT rl = 0;
 			FRESULT res = f_read(&fp_, dst, len, &rl);
 			if(res != FR_OK) {
+				error_ = true;
 				return 0;
 			}
 			return rl;
@@ -405,6 +408,7 @@ namespace utils {
 			UINT wl = 0;
 			FRESULT res = f_write(&fp_, src, len, &wl);
 			if(res != FR_OK) {
+				error_ = true;
 				return 0;
 			}
 			return wl;
@@ -445,6 +449,9 @@ namespace utils {
 				return false;
 				break;
 			}
+			if(ret != FR_OK) {
+				error_ = true;
+			}
 			return ret == FR_OK;
 		}
 
@@ -473,6 +480,15 @@ namespace utils {
 			if(!open_) return false;
 			return f_eof(&fp_);
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	エラーの取得
+			@return エラーなら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool get_error() const noexcept { return error_; }
 
 
 		//-----------------------------------------------------------------//

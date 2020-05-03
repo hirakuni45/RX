@@ -1,17 +1,20 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX64M Makefile
+#   @brief  RX65N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	rtos_fatfs_sample
+TARGET		=	dsos_sample
 
-DEVICE		=	R5F564MF
+ROOT		=	DSOS_sample
 
-ROOT_DEV	=	RX64M
+DEVICE		=	R5F565NE
+
+ROOT_DEV	=	RX65N
+ROOT_DEV_	=	RX65x
 
 FATFS_VER	=	ff13c/source
 
@@ -28,31 +31,25 @@ CSOURCES	=	common/init.c \
 				$(FATFS_VER)/ff.c \
 				$(FATFS_VER)/ffsystem.c \
 				$(FATFS_VER)/ffunicode.c \
-				common/time.c \
-				FreeRTOS/Source/portable/GCC/RX600v2/port.c \
-				FreeRTOS/Source/portable/MemMang/heap_3.c \
-				FreeRTOS/Source/croutine.c \
-				FreeRTOS/Source/event_groups.c \
-				FreeRTOS/Source/list.c \
-				FreeRTOS/Source/queue.c \
-				FreeRTOS/Source/stream_buffer.c \
-				FreeRTOS/Source/tasks.c \
-				FreeRTOS/Source/timers.c
+				common/time.c
 
-PSOURCES	=	FreeRTOS_FatFs/main.cpp \
+PSOURCES	=	$(ROOT)/main.cpp \
+				graphics/font8x16.cpp \
+				graphics/kfont16.cpp \
+				graphics/color.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	supc++ mad
+USER_LIBS	=	m supc++ drw2d
 
-LDSCRIPT	=	../../$(ROOT_DEV)/$(DEVICE).ld
+LDSCRIPT	=	../../$(ROOT_DEV_)/$(DEVICE).ld
 
 USER_DEFS	=	SIG_$(ROOT_DEV) \
 				F_ICLK=120000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000 \
-				RTOS FAT_FS FAT_FS_NUM=4
+				FAT_FS FAT_FS_NUM=4
 
-AS_DEFS		=	--defsym NOT_USER=1
+AS_DEFS		=
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 
@@ -75,11 +72,9 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../../ \
-				../../FreeRTOS/Source/include \
-				../../FreeRTOS/Source/portable/GCC/RX600v2
+INC_APP		=	. ../ ../../ ../../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../../libmad
+LIB_ROOT	=	../../RX600/drw2d ../../zlib
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ルネサス RX デバイス選択
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -88,7 +88,7 @@
 #include "RX600/cmtw.hpp"
 #include "RX600/can.hpp"
 #include "RX600/qspi.hpp"
-#include "RX600/s12adc.hpp"
+#include "RX600/s12adf.hpp"
 #include "RX600/adc_in.hpp"
 #include "RX600/r12da.hpp"
 #include "RX600/dac_out.hpp"
@@ -136,7 +136,7 @@
 #include "RX600/cmtw.hpp"
 #include "RX600/qspi.hpp"
 #include "RX600/can.hpp"
-#include "RX65x/s12adf.hpp"
+#include "RX600/s12adf.hpp"
 #include "RX600/adc_in.hpp"
 #include "RX600/r12da.hpp"
 #include "RX600/dac_out.hpp"

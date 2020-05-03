@@ -18,6 +18,7 @@
 #include "graphics/slider.hpp"
 #include "graphics/menu.hpp"
 #include "graphics/spinbox.hpp"
+#include "graphics/closebox.hpp"
 
 namespace gui {
 
@@ -299,6 +300,13 @@ namespace gui {
 				case widget::ID::SPINBOX:
 					{
 						auto* w = dynamic_cast<spinbox*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::CLOSEBOX:
+					{
+						auto* w = dynamic_cast<closebox*>(t.w_);
 						if(w == nullptr) break;
 						w->draw(rdr_);
 					}

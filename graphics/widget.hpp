@@ -36,6 +36,7 @@ namespace gui {
 			SLIDER,		///< スライダー
 			MENU,		///< メニュー
 			SPINBOX,	///< スピンボックス
+			CLOSEBOX,	///< クローズボックス
 		};
 
 

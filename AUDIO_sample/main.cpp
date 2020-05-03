@@ -172,6 +172,7 @@ namespace {
 
 	// コーデックの、リスト、制御カスタムクラス
 	class list_ctrl {
+
 		sound::def_list_ctrl	def_;
 
 	public:
@@ -181,6 +182,9 @@ namespace {
 		void start(const char* fn) noexcept
 		{
 			def_.start(fn);
+#ifdef USE_GLCDC
+			gui_.set_file_name(fn);
+#endif
 		}
 
 		//------
@@ -195,7 +199,7 @@ namespace {
 			auto c = def_.ctrl();
 			if(sound::af_play::CTRL::NONE != c) return c;
 #ifdef USE_GLCDC
-			c = gui_.ctrl();
+			c = gui_.get_ctrl();
 #endif
 			return c; 
 		}
