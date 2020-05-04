@@ -110,6 +110,7 @@ namespace app {
 		// RX65N Envision Kit: INT to P02(IRQ10), not use
 		// RX72N Envision Kit: INT to P34(IRQ4), not use
 
+		typedef gui::filer_base FILER_BASE;
 		typedef gui::filer<RENDER> FILER;
 		FILER	filer_;
 
@@ -134,6 +135,8 @@ namespace app {
 		uint32_t	ctrl_;
 
 		char		path_[256];
+
+		sound::tag_t	play_tag_;
 
 		struct th_sync_t {
 			volatile uint8_t	put;
@@ -229,7 +232,8 @@ namespace app {
 			play_(  vtx::srect(70*1, 272-64, 64, 64), "-"),
 			ff_(    vtx::srect(70*2, 272-64, 64, 64), ">>"),
 			scaling_(render_), img_in_(scaling_),
-			ctrl_(0), path_{ 0 }, play_stop_(), play_rew_(), play_pause_(), play_ff_(),
+			ctrl_(0), path_{ 0 }, play_tag_(), 
+			play_stop_(), play_rew_(), play_pause_(), play_ff_(),
 			mount_state_(false), filer_state_(false)
 		{ }
 
@@ -295,9 +299,9 @@ namespace app {
 				auto ver = render_.get_version();
 				utils::format("DRW2D Version: %04X\n") % ver;
 				if(render_.start()) {
-					utils:: format("Start DRW2D\n");
+					utils::format("Start DRW2D\n");
 				} else {
-					utils:: format("DRW2D Fail\n");
+					utils::format("DRW2D Fail\n");
 				}
 			}
 
@@ -361,7 +365,7 @@ namespace app {
 		{
 			select_.enable();
             select_.at_select_func() = [this](uint32_t id) {
-				gui::set(gui::filer_ctrl::OPEN, ctrl_);
+				FILER_BASE::set(FILER_BASE::ctrl::OPEN, ctrl_);
 			};
 
 			rew_.enable();
@@ -417,7 +421,7 @@ namespace app {
 
 			ctrl_ = 0;
 			if(mount) {
-				gui::set(gui::filer_ctrl::MOUNT, ctrl_);
+				FILER_BASE::set(FILER_BASE::ctrl::MOUNT, ctrl_);
 				if(!mount_state_ && mount) {  // SD がマウントされたら、画面を消して GUI 再描画
 					render_.clear(DEF_COLOR::Black);
 					widd_.redraw_all();
@@ -425,7 +429,7 @@ namespace app {
 			} else {
 				dialog_.modal(vtx::spos(400, 60),
 					"Insert the SD card.\n(The one with the music file.)");
-				gui::set(gui::filer_ctrl::CLOSE, ctrl_);
+				FILER_BASE::set(FILER_BASE::ctrl::CLOSE, ctrl_);
 				if(st == sound::af_play::STATE::PLAY) {
 					play_stop_.send();
 				}
@@ -448,32 +452,34 @@ namespace app {
 #ifdef ENABLE_FAMIPAD
 				auto data = get_fami_pad();
 				if(chip::on(data, chip::FAMIPAD_ST::SELECT)) {
-					gui::set(gui::filer_ctrl::OPEN, ctrl_);
+					FILER_BASE::set(FILER_BASE::ctrl::OPEN, ctrl_);
 				}
 				if(chip::on(data, chip::FAMIPAD_ST::UP)) {
-					gui::set(gui::filer_ctrl::UP, ctrl_);
+					FILER_BASE::set(FILER_BASE::ctrl::UP, ctrl_);
 				}
 				if(chip::on(data, chip::FAMIPAD_ST::DOWN)) {
-					gui::set(gui::filer_ctrl::DOWN, ctrl_);
+					FILER_BASE::set(FILER_BASE::ctrl::DOWN, ctrl_);
 				}
 				if(chip::on(data, chip::FAMIPAD_ST::LEFT)) {
-					gui::set(gui::filer_ctrl::BACK, ctrl_);
+					FILER_BASE::set(FILER_BASE::ctrl::BACK, ctrl_);
 				}
 				if(chip::on(data, chip::FAMIPAD_ST::RIGHT)) {
-					gui::set(gui::filer_ctrl::SELECT, ctrl_);
+					FILER_BASE::set(FILER_BASE::ctrl::SELECT, ctrl_);
 				}
 #endif
 				auto tnum = touch_.get_touch_num();
 				const auto& t = touch_.get_touch_pos(0);
 				filer_.set_touch(tnum, t.pos); 
 				path_[0] = 0;
-				if(filer_.update(ctrl_, path_, sizeof(path_))) {
+				auto fst = filer_.update(ctrl_, path_, sizeof(path_));
+				if(fst == FILER_BASE::status::FILE) {  // ファイル選択
 //					utils::format("Play: '%s'\n") % path_;
 					// プレイヤーが再生中なら停止を送る。
-					if(st == sound::af_play::STATE::PLAY) {
+					if(st == sound::af_play::STATE::PLAY || st == sound::af_play::STATE::PAUSE) {
 						play_stop_.send();
 					}
 					ret = true;
+				} else if(fst == FILER_BASE::status::CANCEL) {  // ファイル選択キャンセル
 				}
 			}
 			return ret;
@@ -531,6 +537,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void render_tag(utils::file_io& fin, const sound::tag_t& tag) noexcept
 		{
+			play_tag_ = tag;
 			render_tag_(fin, tag);
 		}
 
