@@ -15,34 +15,56 @@
 
 namespace gui {
 
+
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	ファイラー制御型
+		@brief	ファイラー・ベース・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class filer_ctrl : uint8_t {
-		MOUNT,		///< ＳＤカードのマウント状態
-		OPEN,		///< ファイラーを起動
-		UP,			///< スクロール上
-		DOWN,		///< スクロール下
-		BACK,		///< ディレクトリーを戻る
-		SELECT,		///< 選択
-		INFO,		///< ファイルの情報を表示
-		CLOSE,		///< ファイラーを閉じる
+	class filer_base {
+	public:
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ファイラー制御型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class ctrl : uint8_t {
+			MOUNT,		///< ＳＤカードのマウント状態
+			OPEN,		///< ファイラーを起動
+			UP,			///< スクロール上
+			DOWN,		///< スクロール下
+			BACK,		///< ディレクトリーを戻る
+			SELECT,		///< 選択
+			INFO,		///< ファイルの情報を表示
+			CLOSE,		///< ファイラーを閉じる
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	制御データ構築
+			@param[in]	pos		ファイラー制御型
+			@param[in]	ctrl	制御データ（参照）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static void set(ctrl pos, uint32_t& ctrl) noexcept
+		{
+			ctrl |= 1 << static_cast<uint8_t>(pos);
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	ステータス型 @n
+					ファイラーが閉じた時の状態
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class status : uint8_t {
+			NONE,	///< 未定義動作
+			FILE,	///< ファイルが選択された
+			CANCEL,	///< 操作がキャンセルされた
+		};
 	};
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief	制御データ構築
-		@param[in]	pos		ファイラー制御型
-		@param[in]	ctrl	制御データ（参照）
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	static inline void set(filer_ctrl pos, uint32_t& ctrl) noexcept
-	{
-		ctrl |= 1 << static_cast<uint8_t>(pos);
-	}
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -52,7 +74,7 @@ namespace gui {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class RDR>
-	class filer {
+	class filer : public filer_base {
 
 		using GLC = typename RDR::glc_type;
 
@@ -114,7 +136,7 @@ namespace gui {
 		uint16_t	repeat_;
 
 
-		static uint32_t ctrl_mask_(filer_ctrl ctrl) noexcept
+		static uint32_t ctrl_mask_(ctrl ctrl) noexcept
 		{
 			return 1 << static_cast<uint8_t>(ctrl);
 		}
@@ -267,10 +289,10 @@ namespace gui {
 			@param[in]	ctrl	ファイラー制御
 			@param[in]	dst		選択パス受け取り先
 			@param[in]	dstlen	選択パス最大サイズ
-			@return ファイルが選択された場合「true」
+			@return ステータス型による状態の返却
 		*/
 		//-----------------------------------------------------------------//
-		bool update(uint32_t ctrl, char* dst, uint32_t dstlen) noexcept
+		status update(uint32_t ctrl, char* dst, uint32_t dstlen) noexcept
 		{
 			uint32_t ptrg = ~ctrl_ &  ctrl;
 			uint32_t ntrg =  ctrl_ & ~ctrl;
@@ -280,13 +302,13 @@ namespace gui {
 				[&](const char* name, const FILINFO* fi, bool dir, void* opt) {
 				dir_draw_func_(name, fi, dir, opt); }, true, &rdr_st_);
 
-			if((ntrg & ctrl_mask_(filer_ctrl::MOUNT))) {  // SD カードのマウント状態
+			if((ntrg & ctrl_mask_(ctrl::MOUNT))) {  // SD カードのマウント状態
 				open_ = false;
 				pos_stack_.clear();
 				rdr_.clear(DEF_COLOR::Black);
 			}
-			if((ctrl & ctrl_mask_(filer_ctrl::MOUNT)) == 0) {
-				return false;
+			if((ctrl & ctrl_mask_(ctrl::MOUNT)) == 0) {
+				return status::NONE;
 			}
 
 			bool opt = false;
@@ -296,7 +318,8 @@ namespace gui {
 					opt = true;
 				}
 			}
-			if((ptrg & ctrl_mask_(filer_ctrl::OPEN)) != 0 || opt) {
+			bool open = open_;
+			if((ptrg & ctrl_mask_(ctrl::OPEN)) != 0 || opt) {
 				open_ = !open_;
 				rdr_.clear(DEF_COLOR::Black);
 				if(open_) {
@@ -304,41 +327,45 @@ namespace gui {
 					scan_dir_(false);
 				}
 			}
-			if((ptrg & ctrl_mask_(filer_ctrl::CLOSE)) != 0) {
+			if((ptrg & ctrl_mask_(ctrl::CLOSE)) != 0) {
 				rdr_.clear(DEF_COLOR::Black);
 				open_ = false;
 			}
 			back_num_ = touch_num_;
 
 			if(!open_) {
-				return false;
+				if(open && !open_) {
+					return status::CANCEL;
+				} else {
+					return status::NONE;
+				}
 			}
 
 			{  // ドラッグでフォーカス移動
 				if(touch_neg_) {
 					auto dx = touch_.x - touch_org_.x;
 					if(dx >= FLN * 2) {
-						ptrg |= ctrl_mask_(filer_ctrl::SELECT);
+						ptrg |= ctrl_mask_(ctrl::SELECT);
 						touch_org_.x = touch_.x;
 					} else if(dx <= -FLN * 2) {
-						ptrg |= ctrl_mask_(filer_ctrl::BACK);
+						ptrg |= ctrl_mask_(ctrl::BACK);
 						touch_org_.x = touch_.x;
 					}
 				}
 				if(touch_lvl_) {
 					auto dy = touch_.y - touch_org_.y;
 					if(dy >= FLN) {
-						ptrg |= ctrl_mask_(filer_ctrl::DOWN);
+						ptrg |= ctrl_mask_(ctrl::DOWN);
 						touch_org_.y = touch_.y;
 					} else if(dy <= -FLN) {
-						ptrg |= ctrl_mask_(filer_ctrl::UP);
+						ptrg |= ctrl_mask_(ctrl::UP);
 						touch_org_.y = touch_.y;
 					}
 				}
 			}
 
 			{
-				auto t = ctrl_ & (ctrl_mask_(filer_ctrl::DOWN) | ctrl_mask_(filer_ctrl::UP));
+				auto t = ctrl_ & (ctrl_mask_(ctrl::DOWN) | ctrl_mask_(ctrl::UP));
 				if(t != 0) {
 					++repeat_;
 					if(repeat_ >= REPEAT_DELAY) {
@@ -351,28 +378,28 @@ namespace gui {
 			}
 
 			{
-				if(dlist_.probe()) return false;
+				if(dlist_.probe()) return status::NONE;
 				if(rdr_st_.num_ < static_cast<int16_t>(dlist_.get_total())) {
-					return false;
+					return status::NONE;
 				}
 			}
 
-			if(ptrg & ctrl_mask_(filer_ctrl::INFO)) {
+			if(ptrg & ctrl_mask_(ctrl::INFO)) {
 				if(info_) {
 					pos_stack_.push(pos_t(rdr_st_.vofs_, rdr_st_.sel_pos_));
 					info_ = false;
 					rdr_.clear(DEF_COLOR::Black);
 					scan_dir_(true);
-					return false;
+					return status::NONE;
 				} else {
 					info_ = true;
 					uint32_t idx = rdr_st_.sel_pos_ - rdr_st_.vofs_ / FLN;
 					char tmp[FF_MAX_LFN + 1];
 					if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
-						return false;
+						return status::NONE;
 					}
 					if(!utils::file_io::get_dir_path(tmp, idx, dst, dstlen)) {
-						return false;
+						return status::NONE;
 					}
 					bool dir = false;
 					uint32_t l = strlen(dst);
@@ -397,17 +424,17 @@ namespace gui {
 				}
 			}
 			if(info_) {
-				return false;
+				return status::NONE;
 			}
 
 			// 選択フレームの描画
 			rdr_.set_fore_color(DEF_COLOR::White);
 			draw_sel_frame_(rdr_st_.sel_pos_);
 			int16_t pos = rdr_st_.sel_pos_;
-			if(ptrg & ctrl_mask_(filer_ctrl::UP)) {
+			if(ptrg & ctrl_mask_(ctrl::UP)) {
 				pos--;
 			}
-			if(ptrg & ctrl_mask_(filer_ctrl::DOWN)) {
+			if(ptrg & ctrl_mask_(ctrl::DOWN)) {
 				++pos;
 			}
 			int16_t vofs = rdr_st_.vofs_;
@@ -450,14 +477,14 @@ namespace gui {
 				rdr_st_.sel_pos_ = pos;
 			}
 
-			if(ptrg & ctrl_mask_(filer_ctrl::SELECT)) {
+			if(ptrg & ctrl_mask_(ctrl::SELECT)) {
 				uint32_t idx = rdr_st_.sel_pos_ - rdr_st_.vofs_ / FLN;
 				char root[FF_MAX_LFN + 1];
 				if(!utils::file_io::pwd(root, sizeof(root))) {
-					return false;
+					return status::NONE;
 				}
 				if(!utils::file_io::get_dir_path(root, idx, dst, dstlen)) {
-					return false;
+					return status::NONE;
 				}
 				uint32_t l = strlen(dst);
 				if(dst[l - 1] == '/') {  // directory ?
@@ -469,11 +496,11 @@ namespace gui {
 				} else {
 					rdr_.clear(DEF_COLOR::Black);
 					open_ = false;
-					return true;
+					return status::FILE;
 				}
 			}
 
-			if(ptrg & ctrl_mask_(filer_ctrl::BACK)) {
+			if(ptrg & ctrl_mask_(ctrl::BACK)) {
 				if(!pos_stack_.empty()) {
 					utils::file_io::cd("..");
 					rdr_.clear(DEF_COLOR::Black);
@@ -481,7 +508,7 @@ namespace gui {
 				}
 			}
 
-			return false;
+			return status::NONE;
 		}
 	};
 }

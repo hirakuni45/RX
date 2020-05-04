@@ -123,6 +123,7 @@ namespace app {
 
 		typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
 #endif
+		typedef gui::filer_base FILER_BASE;
 		typedef gui::filer<RENDER> FILER;
 
 		typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
@@ -381,7 +382,8 @@ namespace app {
 				const auto& xy = touch_.get_touch_pos(0);
 				filer_.set_touch(tnum, xy.pos);
 				char path[256];
-				if(filer_.update(ctrl, path, sizeof(path))) {
+				auto fst = filer_.update(ctrl, path, sizeof(path));
+				if(fst == FILER_BASE::status::FILE) {
 					render_.sync_frame();
 
 					utils::format("%s\n") % path;

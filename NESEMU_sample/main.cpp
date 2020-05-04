@@ -180,6 +180,7 @@ namespace {
 	typedef gui::dialog<RENDER, FAMIPAD> DIALOG;
 	DIALOG		dialog_(render_, famipad_);
 
+	typedef gui::filer_base FILER_BASE;
 	typedef gui::filer<RENDER> FILER;
 	FILER		filer_(render_);
 
@@ -492,7 +493,7 @@ int main(int argc, char** argv)
 		bool m = sdh_.get_mount();
 		uint32_t ctrl = 0;
 		if(m) {
-			gui::set(gui::filer_ctrl::MOUNT, ctrl);
+			FILER_BASE::set(FILER_BASE::ctrl::MOUNT, ctrl);
 		}
 		if(!menu && flt >= 120) {
 			flt = 0;
@@ -541,7 +542,7 @@ int main(int argc, char** argv)
 			if(chip::on(trg, chip::FAMIPAD_ST::A)) {
 				switch(idx) {
 				case 0:
-					gui::set(gui::filer_ctrl::OPEN, ctrl);
+					FILER_BASE::set(FILER_BASE::ctrl::OPEN, ctrl);
 					filer = true;
 					break;
 				case 1:
@@ -570,26 +571,27 @@ int main(int argc, char** argv)
 
 		if(filer) {
 			if(chip::on(lvl, chip::FAMIPAD_ST::B)) {
-				gui::set(gui::filer_ctrl::CLOSE, ctrl);
+				FILER_BASE::set(FILER_BASE::ctrl::CLOSE, ctrl);
 				filer = false;
 			}
 			if(chip::on(lvl, chip::FAMIPAD_ST::A)) {
-				gui::set(gui::filer_ctrl::INFO, ctrl);
+				FILER_BASE::set(FILER_BASE::ctrl::INFO, ctrl);
 			}
 			if(chip::on(lvl, chip::FAMIPAD_ST::UP)) {
-				gui::set(gui::filer_ctrl::UP, ctrl);
+				FILER_BASE::set(FILER_BASE::ctrl::UP, ctrl);
 			}
 			if(chip::on(lvl, chip::FAMIPAD_ST::DOWN)) {
-				gui::set(gui::filer_ctrl::DOWN, ctrl);
+				FILER_BASE::set(FILER_BASE::ctrl::DOWN, ctrl);
 			}
 			if(chip::on(lvl, chip::FAMIPAD_ST::LEFT)) {
-				gui::set(gui::filer_ctrl::BACK, ctrl);
+				FILER_BASE::set(FILER_BASE::ctrl::BACK, ctrl);
 			}
 			if(chip::on(lvl, chip::FAMIPAD_ST::RIGHT)) {
-				gui::set(gui::filer_ctrl::SELECT, ctrl);
+				FILER_BASE::set(FILER_BASE::ctrl::SELECT, ctrl);
 			}
 			char path[256];
-			if(filer_.update(ctrl, path, sizeof(path))) {
+			auto fst = filer_.update(ctrl, path, sizeof(path));
+			if(fst == FILER_BASE::status::FILE) {
 				char tmp[256];
 				utils::file_io::make_full_path(path, tmp, sizeof(tmp));
 				nesemu_.close();
