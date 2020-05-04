@@ -506,7 +506,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void set_file_name(const char* fn) noexcept
 		{
-			strncpy(path_tag_, fn, sizeof(path_tag_));
+			utils::file_io::make_full_path(fn, path_tag_, sizeof(path_tag_));
 		}
 
 
