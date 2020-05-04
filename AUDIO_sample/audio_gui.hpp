@@ -136,8 +136,6 @@ namespace app {
 
 		char		path_[256];
 
-		sound::tag_t	play_tag_;
-
 		struct th_sync_t {
 			volatile uint8_t	put;
 			volatile uint8_t	get;
@@ -152,6 +150,10 @@ namespace app {
 		th_sync_t	play_rew_;
 		th_sync_t	play_pause_;
 		th_sync_t	play_ff_;
+
+		char			path_tag_[256];
+		th_sync_t		req_tag_;
+		sound::tag_t	play_tag_;
 
 		bool		mount_state_;
 		bool		filer_state_;
@@ -232,8 +234,9 @@ namespace app {
 			play_(  vtx::srect(70*1, 272-64, 64, 64), "-"),
 			ff_(    vtx::srect(70*2, 272-64, 64, 64), ">>"),
 			scaling_(render_), img_in_(scaling_),
-			ctrl_(0), path_{ 0 }, play_tag_(), 
+			ctrl_(0), path_{ 0 },
 			play_stop_(), play_rew_(), play_pause_(), play_ff_(),
+			path_tag_{ 0 }, req_tag_(), play_tag_(),
 			mount_state_(false), filer_state_(false)
 		{ }
 
@@ -480,6 +483,15 @@ namespace app {
 					}
 					ret = true;
 				} else if(fst == FILER_BASE::status::CANCEL) {  // ファイル選択キャンセル
+					req_tag_.send();
+				}
+			}
+			if(!req_tag_.sync()) {
+				utils::file_io fin;
+				if(fin.open(path_tag_, "rb")) {
+					req_tag_.recv();
+					render_tag_(fin, play_tag_);
+					fin.close();
 				}
 			}
 			return ret;
@@ -494,6 +506,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void set_file_name(const char* fn) noexcept
 		{
+			strncpy(path_tag_, fn, sizeof(path_tag_));
 		}
 
 
@@ -538,7 +551,7 @@ namespace app {
 		void render_tag(utils::file_io& fin, const sound::tag_t& tag) noexcept
 		{
 			play_tag_ = tag;
-			render_tag_(fin, tag);
+			req_tag_.send();
 		}
 
 
