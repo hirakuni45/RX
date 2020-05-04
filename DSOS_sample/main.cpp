@@ -243,14 +243,15 @@ int main(int argc, char** argv)
 	}
 
 	{  // キャプチャー開始
-//		uint32_t freq = 2000000;  // 2 MHz
-		uint32_t freq = 100000;  // 100 KHz
+		uint32_t freq = 2000000;  // 2 MHz
+//		uint32_t freq = 100000;  // 100 KHz
 		if(!capture_.start(freq)) {
 			utils::format("Capture not start...\n");
 		}
 	}
 
-	utils::format("RTK5RX65N Start for Digital Storage Oscilloscope\n");
+	utils::format("\r%s Start for Digital Storage Oscilloscope\n") % sys_msg_;
+
 	cmd_.set_prompt("# ");
 
 	{  // GLCDC の初期化
@@ -294,26 +295,24 @@ int main(int argc, char** argv)
 
 	LED::DIR = 1;
 
-	{  // startup trigger...
-		trigger_ = utils::capture_trigger::SINGLE;
-		capture_.set_trigger(trigger_);			
-	}
-
-	// タッチパネルの安定待ち
 #if 0
 	{
+		render_.sync_frame();
+		dialog_.modal(vtx::spos(400, 60),
+			"Touch panel device wait...\nPlease touch it with some screen.");
 		uint8_t nnn = 0;
 		while(1) {
-			glcdc_io_.sync_vpos();
-			ft5206_.update();
-//			if(ft5206_.get_touch_num() == 0) {
-//				++nnn;
-///				if(nnn >= 60) break;
-//			} else {
-// utils::format("%d\n") % static_cast<uint16_t>(ft5206_.get_touch_num());
-//				nnn = 0;
-//			}
+			render_.sync_frame();
+			touch_.update();
+			auto num = touch_.get_touch_num();
+			if(num == 0) {
+				++nnn;
+				if(nnn >= 60) break;
+			} else {
+				nnn = 0;
+			}
 		}
+		render_.clear(DEF_COLOR::Black);
 	}
 #endif
 

@@ -42,14 +42,22 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t CAPN>
 	class capture {
+
+		typedef device::S12AD  ADC0;
+		typedef device::S12AD1 ADC1;
+#if defined(SIG_RX65N)
+		static const auto ADC_CH0 = ADC0::analog::AIN000;
+		static const auto ADC_CH1 = ADC1::analog::AIN114;
+#elif defined(SIG_RX72N)
+		static const auto ADC_CH0 = ADC0::analog::AIN007;  ///< P47
+		static const auto ADC_CH1 = ADC1::analog::AIN108;  ///< PD0
+#endif
+
 	public:
 		static const uint32_t CAP_NUM = CAPN;
 
 	private:
 		static capture_data				data_[CAPN];
-
-		typedef device::S12AD  ADC0;
-		typedef device::S12AD1 ADC1;
 
 		static volatile uint16_t		pos_;
 		static volatile capture_trigger	trigger_;
@@ -64,8 +72,8 @@ namespace utils {
 					ADC1::ADCSR = ADC1::ADCSR.ADCS.b(0b01) | ADC1::ADCSR.ADST.b();
 					break;
 				case capture_trigger::SINGLE:
-					data_[pos_].ch0_ = ADC0::ADDR(ADC0::analog::AIN000);
-					data_[pos_].ch1_ = ADC1::ADDR(ADC1::analog::AIN114);
+					data_[pos_].ch0_ = ADC0::ADDR(ADC_CH0);
+					data_[pos_].ch1_ = ADC1::ADDR(ADC_CH1);
 					ADC0::ADCSR = ADC0::ADCSR.ADCS.b(0b01) | ADC0::ADCSR.ADST.b();
 					ADC1::ADCSR = ADC1::ADCSR.ADCS.b(0b01) | ADC1::ADCSR.ADST.b();
 					++pos_;
@@ -118,17 +126,17 @@ namespace utils {
 
 			{  // A/D 設定
 				device::power_mgr::turn(ADC0::PERIPHERAL);
-				ADC0::enable(ADC0::analog::AIN000);
-				ADC0::ADANSA.set(ADC0::analog::AIN000);
-				ADC0::ADSSTR.set(ADC0::analog::AIN000, 11);
+				ADC0::enable(ADC_CH0);
+				ADC0::ADANSA.set(ADC_CH0);
+				ADC0::ADSSTR.set(ADC_CH0, 11);
 				ADC0::ADSTRGR = ADC0::ADSTRGR.TRSA.b(0b100000) | ADC0::ADSTRGR.TRSB.b(0b111111);
 				ADC0::ADSAM.SAM = 0;
 				ADC0::ADCSR.ADCS = 0b01;
 
 				device::power_mgr::turn(ADC1::PERIPHERAL);
-				ADC1::enable(ADC1::analog::AIN114);
-				ADC1::ADANSA.set(ADC1::analog::AIN114);
-				ADC1::ADSSTR.set(ADC1::analog::AIN114, 11);
+				ADC1::enable(ADC_CH1);
+				ADC1::ADANSA.set(ADC_CH1);
+				ADC1::ADSSTR.set(ADC_CH1, 11);
 				ADC1::ADSTRGR = ADC1::ADSTRGR.TRSA.b(0b100000) | ADC1::ADSTRGR.TRSB.b(0b111111);
 				ADC1::ADSAM.SAM = 1;
 				ADC1::ADCSR.ADCS = 0b01;
