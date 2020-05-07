@@ -25,6 +25,14 @@
 #define SYNTH_LG_N 6
 #define SYNTH_N (1 << SYNTH_LG_N)
 
+// for glfw3_app
+#ifdef WIN32
+#include "utils/format.hpp"
+#else
+// for RX C++ framework
+#include "common/format.hpp"
+#endif
+
 #if defined(__APPLE__)
 #include <libkern/OSAtomic.h>
 #define SynthMemoryBarrier() OSMemoryBarrier()

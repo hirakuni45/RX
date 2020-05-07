@@ -31,7 +31,14 @@ static const double M_PI = 3.1415926535897932384626433832795;
 
 #define R (1 << 29)
 
+// for glfw3_app
+#ifdef WIN32
 #define LG_N_SAMPLES 10
+#else
+// RX C++ framework
+#define LG_N_SAMPLES 9
+#endif
+
 #define N_SAMPLES (1 << LG_N_SAMPLES)
 #define N_PARTIALS_MAX (N_SAMPLES / 2)
 

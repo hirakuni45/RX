@@ -34,8 +34,6 @@
 #include "synth_unit.h"
 #include "aligned_buf.h"
 
-#include "common/format.hpp"
-
 static const char epiano[] = {
   95, 29, 20, 50, 99, 95,  0,  0, 41, 0, 19,  0, 115, 24, 79,  2, 0,
   95, 20, 20, 50, 99, 95,  0,  0,  0, 0,  0,  0,   3,  0, 99,  2, 0,
@@ -48,17 +46,8 @@ static const char epiano[] = {
   69, 46, 80, 73, 65, 78, 79, 32, 49, 32
 };
 
-void SynthUnit::Init(double sample_rate) {
-  Freqlut::init(sample_rate);
-  Exp2::init();
-  Tanh::init();
-  Sin::init();
-  Lfo::init(sample_rate);
-  PitchEnv::init(sample_rate);
-}
-
-SynthUnit::SynthUnit(RingBuffer *ring_buffer) {
-  ring_buffer_ = ring_buffer;
+void SynthUnit::init_()
+{
   for (int note = 0; note < max_active_notes; ++note) {
     active_note_[note].dx7_note = new Dx7Note;
     active_note_[note].keydown = false;
@@ -77,16 +66,25 @@ SynthUnit::SynthUnit(RingBuffer *ring_buffer) {
   extra_buf_size_ = 0;
 }
 
+void SynthUnit::Init(double sample_rate) {
+  Freqlut::init(sample_rate);
+  Exp2::init();
+  Tanh::init();
+  Sin::init();
+  Lfo::init(sample_rate);
+  PitchEnv::init(sample_rate);
+}
+
 // Transfer as many bytes as possible from ring buffer to input buffer.
 // Note that this implementation has a fair amount of copying - we'd probably
 // do it a bit differently if it were bulk data, but in this case we're
 // optimizing for simplicity of implementation.
 void SynthUnit::TransferInput() {
-  size_t bytes_available = ring_buffer_->BytesAvailable();
+  size_t bytes_available = ring_buffer_.BytesAvailable();
   int bytes_to_read = min(bytes_available,
       sizeof(input_buffer_) - input_buffer_index_);
   if (bytes_to_read > 0) {
-    ring_buffer_->Read(bytes_to_read, input_buffer_ + input_buffer_index_);
+    ring_buffer_.Read(bytes_to_read, input_buffer_ + input_buffer_index_);
     input_buffer_index_ += bytes_to_read;
   }
 }

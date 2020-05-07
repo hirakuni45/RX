@@ -30,10 +30,16 @@ struct ActiveNote {
 };
 
 class SynthUnit {
+  RingBuffer& ring_buffer_;
  public:
   static void Init(double sample_rate);
 
-  explicit SynthUnit(RingBuffer *ring_buffer);
+  void init_();
+
+  explicit SynthUnit(RingBuffer& ring_buffer) :
+  ring_buffer_(ring_buffer) {
+	init_();
+  }
 
   void GetSamples(int n_samples, int16_t *buffer);
 
@@ -61,8 +67,15 @@ class SynthUnit {
 
   int ProcessMidiMessage(const uint8_t *buf, int buf_size);
 
-  RingBuffer *ring_buffer_;
+#ifdef WIN32
   static const int max_active_notes = 16;
+#else
+#if defined(SIG_RX65N)
+  static const int max_active_notes = 8;
+#elif defined(SIG_RX65N)
+  static const int max_active_notes = 16;
+#endif
+#endif
   ActiveNote active_note_[max_active_notes];
   int current_note_;
   uint8_t input_buffer_[8192];

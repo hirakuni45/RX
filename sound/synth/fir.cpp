@@ -19,6 +19,7 @@
 #include <cstdio> // for debugging, remove
 #include <cstdlib>
 
+#include "synth.h"
 #include "aligned_buf.h"
 #include "fir.h"
 
@@ -212,7 +213,7 @@ SseFirFilter::~SseFirFilter() {
 
 void printvec(__m128 v) {
   float *f = (float *)&v;
-  printf("[%f %f %f %f]\n", f[0], f[1], f[2], f[3]);
+  utils::format("[%f %f %f %f]\n") % f[0] % f[1] % f[2] % f[3];
 }
 
 void SseFirFilter::process(const float *in1, float *out, size_t n) {

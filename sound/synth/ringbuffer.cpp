@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// for glfw3_app
+#ifdef WIN32
+#include <time.h>
+#else
+// for RX C++ framework
 #include "common/delay.hpp"
+#endif
 
-/// #include <time.h>
 #include <cstring>
 
 #include "synth.h"
@@ -54,7 +59,7 @@ void RingBuffer::Write(const uint8_t *bytes, int size) {
     int wr_ix = wr_ix_;
     unsigned int space_available = (rd_ix - wr_ix - 1) & (kBufSize - 1);
     if (space_available == 0) {
-#if 0
+#ifdef WIN32
       struct timespec sleepTime;
       sleepTime.tv_sec = 0;
       sleepTime.tv_nsec = 1000'000;
