@@ -502,11 +502,20 @@ int main(int argc, char** argv)
 	bool mount = sdh_.get_mount();
 	bool error = false;
 
-
+///	uint32_t samples = sound_out_.get_sample_count();
+///	uint32_t sample_d = 0;
 	while(1) {
 		render_.sync_frame();
 
 		{  // シンセサイザー・サービス
+///			auto ref = sound_out_.get_sample_count();
+///			uint32_t d = ref - samples;
+///			if(sample_d != d) {
+///				utils::format("Sample: %d\n") % d;
+///				samples = ref;
+///				sample_d = d;
+///			}
+
 			uint32_t n = 48'000 / 60;
 			int16_t tmp[n];
 			synth_unit_.GetSamples(n, tmp);

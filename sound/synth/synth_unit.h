@@ -72,7 +72,7 @@ class SynthUnit {
 #else
 #if defined(SIG_RX65N)
   static const int max_active_notes = 8;
-#elif defined(SIG_RX65N)
+#elif defined(SIG_RX72N)
   static const int max_active_notes = 16;
 #endif
 #endif
