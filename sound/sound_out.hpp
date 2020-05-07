@@ -67,6 +67,8 @@ namespace sound {
 
 		T			zero_ofs_;
 
+		volatile uint32_t	sample_count_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -75,7 +77,8 @@ namespace sound {
 		*/
 		//-----------------------------------------------------------------//
 		sound_out(T zero_ofs) noexcept : w_put_(0), fifo_(),
-			out_rate_(48'000), inp_rate_(48'000), timebase_(0), wbase_(), zero_ofs_(zero_ofs)
+			out_rate_(48'000), inp_rate_(48'000), timebase_(0), wbase_(), zero_ofs_(zero_ofs),
+			sample_count_(0)
 		{ }
 
 
@@ -200,6 +203,7 @@ namespace sound {
 					++w_put_;
 					w_put_ &= (OUTS - 1);
 				}
+				sample_count_ += num;
 			} else {
 				uint32_t i = 0;
 				WAVE next(0);
@@ -233,6 +237,15 @@ namespace sound {
 			@return 波形メモリの位置
 		*/
 		//-----------------------------------------------------------------//
-		auto get_wave_pos() const { return w_put_; }
+		auto get_wave_pos() const noexcept { return w_put_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	総サンプル数の取得
+			@return 総サンプル数
+		*/
+		//-----------------------------------------------------------------//
+		auto get_sample_count() const noexcept { return sample_count_; }
 	};
 }
