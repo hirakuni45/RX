@@ -1,7 +1,11 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX72M/RX651/RX65N/RX66T/RX72T/RX72N システム定義
+	@brief	システム定義（クロック発生回路、）@n
+			・RX64M/RX71M @n
+			・RX651/RX65N @n
+			・RX66T @n
+			・RX72M/RX72T/RX72N
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -19,6 +23,8 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template<class _>
 	struct system_t {
+
+		//----  クロック発生回路  ---------------------------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -235,13 +241,13 @@ namespace device {
 		static SCKCR_ SCKCR;
 
 
-#if defined(SIG_RX71M)
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  メモリウェイトサイクル設定レジスタ（MEMWAIT）
 			@param[in]	base	ベース・アドレス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+#if defined(SIG_RX71M)
 		template<uint32_t base>
 		struct memwait_t : public rw32_t<base> {
 			typedef rw32_t<base> io_;
@@ -255,7 +261,7 @@ namespace device {
 		typedef memwait_t<0x00086610> MEMWAIT_;
 		static MEMWAIT_ MEMWAIT;
 
-#elif defined(SIG_RX72M) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72N)
+#elif defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 		template<uint32_t base>
 		struct memwait_t : public rw8_t<base> {
 			typedef rw8_t<base> io_;
@@ -538,7 +544,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B2> PLOVF;
 			bit_rw_t<io_, bitpos::B3> HCOVF;
 			bit_rw_t<io_, bitpos::B4> ILCOVF;
-#if defined(SIG_RX72M)
+#if defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 			bit_rw_t<io_, bitpos::B5> PPLOVF;
 #endif
 		};
@@ -691,9 +697,9 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t<io_, bitpos::B4>   OUTCKSEL;
-
+#if defined (SIG_RX72M)
 			bit_rw_t<io_, bitpos::B8>   EPLLSEL;
-
+#endif
 			bit_rw_t<io_, bitpos::B12>  UPLLSEL;
 		};
 		typedef packcr_t<0x00080044> PACKCR_;
@@ -762,7 +768,7 @@ namespace device {
 		static PPLLCR3_ PPLLCR3;
 #endif
 
-//-----------------------------------------------------------------------------//
+		//----  消費電力低減機能  ---------------------------------------------//
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!

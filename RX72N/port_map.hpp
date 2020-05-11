@@ -1497,6 +1497,27 @@ namespace device {
 
 			return ret;
 		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CLKOUT25M 出力を許可する
+			@param[in]	ena	不許可にする場合「false」
+			@return 無効な周辺機器の場合「false」
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static void turn_CLKOUT25M(bool ena = true) noexcept
+		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			PORT5::PMR.B6 = 0;
+			uint8_t sel = ena ? 0b101010 : 0;			
+			MPC::P56PFS.PSEL = sel;
+			PORT5::PMR.B6 = ena;
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
+		}
 	};
 }
 
