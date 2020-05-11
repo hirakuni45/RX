@@ -94,6 +94,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/SIDE_sample](./SIDE_sample)|Renesas RX65N/RX72N Envision Kit, Space Invaders emulator|
 |[/NESEMU_sample](./NESEMU_sample)|Renesas RX65N/RX72N Envision Kit, NES emulator|
 |[/AUDIO_sample](./AUDIO_sample)|For each platform, MP3/WAV Audio player|
+|[/SYNTH_sample](./SYNTH_sample)|FM Sound Source Synthesizer and Emulato|
 |/rx24t_GPS_sample      |GPS operation sample using RX24T|
 |/rx24t_DATA_FLASH_sample|Internal data flash operation sample using RX24T|
 |/rx64m_SDRAM_sample    |Control sample of SDRAM using RX64M (128 Mbit × 2, 32-bit bus)|

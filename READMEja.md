@@ -70,6 +70,7 @@ int main(int argc, char** argv)
 |[/RX24T](./RX24T)      |RX24T 専用のデバイス定義クラス、リンカースクリプト|
 |[/RX64M](./RX64M)      |RX64M 専用のデバイス定義クラス、リンカースクリプト|
 |[/RX71M](./RX71M)      |RX71M 専用のデバイス定義クラス、リンカースクリプト|
+|[/RX72N](./RX72N)      |RX72N 専用のデバイス定義クラス、リンカースクリプト|
 |[/RX65x](./RX65x)      |RX651, RX65N 専用デバイス定義クラス、リンカースクリプト|
 |[/RX66T](./RX66T)      |RX66T 専用デバイス定義クラス、リンカースクリプト|
 |[/FreeRTOS](./FreeRTOS)|FreeRTOS の RX マイコン各種対応版と簡単なサンプル|
@@ -90,6 +91,7 @@ int main(int argc, char** argv)
 |[/SIDE_sample](./SIDE_sample)|ルネサス製 RX65N/RX72N Envision Kit, Space Invaders エミュレーター|
 |[/NESEMU_sample](./NESEMU_sample)|ルネサス製 RX65N/RX72N Envision Kit, NES エミュレーター|
 |[/AUDIO_sample](./AUDIO_sample)|MP3/WAV オーディオプレイヤー|
+|[/SYNTH_sample](./SYNTH_sample)|FM 音源シンセサイザー・エミュレータ|
 |/rx24t_GPS_sample      |RX24T を使った GPS の動作サンプル|
 |/rx24t_DATA_FLASH_sample|RX24T を使った内臓データ・フラッシュ操作サンプル|
 |/rx24t_LOGGER          |RX24T を使ったデータロガー・プロジェクト|
