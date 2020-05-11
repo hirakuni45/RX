@@ -95,6 +95,7 @@ extern "C" {
 	{
 		return sci_.recv_length();
 	}
+
 }
 
 int main(int argc, char** argv);
@@ -103,10 +104,11 @@ int main(int argc, char** argv)
 {
 	SYSTEM_IO::setup_system_clock();
 
-	{  // タイマー設定（100Hz）
+	{  // タイマー設定
 		uint8_t intr = 4;
-		cmt_.start(100, intr);
+		cmt_.start(850, intr);
 	}
+
 
 	{  // SCI の開始
 		uint8_t intr = 2;        // 割り込みレベル
@@ -114,15 +116,8 @@ int main(int argc, char** argv)
 		sci_.start(baud, intr);
 	}
 
-///	auto iclk = F_ICLK / 1000000;
-///	utils::format("Start test for '%s' %d[MHz]\n") % system_str_ % iclk;
-
-///
-
-
-	device::CAC::CACR1 = 0;
-
-	device::CMTW0::CMWOCR0 = 0;
+	auto iclk = F_ICLK / 1000000;
+	utils::format("Start test for '%s' %d[MHz]\n") % system_str_ % iclk;
 
 
 #if 0
@@ -160,14 +155,20 @@ int main(int argc, char** argv)
 #endif
 
 ///	std::cout << "Hello!" << std::endl;
-	utils::format("Hello!\n");
+///	utils::format("Hello!\n");
 ///	printf("Hello!\n");
 
-#if 0
 	LED::OUTPUT();  // LED ポートを出力に設定
 	uint8_t cnt = 0;
 	while(1) {
 		cmt_.sync();
+
+		if(sci_.recv_length() > 0) {
+			if(sci_.getch() == ' ') {
+				utils::format("Freq  (set): %u Hz\n") % cmt_.get_rate();
+				utils::format("Freq (real): %u Hz\n") % cmt_.get_rate(true);
+			}
+		}
 
 		++cnt;
 		if(cnt >= 50) {
@@ -179,7 +180,4 @@ int main(int argc, char** argv)
 			LED::P = 1;
 		}
 	}
-#endif
-
-	while(1) ;
 }

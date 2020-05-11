@@ -22,8 +22,8 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c \
-				common/time.c
+				common/syscalls.c
+#				common/time.c
 
 # r_lcd/r_glcdc_rx_pinset.c
 
