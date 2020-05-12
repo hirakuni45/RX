@@ -77,7 +77,8 @@ INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \
-				../../FreeRTOS/Source/portable/GCC/RX600v2
+				../../FreeRTOS/Source/portable/GCC/RX600v2 \
+				../../libmad
 
 LIB_ROOT	=	../../libmad
 
