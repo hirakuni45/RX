@@ -28,6 +28,7 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class option : uint8_t {
+			BYPASS,		///< ポートマップの設定をバイパスする場合
 			FIRST,		///< 第１候補 (XXX-A グループ)
 			SECOND,		///< 第２候補 (XXX-B グループ)
 			THIRD,		///< 第３候補
@@ -224,6 +225,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static bool turn(peripheral t, bool f = true, option opt = option::FIRST) noexcept
 		{
+			if(opt == option::BYPASS) return false;
+
 			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
