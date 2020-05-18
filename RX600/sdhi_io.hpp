@@ -55,7 +55,7 @@ namespace fatfs {
 		static const uint8_t TIME_OUT_DIVIDE_    = 14;		///< タイムアウトカウント（０～１４）
 		// SD カード初期化時100～400KBPS(60MHz / 256: 224KBPS）
 		static const uint8_t CLOCK_SLOW_DIVIDE_  = 0b01000000;	///< 初期化時の分周比 (1/256)
-//		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b11111111;	///< ブースト時 (60MHz:1/1)
+///		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b11111111;	///< ブースト時 (60MHz:1/1)
 		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000000;	///< ブースト時 (30MHz:1/2)
 //		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000001;	///< ブースト時 (15MHz:1/4)
 //		static const uint8_t CLOCK_FAST_DIVIDE_  = 0b00000010;	///< ブースト時 (7.5MHz:1/8)
