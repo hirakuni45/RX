@@ -12,11 +12,6 @@
 #include "common/intr_utils.hpp"
 #include "common/vect.h"
 
-/// F_PCLKB は周期パラメーター計算で必要で、設定が無いとエラーにします。
-#ifndef F_PCLKB
-#  error "cmtw_mgr.hpp requires F_PCLKB to be defined"
-#endif
-
 namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -64,13 +59,9 @@ namespace device {
 		{
 			if(freq == 0) return false;
 
-			uint32_t cmcor = F_PCLKB / freq / 4;
-			if(cmcor & 1) {
-				cmcor >>= 1;
-				++cmcor;
-			} else {
-				cmcor >>= 1;
-			}
+			uint32_t cmcor = CMTW::PCLK / freq / 4;
+			++cmcor;
+			cmcor >>= 1;
 
 			uint8_t cks = 0;
 			while(cmcor > 65536) {
@@ -87,8 +78,8 @@ namespace device {
 
 			CMTW::CMWSTR = 0;
 
-			CMTW::CMCNT = 0;
-		    CMTW::CMCOR = cmcor - 1;
+			CMTW::CMWCNT = 0;
+		    CMTW::CMWCOR = cmcor - 1;
 
 			counter_ = 0;
 
@@ -117,8 +108,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void destroy() noexcept
 		{
-		    CMT::CMCR.CMIE = 0;
-			CMT::enable(false);
+		    CMTW::CMCR.CMIE = 0;
+			CMTW::enable(false);
 		}
 
 
@@ -133,8 +124,8 @@ namespace device {
 				volatile uint32_t cnt = counter_;
 				while(cnt == counter_) sleep_();
 			} else {
-				auto ref = CMT::CMCNT();
-				while(ref <= CMT::CMCNT()) sleep_();
+				auto ref = CMTW::CMWCNT();
+				while(ref <= CMTW::CMWCNT()) sleep_();
 				task_();
 				++counter_;
 			}
@@ -161,20 +152,20 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  CMCNT レジスターの値を取得
-			@return CMCNT レジスター
+			@brief  CMWCNT レジスターの値を取得
+			@return CMWCNT レジスター
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_cmt_count() const noexcept { return CMT::CMCNT(); }
+		auto get_cmt_count() const noexcept { return CMTW::CMWCNT(); }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  CMCOR レジスターの値を取得
-			@return CMCOR レジスター
+			@brief  CMWCOR レジスターの値を取得
+			@return CMWCOR レジスター
 		*/
 		//-----------------------------------------------------------------//
-		uint16_t get_cmp_count() const noexcept { return CMT::CMCOR(); }
+		auto get_cmp_count() const noexcept { return CMTW::CMWCOR(); }
 
 
 		//-----------------------------------------------------------------//
@@ -186,6 +177,6 @@ namespace device {
 		static TASK& at_task() noexcept { return task_; }
 	};
 
-	template <class CMT, class TASK> volatile uint32_t cmt_io<CMT, TASK>::counter_ = 0;
-	template <class CMT, class TASK> TASK cmt_io<CMT, TASK>::task_;
+	template <class CMTW, class TASK> volatile uint32_t cmtw_io<CMTW, TASK>::counter_ = 0;
+	template <class CMTW, class TASK> TASK cmtw_io<CMTW, TASK>::task_;
 }
