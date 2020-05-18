@@ -127,6 +127,7 @@ namespace sound {
 //					utils::format("DMAC Not start...\n");
 					return false;
 				}
+//				utils::format("TPU intr level: %d\n") % static_cast<int>(tpu_io_.get_intr_vec());
 			}
 
 			return true;
