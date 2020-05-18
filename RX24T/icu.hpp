@@ -333,7 +333,7 @@ namespace device {
 			rw8_t<base + 248> RIIC_TXI0;
 			rw8_t<base + 249> RIIC_TEI0;
 		};
-		typedef ir_t<0x00087010> IR_;
+		typedef ir_t<0x00087000> IR_;
 		static IR_ IR;
 
 
