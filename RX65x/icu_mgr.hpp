@@ -151,31 +151,33 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込み設定（選択Ａベクター）
-			@param[in]	vec		割り込み要因
+			@param[in]	sel		割り込み要因
 			@param[in]	task	割り込みタスク
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELA vec, utils::TASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELA sel, utils::TASK task, uint8_t lvl) noexcept
 		{
-			for(uint16_t i = 208; i <= 255; ++i) {
+			for(uint8_t i = 208; i <= 255; ++i) {
+				auto idx = static_cast<ICU::VECTOR>(i);
 				if(lvl > 0) {
-					if(ICU::SLIXR[i] == 0) {
-						ICU::IER.enable(i, 0);
-						set_task(static_cast<ICU::VECTOR>(i), task);
-						ICU::IPR[i] = lvl;
-						ICU::SLIXR[i] = static_cast<uint8_t>(vec);
-						ICU::IR[i] = 0;
-						ICU::IER.enable(i, 1);
-						return static_cast<ICU::VECTOR>(i);
+					if(ICU::SLIAR[idx] == ICU::VECTOR_SELA::NONE) {
+						ICU::IER.enable(idx, 0);
+						set_task(idx, task);
+						ICU::IPR[idx] = lvl;
+						ICU::SLIAR[idx] = sel;
+						ICU::IR[idx] = 0;
+						ICU::IER.enable(idx, 1);
+						return idx;
 					}
-				} else if(ICU::SLIXR[i] == static_cast<uint8_t>(vec)) {
-					ICU::IER.enable(i, 0);
-					set_task(static_cast<ICU::VECTOR>(i), nullptr);
-					ICU::SLIXR[i] = 0;
-					ICU::IR[i] = 0;
-					return static_cast<ICU::VECTOR>(i);
+				} else if(ICU::SLIAR[idx] == sel) {
+					ICU::IER.enable(idx, 0);
+					set_task(idx, nullptr);
+					ICU::SLIAR[idx] = ICU::VECTOR_SELA::NONE;
+					ICU::IPR[idx] = 0;
+					ICU::IR[idx] = 0;
+					return idx;
 				}
 			}
 			return ICU::VECTOR::NONE;
@@ -185,31 +187,33 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込み設定（選択Ｂベクター）
-			@param[in]	vec		割り込み要因
+			@param[in]	sel		割り込み要因
 			@param[in]	task	割り込みタスク
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELB vec, utils::TASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELB sel, utils::TASK task, uint8_t lvl) noexcept
 		{
 			for(uint16_t i = 128; i <= 207; ++i) {
+				auto idx = static_cast<ICU::VECTOR>(i);
 				if(lvl > 0) {
-					if(ICU::SLIXR[i] == 0) {
-						ICU::IER.enable(i, 0);
+					if(ICU::SLIBR[idx] == ICU::VECTOR_SELB::NONE) {
+						ICU::IER.enable(idx, 0);
 						set_task(static_cast<ICU::VECTOR>(i), task);
-						ICU::IPR[i] = lvl;
-						ICU::SLIXR[i] = static_cast<uint8_t>(vec);
-						ICU::IR[i] = 0;
-						ICU::IER.enable(i, 1);
-						return static_cast<ICU::VECTOR>(i);
+						ICU::IPR[idx] = lvl;
+						ICU::SLIBR[idx] = sel;
+						ICU::IR[idx] = 0;
+						ICU::IER.enable(idx, 1);
+						return idx;
 					}
-				} else if(ICU::SLIXR[i] == static_cast<uint8_t>(vec)) {
-					ICU::IER.enable(i, 0);
-					set_task(static_cast<ICU::VECTOR>(i), nullptr);
-					ICU::SLIXR[i] = 0;
-					ICU::IR[i] = 0;
-					return static_cast<ICU::VECTOR>(i);
+				} else if(ICU::SLIBR[idx] == sel) {
+					ICU::IER.enable(idx, 0);
+					set_task(idx, nullptr);
+					ICU::SLIBR[idx] = ICU::VECTOR_SELB::NONE;
+					ICU::IPR[idx] = 0;
+					ICU::IR[idx] = 0;
+					return idx;
 				}
 			}
 			return ICU::VECTOR::NONE;
@@ -408,36 +412,6 @@ namespace device {
 				break;
 			}
 			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  割り込みベクターの取得
-			@param[in]	per	周辺機器タイプ
-			@param[in]	id	割り込み要因
-			@return 割り込みベクター（マッチするベクターが無ければ「NONE」を返す）
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR get_vector(peripheral per, uint8_t id) noexcept
-		{
-			switch(per) {
-			case peripheral::TPU0:
-			case peripheral::TPU1:
-			case peripheral::TPU2:
-			case peripheral::TPU3:
-			case peripheral::TPU4:
-			case peripheral::TPU5:
-				// INTB128 to INTB207
-				for(uint8_t i = 128; i <= 207; ++i) {
-					
-				}
-				break;
-			default:
-				return ICU::VECTOR::NONE;
-			}
-
-			return ICU::VECTOR::INTB128;
 		}
 
 
