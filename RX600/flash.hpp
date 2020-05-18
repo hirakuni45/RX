@@ -252,6 +252,7 @@ namespace device {
 			using io_::operator &=;
 
 			bit_rw_t <io_, bitpos::B0>     SUINIT;
+
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
 		typedef fsuinitr_t<0x007FE08C> FSUINITR_;
@@ -412,7 +413,7 @@ namespace device {
 		static FPCKAR_ FPCKAR;
 
 
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
+#if defined(SIG_RX72M) || defined(SIG_RX72N) || defined(SIG_RX72T)
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  フラッシュアクセスウィンドウモニタレジスタ (FAWMON)
@@ -425,8 +426,10 @@ namespace device {
 			using io_::operator ();
 
 			bits_ro_t<io_, bitpos::B0,  12>  FAWS;
+
 			bit_ro_t <io_, bitpos::B15>      FSPR;
 			bits_ro_t<io_, bitpos::B16, 12>  FAWE;
+
 			bit_ro_t <io_, bitpos::B31>      BTFLG;
 		};
 		typedef fawmon_t<0x007FE0DC> FAWMON_;
@@ -448,6 +451,7 @@ namespace device {
 			using io_::operator &=;
 
 			bits_rw_t<io_, bitpos::B0, 2>  SAS;
+
 			bits_rw_t<io_, bitpos::B8, 8>  KEY;
 		};
 		typedef fsuacr_t<0x007FE0E8> FSUACR_;
