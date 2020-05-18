@@ -294,7 +294,7 @@ namespace device {
 			@brief  選択型割り込みＢ要因・ベクター・インデックス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_SELB {
+		enum class VECTOR_SELB : uint8_t {
 			NONE = 0,	///< なし
 
 			CMI2 = 1,	///< CMT2
@@ -369,7 +369,7 @@ namespace device {
 			@brief  選択型割り込みＡ要因・ベクター・インデックス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_SELA {
+		enum class VECTOR_SELA : uint8_t {
 			NONE = 0,	///< なし
 
 			TGIA0 = 1,	///< MTU0（TGRAのインプットキャプチャ /コンペアマッチ）
@@ -431,7 +431,7 @@ namespace device {
 			@brief  GROUPBE0・ベクター・インデックス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BE0 {
+		enum class VECTOR_BE0 : uint8_t {
 			ERS0,	///< CAN0 / ERS0
 			ERS1,	///< CAN1 / ERS1
 			ERS2	///< CAN2 / ERS2
@@ -443,7 +443,7 @@ namespace device {
 			@brief  GROUPBL0・ベクター・インデックス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BL0 {
+		enum class VECTOR_BL0 : uint8_t {
 			TEI0,	///< SCI0 / TEI0（送信完了）
 			ERI0,	///< SCI0 / ERI0（受信エラー）
 			TEI1,	///< SCI1 / TEI1（送信完了）
@@ -483,7 +483,7 @@ namespace device {
 			@brief  GROUPBL1・ベクター・インデックス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BL1 {
+		enum class VECTOR_BL1 : uint8_t {
 			OVFI = 0,		///< SRC / OVFI
 			UDFI,			///< SRC / UDFI
 			CEFI,			///< SRC / CEFI
@@ -514,7 +514,7 @@ namespace device {
 			@brief  GROUPAL0・ベクター・インデックス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_AL0 {
+		enum class VECTOR_AL0 : uint8_t {
 			TEIF8 = 0,		///< SCIFA8 / TEIF8
 			ERIF8,			///< SCIFA8 / ERIF8
 			BRIF8,			///< SCIFA8 / BRIF8
@@ -545,7 +545,7 @@ namespace device {
 			@brief  GROUPAL1・ベクター・インデックス
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_AL1 {
+		enum class VECTOR_AL1 : uint8_t {
 			MINT = 0,		///< EPTPC / MINT
 			PINT,			///< PTPEDMAC / PINT
 
@@ -832,15 +832,15 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  []オペレータ
-				@param[in]	idx		インデックス（０～２５５）
+				@param[in]	vec		割り込みベクター
 				@return IR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
-			volatile uint8_t& operator [] (uint8_t idx) {
-				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			volatile uint8_t& operator [] (VECTOR vec) {
+				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
-		typedef ir_t<0x00087010> IR_;
+		typedef ir_t<0x00087000> IR_;
 		static IR_ IR;
 
 
@@ -1013,12 +1013,13 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  許可、不許可
-				@param[in]	idx		インデックス（０～２５５）
+				@param[in]	vec		割り込みベクター
 				@param[in]	ena		許可／不許可
 			*/
 			//-------------------------------------------------------------//
-			void enable(uint8_t idx, bool ena) noexcept
+			void enable(VECTOR vec, bool ena) noexcept
 			{
+				auto idx = static_cast<uint8_t>(vec);
 				auto tmp = rd8_(base + (idx >> 3));
 				if(ena) {
 					tmp |=   1 << (idx & 7);
@@ -1032,12 +1033,13 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  許可状態を取得
-				@param[in]	idx		インデックス（０～２５５）
+				@param[in]	vec		割り込みベクター
 				@return 許可状態（許可の場合「true」）
 			*/
 			//-------------------------------------------------------------//
-			bool get(uint8_t idx) const noexcept
+			bool get(VECTOR vec) const noexcept
 			{
+				auto idx = static_cast<uint8_t>(vec);
 				auto tmp = rd8_(base + (idx >> 3));
 				return tmp & (1 << (idx & 7));
 			}
@@ -1212,8 +1214,8 @@ namespace device {
 				@return IR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
-			volatile uint8_t& operator [] (uint8_t idx) {
-				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			volatile uint8_t& operator [] (VECTOR idx) {
+				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(idx));
 			}
 		};
 		typedef ipr_t<0x00087300> IPR_;
@@ -1630,6 +1632,9 @@ namespace device {
 			@brief  選択型割り込み B 要因選択レジスタ Xn（SLIBXRn）（n = 128 ～ 143）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef icu_utils::slixr_t<0x00087700, VECTOR, VECTOR_SELB> SLIBR_;
+		static SLIBR_ SLIBR;
+#if 0
 		typedef rw8_t<0x00087780> SLIBXR128_;
 		static SLIBXR128_ SLIBXR128;
 		static rw8_t<0x00087781> SLIBXR129;
@@ -1721,13 +1726,16 @@ namespace device {
 		static rw8_t<0x000877CD> SLIBR205;
 		static rw8_t<0x000877CE> SLIBR206;
 		static rw8_t<0x000877CF> SLIBR207;
-
+#endif
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef icu_utils::slixr_t<0x00087900, VECTOR, VECTOR_SELA> SLIAR_;
+		static SLIAR_ SLIAR;
+#if 0
 		static rw8_t<0x000879D0> SLIAR208;
 		static rw8_t<0x000879D1> SLIAR209;
 		static rw8_t<0x000879D2> SLIAR210;
@@ -1778,9 +1786,7 @@ namespace device {
 		static rw8_t<0x000879FD> SLIAR253;
 		static rw8_t<0x000879FE> SLIAR254;
 		static rw8_t<0x000879FF> SLIAR255;
-
-		typedef icu_utils::slixr_t<0x00087700> SLIXR_;
-		static SLIXR_ SLIXR;
+#endif
 	};
 	typedef icu_t<void> ICU;
 
@@ -1797,7 +1803,6 @@ namespace device {
 	template<class _> typename icu_t<_>::DMRSR6_ icu_t<_>::DMRSR6;
 	template<class _> typename icu_t<_>::DMRSR7_ icu_t<_>::DMRSR7;
 
-	template<class _> typename icu_t<_>::SLIBXR128_ icu_t<_>::SLIBXR128;
-
-	template<class _> typename icu_t<_>::SLIXR_ icu_t<_>::SLIXR;
+	template<class _> typename icu_t<_>::SLIBR_ icu_t<_>::SLIBR;
+	template<class _> typename icu_t<_>::SLIAR_ icu_t<_>::SLIAR;
 }

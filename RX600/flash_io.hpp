@@ -26,10 +26,11 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  FLASH 制御クラス
+		@param[in]	DFSIZE	データ・フラッシュ・サイズ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class _>
-	class flash_io_ {
+	template <uint32_t DFSIZE>
+	class flash_io_t {
 
 #ifdef FIO_DEBUG
 		typedef utils::format debug_format;
@@ -47,13 +48,8 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		static const uint32_t data_flash_block = 64;	///< データ・フラッシュのブロックサイズ
-#if defined(SIG_RX64M) || defined(SIG_RX71M)
-		static const uint32_t data_flash_size  = 65536;	///< データ・フラッシュの容量
-		static const uint32_t data_flash_bank  = 1024;	///< データ・フラッシュのバンク数
-#elif defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
-		static const uint32_t data_flash_size  = 32768;	///< データ・フラッシュの容量
-		static const uint32_t data_flash_bank  = 512;	///< データ・フラッシュのバンク数
-#endif
+		static const uint32_t data_flash_size  = DFSIZE;	///< データ・フラッシュの容量
+		static const uint32_t data_flash_bank  = DFSIZE / data_flash_block;	///< データ・フラッシュのバンク数
 		static const uint32_t data_flash_word  = 4;		///< データ・フラッシュ書き込みワードサイズ
 
 
@@ -260,7 +256,7 @@ namespace device {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		flash_io_() noexcept : error_(error::NONE), mode_(mode::NONE), trans_farm_(false) { }
+		flash_io_t() noexcept : error_(error::NONE), mode_(mode::NONE), trans_farm_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -284,14 +280,14 @@ namespace device {
 
 			device::FLASH::FWEPROR.FLWE = 1;
 
-			uint32_t clk = static_cast<uint32_t>(F_FCLK) / 500000;
-			if(clk & 1) { clk >>= 1; ++clk; }
-			else { clk >>= 1; }
+			uint32_t clk = ((static_cast<uint32_t>(F_FCLK) / 500'000) + 1) >> 1;
 			if(clk > 60) {
 				clk = 60;
 			}
 			device::FLASH::FPCKAR = 0x1E00 | clk;
-
+#if defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
+			device::FLASH::EEPFCLK = clk;
+#endif
 			init_fcu_();
 
 			error_ = error::NONE;
@@ -579,8 +575,14 @@ namespace device {
 #endif
 		}
 	};
-	typedef flash_io_<void> flash_io;
+#if defined(SIG_RX64M) || defined(SIG_RX71M)
+	typedef flash_io_t<65536> flash_io;
+#elif defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+	typedef flash_io_t<32768> flash_io;
+#endif
 
-	template <class _> typename flash_io_<_>::FACI_CMD_AREA_   flash_io_<_>::FACI_CMD_AREA;
-	template <class _> typename flash_io_<_>::FACI_CMD_AREA16_ flash_io_<_>::FACI_CMD_AREA16;
+	template <uint32_t DFSIZE> typename flash_io_t<DFSIZE>::FACI_CMD_AREA_
+		flash_io_t<DFSIZE>::FACI_CMD_AREA;
+	template <uint32_t DFSIZE> typename flash_io_t<DFSIZE>::FACI_CMD_AREA16_
+		flash_io_t<DFSIZE>::FACI_CMD_AREA16;
 }

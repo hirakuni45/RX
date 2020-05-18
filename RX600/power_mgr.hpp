@@ -60,6 +60,12 @@ namespace device {
 
 			bool f = !ena;
 			switch(t) {
+
+			case peripheral::ELC:
+				SYSTEM::MSTPCRB.MSTPB9 = f;		// ELC のストップ状態解除
+				break;
+
+
 			case peripheral::CMT0:
 			case peripheral::CMT1:
 				// CMT0, CMT1 のストップ状態設定
@@ -89,17 +95,6 @@ namespace device {
 				// TPU0 to TPU5 のストップ状態設定
 				set_(ena, STH::st.tpu_, peripheral::TPU0, t);
 				SYSTEM::MSTPCRA.MSTPA13 = (STH::st.tpu_ == 0);
-				break;
-
-			case peripheral::S12AD:
-				SYSTEM::MSTPCRA.MSTPA17 = f;	// S12AD のストップ状態解除
-				break;
-			case peripheral::S12AD1:
-				SYSTEM::MSTPCRA.MSTPA16 = f;	// S12AD1 のストップ状態解除
-				break;
-
-			case peripheral::R12DA:
-				SYSTEM::MSTPCRA.MSTPA19 = f;	// R12DA のストップ状態解除
 				break;
 
 			case peripheral::DMAC0:
@@ -176,10 +171,6 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB2 = f;	// CAN2 のストップ状態解除
 				break;
 
-			case peripheral::SDHI:
-				SYSTEM::MSTPCRD.MSTPD19 = f;	// SDHI のストップ状態解除
-				break;
-
 			case peripheral::ETHERC0:
 			case peripheral::ETHERCA:
 			case peripheral::EDMAC0:
@@ -199,12 +190,32 @@ namespace device {
 				SYSTEM::MSTPCRB.MSTPB12 = f;	// USBA のストップ状態解除
 				break;
 
-			case peripheral::TEMPS:
-				SYSTEM::MSTPCRB.MSTPB8 = f;		// TEMPS のストップ状態解除
+			case peripheral::SSI0:
+				SYSTEM::MSTPCRD.MSTPD15 = f;	// SSI0 のストップ状態解除
+				break;
+			case peripheral::SSI1:
+				SYSTEM::MSTPCRD.MSTPD14 = f;	// SSI1 のストップ状態解除
 				break;
 
-			case peripheral::ELC:
-				SYSTEM::MSTPCRB.MSTPB9 = f;		// ELC のストップ状態解除
+			case peripheral::SDHI:
+				SYSTEM::MSTPCRD.MSTPD19 = f;	// SDHI のストップ状態解除
+				break;
+
+
+
+			case peripheral::S12AD:
+				SYSTEM::MSTPCRA.MSTPA17 = f;	// S12AD のストップ状態解除
+				break;
+			case peripheral::S12AD1:
+				SYSTEM::MSTPCRA.MSTPA16 = f;	// S12AD1 のストップ状態解除
+				break;
+
+			case peripheral::R12DA:
+				SYSTEM::MSTPCRA.MSTPA19 = f;	// R12DA のストップ状態解除
+				break;
+
+			case peripheral::TEMPS:
+				SYSTEM::MSTPCRB.MSTPB8 = f;		// TEMPS のストップ状態解除
 				break;
 
 			case peripheral::ECCRAM:

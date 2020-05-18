@@ -22,22 +22,24 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  選択型割り込み要因選択レジスタ・テンプレート
-			@param[in]	base	ベース・アドレス
+			@param[in]	base		ベース・アドレス
+			@param[in]	VECTOR		割り込みベクター型
+			@param[in]	INTR_SEL	割り込み要因型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		template <uint32_t base>
+		template <uint32_t base, typename VECTOR, typename INTR_SEL>
 		struct slixr_t {
 
-			void set(uint16_t idx, uint8_t val) noexcept {
-				wr8_(base + idx, val);
+			void set(VECTOR vec, INTR_SEL sel) noexcept {
+				wr8_(base + static_cast<uint8_t>(vec), static_cast<uint8_t>(sel));
 			}
 
-			uint8_t get(uint16_t idx) noexcept {
-				return rd8_(base + idx);
+			INTR_SEL get(VECTOR vec) noexcept {
+				return static_cast<INTR_SEL>(rd8_(base + static_cast<uint8_t>(vec)));
 			}
 
-			volatile uint8_t& operator [] (uint8_t idx) {
-				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			volatile INTR_SEL& operator [] (VECTOR vec) {
+				return *reinterpret_cast<volatile INTR_SEL*>(base + static_cast<uint8_t>(vec));
 			}
 		};
 

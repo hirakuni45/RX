@@ -127,6 +127,47 @@ namespace device {
 			device::SYSTEM::ROMCE = 1;
 #endif
 		}
+
+
+#if defined(SIG_RX72M) || defined(SIG_RX72N)
+		//-------------------------------------------------------------//
+		/*!
+			@brief  PPLL 制御を使って PHY 向け 25MHz を出力する。
+			@return 成功なら「true」
+		*/
+		//-------------------------------------------------------------//
+		static bool setup_phy25() noexcept
+		{
+			if(BASE_CLOCK != 16'000'000) {  // ベースクロックが 16MHz 以外は、生成不可とする。 
+				return false;
+			}
+
+			bool ret = true;
+			device::SYSTEM::PRCR = 0xA50B;	// クロック、低消費電力、関係書き込み許可
+
+			device::SYSTEM::PACKCR.OUTCKSEL = 1;
+
+			// PPLIDIV: 1/2, PPLSTC: x12.5 (100MHz)
+			device::SYSTEM::PPLLCR  = device::SYSTEM::PPLLCR.PPLIDIV.b(0b01)
+								    | device::SYSTEM::PPLLCR.PPLSTC.b(0b011000);
+			device::SYSTEM::PPLLCR2 = device::SYSTEM::PPLLCR2.PPLLEN.b(1);  // 発信許可
+
+			// PPLL 安定待ち
+			while(device::SYSTEM::OSCOVFSR.PPLOVF() == 0) { asm("nop"); }
+
+			// PPLLCR3: 1/4 (25MHz)
+			device::SYSTEM::PPLLCR3 = device::SYSTEM::PPLLCR3.PPLCK.b(0b0011);
+
+			// クロック関係書き込み不許可
+			device::SYSTEM::PRCR = 0xA500;
+
+			// ポート・マッピングを行う必要があるが、あえて、ここでは許可しない。
+			// ※このヘッダーに、port_map.hpp の依存を無くす為。
+			// deveice::port_map::turn_CLKOUT25M();
+
+			return true;
+		}
+#endif
 	};
 
 
@@ -141,22 +182,6 @@ namespace device {
 		device::SYSTEM::SWRR = 0xA501;
 		device::SYSTEM::PRCR = 0xA500;
 	}
-
-
-#if defined(SIG_RX72M) || defined(SIG_RX72N)
-	//-------------------------------------------------------------//
-	/*!
-		@brief  PPLL 制御を使って PHY 向け 25MHz を出力する。
-		@return 成功なら「true」
-	*/
-	//-------------------------------------------------------------//
-	bool setup_phy25()
-	{
-
-		return true;
-	}
-
-#endif
 
 
 	//-------------------------------------------------------------//

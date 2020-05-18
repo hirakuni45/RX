@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX600 グループ・TPU I/O 制御
+	@brief	RX64M/RX71M/RX65x/RX72M/RX72N グループ・TPU I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -41,7 +41,6 @@ namespace device {
 
 	private:
 		uint8_t		level_;
-
 		ICU::VECTOR	intr_vec_;
 
 		static volatile uint32_t counter_;
@@ -67,13 +66,14 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  タイマー動作開始
+			@brief  タイマー動作開始（TGRA コンペアマッチ）
 			@param[in]	freq	タイマー周波数
 			@param[in]	level	割り込みレベル（０ならポーリング）
+			@param[in]	vector	選択型ベクター
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level = 0) noexcept
+		bool start(uint32_t freq, uint8_t level) noexcept
 		{
 			if(freq == 0) return false;
 
@@ -138,13 +138,9 @@ namespace device {
 			TPU::TCNT = 0x0000;
 
 			if(level_ > 0) {  // 割り込み設定
-#if (defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N))
-				intr_vec_ = ICU::VECTOR::INTB128;
-				icu_mgr::set_task(intr_vec_, tpu_task_);
-				ICU::SLIBXR128 = TPU::RA_INN;
-				ICU::IPR.INTB128 = level_;
-				ICU::IER.INTB128 = true;
-#endif
+				if(intr_vec_ == ICU::VECTOR::NONE) {
+					intr_vec_ = icu_mgr::set_interrupt(TPU::RA_INN, tpu_task_, level_);
+				}
 				TPU::TIER.TGIEA = 1;  // TGRA interrupt
 			} else {
 				TPU::TIER.TGIEA = 0;
@@ -163,6 +159,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void destroy() noexcept
 		{
+			icu_mgr::set_interrupt(TPU::RA_INN, nullptr, 0);
+			intr_vec_ = 0;
 			TPU::TIER = 0;
 			TPU::enable(false);
 			power_mgr::turn(TPU::PERIPHERAL, false);

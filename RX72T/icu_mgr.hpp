@@ -23,10 +23,10 @@ namespace device {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class icu_mgr {
 
-		static utils::dispatch<icu_t::VECTOR::GROUPBE0, 2>  GROUPBE0_dispatch_;
-		static utils::dispatch<icu_t::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_;
-		static utils::dispatch<icu_t::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_;
-		static utils::dispatch<icu_t::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPBE0, 3>  GROUPBE0_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPBL0, 32> GROUPBL0_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPBL1, 32> GROUPBL1_dispatch_;
+		static utils::dispatch<ICU::VECTOR::GROUPAL0, 22> GROUPAL0_dispatch_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -44,12 +44,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込みレベルを設定する
-			@param[in]	icu	割り込み要因
+			@param[in]	vec	割り込み要因
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static bool set_level(icu_t::VECTOR vec, uint8_t lvl) noexcept
+		static bool set_level(ICU::VECTOR vec, uint8_t lvl) noexcept
 		{
 			bool ena = lvl != 0 ? true : false;
 			switch(vec) {
@@ -76,22 +76,22 @@ namespace device {
 				ICU::IER.CMI1 = ena;
 				break;
 
-			case icu_t::VECTOR::GROUPBE0:
+			case ICU::VECTOR::GROUPBE0:
 				ICU::IER.GROUPBE0 = 0;
 				ICU::IPR.GROUPBE0 = lvl;
 				ICU::IER.GROUPBE0 = ena;
 				break;
-			case icu_t::VECTOR::GROUPBL0:
+			case ICU::VECTOR::GROUPBL0:
 				ICU::IER.GROUPBL0 = 0;
 				ICU::IPR.GROUPBL0 = lvl;
 				ICU::IER.GROUPBL0 = ena;
 				break;
-			case icu_t::VECTOR::GROUPBL1:
+			case ICU::VECTOR::GROUPBL1:
 				ICU::IER.GROUPBL1 = 0;
 				ICU::IPR.GROUPBL1 = lvl;
 				ICU::IER.GROUPBL1 = ena;
 				break;
-			case icu_t::VECTOR::GROUPAL0:
+			case ICU::VECTOR::GROUPAL0:
 				ICU::IER.GROUPAL0 = 0;
 				ICU::IPR.GROUPAL0 = lvl;
 				ICU::IER.GROUPAL0 = ena;
@@ -122,31 +122,33 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  割り込み設定（選択Ａベクター）
-			@param[in]	vec		割り込み要因
+			@param[in]	sel		割り込み要因
 			@param[in]	task	割り込みタスク
 			@param[in]	lvl	割り込みレベル（０の場合、割り込み禁止）
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELA vec, utils::TASK task, uint8_t lvl) noexcept
+		static ICU::VECTOR set_interrupt(ICU::VECTOR_SELA sel, utils::TASK task, uint8_t lvl) noexcept
 		{
-			for(uint16_t i = 208; i <= 255; ++i) {
+			for(uint8_t i = 208; i <= 255; ++i) {
+				auto idx = static_cast<ICU::VECTOR>(i);
 				if(lvl > 0) {
-					if(ICU::SLIXR[i] == 0) {
-						ICU::IER.enable(i, 0);
-						set_task(static_cast<ICU::VECTOR>(i), task);
-						ICU::IPR[i] = lvl;
-						ICU::SLIXR[i] = static_cast<uint8_t>(vec);
-						ICU::IR[i] = 0;
-						ICU::IER.enable(i, 1);
-						return static_cast<ICU::VECTOR>(i);
+					if(ICU::SLIAR[idx] == ICU::VECTOR_SELA::NONE) {
+						ICU::IER.enable(idx, 0);
+						set_task(idx, task);
+						ICU::IPR[idx] = lvl;
+						ICU::SLIAR[idx] = sel;
+						ICU::IR[idx] = 0;
+						ICU::IER.enable(idx, 1);
+						return idx;
 					}
-				} else if(ICU::SLIXR[i] == static_cast<uint8_t>(vec)) {
-					ICU::IER.enable(i, 0);
-					set_task(static_cast<ICU::VECTOR>(i), nullptr);
-					ICU::SLIXR[i] = 0;
-					ICU::IR[i] = 0;
-					return static_cast<ICU::VECTOR>(i);
+				} else if(ICU::SLIAR[idx] == sel) {
+					ICU::IER.enable(idx, 0);
+					set_task(idx, nullptr);
+					ICU::SLIAR[idx] = ICU::VECTOR_SELA::NONE;
+					ICU::IPR[idx] = 0;
+					ICU::IR[idx] = 0;
+					return idx;
 				}
 			}
 			return ICU::VECTOR::NONE;
