@@ -699,15 +699,15 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  []オペレータ
-				@param[in]	idx		インデックス（０～２５５）
+				@param[in]	vec		割り込みベクター
 				@return IR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
-			volatile uint8_t& operator [] (uint8_t idx) {
-				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			volatile uint8_t& operator [] (VECTOR vec) {
+				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
-		typedef ir_t<0x00087010> IR_;
+		typedef ir_t<0x00087000> IR_;
 		static IR_ IR;
 
 
@@ -930,12 +930,14 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  許可、不許可
-				@param[in]	idx		インデックス（０～２５５）
+
+				@param[in]	vec		割り込みベクター
 				@param[in]	ena		許可／不許可
 			*/
 			//-------------------------------------------------------------//
-			void enable(uint8_t idx, bool ena) noexcept
+			void enable(VECTOR vec, bool ena) noexcept
 			{
+				auto idx = static_cast<uint8_t>(vec);
 				auto tmp = rd8_(base + (idx >> 3));
 				if(ena) {
 					tmp |=   1 << (idx & 7);
@@ -949,12 +951,13 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  許可状態を取得
-				@param[in]	idx		インデックス（０～２５５）
+				@param[in]	vec		割り込みベクター
 				@return 許可状態（許可の場合「true」）
 			*/
 			//-------------------------------------------------------------//
-			bool get(uint8_t idx) const noexcept
+			bool get(VECTOR vec) const noexcept
 			{
+				auto idx = static_cast<uint8_t>(vec);
 				auto tmp = rd8_(base + (idx >> 3));
 				return tmp & (1 << (idx & 7));
 			}
@@ -1163,12 +1166,12 @@ namespace device {
 			//-------------------------------------------------------------//
 			/*!
 				@brief  []オペレータ
-				@param[in]	idx		インデックス（０～２５５）
+				@param[in]	vec		割り込みベクター
 				@return IR レジスターの参照
 			*/
 			//-------------------------------------------------------------//
-			volatile uint8_t& operator [] (uint8_t idx) {
-				return *reinterpret_cast<volatile uint8_t*>(base + idx);
+			volatile uint8_t& operator [] (VECTOR vec) {
+				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(vec));
 			}
 		};
 		typedef ipr_t<0x00087300> IPR_;
@@ -1557,6 +1560,9 @@ namespace device {
 			@brief  選択型割り込み A 要因選択レジスタ n（SLIARn）（n = 208 ～ 255）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef icu_utils::slixr_t<0x00087700, VECTOR, VECTOR_SELA> SLIAR_;
+		static SLIAR_ SLIAR;
+#if 0
 		static rw8_t<0x000879D0> SLIAR208;
 		static rw8_t<0x000879D1> SLIAR209;
 		static rw8_t<0x000879D2> SLIAR210;
@@ -1607,13 +1613,13 @@ namespace device {
 		static rw8_t<0x000879FD> SLIAR253;
 		static rw8_t<0x000879FE> SLIAR254;
 		static rw8_t<0x000879FF> SLIAR255;
-
-
-		static icu_utils::slixr_t<0x00087700> SLIXR;
+#endif
 	};
 	typedef icu_t<void> ICU;
 
 	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;
 	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
 	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
+
+	template<class _> typename icu_t<_>::SLIAR_ icu_t<_>::SLIAR;
 }
