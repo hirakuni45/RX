@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65N/RX651/RX66T/RX72T/RX72N バス定義
+	@brief	RX600/RX700 バス定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -255,6 +255,105 @@ namespace device {
 		static CS6WCR2_ CS6WCR2;
 		typedef csnwcr2_t<0x00083078> CS7WCR2_;
 		static CS7WCR2_ CS7WCR2;
+#endif
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CS 空間クラス
+			@param[in]	base	レジスタ・ベース・アドレス
+			@param[in]	org		CS 空間開始アドレス
+			@param[in]	end		CS 空間終了アドレス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		template <uint32_t base, uint32_t org, uint32_t end>
+		class cs_t {
+		public:
+			static const auto ORG = org;			///< CS 空間開始アドレス
+			static const auto END = end;			///< CS 空間終了アドレス
+			static const auto LEN = end - org + 1;	///< CS 空間長さ
+
+
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			/*!
+				@brief  CS 制御レジスタ
+				@param[in]	base	レジスタ・ベース・アドレス
+			*/
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			static csncr_t<base + 0x0802>  CSCR;
+
+
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			/*!
+				@brief  CS リカバリサイクル設定レジスタ
+				@param[in]	base	レジスタ・ベース・アドレス
+			*/
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			static csnrec_t<base + 0x080A> CSREC;			
+
+
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			/*!
+				@brief  CS セパレートバスリカバリサイクル挿入許可
+				@param[in]	ena		不許可なら「false」
+			*/
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			static void enable_sep_CSREC(bool ena = true) {
+				if(ena) CSRECEN |= 1 << ((base & 0x70) >> 4);
+				else CSRECEN &= ~(1 << ((base & 0x70) >> 4));
+			}
+
+
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			/*!
+				@brief  CS マルチプレックスバスリカバリサイクル挿入許可
+				@param[in]	ena		不許可なら「false」
+			*/
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			static void enable_mux_CSREC(bool ena = true) {
+				if(ena) CSRECEN |= 0x80 << ((base & 0x70) >> 4);
+				else CSRECEN &= ~(0x80 << ((base & 0x70) >> 4));
+			}
+
+
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			/*!
+				@brief  CS モードレジスタ
+				@param[in]	base	レジスタ・ベース・アドレス
+			*/
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			static csnmod_t<base + 0x0002> CSMOD;
+
+
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			/*!
+				@brief  CS ウェイト制御レジスタ 1
+				@param[in]	base	レジスタ・ベース・アドレス
+			*/
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			static csnwcr1_t<base + 0x0004> CSWCR1;
+
+
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			/*!
+				@brief  CS ウェイト制御レジスタ 2
+				@param[in]	base	レジスタ・ベース・アドレス
+			*/
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+			static csnwcr1_t<base + 0x0008> CSWCR2;
+		};
+
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72N)
+		typedef cs_t<0x0008'3000, 0xFF00'0000, 0xFFFF'FFFF> CS0;
+		typedef cs_t<0x0008'3010, 0x0700'0000, 0x07FF'FFFF> CS1;
+		typedef cs_t<0x0008'3020, 0x0600'0000, 0x06FF'FFFF> CS2;
+		typedef cs_t<0x0008'3030, 0x0500'0000, 0x05FF'FFFF> CS3;
+#endif
+
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX65N) || defined(SIG_RX72M) || defined(SIG_RX72N)
+		typedef cs_t<0x0008'3040, 0x0400'0000, 0x04FF'FFFF> CS4;
+		typedef cs_t<0x0008'3050, 0x0300'0000, 0x03FF'FFFF> CS5;
+		typedef cs_t<0x0008'3060, 0x0200'0000, 0x02FF'FFFF> CS6;
+		typedef cs_t<0x0008'3070, 0x0100'0000, 0x01FF'FFFF> CS7;
 #endif
 
 
