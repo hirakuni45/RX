@@ -2,7 +2,7 @@
 /*! @file
     @brief  TFT-LCD(R61505W, 320x240) サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -24,7 +24,7 @@
 
 namespace {
 
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 
@@ -39,12 +39,12 @@ namespace {
 	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
 	CMT			cmt_;
 
-	typedef device::PORT<device::PORTA, device::bitpos::B1> RS;
-	typedef device::PORT<device::PORT5, device::bitpos::B2> RD;
-	typedef device::PORT<device::PORT5, device::bitpos::B0> WR;
-	typedef device::PORT<device::PORT2, device::bitpos::B4> CS;
-	typedef device::PORT_BYTE<device::PORTD> DL;
-	typedef device::PORT_BYTE<device::PORTE> DH;
+	typedef device::PORT<device::PORTA, device::bitpos::B1> RS;  // A1/DQM3
+	typedef device::PORT<device::PORT5, device::bitpos::B2> RD;  // P52: RD#
+	typedef device::PORT<device::PORT5, device::bitpos::B0> WR;  // P50: WR0#/WR#
+	typedef device::PORT<device::PORT2, device::bitpos::B4> CS;  // P24: CS4#/
+	typedef device::PORT_BYTE<device::PORTD> DL;  // D0-D7
+	typedef device::PORT_BYTE<device::PORTE> DH;  // D8-D15
 	typedef device::bus_rw16<CS, RS, RD, WR, DL, DH> BUS;
 	BUS			bus_;
 
