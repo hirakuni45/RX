@@ -8,7 +8,8 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/cmt_io.hpp"
+#include "common/renesas.hpp"
+#include "common/cmt_mgr.hpp"
 #include "common/sci_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
@@ -44,7 +45,7 @@ namespace {
 	// LED インジケーター
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 
-	typedef device::cmt_io<device::CMT0> CMT;
+	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
 
 	typedef utils::fixed_fifo<char, 128> buffer;

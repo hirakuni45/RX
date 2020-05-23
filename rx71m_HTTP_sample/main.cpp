@@ -9,7 +9,7 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 
-#include "common/cmt_io.hpp"
+#include "common/cmt_mgr.hpp"
 #include "common/sci_io.hpp"
 #include "common/rspi_io.hpp"
 #include "common/fixed_fifo.hpp"
@@ -51,7 +51,7 @@ namespace {
 		volatile unsigned long get_millis() const { return millis10x_ * 10; }
 	};
 
-	typedef device::cmt_io<device::CMT0, cmt_task> CMT;
+	typedef device::cmt_mgr<device::CMT0, cmt_task> CMT;
 	CMT			cmt_;
 
 	typedef utils::fixed_fifo<char, 1024> RX_SCI;

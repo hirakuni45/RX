@@ -11,7 +11,7 @@
 #define CASH_KFONT
 
 #include "common/renesas.hpp"
-#include "common/cmt_io.hpp"
+#include "common/cmt_mgr.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
@@ -57,7 +57,7 @@ namespace {
 	typedef device::system_io<12000000> SYSTEM_IO;
 
 	static const uint32_t CMT_FREQ = 1000;  ///< 計測用タイマー分解能
-	typedef device::cmt_io<device::CMT0> CMT;
+	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
 
 	typedef utils::fixed_fifo<char,  512> RECV_BUFF;

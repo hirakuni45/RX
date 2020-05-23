@@ -26,7 +26,7 @@
 
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
-#include "common/cmt_io.hpp"
+#include "common/cmt_mgr.hpp"
 
 #include "common/format.hpp"
 #include "common/input.hpp"
@@ -87,7 +87,7 @@ namespace {
 	static const char* system_str_ = { "RX66T" };
 #endif
 
-	typedef device::cmt_io<device::CMT0> CMT;
+	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT			cmt_;
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義

@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX66T GPTW 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -28,11 +28,23 @@ namespace device {
 		@param[in]	gtciv	GTCIVn 割り込みベクタ
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral peri,
+	template <uint32_t base, peripheral per,
 		ICU::VECTOR_SELA gtcia, ICU::VECTOR_SELA gtcib, ICU::VECTOR_SELA gtcic,
 		ICU::VECTOR_SELA gtcid, ICU::VECTOR_SELA gdte,  ICU::VECTOR_SELA gtcie,
 		ICU::VECTOR_SELA gtcif, ICU::VECTOR_SELA gtciu, ICU::VECTOR_SELA gtciv>
 	struct gptw_t {
+
+		static const auto PERIPHERAL = per;	///< ペリフェラル型
+		static const auto GTCIA = gtcia;	///< GTCIAn 割り込みベクタ
+		static const auto GTCIB = gtcib;	///< GTCIBn 割り込みベクタ
+		static const auto GTCIC = gtcic;	///< GTCICn 割り込みベクタ
+		static const auto GTCID = gtcid;	///< GTCIDn 割り込みベクタ
+		static const auto GDTE  = gdte;		///< GDTEn  割り込みベクタ
+		static const auto GTCIE = gtcie;	///< GTCIEn 割り込みベクタ
+		static const auto GTCIF = gtcif;	///< GTCIFn 割り込みベクタ
+		static const auto GTCIU = gtciu;	///< GTCIUn 割り込みベクタ
+		static const auto GTCIV = gtciv;	///< GTCIVn 割り込みベクタ
+
 
 		//-----------------------------------------------------------------//
 		/*!
@@ -1008,96 +1020,6 @@ namespace device {
 			bit_rw_t <io_, bitpos::B11>     SBDDD;
 		};
 		static gtsecr_t<base + 0xD4> GTSECR;
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  ペリフェラル型を返す
-			@return ペリフェラル型
-		*/
-		//-----------------------------------------------------------------//
-		static peripheral get_peripheral() { return peri; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GTCIA 割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_SELA get_gtcia_vec() { return gtcia; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GTCIB 割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_SELA get_gtcib_vec() { return gtcib; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GTCIC 割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_SELA get_gtcic_vec() { return gtcic; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GTCID 割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_SELA get_gtcid_vec() { return gtcid; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GDTE 割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_SELA get_gdte_vec() { return gdte; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GTCIE 割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_SELA get_gtcie_vec() { return gtcie; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GTCIF 割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_SELA get_gtcif_vec() { return gtcif; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GTCIU 割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_SELA get_gtciu_vec() { return gtciu; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  GTCIV 割り込みベクターを返す
-			@return ベクター型
-		*/
-		//-----------------------------------------------------------------//
-		static ICU::VECTOR_SELA get_gtciv_vec() { return gtciv; }
 	};
 
 	typedef gptw_t<0x000C2000, peripheral::GPTW0,

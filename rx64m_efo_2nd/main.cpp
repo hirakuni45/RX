@@ -11,7 +11,7 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "common/cmt_io.hpp"
+#include "common/cmt_mgr.hpp"
 #include "common/tpu_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
@@ -71,7 +71,7 @@ namespace {
 
 	typedef device::PORT<device::PORTE, device::bitpos::B3> LED;
 
-	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
+	typedef device::cmt_mgr<device::CMT0, utils::null_task> CMT;
 	CMT		cmt_;
 
 	// LTC2348-16 A/D 制御ポート定義

@@ -16,13 +16,13 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  CMT I/O クラス
+		@brief  CMT マネージャー・クラス
 		@param[in]	CMT	チャネルクラス
 		@param[in]	TASK	タイマー動作クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class CMT, class TASK = utils::null_task>
-	class cmt_io {
+	class cmt_mgr {
 
 		uint8_t		level_;
 		uint32_t	rate_;
@@ -45,7 +45,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		cmt_io() : level_(0), rate_(0) { }
+		cmt_mgr() noexcept : level_(0), rate_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -201,6 +201,6 @@ namespace device {
 		static TASK& at_task() noexcept { return task_; }
 	};
 
-	template <class CMT, class TASK> volatile uint32_t cmt_io<CMT, TASK>::counter_ = 0;
-	template <class CMT, class TASK> TASK cmt_io<CMT, TASK>::task_;
+	template <class CMT, class TASK> volatile uint32_t cmt_mgr<CMT, TASK>::counter_ = 0;
+	template <class CMT, class TASK> TASK cmt_mgr<CMT, TASK>::task_;
 }

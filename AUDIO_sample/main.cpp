@@ -13,7 +13,7 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "common/cmt_io.hpp"
+#include "common/cmt_mgr.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
@@ -37,7 +37,7 @@
 
 namespace {
 
-	typedef device::cmt_io<device::CMT0> CMT;
+	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT			cmt_;
 
 #if defined(SIG_RX64M)

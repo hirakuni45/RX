@@ -24,7 +24,7 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 
-#include "common/cmt_io.hpp"
+#include "common/cmt_mgr.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
@@ -73,7 +73,7 @@ namespace {
 //	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
 	SCI			sci_;
 
-	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
+	typedef device::cmt_mgr<device::CMT0, utils::null_task> CMT;
 	CMT			cmt_;
 
 	typedef utils::command<256> COMMAND;

@@ -26,7 +26,7 @@ namespace app {
 
 		gui::button		button_;
 		gui::check		check_;
-		gui::group		group_;
+		gui::group<3>	group_;
 		gui::radio		radio1_;
 		gui::radio		radio2_;
 		gui::radio		radio3_;

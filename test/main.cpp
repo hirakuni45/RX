@@ -26,7 +26,7 @@
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
-#include "common/cmt_io.hpp"
+#include "common/cmt_mgr.hpp"
 
 #include "common/fixed_string.hpp"
 
@@ -69,7 +69,7 @@ namespace {
 //	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
 	SCI		sci_;
 
-	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
+	device::cmt_mgr<device::CMT0, utils::null_task>  cmt_;
 }
 
 extern "C" {
