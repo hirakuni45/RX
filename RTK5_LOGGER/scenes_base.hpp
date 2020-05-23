@@ -34,7 +34,7 @@
 #include "common/sci_i2c_io.hpp"
 #endif
 
-#include "common/cmt_io.hpp"
+#include "common/cmt_mgr.hpp"
 #include "common/nmea_dec.hpp"
 
 #include "resource.hpp"
@@ -209,7 +209,7 @@ namespace app {
 			}
 		};
 
-		typedef device::cmt_io<device::CMT0, watch_task> CMT;
+		typedef device::cmt_mgr<device::CMT1, watch_task> CMT;
 		// GPS 専用シリアル定義
 		typedef utils::fixed_fifo<char, 2048>  G_REB;
 		typedef utils::fixed_fifo<char, 512> G_SEB;
