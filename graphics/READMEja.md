@@ -36,7 +36,7 @@
 |glmatrix.hpp|OpenGL マトリックスクラス|
 |tgl.hpp|TinyGL(OpenGL) クラス|
 |widget_director.hpp|Widget ディレクター|
-|widget.hpp|Widget 基本クラス|
+|widget.hpp|Widget ウィジェット基本クラス|
 |group.hpp|Widget グループ|
 |frame.hpp|Widget フレーム|
 |button.hpp|Widget ボタン|
@@ -49,6 +49,11 @@
 ---
    
 ## GUI Widget 概要
+
+- タッチパネルと、グラフィックス画面を使った GUI フレームワーク
+- テンプレートを使う事で、記憶割り当てを使わないシンプルな構造
+- ソフトウェアー、及びハードウェアーレンダリングに適応出来る柔軟な構造
+- 
 
 
 
