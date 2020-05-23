@@ -18,7 +18,7 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 
-#include "common/cmt_io.hpp"
+#include "common/cmt_mgr.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
@@ -98,7 +98,7 @@ namespace {
 		}
 	};
 
-	typedef device::cmt_io<device::CMT0, cmt_task> CMT;
+	typedef device::cmt_mgr<device::CMT0, cmt_task> CMT;
 	CMT			cmt_;
 
 	typedef utils::command<256> CMD;
