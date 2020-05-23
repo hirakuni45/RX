@@ -9,7 +9,7 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "common/cmt_io.hpp"
+#include "common/cmt_mgr.hpp"
 #include "common/sci_io.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/format.hpp"
@@ -18,7 +18,7 @@
 
 namespace {
 
-	typedef device::cmt_io<device::CMT0, utils::null_task> CMT;
+	typedef device::cmt_mgr<device::CMT0, utils::null_task> CMT;
 	CMT		cmt_;
 
 	typedef utils::fixed_fifo<char, 256> BUFFER;
