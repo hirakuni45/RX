@@ -11,7 +11,7 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "common/cmt_io.hpp"
+#include "common/cmt_mgr.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
@@ -31,7 +31,7 @@ namespace {
 
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 
-	device::cmt_io<device::CMT0, utils::null_task>  cmt_;
+	device::cmt_mgr<device::CMT0, utils::null_task>  cmt_;
 
 	// 標準シリアルポート設定
 	typedef utils::fixed_fifo<char, 1024> RBF;
