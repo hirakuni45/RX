@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ・CAN I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -15,7 +15,29 @@
 #  error "can_io.hpp requires F_PCLKB to be defined"
 #endif
 
-namespace device {
+namespace utils {
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  CAN 制御ベースクラス
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	class can_io_base {
+	public:
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CAN スピード型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class SPEED {
+			_125K =   125'000,	///< 125 Kbps
+			_250K =   250'000,	///< 250 Kbps
+			_500K =   500'000,	///< 500 Kbps
+			_1M   = 1'000'000	///< 1 Mbps
+		};
+	};
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -25,7 +47,7 @@ namespace device {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class CAN, port_map::option PSEL = port_map::option::FIRST>
-	class can_io {
+	class can_io : public can_io_base {
 	public:
 
 	private:
@@ -61,13 +83,20 @@ namespace device {
 			@return エラー（速度設定範囲外）なら「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t speed, uint8_t level = 0) noexcept
+		bool start(SPEED speed, uint8_t level = 0) noexcept
 		{
 			level_ = level;
 
 			power_mgr::turn(CAN::get_peripheral());
 			port_map::turn(CAN::get_peripheral(), true, PSEL);
 
+			uint32_t tq = 10;  // TSEG2: 6-1, TSEG1: 4-1
+			uint32_t brp = F_PCLKB / static_cast<uint32_t>(speed);
+			brp /= tq;
+			--brp;
+
+			CAN::BCR = CAN::BCR.TSEG1.b(0b0101) | CAN::BCR.BRP.b(brp)
+				CAN::BCR.TSEG2.b(0b011);
 
 
 
