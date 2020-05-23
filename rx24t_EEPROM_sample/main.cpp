@@ -8,7 +8,8 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "common/cmt_io.hpp"
+#include "common/renesas.hpp"
+#include "common/cmt_mgr.hpp"
 #include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
@@ -22,7 +23,7 @@ namespace {
 		}
 	};
 
-	device::cmt_io<device::CMT0, cmt_task>  cmt_;
+	device::cmt_mgr<device::CMT0, cmt_task>  cmt_;
 
 	typedef utils::fixed_fifo<char, 128> fifo128;
 	device::sci_io<device::SCI1, fifo128, fifo128> sci_;
