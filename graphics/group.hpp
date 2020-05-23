@@ -14,14 +14,14 @@ namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	グループ・クラス
+		@brief	グループ・クラス（テンプレート）
+		@param[in]	CNUM	グループ最大数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <uint32_t CNUM>
 	struct group : public widget {
 
 		typedef group value_type;
-
-		static const uint32_t CNUM = 16;
 
 	private:
 		widget*		child_[CNUM];
