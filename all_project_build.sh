@@ -20,6 +20,7 @@ RED=`tput setaf 1`
 GREEN=`tput setaf 2`
 PINK=`tput setaf 5`
 LIGHTBLUE=`tput setaf 6`
+YELLO=`tput setaf 3`
 NOCOLOR=`tput sgr0`
 
 # make clean func
@@ -41,7 +42,7 @@ if [[ $1 = "clean" ]]; then
 	for file in `ls -d *`;
 	do
 	    if [ ${file} = "legacy" ]; then
-		echo "${GREEN}Legacy project: pass..." "${NOCOLOR}"
+		echo "${YELLO}Legacy project: pass..." "${NOCOLOR}"
 	    elif [ -e "${file}/Makefile" ]; then
 		make_clean "" "${file}"
 	    elif [ -d "${file}" ]; then
@@ -85,7 +86,7 @@ done
 for file in `ls -d *`;
 do
     	if [ ${file} = "legacy" ]; then
-	    echo "Legacy project: pass..."
+	    echo "${YELLO}Legacy project: pass..." "${NOCOLOR}"
 	elif [ -e "${file}/Makefile" ]; then
 		make_main "" ${file}
 	elif [ -d "${file}" ]; then
