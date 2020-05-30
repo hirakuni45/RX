@@ -10,9 +10,6 @@
 			RX24T: @n
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する @n
-			RX66T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する
 			RX72N (Renesas Envision kit RX72N): @n
 					16MHz のベースクロックを使用する @n
 					P40 に接続された LED を利用する
@@ -53,7 +50,7 @@ namespace {
 	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	// SDCARD 制御リソース
+	// SDCARD 制御リソース（ソフト SPI）
 	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
 	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
 	typedef device::PORT<device::PORT7, device::bitpos::B7> SPCK;
@@ -94,11 +91,6 @@ namespace {
 	typedef device::iica_io<device::RIIC0> I2C;
 	typedef chip::DS3231<I2C> RTC;
 	#define ENABLE_I2C_RTC
-#elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
-	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N" };
 	typedef device::system_io<16'000'000> SYSTEM_IO;
