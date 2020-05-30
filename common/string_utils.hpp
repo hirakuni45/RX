@@ -59,6 +59,48 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  半角相当文字数を数える @n
+					※半角： +1、全角： +2
+			@param[in]	src	ソース
+			@return 半角相当文字数
+		*/
+		//-----------------------------------------------------------------//
+		static uint32_t utf8_string_length(const char* src) noexcept
+		{
+			uint32_t len = 0;
+			if(src == nullptr) return len;
+
+			uint8_t cnt = 0;
+			uint16_t code = 0;
+			char tc;
+			while((tc = *src++) != 0) {
+				uint8_t c = static_cast<uint8_t>(tc);
+				if(c < 0x80) { code = c; cnt = 0; }
+				else if((c & 0xf0) == 0xe0) { code = (c & 0x0f); cnt = 2; }
+				else if((c & 0xe0) == 0xc0) { code = (c & 0x1f); cnt = 1; }
+				else if((c & 0xc0) == 0x80) {
+					code <<= 6;
+					code |= c & 0x3f;
+					cnt--;
+					if(cnt == 0 && code < 0x80) {
+						code = 0;	// 不正なコードとして無視
+						break;
+					} else if(cnt < 0) {
+						code = 0;
+					}
+				}
+				if(cnt == 0 && code != 0) {
+					if(code < 256) len += 1;
+					else len += 2;
+					code = 0;
+				}
+			}
+			return len;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  UTF-8 から UTF-16 への変換
 			@param[in]	src	ソース
 			@param[in]	dst	変換先

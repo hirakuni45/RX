@@ -16,26 +16,45 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  CMTW 管理クラス
-		@param[in]	CMTW	チャネルクラス
-		@param[in]	TASK	タイマー動作クラス
+		@brief  CMTW ベースクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class CMTW, class TASK = utils::null_task>
-	class cmtw_mgr {
+	class cmtw_base {
+	public:
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  CMTW ベースクラス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class MODE : uint8_t {
+			COUNT,		///< 周期カウント
+		};
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  CMTW 管理クラス
+		@param[in]	CMTW	チャネルクラス
+		@param[in]	FUNC	タイマー動作、ファンクタクラス型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class CMTW, class FUNC = utils::null_task>
+	class cmtw_mgr : public cmtw_base {
 
 		uint8_t		level_;
 
 		void sleep_() const { asm("nop"); }
 
-		static TASK	task_;
+		static FUNC	func_;
 
 		static volatile uint32_t counter_;
 
 		static INTERRUPT_FUNC void i_task_()
 		{
 			++counter_;
-			task_();
+			func_();
 		}
 
 	public:
@@ -55,7 +74,7 @@ namespace device {
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level = 0, void (*task)() = nullptr) noexcept
+		bool start(uint32_t freq, uint8_t level = 0) noexcept
 		{
 			if(freq == 0) return false;
 
@@ -85,11 +104,7 @@ namespace device {
 
 			auto vec = CMTW::get_ivec();
 			if(level_ > 0) {
-				if(task != nullptr) {
-					icu_mgr::set_interrupt(vec, task, level_);
-				} else {
-					icu_mgr::set_interrupt(vec, i_task_, level_);
-				}
+				icu_mgr::set_interrupt(vec, i_task_, level_);
 			    CMTW::CMCR = CMTW::CMCR.CKS.b(cks) | CMTW::CMCR.CMIE.b();
 			} else {
 				icu_mgr::set_interrupt(vec, nullptr, 0);
@@ -170,13 +185,13 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  TASK クラスの参照
-			@return TASK クラス
+			@brief  FUNC クラスの参照
+			@return FUNC クラス
 		*/
 		//-----------------------------------------------------------------//
-		static TASK& at_task() noexcept { return task_; }
+		static FUNC& at_func() noexcept { return func_; }
 	};
 
-	template <class CMTW, class TASK> volatile uint32_t cmtw_io<CMTW, TASK>::counter_ = 0;
-	template <class CMTW, class TASK> TASK cmtw_io<CMTW, TASK>::task_;
+	template <class CMTW, class FUNC> volatile uint32_t cmtw_io<CMTW, FUNC>::counter_ = 0;
+	template <class CMTW, class FUNC> FUNC cmtw_io<CMTW, FUNC>::task_;
 }

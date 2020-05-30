@@ -16,18 +16,11 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  MTU 制御クラス
-		@param[in]	MTU	MTU ユニット
-		@param[in]	MTASK	メイン割り込みタスク
-		@param[in]	OTASK	オーバーフロー割り込みタスク
+		@brief  MTU 基本クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class MTUX, class MTASK = utils::null_task, class OTASK = utils::null_task>
-	class mtu_io {
+	class mtu_base {
 	public:
-
-		typedef MTUX mtu_type;
-
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  アウトプット・タイプ
@@ -73,7 +66,22 @@ namespace device {
 				ovfw_count_ = 0;
 			}
 		};
+	};
 
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  MTU 制御クラス
+		@param[in]	MTU	MTU ユニット
+		@param[in]	MTASK	メイン割り込みタスク
+		@param[in]	OTASK	オーバーフロー割り込みタスク
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	template <class MTUX, class MTASK = utils::null_task, class OTASK = utils::null_task>
+	class mtu_io : public mtu_base {
+	public:
+
+		typedef MTUX mtu_type;
 
 	private:
 

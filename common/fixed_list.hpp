@@ -68,16 +68,31 @@ namespace utils {
 			@brief  リストをクリア（リセット）
 		*/
 		//-----------------------------------------------------------------//
-///		void clear() noexcept { pos_ = 0; }
+		void clear() noexcept { count_ = 0; }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  リストを追加
+			@param[in]	item	アイテム
+			@return 追加出来ない場合「false」
+		*/
+		//-----------------------------------------------------------------//
 		bool insert(const ITEM& item)
 		{
+			if(count_ >= capacity()) return false;
+
+			list_t* back = nullptr;	
+			if(count_ > 0) {
+				back = &list_[count_ - 1];
+				list_[count_ - 1].next_ = &list_[count_];
+			}
+			list_[count_].back_ = back;
 			list_[count_].item_ = item;
+			list_[count_].next_ = nullptr;
 			++count_;
 
+			return true;
 		}
-
-
 	};
 }
