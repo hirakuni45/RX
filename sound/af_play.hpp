@@ -79,13 +79,16 @@ namespace sound {
 
 			STATE		state_;
 
+			uint32_t	all_time_;
+
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
 		af_play() noexcept : ctrl_task_(), tag_task_(), update_task_(),
-			state_(STATE::IDLE) { }
+			state_(STATE::IDLE), all_time_(0)
+		{ }
 
 
 		//-----------------------------------------------------------------//
@@ -137,7 +140,7 @@ namespace sound {
 		void system_delay(uint32_t ms) noexcept
 		{
 #ifdef RTOS
-			vTaskDelay(ms / portTICK_PERIOD_MS);
+			vTaskDelay(pdMS_TO_TICKS(ms));
 #endif
 		}
 
@@ -158,5 +161,14 @@ namespace sound {
 		*/
 		//-----------------------------------------------------------------//
 		auto get_state() const noexcept { return state_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	最大演奏時間の取得
+			@return 最大演奏時間
+		*/
+		//-----------------------------------------------------------------//
+		auto get_all_time() const noexcept { return all_time_; }
 	};
 }

@@ -226,6 +226,14 @@ namespace sound {
 			mad_timer_reset(&mad_timer_);
 
 			uint32_t forg = fin.tell();
+#if 0
+			// 全体のフレーム数をカウント
+			uint32_t frames = 0;
+			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
+				++frames;
+			}
+			fin.seek(file_io::SEEK::SET, forg);
+#endif
 			bool info = false;
 			uint32_t pos = 0;
 			uint32_t frame_count = 0;

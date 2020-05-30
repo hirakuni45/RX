@@ -8,8 +8,8 @@ Renesas RX24T, RX64M, RX65N, RX72N SD-CARD アクセス・サンプル
 SD カード・アクセス、サンプルプログラム   
 
 - ファイルシステムには FatFs (Version ff13c) を利用
-- SPI (SPI モード) 又は、RX 内臓 SDHI (SD モード) を利用したサンプル
-- ディレクトリーのリスト (dir)
+- SPI (RSPI/ソフト SPI モード) 又は、RX 内臓 SDHI (4 bits SD モード) を利用したサンプル
+- ディレクトリーのリスト (ls)
 - ディレクトリーの移動 (cd)
 - ディレクトリーパスの表示 (pwd)
 - 容量、空き容量表示 (free)

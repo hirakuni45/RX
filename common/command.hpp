@@ -11,6 +11,7 @@
 #include "common/string_utils.hpp"
 #include "common/input.hpp"
 
+// SCI（文字入出力）コンテキストとして、以下の API を定義する必要がある。
 extern "C" {
 	void sci_putch(char ch);
 	void sci_puts(const char *str);
@@ -62,6 +63,7 @@ namespace utils {
 			sci_putch('\r');	///< CR
 			sci_putch('\n');	///< LF
 		}
+
 	public:
         //-----------------------------------------------------------------//
         /*!
