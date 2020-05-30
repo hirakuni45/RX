@@ -35,6 +35,8 @@ namespace gui {
 		float				ratio_org_;
 		float				ratio_;
 
+		bool				read_only_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -45,7 +47,7 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		slider(const vtx::srect& loc = vtx::srect(0), float inr = 0.0f) noexcept :
 			widget(loc, nullptr), select_func_(),
-			touch_org_(0), ratio_org_(inr), ratio_(inr)
+			touch_org_(0), ratio_org_(inr), ratio_(inr), read_only_(false)
 		{
 			if(loc.size.x <= 0) {
 				at_location().size.x = handle_size;
@@ -106,7 +108,8 @@ namespace gui {
 		{
 			update_touch_slider(pos, num);
 
-			if(get_touch_state().positive_) {
+			if(read_only_) {
+			} else if(get_touch_state().positive_) {
 				touch_org_ = get_touch_state().position_;
 				ratio_org_ = ratio_;
 			} else if(get_touch_state().level_) {
@@ -168,6 +171,15 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	リード・オンリー（表示のみ）の設定
+			@param[in]	ena		リード・オンリーを無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable_read_only(bool ena = true) noexcept { read_only_ = ena; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	セレクト関数への参照
 			@return	セレクト関数
 		*/
@@ -188,7 +200,7 @@ namespace gui {
 			auto r = vtx::srect(org, get_location().size);
 			rdr.set_fore_color(graphics::def_color::White);
 			rdr.round_box(r, round_radius);
-			if(get_touch_state().level_) {
+			if(!read_only_ && get_touch_state().level_) {
 				rdr.set_fore_color(graphics::def_color::Silver);
 			} else {
 				rdr.set_fore_color(graphics::def_color::Darkgray);
