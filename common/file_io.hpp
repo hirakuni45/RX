@@ -33,6 +33,8 @@ namespace utils {
 
 	public:
 
+		static const uint32_t PATH_MAX = FF_MAX_LFN + 1;	///< パスの最大数
+
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
         /*!
             @brief  SEEK タイプ
@@ -50,9 +52,10 @@ namespace utils {
 		bool		error_;
 
 		struct dir_list_t {
-			bool	ll_;
-			uint8_t	cnt_;
-			uint8_t	lim_;
+			bool		ll_;
+			uint16_t	count_;
+			uint16_t	block_;
+			uint16_t	limit_;
 		};
 
 		///< 標準的、ディレクトリーリスト
@@ -77,21 +80,44 @@ namespace utils {
 					% static_cast<int>(m->tm_hour)
 					% static_cast<int>(m->tm_min);
 				if(dir) {
+					format("%c[34m") % 0x1b;
 					format("/");
 				} else {
+					format("%c[37m") % 0x1b;
 					format(" ");
 				}
 				format("%s\n") % name;
+				format("%c[37m") % 0x1b;
 			} else {
-				if(dir) {
-					format("/");
-				} else {
-					format(" ");
+				auto l = utils::str::utf8_string_length(name);
+				if(dir) ++l;
+				++l;  // space
+				if((p->count_ + l) >= p->limit_) {
+					format("\n");
+					p->count_ = 0;
 				}
-				format("%15s") % name;
-				++p->cnt_;
-				if(p->cnt_ >= p->lim_) {
-					p->cnt_ = 0;
+				if(dir) {
+					format("%c[34m") % 0x1b;
+				} else {
+					format("%c[37m") % 0x1b;
+				}
+				format("%s") % name;
+				if(dir) format("/");
+				format(" ");
+				p->count_ += l;
+				auto d = p->limit_ - p->count_;
+				if(d < p->block_) {
+					format("%c[37m") % 0x1b;
+					format("\n");
+					p->count_ = 0;
+				} else {
+					auto block = p->block_;
+					while(l > block) { block += p->block_; }
+					while(l < block) {
+						format(" ");
+						++p->count_;
+						++l;
+					}
 				}
 			}
 		}
@@ -308,18 +334,17 @@ namespace utils {
 		bool is_open() const noexcept { return open_; }
 
 
-#if 0
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	ディレクトリかどうか
+			@brief	ディレクトリかどうか @n
+					※ファイルがオープンしていない場合「false」を返す。
 			@return ディレクトリなら「true」
 		*/
 		//-----------------------------------------------------------------//
 		bool is_directory() const noexcept {
 			if(!open_) return false;
-			return 
+			return (fp_.obj.attr & AM_DIR) != 0;
 		}
-#endif
 
 
 		//-----------------------------------------------------------------//
@@ -619,22 +644,27 @@ namespace utils {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static uint32_t dir(const char* root, bool ll = true) noexcept
 		{
-			char tmp[FF_MAX_LFN + 1];
+			char tmp[PATH_MAX];
 			make_full_path(root, tmp, sizeof(tmp));
 			dir_list dl;
 			if(!dl.start(tmp)) return 0;
 
 			dir_list_t t;
 			t.ll_ = ll;
-			t.cnt_ = 0;
-			t.lim_ = 5;
+			t.count_ = 0;
+			t.block_ = 16;	// １ファイルの表示範囲
+			t.limit_ = 80;  // 80 行のターミナルを想定
+
 			do {
 				dl.service(10, dir_list_func_, true, &t);
 			} while(dl.probe()) ;
 			auto n = dl.get_total();
+
+			format("%c[37m") % 0x1b;  // color white
+
 			if(t.ll_) utils::format("Total %d file%s\n") % n % (n > 1 ? "s" : "");
 			else {
-				if(t.cnt_ != 0) {
+				if(t.count_ != 0) {
 					utils::format("\n");
 				}
 			}
@@ -711,7 +741,7 @@ namespace utils {
 					return false;
 				}
 
-				char tmp[FF_MAX_LFN + 1];
+				char tmp[PATH_MAX];
 				make_full_path(org_path, tmp, sizeof(tmp));
 				dir_list dl;
 				if(!dl.start(tmp)) return false;
