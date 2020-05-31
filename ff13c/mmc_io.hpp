@@ -266,7 +266,7 @@ namespace fatfs {
 			if(POW::BIT_POS < 32) {
 				lock_();
 				POW::DIR = 1;
-				POW::P = 1;  // power off
+				POW::P = 0;  // power off
 				POW::PU = 0;
 
 				SEL::DIR = 1;
@@ -533,7 +533,7 @@ namespace fatfs {
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
 				if(POW::BIT_POS < 32) {
 					lock_();
-					POW::P = 0;
+					POW::P = 1;
 					SEL::P = 1;
 					unlock_();
 				} else {
@@ -547,7 +547,7 @@ namespace fatfs {
 				spi_.destroy();
 				if(POW::BIT_POS < 32) {
 					lock_();
-					POW::P = 1;
+					POW::P = 0;
 					SEL::P = 0;
 					unlock_();
 				} else {
@@ -570,7 +570,7 @@ namespace fatfs {
 						spi_.destroy();
 						if(POW::BIT_POS < 32) {
 							lock_();
-							POW::P = 1;
+							POW::P = 0;
 							SEL::P = 0;
 							unlock_();
 						} else {
