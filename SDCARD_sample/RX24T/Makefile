@@ -77,7 +77,7 @@ endif
 ifeq ($(BUILD),release)
     CC_OPT += -DNDEBUG
     CP_OPT += -DNDEBUG
-	OPTIMIZE = -O2
+	OPTIMIZE = -Os
 endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
