@@ -1,5 +1,10 @@
 #include "graphics/kfont.hpp"
 
+// 東雲16ドット漢字フォント
+// 東雲フォントメインデザイン
+//   古川 泰之 <Furukawa.Yasuyuki@fujixerox.co.jp>
+//   参照 http://www.on.cs.keio.ac.jp/~yasu/jp_fonts.html
+
 namespace graphics {
 
 const uint8_t kfont_bitmap::kfont_start[] = {

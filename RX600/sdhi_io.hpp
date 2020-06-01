@@ -948,7 +948,8 @@ namespace fatfs {
 				mount_delay_ = MOUNT_DELAY_FRAME;  // n フレーム後にマウントする
 			} else if(!cd && cd_) {
 ///				utils::format("Card Eject\n");
-				f_mount(nullptr, "", 0);
+				BYTE opt = 1; // マウント時初期化をする場合
+				f_mount(nullptr, "", opt);
 				device::port_map::turn_sdhi(device::port_map::sdhi_situation::EJECT, PSEL);
 				POW::P = 0;
 

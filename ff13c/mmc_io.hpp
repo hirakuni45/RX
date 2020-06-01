@@ -15,7 +15,7 @@
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
-// #define DEBUG_MMC
+/// #define DEBUG_MMC
 
 namespace fatfs {
 
@@ -235,9 +235,11 @@ namespace fatfs {
 			} else {
 				speed = 400000;  // 初期化時、400Kbits/s
 			}
+/// utils::format("Entry SPI start_sdc\n");
 			if(!spi_.start_sdc(speed)) {
 				utils::format("CSI Start fail ! (Clock spped over range)\n");
 			}
+/// utils::format("Final SPI start_sdc\n");
 		}
 
 	public:
@@ -266,7 +268,7 @@ namespace fatfs {
 			if(POW::BIT_POS < 32) {
 				lock_();
 				POW::DIR = 1;
-				POW::P = 1;  // power off
+				POW::P = 0;  // power off
 				POW::PU = 0;
 
 				SEL::DIR = 1;
@@ -533,7 +535,7 @@ namespace fatfs {
 				mount_delay_ = 30;  // 30 フレーム後にマウントする
 				if(POW::BIT_POS < 32) {
 					lock_();
-					POW::P = 0;
+					POW::P = 1;
 					SEL::P = 1;
 					unlock_();
 				} else {
@@ -541,13 +543,13 @@ namespace fatfs {
 					SEL::P = 1;
 					unlock_();
 				}
-//				utils::format("Card ditect\n");
+/// utils::format("Card ditect signal\n");
 			} else if(cd_ && select_wait_ == 0) {
-				f_mount(nullptr, "", 0);
-				spi_.destroy();
+				f_mount(nullptr, "", 0);  // 登録抹消
+///				spi_.destroy();
 				if(POW::BIT_POS < 32) {
 					lock_();
-					POW::P = 1;
+					POW::P = 0;
 					SEL::P = 0;
 					unlock_();
 				} else {
@@ -556,7 +558,7 @@ namespace fatfs {
 					unlock_();
 				}
 				mount_ = false;
-//				utils::format("Card unditect\n");
+/// utils::format("Card unditect signal\n");
 			}
 			if(select_wait_ >= 10) cd_ = true;
 			else cd_ = false;
@@ -564,13 +566,14 @@ namespace fatfs {
 			if(mount_delay_) {
 				--mount_delay_;
 				if(mount_delay_ == 0) {
-					auto st = f_mount(&fatfs_, "", 0);
+					BYTE opt = 1; // マウント時初期化をする場合
+					auto st = f_mount(&fatfs_, "", opt);
 					if(st != FR_OK) {
 						utils::format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
 						spi_.destroy();
 						if(POW::BIT_POS < 32) {
 							lock_();
-							POW::P = 1;
+							POW::P = 0;
 							SEL::P = 0;
 							unlock_();
 						} else {
