@@ -29,22 +29,42 @@
 #include "common/input.hpp"
 #include "common/string_utils.hpp"
 
-#include "common/rspi_io.hpp"
-#include "common/iica_io.hpp"
 #include "common/spi_io2.hpp"
+#include "common/rspi_io.hpp"
+#include "common/command.hpp"
 #include "common/shell.hpp"
 
-#include "common/command.hpp"
-
+#include "common/iica_io.hpp"
 #include "chip/DS3231.hpp"
 
 namespace {
 
-#if defined(SIG_RX71M)
-	static const char* system_str_ = { "RX71M" };
-	typedef device::system_io<12'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+#if defined(SIG_RX24T)
+	static const char* system_str_ = { "RX24T" };
+	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
+	// SDCARD 制御リソース
+#if 1
+	// RSPI0 定義
+	typedef device::rspi_io<device::RSPI0> SDC_SPI;
+#else
+	// Soft SPI 定義
+	typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;
+	typedef device::PORT<device::PORT2, device::bitpos::B3> MOSI;
+	typedef device::PORT<device::PORT2, device::bitpos::B4> SPCK;
+	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;
+#endif
+	SDC_SPI	sdc_spi_;
+	typedef device::PORT<device::PORT6, device::bitpos::B5> SDC_SELECT;	///< カード選択信号
+	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< カード電源制御
+	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
+	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
+	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
+	SDC		sdc_(sdc_spi_, 20'000'000);
+	typedef device::iica_io<device::RIIC0> I2C;
+	typedef chip::DS3231<I2C> RTC;
+	#define ENABLE_I2C_RTC
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
 	typedef device::system_io<12'000'000> SYSTEM_IO;
@@ -65,6 +85,11 @@ namespace {
 	// 内臓 RTC を有効
 	#define ENABLE_RTC
 	typedef utils::rtc_io RTC;
+#elif defined(SIG_RX71M)
+	static const char* system_str_ = { "RX71M" };
+	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N" };
 	typedef device::system_io<12'000'000> SYSTEM_IO;
@@ -74,23 +99,6 @@ namespace {
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
 	SDC		sdc_;
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T" };
-	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
-	// SDCARD 制御リソース
-	typedef device::rspi_io<device::RSPI0> SDC_SPI;
-	typedef device::PORT<device::PORT6, device::bitpos::B5> SDC_SELECT;	///< カード選択信号
-	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< カード電源制御
-	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
-	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
-	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
-	SDC_SPI	sdc_spi_;
-	SDC		sdc_(sdc_spi_, 20'000'000);
-	typedef device::iica_io<device::RIIC0> I2C;
-	typedef chip::DS3231<I2C> RTC;
-	#define ENABLE_I2C_RTC
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N" };
 	typedef device::system_io<16'000'000> SYSTEM_IO;
