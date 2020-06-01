@@ -545,8 +545,7 @@ namespace fatfs {
 				}
 /// utils::format("Card ditect signal\n");
 			} else if(cd_ && select_wait_ == 0) {
-				BYTE opt = 1;
-				f_mount(nullptr, "", opt);
+				f_mount(nullptr, "", 0);  // 登録抹消
 ///				spi_.destroy();
 				if(POW::BIT_POS < 32) {
 					lock_();
