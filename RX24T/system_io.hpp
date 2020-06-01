@@ -11,8 +11,13 @@
 #include "RX24T/system.hpp"
 #include "RX24T/flash.hpp"
 
-#ifndef F_ICLK
-#  error "system_io.hpp requires F_ICLK to be defined"
+#if defined(F_ICLK) && defined(F_PCLKA) && defined(F_PCLKB) && defined(F_PCLKD) && defined(F_FCLK)
+#else  
+#  error "system_io.hpp requires F_[IF]CLK and F_PCLK[ABD] to be defined"
+#endif
+
+#ifndef SIG_RX24T
+#  error "system_io.hpp: Not available on not RX24T"
 #endif
 
 namespace device {
