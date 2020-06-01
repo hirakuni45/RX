@@ -230,9 +230,10 @@ namespace device {
 			RSPI::SPPCR = 0x00;	 // Fixed idle value, disable loop-back
 			RSPI::SPSCR = 0x00;	 // disable sequence control
 			RSPI::SPDCR = 0x20;	 // SPLW=1 (data register 32bits access) 
+			RSPI::SPND = 0b011;  // 4 RSPCK + 2 PCLK
 			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv)
 				| RSPI::SPCMD0.SPB.b(static_cast<uint8_t>(DLEN::W8))
-				| RSPI::SPCMD0.CPHA.b(0) | RSPI::SPCMD0.CPOL.b(0);
+				| RSPI::SPCMD0.CPHA.b(1) | RSPI::SPCMD0.CPOL.b(1) | RSPI::SPCMD0.SPNDEN.b(1);
 
 			// 3 線式（SSLAx を使わない）、Master
 			RSPI::SPCR = RSPI::SPCR.SPMS.b(1) | RSPI::SPCR.MSTR.b(1);
