@@ -70,7 +70,7 @@ namespace device {
 
 
 		bool clock_div_(uint32_t speed, uint8_t& brdv, uint8_t& spbr) {
-///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(PCLK_);
+///			utils::format("PCLK: %d\n") % static_cast<uint32_t>(RSPI::PCLK);
 			uint32_t br = static_cast<uint32_t>(RSPI::PCLK) / speed;
 			uint8_t dv = 0;
 			while(br > 512) {
@@ -131,13 +131,19 @@ namespace device {
 			@param[in]	speed	通信速度
 			@param[in]	ctype	クロック位相タイプ
 			@param[in]	dlen	データ長設定
-			@param[in]	level	割り込みレベル（１～２）、０の場合はポーリング
+			@param[in]	level	割り込みレベル、０の場合はポーリング
 			@return エラー（速度設定範囲外）なら「false」
 		*/
 		//-----------------------------------------------------------------//
 		bool start(uint32_t speed, PHASE ctype, DLEN dlen, uint8_t level = 0) noexcept
 		{
 			level_ = level;
+
+			uint8_t brdv;
+			uint8_t spbr;
+			if(!clock_div_(speed, brdv, spbr)) {
+				return false;
+			}
 
 			power_mgr::turn(RSPI::PERIPHERAL);
 
@@ -147,20 +153,13 @@ namespace device {
 			// ポートを有効にする
 			port_map::turn(RSPI::PERIPHERAL, true, PSEL);
 
-			bool f = true;
-			uint8_t brdv;
-			uint8_t spbr;
-			if(!clock_div_(speed, brdv, spbr)) {
-				f = false;
-			}
-
 			// 設定
 		    RSPI::SPBR = spbr;
 
 			RSPI::SPPCR = 0x00;	// Fixed idle value, disable loop-back
 			RSPI::SPSCR = 0x00;	// disable sequence control
 			RSPI::SPDCR = 0x20;	// SPLW=1 (long word access) 
-///			RSPI::SPCMD0 = RSPI::SPCMD0.LSBF.b() | RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0100);
+
 			bool cpol = 0;
 			bool cpha = 0;
 			switch(ctype) {
@@ -188,7 +187,7 @@ namespace device {
 
 			RSPI::SPCR.SPE = 1;
 
-			return f;
+			return true;
 		}
 
 
@@ -203,16 +202,16 @@ namespace device {
 		{
 			level_ = 0;
 
-			power_mgr::turn(RSPI::PERIPHERAL);
-
-			RSPI::SPCR = 0x00;			
-
-			bool f = true;
 			uint8_t brdv;
 			uint8_t spbr;
 			if(!clock_div_(speed, brdv, spbr)) {
-				f = false;
+				return false;
 			}
+
+			power_mgr::turn(RSPI::PERIPHERAL);
+
+			RSPI::SPCR = 0x00;
+
 			port_map::turn(RSPI::PERIPHERAL, true, PSEL);
 #if 0
 			utils::format("RSPI Request Speed: %u [Hz]\n") % speed;
@@ -224,22 +223,23 @@ namespace device {
 			// 実際のクロックを表示
 #if 0
 			static const uint8_t n[4] = { 1, 2, 4, 8 };
-			uint32_t z = static_cast<uint32_t>(PCLK_)
+			uint32_t z = static_cast<uint32_t>(RSPI::PCLK)
 					/ (2 * static_cast<uint32_t>(spbr + 1) * static_cast<uint32_t>(n[brdv]));
 			utils::format("RSPI Real Speed: %u [Hz]\n") % z;
 #endif
-			RSPI::SPPCR = 0x00;	// Fixed idle value, disable loop-back
-			RSPI::SPSCR = 0x00;	// disable sequence control
-			RSPI::SPDCR = 0x20;	// SPLW=1 (long word access) 
-			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv) | RSPI::SPCMD0.SPB.b(0b0100);
-///				| RSPI::SPCMD0.CPHA.b(0) | RSPI::SPCMD0.CPOL.b(1);
+			RSPI::SPPCR = 0x00;	 // Fixed idle value, disable loop-back
+			RSPI::SPSCR = 0x00;	 // disable sequence control
+			RSPI::SPDCR = 0x20;	 // SPLW=1 (data register 32bits access) 
+			RSPI::SPCMD0 = RSPI::SPCMD0.BRDV.b(brdv)
+				| RSPI::SPCMD0.SPB.b(static_cast<uint8_t>(DLEN::W8))
+				| RSPI::SPCMD0.CPHA.b(0) | RSPI::SPCMD0.CPOL.b(0);
 
-			RSPI::SPCR.SPMS = 1;
-			RSPI::SPCR.MSTR = 1;
+			// 3 線式（SSLAx を使わない）、Master
+			RSPI::SPCR = RSPI::SPCR.SPMS.b(1) | RSPI::SPCR.MSTR.b(1);
 
 			RSPI::SPCR.SPE = 1;
 
-			return f;
+			return true;
 		}
 
 
