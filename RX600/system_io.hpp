@@ -21,7 +21,8 @@
 #  error "system_io.hpp requires F_[IFB]CLK and F_PCLK[ABCD] to be defined"
 #endif
 
-#if defined(SIG_RX24T)
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX66T) || defined(SIG_RX65N) || defined(SIG_RX72T) || defined(SIG_RX72N) || defined(SIG_RX72M)
+#elif
 #  error "system_io.hpp: Not available on RX24T"
 #endif
 
