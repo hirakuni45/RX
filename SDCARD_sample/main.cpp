@@ -4,6 +4,11 @@
 			RX64M, RX71M: @n
 					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
+			RX64M GR-KAEDE: @n
+					内蔵 SD カードインターフェースの RSPI は、デバッガー E1 @n
+					と共有されており、ポートがプルダウンされています。@n
+					SD カードの初期化時、プルアップが必要なので、そ対策が必要。@n
+					※ main 関数の始めで、その対策をしています。@n
 			RX65N (Renesas Envision kit RX65N): @n
 					12MHz のベースクロックを使用する @n
 			　　　　P70 に接続された LED を利用する @n
@@ -40,6 +45,7 @@
 namespace {
 
 #if defined(SIG_RX24T)
+
 	static const char* system_str_ = { "RX24T" };
 	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
@@ -65,32 +71,62 @@ namespace {
 	typedef device::iica_io<device::RIIC0> I2C;
 	typedef chip::DS3231<I2C> RTC;
 	#define ENABLE_I2C_RTC
+
 #elif defined(SIG_RX64M)
-	static const char* system_str_ = { "RX64M" };
+
+	// GR-KAEDE の場合有効にする。
+//	#define GR_KAEDE
+
 	typedef device::system_io<12'000'000> SYSTEM_IO;
+
+	#ifdef GR_KAEDE
+	static const char* system_str_ = { "RX64M GR-KAEDE" };
+	typedef device::PORT<device::PORT0, device::bitpos::B3> LED;
+//	typedef device::PORT<device::PORT0, device::bitpos::B2> LED1;
+//	typedef device::PORT<device::PORTC, device::bitpos::B0> LED2;
+//	typedef device::PORT<device::PORTC, device::bitpos::B1> LED3;
+	typedef device::SCI7 SCI_CH;
+
+    typedef device::rspi_io<device::RSPI> SDC_SPI;
+    typedef device::PORT<device::PORTC, device::bitpos::B4> SDC_SELECT; ///< カード選択信号
+    typedef device::NULL_PORT  SDC_POWER;   ///< カード電源制御（常に電源ＯＮ）
+    typedef device::PORT<device::PORTB, device::bitpos::B7> SDC_DETECT; ///< カード検出
+	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
+
+	#else
+	static const char* system_str_ = { "RX64M DIY" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+
 	// SDCARD 制御リソース（ソフト SPI）
 	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
 	typedef device::PORT<device::PORT7, device::bitpos::B6> MOSI;
 	typedef device::PORT<device::PORT7, device::bitpos::B7> SPCK;
 	typedef device::spi_io2<MISO, MOSI, SPCK> SDC_SPI;  ///< Soft SPI 定義
-	SDC_SPI	sdc_spi_;
+
 	typedef device::PORT<device::PORTC, device::bitpos::B2> SDC_SELECT;	///< カード選択信号
 	typedef device::PORT<device::PORT8, device::bitpos::B2, 0> SDC_POWER;	///< カード電源制御
 	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;	///< カード検出
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止
+	#endif
+
+	SDC_SPI	sdc_spi_;
 	typedef fatfs::mmc_io<SDC_SPI, SDC_SELECT, SDC_POWER, SDC_DETECT, SDC_WPRT> SDC;
-	SDC		sdc_(sdc_spi_, 25'000'000);
+	SDC		sdc_(sdc_spi_, 20'000'000);
+
 	// 内臓 RTC を有効
 	#define ENABLE_RTC
 	typedef utils::rtc_io RTC;
+
 #elif defined(SIG_RX71M)
+
 	static const char* system_str_ = { "RX71M" };
 	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+
 #elif defined(SIG_RX65N)
+
 	static const char* system_str_ = { "RX65N" };
 	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
@@ -99,7 +135,9 @@ namespace {
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
 	SDC		sdc_;
+
 #elif defined(SIG_RX72N)
+
 	static const char* system_str_ = { "RX72N" };
 	typedef device::system_io<16'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
@@ -108,6 +146,7 @@ namespace {
 	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
 	SDC		sdc_;
+
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
@@ -354,6 +393,13 @@ int main(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
+#ifdef GR_KAEDE
+    // GR-KAEDE の RSPI 端子のプルダウン問題回避
+    // ※PC3 から、PC7 へ １K オームで接続して、プルアップの状態にします。
+    device::PORTC::PDR.B3 = 1; // output
+    device::PORTC::PODR.B3 = 1;
+#endif
+
 	SYSTEM_IO::setup_system_clock();
 
 	{  // タイマー設定
