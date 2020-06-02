@@ -157,6 +157,20 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	セレクト位置の文字取得
+			@param[in]	dst		文字列バッファ
+			@param[in]	len		文字列バッファサイズ
+			@return	セレクト位置
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t get_select_text(char* dst, uint32_t len) const noexcept {
+			utils::str::get_word(get_title(), select_pos_, dst, len, ',');
+			return select_pos_;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	セレクト関数への参照
 			@return	セレクト関数
 		*/

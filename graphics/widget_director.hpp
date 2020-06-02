@@ -17,6 +17,7 @@
 #include "graphics/radio.hpp"
 #include "graphics/slider.hpp"
 #include "graphics/menu.hpp"
+#include "graphics/term.hpp"
 #include "graphics/spinbox.hpp"
 #include "graphics/closebox.hpp"
 
@@ -295,6 +296,13 @@ namespace gui {
 						auto* w = dynamic_cast<menu*>(t.w_);
 						if(w == nullptr) break;
 						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::TERM:
+					{
+//						auto* w = dynamic_cast<term*>(t.w_);
+//						if(w == nullptr) break;
+//						w->draw(rdr_);
 					}
 					break;
 				case widget::ID::SPINBOX:

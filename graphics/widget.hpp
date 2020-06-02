@@ -27,7 +27,7 @@ namespace gui {
 			@brief	widget ID
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class ID {
+		enum class ID : uint8_t {
 			GROUP,		///< グループ
 			FRAME,		///< フレーム
 			BUTTON,		///< ボタン
@@ -35,6 +35,7 @@ namespace gui {
 			RADIO,		///< ラジオ・ボタン
 			SLIDER,		///< スライダー
 			MENU,		///< メニュー
+			TERM,		///< ターミナル
 			SPINBOX,	///< スピンボックス
 			CLOSEBOX,	///< クローズボックス
 		};
