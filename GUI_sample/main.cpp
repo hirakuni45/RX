@@ -30,6 +30,7 @@
 
 namespace {
 
+	// LCD 定義
 	static const int16_t LCD_X = 480;
 	static const int16_t LCD_Y = 272;
 	static const auto PIX = graphics::pixel::TYPE::RGB565;
@@ -102,6 +103,7 @@ namespace {
 	typedef graphics::kfont<16, 16> KFONT;
 	typedef graphics::font<AFONT, KFONT> FONT;
 
+	// DRW2D レンダラー
 //	typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
 	// ソフトウェアーレンダラー
 	typedef graphics::render<GLCDC, FONT> RENDER;
@@ -120,16 +122,70 @@ namespace {
 
 	typedef gui::dialog<RENDER, TOUCH> DIALOG;
 	DIALOG		dialog_(render_, touch_);
-#if 0
+
+	// 最大３２個の Widget 管理
 	typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
-	WIDD		widd_;
+	WIDD		widd_(render_, touch_);
 
 	typedef gui::button BUTTON;
-	BUTTON		select_;
-	BUTTON		rew_;
-	BUTTON		play_;
-	BUTTON		ff_;
-#endif
+	BUTTON		button_  (vtx::srect(   10, 10+50*0, 80, 32), "Button");
+	typedef gui::check CHECK;
+	CHECK		check_(vtx::srect(   10, 10+50*1, 0, 0), "Check");  // サイズ０指定で標準サイズ
+	typedef gui::group<3> GROUP3;
+	GROUP3		group_(vtx::srect(   10, 10+50*2, 0, 0));
+	typedef gui::radio RADIO;
+	RADIO		radioR_(vtx::srect(   0, 50*0, 0, 0), "Red");
+	RADIO		radioG_(vtx::srect(   0, 50*1, 0, 0), "Green");
+	RADIO		radioB_(vtx::srect(   0, 50*2, 0, 0), "Blue");
+	typedef gui::slider SLIDER;
+	SLIDER		sliderh_(vtx::srect(200, 20, 200, 0), 0.5f);
+	SLIDER		sliderv_(vtx::srect(440, 20, 0, 200), 0.0f);
+	typedef gui::menu MENU;
+	MENU		menu_(vtx::srect(120, 70, 100, 0), "ItemA,ItemB,ItemC,ItemD");
+
+	void setup_gui_()
+	{
+		button_.enable();
+		button_.at_select_func() = [=](uint32_t id) {
+			utils::format("Select Button: %d\n") % id;
+		};
+
+		check_.enable();
+		check_.at_select_func() = [=](bool ena) {
+			utils::format("Select Check: %s\n") % (ena ? "On" : "Off");
+		};
+
+		// グループにラジオボタンを登録
+		group_ + radioR_ + radioG_ + radioB_;
+		group_.enable();  // グループ登録された物が全て有効になる。
+		radioR_.at_select_func() = [=](bool ena) {
+			utils::format("Select Red: %s\n") % (ena ? "On" : "Off");
+		};
+		radioG_.at_select_func() = [=](bool ena) {
+			utils::format("Select Green: %s\n") % (ena ? "On" : "Off");
+		};
+		radioB_.at_select_func() = [=](bool ena) {
+			utils::format("Select Blue: %s\n") % (ena ? "On" : "Off");
+		};
+		radioG_.exec_select();  // 最初に選択されるラジオボタン
+
+		sliderh_.enable();
+		sliderh_.at_select_func() = [=](float val) {
+			utils::format("Slider H: %3.2f\n") % val;
+		};
+		sliderv_.enable();
+		sliderv_.at_select_func() = [=](float val) {
+			utils::format("Slider V: %3.2f\n") % val;
+		};
+
+		menu_.enable();
+		menu_.at_select_func() = [=](uint32_t pos, uint32_t num) {
+			char tmp[32];
+			menu_.get_select_text(tmp, sizeof(tmp));
+			utils::format("Menu: '%s', %u/%u\n") % tmp % pos % num;
+		};
+	}
+
 
 	void cmd_service_()
 	{
@@ -164,19 +220,19 @@ namespace {
 	}
 }
 
-#if 0
+
 /// widget の登録・グローバル関数
 bool insert_widget(gui::widget* w)
 {
-    return gui_.insert_widget(w);
+    return widd_.insert(w);
 }
 
 /// widget の解除・グローバル関数
 void remove_widget(gui::widget* w)
 {
-    gui_.remove_widget(w);
+    widd_.remove(w);
 }
-#endif
+
 
 extern "C" {
 
@@ -304,6 +360,8 @@ int main(int argc, char** argv)
 
 	setup_touch_panel_();
 
+	setup_gui_();
+
 	cmd_.set_prompt("# ");
 
 	LED::OUTPUT();  // LED ポートを出力に設定
@@ -312,6 +370,8 @@ int main(int argc, char** argv)
 	while(1) {
 		render_.sync_frame();
 		touch_.update();			
+
+		widd_.update();
 
 		sdc_.service();
 
