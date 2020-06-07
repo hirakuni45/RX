@@ -2,7 +2,7 @@
 /*!	@file
 	@brief	Renesas RX Series Programmer (Flash Writer)
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,7 +16,7 @@
 
 namespace {
 
-	const std::string version_ = "1.23b";
+	const std::string version_ = "1.25";
 	const std::string conf_file_ = "rx_prog.conf";
 	const uint32_t progress_num_ = 50;
 	const char progress_cha_ = '#';
@@ -434,6 +434,8 @@ int main(int argc, char* argv[])
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
 					progress_(pageall, page);
+				} else if(opts.verbose) {
+					std::cout << boost::format("Erase: %08X to %08X") % adr % (adr + 255) << std::endl;
 				}
 				if(!prog_.erase_page(adr)) {  // 256 バイト単位で消去要求を送る
 					prog_.end();
@@ -442,6 +444,7 @@ int main(int argc, char* argv[])
 				adr += 256;
 				len += 256;
 				++page.n;
+				usleep(2000);	// 2[ms] wait 待ちを入れないとマイコン側がロストする・・
 			}
 		}
 		if(opts.progress) {
@@ -469,8 +472,9 @@ int main(int argc, char* argv[])
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
 					progress_(pageall, page);
+				} else if(opts.verbose) {
+					std::cout << boost::format("Write: %08X to %08X") % adr % (adr + 255) << std::endl;
 				}
-				/// std::cout << boost::format("%08X to %08X") % adr % (adr + 255) << std::endl;
 				auto mem = motsx_.get_memory(adr);
 				if(!prog_.write(adr, &mem[0])) {
 					prog_.end();
@@ -479,6 +483,7 @@ int main(int argc, char* argv[])
 				adr += 256;
 				len += 256;
 				++page.n;
+				usleep(5000);	// 5[ms] wait 待ちを入れないとマイコン側がロストする・・
 			}
 		}
 		if(opts.progress) {
@@ -503,8 +508,9 @@ int main(int argc, char* argv[])
 			while(len < (a.max_ - a.min_ + 1)) {
 				if(opts.progress) {
 					progress_(pageall, page);
+				} else if(opts.verbose) {
+					std::cout << boost::format("Verify: %08X to %08X") % adr % (adr + 255) << std::endl;
 				}
-				/// std::cout << boost::format("%08X to %08X") % adr % (adr + 255) << std::endl;
 				auto mem = motsx_.get_memory(adr);
 				if(!prog_.verify_page(adr, &mem[0])) {
 					prog_.end();
