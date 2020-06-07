@@ -213,7 +213,8 @@ namespace utils {
 			@return 正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool close() {
+		bool close() noexcept
+		{
 			if(fd_ < 0) return false;
 
 			int status;
@@ -242,10 +243,12 @@ namespace utils {
 			@return 正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool sync_send() const {
+		bool sync_send() const noexcept
+		{
 			if(fd_ < 0) return false;
 
 			tcdrain(fd_);
+
 			return true;
 		}
 
@@ -258,7 +261,8 @@ namespace utils {
 			@return 受信した長さ
 		*/
 		//-----------------------------------------------------------------//
-		size_t recv(void* dst, size_t len) {
+		size_t recv(void* dst, size_t len) noexcept
+		{
 			if(fd_ < 0) return 0;
 
 			return ::read(fd_, dst, len);
@@ -274,11 +278,13 @@ namespace utils {
 			@return 受信した長さ
 		*/
 		//-----------------------------------------------------------------//
-		size_t recv(void* dst, size_t len, const timeval& tv) {
+		size_t recv(void* dst, size_t len, const timeval& tv) noexcept
+		{
 			if(fd_ < 0) return 0;
 
 			size_t total = 0;
 			uint8_t* p = static_cast<uint8_t*>(dst);
+			int retry = 5;
 			while(total < len) {
 				fd_set fds;
 				FD_ZERO(&fds);
@@ -287,15 +293,20 @@ namespace utils {
 				t = tv;
 				int ret = select(fd_ + 1, &fds, NULL, NULL, &t);
 				if(ret == -1) {  // for error..
-					break;
-				} else if(ret > 0) {
+					std::cout << "recv select: 'error'" << std::endl;
+					retry--;
+				} else if(ret == 1) {
 					size_t rl = ::read(fd_, p, len - total);
 					total += rl;
 					p += rl;
 				} else {
+					retry--;
+				}
+				if(retry == 0) {
 					break;
 				}
 			}
+
 			return total;
 		}
 
@@ -307,7 +318,8 @@ namespace utils {
 			@return 受信データ
 		*/
 		//-----------------------------------------------------------------//
-		int recv(const timeval& tv) {
+		int recv(const timeval& tv) noexcept
+		{
 			uint8_t buff[1];
 			if(recv(buff, 1, tv) != 1) {
 				return EOF;
@@ -324,7 +336,8 @@ namespace utils {
 			@return 送信した長さ
 		*/
 		//-----------------------------------------------------------------//
-		size_t send(const void* src, size_t len) {
+		size_t send(const void* src, size_t len) noexcept
+		{
 			if(fd_ < 0) return 0;
 
 			return ::write(fd_, src, len);
@@ -338,7 +351,8 @@ namespace utils {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool send(char ch) {
+		bool send(char ch) noexcept
+		{
 			if(fd_ < 0) return false;
 
 			char buff[1];
@@ -353,7 +367,7 @@ namespace utils {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool flush()
+		bool flush() noexcept
 		{
 			return tcflush(fd_, TCIOFLUSH) == 0;
 		}
@@ -365,7 +379,8 @@ namespace utils {
 			@return DCD 信号
 		*/
 		//-----------------------------------------------------------------//
-		bool get_DCD() const {
+		bool get_DCD() const noexcept
+		{
 			if(fd_ < 0) return false;
 
 			int status;
@@ -383,7 +398,8 @@ namespace utils {
 			@return CTS 信号
 		*/
 		//-----------------------------------------------------------------//
-		bool get_CTS() const {
+		bool get_CTS() const noexcept
+		{
 			if(fd_ < 0) return false;
 
 			int status;
@@ -401,7 +417,8 @@ namespace utils {
 			@return DSR 信号
 		*/
 		//-----------------------------------------------------------------//
-		bool get_DSR() const {
+		bool get_DSR() const noexcept
+		{
 			if(fd_ < 0) return false;
 
 			int status;
@@ -421,7 +438,7 @@ namespace utils {
 			@return 正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool set_TXD(bool level)
+		bool set_TXD(bool level) noexcept
 		{
 			if(fd_ < 0) return false;
 
@@ -442,7 +459,8 @@ namespace utils {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool enable_DTR(bool ena = true) {
+		bool enable_DTR(bool ena = true) noexcept
+		{
 			if(fd_ < 0) return false;
 
 			int status;
@@ -468,7 +486,8 @@ namespace utils {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool enable_RTS(bool ena = true) {
+		bool enable_RTS(bool ena = true) noexcept
+		{
 			if(fd_ < 0) return false;
 
 			int status;
@@ -486,4 +505,3 @@ namespace utils {
 		}
 	};
 }
-
