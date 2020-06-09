@@ -97,6 +97,7 @@ namespace {
 	// GLCDC 関係リソース
 	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC;
 
+	// フォントの定義
 	typedef graphics::font8x16 AFONT;
 // 	for cash into SD card /kfont16.bin
 //	typedef graphics::kfont<16, 16, 64> KFONT;
