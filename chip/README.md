@@ -142,15 +142,24 @@ Interface: BUS-8(/CS,/RD,/WR), BUS-16(/CS,/RD,/WR),SPI(/CS,MOSI,MISO,CLK)
 
  - FAMIPAD
 Nintendo
-Family Computer Joy-Pad P/S Conversion
+Family Computer Joy-Pad P/S Conversion (C-MOS Logic IC 4021)
 Interface: 8 bits serial(P/S, CLK, OUT)
-
+Vcc: 3.0 to 5.5
+   
  - MAX6675
 Maxim Integrated   
 Cold-Junction-Compensated K-Thermocouple-to-Digital Converter (0°C to +1024°C)
 https://www.maximintegrated.com/products/sensors/MAX6675.html   
 Interface: SPI (/CS, SCK, SO)   
-
+Vcc: 3.0 to 5.5
+   
+ - ISL29034
+Renesas (intersil)
+Integrated Digital Light Sensor
+https://www.renesas.com/jp/ja/products/sensors/ambient-light-sensors/light-to-digital-sensors/device/ISL29034.html
+Interface: I2C
+Vcc: 2.25V to 3.63V
+   
 -----
    
 License

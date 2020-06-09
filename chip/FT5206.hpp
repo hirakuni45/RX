@@ -15,6 +15,7 @@
 #include <cstdint>
 #include "common/delay.hpp"
 #include "common/vtx.hpp"
+#include "common/format.hpp"
 
 namespace chip {
 
