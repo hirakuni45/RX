@@ -480,6 +480,7 @@ extern "C" {
 		volatile uint32_t audio_t = audio_t_;
 #endif
 		while(1) {
+			sdc_.service();
 #ifdef USE_GLCDC
 			if(gui_.update(sdc_.get_mount(), codec_mgr_.get_state())) {
 				// オーディオ・タスクに、ファイル名を送る。
@@ -490,18 +491,13 @@ extern "C" {
 				gui_.render_time(audio_t_);
 				audio_t = audio_t_;
 			}
-			cmd_service_();
 #else
 			// GLCDC を使わない場合（コンソールのみ）
-			auto n = cmt_.get_counter();
-			while((n + 10) <= cmt_.get_counter()) {
-				vTaskDelay(1 / portTICK_PERIOD_MS);
-			}
+			vTaskDelay(16 / portTICK_PERIOD_MS);
+#endif
 			if(codec_mgr_.get_state() != sound::af_play::STATE::PLAY) {
 				cmd_service_();
 			}
-#endif
-			sdc_.service();
 			update_led_();
 		}
 	}
