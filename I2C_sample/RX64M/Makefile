@@ -1,15 +1,15 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX66T Makefile
+#   @brief  RX64M Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	raytracer_sample
+TARGET		=	i2c_sample
 
-DEVICE		=	R5F566TE
+DEVICE		=	R5F564MF
 
 BUILD		=	release
 # BUILD		=	debug
@@ -22,18 +22,16 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	RAYTRACER_sample/main.cpp \
-				graphics/font8x16.cpp \
-				graphics/color.cpp \
-				common/stdapi.cpp
+PSOURCES	=	I2C_sample/main.cpp
+
 USER_LIBS	=
 
-LDSCRIPT	=	../../RX66T/$(DEVICE).ld
+LDSCRIPT	=	../../RX64M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX66T \
-				F_ICLK=160000000 \
-				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKC=160000000 F_PCLKD=40000000 \
-				F_FCLK=40000000 F_BCLK=40000000
+USER_DEFS	=	SIG_RX64M \
+				F_ICLK=120000000 \
+				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
+				F_FCLK=60000000 F_BCLK=120000000
 
 MCU_TARGET	=	
 
@@ -57,8 +55,6 @@ endif
 INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../
-
-AS_OPT		=	-mcpu=rx600
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
@@ -102,7 +98,6 @@ SIZE		=	rx-elf-size
 
 # AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
 # AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
-AFLAGS		=	$(AS_OPT)
 # ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
 ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
 
@@ -199,6 +194,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX66T --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

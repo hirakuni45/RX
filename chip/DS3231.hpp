@@ -1,9 +1,11 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	DS3231 RTC ドライバー
+	@brief	DS3231 RTC ドライバー @n
+			中華製モジュールの注意点：@n
+			・バッテリーバックアップにリチウム電池を使う場合、直列抵抗を除く事
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -17,16 +19,16 @@ namespace chip {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  DS3231 RTC テンプレートクラス
-		@param[in]	I2C_IO	i2c I/O クラス
+		@param[in]	I2C		i2c クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class I2C_IO>
+	template <class I2C>
 	class DS3231 {
 
 		// R/W ビットを含まない７ビット値
 		static const uint8_t DS3231_ADR_ = 0x68;
 
-		I2C_IO& i2c_io_;
+		I2C&	i2c_;
 
 		bool	start_;
 
@@ -43,10 +45,10 @@ namespace chip {
 		bool get_time_(reg_t& t) const {
 			uint8_t reg[1];
 			reg[0] = 0x00;	// set address
-			if(!i2c_io_.send(DS3231_ADR_, reg, 1)) {
+			if(!i2c_.send(DS3231_ADR_, reg, 1)) {
 				return false;
 			}
-			if(!i2c_io_.recv(DS3231_ADR_, &t.reg[0], 7)) {
+			if(!i2c_.recv(DS3231_ADR_, &t.reg[0], 7)) {
 				return false;
 			}
 			return true;
@@ -56,10 +58,10 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
-			@param[in]	i2c	iica_io クラスを参照で渡す
+			@param[in]	i2c	I2C クラスを参照で渡す
 		 */
 		//-----------------------------------------------------------------//
-		DS3231(I2C_IO& i2c) : i2c_io_(i2c), start_(false) { }
+		DS3231(I2C& i2c) : i2c_(i2c), start_(false) { }
 
 
 		//-----------------------------------------------------------------//
@@ -72,7 +74,7 @@ namespace chip {
 			uint8_t reg[2];
 			reg[0] = 0x0e;	/// internal register address
 			reg[1] = 0x00;
-			start_ = i2c_io_.send(DS3231_ADR_, reg, 2);
+			start_ = i2c_.send(DS3231_ADR_, reg, 2);
 			return start_;
 		}
 
@@ -98,42 +100,42 @@ namespace chip {
 			reg[5] = ((mon / 10) << 4) | (mon % 10);  // 1 to 12
 			uint16_t y = tp->tm_year % 100;
 			reg[6] = ((y / 10) << 4) | (y % 10);  // 0 to 99
-			return i2c_io_.send(DS3231_ADR_, 0x00, reg, 7);
+			return i2c_.send(DS3231_ADR_, 0x00, reg, 7);
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	DS3231 時間呼び出し
-			@param[in]	tp	取得時間
+			@param[out]	t	取得時間
 			@return 成功なら「true」
 		 */
 		//-----------------------------------------------------------------//
-		bool get_time(time_t& tp) const {
+		bool get_time(time_t& t) const {
 			if(!start_) return false;
 
-			reg_t t;
+			reg_t tt;
 			reg_t tmp;
 			tm ts;
 			// 二度読んで、同じだったら正しい時間とする
 			uint8_t n = 5; // ５回ループして正常に読めなかったら、エラーとする
 			do {
-				tmp = t;
-				if(!get_time_(t)) return false;
+				tmp = tt;
+				if(!get_time_(tt)) return false;
 				--n;
 				if(n == 0) {
 					return false;
 				}
-			} while(t != tmp) ;
+			} while(tt != tmp) ;
 
-			ts.tm_sec  = ((t.reg[0] >> 4) * 10) + (t.reg[0] & 0xf);
-			ts.tm_min  = ((t.reg[1] >> 4) * 10) + (t.reg[1] & 0xf);
-			ts.tm_hour = ((t.reg[2] >> 4) * 10) + (t.reg[2] & 0xf);
-			ts.tm_mday = ((t.reg[4] >> 4) * 10) + (t.reg[4] & 0xf);
-			ts.tm_mon  = ((((t.reg[5] & 0x10) >> 4) * 10) + (t.reg[5] & 0xf)) - 1;
-			ts.tm_year = ((t.reg[6] >> 4) * 10) + (t.reg[6] & 0xf);
+			ts.tm_sec  = ((tt.reg[0] >> 4) * 10) + (tt.reg[0] & 0xf);
+			ts.tm_min  = ((tt.reg[1] >> 4) * 10) + (tt.reg[1] & 0xf);
+			ts.tm_hour = ((tt.reg[2] >> 4) * 10) + (tt.reg[2] & 0xf);
+			ts.tm_mday = ((tt.reg[4] >> 4) * 10) + (tt.reg[4] & 0xf);
+			ts.tm_mon  = ((((tt.reg[5] & 0x10) >> 4) * 10) + (tt.reg[5] & 0xf)) - 1;
+			ts.tm_year = ((tt.reg[6] >> 4) * 10) + (tt.reg[6] & 0xf);
 			ts.tm_year += 100;
-			tp = mktime_gmt(&ts);
+			t = mktime_gmt(&ts);
 			return true;
 		}
 	};

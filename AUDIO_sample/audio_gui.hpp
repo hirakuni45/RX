@@ -120,6 +120,8 @@ namespace app {
 		typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
 		WIDD	widd_;
 
+		typedef gui::slider SLIDER;
+		SLIDER	slider_;
 		typedef gui::button BUTTON;
 		BUTTON	select_;
 		BUTTON	rew_;
@@ -229,6 +231,7 @@ namespace app {
 			filer_(render_, false),
 			dialog_(render_, touch_),
 			widd_(render_, touch_),
+			slider_(vtx::srect(   0, 272-64*2-6-18, 206, 14)),
 			select_(vtx::srect(   0, 272-64*2-6, 64, 64), "Sel"),
 			rew_(   vtx::srect(70*0, 272-64, 64, 64), "<<"),
 			play_(  vtx::srect(70*1, 272-64, 64, 64), "-"),
@@ -366,6 +369,9 @@ namespace app {
 		//-------------------------------------------------------------//
 		void open() noexcept
 		{
+			slider_.enable_read_only();
+			slider_.enable(false);
+
 			select_.enable();
             select_.at_select_func() = [this](uint32_t id) {
 				FILER_BASE::set(FILER_BASE::ctrl::OPEN, ctrl_);
@@ -398,6 +404,7 @@ namespace app {
 			play_.enable(ena);
 			rew_.enable(ena);
 			select_.enable(ena);
+			slider_.enable(ena);
 		}
 
 

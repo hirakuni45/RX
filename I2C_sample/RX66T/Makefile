@@ -7,7 +7,7 @@
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	raytracer_sample
+TARGET		=	i2c_sample
 
 DEVICE		=	R5F566TE
 
@@ -22,10 +22,8 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	RAYTRACER_sample/main.cpp \
-				graphics/font8x16.cpp \
-				graphics/color.cpp \
-				common/stdapi.cpp
+PSOURCES	=	I2C_sample/main.cpp
+
 USER_LIBS	=
 
 LDSCRIPT	=	../../RX66T/$(DEVICE).ld
@@ -54,7 +52,7 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS		=
 
 INC_APP		=	. ../ ../../
 

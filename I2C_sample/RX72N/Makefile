@@ -1,15 +1,17 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX66T Makefile
+#   @brief  RX72N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	raytracer_sample
+TARGET		=	i2c_sample
 
-DEVICE		=	R5F566TE
+DEVICE		=	R5F572NN
+
+FATFS_VER	=	ff13c/source
 
 BUILD		=	release
 # BUILD		=	debug
@@ -22,18 +24,16 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	RAYTRACER_sample/main.cpp \
-				graphics/font8x16.cpp \
-				graphics/color.cpp \
-				common/stdapi.cpp
-USER_LIBS	=
+PSOURCES	=	I2C_sample/main.cpp
 
-LDSCRIPT	=	../../RX66T/$(DEVICE).ld
+USER_LIBS	=	supc++
 
-USER_DEFS	=	SIG_RX66T \
-				F_ICLK=160000000 \
-				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKC=160000000 F_PCLKD=40000000 \
-				F_FCLK=40000000 F_BCLK=40000000
+LDSCRIPT	=	../../RX72N/$(DEVICE).ld
+
+USER_DEFS	=	SIG_RX72N \
+				F_ICLK=240000000 \
+				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
+				F_FCLK=60000000 F_BCLK=120000000
 
 MCU_TARGET	=	
 
@@ -56,7 +56,9 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../../
+INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
+
+LIB_ROOT	=	../../RX600/drw2d
 
 AS_OPT		=	-mcpu=rx600
 
@@ -199,6 +201,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX66T --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

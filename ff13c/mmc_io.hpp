@@ -566,7 +566,7 @@ namespace fatfs {
 			if(mount_delay_) {
 				--mount_delay_;
 				if(mount_delay_ == 0) {
-					BYTE opt = 1; // マウント時初期化をする場合
+					BYTE opt = 1; // マウント時初期化をする場合[1]
 					auto st = f_mount(&fatfs_, "", opt);
 					if(st != FR_OK) {
 						utils::format("f_mount NG: %d\n") % static_cast<uint32_t>(st);

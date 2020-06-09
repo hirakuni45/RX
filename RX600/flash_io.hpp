@@ -175,7 +175,6 @@ namespace device {
 			for(uint32_t i = 0; i < (4096 / 4); ++i) {
 				*dst++ = *src++;
 			}
-
 			device::FLASH::FCURAME = 0xC400;
 #elif defined(SIG_RX72M) || defined(SIG_RX72N)
 			device::FLASH::FSUINITR = 0x2D01;

@@ -7,152 +7,44 @@
 I2C、SPI、BUS、等のインターフェースで通信を行うデバイス制御クラス
    
 ## デバイス・リスト
- - BMP180   
-BOSCH   
-digital barometric pressure sensor   
-<http://akizukidenshi.com/catalog/g/gI-06585/>   
-Interface: I2C   
-   
- - BMP280   
-BOSCH   
-digital barometric pressure sensor   
-<http://akizukidenshi.com/catalog/g/gI-06585/>   
-Interface: I2C   
-   
- - DS1371   
-Maxim Integrated   
-内部バイナリー、I²Cリアルタイムクロック(RTC)    
-<https://www.maximintegrated.com/jp/products/digital/real-time-clocks/DS1371.html>   
-Interface: I2C   
-   
- - DS3231   
-Maxim Integrated   
-超高精度I²Cリアルタイムクロック(RTC)    
-超高精度I²C内蔵RTC/TCXO/水晶    
-<https://www.maximintegrated.com/jp/products/digital/real-time-clocks/DS3231.html>   
-Interface: I2C   
-   
- - EEPROM   
-各社   
-I2C EEPROM   
-I2C EEPROM（１byte、２byte address）   
-Interface: I2C   
-   
- - EUI_XX   
-Microchip   
-2K SPI Bus Serial EEPROMs with EUI-48 or EUI-64 Node Identity   
-25AA02E48/25AA02E64   
-Interface: SPI   
-   
- - LTC2348_16   
-LINEAR TECHNOLOGY   
-Octal, 16-Bit, 200ksps Differential +-10.24V Input SoftSpan ADC   
-Interface: wide SPI   
-   
- - MAX7219   
-Maxim Integrated   
-SPI, 8 Digits LED Driver   
-Interface: SPI   
-   
- - MPU6050   
-InvenSense   
-Digital Motion Processor   
-<https://www.invensense.com/products/motion-tracking/6-axis/mpu-6050/>   
-Interface: I2C   
-   
- - NTCTH   
-muRata   
-NTC サーミスタ   
-Interface: Analog   
-   
- - SH1106   
-SINO WEALTH   
-132x64 Dot Matrix OLED/PLED Segment/Common Driver with Controller   
-<http://www.rhydolabz.com/documents/sh1106_datasheet.pdf>   
-Interface: SPI   
-   
- - SSD1306   
-SOLOMON SYSTECH   
-128 x 64 Dot Matrix OLED/PLED Segment/Common Driver with Controller   
-Interface: SPI   
-   
- - ST7565：（ST7565R）、（ST7567）   
-Sitronix   
-65 x 132 Dot Matrix LCD Controller/Driver   
-RAM capacity : 65 x 132 = 8580 bits   
-<http://www.hpinfotech.ro/ST7565.pdf>   
-<http://www.aitendo.com/product/13327>   
-<http://www.aitendo.com/product/12866>   
-Interface: SPI   
-   
- - UC1701   
-ULTRA CHIP   
-Single-Chip, Ultra-Low Power 65COM by 132SEG Passive Matrix LCD Controller-Driver   
-<http://www.hpinfotech.ro/UC1701.pdf>   
-Interface: SPI   
-   
- - VS1063   
-VLSI Solution   
-MP3 / OGG VORBIS ENCODER AND AUDIO CODEC   
-<http://www.vlsi.fi/fileadmin/datasheets/vs1063ds.pdf>   
-Interface: SPI   
-   
- - phy_base   
-Ethernet default PHY device   
-LAN8720(A) 10/100M (Microchip)   
-DP83822 10/100M (Texas Instruments) for option   
-KSZ8041NL 10/100M (MICREL) for option   
-Interface: PHY   
-   
- - VL53L0X   
-STMicroelectronics   
-World smallest Time-of-Flight (ToF) ranging sensor   
-<http://www.st.com/ja/imaging-and-photonics-solutions/vl53l0x.html>   
-Interface: I2C   
-   
- - AD9833   
-ANALOG DEVICES   
-Programmable Waveform Generator   
-<http://www.analog.com/media/jp/technical-documentation/data-sheets/AD9833_JP.pdf>   
-Interface: SPI   
 
- - AD985X (AD9850, AD9851)   
-ANALOG DEVICES   
-Programmable Waveform Generator   
-<http://www.analog.com/media/jp/technical-documentation/data-sheets/AD9851_JP.pdf>   
-Interface: 3 Wire Serial (W_CLK, D7, UD)   
+|デバイス名|機能|メーカー|I/F|電源電圧|URL|
+|---------|----|--------|---|--------|---|
+|BMP180|digital barometric pressure sensor|BOSCH|I2C|3.3|[秋月電子](http://akizukidenshi.com/catalog/g/gI-06585/)|
+|BMP280|digital barometric pressure sensor|BOSCH|I2C|3.3|[秋月電子](http://akizukidenshi.com/catalog/g/gI-06585/)|   
+|DS1371|内部バイナリー、I²Cリアルタイムクロック|Maxim Integrated|I2C|1.7 to 5.5|[MAXIM](https://www.maximintegrated.com/jp/products/digital/real-time-clocks/DS1371.html)|
+|DS3231|超高精度I²Cリアルタイムクロック|Maxim Integrated|I2C|3.3|[MAXIM](https://www.maximintegrated.com/jp/products/digital/real-time-clocks/DS3231.html)|
+|EEPROM|I2C EEPROM|各社|I2C|3.3 to 5.5|-|
+|EUI_XX (25AA02E48/25AA02E64)|2K SPI Bus Serial EEPROMs with EUI-48 or EUI-64 Node Identity|Microchip|SPI|3.3|-|
+|LTC2348_16|Octal, 16-Bit, 200ksps Differential +-10.24V Input SoftSpan ADC|LINEAR TECHNOLOGY|SPI|3.3|-|
+|MAX7219|8 Digits LED Driver|Maxim Integrated|SPI|3.3|-|
+|MPU6050|Digital Motion Processor|InvenSense|I2C|3.3|[InvenSense](https://www.invensense.com/products/motion-tracking/6-axis/mpu-6050/)|
+|NTCTH|NTC サーミスタ|muRata|アナログ|-|-|   
+|SH1106|132x64 Dot Matrix OLED/PLED Segment/Common Driver with Controller|SINO WEALTH|SPI|3.3|[Other](http://www.rhydolabz.com/documents/sh1106_datasheet.pdf)|
+|SSD1306|128 x 64 Dot Matrix OLED/PLED Segment/Common Driver with Controller|SOLOMON SYSTECH|SPI|3.3|-|
+|ST7565/ST7565R/ST7567|65 x 132 Dot Matrix LCD Controller/Driver|Sitronix|SPI|3.3|[Other](http://www.hpinfotech.ro/)|
+|UC1701|Single-Chip, Ultra-Low Power 65COM by 132SEG Passive Matrix LCD Controller-Driver|ULTRA CHIP|SPI|3.3|[Other](http://www.hpinfotech.ro/UC1701.pdf)|   
+|VS1063|MP3 / OGG VORBIS ENCODER AND AUDIO CODEC|VLSI Solution|SPI|3.3|[VLSI](http://www.vlsi.fi/fileadmin/VS1063.pdf)|
+|phy_base(LAN8720/DP83822/KSZ8041NL)|Ethernet default PHY device|Microchip/Texas Instruments/MICREL|-|3.3|-|
+|VL53L0X|World smallest Time-of-Flight (ToF) ranging sensor|STMicroelectronics|I2C|3.3|[ST](http://www.st.com/ja/imaging-and-photonics-solutions/vl53l0x.html)|
+|AD9833|Programmable Waveform Generator|ANALOG DEVICES|SPI|3.3|[AD](http://www.analog.com/media/jp/technical-documentation/data-sheets/AD9833_JP.pdf)|
+|AD985X (AD9850, AD9851)|Programmable Waveform Generator|ANALOG DEVICES|3-Wire|3.3|[AD](http://www.analog.com/media/jp/technical-documentation/data-sheets/AD9851_JP.pdf)|
+|FT5206|Capacitive Touch Panel Controller|FocalTech|I2C|3.3|[Other](https://www.buydisplay.com/download/ic/FT5206.pdf)|
+|R61505V/W|TFT Display Controller Driver|Renesas SP|BUS-8/BUS-16/SPI|[Other](https://datasheetspdf.com/pdf-down/R/6/1/R61505-Renesas.pdf)|
+|FAMIPAD|Family Computer Joy-Pad P/S Conversion (C-MOS Logic IC 4021)|Nintendo|serial(P/S, CLK, OUT)|3.0 to 5.5|-|
+|MAX6675|冷接点補償K熱電対デジタルコンバータ(0℃～+1024℃)|Maxim Integrated|SPI|3.0 to 5.5|[MAXIM](https://www.maximintegrated.com/jp/products/sensors/MAX6675.html)| 
+|ISL29034|Integrated Digital Light Sensor|Renesas (intersil)|I2C|2.25 to 3.63|[Renesas](https://www.renesas.com/jp/ja/products/sensors/ambient-light-sensors/light-to-digital-sensors/device/ISL29034.html)|
    
- - FT5206
-FocalTech   
-Capacitive Touch Panel Controller   
-<https://www.buydisplay.com/download/ic/FT5206.pdf>   
-Interface: I2C   
-   
- - VFD
-?
-Variable Frequency Drive
-?
-Interface: RS-485 (8 Bits 1 Stop No-Parity, 9600 Baud)
-   
- - R61505V/W
-Renesas SP
-TFT Display Controller Driver (262,144-color, 240RGB x 320-dot)
-<https://datasheetspdf.com/pdf-down/R/6/1/R61505-Renesas.pdf>
-Interface: BUS-8(/CS,/RD,/WR), BUS-16(/CS,/RD,/WR),SPI(/CS,MOSI,MISO,CLK)
+---
 
- - FAMIPAD
-Nintendo
-Family Computer Joy-Pad P/S Conversion
-Interface: 8 bits serial(P/S, CLK, OUT)
+## I2C インターフェース・クラスに要求される機能
 
- - MAX6675
-Maxim Integrated   
-冷接点補償K熱電対デジタルコンバータ(0℃～+1024℃)   
-https://www.maximintegrated.com/jp/products/sensors/MAX6675.html   
-Interface: SPI (/CS, SCK, SO)   
+---
 
------
-   
+## SPI インターフェース・クラスに要求される機能
+
+---
+
 License
 ----
 
