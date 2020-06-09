@@ -16,7 +16,7 @@
 
 namespace {
 
-	const std::string version_ = "1.25";
+	const std::string version_ = "1.30";
 	const std::string conf_file_ = "rx_prog.conf";
 	const uint32_t progress_num_ = 50;
 	const char progress_cha_ = '#';
@@ -110,6 +110,9 @@ namespace {
 		std::string id_val;
 		bool	id = false;
 
+		std::string erase_page_wait = "2000";
+		std::string write_page_wait = "5000";
+
 		utils::areas area_val;
 		bool	area = false;
 
@@ -200,6 +203,8 @@ namespace {
 		cout << "    -v, --verify               Perform data verify" << endl;
 		cout << "    -w, --write                Perform data write" << endl;
 		cout << "    --progress                 display Progress output" << endl;
+		cout << "    --erase-page-wait=WAIT     Delay per read page  (2000) [uS]" << endl;
+		cout << "    --write-page-wait=WAIT     Delay per write page (5000) [uS]" << endl;
 		cout << "    --device-list              Display device list" << endl;
 		cout << "    --verbose                  Verbose output" << endl;
 		cout << "    -h, --help                 Display this" << endl;
@@ -247,6 +252,8 @@ int main(int argc, char* argv[])
 			opts.com_speed = defa.speed_;
 		}
 		opts.id_val = defa.id_;
+		opts.erase_page_wait = defa.erase_page_wait_;
+		opts.write_page_wait = defa.write_page_wait_;
 	} else {
 		std::cerr << "Configuration file can't load: '" << conf_path << '\'' << std::endl;
 		return -1;
@@ -294,6 +301,10 @@ int main(int argc, char* argv[])
 ///			} else if(p == "--erase-all" || p == "--erase-chip") {
 //				opts.erase_rom = true;
 //				opts.erase_data = true;
+			} else if(p.find("--erase-page-wait=") == 0) {
+				opts.erase_page_wait = &p[std::strlen("--erase-page-wait=")];
+			} else if(p.find("--write-page-wait=") == 0) {
+				opts.write_page_wait = &p[std::strlen("--write-page-wait=")];
 			} else if(p == "-h" || p == "--help") {
 				opts.help = true;
 			} else {
@@ -309,12 +320,27 @@ int main(int argc, char* argv[])
 			opts.help = true;
 		}
 	}
+
+	// erase/write page wait の変換
+	int erase_page_wait = 0;
+	if(!utils::string_to_int(opts.erase_page_wait, erase_page_wait)) {
+		std::cerr << "Erase page wait value conversion error: '" << opts.erase_page_wait << "'" << std::endl;
+		opts.help = true;
+	}
+	int write_page_wait = 0;
+	if(!utils::string_to_int(opts.write_page_wait, write_page_wait)) {
+		std::cerr << "Write page wait value conversion error: '" << opts.write_page_wait << "'" << std::endl;
+		opts.help = true;
+	}
+
 	if(opts.verbose) {
 		std::cout << "# Platform: '" << opts.platform << '\'' << std::endl;
 		std::cout << "# Configuration file path: '" << conf_path << '\'' << std::endl;
 		std::cout << "# Device: '" << opts.device << '\'' << std::endl;
 		std::cout << "# Serial port path: '" << opts.com_path << '\'' << std::endl;
 		std::cout << "# Serial port speed: " << opts.com_speed << std::endl;
+		std::cout << "# Erase Page Wait: " << erase_page_wait << " [uS]" << std::endl;
+		std::cout << "# Write Page Wait: " << write_page_wait << " [uS]" << std::endl;
 	}
 
 	// デバイス・リスト表示
@@ -444,7 +470,7 @@ int main(int argc, char* argv[])
 				adr += 256;
 				len += 256;
 				++page.n;
-				usleep(2000);	// 2[ms] wait 待ちを入れないとマイコン側がロストする・・
+				usleep(erase_page_wait);	// 2[ms] wait 待ちを入れないとマイコン側がロストする・・
 			}
 		}
 		if(opts.progress) {
@@ -483,7 +509,7 @@ int main(int argc, char* argv[])
 				adr += 256;
 				len += 256;
 				++page.n;
-				usleep(5000);	// 5[ms] wait 待ちを入れないとマイコン側がロストする・・
+				usleep(write_page_wait);	// 5[ms] wait 待ちを入れないとマイコン側がロストする・・
 			}
 		}
 		if(opts.progress) {

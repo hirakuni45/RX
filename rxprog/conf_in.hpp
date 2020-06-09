@@ -69,6 +69,8 @@ namespace utils {
 			std::string speed_osx_;
 			std::string speed_linux_;
 			std::string id_;
+			std::string erase_page_wait_;
+			std::string write_page_wait_;
 
 			bool analize(const std::string& s) {
 				bool ok = true;
@@ -85,6 +87,8 @@ namespace utils {
 					else if(ss[0] == "speed_osx") speed_osx_ = ss[1];
 					else if(ss[0] == "speed_linux") speed_linux_ = ss[1];
 					else if(ss[0] == "id") id_ = ss[1];
+					else if(ss[0] == "erase_page_wait") erase_page_wait_ = ss[1];
+					else if(ss[0] == "write_page_wait") write_page_wait_ = ss[1];
 					else ok = false;
 				} else {
 					ok = false;

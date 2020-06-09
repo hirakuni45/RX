@@ -93,6 +93,8 @@ Options :
     -v, --verify               Perform data verify
     -w, --write                Perform data write
     --progress                 display Progress output
+    --erase-page-wait=WAIT     Delay per read page  (2000) [uS]
+    --write-page-wait=WAIT     Delay per write page (5000) [uS]
     --device-list              Display device list
     --verbose                  Verbose output
     -h, --help                 Display this
@@ -120,6 +122,11 @@ port_linux = /dev/ttyUSB0
 speed_win = 230400
 speed_osx = 230400
 speed_linux = 230400
+
+# erase-page command wait [uS]
+erase_page_wait = 2000
+# write-page command wait [uS]
+write_page_wait = 5000
 ```
 rx_prog.conf is scanned and loaded in the following order:   
 - Current directory
