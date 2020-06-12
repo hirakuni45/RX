@@ -159,7 +159,7 @@ namespace app {
 			utils::sformat("%03d", tmp, sizeof(tmp)) % (n % 1000);
 			auto loc = pos;
 			loc.x = draw_nmb_24(loc, tmp);
-			loc.x += 16;
+			loc.x += 20;
 			// 現在時間の 1/100 は表示しない
 			t /= 100;
 			auto sec = t % 60;
@@ -169,7 +169,7 @@ namespace app {
 			auto hur = t % 24;
 			utils::sformat("%02d:%02d:%02d", tmp, sizeof(tmp)) % hur % min % sec;
 			loc.x = draw_nmb_24(loc, tmp);
-			loc.x += 16;
+			loc.x += 20;
 			auto mod = d % 100;
 			d /= 100;
 			sec = d % 60;

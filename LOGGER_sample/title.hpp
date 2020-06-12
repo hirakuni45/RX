@@ -63,7 +63,7 @@ namespace app {
 		{
 			if(wait_ > 0) {
 				--wait_;
-				if(wait_ == 0 && fatfs_get_mount() == 0) {
+				if(wait_ == 0 && at_scenes_base().at_sdc().get_mount() == 0) {
 					at_scenes_base().at_dialog().modal(vtx::spos(400, 60),
 						"Not mount SD card.");
 					logo_ = true;
@@ -75,7 +75,7 @@ namespace app {
 				if(logo_) {
 					return;
 				}
-				if(fatfs_get_mount() != 0) {
+				if(at_scenes_base().at_sdc().get_mount() != 0) {
 					auto& im = at_scenes_base().at_img();
 					static const char* fname = { "HRC_logo_s.bmp" };
 					img::img_info ifo;

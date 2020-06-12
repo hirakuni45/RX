@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  RX65N ロガーメイン
+    @brief  RX65N/RX72N Envision kit ロガーメイン
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -27,15 +27,19 @@ namespace {
     typedef device::cmt_mgr<device::CMT0> CMT;
     CMT         cmt_;
 
-	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
-	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
-
-	typedef device::system_io<12000000> SYSTEM_IO;
-
 	// debug serial port
 	typedef utils::fixed_fifo<char, 512>  REB;
 	typedef utils::fixed_fifo<char, 1024> SEB;
-	typedef device::sci_io<device::SCI9, REB, SEB> SCI;
+#if defined(SIG_RX65N)
+	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
+	typedef device::SCI9 SCI_CH;
+#elif defined(SIG_RX72N)
+	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::SCI2 SCI_CH;
+#endif
+	typedef device::sci_io<SCI_CH, REB, SEB> SCI;
 	SCI			sci_;
 
 	// QSPI B グループ
@@ -138,27 +142,27 @@ extern "C" {
 
 
 	DSTATUS disk_initialize(BYTE drv) {
-		return scenes_.at_base().at_sdh().disk_initialize(drv);
+		return scenes_.at_base().at_sdc().disk_initialize(drv);
 	}
 
 
 	DSTATUS disk_status(BYTE drv) {
-		return scenes_.at_base().at_sdh().disk_status(drv);
+		return scenes_.at_base().at_sdc().disk_status(drv);
 	}
 
 
 	DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
-		return scenes_.at_base().at_sdh().disk_read(drv, buff, sector, count);
+		return scenes_.at_base().at_sdc().disk_read(drv, buff, sector, count);
 	}
 
 
 	DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
-		return scenes_.at_base().at_sdh().disk_write(drv, buff, sector, count);
+		return scenes_.at_base().at_sdc().disk_write(drv, buff, sector, count);
 	}
 
 
 	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
-		return scenes_.at_base().at_sdh().disk_ioctl(drv, ctrl, buff);
+		return scenes_.at_base().at_sdc().disk_ioctl(drv, ctrl, buff);
 	}
 
 
@@ -220,7 +224,45 @@ extern "C" {
         device::icu_mgr::set_task(device::ICU::VECTOR::SWINT, vSoftwareInterruptISR);
         device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, configKERNEL_INTERRUPT_PRIORITY);
     }
+
+
+	void main_task_(void* param)
+	{
+
+		cmd_.set_prompt("# ");
+
+//		{  // QSPI の初期化（Flash Memory Read/Write Interface)
+//			if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
+//				utils::format("QSPI not start.\n");
+//			}
+//		}
+
+		// シーン初期化
+		scenes_.at_base().init();
+
+		LED::DIR = 1;
+
+		uint8_t n = 0;
+		while(1) {
+			scenes_.at_base().sync();
+
+			scenes_.at_base().update();
+
+			scenes_.service();
+
+			command_();
+
+			++n;
+			if(n >= 30) n = 0;
+			if(n < 10) {
+				LED::P = 0;
+			} else {
+				LED::P = 1;
+			}
+		}
+	}
 }
+
 
 int main(int argc, char** argv);
 
@@ -235,35 +277,12 @@ int main(int argc, char** argv)
 
 	utils::format("\rRTK5RX65N Start for Data Logger\n");
 
-	cmd_.set_prompt("# ");
+    {
+        uint32_t stack_size = 8192;
+        void* param = nullptr;
+        uint32_t prio = 1;
+        xTaskCreate(main_task_, "Main", stack_size, param, prio, nullptr);
+    }
 
-//	{  // QSPI の初期化（Flash Memory Read/Write Interface)
-//		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
-//			utils::format("QSPI not start.\n");
-//		}
-//	}
-
-	// シーン初期化
-	scenes_.at_base().init();
-
-	LED::DIR = 1;
-
-	uint8_t n = 0;
-	while(1) {
-		scenes_.at_base().sync();
-
-		scenes_.at_base().update();
-
-		scenes_.service();
-
-		command_();
-
-		++n;
-		if(n >= 30) n = 0;
-		if(n < 10) {
-			LED::P = 0;
-		} else {
-			LED::P = 1;
-		}
-	}
+    vTaskStartScheduler();
 }

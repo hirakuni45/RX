@@ -64,36 +64,51 @@ namespace app {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class scenes_base {
 
-		typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
-
 		/// GLCDC
 		static const int16_t LCD_X = 480;
 		static const int16_t LCD_Y = 272;
+        typedef utils::fixed_fifo<uint8_t, 64> RB64;
+        typedef utils::fixed_fifo<uint8_t, 64> SB64;
+#if defined(SIG_RX65N)
+		typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
+
 		typedef device::PORT<device::PORT6, device::bitpos::B3> LCD_DISP;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> LCD_LIGHT;
+		static const uint32_t LCD_ORG = 0x0000'0100;
+		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+        typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::FIRST_I2C> FT5206_I2C;
+		typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< '0'でＯＮ
+		typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
+		// RX65N Envision Kit の SDHI ポートは、候補３で指定できる。
+		typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
+#elif defined(SIG_RX72N)
+		typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
+
+        typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
+        typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
+        static const uint32_t LCD_ORG = 0x0080'0000;
+		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
+        typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
+		typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;  ///< '1'でＯＮ
+		typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
+		// RX72N Envision Kit の SDHI ポートは、候補３で指定できる
+		typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
+#endif
 		static const auto PIX = graphics::pixel::TYPE::RGB565;
 		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
 
 	public:
 		typedef graphics::font8x16 AFONT;
+#ifdef CASH_KFONT
 		typedef graphics::kfont<16, 16, 64> KFONT;
+#else
+		typedef graphics::kfont<16, 16> KFONT;
+#endif
 		typedef graphics::font<AFONT, KFONT> FONT;
 
 //		typedef device::drw2d_mgr<GLCDC_MGR, FONT> RENDER;
 		typedef graphics::render<GLCDC_MGR, FONT> RENDER;
 
-		// FT5206, SCI6 簡易 I2C 定義
-		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
-#ifdef SOFT_I2C
-		typedef device::PORT<device::PORT0, device::bitpos::B0> FT5206_SDA;
-		typedef device::PORT<device::PORT0, device::bitpos::B1> FT5206_SCL;
-		typedef device::si2c_io<FT5206_SDA, FT5206_SCL> FT5206_I2C;
-#else
-		typedef utils::fixed_fifo<uint8_t, 64> RECV6_BUFF;
-		typedef utils::fixed_fifo<uint8_t, 64> SEND6_BUFF;
-		typedef device::sci_i2c_io<device::SCI6, RECV6_BUFF, SEND6_BUFF,
-				device::port_map::option::FIRST_I2C> FT5206_I2C;
-#endif
 		// FT5206 touch device
 		typedef chip::FT5206<FT5206_I2C> TOUCH;
 
@@ -101,28 +116,6 @@ namespace app {
 
 		typedef gui::dialog<RENDER, TOUCH> DIALOG;
 
-		// カード電源制御は使わないので、「device::NULL_PORT」を指定する。
-		typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
-//		typedef device::NULL_PORT SDC_POWER;
-
-		// 書き込み禁止は使わない
-		typedef device::NULL_PORT SDC_WPRT;
-
-#ifdef USE_SDHI
-		// RX65N Envision Kit の SDHI ポートは、候補３になっている
-		typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT,
-			device::port_map::option::THIRD> SDHI;
-#else
-		// Soft SDC 用　SPI 定義（SPI）
-		typedef device::PORT<device::PORT2, device::bitpos::B2> MISO;  // DAT0
-		typedef device::PORT<device::PORT2, device::bitpos::B0> MOSI;  // CMD
-		typedef device::PORT<device::PORT2, device::bitpos::B1> SPCK;  // CLK
-		typedef device::spi_io2<MISO, MOSI, SPCK> SPI;  ///< Soft SPI 定義
-		typedef device::PORT<device::PORT1, device::bitpos::B7> SDC_SELECT;  // DAT3 カード選択信号
-		typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD   カード検出
-
-		typedef fatfs::mmc_io<SPI, SDC_SELECT, SDC_POWER, SDC_DETECT> MMC;   // ハードウェアー定義
-#endif
 		typedef gui::filer_base FILER_BASE;
 		typedef gui::filer<RENDER> FILER;
 
@@ -210,6 +203,7 @@ namespace app {
 		};
 
 		typedef device::cmt_mgr<device::CMT1, watch_task> CMT;
+
 		// GPS 専用シリアル定義
 		typedef utils::fixed_fifo<char, 2048>  G_REB;
 		typedef utils::fixed_fifo<char, 512> G_SEB;
@@ -227,12 +221,8 @@ namespace app {
 		BACK		back_;
 		DIALOG		dialog_;
 
-#ifdef USE_SDHI
-		SDHI		sdh_;
-#else
-		SPI			spi_;
-		MMC			sdh_;
-#endif
+		SDC			sdc_;
+
 		FILER		filer_;
 
 		CMT			cmt_;
@@ -261,11 +251,7 @@ namespace app {
 			touch_(ft5206_i2c_),
 			widd_(render_, touch_),
 			menu_(render_, back_), back_(render_), dialog_(render_, touch_),
-#ifdef USE_SDHI
-			sdh_(),
-#else
-			spi_(), sdh_(spi_, 35000000),
-#endif
+			sdc_(),
 			filer_(render_),
 			resource_(render_),
 			plot_(render_), img_in_(plot_),
@@ -282,7 +268,7 @@ namespace app {
 		void init() noexcept
 		{
 			{
-				sdh_.start();
+				sdc_.start();
 			}
 
 			{
@@ -352,7 +338,7 @@ namespace app {
 		//-------------------------------------------------------------//
 		void update() noexcept
 		{
-			sdh_.service();
+			sdc_.service();
 
 			nmea_.service();
 //			nmea_.list_all();
@@ -498,11 +484,11 @@ namespace app {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	SDH の参照
-			@return SDH
+			@brief	SDC の参照
+			@return SDC
 		*/
 		//-------------------------------------------------------------//
-		auto& at_sdh() noexcept { return sdh_; }
+		auto& at_sdc() noexcept { return sdc_; }
 
 
 		//-------------------------------------------------------------//

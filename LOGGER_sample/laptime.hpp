@@ -22,6 +22,14 @@ namespace app {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class laptime : public utils::scene {
 
+		static const uint16_t LAP_LIST_NUM = 6;
+		static const uint16_t LAP_LIST_X = 24;
+		static const uint16_t LAP_LIST_Y = 48;
+		static const uint16_t LAP_FONT_HEIGHT = 28;
+
+		gui::button		button_;
+		gui::slider		slider_;
+
 		uint32_t	lap_best_t_;
 		uint32_t	lap_best_n_;
 
@@ -48,6 +56,8 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		laptime() :
+			button_(vtx::srect(480-100-2, 272-30-10-2, 100, 30), "Exit"),
+			slider_(vtx::srect(0, LAP_LIST_Y + LAP_FONT_HEIGHT, 0, LAP_LIST_NUM * LAP_FONT_HEIGHT), 0.0f),
 			lap_best_t_(0), lap_best_n_(0)
 		{ }
 
@@ -59,9 +69,18 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init() override
 		{
+			button_.enable();
+			button_.at_select_func() = [this](uint32_t id) {
+				change_scene(scene_id::root_menu);
+			};
+			slider_.enable();
+
 			at_scenes_base().at_cmt().at_task().enable();
 			lap_best_t_ = 0;
 			lap_best_n_ = 0;
+
+			auto& watch = at_scenes_base().at_cmt().at_task();
+			watch.reset();
 
 			auto& render = at_scenes_base().at_render();
 			render.clear(DEF_COLOR::Black);
@@ -79,6 +98,9 @@ namespace app {
 		void service() override
 		{
 			auto& render = at_scenes_base().at_render();
+			render.set_fore_color(DEF_COLOR::White);
+			render.line_v(480-1, 0, 272);
+
 			auto& res = at_scenes_base().at_resource();
 			auto& watch = at_scenes_base().at_cmt().at_task();
 
@@ -123,20 +145,35 @@ namespace app {
 				render.fill_box(vtx::srect(1, RENDER::glc_type::height - 10 + 1, per, 10 - 2));
 			}
 
-			for(uint32_t i = 0; i < 4; ++i) {
+			auto lapmax = watch.get_lap_pos();
+			uint32_t ofs = 0;
+			if(lapmax >= LAP_LIST_NUM) {
+				ofs = (lapmax - LAP_LIST_NUM) * slider_.get_ratio();
+			}
+			for(uint32_t i = 0; i < LAP_LIST_NUM; ++i) {
 				if(i >= pos) {
 					break;
 				}
-				auto t = watch.get_lap(pos - i - 1);
+				auto p = pos - i - 1 - ofs;
+				auto t = watch.get_lap(p);
 				if(pos > 1) {
-					t -= watch.get_lap(pos - i - 2);
+					t -= watch.get_lap(p - 1);
 				}
-				res.draw_short_lap(vtx::spos(0, 48 + 28 * 4 - i * 28), pos - i, t);
+				if(lap_best_n_ == p) {
+					render.set_fore_color(DEF_COLOR::Green);
+				} else {
+					render.set_fore_color(DEF_COLOR::White);
+				}
+				render.set_back_color(DEF_COLOR::Black);
+				res.draw_short_lap(vtx::spos(LAP_LIST_X, LAP_LIST_Y + LAP_FONT_HEIGHT * LAP_LIST_NUM - i * LAP_FONT_HEIGHT), pos - i - ofs, t);
 			}
 
 			// GPS 書き込みサービス
 //			auto& nmea = at_scenes_base().at_nmea();
 //			auto n = nmea.get_satellite_num();
+
+			render.set_fore_color(DEF_COLOR::Black);
+			render.line_v(480-1, 0, 272);
 		}
 
 
@@ -145,6 +182,9 @@ namespace app {
 			@brief	シーンの終了
 		*/
 		//-------------------------------------------------------------//
-		void exit() override { }
+		void exit() override {
+			button_.enable(false);
+			slider_.enable(false);
+		}
 	};
 }
