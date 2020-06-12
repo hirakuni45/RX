@@ -4,18 +4,21 @@
 	@brief	RX グループ・SCI I/O 制御 @n
 			・DMAC による転送をサポートしていませんが、必要性を感じていません。@n
 			・同期通信で、ブロック転送を行うような場合は、必要かもしれません。@n
-			・RS-485 半二重通信用ポート制御を追加。@n
+			・RS-485 半二重通信用ポート制御を追加。(作業中) @n
 			Ex: 定義例 @n
 			・受信バッファ、送信バッファの大きさは、最低１６バイトは必要でしょう。@n
 			・ボーレート、サービスする内容に応じて適切に設定して下さい。@n
-			  typedef utils::fixed_fifo<char, 512>  RECV_BUFF;  // 受信バッファ定義 @n
-			  typedef utils::fixed_fifo<char, 1024> SEND_BUFF;  // 送信バッファ定義 @n
-			  typedef device::sci_io<device::SCI1, RECV_BUFF, SEND_BUFF> SCI;  // SCI1 の場合 @n
+			  typedef utils::fixed_fifo<char, 512>  RBF;  // 受信バッファ定義 @n
+			  typedef utils::fixed_fifo<char, 1024> SBF;  // 送信バッファ定義 @n
+			  typedef device::sci_io<device::SCI1, RBF, SBF> SCI;  // SCI1 の場合 @n
 			  SCI	sci_; // 実態の宣言 @n
 			Ex: 開始例 @n
-			  uint8_t intr_level = 2;          // 割り込みレベル(2) @n
-			  sci_.start(115200, intr_level);  // ボーレート設定(115200) @n
+			  uint8_t intr_level = 2;    // 割り込みレベル(2) @n
+			  uint32_t baud = 115200;    // ボーレート設定(115200) @n
+			  sci_.start(baud, intr_level); @n  
 			Ex: POSIX 関数 (printf など) への通路設定 @n
+              C の関数「sci_putch(), sci_getch()」を定義してリンク可能にする。@n
+			  POSIX read, write 関数が、stdout ディスクリプタに対してアクセスする。 @n
 			  extern "C" { @n
 				void sci_putch(char ch) @n
 				{ @n
@@ -29,7 +32,7 @@
 			// 上記関数を定義しておけば、syscalls.c との連携で、printf が使えるようになる。@n
 			// ※ C++ では printf は推奨しないし使う理由が無い、utils::format を使って下さい。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2013, 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
