@@ -490,17 +490,16 @@ namespace utils {
         //-----------------------------------------------------------------//
 		bool service() noexcept
 		{
-			auto len = sci_.recv_length();
 			auto errc = sci_.get_error_count();
-			if(len == 0 || errc != sci_errc_) {
+			if(errc != sci_errc_) {
 				sci_errc_ = errc;
 				sci_.flush_recv();
 				++no_recv_cnt_;
 				if(no_recv_cnt_ >= (60 * 5)) {  // ５秒間受信が無い場合、ボーレートを変更
 					if(baud_real_rate_ == 9600) {  // 9600 で通信出来てないので、高速になってるかも
-///						sci_.start(fast_baud_, intr_);
-///						init_();
-///						baud_real_rate_ = baud_fast_rate_;
+//						sci_.start(baud_fast_rate_, intr_);
+//						init_();
+//						baud_real_rate_ = baud_fast_rate_;
 					}
 					no_recv_cnt_ = 0;
 				}
@@ -508,9 +507,10 @@ namespace utils {
 			}
 
 			bool ret = false;
+			auto len = sci_.recv_length();
 			if(len > 0) {
 				if(baud_real_rate_ == 9600) {  // 9600 で通信出来てる場合、高速にキック
-///					set_baudrate(fast_baud_);
+//					set_baudrate(baud_fast_rate_);
 				}
 			}
 			no_recv_cnt_ = 0;
