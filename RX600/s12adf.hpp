@@ -508,7 +508,6 @@ namespace device {
 		typedef adsampr_t<base + 0x63>  ADSAMPR_;
 		static  ADSAMPR_ ADSAMPR;
 	};
-#if 0
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR0_ s12adf_t<base, per, avec, bvec>::ADDR0;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR1_ s12adf_t<base, per, avec, bvec>::ADDR1;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADDR2_ s12adf_t<base, per, avec, bvec>::ADDR2;
@@ -544,7 +543,7 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADWINULB_ s12adf_t<base, per, avec, bvec>::ADWINULB;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSAM_ s12adf_t<base, per, avec, bvec>::ADSAM;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf_t<base,per, avec, bvec>::ADSAMPR_ s12adf_t<base, per, avec, bvec>::ADSAMPR;
-#endif
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -996,7 +995,6 @@ namespace device {
 		typedef adcmpbsr_t<base + 0xAC>  ADCMPBSR_;
 		static  ADCMPBSR_ ADCMPBSR;
 	};
-#if 0
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADDR_ s12adf0_t<base, per, avec, bvec>::ADDR;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSA0_ s12adf0_t<base, per, avec, bvec>::ADANSA0;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADANSB0_ s12adf0_t<base, per, avec, bvec>::ADANSB0;
@@ -1013,7 +1011,7 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPSR0_ s12adf0_t<base, per, avec, bvec>::ADCMPSR0;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPBNSR_ s12adf0_t<base, per, avec, bvec>::ADCMPBNSR;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf0_t<base,per, avec, bvec>::ADCMPBSR_ s12adf0_t<base, per, avec, bvec>::ADCMPBSR;
-#endif
+
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -2068,7 +2066,6 @@ namespace device {
 		typedef adcmpbsr_t<base + 0xAC>  ADCMPBSR_;
 		static  ADCMPBSR_ ADCMPBSR;
 	};
-#if 0
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR8_  s12adf1_t<base, per, avec, bvec>::ADDR8;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR9_  s12adf1_t<base, per, avec, bvec>::ADDR9;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADDR10_ s12adf1_t<base, per, avec, bvec>::ADDR10;
@@ -2121,7 +2118,6 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPSER_ s12adf1_t<base, per, avec, bvec>::ADCMPSER;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPBNSR_ s12adf1_t<base, per, avec, bvec>::ADCMPBNSR;
 	template <uint32_t base, peripheral per, ICU::VECTOR_BL1 avec, ICU::VECTOR_BL1 bvec> typename s12adf1_t<base, per, avec, bvec>::ADCMPBSR_ s12adf1_t<base, per, avec, bvec>::ADCMPBSR;
-#endif
 
 	typedef s12adf0_t<0x00089000, peripheral::S12AD,
 		ICU::VECTOR_BL1::S12CMPAI,  ICU::VECTOR_BL1::S12CMPBI>   S12AD;
