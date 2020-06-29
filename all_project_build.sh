@@ -1,6 +1,6 @@
 #!/bin/bash
 CMDNAME=`basename $0`
-if [[ $1 = "help" ]]; then
+if [[ $1 = "-help" ]]; then
     echo "Usage: $CMDNAME options [clean]"
     echo "    -debug      debug build, 'OPTIMIZE=-O0'"
     echo ""

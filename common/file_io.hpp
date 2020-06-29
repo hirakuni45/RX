@@ -262,7 +262,7 @@ namespace utils {
 			if(base == nullptr || dst == nullptr) return false;
 
 			if(base[0] == '/') {
-				strncpy(dst, base, len);
+				strncpy(dst, base, len - 1);
 			} else {
 				if(!pwd(dst, len)) {
 					return false;
@@ -274,7 +274,7 @@ namespace utils {
 						++l;
 					}
 				}
-				strncpy(&dst[l], base, len);
+				strncpy(&dst[l], base, len - l -1);
 			}
 			return true;
 		}
