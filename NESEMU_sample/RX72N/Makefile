@@ -133,6 +133,7 @@ INC_APP		=	. ../ ../../ ../../RX600/drw2d/inc/tes \
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-stringop-truncation \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
@@ -141,6 +142,7 @@ CC_OPT		=	-Wall -Werror \
 				-Wno-maybe-uninitialized \
 				-Wno-unused-but-set-variable \
 				-Wno-strict-aliasing \
+				-Wno-stringop-truncation \
 				-fno-exceptions
 
 ifeq ($(BUILD),debug)

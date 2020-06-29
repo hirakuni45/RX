@@ -79,6 +79,7 @@ LIB_ROOT	=	../../RX600/drw2d ../../zlib
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-stringop-truncation \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
