@@ -20,11 +20,11 @@ namespace utils {
 	/*!
 		@brief  波形描画クラス
 		@param[in]	RENDER	描画クラス
-		@param[in]	CAPTURE	キャプチャー・クラス
 		@param[in]	TOUCH	タッチ・クラス
+		@param[in]	CAPTURE	キャプチャー・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class RENDER, class CAPTURE, class TOUCH>
+	template <class RENDER, class TOUCH, class CAPTURE>
 	class render_wave {
 
 		static const int16_t GRID             = 40;
@@ -161,10 +161,11 @@ namespace utils {
 		/*!
 			@brief  コンストラクタ
 			@param[in]	render	描画クラス
+			@param[in]	touch	タッチ・クラス
 			@param[in]	capture	キャプチャー・クラス
 		*/
 		//-----------------------------------------------------------------//
-		render_wave(RENDER& render, CAPTURE& capture, TOUCH& touch) noexcept :
+		render_wave(RENDER& render, TOUCH& touch, CAPTURE& capture) noexcept :
 			render_(render), capture_(capture), touch_(touch), dialog_(render, touch),
 			time_pos_(0), time_org_(0),
 			ch0_vpos_(0), ch0_vorg_(0), ch1_vpos_(0), ch1_vorg_(0),

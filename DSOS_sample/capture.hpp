@@ -49,8 +49,8 @@ namespace utils {
 		static const auto ADC_CH0 = ADC0::analog::AIN000;
 		static const auto ADC_CH1 = ADC1::analog::AIN114;
 #elif defined(SIG_RX72N)
-		static const auto ADC_CH0 = ADC0::analog::AIN007;  ///< P47
-		static const auto ADC_CH1 = ADC1::analog::AIN108;  ///< PD0
+		static const auto ADC_CH0 = ADC0::analog::AIN007;  ///< P47 Pmod2(10)
+		static const auto ADC_CH1 = ADC1::analog::AIN108;  ///< PD0 Pmod2( 7)
 #endif
 
 	public:

@@ -210,9 +210,9 @@ In device I / O operation, a dedicated header is prepared using template class l
 ---
 ## RX Development environment construction
    
-- The RX compiler (rx-elf-gcc, g++) uses "gcc-6.4.0".   
-- Download "binutils-2.30.tar.gz".   
-- Download "gcc-6.4.0.tar.gz".   
+- The RX compiler (rx-elf-gcc, g++) uses "gcc-7.5.0".   
+- Download "binutils-2.34.tar.gz".   
+- Download "gcc-7.5.0.tar.gz".   
 - Download "newlib-2.4.0.tar.gz".   
 - There are multiple versions of binutils, gcc and newlib, but some combinations   
   It has been found that ineligible binaries (which have subtle problems with operation) will be built.
@@ -225,17 +225,18 @@ In device I / O operation, a dedicated header is prepared using template class l
    binutils-2.27, gcc-5.5.0, newlib-2.4.0 ---> OK
    binutils-2.27, gcc-6.4.0, newlib-2.4.0 ---> OK
    binutils-2.28, gcc-6.4.0, newlib-2.4.0 ---> OK
-   binutils-2.30, gcc-6.4.0, newlib-2.4.0 ---> OK (current)
-   binutils-2.30, gcc-6.4.0, newlib-3.0.0 ---> NG 
+   binutils-2.30, gcc-6.4.0, newlib-2.4.0 ---> OK (old current)
+   binutils-2.30, gcc-6.4.0, newlib-3.0.0 ---> NG
+   binutils-2.34, gcc-7.5.0, newlib-2.4.0 ---> OK (new current)
 ```
 - Using the latest gcc seems to be faster code, especially for C++.
    
 ---
-#### build binutils-2.30
+#### build binutils-2.34
 ```
    cd
-   tar xfvz binutils-2.30.tar.gz
-   cd binutils-2.30
+   tar xfvz binutils-2.34.tar.gz
+   cd binutils-2.34
    mkdir rx_build
    cd rx_build
    ../configure --target=rx-elf --prefix=/usr/local/rx-elf --disable-nls
@@ -260,8 +261,8 @@ In device I / O operation, a dedicated header is prepared using template class l
 #### Build C compiler
 ```
     cd
-    tar xfvz gcc-6.4.0.tar.gz
-    cd gcc-6.4.0
+    tar xfvz gcc-7.5.0.tar.gz
+    cd gcc-7.5.0
     mkdir rx_build
 	cd rx_build
     ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto
@@ -297,7 +298,7 @@ make install
 #### Build C++ compiler
 ```
     cd
-    cd gcc-6.4.0
+    cd gcc-7.5.0
     cd rx_build
     ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c,c++ --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto --with-system-zlib
     make

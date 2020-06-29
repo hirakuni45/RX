@@ -76,6 +76,7 @@ CP_OPT		=	-Wall -Werror \
 				-Wno-unused-function \
 				-Wno-maybe-uninitialized \
 				-Wno-unused-but-set-variable \
+				-Wno-stringop-truncation \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \

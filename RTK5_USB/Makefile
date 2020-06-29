@@ -132,11 +132,13 @@ CC_OPT		=	-Wall -Werror \
 				-Wno-strict-aliasing \
 				-Wno-sizeof-pointer-memaccess \
 				-Wno-array-bounds \
+				-Wno-stringop-truncation \
 				-fno-exceptions
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-stringop-truncation \
 				-fno-exceptions
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))

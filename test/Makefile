@@ -13,8 +13,8 @@ DEVICE		=	R5F565NE
 
 FATFS_VER	=	ff13c/source
 
-# BUILD		=	release
-BUILD		=	debug
+BUILD		=	release
+# BUILD		=	debug
 
 VPATH		=	../
 

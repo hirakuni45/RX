@@ -86,7 +86,7 @@ namespace {
 
 #endif
 
-	typedef device::cmt_mgr<device::CMT0, utils::null_task> CMT;
+	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT			cmt_;
 
 	typedef utils::fixed_fifo<char, 512>  RECV_BUFF;
@@ -122,8 +122,8 @@ namespace {
 	typedef chip::FT5206<FT5206_I2C> FT5206;
 	FT5206		ft5206_(ft5206_i2c_);
 
-	typedef utils::render_wave<RENDER, CAPTURE, FT5206> RENDER_WAVE;
-	RENDER_WAVE	render_wave_(render_, capture_, ft5206_);
+	typedef utils::render_wave<RENDER, FT5206, CAPTURE> RENDER_WAVE;
+	RENDER_WAVE	render_wave_(render_, ft5206_, capture_);
 
 	typedef utils::command<256> CMD;
 	CMD			cmd_;
