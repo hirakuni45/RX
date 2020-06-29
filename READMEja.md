@@ -210,9 +210,9 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 ---
 ## RX 開発環境構築
 
- - RX 用コンパイラ（rx-elf-gcc,g++）は gcc-6.4.0 を使います。   
- - binutils-2.30.tar.gz をダウンロードしておく。   
- - gcc-6.4.0.tar.gz をダウンロードしておく。   
+ - RX 用コンパイラ（rx-elf-gcc,g++）は gcc-7.5.0 を使います。   
+ - binutils-2.34.tar.gz をダウンロードしておく。   
+ - gcc-7.5.0.tar.gz をダウンロードしておく。   
  - newlib-2.4.0.tar.gz をダウンロードしておく。   
  - binutils, gcc, newlib には複数のバージョンがありますが、組み合わせによっては   
    不適格なバイナリー（微妙に動作に問題がある）がビルドされる事が判っています。   
@@ -225,18 +225,19 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
    binutils-2.27, gcc-5.5.0, newlib-2.4.0 ---> OK
    binutils-2.27, gcc-6.4.0, newlib-2.4.0 ---> OK
    binutils-2.28, gcc-6.4.0, newlib-2.4.0 ---> OK
-   binutils-2.30, gcc-6.4.0, newlib-2.4.0 ---> OK (current)
-   binutils-2.30, gcc-6.4.0, newlib-3.0.0 ---> NG 
+   binutils-2.30, gcc-6.4.0, newlib-2.4.0 ---> OK (old current)
+   binutils-2.30, gcc-6.4.0, newlib-3.0.0 ---> NG
+   binutils-2.34, gcc-7.5.0, newlib-2.4.0 ---> OK (new current)
 ```
  - 最新の gcc を使った方がより高速なコードになるようで、C++ の場合に特に効果が大きいです。
    
 ---
    
-#### binutils-2.30 をビルド
+#### binutils-2.34 をビルド
 ```
    cd
-   tar xfvz binutils-2.30.tar.gz
-   cd binutils-2.30
+   tar xfvz binutils-2.34.tar.gz
+   cd binutils-2.34
    mkdir rx_build
    cd rx_build
    ../configure --target=rx-elf --prefix=/usr/local/rx-elf --disable-nls
@@ -261,8 +262,8 @@ Linux 環境は、複数あるので、ここでは「Ubuntu 16.04 LTS」環境�
 #### C コンパイラをビルド
 ```
     cd
-    tar xfvz gcc-6.4.0.tar.gz
-    cd gcc-6.4.0
+    tar xfvz gcc-7.5.0.tar.gz
+    cd gcc-7.5.0
     mkdir rx_build
 	cd rx_build
     ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto
@@ -300,7 +301,7 @@ make install
 #### C++ コンパイラをビルド
 ```
     cd
-    cd gcc-6.4.0
+    cd gcc-7.5.0
     cd rx_build
     ../configure --prefix=/usr/local/rx-elf --target=rx-elf --enable-languages=c,c++ --disable-libssp --with-newlib --disable-nls --disable-threads --disable-libgomp --disable-libmudflap --disable-libstdcxx-pch --disable-multilib --enable-lto --with-system-zlib
     make
