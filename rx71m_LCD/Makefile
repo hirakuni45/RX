@@ -33,7 +33,7 @@ USER_DEFS	=	SIG_RX71M \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000
 
-MCU_TARGET	=	
+MCU_TARGET	=	-mcpu=rx71m
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
@@ -58,7 +58,7 @@ INC_APP		=	. ../
 
 OPTIMIZE	=	-O3
 
-AS_OPT		=	-mcpu=rx600 --defsym MEMWAIT=1
+AS_OPT		=	--defsym MEMWAIT=1
 
 # 	-m64bit-doubles
 CP_OPT		=	-mcpu=rx600 \
