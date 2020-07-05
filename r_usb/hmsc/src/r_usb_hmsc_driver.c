@@ -2163,7 +2163,8 @@ static void usb_hmsc_detach (usb_utr_t *ptr, uint16_t addr, uint16_t data2)
         {
             g_drive_search_que[i] = USB_FALSE;
             /* WAIT_LOOP */
-            for (j = i; j < que_cnt; j++)
+///			for (j = i; j < que_cnt; j++)
+			for (j = i; j < (que_cnt - 1); j++)
             {
                 g_drive_search_que[j] = g_drive_search_que[j + 1];
             }
