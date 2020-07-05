@@ -22,6 +22,10 @@ $CMP LCD_480_272
 D MDK43WQV118-WCT
 $ENDCMP
 #
+$CMP MAU106
+D １Ｗ級絶縁型ＤＣ－ＤＣコンバーター（±５Ｖ１００ｍＡ）
+$ENDCMP
+#
 $CMP MR
 D Flat Chip Resistors
 $ENDCMP
@@ -33,6 +37,10 @@ $ENDCMP
 #
 $CMP NON-POL
 D Non polarity capacitor
+$ENDCMP
+#
+$CMP PS7200K
+D 光ＭＯＳＦＥＴ
 $ENDCMP
 #
 $CMP R
