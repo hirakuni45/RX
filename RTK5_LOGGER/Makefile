@@ -54,8 +54,10 @@ USER_DEFS	=	SIG_RX65N \
 				FAT_FS RTOS
 
 AS_DEFS		=	--defsym NOT_USER=1
-CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
-CP_DEFS		=	-mcpu=rx600
+# CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CC_DEFS		=	-mcpu=rx64m
+# CP_DEFS		=	-mcpu=rx600
+CP_DEFS		=	-mcpu=rx64m
 
 MCU_TARGET	=	
 
@@ -91,6 +93,7 @@ CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
 				-Wno-unused-but-set-variable \
+				-Wno-stringop-truncation \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \

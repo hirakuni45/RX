@@ -34,13 +34,23 @@ namespace {
 	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
+	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< '0'でＯＮ
+	typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
+	// RX65N Envision Kit の SDHI ポートは、候補３で指定できる。
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
 #elif defined(SIG_RX72N)
 	typedef device::system_io<16'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
+	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;  ///< '1'でＯＮ
+	typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
+	// RX72N Envision Kit の SDHI ポートは、候補３で指定できる
+	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
 #endif
 	typedef device::sci_io<SCI_CH, REB, SEB> SCI;
 	SCI			sci_;
+
+	SDC			sdc_;
 
 	// QSPI B グループ
 //	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
@@ -74,6 +84,12 @@ namespace {
 			utils::format("Command error: '%s'\n") % cmd_.get_command();
 		}
 	}
+}
+
+
+bool get_mount()
+{
+	return sdc_.get_mount();
 }
 
 
@@ -142,27 +158,27 @@ extern "C" {
 
 
 	DSTATUS disk_initialize(BYTE drv) {
-		return scenes_.at_base().at_sdc().disk_initialize(drv);
+		return sdc_.disk_initialize(drv);
 	}
 
 
 	DSTATUS disk_status(BYTE drv) {
-		return scenes_.at_base().at_sdc().disk_status(drv);
+		return sdc_.disk_status(drv);
 	}
 
 
 	DRESULT disk_read(BYTE drv, BYTE* buff, DWORD sector, UINT count) {
-		return scenes_.at_base().at_sdc().disk_read(drv, buff, sector, count);
+		return sdc_.disk_read(drv, buff, sector, count);
 	}
 
 
 	DRESULT disk_write(BYTE drv, const BYTE* buff, DWORD sector, UINT count) {
-		return scenes_.at_base().at_sdc().disk_write(drv, buff, sector, count);
+		return sdc_.disk_write(drv, buff, sector, count);
 	}
 
 
 	DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void* buff) {
-		return scenes_.at_base().at_sdc().disk_ioctl(drv, ctrl, buff);
+		return sdc_.disk_ioctl(drv, ctrl, buff);
 	}
 
 
@@ -173,6 +189,7 @@ extern "C" {
 		auto t = scenes_.at_base().at_nmea().get_gmtime();		
 		return utils::str::get_fattime(t);
 	}
+
 
     void vApplicationMallocFailedHook(void)
     {
@@ -249,6 +266,8 @@ extern "C" {
 			scenes_.at_base().update();
 
 			scenes_.service();
+
+			sdc_.service();
 
 			command_();
 

@@ -56,8 +56,8 @@ static int32_t dhcp_request(DHCP *dhcp, DHCP_PACKET *dhcp_packet);
 static int32_t dhcp_wait_ack(DHCP *dhcp, DHCP_PACKET *dhcp_packet);
 static uint16_t htons(uint16_t data);
 static uint32_t htonl(uint32_t data);
-static uint16_t checksum(uint16_t *data, int32_t len);
-static uint16_t checksum_udp(uint16_t *pre_header, uint16_t *data, int32_t len);
+static uint16_t checksum_(const void *data, int32_t len);
+static uint16_t checksum_udp_(const void *pre_header, const void *data, int32_t len);
 #endif
 
 /******************************************************************************
@@ -147,7 +147,7 @@ int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 	memcpy(dhcp_packet->dhcp.options.client_mac, dhcp->macaddr, 6);
 	dhcp_packet->dhcp.options.dummy[0]				= 0xff;
 
-	dhcp_packet->ipv4.checksum						= checksum((uint16_t *) & dhcp_packet->ipv4, sizeof(dhcp_packet->ipv4));
+	dhcp_packet->ipv4.checksum						= checksum_(&dhcp_packet->ipv4, sizeof(dhcp_packet->ipv4));
 
 	memcpy(tmp_header, dhcp_packet->ipv4.source_ip, 4);
 	memcpy(tmp_header + 4, dhcp_packet->ipv4.destination_ip, 4);
@@ -155,7 +155,7 @@ int32_t dhcp_discover(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 	tmp_header[9]	=	dhcp_packet->ipv4.protocol;
 	memcpy(&tmp_header[10], &dhcp_packet->udp.length, 2);
 
-	dhcp_packet->udp.checksum						= checksum_udp((uint16_t *)tmp_header, (uint16_t *) & dhcp_packet->udp,
+	dhcp_packet->udp.checksum						= checksum_udp_(tmp_header, &dhcp_packet->udp,
 	                                 sizeof(dhcp_packet->udp) + sizeof(dhcp_packet->dhcp));
 
 	int head_len = sizeof(dhcp_packet->ether);
@@ -256,7 +256,7 @@ int32_t dhcp_request(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 	memcpy(&dhcp_packet->dhcp.options.dummy[2], dhcp->ipaddr, 4);
 	dhcp_packet->dhcp.options.dummy[6]				= 0xff;
 
-	dhcp_packet->ipv4.checksum						= checksum((uint16_t *) & dhcp_packet->ipv4, sizeof(dhcp_packet->ipv4));
+	dhcp_packet->ipv4.checksum						= checksum_(&dhcp_packet->ipv4, sizeof(dhcp_packet->ipv4));
 
 	memcpy(tmp_header, dhcp_packet->ipv4.source_ip, 4);
 	memcpy(tmp_header + 4, dhcp_packet->ipv4.destination_ip, 4);
@@ -264,7 +264,7 @@ int32_t dhcp_request(DHCP *dhcp, DHCP_PACKET *dhcp_packet)
 	tmp_header[9]	=	dhcp_packet->ipv4.protocol;
 	memcpy(&tmp_header[10], &dhcp_packet->udp.length, 2);
 
-	dhcp_packet->udp.checksum						= checksum_udp((uint16_t *)tmp_header, (uint16_t *) & dhcp_packet->udp,
+	dhcp_packet->udp.checksum						= checksum_udp_(tmp_header, &dhcp_packet->udp,
 	                                 sizeof(dhcp_packet->udp) + sizeof(dhcp_packet->dhcp));
 
 	lan_write(ETHER_CHANNEL_0, (int8_t *)&dhcp_packet->ether, sizeof(dhcp_packet->ether), (int8_t *)&dhcp_packet->ipv4, sizeof(DHCP_PACKET) - sizeof(dhcp_packet->ether));
@@ -401,22 +401,26 @@ static uint32_t htonl(uint32_t data)
 	return data;
 }
 
-static uint16_t checksum(uint16_t *data, int32_t len)
+static uint16_t checksum_(const void *data, int32_t len)
 {
 	long sum = 0;
 
+	const uint8_t *p = data;
 	for (; len > 1; len -= 2)
 	{
-		sum += *data++;
+///		sum += *data++;
+		sum += p[0] | ((uint16_t)p[1] << 8);
+		p += 2;
 		if (sum & 0x80000000)
 			sum = (sum & 0xffff) + (sum >> 16);
 	}
 
 	if (len == 1)
 	{
-		uint8_t i = 0;
-		*(uint8_t*)(&i) = *(uint8_t *)data;
-		sum += i;
+///		uint8_t i = 0;
+///		*(uint8_t*)(&i) = *(uint8_t *)data;
+///		sum += i;
+		sum += *p;
 	}
 
 	while (sum >> 16)
@@ -426,30 +430,37 @@ static uint16_t checksum(uint16_t *data, int32_t len)
 }
 
 
-static uint16_t checksum_udp(uint16_t *pre_header, uint16_t *data, int32_t len)
+static uint16_t checksum_udp_(const void *pre_header, const void *data, int32_t len)
 {
 	long sum = 0;
 	char cnt;
 
+	const uint8_t *ph = pre_header;
 	for (cnt = 0; cnt < 6; cnt++)
 	{
-		sum += *pre_header++;
+///		sum += *pre_header++;
+		sum += ph[0] | ((uint16_t)ph[1] << 8);
+		ph += 2;
 		if (sum & 0x80000000)
 			sum = (sum & 0xffff) + (sum >> 16);
 	}
 
+	const uint8_t *p = data;
 	for (; len > 1; len -= 2)
 	{
-		sum += *data++;
+///		sum += *data++;
+		sum += p[0] | ((uint16_t)p[1] << 8);
+		p += 2;
 		if (sum & 0x80000000)
 			sum = (sum & 0xffff) + (sum >> 16);
 	}
 
 	if (len == 1)
 	{
-		uint8_t i = 0;
-		*(uint8_t*)(&i) = *(uint8_t *)data;
-		sum += i;
+///		uint8_t i = 0;
+///		*(uint8_t*)(&i) = *(uint8_t *)data;
+///		sum += i;
+		sum += *p;
 	}
 
 	while (sum >> 16)

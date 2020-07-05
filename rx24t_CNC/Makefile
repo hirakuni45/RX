@@ -1,28 +1,19 @@
+# -*- tab-width : 4 -*-
 #=======================================================================
-#   @brief  RX24T Makefile 
+#   @file
+#   @brief  RX24T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#   @copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	cnc_driver
+TARGET		=	CNC_sample
 
 DEVICE		=	R5F524TA
 
-BUILD		=	release
+FATFS_VER	=	ff13c/source
 
-ifeq ($(OS),Windows_NT)
-SYSTEM := WIN
-else
-  UNAME := $(shell uname -s)
-  ifeq ($(UNAME),Linux)
-    SYSTEM := LINUX
-  endif
-  ifeq ($(UNAME),Darwin)
-    SYSTEM := OSX
-	OSX_VER := $(shell sw_vers -productVersion | sed 's/^\([0-9]*.[0-9]*\).[0-9]*/\1/')
-  endif
-endif
+BUILD		=	release
 
 VPATH		=	../
 
@@ -32,22 +23,39 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	main.cpp
+PSOURCES	=	main.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=	m
+USER_LIBS	=	supc++ m
 
 LDSCRIPT	=	../RX24T/$(DEVICE).ld
 
 USER_DEFS	=	SIG_RX24T F_ICLK=80000000 F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKD=40000000 F_FCLK=20000000
 
-# for boost path
-ifeq ($(SYSTEM),WIN)
-INC_SYS		=	/mingw64/include
+MCU_TARGET	=	-mcpu=rx64m
+
+# Include path for each environment
+ifeq ($(OS),Windows_NT)
+SYSTEM := WIN
+LOCAL_PATH  =   /mingw64
 else
-INC_SYS		=	/usr/local/include
+  UNAME := $(shell uname -s)
+  ifeq ($(UNAME),Linux)
+    SYSTEM := LINUX
+    LOCAL_PATH = /usr/local
+  endif
+  ifeq ($(UNAME),Darwin)
+    SYSTEM := OSX
+    OSX_VER := $(shell sw_vers -productVersion | sed 's/^\([0-9]*.[0-9]*\).[0-9]*/\1/')
+    LOCAL_PATH = /opt/local
+  endif
 endif
 
-INC_APP		=	. ../
+INC_SYS     =   $(LOCAL_PATH)/include
+
+INC_APP		=	. ../ ../RX600/drw2d/inc/tes
+
+LIB_ROOT	=	../RX600/drw2d ../libpng ../zlib
 
 OPTIMIZE	=	-O3
 
@@ -55,10 +63,13 @@ CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
 				-Wno-unused-but-set-variable \
+				-Wno-stringop-truncation \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
+				-Wno-unused-function \
+				-Wno-unused-but-set-variable \
 				-fno-exceptions
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
@@ -88,7 +99,7 @@ ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
 # Override is only needed by avr-lib build system.
 
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++14 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
+PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
 # override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
 
@@ -178,6 +189,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -P COM34 -d RX24T --progress --write --verify $(TARGET).mot
+	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

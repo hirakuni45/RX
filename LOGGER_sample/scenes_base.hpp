@@ -77,10 +77,6 @@ namespace app {
 		static const uint32_t LCD_ORG = 0x0000'0100;
 		typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
         typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::FIRST_I2C> FT5206_I2C;
-		typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< '0'でＯＮ
-		typedef device::NULL_PORT SDC_WPRT;  ///< カード書き込み禁止ポート設定
-		// RX65N Envision Kit の SDHI ポートは、候補３で指定できる。
-		typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
 #elif defined(SIG_RX72N)
 		typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
 
@@ -89,10 +85,6 @@ namespace app {
         static const uint32_t LCD_ORG = 0x0080'0000;
 		typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
         typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
-		typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;  ///< '1'でＯＮ
-		typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
-		// RX72N Envision Kit の SDHI ポートは、候補３で指定できる
-		typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
 #endif
 		static const auto PIX = graphics::pixel::TYPE::RGB565;
 		typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
@@ -221,8 +213,6 @@ namespace app {
 		BACK		back_;
 		DIALOG		dialog_;
 
-		SDC			sdc_;
-
 		FILER		filer_;
 
 		CMT			cmt_;
@@ -251,7 +241,6 @@ namespace app {
 			touch_(ft5206_i2c_),
 			widd_(render_, touch_),
 			menu_(render_, back_), back_(render_), dialog_(render_, touch_),
-			sdc_(),
 			filer_(render_),
 			resource_(render_),
 			plot_(render_), img_in_(plot_),
@@ -267,10 +256,6 @@ namespace app {
 		//-------------------------------------------------------------//
 		void init() noexcept
 		{
-			{
-				sdc_.start();
-			}
-
 			{
 				uint8_t intr = 1;
 				nmea_.start(intr);
@@ -338,8 +323,6 @@ namespace app {
 		//-------------------------------------------------------------//
 		void update() noexcept
 		{
-			sdc_.service();
-
 			nmea_.service();
 //			nmea_.list_all();
 
@@ -480,15 +463,6 @@ namespace app {
 		*/
 		//-------------------------------------------------------------//
 		NMEA& at_nmea() noexcept { return nmea_; }
-
-
-		//-------------------------------------------------------------//
-		/*!
-			@brief	SDC の参照
-			@return SDC
-		*/
-		//-------------------------------------------------------------//
-		auto& at_sdc() noexcept { return sdc_; }
 
 
 		//-------------------------------------------------------------//

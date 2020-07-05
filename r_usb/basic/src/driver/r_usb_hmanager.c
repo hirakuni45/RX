@@ -2150,9 +2150,12 @@ usb_er_t usb_hstd_mgr_open (usb_utr_t *ptr)
     memset(g_usb_hstd_class_data[ptr->ip], 0, CLSDATASIZE);
     memset(g_usb_hstd_device_descriptor[ptr->ip], 0, USB_DEVICESIZE);
     memset(g_usb_hstd_config_descriptor[ptr->ip], 0, USB_CONFIGSIZE);
-    memset((void *)&g_usb_hstd_class_request[ptr->ip], 0, (5*2));
-    memset((void *)&g_usb_hstd_class_ctrl[ptr->ip], 0, sizeof(usb_utr_t));
-    memset((void *)&p_usb_shstd_mgr_msg[ptr->ip], 0, sizeof(usb_mgrinfo_t));
+///    memset((void *)&g_usb_hstd_class_request[ptr->ip], 0, (5*2));
+    memset(&g_usb_hstd_class_request[ptr->ip], 0, (5*2));
+///    memset((void *)&g_usb_hstd_class_ctrl[ptr->ip], 0, sizeof(usb_utr_t));
+    memset(&g_usb_hstd_class_ctrl[ptr->ip], 0, sizeof(usb_utr_t));
+///	memset((void *)&p_usb_shstd_mgr_msg[ptr->ip], 0, sizeof(usb_mgrinfo_t));
+	memset(&p_usb_shstd_mgr_msg[ptr->ip], 0, sizeof(usb_mgrinfo_t*));
 
     g_usb_hstd_enum_seq[ptr->ip] = 0;
     g_usb_hstd_check_enu_result[ptr->ip] = 0;

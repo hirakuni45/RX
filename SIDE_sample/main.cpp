@@ -222,7 +222,7 @@ extern "C" {
 		dac_stream_.set_sample_rate(freq);
 #endif
 #ifdef USE_SSIE
-		sound_out_.set_output_rate(freq);
+		sound_out_.set_input_rate(freq);
 #endif
 	}
 

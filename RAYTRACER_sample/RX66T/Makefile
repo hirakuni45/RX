@@ -35,7 +35,11 @@ USER_DEFS	=	SIG_RX66T \
 				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKC=160000000 F_PCLKD=40000000 \
 				F_FCLK=40000000 F_BCLK=40000000
 
-MCU_TARGET	=	
+AS_DEFS		=	--defsym NOT_USER=1
+# CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CC_DEFS		=	-mcpu=rx66T
+# CP_DEFS		=	-mcpu=rx600
+CP_DEFS		=	-mcpu=rx66T
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
@@ -100,18 +104,9 @@ OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
 
-# AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
-# AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
-AFLAGS		=	$(AS_OPT)
-# ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
-ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
-
-# Override is only needed by avr-lib build system.
-
-CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
+AFLAGS		=	$(AS_OPT) $(AS_DEFS)
+CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
+PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(CP_DEFS) $(DEFS)
 
 override LDFLAGS = $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
 

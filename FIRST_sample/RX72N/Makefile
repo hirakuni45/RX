@@ -12,7 +12,7 @@ TARGET		=	led_sample
 DEVICE		=	R5F572NN
 
 BUILD		=	release
-#BUILD		=	debug
+# BUILD		=	debug
 
 VPATH		=	../../
 
