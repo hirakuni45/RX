@@ -46,8 +46,10 @@ USER_DEFS	=	SIG_RX72N \
 				FAT_FS FAT_FS_NUM=16
 
 AS_DEFS		=	--defsym NOT_USER=1
-CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
-CP_DEFS		=	-mcpu=rx600
+# CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CC_DEFS		=	-mcpu=rx64m
+# CP_DEFS		=	-mcpu=rx600
+CP_DEFS		=	-mcpu=rx64m
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
