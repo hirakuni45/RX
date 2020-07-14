@@ -1,15 +1,15 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX65N Makefile
+#   @brief  RX72N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
 TARGET		=	test
 
-DEVICE		=	R5F565NE
+DEVICE		=	R5F572NN
 
 FATFS_VER	=	ff13c/source
 
@@ -23,23 +23,32 @@ ASOURCES	=	common/start.s
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
-#				common/time.c
-
-# r_lcd/r_glcdc_rx_pinset.c
 
 PSOURCES	=	main.cpp
 
 USER_LIBS	=	supc++
-#USER_LIBS	=	stdc++
 
-LDSCRIPT	=	../RX65x/$(DEVICE).ld
+LDSCRIPT	=	../RX72N/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX65N \
-				F_ICLK=120000000 \
+USER_DEFS	=	SIG_RX72N \
+				F_ICLK=240000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000
 
-MCU_TARGET	=	
+# rx-elf-gcc compiler version check
+TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
+
+# AS_DEFS		=	--defsym NOT_USER=1
+ifeq ($(TARGET_ISA_TEXT), )
+# gcc-7.5.0 current gcc source build
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
+else # Renesas GNU-RX gcc
+CC_DEFS		=	-misa=v3
+# CP_DEFS		=	-misa=v3 -mdfpu -mtfu=intrinsic,mathlib
+CP_DEFS		=	-misa=v3 -mtfu=intrinsic,mathlib
+# CP_DEFS		=	-misa=v3 -mdfpu
+endif
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
@@ -60,19 +69,25 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../RX600/drw2d/inc/tes
+INC_APP		=	. ../ \
+				../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../RX600/drw2d ../zlib
+LIB_ROOT	=	../RX600/drw2d ../libmad ../zlib ../libpng
+
+AS_OPT		=
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
-				-Wno-unused-but-set-variable \
+				-Wno-stringop-truncation \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
-				-Wno-unused-variable \
-				-fno-exceptions
+                -Wno-unused-variable \
+                -Wno-unused-function \
+                -Wno-maybe-uninitialized \
+                -Wno-unused-but-set-variable \
+                -fno-exceptions
 
 ifeq ($(BUILD),debug)
     CC_OPT += -g -DDEBUG
@@ -105,17 +120,9 @@ OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
 
-# AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
-# AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
-# ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
-ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
-
-# Override is only needed by avr-lib build system.
-
-CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
+AFLAGS		=	$(AS_OPT) $(AS_DEFS)
+CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
+PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(CP_DEFS) $(DEFS)
 
 override LDFLAGS = $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
 
@@ -203,6 +210,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX72N --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

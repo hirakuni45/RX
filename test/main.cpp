@@ -27,10 +27,19 @@
 #include "common/sci_io.hpp"
 #include "common/format.hpp"
 #include "common/cmt_mgr.hpp"
+#include "common/vtx.hpp"
 
-#include "common/fixed_string.hpp"
-
-/// #include <iostream>
+#if 0
+extern "C" {
+	void __init_tfu(void);
+	void __builtin_rx_sincosf(float, float*, float*);
+	void __builtin_rx_atan2hypotf(float, float, float*, float*);
+	float __builtin_rx_sinf(float);
+	float __builtin_rx_cosf(float);
+	float __builtin_rx_atan2f(float, float);
+	float __builtin_rx_hypotf(float, float);
+};
+#endif
 
 namespace {
 
@@ -59,6 +68,11 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX66T" };
+#elif defined(SIG_RX72N)
+	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::SCI2 SCI_CH;
+	static const char* system_str_ = { "RX72N" };
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
@@ -69,7 +83,8 @@ namespace {
 //	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
 	SCI		sci_;
 
-	device::cmt_mgr<device::CMT0, utils::null_task>  cmt_;
+	typedef device::cmt_mgr<device::CMT0> CMT;
+	CMT		cmt_;
 }
 
 extern "C" {
@@ -109,7 +124,6 @@ int main(int argc, char** argv)
 		cmt_.start(850, intr);
 	}
 
-
 	{  // SCI の開始
 		uint8_t intr = 2;        // 割り込みレベル
 		uint32_t baud = 115200;  // ボーレート
@@ -119,44 +133,18 @@ int main(int argc, char** argv)
 	auto iclk = F_ICLK / 1000000;
 	utils::format("Start test for '%s' %d[MHz]\n") % system_str_ % iclk;
 
-
-#if 0
-	utils::STR16 str;
-
-	str = "asdfg";
-
-	for(const auto ch : str) {
-		utils::format("%c") % ch;
-	}
-	utils::format("\n");
-
-
-	utils::STR16 a("012");
-	utils::STR16 b("013");
-
-	utils::format("a: '%s'\n") % a.c_str();
-	utils::format("b: '%s'\n") % b.c_str();
 	{
-		int a_eq_b = a == b;
-		utils::format("a.EQ.b: %d\n") % a_eq_b;
+		utils::format("SCI Baud rate (set):  %d\n") % sci_.get_baud_rate();
+		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
+		rate *= 100.0f;
+		utils::format("SCI Baud rate (real): %d (%3.2f [%%])\n") % sci_.get_baud_rate(true) % rate;
+		utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
+		rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
+		rate *= 100.0f;
+		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
-	{
-		int a_eq_b = a == "013";
-		utils::format("a.EQ.\"013\": %d\n") % a_eq_b;
-	}
 
-	int a_lt_b = a < b;
-	utils::format("a.LT.b: %d\n") % a_lt_b;
-
-	int a_gt_b = a > b;
-	utils::format("a.GT.b: %d\n") % a_gt_b;
-
-//	if(a > b) utils::format("a < b: %d\n") % (a > b);
-#endif
-
-///	std::cout << "Hello!" << std::endl;
-///	utils::format("Hello!\n");
-///	printf("Hello!\n");
+	__init_tfu();
 
 	LED::OUTPUT();  // LED ポートを出力に設定
 	uint8_t cnt = 0;
@@ -165,8 +153,14 @@ int main(int argc, char** argv)
 
 		if(sci_.recv_length() > 0) {
 			if(sci_.getch() == ' ') {
-				utils::format("Freq  (set): %u Hz\n") % cmt_.get_rate();
-				utils::format("Freq (real): %u Hz\n") % cmt_.get_rate(true);
+				float a = vtx::get_pi<float>() * 0.25f;
+				float si, co;
+				__builtin_rx_sincosf(a, &si, &co);
+				utils::format("%8.7f: %8.7f, %8.7f\n") % a % si % co;
+				a = vtx::get_pi<float>() * 1.75f;
+				si = __builtin_rx_sinf(a);
+				co = __builtin_rx_cosf(a);
+				utils::format("%8.7f: %8.7f, %8.7f\n") % a % si % co;
 			}
 		}
 

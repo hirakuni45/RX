@@ -125,9 +125,12 @@ int main(int argc, char** argv)
 	}
 
 	{  // SCI の開始
-		uint8_t intr = 2;        // 割り込みレベル
-		uint32_t baud = 115200;  // ボーレート
-		sci_.start(baud, intr);
+		uint8_t intr = 2;        // 割り込みレベル（０を指定すると、ポーリング動作になる）
+		uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
+		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットが選択
+// 通信プロトコルを設定する場合は、通信プロトコルのタイプを指定する事が出来る。
+// sci_io.hpp PROTOCOL enum class のタイプを参照
+//		sci_.start(baud, intr, SCI::PROTOCOL::B8_E_1S);
 	}
 
 	auto clk = F_ICLK / 1000000;
