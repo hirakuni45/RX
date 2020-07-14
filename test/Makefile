@@ -13,8 +13,8 @@ DEVICE		=	R5F572NN
 
 FATFS_VER	=	ff13c/source
 
-# BUILD		=	release
-BUILD		=	debug
+BUILD		=	release
+# BUILD		=	debug
 
 VPATH		=	../
 
@@ -26,7 +26,7 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	main.cpp
 
-USER_LIBS	=	supc++ m
+USER_LIBS	=	supc++
 
 LDSCRIPT	=	../RX72N/$(DEVICE).ld
 
