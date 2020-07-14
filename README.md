@@ -107,6 +107,36 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[LICENSE](./LICENSE)  |License notation file|
    
 - Although not in the above list, please think that directories and files that exist when you check out are working.   
+
+---
+
+## Installation and features of Renesas GNU-RX
+   
+The former KPIT support for the GNU toolchain has been replaced by [GNU Tools]( https://gcc-renesas.com/) has added a new GNU tools.      
+   
+As the latest (as of July 2020) GNU toolchain for RX microcontrollers,   
+ - binutils-2.24
+ - gcc-8.3.0
+ - newlib-3.1.0
+ - gdb-7.8.2
+
+You can download a toolchain for RX microcontrollers based on the above files.      
+   
+The tool can be downloaded by anyone who registers, and there is no binary limit.   
+It also seems to have optimizations in RX microcomputers and support for the latest cores.   
+Since gcc is based on 8.3.0, it supports C++17.   
+It has deeper optimizations than normal gcc and supports the latest CPU cores.   
+All projects using the C++ framework published here are compileable.   
+
+They are also providing support.（CyberTHOR Studios Limited）   
+
+To use this tool, install the toolchain and add ".bash_profile Set the command path to   
+
+```
+# rx-elf path
+# PATH=$PATH:/usr/local/rx-elf/bin
+PATH=$PATH:/C/'Program Files (x86)'/'GCC for Renesas RX 8.3.0.202002-GNURX-ELF'/rx-elf/rx-elf/bin
+```
    
 ---
 ## RX Development environment preparation (Windows、MSYS2)
