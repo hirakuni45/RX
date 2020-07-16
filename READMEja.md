@@ -136,6 +136,12 @@ RX マイコン用 最新（2020/07 現在）GNU ツールチェインとして�
 PATH=$PATH:/C/'Program Files (x86)'/'GCC for Renesas RX 8.3.0.202002-GNURX-ELF'/rx-elf/rx-elf/bin
 ```
 
+Renesas GNU-RX 8.3.0 に搭載された機能：
+
+- RXv3 コアサポート
+- 倍精度浮動小数点命令の生成
+- RX72N 内蔵 TFU（三角関数演算器）のサポート
+
 ## RX 開発環境準備（Windows、MSYS2）
    
  - Windows では、事前に MSYS2 環境をインストールしておきます。
