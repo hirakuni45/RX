@@ -38,11 +38,17 @@ USER_DEFS	=	SIG_RX72N \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000
 
-AS_DEFS		=	--defsym NOT_USER=1
-# CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
-CC_DEFS		=	-mcpu=rx71m -dfpu
-# CP_DEFS		=	-mcpu=rx600
-CP_DEFS		=	-mcpu=rx71m
+# rx-elf-gcc compiler version check
+TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
+
+ifeq ($(TARGET_ISA_TEXT), )
+# gcc-7.5.0 current gcc source build
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
+else # Renesas GNU-RX gcc
+CC_DEFS		=	-misa=v3
+CP_DEFS		=	-misa=v3
+endif
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
@@ -200,5 +206,9 @@ bin_zip:
 
 run:
 	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
+
+target_cpu:
+	$(CC) --target-help | grep mcpu
+	$(CC) --target-help | grep misa
 
 -include $(DEPENDS)

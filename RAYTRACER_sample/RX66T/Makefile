@@ -35,11 +35,17 @@ USER_DEFS	=	SIG_RX66T \
 				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKC=160000000 F_PCLKD=40000000 \
 				F_FCLK=40000000 F_BCLK=40000000
 
-AS_DEFS		=	--defsym NOT_USER=1
-# CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
-CC_DEFS		=	-mcpu=rx66T
-# CP_DEFS		=	-mcpu=rx600
-CP_DEFS		=	-mcpu=rx66T
+# rx-elf-gcc compiler version check
+TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
+
+ifeq ($(TARGET_ISA_TEXT), )
+# gcc-7.5.0 current gcc source build
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
+else # Renesas GNU-RX gcc
+CC_DEFS		=	-misa=v3
+CP_DEFS		=	-misa=v3
+endif
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
