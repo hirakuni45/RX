@@ -137,7 +137,13 @@ To use this tool, install the toolchain and add ".bash_profile Set the command p
 # PATH=$PATH:/usr/local/rx-elf/bin
 PATH=$PATH:/C/'Program Files (x86)'/'GCC for Renesas RX 8.3.0.202002-GNURX-ELF'/rx-elf/rx-elf/bin
 ```
-   
+
+Features in Renesas GNU-RX 8.3.0：
+
+- RXv3 Core Support
+- Generation of double-precision floating-point instructions
+- RX72N Built-in trigonometric function unit (TFU) support
+
 ---
 ## RX Development environment preparation (Windows、MSYS2)
    
