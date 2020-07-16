@@ -261,7 +261,7 @@ float sample(ray& r, vec3& color)
   // Did we hit anything
   if (hit == SKY) {
     // Generate a sky color if the ray goes upwards without hitting anything
-    color = vec3(0.1f,0.0f,0.3f) + vec3(.7f,.2f,0.5f)*raise(1.0-r.d.z,2);
+    color = vec3(0.1f,0.0f,0.3f) + vec3(.7f,.2f,0.5f)*raise(1.0f-r.d.z,2);
     return 0.0f;
   }
 
@@ -269,7 +269,7 @@ float sample(ray& r, vec3& color)
   r.o += r.d*t;
 
   // Half vector
-  const vec3 half = !(r.d+n*((n%r.d)*-2));
+  const vec3 half = !(r.d + n * ((n % r.d) * -2.0f));
 
 // Vector that points towards the light
   r.d = vec3(9.0f + SH, 6.0f + SH, 16.0f); // Where the light is
@@ -298,7 +298,7 @@ float sample(ray& r, vec3& color)
   }
 
   // No, we hit the scene, read material color from progmem
-  const float* mat = materials+(hit*4);
+  const float* mat = materials + (hit * 4);
   color.x = *mat++;
   color.y = *mat++;
   color.z = *mat++;
@@ -339,7 +339,8 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
       vec3 acc(0,0,0);     // Color accumulator
       for (int p=raysPerPixel; p--;) {
         ray r;  vec3 temp;
-        float xpos = float(x-dw2), ypos=float(dh2-y);
+        auto xpos = static_cast<float>(x - dw2);
+		auto ypos = static_cast<float>(dh2 - y);
         if (raysPerPixel>1) { xpos+=RF; ypos+=RF; }       // Stochastic antialiasing when RPP > 1
 
         // Calculate a ray through this pixel
@@ -367,7 +368,7 @@ void doRaytrace(int raysPerPixel = 4, int dw = 320, int dh = 240, int q = 1)
       }
       
       // Output the pixel
-      acc = acc*(255.0f/float(raysPerPixel));
+      acc = acc * (255.0f / static_cast<float>(raysPerPixel));
       int r = acc.x;    if (r>255) { r=255; }
       int g = acc.y;    if (g>255) { g=255; }
       int b = acc.z;    if (b>255) { b=255; }
