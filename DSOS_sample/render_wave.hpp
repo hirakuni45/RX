@@ -166,7 +166,8 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		render_wave(RENDER& render, TOUCH& touch, CAPTURE& capture) noexcept :
-			render_(render), capture_(capture), touch_(touch), dialog_(render, touch),
+			render_(render), capture_(capture), touch_(touch),
+			dialog_(render, touch),
 			time_pos_(0), time_org_(0),
 			ch0_vpos_(0), ch0_vorg_(0), ch1_vpos_(0), ch1_vorg_(0),
 			rate_div_(11), ch0_div_(3), ch1_div_(3),
@@ -423,7 +424,7 @@ namespace utils {
 							 vtx::spos(CH1_MOVE_AREA, 272 - 16));
 			}
 
-			// メニュー・ボタンの描画
+#if 0
 			{
 				static const char* menu[] = {
 					"CH0", "CH1", "Trg", "Smp", "Mes", "Opt" };
@@ -434,6 +435,7 @@ namespace utils {
 					dialog_.square_button(vtx::srect(441, 16 + GRID * i + 1, GRID - 1, GRID - 1), menu[i]);
 				}
 			}
+#endif
 
 			for(int16_t x = 0; x < (440 - 1); ++x) {
 				int16_t p0 = time_pos_ + x;

@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M/RX65x/RX72M/RX72N グループ・TPU I/O 制御
+	@brief	RX64M/RX71M/RX65[1N]/RX72[MN] グループ・TPU 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -21,7 +21,7 @@ namespace device {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  TPU I/O クラス
+		@brief  TPU 制御クラス
 		@param[in]	TPU	チャネルクラス
 		@param[in]	TASK	タイマー動作ファンクタ・クラス
 	*/

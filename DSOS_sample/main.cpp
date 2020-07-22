@@ -8,7 +8,7 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#define CASH_KFONT
+/// #define CASH_KFONT
 
 #include "common/renesas.hpp"
 #include "common/cmt_mgr.hpp"
@@ -31,6 +31,7 @@
 
 #include "capture.hpp"
 #include "render_wave.hpp"
+#include "dso_gui.hpp"
 
 namespace {
 
@@ -122,6 +123,9 @@ namespace {
 	typedef chip::FT5206<FT5206_I2C> FT5206;
 	FT5206		ft5206_(ft5206_i2c_);
 
+	typedef utils::dso_gui<RENDER, FT5206, CAPTURE> DSO_GUI;
+	DSO_GUI		dso_gui_(render_, ft5206_, capture_);
+
 	typedef utils::render_wave<RENDER, FT5206, CAPTURE> RENDER_WAVE;
 	RENDER_WAVE	render_wave_(render_, ft5206_, capture_);
 
@@ -168,6 +172,17 @@ namespace {
 	}
 }
 
+/// widget の登録・グローバル関数
+bool insert_widget(gui::widget* w)
+{
+	return 	dso_gui_.at_widd().insert(w);
+}
+
+/// widget の解除・グローバル関数
+void remove_widget(gui::widget* w)
+{
+	dso_gui_.at_widd().remove(w);
+}
 
 extern "C" {
 
@@ -324,6 +339,8 @@ int main(int argc, char** argv)
 		sdh_.service();
 
 		command_();
+
+		dso_gui_.update();
 
 		// タッチ操作による画面更新が必要か？
 		bool f = render_wave_.ui_service();

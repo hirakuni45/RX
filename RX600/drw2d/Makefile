@@ -1,7 +1,7 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX65N Makefile
+#   @brief  DRW2D Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
@@ -62,7 +62,16 @@ INC_APP		=	. inc/tes
 
 LIB_ROOT	=
 
-OPTIMIZE	=	-O3
+# rx-elf-gcc compiler version check
+TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
+
+ifeq ($(TARGET_ISA_TEXT), )
+# gcc-7.5.0 current gcc source build
+OPTIMIZE	=	-O3 -mcpu=rx600 
+else # Renesas GNU-RX gcc
+OPTIMIZE	=	-O3 -misa=v2
+endif
+
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
