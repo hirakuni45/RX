@@ -25,7 +25,8 @@ namespace gui {
 
 		typedef button value_type;
 
-		typedef std::function<void(uint32_t)> SELECT_FUNC_TYPE;
+		/// 選択される度にカ count が＋１する。
+		typedef std::function<void(uint32_t count)> SELECT_FUNC_TYPE;
 
 		static const int16_t round_radius = 6;
 		static const int16_t frame_width  = 3;
