@@ -142,8 +142,6 @@ OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
 
-# Override is only needed by avr-lib build system.
-
 AFLAGS		=	$(AS_OPT) $(AS_DEFS)
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
 PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(CP_DEFS) $(DEFS)
