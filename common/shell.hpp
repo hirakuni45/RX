@@ -30,7 +30,7 @@ namespace utils {
 
 		CMD&	cmd_;
 
-		char	prompt_[file_io::PATH_MAX + 3];
+		char	prompt_[file_io::PATH_MAX_SIZE + 3];
 
 		bool	state_;
 
@@ -98,7 +98,7 @@ namespace utils {
 				}
 
                 if(cmd_.cmp_word(0, "ls")) {  // ls [xxx]
-					char tmp[utils::file_io::PATH_MAX];
+					char tmp[utils::file_io::PATH_MAX_SIZE];
 					bool ll = false;
 					if(opt > 0 && cmd_.cmp_word(opt, "-l")) ll = true;
 					if(path == 0) {
@@ -112,14 +112,14 @@ namespace utils {
 						state_ = utils::file_io::dir(tmp, ll);
 					}
 				} else if(cmd_.cmp_word(0, "pwd")) {  // pwd
-					char tmp[utils::file_io::PATH_MAX];
+					char tmp[utils::file_io::PATH_MAX_SIZE];
 					if(!utils::file_io::pwd(tmp, sizeof(tmp))) {
 						state_ = false;
 					} else {
 						utils::format("%s\n") % tmp;
 					}
 				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
-					char tmp[utils::file_io::PATH_MAX];
+					char tmp[utils::file_io::PATH_MAX_SIZE];
 					if(path == 0) {
 						strcpy(tmp, "/");
 					} else {
@@ -128,6 +128,8 @@ namespace utils {
 					state_ = utils::file_io::cd(tmp);
 					if(state_) {
 						make_prompt_();
+					} else {
+						utils::format("Illegal file path: '%s'\n") % tmp; 
 					}
 				} else if(cmd_.cmp_word(0, "free")) {  // free
 					uint32_t fre;

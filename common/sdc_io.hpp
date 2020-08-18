@@ -2,6 +2,9 @@
 //=========================================================================//
 /*!	@file
 	@brief	SD カード・アクセス制御 @n
+			※レガシー・クラス @n
+			mmc_io.hpp、file_io.hpp に集約されていrるので、そちらを利用の事 @n
+			過去ソースで利用、互換性の為残してある。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2015, 2019 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -12,7 +15,7 @@
 #include "common/renesas.hpp"
 #include "common/format.hpp"
 #include "common/string_utils.hpp"
-#include "ff13c/mmc_io.hpp"
+#include "ff14/mmc_io.hpp"
 
 namespace utils {
 
@@ -739,7 +742,8 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	SD カードアクセス・サービス（毎フレーム呼ぶ）
+			@brief	SD カードアクセス・サービス（毎フレーム呼ぶ）@n
+					※フレーム数は、10～100 程度
 			@param[in]	init	SPI の初期化を行う場合「true」
 			@return マウントしている場合「true」
 		 */
@@ -761,7 +765,7 @@ namespace utils {
 				}
 				SELECT::P = 1;
 			} else if(cd_ && select_wait_ == 0) {  // unmount
-				f_mount(&fatfs_, "", 0);
+				f_mount(nullptr, "", 1);
 				spi_.destroy();
 				if(POWER::BIT_POS < 32) {  // 電源制御を行なう場合
 					POWER::P = 1;

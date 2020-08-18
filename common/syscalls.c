@@ -41,8 +41,8 @@ unsigned long millis(void) { return 0; }
 #endif
 
 #ifdef FAT_FS
-#include "ff13c/source/ff.h"
-#include "ff13c/source/diskio.h"
+#include "ff14/source/ff.h"
+#include "ff14/source/diskio.h"
 
 int fatfs_get_mount(void) __attribute__((weak));
 int fatfs_get_mount(void) { return 1; }
