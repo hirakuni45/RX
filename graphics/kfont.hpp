@@ -9,7 +9,7 @@
 */
 //=====================================================================//
 #include <cstdint>
-#include "ff13c/source/ff.h"
+#include "ff14/source/ff.h"
 #include "common/vtx.hpp"
 
 // 漢字フォントデータをＳＤカード上に置いて、キャッシュアクセスする場合有効にする
