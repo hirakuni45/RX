@@ -11,7 +11,7 @@ TARGET		=	sdc_sample
 
 DEVICE		=	R5F565NE
 
-FATFS_VER	=	ff13c/source
+FATFS_VER	=	ff14/source
 
 BUILD		=	release
 # BUILD		=	debug
