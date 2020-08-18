@@ -14,7 +14,7 @@ DEVICE		=	R5F565NE
 ROOT_DEV	=	RX65N
 ROOT_DEV_	=	RX65x
 
-FATFS_VER	=	ff13c/source
+FATFS_VER	=	ff14/source
 
 BUILD		=	release
 # BUILD		=	debug
