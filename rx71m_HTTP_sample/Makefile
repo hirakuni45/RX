@@ -13,7 +13,7 @@ DEVICE		=	R5F571ML
 
 ROOT_DEV	=	RX71M
 
-FATFS_VER	=	ff13c/source
+FATFS_VER	=	ff14/source
 
 OPTIMIZE	=	-O3
 

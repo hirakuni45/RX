@@ -41,9 +41,20 @@ _start:
 		mov	#__datastart, r1
 		mov	#__romdatastart, r2
 		mov	#__romdatacopysize, r3
-		smovf
+#ifdef __RX_ALLOW_STRING_INSNS__
+		smovf		/* block copy R3 bytes from R2 to R1 */
+#else
+		cmp     #0, r3
+		beq     2f
 
-# MEMWAIT を設定 (for RX71M/RX72M by 240MHz)
+1:		mov.b   [r2+], r5
+		mov.b   r5, [r1+]
+		sub     #1, r3
+		bne     1b
+2:
+#endif
+
+# MEMWAIT を設定 (for RX71M by 240MHz)
 .ifdef MEMWAIT
 		mov #0x86610,r1
 		mov # 0x00000001,r2

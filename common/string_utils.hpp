@@ -10,7 +10,8 @@
 //=====================================================================//
 #include <cstring>
 #ifdef FAT_FS
-#include "ff13c/source/ff.h"
+#include "ff14/source/ff.h"
+#include "ff14/mmc_io.hpp"
 #endif
 #include "common/time.h"
 #include "common/format.hpp"

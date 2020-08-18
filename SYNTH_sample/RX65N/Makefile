@@ -16,7 +16,7 @@ DEVICE		=	R5F565NE
 ROOT_DEV	=	RX65N
 ROOT_DEV_	=	RX65x
 
-FATFS_VER	=	ff13c/source
+FATFS_VER	=	ff14/source
 
 BUILD		=	release
 # BUILD		=	debug
@@ -65,11 +65,18 @@ USER_DEFS	=	SIG_$(ROOT_DEV) \
 				F_FCLK=60000000 F_BCLK=120000000 \
 				FAT_FS FAT_FS_NUM=4
 
-AS_DEFS		=
-# CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
-CC_DEFS		=	-mcpu=rx64m
-# CP_DEFS		=	-mcpu=rx600
-CP_DEFS		=	-mcpu=rx64m
+# rx-elf-gcc compiler version check
+TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
+
+# AS_DEFS		=	--defsym NOT_USER=1
+ifeq ($(TARGET_ISA_TEXT), )
+# gcc-7.5.0 current gcc source build
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
+else # Renesas GNU-RX gcc
+CC_DEFS		=	-misa=v2
+CP_DEFS		=	-misa=v2
+endif
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)

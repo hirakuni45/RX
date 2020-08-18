@@ -2,11 +2,11 @@
 //=====================================================================//
 /*!	@file
 	@brief	ファイル・入出力クラス @n
-			※ FatFs のラッパー（ff13c 以降が必要） @n
+			※ FatFs のラッパー（ff14 以降が必要） @n
 			※ FatFs のファイル操作系をラップして fopen ぽい機能を提供する。@n
 			※ fopen と違って、バッファリング（キャッシュ）されない。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -16,7 +16,6 @@
 #endif
 
 #include "common/string_utils.hpp"
-#include "ff13c/mmc_io.hpp"
 #include "common/format.hpp"
 #include "common/dir_list.hpp"
 
@@ -27,13 +26,18 @@ namespace utils {
 		@brief	ファイル入出力クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class file_io {
+	template <class _>
+	class file_io_ {
 
 		static const uint32_t COPY_TMP_SIZE = 512;	///< コピーを行う場合のテンポラリサイズ
 
 	public:
 
-		static const uint32_t PATH_MAX = FF_MAX_LFN + 1;	///< パスの最大数
+#if 1
+		static const uint32_t PATH_MAX_SIZE = 512;			///< パスの最大サイズ
+#else
+		static const uint32_t PATH_MAX_SIZE = FF_MAX_LFN + 1;	///< パスの最大サイズ
+#endif
 
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
         /*!
@@ -152,13 +156,15 @@ namespace utils {
 			++t->count_;
 		}
 
+		static char current_path_[PATH_MAX_SIZE];
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		file_io() noexcept :
+		file_io_() noexcept :
 			fp_(),
 			open_(false), error_(false)
 		{ }
@@ -169,7 +175,7 @@ namespace utils {
 			@brief	デストラクター
 		*/
 		//-----------------------------------------------------------------//
-		~file_io() { close(); }
+		~file_io_() { close(); }
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -222,8 +228,17 @@ namespace utils {
 		static bool cd(const char* path) noexcept {
 			if(path == nullptr) return false;
 
+#if 1
+			// 絶対パスに変換
+			char tmp[PATH_MAX_SIZE];
+			make_full_path(path, tmp, sizeof(tmp));
+
+
+			return true;
+#else
 			auto ret = f_chdir(path);
 			return ret == FR_OK;
+#endif
 		}
 
 
@@ -274,7 +289,10 @@ namespace utils {
 						++l;
 					}
 				}
-				strncpy(&dst[l], base, len - l -1);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+				strncpy(&dst[l], base, len - l - 1);
+#pragma GCC diagnostic pop
 			}
 			return true;
 		}
@@ -448,7 +466,7 @@ namespace utils {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool seek(SEEK seek, int32_t ofs) noexcept
+		bool seek(SEEK seek, FSIZE_t ofs) noexcept
 		{
 			if(!open_) return false;
 			FRESULT ret;
@@ -458,14 +476,14 @@ namespace utils {
 				break;
 			case SEEK::CUR:
 				{
-					int32_t pos = tell();
+					auto pos = tell();
 					pos += ofs;
 					ret = f_lseek(&fp_, pos);
 				}
 				break;
 			case SEEK::END:
 				{
-					int32_t pos = get_file_size();
+					auto pos = get_file_size();
 					pos -= ofs;
 					ret = f_lseek(&fp_, pos);
 				}
@@ -487,9 +505,9 @@ namespace utils {
 			@return ファイル位置
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t tell() const noexcept
+		FSIZE_t tell() const noexcept
 		{
-			if(!open_) return false;
+			if(!open_) return 0;
 			return f_tell(&fp_);
 		}
 
@@ -522,7 +540,7 @@ namespace utils {
 			@return ファイルサイズ
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_file_size() const noexcept
+		FSIZE_t get_file_size() const noexcept
 		{
 			if(!open_) return 0;
 			return f_size(&fp_);
@@ -644,7 +662,7 @@ namespace utils {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static uint32_t dir(const char* root, bool ll = true) noexcept
 		{
-			char tmp[PATH_MAX];
+			char tmp[PATH_MAX_SIZE];
 			make_full_path(root, tmp, sizeof(tmp));
 			dir_list dl;
 			if(!dl.start(tmp)) return 0;
@@ -741,7 +759,7 @@ namespace utils {
 					return false;
 				}
 
-				char tmp[PATH_MAX];
+				char tmp[PATH_MAX_SIZE];
 				make_full_path(org_path, tmp, sizeof(tmp));
 				dir_list dl;
 				if(!dl.start(tmp)) return false;
@@ -752,12 +770,12 @@ namespace utils {
 
 				return true;
 			} else {
-				file_io forg;
+				file_io_<void> forg;
 				if(!forg.open(org_path, "rb")) {
 					return false;
 				}
 
-				file_io fnew;
+				file_io_<void> fnew;
 				if(!fnew.open(new_path, "wb")) {
 					return false;
 				}
@@ -778,4 +796,7 @@ namespace utils {
 			}
 		}
 	};
+	typedef file_io_<void> file_io;
+
+	template <class _> char file_io_<_>::current_path_[file_io_<_>::PATH_MAX_SIZE];
 }

@@ -10,8 +10,8 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
-#include "ff13c/source/ff.h"
-#include "ff13c/source/diskio.h"
+#include "ff14/source/ff.h"
+#include "ff14/source/diskio.h"
 
 #include "common/format.hpp"
 // #include "common/memmgr.hpp"
@@ -45,6 +45,8 @@ namespace fatfs {
 
 //		typedef utils::format debug_format;
 		typedef utils::null_format debug_format;
+
+		static const BYTE DO_MOUNT_INIT = 1;	///< マウント時に初期化を行う場合「１」
 
 		static const uint32_t MOUNT_DELAY_FRAME = 60;		///< 60 frame (1.0 sec)
 
@@ -948,8 +950,7 @@ namespace fatfs {
 				mount_delay_ = MOUNT_DELAY_FRAME;  // n フレーム後にマウントする
 			} else if(!cd && cd_) {
 ///				utils::format("Card Eject\n");
-				BYTE opt = 1; // マウント時初期化をする場合
-				f_mount(nullptr, "", opt);
+				f_mount(nullptr, "", DO_MOUNT_INIT);
 				device::port_map::turn_sdhi(device::port_map::sdhi_situation::EJECT, PSEL);
 				POW::P = 0;
 
@@ -961,7 +962,7 @@ namespace fatfs {
 			if(mount_delay_) {
 				--mount_delay_;
 				if(mount_delay_ == 0) {
-					auto st = f_mount(&fatfs_, "", 0);
+					auto st = f_mount(&fatfs_, "", 1);
 					if(st != FR_OK) {
 						debug_format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
 						POW::P = 0;

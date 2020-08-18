@@ -10,8 +10,8 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "ff13c/source/ff.h"
-#include "ff13c/source/diskio.h"
+#include "ff14/source/ff.h"
+#include "ff14/source/diskio.h"
 #include "common/delay.hpp"
 #include "common/format.hpp"
 
@@ -31,6 +31,8 @@ namespace fatfs {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class SPI, class SEL, class POW, class CDT, class WPR>
 	class mmc_io {
+
+		static const BYTE DO_MOUNT_INIT = 1;	///< マウント時に初期化を行う場合「１」
 
 		inline void lock_() {
 #ifdef RTOS
@@ -545,7 +547,7 @@ namespace fatfs {
 				}
 /// utils::format("Card ditect signal\n");
 			} else if(cd_ && select_wait_ == 0) {
-				f_mount(nullptr, "", 0);  // 登録抹消
+				f_mount(nullptr, "", 0);  // 登録抹消（nullptr）
 ///				spi_.destroy();
 				if(POW::BIT_POS < 32) {
 					lock_();
@@ -566,8 +568,7 @@ namespace fatfs {
 			if(mount_delay_) {
 				--mount_delay_;
 				if(mount_delay_ == 0) {
-					BYTE opt = 1; // マウント時初期化をする場合[1]
-					auto st = f_mount(&fatfs_, "", opt);
+					auto st = f_mount(&fatfs_, "", DO_MOUNT_INIT);
 					if(st != FR_OK) {
 						utils::format("f_mount NG: %d\n") % static_cast<uint32_t>(st);
 						spi_.destroy();

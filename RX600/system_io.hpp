@@ -85,6 +85,8 @@ namespace device {
 				device::SYSTEM::ROMWT = 0b00;
 			}
 #endif
+			// RX71M はスーパーバイザモードでの変更が必要なので、「start.s」内で行う。
+			// RX71M の場合、アセンブラにオプション「--defsym MEMWAIT=1」を渡す。
 #if defined(SIG_RX66T) || defined(SIG_RX72M) || defined(SIG_RX72T) || defined(SIG_RX72N)
 			if(F_ICLK > 120'000'000) {  // 120MHz 以上の場合設定
 				device::SYSTEM::MEMWAIT = 1;

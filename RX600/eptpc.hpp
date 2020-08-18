@@ -1,7 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX64M/RX71M グループ EPTPC 定義
+	@brief	RX64M/RX71M グループ EPTPC 定義 @n
+			RX72M/RX72N グループ EPTPCb
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -91,6 +92,7 @@ namespace device {
 			bit_rw_t<io_, bitpos::B13>  CYCN5;
 
 			bit_rw_t<io_, bitpos::B16>  PLSP;
+
 			bit_rw_t<io_, bitpos::B24>  PLSN;
 		};
 		typedef elippr_t<0x000C4010>  ELIPPR_;
@@ -939,7 +941,6 @@ namespace device {
 	struct eptpcx_t {
 
 		static const auto PERIPHERAL = per;	///< ペリフェラル型
-
 
 		//-----------------------------------------------------------------//
 		/*!

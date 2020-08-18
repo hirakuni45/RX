@@ -11,7 +11,7 @@ TARGET		=	audio_sample
 
 DEVICE		=	R5F564MF
 
-FATFS_VER	=	ff13c/source
+FATFS_VER	=	ff14/source
 
 BUILD		=	release
 # BUILD		=	debug
