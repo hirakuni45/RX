@@ -16,7 +16,7 @@ ROOT_DEV_	=	RX65x
 
 #RTOS		=	FreeRTOS
 
-FATFS_VER	=	ff13c/source
+FATFS_VER	=	ff14/source
 
 OPTIMIZE	=	-O3
 
