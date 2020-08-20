@@ -7,7 +7,7 @@ Renesas RX24T, RX64M, RX65N, RX72N SD-CARD access sample
 
 SD card access, sample program   
 
-- Use FatFs (Version ff13c) for file system
+- Use FatFs (Version ff14) for file system
 - Sample using SPI (SPI mode) or SD built-in SDHI (SD mode)
 - Directory listing (dir)
 - Change directory (cd)
@@ -26,7 +26,7 @@ SD card access, sample program
 
 ※In the case of Soft SPI, the speed does not come out, but there is a convenience that you can collect and use the remaining ports.   
 
-[C++ template header ( ff13c/mmc_io.hpp )](https://github.com/hirakuni45/RX/tree/master/ff13c/mmc_io.hpp?ts=4)
+[C++ template header ( ff14/mmc_io.hpp )](https://github.com/hirakuni45/RX/tree/master/ff14/mmc_io.hpp?ts=4)
 
 ### SD mode :
 
@@ -178,7 +178,7 @@ The big difference in SD mode：
 
 ## SPI mode initialization process
 
-See: [mmc_io.hpp / disk_initialize(BYTE drv)](https://github.com/hirakuni45/RX/blob/master/ff13c/mmc_io.hpp?ts=4)
+See: [mmc_io.hpp / disk_initialize(BYTE drv)](https://github.com/hirakuni45/RX/blob/master/ff14/mmc_io.hpp?ts=4)
 
 ## SD mode initialization process overview
 
@@ -366,9 +366,19 @@ WriteOpen:  1 [ms]
 Write: 200 KBytes/Sec
 WriteClose: 46 [ms]
 
-Open:  1 [ms]
+ReadOpen:  1 [ms]
 Read: 1065 KBytes/Sec
 ReadClose: 0 [ms]
+
+-----------------------------------------
+Micron LMC-SD 64GB (SDXC) Class10
+Write Open:  23 [ms]
+Write: 684 KBytes/Sec
+Write Close: 4 [ms]
+
+Read Open:  1 [ms]
+Read: 1622 KBytes/Sec
+Read Close: 0 [ms]
 ```
 
 Since the test is in units of 512 bytes, I think that it is much faster when running continuously.   
