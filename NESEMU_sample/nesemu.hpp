@@ -312,6 +312,7 @@ namespace emu {
 			uint16_t hexadec = 0;
 			bool write = false;
 			bool area = false;
+			bool search = false;
 			while(1) {
 				ch = *cmd++;
 				if(ch >= 'a' && ch <= 'z') ch -= 0x20;
@@ -323,7 +324,7 @@ namespace emu {
 					mon_val_[0] <<= 4;
 					mon_val_[0] |= static_cast<uint16_t>(ch - 'A' + 10);
 					++hexadec;
-				} else if(ch == 'L') {
+				} else if(ch == 'L') {  ///< disasm List
 					if(hexadec > 0) {
 						mon_val_[2] = mon_val_[0];
 					}
@@ -337,6 +338,10 @@ namespace emu {
 					hexadec = 0;
 					write = false;
 					area = false;
+				} else if(ch == 'S') {  ///< Search
+					mon_val_[2] = mon_val_[0];
+					search = true;
+					hexadec = 0;
 				} else if(ch == '.') {
 					mon_val_[1] = mon_val_[0];
 					write = false;
@@ -354,34 +359,46 @@ namespace emu {
 							mon_val_[1]++;						
 						}
 					} else if(ch == 0) {
-						uint32_t org = 0; 
+						uint32_t org = 0;
 						uint32_t end = 0;
-						if(area) {
+						if(search) {  // search
 							org = mon_val_[1];
-							if(hexadec > 0) {
-								end = mon_val_[0] + 1;
-								if(org > end) end = org;
-							} else {
-								end = org + 16;
+							end = mon_val_[2];
+							while(org <= end) {
+								auto rd = nes6502_getbyte(org);
+								if(rd == (mon_val_[0] & 0xff)) {
+									utils::format("%04X- %02X\n") % org % static_cast<uint16_t>(rd);
+								} 
+								++org;
 							}
-							area = false; 
-						} else {
-							if(hexadec > 0) {
-								org = mon_val_[1] = mon_val_[0];
-								end = org + 1;
+						} else {  // for dump
+							if(area) {
+								org = mon_val_[1];
+								if(hexadec > 0) {
+									end = mon_val_[0] + 1;
+									if(org > end) end = org;
+								} else {
+									end = org + 16;
+								}
+								area = false; 
 							} else {
-								org = end = mon_val_[1];
+								if(hexadec > 0) {
+									org = mon_val_[1] = mon_val_[0];
+									end = org + 1;
+								} else {
+									org = end = mon_val_[1];
+								}
 							}
+							while(org < end) {
+								char tmp[96];
+								auto l = end - org;
+								if(l == 0) l = 1;
+								else if(l > 16) l = 16;
+								org = disa_.dump(org, l, tmp, sizeof(tmp));
+								utils::format("%s\n") % tmp;
+							 }
+							mon_val_[1] = org;
 						}
-						while(org < end) {
-							char tmp[96];
-							auto l = end - org;
-							if(l == 0) l = 1;
-							else if(l > 16) l = 16;
-							org = disa_.dump(org, l, tmp, sizeof(tmp));
-							utils::format("%s\n") % tmp;
-						 }
-						mon_val_[1] = org;
 					}
 					mon_val_[0] = 0;
 					hexadec = 0;
@@ -390,6 +407,7 @@ namespace emu {
 					hexadec = 0;
 					write = false;
 					area = false;
+					search = false;
 				}
 
 				if(ch == 0) break;
