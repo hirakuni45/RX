@@ -382,13 +382,19 @@ namespace fatfs {
 		/*!
 			@brief	ステータス
 			@param[in]	drv		Physical drive nmuber (0)
+			@return ステータスを返す
 		 */
 		//-----------------------------------------------------------------//
 		DSTATUS disk_status(BYTE drv) const noexcept
 		{
-			if (drv) return STA_NOINIT;
-			if(!SDHI::SDSTS1.SDCDMON()) return RES_NOTRDY;
-			return stat_;
+			if(drv) return STA_NOINIT;
+
+			auto ret = stat_;
+			// 書き込み禁止を直接検査
+			if(SDHI::SDSTS1.SDWPMON()) ret |= STA_PROTECT;
+			// SD カードが無い場合を直接検査
+			if(!SDHI::SDSTS1.SDCDMON()) ret |= STA_NODISK;
+			return ret;
 		}
 
 
@@ -954,7 +960,7 @@ namespace fatfs {
 				device::port_map::turn_sdhi(device::port_map::sdhi_situation::EJECT, PSEL);
 				POW::P = 0;
 
-				stat_ = STA_NOINIT;
+				stat_ = STA_NODISK | STA_NOINIT;
 				mount_ = false;
 			}
 			cd_ = cd;

@@ -19,6 +19,11 @@
 #include "common/format.hpp"
 #include "common/dir_list.hpp"
 
+// カレントパスの管理を自前で行う場合
+#if FF_FS_EXFAT > 1
+#define MANAGE_CURRENT_PATH_
+#endif
+
 namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -33,8 +38,8 @@ namespace utils {
 
 	public:
 
-#if 1
-		static const uint32_t PATH_MAX_SIZE = 512;			///< パスの最大サイズ
+#ifdef MANAGE_CURRENT_PATH_
+		static const uint32_t PATH_MAX_SIZE = 256 + 1;			///< パスの最大サイズ
 #else
 		static const uint32_t PATH_MAX_SIZE = FF_MAX_LFN + 1;	///< パスの最大サイズ
 #endif
@@ -156,7 +161,9 @@ namespace utils {
 			++t->count_;
 		}
 
+#ifdef MANAGE_CURRENT_PATH_
 		static char current_path_[PATH_MAX_SIZE];
+#endif
 
 	public:
 		//-----------------------------------------------------------------//
@@ -220,30 +227,6 @@ namespace utils {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	カレント・パスの移動
-			@param[in]	path	相対パス、又は、絶対パス
-			@return 移動成功なら「true」
-		 */
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool cd(const char* path) noexcept {
-			if(path == nullptr) return false;
-
-#if 1
-			// 絶対パスに変換
-			char tmp[PATH_MAX_SIZE];
-			make_full_path(path, tmp, sizeof(tmp));
-
-
-			return true;
-#else
-			auto ret = f_chdir(path);
-			return ret == FR_OK;
-#endif
-		}
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
 			@brief	カレント・パスを取得
 			@param[in]	dst		パス格納
 			@param[in]	len		格納サイズ
@@ -254,6 +237,14 @@ namespace utils {
 			if(dst == nullptr) {
 				return false;
 			}
+#ifdef MANAGE_CURRENT_PATH_
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+			strncpy(dst, current_path_, len - 1);
+			dst[len - 1] = 0;
+#pragma GCC diagnostic pop
+			return true;
+#else
 			auto ret = f_getcwd(dst, len);
 			if(ret == FR_OK) {
 				return true;
@@ -261,6 +252,7 @@ namespace utils {
 				dst[0] = 0;
 				return false;
 			}
+#endif
 		}
 
 
@@ -276,14 +268,41 @@ namespace utils {
 		static bool make_full_path(const char* base, char* dst, uint32_t len) noexcept {
 			if(base == nullptr || dst == nullptr) return false;
 
+			dst[0] = 0;
+
+#ifdef MANAGE_CURRENT_PATH_
+			if(strcmp(base, "..") == 0) {
+				const char* p = strrchr(current_path_, '/');
+				if(p != nullptr) {
+					if(current_path_ == p) {
+						current_path_[1] = 0;
+					} else {
+						current_path_[p - current_path_] = 0;
+					}
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+					strncpy(dst, current_path_, len - 1);
+					dst[len - 1] = 0;
+#pragma GCC diagnostic pop
+				}
+				return true;
+			} else 
+#endif
 			if(base[0] == '/') {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
 				strncpy(dst, base, len - 1);
+#pragma GCC diagnostic pop
+				dst[len - 1] = 0;
 			} else {
 				if(!pwd(dst, len)) {
 					return false;
 				}
 				auto l = strlen(dst);
-				if(l > 1) {
+				if(l == 0) {
+					dst[l] = '/';
+					++l;
+				} else if(l > 1) {
 					if(strlen(base) > 0) {
 						dst[l] = '/';
 						++l;
@@ -295,6 +314,37 @@ namespace utils {
 #pragma GCC diagnostic pop
 			}
 			return true;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	カレント・パスの移動
+			@param[in]	path	相対パス、又は、絶対パス
+			@return 移動成功なら「true」
+		 */
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool cd(const char* path) noexcept
+		{
+			if(path == nullptr) return false;
+
+#ifdef MANAGE_CURRENT_PATH_
+			// 絶対パスに変換
+			char tmp[PATH_MAX_SIZE];
+			make_full_path(path, tmp, PATH_MAX_SIZE);
+
+			if(!is_directory(tmp)) {
+				return false;
+			}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+			strncpy(current_path_, tmp, PATH_MAX_SIZE - 1);
+			current_path_[PATH_MAX_SIZE - 1] = 0;
+#pragma GCC diagnostic pop
+#endif
+			auto ret = f_chdir(path);
+			return ret == FR_OK;
 		}
 
 
@@ -636,16 +686,20 @@ namespace utils {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief	ディレクトリかどうか
-			@param[in]	filename	ファイル名
+			@param[in]	path	パス
 			@return ディレクトリなら「true」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool is_directory(const char* filename) noexcept
+		static bool is_directory(const char* path) noexcept
 		{
-			if(filename == nullptr) return false;
+			if(path == nullptr) return false;
+
+#ifdef MANAGE_CURRENT_PATH_
+			if(strcmp(path, "/") == 0) return true;
+#endif
 
 			FILINFO fno;
-			if(f_stat(filename, &fno) != FR_OK) {
+			if(f_stat(path, &fno) != FR_OK) {
 				return false;
 			}
 			return (fno.fattrib & AM_DIR) != 0;
@@ -798,5 +852,7 @@ namespace utils {
 	};
 	typedef file_io_<void> file_io;
 
+#ifdef MANAGE_CURRENT_PATH_
 	template <class _> char file_io_<_>::current_path_[file_io_<_>::PATH_MAX_SIZE];
+#endif
 }
