@@ -198,6 +198,7 @@ namespace {
 #ifdef ENABLE_RTC
 	RTC		rtc_;
 #else
+#ifndef ENABLE_I2C_RTC
 	class MYRTC {
 	public:
 		bool start() noexcept { return true; }
@@ -208,6 +209,7 @@ namespace {
 		}
 	};
 	MYRTC	rtc_;
+#endif
 #endif
 
 #ifdef ENABLE_I2C_RTC
