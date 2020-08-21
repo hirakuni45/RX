@@ -45,7 +45,6 @@
 namespace {
 
 #if defined(SIG_RX24T)
-
 	static const char* system_str_ = { "RX24T" };
 	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
@@ -73,7 +72,6 @@ namespace {
 	#define ENABLE_I2C_RTC
 
 #elif defined(SIG_RX64M)
-
 	// GR-KAEDE の場合有効にする。
 //	#define GR_KAEDE
 
@@ -160,20 +158,30 @@ namespace {
 	class cmt_task {
 		volatile uint32_t	cnt_;
 		volatile uint32_t	div_;
+		volatile uint32_t	tdiv_;
+		volatile uint32_t	time_;
 
 	public:
-		cmt_task() : cnt_(0), div_(0) { }
+		cmt_task() : cnt_(0), div_(0), tdiv_(0), time_(0) { }
 
 		void sync_100hz() noexcept {
 			auto tmp = div_;
 			while(tmp == div_) ;
 		}
 
+		void set_time(uint32_t time) { time_ = time; }
+		auto get_time() const noexcept { return time_; }
+
 		void operator() () noexcept {
 			++cnt_;
 			if(cnt_ >= 10) {
 				cnt_ = 0;
 				++div_;
+			}
+			++tdiv_;
+			if(tdiv_ > CMT_FREQ) {
+				++time_;
+				tdiv_ = 0;
 			}
 		}
 	};
@@ -189,6 +197,17 @@ namespace {
 
 #ifdef ENABLE_RTC
 	RTC		rtc_;
+#else
+	class MYRTC {
+	public:
+		bool start() noexcept { return true; }
+		bool set_time(time_t t) { cmt_.at_task().set_time(t); return true; }
+		bool get_time(time_t& t) {
+			t = cmt_.at_task().get_time();
+			return true;
+		}
+	};
+	MYRTC	rtc_;
 #endif
 
 #ifdef ENABLE_I2C_RTC
@@ -304,7 +323,6 @@ namespace {
 				read_test_(tmp, 1024 * 1024);
 			}
 		} else if(cmd_.cmp_word(0, "time")) { // 日付・時間設定
-#if defined( ENABLE_RTC) || defined(ENABLE_I2C_RTC)
 			if(cmdn >= 3) {
 				char date[64];
 				cmd_.get_word(1, date, sizeof(date));
@@ -318,9 +336,6 @@ namespace {
 					utils::str::print_date_time(t);
 				}
 			}
-#else
-			utils::format("RTC Disabled...\n");
-#endif
 		} else if(cmd_.cmp_word(0, "help")) {
 			shell_.help();
 			utils::format("    write filename      test for write\n");
@@ -395,7 +410,8 @@ int main(int argc, char** argv)
 {
 #ifdef GR_KAEDE
     // GR-KAEDE の RSPI 端子のプルダウン問題回避
-    // ※PC3 から、PC7 へ １K オームで接続して、プルアップの状態にします。
+    // ※PC3 から、PC7 へ １K オームの抵抗を接続しておきます。
+	// それを利用して、プルアップの状態にします。
     device::PORTC::PDR.B3 = 1; // output
     device::PORTC::PODR.B3 = 1;
 #endif

@@ -7,7 +7,7 @@ Renesas RX24T, RX64M, RX65N, RX72N SD-CARD アクセス・サンプル
 
 SD カード・アクセス、サンプルプログラム   
 
-- ファイルシステムには FatFs (Version ff13c) を利用
+- ファイルシステムには FatFs (Version ff14) を利用
 - SPI (RSPI/ソフト SPI モード) 又は、RX 内臓 SDHI (4 bits SD モード) を利用したサンプル
 - ディレクトリーのリスト (ls)
 - ディレクトリーの移動 (cd)
@@ -16,8 +16,8 @@ SD カード・アクセス、サンプルプログラム
 - 時間の設定、表示 (time)
 - SD カードへの書き込み、時間計測 (write)
 - SD カードから読み出し、時間計測 (read)
-
-※「time」コマンドは、RTC がサポートされている場合に機能する。
+- exFAT 有効にする事で 64GB 以上の SD カードに対応
+- ハードウェアー RTC がサポートされない場合、ソフトウェアー RTC のサポート
 
 ### SPI モード：
 
@@ -25,12 +25,11 @@ SD カード・アクセス、サンプルプログラム
 - RSPI を利用出来ない場合、ソフト SPI を利用出来ます。
 
 ※Soft SPI の場合、どうしても速度が出ませんが、余っているポートを集めて利用出来る利便性があります。   
-
-[C++ テンプレート・ヘッダー ( ff13c/mmc_io.hpp )](https://github.com/hirakuni45/RX/tree/master/ff13c/mmc_io.hpp?ts=4)
-
+[C++ テンプレート・ヘッダー ( ff14/mmc_io.hpp )](https://github.com/hirakuni45/RX/tree/master/ff14/mmc_io.hpp?ts=4)
+   
 ### SD モード：
 
-- SDHI ペリフェラルが在る場合に利用出来ます。
+- SDHI ペリフェラルが利用できる場合。
 
 [C++ テンプレート・ヘッダー ( RX600/sdhi_io.hpp )](https://github.com/hirakuni45/RX/tree/master/RX600/sdhi_io.hpp?ts=4)
 
@@ -46,7 +45,8 @@ SD カード・アクセス、サンプルプログラム
 ※RTC はファイル書き込み時の時間を記録する為に利用しています。   
 ※RX24T では、I2C 接続の RTC を利用する事が出来ます。   
 ※RX64M では、内臓 RTC を利用しています。   
-※RX65N/RX72N Envision Kit では、内臓 RTC は無効になっていますが I2C 接続の RTC を利用する事が出来ます。   
+※RX65N/RX72N Envision Kit では、内臓 RTC は無効になっていますが I2C 接続の RTC を利用する事が出来ます。
+※ハードウェア RTC が利用出来ない場合、ソフト RTC で時間管理を行います。
 
 ## RX マイコンにおける SDHI 内臓デバイス
 
@@ -180,7 +180,7 @@ SD モードでの大きな違いは：
 
 ## SPI モードの初期化プロセス
 
-[mmc_io.hpp / disk_initialize(BYTE drv)](https://github.com/hirakuni45/RX/blob/master/ff13c/mmc_io.hpp?ts=4) を参照
+[mmc_io.hpp / disk_initialize(BYTE drv)](https://github.com/hirakuni45/RX/blob/master/ff14/mmc_io.hpp?ts=4) を参照
 
 ## SD モードの初期化プロセス概要
 
@@ -368,9 +368,19 @@ WriteOpen:  1 [ms]
 Write: 200 KBytes/Sec
 WriteClose: 46 [ms]
 
-Open:  1 [ms]
+ReadOpen:  1 [ms]
 Read: 1065 KBytes/Sec
 ReadClose: 0 [ms]
+
+-----------------------------------------
+Micron LMC-SD 64GB (SDXC) Class10
+Write Open:  23 [ms]
+Write: 684 KBytes/Sec
+Write Close: 4 [ms]
+
+Read Open:  1 [ms]
+Read: 1622 KBytes/Sec
+Read Close: 0 [ms]
 ```
 
 テストは５１２バイト単位である為、連続で行う場合、もっと高速だと思います。   

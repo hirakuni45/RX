@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstring>
 #include <iterator>
+#include "common/string_utils.hpp"
 
 namespace utils {
 

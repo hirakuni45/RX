@@ -85,8 +85,8 @@ namespace utils {
 				make_prompt_("/");
 			}
 
-            auto cmdn = cmd_.get_words();
-            if(cmdn >= 1) {
+			auto cmdn = cmd_.get_words();
+			if(cmdn >= 1) {
 
 				int opt = 0;
 				int path = 0;
@@ -117,6 +117,7 @@ namespace utils {
 						state_ = false;
 					} else {
 						utils::format("%s\n") % tmp;
+						make_prompt_();
 					}
 				} else if(cmd_.cmp_word(0, "cd")) {  // cd [xxx]
 					char tmp[utils::file_io::PATH_MAX_SIZE];
@@ -145,6 +146,8 @@ namespace utils {
 				} else {
 					return false;
 				}
+			} else {
+				make_prompt_();
 			}
 			return true;
 		}
