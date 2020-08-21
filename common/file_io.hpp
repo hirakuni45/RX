@@ -20,7 +20,7 @@
 #include "common/dir_list.hpp"
 
 // カレントパスの管理を自前で行う場合
-#if FF_FS_EXFAT > 1
+#if FF_FS_EXFAT > 0
 #define MANAGE_CURRENT_PATH_
 #endif
 
@@ -152,7 +152,7 @@ namespace utils {
 			copy_t* t = static_cast<copy_t*>(option);
 			if(t->count_ == t->match_) {
 				if(t->dst_ != nullptr && t->dstlen_ > 0) {
-					std::strncpy(t->dst_, name, t->dstlen_);
+					str::strncpy_(t->dst_, name, t->dstlen_);
 					if(dir) {
 						std::strncat(t->dst_, "/", t->dstlen_);
 					}
@@ -238,11 +238,7 @@ namespace utils {
 				return false;
 			}
 #ifdef MANAGE_CURRENT_PATH_
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-truncation"
-			strncpy(dst, current_path_, len - 1);
-			dst[len - 1] = 0;
-#pragma GCC diagnostic pop
+			str::strncpy_(dst, current_path_, len);
 			return true;
 #else
 			auto ret = f_getcwd(dst, len);
@@ -279,21 +275,13 @@ namespace utils {
 					} else {
 						current_path_[p - current_path_] = 0;
 					}
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-truncation"
-					strncpy(dst, current_path_, len - 1);
-					dst[len - 1] = 0;
-#pragma GCC diagnostic pop
+					str::strncpy_(dst, current_path_, len);
 				}
 				return true;
 			} else 
 #endif
 			if(base[0] == '/') {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-truncation"
-				strncpy(dst, base, len - 1);
-#pragma GCC diagnostic pop
-				dst[len - 1] = 0;
+				str::strncpy_(dst, base, len);
 			} else {
 				if(!pwd(dst, len)) {
 					return false;
@@ -308,10 +296,7 @@ namespace utils {
 						++l;
 					}
 				}
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-truncation"
-				strncpy(&dst[l], base, len - l - 1);
-#pragma GCC diagnostic pop
+				str::strncpy_(&dst[l], base, len - l);
 			}
 			return true;
 		}
@@ -337,11 +322,7 @@ namespace utils {
 				return false;
 			}
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-truncation"
-			strncpy(current_path_, tmp, PATH_MAX_SIZE - 1);
-			current_path_[PATH_MAX_SIZE - 1] = 0;
-#pragma GCC diagnostic pop
+			str::strncpy_(current_path_, tmp, PATH_MAX_SIZE);
 #endif
 			auto ret = f_chdir(path);
 			return ret == FR_OK;
@@ -373,6 +354,11 @@ namespace utils {
 			if(strchr(mode, 'a') != nullptr) {
 				mdf |= FA_OPEN_APPEND;
 			}
+
+//			char tmp[PATH_MAX_SIZE];
+//			if(!make_full_path(filename, tmp, PATH_MAX_SIZE)) {
+//				return false;
+//			}
 
 			FRESULT res = f_open(&fp_, filename, mdf);
 			if(res != FR_OK) {
@@ -716,10 +702,8 @@ namespace utils {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static uint32_t dir(const char* root, bool ll = true) noexcept
 		{
-			char tmp[PATH_MAX_SIZE];
-			make_full_path(root, tmp, sizeof(tmp));
 			dir_list dl;
-			if(!dl.start(tmp)) return 0;
+			if(!dl.start(root)) return 0;
 
 			dir_list_t t;
 			t.ll_ = ll;

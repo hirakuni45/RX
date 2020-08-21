@@ -35,6 +35,36 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  有限文字列コピー「strncpy」の亜種 @n
+					※バッファサイズがリミット－１に達したら、最後は「０」で埋める。
+			@param[in]	dst	コピー先
+			@param[in]	src	コピー元
+			@param[in]	len	コピー先容量
+			@return コピー先先頭
+		*/
+		//-----------------------------------------------------------------//
+		static char* strncpy_(char* dst, const char* src, uint32_t len) noexcept
+		{
+			// strncpy の実装では、ポインターをチェックしない
+//			if(dst == nullptr || src == nullptr) return dst;
+			if(len == 0) return dst;
+
+			auto tmp = dst;
+			--len;
+			while(tmp < (dst + len)) {
+				auto ch = *src++;
+				*tmp++ = ch;
+				if(ch == 0) {
+					return dst;
+				}
+			}
+			*tmp = 0;
+			return dst;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  １６進数ダンプ
 			@param[in]	src	ソース
 			@param[in]	num	数
