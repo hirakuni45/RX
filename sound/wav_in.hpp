@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	WAV 音声ファイルを扱うクラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,6 +14,7 @@
 #include "sound/tag.hpp"
 #include "sound/af_play.hpp"
 #include "sound/sound_out.hpp"
+#include "sound/audio_info.hpp"
 
 extern "C" {
 	void set_sample_rate(uint32_t freq);
@@ -190,6 +191,21 @@ namespace sound {
 			data_top_ = fi.tell();
 
 			data_pos_ = 0;
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	情報を取得
+			@param[in]	fin		file_io コンテキスト（参照）
+			@param[out]	info	情報
+			@return 正常なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool info(utils::file_io& fin, audio_info& info) noexcept
+		{
 
 			return true;
 		}
