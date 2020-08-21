@@ -53,7 +53,7 @@
 #if defined(SIG_RX24T)
 #define configTOTAL_HEAP_SIZE			( ( size_t ) ( 8 * 1024 ) )
 #else
-#define configTOTAL_HEAP_SIZE			( ( size_t ) ( 45 * 1024 ) )
+#define configTOTAL_HEAP_SIZE			( ( size_t ) ( 64 * 1024 ) )
 #endif
 #define configMAX_TASK_NAME_LEN			( 12 )
 #define configUSE_TRACE_FACILITY		1
