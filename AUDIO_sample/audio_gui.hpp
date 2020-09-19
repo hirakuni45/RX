@@ -14,7 +14,7 @@
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
-#include "graphics/dialog.hpp"
+#include "graphics/simple_dialog.hpp"
 #include "graphics/img_in.hpp"
 #include "graphics/widget_director.hpp"
 #include "graphics/scaling.hpp"
@@ -114,7 +114,7 @@ namespace app {
 		typedef gui::filer<RENDER> FILER;
 		FILER	filer_;
 
-		typedef gui::dialog<RENDER, TOUCH> DIALOG;
+		typedef gui::simple_dialog<RENDER, TOUCH> DIALOG;
 		DIALOG	dialog_;
 
 		typedef gui::widget_director<RENDER, TOUCH, 32> WIDD;
