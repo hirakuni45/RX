@@ -1,7 +1,8 @@
+/* -*- tab-width : 4 -*- */
 /*!	@file
 	@brief	RX24T R5F524T8 リンカー・スクリプト
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2016, 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2016, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
