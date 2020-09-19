@@ -19,7 +19,7 @@ L Connector:Conn_Coaxial J?
 U 1 1 5EF694A4
 P 950 1050
 F 0 "J?" H 878 1288 50  0000 C CNN
-F 1 "Conn_Coaxial" H 878 1197 50  0000 C CNN
+F 1 "CH1" H 878 1197 50  0000 C CNN
 F 2 "" H 950 1050 50  0001 C CNN
 F 3 " ~" H 950 1050 50  0001 C CNN
 	1    950  1050
@@ -383,39 +383,6 @@ Wire Wire Line
 Connection ~ 6800 2050
 Wire Wire Line
 	6250 2050 6800 2050
-$Comp
-L 74xx:74HC04 U?
-U 1 1 5EFD6638
-P 1300 3800
-F 0 "U?" H 1300 4117 50  0000 C CNN
-F 1 "74HC04" H 1300 4026 50  0000 C CNN
-F 2 "" H 1300 3800 50  0001 C CNN
-F 3 "https://assets.nexperia.com/documents/data-sheet/74HC_HCT04.pdf" H 1300 3800 50  0001 C CNN
-	1    1300 3800
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx:74HC04 U?
-U 2 1 5EFD8188
-P 1300 4650
-F 0 "U?" H 1300 4967 50  0000 C CNN
-F 1 "74HC04" H 1300 4876 50  0000 C CNN
-F 2 "" H 1300 4650 50  0001 C CNN
-F 3 "https://assets.nexperia.com/documents/data-sheet/74HC_HCT04.pdf" H 1300 4650 50  0001 C CNN
-	2    1300 4650
-	1    0    0    -1  
-$EndComp
-$Comp
-L 74xx:74HC04 U?
-U 3 1 5EFD9CAB
-P 1300 5500
-F 0 "U?" H 1300 5817 50  0000 C CNN
-F 1 "74HC04" H 1300 5726 50  0000 C CNN
-F 2 "" H 1300 5500 50  0001 C CNN
-F 3 "https://assets.nexperia.com/documents/data-sheet/74HC_HCT04.pdf" H 1300 5500 50  0001 C CNN
-	3    1300 5500
-	1    0    0    -1  
-$EndComp
 $Comp
 L akizuki:R R?
 U 1 1 5EFE1FA4
@@ -921,6 +888,144 @@ F 1 "GNDA" H 8305 3577 50  0000 C CNN
 F 2 "" H 8300 3750 50  0001 C CNN
 F 3 "" H 8300 3750 50  0001 C CNN
 	1    8300 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74HC04 U?
+U 6 1 5F030DBA
+P 1300 3800
+F 0 "U?" H 1300 4117 50  0000 C CNN
+F 1 "74HC05" H 1300 4026 50  0000 C CNN
+F 2 "" H 1300 3800 50  0001 C CNN
+F 3 "https://assets.nexperia.com/documents/data-sheet/74HC_HCT04.pdf" H 1300 3800 50  0001 C CNN
+	6    1300 3800
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74HC04 U?
+U 5 1 5F031E3D
+P 1300 4650
+F 0 "U?" H 1300 4967 50  0000 C CNN
+F 1 "74HC05" H 1300 4876 50  0000 C CNN
+F 2 "" H 1300 4650 50  0001 C CNN
+F 3 "https://assets.nexperia.com/documents/data-sheet/74HC_HCT04.pdf" H 1300 4650 50  0001 C CNN
+	5    1300 4650
+	1    0    0    -1  
+$EndComp
+$Comp
+L 74xx:74HC04 U?
+U 4 1 5F03297F
+P 1300 5500
+F 0 "U?" H 1300 5817 50  0000 C CNN
+F 1 "74HC05" H 1300 5726 50  0000 C CNN
+F 2 "" H 1300 5500 50  0001 C CNN
+F 3 "https://assets.nexperia.com/documents/data-sheet/74HC_HCT04.pdf" H 1300 5500 50  0001 C CNN
+	4    1300 5500
+	1    0    0    -1  
+$EndComp
+$Comp
+L akizuki:R R?
+U 1 1 5F033338
+P 2100 5100
+F 0 "R?" H 2100 5307 50  0000 C CNN
+F 1 "47K" H 2100 5216 50  0000 C CNN
+F 2 "" H 2100 5030 50  0000 C CNN
+F 3 "" V 2100 5100 50  0000 C CNN
+	1    2100 5100
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1950 5100 1750 5100
+Connection ~ 1750 5100
+Wire Wire Line
+	2250 5100 2700 5100
+Wire Wire Line
+	2700 5100 2700 5000
+$Comp
+L power:+5V #PWR?
+U 1 1 5F03F0F2
+P 2700 5000
+F 0 "#PWR?" H 2700 4850 50  0001 C CNN
+F 1 "+5V" H 2715 5173 50  0000 C CNN
+F 2 "" H 2700 5000 50  0001 C CNN
+F 3 "" H 2700 5000 50  0001 C CNN
+	1    2700 5000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:USB_B_Micro J?
+U 1 1 5F08D6F5
+P 7800 5750
+F 0 "J?" H 7857 6217 50  0000 C CNN
+F 1 "USB_B_Micro" H 7857 6126 50  0000 C CNN
+F 2 "" H 7950 5700 50  0001 C CNN
+F 3 "~" H 7950 5700 50  0001 C CNN
+	1    7800 5750
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 5F08F27B
+P 7800 6300
+F 0 "#PWR?" H 7800 6050 50  0001 C CNN
+F 1 "GND" H 7805 6127 50  0000 C CNN
+F 2 "" H 7800 6300 50  0001 C CNN
+F 3 "" H 7800 6300 50  0001 C CNN
+	1    7800 6300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7800 6300 7800 6150
+Wire Wire Line
+	8600 5550 8100 5550
+Wire Wire Line
+	1450 6700 1300 6700
+Wire Wire Line
+	1300 6700 1300 6400
+Wire Wire Line
+	1300 6400 2100 6400
+Wire Wire Line
+	2100 6400 2100 6700
+Wire Wire Line
+	2100 6700 1950 6700
+Wire Wire Line
+	1450 6800 1200 6800
+Wire Wire Line
+	1200 6800 1200 6300
+Wire Wire Line
+	1200 6300 2200 6300
+Wire Wire Line
+	2200 6300 2200 6800
+Wire Wire Line
+	2200 6800 1950 6800
+Wire Wire Line
+	1300 6400 1300 6200
+Connection ~ 1300 6400
+$Comp
+L power:+3.3V #PWR?
+U 1 1 5F12494F
+P 1300 6200
+F 0 "#PWR?" H 1300 6050 50  0001 C CNN
+F 1 "+3.3V" H 1315 6373 50  0000 C CNN
+F 2 "" H 1300 6200 50  0001 C CNN
+F 3 "" H 1300 6200 50  0001 C CNN
+	1    1300 6200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2200 6300 2350 6300
+Wire Wire Line
+	2350 6300 2350 6500
+Connection ~ 2200 6300
+$Comp
+L power:GND #PWR?
+U 1 1 5F12C80A
+P 2350 6500
+F 0 "#PWR?" H 2350 6250 50  0001 C CNN
+F 1 "GND" H 2355 6327 50  0000 C CNN
+F 2 "" H 2350 6500 50  0001 C CNN
+F 3 "" H 2350 6500 50  0001 C CNN
+	1    2350 6500
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC
