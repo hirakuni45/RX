@@ -12,7 +12,7 @@
 #include "common/enum_utils.hpp"
 #include "common/intmath.hpp"
 #include "graphics/color.hpp"
-#include "graphics/dialog.hpp"
+#include "graphics/simple_dialog.hpp"
 
 namespace utils {
 
@@ -38,7 +38,7 @@ namespace utils {
 		static const int16_t VOLT_BEGIN_POS   = 0;
 		static const int16_t VOLT_LIMIT_POS   = RENDER::glc_type::width - MENU_SIZE;
 
-		typedef gui::dialog<RENDER, TOUCH> DIALOG;
+		typedef gui::simple_dialog<RENDER, TOUCH> DIALOG;
 
 		RENDER&		render_;
 		CAPTURE&	capture_;
