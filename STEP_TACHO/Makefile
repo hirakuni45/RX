@@ -1,64 +1,46 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
-#   @file
-#   @brief  RX65N Makefile
+#	RX24T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	GUI_sample
+TARGET		=	step_tacho
 
-DEVICE		=	R5F565NE
-
-FATFS_VER	=	ff14/source
+DEVICE		=	R5F524TA
 
 BUILD		=	release
 # BUILD		=	debug
 
-VPATH		=	../../
+VPATH		=	../
 
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c \
-				common/syscalls.c \
-				$(FATFS_VER)/ff.c \
-				$(FATFS_VER)/ffsystem.c \
-				$(FATFS_VER)/ffunicode.c \
-				common/time.c \
-				graphics/picojpeg.c
+				common/vect.c
 
-PSOURCES	=	GUI_sample/main.cpp \
-				graphics/font8x16.cpp \
-				graphics/kfont16.cpp \
-				graphics/color.cpp \
-				common/stdapi.cpp
+PSOURCES	=	main.cpp
 
-USER_LIBS	=	supc++ drw2d png z m
+USER_LIBS	=
 
-LDSCRIPT	=	../../RX65x/$(DEVICE).ld
+LDSCRIPT	=	../RX24T/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX65N \
-				F_ICLK=120000000 \
-				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
-				F_FCLK=60000000 F_BCLK=120000000 \
-				FAT_FS FAT_FS_NUM=16
+USER_DEFS   =   SIG_RX24T \
+				F_ICLK=80000000 \
+				F_FCLK=20000000 \
+				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKD=40000000
 
 # rx-elf-gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
-# For FreeRTOS
-# AS_DEFS       =   --defsym NOT_USER=1
 ifeq ($(TARGET_ISA_TEXT), )
 # gcc-7.5.0 current gcc source build
-CC_DEFS     =   -mcpu=rx600 -Wa,-mcpu=rxv2
-CP_DEFS     =   -mcpu=rx600
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc
-CC_DEFS     =   -misa=v3
-# CP_DEFS       =   -misa=v3 -mdfpu -mtfu=intrinsic,mathlib
-CP_DEFS     =   -misa=v3 -mtfu=intrinsic,mathlib
-# CP_DEFS       =   -misa=v3 -mdfpu
+CC_DEFS		=	-misa=v2
+CP_DEFS		=	-misa=v2
 endif
 
 # Include path for each environment
@@ -80,26 +62,16 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../../ ../ \
-				../../RX600/drw2d/inc/tes
-
-LIB_ROOT	=	../../RX600/drw2d ../../zlib ../../libpng
-
-AS_OPT		=
+INC_APP		=	. ../
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
-				-Wno-stringop-truncation \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
-                -Wno-unused-variable \
-                -Wno-unused-function \
-                -Wno-maybe-uninitialized \
-                -Wno-unused-but-set-variable \
-                -Wno-strict-aliasing \
-                -fno-exceptions
+				-Wno-unused-variable \
+				-fno-exceptions
 
 ifeq ($(BUILD),debug)
     CC_OPT += -g -DDEBUG
@@ -222,6 +194,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX24T --progress --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

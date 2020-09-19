@@ -8,6 +8,10 @@ $CMP 6P-SW
 D 6P Switch
 $ENDCMP
 #
+$CMP A3967
+D Microstepping Driver with Translator (Allego Micro Systems, LLC)
+$ENDCMP
+#
 $CMP CAT4238
 D High Efficiency 10 LED Boost Converter
 K LED Boost Driver

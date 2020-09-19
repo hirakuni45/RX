@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	ダイアログ表示 @n
 			・単独で利用できるシンプルなダイアログクラス。@n
-			・文字列を表示して、タッチを検出する事しか出来ない。
+			・文字列を表示して、タッチを検出して閉じる事しか出来ない。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -17,11 +17,13 @@ namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	ダイアログ表示クラス
+		@brief	シンプル・ダイアログ表示クラス
+		@param[in]	RDR		レンダークラス
+		@param[in]	TOUCH	タッチクラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class RDR, class TOUCH>
-	class dialog {
+	class simple_dialog {
 	public:
 		typedef graphics::def_color DEF_COLOR;
 		static const int16_t modal_radius = 10;  // modal round radius
@@ -41,7 +43,7 @@ namespace gui {
 			@param[in]	touch	タッチクラス
 		*/
 		//-----------------------------------------------------------------//
-		dialog(RDR& rdr, TOUCH& touch) noexcept : rdr_(rdr), touch_(touch)
+		simple_dialog(RDR& rdr, TOUCH& touch) noexcept : rdr_(rdr), touch_(touch)
 		{ }
 
 

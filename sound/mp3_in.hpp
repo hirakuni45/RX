@@ -4,7 +4,7 @@
 	@brief	libmad を使った MP3 デコード・クラス @n
 			※このクラスを使うには、libmad ライブラリーが必要
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,6 +14,7 @@
 #include "sound/id3_mgr.hpp"
 #include "sound/af_play.hpp"
 #include "sound/sound_out.hpp"
+#include "sound/audio_info.hpp"
 
 extern "C" {
 	void set_sample_rate(uint32_t freq);
@@ -190,6 +191,64 @@ namespace sound {
 		*/
 		//-----------------------------------------------------------------//
 		mp3_in() : subband_filter_enable_(false), id3v1_(false), time_(0) { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	情報を取得
+			@param[in]	fin		file_io コンテキスト（参照）
+			@param[out]	info	情報
+			@return 正常なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool info(utils::file_io& fin, audio_info& info) noexcept
+		{
+			id3_mgr id3;
+			if(!id3.parse(fin)) {
+				return false;
+			}
+			if(tag_task_) {
+				const auto& tag = id3.get_tag();
+				tag_task_(fin, tag);
+			}
+
+			mad_stream_init(&mad_stream_);
+			mad_frame_init(&mad_frame_);
+			mad_synth_init(&mad_synth_);
+			mad_timer_reset(&mad_timer_);
+
+			uint32_t forg = fin.tell();
+			info.header_size = forg;
+
+			// 全体のフレーム数をカウント
+			uint32_t frames = 0;
+			uint32_t freq = 0;
+			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
+				++frames;
+
+				if(freq < mad_frame_.header.samplerate) {
+					freq = mad_frame_.header.samplerate;
+				}
+			}
+			fin.seek(utils::file_io::SEEK::SET, forg);
+
+			info.samples = frames * 1152;
+			if(mad_frame_.header.mode != MAD_MODE_SINGLE_CHANNEL) {
+				info.type = audio_format::PCM16_STEREO;
+				info.chanels = 2;
+			} else {
+				info.type = audio_format::PCM16_MONO;
+				info.chanels = 1;
+			}
+			info.bits = 16;
+			info.frequency = freq;
+
+			mad_synth_finish(&mad_synth_);
+			mad_frame_finish(&mad_frame_);
+			mad_stream_finish(&mad_stream_);
+
+			return true;
+		}
 
 
 		//-----------------------------------------------------------------//

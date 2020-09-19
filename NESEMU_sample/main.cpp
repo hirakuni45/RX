@@ -23,7 +23,7 @@
 #include "graphics/font.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
-#include "graphics/dialog.hpp"
+#include "graphics/simple_dialog.hpp"
 #include "graphics/root_menu.hpp"
 
 #include "chip/FAMIPAD.hpp"
@@ -177,7 +177,7 @@ namespace {
 	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
 	RENDER		render_(glcdc_mgr_, font_);
 
-	typedef gui::dialog<RENDER, FAMIPAD> DIALOG;
+	typedef gui::simple_dialog<RENDER, FAMIPAD> DIALOG;
 	DIALOG		dialog_(render_, famipad_);
 
 	typedef gui::filer_base FILER_BASE;

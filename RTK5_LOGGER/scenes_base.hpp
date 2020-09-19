@@ -16,7 +16,7 @@
 #include "graphics/scaling.hpp"
 #include "graphics/img_in.hpp"
 #include "graphics/root_menu.hpp"
-#include "graphics/dialog.hpp"
+#include "graphics/simple_dialog.hpp"
 #include "graphics/filer.hpp"
 #include "chip/FT5206.hpp"
 
@@ -99,7 +99,7 @@ namespace app {
 
 		typedef resource<RENDER> RESOURCE;
 
-		typedef gui::dialog<RENDER, TOUCH> DIALOG;
+		typedef gui::simple_dialog<RENDER, TOUCH> DIALOG;
 
 		// カード電源制御は使わないので、「device::NULL_PORT」を指定する。
 		typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
