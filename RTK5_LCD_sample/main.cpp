@@ -24,7 +24,7 @@
 #include "graphics/graphics.hpp"
 
 #include "graphics/filer.hpp"
-#include "graphics/dialog.hpp"
+#include "graphics/simple_dialog.hpp"
 #include "chip/FT5206.hpp"
 
 #include "graphics/img_in.hpp"
@@ -133,7 +133,7 @@ namespace {
 	typedef chip::FT5206<FT5206_I2C> FT5206;
 	FT5206		ft5206_(ft5206_i2c_);
 
-	typedef gui::dialog<RENDER, FT5206> DIALOG;
+	typedef gui::simple_dialog<RENDER, FT5206> DIALOG;
 	DIALOG		dialog_(render_, ft5206_);
 
 	typedef img::scaling<RENDER> PLOT;
