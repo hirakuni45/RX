@@ -17,7 +17,7 @@
 #include "graphics/kfont.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
-#include "graphics/dialog.hpp"
+#include "graphics/simple_dialog.hpp"
 #include "graphics/img_in.hpp"
 #include "graphics/widget_director.hpp"
 #include "graphics/scaling.hpp"
@@ -121,7 +121,7 @@ namespace {
 	typedef chip::FT5206<FT5206_I2C> TOUCH;
 	TOUCH		touch_(ft5206_i2c_);
 
-	typedef gui::dialog<RENDER, TOUCH> DIALOG;
+	typedef gui::simple_dialog<RENDER, TOUCH> DIALOG;
 	DIALOG		dialog_(render_, touch_);
 
 	// 最大３２個の Widget 管理
