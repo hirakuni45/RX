@@ -19,7 +19,7 @@
 #include "graphics/font.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
-#include "graphics/dialog.hpp"
+#include "graphics/simple_dialog.hpp"
 #include "graphics/root_menu.hpp"
 
 #include "sound/synth/synth_unit.h"
@@ -159,7 +159,7 @@ namespace {
 	typedef chip::FT5206<FT5206_I2C> TOUCH;
 	TOUCH		touch_;
 
-	typedef gui::dialog<RENDER> DIALOG;
+	typedef gui::simple_dialog<RENDER> DIALOG;
 	DIALOG		dialog_(render_);
 #endif
 	typedef gui::filer_base FILER_BASE;
