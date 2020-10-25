@@ -12,6 +12,7 @@ TARGET		=	can_sample
 DEVICE		=	R5F566TE
 
 BUILD		=	release
+# BUILD		=	debug
 
 VPATH		=	../../
 
@@ -21,7 +22,7 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	SCI_sample/main.cpp
+PSOURCES	=	CAN_sample/main.cpp
 
 USER_LIBS	=
 
@@ -32,7 +33,17 @@ USER_DEFS	=	SIG_RX66T \
 				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKC=160000000 F_PCLKD=40000000 \
 				F_FCLK=40000000 F_BCLK=40000000
 
-MCU_TARGET	=	
+# Renesas GNU-RX gcc compiler version check
+TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
+
+ifeq ($(TARGET_ISA_TEXT), )
+# gcc-7.5.0 current gcc source build
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
+else # Renesas GNU-RX gcc-8.3.0
+CC_DEFS		=	-misa=v3
+CP_DEFS		=	-misa=v3
+endif
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
@@ -55,8 +66,6 @@ INC_SYS		=
 
 INC_APP		=	. ../ ../../
 
-OPTIMIZE	=	-O3
-
 AS_OPT		=	-mcpu=rx600
 
 CP_OPT		=	-Wall -Werror \
@@ -67,6 +76,18 @@ CP_OPT		=	-Wall -Werror \
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-fno-exceptions
+
+ifeq ($(BUILD),debug)
+    CC_OPT += -g -DDEBUG
+    CP_OPT += -g -DDEBUG
+	OPTIMIZE = -O0
+endif
+
+ifeq ($(BUILD),release)
+    CC_OPT += -DNDEBUG
+    CP_OPT += -DNDEBUG
+	OPTIMIZE = -O3
+endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
 APPINCS		=	$(addprefix -I, $(INC_APP))
@@ -87,18 +108,9 @@ OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
 
-# AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
-# AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
-AFLAGS		=	$(AS_OPT)
-# ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
-ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
-
-# Override is only needed by avr-lib build system.
-
-CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
+AFLAGS		=	$(AS_OPT) $(AS_DEFS)
+CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
+PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(CP_DEFS) $(DEFS)
 
 override LDFLAGS = $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
 
