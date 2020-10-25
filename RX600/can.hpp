@@ -187,30 +187,31 @@ namespace device {
 		typedef mbn_t<base + 0x0228> MKIVLR_;
 		static  MKIVLR_ MKIVLR;
 
-/// 構成を検討中・・・
-#if 0
+
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  メールボックスレジスタ j （ MBj ）（ j = 0 ～ 31 ）
+			@brief  メールボックスレジスタ j （ MBj ）（ j = 0 ～ 31 ）@n
+					32 bits access
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
-		template <uint32_t ofs>
-		struct mbx_t : public rw32_t<ofs> {
-			typedef rw32_t<ofs> io_;
-			using io_::operator =;
-			using io_::operator ();
-			using io_::operator |=;
-			using io_::operator &=;
+		struct mb_t {
+			uint32_t get0(uint32_t j) { return rd32_(base + 16 * j +  0); }
+			uint32_t get1(uint32_t j) { return rd32_(base + 16 * j +  4); }
+			uint32_t get2(uint32_t j) { return rd32_(base + 16 * j +  8); }
+			uint32_t get3(uint32_t j) { return rd32_(base + 16 * j + 12); }
 
-			bits_rw_t<io_, bitpos::B0,  18>  EID;
-			bits_rw_t<io_, bitpos::B18, 11>  SID;
-			bit_rw_t <io_, bitpos::B30>      RTR;
-			bit_rw_t <io_, bitpos::B31>      IDE;
+			void set0(uint32_t j, uint32_t d) { wr32_(base + 16 * j +  0, d); }
+			void set1(uint32_t j, uint32_t d) { wr32_(base + 16 * j +  4, d); }
+			void set2(uint32_t j, uint32_t d) { wr32_(base + 16 * j +  8, d); }
+			void set3(uint32_t j, uint32_t d) { wr32_(base + 16 * j + 12, d); }
+
+			volatile uint32_t& operator [] (uint32_t idx) {
+				return *reinterpret_cast<volatile uint32_t*>(base + idx * 4);
+			}
 		};
-///		typedef mbx_t<base + 0x0000> MB0_;
-///		static  MB0_ MB0;
-#endif
+		typedef mb_t MB_;
+		static  MB_ MB;
 
 
 		//-----------------------------------------------------------------//
@@ -221,29 +222,46 @@ namespace device {
 		typedef mbn_t<base + 0x022C> MIER_;
 		static  MIER_ MIER;
 
-#if 0
+
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  メッセージ制御レジスタ j （ MCTLj ）（ j ＝ 0 ～ 31 ）
+			@brief  メッセージ制御レジスタ j（ MCTLj ）（ j ＝ 0 ～ 31 ）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
+#if 0
 		template <uint32_t ofs>
-		struct mctln_t : public rw8_t<ofs> {
+		struct mctl_t : public rw8_t<ofs> {
 			typedef rw8_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
-			bits_rw_t<io_, bitpos::B0,  18>  EID;
-			bits_rw_t<io_, bitpos::B18, 11>  SID;
-			bit_rw_t <io_, bitpos::B30>      RTR;
-			bit_rw_t <io_, bitpos::B31>      IDE;
+			bit_rw_t <io_, bitpos::B0>  SENTDATA;  // Send mode
+			bit_rw_t <io_, bitpos::B0>  NEWDATA;   // Recv mode
+			bit_rw_t <io_, bitpos::B1>  TRMACTIVE; // Send mode
+			bit_rw_t <io_, bitpos::B1>  INVALDATA; // Recv mode
+			bit_rw_t <io_, bitpos::B2>  TRMABT;    // Send mode
+			bit_rw_t <io_, bitpos::B2>  TMSGLOST;  // Recv mode
+
+			bit_rw_t <io_, bitpos::B4>  ONESHOT;
+
+			bit_rw_t <io_, bitpos::B6>  RECREQ;
+			bit_rw_t <io_, bitpos::B7>  TRMREQ;
 		};
-		typedef mctln_t<base + 0x0620> MCTL0_;
-		static  MCTL0_ MCTL0;
+		typedef mctl_t<base + 0x0620> MCTL_;
+		static  MCTL_ MCTL;
 #endif
+		struct mctl_t {
+
+
+			volatile uint8_t& operator [] (uint32_t idx) {
+				return *reinterpret_cast<volatile uint8_t*>(base + 0x0620 + idx);
+			}
+		};
+		typedef mctl_t MCTL_;
+		static MCTL_ MCTL;
 
 
 		//-----------------------------------------------------------------//
@@ -543,9 +561,9 @@ namespace device {
 	template <uint32_t base, peripheral per> typename can_t<base, per>::FIDCR0_ can_t<base, per>::FIDCR0;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::FIDCR1_ can_t<base, per>::FIDCR1;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::MKIVLR_ can_t<base, per>::MKIVLR;
-///	template <uint32_t base, peripheral per> typename can_t<base, per>::MB0_ can_t<base, per>::MB0;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::MB_ can_t<base, per>::MB;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::MIER_ can_t<base, per>::MIER;
-///	template <uint32_t base, peripheral per> typename can_t<base, per>::MCTL0_ can_t<base, per>::MCTL0;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::MCTL_ can_t<base, per>::MCTL;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::RFCR_ can_t<base, per>::RFCR;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::RFPCR_ can_t<base, per>::RFPCR;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::TFCR_ can_t<base, per>::TFCR;
@@ -574,20 +592,22 @@ namespace device {
 		@param[in]	txf		送信 FIFO 割り込み
 		@param[in]	rxm		メールボックス受信割り込み
 		@param[in]	txm		メールボックス送信割り込み
+		@param[in]	ers		エラー割り込み
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t base, peripheral per,
-		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm>
+		ICU::VECTOR rxf, ICU::VECTOR txf, ICU::VECTOR rxm, ICU::VECTOR txm, ICU::VECTOR_BE0 ers>
 	struct can_norm_t : can_t<base, per> {
 
 		static const auto RXF_VEC = rxf;	///< RXF 割り込みベクター
 		static const auto TXF_VEC = txf;	///< TXF 割り込みベクター
 		static const auto RXM_VEC = rxm;	///< RXM 割り込みベクター
 		static const auto TXM_VEC = txm;	///< TXM 割り込みベクター
+		static const auto ERS_VEC = ers;	///< ERS 割り込みベクター
 	};
 	typedef can_norm_t<0x00090200, peripheral::CAN0,
 		ICU::VECTOR::RXF0, ICU::VECTOR::TXF0,
-		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0> CAN0;
+		ICU::VECTOR::RXM0, ICU::VECTOR::TXM0, ICU::VECTOR_BE0::ERS0> CAN0;
 #endif
 
 
@@ -609,7 +629,7 @@ namespace device {
 		ICU::VECTOR_BE0 ers>
 	struct can_seli_t : can_t<base, per> {
 
-		static const auto VEC_RXF = rxf;	///< RXF 割り込みベクター
+		static const auto RXF_VEC = rxf;	///< RXF 割り込みベクター
 		static const auto TXF_VEC = txf;	///< TXF 割り込みベクター
 		static const auto RXM_VEC = rxm;	///< RXM 割り込みベクター
 		static const auto TXM_VEC = txm;	///< TXM 割り込みベクター
@@ -630,5 +650,5 @@ namespace device {
 		ICU::VECTOR_SELB::RXM2, ICU::VECTOR_SELB::TXM2, ICU::VECTOR_BE0::ERS2> CAN2;
 #endif
 #endif
-// note: RX65x CAN0, CAN1
+// note: RX65x/RX72x CAN0, CAN1
 }
