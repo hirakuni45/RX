@@ -89,16 +89,17 @@ namespace chip {
 		bool set_time(time_t t) const {
 			if(!start_) return false;
 
-			const tm* tp = gmtime(&t);
+			tm tmt;
+			gmtime_r(&t, &tmt);
 			uint8_t reg[7];
-			reg[0] = ((tp->tm_sec  / 10) << 4) | (tp->tm_sec  % 10);  // 0 to 59
-			reg[1] = ((tp->tm_min  / 10) << 4) | (tp->tm_min  % 10);  // 0 to 59
-			reg[2] = ((tp->tm_hour / 10) << 4) | (tp->tm_hour % 10);  // 0 to 23
-			reg[3] = tp->tm_wday + 1;  // 1 to 7
-			reg[4] = ((tp->tm_mday / 10) << 4) | (tp->tm_mday % 10);  // 1 to 31
-			uint8_t mon = tp->tm_mon + 1;
+			reg[0] = ((tmt.tm_sec  / 10) << 4) | (tmt.tm_sec  % 10);  // 0 to 59
+			reg[1] = ((tmt.tm_min  / 10) << 4) | (tmt.tm_min  % 10);  // 0 to 59
+			reg[2] = ((tmt.tm_hour / 10) << 4) | (tmt.tm_hour % 10);  // 0 to 23
+			reg[3] = tmt.tm_wday + 1;  // 1 to 7
+			reg[4] = ((tmt.tm_mday / 10) << 4) | (tmt.tm_mday % 10);  // 1 to 31
+			uint8_t mon = tmt.tm_mon + 1;
 			reg[5] = ((mon / 10) << 4) | (mon % 10);  // 1 to 12
-			uint16_t y = tp->tm_year % 100;
+			uint16_t y = tmt.tm_year % 100;
 			reg[6] = ((y / 10) << 4) | (y % 10);  // 0 to 99
 			return i2c_.send(DS3231_ADR_, 0x00, reg, 7);
 		}
