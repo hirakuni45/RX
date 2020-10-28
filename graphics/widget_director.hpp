@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Widget ディレクター
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,6 +12,7 @@
 #include "graphics/widget.hpp"
 #include "graphics/group.hpp"
 #include "graphics/frame.hpp"
+#include "graphics/dialog.hpp"
 #include "graphics/button.hpp"
 #include "graphics/check.hpp"
 #include "graphics/radio.hpp"
@@ -259,6 +260,13 @@ namespace gui {
 				case widget::ID::FRAME:
 					{
 						auto* w = dynamic_cast<frame*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::DIALOG:
+					{
+						auto* w = dynamic_cast<dialog*>(t.w_);
 						if(w == nullptr) break;
 						w->draw(rdr_);
 					}

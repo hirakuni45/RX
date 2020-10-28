@@ -55,6 +55,14 @@ namespace utils {
 			END		///< 終端からのオフセット
         };
 
+
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+        /*!
+            @brief  ファイルサイズタイプ
+        */
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		typedef FSIZE_t FSIZE;
+
 	private: 
 		FIL			fp_;
 		bool		open_;
@@ -502,7 +510,7 @@ namespace utils {
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool seek(SEEK seek, FSIZE_t ofs) noexcept
+		bool seek(SEEK seek, FSIZE ofs) noexcept
 		{
 			if(!open_) return false;
 			FRESULT ret;
@@ -541,7 +549,7 @@ namespace utils {
 			@return ファイル位置
 		*/
 		//-----------------------------------------------------------------//
-		FSIZE_t tell() const noexcept
+		FSIZE tell() const noexcept
 		{
 			if(!open_) return 0;
 			return f_tell(&fp_);
@@ -576,7 +584,7 @@ namespace utils {
 			@return ファイルサイズ
 		*/
 		//-----------------------------------------------------------------//
-		FSIZE_t get_file_size() const noexcept
+		FSIZE get_file_size() const noexcept
 		{
 			if(!open_) return 0;
 			return f_size(&fp_);

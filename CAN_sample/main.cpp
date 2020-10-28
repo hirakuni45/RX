@@ -98,11 +98,10 @@ namespace {
 	};
 
 	typedef device::can_io<device::CAN0, CAN0_PORT, can_task> CAN0;
-	typedef device::can_io<device::CAN1, CAN1_PORT, can_task> CAN1;
-
 	CAN0	can0_;
 
 #ifdef LOOP
+	typedef device::can_io<device::CAN1, CAN1_PORT, can_task> CAN1;
 	CAN1	can1_;
 
 	uint32_t	cur_ch_;
@@ -448,17 +447,19 @@ int main(int argc, char** argv)
 		if(!can0_.start(CAN::SPEED::_1M, prop, intr)) {
 			utils::format("Can't start CAN0...\n");
 		} else {
-			utils::format("CAN0: SPEED: %u [bps], BRP: %u, TSEG1: %u, TSEG2: %u\n")
+			utils::format("CAN0: SPEED: %u [bps], BRP: %u, TSEG1: %u, TSEG2: %u, SJW: %u\n")
 				% can0_.get_speed()
-				% can0_.get_bcr_brp() % can0_.get_bcr_tseg1() % can0_.get_bcr_tseg2();
+				% can0_.get_bcr_brp() % can0_.get_bcr_tseg1() % can0_.get_bcr_tseg2()
+				% can0_.get_bcr_sjw();
 		}
 #ifdef LOOP
 		if(!can1_.start(CAN::SPEED::_1M, prop, intr)) {
 			utils::format("Can't start CAN1...\n");
 		} else {
-			utils::format("CAN1: SPEED: %u [bps], BRP: %u, TSEG1: %u, TSEG2: %u\n")
+			utils::format("CAN1: SPEED: %u [bps], BRP: %u, TSEG1: %u, TSEG2: %u, SJW: %u\n")
 				% can1_.get_speed()
-				% can1_.get_bcr_brp() % can1_.get_bcr_tseg1() % can1_.get_bcr_tseg2();
+				% can1_.get_bcr_brp() % can1_.get_bcr_tseg1() % can1_.get_bcr_tseg2()
+				% can1_.get_bcr_sjw();
 		}
 #endif
 	}
