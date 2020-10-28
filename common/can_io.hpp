@@ -319,7 +319,7 @@ namespace device {
 			uint32_t brp = get_can_clock_() / (static_cast<uint32_t>(speed) * tq);
 			uint32_t tseg1 = 16;
 			uint32_t tseg2 = 8;
-			uint32_t sjw = 1;  // とりあえず固定
+			uint32_t sjw = 4;  // とりあえず固定
 			// TSEG1(4 to 16) > TSEG2(2 to 8) ≧ SJW(1 to 4)
 			// TQ = 1 + TSEG1 + TSEG2;
 			// 上記の関係性から、それぞれ選択
@@ -347,20 +347,19 @@ namespace device {
 					return false;
 				}
 			}
+			// • SJW (リシンクロナイゼーションジャンプ幅)：
+			// フェーズエラーによっておこる位相誤差を補償するために、
+			// タイムセグメントを延長または短縮する長さです。
+			if(sjw >= tseg2) sjw = tseg2 - 1;  // SJW はなるべく大きい値にする。 
 
 			// format("BRP: %u, TSEG1: %u, TESG2: %u\n") % brp % tseg1 % tseg2;
 			CAN::CTLR.SLPM = 0;  // BCR レジスタを設定するので、スリープモードを解除
 			CAN::BCR = CAN::BCR.TSEG1.b(tseg1 - 1) | CAN::BCR.TSEG2.b(tseg2 - 1)
 				| CAN::BCR.BRP.b(brp - 1) | CAN::BCR.SJW.b(sjw - 1) | CAN::BCR.CCLKS.b(EXTAL);
 
-			CAN::MKR0 = 0;
-			CAN::MKR1 = 0;
-			CAN::MKR2 = 0;
-			CAN::MKR3 = 0;
-			CAN::MKR4 = 0;
-			CAN::MKR5 = 0;
-			CAN::MKR6 = 0;
-			CAN::MKR7 = 0;
+			for(uint32_t i = 0; i < 8; ++i) {
+				CAN::MKR[i] = 0;
+			}
 			CAN::MKIVLR = 0;  // マスク有効
 
 			CAN::MIER = 0;  // 割り込み許可
