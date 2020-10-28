@@ -1773,7 +1773,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30> CLR30;
 			bit_rw_t <io_, bitpos::B31> CLR31;
 		};
-		static gcrbe0_t<0x00087680> GCRBE0;
+		typedef gcrbe0_t<0x00087680> GCRBE0_;
+		static GCRBE0_ GCRBE0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -2026,6 +2027,8 @@ namespace device {
 	template<class _> typename icu_t<_>::GENBL1_ icu_t<_>::GENBL1;
 	template<class _> typename icu_t<_>::GENAL0_ icu_t<_>::GENAL0;
 	template<class _> typename icu_t<_>::GENAL1_ icu_t<_>::GENAL1;
+
+	template<class _> typename icu_t<_>::GCRBE0_ icu_t<_>::GCRBE0;
 
 	template<class _> typename icu_t<_>::SLIBR_ icu_t<_>::SLIBR;
 	template<class _> typename icu_t<_>::SLIAR_ icu_t<_>::SLIAR;

@@ -1387,10 +1387,14 @@ namespace device {
 					グループ AL0/1 割り込み要求レジスタ（GRPAL0/GRPAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static grp_t<0x00087600> GRPBE0;
-		static grp_t<0x00087630> GRPBL0;
-		static grp_t<0x00087634> GRPBL1;
-		static grp_t<0x00087830> GRPAL0;
+		typedef grp_t<0x00087600> GRPBE0_;
+		static GRPBE0_ GRPBE0;
+		typedef grp_t<0x00087630> GRPBL0_;
+		static GRPBL0_ GRPBL0;
+		typedef grp_t<0x00087634> GRPBL1_;
+		static GRPBL1_ GRPBL1;
+		typedef grp_t<0x00087830> GRPAL0_;
+		static GRPAL0_ GRPAL0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1452,10 +1456,14 @@ namespace device {
 					グループ AL0/1 割り込み要求許可レジスタ（GENAL0/GENAL1）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static gen_t<0x00087640> GENBE0;
-		static gen_t<0x00087670> GENBL0;
-		static gen_t<0x00087674> GENBL1;
-		static gen_t<0x00087870> GENAL0;
+		typedef gen_t<0x00087640> GENBE0_;
+		static GENBE0_ GENBE0;
+		typedef gen_t<0x00087670> GENBL0_;
+		static GENBL0_ GENBL0;
+		typedef gen_t<0x00087674> GENBL1_;
+		static GENBL1_ GENBL1;
+		typedef gen_t<0x00087870> GENAL0_;
+		static GENAL0_ GENAL0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1508,7 +1516,8 @@ namespace device {
 			bit_rw_t <io_, bitpos::B30> CLR30;
 			bit_rw_t <io_, bitpos::B31> CLR31;
 		};
-		static gcrbe0_t<0x00087680> GCRBE0;
+		typedef gcrbe0_t<0x00087680> GCRBE0_;
+		static GCRBE0_ GCRBE0;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -1620,6 +1629,18 @@ namespace device {
 	template<class _> typename icu_t<_>::IR_ icu_t<_>::IR;
 	template<class _> typename icu_t<_>::IER_ icu_t<_>::IER;
 	template<class _> typename icu_t<_>::IPR_ icu_t<_>::IPR;
+
+	template<class _> typename icu_t<_>::GRPBE0_ icu_t<_>::GRPBE0;
+	template<class _> typename icu_t<_>::GRPBL0_ icu_t<_>::GRPBL0;
+	template<class _> typename icu_t<_>::GRPBL1_ icu_t<_>::GRPBL1;
+	template<class _> typename icu_t<_>::GRPAL0_ icu_t<_>::GRPAL0;
+
+	template<class _> typename icu_t<_>::GENBE0_ icu_t<_>::GENBE0;
+	template<class _> typename icu_t<_>::GENBL0_ icu_t<_>::GENBL0;
+	template<class _> typename icu_t<_>::GENBL1_ icu_t<_>::GENBL1;
+	template<class _> typename icu_t<_>::GENAL0_ icu_t<_>::GENAL0;
+
+	template<class _> typename icu_t<_>::GCRBE0_ icu_t<_>::GCRBE0;
 
 	template<class _> typename icu_t<_>::SLIAR_ icu_t<_>::SLIAR;
 }
