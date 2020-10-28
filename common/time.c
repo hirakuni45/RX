@@ -122,6 +122,54 @@ time_t get_timezone_offset(void)
 
 //-----------------------------------------------------------------//
 /*!
+	@brief	世界標準時間（グリニッジ）から、tm 構造体のメンバー
+			を生成する。（スタティック構造体を使わない）
+	@param[in]	tp
+	@param[out]	res
+	@return		構造体のポインター
+*/
+//-----------------------------------------------------------------//
+struct tm *gmtime_r(const time_t *tp, struct tm* res)
+{
+//	if(res == NULL) return NULL;
+
+	uint32_t t = (uint32_t)(*tp);
+
+	res->tm_sec  = t % 60;
+	t /= 60;
+
+	res->tm_min  = t % 60;
+	t /= 60;
+
+	res->tm_hour = t % 24;
+	t /= 24;
+
+	res->tm_wday = (t + 4) % 7;
+
+	short i;
+	short j = 1970;
+	while(t >= (i = get_yday(j))) {
+		t -= i;
+		j++;
+	}
+	res->tm_year = j - 1900;
+
+	res->tm_yday = t;
+
+	short k = 0;
+	while(t >= (i = get_mday(j, k))) {
+		t -= i;
+		k++;
+	}
+	res->tm_mon = k;
+	res->tm_mday = t + 1;
+
+	return res;
+}
+
+
+//-----------------------------------------------------------------//
+/*!
 	@brief	グリニッジ標準時への変換
 	@param[in]	timer 
 	@return		グローバル tm 構造体のポインター
@@ -129,40 +177,7 @@ time_t get_timezone_offset(void)
 //-----------------------------------------------------------------//
 struct tm *gmtime(const time_t *tp)
 {
-	uint32_t t;
-	short	i, j, k;
-
-	t = (uint32_t)(*tp);
-
-	time_st_.tm_sec  = t % 60;
-	t /= 60;
-
-	time_st_.tm_min  = t % 60;
-	t /= 60;
-
-	time_st_.tm_hour = t % 24;
-	t /= 24;
-
-	time_st_.tm_wday = (t + 4) % 7;
-
-	j = 1970;
-	while(t >= (i = get_yday(j))) {
-		t -= i;
-		j++;
-	}
-	time_st_.tm_year = j - 1900;
-
-	time_st_.tm_yday = t;
-
-	k = 0;
-	while(t >= (i = get_mday(j, k))) {
-		t -= i;
-		k++;
-	}
-	time_st_.tm_mon = k;
-	time_st_.tm_mday = t + 1;
-
-	return &time_st_;
+	return gmtime_r(tp, &time_st_);
 }
 
 
