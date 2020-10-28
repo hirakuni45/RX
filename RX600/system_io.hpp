@@ -33,14 +33,16 @@ namespace device {
 		@brief  systen_io クラス @n
 				INTR_CLOCK は、内部 PLL で扱える最大速度です、@n
 				外部クリスタルを微妙な周波数にする場合、その整数倍にしなければなりません。@n
-		@param[in]	BASE_CLOCK	ベース・クロック周波数（１２ＭＨｚ）
+		@param[in]	BASE_CLOCK_	ベース・クロック周波数（１２ＭＨｚ）
 		@param[in]	INTR_CLOCK	内臓クロック周波数（２４０ＭＨｚ）@n
 								※USB を使う場合、「INTR_CLOCK」は48の倍数である事
-		@param[in]	EXT_CLOCK	外部クロックに入力を行う場合「true」
+		@param[in]	EXT_CLOCK	外部クロック入力を行う場合「true」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t BASE_CLOCK = 12'000'000, uint32_t INTR_CLOCK = 240'000'000, bool EXT_CLOCK = false>
+	template <uint32_t BASE_CLOCK_ = 12'000'000, uint32_t INTR_CLOCK = 240'000'000, bool EXT_CLOCK = false>
 	struct system_io {
+
+		static const uint32_t BASE_CLOCK = BASE_CLOCK_;
 
 		static uint8_t clock_div_(uint32_t clk) noexcept
 		{

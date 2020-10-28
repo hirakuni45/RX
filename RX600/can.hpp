@@ -183,6 +183,17 @@ namespace device {
 			bit_rw_t <io_, bitpos::B29>  MB29;
 			bit_rw_t <io_, bitpos::B30>  MB30;
 			bit_rw_t <io_, bitpos::B31>  MB31;
+
+			void set(uint32_t idx) {
+				auto v = rd32_(io_::address());
+				v |= 1 << idx;
+				wr32_(io_::address(), v);
+			}
+
+			bool get(uint32_t idx) {
+				auto v = rd32_(io_::address());
+				return (v & (1 << idx)) != 0;
+			}
 		};
 		typedef mbn_t<base + 0x0228> MKIVLR_;
 		static  MKIVLR_ MKIVLR;
@@ -196,6 +207,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		struct mb_t {
+
 			uint32_t get0(uint32_t j) { return rd32_(base + 16 * j +  0); }
 			uint32_t get1(uint32_t j) { return rd32_(base + 16 * j +  4); }
 			uint32_t get2(uint32_t j) { return rd32_(base + 16 * j +  8); }
@@ -225,18 +237,19 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  メッセージ制御レジスタ j（ MCTLj ）（ j ＝ 0 ～ 31 ）
+			@brief  メッセージ制御レジスタ j（ MCTL[j] ）（ j ＝ 0 ～ 31 ）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
-#if 0
 		template <uint32_t ofs>
-		struct mctl_t : public rw8_t<ofs> {
-			typedef rw8_t<ofs> io_;
+		struct mctl_t : public rw8_index_t<ofs> {
+			typedef rw8_index_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
+
+			void set_index(uint32_t j) { if(j < 32) { io_::index = j; } }
 
 			bit_rw_t <io_, bitpos::B0>  SENTDATA;  // Send mode
 			bit_rw_t <io_, bitpos::B0>  NEWDATA;   // Recv mode
@@ -249,19 +262,15 @@ namespace device {
 
 			bit_rw_t <io_, bitpos::B6>  RECREQ;
 			bit_rw_t <io_, bitpos::B7>  TRMREQ;
+
+			mctl_t& operator [] (uint32_t idx)
+			{
+				set_index(idx);
+				return *this;
+			}
 		};
 		typedef mctl_t<base + 0x0620> MCTL_;
 		static  MCTL_ MCTL;
-#endif
-		struct mctl_t {
-
-
-			volatile uint8_t& operator [] (uint32_t idx) {
-				return *reinterpret_cast<volatile uint8_t*>(base + 0x0620 + idx);
-			}
-		};
-		typedef mctl_t MCTL_;
-		static MCTL_ MCTL;
 
 
 		//-----------------------------------------------------------------//
