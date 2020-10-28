@@ -30,6 +30,7 @@ namespace gui {
 		enum class ID : uint8_t {
 			GROUP,		///< グループ
 			FRAME,		///< フレーム
+			DIALOG,		///< ダイアログ
 			BUTTON,		///< ボタン
 			CHECK,		///< チェック・ボタン
 			RADIO,		///< ラジオ・ボタン
