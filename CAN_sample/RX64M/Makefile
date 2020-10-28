@@ -1,8 +1,9 @@
+# -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
 #   @brief  RX64M Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
@@ -11,8 +12,9 @@ TARGET		=	can_sample
 DEVICE		=	R5F564MF
 
 BUILD		=	release
+# BUILD		=	debug
 
-VPATH		=	../
+VPATH		=	../../
 
 ASOURCES	=	common/start.s
 
@@ -20,25 +22,49 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	main.cpp \
-				common/stdapi.cpp
+PSOURCES	=	CAN_sample/main.cpp
 
+USER_LIBS	=
 
-USER_LIBS	=	supc++
-
-LDSCRIPT	=	../RX64M/$(DEVICE).ld
+LDSCRIPT	=	../../RX64M/$(DEVICE).ld
 
 USER_DEFS	=	SIG_RX64M \
 				F_ICLK=120000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000
-MCU_TARGET	=	
 
-INC_SYS		=
+# Renesas GNU-RX gcc compiler version check
+TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
-INC_APP		=	. ../ ../RX64M
+ifeq ($(TARGET_ISA_TEXT), )
+# gcc-7.5.0 current gcc source build
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
+else # Renesas GNU-RX gcc
+CC_DEFS		=	-misa=v2
+CP_DEFS		=	-misa=v2
+endif
 
-OPTIMIZE	=	-O3
+# Include path for each environment
+ifeq ($(OS),Windows_NT)
+SYSTEM := WIN
+LOCAL_PATH  =   /mingw64
+else
+  UNAME := $(shell uname -s)
+  ifeq ($(UNAME),Linux)
+    SYSTEM := LINUX
+    LOCAL_PATH = /usr/local
+  endif
+  ifeq ($(UNAME),Darwin)
+    SYSTEM := OSX
+    OSX_VER := $(shell sw_vers -productVersion | sed 's/^\([0-9]*.[0-9]*\).[0-9]*/\1/')
+    LOCAL_PATH = /opt/local
+  endif
+endif
+
+INC_SYS     =   $(LOCAL_PATH)/include
+
+INC_APP		=	. ../ ../../
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
@@ -48,6 +74,18 @@ CP_OPT		=	-Wall -Werror \
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-fno-exceptions
+
+ifeq ($(BUILD),debug)
+    CC_OPT += -g -DDEBUG
+    CP_OPT += -g -DDEBUG
+	OPTIMIZE = -O0
+endif
+
+ifeq ($(BUILD),release)
+    CC_OPT += -DNDEBUG
+    CP_OPT += -DNDEBUG
+	OPTIMIZE = -O3
+endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
 APPINCS		=	$(addprefix -I, $(INC_APP))
@@ -68,17 +106,9 @@ OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
 
-# AFLAGS        = -Wa,-adhlns=$(<:.s=.lst),-gstabs
-# AFLAGS        =	-Wa,-adhlns=$(<:.s=.lst)
-# ALL_ASFLAGS    = -x assembler-with-cpp $(ASFLAGS) $(DEFS)
-ALL_ASFLAGS    = $(AFLAGS) $(MCU_TARGET) $(DEFS)
-
-# Override is only needed by avr-lib build system.
-
-CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-PFLAGS		=	-std=c++14 $(CP_OPT) $(OPTIMIZE) $(MCU_TARGET) $(DEFS)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,-fdata-sections,-ffunction-sections,-falign-jumps,-fno-function-cse,-funit-at-a-time --select-lib=newlib -T $(LDSCRIPT)
-# override LDFLAGS	= $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map,--cref,--gc-sections -T $(LDSCRIPT)
+AFLAGS		=	$(AS_OPT) $(AS_DEFS)
+CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
+PFLAGS		=	-std=c++17 $(CP_OPT) $(OPTIMIZE) $(CP_DEFS) $(DEFS)
 
 override LDFLAGS = $(MCU_TARGET) -nostartfiles -Wl,-Map,$(TARGET).map -T $(LDSCRIPT)
 
@@ -166,6 +196,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -P COM11 -d RX64M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

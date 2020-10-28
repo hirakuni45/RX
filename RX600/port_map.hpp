@@ -487,33 +487,33 @@ namespace device {
 				{
 					uint8_t sel = enable ? 0b010000 : 0;
 					PORT3::PMR.B2 = 0;
-					MPC::P32PFS.PSEL = sel;  // CTX0 (P32 LQFP176: 29)
-					PORT3::PMR.B2 = 1;
 					PORT3::PMR.B3 = 0;
+					MPC::P32PFS.PSEL = sel;  // CTX0 (P32 LQFP176: 29)
 					MPC::P33PFS.PSEL = sel;  // CRX0 (P33 LQFP176: 28)
-					PORT3::PMR.B3 = 1;
+					PORT3::PMR.B2 = enable;
+					PORT3::PMR.B3 = enable;
 				}
 				break;
 			case peripheral::CAN1:
 				{
 					uint8_t sel = enable ? 0b010000 : 0;
 					PORT1::PMR.B4 = 0;
-					MPC::P14PFS.PSEL = sel;  // CTX1    (P14 LQFP176: 51)
-					PORT1::PMR.B4 = 1;
 					PORT1::PMR.B5 = 0;
+					MPC::P14PFS.PSEL = sel;  // CTX1    (P14 LQFP176: 51)
 					MPC::P15PFS.PSEL = sel;  // CRX1-DS (P15 LQFP176: 50)
-					PORT1::PMR.B5 = 1;
+					PORT1::PMR.B4 = enable;
+					PORT1::PMR.B5 = enable;
 				}
 				break;
 			case peripheral::CAN2:
 				{
 					uint8_t sel = enable ? 0b010000 : 0;
 					PORT6::PMR.B6 = 0;
-					MPC::P66PFS.PSEL = sel;  // CTX2 (P66 LQFP176: 122)
-					PORT6::PMR.B6 = 1;
 					PORT6::PMR.B7 = 0;
+					MPC::P66PFS.PSEL = sel;  // CTX2 (P66 LQFP176: 122)
 					MPC::P67PFS.PSEL = sel;  // CRX2 (P67 LQFP176: 120)
-					PORT6::PMR.B7 = 1;
+					PORT6::PMR.B6 = enable;
+					PORT6::PMR.B7 = enable;
 				}
 				break;
 
@@ -779,11 +779,11 @@ namespace device {
 				{
 					uint8_t sel = enable ? 0b010000 : 0;
 					PORTD::PMR.B1 = 0;
-					MPC::PD1PFS.PSEL = sel;  // CTX0 (PD1 LQFP176: 156)
-					PORTD::PMR.B1 = 1;
 					PORTD::PMR.B2 = 0;
+					MPC::PD1PFS.PSEL = sel;  // CTX0 (PD1 LQFP176: 156)
 					MPC::PD2PFS.PSEL = sel;  // CRX0 (PD2 LQFP176: 154)
-					PORTD::PMR.B2 = 1;
+					PORTD::PMR.B1 = enable;
+					PORTD::PMR.B2 = enable;
 				}
 				break;
 

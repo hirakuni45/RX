@@ -1,18 +1,20 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX66T Makefile
+#   @brief  RX72N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
 TARGET		=	can_sample
 
-DEVICE		=	R5F566TE
+DEVICE		=	R5F572NN
 
-# BUILD		=	release
-BUILD		=	debug
+FATFS_VER	=	ff13c/source
+
+BUILD		=	release
+# BUILD		=	debug
 
 VPATH		=	../../
 
@@ -24,14 +26,14 @@ CSOURCES	=	common/init.c \
 
 PSOURCES	=	CAN_sample/main.cpp
 
-USER_LIBS	=
+USER_LIBS	=	supc++
 
-LDSCRIPT	=	../../RX66T/$(DEVICE).ld
+LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX66T \
-				F_ICLK=160000000 \
-				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKC=160000000 F_PCLKD=40000000 \
-				F_FCLK=40000000 F_BCLK=40000000
+USER_DEFS	=	SIG_RX72N \
+				F_ICLK=240000000 \
+				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
+				F_FCLK=60000000 F_BCLK=120000000
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
@@ -40,7 +42,7 @@ ifeq ($(TARGET_ISA_TEXT), )
 # gcc-7.5.0 current gcc source build
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
-else # Renesas GNU-RX gcc-8.3.0
+else # Renesas GNU-RX gcc
 CC_DEFS		=	-misa=v3
 CP_DEFS		=	-misa=v3
 endif
@@ -62,9 +64,11 @@ else
   endif
 endif
 
-INC_SYS		=
+INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../../
+INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
+
+LIB_ROOT	=	../../RX600/drw2d
 
 AS_OPT		=	-mcpu=rx600
 
@@ -198,6 +202,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX66T --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)
