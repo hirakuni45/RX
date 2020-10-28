@@ -11,8 +11,8 @@ TARGET		=	can_sample
 
 DEVICE		=	R5F566TE
 
-BUILD		=	release
-# BUILD		=	debug
+# BUILD		=	release
+BUILD		=	debug
 
 VPATH		=	../../
 
