@@ -98,11 +98,10 @@ namespace {
 	};
 
 	typedef device::can_io<device::CAN0, CAN0_PORT, can_task> CAN0;
-	typedef device::can_io<device::CAN1, CAN1_PORT, can_task> CAN1;
-
 	CAN0	can0_;
 
 #ifdef LOOP
+	typedef device::can_io<device::CAN1, CAN1_PORT, can_task> CAN1;
 	CAN1	can1_;
 
 	uint32_t	cur_ch_;
