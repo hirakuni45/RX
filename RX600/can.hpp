@@ -79,37 +79,46 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  マスクレジスタ k （ MKRk ）（ k = 0 ～ 7 ）
+			@brief  マスクレジスタ k （ MKR[k] ）（ k = 0 ～ 7 ）
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
 		template <uint32_t ofs>
-		struct mkrk_t : public rw32_t<ofs> {
-			typedef rw32_t<ofs> io_;
+		struct mkr_t : public rw32_index_t<ofs> {
+			typedef rw32_index_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
 
+			void set_index(uint32_t j) { if(j < 8) { io_::index = j * 4; } }
+
 			bits_rw_t<io_, bitpos::B0,  18>  EID;
 			bits_rw_t<io_, bitpos::B18, 11>  SID;
+
+			mkr_t& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
 		};
-		typedef mkrk_t<base + 0x0200> MKR0_;
-		static  MKR0_ MKR0;
-		typedef mkrk_t<base + 0x0204> MKR1_;
+		typedef mkr_t<base + 0x0200> MKR_;
+		static  MKR_ MKR;
+#if 0
+		typedef mkr_t<base + 0x0204> MKR1_;
 		static  MKR1_ MKR1;
-		typedef mkrk_t<base + 0x0208> MKR2_;
+		typedef mkr_t<base + 0x0208> MKR2_;
 		static  MKR2_ MKR2;
-		typedef mkrk_t<base + 0x020C> MKR3_;
+		typedef mkr_t<base + 0x020C> MKR3_;
 		static  MKR3_ MKR3;
-		typedef mkrk_t<base + 0x0210> MKR4_;
+		typedef mkr_t<base + 0x0210> MKR4_;
 		static  MKR4_ MKR4;
-		typedef mkrk_t<base + 0x0214> MKR5_;
+		typedef mkr_t<base + 0x0214> MKR5_;
 		static  MKR5_ MKR5;
-		typedef mkrk_t<base + 0x0218> MKR6_;
+		typedef mkr_t<base + 0x0218> MKR6_;
 		static  MKR6_ MKR6;
-		typedef mkrk_t<base + 0x021C> MKR7_;
+		typedef mkr_t<base + 0x021C> MKR7_;
 		static  MKR7_ MKR7;
+#endif
 
 
 		//-----------------------------------------------------------------//
@@ -559,7 +568,8 @@ namespace device {
 	};
 	template <uint32_t base, peripheral per> typename can_t<base, per>::CTLR_ can_t<base, per>::CTLR;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::BCR_ can_t<base, per>::BCR;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR0_ can_t<base, per>::MKR0;
+	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR_ can_t<base, per>::MKR;
+#if 0
 	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR1_ can_t<base, per>::MKR1;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR2_ can_t<base, per>::MKR2;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR3_ can_t<base, per>::MKR3;
@@ -567,6 +577,7 @@ namespace device {
 	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR5_ can_t<base, per>::MKR5;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR6_ can_t<base, per>::MKR6;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR7_ can_t<base, per>::MKR7;
+#endif
 	template <uint32_t base, peripheral per> typename can_t<base, per>::FIDCR0_ can_t<base, per>::FIDCR0;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::FIDCR1_ can_t<base, per>::FIDCR1;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::MKIVLR_ can_t<base, per>::MKIVLR;
