@@ -84,24 +84,25 @@ namespace {
 	volatile uint32_t send_tic_;
 	volatile uint32_t recv_tic_;
 
-	class can_task {
+	class rx_task {
 	public:
-		void operator () (device::peripheral per, CAN::INTR_TYPE it)
+		void operator () (device::peripheral per, uint32_t mbi)
 		{
-			if(it == CAN::INTR_TYPE::TXM) {
-				++send_tic_;
-			}
-			if(it == CAN::INTR_TYPE::RXM) {
-				++recv_tic_;
-			}
 		}
 	};
 
-	typedef device::can_io<device::CAN0, CAN0_PORT, can_task> CAN0;
+	class tx_task {
+	public:
+		void operator () (device::peripheral per, uint32_t mbi)
+		{
+		}
+	};
+
+	typedef device::can_io<device::CAN0, CAN0_PORT, rx_task, tx_task> CAN0;
 	CAN0	can0_;
 
 #ifdef LOOP
-	typedef device::can_io<device::CAN1, CAN1_PORT, can_task> CAN1;
+	typedef device::can_io<device::CAN1, CAN1_PORT, rx_task, tx_task> CAN1;
 	CAN1	can1_;
 
 	uint32_t	cur_ch_;
@@ -172,7 +173,7 @@ namespace {
 	}
 
 
-	void command_()
+	void legacy_command_()
 	{
 		if(!cmd_.service()) {
 			return;
@@ -211,26 +212,8 @@ namespace {
 #endif			
 		} else if(cmd_.cmp_word(0, "ext")) { // ext-id mode
 			ext_id_ = true;
-#ifdef LOOP
-			if(cur_ch_ == 0) {
-				can0_.enable_ext();
-			} else if(cur_ch_ == 1) {
-				can1_.enable_ext();
-			}
-#else
-			can0_.enable_ext();
-#endif
 		} else if(cmd_.cmp_word(0, "std")) { // std-id mode
 			ext_id_ = false;
-#ifdef LOOP
-			if(cur_ch_ == 0) {
-				can0_.enable_ext(false);
-			} else if(cur_ch_ == 1) {
-				can1_.enable_ext(false);
-			}
-#else
-			can0_.enable_ext(false);
-#endif
 		} else if(cmd_.cmp_word(0, "reset")) { // reset MB
 			if(cmdn == 2) {
 				char tmp[64];
@@ -318,12 +301,12 @@ namespace {
 					if(!error) {
 #ifdef LOOP
 						if(cur_ch_ == 0) {
-							can0_.put_frame(idx, f);
+							can0_.set_mb(idx, f);
 						} else if(cur_ch_ == 1) {
-							can1_.put_frame(idx, f);
+							can1_.set_mb(idx, f);
 						}
 #else
-						can0_.put_frame(idx, f);
+						can0_.set_mb(idx, f);
 #endif
 					}
 				}
@@ -336,18 +319,14 @@ namespace {
 				if(!(utils::input("%a", tmp) % idx).status()) {
 					error = true;
 				} else {
-					CAN::frame f;
 #ifdef LOOP
 					if(cur_ch_ == 0) {
-						can0_.get_frame(idx, f);
-						f.list();
+						can0_.list(idx);
 					} else if(cur_ch_ == 1) {
-						can1_.get_frame(idx, f);
-						f.list();
+						can1_.list(idx);
 					}
 #else
-					can0_.get_frame(idx, f);
-					f.list();
+					can0_.list(idx);
 #endif
 				}				
 			}
@@ -476,7 +455,7 @@ int main(int argc, char** argv)
 	while(1) {
 		cmt_.sync();
 
-		command_();
+		legacy_command_();
 
 		if(send_tic != send_tic_) {
 			utils::format("Send OK.\n");
