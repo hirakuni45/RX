@@ -79,7 +79,8 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  マスクレジスタ k （ MKR[k] ）（ k = 0 ～ 7 ）
+			@brief  マスクレジスタ k （ MKR[k] ）（ k = 0 ～ 7 ）@n
+					※MKR0 ～ 7 は廃止
 			@param[in]	ofs	オフセット
 		*/
 		//-----------------------------------------------------------------//
@@ -103,22 +104,6 @@ namespace device {
 		};
 		typedef mkr_t<base + 0x0200> MKR_;
 		static  MKR_ MKR;
-#if 0
-		typedef mkr_t<base + 0x0204> MKR1_;
-		static  MKR1_ MKR1;
-		typedef mkr_t<base + 0x0208> MKR2_;
-		static  MKR2_ MKR2;
-		typedef mkr_t<base + 0x020C> MKR3_;
-		static  MKR3_ MKR3;
-		typedef mkr_t<base + 0x0210> MKR4_;
-		static  MKR4_ MKR4;
-		typedef mkr_t<base + 0x0214> MKR5_;
-		static  MKR5_ MKR5;
-		typedef mkr_t<base + 0x0218> MKR6_;
-		static  MKR6_ MKR6;
-		typedef mkr_t<base + 0x021C> MKR7_;
-		static  MKR7_ MKR7;
-#endif
 
 
 		//-----------------------------------------------------------------//
@@ -210,26 +195,70 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  メールボックスレジスタ j （ MBj ）（ j = 0 ～ 31 ）@n
-					32 bits access
-			@param[in]	ofs	オフセット
+			@brief  メールボックスレジスタ j （ MB[j] ）（ j = 0 ～ 31 ）
 		*/
 		//-----------------------------------------------------------------//
 		struct mb_t {
+			typedef rw32_index_t<base +  0> io0_;
+			typedef rw8_index_t <base +  4 + 1> io1_;
+			typedef rw16_index_t<base + 12 + 2> io3_;
 
-			uint32_t get0(uint32_t j) { return rd32_(base + 16 * j +  0); }
-			uint32_t get1(uint32_t j) { return rd32_(base + 16 * j +  4); }
-			uint32_t get2(uint32_t j) { return rd32_(base + 16 * j +  8); }
-			uint32_t get3(uint32_t j) { return rd32_(base + 16 * j + 12); }
+			bits_rw_t<io0_, bitpos::B0,  18>  EID;
+			bits_rw_t<io0_, bitpos::B18, 11>  SID;
+			bit_rw_t <io0_, bitpos::B30>      RTR;
+			bit_rw_t <io0_, bitpos::B31>      IDE;
 
-			void set0(uint32_t j, uint32_t d) { wr32_(base + 16 * j +  0, d); }
-			void set1(uint32_t j, uint32_t d) { wr32_(base + 16 * j +  4, d); }
-			void set2(uint32_t j, uint32_t d) { wr32_(base + 16 * j +  8, d); }
-			void set3(uint32_t j, uint32_t d) { wr32_(base + 16 * j + 12, d); }
+			bits_rw_t<io1_, bitpos::B0, 4>    DLC;
 
-			volatile uint32_t& operator [] (uint32_t idx) {
-				return *reinterpret_cast<volatile uint32_t*>(base + idx * 4);
+			struct data_t {
+				volatile uint8_t& operator [] (uint32_t n) {
+					return *reinterpret_cast<volatile uint8_t*>(io0_::address() + 6 + n);
+				}
+			};
+			data_t	DATA;
+
+			io3_	TS;
+
+			void set_index(uint32_t j) {
+				if(j < 32) {
+					io0_::index = j * 16;
+					io1_::index = j * 16;
+					io3_::index = j * 16;
+				}
 			}
+
+			void clear(uint32_t d = 0) {
+				auto a = io0_::address();
+				wr32_(a,      d);
+				wr32_(a +  4, d);
+				wr32_(a +  8, d);
+				wr32_(a + 12, d);
+			}
+
+			uint32_t get_id() {
+				return SID() | (EID() << 11);
+			}
+
+			void set_id(uint32_t id) {
+				SID = id & 0x7ff;
+				EID = id >> 11;
+			}
+
+			void copy(uint32_t idx) {
+				wr32_(io0_::address() +  0, rd32_(base + idx * 16 +  0));
+				wr32_(io0_::address() +  4, rd32_(base + idx * 16 +  4));
+				wr32_(io0_::address() +  8, rd32_(base + idx * 16 +  8));
+				wr32_(io0_::address() + 12, rd32_(base + idx * 16 + 12));
+			}
+
+			mb_t& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
+
+		private:
+			void operator = (const mb_t& t) {
+			};
 		};
 		typedef mb_t MB_;
 		static  MB_ MB;
@@ -569,15 +598,6 @@ namespace device {
 	template <uint32_t base, peripheral per> typename can_t<base, per>::CTLR_ can_t<base, per>::CTLR;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::BCR_ can_t<base, per>::BCR;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR_ can_t<base, per>::MKR;
-#if 0
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR1_ can_t<base, per>::MKR1;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR2_ can_t<base, per>::MKR2;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR3_ can_t<base, per>::MKR3;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR4_ can_t<base, per>::MKR4;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR5_ can_t<base, per>::MKR5;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR6_ can_t<base, per>::MKR6;
-	template <uint32_t base, peripheral per> typename can_t<base, per>::MKR7_ can_t<base, per>::MKR7;
-#endif
 	template <uint32_t base, peripheral per> typename can_t<base, per>::FIDCR0_ can_t<base, per>::FIDCR0;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::FIDCR1_ can_t<base, per>::FIDCR1;
 	template <uint32_t base, peripheral per> typename can_t<base, per>::MKIVLR_ can_t<base, per>::MKIVLR;

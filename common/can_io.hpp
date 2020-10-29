@@ -3,7 +3,8 @@
 /*!	@file
 	@brief	RX グループ・CAN I/O 制御 @n
 			・CAN クロックは、正確に一致しない場合、エラーとなる。@n
-			・CAN ポートに、CAN バス・トランシーバーを接続する。
+			・CAN ポートに、CAN バス・トランシーバーを接続する。@n
+			・FIFO 機能は使わない。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -58,119 +59,33 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  フレーム構造体
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct frame {
+			uint32_t	id;
+			bool		ide;
+			bool		rtr;
+			uint8_t		dlc;
+			uint8_t		data[8];
+			uint16_t	ts;
+
+			frame() : id(0), ide(0), rtr(0), dlc(0), data{ 0 }, ts(0) { }
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  割り込み設定
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct interrupt_t {
 			uint8_t		error_level;	///< エラー割り込みレベル
-			uint8_t		rxf_level;		///< RXF 割り込みレベル
-			uint8_t		txf_level;		///< TXF 割り込みレベル
 			uint8_t		rxm_level;		///< RXM 割り込みレベル
 			uint8_t		txm_level;		///< TXM 割り込みレベル
 			interrupt_t() :
-				error_level(0), rxf_level(0), txf_level(0), rxm_level(0), txm_level(0)
+				error_level(0), rxm_level(0), txm_level(0)
 			{ }
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  CAN フレーム・クラス @n
-					・データフレームはデータ転送、DLC が０以外 @n
-					・リモートフレームは、データ転送要求フレーム、DLC が０
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct frame {
-
-			uint32_t	id;			// SID(11 bits) + EID(29 bits)
-
-			bool		rtr;		// RTR 0:データフレーム、1:リモートフレーム
-			bool		ide;		// IDE 0:標準 ID、1:拡張 ID
-
-			uint8_t		dlc;		// DLC 0 - 8 データ長コード
-			uint8_t		data[8];	// DATA0 - DATA8 データバイト
-			uint16_t	ts;			// TS タイムスタンプ
-
-			frame() noexcept : id(0), rtr(0), ide(0), data{ 0 }, ts(0)
-			{ }
-
-
-			//-------------------------------------------------------------//
-			/*!
-				@brief  メールボックス型から取得
-				@param[in]	src	ソース
-			*/
-			//-------------------------------------------------------------//
-			void get(volatile const uint32_t* src) noexcept
-			{
-				id = ((src[0] & 0x1ffc0000) >> 18) | (src[0] & 0x0003ffff) << 18;
-				rtr = (src[0] >> 30) & 1;
-				ide = (src[0] >> 31) & 1;
-				dlc = (src[1] >> 16) & 15;
-				data[0] = src[1] >> 8;
-				data[1] = src[1];
-				data[2] = src[2] >> 24;
-				data[3] = src[2] >> 16;
-				data[4] = src[2] >> 8;
-				data[5] = src[2];
-				data[6] = src[3] >> 24;
-				data[7] = src[3] >> 16;
-				ts = src[3];
-			}
-
-
-			//-------------------------------------------------------------//
-			/*!
-				@brief  メールボックス型へ設定
-				@param[in]	dst	先
-			*/
-			//-------------------------------------------------------------//
-			void put(volatile uint32_t* dst) const noexcept
-			{
-				dst[0] = (ide << 31) | (rtr << 30) | ((id & 0x7ff) << 18) | (id >> 18);
-				dst[1] = (dlc << 16) | (data[0] << 8) | data[1];
-				dst[2] = (data[2] << 24) | (data[3] << 16) | (data[4] << 8) | data[5];
-				dst[3] = (data[6] << 24) | (data[7] << 16) | ts;
-			}
-
-
-			//-------------------------------------------------------------//
-			/*!
-				@brief  フレーム内容表示
-			*/
-			//-------------------------------------------------------------//
-			void list() noexcept
-			{
-				if(ide) {
-					utils::format("ID: ext 0x%08X (%u)\n") % id % id;
-				} else {
-					utils::format("ID: std 0x%03X (%u)\n") % id % id;
-				}
-				if(!rtr) {  // data frame
-					utils::format("DATA(%u):") % static_cast<uint16_t>(dlc & 0xf);
-					for(uint8_t i = 0; i < (dlc & 0xf); ++i) {
-						utils::format(" %02X") % static_cast<uint16_t>(data[i]);
-					}
-					utils::format("\n");
-				} else {
-					utils::format("DATA(0):\n");
-				}
-				utils::format("TS: %u\n") % ts;
-			}		
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  割り込み型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class INTR_TYPE : uint8_t {
-			RXM,	///< RXM 割り込み型
-			TXM,	///< TXM 割り込み型
-			RXF,	///< RXF 割り込み型
-			TXF,	///< TXF 割り込み型
-			ERS,	///< ERS 割り込み型
 		};
 
 
@@ -185,10 +100,10 @@ namespace device {
 			/*!
 				@brief  ファンクタ定義
 				@param[in]	per		CAN ペリフェラル型
-				@param[in]	it		割り込み型
+				@param[in]	mbi		メールボックス番号
 			*/
 			//-------------------------------------------------------------//
-			void operator () (peripheral per, INTR_TYPE it) { }
+			void operator () (peripheral per, uint32_t mbi) { }
 		};
 
 
@@ -222,11 +137,10 @@ namespace device {
 		@param[in]	CAN		CAN 定義クラス
 		@param[in]	PSEL	ポート候補
 		@param[in]	ITASK	割り込みタスク
-		@param[in]	EXTAL	EXTAL クロックを選択する場合「true」
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class CAN, port_map::option PSEL = port_map::option::FIRST,
-		class ITASK = can_io_def::null_task, bool EXTAL = false>
+		class RX_TASK = can_io_def::null_task, class TX_TASK = can_io_def::null_task>
 	class can_io : public can_io_def {
 	public:
 
@@ -236,41 +150,24 @@ namespace device {
 		typedef utils::format		format;
 
 		MODE			mode_;
-		bool			ext_id_;
 
-		static ITASK	itask_;
+		static RX_TASK	rx_task_;
+		static TX_TASK	tx_task_;
 
 		void sleep_() const { asm("nop"); }
 
-		static INTERRUPT_FUNC void rxf_task_() {
-			itask_(CAN::PERIPHERAL, INTR_TYPE::RXF);
-		}
-
-		static INTERRUPT_FUNC void txf_task_() {
-			itask_(CAN::PERIPHERAL, INTR_TYPE::TXF);
-		}
-
 		static INTERRUPT_FUNC void rxm_task_() {
-			itask_(CAN::PERIPHERAL, INTR_TYPE::RXM);
+			uint32_t idx = 0;
+			rx_task_(CAN::PERIPHERAL, idx);
 		}
 
 		static INTERRUPT_FUNC void txm_task_() {
-			itask_(CAN::PERIPHERAL, INTR_TYPE::TXM);
+			uint32_t idx = 0;
+			tx_task_(CAN::PERIPHERAL, idx);
 		}
 
 		// ERS 割り込みは、グループ割り込みなので、通常関数とする
 		static void ers_task_() {
-			itask_(CAN::PERIPHERAL, INTR_TYPE::ERS);
-		}
-
-		static uint32_t get_can_clock_()
-		{
-			if(EXTAL) {
-				// 外部接続周波数を取得する機構が必要・・・
-				return 12'000'000;
-			} else {
-				return F_PCLKB;
-			}
 		}
 
 	public:
@@ -279,7 +176,7 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		can_io() noexcept : mode_(MODE::RESET), ext_id_(false) { }
+		can_io() noexcept : mode_(MODE::RESET) { }
 
 
 		//-----------------------------------------------------------------//
@@ -298,7 +195,7 @@ namespace device {
 			// より大きい値で適合した値を選択
 			uint32_t tq = 25;
 			while(1) {
-				if((get_can_clock_() % (static_cast<uint32_t>(speed) * tq)) == 0) {
+				if((F_PCLKB % (static_cast<uint32_t>(speed) * tq)) == 0) {
 					break;
 				}
 				tq--;
@@ -316,7 +213,7 @@ namespace device {
 			}
 
 			// 動作クロックの設定
-			uint32_t brp = get_can_clock_() / (static_cast<uint32_t>(speed) * tq);
+			uint32_t brp = F_PCLKB / (static_cast<uint32_t>(speed) * tq);
 			uint32_t tseg1 = 16;
 			uint32_t tseg2 = 8;
 			uint32_t sjw = 4;  // とりあえず固定
@@ -355,7 +252,7 @@ namespace device {
 			// format("BRP: %u, TSEG1: %u, TESG2: %u\n") % brp % tseg1 % tseg2;
 			CAN::CTLR.SLPM = 0;  // BCR レジスタを設定するので、スリープモードを解除
 			CAN::BCR = CAN::BCR.TSEG1.b(tseg1 - 1) | CAN::BCR.TSEG2.b(tseg2 - 1)
-				| CAN::BCR.BRP.b(brp - 1) | CAN::BCR.SJW.b(sjw - 1) | CAN::BCR.CCLKS.b(EXTAL);
+				| CAN::BCR.BRP.b(brp - 1) | CAN::BCR.SJW.b(sjw - 1) | CAN::BCR.CCLKS.b(0);
 
 			for(uint32_t i = 0; i < 8; ++i) {
 				CAN::MKR[i] = 0;
@@ -372,12 +269,6 @@ namespace device {
 				icu_mgr::install_group_task(CAN::ERS_VEC, ers_task_);
 			    CAN::EIER = CAN::EIER.ORIE.b(1);
 			}
-			if(intr.rxf_level > 0) {
-				icu_mgr::set_interrupt(CAN::RXF_VEC, rxf_task_, intr.rxf_level);
-			}
-			if(intr.txf_level > 0) {
-				icu_mgr::set_interrupt(CAN::TXF_VEC, txf_task_, intr.txf_level);
-			}
 			if(intr.rxm_level > 0) {
 				icu_mgr::set_interrupt(CAN::RXM_VEC, rxm_task_, intr.rxm_level);
 			}
@@ -392,8 +283,8 @@ namespace device {
 				| CAN::CTLR.BOM.b(bom);
 
 			// メールボックスをクリア
-			for(uint32_t i = 0; i < (4 * 32); ++i) {
-				CAN::MB[i] = 0;
+			for(uint32_t i = 0; i < 32; ++i) {
+				CAN::MB[i].clear();
 			}
 
 			// 受信 FIFO 開始
@@ -458,7 +349,7 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		uint32_t get_speed() const noexcept {
-			return get_can_clock_()
+			return F_PCLKB
 				/ (get_bcr_brp() * (1 + get_bcr_tseg1() + get_bcr_tseg2()));
 		}
 
@@ -483,54 +374,6 @@ namespace device {
 		uint8_t get_send_error_count() const noexcept {
 			return CAN::TECR();
 		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  フレームを取得
-			@param[in]	idx		メールボックス番号（０～３１）
-			@param[in]	dst		ディストネーションフレームの参照
-			@return 成功なら「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool get_frame(uint32_t idx, frame& dst) noexcept
-		{
-			if(idx < 32) {
-				dst.get(const_cast<const uint32_t*>(&CAN::MB[idx * 4]));
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  フレームを設定
-			@param[in]	idx		メールボックス番号（０～３１）
-			@param[in]	src		ソースフレームの参照
-			@return メールボックス
-			@return 成功なら「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool put_frame(uint32_t idx, const frame& src) noexcept
-		{
-			if(idx < 32) {
-				src.put(&CAN::MB[idx * 4]);
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  拡張 ID モードを有効にする
-			@param[in]	ena		無効なら「false」
-		*/
-		//-----------------------------------------------------------------//
-		void enable_ext(bool ena = true) noexcept { ext_id_ = ena; }
 
 
 		//-----------------------------------------------------------------//
@@ -609,6 +452,69 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  メールボックスを設定
+			@param[in]	idx		メールボックス番号（０～３１）
+			@param[in]	frm		フレーム
+		*/
+		//-----------------------------------------------------------------//
+		void set_mb(uint32_t idx, const frame& frm) noexcept
+		{
+			auto& mb = CAN::MB[idx];
+			mb.IDE = frm.ide;
+			mb.RTR = frm.rtr;
+			mb.set_id(frm.id);
+			mb.DLC = frm.dlc;
+			for(uint8_t i = 0; i < frm.dlc; ++i) {
+				mb.DATA[i] = frm.data[i];
+			}
+			mb.TS  = frm.ts;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  メールボックスの参照
+			@param[in]	idx		メールボックス番号（０～３１）
+			@return メールボックス
+		*/
+		//-----------------------------------------------------------------//
+		auto& at_mb(uint32_t idx) noexcept
+		{
+			return CAN::MB[idx];
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  メールボックスの表示
+			@param[in]	idx		メールボックス番号（０～３１）
+		*/
+		//-----------------------------------------------------------------//
+		void list(uint32_t idx) noexcept
+		{
+			auto& mb = CAN::MB[idx];
+			if(mb.IDE()) {
+				uint32_t id = mb.get_id();
+				utils::format("ID: ext 0x%08X (%u)\n") % id % id;
+			} else {
+				utils::format("ID: std 0x%03X (%u)\n") % mb.SID() % mb.SID();
+			}
+			if(!mb.RTR()) {  // data frame
+				auto dlc = mb.DLC();
+				utils::format("DATA(%u):") % dlc;
+				for(uint32_t i = 0; i < dlc; ++i) {
+					utils::format(" %02X") % static_cast<uint16_t>(mb.DATA[i]);
+				}
+				utils::format("\n");
+			} else {
+				utils::format("DATA(0):\n");
+			}
+			utils::format("TS: %u\n") % mb.TS();
+		}		
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  メールボックス制御の参照
 			@param[in]	idx		メールボックス番号（０～３１）
 			@return メールボックス制御
@@ -639,13 +545,24 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込み TASK クラスの参照
-			@return 割り込み TASK クラス
+			@brief  割り込み RX_TASK クラスの参照
+			@return 割り込み RX_TASK クラス
 		*/
 		//-----------------------------------------------------------------//
-		static ITASK& at_itask() noexcept { return itask_; }
+		static auto& at_rx_task() noexcept { return rx_task_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み TX_TASK クラスの参照
+			@return 割り込み TX_TASK クラス
+		*/
+		//-----------------------------------------------------------------//
+		static auto& at_tx_task() noexcept { return tx_task_; }
 	};
 
-	template <class CAN, port_map::option PSEL, class ITASK, bool EXTAL> ITASK
-		can_io<CAN, PSEL, ITASK, EXTAL>::itask_;
+	template <class CAN, port_map::option PSEL, class RX_TASK, class TX_TASK> RX_TASK
+		can_io<CAN, PSEL, RX_TASK, TX_TASK>::rx_task_;
+	template <class CAN, port_map::option PSEL, class RX_TASK, class TX_TASK> TX_TASK
+		can_io<CAN, PSEL, RX_TASK, TX_TASK>::tx_task_;
 }
