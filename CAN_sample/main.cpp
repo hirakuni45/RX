@@ -1,20 +1,21 @@
 //=====================================================================//
 /*! @file
     @brief  CAN サンプル @n
+			シリアルターミナルを接続して、対話式で、通信を行う @n
 			RX64M, RX71M: @n
 					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
-			RX65N (Renesas Envision kit RX65N): @n
-					12MHz のベースクロックを使用する @n
-			　　　　P70 に接続された LED を利用する @n
-			RX24T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
 			RX66T: @n
 					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する
+			　　　　P00 ピンにLEDを接続する @n
+			RX72N: (Renesas Envision kit RX72N) @n
+					16MHz のベースクロックを使用する @n
+					P40 ピンにLEDを接続する @n
+					SCI2 を使用する @n
+			「MULTI」を有効にするとマルチチャネルサポート @n
+			「LEGACY」モードの場合、メールボックス直接操作
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -32,6 +33,8 @@
 
 #include "common/command.hpp"
 
+// #define LEGACY
+
 namespace {
 
 #if defined(SIG_RX71M)
@@ -41,7 +44,7 @@ namespace {
 	typedef device::SCI1 SCI_CH;
 	static const auto CAN0_PORT = device::port_map::option::FIRST;
 	static const auto CAN1_PORT = device::port_map::option::FIRST;
-	#define LOOP
+	#define MULTI
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
 	typedef device::system_io<12000000> SYSTEM_IO;
@@ -49,7 +52,7 @@ namespace {
 	typedef device::SCI1 SCI_CH;
 	static const auto CAN0_PORT = device::port_map::option::FIRST;
 	static const auto CAN1_PORT = device::port_map::option::FIRST;
-	#define LOOP
+	#define MULTI
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N" };
 	typedef device::system_io<12000000> SYSTEM_IO;
@@ -78,31 +81,19 @@ namespace {
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
 
+	//
 	// CAN 関連定義
+	//
 	typedef device::can_io_def CAN;
 
-	volatile uint32_t send_tic_;
-	volatile uint32_t recv_tic_;
+	// CAN 受信バッファの定義
+	typedef utils::fixed_fifo<device::can_frame, 256> CAN_RXB;
 
-	class rx_task {
-	public:
-		void operator () (device::peripheral per, uint32_t mbi)
-		{
-		}
-	};
-
-	class tx_task {
-	public:
-		void operator () (device::peripheral per, uint32_t mbi)
-		{
-		}
-	};
-
-	typedef device::can_io<device::CAN0, CAN0_PORT, rx_task, tx_task> CAN0;
+	typedef device::can_io<device::CAN0, CAN_RXB, CAN0_PORT> CAN0;
 	CAN0	can0_;
 
-#ifdef LOOP
-	typedef device::can_io<device::CAN1, CAN1_PORT, rx_task, tx_task> CAN1;
+#ifdef MULTI
+	typedef device::can_io<device::CAN1, CAN_RXB, CAN1_PORT> CAN1;
 	CAN1	can1_;
 
 	uint32_t	cur_ch_;
@@ -114,66 +105,133 @@ namespace {
 	typedef utils::command<256> CMD;
 	CMD		cmd_;
 
-	void reset_(uint32_t idx)
+
+	bool get_cmd_id_(uint32_t i, uint32_t& id)
 	{
-#ifdef LOOP
-		if(cur_ch_ == 0) {
-			can0_.reset_box(idx);
-		} else if(cur_ch_ == 1) {
-			can1_.reset_box(idx);
+		uint32_t v = 0;
+		char tmp[64];
+		cmd_.get_word(1, tmp, sizeof(tmp));
+		if(!(utils::input("%a", tmp) % v).status()) {
+			utils::format("ID parse error: '%s'\n") % tmp;
+			return false;
+		} else {
+			id = v;
+			return true;
 		}
-#else
-		can0_.reset_box(idx);
-#endif
 	}
 
 
-	void recv_(uint32_t idx)
+	bool get_cmd_data_(uint32_t top, uint8_t* dst, uint32_t num)
 	{
-#ifdef LOOP
-		if(cur_ch_ == 0) {
-			can0_.recv_box(idx);
-		} else if(cur_ch_ == 1) {
-			can1_.recv_box(idx);
-		}
-#else
-		can0_.recv_box(idx);
-#endif
-	}
+		if(num > 8) num = 8;
 
-
-	void send_(uint32_t idx)
-	{
-#ifdef LOOP
-		if(cur_ch_ == 0) {
-			can0_.send_box(idx);
-		} else if(cur_ch_ == 1) {
-			can1_.send_box(idx);
+		for(uint32_t i = top; i < (top + num); ++i) {
+			char tmp[64];
+			cmd_.get_word(i, tmp, sizeof(tmp));
+			uint32_t val = 0;
+			if(!(utils::input("%a", tmp) % val).status()) {
+				utils::format("DATA parse error: '%s'\n") % tmp;
+				return false;
+			} else {
+				dst[i - top] = val;
+			}
 		}
-#else
-		can0_.send_box(idx);
-#endif
+		return true;
 	}
 
 
 	void stat_(uint32_t idx)
 	{
 		uint8_t ret = 0;
-#ifdef LOOP
+#ifdef MULTI
 		if(cur_ch_ == 0) {
-			ret = can0_.stat_box(idx);
+			ret = can0_.stat_mb(idx);
 		} else if(cur_ch_ == 1) {
-			ret = can1_.stat_box(idx);
+			ret = can1_.stat_mb(idx);
 		}
 #else
-		ret = can0_.stat_box(idx);
+		ret = can0_.stat_mb(idx);
 #endif
 		utils::format("MCTL: 0x%02X (0b%08b)\n")
 			% static_cast<uint16_t>(ret) % static_cast<uint16_t>(ret);
 	}
 
 
-	void legacy_command_()
+	void list_(uint32_t idx)
+	{
+#ifdef MULTI
+		if(cur_ch_ == 0) {
+			can0_.list_mb(idx);
+		} else if(cur_ch_ == 1) {
+			can1_.list_mb(idx);
+		}
+#else
+		can0_.list_mb(idx);
+#endif
+	}
+
+
+	void send_data_(uint32_t id, const uint8_t* src, uint32_t len)
+	{
+#ifdef MULTI
+		if(cur_ch_ == 0) {
+			can0_.send(id, src, len);
+		} else if(cur_ch_ == 1) {
+			can1_.send(id, src, len);
+		}
+#else
+		can0_.send(id, src, len);
+#endif
+	}
+
+
+#ifdef LEGACY
+
+	// 低レベル操作系
+
+	void reset_(uint32_t idx)
+	{
+#ifdef MULTI
+		if(cur_ch_ == 0) {
+			can0_.reset_mb(idx);
+		} else if(cur_ch_ == 1) {
+			can1_.reset_mb(idx);
+		}
+#else
+		can0_.reset_mb(idx);
+#endif
+	}
+
+
+	void recv_(uint32_t idx)
+	{
+#ifdef MULTI
+		if(cur_ch_ == 0) {
+			can0_.recv_mb(idx);
+		} else if(cur_ch_ == 1) {
+			can1_.recv_mb(idx);
+		}
+#else
+		can0_.recv_mb(idx);
+#endif
+	}
+
+
+	void send_(uint32_t idx)
+	{
+#ifdef MULTI
+		if(cur_ch_ == 0) {
+			can0_.send_mb(idx);
+		} else if(cur_ch_ == 1) {
+			can1_.send_mb(idx);
+		}
+#else
+		can0_.send_mb(idx);
+#endif
+	}
+
+
+	void command_()
 	{
 		if(!cmd_.service()) {
 			return;
@@ -198,7 +256,7 @@ namespace {
 			} else {
 				utils::format("ID: 0x%X (%d)\n") % cur_id_ % cur_id_;
 			}
-#ifdef LOOP
+#ifdef MULTI
 		} else if(cmd_.cmp_word(0, "ch")) { // set current channel
 			if(cmdn >= 2) {
 				char tmp[64];
@@ -299,7 +357,7 @@ namespace {
 						f.dlc = 0;
 					}
 					if(!error) {
-#ifdef LOOP
+#ifdef MULTI
 						if(cur_ch_ == 0) {
 							can0_.set_mb(idx, f);
 						} else if(cur_ch_ == 1) {
@@ -319,40 +377,32 @@ namespace {
 				if(!(utils::input("%a", tmp) % idx).status()) {
 					error = true;
 				} else {
-#ifdef LOOP
-					if(cur_ch_ == 0) {
-						can0_.list(idx);
-					} else if(cur_ch_ == 1) {
-						can1_.list(idx);
-					}
-#else
-					can0_.list(idx);
-#endif
+					list_(idx);
 				}				
 			}
 		} else if(cmd_.cmp_word(0, "state")) { // report state
 			utils::format("CAN0: Recv error: %u, Send error: %u\n")
 				% static_cast<uint16_t>(can0_.get_recv_error_count())
 				% static_cast<uint16_t>(can0_.get_send_error_count());
-#ifdef LOOP
+#ifdef MULTI
 			utils::format("CAN1: Recv error: %u, Send error: %u\n")
 				% static_cast<uint16_t>(can1_.get_recv_error_count())
 				% static_cast<uint16_t>(can1_.get_send_error_count());
 #endif
 		} else if(cmd_.cmp_word(0, "help")) { // help
-#ifdef LOOP
+#ifdef MULTI
 			utils::format("    ch CH-no               set current CAN channel (CH-no: 0, 1)\n");
 #endif
 			utils::format("    id number              set current ID number\n");
 			utils::format("    ext                    set ext-id mode\n");
 			utils::format("    std                    set std-id mode\n");
 			utils::format("    data MB-no [byte ...]  set frame data (MB-no: 0 to 31)\n");
-			utils::format("    list MB-no             list frame (MB-no: 0 to 31)\n");
 			utils::format("    reset MB-no            reset MB (MB-no: 0 to 31)\n");
 			utils::format("    send MB-no             send frame (MB-no: 0 to 31)\n");
 			utils::format("    recv MB-no             recv frame (MB-no: 0 to 31)\n");
-			utils::format("    stat MB-no             stat frame (MB-no: 0 to 31)\n");
 			utils::format("    state                  report CAN state\n");
+			utils::format("    stat MB-no             stat mail-box (MB-no: 0 to 31)\n");
+			utils::format("    list MB-no             list mail-box (MB-no: 0 to 31)\n");
 			utils::format("    help                   command list (this)\n");
 		} else {
 			char tmp[64];
@@ -360,12 +410,94 @@ namespace {
 			utils::format("Command error: '%s'\n") % tmp;
 		}
 		if(error) {
-			char tmp[64];
-			tmp[0] = 0;
-			cmd_.get_word(1, tmp, sizeof(tmp));
-			utils::format("parameter error: '%s'\n") % tmp;
+			utils::format("Parameter error...\n");
 		}
 	}
+#else
+
+	// 高位コマンド操作系（標準）
+	void command_()
+	{
+		if(!cmd_.service()) {
+			return;
+		}
+
+		auto cmdn = cmd_.get_words();
+
+		bool error = false;
+		if(cmdn == 0) {
+#ifdef MULTI
+		} else if(cmd_.cmp_word(0, "ch")) { // set current channel
+			if(cmdn >= 2) {
+				char tmp[64];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				if(!(utils::input("%a", tmp) % cur_ch_).status()) {
+					error = true;
+				}
+			} else {
+				utils::format("Current device CAN%d\n") % cur_ch_;
+			}
+#endif			
+		} else if(cmd_.cmp_word(0, "send")) { // データ送信
+			if(cmdn >= 2) {
+				uint32_t id = 0;
+				uint8_t data[8];
+				if(!get_cmd_id_(1, id)) {
+					error = true;
+				} else if(cmdn >= 3) {
+					if(!get_cmd_data_(2, data, cmdn - 2)) {
+						error = true;
+					}
+				}
+				if(!error) {
+					send_data_(id, data, cmdn - 2);
+				}
+			} else {
+				error = true;
+			}
+		} else if(cmd_.cmp_word(0, "stat")) { // stat
+			if(cmdn == 2) {
+				char tmp[64];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				int idx = 0;
+				if(!(utils::input("%a", tmp) % idx).status()) {
+					error = true;
+				} else {
+					stat_(idx);
+				}
+			} else {
+				error = true;
+			}
+		} else if(cmd_.cmp_word(0, "list")) { // get frame, list frame
+			if(cmdn >= 2) {
+				char tmp[64];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				int idx = 0;
+				if(!(utils::input("%a", tmp) % idx).status()) {
+					error = true;
+				} else {
+					list_(idx);
+				}				
+			}
+		} else if(cmd_.cmp_word(0, "help")) { // help
+#ifdef MULTI
+			utils::format("    ch CH-no               set current CAN channel (CH-no: 0, 1)\n");
+#endif
+			utils::format("    send CAN-ID [data...]  send data frame\n");
+			utils::format("    stat MB-no             stat mail-box (MB-no: 0 to 31)\n");
+			utils::format("    list MB-no             list mail-box (MB-no: 0 to 31)\n");
+			utils::format("    help                   command list (this)\n");
+		} else {
+			char tmp[64];
+			cmd_.get_word(0, tmp, sizeof(tmp));
+			utils::format("Command error: '%s'\n") % tmp;
+		}
+
+		if(error) {
+			utils::format("Parameter error...\n");
+		}
+	}
+#endif
 }
 
 
@@ -419,26 +551,28 @@ int main(int argc, char** argv)
 	utils::format("Start CAN sample for '%s' %d[MHz]\n") % system_str_ % clk;
 
 	{  // CAN 開始
-		CAN::mb_property prop;
-		CAN::interrupt_t intr;
-//		intr.txm_level = 1;
-//		intr.rxm_level = 1;
-		if(!can0_.start(CAN::SPEED::_1M, prop, intr)) {
+		if(!can0_.start(CAN::SPEED::_1M)) {
 			utils::format("Can't start CAN0...\n");
 		} else {
 			utils::format("CAN0: SPEED: %u [bps], BRP: %u, TSEG1: %u, TSEG2: %u, SJW: %u\n")
 				% can0_.get_speed()
 				% can0_.get_bcr_brp() % can0_.get_bcr_tseg1() % can0_.get_bcr_tseg2()
 				% can0_.get_bcr_sjw();
+			utils::format("    RX Interrupt level: %u, TX Interrupt level: %u\n")
+				% static_cast<uint16_t>(can0_.get_interrupt().rxm_level)
+				% static_cast<uint16_t>(can0_.get_interrupt().txm_level);
 		}
-#ifdef LOOP
-		if(!can1_.start(CAN::SPEED::_1M, prop, intr)) {
+#ifdef MULTI
+		if(!can1_.start(CAN::SPEED::_1M)) {
 			utils::format("Can't start CAN1...\n");
 		} else {
 			utils::format("CAN1: SPEED: %u [bps], BRP: %u, TSEG1: %u, TSEG2: %u, SJW: %u\n")
 				% can1_.get_speed()
 				% can1_.get_bcr_brp() % can1_.get_bcr_tseg1() % can1_.get_bcr_tseg2()
 				% can1_.get_bcr_sjw();
+			utils::format("    RX Interrupt level: %u, TX Interrupt level: %u\n")
+				% static_cast<uint16_t>(can1_.get_interrupt().rxm_level)
+				% static_cast<uint16_t>(can1_.get_interrupt().txm_level);
 		}
 #endif
 	}
@@ -449,22 +583,24 @@ int main(int argc, char** argv)
 
 	cmd_.set_prompt("# ");
 
-	auto send_tic = send_tic_;
-	auto recv_tic = recv_tic_;
 	uint8_t cnt = 0;
 	while(1) {
 		cmt_.sync();
 
-		legacy_command_();
+		command_();
 
-		if(send_tic != send_tic_) {
-			utils::format("Send OK.\n");
-			send_tic = send_tic_;
+		while(can0_.get_recv_num() > 0) {
+			auto frm = can0_.get_recv_frame();
+			utils::format("\nCAN0:\n");
+			CAN::list(frm, "  ");
 		}
-		if(recv_tic != recv_tic_) {
-			utils::format("Recv OK.\n");
-			recv_tic = recv_tic_;
+#ifdef MULTI
+		while(can1_.get_recv_num() > 0) {
+			auto frm = can1_.get_recv_frame();
+			utils::format("\nCAN1:\n");
+			CAN::list(frm, "  ");
 		}
+#endif
 
 		++cnt;
 		if(cnt >= 50) {
