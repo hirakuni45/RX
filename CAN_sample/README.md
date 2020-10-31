@@ -82,7 +82,7 @@ Translated with www.DeepL.com/Translator (free version)
     send CAN-ID [data...]  send data frame
     stat MB-no             stat mail-box (MB-no: 0 to 31)
     list MB-no             list mail-box (MB-no: 0 to 31)
-    map [CAN-ID]           recving CAN-ID list
+    map [CAN-ID]           receiving CAN-ID list
     clear                  clear map
     dump CAN-ID            dump frame data
     send_loop NUM          random ID, random DATA, send loop
