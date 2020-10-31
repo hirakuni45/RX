@@ -22,9 +22,10 @@ CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c
 
-PSOURCES	=	CAN_sample/main.cpp
+PSOURCES	=	CAN_sample/main.cpp \
+				common/stdapi.cpp
 
-USER_LIBS	=
+USER_LIBS	=	m supc++
 
 LDSCRIPT	=	../../RX64M/$(DEVICE).ld
 
