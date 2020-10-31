@@ -2,6 +2,9 @@
 /*! @file
     @brief  CAN サンプル @n
 			シリアルターミナルを接続して、対話式で、通信を行う @n
+			※使い方は、コマンド「help」を参照 @n
+			「MULTI」を有効にするとマルチチャネルサポート @n
+			「LEGACY」モードの場合、メールボックス直接操作 @n
 			RX64M, RX71M: @n
 					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
@@ -11,9 +14,7 @@
 			RX72N: (Renesas Envision kit RX72N) @n
 					16MHz のベースクロックを使用する @n
 					P40 ピンにLEDを接続する @n
-					SCI2 を使用する @n
-			「MULTI」を有効にするとマルチチャネルサポート @n
-			「LEGACY」モードの場合、メールボックス直接操作
+					SCI2 を使用する
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -30,6 +31,7 @@
 #include "common/input.hpp"
 
 #include "common/can_io.hpp"
+#include "common/can_analize.hpp"
 
 #include "common/command.hpp"
 
@@ -88,12 +90,18 @@ namespace {
 
 	// CAN 受信バッファの定義
 	typedef utils::fixed_fifo<device::can_frame, 256> CAN_RXB;
+	// CAN 送信バッファの定義
+	typedef utils::fixed_fifo<device::can_frame, 128> CAN_TXB;
 
-	typedef device::can_io<device::CAN0, CAN_RXB, CAN0_PORT> CAN0;
+	typedef device::can_io<device::CAN0, CAN_RXB, CAN_TXB, CAN0_PORT> CAN0;
 	CAN0	can0_;
 
+	// CAN の解析機能は CAN0 のみとする
+	typedef utils::can_analize<CAN0> ANALIZE;
+	ANALIZE	analize_(can0_);
+
 #ifdef MULTI
-	typedef device::can_io<device::CAN1, CAN_RXB, CAN1_PORT> CAN1;
+	typedef device::can_io<device::CAN1, CAN_RXB, CAN_TXB, CAN1_PORT> CAN1;
 	CAN1	can1_;
 
 	uint32_t	cur_ch_;
@@ -182,6 +190,18 @@ namespace {
 #else
 		can0_.send(id, src, len);
 #endif
+	}
+
+
+	void send_loop_(uint32_t count)
+	{
+		for(uint32_t i = 0; i < count; ++i) {
+			uint32_t id = (rand() % 799) + 1;
+			uint32_t len = (rand() % 7) + 1;
+			uint8_t tmp[8];
+			for(uint8_t j = 0; j < len; ++j) tmp[j] = rand();
+			send_data_(id, tmp, len);
+		}
 	}
 
 
@@ -477,7 +497,50 @@ namespace {
 					error = true;
 				} else {
 					list_(idx);
+				}
+			}
+		} else if(cmd_.cmp_word(0, "map")) {
+			if(cmdn >= 2) {
+				char tmp[64];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				uint32_t id = 0;
+				if(!(utils::input("%a", tmp) % id).status()) {
+					error = true;
+				} else {
+					analize_.list(id);
 				}				
+			} else {
+				analize_.list_all();
+			}
+		} else if(cmd_.cmp_word(0, "clear")) {
+			analize_.clear();
+		} else if(cmd_.cmp_word(0, "dump")) {
+			if(cmdn >= 2) {
+				char tmp[64];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				uint32_t id = 0;
+				if(!(utils::input("%a", tmp) % id).status()) {
+					error = true;
+				} else {
+					if(!analize_.dump(id)) {
+						utils::format("Can't find ID: x%07X (%u)\n") % id % id;
+					}
+				}				
+			} else {
+				error = true;
+			}
+		} else if(cmd_.cmp_word(0, "send_loop")) {
+			if(cmdn >= 2) {
+				char tmp[64];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				uint32_t n = 0;
+				if(!(utils::input("%a", tmp) % n).status()) {
+					error = true;
+				} else {
+					send_loop_(n);
+				}				
+			} else {
+				error = true;
 			}
 		} else if(cmd_.cmp_word(0, "help")) { // help
 #ifdef MULTI
@@ -486,6 +549,10 @@ namespace {
 			utils::format("    send CAN-ID [data...]  send data frame\n");
 			utils::format("    stat MB-no             stat mail-box (MB-no: 0 to 31)\n");
 			utils::format("    list MB-no             list mail-box (MB-no: 0 to 31)\n");
+			utils::format("    map [CAN-ID]           recving CAN-ID list\n");
+			utils::format("    clear                  clear map\n");
+			utils::format("    dump CAN-ID            dump frame data\n");
+			utils::format("    send_loop NUM          random ID, random DATA, send loop\n");
 			utils::format("    help                   command list (this)\n");
 		} else {
 			char tmp[64];
@@ -589,11 +656,15 @@ int main(int argc, char** argv)
 
 		command_();
 
+#if 0
 		while(can0_.get_recv_num() > 0) {
 			auto frm = can0_.get_recv_frame();
 			utils::format("\nCAN0:\n");
 			CAN::list(frm, "  ");
 		}
+#endif
+		analize_.service();
+
 #ifdef MULTI
 		while(can1_.get_recv_num() > 0) {
 			auto frm = can1_.get_recv_frame();
