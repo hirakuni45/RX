@@ -549,7 +549,7 @@ namespace {
 			utils::format("    send CAN-ID [data...]  send data frame\n");
 			utils::format("    stat MB-no             stat mail-box (MB-no: 0 to 31)\n");
 			utils::format("    list MB-no             list mail-box (MB-no: 0 to 31)\n");
-			utils::format("    map [CAN-ID]           recving CAN-ID list\n");
+			utils::format("    map [CAN-ID]           receiving CAN-ID list\n");
 			utils::format("    clear                  clear map\n");
 			utils::format("    dump CAN-ID            dump frame data\n");
 			utils::format("    send_loop NUM          random ID, random DATA, send loop\n");
