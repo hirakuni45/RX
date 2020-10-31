@@ -13,6 +13,7 @@
 //=====================================================================//
 #include "common/renesas.hpp"
 #include "common/vect.h"
+#include "common/format.hpp"
 
 #ifndef F_PCLKB
 #  error "can_io.hpp requires F_PCLKB to be defined"
@@ -106,11 +107,12 @@ namespace device {
 	/*!
 		@brief  CAN 制御クラス
 		@param[in]	CAN		CAN 定義クラス
-		@param[in]	RBF		受信バッファクラス
+		@param[in]	RBF		受信バッファクラス (utils::fixed_fifo<can_frame, N>)
+		@param[in]	TBF		送信バッファクラス (utils::fixed_fifo<can_frame, N>)
 		@param[in]	PSEL	ポート候補
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class CAN, class RBF, port_map::option PSEL = port_map::option::FIRST>
+	template <class CAN, class RBF, class TBF, port_map::option PSEL = port_map::option::FIRST>
 	class can_io : public can_io_def {
 	public:
 
@@ -128,30 +130,43 @@ namespace device {
 		MODE			mode_;
 
 		static RBF		rbf_;
+		static TBF		tbf_;
 
 		void sleep_() const { asm("nop"); }
 
 
 		static INTERRUPT_FUNC void rxm_task_()
 		{
-			if(CAN::MCTL[RX_MB_INDEX].NEWDATA() != 0) {
-				auto& t = rbf_.put_at();
-				CAN::MB[RX_MB_INDEX].get(t);
-				rbf_.put_go();
+			for(uint32_t i = RX_MB_INDEX; i < (RX_MB_INDEX + RX_MB_NUM); ++i) {
+				if(CAN::MCTL[i].NEWDATA() != 0) {
+					auto& t = rbf_.put_at();
+					CAN::MB[i].get(t);
+					rbf_.put_go();
+				}
+				CAN::MCTL[i] = 0;  // RECREQ を落とす
+				CAN::MCTL[i] = 0;  // NEWDATA を落とす
+				CAN::MCTL[i] = CAN::MCTL.RECREQ.b(1);
 			}
-			CAN::MCTL[RX_MB_INDEX] = 0;  // 二回書く
-			CAN::MCTL[RX_MB_INDEX] = 0;
-			CAN::MCTL[RX_MB_INDEX] = CAN::MCTL.RECREQ.b(1);
 		}
 
-
+		// 送信完了割り込みエントリー
 		static INTERRUPT_FUNC void txm_task_()
 		{
-			if(CAN::MCTL[TX_MB_INDEX].SENTDATA() != 0) {
-
+			uint32_t i;
+			for(i = TX_MB_INDEX; i < (TX_MB_INDEX + TX_MB_NUM); ++i) {
+				if(CAN::MCTL[i].SENTDATA() != 0) {
+		   			CAN::MCTL[i] = 0;  // SENTDATA=0 にするには、TRMREQ=0 にして
+					CAN::MCTL[i] = 0;  // SENTDATA=0
+				}
 			}
-			CAN::MCTL[TX_MB_INDEX].TRMREQ = 0;  // SENTDATA=0 にするには、TRMREQ=0 にして
-			CAN::MCTL[TX_MB_INDEX] = 0;  // SENTDATA=0
+			if(tbf_.length() > 0) {
+				++i;
+				if(i >= (TX_MB_INDEX + TX_MB_NUM)) i = TX_MB_INDEX;
+				const auto& t = tbf_.get_at();
+				CAN::MB[i].set(t);
+				tbf_.get_go();
+				CAN::MCTL[i] = CAN::MCTL.TRMREQ.b(1);
+			}
 		}
 
 		// ERS 割り込みは、グループ割り込みなので、通常関数とする
@@ -249,6 +264,7 @@ namespace device {
 			// メールボックスをクリア
 			for(uint32_t i = 0; i < 32; ++i) {
 				CAN::MCTL[i] = 0;  // 一応、MCTL も「０」クリア
+				CAN::MCTL[i] = 0;  // ２度書く事が必要
 				CAN::MB[i].clear();
 			}
 
@@ -285,8 +301,9 @@ namespace device {
 			mode_ = MODE::OPERATION;
 
 			// 受信メールボックス設定
-			CAN::MCTL[RX_MB_INDEX].RECREQ = 1;
-
+			for(uint32_t i = RX_MB_INDEX; i < (RX_MB_INDEX + RX_MB_NUM); ++i) {
+				CAN::MCTL[i].RECREQ = 1;
+			}
 			return true;
 		}
 
@@ -515,31 +532,43 @@ namespace device {
 			@param[in]	id		SID+EID の ID
 			@param[in]	src		送信データポインター
 			@param[in]	len		送信データ数
-			@param[in]	ext		拡張モードの場合「true」
+			@param[in]	ide		拡張モードの場合「true」
 			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool send(uint32_t id, const void* src, uint32_t len, bool ext = false) noexcept
+		bool send(uint32_t id, const void* src, uint32_t len, bool ide = false) noexcept
 		{
-			while(CAN::MCTL[TX_MB_INDEX].TRMREQ() != 0) sleep_();
+			// バッファサイズが、最大容量の 15/16 を超えたら、「1」に戻るまで待つ。
+			if(tbf_.length() > (tbf_.size() - (tbf_.size() / 16))) {
+				while(tbf_.length() > 1) sleep_();
+			}
 
-			auto& mb = CAN::MB[TX_MB_INDEX];
-			mb.set_id(id);
-			mb.EID = ext;
+			auto& t = tbf_.put_at();
+			t.set_id(id);
+			t.set_IDE(ide);
 			if(src != nullptr && len > 0 && len <= 8) {
-				mb.RTR = 0;
-				mb.DLC = len;
+				t.set_RTR(0);
+				t.set_DLC(len);
 				auto* p = static_cast<const uint8_t*>(src);
 				for(uint32_t i = 0; i < len; ++i) {
-					mb.DATA[i] = p[i];
+					t.set_DATA(i, p[i]);
 				}
 			} else {
-				mb.RTR = 1;
-				mb.DLC = 0;
+				t.set_RTR(1);
+				t.set_DLC(0);
 			}
-//			mb.TS = CAN::TSR;  // TS は設定しなくてもハードが勝手に付加して送る。
+			tbf_.put_go();
 
-			CAN::MCTL[TX_MB_INDEX] = CAN::MCTL.TRMREQ.b(1);
+			uint32_t n = 0;
+			for(uint32_t i = TX_MB_INDEX; i < (TX_MB_INDEX + TX_MB_NUM); ++i) {
+				if(CAN::MCTL[i]() == 0) ++n;
+			}
+			if(n == TX_MB_NUM) {  // 送信が完全に停止中なら送信トリガを出す
+				const auto& t = tbf_.get_at();
+				CAN::MB[TX_MB_INDEX].set(t);
+				tbf_.get_go();
+				CAN::MCTL[TX_MB_INDEX] = CAN::MCTL.TRMREQ.b(1);
+			}
 
 			return true;
 		} 
@@ -584,5 +613,8 @@ namespace device {
 		}
 	};
 
-	template <class CAN, class RBF, port_map::option PSEL> RBF can_io<CAN, RBF, PSEL>::rbf_;
+	template <class CAN, class RBF, class TBF, port_map::option PSEL>
+		RBF can_io<CAN, RBF, TBF, PSEL>::rbf_;
+	template <class CAN, class RBF, class TBF, port_map::option PSEL>
+		TBF can_io<CAN, RBF, TBF, PSEL>::tbf_;
 }
