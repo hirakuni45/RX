@@ -88,6 +88,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/rxprog](./rxprog)    |Program writing tool to RX microcontroller flash (Windows, OS-X, Linux compatible)|
 |[/FIRST_sample](./FIRST_sample)|LED flashing program for each platform|
 |[/SCI_sample](./SCI_sample)|Each platform, corresponding SCI sample program|
+|[/CAN_sample](./CAN_sample)|RX64M/RX71M/RX66T/RX72N CAN sample program|
 |[/FLASH_sample](./FLASH_sample)|Built-in data flash operation sample for each platform|
 |[/RAYTRACER_sample](./RAYTRACER_sample)|For each platform, Ray tracing benchmark|
 |[/SDCARD_sample](./SDCARD_sample)|For each platform, SD card operation sample|

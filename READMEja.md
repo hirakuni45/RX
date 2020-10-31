@@ -85,6 +85,7 @@ int main(int argc, char** argv)
 |[/rxprog](./rxprog)    |RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）|
 |[/FIRST_sample](./FIRST_sample)|各プラットホーム対応、LED 点滅プログラム|
 |[/SCI_sample](./SCI_sample)|各プラットホーム対応、SCI サンプルプログラム|
+|[/CAN_sample](./CAN_sample)|RX64M/RX71M/RX66T/RX72N 対応 CAN サンプルプログラム|
 |[/FLASH_sample](./FLASH_sample)|各プラットホーム対応、内臓データフラッシュ操作サンプル|
 |[/RAYTRACER_sample](./RAYTRACER_sample)|各プラットホーム対応 レイトレーシング・ベンチマーク|
 |[/SDCARD_sample](./SDCARD_sample)|SD カードの動作サンプル|
