@@ -7,7 +7,7 @@ Renesas RX64M, RX71M, RX66T, RX72N CAN 通信サンプル
 RX マイコンを使った CAN 通信サンプルプログラム   
 CAN ポートに CAN バス・トランシーバーを接続する必要があります。   
 CAN が複数チャネルある場合、チャネルを切り替えて通信する事が出来ます。   
-※「main.cpp」で、環境変数「LOOP」を有効にします。
+※「main.cpp」で、環境変数「MULTI」を有効にします。
    
 ## プロジェクト・リスト
 
@@ -81,7 +81,7 @@ Texas Instruments: SN65HVD23x
     send CAN-ID [data...]  send data frame
     stat MB-no             stat mail-box (MB-no: 0 to 31)
     list MB-no             list mail-box (MB-no: 0 to 31)
-    map [CAN-ID]           receiving CAN-ID list
+    map [CAN-ID]           Display all collected IDs
     clear                  clear map
     dump CAN-ID            dump frame data
     send_loop NUM          random ID, random DATA, send loop

@@ -8,7 +8,7 @@ Renesas RX64M, RX71M, RX66T, RX72N CAN sample
 Sample program for CAN communication using RX microcontroller   
 A CAN bus transceiver has to be connected to the CAN port.   
 If there are multiple channels of CAN, the communication channel is switched.   
-The environment variable "LOOP" is enabled in "main.cpp".
+The environment variable "MULTI" is enabled in "main.cpp".
 
 ## Description
 - main.cpp
@@ -82,7 +82,7 @@ Translated with www.DeepL.com/Translator (free version)
     send CAN-ID [data...]  send data frame
     stat MB-no             stat mail-box (MB-no: 0 to 31)
     list MB-no             list mail-box (MB-no: 0 to 31)
-    map [CAN-ID]           receiving CAN-ID list
+    map [CAN-ID]           Display all collected IDs
     clear                  clear map
     dump CAN-ID            dump frame data
     send_loop NUM          random ID, random DATA, send loop
