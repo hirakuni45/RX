@@ -46,8 +46,8 @@ namespace {
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	static const auto CAN0_CH = device::CAN0;
-	static const auto CAN1_CH = device::CAN1;
+	typedef device::CAN0 CAN0_CH;
+	typedef device::CAN1 CAN1_CH;
 	static const auto CAN0_PORT = device::port_map::option::FIRST;
 	static const auto CAN1_PORT = device::port_map::option::FIRST;
 	#define MULTI
