@@ -209,7 +209,13 @@ namespace device {
 			@return 統合 ID
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_id() const { return get_SID() | (get_EID() << 11); }
+		uint32_t get_id() const {
+			if(get_IDE() == 0) {
+				return get_SID();
+			} else {
+	 			return get_SID() | (get_EID() << 11);
+			}
+		}
 
 
 		const uint32_t& operator [] (uint32_t idx) const { return pad[idx]; }

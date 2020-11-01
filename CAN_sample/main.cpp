@@ -39,7 +39,7 @@
 
 namespace {
 
-	static const uint32_t can_cmd_ver_ = 50;
+	static const uint32_t can_cmd_ver_ = 86;
 
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
@@ -626,6 +626,7 @@ int main(int argc, char** argv)
 
 	auto clk = F_ICLK / 1000000;
 	utils::format("Start CAN sample for '%s' %d[MHz]\n") % system_str_ % clk;
+	utils::format("CAN command version: %d.%02d\n") % (can_cmd_ver_ / 100) % (can_cmd_ver_ % 100);
 
 	{  // CAN 開始
 		if(!can0_.start(CAN::SPEED::_1M)) {
