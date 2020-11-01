@@ -8,7 +8,7 @@ Renesas RX64M, RX71M, RX66T, RX72N CAN sample
 Sample program for CAN communication using RX microcontroller   
 A CAN bus transceiver has to be connected to the CAN port.   
 If there are multiple channels of CAN, the communication channel is switched.   
-The environment variable "LOOP" is enabled in "main.cpp".
+The environment variable "MULTI" is enabled in "main.cpp".
 
 ## Description
 - main.cpp
@@ -33,10 +33,46 @@ The environment variable "LOOP" is enabled in "main.cpp".
 - Connect the appropriate terminator resistor to the CAN bus transceiver.
 - The CAN bus transceiver must be of the 3.3 V operating variety.
    
-### Typical varieties of CAN bus transceivers.
+### CAN port setting
 
-Texas Instruments: SN65HVD23x
+See the following sources for the ports to connect the CAN bus transceiver.
+
+|microcontroller|file|CAN0 Alternate|CAN1 Alternate|
+|-------|--------|--------|---------|
+|RX64M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
+|RX71M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
+|RX66T  |[RX66T/port_map.hpp](../RX66T/port_map.hpp)|FIRST|X|
+|RX72N  |[RX72N/port_map.hpp](../RX72N/port_map.hpp)|X|SECOND|
    
+For RX64M (port_map.hpp FIRST candidate)
+```
+            case peripheral::CAN0:
+                {
+                    uint8_t sel = enable ? 0b010000 : 0;
+                    PORT3::PMR.B2 = 0;
+                    PORT3::PMR.B3 = 0;
+                    MPC::P32PFS.PSEL = sel;  // CTX0 (P32 LQFP176: 29)
+                    MPC::P33PFS.PSEL = sel;  // CRX0 (P33 LQFP176: 28)
+                    PORT3::PMR.B2 = enable;
+                    PORT3::PMR.B3 = enable;
+                }
+                break;
+```
+
+- By changing the CAN port candidate in main.cpp, the assigned port can be changed.
+- Basic port settings are prepared in port_map.hpp.
+
+```
+    static const auto CAN0_PORT = device::port_map::option::FIRST;
+    static const auto CAN1_PORT = device::port_map::option::FIRST;
+```
+
+---
+
+### Typical varieties of CAN bus transceivers
+
+[Texas Instruments: SN65HVD23x](https://www.ti.com/lit/ds/symlink/sn65hvd234.pdf?ts=1604192672378&ref_url=https%253A%252F%252Fwww.google.com%252F)
+      
 ### In the case of RX64M/RX71M
 
 - Multi-channel support
@@ -48,6 +84,8 @@ Texas Instruments: SN65HVD23x
 ### In the case of the RX72N Envision Kit
 
 - The program supports multiple channels, but it is a single channel because it does not have access to the CAN port.
+- Pmod1 (1) P54_SS (CTX1)
+- Pmod1 (7) P55/IRQ10 (CRX1)
 
 ## Resource preparation
 - None
@@ -82,7 +120,7 @@ Translated with www.DeepL.com/Translator (free version)
     send CAN-ID [data...]  send data frame
     stat MB-no             stat mail-box (MB-no: 0 to 31)
     list MB-no             list mail-box (MB-no: 0 to 31)
-    map [CAN-ID]           receiving CAN-ID list
+    map [CAN-ID]           Display all collected IDs
     clear                  clear map
     dump CAN-ID            dump frame data
     send_loop NUM          random ID, random DATA, send loop
