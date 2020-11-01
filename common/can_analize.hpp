@@ -42,12 +42,18 @@ namespace utils {
 
 		void list_line_(const info_t& t) const
 		{
-			if(t.frame_.get_IDE()) {
-				utils::format("%6u E:x%07X (%u)\n")
-					% t.count_ % t.frame_.get_id() % t.frame_.get_id();
+			char ch;
+			if(t.frame_.get_RTR()) {
+				ch = 'R';
 			} else {
-				utils::format("%6u S:x%07X (%u)\n")
-					% t.count_ % t.frame_.get_id() % t.frame_.get_id();
+				ch = 'D';
+			}
+			if(t.frame_.get_IDE()) {
+				utils::format("%c %6u E:x%07X (%u)\n")
+					% ch % t.count_ % t.frame_.get_id() % t.frame_.get_id();
+			} else {
+				utils::format("%c %6u S:x%07X (%u)\n")
+					% ch % t.count_ % t.frame_.get_id() % t.frame_.get_id();
 			}
 		}
 
@@ -138,14 +144,22 @@ namespace utils {
 			uint32_t n = 0;
 			uint32_t a = 0;
 			uint32_t r = 0;
+			uint32_t df = 0;
+			uint32_t rf = 0;
 			for(auto&& it : map_) {
 				const auto& t = it.second;
 				list_line_(t);
 				a += t.count_;
 				r += t.frame_.get_DLC();
+				if(t.frame_.get_RTR()) {
+					++rf;
+				} else {
+					++df;
+				}
 				++n;
 			}
-			utils::format("Total ID = %u / Total count = %u, Total Record = %u\n") % n % a % r;
+			utils::format("ID = %u / Total = %u, Records = %u, Df = %u, Rf = %u\n")
+				% n % a % r % df % rf;
 		}
 
 
