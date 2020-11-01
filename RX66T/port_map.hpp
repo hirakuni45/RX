@@ -288,8 +288,8 @@ namespace device {
 				// P22/CRX0 (97/144)
 				PORT2::PMR.B3 = 0;
 				PORT2::PMR.B2 = 0;
-				MPC::P23PFS.PSEL = sel;  // PA0/CTX0 (59/144)
-				MPC::P22PFS.PSEL = sel;  // PA1/CRX0 (58/144)
+				MPC::P23PFS.PSEL = sel;
+				MPC::P22PFS.PSEL = sel;
 				PORT2::PMR.B3 = enable;
 				PORT2::PMR.B2 = enable;
 				break;
