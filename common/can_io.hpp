@@ -172,7 +172,7 @@ namespace device {
 			}
 		}
 
-		// ERS 割り込みは、グループ割り込みなので、通常関数とする
+		// ERS 割り込みは、グループ割り込みなので、ディスパッチャーから呼ばれるので通常関数
 		static void ers_task_() {
 		}
 
@@ -196,6 +196,12 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(SPEED speed, const interrupt_t& intr = interrupt_t()) noexcept
 		{
+			if(intr.rxm_level == 0 || intr.txm_level == 0) {
+				// 割り込み未使用では、常に失敗する。
+				format("(0)RX/TX interrup level...\n");
+				return false;
+			}
+
 			// 通信速度に対する、TQ 値 8 to 25 で適切な値を選ぶ
 			// より大きい値で適合した値を選択
 			uint32_t tq = 25;
