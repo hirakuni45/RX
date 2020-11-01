@@ -332,6 +332,17 @@ namespace device {
 			rw8_t<base + 247> RIIC_RXI0;
 			rw8_t<base + 248> RIIC_TXI0;
 			rw8_t<base + 249> RIIC_TEI0;
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  []オペレータ
+				@param[in]	idx		インデックス（０～２５５）
+				@return IR レジスターの参照
+			*/
+			//-------------------------------------------------------------//
+			volatile uint8_t& operator [] (VECTOR idx) {
+				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(idx));
+			}
 		};
 		typedef ir_t<0x00087000> IR_;
 		static IR_ IR;
@@ -582,10 +593,20 @@ namespace device {
 			rw8_t<base + 247> RIIC_RXI0;
 			rw8_t<base + 248> RIIC_TXI0;
 			rw8_t<base + 249> RIIC_TEI0;
+
+			//-------------------------------------------------------------//
+			/*!
+				@brief  []オペレータ
+				@param[in]	idx		インデックス（０～２５５）
+				@return IR レジスターの参照
+			*/
+			//-------------------------------------------------------------//
+			volatile uint8_t& operator [] (VECTOR idx) {
+				return *reinterpret_cast<volatile uint8_t*>(base + static_cast<uint8_t>(idx));
+			}
 		};
 		typedef ipr_t<0x00087300> IPR_;
 		static IPR_ IPR;
-
 	};
 	typedef icu_t<void> ICU;
 
