@@ -73,7 +73,7 @@ RX64M の場合 (port_map.hpp FIRST 候補)
 ### CAN バス・トランシーバーの代表的な品種
 
 [Texas Instruments: SN65HVD23x](https://www.ti.com/jp/lit/ds/symlink/sn65hvd230.pdf?ts=1604189973572&ref_url=https%253A%252F%252Fwww.google.com%252F)
-   
+
 ### RX64M/RX71M の場合
 
 - 複数チャネル対応
@@ -87,6 +87,42 @@ RX64M の場合 (port_map.hpp FIRST 候補)
 - プログラムは複数チャネルに対応していますが、CAN ポートにアクセス出来ない為、シングルチャネルです。
 - Pmod1 (1) P54_SS (CTX1)
 - Pmod1 (7) P55/IRQ10 (CRX1)
+
+---
+
+## CAN/ID フィルター
+
+main.cpp には、通過する事が出来る ID リストを使った、フィルターのサンプルコードが含まれます。   
+※この機能は、「MULTI」チャネルの場合に利用されます。   
+   
+フィルターには、「boost/unordered_set」を利用しています。
+   
+main.cpp の先頭で、「#define VALID_FILTER」をコメントアウトすると、フィルターをスルーします。
+   
+有効な ID テーブルは、以下のようになっています。
+
+```
+	// 有効な ID だけ通すフィルター
+	typedef boost::unordered_set<uint32_t> VALID;
+//	typedef const boost::unordered_set<uint32_t> VALID;
+	VALID	valid_{ 0x123, 0x200, 0x300, 0xaaa, 15, 21, 33 };
+```
+   
+メインループで、CAN1 の受信フレームをディスパッチする際に、ID が有効か確認し、無効な ID を無視します。
+   
+```
+		while(can1_.get_recv_num() > 0) {
+			auto frm = can1_.get_recv_frame();
+#ifdef VALID_FILTER
+			if(valid_.find(frm.get_id()) != valid_.end()) {
+#else
+			{
+#endif
+				utils::format("\nCAN1:\n");
+				CAN::list(frm, "  ");
+			}
+		}
+```
 
 ---
 
