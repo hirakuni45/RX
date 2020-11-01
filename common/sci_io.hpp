@@ -212,9 +212,13 @@ namespace device {
 			recv_.clear();
 			send_.clear();
 
-			power_mgr::turn(SCI::PERIPHERAL);
+			if(!power_mgr::turn(SCI::PERIPHERAL)) {
+				return false;
+			}
 
-			icu_mgr::set_level(SCI::PERIPHERAL, 0);
+			if(!icu_mgr::set_level(SCI::PERIPHERAL, 0)) {
+				return false;
+			}
 			SCI::SCR = 0x00;			// TE, RE disable.
 			{
 				auto tmp = SCI::SSR();

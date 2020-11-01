@@ -32,7 +32,10 @@ namespace device {
 			FIRST,		///< 第１候補 (XXX-A グループ)
 			SECOND,		///< 第２候補 (XXX-B グループ)
 			THIRD,		///< 第３候補
-			FORCE,		///< 第４候補
+			FOURTH,		///< 第４候補
+			FIFTH,		///< 第５候補
+			_6TH,		///< 第６候補
+			_7TH,		///< 第７候補
 			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合、第１候補
 			SECOND_I2C,	///< SCI ポートを簡易 I2C として使う場合、第２候補
 			FIRST_SPI,	///< SCI ポートを簡易 SPI として使う場合、第１候補
@@ -63,6 +66,8 @@ namespace device {
 		};
 
 	private:
+
+		
 
 		static bool sub_1st_(peripheral t, bool enable) noexcept
 		{
@@ -213,17 +218,98 @@ namespace device {
 			return true;
 		}
 
+
+		static bool sub_can_(option opt, bool enable)
+		{
+			uint8_t sel = enable ? 0b10000 : 0;
+			switch(opt) {
+			case option::FIRST:
+				// PE0/CRX0 (22/144) 1ST
+				// PD7/CTX0 (23/144)
+				PORTE::PMR.B0 = 0;
+				PORTD::PMR.B7 = 0;
+				MPC::PE0PFS.PSEL = sel;
+				MPC::PD7PFS.PSEL = sel;
+				PORTE::PMR.B0 = enable;
+				PORTD::PMR.B7 = enable;
+				break;
+			case option::SECOND:
+				// PF3/CRX0 (31/144) 2ND
+				// PF2/CTX0 (32/144)
+				PORTF::PMR.B3 = 0;
+				PORTF::PMR.B2 = 0;
+				MPC::PF3PFS.PSEL = sel;
+				MPC::PF3PFS.PSEL = sel;
+				PORTF::PMR.B3 = enable;
+				PORTF::PMR.B2 = enable;
+				break;
+			case option::THIRD:
+				// PB6/CRX0 (40/144) 3RD
+				// PB5/CTX0 (41/144)
+				PORTB::PMR.B6 = 0;
+				PORTB::PMR.B5 = 0;
+				MPC::PB6PFS.PSEL = sel;
+				MPC::PB5PFS.PSEL = sel;
+				PORTB::PMR.B6 = enable;
+				PORTB::PMR.B5 = enable;
+				break;
+			case option::FOURTH:
+				// PA7/CRX0 (52/144) 4TH
+				// PA6/CTX0 (53/144)
+				PORTA::PMR.B7 = 0;
+				PORTA::PMR.B6 = 0;
+				MPC::PA7PFS.PSEL = sel;
+				MPC::PA6PFS.PSEL = sel;
+				PORTA::PMR.B7 = enable;
+				PORTA::PMR.B6 = enable;
+				break;
+			case option::FIFTH:
+				// PA1/CRX0 (58/144) 5TH
+				// PA0/CTX0 (59/144)
+				PORTA::PMR.B1 = 0;
+				PORTA::PMR.B0 = 0;
+				MPC::PA1PFS.PSEL = sel;
+				MPC::PA0PFS.PSEL = sel;
+				PORTA::PMR.B1 = enable;
+				PORTA::PMR.B0 = enable;
+				break;
+			case option::_6TH:
+				// PC6/CRX0 (62/144) 6TH
+				// PC5/CTX0 (63/144)
+				PORTC::PMR.B6 = 0;
+				PORTC::PMR.B5 = 0;
+				MPC::PC6PFS.PSEL = sel;
+				MPC::PC5PFS.PSEL = sel;
+				PORTC::PMR.B6 = enable;
+				PORTC::PMR.B5 = enable;
+				break;
+			case option::_7TH:
+				// P23/CTX0 (96/144) 7TH
+				// P22/CRX0 (97/144)
+				PORT2::PMR.B3 = 0;
+				PORT2::PMR.B2 = 0;
+				MPC::P23PFS.PSEL = sel;  // PA0/CTX0 (59/144)
+				MPC::P22PFS.PSEL = sel;  // PA1/CRX0 (58/144)
+				PORT2::PMR.B3 = enable;
+				PORT2::PMR.B2 = enable;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  周辺機器別ポート切り替え
-			@param[in]	t	周辺機器タイプ
-			@param[in]	f	無効にする場合「false」
+			@param[in]	per	周辺機器タイプ
+			@param[in]	ena	無効にする場合「false」
 			@param[in]	opt	候補を選択する場合
 			@return 無効な周辺機器の場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static bool turn(peripheral t, bool f = true, option opt = option::FIRST) noexcept
+		static bool turn(peripheral per, bool ena = true, option opt = option::FIRST) noexcept
 		{
 			if(opt == option::BYPASS) return false;
 
@@ -231,10 +317,12 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 
 			bool ret = false;
-			if(opt == option::FIRST) {
-				ret = sub_1st_(t, f);
+			if(per == peripheral::CAN0) {
+				ret = sub_can_(opt, ena);
+			} else if(opt == option::FIRST) {
+				ret = sub_1st_(per, ena);
 			} else if(opt == option::SECOND) {
-				ret = sub_2nd_(t, f);
+				ret = sub_2nd_(per, ena);
 			}
 
 			MPC::PWPR = device::MPC::PWPR.B0WI.b();

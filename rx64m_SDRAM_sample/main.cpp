@@ -34,6 +34,11 @@ extern "C" {
 		sci_.putch(ch);
 	}
 
+	void sci_puts(const char* str)
+	{
+		sci_.puts(str);
+	}
+
 	char sci_getch(void)
 	{
 		return sci_.getch();

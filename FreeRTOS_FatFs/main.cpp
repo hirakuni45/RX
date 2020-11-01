@@ -33,16 +33,18 @@
 #include "common/file_io.hpp"
 #include "common/shell.hpp"
 
-#include "common/tpu_io.hpp"
-#include "sound/sound_out.hpp"
-#include "sound/wav_in.hpp"
-#include "sound/mp3_in.hpp"
-
 #include "FreeRTOS.h"
 #include "task.h"
 
 // オーディオ再生を行う場合有効にする
-#define PLAY_AUDIO
+// #define PLAY_AUDIO
+
+#ifdef PLAY_AUDIO
+#include "common/tpu_io.hpp"
+#include "sound/sound_out.hpp"
+#include "sound/wav_in.hpp"
+#include "sound/mp3_in.hpp"
+#endif
 
 #ifdef SIG_RX64M
 // RX64Mで、GR-KAEDE の場合有効にする
@@ -563,21 +565,20 @@ namespace {
 		}
 
 		auto cmdn = cmd_.get_words();
-#ifdef PLAY_AUDIO
-		if(cmd_.cmp_word(0, "play")) {  // play [xxx]
+		if(cmd_.cmp_word(0, "scan")) {  // scan
 			if(cmdn >= 2) {
 				if(name_t_.get_ != name_t_.put_) {
-					utils::format("Audio task is busy !\n");
+					utils::format("Scan task is busy !\n");
 				} else {
 					cmd_.get_word(1, name_t_.filename_, sizeof(name_t_.filename_));
 					name_t_.put_++;
 				}
 			}
-#else
-		} else if(cmd_.cmp_word(0, "scan")) {  // scan
+#ifdef PLAY_AUDIO
+		} else if(cmd_.cmp_word(0, "play")) {  // play [xxx]
 			if(cmdn >= 2) {
 				if(name_t_.get_ != name_t_.put_) {
-					utils::format("Scan task is busy !\n");
+					utils::format("Audio task is busy !\n");
 				} else {
 					cmd_.get_word(1, name_t_.filename_, sizeof(name_t_.filename_));
 					name_t_.put_++;

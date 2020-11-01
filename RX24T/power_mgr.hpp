@@ -25,12 +25,14 @@ namespace device {
 			@brief  モジュール・ストップ機能を設定
 			@param[in]	t	周辺機器タイプ
 			@param[in]	ena	オフにする場合「false」
+			@return ペリフェラルが見つからない場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		static void turn(peripheral t, bool ena = true)
+		static bool turn(peripheral t, bool ena = true)
 		{
 			device::SYSTEM::PRCR = 0xA500 | 0b0010;	// 低消費電力機能
 
+			bool ret = true;
 			bool f = !ena;
 			switch(t) {
 			case peripheral::DTC:
@@ -129,9 +131,11 @@ namespace device {
 				break;
 
 			default:
+				ret = false;
 				break;
 			}
 			device::SYSTEM::PRCR = 0xA500;
+			return ret;
 		}
 	};
 }
