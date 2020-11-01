@@ -87,6 +87,44 @@ For RX64M (port_map.hpp FIRST candidate)
 - Pmod1 (1) P54_SS (CTX1)
 - Pmod1 (7) P55/IRQ10 (CRX1)
 
+---
+
+## CAN/ID Filters
+
+main.cpp contains sample code for a filter with a list of IDs that can be passed through.   
+This function is used for the "MULTI" channel.   
+   
+This filter uses "boost/unordered_set".   
+   
+If you comment out "#define VALID_FILTER" at the beginning of main.cpp, the filter is passed through.   
+   
+A valid ID table looks like this   
+
+```
+	// 有効な ID だけ通すフィルター
+	typedef boost::unordered_set<uint32_t> VALID;
+//	typedef const boost::unordered_set<uint32_t> VALID;
+	VALID	valid_{ 0x123, 0x200, 0x300, 0xaaa, 15, 21, 33 };
+```
+   
+In the main loop, when dispatching the incoming frame of CAN1, check if the ID is valid and ignore invalid IDs.
+   
+```
+		while(can1_.get_recv_num() > 0) {
+			auto frm = can1_.get_recv_frame();
+#ifdef VALID_FILTER
+			if(valid_.find(frm.get_id()) != valid_.end()) {
+#else
+			{
+#endif
+				utils::format("\nCAN1:\n");
+				CAN::list(frm, "  ");
+			}
+		}
+```
+
+---
+
 ## Resource preparation
 - None
    

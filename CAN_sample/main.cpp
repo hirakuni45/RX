@@ -35,6 +35,12 @@
 
 #include "common/command.hpp"
 
+#define VALID_FILTER
+
+#ifdef VALID_FILTER
+#include <boost/unordered_set.hpp>
+#endif
+
 // #define LEGACY
 
 namespace {
@@ -121,6 +127,12 @@ namespace {
 	typedef utils::command<256> CMD;
 	CMD		cmd_;
 
+#ifdef VALID_FILTER
+	// 有効な ID だけ通すフィルター
+	typedef boost::unordered_set<uint32_t> VALID;
+//	typedef const boost::unordered_set<uint32_t> VALID;
+	VALID	valid_{ 0x123, 0x200, 0x300, 0xaaa, 15, 21, 33 };
+#endif
 
 	bool get_cmd_id_(uint32_t i, uint32_t& id)
 	{
@@ -679,8 +691,14 @@ int main(int argc, char** argv)
 #ifdef MULTI
 		while(can1_.get_recv_num() > 0) {
 			auto frm = can1_.get_recv_frame();
-			utils::format("\nCAN1:\n");
-			CAN::list(frm, "  ");
+#ifdef VALID_FILTER
+			if(valid_.find(frm.get_id()) != valid_.end()) {
+#else
+			{
+#endif
+				utils::format("\nCAN1:\n");
+				CAN::list(frm, "  ");
+			}
 		}
 #endif
 
