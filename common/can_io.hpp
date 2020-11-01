@@ -210,10 +210,13 @@ namespace device {
 				}
 			}
 
-			power_mgr::turn(CAN::PERIPHERAL);
+			if(!power_mgr::turn(CAN::PERIPHERAL)) {
+				format("(2)fail power manager...\n");
+				return false;
+			}
 			if(!port_map::turn(CAN::PERIPHERAL, true, PSEL)) {
 				power_mgr::turn(CAN::PERIPHERAL, false);
-				format("(2)fail port mapping...\n");
+				format("(3)fail port mapping...\n");
 				return false;
 			}
 
@@ -231,21 +234,21 @@ namespace device {
 				tseg1--;
 				if(tq == (1 + tseg1 + tseg2)) break;
 				else if(tseg1 < 4) {
-					format("(3)TSEG1 value indivisible...\n");
+					format("(4)TSEG1 value indivisible...\n");
 					return false;
 				}
 
 				tseg1--;
 				if(tq == (1 + tseg1 + tseg2)) break;
 				else if(tseg1 < 4) {
-					format("(4)TSEG1 value indivisible...\n");
+					format("(5)TSEG1 value indivisible...\n");
 					return false;
 				}
 
 				tseg2--;
 				if(tq == (1 + tseg1 + tseg2)) break;
 				else if(tseg2 < 2) {
-					format("(5)TSEG2 value indivisible...\n");
+					format("(6)TSEG2 value indivisible...\n");
 					return false;
 				}
 			}
