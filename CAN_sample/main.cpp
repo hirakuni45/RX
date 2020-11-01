@@ -39,11 +39,15 @@
 
 namespace {
 
+	static const uint32_t can_cmd_ver_ = 50;
+
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+	static const auto CAN0_CH = device::CAN0;
+	static const auto CAN1_CH = device::CAN1;
 	static const auto CAN0_PORT = device::port_map::option::FIRST;
 	static const auto CAN1_PORT = device::port_map::option::FIRST;
 	#define MULTI
@@ -52,6 +56,8 @@ namespace {
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+	typedef device::CAN0 CAN0_CH;
+	typedef device::CAN1 CAN1_CH;
 	static const auto CAN0_PORT = device::port_map::option::FIRST;
 	static const auto CAN1_PORT = device::port_map::option::FIRST;
 	#define MULTI
@@ -65,12 +71,14 @@ namespace {
 	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
+	typedef device::CAN0 CAN0_CH;
 	static const auto CAN0_PORT = device::port_map::option::FIRST;
 #elif defined(SIG_RX72N)
-	static const char* system_str_ = { "RX72N" };
+	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::system_io<16'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
+	typedef device::CAN1 CAN0_CH;
 	static const auto CAN0_PORT = device::port_map::option::SECOND;
 #endif
 
@@ -93,7 +101,7 @@ namespace {
 	// CAN 送信バッファの定義
 	typedef utils::fixed_fifo<device::can_frame, 128> CAN_TXB;
 
-	typedef device::can_io<device::CAN0, CAN_RXB, CAN_TXB, CAN0_PORT> CAN0;
+	typedef device::can_io<CAN0_CH, CAN_RXB, CAN_TXB, CAN0_PORT> CAN0;
 	CAN0	can0_;
 
 	// CAN の解析機能は CAN0 のみとする
@@ -101,7 +109,7 @@ namespace {
 	ANALIZE	analize_(can0_);
 
 #ifdef MULTI
-	typedef device::can_io<device::CAN1, CAN_RXB, CAN_TXB, CAN1_PORT> CAN1;
+	typedef device::can_io<CAN1_CH, CAN_RXB, CAN_TXB, CAN1_PORT> CAN1;
 	CAN1	can1_;
 
 	uint32_t	cur_ch_;
@@ -543,6 +551,8 @@ namespace {
 				error = true;
 			}
 		} else if(cmd_.cmp_word(0, "help")) { // help
+			utils::format("CAN command version: %d.%02d\n")
+				% (can_cmd_ver_ / 100) % (can_cmd_ver_ % 100);
 #ifdef MULTI
 			utils::format("    ch CH-no               set current CAN channel (CH-no: 0, 1)\n");
 #endif
