@@ -82,22 +82,24 @@ namespace device {
 		//-----------------------------------------------------------------//
 		static void list(const can_frame& src, const char* ht = "") noexcept
 		{
+			if(src.get_RTR()) {
+				utils::format("%sR: ") % ht;
+			} else {
+				utils::format("%sD: ") % ht;
+			}
 			if(src.get_IDE()) {
 				uint32_t id = src.get_id();
-				utils::format("%sID: ext 0x%08X (%u)\n") % ht % id % id;
+				utils::format("ID: ext 0x%08X (%u)\n") % id % id;
 			} else {
-				utils::format("%sID: std 0x%03X (%u)\n") % ht % src.get_SID() % src.get_SID();
+				utils::format("ID: std 0x%03X (%u)\n") % src.get_SID() % src.get_SID();
 			}
-			if(!src.get_RTR()) {  // data frame
-				auto dlc = src.get_DLC();
-				utils::format("%sDATA(%u):") % ht % dlc;
-				for(uint32_t i = 0; i < dlc; ++i) {
-					utils::format(" %02X") % static_cast<uint16_t>(src.get_DATA(i));
-				}
-				utils::format("\n");
-			} else {
-				utils::format("%sDATA(0):\n") % ht;
+
+			auto dlc = src.get_DLC();
+			utils::format("%s(%u):") % ht % dlc;
+			for(uint32_t i = 0; i < dlc; ++i) {
+				utils::format(" %02X") % static_cast<uint16_t>(src.get_DATA(i));
 			}
+			utils::format("\n");
 			utils::format("%sTS: %u\n") % ht % src.get_TS();
 		}
 	};
@@ -116,10 +118,10 @@ namespace device {
 	class can_io : public can_io_def {
 	public:
 
-		static const uint32_t RX_MB_INDEX = 0;	///< 受信用メールボックス先頭番号
-		static const uint32_t RX_MB_NUM   = 4;	///< 受信用メールボックス数	
-		static const uint32_t TX_MB_INDEX = 4;	///< 送信用メールボックス先頭番号
-		static const uint32_t TX_MB_NUM   = 4;	///< 送信用メールボックス数	
+		static const uint32_t RX_MB_TOP = 0;	///< 受信用メールボックス先頭番号
+		static const uint32_t RX_MB_NUM = 8;	///< 受信用メールボックス数（最小８）
+		static const uint32_t TX_MB_TOP = 8;	///< 送信用メールボックス先頭番号
+		static const uint32_t TX_MB_NUM = 4;	///< 送信用メールボックス数（最小４）
 
 	private:
 
@@ -137,7 +139,7 @@ namespace device {
 
 		static INTERRUPT_FUNC void rxm_task_()
 		{
-			for(uint32_t i = RX_MB_INDEX; i < (RX_MB_INDEX + RX_MB_NUM); ++i) {
+			for(uint32_t i = RX_MB_TOP; i < (RX_MB_TOP + RX_MB_NUM); ++i) {
 				if(CAN::MCTL[i].NEWDATA() != 0) {
 					auto& t = rbf_.put_at();
 					CAN::MB[i].get(t);
@@ -145,7 +147,7 @@ namespace device {
 				}
 				CAN::MCTL[i] = 0;  // RECREQ を落とす
 				CAN::MCTL[i] = 0;  // NEWDATA を落とす
-				CAN::MCTL[i] = CAN::MCTL.RECREQ.b(1);
+				CAN::MCTL[i] = CAN::MCTL.RECREQ.b(1);  // 再度受信リクエスト
 			}
 		}
 
@@ -153,15 +155,16 @@ namespace device {
 		static INTERRUPT_FUNC void txm_task_()
 		{
 			uint32_t i;
-			for(i = TX_MB_INDEX; i < (TX_MB_INDEX + TX_MB_NUM); ++i) {
+			for(i = TX_MB_TOP; i < (TX_MB_TOP + TX_MB_NUM); ++i) {
 				if(CAN::MCTL[i].SENTDATA() != 0) {
 		   			CAN::MCTL[i] = 0;  // SENTDATA=0 にするには、TRMREQ=0 にして
 					CAN::MCTL[i] = 0;  // SENTDATA=0
+					break;
 				}
 			}
 			if(tbf_.length() > 0) {
 				++i;
-				if(i >= (TX_MB_INDEX + TX_MB_NUM)) i = TX_MB_INDEX;
+				if(i >= (TX_MB_TOP + TX_MB_NUM)) i = TX_MB_TOP;
 				const auto& t = tbf_.get_at();
 				CAN::MB[i].set(t);
 				tbf_.get_go();
@@ -253,6 +256,7 @@ namespace device {
 
 			// format("BRP: %u, TSEG1: %u, TESG2: %u\n") % brp % tseg1 % tseg2;
 			CAN::CTLR.SLPM = 0;  // BCR レジスタを設定するので、スリープモードを解除
+			while(CAN::STR.SLPST() != 0) sleep_();  // スリープモードを抜けた事を確認
 			CAN::BCR = CAN::BCR.TSEG1.b(tseg1 - 1) | CAN::BCR.TSEG2.b(tseg2 - 1)
 				| CAN::BCR.BRP.b(brp - 1) | CAN::BCR.SJW.b(sjw - 1) | CAN::BCR.CCLKS.b(0);
 
@@ -261,11 +265,23 @@ namespace device {
 			}
 			CAN::MKIVLR = 0;  // マスク有効
 
-			// メールボックスをクリア
+			// FIFO モードの場合： リモートフレーム、標準ID、拡張ID 受信可能設定
+			CAN::CTLR.MBM = 1;
+			CAN::FIDCR0 = CAN::FIDCR0.RTR.b(0) | CAN::FIDCR0.IDE.b(0);
+			CAN::FIDCR1 = CAN::FIDCR1.RTR.b(1) | CAN::FIDCR1.IDE.b(1);
+			CAN::CTLR.MBM = 0;
+
+			// メールボックスを初期化
 			for(uint32_t i = 0; i < 32; ++i) {
 				CAN::MCTL[i] = 0;  // 一応、MCTL も「０」クリア
-				CAN::MCTL[i] = 0;  // ２度書く事が必要
+				CAN::MCTL[i] = 0;  // 完全にクリアするには、２度書く事が必要
 				CAN::MB[i].clear();
+				if(i >= RX_MB_TOP && i < (RX_MB_TOP + RX_MB_NUM)) {
+					// データフレーム、リモートフレーム受信用
+					// 標準ID、拡張ID 受信用
+					CAN::MB[i].RTR = i & 1;
+					CAN::MB[i].IDE = (i >> 1) & 1;
+				}
 			}
 
 			intr_ = intr;
@@ -281,18 +297,23 @@ namespace device {
 			}
 			if(intr.rxm_level > 0) {  // 受信割り込み設定
 				icu_mgr::set_interrupt(CAN::RXM_VEC, rxm_task_, intr.rxm_level);
-				CAN::MIER.set(RX_MB_INDEX);
+				for(uint32_t i = RX_MB_TOP; i < (RX_MB_TOP + RX_MB_NUM); ++i) {
+					CAN::MIER.set(i);
+				}
 			}
 			if(intr.txm_level > 0) {  // 送信割り込み設定
 				icu_mgr::set_interrupt(CAN::TXM_VEC, txm_task_, intr.txm_level);
-				CAN::MIER.set(TX_MB_INDEX);
+				for(uint32_t i = TX_MB_TOP; i < (TX_MB_TOP + TX_MB_NUM); ++i) {
+					CAN::MIER.set(i);
+				}
 			}
 
 			// CAN オペレーションモードに移行
 			uint8_t idfm = 0b10;  // 標準 ID モード、拡張 ID モード、ミックス
 			uint8_t bom  = 0b00;  // ISO 11898-1 規格、バスオフ復帰モード
+			bool tpm = 1;  // メールボックス番号優先送信モード
 			CAN::CTLR = CAN::CTLR.CANM.b(0b00) | CAN::CTLR.SLPM.b(0) | CAN::CTLR.IDFM.b(idfm)
-				| CAN::CTLR.BOM.b(bom);
+				| CAN::CTLR.BOM.b(bom) | CAN::CTLR.TPM.b(tpm);
 
 			// CAN オペレーションモードに移行するまで待機
 			while(CAN::STR.RSTST() != 0 || CAN::STR.HLTST() != 0) {
@@ -301,7 +322,7 @@ namespace device {
 			mode_ = MODE::OPERATION;
 
 			// 受信メールボックス設定
-			for(uint32_t i = RX_MB_INDEX; i < (RX_MB_INDEX + RX_MB_NUM); ++i) {
+			for(uint32_t i = RX_MB_TOP; i < (RX_MB_TOP + RX_MB_NUM); ++i) {
 				CAN::MCTL[i].RECREQ = 1;
 			}
 			return true;
@@ -560,14 +581,14 @@ namespace device {
 			tbf_.put_go();
 
 			uint32_t n = 0;
-			for(uint32_t i = TX_MB_INDEX; i < (TX_MB_INDEX + TX_MB_NUM); ++i) {
+			for(uint32_t i = TX_MB_TOP; i < (TX_MB_TOP + TX_MB_NUM); ++i) {
 				if(CAN::MCTL[i]() == 0) ++n;
 			}
 			if(n == TX_MB_NUM) {  // 送信が完全に停止中なら送信トリガを出す
 				const auto& t = tbf_.get_at();
-				CAN::MB[TX_MB_INDEX].set(t);
+				CAN::MB[TX_MB_TOP].set(t);
 				tbf_.get_go();
-				CAN::MCTL[TX_MB_INDEX] = CAN::MCTL.TRMREQ.b(1);
+				CAN::MCTL[TX_MB_TOP] = CAN::MCTL.TRMREQ.b(1);
 			}
 
 			return true;
