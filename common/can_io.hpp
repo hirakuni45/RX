@@ -54,7 +54,7 @@ namespace device {
 			RESET,		///< リセット・モード
 			HALT,		///< Halt モード
 			OPERATION,	///< オペレーション・モード
-			SLEEP		///< スリープ・モード
+			SLEEP,		///< スリープ・モード
 		};
 
 
@@ -125,8 +125,11 @@ namespace device {
 
 	private:
 
-//		typedef utils::null_format	format;
+#ifndef NDEBUG
+		typedef utils::null_format	format;
+#else
 		typedef utils::format		format;
+#endif
 
 		interrupt_t		intr_;
 		MODE			mode_;
@@ -188,7 +191,8 @@ namespace device {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  通信速度を設定して、CAN デバイスを「OPERATION」モードにする @n
-					正確な通信速度を設定出来ない場合「false」を返して失敗する。
+					正確な通信速度を設定出来ない場合「false」を返して失敗する。@n
+					「オペレーションモード」に移行
 			@param[in]	speed	通信速度
 			@param[in]	intr	割り込み設定
 			@return エラーなら「false」
@@ -340,20 +344,80 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込み設定を返す
-			@return 割り込み設定
-		*/
-		//-----------------------------------------------------------------//
-		auto get_interrupt() const noexcept { return intr_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
 			@brief  動作モードを返す
 			@return 動作モード
 		*/
 		//-----------------------------------------------------------------//
 		auto get_mode() const noexcept { return mode_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  動作モードを設定します
+			@param[in]	mode	動作モード
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool set_mode(MODE mode) noexcept
+		{
+			if(mode_ == MODE::OPERATION) {  // リセット、Halt へ移行可能
+				if(mode == MODE::RESET) {
+					CAN::CTLR.CANM = 0b01;
+					while(CAN::STR.RSTST() == 0) sleep_();
+					mode_ = MODE::RESET;
+				} else if(mode == MODE::HALT) {
+					CAN::CTLR.CANM = 0b10;
+					while(CAN::STR.HLTST() == 0) sleep_();
+					mode_ = MODE::HALT;
+				} else {
+					return false;
+				}
+			} else if(mode_ == MODE::RESET) {
+				if(mode == MODE::OPERATION) {
+					CAN::CTLR.CANM = 0b00;
+					while(CAN::STR.RSTST() != 0) sleep_();
+					mode_ = MODE::OPERATION;
+				} else if(mode == MODE::HALT) {
+					CAN::CTLR.CANM = 0b10;
+					while(CAN::STR.HLTST() != 0) sleep_();
+					mode_ = MODE::HALT;
+				} else if(mode == MODE::SLEEP) {
+					CAN::CTLR.SLPM = 1;
+					while(CAN::STR.SLPST() != 0) sleep_();
+					mode_ = MODE::SLEEP;
+				} else {
+					return false;
+				}
+			} else if(mode_ == MODE::HALT) {
+				if(mode == MODE::OPERATION) {
+// underconstructions
+				} else if(mode == MODE::RESET) {
+// underconstructions
+				} else if(mode == MODE::SLEEP) {
+// underconstructions
+				}
+			} else if(mode_ == MODE::SLEEP) {
+				if(mode == MODE::RESET) {
+// underconstructions
+				} else if(mode == MODE::HALT) {
+// underconstructions
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  割り込み設定を返す
+			@return 割り込み設定
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_interrupt() const noexcept { return intr_; }
 
 
 		//-----------------------------------------------------------------//

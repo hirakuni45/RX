@@ -85,9 +85,13 @@ RX64M の場合 (port_map.hpp FIRST 候補)
 ### RX72N Envision Kit の場合
 
 - プログラムは複数チャネルに対応していますが、CAN ポートにアクセス出来ない為、シングルチャネルです。
-- Pmod1 (1) P54_SS (CTX1)
-- Pmod1 (7) P55/IRQ10 (CRX1)
-
+- CAN1 を使います。
+- Pmod1  (1) P54_SS    (CTX1)
+- Pmod1  (7) P55/IRQ10 (CRX1)
+- Pmod1  (6) 3.3V
+- Pmod1 (12) 3.3V
+- Pmod1  (5) GND
+- Pmod1 (11) GND
 ---
 
 ## CAN/ID フィルター

@@ -39,13 +39,15 @@
 
 #ifdef VALID_FILTER
 #include <boost/unordered_set.hpp>
+// #include <unordered_set>
+// #include <set>
 #endif
 
 // #define LEGACY
 
 namespace {
 
-	static const uint32_t can_cmd_ver_ = 86;
+	static const uint32_t can_cmd_ver_ = 89;
 
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
@@ -129,7 +131,10 @@ namespace {
 
 #ifdef VALID_FILTER
 	// 有効な ID だけ通すフィルター
+	// std:: を使う場合、Makefile の USER_LIBS を変更する
 	typedef boost::unordered_set<uint32_t> VALID;
+//	typedef std::set<uint32_t> VALID;
+//	typedef std::unordered_set<uint32_t> VALID;
 //	typedef const boost::unordered_set<uint32_t> VALID;
 	VALID	valid_{ 0x123, 0x200, 0x300, 0xaaa, 15, 21, 33 };
 #endif
@@ -203,24 +208,33 @@ namespace {
 	{
 #ifdef MULTI
 		if(cur_ch_ == 0) {
-			can0_.send(id, src, len);
+			can0_.send(id, src, len, ext_id_);
 		} else if(cur_ch_ == 1) {
-			can1_.send(id, src, len);
+			can1_.send(id, src, len, ext_id_);
 		}
 #else
-		can0_.send(id, src, len);
+		can0_.send(id, src, len, ext_id_);
 #endif
 	}
 
 
-	void send_loop_(uint32_t count)
+	void send_loop_(uint32_t count, bool rtr = false)
 	{
 		for(uint32_t i = 0; i < count; ++i) {
-			uint32_t id = (rand() % 799) + 1;
-			uint32_t len = (rand() % 7) + 1;
-			uint8_t tmp[8];
-			for(uint8_t j = 0; j < len; ++j) tmp[j] = rand();
-			send_data_(id, tmp, len);
+			uint32_t id;
+			if(ext_id_) {
+				id = (rand() % 0x1fffffff) + 1;  // 0 を含まない
+			} else {
+				id = (rand() % 0x7ff) + 1;  // 0 を含まない
+			}
+			if(rtr) {
+				send_data_(id, nullptr, 0);
+			} else {
+				uint32_t len = (rand() % 7) + 1;  // 1 to 8 bytes
+				uint8_t tmp[8];
+				for(uint8_t j = 0; j < len; ++j) tmp[j] = rand();
+				send_data_(id, tmp, len);
+			}
 		}
 	}
 
@@ -284,11 +298,11 @@ namespace {
 
 		} else if(cmd_.cmp_word(0, "id")) { // set current ID
 			if(cmdn >= 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				if(!(utils::input("%a", tmp) % cur_id_).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
 					error = true;
 				} else {
+					cur_id_ = val;
 					if(cur_id_ >= 0x800) {
 						ext_id_ = true;
 					}
@@ -314,52 +328,44 @@ namespace {
 			ext_id_ = false;
 		} else if(cmd_.cmp_word(0, "reset")) { // reset MB
 			if(cmdn == 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				int idx = 0;
-				if(!(utils::input("%a", tmp) % idx).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
 					error = true;
 				} else {
-					reset_(idx);
+					reset_(val);
 				}
 			} else {
 				error = true;
 			}
 		} else if(cmd_.cmp_word(0, "recv")) { // recv
 			if(cmdn == 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				int idx = 0;
-				if(!(utils::input("%a", tmp) % idx).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
 					error = true;
 				} else {
-					recv_(idx);
+					recv_(val);
 				}
 			} else {
 				error = true;
 			}
 		} else if(cmd_.cmp_word(0, "send")) { // send data
 			if(cmdn == 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				int idx = 0;
-				if(!(utils::input("%a", tmp) % idx).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
 					error = true;
 				} else {
-					send_(idx);
+					send_(val);
 				}
 			} else {
 				error = true;
 			}
 		} else if(cmd_.cmp_word(0, "stat")) { // stat
 			if(cmdn == 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				int idx = 0;
-				if(!(utils::input("%a", tmp) % idx).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
 					error = true;
 				} else {
-					stat_(idx);
+					stat_(val);
 				}
 			} else {
 				error = true;
@@ -368,10 +374,8 @@ namespace {
 			if(cmdn < 2) {
 				error = true;
 			} else {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				int idx = 0;
-				if(!(utils::input("%a", tmp) % idx).status()) {
+				int32_t idx;
+				if(!cmd_.get_integer(1, idx, false)) {
 					error = true;
 				} else {
 					CAN::frame f;
@@ -411,13 +415,11 @@ namespace {
 			}
 		} else if(cmd_.cmp_word(0, "list")) { // get frame, list frame
 			if(cmdn >= 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				int idx = 0;
-				if(!(utils::input("%a", tmp) % idx).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
 					error = true;
 				} else {
-					list_(idx);
+					list_(val);
 				}				
 			}
 		} else if(cmd_.cmp_word(0, "state")) { // report state
@@ -469,15 +471,24 @@ namespace {
 #ifdef MULTI
 		} else if(cmd_.cmp_word(0, "ch")) { // set current channel
 			if(cmdn >= 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				if(!(utils::input("%a", tmp) % cur_ch_).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val)) {
 					error = true;
+				} else {
+					if(val == 0 || val == 1) {
+						cur_ch_ = val;
+					} else {
+						error = true;
+					}
 				}
 			} else {
 				utils::format("Current device CAN%d\n") % cur_ch_;
 			}
-#endif			
+#endif
+		} else if(cmd_.cmp_word(0, "ext")) { // ext-id mode
+			ext_id_ = true;
+		} else if(cmd_.cmp_word(0, "std")) { // std-id mode
+			ext_id_ = false;
 		} else if(cmd_.cmp_word(0, "send")) { // データ送信
 			if(cmdn >= 2) {
 				uint32_t id = 0;
@@ -497,37 +508,31 @@ namespace {
 			}
 		} else if(cmd_.cmp_word(0, "stat")) { // stat
 			if(cmdn == 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				int idx = 0;
-				if(!(utils::input("%a", tmp) % idx).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
 					error = true;
 				} else {
-					stat_(idx);
+					stat_(val);
 				}
 			} else {
 				error = true;
 			}
 		} else if(cmd_.cmp_word(0, "list")) { // get frame, list frame
 			if(cmdn >= 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				int idx = 0;
-				if(!(utils::input("%a", tmp) % idx).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
 					error = true;
 				} else {
-					list_(idx);
+					list_(val);
 				}
 			}
 		} else if(cmd_.cmp_word(0, "map")) {
 			if(cmdn >= 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				uint32_t id = 0;
-				if(!(utils::input("%a", tmp) % id).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
 					error = true;
 				} else {
-					analize_.list(id);
+					analize_.list(val);
 				}				
 			} else {
 				analize_.list_all();
@@ -536,14 +541,12 @@ namespace {
 			analize_.clear();
 		} else if(cmd_.cmp_word(0, "dump")) {
 			if(cmdn >= 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				uint32_t id = 0;
-				if(!(utils::input("%a", tmp) % id).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
 					error = true;
 				} else {
-					if(!analize_.dump(id)) {
-						utils::format("Can't find ID: x%07X (%u)\n") % id % id;
+					if(!analize_.dump(val)) {
+						utils::format("Can't find ID: x%07X (%u)\n") % val % val;
 					}
 				}				
 			} else {
@@ -551,14 +554,16 @@ namespace {
 			}
 		} else if(cmd_.cmp_word(0, "send_loop")) {
 			if(cmdn >= 2) {
-				char tmp[64];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				uint32_t n = 0;
-				if(!(utils::input("%a", tmp) % n).status()) {
+				int32_t val;
+				if(!cmd_.get_integer(1, val, false)) {
 					error = true;
 				} else {
-					send_loop_(n);
-				}				
+					bool rtr = false;
+					if(cmdn >= 3 && cmd_.cmp_word(2, "-rtr")) {
+						rtr = true;
+					}
+					send_loop_(val, rtr);
+				}
 			} else {
 				error = true;
 			}
@@ -568,13 +573,15 @@ namespace {
 #ifdef MULTI
 			utils::format("    ch CH-no               set current CAN channel (CH-no: 0, 1)\n");
 #endif
+			utils::format("    ext                    set ext-id mode\n");
+			utils::format("    std                    set std-id mode\n");
 			utils::format("    send CAN-ID [data...]  send data frame\n");
 			utils::format("    stat MB-no             stat mail-box (MB-no: 0 to 31)\n");
 			utils::format("    list MB-no             list mail-box (MB-no: 0 to 31)\n");
 			utils::format("    map [CAN-ID]           Display all collected IDs\n");
 			utils::format("    clear                  clear map\n");
 			utils::format("    dump CAN-ID            dump frame data\n");
-			utils::format("    send_loop NUM          random ID, random DATA, send loop\n");
+			utils::format("    send_loop NUM [-rtr]   random ID, random DATA, send loop (RTR)\n");
 			utils::format("    help                   command list (this)\n");
 		} else {
 			char tmp[64];

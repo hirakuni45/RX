@@ -1,7 +1,8 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	CAN 通信解析クラス
+	@brief	CAN 通信解析クラス @n
+			std::map を使う場合、Makefile でのリンクを修正する (USER_DEFS = m stdc++) @n
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -9,7 +10,7 @@
 */
 //=====================================================================//
 #include <boost/unordered_map.hpp>
-#include <map>
+// #include <map>
 #include "common/can_io.hpp"
 #include "common/format.hpp"
 
