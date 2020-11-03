@@ -84,8 +84,13 @@ For RX64M (port_map.hpp FIRST candidate)
 ### In the case of the RX72N Envision Kit
 
 - The program supports multiple channels, but it is a single channel because it does not have access to the CAN port.
-- Pmod1 (1) P54_SS (CTX1)
-- Pmod1 (7) P55/IRQ10 (CRX1)
+- Use CAN1
+- Pmod1  (1) P54_SS    (CTX1)
+- Pmod1  (7) P55/IRQ10 (CRX1)
+- Pmod1  (6) 3.3V
+- Pmod1 (12) 3.3V
+- Pmod1  (5) GND
+- Pmod1 (11) GND
 
 ---
 
