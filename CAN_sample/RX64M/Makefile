@@ -26,6 +26,7 @@ PSOURCES	=	CAN_sample/main.cpp \
 				common/stdapi.cpp
 
 USER_LIBS	=	m supc++
+# USER_LIBS	=	m stdc++
 
 LDSCRIPT	=	../../RX64M/$(DEVICE).ld
 
