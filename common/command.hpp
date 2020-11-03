@@ -239,15 +239,20 @@ namespace utils {
             @brief  整数を取得
 			@param[in]	argc	ワード位置
 			@param[out]	out		整数
+			@param[in]	fix		２進、８進、１６進などで入力可能にする場合「false」
 			@return 取得できたら「true」を返す
         */
         //-----------------------------------------------------------------//
-		bool get_integer(uint8_t argc, int32_t& out) const
+		bool get_integer(uint8_t argc, int32_t& out, bool fix = true) const
 		{
-			char tmp[16];
+			char tmp[32];
 			if(!get_word(argc, tmp, sizeof(tmp))) return false;
 
-			return (utils::input("%d", tmp) % out).status();
+			char form[3];
+			form[0] = '%';
+			form[1] = fix ? 'a' : 'd';
+			form[2] = 0;
+			return (utils::input(form, tmp) % out).status();
 		}
 
 
