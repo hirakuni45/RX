@@ -52,6 +52,11 @@ D Resistor
 K R DEV
 $ENDCMP
 #
+$CMP R-78E5
+D Low Cost Switching Regulator
+K RECOM Electronic GmbH.
+$ENDCMP
+#
 $CMP STEREO
 D Stereo conector
 $ENDCMP
