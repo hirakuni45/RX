@@ -1,31 +1,83 @@
 EESchema-DOCLIB  Version 2.0
 #
-$CMP ADP2504
-D 1000 mA, 2.5 MHz Buck-Boost DC-to-DC Converters
+$CMP AD5593R
+D 8-channel 12bits configurable ADC/DAC/GPIO Internal Reference, I2C interface Integrated temperature sensor,Single Supply, TSSOP-16
+K 8channel 12bit ADC DAC GPIO I2C Temperature
+F https://www.analog.com/media/en/technical-documentation/data-sheets/AD5593R.pdf
 $ENDCMP
 #
-$CMP BQ24072T
-D 1.5A USB-Friendly Li-Ion Battery and Power-Path Management
+$CMP AD630ARZ
+D High precision Balanced Modulator/Demodulator, 2 MHz, SOIC-20W
+K modulator demodulator
+F https://www.analog.com/media/en/technical-documentation/data-sheets/ad630.pdf
 $ENDCMP
 #
-$CMP DIT4192
-D 192kHz Digital Audio Transmitter
-K TI
+$CMP ADP2503
+D ANALOG DEVICES 600 mA/1000 mA, 2.5 MHz Buck-Boost DC-to-DC Converters
+F https://www.analog.com/media/en/technical-documentation/data-sheets/ADP2503_2504.pdf
 $ENDCMP
 #
-$CMP RX24T
-D Renesas RX24T LFQFP 100
-K RX
+$CMP J-2506W
+D 2.5 mm - 6P フオーンジャック (.J-2506W-01G) トープラ販売株式会社
 $ENDCMP
 #
-$CMP RX24T_100P
-D Renesas RX24T LFQFP 100
-K RX
+$CMP LF398H
+D Sample And Hold Unity Gain Follower, TO-99-8
+K sample hold buffer unity gain
+F http://www.ti.com/lit/ds/symlink/lf398-n.pdf
 $ENDCMP
 #
-$CMP RX64M
-D Renesas RX64M 176 pin LQFP 
-K RX64M
+$CMP LF398_DIP8
+D Sample And Hold Unity Gain Follower, DIP-8
+K sample hold buffer unity gain
+F http://www.ti.com/lit/ds/symlink/lf398-n.pdf
+$ENDCMP
+#
+$CMP LF398_SOIC14
+D Sample And Hold Unity Gain Follower, SOIC-14
+K sample hold buffer unity gain
+F http://www.ti.com/lit/ds/symlink/lf398-n.pdf
+$ENDCMP
+#
+$CMP LF398_SOIC8
+D Sample And Hold Unity Gain Follower, SOIC-8
+K sample hold buffer unity gain
+F https://www.analog.com/media/en/technical-documentation/data-sheets/lt0398s8.pdf
+$ENDCMP
+#
+$CMP MPY634KP
+D Wide Bandwidth Precision Analog Multiplier, DIP-14
+K analog multiplier
+F http://www.ti.com/lit/ds/symlink/mpy634.pdf
+$ENDCMP
+#
+$CMP MPY634KU
+D Wide Bandwidth Precision Analog Multiplier, SOIC-16W
+K analog multiplier
+F http://www.ti.com/lit/ds/symlink/mpy634.pdf
+$ENDCMP
+#
+$CMP OPA2314
+D 3-MHz,Low-Power,Low-Noise,RRIO,1.8-V CMOSOperationalAmplifier
+K OPAx314
+F http://www.ti.com/jp/lit/ds/symlink/opa2314.pdf
+$ENDCMP
+#
+$CMP PGA112
+D Zero-Drift Programmable Gain Amplifier With Mux, x1/x2/x4/x8/x16/x32/x64/x128 gains, VSSOP-10
+K PGA SPI
+F http://www.ti.com/lit/ds/sbos424c/sbos424c.pdf
+$ENDCMP
+#
+$CMP PGA113
+D Zero-Drift Programmable Gain Amplifier With Mux, x1/x2/x5/x10/x20/x50/x100/x200 gains, VSSOP-10
+K PGA SPI
+F http://www.ti.com/lit/ds/sbos424c/sbos424c.pdf
+$ENDCMP
+#
+$CMP SN65HVD230
+D  3.3V CAN バ ス ・ ト ラ ン シ ー
+K CAN
 $ENDCMP
 #
 #End Doc Library
