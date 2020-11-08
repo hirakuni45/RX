@@ -57,6 +57,16 @@ K analog multiplier
 F http://www.ti.com/lit/ds/symlink/mpy634.pdf
 $ENDCMP
 #
+$CMP OBD2_Female
+D OBD2 メス・コネクター
+K OBD2
+$ENDCMP
+#
+$CMP OBD2_Male
+D OBD2 オス・コネクター
+K OBD2
+$ENDCMP
+#
 $CMP OPA2314
 D 3-MHz,Low-Power,Low-Noise,RRIO,1.8-V CMOSOperationalAmplifier
 K OPAx314
