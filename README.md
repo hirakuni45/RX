@@ -77,7 +77,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/RX66T](./RX66T)      |Device definition class dedicated to RX66T, linker script|
 |[/RX72N](./RX72N)      |Device definition class dedicated to RX72N, linker script|
 |[/FreeRTOS](./FreeRTOS)|FreeRTOS RX microcontroller compatible version and a simple sample|
-|[/ff13c](./ff13c)      |ChaN's fatfs source code and handler for RX microcontroller|
+|[/ff14](./ff14)        |ChaN's fatfs source code and handler for RX microcontroller|
 |[/common](./common)    |Shared classes, utilities, etc.|
 |[/chip](./chip)        |Device-specific control driver library for I2C, SPI, etc.|
 |[/graphics](./graphics)|Graphics drawing relation class|
@@ -96,15 +96,6 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/NESEMU_sample](./NESEMU_sample)|Renesas RX65N/RX72N Envision Kit, NES emulator|
 |[/AUDIO_sample](./AUDIO_sample)|For each platform, MP3/WAV Audio player|
 |[/SYNTH_sample](./SYNTH_sample)|FM Sound Source Synthesizer and Emulato|
-|/rx24t_GPS_sample      |GPS operation sample using RX24T|
-|/rx24t_DATA_FLASH_sample|Internal data flash operation sample using RX24T|
-|/rx64m_SDRAM_sample    |Control sample of SDRAM using RX64M (128 Mbit × 2, 32-bit bus)|
-|/rx64m_RTC_sample      |Operation sample of built-in RTC using RX64M|
-|/rx64m_TPU_sample      |Control sample of TPU using RX64M (timer interrupt)|
-|/rx64m_DMAC_sample     |DMAC control sample using RX64M (memory operation)|
-|/rx64m_DA_sample       |Built-in D / A conversion using RX64M, sample of TPU, DMAC|
-|/GR-KAEDE_ftps         |Sample for Renesas RX64M microcontroller board (FTP server)|
-|/GR-KAEDE_http         |Sample for Renesas RX64M microcontroller board (http server)|
 |[LICENSE](./LICENSE)  |License notation file|
    
 - Although not in the above list, please think that directories and files that exist when you check out are working.   
