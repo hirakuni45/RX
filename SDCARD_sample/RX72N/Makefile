@@ -41,16 +41,18 @@ USER_DEFS	=	SIG_RX72N \
 				F_FCLK=60000000 F_BCLK=120000000 \
 				FAT_FS FAT_FS_NUM=2
 
-# rx-elf-gcc compiler version check
+# Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
 ifeq ($(TARGET_ISA_TEXT), )
 # gcc-7.5.0 current gcc source build
+AS_DEFS		=	-mcpu=rx600
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc
-CC_DEFS		=	-misa=v2
-CP_DEFS		=	-misa=v2
+AS_DEFS		=	-misa=v3
+CC_DEFS		=	-misa=v3
+CP_DEFS		=	-misa=v3
 endif
 
 # Include path for each environment
@@ -78,7 +80,7 @@ LIB_ROOT	=	../../RX600/drw2d
 
 OPTIMIZE	=	-O3
 
-AS_OPT		=	-mcpu=rx600
+AS_OPT		=
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
