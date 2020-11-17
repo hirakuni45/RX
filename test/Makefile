@@ -35,15 +35,17 @@ USER_DEFS	=	SIG_RX72N \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000
 
-# rx-elf-gcc compiler version check
+# Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
 # AS_DEFS		=	--defsym NOT_USER=1
 ifeq ($(TARGET_ISA_TEXT), )
 # gcc-7.5.0 current gcc source build
+AS_DEFS		=	-mcpu=rx600
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc
+AS_DEFS		=	-misa=v3
 CC_DEFS		=	-misa=v3
 # CP_DEFS		=	-misa=v3 -mdfpu -mtfu=intrinsic,mathlib
 CP_DEFS		=	-misa=v3 -mtfu=intrinsic,mathlib
