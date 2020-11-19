@@ -589,7 +589,7 @@ namespace device {
 	typedef scih_t<0x0008B300, peripheral::SCI12, ICU::VECTOR::TXI12, ICU::VECTOR::RXI12,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI12, F_PCLKB> SCI12;
 
-#elif defined(SIG_RX66T)
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef scij_t<0x0008A020, peripheral::SCI1, ICU::VECTOR::TXI1, ICU::VECTOR::RXI1,
 		ICU::VECTOR_BL0, ICU::VECTOR_BL0::TEI1, F_PCLKB> SCI1;
 
