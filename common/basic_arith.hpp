@@ -95,15 +95,15 @@ namespace utils {
 					else if(ch_ == '-') break;
 					else if(ch_ == '*') break;
 					else if(ch_ == '/') break;
-					else if(ch_ == '&') break;
-					else if(ch_ == '^') break;
-					else if(ch_ == '|') break;
-					else if(ch_ == '%') break;
+//					else if(ch_ == '&') break;
+//					else if(ch_ == '^') break;
+//					else if(ch_ == '|') break;
+//					else if(ch_ == '%') break;
 					else if(ch_ == ')') break;
-					else if(ch_ == '<') break;
-					else if(ch_ == '>') break;
-					else if(ch_ == '!') break;
-					else if(ch_ == '~') break;
+//					else if(ch_ == '<') break;
+//					else if(ch_ == '>') break;
+//					else if(ch_ == '!') break;
+//					else if(ch_ == '~') break;
 					else if(ch_ == '.') {
 						if(point) {
 							error_.set(error::fatal);
@@ -176,6 +176,7 @@ namespace utils {
 					ch_ = *tx_++;
 					v *= factor_();
 					break;
+#if 0
 				case '%':
 					ch_ = *tx_++;
 					tmp = factor_();
@@ -183,8 +184,9 @@ namespace utils {
 						error_.set(error::zero_divide);
 						break;
 					}
-					v /= tmp;
+					v %= tmp;
 					break;
+#endif
 				case '/':
 					ch_ = *tx_++;
 					if(ch_ == '/') {
@@ -194,7 +196,7 @@ namespace utils {
 							error_.set(error::zero_divide);
 							break;
 						}
-						v %= tmp;
+///						v %= tmp;
 					} else {
 						tmp = factor_();
 						if(tmp == 0) {
@@ -204,6 +206,7 @@ namespace utils {
 						v /= tmp;
 					}
 					break;
+#if 0
 				case '<':
 					ch_ = *tx_++;
 					if(ch_ == '<') {
@@ -222,6 +225,7 @@ namespace utils {
 						error_.set(error::fatal);
 					}
 					break;
+#endif
 				default:
 					return v;
 					break;
@@ -247,6 +251,7 @@ namespace utils {
 					ch_ = *tx_++;
 					v -= term_();
 					break;
+#if 0
 				case '&':
 					ch_ = *tx_++;
 					v &= term_();
@@ -259,6 +264,7 @@ namespace utils {
 					ch_ = *tx_++;
 					v |= term_();
 					break;
+#endif
 				default:
 					return v;
 					break;
