@@ -657,6 +657,25 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	移動
+			@param[in]	src		ソース位置と大きさ
+			@param[in]	dst		転送位置
+		*/
+		//-----------------------------------------------------------------//
+		void move(const vtx::srect& src, const vtx::spos& dst) noexcept
+		{
+			for(int16_t y = 0; y < src.size.y; ++y) {
+				auto* d = &fb_[dst.x + (dst.y + y) * line_offset];
+				const auto* s = &fb_[src.org.x + (src.org.y + y) * line_offset];
+				for(int16_t x = src.org.x; x < src.end_x(); ++x) {
+					*d++ = *s++;
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	ビットマップイメージを描画する
 			@param[in]	pos		開始点を指定
 			@param[in]	img		描画ソースのポインター
