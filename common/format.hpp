@@ -30,6 +30,8 @@
 			! 2019/02/02 19:42- 符号文字カウントの不具合修正。@n
 			+ 2020/02/04 05:23- std::string 型追加。@n
 			+ 2020/04/25 07:45- stdout_buffered_chaout に、操作位置を返すメソッド pos() を追加。
+			! 2020/11/20 07:44- sformat 時の nega_ フラグの初期化漏れ
+			! 2020/11/20 07:44- nega_ 符号表示の順番、不具合
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -370,7 +372,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class base_format {
 	public:
-		static const uint16_t VERSION = 90;		///< バージョン番号（整数）
+		static const uint16_t VERSION = 92;		///< バージョン番号（整数）
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -554,7 +556,10 @@ namespace utils {
 
 		void out_str_(const char* str, char sign, uint16_t n)
 		{
-			if(nega_) { str_(str); }
+			if(nega_) {
+				if(sign != 0) { chaout_(sign); }
+				str_(str);
+			}
 
 			auto num = num_;
 			if(sign != 0 && num > 0) { num--; } 
@@ -572,10 +577,10 @@ namespace utils {
 						--spc;
 						chaout_(' ');
 					}
-					if(sign != 0) { chaout_(sign); }
+					if(!nega_ && sign != 0) { chaout_(sign); }
 				}
 			} else {
-				if(sign != 0) { chaout_(sign); }
+				if(!nega_ && sign != 0) { chaout_(sign); }
 			}
 
 			if(!nega_) { str_(str); }
@@ -880,7 +885,7 @@ namespace utils {
 			num_(0), point_(0),
 			bitlen_(0),
 			error_(error::none),
-			mode_(mode::NONE), zerosupp_(false), sign_(false)
+			mode_(mode::NONE), zerosupp_(false), sign_(false), nega_(false)
 		{
 			if(!chaout_.set(buff, size)) {
 				error_ = error::out_null;

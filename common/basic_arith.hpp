@@ -62,7 +62,7 @@ namespace utils {
 			bool inv = false;
 ///			bool neg = false;
 			bool point = false;
-			uint32_t v = 0;
+			int32_t v = 0;
 			uint32_t fp = 0;
 			uint32_t fs = 1;
 
