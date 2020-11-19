@@ -136,7 +136,24 @@ namespace utils {
 			@return 末尾要素への参照
 		*/
 		//-----------------------------------------------------------------//
-		char& back() noexcept { return str_[pos_]; }
+		char& back() noexcept {
+			auto pos = pos_;
+			if(pos > 0) --pos;
+			return str_[pos];
+		}
+
+
+  		//-----------------------------------------------------------------//
+		/*!
+			@brief  末尾要素への参照を取得する。
+			@return 末尾要素への参照
+		*/
+		//-----------------------------------------------------------------//
+		const char& back() const noexcept {
+			auto pos = pos_;
+			if(pos > 0) --pos;
+			return str_[pos];
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -241,6 +258,23 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		char& operator [] (uint32_t pos) noexcept {
+			if(pos >= SIZE) {
+				static char tmp = 0;
+				return tmp;
+			}
+			return str_[pos];
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  文字参照 const @n
+					※範囲外ではテンポラリを返す（例外を投げない）
+			@param[in]	pos	配列位置
+			@return 文字
+		*/
+		//-----------------------------------------------------------------//
+		const char& operator [] (uint32_t pos) const noexcept {
 			if(pos >= SIZE) {
 				static char tmp = 0;
 				return tmp;
