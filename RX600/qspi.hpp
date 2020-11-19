@@ -270,17 +270,19 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  QSPI コマンドレジスタ n（SPCMDn）（n = 0 ～ 3）
+			@brief  QSPI コマンドレジスタ n（SPCMD[n]）（n = 0 ～ 3）
 			@param[in]	ofs	レジスター・オフセット
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct spcmd_t : public rw16_t<ofs> {
-			typedef rw16_t<ofs> io_;
+		struct spcmd_t : public rw16_index_t<ofs> {
+			typedef rw16_index_t<ofs> io_;
 			using io_::operator =;
 			using io_::operator ();
 			using io_::operator |=;
 			using io_::operator &=;
+
+			void set_index(uint32_t j) { if(j < 4) { io_::index = j * 2; } }
 
 			bit_rw_t <io_, bitpos::B0>    CPHA;
 			bit_rw_t <io_, bitpos::B1>    CPOL;
@@ -293,15 +295,14 @@ namespace device {
 			bit_rw_t <io_, bitpos::B13>   SPNDEN;
 			bit_rw_t <io_, bitpos::B14>   SLNDEN;
 			bit_rw_t <io_, bitpos::B15>   SCKDEN;
+
+			spcmd_t& operator [] (uint32_t idx) {
+				set_index(idx);
+				return *this;
+			}
 		};
-		typedef spcmd_t<base + 0x10> SPCMD0_;
-		static  SPCMD0_ SPCMD0;
-		typedef spcmd_t<base + 0x12> SPCMD1_;
-		static  SPCMD1_ SPCMD1;
-		typedef spcmd_t<base + 0x14> SPCMD2_;
-		static  SPCMD2_ SPCMD2;
-		typedef spcmd_t<base + 0x16> SPCMD3_;
-		static  SPCMD3_ SPCMD3;
+		typedef spcmd_t<base + 0x10> SPCMD_;
+		static  SPCMD_ SPCMD;
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -378,10 +379,8 @@ namespace device {
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCKD_ qspi_t<base, per, txv, rxv, sslv>::SPCKD;
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SSLND_ qspi_t<base, per, txv, rxv, sslv>::SSLND;
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPND_ qspi_t<base, per, txv, rxv, sslv>::SPND;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCMD0_ qspi_t<base, per, txv, rxv, sslv>::SPCMD0;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCMD1_ qspi_t<base, per, txv, rxv, sslv>::SPCMD1;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCMD2_ qspi_t<base, per, txv, rxv, sslv>::SPCMD2;
-	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPCMD3_ qspi_t<base, per, txv, rxv, sslv>::SPCMD3;
+	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv
+> typename qspi_t<base, per, txv, rxv, sslv>::SPCMD_ qspi_t<base, per, txv, rxv, sslv>::SPCMD;
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBFCR_ qspi_t<base, per, txv, rxv, sslv>::SPBFCR;
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBDCR_ qspi_t<base, per, txv, rxv, sslv>::SPBDCR;
 	template <uint32_t base, peripheral per, ICU::VECTOR txv, ICU::VECTOR rxv, ICU::VECTOR_BL0 sslv> typename qspi_t<base, per, txv, rxv, sslv>::SPBMUL0_ qspi_t<base, per, txv, rxv, sslv>::SPBMUL0;
