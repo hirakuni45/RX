@@ -1,14 +1,17 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
-#	RX24T Makefile
+#   @file
+#   @brief  RX72N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	flash_sample
+TARGET		=	calc_sample
 
-DEVICE		=	R5F524TA
+DEVICE		=	R5F572NN
+
+FATFS_VER	=	ff14/source
 
 BUILD		=	release
 # BUILD		=	debug
@@ -19,16 +22,24 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c
+				common/syscalls.c \
+				$(FATFS_VER)/ff.c \
+				$(FATFS_VER)/ffsystem.c \
+				$(FATFS_VER)/ffunicode.c
 
-PSOURCES	=	FLASH_sample/main.cpp
+PSOURCES	=	CALC_sample/main.cpp \
+				graphics/font8x16.cpp \
+				graphics/kfont16.cpp \
+				graphics/color.cpp
 
-USER_LIBS	=
+USER_LIBS	=	supc++
 
-LDSCRIPT	=	../../RX24T/$(DEVICE).ld
+LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 
-USER_DEFS   =   SIG_RX24T F_ICLK=80000000 F_PCLKA=80000000 \
-				F_PCLKB=40000000 F_PCLKD=40000000 F_FCLK=20000000
+USER_DEFS	=	SIG_RX72N \
+				F_ICLK=240000000 \
+				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
+				F_FCLK=60000000 F_BCLK=120000000
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
@@ -39,9 +50,9 @@ AS_DEFS		=	-mcpu=rx600
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc
-AS_DEFS		=	-misa=v2
-CC_DEFS		=	-misa=v2
-CP_DEFS		=	-misa=v2
+AS_DEFS		=	-misa=v3
+CC_DEFS		=	-misa=v3
+CP_DEFS		=	-misa=v3
 endif
 
 # Include path for each environment
@@ -63,7 +74,11 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../../
+INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
+
+LIB_ROOT	=	../../RX600/drw2d
+
+AS_OPT		=
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
@@ -83,7 +98,7 @@ endif
 ifeq ($(BUILD),release)
     CC_OPT += -DNDEBUG
     CP_OPT += -DNDEBUG
-	OPTIMIZE = -Os
+	OPTIMIZE = -O3
 endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
@@ -104,8 +119,6 @@ LD			=	rx-elf-ld
 OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
-
-# Override is only needed by avr-lib build system.
 
 AFLAGS		=	$(AS_OPT) $(AS_DEFS)
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
@@ -197,6 +210,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX24T --progress --write --verify $(TARGET).mot
+	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

@@ -45,20 +45,23 @@ USER_DEFS	=	SIG_RX65N \
 				F_FCLK=60000000 F_BCLK=120000000 \
 				FAT_FS FAT_FS_NUM=16
 
-# rx-elf-gcc compiler version check
+# Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
 # For FreeRTOS
 # AS_DEFS       =   --defsym NOT_USER=1
 ifeq ($(TARGET_ISA_TEXT), )
 # gcc-7.5.0 current gcc source build
+AS_DEFS     =   -mcpu=rx600
 CC_DEFS     =   -mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS     =   -mcpu=rx600
 else # Renesas GNU-RX gcc
-CC_DEFS     =   -misa=v3
-# CP_DEFS       =   -misa=v3 -mdfpu -mtfu=intrinsic,mathlib
-CP_DEFS     =   -misa=v3 -mtfu=intrinsic,mathlib
-# CP_DEFS       =   -misa=v3 -mdfpu
+AS_DEFS     =   -misa=v2
+CC_DEFS     =   -misa=v2
+# CP_DEFS       =   -misa=v2 -mdfpu -mtfu=intrinsic,mathlib
+# CP_DEFS     =   -misa=v2 -mtfu=intrinsic,mathlib
+# CP_DEFS       =   -misa=v2 -mdfpu
+CP_DEFS     =   -misa=v2
 endif
 
 # Include path for each environment

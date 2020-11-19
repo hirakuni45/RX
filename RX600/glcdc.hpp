@@ -46,9 +46,27 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		template <uint32_t ofs>
-		struct grclut_t {
-			volatile uint32_t& operator[] (uint32_t idx) {
-				return *reinterpret_cast<volatile uint32_t*>(ofs + (idx & 0xff));
+		struct grclut_t : public rw32_index_t<ofs> {
+			typedef rw32_index_t<ofs> io_;
+			using io_::operator =;
+			using io_::operator ();
+			using io_::operator |=;
+			using io_::operator &=;
+
+			void set_index(uint32_t j) {
+				if(j < 256) {
+					io_::index = j * 4;
+				}
+			}
+
+			bits_rw_t<io_, bitpos::B0,  8> B;
+			bits_rw_t<io_, bitpos::B8,  8> G;
+			bits_rw_t<io_, bitpos::B16, 8> R;
+			bits_rw_t<io_, bitpos::B24, 8> A;
+
+			grclut_t& operator[] (uint32_t idx) {
+				set_index(idx);
+				return *this;
 			}
 		};
 		typedef grclut_t<base + 0x0000> GR1CLUT0_;

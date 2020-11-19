@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 |[/RX65x](./RX65x)      |RX651, RX65N 専用デバイス定義クラス、リンカースクリプト|
 |[/RX66T](./RX66T)      |RX66T 専用デバイス定義クラス、リンカースクリプト|
 |[/FreeRTOS](./FreeRTOS)|FreeRTOS の RX マイコン各種対応版と簡単なサンプル|
-|[/ff13c](./ff13c)      |ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
+|[/ff14](./ff14)        |ChaN 氏作成の fatfs ソースコードと RX マイコン向けハンドラ|
 |[/common](./common)    |共有クラス、ヘッダーなど|
 |[/chip](./chip)        |I2C、SPI、など各種デバイス固有制御ドライバ・ライブラリ|
 |[/graphics](./graphics)|グラフィックス描画関係クラス|
@@ -93,16 +93,6 @@ int main(int argc, char** argv)
 |[/NESEMU_sample](./NESEMU_sample)|ルネサス製 RX65N/RX72N Envision Kit, NES エミュレーター|
 |[/AUDIO_sample](./AUDIO_sample)|MP3/WAV オーディオプレイヤー|
 |[/SYNTH_sample](./SYNTH_sample)|FM 音源シンセサイザー・エミュレータ|
-|/rx24t_GPS_sample      |RX24T を使った GPS の動作サンプル|
-|/rx24t_DATA_FLASH_sample|RX24T を使った内臓データ・フラッシュ操作サンプル|
-|/rx24t_LOGGER          |RX24T を使ったデータロガー・プロジェクト|
-|/rx64m_SDRAM_sample    |RX64M を使った SDRAM の制御サンプル（128Mビット×2、32ビットバス）|
-|/rx64m_RTC_sample      |RX64M を使った 内臓 RTC の動作サンプル|
-|/rx64m_TPU_sample      |RX64M を使った TPU の制御サンプル（タイマー割り込み）|
-|/rx64m_DMAC_sample     |RX64M を使った DMAC 制御のサンプル（メモリー操作）|
-|/rx64m_DA_sample       |RX64M を使った 内臓 D/A 変換、TPU、DMAC のサンプル|
-|/GR-KAEDE_ftps         |ルネサス製の RX64M 搭載マイコンボード向けサンプル（FTP サーバー）|
-|/GR-KAEDE_http         |ルネサス製の RX64M 搭載マイコンボード向けサンプル（http サーバー）|
 |[LICENSE](./LICENSE)   |ライセンス表記ファイル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
