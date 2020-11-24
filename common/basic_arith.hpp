@@ -3,11 +3,11 @@
 /*!	@file
 	@brief	Arithmetic テンプレート @n
 			※テキストの数式を展開して、計算結果を得る。@n
-			演算式解析
+			NVAL には、Boost Multiprecision Library を利用する事を前提にしている。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2015, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
-				https://github.com/hirakuni45/R8C/blob/master/LICENSE
+				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
 #include <cstdint>
@@ -18,12 +18,15 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	Arithmetic クラス
-		@param[in]	VTYPE	基本型
-		@param[in]	SYMBOL	シンボルクラス
+		@param[in]	NVAL	基本型
+		@param[in]	SYMBOL	変数クラス
+		@param[in]	FUNC	関数クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <typename VTYPE>
+	template <class NVAL, class SYMBOL, class FUNC>
 	struct basic_arith {
+
+		static const uint32_t NUMBER_NUM = 50;  // 最大桁数
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -39,115 +42,130 @@ namespace utils {
 			hexdecimal_fatal,	///< １６進データの変換に関するエラー
 			num_fatal,			///< 数値の変換に関するエラー
 			symbol_fatal,		///< シンボルデータの変換に関するエラー
+			func_fatal,			///< 関数の変換に関するエラー
 		};
 
 		typedef bitset<uint16_t, error> error_t;
 
 	private:
 
+		SYMBOL&		symbol_;
+		FUNC&		func_;
+
 		const char*		tx_;
 		char			ch_;
 
 		error_t		error_;
 
-		VTYPE		value_;
+		NVAL		value_;
 
-		void skip_space_() {
+
+		// スペース、TAB を取り除く
+		void skip_space_() noexcept
+		{
 			while(ch_ == ' ' || ch_ == '\t') {
 				ch_ = *tx_++;
 			}
 		}
 
-		VTYPE number_() {
-			bool inv = false;
-///			bool neg = false;
-			bool point = false;
-			int32_t v = 0;
-			uint32_t fp = 0;
-			uint32_t fs = 1;
+
+		// 関数内パラメーターの取得
+		bool param_(char* dst, uint32_t len)
+		{
+			if(ch_ != '(') return false;
+
+			while(ch_ != 0) {
+				--len;
+				if(len == 0) break;
+			}
+
+			return true;
+		}
+
+
+		NVAL number_()
+		{
+			bool minus = false;
+			char tmp[NUMBER_NUM];
 
 			skip_space_();
 
 			// 符号、反転の判定
 			if(ch_ == '-') {
-				inv = true;
+				minus = true;
 				ch_ = *tx_++;
 			} else if(ch_ == '+') {
 				ch_ = *tx_++;
-//			} else if(ch_ == '!' || ch_ == '~') {
-//				neg = true;
-//				ch_ = *tx_++;
 			}
 
 			skip_space_();
 
-			if(ch_ == '(') {
-				v = factor_();
-			} else {
-				skip_space_();
-
-//				if(ch_ >= 'A' && ch_ <= 'Z') symbol = true;
-//				else if(ch_ >= 'a' && ch_ <= 'z') symbol = true;
-//				else if(ch_ == '_' || ch_ == '?') symbol = true;
-
-				while(ch_ != 0) {
-					if(ch_ == '+') break;
-					else if(ch_ == '-') break;
-					else if(ch_ == '*') break;
-					else if(ch_ == '/') break;
-//					else if(ch_ == '&') break;
-//					else if(ch_ == '^') break;
-//					else if(ch_ == '|') break;
-//					else if(ch_ == '%') break;
-					else if(ch_ == ')') break;
-//					else if(ch_ == '<') break;
-//					else if(ch_ == '>') break;
-//					else if(ch_ == '!') break;
-//					else if(ch_ == '~') break;
-					else if(ch_ == '.') {
-						if(point) {
-							error_.set(error::fatal);
-							break;
-						} else {
-							point = true;
-						}
-					} else if(ch_ >= '0' && ch_ <= '9') {
-						if(point) {
-							fp *= 10;
-							fp += ch_ - '0';
-							fs *= 10;
-						} else {
-							v *= 10;
-							v += ch_ - '0';
-						}
-					} 
+			NVAL nval;
+			if(static_cast<uint8_t>(ch_) >= 0x80) {  // symbol?, func?
+				if(static_cast<uint8_t>(ch_) >= 0xC0) {  // func ?
+					auto fc = static_cast<typename FUNC::NAME>(ch_);
 					ch_ = *tx_++;
-				}
-
-#if 0
-				if(symbol) {
-					symbol_map_cit cit = symbol_.find(sym);
-					if(cit != symbol_.end()) {
-						v = (*cit).second;
+					if(ch_ == '(') {
+						ch_ = *tx_++;
+						auto param = expression_();
+						if(ch_ == ')') {
+							ch_ = *tx_++;
+							if(!func_(fc, param, nval)) {
+								error_.set(error::func_fatal);
+							}
+						} else {
+							error_.set(error::fatal);
+						}
+					} else {
+						error_.set(error::func_fatal);
+					}
+				} else {  // to symbol
+					if(symbol_(static_cast<typename SYMBOL::NAME>(ch_), nval)) {
+						ch_ = *tx_++;	
 					} else {
 						error_.set(error::symbol_fatal);
 					}
 				}
-#endif
+				if(minus) { nval = -nval; }
+				return nval;
 			}
 
-			if(inv) { v = -v; }
-///			if(neg) { v = ~v; }
-			if(point) {
-				return static_cast<VTYPE>(v) + static_cast<VTYPE>(fp) / static_cast<VTYPE>(fs);
+			if(ch_ == '(') {
+				nval = factor_();
 			} else {
-				return static_cast<VTYPE>(v);
+				uint32_t idx = 0;
+				while(ch_ != 0) {
+					if(ch_ == ' ' || ch_ == '\t') continue;
+					else if(ch_ == '+') break;
+					else if(ch_ == '-') break;
+					else if(ch_ == '*') break;
+					else if(ch_ == '/') break;
+					else if(ch_ == ')') break;
+					else if(ch_ == '^') break;
+					else if((ch_ >= '0' && ch_ <= '9') || ch_=='.' || ch_=='e' || ch_=='E') {
+						tmp[idx] = ch_;
+						idx++;
+					} else {
+						error_.set(error::fatal);
+						break;
+					}
+					ch_ = *tx_++;
+				}
+				tmp[idx] = 0;
+				if(error_() == 0) {
+					nval.assign(tmp);
+				}
 			}
+
+			if(minus) { nval = -nval; }
+
+			return nval;
 		}
 
 
-		VTYPE factor_() {
-			VTYPE v = 0;
+		auto factor_()
+		{
+			NVAL v(0);
 			if(ch_ == '(') {
 				ch_ = *tx_++;
 				v = expression_();
@@ -158,14 +176,19 @@ namespace utils {
 				}
 			} else {
 				v = number_();
+				if(ch_ == '^') {  // べき乗
+					ch_ = *tx_++;
+					auto n = number_();
+					v.pow(n);
+				}
 			}
 			return v;
 		}
 
 
-		VTYPE term_() {
-			VTYPE v = factor_();
-			VTYPE tmp;
+		NVAL term_() {
+			NVAL v = factor_();
+			NVAL tmp;
 			while(error_() == 0) {
 				switch(ch_) {
 				case ' ':
@@ -196,7 +219,6 @@ namespace utils {
 							error_.set(error::zero_divide);
 							break;
 						}
-///						v %= tmp;
 					} else {
 						tmp = factor_();
 						if(tmp == 0) {
@@ -235,8 +257,8 @@ namespace utils {
 		}
 
 
-		VTYPE expression_() {
-			VTYPE v = term_();
+		NVAL expression_() {
+			NVAL v = term_();
 			while(error_() == 0) {
 				switch(ch_) {
 				case ' ':
@@ -277,9 +299,12 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	func	関数クラス
 		*/
 		//-----------------------------------------------------------------//
-		basic_arith() : tx_(nullptr), ch_(0), error_(), value_(0) { }
+		basic_arith(SYMBOL& symbol, FUNC& func) noexcept : symbol_(symbol), func_(func),
+			tx_(nullptr), ch_(0), error_(), value_()
+		{ }
 
 
 		//-----------------------------------------------------------------//
@@ -289,7 +314,8 @@ namespace utils {
 			@return	文法にエラーがあった場合、「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool analize(const char* text) {
+		bool analize(const char* text)
+		{
 			if(text == nullptr) {
 				error_.set(error::fatal);
 				return false;
@@ -326,11 +352,43 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	結果を取得
-			@return	結果
+			@brief	エラーメッセージを取得
+			@return エラーメッセージ
 		*/
 		//-----------------------------------------------------------------//
-		VTYPE get() const { return value_; }
+		template <class STR>
+		STR get_error() const {
+			STR str;
+			return str;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	埋め込まれた、シンボル、関数名を展開
+			@param[in]	in		入力文字列
+			@param[out]	out		展開文字列
+			@param[in]	len		展開文字列サイズ
+			@return	成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool parse(const char* in, char* out, uint32_t len) const
+		{
+			char ch;
+			while(len > 1 && (ch = *in++) != 0) {
+				uint8_t n = static_cast<uint8_t>(ch);
+				if(n < 0x80) {
+					*out++ = ch;
+					len--;
+				} else if(n < 0xc0) {  // シンボル
+
+				} else {  // 関数
+
+				}
+			}
+			*out = 0;
+			return len > 1;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -339,6 +397,6 @@ namespace utils {
 			@return	結果
 		*/
 		//-----------------------------------------------------------------//
-		VTYPE operator() () const { return value_; }
+		NVAL operator() () const { return value_; }
 	};
 }

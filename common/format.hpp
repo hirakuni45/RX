@@ -32,6 +32,7 @@
 			+ 2020/04/25 07:45- stdout_buffered_chaout に、操作位置を返すメソッド pos() を追加。
 			! 2020/11/20 07:44- sformat 時の nega_ フラグの初期化漏れ
 			! 2020/11/20 07:44- nega_ 符号表示の順番、不具合
+			! 2020/11/20 16:59- uint 型を削除
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2013, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -219,7 +220,7 @@ namespace utils {
 			if(pos_ == 0) return;
 
 #ifdef USE_PUTCHAR
-			for(uint i = 0; i < pos_; ++i) {
+			for(uint16_t i = 0; i < pos_; ++i) {
 				putchar(buff_[i]);
 			}
 #else
@@ -239,7 +240,7 @@ namespace utils {
 	public:
 		void operator() (const char* s, uint16_t l) noexcept {
 #ifdef USE_PUTCHAR
-			for(uint i = 0; i < l; ++i) {
+			for(uint16_t i = 0; i < l; ++i) {
 				putchar(s[i]);
 			}
 #else
@@ -372,7 +373,7 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	class base_format {
 	public:
-		static const uint16_t VERSION = 92;		///< バージョン番号（整数）
+		static const uint16_t VERSION = 93;		///< バージョン番号（整数）
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
