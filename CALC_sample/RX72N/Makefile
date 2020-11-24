@@ -32,7 +32,7 @@ PSOURCES	=	CALC_sample/main.cpp \
 				graphics/kfont16.cpp \
 				graphics/color.cpp
 
-USER_LIBS	=	supc++
+USER_LIBS	=	mpfr gmp supc++
 
 LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 
@@ -72,15 +72,16 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS     =   /usr/local/rxlib/include $(LOCAL_PATH)/include
 
 INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../../RX600/drw2d
+LIB_ROOT	=	../../RX600/drw2d /usr/local/rxlib/lib
 
 AS_OPT		=
 
-CP_OPT		=	-Wall -Werror \
+CP_OPT		=	-mdfpu -m64bit-doubles \
+				-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
 				-fno-exceptions
