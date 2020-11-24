@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX66T グループ・ポート・マッピング
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -29,11 +29,11 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class option : uint8_t {
 			BYPASS,		///< ポートマップの設定をバイパスする場合
-			FIRST,		///< 第１候補 (XXX-A グループ)
-			SECOND,		///< 第２候補 (XXX-B グループ)
+			FIRST,		///< 第１候補
+			SECOND,		///< 第２候補
 			THIRD,		///< 第３候補
 			FOURTH,		///< 第４候補
-			FIFTH,		///< 第５候補
+			_5TH,		///< 第５候補
 			_6TH,		///< 第６候補
 			_7TH,		///< 第７候補
 			FIRST_I2C,	///< SCI ポートを簡易 I2C として使う場合、第１候補
@@ -67,29 +67,17 @@ namespace device {
 
 	private:
 
-		
-
 		static bool sub_1st_(peripheral t, bool enable) noexcept
 		{
 			switch(t) {
 
-			case peripheral::CAN0:
-				{
-					uint8_t sel = enable ? 0b10000 : 0;
-					PORTA::PMR.B0 = 0;
-					PORTA::PMR.B1 = 0;
-					MPC::PA0PFS.PSEL = sel;  // PA0/CTX0 (59/144)
-					MPC::PA1PFS.PSEL = sel;  // PA1/CRX0 (58/144)
-					PORTA::PMR.B0 = enable;
-					PORTA::PMR.B1 = enable;
-				}
-				break;
-
 			case peripheral::RIIC0:
 				{
 					uint8_t sel = enable ? 0b01111 : 0;
-					MPC::PB1PFS.PSEL = sel;  // PB1/SCL0 (34/100)
-					MPC::PB2PFS.PSEL = sel;  // PB2/SDA0 (33/100)
+					PORTB::PMR.B1 = 0;
+					PORTB::PMR.B2 = 0;
+					MPC::PB1PFS.PSEL = sel;  // PB1/SCL (34/100)
+					MPC::PB2PFS.PSEL = sel;  // PB2/SDA (33/100)
 					PORTB::PMR.B1 = enable;
 					PORTB::PMR.B2 = enable;
 				}
@@ -167,18 +155,6 @@ namespace device {
 		{
 			switch(t) {
 
-			case peripheral::CAN0:
-				{
-					uint8_t sel = enable ? 0b10000 : 0;
-					PORTA::PMR.B6 = 0;
-					PORTA::PMR.B7 = 0;
-					MPC::PA6PFS.PSEL = sel;  // PA6/CTX0 (53/144)
-					MPC::PA7PFS.PSEL = sel;  // PA7/CRX0 (42/144)
-					PORTA::PMR.B6 = enable;
-					PORTA::PMR.B7 = enable;
-				}
-				break;
-
 //			case peripheral::SCI5C:
 //				{
 //					uint8_t sel = enable ? 0b01010 : 0;
@@ -224,8 +200,8 @@ namespace device {
 			uint8_t sel = enable ? 0b10000 : 0;
 			switch(opt) {
 			case option::FIRST:
-				// PE0/CRX0 (22/144) 1ST
-				// PD7/CTX0 (23/144)
+				// PE0/CRX0 (22/144) (17/100)
+				// PD7/CTX0 (23/144) (18/100)
 				PORTE::PMR.B0 = 0;
 				PORTD::PMR.B7 = 0;
 				MPC::PE0PFS.PSEL = sel;
@@ -234,7 +210,37 @@ namespace device {
 				PORTD::PMR.B7 = enable;
 				break;
 			case option::SECOND:
-				// PF3/CRX0 (31/144) 2ND
+				// PB6/CRX0 (40/144) (27/100)
+				// PB5/CTX0 (41/144) (28/100)
+				PORTB::PMR.B6 = 0;
+				PORTB::PMR.B5 = 0;
+				MPC::PB6PFS.PSEL = sel;
+				MPC::PB5PFS.PSEL = sel;
+				PORTB::PMR.B6 = enable;
+				PORTB::PMR.B5 = enable;
+				break;
+			case option::THIRD:
+				// PA1/CRX0 (58/144) (40/100)
+				// PA0/CTX0 (59/144) (41/100)
+				PORTA::PMR.B1 = 0;
+				PORTA::PMR.B0 = 0;
+				MPC::PA1PFS.PSEL = sel;
+				MPC::PA0PFS.PSEL = sel;
+				PORTA::PMR.B1 = enable;
+				PORTA::PMR.B0 = enable;
+				break;
+			case option::FOURTH:
+				// P23/CTX0 (96/144) (66/100)
+				// P22/CRX0 (97/144) (67/100)
+				PORT2::PMR.B3 = 0;
+				PORT2::PMR.B2 = 0;
+				MPC::P23PFS.PSEL = sel;
+				MPC::P22PFS.PSEL = sel;
+				PORT2::PMR.B3 = enable;
+				PORT2::PMR.B2 = enable;
+				break;
+			case option::_5TH:
+				// PF3/CRX0 (31/144)
 				// PF2/CTX0 (32/144)
 				PORTF::PMR.B3 = 0;
 				PORTF::PMR.B2 = 0;
@@ -243,18 +249,8 @@ namespace device {
 				PORTF::PMR.B3 = enable;
 				PORTF::PMR.B2 = enable;
 				break;
-			case option::THIRD:
-				// PB6/CRX0 (40/144) 3RD
-				// PB5/CTX0 (41/144)
-				PORTB::PMR.B6 = 0;
-				PORTB::PMR.B5 = 0;
-				MPC::PB6PFS.PSEL = sel;
-				MPC::PB5PFS.PSEL = sel;
-				PORTB::PMR.B6 = enable;
-				PORTB::PMR.B5 = enable;
-				break;
-			case option::FOURTH:
-				// PA7/CRX0 (52/144) 4TH
+			case option::_6TH:
+				// PA7/CRX0 (52/144)
 				// PA6/CTX0 (53/144)
 				PORTA::PMR.B7 = 0;
 				PORTA::PMR.B6 = 0;
@@ -263,18 +259,8 @@ namespace device {
 				PORTA::PMR.B7 = enable;
 				PORTA::PMR.B6 = enable;
 				break;
-			case option::FIFTH:
-				// PA1/CRX0 (58/144) 5TH
-				// PA0/CTX0 (59/144)
-				PORTA::PMR.B1 = 0;
-				PORTA::PMR.B0 = 0;
-				MPC::PA1PFS.PSEL = sel;
-				MPC::PA0PFS.PSEL = sel;
-				PORTA::PMR.B1 = enable;
-				PORTA::PMR.B0 = enable;
-				break;
-			case option::_6TH:
-				// PC6/CRX0 (62/144) 6TH
+			case option::_7TH:
+				// PC6/CRX0 (62/144)
 				// PC5/CTX0 (63/144)
 				PORTC::PMR.B6 = 0;
 				PORTC::PMR.B5 = 0;
@@ -282,16 +268,6 @@ namespace device {
 				MPC::PC5PFS.PSEL = sel;
 				PORTC::PMR.B6 = enable;
 				PORTC::PMR.B5 = enable;
-				break;
-			case option::_7TH:
-				// P23/CTX0 (96/144) 7TH
-				// P22/CRX0 (97/144)
-				PORT2::PMR.B3 = 0;
-				PORT2::PMR.B2 = 0;
-				MPC::P23PFS.PSEL = sel;
-				MPC::P22PFS.PSEL = sel;
-				PORT2::PMR.B3 = enable;
-				PORT2::PMR.B2 = enable;
 				break;
 			default:
 				return false;

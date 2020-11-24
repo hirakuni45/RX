@@ -62,6 +62,12 @@ namespace graphics {
 		color_t(const color_t& t) noexcept : rgba(t.rgba) { }
  		color_t& operator = (const color_t& t) noexcept { rgba = t.rgba; return *this; }
 		color_t& operator = (color_t&& t) noexcept { rgba = t.rgba; return *this; }
+		color_t& operator *= (uint8_t s) noexcept {
+			unit.r = (static_cast<uint16_t>(unit.r) * (static_cast<uint16_t>(s) + 1)) >> 8;
+			unit.g = (static_cast<uint16_t>(unit.g) * (static_cast<uint16_t>(s) + 1)) >> 8;
+			unit.b = (static_cast<uint16_t>(unit.b) * (static_cast<uint16_t>(s) + 1)) >> 8;
+			return *this;
+		}
 	};
 
 
@@ -94,6 +100,21 @@ namespace graphics {
 			rgb565 = t.rgb565;
 			rgba8 = t.rgba8;
 			return *this;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	輝度付きカラー設定
+			@param[in]	col	ベースカラー
+			@param[in]	y	輝度
+		*/
+		//-----------------------------------------------------------------//
+		void set_color(const color_t& col, uint8_t y) noexcept
+		{
+			rgba8 = col;
+			rgba8 *= y;
+			rgb565 = to_565(rgba8.unit.r, rgba8.unit.g, rgba8.unit.b);
 		}
 
 
@@ -159,6 +180,9 @@ namespace graphics {
 			rgba8_t t(r >> 8, g >> 8, b >> 8);
 			return t;
 		}
+
+
+
 	};
 
 
@@ -187,5 +211,9 @@ namespace graphics {
 		static const share_color Fuchsi;
 		static const share_color Aqua;
 		static const share_color White;
+		static const share_color Orange;
+		static const share_color SafeColor;
+		static const share_color EmeraldGreen;
+		static const share_color LightPink;
 	};
 }

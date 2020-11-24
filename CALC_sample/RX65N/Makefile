@@ -1,7 +1,7 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX72N Makefile
+#   @brief  RX65N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
@@ -9,12 +9,11 @@
 #=======================================================================
 TARGET		=	calc_sample
 
-DEVICE		=	R5F572NN
+DEVICE		=	R5F565NE
 
 FATFS_VER	=	ff14/source
 
 BUILD		=	release
-# BUILD		=	debug
 
 VPATH		=	../../
 
@@ -32,12 +31,12 @@ PSOURCES	=	CALC_sample/main.cpp \
 				graphics/kfont16.cpp \
 				graphics/color.cpp
 
-USER_LIBS	=	mpfr gmp supc++
+USER_LIBS	=	supc++
 
-LDSCRIPT	=	../../RX72N/$(DEVICE).ld
+LDSCRIPT	=	../../RX65x/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX72N \
-				F_ICLK=240000000 \
+USER_DEFS	=	SIG_RX65N \
+				F_ICLK=120000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000
 
@@ -72,16 +71,13 @@ else
   endif
 endif
 
-INC_SYS     =   /usr/local/rxlib/include $(LOCAL_PATH)/include
+INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../../RX600/drw2d /usr/local/rxlib/lib
+OPTIMIZE	=	-O3
 
-AS_OPT		=
-
-CP_OPT		=	-mdfpu -m64bit-doubles \
-				-Wall -Werror \
+CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
 				-fno-exceptions
@@ -89,18 +85,6 @@ CP_OPT		=	-mdfpu -m64bit-doubles \
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-fno-exceptions
-
-ifeq ($(BUILD),debug)
-    CC_OPT += -g -DDEBUG
-    CP_OPT += -g -DDEBUG
-	OPTIMIZE = -O0
-endif
-
-ifeq ($(BUILD),release)
-    CC_OPT += -DNDEBUG
-    CP_OPT += -DNDEBUG
-	OPTIMIZE = -O3
-endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
 APPINCS		=	$(addprefix -I, $(INC_APP))
@@ -211,6 +195,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

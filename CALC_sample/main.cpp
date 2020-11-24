@@ -49,6 +49,12 @@ namespace {
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 	#define USE_GUI
+
+    typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
+    typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない
+    // RX65N Envision Kit の SDHI ポートは、候補３で指定できる
+    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
+    SDC		sdc_;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
 	typedef device::system_io<10000000> SYSTEM_IO;

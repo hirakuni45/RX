@@ -2,7 +2,7 @@
 	@brief	RX72T R5F572TK リンカー・スクリプト @n
 			Code: 1M, RAM: 128K, DataFlash: 32K
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -14,11 +14,11 @@ ENTRY(_start)
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 
-/* This memory layout corresponds to the smallest predicted RX66TK chip.  */
+/* This memory layout corresponds to the smallest predicted RX72TK chip.  */
 MEMORY {
-	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0001FC00 /* 128K - stack_size (1024) */
-	USTACK (w) : ORIGIN = 0x0001FF80, LENGTH = 4 /* ustack 896 bytes */
-	ISTACK (w) : ORIGIN = 0x00020000, LENGTH = 4 /* istack 128 bytes  */
+	RAM (w)    : ORIGIN = 0x00000000, LENGTH = 0x0001F800 /* 128K - stack_size (2048) */
+	USTACK (w) : ORIGIN = 0x0001FE00, LENGTH = 4 /* ustack 1536 bytes */
+	ISTACK (w) : ORIGIN = 0x00020000, LENGTH = 4 /* istack 512 bytes  */
 	ROM (w)    : ORIGIN = 0xFFF00000, LENGTH = 0x000FFFD0 /* 1024K - hw_vectors(48) */
 }
 
