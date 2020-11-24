@@ -93,6 +93,7 @@ int main(int argc, char** argv)
 |[/NESEMU_sample](./NESEMU_sample)|ルネサス製 RX65N/RX72N Envision Kit, NES エミュレーター|
 |[/AUDIO_sample](./AUDIO_sample)|MP3/WAV オーディオプレイヤー|
 |[/SYNTH_sample](./SYNTH_sample)|FM 音源シンセサイザー・エミュレータ|
+|[/CALC_sample](./CALC_sample)|汎用電卓サンプル|
 |[LICENSE](./LICENSE)   |ライセンス表記ファイル|
    
 ※上記リストに無いけど、チェックアウトすると存在するディレクトリーやファイルは、作業中と考えて下さい。
