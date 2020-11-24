@@ -6,7 +6,7 @@
 			・選択時関数を使わない場合、select_id を監視する事で、状態の変化を認識できる。@n
 			・選択時関数にはラムダ式を使える。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -38,6 +38,9 @@ namespace gui {
 		SELECT_FUNC_TYPE	select_func_;
 		uint32_t			select_id_;
 
+		graphics::share_color	base_color_;
+		graphics::share_color	font_color_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -47,7 +50,8 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		button(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), select_func_(), select_id_(0)
+			widget(loc, str), select_func_(), select_id_(0),
+			base_color_(graphics::def_color::White), font_color_(graphics::def_color::White)
 		{
 			if(get_location().size.x <= 0) {
 				auto tlen = 0;
@@ -163,6 +167,30 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	ベースカラーの設定
+			@param[in]	col	ベースカラー
+		*/
+		//-----------------------------------------------------------------//
+		void set_base_color(const graphics::share_color& col) noexcept
+		{
+			base_color_ = col;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フォントカラーの設定
+			@param[in]	col	ベースカラー
+		*/
+		//-----------------------------------------------------------------//
+		void set_font_color(const graphics::share_color& col) noexcept
+		{
+			font_color_ = col;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	描画
 			@param[in]	rdr		描画インスタンス
 		*/
@@ -171,18 +199,22 @@ namespace gui {
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
-			rdr.set_fore_color(graphics::def_color::White);
+			rdr.set_fore_color(base_color_);
 			rdr.round_box(r, round_radius);
-			if(get_touch_state().level_) {
-				rdr.set_fore_color(graphics::def_color::Silver);
-			} else {
-				rdr.set_fore_color(graphics::def_color::Darkgray);
+			uint8_t inten = 64;
+			if(get_touch_state().level_) {  // 0.75
+				inten = 192;
 			}
+			graphics::color_t c;
+			graphics::share_color sh(0, 0, 0);
+			sh.set_color(base_color_.rgba8, inten);
+			rdr.set_fore_color(sh);
+
 			r.org  += frame_width;
 			r.size -= frame_width * 2;
 			rdr.round_box(r, round_radius - frame_width);
 
-			rdr.set_fore_color(graphics::def_color::White);
+			rdr.set_fore_color(font_color_);
 			auto sz = rdr.at_font().get_text_size(get_title());
 			rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
 		}
