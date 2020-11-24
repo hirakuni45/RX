@@ -10,7 +10,6 @@
 //=====================================================================//
 #include <cmath>
 #include <cstring>
-#include "calc_def.hpp"
 
 namespace utils {
 
@@ -89,6 +88,7 @@ namespace utils {
 			case ATYPE::Grad:
 				return in / grad_ * c2_ * NVAL::get_pi();
 			}
+			return in;
 		}
 
 
@@ -102,6 +102,7 @@ namespace utils {
 			case ATYPE::Grad:
 				return in / (c2_ * NVAL::get_pi()) * grad_; 
 			}
+			return in;
 		}
 
 

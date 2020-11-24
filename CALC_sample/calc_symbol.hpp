@@ -10,7 +10,6 @@
 //=====================================================================//
 #include <cmath>
 #include <cstring>
-#include "calc_def.hpp"
 
 namespace utils {
 

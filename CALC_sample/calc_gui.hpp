@@ -322,7 +322,7 @@ namespace app {
 
 		void update_calc_()
 		{
-			if(cbuff_pos_ != static_cast<int32_t>(cbuff_.size())) {
+			if(cbuff_pos_ != cbuff_.size()) {
 				if(cbuff_pos_ > cbuff_.size()) {
 					if(del_len_ > 0) {
 						auto x = cur_pos_.x - del_len_;
