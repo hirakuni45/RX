@@ -295,26 +295,26 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	水平ラインを描画
-			@param[in]	y	開始位置Ｘ
-			@param[in]	x	開始位置Ｙ
+			@param[in]	y	開始位置Ｘ（小数４ビット）
+			@param[in]	x	開始位置Ｙ（小数４ビット）
 			@param[in]	w	水平幅
 		*/
 		//-----------------------------------------------------------------//
 		void line_h(int16_t y, int16_t x, int16_t w) noexcept
 		{
-			if(w <= 0) return;
+			if(w < 16) return;
 			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(GLC::height)) return;
-			if(x < 0) {
+			if(x < 0) {  // クリッピング
 				w += x;
 				x = 0;
-			} else if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(GLC::width)) {
+			} else if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(GLC::width << 4)) {
 				return;
 			}
-			if(static_cast<uint16_t>(x + w) >= static_cast<uint16_t>(GLC::width)) {
-				w = GLC::width - x;
+			if(static_cast<uint16_t>(x + w) >= static_cast<uint16_t>(GLC::width << 4)) {
+				w = (GLC::width << 4) - x;
 			}
-			uint16_t* out = &fb_[y * line_offset + x];
-			for(int16_t i = 0; i < w; ++i) {
+			uint16_t* out = &fb_[y * line_offset + (x >> 4)];
+			for(int16_t i = 0; i < w; i += 16) {
 				*out++ = fore_color_.rgb565;
 			}
 		}
@@ -360,7 +360,7 @@ namespace graphics {
 			if(rect.size.x <= 0 || rect.size.y <= 0) return;
 
 			for(int16_t yy = rect.org.y; yy < (rect.org.y + rect.size.y); ++yy) {
-				line_h(yy, rect.org.x, rect.size.x);
+				line_h(yy, rect.org.x << 4, rect.size.x << 4);
 			}
 		}
 
@@ -462,10 +462,10 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		void frame(const vtx::srect& rect) noexcept
 		{
-			line_h(rect.org.y,  rect.org.x, rect.size.x);
-			line_h(rect.org.y + rect.size.y - 1, rect.org.x, rect.size.x);
-			line_v(rect.org.x,  rect.org.y  + 1, rect.size.y - 2);
-			line_v(rect.org.x + rect.size.x - 1, rect.org.y + 1, rect.size.y - 2);
+			line_h(rect.org.y,  rect.org.x << 4, rect.size.x << 4);
+			line_h(rect.org.y + rect.size.y - 1, rect.org.x << 4, rect.size.x << 4);
+			line_v(rect.org.x, (rect.org.y  + 1) << 4, (rect.size.y - 2) << 4);
+			line_v(rect.org.x + rect.size.x - 1, (rect.org.y + 1) << 4, (rect.size.y - 2) << 4);
 		}
 
 
@@ -484,10 +484,10 @@ namespace graphics {
 			} 
 			auto cen = rect.org + rad;
 			auto ofs = rect.size - (rad * 2 - 2);
-			line_h(rect.org.y, cen.x, ofs.x);
-			line_h(rect.org.y + rect.size.y - 1, cen.x, ofs.x);
-			line_v(rect.org.x, cen.y, ofs.y);
-			line_v(rect.org.x + rect.size.x - 1, cen.y, ofs.y);
+			line_h(rect.org.y, cen.x << 4, ofs.x << 4);
+			line_h(rect.org.y + rect.size.y - 1, cen.x << 4, ofs.x << 4);
+			line_v(rect.org.x, cen.y << 4, ofs.y << 4);
+			line_v(rect.org.x + rect.size.x - 1, cen.y << 4, ofs.y << 4);
 			vtx::spos pos(0, rad);
 			int16_t p = (5 - rad * 4) / 4;
 			circle_offset_(cen, pos, ofs);
@@ -538,13 +538,21 @@ namespace graphics {
 					p += 2 * po.x + 1;
 				} else {
 					// x` = x - 1
-					if(up) line_h(cn.y - po.y,        cn.x - po.x + 1, po.x + po.x + of.x - 1);
-					if(dn) line_h(cn.y + po.y + of.y, cn.x - po.x + 1, po.x + po.x + of.x - 1);
+					if(up) {
+						line_h(cn.y - po.y, (cn.x - po.x + 1) << 4, (po.x + po.x + of.x - 1) << 4);
+					}
+					if(dn) {
+						line_h(cn.y + po.y + of.y, (cn.x - po.x + 1) << 4, (po.x + po.x + of.x - 1) << 4);
+					}
 					po.y--;
 					p += 2 * (po.x - po.y) + 1;
 				}
-				if(up) line_h(cn.y - po.x,        cn.x - po.y, po.y + po.y + of.x + 1);
-				if(dn) line_h(cn.y + po.x + of.y, cn.x - po.y, po.y + po.y + of.x + 1);
+				if(up) {
+					line_h(cn.y - po.x,        (cn.x - po.y) << 4, (po.y + po.y + of.x + 1) << 4);
+				}
+				if(dn) {
+					line_h(cn.y + po.x + of.y, (cn.x - po.y) << 4, (po.y + po.y + of.x + 1) << 4);
+				}
 			}
 		}
 
@@ -616,20 +624,20 @@ namespace graphics {
 			int16_t x = 0;
 			int16_t y = rad;
 			int16_t p = (5 - rad * 4) / 4;
-			line_h(cen.y, cen.x - y, y + y + 1);
+			line_h(cen.y, (cen.x - y) << 4, (y + y + 1) << 4);
 			while(x < y) {
 				x++;
 				if(p < 0) {
 					p += 2 * x + 1;
 				} else {
 					// x` = x - 1
-					line_h(cen.y - y, cen.x - x + 1, x + x - 1);
-					line_h(cen.y + y, cen.x - x + 1, x + x - 1);
+					line_h(cen.y - y, (cen.x - x + 1) << 4, (x + x - 1) << 4);
+					line_h(cen.y + y, (cen.x - x + 1) << 4, (x + x - 1) << 4);
 					y--;
 					p += 2 * (x - y) + 1;
 				}
-				line_h(cen.y - x, cen.x - y, y + y + 1);
-				line_h(cen.y + x, cen.x - y, y + y + 1);
+				line_h(cen.y - x, (cen.x - y) << 4, (y + y + 1) << 4);
+				line_h(cen.y + x, (cen.x - y) << 4, (y + y + 1) << 4);
 			}
 		}
 
