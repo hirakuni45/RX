@@ -68,6 +68,8 @@ namespace graphics {
 			unit.b = (static_cast<uint16_t>(unit.b) * (static_cast<uint16_t>(s) + 1)) >> 8;
 			return *this;
 		}
+		bool operator == (const color_t& t) const { return rgba == t.rgba; }
+		bool operator != (const color_t& t) const { return rgba != t.rgba; }
 	};
 
 
@@ -96,12 +98,19 @@ namespace graphics {
 		share_color(const share_color& t) noexcept :
 			rgb565(t.rgb565), rgba8(t.rgba8) { }
 
-		share_color& operator = (const share_color& t) {
+		share_color& operator = (const share_color& t) noexcept {
 			rgb565 = t.rgb565;
 			rgba8 = t.rgba8;
 			return *this;
 		}
 
+		bool operator == (const share_color& t) const noexcept {
+			return rgba8 == t.rgba8;
+		}
+
+		bool operator != (const share_color& t) const noexcept {
+			return rgba8 != t.rgba8;
+		}
 
 		//-----------------------------------------------------------------//
 		/*!

@@ -1,7 +1,7 @@
 #pragma once
 //=============================================================================//
 /*! @file
-    @brief  mpfr クラス @n
+    @brief  mpfr ラッパークラス @n
 			GNU gmp, mpfr の C++ ラッパー
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
@@ -142,30 +142,51 @@ namespace mpfr {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ２の自然対数を取得
+			@return ２の自然対数
+		*/
+		//-----------------------------------------------------------------//
+		static const auto get_log2() {
+			value tmp;
+			mpfr_const_log2(tmp.t_, tmp.get_rnd());
+			return tmp;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  Euler数を取得
+			@return Euler数
+		*/
+		//-----------------------------------------------------------------//
+		static const auto get_euler() {
+			value tmp;
+			mpfr_const_euler(tmp.t_, tmp.get_rnd());
+			return tmp;
+		}
+
+
 		void assign(const char* str) noexcept
 		{
 			mpfr_set_str(t_, str, 10, rnd_);
 		}
 
 
+		// べき乗
 		void pow(const value& n) noexcept
 		{
 			mpfr_pow(t_, t_, n.t_, rnd_);
 		}
 
 
-		bool operator == (int v) const noexcept
-		{
-			return mpfr_cmp_si(t_, v) == 0;
-		}
-		bool operator == (long v) const noexcept
-		{
-			return mpfr_cmp_si(t_, v) == 0;
-		}
-		bool operator == (double v) const noexcept
-		{
-			return mpfr_cmp_d(t_, v) == 0;
-		}
+		bool operator == (int v) const noexcept { return mpfr_cmp_si(t_, v) == 0; }
+		bool operator != (int v) const noexcept { return mpfr_cmp_si(t_, v) != 0; }
+		bool operator == (long v) const noexcept { return mpfr_cmp_si(t_, v) == 0; }
+		bool operator != (long v) const noexcept { return mpfr_cmp_si(t_, v) != 0; }
+		bool operator == (double v) const noexcept { return mpfr_cmp_d(t_, v) == 0; }
+		bool operator != (double v) const noexcept { return mpfr_cmp_d(t_, v) != 0; }
 
 
 		value& operator = (const value& th) noexcept {
@@ -219,6 +240,14 @@ namespace mpfr {
 		value operator / (const value& th) const noexcept { return value(*this) /= th; }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  数値文字列を取得
+			@param[in]	upn		小数点以下の文字数
+			@param[out]	out		格納文字列ポインター
+			@param[in]	len		格納文字列最大数
+		*/
+		//-----------------------------------------------------------------//
 		void operator() (int upn, char* out, uint32_t len) noexcept
 		{
 			char form[16];
@@ -291,6 +320,14 @@ namespace mpfr {
 		{
 			value out;
 			mpfr_sqrt(out.t_, in.t_, out.get_rnd());
+			return out;
+		}
+
+
+		static value exp10(const value& in)
+		{
+			value out;
+			mpfr_exp10(out.t_, in.t_, out.get_rnd());
 			return out;
 		}
 	};
