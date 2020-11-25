@@ -31,7 +31,7 @@ PSOURCES	=	CALC_sample/main.cpp \
 				graphics/kfont16.cpp \
 				graphics/color.cpp
 
-USER_LIBS	=	supc++
+USER_LIBS	=	mpfr gmp supc++
 
 LDSCRIPT	=	../../RX65x/$(DEVICE).ld
 
@@ -49,9 +49,9 @@ AS_DEFS		=	-mcpu=rx600
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc
-AS_DEFS		=	-misa=v3
-CC_DEFS		=	-misa=v3
-CP_DEFS		=	-misa=v3
+AS_DEFS		=	-misa=v2
+CC_DEFS		=	-misa=v2
+CP_DEFS		=	-misa=v2
 endif
 
 # Include path for each environment
@@ -71,13 +71,16 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS     =   /usr/local/rxlib/include $(LOCAL_PATH)/include
 
 INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
 
+LIB_ROOT	=	../../RX600/drw2d /usr/local/rxlib/lib
+
 OPTIMIZE	=	-O3
 
-CP_OPT		=	-Wall -Werror \
+CP_OPT		=	-m64bit-doubles \
+				-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
 				-fno-exceptions
