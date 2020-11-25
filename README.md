@@ -96,7 +96,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/NESEMU_sample](./NESEMU_sample)|Renesas RX65N/RX72N Envision Kit, NES emulator|
 |[/AUDIO_sample](./AUDIO_sample)|For each platform, MP3/WAV Audio player|
 |[/SYNTH_sample](./SYNTH_sample)|FM Sound Source Synthesizer and Emulato|
-|[/CALC_sample](./CALC_sample)|Generic Calculator Sample|
+|[/CALC_sample](./CALC_sample)|Generic Calculator Sample (gmp, mpfr library)|
 |[LICENSE](./LICENSE)  |License notation file|
    
 - Although not in the above list, please think that directories and files that exist when you check out are working.   
