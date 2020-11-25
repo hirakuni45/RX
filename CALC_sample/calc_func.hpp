@@ -38,6 +38,8 @@ namespace utils {
 			SQRT,			///< sqrt(x)
 			LOG,			///< log(x)
 			LN,				///< ln(x)
+
+			EXP10,			///< exp10(x)
 		};
 
 
@@ -142,6 +144,7 @@ namespace utils {
 			case NAME::SQRT: return "sqrt";
 			case NAME::LOG:  return "log";
 			case NAME::LN:   return "ln";
+			case NAME::EXP10: return "e10";
 			default:
 				break;
 			}
@@ -228,7 +231,11 @@ namespace utils {
 				}
 				break;
 
-
+			case NAME::EXP10:
+				{
+					out = NVAL::exp10(in);
+				}
+				break;
 			default:
 				return false;
 			}
