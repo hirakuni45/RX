@@ -80,6 +80,9 @@ namespace gui {
 
 		const char*	title_;			///< タイトル
 
+		graphics::share_color	base_color_;	///< GUI 基本色
+		graphics::share_color	font_color_;	///< フォント基本色
+
 		STATE		state_;
 		bool		focus_;
 		bool		touch_;
@@ -99,6 +102,7 @@ namespace gui {
 			noexcept :
 			parents_(nullptr), next_(nullptr),
 			location_(loc), title_(title),
+			base_color_(graphics::def_color::White), font_color_(graphics::def_color::White),
 			state_(STATE::DISABLE), focus_(false), touch_(false),
 			touch_state_(fexp)
 		{ } 
@@ -230,6 +234,42 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		const char* get_title() const noexcept { return title_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ベースカラーの設定
+			@param[in]	color	カラー
+		*/
+		//-----------------------------------------------------------------//
+		void set_base_color(const graphics::share_color& color) noexcept { base_color_ = color; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ベースカラーの取得
+			@return ベースカラー
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_base_color() const noexcept { return base_color_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フォントカラーの設定
+			@param[in]	color	カラー
+		*/
+		//-----------------------------------------------------------------//
+		void set_font_color(const graphics::share_color& color) noexcept { font_color_ = color; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	フォントカラーの取得
+			@return フォントカラー
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_font_color() const noexcept { return font_color_; }
 
 
 		//-----------------------------------------------------------------//
