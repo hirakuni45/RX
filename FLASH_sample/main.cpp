@@ -1,6 +1,6 @@
 //=====================================================================//
 /*! @file
-    @brief  Data Flash 操作サンプル @n
+    @brief  CPU 内蔵 Data Flash 操作サンプル @n
 			RX64M, RX71M: @n
 					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
@@ -34,43 +34,41 @@
 namespace {
 
 #if defined(SIG_RX71M)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX71M" };
-#elif defined(SIG_RX64M)
 	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
+	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX65N)
+	static const char* system_str_ = { "RX65N" };
 	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
-	static const char* system_str_ = { "RX65N" };
 #elif defined(SIG_RX24T)
+	static const char* system_str_ = { "RX24T" };
 	typedef device::system_io<10'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX24T" };
 #elif defined(SIG_RX66T)
+	static const char* system_str_ = { "RX66T" };
 	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX66T" };
 #elif defined(SIG_RX72N)
+	static const char* system_str_ = { "RX72N" };
 	typedef device::system_io<16'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
-	static const char* system_str_ = { "RX72N" };
 #endif
 
-	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
+	typedef utils::fixed_fifo<char, 512> RXB;  ///< SCI/RX (RECV) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  ///< SCI/TX (SEND) バッファの定義
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
-// SCI ポートの第二候補を選択する場合
-//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
 	SCI			sci_;
 
 	typedef device::cmt_mgr<device::CMT0, utils::null_task> CMT;
