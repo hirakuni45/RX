@@ -4,7 +4,7 @@ Various device drivers
 [Japanese](READMEja.md)
 
 ## Overview
-Device control class that communicates with interfaces such as I2C, SPI, BUS, etc.
+Device control class that communicates with interfaces such as I2C, SPI, BUS, CAN, etc.
    
 ## Device list
  - BMP180   
@@ -129,22 +129,22 @@ Capacitive Touch Panel Controller
 Interface: I2C   
    
  - VFD
-?
-Variable Frequency Drive
-?
-Interface: RS-485 (8 Bits 1 Stop No-Parity, 9600 Baud)
+?   
+Variable Frequency Drive   
+?   
+Interface: RS-485 (8 Bits 1 Stop No-Parity, 9600 Baud)   
    
  - R61505V/W
-Renesas SP
-TFT Display Controller Driver (262,144-color, 240RGB x 320-dot)
-<https://datasheetspdf.com/pdf-down/R/6/1/R61505-Renesas.pdf>
-Interface: BUS-8(/CS,/RD,/WR), BUS-16(/CS,/RD,/WR),SPI(/CS,MOSI,MISO,CLK)
+Renesas SP   
+TFT Display Controller Driver (262,144-color, 240RGB x 320-dot)   
+<https://datasheetspdf.com/pdf-down/R/6/1/R61505-Renesas.pdf>   
+Interface: BUS-8(/CS,/RD,/WR), BUS-16(/CS,/RD,/WR),SPI(/CS,MOSI,MISO,CLK)   
 
  - FAMIPAD
-Nintendo
-Family Computer Joy-Pad P/S Conversion (C-MOS Logic IC 4021)
-Interface: 8 bits serial(P/S, CLK, OUT)
-Vcc: 3.0 to 5.5
+Nintendo   
+Family Computer Joy-Pad P/S Conversion (C-MOS Logic IC 4021)   
+Interface: 8 bits serial(P/S, CLK, OUT)   
+Vcc: 3.0 to 5.5   
    
  - MAX6675
 Maxim Integrated   
@@ -154,15 +154,20 @@ Interface: SPI (/CS, SCK, SO)
 Vcc: 3.0 to 5.5
    
  - ISL29034
-Renesas (intersil)
-Integrated Digital Light Sensor
-https://www.renesas.com/jp/ja/products/sensors/ambient-light-sensors/light-to-digital-sensors/device/ISL29034.html
-Interface: I2C
-Vcc: 2.25V to 3.63V
+Renesas (intersil)   
+Integrated Digital Light Sensor   
+https://www.renesas.com/jp/ja/products/sensors/ambient-light-sensors/light-to-digital-sensors/device/ISL29034.html   
+Interface: I2C   
+Vcc: 2.25V to 3.63V   
    
------
+- OBD2
+SAE   
+On Board Diagnosis second generation   
+https://en.wikipedia.org/wiki/OBD-II_PIDs   
+Interface: CAN   
+Vcc 3.3 to 5.0   
+---
    
 License
-----
 
 MIT

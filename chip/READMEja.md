@@ -4,7 +4,7 @@
 [English](README.md)
 
 ## 概要
-I2C、SPI、BUS、等のインターフェースで通信を行うデバイス制御クラス
+I2C、SPI、BUS、CAN、等のインターフェースで通信を行うデバイス制御クラス
    
 ## デバイス・リスト
 
@@ -34,7 +34,7 @@ I2C、SPI、BUS、等のインターフェースで通信を行うデバイス�
 |FAMIPAD|Family Computer Joy-Pad P/S Conversion (C-MOS Logic IC 4021)|Nintendo|serial(P/S, CLK, OUT)|3.0 to 5.5|-|
 |MAX6675|冷接点補償K熱電対デジタルコンバータ(0℃～+1024℃)|Maxim Integrated|SPI|3.0 to 5.5|[MAXIM](https://www.maximintegrated.com/jp/products/sensors/MAX6675.html)| 
 |ISL29034|Integrated Digital Light Sensor|Renesas (intersil)|I2C|2.25 to 3.63|[Renesas](https://www.renesas.com/jp/ja/products/sensors/ambient-light-sensors/light-to-digital-sensors/device/ISL29034.html)|
-   
+|OBD2|On Board Diagnosis second generation|SAE|CAN|3.3 to 5.0|[Wikipedia](https://en.wikipedia.org/wiki/OBD-II_PIDs)|
 ---
 
 ## I2C インターフェース・クラスに要求される機能
@@ -42,6 +42,10 @@ I2C、SPI、BUS、等のインターフェースで通信を行うデバイス�
 ---
 
 ## SPI インターフェース・クラスに要求される機能
+
+---
+
+## CAN インターフェース・クラスに要求される機能
 
 ---
 
