@@ -233,6 +233,7 @@ namespace app {
 		ARITH	arith_;
 
 		typedef utils::fixed_string<256> STR;
+		STR			cbackup_;
 		STR			cbuff_;
 		uint32_t	cbuff_pos_;
 		uint32_t	del_len_;
@@ -416,7 +417,10 @@ namespace app {
 		// 答え表示
 		void update_equ_()
 		{
-			if(cbuff_.empty()) return;
+			if(cbuff_.empty()) {
+				cbuff_ = cbackup_;
+				return;
+			}
 
 			// 括弧が開いていたら自動で閉じる
 			while(nest_ > 0) { cbuff_ += ')'; nest_--; }
@@ -431,6 +435,7 @@ namespace app {
 			parse_cbuff_(cmd);
 			utils::format("%s\n") % cmd.c_str();
 
+			cbackup_ = cbuff_;
 			cbuff_.clear();
 			cur_pos_.x = 0;
 			cur_pos_.y++;
@@ -528,7 +533,7 @@ namespace app {
 			sym_out_ (vtx::srect(LOC_X(1), LOC_Y(2), BTN_W, BTN_H), "Rcl"),
 
 			symbol_(), func_(), arith_(symbol_, func_),
-			cbuff_(), cbuff_pos_(0), del_len_(0), cur_pos_(0),
+			cbackup_(), cbuff_(), cbuff_pos_(0), del_len_(0), cur_pos_(0),
 			fc_mode_(false), nest_(0), symbol_idx_(0), shift_(0)
 		{ }
 
@@ -697,9 +702,12 @@ namespace app {
 				} else if(code == ')') {
 					del_len_ = 8;
 					nest_++;
+				} else if(code == '.') {
+					del_len_ = 8;
 				} else if(code >= '0' && code <= '9') {
 					del_len_ = 16;
-				} else if(code == '+' || code == '-' || code == '*' || code == '/' || code == '^') {
+				} else if(code == '+' || code == '-' || code == '*' || code == '/'
+					|| code == '^') {
 					del_len_ = 16;
 				} else if(code >= 0x80 && code < 0xc0) {
 					del_len_ = symbol_.get_name_size(static_cast<SYMBOL::NAME>(code));
