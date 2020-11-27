@@ -72,11 +72,11 @@ else
   endif
 endif
 
-INC_SYS     =   /usr/local/rxlib/include $(LOCAL_PATH)/include
+INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
 
 INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../../RX600/drw2d /usr/local/rxlib/lib
+LIB_ROOT	=	../../RX600/drw2d ../../rxlib/lib
 
 AS_OPT		=
 
