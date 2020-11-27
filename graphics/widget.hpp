@@ -73,12 +73,13 @@ namespace gui {
 
 	private:
 
-		widget*		parents_;		///< 親
-		widget*		next_;			///< リンク
+		widget*		parents_;	///< 親
+		widget*		next_;		///< リンク
 
-		vtx::srect	location_;		///< 位置とサイズ
+		vtx::srect	location_;	///< 位置とサイズ
 
-		const char*	title_;			///< タイトル
+		const char*	title_;		///< タイトル
+		const void*	mobj_;		///< モーションオブジェクト	
 
 		graphics::share_color	base_color_;	///< GUI 基本色
 		graphics::share_color	font_color_;	///< フォント基本色
@@ -101,7 +102,7 @@ namespace gui {
 		widget(const vtx::srect& loc = vtx::srect(0), const char* title = nullptr, const vtx::spos& fexp = vtx::spos(0))
 			noexcept :
 			parents_(nullptr), next_(nullptr),
-			location_(loc), title_(title),
+			location_(loc), title_(title), mobj_(nullptr),
 			base_color_(graphics::def_color::White), font_color_(graphics::def_color::White),
 			state_(STATE::DISABLE), focus_(false), touch_(false),
 			touch_state_(fexp)
@@ -234,6 +235,24 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		const char* get_title() const noexcept { return title_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	モーションオブジェクトの設定
+			@param[in]	mobj	モーションオブジェクト
+		*/
+		//-----------------------------------------------------------------//
+		void set_mobj(const void* mobj) noexcept { mobj_ = mobj; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	モーションオブジェクトの取得
+			@return モーションオブジェクト
+		*/
+		//-----------------------------------------------------------------//
+		const void* get_mobj() const noexcept { return mobj_; }
 
 
 		//-----------------------------------------------------------------//
