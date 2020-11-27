@@ -200,7 +200,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		fixed_string& operator = (const fixed_string& src) noexcept {
-			std::strncpy(str_, src.c_str(), SIZE);
+			utils::str::strncpy_(str_, src.c_str(), SIZE);
 			pos_ = src.pos_;
 			return *this;
 		}

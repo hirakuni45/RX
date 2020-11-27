@@ -187,8 +187,14 @@ namespace gui {
 			rdr.round_box(r, round_radius - frame_width);
 
 			rdr.set_fore_color(get_font_color());
-			auto sz = rdr.at_font().get_text_size(get_title());
-			rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
+			auto mobj = get_mobj();
+			if(mobj != nullptr) {
+				auto sz = rdr.get_mobj_size(mobj);
+				rdr.draw_mobj(r.org + (r.size - sz) / 2, mobj, false);
+			} else {
+				auto sz = rdr.at_font().get_text_size(get_title());
+				rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
+			}
 		}
 	};
 }

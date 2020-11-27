@@ -60,17 +60,8 @@ namespace utils {
 		NVAL		value_;
 
 
-		// スペース、TAB を取り除く
-		void skip_space_() noexcept
-		{
-			while(ch_ == ' ' || ch_ == '\t') {
-				ch_ = *tx_++;
-			}
-		}
-
-
 		// 関数内パラメーターの取得
-		bool param_(char* dst, uint32_t len)
+		bool param_(char* dst, uint32_t len) noexcept
 		{
 			if(ch_ != '(') return false;
 
@@ -83,12 +74,10 @@ namespace utils {
 		}
 
 
-		NVAL number_()
+		NVAL number_() noexcept
 		{
 			bool minus = false;
 			char tmp[NUMBER_NUM];
-
-			skip_space_();
 
 			// 符号、反転の判定
 			if(ch_ == '-') {
@@ -97,8 +86,6 @@ namespace utils {
 			} else if(ch_ == '+') {
 				ch_ = *tx_++;
 			}
-
-			skip_space_();
 
 			NVAL nval;
 			if(static_cast<uint8_t>(ch_) >= 0x80) {  // symbol?, func?
@@ -135,8 +122,7 @@ namespace utils {
 			} else {
 				uint32_t idx = 0;
 				while(ch_ != 0) {
-					if(ch_ == ' ' || ch_ == '\t') continue;
-					else if(ch_ == '+') break;
+					if(ch_ == '+') break;
 					else if(ch_ == '-') break;
 					else if(ch_ == '*') break;
 					else if(ch_ == '/') break;
@@ -163,7 +149,7 @@ namespace utils {
 		}
 
 
-		auto factor_()
+		auto factor_() noexcept
 		{
 			NVAL v(0);
 			if(ch_ == '(') {
@@ -186,15 +172,12 @@ namespace utils {
 		}
 
 
-		NVAL term_() {
+		NVAL term_() noexcept
+		{
 			NVAL v = factor_();
 			NVAL tmp;
 			while(error_() == 0) {
 				switch(ch_) {
-				case ' ':
-				case '\t':
-					ch_ = *tx_++;
-					break;
 				case '*':
 					ch_ = *tx_++;
 					v *= factor_();
@@ -257,14 +240,11 @@ namespace utils {
 		}
 
 
-		NVAL expression_() {
+		NVAL expression_() noexcept
+		{
 			NVAL v = term_();
 			while(error_() == 0) {
 				switch(ch_) {
-				case ' ':
-				case '\t':
-					ch_ = *tx_++;
-					break;
 				case '+':
 					ch_ = *tx_++;
 					v += term_();
@@ -314,7 +294,7 @@ namespace utils {
 			@return	文法にエラーがあった場合、「false」
 		*/
 		//-----------------------------------------------------------------//
-		bool analize(const char* text)
+		bool analize(const char* text) noexcept
 		{
 			if(text == nullptr) {
 				error_.set(error::fatal);
@@ -347,7 +327,7 @@ namespace utils {
 			@return エラー
 		*/
 		//-----------------------------------------------------------------//
-		const error_t& get_error() const { return error_; }
+		const error_t& get_error() const noexcept { return error_; }
 
 
 		//-----------------------------------------------------------------//
@@ -357,7 +337,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		template <class STR>
-		STR get_error() const {
+		STR get_error() const noexcept {
 			STR str;
 			return str;
 		}
@@ -372,7 +352,7 @@ namespace utils {
 			@return	成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool parse(const char* in, char* out, uint32_t len) const
+		bool parse(const char* in, char* out, uint32_t len) const noexcept
 		{
 			char ch;
 			while(len > 1 && (ch = *in++) != 0) {
@@ -397,6 +377,6 @@ namespace utils {
 			@return	結果
 		*/
 		//-----------------------------------------------------------------//
-		NVAL operator() () const { return value_; }
+		NVAL operator() () const noexcept { return value_; }
 	};
 }
