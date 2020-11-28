@@ -291,30 +291,29 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL1 : uint8_t {
-			CDETI = 3,		///< SDHI / CDETI
-			CACI,			///< SDHI / CACI
-			SDACI,			///< SDHI / SDACI
-			CDETIO,			///< MMCIF / CDETIO
-			ERRIO,			///< MMCIF / ERRIO
-			ACCIO,			///< MMCIF / ACCIO
-			OEI1,			///< POE3 / OEI1
-			OEI2,			///< POE3 / OEI2
-			OEI3,			///< POE3 / OEI3
-			OEI4,			///< POE3 / OEI4
+			POEGGAI,		///< POEG (group A)
+			POEGGBI,		///< POEG (group B)
+			POEGGCI,		///< POEG (group C)
+			POEGGDI,		///< POEG (group C)
+
+			OEI5 = 8,		///< POE / OEI5
+			OEI1,			///< POE / OEI1
+			OEI2,			///< POE / OEI2
+			OEI3,			///< POE / OEI3
+			OEI4,			///< POE / OEI4
 			TEI0,			///< RIIC0 / TEI0
 			EEI0,			///< RIIC0 / EEI0
-			TEI2,			///< RIIC2 / TEI2
-			EEI2,			///< RIIC2 / EEI2
-			SSIF0,			///< SSIE0 / SSIF0
-			SSIF1,			///< SSIE1 / SSIF1
 
-			S12CMPAI  = 20,	///< S12AD / S12CMPAI
-			S12CMPBI,
-			S12CMPAI1 = 22,	///< S12AD1 / S12CMPAI1
-			S12CMPBI1,
-
-			TEI1      = 28,	///< RIIC1 / TEI1
-			EEI1,			///< RIIC1 / EEI1
+			S12CMPAI2 = 18,	///< S12AD2 / S12CMPAI2
+			S12CMPBI2,		///< S12AD2 / S12CMPBI2
+			S12CMPAI,		///< S12AD / S12CMPAI
+			S12CMPBI,		///< S12AD / S12CMPBI
+			S12CMPAI1,		///< S12AD1 / S12CMPAI1
+			S12CMPBI1,		///< S12AD1 / S12CMPBI1
+			IEI8,			///< SCI8 / IEI8
+			ERI8,			///< SCI8 / ERI8
+			IEI9,			///< SCI9 / IEI9
+			ERI9,			///< SCI9 / ERI9
 		};
 
 
@@ -337,26 +336,11 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_AL0 : uint8_t {
-			TEI8 = 0,		///< SCI8 / TEI8
-			ERI8,			///< SCI8 / ERI8
-
-			TEI9 = 4,		///< SCI9 / TEI9
-			ERI9,			///< SCI9 / ERI9
-
-			TEI10 = 8,		///< SCI10 / TEI10
-			ERI10,			///< SCI10 / ERI10
-
 			TEI11 = 12,		///< SCI11 / TEI11
 			ERI11,			///< SCI11 / ERI11
 
 			SPII0 = 16,		///< RSPI0 / SPII0
 			SPEI0,			///< RSPI0 / SPEI0
-			SPII1,			///< RSPI1 / SPII1
-			SPEI1,			///< RSPI1 / SPEI1
-			SPII2,			///< RSPI2 / SPII1
-			SPEI2,			///< RSPI2 / SPEI1
-			TEI7,			///< SCI7  / TEI11
-			ERI7,			///< SCI7  / ERI11
 		};
 
 

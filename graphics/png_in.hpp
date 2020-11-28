@@ -14,7 +14,7 @@
 #include "common/format.hpp"
 
 #include "common/time.h"
-#include "libpng/png.h"
+#include <png.h>
 
 namespace img {
 
