@@ -149,8 +149,8 @@ namespace {
 	TGL			tgl_(render_);
 
 	// QSPI B グループ
-	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
-	QSPI		qspi_;
+//	typedef device::qspi_io<device::QSPI, device::port_map::option::SECOND> QSPI;
+//	QSPI		qspi_;
 
 	typedef utils::command<256> CMD;
 	CMD			cmd_;
@@ -376,9 +376,9 @@ int main(int argc, char** argv)
 	cmd_.set_prompt("# ");
 
 	{  // QSPI の初期化（Flash Memory Read/Write Interface)
-		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
-			utils::format("QSPI not start.\n");
-		}
+//		if(!qspi_.start(1000000, QSPI::PHASE::TYPE1, QSPI::DLEN::W8)) {
+//			utils::format("QSPI not start.\n");
+//		}
 	}
 
 	{  // GLCDC の初期化
