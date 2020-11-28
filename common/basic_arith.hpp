@@ -162,11 +162,6 @@ namespace utils {
 				}
 			} else {
 				v = number_();
-				if(ch_ == '^') {  // べき乗
-					ch_ = *tx_++;
-					auto n = number_();
-					v.pow(n);
-				}
 			}
 			return v;
 		}
@@ -175,7 +170,6 @@ namespace utils {
 		NVAL term_() noexcept
 		{
 			NVAL v = factor_();
-			NVAL tmp;
 			while(error_() == 0) {
 				switch(ch_) {
 				case '*':
@@ -197,18 +191,25 @@ namespace utils {
 					ch_ = *tx_++;
 					if(ch_ == '/') {
 						ch_ = *tx_++;
-						tmp = factor_();
+						auto tmp = factor_();
 						if(tmp == 0) {
 							error_.set(error::zero_divide);
 							break;
 						}
 					} else {
-						tmp = factor_();
+						auto tmp = factor_();
 						if(tmp == 0) {
 							error_.set(error::zero_divide);
 							break;
 						}
 						v /= tmp;
+					}
+					break;
+				case '^':
+					ch_ = *tx_++;
+					{
+						auto n = factor_();
+						v.pow(n);
 					}
 					break;
 #if 0
