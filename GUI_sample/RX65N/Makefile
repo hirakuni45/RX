@@ -58,9 +58,6 @@ CP_DEFS     =   -mcpu=rx600
 else # Renesas GNU-RX gcc
 AS_DEFS     =   -misa=v2
 CC_DEFS     =   -misa=v2
-# CP_DEFS       =   -misa=v2 -mdfpu -mtfu=intrinsic,mathlib
-# CP_DEFS     =   -misa=v2 -mtfu=intrinsic,mathlib
-# CP_DEFS       =   -misa=v2 -mdfpu
 CP_DEFS     =   -misa=v2
 endif
 
@@ -81,12 +78,12 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
 
 INC_APP		=	. ../../ ../ \
 				../../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../../RX600/drw2d ../../zlib ../../libpng
+LIB_ROOT	=	../../RX600/drw2d ../../rxlib/lib
 
 AS_OPT		=
 
