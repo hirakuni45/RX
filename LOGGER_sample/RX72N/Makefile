@@ -54,11 +54,19 @@ USER_DEFS	=	SIG_RX72N \
 				F_FCLK=60000000 F_BCLK=120000000 \
 				FAT_FS FAT_FS_NUM=16 RTOS
 
-AS_DEFS		=	--defsym NOT_USER=1
-# CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
-CC_DEFS		=	-mcpu=rx64m
-# CP_DEFS		=	-mcpu=rx600
-CP_DEFS		=	-mcpu=rx64m
+# Renesas GNU-RX gcc compiler version check
+TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
+
+ifeq ($(TARGET_ISA_TEXT), )
+# gcc-7.5.0 current gcc source build
+AS_DEFS		=	-mcpu=rx600 --defsym NOT_USER=1
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
+else # Renesas GNU-RX gcc
+AS_DEFS		=	-misa=v3 --defsym NOT_USER=1
+CC_DEFS		=	-misa=v3
+CP_DEFS		=	-misa=v3
+endif
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
@@ -77,15 +85,14 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
 
 INC_APP		=	. ../../ ../ \
 				../../FreeRTOS/Source/include \
 				../../FreeRTOS/Source/portable/GCC/RX600v2 \
-				../../RX600/drw2d/inc/tes \
-				../../libmad
+				../../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../../RX600/drw2d ../../libmad ../../zlib ../../libpng
+LIB_ROOT	=	../../RX600/drw2d ../../rxlib/lib
 
 AS_OPT		=
 
