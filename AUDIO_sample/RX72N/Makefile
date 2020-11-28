@@ -84,15 +84,14 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
 
 INC_APP		=	. ../../ ../ \
 				../../FreeRTOS/Source/include \
 				../../FreeRTOS/Source/portable/GCC/RX600v2 \
-				../../RX600/drw2d/inc/tes \
-				../../libmad
+				../../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../../RX600/drw2d ../../libmad ../../zlib ../../libpng
+LIB_ROOT	=	../../RX600/drw2d ../../rxlib/lib
 
 AS_OPT		=
 
