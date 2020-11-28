@@ -80,8 +80,7 @@ int main(int argc, char** argv)
 |[/graphics](./graphics)|グラフィックス描画関係クラス|
 |[/sound](./sound)      |サウンド、オーディオ関係クラス|
 |/r_net                 |ルネサス T4(TCP/UDP) ライブラリと、C++ ハンドラ、ラッパー|
-|[/libmad](./libmad)    |MP3 デコード、mad ライブラリ|
-|[/libpng](./libpng)    |PNG ライブラリ|
+|[/rxlib](./rxlib)      |zlib, png, mad, gmp, mpfr ライブラリ|
 |[/rxprog](./rxprog)    |RX フラッシュへのプログラム書き込みツール（Windows、OS-X、Linux 対応）|
 |[/FIRST_sample](./FIRST_sample)|各プラットホーム対応、LED 点滅プログラム|
 |[/SCI_sample](./SCI_sample)|各プラットホーム対応、SCI サンプルプログラム|
