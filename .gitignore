@@ -21,10 +21,10 @@ html/
 jpeg-6b/
 libusb/
 tmp/
-libmad/libmad
 libpng/libpng
 !NESEMU_sample/RX65N/nesemu_stable.mot
 !NESEMU_sample/RX72N/nesemu_stable.mot
 !RX600/drw2d/libdrw2d.a
+!rxlib/lib/libmad.a
 !rxlib/lib/libgmp.a
 !rxlib/lib/libmpfr.a
