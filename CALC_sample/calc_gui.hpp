@@ -34,6 +34,8 @@
 #include "calc_func.hpp"
 #include "calc_symbol.hpp"
 
+#include "resource.hpp"
+
 namespace app {
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -203,7 +205,7 @@ namespace app {
 		BUTTON	tan_;
 		BUTTON	pai_;
 
-		BUTTON	sqr_;   // x^x
+		BUTTON	sqr_;   // x^2
 		BUTTON	sqrt_;  // √
 		BUTTON	pow_;	// x^y
 
@@ -516,13 +518,13 @@ namespace app {
 			tan_(vtx::srect(LOC_X(4), LOC_Y(2), BTN_W, BTN_H), "tan"),
 			pai_(vtx::srect(LOC_X(4), LOC_Y(3), BTN_W, BTN_H), "π"),
 
-			sqr_ (vtx::srect(LOC_X(3), LOC_Y(0), BTN_W, BTN_H), "X^2"),
+			sqr_ (vtx::srect(LOC_X(3), LOC_Y(0), BTN_W, BTN_H)),
 			sqrt_(vtx::srect(LOC_X(3), LOC_Y(1), BTN_W, BTN_H), "√"),
-			pow_ (vtx::srect(LOC_X(3), LOC_Y(2), BTN_W, BTN_H), "X^Y"),
+			pow_ (vtx::srect(LOC_X(3), LOC_Y(2), BTN_W, BTN_H)),
 
 			log_(vtx::srect(LOC_X(2), LOC_Y(0), BTN_W, BTN_H), "log"),
 			ln_ (vtx::srect(LOC_X(2), LOC_Y(1), BTN_W, BTN_H), "ln"),
-			inv_(vtx::srect(LOC_X(2), LOC_Y(2), BTN_W, BTN_H), "X^-1"),
+			inv_(vtx::srect(LOC_X(2), LOC_Y(2), BTN_W, BTN_H)),
 
 			fc_ (vtx::srect(LOC_X(0), LOC_Y(0), BTN_W, BTN_H), "FC"),
 			angt_(vtx::srect(LOC_X(0), LOC_Y(1), BTN_W, BTN_H), "Deg"),
@@ -815,6 +817,7 @@ namespace app {
 			};
 
 			sqr_.enable();
+			sqr_.set_mobj(resource::bitmap::x_2_);
 			sqr_.at_select_func() = [=](uint32_t id) {
 				cbuff_ += '^';
 				cbuff_ += '2';
@@ -825,6 +828,7 @@ namespace app {
 				cbuff_ += '('; nest_++;
 			};
 			pow_.enable();
+			pow_.set_mobj(resource::bitmap::x_y_);
 			pow_.at_select_func() = [=](uint32_t id) {
 				cbuff_ += '^';
 			};
@@ -840,6 +844,7 @@ namespace app {
 				cbuff_ += '('; nest_++;
 			};
 			inv_.enable();
+			inv_.set_mobj(resource::bitmap::x_m1_);
 			inv_.at_select_func() = [=](uint32_t id) {
 				cbuff_ += '^';
 				cbuff_ += '-';
