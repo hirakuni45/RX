@@ -83,8 +83,7 @@ In device I / O operation, a dedicated header is prepared using template class l
 |[/graphics](./graphics)|Graphics drawing relation class|
 |[/sound](./sound)      |Sound, audio relationship class|
 |/r_net                 |Renesas T4 (TCP / UDP) library, C ++ handler, wrapper|
-|[/libmad](./libmad)    |MP3 decoding, mad library|
-|[/libpng](./libpng)    |PNG library|
+|[/rxlib](./rxlib)      |zlib, png, mad, gmp, mpfr library|
 |[/rxprog](./rxprog)    |Program writing tool to RX microcontroller flash (Windows, OS-X, Linux compatible)|
 |[/FIRST_sample](./FIRST_sample)|LED flashing program for each platform|
 |[/SCI_sample](./SCI_sample)|Each platform, corresponding SCI sample program|
