@@ -66,7 +66,7 @@ endif
 
 INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../../
+INC_APP		=	. ../../
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
