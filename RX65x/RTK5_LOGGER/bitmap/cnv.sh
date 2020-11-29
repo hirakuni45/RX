@@ -1,0 +1,13 @@
+bmc -offset  0*24,32 -size 16,24 -text -header 8 -c_style nmb24_0 font12_24.png ../resource/nmb24_0.h
+bmc -offset  1*24,32 -size 16,24 -text -header 8 -c_style nmb24_1 font12_24.png ../resource/nmb24_1.h
+bmc -offset  2*24,32 -size 16,24 -text -header 8 -c_style nmb24_2 font12_24.png ../resource/nmb24_2.h
+bmc -offset  3*24,32 -size 16,24 -text -header 8 -c_style nmb24_3 font12_24.png ../resource/nmb24_3.h
+bmc -offset  4*24,32 -size 16,24 -text -header 8 -c_style nmb24_4 font12_24.png ../resource/nmb24_4.h
+bmc -offset  5*24,32 -size 16,24 -text -header 8 -c_style nmb24_5 font12_24.png ../resource/nmb24_5.h
+bmc -offset  6*24,32 -size 16,24 -text -header 8 -c_style nmb24_6 font12_24.png ../resource/nmb24_6.h
+bmc -offset  7*24,32 -size 16,24 -text -header 8 -c_style nmb24_7 font12_24.png ../resource/nmb24_7.h
+bmc -offset  8*24,32 -size 16,24 -text -header 8 -c_style nmb24_8 font12_24.png ../resource/nmb24_8.h
+bmc -offset  9*24,32 -size 16,24 -text -header 8 -c_style nmb24_9 font12_24.png ../resource/nmb24_9.h
+bmc -offset 10*24,32 -size 16,24 -text -header 8 -c_style nmb24_co font12_24.png ../resource/nmb24_co.h
+bmc -offset  0*24,32+32 -size 16,24 -text -header 8 -c_style nmb24_do font12_24.png ../resource/nmb24_do.h
+bmc -offset  1*24,32+32 -size 16,24 -text -header 8 -c_style nmb24_x font12_24.png ../resource/nmb24_x.h
