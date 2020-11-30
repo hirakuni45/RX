@@ -26,6 +26,8 @@ namespace mpfr {
 		mpfr_t		t_;
 		mpfr_rnd_t	rnd_;
 
+		static uint32_t ref_count_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -35,6 +37,7 @@ namespace mpfr {
 		//-----------------------------------------------------------------//
 		value(mpfr_rnd_t rnd = MPFR_RNDN) noexcept : t_(), rnd_(rnd) {
 			mpfr_init2(t_, num);
+			++ref_count_;
 		}
 
 
@@ -48,6 +51,7 @@ namespace mpfr {
 		{
 			mpfr_init2(t_, num);
 			mpfr_set(t_, t.t_, rnd_);
+			++ref_count_;
 		}
 
 
@@ -61,6 +65,7 @@ namespace mpfr {
 		explicit value(int iv, mpfr_rnd_t rnd = MPFR_RNDN) noexcept : rnd_(rnd) {
 			mpfr_init2(t_, num);
 			mpfr_set_si(t_, iv, rnd);
+			++ref_count_;
 		}
 
 
@@ -74,6 +79,7 @@ namespace mpfr {
 		explicit value(float iv, mpfr_rnd_t rnd = MPFR_RNDN) noexcept : rnd_(rnd) {
 			mpfr_init2(t_, num);
 			mpfr_set_flt(t_, iv, rnd);
+			++ref_count_;
 		}
 
 
@@ -87,6 +93,7 @@ namespace mpfr {
 		explicit value(double iv, mpfr_rnd_t rnd = MPFR_RNDN) noexcept : rnd_(rnd) {
 			mpfr_init2(t_, num);
 			mpfr_set_d(t_, iv, rnd);
+			++ref_count_;
 		}
 
 
@@ -100,6 +107,7 @@ namespace mpfr {
 		explicit value(const char* iv, mpfr_rnd_t rnd = MPFR_RNDN) noexcept : rnd_(rnd) {
 			mpfr_init2(t_, num);
 			mpfr_set_str(t_, iv, 10, rnd);
+			++ref_count_;
 		}
 
 
@@ -108,7 +116,13 @@ namespace mpfr {
 			@brief  デストラクター
 		*/
 		//-----------------------------------------------------------------//
-		~value() { mpfr_clear(t_); }
+		~value() {
+			mpfr_clear(t_);
+			--ref_count_;
+			if(ref_count_ == 0) {
+				mpfr_free_cache();
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -165,6 +179,18 @@ namespace mpfr {
 			value tmp;
 			mpfr_const_euler(tmp.t_, tmp.get_rnd());
 			return tmp;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  交換
+			@param[in]	th	交換クラス
+		*/
+		//-----------------------------------------------------------------//
+		void swap(value& th) noexcept
+		{
+			mpfr_swap(t_, th.t_);
 		}
 
 
@@ -331,4 +357,7 @@ namespace mpfr {
 			return out;
 		}
 	};
+
+	// テンプレート関数、実態の定義
+	template<uint32_t num> uint32_t value<num>::ref_count_;
 }
