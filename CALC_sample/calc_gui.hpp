@@ -27,9 +27,9 @@
 #include "graphics/scaling.hpp"
 
 #include "common/format.hpp"
-#include "common/basic_arith.hpp"
 #include "common/fixed_string.hpp"
 
+#include "common/basic_arith.hpp"
 #include "common/mpfr.hpp"
 #include "calc_func.hpp"
 #include "calc_symbol.hpp"
@@ -47,7 +47,7 @@ namespace app {
 	public:
 		static const uint32_t CALC_NUM = 250;  ///< 250 桁
 
-		static const uint32_t ANS_NUM = 100;
+		static const uint32_t ANS_NUM = 60;
 		static const int16_t  DISP_OFS_X = 4;
 		static const int16_t  DISP_OFS_Y = 6;
 
@@ -257,6 +257,7 @@ namespace app {
 
 		void clear_win_()
 		{
+			cbackup_.clear();
 			cbuff_.clear();
 			cbuff_pos_ = 0;
 			del_len_ = 0;
@@ -300,7 +301,6 @@ namespace app {
 			case '-': out += "－"; break;
 			case '/': out += "÷"; break;
 			case '*': out += "×"; break;
-			case '^': out += "＾"; break;
 			case '?': out += "？"; break;
 			default:
 				if(ch >= 0) {
@@ -323,7 +323,7 @@ namespace app {
 				l *= 8;
 			} else if(ch >= '0' && ch <= '9') {
 				l = 16;
-			} else if(ch == '+' || ch == '-' || ch == '/' || ch == '*' || ch == '^') {
+			} else if(ch == '+' || ch == '-' || ch == '/' || ch == '*') {
 				l = 16;
 			}
 			return l;
@@ -343,29 +343,29 @@ namespace app {
 
 		void update_calc_()
 		{
-			if(cbuff_pos_ != cbuff_.size()) {
-				if(cbuff_pos_ > cbuff_.size()) {
-					if(del_len_ > 0) {
-						auto x = cur_pos_.x - del_len_;
-						render_.set_fore_color(DEF_COLOR::Darkgray);
-						render_.fill_box(vtx::srect(DISP_OFS_X + x, DISP_OFS_Y + cur_pos_.y * 20, del_len_, 16));
-						cur_pos_.x -= del_len_;
-						del_len_ = 0;
-					}
-				} else {
-					render_.set_fore_color(DEF_COLOR::White);
-					auto i = cbuff_pos_;
-					int x = cur_pos_.x + DISP_OFS_X;
-					while(i < cbuff_.size()) {
-						OUTSTR tmp;
-						conv_cha_(cbuff_[i], tmp);
-						x = render_.draw_text(vtx::spos(x, DISP_OFS_Y + cur_pos_.y * 20), tmp.c_str());
-						++i;
-					}
-					cur_pos_.x = x - DISP_OFS_X;
+			if(cbuff_pos_ == cbuff_.size()) return;
+
+			if(cbuff_pos_ > cbuff_.size()) {
+				if(del_len_ > 0) {
+					auto x = cur_pos_.x - del_len_;
+					render_.set_fore_color(DEF_COLOR::Darkgray);
+					render_.fill_box(vtx::srect(DISP_OFS_X + x, DISP_OFS_Y + cur_pos_.y * 20, del_len_, 16));
+					cur_pos_.x -= del_len_;
+					del_len_ = 0;
 				}
-				cbuff_pos_ = cbuff_.size();
+			} else {
+				render_.set_fore_color(DEF_COLOR::White);
+				auto i = cbuff_pos_;
+				int x = cur_pos_.x + DISP_OFS_X;
+				while(i < cbuff_.size()) {
+					OUTSTR tmp;
+					conv_cha_(cbuff_[i], tmp);
+					x = render_.draw_text(vtx::spos(x, DISP_OFS_Y + cur_pos_.y * 20), tmp.c_str());
+					++i;
+				}
+				cur_pos_.x = x - DISP_OFS_X;
 			}
+			cbuff_pos_ = cbuff_.size();
 		}
 
 
@@ -709,12 +709,11 @@ namespace app {
 				} else if(code == ')') {
 					del_len_ = 8;
 					nest_++;
-				} else if(code == '.') {
+				} else if(code == '.' || code == '^') {
 					del_len_ = 8;
 				} else if(code >= '0' && code <= '9') {
 					del_len_ = 16;
-				} else if(code == '+' || code == '-' || code == '*' || code == '/'
-					|| code == '^') {
+				} else if(code == '+' || code == '-' || code == '*' || code == '/') {
 					del_len_ = 16;
 				} else if(code >= 0x80 && code < 0xc0) {
 					del_len_ = symbol_.get_name_size(static_cast<SYMBOL::NAME>(code));
