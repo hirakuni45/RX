@@ -9,7 +9,7 @@ Renesas RX65N/RX72N Envision Kit 電卓サンプル
 
  - 汎用関数電卓サンプル
  - RX65N/RX72N Envision Kit で利用する場合、GUI での操作が可能
- - グラフィックスを持たないマイコンではコンソールから操作可能（開発中）
+ - グラフィックスを持たないマイコンではコンソールから操作可能
  - gmp mpfr ライブラリを使った、多倍長浮動小数点数
  - 250 桁の内部処理としている（もっと増やす事が出来るが、当面必要十分）
     
@@ -19,8 +19,12 @@ Renesas RX65N/RX72N Envision Kit 電卓サンプル
  - calc_gui.hpp
  - calc_symbol.hpp
  - calc_func.hpp
- - RX65N/Makefile
- - RX72N/Makefile
+ - calc_cmd.hpp
+ - RX64M/Makefile
+ - RX71M/Makefile
+ - RX66T/Makefile
+ - RX65N/Makefile (LCD 対応)
+ - RX72N/Makefile (LCD 対応)
    
 ### 利用ライブラリ
 
