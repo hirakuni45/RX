@@ -29,7 +29,15 @@
 #include "common/format.hpp"
 #include "common/input.hpp"
 
+#if defined(SIG_RX65N) | defined(SIG_RX72N)
+	#define USE_GUI
+#endif
+
+#ifdef USE_GUI
 #include "calc_gui.hpp"
+#else
+#include "calc_cmd.hpp"
+#endif
 
 namespace {
 
@@ -48,7 +56,6 @@ namespace {
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
-	#define USE_GUI
 
     typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
     typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない
@@ -70,7 +77,6 @@ namespace {
 	typedef device::system_io<16'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
-	#define USE_GUI
 
     typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
     typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
@@ -89,7 +95,11 @@ namespace {
 	CMT		cmt_;
 
 #ifdef USE_GUI
-	app::calc_gui	gui_;
+	typedef app::calc_gui GUI;
+	GUI		gui_;
+#else
+	typedef app::calc_cmd CMD;
+	CMD		cmd_;
 #endif
 }
 
@@ -133,6 +143,7 @@ extern "C" {
 		return sci_.recv_length();
 	}
 
+#ifdef USE_GUI
 	DSTATUS disk_initialize(BYTE drv) {
 		return sdc_.disk_initialize(drv);
 	}
@@ -161,6 +172,7 @@ extern "C" {
 	DWORD get_fattime(void) {
 		return 0;
 	}
+#endif
 }
 
 
@@ -187,7 +199,6 @@ int main(int argc, char** argv)
 	LED::DIR = 1;
 	LED::P = 1;
 
-//	cmd_.set_prompt("# ");
 	uint8_t cnt = 0;
 
 	LED::DIR = 1;
@@ -195,10 +206,15 @@ int main(int argc, char** argv)
 	gui_.start();
 	gui_.setup_touch_panel();
 	gui_.setup();
+#else
+	cmd_.start();
 #endif
 	while(1) {
 #ifdef USE_GUI
 		gui_.update();
+#else
+		cmt_.sync();
+		cmd_.update();
 #endif
 		++cnt;
 		if(cnt >= 50) {
