@@ -32,7 +32,7 @@ PSOURCES	=	CALC_sample/main.cpp \
 				graphics/kfont16.cpp \
 				graphics/color.cpp
 
-USER_LIBS	=	mpfr gmp supc++
+USER_LIBS	=	mpfr gmp m supc++
 
 LDSCRIPT	=	../../RX65x/$(DEVICE).ld
 
@@ -78,8 +78,6 @@ INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
 
 LIB_ROOT	=	../../RX600/drw2d ../../rxlib/lib
 
-OPTIMIZE	=	-O3
-
 CP_OPT		=	-m64bit-doubles \
 				-Wall -Werror \
 				-Wno-unused-variable \
@@ -89,6 +87,18 @@ CP_OPT		=	-m64bit-doubles \
 CC_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-fno-exceptions
+
+ifeq ($(BUILD),debug)
+    CC_OPT += -g -DDEBUG
+    CP_OPT += -g -DDEBUG
+	OPTIMIZE = -O0
+endif
+
+ifeq ($(BUILD),release)
+    CC_OPT += -DNDEBUG
+    CP_OPT += -DNDEBUG
+	OPTIMIZE = -O3
+endif
 
 SYSINCS		=	$(addprefix -I, $(INC_SYS))
 APPINCS		=	$(addprefix -I, $(INC_APP))
