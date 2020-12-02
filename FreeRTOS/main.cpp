@@ -15,7 +15,10 @@
 			　　　　P00 ピンにLEDを接続する @n
 			RX66T: @n
 					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する
+			　　　　P00 ピンにLEDを接続する @n
+			RX72N: (Renesas Envision kit RX72N) @n
+					16MHz のベースクロックを使用する @n
+					P40 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -44,47 +47,53 @@ namespace {
 /// ベースクリスタルの定義
 /// LED 接続ポートの定義
 #if defined(SIG_RX71M)
-	typedef device::system_io<12000000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX71M" };
-#elif defined(SIG_RX72M)
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX72M)
 	static const char* system_str_ = { "RX72M" };
+	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX64M)
+
 	typedef device::system_io<12000000> SYSTEM_IO;
 #ifdef GR_KAEDE
+	static const char* system_str_ = { "GR-KAEDE" };
 	typedef device::PORT<device::PORTC, device::bitpos::B1> LED;
 	typedef device::PORT<device::PORTC, device::bitpos::B0> LED2;
 	typedef device::SCI7 SCI_CH;
-	static const char* system_str_ = { "GR-KAEDE" };
 #else
+	static const char* system_str_ = { "RX64M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX64M" };
 #endif
 #elif defined(SIG_RX65N)
+	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
-	static const char* system_str_ = { "RX65N" };
 #elif defined(SIG_RX63T)
+	static const char* system_str_ = { "RX63T" };
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORTB, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX63T" };
 #elif defined(SIG_RX24T)
+	static const char* system_str_ = { "RX24T" };
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX24T" };
 #elif defined(SIG_RX66T)
+	static const char* system_str_ = { "RX66T" };
 	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX66T" };
+#elif defined(SIG_RX72N)
+	static const char* system_str_ = { "RX72N Envision Kit" };
+	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::SCI2 SCI_CH;
 #endif
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
@@ -306,6 +315,7 @@ int main(int argc, char** argv)
 	vTaskStartScheduler();
 
 	// タスクスケジューラーが正常なら実行されない
+	utils::format("FreeRTOS Stalled...\n");
 	while(1) {
 		utils::delay::milli_second(250);
 		LED::P = !LED::P();
