@@ -14,11 +14,6 @@ release/
 debug/
 html/
 *.db
-!jpeg-6b/jpeglib.h
-!jpeg-6b/jconfig.h
-!jpeg-6b/jmorecfg.h
-!jpeg-6b/libjpeg.a
-jpeg-6b/
 libusb/
 tmp/
 !NESEMU_sample/RX65N/nesemu_stable.mot
@@ -29,3 +24,5 @@ tmp/
 !rxlib/lib/libmpfr.a
 !rxlib/lib/libz.a
 !rxlib/lib/libpng.a
+!rxlib/lib/libjpeg.a
+rxlib/src
