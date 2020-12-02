@@ -18,7 +18,10 @@
 			　　　　P00 ピンにLEDを接続する
 			RX72N: @n
 					16MHz のベースクロックを使用する @n
-					P40 ピンにLEDを接続する
+					P40 ピンにLEDを接続する @n
+			RX72T: @n
+					8MHz のベースクロックを使用する @n
+					P00 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -57,7 +60,7 @@ namespace {
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #elif defined(SIG_RX72T)
 	typedef device::system_io<8'000'000, 192'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 #endif
 }
 
