@@ -4,7 +4,7 @@
     @brief  GUI 関数電卓・クラス @n
 			RX65N Envision Kit @n
 			RX72N Envision Kit @n
-			rx_gui_emu
+			calc_gui
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -45,9 +45,9 @@ namespace app {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
     class calc_gui {
 	public:
-		static const uint32_t CALC_NUM = 250;  ///< 250 桁
+		static const uint32_t CALC_NUM = 250;  ///< 計算精度桁数 (250)
+		static const uint32_t ANS_NUM = 60;  ///< 結果表示桁数
 
-		static const uint32_t ANS_NUM = 60;
 		static const int16_t  DISP_OFS_X = 4;
 		static const int16_t  DISP_OFS_Y = 6;
 
@@ -83,6 +83,7 @@ namespace app {
 		public:
 			static const uint32_t	width  = LCDX;
 			static const uint32_t	height = LCDY;
+			static const uint32_t	line_width = width;
 
 		private:
 			uint16_t fb_[LCDX * LCDY];
@@ -668,6 +669,14 @@ namespace app {
 		//-------------------------------------------------------------//
 		void setup() noexcept
 		{
+
+//			for(int y = 0; y < 80; ++y) {
+//				render_.line_h(16*16+(y << 4), 16*16+4, 16*300);
+//			}
+
+//			render_.round_box(vtx::srect(16, 16, 300, 100), 16);
+
+// return;
 			no0_.enable();
 			no0_.at_select_func() = [=](uint32_t id) { cbuff_ += '0'; };
 			no1_.enable();
