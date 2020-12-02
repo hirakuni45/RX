@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX600 グループ　GLCDC 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -30,6 +30,8 @@ namespace device {
 		static const int16_t width  = XSIZE;
 		static const int16_t height = YSIZE;
 		static const graphics::pixel::TYPE PXT = PXT_;
+		static const uint32_t line_width =
+			(((width * static_cast<uint32_t>(PXT) / 8) + 63) & 0x7fc0) / (static_cast<uint32_t>(PXT) / 8);
 
 	private:
 

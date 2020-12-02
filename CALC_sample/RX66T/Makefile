@@ -1,7 +1,7 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX72N Makefile
+#   @brief  RX66T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
@@ -9,12 +9,9 @@
 #=======================================================================
 TARGET		=	calc_sample
 
-DEVICE		=	R5F572NN
-
-FATFS_VER	=	ff14/source
+DEVICE		=	R5F566TE
 
 BUILD		=	release
-# BUILD		=	debug
 
 VPATH		=	../../
 
@@ -22,25 +19,18 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c \
-				$(FATFS_VER)/ff.c \
-				$(FATFS_VER)/ffsystem.c \
-				$(FATFS_VER)/ffunicode.c
+				common/syscalls.c
 
-PSOURCES	=	CALC_sample/main.cpp \
-				CALC_sample/resource.cpp \
-				graphics/font8x16.cpp \
-				graphics/kfont16.cpp \
-				graphics/color.cpp
+PSOURCES	=	CALC_sample/main.cpp
 
-USER_LIBS	=	mpfr gmp m supc++
+USER_LIBS	=	mpfr gmp
 
-LDSCRIPT	=	../../RX72N/$(DEVICE).ld
+LDSCRIPT	=	../../RX66T/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX72N \
-				F_ICLK=240000000 \
-				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
-				F_FCLK=60000000 F_BCLK=120000000
+USER_DEFS	=	SIG_RX66T \
+				F_ICLK=160000000 \
+				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKC=160000000 F_PCLKD=40000000 \
+				F_FCLK=40000000 F_BCLK=40000000
 
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
@@ -75,14 +65,11 @@ endif
 
 INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
 
-INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
+INC_APP		=	. ../ ../../
 
-LIB_ROOT	=	../../RX600/drw2d ../../rxlib/lib
+LIB_ROOT	=	../../rxlib/lib
 
-AS_OPT		=
-
-CP_OPT		=	-mdfpu -m64bit-doubles \
-				-Wall -Werror \
+CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
 				-fno-exceptions
@@ -212,6 +199,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX66T --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

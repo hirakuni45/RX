@@ -1,7 +1,7 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX72N Makefile
+#   @brief  RX64M Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
@@ -9,12 +9,11 @@
 #=======================================================================
 TARGET		=	calc_sample
 
-DEVICE		=	R5F572NN
+DEVICE		=	R5F564MF
 
 FATFS_VER	=	ff14/source
 
 BUILD		=	release
-# BUILD		=	debug
 
 VPATH		=	../../
 
@@ -22,23 +21,16 @@ ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
 				common/vect.c \
-				common/syscalls.c \
-				$(FATFS_VER)/ff.c \
-				$(FATFS_VER)/ffsystem.c \
-				$(FATFS_VER)/ffunicode.c
+				common/syscalls.c
 
-PSOURCES	=	CALC_sample/main.cpp \
-				CALC_sample/resource.cpp \
-				graphics/font8x16.cpp \
-				graphics/kfont16.cpp \
-				graphics/color.cpp
+PSOURCES	=	CALC_sample/main.cpp
 
-USER_LIBS	=	mpfr gmp m supc++
+USER_LIBS	=	mpfr gmp
 
-LDSCRIPT	=	../../RX72N/$(DEVICE).ld
+LDSCRIPT	=	../../RX64M/$(DEVICE).ld
 
-USER_DEFS	=	SIG_RX72N \
-				F_ICLK=240000000 \
+USER_DEFS	=	SIG_RX64M \
+				F_ICLK=120000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
 				F_FCLK=60000000 F_BCLK=120000000
 
@@ -51,9 +43,9 @@ AS_DEFS		=	-mcpu=rx600
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc
-AS_DEFS		=	-misa=v3
-CC_DEFS		=	-misa=v3
-CP_DEFS		=	-misa=v3
+AS_DEFS		=	-misa=v2
+CC_DEFS		=	-misa=v2
+CP_DEFS		=	-misa=v2
 endif
 
 # Include path for each environment
@@ -75,14 +67,11 @@ endif
 
 INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
 
-INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
+INC_APP		=	. ../ ../../
 
-LIB_ROOT	=	../../RX600/drw2d ../../rxlib/lib
+LIB_ROOT	=	../../rxlib/lib
 
-AS_OPT		=
-
-CP_OPT		=	-mdfpu -m64bit-doubles \
-				-Wall -Werror \
+CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
 				-fno-exceptions
@@ -212,6 +201,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX64M --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

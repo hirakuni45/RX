@@ -9,7 +9,7 @@ Renesas RX65N/RX72N Envision Kit Calculator Sample
 
  - Generic Calculator Applications
  - GUI operation when used with the RX65N/RX72N Envision Kit
- - Operable from the console in microcontrollers that do not have graphics (under development)
+ - Operable from the console in microcontrollers that do not have graphics
  - Multiply floating point number using the gmp mpfr library
  - 250 digits of internal processing (could be more, but sufficient for the time being)
 
@@ -19,8 +19,12 @@ Renesas RX65N/RX72N Envision Kit Calculator Sample
  - calc_gui.hpp
  - calc_symbol.hpp
  - calc_func.hpp
- - RX65N/Makefile
- - RX72N/Makefile
+ - calc_cmd.hpp
+ - RX64M/Makefile
+ - RX71M/Makefile
+ - RX66T/Makefile
+ - RX65N/Makefile (for LCD)
+ - RX72N/Makefile (for LCD)
 
 ### Use Library
 

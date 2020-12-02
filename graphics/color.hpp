@@ -191,7 +191,24 @@ namespace graphics {
 		}
 
 
-
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	アルファ・ブレンド
+			@param[in]	fc		正カラー
+			@param[in]	alpha	輝度
+			@param[in]	bc		裏カラー
+			@return 合成後カラー
+		*/
+		//-----------------------------------------------------------------//
+		static rgba8_t blend(const rgba8_t& fc, uint8_t alpha, const rgba8_t& bc) noexcept
+		{
+			uint16_t fi = alpha + 1;
+			uint16_t bi = 256 - (alpha + 1);
+			uint8_t r = (static_cast<uint16_t>(fc.r) * fi + static_cast<uint16_t>(bc.r) * bi) >> 8;
+			uint8_t g = (static_cast<uint16_t>(fc.g) * fi + static_cast<uint16_t>(bc.g) * bi) >> 8;
+			uint8_t b = (static_cast<uint16_t>(fc.b) * fi + static_cast<uint16_t>(bc.b) * bi) >> 8;
+			return rgba8_t(r, g, b);
+		}
 	};
 
 
