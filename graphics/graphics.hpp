@@ -572,7 +572,7 @@ namespace graphics {
 				rr *= rr;
 				float radf = rad << 4;
 				radf *= radf;
-				auto l = static_cast<int16_t>(std::sqrt(radf - rr));
+				auto l = static_cast<int16_t>(vtx::fsqrt(radf - rr));
 				int16_t w = len + (l + l);
 				if(up) {
 					line_h(yu, org + (rad << 4) - l, w);
