@@ -33,7 +33,7 @@ PSOURCES	=	CALC_sample/main.cpp \
 				graphics/kfont16.cpp \
 				graphics/color.cpp
 
-USER_LIBS	=	mpfr gmp m supc++
+USER_LIBS	=	mpfr gmp supc++
 
 LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 
