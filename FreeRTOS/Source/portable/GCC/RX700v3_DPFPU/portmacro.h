@@ -105,7 +105,7 @@
         "PUSH.L	R10					\n"\
         "MOV.L	#0x872E0, R10		\n"\
         "MOV.B	#0x1, [R10]			\n"\
-        "CMP	[R10].UB, R10		\n"\
+        "MOV.L	[R10], R10			\n"\
         "POP    R10					\n"\
         :::"cc"						\
     )
