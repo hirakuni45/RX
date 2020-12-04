@@ -54,8 +54,8 @@ ifeq ($(TARGET_ISA_TEXT), )
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc
-CC_DEFS		=	-misa=v2
-CP_DEFS		=	-misa=v2
+CC_DEFS		=	-misa=v3
+CP_DEFS		=	-misa=v3
 endif
 
 # Include path for each environment
