@@ -1,7 +1,7 @@
 Renesas RX マイコン FreeRTOS (V202011.00)
 =========
 
-[English](README.md)
+[Japanese](READMEja.md)
 
 ## 概要
 
