@@ -45,11 +45,18 @@ USER_DEFS	=	SIG_$(ROOT_DEV) \
 				F_FCLK=60000000 F_BCLK=120000000 \
 				RTOS
 
-AS_DEFS		=	--defsym NOT_USER=1 --defsym MEMWAIT=1
-# CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
-CC_DEFS		=	-mcpu=rx71m
-# CP_DEFS		=	-mcpu=rx600
-CP_DEFS		=	-mcpu=rx71m
+# rx-elf-gcc compiler version check
+TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
+
+AS_DEFS		=	--defsym NOT_USER=1
+ifeq ($(TARGET_ISA_TEXT), )
+# gcc-7.5.0 current gcc source build
+CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
+CP_DEFS		=	-mcpu=rx600
+else # Renesas GNU-RX gcc
+CC_DEFS		=	-misa=v2
+CP_DEFS		=	-misa=v2
+endif
 
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
@@ -73,6 +80,9 @@ INC_SYS     =   $(LOCAL_PATH)/include
 INC_APP		=	. ../ ../../ \
 				../../FreeRTOS/Source/include \
 				../../FreeRTOS/Source/portable/GCC/RX600v2
+
+# RX71M MEMWAIT register access for 'start.s'
+AS_OPT		=	--defsym MEMWAIT=1
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

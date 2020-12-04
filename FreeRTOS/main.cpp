@@ -7,9 +7,6 @@
 			RX65N (Renesas Envision kit RX65N): @n
 					12MHz のベースクロックを使用する @n
 			　　　　P70 に接続された LED を利用する @n
-			RX63T @n
-					12MHz のベースクロックを使用する @n
-					PB7 に接続された LED を利用する @n
 			RX24T: @n
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する @n
@@ -74,11 +71,6 @@ namespace {
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
-#elif defined(SIG_RX63T)
-	static const char* system_str_ = { "RX63T" };
-	typedef device::system_io<12000000> SYSTEM_IO;
-	typedef device::PORT<device::PORTB, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
 	typedef device::system_io<10000000> SYSTEM_IO;
