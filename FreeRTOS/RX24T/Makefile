@@ -43,17 +43,18 @@ USER_DEFS	=	SIG_$(ROOT_DEV) \
 				F_ICLK=80000000 \
 				F_FCLK=20000000 \
 				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKD=40000000 \
-				RTOS
+				RTOS RTOS_HEAP_SIZE=10
 
 # rx-elf-gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
-AS_DEFS		=	--defsym NOT_USER=1
 ifeq ($(TARGET_ISA_TEXT), )
 # gcc-7.5.0 current gcc source build
+AS_DEFS		=	--defsym NOT_USER=1
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc
+AS_DEFS		=	-misa=v2 --defsym NOT_USER=1
 CC_DEFS		=	-misa=v2
 CP_DEFS		=	-misa=v2
 endif
