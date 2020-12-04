@@ -184,6 +184,34 @@ namespace mpfr {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  整数部と小数部の分離
+			@param[in]	src	ソース
+			@param[out]	iop	整数部
+			@param[out]	fop	小数部
+		*/
+		//-----------------------------------------------------------------//
+		static void fmod(const value& src, value& iop, value& fop)
+		{
+			mpfr_modf(iop.t_, fop.t_, src.t_, fop.get_rnd());
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  整数除算(x/y)における余り
+			@param[in]	x	分子
+			@param[in]	y	分母
+			@param[out]	m	余り
+		*/
+		//-----------------------------------------------------------------//
+		static void mod(const value& x, const value& y, value& m)
+		{
+			mpfr_fmod(m.t_, x.t_, y.t_, m.get_rnd());
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  交換
 			@param[in]	th	交換クラス
 		*/
@@ -280,7 +308,6 @@ namespace mpfr {
 			utils::sformat("%%.%dRNf", form, sizeof(form)) % upn;
 			mpfr_snprintf(out, len, form, t_);
 //			mpfr_snprintf(out, len, "%.50RNf", t_);
-//			mpfr_snprintf(out, len, "%10.5RNE", t_);
 		}
 
 
@@ -298,6 +325,20 @@ namespace mpfr {
 			return out;
 		}
 
+		static value sinh(const value& in)
+		{
+			value out;
+			mpfr_sinh(out.t_, in.t_, out.get_rnd());
+			return out;
+		}
+
+		static value asinh(const value& in)
+		{
+			value out;
+			mpfr_asinh(out.t_, in.t_, out.get_rnd());
+			return out;
+		}
+
 		static value cos(const value& in)
 		{
 			value out;
@@ -312,6 +353,20 @@ namespace mpfr {
 			return out;
 		}
 
+		static value cosh(const value& in)
+		{
+			value out;
+			mpfr_cosh(out.t_, in.t_, out.get_rnd());
+			return out;
+		}
+
+		static value acosh(const value& in)
+		{
+			value out;
+			mpfr_acosh(out.t_, in.t_, out.get_rnd());
+			return out;
+		}
+
 		static value tan(const value& in)
 		{
 			value out;
@@ -323,6 +378,27 @@ namespace mpfr {
 		{
 			value out;
 			mpfr_atan(out.t_, in.t_, out.get_rnd());
+			return out;
+		}
+
+		static value tanh(const value& in)
+		{
+			value out;
+			mpfr_tanh(out.t_, in.t_, out.get_rnd());
+			return out;
+		}
+
+		static value atanh(const value& in)
+		{
+			value out;
+			mpfr_atanh(out.t_, in.t_, out.get_rnd());
+			return out;
+		}
+
+		static value eint(const value& in)  // 指数積分
+		{
+			value out;
+			mpfr_eint(out.t_, in.t_, out.get_rnd());
 			return out;
 		}
 
