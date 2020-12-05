@@ -1,7 +1,7 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX66T Makefile
+#   @brief  RX72T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
 #				Released under the MIT license @n

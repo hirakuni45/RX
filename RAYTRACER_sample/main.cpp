@@ -161,6 +161,7 @@ namespace {
 	public:
 		static const uint16_t width  = X;
 		static const uint16_t height = Y;
+		static const uint32_t line_width = width;
 
 		glc() { }
 

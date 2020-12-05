@@ -56,26 +56,24 @@ namespace {
 /// ベースクリスタルの定義
 /// LED 接続ポートの定義
 #if defined(SIG_RX71M)
-	typedef device::system_io<12000000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-
-	static const uint32_t sdc_spi_speed_ = 30000000;
 	static const char* system_str_ = { "RX71M" };
+	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
 
+	static const uint32_t sdc_spi_speed_ = 30000000;
 #elif defined(SIG_RX72M)
+	static const char* system_str_ = { "RX72M" };
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	static const uint32_t sdc_spi_speed_ = 30000000;
-	static const char* system_str_ = { "RX72M" };
-
 #elif defined(SIG_RX64M)
 	typedef device::system_io<12000000> SYSTEM_IO;
-
 	typedef utils::rtc_io RTC;
 
 #ifdef GR_KAEDE
+	static const char* system_str_ = { "GR-KAEDE" };
 	typedef device::PORT<device::PORTC, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORTC, device::bitpos::B1> LED2;
 	typedef device::SCI7 SCI_CH;
@@ -97,8 +95,8 @@ namespace {
 	typedef device::PORT<device::PORTB, device::bitpos::B7> SDC_DETECT;	///< SD カード検出
 
 	static const uint32_t sdc_spi_speed_ = 30000000;
-	static const char* system_str_ = { "GR-KAEDE" };
 #else
+	static const char* system_str_ = { "RX64M" };
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 
@@ -113,10 +111,10 @@ namespace {
 	typedef device::PORT<device::PORT8, device::bitpos::B1> SDC_DETECT;  ///< カード検出
 
 	static const uint32_t sdc_spi_speed_ = 30000000;
-	static const char* system_str_ = { "RX64M" };
 #endif
 
 #elif defined(SIG_RX65N)
+	static const char* system_str_ = { "RX65N Envision Kit" };
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
@@ -130,9 +128,9 @@ namespace {
 	typedef device::PORT<device::PORT2, device::bitpos::B5> SDC_DETECT;  // CD カード検出
 
 	static const uint32_t sdc_spi_speed_ = 30000000;
-	static const char* system_str_ = { "RX65N" };
 
 #elif defined(SIG_RX24T)
+	static const char* system_str_ = { "RX24T" };
 	typedef device::system_io<10000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
@@ -153,15 +151,28 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B3> SDC_DETECT;	///< カード検出
 
 	static const uint32_t sdc_spi_speed_ = 20000000;
-	static const char* system_str_ = { "RX24T" };
 
 #elif defined(SIG_RX66T)
+	static const char* system_str_ = { "RX66T" };
 	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 
 	static const uint32_t sdc_spi_speed_ = 30000000;
-	static const char* system_str_ = { "RX66T" };
+
+#elif defined(SIG_RX72N)
+	static const char* system_str_ = { "RX72N Envision Kit" };
+	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
+	typedef device::SCI2 SCI_CH;
+
+    typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
+    typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
+    // RX72N Envision Kit の SDHI ポートは、候補３で指定できる
+    typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
+    SDC			sdc_;
+
+	static const uint32_t sdc_spi_speed_ = 30000000;
 #endif
 
 	typedef device::cmt_mgr<device::CMT0> CMT;

@@ -38,8 +38,6 @@ USER_DEFS	=	SIG_RX71M \
 # Renesas GNU-RX gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
-AS_DEFS		=	--defsym NOT_USER=1
-
 ifeq ($(TARGET_ISA_TEXT), )
 # gcc-7.5.0 current gcc source build
 AS_DEFS		=	-mcpu=rx600
@@ -72,6 +70,7 @@ INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../
 
+# RX71M MEMWAIT register access for 'start.s'
 AS_OPT		=	--defsym MEMWAIT=1
 
 CP_OPT		=	-Wall -Werror \

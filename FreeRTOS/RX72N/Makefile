@@ -1,7 +1,7 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX66T Makefile
+#   @brief  RX72N Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
@@ -9,9 +9,9 @@
 #=======================================================================
 TARGET		=	rtos_sample
 
-DEVICE		=	R5F566TE
+DEVICE		=	R5F572NN
 
-ROOT_DEV	=	RX66T
+FATFS_VER	=	ff14/source
 
 BUILD		=	release
 # BUILD		=	debug
@@ -23,26 +23,26 @@ ASOURCES	=	common/start.s
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-				FreeRTOS/Source/portable/GCC/RX600v2/port.c \
-				FreeRTOS/Source/portable/MemMang/heap_3.c \
-				FreeRTOS/Source/croutine.c \
-				FreeRTOS/Source/event_groups.c \
-				FreeRTOS/Source/list.c \
-				FreeRTOS/Source/queue.c \
-				FreeRTOS/Source/stream_buffer.c \
-				FreeRTOS/Source/tasks.c \
-				FreeRTOS/Source/timers.c
+                FreeRTOS/Source/portable/GCC/RX600v2/port.c \
+                FreeRTOS/Source/portable/MemMang/heap_3.c \
+                FreeRTOS/Source/croutine.c \
+                FreeRTOS/Source/event_groups.c \
+                FreeRTOS/Source/list.c \
+                FreeRTOS/Source/queue.c \
+                FreeRTOS/Source/stream_buffer.c \
+                FreeRTOS/Source/tasks.c \
+                FreeRTOS/Source/timers.c
 
 PSOURCES	=	FreeRTOS/main.cpp
 
 USER_LIBS	=
 
-LDSCRIPT	=	../../$(ROOT_DEV)/$(DEVICE).ld
+LDSCRIPT	=	../../RX72N/$(DEVICE).ld
 
-USER_DEFS	=	SIG_$(ROOT_DEV) \
-				F_ICLK=160000000 \
-				F_PCLKA=80000000 F_PCLKB=40000000 F_PCLKC=160000000 F_PCLKD=40000000 \
-				F_FCLK=40000000 F_BCLK=40000000 \
+USER_DEFS	=	SIG_RX72N \
+				F_ICLK=240000000 \
+				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
+				F_FCLK=60000000 F_BCLK=120000000 \
 				RTOS
 
 # rx-elf-gcc compiler version check
@@ -76,22 +76,29 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../../ \
+INC_APP		=	. ../../ ../ \
 				../../FreeRTOS/Source/include \
-				../../FreeRTOS/Source/portable/GCC/RX600v2
+				../../FreeRTOS/Source/portable/GCC/RX600v2 \
+				../../RX600/drw2d/inc/tes
+
+LIB_ROOT	=	../../RX600/drw2d ../../rxlib/lib
+
+AS_OPT		=
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
 				-Wno-unused-function \
+				-Wno-stringop-truncation \
 				-fno-exceptions
 
 CC_OPT		=	-Wall -Werror \
-				-Wno-implicit-function-declaration \
-				-Wno-unused-function \
-				-Wno-unused-variable \
-				-fno-exceptions
+                -Wno-unused-variable \
+                -Wno-unused-function \
+                -Wno-maybe-uninitialized \
+                -Wno-unused-but-set-variable \
+                -fno-exceptions
 
 ifeq ($(BUILD),debug)
     CC_OPT += -g -DDEBUG
@@ -123,8 +130,6 @@ LD			=	rx-elf-ld
 OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
-
-# Override is only needed by avr-lib build system.
 
 AFLAGS		=	$(AS_OPT) $(AS_DEFS)
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
@@ -216,6 +221,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d $(ROOT_DEV) --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d RX72N --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)

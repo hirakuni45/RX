@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX66N/RX72N グループ・ICUD 定義
+	@brief	RX72T グループ・ICUC 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -83,14 +83,9 @@ namespace device {
 
 			USBR0	= 90,	///< USB0
 
-			ALM     = 92,   // RTC
-			PRD     = 93,
-
 			IWUNI   = 95,   // IWDT
 			WUNI	= 96,	// WDT
-			PCDFI   = 97,   // PDC
-			RXI7    = 98,   // SCI7
-			TXI7    = 99,
+
 			RXI8	= 100,	///< SCI8
 			TXI8	= 101,	///< SCI8
 			RXI9	= 102,	///< SCI9
@@ -241,8 +236,6 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BE0 : uint8_t {
 			ERS0,	///< CAN0 / ERS0
-			ERS1,	///< CAN1 / ERS1
-			ERS2	///< CAN2 / ERS2
 		};
 
 
@@ -252,17 +245,10 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class VECTOR_BL0 : uint8_t {
-			TEI0,			///< SCI0 / TEI0（送信完了）
-			ERI0,			///< SCI0 / ERI0（受信エラー）
-			TEI1,			///< SCI1 / TEI1（送信完了）
+			TEI1 = 2,		///< SCI1 / TEI1（送信完了）
 			ERI1,			///< SCI1 / ERI1（受信エラー）
-			TEI2,			///< SCI2 / TEI2（送信完了）
-			ERI2,			///< SCI2 / ERI2（受信エラー）
-			TEI3,			///< SCI3 / TEI3（送信完了）
-			ERI3,			///< SCI3 / ERI3（受信エラー）
-			TEI4,			///< SCI4 / TEI4（送信完了）
-			ERI4,			///< SCI4 / ERI4（受信エラー）
-			TEI5,			///< SCI5 / TEI5（送信完了）
+
+			TEI5 = 10,		///< SCI5 / TEI5（送信完了）
 			ERI5,			///< SCI5 / ERI5（受信エラー）
 			TEI6,			///< SCI6 / TEI6（送信完了）
 			ERI6,			///< SCI6 / ERI6（受信エラー）
@@ -274,14 +260,10 @@ namespace device {
 			SCIX2,			///< SCI12 / SCIX2
 			SCIX3,			///< SCI12 / SCIX3
 
-			QSPSSLI = 24,	///< QSPI / QSPSSLI
-
 			FERRI   = 26,	///< CAC / FERRI
 			MENDI,			///< CAC / MENDI
 			OVFI,			///< CAC / OVFI
 			DOPCI,			///< DOC / DOPCI
-			PCFEI,			///< PDC / PCFEI
-			PCERI			///< PDC / PCERI
 		};
 
 
@@ -310,23 +292,10 @@ namespace device {
 			S12CMPBI,		///< S12AD / S12CMPBI
 			S12CMPAI1,		///< S12AD1 / S12CMPAI1
 			S12CMPBI1,		///< S12AD1 / S12CMPBI1
-			IEI8,			///< SCI8 / IEI8
+			TEI8,			///< SCI8 / TEI8
 			ERI8,			///< SCI8 / ERI8
-			IEI9,			///< SCI9 / IEI9
+			TEI9,			///< SCI9 / TEI9
 			ERI9,			///< SCI9 / ERI9
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  GROUPBL2・ベクター・インデックス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_BL2 : uint8_t {
-			POEGGAI = 7,	///< POEG グループＡ
-			POEGGBI,		///< POEG グループＢ
-			POEGGCI,		///< POEG グループＣ
-			POEGGDI,		///< POEG グループＤ
 		};
 
 
@@ -341,25 +310,6 @@ namespace device {
 
 			SPII0 = 16,		///< RSPI0 / SPII0
 			SPEI0,			///< RSPI0 / SPEI0
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  GROUPAL1・ベクター・インデックス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_AL1 : uint8_t {
-			MINT = 0,		///< EPTPC    / MINT
-			PINT,			///< PTPEDMAC / PINT
-
-			EINT0 = 4,		///< EDMAC0   / EINT0
-			EINT1 = 5,		///< EDMAC1   / EINT1
-
-			VPOS  = 8,		///< GLCDC    / VPOS
-			GR1UF,			///< GLCDC    / GR1UF
-			GR2UF,			///< GLCDC    / GR2UF
-			DRW_IRQ,		///< DRW2D    / DRW_IRQ
 		};
 
 
@@ -423,7 +373,15 @@ namespace device {
 			TGID8,		///< MTU8（TGRDのインプットキャプチャ /コンペアマッチ）
 			TCIV8,		///< MTU8（TCNTのオーバフロー）
 
-			GTCIA0 = 47,///< GPTW0 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			TGIA9 = 47,	///< MTU9（TGRAのインプットキャプチャ /コンペアマッチ）
+			TGIB9,		///< MTU9（TGRBのインプットキャプチャ /コンペアマッチ）
+			TGIC9,		///< MTU9（TGRCのインプットキャプチャ /コンペアマッチ）
+			TGID9,		///< MTU9（TGRDのインプットキャプチャ /コンペアマッチ）
+			TGIV9,		///< MTU9（TCNTのオーバフロー）
+			TGIE9,		///< MTU9 (TGREのコンペアマッチ)
+			TGIF9,		///< MTU9 (TGRFのコンペアマッチ)
+
+			GTCIA0 = 56,///< GPTW0 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
 			GTCIB0,		///< GPTW0 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
 			GTCIC0,		///< GPTW0 (GTCCRC レジスタのコンペアマッチ)
 			GTCID0,		///< GPTW0 (GTCCRD レジスタのコンペアマッチ)
@@ -433,7 +391,7 @@ namespace device {
 			GTCIV0,		///< GPTW0 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
 			GTCIU0,		///< GPTW0 (GTCNT カウンタのアンダフロー)
 
-			GTCIA1 = 58,///< GPTW1 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIA1 = 65,///< GPTW1 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
 			GTCIB1,		///< GPTW1 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
 			GTCIC1,		///< GPTW1 (GTCCRC レジスタのコンペアマッチ)
 			GTCID1,		///< GPTW1 (GTCCRD レジスタのコンペアマッチ)
@@ -443,7 +401,7 @@ namespace device {
 			GTCIV1,		///< GPTW1 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
 			GTCIU1,		///< GPTW1 (GTCNT カウンタのアンダフロー)
 
-			GTCIA2 = 67,///< GPTW2 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIA2 = 74,///< GPTW2 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
 			GTCIB2,		///< GPTW2 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
 			GTCIC2,		///< GPTW2 (GTCCRC レジスタのコンペアマッチ)
 			GTCID2,		///< GPTW2 (GTCCRD レジスタのコンペアマッチ)
@@ -453,7 +411,7 @@ namespace device {
 			GTCIV2,		///< GPTW2 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
 			GTCIU2,		///< GPTW2 (GTCNT カウンタのアンダフロー)
 
-			GTCIA3 = 76,///< GPTW3 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIA3 = 83,///< GPTW3 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
 			GTCIB3,		///< GPTW3 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
 			GTCIC3,		///< GPTW3 (GTCCRC レジスタのコンペアマッチ)
 			GTCID3,		///< GPTW3 (GTCCRD レジスタのコンペアマッチ)
@@ -463,112 +421,67 @@ namespace device {
 			GTCIV3,		///< GPTW3 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
 			GTCIU3,		///< GPTW3 (GTCNT カウンタのアンダフロー)
 
-			IPLS = 86,	///< EPTPC (タイマ割り込み)
+			GTCIA4 = 92,///< GPTW4 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB4,		///< GPTW4 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC4,		///< GPTW4 (GTCCRC レジスタのコンペアマッチ)
+			GTCID4,		///< GPTW4 (GTCCRD レジスタのコンペアマッチ)
+			GDTE4,		///< GPTW4 (デッドタイムエラー)
+			GTCIE4,		///< GPTW4 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF4,		///< GPTW4 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV4,		///< GPTW4 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU4,		///< GPTW4 (GTCNT カウンタのアンダフロー)
 
-			PMGI0I = 98,///< PMGI0 (アクセス完了割り込み)
-			PMGI1I,		///< PMGI1 (アクセス完了割り込み)
+			GTCIA5 =101,///< GPTW5 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB5,		///< GPTW5 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC5,		///< GPTW5 (GTCCRC レジスタのコンペアマッチ)
+			GTCID5,		///< GPTW5 (GTCCRD レジスタのコンペアマッチ)
+			GDTE5,		///< GPTW5 (デッドタイムエラー)
+			GTCIE5,		///< GPTW5 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF5,		///< GPTW5 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV5,		///< GPTW5 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU5,		///< GPTW5 (GTCNT カウンタのアンダフロー)
+
+			GTCIA6 =110,///< GPTW6 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB6,		///< GPTW6 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC6,		///< GPTW6 (GTCCRC レジスタのコンペアマッチ)
+			GTCID6,		///< GPTW6 (GTCCRD レジスタのコンペアマッチ)
+			GDTE6,		///< GPTW6 (デッドタイムエラー)
+			GTCIE6,		///< GPTW6 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF6,		///< GPTW6 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV6,		///< GPTW6 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU6,		///< GPTW6 (GTCNT カウンタのアンダフロー)
+
+			GTCIA7 =119,///< GPTW7 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB7,		///< GPTW7 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC7,		///< GPTW7 (GTCCRC レジスタのコンペアマッチ)
+			GTCID7,		///< GPTW7 (GTCCRD レジスタのコンペアマッチ)
+			GDTE7,		///< GPTW7 (デッドタイムエラー)
+			GTCIE7,		///< GPTW7 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF7,		///< GPTW7 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV7,		///< GPTW7 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU7,		///< GPTW7 (GTCNT カウンタのアンダフロー)
+
+			GTCIA8 =128,///< GPTW8 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB8,		///< GPTW8 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC8,		///< GPTW8 (GTCCRC レジスタのコンペアマッチ)
+			GTCID8,		///< GPTW8 (GTCCRD レジスタのコンペアマッチ)
+			GDTE8,		///< GPTW8 (デッドタイムエラー)
+			GTCIE8,		///< GPTW8 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF8,		///< GPTW8 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV8,		///< GPTW8 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU8,		///< GPTW8 (GTCNT カウンタのアンダフロー)
+
+			GTCIA9 =137,///< GPTW9 (GTCCRA レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIB9,		///< GPTW9 (GTCCRB レジスタのインプットキャプチャ / コンペアマッチ)
+			GTCIC9,		///< GPTW9 (GTCCRC レジスタのコンペアマッチ)
+			GTCID9,		///< GPTW9 (GTCCRD レジスタのコンペアマッチ)
+			GDTE9,		///< GPTW9 (デッドタイムエラー)
+			GTCIE9,		///< GPTW9 (GTCCRE レジスタのコンペアマッチ)
+			GTCIF9,		///< GPTW9 (GTCCRF レジスタのコンペアマッチ)
+			GTCIV9,		///< GPTW9 (GTCNT カウンタのオーバフロー (GTPR レジスタのコンペアマッチ))
+			GTCIU9,		///< GPTW9 (GTCNT カウンタのアンダフロー)
 
 			NONE2 = 255,///< 割り込み選択なし
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込みＢ要因・ベクター・インデックス
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class VECTOR_SELB : uint8_t {
-			NONE = 0,	///< なし
-
-			CMI2 = 1,	///< CMT2 (CMCOR のコンペアマッチ)
-			CMI3 = 2,	///< CMT3 (CMCOR のコンペアマッチ)
-
-			CMIA0 = 3,	///< TMR0 (TCORA のコンペアマッチ)
-			CMIB0,		///< TMR0 (TCORB のコンペアマッチ)
-			OVI0,		///< TMR0 (TCNT のオーバフロー)
-			CMIA1,		///< TMR1 (TCORA のコンペアマッチ)
-			CMIB1,		///< TMR1 (TCORB のコンペアマッチ)
-			OVI1,		///< TMR1 (TCNT のオーバフロー)
-			CMIA2,		///< TMR2 (TCORA のコンペアマッチ)
-			CMIB2,		///< TMR2 (TCORB のコンペアマッチ)
-			OVI2,		///< TMR2 (TCNT のオーバフロー)
-			CMIA3,		///< TMR3 (TCORA のコンペアマッチ)
-			CMIB3,		///< TMR3 (TCORB のコンペアマッチ)
-			OVI3,		///< TMR3 (TCNT のオーバフロー)
-			TGI0A,		///< TPU0 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI0B,		///< TPU0 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI0C,		///< TPU0 (TGRC のインプットキャプチャ / コンペアマッチ)
-			TGI0D,		///< TPU0 (TGRD のインプットキャプチャ / コンペアマッチ)
-			TGI0V,		///< TPU0 (TCNT のオーバフロー)
-			TGI1A,		///< TPU1 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI1B,		///< TPU1 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI1V,		///< TPU1 (TCNT のオーバフロー)
-			TGI1U,		///< TPU1 (TCNT のアンダーフロー)
-			TGI2A,		///< TPU2 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI2B,		///< TPU2 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI2V,		///< TPU2 (TCNT のオーバフロー)
-			TGI2U,		///< TPU2 (TCNT のアンダーフロー)
-			TGI3A,		///< TPU3 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI3B,		///< TPU3 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI3C,		///< TPU3 (TGRC のインプットキャプチャ / コンペアマッチ)
-			TGI3D,		///< TPU3 (TGRD のインプットキャプチャ / コンペアマッチ)
-			TGI3V,		///< TPU3 (TCNT のオーバフロー)
-			TGI4A,		///< TPU4 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI4B,		///< TPU4 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI4V,		///< TPU4 (TCNT のオーバフロー)
-			TGI4U,		///< TPU4 (TCNT のアンダーフロー)
-			TGI5A,		///< TPU5 (TGRA のインプットキャプチャ / コンペアマッチ)
-			TGI5B,		///< TPU5 (TGRB のインプットキャプチャ / コンペアマッチ)
-			TGI5V,		///< TPU5 (TCNT のオーバフロー)
-			TGI5U,		///< TPU5 (TCNT のアンダーフロー)
-			IC0I0,		///< CMTW0 (CMWICR0 レジスタのインプットキャプチャ入力)
-			IC1I0,		///< CMTW0 (CMWICR1 レジスタのインプットキャプチャ入力)
-			OC0I0,		///< CMTW0 (CMWOCR0 レジスタのアウトプットコンペア出力)
-			OC1I0,		///< CMTW0 (CMWOCR1 レジスタのアウトプットコンペア出力)
-			IC0I1,		///< CMTW1 (CMWICR0 レジスタのインプットキャプチャ入力)
-			IC1I1,		///< CMTW1 (CMWICR1 レジスタのインプットキャプチャ入力)
-			OC0I1,		///< CMTW1 (CMWOCR0 レジスタのアウトプットコンペア出力)
-			OC1I1,		///< CMTW1 (CMWOCR1 レジスタのアウトプットコンペア出力)
-			CUP,		///< RTC (桁上げ割り込み)
-			RXF0 = 50,	///< CAN0（受信 FIFO 割り込み）
-			TXF0 = 51,	///< CAN0（送信 FIFO 割り込み）
-			RXM0 = 52,	///< CAN0（メールボックス０～３１メッセージ受信完了）
-			TXM0 = 53,	///< CAN0（メールボックス０～３１メッセージ送信完了）
-			RXF1 = 54,	///< CAN1（受信 FIFO 割り込み）
-			TXF1 = 55,	///< CAN1（送信 FIFO 割り込み）
-			RXM1 = 56,	///< CAN1（メールボックス０～３１メッセージ受信完了）
-			TXM1 = 57,	///< CAN1（メールボックス０～３１メッセージ送信完了）
-			RXF2 = 58,	///< CAN2（受信 FIFO 割り込み）
-			TXF2 = 59,	///< CAN2（送信 FIFO 割り込み）
-			RXM2 = 60,	///< CAN2（メールボックス０～３１メッセージ受信完了）
-			TXM2 = 61,	///< CAN2（メールボックス０～３１メッセージ送信完了）
-
-			USBI0 = 62,	///< USB0 (15 要因のステータス割り込み)
-
-			S12ADI = 64,///< S12AD (A/D 変換終了)
-			S12GBADI,	///< S12AD (グループ B A/D 変換終了割り込み)
-			S12GCADI,	///< S12AD (グループ C A/D 変換終了割り込み)
-
-			S12ADI1 = 68,///< S12AD1 (A/D 変換終了)
-			S12GBADI1,	///< S12AD1 (グループ B A/D 変換終了割り込み)
-			S12GCADI1,	///< S12AD1 (グループ C A/D 変換終了割り込み)
-
-			ELSR18I = 79,///< ELC (ELC 割り込み)
-			ELSR19I,	///< ELC (ELC 割り込み)
-
-			PROC_BUSY = 85,	///< TSIP (手順完了割り込み)
-			ROMOK,			///< TSIP (改ざん検出割り込み)
-			LONG_PLG,		///< TSIP (演算完了割り込み)
-			TEST_BUSY,		///< TSIP (テストビジー)
-			WRRDY0,			///< TSIP (ライトレディ 0)
-			WRRDY1,			///< TSIP (ライトレディ 1)
-			WRRDY4,			///< TSIP (ライトレディ 4)
-			RDRDY0,			///< TSIP (リードレディ 0)
-			RDRDY1,			///< TSIP (リードレディ 1)
-			INTEGRATE_WRRDY,///< TSIP (インテグレートライトレディ)
-			INTEGRATE_RDRDY,///< TSIP (インテグレートリードレディ)
-
-			NONE2 = 255,	///< 割り込み選択なし
 		};
 
 
@@ -610,18 +523,6 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  グループベクター BL2 の取得
-			@param[in]	VEC		グループベクター型
-			@return グループベクター
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static VECTOR get_group_vector(VECTOR_BL2 ivec) noexcept {
-			return VECTOR::GROUPBL2;
-		}
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
 			@brief  グループベクター BE0 の取得
 			@param[in]	VEC		グループベクター型
 			@return グループベクター
@@ -641,18 +542,6 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static VECTOR get_group_vector(VECTOR_AL0 ivec) noexcept {
 			return VECTOR::GROUPAL0;
-		}
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  グループベクター AL1 の取得
-			@param[in]	VEC		グループベクター型
-			@return グループベクター
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static VECTOR get_group_vector(VECTOR_AL1 ivec) noexcept {
-			return VECTOR::GROUPAL1;
 		}
 
 
@@ -1802,13 +1691,6 @@ namespace device {
 		static rw8_t<0x0008778F> SLIBXR143;
 #endif
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  選択型割り込み B 要因選択レジスタ n（SLIBRn）（n = 144 ～ 207）
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		typedef icu_utils::slixr_t<0x00087700, VECTOR, VECTOR_SELB> SLIBR_;
-		static SLIBR_ SLIBR;
 #if 0
 		static rw8_t<0x00087790> SLIBR144;
 		static rw8_t<0x00087791> SLIBR145;
@@ -1966,6 +1848,5 @@ namespace device {
 	template<class _> typename icu_t<_>::GENAL0_ icu_t<_>::GENAL0;
 	template<class _> typename icu_t<_>::GENAL1_ icu_t<_>::GENAL1;
 
-	template<class _> typename icu_t<_>::SLIBR_ icu_t<_>::SLIBR;
 	template<class _> typename icu_t<_>::SLIAR_ icu_t<_>::SLIAR;
 }

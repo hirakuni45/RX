@@ -1,6 +1,6 @@
 /*
- * FreeRTOS Kernel V10.2.1
- * Copyright (C) 2019 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.4.2
+ * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -19,8 +19,8 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * http://www.FreeRTOS.org
- * http://aws.amazon.com/freertos
+ * https://www.FreeRTOS.org
+ * https://github.com/FreeRTOS
  *
  * 1 tab == 4 spaces!
  */
@@ -36,11 +36,17 @@
 /* Library includes. */
 #include "string.h"
 
-void LED_(void);
-void LED_t(void);
-
 /* Hardware specifics. */
-// #include "iodefine.h"
+#if ( configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H == 1 )
+
+    #include "platform.h"
+
+#else /* configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H */
+
+///    #include "iodefine.h"
+
+#endif /* configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H */
+
 
 /*-----------------------------------------------------------*/
 
@@ -64,18 +70,36 @@ which would require the old IPL to be read first and stored in a local variable.
  * access to registers is required.
  */
 static void prvStartFirstTask( void ) __attribute__((naked));
-
 /*
  * Software interrupt handler.  Performs the actual context switch (saving and
  * restoring of registers).  Written in asm code as direct register access is
  * required.
  */
-void vSoftwareInterruptISR( void ) __attribute__((naked));
+#if ( configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H == 1 )
+
+    R_BSP_PRAGMA_INTERRUPT( vSoftwareInterruptISR, VECT( ICU, SWINT ) )
+    R_BSP_ATTRIB_INTERRUPT void vSoftwareInterruptISR( void ) __attribute__( ( naked ) );
+
+#else /* configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H */
+
+    void vSoftwareInterruptISR( void ) __attribute__( ( naked ) );
+
+#endif /* configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H  */
 
 /*
- * The tick interrupt handler.
+ * The tick ISR handler.  The peripheral used is configured by the application
+ * via a hook/callback function.
  */
-void vTickISR( void ) __attribute__((interrupt));
+#if ( configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H == 1 )
+
+    R_BSP_PRAGMA_INTERRUPT( vTickISR, _VECT( configTICK_VECTOR ) )
+    R_BSP_ATTRIB_INTERRUPT void vTickISR( void ); /* Do not add __attribute__( ( interrupt ) ). */
+
+#else /* configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H */
+
+    void vTickISR( void ) __attribute__( ( interrupt ) );
+
+#endif /* configINCLUDE_PLATFORM_H_INSTEAD_OF_IODEFINE_H */
 
 /*-----------------------------------------------------------*/
 
@@ -162,11 +186,13 @@ extern void vApplicationSetupTimerInterrupt( void );
 		vApplicationSetupTimerInterrupt();
 
 		/* Enable the software interrupt. */
-//		_IEN( _ICU_SWINT ) = 1;
+///		_IEN( _ICU_SWINT ) = 1;
+
 		/* Ensure the software interrupt is clear. */
-//		_IR( _ICU_SWINT ) = 0;
+///		_IR( _ICU_SWINT ) = 0;
+
 		/* Ensure the software interrupt is set to the kernel priority. */
-//		_IPR( _ICU_SWINT ) = configKERNEL_INTERRUPT_PRIORITY;
+///		_IPR( _ICU_SWINT ) = configKERNEL_INTERRUPT_PRIORITY;
 
 		/* Start the first task. */
 		prvStartFirstTask();
@@ -326,7 +352,6 @@ void vTickISR( void )
 		}
 	}
 	portENABLE_INTERRUPTS_FROM_KERNEL_ISR();
-//	LED_t();
 }
 /*-----------------------------------------------------------*/
 
@@ -346,6 +371,9 @@ uint32_t ulPortGetIPL( void )
 
 void vPortSetIPL( uint32_t ulNewIPL )
 {
+	/* Avoid compiler warning about unreferenced parameter. */
+	( void ) ulNewIPL;
+
 	__asm volatile
 	(
 		"PUSH	R5				\n" \
