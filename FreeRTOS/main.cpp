@@ -293,7 +293,8 @@ int main(int argc, char** argv)
 	}
 
 	auto clk = F_ICLK / 1000000;
-	utils::format("Start FreeRTOS sample for '%s' %d[MHz]\n") % system_str_ % clk;
+	utils::format("Start FreeRTOS %s, sample for '%s' %d[MHz]\n")
+		% tskKERNEL_VERSION_NUMBER % system_str_ % clk;
 
 	{
 		uint32_t stack_size = 512;
