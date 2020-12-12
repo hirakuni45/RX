@@ -149,6 +149,16 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  割り込みレベルを取得する
+			@param[in]	vec	割り込み要因
+			@return 割り込みレベル
+		*/
+		//-----------------------------------------------------------------//
+		static uint8_t get_level(ICU::VECTOR vec) noexcept { return ICU::IPR[vec]; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  割り込み設定（通常ベクター）
 			@param[in]	vec		割り込み要因
 			@param[in]	task	割り込みタスク
@@ -661,6 +671,75 @@ namespace device {
 			bool ret = GROUPAL1_dispatch_.set_task(i, task);
 			if(ret && ena) ICU::GENAL1 |= 1 << i;
 			return ret;
+		}
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み IE0 に対するベクタを返す
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_IE0 vec) noexcept {
+			return ICU::VECTOR::GROUPIE0;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み BE0 に対するベクタを返す
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_BE0 vec) noexcept {
+			return ICU::VECTOR::GROUPBE0;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み BL0 に対するベクタを返す
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_BL0 vec) noexcept {
+			return ICU::VECTOR::GROUPBL0;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み BL1 に対するベクタを返す
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_BL1 vec) noexcept {
+			return ICU::VECTOR::GROUPBL1;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み BL2 に対するベクタを返す
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_BL2 vec) noexcept {
+			return ICU::VECTOR::GROUPBL2;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み AL0 に対するベクタを返す
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_AL0 vec) noexcept {
+			return ICU::VECTOR::GROUPAL0;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  グループ割り込み AL1 に対するベクタを返す
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static ICU::VECTOR get_group_vector(ICU::VECTOR_AL1 vec) noexcept {
+			return ICU::VECTOR::GROUPAL1;
 		}
 	};
 	typedef icu_mgr_<void> icu_mgr;

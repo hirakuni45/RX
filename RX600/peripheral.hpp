@@ -89,8 +89,6 @@ namespace device {
 		EPTPC0,		///< イーサネットコントローラ用 PTP コントローラ 0
 		EPTPC1,		///< イーサネットコントローラ用 PTP コントローラ 1
 
-		ETHERCA,	///< Ethernet 0 (PHY RMII)カスタムポート接続
-
 		EDMAC0,		///< Ethernet DMA 0
 		EDMAC1,		///< Ethernet DMA 1
 		PTPEDMAC,	///< PTP Ethernet DMA

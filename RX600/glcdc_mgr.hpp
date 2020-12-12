@@ -30,8 +30,8 @@ namespace device {
 		static const int16_t width  = XSIZE;
 		static const int16_t height = YSIZE;
 		static const graphics::pixel::TYPE PXT = PXT_;
-		static const uint32_t line_width =
-			(((width * static_cast<uint32_t>(PXT) / 8) + 63) & 0x7fc0) / (static_cast<uint32_t>(PXT) / 8);
+		static const int16_t line_width =
+			(((width * static_cast<int16_t>(PXT) / 8) + 63) & 0x7fc0) / (static_cast<int16_t>(PXT) / 8);
 
 	private:
 

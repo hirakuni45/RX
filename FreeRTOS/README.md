@@ -34,18 +34,17 @@ Other microcontrollers use malloc/free memory allocation, so memory is allocated
 
 ## Project List
 
-
-- FreeRTOSConfig.h
-- main.cpp
+- [FreeRTOSConfig.h](FreeRTOSConfig.h)
+- [main.cpp](main.cpp)
 - READMEja.md
 - README.md
-- Source (FreeRTOS Kernel)
-- RX24T/Makefile
-- RX64M/Makefile
-- RX71M/Makefile
-- RX66T/Makefile
-- RX65N/Makefile
-- RX72N/Makefile
+- Source (FreeRTOS Kernel sources)
+- [RX24T/Makefile](RX24T/Makefile)
+- [RX64M/Makefile](RX64M/Makefile)
+- [RX71M/Makefile](RX71M/Makefile)
+- [RX66T/Makefile](RX66T/Makefile)
+- [RX65N/Makefile](RX65N/Makefile)
+- [RX72N/Makefile](RX72N/Makefile)
    
 ---
 

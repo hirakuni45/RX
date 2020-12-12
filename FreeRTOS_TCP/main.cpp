@@ -1,23 +1,17 @@
 //=====================================================================//
 /*! @file
-    @brief  FreeRTOS sample（Flash LED, Output SCI） @n
+    @brief  FreeRTOS_TCP TCP sample @n
 			RX64M, RX71M, RX72M: @n
 					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
 			RX65N (Renesas Envision kit RX65N): @n
 					12MHz のベースクロックを使用する @n
 			　　　　P70 に接続された LED を利用する @n
-			RX24T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
-			RX66T: @n
-					10MHz のベースクロックを使用する @n
-			　　　　P00 ピンにLEDを接続する @n
 			RX72N: (Renesas Envision kit RX72N) @n
 					16MHz のベースクロックを使用する @n
 					P40 ピンにLEDを接続する
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -31,11 +25,16 @@
 #include "common/format.hpp"
 #include "common/input.hpp"
 
+#include "chip/phy_base.hpp"
+
 #include "FreeRTOS.h"
-#include "task.h"
+// #include "task.h"
+#include "FreeRTOS_IP.h"
+
+#include <random>
 
 #ifdef SIG_RX64M
-// RX64Mで、GR-KAEDE の場合有効にする
+// GR-KAEDE の場合有効にする
 // #define GR_KAEDE
 #endif
 
@@ -48,21 +47,27 @@ namespace {
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+    typedef device::ETHERC0 ETHERC;      // Ethernet Controller
+    typedef device::EDMAC0 EDMAC;        // Ethernet DMA Controller
+	// Ethernet PHY device
+    typedef chip::phy_base<ETHERC, chip::phy_device::LAN8720, chip::phy_interface::RMII> PHY;
+	// Ethernet MAC device
+    typedef device::ether_io<ETHERC, EDMAC, PHY, device::port_map::option::FIRST_RMII> ETHD;
 #elif defined(SIG_RX72M)
 	static const char* system_str_ = { "RX72M" };
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX64M)
+
+	typedef device::system_io<12000000> SYSTEM_IO;
 #ifdef GR_KAEDE
 	static const char* system_str_ = { "GR-KAEDE" };
-	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORTC, device::bitpos::B1> LED;
 	typedef device::PORT<device::PORTC, device::bitpos::B0> LED2;
 	typedef device::SCI7 SCI_CH;
 #else
 	static const char* system_str_ = { "RX64M" };
-	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 #endif
@@ -71,16 +76,6 @@ namespace {
 	typedef device::system_io<12000000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
-#elif defined(SIG_RX24T)
-	static const char* system_str_ = { "RX24T" };
-	typedef device::system_io<10000000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
-#elif defined(SIG_RX66T)
-	static const char* system_str_ = { "RX66T" };
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
-	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72N)
 	static const char* system_str_ = { "RX72N Envision Kit" };
 	typedef device::system_io<16'000'000> SYSTEM_IO;
@@ -89,13 +84,17 @@ namespace {
 #endif
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
-	CMT			cmt_;
+	CMT		cmt_;
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
-	SCI			sci_;
+	SCI		sci_;
+
+	std::mt19937 mrand_;    // メルセンヌ・ツイスタの32ビット版
+
+    ETHD    ethd_;
 }
 
 extern "C" {
@@ -214,6 +213,90 @@ extern "C" {
 		device::icu_mgr::set_task(device::ICU::VECTOR::SWINT, vSoftwareInterruptISR);
 		device::icu_mgr::set_level(device::ICU::VECTOR::SWINT, configKERNEL_INTERRUPT_PRIORITY);
 	}
+
+
+	//--------------------------------------------------------------------------//
+	//
+	// FreeRTOS+TCP 関係のバインドコード
+	//
+	//--------------------------------------------------------------------------//
+	/// Ethernet の開始
+	int InitializeEth(void)
+    {
+		uint8_t intr_level = 4;
+		if(!ethd_.start(intr_level)) {
+			utils::format("Ethernet start fail...\n");
+			return 0;
+		}
+
+		static const uint8_t mac[6] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+		if(!ethd_.open(mac)) {
+			utils::format("Ethernet open fail...\n");
+			return 0;
+		}
+
+		return 1;
+	}
+
+
+	int GetLinkStatusPHY(void)
+	{
+		return ethd_.at_phy().get_link_status();
+	}
+
+
+	/* DHCP has an option for clients to register their hostname.  It doesn't
+	 * have much use, except that a device can be found in a router along with its
+	 * name. If this option is used the callback below must be provided by the
+	 * application writer to return a const string, denoting the device's name. */
+	/* Typically this function is defined in a user module. */
+	const char* pcApplicationHostnameHook( void )
+	{
+		return system_str_;
+	}
+
+
+	/* This xApplicationGetRandomNumber() will set *pulNumber to a random number,
+	 * and return pdTRUE. When the random number generator is broken, it shall return
+	 * pdFALSE.
+	 * The function is defined in 'iot_secure_sockets.c'.
+	 * If that module is not included in the project, the application must provide an
+	 * implementation of it.
+	 * The macro's ipconfigRAND32() and configRAND32() are not in use anymore. */
+
+	/* "xApplicationGetRandomNumber" is declared but never defined, because it may
+	 * be defined in a user module. */
+    BaseType_t xApplicationGetRandomNumber( uint32_t * pulNumber )
+	{
+		uint32_t n = mrand_();
+		*pulNumber = n;
+		return pdTRUE;
+	}
+
+
+	/*
+	 * Generate a randomized TCP Initial Sequence Number per RFC.
+	 * This function must be provided by the application builder.
+	 */
+	/* This function is defined generally by the application. */
+    uint32_t ulApplicationGetNextSequenceNumber( uint32_t ulSourceAddress,
+                                                 uint16_t usSourcePort,
+                                                 uint32_t ulDestinationAddress,
+                                                 uint16_t usDestinationPort )
+	{
+		// See. RFC6528
+		uint32_t sn = mrand_();
+		sn ^= cmt_.get_counter();
+		sn ^= ulSourceAddress;
+		sn ^= (usSourcePort << 16) | usDestinationPort;
+		sn ^= ulDestinationAddress;
+		return sn;
+	}
+
+
+	void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
+	{
+	}
 };
 
 
@@ -259,17 +342,6 @@ namespace {
 			}
 		}
 	}
-
-
-	void vTask3(void *pvParameters)
-	{
-		uint32_t cnt = 0;
-		while(1) {
-			utils::format("Task3: %u\n") % cnt;
-			++cnt;
-			vTaskDelay(1000 / portTICK_PERIOD_MS);
-		}
-	}
 }
 
 
@@ -292,17 +364,20 @@ int main(int argc, char** argv)
 		sci_.start(baud, intr);
 	}
 
+	{  // 乱数生成器に初期値を与える
+	    mrand_.seed(0x1234);
+	}
+
 	auto clk = F_ICLK / 1000000;
-	utils::format("Start FreeRTOS %s, sample for '%s' %d[MHz]\n")
+	utils::format("Start FreeRTOS %s + TCP, sample for '%s' %d[MHz]\n")
 		% tskKERNEL_VERSION_NUMBER % system_str_ % clk;
 
 	{
-		uint32_t stack_size = 512;
+		uint32_t stack_size = 2048;
 		void* param = nullptr;
 		uint32_t prio = 1;
 		xTaskCreate(vTask1, "Task1", stack_size, param, prio, nullptr);
 		xTaskCreate(vTask2, "Task2", stack_size, param, prio, nullptr);
-		xTaskCreate(vTask3, "Task3", stack_size, param, prio, nullptr);
 	}
 
 	vTaskStartScheduler();

@@ -56,6 +56,7 @@ namespace {
 	public:
 		static const int16_t width  = 320;
 		static const int16_t height = 240;
+		static const int16_t line_width = 320;
 
 	private:
 		uint16_t	fb_[width * height];

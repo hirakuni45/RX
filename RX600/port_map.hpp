@@ -45,6 +45,10 @@ namespace device {
 			SECOND_I2C,	///< SCI ポートを簡易 I2C として使う場合、第２候補
 			FIRST_SPI,	///< SCI ポートを簡易 SPI として使う場合、第１候補
 			SECOND_SPI,	///< SCI ポートを簡易 SPI として使う場合、第２候補
+			FIRST_MII,	///< ETHERC MII 接続、第１候補
+			SECOND_MII,	///< ETHERC MII 接続、第２候補
+			FIRST_RMII,	///< ETHERC RMII 接続、第１候補
+			SECOND_RMII,///< ETHERC RMII 接続、第２候補
 		};
 
 
@@ -517,98 +521,6 @@ namespace device {
 				}
 				break;
 
-			case peripheral::ETHERC0:  // only RMII mode, not use link status interrupt
-				{
-					uint8_t  mii = enable ? 0b010001 : 0;
-					uint8_t rmii = enable ? 0b010010 : 0;
-
-//					PORT3::PMR.B4 = 0;
-//					MPC::P34PFS.PSEL = mii;   // ET0_LINKSTA
-//					PORT3::PMR.B4 = enable;
-
-					PORT7::PMR.B1 = 0;
-					PORT7::PMR.B2 = 0;
-//					PORT7::PMR.B3 = 0;
-					PORT7::PMR.B4 = 0;
-					PORT7::PMR.B5 = 0;
-					PORT7::PMR.B6 = 0;
-					PORT7::PMR.B7 = 0;
-					MPC::P71PFS.PSEL = mii;   // ET0_MDIO
-					MPC::P72PFS.PSEL = mii;   // ET0_MDC
-//					MPC::P73PFS.PSEL = mii;   // ET0_WOL
-					MPC::P74PFS.PSEL = rmii;  // RMII0_RXD1
-					MPC::P75PFS.PSEL = rmii;  // RMII0_RXD0
-					MPC::P76PFS.PSEL = rmii;  // REF50CK0
-					MPC::P77PFS.PSEL = rmii;  // RMII0_RX_ER
-					PORT7::PMR.B1 = enable;
-					PORT7::PMR.B2 = enable;
-//					PORT7::PMR.B3 = enable;
-					PORT7::PMR.B4 = enable;
-					PORT7::PMR.B5 = enable;
-					PORT7::PMR.B6 = enable;
-					PORT7::PMR.B7 = enable;
-
-					PORT8::PMR.B0 = 0;
-					PORT8::PMR.B1 = 0;
-					PORT8::PMR.B2 = 0;
-					PORT8::PMR.B3 = 0;
-					MPC::P80PFS.PSEL = rmii;  // RMII0_TXD_EN
-					MPC::P81PFS.PSEL = rmii;  // RMII0_TXD0
-					MPC::P82PFS.PSEL = rmii;  // RMII0_TXD1
-					MPC::P83PFS.PSEL = rmii;  // RMII0_CRS_DV
-					PORT8::PMR.B0 = enable;
-					PORT8::PMR.B1 = enable;
-					PORT8::PMR.B2 = enable;
-					PORT8::PMR.B3 = enable;
-
-					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
-				}
-				break;
-
-			case peripheral::ETHERCA:  // only RMII mode, not use link status interrupt
-				{
-					uint8_t  mii = enable ? 0b010001 : 0;
-					uint8_t rmii = enable ? 0b010010 : 0;
-
-///					PORT7::PMR.B3 = 0;
-					PORT7::PMR.B2 = 0;
-					PORT7::PMR.B1 = 0;
-///					MPC::P73PFS.PSEL = mii;   // ET0_WOL  (144LQFP: 77)
-					MPC::P72PFS.PSEL = mii;   // ET0_MDC  (144LQFP: 85)
-					MPC::P71PFS.PSEL = mii;   // ET0_MDIO (144LQFP: 86)
-///					PORT7::PMR.B3 = enable;
-					PORT7::PMR.B2 = enable;
-					PORT7::PMR.B1 = enable;
-
-					PORTB::PMR.B7 = 0;
-					PORTB::PMR.B6 = 0;
-					PORTB::PMR.B5 = 0;
-					PORTB::PMR.B4 = 0;
-					PORTB::PMR.B3 = 0;
-					PORTB::PMR.B2 = 0;
-					PORTB::PMR.B1 = 0;
-					PORTB::PMR.B0 = 0;
-					MPC::PB7PFS.PSEL = rmii;  // RMII0_CRS_DV (144LQFP: 78)
-					MPC::PB6PFS.PSEL = rmii;  // RMII0_TXD1   (144LQFP: 79)
-					MPC::PB5PFS.PSEL = rmii;  // RMII0_TXD0   (144LQFP: 80)
-					MPC::PB4PFS.PSEL = rmii;  // RMII0_TXD_EN (144LQFP: 81)
-					MPC::PB3PFS.PSEL = rmii;  // RMII0_RX_ER  (144LQFP: 82)
-					MPC::PB2PFS.PSEL = rmii;  // REF50CK0     (144LQFP: 83)
-					MPC::PB1PFS.PSEL = rmii;  // RMII0_RXD0   (144LQFP: 84)
-					MPC::PB0PFS.PSEL = rmii;  // RMII0_RXD1   (144LQFP: 87)
-					PORTB::PMR.B7 = enable;
-					PORTB::PMR.B6 = enable;
-					PORTB::PMR.B5 = enable;
-					PORTB::PMR.B4 = enable;
-					PORTB::PMR.B3 = enable;
-					PORTB::PMR.B2 = enable;
-					PORTB::PMR.B1 = enable;
-					PORTB::PMR.B0 = enable;
-
-					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
-				}
-				break;
-
 			case peripheral::IRQ0:
 				PORTD::PMR.B0 = 0;
 				MPC::PD0PFS.ISEL = enable;  // PD0
@@ -811,6 +723,50 @@ namespace device {
 				}
 				break;
 
+			case peripheral::ETHERC0:  // (ETHERCA) only RMII mode, not use link status interrupt
+				{
+					uint8_t  mii = enable ? 0b010001 : 0;
+					uint8_t rmii = enable ? 0b010010 : 0;
+
+///					PORT7::PMR.B3 = 0;
+					PORT7::PMR.B2 = 0;
+					PORT7::PMR.B1 = 0;
+///					MPC::P73PFS.PSEL = mii;   // ET0_WOL  (144LQFP: 77)
+					MPC::P72PFS.PSEL = mii;   // ET0_MDC  (144LQFP: 85)
+					MPC::P71PFS.PSEL = mii;   // ET0_MDIO (144LQFP: 86)
+///					PORT7::PMR.B3 = enable;
+					PORT7::PMR.B2 = enable;
+					PORT7::PMR.B1 = enable;
+
+					PORTB::PMR.B7 = 0;
+					PORTB::PMR.B6 = 0;
+					PORTB::PMR.B5 = 0;
+					PORTB::PMR.B4 = 0;
+					PORTB::PMR.B3 = 0;
+					PORTB::PMR.B2 = 0;
+					PORTB::PMR.B1 = 0;
+					PORTB::PMR.B0 = 0;
+					MPC::PB7PFS.PSEL = rmii;  // RMII0_CRS_DV (144LQFP: 78)
+					MPC::PB6PFS.PSEL = rmii;  // RMII0_TXD1   (144LQFP: 79)
+					MPC::PB5PFS.PSEL = rmii;  // RMII0_TXD0   (144LQFP: 80)
+					MPC::PB4PFS.PSEL = rmii;  // RMII0_TXD_EN (144LQFP: 81)
+					MPC::PB3PFS.PSEL = rmii;  // RMII0_RX_ER  (144LQFP: 82)
+					MPC::PB2PFS.PSEL = rmii;  // REF50CK0     (144LQFP: 83)
+					MPC::PB1PFS.PSEL = rmii;  // RMII0_RXD0   (144LQFP: 84)
+					MPC::PB0PFS.PSEL = rmii;  // RMII0_RXD1   (144LQFP: 87)
+					PORTB::PMR.B7 = enable;
+					PORTB::PMR.B6 = enable;
+					PORTB::PMR.B5 = enable;
+					PORTB::PMR.B4 = enable;
+					PORTB::PMR.B3 = enable;
+					PORTB::PMR.B2 = enable;
+					PORTB::PMR.B1 = enable;
+					PORTB::PMR.B0 = enable;
+
+					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
+				}
+				break;
+
 			case peripheral::IRQ4:
 				PORTF::PMR.B5 = 0;
 				MPC::PF5PFS.ISEL = enable;  // PF5
@@ -928,6 +884,154 @@ namespace device {
 	public:
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
+			@brief  RX64M/RX71M Enthernet0/1 ポート切り替え @n
+					PJ3( 13): ET0_EXOUT      @n
+					P34( 27): ET0_LINKSTA    @n
+					P31( 32): ET1_MDC        @n
+					P30( 33): ET1_MDIO       @n
+					P27( 36): ET1_WOL        @n
+					P26( 37): ET1_EXOUT      @n
+					P83( 74): ET0_CRS/RMMI0_CRS_DV @n
+					PC7( 76): ET0_COL        @n
+					PC6( 77): ET0_ETXD3      @n
+					PC5( 78): ET0_ETXD2      @n
+					P82( 79): ET0_ETXD1/RMII0_TXD1    @n
+					P81( 80): ET0_ETXD0/RMII0_TXD0    @n
+					P80( 81): ET0_TX_EN/RMII0_TXD_EN  @n
+					PC4( 82): ET0_TX_CLK     @n
+					PC3( 83): ET0_TX_ER      @n
+					P77( 84): ET0_RX_ER/RMMI0_RX_ER   @n
+					P76( 85): ET0_RX_CLK/REF50CK0     @n
+					PC2( 86): ET0_RX_DV      @n
+					P75( 87): ET0_ERXD0/RMMI0_RXD0    @n
+					P74( 88): ET0_ERXD1/RMMI0_RXD1    @n
+					PC1( 89): ET0_ERXD2      @n
+					PC0( 91): ET0_ERXD3      @n
+					P73( 93): ET0_WOL        @n
+					PB7( 94): ET0_CRS/RMMI0_CRS_DV    @n
+					PB6( 95): ET0_ETXD1/RMII0_TXD1    @n
+					PB5( 96): ET0_ETXD0/RMII0_TXD0    @n
+					PB4( 97): ET0_TX_EN/RMII0_TXD_EN  @n
+					PB3( 98): ET0_RX_ER/RMII0_RX_ER   @n
+					PB2( 99): ET0_RX_CLK/REF50CK0     @n
+					PB1(100): ET0_ERXD0/RMII0_RXD0    @n
+					P72(101): ET0_MDC        @n
+					P71(102): ET0_MDIO       @n
+					PB0(104): ET0_ERXD1/RMII0_RXD1    @n
+					PA7(106): ET0_WOL        @n
+					PA6(107): ET0_EXOUT      @n
+					PA5(108): ET0_LINKSTA    @n
+					PA4(109): ET0_MDC        @n
+					PA3(110): ET0_MDIO       @n
+					PG7(111): ET1_TX_ER      @n
+					PG6(113): ET1_ETXD3      @n
+					PA1(114): ET0_WOL        @n
+					PG5(116): ET1_ETXD2      @n
+					PA0(118): ET0_TX_EN/RMII0_TXD_EN  @n
+					PG4(119): ET1_ETXD1/RMII1_TXD1    @n
+					PG3(121): ET1_ETXD0/RMII1_TXD0    @n
+					PG2(123): ET1_TX_CLK     @n
+					PE5(130): ET0_RX_CLK/REF50CK      @n
+					PE4(131): ET0_ERXD2      @n
+					PE3(132): ET0_ERXD3      @n
+					P60(141): ET1_TX_EN/RMII1_TXD_EN  @n
+					PG1(144): ET1_RX_ER/RMII1_RX_ER   @n
+					PG0(146): ET1_RX_CLK/REFCK1       @n
+					P97(149): ET1_ERXD3      @n
+					P96(152): ET1_ERXD2      @n
+					P95(155): ET1_ERXD1/RMII1_RXD1    @n
+					P94(157): ET1_ERXD0/RMII1_RXD0    @n
+					P93(159): ET1_LINKSTA    @n
+					P92(160): ET1_CRS/RMII1_CRS_DV    @n
+					P91(161): ET1_COL        @n
+					P90(163): ET1_RX_DV 
+			@param[in]	per		周辺機器タイプ
+			@param[in]	ena		無効にする場合「false」
+			@param[in]	opt		ポート・マップ・オプション（ポート候補）
+			
+			@return 無効な周辺機器の場合「false」
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		static bool turn_ethernet(peripheral per, bool ena, option opt) noexcept
+		{
+			if(opt == option::BYPASS) {  // バイパス
+				return true;
+			}
+			if(per == peripheral::ETHERC0) ;
+			else if(per == peripheral::ETHERC1) ;
+			else {
+				return false;
+			}
+
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			bool ret = true;
+			uint8_t  mii = ena ? 0b010001 : 0;
+			uint8_t rmii = ena ? 0b010010 : 0;
+			if(per == peripheral::ETHERC0) {  // chanel-0
+				switch(opt) {
+				case option::FIRST_RMII:
+
+//					PORT3::PMR.B4 = 0;
+//					MPC::P34PFS.PSEL = mii;   // ET0_LINKSTA
+//					PORT3::PMR.B4 = enable;
+
+					PORT7::PMR.B1 = 0;
+					PORT7::PMR.B2 = 0;
+//					PORT7::PMR.B3 = 0;
+					PORT7::PMR.B4 = 0;
+					PORT7::PMR.B5 = 0;
+					PORT7::PMR.B6 = 0;
+					PORT7::PMR.B7 = 0;
+					MPC::P71PFS.PSEL = mii;   // ET0_MDIO
+					MPC::P72PFS.PSEL = mii;   // ET0_MDC
+//					MPC::P73PFS.PSEL = mii;   // ET0_WOL
+					MPC::P74PFS.PSEL = rmii;  // RMII0_RXD1
+					MPC::P75PFS.PSEL = rmii;  // RMII0_RXD0
+					MPC::P76PFS.PSEL = rmii;  // REF50CK0
+					MPC::P77PFS.PSEL = rmii;  // RMII0_RX_ER
+					PORT7::PMR.B1 = ena;
+					PORT7::PMR.B2 = ena;
+//					PORT7::PMR.B3 = ena;
+					PORT7::PMR.B4 = ena;
+					PORT7::PMR.B5 = ena;
+					PORT7::PMR.B6 = ena;
+					PORT7::PMR.B7 = ena;
+
+					PORT8::PMR.B0 = 0;
+					PORT8::PMR.B1 = 0;
+					PORT8::PMR.B2 = 0;
+					PORT8::PMR.B3 = 0;
+					MPC::P80PFS.PSEL = rmii;  // RMII0_TXD_EN
+					MPC::P81PFS.PSEL = rmii;  // RMII0_TXD0
+					MPC::P82PFS.PSEL = rmii;  // RMII0_TXD1
+					MPC::P83PFS.PSEL = rmii;  // RMII0_CRS_DV
+					PORT8::PMR.B0 = ena;
+					PORT8::PMR.B1 = ena;
+					PORT8::PMR.B2 = ena;
+					PORT8::PMR.B3 = ena;
+
+					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
+					break; 
+
+///				case option::
+///					break;
+				default:
+					ret = false;
+					break;
+				}
+			} else if(per == peripheral::ETHERC1) {  // chanel-1
+
+			}
+			MPC::PWPR = MPC::PWPR.B0WI.b();
+
+			return ret;
+		}
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
 			@brief  SDHI ポート専用切り替え
 			@param[in]	sit		SHDI シチュエーション
 			@param[in]	opt		ポート・マップ・オプション（ポート候補）
@@ -956,13 +1060,13 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
 			@brief  周辺機器に切り替える
-			@param[in]	t	周辺機器タイプ
+			@param[in]	per	周辺機器タイプ
 			@param[in]	ena	無効にする場合「false」
 			@param[in]	opt	ポート・マップ・オプション
 			@return 無効な周辺機器の場合「false」
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		static bool turn(peripheral t, bool ena = true, option opt = option::FIRST) noexcept
+		static bool turn(peripheral per, bool ena = true, option opt = option::FIRST) noexcept
 		{
 			if(opt == option::BYPASS) return false;
 
@@ -974,15 +1078,15 @@ namespace device {
 			case option::FIRST:
 			case option::FIRST_I2C:
 			case option::FIRST_SPI:
-				ret = sub_1st_(t, ena, opt);
+				ret = sub_1st_(per, ena, opt);
 				break;
 			case option::SECOND:
 			case option::SECOND_I2C:
 			case option::SECOND_SPI:
-				ret = sub_2nd_(t, ena, opt);
+				ret = sub_2nd_(per, ena, opt);
 				break;
 			case option::THIRD:
-				ret = sub_3rd_(t, ena, opt);
+				ret = sub_3rd_(per, ena, opt);
 				break;
 
 			default:

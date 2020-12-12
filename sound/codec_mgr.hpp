@@ -3,16 +3,16 @@
 /*!	@file
 	@brief	オーディオ・コーデック・マネージャー @n
 			複数のオーディオ・コーデックを扱う。@n
-			・mp3（mp3_in.hpp）@n
-			・wav（wav_in.hpp）
+			・wav（wav_in.hpp）@n
+			・mp3（mp3_in.hpp）
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "sound/mp3_in.hpp"
 #include "sound/wav_in.hpp"
+#include "sound/mp3_in.hpp"
 #include "sound/sound_out.hpp"
 #include "common/dir_list.hpp"
 #include "common/format.hpp"
@@ -110,8 +110,8 @@ namespace sound {
 
 		enum class CODEC : uint8_t {
 			NONE,
-			MP3,
 			WAV,
+			MP3,
 		};
 
 		typedef utils::dir_list DLIST;

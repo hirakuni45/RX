@@ -195,7 +195,9 @@ namespace sound {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	情報を取得
+			@brief	情報を取得 @n
+					可変ビットレートの場合は、情報は正確では無い。@n
+					※全体時間は正確
 			@param[in]	fin		file_io コンテキスト（参照）
 			@param[out]	info	情報
 			@return 正常なら「true」
@@ -205,67 +207,6 @@ namespace sound {
 		{
 			id3_mgr id3;
 			if(!id3.parse(fin)) {
-				return false;
-			}
-			if(tag_task_) {
-				const auto& tag = id3.get_tag();
-				tag_task_(fin, tag);
-			}
-
-			mad_stream_init(&mad_stream_);
-			mad_frame_init(&mad_frame_);
-			mad_synth_init(&mad_synth_);
-			mad_timer_reset(&mad_timer_);
-
-			uint32_t forg = fin.tell();
-			info.header_size = forg;
-
-			// 全体のフレーム数をカウント
-			uint32_t frames = 0;
-			uint32_t freq = 0;
-			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
-				++frames;
-
-				if(freq < mad_frame_.header.samplerate) {
-					freq = mad_frame_.header.samplerate;
-				}
-			}
-			fin.seek(utils::file_io::SEEK::SET, forg);
-
-			info.samples = frames * 1152;
-			if(mad_frame_.header.mode != MAD_MODE_SINGLE_CHANNEL) {
-				info.type = audio_format::PCM16_STEREO;
-				info.chanels = 2;
-			} else {
-				info.type = audio_format::PCM16_MONO;
-				info.chanels = 1;
-			}
-			info.bits = 16;
-			info.frequency = freq;
-
-			mad_synth_finish(&mad_synth_);
-			mad_frame_finish(&mad_frame_);
-			mad_stream_finish(&mad_stream_);
-
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	デコード
-			@param[in]	fin		file_io コンテキスト（参照）
-			@param[in]	out		オーディオ出力（参照）
-			@return 正常終了なら「true」
-		*/
-		//-----------------------------------------------------------------//
-		template <class SOUND_OUT>
-		bool decode(utils::file_io& fin, SOUND_OUT& out)
-		{
-			set_state(STATE::TAG);
-			id3_mgr id3;
-			if(!id3.parse(fin)) {
-				set_state(STATE::IDLE);
 				return false;
 			}
 			if(tag_task_) {
@@ -285,14 +226,74 @@ namespace sound {
 			mad_timer_reset(&mad_timer_);
 
 			uint32_t forg = fin.tell();
-#if 0
+			info.header_size = forg;
+
 			// 全体のフレーム数をカウント
 			uint32_t frames = 0;
+			uint32_t freq = 0;
 			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
 				++frames;
+
+				if(freq < mad_frame_.header.samplerate) {
+					freq = mad_frame_.header.samplerate;
+				}
+
+				mad_timer_add(&mad_timer_, mad_frame_.header.duration);
+
 			}
-			fin.seek(file_io::SEEK::SET, forg);
+			fin.seek(utils::file_io::SEEK::SET, forg);
+
+			info.samples = frames * 1152;
+			if(mad_frame_.header.mode != MAD_MODE_SINGLE_CHANNEL) {
+				info.type = audio_format::PCM16_STEREO;
+				info.chanels = 2;
+			} else {
+				info.type = audio_format::PCM16_MONO;
+				info.chanels = 1;
+			}
+			info.bits = 16;
+			info.frequency = freq;
+			info.total_second = mad_timer_.seconds;
+
+			mad_synth_finish(&mad_synth_);
+			mad_frame_finish(&mad_frame_);
+			mad_stream_finish(&mad_stream_);
+
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	デコード @n
+					デコードの準備として、info で情報を取得する事。
+			@param[in]	fin		file_io コンテキスト（参照）
+			@param[in]	out		オーディオ出力（参照）
+			@return 正常終了なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		template <class SOUND_OUT>
+		bool decode(utils::file_io& fin, SOUND_OUT& out)
+		{
+#if 0
+			set_state(STATE::TAG);
+			id3_mgr id3;
+			if(!id3.parse(fin)) {
+				set_state(STATE::IDLE);
+				return false;
+			}
+			if(tag_task_) {
+				const auto& tag = id3.get_tag();
+				tag_task_(fin, tag);
+			}
 #endif
+			mad_stream_init(&mad_stream_);
+			mad_frame_init(&mad_frame_);
+			mad_synth_init(&mad_synth_);
+			mad_timer_reset(&mad_timer_);
+
+			uint32_t forg = fin.tell();
+
 			bool info = false;
 			uint32_t pos = 0;
 			uint32_t frame_count = 0;

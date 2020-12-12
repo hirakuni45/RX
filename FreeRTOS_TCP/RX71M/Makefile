@@ -1,17 +1,17 @@
 # -*- tab-width : 4 -*-
 #=======================================================================
 #   @file
-#   @brief  RX72N Makefile
+#   @brief  RX71M Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
 #	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	calc_sample
+TARGET		=	rtos_tcp_sample
 
-DEVICE		=	R5F572NN
+DEVICE		=	R5F571ML
 
-FATFS_VER	=	ff14/source
+ROOT_DEV	=	RX71M
 
 BUILD		=	release
 # BUILD		=	debug
@@ -23,38 +23,53 @@ ASOURCES	=	common/start.s
 CSOURCES	=	common/init.c \
 				common/vect.c \
 				common/syscalls.c \
-				$(FATFS_VER)/ff.c \
-				$(FATFS_VER)/ffsystem.c \
-				$(FATFS_VER)/ffunicode.c
+				FreeRTOS/Source/portable/GCC/RX600v2/port.c \
+				FreeRTOS/Source/portable/MemMang/heap_4.c \
+				FreeRTOS/Source/croutine.c \
+				FreeRTOS/Source/event_groups.c \
+				FreeRTOS/Source/list.c \
+				FreeRTOS/Source/queue.c \
+				FreeRTOS/Source/stream_buffer.c \
+				FreeRTOS/Source/tasks.c \
+				FreeRTOS/Source/timers.c \
+				FreeRTOS_TCP/Source/FreeRTOS_IP.c \
+				FreeRTOS_TCP/Source/FreeRTOS_ARP.c \
+				FreeRTOS_TCP/Source/FreeRTOS_DHCP.c \
+				FreeRTOS_TCP/Source/FreeRTOS_DNS.c \
+				FreeRTOS_TCP/Source/FreeRTOS_Sockets.c \
+				FreeRTOS_TCP/Source/FreeRTOS_TCP_IP.c \
+				FreeRTOS_TCP/Source/FreeRTOS_UDP_IP.c \
+				FreeRTOS_TCP/Source/FreeRTOS_TCP_WIN.c \
+				FreeRTOS_TCP/Source/FreeRTOS_Stream_Buffer.c \
+				FreeRTOS_TCP/Source/portable/BufferManagement/BufferAllocation_2.c \
+				FreeRTOS_TCP/Source/portable/NetworkInterface/RX/NetworkInterface.c
 
-PSOURCES	=	CALC_sample/main.cpp \
-				CALC_sample/resource.cpp \
-				graphics/font8x16.cpp \
-				graphics/kfont16.cpp \
-				graphics/color.cpp \
-				common/stdapi.cpp
+#				FreeRTOS_TCP/Source/portable/NetworkInterface/RX/ether_callback.c
 
-USER_LIBS	=	mpfr gmp supc++
+PSOURCES	=	FreeRTOS_TCP/main.cpp
 
-LDSCRIPT	=	../../RX72N/$(DEVICE).ld
+USER_LIBS	=
 
-USER_DEFS	=	SIG_RX72N \
+LDSCRIPT	=	../../$(ROOT_DEV)/$(DEVICE).ld
+
+USER_DEFS	=	SIG_$(ROOT_DEV) \
 				F_ICLK=240000000 \
 				F_PCLKA=120000000 F_PCLKB=60000000 F_PCLKC=60000000 F_PCLKD=60000000 \
-				F_FCLK=60000000 F_BCLK=120000000
+				F_FCLK=60000000 F_BCLK=120000000 \
+				RTOS RTOS_HEAP_SIZE=64
 
-# Renesas GNU-RX gcc compiler version check
+# rx-elf-gcc compiler version check
 TARGET_ISA_TEXT := $(shell rx-elf-gcc --target-help | grep ISA)
 
 ifeq ($(TARGET_ISA_TEXT), )
 # gcc-7.5.0 current gcc source build
-AS_DEFS		=	-mcpu=rx600
+AS_DEFS		=	--defsym NOT_USER=1
 CC_DEFS		=	-mcpu=rx600 -Wa,-mcpu=rxv2
 CP_DEFS		=	-mcpu=rx600
 else # Renesas GNU-RX gcc
-AS_DEFS		=	-misa=v3
-CC_DEFS		=	-misa=v3
-CP_DEFS		=	-misa=v3
+AS_DEFS		=	-misa=v2 --defsym NOT_USER=1
+CC_DEFS		=	-misa=v2
+CP_DEFS		=	-misa=v2
 endif
 
 # Include path for each environment
@@ -74,22 +89,26 @@ else
   endif
 endif
 
-INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
+INC_SYS     =   $(LOCAL_PATH)/include
 
-INC_APP		=	. ../../ ../../RX600/drw2d/inc/tes
+INC_APP		=	. ../ ../../ \
+				../../FreeRTOS/Source/include \
+				../../FreeRTOS/Source/portable/GCC/RX600v2 \
+				../../FreeRTOS_TCP/Source/portable/Compiler/GCC \
+				../../FreeRTOS_TCP/Source/include
 
-LIB_ROOT	=	../../RX600/drw2d ../../rxlib/lib
-
-AS_OPT		=
-
-CP_OPT		=	-mdfpu -m64bit-doubles \
-				-Wall -Werror \
-				-Wno-unused-variable \
-				-Wno-unused-function \
-				-fno-exceptions
+AS_OPT		=	--defsym MEMWAIT=1
 
 CC_OPT		=	-Wall -Werror \
+				-Wno-unused-but-set-variable \
+				-Wno-implicit-function-declaration \
+				-Wno-unused-function \
 				-Wno-unused-variable \
+				-fno-exceptions
+
+CP_OPT		=	-Wall -Werror \
+				-Wno-unused-variable \
+				-Wno-unused-function \
 				-fno-exceptions
 
 ifeq ($(BUILD),debug)
@@ -122,6 +141,8 @@ LD			=	rx-elf-ld
 OBJCOPY		=	rx-elf-objcopy
 OBJDUMP		=	rx-elf-objdump
 SIZE		=	rx-elf-size
+
+# Override is only needed by avr-lib build system.
 
 AFLAGS		=	$(AS_OPT) $(AS_DEFS)
 CFLAGS		=	-std=gnu99 $(CC_OPT) $(OPTIMIZE) $(CC_DEFS) $(DEFS)
@@ -213,6 +234,6 @@ bin_zip:
 	zip $(subst .exe,,$(TARGET))_$(shell date +%Y%m%d%H)_bin.zip *.exe *.dll res/*.*
 
 run:
-	rx_prog -d RX71M --progress --erase --write --verify $(TARGET).mot
+	rx_prog -d $(ROOT_DEV) --progress --erase --write --verify $(TARGET).mot
 
 -include $(DEPENDS)
