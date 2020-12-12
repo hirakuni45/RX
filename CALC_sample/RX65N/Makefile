@@ -30,7 +30,8 @@ PSOURCES	=	CALC_sample/main.cpp \
 				CALC_sample/resource.cpp \
 				graphics/font8x16.cpp \
 				graphics/kfont16.cpp \
-				graphics/color.cpp
+				graphics/color.cpp \
+				common/stdapi.cpp
 
 USER_LIBS	=	mpfr gmp supc++
 
