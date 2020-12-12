@@ -15,43 +15,67 @@
 
 namespace chip {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  PHY リンク・ステート
+		@brief  PHY デバイス型
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class phy_link_state : uint16_t {
-		NO_LINK = 0,	///< リンク無し
-		LINK_10H,		///< 10MBPS / Half
-		LINK_10F,		///< 10MBPS / Full
-		LINK_100H,		///< 100MBPS / Half
-		LINK_100F,		///< 100MBPS / Full
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class phy_device : uint8_t {
+		LAN8720,			///< LAN8720
+		TI_DP83822,			///< TI/DP83822
+		MICREL_KSZ8041NL,	///< MICREL/KSZ8041NL
+	};
+
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	/*!
+		@brief  PHY インターフェース型
+	*/
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	enum class phy_interface : uint8_t {
+		MII,	///< MII
+		RMII,	///< RMII
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief  PHY オプショナル・デバイス型
+		@brief  PHY 定義
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	enum class phy_option {
-		BASE,				///< 一般、標準仕様（Ex: LAN8720）
-		TI_DP83822,			///< TI/DP83822
-		MICREL_KSZ8041NL,	///< MICREL/KSZ8041NL
+	struct phy_def {
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  PHY リンク・ステート
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class link_state : uint8_t {
+			NO_LINK = 0,	///< リンク無し
+			LINK_10H,		///< 10MBPS / Half
+			LINK_10F,		///< 10MBPS / Full
+			LINK_100H,		///< 100MBPS / Half
+			LINK_100F,		///< 100MBPS / Full
+		};
 	};
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  PHY ベース・テンプレート・クラス
-		@param[in]	ETHERC	インサーネット・コントローラー・クラス
-		@param[in]	DEV_ADR	PHY デバイス・アドレス
-		@param[in]	DEV_OPT	オプションデバイス型
+		@param[in]	ETHERC		インサーネット・コントローラー・クラス
+		@param[in]	PHYDEV		PHY デバイス型
+		@param[in]	PHYIF		PHY インターフェース型
+		@param[in]	PHYADR		PHY デバイス・アドレス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHERC, uint16_t DEV_ADR = 0, phy_option DEV_OPT = phy_option::BASE>
-	class phy_base {
+	template <class ETHERC, phy_device PHYDEV, phy_interface PHYIF, uint16_t PHYADR = 0>
+	class phy_base : public phy_def {
+	public:
 
+		static const phy_interface phyif = PHYIF;
+
+	private:
 #ifndef PHY_DEBUG
 		typedef utils::null_format debug_format;
 #else
@@ -249,7 +273,7 @@ namespace chip {
 				data |= (MII_WRITE << 12);	// OP code(WT)
 			}
 
-			data |= (DEV_ADR << 7);			// PHY Address
+			data |= (PHYADR << 7);			// PHY Address
 			data |= (reg_addr << 2);		// Reg Address
 
 			int i = 14;
@@ -352,7 +376,7 @@ namespace chip {
 		uint16_t read_(uint16_t addr)
 		{
 			if(addr > 0x1f) {  // 拡張アドレスの場合
-				if(DEV_OPT == phy_option::TI_DP83822) {
+				if(PHYDEV == phy_device::TI_DP83822) {
 					write_sub_(REG_DP83822_REGCR, 0x001F);  // address command
 					write_sub_(REG_DP83822_ADDAR, addr);
 					write_sub_(REG_DP83822_REGCR, 0x401F);  // read/write command
@@ -369,7 +393,7 @@ namespace chip {
 		void write_(uint16_t addr, uint16_t data)
 		{
 			if(addr > 0x1f) {  // 拡張アドレスの場合
-				if(DEV_OPT == phy_option::TI_DP83822) {
+				if(PHYDEV == phy_device::TI_DP83822) {
 					write_sub_(REG_DP83822_REGCR, 0x001F);  // address command
 					write_sub_(REG_DP83822_ADDAR, addr);
 					write_sub_(REG_DP83822_REGCR, 0x401F);  // read/write command
@@ -398,11 +422,11 @@ namespace chip {
 			@return 正常なら「true」
 		*/
 		//-----------------------------------------------------------------//
-		bool init(void)
+		bool init()
 		{
 			uint16_t reg;
 
-			debug_format("Start PHY init: ADR: %d\n") % static_cast<int>(DEV_ADR);
+			debug_format("Start PHY init: ADR: %d\n") % static_cast<int>(PHYADR);
 			reg = read_(REG_IDENTIFIER1);
 			reg = read_(REG_IDENTIFIER1);
 			debug_format("PHY Identifier1: 0x%04X\n") % static_cast<int>(reg);
@@ -427,12 +451,12 @@ namespace chip {
 				// When KSZ8041NL of the Micrel, Inc. is used, 
 				// the pin that outputs the state of LINK is used combinedly with ACTIVITY in default. 
 				// The setting of the pin is changed so that only the state of LINK is output. 
-				if(DEV_OPT == phy_option::MICREL_KSZ8041NL) {
+				if(PHYDEV == phy_device::MICREL_KSZ8041NL) {
 					reg = read_(REG_PHY_CONTROL_1);
 					reg &= ~0x8000;
 					reg |= 0x4000;
 					write_(REG_PHY_CONTROL_1, reg);
-				} else if(DEV_OPT == phy_option::TI_DP83822) {
+				} else if(PHYDEV == phy_device::TI_DP83822) {
 
 					debug_format("DP83822 Boot Strap Latch in  (0x0462): 0x%04X\n")
 						% static_cast<int>(read_(0x0462));
@@ -499,9 +523,9 @@ namespace chip {
 			@return		リンク・ステート
 		*/
 		//-----------------------------------------------------------------//
-		phy_link_state get_autonegotiate(uint16_t& local_pause, uint16_t& partner_pause)
+		auto get_autonegotiate(uint16_t& local_pause, uint16_t& partner_pause)
 		{
-			phy_link_state speed_duplex = phy_link_state::NO_LINK;
+			link_state speed_duplex = link_state::NO_LINK;
 
 			// Because reading the first time shows the previous state, the Link status bit is read twice.
 			uint16_t reg = read_(REG_STATUS);
@@ -540,19 +564,19 @@ namespace chip {
 
 				// Establish the line speed and the duplex
 				if(reg & AN_LINK_PARTNER_10H) {
-					speed_duplex = phy_link_state::LINK_10H;
+					speed_duplex = link_state::LINK_10H;
 				}
 
 				if(reg & AN_LINK_PARTNER_10F) {
-					speed_duplex = phy_link_state::LINK_10F;
+					speed_duplex = link_state::LINK_10F;
 				}
 
 				if(reg & AN_LINK_PARTNER_100H) {
-					speed_duplex = phy_link_state::LINK_100H;
+					speed_duplex = link_state::LINK_100H;
 				}
 
 				if(reg & AN_LINK_PARTNER_100F) {
-					speed_duplex = phy_link_state::LINK_100F;
+					speed_duplex = link_state::LINK_100F;
 				}
 		        return speed_duplex;
     		}
