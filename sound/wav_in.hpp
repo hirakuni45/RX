@@ -206,6 +206,10 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		bool info(utils::file_io& fin, audio_info& info) noexcept
 		{
+			tag_t tag;
+			if(!load_header(fin, tag)) {
+				return false;
+			}
 
 			return true;
 		}
@@ -213,7 +217,8 @@ namespace sound {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	デコード
+			@brief	デコード @n
+					デコードの準備として、info で情報を取得する事。
 			@param[in]	fi	ファイルＩ／Ｏ
 			@return 正常終了なら「true」
 		*/
@@ -221,19 +226,13 @@ namespace sound {
 		template <class SOUND_OUT>
 		bool decode(utils::file_io& fin, SOUND_OUT& out) noexcept
 		{
-			set_state(STATE::TAG);
-			tag_t tag;
-			if(!load_header(fin, tag)) {
-				return false;
-			}
-
 			// サンプル・レートの設定（外部）
 			set_sample_rate(rate_);
-
+#if 0
 			if(tag_task_) {
 				tag_task_(fin, tag);
 			}
-
+#endif
 			bool status = true;
 			bool pause = false;
 			uint32_t pos = 0;

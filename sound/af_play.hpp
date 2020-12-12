@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	Audio ファイル Play
+	@brief	Audio ファイル再生インターフェース
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2018、2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -44,7 +44,7 @@ namespace sound {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class STATE : uint8_t {
 			IDLE,		///< アイドル状態
-			TAG,		///< TAG パース中
+///			TAG,		///< TAG パース中
 			PLAY,		///< プレイ中
 			PAUSE,		///< ポーズ中
 		};

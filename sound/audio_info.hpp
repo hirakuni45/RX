@@ -45,6 +45,7 @@ namespace sound {
 		uint32_t		block_align;	///< ブロック辺りのバイト数
 		uint32_t		header_size;	///< インフォメーション・ヘッダーのサイズ
 
+		uint32_t		total_second;	///< 全体時間 
 
         //-----------------------------------------------------------------//
         /*!
@@ -53,7 +54,7 @@ namespace sound {
         //-----------------------------------------------------------------//
         audio_info() noexcept :
 			type(audio_format::NONE), samples(0), chanels(0), bits(0), frequency(0),
-            block_align(0), header_size(0) { }
+            block_align(0), header_size(0), total_second(0) { }
 
 
 		//-----------------------------------------------------------------//
