@@ -598,6 +598,6 @@ namespace device {
 	typedef edmac_t<0x000C0000, peripheral::EDMAC0, ICU::VECTOR_AL1::EINT0> EDMAC0;
 #if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef edmac_t<0x000C0200, peripheral::EDMAC1, ICU::VECTOR_AL1::EINT1> EDMAC1;
-#endif
 	typedef ptpedmac_t<0x000C0400, peripheral::PTPEDMAC> PTPEDMAC;
+#endif
 }
