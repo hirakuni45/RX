@@ -25,24 +25,23 @@ RX24T/Makefile の環境変数の設定で、このサイズを変更出来ま�
 #define configTOTAL_HEAP_SIZE			( ( size_t ) ( RTOS_HEAP_SIZE * 1024 ) )
 ``` 
    
-この設定は、メモリモデル「Source/portable/MemMang/heap_1.c」を使った場合に有効です。   
-
-他のマイコンでは、malloc/free による記憶割り当てを利用するので、動的にメモリが割り当てされます。
+この設定は、メモリモデル「Source/portable/MemMang/heap_3.c」以外を使った場合に有効です。   
+※「heap_3.c」は、malloc、free、を呼び出しています。
 
 ---
 ## プロジェクト・リスト
 
-- FreeRTOSConfig.h
-- main.cpp
+- [FreeRTOSConfig.h](FreeRTOSConfig.h)
+- [main.cpp](main.cpp)
 - READMEja.md
 - README.md
-- Source (FreeRTOS Kernel)
-- RX24T/Makefile
-- RX64M/Makefile
-- RX71M/Makefile
-- RX66T/Makefile
-- RX65N/Makefile
-- RX72N/Makefile
+- Source (FreeRTOS Kernel sources)
+- [RX24T/Makefile](RX24T/Makefile)
+- [RX64M/Makefile](RX64M/Makefile)
+- [RX71M/Makefile](RX71M/Makefile)
+- [RX66T/Makefile](RX66T/Makefile)
+- [RX65N/Makefile](RX65N/Makefile)
+- [RX72N/Makefile](RX72N/Makefile)
    
 ---
 ## カーネル修正箇所
