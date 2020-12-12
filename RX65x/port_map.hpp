@@ -563,6 +563,7 @@ namespace device {
 				}
 				break;
 
+#if 0
 			case peripheral::ETHERCA:  // only RMII mode, not use link status interrupt
 				{
 					uint8_t  mii = enable ? 0b010001 : 0;
@@ -605,7 +606,7 @@ namespace device {
 					MPC::PFENET.PHYMODE0 = 0;  // for RMII mode chanel 0
 				}
 				break;
-
+#endif
 			case peripheral::GLCDC:
 				{
 					uint8_t sel = enable ? 0b100101 : 0;
