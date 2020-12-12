@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX グループ・Etherenet I/O 制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -11,12 +11,7 @@
 #include "common/renesas.hpp"
 #include "common/format.hpp"
 #include "chip/phy_base.hpp"
-
-#if defined(LITTLE_ENDIAN)
-#elif defined(BIG_ENDIAN)
-#else
-#error "ether_io.hpp requires BIG_ENDIAN or LITTLE_ENDIAN be defined."
-#endif
+#include "common/byte_order.h"
 
 #define ETHRC_DEBUG
 
@@ -119,11 +114,12 @@ namespace device {
 		@param[in]	ETHRC	インサーネット・コントローラー
 		@param[in]	EDMAC	インサーネットＤＭＡコントローラー
 		@param[in]	PHY		物理層コントローラー
+		@param[in]	PSEL	ポート候選択（候補）
 		@param[in]	TXDN	送信バッファ数（標準４）
 		@param[in]	RXDN	受信バッファ数（標準４）
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN = 4, uint32_t RXDN = 4>
+	template <class ETHRC, class EDMAC, class PHY, port_map::option PSEL, uint32_t TXDN = 4, uint32_t RXDN = 4>
 	class ether_io {
 	public:
 		static const int EMAC_BUFSIZE = 1536;	///< イーサーネット・バッファ最大値
@@ -445,14 +441,14 @@ namespace device {
 			switch(speed_duplex) {
 
 			// Half duplex link
-			case chip::phy_link_state::LINK_100H:
+			case PHY::link_state::LINK_100H:
 				ETHRC::ECMR.DM  = 0;
 				ETHRC::ECMR.RTM = 1;
 				ret = OK;
 				debug_format("PHY Link 100Mbps / Half\n");
 				break;
 
-			case chip::phy_link_state::LINK_10H:
+			case PHY::link_state::LINK_10H:
 				ETHRC::ECMR.DM  = 0;
 				ETHRC::ECMR.RTM = 0;
 				ret = OK;
@@ -460,7 +456,7 @@ namespace device {
 				break;
 
 			// Full duplex link
-			case chip::phy_link_state::LINK_100F:
+			case PHY::link_state::LINK_100F:
 				ETHRC::ECMR.DM  = 1;
 				ETHRC::ECMR.RTM = 1;
 				full_duplex = true;
@@ -468,7 +464,7 @@ namespace device {
 				debug_format("PHY Link 100Mbps / Full\n");
 				break;
 
-			case chip::phy_link_state::LINK_10F:
+			case PHY::link_state::LINK_10F:
 				ETHRC::ECMR.DM  = 1;
 				ETHRC::ECMR.RTM = 0;
 				full_duplex = true;
@@ -568,8 +564,9 @@ namespace device {
 		}
 
 
-		// EDMA interrupt task
-		static void ether_task_() __attribute__ ((interrupt))
+		// EDMAC interrupt task
+		// グループタスクなので、通常関数
+		static void ether_task_()
 		{
 			uint32_t status_ecsr = ETHRC::ECSR();
 			uint32_t status_eesr = EDMAC::EESR();
@@ -709,7 +706,7 @@ namespace device {
 		bool start(uint8_t level)
 		{
 			power_mgr::turn(ETHRC::PERIPHERAL);
-			port_map::turn(ETHRC::PERIPHERAL);
+			port_map::turn(ETHRC::PERIPHERAL, true, PSEL);
 
 			intr_level_ = level;
 
@@ -776,11 +773,18 @@ namespace device {
 				ETHRC::ECSIPR.LCHNGIP = 1;
 				EDMAC::EESIPR.ECIIP  = 1;
 
-				// Set Ethernet interrupt level and enable
-				ICU::IPR.GROUPAL1 = intr_level_;
-				ICU::GENAL1.EN4   = 1;
-				ICU::IER.GROUPAL1 = 1;
-				set_interrupt_task(ether_task_, static_cast<uint32_t>(device::ICU::VECTOR::GROUPAL1));
+				// Set EDMAC interrupt level and enable
+				if(intr_level_ > 0) {
+					auto gvec = icu_mgr::get_group_vector(EDMAC::EINT);
+					if(icu_mgr::get_level(gvec) == 0) {
+						icu_mgr::set_level(gvec, intr_level_);
+					}
+					icu_mgr::install_group_task(EDMAC::EINT, ether_task_);
+				}
+//				ICU::IPR.GROUPAL1 = intr_level_;
+//				ICU::GENAL1.EN4   = 1;  // EDMAC0
+//				ICU::IER.GROUPAL1 = 1;
+//				set_interrupt_task(ether_task_, static_cast<uint32_t>(device::ICU::VECTOR::GROUPAL1));
 
 				stat_.reset();
 
@@ -1246,10 +1250,10 @@ namespace device {
 		}
 	};
 
-	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN, uint32_t RXDN>
-		volatile void* ether_io<ETHRC, EDMAC, PHY, TXDN, RXDN>::intr_task_ = nullptr;
+	template <class ETHRC, class EDMAC, class PHY, port_map::option PSEL, uint32_t TXDN, uint32_t RXDN>
+		volatile void* ether_io<ETHRC, EDMAC, PHY, PSEL, TXDN, RXDN>::intr_task_ = nullptr;
 
-	template <class ETHRC, class EDMAC, class PHY, uint32_t TXDN, uint32_t RXDN>
-		volatile bool ether_io<ETHRC, EDMAC, PHY, TXDN, RXDN>::mpd_flag_ = false;
+	template <class ETHRC, class EDMAC, class PHY, port_map::option PSEL, uint32_t TXDN, uint32_t RXDN>
+		volatile bool ether_io<ETHRC, EDMAC, PHY, PSEL, TXDN, RXDN>::mpd_flag_ = false;
 
 }

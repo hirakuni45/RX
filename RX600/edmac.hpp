@@ -362,8 +362,10 @@ namespace device {
 		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t base, peripheral per>
+	template <uint32_t base, peripheral per, ICU::VECTOR_AL1 eint>
 	struct edmac_t : public edmac_core_t<base, per> {
+
+		static const auto EINT = eint;
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -494,10 +496,14 @@ namespace device {
 		typedef iosr_t<base + 0x6C> IOSR_;
 		static  IOSR_ IOSR;
 	};
-	template <uint32_t base, peripheral per> typename edmac_t<base, per>::EESR_ edmac_t<base, per>::EESR;
-	template <uint32_t base, peripheral per> typename edmac_t<base, per>::EESIPR_ edmac_t<base, per>::EESIPR;
-	template <uint32_t base, peripheral per> typename edmac_t<base, per>::TRSCER_ edmac_t<base, per>::TRSCER;
-	template <uint32_t base, peripheral per> typename edmac_t<base, per>::IOSR_ edmac_t<base, per>::IOSR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_AL1 eint>
+		typename edmac_t<base, per, eint>::EESR_ edmac_t<base, per, eint>::EESR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_AL1 eint>
+		typename edmac_t<base, per, eint>::EESIPR_ edmac_t<base, per, eint>::EESIPR;
+	template <uint32_t base, peripheral per, ICU::VECTOR_AL1 eint>
+		typename edmac_t<base, per, eint>::TRSCER_ edmac_t<base, per, eint>::TRSCER;
+	template <uint32_t base, peripheral per, ICU::VECTOR_AL1 eint>
+		typename edmac_t<base, per, eint>::IOSR_ edmac_t<base, per, eint>::IOSR;
 
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -584,10 +590,14 @@ namespace device {
 		typedef eesipr_t<base + 0x30> EESIPR_;
 		static  EESIPR_ EESIPR;
 	};
-	template <uint32_t base, peripheral per> typename ptpedmac_t<base, per>::EESR_ ptpedmac_t<base, per>::EESR;
-	template <uint32_t base, peripheral per> typename ptpedmac_t<base, per>::EESIPR_ ptpedmac_t<base, per>::EESIPR;
+	template <uint32_t base, peripheral per>
+		typename ptpedmac_t<base, per>::EESR_ ptpedmac_t<base, per>::EESR;
+	template <uint32_t base, peripheral per>
+		typename ptpedmac_t<base, per>::EESIPR_ ptpedmac_t<base, per>::EESIPR;
 
-	typedef edmac_t<0x000C0000, peripheral::EDMAC0>      EDMAC0;
-	typedef edmac_t<0x000C0200, peripheral::EDMAC1>      EDMAC1;
+	typedef edmac_t<0x000C0000, peripheral::EDMAC0, ICU::VECTOR_AL1::EINT0> EDMAC0;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX72N)
+	typedef edmac_t<0x000C0200, peripheral::EDMAC1, ICU::VECTOR_AL1::EINT1> EDMAC1;
+#endif
 	typedef ptpedmac_t<0x000C0400, peripheral::PTPEDMAC> PTPEDMAC;
 }

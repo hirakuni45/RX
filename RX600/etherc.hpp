@@ -460,5 +460,7 @@ namespace device {
 
 
 	typedef etherc_t<0x000C0100, peripheral::ETHERC0> ETHERC0;
+#if defined(SIG_RX64M) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX72N)
 	typedef etherc_t<0x000C0300, peripheral::ETHERC1> ETHERC1;
+#endif
 }
