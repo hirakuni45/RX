@@ -173,7 +173,6 @@ namespace device {
 				break;
 
 			case peripheral::ETHERC0:
-			case peripheral::ETHERCA:
 			case peripheral::EDMAC0:
 				SYSTEM::MSTPCRB.MSTPB15 = f;	// ETHER0, EDMAC0 のストップ状態解除
 				BUS::BEREN.TOEN = 1;

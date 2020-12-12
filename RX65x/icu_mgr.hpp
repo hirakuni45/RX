@@ -373,8 +373,6 @@ namespace device {
 
 			case peripheral::ETHERC0:
 				break;
-			case peripheral::ETHERC1:
-				break;
 
 			case peripheral::IRQ0:
 				ICU::IPR.IRQ0 = lvl;

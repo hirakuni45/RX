@@ -79,14 +79,7 @@ namespace device {
 		RTC,		///< リアルタイムクロック
 
 		ETHERC0,	///< イーサネットコントローラ 0
-		ETHERC1,	///< イーサネットコントローラ 1
-		EPTPC,		///< イーサネットコントローラ用 PTP コントローラ
-
-		ETHERCA,	///< Ethernet 0 (PHY RMII)カスタムポート接続
-
 		EDMAC0,		///< Ethernet DMA 0
-		EDMAC1,		///< Ethernet DMA 1
-		PTPEDMAC,	///< PTP Ethernet DMA
 
 		USB0,		///< USB2.0FSホスト/ファンクションモジュール（USBb）
 
