@@ -206,12 +206,46 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		bool info(utils::file_io& fin, audio_info& info) noexcept
 		{
+			set_state(STATE::TAG);
 			tag_t tag;
 			if(!load_header(fin, tag)) {
+				set_state(STATE::IDLE);
 				return false;
 			}
+			if(tag_task_) {
+				tag_task_(fin, tag);
+			}
 
-			return true;
+			info.type = audio_format::NONE;
+			if(bits_ == 8) {
+				if(channel_ == 1) info.type = audio_format::PCM8_MONO;
+				else if(channel_ == 2) info.type = audio_format::PCM8_STEREO;
+			} else if(bits_ == 16) {
+				if(channel_ == 1) info.type = audio_format::PCM16_MONO;
+				else if(channel_ == 2) info.type = audio_format::PCM16_STEREO;
+			} else if(bits_ == 24) {
+				if(channel_ == 1) info.type = audio_format::PCM24_MONO;
+				else if(channel_ == 2) info.type = audio_format::PCM24_STEREO;
+			} else if(bits_ == 32) {
+				if(channel_ == 1) info.type = audio_format::PCM32_MONO;
+				else if(channel_ == 2) info.type = audio_format::PCM32_STEREO;
+			}
+			uint32_t unit = (bits_ / 8) * channel_;
+			info.samples = data_size_ / unit;
+			info.chanels = channel_;
+			info.bits = bits_;
+			info.frequency = rate_;
+			info.block_align = unit;
+			info.total_second = info.samples / rate_;
+
+			set_state(STATE::IDLE);
+
+			if(rate_ > 0) {
+				set_sample_rate(rate_);
+				return true;
+			} else {
+				return false;
+			}
 		}
 
 
@@ -226,13 +260,6 @@ namespace sound {
 		template <class SOUND_OUT>
 		bool decode(utils::file_io& fin, SOUND_OUT& out) noexcept
 		{
-			// サンプル・レートの設定（外部）
-			set_sample_rate(rate_);
-#if 0
-			if(tag_task_) {
-				tag_task_(fin, tag);
-			}
-#endif
 			bool status = true;
 			bool pause = false;
 			uint32_t pos = 0;

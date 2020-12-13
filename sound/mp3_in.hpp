@@ -32,9 +32,10 @@ namespace sound {
 		static const uint32_t INPUT_BUFFER_SIZE = 2048;
 
 		mad_stream	mad_stream_;
+		mad_header	mad_header_;
 		mad_frame	mad_frame_;
 		mad_synth	mad_synth_;
-		mad_timer_t	mad_timer_;
+///		mad_timer_t	mad_timer_;
 
 		uint8_t		input_buffer_[INPUT_BUFFER_SIZE + MAD_BUFFER_GUARD];
 
@@ -44,7 +45,7 @@ namespace sound {
 		bool			id3v1_;
 
 		uint32_t		time_;
-
+		uint32_t		header_size_;
 
 		int fill_read_buffer_(utils::file_io& fin, mad_stream& strm)
  		{
@@ -190,7 +191,7 @@ namespace sound {
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		mp3_in() : subband_filter_enable_(false), id3v1_(false), time_(0) { }
+		mp3_in() : subband_filter_enable_(false), id3v1_(false), time_(0), header_size_(0) { }
 
 
 		//-----------------------------------------------------------------//
@@ -206,45 +207,53 @@ namespace sound {
 		bool info(utils::file_io& fin, audio_info& info) noexcept
 		{
 			id3_mgr id3;
+			set_state(STATE::TAG);
 			if(!id3.parse(fin)) {
+				set_state(STATE::IDLE);
 				return false;
 			}
+
 			if(tag_task_) {
 				const auto& tag = id3.get_tag();
 				tag_task_(fin, tag);
-//				utils::format("Album:  '%s'\n") % tag.album_;
-//				utils::format("Title:  '%s'\n") % tag.title_;
-//				utils::format("Artist: '%s'\n") % tag.artist_;
-//				utils::format("Year:    %s\n") % tag.year_;
-//				utils::format("Disc:    %s\n") % tag.disc_;
-//				utils::format("Track:   %s\n") % tag.track_;
 			}
 
 			mad_stream_init(&mad_stream_);
-			mad_frame_init(&mad_frame_);
-			mad_synth_init(&mad_synth_);
-			mad_timer_reset(&mad_timer_);
+			mad_header_init(&mad_header_);
 
 			uint32_t forg = fin.tell();
 			info.header_size = forg;
+			header_size_ = forg;
 
 			// 全体のフレーム数をカウント
 			uint32_t frames = 0;
 			uint32_t freq = 0;
 			while(fill_read_buffer_(fin, mad_stream_) >= 0) {
-				++frames;
-
-				if(freq < mad_frame_.header.samplerate) {
-					freq = mad_frame_.header.samplerate;
+				if(fin.get_error()) {
+					break;
+				}
+				if(mad_header_decode(&mad_header_, &mad_stream_)) {
+					if(MAD_RECOVERABLE(mad_stream_.error)) {
+						continue;
+					} else {
+						if(mad_stream_.error == MAD_ERROR_BUFLEN) {
+							continue;
+						} else {
+							break;
+						}
+					}
 				}
 
-				mad_timer_add(&mad_timer_, mad_frame_.header.duration);
+				++frames;
 
+				if(freq < mad_header_.samplerate) {
+					freq = mad_header_.samplerate;
+				}
 			}
 			fin.seek(utils::file_io::SEEK::SET, forg);
 
 			info.samples = frames * 1152;
-			if(mad_frame_.header.mode != MAD_MODE_SINGLE_CHANNEL) {
+			if(mad_header_.mode != MAD_MODE_SINGLE_CHANNEL) {
 				info.type = audio_format::PCM16_STEREO;
 				info.chanels = 2;
 			} else {
@@ -253,11 +262,16 @@ namespace sound {
 			}
 			info.bits = 16;
 			info.frequency = freq;
-			info.total_second = mad_timer_.seconds;
+			info.total_second = info.samples / freq;
 
-			mad_synth_finish(&mad_synth_);
+			mad_header_finish(&mad_header_);
 			mad_frame_finish(&mad_frame_);
-			mad_stream_finish(&mad_stream_);
+
+			set_state(STATE::IDLE);
+
+			if(info.frequency > 0) {
+				set_sample_rate(info.frequency);
+			}
 
 			return true;
 		}
@@ -266,7 +280,7 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	デコード @n
-					デコードの準備として、info で情報を取得する事。
+					デコードの準備として、info で情報を取得する必要がある。
 			@param[in]	fin		file_io コンテキスト（参照）
 			@param[in]	out		オーディオ出力（参照）
 			@return 正常終了なら「true」
@@ -275,26 +289,13 @@ namespace sound {
 		template <class SOUND_OUT>
 		bool decode(utils::file_io& fin, SOUND_OUT& out)
 		{
-#if 0
-			set_state(STATE::TAG);
-			id3_mgr id3;
-			if(!id3.parse(fin)) {
-				set_state(STATE::IDLE);
-				return false;
-			}
-			if(tag_task_) {
-				const auto& tag = id3.get_tag();
-				tag_task_(fin, tag);
-			}
-#endif
 			mad_stream_init(&mad_stream_);
 			mad_frame_init(&mad_frame_);
 			mad_synth_init(&mad_synth_);
-			mad_timer_reset(&mad_timer_);
+///			mad_timer_reset(&mad_timer_);
 
-			uint32_t forg = fin.tell();
+			uint32_t forg = fin.seek(utils::file_io::SEEK::SET, header_size_);
 
-			bool info = false;
 			uint32_t pos = 0;
 			uint32_t frame_count = 0;
 			bool status = true;
@@ -321,7 +322,6 @@ namespace sound {
 				} else if(ctrl == CTRL::REPLAY) {
 					out.mute();
 					fin.seek(utils::file_io::SEEK::SET, forg);
-					info = false;
 					pos = 0;
 					time_ = 0;
 					frame_count = 0;
@@ -353,13 +353,8 @@ namespace sound {
 					}
 				}
 
-				if(!info) {
-					set_sample_rate(mad_frame_.header.samplerate);
-					info = true;
-				}
-
 				frame_count++;
-				mad_timer_add(&mad_timer_, mad_frame_.header.duration);
+///				mad_timer_add(&mad_timer_, mad_frame_.header.duration);
 
 				if(subband_filter_enable_) {
 					apply_filter_(mad_frame_);
