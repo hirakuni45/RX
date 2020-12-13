@@ -105,6 +105,8 @@ namespace sound {
 		LIST_CTRL&	list_ctrl_;
 		SOUND_OUT&	sound_out_;
 
+		audio_info	info_;
+
 		wav_in		wav_in_;
 		mp3_in		mp3_in_;
 
@@ -146,10 +148,15 @@ namespace sound {
 			mp3_in_.set_tag_task([=](utils::file_io& fin, const sound::tag_t& tag) {
 				list_ctrl_.tag(fin, tag); }
 			);
-			mp3_in_.set_update_task([=](uint32_t t) { list_ctrl_.update(t); });
-			list_ctrl_.start(fname);
-			stop_ = false;
-			bool ret = mp3_in_.decode(fin, sound_out_);
+
+			// 情報取得
+			bool ret = false;
+			if(mp3_in_.info(fin, info_)) {
+				mp3_in_.set_update_task([=](uint32_t t) { list_ctrl_.update(t); });
+				list_ctrl_.start(fname);
+				stop_ = false;
+				ret = mp3_in_.decode(fin, sound_out_);
+			}
 			list_ctrl_.close();
 			fin.close();
 			return ret;
@@ -174,10 +181,14 @@ namespace sound {
 			wav_in_.set_tag_task([=](utils::file_io& fin, const sound::tag_t& tag) {
 				list_ctrl_.tag(fin, tag); }
 			);
-			wav_in_.set_update_task([=](uint32_t t) { list_ctrl_.update(t); });
-			list_ctrl_.start(fname);
-			stop_ = false;
-			bool ret = wav_in_.decode(fin, sound_out_);
+			// 情報取得
+			bool ret = false;
+			if(wav_in_.info(fin, info_)) {
+				wav_in_.set_update_task([=](uint32_t t) { list_ctrl_.update(t); });
+				list_ctrl_.start(fname);
+				stop_ = false;
+				ret = wav_in_.decode(fin, sound_out_);
+			}
 			list_ctrl_.close();
 			fin.close();
 			return ret;
@@ -235,7 +246,7 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		codec_mgr(LIST_CTRL& list_ctrl, SOUND_OUT& sound_out) noexcept :
 			list_ctrl_(list_ctrl), sound_out_(sound_out),
-			wav_in_(), mp3_in_(),
+			info_(), wav_in_(), mp3_in_(),
 			dlist_(), loop_t_(), stop_(false), codec_(CODEC::NONE)
 		{ }
 
@@ -280,6 +291,18 @@ namespace sound {
 			default:
 				return af_play::STATE::IDLE;
 			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	オーディオ情報を取得
+			@return オーディオ情報
+		*/
+		//-----------------------------------------------------------------//
+		auto get_audio_info() const noexcept
+		{
+			return info_;
 		}
 	};
 }

@@ -567,21 +567,30 @@ namespace app {
 			@brief  時間のレンダリング @n
 					※非同期、外部のタスクがこの API を呼ぶ
 			@param[in]	t		時間
+			@param[in]	all		全体時間
 		*/
 		//-------------------------------------------------------------//
-		void render_time(uint32_t t) noexcept
+		void render_time(uint32_t t, uint32_t all) noexcept
 		{
 			if(filer_.get_state()) return;
 
 			uint16_t sec = t % 60;
 			uint16_t min = (t / 60) % 60;
 			uint16_t hor = (t / 3600) % 24;
-			char tmp[16];
-			utils::sformat("%02d:%02d:%02d", tmp, sizeof(tmp)) % hor % min % sec;
+			uint16_t asec = all % 60;
+			uint16_t amin = (all / 60) % 60;
+			uint16_t ahor = (all / 3600) % 24;
+			char tmp[32];
+			utils::sformat("%02d:%02d:%02d / %02d:%02d:%02d", tmp, sizeof(tmp))
+				% hor % min % sec % ahor % amin % asec;
 			render_.set_fore_color(graphics::def_color::Black);
 			render_.fill_box(vtx::srect(0, 5 * 20, 8 * 8, 16));
 			render_.set_fore_color(graphics::def_color::White);
 			render_.draw_text(vtx::spos(0, 5 * 20), tmp);
+			if(all > 0) {
+				slider_.set_ratio(static_cast<float>(t) / static_cast<float>(all));
+				widd_.redraw(&slider_);
+			}
 			render_.sync_frame(false);
 		}
 
