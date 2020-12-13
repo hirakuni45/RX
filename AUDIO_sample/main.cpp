@@ -488,7 +488,7 @@ extern "C" {
 				name_t_.put_++;
 			}
 			if(audio_t != audio_t_) {
-				gui_.render_time(audio_t_);
+				gui_.render_time(audio_t_, codec_mgr_.get_audio_info().total_second);
 				audio_t = audio_t_;
 			}
 #else
@@ -522,7 +522,7 @@ int main(int argc, char** argv)
 	utils::format("\r%s Start for Audio Sample\n") % system_str_;
 
     {
-        uint32_t stack_size = 8192;
+        uint32_t stack_size = 16384;
         void* param = nullptr;
         uint32_t prio = 2;
         xTaskCreate(codec_task_, "Codec", stack_size, param, prio, nullptr);
@@ -537,4 +537,3 @@ int main(int argc, char** argv)
 
 	vTaskStartScheduler();
 }
-
