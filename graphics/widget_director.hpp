@@ -171,26 +171,6 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	再描画設定
-			@param[in]	w	描画 widget
-		*/
-		//-----------------------------------------------------------------//
-		void redraw(widget* w) noexcept
-		{
-			for(auto& t : widgets_) {
-				if(t.w_ == nullptr) continue;
-				if(t.w_ == w) {
-					if(t.w_->get_state() == widget::STATE::ENABLE) {
-						t.draw_ = true;
-					}
-					break;
-				}
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	再描画設定
 		*/
 		//-----------------------------------------------------------------//
 		void redraw_all() noexcept
@@ -247,6 +227,10 @@ namespace gui {
 					}
 					if(t.w_->get_font_color() != t.font_color_) {  // フォントカラー変更で再描画
 						t.font_color_ = t.w_->get_font_color();
+						t.draw_ = true;
+					}
+					if(t.w_->get_update()) {  // 更新リクエス？
+						t.w_->set_update(false);
 						t.draw_ = true;
 					}
 				}

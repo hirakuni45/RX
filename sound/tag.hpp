@@ -25,7 +25,8 @@ namespace sound {
 	private:
 		STR128	album_;		///< アルバム名
 		STR128	title_;		///< タイトル（曲名）
-		STR128	artist_;	///< アーティスト
+		STR128	artist_;	///< 1st アーティスト
+		STR128	artist2_;	///< 2nd アーティスト
 		STR16	year_;		///< リリース年
 		STR8	disc_;		///< ディスク
 		STR8	track_;		///< トラック
@@ -72,6 +73,7 @@ namespace sound {
 			album_.clear();
 			title_.clear();
 			artist_.clear();
+			artist2_.clear();
 			year_.clear();
 			disc_.clear();
 			track_.clear();
@@ -85,7 +87,7 @@ namespace sound {
 			@return アルバム
 		*/
 		//-------------------------------------------------------------//
-		STR128& at_album() noexcept { return album_; }
+		auto& at_album() noexcept { return album_; }
 
 
 		//-------------------------------------------------------------//
@@ -94,7 +96,7 @@ namespace sound {
 			@return アルバム
 		*/
 		//-------------------------------------------------------------//
-		const STR128& get_album() const noexcept { return album_; }
+		const auto& get_album() const noexcept { return album_; }
 
 
 		//-------------------------------------------------------------//
@@ -103,7 +105,7 @@ namespace sound {
 			@return タイトル
 		*/
 		//-------------------------------------------------------------//
-		STR128& at_title() noexcept { return title_; }
+		auto& at_title() noexcept { return title_; }
 
 
 		//-------------------------------------------------------------//
@@ -112,25 +114,43 @@ namespace sound {
 			@return タイトル
 		*/
 		//-------------------------------------------------------------//
-		const STR128& get_title() const noexcept { return title_; }
+		const auto& get_title() const noexcept { return title_; }
 
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	アーティストへの参照
-			@return アーティスト
+			@brief	1st アーティストへの参照
+			@return 1st アーティスト
 		*/
 		//-------------------------------------------------------------//
-		STR128& at_artist() noexcept { return artist_; }
+		auto& at_artist() noexcept { return artist_; }
 
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	アーティストへの参照 (RO)
-			@return アーティスト
+			@brief	1st アーティストへの参照 (RO)
+			@return 1st アーティスト
 		*/
 		//-------------------------------------------------------------//
-		const STR128& get_artist() const noexcept { return artist_; }
+		const auto& get_artist() const noexcept { return artist_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	2nd アーティストへの参照
+			@return 2nd アーティスト
+		*/
+		//-------------------------------------------------------------//
+		auto& at_artist2() noexcept { return artist2_; }
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief	2nd アーティストへの参照 (RO)
+			@return 2nd アーティスト
+		*/
+		//-------------------------------------------------------------//
+		const auto& get_artist2() const noexcept { return artist2_; }
 
 
 		//-------------------------------------------------------------//
@@ -139,7 +159,7 @@ namespace sound {
 			@return 年
 		*/
 		//-------------------------------------------------------------//
-		STR16& at_year() noexcept { return year_; }
+		auto& at_year() noexcept { return year_; }
 
 
 		//-------------------------------------------------------------//
@@ -148,7 +168,7 @@ namespace sound {
 			@return 年
 		*/
 		//-------------------------------------------------------------//
-		const STR16& get_year() const noexcept { return year_; }
+		const auto& get_year() const noexcept { return year_; }
 
 
 		//-------------------------------------------------------------//
@@ -157,7 +177,7 @@ namespace sound {
 			@return ディスク
 		*/
 		//-------------------------------------------------------------//
-		STR8& at_disc() noexcept { return disc_; }
+		auto& at_disc() noexcept { return disc_; }
 
 
 		//-------------------------------------------------------------//
@@ -166,7 +186,7 @@ namespace sound {
 			@return ディスク
 		*/
 		//-------------------------------------------------------------//
-		const STR8& get_disc() const noexcept { return disc_; }
+		const auto& get_disc() const noexcept { return disc_; }
 
 
 		//-------------------------------------------------------------//
@@ -175,7 +195,7 @@ namespace sound {
 			@return トラック
 		*/
 		//-------------------------------------------------------------//
-		STR8& at_track() noexcept { return track_; }
+		auto& at_track() noexcept { return track_; }
 
 
 		//-------------------------------------------------------------//
@@ -184,7 +204,7 @@ namespace sound {
 			@return トラック
 		*/
 		//-------------------------------------------------------------//
-		const STR8& get_track() const noexcept { return track_; }
+		const auto& get_track() const noexcept { return track_; }
 
 
 		//-------------------------------------------------------------//
@@ -193,7 +213,7 @@ namespace sound {
 			@return アルバム画像情報
 		*/
 		//-------------------------------------------------------------//
-		apic_t& at_apic() noexcept { return apic_; }
+		auto& at_apic() noexcept { return apic_; }
 
 
 		//-------------------------------------------------------------//
@@ -202,7 +222,7 @@ namespace sound {
 			@return アルバム画像情報
 		*/
 		//-------------------------------------------------------------//
-		const apic_t& get_apic() const noexcept { return apic_; }
+		const auto& get_apic() const noexcept { return apic_; }
 
 
 		//-------------------------------------------------------------//
@@ -214,6 +234,7 @@ namespace sound {
 			album_  = ths.album_;
 			title_  = ths.title_;
 			artist_ = ths.artist_;
+			artist2_ = ths.artist2_;
 			year_   = ths.year_;
 			disc_   = ths.disc_;
 			track_  = ths.track_;
