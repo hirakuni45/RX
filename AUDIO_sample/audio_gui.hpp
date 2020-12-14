@@ -188,6 +188,10 @@ namespace app {
 					fin.seek(utils::file_io::SEEK::SET, tag.get_apic().ofs_);
 					img::img_info ifo;
 					if(!img_in_.info(fin, ifo)) {
+
+						auto st = img_in_.at_jpeg().get_status();
+						utils::format("JPEG status: %d\n") % static_cast<int>(st);
+
 						scaling_.set_scale();
 						img_in_.load("/NoImage.jpg");
 						render_.swap_color();
@@ -209,11 +213,27 @@ namespace app {
 			render_.set_back_color(graphics::def_color::Gray);
 			render_text_(0, 0 * 20, tag.get_album().c_str());
 			render_text_(0, 1 * 20, tag.get_title().c_str());
-			render_text_(0, 2 * 20, tag.get_artist().c_str());
+			{
+				auto x = render_text_(0, 2 * 20, tag.get_artist().c_str());
+				if(!tag.get_artist2().empty()) {
+					x = render_text_(x, 2 * 20, " / ");
+					render_text_(x, 2 * 20, tag.get_artist2().c_str());
+				}
+			}
 			render_text_(0, 3 * 20, tag.get_year().c_str());
-			auto x = render_text_(0, 4 * 20, tag.get_disc().c_str());
-			if(x > 0) x += 8;
-			render_text_(x, 4 * 20, tag.get_track().c_str());
+			{
+				char tmp[10];
+				int16_t x = 0;
+				if(!tag.get_disc().empty()) {
+					utils::sformat("D:%s", tmp, sizeof(tmp)) % tag.get_disc().c_str();
+					x = render_text_(0, 4 * 20, tmp);
+				}
+				if(!tag.get_track().empty()) {
+					utils::sformat("T:%s", tmp, sizeof(tmp)) % tag.get_track().c_str();
+					if(x > 0) x += 8;
+					render_text_(x, 4 * 20, tmp);
+				}
+			}
 			render_.sync_frame(false);
 		}
 
@@ -589,7 +609,7 @@ namespace app {
 			render_.draw_text(vtx::spos(0, 5 * 20), tmp);
 			if(all > 0) {
 				slider_.set_ratio(static_cast<float>(t) / static_cast<float>(all));
-				widd_.redraw(&slider_);
+				slider_.set_update();
 			}
 			render_.sync_frame(false);
 		}
