@@ -90,6 +90,8 @@ namespace gui {
 
 		touch_state	touch_state_;
 
+		bool		update_;
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -105,7 +107,7 @@ namespace gui {
 			location_(loc), title_(title), mobj_(nullptr),
 			base_color_(graphics::def_color::White), font_color_(graphics::def_color::White),
 			state_(STATE::DISABLE), focus_(false), touch_(false),
-			touch_state_(fexp)
+			touch_state_(fexp), update_(false)
 		{ } 
 
 
@@ -293,14 +295,29 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	「更新」の設定
+			@param[in]	update	更新をしない場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void set_update(bool update = true) noexcept { update_ = update; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	「更新」の取得
+			@return	「更新」
+		*/
+		//-----------------------------------------------------------------//
+		auto get_update() const noexcept { return update_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	ステートの設定
 			@param[in]	state	ステート
 		*/
 		//-----------------------------------------------------------------//
-		void set_state(STATE state) noexcept
-		{
-			state_ = state;
-		}
+		void set_state(STATE state) noexcept { state_ = state; }
 
 
 		//-----------------------------------------------------------------//
