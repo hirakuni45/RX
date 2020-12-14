@@ -32,10 +32,8 @@ namespace sound {
 		static const uint32_t INPUT_BUFFER_SIZE = 2048;
 
 		mad_stream	mad_stream_;
-		mad_header	mad_header_;
 		mad_frame	mad_frame_;
 		mad_synth	mad_synth_;
-///		mad_timer_t	mad_timer_;
 
 		uint8_t		input_buffer_[INPUT_BUFFER_SIZE + MAD_BUFFER_GUARD];
 
@@ -92,7 +90,7 @@ namespace sound {
 				 */
 				// ReadSize = BstdRead(ReadStart, 1, ReadSize, BstdFile);
 				size_t req = size;
-				size_t rs = fin.read(ptr, 1, req);
+				size_t rs = fin.read(ptr, req);
 				if(id3v1_) {
 					if(fin.tell() >= (fin.get_file_size() - 128)) return -1;
 				} else {
@@ -219,7 +217,7 @@ namespace sound {
 			}
 
 			mad_stream_init(&mad_stream_);
-			mad_header_init(&mad_header_);
+			mad_header_init(&mad_frame_.header);
 
 			uint32_t forg = fin.tell();
 			info.header_size = forg;
@@ -232,7 +230,7 @@ namespace sound {
 				if(fin.get_error()) {
 					break;
 				}
-				if(mad_header_decode(&mad_header_, &mad_stream_)) {
+				if(mad_header_decode(&mad_frame_.header, &mad_stream_) != 0) {
 					if(MAD_RECOVERABLE(mad_stream_.error)) {
 						continue;
 					} else {
@@ -243,17 +241,15 @@ namespace sound {
 						}
 					}
 				}
-
 				++frames;
-
-				if(freq < mad_header_.samplerate) {
-					freq = mad_header_.samplerate;
+				if(freq < mad_frame_.header.samplerate) {
+					freq = mad_frame_.header.samplerate;
 				}
 			}
 			fin.seek(utils::file_io::SEEK::SET, forg);
 
 			info.samples = frames * 1152;
-			if(mad_header_.mode != MAD_MODE_SINGLE_CHANNEL) {
+			if(mad_frame_.header.mode != MAD_MODE_SINGLE_CHANNEL) {
 				info.type = audio_format::PCM16_STEREO;
 				info.chanels = 2;
 			} else {
@@ -264,7 +260,7 @@ namespace sound {
 			info.frequency = freq;
 			info.total_second = info.samples / freq;
 
-			mad_header_finish(&mad_header_);
+			mad_header_finish(&mad_frame_.header);
 			mad_frame_finish(&mad_frame_);
 
 			set_state(STATE::IDLE);

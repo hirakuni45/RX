@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	MP3/ID3 タグ・デコード・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -26,7 +26,8 @@ namespace sound {
 			NA,		///< 未知の ID
 
 			TIT2,	///< 曲名
-			TPE1,	///< アーティスト
+			TPE1,	///< 1st アーティスト
+			TPE2,	///< 2nd アーティスト
 			TALB,	///< アルバム名
 			TYER,	///< 年
 			TPOS,	///< Part Of Set
@@ -47,6 +48,8 @@ namespace sound {
 			if(strncmp(id, "TT2", 3) == 0) return ID::TIT2;
 			if(strncmp(id, "TPE1", 4) == 0) return ID::TPE1;
 			if(strncmp(id, "TP1", 3) == 0) return ID::TPE1;
+			if(strncmp(id, "TPE2", 4) == 0) return ID::TPE2;
+			if(strncmp(id, "TP2", 3) == 0) return ID::TPE2;
 			if(strncmp(id, "TALB", 4) == 0) return ID::TALB;
 			if(strncmp(id, "TAL", 3) == 0) return ID::TALB;
 			if(strncmp(id, "TYER", 4) == 0) return ID::TYER;
@@ -62,7 +65,7 @@ namespace sound {
 
 		static bool get_text64_(utils::file_io& fin, char* dst, uint32_t& len) noexcept
 		{
-			for(int i = 0; i < 64; ++i) {
+			for(int i = 0; i < 63; ++i) {
 				char ch;
 				if(fin.read(&ch, 1) != 1) return false;
 				len--;
@@ -100,48 +103,62 @@ namespace sound {
 			return false;
 		}
 
+		bool set_apic_(utils::file_io& fin, uint32_t len, bool v2_3) noexcept
+		{
+			uint8_t code;
+			if(fin.read(&code, 1) != 1) {
+				return false;
+			}
+			len--;
+
+			if(v2_3) {
+				char tmp[64];
+				if(!get_text64_(fin, tmp, len)) {
+					return false;
+				}
+				if(strlen(tmp) < 5) {  // ヘッダーが微妙に違う場合の強引な回避策・・
+					if(!get_text64_(fin, tmp, len)) {
+						return false;
+					}
+				}
+				if(strcmp(tmp, "image/jpeg") == 0) {
+					strcpy(tag_.at_apic().ext_, "jpg");
+				} else if(strcmp(tmp, "image/png") == 0) {
+					strcpy(tag_.at_apic().ext_, "png");
+				} else if(strcmp(tmp, "image/bmp") == 0) {
+					strcpy(tag_.at_apic().ext_, "bmp");
+				}
+				if(fin.read(&tag_.at_apic().typ_, 1) != 1) {
+					return false;
+				}
+				len--;
+				utils::format("V2.3: '%s'\n") % tmp;
+			} else {
+				if(fin.read(tag_.at_apic().ext_, 3) != 3) {
+					return false;
+				}
+				len -= 3;
+				if(fin.read(&tag_.at_apic().typ_, 1) != 1) {
+					return false;
+				}
+				len--;
+				utils::format("V2.2: '%s'\n") % tag_.get_apic().ext_;
+			}
+			auto ret = skip_text_(code, fin, len);
+			if(!ret) {
+				utils::format("ID3 APIC skip text error\n");
+			}
+			tag_.at_apic().ofs_ = fin.tell();
+			tag_.at_apic().len_ = len;
+			fin.seek(utils::file_io::SEEK::CUR, len);
+			return ret;
+		}
+
 
 		bool set_info_(ID id, utils::file_io& fin, uint32_t len, bool v2_3) noexcept
 		{
-			char* dst = nullptr;
-			uint32_t dstlen = 0;
-			bool apic = false;
-			switch(id) {
-			case ID::TIT2:
-				dst    = tag_.at_title().begin();
-				dstlen = tag_.at_title().capacity();
-				break;
-			case ID::TPE1:
-				dst    = tag_.at_artist().begin();
-				dstlen = tag_.at_artist().capacity();
-				break;
-			case ID::TALB:
-				dst    = tag_.at_album().begin();
-				dstlen = tag_.at_album().capacity();
-				break;
-			case ID::TYER:
-				dst    = tag_.at_year().begin();
-				dstlen = tag_.at_year().capacity();
-				break;
-			case ID::TPOS:
-				dst    = tag_.at_disc().begin();
-				dstlen = tag_.at_disc().capacity();
-				break;
-			case ID::TRCK:
-				dst    = tag_.at_track().begin();
-				dstlen = tag_.at_track().capacity();
-				break;
-			case ID::APIC:
-				apic = true;
-				break;
-			default:
-				break;
-			}
-
-			if(apic) ;
-			else if(dst == nullptr) {
-				fin.seek(utils::file_io::SEEK::CUR, len);
-				return false;
+			if(id == ID::APIC) {
+				return set_apic_(fin, len, v2_3);
 			}
 
 			uint8_t code;
@@ -149,61 +166,8 @@ namespace sound {
 				return false;
 			}
 			len--;
-
-			if(apic) {
-				if(v2_3) {
-					char tmp[64];
-					if(!get_text64_(fin, tmp, len)) {
-						return false;
-					}
-					if(strcmp(tmp, "image/jpeg") == 0) {
-						strcpy(tag_.at_apic().ext_, "jpg");
-					} else if(strcmp(tmp, "image/png") == 0) {
-						strcpy(tag_.at_apic().ext_, "png");
-					} else if(strcmp(tmp, "image/bmp") == 0) {
-						strcpy(tag_.at_apic().ext_, "bmp");
-					}
-					if(fin.read(&tag_.at_apic().typ_, 1) != 1) {
-						return false;
-					}
-					len--;
-					utils::format("V2.3: '%s'\n") % tmp;
-				} else {
-					if(fin.read(tag_.at_apic().ext_, 3) != 3) {
-						return false;
-					}
-					len -= 3;
-					if(fin.read(&tag_.at_apic().typ_, 1) != 1) {
-						return false;
-					}
-					len--;
-					utils::format("V2.2: '%s'\n") % tag_.get_apic().ext_;
-				}
-				auto ret = skip_text_(code, fin, len);
-				if(!ret) {
-					utils::format("ID3 APIC skip text error\n");
-				}
-#if 0
-				// この実装は、不正なタグを回避する為に行う。
-				if(strcmp(tag_.at_apic().ext_, "jpg") == 0) {
-					auto org = fin.tell();
-					uint8_t tmp[2] = { 0 };
-					for(int i = 0; i < 64; ++i) {
-						tmp[0] = tmp[1];
-						fin.read(&tmp[1], 1);
-						if(tmp[0] == 0xff && tmp[1] == 0xd8) break;
-					}
-					auto pos = fin.tell();
-					pos -= 2;
-					fin.seek(utils::file_io::SEEK::SET, pos);
-				}
-#endif
-				tag_.at_apic().ofs_ = fin.tell();
-				tag_.at_apic().len_ = len;
-				fin.seek(utils::file_io::SEEK::CUR, len);
-				return ret;
-			}
-
+			char dst[128];
+			auto dstlen = sizeof(dst);
 			if(code == 0x00) {  // ISO-8859-1
 				char tmp[len + 1];
 				if(fin.read(tmp, len) != len) {
@@ -242,7 +206,36 @@ namespace sound {
 				fin.seek(utils::file_io::SEEK::CUR, len);
 				return false;
 			}
-			return true;
+
+			bool ret = true;
+			switch(id) {
+			case ID::TIT2:
+				tag_.at_title() = dst;
+				break;
+			case ID::TPE1:
+				tag_.at_artist() = dst;
+				break;
+			case ID::TPE2:
+				tag_.at_artist2() = dst;
+				break;
+			case ID::TALB:
+				tag_.at_album() = dst;
+				break;
+			case ID::TYER:
+				tag_.at_year() = dst;
+				break;
+			case ID::TPOS:
+				tag_.at_disc() = dst;
+				break;
+			case ID::TRCK:
+				tag_.at_track() = dst;
+				break;
+			default:
+				ret = false;
+				break;
+			}
+
+			return ret;
 		}
 
 

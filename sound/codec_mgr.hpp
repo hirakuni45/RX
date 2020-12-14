@@ -72,12 +72,13 @@ namespace sound {
 
 		void tag(utils::file_io& fin, const sound::tag_t& t) noexcept
 		{
-			utils::format("Album:  '%s'\n") % t.get_album().c_str();
-			utils::format("Title:  '%s'\n") % t.get_title().c_str();
-			utils::format("Artist: '%s'\n") % t.get_artist().c_str();
-			utils::format("Year:    %s\n")  % t.get_year().c_str();
-			utils::format("Disc:    %s\n")  % t.get_disc().c_str();
-			utils::format("Track:   %s\n")  % t.get_track().c_str();
+			utils::format("Album:   '%s'\n") % t.get_album().c_str();
+			utils::format("Title:   '%s'\n") % t.get_title().c_str();
+			utils::format("Artist:  '%s'\n") % t.get_artist().c_str();
+			utils::format("Artist2: '%s'\n") % t.get_artist2().c_str();
+			utils::format("Year:     %s\n")  % t.get_year().c_str();
+			utils::format("Disc:     %s\n")  % t.get_disc().c_str();
+			utils::format("Track:    %s\n")  % t.get_track().c_str();
 		}
 
 
