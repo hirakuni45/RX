@@ -12,6 +12,7 @@
 #include "graphics/widget.hpp"
 #include "graphics/group.hpp"
 #include "graphics/frame.hpp"
+#include "graphics/text.hpp"
 #include "graphics/dialog.hpp"
 #include "graphics/button.hpp"
 #include "graphics/check.hpp"
@@ -229,7 +230,7 @@ namespace gui {
 						t.font_color_ = t.w_->get_font_color();
 						t.draw_ = true;
 					}
-					if(t.w_->get_update()) {  // 更新リクエス？
+					if(t.w_->get_update()) {  // 描画更新リクエス？
 						t.w_->set_update(false);
 						t.draw_ = true;
 					}
@@ -284,6 +285,13 @@ namespace gui {
 				case widget::ID::FRAME:
 					{
 						auto* w = dynamic_cast<frame*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::TEXT:
+					{
+						auto* w = dynamic_cast<text*>(t.w_);
 						if(w == nullptr) break;
 						w->draw(rdr_);
 					}

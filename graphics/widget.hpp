@@ -30,6 +30,7 @@ namespace gui {
 		enum class ID : uint8_t {
 			GROUP,		///< グループ
 			FRAME,		///< フレーム
+			TEXT,		///< テキスト
 			DIALOG,		///< ダイアログ
 			BUTTON,		///< ボタン
 			CHECK,		///< チェック・ボタン
@@ -140,7 +141,7 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タッチ判定を更新
+			@brief	タッチ判定を更新（通常毎フレーム呼ばれる）
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
 		*/
