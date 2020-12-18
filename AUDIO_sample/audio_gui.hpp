@@ -465,6 +465,10 @@ namespace app {
 		//-------------------------------------------------------------//
 		void enable(bool ena = true) noexcept
 		{
+			album_.enable(ena);
+			title_.enable(ena);
+			artist_.enable(ena);
+
 			ff_.enable(ena);
 			play_.enable(ena);
 			rew_.enable(ena);
