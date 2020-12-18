@@ -40,6 +40,7 @@
 |widget.hpp|Widget ウィジェット基本クラス|
 |group.hpp|Widget グループ|
 |frame.hpp|Widget フレーム|
+|text.hpp|Widget テキスト|
 |button.hpp|Widget ボタン|
 |check.hpp|Widget チェックボックス|
 |radio.hpp|Widget ラジオボタン|
@@ -75,7 +76,7 @@
 - ソフトウェアー、及びハードウェアーレンダリングに適応出来る構成
 - 記憶割り当てを利用しない、スタテック構造（テンプレートパラメーターでサイズ指定）
 - リソースの消費を抑えた設計
-
+- 描画を最適化させる為の仕組み
 
 
 
