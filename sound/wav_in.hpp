@@ -93,6 +93,29 @@ namespace sound {
 			rate_(0), channel_(0), bits_(0), time_(0) { }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	WAV ファイルか確認する
+			@param[in]	fin	file_io クラス
+			@return エラーなら「false」を返す
+		*/
+		//-----------------------------------------------------------------//
+		bool probe(utils::file_io& fin) noexcept 
+		{
+			auto org = fin.tell();
+			WAVEFILEHEADER wh;
+			auto len = fin.read(&wh, sizeof(wh));
+			fin.seek(utils::file_io::SEEK::SET, org);
+			if(len != sizeof(wh)) {
+				return false;
+			}
+			if(strncmp(wh.szRIFF, "RIFF", 4) == 0 && strncmp(wh.szWAVE, "WAVE", 4) == 0) ;
+			else return false;
+
+			return true;
+		}
+
+
 		//-------------------------------------------------------------//
 		/*!
 			@brief	ヘッダーをロードして、フォーマット、サイズを取得する

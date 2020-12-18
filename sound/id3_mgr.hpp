@@ -30,14 +30,17 @@ namespace sound {
 			TPE2,	///< 2nd アーティスト
 			TALB,	///< アルバム名
 			TYER,	///< 年
+			TDAT,	///< 日付
 			TPOS,	///< Part Of Set
 			TRCK,	///< トラック
+			COMM,	///< コメント
 			APIC,	///< アルバム画像
 		};
 
 		uint32_t	org_pos_;
 		uint16_t	ver_;
 		uint8_t		flag_;
+		bool		id3v1_;
 		uint32_t	size_;
 
 		tag_t		tag_;
@@ -54,9 +57,13 @@ namespace sound {
 			if(strncmp(id, "TAL", 3) == 0) return ID::TALB;
 			if(strncmp(id, "TYER", 4) == 0) return ID::TYER;
 			if(strncmp(id, "TYE", 3) == 0) return ID::TYER;
+			if(strncmp(id, "TDAT", 4) == 0) return ID::TDAT;
+			if(strncmp(id, "DAT", 3) == 0) return ID::TDAT;
 			if(strncmp(id, "TPOS", 4) == 0) return ID::TPOS;
 			if(strncmp(id, "TRCK", 4) == 0) return ID::TRCK;
 			if(strncmp(id, "TRK", 3) == 0) return ID::TRCK;
+			if(strncmp(id, "COM", 3) == 0) return ID::COMM;
+			if(strncmp(id, "COMM", 4) == 0) return ID::COMM;
 			if(strncmp(id, "APIC", 4) == 0) return ID::APIC;
 			if(strncmp(id, "PIC", 3) == 0) return ID::APIC;
 			return ID::NA;
@@ -224,11 +231,17 @@ namespace sound {
 			case ID::TYER:
 				tag_.at_year() = dst;
 				break;
+			case ID::TDAT:
+				tag_.at_date() = dst;
+				break;
 			case ID::TPOS:
 				tag_.at_disc() = dst;
 				break;
 			case ID::TRCK:
 				tag_.at_track() = dst;
+				break;
+			case ID::COMM:
+				tag_.at_comment() = dst;
 				break;
 			default:
 				ret = false;
@@ -350,14 +363,77 @@ namespace sound {
 			return true;
 		}
 
+
+		bool parse_v1_(utils::file_io& fin) noexcept
+		{
+			if(!fin.seek(utils::file_io::SEEK::END, 128)) {
+				return false;
+			}
+
+			char tmp[128];
+			if(fin.read(tmp, 128) != 128) {
+				return false;
+			}
+			if(strncmp(tmp, "TAG", 3) != 0) {
+				return false;
+			}
+
+			tag_.clear();
+
+			tag_.at_album() = &tmp[63];
+			tag_.at_title() = &tmp[3];
+			tag_.at_artist() = &tmp[33];
+
+			tag_.at_comment() = &tmp[97];
+
+			tmp[93+4] = 0;
+			tag_.at_date() = &tmp[93];
+
+			return true;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		id3_mgr() noexcept : org_pos_(0), ver_(0), flag_(0), size_(0), tag_()
+		id3_mgr() noexcept : org_pos_(0), ver_(0), flag_(0), id3v1_(false), size_(0), tag_()
 		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ID3 タグを検出したらスキップする
+			@param[in]	fin		「file_io」
+			@return	成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool skip_header(utils::file_io& fin) noexcept
+		{
+			auto org = fin.tell();
+
+			char tmp[10];
+			if(fin.read(tmp, 10) != 10) {
+				fin.seek(utils::file_io::SEEK::SET, org);
+				return false;
+			}
+			if(strncmp(tmp, "ID3", 3) != 0) {
+				fin.seek(utils::file_io::SEEK::SET, org);
+				return false;
+			}
+//			ver = get16_(&tmp[3]);
+//			flag = static_cast<uint8_t>(tmp[5]);
+			auto size = get_size_syncsafe_(&tmp[6]);
+
+			if(!fin.seek(utils::file_io::SEEK::SET, org + 10 + size)) {
+				fin.seek(utils::file_io::SEEK::SET, org);
+				return false;
+			}
+
+			fin.seek(utils::file_io::SEEK::SET, org);
+			return true;
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -373,6 +449,8 @@ namespace sound {
 				return false;
 			}
 
+			id3v1_ = false;
+
 			org_pos_ = fin.tell();
 			char tmp[10];
 			if(fin.read(tmp, 10) != 10) {
@@ -380,9 +458,12 @@ namespace sound {
 				return false;
 			}
 			if(strncmp(tmp, "ID3", 3) != 0) {
+				auto ret = parse_v1_(fin);
 				fin.seek(utils::file_io::SEEK::SET, org_pos_);
-				return false;
+				if(ret) id3v1_ = true;
+				return ret;
 			}
+			tag_.clear();
 			uint32_t org = fin.tell();
 			ver_ = get16_(&tmp[3]);
 			flag_ = static_cast<uint8_t>(tmp[5]);
@@ -426,6 +507,15 @@ namespace sound {
 
 			return true;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	V1 タグか検査
+			@return V1 タグの場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		auto is_v1() const noexcept { return id3v1_; }
 
 
 		//-----------------------------------------------------------------//

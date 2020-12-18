@@ -13,6 +13,7 @@
 //=====================================================================//
 #include "sound/wav_in.hpp"
 #include "sound/mp3_in.hpp"
+#include "sound/aac_in.hpp"
 #include "sound/sound_out.hpp"
 #include "common/dir_list.hpp"
 #include "common/format.hpp"
@@ -77,8 +78,10 @@ namespace sound {
 			utils::format("Artist:  '%s'\n") % t.get_artist().c_str();
 			utils::format("Artist2: '%s'\n") % t.get_artist2().c_str();
 			utils::format("Year:     %s\n")  % t.get_year().c_str();
+			utils::format("Date:     %s\n")  % t.get_date().c_str();
 			utils::format("Disc:     %s\n")  % t.get_disc().c_str();
 			utils::format("Track:    %s\n")  % t.get_track().c_str();
+			utils::format("Comment:  %s\n")  % t.get_comment().c_str();
 		}
 
 
@@ -110,11 +113,13 @@ namespace sound {
 
 		wav_in		wav_in_;
 		mp3_in		mp3_in_;
+		aac_in		aac_in_;
 
 		enum class CODEC : uint8_t {
 			NONE,
 			WAV,
 			MP3,
+			AAC,
 		};
 
 		typedef utils::dir_list DLIST;
@@ -130,38 +135,6 @@ namespace sound {
 		bool		stop_;
 
 		CODEC		codec_;
-
-		bool play_mp3_(const char* fname) noexcept
-		{
-			utils::file_io fin;
-			if(!fin.open(fname, "rb")) {
-				return false;
-			}
-			codec_ = CODEC::MP3;
-			mp3_in_.set_ctrl_task([=]() {
-					auto c = list_ctrl_.ctrl();
-					if(c == sound::af_play::CTRL::STOP) {
-						dlist_.stop();
-						stop_ = true;
-					}
-					return c;
-				} );
-			mp3_in_.set_tag_task([=](utils::file_io& fin, const sound::tag_t& tag) {
-				list_ctrl_.tag(fin, tag); }
-			);
-
-			// 情報取得
-			bool ret = false;
-			if(mp3_in_.info(fin, info_)) {
-				mp3_in_.set_update_task([=](uint32_t t) { list_ctrl_.update(t); });
-				list_ctrl_.start(fname);
-				stop_ = false;
-				ret = mp3_in_.decode(fin, sound_out_);
-			}
-			list_ctrl_.close();
-			fin.close();
-			return ret;
-		}
 
 
 		bool play_wav_(const char* fname) noexcept
@@ -196,6 +169,46 @@ namespace sound {
 		}
 
 
+		bool play_mp3_(const char* fname) noexcept
+		{
+			utils::file_io fin;
+			if(!fin.open(fname, "rb")) {
+				return false;
+			}
+			codec_ = CODEC::MP3;
+			mp3_in_.set_ctrl_task([=]() {
+					auto c = list_ctrl_.ctrl();
+					if(c == sound::af_play::CTRL::STOP) {
+						dlist_.stop();
+						stop_ = true;
+					}
+					return c;
+				} );
+			mp3_in_.set_tag_task([=](utils::file_io& fin, const sound::tag_t& tag) {
+				list_ctrl_.tag(fin, tag); }
+			);
+
+			// 情報取得
+			bool ret = false;
+			if(mp3_in_.info(fin, info_)) {
+				mp3_in_.set_update_task([=](uint32_t t) { list_ctrl_.update(t); });
+				list_ctrl_.start(fname);
+				stop_ = false;
+				ret = mp3_in_.decode(fin, sound_out_);
+			}
+			list_ctrl_.close();
+			fin.close();
+			return ret;
+		}
+
+
+		bool play_aac_(const char* fname) noexcept
+		{
+
+			return true;
+		}
+
+
 		void play_loop_(const char* root, const char* start) noexcept
 		{
 			loop_t_.start = start;
@@ -224,10 +237,13 @@ namespace sound {
 				const char* ext = strrchr(name, '.');
 				if(ext != nullptr) {
 					bool ret = true;  // 拡張子が無い場合スルー
-					if(utils::str::strcmp_no_caps(ext, ".mp3") == 0) {
-						ret = play_mp3_(name);
-					} else if(utils::str::strcmp_no_caps(ext, ".wav") == 0) {
+
+					if(utils::str::strcmp_no_caps(ext, ".wav") == 0) {
 						ret = play_wav_(name);
+					} else if(utils::str::strcmp_no_caps(ext, ".mp3") == 0) {
+						ret = play_mp3_(name);
+					} else if(utils::str::strcmp_no_caps(ext, ".aac") == 0) {
+						ret = play_aac_(name);
 					}
 					if(!ret && !stop_) {
 						utils::format("Can't open audio file: '%s'\n") % name;

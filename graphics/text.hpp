@@ -1,70 +1,57 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	ボタン表示と制御 @n
-			・領域内で、「押した」、「離した」がある場合に「選択」と認識する。@n
-			・選択時関数を使わない場合、select_id を監視する事で、状態の変化を認識できる。@n
-			・選択時関数にはラムダ式を使える。
+	@brief	テキスト表示と制御 @n
+			クリッピングされた描画と、位置の管理などを行う @n
+			描画領域より大きなテキスト描画を行う場合は、自動でスクロールを行う。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include <functional>
 #include "graphics/widget.hpp"
 
 namespace gui {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	ボタン・クラス
+		@brief	テキスト・クラス
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct button : public widget {
+	struct text : public widget {
 
-		typedef button value_type;
+		typedef text value_type;
 
-		/// 選択される度にカ count が＋１する。
-		typedef std::function<void(uint32_t count)> SELECT_FUNC_TYPE;
+		static const uint16_t	SCROLL_SPEED_FRAME = 3;
+		static const uint16_t	SCROLL_WAIT_FRAME = 240;
 
-		static const int16_t round_radius = 6;
-		static const int16_t frame_width  = 3;
-		static const int16_t box_size     = 30;		///< サイズが省略された場合の標準的なサイズ
-		static const int16_t edge_to_title = 4;
-
-	private:
-
-		SELECT_FUNC_TYPE	select_func_;
-		uint32_t			select_id_;
+		bool		enable_scroll_;
+		int16_t		text_draw_h_;
+		int16_t		scroll_h_;
+		uint16_t	scroll_speed_;	///< フレーム数
+		uint16_t	scroll_delay_;
+		uint16_t	scroll_wait_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	str		ボタン文字列
+			@param[in]	str		初期文字列
 		*/
 		//-----------------------------------------------------------------//
-		button(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), select_func_(), select_id_(0)
+		text(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
+			widget(loc, str),
+			enable_scroll_(true), text_draw_h_(0), scroll_h_(0),
+			scroll_speed_(SCROLL_SPEED_FRAME), scroll_delay_(0), scroll_wait_(SCROLL_WAIT_FRAME)
 		{
-			if(get_location().size.x <= 0) {
-				auto tlen = 0;
-				if(str != nullptr) {
-					tlen = strlen(str) * 8;
-				}
-				at_location().size.x = (frame_width + edge_to_title) * 2 + tlen;
-			}
-			if(get_location().size.y <= 0) {
-				at_location().size.y = box_size;
-			}
 			insert_widget(this);
 		}
 
 
-		button(const button& th) = delete;
-		button& operator = (const button& th) = delete;
+		text(const text& th) = delete;
+		text& operator = (const text& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -72,7 +59,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~button() { remove_widget(this); }
+		virtual ~text() noexcept { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -81,7 +68,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const noexcept override { return "Button"; }
+		const char* get_name() const noexcept override { return "Text"; }
 
 
 		//-----------------------------------------------------------------//
@@ -90,7 +77,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const noexcept override { return ID::BUTTON; }
+		ID get_id() const noexcept override { return ID::TEXT; }
 
 
 		//-----------------------------------------------------------------//
@@ -103,15 +90,31 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	タッチ判定を更新
+			@brief	タッチ判定を更新（通常毎フレーム呼ばれる）
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
-			@param[in]	slt		スライド・タイプの場合「true」
 		*/
 		//-----------------------------------------------------------------//
 		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
 		{
-			update_touch_def(pos, num);
+			if(enable_scroll_ && text_draw_h_ > get_location().size.x) {
+				if(scroll_wait_ > 0) {
+					scroll_wait_--;
+				} else {
+					++scroll_delay_;
+					if(scroll_delay_ >= scroll_speed_) {
+						scroll_delay_ = 0;
+						++scroll_h_;
+						if(scroll_h_ == 0) {
+							scroll_wait_ = SCROLL_WAIT_FRAME;
+						}
+						set_update();
+						if(scroll_h_ >= text_draw_h_) {
+							scroll_h_ = -get_location().size.x;
+						}					
+					}
+				}
+			}
 		}
 
 
@@ -121,13 +124,7 @@ namespace gui {
 			@param[in]	ena		無効状態にする場合「false」
 		*/
 		//-----------------------------------------------------------------//
-		void exec_select(bool ena = true) noexcept override
-		{
-			++select_id_;
-			if(select_func_) {
-				select_func_(select_id_);
-			}
-		}
+		void exec_select(bool ena = true) noexcept override { }
 
 
 		//-----------------------------------------------------------------//
@@ -145,20 +142,18 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	セレクト ID の取得
-			@return	セレクト ID
+			@brief	スクロールをリセット
 		*/
 		//-----------------------------------------------------------------//
-		uint32_t get_select_id() const noexcept { return select_id_; }
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	セレクト関数への参照
-			@return	セレクト関数
-		*/
-		//-----------------------------------------------------------------//
-		SELECT_FUNC_TYPE& at_select_func() noexcept { return select_func_; }
+		void reset_scroll() noexcept
+		{
+			text_draw_h_ = 0;
+			scroll_h_ = 0;
+			scroll_speed_ = SCROLL_SPEED_FRAME;
+			scroll_delay_ = 0;
+			scroll_wait_ = SCROLL_WAIT_FRAME;
+			set_update();
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -171,8 +166,19 @@ namespace gui {
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
-			rdr.set_fore_color(get_base_color());
-			rdr.round_box(r, round_radius);
+			auto sz = rdr.at_font().get_text_size(get_title());
+			if(sz.x < r.size.x) {
+				rdr.set_fore_color(get_base_color());
+				rdr.fill_box(r);
+			} else {
+				if(text_draw_h_ != sz.x) {
+					text_draw_h_ = sz.x;
+					scroll_h_ = 0;
+					rdr.set_fore_color(get_base_color());
+					rdr.fill_box(r);
+				}
+			}
+#if 0
 			uint8_t inten = 64;
 			if(get_touch_state().level_) {  // 0.75
 				inten = 192;
@@ -181,19 +187,19 @@ namespace gui {
 			graphics::share_color sh(0, 0, 0);
 			sh.set_color(get_base_color().rgba8, inten);
 			rdr.set_fore_color(sh);
-
-			r.org  += frame_width;
-			r.size -= frame_width * 2;
-			rdr.round_box(r, round_radius - frame_width);
-
+#endif
 			rdr.set_fore_color(get_font_color());
-			auto mobj = get_mobj();
-			if(mobj != nullptr) {
-				auto sz = rdr.get_mobj_size(mobj);
-				rdr.draw_mobj(r.org + (r.size - sz) / 2, mobj, false);
-			} else {
-				auto sz = rdr.at_font().get_text_size(get_title());
-				rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
+
+			if(sz.x < r.size.x) {
+				rdr.draw_text(vtx::spos(r.org.x, r.org.y + (r.size.y - sz.y) / 2), get_title());
+			} else { 
+				rdr.set_back_color(get_base_color());
+				if(enable_scroll_ && text_draw_h_ > 0) {
+					auto oc = rdr.get_clip();
+					rdr.set_clip(r);
+					rdr.draw_text(vtx::spos(r.org.x - scroll_h_, r.org.y + (r.size.y - sz.y) / 2), get_title(), false, true);
+					rdr.set_clip(oc);
+				}
 			}
 		}
 	};

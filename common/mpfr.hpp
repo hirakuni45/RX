@@ -212,6 +212,45 @@ namespace mpfr {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	数値文字列の入力
+			@param[in]	str		数値文字列
+		*/
+		//-----------------------------------------------------------------//
+		void assign(const char* str) noexcept
+		{
+			mpfr_set_str(t_, str, 10, rnd_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	絶対値
+			@param[in]	in	入力
+			@return	in に対する絶対値
+		*/
+		//-----------------------------------------------------------------//
+		static value abs(const value& in) noexcept
+		{
+			value out;
+			mpfr_abs(out.t_, in.t_, in.rnd_);
+			return out;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	べき乗 (this = this ^ n)
+			@param[in]	n	n 乗
+		*/
+		//-----------------------------------------------------------------//
+		void pow(const value& n) noexcept
+		{
+			mpfr_pow(t_, t_, n.t_, rnd_);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  交換
 			@param[in]	th	交換クラス
 		*/
@@ -219,19 +258,6 @@ namespace mpfr {
 		void swap(value& th) noexcept
 		{
 			mpfr_swap(t_, th.t_);
-		}
-
-
-		void assign(const char* str) noexcept
-		{
-			mpfr_set_str(t_, str, 10, rnd_);
-		}
-
-
-		// べき乗
-		void pow(const value& n) noexcept
-		{
-			mpfr_pow(t_, t_, n.t_, rnd_);
 		}
 
 
@@ -263,6 +289,7 @@ namespace mpfr {
 			mpfr_neg(tmp.t_, tmp.t_, rnd_);
 			return tmp;
 		}
+
 
 		value& operator += (const value& th) noexcept
 		{
@@ -311,12 +338,19 @@ namespace mpfr {
 		}
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  三角関数 sin
+			@param[in]	in	角度
+		*/
+		//-----------------------------------------------------------------//
 		static value sin(const value& in)
 		{
 			value out;
 			mpfr_sin(out.t_, in.t_, out.get_rnd());
 			return out;
 		}
+
 
 		static value asin(const value& in)
 		{

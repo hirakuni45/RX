@@ -241,5 +241,7 @@ namespace graphics {
 		static const share_color SafeColor;
 		static const share_color EmeraldGreen;
 		static const share_color LightPink;
+		static const share_color DarkSafeColor;
+		static const share_color LightSafeColor;
 	};
 }

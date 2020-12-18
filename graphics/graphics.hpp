@@ -242,6 +242,25 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	点を描画する（ストライプを伴った描画を行わない）
+			@param[in]	pos	開始点を指定
+			@param[in]	c	カラー
+            @return 範囲内なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool fast_plot(const vtx::spos& pos, T c) noexcept
+		{
+			if(pos.x < clip_.org.x) return false;
+			if(pos.y < clip_.org.y) return false;
+			if(pos.x >= clip_.end_x()) return false;
+			if(pos.y >= clip_.end_y()) return false;
+			fb_[pos.y * GLC::line_width + pos.x] = c;
+			return true;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	点を描画する
 			@param[in]	pos	開始点を指定
 			@param[in]	c	カラー
@@ -257,27 +276,7 @@ namespace graphics {
 			if((stipple_ & m) == 0) {
 				return false;
 			}
-			if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(clip_.size.x)) return false;
-			if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(clip_.size.y)) return false;
-			fb_[pos.y * GLC::line_width + pos.x] = c;
-			return true;
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief	点を描画する
-			@param[in]	pos	開始点を指定
-			@param[in]	c	カラー
-            @return 範囲内なら「true」
-		*/
-		//-----------------------------------------------------------------//
-		bool fast_plot(const vtx::spos& pos, T c) noexcept
-		{
-			if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(clip_.size.x)) return false;
-			if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(clip_.size.y)) return false;
-			fb_[pos.y * GLC::line_width + pos.x] = c;
-			return true;
+			return fast_plot(pos, c);
 		}
 
 
@@ -822,17 +821,17 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		void draw_font_utf16(const vtx::spos& pos, uint16_t code, bool back) noexcept
 		{
-			if(pos.y <= -FONT::height || pos.y >= GLC::height) {
+			if(pos.y <= (clip_.org.y - FONT::height) || pos.y >= clip_.end_y()) {
 				return;
 			}
 			if(code < 0x80) {
-				if(pos.x <= -FONT::a_type::width || pos.x >= GLC::width) {
+				if(pos.x <= (clip_.org.x - FONT::a_type::width) || pos.x >= clip_.end_x()) {
 					return;
 				}
 				vtx::spos ssz(FONT::a_type::width, FONT::a_type::height);
 				draw_bitmap(pos, FONT::a_type::get(code), ssz, back);
 			} else {
-				if(pos.x <= -FONT::k_type::width || pos.x >= GLC::width) {
+				if(pos.x <= (clip_.org.x - FONT::k_type::width) || pos.x >= clip_.end_x()) {
 					return;
 				}
 				auto p = font_.at_kfont().get(code);
