@@ -166,8 +166,18 @@ namespace gui {
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
-			rdr.set_fore_color(get_base_color());
-			rdr.fill_box(r);
+			auto sz = rdr.at_font().get_text_size(get_title());
+			if(sz.x < r.size.x) {
+				rdr.set_fore_color(get_base_color());
+				rdr.fill_box(r);
+			} else {
+				if(text_draw_h_ != sz.x) {
+					text_draw_h_ = sz.x;
+					scroll_h_ = 0;
+					rdr.set_fore_color(get_base_color());
+					rdr.fill_box(r);
+				}
+			}
 #if 0
 			uint8_t inten = 64;
 			if(get_touch_state().level_) {  // 0.75
@@ -179,18 +189,15 @@ namespace gui {
 			rdr.set_fore_color(sh);
 #endif
 			rdr.set_fore_color(get_font_color());
-			auto sz = rdr.at_font().get_text_size(get_title());
+
 			if(sz.x < r.size.x) {
 				rdr.draw_text(vtx::spos(r.org.x, r.org.y + (r.size.y - sz.y) / 2), get_title());
 			} else { 
-				if(text_draw_h_ != sz.x) {
-					text_draw_h_ = sz.x;
-					scroll_h_ = 0;
-				}
+				rdr.set_back_color(get_base_color());
 				if(enable_scroll_ && text_draw_h_ > 0) {
 					auto oc = rdr.get_clip();
 					rdr.set_clip(r);
-					rdr.draw_text(vtx::spos(r.org.x - scroll_h_, r.org.y + (r.size.y - sz.y) / 2), get_title());
+					rdr.draw_text(vtx::spos(r.org.x - scroll_h_, r.org.y + (r.size.y - sz.y) / 2), get_title(), false, true);
 					rdr.set_clip(oc);
 				}
 			}
