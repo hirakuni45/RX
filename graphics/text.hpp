@@ -24,7 +24,7 @@ namespace gui {
 		typedef text value_type;
 
 		static const uint16_t	SCROLL_SPEED_FRAME = 3;
-		static const uint16_t	SCROLL_WAIT_FRAME = 240;
+		static const uint16_t	SCROLL_WAIT_FRAME = 60 * 6;
 
 		bool		enable_scroll_;
 		int16_t		text_draw_h_;
@@ -109,7 +109,7 @@ namespace gui {
 							scroll_wait_ = SCROLL_WAIT_FRAME;
 						}
 						set_update();
-						if(scroll_h_ >= text_draw_h_) {
+						if(scroll_h_ > text_draw_h_) {
 							scroll_h_ = -get_location().size.x;
 						}					
 					}
@@ -166,38 +166,33 @@ namespace gui {
 		void draw(RDR& rdr) noexcept
 		{
 			auto r = vtx::srect(get_final_position(), get_location().size);
-			auto sz = rdr.at_font().get_text_size(get_title());
-			if(sz.x < r.size.x) {
+			auto fsz = rdr.at_font().get_text_size(get_title());
+			if(fsz.x < r.size.x) {
 				rdr.set_fore_color(get_base_color());
 				rdr.fill_box(r);
 			} else {
-				if(text_draw_h_ != sz.x) {
-					text_draw_h_ = sz.x;
+				if(text_draw_h_ != fsz.x) {
+					text_draw_h_ = fsz.x;
 					scroll_h_ = 0;
 					rdr.set_fore_color(get_base_color());
 					rdr.fill_box(r);
 				}
 			}
-#if 0
-			uint8_t inten = 64;
-			if(get_touch_state().level_) {  // 0.75
-				inten = 192;
-			}
-			graphics::color_t c;
-			graphics::share_color sh(0, 0, 0);
-			sh.set_color(get_base_color().rgba8, inten);
-			rdr.set_fore_color(sh);
-#endif
+
 			rdr.set_fore_color(get_font_color());
 
-			if(sz.x < r.size.x) {
-				rdr.draw_text(vtx::spos(r.org.x, r.org.y + (r.size.y - sz.y) / 2), get_title());
+			if(fsz.x < r.size.x) {
+				rdr.draw_text(vtx::spos(r.org.x, r.org.y + (r.size.y - fsz.y) / 2), get_title());
 			} else { 
-				rdr.set_back_color(get_base_color());
 				if(enable_scroll_ && text_draw_h_ > 0) {
+					rdr.set_back_color(get_base_color());
 					auto oc = rdr.get_clip();
 					rdr.set_clip(r);
-					rdr.draw_text(vtx::spos(r.org.x - scroll_h_, r.org.y + (r.size.y - sz.y) / 2), get_title(), false, true);
+					auto ex = rdr.draw_text(vtx::spos(r.org.x - scroll_h_,
+						r.org.y + (r.size.y - fsz.y) / 2), get_title(),
+						false, true);
+					rdr.swap_color();
+					rdr.fill_box(vtx::srect(ex, r.org.y, 1, r.size.y));
 					rdr.set_clip(oc);
 				}
 			}
