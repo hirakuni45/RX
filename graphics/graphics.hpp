@@ -307,15 +307,15 @@ namespace graphics {
 		{
 			if(w == 0) return;
 
-			if(static_cast<uint16_t>(y) >= static_cast<uint16_t>(GLC::height << 4)) return;
-			if(x < 0) {  // クリッピング
+			if(y < (clip_.org.y << 4) || y >= (clip_.end_y() << 4)) return;
+			if(x < (clip_.org.x << 4)) {  // クリッピング
 				w += x;
-				x = 0;
-			} else if(static_cast<uint16_t>(x) >= static_cast<uint16_t>(GLC::width << 4)) {
+				x = clip_.org.x << 4;
+			} else if(x < (clip_.org.x << 4) || x >= (clip_.end_x() << 4)) {
 				return;
 			}
-			if(static_cast<uint16_t>(x + w) >= static_cast<uint16_t>(GLC::width << 4)) {
-				w = (GLC::width << 4) - x;
+			if((x + w) >= (clip_.end_x() << 4)) {
+				w = (clip_.end_x() << 4) - x;
 			}
 			uint16_t* out = &fb_[(y >> 4) * GLC::line_width + (x >> 4)];
 			auto end = x + w;
