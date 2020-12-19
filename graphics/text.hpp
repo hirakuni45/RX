@@ -24,7 +24,7 @@ namespace gui {
 		typedef text value_type;
 
 		static const uint16_t	SCROLL_SPEED_FRAME = 3;
-		static const uint16_t	SCROLL_WAIT_FRAME = 240;
+		static const uint16_t	SCROLL_WAIT_FRAME = 60 * 6;
 
 		bool		enable_scroll_;
 		int16_t		text_draw_h_;
