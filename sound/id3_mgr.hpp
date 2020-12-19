@@ -164,6 +164,11 @@ namespace sound {
 
 		bool set_info_(ID id, utils::file_io& fin, uint32_t len, bool v2_3) noexcept
 		{
+			if(len == 0) {
+				// len が「０」のタグ検査
+				return false;
+			}
+
 			if(id == ID::APIC) {
 				return set_apic_(fin, len, v2_3);
 			}
@@ -325,8 +330,6 @@ namespace sound {
 			} else {
 				size = get_size_32_(&tmp[4]);
 			}
-			if(size == 0) return false;
-
 			id = scan_id_(&tmp[0]);
 
 //			utils::format("ID: %c%c%c%c\n") % tmp[0] % tmp[1] % tmp[2] % tmp[3];
@@ -351,7 +354,6 @@ namespace sound {
 			if(!check_id_(tmp[2])) return false;
 
 			auto size = get_size_24_(&tmp[3]);
-			if(size == 0) return false;
 
 			id = scan_id_(&tmp[0]);
 
@@ -481,9 +483,11 @@ namespace sound {
 				}
 				uint32_t size;
 				if(ver_ >= 0x400) {  // v2.4
-					size = get_size_syncsafe_(&tmp[4]);
+//					size = get_size_syncsafe_(&tmp[4]);
+					size = get_size_syncsafe_(tmp);
 				} else {
-					size = get_size_32_(&tmp[4]);
+//					size = get_size_32_(&tmp[4]);
+					size = get_size_32_(tmp);
 				}
 				fin.seek(utils::file_io::SEEK::CUR, size - 4);
 			}
