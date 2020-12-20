@@ -124,8 +124,9 @@ namespace app {
 		TEXT	album_;
 		TEXT	title_;
 		TEXT	artist_;
-//		TEXT	year_;
-//		TEXT	td_info_;
+		TEXT	year_;
+		TEXT	info_;
+		TEXT	time_;
 
 		typedef gui::slider SLIDER;
 		SLIDER	slider_;
@@ -146,6 +147,9 @@ namespace app {
 		char		path_[256];
 
 		utils::STR256	fin_artist_;
+		utils::STR32	year_str_;
+		utils::STR32	info_str_;
+		utils::STR32	time_str_;
 
 		struct th_sync_t {
 			volatile uint8_t	put;
@@ -169,7 +173,7 @@ namespace app {
 		bool		mount_state_;
 		bool		filer_state_;
 
-
+#if 0
 		int16_t render_text_(int16_t x, int16_t y, const char* text)
 		{
 			render_.swap_color();
@@ -178,7 +182,7 @@ namespace app {
 			render_.draw_text(vtx::spos(x + 1, y + 1), text);
 			return xx;
 		}
-
+#endif
 
 		void render_tag_(utils::file_io& fin, const sound::tag_t& tag) noexcept
 		{
@@ -218,49 +222,47 @@ namespace app {
 				img_in_.load("/NoImage.jpg");
 			}
 
-			render_.set_fore_color(graphics::def_color::White);
-			render_.set_back_color(graphics::def_color::Gray);
-//			render_text_(0, 0 * 20, tag.get_album().c_str());
 			album_.set_title(tag.get_album().c_str());
 			album_.reset_scroll();
-//			render_text_(0, 1 * 20, tag.get_title().c_str());
 			title_.set_title(tag.get_title().c_str());
 			title_.reset_scroll();
 			{
 				fin_artist_ = tag.get_artist().c_str();
-///				auto x = render_text_(0, 2 * 20, tag.get_artist().c_str());
 				if(!tag.get_artist2().empty()) {
 					fin_artist_ += " / ";
 					fin_artist_ += tag.get_artist2().c_str();
-///					x = render_text_(x, 2 * 20, " / ");
-///					render_text_(x, 2 * 20, tag.get_artist2().c_str());
 				}
 				artist_.set_title(fin_artist_.c_str());
 				artist_.reset_scroll();
 			}
 			{
-				auto x = render_text_(0, 3 * 20, tag.get_year().c_str());
+				year_str_ = tag.get_year().c_str();
 				if(!tag.get_date().empty()) {
-					x = render_text_(x, 3 * 20, "/");
+					year_str_ += '/';
 					char tmp[8];
 					utils::sformat("%c%c/%c%c", tmp, sizeof(tmp))
 						% tag.get_date()[0] % tag.get_date()[1]
 						% tag.get_date()[2] % tag.get_date()[3];
-					render_text_(x, 3 * 20, tag.get_date().c_str());
+					year_str_ += tmp;
 				}
+				year_.set_title(year_str_.c_str());
+				year_.reset_scroll();
 			}
 			{
-				char tmp[10];
-				int16_t x = 0;
+				info_str_.clear();
 				if(!tag.get_disc().empty()) {
+					char tmp[10];
 					utils::sformat("D:%s", tmp, sizeof(tmp)) % tag.get_disc().c_str();
-					x = render_text_(0, 4 * 20, tmp);
+					info_str_ += tmp;
 				}
 				if(!tag.get_track().empty()) {
+					char tmp[10];
 					utils::sformat("T:%s", tmp, sizeof(tmp)) % tag.get_track().c_str();
-					if(x > 0) x += 8;
-					render_text_(x, 4 * 20, tmp);
+					if(!info_str_.empty()) info_str_ += ' ';
+					info_str_ += tmp;
 				}
+				info_.set_title(info_str_.c_str());
+				info_.reset_scroll();
 			}
 			render_.sync_frame(false);
 		}
@@ -279,11 +281,12 @@ namespace app {
 			filer_(render_, false),
 			dialog_(render_, touch_),
 			widd_(render_, touch_),
-			album_(  vtx::srect(   0, 20*0, 206, 20)),
-		   	title_(  vtx::srect(   0, 20*1, 206, 20)),
-		   	artist_( vtx::srect(   0, 20*2, 206, 20)),
-//			year_(   vtx::srect(   0, 20*3, 206, 20)),
-//			td_info_(vtx::srect(   0, 20*4, 206, 20)),
+			album_( vtx::srect(   0, 20*0, 206, 20)),
+		   	title_( vtx::srect(   0, 20*1, 206, 20)),
+		   	artist_(vtx::srect(   0, 20*2, 206, 20)),
+			year_(  vtx::srect(   0, 20*3, 206, 20)),
+			info_(  vtx::srect(   0, 20*4, 206, 20)),
+			time_(  vtx::srect(   0, 20*5, 206, 20)),
 			slider_(vtx::srect(   0, 272-64*2-6-18, 206, 14)),
 			select_(vtx::srect(   0, 272-64*2-6, 64, 64), "Sel"),
 			rew_(   vtx::srect(70*0, 272-64, 64, 64), "<<"),
@@ -291,7 +294,7 @@ namespace app {
 			ff_(    vtx::srect(70*2, 272-64, 64, 64), ">>"),
 			scaling_(render_), img_in_(scaling_),
 			ctrl_(0), path_{ 0 },
-			fin_artist_(),
+			fin_artist_(), year_str_(), info_str_(), time_str_(),
 			play_stop_(), play_rew_(), play_pause_(), play_ff_(),
 			path_tag_{ 0 }, req_tag_(), play_tag_(),
 			mount_state_(false), filer_state_(false)
@@ -429,10 +432,12 @@ namespace app {
 			title_.set_base_color(DEF_COLOR::LightSafeColor);
 			artist_.enable();
 			artist_.set_base_color(DEF_COLOR::DarkSafeColor);
-//			year_.enable();
-//			year_.set_base_color(DEF_COLOR::LightSafeColor);
-//			td_info_.enable();
-//			td_info_.set_base_color(DEF_COLOR::DarkSafeColor);
+			year_.enable();
+			year_.set_base_color(DEF_COLOR::LightSafeColor);
+			info_.enable();
+			info_.set_base_color(DEF_COLOR::DarkSafeColor);
+			time_.enable();
+			time_.set_base_color(DEF_COLOR::LightSafeColor);
 
 			slider_.enable_read_only();
 			slider_.enable(false);
@@ -468,12 +473,16 @@ namespace app {
 			album_.enable(ena);
 			title_.enable(ena);
 			artist_.enable(ena);
+			year_.enable(ena);
+			info_.enable(ena);
+			time_.enable(ena);
+
+			slider_.enable(ena);
+			select_.enable(ena);
 
 			ff_.enable(ena);
 			play_.enable(ena);
 			rew_.enable(ena);
-			select_.enable(ena);
-			slider_.enable(ena);
 		}
 
 
@@ -652,10 +661,9 @@ namespace app {
 			char tmp[32];
 			utils::sformat("%02d:%02d:%02d / %02d:%02d:%02d", tmp, sizeof(tmp))
 				% hor % min % sec % ahor % amin % asec;
-			render_.set_fore_color(graphics::def_color::Black);
-			render_.fill_box(vtx::srect(0, 5 * 20, 8 * 8, 16));
-			render_.set_fore_color(graphics::def_color::White);
-			render_.draw_text(vtx::spos(0, 5 * 20), tmp);
+			time_str_ = tmp;
+			time_.set_title(time_str_.c_str());
+			time_.reset_scroll();
 			if(all > 0) {
 				slider_.set_ratio(static_cast<float>(t) / static_cast<float>(all));
 				slider_.set_update();
