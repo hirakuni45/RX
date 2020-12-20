@@ -242,8 +242,8 @@ namespace sound {
 						ret = play_wav_(name);
 					} else if(utils::str::strcmp_no_caps(ext, ".mp3") == 0) {
 						ret = play_mp3_(name);
-					} else if(utils::str::strcmp_no_caps(ext, ".aac") == 0) {
-						ret = play_aac_(name);
+///					} else if(utils::str::strcmp_no_caps(ext, ".aac") == 0) {
+///						ret = play_aac_(name);
 					}
 					if(!ret && !stop_) {
 						utils::format("Can't open audio file: '%s'\n") % name;
