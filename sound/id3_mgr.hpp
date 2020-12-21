@@ -188,14 +188,14 @@ namespace sound {
 				tmp[len] = 0;
 				utils::str::oemc_to_utf8(tmp, dst, dstlen); 
 			} else if(code == 0x01) {  // UTF-16 (with BOM)
-				WCHAR tmp[len / 2 + 1];
+				uint16_t tmp[len / 2 + 1];
 				if(fin.read(tmp, len) != len) {
 					return false;
 				}
 				tmp[len / 2] = 0;
 				utils::str::utf16_to_utf8(&tmp[1], dst, dstlen);
 			} else if(code == 0x02) {  // UTF-16BE (no BOM)
-				WCHAR tmp[len / 2 + 1];
+				uint16_t tmp[len / 2 + 1];
 				if(fin.read(tmp, len) != len) {
 					return false;
 				}
@@ -228,7 +228,7 @@ namespace sound {
 				tag_.at_artist() = dst;
 				break;
 			case ID::TPE2:
-				tag_.at_artist2() = dst;
+				tag_.at_writer() = dst;
 				break;
 			case ID::TALB:
 				tag_.at_album() = dst;
