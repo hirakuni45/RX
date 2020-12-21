@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	Audio タグ・クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -18,14 +18,17 @@ namespace sound {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct tag_t {
+
+		uint32_t	serial_;
+
 		typedef utils::fixed_string<128> STR128;
 		typedef utils::fixed_string<8> STR8;
 
 	private:
 		STR128	album_;		///< アルバム名
 		STR128	title_;		///< タイトル（曲名）
-		STR128	artist_;	///< 1st アーティスト
-		STR128	artist2_;	///< 2nd アーティスト
+		STR128	artist_;	///< アーティスト
+		STR128	writer_;	///< ライター（作曲者）
 		STR8	year_;		///< リリース年
 		STR8	date_;		///< リリース日付
 		STR8	disc_;		///< ディスク番号
@@ -43,7 +46,9 @@ namespace sound {
 			char		ext_[4];
 			uint32_t	ofs_;
 			uint32_t	len_;
+
 			apic_t() : typ_(0), ext_{ 0 }, ofs_(0), len_(0) { }
+
 			apic_t& operator = (const apic_t& t) noexcept {
 				typ_ = t.typ_;
 				std::memcpy(ext_, t.ext_, sizeof(ext_));
@@ -61,7 +66,18 @@ namespace sound {
 			@brief	コンストラクター
 		*/
 		//-------------------------------------------------------------//
-		tag_t() noexcept : apic_() { clear(); }
+		tag_t() noexcept : serial_(0),
+			album_(),
+			title_(),
+			artist_(),
+			writer_(),
+			year_(),
+			date_(),
+			disc_(),
+			track_(),
+			comment_(),
+			apic_()
+		{ }
 
 
 		//-------------------------------------------------------------//
@@ -74,7 +90,7 @@ namespace sound {
 			album_.clear();
 			title_.clear();
 			artist_.clear();
-			artist2_.clear();
+			writer_.clear();
 			year_.clear();
 			date_.clear();
 			disc_.clear();
@@ -122,8 +138,8 @@ namespace sound {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	1st アーティストへの参照
-			@return 1st アーティスト
+			@brief	アーティストへの参照
+			@return アーティスト
 		*/
 		//-------------------------------------------------------------//
 		auto& at_artist() noexcept { return artist_; }
@@ -131,8 +147,8 @@ namespace sound {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	1st アーティストへの参照 (RO)
-			@return 1st アーティスト
+			@brief	アーティストへの参照 (RO)
+			@return アーティスト
 		*/
 		//-------------------------------------------------------------//
 		const auto& get_artist() const noexcept { return artist_; }
@@ -140,20 +156,20 @@ namespace sound {
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	2nd アーティストへの参照
-			@return 2nd アーティスト
+			@brief	ライターへの参照
+			@return ライター
 		*/
 		//-------------------------------------------------------------//
-		auto& at_artist2() noexcept { return artist2_; }
+		auto& at_writer() noexcept { return writer_; }
 
 
 		//-------------------------------------------------------------//
 		/*!
-			@brief	2nd アーティストへの参照 (RO)
-			@return 2nd アーティスト
+			@brief	ライターへの参照 (RO)
+			@return ライター
 		*/
 		//-------------------------------------------------------------//
-		const auto& get_artist2() const noexcept { return artist2_; }
+		const auto& get_writer() const noexcept { return writer_; }
 
 
 		//-------------------------------------------------------------//
@@ -273,7 +289,7 @@ namespace sound {
 			album_  = ths.album_;
 			title_  = ths.title_;
 			artist_ = ths.artist_;
-			artist2_ = ths.artist2_;
+			writer_ = ths.writer_;
 			year_   = ths.year_;
 			disc_   = ths.disc_;
 			track_  = ths.track_;

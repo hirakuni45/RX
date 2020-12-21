@@ -21,7 +21,7 @@ Project consists of Makefile, related header, source code, dedicated startup It 
    
 <img src="docs/RTK5_side.jpg" width="40%"> <img src="docs/NES_001.jpg" width="40%">   
 Space Invaders Emulator, NES Emulator, for RX65N/RX72N Envision kit   
-<img src="docs/AudioPlayer001.jpg" width="40%"> <img src="docs/Filer.jpg" width="40%">   
+<img src="docs/AudioPlayer.jpg" width="40%"> <img src="docs/Filer.jpg" width="40%">   
 WAV/MP3 Audio Player, File selector, for RX65N/RX72N Envision kit   
    
 <a href="http://www.youtube.com/watch?v=frRI-cbzGus" target="_blank"><img src="http://img.youtube.com/vi/frRI-cbzGus/0.jpg" width="40%" alt="YouTube Link for 'frRI-cbzGus'"></a>   
