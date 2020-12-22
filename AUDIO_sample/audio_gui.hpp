@@ -228,9 +228,9 @@ namespace app {
 			title_.reset_scroll();
 			{
 				fin_artist_ = tag.get_artist().c_str();
-				if(!tag.get_artist2().empty()) {
+				if(!tag.get_writer().empty()) {
 					fin_artist_ += " / ";
-					fin_artist_ += tag.get_artist2().c_str();
+					fin_artist_ += tag.get_writer().c_str();
 				}
 				artist_.set_title(fin_artist_.c_str());
 				artist_.reset_scroll();
