@@ -3,7 +3,8 @@
 /*!	@file
 	@brief	テキスト表示と制御 @n
 			クリッピングされた描画と、位置の管理などを行う @n
-			描画領域より大きなテキスト描画を行う場合は、自動でスクロールを行う。
+			描画領域より大きなテキスト描画を行う場合は、自動でスクロールを行う。@n
+			現状の実装では、複数行はサポートしない。
     @author 平松邦仁 (hira@rvf-rc45.net)
 	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
@@ -23,13 +24,15 @@ namespace gui {
 
 		typedef text value_type;
 
-		static const uint16_t	SCROLL_SPEED_FRAME = 3;
-		static const uint16_t	SCROLL_WAIT_FRAME = 60 * 6;
+	private:
+
+		static const uint16_t	SCROLL_SPEED_FRAME = 3;		///< 標準スクロール速度
+		static const uint16_t	SCROLL_WAIT_FRAME = 60 * 6;	///< 標準ホールド時間
 
 		bool		enable_scroll_;
 		int16_t		text_draw_h_;
 		int16_t		scroll_h_;
-		uint16_t	scroll_speed_;	///< フレーム数
+		uint16_t	scroll_speed_;
 		uint16_t	scroll_delay_;
 		uint16_t	scroll_wait_;
 
@@ -46,6 +49,7 @@ namespace gui {
 			enable_scroll_(true), text_draw_h_(0), scroll_h_(0),
 			scroll_speed_(SCROLL_SPEED_FRAME), scroll_delay_(0), scroll_wait_(SCROLL_WAIT_FRAME)
 		{
+			set_base_color(graphics::def_color::Gray);
 			insert_widget(this);
 		}
 
