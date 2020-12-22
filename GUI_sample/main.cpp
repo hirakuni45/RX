@@ -143,6 +143,8 @@ namespace {
 	SLIDER		sliderv_(vtx::srect(440, 20, 0, 200), 0.0f);
 	typedef gui::menu MENU;
 	MENU		menu_(vtx::srect(120, 70, 100, 0), "ItemA,ItemB,ItemC,ItemD");
+	typedef gui::text TEXT;
+	TEXT		text_(vtx::srect(240, 70, 150, 20), "１６ピクセル漢字の表示サンプル～");
 
 	void setup_gui_()
 	{
@@ -185,6 +187,8 @@ namespace {
 			menu_.get_select_text(tmp, sizeof(tmp));
 			utils::format("Menu: '%s', %u/%u\n") % tmp % pos % num;
 		};
+
+		text_.enable();
 	}
 
 
