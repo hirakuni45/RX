@@ -497,13 +497,13 @@ namespace app {
 			level_l_.enable();
 			level_l_.at_draw_func() = [this](const vtx::srect& r) {
 				render_level_(r, peak_level_l_, peak_hold_l_);
-				render_.set_fore_color(graphics::def_color::Green);
+				render_.set_fore_color(graphics::def_color::White);
 				render_.draw_font(vtx::spos(r.org.x+1, r.org.y+2), 'L'); 
 			};
 			level_r_.enable();
 			level_r_.at_draw_func() = [this](const vtx::srect& r) {
 				render_level_(r, peak_level_r_, peak_hold_r_);
-				render_.set_fore_color(graphics::def_color::Green);
+				render_.set_fore_color(graphics::def_color::White);
 				render_.draw_font(vtx::spos(r.org.x+1, r.org.y+2), 'R'); 
 			};
 		}
