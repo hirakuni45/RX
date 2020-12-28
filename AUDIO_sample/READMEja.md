@@ -2,6 +2,8 @@ Renesas RX65N/RX72N Envision Kit, RX64M オーディオ・プレイヤー
 =========
 <img src="../docs/AudioPlayer.jpg" width="80%">
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/fdcX3VAOFLM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 [English](README.md)
    
 ## 概要
