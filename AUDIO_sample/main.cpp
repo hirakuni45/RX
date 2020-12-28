@@ -311,6 +311,7 @@ void remove_widget(gui::widget* w)
 }
 #endif
 
+
 extern "C" {
 
 	void set_sample_rate(uint32_t freq)
@@ -482,6 +483,8 @@ extern "C" {
 		while(1) {
 			sdc_.service();
 #ifdef USE_GLCDC
+			auto w = sound_out_.get_peak_level();
+			gui_.set_peak_level(w.l_ch, w.r_ch);
 			if(gui_.update(sdc_.get_mount(), codec_mgr_.get_state())) {
 				// オーディオ・タスクに、ファイル名を送る。
 				strncpy(name_t_.filename_, gui_.get_filename(), sizeof(name_t_.filename_));
