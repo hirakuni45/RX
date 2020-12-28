@@ -204,7 +204,9 @@ namespace gui {
 					}
 					if(t.state_ != t.w_->get_state()) {
 						t.state_ = t.w_->get_state();
-						t.draw_ = true;
+						if(t.state_ != widget::STATE::DISABLE) {
+							t.draw_ = true;
+						}
 					}
 					if(t.w_->get_state() == widget::STATE::ENABLE) {
 						t.w_->update_touch(tp.pos, num);
