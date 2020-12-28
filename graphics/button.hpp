@@ -188,7 +188,7 @@ namespace gui {
 
 			rdr.set_fore_color(get_font_color());
 			auto mobj = get_mobj();
-			if(mobj != nullptr) {
+			if(mobj != nullptr) {  // mobj があれば、テキストより優先される。
 				auto sz = rdr.get_mobj_size(mobj);
 				rdr.draw_mobj(r.org + (r.size - sz) / 2, mobj, false);
 			} else {
