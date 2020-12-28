@@ -42,6 +42,9 @@ namespace app {
 		static const int16_t LCD_Y = 272;
 		static const auto PIX = graphics::pixel::TYPE::RGB565;
 
+		/// ピークホールド減衰時間調整（100 * 60 / 32768) 秒辺りの減衰ピクセル数
+		static const int16_t PEAK_HOLD_SUB = 100;
+
 		typedef utils::fixed_fifo<uint8_t, 64> RB64;
 		typedef utils::fixed_fifo<uint8_t, 64> SB64;
 
@@ -179,10 +182,9 @@ namespace app {
 		bool		filer_state_;
 
 		int16_t		peak_level_l_;
-		int16_t		peak_level_ll_;
 		int16_t		peak_level_r_;
-		int16_t		peak_level_rr_;
-
+		int16_t		peak_hold_l_;
+		int16_t		peak_hold_r_;
 
 		void render_tag_(utils::file_io& fin) noexcept
 		{
@@ -274,19 +276,27 @@ namespace app {
 		}
 
 
-		void render_level_(const vtx::srect& rect, int16_t lvl) noexcept
+		void render_level_(const vtx::srect& rect, int16_t lvl, int16_t hold) noexcept
 		{
 			int32_t l = static_cast<int32_t>(lvl) + 1;  // Max:32768
 			l *= rect.size.x;
 			l >>= 15;
 			vtx::srect r = rect;
 			r.size.x = l;
-			render_.set_fore_color(graphics::def_color::White);
+			render_.set_fore_color(graphics::def_color::SafeColor);
 			render_.fill_box(r);
 			render_.set_fore_color(graphics::def_color::Black);
 			r.org.x += l;
 			r.size.x = rect.size.x - l;
 			render_.fill_box(r);
+
+			l = static_cast<int32_t>(hold) + 1;
+			l *= rect.size.x;
+			l >>= 15;
+			if(l > 4) {
+				render_.set_fore_color(graphics::def_color::Orange);
+				render_.fill_box(vtx::srect(rect.org.x + l - 4, rect.org.y, 4, rect.size.y));
+			}
 		}
 
 	public:
@@ -322,7 +332,7 @@ namespace app {
 			play_stop_(), play_rew_(), play_pause_(), play_ff_(),
 			path_tag_{ 0 }, req_tag_(), play_tag_(),
 			mount_state_(false), filer_state_(false),
-			peak_level_l_(0), peak_level_ll_(0), peak_level_r_(0), peak_level_rr_(0)
+			peak_level_l_(0), peak_level_r_(0), peak_hold_l_(0), peak_hold_r_(0)
 		{ }
 
 
@@ -486,11 +496,15 @@ namespace app {
 			};
 			level_l_.enable();
 			level_l_.at_draw_func() = [this](const vtx::srect& r) {
-				render_level_(r, peak_level_l_);
+				render_level_(r, peak_level_l_, peak_hold_l_);
+				render_.set_fore_color(graphics::def_color::Green);
+				render_.draw_font(vtx::spos(r.org.x+1, r.org.y+2), 'L'); 
 			};
 			level_r_.enable();
 			level_r_.at_draw_func() = [this](const vtx::srect& r) {
-				render_level_(r, peak_level_r_);
+				render_level_(r, peak_level_r_, peak_hold_r_);
+				render_.set_fore_color(graphics::def_color::Green);
+				render_.draw_font(vtx::spos(r.org.x+1, r.org.y+2), 'R'); 
 			};
 		}
 
@@ -544,14 +558,14 @@ namespace app {
 			}
 
 			// ピークレベルメーターの描画
-			if(peak_level_l_ != peak_level_ll_) {
-				peak_level_ll_ = peak_level_l_;
-				level_l_.set_update();
+			if(peak_hold_l_ >= PEAK_HOLD_SUB) {
+				peak_hold_l_ -= PEAK_HOLD_SUB;
 			}
-			if(peak_level_r_ != peak_level_rr_) {
-				peak_level_rr_ = peak_level_r_;
-				level_r_.set_update();
+			if(peak_hold_r_ >= PEAK_HOLD_SUB) {
+				peak_hold_r_ -= PEAK_HOLD_SUB;
 			}
+			level_l_.set_update();
+			level_r_.set_update();
 
 			ctrl_ = 0;
 			if(mount) {
@@ -640,6 +654,8 @@ namespace app {
 		{
 			peak_level_l_ = l;
 			peak_level_r_ = r;
+			peak_hold_l_ = std::max(peak_hold_l_, peak_level_l_);
+			peak_hold_r_ = std::max(peak_hold_r_, peak_level_r_);
 		}
 
 
