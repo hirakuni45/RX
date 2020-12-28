@@ -83,10 +83,12 @@ namespace sound {
 		//-------------------------------------------------------------//
 		/*!
 			@brief	クリア
+			@param[in]	serial	シリアル番号を与える場合
 		*/
 		//-------------------------------------------------------------//
-		void clear() noexcept
+		void clear(uint32_t serial = 0) noexcept
 		{
+			serial_ = serial;
 			album_.clear();
 			title_.clear();
 			artist_.clear();
@@ -286,14 +288,16 @@ namespace sound {
 		*/
 		//-------------------------------------------------------------//
 		tag_t& operator = (const tag_t& ths) noexcept {
-			album_  = ths.album_;
-			title_  = ths.title_;
-			artist_ = ths.artist_;
-			writer_ = ths.writer_;
-			year_   = ths.year_;
-			disc_   = ths.disc_;
-			track_  = ths.track_;
-			apic_   = ths.apic_;
+			serial_  = ths.serial_;
+			album_   = ths.album_;
+			title_   = ths.title_;
+			artist_  = ths.artist_;
+			writer_  = ths.writer_;
+			year_    = ths.year_;
+			disc_    = ths.disc_;
+			track_   = ths.track_;
+			comment_ = ths.comment_;
+			apic_    = ths.apic_;
 			return *this;
 		}
 	};
