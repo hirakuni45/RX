@@ -65,6 +65,37 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ファイルパスから、ベース名を取得
+			@param[in]	src	ソース
+			@param[out]	dst	出力先
+			@param[in]	len	出力先サイズ
+			@return 成功なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		static bool get_file_base(const char* src, char* dst, uint32_t len) noexcept
+		{
+			const auto* p = strrchr(src, '/');
+			if(p != nullptr) {
+				++p;
+			} else {
+				p = src;
+			}
+			const auto* pp = strrchr(p, '.');
+			if(pp != nullptr && p < pp) {
+				uint32_t n = pp - p;
+				if(n >= len) {
+					n = len;
+				}
+				strncpy_(dst, p, n);
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  １６進数ダンプ
 			@param[in]	src	ソース
 			@param[in]	num	数

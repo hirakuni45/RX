@@ -30,6 +30,7 @@ namespace gui {
 		enum class ID : uint8_t {
 			GROUP,		///< グループ
 			FRAME,		///< フレーム
+			BOX,		///< ボックス（シンプルな単型）
 			TEXT,		///< テキスト
 			DIALOG,		///< ダイアログ
 			BUTTON,		///< ボタン
@@ -246,7 +247,10 @@ namespace gui {
 			@param[in]	mobj	モーションオブジェクト
 		*/
 		//-----------------------------------------------------------------//
-		void set_mobj(const void* mobj) noexcept { mobj_ = mobj; }
+		void set_mobj(const void* mobj) noexcept {
+			mobj_ = mobj;
+			set_update();			
+		}
 
 
 		//-----------------------------------------------------------------//

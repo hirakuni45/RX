@@ -459,13 +459,13 @@ namespace sound {
 				fin.seek(utils::file_io::SEEK::SET, org_pos_);
 				return false;
 			}
-			if(strncmp(tmp, "ID3", 3) != 0) {
-				auto ret = parse_v1_(fin);
+			if(strncmp(tmp, "ID3", 3) != 0) {  // V2 が無い場合、
+				auto ret = parse_v1_(fin);  // V1 がある場合、パース
 				fin.seek(utils::file_io::SEEK::SET, org_pos_);
 				if(ret) id3v1_ = true;
 				return ret;
 			}
-			tag_.clear();
+			tag_.clear(tag_.serial_ + 1);
 			uint32_t org = fin.tell();
 			ver_ = get16_(&tmp[3]);
 			flag_ = static_cast<uint8_t>(tmp[5]);

@@ -12,6 +12,7 @@
 #include "graphics/widget.hpp"
 #include "graphics/group.hpp"
 #include "graphics/frame.hpp"
+#include "graphics/box.hpp"
 #include "graphics/text.hpp"
 #include "graphics/dialog.hpp"
 #include "graphics/button.hpp"
@@ -39,14 +40,13 @@ namespace gui {
 		struct widget_t {
 			widget*			w_;
 			const char*		title_;	// タイトルの変化を監視するパッド
-			const void*		mobj_;	// モーションオブジェクト
 			graphics::share_color	base_color_;  // ベースカラーの変化を監視するパッド
 			graphics::share_color	font_color_;  // フォントカラーの変化を監視するパッド
 			widget::STATE	state_;
 			bool			init_;
 			bool			focus_;
 			bool			draw_;
-			widget_t() : w_(nullptr), title_(nullptr), mobj_(nullptr),
+			widget_t() : w_(nullptr), title_(nullptr),
 				base_color_(graphics::def_color::White), font_color_(graphics::def_color::White),
 				state_(widget::STATE::DISABLE),
 				init_(false), focus_(false), draw_(false) { }
@@ -108,7 +108,6 @@ namespace gui {
 				if(t.w_ == nullptr) {
 					t.w_ = w;
 					t.title_ = w->get_title();
-					t.mobj_  = w->get_mobj();
 					t.base_color_ = w->get_base_color();
 					t.font_color_ = w->get_font_color();
 					t.init_ = false;
@@ -218,10 +217,6 @@ namespace gui {
 						t.title_ = t.w_->get_title();
 						t.draw_ = true;
 					}
-					if(t.w_->get_mobj() != t.mobj_) {  // mobj 変更で再描画
-						t.mobj_ = t.w_->get_mobj();
-						t.draw_ = true;
-					}
 					if(t.w_->get_base_color() != t.base_color_) {  // ベースカラー変更で再描画
 						t.base_color_ = t.w_->get_base_color();
 						t.draw_ = true;
@@ -285,6 +280,13 @@ namespace gui {
 				case widget::ID::FRAME:
 					{
 						auto* w = dynamic_cast<frame*>(t.w_);
+						if(w == nullptr) break;
+						w->draw(rdr_);
+					}
+					break;
+				case widget::ID::BOX:
+					{
+						auto* w = dynamic_cast<box*>(t.w_);
 						if(w == nullptr) break;
 						w->draw(rdr_);
 					}

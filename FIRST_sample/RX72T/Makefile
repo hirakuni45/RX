@@ -49,7 +49,7 @@ endif
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
 SYSTEM := WIN
-LOCAL_PATH  =   /mingw64
+LOCAL_PATH  =   /rxlib
 else
   UNAME := $(shell uname -s)
   ifeq ($(UNAME),Linux)

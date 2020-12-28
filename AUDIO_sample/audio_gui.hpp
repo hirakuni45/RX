@@ -42,6 +42,9 @@ namespace app {
 		static const int16_t LCD_Y = 272;
 		static const auto PIX = graphics::pixel::TYPE::RGB565;
 
+		/// ピークホールド減衰時間調整（100 * 60 / 32768) 秒辺りの減衰ピクセル数
+		static const int16_t PEAK_HOLD_SUB = 100;
+
 		typedef utils::fixed_fifo<uint8_t, 64> RB64;
 		typedef utils::fixed_fifo<uint8_t, 64> SB64;
 
@@ -130,11 +133,16 @@ namespace app {
 
 		typedef gui::slider SLIDER;
 		SLIDER	slider_;
+
 		typedef gui::button BUTTON;
 		BUTTON	select_;
 		BUTTON	rew_;
 		BUTTON	play_;
 		BUTTON	ff_;
+
+		typedef gui::box LEVEL;
+		LEVEL	level_l_;
+		LEVEL	level_r_;
 
 		typedef img::scaling<RENDER> SCALING;
 		SCALING		scaling_;
@@ -173,19 +181,14 @@ namespace app {
 		bool		mount_state_;
 		bool		filer_state_;
 
-#if 0
-		int16_t render_text_(int16_t x, int16_t y, const char* text)
-		{
-			render_.swap_color();
-			auto xx = render_.draw_text(vtx::spos(x, y), text);
-			render_.swap_color();
-			render_.draw_text(vtx::spos(x + 1, y + 1), text);
-			return xx;
-		}
-#endif
+		int16_t		peak_level_l_;
+		int16_t		peak_level_r_;
+		int16_t		peak_hold_l_;
+		int16_t		peak_hold_r_;
 
-		void render_tag_(utils::file_io& fin, const sound::tag_t& tag) noexcept
+		void render_tag_(utils::file_io& fin) noexcept
 		{
+			auto& tag = play_tag_;
 			render_.set_fore_color(graphics::def_color::Black);
 			render_.fill_box(vtx::srect(0, 0, LCD_X - LCD_Y, 20 * 6));
 			render_.fill_box(vtx::srect(LCD_X - LCD_Y, 0, LCD_Y, LCD_Y));
@@ -224,11 +227,16 @@ namespace app {
 
 			album_.set_title(tag.get_album().c_str());
 			album_.reset_scroll();
+			if(tag.get_title().empty()) {
+				char tmp[128];
+				utils::str::get_file_base(path_tag_, tmp, sizeof(tmp));
+				tag.at_title() = tmp;
+			}
 			title_.set_title(tag.get_title().c_str());
 			title_.reset_scroll();
 			{
 				fin_artist_ = tag.get_artist().c_str();
-				if(!tag.get_writer().empty()) {
+				if(!tag.get_writer().empty() && tag.get_artist() != tag.get_writer()) {
 					fin_artist_ += " / ";
 					fin_artist_ += tag.get_writer().c_str();
 				}
@@ -267,6 +275,30 @@ namespace app {
 			render_.sync_frame(false);
 		}
 
+
+		void render_level_(const vtx::srect& rect, int16_t lvl, int16_t hold) noexcept
+		{
+			int32_t l = static_cast<int32_t>(lvl) + 1;  // Max:32768
+			l *= rect.size.x;
+			l >>= 15;
+			vtx::srect r = rect;
+			r.size.x = l;
+			render_.set_fore_color(graphics::def_color::SafeColor);
+			render_.fill_box(r);
+			render_.set_fore_color(graphics::def_color::Black);
+			r.org.x += l;
+			r.size.x = rect.size.x - l;
+			render_.fill_box(r);
+
+			l = static_cast<int32_t>(hold) + 1;
+			l *= rect.size.x;
+			l >>= 15;
+			if(l > 4) {
+				render_.set_fore_color(graphics::def_color::Orange);
+				render_.fill_box(vtx::srect(rect.org.x + l - 4, rect.org.y, 4, rect.size.y));
+			}
+		}
+
 	public:
 		//-------------------------------------------------------------//
 		/*!
@@ -292,12 +324,15 @@ namespace app {
 			rew_(   vtx::srect(70*0, 272-64, 64, 64), "<<"),
 			play_(  vtx::srect(70*1, 272-64, 64, 64), "-"),
 			ff_(    vtx::srect(70*2, 272-64, 64, 64), ">>"),
+			level_l_(vtx::srect(70*1, 272-64*2+26*0, 134, 20)),
+			level_r_(vtx::srect(70*1, 272-64*2+26*1, 134, 20)),
 			scaling_(render_), img_in_(scaling_),
 			ctrl_(0), path_{ 0 },
 			fin_artist_(), year_str_(), info_str_(), time_str_(),
 			play_stop_(), play_rew_(), play_pause_(), play_ff_(),
 			path_tag_{ 0 }, req_tag_(), play_tag_(),
-			mount_state_(false), filer_state_(false)
+			mount_state_(false), filer_state_(false),
+			peak_level_l_(0), peak_level_r_(0), peak_hold_l_(0), peak_hold_r_(0)
 		{ }
 
 
@@ -459,6 +494,18 @@ namespace app {
 			ff_.at_select_func() = [this](uint32_t id) {
 				play_ff_.send();
 			};
+			level_l_.enable();
+			level_l_.at_draw_func() = [this](const vtx::srect& r) {
+				render_level_(r, peak_level_l_, peak_hold_l_);
+				render_.set_fore_color(graphics::def_color::White);
+				render_.draw_font(vtx::spos(r.org.x+1, r.org.y+2), 'L'); 
+			};
+			level_r_.enable();
+			level_r_.at_draw_func() = [this](const vtx::srect& r) {
+				render_level_(r, peak_level_r_, peak_hold_r_);
+				render_.set_fore_color(graphics::def_color::White);
+				render_.draw_font(vtx::spos(r.org.x+1, r.org.y+2), 'R'); 
+			};
 		}
 
 
@@ -483,6 +530,9 @@ namespace app {
 			ff_.enable(ena);
 			play_.enable(ena);
 			rew_.enable(ena);
+
+			level_l_.enable(ena);
+			level_r_.enable(ena);
 		}
 
 
@@ -506,6 +556,16 @@ namespace app {
 			} else {
 				play_.set_title("-");
 			}
+
+			// ピークレベルメーターの描画
+			if(peak_hold_l_ >= PEAK_HOLD_SUB) {
+				peak_hold_l_ -= PEAK_HOLD_SUB;
+			}
+			if(peak_hold_r_ >= PEAK_HOLD_SUB) {
+				peak_hold_r_ -= PEAK_HOLD_SUB;
+			}
+			level_l_.set_update();
+			level_r_.set_update();
 
 			ctrl_ = 0;
 			if(mount) {
@@ -575,11 +635,27 @@ namespace app {
 				utils::file_io fin;
 				if(fin.open(path_tag_, "rb")) {
 					req_tag_.recv();
-					render_tag_(fin, play_tag_);
+					render_tag_(fin);
 					fin.close();
 				}
 			}
 			return ret;
+		}
+
+
+		//-------------------------------------------------------------//
+		/*!
+			@brief  ピークレベルの設定
+			@param[in]	l	L チャネルの値（ABS)
+			@param[in]	r	R チャネルの値（ABS)
+		*/
+		//-------------------------------------------------------------//
+		void set_peak_level(int16_t l, int16_t r) noexcept
+		{
+			peak_level_l_ = l;
+			peak_level_r_ = r;
+			peak_hold_l_ = std::max(peak_hold_l_, peak_level_l_);
+			peak_hold_r_ = std::max(peak_hold_r_, peak_level_r_);
 		}
 
 
