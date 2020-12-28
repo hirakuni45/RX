@@ -35,6 +35,11 @@ namespace sound {
 			return tmp;
 		}
 		void offset(T ofs) noexcept { l_ch += ofs; r_ch += ofs; }
+		static void abs(const wave_t& in, wave_t& out) noexcept
+		{
+			out.l_ch = std::abs(in.l_ch);
+			out.r_ch = std::abs(in.r_ch);
+		}
 	};
 
 
@@ -51,7 +56,9 @@ namespace sound {
 	public:
 		typedef T value_type;
 		typedef wave_t<T> WAVE;
-		typedef utils::fixed_fifo<WAVE, BFS> FIFO;		
+		typedef utils::fixed_fifo<WAVE, BFS> FIFO;
+
+		static const uint16_t PEAK_LEVEL_FRAME = 400;	///< 400 sample (48KHz : 0.5sec)
 
 	private:
 
@@ -69,6 +76,24 @@ namespace sound {
 
 		volatile uint32_t	sample_count_;
 
+		WAVE		peak_level_;
+		uint16_t	peak_level_frame_;
+		uint16_t	peak_level_count_;
+
+		void peak_level_service_(const WAVE& t)
+		{
+			if(peak_level_count_ >= peak_level_frame_) {
+				peak_level_count_ = 0;
+				peak_level_ = 0;
+			} else {
+				WAVE at;
+				WAVE::abs(t, at);
+				peak_level_.l_ch = std::max(peak_level_.l_ch, at.l_ch);
+				peak_level_.r_ch = std::max(peak_level_.r_ch, at.r_ch);
+				++peak_level_count_;
+			}
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -78,7 +103,8 @@ namespace sound {
 		//-----------------------------------------------------------------//
 		sound_out(T zero_ofs) noexcept : w_put_(0), fifo_(),
 			out_rate_(48'000), inp_rate_(48'000), timebase_(0), wbase_(), zero_ofs_(zero_ofs),
-			sample_count_(0)
+			sample_count_(0),
+			peak_level_(0), peak_level_frame_(PEAK_LEVEL_FRAME), peak_level_count_(0) 
 		{ }
 
 
@@ -202,6 +228,7 @@ namespace sound {
 					wave_[w_put_].offset(zero_ofs_);
 					++w_put_;
 					w_put_ &= (OUTS - 1);
+					peak_level_service_(t);
 				}
 				sample_count_ += num;
 			} else {
@@ -226,6 +253,7 @@ namespace sound {
 					w_put_ &= (OUTS - 1);
 					timebase_ += inp_rate_;
 					++i;
+					peak_level_service_(wbase_);
 				}
 			}
 		}
@@ -247,5 +275,24 @@ namespace sound {
 		*/
 		//-----------------------------------------------------------------//
 		auto get_sample_count() const noexcept { return sample_count_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ピークレベル・フレームの設定
+			@param[in]	ピークレベルフレーム
+		*/
+		//-----------------------------------------------------------------//
+		void set_peak_level_frame(int16_t frame) noexcept { peak_level_frame_ = frame; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ピークレベルの取得
+			@return ピークレベル
+		*/
+		//-----------------------------------------------------------------//
+		auto& get_peak_level() const noexcept { return peak_level_; }
+
 	};
 }
