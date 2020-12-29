@@ -35,7 +35,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		fixed_string(const char* str = nullptr) noexcept : pos_(0) {
 			if(str != nullptr) {
-				std::strncpy(str_, str, SIZE);
+				utils::str::strncpy_(str_, str, SIZE);
 				pos_ = std::strlen(str_);
 			}
 			str_[pos_] = 0;
@@ -186,7 +186,7 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		fixed_string& operator = (const char* src) noexcept {
-			std::strncpy(str_, src, SIZE);
+			utils::str::strncpy_(str_, src, SIZE);
 			pos_ = std::strlen(str_);
 			return *this;
 		}
@@ -241,7 +241,7 @@ namespace utils {
 				pos_ += l;
 			} else {  // バッファが許す範囲でコピー
 				l = SIZE - pos_;
-				std::strncpy(&str_[pos_], str, l);
+				utils::str::strncpy_(&str_[pos_], str, l);
 				pos_ = SIZE;
 			}
 			str_[pos_] = 0; 
