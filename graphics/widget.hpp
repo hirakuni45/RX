@@ -32,6 +32,7 @@ namespace gui {
 			FRAME,		///< フレーム
 			BOX,		///< ボックス（シンプルな単型）
 			TEXT,		///< テキスト
+			TEXTBOX,	///< テキスト・ボックス
 			DIALOG,		///< ダイアログ
 			BUTTON,		///< ボタン
 			CHECK,		///< チェック・ボタン
@@ -71,6 +72,30 @@ namespace gui {
 			touch_state(const vtx::spos& fexp = vtx::spos(4)) noexcept :
 				position_(-1), expand_(fexp),
 				positive_(false), level_(false), negative_(false) { }
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	水平配置型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class H_ALIGNMENT : uint8_t {
+			LEFT,	///< 左
+			CENTER,	///< 中央
+			RIGHT,	///< 右
+		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief	垂直配置型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class V_ALIGNMENT : uint8_t {
+			TOP,	///< 上
+			CENTER,	///< 中央
+			BOTTOM,	///< 下
 		};
 
 	private:
@@ -243,6 +268,14 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	タイトル更新前処理
+		*/
+		//-----------------------------------------------------------------//
+		virtual void update_title() noexcept { }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	モーションオブジェクトの設定
 			@param[in]	mobj	モーションオブジェクト
 		*/
@@ -268,7 +301,10 @@ namespace gui {
 			@param[in]	color	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void set_base_color(const graphics::share_color& color) noexcept { base_color_ = color; }
+		void set_base_color(const graphics::share_color& color) noexcept {
+			base_color_ = color;
+			set_update();
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -277,7 +313,15 @@ namespace gui {
 			@return ベースカラー
 		*/
 		//-----------------------------------------------------------------//
-		const auto& get_base_color() const noexcept { return base_color_; }
+		auto get_base_color() const noexcept {
+			if(state_ == STATE::STALL) {
+				graphics::share_color sh(0, 0, 0);
+				sh.set_color(base_color_.rgba8, 96);
+				return sh;
+			} else {
+				return base_color_;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -286,7 +330,10 @@ namespace gui {
 			@param[in]	color	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void set_font_color(const graphics::share_color& color) noexcept { font_color_ = color; }
+		void set_font_color(const graphics::share_color& color) noexcept {
+			font_color_ = color;
+			set_update();
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -295,7 +342,16 @@ namespace gui {
 			@return フォントカラー
 		*/
 		//-----------------------------------------------------------------//
-		const auto& get_font_color() const noexcept { return font_color_; }
+		auto get_font_color() const noexcept
+		{
+			if(state_ == STATE::STALL) {
+				graphics::share_color sh(0, 0, 0);
+				sh.set_color(font_color_.rgba8, 96);
+				return sh;
+			} else {
+				return font_color_;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//

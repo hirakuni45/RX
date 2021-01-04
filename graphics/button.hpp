@@ -106,7 +106,6 @@ namespace gui {
 			@brief	タッチ判定を更新
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
-			@param[in]	slt		スライド・タイプの場合「true」
 		*/
 		//-----------------------------------------------------------------//
 		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
@@ -177,7 +176,6 @@ namespace gui {
 			if(get_touch_state().level_) {  // 0.75
 				inten = 192;
 			}
-			graphics::color_t c;
 			graphics::share_color sh(0, 0, 0);
 			sh.set_color(get_base_color().rgba8, inten);
 			rdr.set_fore_color(sh);

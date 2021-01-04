@@ -103,8 +103,10 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		vtx::spos get_text_size(const char* text, bool prop = false) noexcept
 		{
-			char cha;
 			vtx::spos sz(0);
+			if(text == nullptr) return sz;
+
+			char cha;	
 			int16_t x = 0;
 			while((cha = *text++) != 0) {
 				if(cha == '\n') {

@@ -1,9 +1,9 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	フレーム表示と制御
+	@brief	複数行のテキスト表示と制御
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -12,38 +12,42 @@
 
 namespace gui {
 
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	フレーム・クラス
+		@brief	テキストボックス・クラス
 	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct frame : public widget {
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+	struct textbox : public widget {
 
-		typedef frame value_type;
-
-		static const int16_t round_radius = 6;  // round radius
+		typedef textbox value_type;
 
 	private:
 
-		int16_t		caption_height_;
+		H_ALIGNMENT	h_alignment_;
+		V_ALIGNMENT	v_alignment_;
+
+		bool		text_update_;
+		vtx::spos	text_size_;
 
 	public:
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
 			@param[in]	loc		ロケーション
-			@param[in]	str		フレーム・タイトル
+			@param[in]	str		テキスト文字列
 		*/
 		//-----------------------------------------------------------------//
-		frame(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), caption_height_(0)
+		textbox(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
+			widget(loc, str), h_alignment_(H_ALIGNMENT::LEFT), v_alignment_(V_ALIGNMENT::TOP),
+			text_update_(false), text_size_(0)
 		{
+			set_base_color(graphics::def_color::Gray);
 			insert_widget(this);
 		}
 
 
-		frame(const frame& th) = delete;
-		frame& operator = (const frame& th) = delete;
+		textbox(const frame& th) = delete;
+		textbox& operator = (const frame& th) = delete;
 
 
 		//-----------------------------------------------------------------//
@@ -51,7 +55,7 @@ namespace gui {
 			@brief	デストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		virtual ~frame() noexcept { remove_widget(this); }
+		virtual ~textbox() noexcept { remove_widget(this); }
 
 
 		//-----------------------------------------------------------------//
@@ -60,7 +64,7 @@ namespace gui {
 			@return 型整数
 		*/
 		//-----------------------------------------------------------------//
-		const char* get_name() const noexcept override { return "Frame"; }
+		const char* get_name() const noexcept override { return "TextBox"; }
 
 
 		//-----------------------------------------------------------------//
@@ -69,7 +73,7 @@ namespace gui {
 			@return ID
 		*/
 		//-----------------------------------------------------------------//
-		ID get_id() const noexcept override { return ID::FRAME; }
+		ID get_id() const noexcept override { return ID::TEXTBOX; }
 
 
 		//-----------------------------------------------------------------//
@@ -102,6 +106,32 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	タイトル更新時処理
+		*/
+		//-----------------------------------------------------------------//
+		void update_title() noexcept override { text_update_ = true; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	水平整列を設定
+			@param[in]	ha	水平整列型
+		*/
+		//-----------------------------------------------------------------//
+		void set_holizontal_alignment(H_ALIGNMENT ha) noexcept { h_alignment_ = ha; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	垂直整列を設定
+			@param[in]	va	垂直整列型
+		*/
+		//-----------------------------------------------------------------//
+		void set_vertical_alignment(V_ALIGNMENT va) noexcept { v_alignment_ = va; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	許可・不許可
 			@param[in]	ena		不許可の場合「false」
 		*/
@@ -121,41 +151,48 @@ namespace gui {
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
-			auto r = get_location();
+			auto r = vtx::srect(get_final_position(), get_location().size);
 			rdr.set_fore_color(get_base_color());
-			rdr.round_box(r, round_radius);
-
-			uint8_t inten = 64;
-			if(get_touch_state().level_) {  // 0.75
-				inten = 192;
-			}
-			graphics::share_color sh(0, 0, 0);
-			sh.set_color(get_base_color().rgba8, inten);
-			rdr.set_fore_color(sh);
-
-			r.org += 2;
-			r.size -= 4;
-			rdr.round_box(r, round_radius - 2);
+			rdr.fill_box(r);
 
 			rdr.set_fore_color(get_font_color());
-			auto sz = rdr.at_font().get_text_size(get_title());
-			rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
-		}
 
+			if(text_update_) {
+				text_update_ = false;
+				text_size_ = rdr.at_font().get_text_size(get_title());
+			}
 
-		template <class T>
-		frame& operator + (T& th)
-		{
-			th.set_parents(this);
-			return *this;
-		}
+			vtx::spos ofs;
+			switch(h_alignment_) {
+			case H_ALIGNMENT::CENTER:
+				ofs.x = (r.size.x - text_size_.x) / 2;
+				break;
+			case H_ALIGNMENT::RIGHT:
+				ofs.x = r.size.x - text_size_.x;
+				break;
+			case H_ALIGNMENT::LEFT:
+			default:
+				ofs.x = 0;
+				break;
+			}
 
+			switch(v_alignment_) {
+			case V_ALIGNMENT::CENTER:
+				ofs.y = (r.size.y - text_size_.y) / 2;
+				break;
+			case V_ALIGNMENT::BOTTOM:
+				ofs.y = r.size.y - text_size_.y;
+				break;
+			case V_ALIGNMENT::TOP:
+			default:
+				ofs.y = 0;
+				break;
+			}
 
-		template <class T>
-		frame& operator += (T& th)
-		{
-			th.set_parents(this);
-			return *this;
+			auto oc = rdr.get_clip();
+			rdr.set_clip(r);
+			rdr.draw_text(r.org + ofs, get_title());
+			rdr.set_clip(oc);
 		}
 	};
 }
