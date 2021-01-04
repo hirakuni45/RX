@@ -129,15 +129,16 @@ namespace {
 	WIDD		widd_(render_, touch_);
 
 	typedef gui::button BUTTON;
-	BUTTON		button_  (vtx::srect(   10, 10+50*0, 80, 32), "Button");
+	BUTTON		button_(vtx::srect(10, 10, 80, 32), "Button");
+	BUTTON		button_stall_(vtx::srect(100, 10, 80, 32), "Stall");
 	typedef gui::check CHECK;
-	CHECK		check_(vtx::srect(   10, 10+50*1, 0, 0), "Check");  // サイズ０指定で標準サイズ
+	CHECK		check_(vtx::srect(   10, 10+50, 0, 0), "Check");  // サイズ０指定で標準サイズ
 	typedef gui::group<3> GROUP3;
-	GROUP3		group_(vtx::srect(   10, 10+50*2, 0, 0));
+	GROUP3		group_(vtx::srect(   10, 10+50+40, 0, 0));
 	typedef gui::radio RADIO;
-	RADIO		radioR_(vtx::srect(   0, 50*0, 0, 0), "Red");
-	RADIO		radioG_(vtx::srect(   0, 50*1, 0, 0), "Green");
-	RADIO		radioB_(vtx::srect(   0, 50*2, 0, 0), "Blue");
+	RADIO		radioR_(vtx::srect(   0, 40*0, 0, 0), "Red");
+	RADIO		radioG_(vtx::srect(   0, 40*1, 0, 0), "Green");
+	RADIO		radioB_(vtx::srect(   0, 40*2, 0, 0), "Blue");
 	typedef gui::slider SLIDER;
 	SLIDER		sliderh_(vtx::srect(200, 20, 200, 0), 0.5f);
 	SLIDER		sliderv_(vtx::srect(460, 20, 0, 200), 0.0f);
@@ -146,18 +147,35 @@ namespace {
 	typedef gui::text TEXT;
 	TEXT		text_(vtx::srect(240, 70, 150, 20), "１６ピクセル漢字の表示サンプル～");
 	typedef gui::textbox TEXTBOX;
-	TEXTBOX		textbox_(vtx::srect(240, 100, 200, 80), "");
+	TEXTBOX		textbox_(vtx::srect(240, 100, 160, 80), "");
 
 	void setup_gui_()
 	{
 		button_.enable();
 		button_.at_select_func() = [=](uint32_t id) {
 			utils::format("Select Button: %d\n") % id;
+			if(button_stall_.get_state() == BUTTON::STATE::STALL) {
+				button_stall_.set_state(BUTTON::STATE::ENABLE);
+				button_stall_.set_title("Active");
+			} else if(button_stall_.get_state() == BUTTON::STATE::ENABLE) {
+				button_stall_.set_state(BUTTON::STATE::STALL);
+				button_stall_.set_title("Stall");
+			}
 		};
+		button_stall_.enable();
+		button_stall_.set_state(BUTTON::STATE::STALL);
 
 		check_.enable();
 		check_.at_select_func() = [=](bool ena) {
 			utils::format("Select Check: %s\n") % (ena ? "On" : "Off");
+			if(ena) {
+				radioR_.set_base_color(DEF_COLOR::White);
+				radioG_.set_base_color(DEF_COLOR::White);
+				radioB_.set_base_color(DEF_COLOR::White);
+				radioR_.set_font_color(DEF_COLOR::White);
+				radioG_.set_font_color(DEF_COLOR::White);
+				radioB_.set_font_color(DEF_COLOR::White);
+			}
 		};
 
 		// グループにラジオボタンを登録
@@ -165,12 +183,36 @@ namespace {
 		group_.enable();  // グループ登録された物が全て有効になる。
 		radioR_.at_select_func() = [=](bool ena) {
 			utils::format("Select Red: %s\n") % (ena ? "On" : "Off");
+			if(ena) {
+				radioR_.set_base_color(DEF_COLOR::Red);
+				radioG_.set_base_color(DEF_COLOR::Red);
+				radioB_.set_base_color(DEF_COLOR::Red);
+				radioR_.set_font_color(DEF_COLOR::Red);
+				radioG_.set_font_color(DEF_COLOR::Red);
+				radioB_.set_font_color(DEF_COLOR::Red);
+			}
 		};
 		radioG_.at_select_func() = [=](bool ena) {
 			utils::format("Select Green: %s\n") % (ena ? "On" : "Off");
+			if(ena) {
+				radioR_.set_base_color(DEF_COLOR::Green);
+				radioG_.set_base_color(DEF_COLOR::Green);
+				radioB_.set_base_color(DEF_COLOR::Green);
+				radioR_.set_font_color(DEF_COLOR::Green);
+				radioG_.set_font_color(DEF_COLOR::Green);
+				radioB_.set_font_color(DEF_COLOR::Green);
+			}
 		};
 		radioB_.at_select_func() = [=](bool ena) {
 			utils::format("Select Blue: %s\n") % (ena ? "On" : "Off");
+			if(ena) {
+				radioR_.set_base_color(DEF_COLOR::Blue);
+				radioG_.set_base_color(DEF_COLOR::Blue);
+				radioB_.set_base_color(DEF_COLOR::Blue);
+				radioR_.set_font_color(DEF_COLOR::Blue);
+				radioG_.set_font_color(DEF_COLOR::Blue);
+				radioB_.set_font_color(DEF_COLOR::Blue);
+			}
 		};
 		radioG_.exec_select();  // 最初に選択されるラジオボタン
 
@@ -193,7 +235,7 @@ namespace {
 		text_.enable();
 
 		textbox_.enable();
-		textbox_.set_title("(1) 項目\n(2) について\n(3) まとめ");
+		textbox_.set_title("(1) 項目\n(2) GUI サンプルについて。\n(3) まとめ");
 		textbox_.set_vertical_alignment(TEXTBOX::V_ALIGNMENT::CENTER);
 	}
 
