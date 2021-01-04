@@ -171,22 +171,25 @@ namespace gui {
 			loc.size.x = loc.size.y;
 			auto r = loc;
 
-			rdr.set_fore_color(graphics::def_color::White);
+			rdr.set_fore_color(get_base_color());
 			rdr.round_box(r, round_radius);
 
 			r.org  += frame_width;
 			r.size -= frame_width * 2;
-			rdr.set_fore_color(graphics::def_color::Darkgray);
+
+			graphics::share_color sh(0, 0, 0);
+			sh.set_color(get_base_color().rgba8, 64);
+			rdr.set_fore_color(sh);
 			rdr.round_box(r, round_radius - frame_width);
 
 			if(get_touch_state().level_ || enable_) {
-				rdr.set_fore_color(graphics::def_color::White);
+				rdr.set_fore_color(get_base_color());
 				r.org  += check_space;
 				r.size -= check_space * 2;
 				rdr.fill_box(r);
 			}
 
-			rdr.set_fore_color(graphics::def_color::White);
+			rdr.set_fore_color(get_font_color());
 			vtx::spos pos = vtx::spos(loc.end_x() + box_to_title,
 				loc.org.y + (loc.size.y - font_height) / 2);
 			rdr.draw_text(pos, get_title());

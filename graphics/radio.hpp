@@ -169,15 +169,18 @@ namespace gui {
 			const auto& org = get_final_position();
 			auto cen = org + rad;
 
-			rdr.set_fore_color(graphics::def_color::White);
+			rdr.set_fore_color(get_base_color());
 			rdr.fill_circle(cen, rad);
 			rad -= frame_width;
-			rdr.set_fore_color(graphics::def_color::Darkgray);
+
+			graphics::share_color sh(0, 0, 0);
+			sh.set_color(get_base_color().rgba8, 64);
+			rdr.set_fore_color(sh);
 			rdr.fill_circle(cen, rad);
 
 			if(get_touch_state().level_ || enable_) {
 				rad -= check_space;
-				rdr.set_fore_color(graphics::def_color::White);
+				rdr.set_fore_color(get_base_color());
 				rdr.fill_circle(cen, rad);
 			}
 
