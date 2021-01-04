@@ -198,6 +198,7 @@ namespace gui {
 				rdr.draw_text(vtx::spos(r.org.x, r.org.y + (r.size.y - fsz.y) / 2), get_title());
 			} else { 
 				if(enable_scroll_ && text_draw_h_ > 0) {
+					auto bc = rdr.get_back_color();
 					rdr.set_back_color(get_base_color());
 					auto oc = rdr.get_clip();
 					rdr.set_clip(r);
@@ -207,6 +208,7 @@ namespace gui {
 					rdr.swap_color();
 					rdr.fill_box(vtx::srect(ex, r.org.y, 1, r.size.y));
 					rdr.set_clip(oc);
+					rdr.set_back_color(bc);
 				}
 			}
 		}
