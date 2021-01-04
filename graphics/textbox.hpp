@@ -151,7 +151,7 @@ namespace gui {
 		template<class RDR>
 		void draw(RDR& rdr) noexcept
 		{
-			auto r = get_location();
+			auto r = vtx::srect(get_final_position(), get_location().size);
 			rdr.set_fore_color(get_base_color());
 			rdr.fill_box(r);
 
@@ -189,7 +189,10 @@ namespace gui {
 				break;
 			}
 
+			auto oc = rdr.get_clip();
+			rdr.set_clip(r);
 			rdr.draw_text(r.org + ofs, get_title());
+			rdr.set_clip(oc);
 		}
 	};
 }

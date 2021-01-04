@@ -187,7 +187,7 @@ namespace gui {
 			auto pos = org;
 			pos.x +=  get_location().size.y + box_to_title;
 			pos.y += (get_location().size.y - RDR::font_type::height) / 2;
-			rdr.set_fore_color(graphics::def_color::White);
+			rdr.set_fore_color(get_font_color());
 			rdr.draw_text(pos, get_title());
 		}
 	};

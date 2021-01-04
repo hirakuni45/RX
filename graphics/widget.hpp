@@ -313,7 +313,15 @@ namespace gui {
 			@return ベースカラー
 		*/
 		//-----------------------------------------------------------------//
-		const auto& get_base_color() const noexcept { return base_color_; }
+		auto get_base_color() const noexcept {
+			if(state_ == STATE::STALL) {
+				graphics::share_color sh(0, 0, 0);
+				sh.set_color(base_color_.rgba8, 96);
+				return sh;
+			} else {
+				return base_color_;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -334,7 +342,16 @@ namespace gui {
 			@return フォントカラー
 		*/
 		//-----------------------------------------------------------------//
-		const auto& get_font_color() const noexcept { return font_color_; }
+		auto get_font_color() const noexcept
+		{
+			if(state_ == STATE::STALL) {
+				graphics::share_color sh(0, 0, 0);
+				sh.set_color(font_color_.rgba8, 96);
+				return sh;
+			} else {
+				return font_color_;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//
