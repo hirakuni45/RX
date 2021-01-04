@@ -140,11 +140,13 @@ namespace {
 	RADIO		radioB_(vtx::srect(   0, 50*2, 0, 0), "Blue");
 	typedef gui::slider SLIDER;
 	SLIDER		sliderh_(vtx::srect(200, 20, 200, 0), 0.5f);
-	SLIDER		sliderv_(vtx::srect(440, 20, 0, 200), 0.0f);
+	SLIDER		sliderv_(vtx::srect(460, 20, 0, 200), 0.0f);
 	typedef gui::menu MENU;
 	MENU		menu_(vtx::srect(120, 70, 100, 0), "ItemA,ItemB,ItemC,ItemD");
 	typedef gui::text TEXT;
 	TEXT		text_(vtx::srect(240, 70, 150, 20), "１６ピクセル漢字の表示サンプル～");
+	typedef gui::textbox TEXTBOX;
+	TEXTBOX		textbox_(vtx::srect(240, 100, 200, 80), "");
 
 	void setup_gui_()
 	{
@@ -189,6 +191,10 @@ namespace {
 		};
 
 		text_.enable();
+
+		textbox_.enable();
+		textbox_.set_title("(1) 項目\n(2) について\n(3) まとめ");
+		textbox_.set_vertical_alignment(TEXTBOX::V_ALIGNMENT::CENTER);
 	}
 
 
