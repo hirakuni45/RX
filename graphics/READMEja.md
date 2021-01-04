@@ -42,6 +42,7 @@
 |frame.hpp|Widget フレーム|
 |box.hpp|Widget ボックス|
 |text.hpp|Widget テキスト|
+|textbox.hpp|Widget テキスト・ボックス|
 |button.hpp|Widget ボタン|
 |check.hpp|Widget チェックボックス|
 |radio.hpp|Widget ラジオボタン|

@@ -21,33 +21,13 @@ namespace gui {
 
 		typedef textbox value_type;
 
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief	水平配置型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class H_LOCATION : uint8_t {
-			LEFT,	///< 左
-			CENTER,	///< 中央
-			RIGHT,	///< 右
-		};
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief	垂直配置型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class V_LOCATION : uint8_t {
-			TOP,	///< 上
-			CENTER,	///< 中央
-			BOTTOM,	///< 下
-		};
-
 	private:
 
-		H_LOCATION	h_location_;
-		V_LOCATION	v_location_;
+		H_ALIGNMENT	h_alignment_;
+		V_ALIGNMENT	v_alignment_;
+
+		bool		text_update_;
+		vtx::spos	text_size_;
 
 	public:
 		//-----------------------------------------------------------------//
@@ -58,8 +38,10 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		textbox(const vtx::srect& loc = vtx::srect(0), const char* str = "") noexcept :
-			widget(loc, str), h_location_(H_LOCATION::LEFT), v_location_(V_LOCATION::TOP)
+			widget(loc, str), h_alignment_(H_ALIGNMENT::LEFT), v_alignment_(V_ALIGNMENT::TOP),
+			text_update_(false), text_size_(0)
 		{
+			set_base_color(graphics::def_color::Gray);
 			insert_widget(this);
 		}
 
@@ -124,6 +106,32 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	タイトル更新時処理
+		*/
+		//-----------------------------------------------------------------//
+		void update_title() noexcept override { text_update_ = true; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	水平整列を設定
+			@param[in]	ha	水平整列型
+		*/
+		//-----------------------------------------------------------------//
+		void set_holizontal_alignment(H_ALIGNMENT ha) noexcept { h_alignment_ = ha; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	垂直整列を設定
+			@param[in]	va	垂直整列型
+		*/
+		//-----------------------------------------------------------------//
+		void set_vertical_alignment(V_ALIGNMENT va) noexcept { v_alignment_ = va; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	許可・不許可
 			@param[in]	ena		不許可の場合「false」
 		*/
@@ -148,8 +156,40 @@ namespace gui {
 			rdr.fill_box(r);
 
 			rdr.set_fore_color(get_font_color());
-			auto sz = rdr.at_font().get_text_size(get_title());
-			rdr.draw_text(r.org + (r.size - sz) / 2, get_title());
+
+			if(text_update_) {
+				text_update_ = false;
+				text_size_ = rdr.at_font().get_text_size(get_title());
+			}
+
+			vtx::spos ofs;
+			switch(h_alignment_) {
+			case H_ALIGNMENT::CENTER:
+				ofs.x = (r.size.x - text_size_.x) / 2;
+				break;
+			case H_ALIGNMENT::RIGHT:
+				ofs.x = r.size.x - text_size_.x;
+				break;
+			case H_ALIGNMENT::LEFT:
+			default:
+				ofs.x = 0;
+				break;
+			}
+
+			switch(v_alignment_) {
+			case V_ALIGNMENT::CENTER:
+				ofs.y = (r.size.y - text_size_.y) / 2;
+				break;
+			case V_ALIGNMENT::BOTTOM:
+				ofs.y = r.size.y - text_size_.y;
+				break;
+			case V_ALIGNMENT::TOP:
+			default:
+				ofs.y = 0;
+				break;
+			}
+
+			rdr.draw_text(r.org + ofs, get_title());
 		}
 	};
 }
