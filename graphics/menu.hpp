@@ -101,7 +101,6 @@ namespace gui {
 			@brief	タッチ判定を更新
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数
-			@param[in]	slt		スライド・タイプの場合「true」
 		*/
 		//-----------------------------------------------------------------//
 		void update_touch(const vtx::spos& pos, uint16_t num) noexcept override
@@ -141,8 +140,12 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void enable(bool ena = true) noexcept override
 		{
-			if(ena) set_state(STATE::ENABLE);
-			else set_state(STATE::DISABLE);
+			if(ena) {
+				set_state(STATE::ENABLE);
+			} else {
+				set_state(STATE::DISABLE);
+				reset_touch_state();
+			}
 		}
 
 
@@ -189,22 +192,32 @@ namespace gui {
 			auto r = vtx::srect(get_final_position(), get_location().size);
 			r.size.y /= num_;
 			for(uint32_t i = 0; i < num_; ++i) {
+				uint8_t inten = 64;
 				if(get_touch_state().level_ && select_pos_ == i) {
-					rdr.set_fore_color(graphics::def_color::Silver);
+//					rdr.set_fore_color(graphics::def_color::Silver);
+					inten = 192;
 				} else {
-					if(i & 1) rdr.set_fore_color(graphics::def_color::Midgray);
-					else rdr.set_fore_color(graphics::def_color::Gray);
+					if(i & 1) {
+//						rdr.set_fore_color(graphics::def_color::Midgray);
+						inten = 96;
+					} else {
+//						rdr.set_fore_color(graphics::def_color::Gray);
+						inten = 128;
+					}
 				}
+				graphics::share_color sh(0, 0, 0);
+				sh.set_color(get_base_color().rgba8, inten);
+				rdr.set_fore_color(sh);
 				bool up = false;
 				bool dn = false;
 				if(i == 0) up = true;
 				if(i == (num_ - 1)) dn = true;
 				rdr.round_box(r, round_radius, up, dn);
 
-				char tmp[16];
+				char tmp[32];
 				if(utils::str::get_word(get_title(), i, tmp, sizeof(tmp), ',')) {
 					auto sz = rdr.at_font().get_text_size(tmp);
-					rdr.set_fore_color(graphics::def_color::White);
+					rdr.set_fore_color(get_font_color());
 					rdr.draw_text(r.org + (r.size - sz) / 2, tmp);
 				}
 				r.org.y += r.size.y;

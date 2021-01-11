@@ -137,8 +137,12 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		void enable(bool ena = true) noexcept override
 		{
-			if(ena) set_state(STATE::ENABLE);
-			else set_state(STATE::DISABLE);
+			if(ena) {
+				set_state(STATE::ENABLE);
+			} else {
+				set_state(STATE::DISABLE);
+				reset_touch_state();
+			}
 		}
 
 

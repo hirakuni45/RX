@@ -238,8 +238,8 @@ namespace gui {
 						t.w_->exec_select(ena);
 						t.draw_ = true;
 						if(t.w_->get_id() == widget::ID::RADIO) {
-							widget_t* list[8];
-							auto n = create_childs_(t.w_, list, 8, true);
+							widget_t* list[16];
+							auto n = create_childs_(t.w_, list, 16, true);
 							for(uint16_t i = 0; i < n; ++i) {
 								list[i]->w_->exec_select(false);
 								list[i]->draw_ = true;
