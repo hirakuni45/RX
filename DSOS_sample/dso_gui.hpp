@@ -194,8 +194,6 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		void update() noexcept
 		{
-			touch_.update();
-
 			widd_.update();
 
 			if(trg_menu_.get_state() == gui::widget::STATE::ENABLE) {
