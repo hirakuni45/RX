@@ -410,6 +410,19 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	タッチステートをリセット
+		*/
+		//-----------------------------------------------------------------//
+		void reset_touch_state() noexcept
+		{
+			touch_state_.positive_ = false;
+			touch_state_.negative_ = false;
+			touch_state_.level_    = false;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	標準的なタッチ判定更新
 			@param[in]	pos		判定位置
 			@param[in]	num		タッチ数

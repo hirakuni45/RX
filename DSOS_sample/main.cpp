@@ -18,9 +18,7 @@
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/shell.hpp"
-#include "common/spi_io2.hpp"
 #include "common/tpu_io.hpp"
-#include "common/qspi_io.hpp"
 #include "graphics/font8x16.hpp"
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
@@ -30,7 +28,6 @@
 #include "chip/FT5206.hpp"
 
 #include "capture.hpp"
-#include "render_wave.hpp"
 #include "dso_gui.hpp"
 
 namespace {
@@ -56,12 +53,14 @@ namespace {
 	// ※０～ＦＦは未使用領域
 	static void* LCD_ORG = reinterpret_cast<void*>(0x00000100);
 
-	// カード電源制御を使わない場合、「device::NULL_PORT」を指定する。
+	// SD カード電源制御を使わない場合、「device::NULL_PORT」を指定する。
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 	// 書き込み禁止は使わない
 	typedef device::NULL_PORT SDC_WP;
 
+	// タッチセンサー「RESET」制御ポート
 	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+	// タッチセンサー I2C ポート設定
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::FIRST_I2C> FT5206_I2C;
 
 #elif defined(SIG_RX72N)
@@ -77,12 +76,14 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
 	static void* LCD_ORG = reinterpret_cast<void*>(0x0080'0000);
 
-	// SD-CARD の制御関係
+	// SD カードの制御ポート設定
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;
 	// 書き込み禁止は使わない
 	typedef device::NULL_PORT SDC_WP;
 
+	// タッチセンサー「RESET」制御ポート
 	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
+	// タッチセンサー I2C ポート設定
 	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
 
 #endif
@@ -95,12 +96,12 @@ namespace {
 	typedef device::sci_io<SCI_CH, RECV_BUFF, SEND_BUFF> SCI;
 	SCI			sci_;
 
-	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
-	GLCDC_MGR	glcdc_mgr_(nullptr, LCD_ORG);
-
 	// RX65N/RX72N Envision Kit の SDHI は、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDHI;
 	SDHI		sdh_;
+
+	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
+	GLCDC_MGR	glcdc_mgr_(nullptr, LCD_ORG);
 
 	typedef graphics::font8x16 AFONT;
 	AFONT		afont_;
@@ -116,25 +117,27 @@ namespace {
 	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
 	RENDER		render_(glcdc_mgr_, font_);
 
+	// 標準カラーインスタンス
+	typedef graphics::def_color DEF_COLOR;
+
 	typedef utils::capture<2048> CAPTURE;
 	CAPTURE		capture_;
 
 	FT5206_I2C	ft5206_i2c_;
-	typedef chip::FT5206<FT5206_I2C> FT5206;
-	FT5206		ft5206_(ft5206_i2c_);
+	typedef chip::FT5206<FT5206_I2C> TOUCH;
+	TOUCH		touch_(ft5206_i2c_);
 
-	typedef utils::dso_gui<RENDER, FT5206, CAPTURE> DSO_GUI;
-	DSO_GUI		dso_gui_(render_, ft5206_, capture_);
+	typedef gui::simple_dialog<RENDER, TOUCH> DIALOG;
+	DIALOG      dialog_(render_, touch_);
 
-	typedef utils::render_wave<RENDER, FT5206, CAPTURE> RENDER_WAVE;
-	RENDER_WAVE	render_wave_(render_, ft5206_, capture_);
+	typedef utils::dso_gui<RENDER, TOUCH, CAPTURE> DSO_GUI;
+	DSO_GUI		dso_gui_(render_, touch_, capture_);
 
 	typedef utils::command<256> CMD;
 	CMD			cmd_;
+
 	typedef utils::shell<CMD> SHELL;
 	SHELL		shell_(cmd_);
-
-	utils::capture_trigger	trigger_ = utils::capture_trigger::NONE;
 
 
 	void update_led_()
@@ -152,6 +155,27 @@ namespace {
 	}
 
 
+    void setup_touch_panel_()
+    {
+        render_.sync_frame();
+        dialog_.modal(vtx::spos(400, 60),
+            "Touch panel device wait...\nPlease touch it with some screen.");
+        uint8_t nnn = 0;
+        while(1) {
+            render_.sync_frame();
+            touch_.update();
+            auto num = touch_.get_touch_num();
+            if(num == 0) {
+                ++nnn;
+                if(nnn >= 60) break;
+            } else {
+                nnn = 0;
+            }
+        }
+        render_.clear(DEF_COLOR::Black);
+    }
+
+
 	void command_()
 	{
 		if(!cmd_.service()) {
@@ -161,8 +185,8 @@ namespace {
 			return;
 		}
 		if(cmd_.cmp_word(0, "cap")) { // capture
-			trigger_ = utils::capture_trigger::SINGLE;
-			capture_.set_trigger(trigger_);			
+//			trigger_ = utils::capture_trigger::SINGLE;
+//			capture_.set_trigger(trigger_);			
 		} else if(cmd_.cmp_word(0, "help")) {
 			shell_.help();
 			utils::format("    cap        single trigger\n");
@@ -236,7 +260,7 @@ extern "C" {
 
 
 	DWORD get_fattime(void) {
-		time_t t = 0;
+		time_t t = utils::str::get_compiled_time();
 ///		rtc_.get_time(t);
 		return utils::str::get_fattime(t);
 	}
@@ -267,8 +291,6 @@ int main(int argc, char** argv)
 
 	utils::format("\r%s Start for Digital Storage Oscilloscope\n") % sys_msg_;
 
-	cmd_.set_prompt("# ");
-
 	{  // GLCDC の初期化
 		LCD_DISP::DIR  = 1;
 		LCD_LIGHT::DIR = 1;
@@ -298,59 +320,34 @@ int main(int argc, char** argv)
 	}
 
 	{  // FT5206 touch screen controller
-		FT5206::reset<FT5206_RESET>();
+		TOUCH::reset<FT5206_RESET>();
 		uint8_t intr_lvl = 1;
 		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
 			utils::format("FT5206 I2C Start Fail...\n");
 		}
-		if(!ft5206_.start()) {
+		if(!touch_.start()) {
 			utils::format("FT5206 Start Fail...\n");
 		}
 	}
 
-	LED::DIR = 1;
+	setup_touch_panel_();
 
-#if 0
-	{
-		render_.sync_frame();
-		dialog_.modal(vtx::spos(400, 60),
-			"Touch panel device wait...\nPlease touch it with some screen.");
-		uint8_t nnn = 0;
-		while(1) {
-			render_.sync_frame();
-			touch_.update();
-			auto num = touch_.get_touch_num();
-			if(num == 0) {
-				++nnn;
-				if(nnn >= 60) break;
-			} else {
-				nnn = 0;
-			}
-		}
-		render_.clear(DEF_COLOR::Black);
-	}
-#endif
+	dso_gui_.start();
+
+	LED::OUTPUT();
+
+	cmd_.set_prompt("# ");
 
 	while(1) {
 		glcdc_mgr_.sync_vpos();
 
-		ft5206_.update();
+		touch_.update();
 
 		sdh_.service();
 
 		command_();
 
 		dso_gui_.update();
-
-		// タッチ操作による画面更新が必要か？
-		bool f = render_wave_.ui_service();
-
-		// 波形をキャプチャーしたら描画
-		if(f || (trigger_ != utils::capture_trigger::NONE
-			&& capture_.get_trigger() == utils::capture_trigger::NONE)) {
-			trigger_ = utils::capture_trigger::NONE;
-			render_wave_.update();
-		}
 
 		update_led_();
 	}
