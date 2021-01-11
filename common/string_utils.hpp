@@ -370,6 +370,7 @@ namespace utils {
 		}
 #endif
 
+
 #ifdef FAT_FS
 		//-----------------------------------------------------------------//
 		/*!
@@ -443,6 +444,46 @@ namespace utils {
 			return mktime(&ttm);
 		}
 #endif
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ソースコードがコンパイル GMT を取得
+			@return コンパイル GMT
+		*/
+		//-----------------------------------------------------------------//
+		static time_t get_compiled_time()
+		{
+			static const char* date_ = __DATE__;
+			static const char* time_ = __TIME__;
+
+			int day = 1;
+			int year = 2021;
+			utils::input("%d %d", date_ + 4) % day % year;
+			int mon = 0;
+			for(int i = 0; i < 12; ++i) {
+				if(strncmp(date_, get_mon(i), 3) == 0) {
+					mon = i;
+					break;
+				}
+			}
+
+			struct tm m;
+			m.tm_year = year - 1900;
+			m.tm_mon  = mon;
+			m.tm_mday = day;
+
+			int hour = 0;
+			int min = 0;
+			int sec = 0;
+			utils::input("%d:%d:%d", time_) % hour % min % sec;
+			m.tm_hour = hour;
+			m.tm_min  = min;
+			m.tm_sec  = sec;
+
+			return mktime(&m);
+		}
+
 
 		//-----------------------------------------------------------------//
 		/*!
