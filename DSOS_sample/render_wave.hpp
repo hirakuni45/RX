@@ -3,7 +3,7 @@
 /*! @file
     @brief  波形描画クラス
     @author 平松邦仁 (hira@rvf-rc45.net)
-    @copyright  Copyright (C) 2018 Kunihito Hiramatsu @n
+    @copyright  Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
                 Released under the MIT license @n
                 https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -41,8 +41,9 @@ namespace utils {
 		typedef gui::simple_dialog<RENDER, TOUCH> DIALOG;
 
 		RENDER&		render_;
-		CAPTURE&	capture_;
 		TOUCH&		touch_;
+		CAPTURE&	capture_;
+
 		DIALOG		dialog_;
 
 		int16_t		time_pos_;
@@ -62,19 +63,6 @@ namespace utils {
 		uint16_t	ch0_div_;
 		uint16_t	ch1_div_;
 
-		enum class MENU : uint8_t {
-			NONE,
-			CH0,
-			CH1,
-			TRG,
-			SMP,
-			MES,
-			OPT
-		};
-
-		MENU		menu_;
-		MENU		menu_run_;
-
 		enum class MEASERE : uint8_t {
 			NONE,
 			TIME,
@@ -92,6 +80,7 @@ namespace utils {
 
 		bool		touch_down_;
 		uint8_t		touch_num_;
+
 
 		typedef graphics::def_color DEF_COLOR;
 
@@ -166,12 +155,11 @@ namespace utils {
 		*/
 		//-----------------------------------------------------------------//
 		render_wave(RENDER& render, TOUCH& touch, CAPTURE& capture) noexcept :
-			render_(render), capture_(capture), touch_(touch),
+			render_(render), touch_(touch), capture_(capture),
 			dialog_(render, touch),
 			time_pos_(0), time_org_(0),
 			ch0_vpos_(0), ch0_vorg_(0), ch1_vpos_(0), ch1_vorg_(0),
 			rate_div_(11), ch0_div_(3), ch1_div_(3),
-			menu_(MENU::NONE), menu_run_(MENU::NONE),
 			measere_(MEASERE::NONE),
 			mes_time_begin_(0), mes_time_size_(40), mes_time_org_(0),
 			mes_volt_begin_(0), mes_volt_size_(40), mes_volt_org_(0),
@@ -312,14 +300,14 @@ namespace utils {
 			if(num == 0) {
 				touch_down_ = false;
 				if(p.before == TOUCH::EVENT::CONTACT && p.event == TOUCH::EVENT::UP) {
-					menu_run_ = menu_;
-					menu_ = MENU::NONE;
+#if 0
 					if(menu_run_ == MENU::TRG) {
 						// とりあえず、シングル・トリガー
 						capture_.set_trigger(utils::capture_trigger::SINGLE);
 					} else if(menu_run_ == MENU::MES) {
 						measere_ = enum_utils::inc(measere_, MEASERE::NONE, MEASERE::VOLT);
 					}
+#endif
 					return true;
 				} else {
 					return false;
@@ -336,7 +324,7 @@ namespace utils {
 				} else if(p.event == TOUCH::EVENT::CONTACT) {
 					auto d = p.pos - p.org;
 					if(CH1_MOVE_AREA <= p.pos.x && p.pos.x < RENDER::glc_type::width) {
-						menu_ = static_cast<MENU>((p.pos.y - 16) / MENU_SIZE + 1);
+///						menu_ = static_cast<MENU>((p.pos.y - 16) / MENU_SIZE + 1);
 					} else if(measere_ == MEASERE::TIME) {
 						if(TIME_BEGIN_POS <= p.pos.y && p.pos.y < TIME_LIMIT_POS
 							&& VOLT_BEGIN_POS <= p.pos.x && p.pos.x < VOLT_LIMIT_POS) {
@@ -423,19 +411,6 @@ namespace utils {
 				render_.line(vtx::spos(CH1_MOVE_AREA, TIME_SCROLL_AREA),
 							 vtx::spos(CH1_MOVE_AREA, 272 - 16));
 			}
-
-#if 0
-			{
-				static const char* menu[] = {
-					"CH0", "CH1", "Trg", "Smp", "Mes", "Opt" };
-				for(int16_t i = 0; i < 6; ++i) {
-					auto c = DEF_COLOR::Olive;
-					if(static_cast<MENU>(i + 1) == menu_) c = DEF_COLOR::Yellow;
-					render_.set_back_color(c);
-					dialog_.square_button(vtx::srect(441, 16 + GRID * i + 1, GRID - 1, GRID - 1), menu[i]);
-				}
-			}
-#endif
 
 			for(int16_t x = 0; x < (440 - 1); ++x) {
 				int16_t p0 = time_pos_ + x;
