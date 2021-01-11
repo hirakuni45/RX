@@ -118,10 +118,15 @@ namespace gui {
 			auto st = STATE::DISABLE;
 			if(ena) {
 				st = STATE::ENABLE;
+			} else {
+				reset_touch_state();
 			}
 			set_state(st);
 			for(uint32_t i = 0; i < count_; ++i) {
 				child_[i]->set_state(st);
+				if(!ena) {
+					child_[i]->reset_touch_state();
+				}
 			}
 		}
 
