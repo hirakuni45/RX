@@ -219,6 +219,15 @@ namespace device {
 			@return TASK クラス
 		*/
 		//-----------------------------------------------------------------//
+		static const TASK& get_task() noexcept { return task_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  TASK クラスの参照
+			@return TASK クラス
+		*/
+		//-----------------------------------------------------------------//
 		static TASK& at_task() noexcept { return task_; }
 	};
 
