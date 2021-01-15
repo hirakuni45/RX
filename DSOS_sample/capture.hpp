@@ -2,6 +2,7 @@
 //=====================================================================//
 /*! @file
     @brief  A/D 変換、キャプチャー制御クラス @n
+			最大サンプルレート 2MHz (RX65N/RX72N) @n
 			※「GLFW_SIM」を有効にする事で、キャプチャー動作をシュミレートする。
     @author 平松邦仁 (hira@rvf-rc45.net)
     @copyright  Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
@@ -13,6 +14,9 @@
 #include "common/renesas.hpp"
 #endif
 
+#include "common/vtx.hpp"
+#include "common/string_utils.hpp"
+
 namespace utils {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -22,31 +26,64 @@ namespace utils {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	struct capture_base {
 
+		/// グリッド単位数
+		static const int16_t GRID = 40;
+
+		/// チャネル・モード文字列
+		static constexpr char CH_MODE_STR[] = "AC,GND,DC,OFF";
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  キャプチャー・データ構造体
+			@brief  チャネル・モード型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		struct data_t {
-			uint16_t	ch0_;
-			uint16_t	ch1_;
-			data_t(uint16_t v = 0) noexcept : ch0_(v), ch1_(v) { }
+		enum class CH_MODE : uint8_t {
+			AC,
+			GND,
+			DC,
+			OFF
+		};
+
+		/// チャネル・電圧文字列
+		static constexpr char CH_VOLT_STR[] = "5V,1V,500mV,100mV,50mV,10mV";
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  チャネル・電圧型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class CH_VOLT : uint8_t {
+			_5V,
+			_1V,
+			_500mV,
+			_100mV,
+			_50mV,
+			_10mV
 		};
 
 
+		/// トリガー文字列
+		static constexpr char TRG_MODE_STR[] = "None,One,Run,CH0-Pos,CH1-Pos,CH0-Neg,CH1-Neg";
+
+
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  キャプチャー・トリガー型
+			@brief  チャネル・電圧型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class TRIGGER : uint8_t {
+		enum class TRG_MODE : uint8_t {
 			NONE,		///< 何もしない
-			FREE,		///< フリーラン取得
-			CH0_P_TRG,	///< CH0 ポジティブ・トリガー
-			CH1_P_TRG,	///< CH1 ポジティブ・トリガー
-			CH0_N_TRG,	///< CH0 ネガティブ・トリガー
-			CH1_N_TRG,	///< CH1 ネガティブ・トリガー
+			ONE,		///< ワンショット
+			RUN,		///< フリーランニング
+			CH0_POS,	///< CH0 立ち上がりエッジ
+			CH1_POS,	///< CH1 立ち上がりエッジ
+			CH0_NEG,	///< CH0 立ち下がりエッジ
+			CH1_NEG,	///< CH1 立ち下がりエッジ
 		};
+
+		typedef vtx::spos DATA;
 	};
 
 
@@ -76,37 +113,124 @@ namespace utils {
 		// キャプチャー・タスク
 		class cap_task {
 		public:
-			data_t	min_;
-			data_t	max_;
+			DATA				data_[CAPN];
+
+			volatile uint32_t	tic_;
+			volatile uint16_t	pos_;
+			uint16_t	count_;
+			volatile TRG_MODE	trg_mode_;
+			volatile uint16_t	trg_pos_;
+
+			DATA	min_;
+			DATA	max_;
+			DATA	cmp_;
+			DATA	dlt_;
+			DATA	back_;
 
 #ifdef GLFW_SIM
-			data_t	adv_;
+			DATA	adv_;
 #endif
 
-			cap_task() noexcept : min_(0), max_(0) { }
+			cap_task() noexcept :
+				data_ { { 2048, 2048 } }, tic_(0), pos_(0), count_(0),
+				trg_mode_(TRG_MODE::NONE), trg_pos_(0),
+				min_(4096 - 1), max_(0), cmp_(100), dlt_(10), back_(0)
+			{ }
 
 			void operator() ()
 			{
-				switch(trigger_) {
-				case TRIGGER::NONE:
 #ifndef GLFW_SIM
-					ADC0::ADCSR = ADC0::ADCSR.ADCS.b(0b01) | ADC0::ADCSR.ADST.b();
-					ADC1::ADCSR = ADC1::ADCSR.ADCS.b(0b01) | ADC1::ADCSR.ADST.b();
-#endif
-					break;
-				case TRIGGER::FREE:
-#ifdef GLFW_SIM
-					data_[pos_] = adv_;
+				DATA t(ADC0::ADDR(ADC_CH0), ADC1::ADDR(ADC_CH1));
+				t.x -= 2048;
+				t.y -= 2048;
+				ADC0::ADCSR = ADC0::ADCSR.ADCS.b(0b01) | ADC0::ADCSR.ADST.b();
+				ADC1::ADCSR = ADC1::ADCSR.ADCS.b(0b01) | ADC1::ADCSR.ADST.b();
 #else
-					data_[pos_].ch0_ = ADC0::ADDR(ADC_CH0);
-					data_[pos_].ch1_ = ADC1::ADDR(ADC_CH1);
-					ADC0::ADCSR = ADC0::ADCSR.ADCS.b(0b01) | ADC0::ADCSR.ADST.b();
-					ADC1::ADCSR = ADC1::ADCSR.ADCS.b(0b01) | ADC1::ADCSR.ADST.b();
+				DATA t = adv_;
 #endif
+				switch(trg_mode_) {
+				case TRG_MODE::NONE:
+					break;
+				case TRG_MODE::ONE:
+				case TRG_MODE::RUN:
+					data_[pos_] = t;
 					++pos_;
-					if(pos_ >= CAPN) {
-						trigger_ = TRIGGER::NONE;
+					pos_ &= CAPN - 1;
+					if(pos_ == (CAPN - 1)) {
+						if(trg_mode_ == TRG_MODE::ONE) {
+							trg_mode_ = TRG_MODE::NONE;
+						}
+						trg_pos_ = pos_;
+						pos_ = 0;
 						++tic_;
+					}
+					break;
+				case TRG_MODE::CH0_POS:
+					data_[pos_] = t;
+					dlt_ += t - back_;
+					back_ = t;
+					++pos_;
+					pos_ &= CAPN - 1;
+					if(count_ > 0) {
+						count_--;
+						if(count_ == 0) {
+							trg_mode_ = TRG_MODE::NONE;
+							++tic_;
+						}
+					} else if(dlt_.x > cmp_.x) {
+						trg_pos_ = pos_;
+						count_ = CAPN / 2;
+					}
+					break;
+				case TRG_MODE::CH1_POS:
+					data_[pos_] = t;
+					dlt_ += t - back_;
+					back_ = t;
+					++pos_;
+					pos_ &= CAPN - 1;
+					if(count_ > 0) {
+						count_--;
+						if(count_ == 0) {
+							trg_mode_ = TRG_MODE::NONE;
+							++tic_;
+						}
+					} else if(dlt_.y > cmp_.y) {
+						trg_pos_ = pos_;
+						count_ = CAPN / 2;
+					}
+					break;
+				case TRG_MODE::CH0_NEG:
+					data_[pos_] = t;
+					dlt_ += t - back_;
+					back_ = t;
+					++pos_;
+					pos_ &= CAPN - 1;
+					if(count_ > 0) {
+						count_--;
+						if(count_ == 0) {
+							trg_mode_ = TRG_MODE::NONE;
+							++tic_;
+						}
+					} else if(dlt_.x < cmp_.x) {
+						trg_pos_ = pos_;
+						count_ = CAPN / 2;
+					}
+					break;
+				case TRG_MODE::CH1_NEG:
+					data_[pos_] = t;
+					dlt_ += t - back_;
+					back_ = t;
+					++pos_;
+					pos_ &= CAPN - 1;
+					if(count_ > 0) {
+						count_--;
+						if(count_ == 0) {
+							trg_mode_ = TRG_MODE::NONE;
+							++tic_;
+						}
+					} else if(dlt_.y > cmp_.y) {
+						trg_pos_ = pos_;
+						count_ = CAPN / 2;
 					}
 					break;
 				default:
@@ -116,11 +240,6 @@ namespace utils {
 		};
 
 	private:
-		static data_t				data_[CAPN];
-
-		static volatile uint32_t	tic_;
-		static volatile uint16_t	pos_;
-		static volatile TRIGGER		trigger_;
 
 #ifndef GLFW_SIM
 		typedef device::tpu_io<device::TPU0, cap_task> TPU0;
@@ -214,13 +333,13 @@ namespace utils {
 		}
 
 
-#ifdef GLFW_SIM
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  キャプチャー・タスク参照
 			@return キャプチャー・タスク
 		*/
 		//-----------------------------------------------------------------//
+#ifdef GLFW_SIM
 		auto& at_cap_task() noexcept { return cap_task_; }
 #else
 		auto& at_cap_task() noexcept { return tpu0_.at_task(); }
@@ -229,14 +348,43 @@ namespace utils {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  キャプチャー・タスク参照(RO)
+			@return キャプチャー・タスク
+		*/
+		//-----------------------------------------------------------------//
+#ifdef GLFW_SIM
+		const auto& get_cap_task() const noexcept { return cap_task_; }
+#else
+		const auto& get_cap_task() const noexcept { return tpu0_.get_task(); }
+#endif
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  トリガー設定
 			@param[in]	trg		トリガー種別
 		*/
 		//-----------------------------------------------------------------//
-		void set_trigger(TRIGGER trigger) noexcept
+		const char* get_trigger_str() noexcept
 		{
-			pos_ = 0;
-			trigger_ = trigger;
+			static char tmp[16];
+			auto pos = static_cast<uint32_t>(get_cap_task().trg_mode_);
+			utils::str::get_word(TRG_MODE_STR, pos, tmp, sizeof(tmp), ',');
+			return tmp;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  トリガー設定
+			@param[in]	trg		トリガー種別
+		*/
+		//-----------------------------------------------------------------//
+		void set_trigger(TRG_MODE trg_mode) noexcept
+		{
+			at_cap_task().pos_ = 0;
+			at_cap_task().dlt_ = 0;
+			at_cap_task().count_ = 0;
+			at_cap_task().trg_mode_ = trg_mode;
 		}
 
 
@@ -246,7 +394,7 @@ namespace utils {
 			@return タスク・カウンタ
 		*/
 		//-----------------------------------------------------------------//
-		auto get_capture_tic() const noexcept { return tic_; }
+		auto get_capture_tic() const noexcept { return get_cap_task().tic_; }
 
 
 		//-----------------------------------------------------------------//
@@ -256,13 +404,7 @@ namespace utils {
 		//-----------------------------------------------------------------//
 		const auto& get(uint32_t pos) noexcept
 		{
-			return data_[pos & (CAPN - 1)];
+			return at_cap_task().data_[(pos + get_cap_task().trg_pos_) & (CAPN - 1)];
 		}
 	};
-
-	template <uint32_t CAPN> capture_base::data_t capture<CAPN>::data_[CAPN] = { 2048 };
-	template <uint32_t CAPN> volatile uint32_t capture<CAPN>::tic_ = 0;
-	template <uint32_t CAPN> volatile uint16_t capture<CAPN>::pos_ = 0;
-	template <uint32_t CAPN>
-	volatile capture_base::TRIGGER capture<CAPN>::trigger_ = capture_base::TRIGGER::NONE;
 }

@@ -120,7 +120,7 @@ namespace {
 	// 標準カラーインスタンス
 	typedef graphics::def_color DEF_COLOR;
 
-	typedef utils::capture<2048> CAPTURE;
+	typedef utils::capture<8192> CAPTURE;
 	CAPTURE		capture_;
 
 	FT5206_I2C	ft5206_i2c_;
@@ -130,7 +130,7 @@ namespace {
 	typedef gui::simple_dialog<RENDER, TOUCH> DIALOG;
 	DIALOG      dialog_(render_, touch_);
 
-	typedef utils::dso_gui<RENDER, TOUCH, CAPTURE> DSO_GUI;
+	typedef dsos::dso_gui<RENDER, TOUCH, CAPTURE> DSO_GUI;
 	DSO_GUI		dso_gui_(render_, touch_, capture_);
 
 	typedef utils::command<256> CMD;

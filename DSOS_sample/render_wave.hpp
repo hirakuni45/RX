@@ -14,7 +14,9 @@
 #include "graphics/color.hpp"
 #include "graphics/simple_dialog.hpp"
 
-namespace utils {
+#include "render_base.hpp"
+
+namespace dsos {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -25,12 +27,11 @@ namespace utils {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <class RENDER, class TOUCH, class CAPTURE>
-	class render_wave {
+	class render_wave : public render_base {
 
-		static const int16_t GRID             = 40;
-		static constexpr float   GRID_SCALE   = 1.0f / static_cast<float>(GRID);
+		static constexpr float GRID_SCALE   = 1.0f / static_cast<float>(CAPTURE::GRID);
 		static const int16_t MENU_SIZE        = 40;
-		static const int16_t TIME_SCROLL_AREA = RENDER::font_type::height + GRID;
+		static const int16_t TIME_SCROLL_AREA = RENDER::font_type::height + CAPTURE::GRID;
 		static const int16_t CH0_MOVE_AREA    = (RENDER::glc_type::width - MENU_SIZE) / 2;
 		static const int16_t CH1_MOVE_AREA    = RENDER::glc_type::width - MENU_SIZE;
 		static const int16_t TIME_BEGIN_POS   = RENDER::font_type::height;
@@ -80,9 +81,6 @@ namespace utils {
 
 		bool		touch_down_;
 		uint8_t		touch_num_;
-
-
-		typedef graphics::def_color DEF_COLOR;
 
 
 		void update_measere_() noexcept
@@ -230,12 +228,13 @@ namespace utils {
 			};
 
 			char tmp[64];
-			utils::sformat("%s (%s)", tmp, sizeof(tmp)) % freq[rate_div_] % rate[rate_div_];
+			utils::sformat("%s", tmp, sizeof(tmp)) % capture_.get_trigger_str();
 			render_.set_fore_color(DEF_COLOR::Black);
 			render_.fill_box(vtx::srect(0, 0, 480, 16));
 			render_.set_fore_color(DEF_COLOR::White);
 			auto x = render_.draw_text(vtx::spos(0, 0), tmp);
 
+#if 0
 			// 計測モード時結果
 			if(measere_ == MEASERE::TIME) {
 				float a = static_cast<float>(mes_time_size_) * GRID_SCALE * rate_f[rate_div_];
@@ -248,6 +247,7 @@ namespace utils {
 //				utils::sformat("%4.3f", tmp, sizeof(tmp)) % a;
 //				render_.draw_text(x + 8, 0, tmp);
 			}
+#endif
 		}
 
 
@@ -265,7 +265,7 @@ namespace utils {
 
 			char tmp[32];
 			if(ch == 0) {
-				render_.set_fore_color(DEF_COLOR::Lime);
+				render_.set_fore_color(CH0_COLOR);
 				render_.fill_box(vtx::srect(  0, 272 - 16 + 1, 15, 15));
 				render_.set_fore_color(DEF_COLOR::Black);
 				render_.fill_box(vtx::srect( 16, 272 - 16 + 1, 240 - 16, 15));
@@ -273,7 +273,7 @@ namespace utils {
 				utils::sformat("CH0: %s [V]", tmp, sizeof(tmp)) % divs[ch0_div_];
 				render_.draw_text(vtx::spos(  16, 272 - 16 + 1), tmp);
 			} else {
-				render_.set_fore_color(DEF_COLOR::Fuchsi);
+				render_.set_fore_color(CH1_COLOR);
 				render_.fill_box(vtx::srect(240, 272 - 16 + 1, 15, 15));
 				utils::sformat("CH1: %s [V]", tmp, sizeof(tmp)) % divs[ch1_div_];
 				render_.set_fore_color(DEF_COLOR::Black);
@@ -300,14 +300,6 @@ namespace utils {
 			if(num == 0) {
 				touch_down_ = false;
 				if(p.before == TOUCH::EVENT::CONTACT && p.event == TOUCH::EVENT::UP) {
-#if 0
-					if(menu_run_ == MENU::TRG) {
-						// とりあえず、シングル・トリガー
-						capture_.set_trigger(utils::capture_trigger::SINGLE);
-					} else if(menu_run_ == MENU::MES) {
-						measere_ = enum_utils::inc(measere_, MEASERE::NONE, MEASERE::VOLT);
-					}
-#endif
 					return true;
 				} else {
 					return false;
@@ -341,7 +333,7 @@ namespace utils {
 						}
 					} else {
 						if(0 <= p.pos.y && p.pos.y < TIME_SCROLL_AREA) {
-							time_pos_ = time_org_ + d.x;
+							time_pos_ = time_org_ - d.x;
 							touch_down_ = true;
 						} else if(0 <= p.pos.x && p.pos.x < CH0_MOVE_AREA) {
 							ch0_vpos_ = ch0_vorg_ + d.y;
@@ -398,7 +390,7 @@ namespace utils {
 		{
 			render_.set_fore_color(DEF_COLOR::Black);
 			render_.fill_box(vtx::srect(0, 16, 440, 240));
-			draw_grid(0, 16, 440, 240, GRID);
+			draw_grid(0, 16, 440, 240, CAPTURE::GRID);
 
 			if(measere_ != MEASERE::NONE) {
 				update_measere_();
@@ -422,24 +414,24 @@ namespace utils {
 				const auto& d1 = capture_.get(p1);
 				{
 					int16_t ofs = ch0_vpos_ + 272 / 2;
-					int16_t y0 = d0.ch0_;
+					int16_t y0 = d0.x;
 					y0 -= 2048;
 					y0 /= -17;
-					int16_t y1 = d1.ch0_;
+					int16_t y1 = d1.y;
 					y1 -= 2048;
 					y1 /= -17;
-					render_.set_fore_color(DEF_COLOR::Lime);
+					render_.set_fore_color(CH0_COLOR);
 					render_.line(vtx::spos(x, ofs + y0), vtx::spos(x + 1, ofs + y1));
 				}
 				{
 					int16_t ofs = ch1_vpos_ + 272 / 2;
-					int16_t y0 = d0.ch1_;
+					int16_t y0 = d0.x;
 					y0 -= 2048;
 					y0 /= -17;
-					int16_t y1 = d1.ch1_;
+					int16_t y1 = d1.y;
 					y1 -= 2048;
 					y1 /= -17;
-					render_.set_fore_color(DEF_COLOR::Fuchsi);
+					render_.set_fore_color(CH1_COLOR);
 					render_.line(vtx::spos(x, ofs + y0), vtx::spos(x + 1, ofs + y1));
 				}
 			}
