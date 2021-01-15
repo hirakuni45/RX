@@ -1409,6 +1409,7 @@ namespace device {
 		}
 
 
+		// 割り込みグループタスクの場合、割り込み関数として宣言しない事。
 		static void line_detect_isr_()
 		{
 			callback_args_t args;
@@ -1436,6 +1437,7 @@ namespace device {
 		}
 
 
+		// 割り込みグループタスクの場合、割り込み関数として宣言しない事。
 		static void underflow_1_isr_()
 		{
 			callback_args_t args;
@@ -1450,6 +1452,7 @@ namespace device {
 		}
 
 
+		// 割り込みグループタスクの場合、割り込み関数として宣言しない事。
 		static void underflow_2_isr_()
 		{
 			callback_args_t args;
