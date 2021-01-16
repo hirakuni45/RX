@@ -31,7 +31,7 @@ namespace vtx {
 		return x;
 	}
 #else
-	inline float fsqrt(float x) { return std::sqrtf(x); }
+	inline float fsqrt(float x) { return std::sqrt(x); }
 #endif
 
 	template <typename T>
@@ -218,63 +218,63 @@ namespace vtx {
 		T	x;
 		T	y;
 
-		inline vertex2() { }
-		inline vertex2(const spos& v) : x(v.x), y(v.y) { }
-		inline vertex2(const ipos& v) : x(v.x), y(v.y) { }
-		inline vertex2(const fpos& v) : x(v.x), y(v.y) { }
-		inline vertex2(const dpos& v) : x(v.x), y(v.y) { }
-		explicit inline vertex2(T c) : x(c), y(c) { }
-		inline vertex2(T xx, T yy) : x(xx), y(yy) { }
+		vertex2() { }
+		constexpr vertex2(const spos& v) : x(v.x), y(v.y) { }
+		constexpr vertex2(const ipos& v) : x(v.x), y(v.y) { }
+		constexpr vertex2(const fpos& v) : x(v.x), y(v.y) { }
+		constexpr vertex2(const dpos& v) : x(v.x), y(v.y) { }
+		explicit constexpr vertex2(T c) : x(c), y(c) { }
+		constexpr vertex2(T xx, T yy) : x(xx), y(yy) { }
 
-		inline const T* getXY() const { return &x; }
+		const T* getXY() const { return &x; }
 
-		inline T sqrX() const { return x * x; }
-		inline T sqrY() const { return y * y; }
-		inline T sqr() const { return sqrX() + sqrY(); }
-		inline T len() const { return fsqrt(sqr()); }
+		T sqrX() const { return x * x; }
+		T sqrY() const { return y * y; }
+		T sqr() const { return sqrX() + sqrY(); }
+		T len() const { return fsqrt(sqr()); }
 
-		inline T min() const { return x < y ? x : y; }
-		inline T max() const { return x > y ? x : y; }
+		T min() const { return x < y ? x : y; }
+		T max() const { return x > y ? x : y; }
 
-		inline void set(T c) { x = y = c; }
-		inline void set(T xx, T yy) { x = xx; y = yy; }
-		inline void set(const vertex2& v) { x = v.x; y = v.y; }
+		void set(T c) { x = y = c; }
+		void set(T xx, T yy) { x = xx; y = yy; }
+		void set(const vertex2& v) { x = v.x; y = v.y; }
 
-		inline void add(T c) { x += c; y += c; }
-		inline void add(T xx, T yy) { x += xx; y += yy; }
-		inline void add(const vertex2<T>& v) { x += v.x; y += v.y; }
-		inline void sub(T c) { x -= c; y -= c; }
-		inline void sub(T xx, T yy) { x -= xx; y -= yy; }
-		inline void sub(const vertex2<T>& v) { x -= v.x; y -= v.y; }
-		inline void mul(T c) { x *= c; y *= c; }
-		inline void mul(T xx, T yy) { x *= xx; y *= yy; }
-		inline void mul(const vertex2<T>& v) { x *= v.x; y *= v.y; }
-		inline void div(T c) { x /= c; y /= c; }
-		inline void div(T xx, T yy) { x /= xx; y /= yy; }
-		inline void div(const vertex2<T>& v) { x /= v.x; y /= v.y; }
+		void add(T c) { x += c; y += c; }
+		void add(T xx, T yy) { x += xx; y += yy; }
+		void add(const vertex2<T>& v) { x += v.x; y += v.y; }
+		void sub(T c) { x -= c; y -= c; }
+		void sub(T xx, T yy) { x -= xx; y -= yy; }
+		void sub(const vertex2<T>& v) { x -= v.x; y -= v.y; }
+		void mul(T c) { x *= c; y *= c; }
+		void mul(T xx, T yy) { x *= xx; y *= yy; }
+		void mul(const vertex2<T>& v) { x *= v.x; y *= v.y; }
+		void div(T c) { x /= c; y /= c; }
+		void div(T xx, T yy) { x /= xx; y /= yy; }
+		void div(const vertex2<T>& v) { x /= v.x; y /= v.y; }
 
-		static inline T dot(const vertex2& a, const vertex2& b) { return a.x * b.x + a.y * b.y; }
-		static inline T cross(const vertex2& a, const vertex2& b) { return a.x * b.y - a.y * b.x; }
+		static T dot(const vertex2& a, const vertex2& b) { return a.x * b.x + a.y * b.y; }
+		static T cross(const vertex2& a, const vertex2& b) { return a.x * b.y - a.y * b.x; }
 
 		// Method necessary for using「boost/unordered_map」
-		inline bool operator == (const vertex2<T>& v) const {
+		bool operator == (const vertex2<T>& v) const {
 			if(x == v.x && y == v.y) return true;
 			else return false;
 		}
 
-		inline bool operator != (const vertex2<T>& v) const {
+		bool operator != (const vertex2<T>& v) const {
 			if(x == v.x && y == v.y) return false;
 			else return true;
 		}
 
-		inline size_t hash() const {
+		size_t hash() const {
 			size_t h = 0;
 			boost::hash_combine(h, x);
 			boost::hash_combine(h, y);
 			return h;
 		}
 
-		inline vertex2& operator = (T c) { set(c); return *this; }
+		vertex2& operator = (T c) { set(c); return *this; }
 
 		vertex2& operator = (const spos& v) {
 			set(static_cast<T>(v.x), static_cast<T>(v.y)); return *this;
@@ -289,47 +289,47 @@ namespace vtx {
 			set(static_cast<T>(v.x), static_cast<T>(v.y)); return *this;
 		}
 
-		inline vertex2& operator += (const vertex2& v) { add(v); return *this; }
-		inline vertex2& operator += (T c) { add(c); return *this; }
-		inline vertex2 operator + (T c) const {
+		vertex2& operator += (const vertex2& v) { add(v); return *this; }
+		vertex2& operator += (T c) { add(c); return *this; }
+		vertex2 operator + (T c) const {
 			vertex2 t(x + c, y + c);
 			return t;
 		}
-		inline vertex2 operator + (const vertex2& v) const {
+		vertex2 operator + (const vertex2& v) const {
 			vertex2	t(x + v.x, y + v.y);
 			return t;
 		}
 
-		inline vertex2& operator -= (const vertex2& v) { sub(v); return *this; }
-		inline vertex2& operator -= (T c) { sub(c); return *this; }
-		inline vertex2 operator - (T c) const {
+		vertex2& operator -= (const vertex2& v) { sub(v); return *this; }
+		vertex2& operator -= (T c) { sub(c); return *this; }
+		vertex2 operator - (T c) const {
 			vertex2	t(x - c, y - c);
 			return t;
 		}
-		inline vertex2 operator - (const vertex2& v) const {
+		vertex2 operator - (const vertex2& v) const {
 			vertex2 t(x, y);
 			t.sub(v);
 			return t;
 		}
 
-		inline vertex2& operator *= (T c) { mul(c); return *this; }
-		inline vertex2& operator *= (const vertex2& v) { mul(v);  return *this; }
-		inline vertex2 operator * (const vertex2& v) const {
+		vertex2& operator *= (T c) { mul(c); return *this; }
+		vertex2& operator *= (const vertex2& v) { mul(v);  return *this; }
+		vertex2 operator * (const vertex2& v) const {
 			vertex2	t(x * v.x, y * v.y);
 			return t;
 		}
-		inline vertex2 operator * (T c) const {
+		vertex2 operator * (T c) const {
 			vertex2	t(x * c, y * c);
 			return t;
 		}
 
-		inline vertex2& operator /= (T c) { div(c); return *this; }
-		inline vertex2& operator /= (const vertex2& v) { div(v); return *this; }
-		inline vertex2 operator / (T c) const {
+		vertex2& operator /= (T c) { div(c); return *this; }
+		vertex2& operator /= (const vertex2& v) { div(v); return *this; }
+		vertex2 operator / (T c) const {
 			vertex2	t(x / c, y / c);
 			return t;
 		}
-		inline vertex2 operator / (const vertex2& v) const {
+		vertex2 operator / (const vertex2& v) const {
 			vertex2	t(x / v.x, y / v.y);
 			return t;
 		}
@@ -940,10 +940,10 @@ namespace vtx {
 		vertex2<T>		size;	///< サイズ
 
 		rectangle() { }
-		rectangle(T v) : org(v), size(v) { }
-		rectangle(T x, T y, T w, T h) : org(x, y), size(w, h) { }
-		rectangle(const vertex2<T>& org_, const vertex2<T>& size_) : org(org_), size(size_) { }
-		rectangle(const rectangle<T>& r) : org(r.org), size(r.size) { }
+		constexpr rectangle(T v) : org(v), size(v) { }
+		constexpr rectangle(T x, T y, T w, T h) : org(x, y), size(w, h) { }
+		constexpr rectangle(const vertex2<T>& org_, const vertex2<T>& size_) : org(org_), size(size_) { }
+		constexpr rectangle(const rectangle<T>& r) : org(r.org), size(r.size) { }
 
 		void set(T x, T y, T w, T h) { org.set(x, y); size.set(w, h); }
 		void set(const vertex2<T>& org_, const vertex2<T>& size_) { org = org_; size = size_; }
