@@ -58,6 +58,7 @@ namespace dsos {
 		MENU		trg_menu_;
 		MENU		smp_unit_menu_;
 		MENU		smp_fine_menu_;
+		MENU		mes_menu_;
 
 		uint8_t		smp_unit_;
 		uint8_t		smp_fine_;
@@ -96,29 +97,28 @@ namespace dsos {
 		{
 			const char* p = nullptr;
 			switch(smp_unit_) {
-			case 0:  // 1us
-				p = "1us,2us,5us";
+			case 0:
+				p = SMP_FINE0_STR;
 				break;
-			case 1:  // 10us
-				p = "10us,20us,50us";
+			case 1:
+				p = SMP_FINE1_STR;
 				break;
-			case 2:  // 100us
-				p = "100us,200us,500us";
+			case 2:
+				p = SMP_FINE2_STR;
 				break;
-			case 3:  // 1ms
-				p = "1ms,2ms,5ms";
+			case 3:
+				p = SMP_FINE3_STR;
 				break;
-			case 4:  // 10ms
-				p = "10ms,20ms,50ms";
+			case 4:
+				p = SMP_FINE4_STR;
 				break;
-			case 5:  // 100ms
-				p = "100ms,200ms,500ms";
+			case 5:
+				p = SMP_FINE4_STR;
 				break;
 			default:
 				break;
 			}
 			smp_fine_menu_.set_title(p);
-			smp_fine_menu_.set_select_pos(0);
 		}
 
 
@@ -147,9 +147,9 @@ namespace dsos {
 			ch1_mode_menu_(vtx::srect(442-90*2, 16, 80, 0), CAPTURE::CH_MODE_STR),
 			ch1_volt_menu_(vtx::srect(442-90*1, 16, 80, 0), CAPTURE::CH_VOLT_STR),
 			trg_menu_(vtx::srect(442-100, 16, 90, 0), CAPTURE::TRG_MODE_STR),
-			smp_unit_menu_(vtx::srect(442-90*2, 16, 80, 0),
-				"1us,10us,100us,1ms,10ms,100ms", false),
+			smp_unit_menu_(vtx::srect(442-90*2, 16, 80, 0), SMP_UNIT_STR, false),
 			smp_fine_menu_(vtx::srect(442-90*1, 16, 80, 0), ""),
+			mes_menu_(vtx::srect(442-90*1, 16, 80, 0), MES_MODE_STR),
 			smp_unit_(0), smp_fine_(0)
 		{ }
 
@@ -190,6 +190,7 @@ namespace dsos {
 				}
 			};
 
+			smp_btn_.set_base_color(SMP_COLOR);
 			smp_btn_.enable();
 			smp_btn_.at_select_func() = [=](uint32_t id) {
 				bool ena = smp_unit_menu_.get_state() == WIDGET::STATE::ENABLE;
@@ -197,15 +198,28 @@ namespace dsos {
 				setup_smp_fine_();
 				smp_fine_menu_.enable(!ena);
 				side_button_stall_(smp_btn_, !ena);
+				if(ena) {
+					auto smp = static_cast<SMP_MODE>(smp_fine_menu_.get_select_pos()
+						+ smp_unit_menu_.get_select_pos() * SMP_FINE_NUM);
+					render_wave_.set_smp_mode(smp);
+				}
 			};
 
+			mes_btn_.set_base_color(MES_COLOR);
 			mes_btn_.enable();
 			mes_btn_.at_select_func() = [=](uint32_t id) {
-//				side_button_stall_(mes_btn_, !ena);
+				bool ena = mes_menu_.get_state() == WIDGET::STATE::ENABLE;
+				mes_menu_.enable(!ena);
+				side_button_stall_(mes_btn_, !ena);
+				if(ena) {
+					render_wave_.set_measere(static_cast<MEASERE>(mes_menu_.get_select_pos()));
+				}
 			};
+			mes_menu_.set_base_color(MES_COLOR);
 
 			opt_btn_.enable();
 			opt_btn_.at_select_func() = [=](uint32_t id) {
+//				bool ena = opt_menu_.get_state() == WIDGET::STATE::ENABLE;
 //				side_button_stall_(opt_btn_, !ena);
 			};
 
@@ -215,13 +229,12 @@ namespace dsos {
 			ch1_volt_menu_.set_base_color(CH1_COLOR);
 			trg_menu_.set_base_color(TRG_COLOR);
 
-			trg_menu_.at_select_func() = [=](uint32_t pos, uint32_t num) {
-			};
-
+			smp_unit_menu_.set_base_color(SMP_COLOR);
 			smp_unit_menu_.at_select_func() = [=](uint32_t pos, uint32_t num) {
 				smp_unit_ = pos;
 				setup_smp_fine_();
 			};
+			smp_fine_menu_.set_base_color(SMP_COLOR);
 			smp_fine_menu_.at_select_func() = [=](uint32_t pos, uint32_t num) {
 				smp_fine_ = pos;
 			};
@@ -249,6 +262,8 @@ namespace dsos {
 			} else if(trg_menu_.get_state() == gui::widget::STATE::ENABLE) {
 				++n;
 			} else if(smp_unit_menu_.get_state() == gui::widget::STATE::ENABLE) {
+				++n;
+			} else if(mes_menu_.get_state() == gui::widget::STATE::ENABLE) {
 				++n;
 			}
 

@@ -14,78 +14,11 @@
 #include "common/renesas.hpp"
 #endif
 
+#include "render_base.hpp"
 #include "common/vtx.hpp"
 #include "common/string_utils.hpp"
 
-namespace utils {
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
-		@brief  キャプチャー・ベースクラス
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	struct capture_base {
-
-		/// グリッド単位数
-		static const int16_t GRID = 40;
-
-		/// チャネル・モード文字列
-		static constexpr char CH_MODE_STR[] = "AC,GND,DC,OFF";
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  チャネル・モード型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CH_MODE : uint8_t {
-			AC,
-			GND,
-			DC,
-			OFF
-		};
-
-		/// チャネル・電圧文字列
-		static constexpr char CH_VOLT_STR[] = "5V,1V,500mV,100mV,50mV,10mV";
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  チャネル・電圧型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class CH_VOLT : uint8_t {
-			_5V,
-			_1V,
-			_500mV,
-			_100mV,
-			_50mV,
-			_10mV
-		};
-
-
-		/// トリガー文字列
-		static constexpr char TRG_MODE_STR[] = "None,One,Run,CH0-Pos,CH1-Pos,CH0-Neg,CH1-Neg";
-
-
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief  チャネル・電圧型
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class TRG_MODE : uint8_t {
-			NONE,		///< 何もしない
-			ONE,		///< ワンショット
-			RUN,		///< フリーランニング
-			CH0_POS,	///< CH0 立ち上がりエッジ
-			CH1_POS,	///< CH1 立ち上がりエッジ
-			CH0_NEG,	///< CH0 立ち下がりエッジ
-			CH1_NEG,	///< CH1 立ち下がりエッジ
-		};
-
-		typedef vtx::spos DATA;
-	};
-
+namespace dsos {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
@@ -93,7 +26,9 @@ namespace utils {
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t CAPN>
-	class capture : public capture_base {
+	class capture : public render_base {
+
+		typedef vtx::spos DATA;
 
 #ifndef GLFW_SIM
 		typedef device::S12AD  ADC0;
