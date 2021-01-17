@@ -67,6 +67,11 @@ namespace dsos {
 		int16_t		trg_org_;
 		int16_t		trg_pos_;
 
+		CH_MODE		ch0_mode_;
+		CH_MODE		ch1_mode_;
+		CH_VOLT		ch0_volt_;
+		CH_VOLT		ch1_volt_;
+		TRG_MODE	trg_mode_;
 		SMP_MODE	smp_mode_;
 
 		MEASERE		measere_;
@@ -139,6 +144,21 @@ namespace dsos {
 		}
 
 
+		void make_volt_(int16_t val, int32_t unit_mv, char* tmp, uint32_t len)
+		{
+			auto n = (val * unit_mv) / GRID;
+			int32_t div = 1;
+			const char* units = "mV";
+			if(std::abs(n) >= 1000) {
+				div = 1000;
+				n /= div;
+				units = "V";
+			}
+			auto m = std::abs(val * unit_mv * 100 / div) % GRID;
+			utils::sformat("%d.%d %s", tmp, len) % n % m % units;
+		}
+
+
 		void make_rate_(int16_t val, int32_t unit_ms, char* str, uint32_t len)
 		{
 			int32_t n = val * unit_ms / GRID;
@@ -167,9 +187,12 @@ namespace dsos {
 			render_(render), touch_(touch), capture_(capture),
 			dialog_(render, touch),
 			time_org_(0), time_pos_(0),
-			ch0_vorg_(0), ch0_vpos_(0),
-			ch1_vorg_(0), ch1_vpos_(0),
+			ch0_vorg_(272/2), ch0_vpos_(272/2),
+			ch1_vorg_(272/2), ch1_vpos_(272/2),
 			trg_org_(272/2), trg_pos_(272/2),
+			ch0_mode_(CH_MODE::AC), ch1_mode_(CH_MODE::AC),
+			ch0_volt_(CH_VOLT::_5V), ch1_volt_(CH_VOLT::_5V),
+			trg_mode_(TRG_MODE::NONE),
 			smp_mode_(SMP_MODE::_1us),
 			measere_(MEASERE::OFF),
 			mes_time_0_org_(220), mes_time_0_pos_(220), mes_time_1_org_(220), mes_time_1_pos_(220),
@@ -181,11 +204,47 @@ namespace dsos {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  メジャー（計測）モードの設定
-			@param[in]	mes	計測型
+			@brief  CH0 モード設定
+			@param[in]	mode	チャネル・モード型
 		*/
 		//-----------------------------------------------------------------//
-		void set_measere(MEASERE mes) noexcept { measere_ = mes; }
+		void set_ch0_mode(CH_MODE mode) noexcept { ch0_mode_ = mode; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CH0 電圧レンジ設定
+			@param[in]	volt	電圧レンジ型
+		*/
+		//-----------------------------------------------------------------//
+		void set_ch0_volt(CH_VOLT volt) noexcept { ch0_volt_ = volt; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CH1 モード設定
+			@param[in]	mode	チャネル・モード型
+		*/
+		//-----------------------------------------------------------------//
+		void set_ch1_mode(CH_MODE mode) noexcept { ch1_mode_ = mode; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CH1 電圧レンジ設定
+			@param[in]	volt	電圧レンジ型
+		*/
+		//-----------------------------------------------------------------//
+		void set_ch1_volt(CH_VOLT volt) noexcept { ch1_volt_ = volt; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  トリガー型設定
+			@param[in]	trg	トリガー型
+		*/
+		//-----------------------------------------------------------------//
+		void set_trg_mode(TRG_MODE trg) noexcept { trg_mode_ = trg; }
 
 
 		//-----------------------------------------------------------------//
@@ -195,6 +254,15 @@ namespace dsos {
 		*/
 		//-----------------------------------------------------------------//
 		void set_smp_mode(SMP_MODE smp) noexcept { smp_mode_ = smp; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  メジャー（計測）モードの設定
+			@param[in]	mes	計測型
+		*/
+		//-----------------------------------------------------------------//
+		void set_measere(MEASERE mes) noexcept { measere_ = mes; }
 
 
 		//-----------------------------------------------------------------//
@@ -236,7 +304,8 @@ namespace dsos {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  サンプリング情報描画
+			@brief  サンプリング情報描画 @n
+					※上段の情報ライン
 			@param[in]	ch	チャネル
 		*/
 		//-----------------------------------------------------------------//
@@ -247,15 +316,35 @@ namespace dsos {
 			render_.set_fore_color(DEF_COLOR::White);
 			if(measere_ == MEASERE::OFF) {
 				char tmp[16];
-				utils::sformat("%s", tmp, sizeof(tmp)) % get_smp_str(smp_mode_);
+				utils::sformat("%s/div, ", tmp, sizeof(tmp)) % get_smp_str(smp_mode_);
 				auto x = render_.draw_text(vtx::spos(0, 0), tmp);
+				x = render_.draw_text(vtx::spos(x, 0), get_trg_mode_str(trg_mode_));
+				if(trg_mode_ == TRG_MODE::CH0_POS || trg_mode_ == TRG_MODE::CH0_NEG) {
+					x = render_.draw_text(vtx::spos(x, 0), ": ");
+					auto v = ch0_vpos_ - trg_pos_;
+					make_volt_(v, get_volt(ch0_volt_), tmp, sizeof(tmp));
+					x = render_.draw_text(vtx::spos(x, 0), tmp);
+				} else if(trg_mode_ == TRG_MODE::CH1_POS || trg_mode_ == TRG_MODE::CH1_NEG) {
+					x = render_.draw_text(vtx::spos(x, 0), ": ");
+					auto v = ch1_vpos_ - trg_pos_;
+					make_volt_(v, get_volt(ch1_volt_), tmp, sizeof(tmp));
+					x = render_.draw_text(vtx::spos(x, 0), tmp);
+				}
+			} else if(measere_ == MEASERE::VOLT) {
+				auto d = mes_volt_1_pos_ - mes_volt_0_pos_;
+				auto x = render_.draw_text(vtx::spos(0, 0), "CH0: ");
+				char tmp[16];
+				make_volt_(d, get_volt(ch0_volt_), tmp, sizeof(tmp));
+				x = render_.draw_text(vtx::spos(x, 0), tmp);
+				x += 8;
+				x = render_.draw_text(vtx::spos(x, 0), ", CH1: ");
+				make_volt_(d, get_volt(ch1_volt_), tmp, sizeof(tmp));
+				x = render_.draw_text(vtx::spos(x, 0), tmp);
 			} else if(measere_ == MEASERE::TIME) {
 				auto d = mes_time_1_pos_ - mes_time_0_pos_;
 				char tmp[16];
 				make_rate_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
 				auto x = render_.draw_text(vtx::spos(0, 0), tmp);
-			} else if(measere_ == MEASERE::VOLT) {
-
 			}
 		}
 
@@ -268,26 +357,22 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		void draw_channel_info(uint32_t ch) noexcept
 		{
-#if 0
 			char tmp[32];
 			if(ch == 0) {
+				render_.set_fore_color(DEF_COLOR::Black);
+				render_.fill_box(vtx::srect(0, 272 - 16 + 1, 240, 15));
 				render_.set_fore_color(CH0_COLOR);
-				render_.fill_box(vtx::srect(  0, 272 - 16 + 1, 15, 15));
-				render_.set_fore_color(DEF_COLOR::Black);
-				render_.fill_box(vtx::srect( 16, 272 - 16 + 1, 240 - 16, 15));
-				render_.set_fore_color(DEF_COLOR::White);
-				utils::sformat("CH0: %s [V]", tmp, sizeof(tmp)) % divs[ch0_div_];
-				render_.draw_text(vtx::spos(  16, 272 - 16 + 1), tmp);
+				utils::sformat("0: %s, %s/div", tmp, sizeof(tmp))
+					% get_ch_mode_str(ch0_mode_) % get_ch_volt_str(ch0_volt_);
+				render_.draw_text(vtx::spos(0, 272 - 16 + 1), tmp);
 			} else {
-				render_.set_fore_color(CH1_COLOR);
-				render_.fill_box(vtx::srect(240, 272 - 16 + 1, 15, 15));
-				utils::sformat("CH1: %s [V]", tmp, sizeof(tmp)) % divs[ch1_div_];
 				render_.set_fore_color(DEF_COLOR::Black);
-				render_.fill_box(vtx::srect(240 + 16, 272 - 16 + 1, 240 - 16, 15));
-				render_.set_fore_color(DEF_COLOR::White);
-				render_.draw_text(vtx::spos(240 + 16, 272 - 16 + 1), tmp);
+				render_.fill_box(vtx::srect(240, 272 - 16 + 1, 240, 15));
+				render_.set_fore_color(CH1_COLOR);
+				utils::sformat("1: %s, %s/div", tmp, sizeof(tmp))
+					% get_ch_mode_str(ch1_mode_) % get_ch_volt_str(ch1_volt_);
+				render_.draw_text(vtx::spos(240, 272 - 16 + 1), tmp);
 			}
-#endif
 		}
 
 
@@ -432,25 +517,21 @@ namespace dsos {
 				}
 				const auto& d0 = capture_.get(p0);
 				const auto& d1 = capture_.get(p1);
-				{
-					int16_t ofs = ch0_vpos_ + 272 / 2;
+				if(ch0_mode_ != CH_MODE::OFF) {
+					int16_t ofs = ch0_vpos_;
 					int16_t y0 = d0.x;
-					y0 -= 2048;
-					y0 /= -17;
+			y0 /= -17;
 					int16_t y1 = d1.y;
-					y1 -= 2048;
-					y1 /= -17;
+			y1 /= -17;
 					render_.set_fore_color(CH0_COLOR);
 					render_.line(vtx::spos(x, ofs + y0), vtx::spos(x + 1, ofs + y1));
 				}
-				{
-					int16_t ofs = ch1_vpos_ + 272 / 2;
+				if(ch1_mode_ != CH_MODE::OFF) {
+					int16_t ofs = ch1_vpos_;
 					int16_t y0 = d0.x;
-					y0 -= 2048;
-					y0 /= -17;
+			y0 /= -17;
 					int16_t y1 = d1.y;
-					y1 -= 2048;
-					y1 /= -17;
+			y1 /= -17;
 					render_.set_fore_color(CH1_COLOR);
 					render_.line(vtx::spos(x, ofs + y0), vtx::spos(x + 1, ofs + y1));
 				}

@@ -39,6 +39,16 @@ namespace dsos {
 		};
 
 
+		const char* get_ch_mode_str(CH_MODE mode)
+		{
+			static char tmp[8];
+			tmp[0] = 0;
+			auto n = static_cast<uint8_t>(mode);
+			utils::str::get_word(CH_MODE_STR, n, tmp, sizeof(tmp), ',');
+			return tmp;
+		}
+
+
 		/// チャネル・電圧文字列
 		static constexpr char CH_VOLT_STR[] = "5V,1V,500mV,100mV,50mV,10mV";
 
@@ -56,6 +66,32 @@ namespace dsos {
 			_50mV,
 			_10mV
 		};
+
+
+		const char* get_ch_volt_str(CH_VOLT volt)
+		{
+			static char tmp[8];
+			tmp[0] = 0;
+			auto n = static_cast<uint8_t>(volt);
+			utils::str::get_word(CH_VOLT_STR, n, tmp, sizeof(tmp), ',');
+			return tmp;
+		}
+
+
+		static constexpr int32_t VOLT_MV[] = {
+			5000,
+			1000,
+			 500,
+			 100,
+			  50,
+			  10
+		};
+
+
+		static int32_t get_volt(CH_VOLT val)
+		{
+			return VOLT_MV[static_cast<uint8_t>(val)];
+		}
 
 
 		/// トリガー文字列
@@ -76,6 +112,16 @@ namespace dsos {
 			CH0_NEG,	///< CH0 立ち下がりエッジ
 			CH1_NEG,	///< CH1 立ち下がりエッジ
 		};
+
+
+		const char* get_trg_mode_str(TRG_MODE trg)
+		{
+			static char tmp[16];
+			tmp[0] = 0;
+			auto n = static_cast<uint8_t>(trg);
+			utils::str::get_word(TRG_MODE_STR, n, tmp, sizeof(tmp), ',');
+			return tmp;
+		}
 
 
 		/// サンプリング・ユニット文字列
