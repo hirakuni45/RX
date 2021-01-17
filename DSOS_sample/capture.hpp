@@ -310,11 +310,11 @@ namespace dsos {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  トリガー設定
-			@param[in]	trg		トリガー種別
+			@brief  トリガー型設定
+			@param[in]	trg		トリガー型
 		*/
 		//-----------------------------------------------------------------//
-		void set_trigger(TRG_MODE trg_mode) noexcept
+		void set_trg_mode(TRG_MODE trg_mode) noexcept
 		{
 			at_cap_task().pos_ = 0;
 			at_cap_task().dlt_ = 0;

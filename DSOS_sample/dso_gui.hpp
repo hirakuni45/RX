@@ -168,6 +168,12 @@ namespace dsos {
 				ch0_mode_menu_.enable(!ena);
 				ch0_volt_menu_.enable(!ena);
 				side_button_stall_(ch0_btn_, !ena);
+				if(ena) {  // メニューを閉じる瞬間
+					auto mode = static_cast<CH_MODE>(ch0_mode_menu_.get_select_pos());
+					render_wave_.set_ch0_mode(mode);
+					auto vol = static_cast<CH_VOLT>(ch0_volt_menu_.get_select_pos());
+					render_wave_.set_ch0_volt(vol);
+				}
 			};
 
 			ch1_btn_.set_base_color(CH1_COLOR);
@@ -177,6 +183,12 @@ namespace dsos {
 				ch1_mode_menu_.enable(!ena);
 				ch1_volt_menu_.enable(!ena);
 				side_button_stall_(ch1_btn_, !ena);
+				if(ena) {  // メニューを閉じる瞬間
+					auto mode = static_cast<CH_MODE>(ch1_mode_menu_.get_select_pos());
+					render_wave_.set_ch1_mode(mode);
+					auto vol = static_cast<CH_VOLT>(ch1_volt_menu_.get_select_pos());
+					render_wave_.set_ch1_volt(vol);
+				}
 			};
 
 			trg_btn_.set_base_color(TRG_COLOR);
@@ -186,7 +198,9 @@ namespace dsos {
 				trg_menu_.enable(!ena);
 				side_button_stall_(trg_btn_, !ena);
 				if(ena) {  // メニューを閉じる瞬間
-					capture_.set_trigger(static_cast<typename CAPTURE::TRG_MODE>(trg_menu_.get_select_pos()));
+					auto trg = static_cast<TRG_MODE>(trg_menu_.get_select_pos());
+					capture_.set_trg_mode(trg);
+					render_wave_.set_trg_mode(trg);
 				}
 			};
 
@@ -240,7 +254,7 @@ namespace dsos {
 			};
 
 			capture_tic_ = capture_.get_capture_tic();
-			capture_.set_trigger(CAPTURE::TRG_MODE::ONE);
+			capture_.set_trg_mode(TRG_MODE::ONE);
 		}
 
 
