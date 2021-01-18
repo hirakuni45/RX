@@ -67,9 +67,11 @@ namespace dsos {
 		int16_t		trg_org_;
 		int16_t		trg_pos_;
 
+		CH_MULT		ch0_mult_;
 		CH_MODE		ch0_mode_;
-		CH_MODE		ch1_mode_;
 		CH_VOLT		ch0_volt_;
+		CH_MULT		ch1_mult_;
+		CH_MODE		ch1_mode_;
 		CH_VOLT		ch1_volt_;
 		TRG_MODE	trg_mode_;
 		SMP_MODE	smp_mode_;
@@ -190,8 +192,8 @@ namespace dsos {
 			ch0_vorg_(272/2), ch0_vpos_(272/2),
 			ch1_vorg_(272/2), ch1_vpos_(272/2),
 			trg_org_(272/2), trg_pos_(272/2),
-			ch0_mode_(CH_MODE::AC), ch1_mode_(CH_MODE::AC),
-			ch0_volt_(CH_VOLT::_5V), ch1_volt_(CH_VOLT::_5V),
+			ch0_mult_(CH_MULT::X1), ch0_mode_(CH_MODE::AC), ch0_volt_(CH_VOLT::_5V),
+			ch1_mult_(CH_MULT::X1), ch1_mode_(CH_MODE::AC), ch1_volt_(CH_VOLT::_5V),
 			trg_mode_(TRG_MODE::NONE),
 			smp_mode_(SMP_MODE::_1us),
 			measere_(MEASERE::OFF),
@@ -200,6 +202,24 @@ namespace dsos {
 			touch_down_(false), touch_num_(0),
 			area_(AREA::NONE)
 		{ }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CH0 倍率設定
+			@param[in]	mult	チャネル倍率型
+		*/
+		//-----------------------------------------------------------------//
+		void set_ch0_mult(CH_MULT mult) noexcept { ch0_mult_ = mult; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  CH1 倍率設定
+			@param[in]	mult	チャネル倍率型
+		*/
+		//-----------------------------------------------------------------//
+		void set_ch1_mult(CH_MULT mult) noexcept { ch1_mult_ = mult; }
 
 
 		//-----------------------------------------------------------------//
@@ -362,14 +382,14 @@ namespace dsos {
 				render_.set_fore_color(DEF_COLOR::Black);
 				render_.fill_box(vtx::srect(0, 272 - 16 + 1, 240, 15));
 				render_.set_fore_color(CH0_COLOR);
-				utils::sformat("0: %s, %s/div", tmp, sizeof(tmp))
+				utils::sformat("0.%s: %s, %s/div", tmp, sizeof(tmp)) % get_ch_mult_str(ch0_mult_)
 					% get_ch_mode_str(ch0_mode_) % get_ch_volt_str(ch0_volt_);
 				render_.draw_text(vtx::spos(0, 272 - 16 + 1), tmp);
 			} else {
 				render_.set_fore_color(DEF_COLOR::Black);
 				render_.fill_box(vtx::srect(240, 272 - 16 + 1, 240, 15));
 				render_.set_fore_color(CH1_COLOR);
-				utils::sformat("1: %s, %s/div", tmp, sizeof(tmp))
+				utils::sformat("1.%s: %s, %s/div", tmp, sizeof(tmp)) % get_ch_mult_str(ch1_mult_)
 					% get_ch_mode_str(ch1_mode_) % get_ch_volt_str(ch1_volt_);
 				render_.draw_text(vtx::spos(240, 272 - 16 + 1), tmp);
 			}
@@ -521,14 +541,14 @@ namespace dsos {
 					int16_t ofs = ch0_vpos_;
 					int16_t y0 = d0.x;
 			y0 /= -17;
-					int16_t y1 = d1.y;
+					int16_t y1 = d1.x;
 			y1 /= -17;
 					render_.set_fore_color(CH0_COLOR);
 					render_.line(vtx::spos(x, ofs + y0), vtx::spos(x + 1, ofs + y1));
 				}
 				if(ch1_mode_ != CH_MODE::OFF) {
 					int16_t ofs = ch1_vpos_;
-					int16_t y0 = d0.x;
+					int16_t y0 = d0.y;
 			y0 /= -17;
 					int16_t y1 = d1.y;
 			y1 /= -17;

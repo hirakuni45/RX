@@ -22,6 +22,32 @@ namespace dsos {
 		/// グリッド単位数
 		static const int16_t GRID = 40;
 
+
+		/// チャネル・倍率文字列
+		static constexpr char CH_MULT_STR[] = "X1,X10";
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  チャネル・倍率型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class CH_MULT : uint8_t {
+			X1,
+			X10
+		};
+
+
+		const char* get_ch_mult_str(CH_MULT mult)
+		{
+			static char tmp[8];
+			tmp[0] = 0;
+			auto n = static_cast<uint8_t>(mult);
+			utils::str::get_word(CH_MULT_STR, n, tmp, sizeof(tmp), ',');
+			return tmp;
+		}
+
+
 		/// チャネル・モード文字列
 		static constexpr char CH_MODE_STR[] = "AC,GND,DC,OFF";
 
