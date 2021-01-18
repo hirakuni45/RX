@@ -161,9 +161,9 @@ namespace dsos {
 		}
 
 
-		void make_rate_(int16_t val, int32_t unit_ms, char* str, uint32_t len)
+		void make_rate_(int16_t val, int32_t unit_us, char* str, uint32_t len)
 		{
-			int32_t n = val * unit_ms / GRID;
+			int32_t n = val * unit_us / GRID;
 			int32_t div = 1;
 			const char* units = "us";
 			if(std::abs(n) >= 1000) {
@@ -171,10 +171,28 @@ namespace dsos {
 				n /= div;
 				units = "ms";
 			}
-			int32_t m = std::abs(val * unit_ms * 100 / div / GRID) % 100;
-			utils::sformat("%d.%d %s", str, len) % n % m % units;
+			int32_t m = std::abs(val * unit_us * 100 / div / GRID) % 100;
+			utils::sformat("%d.%d%s", str, len) % n % m % units;
 		}
 
+
+		void make_freq_(int16_t val, int32_t unit_us, char* str, uint32_t len)
+		{
+			if(val == 0) {
+				str[0] = 0;
+				return;
+			}
+			auto a = 1.0f / (static_cast<float>(val * unit_us) / static_cast<float>(GRID) * 1e-6);
+			if(a < 1000.0f) {
+				utils::sformat("%3.2fHz", str, len) % a;
+			} else if(a < 1e6) {
+				a *= 1e-3;
+				utils::sformat("%2.1fKHz", str, len) % a;
+			} else {
+				a *= 1e-6;
+				utils::sformat("%2.1fMHz", str, len) % a;
+			}
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -365,6 +383,9 @@ namespace dsos {
 				char tmp[16];
 				make_rate_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
 				auto x = render_.draw_text(vtx::spos(0, 0), tmp);
+				make_freq_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
+				x += 8;
+				x = render_.draw_text(vtx::spos(x, 0), tmp);
 			}
 		}
 
@@ -529,12 +550,16 @@ namespace dsos {
 				render_.line(vtx::spos(0, trg_pos_), vtx::spos(440-14, trg_pos_));
 			}
 
+			auto sr = static_cast<float>(get_smp_rate(smp_mode_) * 1e-6
+				/ static_cast<float>(GRID));
+			auto step = sr / (1.0f / static_cast<float>(capture_.get_samplerate()));
+			int32_t istep = static_cast<int32_t>(step * 65536.0f);
+			int32_t pos = 0;
+			auto iofs = static_cast<int16_t>(static_cast<float>(time_pos_) * step);
 			for(int16_t x = 0; x < (440 - 1); ++x) {
-				int16_t p0 = time_pos_ + x;
-				int16_t p1 = time_pos_ + x + 1;
-				if(p1 >= static_cast<int16_t>(CAPTURE::CAP_NUM)) {
-					break;
-				}
+				int16_t p0 = iofs + (pos >> 16);
+				int16_t p1 = iofs + ((pos + istep) >> 16);
+				pos += istep;
 				const auto& d0 = capture_.get(p0);
 				const auto& d1 = capture_.get(p1);
 				if(ch0_mode_ != CH_MODE::OFF) {

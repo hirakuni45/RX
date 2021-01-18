@@ -163,7 +163,8 @@ namespace dsos {
 
 		static const uint8_t SMP_FINE_NUM = 3;
 
-		static constexpr int32_t SMP_RATE_MS[] = {
+		/// サンプリング時間（マイクロ秒）
+		static constexpr int32_t SMP_RATE_US[] = {
 			     1,      2,      5,
 			    10,     20,     50,
 			   100,    200,    500,
@@ -232,7 +233,7 @@ namespace dsos {
 
 		static int32_t get_smp_rate(SMP_MODE smp)
 		{
-			return SMP_RATE_MS[static_cast<uint8_t>(smp)];
+			return SMP_RATE_US[static_cast<uint8_t>(smp)];
 		}
 
 

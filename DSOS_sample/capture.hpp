@@ -202,13 +202,13 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		void set_samplerate(uint32_t freq) noexcept
 		{
-			samplerate_ = freq;
 #ifndef GLFW_SIM
 			uint8_t intr_level = 5;
 			if(!tpu0_.start(freq, intr_level)) {
 				utils::format("TPU0 start error...\n");
 			}
 #endif
+			samplerate_ = freq;
 		}
 
 
