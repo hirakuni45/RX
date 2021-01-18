@@ -51,8 +51,10 @@ namespace dsos {
 		BUTTON		opt_btn_;
 
 		typedef gui::menu MENU;
+		MENU		ch0_mult_menu_;
 		MENU		ch0_mode_menu_;
 		MENU		ch0_volt_menu_;
+		MENU		ch1_mult_menu_;
 		MENU		ch1_mode_menu_;
 		MENU		ch1_volt_menu_;
 		MENU		trg_menu_;
@@ -142,8 +144,10 @@ namespace dsos {
 			smp_btn_(vtx::srect(442, 16+BTN_GRID*3, BTN_SIZE, BTN_SIZE), "Smp"),
 			mes_btn_(vtx::srect(442, 16+BTN_GRID*4, BTN_SIZE, BTN_SIZE), "Mes"),
 			opt_btn_(vtx::srect(442, 16+BTN_GRID*5, BTN_SIZE, BTN_SIZE), "Opt"),
+			ch0_mult_menu_(vtx::srect(442-90*3, 16, 80, 0), CAPTURE::CH_MULT_STR),
 			ch0_mode_menu_(vtx::srect(442-90*2, 16, 80, 0), CAPTURE::CH_MODE_STR),
 			ch0_volt_menu_(vtx::srect(442-90*1, 16, 80, 0), CAPTURE::CH_VOLT_STR),
+			ch1_mult_menu_(vtx::srect(442-90*3, 16, 80, 0), CAPTURE::CH_MULT_STR),
 			ch1_mode_menu_(vtx::srect(442-90*2, 16, 80, 0), CAPTURE::CH_MODE_STR),
 			ch1_volt_menu_(vtx::srect(442-90*1, 16, 80, 0), CAPTURE::CH_VOLT_STR),
 			trg_menu_(vtx::srect(442-100, 16, 90, 0), CAPTURE::TRG_MODE_STR),
@@ -165,10 +169,13 @@ namespace dsos {
 			ch0_btn_.enable();
 			ch0_btn_.at_select_func() = [=](uint32_t id) {
 				bool ena = ch0_mode_menu_.get_state() == WIDGET::STATE::ENABLE;
+				ch0_mult_menu_.enable(!ena);
 				ch0_mode_menu_.enable(!ena);
 				ch0_volt_menu_.enable(!ena);
 				side_button_stall_(ch0_btn_, !ena);
 				if(ena) {  // メニューを閉じる瞬間
+					auto mult = static_cast<CH_MULT>(ch0_mult_menu_.get_select_pos());
+					render_wave_.set_ch0_mult(mult);
 					auto mode = static_cast<CH_MODE>(ch0_mode_menu_.get_select_pos());
 					render_wave_.set_ch0_mode(mode);
 					auto vol = static_cast<CH_VOLT>(ch0_volt_menu_.get_select_pos());
@@ -180,10 +187,13 @@ namespace dsos {
 			ch1_btn_.enable();
 			ch1_btn_.at_select_func() = [=](uint32_t id) {
 				bool ena = ch1_mode_menu_.get_state() == WIDGET::STATE::ENABLE;
+				ch1_mult_menu_.enable(!ena);
 				ch1_mode_menu_.enable(!ena);
 				ch1_volt_menu_.enable(!ena);
 				side_button_stall_(ch1_btn_, !ena);
 				if(ena) {  // メニューを閉じる瞬間
+					auto mult = static_cast<CH_MULT>(ch1_mult_menu_.get_select_pos());
+					render_wave_.set_ch1_mult(mult);
 					auto mode = static_cast<CH_MODE>(ch1_mode_menu_.get_select_pos());
 					render_wave_.set_ch1_mode(mode);
 					auto vol = static_cast<CH_VOLT>(ch1_volt_menu_.get_select_pos());
@@ -237,8 +247,10 @@ namespace dsos {
 //				side_button_stall_(opt_btn_, !ena);
 			};
 
+			ch0_mult_menu_.set_base_color(CH0_COLOR);
 			ch0_mode_menu_.set_base_color(CH0_COLOR);
 			ch0_volt_menu_.set_base_color(CH0_COLOR);
+			ch1_mult_menu_.set_base_color(CH1_COLOR);
 			ch1_mode_menu_.set_base_color(CH1_COLOR);
 			ch1_volt_menu_.set_base_color(CH1_COLOR);
 			trg_menu_.set_base_color(TRG_COLOR);
