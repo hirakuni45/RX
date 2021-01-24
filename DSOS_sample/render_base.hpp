@@ -22,7 +22,15 @@ namespace dsos {
 		/// グリッド単位数
 		static const int16_t GRID = 40;
 
+		/// 時間軸サイズ
+		static const int16_t TIME_SIZE = GRID * 11;
+		/// 電圧軸サイズ
+		static const int16_t VOLT_SIZE = GRID * 6;
 
+		static constexpr float VOLT_DIV_L =  4.710407f;  ///< 7.77Vp-p
+		static constexpr float VOLT_DIV_H = 49.571428f;  ///< 82Vp-p
+
+#if 0
 		/// チャネル・倍率文字列
 		static constexpr char CH_MULT_STR[] = "X1,X10";
 
@@ -46,7 +54,7 @@ namespace dsos {
 			utils::str::get_word(CH_MULT_STR, n, tmp, sizeof(tmp), ',');
 			return tmp;
 		}
-
+#endif
 
 		/// チャネル・モード文字列
 		static constexpr char CH_MODE_STR[] = "AC,GND,DC,OFF";
@@ -76,7 +84,7 @@ namespace dsos {
 
 
 		/// チャネル・電圧文字列
-		static constexpr char CH_VOLT_STR[] = "5V,1V,500mV,100mV,50mV,10mV";
+		static constexpr char CH_VOLT_STR[] = "10V,5V,2V,1V,500mV,200mV,100mV,50mV,10mV";
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -85,12 +93,28 @@ namespace dsos {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class CH_VOLT : uint8_t {
+			_10V,
 			_5V,
+			_2V,
 			_1V,
 			_500mV,
+			_200mV,
 			_100mV,
 			_50mV,
 			_10mV
+		};
+
+
+		static constexpr int32_t VOLT_MV[] = {
+		   10000,	///< 10V
+			5000,	///<  5V
+			2000,	///<  2V
+			1000,	///<  1V
+			 500,	///<  0.5V
+			 200,	///<  0.2V
+			 100,	///<  0.1V
+			  50,	///<  0.05V
+			  10	///<  0.01V
 		};
 
 
@@ -102,16 +126,6 @@ namespace dsos {
 			utils::str::get_word(CH_VOLT_STR, n, tmp, sizeof(tmp), ',');
 			return tmp;
 		}
-
-
-		static constexpr int32_t VOLT_MV[] = {
-			5000,
-			1000,
-			 500,
-			 100,
-			  50,
-			  10
-		};
 
 
 		static int32_t get_volt(CH_VOLT val)
@@ -137,6 +151,9 @@ namespace dsos {
 			CH1_POS,	///< CH1 立ち上がりエッジ
 			CH0_NEG,	///< CH0 立ち下がりエッジ
 			CH1_NEG,	///< CH1 立ち下がりエッジ
+
+			_TRG_BEFORE,///< ※内部処理 トリガー前処理
+			_TRG_AFTER,	///< ※内部処理 トリガー後処理
 		};
 
 
@@ -163,7 +180,8 @@ namespace dsos {
 
 		static const uint8_t SMP_FINE_NUM = 3;
 
-		static constexpr int32_t SMP_RATE_MS[] = {
+		/// サンプリング時間（マイクロ秒）
+		static constexpr int32_t SMP_RATE_US[] = {
 			     1,      2,      5,
 			    10,     20,     50,
 			   100,    200,    500,
@@ -232,12 +250,12 @@ namespace dsos {
 
 		static int32_t get_smp_rate(SMP_MODE smp)
 		{
-			return SMP_RATE_MS[static_cast<uint8_t>(smp)];
+			return SMP_RATE_US[static_cast<uint8_t>(smp)];
 		}
 
 
 		/// 計測タイプ文字列
-		static constexpr char MES_MODE_STR[] = "Off,Volt,Time";
+		static constexpr char MES_MODE_STR[] = "Off,Time Sub,CH0 Sub,CH1 Sub,Time Abs,CH0 Abs,CH1 Abs";
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -246,9 +264,31 @@ namespace dsos {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class MEASERE : uint8_t {
 			OFF,
-			VOLT,
-			TIME,
+			TIME_SUB,	///< 時間差分
+			CH0_SUB,	///< CH0 差分
+			CH1_SUB,	///< CH1 差分
+			TIME_ABS,	///< 時間絶対値
+			CH0_ABS,	///< CH0 絶対値
+			CH1_ABS		///< CH1 絶対値
 		};
+
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  波形型
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class PWAVE_TYPE : uint8_t {
+			SIN,		///< sin
+			COS,		///< cos
+			TRI_S,		///< 三角波(sin)
+			TRI_C,		///< 三角波(cos)
+			SQU_S,		///< 矩形波(sin)
+			SQU_C,		///< 矩形波(cos)
+			FSQU_S,		///< フィルター矩形波(sin)
+			FSQU_C,		///< フィルター矩形波(cos)
+		};
+
 
 		typedef graphics::def_color DEF_COLOR;
 
