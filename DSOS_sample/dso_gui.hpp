@@ -182,7 +182,7 @@ namespace dsos {
 			trg_menu_(vtx::srect(442-100, 16, 90, 0), CAPTURE::TRG_MODE_STR),
 			smp_unit_menu_(vtx::srect(442-90*2, 16, 80, 0), SMP_UNIT_STR, false),
 			smp_fine_menu_(vtx::srect(442-90*1, 16, 80, 0), ""),
-			mes_menu_(vtx::srect(442-90*1, 16, 80, 0), MES_MODE_STR),
+			mes_menu_(vtx::srect(442-100*1, 16, 90, 0), MES_MODE_STR),
 			smp_unit_(0), smp_fine_(0),
 			trg_update_(0)
 		{ }

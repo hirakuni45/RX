@@ -212,6 +212,64 @@ namespace dsos {
 		   	return a * 4.0f;
 		}
 
+
+		static float fsqu_(float in) noexcept
+		{
+			auto a = fmod(in, 1.0f);
+			if(a < 0.5f) {
+				return 1.0f;
+			} else {
+				return -1.0f;
+			}
+		}
+
+
+		static float fsquf_(float in, float& back) noexcept
+		{
+			auto a = fsqu_(in);
+			auto d = (a - back) * 0.707f;
+			auto ans = back + d;
+			back = a; 
+			return ans;
+		}
+
+
+		static int16_t pwave_(PWAVE_TYPE pw, float phase, float gain) noexcept
+		{
+			static float fsqu_s_ = 0;
+			static float fsqu_c_ = 0;
+			int16_t ret = 0;
+			switch(pw) {
+			case PWAVE_TYPE::SIN:
+				ret = static_cast<int16_t>(sinf(phase * vtx::radian_f_) * gain);
+				break;
+			case PWAVE_TYPE::COS:
+				ret = static_cast<int16_t>(cosf(phase * vtx::radian_f_) * gain);
+				break;
+			case PWAVE_TYPE::TRI_C:
+				ret = static_cast<int16_t>(ftri_(phase) * gain);
+				break;
+			case PWAVE_TYPE::TRI_S:
+				ret = static_cast<int16_t>(ftri_(phase + 0.25f) * gain);
+				break;
+			case PWAVE_TYPE::SQU_C:
+				ret = static_cast<int16_t>(fsqu_(phase) * gain);
+				break;
+			case PWAVE_TYPE::SQU_S:
+				ret = static_cast<int16_t>(fsqu_(phase + 0.25f) * gain);
+				break;
+			case PWAVE_TYPE::FSQU_C:
+				ret = static_cast<int16_t>(fsquf_(phase, fsqu_c_) * gain);
+				break;
+			case PWAVE_TYPE::FSQU_S:
+				ret = static_cast<int16_t>(fsquf_(phase + 0.25f, fsqu_s_) * gain);
+				break;
+			default:
+				break;
+			}
+			return ret;
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -444,9 +502,12 @@ namespace dsos {
 			@param[in]	freq	周波数
 			@param[in]	ppv		電圧 (peak to peak)
 			@param[in]	num		生成数
+			@param[in]	ch0		CH0 波形型
+			@param[in]	ch1		CH1 波形型
 		*/
 		//-----------------------------------------------------------------//
-		void make_sincos_wave(uint32_t freq, float ppv, uint32_t num) noexcept
+		void make_wave(uint32_t freq, float ppv, uint32_t num, PWAVE_TYPE ch0, PWAVE_TYPE ch1)
+		noexcept
 		{
 			static int32_t count = 0;
 			auto smpl = get_samplerate();
@@ -456,41 +517,8 @@ namespace dsos {
 			auto vgain1 = voltage_to_value(1, ppv);
 			for(uint32_t i = 0; i < num; ++i) {
 				auto a = static_cast<float>(count % static_cast<int32_t>(unit)) / unit;
-				task.adv_.x = static_cast<int16_t>(sinf(a * vtx::radian_f_) * vgain0);
-				task.adv_.y = static_cast<int16_t>(cosf(a * vtx::radian_f_) * vgain1);
-				if(task.adv_.x < -CAP_OFS) task.adv_.x = -CAP_OFS;
-				else if(task.adv_.x > (CAP_OFS-1)) task.adv_.x = CAP_OFS-1;
-				if(task.adv_.y < -CAP_OFS) task.adv_.y = -CAP_OFS;
-				else if(task.adv_.y > (CAP_OFS-1)) task.adv_.y = CAP_OFS-1;
-				task();
-				++count;
-				if(count >= CAP_NUM) {
-					count = 0;
-				}
-			}
-		}
-
-
-		//-----------------------------------------------------------------//
-		/*!
-			@brief  三角波を生成
-			@param[in]	freq	周波数
-			@param[in]	ppv		電圧 (peak to peak)
-			@param[in]	num		生成数
-		*/
-		//-----------------------------------------------------------------//
-		void make_triangle_wave(uint32_t freq, float ppv, uint32_t num) noexcept
-		{
-			static int32_t count = 0;
-			auto smpl = get_samplerate();
-			auto& task = at_cap_task();
-			auto unit = static_cast<float>(smpl) / static_cast<float>(freq);
-			auto vgain0 = voltage_to_value(0, ppv);
-			auto vgain1 = voltage_to_value(1, ppv);
-			for(uint32_t i = 0; i < num; ++i) {
-				auto a = static_cast<float>(count % static_cast<int32_t>(unit)) / unit;
-				task.adv_.x = static_cast<int16_t>(ftri_(a) * vgain0);
-				task.adv_.y = static_cast<int16_t>(ftri_(a + 0.5f) * vgain1);
+				task.adv_.x = -pwave_(ch0, a, vgain0);
+				task.adv_.y = -pwave_(ch1, a, vgain1);
 				if(task.adv_.x < -CAP_OFS) task.adv_.x = -CAP_OFS;
 				else if(task.adv_.x > (CAP_OFS-1)) task.adv_.x = CAP_OFS-1;
 				if(task.adv_.y < -CAP_OFS) task.adv_.y = -CAP_OFS;

@@ -255,7 +255,7 @@ namespace dsos {
 
 
 		/// 計測タイプ文字列
-		static constexpr char MES_MODE_STR[] = "Off,Time,CH0 Volt,CH1 Volt";
+		static constexpr char MES_MODE_STR[] = "Off,Time Sub,CH0 Sub,CH1 Sub,Time Abs,CH0 Abs,CH1 Abs";
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -264,22 +264,29 @@ namespace dsos {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class MEASERE : uint8_t {
 			OFF,
-			TIME,
-			CH0_VOLT,
-			CH1_VOLT
+			TIME_SUB,	///< 時間差分
+			CH0_SUB,	///< CH0 差分
+			CH1_SUB,	///< CH1 差分
+			TIME_ABS,	///< 時間絶対値
+			CH0_ABS,	///< CH0 絶対値
+			CH1_ABS		///< CH1 絶対値
 		};
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  疑似波形型
+			@brief  波形型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class PSEUDO_WAVE_TYPE : uint8_t {
-			SINCOS,		///< sin, cos 波
-			TRIANGLE,	///< 三角波
-			SQUARE,		///< 矩形波
-			PLUS,		///< シングルショットパルス
+		enum class PWAVE_TYPE : uint8_t {
+			SIN,		///< sin
+			COS,		///< cos
+			TRI_S,		///< 三角波(sin)
+			TRI_C,		///< 三角波(cos)
+			SQU_S,		///< 矩形波(sin)
+			SQU_C,		///< 矩形波(cos)
+			FSQU_S,		///< フィルター矩形波(sin)
+			FSQU_C,		///< フィルター矩形波(cos)
 		};
 
 

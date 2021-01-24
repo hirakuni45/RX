@@ -107,7 +107,7 @@ namespace dsos {
 
 		void scan_area_(const vtx::spos& pos) noexcept
 		{
-			if(measere_ == MEASERE::TIME) {
+			if(measere_ == MEASERE::TIME_SUB) {
 				if(MES_AREA_TIME_0.is_focus(pos)) {
 					area_ = AREA::MES_TIME_0;
 					mes_time_0_org_ = pos.x;
@@ -115,13 +115,23 @@ namespace dsos {
 					area_ = AREA::MES_TIME_1;
 					mes_time_1_org_ = pos.x;
 				}
-			} else if(measere_ == MEASERE::CH0_VOLT || measere_ == MEASERE::CH1_VOLT) {
+			} else if(measere_ == MEASERE::TIME_ABS) {
+				if(MES_AREA_TIME_0.is_focus(pos)) {
+					area_ = AREA::MES_TIME_0;
+					mes_time_0_org_ = pos.x;
+				}
+			} else if(measere_ == MEASERE::CH0_SUB || measere_ == MEASERE::CH1_SUB) {
 				if(MES_AREA_VOLT_0.is_focus(pos)) {
 					area_ = AREA::MES_VOLT_0;
 					mes_volt_0_org_ = pos.y;
 				} else if(MES_AREA_VOLT_1.is_focus(pos)) {
 					area_ = AREA::MES_VOLT_1;
 					mes_volt_1_org_ = pos.y;
+				}
+			} else if(measere_ == MEASERE::CH0_ABS || measere_ == MEASERE::CH1_ABS) {
+				if(MES_AREA_VOLT_0.is_focus(pos)) {
+					area_ = AREA::MES_VOLT_0;
+					mes_volt_0_org_ = pos.y;
 				}
 			} else {
 				if(TRG_AREA.is_focus(pos)) {
@@ -394,19 +404,31 @@ namespace dsos {
 						x = render_.draw_text(vtx::spos(x, 0), tmp);
 					}
 				}
-			} else if(measere_ == MEASERE::CH0_VOLT) {
+			} else if(measere_ == MEASERE::CH0_SUB) {
 				auto d = mes_volt_1_pos_ - mes_volt_0_pos_;
 				auto x = render_.draw_text(vtx::spos(0, 0), "CH0: ");
 				char tmp[16];
 				make_volt_(d, get_volt(ch0_volt_), tmp, sizeof(tmp));
 				x = render_.draw_text(vtx::spos(x, 0), tmp);
-			} else if(measere_ == MEASERE::CH1_VOLT) {
+			} else if(measere_ == MEASERE::CH1_SUB) {
 				auto d = mes_volt_1_pos_ - mes_volt_0_pos_;
 				auto x = render_.draw_text(vtx::spos(0, 0), "CH1: ");
 				char tmp[16];
 				make_volt_(d, get_volt(ch1_volt_), tmp, sizeof(tmp));
 				x = render_.draw_text(vtx::spos(x, 0), tmp);
-			} else if(measere_ == MEASERE::TIME) {
+			} else if(measere_ == MEASERE::CH0_ABS) {
+				auto d = ch0_vpos_ - mes_volt_0_pos_;
+				auto x = render_.draw_text(vtx::spos(0, 0), "CH0: ");
+				char tmp[16];
+				make_volt_(d, get_volt(ch0_volt_), tmp, sizeof(tmp));
+				x = render_.draw_text(vtx::spos(x, 0), tmp);
+			} else if(measere_ == MEASERE::CH1_ABS) {
+				auto d = ch1_vpos_ - mes_volt_0_pos_;
+				auto x = render_.draw_text(vtx::spos(0, 0), "CH1: ");
+				char tmp[16];
+				make_volt_(d, get_volt(ch1_volt_), tmp, sizeof(tmp));
+				x = render_.draw_text(vtx::spos(x, 0), tmp);
+			} else if(measere_ == MEASERE::TIME_SUB) {
 				auto d = mes_time_1_pos_ - mes_time_0_pos_;
 				char tmp[16];
 				make_rate_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
@@ -416,7 +438,15 @@ namespace dsos {
 				x = render_.draw_text(vtx::spos(x, 0), tmp);
 				x += 8;
 				// CH0 の電圧、計測ポイント０
-				
+			} else if(measere_ == MEASERE::TIME_ABS) {
+				auto d = mes_time_0_pos_ - time_pos_;
+				char tmp[16];
+				make_rate_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
+				auto x = render_.draw_text(vtx::spos(0, 0), tmp);
+				make_freq_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
+				x += 8;
+				x = render_.draw_text(vtx::spos(x, 0), tmp);
+				x += 8;				
 			}
 		}
 
@@ -649,7 +679,8 @@ namespace dsos {
 				}
 			}
 
-			if(measere_ == MEASERE::TIME) {
+			switch(measere_) {
+			case MEASERE::TIME_SUB:
 				render_.set_fore_color(MES_COLOR);
 				render_.draw_mobj(vtx::spos(mes_time_0_pos_ - 7, 16),
 					resource::bitmap::dir_1_, false);
@@ -657,7 +688,15 @@ namespace dsos {
 				render_.draw_mobj(vtx::spos(mes_time_1_pos_ - 7, 272-16-14),
 					resource::bitmap::dir_3_, false);
 				render_.line(vtx::spos(mes_time_1_pos_, 16), vtx::spos(mes_time_1_pos_, 272-16-14));
-			} else if(measere_ == MEASERE::CH0_VOLT || measere_ == MEASERE::CH1_VOLT) {
+				break;
+			case MEASERE::TIME_ABS:
+				render_.set_fore_color(MES_COLOR);
+				render_.draw_mobj(vtx::spos(mes_time_0_pos_ - 7, 16),
+					resource::bitmap::dir_1_, false);
+				render_.line(vtx::spos(mes_time_0_pos_, 16+14), vtx::spos(mes_time_0_pos_, 272-16));
+				break;
+			case MEASERE::CH0_SUB:
+			case MEASERE::CH1_SUB:
 				render_.set_fore_color(MES_COLOR);
 				render_.draw_mobj(vtx::spos(0, mes_volt_0_pos_ - 7),
 					resource::bitmap::dir_2_, false);
@@ -665,11 +704,20 @@ namespace dsos {
 				render_.draw_mobj(vtx::spos(440-14, mes_volt_1_pos_ - 7),
 					resource::bitmap::dir_0_, false);
 				render_.line(vtx::spos(0, mes_volt_1_pos_), vtx::spos(440-14, mes_volt_1_pos_));
-			} else {
+				break;
+			case MEASERE::CH0_ABS:
+			case MEASERE::CH1_ABS:
+				render_.set_fore_color(MES_COLOR);
+				render_.draw_mobj(vtx::spos(0, mes_volt_0_pos_ - 7),
+					resource::bitmap::dir_2_, false);
+				render_.line(vtx::spos(14, mes_volt_0_pos_), vtx::spos(440, mes_volt_0_pos_));
+				break;
+			default:
 				// トリガー基準
 				render_.set_fore_color(TRG_COLOR);
 				render_.draw_mobj(vtx::spos(440-14, trg_pos_ - 7),
 					resource::bitmap::dir_0_, false);
+				break;
 			}
 
 			// トリガー位置（時間）表示
@@ -697,14 +745,25 @@ namespace dsos {
 		{
 			int16_t val = 0;
 			auto trg = capture_.get_trg_mode();
-			if(trg == TRG_MODE::CH0_POS || trg == TRG_MODE::CH0_NEG) {
-				float d = static_cast<float>(ch0_vpos_ - trg_pos_) * get_volt(ch0_volt_);
-				d /= static_cast<float>(GRID);
-				val = capture_.voltage_to_value(0, d * 1e-3);
-			} else if(trg == TRG_MODE::CH1_POS || trg == TRG_MODE::CH1_NEG) {
-				float d = static_cast<float>(ch1_vpos_ - trg_pos_) * get_volt(ch1_volt_);
-				d /= static_cast<float>(GRID);
-				val = capture_.voltage_to_value(1, d * 1e-3);
+			switch(trg) {
+			case TRG_MODE::CH0_POS:
+			case TRG_MODE::CH0_NEG:
+				{
+					float d = static_cast<float>(ch0_vpos_ - trg_pos_) * get_volt(ch0_volt_);
+					d /= static_cast<float>(GRID);
+					val = capture_.voltage_to_value(0, d * 1e-3);
+				}
+				break;
+			case TRG_MODE::CH1_POS:
+			case TRG_MODE::CH1_NEG:
+				{
+					float d = static_cast<float>(ch1_vpos_ - trg_pos_) * get_volt(ch1_volt_);
+					d /= static_cast<float>(GRID);
+					val = capture_.voltage_to_value(1, d * 1e-3);
+				}
+				break;
+			default:
+				break;
 			}
 			return val;
 		}
