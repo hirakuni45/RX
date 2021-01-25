@@ -13,7 +13,7 @@
 //=====================================================================//
 #include "sound/wav_in.hpp"
 #include "sound/mp3_in.hpp"
-#include "sound/aac_in.hpp"
+// #include "sound/aac_in.hpp"
 #include "sound/sound_out.hpp"
 #include "common/dir_list.hpp"
 #include "common/format.hpp"
@@ -113,7 +113,7 @@ namespace sound {
 
 		wav_in		wav_in_;
 		mp3_in		mp3_in_;
-		aac_in		aac_in_;
+//		aac_in		aac_in_;
 
 		enum class CODEC : uint8_t {
 			NONE,
