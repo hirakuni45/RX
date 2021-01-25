@@ -31,8 +31,9 @@ CSOURCES	=	common/init.c \
 				FreeRTOS/Source/queue.c \
 				FreeRTOS/Source/stream_buffer.c \
 				FreeRTOS/Source/tasks.c \
-				FreeRTOS/Source/timers.c \
-				FreeRTOS_TCP/Source/FreeRTOS_IP.c \
+				FreeRTOS/Source/timers.c
+
+#				FreeRTOS_TCP/Source/FreeRTOS_IP.c \
 				FreeRTOS_TCP/Source/FreeRTOS_ARP.c \
 				FreeRTOS_TCP/Source/FreeRTOS_DHCP.c \
 				FreeRTOS_TCP/Source/FreeRTOS_DNS.c \

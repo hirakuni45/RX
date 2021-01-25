@@ -29,7 +29,7 @@
 
 #include "FreeRTOS.h"
 // #include "task.h"
-#include "FreeRTOS_IP.h"
+// #include "FreeRTOS_IP.h"
 
 #include <random>
 
@@ -244,7 +244,7 @@ extern "C" {
 		return ethd_.at_phy().get_link_status();
 	}
 
-
+#if 0
 	/* DHCP has an option for clients to register their hostname.  It doesn't
 	 * have much use, except that a device can be found in a router along with its
 	 * name. If this option is used the callback below must be provided by the
@@ -297,6 +297,7 @@ extern "C" {
 	void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
 	{
 	}
+#endif
 };
 
 
