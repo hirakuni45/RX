@@ -24,6 +24,7 @@
 #include "graphics/filer.hpp"
 #include "graphics/kfont.hpp"
 #include "graphics/font.hpp"
+#include "graphics/simple_dialog.hpp"
 
 #include "chip/FT5206.hpp"
 

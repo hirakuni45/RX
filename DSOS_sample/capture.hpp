@@ -28,8 +28,6 @@ namespace dsos {
 	template <uint32_t CAPN>
 	class capture : public render_base {
 
-		typedef vtx::spos DATA;
-
 #ifndef GLFW_SIM
 		typedef device::S12AD  ADC0;
 		typedef device::S12AD1 ADC1;
@@ -43,6 +41,8 @@ namespace dsos {
 #endif
 
 	public:
+		typedef vtx::spos DATA;
+
 		static const uint32_t CAP_NUM = CAPN;	///< キャプチャー数
 		static const int16_t CAP_OFS = 2048;	///< 12bit A/D offset
 
@@ -193,6 +193,8 @@ namespace dsos {
 
 		TRG_MODE	trg_mode_;
 
+//		DATA		data_[CAPN];
+
 
 		static int16_t limit_(int16_t val) noexcept
 		{
@@ -315,10 +317,6 @@ namespace dsos {
 		*/
 		//-----------------------------------------------------------------//
 		void set_voltage_gain(uint32_t ch, float gain) noexcept {
-			bool cap = false;
-			if(volt_gain_[ch & 1] != gain) {
-				cap = true;
-			}
 			volt_gain_[ch & 1] = gain;
 		}
 
@@ -477,9 +475,9 @@ namespace dsos {
 			@brief  波形を取得
 		*/
 		//-----------------------------------------------------------------//
-		const auto& get(uint32_t pos) noexcept
+		const auto& get(uint32_t pos) const noexcept
 		{
-			return at_cap_task().data_[(pos + get_cap_task().trg_pos_) & (CAPN - 1)];
+			return get_cap_task().data_[(pos + get_cap_task().trg_pos_) & (CAPN - 1)];
 		}
 
 
@@ -529,6 +527,47 @@ namespace dsos {
 					count = 0;
 				}
 			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  解析
+			@param[in]	org		開始ポイント
+			@param[in]	end		終了ポイント
+			@param[out]	ch0		CH0 情報
+			@param[out]	ch1		CH1 情報
+		*/
+		//-----------------------------------------------------------------//
+		void analize(uint16_t org, uint16_t end, wave_info& ch0, wave_info& ch1) const noexcept
+		{
+			ch0.min_ = get(org).x;
+			ch0.max_ = get(org).x;
+			ch1.min_ = get(org).y;
+			ch1.max_ = get(org).y;
+			for(uint16_t i = org + 1; i < end; ++i) {
+				ch0.min_ = std::min(ch0.min_, get(i).x);
+				ch0.max_ = std::max(ch0.max_, get(i).x);
+				ch1.min_ = std::min(ch1.min_, get(i).y);
+				ch1.max_ = std::max(ch1.max_, get(i).y);
+			}
+
+			auto ch0_th = (ch0.min_ + ch0.max_) / 2;
+			uint8_t ch0_step = 0;
+			auto ch1_th = (ch1.min_ + ch1.max_) / 2;
+			uint8_t ch1_step = 0;
+//			utils::format("CH0: Min: %d, Max: %d, Th: %d\n") % ch0.min_ % ch0.max_ % ch0_th;
+//			utils::format("CH1: Min: %d, Max: %d, Th: %d\n") % ch1.min_ % ch1.max_ % ch1_th;
+
+			ch0.setup();
+			ch1.setup();
+			for(uint16_t i = org + 0; i < end; ++i) {
+				ch0.update(get(i).x, i);
+				ch1.update(get(i).y, i);
+				if(ch0.probe() && ch1.probe()) break;
+			}
+			ch0.build(get_samplerate());
+			ch1.build(get_samplerate());
 		}
 	};
 }
