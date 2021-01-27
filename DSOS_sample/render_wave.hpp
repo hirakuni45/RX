@@ -12,7 +12,6 @@
 #include "common/enum_utils.hpp"
 #include "common/intmath.hpp"
 #include "graphics/color.hpp"
-#include "graphics/simple_dialog.hpp"
 
 #include "render_base.hpp"
 #include "resource.hpp"
@@ -50,13 +49,9 @@ namespace dsos {
 		static constexpr vtx::srect MES_AREA_VOLT_0 = { 0, 16, 40, 272-16*2 };
 		static constexpr vtx::srect MES_AREA_VOLT_1 = { 440-20, 16, 40, 272-16*2 };
 
-		typedef gui::simple_dialog<RENDER, TOUCH> DIALOG;
-
 		RENDER&		render_;
 		TOUCH&		touch_;
 		CAPTURE&	capture_;
-
-		DIALOG		dialog_;
 
 		int16_t		time_org_;
 		int16_t		time_pos_;
@@ -91,6 +86,13 @@ namespace dsos {
 		uint16_t	trg_wait_;
 		uint32_t	trg_update_;
 
+		uint32_t	cap_tic_;
+		SMP_MODE	cur_smp_mode_;
+		typedef typename CAPTURE::wave_info WAVE_INFO;
+		WAVE_INFO	wave_info0_;
+		WAVE_INFO	wave_info1_;
+		uint16_t	ch_info_count_;
+
 		enum class AREA {
 			NONE,
 			TIME,
@@ -103,6 +105,11 @@ namespace dsos {
 			MES_VOLT_1,
 		};
 		AREA		area_;
+
+		uint16_t	cap_win_org_;
+		uint16_t	cap_win_end_;
+		vtx::spos	volt_min_[2];
+		vtx::spos	volt_max_[2];
 
 
 		void scan_area_(const vtx::spos& pos) noexcept
@@ -155,12 +162,7 @@ namespace dsos {
 		}
 
 
-		void update_measere_() noexcept
-		{
-		}
-
-
-		void make_volt_(int16_t val, int32_t unit_mv, char* tmp, uint32_t len)
+		void make_volt_(int16_t val, int32_t unit_mv, char* tmp, uint32_t len) noexcept
 		{
 			auto n = static_cast<float>(val * unit_mv) / static_cast<float>(GRID);
 			if(std::abs(n) >= 1000.0f) {
@@ -172,7 +174,7 @@ namespace dsos {
 		}
 
 
-		void make_rate_(int16_t val, int32_t unit_us, char* str, uint32_t len)
+		void make_rate_(int16_t val, int32_t unit_us, char* str, uint32_t len) noexcept
 		{
 			int32_t n = val * unit_us / GRID;
 			int32_t div = 1;
@@ -187,7 +189,7 @@ namespace dsos {
 		}
 
 
-		void make_freq_(int16_t val, int32_t unit_us, char* str, uint32_t len)
+		void make_freq_(int16_t val, int32_t unit_us, char* str, uint32_t len) noexcept
 		{
 			if(val == 0) {
 				str[0] = 0;
@@ -205,6 +207,48 @@ namespace dsos {
 			}
 		}
 
+
+		void make_freq_(float freq, char* str, uint32_t len)
+		{
+			if(freq == 0.0f) {
+				utils::sformat("---Hz", str, len);
+			} else if(freq < 1000.0f) {
+				utils::sformat("%3.2fHz", str, len) % freq;
+			} else if(freq < 1000000.0f) {
+				freq /= 1e3;
+				utils::sformat("%4.3fKHz", str, len) % freq;
+			} else {
+				freq /= 1e6;
+				utils::sformat("%4.3fMHz", str, len) % freq;
+			}
+		}
+
+
+		void make_ch_voltage_(WAVE_INFO& info, float gain, char* str, uint32_t len) const
+		{
+			auto min = gain * static_cast<float>(info.min_) / 2048.0f;
+			auto max = gain * static_cast<float>(info.max_) / 2048.0f;
+			auto vol = max - min;
+			if(std::abs(vol) < 1e-3) {
+				vol /= 1e-3;
+	 			utils::sformat("%2.1fmVpp, ", str, len) % vol;
+			} else {
+	 			utils::sformat("%3.2fVpp, ", str, len) % vol;
+			}
+			if(std::abs(min) < 1e-3) {
+				min /= 1e-3;
+	 			utils::sformat("%2.1fmV", str, len, true) % min;
+			} else {
+	 			utils::sformat("%3.2fV", str, len, true) % min;
+			}
+			if(std::abs(max) < 1e-3) {
+				max /= 1e-3;
+	 			utils::sformat(" to %2.1fmV", str, len, true) % max;
+			} else {
+	 			utils::sformat(" to %3.2fV", str, len, true) % max;
+			}
+		}
+
 	public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -216,7 +260,6 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		render_wave(RENDER& render, TOUCH& touch, CAPTURE& capture) noexcept :
 			render_(render), touch_(touch), capture_(capture),
-			dialog_(render, touch),
 			time_org_(0), time_pos_(0),
 			ch0_vorg_(272/2), ch0_vpos_(272/2),
 			ch1_vorg_(272/2), ch1_vpos_(272/2),
@@ -230,7 +273,10 @@ namespace dsos {
 			mes_time_0_org_(220), mes_time_0_pos_(220), mes_time_1_org_(220), mes_time_1_pos_(220),
 			mes_volt_0_org_(272/2), mes_volt_0_pos_(272/2), mes_volt_1_org_(272/2), mes_volt_1_pos_(272/2),
 			touch_down_(false), touch_num_(0), trg_wait_(0), trg_update_(0),
-			area_(AREA::NONE)
+			cap_tic_(0), cur_smp_mode_(SMP_MODE::_1us), wave_info0_(), wave_info1_(),
+			ch_info_count_(0),
+			area_(AREA::NONE),
+			cap_win_org_(0), cap_win_end_(0), volt_min_(), volt_max_()
 		{ }
 
 
@@ -375,78 +421,101 @@ namespace dsos {
 			render_.set_fore_color(DEF_COLOR::Black);
 			render_.fill_box(vtx::srect(0, 0, 480, 16));
 			render_.set_fore_color(DEF_COLOR::White);
-			if(measere_ == MEASERE::OFF) {
-				bool disp = true;
-				if(capture_.get_trg_mode(true) != TRG_MODE::NONE) {
-					++trg_wait_;
-					if(trg_wait_ >= 30) {
-						trg_wait_ = 0;
+			switch(measere_) {
+			case MEASERE::OFF:
+				{
+					bool disp = true;
+					if(capture_.get_trg_mode(true) != TRG_MODE::NONE) {
+						++trg_wait_;
+						if(trg_wait_ >= 30) {
+							trg_wait_ = 0;
+						}
+						if(trg_wait_ < 10) {
+							disp = false;
+						}
 					}
-					if(trg_wait_ < 10) {
-						disp = false;
+					if(disp) {
+						auto trg = capture_.get_trg_mode();
+						char tmp[16];
+						utils::sformat("%s/div, ", tmp, sizeof(tmp)) % get_smp_str(smp_mode_);
+						auto x = render_.draw_text(vtx::spos(0, 0), tmp);
+						x = render_.draw_text(vtx::spos(x, 0), capture_.get_trigger_str());
+						if(trg == TRG_MODE::CH0_POS || trg == TRG_MODE::CH0_NEG) {
+							x = render_.draw_text(vtx::spos(x, 0), ": ");
+							auto v = ch0_vpos_ - trg_pos_;
+							make_volt_(v, get_volt(ch0_volt_), tmp, sizeof(tmp));
+							x = render_.draw_text(vtx::spos(x, 0), tmp);
+						} else if(trg == TRG_MODE::CH1_POS || trg == TRG_MODE::CH1_NEG) {
+							x = render_.draw_text(vtx::spos(x, 0), ": ");
+							auto v = ch1_vpos_ - trg_pos_;
+							make_volt_(v, get_volt(ch1_volt_), tmp, sizeof(tmp));
+							x = render_.draw_text(vtx::spos(x, 0), tmp);
+						}
 					}
 				}
-				if(disp) {
-					auto trg = capture_.get_trg_mode();
+				break;
+			case MEASERE::CH0_SUB:
+				{
+					auto d = mes_volt_1_pos_ - mes_volt_0_pos_;
+					auto x = render_.draw_text(vtx::spos(0, 0), "CH0: ");
 					char tmp[16];
-					utils::sformat("%s/div, ", tmp, sizeof(tmp)) % get_smp_str(smp_mode_);
-					auto x = render_.draw_text(vtx::spos(0, 0), tmp);
-					x = render_.draw_text(vtx::spos(x, 0), capture_.get_trigger_str());
-					if(trg == TRG_MODE::CH0_POS || trg == TRG_MODE::CH0_NEG) {
-						x = render_.draw_text(vtx::spos(x, 0), ": ");
-						auto v = ch0_vpos_ - trg_pos_;
-						make_volt_(v, get_volt(ch0_volt_), tmp, sizeof(tmp));
-						x = render_.draw_text(vtx::spos(x, 0), tmp);
-					} else if(trg == TRG_MODE::CH1_POS || trg == TRG_MODE::CH1_NEG) {
-						x = render_.draw_text(vtx::spos(x, 0), ": ");
-						auto v = ch1_vpos_ - trg_pos_;
-						make_volt_(v, get_volt(ch1_volt_), tmp, sizeof(tmp));
-						x = render_.draw_text(vtx::spos(x, 0), tmp);
-					}
+					make_volt_(d, get_volt(ch0_volt_), tmp, sizeof(tmp));
+					x = render_.draw_text(vtx::spos(x, 0), tmp);
 				}
-			} else if(measere_ == MEASERE::CH0_SUB) {
-				auto d = mes_volt_1_pos_ - mes_volt_0_pos_;
-				auto x = render_.draw_text(vtx::spos(0, 0), "CH0: ");
-				char tmp[16];
-				make_volt_(d, get_volt(ch0_volt_), tmp, sizeof(tmp));
-				x = render_.draw_text(vtx::spos(x, 0), tmp);
-			} else if(measere_ == MEASERE::CH1_SUB) {
-				auto d = mes_volt_1_pos_ - mes_volt_0_pos_;
-				auto x = render_.draw_text(vtx::spos(0, 0), "CH1: ");
-				char tmp[16];
-				make_volt_(d, get_volt(ch1_volt_), tmp, sizeof(tmp));
-				x = render_.draw_text(vtx::spos(x, 0), tmp);
-			} else if(measere_ == MEASERE::CH0_ABS) {
-				auto d = ch0_vpos_ - mes_volt_0_pos_;
-				auto x = render_.draw_text(vtx::spos(0, 0), "CH0: ");
-				char tmp[16];
-				make_volt_(d, get_volt(ch0_volt_), tmp, sizeof(tmp));
-				x = render_.draw_text(vtx::spos(x, 0), tmp);
-			} else if(measere_ == MEASERE::CH1_ABS) {
-				auto d = ch1_vpos_ - mes_volt_0_pos_;
-				auto x = render_.draw_text(vtx::spos(0, 0), "CH1: ");
-				char tmp[16];
-				make_volt_(d, get_volt(ch1_volt_), tmp, sizeof(tmp));
-				x = render_.draw_text(vtx::spos(x, 0), tmp);
-			} else if(measere_ == MEASERE::TIME_SUB) {
-				auto d = mes_time_1_pos_ - mes_time_0_pos_;
-				char tmp[16];
-				make_rate_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
-				auto x = render_.draw_text(vtx::spos(0, 0), tmp);
-				make_freq_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
-				x += 8;
-				x = render_.draw_text(vtx::spos(x, 0), tmp);
-				x += 8;
-				// CH0 の電圧、計測ポイント０
-			} else if(measere_ == MEASERE::TIME_ABS) {
-				auto d = mes_time_0_pos_ - time_pos_;
-				char tmp[16];
-				make_rate_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
-				auto x = render_.draw_text(vtx::spos(0, 0), tmp);
-				make_freq_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
-				x += 8;
-				x = render_.draw_text(vtx::spos(x, 0), tmp);
-				x += 8;				
+				break;
+			case MEASERE::CH1_SUB:
+				{
+					auto d = mes_volt_1_pos_ - mes_volt_0_pos_;
+					auto x = render_.draw_text(vtx::spos(0, 0), "CH1: ");
+					char tmp[16];
+					make_volt_(d, get_volt(ch1_volt_), tmp, sizeof(tmp));
+					x = render_.draw_text(vtx::spos(x, 0), tmp);
+				}
+				break;
+			case MEASERE::CH0_ABS:
+				{
+					auto d = ch0_vpos_ - mes_volt_0_pos_;
+					auto x = render_.draw_text(vtx::spos(0, 0), "CH0: ");
+					char tmp[16];
+					make_volt_(d, get_volt(ch0_volt_), tmp, sizeof(tmp));
+					x = render_.draw_text(vtx::spos(x, 0), tmp);
+				}
+				break;
+			case MEASERE::CH1_ABS:
+				{
+					auto d = ch1_vpos_ - mes_volt_0_pos_;
+					auto x = render_.draw_text(vtx::spos(0, 0), "CH1: ");
+					char tmp[16];
+					make_volt_(d, get_volt(ch1_volt_), tmp, sizeof(tmp));
+					x = render_.draw_text(vtx::spos(x, 0), tmp);
+				}
+				break;
+			case MEASERE::TIME_SUB:
+				{
+					auto d = mes_time_1_pos_ - mes_time_0_pos_;
+					char tmp[16];
+					make_rate_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
+					auto x = render_.draw_text(vtx::spos(0, 0), tmp);
+					make_freq_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
+					x += 8;
+					x = render_.draw_text(vtx::spos(x, 0), tmp);
+					x += 8;
+				}
+				break;
+			case MEASERE::TIME_ABS:  // CH0 の電圧、計測ポイント０
+				{
+					auto d = mes_time_0_pos_ - time_pos_;
+					char tmp[16];
+					make_rate_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
+					auto x = render_.draw_text(vtx::spos(0, 0), tmp);
+					make_freq_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
+					x += 8;
+					x = render_.draw_text(vtx::spos(x, 0), tmp);
+					x += 8;
+				}
+				break;
+			default:
+				break;
 			}
 		}
 
@@ -459,23 +528,43 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		void draw_channel_info(uint32_t ch) noexcept
 		{
-			char tmp[32];
+			char tmp[64];
 			if(ch == 0) {
 				render_.set_fore_color(DEF_COLOR::Black);
 				render_.fill_box(vtx::srect(0, 272 - 16 + 1, 240, 15));
 				render_.set_fore_color(CH0_COLOR);
+				if(ch_info_count_ < (60*2*3)) {
 //				utils::sformat("0.%s: %s, %s/div", tmp, sizeof(tmp)) % get_ch_mult_str(ch0_mult_)
-				utils::sformat("0: %s, %s/div", tmp, sizeof(tmp))
-					% get_ch_mode_str(ch0_mode_) % get_ch_volt_str(ch0_volt_);
-				render_.draw_text(vtx::spos(0, 272 - 16 + 1), tmp);
+					utils::sformat("0:%s,%s/div", tmp, sizeof(tmp))
+						% get_ch_mode_str(ch0_mode_) % get_ch_volt_str(ch0_volt_);
+					auto x = render_.draw_text(vtx::spos(0, 272 - 16 + 1), tmp);
+					x += 8;
+					make_freq_(wave_info0_.freq_, tmp, sizeof(tmp));
+					render_.draw_text(vtx::spos(x, 272 - 16 + 1), tmp);
+				} else {
+					make_ch_voltage_(wave_info0_, capture_.get_voltage_gain(0), tmp, sizeof(tmp));
+					render_.draw_text(vtx::spos(0, 272 - 16 + 1), tmp);
+				}
 			} else {
 				render_.set_fore_color(DEF_COLOR::Black);
 				render_.fill_box(vtx::srect(240, 272 - 16 + 1, 240, 15));
 				render_.set_fore_color(CH1_COLOR);
+				if(ch_info_count_ < (60*2*3)) {
 //				utils::sformat("1.%s: %s, %s/div", tmp, sizeof(tmp)) % get_ch_mult_str(ch1_mult_)
-				utils::sformat("1: %s, %s/div", tmp, sizeof(tmp))
-					% get_ch_mode_str(ch1_mode_) % get_ch_volt_str(ch1_volt_);
-				render_.draw_text(vtx::spos(240, 272 - 16 + 1), tmp);
+					utils::sformat("1:%s,%s/div", tmp, sizeof(tmp))
+						% get_ch_mode_str(ch1_mode_) % get_ch_volt_str(ch1_volt_);
+					auto x = render_.draw_text(vtx::spos(240, 272 - 16 + 1), tmp);
+					x += 8;
+					make_freq_(wave_info1_.freq_, tmp, sizeof(tmp));
+					render_.draw_text(vtx::spos(x, 272 - 16 + 1), tmp);
+				} else {
+					make_ch_voltage_(wave_info1_, capture_.get_voltage_gain(1), tmp, sizeof(tmp));
+					render_.draw_text(vtx::spos(240, 272 - 16 + 1), tmp);
+				}
+			}
+			++ch_info_count_;
+			if(ch_info_count_ >= (60*4*3)) {
+				ch_info_count_ = 0;
 			}
 		}
 
@@ -566,7 +655,7 @@ namespace dsos {
 						break;
 					}
 				}
-			} else if(num == 2) {
+			} else if(num == 2) {  // 二本タッチによるズーム
 				const auto& p2 = touch_.get_touch_pos(1);
 #if 0
 				if(measere_ == MEASERE::TIME) {
@@ -651,6 +740,7 @@ namespace dsos {
 			for(int16_t x = 0; x < (TIME_SIZE - 1); ++x) {
 				if(x == 0) {
 					p0 = iofs + (pos >> 16);
+					cap_win_org_ = p0;
 				}
 				const auto& d0 = capture_.get(p0);
 				pos += istep;
@@ -676,6 +766,18 @@ namespace dsos {
 					int16_t ofs = ch1_vpos_;
 					render_.line(vtx::spos(x, ofs + ch1_y), vtx::spos(x + 1, ofs + y1));
 					ch1_y = y1;
+				}
+			}
+			cap_win_end_ = p0;
+
+			// キャプチャー動作が更新した場合を検出
+			{
+				auto tic = capture_.get_capture_tic();
+				// キャプチャー更新、サンプリング周期変更？
+				if(tic != cap_tic_ || smp_mode_ != cur_smp_mode_) {
+					cap_tic_ = tic;
+					cur_smp_mode_ = smp_mode_;
+					capture_.analize(cap_win_org_, cap_win_end_, wave_info0_, wave_info1_);
 				}
 			}
 
@@ -730,6 +832,16 @@ namespace dsos {
 			}
 
 			draw_sampling_info();
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  チャネル情報関係、アップ・デート
+		*/
+		//-----------------------------------------------------------------//
+		void update_info() noexcept
+		{
 			draw_channel_info(0);
 			draw_channel_info(1);
 		}
@@ -771,8 +883,9 @@ namespace dsos {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  トリガー電圧変更の取得
-			@return トリガー電圧変更
+			@brief  トリガー電圧変更を変更した場合の取得 @n
+					トリガー電圧変更で、「trg_update_」がインクリメント
+			@return トリガー電圧変更カウンタ
 		*/
 		//-----------------------------------------------------------------//
 		auto get_trg_update() const noexcept { return trg_update_; }

@@ -328,13 +328,12 @@ namespace dsos {
 
 				// 波形をキャプチャーしたら描画
 				auto tic = capture_.get_capture_tic();
-				if(tic != capture_tic_) {
-
-				}
 				if(f || tic != capture_tic_) {
 					capture_tic_ = tic;
 					render_wave_.update();
 				}
+
+				render_wave_.update_info();
 			}
 		}
 

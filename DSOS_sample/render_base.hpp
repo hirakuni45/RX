@@ -290,6 +290,87 @@ namespace dsos {
 		};
 
 
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  波形情報クラス
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		struct wave_info {
+
+			int16_t		min_;
+			int16_t		max_;
+
+			uint16_t	org_;
+			uint16_t	end_;
+
+			float		freq_;
+
+		private:
+			int16_t		thv_org_;
+			int16_t		thv_end_;
+			uint16_t	step_;
+
+		public:
+			wave_info() noexcept :
+				min_(0), max_(0), org_(0), end_(0), freq_(0.0f),
+				thv_org_(0), thv_end_(0), step_(0)
+			{ }
+
+
+			void setup() noexcept
+			{
+				thv_org_ = (min_ + max_) / 2;
+				thv_end_ = (thv_org_ + min_) / 2;
+				step_ = 0;
+			}
+
+
+			void update(int16_t v, uint16_t pos) noexcept
+			{
+				switch(step_) {
+				case 0:
+					if(v > thv_org_) {
+						org_ = pos;
+						step_++;
+					}
+					break;
+				case 1:
+					if(v < thv_end_) {
+						step_++;
+					}
+					break;
+				case 2:
+					if(v > thv_org_) {
+						end_ = pos;
+						step_++;
+					}
+					break;
+				default:
+					break;
+				}
+			}
+
+
+			bool probe() const noexcept { return step_ == 3; }
+
+			bool build(uint32_t samplerate) noexcept
+			{
+				freq_ = 0.0f;
+
+				if(!probe()) return false;
+
+				auto d = end_ - org_;
+				if(d == 0) return false;
+
+//				utils::format("%d, %d\n") % ch0.org_ % ch0.end_;
+				freq_ = static_cast<float>(samplerate) / static_cast<float>(d);
+//				utils::format("CH0 Freq: %3.2f\n") % ch0.freq_;
+
+				return true;
+			}
+		};
+
+
 		typedef graphics::def_color DEF_COLOR;
 
 		const graphics::share_color&	CH0_COLOR;	///< チャネル０カラー
