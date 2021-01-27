@@ -533,7 +533,7 @@ namespace dsos {
 				render_.set_fore_color(DEF_COLOR::Black);
 				render_.fill_box(vtx::srect(0, 272 - 16 + 1, 240, 15));
 				render_.set_fore_color(CH0_COLOR);
-				if(ch_info_count_ < (60*4)) {
+				if(ch_info_count_ < (60*2*3)) {
 //				utils::sformat("0.%s: %s, %s/div", tmp, sizeof(tmp)) % get_ch_mult_str(ch0_mult_)
 					utils::sformat("0:%s,%s/div", tmp, sizeof(tmp))
 						% get_ch_mode_str(ch0_mode_) % get_ch_volt_str(ch0_volt_);
@@ -549,7 +549,7 @@ namespace dsos {
 				render_.set_fore_color(DEF_COLOR::Black);
 				render_.fill_box(vtx::srect(240, 272 - 16 + 1, 240, 15));
 				render_.set_fore_color(CH1_COLOR);
-				if(ch_info_count_ < (60*4)) {
+				if(ch_info_count_ < (60*2*3)) {
 //				utils::sformat("1.%s: %s, %s/div", tmp, sizeof(tmp)) % get_ch_mult_str(ch1_mult_)
 					utils::sformat("1:%s,%s/div", tmp, sizeof(tmp))
 						% get_ch_mode_str(ch1_mode_) % get_ch_volt_str(ch1_volt_);
@@ -563,7 +563,7 @@ namespace dsos {
 				}
 			}
 			++ch_info_count_;
-			if(ch_info_count_ >= (60*2*4)) {
+			if(ch_info_count_ >= (60*4*3)) {
 				ch_info_count_ = 0;
 			}
 		}
