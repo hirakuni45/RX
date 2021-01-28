@@ -1,8 +1,6 @@
-RTK5_NESEMU/emu/* linguist-vendored
-ff13c/source/* linguist-vendored
-zlib/* linguist-vendored
-libmad/* linguist-vendored
-jpeg-6b/* linguist-vendored
+NESEMU_sample/emu/* linguist-vendored
+ff14/source/* linguist-vendored
+rxlib/* linguist-vendored
 RX600/drw2d/* linguist-vendored
 r_net/driver/* linguist-vendored
 r_net/T4_src/* linguist-vendored
