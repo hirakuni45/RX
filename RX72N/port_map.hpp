@@ -47,7 +47,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  MTUx（マルチ・ファンクション・タイマ） チャネル型
+			@brief  タイマー系・チャネル型
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class channel : uint8_t {
@@ -1219,7 +1219,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  MTU3 関係、チャネル別ポート切り替え
+			@brief  タイマー系、チャネル別ポート切り替え
 			@param[in]	per	周辺機器タイプ
 			@param[in]	ch	チャネル
 			@param[in]	ena	無効にする場合場合「false」
@@ -1262,6 +1262,7 @@ namespace device {
 				break;
 
 			case peripheral::MTU1:
+				sel = ena ? 0b00001 : 0;
 				switch(ch) {
 				case channel::A:
 					sel = ena ? 0b00001 : 0;
@@ -1296,6 +1297,7 @@ namespace device {
 				break;
 
 			case peripheral::MTU2:
+				sel = ena ? 0b00001 : 0;
 				switch(ch) {
 				case channel::A:					
 					MPC::PA3PFS.PSEL = sel;  // MTIOC2A (38/100)
@@ -1349,6 +1351,7 @@ namespace device {
 				break;
 
 			case peripheral::MTU3:
+				sel = ena ? 0b00001 : 0;
 				switch(ch) {
 				case channel::A:					
 					MPC::P33PFS.PSEL = sel;  // MTIOC3A (58/100)
@@ -1373,14 +1376,20 @@ namespace device {
 				break;
 
 			case peripheral::MTU4:
+				sel = ena ? 0b00001 : 0;
 				switch(ch) {
 				case channel::A:					
 					MPC::P72PFS.PSEL = sel;  // MTIOC4A (55/100)
 					PORT7::PMR.B2 = ena;
 					break;
 				case channel::B:
-					MPC::P73PFS.PSEL = sel;  // MTIOC4B (54/100)
-					PORT7::PMR.B3 = ena;
+//					if(opt == option::FIRST) {  // MTIOC4B (54/100)
+//						MPC::P73PFS.PSEL = sel;
+//						PORT7::PMR.B3 = ena;
+//					} else if(opt == option::SECOND) {  // PD1:MTIOC4B
+						MPC::PD1PFS.PSEL = sel;
+						PORTD::PMR.B1 = ena;
+//					}
 					break;
 				case channel::C:
 					MPC::P75PFS.PSEL = sel;  // MTIOC4C (52/100)
@@ -1397,6 +1406,7 @@ namespace device {
 				break;
 
 			case peripheral::MTU5:
+				sel = ena ? 0b00001 : 0;
 				switch(ch) {
 				case channel::U:
 					MPC::P24PFS.PSEL = sel;  // MTIOC5U (64/100)
@@ -1429,6 +1439,7 @@ namespace device {
 				break;
 
 			case peripheral::MTU6:
+				sel = ena ? 0b00001 : 0;
 				switch(ch) {
 				case channel::A:
 					MPC::PA1PFS.PSEL = sel;  // MTIOC6A (40/100)
@@ -1453,6 +1464,7 @@ namespace device {
 				break;
 
 			case peripheral::MTU7:
+				sel = ena ? 0b00001 : 0;
 				switch(ch) {
 				case channel::A:
 					MPC::P94PFS.PSEL = sel;  // MTIOC7A (46/100)
@@ -1475,31 +1487,20 @@ namespace device {
 					break;
 				}
 				break;
-#if 0
-			case peripheral::MTU9:
+
+			case peripheral::TPU4:
+				sel = ena ? 0b00001 : 0;
 				switch(ch) {
 				case channel::A:
-					MPC::PD7PFS.PSEL = sel;  // MTIOC9A (18/100)
-					PORTD::PMR.B7 = ena;
 					break;
 				case channel::B:
-					MPC::PE0PFS.PSEL = sel;  // MTIOC9B (17/100)
-					PORTE::PMR.B0 = ena;
-					break;
-				case channel::C:
-					MPC::PD6PFS.PSEL = sel;  // MTIOC9C (19/100)
-					PORTD::PMR.B6 = ena;
-					break;
-				case channel::D:
-					MPC::PE1PFS.PSEL = sel;  // MTIOC9D (16/100)
-					PORTE::PMR.B1 = ena;
 					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-#endif
+
 			default:
 				ret = false;
 				break;
