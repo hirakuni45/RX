@@ -10,6 +10,7 @@
                 https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
+// GLFW_SIM for simulate A/D conversion
 #ifndef GLFW_SIM
 #include "common/renesas.hpp"
 #endif
@@ -23,6 +24,7 @@ namespace dsos {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  キャプチャー・クラス
+		@param[in]	CAPN	キャプチャー数
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	template <uint32_t CAPN>
@@ -32,8 +34,8 @@ namespace dsos {
 		typedef device::S12AD  ADC0;
 		typedef device::S12AD1 ADC1;
 #if defined(SIG_RX65N)
-		static const auto ADC_CH0 = ADC0::analog::AIN000;
-		static const auto ADC_CH1 = ADC1::analog::AIN114;
+		static const auto ADC_CH0 = ADC0::analog::AIN000;  ///< P40 CN10(1)
+		static const auto ADC_CH1 = ADC1::analog::AIN114;  ///< P90 CN10(5)
 #elif defined(SIG_RX72N)
 		static const auto ADC_CH0 = ADC0::analog::AIN007;  ///< P47 Pmod2(10) CN6
 		static const auto ADC_CH1 = ADC1::analog::AIN108;  ///< PD0 Pmod2( 7) CN6
@@ -41,6 +43,7 @@ namespace dsos {
 #endif
 
 	public:
+		// x:ch0, y:ch1
 		typedef vtx::spos DATA;
 
 		static const uint32_t CAP_NUM = CAPN;	///< キャプチャー数
@@ -80,14 +83,14 @@ namespace dsos {
 
 			void operator() ()
 			{
-#ifndef GLFW_SIM
+#ifdef GLFW_SIM
+				DATA t = adv_;
+#else
 				DATA t(ADC0::ADDR(ADC_CH0), ADC1::ADDR(ADC_CH1));
 				t.x -= CAP_OFS;
 				t.y -= CAP_OFS;
 				ADC0::ADCSR = ADC0::ADCSR.ADCS.b(0b01) | ADC0::ADCSR.ADST.b();
 				ADC1::ADCSR = ADC1::ADCSR.ADCS.b(0b01) | ADC1::ADCSR.ADST.b();
-#else
-				DATA t = adv_;
 #endif
 				switch(trg_mode_) {
 				case TRG_MODE::NONE:
@@ -292,7 +295,7 @@ namespace dsos {
 		{
 #ifndef GLFW_SIM
 			uint8_t intr_level = 5;
-			if(!tpu0_.start(freq, intr_level)) {
+			if(!tpu0_.start(TPU0::TYPE::MATCH_A, freq, intr_level)) {
 				utils::format("TPU0 start error...\n");
 			}
 #endif
@@ -406,6 +409,30 @@ namespace dsos {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  最低値、最大値を検出
+			@param[in]	org		開始位置
+			@param[in]	end		終端位置
+			@param[out]	min		最小値
+			@param[in]	max		最大値
+		*/
+		//-----------------------------------------------------------------//
+		void get_min_max(uint32_t org, uint32_t end, DATA& min, DATA& max) const noexcept
+		{
+			min.x = get(org).x;
+			max.x = get(org).x;
+			min.y = get(org).y;
+			max.y = get(org).y;
+			for(uint32_t i = org + 1; i < end; ++i) {
+				min.x = std::min(min.x, get(i).x);
+				max.x = std::max(max.x, get(i).x);
+				min.y = std::min(min.y, get(i).y);
+				max.y = std::max(max.y, get(i).y);
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  トリガー型設定
 			@param[in]	trg		トリガー型
 			@param[in]	ref		トリガー基準値
@@ -413,7 +440,6 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		void set_trg_mode(TRG_MODE trg_mode, int16_t ref) noexcept
 		{
-// utils::format("Trg value: %d\n") % ref;
 			at_cap_task().trg_ref_ = limit_(ref);
 			at_cap_task().pos_ = 0;
 			at_cap_task().before_count_ = CAP_NUM / 4;
@@ -539,29 +565,24 @@ namespace dsos {
 			@param[out]	ch1		CH1 情報
 		*/
 		//-----------------------------------------------------------------//
-		void analize(uint16_t org, uint16_t end, wave_info& ch0, wave_info& ch1) const noexcept
+		void analize(uint32_t org, uint32_t end, wave_info& ch0, wave_info& ch1) const noexcept
 		{
-			ch0.min_ = get(org).x;
-			ch0.max_ = get(org).x;
-			ch1.min_ = get(org).y;
-			ch1.max_ = get(org).y;
-			for(uint16_t i = org + 1; i < end; ++i) {
-				ch0.min_ = std::min(ch0.min_, get(i).x);
-				ch0.max_ = std::max(ch0.max_, get(i).x);
-				ch1.min_ = std::min(ch1.min_, get(i).y);
-				ch1.max_ = std::max(ch1.max_, get(i).y);
-			}
+			DATA min;
+			DATA max;
+			get_min_max(org, end, min, max);
+			ch0.min_ = min.x;
+			ch0.max_ = max.x;
+			ch1.min_ = min.y;
+			ch1.max_ = max.y;
 
 			auto ch0_th = (ch0.min_ + ch0.max_) / 2;
 			uint8_t ch0_step = 0;
 			auto ch1_th = (ch1.min_ + ch1.max_) / 2;
 			uint8_t ch1_step = 0;
-//			utils::format("CH0: Min: %d, Max: %d, Th: %d\n") % ch0.min_ % ch0.max_ % ch0_th;
-//			utils::format("CH1: Min: %d, Max: %d, Th: %d\n") % ch1.min_ % ch1.max_ % ch1_th;
 
 			ch0.setup();
 			ch1.setup();
-			for(uint16_t i = org + 0; i < end; ++i) {
+			for(uint32_t i = org + 0; i < end; ++i) {
 				ch0.update(get(i).x, i);
 				ch1.update(get(i).y, i);
 				if(ch0.probe() && ch1.probe()) break;
