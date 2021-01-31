@@ -1403,7 +1403,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	MTU0 タイマ I/O コントロールレジスタ（TIOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
@@ -1743,7 +1743,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	MTU1 タイマ I/O コントロールレジスタ（TIOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
@@ -2041,7 +2041,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	MTU2 タイマ I/O コントロールレジスタ（TIOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
@@ -2232,7 +2232,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 		};
 
 
@@ -2295,7 +2295,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	MTU3 タイマ I/O コントロールレジスタ（TIOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
@@ -2314,12 +2314,14 @@ namespace device {
 					TIORH.IOA = val;
 					break;
 				case channel::B:
+					MTU::TOERA.OE3B = 1;
 					TIORH.IOB = val;
 					break;
 				case channel::C:
 					TIORL.IOC = val;
 					break;
 				case channel::D:
+					MTU::TOERA.OE3D = 1;
 					TIORL.IOD = val;
 					break;
 				default:
@@ -2451,7 +2453,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU3 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/
@@ -2540,7 +2542,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 		};
 
 
@@ -2603,7 +2605,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	MTU4 タイマ I/O コントロールレジスタ（TIOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
@@ -2619,15 +2621,19 @@ namespace device {
 			{
 				switch(ch) {
 				case channel::A:
+					MTU::TOERA.OE4A = 1;
 					TIORH.IOA = val;
 					break;
 				case channel::B:
+					MTU::TOERA.OE4B = 1;
 					TIORH.IOB = val;
 					break;
 				case channel::C:
+					MTU::TOERA.OE4C = 1;
 					TIORL.IOC = val;
 					break;
 				case channel::D:
+					MTU::TOERA.OE4D = 1;
 					TIORL.IOD = val;
 					break;
 				default:
@@ -2833,7 +2839,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU4 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/
@@ -3254,7 +3260,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 		};
 
 
@@ -3500,7 +3506,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU6 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/
@@ -3590,7 +3596,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 		};
 
 
@@ -3883,7 +3889,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU7 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/
@@ -3978,7 +3984,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 		};
 
 
@@ -4170,7 +4176,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU8 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/
@@ -4259,7 +4265,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 			E,		///< TGIE
 			F,		///< TGIF
 		};
@@ -4489,7 +4495,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU9 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/
