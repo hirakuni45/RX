@@ -29,6 +29,19 @@
 #include "common/cmt_mgr.hpp"
 #include "common/vtx.hpp"
 
+
+// #ifdef TFU
+// #define OUT_TPU
+#define OUT_MTU
+
+#ifdef OUT_TPU
+#include "common/tpu_io.hpp"
+#endif
+
+#ifdef OUT_MTU
+#include "common/mtu_io.hpp"
+#endif
+
 #if 0
 extern "C" {
 	void __init_tfu(void);
@@ -85,6 +98,19 @@ namespace {
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
+
+#ifdef OUT_TPU
+	typedef device::tpu_io<device::TPU4> TPU;
+	TPU		tpu_;
+#endif
+
+#ifdef OUT_MTU
+	typedef device::MTU4 MTU;
+	typedef device::mtu_io<MTU> MTU_IO;
+	MTU_IO	mtu_io_;
+#endif
+
+//	typedef device::PORT<device::PORTD, device::bitpos::B1> PD1;
 }
 
 extern "C" {
@@ -121,7 +147,7 @@ int main(int argc, char** argv)
 
 	{  // タイマー設定
 		uint8_t intr = 4;
-		cmt_.start(850, intr);
+		cmt_.start(100, intr);
 	}
 
 	{  // SCI の開始
@@ -144,14 +170,52 @@ int main(int argc, char** argv)
 		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
 
-	__init_tfu();
-
 	LED::OUTPUT();  // LED ポートを出力に設定
+
+#ifdef TFU
+	__init_tfu();
+#endif
+
+#ifdef OUT_TPU
+	{
+		// RX72N Envision Kit Pmod2.8(PD1)
+		// MTIOC4B(TPU4,B)
+		uint8_t intr = 0;
+//		uint32_t freq = 10'000 * 2;  // トグル出力なので２倍
+		uint32_t freq = 100;  // トグル出力なので２倍
+		if(!tpu_.start(TPU::TYPE::MATCH_B, freq, intr, TPU::OUTPUT::IH_MT)) {
+			utils::format("TPU4 not start...\n");
+		} else {
+			utils::format("TPU rate (set):  %d [Hz]\n") % tpu_.get_rate();
+			auto rate = 1.0f - static_cast<float>(tpu_.get_rate()) / tpu_.get_rate(true);
+			rate *= 100.0f;
+			utils::format("TPU rate (real): %d [Hz] (%3.2f [%%])\n") % tpu_.get_rate(true) % rate;
+		}
+	}
+//	PD1::OUTPUT();
+#endif
+
+#ifdef OUT_MTU
+	{
+		uint32_t freq = 10'000;
+		if(!mtu_io_.start_normal(MTU::channel::B, MTU_IO::OUTPUT_TYPE::TOGGLE, freq)) {
+			utils::format("MTU4 not start...\n");
+		} else {
+			utils::format("MTU rate (set):  %d [Hz]\n") % mtu_io_.get_rate();
+			auto rate = 1.0f - static_cast<float>(mtu_io_.get_rate()) / mtu_io_.get_rate(true);
+			rate *= 100.0f;
+			utils::format("MTU rate (real): %d [Hz] (%3.2f [%%])\n")
+				% mtu_io_.get_rate(true) % rate;
+		}
+	}
+#endif
+
 	uint8_t cnt = 0;
 	while(1) {
 		cmt_.sync();
 
 		if(sci_.recv_length() > 0) {
+#ifdef TFU
 			if(sci_.getch() == ' ') {
 				float a = vtx::get_pi<float>() * 0.25f;
 				float si, co;
@@ -162,7 +226,10 @@ int main(int argc, char** argv)
 				co = __builtin_rx_cosf(a);
 				utils::format("%8.7f: %8.7f, %8.7f\n") % a % si % co;
 			}
+#endif
 		}
+
+//		PD1::P = cnt & 1;
 
 		++cnt;
 		if(cnt >= 50) {
