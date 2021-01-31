@@ -60,6 +60,7 @@ namespace cnc {
 
 		typedef utils::fixed_fifo<uint8_t, 2048> STEP_PAD;
 
+
 		class mtu_task {
 
 			uint32_t	count_;
@@ -127,8 +128,10 @@ namespace cnc {
 			}
 		};
 
+
 		typedef device::mtu_io<device::MTU0, mtu_task> MTU;
 		MTU			mtu_;
+
 
 		enum class OP_CODE : uint8_t {
 			NONE,
