@@ -1358,6 +1358,36 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -1654,8 +1684,8 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class channel : uint8_t {
-			A,  ///< PA5 / MTIOC1A (LFQFP100:36)
-			B,  ///< PA4 / MTIOC1B (LFQFP100:37)
+			A,  ///< MTIOC1A
+			B,  ///< MTIOC1B
 		};
 
 
@@ -1681,6 +1711,30 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST1 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
@@ -2005,6 +2059,30 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			default:
+				break;
+			}
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -2245,6 +2323,36 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST3 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
@@ -2555,6 +2663,36 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST4 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
@@ -2919,9 +3057,6 @@ namespace device {
 			U,   ///< P24 / MTIOC5U (LFQFP100:64)
 			V,   ///< P23 / MTIOC5V (LFQFP100:65)
 			W,   ///< P22 / MTIOC5W (LFQFP100:66)
-			U2,  ///< P82 / MTIOC5U (LFQFP100:96)
-			V2,  ///< P81 / MTIOC5V (LFQFP100:97)
-			W2,  ///< P80 / MTIOC5W (LFQFP100:98)
 		};
 
 
@@ -2935,6 +3070,33 @@ namespace device {
 			V,		///< TGIV
 			W,		///< TGIW
 		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::U:
+				ret = port_map_mtu::channel::U;
+				break;
+			case channel::V:
+				ret = port_map_mtu::channel::V;
+				break;
+			case channel::W:
+				ret = port_map_mtu::channel::W;
+				break;
+			default:
+				break;
+			}
+			return ret;
+		}
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3278,6 +3440,36 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -3609,6 +3801,36 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRB.CST7 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
@@ -4002,6 +4224,36 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -4280,6 +4532,36 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST9 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
