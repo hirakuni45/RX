@@ -17,6 +17,7 @@
 #include "RX24T/icu.hpp"
 #include "RX24T/icu_mgr.hpp"
 #include "RX24T/port_map.hpp"
+#include "RX24T/port_map_mtu.hpp"
 
 #elif defined(SIG_RX62N)
 #include "RX62x/system.hpp"
@@ -30,6 +31,7 @@
 #include "RX600/icu.hpp"
 #include "RX600/icu_mgr.hpp"
 #include "RX600/port_map.hpp"
+#include "RX600/port_map_mtu.hpp"
 
 #elif defined(SIG_RX72M)
 #include "RX72M/peripheral.hpp"
@@ -38,6 +40,7 @@
 #include "RX72M/icu.hpp"
 #include "RX72M/icu_mgr.hpp"
 #include "RX72M/port_map.hpp"
+#include "RX72M/port_map_mtu.hpp"
 
 #elif defined(SIG_RX72N)
 #include "RX72N/peripheral.hpp"
@@ -46,6 +49,7 @@
 #include "RX72N/icu.hpp"
 #include "RX72N/icu_mgr.hpp"
 #include "RX72N/port_map.hpp"
+#include "RX72N/port_map_mtu.hpp"
 
 #elif defined(SIG_RX65N)
 #include "RX65x/peripheral.hpp"
@@ -54,6 +58,7 @@
 #include "RX65x/icu.hpp"
 #include "RX65x/icu_mgr.hpp"
 #include "RX65x/port_map.hpp"
+#include "RX65x/port_map_mtu.hpp"
 
 #elif defined(SIG_RX66T)
 #include "RX66T/peripheral.hpp"
@@ -62,6 +67,7 @@
 #include "RX66T/icu.hpp"
 #include "RX66T/icu_mgr.hpp"
 #include "RX66T/port_map.hpp"
+#include "RX66T/port_map_mtu.hpp"
 
 #elif defined(SIG_RX72T)
 #include "RX72T/peripheral.hpp"
@@ -70,6 +76,7 @@
 #include "RX72T/icu.hpp"
 #include "RX72T/icu_mgr.hpp"
 #include "RX72T/port_map.hpp"
+#include "RX72T/port_map_mtu.hpp"
 
 #else
 #  error "device.hpp: Requires SIG_XXX to be defined"
