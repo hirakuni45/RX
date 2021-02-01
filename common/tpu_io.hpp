@@ -207,14 +207,14 @@ namespace device {
 			if(out != OUTPUT::NONE) {
 				switch(type) {
 				case TYPE::MATCH_A:  // TGRA のコンペアマッチ
-					if(!port_map::turn(per, port_map::channel::A)) {
-						ret = false;
-					}
+//					if(!port_map::turn(per, port_map::channel::A)) {
+//						ret = false;
+//					}
 					break;
 				case TYPE::MATCH_B:  // TGRB のコンペアマッチ
-					if(!port_map::turn(per, port_map::channel::B)) {
-						ret = false;
-					}
+//					if(!port_map::turn(per, port_map::channel::B)) {
+//						ret = false;
+//					}
 					break;
 				default:
 					ret = false;
