@@ -468,7 +468,7 @@ namespace cnc {
 			// MTU3 をノーマルモードで起動、初期 100Hz
 			uint8_t intr = 4;
 			auto ch = device::MTU0::channel::A;
-			auto ot = MTU::OUTPUT_TYPE::NONE;
+			auto ot = MTU::OUTPUT::NONE;
 			auto f = mtu_.start_normal(ch, ot, 100, intr);
 
 			return f;
