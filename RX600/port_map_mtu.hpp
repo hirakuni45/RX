@@ -1,7 +1,7 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX72N グループ・ポート・マッピング (MTU) @n
+	@brief	RX64M/RX71M グループ・ポート・マッピング (MTU) @n
 			・MTU 型に従って、タイマー用ポートを設定 @n
 			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU8
     @author 平松邦仁 (hira@rvf-rc45.net)
@@ -10,9 +10,12 @@
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX72N/peripheral.hpp"
+#include "RX600/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
+
+
+// Under constructions....................
 
 namespace device {
 
@@ -678,9 +681,9 @@ namespace device {
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
-					PORTJ::PMR.B1 = 0;
-					MPC::PJ1PFS.PSEL = sel;
-					PORTJ::PMR.B1 = ena;
+//					PORTJ::PMR.B1 = 0;
+//					MPC::PJ1PFS.PSEL = sel;
+//					PORTJ::PMR.B1 = ena;
 					break;
 				case option::SECOND:
 					PORTE::PMR.B7 = 0;
@@ -695,9 +698,9 @@ namespace device {
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
-					PORTJ::PMR.B0 = 0;
-					MPC::PJ0PFS.PSEL = sel;
-					PORTJ::PMR.B0 = ena;
+//					PORTJ::PMR.B0 = 0;
+//					MPC::PJ0PFS.PSEL = sel;
+//					PORTJ::PMR.B0 = ena;
 					break;
 				case option::SECOND:
 					PORTA::PMR.B5 = 0;

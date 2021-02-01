@@ -1,16 +1,16 @@
 #pragma once
 //=====================================================================//
 /*!	@file
-	@brief	RX72N グループ・ポート・マッピング (MTU) @n
+	@brief	RX72T グループ・ポート・マッピング (MTU) @n
 			・MTU 型に従って、タイマー用ポートを設定 @n
 			MTU0, MTU1, MTU2, MTU3, MTU4, MTU5, MTU6, MTU7, MTU8
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
 //=====================================================================//
-#include "RX72N/peripheral.hpp"
+#include "RX72T/peripheral.hpp"
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
 
@@ -340,9 +340,9 @@ namespace device {
 			case channel::C:
 				switch(opt) {
 				case option::FIRST:
-					PORTJ::PMR.B3 = 0;
-					MPC::PJ3PFS.PSEL = sel;
-					PORTJ::PMR.B3 = ena;
+//					PORTJ::PMR.B3 = 0;
+//					MPC::PJ3PFS.PSEL = sel;
+//					PORTJ::PMR.B3 = ena;
 					break;
 				case option::SECOND:
 					PORT5::PMR.B6 = 0;
@@ -678,9 +678,9 @@ namespace device {
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
-					PORTJ::PMR.B1 = 0;
-					MPC::PJ1PFS.PSEL = sel;
-					PORTJ::PMR.B1 = ena;
+//					PORTJ::PMR.B1 = 0;
+//					MPC::PJ1PFS.PSEL = sel;
+//					PORTJ::PMR.B1 = ena;
 					break;
 				case option::SECOND:
 					PORTE::PMR.B7 = 0;
@@ -695,9 +695,9 @@ namespace device {
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
-					PORTJ::PMR.B0 = 0;
-					MPC::PJ0PFS.PSEL = sel;
-					PORTJ::PMR.B0 = ena;
+//					PORTJ::PMR.B0 = 0;
+//					MPC::PJ0PFS.PSEL = sel;
+//					PORTJ::PMR.B0 = ena;
 					break;
 				case option::SECOND:
 					PORTA::PMR.B5 = 0;
@@ -769,9 +769,9 @@ namespace device {
 			case channel::C:
 				switch(opt) {
 				case option::FIRST:
-					PORT6::PMR.B7 = 0;
-					MPC::P67PFS.PSEL = sel;
-					PORT6::PMR.B7 = ena;
+//					PORT6::PMR.B7 = 0;
+//					MPC::P67PFS.PSEL = sel;
+//					PORT6::PMR.B7 = ena;
 					break;
 				default:
 					ret = false;
@@ -797,7 +797,7 @@ namespace device {
 			return ret;
 		}
 
-
+#if 0
 		static bool mtu8_(channel ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
@@ -835,6 +835,7 @@ namespace device {
 			}
 			return ret;
 		}
+#endif
 
 	public:
 
@@ -880,9 +881,6 @@ namespace device {
 				break;
 			case peripheral::MTU7:
 				ret = mtu7_(ch, ena, opt);
-				break;
-			case peripheral::MTU8:
-				ret = mtu8_(ch, ena, opt);
 				break;
 
 			default:
