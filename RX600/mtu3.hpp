@@ -1358,6 +1358,36 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -1403,7 +1433,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	MTU0 タイマ I/O コントロールレジスタ（TIOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
@@ -1654,8 +1684,8 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class channel : uint8_t {
-			A,  ///< PA5 / MTIOC1A (LFQFP100:36)
-			B,  ///< PA4 / MTIOC1B (LFQFP100:37)
+			A,  ///< MTIOC1A
+			B,  ///< MTIOC1B
 		};
 
 
@@ -1681,6 +1711,30 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST1 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
@@ -1743,7 +1797,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	MTU1 タイマ I/O コントロールレジスタ（TIOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
@@ -2005,6 +2059,30 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			default:
+				break;
+			}
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  タイマコントロールレジスタ（TCR）
 		*/
 		//-----------------------------------------------------------------//
@@ -2041,7 +2119,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	MTU2 タイマ I/O コントロールレジスタ（TIOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
@@ -2232,7 +2310,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 		};
 
 
@@ -2245,6 +2323,36 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST3 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
@@ -2295,7 +2403,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	MTU3 タイマ I/O コントロールレジスタ（TIOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
@@ -2314,12 +2422,14 @@ namespace device {
 					TIORH.IOA = val;
 					break;
 				case channel::B:
+					MTU::TOERA.OE3B = 1;
 					TIORH.IOB = val;
 					break;
 				case channel::C:
 					TIORL.IOC = val;
 					break;
 				case channel::D:
+					MTU::TOERA.OE3D = 1;
 					TIORL.IOD = val;
 					break;
 				default:
@@ -2451,7 +2561,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU3 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/
@@ -2540,7 +2650,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 		};
 
 
@@ -2553,6 +2663,36 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST4 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
@@ -2603,7 +2743,7 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief	タイマ I/O コントロールレジスタ（TIOR）
+			@brief	MTU4 タイマ I/O コントロールレジスタ（TIOR）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		struct tior_t {
@@ -2619,15 +2759,19 @@ namespace device {
 			{
 				switch(ch) {
 				case channel::A:
+					MTU::TOERA.OE4A = 1;
 					TIORH.IOA = val;
 					break;
 				case channel::B:
+					MTU::TOERA.OE4B = 1;
 					TIORH.IOB = val;
 					break;
 				case channel::C:
+					MTU::TOERA.OE4C = 1;
 					TIORL.IOC = val;
 					break;
 				case channel::D:
+					MTU::TOERA.OE4D = 1;
 					TIORL.IOD = val;
 					break;
 				default:
@@ -2833,7 +2977,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU4 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/
@@ -2913,9 +3057,6 @@ namespace device {
 			U,   ///< P24 / MTIOC5U (LFQFP100:64)
 			V,   ///< P23 / MTIOC5V (LFQFP100:65)
 			W,   ///< P22 / MTIOC5W (LFQFP100:66)
-			U2,  ///< P82 / MTIOC5U (LFQFP100:96)
-			V2,  ///< P81 / MTIOC5V (LFQFP100:97)
-			W2,  ///< P80 / MTIOC5W (LFQFP100:98)
 		};
 
 
@@ -2929,6 +3070,33 @@ namespace device {
 			V,		///< TGIV
 			W,		///< TGIW
 		};
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::U:
+				ret = port_map_mtu::channel::U;
+				break;
+			case channel::V:
+				ret = port_map_mtu::channel::V;
+				break;
+			case channel::W:
+				ret = port_map_mtu::channel::W;
+				break;
+			default:
+				break;
+			}
+			return ret;
+		}
 
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -3254,7 +3422,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 		};
 
 
@@ -3267,6 +3435,36 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRB.CST6 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
@@ -3500,7 +3698,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU6 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/
@@ -3590,7 +3788,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 		};
 
 
@@ -3603,6 +3801,36 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRB.CST7 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
@@ -3883,7 +4111,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU7 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/
@@ -3978,7 +4206,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 		};
 
 
@@ -3991,6 +4219,36 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST8 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
@@ -4170,7 +4428,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU8 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/
@@ -4259,7 +4517,7 @@ namespace device {
 			B,		///< TGIB
 			C,		///< TGIC
 			D,		///< TGID
-			OVR,	///< TCIV オーバーフロー
+			OVF,	///< TCIV オーバーフロー
 			E,		///< TGIE
 			F,		///< TGIF
 		};
@@ -4274,6 +4532,36 @@ namespace device {
 		static void enable(bool ena = true)
 		{
 			MTU::TSTRA.CST9 = ena;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ポートマッピングチャネルを取得
+			@param[in]	ch	チャネル
+			@return ポート・マッピング・チャネル
+		*/
+		//-----------------------------------------------------------------//
+		static auto get_port_map_channel(channel ch)
+		{
+			auto ret = port_map_mtu::channel::NONE;
+			switch(ch) {
+			case channel::A:
+				ret = port_map_mtu::channel::A;
+				break;
+			case channel::B:
+				ret = port_map_mtu::channel::B;
+				break;
+			case channel::C:
+				ret = port_map_mtu::channel::C;
+				break;
+			case channel::D:
+				ret = port_map_mtu::channel::D;
+				break;
+			default:
+				break;
+			}
+			return ret;
 		}
 
 
@@ -4489,7 +4777,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  割り込みベクターを返す
+			@brief  MTU9 割り込みベクターを返す
 			@param[in]	intr	割り込み要因
 			@return 割り込みベクター型
 		*/

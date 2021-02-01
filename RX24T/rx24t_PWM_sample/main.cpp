@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 	// MTU0 設定
 	{
 		uint32_t frq = 10000;
-		if(!mtu0_io_.start_pwm2(MTU0::channel::A, MTU0_IO::OUTPUT_TYPE::LOW_TO_HIGH, frq)) {
+		if(!mtu0_io_.start_pwm2(MTU0::channel::A, MTU0_IO::OUTPUT::LOW_TO_HIGH, frq)) {
 			utils::format("MTU0 input capture start fail...\n");
 		}
 	}
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 	// MTU1 設定
 	{
 		uint32_t frq = 10000;
-		if(!mtu1_io_.start_pwm2(MTU1::channel::A, MTU1_IO::OUTPUT_TYPE::HIGH_TO_LOW, frq)) {
+		if(!mtu1_io_.start_pwm2(MTU1::channel::A, MTU1_IO::OUTPUT::HIGH_TO_LOW, frq)) {
 			utils::format("MTU1 output start fail...\n");
 		}
 	}

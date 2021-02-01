@@ -92,7 +92,7 @@ int main(int argc, char** argv)
 	// MTU0 設定
 	{
 		uint8_t intr = 3;		
-		if(!mtu0_io_.start_capture(MTU0::channel::A, MTU0_IO::CAPTURE_TYPE::POSITIVE, intr)) {
+		if(!mtu0_io_.start_capture(MTU0::channel::A, MTU0_IO::CAPTURE::POSITIVE, intr)) {
 			utils::format("MTU0 input capture start fail...\n");
 		}
 	}
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 	// MTU1 設定
 	{
 		uint32_t frq = 1000;
-		if(!mtu1_io_.start_normal(MTU1::channel::A, MTU1_IO::OUTPUT_TYPE::TOGGLE, frq)) {
+		if(!mtu1_io_.start_normal(MTU1::channel::A, MTU1_IO::OUTPUT::TOGGLE, frq)) {
 			utils::format("MTU1 output start fail...\n");
 		}
 	}

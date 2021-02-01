@@ -28,6 +28,20 @@
 #include "common/format.hpp"
 #include "common/cmt_mgr.hpp"
 #include "common/vtx.hpp"
+#include "common/command.hpp"
+#include "common/input.hpp"
+
+// #ifdef TFU
+// #define OUT_TPU
+#define OUT_MTU
+
+#ifdef OUT_TPU
+#include "common/tpu_io.hpp"
+#endif
+
+#ifdef OUT_MTU
+#include "common/mtu_io.hpp"
+#endif
 
 #if 0
 extern "C" {
@@ -79,12 +93,37 @@ namespace {
 	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
-// SCI ポートの第二候補を選択する場合
-//	typedef device::sci_io<SCI_CH, RXB, TXB, device::port_map::option::SECOND> SCI;
 	SCI		sci_;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
 	CMT		cmt_;
+
+#ifdef OUT_TPU
+	typedef device::tpu_io<device::TPU4> TPU;
+	TPU		tpu_;
+#endif
+
+#ifdef OUT_MTU
+	typedef device::MTU4 MTU;
+	static const auto PSEL = device::port_map_mtu::option::FIFTH;
+	typedef device::mtu_io<MTU, utils::null_task, utils::null_task, PSEL> MTU_IO;
+	MTU_IO	mtu_io_;
+//	typedef device::PORT<device::PORTD, device::bitpos::B1> PD1;
+#endif
+
+	typedef utils::command<256> CMD;
+	CMD		cmd_;
+
+#ifdef OUT_MTU
+	void list_mtu_freq_()
+	{
+		utils::format("MTU rate (set):  %d [Hz]\n") % mtu_io_.get_rate();
+		auto rate = 1.0f - static_cast<float>(mtu_io_.get_rate()) / mtu_io_.get_rate(true);
+		rate *= 100.0f;
+		utils::format("MTU rate (real): %d [Hz] (%3.2f [%%])\n")
+			% mtu_io_.get_rate(true) % rate;
+	}
+#endif
 }
 
 extern "C" {
@@ -121,7 +160,7 @@ int main(int argc, char** argv)
 
 	{  // タイマー設定
 		uint8_t intr = 4;
-		cmt_.start(850, intr);
+		cmt_.start(100, intr);
 	}
 
 	{  // SCI の開始
@@ -144,13 +183,49 @@ int main(int argc, char** argv)
 		utils::format("CMT rate (real): %d [Hz] (%3.2f [%%])\n") % cmt_.get_rate(true) % rate;
 	}
 
-	__init_tfu();
-
 	LED::OUTPUT();  // LED ポートを出力に設定
+
+#ifdef TFU
+	__init_tfu();
+#endif
+
+#ifdef OUT_TPU
+	{
+		// RX72N Envision Kit Pmod2.8(PD1)
+		// MTIOC4B(TPU4,B)
+		uint8_t intr = 0;
+//		uint32_t freq = 10'000 * 2;  // トグル出力なので２倍
+		uint32_t freq = 100;  // トグル出力なので２倍
+		if(!tpu_.start(TPU::TYPE::MATCH_B, freq, intr, TPU::OUTPUT::IH_MT)) {
+			utils::format("TPU4 not start...\n");
+		} else {
+			utils::format("TPU rate (set):  %d [Hz]\n") % tpu_.get_rate();
+			auto rate = 1.0f - static_cast<float>(tpu_.get_rate()) / tpu_.get_rate(true);
+			rate *= 100.0f;
+			utils::format("TPU rate (real): %d [Hz] (%3.2f [%%])\n") % tpu_.get_rate(true) % rate;
+		}
+	}
+//	PD1::OUTPUT();
+#endif
+
+#ifdef OUT_MTU
+	{
+		uint32_t freq = 10'000;
+		if(!mtu_io_.start_normal(MTU::channel::B, MTU_IO::OUTPUT::TOGGLE, freq)) {
+			utils::format("MTU4 not start...\n");
+		} else {
+			list_mtu_freq_();
+		}
+	}
+#endif
+
+	cmd_.set_prompt("# ");
+
 	uint8_t cnt = 0;
 	while(1) {
 		cmt_.sync();
 
+#ifdef TFU
 		if(sci_.recv_length() > 0) {
 			if(sci_.getch() == ' ') {
 				float a = vtx::get_pi<float>() * 0.25f;
@@ -163,6 +238,36 @@ int main(int argc, char** argv)
 				utils::format("%8.7f: %8.7f, %8.7f\n") % a % si % co;
 			}
 		}
+#endif
+
+#ifdef OUT_MTU
+		if(cmd_.service()) {
+			auto cmdn = cmd_.get_words();
+			if(cmdn >= 2 && cmd_.cmp_word(0, "freq")) {
+				char tmp[32];
+				cmd_.get_word(1, tmp, sizeof(tmp));
+				int freq = 100;
+				if((utils::input("%d", tmp) % freq).status()) {
+					if(freq < 100) {
+						utils::format("Error Limit under 100[Hz]\n");
+					} else {
+						mtu_io_.set_freq(freq);
+						list_mtu_freq_();
+					}
+				} else {
+					utils::format("input error: '%s'\n") % tmp;
+				}
+			} else if(cmdn >= 1 && cmd_.cmp_word(0, "help")) {
+				utils::format("freq FREQ[Hz]\n");
+			} else if(cmdn >= 1) {
+				char tmp[32];
+				cmd_.get_word(0, tmp, sizeof(tmp));
+				utils::format("Command error: '%s'") % tmp;
+			}
+		}
+#endif
+
+//		PD1::P = cnt & 1;
 
 		++cnt;
 		if(cnt >= 50) {

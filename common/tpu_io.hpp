@@ -32,15 +32,37 @@ namespace device {
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
-			@brief  タイプ
+			@brief  タイマー・タイプ
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class TYPE : uint8_t {
-			MATCH,	///< コンペアー・マッチ
+			MATCH_A,	///< TGRA コンペアマッチ
+			MATCH_B,	///< TGRB コンペアマッチ
 		};
 
+
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		/*!
+			@brief  出力タイプ（コンペアマッチ）
+		*/
+		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+		enum class OUTPUT : uint8_t {
+			NONE  = 0b0000,		///< 出力しない
+			IL_ML = 0b0001,		///< 初期出力はLow出力、コンペアマッチでLow出力
+			IL_MH = 0b0010,		///< 初期出力はLow出力、コンペアマッチでHigh出力
+			IL_MT = 0b0011,		///< 初期出力はLow出力、コンペアマッチでトグル出力
+			IH_ML = 0b0101,		///< 初期出力はHigh出力、コンペアマッチでLow出力
+			IH_MH = 0b0110,		///< 初期出力はHigh出力、コンペアマッチでHigh出力
+			IH_MT = 0b0111		///< 初期出力はHigh出力、コンペアマッチでトグル出力
+		};
+
+
 	private:
+		TYPE		type_;
 		uint8_t		level_;
+		uint8_t		shift_;
+		uint32_t	rate_;
+
 		ICU::VECTOR	intr_vec_;
 
 		static volatile uint32_t counter_;
@@ -61,22 +83,27 @@ namespace device {
 			@brief  コンストラクター
 		*/
 		//-----------------------------------------------------------------//
-		tpu_io() noexcept : level_(0), intr_vec_(ICU::VECTOR::NONE) { }
+		tpu_io() noexcept : type_(TYPE::MATCH_A), level_(0), shift_(0), rate_(0),
+			intr_vec_(ICU::VECTOR::NONE)
+		{ }
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  タイマー動作開始（TGRA コンペアマッチ）
+			@brief  タイマー動作開始
+			@param[in]	type	タイプ
 			@param[in]	freq	タイマー周波数
 			@param[in]	level	割り込みレベル（０ならポーリング）
-			@param[in]	vector	選択型ベクター
+			@param[in]	out		出力タイプ
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(uint32_t freq, uint8_t level) noexcept
+		bool start(TYPE type, uint32_t freq, uint8_t level, OUTPUT out = OUTPUT::NONE) noexcept
 		{
 			if(freq == 0) return false;
 
+			type_ = type;
+			rate_ = freq;
 			level_ = level;
 
 			uint32_t cmt = F_PCLKB / freq;
@@ -130,25 +157,86 @@ namespace device {
 			} else {
 				return false;
 			}
+			shift_ = shift * 2;
 
+			bool ret = true;
 			power_mgr::turn(per);
 
-			TPU::TCR = TPU::TCR.CCLR.b(1) | TPU::TCR.TPSC.b(tpsc);  // TGRA のコンペアマッチ
-			TPU::TGRA = cmt - 1;
+			TPU::TMDR = 0;  // 通常モード、通常動作
+
+			switch(type) {
+			case TYPE::MATCH_A:  // TGRA のコンペアマッチ
+				TPU::TCR = TPU::TCR.CCLR.b(0b001) | TPU::TCR.TPSC.b(tpsc);
+				TPU::TGRA = cmt - 1;
+				// ※本来「TIORH」は TPU0、TPU3 のレジスタとなっているが、現在の実装では、TPU 共通
+				TPU::TIORH.IOA = static_cast<uint8_t>(out);
+				break;
+			case TYPE::MATCH_B:  // TGRB のコンペアマッチ
+				TPU::TCR = TPU::TCR.CCLR.b(0b010) | TPU::TCR.TPSC.b(tpsc);
+				TPU::TGRB = cmt - 1;
+				// ※本来「TIORH」は TPU0、TPU3 のレジスタとなっているが、現在の実装では、TPU 共通
+				TPU::TIORH.IOB = static_cast<uint8_t>(out);
+				break;
+			default:
+				ret = false;
+				break;
+			}
 			TPU::TCNT = 0x0000;
 
 			if(level_ > 0) {  // 割り込み設定
 				if(intr_vec_ == ICU::VECTOR::NONE) {
 					intr_vec_ = icu_mgr::set_interrupt(TPU::RA_INN, tpu_task_, level_);
 				}
-				TPU::TIER.TGIEA = 1;  // TGRA interrupt
+				switch(type) {
+				case TYPE::MATCH_A:
+					TPU::TIER.TGIEA = 1;  // TGRA interrupt
+					break;
+				case TYPE::MATCH_B:
+					TPU::TIER.TGIEB = 1;  // TGRB interrupt
+					break;
+				default:
+					break;
+				}
 			} else {
 				TPU::TIER.TGIEA = 0;
+				TPU::TIER.TGIEB = 0;
 			}
 
 			TPU::enable();
 
-			return true;
+			if(out != OUTPUT::NONE) {
+				switch(type) {
+				case TYPE::MATCH_A:  // TGRA のコンペアマッチ
+//					if(!port_map::turn(per, port_map::channel::A)) {
+//						ret = false;
+//					}
+					break;
+				case TYPE::MATCH_B:  // TGRB のコンペアマッチ
+//					if(!port_map::turn(per, port_map::channel::B)) {
+//						ret = false;
+//					}
+					break;
+				default:
+					ret = false;
+					break;
+				}
+			}
+
+			return ret;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  コンペアマッチＡ（出力を行わない）（レガシー）
+			@param[in]	freq	タイマー周波数
+			@param[in]	level	割り込みレベル（０ならポーリング）
+			@return レンジオーバーなら「false」を返す
+		*/
+		//-----------------------------------------------------------------//
+		bool start(uint32_t freq, uint8_t level) noexcept
+		{
+			return start(TYPE::MATCH_A, freq, level, OUTPUT::NONE);
 		}
 
 
@@ -178,8 +266,16 @@ namespace device {
 				volatile uint32_t cnt = counter_;
 				while(cnt == counter_) sleep_();
 			} else {
-				while(TPU::TSR.TGFA() == 0) sleep_();
-				TPU::TSR.TGFA = 0;
+				switch(type_) {
+				case TYPE::MATCH_A:
+					while(TPU::TSR.TGFA() == 0) sleep_();
+					TPU::TSR.TGFA = 0;
+					break;
+				case TYPE::MATCH_B:
+					while(TPU::TSR.TGFB() == 0) sleep_();
+					TPU::TSR.TGFB = 0;
+					break;
+				}
 				task_();
 				++counter_;
 			}
@@ -211,6 +307,35 @@ namespace device {
 		*/
 		//-----------------------------------------------------------------//
 		ICU::VECTOR get_intr_vec() const noexcept { return intr_vec_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	周期を取得
+			@param[in]	real	「true」にした場合、内部で計算されたリアルな値
+			@return 周期
+		 */
+		//-----------------------------------------------------------------//
+		uint32_t get_rate(bool real = false) const noexcept
+		{
+			if(real) {
+				uint32_t cmn = 0;
+				switch(type_) {
+				case TYPE::MATCH_A:
+					cmn = TPU::TGRA();
+					break;
+				case TYPE::MATCH_B:
+					cmn = TPU::TGRB();
+					break;
+				default:
+					break;
+				}
+				uint32_t rate = (static_cast<uint32_t>(F_PCLKB) >> shift_) / (cmn + 1);
+				return rate;
+			} else {
+				return rate_;
+			}
+		}
 
 
 		//-----------------------------------------------------------------//

@@ -1,7 +1,9 @@
-NESEMU_sample/emu/* linguist-vendored
-ff14/source/* linguist-vendored
 rxlib/* linguist-vendored
+FreeRTOS/Source/* linguist-vendored
+FreeRTOS_TCP/Source/* linguist-vendored
+ff14/source/* linguist-vendored
 RX600/drw2d/* linguist-vendored
+NESEMU_sample/emu/* linguist-vendored
 r_net/driver/* linguist-vendored
 r_net/T4_src/* linguist-vendored
 r_usb/* linguist-vendored

@@ -11,7 +11,7 @@ TARGET		=	test
 
 DEVICE		=	R5F572NN
 
-FATFS_VER	=	ff13c/source
+FATFS_VER	=	ff14/source
 
 BUILD		=	release
 # BUILD		=	debug
