@@ -12,6 +12,7 @@
 
 #include "capture.hpp"
 #include "render_wave.hpp"
+#include "refclk.hpp"
 
 namespace dsos {
 
@@ -66,6 +67,8 @@ namespace dsos {
 		uint8_t		smp_fine_;
 
 		uint32_t	trg_update_;
+
+		refclk		refclk_;
 
 		void side_button_stall_(BUTTON& mybtn, bool stall) noexcept
 		{
@@ -287,6 +290,9 @@ namespace dsos {
 
 			capture_tic_ = capture_.get_capture_tic();
 			capture_.set_trg_mode(TRG_MODE::ONE, 0);
+
+			// 基準波開始
+			refclk_.start();
 		}
 
 
