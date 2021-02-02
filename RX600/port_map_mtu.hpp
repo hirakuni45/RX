@@ -14,8 +14,9 @@
 #include "RX600/port.hpp"
 #include "RX600/mpc.hpp"
 
-
-// Under constructions....................
+// check list
+// MTU5
+// MTU8
 
 namespace device {
 
@@ -83,6 +84,70 @@ namespace device {
 		};
 
 	private:
+
+		/// P34 ( 27)  MTIOC0A
+		/// PB3 ( 98)  MTIOC0A / MTIOC4A
+		/// P15 ( 50)  MTIOC0B / MTCLKB
+		/// P13 ( 52)  MTIOC0B
+		/// PA1 (114)  MTIOC0B / MTCLKC / MTIOC7B
+		/// P32 ( 29)  MTIOC0C
+		/// PB1 (100)  MTIOC0C / MTIOC4C
+		/// P33 ( 28)  MTIOC0D
+		/// PA3 (110)  MTIOC0D / MTCLKD
+
+		/// P20 ( 45)  MTIOC1A
+		/// P21 ( 44)  MTIOC1B / MTIOC4A
+
+		/// P26 ( 37)  MTIOC2A
+		/// PB5 ( 96)  MTIOC2A / MTIOC1B
+		/// P27 ( 36)  MTIOC2B
+
+		/// P17 ( 46)  MTIOC3A / MTIOC3B / MTIOC4B
+		/// P14 ( 51)  MTIOC3A / MTCLKA
+		/// PC7 ( 76)  MTIOC3A / MTCLKB
+		/// PC1 ( 89)  MTIOC3A
+		/// P22 ( 43)  MTIOC3B / MTCLKC
+		/// PC5 ( 78)  MTIOC3B / MTCLKD
+		/// P80 ( 81)  MTIOC3B
+		/// PB7 ( 94)  MTIOC3B
+		/// PJ3 ( 13)  MTIOC3C
+		/// P16 ( 48)  MTIOC3C / MTIOC3D
+		/// PC6 ( 77)  MTIOC3C / MTCLKA
+		/// PC0 ( 91)  MTIOC3C
+		/// P23 ( 42)  MTIOC3D / MTCLKD
+		/// P81 ( 80)  MTIOC3D
+		/// PC4 ( 82)  MTIOC3D / MTCLKC
+		/// PB6 ( 95)  MTIOC3D
+		/// PE0 (135)  MTIOC3D
+
+		/// P24 ( 40)  MTIOC4A / MTCLKA
+		/// P82 ( 79)  MTIOC4A
+		/// PA0 (118)  MTIOC4A / MTIOC6D
+		/// P30 ( 33)  MTIOC4B
+		/// PC2 ( 86)  MTIOC4B
+		/// PE3 (132)  MTIOC4B
+		/// PD1 (156)  MTIOC4B
+		/// P25 ( 38)  MTIOC4C / MTCLKB
+		/// P87 ( 47)  MTIOC4C
+		/// P83 ( 74)  MTIOC4C
+		/// PE5 (130)  MTIOC4C / MTIOC2B
+		/// PE1 (134)  MTIOC4C / MTIOC3B
+		/// P31 ( 32)  MTIOC4D
+		/// P86 ( 49)  MTIOC4D
+		/// PC3 ( 83)  MTIOC4D
+		/// PE4 (131)  MTIOC4D / MTIOC1A
+		/// PD2 (154)  MTIOC4D
+
+		/// PE7 (125)  MTIOC6A
+		/// PA5 (108)  MTIOC6B
+		/// PE6 (126)  MTIOC6C
+		/// PA0 (118)  MTIOC4A / MTIOC6D
+
+		/// PA2 (112)  MTIOC7A
+		/// PA1 (114)  MTIOC0B / MTCLKC / MTIOC7B
+		/// P67 (120)  MTIOC7C
+		/// P66 (122)  MTIOC7D
+
 		static bool mtu0_(channel ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
@@ -583,9 +648,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P12 ( 53)  MTIC5U
-			///< PA4 (109)  MTIC5U / MTCLKA
-			///< PD7 (143)  MTIC5U
+			/// P12 ( 53)  MTIC5U
+			/// PA4 (109)  MTIC5U / MTCLKA
+			/// PD7 (143)  MTIC5U
 			case channel::U:
 				switch(opt) {
 				case option::FIRST:
@@ -608,9 +673,9 @@ namespace device {
 					break;
 				}
 				break;
-			///< P11 ( 67)  MTIC5V
-			///< PA6 (107)  MTIC5V / MTCLKB
-			///< PD6 (145)  MTIC5V / MTIOC8A
+			/// P11 ( 67)  MTIC5V
+			/// PA6 (107)  MTIC5V / MTCLKB
+			/// PD6 (145)  MTIC5V / MTIOC8A
 			case channel::V:
 				switch(opt) {
 				case option::FIRST:
@@ -633,9 +698,9 @@ namespace device {
 					break;
 				}
 				break;
-			///< P10 ( 68)  MTIC5W
-			///< PB0 (104)  MTIC5W
-			///< PD5 (147)  MTIC5W / MTIOC8C / MTCLKA
+			/// P10 ( 68)  MTIC5W
+			/// PB0 (104)  MTIC5W
+			/// PD5 (147)  MTIC5W / MTIOC8C
 			case channel::W:
 				switch(opt) {
 				case option::FIRST:
@@ -806,8 +871,20 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< PD4 (148)  MTIOC8B
-			///< PD3 (150)  MTIOC8D
+			/// PD6 (145)  MTIC5V / MTIOC8A
+			case channel::A:
+				switch(opt) {
+				case option::FIRST:
+					PORTD::PMR.B6 = 0;
+					MPC::PD6PFS.PSEL = sel;
+					PORTD::PMR.B6 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// PD4 (148)  MTIOC8B
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -820,6 +897,20 @@ namespace device {
 					break;
 				}
 				break;
+			/// PD5 (147)  MTIC5W / MTIOC8C
+			case channel::C:
+				switch(opt) {
+				case option::FIRST:
+					PORTD::PMR.B5 = 0;
+					MPC::PD5PFS.PSEL = sel;
+					PORTD::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// PD3 (150)  MTIOC8D
 			case channel::D:
 				switch(opt) {
 				case option::FIRST:

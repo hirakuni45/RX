@@ -525,7 +525,7 @@ namespace device {
 			@brief  PJn 端子機能制御レジスタ（PJnPFS）（n = 0 ～ 3, 5）
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-#if defined(SIG_RX72N)
+#if defined(SIG_RX65N) || defined(SIG_RX72N)
 		typedef pfsw_t<0x0008C1D0> PJ0PFS_;
 		static PJ0PFS_ PJ0PFS;
 		typedef pfsw_t<0x0008C1D1> PJ1PFS_;
