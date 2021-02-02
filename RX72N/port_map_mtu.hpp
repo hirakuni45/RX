@@ -68,25 +68,26 @@ namespace device {
 		*/
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		enum class group : uint8_t {
-			MTU0,	///< MTU0 系グループ
-			MTU1,	///< MTU1 系グループ
-			MTU2,	///< MTU2 系グループ
-			MTU3,	///< MTU3 系グループ
-			MTU4,	///< MTU4 系グループ
-			MTU5,	///< MTU5 系グループ
-			MTU6,	///< MTU6 系グループ
-			MTU7,	///< MTU7 系グループ
+			AREA0,	///< エリア０
+			AREA1,	///< エリア１
+			AREA2,	///< エリア２
+			AREA3,	///< エリア３
+			AREA4,	///< エリア４
+			AREA5,	///< 
+			AREA6,	///< 
+			AREA7,	///< 
 			NONE,	///< 無効なグループ
 		};
 
 	private:
+
 		static bool mtu0_(channel ch, bool ena, option opt) noexcept
 		{
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P34 ( 27)  MTIOC0A
-			///< PB3 ( 98)  MTIOC0A / MTIOC4A
+			/// P34 ( 27)  MTIOC0A
+			/// PB3 ( 98)  MTIOC0A / MTIOC4A
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -104,9 +105,9 @@ namespace device {
 					break;
 				}
 				break;
-			///< P15 ( 50)  MTIOC0B / MTCLKB
-			///< P13 ( 52)  MTIOC0B
-			///< PA1 (114)  MTIOC0B / MTCLKC / MTIOC7B
+			/// P15 ( 50)  MTIOC0B / MTCLKB
+			/// P13 ( 52)  MTIOC0B
+			/// PA1 (114)  MTIOC0B / MTCLKC / MTIOC7B
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -129,8 +130,8 @@ namespace device {
 					break;
 				}
 				break;
-			///< P32 ( 29)  MTIOC0C
-			///< PB1 (100)  MTIOC0C / MTIOC4C
+			/// P32 ( 29)  MTIOC0C
+			/// PB1 (100)  MTIOC0C / MTIOC4C
 			case channel::C:
 				switch(opt) {
 				case option::FIRST:
@@ -148,8 +149,8 @@ namespace device {
 					break;
 				}
 				break;
-			///< P33 ( 28)  MTIOC0D
-			///< PA3 (110)  MTIOC0D / MTCLKD
+			/// P33 ( 28)  MTIOC0D
+			/// PA3 (110)  MTIOC0D / MTCLKD
 			case channel::D:
 				switch(opt) {
 				case option::FIRST:
@@ -180,9 +181,8 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P20 ( 45)  MTIOC1A
-			///< P21 ( 44)  MTIOC1B / MTIOC4A
-			///< PB5 ( 96)  MTIOC2A / MTIOC1B
+			/// P20 ( 45)  MTIOC1A
+			/// PE4 (131)  MTIOC4D / MTIOC1A
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -190,11 +190,18 @@ namespace device {
 					MPC::P20PFS.PSEL = sel;
 					PORT2::PMR.B0 = ena;
 					break;
+				case option::SECOND:
+					PORTE::PMR.B4 = 0;
+					MPC::PE4PFS.PSEL = sel;
+					PORTE::PMR.B4 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
+			/// P21 ( 44)  MTIOC1B / MTIOC4A
+			/// PB5 ( 96)  MTIOC2A / MTIOC1B
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -225,9 +232,8 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P26 ( 37)  MTIOC2A
-			///< PB5 ( 96)  MTIOC2A / MTIOC1B
-			///< P27 ( 36)  MTIOC2B
+			/// P26 ( 37)  MTIOC2A
+			/// PB5 ( 96)  MTIOC2A / MTIOC1B
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -245,12 +251,19 @@ namespace device {
 					break;
 				}
 				break;
+			/// P27 ( 36)  MTIOC2B
+			/// PE5 (130)  MTIOC4C / MTIOC2B
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
 					PORT2::PMR.B7 = 0;
 					MPC::P27PFS.PSEL = sel;
 					PORT2::PMR.B7 = ena;
+					break;
+				case option::SECOND:
+					PORTE::PMR.B5 = 0;
+					MPC::PE5PFS.PSEL = sel;
+					PORTE::PMR.B5 = ena;
 					break;
 				default:
 					ret = false;
@@ -270,10 +283,10 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P17 ( 46)  MTIOC3A / MTIOC3B / MTIOC4B
-			///< P14 ( 51)  MTIOC3A / MTCLKA
-			///< PC7 ( 76)  MTIOC3A / MTCLKB
-			///< PC1 ( 89)  MTIOC3A
+			/// P17 ( 46)  MTIOC3A / MTIOC3B / MTIOC4B
+			/// P14 ( 51)  MTIOC3A / MTCLKA
+			/// PC7 ( 76)  MTIOC3A / MTCLKB
+			/// PC1 ( 89)  MTIOC3A
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -301,10 +314,12 @@ namespace device {
 					break;
 				}
 				break;
-			///< P22 ( 43)  MTIOC3B / MTCLKC
-			///< PC5 ( 78)  MTIOC3B / MTCLKD
-			///< P80 ( 81)  MTIOC3B
-			///< PB7 ( 94)  MTIOC3B
+			/// P22 ( 43)  MTIOC3B / MTCLKC
+			/// PC5 ( 78)  MTIOC3B / MTCLKD
+			/// P80 ( 81)  MTIOC3B
+			/// PB7 ( 94)  MTIOC3B
+			/// P17 ( 46)  MTIOC3A / MTIOC3B / MTIOC4B
+			/// PE1 (134)  MTIOC4C / MTIOC3B
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -327,16 +342,26 @@ namespace device {
 					MPC::PB7PFS.PSEL = sel;
 					PORTB::PMR.B7 = ena;
 					break;
+				case option::FIFTH:
+					PORT1::PMR.B7 = 0;
+					MPC::P17PFS.PSEL = sel;
+					PORT1::PMR.B7 = ena;
+					break;
+				case option::SIXTH:
+					PORTE::PMR.B1 = 0;
+					MPC::PE1PFS.PSEL = sel;
+					PORTE::PMR.B1 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			///< PJ3 ( 13)  MTIOC3C
-			///< P56 ( 64)  MTIOC3C
-			///< P16 ( 48)  MTIOC3C / MTIOC3D
-			///< PC6 ( 77)  MTIOC3C / MTCLKA
-			///< PC0 ( 91)  MTIOC3C
+			/// PJ3 ( 13)  MTIOC3C
+			/// P56 ( 64)  MTIOC3C
+			/// P16 ( 48)  MTIOC3C / MTIOC3D
+			/// PC6 ( 77)  MTIOC3C / MTCLKA
+			/// PC0 ( 91)  MTIOC3C
 			case channel::C:
 				switch(opt) {
 				case option::FIRST:
@@ -369,11 +394,12 @@ namespace device {
 					break;
 				}
 				break;
-			///< P23 ( 42)  MTIOC3D / MTCLKD
-			///< P81 ( 80)  MTIOC3D
-			///< PC4 ( 82)  MTIOC3D / MTCLKC
-			///< PB6 ( 95)  MTIOC3D
-			///< PE0 (135)  MTIOC3D
+			/// P23 ( 42)  MTIOC3D / MTCLKD
+			/// P81 ( 80)  MTIOC3D
+			/// PC4 ( 82)  MTIOC3D / MTCLKC
+			/// PB6 ( 95)  MTIOC3D
+			/// PE0 (135)  MTIOC3D
+			/// P16 ( 48)  MTIOC3C / MTIOC3D
 			case channel::D:
 				switch(opt) {
 				case option::FIRST:
@@ -419,10 +445,12 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P24 ( 40)  MTIOC4A / MTCLKA
-			///< P82 ( 79)  MTIOC4A
-			///< PA0 (118)  MTIOC4A / MTIOC6D
-			///< PE2 (133)  MTIOC4A
+			/// P24 ( 40)  MTIOC4A / MTCLKA
+			/// P82 ( 79)  MTIOC4A
+			/// PA0 (118)  MTIOC4A / MTIOC6D
+			/// PE2 (133)  MTIOC4A
+			/// PB3 ( 98)  MTIOC0A / MTIOC4A
+			/// P21 ( 44)  MTIOC1B / MTIOC4A
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -445,16 +473,27 @@ namespace device {
 					MPC::PE2PFS.PSEL = sel;
 					PORTE::PMR.B2 = ena;
 					break;
+				case option::FIFTH:
+					PORTB::PMR.B3 = 0;
+					MPC::PB3PFS.PSEL = sel;
+					PORTB::PMR.B3 = ena;
+					break;
+				case option::SIXTH:
+					PORT2::PMR.B2 = 0;
+					MPC::P21PFS.PSEL = sel;
+					PORT2::PMR.B1 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			///< P30 ( 33)  MTIOC4B
-			///< P54 ( 66)  MTIOC4B
-			///< PC2 ( 86)  MTIOC4B
-			///< PE3 (132)  MTIOC4B
-			///< PD1 (156)  MTIOC4B
+			/// P30 ( 33)  MTIOC4B
+			/// P54 ( 66)  MTIOC4B
+			/// PC2 ( 86)  MTIOC4B
+			/// PE3 (132)  MTIOC4B
+			/// PD1 (156)  MTIOC4B
+			/// P17 ( 46)  MTIOC3A / MTIOC3B / MTIOC4B
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -482,16 +521,22 @@ namespace device {
 					MPC::PD1PFS.PSEL = sel;
 					PORTD::PMR.B1 = ena;
 					break;
+				case option::SIXTH:
+					PORT1::PMR.B7 = 0;
+					MPC::P17PFS.PSEL = sel;
+					PORT1::PMR.B7 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			///< P25 ( 38)  MTIOC4C / MTCLKB
-			///< P87 ( 47)  MTIOC4C
-			///< P83 ( 74)  MTIOC4C
-			///< PE5 (130)  MTIOC4C / MTIOC2B
-			///< PE1 (134)  MTIOC4C / MTIOC3B
+			/// P25 ( 38)  MTIOC4C / MTCLKB
+			/// P87 ( 47)  MTIOC4C
+			/// P83 ( 74)  MTIOC4C
+			/// PE5 (130)  MTIOC4C / MTIOC2B
+			/// PE1 (134)  MTIOC4C / MTIOC3B
+			/// PB1 (100)  MTIOC0C / MTIOC4C
 			case channel::C:
 				switch(opt) {
 				case option::FIRST:
@@ -519,17 +564,22 @@ namespace device {
 					MPC::PE1PFS.PSEL = sel;
 					PORTE::PMR.B1 = ena;
 					break;
+				case option::SIXTH:
+					PORTB::PMR.B2 = 0;
+					MPC::PB2PFS.PSEL = sel;
+					PORTB::PMR.B2 = ena;
+					break;
 				default:
 					ret = false;
 					break;
 				}
 				break;
-			///< P31 ( 32)  MTIOC4D
-			///< P86 ( 49)  MTIOC4D
-			///< P55 ( 65)  MTIOC4D
-			///< PC3 ( 83)  MTIOC4D
-			///< PE4 (131)  MTIOC4D / MTIOC1A
-			///< PD2 (154)  MTIOC4D
+			/// P31 ( 32)  MTIOC4D
+			/// P86 ( 49)  MTIOC4D
+			/// P55 ( 65)  MTIOC4D
+			/// PC3 ( 83)  MTIOC4D
+			/// PE4 (131)  MTIOC4D / MTIOC1A
+			/// PD2 (154)  MTIOC4D
 			case channel::D:
 				switch(opt) {
 				case option::FIRST:
@@ -580,9 +630,9 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< P12 ( 53)  MTIC5U
-			///< PA4 (109)  MTIC5U / MTCLKA
-			///< PD7 (143)  MTIC5U
+			/// P12 ( 53)  MTIC5U
+			/// PA4 (109)  MTIC5U / MTCLKA
+			/// PD7 (143)  MTIC5U
 			case channel::U:
 				switch(opt) {
 				case option::FIRST:
@@ -605,9 +655,9 @@ namespace device {
 					break;
 				}
 				break;
-			///< P11 ( 67)  MTIC5V
-			///< PA6 (107)  MTIC5V / MTCLKB
-			///< PD6 (145)  MTIC5V / MTIOC8A
+			/// P11 ( 67)  MTIC5V
+			/// PA6 (107)  MTIC5V / MTCLKB
+			/// PD6 (145)  MTIC5V / MTIOC8A
 			case channel::V:
 				switch(opt) {
 				case option::FIRST:
@@ -630,9 +680,9 @@ namespace device {
 					break;
 				}
 				break;
-			///< P10 ( 68)  MTIC5W
-			///< PB0 (104)  MTIC5W
-			///< PD5 (147)  MTIC5W / MTIOC8C / MTCLKA
+			/// P10 ( 68)  MTIC5W
+			/// PB0 (104)  MTIC5W
+			/// PD5 (147)  MTIC5W / MTIOC8C / MTCLKA
 			case channel::W:
 				switch(opt) {
 				case option::FIRST:
@@ -668,13 +718,8 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< PJ1 ( 59)  MTIOC6A
-			///< PE7 (125)  MTIOC6A
-			///< PJ0 ( 60)  MTIOC6B
-			///< PA5 (108)  MTIOC6B
-			///< P85 ( 61)  MTIOC6C
-			///< PE6 (126)  MTIOC6C
-			///< P84 ( 62)  MTIOC6D
+			/// PJ1 ( 59)  MTIOC6A
+			/// PE7 (125)  MTIOC6A
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -692,6 +737,8 @@ namespace device {
 					break;
 				}
 				break;
+			/// PJ0 ( 60)  MTIOC6B
+			/// PA5 (108)  MTIOC6B
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -709,6 +756,8 @@ namespace device {
 					break;
 				}
 				break;
+			/// P85 ( 61)  MTIOC6C
+			/// PE6 (126)  MTIOC6C
 			case channel::C:
 				switch(opt) {
 				case option::FIRST:
@@ -726,12 +775,19 @@ namespace device {
 					break;
 				}
 				break;
+			/// P84 ( 62)  MTIOC6D
+			/// PA0 (118)  MTIOC4A / MTIOC6D
 			case channel::D:
 				switch(opt) {
 				case option::FIRST:
 					PORT8::PMR.B4 = 0;
 					MPC::P84PFS.PSEL = sel;
 					PORT8::PMR.B4 = ena;
+					break;
+				case option::SECOND:
+					PORTA::PMR.B0 = 0;
+					MPC::PA0PFS.PSEL = sel;
+					PORTA::PMR.B0 = ena;
 					break;
 				default:
 					ret = false;
@@ -751,9 +807,7 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< PA2 (112)  MTIOC7A
-			///< P67 (120)  MTIOC7C
-			///< P66 (122)  MTIOC7D
+			/// PA2 (112)  MTIOC7A
 			case channel::A:
 				switch(opt) {
 				case option::FIRST:
@@ -766,6 +820,20 @@ namespace device {
 					break;
 				}
 				break;
+			/// PA1 (114)  MTIOC0B / MTCLKC / MTIOC7B
+			case channel::B:
+				switch(opt) {
+				case option::FIRST:
+					PORTA::PMR.B1 = 0;
+					MPC::PA1PFS.PSEL = sel;
+					PORTA::PMR.B1 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// P67 (120)  MTIOC7C
 			case channel::C:
 				switch(opt) {
 				case option::FIRST:
@@ -778,6 +846,7 @@ namespace device {
 					break;
 				}
 				break;
+			/// P66 (122)  MTIOC7D
 			case channel::D:
 				switch(opt) {
 				case option::FIRST:
@@ -803,8 +872,20 @@ namespace device {
 			bool ret = true;
 			uint8_t sel = ena ? 0b000001 : 0;
 			switch(ch) {
-			///< PD4 (148)  MTIOC8B
-			///< PD3 (150)  MTIOC8D
+			/// PD6 (145)  MTIC5V / MTIOC8A
+			case channel::A:
+				switch(opt) {
+				case option::FIRST:
+					PORTD::PMR.B6 = 0;
+					MPC::PD6PFS.PSEL = sel;
+					PORTD::PMR.B6 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// PD4 (148)  MTIOC8B
 			case channel::B:
 				switch(opt) {
 				case option::FIRST:
@@ -817,6 +898,20 @@ namespace device {
 					break;
 				}
 				break;
+			/// PD5 (147)  MTIC5W / MTIOC8C
+			case channel::C:
+				switch(opt) {
+				case option::FIRST:
+					PORTD::PMR.B5 = 0;
+					MPC::PD5PFS.PSEL = sel;
+					PORTD::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// PD3 (150)  MTIOC8D
 			case channel::D:
 				switch(opt) {
 				case option::FIRST:
@@ -907,7 +1002,150 @@ namespace device {
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		static bool turn_clock(group grp, channel ch, bool ena = true) noexcept
 		{
+			MPC::PWPR.B0WI  = 0;	// PWPR 書き込み許可
+			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
+
+			uint8_t sel = ena ? 0b000010 : 0;
 			bool ret = true;
+			switch(grp) {
+			/// P15 ( 50)  MTIOC0B / MTCLKB
+			/// PA1 (114)  MTIOC0B / MTCLKC / MTIOC7B
+			/// PA3 (110)  MTIOC0D / MTCLKD
+			case group::AREA0:
+				switch(ch) {
+				case channel::CLK_B:
+					PORT1::PMR.B5 = 0;
+					MPC::P15PFS.PSEL = sel;
+					PORT1::PMR.B5 = ena;
+					break;
+				case channel::CLK_C:
+					PORTA::PMR.B1 = 0;
+					MPC::PA1PFS.PSEL = sel;
+					PORTA::PMR.B1 = ena;
+					break;
+				case channel::CLK_D:
+					PORTA::PMR.B3 = 0;
+					MPC::PA3PFS.PSEL = sel;
+					PORTA::PMR.B3 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// P14 ( 51)  MTIOC3A / MTCLKA
+			/// PC7 ( 76)  MTIOC3A / MTCLKB
+			/// P22 ( 43)  MTIOC3B / MTCLKC
+			/// PC5 ( 78)  MTIOC3B / MTCLKD
+			case group::AREA1:
+				switch(ch) {
+				case channel::CLK_A:
+					PORT1::PMR.B4 = 0;
+					MPC::P14PFS.PSEL = sel;
+					PORT1::PMR.B4 = ena;
+					break;
+				case channel::CLK_B:
+					PORTC::PMR.B7 = 0;
+					MPC::PC7PFS.PSEL = sel;
+					PORTC::PMR.B7 = ena;
+					break;
+				case channel::CLK_C:
+					PORT2::PMR.B2 = 0;
+					MPC::P22PFS.PSEL = sel;
+					PORT2::PMR.B2 = ena;
+					break;
+				case channel::CLK_D:
+					PORTC::PMR.B5 = 0;
+					MPC::PC5PFS.PSEL = sel;
+					PORTC::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// PC6 ( 77)  MTIOC3C / MTCLKA
+			/// P23 ( 42)  MTIOC3D / MTCLKD
+			/// PC4 ( 82)  MTIOC3D / MTCLKC
+			case group::AREA2:
+				switch(ch) {
+				case channel::CLK_A:
+					PORTC::PMR.B6 = 0;
+					MPC::PC6PFS.PSEL = sel;
+					PORTC::PMR.B6 = ena;
+					break;
+				case channel::CLK_C:
+					PORT2::PMR.B3 = 0;
+					MPC::P23PFS.PSEL = sel;
+					PORT2::PMR.B3 = ena;
+					break;
+				case channel::CLK_D:
+					PORTC::PMR.B4 = 0;
+					MPC::PC4PFS.PSEL = sel;
+					PORTC::PMR.B4 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// P24 ( 40)  MTIOC4A / MTCLKA
+			/// P25 ( 38)  MTIOC4C / MTCLKB
+			case group::AREA3:
+				switch(ch) {
+				case channel::CLK_A:
+					PORT2::PMR.B4 = 0;
+					MPC::P24PFS.PSEL = sel;
+					PORT2::PMR.B4 = ena;
+					break;
+				case channel::CLK_B:
+					PORT2::PMR.B5 = 0;
+					MPC::P25PFS.PSEL = sel;
+					PORT2::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// PA4 (109)  MTIC5U / MTCLKA
+			/// PA6 (107)  MTIC5V / MTCLKB
+			case group::AREA4:
+				switch(ch) {
+				case channel::CLK_A:
+					PORTA::PMR.B4 = 0;
+					MPC::PA4PFS.PSEL = sel;
+					PORTA::PMR.B4 = ena;
+					break;
+				case channel::CLK_B:
+					PORTA::PMR.B6 = 0;
+					MPC::PA6PFS.PSEL = sel;
+					PORTA::PMR.B6 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			/// PD5 (147)  MTIC5W / MTIOC8C / MTCLKA
+			case group::AREA5:
+				switch(ch) {
+				case channel::CLK_A:
+					PORTD::PMR.B5 = 0;
+					MPC::PD5PFS.PSEL = sel;
+					PORTD::PMR.B5 = ena;
+					break;
+				default:
+					ret = false;
+					break;
+				}
+				break;
+			default:
+				ret = false;
+				break;
+			}
+
+			MPC::PWPR = MPC::PWPR.B0WI.b();
 
 			return ret;
 		}
