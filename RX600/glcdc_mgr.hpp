@@ -32,6 +32,8 @@ namespace device {
 		static const graphics::pixel::TYPE PXT = PXT_;
 		static const int16_t line_width =
 			(((width * static_cast<int16_t>(PXT) / 8) + 63) & 0x7fc0) / (static_cast<int16_t>(PXT) / 8);
+		static const uint32_t frame_size =
+			line_width * (static_cast<uint32_t>(PXT) / 8) * height;
 
 	private:
 
@@ -424,6 +426,10 @@ namespace device {
 
 		void*				layer1_org_;
 		void*				layer2_org_;
+
+		uint32_t			flip_count_;
+		bool				enable_double_;
+
 		uint8_t				intr_lvl_;
 		ERROR				last_error_;
 
@@ -1637,6 +1643,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		glcdc_mgr(void* ly1, void* ly2) noexcept :
 			layer1_org_(ly1), layer2_org_(ly2),
+			flip_count_(0), enable_double_(false),
 			intr_lvl_(0), last_error_(ERROR::SUCCESS)
 		{ }
 
@@ -1647,10 +1654,39 @@ namespace device {
 			@return フレームバッファポインター
 		*/
 		//-----------------------------------------------------------------//
-		void* get_fbp() const noexcept {
-			if(layer2_org_ != nullptr) return layer2_org_;
-			else return layer1_org_;
+		void* get_fbp() const noexcept
+		{
+			uint32_t ofs = 0;
+			if(enable_double_) {
+				ofs = (flip_count_ & 1) != 0 ? 0 : frame_size;
+			}
+			if(layer2_org_ != nullptr) {
+				uint32_t org = reinterpret_cast<uint32_t>(layer2_org_);
+				return reinterpret_cast<void*>(org + ofs);
+			} else if(layer1_org_ != nullptr) {
+				uint32_t org = reinterpret_cast<uint32_t>(layer1_org_);
+				return reinterpret_cast<void*>(org + ofs);
+			}
+			return nullptr;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ダブルバッファを有効にする
+			@param[in]	ena		無効にする場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable_double_buffer(bool ena = true) noexcept { enable_double_ = ena; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ダブルバッファが有効か検査
+			@return 有効な場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool is_double_buffer() const noexcept { return enable_double_; }
 
 
 		//-----------------------------------------------------------------//
@@ -2051,10 +2087,28 @@ namespace device {
 		//-----------------------------------------------------------------//
 		void sync_vpos() const noexcept
 		{
+			if(enable_double_) {
+				uint32_t ofs = (flip_count_ & 1) != 0 ? 0 : frame_size;
+				uint32_t org = reinterpret_cast<uint32_t>(layer2_org_);
+				GLC::GR2VEN = 1;
+				GLC::GR2FLM2 = org + ofs;
+			}
 			volatile auto n = ctrl_blk_.vpos_count;
 			while(n == ctrl_blk_.vpos_count) {
 				asm("nop");
 			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バッファの FLIP @n
+					※480x272 の解像度では、RAM は 512K バイト必要
+		*/
+		//-----------------------------------------------------------------//
+		void flip() noexcept
+		{
+			++flip_count_;
 		}
 
 
