@@ -50,6 +50,7 @@
 #include "RX72N/icu_mgr.hpp"
 #include "RX72N/port_map.hpp"
 #include "RX72N/port_map_mtu.hpp"
+#include "RX72N/port_map_tpu.hpp"
 
 #elif defined(SIG_RX65N)
 #include "RX65x/peripheral.hpp"
