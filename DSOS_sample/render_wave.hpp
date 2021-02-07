@@ -106,8 +106,8 @@ namespace dsos {
 		};
 		AREA		area_;
 
-		uint16_t	cap_win_org_;
-		uint16_t	cap_win_end_;
+		int16_t		cap_win_org_;
+		int16_t		cap_win_end_;
 		vtx::spos	volt_min_[2];
 		vtx::spos	volt_max_[2];
 
@@ -777,7 +777,9 @@ namespace dsos {
 				if(tic != cap_tic_ || smp_mode_ != cur_smp_mode_) {
 					cap_tic_ = tic;
 					cur_smp_mode_ = smp_mode_;
-					capture_.analize(cap_win_org_, cap_win_end_, wave_info0_, wave_info1_);
+					// 見えている倍の領域をスキャン
+					auto end = cap_win_end_ + (cap_win_end_ - cap_win_org_);
+					capture_.analize(cap_win_org_, end, wave_info0_, wave_info1_);
 				}
 			}
 

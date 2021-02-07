@@ -86,9 +86,7 @@ namespace dsos {
 #ifdef GLFW_SIM
 				DATA t = adv_;
 #else
-				DATA t(ADC0::ADDR(ADC_CH0), ADC1::ADDR(ADC_CH1));
-				t.x -= CAP_OFS;
-				t.y -= CAP_OFS;
+				DATA t(ADC0::ADDR(ADC_CH0) - CAP_OFS, ADC1::ADDR(ADC_CH1) - CAP_OFS);
 				ADC0::ADCSR = ADC0::ADCSR.ADCS.b(0b01) | ADC0::ADCSR.ADST.b();
 				ADC1::ADCSR = ADC1::ADCSR.ADCS.b(0b01) | ADC1::ADCSR.ADST.b();
 #endif
@@ -295,7 +293,8 @@ namespace dsos {
 		{
 #ifndef GLFW_SIM
 			uint8_t intr_level = 5;
-			if(!tpu0_.start(TPU0::TYPE::MATCH_A, freq, intr_level)) {
+			bool intr_only = true;  // 割り込みタスクのみ実行
+			if(!tpu0_.start(TPU0::TYPE::MATCH_A, freq, intr_level, TPU0::OUTPUT::NONE, intr_only)) {
 				utils::format("TPU0 start error...\n");
 			}
 #endif
@@ -416,13 +415,15 @@ namespace dsos {
 			@param[in]	max		最大値
 		*/
 		//-----------------------------------------------------------------//
-		void get_min_max(uint32_t org, uint32_t end, DATA& min, DATA& max) const noexcept
+		void get_min_max(int32_t org, int32_t end, DATA& min, DATA& max) const noexcept
 		{
+			if(end < org) end += CAP_NUM;
+
 			min.x = get(org).x;
 			max.x = get(org).x;
 			min.y = get(org).y;
 			max.y = get(org).y;
-			for(uint32_t i = org + 1; i < end; ++i) {
+			for(int32_t i = org + 1; i < end; ++i) {
 				min.x = std::min(min.x, get(i).x);
 				max.x = std::max(max.x, get(i).x);
 				min.y = std::min(min.y, get(i).y);
@@ -503,7 +504,7 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		const auto& get(uint32_t pos) const noexcept
 		{
-			return get_cap_task().data_[(pos + get_cap_task().trg_pos_) & (CAPN - 1)];
+			return get_cap_task().data_[(pos + get_cap_task().trg_pos_) & (CAP_NUM - 1)];
 		}
 
 
@@ -565,8 +566,12 @@ namespace dsos {
 			@param[out]	ch1		CH1 情報
 		*/
 		//-----------------------------------------------------------------//
-		void analize(uint32_t org, uint32_t end, wave_info& ch0, wave_info& ch1) const noexcept
+		void analize(int32_t org, int32_t end, wave_info& ch0, wave_info& ch1) const noexcept
 		{
+			if(end < org) end += CAP_NUM;
+			if((end - org) > static_cast<int32_t>(CAP_NUM)) end = org + CAP_NUM;
+///			utils::format("Cap win width: %d\n") % static_cast<int>(end - org);
+
 			DATA min;
 			DATA max;
 			get_min_max(org, end, min, max);
@@ -575,14 +580,9 @@ namespace dsos {
 			ch1.min_ = min.y;
 			ch1.max_ = max.y;
 
-			auto ch0_th = (ch0.min_ + ch0.max_) / 2;
-			uint8_t ch0_step = 0;
-			auto ch1_th = (ch1.min_ + ch1.max_) / 2;
-			uint8_t ch1_step = 0;
-
 			ch0.setup();
 			ch1.setup();
-			for(uint32_t i = org + 0; i < end; ++i) {
+			for(int32_t i = org + 1; i < end; ++i) {
 				ch0.update(get(i).x, i);
 				ch1.update(get(i).y, i);
 				if(ch0.probe() && ch1.probe()) break;
