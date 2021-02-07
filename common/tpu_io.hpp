@@ -69,8 +69,11 @@ namespace device {
 
 		static TASK	task_;
 
+		static INTERRUPT_FUNC void tpu_task_only_() noexcept {
+			task_();
+		}
+
 		static INTERRUPT_FUNC void tpu_task_() noexcept {
-///			if(TPU::TSR.TGFA()) TPU::TSR.TGFA = 0;
 			++counter_;
 			task_();
 		}
@@ -95,10 +98,11 @@ namespace device {
 			@param[in]	freq	タイマー周波数
 			@param[in]	level	割り込みレベル（０ならポーリング）
 			@param[in]	out		出力タイプ
+			@param[in]	intronly	割り込みタスクのみの場合「true」
 			@return レンジオーバーなら「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		bool start(TYPE type, uint32_t freq, uint8_t level, OUTPUT out = OUTPUT::NONE) noexcept
+		bool start(TYPE type, uint32_t freq, uint8_t level, OUTPUT out = OUTPUT::NONE, bool intronly = false) noexcept
 		{
 			if(freq == 0) return false;
 
@@ -185,7 +189,11 @@ namespace device {
 
 			if(level_ > 0) {  // 割り込み設定
 				if(intr_vec_ == ICU::VECTOR::NONE) {
-					intr_vec_ = icu_mgr::set_interrupt(TPU::RA_INN, tpu_task_, level_);
+					if(intronly) {
+						intr_vec_ = icu_mgr::set_interrupt(TPU::RA_INN, tpu_task_only_, level_);
+					} else {
+						intr_vec_ = icu_mgr::set_interrupt(TPU::RA_INN, tpu_task_, level_);
+					}
 				}
 				switch(type) {
 				case TYPE::MATCH_A:
@@ -228,7 +236,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  コンペアマッチＡ（出力を行わない）（レガシー）
+			@brief  コンペアマッチＡ（MATCH_A, 出力を行わない）（レガシー）
 			@param[in]	freq	タイマー周波数
 			@param[in]	level	割り込みレベル（０ならポーリング）
 			@return レンジオーバーなら「false」を返す
@@ -236,7 +244,7 @@ namespace device {
 		//-----------------------------------------------------------------//
 		bool start(uint32_t freq, uint8_t level) noexcept
 		{
-			return start(TYPE::MATCH_A, freq, level, OUTPUT::NONE);
+			return start(TYPE::MATCH_A, freq, level);
 		}
 
 
