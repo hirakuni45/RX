@@ -309,6 +309,7 @@ int main(int argc, char** argv)
 		}
 	}
 
+#if 0
 	{  // DRW2D 初期化
 		auto ver = render_.get_version();
 		utils::format("DRW2D Version: %04X\n") % ver;
@@ -319,6 +320,7 @@ int main(int argc, char** argv)
 			utils:: format("DRW2D Fail\n");
 		}
 	}
+#endif
 
 	{  // FT5206 touch screen controller
 		TOUCH::reset<FT5206_RESET>();
@@ -339,8 +341,10 @@ int main(int argc, char** argv)
 
 	cmd_.set_prompt("# ");
 
+	glcdc_mgr_.enable_double();
+
 	while(1) {
-		glcdc_mgr_.sync_vpos();
+		render_.sync_frame();
 
 		touch_.update();
 
