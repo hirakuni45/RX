@@ -142,6 +142,20 @@ namespace graphics {
 		void sync_frame(bool vsync = true) noexcept
 		{
 			if(vsync) glc_.sync_vpos();
+			fb_ = static_cast<T*>(glc_.get_fbp());
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  バッファの FLIP
+		*/
+		//-----------------------------------------------------------------//
+		void flip() noexcept
+		{
+			if(glc_.is_double_buffer()) {
+				glc_.flip();
+			}
 		}
 
 

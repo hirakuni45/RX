@@ -300,8 +300,8 @@ namespace dsos {
 			int16_t		min_;
 			int16_t		max_;
 
-			uint16_t	org_;
-			uint16_t	end_;
+			int32_t		org_;
+			int32_t		end_;
 
 			float		freq_;
 
@@ -325,7 +325,7 @@ namespace dsos {
 			}
 
 
-			void update(int16_t v, uint16_t pos) noexcept
+			void update(int16_t v, int32_t pos) noexcept
 			{
 				switch(step_) {
 				case 0:

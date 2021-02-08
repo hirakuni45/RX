@@ -361,8 +361,11 @@ namespace gl {
 			@return	OpenGL 並びの、ワールド・マトリックス
 		 */
 		//-----------------------------------------------------------------//
-		void world_matrix(matrix_type& mat) const {
-			mtx::matmul4(mat.m, acc_[mode::projection].m, acc_[mode::modelview].m);
+		void world_matrix(matrix_type& mat) const noexcept
+		{
+			const auto& pm = acc_[static_cast<int>(mode::projection)];
+			const auto& mm = acc_[static_cast<int>(mode::modelview)];
+			mtx::matmul4(mat(), pm(), mm());
 		}
 
 
@@ -375,10 +378,11 @@ namespace gl {
 			@param[out]	scr		スクリーン座標
 		 */
 		//-----------------------------------------------------------------//
-		void vertex(const matrix_type& mat, const vtx::vertex3<T>& inv, vtx::vertex3<T>& out, vtx::vertex3<T>& scr) const {
+		void vertex(const matrix_type& mat, const vtx::vertex3<T>& inv, vtx::vertex3<T>& out, vtx::vertex3<T>& scr) const noexcept
+		{
 			vtx::vertex4<T> in = inv;
 			T o[4];
-			mtx::matmul1<T>(o, mat.m, in.getXYZW());
+			mtx::matmul1<T>(o, mat(), in.getXYZW());
 			out.set(o[0], o[1], o[2]);
 			T invw = static_cast<T>(1) / o[3];
 			T w = (far_ * near_) / (far_ - near_) * invw;
@@ -410,10 +414,11 @@ namespace gl {
 			@param[out]	outv	結果を受け取るベクター
 		 */
 		//-----------------------------------------------------------------//
-		void vertex_screen(const mtx::matrix4<T>& mat, const vtx::vertex3<T>& inv, vtx::vertex3<T>& outv) const {
+		void vertex_screen(const mtx::matrix4<T>& mat, const vtx::vertex3<T>& inv, vtx::vertex3<T>& outv) const noexcept
+		{
 			T out[4];
 			vtx::vertex4<T> in = inv;
-			mtx::matmul1<T>(out, mat.m, in.getXYZW());
+			mtx::matmul1<T>(out, mat(), in.getXYZW());
 			T invw = 1.0f / out[3];
 			T w = (far_ * near_) / (far_ - near_) * invw;
 			outv.set(out[0] * invw, out[1] * invw, w);
@@ -441,7 +446,7 @@ namespace gl {
 		//-----------------------------------------------------------------//
 		void print_matrix() {
 			for(int i = 0; i < 4; ++i) {
-				utils::format("(%d) %-1.5f, %-1.5f, %-1.5f, %-1.5f\n")
+				utils::format("(%d) %-6.5f, %-6.5f, %-6.5f, %-6.5f\n")
 					% i
 					% acc_[static_cast<int>(mode_)].m[0 * 4 + i]
 					% acc_[static_cast<int>(mode_)].m[1 * 4 + i]
