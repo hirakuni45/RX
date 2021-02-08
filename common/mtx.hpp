@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	各種マトリックスの定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -13,23 +13,31 @@
 
 namespace mtx {
 
-	static inline void deg_sin_cos_(float deg, float& si, float& co) {
+	static inline void deg_sin_cos_(float deg, float& si, float& co) noexcept
+	{
+#ifdef SIG_RX72N
+		__builtin_rx_sincosf(deg  * vtx::deg2rad_f_, &si, &co);
+#else
 		si = std::sin(deg * vtx::deg2rad_f_);
 		co = std::cos(deg * vtx::deg2rad_f_);
+#endif
 	}
 
-	static inline void deg_sin_cos_(double deg, double& si, double& co) {
+	static inline void deg_sin_cos_(double deg, double& si, double& co) noexcept
+	{
 		si = std::sin(deg * vtx::deg2rad_d_);
 		co = std::cos(deg * vtx::deg2rad_d_);
 	}
 
 	template <typename T>
-	const T& grc_(const T* p, uint32_t row, uint32_t col) {
+	const T& grc_(const T* p, uint32_t row, uint32_t col) noexcept
+	{
 		return p[(col << 2) + row];
 	}
 
 	template <typename T>
-	T& prc_(T* p, uint32_t row, uint32_t col) {
+	T& prc_(T* p, uint32_t row, uint32_t col) noexcept
+	{
 		return p[(col << 2) + row];
 	}
 
@@ -42,7 +50,8 @@ namespace mtx {
 	 */
 	//-----------------------------------------------------------------//
 	template <class T, int n>
-	void matrix_copy(const T* src, T* dst) {
+	void matrix_copy(const T* src, T* dst) noexcept
+	{
 		for(uint32_t i = 0; i < n; ++i) { dst[i] = src[i]; }
 	}
 
@@ -53,7 +62,8 @@ namespace mtx {
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	void create_identity(T* m) {
+	void create_identity(T* m) noexcept
+	{
 		m[ 0] = static_cast<T>(1);
 		m[ 1] = static_cast<T>(0);
 		m[ 2] = static_cast<T>(0);
@@ -78,14 +88,15 @@ namespace mtx {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@brief	OpenGL ４×４マトリックス積
+		@brief	OpenGL ４×４マトリックス積 (a * b -> out)
 		@param[out]	out		出力マトリックス
 		@param[in]	a		入力マトリックス
 		@param[in]	b		入力マトリックス
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	void matmul4(T* out, const T* a, const T* b) {
+	void matmul4(T* out, const T* a, const T* b) noexcept
+	{
 		for(uint32_t i = 0; i < 4; ++i) {
 			T ai0 = grc_(a,i,0);
 			T ai1 = grc_(a,i,1);
@@ -101,14 +112,15 @@ namespace mtx {
 
 	//-----------------------------------------------------------------//
 	/*!
-		@brief	OpenGL ４×４マトリックスとベクターの積
+		@brief	OpenGL ４×４マトリックスとベクターの積 (mat * vec -> out)
 		@param[out]	out		出力ベクター
 		@param[in]	mat		入力マトリックス
 		@param[in]	vec		入力ベクター
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	void matmul1(T* out, const T* mat, const T* vec) {
+	void matmul1(T* out, const T* mat, const T* vec) noexcept
+	{
 		out[0] = (mat[0] * vec[0]) + (mat[4] * vec[1]) + (mat[ 8] * vec[2]) + (mat[12] * vec[3]);
 		out[1] = (mat[1] * vec[0]) + (mat[5] * vec[1]) + (mat[ 9] * vec[2]) + (mat[13] * vec[3]);
 		out[2] = (mat[2] * vec[0]) + (mat[6] * vec[1]) + (mat[10] * vec[2]) + (mat[14] * vec[3]);
@@ -126,7 +138,8 @@ namespace mtx {
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	void mult_scale(T* out, T x, T y, T z) {
+	void mult_scale(T* out, T x, T y, T z) noexcept
+	{
 		out[0] *= x; out[4] *= y; out[8]  *= z;
 		out[1] *= x; out[5] *= y; out[9]  *= z;
 		out[2] *= x; out[6] *= y; out[10] *= z;
@@ -141,7 +154,8 @@ namespace mtx {
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	void mult_translate(T *out, T x, T y, T z) {
+	void mult_translate(T *out, T x, T y, T z) noexcept
+	{
 		vtx::vertex4<T> t(x, y, z);
 		matmul1<T>(&out[12], out, t.getXYZW());
 	}
@@ -160,7 +174,8 @@ namespace mtx {
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	void mult_frustum(T* out, T left, T right, T bottom, T top, T nearval, T farval) {
+	void mult_frustum(T* out, T left, T right, T bottom, T top, T nearval, T farval) noexcept
+	{
 		T x = (static_cast<T>(2) * nearval) / (right - left);
 		T y = (static_cast<T>(2) * nearval) / (top - bottom);
 		T a = (right + left)   / (right - left);
@@ -202,7 +217,8 @@ namespace mtx {
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	void mult_ortho(T* out, T left, T right, T bottom, T top, T nearval, T farval) {
+	void mult_ortho(T* out, T left, T right, T bottom, T top, T nearval, T farval) noexcept
+	{
 		T m[16];
 		prc_(m,0,0) = static_cast<T>(2) / (right - left);
 		prc_(m,0,1) = static_cast<T>(0);
@@ -238,7 +254,8 @@ namespace mtx {
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	bool mult_perspective(T* out, T fovy, T aspect, T nearv, T farv) {
+	bool mult_perspective(T* out, T fovy, T aspect, T nearv, T farv) noexcept
+	{
 		T si, co;
 		deg_sin_cos_(fovy * 0.5f, si, co);
 		T delta = farv - nearv;
@@ -283,7 +300,8 @@ namespace mtx {
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	void mult_look_at(T* out, const vtx::vertex3<T>& eye, const vtx::vertex3<T>& center, const vtx::vertex3<T>& up) {
+	void mult_look_at(T* out, const vtx::vertex3<T>& eye, const vtx::vertex3<T>& center, const vtx::vertex3<T>& up) noexcept
+	{
 		vtx::vertex3<T> forward;
 		vtx::normalize((center - eye), forward);
 
@@ -330,7 +348,8 @@ namespace mtx {
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	bool mult_rotate(T* out, T si, T co, T x, T y, T z) {
+	bool mult_rotate(T* out, T si, T co, T x, T y, T z) noexcept
+	{
 		T m[16];
 		create_identity(m);
 		bool optimized = false;
@@ -436,7 +455,7 @@ namespace mtx {
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	bool invert_matrix(const T* src, T* dst)
+	bool invert_matrix(const T* src, T* dst) noexcept
 	{
 		const T* m = src;
 		T wtmp[4][8];
@@ -569,7 +588,7 @@ namespace mtx {
 	 */
 	//-----------------------------------------------------------------//
 	template <class T>
-	bool invert_matrix_3d(const T* src, T* dst)
+	bool invert_matrix_3d(const T* src, T* dst) noexcept
 	{
 		/* Calculate the determinant of upper left 3x3 submatrix and
 		* determine if the matrix is singular.
@@ -644,7 +663,8 @@ namespace mtx {
 			@brief	コンストラクター
 		 */
 		//-----------------------------------------------------------------//
-		matrix4() { }
+		matrix4() noexcept {
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -653,7 +673,9 @@ namespace mtx {
 			@param[in]	srcm	マトリックス
 		 */
 		//-----------------------------------------------------------------//
-		matrix4(const matrix4<T>& srcm) { matrix_copy<T, 16>(srcm(), m_); }
+		matrix4(const matrix4<T>& srcm) noexcept {
+			matrix_copy<T, 16>(srcm(), m_);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -662,7 +684,9 @@ namespace mtx {
 			@param[in]	srcm	基本型のポインター
 		 */
 		//-----------------------------------------------------------------//
-		explicit matrix4(const T* srcm) { matrix_copy<T, 16>(srcm, m_); }
+		explicit matrix4(const T* srcm) noexcept {
+			matrix_copy<T, 16>(srcm, m_);
+		}
 
 
 		//-----------------------------------------------------------------//
@@ -678,7 +702,7 @@ namespace mtx {
 			@brief	ゼロ・リセット
 		 */
 		//-----------------------------------------------------------------//
-		void zero() {
+		void zero() noexcept {
 			for(uint32_t i = 0; i < 16; ++i) {
 				m_[i] = static_cast<T>(0);
 			}
@@ -690,7 +714,7 @@ namespace mtx {
 			@brief	単位ユニットの設定
 		 */
 		//-----------------------------------------------------------------//
-		void identity() { create_identity(m_); }
+		void identity() noexcept { create_identity(m_); }
 
 
 		//-----------------------------------------------------------------//
@@ -699,7 +723,7 @@ namespace mtx {
 			@param[in]	srcm	ソース・マトリックス配列
 		 */
 		//-----------------------------------------------------------------//
-		void load(const T* srcm) { matrix_copy<T, 16>(srcm, m_); }
+		void load(const T* srcm) noexcept { matrix_copy<T, 16>(srcm, m_); }
 
 
 		//-----------------------------------------------------------------//
@@ -709,7 +733,7 @@ namespace mtx {
 			@return エラーなら「false」
 		 */
 		//-----------------------------------------------------------------//
-		bool inverse(const T* srcm) { return invert_matrix<T>(srcm, m_); }
+		bool inverse(const T* srcm) noexcept { return invert_matrix<T>(srcm, m_); }
 
 
 		//-----------------------------------------------------------------//
@@ -719,7 +743,7 @@ namespace mtx {
 			@return エラーなら「false」
 		 */
 		//-----------------------------------------------------------------//
-		bool inverse_3d(const T* srcm) { return invert_matrix_3d<T>(srcm, m_); }
+		bool inverse_3d(const T* srcm) noexcept { return invert_matrix_3d<T>(srcm, m_); }
 
 
 		//-----------------------------------------------------------------//
@@ -728,7 +752,7 @@ namespace mtx {
 			@param[in]	v	スケールファクター
 		 */
 		//-----------------------------------------------------------------//
-		void scale(const vtx::vertex3<T>& v) { mult_scale<T>(m_, v.x, v.y, v.z); }
+		void scale(const vtx::vertex3<T>& v) noexcept { mult_scale<T>(m_, v.x, v.y, v.z); }
 
 
 		//-----------------------------------------------------------------//
@@ -737,7 +761,7 @@ namespace mtx {
 			@param[in]	v	移動距離
 		 */
 		//-----------------------------------------------------------------//
-		void translate(const vtx::vertex3<T>& v) { mult_translate<T>(m_, v.x, v.y, v.z); }
+		void translate(const vtx::vertex3<T>& v) noexcept { mult_translate<T>(m_, v.x, v.y, v.z); }
 
 
 		//-----------------------------------------------------------------//
@@ -748,7 +772,8 @@ namespace mtx {
 			@param[in]	v	回転中心座標
 		 */
 		//-----------------------------------------------------------------//
-		void rotate(T angle, const vtx::vertex3<T>& v) {
+		void rotate(T angle, const vtx::vertex3<T>& v) noexcept
+		{
 			T si, co;
 			deg_sin_cos_(angle, si, co);
 			mult_rotate<T>(m_, si, co, v.x, v.y, v.z);
@@ -766,7 +791,8 @@ namespace mtx {
 			@param[in]	farval	クリップ平面上の位置（奥）
 		 */
 		//-----------------------------------------------------------------//
-		void frustum(T left, T right, T bottom, T top, T nearval, T farval) {
+		void frustum(T left, T right, T bottom, T top, T nearval, T farval) noexcept
+		{
 			mult_frustum<T>(m_, left, right, bottom, top, nearval, farval);
 		}
 
@@ -782,7 +808,8 @@ namespace mtx {
 			@param[in]	farval	クリップ平面上の位置（奥）
 		 */
 		//-----------------------------------------------------------------//
-		void ortho(T left, T right, T bottom, T top, T nearval, T farval) {
+		void ortho(T left, T right, T bottom, T top, T nearval, T farval) noexcept
+		{
 			mult_ortho<T>(m_, left, right, bottom, top, nearval, farval);
 		}
 
@@ -796,7 +823,8 @@ namespace mtx {
 			@param[in]	zFar	クリップ平面上の位置（奥）
 		 */
 		//-----------------------------------------------------------------//
-		void perspective(T fovy, T aspect, T zNear, T zFar) {
+		void perspective(T fovy, T aspect, T zNear, T zFar) noexcept
+		{
 			mult_perspective<T>(m_, fovy, aspect, zNear, zFar);
 		}
 
@@ -809,7 +837,8 @@ namespace mtx {
 			@param[in]	up カメラの上向き方向ベクトル
 		 */
 		//-----------------------------------------------------------------//
-		void look_at(const vtx::vertex3<T>& eye, const vtx::vertex3<T>& center, const vtx::vertex3<T>& up) {
+		void look_at(const vtx::vertex3<T>& eye, const vtx::vertex3<T>& center, const vtx::vertex3<T>& up) noexcept
+		{
 			mult_look_at<T>(m_, eye, center, up);
 		}
 
@@ -821,7 +850,8 @@ namespace mtx {
 			@param[out]	out	出力ベクトル(4)
 		 */
 		//-----------------------------------------------------------------//
-		void vertex_mult(const vtx::vertex3<T>& vin, vtx::vertex4<T>& out) {
+		void vertex_mult(const vtx::vertex3<T>& vin, vtx::vertex4<T>& out) noexcept
+		{
 			vtx::vertex4<T> t(vin.x, vin.y, vin.z);
 			matmul1<T>(out, m_, t.xyzw);
 		}
@@ -834,7 +864,8 @@ namespace mtx {
 			@param[out]	out	出力ベクトル(3)
 		 */
 		//-----------------------------------------------------------------//
-		void vertex_mult(const vtx::vertex3<T>& vin, vtx::vertex3<T>& out) {
+		void vertex_mult(const vtx::vertex3<T>& vin, vtx::vertex3<T>& out) noexcept
+		{
 			vtx::vertex4<T> t(vin.x, vin.y, vin.z);
 			float o[4];
 			matmul1<T>(o, m_, t.getXYZW());
@@ -930,11 +961,20 @@ namespace mtx {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	() オペレーター
+			@brief	() オペレーター (RO)
 			@return 先頭ポインター
 		 */
 		//-----------------------------------------------------------------//
 		const T* operator() () const { return &m_[0]; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	() オペレーター (RW)
+			@return 先頭ポインター
+		 */
+		//-----------------------------------------------------------------//
+		T* operator() () { return &m_[0]; }
 	};
 	typedef matrix4<float>	fmat4;	///< 「float」型マトリックス
 	typedef matrix4<double>	dmat4;	///< 「double」型マトリックス

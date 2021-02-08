@@ -367,23 +367,23 @@ namespace vtx {
 		T	y;
 		T	z;
 
-		inline vertex3() { }
-		inline vertex3(const svtx& v) : x(v.x), y(v.y), z(v.z) { }
-		inline vertex3(const ivtx& v) : x(v.x), y(v.y), z(v.z) { }
-		inline vertex3(const fvtx& v) : x(v.x), y(v.y), z(v.z) { }
-		inline vertex3(const dvtx& v) : x(v.x), y(v.y), z(v.z) { }
-		explicit inline vertex3(T c) : x(c), y(c), z(c) { }
-		explicit inline vertex3(T xx, T yy, T zz = static_cast<T>(0)) : x(xx), y(yy), z(zz) { }
+		vertex3() { }
+		constexpr vertex3(const svtx& v) : x(v.x), y(v.y), z(v.z) { }
+		constexpr vertex3(const ivtx& v) : x(v.x), y(v.y), z(v.z) { }
+		constexpr vertex3(const fvtx& v) : x(v.x), y(v.y), z(v.z) { }
+		constexpr vertex3(const dvtx& v) : x(v.x), y(v.y), z(v.z) { }
+		explicit constexpr vertex3(T c) : x(c), y(c), z(c) { }
+		constexpr vertex3(T xx, T yy, T zz = static_cast<T>(0)) : x(xx), y(yy), z(zz) { }
 
 		inline const T* getXYZ() const { return &x; }
 
-		inline T sqrX() const { return x * x; }
-		inline T sqrY() const { return y * y; }
-		inline T sqrZ() const { return z * z; }
-		inline T sqr() const { return sqrX() + sqrY() + sqrZ(); }
-		inline T len() const { return fsqrt(sqr()); }
+		T sqrX() const { return x * x; }
+		T sqrY() const { return y * y; }
+		T sqrZ() const { return z * z; }
+		T sqr() const { return sqrX() + sqrY() + sqrZ(); }
+		T len() const { return fsqrt(sqr()); }
 
-		inline T min() const {
+		T min() const {
 			if(x < y) {
 				if(x < z) return x;
 			} else {
@@ -391,7 +391,7 @@ namespace vtx {
 			}
 			return z;
 		}
-		inline T max() const {
+		T max() const {
 			if(x > y) {
 				if(x > z) return x;
 			} else {
