@@ -125,7 +125,7 @@ namespace {
 			case 1: tgl_.color(DEF_COLOR::Red);   break;
 			case 2: tgl_.color(DEF_COLOR::Blue);  break;
 			case 3: tgl_.color(DEF_COLOR::Green); break;
-			case 4: tgl_.color(DEF_COLOR::Purple); break;
+			case 4: tgl_.color(DEF_COLOR::Fuchsi); break;
 			case 5: tgl_.color(DEF_COLOR::Yellow); break; 
 			default:
 				break;
