@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX65N/RX651 DRW2D マネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2019 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2019, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -43,8 +43,6 @@ namespace device {
 
 	private:
 		typedef device::DRW2D DRW;
-
-		static const int16_t line_offset = (((GLC::width * sizeof(value_type)) + 63) & 0x7fc0) / sizeof(value_type);
 
 		GLC&		glc_;
 
@@ -117,6 +115,8 @@ namespace device {
 		{
 			start_frame_enable_ = true;
 			d2_startframe(d2_);
+
+			fb_ = static_cast<value_type*>(glc_.get_fbp());
 
 			auto xs = GLC::width;
 			auto ys = GLC::height;
@@ -242,6 +242,19 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	フレームバッファ、フリッピング
+		*/
+		//-----------------------------------------------------------------//
+		void flip() noexcept
+		{
+			if(glc_.is_double_buffer()) {
+				glc_.flip();
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	停止
 		*/
 		//-----------------------------------------------------------------//
@@ -360,7 +373,7 @@ namespace device {
 			}
 			if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(GLC::width)) return false;
 			if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(GLC::height)) return false;
-			fb_[pos.y * line_offset + pos.x] = c;
+			fb_[pos.y * GLC::line_width + pos.x] = c;
 			return true;
 		}
 
@@ -376,7 +389,7 @@ namespace device {
         {
             if(static_cast<uint16_t>(pos.x) >= static_cast<uint16_t>(GLC::width)) return -1;
             if(static_cast<uint16_t>(pos.y) >= static_cast<uint16_t>(GLC::height)) return -1;
-            return fb_[pos.y * line_offset + pos.x];
+            return fb_[pos.y * GLC::line_width + pos.x];
         }
 
 
@@ -472,11 +485,47 @@ namespace device {
 			@return エラー無い場合「true」
 		*/
 		//-----------------------------------------------------------------//
+		bool line_d(const vtx::spos& org, const vtx::spos& end) noexcept
+		{
+			setup_();
+			last_error_ = d2_renderline(d2_, org.x, org.y, end.x, end.y,
+				pen_size_, d2_le_exclude_none);
+			return last_error_ == D2_OK;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	ライン描画（アンチエリアスされたライン）
+			@param[in]	org		開始位置
+			@param[in]	end		終端位置
+			@return エラー無い場合「true」
+		*/
+		//-----------------------------------------------------------------//
 		bool line(const vtx::spos& org, const vtx::spos& end) noexcept
 		{
 			setup_();
 			last_error_ = d2_renderline(d2_, org.x << 4, org.y << 4, end.x << 4, end.y << 4,
 				pen_size_, d2_le_exclude_none);
+			return last_error_ == D2_OK;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	四角形の描画
+			@param[in]	p0		頂点０
+			@param[in]	p1		頂点１
+			@param[in]	p2		頂点２
+			@param[in]	p3		頂点３
+			@return エラー無い場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool quad_d(const vtx::spos& p0, const vtx::spos& p1, const vtx::spos& p2, const vtx::spos& p3) noexcept
+		{
+			setup_();
+			last_error_ = d2_renderquad(d2_, p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y,
+				d2_le_exclude_none);
 			return last_error_ == D2_OK;
 		}
 
@@ -604,13 +653,13 @@ namespace device {
 		void scroll(int16_t h) noexcept
 		{
 			if(h > 0) {
-				for(int32_t i = 0; i < (line_offset * (GLC::height - h)); ++i) {
-					fb_[i] = fb_[i + (line_offset * h)];
+				for(int32_t i = 0; i < (GLC::line_width * (GLC::height - h)); ++i) {
+					fb_[i] = fb_[i + (GLC::line_width * h)];
 				}
 			} else if(h < 0) {
 				h = -h;
-				for(int32_t i = (line_offset * (GLC::height - h)) - 1; i >= 0; --i) {
-					fb_[i + (line_offset * h)] = fb_[i];
+				for(int32_t i = (GLC::line_width * (GLC::height - h)) - 1; i >= 0; --i) {
+					fb_[i + (GLC::line_width * h)] = fb_[i];
 				}
 			}
 		}
