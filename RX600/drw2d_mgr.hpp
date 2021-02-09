@@ -513,6 +513,24 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	三角形の描画
+			@param[in]	p0		頂点０
+			@param[in]	p1		頂点１
+			@param[in]	p2		頂点２
+			@return エラー無い場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool triangle_d(const vtx::spos& p0, const vtx::spos& p1, const vtx::spos& p2) noexcept
+		{
+			setup_();
+			last_error_ = d2_rendertri(d2_, p0.x, p0.y, p1.x, p1.y, p2.x, p2.y,
+				d2_le_exclude_none);
+			return last_error_ == D2_OK;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	四角形の描画
 			@param[in]	p0		頂点０
 			@param[in]	p1		頂点１
