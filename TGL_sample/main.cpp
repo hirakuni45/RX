@@ -18,6 +18,7 @@
 #include "graphics/kfont.hpp"
 #include "graphics/font.hpp"
 #include "graphics/tgl.hpp"
+#include "graphics/shape_3d.hpp"
 
 namespace {
 
@@ -54,6 +55,9 @@ namespace {
 	static const uint32_t PNUM = 300;  // プリミティブ最大数
 	typedef graphics::tgl<RENDER, VNUM, PNUM> TGL;
 	TGL			tgl_(render_);
+
+	typedef graphics::shape_3d<TGL> SHAPE;
+	SHAPE		shape_(tgl_);
 #endif
 
 	typedef graphics::def_color DEF_COLOR;
@@ -87,58 +91,6 @@ namespace {
 				}
 			}
 		}
-	}
-
-
-	void draw_box_(float size, TGL::PTYPE prim) noexcept
-	{
-		static constexpr vtx::fvtx n[6] = {
-			{ -1.0f,  0.0f,  0.0f },
-			{  0.0f,  1.0f,  0.0f },
-			{  1.0f,  0.0f,  0.0f },
-			{  0.0f, -1.0f,  0.0f },
-			{  0.0f,  0.0f,  1.0f },
-			{  0.0f,  0.0f, -1.0f }
-		};
-
-		static const int faces[6][4] =
-		{
-			{ 0, 1, 2, 3 },
-			{ 3, 2, 6, 7 },
-			{ 7, 6, 5, 4 },
-			{ 4, 5, 1, 0 },
-			{ 5, 6, 2, 1 },
-			{ 7, 4, 0, 3 }
-		};
-
-		vtx::fvtx v[8];
-		v[0].x = v[1].x = v[2].x = v[3].x = -size / 2;
-		v[4].x = v[5].x = v[6].x = v[7].x =  size / 2;
-		v[0].y = v[1].y = v[4].y = v[5].y = -size / 2;
-		v[2].y = v[3].y = v[6].y = v[7].y =  size / 2;
-		v[0].z = v[3].z = v[4].z = v[7].z = -size / 2;
-		v[1].z = v[2].z = v[5].z = v[6].z =  size / 2;
-
-		for (int i = 5; i >= 0; i--) {
-			switch(i) {
-			case 0: tgl_.color(DEF_COLOR::White); break;
-			case 1: tgl_.color(DEF_COLOR::Red);   break;
-			case 2: tgl_.color(DEF_COLOR::Blue);  break;
-			case 3: tgl_.color(DEF_COLOR::Green); break;
-			case 4: tgl_.color(DEF_COLOR::Fuchsi); break;
-			case 5: tgl_.color(DEF_COLOR::Yellow); break; 
-			default:
-				break;
-			}
-
-    		tgl_.begin(prim);
-    		// glNormal3fv(&n[i]);
-    		tgl_.vertex(v[faces[i][0]]);
-    		tgl_.vertex(v[faces[i][1]]);
-    		tgl_.vertex(v[faces[i][2]]);
-    		tgl_.vertex(v[faces[i][3]]);
-    		tgl_.end();
-  		}
 	}
 }
 
@@ -207,7 +159,9 @@ int main(int argc, char** argv)
 			if(!glcdc_mgr_.control(GLCDC_MGR::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC ctrl fail...\n");
 			} else {
-				glcdc_mgr_.enable_double_buffer();  // ダブルバッファを有効にする。
+				if(!glcdc_mgr_.enable_double_buffer()) {  // ダブルバッファを有効にする。
+					utils::format("Can't enable double-bufer\n");
+				}
 			}
 		} else {
 			utils::format("Fail GLCDC\n");
@@ -231,6 +185,7 @@ int main(int argc, char** argv)
 
 	uint8_t n = 0;
 	int16_t xx = 0;
+	uint16_t nn = 0;
 	float ax = 0.0f;
 	float ay = 0.0f;
 	while(1) {
@@ -240,6 +195,11 @@ int main(int argc, char** argv)
 
 		auto& m = tgl_.at_matrix();
 		m.set_viewport(0, 0, LCD_X, LCD_Y);
+
+		m.set_mode(gl::matrixf::mode::projection);
+		m.identity();
+		m.perspective(45.0f, static_cast<float>(LCD_X) / static_cast<float>(LCD_Y), 1.0f, 50.0f);
+
 		m.set_mode(gl::matrixf::mode::modelview);
 		m.identity();
 		m.translate(0.0f, 0.0f, -10.0f);
@@ -251,12 +211,14 @@ int main(int argc, char** argv)
 		ay += 1.5f;
 		if(ay >= 360.0f) ay -= 360.0f;
 
-		m.set_mode(gl::matrixf::mode::projection);
-		m.identity();
-		m.perspective(45.0f, static_cast<float>(LCD_X) / static_cast<float>(LCD_Y), 1.0f, 50.0f);
-
-//		draw_box_(2.0f, TGL::PTYPE::LINE_LOOP);
-		draw_box_(2.0f, TGL::PTYPE::QUAD);
+		if(nn < 240) {
+			tgl_.LineWidth(3.0f);
+			shape_.WireCube(2.0f);
+		} else {
+			shape_.SolidCube(2.0f);
+		}
+		++nn;
+		if(nn >= 480) nn = 0;
 
 		tgl_.renderring();
 
