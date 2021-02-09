@@ -59,7 +59,7 @@ namespace graphics {
 		constexpr explicit color_t(uint32_t v = 0xff000000) : rgba(v) { }
 		constexpr color_t(const rgba8_t& t) : unit(t) { }
 		constexpr color_t(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) : unit(r, g, b, a) { }
-		color_t(const color_t& t) noexcept : rgba(t.rgba) { }
+		constexpr color_t(const color_t& t) noexcept : rgba(t.rgba) { }
  		color_t& operator = (const color_t& t) noexcept { rgba = t.rgba; return *this; }
 		color_t& operator = (color_t&& t) noexcept { rgba = t.rgba; return *this; }
 		color_t& operator *= (uint8_t s) noexcept {
@@ -95,7 +95,7 @@ namespace graphics {
 		constexpr share_color(uint8_t r, uint8_t g, uint8_t b) noexcept :
 			rgb565(to_565(r, g, b)), rgba8(r, g, b, 255) { }
 
-		share_color(const share_color& t) noexcept :
+		constexpr share_color(const share_color& t) noexcept :
 			rgb565(t.rgb565), rgba8(t.rgba8) { }
 
 		share_color& operator = (const share_color& t) noexcept {
