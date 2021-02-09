@@ -11,38 +11,14 @@
 #include "common/vtx.hpp"
 #include "graphics/color.hpp"
 #include "graphics/glmatrix.hpp"
+#include "graphics/tgl_base.hpp"
 
 namespace graphics {
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	TinyGL base class
-	*/
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	class tgl_base {
-	public:
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		/*!
-			@brief	TinyGL Primitive Type
-		*/
-		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-		enum class PTYPE {
-			NONE,
-			POINTS,			///< 点の描画
-			LINES,			///< 単線の描画
-			LINE_STRIP,		///< 複数線の描画
-			LINE_LOOP,		///< 閉じた線の描画
-			QUAD,			///< ４点ポリゴンの描画
-		};
-
-		typedef gl::matrixf	MATRIX;
-	};
-
-
-	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	/*!
 		@brief	TinyGL class
-		@param[in]	RDR		レンダークラス
+		@param[in]	RDR		レンダークラス（DRW2D インスタンス）
 		@param[in]	VNUM	最大頂点数
 		@param[in]	PNUM	最大プリミティブ数
 	*/
@@ -74,6 +50,7 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	コンストラクター
+			@param[in]	rdr		レンダークラス（DRW2D インスタンス）
 		*/
 		//-----------------------------------------------------------------//
 		tgl(RDR& rdr) noexcept : rdr_(rdr),
@@ -87,11 +64,14 @@ namespace graphics {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	開始
+			@return 成功なら「true」
 		*/
 		//-----------------------------------------------------------------//
 		bool start() noexcept
 		{
 #ifdef SIG_RX72N
+			// GNU-RX 8.3.0 compile options: -mtfu=intrinsic,mathlib
+			// see: common/mtx.hpp
 			utils::format("TinyGL Start\n");
 			__init_tfu();
 			utils::format("  TFU initializations\n");
@@ -107,11 +87,23 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	描画線サイズ指定
+			@param[in]	w	線幅
+		*/
+		//-----------------------------------------------------------------//
+		void LineWidth(float w) noexcept
+		{
+			rdr_.set_pen_size(static_cast<int16_t>(w * 16.0f));
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	描画開始
 			@param[in]	pt	描画タイプ
 		*/
 		//-----------------------------------------------------------------//
-		void begin(PTYPE pt) noexcept
+		void Begin(PTYPE pt) noexcept
 		{
 			if(dt_idx_ >= PNUM) return;
 
@@ -127,7 +119,7 @@ namespace graphics {
 			@brief	描画終了
 		*/
 		//-----------------------------------------------------------------//
-		void end() noexcept
+		void End() noexcept
 		{
 			if(dts_[dt_idx_].org_ == vtx_idx_) {
 				return;
@@ -143,7 +135,7 @@ namespace graphics {
 			@param[in]	c	カラー
 		*/
 		//-----------------------------------------------------------------//
-		void color(const share_color& c) noexcept
+		void Color(const share_color& c) noexcept
 		{
 			color_ = c;
 		}
@@ -155,7 +147,7 @@ namespace graphics {
 			@param[in]	v	頂点
 		*/
 		//-----------------------------------------------------------------//
-		void vertex(float x, float y) noexcept
+		void Vertex(float x, float y) noexcept
 		{
 			if(vtx_idx_ >= VNUM) return;
 			vtxs_[vtx_idx_].x = x;
@@ -164,9 +156,9 @@ namespace graphics {
 			vtxs_[vtx_idx_].w = 1.0f;
 			++vtx_idx_;
 		}
-		void vertex(const vtx::spos& v) noexcept { vertex(v.x, v.y); }
-		void vertex(const vtx::ipos& v) noexcept { vertex(v.x, v.y); }
-		void vertex(const vtx::fpos& v) noexcept { vertex(v.x, v.y); }
+		void Vertex(const vtx::spos& v) noexcept { Vertex(v.x, v.y); }
+		void Vertex(const vtx::ipos& v) noexcept { Vertex(v.x, v.y); }
+		void Vertex(const vtx::fpos& v) noexcept { Vertex(v.x, v.y); }
 
 
 		//-----------------------------------------------------------------//
@@ -175,7 +167,7 @@ namespace graphics {
 			@param[in]	v	頂点
 		*/
 		//-----------------------------------------------------------------//
-		void vertex(float x, float y, float z) noexcept
+		void Vertex(float x, float y, float z) noexcept
 		{
 			if(vtx_idx_ >= VNUM) return;
 			vtxs_[vtx_idx_].x = x;
@@ -184,9 +176,9 @@ namespace graphics {
 			vtxs_[vtx_idx_].w = 1.0f;
 			++vtx_idx_;
 		}
-		void vertex(const vtx::svtx& v) noexcept { vertex(v.x, v.y, v.z); }
-		void vertex(const vtx::ivtx& v) noexcept { vertex(v.x, v.y, v.z); }
-		void vertex(const vtx::fvtx& v) noexcept { vertex(v.x, v.y, v.z); }
+		void Vertex(const vtx::svtx& v) noexcept { Vertex(v.x, v.y, v.z); }
+		void Vertex(const vtx::ivtx& v) noexcept { Vertex(v.x, v.y, v.z); }
+		void Vertex(const vtx::fvtx& v) noexcept { Vertex(v.x, v.y, v.z); }
 
 
 		//-----------------------------------------------------------------//
@@ -234,10 +226,19 @@ namespace graphics {
 				}
 				switch(t.pt_) {
 				case PTYPE::POINTS:
+
 					break;
 				case PTYPE::LINES:
+					for(uint32_t j = 0; j < k; j += 2) {
+						rdr_.line_d(tmp[j], tmp[j + 1]);
+					}
 					break;
 				case PTYPE::LINE_STRIP:
+					for(uint32_t j = 0; j < k; ++j) {
+						if((j + 1) < k) {
+							rdr_.line_d(tmp[j], tmp[j + 1]);
+						}
+					}
 					break;
 				case PTYPE::LINE_LOOP:
 					for(uint32_t j = 0; j < k; ++j) {
@@ -249,6 +250,11 @@ namespace graphics {
 				case PTYPE::QUAD:
 					for(uint32_t j = 0; j < k; j += 4) {
 						rdr_.quad_d(tmp[j+0], tmp[j+1], tmp[j+2], tmp[j+3]);
+					}
+					break;
+				case PTYPE::TRIANGLE:
+					for(uint32_t j = 0; j < k; j += 3) {
+						rdr_.triangle_d(tmp[j+0], tmp[j+1], tmp[j+2]);
 					}
 					break;
 				default:

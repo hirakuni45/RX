@@ -1675,9 +1675,17 @@ namespace device {
 		/*!
 			@brief	ダブルバッファを有効にする
 			@param[in]	ena		無効にする場合「false」
+			@return 有効に出来ない場合「false」を返す
 		*/
 		//-----------------------------------------------------------------//
-		void enable_double_buffer(bool ena = true) noexcept { enable_double_ = ena; }
+		bool enable_double_buffer(bool ena = true) noexcept {
+#if defined(SIG_RX72N) || defined(SIG_RX72M)
+			enable_double_ = ena;
+			return true;
+#else
+			return false;
+#endif
+		}
 
 
 		//-----------------------------------------------------------------//
