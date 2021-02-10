@@ -378,6 +378,7 @@ namespace device {
 		void set_stipple(uint32_t stipple = -1) noexcept {
 			stipple_ = stipple;
 			stipple_mask_ = 1;
+//			d2_setpattern(d2_, stipple);
 		}
 
 
@@ -746,11 +747,17 @@ namespace device {
 			// setup_();
 			d2_color clut[2];
 			clut[0] = back_color_.rgba8.rgba;
+			auto copyflag = d2_bf_filter;
+			if(!back) {
+				clut[0] &= 0xffffff;
+				copyflag |= d2_bf_usealpha;
+			}
+			// d2_setalphaex(d2_, 0, 0);
 			clut[1] = fore_color_.rgba8.rgba;
 			d2_settexclut_part(d2_, clut, 0, 2);
 			d2_setblitsrc(d2_, src, w, w, h, d2_mode_i1 | d2_mode_clut);
 			d2_blitcopy(d2_, w, h,
-				0, 0, w * 16, h * 16, pos.x * 16, pos.y * 16, d2_bf_filter);
+				0, 0, w * 16, h * 16, pos.x * 16, pos.y * 16, copyflag);
 		}
 
 
