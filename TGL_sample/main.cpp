@@ -2,7 +2,7 @@
 /*! @file
     @brief  RX24T/RX64M/RX71M/RX65N/RX66T/RX72N RayTracer サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -45,7 +45,6 @@ namespace {
 	typedef device::PORT<device::PORTB, device::bitpos::B3> LCD_DISP;
 	typedef device::PORT<device::PORT6, device::bitpos::B7> LCD_LIGHT;
 	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, graphics::pixel::TYPE::RGB565> GLCDC_MGR;
-//	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
 	typedef device::drw2d_mgr<GLCDC_MGR, FONT> RENDER;
 
 	GLCDC_MGR	glcdc_mgr_(nullptr, fb_);
