@@ -70,6 +70,9 @@ namespace dsos {
 
 		refclk		refclk_;
 
+		bool		widd_last_;
+		bool		wave_last_;
+
 		void side_button_stall_(BUTTON& mybtn, bool stall) noexcept
 		{
 			if(&mybtn != &ch0_btn_) {
@@ -187,7 +190,8 @@ namespace dsos {
 			smp_fine_menu_(vtx::srect(442-90*1, 16, 80, 0), ""),
 			mes_menu_(vtx::srect(442-100*1, 16, 90, 0), MES_MODE_STR),
 			smp_unit_(0), smp_fine_(0),
-			trg_update_(0)
+			trg_update_(0),
+			refclk_(), widd_last_(false), wave_last_(false)
 		{ }
 
 
@@ -304,7 +308,10 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		void update() noexcept
 		{
-			widd_.update();
+			if(widd_last_) {
+				widd_.redraw_all();
+			}
+			widd_last_ = widd_.update();
 
 			if(trg_update_ != render_wave_.get_trg_update()) {
 				trg_update_ = render_wave_.get_trg_update();
@@ -328,6 +335,9 @@ namespace dsos {
 				++n;
 			}
 
+			// ダブルバッファでは、常に書き換え
+			bool dbf = render_.is_double_buffer();
+
 			if(n == 0) {  // メニュー選択時はバイパスする。
 				// タッチ操作による画面更新が必要か？
 				bool f = render_wave_.ui_service();
@@ -337,10 +347,16 @@ namespace dsos {
 				if(f || tic != capture_tic_) {
 					capture_tic_ = tic;
 					render_wave_.update();
+					wave_last_ = true;
+				} else if(wave_last_) {
+					render_wave_.update();
+					wave_last_ = false;
 				}
 
 				render_wave_.update_info();
 			}
+
+			render_.flip();
 		}
 
 

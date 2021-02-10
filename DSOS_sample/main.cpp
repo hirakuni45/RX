@@ -305,7 +305,6 @@ int main(int argc, char** argv)
 			if(!glcdc_mgr_.control(GLCDC_MGR::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC ctrl fail...\n");
 			}
-			glcdc_mgr_.enable_double_buffer();
 		} else {
 			utils::format("GLCDC Fail\n");
 		}
@@ -334,6 +333,8 @@ int main(int argc, char** argv)
 
 	setup_touch_panel_();
 
+	glcdc_mgr_.enable_double_buffer();
+
 	dso_gui_.start();
 
 	LED::OUTPUT();
@@ -345,11 +346,11 @@ int main(int argc, char** argv)
 
 		touch_.update();
 
+		dso_gui_.update();
+
 		sdh_.service();
 
 		command_();
-
-		dso_gui_.update();
 
 		update_led_();
 	}

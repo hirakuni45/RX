@@ -183,9 +183,10 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	アップデート（管理と描画）
+			@return 書き換えアイテムがあれば「true」
 		*/
 		//-----------------------------------------------------------------//
-		void update() noexcept
+		bool update() noexcept
 		{
 			// 状態の生成とGUIへ反映
 			{
@@ -259,12 +260,13 @@ namespace gui {
 				}
 			}
 
+			uint32_t dc = 0;
 			for(auto& t : widgets_) {
 				if(t.w_ == nullptr) continue;
 				if(t.w_->get_state() == widget::STATE::DISABLE) continue;
 				if(!t.draw_) continue; 
 				t.draw_ = false;
-
+				++dc;
 				switch(t.w_->get_id()) {
 				case widget::ID::GROUP:
 					break;
@@ -361,6 +363,7 @@ namespace gui {
 					break;
 				}
 			}
+			return dc != 0;
 		}
 
 
