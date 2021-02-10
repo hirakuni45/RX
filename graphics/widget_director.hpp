@@ -45,9 +45,10 @@ namespace gui {
 			bool			init_;
 			bool			focus_;
 			bool			draw_;
+			bool			refresh_;
 			widget_t() : w_(nullptr), title_(nullptr),
 				state_(widget::STATE::DISABLE),
-				init_(false), focus_(false), draw_(false) { }
+				init_(false), focus_(false), draw_(false), refresh_(false) { }
 		};
 
 		typedef std::array<widget_t, WNUM> WIDGETS; 
@@ -182,10 +183,27 @@ namespace gui {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	アップデート（管理と描画）
+			@brief	リフレッシュ描画設定
 		*/
 		//-----------------------------------------------------------------//
-		void update() noexcept
+		void refresh() noexcept
+		{
+			for(auto& t : widgets_) {
+				if(t.w_ == nullptr) continue;
+				if(t.w_->get_state() == widget::STATE::ENABLE) {
+					t.refresh_ = true;
+				}
+			}
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	アップデート（管理と描画）
+			@return 書き換えアイテムがあれば「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool update() noexcept
 		{
 			// 状態の生成とGUIへ反映
 			{
@@ -259,11 +277,21 @@ namespace gui {
 				}
 			}
 
+			uint32_t dc = 0;
 			for(auto& t : widgets_) {
 				if(t.w_ == nullptr) continue;
 				if(t.w_->get_state() == widget::STATE::DISABLE) continue;
-				if(!t.draw_) continue; 
-				t.draw_ = false;
+				bool draw = false;
+				if(t.draw_) {
+					draw = true;
+					t.draw_ = false;
+					++dc;
+				}
+				if(t.refresh_) {
+					draw = true;
+					t.refresh_ = false;
+				}
+				if(!draw) continue;
 
 				switch(t.w_->get_id()) {
 				case widget::ID::GROUP:
@@ -361,6 +389,7 @@ namespace gui {
 					break;
 				}
 			}
+			return dc != 0;
 		}
 
 

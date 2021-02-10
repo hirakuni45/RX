@@ -420,6 +420,7 @@ namespace dsos {
 		{
 			render_.set_fore_color(DEF_COLOR::Black);
 			render_.fill_box(vtx::srect(0, 0, 480, 16));
+
 			render_.set_fore_color(DEF_COLOR::White);
 			switch(measere_) {
 			case MEASERE::OFF:
@@ -499,7 +500,6 @@ namespace dsos {
 					make_freq_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
 					x += 8;
 					x = render_.draw_text(vtx::spos(x, 0), tmp);
-					x += 8;
 				}
 				break;
 			case MEASERE::TIME_ABS:  // CH0 の電圧、計測ポイント０
@@ -511,7 +511,6 @@ namespace dsos {
 					make_freq_(d, get_smp_rate(smp_mode_), tmp, sizeof(tmp));
 					x += 8;
 					x = render_.draw_text(vtx::spos(x, 0), tmp);
-					x += 8;
 				}
 				break;
 			default:
@@ -524,21 +523,22 @@ namespace dsos {
 		/*!
 			@brief  チャネル情報描画
 			@param[in]	ch	チャネル
+			@return 情報更新があれば「true」
 		*/
 		//-----------------------------------------------------------------//
-		void draw_channel_info(uint32_t ch) noexcept
+		bool draw_channel_info(uint32_t ch) noexcept
 		{
 			char tmp[64];
 			if(ch == 0) {
 				render_.set_fore_color(DEF_COLOR::Black);
 				render_.fill_box(vtx::srect(0, 272 - 16 + 1, 240, 15));
+
 				render_.set_fore_color(CH0_COLOR);
 				if(ch_info_count_ < (60*2*3)) {
 //				utils::sformat("0.%s: %s, %s/div", tmp, sizeof(tmp)) % get_ch_mult_str(ch0_mult_)
-					utils::sformat("0:%s,%s/div", tmp, sizeof(tmp))
+					utils::sformat("0:%s,%s/div ", tmp, sizeof(tmp))
 						% get_ch_mode_str(ch0_mode_) % get_ch_volt_str(ch0_volt_);
 					auto x = render_.draw_text(vtx::spos(0, 272 - 16 + 1), tmp);
-					x += 8;
 					make_freq_(wave_info0_.freq_, tmp, sizeof(tmp));
 					render_.draw_text(vtx::spos(x, 272 - 16 + 1), tmp);
 				} else {
@@ -548,13 +548,13 @@ namespace dsos {
 			} else {
 				render_.set_fore_color(DEF_COLOR::Black);
 				render_.fill_box(vtx::srect(240, 272 - 16 + 1, 240, 15));
+
 				render_.set_fore_color(CH1_COLOR);
 				if(ch_info_count_ < (60*2*3)) {
 //				utils::sformat("1.%s: %s, %s/div", tmp, sizeof(tmp)) % get_ch_mult_str(ch1_mult_)
-					utils::sformat("1:%s,%s/div", tmp, sizeof(tmp))
+					utils::sformat("1:%s,%s/div ", tmp, sizeof(tmp))
 						% get_ch_mode_str(ch1_mode_) % get_ch_volt_str(ch1_volt_);
 					auto x = render_.draw_text(vtx::spos(240, 272 - 16 + 1), tmp);
-					x += 8;
 					make_freq_(wave_info1_.freq_, tmp, sizeof(tmp));
 					render_.draw_text(vtx::spos(x, 272 - 16 + 1), tmp);
 				} else {
@@ -566,6 +566,8 @@ namespace dsos {
 			if(ch_info_count_ >= (60*4*3)) {
 				ch_info_count_ = 0;
 			}
+
+			return true;
 		}
 
 
@@ -703,6 +705,7 @@ namespace dsos {
 		{
 			render_.set_fore_color(DEF_COLOR::Black);
 			render_.fill_box(vtx::srect(0, 16, 440, 240));
+
 			draw_grid(0, 16, 440, 240, CAPTURE::GRID);
 
 			if(touch_down_) {
@@ -840,12 +843,15 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  チャネル情報関係、アップ・デート
+			@return 情報更新があれば「true」
 		*/
 		//-----------------------------------------------------------------//
-		void update_info() noexcept
+		bool update_info() noexcept
 		{
-			draw_channel_info(0);
-			draw_channel_info(1);
+			uint32_t n = 0;
+			if(draw_channel_info(0)) ++n;
+			if(draw_channel_info(1)) ++n;
+			return n != 0;
 		}
 
 

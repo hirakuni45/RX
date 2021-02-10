@@ -242,6 +242,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	ダブルバッファが有効か検査
+			@return ダブルバッファが有効なら「true」
+		*/
+		//-----------------------------------------------------------------//
+		bool is_double_buffer() const noexcept { return glc_.is_double_buffer(); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	フレームバッファ、フリッピング
 		*/
 		//-----------------------------------------------------------------//
@@ -369,6 +378,7 @@ namespace device {
 		void set_stipple(uint32_t stipple = -1) noexcept {
 			stipple_ = stipple;
 			stipple_mask_ = 1;
+//			d2_setpattern(d2_, stipple);
 		}
 
 
@@ -632,18 +642,33 @@ namespace device {
             auto cen = rect.org + rad;
 			auto len = rect.size - (rad * 2);
 			setup_();
-			d2_renderbox(d2_, cen.x << 4, rect.org.y << 4, len.x << 4, rect.size.y << 4);
-			d2_renderbox(d2_, rect.org.x << 4, cen.y << 4, rad << 4, len.y << 4);
+			auto yo = rect.org.y;
+			auto yl = len.y;
+			if(up) {
+				d2_renderbox(d2_, cen.x << 4, rect.org.y << 4, len.x << 4, rad << 4);
+				yo += rad;
+			} else {
+				yl += rad;
+			}
+			if(!dn) {
+				yl += rad;
+			}
+			d2_renderbox(d2_, rect.org.x << 4, yo << 4, rect.size.x << 4, yl << 4);
 			auto end = rect.end() - rad - 1;
-			d2_renderbox(d2_, (end.x + 1) << 4, cen.y << 4, rad << 4, len.y << 4);
+			if(dn) {
+				d2_renderbox(d2_, cen.x << 4, (end.y + 1) << 4, len.x << 4, rad << 4);
+			}
 
 //			uint32_t f = d2_edge0_shared | d2_edge1_shared;
 			++rad;
-			arc_(cen, rad, 0, vtx::spos(-1, 0), vtx::spos(0, -1));
-			arc_(vtx::spos(end.x, cen.y), rad, 0, vtx::spos(0, -1), vtx::spos(1, 0));
-			arc_(end, rad, 0, vtx::spos(1, 0), vtx::spos(0, 1));
-			arc_(vtx::spos(cen.x, end.y), rad, 0, vtx::spos(0, 1), vtx::spos(-1, 0));
-
+			if(up) {
+				arc_(cen, rad, 0, vtx::spos(-1, 0), vtx::spos(0, -1));
+				arc_(vtx::spos(end.x, cen.y), rad, 0, vtx::spos(0, -1), vtx::spos(1, 0));
+			}
+			if(dn) {
+				arc_(end, rad, 0, vtx::spos(1, 0), vtx::spos(0, 1));
+				arc_(vtx::spos(cen.x, end.y), rad, 0, vtx::spos(0, 1), vtx::spos(-1, 0));
+			}
 //			return last_error_ == D2_OK;
 		}
 
@@ -718,32 +743,21 @@ namespace device {
 			const uint8_t* src = static_cast<const uint8_t*>(img);
 			int16_t w = ssz.x;
 			int16_t h = ssz.y;
-			if(back) back_color_.rgba8.unit.a = 255;
-			else back_color_.rgba8.unit.a = 0;
-			setup_();
+
+			// setup_();
+			d2_color clut[2];
+			clut[0] = back_color_.rgba8.rgba;
+			auto copyflag = d2_bf_filter;
+			if(!back) {
+				clut[0] &= 0xffffff;
+				copyflag |= d2_bf_usealpha;
+			}
+			// d2_setalphaex(d2_, 0, 0);
+			clut[1] = fore_color_.rgba8.rgba;
+			d2_settexclut_part(d2_, clut, 0, 2);
 			d2_setblitsrc(d2_, src, w, w, h, d2_mode_i1 | d2_mode_clut);
 			d2_blitcopy(d2_, w, h,
-				0, 0, w * 16, h * 16, pos.x * 16, pos.y * 16, d2_bf_filter);
-#if 0
-			uint8_t k = 1;
-			uint8_t c = *p++;
-			vtx::spos loc = pos;
-			for(uint8_t i = 0; i < ssz.y; ++i) {
-				loc.x = pos.x;
-				for(uint8_t j = 0; j < ssz.x; ++j) {
-//					if(c & k) fast_plot(loc, fore_color_.rgb565);
-//					else if(back) fast_plot(loc, back_color_.rgb565);
-					k <<= 1;
-					if(k == 0) {
-						k = 1;
-						c = *p++;
-					}
-					++loc.x;
-				}
-				++loc.y;
-			}
-#endif
-			back_color_.rgba8.unit.a = 255;
+				0, 0, w * 16, h * 16, pos.x * 16, pos.y * 16, copyflag);
 		}
 
 
