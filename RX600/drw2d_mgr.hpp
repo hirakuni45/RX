@@ -280,6 +280,15 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	フォア・カラーの取得
+			@return フォア・カラー
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_fore_color() const noexcept { return fore_color_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	前面カラーの設定
 			@param[in]	color	カラー
 		*/
@@ -290,6 +299,15 @@ namespace device {
 			clut_[1] = color.rgba8.rgba;
 			set_fore_color_ = false;
 		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	バック・カラーの取得
+			@return バック・カラー
+		*/
+		//-----------------------------------------------------------------//
+		const auto& get_back_color() const noexcept { return back_color_; }
 
 
 		//-----------------------------------------------------------------//
@@ -596,15 +614,16 @@ namespace device {
 		}
 
 
-        //-----------------------------------------------------------------//
-        /*!
-            @brief  角がラウンドした塗りつぶされた箱を描画する
-            @param[in]  rect    短形を指定
-            @param[in]  rad     ラウンドの半径
-			@return エラー無い場合「true」
-        */
-        //-----------------------------------------------------------------//
-        bool round_box(const vtx::srect& rect, int16_t rad) noexcept
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	角がラウンドした塗りつぶされた箱を描画する
+			@param[in]	rect	短形を指定
+			@param[in]	rad		ラウンドの半径
+			@param[in]	up		上部をラウンドする
+			@param[in]	dn		下部をラウンドする
+		*/
+		//-----------------------------------------------------------------//
+		void round_box(const vtx::srect& rect, int16_t rad, bool up = true, bool dn = true) noexcept
 		{
             if(rect.size.x < (rad * 2) || rect.size.y < (rad * 2)) {
                 if(rect.size.x < rect.size.y) rad = rect.size.x / 2;
@@ -625,7 +644,7 @@ namespace device {
 			arc_(end, rad, 0, vtx::spos(1, 0), vtx::spos(0, 1));
 			arc_(vtx::spos(cen.x, end.y), rad, 0, vtx::spos(0, 1), vtx::spos(-1, 0));
 
-			return last_error_ == D2_OK;
+//			return last_error_ == D2_OK;
 		}
 
 
@@ -685,33 +704,121 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	UTF-16 フォントの描画
-			@param[in]	pos		描画位置
-			@param[in]	cha		UTF-16 コード
+			@brief	ビットマップイメージを描画する
+			@param[in]	pos		開始点を指定
+			@param[in]	img		描画ソースのポインター
+			@param[in]	ssz		描画ソースのサイズ
+			@param[in]	back	背景を描画する場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		void draw_font_utf16(const vtx::spos& pos, uint16_t cha) noexcept
-		{
-			const uint8_t* src = nullptr;
-			int16_t w;
-			int16_t h;
-			if(cha < 0x80) {
-				src = FONT::a_type::get(cha);
-				w = FONT::a_type::width;
-				h = FONT::a_type::height;
-			} else {
-				src = font_.at_kfont().get(cha);
-				if(src == nullptr) {
-					return;
-				}
-				w = FONT::k_type::width;
-				h = FONT::k_type::height;
-			}
+		void draw_bitmap(const vtx::spos& pos, const void* img, const vtx::spos& ssz, bool back = false)
+		noexcept {
+			if(img == nullptr) return;
+
+			const uint8_t* src = static_cast<const uint8_t*>(img);
+			int16_t w = ssz.x;
+			int16_t h = ssz.y;
+			if(back) back_color_.rgba8.unit.a = 255;
+			else back_color_.rgba8.unit.a = 0;
 			setup_();
 			d2_setblitsrc(d2_, src, w, w, h, d2_mode_i1 | d2_mode_clut);
 			d2_blitcopy(d2_, w, h,
 				0, 0, w * 16, h * 16, pos.x * 16, pos.y * 16, d2_bf_filter);
-//  | d2_bf_colorize);
+#if 0
+			uint8_t k = 1;
+			uint8_t c = *p++;
+			vtx::spos loc = pos;
+			for(uint8_t i = 0; i < ssz.y; ++i) {
+				loc.x = pos.x;
+				for(uint8_t j = 0; j < ssz.x; ++j) {
+//					if(c & k) fast_plot(loc, fore_color_.rgb565);
+//					else if(back) fast_plot(loc, back_color_.rgb565);
+					k <<= 1;
+					if(k == 0) {
+						k = 1;
+						c = *p++;
+					}
+					++loc.x;
+				}
+				++loc.y;
+			}
+#endif
+			back_color_.rgba8.unit.a = 255;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	モーションオブジェクトのサイズを取得
+			@param[in]	src	描画オブジェクト
+			@return サイズwを返す
+		*/
+		//-----------------------------------------------------------------//
+		vtx::spos get_mobj_size(const void* src) const noexcept
+		{
+			vtx::spos sz(0);
+			if(src != nullptr) {
+				const uint8_t* p = static_cast<const uint8_t*>(src);
+				sz.x = *p++;
+				sz.y = *p;
+			}
+			return sz;
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	モーションオブジェクトを描画する
+			@param[in]	pos		開始点を指定
+			@param[in]	src		描画オブジェクト
+			@param[in]	back	背景を描画する場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		void draw_mobj(const vtx::spos& pos, const void* src, bool back) noexcept
+		{
+			if(src == nullptr) return;
+
+			const uint8_t* p = static_cast<const uint8_t*>(src);
+			vtx::spos ssz(p[0], p[1]);
+			p += 2;
+			draw_bitmap(pos, p, ssz, back);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	UTF-16 フォントの描画
+			@param[in]	pos		描画位置
+			@param[in]	code	UTF-16 コード
+			@param[in]	back	背景を描画する場合「true」
+		*/
+		//-----------------------------------------------------------------//
+		void draw_font_utf16(const vtx::spos& pos, uint16_t code, bool back) noexcept
+		{
+			if(pos.y <= (clip_.org.y - FONT::height) || pos.y >= clip_.end_y()) {
+				return;
+			}
+			if(code < 0x80) {
+				if(pos.x <= (clip_.org.x - FONT::a_type::width) || pos.x >= clip_.end_x()) {
+					return;
+				}
+				vtx::spos ssz(FONT::a_type::width, FONT::a_type::height);
+				draw_bitmap(pos, FONT::a_type::get(code), ssz, back);
+			} else {
+				if(pos.x <= (clip_.org.x - FONT::k_type::width) || pos.x >= clip_.end_x()) {
+					return;
+				}
+				auto p = font_.at_kfont().get(code);
+				if(p != nullptr) {
+					vtx::spos ssz(FONT::k_type::width, FONT::k_type::height);
+					draw_bitmap(pos, p, ssz, back);
+				} else {
+					vtx::spos ssz(FONT::a_type::width, FONT::a_type::height);
+					draw_bitmap(pos, FONT::a_type::get('['), ssz, back);
+					vtx::spos loc(pos.x + FONT::a_type::width, pos.y);
+					draw_bitmap(loc, FONT::a_type::get(']'), ssz, back);
+				}
+			}
 		}
 
 
@@ -721,10 +828,12 @@ namespace device {
 			@param[in]	pos		描画位置
 			@param[in]	cha		文字コード
 			@param[in]	prop	プロポーショナルの場合「true」
-			@return 文字の終端座標 (X)
+			@param[in]	back	背景を描画する場合「true」
+			@return 文字の幅 (X)
 		*/
 		//-----------------------------------------------------------------//
-		int16_t draw_font(const vtx::spos& pos, char cha, bool prop = false) noexcept
+		int16_t draw_font(const vtx::spos& pos, char cha, bool prop = false,
+			bool back = false) noexcept
 		{
 			int16_t w = 0;
 			if(static_cast<uint8_t>(cha) < 0x80) {
@@ -732,7 +841,7 @@ namespace device {
 				if(prop) {
 					w = FONT::a_type::get_kern(code);
 				}
-				draw_font_utf16(vtx::spos(pos.x + w, pos.y), code);
+				draw_font_utf16(vtx::spos(pos.x + w, pos.y), code, back);
 				if(prop) {
 					w += FONT::a_type::get_width(code);
 				} else {
@@ -742,7 +851,7 @@ namespace device {
 				if(font_.at_kfont().injection_utf8(static_cast<uint8_t>(cha))) {
 					auto code = font_.at_kfont().get_utf16();
 					if(code >= 0x80) {
-						draw_font_utf16(pos, code);
+						draw_font_utf16(pos, code, back);
 						w = FONT::k_type::width;
 					}
 				}
@@ -755,12 +864,14 @@ namespace device {
 		/*!
 			@brief	文字列の描画
 			@param[in]	pos		描画位置
-			@param[in]	str		文字列 (UTF-8)
+			@param[in]	str		文字列　(UTF-8)
 			@param[in]	prop	プロポーショナルの場合「true」
+			@param[in]	back	背景を描画する場合「true」
 			@return 文字の最終座標 (X)
 		*/
 		//-----------------------------------------------------------------//
-		int16_t draw_text(const vtx::spos& pos, const char* str, bool prop = false) noexcept
+		int16_t draw_text(const vtx::spos& pos, const char* str, bool prop = false,
+			bool back = false) noexcept
 		{
 			if(str == nullptr) return 0;
 
@@ -768,10 +879,10 @@ namespace device {
 			char ch;
 			while((ch = *str++) != 0) {
 				if(ch == '\n') {
-					p.x = 0;
-					p.y += FONT::a_type::height;
+					p.x = pos.x;
+					p.y += FONT::height;
 				} else {
-					p.x += draw_font(p, ch, prop);
+					p.x += draw_font(p, ch, prop, back);
 				}
 			}
 			return p.x;
