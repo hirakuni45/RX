@@ -474,7 +474,7 @@ int main(int argc, char** argv)
 
 		case 4:
 			render_.clear(DEF_COLOR::Black);
-
+#if 0
 			tgl_.at_matrix().set_viewport(0, 0, LCD_X, LCD_Y);
 
 			tgl_.at_matrix().identity();
@@ -482,14 +482,15 @@ int main(int argc, char** argv)
 			tgl_.at_matrix().rotate(angle, 0.0f, 0.0f, 1.0f);
 			angle += 1.5f;
 
-			tgl_.begin(TGL::PTYPE::LINES);
-			tgl_.vertex(vtx::fvtx(-1.0f,  1.0f, 0.0f));
-			tgl_.vertex(vtx::fvtx( 1.0f, -1.0f, 0.0f));
-			tgl_.vertex(vtx::fvtx( 1.0f, -1.0f, 0.0f));
-			tgl_.vertex(vtx::fvtx(-1.0f,  1.0f, 0.0f));
-			tgl_.end();
+			tgl_.Begin(TGL::PTYPE::LINES);
+			tgl_.Vertex(vtx::fvtx(-1.0f,  1.0f, 0.0f));
+			tgl_.Vertex(vtx::fvtx( 1.0f, -1.0f, 0.0f));
+			tgl_.Vertex(vtx::fvtx( 1.0f, -1.0f, 0.0f));
+			tgl_.Vertex(vtx::fvtx(-1.0f,  1.0f, 0.0f));
+			tgl_.End();
 
 			tgl_.renderring();
+#endif
 			break;
 
 		default:

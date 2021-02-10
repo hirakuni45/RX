@@ -115,7 +115,8 @@ namespace {
 	typedef graphics::font<AFONT, KFONT> FONT;
 	FONT		font_(afont_, kfont_);
 
-	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
+//	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
+	typedef device::drw2d_mgr<GLCDC_MGR, FONT> RENDER;
 	RENDER		render_(glcdc_mgr_, font_);
 
 	// 標準カラーインスタンス
@@ -304,23 +305,21 @@ int main(int argc, char** argv)
 			if(!glcdc_mgr_.control(GLCDC_MGR::CONTROL_CMD::START_DISPLAY)) {
 				utils::format("GLCDC ctrl fail...\n");
 			}
+			glcdc_mgr_.enable_double_buffer();
 		} else {
 			utils::format("GLCDC Fail\n");
 		}
 	}
 
-#if 0
 	{  // DRW2D 初期化
-		auto ver = render_.get_version();
-		utils::format("DRW2D Version: %04X\n") % ver;
-
 		if(render_.start()) {
 			utils:: format("Start DRW2D\n");
+			auto ver = render_.get_version();
+			utils::format("    Version: %04X\n") % ver;
 		} else {
 			utils:: format("DRW2D Fail\n");
 		}
 	}
-#endif
 
 	{  // FT5206 touch screen controller
 		TOUCH::reset<FT5206_RESET>();
@@ -340,8 +339,6 @@ int main(int argc, char** argv)
 	LED::OUTPUT();
 
 	cmd_.set_prompt("# ");
-
-	glcdc_mgr_.enable_double();
 
 	while(1) {
 		render_.sync_frame();

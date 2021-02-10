@@ -28,8 +28,15 @@ namespace graphics {
 
 		RDR&		rdr_;
 
+		struct vtx_t {
+			vtx::fvtx	p_;
+			vtx::fvtx	n_;
+			bool		normal_;
+			vtx_t() : p_(), n_(), normal_(false) { }
+		};
+
 		uint32_t	vtx_idx_;
-		vtx::fvtx4	vtxs_[VNUM];
+		vtx_t		vtxs_[VNUM];
 
 		struct dt_t {
 			PTYPE		pt_;
@@ -45,6 +52,22 @@ namespace graphics {
 		share_color	color_;
 
 		MATRIX		matrix_;
+
+		bool test_cw_(const vtx::spos* p, int32_t num) noexcept
+		{
+			for(int32_t i = 0; i < (num - 1); ++i) {
+				auto n = i + 1;
+				if(p[i].y >= p[n].y) {
+					if(p[i].x < p[n].x) return true;  // CW
+					else if(p[i].x > p[n].x) return false;  // CCW
+				} else {
+					if(p[i].x > p[n].x) return true;  // CW
+					else if(p[i].x < p[n].x) return false;  // CCW
+				}
+			}
+			// 判定が出来ない場合は「false」
+			return false;
+		}
 
 	public:
 		//-----------------------------------------------------------------//
@@ -143,17 +166,17 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	頂点の登録（spos）
+			@brief	2D 頂点の登録
 			@param[in]	v	頂点
 		*/
 		//-----------------------------------------------------------------//
 		void Vertex(float x, float y) noexcept
 		{
 			if(vtx_idx_ >= VNUM) return;
-			vtxs_[vtx_idx_].x = x;
-			vtxs_[vtx_idx_].y = y;
-			vtxs_[vtx_idx_].z = 0.0f;
-			vtxs_[vtx_idx_].w = 1.0f;
+			auto& p = vtxs_[vtx_idx_].p_;
+			p.x = x;
+			p.y = y;
+			p.z = 0.0f;
 			++vtx_idx_;
 		}
 		void Vertex(const vtx::spos& v) noexcept { Vertex(v.x, v.y); }
@@ -163,22 +186,40 @@ namespace graphics {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	頂点の登録（svtx）
+			@brief	3D 頂点の登録
 			@param[in]	v	頂点
 		*/
 		//-----------------------------------------------------------------//
 		void Vertex(float x, float y, float z) noexcept
 		{
 			if(vtx_idx_ >= VNUM) return;
-			vtxs_[vtx_idx_].x = x;
-			vtxs_[vtx_idx_].y = y;
-			vtxs_[vtx_idx_].z = z;
-			vtxs_[vtx_idx_].w = 1.0f;
+			auto& p = vtxs_[vtx_idx_].p_;
+			p.x = x;
+			p.y = y;
+			p.z = z;
 			++vtx_idx_;
 		}
 		void Vertex(const vtx::svtx& v) noexcept { Vertex(v.x, v.y, v.z); }
 		void Vertex(const vtx::ivtx& v) noexcept { Vertex(v.x, v.y, v.z); }
 		void Vertex(const vtx::fvtx& v) noexcept { Vertex(v.x, v.y, v.z); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	法線ベクトルの登録
+			@param[in]	n	法線ベクトル
+		*/
+		//-----------------------------------------------------------------//
+		void Normal(float x, float y, float z) noexcept
+		{
+			if(vtx_idx_ >= VNUM) return;
+			auto& n = vtxs_[vtx_idx_].n_;
+			n.x = x;
+			n.y = y;
+			n.z = z;
+			vtxs_[vtx_idx_].normal_ = true;
+		}
+		void Normal(const vtx::fvtx& v) noexcept { Normal(v.x, v.y, v.z); }
 
 
 		//-----------------------------------------------------------------//
@@ -217,9 +258,8 @@ namespace graphics {
 				uint32_t k = 0;
 				vtx::spos tmp[16];
 				for(uint32_t j = t.org_; j < t.end_; ++j) {
-					vtx::fvtx src(vtxs_[j].x, vtxs_[j].y, vtxs_[j].z);
 					vtx::fvtx dst;
-					matrix_.vertex_screen(wm, src, dst);
+					matrix_.vertex_screen(wm, vtxs_[j].p_, dst);
 					tmp[k].x = static_cast<int16_t>(dst.x * w) + (w / 2) + ox;
 					tmp[k].y = static_cast<int16_t>(dst.y * h) + (h / 2) + oy;
 					++k;
@@ -230,21 +270,20 @@ namespace graphics {
 					break;
 				case PTYPE::LINES:
 					for(uint32_t j = 0; j < k; j += 2) {
-						rdr_.line_d(tmp[j], tmp[j + 1]);
+						rdr_.line_d(tmp[j], tmp[j+1]);
 					}
 					break;
 				case PTYPE::LINE_STRIP:
-					for(uint32_t j = 0; j < k; ++j) {
-						if((j + 1) < k) {
-							rdr_.line_d(tmp[j], tmp[j + 1]);
-						}
+					for(uint32_t j = 0; j < (k - 1); ++j) {
+						rdr_.line_d(tmp[j], tmp[j+1]);
 					}
 					break;
 				case PTYPE::LINE_LOOP:
+					// if(!test_cw_(tmp, k)) break;  // ccw を描画しない
 					for(uint32_t j = 0; j < k; ++j) {
-						auto l = j + 1;
-						if(l >= k) l = 0;
-						rdr_.line_d(tmp[j], tmp[l]);
+						auto n = j + 1;
+						if(n >= k) n = 0;
+						rdr_.line_d(tmp[j], tmp[n]);
 					}
 					break;
 				case PTYPE::QUAD:
