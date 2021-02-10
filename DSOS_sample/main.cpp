@@ -146,10 +146,10 @@ namespace {
 	{
 		static uint8_t n = 0;
 		++n;
-		if(n >= 30) {
+		if(n >= 15) {
 			n = 0;
 		}
-		if(n < 10) {
+		if(n < 5) {
 			LED::P = 0;
 		} else {
 			LED::P = 1;

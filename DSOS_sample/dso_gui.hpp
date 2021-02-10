@@ -308,10 +308,13 @@ namespace dsos {
 		//-----------------------------------------------------------------//
 		void update() noexcept
 		{
-			if(widd_last_) {
-				widd_.redraw_all();
-			}
 			widd_last_ = widd_.update();
+			// ダブルバッファ時の widget 管理のケア
+			if(render_.is_double_buffer()) {
+				if(!widd_last_) {
+					widd_.refresh();
+				}
+			}
 
 			if(trg_update_ != render_wave_.get_trg_update()) {
 				trg_update_ = render_wave_.get_trg_update();
@@ -334,9 +337,6 @@ namespace dsos {
 			} else if(mes_menu_.get_state() == gui::widget::STATE::ENABLE) {
 				++n;
 			}
-
-			// ダブルバッファでは、常に書き換え
-			bool dbf = render_.is_double_buffer();
 
 			if(n == 0) {  // メニュー選択時はバイパスする。
 				// タッチ操作による画面更新が必要か？
