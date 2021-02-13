@@ -94,7 +94,7 @@ PSOURCES	=	$(ROOT)/main.cpp \
 				graphics/color.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	m supc++
+USER_LIBS	=	supc++ m drw2d
 
 LDSCRIPT	=	../../$(ROOT_DEV)/$(DEVICE).ld
 
@@ -139,6 +139,8 @@ INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../ ../../RX600/drw2d/inc/tes \
 				../emu ../emu/cpu ../emu/nes ../emu/mappers ../emu/sndhrdw ../emu/libsnss
+
+LIB_ROOT	=	../../RX600/drw2d
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
