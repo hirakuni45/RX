@@ -102,6 +102,20 @@ namespace device {
 				d2_cliprect(d2_, clip_.org.x, clip_.org.y, clip_.size.x, clip_.size.y);
 				set_clip_ = true;
 			}
+			d2_setfillmode(d2_, d2_fm_color);
+		}
+
+
+		void setup_stipple_(const vtx::spos& d)
+		{
+			if(stipple_ != 0xffffffff) {
+				d2_setpatternsize(d2_, 8);
+//				d2_setpatternalpha(d2_, 0, 255);
+//				d2_setpatternalpha(d2_, 1, 255);
+				d2_setpatternparam(d2_, 0, 0, d.x, d.y);
+				d2_setpattern(d2_, stipple_);
+  				d2_setfillmode(d2_, d2_fm_pattern);
+			}
 		}
 
 
@@ -110,6 +124,7 @@ namespace device {
 			d2_renderwedge(d2_, cen.x << 4, cen.y << 4, rad << 4, w,
 				n1.x << 16, n1.y << 16, n2.x << 16, n2.y << 16, f);
 		}
+
 
 		void start_frame_() noexcept
 		{
@@ -378,7 +393,6 @@ namespace device {
 		void set_stipple(uint32_t stipple = -1) noexcept {
 			stipple_ = stipple;
 			stipple_mask_ = 1;
-//			d2_setpattern(d2_, stipple);
 		}
 
 
@@ -451,6 +465,7 @@ namespace device {
         bool line_h(int16_t y, int16_t x, int16_t w) noexcept
 		{
 			setup_();
+			setup_stipple_(vtx::spos(128, 0));
 			last_error_ = d2_renderline(d2_, x << 4, y << 4, (x + w - 1) << 4, y << 4,
 				pen_size_, d2_le_exclude_none);
 			return last_error_ == D2_OK;
@@ -469,6 +484,7 @@ namespace device {
         bool line_v(int16_t x, int16_t y, int16_t h) noexcept
 		{
 			setup_();
+			setup_stipple_(vtx::spos(0, 128));
 			last_error_ = d2_renderline(d2_, x << 4, y << 4, x << 4, (y + h - 1) << 4,
 				pen_size_, d2_le_exclude_none);
 			return last_error_ == D2_OK;
@@ -516,6 +532,7 @@ namespace device {
 		bool line_d(const vtx::spos& org, const vtx::spos& end) noexcept
 		{
 			setup_();
+			// setup_stipple_();
 			last_error_ = d2_renderline(d2_, org.x, org.y, end.x, end.y,
 				pen_size_, d2_le_exclude_none);
 			return last_error_ == D2_OK;
@@ -533,6 +550,7 @@ namespace device {
 		bool line(const vtx::spos& org, const vtx::spos& end) noexcept
 		{
 			setup_();
+			// setup_stipple_();
 			last_error_ = d2_renderline(d2_, org.x << 4, org.y << 4, end.x << 4, end.y << 4,
 				pen_size_, d2_le_exclude_none);
 			return last_error_ == D2_OK;
@@ -717,35 +735,22 @@ namespace device {
 		{
 			d2_utility_fbblitcopy(d2_, src.size.x, src.size.y, src.org.x, src.org.y, dst.x, dst.y,
 				d2_bf_filter);
-//			for(int16_t y = 0; y < src.size.y; ++y) {
-//				auto* d = &fb_[dst.x + (dst.y + y) * GLC::line_width];
-//				const auto* s = &fb_[src.org.x + (src.org.y + y) * GLC::line_width];
-//				for(int16_t x = src.org.x; x < src.end_x(); ++x) {
-//					*d++ = *s++;
-//				}
-//			}
 		}
 
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief  スクロール
+			@brief  全体スクロール
 			@param[in]  h       スクロール高さ（+up、-down）
 		*/
 		//-----------------------------------------------------------------//
 		void scroll(int16_t h) noexcept
 		{
 			if(h > 0) {
-//				for(int32_t i = 0; i < (GLC::line_width * (GLC::height - h)); ++i) {
-//					fb_[i] = fb_[i + (GLC::line_width * h)];
-//				}
 				move(vtx::srect(0, h, GLC::width, GLC::height - h), vtx::spos(0, 0));
 			} else if(h < 0) {
 				h = -h;
 				move(vtx::srect(0, 0, GLC::width, GLC::height - h), vtx::spos(0, h));
-//				for(int32_t i = (GLC::line_width * (GLC::height - h)) - 1; i >= 0; --i) {
-//					fb_[i + (GLC::line_width * h)] = fb_[i];
-//				}
 			}
 		}
 
@@ -768,16 +773,15 @@ namespace device {
 			int16_t h = ssz.y;
 
 			// setup_();
-			d2_color clut[2];
-			clut[0] = back_color_.rgba8.rgba;
+			clut_[0] = back_color_.rgba8.rgba;
 			auto copyflag = d2_bf_filter;
 			if(!back) {
-				clut[0] &= 0xffffff;
+				clut_[0] &= 0xffffff;
 				copyflag |= d2_bf_usealpha;
 			}
 			// d2_setalphaex(d2_, 0, 0);
-			clut[1] = fore_color_.rgba8.rgba;
-			d2_settexclut_part(d2_, clut, 0, 2);
+			clut_[1] = fore_color_.rgba8.rgba;
+			d2_settexclut_part(d2_, clut_, 0, 2);
 			d2_setblitsrc(d2_, src, w, w, h, d2_mode_i1 | d2_mode_clut);
 			d2_blitcopy(d2_, w, h,
 				0, 0, w * 16, h * 16, pos.x * 16, pos.y * 16, copyflag);
@@ -786,21 +790,41 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	clut のポインター取得（最大２５６個まで格納可能）
+			@return clut ポインター
+		*/
+		//-----------------------------------------------------------------//
+		uint32_t* get_clut() noexcept { return reinterpret_cast<uint32_t*>(clut_); }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	clut の設定
+			@param[in]	org	開始インデックス
+			@param[in]	num	個数
+		*/
+		//-----------------------------------------------------------------//
+		void set_clut(uint32_t org, uint32_t num) noexcept
+		{
+			d2_settexclut_part(d2_, clut_, org, num);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	8 bits indexed color イメージを描画する
 			@param[in]	pos		開始点を指定
 			@param[in]	src		indexed8 のポインター
-			@param[in]	clut	clut のポインター(_RGB 32bits)
 			@param[in]	ssz		ソースのサイズ
 			@param[in]	pitch	ソースの横幅ピッチ（指定しないとソースの横幅と同じ）
 		*/
 		//-----------------------------------------------------------------//
-		void draw_indexed8(const vtx::spos& pos, const uint8_t* src, const uint32_t* clut, const vtx::spos& ssz, int16_t pitch = 0)
+		void draw_indexed8(const vtx::spos& pos, const uint8_t* src, const vtx::spos& ssz, int16_t pitch = 0)
 		noexcept {
-			if(src == nullptr || clut == nullptr) return;
+			if(src == nullptr) return;
 
 			int16_t w = ssz.x;
 			int16_t h = ssz.y;
-			d2_settexclut_part(d2_, reinterpret_cast<const d2_color*>(clut), 0, 256);
 			if(pitch == 0) pitch = w;
 			d2_setblitsrc(d2_, src, pitch, w, h, d2_mode_i8 | d2_mode_clut);
 			d2_blitcopy(d2_, w, h,
