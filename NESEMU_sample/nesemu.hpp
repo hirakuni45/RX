@@ -240,14 +240,15 @@ namespace emu {
 				dst += xs;
 			}
 #else
-			static uint32_t luttmp[256];
+			uint32_t* clut = render_.get_clut();
 			for(uint32_t i = 0; i < 64; ++i) {
-               	luttmp[i] = (lut[i].r << 16) | (lut[i].g << 8) | (lut[i].b);
-				luttmp[i+128+64] = luttmp[i+128] = luttmp[i+64] = luttmp[i];
+               	clut[i] = (lut[i].r << 16) | (lut[i].g << 8) | (lut[i].b);
+				clut[i+128+64] = clut[i+128] = clut[i+64] = clut[i];
 			}
+			render_.set_clut(0, 256);
 			int16_t ox = (RENDER::glc_type::width  - nes_width_)  / 2;
 			int16_t oy = (RENDER::glc_type::height - nes_height_) / 2;
-			render_.draw_indexed8(vtx::spos(ox, oy), v->data, luttmp, vtx::spos(nes_width_, nes_height_), v->pitch);
+			render_.draw_indexed8(vtx::spos(ox, oy), v->data, vtx::spos(nes_width_, nes_height_), v->pitch);
 #endif
 			if(nesrom_) {
 				apu_process(audio_buf_, audio_len_);
