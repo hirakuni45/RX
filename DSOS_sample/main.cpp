@@ -335,6 +335,13 @@ int main(int argc, char** argv)
 
 	glcdc_mgr_.enable_double_buffer();
 
+	if(render_.is_double_buffer()) {
+		render_.sync_frame();
+		render_.clear(graphics::def_color::Black);
+		render_.sync_frame();
+		render_.clear(graphics::def_color::Black);
+	}
+
 	dso_gui_.start();
 
 	LED::OUTPUT();

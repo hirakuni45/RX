@@ -28,10 +28,11 @@ namespace emu {
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief  ＮＥＳエミュレーション・クラス
+		@param[in]	RENDER				レンダリングクラス
 		@param[in]	AUDIO_SAMPLE_RATE	オーディオ・サンプル・レート
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-	template <uint32_t AUDIO_SAMPLE_RATE>
+	template <class RENDER, uint32_t AUDIO_SAMPLE_RATE>
 	class nesemu {
 
 		static const int nes_width_  = 256;
@@ -39,6 +40,8 @@ namespace emu {
         static const int sample_rate_ = AUDIO_SAMPLE_RATE;
 		static const int sample_bits_ = 16;
 		static const int audio_len_ = (sample_rate_ / 60) + 1;
+
+		RENDER&			render_;
 
 		uint16_t		audio_buf_[audio_len_];
 
@@ -56,7 +59,7 @@ namespace emu {
 			@brief  コンストラクタ
 		*/
 		//-----------------------------------------------------------------//
-		nesemu() noexcept : audio_buf_{ 0 }, nesrom_(false),
+		nesemu(RENDER& render) noexcept : render_(render), audio_buf_{ 0 }, nesrom_(false),
 			disa_(nes6502_getbyte, nes6502_putbyte),
 			mon_val_{ 0 }
 		{ }
@@ -165,12 +168,9 @@ namespace emu {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief  サービス
-			@param[in]	org		フレームバッファのアドレス
-			@param[in]	xs		フレームバッファのＸ幅
-			@param[in]	ys		フレームバッファのＹ幅
 		*/
 		//-----------------------------------------------------------------//
-		void service(void* org, uint32_t xs, uint32_t ys)
+		void service() noexcept
 		{
 			auto nes = nes_getcontext();
 			bitmap_t* v = nes->vidbuf;
@@ -208,7 +208,7 @@ namespace emu {
 					inp_[0].data |= INP_PAD_RIGHT;
 				}
 			}
-
+#if 0
 			uint16_t luttmp[256];
 			for(uint32_t i = 0; i < 64; ++i) {
                	uint16_t r = lut[i].r;  // R
@@ -218,6 +218,7 @@ namespace emu {
 				luttmp[i] = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | (b >> 3);
 				luttmp[i+128+64] = luttmp[i+128] = luttmp[i+64] = luttmp[i];
 			}
+
 			uint16_t* dst = static_cast<uint16_t*>(org);
 			dst += ((ys - (nes_height_ - 16)) / 2) * xs;
 			const uint8_t* src = v->data;
@@ -238,6 +239,17 @@ namespace emu {
 				src += v->pitch - nes_width_;
 				dst += xs;
 			}
+#else
+			uint32_t* clut = render_.get_clut();
+			for(uint32_t i = 0; i < 64; ++i) {
+               	clut[i] = (lut[i].r << 16) | (lut[i].g << 8) | (lut[i].b);
+				clut[i+128+64] = clut[i+128] = clut[i+64] = clut[i];
+			}
+			render_.set_clut(0, 256);
+			int16_t ox = (RENDER::glc_type::width  - nes_width_)  / 2;
+			int16_t oy = (RENDER::glc_type::height - nes_height_) / 2;
+			render_.draw_indexed8(vtx::spos(ox, oy), v->data, vtx::spos(nes_width_, nes_height_), v->pitch);
+#endif
 			if(nesrom_) {
 				apu_process(audio_buf_, audio_len_);
 				nes_emulate(1);

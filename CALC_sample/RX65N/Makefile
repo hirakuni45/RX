@@ -33,7 +33,7 @@ PSOURCES	=	CALC_sample/main.cpp \
 				graphics/color.cpp \
 				common/stdapi.cpp
 
-USER_LIBS	=	mpfr gmp supc++
+USER_LIBS	=	supc++ mpfr gmp drw2d
 
 LDSCRIPT	=	../../RX65x/$(DEVICE).ld
 

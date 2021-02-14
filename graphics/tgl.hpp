@@ -251,6 +251,8 @@ namespace graphics {
 			w <<= 4;
 			h <<= 4;
 
+			rdr_.set_back_color(def_color::Black);
+
 			for(uint32_t i = 0; i < dt_idx_; ++i) {
 				const auto& t = dts_[i];
 				rdr_.set_fore_color(t.col_);

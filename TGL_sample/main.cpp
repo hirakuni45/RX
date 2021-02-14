@@ -209,7 +209,12 @@ int main(int argc, char** argv)
 		if(ax >= 360.0f) ax -= 360.0f;
 		ay += 1.5f;
 		if(ay >= 360.0f) ay -= 360.0f;
-
+#if 0
+		render_.set_fore_color(DEF_COLOR::White);
+		render_.set_back_color(DEF_COLOR::Black);
+		render_.set_stipple(0x33);
+		render_.line_d(vtx::spos(0, 100 << 4), vtx::spos(256 << 4, 100 << 4));
+#endif
 		if(nn < 240) {
 			tgl_.LineWidth(3.0f);
 			shape_.WireCube(2.0f);

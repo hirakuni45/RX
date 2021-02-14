@@ -127,7 +127,18 @@ namespace {
 	// サウンド出力コンテキスト
 	SOUND_OUT	sound_out_(ZERO_LEVEL);
 
-	typedef emu::nesemu<AUDIO_SAMPLE_RATE> NESEMU;
+	typedef graphics::font8x16 AFONT;
+	AFONT		afont_;
+	typedef graphics::kfont<16, 16> KFONT;
+	KFONT		kfont_;
+	typedef graphics::font<AFONT, KFONT> FONT;
+	FONT		font_(afont_, kfont_);
+
+	// typedef graphics::render<GLCDC_MGR, FONT> RENDER;
+	typedef device::drw2d_mgr<GLCDC_MGR, FONT> RENDER;
+	RENDER		render_(glcdc_mgr_, font_);
+
+	typedef emu::nesemu<RENDER, AUDIO_SAMPLE_RATE> NESEMU;
 
 #ifdef USE_DAC
 	typedef sound::dac_stream<device::R12DA, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
@@ -167,16 +178,6 @@ namespace {
 	}
 #endif
 
-	typedef graphics::font8x16 AFONT;
-	AFONT		afont_;
-	typedef graphics::kfont<16, 16> KFONT;
-	KFONT		kfont_;
-	typedef graphics::font<AFONT, KFONT> FONT;
-	FONT		font_(afont_, kfont_);
-
-	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
-	RENDER		render_(glcdc_mgr_, font_);
-
 	typedef gui::simple_dialog<RENDER, FAMIPAD> DIALOG;
 	DIALOG		dialog_(render_, famipad_);
 
@@ -193,7 +194,7 @@ namespace {
 	// RX65N/RX72N Envision Kit では、内臓 RTC は利用出来ない為、簡易的な時計を用意する。
 	time_t		rtc_time_ = 0;
 
-	NESEMU		nesemu_;
+	NESEMU		nesemu_(render_);
 
 	typedef utils::command<256> CMD;
 	CMD			cmd_;
@@ -287,7 +288,8 @@ namespace {
 
 	void update_nesemu_()
 	{
-		nesemu_.service(LCD_ORG, GLCDC_MGR::width, GLCDC_MGR::height);
+		// nesemu_.service(LCD_ORG, GLCDC_MGR::width, GLCDC_MGR::height);
+		nesemu_.service();
 
 		uint32_t len = nesemu_.get_audio_len();
 		const uint16_t* wav = nesemu_.get_audio_buf();
@@ -436,6 +438,10 @@ int main(int argc, char** argv)
 		} else {
 			utils::format("GLCDC Fail\n");
 		}
+	}
+
+	{
+		render_.start();
 	}
 
 	{  // サンプリング・タイマー周期設定

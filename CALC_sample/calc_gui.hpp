@@ -101,7 +101,9 @@ namespace app {
 		typedef graphics::font<AFONT, KFONT> FONT;
 
 		// ソフトウェアーレンダラー
-		typedef graphics::render<GLCDC, FONT> RENDER;
+//		typedef graphics::render<GLCDC, FONT> RENDER;
+		// RX65N/RX72N DRW2D Engine
+		typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
 		// 標準カラーインスタンス
 		typedef graphics::def_color DEF_COLOR;
 
@@ -631,6 +633,9 @@ namespace app {
 				if(!touch_.start()) {
 					utils::format("FT5206 Start Fail...\n");
 				}
+			}
+			{  // render class の初期化
+				render_.start();
 			}
 #endif
 		}

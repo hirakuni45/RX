@@ -385,25 +385,26 @@ namespace dsos {
 		void draw_grid(int16_t x, int16_t y, int16_t w, int16_t h, int16_t unit) noexcept
 		{
 			render_.set_fore_color(DEF_COLOR::Aqua);
+			render_.set_back_color(DEF_COLOR::Black);
 			for(int16_t i = x; i <= (x + w); i += unit) {
 				uint32_t mask;
 				if(i == x || i == (x + w)) {
 					mask = -1;
 				} else {
-					mask = 0b11000000110000001100000011000000;
+					mask = 0b00111111001111110011111100111111;
 				}
 				render_.set_stipple(mask);
-				render_.line(vtx::spos(i, y), vtx::spos(i, y + h));
+				render_.line_v(i, y, h);
 			}
 			for(int16_t i = y; i <= (y + h); i += unit) {
 				uint32_t mask;
 				if(i == y || i == (y + h)) {
 					mask = -1;
 				} else {
-					mask = 0b11000000110000001100000011000000;
+					mask = 0b00111111001111110011111100111111;
 				}
 				render_.set_stipple(mask);
-				render_.line(vtx::spos(x, i), vtx::spos(x + w, i));
+				render_.line_h(i, x, w);
 			}
 			render_.set_stipple();
 		}
