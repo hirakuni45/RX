@@ -90,7 +90,7 @@ namespace app {
 		typedef graphics::kfont<16, 16> KFONT;
 		typedef graphics::font<AFONT, KFONT> FONT;
 
-//	typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
+//		typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
 		// ソフトウェアーレンダラー
 		typedef graphics::render<GLCDC, FONT> RENDER;
 		// 標準カラーインスタンス
@@ -393,7 +393,7 @@ namespace app {
 				}
 			}
 
-			{  // DRW2D 初期化
+			{  // レンダラー初期化
 				auto ver = render_.get_version();
 				utils::format("DRW2D Version: %04X\n") % ver;
 				if(render_.start()) {
