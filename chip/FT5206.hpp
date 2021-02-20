@@ -145,8 +145,8 @@ namespace chip {
 		bool		startup_;
 		uint16_t	version_;
 		uint8_t		chip_;
-		uint8_t		touch_tmp_[12];
-		touch_t		t_[2];
+		uint8_t		touch_tmp_[24];
+		touch_t		t_[4];
 
 
 		void write_(REG reg, uint8_t data) noexcept
@@ -175,14 +175,17 @@ namespace chip {
 			touch_id_  = touch_tmp_[0];  // GEST_ID
 			touch_num_ = touch_tmp_[1] & 0x0f;  // TD_STATUS
 
-			t_[0].before = t_[0].event;
-			t_[0].event = static_cast<EVENT>(touch_tmp_[2] >> 6);
-			t_[0].id = touch_tmp_[4] >> 4;
-			t_[0].pos.x = (static_cast<int16_t>(touch_tmp_[2] & 0x0F) << 8)
-				| static_cast<int16_t>(touch_tmp_[3]);
-			t_[0].pos.y = (static_cast<int16_t>(touch_tmp_[4] & 0x0F) << 8)
-				| static_cast<int16_t>(touch_tmp_[5]);
+			for(uint32_t i = 0; i < 4; ++i) {
+				t_[i].before = t_[i].event;
+				t_[i].event = static_cast<EVENT>(touch_tmp_[2 + i * 6] >> 6);
+				t_[i].id = touch_tmp_[4 + i * 6] >> 4;
+				t_[i].pos.x = (static_cast<int16_t>(touch_tmp_[2 + i * 6] & 0x0F) << 8)
+					| static_cast<int16_t>(touch_tmp_[3 + i * 6]);
+				t_[i].pos.y = (static_cast<int16_t>(touch_tmp_[4 + i * 6] & 0x0F) << 8)
+					| static_cast<int16_t>(touch_tmp_[5 + i * 6]);
+			}
 
+#if 0
 			t_[1].before = t_[1].event;
 			t_[1].event = static_cast<EVENT>(touch_tmp_[8] >> 6);
 			t_[1].id = touch_tmp_[10] >> 4;
@@ -190,13 +193,13 @@ namespace chip {
 				| static_cast<int16_t>(touch_tmp_[9]);
 			t_[1].pos.y = (static_cast<int16_t>(touch_tmp_[10] & 0x0F) << 8)
 				| static_cast<int16_t>(touch_tmp_[11]);
-
+#endif
 			// イベントが不正なら、無効にする。
 //			if(t_[0].event == EVENT::NONE || t_[1].event == EVENT::NONE) {
 //				touch_num_ = 0;
 //			}
 #if 1
-			if(t_[0].event == EVENT::DOWN || t_[1].event == EVENT::DOWN) {
+			if(t_[0].event == EVENT::DOWN || t_[1].event == EVENT::DOWN || t_[2].event == EVENT::DOWN || t_[3].event == EVENT::DOWN) {
 				startup_ = true;
 			}
 			if(!startup_) {
@@ -311,7 +314,7 @@ namespace chip {
 			convert_touch_();
 			request_touch_();
 
-			for(uint8_t i = 0; i < 2; ++i) {
+			for(uint8_t i = 0; i < 4; ++i) {
 				if(t_[i].event == EVENT::DOWN) {
 					t_[i].org = t_[i].pos;
 				} else if(t_[i].event == EVENT::UP) {
@@ -337,6 +340,6 @@ namespace chip {
 			@return タッチ位置
 		 */
 		//-----------------------------------------------------------------//
-		const touch_t& get_touch_pos(uint8_t idx) const noexcept { return t_[idx & 1]; }
+		const touch_t& get_touch_pos(uint8_t idx) const noexcept { return t_[idx & 3]; }
 	};
 }
