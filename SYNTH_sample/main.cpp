@@ -216,14 +216,14 @@ namespace {
 			if(key.positive_) {
 				uint8_t tmp[3];
 				tmp[0] = 0x90;
-				tmp[1] = 0x3C + i;
+				tmp[1] = 0x24 + synth_gui_.get_octave() * 12 + i;
 				tmp[2] = 0x7f;
 				ring_buffer_.Write(tmp, 3);
 			}
 			if(key.negative_) {
 				uint8_t tmp[3];
 				tmp[0] = 0x80;
-				tmp[1] = 0x3C + i;
+				tmp[1] = 0x24 + synth_gui_.get_octave() * 12 + i;
 				tmp[2] = 0x7f;
 				ring_buffer_.Write(tmp, 3);
 			}
