@@ -32,6 +32,8 @@
 
 namespace {
 
+	static const char* SOUND_COLOR_FILE = { "DX7_0628.SYX" };
+
 	typedef utils::fixed_fifo<uint8_t, 64> RB64;
 	typedef utils::fixed_fifo<uint8_t, 64> SB64;
 
@@ -151,8 +153,10 @@ namespace {
 	SOUND_OUT	sound_out_(ZERO_LEVEL);
 
 	// シンセサイザー・コンテキスト
+	static const int32_t	SYNTH_SAMPLE_RATE = 48'000;
 	RingBuffer	ring_buffer_;
 	SynthUnit	synth_unit_(ring_buffer_);
+	char		synth_color_name_[16 * 32];
 
 #ifdef USE_DAC
 	typedef sound::dac_stream<device::R12DA, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
@@ -192,13 +196,9 @@ namespace {
 	}
 #endif
 
-//	typedef gui::simple_dialog<RENDER> DIALOG;
-//	DIALOG		dialog_(render_);
-
 	typedef gui::filer_base FILER_BASE;
 	typedef gui::filer<RENDER> FILER;
 	FILER		filer_(render_);
-
 
 	// RX65N/RX72N Envision Kit では、内臓 RTC は利用出来ない為、簡易的な時計を用意する。
 	time_t		rtc_time_ = 0;
@@ -208,14 +208,8 @@ namespace {
 	typedef utils::shell<CMD> SHELL;
 	SHELL		shell_(cmd_);
 
-	struct note_t {
-		char		code;
-		uint16_t	count;
-		note_t() : code(0), count(0) { }
-	};
-	note_t		note_buff_[8];
 
-	void service_note_()
+	void service_note_() noexcept
 	{
 		for(int i = 0; i < 21; ++i) {
 			const auto& key = synth_gui_.get_keyboard().get(static_cast<SYNTH_GUI::KEYBOARD::key>(i));
@@ -235,6 +229,83 @@ namespace {
 			}
 		}
 	}
+
+
+    void setup_touch_panel_() noexcept
+    {
+        render_.sync_frame();
+        dialog_.modal(vtx::spos(400, 60),
+            "Touch panel device wait...\nPlease touch it with some screen.");
+        uint8_t nnn = 0;
+        while(1) {
+            render_.sync_frame();
+            touch_.update();
+            auto num = touch_.get_touch_num();
+            if(num == 0) {
+                ++nnn;
+                if(nnn >= 60) break;
+            } else {
+                nnn = 0;
+            }
+        }
+        render_.clear(DEF_COLOR::Black);
+    }
+
+
+	// 音色の読み込み、３２個
+	bool read_synth_color_(const char* filename) noexcept
+	{
+		utils::file_io fin;
+		if(fin.open(filename, "rb")) {
+			uint8_t tmp[4096 + 8];
+			if(fin.read(tmp, sizeof(tmp)) == sizeof(tmp)) {
+				ring_buffer_.Write(tmp, sizeof(tmp));
+				{  // データを処理させる為、エンジンを動かす。
+					const uint32_t len = SYNTH_SAMPLE_RATE / 60;
+					int16_t tmp[len];
+					synth_unit_.GetSamples(len, tmp);
+				}
+				for(int i = 0; i < 32; ++i) {
+					char tmp[12];
+					synth_unit_.get_patch_name(i, tmp, 12 - 1);
+					tmp[11] = 0;
+					utils::sformat(" %2d: %s", &synth_color_name_[i * 16], 16) % (i + 1) % tmp;
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+
+	// 音色の切り替え
+	void select_synth_color_(uint32_t no) noexcept
+	{
+		uint8_t tmp[2];
+		tmp[0] = 0xc0;
+		tmp[1] = no & 31;
+		ring_buffer_.Write(tmp, sizeof(tmp));
+	}
+}
+
+
+/// widget の登録・グローバル関数
+bool insert_widget(gui::widget* w)
+{
+	return 	synth_gui_.at_widd().insert(w);
+}
+
+/// widget の解除・グローバル関数
+void remove_widget(gui::widget* w)
+{
+	synth_gui_.at_widd().remove(w);
+}
+
+/// 音色を設定
+void select_synth_color(uint32_t no)
+{
+	select_synth_color_(no);
 }
 
 
@@ -301,28 +372,8 @@ extern "C" {
 //		rtc_.get_time(t);
 		return utils::str::get_fattime(rtc_time_);
 	}
-
-
-    void setup_touch_panel_()
-    {
-        render_.sync_frame();
-        dialog_.modal(vtx::spos(400, 60),
-            "Touch panel device wait...\nPlease touch it with some screen.");
-        uint8_t nnn = 0;
-        while(1) {
-            render_.sync_frame();
-            touch_.update();
-            auto num = touch_.get_touch_num();
-            if(num == 0) {
-                ++nnn;
-                if(nnn >= 60) break;
-            } else {
-                nnn = 0;
-            }
-        }
-        render_.clear(DEF_COLOR::Black);
-    }
 }
+
 
 int main(int argc, char** argv);
 
@@ -335,10 +386,10 @@ int main(int argc, char** argv)
 		sci_.start(115200, sci_level);
 	}
 
-	{  // 時計の初期時刻(2020/4/1 12:00:00)
+	{  // 時計の初期時刻(2021/2/1 12:00:00)
 		struct tm m;
-		m.tm_year = 2020 - 1900;
-		m.tm_mon  = 4 - 1;
+		m.tm_year = 2021 - 1900;
+		m.tm_mon  = 2 - 1;
 		m.tm_mday = 1;
 		m.tm_hour = 12;
 		m.tm_min  = 0;
@@ -352,7 +403,7 @@ int main(int argc, char** argv)
 
 	start_audio_();
 
-	SynthUnit::Init(48'000);
+	SynthUnit::Init(SYNTH_SAMPLE_RATE);
 
 	{  // サンプリング・タイマー周期設定
 		set_sample_rate(AUDIO_SAMPLE_RATE);
@@ -378,8 +429,12 @@ int main(int argc, char** argv)
 		}
 	}
 
-	{
-		render_.start();
+	{  // DRW2D start
+		if(render_.start()) {
+			utils::format("DRW2D Start OK\n");
+		} else {
+			utils::format("DRW2D Start Fail\n");
+		}
 	}
 
 	{  // FT5206 touch screen controller
@@ -395,16 +450,15 @@ int main(int argc, char** argv)
 
 	setup_touch_panel_();
 
-	synth_gui_.start();
+	synth_gui_.start(synth_color_name_);
 
 	LED::DIR = 1;
 //	SW2::DIR = 0;
 
 	uint8_t n = 0;
-
-///	uint32_t samples = sound_out_.get_sample_count();
-///	uint32_t sample_d = 0;
 	uint8_t sec = 0;
+	synth_color_name_[0] = 0;
+	int sound_color_load_delay = 200;  // SD カードがマウントされて、開始するまで時間がかかるので・・
 	while(1) {
 		render_.sync_frame();
 
@@ -424,6 +478,15 @@ int main(int argc, char** argv)
 			}
 
 			service_note_();
+		}
+
+		if(sound_color_load_delay >= 0) {
+			sound_color_load_delay--;
+			if(sound_color_load_delay == 0) {
+				if(!read_synth_color_(SOUND_COLOR_FILE)) {
+					utils::format("Synth sound color load fail: '%s'\n") % SOUND_COLOR_FILE;
+				}
+			}
 		}
 
 		sdh_.service();
