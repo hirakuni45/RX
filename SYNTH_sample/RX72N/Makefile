@@ -54,7 +54,7 @@ PSOURCES	=	$(ROOT)/main.cpp \
 				sound/synth/sin.cpp \
 				sound/synth/synth_unit.cpp
 
-USER_LIBS	=	m supc++
+USER_LIBS	=	supc++ m drw2d
 
 LDSCRIPT	=	../../$(ROOT_DEV)/$(DEVICE).ld
 
@@ -98,6 +98,8 @@ endif
 INC_SYS     =   $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../ ../../RX600/drw2d/inc/tes
+
+LIB_ROOT	=	../../RX600/drw2d ../../zlib
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \

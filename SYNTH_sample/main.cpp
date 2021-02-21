@@ -8,7 +8,10 @@
 */
 //=====================================================================//
 #include "common/renesas.hpp"
+#include "common/cmt_mgr.hpp"
+#include "common/fixed_fifo.hpp"
 #include "common/sci_io.hpp"
+#include "common/sci_i2c_io.hpp"
 #include "common/format.hpp"
 #include "common/command.hpp"
 #include "common/shell.hpp"
@@ -20,11 +23,19 @@
 #include "graphics/graphics.hpp"
 #include "graphics/filer.hpp"
 #include "graphics/simple_dialog.hpp"
-#include "graphics/root_menu.hpp"
+
+#include "chip/FT5206.hpp"
 
 #include "sound/synth/synth_unit.h"
 
+#include "synth_gui.hpp"
+
 namespace {
+
+	static const char* SOUND_COLOR_FILE = { "DX7_0628.SYX" };
+
+	typedef utils::fixed_fifo<uint8_t, 64> RB64;
+	typedef utils::fixed_fifo<uint8_t, 64> SB64;
 
 #if defined(SIG_RX65N)
 
@@ -46,6 +57,11 @@ namespace {
 	typedef device::PORT<device::PORT6, device::bitpos::B4> SDC_POWER;
 	// 書き込み禁止は使わない
 	typedef device::NULL_PORT SDC_WP;
+
+	// タッチセンサー「RESET」制御ポート
+	typedef device::PORT<device::PORT0, device::bitpos::B7> FT5206_RESET;
+	// タッチセンサー I2C ポート設定
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::FIRST_I2C> FT5206_I2C;
 
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
@@ -76,6 +92,11 @@ namespace {
 	// 書き込み禁止は使わない
 	typedef device::NULL_PORT SDC_WP;
 
+	// タッチセンサー「RESET」制御ポート
+	typedef device::PORT<device::PORT6, device::bitpos::B6> FT5206_RESET;
+	// タッチセンサー I2C ポート設定
+	typedef device::sci_i2c_io<device::SCI6, RB64, SB64, device::port_map::option::THIRD_I2C> FT5206_I2C;
+
 	// マスターバッファはサービスできる時間間隔を考えて余裕のあるサイズとする（2048）
 	// SSIE の FIFO サイズの２倍以上（256）
 	typedef sound::sound_out<int16_t, 2048, 256> SOUND_OUT;
@@ -96,6 +117,34 @@ namespace {
 	typedef device::glcdc_mgr<device::GLCDC, LCD_X, LCD_Y, PIX> GLCDC_MGR;
 	GLCDC_MGR	glcdc_mgr_(nullptr, LCD_ORG);
 
+	typedef graphics::font8x16 AFONT;
+	AFONT		afont_;
+#ifdef CASH_KFONT
+	typedef graphics::kfont<16, 16, 64> KFONT;
+#else
+	typedef graphics::kfont<16, 16> KFONT;
+#endif
+	KFONT		kfont_;
+	typedef graphics::font<AFONT, KFONT> FONT;
+	FONT		font_(afont_, kfont_);
+
+	FT5206_I2C	ft5206_i2c_;
+	typedef chip::FT5206<FT5206_I2C> TOUCH;
+	TOUCH		touch_(ft5206_i2c_);
+
+//	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
+	typedef device::drw2d_mgr<GLCDC_MGR, FONT> RENDER;
+	RENDER		render_(glcdc_mgr_, font_);
+
+	// 標準カラーインスタンス
+	typedef graphics::def_color DEF_COLOR;
+
+	typedef gui::simple_dialog<RENDER, TOUCH> DIALOG;
+	DIALOG      dialog_(render_, touch_);
+
+	typedef synth::synth_gui<RENDER, TOUCH> SYNTH_GUI;
+	SYNTH_GUI	synth_gui_(render_, touch_);
+
 	// RX65N/RX72N Envision Kit の SDHI は、候補３になっている
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDHI;
 	SDHI		sdh_;
@@ -104,8 +153,10 @@ namespace {
 	SOUND_OUT	sound_out_(ZERO_LEVEL);
 
 	// シンセサイザー・コンテキスト
+	static const int32_t	SYNTH_SAMPLE_RATE = 48'000;
 	RingBuffer	ring_buffer_;
 	SynthUnit	synth_unit_(ring_buffer_);
+	char		synth_color_name_[16 * 32];
 
 #ifdef USE_DAC
 	typedef sound::dac_stream<device::R12DA, device::TPU0, device::DMAC0, SOUND_OUT> DAC_STREAM;
@@ -145,32 +196,9 @@ namespace {
 	}
 #endif
 
-	typedef graphics::font8x16 AFONT;
-	AFONT		afont_;
-	typedef graphics::kfont<16, 16> KFONT;
-	KFONT		kfont_;
-	typedef graphics::font<AFONT, KFONT> FONT;
-	FONT		font_(afont_, kfont_);
-
-	typedef graphics::render<GLCDC_MGR, FONT> RENDER;
-	RENDER		render_(glcdc_mgr_, font_);
-#if 0
-	FT5206_I2C	ft5206_i2c_;
-	typedef chip::FT5206<FT5206_I2C> TOUCH;
-	TOUCH		touch_;
-
-	typedef gui::simple_dialog<RENDER> DIALOG;
-	DIALOG		dialog_(render_);
-#endif
 	typedef gui::filer_base FILER_BASE;
 	typedef gui::filer<RENDER> FILER;
 	FILER		filer_(render_);
-
-	typedef gui::back_btn<RENDER> BACK_BTN;
-	typedef gui::root_menu<RENDER, BACK_BTN, 5> ROOTM;
-
-	BACK_BTN	back_btn_(render_);
-	ROOTM		rootm_(render_, back_btn_);
 
 	// RX65N/RX72N Envision Kit では、内臓 RTC は利用出来ない為、簡易的な時計を用意する。
 	time_t		rtc_time_ = 0;
@@ -180,186 +208,104 @@ namespace {
 	typedef utils::shell<CMD> SHELL;
 	SHELL		shell_(cmd_);
 
-	struct note_t {
-		char		code;
-		uint16_t	count;
-		note_t() : code(0), count(0) { }
-	};
-	note_t		note_buff_[8];
 
-	void service_note_()
+	void service_note_() noexcept
 	{
-		char code = 13;
-		if(sci_.recv_length() > 0) {
-			auto ch = sci_.getch();
-			switch(ch) {
-			case 'z':
-			case 'Z': code = 0; break;
-			case 's':
-			case 'S': code = 1; break;
-			case 'x':
-			case 'X': code = 2; break;
-			case 'd':
-			case 'D': code = 3; break;
-			case 'c':
-			case 'C': code = 4; break;
-			case 'v':
-			case 'V': code = 5; break;
-			case 'g':
-			case 'G': code = 6; break;
-			case 'b':
-			case 'B': code = 7; break;
-			case 'h':
-			case 'H': code = 8; break;
-			case 'n':
-			case 'N': code = 9; break;
-			case 'j':
-			case 'J': code = 10; break;
-			case 'm':
-			case 'M': code = 11; break;
-			case ',':
-			case '<': code = 12; break;
-			default:
-				break;
-			}
-		}
-
-		if(code < 13) {
-			sci_.putch('A' + code);
-		}
-
-		for(int i = 0; i < 8; ++i) {
-			if(note_buff_[i].count > 0) {
-				note_buff_[i].count--;
-				if(note_buff_[i].count == 0) {
-					uint8_t tmp[3];
-					tmp[0] = 0x80;
-					tmp[1] = 0x3C + note_buff_[i].code;
-					tmp[2] = 0x7f;
-					ring_buffer_.Write(tmp, 3);
-				}
-			}
-			if(code < 13 && note_buff_[i].count == 0) {
-				note_buff_[i].code = code;
-				note_buff_[i].count = 60;
+		for(int i = 0; i < 21; ++i) {
+			const auto& key = synth_gui_.get_keyboard().get(static_cast<SYNTH_GUI::KEYBOARD::key>(i));
+			if(key.positive_) {
 				uint8_t tmp[3];
 				tmp[0] = 0x90;
-				tmp[1] = 0x3C + code;
+				tmp[1] = 0x3C + i;
 				tmp[2] = 0x7f;
 				ring_buffer_.Write(tmp, 3);
-				code = 13;
+			}
+			if(key.negative_) {
+				uint8_t tmp[3];
+				tmp[0] = 0x80;
+				tmp[1] = 0x3C + i;
+				tmp[2] = 0x7f;
+				ring_buffer_.Write(tmp, 3);
 			}
 		}
 	}
 
-#if 0
-	void command_()
+
+    void setup_touch_panel_() noexcept
+    {
+        render_.sync_frame();
+        dialog_.modal(vtx::spos(400, 60),
+            "Touch panel device wait...\nPlease touch it with some screen.");
+        uint8_t nnn = 0;
+        while(1) {
+            render_.sync_frame();
+            touch_.update();
+            auto num = touch_.get_touch_num();
+            if(num == 0) {
+                ++nnn;
+                if(nnn >= 60) break;
+            } else {
+                nnn = 0;
+            }
+        }
+        render_.clear(DEF_COLOR::Black);
+    }
+
+
+	// 音色の読み込み、３２個
+	bool read_synth_color_(const char* filename) noexcept
 	{
-		if(!cmd_.service()) {
-			return;
-		}
-
-		if(shell_.analize()) {
-			return;
-		}
-
-		if(monitor_) {
-			auto n = cmd_.get_words();
-			if(n == 0) return;
-			if(cmd_.cmp_word(0, "exit")) {
-				cmd_.set_prompt("# ");
-				monitor_ = false;
-			} else {
-				nesemu_.monitor(cmd_.get_command());
-			}
-			return;
-		}
-
-		auto cmdn = cmd_.get_words();
-		if(cmdn == 0) return;
-
-		if(cmd_.cmp_word(0, "nes")) {
-			if(cmdn >= 2) {
-				char tmp[FF_MAX_LFN + 1];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				if(!nesemu_.open(tmp)) {
-					utils::format("Open error: '%s'\n") % tmp;
+		utils::file_io fin;
+		if(fin.open(filename, "rb")) {
+			uint8_t tmp[4096 + 8];
+			if(fin.read(tmp, sizeof(tmp)) == sizeof(tmp)) {
+				ring_buffer_.Write(tmp, sizeof(tmp));
+				{  // データを処理させる為、エンジンを動かす。
+					const uint32_t len = SYNTH_SAMPLE_RATE / 60;
+					int16_t tmp[len];
+					synth_unit_.GetSamples(len, tmp);
+				}
+				for(int i = 0; i < 32; ++i) {
+					char tmp[12];
+					synth_unit_.get_patch_name(i, tmp, 12 - 1);
+					tmp[11] = 0;
+					utils::sformat(" %2d: %s", &synth_color_name_[i * 16], 16) % (i + 1) % tmp;
 				}
 			}
-		} else if(cmd_.cmp_word(0, "reset")) {
-			nesemu_.reset();
-		} else if(cmd_.cmp_word(0, "pause")) {
-			nesemu_.enable_pause(!nesemu_.get_pause());
-		} else if(cmd_.cmp_word(0, "save")) {
-			int slot = 0;
-			if(cmdn >= 2) {
-				char tmp[32];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				utils::input("%d", tmp) % slot;
-			}
-			if(!nesemu_.save_state(slot)) {
-				utils::format("Save state error: slot = %d\n") % slot;
-			}
-		} else if(cmd_.cmp_word(0, "load")) {
-			int slot = 0;
-			if(cmdn >= 2) {
-				char tmp[32];
-				cmd_.get_word(1, tmp, sizeof(tmp));
-				utils::input("%d", tmp) % slot;
-			}
-			if(!nesemu_.load_state(slot)) {
-				utils::format("Load state error: slot = %d\n") % slot;
-			}
-		} else if(cmd_.cmp_word(0, "info")) {
-			const char* str = nesemu_.get_info();
-			utils::format("%s\n") % str;
-		} else if(cmd_.cmp_word(0, "call-151")) {
-			if(nesemu_.probe()) {
-				cmd_.set_prompt("$");
-				monitor_ = true;
-			} else {
-				utils::format("Not Ready To Cartridge (NESEMU)\n");
-			}
-		} else if(cmd_.cmp_word(0, "help")) {
-			shell_.help();
-			utils::format("    nes filename    Emulations for NES\n");
-			utils::format("    pause           Pause Emulation (toggle)\n");
-			utils::format("    reset           Reset NES Machine\n");
-			utils::format("    save [slot-no]  Save NES State (slot-no:0 to 9)\n");
-			utils::format("    load [slot-no]  Load NES State (slot-no:0 to 9)\n");
-			utils::format("    info            Cartrige Infomations\n");
-			utils::format("    call-151        Goto Monitor\n");
+			return true;
 		} else {
-			utils::format("Command error: '%s'\n") % cmd_.get_command();
+			return false;
 		}
 	}
 
 
-	void update_nesemu_()
+	// 音色の切り替え
+	void select_synth_color_(uint32_t no) noexcept
 	{
-		nesemu_.service(LCD_ORG, GLCDC_MGR::width, GLCDC_MGR::height);
-
-		uint32_t len = nesemu_.get_audio_len();
-		const uint16_t* wav = nesemu_.get_audio_buf();
-		for(uint32_t i = 0; i < len; ++i) {
-			while((sound_out_.at_fifo().size() - sound_out_.at_fifo().length()) < 8) {
-			}
-			typename SOUND_OUT::WAVE t;
-			t.l_ch = t.r_ch = *wav++;
-			sound_out_.at_fifo().put(t);
-		}
+		uint8_t tmp[2];
+		tmp[0] = 0xc0;
+		tmp[1] = no & 31;
+		ring_buffer_.Write(tmp, sizeof(tmp));
 	}
+}
 
 
-	void make_state_str_(int slot) {
-		static char tmp1[16];
-		utils::sformat("Load State %d", tmp1, sizeof(tmp1)) % slot;
-		rootm_.set(1, tmp1);
-		static char tmp2[16];
-		utils::sformat("Save State %d", tmp2, sizeof(tmp2)) % slot;
-		rootm_.set(2, tmp2);
-	}
-#endif
+/// widget の登録・グローバル関数
+bool insert_widget(gui::widget* w)
+{
+	return 	synth_gui_.at_widd().insert(w);
+}
+
+/// widget の解除・グローバル関数
+void remove_widget(gui::widget* w)
+{
+	synth_gui_.at_widd().remove(w);
+}
+
+/// 音色を設定
+void select_synth_color(uint32_t no)
+{
+	select_synth_color_(no);
 }
 
 
@@ -428,6 +374,7 @@ extern "C" {
 	}
 }
 
+
 int main(int argc, char** argv);
 
 int main(int argc, char** argv)
@@ -439,10 +386,10 @@ int main(int argc, char** argv)
 		sci_.start(115200, sci_level);
 	}
 
-	{  // 時計の初期時刻(2020/4/1 12:00:00)
+	{  // 時計の初期時刻(2021/2/1 12:00:00)
 		struct tm m;
-		m.tm_year = 2020 - 1900;
-		m.tm_mon  = 4 - 1;
+		m.tm_year = 2021 - 1900;
+		m.tm_mon  = 2 - 1;
 		m.tm_mday = 1;
 		m.tm_hour = 12;
 		m.tm_min  = 0;
@@ -456,7 +403,11 @@ int main(int argc, char** argv)
 
 	start_audio_();
 
-	SynthUnit::Init(48'000);
+	SynthUnit::Init(SYNTH_SAMPLE_RATE);
+
+	{  // サンプリング・タイマー周期設定
+		set_sample_rate(AUDIO_SAMPLE_RATE);
+	}
 
 	utils::format("\r%s Start for SYNTH sample\n") % sys_msg_;
 	cmd_.set_prompt("# ");
@@ -478,44 +429,44 @@ int main(int argc, char** argv)
 		}
 	}
 
-	{  // サンプリング・タイマー周期設定
-		set_sample_rate(AUDIO_SAMPLE_RATE);
+	{  // DRW2D start
+		if(render_.start()) {
+			utils::format("DRW2D Start OK\n");
+		} else {
+			utils::format("DRW2D Start Fail\n");
+		}
 	}
+
+	{  // FT5206 touch screen controller
+		TOUCH::reset<FT5206_RESET>();
+		uint8_t intr_lvl = 1;
+		if(!ft5206_i2c_.start(FT5206_I2C::SPEED::STANDARD, intr_lvl)) {
+			utils::format("FT5206 I2C Start Fail...\n");
+		}
+		if(!touch_.start()) {
+			utils::format("FT5206 Start Fail...\n");
+		}
+	}
+
+	setup_touch_panel_();
+
+	synth_gui_.start(synth_color_name_);
 
 	LED::DIR = 1;
 //	SW2::DIR = 0;
 
-	// メニューの設定
-	rootm_.clear();
-	rootm_.set_gap(20);
-	rootm_.set_space(vtx::spos(12, 8));
-	rootm_.add("Select NES File");
-	rootm_.add("Load State 0");
-	rootm_.add("Save State 0");
-	rootm_.add("Reset");
-	rootm_.add("Close Menu");
-
 	uint8_t n = 0;
 	uint8_t sec = 0;
-	bool menu = false;
-	bool filer = false;
-	bool mount = sdh_.get_mount();
-	bool error = false;
-
-///	uint32_t samples = sound_out_.get_sample_count();
-///	uint32_t sample_d = 0;
+	synth_color_name_[0] = 0;
+	int sound_color_load_delay = 200;  // SD カードがマウントされて、開始するまで時間がかかるので・・
 	while(1) {
 		render_.sync_frame();
 
-		{  // シンセサイザー・サービス
-///			auto ref = sound_out_.get_sample_count();
-///			uint32_t d = ref - samples;
-///			if(sample_d != d) {
-///				utils::format("Sample: %d\n") % d;
-///				samples = ref;
-///				sample_d = d;
-///			}
+		touch_.update();
 
+		synth_gui_.update();
+
+		{  // シンセサイザー・サービス
 			uint32_t n = 48'000 / 60;
 			int16_t tmp[n];
 			synth_unit_.GetSamples(n, tmp);
@@ -529,133 +480,15 @@ int main(int argc, char** argv)
 			service_note_();
 		}
 
-		bool m = sdh_.get_mount();
-		uint32_t ctrl = 0;
-		if(m) {
-			FILER_BASE::set(FILER_BASE::ctrl::MOUNT, ctrl);
-		}
-#if 0
-		if(!menu && flt >= 120) {
-			flt = 0;
-			sound_out_.mute();
-			menu = true;
-		}
-
-		{
-			if(!mount && m) {
-				render_.set_fore_color(graphics::def_color::Black);
-				render_.fill_box(vtx::srect(480-24, 0, 24, 16));
-			}
-			if(mount && !m) {
-				render_.set_fore_color(graphics::def_color::White);
-				render_.draw_text(vtx::spos(480-24, 0), "?SD");
-				filer = false;
-			}
-			mount = m;
-		}
-
-		if(menu) {
-			render_.clear(graphics::def_color::Black);
-
-			if(chip::on(trg, chip::FAMIPAD_ST::UP)) {
-				rootm_.prev_focus();
-			}
-			if(chip::on(trg, chip::FAMIPAD_ST::DOWN)) {
-				rootm_.next_focus();
-			}
-
-			auto idx = rootm_.get_pos();
-			if(idx == 1 || idx == 2) {
-				if(chip::on(trg, chip::FAMIPAD_ST::LEFT)) {
-					if(slot > 0) slot--;
-				}
-				if(chip::on(trg, chip::FAMIPAD_ST::RIGHT)) {
-					if(slot < 9) ++slot;
-				}
-			}
-
-			make_state_str_(slot);
-
-			auto pos = rootm_.get_org(idx);
-			rootm_.render(pos, true);
-
-			if(chip::on(trg, chip::FAMIPAD_ST::A)) {
-				switch(idx) {
-				case 0:
-					FILER_BASE::set(FILER_BASE::ctrl::OPEN, ctrl);
-					filer = true;
-					break;
-				case 1:
-					if(!nesemu_.load_state(slot)) {
-						dialog_.modal(vtx::spos(400, 80), "Load state error");
-						error = true;
-					}
-					break;
-				case 2:
-					if(!nesemu_.save_state(slot)) {
-						dialog_.modal(vtx::spos(400, 80), "Save state error");
-						error = true;
-					}
-					break;
-				case 3:
-					nesemu_.reset();
-					break;
-				case 4:
-					break;
-				}
-				fami_pad_data_ = 0;
-				render_.clear(graphics::def_color::Black);
-				menu = false;
-			}
-		}
-
-		if(filer) {
-			if(chip::on(lvl, chip::FAMIPAD_ST::B)) {
-				FILER_BASE::set(FILER_BASE::ctrl::CLOSE, ctrl);
-				filer = false;
-			}
-			if(chip::on(lvl, chip::FAMIPAD_ST::A)) {
-				FILER_BASE::set(FILER_BASE::ctrl::INFO, ctrl);
-			}
-			if(chip::on(lvl, chip::FAMIPAD_ST::UP)) {
-				FILER_BASE::set(FILER_BASE::ctrl::UP, ctrl);
-			}
-			if(chip::on(lvl, chip::FAMIPAD_ST::DOWN)) {
-				FILER_BASE::set(FILER_BASE::ctrl::DOWN, ctrl);
-			}
-			if(chip::on(lvl, chip::FAMIPAD_ST::LEFT)) {
-				FILER_BASE::set(FILER_BASE::ctrl::BACK, ctrl);
-			}
-			if(chip::on(lvl, chip::FAMIPAD_ST::RIGHT)) {
-				FILER_BASE::set(FILER_BASE::ctrl::SELECT, ctrl);
-			}
-			char path[256];
-			auto fst = filer_.update(ctrl, path, sizeof(path));
-			if(fst == FILER_BASE::status::FILE) {
-				char tmp[256];
-				utils::file_io::make_full_path(path, tmp, sizeof(tmp));
-				nesemu_.close();
-				if(nesemu_.open(tmp)) {
-					filer = false;
-				} else {
-					dialog_.modal(vtx::spos(400, 80), "Not NES file");
-					error = true;
+		if(sound_color_load_delay >= 0) {
+			sound_color_load_delay--;
+			if(sound_color_load_delay == 0) {
+				if(!read_synth_color_(SOUND_COLOR_FILE)) {
+					utils::format("Synth sound color load fail: '%s'\n") % SOUND_COLOR_FILE;
 				}
 			}
 		}
 
-		if(error) {
-			if(chip::on(trg, chip::FAMIPAD_ST::A) || chip::on(trg, chip::FAMIPAD_ST::B)) {
-				render_.clear(graphics::def_color::Black);
-				error = false;
-				fami_pad_data_ = 0;
-			}
-		}
-
-		if(!menu && !filer && !error) {
-			update_nesemu_();
-		}
-#endif
 		sdh_.service();
 
 ///		command_();
