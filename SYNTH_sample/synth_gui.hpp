@@ -54,7 +54,7 @@ namespace synth {
 		static const int16_t OCT_AREA_H = 30;
 		static const int16_t OCT_BTN_SZ = 50;   ///< ボタンサイズ
 
-        typedef gui::widget WIDGET;
+		typedef gui::widget WIDGET;
 		typedef gui::button BUTTON;
 		typedef gui::text TEXT;
 		typedef gui::slider SLIDER;
@@ -82,7 +82,7 @@ namespace synth {
 		//-----------------------------------------------------------------//
 		synth_gui(RENDER& render, TOUCH& touch) noexcept :
 			render_(render), touch_(touch), widd_(render, touch),
-            keyboard_(render, touch),
+			keyboard_(render, touch),
 			sc_idx_m_(vtx::srect(CENTER-SC_TEX_W/2-SC_BTN_SZ-SC_SPC, SC_LOC, SC_BTN_SZ, SC_BTN_SZ), "<"),
 			sc_name_ (vtx::srect(CENTER-SC_TEX_W/2, SC_LOC+(SC_BTN_SZ-SC_TEX_H)/2, SC_TEX_W, SC_TEX_H),  ""),
 			sc_idx_p_(vtx::srect(CENTER+SC_TEX_W/2+SC_SPC,        SC_LOC, SC_BTN_SZ, SC_BTN_SZ), ">"),
@@ -91,7 +91,7 @@ namespace synth {
 			octave_p_(vtx::srect(480-OCT_BTN_SZ, OCT_LOC, OCT_BTN_SZ, OCT_BTN_SZ), ">>"),
 			sc_idx_(0), sc_idx_before_(0), sc_name_org_(nullptr),
 			oct_idx_(2)
-        { }
+		{ }
 
 
 		//-----------------------------------------------------------------//
