@@ -24,9 +24,9 @@ namespace gui {
 
 		typedef std::function<void(float ratio)> SELECT_FUNC_TYPE;
 
-		static const int16_t round_radius = 10;
-		static const int16_t frame_width  = 3;
-		static const int16_t handle_size  = 20;
+		static const int16_t round_radius = 10;  ///< 標準ラウンド半径
+		static const int16_t frame_width  = 3;   ///< 標準フレーム幅
+		static const int16_t handle_size  = 20;  ///< 標準ハンドルサイズ
 
 	private:
 
@@ -34,6 +34,8 @@ namespace gui {
 		vtx::spos			touch_org_;
 		float				ratio_org_;
 		float				ratio_;
+
+		int16_t				handle_size_;
 
 		bool				read_only_;
 
@@ -47,13 +49,13 @@ namespace gui {
 		//-----------------------------------------------------------------//
 		slider(const vtx::srect& loc = vtx::srect(0), float inr = 0.0f) noexcept :
 			widget(loc, nullptr), select_func_(),
-			touch_org_(0), ratio_org_(inr), ratio_(inr), read_only_(false)
+			touch_org_(0), ratio_org_(inr), ratio_(inr), handle_size_(handle_size), read_only_(false)
 		{
 			if(loc.size.x <= 0) {
-				at_location().size.x = handle_size;
+				at_location().size.x = handle_size_;
 			}
 			if(loc.size.y <= 0) {
-				at_location().size.y = handle_size;
+				at_location().size.y = handle_size_;
 			}
 			insert_widget(this);
 		}
@@ -109,6 +111,7 @@ namespace gui {
 			update_touch_slider(pos, num);
 
 			if(read_only_) {
+
 			} else if(get_touch_state().positive_) {
 				touch_org_ = get_touch_state().position_;
 				ratio_org_ = ratio_;
@@ -180,8 +183,12 @@ namespace gui {
 		*/
 		//-----------------------------------------------------------------//
 		void set_ratio(float ratio) noexcept {
+			auto tmp = ratio_;
 			if(ratio >= 0.0f && ratio <= 1.0f) {
 				ratio_ = ratio;
+			}
+			if(tmp != ratio_) {
+				set_update();
 			}
 		}
 

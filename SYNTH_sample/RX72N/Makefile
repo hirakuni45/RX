@@ -95,11 +95,11 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../ ../../RX600/drw2d/inc/tes
 
-LIB_ROOT	=	../../RX600/drw2d ../../zlib
+LIB_ROOT	=	../../RX600/drw2d ../../rxlib/lib
 
 CP_OPT		=	-Wall -Werror \
 				-Wno-unused-variable \
