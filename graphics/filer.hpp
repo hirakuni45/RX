@@ -213,10 +213,10 @@ namespace gui {
 		/*!
 			@brief	コンストラクター
 			@param[in]	rdr		レンダリング・インスタンス
-			@param[in]	tto		３本指タッチオープンを無効にする場合「false」
+			@param[in]	tto		３本指タッチオープンを有効にする場合「true」
 		*/
 		//-----------------------------------------------------------------//
-		filer(RDR& rdr, bool tto = true) noexcept : rdr_(rdr), dlist_(),
+		filer(RDR& rdr, bool tto = false) noexcept : rdr_(rdr), dlist_(),
 			ctrl_(0), rdr_st_(), open_(false), info_(false), 
 			touch_lvl_(false), touch_pos_(false), touch_neg_(false), touch_num_(0),
 			touch_(0), touch_org_(0), touch_end_(0),
