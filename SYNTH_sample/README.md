@@ -22,6 +22,12 @@ Sample program for pronouncing the Yamaha DX7 FM Synthesizer using the RX microc
 
  - RX/sound/synth/
 
+## Standard MIDI File Player (source)
+
+- RX/sound/smf
+
+The original source code is for the "Arduino" environment, so I modified it for this framework.
+
 ## Hardware preparation (general)
 
 - In the RX72N Envision Kit, connect an amplifier to the audio jack.
@@ -42,10 +48,14 @@ Sample program for pronouncing the Yamaha DX7 FM Synthesizer using the RX microc
  - The name of the tone is displayed in the center of the tone change button.
  - The octave range can be changed with the "<<" and ">>" buttons. (5 octaves)
  - Up to four keys can be recognized and sounded simultaneously. (FM synthesizer is capable of 8 simultaneous notes.
+ - Press the "@" button to open the "Filer", and select the MID file to play it.
     
 ## Note
 
 In the case of the RX65N Envision Kit, the number of simultaneous sounds is set to four due to limited processing power.
+   
+Some MID files are playable and some are not, depending on the standard MIDI format, the limitations of the parser currently installed, and the limitations of the synthesizer.
+There are many MID files available on the net, so please search for them and enjoy automatic performance.
 
 -----
    
@@ -57,3 +67,12 @@ MIT
 FM Synthsizer License:
 
   http://www.apache.org/licenses/LICENSE-2.0
+
+smf:
+
+```
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+```
