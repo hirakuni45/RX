@@ -1046,7 +1046,7 @@ namespace device {
 	template<class _> typename mpc_t<_>::PG6PFS_ mpc_t<_>::PG6PFS;
 	template<class _> typename mpc_t<_>::PG7PFS_ mpc_t<_>::PG7PFS;
 
-#if defined(SIG_RX72N)
+#if defined(SIG_RX65N) || defined(SIG_RX72N)
 	template<class _> typename mpc_t<_>::PJ0PFS_ mpc_t<_>::PJ0PFS;
 	template<class _> typename mpc_t<_>::PJ1PFS_ mpc_t<_>::PJ1PFS;
 	template<class _> typename mpc_t<_>::PJ2PFS_ mpc_t<_>::PJ2PFS;

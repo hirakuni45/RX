@@ -45,19 +45,21 @@ namespace synth {
 		static const int16_t SC_LOC = 10;   ///< ボタン関係、縦の位置
 		static const int16_t SC_SPC = 10;   ///< ボタンとの隙間
 		static const int16_t CENTER = 480/2;   ///< X 中心
-		static const int16_t SC_BTN_SZ = 30;   ///< ボタンサイズ
+		static const int16_t SC_BTN_SZ = 40;   ///< ボタンサイズ
 		static const int16_t SC_TEX_W = 8 * SC_NAME_LEN;  ///< テキスト横幅
 		static const int16_t SC_TEX_H = 24;       ///< テキスト高さ
 
 		static const int16_t OCT_LOC = 40;   ///< オクターブ関係、縦の位置
 		static const int16_t OCT_AREA_W = 300;
-		static const int16_t OCT_AREA_H = 30;
+		static const int16_t OCT_AREA_H = 20;
 		static const int16_t OCT_BTN_SZ = 50;   ///< ボタンサイズ
 
 		typedef gui::widget WIDGET;
 		typedef gui::button BUTTON;
 		typedef gui::text TEXT;
 		typedef gui::slider SLIDER;
+		BUTTON		filer_run_;
+
 		BUTTON		sc_idx_m_;
 		TEXT		sc_name_;
 		BUTTON		sc_idx_p_;
@@ -72,6 +74,35 @@ namespace synth {
 
 		uint32_t	oct_idx_;
 
+		typedef gui::filer_base FILER_BASE;
+		typedef gui::filer<RENDER> FILER;
+		FILER		filer_;
+		uint32_t	ctrl_;
+		bool		filer_state_;
+		char		path_[256];
+		uint32_t	file_id_;
+
+
+		void gui_enable_(bool ena)
+		{
+			// 音色が有効になったら、ボタンを有効にする。
+			if(ena && sc_name_org_[0] != 0) {
+				sc_idx_p_.set_state(WIDGET::STATE::ENABLE);
+				sc_idx_m_.set_state(WIDGET::STATE::ENABLE);
+			} else {
+				sc_idx_m_.enable(ena);
+				sc_idx_p_.enable(ena);
+			}
+
+			filer_run_.enable(ena);
+			sc_name_.enable(ena);
+			octave_m_.enable(ena);
+			octave_d_.enable(ena);
+			octave_p_.enable(ena);
+
+			keyboard_.enable(ena);
+		}
+
     public:
 		//-----------------------------------------------------------------//
 		/*!
@@ -83,6 +114,7 @@ namespace synth {
 		synth_gui(RENDER& render, TOUCH& touch) noexcept :
 			render_(render), touch_(touch), widd_(render, touch),
 			keyboard_(render, touch),
+			filer_run_(vtx::srect(CENTER-SC_TEX_W/2 - (SC_BTN_SZ+SC_SPC) * 2 - 10, SC_LOC, SC_BTN_SZ, SC_BTN_SZ), "@"),
 			sc_idx_m_(vtx::srect(CENTER-SC_TEX_W/2-SC_BTN_SZ-SC_SPC, SC_LOC, SC_BTN_SZ, SC_BTN_SZ), "<"),
 			sc_name_ (vtx::srect(CENTER-SC_TEX_W/2, SC_LOC+(SC_BTN_SZ-SC_TEX_H)/2, SC_TEX_W, SC_TEX_H),  ""),
 			sc_idx_p_(vtx::srect(CENTER+SC_TEX_W/2+SC_SPC,        SC_LOC, SC_BTN_SZ, SC_BTN_SZ), ">"),
@@ -90,7 +122,8 @@ namespace synth {
 			octave_d_(vtx::srect(CENTER-OCT_AREA_W/2, OCT_LOC+(OCT_BTN_SZ-OCT_AREA_H)/2, OCT_AREA_W, OCT_AREA_H)),
 			octave_p_(vtx::srect(480-OCT_BTN_SZ, OCT_LOC, OCT_BTN_SZ, OCT_BTN_SZ), ">>"),
 			sc_idx_(0), sc_idx_before_(0), sc_name_org_(nullptr),
-			oct_idx_(2)
+			oct_idx_(2),
+			filer_(render), ctrl_(0), filer_state_(false), file_id_(0)
 		{ }
 
 
@@ -105,6 +138,11 @@ namespace synth {
 			sc_name_org_ = sc_name;
 
             keyboard_.start();
+
+			filer_run_.enable();
+			filer_run_.at_select_func() = [this](uint32_t id) {
+				FILER_BASE::set(FILER_BASE::ctrl::OPEN, ctrl_);
+			};
 
 			sc_idx_m_.enable();
 			sc_idx_m_.set_state(WIDGET::STATE::STALL);
@@ -151,14 +189,14 @@ namespace synth {
 		/*!
 			@brief  更新 @n
 					※毎フレーム呼ぶ
+			@param[in] mount	SD カードのマウント状態
 		*/
 		//-----------------------------------------------------------------//
-		void update() noexcept
+		void update(bool mount) noexcept
 		{
-			// 音色が有効になったら、ボタンを有効にする。
-			if(sc_name_org_[0] != 0) {
-				sc_idx_p_.set_state(WIDGET::STATE::ENABLE);
-				sc_idx_m_.set_state(WIDGET::STATE::ENABLE);
+			ctrl_ = 0;
+			if(mount) {
+				FILER_BASE::set(FILER_BASE::ctrl::MOUNT, ctrl_);
 			}
 
 			// 音色が変更になったら、音色名を表示
@@ -172,8 +210,30 @@ namespace synth {
 
 			octave_d_.set_ratio(static_cast<float>(oct_idx_) / static_cast<float>(OCT_NUM - 1));
 
+			// ファイラーが有効なら、GUI を無効、ファイラーが無効なら GUI を有効にする。
+			auto fs = filer_.get_state();
+			gui_enable_(!fs);
+
+			// ファイラーが閉じた時に GUI を再描画
+			if(filer_state_ && !fs) {
+				widd_.redraw_all();
+			}
+			filer_state_ = fs;
+
 			widd_.update();
             keyboard_.update();
+
+			{  // ファイラーの操作
+				auto tnum = touch_.get_touch_num();
+				const auto& t = touch_.get_touch_pos(0);
+				filer_.set_touch(tnum, t.pos);
+				auto fst = filer_.update(ctrl_, path_, sizeof(path_));
+				if(fst == FILER_BASE::status::FILE) {  // ファイル選択
+//					utils::format("Play: '%s'\n") % path_;
+					++file_id_;
+				} else if(fst == FILER_BASE::status::CANCEL) {  // ファイル選択キャンセル
+				}
+			}
         }
 
     
@@ -202,5 +262,18 @@ namespace synth {
 		*/
 		//-----------------------------------------------------------------//
 		const auto& get_keyboard() const noexcept { return keyboard_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  ファイル名の取得
+			@paramout]	id	ファイル ID
+			@return ファイル名
+		*/
+		//-----------------------------------------------------------------//
+		const char* get_file_name(uint32_t& id) const noexcept {
+			id = file_id_;
+			return path_;
+		}
     };
 }

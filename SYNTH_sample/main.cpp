@@ -30,6 +30,8 @@
 
 #include "synth_gui.hpp"
 
+#include "sound/smf/MD_MIDIFile.h"
+
 namespace {
 
 	static const char* SOUND_COLOR_FILE = { "DX7_0628.SYX" };
@@ -196,10 +198,6 @@ namespace {
 	}
 #endif
 
-	typedef gui::filer_base FILER_BASE;
-	typedef gui::filer<RENDER> FILER;
-	FILER		filer_(render_);
-
 	// RX65N/RX72N Envision Kit では、内臓 RTC は利用出来ない為、簡易的な時計を用意する。
 	time_t		rtc_time_ = 0;
 
@@ -207,6 +205,12 @@ namespace {
 	CMD			cmd_;
 	typedef utils::shell<CMD> SHELL;
 	SHELL		shell_(cmd_);
+
+	uint32_t	file_id_ = 0;
+
+	uint32_t	microsec_ = 0;
+	bool		midifile_ = false;
+	MD_MIDIFile	mdf_;
 
 
 	void service_note_() noexcept
@@ -287,6 +291,42 @@ namespace {
 		tmp[1] = no & 31;
 		ring_buffer_.Write(tmp, sizeof(tmp));
 	}
+
+
+	void midiCallback_(midi_event *pev)
+	{
+		if((pev->data[0] >= 0x80) && (pev->data[0] <= 0xe0)) {
+			uint8_t tmp = pev->data[0] | pev->channel;
+			ring_buffer_.Write(&tmp, 1);
+			ring_buffer_.Write(&pev->data[1], pev->size - 1);
+		} else {
+			ring_buffer_.Write(pev->data, pev->size);
+		}
+#if 0
+		utils::format("T: %d") % static_cast<int>(pev->track);
+		utils::format(", Ch: %d\n") % static_cast<int>(pev->channel+1);
+		for (uint8_t i=0; i<pev->size; i++) {
+			if(i == 0) {
+				utils::format("  %d") % static_cast<uint8_t>(pev->data[i]);
+			} else {
+				utils::format(", %d") % static_cast<uint8_t>(pev->data[i]);
+			}
+		}
+		utils::format("\n");
+#endif
+	}
+
+
+	void sysexCallback_(sysex_event *pev)
+	{
+#if 0
+		utils::format("T: %d") % static_cast<int>(pev->track);
+		for (uint8_t i=0; i<pev->size; i++) {
+			utils::format("%d,") % static_cast<int>(pev->data[i]);
+		}
+		utils::format("\n");
+#endif
+	}
 }
 
 
@@ -306,6 +346,12 @@ void remove_widget(gui::widget* w)
 void select_synth_color(uint32_t no)
 {
 	select_synth_color_(no);
+}
+
+
+uint32_t micros()
+{
+	return microsec_;
 }
 
 
@@ -452,22 +498,28 @@ int main(int argc, char** argv)
 
 	synth_gui_.start(synth_color_name_);
 
+	{  // SMF プレイヤーの設定
+		mdf_.begin(nullptr);
+		mdf_.setMidiHandler(midiCallback_);
+		mdf_.setSysexHandler(sysexCallback_);
+	}
+
 	LED::DIR = 1;
 //	SW2::DIR = 0;
 
 	uint8_t n = 0;
 	uint8_t sec = 0;
 	synth_color_name_[0] = 0;
-	int sound_color_load_delay = 200;  // SD カードがマウントされて、開始するまで時間がかかるので・・
+	bool load_stall = false;
 	while(1) {
 		render_.sync_frame();
 
 		touch_.update();
 
-		synth_gui_.update();
+		synth_gui_.update(sdh_.get_mount());
 
 		{  // シンセサイザー・サービス
-			uint32_t n = 48'000 / 60;
+			uint32_t n = SYNTH_SAMPLE_RATE / 60;
 			int16_t tmp[n];
 			synth_unit_.GetSamples(n, tmp);
 
@@ -480,18 +532,44 @@ int main(int argc, char** argv)
 			service_note_();
 		}
 
-		if(sound_color_load_delay >= 0) {
-			sound_color_load_delay--;
-			if(sound_color_load_delay == 0) {
+		if(sdh_.get_mount()) {
+			if(!load_stall) {
 				if(!read_synth_color_(SOUND_COLOR_FILE)) {
 					utils::format("Synth sound color load fail: '%s'\n") % SOUND_COLOR_FILE;
 				}
+				load_stall = true;
+			}
+		} else {
+			load_stall = false;
+		}
+
+		{
+			uint32_t id;
+			auto fn = synth_gui_.get_file_name(id);
+			if(id != file_id_) {
+				auto state = mdf_.load(fn);
+				if(state == MD_MIDIFile::E_OK) {
+					midifile_ = true;
+				}
+				file_id_ = id;
 			}
 		}
 
 		sdh_.service();
 
 ///		command_();
+
+		if(midifile_) {
+		    if(!mdf_.isEOF()) {
+				if(mdf_.getNextEvent()) {
+       				// tickMetronome(mdf_.getTempo());
+   				}
+			} else {
+				mdf_.close();
+				midifile_ = false;
+			}
+		}
+		microsec_ += 16667;
 
 		++n;
 		if(n >= 30) {

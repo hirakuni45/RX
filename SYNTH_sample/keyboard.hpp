@@ -102,6 +102,9 @@ namespace synth {
         typedef std::array<key_t, 21> KEYS;
         KEYS        keys_;
 
+        bool        enable_;
+
+
         void draw_key_(const key_t& t)
         {
             auto r = t.rect_;
@@ -154,7 +157,8 @@ namespace synth {
                 key_t(vtx::srect(KEY_POS_X + (KEY_W_WIDTH * 10) + 20, KEY_POS_Y, KEY_B_WIDTH, KEY_B_HEIGHT), key::F2s),
                 key_t(vtx::srect(KEY_POS_X + (KEY_W_WIDTH * 11),      KEY_POS_Y, KEY_W_WIDTH, KEY_W_HEIGHT), key::G2),
                 key_t(vtx::srect(KEY_POS_X + (KEY_W_WIDTH * 11) + 20, KEY_POS_Y, KEY_B_WIDTH, KEY_B_HEIGHT), key::G2s),
-            }
+            },
+            enable_(true)
         { }
 
 
@@ -173,12 +177,33 @@ namespace synth {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief  表示許可
+            @param[in]    ena		不許可の場合「false」
+		*/
+		//-----------------------------------------------------------------//
+		void enable(bool ena = true) noexcept
+        {
+            if(!enable_ && ena) {
+                for(auto& t : keys_) {
+                    t.draw_ = true;
+                }
+            }
+            enable_ = ena;
+        }
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief  更新 @n
 					※毎フレーム呼ぶ
 		*/
 		//-----------------------------------------------------------------//
 		void update() noexcept
         {
+            if(!enable_) {
+                return;
+            }
+
             for(auto& t : keys_) {
                 t.back_ = t.level_;
                 t.level_ = false;
@@ -259,6 +284,13 @@ namespace synth {
         }
 
 
+		//-----------------------------------------------------------------//
+		/*!
+			@brief  キーボードの状態を返す
+            @param[in] key  キーコード
+            @return キーボードの状態
+		*/
+		//-----------------------------------------------------------------//
         const auto& get(key k) const noexcept { return keys_[static_cast<uint8_t>(k)]; }
     };
 }
