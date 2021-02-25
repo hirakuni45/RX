@@ -15,7 +15,6 @@
 
 namespace gui {
 
-
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	ファイラー・ベース・クラス
@@ -303,9 +302,11 @@ namespace gui {
 				dir_draw_func_(name, fi, dir, opt); }, true, &rdr_st_);
 
 			if((ntrg & ctrl_mask_(ctrl::MOUNT))) {  // SD カードのマウント状態
-				open_ = false;
 				pos_stack_.clear();
-				rdr_.clear(DEF_COLOR::Black);
+				if(open_) {
+					rdr_.clear(DEF_COLOR::Black);
+				}
+				open_ = false;
 			}
 			if((ctrl & ctrl_mask_(ctrl::MOUNT)) == 0) {
 				return status::NONE;
