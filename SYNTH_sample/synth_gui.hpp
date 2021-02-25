@@ -83,18 +83,27 @@ namespace synth {
 		uint32_t	file_id_;
 
 
-		void gui_enable_(bool ena)
+		void gui_enable_(bool mount, bool sc, bool ena)
 		{
-			// 音色が有効になったら、ボタンを有効にする。
-			if(ena && sc_name_org_[0] != 0) {
-				sc_idx_p_.set_state(WIDGET::STATE::ENABLE);
-				sc_idx_m_.set_state(WIDGET::STATE::ENABLE);
+			if(ena) {
+				if(mount) {
+					filer_run_.enable(ena);
+				} else {
+					filer_run_.set_state(WIDGET::STATE::STALL);
+				}
+				if(sc) {  // 音色が有効になったら、ボタンを有効にする。
+					sc_idx_m_.enable(ena);
+					sc_idx_p_.enable(ena);
+				} else {
+					sc_idx_m_.set_state(WIDGET::STATE::STALL);
+					sc_idx_p_.set_state(WIDGET::STATE::STALL);
+				}
 			} else {
 				sc_idx_m_.enable(ena);
 				sc_idx_p_.enable(ena);
+				filer_run_.enable(ena);
 			}
 
-			filer_run_.enable(ena);
 			sc_name_.enable(ena);
 			octave_m_.enable(ena);
 			octave_d_.enable(ena);
@@ -145,7 +154,6 @@ namespace synth {
 			};
 
 			sc_idx_m_.enable();
-			sc_idx_m_.set_state(WIDGET::STATE::STALL);
 			sc_idx_m_.at_select_func() = [this](uint32_t id) {
 				if(sc_idx_ > 0) {
 					sc_idx_--;
@@ -155,7 +163,6 @@ namespace synth {
 			sc_name_.enable();
 
 			sc_idx_p_.enable();
-			sc_idx_p_.set_state(WIDGET::STATE::STALL);
 			sc_idx_p_.at_select_func() = [this](uint32_t id) {
 				++sc_idx_;
 				if(sc_idx_ >= SC_NUM) {
@@ -212,12 +219,7 @@ namespace synth {
 
 			// ファイラーが有効なら、GUI を無効、ファイラーが無効なら GUI を有効にする。
 			auto fs = filer_.get_state();
-			gui_enable_(!fs);
-
-			// ファイラーが閉じた時に GUI を再描画
-			if(filer_state_ && !fs) {
-				widd_.redraw_all();
-			}
+			gui_enable_(mount, sc_name_org_[0] != 0, !fs);
 			filer_state_ = fs;
 
 			widd_.update();
@@ -232,6 +234,7 @@ namespace synth {
 //					utils::format("Play: '%s'\n") % path_;
 					++file_id_;
 				} else if(fst == FILER_BASE::status::CANCEL) {  // ファイル選択キャンセル
+
 				}
 			}
         }

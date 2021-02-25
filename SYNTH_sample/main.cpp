@@ -539,8 +539,6 @@ int main(int argc, char** argv)
 				}
 				load_stall = true;
 			}
-		} else {
-			load_stall = false;
 		}
 
 		{
