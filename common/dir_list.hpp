@@ -123,6 +123,7 @@ namespace utils {
 				// Read a directory item
 				if(f_readdir(&dir_, &fi) != FR_OK) {
 					init_ = false;
+					stop();
 					return false;
 				}
 				if(!fi.fname[0]) {
@@ -131,7 +132,7 @@ namespace utils {
 				}
 
 				if(func) {
-					std::strcpy(nmb_, fi.fname);
+					std::strncpy(nmb_, fi.fname, sizeof(nmb_));
 					if(fi.fattrib & AM_DIR) {
 						if(todir) {
 							func(nmb_, &fi, true, option);

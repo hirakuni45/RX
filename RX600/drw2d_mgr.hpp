@@ -166,7 +166,8 @@ namespace device {
 			pen_size_(16),
 			set_fore_color_(false), set_back_color_(false),
 			set_clip_(false), start_frame_enable_(false),
-			last_error_(D2_OK)
+			last_error_(D2_OK),
+			clut_{ 0 }
 		{ }
 
 
@@ -320,7 +321,6 @@ namespace device {
 		void set_fore_color(const COLOR& color) noexcept
 		{
 			fore_color_ = color;
-			clut_[1] = color.rgba8.rgba;
 			set_fore_color_ = false;
 		}
 
@@ -343,7 +343,6 @@ namespace device {
 		void set_back_color(const COLOR& color) noexcept
 		{
 			back_color_ = color;
-			clut_[0] = color.rgba8.rgba;
 			set_back_color_ = false;
 		}
 
@@ -772,16 +771,18 @@ namespace device {
 			int16_t w = ssz.x;
 			int16_t h = ssz.y;
 
-			// setup_();
+			auto c0 = clut_[0];
+			auto c1 = clut_[1];
 			clut_[0] = back_color_.rgba8.rgba;
 			auto copyflag = d2_bf_filter;
 			if(!back) {
 				clut_[0] &= 0xffffff;
 				copyflag |= d2_bf_usealpha;
 			}
-			// d2_setalphaex(d2_, 0, 0);
 			clut_[1] = fore_color_.rgba8.rgba;
-			d2_settexclut_part(d2_, clut_, 0, 2);
+			if(c0 != clut_[0] || c1 != clut_[1]) {
+				d2_settexclut_part(d2_, clut_, 0, 2);
+			}
 			d2_setblitsrc(d2_, src, w, w, h, d2_mode_i1 | d2_mode_clut);
 			d2_blitcopy(d2_, w, h,
 				0, 0, w * 16, h * 16, pos.x * 16, pos.y * 16, copyflag);
