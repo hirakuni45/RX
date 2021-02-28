@@ -136,7 +136,7 @@ namespace device {
 			auto xs = GLC::width;
 			auto ys = GLC::height;
 			d2_framebuffer(d2_, fb_, xs, xs, ys, get_mode_());
-			d2_cliprect(d2_, 0, 0, xs * 16, ys * 16);
+			d2_cliprect(d2_, 0, 0, xs, ys);
 //			d2_settexclut(d2_, clut_);
 		}
 
@@ -147,6 +147,19 @@ namespace device {
 				d2_endframe(d2_);
 				start_frame_enable_ = false;
 			}
+		}
+
+
+		void draw_bitmapn_(const vtx::spos& pos, const void* src, const vtx::spos& ssz, bool alpha, int16_t pitch, d2_u32 mode) noexcept
+		{
+			int16_t w = ssz.x;
+			int16_t h = ssz.y;
+			if(pitch == 0) pitch = w;
+			d2_setblitsrc(d2_, src, pitch, w, h, mode | d2_mode_clut);
+			auto copyflag = d2_bf_filter;
+			if(alpha) copyflag |= d2_bf_usealpha;
+			d2_blitcopy(d2_, w, h,
+				0, 0, w * 16, h * 16, pos.x * 16, pos.y * 16, copyflag);
 		}
 
 	public:
@@ -771,6 +784,11 @@ namespace device {
 			int16_t w = ssz.x;
 			int16_t h = ssz.y;
 
+			if(!set_clip_) {
+				d2_cliprect(d2_, clip_.org.x, clip_.org.y, clip_.size.x, clip_.size.y);
+				set_clip_ = true;
+			}
+
 			auto c0 = clut_[0];
 			auto c1 = clut_[1];
 			clut_[0] = back_color_.rgba8.rgba;
@@ -791,7 +809,7 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
-			@brief	clut のポインター取得（最大２５６個まで格納可能）
+			@brief	clut のポインター取得
 			@return clut ポインター
 		*/
 		//-----------------------------------------------------------------//
@@ -813,23 +831,55 @@ namespace device {
 
 		//-----------------------------------------------------------------//
 		/*!
+			@brief	2 bits indexed color イメージを描画する
+			@param[in]	pos		開始点を指定
+			@param[in]	src		indexed4 のポインター
+			@param[in]	ssz		ソースのサイズ
+			@param[in]	alpha	アルファチャネルを使った描画を行う場合「true」
+			@param[in]	pitch	ソースの横幅ピッチ（指定しないとソースの横幅と同じ）
+		*/
+		//-----------------------------------------------------------------//
+		void draw_indexed2(const vtx::spos& pos, const void* src, const vtx::spos& ssz, bool alpha, int16_t pitch = 0) noexcept
+		{
+			if(src == nullptr) return;
+
+			draw_bitmapn_(pos, src, ssz, pitch, d2_mode_i2);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	4 bits indexed color イメージを描画する
+			@param[in]	pos		開始点を指定
+			@param[in]	src		indexed4 のポインター
+			@param[in]	ssz		ソースのサイズ
+			@param[in]	alpha	アルファチャネルを使った描画を行う場合「true」
+			@param[in]	pitch	ソースの横幅ピッチ（指定しないとソースの横幅と同じ）
+		*/
+		//-----------------------------------------------------------------//
+		void draw_indexed4(const vtx::spos& pos, const void* src, const vtx::spos& ssz, bool alpha, int16_t pitch = 0) noexcept
+		{
+			if(src == nullptr) return;
+
+			draw_bitmapn_(pos, src, ssz, alpha, pitch, d2_mode_i4);
+		}
+
+
+		//-----------------------------------------------------------------//
+		/*!
 			@brief	8 bits indexed color イメージを描画する
 			@param[in]	pos		開始点を指定
 			@param[in]	src		indexed8 のポインター
 			@param[in]	ssz		ソースのサイズ
+			@param[in]	alpha	アルファチャネルを使った描画を行う場合「true」
 			@param[in]	pitch	ソースの横幅ピッチ（指定しないとソースの横幅と同じ）
 		*/
 		//-----------------------------------------------------------------//
-		void draw_indexed8(const vtx::spos& pos, const uint8_t* src, const vtx::spos& ssz, int16_t pitch = 0)
-		noexcept {
+		void draw_indexed8(const vtx::spos& pos, const void* src, const vtx::spos& ssz, bool alpha, int16_t pitch = 0) noexcept
+		{
 			if(src == nullptr) return;
 
-			int16_t w = ssz.x;
-			int16_t h = ssz.y;
-			if(pitch == 0) pitch = w;
-			d2_setblitsrc(d2_, src, pitch, w, h, d2_mode_i8 | d2_mode_clut);
-			d2_blitcopy(d2_, w, h,
-				0, 0, w * 16, h * 16, pos.x * 16, pos.y * 16, d2_bf_filter);
+			draw_bitmapn_(pos, src, ssz, alpha, pitch, d2_mode_i8);
 		}
 
 
