@@ -1032,5 +1032,8 @@ namespace graphics {
 				plot(vtx::spos(x + ofs_.x, y + ofs_.y), dc.rgb565);
 			}
 		}
+
+
+		void flush() { }
 	};
 }
