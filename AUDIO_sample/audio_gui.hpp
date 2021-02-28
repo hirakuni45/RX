@@ -90,6 +90,7 @@ namespace app {
 		typedef graphics::kfont<16, 16> KFONT;
 		typedef graphics::font<AFONT, KFONT> FONT;
 
+		// ハードウェアレンダラー
 //		typedef device::drw2d_mgr<GLCDC, FONT> RENDER;
 		// ソフトウェアーレンダラー
 		typedef graphics::render<GLCDC, FONT> RENDER;
@@ -209,6 +210,7 @@ namespace app {
 						utils::format("JPEG status: %d\n") % static_cast<int>(st);
 
 						scaling_.set_scale();
+						render_.flush();
 						img_in_.load("/NoImage.jpg");
 						render_.swap_color();
 						render_.draw_text(vtx::spos(LCD_X - LCD_Y, 0), "image decode error.");
@@ -216,12 +218,14 @@ namespace app {
 					} else {
 						auto n = std::max(ifo.width, ifo.height);
 						scaling_.set_scale(LCD_Y, n);
+						render_.flush();
 						img_in_.load(fin);
 					}
 					fin.seek(utils::file_io::SEEK::SET, pos);
 				}
 			} else {
 				scaling_.set_scale();
+				render_.flush();
 				img_in_.load("/NoImage.jpg");
 			}
 
@@ -564,8 +568,11 @@ namespace app {
 			if(peak_hold_r_ >= PEAK_HOLD_SUB) {
 				peak_hold_r_ -= PEAK_HOLD_SUB;
 			}
-			level_l_.set_update();
-			level_r_.set_update();
+
+			if(mount) {
+				level_l_.set_update();
+				level_r_.set_update();
+			}
 
 			ctrl_ = 0;
 			if(mount) {
