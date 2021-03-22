@@ -197,7 +197,7 @@ namespace device {
 	//-------------------------------------------------------------//
 	inline uint32_t get_mtu_master_clock() noexcept
 	{
-#if defined(SIG_RX66T)
+#if defined(SIG_RX66T) || defined(SIG_RX72T)
 		return F_PCLKC;
 #else
 		return F_PCLKA;
