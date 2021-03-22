@@ -3,11 +3,11 @@
 #   @file
 #   @brief  RX72T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	led_sample
+TARGET		=	sci_sample
 
 DEVICE		=	R5F572TK
 
@@ -19,9 +19,10 @@ VPATH		=	../../
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c
+				common/vect.c \
+				common/syscalls.c
 
-PSOURCES	=	FIRST_sample/main.cpp
+PSOURCES	=	SCI_sample/main.cpp
 
 USER_LIBS	=
 

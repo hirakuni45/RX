@@ -3,11 +3,11 @@
 #   @file
 #   @brief  RX72T Makefile
 #   @author 平松邦仁 (hira@rvf-rc45.net)
-#	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+#	@copyright	Copyright (C) 2021 Kunihito Hiramatsu @n
 #				Released under the MIT license @n
 #				https://github.com/hirakuni45/RX/blob/master/LICENSE
 #=======================================================================
-TARGET		=	led_sample
+TARGET		=	raytracer_sample
 
 DEVICE		=	R5F572TK
 
@@ -19,10 +19,13 @@ VPATH		=	../../
 ASOURCES	=	common/start.s
 
 CSOURCES	=	common/init.c \
-				common/vect.c
+				common/vect.c \
+				common/syscalls.c
 
-PSOURCES	=	FIRST_sample/main.cpp
-
+PSOURCES	=	RAYTRACER_sample/main.cpp \
+				graphics/font8x16.cpp \
+				graphics/color.cpp \
+				common/stdapi.cpp
 USER_LIBS	=
 
 LDSCRIPT	=	../../RX72T/$(DEVICE).ld
@@ -49,7 +52,7 @@ endif
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
 SYSTEM := WIN
-LOCAL_PATH  =   /rxlib
+LOCAL_PATH  =   /mingw64
 else
   UNAME := $(shell uname -s)
   ifeq ($(UNAME),Linux)
@@ -63,7 +66,7 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS     =   /rxlib/include $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../
 

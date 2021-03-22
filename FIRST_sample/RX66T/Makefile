@@ -21,7 +21,8 @@ ASOURCES	=	common/start.s
 CSOURCES	=	common/init.c \
 				common/vect.c
 
-PSOURCES	=	FIRST_sample/main.cpp
+PSOURCES	=	FIRST_sample/main.cpp \
+				FIRST_sample/arduino.cpp
 
 USER_LIBS	=
 

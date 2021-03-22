@@ -23,6 +23,7 @@ Renesas RX65N/RX72N Envision Kit 電卓サンプル
  - RX64M/Makefile
  - RX71M/Makefile
  - RX66T/Makefile
+ - RX72T/Makefile
  - RX65N/Makefile (LCD 対応)
  - RX72N/Makefile (LCD 対応)
    

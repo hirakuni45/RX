@@ -2,7 +2,7 @@
 /*! @file
     @brief  RX24T/RX64M/RX71M/RX65N/RX66T/RX72N RayTracer サンプル
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -148,7 +148,27 @@ namespace {
 
 	#define USE_GLCDC
 
+#elif defined(SIG_RX72T)
+	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX72T" };
+	static const uint16_t LCD_X = 320;
+	static const uint16_t LCD_Y = 240;
+	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
+	typedef device::PORT<device::PORT5, device::bitpos::B3> WR;
+	typedef device::PORT<device::PORT5, device::bitpos::B2> RS;
+	typedef device::PORT<device::PORT5, device::bitpos::B1> CS;
+	typedef device::PORT_BYTE<device::PORT4> DA;
+	typedef device::bus_rw8<CS, RS, RD, WR, DA> BUS;
+	typedef device::PORT<device::PORT5, device::bitpos::B0> RES;
+	typedef chip::R61505<BUS, RES> TFT;
+	TFT         tft_;
+
 #endif
+
+
+
 
 #ifndef USE_GLCDC
 	uint16_t line_[LCD_X];

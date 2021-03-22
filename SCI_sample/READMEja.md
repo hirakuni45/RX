@@ -1,4 +1,4 @@
-Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72N SCI (UART) サンプル
+Renesas RX24T, RX64M, RX71M, RX65N, RX66T, RX72T, RX72N SCI (UART) サンプル
 =========
 
 ## 概要
@@ -11,6 +11,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
  - RX71M/Makefile
  - RX65N/Makefile
  - RX66T/Makefile
+ - RX72T/Makefile
  - RX72N/Makefile
    
 ## ハードウェアーの準備（全般）
@@ -21,6 +22,7 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
  - RX71M: 240MHz (12MHz)
  - RX65N: 120MHz (12MHz)
  - RX66T: 160MHz (10MHz)
+ - RX72T: 192MHz (16MHz)
  - RX72N: 240MHz (16MHz)
  - インジケーター LED を指定のポートに接続する。
  -  USB シリアルとSCI ポートを接続する。
@@ -60,11 +62,17 @@ RX マイコンを使った SCI (UART) のサンプルプログラム
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 	static const char* system_str_ = { "RX72N" };
+#elif defined(SIG_RX72T)
+	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX72T" };
 #endif
 ```
 
  - 標準的には、RX24T, RX66T の場合「10MHz」、他 CPU は「12MHz」のクリスタル。
  - RX72N Envision kit は「16MHz」のクリスタル
+ - RX72T の場合は「16MHz」のクリスタル（USB を使う場合、192MHz、上限200MHz）
  - Envision kit RX65N の場合、インジケーター LED はボード上の青色を利用する。
  - Envision kit RX72N の場合、インジケーター LED はボード上の青色を利用する。
    
