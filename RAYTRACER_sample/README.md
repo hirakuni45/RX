@@ -22,6 +22,7 @@ Ray tracing rendering program using RX microcontroller
 - RX71M/Makefile
 - RX65N/Makefile
 - RX66T/Makefile
+- RX72T/Makefile
 - RX72N/Makefile
    
 ## Hardware preparation (general)
@@ -32,11 +33,12 @@ Ray tracing rendering program using RX microcontroller
 - RX71M: 240MHz (12MHz)
 - RX65N: 120MHz (12MHz)
 - RX66T: 160MHz (10MHz)
+- RX72T: 192MHz (16MHz)
 - RX72N: 240MHz (16MHz)
 - Connect the indicator LED to the specified port.
 - Connect the USB serial signal and the SCI1 (RX24T, RX66T, RX64M, RX71M) port of the setting.
 - RX65N Envision kit uses the attached LCD (480x272).
-- RX24T, RX66T are 8-bit connection (R61505W LCD Controller)
+- RX24T, RX66T, RX72T are 8-bit connection (R61505W LCD Controller)
 - RX64M, RX71M are 16-bit connection (R61505W LCD Controller)
 - Refer to "main.cpp" for the connection port with the R61505W LCD.
 - RX72N Envision kit uses the attached LCD (480x272).
@@ -73,6 +75,7 @@ Ray tracing rendering program using RX microcontroller
 |RX65N     |RXv2|120         |Frame Memory     |784         |
 |RX64M     |RXv2|120         |16 bits, port-bus|751         |
 |RX66T     |RXv3|160         |8 bits, port-bus |602         |
+|RX72T     |RXv3|192         |8 bits, port-bus |464         |
 |RX71M     |RXv2|240         |16 bits, port-bus|439         |
 |RX72N     |RXv3|240         |Frame Memory     |361         |
    

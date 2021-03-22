@@ -22,6 +22,7 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 - RX65N/Makefile
 - RX66T/Makefile
 - RX72N/Makefile
+- RX72T/Makefile
    
 ## ハードウェアーの準備（全般）
 - ベースクリスタルが異なる場合は、typedef のパラメーターを変更する。
@@ -31,11 +32,12 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 - RX71M: 240MHz (12MHz)
 - RX65N: 120MHz (12MHz)
 - RX66T: 160MHz (10MHz)
+- RX72T: 192MHz (16MHz)
 - RX72N: 240MHz (16MHz)
 - インジケーター LED を指定のポートに接続する。
 - USB シリアルの信号と設定の SCI1(RX24T, RX66T, RX64M, RX71M) ポートを接続する。
 - RX65N Envision kit は付属の LCD (480x272) を使う。
-- RX24T, RX66T は８ビット接続 (R61505W LCD Controller)
+- RX24T, RX66T, RX72T は８ビット接続 (R61505W LCD Controller)
 - RX64M, RX71M は１６ビット接続 (R61505W LCD Controller)
 - R61505W LCD との接続ポートは、「main.cpp」を参照
 - RX72N Envision kit は付属の LCD (480x272) を使う。
@@ -60,20 +62,21 @@ RX マイコンを使ったレイトレーシングのレンダリングプロ�
 - RX65N/RX72N Envision kit では、裏側の SW2 を押す事で、サンプリング数、解像度を変えてレンダリング
    
 ## 備考
-   
 - ポートバスによる、フォントの描画を LCD に送る処理は、かなり大きい。
 - オリジナルコードでは、ライン毎にレンダリング時間を LCD に表示しているが、コメントアウトしてある。
    
 ## レンダリング時間３２０ｘ２４０、サンプリング数：１
    
-|マイコン  |core|周波数 [MHz]|描画方式         |時間 [ms]   |
+|マイコン   |core|周波数 [MHz]|描画方式         |時間 [ms]   |
 |----------|----|------------|-----------------|------------|
 |RX24T     |RXv2|80          |8 bits, port-bus |1224        |
 |RX65N     |RXv2|120         |Frame Memory     |784         |
 |RX64M     |RXv2|120         |16 bits, port-bus|751         |
 |RX66T     |RXv3|160         |8 bits, port-bus |602         |
+|RX72T     |RXv3|192         |8 bits, port-bus |464         |
 |RX71M     |RXv2|240         |16 bits, port-bus|439         |
 |RX72N     |RXv3|240         |Frame Memory     |361         |
+
 ---
    
 License
