@@ -234,16 +234,19 @@ namespace device {
 			HCTL::P = 0;  // disable send driver
 
 			baud_ = baud;
-			uint32_t brr = SCI::PCLK / 16 / baud;
+			uint32_t brr = SCI::PCLK / 8 / baud;
 			uint8_t cks = 0;
-			while(brr > 256) {
+			while(brr > 1024) {
 				brr >>= 2;
 				++cks;
 			}
-			uint32_t rate = SCI::PCLK / 16 / brr / (1 << (cks * 2));
-			bool abcs = false;
+			uint32_t mtx = 8;
+			bool bgdm = true;
+			if(brr >= 512) { brr >>= 1; bgdm = false; mtx <<= 1; }
+			bool abcs = true;
+			if(brr >= 256) { brr >>= 1; abcs = false; mtx <<= 1;}
+			uint32_t rate = SCI::PCLK / mtx / brr / (1 << (cks * 2));
 			uint32_t mddr = (baud_ << 9) / rate;
-			if(mddr >= 256 && mddr < 512) abcs = true;
 			++mddr;
 			mddr >>= 1;
 
@@ -289,8 +292,8 @@ namespace device {
 			SCI::SMR = SCI::SMR.CKS.b(cks) | SCI::SMR.STOP.b(stop)
 					 | SCI::SMR.PM.b(pm) | SCI::SMR.PE.b(pe);
 			bool brme = false;
-			if(mddr >= 128) brme = true;
-			SCI::SEMR = SCI::SEMR.ABCS.b(abcs) | SCI::SEMR.BRME.b(brme);
+			if(mddr >= 128 && mddr < 256) brme = true;
+			SCI::SEMR = SCI::SEMR.ABCS.b(abcs) | SCI::SEMR.BRME.b(brme) | SCI::SEMR.BGDM.b(bgdm);
 			if(brr) --brr;
 			SCI::BRR = brr;
 			SCI::MDDR = mddr;
@@ -326,7 +329,10 @@ namespace device {
 			if(real) {
 				uint32_t brr = SCI::BRR();
 				uint32_t cks = 1 << (SCI::SMR.CKS() * 2);
-				auto baud = SCI::PCLK / 16 / cks / (brr + 1);
+				uint32_t mtx = 8;
+				if(!SCI::SEMR.BGDM()) mtx <<= 1;
+				if(!SCI::SEMR.ABCS()) mtx <<= 1;
+				auto baud = SCI::PCLK / mtx / cks / (brr + 1);
 				if(SCI::SEMR.BRME()) {
 					baud *= SCI::MDDR();
 					baud /= 256;
