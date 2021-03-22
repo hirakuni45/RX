@@ -4,7 +4,7 @@
 	@brief	RX600 グループ・USB 定義 @n
 			RX64M/RX71M/RX651/RX65N/RX72M/RX72N
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
