@@ -4,18 +4,25 @@
 			RX64M, RX71M: @n
 					12MHz のベースクロックを使用する @n
 			　　　　P07 ピンにLEDを接続する @n
+					SCI1 を使用する。@n
 			RX65N (Renesas Envision kit RX65N): @n
 					12MHz のベースクロックを使用する @n
 			　　　　P70 に接続された LED を利用する @n
+					SCI9 を使用する。@n
 			RX24T, RX66T: @n
 					10MHz のベースクロックを使用する @n
 			　　　　P00 ピンにLEDを接続する @n
+					SCI1 を使用する。@n
 			RX72N: (Renesas Envision kit RX72N) @n
 					16MHz のベースクロックを使用する @n
 					P40 ピンにLEDを接続する @n
-					SCI2 を使用する @n
+					SCI2 を使用する。 @n
+			RX72T: @n
+					16MHz のベースクロックを使用する @n
+					P01 ピンにLEDを接続する @n
+					SCI1 を使用する。
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2020,2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -43,17 +50,17 @@ namespace {
 
 #if defined(SIG_RX71M)
 	static const char* system_str_ = { "RX71M" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX65N)
 	static const char* system_str_ = { "RX65N" };
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 
@@ -64,12 +71,12 @@ namespace {
     SDC		sdc_;
 #elif defined(SIG_RX24T)
 	static const char* system_str_ = { "RX24T" };
-	typedef device::system_io<10000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX66T)
 	static const char* system_str_ = { "RX66T" };
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
+	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX72N)
@@ -83,6 +90,11 @@ namespace {
     // RX72N Envision Kit の SDHI ポートは、候補３で指定できる
     typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WP, device::port_map::option::THIRD> SDC;
     SDC		sdc_;
+#elif defined(SIG_RX72T)
+	static const char* system_str_ = { "RX72T" };
+	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::SCI1 SCI_CH;
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義

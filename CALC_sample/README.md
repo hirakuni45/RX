@@ -23,6 +23,7 @@ Renesas RX65N/RX72N Envision Kit Calculator Sample
  - RX64M/Makefile
  - RX71M/Makefile
  - RX66T/Makefile
+ - RX72T/Makefile
  - RX65N/Makefile (for LCD)
  - RX72N/Makefile (for LCD)
 
