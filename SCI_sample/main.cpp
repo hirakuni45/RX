@@ -69,6 +69,11 @@ namespace {
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 	static const char* system_str_ = { "RX72N" };
+#elif defined(SIG_RX72T)
+	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::SCI1 SCI_CH;
+	static const char* system_str_ = { "RX72T" };
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
@@ -80,10 +85,10 @@ namespace {
 	SCI		sci_;
 
 	typedef device::cmt_mgr<device::CMT0> CMT;
-	CMT			cmt_;
+	CMT		cmt_;
 
 	typedef utils::command<256> CMD;
-	CMD 		cmd_;
+	CMD 	cmd_;
 }
 
 
@@ -140,10 +145,11 @@ int main(int argc, char** argv)
 	LED::P = 0;
 
 	{
-		utils::format("SCI Baud rate (set):  %d\n") % sci_.get_baud_rate();
+		utils::format("SCI PCLK: %u\n") % SCI_CH::PCLK;
+		utils::format("SCI Baud rate (set):  %u\n") % sci_.get_baud_rate();
 		float rate = 1.0f - static_cast<float>(sci_.get_baud_rate()) / sci_.get_baud_rate(true);
 		rate *= 100.0f;
-		utils::format("SCI Baud rate (real): %d (%3.2f [%%])\n") % sci_.get_baud_rate(true) % rate;
+		utils::format("SCI Baud rate (real): %u (%3.2f [%%])\n") % sci_.get_baud_rate(true) % rate;
 		utils::format("CMT rate (set):  %d [Hz]\n") % cmt_.get_rate();
 		rate = 1.0f - static_cast<float>(cmt_.get_rate()) / cmt_.get_rate(true);
 		rate *= 100.0f;
