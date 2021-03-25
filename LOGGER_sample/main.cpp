@@ -31,7 +31,7 @@ namespace {
 	typedef utils::fixed_fifo<char, 512>  REB;
 	typedef utils::fixed_fifo<char, 1024> SEB;
 #if defined(SIG_RX65N)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 	typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;  ///< '0'でＯＮ
@@ -39,7 +39,7 @@ namespace {
 	// RX65N Envision Kit の SDHI ポートは、候補３で指定できる。
 	typedef fatfs::sdhi_io<device::SDHI, SDC_POWER, SDC_WPRT, device::port_map::option::THIRD> SDC;
 #elif defined(SIG_RX72N)
-	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
 	typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;  ///< '1'でＯＮ
