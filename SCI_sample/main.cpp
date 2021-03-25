@@ -40,44 +40,44 @@
 namespace {
 
 #if defined(SIG_RX71M)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
 	static const char* system_str_ = { "RX71M" };
-#elif defined(SIG_RX64M)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
+#elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
 #elif defined(SIG_RX65N)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX65N" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
-	static const char* system_str_ = { "RX65N" };
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX24T" };
+	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX24T" };
 #elif defined(SIG_RX66T)
+	static const char* system_str_ = { "RX66T" };
 	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX66T" };
 #elif defined(SIG_RX72N)
-	typedef device::system_io<16'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX72N" };
+	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::SCI2 SCI_CH;
-	static const char* system_str_ = { "RX72N" };
 #elif defined(SIG_RX72T)
+	static const char* system_str_ = { "RX72T" };
 	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX72T" };
 #endif
 
-	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
-	typedef utils::fixed_fifo<char, 256> TXB;  // TX (SEND) バッファの定義
+	typedef utils::fixed_fifo<char, 512> RXB;  // RX (受信) バッファの定義
+	typedef utils::fixed_fifo<char, 256> TXB;  // TX (送信) バッファの定義
 
 	typedef device::sci_io<SCI_CH, RXB, TXB> SCI;
 // SCI ポートの第二候補を選択する場合
@@ -132,7 +132,7 @@ int main(int argc, char** argv)
 	{  // SCI の開始
 		uint8_t intr = 2;        // 割り込みレベル（０を指定すると、ポーリング動作になる）
 		uint32_t baud = 115200;  // ボーレート（任意の整数値を指定可能）
-		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットが選択
+		sci_.start(baud, intr);  // 標準では、８ビット、１ストップビットを選択
 // 通信プロトコルを設定する場合は、通信プロトコルのタイプを指定する事が出来る。
 // sci_io.hpp PROTOCOL enum class のタイプを参照
 //		sci_.start(baud, intr, SCI::PROTOCOL::B8_E_1S);

@@ -50,7 +50,7 @@ endif
 # Include path for each environment
 ifeq ($(OS),Windows_NT)
 SYSTEM := WIN
-LOCAL_PATH  =   /rxlib
+LOCAL_PATH  =   /mingw64
 else
   UNAME := $(shell uname -s)
   ifeq ($(UNAME),Linux)
@@ -64,7 +64,7 @@ else
   endif
 endif
 
-INC_SYS     =   $(LOCAL_PATH)/include
+INC_SYS     =   /rxlib/include $(LOCAL_PATH)/include
 
 INC_APP		=	. ../ ../../
 
