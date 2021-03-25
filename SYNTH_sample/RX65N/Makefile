@@ -53,7 +53,10 @@ PSOURCES	=	$(ROOT)/main.cpp \
 				sound/synth/ringbuffer.cpp \
 				sound/synth/sawtooth.cpp \
 				sound/synth/sin.cpp \
-				sound/synth/synth_unit.cpp
+				sound/synth/synth_unit.cpp \
+				sound/smf/MD_MIDIFile.cpp \
+				sound/smf/MD_MIDITrack.cpp \
+				sound/smf/MD_MIDIHelper.cpp
 
 USER_LIBS	=	supc++ m drw2d
 
@@ -99,7 +102,7 @@ endif
 
 INC_SYS     =   ../../rxlib/include $(LOCAL_PATH)/include
 
-INC_APP		=	. ../ ../../ ../../RX600/drw2d/inc/tes
+INC_APP		=	. ../ ../../ ../../RX600/drw2d/inc/tes  ../../sound/smf
 
 LIB_ROOT	=	../../RX600/drw2d ../../rxlib/lib
 
