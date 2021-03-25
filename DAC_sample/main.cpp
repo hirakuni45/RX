@@ -32,35 +32,41 @@
 namespace {
 
 #if defined(SIG_RX71M)
-	typedef device::system_io<12000000> SYSTEM_IO;
-	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
-	typedef device::SCI1 SCI_CH;
-	typedef device::R12DA DAC;
 	static const char* system_str_ = { "RX71M" };
-#elif defined(SIG_RX64M)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::R12DA DAC;
+#elif defined(SIG_RX64M)
 	static const char* system_str_ = { "RX64M" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
+	typedef device::SCI1 SCI_CH;
+	typedef device::R12DA DAC;
 #elif defined(SIG_RX65N)
-	typedef device::system_io<12000000> SYSTEM_IO;
+	static const char* system_str_ = { "RX65N" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
 	typedef device::R12DA DAC;
-	static const char* system_str_ = { "RX65N" };
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10000000> SYSTEM_IO;
+	static const char* system_str_ = { "RX24T" };
+	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::DA DAC;
-	static const char* system_str_ = { "RX24T" };
 #elif defined(SIG_RX66T)
-	typedef device::system_io<10000000, 160000000> SYSTEM_IO;
+	static const char* system_str_ = { "RX66T" };
+	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
 	typedef device::R12DA DAC;
-	static const char* system_str_ = { "RX66T" };
+#elif defined(SIG_RX72T)
+	static const char* system_str_ = { "RX72T" };
+	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
+	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
+	typedef device::SCI1 SCI_CH;
+	typedef device::R12DA DAC;
 #endif
 
 	typedef utils::fixed_fifo<char, 512> RXB;  // RX (RECV) バッファの定義
