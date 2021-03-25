@@ -41,10 +41,10 @@ namespace {
 	CMT			cmt_;
 
 #if defined(SIG_RX64M)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX64M" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX64M" };
 
 	// SDCARD 制御リソース
 	typedef device::PORT<device::PORTC, device::bitpos::B3> MISO;
@@ -67,10 +67,10 @@ namespace {
 	#define USE_DAC
 
 #elif defined(SIG_RX71M)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX71M" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX71M" };
 
 	// マスターバッファはでサービスできる時間間隔を考えて余裕のあるサイズとする（8192）
 	// DMAC でループ転送できる最大数の２倍（1024）
@@ -81,10 +81,10 @@ namespace {
 
 #elif defined(SIG_RX65N)
 	/// RX65N Envision Kit
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX65N" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::SCI9 SCI_CH;
-	static const char* system_str_ = { "RX65N" };
 
     typedef device::PORT<device::PORT6, device::bitpos::B4, 0> SDC_POWER;	///< '0'でＯＮ
     typedef device::NULL_PORT SDC_WP;		///< 書き込み禁止は使わない
@@ -102,11 +102,11 @@ namespace {
 
 #elif defined(SIG_RX72N)
 	/// RX72N Envision Kit
-	typedef device::system_io<16'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX72N" };
+	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
 	typedef device::SCI2 SCI_CH;
-	static const char* system_str_ = { "RX72N" };
 
     typedef device::PORT<device::PORT4, device::bitpos::B2> SDC_POWER;	///< '1'でＯＮ
     typedef device::NULL_PORT SDC_WP;  ///< カード書き込み禁止ポート設定
