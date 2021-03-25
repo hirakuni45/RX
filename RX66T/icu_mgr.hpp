@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX66T グループ・割り込みマネージャー
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2018 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2018, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -80,6 +80,16 @@ namespace device {
 				ICU::IER.CMI1 = 0;
 				ICU::IPR.CMI1 = lvl;
 				ICU::IER.CMI1 = ena;
+				break;
+			case ICU::VECTOR::CMI2:
+				ICU::IER.CMI2 = 0;
+				ICU::IPR.CMI2 = lvl;
+				ICU::IER.CMI2 = ena;
+				break;
+			case ICU::VECTOR::CMI3:
+				ICU::IER.CMI3 = 0;
+				ICU::IPR.CMI3 = lvl;
+				ICU::IER.CMI3 = ena;
 				break;
 
 			case ICU::VECTOR::GROUPBE0:
