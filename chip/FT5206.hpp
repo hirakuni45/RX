@@ -82,7 +82,7 @@ namespace chip {
 		I2C&	i2c_;
 
 		enum class REG : uint8_t {
-			DEVICE_MODE,		// R/W
+			DEVICE_MODE = 0x00,	// R/W
 			GEST_ID,			// R
 			TD_STATUS,			// R
 			TOUCH_XH,			// R
@@ -139,14 +139,16 @@ namespace chip {
 			LOG_CUR_CHA					// R
 		};
 
+		static const uint32_t TOUCH_NUM = 4;
+
 		uint8_t		touch_id_;
 		uint8_t		touch_num_;
 		bool		start_;
 		bool		startup_;
 		uint16_t	version_;
 		uint8_t		chip_;
-		uint8_t		touch_tmp_[24];
-		touch_t		t_[4];
+		uint8_t		touch_tmp_[2 + 6 * TOUCH_NUM];
+		touch_t		t_[TOUCH_NUM];
 
 
 		void write_(REG reg, uint8_t data) noexcept
@@ -173,9 +175,15 @@ namespace chip {
 		void convert_touch_() noexcept
 		{
 			touch_id_  = touch_tmp_[0];  // GEST_ID
-			touch_num_ = touch_tmp_[1] & 0x0f;  // TD_STATUS
+			uint8_t n = touch_tmp_[1] & 0x0f;  // TD_STATUS
+			if(n > TOUCH_NUM) {  // 電源投入時に異常なタッチ数が来る場合は、無視する。
+				touch_num_ = 0;
+			} else {
+				startup_ = true;
+				touch_num_ = n;
+			}
 
-			for(uint32_t i = 0; i < 4; ++i) {
+			for(uint32_t i = 0; i < TOUCH_NUM; ++i) {
 				t_[i].before = t_[i].event;
 				t_[i].event = static_cast<EVENT>(touch_tmp_[2 + i * 6] >> 6);
 				t_[i].id = touch_tmp_[4 + i * 6] >> 4;
@@ -184,28 +192,6 @@ namespace chip {
 				t_[i].pos.y = (static_cast<int16_t>(touch_tmp_[4 + i * 6] & 0x0F) << 8)
 					| static_cast<int16_t>(touch_tmp_[5 + i * 6]);
 			}
-
-#if 0
-			t_[1].before = t_[1].event;
-			t_[1].event = static_cast<EVENT>(touch_tmp_[8] >> 6);
-			t_[1].id = touch_tmp_[10] >> 4;
-			t_[1].pos.x = (static_cast<int16_t>(touch_tmp_[8] & 0x0F) << 8)
-				| static_cast<int16_t>(touch_tmp_[9]);
-			t_[1].pos.y = (static_cast<int16_t>(touch_tmp_[10] & 0x0F) << 8)
-				| static_cast<int16_t>(touch_tmp_[11]);
-#endif
-			// イベントが不正なら、無効にする。
-//			if(t_[0].event == EVENT::NONE || t_[1].event == EVENT::NONE) {
-//				touch_num_ = 0;
-//			}
-#if 1
-			if(t_[0].event == EVENT::DOWN || t_[1].event == EVENT::DOWN || t_[2].event == EVENT::DOWN || t_[3].event == EVENT::DOWN) {
-				startup_ = true;
-			}
-			if(!startup_) {
-				touch_num_ = 0;
-			}
-#endif
 		}
 
 
@@ -244,6 +230,15 @@ namespace chip {
 		 */
 		//-----------------------------------------------------------------//
 		uint8_t get_chip() const noexcept { return chip_; }
+
+
+		//-----------------------------------------------------------------//
+		/*!
+			@brief	スタートアップを取得
+			@return スタートアップ
+		 */
+		//-----------------------------------------------------------------//
+		bool get_startup() const noexcept { return startup_; }
 
 
 		//-----------------------------------------------------------------//
@@ -314,7 +309,7 @@ namespace chip {
 			convert_touch_();
 			request_touch_();
 
-			for(uint8_t i = 0; i < 4; ++i) {
+			for(uint8_t i = 0; i < TOUCH_NUM; ++i) {
 				if(t_[i].event == EVENT::DOWN) {
 					t_[i].org = t_[i].pos;
 				} else if(t_[i].event == EVENT::UP) {
@@ -336,7 +331,7 @@ namespace chip {
 		//-----------------------------------------------------------------//
 		/*!
 			@brief	タッチ位置を取得
-			@param[in]	idx	タッチ・インデックス（０～１）
+			@param[in]	idx	タッチ・インデックス（０～３）
 			@return タッチ位置
 		 */
 		//-----------------------------------------------------------------//
