@@ -3,7 +3,7 @@
 /*!	@file
 	@brief	RX64M/RX71M/RX65x/RX66T グループ・R12DA 定義
     @author 平松邦仁 (hira@rvf-rc45.net)
-	@copyright	Copyright (C) 2017, 2020 Kunihito Hiramatsu @n
+	@copyright	Copyright (C) 2017, 2021 Kunihito Hiramatsu @n
 				Released under the MIT license @n
 				https://github.com/hirakuni45/RX/blob/master/LICENSE
 */
@@ -113,8 +113,7 @@ namespace device {
 	template <peripheral per> typename r12da_t<per>::DADPR_ r12da_t<per>::DADPR;
 	template <peripheral per> typename r12da_t<per>::DAADSCR_ r12da_t<per>::DAADSCR;
 
-
-#if defined(SIG_RX64M) || defined(SIG_RX65N) || defined(SIG_RX71M) || defined(SIG_RX72T) || defined(SIG_RX72M) || defined(SIG_RX72N) 
+#if defined(SIG_RX64M) || defined(SIG_RX65N) || defined(SIG_RX71M) || defined(SIG_RX72M) || defined(SIG_RX72N) 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
 		@brief	12 ビット D/A コンバータ（R12DA）
@@ -191,10 +190,12 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 			switch(an) {
 			case analog::DA0:
+				PORT0::PMR.B3 = 0;
 				MPC::P03PFS.ASEL = f;
 				PORT0::PMR.B3 = 1;
 				break;
 			case analog::DA1:
+				PORT0::PMR.B5 = 0;
 				MPC::P05PFS.ASEL = f;
 				PORT0::PMR.B5 = 1;
 				break;
@@ -210,10 +211,10 @@ namespace device {
 	template <peripheral per> typename r12da_a_t<per>::DAADUSR_ r12da_a_t<per>::DAADUSR;
 
 
-#elif defined(SIG_RX66T)
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 	/*!
-		@brief	12 ビット D/A コンバータ（R12DA）
+		@brief	12 ビット D/A コンバータ（R12DAb）
 		@param[in]	per		ペリフェラル型
 	*/
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
@@ -221,7 +222,6 @@ namespace device {
 	struct r12da_b_t : public r12da_t<per> {
 
 		typedef r12da_t<per> base_type;
-
 
 		//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 		/*!
@@ -269,10 +269,12 @@ namespace device {
 			MPC::PWPR.PFSWE = 1;	// PxxPFS 書き込み許可
 			switch(an) {
 			case analog::DA0:
+				PORT6::PMR.B4 = 0;
 				MPC::P64PFS.ASEL = 1;
 				PORT6::PMR.B4 = 1;
 				break;
 			case analog::DA1:
+				PORT6::PMR.B5 = 0;
 				MPC::P65PFS.ASEL = 1;
 				PORT6::PMR.B5 = 1;
 				break;

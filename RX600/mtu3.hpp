@@ -4833,7 +4833,7 @@ namespace device {
 	typedef mtu6_t<peripheral::MTU6, ICU::VECTOR_SELA> MTU6;
 	typedef mtu7_t<peripheral::MTU7, ICU::VECTOR_SELA> MTU7;
 	typedef mtu8_t<peripheral::MTU8, ICU::VECTOR_SELA> MTU8;
-#elif defined(SIG_RX66T)
+#elif defined(SIG_RX66T) || defined(SIG_RX72T)
 	typedef mtu0_t<peripheral::MTU0, ICU::VECTOR_SELA> MTU0;
 	typedef mtu1_t<peripheral::MTU1, ICU::VECTOR_SELA> MTU1;
 	typedef mtu2_t<peripheral::MTU2, ICU::VECTOR_SELA> MTU2;
