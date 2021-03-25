@@ -1,4 +1,4 @@
-Renesas RX64M, RX71M, RX66T, RX72N CAN 通信サンプル
+Renesas RX64M, RX71M, RX66T, RX72T, RX72N CAN 通信サンプル
 =========
    
 [English](README.md)
@@ -16,6 +16,7 @@ CAN が複数チャネルある場合、チャネルを切り替えて通信す�
 - RX64M/Makefile
 - RX71M/Makefile
 - RX66T/Makefile
+- RX72T/Makefile
 - RX72N/Makefile
 - README.md
 - READMEja.md
@@ -27,6 +28,7 @@ CAN が複数チャネルある場合、チャネルを切り替えて通信す�
 - RX64M: 120MHz (12MHz)
 - RX71M: 240MHz (12MHz)
 - RX66T: 160MHz (10MHz)
+- RX72T: 192MHz (16MHz)
 - RX72N: 240MHz (16MHz) for 'RX72N Envision Kit'
 - LED を指定のポートに接続する。
 - RX72N Envision kit の場合は、ボード上の青色 LED を利用する。
@@ -43,6 +45,7 @@ CAN バス・トランシーバーを接続するポートは、以下のソー�
 |RX64M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX71M  |[RX600/port_map.hpp](../RX600/port_map.hpp)|FIRST|FIRST|
 |RX66T  |[RX66T/port_map.hpp](../RX66T/port_map.hpp)|FIRST|X|
+|RX72T  |[RX72T/port_map.hpp](../RX72T/port_map.hpp)|FIRST|X|
 |RX72N  |[RX72N/port_map.hpp](../RX72N/port_map.hpp)|X|SECOND|
    
 RX64M の場合 (port_map.hpp FIRST 候補)
@@ -78,7 +81,7 @@ RX64M の場合 (port_map.hpp FIRST 候補)
 
 - 複数チャネル対応
    
-### RX66T の場合
+### RX66T、RX72T の場合
 
 - シングルチャネル
 
