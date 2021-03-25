@@ -34,7 +34,7 @@ namespace {
 
 #if defined(SIG_RX72N)
 	/// for RX72N Envision Kit
-	typedef device::system_io<16'000'000> SYSTEM_IO;
+	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
 	typedef device::SCI2 SCI_CH;
