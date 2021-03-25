@@ -37,10 +37,10 @@ namespace {
 	FONT		font_(afont_, kfont_);
 
 #if defined(SIG_RX71M)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX71M" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX71M" };
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 
@@ -56,10 +56,10 @@ namespace {
 	TFT         tft_;
 
 #elif defined(SIG_RX64M)
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX64M" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX64M" };
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 
@@ -76,11 +76,11 @@ namespace {
 
 #elif defined(SIG_RX65N)
 	/// for RX65N Envision Kit
-	typedef device::system_io<12'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX65N" };
+	typedef device::system_io<12'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT7, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B5> SW2;
 	typedef device::SCI9 SCI_CH;
-	static const char* system_str_ = { "RX65N" };
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
 	/// フレームバッファ開始アドレスは null_ptr の関係で０から開始出来ない
@@ -96,10 +96,10 @@ namespace {
 	#define USE_GLCDC
 
 #elif defined(SIG_RX24T)
-	typedef device::system_io<10'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX24T" };
+	typedef device::system_io<10'000'000, 80'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX24T" };
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
@@ -113,10 +113,10 @@ namespace {
 	TFT         tft_;
 
 #elif defined(SIG_RX66T)
+	static const char* system_str_ = { "RX66T" };
 	typedef device::system_io<10'000'000, 160'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B0> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX66T" };
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
@@ -131,11 +131,11 @@ namespace {
 
 #elif defined(SIG_RX72N)
 	/// for RX72N Envision Kit
-	typedef device::system_io<16'000'000> SYSTEM_IO;
+	static const char* system_str_ = { "RX72N" };
+	typedef device::system_io<16'000'000, 240'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT4, device::bitpos::B0> LED;
 	typedef device::PORT<device::PORT0, device::bitpos::B7> SW2;
 	typedef device::SCI2 SCI_CH;
-	static const char* system_str_ = { "RX72N" };
 	static const uint16_t LCD_X = 480;
 	static const uint16_t LCD_Y = 272;
 	uint16_t*	fb_ = reinterpret_cast<uint16_t*>(0x0080'0000);
@@ -149,10 +149,10 @@ namespace {
 	#define USE_GLCDC
 
 #elif defined(SIG_RX72T)
+	static const char* system_str_ = { "RX72T" };
 	typedef device::system_io<16'000'000, 192'000'000> SYSTEM_IO;
 	typedef device::PORT<device::PORT0, device::bitpos::B1> LED;
 	typedef device::SCI1 SCI_CH;
-	static const char* system_str_ = { "RX72T" };
 	static const uint16_t LCD_X = 320;
 	static const uint16_t LCD_Y = 240;
 	typedef device::PORT<device::PORT5, device::bitpos::B4> RD;
